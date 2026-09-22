@@ -2,9 +2,9 @@
 <templates>
     <t t-name="spreadsheet_edition.SidePanelDomain">
         <Section class="'o-section'" title.translate="Domain">
-            <DomainSelector resModel="props.resModel" domain="getStringifiedDomain()"/>
-            <div class="btn btn-link o_edit_domain" t-on-click="openDomainEdition">
-                <i class="oi oi-arrow-right me-1"/>Edit domain
+            <DomainSelector resModel="this.props.resModel" domain="this.getStringifiedDomain()"/>
+            <div class="btn btn-link o_edit_domain" t-on-click="this.openDomainEdition">
+                <i class="oi me-1" data-icon="east"/>Edit domain
             </div>
         </Section>
     </t>

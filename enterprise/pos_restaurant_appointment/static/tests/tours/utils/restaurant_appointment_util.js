@@ -49,10 +49,3 @@ export function checkAppointmentLabelNotPresent(table_num, appointment_name) {
         },
     ];
 }
-
-export function isKanbanViewShown() {
-    return {
-        content: "Check that the booking kanban view is shown",
-        trigger: ".pos-content .o_action_manager .o_kanban_view",
-    };
-}

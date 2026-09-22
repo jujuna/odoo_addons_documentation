@@ -25,6 +25,9 @@
                                 placeholder="Example: Gift for customer" required="True" />
                         </group>
                     </group>
+                    <div class="text-muted o_row ps-1" invisible="not valid_until or valid_until &gt;= context_today().strftime('%Y-%m-%d')">
+                        <i class="oi pe-2" data-icon="warning" title="Warning"/>Please select a future date.
+                    </div>
                 </sheet>
                 <footer>
                     <button name="generate_giftcard" type="object" class="btn-primary"
@@ -33,7 +36,7 @@
                             Generate &amp; Send Gift Card
                         </span>
                     </button>
-                    <button special="cancel" data-hotkey="x" string="Discard" />
+                    <button special="cancel" data-hotkey="x"/>
                 </footer>
             </form>
         </field>

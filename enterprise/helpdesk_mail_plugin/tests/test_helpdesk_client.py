@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import json
-
 from odoo.addons.mail_plugin.tests.common import TestMailPluginControllerCommon, mock_auth_method_outlook
+from odoo.tests import tagged
+
 from odoo.addons.mail.tests.common import MailCase
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHelpdeskClient(TestMailPluginControllerCommon, MailCase):
     @mock_auth_method_outlook('employee')
     def test_ticket_creation_notification(self):
@@ -48,7 +48,9 @@ class TestHelpdeskClient(TestMailPluginControllerCommon, MailCase):
                 'email_body': email_body,
                 'email_subject': email_subject,
                 'partner_id': customer.id,
-            }).get('ticket_id')
+                'partner_email': customer.email,
+                'partner_name': customer.name,
+            }).get('id')
             self.env['mail.mail'].process_email_queue()
 
         self.assertTrue(bool(ticket_id))

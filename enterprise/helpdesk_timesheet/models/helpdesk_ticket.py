@@ -1,11 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
+from odoo.fields import Domain
 
 
 class HelpdeskTicket(models.Model):
     _name = 'helpdesk.ticket'
-    _inherit = ['helpdesk.ticket', 'timer.parent.mixin']
+    _inherit = 'helpdesk.ticket'
 
     def _default_team_id(self):
         if project_id := self.env.context.get('default_project_id'):
@@ -21,9 +22,7 @@ class HelpdeskTicket(models.Model):
         help="Time spent on this ticket. By default, your timesheets will be linked to the sales order item of your ticket.\n"
              "Remove the sales order item to make your timesheet entries non billable.")
     use_helpdesk_timesheet = fields.Boolean('Timesheet activated on Team', related='team_id.use_helpdesk_timesheet', readonly=True)
-    display_timesheet_timer = fields.Boolean("Display Timesheet Time", compute='_compute_display_timesheet_timer')
-    timesheet_unit_amount = fields.Float(compute='_compute_timesheet_unit_amount')
-    total_hours_spent = fields.Float("Time Spent", compute='_compute_total_hours_spent', default=0, compute_sudo=True, store=True, aggregator="avg")
+    total_hours_spent = fields.Float("Time Spent", compute='_compute_total_hours_spent', default=0, compute_sudo=True, store=True)
     encode_uom_in_days = fields.Boolean(compute='_compute_encode_uom_in_days', export_string_translation=False)
     analytic_account_id = fields.Many2one('account.analytic.account',
         compute='_compute_analytic_account_id', store=True, readonly=False,
@@ -31,33 +30,6 @@ class HelpdeskTicket(models.Model):
 
     def _compute_encode_uom_in_days(self):
         self.encode_uom_in_days = self.env.company.timesheet_encode_uom_id == self.env.ref('uom.product_uom_day')
-
-    @api.depends('use_helpdesk_timesheet', 'timesheet_ids', 'encode_uom_in_days')
-    def _compute_display_timesheet_timer(self):
-        for ticket in self:
-            ticket.display_timesheet_timer = ticket.use_helpdesk_timesheet and not ticket.encode_uom_in_days
-
-    @api.depends('user_timer_id')
-    def _compute_timesheet_unit_amount(self):
-        if not any(self._ids):
-            for ticket in self:
-                unit_amount = 0.0
-                if ticket.user_timer_id:
-                    unit_amount = ticket.filtered(lambda t: (t.id or t.origin.id) == ticket.user_timer_id.id).unit_amount or 0.0
-                ticket.timesheet_unit_amount = unit_amount
-            return
-        timesheet_id_per_timer_id = {ticket.user_timer_id.id: ticket.user_timer_id.res_id for ticket in self}
-        timesheet_read = self.env['account.analytic.line'].search_read(
-            [('id', 'in', list(timesheet_id_per_timer_id.values()))],
-            ['unit_amount'],
-        )
-        unit_amount_per_timesheet_id = {res['id']: res['unit_amount'] for res in timesheet_read}
-        for ticket in self:
-            timesheet_id = ticket.user_timer_id.id or timesheet_id_per_timer_id.get(ticket.user_timer_id.id, False)
-            if timesheet_id:
-                ticket.timesheet_unit_amount = unit_amount_per_timesheet_id.get(timesheet_id, 0.0)
-            else:
-                ticket.timesheet_unit_amount = 0.0
 
     @api.depends('timesheet_ids.unit_amount')
     def _compute_total_hours_spent(self):
@@ -119,17 +91,6 @@ class HelpdeskTicket(models.Model):
     def write(self, vals):
         res = super().write(vals)
         if vals.get('team_id'):
-            if not self.team_id.use_helpdesk_timesheet:
-                timers = self.env['timer.timer'].search([
-                    ('parent_res_model', '=', 'helpdesk.ticket'),
-                    ('parent_res_id', 'in', self.ids),
-                    ('res_model', '=', 'account.analytic.line'),
-                ])
-                if timers:
-                    timesheets = self.env['account.analytic.line'].browse(timers.mapped('res_id')).sudo()
-                    timers.unlink()
-                    if timesheets_to_remove := timesheets.filtered(lambda t: t.unit_amount == 0):
-                        timesheets_to_remove.unlink()
             timesheet_read_group = self.env['account.analytic.line']._read_group(
                 [('project_id', '!=', False), ('helpdesk_ticket_id', 'in', self.ids), ('validated', '=', False)],
                 ['helpdesk_ticket_id'],
@@ -143,42 +104,51 @@ class HelpdeskTicket(models.Model):
                     timesheets.helpdesk_ticket_id = False
         return res
 
-    def action_timer_start(self):
-        if self.display_timesheet_timer:
-            super().action_timer_start()
+    @api.model
+    def name_search(self, name='', domain=None, operator='ilike', limit=100):
+        if name or not self.env.context.get('timesheet_timer_search') or not (employee := self.env.user.employee_id):
+            return super().name_search(name=name, domain=domain, operator=operator, limit=limit)
 
-    def action_timer_stop(self):
-        # timer was either running or paused
-        if self.display_timesheet_timer and self.user_timer_id:
-            timesheet = self._get_record_with_timer_running()
-            if timesheet:
-                return {
-                    "name": _("Confirm Time Spent"),
-                    "type": "ir.actions.act_window",
-                    "res_model": 'hr.timesheet.stop.timer.confirmation.wizard',
-                    'context': {
-                        'default_timesheet_id': timesheet.id,
-                        'dialog_size': 'medium',
-                    },
-                    "views": [[self.env.ref('timesheet_grid.hr_timesheet_stop_timer_confirmation_wizard_view_form').id, "form"]],
-                    "target": 'new',
+        timesheet_domain = [
+            ('employee_id', '=', employee.id),
+            ('project_id', '!=', False),
+            ('project_id.allow_timesheets', '=', True),
+            ('helpdesk_ticket_id', '!=', False),
+        ]
+        ticket_domain = Domain.AND([
+            domain or [],
+            [('active', '=', True)],
+        ])
+        if ticket_domain:
+            timesheet_domain.append(('helpdesk_ticket_id', 'any', ticket_domain))
+        recent_tickets = self.env['account.analytic.line']._get_recently_used_records(
+            'helpdesk_ticket_id',
+            domain=timesheet_domain,
+        )
+        if not recent_tickets:
+            return super().name_search(name=name, domain=domain, operator=operator, limit=limit)
+
+        if len(recent_tickets) >= limit:
+            return recent_tickets
+
+        recent_ticket_ids = [ticket_id for ticket_id, _display_name in recent_tickets]
+        remaining_tickets = super().name_search(
+            name=name,
+            domain=Domain.AND([domain or [], [('id', 'not in', recent_ticket_ids)]]),
+            operator=operator,
+            limit=limit - len(recent_tickets)
+        )
+        return recent_tickets + remaining_tickets
+
+    def action_print_timesheets(self):
+        if not self.timesheet_ids:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'message': self.env._('There are no timesheets to print for this ticket'),
+                    'type': 'warning',
+                    'sticky': False,
                 }
-            else:
-                return super().action_timer_stop()
-        return False
-
-    def _create_record_to_start_timer(self):
-        """ Create a timesheet to launch a timer """
-        return self.env['account.analytic.line'].create({
-            'helpdesk_ticket_id': self.id,
-            'project_id': self.project_id.id,
-            'date': fields.Date.context_today(self),
-            'name': '/',
-            'user_id': self.env.uid,
-        })
-
-    def _action_interrupt_user_timers(self):
-        """ Call action interrupt user timers to launch a new one
-            Stop the existing runnning timer before launching a new one.
-        """
-        self.action_timer_stop()
+            }
+        return self.env.ref('helpdesk_timesheet.timesheet_report_ticket').report_action(self)

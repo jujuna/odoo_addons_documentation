@@ -2,16 +2,10 @@ import { registry } from "@web/core/registry";
 import * as tourUtils from "@website_sale/js/tours/tour_utils";
 
 registry.category("web_tour.tours").add("test_checkout_id_nit", {
-    url: "/shop",
     steps: () => [
         ...tourUtils.addToCart({ productName: "Test Product", expectUnloadPage: true }),
         tourUtils.goToCart({ quantity: 1 }),
-        {
-            content: "Go to checkout",
-            trigger: "a[name='website_sale_main_button']",
-            run: "click",
-            expectUnloadPage: true,
-        },
+        tourUtils.goToCheckout(),
         {
             trigger: "select[name=country_id]",
             run: "selectByLabel Colombia",
@@ -37,7 +31,7 @@ registry.category("web_tour.tours").add("test_checkout_id_nit", {
             run: "edit 10000",
         },
         {
-            trigger: "input[name=company_name]",
+            trigger: "input[name=parent_name]",
             run: "edit Test Name",
         },
         {
@@ -45,16 +39,12 @@ registry.category("web_tour.tours").add("test_checkout_id_nit", {
             run: "edit 213123432-1",
         },
         {
-            trigger: "select[name=state_id]",
-            run: "selectByIndex 1",
+            trigger: "select[name=state_id]:has(option:contains(Amazonas))",
+            run: "selectByLabel Amazonas",
         },
         {
-            trigger: "select[name=city_id]",
-            run: "selectByIndex 1",
-        },
-        {
-            trigger: "select[name=l10n_latam_identification_type_id]",
-            run: "selectByIndex 1",
+            trigger: "select[name=city_id]:has(option:contains(el encanto))",
+            run: "selectByLabel El encanto",
         },
         {
             trigger: "select[name=l10n_co_edi_obligation_type_ids]:not(:visible)",
@@ -73,7 +63,6 @@ registry.category("web_tour.tours").add("test_checkout_id_nit", {
 });
 
 registry.category("web_tour.tours").add("test_checkout_other_id", {
-    url: "/shop",
     steps: () => [
         ...tourUtils.addToCart({ productName: "Test Product", expectUnloadPage: true }),
         tourUtils.goToCart({ quantity: 1 }),
@@ -108,24 +97,16 @@ registry.category("web_tour.tours").add("test_checkout_other_id", {
             run: "edit 10000",
         },
         {
-            trigger: "input[name=company_name]",
+            trigger: "input[name=parent_name]",
             run: "edit Test Name",
         },
         {
-            trigger: "input[name=vat]",
-            run: "edit 213123432-1",
+            trigger: "select[name=state_id]:has(option:contains(Amazonas))",
+            run: "selectByLabel Amazonas",
         },
         {
-            trigger: "select[name=state_id]",
-            run: "selectByIndex 1",
-        },
-        {
-            trigger: "select[name=city_id]",
-            run: "selectByIndex 1",
-        },
-        {
-            trigger: "select[name=l10n_latam_identification_type_id]",
-            run: "selectByLabel Registro Civil",
+            trigger: "select[name=city_id]:has(option:contains(el encanto))",
+            run: "selectByLabel El encanto",
         },
         {
             content: "Validate address",

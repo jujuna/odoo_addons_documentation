@@ -10,6 +10,8 @@ from odoo.addons.account_transfer.tests.account_transfer_test_classes import Acc
 @tagged('post_install', '-at_install')
 class MoveModelLineTestCase(AccountAutoTransferTestCase):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

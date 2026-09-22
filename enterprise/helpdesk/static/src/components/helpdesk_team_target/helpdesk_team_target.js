@@ -3,31 +3,26 @@ import { localization } from "@web/core/l10n/localization";
 import { escapeRegExp } from "@web/core/utils/strings";
 import { useAutofocus, useService } from "@web/core/utils/hooks";
 import { formatFloat, formatPercentage } from "@web/views/fields/formatters";
-import { Component, useRef, useState } from "@odoo/owl";
+import { Component, useProps, proxy, signal, t } from "@odoo/owl";
 
 export class HelpdeskTeamTarget extends Component {
     static template = "helpdesk.HelpdeskTeamTarget";
-    static props = {
-        showDemo: { type: Boolean, optional: true },
-        demoClass: { type: String, optional: true },
-        update: Function,
-        percentage: { type: Boolean, optional: true },
-        rating: { type: Boolean, optional: true },
-        value: Number,
-        hotkey: { type: String, optional: true },
-    };
-    static defaultProps = {
-        showDemo: false,
-        demoClass: "",
-        percentage: false,
-        rating: false,
-    };
+    props = useProps({
+        showDemo: t.boolean().optional(false),
+        demoClass: t.string().optional(""),
+        update: t.function(),
+        percentage: t.boolean().optional(false),
+        rating: t.boolean().optional(false),
+        value: t.number(),
+        hotkey: t.string().optional(),
+    });
+
+    inputRef = signal.ref();
 
     setup() {
-        useAutofocus({ refName: 'inputRef', selectAll: true });
-        this.inputRef = useRef("inputRef");
+        useAutofocus({ ref: this.inputRef, selectAll: true });
         this.notification = useService("notification");
-        this.state = useState({
+        this.state = proxy({
             isFocused: false,
             value: this.props.value,
         });
@@ -65,8 +60,8 @@ export class HelpdeskTeamTarget extends Component {
      * @param {KeyboardEvent} ev
      */
     _onInputKeydown(ev) {
-        if (ev.key === 'Enter') {
-            this.inputRef.el.blur();
+        if (ev.key === "Enter") {
+            this.inputRef()?.blur();
         }
     }
 
@@ -74,7 +69,7 @@ export class HelpdeskTeamTarget extends Component {
      * @private
      */
     async _onValueChange() {
-        let inputValue = this.inputRef.el.value;
+        let inputValue = this.inputRef().value;
         // a number can have the thousand separator multiple times. ex: 1,000,000.00
         inputValue = inputValue.replaceAll(
             new RegExp(escapeRegExp(localization.thousandsSep || ""), "g") || ",",

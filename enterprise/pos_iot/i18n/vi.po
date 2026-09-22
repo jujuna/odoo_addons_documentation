@@ -7,24 +7,40 @@
 # Thi Huong Nguyen, 2023
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Thi Huong Nguyen (thng)" <thng@odoo.com>, 2025.
+# "Thi Huong Nguyen (thng)" <thng@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-12-06 09:54+0000\n"
-"Last-Translator: \"Thi Huong Nguyen (thng)\" <thng@odoo.com>\n"
-"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 00:10+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-master/"
 "pos_iot/vi/>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: pos_iot
+#: model:ir.module.module,description:base.module_pos_iot
+msgid ""
+"\n"
+"Allows to use in the Point of Sale the devices that are connected to an IoT "
+"Box.\n"
+"Supported devices include payment terminals, receipt printers, scales and "
+"customer displays.\n"
+msgstr ""
+
+#. module: pos_iot
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/iot_test_dialog/iot_test_dialog.xml:0
+msgid ", internet speed is"
+msgstr ""
 
 #. module: pos_iot
 #: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
@@ -33,19 +49,8 @@ msgstr "Chấp nhận thanh toán với thiết bị thanh toán SIX"
 
 #. module: pos_iot
 #: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
-msgid "Accept payments with a Worldline payment terminal"
-msgstr "Chấp nhận thanh toán với thiết bị thanh toán Worldline"
-
-#. module: pos_iot
-#: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
-msgid "Accept payments with an Ingenico payment terminal"
-msgstr "Chấp nhận thanh toán với thiết bị thanh toán Ingenico"
-
-#. module: pos_iot
-#. odoo-javascript
-#: code:addons/pos_iot/static/src/app/components/popups/iot_box_disconnected_dialog/iot_box_disconnected_dialog.xml:0
-msgid "Access your"
-msgstr "Truy cập"
+msgid "Accept payments with a Worldline/Ingenico payment terminal"
+msgstr ""
 
 #. module: pos_iot
 #: model:ir.model.fields,field_description:pos_iot.field_auto_config_pos_iot__pos_config_ids
@@ -65,35 +70,21 @@ msgid "Barcode Scanners/Card Readers"
 msgstr "Máy quét mã vạch/Máy đọc thẻ"
 
 #. module: pos_iot
-#: model:ir.model.fields,help:pos_iot.field_pos_config__iface_print_via_proxy
-msgid "Bypass browser printing and prints via the hardware proxy."
-msgstr "Bỏ qua việc in trên trình duyệt và in thông qua proxy phần cứng."
-
-#. module: pos_iot
-#: model_terms:ir.ui.view,arch_db:pos_iot.pos_iot_config_view_form
-#: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
-msgid "Cashdrawer"
-msgstr "Ngăn két"
-
-#. module: pos_iot
 #. odoo-javascript
-#: code:addons/pos_iot/static/src/app/components/popups/iot_box_disconnected_dialog/iot_box_disconnected_dialog.xml:0
-msgid "Click on Advanced/Show Details/Details/More information"
-msgstr "Bấm vào Nâng cao/Hiển thị chi tiết/Chi tiết/Thêm thông tin"
-
-#. module: pos_iot
-#. odoo-javascript
-#: code:addons/pos_iot/static/src/app/components/popups/iot_box_disconnected_dialog/iot_box_disconnected_dialog.xml:0
-msgid ""
-"Click on Proceed to .../Add Exception/Visit this website/Go on to the webpage"
+#: code:addons/pos_iot/static/src/backend/test_iot_printer.js:0
+msgid "Cannot reach IoT Box."
 msgstr ""
-"Bấm vào Tiến hành.../Thêm ngoại lệ/Truy cập trang web này/Đi tới trang web"
 
 #. module: pos_iot
 #. odoo-javascript
-#: code:addons/pos_iot/static/src/app/components/popups/iot_box_disconnected_dialog/iot_box_disconnected_dialog.xml:0
-msgid "Close this window and try again"
-msgstr "Đóng cửa sổ này và thử lại"
+#: code:addons/pos_iot/static/src/app/utils/scale/iot_scale.js:0
+msgid "Cannot weigh product - %s"
+msgstr ""
+
+#. module: pos_iot
+#: model:ir.model.fields,field_description:pos_iot.field_pos_printer__company_id
+msgid "Company"
+msgstr "Công ty"
 
 #. module: pos_iot
 #: model:ir.model,name:pos_iot.model_res_config_settings
@@ -109,6 +100,12 @@ msgstr "Cấu hình thiết bị thanh toán không thành công"
 #. module: pos_iot
 #: model:ir.model,name:pos_iot.model_auto_config_pos_iot
 msgid "Configure Automatically IoT Box In PoS"
+msgstr ""
+
+#. module: pos_iot
+#: model_terms:ir.ui.view,arch_db:pos_iot.pos_iot_config_view_form
+#: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
+msgid "Connect devices using an IoT Box"
 msgstr ""
 
 #. module: pos_iot
@@ -151,9 +148,10 @@ msgid "Customer Display"
 msgstr "Màn hình cho khách hàng"
 
 #. module: pos_iot
-#: model_terms:ir.ui.view,arch_db:pos_iot.view_auto_config_pos_iot
-msgid "Discard"
-msgstr "Huỷ bỏ"
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/iot_test_dialog/iot_test_dialog.xml:0
+msgid "Devices"
+msgstr ""
 
 #. module: pos_iot
 #: model:ir.model.fields,field_description:pos_iot.field_auto_config_pos_iot__display_name
@@ -168,16 +166,14 @@ msgid "Display Name"
 msgstr "Tên hiển thị"
 
 #. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iface_electronic_scale
 #: model_terms:ir.ui.view,arch_db:pos_iot.pos_iot_config_view_form
 #: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
 msgid "Electronic Scale"
 msgstr "Cân điện tử"
 
 #. module: pos_iot
-#: model:ir.model.fields,help:pos_iot.field_pos_config__iface_scan_via_proxy
-#: model:ir.model.fields,help:pos_iot.field_pos_config__iface_scanner_ids
-#: model:ir.model.fields,help:pos_iot.field_res_config_settings__pos_iface_scanner_ids
+#: model:ir.model.fields,help:pos_iot.field_pos_config__iot_scanner_ids
+#: model:ir.model.fields,help:pos_iot.field_res_config_settings__pos_iot_scanner_ids
 msgid ""
 "Enable barcode scanning with a remotely connected barcode scanner and card "
 "swiping with a Vantiv card reader."
@@ -186,15 +182,16 @@ msgstr ""
 "máy đọc thẻ Vantiv."
 
 #. module: pos_iot
-#: model:ir.model.fields,help:pos_iot.field_pos_config__iface_electronic_scale
-msgid "Enables Electronic Scale integration."
-msgstr "Bật tích hợp cân điện tử."
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/payment/payment_interface_iot.js:0
+msgid "Ensure a payment terminal is properly linked in the settings."
+msgstr ""
 
 #. module: pos_iot
 #. odoo-javascript
-#: code:addons/pos_iot/static/src/app/components/popups/iot_box_disconnected_dialog/iot_box_disconnected_dialog.xml:0
-msgid "Firefox only: Click on Confirm Security Exception"
-msgstr "Chỉ Firefox: Bấm vào Xác nhận ngoại lệ an ninh"
+#: code:addons/pos_iot/static/src/backend/test_iot_printer.js:0
+msgid "Failed to print the test receipt on the printer %s"
+msgstr ""
 
 #. module: pos_iot
 #: model:ir.model.fields,field_description:pos_iot.field_auto_config_pos_iot__id
@@ -214,69 +211,20 @@ msgid "IOT Device"
 msgstr "Thiết bị IOT"
 
 #. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_printer__device_identifier
-msgid "Identifier"
-msgstr "Định danh"
-
-#. module: pos_iot
-#. odoo-javascript
-#: code:addons/pos_iot/static/src/app/components/popups/iot_box_disconnected_dialog/iot_box_disconnected_dialog.xml:0
-msgid ""
-"If you are on a secure server (HTTPS) check if you accepted the certificate:"
+#: model:ir.model.fields.selection,name:pos_iot.selection__pos_printer__printer_type__iot
+msgid "IoT"
 msgstr ""
-"Nếu bạn đang sử dụng máy chủ bảo mật (HTTPS) hãy kiểm tra xem bạn đã chấp "
-"nhận chứng chỉ hay chưa:"
-
-#. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iface_display_id
-#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__pos_iface_display_id
-msgid "Iface Display"
-msgstr "Màn hình Iface"
-
-#. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iface_printer_id
-#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__pos_iface_printer_id
-msgid "Iface Printer"
-msgstr "Máy in Iface"
-
-#. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iface_scale_id
-#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__pos_iface_scale_id
-msgid "Iface Scale"
-msgstr "Cân Iface"
-
-#. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iface_scanner_ids
-#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__pos_iface_scanner_ids
-msgid "Iface Scanner"
-msgstr "Máy quét Iface"
-
-#. module: pos_iot
-#: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
-msgid "Ingenico (BENELUX)"
-msgstr "Ingenico (BENELUX)"
-
-#. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__module_pos_iot_ingenico
-msgid "Ingenico Payment Terminal"
-msgstr "Thiết bị thanh toán Ingenico"
-
-#. module: pos_iot
-#: model:ir.model,name:pos_iot.model_iot_box
-msgid "IoT Box"
-msgstr "Hộp IoT"
 
 #. module: pos_iot
 #. odoo-javascript
 #: code:addons/pos_iot/static/src/app/components/navbar/navbar.xml:0
-msgid "IoT Box Connected"
-msgstr ""
-
-#. module: pos_iot
-#. odoo-javascript
-#: code:addons/pos_iot/static/src/app/components/popups/iot_box_disconnected_dialog/iot_box_disconnected_dialog.xml:0
-msgid "IoT Box Homepage"
-msgstr "Trang chủ Hộp IoT"
+#: model:ir.model,name:pos_iot.model_iot_box
+#: model:ir.model.fields,field_description:pos_iot.field_pos_config__use_iot_box
+#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__pos_use_iot_box
+#: model_terms:ir.ui.view,arch_db:pos_iot.pos_iot_config_view_form
+#: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
+msgid "IoT Box"
+msgstr "Hộp IoT"
 
 #. module: pos_iot
 #. odoo-javascript
@@ -285,15 +233,26 @@ msgid "IoT Box Warning"
 msgstr ""
 
 #. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_printer__device_id
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/iot_test_dialog/iot_test_dialog.xml:0
+msgid "IoT Connection Status"
+msgstr ""
+
+#. module: pos_iot
+#: model:ir.model.fields,field_description:pos_iot.field_pos_printer__iot_device_id
 msgid "IoT Device"
-msgstr "Thiết bị IoT"
+msgstr ""
 
 #. module: pos_iot
 #: model_terms:ir.ui.view,arch_db:pos_iot.pos_iot_config_view_form
 #: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
 msgid "IoT Devices"
 msgstr "Thiết bị IoT"
+
+#. module: pos_iot
+#: model:ir.module.module,shortdesc:base.module_pos_iot
+msgid "IoT for PoS"
+msgstr ""
 
 #. module: pos_iot
 #: model:ir.model.fields,field_description:pos_iot.field_auto_config_pos_iot__iot_box_id
@@ -309,6 +268,30 @@ msgstr ""
 #: model:ir.model.fields,field_description:pos_iot.field_pos_config__iot_device_ids
 msgid "Iot Device"
 msgstr "Thiết bị IoT"
+
+#. module: pos_iot
+#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iot_display_id
+#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__pos_iot_display_id
+msgid "Iot Display"
+msgstr ""
+
+#. module: pos_iot
+#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iot_printer_id
+#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__pos_iot_printer_id
+msgid "Iot Printer"
+msgstr ""
+
+#. module: pos_iot
+#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iot_scale_id
+#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__pos_iot_scale_id
+msgid "Iot Scale"
+msgstr ""
+
+#. module: pos_iot
+#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iot_scanner_ids
+#: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__pos_iot_scanner_ids
+msgid "Iot Scanner"
+msgstr ""
 
 #. module: pos_iot
 #. odoo-javascript
@@ -339,17 +322,41 @@ msgstr "Cập nhật lần cuối vào"
 
 #. module: pos_iot
 #. odoo-javascript
-#: code:addons/pos_iot/static/src/app/components/popups/iot_box_disconnected_dialog/iot_box_disconnected_dialog.xml:0
-msgid "Network Error"
-msgstr "Lỗi mạng"
+#: code:addons/pos_iot/static/src/app/utils/debug/iot_test_dialog/iot_test_dialog.xml:0
+msgid "Local network speed is"
+msgstr ""
+
+#. module: pos_iot
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/iot_test_dialog/iot_test_dialog.xml:0
+msgid "Longpolling status:"
+msgstr ""
+
+#. module: pos_iot
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/iot_test_dialog/iot_test_dialog.xml:0
+msgid "Network"
+msgstr ""
+
+#. module: pos_iot
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/iot_test_dialog/iot_test_dialog.xml:0
+msgid "Network speed:"
+msgstr ""
+
+#. module: pos_iot
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/debug_widget/debug_widget.js:0
+msgid "No IoT devices are configured in this POS."
+msgstr ""
 
 #. module: pos_iot
 #: model_terms:ir.ui.view,arch_db:pos_iot.view_auto_config_pos_iot
+#: model_terms:ir.ui.view,arch_db:pos_iot.view_pos_printer_iot_form
 msgid "None"
 msgstr "Không"
 
 #. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_config__payment_terminal_device_ids
 #: model:ir.model.fields,field_description:pos_iot.field_pos_payment_method__iot_device_id
 msgid "Payment Terminal Device"
 msgstr "Thiết bị thanh toán"
@@ -358,18 +365,6 @@ msgstr "Thiết bị thanh toán"
 #: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
 msgid "Payment method"
 msgstr "Phương thức thanh toán"
-
-#. module: pos_iot
-#. odoo-javascript
-#: code:addons/pos_iot/static/src/app/components/popups/iot_box_disconnected_dialog/iot_box_disconnected_dialog.xml:0
-msgid "Please check if the IoT Box is still connected."
-msgstr "Vui lòng kiểm tra xem Hộp IoT của bạn có còn kết nối không."
-
-#. module: pos_iot
-#. odoo-javascript
-#: code:addons/pos_iot/static/src/app/utils/payment/payment_interface_iot.js:0
-msgid "Please check if the terminal is still connected."
-msgstr "Vui lòng kiểm tra xem thiết bị đầu cuối còn kết nối không."
 
 #. module: pos_iot
 #. odoo-javascript
@@ -384,8 +379,8 @@ msgstr "Cấu hình POS"
 
 #. module: pos_iot
 #: model:ir.model,name:pos_iot.model_pos_payment_method
-msgid "Point of Sale Payment Methods"
-msgstr "Phương thức thanh toán POS"
+msgid "Point of Sale Payment Method"
+msgstr ""
 
 #. module: pos_iot
 #: model:ir.model,name:pos_iot.model_pos_printer
@@ -398,43 +393,15 @@ msgid "Point of Sale Session"
 msgstr "Phiên POS"
 
 #. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iface_print_via_proxy
-msgid "Print via Proxy"
-msgstr "In qua Proxy"
+#: model:ir.model.fields,field_description:pos_iot.field_pos_printer__printer_type
+msgid "Printer Type"
+msgstr ""
 
 #. module: pos_iot
 #. odoo-javascript
 #: code:addons/pos_iot/static/src/app/utils/printer/iot_printer.js:0
 msgid "Printing failed"
 msgstr "In không thành công"
-
-#. module: pos_iot
-#. odoo-javascript
-#: code:addons/pos_iot/static/src/app/utils/printer/iot_printer.js:0
-msgid "Printing warning"
-msgstr ""
-
-#. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_printer__proxy_ip
-msgid "Proxy IP Address"
-msgstr "Địa chỉ IP của Proxy"
-
-#. module: pos_iot
-#. odoo-python
-#: code:addons/pos_iot/models/pos_printer.py:0
-msgid "Proxy IP cannot be empty."
-msgstr "Không thể để trống IP proxy."
-
-#. module: pos_iot
-#: model_terms:ir.ui.view,arch_db:pos_iot.pos_iot_config_view_form
-#: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
-msgid "Receipt Printer"
-msgstr "Máy in biên lai"
-
-#. module: pos_iot
-#: model:ir.model.fields,field_description:pos_iot.field_pos_config__iface_scan_via_proxy
-msgid "Scan via Proxy"
-msgstr "Quét qua Proxy"
 
 #. module: pos_iot
 #: model_terms:ir.ui.view,arch_db:pos_iot.pos_iot_config_view_form
@@ -452,9 +419,30 @@ msgid "Six Payment Terminal"
 msgstr "Thiết bị thanh toán SIX"
 
 #. module: pos_iot
-#: model:ir.model.fields,help:pos_iot.field_pos_printer__proxy_ip
-msgid "The IP Address or hostname of the Printer's hardware proxy"
-msgstr "Địa chỉ IP hoặc hostname của proxy phần cứng của máy in"
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/debug_widget/debug_widget.xml:0
+msgid "Test IoT Box"
+msgstr ""
+
+#. module: pos_iot
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/backend/test_iot_printer.js:0
+msgid "Test receipt printed"
+msgstr ""
+
+#. module: pos_iot
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/iot_test_dialog/iot_test_dialog.xml:0
+msgid "Tested at"
+msgstr ""
+
+#. module: pos_iot
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/payment/payment_interface_iot.js:0
+msgid ""
+"The IoT Box cannot detect the payment terminal. Please check if the terminal "
+"is still connected."
+msgstr ""
 
 #. module: pos_iot
 #. odoo-javascript
@@ -474,16 +462,6 @@ msgstr ""
 "2/ Đối với máy in mạng, hãy đảm bảo máy in đã được kết nối với internet."
 
 #. module: pos_iot
-#: model:ir.model.fields,help:pos_iot.field_res_config_settings__module_pos_iot_ingenico
-#: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
-msgid ""
-"The transactions are processed by Ingenico via an IoT box. Setup your "
-"terminal on the related payment method."
-msgstr ""
-"Các giao dịch được xử lý bởi Ingenico thông qua một Hộp IoT. Hãy thiết lập "
-"thiết bị đầu cuối trên phương thức thanh toán liên quan."
-
-#. module: pos_iot
 #: model:ir.model.fields,help:pos_iot.field_res_config_settings__module_pos_iot_six
 #: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
 msgid ""
@@ -494,8 +472,14 @@ msgstr ""
 "bị đầu cuối trên phương thức thanh toán liên quan."
 
 #. module: pos_iot
-#: model:ir.model.fields,help:pos_iot.field_res_config_settings__module_pos_iot_worldline
 #: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
+msgid ""
+"The transactions are processed by Worldline or Ingenico via an IoT box. "
+"Setup your terminal on the related payment method."
+msgstr ""
+
+#. module: pos_iot
+#: model:ir.model.fields,help:pos_iot.field_res_config_settings__module_pos_iot_worldline
 msgid ""
 "The transactions are processed by Worldline via an IoT box. Setup your "
 "terminal on the related payment method."
@@ -510,9 +494,15 @@ msgid "Transaction in progress"
 msgstr "Giao dịch đang diễn ra"
 
 #. module: pos_iot
-#: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
-msgid "Worldline (BENELUX)"
-msgstr "Worldline (BENELUX)"
+#: model:ir.module.module,summary:base.module_pos_iot
+msgid "Use IoT Devices in the PoS"
+msgstr ""
+
+#. module: pos_iot
+#. odoo-javascript
+#: code:addons/pos_iot/static/src/app/utils/debug/iot_test_dialog/iot_test_dialog.xml:0
+msgid "Websocket status:"
+msgstr ""
 
 #. module: pos_iot
 #: model:ir.model.fields,field_description:pos_iot.field_res_config_settings__module_pos_iot_worldline
@@ -520,10 +510,9 @@ msgid "Worldline Payment Terminal"
 msgstr "Thiết bị thanh toán Worldline"
 
 #. module: pos_iot
-#. odoo-javascript
-#: code:addons/pos_iot/static/src/app/utils/payment/payment_interface_iot.js:0
-msgid "You must select a payment terminal in your POS config."
-msgstr "Bạn phải chọn thiết bị thanh toán trong cấu hình POS."
+#: model_terms:ir.ui.view,arch_db:pos_iot.res_config_view_form_inherit_pos_iot
+msgid "Worldline/Ingenico (BENELUX)"
+msgstr ""
 
 #. module: pos_iot
 #. odoo-javascript
@@ -535,8 +524,8 @@ msgid ""
 "If you have just paired the IoT box, you may be experiencing a DNS issue.\n"
 "If you wait for some time the problem may resolve itself."
 msgstr ""
-"Hộp IoT của bạn đã được đăng ký, nhưng trình duyệt không thể kết nối với "
-"nó. \n"
+"Hộp IoT của bạn đã được đăng ký, nhưng trình duyệt không thể kết nối với nó. "
+"\n"
 "Hãy đảm bảo hộp đã được bật và kết nối với mạng.\n"
 "\n"
 "Nếu bạn vừa ghép nối hộp IoT, có thể bạn đang gặp sự cố liên quan đến DNS. \n"
@@ -548,92 +537,5 @@ msgstr ""
 msgid "none"
 msgstr "không"
 
-#~ msgid "Action identifier:"
-#~ msgstr "Định danh hành động: "
-
-#~ msgid "Amount:"
-#~ msgstr "Số tiền:"
-
-#~ msgid "Could not connect to IoT scale"
-#~ msgstr "Không thể kết nối với cân IoT"
-
-#~ msgid "Customer Facing Display"
-#~ msgstr "Màn hình cho khách hàng"
-
-#~ msgid "Electronic payment in progress"
-#~ msgstr "Thanh toán điện tử đang diễn ra"
-
 #~ msgid "Get Weight"
 #~ msgstr "Cân sản phẩm"
-
-#~ msgid ""
-#~ "It seems that no scale was detected.\n"
-#~ "Make sure that the scale is connected and visible in the IoT app."
-#~ msgstr ""
-#~ "Có vẻ như không phát hiện cân nào.\n"
-#~ "Bảo đảm cân được kết nối và hiển thị trong ứng dụng IoT. "
-
-#~ msgid "Last Transaction Status"
-#~ msgstr "Trạng thái giao dịch gần nhất"
-
-#~ msgid "No Scale Detected"
-#~ msgstr "Không phát hiện cân"
-
-#~ msgid "Ok"
-#~ msgstr "Đồng ý"
-
-#~ msgid "Payment Terminal"
-#~ msgstr "Thiết bị đầu cuối thanh toán"
-
-#~ msgid "Payment terminal error"
-#~ msgstr "Lỗi thiết bị đầu cuối thanh toán"
-
-#~ msgid ""
-#~ "Please check the network connection and then check the status of the last "
-#~ "transaction manually."
-#~ msgstr ""
-#~ "Vui lòng kiểm tra kết nối mạng và sau đó kiểm tra trạng thái của giao "
-#~ "dịch gần nhất theo cách thủ công. "
-
-#~ msgid "Show checkout to customers with a remotely-connected screen."
-#~ msgstr ""
-#~ "Hiển thị thanh toán cho khách hàng bằng màn hình được kết nối từ xa."
-
-#~ msgid "Terminal Disconnected"
-#~ msgstr "Đã ngắt kết nối với thiết bị đầu cuối"
-
-#~ msgid "The IoT scale is not responding. You should check your connection."
-#~ msgstr "Cân IoT không phản hồi. Bạn nên kiểm tra kết nối. "
-
-#~ msgid ""
-#~ "The transactions are processed by Ingenico. Set your Ingenico device on "
-#~ "the related payment method."
-#~ msgstr ""
-#~ "Giao dịch được xử lý bởi Ingenico. Thiết lập thiết bị Ingenico của bạn "
-#~ "cho phương thức thanh toán liên quan. "
-
-#~ msgid ""
-#~ "The transactions are processed by Worldline. Set your Worldline device on "
-#~ "the related payment method."
-#~ msgstr ""
-#~ "Giao dịch được xử lý bởi Worldline. Thiết lập thiết bị Worldline của bạn "
-#~ "cho phương thức thanh toán liên quan. "
-
-#~ msgid "Time:"
-#~ msgstr "Thời gian: "
-
-#~ msgid "Transaction could not be cancelled"
-#~ msgstr "Không thể hủy giao dịch"
-
-#~ msgid "Worldline"
-#~ msgstr "Worldline"
-
-#~ msgid "Worldline - Last Transaction Status"
-#~ msgstr "Worldline - Trạng thái giao dịch gần nhất"
-
-#~ msgid ""
-#~ "You cannot check the status of the last transaction when a payment in in "
-#~ "progress."
-#~ msgstr ""
-#~ "Bạn có thể kiểm tra trạng thái của giao dịch gần nhất khi một khoản thanh "
-#~ "toán đang diễn ra."

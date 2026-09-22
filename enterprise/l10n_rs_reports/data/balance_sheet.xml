@@ -1304,7 +1304,7 @@
                                                 <field name="label">cross_report</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">RS_1064.balance</field>
-                                                <field name="subformula">cross_report(l10n_rs_reports.account_financial_report_rs_PnL)</field>
+                                                <field name="subformula">cross_report(l10n_rs_reports.account_financial_report_rs_PnL, force_date_scope)</field>
                                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
                                             </record>
                                             <record id="account_financial_report_rs_BS_equity_liabilities_A_VIII_1_accounts" model="account.report.expression">
@@ -1336,7 +1336,7 @@
                                                 <field name="label">balance_signed</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">RS_1064.balance</field>
-                                                <field name="subformula">cross_report(l10n_rs_reports.account_financial_report_rs_PnL)</field>
+                                                <field name="subformula">cross_report(l10n_rs_reports.account_financial_report_rs_PnL, force_date_scope)</field>
                                                 <field name="date_scope">from_fiscalyear</field>
                                             </record>
                                             <record id="account_financial_report_rs_BS_equity_liabilities_A_VIII_2_balance" model="account.report.expression">

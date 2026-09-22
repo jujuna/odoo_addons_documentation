@@ -1,3 +1,4 @@
+import { signal } from "@odoo/owl";
 import { KeepLast, Mutex } from "@web/core/utils/concurrency";
 import { useService } from "@web/core/utils/hooks";
 import { Domain } from "@web/core/domain";
@@ -12,22 +13,28 @@ const { DateTime, Interval } = luxon;
 
 export class GridCell {
     /**
-     * Constructor
-     *
-     * @param model {GridModel} the grid model.
-     * @param row {GridRow} the grid row linked to the cell.
-     * @param column {GridColumn} the grid column linked to the cell.
-     * @param value {Number} the value of the cell.
-     * @param isHovered {Boolean} is the cell in a hover state?
+     * @param {GridModel} model
+     * @param {GridRow | GridSection} row
+     * @param {GridColumn} column
+     * @param {number} [value=0]
+     * @param {boolean} [isHovered=false]
      */
     constructor(model, row, column, value = 0, isHovered = false) {
         this.row = row;
         this.column = column;
         this.model = model;
-        this.value = value;
+        this._value = signal(value);
         this.isHovered = isHovered;
         this._readonly = false;
         this.column.addCell(this);
+    }
+
+    get value() {
+        return this._value();
+    }
+
+    set value(value) {
+        this._value.set(value);
     }
 
     get readonly() {
@@ -68,7 +75,7 @@ export class GridCell {
     /**
      * Update the grid cell according to the value set by the current user.
      *
-     * @param {Number} value the value entered by the current user.
+     * @param {number} value
      */
     async update(value) {
         return this.model.mutex.exec(async () => {
@@ -95,13 +102,12 @@ export class GridCell {
 
 export class GridRow {
     /**
-     * Constructor
-     *
-     * @param domain {Domain} the domain of the row.
-     * @param valuePerFieldName {{string: string}} the list of to display the label of the row.
-     * @param model {GridModel} the grid model.
-     * @param section {GridSection} the section of the grid.
-     * @param columns {GridColumn[]} the columns of the grid.
+     * @param {any} data
+     * @param {Domain} domain
+     * @param {Record<string, string>} valuePerFieldName initial values
+     * @param {GridModel} model
+     * @param {GridSection} section
+     * @param {boolean} [isAdditionalRow=false]
      */
     constructor(data, domain, valuePerFieldName, model, section, isAdditionalRow = false) {
         this._domain = domain;
@@ -127,7 +133,8 @@ export class GridRow {
         const labelArray = [];
         for (const rowField of this.model.rowFields) {
             let title = this.valuePerFieldName[rowField.name];
-            if (this.model.fieldsInfo[rowField.name].type === "many2one") {
+            const fieldInfo = this.model.fieldsInfo[rowField.name];
+            if (fieldInfo.type === "many2one") {
                 if (title) {
                     title = title[1];
                 } else if (labelArray.length) {
@@ -135,6 +142,8 @@ export class GridRow {
                 } else {
                     title = "None";
                 }
+            } else if (fieldInfo.type === "selection") {
+                title = fieldInfo.selection.find(([key]) => key === title)?.[1];
             }
             if (title) {
                 labelArray.push(title);
@@ -183,8 +192,10 @@ export class GridRow {
 
     /**
      * Update the cell value of a cell.
-     * @param {GridColumn} column containing the cell to update.
-     * @param {number} value the value to update
+     *
+     * @param {GridColumn} column
+     * @param {number} value
+     * @param {any} data
      */
     updateCell(column, value, data) {
         this._ensureColumnExist(column, data);
@@ -274,7 +285,8 @@ export class GridSection extends GridRow {
 
     /**
      * Add row to the section rows.
-     * @param row {GridRow} the row to add.
+     *
+     * @param {GridRow} row
      */
     addRow(row) {
         if (row.id in this.rows) {
@@ -286,8 +298,9 @@ export class GridSection extends GridRow {
 
     /**
      * Update the grand totals according to the provided column and delta.
-     * @param column {GridColumn} the column the grand total has to be updated for.
-     * @param delta {Number} the delta to apply on the grand totals.
+     *
+     * @param {GridColumn} column
+     * @param {number} delta delta to apply on the grand totals
      */
     updateGrandTotal(column, delta) {
         this.cells[column.id].value += delta;
@@ -298,10 +311,10 @@ export class GridSection extends GridRow {
 
 export class GridColumn {
     /**
-     * Constructor
-     *
-     * @param model {GridModel} the grid model.
-     * @param title {string} the title of the column to display.
+     * @param {GridModel} model
+     * @param {string} title
+     * @param {string} value
+     * @param {string} [readonly=false]
      */
     constructor(model, title, value, readonly = false) {
         this.model = model;
@@ -315,7 +328,8 @@ export class GridColumn {
 
     /**
      * Add the cell to the column cells.
-     * @param cell {GridCell} the cell to add.
+     *
+     * @param {GridCell} cell
      */
     addCell(cell) {
         if (cell.id in this.cells) {
@@ -336,13 +350,13 @@ export class GridColumn {
 
 export class DateGridColumn extends GridColumn {
     /**
-     * Constructor
-     *
-     * @param model {GridModel} the grid model.
-     * @param title {string} the title of the column to display.
-     * @param dateStart {String} the date start serialized
-     * @param dateEnd {String} the date end serialized
-     * @param isToday {Boolean} is the date column representing today?
+     * @param {GridModel} model
+     * @param {string} title
+     * @param {string} dateStart (serialized)
+     * @param {string} dateEnd (serialized)
+     * @param {boolean} isToday whether the date column represents today
+     * @param {boolean} isWeekDay
+     * @param {boolean} [readonly=false]
      */
     constructor(model, title, dateStart, dateEnd, isToday, isWeekDay, readonly = false) {
         super(model, title, dateStart, readonly);
@@ -428,8 +442,7 @@ export class GridModel extends Model {
         this.navigationInfo = new this.constructor.NavigationInfo(this.defaultAnchor, this);
         this.data = undefined;
         this.record = undefined;
-        const activeRangeName =
-            browser.localStorage.getItem(this.storageKey) || params.activeRangeName;
+        const activeRangeName = this._getActiveRangeName(params);
         if (Object.keys(this.ranges).length && activeRangeName) {
             this.navigationInfo.range = this.ranges[activeRangeName];
         }
@@ -509,6 +522,10 @@ export class GridModel extends Model {
         return fields;
     }
 
+    _getActiveRangeName(params) {
+        return browser.localStorage.getItem(this.storageKey) || params.activeRangeName;
+    }
+
     _getDateColumnTitle(date) {
         const granularity = this.navigationInfo.range.step;
         if (!["day", "month"].includes(granularity)) {
@@ -560,7 +577,8 @@ export class GridModel extends Model {
 
     /**
      * Set the new range according to the range name passed into parameter.
-     * @param rangeName {string} the range name to set.
+     *
+     * @param {string} rangeName
      */
     async setRange(rangeName) {
         this.navigationInfo.range = this.ranges[rangeName];
@@ -599,7 +617,8 @@ export class GridModel extends Model {
 
     /**
      * Move the anchor to the next/previous step
-     * @param direction {"forward"|"backward"} the direction to the move the anchor
+     *
+     * @param {"forward" | "backward"} direction
      */
     async moveAnchor(direction) {
         if (direction == "forward") {
@@ -716,7 +735,7 @@ export class GridModel extends Model {
      * Load the model
      *
      * @override
-     * @param params {Object} the search parameters (domain, groupBy, etc.)
+     * @param {Record<string, any>} params search parameters (domain, groupBy, etc.)
      * @return {Promise<void>}
      */
     async load(params = {}) {
@@ -833,9 +852,9 @@ export class GridModel extends Model {
     /**
      * Search grid columns
      *
-     * @param {Array} domain domain to filter the result
+     * @param {any[]} domain
      * @param {string} readonlyField field uses to make column readonly if true
-     * @returns {Array} array containing id, display_name and readonly if readonlyField is defined.
+     * @returns {any[]} array containing id, display_name and readonly if readonlyField is defined.
      */
     async _searchMany2oneColumns(domain, readonlyField) {
         const fieldsToFetch = ["id", "display_name"];
@@ -914,7 +933,7 @@ export class GridModel extends Model {
             this.resModel,
             Domain.and([searchParams.domain, this.generateNavigationDomain()]).toList({}),
             this._getGroupByFields(metaData),
-            this.aggregates,
+            this.aggregates
         );
         if (this.orm.isSample) {
             dataFetched = dataFetched.filter((group) => {
@@ -1011,9 +1030,10 @@ export class GridModel extends Model {
 
     /**
      * Generate the row key according to the provided read group result.
-     * @param readGroupResult {Array} the read group result the key has to be generated for.
+     *
      * @private
-     * @return {string}
+     * @param {Record<string, any>} readGroupResult the read group result the key has to be generated for.
+     * @param {any} params
      */
     _generateRowKey(readGroupResult, { sectionField, rowFields }) {
         let key = "";
@@ -1030,9 +1050,8 @@ export class GridModel extends Model {
     }
 
     /**
-     * Generate the section
-     * @param readGroupResult
      * @private
+     * @param {Record<string, any>} readGroupResult
      */
     _generateSectionKey(readGroupResult, sectionField) {
         let value = readGroupResult[sectionField.name];
@@ -1043,9 +1062,7 @@ export class GridModel extends Model {
     }
 
     /**
-     * Generate the row domain for the provided read group result.
-     * @param readGroupResult {Array} the read group result the domain has to be generated for.
-     * @return {{domain: Domain, values: Object}} the generated domain and values.
+     * @param {Record<string, any>} readGroupResult
      */
     _generateRowDomainAndValues(readGroupResult, rowFields) {
         let domain = new Domain();
@@ -1071,12 +1088,16 @@ export class GridModel extends Model {
         return section;
     }
 
+    /**
+     * @param {Record<string, any>} readGroupResults
+     * @param {any} metaData
+     */
     async _generateData(readGroupResults, metaData) {
         const { data, record, sectionField, rowFields } = metaData;
         let section;
         for (const readGroupResult of readGroupResults) {
             if (!this.orm.isSample) {
-                record.resIds.push(...readGroupResult['id:array_agg']);
+                record.resIds.push(...readGroupResult["id:array_agg"]);
             }
             const rowKey = this._generateRowKey(readGroupResult, metaData);
             if (sectionField) {
@@ -1124,7 +1145,9 @@ export class GridModel extends Model {
             if (data.columnsKeyToIdMapping[columnKey] in data.columns) {
                 const column = data.columns[data.columnsKeyToIdMapping[columnKey]];
                 row.updateCell(column, readGroupResult[this.measureGroupByFieldName], data);
-                const readonlyFieldAggregator = this.readonlyField && `${this.readonlyField.name}:${this.readonlyField.aggregator}`;
+                const readonlyFieldAggregator =
+                    this.readonlyField &&
+                    `${this.readonlyField.name}:${this.readonlyField.aggregator}`;
                 if (readonlyFieldAggregator && readonlyFieldAggregator in readGroupResult) {
                     row.setReadonlyCell(column, readGroupResult[readonlyFieldAggregator], data);
                 }
@@ -1134,7 +1157,9 @@ export class GridModel extends Model {
 
     /**
      * Method meant to be overridden whenever an item (row and section) post process is needed.
-     * @param item {GridSection|GridRow}
+     *
+     * @param {GridRow | GridSection} item
+     * @param {any} metaData
      */
     _itemsPostProcess(item, metaData) {}
 

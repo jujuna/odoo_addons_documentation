@@ -3,6 +3,11 @@
     text-decoration: none;
 }
 
+.o_daterangepicker_closed {
+    background-color: #cbc8c8;
+    text-decoration: none;
+}
+
 .o_website_sale_renting {
     &.daterangepicker {
         td.disabled, option.disabled {
@@ -73,5 +78,38 @@
 .o_website_sale_daterange_picker#cart_rental_period {
     @include media-breakpoint-up(lg) {
         border-bottom: $border-width solid $border-color;
+    }
+}
+
+#o_wsale_products_header {
+    .o_website_sale_daterange_picker_input {
+        @include media-breakpoint-down(md) {
+            // Used to slightly increase the height of the inputs
+            // to highlight the date picker on mobile.
+            line-height: $line-height-lg;
+
+            &:last-child {
+                // Force to center the dividing line on mobile
+                padding-right: $input-group-addon-padding-x * 2 + $font-size-base;
+            }
+        }
+
+        &:focus {
+            box-shadow: none;
+        }
+
+        &.o_has_separator {
+            box-shadow: calc(#{map-get($spacers, 2)} + 1px) 0 0 #{map-get($spacers, 2) * -1} $border-color;
+        }
+    }
+
+    .s_website_form_datetime {
+        .input-group {
+            border-radius: $input-border-radius;
+
+            &:has(.o_website_sale_daterange_picker_input:focus) {
+                box-shadow: $input-focus-box-shadow;
+            }
+        }
     }
 }

@@ -24,8 +24,8 @@ class HrEmployee(models.Model):
         groups="hr_payroll.group_hr_payroll_user",
         compute="_compute_payroll_id",
         store=True, readonly=True, tracking=True)
-    l10n_au_medicare_variation_form = fields.Binary(string="Medicare Variation Form", attachment=True, groups="hr_payroll.group_hr_payroll_user")
-    l10n_au_medicare_variation_form_filename = fields.Char(groups="hr_payroll.group_hr_payroll_user")
+    l10n_au_medicare_variation_form = fields.Binary(string="Medicare Variation Form", attachment=True, help="Whether the employee requests a variation in the withheld amount for Medicare (Surcharge , Reduction or Exemption).",
+                                                    groups="hr_payroll.group_hr_payroll_user")
     l10n_au_super_account_ids = fields.One2many(
         "l10n_au.super.account",
         "employee_id",
@@ -63,7 +63,7 @@ class HrEmployee(models.Model):
     l10n_au_pay_day = fields.Selection(readonly=False, related="version_id.l10n_au_pay_day", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_au_eligible_for_leave_loading = fields.Boolean(readonly=False, related="version_id.l10n_au_eligible_for_leave_loading", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_au_leave_loading = fields.Selection(readonly=False, related="version_id.l10n_au_leave_loading", inherited=True, groups="hr_payroll.group_hr_payroll_user")
-    l10n_au_leave_loading_leave_types = fields.Many2many(readonly=False, related="version_id.l10n_au_leave_loading_leave_types", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_au_leave_loading_work_entry_types = fields.Many2many(readonly=False, related="version_id.l10n_au_leave_loading_work_entry_types", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_au_leave_loading_rate = fields.Float(readonly=False, related="version_id.l10n_au_leave_loading_rate", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_au_cessation_type_code = fields.Selection(readonly=False, related="version_id.l10n_au_cessation_type_code", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_au_performances_per_week = fields.Integer(readonly=False, related="version_id.l10n_au_performances_per_week", inherited=True, groups="hr_payroll.group_hr_payroll_user")
@@ -115,7 +115,7 @@ class HrEmployee(models.Model):
                 emp.super_account_warning = _(
                     "The proportions of super contributions for this employee do not amount to 100%% across their "
                     "active super accounts! Currently, it is at %d%%!",
-                    proportions[emp.id] * 100,
+                    proportions[emp] * 100,
                 )
 
     @api.model

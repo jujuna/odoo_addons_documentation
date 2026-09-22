@@ -1,3 +1,4 @@
+from . import esg_emission_factor
 from . import esg_other_emission
 from . import fleet_vehicle_assignation_log
 from . import res_company

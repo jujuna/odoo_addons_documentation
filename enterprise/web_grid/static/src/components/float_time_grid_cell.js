@@ -1,20 +1,13 @@
+import { computed } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { parseFloatTime } from "@web/views/fields/parsers";
 import { formatFloatTime } from "@web/views/fields/formatters";
+import { parseFloatTime } from "@web/views/fields/parsers";
 import { GridCell } from "./grid_cell";
 
-function formatter(value, options = {}) {
-    return formatFloatTime(value, { ...options, noLeadingZeroHour: true });
-}
-
 export class FloatTimeGridCell extends GridCell {
-    get formattedValue() {
-        return formatter(this.value);
-    }
+    inputMode = "text";
 
-    get inputMode() {
-        return "text";
-    }
+    formattedValue = computed(() => formatFloatTime(this.value()));
 
     parse(value) {
         return parseFloatTime(value);
@@ -23,7 +16,7 @@ export class FloatTimeGridCell extends GridCell {
 
 export const floatTimeGridCell = {
     component: FloatTimeGridCell,
-    formatter,
+    formatter: formatFloatTime,
 };
 
 registry.category("grid_components").add("float_time", floatTimeGridCell);

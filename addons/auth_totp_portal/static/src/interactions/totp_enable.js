@@ -1,9 +1,8 @@
 import { Interaction } from "@web/public/interaction";
 import { registry } from "@web/core/registry";
 
-import { InputConfirmationDialog } from "@portal/js/components/input_confirmation_dialog/input_confirmation_dialog";
+import { TotpConfirmationDialog } from "../components/totp_confirmation_dialog";
 import { handleCheckIdentity } from "@portal/interactions/portal_security";
-import { browser } from "@web/core/browser/browser";
 import { user } from "@web/core/user";
 import { _t } from "@web/core/l10n/translation";
 
@@ -43,19 +42,13 @@ function fromField(f, record) {
 
             // Copy Button
             const copySpanIcon = document.createElement("span");
-            copySpanIcon.setAttribute("class", "fa fa-clipboard");
+            copySpanIcon.setAttribute("class", "oi");
+            copySpanIcon.setAttribute("data-icon", "assignment");
             const copySpanText = document.createElement("span");
             copySpanText.textContent = _t(" Copy");
 
             const copyButton = document.createElement("button");
             copyButton.setAttribute("class", "btn btn-sm btn-primary o_clipboard_button o_btn_char_copy py-0 px-2");
-            copyButton.onclick = async function (event) {
-                event.preventDefault();
-                $(copyButton).tooltip({ title: _t("Copied!"), trigger: "manual", placement: "bottom" });
-                await browser.navigator.clipboard.writeText($(secretSpan)[0].innerText);
-                $(copyButton).tooltip("show");
-                setTimeout(() => $(copyButton).tooltip("hide"), 800);
-            };
 
             copyButton.appendChild(copySpanIcon);
             copyButton.appendChild(copySpanText);
@@ -155,10 +148,11 @@ export class TOTPEnable extends Interaction {
         const xmlBody = doc.querySelector("sheet *");
         const [body, ,] = fixupViewBody(xmlBody, record);
 
-        this.services.dialog.add(InputConfirmationDialog, {
+        this.services.dialog.add(TotpConfirmationDialog, {
             body: markup(body.outerHTML),
             onInput: ({ inputEl }) => { inputEl.setCustomValidity("") },
             confirmLabel: _t("Activate"),
+            size: "md",
             confirm: async ({ inputEl }) => {
                 if (!inputEl.reportValidity()) {
                     inputEl.classList.add("is-invalid");
@@ -177,7 +171,7 @@ export class TOTPEnable extends Interaction {
                 } catch (e) {
                     const errorMessage = (
                         !e.message ? e.toString()
-                            : !e.message.data ? e.message.message
+                            : !e.message.data ? e.message.message || _t("Verification failed, please double-check the 6-digit code")
                                 : e.message.data.message || _t("Operation failed for unknown reason.")
                     );
                     inputEl.classList.add("is-invalid");

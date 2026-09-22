@@ -1,86 +1,91 @@
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { SignTemplateIframe } from "./sign_template_iframe";
-import { Component, useRef, useEffect, onWillUnmount, onWillStart, useState, useExternalListener } from "@odoo/owl";
-import { buildPDFViewerURL , injectPDFCustomStyles } from "@sign/components/sign_request/utils";
+import {
+    Component,
+    onMounted,
+    onPatched,
+    onWillUnmount,
+    onWillStart,
+    proxy,
+    signal,
+    t,
+    useListener,
+    useProps,
+} from "@odoo/owl";
+import { buildPDFViewerURL, injectPDFCustomStyles } from "@sign/components/sign_request/utils";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { hidePDFJSButtons } from "@web/core/utils/pdfjs";
 import { SignSaveTemplateDialog } from "./sign_save_template_dialog";
 import { user } from "@web/core/user";
-
 
 export class SignTemplateBody extends Component {
     static template = "sign.SignTemplateBody";
     static components = {
         SignSaveTemplateDialog,
     };
-    static props = {
-        signItemTypes: { type: Array },
-        signItems: { type: Array, optional: true },
-        signRoles: { type: Array },
-        radioSets: { type: Object, optional: true },
-        hasSignRequests: { type: Boolean },
-        signItemOptions: { type: Array },
-        attachmentLocation: { type: String },
-        signTemplate: { type: Object },
-        goBackToKanban: { type: Function },
-        onTemplateSaveClick: { type: Function },
-        manageTemplateAccess: { type: Boolean },
-        resModel: { type: String },
-        signStatus: { type: Object },
-        iframe: { type: Object, optional: true },
-        setIframe: { type: Function },
-        documentId: { type: Number },
-        updateSignItemsCountCallback: { type: Function },
-    };
+
+    props = useProps({
+        signItemTypes: t.array(),
+        fetchSignItemTypes: t.function().optional(),
+        signItems: t.array().optional(),
+        radioSets: t.object().optional(),
+        hasSignRequests: t.boolean(),
+        signItemOptions: t.array(),
+        attachmentLocation: t.string(),
+        signTemplate: t.object(),
+        goBackToKanban: t.function(),
+        onTemplateSaveClick: t.function(),
+        manageTemplateAccess: t.boolean(),
+        resModel: t.string(),
+        signStatus: t.object(),
+        iframe: t.object().optional(),
+        setIframe: t.function(),
+        documentId: t.number(),
+        updateSignItemsCountCallback: t.function(),
+    });
+
+    PDFIframeRef = signal.ref();
 
     setup() {
         this.orm = useService("orm");
         this.notification = useService("notification");
         this.popover = useService("popover");
         this.dialog = useService("dialog");
-        this.PDFIframe = useRef("PDFIframe");
-        this.action = useService("action");
-        this.PDFViewerURL = buildPDFViewerURL(this.props.attachmentLocation, this.env.isSmall);
-        this.props.signStatus.discardChanges = this.discardChanges.bind(this);
-        this.state = useState({
+        this.PDFViewerURL = buildPDFViewerURL(this.props.attachmentLocation);
+        this.state = proxy({
             documentUsedTimesCounter: 0,
-        })
-        useEffect(
-            (el) => {
-                if (el) {
-                    hidePDFJSButtons(el, {
-                        hideDownload: true,
-                        hidePrint: true,
-                        hidePresentation: true,
-                        hideRotation: true,
-                    });
-                }
-            },
-            () => [this.PDFIframe.el]
-        );
-        useEffect(
-            () => {
-                return this.waitForPDF();
-            },
-            () => []
-        );
+        });
+        onMounted(() => {
+            const el = this.PDFIframeRef();
+            if (el) {
+                hidePDFJSButtons(el, {
+                    hideDownload: true,
+                    hidePrint: true,
+                    hidePresentation: true,
+                    hideRotation: true,
+                });
+            }
+            this.waitForPDF();
+        });
+        onPatched(() => {
+            this.waitForPDF();
+        });
 
-        useExternalListener(document, "visibilitychange", () => {
+        useListener(document, "visibilitychange", () => {
             if (document.visibilityState === "hidden") {
                 this.props.signStatus.save();
             }
         });
 
-
         onWillUnmount(() => {
-            const iframeDoc = this.PDFIframe.el?.contentDocument;
+            const iframeDoc = this.PDFIframeRef()?.contentDocument;
             if (iframeDoc && this._onIframeClick) {
                 iframeDoc.removeEventListener("click", this._onIframeClick);
             }
             if (this.props.iframe) {
                 this.props.iframe.unmount();
-                this.props.iframe = null;
+                this.props.setIframe(null);
             }
         });
 
@@ -89,24 +94,20 @@ export class SignTemplateBody extends Component {
                 /* When uploading a PDF for signing, we check how many times a PDF with that
                 name was used and if it is bigger than two, then suggest the user saving it
                 as template with in a notification with a button. */
-                const documentUsedTimes = await this.orm.searchCount(
-                    "sign.request",
-                    [["reference", "ilike", this.props.signTemplate.display_name]]
-                );
+                const documentUsedTimes = await this.orm.searchCount("sign.request", [
+                    ["reference", "ilike", this.props.signTemplate.display_name],
+                ]);
                 this.state.documentUsedTimesCounter = documentUsedTimes;
-            };
+            }
 
             return await Promise.all([this.fetchRadioSets(), this.fetchSignItemData()]);
         });
     }
 
     async fetchRadioSets() {
-        this.radioSets = await this.orm.call(
-            "sign.document",
-            "get_radio_sets_dict", [
-                this.props.documentId,
-            ]
-        );
+        this.radioSets = await this.orm.call("sign.document", "get_radio_sets_dict", [
+            this.props.documentId,
+        ]);
     }
 
     async fetchSignItemData() {
@@ -118,6 +119,7 @@ export class SignTemplateBody extends Component {
         );
 
         this.signItems.forEach((item) => {
+            item.type_id = item.type_id[0];
             item.radio_set_id = item?.radio_set_id[0] || undefined;
             item.roleName = item.responsible_id[1];
             item.document_id = item.document_id[0];
@@ -133,43 +135,23 @@ export class SignTemplateBody extends Component {
             iframeDoc.removeEventListener("click", this._onIframeClick);
         }
         this._onIframeClick = () => {
-            document
-                .querySelectorAll(".o-dropdown--menu")
-                .forEach(menu => menu.remove());
+            document.querySelectorAll(".o-dropdown--menu").forEach((menu) => menu.remove());
         };
         iframeDoc.addEventListener("click", this._onIframeClick);
     }
 
     waitForPDF() {
-        this.PDFIframe.el.onload = () => {
-            injectPDFCustomStyles(this.PDFIframe.el.contentDocument);
-            this.attachDropdownCloseOnIframeClick(this.PDFIframe.el.contentDocument);
+        this.PDFIframeRef().onload = () => {
+            injectPDFCustomStyles(this.PDFIframeRef().contentDocument);
+            this.attachDropdownCloseOnIframeClick(this.PDFIframeRef().contentDocument);
             setTimeout(() => this.doPDFPostLoad(), 1);
         };
-    }
-
-    async discardChanges() {
-        const { signTemplate } = this.props;
-        const templateName = signTemplate.display_name;
-        const templateId = parseInt(signTemplate.id, 10);
-        this.props.signStatus.isTemplateChanged = false;
-        this.props.signStatus.isDiscardingChanges = true;
-        await this.action.doAction({
-            type: "ir.actions.client",
-            tag: "sign.Template",
-            name: _t("Template %s", templateName),
-            params: {
-                id: templateId,
-            },
-        }, {
-            stackPosition: "replaceCurrentAction"
-        });
     }
 
     doPDFPostLoad() {
         this.preventDroppingImagesOnViewerContainer();
         const iframe = new SignTemplateIframe(
-            this.PDFIframe.el.contentDocument,
+            this.PDFIframeRef().contentDocument,
             this.env,
             {
                 orm: this.orm,
@@ -180,15 +162,14 @@ export class SignTemplateBody extends Component {
             {
                 signItemTypes: this.props.signItemTypes,
                 signItems: this.signItems,
-                signRoles: this.props.signRoles,
                 hasSignRequests: this.props.hasSignRequests,
                 signItemOptions: this.props.signItemOptions,
                 radioSets: this.radioSets,
                 saveTemplate: () => this.saveTemplate(),
                 getRadioSetInfo: (id) => this.getRadioSetInfo(id),
-                rotatePDF: () => this.rotatePDF(),
                 signStatus: this.props.signStatus,
-                setTemplateChangedState: (state) => this.props.signStatus.isTemplateChanged = state,
+                setTemplateChangedState: (state) =>
+                    (this.props.signStatus.isTemplateChanged = state),
                 documentId: this.props.documentId,
                 updateSignItemsCountCallback: this.props.updateSignItemsCountCallback,
             }
@@ -201,7 +182,8 @@ export class SignTemplateBody extends Component {
      * Ref: https://stackoverflow.com/a/68939139
      */
     preventDroppingImagesOnViewerContainer() {
-        const viewerContainer = this.PDFIframe.el.contentDocument.querySelector("#viewerContainer");
+        const viewerContainer =
+            this.PDFIframeRef().contentDocument.querySelector("#viewerContainer");
         viewerContainer.addEventListener(
             "drop",
             (e) => {
@@ -242,7 +224,7 @@ export class SignTemplateBody extends Component {
         const info = await this.orm.call("sign.template", "get_radio_set_info_by_item_id", [
             this.props.signTemplate.id,
             sign_item_ids,
-        ])
+        ]);
         return info;
     }
 
@@ -257,7 +239,7 @@ export class SignTemplateBody extends Component {
                     Id2UpdatedItem[id] = signItem;
                     const responsible = signItem.responsible;
                     updatedSignItems[id] = {
-                        type_id: signItem.type_id[0],
+                        type_id: signItem.type_id,
                         required: signItem.required,
                         constant: signItem.constant,
                         name: signItem.placeholder || signItem.name,
@@ -280,17 +262,6 @@ export class SignTemplateBody extends Component {
             }
         }
         return [updatedSignItems, Id2UpdatedItem];
-    }
-
-    async rotatePDF() {
-        const result = await this.orm.call("sign.template", "rotate_pdf", [
-            this.props.signTemplate.id,
-        ]);
-        if (!result) {
-            this.showBlockedTemplateDialog();
-        }
-
-        return result;
     }
 
     showBlockedTemplateDialog() {

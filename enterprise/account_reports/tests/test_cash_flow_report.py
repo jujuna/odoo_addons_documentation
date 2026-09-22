@@ -9,6 +9,8 @@ from odoo import Command
 
 @tagged('post_install', '-at_install')
 class TestCashFlowReport(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -26,40 +28,34 @@ class TestCashFlowReport(TestAccountReportsCommon):
             'account_type': 'asset_receivable',
             'name': 'Account Receivable 2',
             'code': '121020',
-            'reconcile': True,
         })
         cls.account_receivable_3 = cls.env['account.account'].create({
             'account_type': 'asset_receivable',
             'name': 'Account Receivable 3',
             'code': '121030',
-            'reconcile': True,
         })
 
         cls.account_no_tag = cls.env['account.account'].create({
             'account_type': 'asset_current',
             'name': 'account_no_tag',
             'code': '121040',
-            'reconcile': True,
         })
         cls.account_financing = cls.env['account.account'].create({
             'account_type': 'asset_current',
             'name': 'account_financing',
             'code': '121050',
-            'reconcile': True,
             'tag_ids': cls.env.ref('account.account_tag_financing'),
         })
         cls.account_operating = cls.env['account.account'].create({
             'account_type': 'asset_current',
             'name': 'account_operating',
             'code': '121060',
-            'reconcile': True,
             'tag_ids': cls.env.ref('account.account_tag_operating'),
         })
         cls.account_investing = cls.env['account.account'].create({
             'account_type': 'asset_current',
             'name': 'account_investing',
             'code': '121070',
-            'reconcile': True,
             'tag_ids': cls.env.ref('account.account_tag_investing'),
         })
 
@@ -70,7 +66,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
         """ Enables period comparison and tests the growth comparison column; in order to ensure this feature works on reports with dynamic lines.
         """
         self.report.filter_period_comparison = True
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-12-31'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-12-31')
         options = self._update_comparison_filter(options, self.report, 'previous_period', 1)
 
         move_1 = self.env['account.move'].create({
@@ -121,7 +117,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
         )
 
     def test_cash_flow_journals(self):
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2017-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2017-01-01')
 
         misc_move = self.env['account.move'].create({
             'move_type': 'entry',
@@ -215,7 +211,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
         self.report.filter_period_comparison = True
         self.report.default_opening_date_filter = 'this_year'
 
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-12-31'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-12-31')
         options = self._update_comparison_filter(options, self.report, comparison_type='previous_period', number_period=1)
         options['filter_period_comparison'] = True
 
@@ -291,7 +287,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
 
     def test_cash_flow_column_groups(self):
         self.report.filter_period_comparison = True
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-01-31'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-01-31')
         options = self._update_comparison_filter(options, self.report, comparison_type='previous_period', number_period=1)
         options['filter_period_comparison'] = True
 
@@ -367,7 +363,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
 
     def test_cash_flow_multi_company_multi_currency_unfolding(self):
         company_data_3 = self.setup_other_company(name="Company 3")
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2017-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2017-01-01')
         options['unfold_all'] = True
         self.company_data_2['default_journal_bank'].default_account_id.code = '101411'
 
@@ -376,7 +372,6 @@ class TestCashFlowReport(TestAccountReportsCommon):
                 'account_type': 'asset_current',
                 'name': 'Account Operating',
                 'code': '121160',
-                'reconcile': True,
                 'tag_ids': self.env.ref('account.account_tag_operating'),
             })
             invoice = self.env['account.move'].with_company(company_data['company']).create({
@@ -438,7 +433,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
          - When making an advance payment.
          - when adding entries after the report date.
         '''
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2017-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2017-01-01')
 
         # First invoice, two receivable lines on the same account.
         invoice = self.env['account.move'].create({
@@ -618,7 +613,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
          - when dealing with multiple receivable account.
          - when making reconciliation involving multiple liquidity moves.
         '''
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2017-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2017-01-01')
 
         # First liquidity move.
         liquidity_move_1 = self.env['account.move'].create({
@@ -788,7 +783,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
         # Reconcile everything on account_financing.
         self._reconcile_on((move_1 + move_2 + move_3).line_ids, self.account_financing)
 
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-01-01')
 
         self.assertLinesValues(self.report._get_lines(options), [0, 1], [
             ['Cash and cash equivalents, beginning of period',                        0.0],
@@ -810,7 +805,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
             ['Cash and cash equivalents, closing balance',                         1000.0],
         ], options)
 
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-02-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-02-01')
 
         self.assertLinesValues(self.report._get_lines(options), [0, 1], [
             ['Cash and cash equivalents, beginning of period',                        0.0],
@@ -836,7 +831,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
         ''' The difficulty of this case is the liquidity move will pay the misc move at 1000 / 3000 = 1/3.
         However, you must take care of the sign because the 3000 in credit must become 1000 in debit.
         '''
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-01-01')
 
         move_1 = self.env['account.move'].create({
             'move_type': 'entry',
@@ -886,7 +881,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
 
     def test_cash_flow_tricky_case_5(self):
         ''' Same as test_cash_flow_tricky_case_4 in credit.'''
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-01-01')
 
         move_1 = self.env['account.move'].create({
             'move_type': 'entry',
@@ -936,7 +931,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
 
     def test_cash_flow_tricky_case_6(self):
         ''' Test the additional lines on liquidity moves (e.g. bank fees) are well reported. '''
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-01-01')
 
         moves = self.env['account.move'].create([
             {
@@ -1014,7 +1009,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
         ''' Test cross reconciliation between liquidity moves with additional lines when the liquidity account
         is reconcile.
         '''
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-01-01')
 
         move_1 = self.env['account.move'].create({
             'move_type': 'entry',
@@ -1038,8 +1033,6 @@ class TestCashFlowReport(TestAccountReportsCommon):
             ],
         })
         (move_1 + move_2).action_post()
-
-        self.account_bank.reconcile = True
 
         self._reconcile_on((move_1 + move_2).line_ids, self.account_bank)
 
@@ -1070,7 +1063,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
         - The reconciliations are partials.
         - There are additional lines on the misc moves.
         '''
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-01-01')
 
         move_1 = self.env['account.move'].create({
             'move_type': 'entry',
@@ -1122,7 +1115,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
 
     def test_cash_flow_tricky_case_9(self):
         ''' Same as test_cash_flow_tricky_case_8 with reversed debit/credit.'''
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-01-01')
 
         move_1 = self.env['account.move'].create({
             'move_type': 'entry',
@@ -1178,7 +1171,7 @@ class TestCashFlowReport(TestAccountReportsCommon):
             - when a mix of several non-cash-flow-report tags and one cash-flow report tag are set.
         '''
 
-        options = self._generate_options(self.report, fields.Date.from_string('2016-01-01'), fields.Date.from_string('2016-01-01'))
+        options = self._generate_options(self.report, '2016-01-01', '2016-01-01')
 
         unrelated_tag_1 = self.env['account.account.tag'].create({
             'name': 'Unrelated Tag 1',
@@ -1235,13 +1228,20 @@ class TestCashFlowReport(TestAccountReportsCommon):
         self.env.company.totals_below_sections = True
 
         # Create the account groups for the bank and cash accounts
-        self.env['account.group'].create([
-            {'name': 'Group Bank & Cash',   'code_prefix_start': '10',   'code_prefix_end': '10'},
-            {'name': 'Group Bank',          'code_prefix_start': '1014', 'code_prefix_end': '1014'},
-            {'name': 'Group Cash',          'code_prefix_start': '1015', 'code_prefix_end': '1015'},
+        account_parent_10 = self.env['account.account'].create({
+            'code': '10',
+            'name': 'Group Bank & Cash',
+            'account_type': 'asset_cash',
+            'active': False,
+        })
+        account_parent_1014, account_parent_1015 = self.env['account.account'].create([
+            {'code': '1014', 'name': 'Group Bank', 'account_type': 'asset_cash', 'parent_id': account_parent_10.id, 'active': False},
+            {'code': '1015', 'name': 'Group Cash', 'account_type': 'asset_cash', 'parent_id': account_parent_10.id, 'active': False},
         ])
         self.account_bank.code = "10140499"
+        self.account_bank.parent_id = account_parent_1014
         self.account_cash.code = "10150199"
+        self.account_cash.parent_id = account_parent_1015
 
         # Create opening balance
         self.env['account.move'].create({
@@ -1260,9 +1260,9 @@ class TestCashFlowReport(TestAccountReportsCommon):
         options['hierarchy'] = False
         lines_wo_hierarchy = [
             {
-                'name': line['name'],
-                'level': line['level'],
-                'book_value': line['columns'][-1]['name']
+                'name': line.name,
+                'level': line.level,
+                'book_value': line.columns[-1].name,
             }
             for line in self.report._get_lines(options)
         ]
@@ -1300,9 +1300,9 @@ class TestCashFlowReport(TestAccountReportsCommon):
         options['hierarchy'] = True
         lines = [
             {
-                'name': line['name'],
-                'level': line['level'],
-                'book_value': line['columns'][-1]['name']
+                'name': line.name,
+                'level': line.level,
+                'book_value': line.columns[-1].name,
             }
             for line in self.report._get_lines(options)
         ]

@@ -1,11 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-from odoo.addons.l10n_ec.models.res_partner import PartnerIdTypeEc
+from odoo.addons.l10n_ec.models.res_partner import EC_PARTNER_ID_CODES, verify_final_consumer
 from odoo.addons.l10n_ec_edi.models.account_move import L10N_EC_VAT_SUBTAXES, L10N_EC_VAT_RATES
 from odoo.exceptions import UserError
 from odoo.tools import float_repr
-from odoo.addons.l10n_ec.models.res_partner import verify_final_consumer
 import re
 
 
@@ -35,12 +34,6 @@ class L10n_EcReimbursement(models.Model):
         string='Vat Number',
         required=True,
         help='The partner vat number that will be showed in EDI and ATS'
-    )
-    partner_vat_type_id = fields.Many2one(
-        'l10n_latam.identification.type',
-        string="Vat Type",
-        required=True,
-        domain=lambda self: [('id', 'in', [self.env.ref('l10n_ec.ec_ruc').id, self.env.ref('l10n_latam_base.it_vat').id])]
     )
     partner_country_id = fields.Many2one(
         'res.country',
@@ -111,18 +104,19 @@ class L10n_EcReimbursement(models.Model):
             self.date = access_key_fields['document_date']
             self.partner_vat_number = access_key_fields['partner_vat']
             self.partner_country_id = access_key_fields['partner_vat'] and self.env['res.country'].search([('code', '=', 'EC')], limit=1).id
-            self.partner_vat_type_id = access_key_fields['partner_vat'] and self.env.ref('l10n_ec.ec_ruc', raise_if_not_found=False)
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
-        """ When the authorization change, populate the number for the document """
+        """ When the partner changes, populate the vat number and country for the document """
         if self.partner_id:
-            self.partner_vat_number = self.partner_id.vat
+            partner_id_type, partner_vat = self.partner_id._l10n_ec_get_identification_type()
+            self.partner_vat_number = partner_vat
             self.partner_country_id = self.partner_id.country_id
-            if self.partner_id.l10n_latam_identification_type_id in [self.env.ref('l10n_ec.ec_ruc', False), self.env.ref('l10n_latam_base.it_vat', False)]:
-                self.partner_vat_type_id = self.partner_id.l10n_latam_identification_type_id
-            else:
-                self.partner_vat_type_id = False
+            if partner_id_type not in ('ruc', 'foreign'):
+                return {'warning': {
+                    'title': self.env._("Unsupported identification type"),
+                    'message': self.env._("Reimbursements can only be registered for partners identified by RUC or a foreign VAT."),
+                }}
 
     def _prepare_base_line_for_taxes_computation(self):
         return self.env['account.tax']._prepare_base_line_for_taxes_computation(
@@ -166,28 +160,11 @@ class L10n_EcReimbursement(models.Model):
         """
         self.ensure_one()
 
-        def _get_ats_code_identification_type(partner_type_id):
-            if partner_type_id == 'ruc':
-                return PartnerIdTypeEc.OUT_RUC.value
-            return PartnerIdTypeEc.FOREIGN.value
-
-        partner_type_id = self._get_identification_type()
         if verify_final_consumer(self.partner_vat_number):  # Verify whether the doc number is: 13 * '9'
-            code = PartnerIdTypeEc.FINAL_CONSUMER.value
-        else:
-            code = _get_ats_code_identification_type(partner_type_id)
-        return code
-
-    def _get_identification_type(self):
-        """Maps Odoo identification types to Ecuadorian ones. In reimbursements can be only ruc or vat"""
-        id_type_xmlid = False
-        identification_type_id = self.partner_vat_type_id
-        if identification_type_id.id == self.env.ref('l10n_ec.ec_ruc').id:
-            id_type_xmlid = 'ruc'
-        elif identification_type_id.id == self.env.ref('l10n_latam_base.it_vat').id or identification_type_id.country_id.code != 'EC':
-            id_type_xmlid = 'foreign'
-
-        return id_type_xmlid
+            return EC_PARTNER_ID_CODES['final_consumer']
+        if self.partner_id and self.partner_id._l10n_ec_get_identification_type()[0] == 'ruc':
+            return EC_PARTNER_ID_CODES['out_ruc']
+        return EC_PARTNER_ID_CODES['foreign']
 
     def _get_reimbursement_line_vals(self):
         # in order to use in EDI

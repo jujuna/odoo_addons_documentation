@@ -14,15 +14,46 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-08 18:43+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 01:20+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"hr_appraisal/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_appraisal
+#: model:ir.module.module,description:base.module_hr_appraisal
+msgid ""
+"\n"
+"Periodical Employees appraisal\n"
+"==============================\n"
+"\n"
+"By using this application you can maintain the motivational process by doing "
+"periodical appraisals of your employees performance. The regular assessment "
+"of human resources can benefit your people as well your organization.\n"
+"\n"
+"An appraisal plan can be assigned to each employee. These plans define the "
+"frequency and the way you manage your periodic personal appraisal.\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Ability to create employee's appraisal(s).\n"
+"* An appraisal can be created by an employee's manager or automatically "
+"based on schedule which is defined in the employee form.\n"
+"* The appraisal is done according to a plan in which various surveys can be "
+"created. Each survey can be answered by a particular level in the employees "
+"hierarchy. The final review and appraisal is done by the manager.\n"
+"* Manager, colleague, collaborator, and employee himself/herself receives "
+"email to perform a periodical appraisal.\n"
+"* Every Appraisal Form filled by employees, colleague, collaborator, can be "
+"viewed in a PDF form.\n"
+"* Meeting Requests are created manually according to employees appraisals.\n"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -32,14 +63,6 @@ msgid "%(user)s decided, as %(role)s, to publish the employee's feedback"
 msgstr ""
 "%(user)s %(role)s sifatida xodimning fikr-mulohazalarini e'lon qilishga "
 "qaror qildi"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal_goal.py:0
-#: code:addons/hr_appraisal/models/hr_appraisal_template.py:0
-#, fuzzy
-msgid "%s (copy)"
-msgstr "%s (nusxa)"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -74,16 +97,6 @@ msgid ". Then, share it with appraisers."
 msgstr ". So‘ngra uni baholovchilarga yetkazing."
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__100
-msgid "100%"
-msgstr ""
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__025
-msgid "25%"
-msgstr ""
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_config_settings__module_hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 #, fuzzy
@@ -91,57 +104,7 @@ msgid "360 Feedback"
 msgstr "360 darajali fikr-mulohaza"
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__050
-msgid "50%"
-msgstr ""
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__075
-msgid "75%"
-msgstr ""
-
-#. module: hr_appraisal
-#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
-#, fuzzy
-msgid ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        An appraisal of <t t-"
-"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
-"                        <br/><br/>\n"
-"                        Please schedule an appraisal date together.\n"
-"                        <br/><br/>\n"
-"                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; text-"
-"align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\"background-color: {{object.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\">\n"
-"                                    View Appraisal\n"
-"                                </a>\n"
-"                            </p>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\"> <p style=\"margin: 0px; padding: "
-"0px; font-size: 13px;\"> <t t-out=\"ctx.get('employee_to_name')\">xodim</"
-"t>ning baholanishi tasdiqlandi. <br/><br/> Iltimos, baholash sanasini "
-"birgalikda belgilang. <br/><br/> <t t-if=\"ctx.get('recipient_users')\"> <p "
-"style=\"margin: 16px 0px 16px 0px; text-align: center;\"> <a t-att-"
-"href=\"ctx.get('url')\" t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\"> Baholashni ko‘rish </a> </p> </t> </p> </div>"
-
-#. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_request_from_employee
-#, fuzzy
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
@@ -151,10 +114,10 @@ msgid ""
 "                        <br/>\n"
 "                        <t t-out=\"ctx.get('author_name', '')\">Addison "
 "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-"\">addison.olson28@example.com</t>) wishes an appraisal.\n"
+"\">addison.olson28@example.com</t>) has requested an appraisal.\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
 "                            <div style=\"margin: 16px 0px 16px 0px; padding: "
-"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
+"8px 16px 8px 16px; background-color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">Annual "
 "appraisal.</t>\n"
 "                            </div>\n"
@@ -162,7 +125,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            <p style=\"margin: 16px 0px 16px 0px; padding: "
 "8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
 "padding: 8px 16px 8px 16px; text-decoration: none; color: "
@@ -176,37 +139,9 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        Hurmatli <t t-out=\"ctx.get('employee_to_name')\">xodim</t>,\n"
-"        <br/>\n"
-"        <t t-out=\"ctx.get('author_name', '')\">Addison Olson</t> (<t t-"
-"out=\"ctx.get('author_mail', '')\">addison.olson28@example.com</t>) sizni "
-"baholashni xohlayapti. <t t-if=\"ctx.get('user_body')\">\n"
-"            <div style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px "
-"16px; background-color: #F1F1F1;\">\n"
-"                <t t-out=\"ctx.get('user_body')\">Yillik baholash.</t>\n"
-"            </div>\n"
-"        </t>\n"
-"        <t t-if=\"ctx.get('recipient_users')\">\n"
-"            <p style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px "
-"16px; text-align: center;\">\n"
-"                <a t-att-href=\"ctx.get('url')\" t-attf-style=\"margin: "
-"auto; background-color: "
-"{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
-"padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
-"radius: 5px;\">\n"
-"                    Baholashni ko‘rish\n"
-"                </a>\n"
-"            </p>\n"
-"        </t>\n"
-"    </p>\n"
-"</div>"
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_reminder
-#, fuzzy
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
@@ -220,7 +155,8 @@ msgid ""
 "\">[deadline]</t>.\n"
 "                        <br/>\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
+"                            <div class=\"my-3 py-2 px-3\" style=\"background-"
+"color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">[Optional "
 "comment]</t>\n"
 "                            </div>\n"
@@ -228,7 +164,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            You can access your appraisal form here:\n"
 "                            <p class=\"text-center my-3 py-2 px-3\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
 "8px 16px; text-decoration: none; color: "
@@ -248,38 +184,35 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+
+#. module: hr_appraisal
+#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
+msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        Salom <t t-out=\"ctx.get('employee_to_name')\">[xodim]</t>,\n"
-"        <br/>\n"
-"        <t t-out=\"ctx.get('manager_names')\"> [Baholovchilar]</t> bilan "
-"keyingi baholashingiz <t t-out=\"ctx.get('date_close')\">[muddat]</t> "
-"sanasiga rejalashtirilganini eslatib o‘tmoqchiman. <br/>\n"
-"        <t t-if=\"ctx.get('user_body')\">\n"
-"            <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
-"                <t t-out=\"ctx.get('user_body')\">[Ixtiyoriy izoh]</t>\n"
-"            </div>\n"
-"        </t>\n"
-"        <t t-if=\"ctx.get('recipient_users')\">\n"
-"            Baholash shaklingizni quyidagi havola orqali ko‘rishingiz "
-"mumkin:\n"
-"            <p class=\"text-center my-3 py-2 px-3\">\n"
-"                <a t-att-href=\"ctx.get('url')\" t-attf-style=\" margin: "
-"auto; background-color: {{object.company_id.email_secondary_color or "
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        The appraisal for <t t-"
+"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
+"                        <br/><br/>\n"
+"                        Please proceed with the appraisal discussion based "
+"on the scheduled date.\n"
+"                        <br/><br/>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\"background-color: {{object.company_id.email_secondary_color or "
 "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
 "\">\n"
-"                    Baholashni ko‘rish\n"
-"                </a>\n"
-"            </p>\n"
-"        </t>\n"
-"        Agar savollaringiz bo‘lsa yoki vaqtni o‘zgartirish kerak bo‘lsa, "
-"bemalol murojaat qilishingiz mumkin. <br/>\n"
-"        <br/>\n"
-"        <t t-out=\"ctx.get('author_signature')\"/>\n"
-"        <br/>\n"
-"    </p>\n"
-"</div>"
+"                                    View Appraisal\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -455,6 +388,13 @@ msgstr "<span class=\"o_stat_text\">So‘nggi baholash</span>"
 #, fuzzy
 msgid "<span class=\"o_stat_text\">Appraisals</span>"
 msgstr "<span class=\"o_stat_text\">Baholashlar</span>"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
+msgid ""
+"<span class=\"o_stat_text\">Appraisals</span>\n"
+"                        <span class=\"o_stat_value\">New</span>"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
@@ -1093,6 +1033,7 @@ msgstr "Faol"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_root
 #, fuzzy
 msgid "Activities"
 msgstr "Faoliyatlar"
@@ -1111,6 +1052,13 @@ msgid "Activity Exception Decoration"
 msgstr "Faoliyat istisno belgisi"
 
 #. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_plans_ids
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_plans_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_plans
+msgid "Activity Plans"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_state
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_state
 #, fuzzy
@@ -1125,6 +1073,19 @@ msgid "Activity Type Icon"
 msgstr "Faoliyat turi belgisi"
 
 #. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_type_action_config_appraisal
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_type
+msgid "Activity Types"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid ""
+"Activity plans are used to assign a list of activities in just a few clicks\n"
+"                (e.g. \"Mid-Year Review\", \"Annual Appraisal\", ...)"
+msgstr ""
+
+#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 #, fuzzy
 msgid "Activity type"
@@ -1133,9 +1094,8 @@ msgstr "Faoliyat turi"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/hr_employee_selection_list/hr_employee_selection_list_view.xml:0
-#, fuzzy
 msgid "Add Goals to Employees"
-msgstr "Xodimlarga maqsadlar qo‘shish"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.hr_appraisal_config_templates_action
@@ -1168,19 +1128,10 @@ msgid "All companies"
 msgstr "Barcha kompaniyalar"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-#, fuzzy
-msgid ""
-"Allow to create appraisals in batches:\n"
-"- By Employee: for specific employees\n"
-"- By Company: all employees of the specified company\n"
-"- By Department: all employees of the specified department\n"
-"- By Employee Tag: all employees of the specific employee group category"
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Already Processed"
 msgstr ""
-"Baholashlarni guruhlar bo‘yicha yaratishga ruxsat berish: - Xodim bo‘yicha: "
-"muayyan xodimlar uchun - Kompaniya bo‘yicha: ko‘rsatilgan kompaniyaning "
-"barcha xodimlari - Bo‘lim bo‘yicha: ko‘rsatilgan bo‘limning barcha xodimlari "
-"- Xodim tegi bo‘yicha: muayyan xodimlar guruhi toifasining barcha xodimlari"
 
 #. module: hr_appraisal
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_reminder
@@ -1198,7 +1149,6 @@ msgstr "Xuddi shu odamlar bilan boshqa bir baholash allaqachon davom etmoqda."
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__appraisal_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__appraisal_id
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_activity
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_tree
@@ -1220,10 +1170,8 @@ msgid "Appraisal Assessment Note"
 msgstr "Baholash qaydnomasi"
 
 #. module: hr_appraisal
-#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 #, fuzzy
 msgid "Appraisal Campaign"
@@ -1278,9 +1226,8 @@ msgstr "Baholash maqsadi"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_appraisal_goal_tag
-#, fuzzy
-msgid "Appraisal Goal Tags"
-msgstr "Baholash maqsadi teglari"
+msgid "Appraisal Goal Tag"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1294,6 +1241,11 @@ msgstr "Baholovchi xodim"
 #, fuzzy
 msgid "Appraisal Plan Posted"
 msgstr "Baholash rejasi e'lon qilindi"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Appraisal Plans"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__appraisal_properties_definition
@@ -1313,6 +1265,12 @@ msgstr "Baholash eslatmasi"
 #, fuzzy
 msgid "Appraisal Request"
 msgstr "Baholash so‘rovi"
+
+#. module: hr_appraisal
+#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
+msgid ""
+"Appraisal Request from {{ hasattr(object, 'name') and object.name or '' }}"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_config_templates_action
@@ -1377,6 +1335,14 @@ msgid "Appraisal to start"
 msgstr "Boshlash uchun baholash"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_employee_departure.py:0
+msgid ""
+"Appraisal's managers have been updated due to the end of collaboration with "
+"an employee."
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.ir_cron_scheduler_appraisal_ir_actions_server
 #, fuzzy
 msgid "Appraisal: Run employee appraisal"
@@ -1387,13 +1353,13 @@ msgstr "Baholash: Xodimni baholashni o‘tkazish"
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_action_multiple_appraisals
 #: model:ir.actions.act_window,name:hr_appraisal.open_view_hr_appraisal_tree
+#: model:ir.module.module,shortdesc:base.module_hr_appraisal
 #: model:ir.ui.menu,name:hr_appraisal.menu_hr_appraisal_root
 #: model:ir.ui.menu,name:hr_appraisal.menu_open_view_hr_appraisal_tree
 #: model:res.groups.privilege,name:hr_appraisal.res_groups_privilege_appraisals
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_graph
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_pivot
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_department_view_kanban
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_departure_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 #, fuzzy
 msgid "Appraisals"
@@ -1446,6 +1412,11 @@ msgstr "Arxivlangan"
 #, fuzzy
 msgid "Ask to fill a survey to other employees"
 msgstr "Boshqa xodimlardan so‘rovnomani to‘ldirishni so‘rang"
+
+#. module: hr_appraisal
+#: model:ir.module.module,summary:base.module_hr_appraisal
+msgid "Assess your employees"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__assessment_note_ids
@@ -1514,30 +1485,6 @@ msgid "Body content is the same as the template"
 msgstr "Matn mazmuni shablon bilan bir xil"
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__company
-#, fuzzy
-msgid "By Company"
-msgstr "Kompaniya bo‘yicha"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__department
-#, fuzzy
-msgid "By Department"
-msgstr "Bo‘lim bo‘yicha"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__employee
-#, fuzzy
-msgid "By Employee"
-msgstr "Xodim bo‘yicha"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__category
-#, fuzzy
-msgid "By Employee Tag"
-msgstr "Xodim tegi bo‘yicha"
-
-#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 #, fuzzy
@@ -1570,14 +1517,14 @@ msgid "Can See Manager Publish"
 msgstr "Rahbar e'lonini ko‘rish imkoni"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
-#, fuzzy
-msgid "Cancel"
-msgstr "Bekor qilish"
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__children_progression
+msgid "Children Progression"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #, fuzzy
 msgid "Close"
@@ -1598,11 +1545,6 @@ msgstr "Rang"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_res_company
-#, fuzzy
-msgid "Companies"
-msgstr "Kompaniyalar"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__company_id
@@ -1632,6 +1574,7 @@ msgid "Configuration"
 msgstr "Konfiguratsiya"
 
 #. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_confirm_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #, fuzzy
 msgid "Confirm"
@@ -1654,9 +1597,13 @@ msgstr "Tarkib"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
-#, fuzzy
 msgid "Continue"
-msgstr "Davom etish"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Create a Appraisal Activity Plan"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__duration_first_appraisal
@@ -1776,18 +1723,6 @@ msgid "Delete"
 msgstr "O‘chirish"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-#, fuzzy
-msgid "Delete Future Appraisals"
-msgstr "Kelgusi baholashlarni o‘chirish"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-#, fuzzy
-msgid "Delete all appraisal after contract end date."
-msgstr "Shartnoma tugash sanasidan keyingi barcha baholashlarni o‘chirish"
-
-#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 #, fuzzy
@@ -1797,7 +1732,6 @@ msgstr "Ostki bo‘limlar bilan birga o‘chirish"
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_department
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__department_id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__department_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__department_ids
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1818,12 +1752,6 @@ msgid "Departments"
 msgstr "Bo‘limlar"
 
 #. module: hr_appraisal
-#: model:ir.model,name:hr_appraisal.model_hr_departure_wizard
-#, fuzzy
-msgid "Departure Wizard"
-msgstr "Ishdan bo‘shash yordamchisi"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__description
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
@@ -1834,7 +1762,6 @@ msgstr "Tavsif"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/hr_employee_selection_list/hr_employee_selection_list_view.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 #, fuzzy
 msgid "Discard"
 msgstr "Bekor qilish"
@@ -1847,8 +1774,8 @@ msgstr "Bekor qilish"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__display_name
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__display_name
@@ -1878,10 +1805,14 @@ msgid "Draft"
 msgstr "Qoralama"
 
 #. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Edit Feedback"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_mail_template
-#, fuzzy
-msgid "Email Templates"
-msgstr "Xat andozalari"
+msgid "Email Template"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_employee
@@ -1913,6 +1844,11 @@ msgid "Employee Autocomplete"
 msgstr "Xodimni avtomatik to‘ldirish"
 
 #. module: hr_appraisal
+#: model:ir.model,name:hr_appraisal.model_hr_employee_departure
+msgid "Employee Departure"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_feedback
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__appraisal_employee_feedback_template
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -1933,12 +1869,6 @@ msgid "Employee Feedback Template"
 msgstr "Xodim fikr-mulohazasi shabloni"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__category_id
-#, fuzzy
-msgid "Employee Tag"
-msgstr "Xodim tegi"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_user_id
 #, fuzzy
 msgid "Employee User"
@@ -1951,6 +1881,8 @@ msgid "Employee to review"
 msgstr "Ko‘rib chiqiladigan xodim"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #, fuzzy
 msgid "Employee's Feedback"
@@ -1984,6 +1916,16 @@ msgstr "Baholash shkalasi"
 #, fuzzy
 msgid "Exceeds expectations"
 msgstr "Kutilganidan yuqori"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Employee's Feedback"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Manager's Feedback"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_external
@@ -2030,13 +1972,6 @@ msgstr "Kuzatuvchilar"
 #, fuzzy
 msgid "Followers (Partners)"
 msgstr "Kuzatuvchilar (Hamkorlar)"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
-#, fuzzy
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesome ikonkasi, masalan fa-tasks"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -2165,8 +2100,8 @@ msgstr "Kompaniya haqida qanday fikrdaman?"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__id
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__id
@@ -2399,9 +2334,8 @@ msgstr "Baholash stsenariyasini yuklash"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-#, fuzzy
 msgid "Load sample data"
-msgstr "Namuna ma'lumotlarini yuklash"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -2458,6 +2392,8 @@ msgid "Manager Feedback Template"
 msgstr "Rahbar fikr-mulohazasi shabloni"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #, fuzzy
 msgid "Manager's Feedback"
@@ -2472,11 +2408,18 @@ msgstr "Rahbarlar"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/goal_helper_static_actions/goal_helper_static_actions.js:0
+#: model:ir.actions.server,name:hr_appraisal.action_mark_appraisal_as_done
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #, fuzzy
 msgid "Mark as Done"
 msgstr "Bajarildi deb belgilash"
+
+#. module: hr_appraisal
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2498,19 +2441,6 @@ msgstr "Xabar yetkazishda xatolik"
 #, fuzzy
 msgid "Messages"
 msgstr "Xabarlar"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-#, fuzzy
-msgid "Mode"
-msgstr "Rejim"
-
-#. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/components/cog_menu/multiple_appraisals_cog_menu.xml:0
-#, fuzzy
-msgid "Multiple Appraisals"
-msgstr "Ko‘p sonli baholashlar"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -2568,9 +2498,8 @@ msgstr "Yaxshilanishi kerak"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-#, fuzzy
 msgid "New Employee"
-msgstr "Yangi xodim"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2622,25 +2551,21 @@ msgid "Next Appraisal Date"
 msgstr "Keyingi baholash sanasi"
 
 #. module: hr_appraisal
+#: model:res.groups.privilege,placeholder:hr_appraisal.res_groups_privilege_appraisals
+msgid "No"
+msgstr ""
+
+#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-#, fuzzy
 msgid "No Appraisals found!"
-msgstr "Baholashlar topilmadi!"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-#, fuzzy
-msgid "No employees have the tag %(category_name)s"
-msgstr "%(category_name)s tegiga ega xodimlar yo‘q"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-#, fuzzy
 msgid "No employees to assess yet!"
-msgstr "Hali baholanadigan xodimlar yo‘q!"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -2648,13 +2573,6 @@ msgstr "Hali baholanadigan xodimlar yo‘q!"
 #, fuzzy
 msgid "No, keep it"
 msgstr "Yo‘q, shundayligicha qolsin"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
-#, fuzzy
-msgid "Note"
-msgstr "Izoh"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__number_of_completed_sibling_goals
@@ -2733,9 +2651,8 @@ msgstr "Afsus! Faqat qoralama baholashlarni o‘chirishingiz mumkin."
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/kanban/goal_kanban/goal_kanban_view.xml:0
 #: code:addons/hr_appraisal/static/src/views/list/goal_list/goal_list_view.xml:0
-#, fuzzy
 msgid "Open Library"
-msgstr "Kutubxonani ochish"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
@@ -2808,24 +2725,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #, fuzzy
-msgid ""
-"Please set a final rating to validate these appraisals:\n"
-"- %s"
-msgstr "Ushbu baholashlarni tasdiqlash uchun yakuniy reytingni belgilang: - %s"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
-#, fuzzy
 msgid "Previous Appraisals"
 msgstr "Oldingi baholashlar"
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/component/print_menu.xml:0
-#, fuzzy
 msgid "Print"
-msgstr "Chop etish"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__note
@@ -2847,7 +2754,8 @@ msgid "Programming"
 msgstr "Dasturlash"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression_display
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 #, fuzzy
 msgid "Progress"
 msgstr "Rivojlanish"
@@ -2857,6 +2765,11 @@ msgstr "Rivojlanish"
 #, fuzzy
 msgid "Progress:"
 msgstr "Jarayon:"
+
+#. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+msgid "Progression"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__appraisal_properties
@@ -2923,7 +2836,7 @@ msgstr "Resursning kirishini boshqarish uchun tegishli foydalanuvchi nomi."
 
 #. module: hr_appraisal
 #. odoo-javascript
-#: code:addons/hr_appraisal/static/src/fields/appraisal_remaining_days.js:0
+#: code:addons/hr_appraisal/static/src/fields/appraisal_relative_date.js:0
 #, fuzzy
 msgid "Remaining Days"
 msgstr "Qolgan kunlar"
@@ -2948,16 +2861,9 @@ msgstr "Hisobot"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_public_view_form
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 #, fuzzy
 msgid "Request Appraisal"
 msgstr "Baholash so‘rovi"
-
-#. module: hr_appraisal
-#: model:ir.actions.server,name:hr_appraisal.action_create_multi_appraisals
-#, fuzzy
-msgid "Request Appraisals"
-msgstr "Baholashlarni so‘rash"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_request_appraisal
@@ -2966,6 +2872,13 @@ msgid "Request an Appraisal"
 msgstr "Baholash so‘rash"
 
 #. module: hr_appraisal
+#. odoo-javascript
+#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
+msgid "Request an Appraisal with your manager to assess your work."
+msgstr ""
+
+#. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_appraisal_reset
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #, fuzzy
 msgid "Reset"
@@ -3005,13 +2918,6 @@ msgid "Schedule"
 msgstr "Jadval"
 
 #. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-#, fuzzy
-msgid "Schedule Appraisals"
-msgstr "Baholashlarni rejalashtirish"
-
-#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #, fuzzy
 msgid "Schedule Meeting"
@@ -3032,9 +2938,8 @@ msgstr "Baholashni qidirish"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
-#, fuzzy
 msgid "Select"
-msgstr "Tanlash"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3054,6 +2959,11 @@ msgstr "O‘zini o‘zi baholash shu yerda ko‘rsatiladi"
 #, fuzzy
 msgid "Send"
 msgstr "Yuborish"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.action_appraisal_send_by_email
+msgid "Send By Email"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -3137,6 +3047,12 @@ msgstr "Turdosh maqsadlar nisbati"
 #, fuzzy
 msgid "Soft Skills"
 msgstr "Yumshoq ko‘nikmalar"
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Some appraisals were already in another state and were skipped."
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__state
@@ -3244,15 +3160,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #, fuzzy
-msgid "The \"Manager Feedback Published\" cannot be changed by an employee."
-msgstr ""
-"\"Rahbar fikr-mulohazasi e'lon qilindi\" xodim tomonidan o‘zgartirilishi "
-"mumkin emas."
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
-#, fuzzy
 msgid "The appraisal's status has been set to Done by %s"
 msgstr "Baholash holati %s tomonidan \"Bajarildi\" deb belgilandi"
 
@@ -3267,13 +3174,6 @@ msgstr ""
 "sanasini to‘ldiradi"
 
 #. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-#, fuzzy
-msgid "The company %(company_name)s doesn't have employees"
-msgstr "%(company_name)s kompaniyasida xodimlar yo‘q"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_employee__next_appraisal_date
 #, fuzzy
 msgid ""
@@ -3282,13 +3182,6 @@ msgid ""
 msgstr ""
 "Keyingi baholash sanasi baholash rejasining sanalari asosida hisoblanadi "
 "(birinchi baholash + davriylik)."
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-#, fuzzy
-msgid "The department %(department_name)s doesn't have employees"
-msgstr "%(department_name)s bo‘limida xodimlar yo‘q"
 
 #. module: hr_appraisal
 #: model:ir.model.constraint,message:hr_appraisal.constraint_res_company_positif_number_months
@@ -3410,15 +3303,30 @@ msgstr "Tugallanmagan maqsadlar soni"
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"field: %(inaccessible_field)s"
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"fields: %(inaccessible_fields)s"
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #, fuzzy
 msgid "Unpublished"
 msgstr "E'lon qilinmagan"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_search
-#, fuzzy
-msgid "Upcoming Appraisals"
-msgstr "Kelgusi baholashlar"
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Update"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -3477,6 +3385,8 @@ msgid "Waiting Feedback from Employee/Managers"
 msgstr "Xodim/rahbarlardan fikr-mulohaza kutilmoqda"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__warning
 #, fuzzy
 msgid "Warning"
@@ -3488,20 +3398,6 @@ msgstr "Ogohlantirish"
 #, fuzzy
 msgid "Weaknesses"
 msgstr "Kamchiliklar"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-#, fuzzy
-msgid "Website Messages"
-msgstr "Veb-sayt xabarlari"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-#, fuzzy
-msgid "Website communication history"
-msgstr "Veb-sayt aloqa tarixi"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -3545,11 +3441,8 @@ msgstr ""
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-#, fuzzy
 msgid "Would you like to test with sample data or create your own employees?"
 msgstr ""
-"Namuna ma'lumotlari bilan sinab ko‘rmoqchimisiz yoki o‘z xodimlaringizni "
-"yaratmoqchimisiz?"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3586,6 +3479,12 @@ msgid ""
 msgstr ""
 "Siz bir vaqtning o‘zida maqsad va uning quyi maqsadlaridan birini takrorlay "
 "olmaysiz. Maqsadni takrorlash uning quyi maqsadlarini ham takrorlaydi."
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "You cannot modify a finished appraisal."
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3669,16 +3568,15 @@ msgid "once published"
 msgstr "e'lon qilingandan so‘ng"
 
 #. module: hr_appraisal
-#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
-#, fuzzy
-msgid ""
-"{{ hasattr(object, 'name') and object.name or '' }} requests an Appraisal"
-msgstr ""
-"{{ hasattr(object, 'name') and object.name or '' }} baholash so‘rovini "
-"yubormoqda"
-
-#. module: hr_appraisal
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_confirm
 #, fuzzy
 msgid "{{ object.employee_id.name }}: Appraisal Confirmed"
 msgstr "{{ object.employee_id.name }}: Baholash tasdiqlandi"
+
+#, fuzzy
+#~ msgid "Website Messages"
+#~ msgstr "Veb-sayt xabarlari"
+
+#, fuzzy
+#~ msgid "Website communication history"
+#~ msgstr "Veb-sayt aloqa tarixi"

@@ -21,8 +21,9 @@ class HelpdeskTicketToLead(models.TransientModel):
         return res
 
     convert_to = fields.Selection([
-        ('convert', 'Convert to opportunity'),
-    ], 'Conversion Action')
+        ('opportunity', 'Convert to Opportunity'),
+        ('lead', 'Convert to Lead'),
+    ], string="Conversion Action", default=lambda self: 'lead' if self.env.user.has_group('crm.group_use_lead') else 'opportunity')
     force_assignment = fields.Boolean(
         'Force assignment', default=True,
         help='If checked, forces salesman to be updated on updated opportunities even if already set.')
@@ -89,7 +90,6 @@ class HelpdeskTicketToLead(models.TransientModel):
             'team_id': self.team_id.id,
             'user_id': self.user_id.id,
             'description': self.ticket_id.description,
-            'email_cc': self.ticket_id.email_cc,
             "campaign_id": self.ticket_id.campaign_id.id,
             "medium_id": self.ticket_id.medium_id.id,
             "source_id": self.ticket_id.source_id.id,

@@ -14,17 +14,19 @@ class L10n_Es_ReportsRealEstate(models.Model):
     name = fields.Char(string='Name', required=True, help="Name to display to identify this real estate.")
     invoice_ids = fields.One2many(string='Related Invoices', inverse_name='l10n_es_real_estate_id', comodel_name='account.move', required=True)
 
-    cadastral_reference = fields.Selection(selection=[('1','Spanish Territory'),
+    real_estate_location = fields.Selection(selection=[('1', 'Spanish Territory'),
                                                       ('2', 'Autonomous Community'),
                                                       ('3', 'No Cadastral Reference'),
                                                       ('4', 'Abroad')],
-                                           string='Cadastral Reference',
+                                           string='Real Estate Location',
                                            required=True,
-                                           help="Cadastral reference: "
+                                           help="Real Estate Location: "
                                                 "1. Spanish Territory:  Property with cadastral reference located in any point of the Spanish territory, except Basque Country and Navarre."
                                                 "2. Autonomous Community: Property located in the Basque Country or Navarra."
                                                 "3. Property in any of the above situations but without cadastral reference."
                                                 "4. Property located abroad.")
+
+    cadastral_reference = fields.Char(string='Cadastral Reference', help="Cadastral Reference")
 
     street_type = fields.Char(string='Street Type', size=5, required=True, help="Type of street, normalized according to INE.")
     street_name = fields.Char(string='Street Name', size=50, required=True, help="Name of the street where the building is located.")

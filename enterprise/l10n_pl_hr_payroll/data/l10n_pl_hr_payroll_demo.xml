@@ -64,58 +64,40 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_pl'))]"/>
         <field name="company_id" ref="base.demo_company_pl"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="l10n_pl_hr_payroll/static/img/hr_employe_antonina.jpg"/>
-    </record>
-
-    <record id="pl_res_bank_pko" model="res.bank">
-        <field name="name">PKO Bank</field>
-        <field name="bic">BPKOPLPWXXX</field>
-        <field name="street">PKO Bank Street</field>
-        <field name="city">Warsaw</field>
-        <field name="zip">03-190</field>
-        <field name="state" ref="base.state_pl_mz"/>
-        <field name="country" ref="base.pl"/>
-        <field name="phone">99 931 29 98</field>
-    </record>
-    <record id="pl_res_bank_pko" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_pl_hr_payroll.pl_res_bank_pko')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="pl_res_bank_handlowy" model="res.bank">
-        <field name="name">Bank Handlowy</field>
-        <field name="bic">CITIPLPXXXX</field>
-        <field name="street">Bank Handlowy Rd</field>
-        <field name="city">Magdalenka</field>
-        <field name="zip">15-902</field>
-        <field name="state" ref="base.state_pl_mz"/>
-        <field name="country" ref="base.pl"/>
-        <field name="phone">99 920 28 94</field>
-    </record>
-    <record id="pl_res_bank_handlowy" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_pl_hr_payroll.pl_res_bank_handlowy')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="image_1920" type="bytes" file="l10n_pl_hr_payroll/static/img/hr_employe_antonina.jpg"/>
     </record>
 
     <record id="res_partner_bank_account_blazej" model="res.partner.bank">
-        <field name="acc_number">PL10105000997603123456789123</field>
+        <field name="account_number">PL10105000997603123456789123</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_pl_hr_payroll.pl_res_bank_pko"/>
+        <field name="bank_name">PKO Bank</field>
+        <field name="bank_bic">BPKOPLPWXXX</field>
+        <field name="street">PKO Bank Street</field>
+        <field name="city">Warsaw</field>
+        <field name="zip">03-190</field>
+        <field name="state_id" ref="base.state_pl_mz"/>
+        <field name="country_id" ref="base.pl"/>
         <field name="partner_id" ref="l10n_pl_hr_payroll.res_partner_blazej"/>
         <field name="company_id" ref="base.demo_company_pl"/>
-        <field name="currency_id" ref="base.PLN"/>
     </record>
 
     <record id="res_partner_bank_account_antonina" model="res.partner.bank">
-        <field name="acc_number">PL20002904010518489266398616</field>
+        <field name="account_number">PL20002904010518489266398616</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_pl_hr_payroll.pl_res_bank_handlowy"/>
+        <field name="bank_name">Bank Handlowy</field>
+        <field name="bank_bic">CITIPLPXXXX</field>
+        <field name="street">Bank Handlowy Rd</field>
+        <field name="city">Magdalenka</field>
+        <field name="zip">15-902</field>
+        <field name="state_id" ref="base.state_pl_mz"/>
+        <field name="country_id" ref="base.pl"/>
         <field name="partner_id" ref="l10n_pl_hr_payroll.res_partner_antonina"/>
         <field name="company_id" ref="base.demo_company_pl"/>
-        <field name="currency_id" ref="base.PLN"/>
     </record>
 
     <record id="hr_employee_blazej" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_pl_hr_payroll.res_partner_blazej')).name"/>
-        <field name="image_1920" type="base64" file="l10n_pl_hr_payroll/static/img/hr_employee_blazej.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_pl_hr_payroll/static/img/hr_employee_blazej.jpg"/>
         <field name="work_phone">99 651 04 01</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_pl_hr_payroll.res_partner_blazej')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_pl_hr_payroll.res_partner_blazej"/>
@@ -140,7 +122,6 @@
         <field name="emergency_phone">99 842 23 40</field>
         <field name="certificate">doctor</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">University of Warsaw</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_pl_hr_payroll.res_partner_bank_account_blazej'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -152,11 +133,12 @@
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_pl').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <record id="hr_employee_antonina" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_pl_hr_payroll.res_partner_antonina')).name"/>
-        <field name="image_1920" type="base64" file="l10n_pl_hr_payroll/static/img/hr_employe_antonina.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_pl_hr_payroll/static/img/hr_employe_antonina.jpg"/>
         <field name="work_phone">99 036 49 02</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_pl_hr_payroll.res_partner_antonina')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_pl_hr_payroll.hr_employee_blazej"/>
@@ -182,7 +164,6 @@
         <field name="emergency_phone">99 497 57 84</field>
         <field name="certificate">master</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Wroclaw University of Science and Technology</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_pl_hr_payroll.res_partner_bank_account_antonina'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -194,6 +175,7 @@
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-2, month=1, day=1))"/>
         <field name="contract_date_end" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-2))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_pl').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <function name="create_version" model="hr.employee">

@@ -9,6 +9,8 @@ from odoo import Command
 from odoo.tests import TransactionCase, tagged
 from odoo.exceptions import UserError
 
+from odoo.addons.delivery_starshipit.models.starshipit_service import Starshipit
+
 
 @contextmanager
 def _mock_starshipit_call(
@@ -122,7 +124,6 @@ class TestDeliveryStarShipIt(TransactionCase):
         })
         cls.au_partner = cls.env['res.partner'].create({
             'name': 'Acme Corporation',
-            'is_company': True,
             'street': '26 Acheron Road',
             'street2': False,
             'city': 'Hazelwood North',
@@ -227,7 +228,7 @@ class TestDeliveryStarShipIt(TransactionCase):
             self.assertIsNot(picking.starshipit_parcel_reference, False, "The StarShipIt Parcel Reference is not set")
 
             # Check that we the PDF is there and contains the "label"
-            pdf = picking.message_ids.attachment_ids.filtered(lambda m: m.datas == b'WW91J3JlIGEgY3VyaW91cyBvbmUgYXJlbid0IHlvdQ==')
+            pdf = picking.message_ids.attachment_ids.filtered(lambda m: m.raw.to_base64() == 'WW91J3JlIGEgY3VyaW91cyBvbmUgYXJlbid0IHlvdQ==')
             self.assertNotEqual(pdf, self.env['ir.attachment'], "The label should be present as a pdf attachment.")
 
     def test_generate_return(self):
@@ -265,7 +266,7 @@ class TestDeliveryStarShipIt(TransactionCase):
             # The parcel has been processed, but we wish to return it
             picking.carrier_id.starshipit_get_return_label(picking)
             self.assertIsNot(picking.starshipit_return_parcel_reference, False, "The StarShipIt Return Parcel Reference is not set")
-            pdf = picking.message_ids.attachment_ids.filtered(lambda m: m.datas == b'WW91J3JlIGEgY3VyaW91cyBvbmUgYXJlbid0IHlvdQ==')
+            pdf = picking.message_ids.attachment_ids.filtered(lambda m: m.raw.to_base64() == 'WW91J3JlIGEgY3VyaW91cyBvbmUgYXJlbid0IHlvdQ==')
             self.assertEqual(len(pdf), 2, "There should be two label, one for the shipping and one for the return.")
 
     def test_shipping_order_async_price(self):
@@ -309,13 +310,13 @@ class TestDeliveryStarShipIt(TransactionCase):
             'state_id': self.env.ref('base.state_au_7').id,
         })
 
-        starshipit_service = self.starshipit._get_starshipit()
-        # Without street2
-        partner_details = starshipit_service._populate_partner_details(self.au_partner)
-        self.assertEqual(partner_details['street'], '26 Acheron Road')
-        # With street2
-        partner_details = starshipit_service._populate_partner_details(au_partner_2)
-        self.assertEqual(partner_details['street'], 'Unit 12 Floor 15 26 Acheron Road')
+        with Starshipit(self.starshipit.starshipit_api_key, self.starshipit.starshipit_subscription_key, self.starshipit.log_xml) as starshipit_service:
+            # Without street2
+            partner_details = starshipit_service._populate_partner_details(self.au_partner)
+            self.assertEqual(partner_details['street'], '26 Acheron Road')
+            # With street2
+            partner_details = starshipit_service._populate_partner_details(au_partner_2)
+            self.assertEqual(partner_details['street'], 'Unit 12 Floor 15 26 Acheron Road')
 
     def test_retry_shipping_after_label_failure(self):
         sale_order = self.env['sale.order'].create({
@@ -339,7 +340,7 @@ class TestDeliveryStarShipIt(TransactionCase):
         # Simulate successful retry
         with _mock_starshipit_call(simulate_error=False):
             picking._action_done()
-            pdf = picking.message_ids.attachment_ids.filtered(lambda m: m.datas == b'WW91J3JlIGEgY3VyaW91cyBvbmUgYXJlbid0IHlvdQ==')
+            pdf = picking.message_ids.attachment_ids.filtered(lambda m: m.raw.to_base64() == 'WW91J3JlIGEgY3VyaW91cyBvbmUgYXJlbid0IHlvdQ==')
             self.assertNotEqual(pdf, self.env['ir.attachment'], "Label should be created successfully on retry.")
 
     def test_create_delivery_method_from_so(self):

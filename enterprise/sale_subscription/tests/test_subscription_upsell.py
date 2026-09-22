@@ -4,16 +4,19 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import Command
+from odoo import Command, fields
 from odoo.exceptions import ValidationError
 from odoo.tests import freeze_time, tagged
 from odoo.tools import format_date
 
 from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSubscriptionCommon
+from odoo.addons.sale_subscription.models.sale_order import SUBSCRIPTION_CLOSED_STATE
 
 
 @tagged('post_install', '-at_install')
 class TestSubscriptionUpsell(TestSubscriptionCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_upsell_no_start_date(self):
         self.sub_product_tmpl.subscription_rule_ids = [(5, 0, 0)]
         self.subscription_tmpl.write({
@@ -129,7 +132,9 @@ class TestSubscriptionUpsell(TestSubscriptionCommon):
                 'product_uom_qty': 1,
                 'price_unit': self.product3.list_price,
             })]
+            self.assertEqual(upsell_so.type_name, "Quotation")
             upsell_so.action_confirm()
+            self.assertEqual(upsell_so.type_name, "Sales Order")
             self.subscription._create_recurring_invoice()
             self.subscription.invoice_ids.filtered(lambda am: am.state == 'draft')._post()
             discounts = [round(v, 2) for v in upsell_so.order_line.sorted('discount').mapped('discount')]
@@ -165,9 +170,9 @@ class TestSubscriptionUpsell(TestSubscriptionCommon):
             self.subscription.invoice_ids.filtered(lambda am: am.state == 'draft')._post()
             inv = self.subscription.invoice_ids.sorted('date')[-1]
             invoice_periods = inv.invoice_line_ids.sorted('id').mapped('name')
-            first_period = invoice_periods[0].split('\n')[2]
+            first_period = invoice_periods[0].split('\n')[1]
             self.assertEqual(first_period, "1 Month 08/01/2021 to 08/31/2021")
-            second_period = invoice_periods[1].split('\n')[2]
+            second_period = invoice_periods[1].split('\n')[1]
             self.assertEqual(second_period, "1 Month 08/01/2021 to 08/31/2021")
 
         self.assertEqual(len(self.subscription.order_line), 4)
@@ -475,6 +480,40 @@ class TestSubscriptionUpsell(TestSubscriptionCommon):
             self.assertEqual(upsell_so_2.next_invoice_date, datetime.date(2023, 1, 2),
                              'We only invoice until the start of the renewal')
 
+    def test_upsell_with_different_end_date(self):
+        with freeze_time("2022-01-05"):
+            self.subscription.write({'start_date': False, 'next_invoice_date': False})
+            self.env['sale.order.line'].create({
+                'name': self.product2.name,
+                'order_id': self.subscription.id,
+                'product_id': self.product2.id,
+                'product_uom_qty': 3,
+                'price_unit': 42})
+
+            self.subscription.action_confirm()
+            self.subscription._create_recurring_invoice()
+            # We decide to invoice the monthly subscription on the 5 of february
+            self.subscription.next_invoice_date = fields.Date.from_string('2022-02-05')
+
+        with freeze_time("2022-01-15"):
+            action = self.subscription.prepare_upsell_order()
+            upsell_so = self.env['sale.order'].browse(action['res_id'])
+            upsell_so.order_line.unlink()
+            upsell_so.order_line = [Command.create({
+                'name': "Non recurring line",
+                'product_id': self.product5.id,  # non recurring product
+                'product_uom_qty': 2
+            })]
+            upsell_so.next_invoice_date = fields.Date.add(fields.Date.today(), years=1)
+            upsell_so.action_confirm()
+            invoice = upsell_so._create_invoices()
+            invoice._post()
+
+        with freeze_time("2022-02-05"):
+            # We check that the next invoice date doesn't take into account the upsell
+            self.subscription._cron_recurring_create_invoice()
+            self.assertEqual(self.subscription.next_invoice_date, datetime.date(2022, 3, 5))
+
     def test_upsell_with_different_currency_throws_error(self):
         pricelist_eur = self.env['product.pricelist'].create({
             'name': 'Euro pricelist',
@@ -525,7 +564,11 @@ class TestSubscriptionUpsell(TestSubscriptionCommon):
         invoice._post()
         self.assertEqual(self.subscription.next_invoice_date, next_invoice_date, "The next Invoice date should not be updated by an upsell")
 
+    @freeze_time('2026-01-28')
     def test_sale_subscription_upsell_does_not_copy_non_recurring_products(self):
+        """Ensure non recurring product of upsells are not copied in the parent order
+        This test also make sure that the discount of the parent order is untouched
+        """
         nr_product = self.env['product.template'].create({
             'name': 'Non recurring product',
             'type': 'service',
@@ -533,23 +576,31 @@ class TestSubscriptionUpsell(TestSubscriptionCommon):
             'list_price': 25,
             'invoice_policy': 'order',
         })
+        self.assertEqual(self.subscription.order_line.mapped('price_subtotal'), [1, 20], "Undiscounted prices should be 1, 20")
+        self.subscription.order_line.discount = 20
         self.subscription.action_confirm()
         self.subscription._create_recurring_invoice()
+        self.assertEqual(self.subscription.order_line.mapped('discount'), [20, 20], "Discount should be applied")
+        self.assertEqual(self.subscription.order_line.mapped('price_subtotal'), [0.8, 16], "Discount should be applied")
 
         action = self.subscription.prepare_upsell_order()
         upsell_so = self.env['sale.order'].browse(action['res_id'])
-        upsell_so.order_line = [(6, 0, self.env['sale.order.line'].create({
+        # add non recurring product
+        self.env['sale.order.line'].create({
             'name': nr_product.name,
             'order_id': upsell_so.id,
             'product_id': nr_product.product_variant_id.id,
             'product_uom_qty': 1,
-        }).ids)]
-
-        upsell_so._confirm_upsell()
-        self.assertEqual(len(upsell_so.order_line), 1)
-        self.assertEqual(len(self.subscription.order_line), 2)
-        self.assertEqual(upsell_so.order_line.name, nr_product.name)
+        })
+        # upsell the start date to trigger discount recomputation bug
+        upsell_so.start_date += relativedelta(days=10)
+        upsell_so.order_line.filtered(lambda l: not l.display_type).product_uom_qty = 1
+        self.assertEqual(upsell_so.order_line.mapped('discount'), [40, 40, 0.0, 0.0], "Upsell discount should be adapted")
+        upsell_so.action_confirm()
         self.assertFalse(nr_product in self.subscription.order_line.product_template_id)
+        self.subscription.order_line.invalidate_recordset(['discount', 'price_subtotal'])
+        self.assertEqual(self.subscription.order_line.mapped('discount'), [20, 20], "Discount of parent sub should remains")
+        self.assertEqual(self.subscription.order_line.mapped('price_subtotal'), [1.6, 32], "Discount of parent sub should remains (with new quantity)")
 
     def test_upsell_descriptions(self):
         """ On invoicing upsells, only subscription-based items should display a duration. """
@@ -676,3 +727,76 @@ class TestSubscriptionUpsell(TestSubscriptionCommon):
         action = self.subscription.prepare_upsell_order()
         upsell_so = self.env['sale.order'].browse(action['res_id'])
         self.assertFalse(upsell_so.duplicated_order_ids, "Upsell quotation should not be marked as duplicate order and not show warning")
+
+    def test_upsell_due_must_close_original_subscription(self):
+        """ Close the original subscription when a confirmed upsell has an unpaid invoice
+        whose payment_limit (based on the earliest maturity) has elapsed. """
+        # Set up the subscription on 2025-07-01 so its own invoice is not yet due.
+        with freeze_time("2025-07-01"):
+            subscription = self.subscription.create({
+                'name': 'Subscription A',
+                'sale_order_template_id': self.subscription_tmpl.id,
+                'partner_id': self.user_portal.partner_id.id,
+                'company_id': self.company.id,
+                'plan_id': self.plan_year.id,
+                'start_date': datetime.date(2025, 1, 1),
+                'order_line': [Command.create({
+                    'name': 'Product 1',
+                    'product_id': self.product.id,
+                    'product_uom_qty': 1,
+                })],
+            })
+            subscription.plan_id.auto_close_limit = 15
+            subscription.action_confirm()
+
+            # Subscription invoice: date_maturity ≈ 2025-07-01, payment_limit = 2025-07-16 (future).
+            invoice = subscription._create_invoices()
+            invoice.action_post()
+
+            # Build the upsell while still on 2025-07-01 to keep prorating consistent.
+            action = subscription.prepare_upsell_order()
+            upsell = self.env['sale.order'].browse(action['res_id'])
+            upsell.order_line.filtered(lambda l: not l.display_type).product_uom_qty = 1
+            upsell.action_confirm()
+
+        # Post the upsell invoice on 2025-06-01 so its payment_limit is in the past.
+        with freeze_time("2025-06-01"):
+            upsell_invoice = upsell._create_invoices()
+            upsell_invoice.invoice_date = datetime.date(2025, 6, 1)
+            upsell_invoice.invoice_date_due = datetime.date(2025, 6, 1)
+            upsell_invoice.action_post()
+
+        # Run the cron back on 2025-07-01: subscription invoice payment_limit is future,
+        # but upsell invoice payment_limit (2025-06-16) is past, so the subscription must close.
+        with freeze_time("2025-07-01"):
+            self.env['sale.order']._cron_subscription_expiration()
+            self.assertIn(
+                subscription.subscription_state,
+                SUBSCRIPTION_CLOSED_STATE,
+                "The subscription must be closed because its upsell invoice has an early date_maturity"
+                "past the auto_close_limit, even though the subscription's own invoice is not yet due.",
+            )
+
+    def test_upsell_productless(self):
+        """
+        Test that a upsell order can be created even if the original subscription has no products.
+        """
+        subscription = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'plan_id': self.plan_month.id,
+            'order_line': [
+                Command.create({
+                    'name': 'productless line',
+                    'product_uom_qty': 1,
+                    'price_unit': 100,
+                }),
+            ],
+        })
+
+        subscription.action_confirm()
+        subscription._create_recurring_invoice()
+
+        action = subscription.prepare_upsell_order()
+        upsell_so = self.env['sale.order'].browse(action['res_id'])
+        upsell_line = upsell_so.order_line.filtered(lambda l: not l.display_type)
+        self.assertEqual(len(upsell_line), 1)

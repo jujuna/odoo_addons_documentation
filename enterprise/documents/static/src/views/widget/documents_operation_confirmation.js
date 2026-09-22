@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { _t } from "@web/core/l10n/translation";
@@ -8,7 +8,7 @@ import { AccessRightsUpdateConfirmationDialog } from "@documents/owl/components/
 
 export class DocumentsOperationConfirmation extends Component {
     static template = "documents.DocumentsOperationConfirmation";
-    static props = { ...standardWidgetProps };
+    props = useProps(standardWidgetProps);
 
     setup() {
         super.setup();
@@ -16,6 +16,7 @@ export class DocumentsOperationConfirmation extends Component {
         this.dialog = useService("dialog");
         this.notification = useService("notification");
         this.orm = useService("orm");
+        this.store = useService("mail.store");
     }
 
     get buttonLabel() {
@@ -64,7 +65,8 @@ export class DocumentsOperationConfirmation extends Component {
                 return;
             }
         }
-        await this.orm.call("documents.operation", "action_confirm", [this.props.record.resId]);
+        const res = await this.orm.call("documents.operation", "action_confirm", [this.props.record.resId]);
+        this.store.insert(res);
         this.notifySuccess();
         this.env.dialogData.close();
     }
@@ -113,6 +115,15 @@ export class DocumentsOperationConfirmation extends Component {
             }
         }
         this.notification.add(message, { title: _t("Done"), type: "success" });
+    }
+
+    get preventNoOperation() {
+        return (
+            this.props.record.data.operation === "move" &&
+            this.props.record.data.document_ids.records.every(
+                (doc) => doc.data.user_folder_id === this.props.record.data.destination
+            )
+        );
     }
 
     get isMultiDocuments() {

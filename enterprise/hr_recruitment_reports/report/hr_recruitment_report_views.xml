@@ -224,7 +224,7 @@
             <field name="priority">10</field>
             <field name="arch" type="xml">
                 <graph string="Team Performance" stacked="0" sample="1">
-                    <field name="user_id"/>
+                    <field name="recruiter_id"/>
                     <field name="state"/>
                 </graph>
             </field>
@@ -236,7 +236,7 @@
             <field name="priority">10</field>
             <field name="arch" type="xml">
                 <pivot string="Team Performance" sample="1" js_class="recruitment_report_pivot">
-                    <field name="user_id" type="row"/>
+                    <field name="recruiter_id" type="row"/>
                     <field name="in_progress" type="measure"/>
                     <field name="refused" type="measure"/>
                     <field name="hired" type="measure"/>

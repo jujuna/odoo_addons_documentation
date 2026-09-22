@@ -2,6 +2,7 @@ import * as ProductScreen from "@point_of_sale/../tests/pos/tours/utils/product_
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
 import * as Dialog from "@point_of_sale/../tests/generic_helpers/dialog_util";
 import * as Chrome from "@point_of_sale/../tests/pos/tours/utils/chrome_util";
+import * as FeedbackScreen from "@point_of_sale/../tests/pos/tours/utils/feedback_screen_util";
 
 import { registry } from "@web/core/registry";
 
@@ -11,10 +12,9 @@ import { registry } from "@web/core/registry";
 
 function isQRDisplayedinDialog() {
     return [
-        Dialog.is({ title: "QR Code" }),
         {
             content: "Verify QR image is displayed",
-            trigger: ".modal-content img[src^='data:image/png;base64,']",
+            trigger: ".modal-content img[src^='data:image/svg+xml;base64,']",
             run: "click",
         },
     ].flat();
@@ -30,15 +30,12 @@ function addProductandPay(isPartialPay = false) {
         ...(isPartialPay
             ? [
                   PaymentScreen.clickPaymentMethod("QR Code"),
+                  Dialog.discard(),
                   PaymentScreen.clickNumpad("⌫"),
                   PaymentScreen.clickNumpad("+10"),
+                  PaymentScreen.clickRetryButton(),
               ]
             : [PaymentScreen.clickPaymentMethod("QR Code", true, { amount: "48" })]),
-        {
-            content: "Display QR Code Payment dialog",
-            trigger: ".button.send_payment_request.highlight",
-            run: "click",
-        },
     ].flat();
 }
 
@@ -66,28 +63,19 @@ registry.category("web_tour.tours").add("PaymentScreenWithQRPayment", {
             // --- FULL PAYMENT ---
             addProductandPay(),
             isQRDisplayedinDialog(),
-            Dialog.cancel(),
+            Dialog.discard(),
             PaymentScreen.validateButtonIsHighlighted(false),
-            {
-                content: "Retry to display QR Code Payment dialog",
-                trigger: ".button.send_payment_request.highlight",
-                run: "click",
-            },
+            PaymentScreen.clickRetryButton(),
             isQRDisplayedinDialog(),
             Dialog.confirm(),
-            {
-                content: "Immediately at the receipt screen.",
-                trigger: '.receipt-screen .button.next.highlight:contains("New Order")',
-                run: "click",
-            },
+            FeedbackScreen.isShown(),
+            FeedbackScreen.clickNextOrder(),
 
             // --- PARTIAL PAYMENT ---
             addProductandPay(true),
             isQRDisplayedinDialog(),
             Dialog.confirm(),
-            {
-                trigger: ".electronic_status:contains('Successful')",
-            },
+            PaymentScreen.hasActionState("paid"),
             PaymentScreen.clickPaymentMethod("Bank"),
             PaymentScreen.clickValidate(),
         ].flat(),
@@ -105,18 +93,10 @@ registry.category("web_tour.tours").add("PaymentScreenWithQRPaymentSwiss", {
             ProductScreen.clickPayButton(),
             PaymentScreen.totalIs("48"),
             PaymentScreen.clickPaymentMethod("QR Code", true, { amount: "48" }),
-            {
-                content: "Display QR Code Payment dialog",
-                trigger: ".button.send_payment_request.highlight",
-                run: "click",
-            },
             PaymentScreen.validateButtonIsHighlighted(false),
             isQRDisplayedinDialog(),
             Dialog.confirm(),
-            {
-                content: "Immediately at the receipt screen.",
-                trigger: '.receipt-screen .button.next.highlight:contains("New Order")',
-                run: "click",
-            },
+            FeedbackScreen.isShown(),
+            FeedbackScreen.clickNextOrder(),
         ].flat(),
 });

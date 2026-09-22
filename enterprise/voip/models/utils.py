@@ -1,4 +1,5 @@
 import re
+import uuid
 
 try:
     import phonenumbers
@@ -16,6 +17,35 @@ INTERNATIONAL_PHONE_NUMBER_RE = re.compile(
     """,
     re.VERBOSE,
 )
+
+
+def digits(number):
+    return re.sub(r"\D", "", number or "")
+
+
+def same_number(a, b):
+    a, b = digits(a), digits(b)
+    if not a or not b:
+        return False
+    return a == b or (len(a) >= 9 and len(b) >= 9 and a[-9:] == b[-9:])
+
+
+def is_valid_uuid4(value):
+    try:
+        return uuid.UUID(str(value)).version == 4
+    except ValueError:
+        return False
+
+
+def normalize_caller_number(number):
+    n = re.sub(r"\s", "", number or "")
+    if n.startswith("+"):
+        return n
+    if n.startswith("00"):
+        return "+" + n[2:]
+    if n.isdigit() and len(n) >= 10 and not n.startswith("0"):
+        return "+" + n
+    return number
 
 
 def extract_country_code(phone_number):
@@ -42,9 +72,17 @@ def extract_country_code(phone_number):
                 }
         return {"iso": "", "itu": ""}
 
-    if len(phone_number) >= 6 and phonenumbers:
+    phone_number = phone_number.strip()
+    # The international call prefix "00" is equivalent to "+"; normalize a leading
+    # "00" (only when followed by a country-code digit 1-9, like
+    # INTERNATIONAL_PHONE_NUMBER_RE) so phonenumbers can parse the full number and
+    # resolve shared country codes by the national number (e.g. 00 1 650… → US,
+    # not the ambiguous bare "1"). parse()/region_code_for_number() still validate
+    # the result, so a number that isn't actually international falls through.
+    parsable_number = re.sub(r"^00(?=[1-9])", "+", phone_number)
+    if len(parsable_number) >= 6 and phonenumbers:
         try:
-            parsed_number = phonenumbers.parse(phone_number, None)
+            parsed_number = phonenumbers.parse(parsable_number, None)
             country_code = phonenumbers.region_code_for_number(parsed_number)
             if country_code:
                 return {

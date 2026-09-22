@@ -20,6 +20,8 @@ from odoo.addons.account_online_synchronization.models.odoofin_auth import OdooF
 from odoo.tools.misc import format_amount, format_date, get_lang
 from odoo.tools import _, LazyTranslate
 
+NON_BLOCKING_ERROR = 'non_blocking_error'
+
 _lt = LazyTranslate(__name__)
 _logger = logging.getLogger(__name__)
 pattern = re.compile("^[a-z0-9-_]+$")
@@ -110,18 +112,20 @@ class AccountOnlineAccount(models.Model):
             or False (we fetch transactions as far as possible)
         """
         currency_id = self.currency_id.id if not self.currency_id.is_current_company_currency else False
-        existing_journal = self.env['account.journal'].search([
-            ('bank_acc_number', '=', self.account_number),
-            ('currency_id', '=', currency_id),
-            ('type', '=', 'bank'),
-            ('account_online_account_id', '=', False),
-        ], limit=1)
+        existing_journals = self.env['account.journal']
+        if self.account_number:
+            existing_journals = self.env['account.journal'].search([
+                ('bank_account_number', '=', self.account_number),
+                ('currency_id', '=', currency_id),
+                ('type', '=', 'bank'),
+            ])
 
         self.ensure_one()
+        journal = self.env['account.journal']
         if (active_id := self.env.context.get('active_id')) and self.env.context.get('active_model') == 'account.journal':
             journal = self.env['account.journal'].browse(active_id)
             # If we already have a linked account on that journal, it means we are in the process of relinking
-            # it is due to an error that occured which require to redo the connection (can't fix it).
+            # it is due to an error that occurred which require to redo the connection (can't fix it).
             # Hence we delete the previously linked account.online.link to prevent showing multiple
             # duplicate existing connections when opening the iframe
             if journal.account_online_link_id:
@@ -147,16 +151,25 @@ class AccountOnlineAccount(models.Model):
                     if not move_lines_in_other_currency:
                         # If not set yet and there are no conflicting entries, set it.
                         journal.sudo().currency_id = self.currency_id.id
-        elif existing_journal:
-            journal = existing_journal
-        else:
-            new_journal_code = self.env['account.journal']._get_next_journal_default_code(journal_type, self.env.company)
+        elif existing_journals:
+            if linked_journals := existing_journals.filtered('account_online_link_id'):
+                if any(j.account_online_link_id.state == 'connected' for j in linked_journals):
+                    raise UserError(_("There's already a synchronized journal linked to this IBAN"))
+                # sort by most recent online_account_id.last_sync
+                linked_journals = linked_journals.sorted(key=lambda j: j.account_online_account_id.last_sync, reverse=True)
+                journal = linked_journals[0]
+            else:
+                # We found a journal with the account_number but not synchronized
+                journal = existing_journals[0]
+        if not journal:
+            company = self.company_id or self.env.company
+            new_journal_code = self.env['account.journal']._get_next_journal_default_code(journal_type, company)
             journal = self.env['account.journal'].create({
                 'name': self.account_number or self.display_name,
                 'code': new_journal_code,
                 'type': journal_type,
-                'company_id': self.env.company.id,
-                'currency_id': self.currency_id.id != self.env.company.currency_id.id and self.currency_id.id or False,
+                'company_id': company.id,
+                'currency_id': self.currency_id.id != company.currency_id.id and self.currency_id.id or False,
             })
 
         self.sudo().journal_ids = journal
@@ -164,8 +177,8 @@ class AccountOnlineAccount(models.Model):
         journal_vals = {
             'bank_statements_source': 'online_sync',
         }
-        if self.account_number and not self.journal_ids.bank_acc_number:
-            journal_vals['bank_acc_number'] = self.account_number
+        if self.account_number and not self.journal_ids.bank_account_number:
+            journal_vals['bank_account_number'] = self.account_number
         self.journal_ids.sudo().write(journal_vals)
         # Update connection status and get consent expiration date and create an activity on related journal
         self.account_online_link_id._update_connection_status()
@@ -178,15 +191,8 @@ class AccountOnlineAccount(models.Model):
             last_sync = bnk_stmt_line.date
         self.last_sync = last_sync
 
-        if swift_code:
-            if self.journal_ids.bank_account_id.bank_id:
-                if not self.journal_ids.bank_account_id.bank_id.bic:
-                    self.journal_ids.bank_account_id.bank_id.bic = swift_code
-            else:
-                bank_rec = self.env['res.bank'].search([('bic', '=', swift_code)], limit=1)
-                if not bank_rec:
-                    bank_rec = self.env['res.bank'].create({'name': self.account_online_link_id.display_name, 'bic': swift_code})
-                self.journal_ids.bank_account_id.bank_id = bank_rec.id
+        if swift_code and not self.journal_ids.bank_account_id.bank_bic:
+            self.journal_ids.bank_account_id.bank_bic = swift_code
 
     def _refresh(self):
         """
@@ -224,7 +230,7 @@ class AccountOnlineAccount(models.Model):
 
     def _retrieve_transactions(self, date=None, transactions_type='posted'):
         last_stmt_line = self.env['account.bank.statement.line'].search([
-                ('date', '<=', self.last_sync or fields.Date().today()),
+                ('date', '<=', date or self.last_sync or fields.Date().today()),
                 ('online_transaction_identifier', '!=', False),
                 ('journal_id', 'in', self.journal_ids.ids),
                 ('online_account_id', '=', self.id)
@@ -262,16 +268,6 @@ class AccountOnlineAccount(models.Model):
             data['next_data'] = resp_json.get('next_data') or {}
 
         return self._format_transactions(transactions)
-
-    def get_formatted_balances(self):
-        balances = {}
-        for account in self:
-            if account.currency_id:
-                formatted_balance = format_amount(self.env, account.balance, account.currency_id)
-            else:
-                formatted_balance = '%.2f' % account.balance
-            balances[account.id] = [formatted_balance, account.balance]
-        return balances
 
     ###########
     # HELPERS #
@@ -321,8 +317,6 @@ class AccountOnlineAccount(models.Model):
         transaction_sign = -1 if self.inverse_transaction_sign else 1
         currencies = self.env['res.currency'].with_context(active_test=False).search([])
         currency_code_mapping = {currency.name: currency for currency in currencies}
-        # field end_to_end_uuid only exists in account_iso20022 but is always given by odoofin
-        is_iso20022_installed = self.env['ir.module.module']._get('account_iso20022').state == 'installed'
 
         formatted_transactions = []
         for transaction in new_transactions:
@@ -332,9 +326,6 @@ class AccountOnlineAccount(models.Model):
                     transaction.update({'foreign_currency_id': currency.id})
                     if not currency.active:
                         currency.active = True
-
-            if not is_iso20022_installed:
-                transaction.pop('end_to_end_uuid', False)
 
             formatted_transactions.append({
                 **transaction,
@@ -414,48 +405,30 @@ class AccountOnlineLink(models.Model):
     ##########################
     # Wizard opening actions #
     ##########################
-    def create_new_bank_account_action(self, data):
+    def action_create_manual_bank_account(self, data):
+        """
+        Creates a new bank or credit journal.
+        If a bank account number is provided in the data payload, a corresponding
+        res.partner.bank record will be created (if missing) and linked to the journal.
+        """
         self.ensure_one()
         journal_type = data.get('journal_type') or 'bank'
         assert journal_type in ('bank', 'credit')
-        if journal_type == 'bank':
-            view_xml_id = 'account.setup_bank_account_wizard'
-            name = _('Setup Bank Account')
-        else:
-            view_xml_id = 'account.setup_credit_card_account_wizard'
-            name = _('Setup Credit Card Account')
 
-        # We do return the bank account setup wizard if we don't have minimum info
-        if not data or not data.get('account_number'):
-            ctx = {**self.env.context, 'journal_type': journal_type}
-            # if this was called from kanban box, active_model is in context
-            if self.env.context.get('active_model') == 'account.journal':
-                ctx = {**ctx, 'default_linked_journal_id': ctx.get('active_id', False), 'dialog_size': 'medium'}
-            return {
-                'type': 'ir.actions.act_window',
-                'name': name,
-                'res_model': 'account.setup.bank.manual.config',
-                'target': 'new',
-                'view_mode': 'form',
-                'context': ctx,
-                'views': [[self.env.ref(view_xml_id).id, 'form']],
-            }
-
-        bank = self.env['res.bank']
-        if data.get('name'):
-            bank = self.env['res.bank'].sudo().create({
-                'name': data['name'],
-                'bic': data.get('swift_code'),
-            })
-
-        bank_account = self.env['res.partner.bank'].sudo().create({
-            'acc_number': data.get('account_number'),
-            'bank_id': bank.id,
-            'partner_id': self.company_id.partner_id.id,
-        })
+        bank_account = self.env['res.partner.bank']
+        if data.get('account_number'):
+            bank_account = self.env['res.partner.bank']._find_or_create_bank_account(
+                account_number=data.get('account_number'),
+                partner=self.company_id.partner_id, allow_company_account_creation=True,
+                company=self.company_id,
+                extra_create_vals={
+                    'bank_name': data.get('name'),
+                    'bank_bic': data.get('swift_code'),
+                },
+            )
 
         self.env['account.journal'].sudo().create({
-            'name': data.get('account_number'),
+            'name': data.get('account_number') or data.get('name'),
             'type': journal_type,
             'bank_account_id': bank_account.id,
             'company_id': self.company_id.id,
@@ -576,7 +549,7 @@ class AccountOnlineLink(models.Model):
 
     @api.model
     def _get_odoofin_url(self, url):
-        proxy_mode = self.env['ir.config_parameter'].sudo().get_param('account_online_synchronization.proxy_mode') or 'production'
+        proxy_mode = self.env['ir.config_parameter'].sudo().get_str('account_online_synchronization.proxy_mode') or 'production'
         if not pattern.match(proxy_mode) and not runbot_pattern.match(proxy_mode):
             raise UserError(_('Invalid value for proxy_mode config parameter.'))
         endpoint_url = 'https://%s.odoofin.com%s' % (proxy_mode, url)
@@ -598,14 +571,14 @@ class AccountOnlineLink(models.Model):
         if not url.startswith('/'):
             raise UserError(_('Invalid URL'))
 
-        timeout = int(self.env['ir.config_parameter'].sudo().get_param('account_online_synchronization.request_timeout')) or 60
+        timeout = self.env['ir.config_parameter'].sudo().get_int('account_online_synchronization.request_timeout') or 60
         endpoint_url = self._get_odoofin_url(url)
         cron = self.env.context.get('cron', False)
         data['utils'] = {
             'request_timeout': timeout,
             'lang': get_lang(self.env).code,
             'server_version': odoo.release.serie,
-            'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+            'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             'cron': cron,
         }
         if request:
@@ -663,7 +636,10 @@ class AccountOnlineLink(models.Model):
             error_details = error.get('data')
             subject = error.get('message')
             message = error_details.get('message')
-            state = error_details.get('odoofin_state') or 'error'
+            state = error_details.get('odoofin_state')
+            if state is None:
+                # None blocking errors must not change the connection state, anything else is a real error
+                state = self.state if error_details.get('exception_type') == NON_BLOCKING_ERROR else 'error'
             ctx = self.env.context.copy()
             ctx['error_reference'] = error_details.get('error_reference')
             ctx['provider_type'] = error_details.get('provider_type')
@@ -790,6 +766,15 @@ class AccountOnlineLink(models.Model):
 
         if accounts:
             self.has_unlinked_accounts = True
+            account_numbers = [acc['account_number'] for acc in accounts.values() if acc.get('account_number')]
+
+            if account_numbers:
+                self.env['res.partner.bank'].search([
+                    ('active', '=', False),
+                    ('partner_id', '=', self.company_id.partner_id.id),
+                    ('account_number', 'in', account_numbers),
+                ]).active = True
+
             return self.env['account.online.account'].create(list(accounts.values())), swift_code
         return False, False
 
@@ -960,6 +945,10 @@ class AccountOnlineLink(models.Model):
             # doesn't send us a new consent expiring date
             self.expiring_synchronization_date = None
 
+    @api.model
+    def _get_institution_data(self):
+        return self._fetch_odoo_fin('/proxy/v1/get_user_institution_data')
+
     def _update_connection_status(self):
         self.ensure_one()
         resp_json = self._fetch_odoo_fin('/proxy/v2/connection_status', ignore_status=True)
@@ -1102,10 +1091,10 @@ class AccountOnlineLink(models.Model):
     def action_new_synchronization(self, preferred_inst=None, journal_id=False, journal_type='bank'):
         # Search for an existing link that was not fully connected
         online_link = self
-        if not online_link:
-            online_link = self.search([('account_online_account_ids', '=', False)], limit=1)
+        if not online_link or online_link.provider_type:
+            online_link = self.search([('account_online_account_ids', '=', False), ('provider_type', '=', False)], limit=1)
         # If not found, create a new one
-        if not online_link:
+        if not online_link or online_link.provider_type:
             online_link = self.create({})
         return online_link._open_iframe('link', preferred_institution=preferred_inst, journal_id=journal_id, journal_type=journal_type)
 
@@ -1130,7 +1119,7 @@ class AccountOnlineLink(models.Model):
                 self.unlink()
                 return self.create({})._open_iframe('link')
 
-        proxy_mode = self.env['ir.config_parameter'].sudo().get_param('account_online_synchronization.proxy_mode') or 'production'
+        proxy_mode = self.env['ir.config_parameter'].sudo().get_str('account_online_synchronization.proxy_mode') or 'production'
         country = self.env['account.journal'].browse(journal_id).company_id.account_fiscal_country_id or self.env.company.country_id
         action = {
             'type': 'ir.actions.client',
@@ -1164,7 +1153,7 @@ class AccountOnlineLink(models.Model):
 
         if mode == 'link':
             user_email = self.env.user.email or self.env.ref('base.user_admin').email or ''  # Necessary for some providers onboarding
-            action['params']['includeParam']['dbUuid'] = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+            action['params']['includeParam']['dbUuid'] = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
             action['params']['includeParam']['userEmail'] = user_email
             # Compute a hash of a random string for each connection in success
             existing_link = self.search([('state', '!=', 'disconnected'), ('has_unlinked_accounts', '=', True)])

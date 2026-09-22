@@ -88,10 +88,6 @@ class AccountReportBudget(models.Model):
             # Make sure that the model is flushed before continuing the code and fetching these new items
             self.env['account.report.budget.item'].flush_model()
 
-    def copy_data(self, default=None):
-        vals_list = super().copy_data(default=default)
-        return [dict(vals, name=self.env._("%s (copy)", budget.name)) for budget, vals in zip(self, vals_list)]
-
     def copy(self, default=None):
         new_budgets = super().copy(default)
         for old_budget, new_budget in zip(self, new_budgets):
@@ -114,7 +110,7 @@ class AccountReportBudgetItem(models.Model):
     account_id = fields.Many2one(
         string="Account",
         comodel_name='account.account',
-        domain="[('account_type', 'in', ('income', 'income_other', 'expense', 'expense_depreciation', 'expense_direct_cost'))]",
+        domain="[('account_type', 'in', ('income', 'income_other', 'expense', 'expense_other', 'expense_depreciation', 'expense_direct_cost'))]",
         required=True,
         index=True,
     )

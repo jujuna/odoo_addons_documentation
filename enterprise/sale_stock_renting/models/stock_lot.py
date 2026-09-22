@@ -14,9 +14,9 @@ class StockLot(models.Model):
             return
 
         sol = self.env['sale.order.line'].browse(sol_id)
-        sol.reserved_lot_ids = (
-            sol.reserved_lot_ids | self._get_available_lots(sol.product_id)
-        )[:int(sol.product_uom_qty)]
+        sol.reserved_lot_ids = (sol.reserved_lot_ids | self._get_available_lots(sol.product_id))[
+            : int(sol.product_uom_qty)
+        ]
 
     @api.model
     def _get_available_lots(self, products, location=None):
@@ -29,7 +29,7 @@ class StockLot(models.Model):
         quant_domain = Domain([
             ('product_id', 'in', products.ids),
             ('lot_id', '!=', False),
-            ('location_id.usage', '=', 'internal')
+            ('location_id.usage', '=', 'internal'),
         ])
         if location:
             quant_domain &= Domain.OR([
@@ -41,5 +41,5 @@ class StockLot(models.Model):
 
     @api.model
     def _get_lots_in_rent(self, product):
-        """Company_wise"""
+        """Company_wise."""
         return self._get_available_lots(product, self.env.company.rental_loc_id)

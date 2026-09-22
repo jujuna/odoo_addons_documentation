@@ -1,7 +1,7 @@
 from odoo import api, fields, models, Command
 
 
-class L10n_Mx_EdiGlobal_InvoiceCreate(models.Model):
+class L10n_Mx_EdiGlobal_InvoiceCreate(models.TransientModel):
     _inherit = 'l10n_mx_edi.global_invoice.create'
 
     pos_order_ids = fields.Many2many(comodel_name='pos.order')
@@ -21,6 +21,6 @@ class L10n_Mx_EdiGlobal_InvoiceCreate(models.Model):
         # EXTENDS 'l10n_mx_edi'
         self.ensure_one()
         if self.pos_order_ids:
-            self.pos_order_ids._l10n_mx_edi_cfdi_global_invoice_try_send(periodicity=self.periodicity)
+            self.pos_order_ids._l10n_mx_edi_cfdi_global_invoice_try_send(self.date, periodicity=self.periodicity)
         else:
             super().action_create_global_invoice()

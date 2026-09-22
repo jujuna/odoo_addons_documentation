@@ -11,6 +11,8 @@ from odoo.tools import misc
 
 @tagged('post_install', '-at_install', 'post_install_l10n')
 class TestL10nBgLedgerReports(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('bg')
     def setUpClass(cls):

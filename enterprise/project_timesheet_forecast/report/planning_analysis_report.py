@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, api
+from odoo.tools import SQL
 
 
 class PlanningAnalysisReport(models.Model):
@@ -16,16 +17,23 @@ class PlanningAnalysisReport(models.Model):
 
     @api.model
     def _select(self):
-        return super()._select() + """,
+        return SQL("""%s,
             S.effective_hours AS effective_hours,
             S.percentage_hours AS percentage_hours,
             (S.allocated_hours - S.effective_hours) AS remaining_hours,
-            S.allocated_hours * E.hourly_cost AS allocated_hours_cost,
-            S.effective_hours * E.hourly_cost AS effective_hours_cost
-        """
+            SUM(S.allocated_hours * E.hourly_cost) AS allocated_hours_cost,
+            SUM(S.effective_hours * E.hourly_cost) AS effective_hours_cost
+        """, super()._select())
+
+    @api.model
+    def _join(self):
+        return SQL("""%s
+            LEFT JOIN planning_slot_resource_resource_rel R ON S.id = R.planning_slot_id
+            LEFT JOIN hr_employee E ON R.resource_resource_id = E.resource_id
+        """, super()._join())
 
     @api.model
     def _group_by(self):
-        return super()._group_by() + """,
-            S.effective_hours, S.allocated_hours, E.hourly_cost
-        """
+        return SQL("""%s,
+            S.effective_hours, S.allocated_hours
+        """, super()._group_by())

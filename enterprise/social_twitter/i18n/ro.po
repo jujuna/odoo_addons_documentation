@@ -9,16 +9,16 @@
 # Dan Stoica <danila@terrabit.ro>, 2022
 # Foldi Robert <foldirobert@nexterp.ro>, 2022
 # Dorin Hongu <dhongu@gmail.com>, 2023
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-11-27 16:39+0000\n"
-"Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:56+0000\n"
+"PO-Revision-Date: 2026-09-17 23:08+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "social_twitter/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -26,15 +26,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.14.3\n"
-
-#. module: social_twitter
-#. odoo-python
-#: code:addons/social_twitter/models/social_post_template.py:0
-msgid "%(current_length)s / %(max_length)s characters to fit in a Post"
-msgstr ""
-"%(current_length)s / %(max_length)s caractere pentru a se încadra într-o "
-"postare"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
@@ -48,33 +40,46 @@ msgstr "<b class=\"text-900\">Cont X</b>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-comments me-1\" title=\"Comments\"/>"
-msgstr "<i class=\"fa fa-comments me-1\" title=\"Comentarii\"/>"
-
-#. module: social_twitter
-#: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-heart me-1\" title=\"Likes\"/>"
-msgstr "<i class=\"fa fa-heart me-1\" title=\"Aprecieri\"/>"
+msgid "<i class=\"oi me-1\" data-icon=\"repeat\" title=\"Repost a post\"/>"
+msgstr ""
+"<i class=\"oi me-1\" data-icon=\"repeat\" title=\"Repostează o postare\"/>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid ""
-"<i class=\"fa fa-pencil me-1\" title=\"Quote a post\"/>\n"
+"<i class=\"oi oi-filled me-1\" data-icon=\"edit\" title=\"Quote a post\"/>\n"
 "                                    <span>Quote</span>"
 msgstr ""
-"<i class=\"fa fa-pencil me-1\" title=\"Citează o postare\"/>\n"
+"<i class=\"oi oi-filled me-1\" data-icon=\"edit\" title=\"Citează o "
+"postare\"/>\n"
 "                                    <span>Citează</span>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-retweet me-1\" title=\"Repost a post\"/>"
-msgstr "<i class=\"fa fa-retweet me-1\" title=\"Repostează o postare\"/>"
+msgid "<i class=\"oi oi-filled me-1\" data-icon=\"favorite\" title=\"Likes\"/>"
+msgstr ""
+"<i class=\"oi oi-filled me-1\" data-icon=\"favorite\" title=\"Aprecieri\"/>"
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
+msgid "<span>1 Comment</span>"
+msgstr ""
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
+msgid "@x ·"
+msgstr ""
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "A repost already exists"
 msgstr "O repostare există deja"
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
+msgid "Add Media"
+msgstr ""
 
 #. module: social_twitter
 #. odoo-python
@@ -100,12 +105,6 @@ msgstr ""
 "%s."
 
 #. module: social_twitter
-#. odoo-javascript
-#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
-msgid "Cancel"
-msgstr "Anulează"
-
-#. module: social_twitter
 #: model:ir.model.fields,help:social_twitter.field_res_config_settings__twitter_use_own_account
 msgid ""
 "Check this if you want to use your personal X Developer Account instead of "
@@ -113,6 +112,19 @@ msgid ""
 msgstr ""
 "Bifați această opțiune dacă doriți să folosiți propriul cont X Developer în "
 "locul celui furnizat."
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
+msgid ""
+"Comment your own post to get the conversation going or share some extra "
+"content."
+msgstr ""
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
+#, fuzzy
+msgid "Comments"
+msgstr "Comentarii"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_res_config_settings
@@ -143,6 +155,13 @@ msgstr "Creat în"
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__description
 msgid "Description"
 msgstr "Descriere"
+
+#. module: social_twitter
+#. odoo-javascript
+#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
+#, fuzzy
+msgid "Discard"
+msgstr "Abandonează"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_res_config_settings__display_name
@@ -246,9 +265,15 @@ msgid "Image"
 msgstr "Imagine"
 
 #. module: social_twitter
-#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
-msgid "Images"
-msgstr "Imagini"
+#. odoo-javascript
+#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
+msgid "Image Url"
+msgstr ""
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_view_form
+msgid "Immediately"
+msgstr ""
 
 #. module: social_twitter
 #: model:social.stream.type,name:social_twitter.stream_type_twitter_keyword
@@ -272,14 +297,15 @@ msgid "Likes"
 msgstr "# Aprecieri"
 
 #. module: social_twitter
-#. odoo-python
-#: code:addons/social_twitter/models/social_stream.py:0
-msgid ""
-"Looks like you've made too many requests. Please wait a few minutes before "
-"giving it another try."
+#: model:ir.module.module,description:base.module_social_twitter
+#: model:ir.module.module,summary:base.module_social_twitter
+msgid "Manage your X accounts and schedule posts"
 msgstr ""
-"Se pare că ai făcut prea multe solicitări. Vă rugăm să așteptați câteva "
-"minute înainte de a încerca din nou."
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
+msgid "Media"
+msgstr ""
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_media__media_type
@@ -334,6 +360,11 @@ msgid "Post Image"
 msgstr "Postare Imagine"
 
 #. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_view_form
+msgid "Post On"
+msgstr ""
+
+#. module: social_twitter
 #: model:social.stream.type,name:social_twitter.stream_type_twitter_follow
 msgid "Posts of"
 msgstr "Postări de"
@@ -371,22 +402,32 @@ msgid "Read More about X Accounts"
 msgstr "Citește mai mult despre conturile X"
 
 #. module: social_twitter
+#. odoo-javascript
+#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
+msgid "Reply"
+msgstr ""
+
+#. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "Repost"
 msgstr "Repostează"
 
 #. module: social_twitter
-#: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
-msgid "Repost or Quote"
-msgstr "Repostează sau Citează"
-
-#. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
-#: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_retweet_count
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
+msgid "Repost count"
+msgstr ""
+
+#. module: social_twitter
+#: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_retweet_count
 msgid "Reposts"
 msgstr "Repostări"
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
+msgid "Scheduled first comment"
+msgstr ""
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream__twitter_searched_keyword
@@ -445,19 +486,14 @@ msgid "Social Stream Post"
 msgstr "Postare Flux Social"
 
 #. module: social_twitter
+#: model:ir.module.module,shortdesc:base.module_social_twitter
+msgid "Social X"
+msgstr ""
+
+#. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_twitter_account
 msgid "Social X Account"
 msgstr "Cont X Social"
-
-#. module: social_twitter
-#. odoo-python
-#: code:addons/social_twitter/models/social_stream.py:0
-msgid ""
-"The keyword you've typed in does not look valid. Please try again with other "
-"words."
-msgstr ""
-"Cuvântul cheie pe care l-ați introdus nu pare valid. Vă rugăm să încercați "
-"din nou cu alte cuvinte."
 
 #. module: social_twitter
 #. odoo-python
@@ -556,8 +592,8 @@ msgid ""
 "limit or API may have send improper response (error: %s)."
 msgstr ""
 "Nu am putut încărca imaginea, este posibil să fie coruptă, să depășească "
-"limita de dimensiune sau API-ul să fi trimis un răspuns incorect (eroare: "
-"%s)."
+"limita de dimensiune sau API-ul să fi trimis un răspuns incorect (eroare: %s)"
+"."
 
 #. module: social_twitter
 #: model:ir.model.fields,help:social_twitter.field_social_post__twitter_image_ids
@@ -566,9 +602,21 @@ msgid "Will attach images to your posts."
 msgstr "Va atașa imagini la postările dvs."
 
 #. module: social_twitter
+#: model:ir.model.fields.selection,name:social_twitter.selection__social_media__media_type__twitter
+#: model:social.media,name:social_twitter.social_media_twitter
+#, fuzzy
+msgid "X"
+msgstr "X"
+
+#. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_author_id
 msgid "X Author ID"
 msgstr "ID autor X"
+
+#. module: social_twitter
+#: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_can_reply
+msgid "X Can Reply"
+msgstr ""
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_res_config_settings__twitter_consumer_key
@@ -589,6 +637,12 @@ msgstr "ID conversație X"
 #: model_terms:ir.ui.view,arch_db:social_twitter.res_config_settings_view_form
 msgid "X Developer Account"
 msgstr "Cont X Developer"
+
+#. module: social_twitter
+#: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_first_comment
+#: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_first_comment
+msgid "X First Comment"
+msgstr ""
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__twitter_id
@@ -634,12 +688,6 @@ msgid "X Post Limit Exceeded"
 msgstr "Limită postări X depășită"
 
 #. module: social_twitter
-#: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_post_limit_message
-#: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_post_limit_message
-msgid "X Post Limit Message"
-msgstr "Mesaj limită postări X"
-
-#. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_preview
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_preview
 msgid "X Preview"
@@ -677,6 +725,11 @@ msgid "X Repost Permission"
 msgstr "Permisiune repostare X"
 
 #. module: social_twitter
+#: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_scheduled_date
+msgid "X Scheduled for"
+msgstr ""
+
+#. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_screen_name
 msgid "X Screen Name"
 msgstr "Nume ecran X"
@@ -711,6 +764,22 @@ msgstr "ID postare X"
 
 #. module: social_twitter
 #. odoo-python
+#: code:addons/social_twitter/models/social_stream.py:0
+msgid ""
+"X: Looks like you've made too many requests. Please wait a few minutes "
+"before giving it another try."
+msgstr ""
+
+#. module: social_twitter
+#. odoo-python
+#: code:addons/social_twitter/models/social_stream.py:0
+msgid ""
+"X: The keyword you've typed in does not look valid. Please try again with "
+"other words."
+msgstr ""
+
+#. module: social_twitter
+#. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "You are not authenticated"
 msgstr "Nu sunteți autentificat"
@@ -733,6 +802,14 @@ msgstr ""
 "înainte de a încerca din nou."
 
 #. module: social_twitter
+#. odoo-javascript
+#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
+msgid ""
+"You cannot reply from an external service because this post doesn't mention "
+"or quote your account."
+msgstr ""
+
+#. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_media.py:0
 msgid ""
@@ -745,106 +822,7 @@ msgstr ""
 msgid "e.g. #odoo"
 msgstr "de exemplu. #odoo"
 
-#~ msgid "Display Twitter Preview"
-#~ msgstr "Afișați Previzualizare Twitter"
-
-#~ msgid "Please select a Twitter account for this stream type."
-#~ msgstr "Vă rugăm să selectați un cont Twitter pentru acest tip de flux."
-
-#~ msgid "Re-tweets"
-#~ msgstr "Re-tweets"
-
-#~ msgid "Retweets"
-#~ msgstr "Retweets"
-
-#~ msgid "Social Twitter Account"
-#~ msgstr "Cont Social Twitter"
-
-#~ msgid "Tweets of"
-#~ msgstr "Tweeturi de"
-
-#~ msgid "Twitter Author ID"
-#~ msgstr "ID Autor Twitter"
-
-#~ msgid "Twitter Consumer Key"
-#~ msgstr "Cheie Consumator Cheie"
-
-#~ msgid "Twitter Consumer Secret Key"
-#~ msgstr "Cheia Secretă Consumatior Twitter"
-
-#~ msgid "Twitter ID"
-#~ msgstr "ID Twitter"
-
-#~ msgid "Twitter Likes"
-#~ msgstr "Like-uri Twitter"
-
-#~ msgid "Twitter OAuth Token"
-#~ msgstr "Twitter Token OAuth"
-
-#~ msgid "Twitter OAuth Token Secret"
-#~ msgstr "Twitter OAuth Token Secret"
-
-#~ msgid "Twitter Preview"
-#~ msgstr "Previzualizare Twitter"
-
-#~ msgid "Twitter Profile Image"
-#~ msgstr "Profil Imagine Twitter"
-
-#~ msgid "Twitter Profile Image URL"
-#~ msgstr "URL Profil Imagine Twitter"
-
-#~ msgid "Twitter Screen Name"
-#~ msgstr "Nume Ecran Twitter"
-
-#~ msgid "Twitter Tweet ID"
-#~ msgstr "ID Tweet Twitter"
-
-#~ msgid "Twitter User ID"
-#~ msgstr "ID Utilizator Twitter"
-
-#~ msgid "Twitter User Likes"
-#~ msgstr "Preferințe Utilizator Twitter"
-
-#~ msgid "Twitter did not provide a valid access token or it may have expired."
-#~ msgstr ""
-#~ "Twitter nu a furnizat un jeton de acces valabil sau poate a expirat."
-
-#~ msgid "Twitter did not provide a valid access token."
-#~ msgstr "Twitter nu a furnizat un jeton de acces valabil."
-
-#~ msgid "Twitter tweet id"
-#~ msgstr "Id tweet twitter"
-
-#~ msgid "Use your own Twitter Account"
-#~ msgstr "Folosiți propriul cont Twitter"
-
-#~ msgid ""
-#~ "Used to make comparisons when we need to restrict some features to a "
-#~ "specific media ('facebook', 'twitter', ...)."
-#~ msgstr ""
-#~ "Folosit pentru a face comparații atunci când trebuie să restricționăm "
-#~ "anumite caracteristici la un anumit suport („facebook”, „twitter”, ...)."
-
-#~ msgid ""
-#~ "You cannot create a Stream from this Twitter account.\n"
-#~ "It may be because it's protected. To solve this, please make sure you "
-#~ "follow it before trying again."
-#~ msgstr ""
-#~ "Nu puteți crea un flux din acest cont Twitter.\n"
-#~ "Poate fi pentru că este protejat. Pentru a rezolva acest lucru, vă rugăm "
-#~ "să vă asigurați că îl urmați înainte de a încerca din nou."
-
-#~ msgid "You don't have an active subscription. Please buy one here: %s"
-#~ msgstr ""
-#~ "Nu aveți un abonament/subscripție activă. Vă rugăm să achiziționați una "
-#~ "aici:%s"
-
-#~ msgid ""
-#~ "You need to add the following callback URL to your twitter application "
-#~ "settings: %s"
-#~ msgstr ""
-#~ "Trebuie să adăugați următoarea adresă de apelare inversă la setările "
-#~ "aplicației dvs. twitter: %s"
-
-#~ msgid "tweet"
-#~ msgstr "tweet"
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
+msgid "reposts"
+msgstr ""

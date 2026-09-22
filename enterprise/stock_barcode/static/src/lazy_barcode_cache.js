@@ -13,6 +13,7 @@ export default class LazyBarcodeCache {
             "product.uom": "barcode",
             "stock.package.type": "barcode",
             "stock.picking": "name",
+            "stock.picking.batch": "name",
             "stock.package": "name",
             "stock.lot": "name", // Also ref, should take in account multiple fields ?
         };

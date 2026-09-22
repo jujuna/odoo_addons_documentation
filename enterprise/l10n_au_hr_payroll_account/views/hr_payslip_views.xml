@@ -7,13 +7,21 @@
         <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
         <field name="priority">99</field>
         <field name="arch" type="xml">
-            <button name="action_register_payment" position="attributes">
-                <attribute name="invisible" add="country_code == 'AU' and l10n_au_stp_status != 'sent'" separator=" or "/>
+            <button name="action_payslip_done" position="after">
+                <button
+                        name="action_register_payment"
+                        string="Register Payment"
+                        type="object"
+                        data-hotkey="w"
+                        class="oe_highlight"
+                        context="{'dont_redirect_to_payments': True, 'hr_payroll_payment_register': True}"
+                        invisible="state != 'validated' or not move_id or batch_payroll_move_lines or l10n_au_stp_status != 'sent'"
+                        groups="account.group_account_invoice"/>
             </button>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <field name="has_superstream" invisible="1"/>
                 <button type="object" class="oe_stat_button" id="open_superstream"
-                    icon="fa-dollar" name="action_open_superstream" invisible="not has_superstream">
+                    icon="attach_money" name="action_open_superstream" invisible="not has_superstream">
                     <div class="o_stat_info">
                         <span class="o_stat_text">
                             Super Contributions
@@ -21,7 +29,7 @@
                     </div>
                 </button>
                 <button type="object" class="oe_stat_button" id="open_payslip_stp"
-                        icon="fa-check" name="action_open_payslip_stp"
+                        icon="check" name="action_open_payslip_stp"
                         invisible="l10n_au_stp_status in ['draft'] or country_code != 'AU'"
                 >
                     <div class="o_stat_info">
@@ -30,12 +38,6 @@
                     </div>
                 </button>
             </xpath>
-            <button name="action_payslip_paid" position="attributes">
-                <attribute name="invisible" separator=" or " add="(l10n_au_stp_status != 'sent' and country_code == 'AU')"/>
-            </button>
-            <button name="action_payslip_paid" position="after">
-                <button name="action_open_payslip_stp" string="Submit to ATO" type="object" class="btn-primary" invisible="l10n_au_stp_status in ['draft', 'sent'] or country_code != 'AU'"/>
-            </button>
             <button name="action_payslip_payment_report" position="attributes">
                 <attribute name="invisible" separator=" or " add="(l10n_au_stp_status != 'sent' and state != 'paid' and country_code == 'AU')"/>
             </button>

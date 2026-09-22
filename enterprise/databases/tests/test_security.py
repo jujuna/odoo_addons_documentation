@@ -4,6 +4,8 @@ from odoo import Command
 from odoo.exceptions import AccessError
 from odoo.tests import tagged
 from odoo.tests.common import users
+from odoo.addons.databases.models.project_project import get_database_api_keys
+from odoo.addons.databases.wizard.project_template_create_wizard import get_wizard_api_keys
 
 
 @tagged('-at_install', 'post_install')
@@ -45,13 +47,13 @@ class TestDatabasesSecurity(TestDatabasesCommon):
             'database_user_ids': [Command.create({'login': 'db_manager@company.tld', 'name': 'User'})],
         }])
 
-        action = cls.env['project.template.create.wizard'].with_context(databases_template=True).create([{
+        database_id = cls.env['project.template.create.wizard'].with_context(databases_template=True).create([{
             **common_fields,
             'template_id': cls.env.ref('databases.database_default_template').id,
             'name': 'Client 6',
             'database_url': 'http://6.doesnt.exist',
-        }]).create_project_from_template()
-        cls.env['project.project'].browse(action['context']['active_id']).write({
+        }])._create_project_from_template()
+        database_id.write({
             'database_user_ids': [
                 Command.create({'login': 'employee@company.tld', 'name': 'User'}),
                 Command.create({'login': 'project_user@company.tld', 'name': 'User'}),
@@ -100,3 +102,79 @@ class TestDatabasesSecurity(TestDatabasesCommon):
 
         # Ensure that above of the Odoo AccessError, there isn't any call made to the outsite world
         self.mock_requests_request.authenticate.assert_not_called()
+
+    @users('db_manager@company.tld')
+    def test_database_api_key_should_never_leak_to_anyone(self):
+        database = self.env.user.database_user_ids.project_id[0]
+        self.assertEqual(
+            database.database_api_key,
+            '',
+            "We shouldn't display anything if there isn't any key configured."
+        )
+
+        database_api_key = get_database_api_keys(database, fallback=False).get(database.id, '')
+        self.assertEqual(
+            database_api_key,
+            '',
+            "The project key hasn't been set yet and fallback=False, we shouldn't retrieve any key."
+        )
+
+        database_api_key = get_database_api_keys(database).get(database.id)
+        self.assertEqual(
+            database_api_key,
+            'odoocom_privateKey',
+            "We should be able to access the apikey by other mean."
+        )
+
+        database.database_api_key = 'MY SEEEEECRET'
+        self.assertEqual(
+            database.database_api_key,
+            '****************************************',
+            "We shouldn't leak the value but we should display something for the user"
+        )
+        database_api_key = get_database_api_keys(database).get(database.id)
+        self.assertEqual(
+            database_api_key,
+            "MY SEEEEECRET",
+            "We should be able to retrieve the key from the database by other mean",
+        )
+
+    @users('db_manager@company.tld')
+    def test_wizard_database_api_key_should_never_leak_to_anyone(self):
+        wizard = self.env['project.template.create.wizard'].create({
+            'name': 'My Database',
+            'template_id': self.ref('databases.database_default_template'),
+        })
+        self.assertEqual(
+            wizard.database_api_key,
+            '',
+            "We shouldn't display anything if there isn't any key configured."
+        )
+
+        wizard_api_key = get_wizard_api_keys(wizard).get(wizard.id, '')
+        self.assertEqual(
+            wizard_api_key,
+            '',
+            "The project key hasn't been set yet, we shouldn't retrieve any key."
+        )
+
+        wizard.database_api_key = 'MY SEEEEECRET'
+        self.assertEqual(
+            wizard.database_api_key,
+            '****************************************',
+            "We shouldn't leak the value but we should display something for the user"
+        )
+        wizard_api_key = get_wizard_api_keys(wizard).get(wizard.id)
+        self.assertEqual(
+            wizard_api_key,
+            "MY SEEEEECRET",
+            "We should be able to retrieve the key from the wizard by other mean",
+        )
+
+        database = wizard.with_context(databases_template=True)._create_project_from_template()
+        database_api_key = get_database_api_keys(database, fallback=False).get(database.id, '')
+        self.assertEqual(
+            database_api_key,
+            "MY SEEEEECRET",
+            "Database creation from a template should still use the hidden key value",
+        )

@@ -1,314 +1,286 @@
-# coding: utf-8
-from odoo.addons.account_edi.tests.common import AccountEdiTestCommon
-from odoo.tools import misc
-from odoo import Command
+import random
+import requests
+import uuid
 
-from unittest.mock import patch, Mock
-from freezegun import freeze_time
-import datetime
 from contextlib import contextmanager
+from datetime import datetime, date
+from freezegun import freeze_time
+from os.path import join as opj
+from unittest.mock import Mock, patch
 
-from pytz import timezone
+from odoo import Command
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+from odoo.addons.l10n_co_edi.models.res_partner import FINAL_CONSUMER_VAT, ResPartner
 
 
-class TestCoEdiCommon(AccountEdiTestCommon):
-
-    @contextmanager
-    def mock_carvajal(self):
-        return_value_upload = {
-            'message': 'mocked success',
-            'transactionId': 'mocked_success',
-        }
-
-        return_value_check = {
-            'filename': 'mock_signed_file',
-            'xml_file': b'file_content',
-            'attachments': None,
-            'l10n_co_edi_cufe_cude_ref': 'cufe_cude ref',
-            'message': 'successfully mocked'
-        }
-
-        with freeze_time(self.frozen_today), \
-             patch('odoo.addons.l10n_co_edi.models.carvajal_request.CarvajalRequest.upload',
-                   new=Mock(return_value=return_value_upload)), \
-             patch('odoo.addons.l10n_co_edi.models.carvajal_request.CarvajalRequest.check_status',
-                   new=Mock(return_value=return_value_check)), \
-             patch('odoo.addons.l10n_co_edi.models.carvajal_request.CarvajalRequest.client',
-                   new=Mock(return_value=None)):
-            yield
-
+class TestCoEdiCommon(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
-    @AccountEdiTestCommon.setup_country('co')
-    @AccountEdiTestCommon.setup_edi_format('l10n_co_edi.edi_carvajal')
+    @AccountTestInvoicingCommon.setup_country('co')
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.frozen_today = datetime.datetime(year=2020, month=8, day=27, hour=0, minute=0, second=0, tzinfo=timezone('utc'))
+        cls.frozen_today = datetime(year=2024, month=1, day=30)
+        cls.document_path = 'odoo.addons.l10n_co_edi.models.l10n_co_edi_document.L10nCoEdiDocument'
+        cls.utils_path = 'odoo.addons.l10n_co_edi.xml_utils'
 
-        cls.salesperson = cls.env.ref('base.user_admin')
-        cls.salesperson.function = 'Funcionario de ventas y trato al cliente final'
+        with freeze_time(cls.frozen_today):
+            cls.key_demo = cls.env["certificate.key"].create({
+                "name": "Test DIAN Key",
+                "content": cls.file_read('l10n_co_edi/demo/demo_key.pem'),
+                "company_id": cls.company_data['company'].id,
+            })
+            cls.certificate_demo = cls.env["certificate.certificate"].create({
+                "name": "Test DIAN certificate",
+                "content": cls.file_read('l10n_co_edi/demo/demo_cert.crt'),
+                "private_key_id": cls.key_demo.id,
+                "company_id": cls.company_data['company'].id,
+            })
 
-        report_text = 'GRANDES CONTRIBUYENTES SHD Res. DDI-042065 13-10-17'
+        city_bogota = cls.env.ref('l10n_co_edi.city_co_150')
         cls.company_data['company'].write({
+            'name': "CO Company Test",
+            'vat': "1018419008-5",
+            'zip': "110110",
+            'street': "CL 12A",
+            'city': city_bogota.name,
+            'state_id': city_bogota.state_id.id,
             'country_id': cls.env.ref('base.co').id,
-            'l10n_co_edi_header_gran_contribuyente': report_text,
-            'l10n_co_edi_header_tipo_de_regimen': report_text,
-            'l10n_co_edi_header_retenedores_de_iva': report_text,
-            'l10n_co_edi_header_autorretenedores': report_text,
-            'l10n_co_edi_header_resolucion_aplicable': report_text,
-            'l10n_co_edi_header_actividad_economica': report_text,
-            'l10n_co_edi_header_bank_information': report_text,
-            'l10n_co_edi_username': 'test',
-            'l10n_co_edi_password': 'test',
-            'l10n_co_edi_company': 'test',
-            'l10n_co_edi_account': 'test',
-            'vat': '213123432-1',
-            'phone': '+57 123 4567890 123',  # Colombian telephone numbers are 10 digit numbers (January 2024); longer here to test shortening
-            'website': 'http://www.example.com',
-            'email': 'info@yourcompany.example.com',
-            'street': 'Route de Ramilies',
-            'zip': '1234',
-            'city': 'Bogota',
-            'state_id': cls.env.ref('base.state_co_01').id,
-            'tax_calculation_rounding_method': 'round_globally',
-        })
-
-        if 'l10n_co_dian_provider' in cls.env['res.company']._fields:
-            # when l10n_co_dian is installed, DIAN is used by default (and Carvajal is disabled)
-            cls.company_data['company'].l10n_co_dian_provider = 'carvajal'
-
-        cls.company_data['company'].partner_id.write({
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_co.rut').id,
-            'l10n_co_edi_obligation_type_ids': [(6, 0, [cls.env.ref('l10n_co_edi.obligation_type_1').id])],
-            'l10n_co_edi_large_taxpayer': True,
-        })
-        cls.company_data['default_journal_sale'].write({
-            'l10n_co_edi_dian_authorization_end_date': cls.frozen_today,
-            'l10n_co_edi_dian_authorization_number': 42,
-            'l10n_co_edi_dian_authorization_date': cls.frozen_today,
-        })
-        cls.company_data['default_journal_purchase'].write({
-            'l10n_co_edi_dian_authorization_end_date': cls.frozen_today,
-            'l10n_co_edi_dian_authorization_number': 42,
-            'l10n_co_edi_dian_authorization_date': cls.frozen_today,
-        })
-
-        cls.company_data_2 = cls.setup_other_company(
-            name='company_2_data',
-            country_id=cls.env.ref('base.co').id,
-            phone='(870)-931-0505',
-            website='http://wwww.company_2.com',
-            email='company_2@example.com',
-            street='Route de Eghezée',
-            zip='4567',
-            city='Medellín',
-            state_id=cls.env.ref('base.state_co_02').id,
-            vat='213.123.432-1',
-        )
-
-        cls.company_data_2['company'].partner_id.write({
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_co.rut').id,
-            'l10n_co_edi_obligation_type_ids': [(6, 0, [cls.env.ref('l10n_co_edi.obligation_type_1').id])],
-            'l10n_co_edi_large_taxpayer': True,
-        })
-
-        cls.tax = cls.company_data['default_tax_sale']
-        cls.tax.write({
-            'amount': 15,
-            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_0').id
-        })
-        cls.retention_tax = cls.tax.copy({
-            'name': 'retention_tax',
-            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_9').id
-        })
-
-        cls.tax_group = cls.env['account.tax'].create({
-            'name': 'tax_group',
-            'amount_type': 'group',
-            'amount': 0.0,
-            'type_tax_use': 'sale',
-            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_0').id,
-            'children_tax_ids': [(6, 0, (cls.tax + cls.retention_tax).ids)],
-        })
-
-        uom = cls.env.ref('uom.product_uom_unit')
-
-        cls.product_a.write({
-            'default_code': 'P0000',
-            'uom_id': uom,
-            'l10n_co_edi_ref_nominal_tax': 500.0,
-        })
-        invoice_data = {
-            'partner_id': cls.company_data_2['company'].partner_id.id,
-            'move_type': 'out_invoice',
-            'ref': 'reference',
-            'invoice_user_id': cls.salesperson.id,
-            'invoice_payment_term_id': cls.env.ref('account.account_payment_term_end_following_month').id,
-            'invoice_line_ids': [
+            'l10n_co_edi_header_actividad_economica': '0114',
+            'l10n_co_edi_operation_mode_ids': [
                 Command.create({
-                    'product_id': cls.product_a.id,
-                    'quantity': 150,
-                    'price_unit': 250,
-                    'discount': 10,
-                    'name': 'Line 1',
-                    'tax_ids': [Command.set((cls.tax + cls.retention_tax).ids)],
+                    'dian_software_operation_mode': 'invoice',
+                    'dian_software_id': 'Odoo',
+                    'dian_software_security_code': '12345',
+                    'dian_testing_id': 'test_id',
+                    'company_id': cls.company_data['company'].id,
                 }),
-            ]
-        }
-        cls.invoice = cls.env['account.move'].create(invoice_data)
-
-        # Invoice in non-company currency
-        cls.currency_usd = cls.env.ref('base.USD')
-        cls.currency_usd.active = True
-        cls.env['res.currency.rate'].create({
-            'name': cls.frozen_today,
-            'company_id': cls.company_data['company'].id,
-            'currency_id': cls.currency_usd.id,
-            'rate': 1 / 3919.109578})
-        cls.invoice_multicurrency = cls.env['account.move'].create({
-            **invoice_data,
-            'invoice_line_ids': [
                 Command.create({
-                    'product_id': cls.product_a.id,
-                    'quantity': 1,
-                    'price_unit': 252.2,
-                    'discount': 10,
-                    'name': 'Line 1',
-                    'tax_ids': [Command.set((cls.tax + cls.retention_tax).ids)],
+                    'dian_software_operation_mode': 'bill',
+                    'dian_software_id': 'Odoo',
+                    'dian_software_security_code': '12345',
+                    'dian_testing_id': 'test_id',
+                    'company_id': cls.company_data['company'].id,
                 }),
             ],
-            'currency_id': cls.currency_usd.id,
+            'l10n_co_edi_certificate_ids': [Command.set(cls.certificate_demo.ids)],
+            'l10n_co_edi_test_environment': True,
+        })
+        cls.company_data['company'].partner_id.write({
+            'city_id': city_bogota.id,
+            'l10n_co_edi_obligation_type_ids': [Command.set(cls.env.ref('l10n_co_edi.obligation_type_1').ids)],
         })
 
+        # Journals
+        dian_vals = {
+            'l10n_co_edi_dian_authorization_number': "18760000001",
+            'l10n_co_edi_dian_authorization_date': date(2020, 1, 19),
+            'l10n_co_edi_dian_authorization_end_date': date(2030, 1, 19),
+            'l10n_co_edi_min_range_number': "990000000",
+            'l10n_co_edi_max_range_number': "995000000",
+            'l10n_co_edi_technical_key': "dummy_journal_technical_key",
+        }
+        cls.company_data['default_journal_sale'].write({
+            'code': 'SETP',
+            **dian_vals,
+        })
+        cls.debit_note_journal = cls.env['account.journal'].create({
+            'name': "DIAN Debit Note",
+            'l10n_co_edi_debit_note': True,
+            'code': "DN",
+            'type': "sale",
+            **dian_vals,
+        })
+        cls.support_document_journal = cls.env['account.journal'].create({
+            'name': "DIAN Support Document",
+            'l10n_co_edi_is_support_document': True,
+            'code': "DS",
+            'type': "purchase",
+            **dian_vals,
+        })
+
+        # Partners
+        cls.partner_co = cls.env['res.partner'].create({
+            'name': "ADQUIRIENTE DE EJEMPLO",
+            'property_account_receivable_id': cls.company_data['default_account_receivable'].id,
+            'property_account_payable_id': cls.company_data['default_account_payable'].id,
+            'street': "CARRERA 8 No 20-14/40",
+            'city': city_bogota.name,
+            'city_id': city_bogota.id,
+            'state_id': city_bogota.state_id.id,
+            'zip': "110110",
+            'country_id': cls.env.ref('base.co').id,
+            'vat': "900108281",
+            'bank_ids': [Command.create({'account_number': "0123456789"})],
+            'l10n_co_edi_obligation_type_ids': cls.env.ref('l10n_co_edi.obligation_type_1'),
+        })
+        cls.final_consumer = cls.env['res.partner'].create({
+            'name': "consumidor o usuario final",
+            'country_id': cls.env.ref('base.co').id,
+            'additional_identifiers': {'CO_CC': FINAL_CONSUMER_VAT},
+            'l10n_co_edi_obligation_type_ids': cls.env.ref('l10n_co_edi.obligation_type_5'),
+            'l10n_co_edi_fiscal_regimen': '49',
+        })
+
+        # Taxes
+        cls.tax_iva_5 = cls.env["account.chart.template"].ref('l10n_co_tax_9')
+        cls.tax_iva_19 = cls.env["account.chart.template"].ref('l10n_co_tax_8')
+        cls.tax_ret_ica_1_104 = cls.env["account.chart.template"].ref('l10n_co_tax_45')
+        cls.tax_ret_ica_0414 = cls.env["account.chart.template"].ref('l10n_co_tax_57')
+        cls.tax_ret_iva_2_85 = cls.env["account.chart.template"].ref('l10n_co_tax_12')
+
+        # Sugar Taxes (need to fill 'l10n_co_edi_ref_nominal_tax' on the product !)
         cls.sugar_tax_1 = cls.env['account.tax'].create({
-            'name': "IBUA >10gr 50ml",  # arbitrary values
+            'name': "IBUA >10gr 3500ml",
             'amount_type': 'fixed',
-            'amount': 17.5,  # actual rate of the tax = 35 (for a product with >10gr of sugar per 100ml)
-            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_20').id,
+            'amount': 35 * 35,  # rate of the tax = 35 (for a product with >10gr of sugar per 100ml)
+            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_20').id,  # IBUA
         })
         cls.sugar_tax_2 = cls.sugar_tax_1.copy({
-            'name': "IBUA >6gr & <10gr 50ml",
-            'amount': 18,  # actual rate of the tax = 36 (for a product with >10gr of sugar per 100ml)
+            'name': "IBUA >6gr & <10gr 100ml",
+            'amount': 36,  # rate of the tax = 36 (for a product with >10gr of sugar per 100ml)
         })
-        # an IBUA tax group to display the total IBUA tax amount in the tax totals section on the invoice
-        cls.env['account.tax'].create({
-            'name': 'IBUA',
-            'amount_type': 'group',
-            'amount': 0.0,
-            'type_tax_use': 'sale',
-            'children_tax_ids': [Command.set([cls.sugar_tax_1.id, cls.sugar_tax_2.id])],
-        })
-        cls.product_sugar = cls.env['product.product'].create({
-            'name': 'Ice Cream',
-            'uom_id': uom.id,
-            'l10n_co_edi_ref_nominal_tax': 50.0,
+
+        # Products
+        cls.product_a.barcode = "562438192"
+        cls.product_b.default_code = "prod_b"
+        cls.product_sugar_1 = cls._create_product(
+            name="Coca cola 3.5L",
+            l10n_co_edi_ref_nominal_tax=3500,
+            default_code='P1111',
+        )
+        cls.product_sugar_2 = cls._create_product(
+            name="Sprite 100mL",
+            l10n_co_edi_ref_nominal_tax=100,
+            default_code='P2222',
+        )
+
+    @classmethod
+    def _create_move(cls, **kwargs):
+        with freeze_time(kwargs.pop('freeze_date', None) or cls.frozen_today):
+            invoice = cls.env['account.move'].create({
+                'partner_id': cls.partner_co.id,
+                'move_type': 'out_invoice',
+                'journal_id': cls.company_data['default_journal_sale'].id,
+                'invoice_line_ids': [
+                    Command.create({'product_id': cls.product_a.id, 'tax_ids': [Command.set(cls.tax_iva_5.ids)]}),
+                ],
+                **kwargs,
+            })
+            invoice.action_post()
+            return invoice
+
+    @classmethod
+    def _create_product(cls, **kwargs):
+        return cls.env['product.product'].create({
+            'name': 'Product',
+            'uom_id': cls.env.ref('uom.product_uom_unit').id,
             'property_account_income_id': cls.company_data['default_account_revenue'].id,
             'property_account_expense_id': cls.company_data['default_account_expense'].id,
-            'default_code': 'P0000',
+            **kwargs,
         })
 
-        # Sugar Invoice
-        invoice_data['invoice_line_ids'] = [
-            # Sugar taxes should not be grouped together since they have different rates
-            Command.create({
-                'product_id': cls.product_sugar.id,
-                'quantity': 1,
-                'price_unit': 100,
-                'tax_ids': [Command.set([cls.tax.id, cls.sugar_tax_1.id])],
-            }),
-            Command.create({
-                'product_id': cls.product_sugar.id,
-                'quantity': 10,
-                'price_unit': 200,
-                'tax_ids': [Command.set([cls.tax.id, cls.sugar_tax_2.id])],
-            }),
-            # The following taxes should be grouped together (same CO tax code, amount, and amount_type)
-            Command.create({
-                'product_id': cls.product_a.id,
-                'quantity': 10,
-                'price_unit': 100,
-                'tax_ids': [Command.set([cls.tax.id, cls.retention_tax.id])],
-            }),
-            Command.create({
-                'product_id': cls.product_a.id,
-                'quantity': 5,
-                'price_unit': 100,
-                'tax_ids': [Command.set([cls.tax.id, cls.retention_tax.id])],
-            }),
-        ]
-        cls.sugar_tax_invoice = cls.env['account.move'].create(invoice_data)
+    def _generate_xml(self, invoice, with_error=False):
+        with self._disable_get_acquirer_call():
+            result = self.env['account.edi.xml.ubl_dian']._export_invoice(invoice)
 
-        cls.tax_iva_19 = cls.env['account.tax'].create({
-            'name': "IVA Ventas 19%",
-            'amount': 19,
-            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_0').id,
-        })
-        cls.tax_iva_5 = cls.env['account.tax'].create({
-            'name': "IVA Ventas 5%",
-            'amount': 5,
-            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_0').id,
-        })
-        cls.tax_iva_excento_0 = cls.env['account.tax'].create({
-            'name': "IVA Excento",
-            'amount': 0,
-            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_0').id,
-        })
-        cls.tax_iva_excluido_0 = cls.env['account.tax'].create({
-            'name': "IVA Excluido",
-            'amount': 0,
-            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_0').id,
-        })
+        if with_error:
+            return result
+        else:
+            return result[0]
 
-        # Testing the grouping inside the TIM sections: invoice with 2 IVA taxes with different rates and 1 Bolsas
-        invoice_data['invoice_line_ids'] = [
-            # IVA 5% and IVA 19% should be grouped inside the same TIM section
-            Command.create({
-                'product_id': cls.product_a.id,
-                'quantity': 1,
-                'price_unit': 100,
-                'tax_ids': [Command.set([cls.tax_iva_19.id])],
-            }),
-            Command.create({
-                'product_id': cls.product_a.id,
-                'quantity': 1,
-                'price_unit': 200,
-                'tax_ids': [Command.set([cls.tax_iva_5.id])],
-            }),
-            # The Bolsas tax should be in another TIM section
-            Command.create({
-                'product_id': cls.product_a.id,
-                'quantity': 1,
-                'price_unit': 200,
-                'tax_ids': [Command.set([cls.tax_iva_19.id, cls.retention_tax.id])],
-            }),
-            # IVA Excento (IVA, 0%) and IVA Excluido (IVA, 0%): both should be grouped together (same rate and CO type)
-            Command.create({
-                'product_id': cls.product_a.id,
-                'quantity': 1,
-                'price_unit': 400,
-                'tax_ids': [Command.set([cls.tax_iva_excento_0.id])],
-            }),
-            Command.create({
-                'product_id': cls.product_a.id,
-                'quantity': 1,
-                'price_unit': 500,
-                'tax_ids': [Command.set([cls.tax_iva_excluido_0.id])],
-            }),
-            Command.create({'display_type': 'line_section', 'name': 'Section'}),
-            Command.create({'display_type': 'line_note', 'name': 'Note'}),
-        ]
-        cls.invoice_tim = cls.env['account.move'].create(invoice_data)
+    def _assert_document_dian(self, xml, file):
+        expected_dian = self.file_read(file).content
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(xml),
+            self.get_xml_tree_from_string(expected_dian),
+        )
 
-        cls.in_invoice = cls.env['account.move'].create({
-            **invoice_data,
-            'move_type': 'in_invoice',
-            'invoice_date': cls.frozen_today,
+    @classmethod
+    def _get_last_sent_document(cls, move):
+        move.ensure_one()
+        return cls.env['l10n_co_edi.document'] if not move.l10n_co_edi_document_ids else move.l10n_co_edi_document_ids.sorted()[0]
+
+    def _update_invoice_from_file(self, module_name, subfolder, filename, invoice):
+        """ Create an attachment from a file and post it on the invoice
+        """
+        file_path = opj(module_name, subfolder, filename)
+        attachment = self.env['ir.attachment'].create({
+            'name': filename,
+            'raw': self.file_read(file_path),
+            'res_id': invoice.id,
+            'res_model': 'account.move',
         })
+        invoice.message_post(message_type='comment', attachment_ids=[attachment.id])
 
-        cls.expected_invoice_xml = misc.file_open('l10n_co_edi/tests/accepted_invoice.xml', 'rb').read()
-        cls.expected_invoice_multicurrency_xml = misc.file_open('l10n_co_edi/tests/accepted_invoice_multicurrency.xml', 'rb').read()
-        cls.expected_sugar_tax_invoice_xml = misc.file_open('l10n_co_edi/tests/accepted_sugar_tax_invoice.xml', 'rb').read()
-        cls.expected_credit_note_xml = misc.file_open('l10n_co_edi/tests/accepted_credit_note.xml', 'rb').read()
-        cls.expected_invoice_tim_xml = misc.file_open('l10n_co_edi/tests/accepted_invoice_tim.xml', 'rb').read()
-        cls.expected_in_invoice_xml = misc.file_open('l10n_co_edi/tests/accepted_in_invoice.xml', 'rb').read()
+    def _assert_imported_invoice_from_file(self, subfolder, filename, invoice_vals):
+        """ Create an empty account.move, update the xml file, and then check the invoice values. """
+        journal = self.company_data['default_journal_purchase']
+        invoice = self.env['account.move'].create({'move_type': 'in_invoice', 'journal_id': journal.id})
+        self._update_invoice_from_file(
+            module_name='l10n_co_edi',
+            subfolder=subfolder,
+            filename=filename,
+            invoice=invoice,
+        )
+        invoice_vals = invoice_vals.copy()
+        invoice_lines = invoice_vals.pop('invoice_lines', False)
+        self.assertRecordValues(invoice, [invoice_vals])
+        if invoice_lines:
+            self.assertRecordValues(invoice.invoice_line_ids, invoice_lines)
+
+    @contextmanager
+    def _mock_uuid_generation(self):
+        rnd = random.Random(42)
+        with patch(f'{self.utils_path}._uuid1', lambda: uuid.UUID(int=rnd.getrandbits(128))):
+            yield
+
+    @contextmanager
+    def patched_document(self, method_name, return_value):
+        with patch.object(
+                self.registry['l10n_co_edi.document'],
+                method_name,
+                return_value=return_value,
+        ):
+            yield
+
+    def _mocked_request(self, response_file, status_code):
+        mock_response = Mock(spec=requests.Response)
+        mock_response.status_code = status_code
+        mock_response.text = self.file_read(f'l10n_co_edi/tests/responses/{response_file}').decode()
+        return mock_response
+
+    def _mocked_response(self, response_file, status_code):
+        return {
+            'response': self.file_read(f'l10n_co_edi/tests/responses/{response_file}').decode(),
+            'status_code': status_code,
+        }
+
+    def _mock_get_status(self, get_status_code=200):
+        return self.patched_document('_get_status', self._mocked_response('GetStatus_invoice.xml', get_status_code))
+
+    def _mock_build_and_send_request(self, response_file, status_code=200):
+        return patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response(response_file, status_code))
+
+    def _disable_get_acquirer_call(self):
+        return patch.object(ResPartner, attribute='_l10n_co_edi_call_get_acquirer', return_value=dict())
+
+    def _mock_send_and_print(self, move, response_file, response_code=200, get_status_code=200):
+        with (
+            self._mock_get_status(get_status_code),
+            self._mock_build_and_send_request(response_file, response_code),
+            self._disable_get_acquirer_call(),
+        ):
+            self.env['account.move.send.wizard'] \
+                .with_context(active_model=move._name, active_ids=move.ids) \
+                .create({}) \
+                .action_send_and_print()
+
+    def _mock_get_status_zip(self, move, response_file, response_code=200):
+        with patch.object(requests, 'post', return_value=self._mocked_request(response_file, response_code)):
+            move.l10n_co_edi_document_ids._get_status_zip()
+
+    def _mock_button_l10n_co_dian_fetch_numbering_range(self, journal, response_file, response_code=200):
+        with patch.object(requests, 'post', return_value=self._mocked_request(response_file, response_code)):
+            return journal.button_l10n_co_edi_fetch_numbering_range()

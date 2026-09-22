@@ -47,12 +47,10 @@ class SocialStreamPost(models.Model):
     # COMMENTS / LIKES
     # ========================================================
 
-    def _youtube_comment_add(self, comment_id, message, is_edit=False):
-        self.ensure_one()
-        self.account_id._refresh_youtube_token()
-
+    @api.model
+    def _youtube_comment_add(self, account_id, video_id, comment_id, message, is_edit=False):
         common_params = {
-            'access_token': self.account_id.youtube_access_token,
+            'access_token': account_id._get_youtube_access_token(),
             'part': 'snippet',
         }
 
@@ -90,8 +88,8 @@ class SocialStreamPost(models.Model):
                 json={
                     'snippet': {
                         'topLevelComment': {'snippet': {'textOriginal': message}},
-                        'channelId': self.account_id.youtube_channel_id,
-                        'videoId': self.youtube_video_id
+                        'channelId': account_id.youtube_channel_id,
+                        'videoId': video_id,
                     },
                 },
                 timeout=5
@@ -103,13 +101,12 @@ class SocialStreamPost(models.Model):
 
     def _youtube_comment_delete(self, comment_id):
         self.ensure_one()
-        self.account_id._refresh_youtube_token()
 
         response = requests.delete(
             url=url_join(self.env['social.media']._YOUTUBE_ENDPOINT, 'youtube/v3/comments'),
             params={
                 'id': comment_id,
-                'access_token': self.account_id.youtube_access_token,
+                'access_token': self.account_id._get_youtube_access_token(),
             }
         )
 
@@ -118,13 +115,12 @@ class SocialStreamPost(models.Model):
 
     def _youtube_comment_fetch(self, next_page_token=False, count=20):
         self.ensure_one()
-        self.stream_id.account_id._refresh_youtube_token()
 
         comments_endpoint_url = url_join(self.env['social.media']._YOUTUBE_ENDPOINT, "youtube/v3/commentThreads")
         params = {
             'part': 'snippet,replies',
             'textFormat': 'plainText',
-            'access_token': self.stream_id.account_id.youtube_access_token,
+            'access_token': self.stream_id.account_id._get_youtube_access_token(),
             'videoId': self.youtube_video_id,
             'maxResults': count
         }

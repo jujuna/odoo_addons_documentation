@@ -1,8 +1,15 @@
 import { ProductCatalogKanbanRecord } from "@product/product_catalog/kanban_record";
 import { patch } from "@web/core/utils/patch";
-import { KanbanRecord } from "@web/views/kanban/kanban_record";
+import { useProps, t } from "@odoo/owl";
 
 patch(ProductCatalogKanbanRecord.prototype, {
+    setup() {
+        super.setup();
+        this.productCatalogProps = useProps({
+            pushCatalogKanbanUpdate: t.function().optional(),
+        });
+    },
+
     _getUpdateQuantityAndGetPriceParams() {
         const params = {
             ...super._getUpdateQuantityAndGetPriceParams(),
@@ -14,12 +21,8 @@ patch(ProductCatalogKanbanRecord.prototype, {
         return params;
     },
 
-    _updateQuantity() {
-        const result = super._updateQuantity();
-        this.props.pushCatalogKanbanUpdate?.(result);
+    _onQuantityChange() {
+        const result = super._onQuantityChange();
+        this.productCatalogProps.pushCatalogKanbanUpdate?.(result);
     },
-});
-
-patch(ProductCatalogKanbanRecord, {
-    props: [...KanbanRecord.props, "pushCatalogKanbanUpdate?"],
 });

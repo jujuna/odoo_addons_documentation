@@ -10,22 +10,30 @@
 # Jeffery CHEN <jeffery9@gmail.com>, 2022
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-20 08:14+0000\n"
+"POT-Creation-Date: 2026-09-18 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 01:49+0000\n"
 "Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/helpdesk_timesheet/zh_Hans/>\n"
+"projects/odoo-master/helpdesk_timesheet/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: helpdesk_timesheet
+#: model:ir.module.module,description:base.module_helpdesk_timesheet
+msgid ""
+"\n"
+"- Allow to set project for Helpdesk team\n"
+"- Track timesheet for a task from a ticket\n"
+msgstr ""
 
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_project_project__ticket_count
@@ -47,12 +55,6 @@ msgstr "分析账户"
 #: model:ir.model,name:helpdesk_timesheet.model_account_analytic_line
 msgid "Analytic Line"
 msgstr "分析行"
-
-#. module: helpdesk_timesheet
-#. odoo-python
-#: code:addons/helpdesk_timesheet/models/helpdesk_ticket.py:0
-msgid "Confirm Time Spent"
-msgstr "确认花费的时间"
 
 #. module: helpdesk_timesheet
 #: model:ir.model,name:helpdesk_timesheet.model_helpdesk_ticket_convert_wizard
@@ -95,11 +97,6 @@ msgid "Display Name"
 msgstr "显示名称"
 
 #. module: helpdesk_timesheet
-#: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__display_timesheet_timer
-msgid "Display Timesheet Time"
-msgstr "显示工时表时间"
-
-#. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_sla_report_analysis__employee_id
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket_report_analysis__employee_id
 msgid "Employee"
@@ -117,6 +114,11 @@ msgstr "帮助中心团队"
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_timesheets_analysis_report__helpdesk_ticket_id
 msgid "Helpdesk Ticket"
 msgstr "服务台工单"
+
+#. module: helpdesk_timesheet
+#: model:ir.module.module,shortdesc:base.module_helpdesk_timesheet
+msgid "Helpdesk Timesheet"
+msgstr ""
 
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_sla_report_analysis__total_hours_spent
@@ -180,12 +182,32 @@ msgid "Project"
 msgstr "项目"
 
 #. module: helpdesk_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
+msgid "Project &amp; Task"
+msgstr ""
+
+#. module: helpdesk_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
+msgid "Project &amp; Task/Ticket"
+msgstr ""
+
+#. module: helpdesk_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
+msgid "Project &amp; Ticket"
+msgstr ""
+
+#. module: helpdesk_timesheet
 #: model:ir.model.fields,help:helpdesk_timesheet.field_helpdesk_team__project_id
 #: model:ir.model.fields,help:helpdesk_timesheet.field_helpdesk_ticket__project_id
 msgid ""
 "Project to which the timesheets of this helpdesk team's tickets will be "
 "linked."
 msgstr "此技术支持团队的工单的工时表将链接到的项目。"
+
+#. module: helpdesk_timesheet
+#: model:ir.module.module,summary:base.module_helpdesk_timesheet
+msgid "Project, Tasks, Timesheet"
+msgstr ""
 
 #. module: helpdesk_timesheet
 #: model_terms:ir.actions.act_window,help:helpdesk_timesheet.act_hr_timesheet_line_helpdesk
@@ -203,32 +225,22 @@ msgid "SLA Status Analysis"
 msgstr "SLA状态分析"
 
 #. module: helpdesk_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_timesheet
-msgid "Start"
-msgstr "开始"
-
-#. module: helpdesk_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_timesheet
-msgid "Stop"
-msgstr "停止"
-
-#. module: helpdesk_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
-msgid "Task/Ticket"
-msgstr "任务/票据"
-
-#. module: helpdesk_timesheet
 #: model:project.project,label_tasks:helpdesk_timesheet.helpdesk_team3_projet
 msgid "Tasks"
 msgstr "任务"
 
 #. module: helpdesk_timesheet
+#. odoo-python
+#: code:addons/helpdesk_timesheet/models/helpdesk_ticket.py:0
+msgid "There are no timesheets to print for this ticket"
+msgstr ""
+
+#. module: helpdesk_timesheet
 #. odoo-javascript
-#: code:addons/helpdesk_timesheet/static/src/components/grid_timesheet_timer_header/grid_timesheet_timer_header.js:0
+#: code:addons/helpdesk_timesheet/static/src/components/aw_timesheet/frequency_viewer/frequency_viewer.js:0
+#: code:addons/helpdesk_timesheet/static/src/components/timesheet_inline_form/timesheet_inline_form.xml:0
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_account_analytic_line__helpdesk_ticket_id
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.hr_timesheet_line_search_inherit_helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.report_timesheet_ticket
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.view_calendar_account_analytic_line
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.view_calendar_account_analytic_line_multi_create
 msgid "Ticket"
@@ -240,6 +252,12 @@ msgid "Ticket Analysis"
 msgstr "工单分析"
 
 #. module: helpdesk_timesheet
+#. odoo-javascript
+#: code:addons/helpdesk_timesheet/static/src/components/timesheet_timer_inline_form/timesheet_timer_inline_form.xml:0
+msgid "Ticket Name"
+msgstr "工单名称"
+
+#. module: helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.report_timesheet_ticket
 msgid "Ticket:"
 msgstr "工单："
@@ -249,6 +267,7 @@ msgstr "工单："
 #: code:addons/helpdesk_timesheet/models/project_project.py:0
 #: model:ir.actions.act_window,name:helpdesk_timesheet.project_project_action_view_helpdesk_tickets
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_project_project__ticket_ids
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.edit_project_helpdesk_form_inherit
 msgid "Tickets"
 msgstr "工单"
 
@@ -281,11 +300,6 @@ msgid "Timesheet Activities"
 msgstr "工时表活动"
 
 #. module: helpdesk_timesheet
-#: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__timesheet_unit_amount
-msgid "Timesheet Unit Amount"
-msgstr "工时表单位金额"
-
-#. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__use_helpdesk_timesheet
 msgid "Timesheet activated on Team"
 msgstr "已在“团队”上启用工时表"
@@ -293,6 +307,7 @@ msgstr "已在“团队”上启用工时表"
 #. module: helpdesk_timesheet
 #: model:ir.actions.act_window,name:helpdesk_timesheet.act_hr_timesheet_line_helpdesk
 #: model:ir.actions.report,name:helpdesk_timesheet.timesheet_report_ticket
+#: model:ir.actions.server,name:helpdesk_timesheet.action_server_print_ticket_timesheets
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__timesheet_ids
 #: model:res.groups,name:helpdesk_timesheet.group_use_helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_timesheet
@@ -304,6 +319,11 @@ msgstr "工时单"
 #: model:ir.model,name:helpdesk_timesheet.model_timesheets_analysis_report
 msgid "Timesheets Analysis Report"
 msgstr "工时表分析报表"
+
+#. module: helpdesk_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.report_timesheet_ticket
+msgid "Timesheets for the"
+msgstr ""
 
 #. module: helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_tree_inherit_helpdesk_timesheet
@@ -331,14 +351,15 @@ msgstr "警告消息"
 #. module: helpdesk_timesheet
 #. odoo-python
 #: code:addons/helpdesk_timesheet/models/account_analytic_line.py:0
+msgid "Working on Helpdesk Ticket"
+msgstr ""
+
+#. module: helpdesk_timesheet
+#. odoo-python
+#: code:addons/helpdesk_timesheet/models/account_analytic_line.py:0
 msgid ""
 "You cannot link a timesheet entry to a task and a ticket at the same time."
 msgstr "您不能将一个工时表条目同时链接一个任务和一个工单。"
-
-#. module: helpdesk_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.report_timesheet_ticket
-msgid "for the"
-msgstr "对于"
 
 #. module: helpdesk_timesheet
 #. odoo-python
@@ -346,107 +367,8 @@ msgstr "对于"
 msgid "id"
 msgstr "id"
 
-#~ msgid "Create Timesheet from ticket"
-#~ msgstr "从工单中创建工时表"
+#~ msgid "Task/Ticket"
+#~ msgstr "任务/票据"
 
-#~ msgid "Created by"
-#~ msgstr "创建人"
-
-#~ msgid "Created on"
-#~ msgstr "创建时间"
-
-#~ msgid "Delete"
-#~ msgstr "删除"
-
-#~ msgid "Describe your activity..."
-#~ msgstr "描述您的活动..."
-
-#~ msgid "Description"
-#~ msgstr "说明"
-
-#~ msgid "Discard"
-#~ msgstr "丢弃"
-
-#~ msgid "Display Task"
-#~ msgstr "显示任务"
-
-#~ msgid "Display Timer"
-#~ msgstr "显示计时器"
-
-#~ msgid "Display Timer Pause"
-#~ msgstr "暂停计时"
-
-#~ msgid "Display Timer Resume"
-#~ msgstr "重新计时"
-
-#~ msgid "Display Timer Start Primary"
-#~ msgstr "重新开始计时"
-
-#~ msgid "Display Timer Start Secondary"
-#~ msgstr "显示计时器启动辅助"
-
-#~ msgid "Display Timer Stop"
-#~ msgstr "停止计时"
-
-#~ msgid "Duration"
-#~ msgstr "时长"
-
-#~ msgid "Encode Uom In Days"
-#~ msgstr "日期编码单位"
-
-#~ msgid "Has Helpdesk Teams"
-#~ msgstr "拥有服务台团队"
-
-#~ msgid "Hours Spent"
-#~ msgstr "耗时"
-
-#~ msgid "Is Timer Running"
-#~ msgstr "定时器是否运行"
-
-#~ msgid "Last Updated by"
-#~ msgstr "最后更新人"
-
-#~ msgid "Last Updated on"
-#~ msgstr "最后更新时间"
-
-#~ msgid "My Department"
-#~ msgstr "我的部门"
-
-#~ msgid "My Team's Ratings"
-#~ msgstr "我的团队的评级"
-
-#~ msgid "My Team's Tickets"
-#~ msgstr "我的团队的工单"
-
-#~ msgid "Pause"
-#~ msgstr "暂停"
-
-#~ msgid "Resume"
-#~ msgstr "重新开始"
-
-#~ msgid "Save"
-#~ msgstr "保存"
-
-#~ msgid "Save time"
-#~ msgstr "保存时间"
-
-#~ msgid "Ticket for which we are creating a sales order"
-#~ msgstr "我们要为其创建一个销售订单的工单"
-
-#~ msgid "Time"
-#~ msgstr "时间"
-
-#~ msgid "Timer Last Pause"
-#~ msgstr "计时器最后一次暂停"
-
-#~ msgid "Timer Start"
-#~ msgstr "计时器启动"
-
-#~ msgid "Timesheet Encoding Unit"
-#~ msgstr "工时表编码单元"
-
-#~ msgid "Total Timesheet Time"
-#~ msgstr "总工时表时长"
-
-#~ msgid "User Timer"
-#~ msgstr "用户定时器"
+#~ msgid "for the"
+#~ msgstr "对于"

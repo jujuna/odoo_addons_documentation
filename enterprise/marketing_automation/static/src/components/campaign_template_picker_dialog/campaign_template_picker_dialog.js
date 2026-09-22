@@ -1,7 +1,16 @@
+import { Component, onWillStart, proxy, t, useProps } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
-import { Notebook } from "@web/core/notebook/notebook";
 import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, useState } from "@odoo/owl";
+
+class CampaignTemplatePickerSheet extends Component {
+    static template = "marketing_automation.CampaignTemplatePickerDialogSheet";
+    props = useProps({
+        activeTemplate: t.object(),
+        setActive: t.function(),
+        templates: t.object(),
+        title: t.string(),
+    });
+}
 
 /**
  * This component will display a campaign template picker.
@@ -11,11 +20,9 @@ export class CampaignTemplatePickerDialog extends Component {
     static template = "marketing_automation.CampaignTemplatePickerDialog";
     static components = {
         Dialog,
-        Notebook,
+        CampaignTemplatePickerSheet,
     };
-    static props = {
-        close: { type: Function, optional: true },
-    };
+    props = useProps({ close: t.function().optional() });
     /**
      * @override
      */
@@ -23,7 +30,8 @@ export class CampaignTemplatePickerDialog extends Component {
         super.setup();
         this.orm = useService("orm");
         this.action = useService("action");
-        this.activeTemplate = useState({});
+        this.dialog = useService("dialog");
+        this.activeTemplate = proxy({});
 
         this.notebookPages = [];
 
@@ -67,7 +75,9 @@ export class CampaignTemplatePickerDialog extends Component {
         if (!action) {
             return;
         }
-        this.action.doAction(action);
+        this.action.doAction(action, {
+            stackPosition: "replaceCurrentAction",
+        });
         this.props.close();
     }
 
@@ -77,13 +87,4 @@ export class CampaignTemplatePickerDialog extends Component {
     setActive(templateName) {
         this.activeTemplate.name = templateName;
     }
-}
-
-class CampaignTemplatePickerSheet extends Component {
-    static template = "marketing_automation.CampaignTemplatePickerDialogSheet";
-    static props = {
-        activeTemplate: { type: Object },
-        setActive: { type: Function },
-        templates: { type: Object },
-    };
 }

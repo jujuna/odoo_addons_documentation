@@ -1,42 +1,60 @@
+/**
+ * @typedef DependencyInManifest
+ * ⚠️ Each dependency of this file in `mail` must be explicitly added in
+ * `web.assets_frontend` in the manifest. This error is not caught by the
+ * standard runbot, only during staging or nightly. The missing dependency might
+ * added by livechat so it only happens when frontend modules are installed and
+ * tested while livechat is not installed.
+ */
+import { createElementFromContent, getInnerHtml, getOuterHtml } from "@mail/utils/common/html";
+
 import { htmlEscape, markup } from "@odoo/owl";
 
 import { router } from "@web/core/browser/router";
-import { loadEmoji, loader } from "@web/core/emoji_picker/emoji_picker";
-import { normalize } from "@web/core/l10n/utils";
+import { emojiLoader } from "@web/core/emoji_picker/emoji_loader";
+import { formatList } from "@web/core/l10n/utils";
 import {
-    createDocumentFragmentFromContent,
     createElementWithContent,
-    htmlFormatList,
     htmlJoin,
     htmlReplace,
     htmlReplaceAll,
     htmlTrim,
+    isHtmlEmpty,
     setElementContent,
 } from "@web/core/utils/html";
-import { escapeRegExp } from "@web/core/utils/strings";
+import { escapeRegExp, nbsp } from "@web/core/utils/strings";
 import { getOrigin } from "@web/core/utils/urls";
 import { setAttributes } from "@web/core/utils/xml";
 
 const urlRegexp =
-    /\b(?:https?:\/\/\d{1,3}(?:\.\d{1,3}){3}|(?:https?:\/\/|(?:www\.))[-a-z0-9@:%._+~#=\u00C0-\u024F\u1E00-\u1EFF]{1,256}\.[a-z]{2,13})\b(?:[-a-z0-9@:%_+~#?&[\]^|{}`\\'$//=\u00C0-\u024F\u1E00-\u1EFF]|[.]*[-a-z0-9@:%_+~#?&[\]^|{}`\\'$//=\u00C0-\u024F\u1E00-\u1EFF]|,(?!$| )|\.(?!$| |\.)|;(?!$| ))*/gi;
+    /\b(?:https?:\/\/\d{1,3}(?:\.\d{1,3}){3}|(?:https?:\/\/|(?:www\.))[-a-z0-9@:%._+~#=\u00C0-\u024F\u1E00-\u1EFF]{1,256}(?:\.{1})?(?:[a-z]{2,13}))\b(?:[-a-z0-9@:%_+~#?&[\]^|{}`\\'$//=\u00C0-\u024F\u1E00-\u1EFF]|[.]*[-a-z0-9@:%_+~#?&[\]^|{}`\\'$//=\u00C0-\u024F\u1E00-\u1EFF]|,(?!$| )|\.(?!$| |\.)|;(?!$| ))*/gi;
 const messageUrlRegExp = new RegExp(`^${escapeRegExp(getOrigin())}/mail/message/(\\d+)$`);
+const MENTION_CLASSNAMES = new Set([
+    "o_mail_redirect",
+    "o_message_redirect",
+    "o_channel_redirect",
+    "o-discuss-mention",
+]);
 
 /**
  * @param {string|ReturnType<markup>} rawBody
- * @param {Object} validMentions
- * @param {import("models").Persona[]} validMentions.partners
+ * @param {Object} [param1]
+ * @param {Object} [param1.validMentions]
+ * @param {import("models").Persona[]} [param1.validMentions.partners]
+ * @param {import("models").Thread[]} [param1.thread]
+ * @param {boolean} [param1.trim=true] whether the text content should be trimmed or not.
+ *   Trim is useful for when posting message and having the auto-trim of content, but when using auto-sync between html and text the whitespaces should be preserved and should have trim=false.
  * @returns {Promise<string|ReturnType<markup>>}
  */
-export function prettifyMessageText(rawBody, { validMentions = {}, thread } = {}) {
+export function prettifyMessageText(rawBody, { validMentions = {}, thread, trim = true } = {}) {
     if (rawBody instanceof markup().constructor) {
         // markup is already "pretty"
         return rawBody;
     }
-    let body = htmlTrim(rawBody);
-    body = htmlReplace(body, /(\r|\n){2,}/g, () => markup`<br/><br/>`);
+    let body = trim ? htmlTrim(rawBody) : htmlJoin([rawBody]);
     body = htmlReplace(body, /(\r|\n)/g, () => markup`<br/>`);
     body = htmlReplace(body, /&nbsp;/g, () => " ");
-    body = htmlTrim(body);
+    body = trim ? htmlTrim(body) : htmlJoin([body]);
     // This message will be received from the mail composer as html content
     // subtype but the urls will not be linkified. If the mail composer
     // takes the responsibility to linkify the urls we end up with double
@@ -45,6 +63,7 @@ export function prettifyMessageText(rawBody, { validMentions = {}, thread } = {}
     // the current design makes this quite hard to do.
     body = generateMentionsLinks(body, { ...validMentions, thread });
     body = parseAndTransform(body, addLink);
+    body = convertWhitespaceToNbsp(body);
     return body;
 }
 
@@ -53,8 +72,11 @@ export function prettifyMessageText(rawBody, { validMentions = {}, thread } = {}
  */
 export async function generateEmojisOnHtml(htmlBody, { allowEmojiLoading = true } = {}) {
     let body = htmlBody;
-    if (allowEmojiLoading || odoo.loader.modules.get("@web/core/emoji_picker/emoji_data")) {
-        body = await _generateEmojisOnHtml(body);
+    if (allowEmojiLoading && !emojiLoader.loaded) {
+        await emojiLoader.load();
+    }
+    if (emojiLoader.loaded) {
+        body = _generateEmojisOnHtml(body);
     }
     return body;
 }
@@ -63,6 +85,9 @@ export async function generateEmojisOnHtml(htmlBody, { allowEmojiLoading = true 
  * @param {string|ReturnType<markup>} rawBody
  * @param {Object} validMentions
  * @param {import("models").Persona[]} validMentions.partners
+ * @param rawBody {string|ReturnType<markup>}
+ * @param validRecords {Object}
+ * @param validRecords.partners {Partner}
  */
 export async function prettifyMessageContent(
     rawBody,
@@ -122,18 +147,21 @@ function linkify(text) {
     let result = "";
     let match;
     while ((match = urlRegexp.exec(text)) !== null) {
+        const url = match[0];
+        const fixedUrl = !/^https?:\/\//i.test(url) ? `http://${url}` : url;
+        if (!URL.canParse(fixedUrl)) {
+            continue;
+        }
         result = htmlJoin([result, text.slice(curIndex, match.index)]);
-        // Decode the url first, in case it's already an encoded url
-        const inputUrl = decodeURI(match[0]);
-        const url = !/^https?:\/\//i.test(inputUrl) ? "http://" + inputUrl : inputUrl;
+        const { href } = URL.parse(fixedUrl);
         const link = document.createElement("a");
         setAttributes(link, {
             target: "_blank",
             rel: "noreferrer noopener",
-            href: encodeURI(url),
+            href,
         });
-        link.textContent = inputUrl;
-        const messageMatch = messageUrlRegExp.exec(url);
+        link.textContent = url;
+        const messageMatch = messageUrlRegExp.exec(fixedUrl);
         if (messageMatch !== null) {
             setAttributes(link, {
                 "data-oe-id": messageMatch[1],
@@ -141,8 +169,7 @@ function linkify(text) {
             });
             link.classList.add("o_message_redirect");
         }
-        // markup: outerHTML is safe when used as a node
-        result = htmlJoin([result, markup(link.outerHTML)]);
+        result = htmlJoin([result, getOuterHtml(link)]);
         curIndex = match.index + match[0].length;
     }
     return htmlJoin([result, text.slice(curIndex)]);
@@ -168,13 +195,35 @@ export function addLink(node, transformChildren) {
         return node.textContent;
     }
     if (node.tagName === "A") {
-        return markup(node.outerHTML);
+        return getOuterHtml(node);
     }
     transformChildren();
-    return markup(node.outerHTML);
+    return getOuterHtml(node);
 }
 
-function generateMentionElement({ className, id, model, text }) {
+/**
+ * Generate a mention element (link or span) with the provided metadata.
+ *
+ * @param {Object} [param0={}]
+ * @param {string} [param0.className] CSS class name for the mention element
+ * @param {number} [param0.id] Record ID of the mentioned entity
+ * @param {string} [param0.model] Model name of the mentioned entity
+ * @param {TranslatedString} param0.text Display text for the mention
+ * @param {boolean} [param0.readonly] If true, returns a non-clickable span; if false, returns a clickable link
+ * @returns {HTMLElement} Either an HTMLSpanElement(readonly) or HTMLAnchorElement(clickable)
+ */
+export function generateMentionElement({ className, id, model, text, readonly }) {
+    if (readonly) {
+        const span = document.createElement("span");
+        setAttributes(span, {
+            class: "o-discuss-readonly-mention",
+            "data-oe-id": id,
+            "data-oe-model": model,
+            contenteditable: "false",
+        });
+        span.textContent = String(text);
+        return span;
+    }
     const link = document.createElement("a");
     setAttributes(link, {
         href: router.stateToUrl({ model: model, resId: id }),
@@ -184,20 +233,24 @@ function generateMentionElement({ className, id, model, text }) {
         target: "_blank",
         contenteditable: "false",
     });
-    link.textContent = text;
+    link.textContent = String(text);
     return link;
 }
 
 /**
  * @param {import("models").ResPartner} partner
- * @param {import("models").Thread} thread
+ * @param {Object} [params]
+ * @param {import("models").Thread} [params.thread]
+ * @param {boolean} [params.readonly=false] If true, returns a non-clickable mention (<span>)
+ *   instead of a link (<a>). Used for log notes where external partners should not be clickable.
  */
-export function generatePartnerMentionElement(partner, thread) {
+export function generatePartnerMentionElement(partner, { thread, readonly } = {}) {
     return generateMentionElement({
         className: "o_mail_redirect",
         id: partner.id,
         model: "res.partner",
         text: `@${thread?.getPersonaName(partner) ?? partner.name}`,
+        readonly,
     });
 }
 
@@ -222,50 +275,28 @@ export function generateSpecialMentionElement(label) {
     return link;
 }
 
-/** @param {import("models").Thread} thread */
-export function generateThreadMentionElement(thread) {
-    return generateMentionElement({
-        className: `o_channel_redirect${
-            thread.parent_channel_id ? " o_channel_redirect_asThread" : ""
-        }`,
-        id: thread.id,
-        model: "discuss.channel",
-        text: `#${thread.fullNameWithParent}`,
-    });
-}
-
 /**
  * @param {string|ReturnType<markup>} body
  * @param {Object} param1
  * @param {import("models").ResPartner[]} param1.partners
  * @param {import("models").ResRole[]} param1.roles
- * @param {import("models").Thread[]} param1.threads
  * @param {string[]} param1.specialMentions
  * @param {import("models").Thread} param1.thread
  * @return {ReturnType<markup>}
  */
-function generateMentionsLinks(
-    body,
-    { partners = [], roles = [], threads = [], specialMentions = [], thread }
-) {
+function generateMentionsLinks(body, { partners = [], roles = [], specialMentions = [], thread }) {
     const mentions = [];
     for (const partner of partners) {
-        const placeholder = `@-mention-partner-${partner.id}`;
+        const placeholder = `@-mention-partner-${partner.id}!`;
         const text = `@${thread?.getPersonaName(partner) ?? partner.name}`;
         mentions.push({
-            link: generatePartnerMentionElement(partner, thread),
+            link: generatePartnerMentionElement(partner, { thread }),
             placeholder,
+            text,
         });
-        body = htmlReplace(body, text, placeholder);
     }
-    for (const thread of threads) {
-        const placeholder = `#-mention-channel-${thread.id}`;
-        const text = `#${thread.fullNameWithParent}`;
-        mentions.push({
-            link: generateThreadMentionElement(thread),
-            placeholder,
-        });
-        body = htmlReplace(body, text, placeholder);
+    for (const mention of mentions.sort((m1, m2) => m2.text.length - m1.text.length)) {
+        body = htmlReplace(body, mention.text, mention.placeholder);
     }
     for (const special of specialMentions) {
         const text = `@${special}`;
@@ -287,8 +318,7 @@ function generateMentionsLinks(
     }
     for (const mention of mentions) {
         const link = mention.link;
-        // markup: outerHTML is safe when used as a node
-        body = htmlReplace(body, mention.placeholder, markup(link.outerHTML));
+        body = htmlReplace(body, mention.placeholder, getOuterHtml(link));
     }
     return htmlEscape(body);
 }
@@ -296,13 +326,11 @@ function generateMentionsLinks(
 /**
  * @private
  * @param {string|ReturnType<markup>} htmlString
- * @returns {Promise<ReturnType<markup>>}
  */
-async function _generateEmojisOnHtml(htmlString) {
-    const { emojis } = await loadEmoji();
-    for (const emoji of emojis) {
-        for (const source of [...emoji.shortcodes, ...emoji.emoticons]) {
-            const escapedSource = htmlEscape(String(source));
+function _generateEmojisOnHtml(htmlString) {
+    for (const emoji of emojiLoader.emojis) {
+        for (const source of emoji.shortcodes.concat(emoji.emoticons)) {
+            const escapedSource = htmlEscape(source);
             const regexp = new RegExp(
                 "(\\s|^)(" + escapeRegExp(escapedSource) + ")(?=\\s|$|<)",
                 "g"
@@ -317,24 +345,26 @@ async function _generateEmojisOnHtml(htmlString) {
  * @param {string|ReturnType<markup>} body
  * @returns {ReturnType<markup>}
  */
-export function getNonEditableMentions(body) {
-    const doc = createDocumentFragmentFromContent(body);
-    for (const block of doc.body.querySelectorAll(".o_mail_reply_hide")) {
+export function prepareBodyForEditing(body) {
+    const bodyEl = createElementFromContent(body);
+    for (const block of bodyEl.querySelectorAll(".o_mail_reply_hide")) {
         block.classList.remove("o_mail_reply_hide");
     }
     // for mentioned partner
-    for (const mention of doc.body.querySelectorAll(".o_mail_redirect")) {
-        mention.setAttribute("contenteditable", false);
-    }
-    // for mentioned channel
-    for (const mention of doc.body.querySelectorAll(".o_channel_redirect")) {
+    for (const mention of bodyEl.querySelectorAll(".o_mail_redirect")) {
         mention.setAttribute("contenteditable", false);
     }
     // for special mentions
-    for (const mention of doc.body.querySelectorAll(".o-discuss-mention")) {
+    for (const mention of bodyEl.querySelectorAll(".o-discuss-mention")) {
         mention.setAttribute("contenteditable", false);
     }
-    return markup(doc.body.innerHTML);
+    // The "(edited)" label is added by the server and must never be editable.
+    // Remove it so that CTRL+A does not select it and it is always re-added at
+    // the end by the server upon saving.
+    for (const edited of bodyEl.querySelectorAll(".o-mail-Message-edited")) {
+        edited.remove();
+    }
+    return getInnerHtml(bodyEl);
 }
 
 /**
@@ -355,13 +385,192 @@ export function htmlToTextContentInline(htmlString) {
         .replace(/\s\s+/g, " ");
 }
 
-export function convertBrToLineBreak(str) {
-    str = htmlReplace(str, /<br\s*\/?>/gi, () => "\n");
-    return createDocumentFragmentFromContent(str).body.textContent;
+export function convertBrToLineBreak(str, { trim = true } = {}) {
+    const regex = trim ? /<br\s*\/?>/gi : /<br\/?>/gi;
+    str = htmlReplace(str, regex, () => "\n");
+    if (!trim) {
+        str = htmlReplace(str, / /g, () => markup`&nbsp;`);
+    }
+    return createElementFromContent(str).textContent.replaceAll(nbsp, " ");
 }
 
-export function cleanTerm(term) {
-    return typeof term === "string" ? normalize(term) : "";
+export function convertLineBreakToBr(str) {
+    return htmlReplace(str, /(\r|\n)/g, () => markup`<br/>`);
+}
+
+/**
+ * @param {string|ReturnType<markup>} content
+ * @returns {ReturnType<markup>}
+ */
+function convertWhitespaceToNbsp(content) {
+    const body = createElementFromContent(content);
+
+    /** @param {Node | null} node */
+    const replaceWhitespaceInNodes = (node) => {
+        while (node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                node.nodeValue = node.nodeValue.replace(/\s{2}/g, ` ${nbsp}`);
+            } else if (
+                node.nodeType === Node.ELEMENT_NODE &&
+                ![...MENTION_CLASSNAMES].some((cls) => node.classList.contains(cls))
+            ) {
+                replaceWhitespaceInNodes(node.firstChild);
+            }
+            node = node.nextSibling;
+        }
+    };
+    replaceWhitespaceInNodes(body.firstChild);
+    return getInnerHtml(body);
+}
+
+/**
+ * @param {string|ReturnType<markup>} content
+ * @returns {ReturnType<markup>}
+ */
+export function trimEmptyBlocksAround(content) {
+    if (isHtmlEmpty(content)) {
+        return content;
+    }
+    const body = createElementFromContent(content);
+    let changed = false;
+
+    /** @param {ChildNode} node */
+    const removeNode = (node) => {
+        node.remove();
+        changed = true;
+    };
+
+    /** @typedef {"start" | "end"} BoundarySide */
+
+    /**
+     * @param {Element | null | undefined} element
+     * @param {BoundarySide} side
+     * @returns {ChildNode | null}
+     */
+    const getBoundaryChild = (element, side) => {
+        if (!element) {
+            return null;
+        }
+        return side === "start" ? element.firstChild : element.lastChild;
+    };
+
+    /**
+     * @param {Element | null | undefined} element
+     * @param {BoundarySide} side
+     */
+    const trimTextNodes = (element, side) => {
+        const node = getBoundaryChild(element, side);
+        if (!node) {
+            return;
+        }
+        if (node.nodeType === Node.TEXT_NODE) {
+            const trimmed =
+                side === "start" ? node.textContent.trimStart() : node.textContent.trimEnd();
+            if (!trimmed) {
+                removeNode(node);
+                return trimTextNodes(element, side);
+            }
+            if (trimmed !== node.textContent) {
+                node.textContent = trimmed;
+                changed = true;
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.nodeName === "PRE") {
+                // whitespaces are preserved in PRE tag
+                return;
+            }
+            trimTextNodes(node, side);
+            // isHtmlEmpty intentionally ignores images, which must not be trimmed.
+            const containsImage = node.nodeName === "IMG" || node.querySelector("img");
+            if (isHtmlEmpty(node.innerHTML) && !containsImage) {
+                removeNode(node);
+                return trimTextNodes(element, side);
+            }
+        }
+    };
+    trimTextNodes(body, "start");
+    trimTextNodes(body, "end");
+    return changed ? getInnerHtml(body) : content;
+}
+
+/**
+ * Converts the content of an element to its inline representation.
+ * - Links and mentions are preserved
+ * - For the rest: text content of nodes
+ *
+ * @param {Element} element modified in place
+ * @returns {Element} the same element
+ */
+export function inlineElement(element) {
+    const previewBody = element.ownerDocument.createElement("body");
+
+    /** @param {HTMLElement} [node] */
+    const isBlock = (node) =>
+        node?.nodeType === Node.ELEMENT_NODE && ["DIV", "P"].includes(node?.tagName);
+
+    /**
+     * @param {HTMLElement} parent
+     * @param {string} [text]
+     */
+    const appendText = (parent, text) => {
+        if (text) {
+            parent.append(element.ownerDocument.createTextNode(text));
+        }
+    };
+
+    /**
+     * @param {HTMLElement} parent
+     * @param {HTMLElement[]} nodes
+     */
+    const appendInlinePreviewChildren = (parent, nodes) => {
+        for (let index = 0; index < nodes.length; index++) {
+            const node = nodes[index];
+            appendInlinePreview(parent, node);
+            if (isBlock(node) && isBlock(nodes[index + 1])) {
+                appendText(parent, nbsp);
+            }
+        }
+    };
+
+    /**
+     * @param {HTMLElement} parent
+     * @param {HTMLElement} node
+     */
+    const appendInlinePreview = (parent, node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+            appendText(parent, node.textContent);
+            return;
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+            return;
+        }
+        if (node.tagName === "BR") {
+            appendText(parent, nbsp);
+            return;
+        }
+        if (node.tagName === "A") {
+            const href = node.getAttribute("href");
+            if ([...node.classList].some((cls) => MENTION_CLASSNAMES.has(cls))) {
+                parent.append(node);
+            } else if (href) {
+                const link = element.ownerDocument.createElement("a");
+                link.setAttribute("href", href);
+                for (const attr of ["target", "rel"]) {
+                    if (node.hasAttribute(attr)) {
+                        link.setAttribute(attr, node.getAttribute(attr));
+                    }
+                }
+                link.append(element.ownerDocument.createTextNode(href));
+                parent.append(link);
+            }
+            return;
+        }
+        appendInlinePreviewChildren(parent, [...node.childNodes]);
+    };
+
+    appendInlinePreviewChildren(previewBody, [...element.childNodes]);
+    element.replaceChildren(...previewBody.childNodes);
+    return element;
 }
 
 /**
@@ -386,23 +595,52 @@ export function parseEmail(text) {
     return [text, false];
 }
 
-export const EMOJI_REGEX = /\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\u200d/gu;
+const r = String.raw;
+/**
+ * Match Country Subdivision Flags.
+ * Black Flag emoji + tag-encoded subdivision name + cancel tag
+ * Example:
+ * 🏴 + [B] + [E] + [W] + [A] + [L] + [CANCEL] = Flag for Wallonia (BE-WAL)
+ */
+const SUBDIVISION_FLAG = r`🏴[\u{E0020}-\u{E007E}]+\u{E007F}`;
+/**
+ * Match Keycaps (e.g., 5️⃣, #️⃣).
+ * Numpad character + Variation Selector-16 + Combining Enclosing Keycap
+ */
+const KEYCAP = r`[#*\d]\uFE0F\u20E3`;
+const EMOJI_WITH_SKIN_TONE = r`\p{Emoji_Modifier_Base}\p{Emoji_Modifier}`;
+/**
+ * Match "regular" emojis.
+ * iOS keyboard sometimes appends an extraneous Variation Selector-16, which the
+ * optional \uFE0F accounts for.
+ */
+const EMOJI_PRESENTATION = r`\p{Emoji_Presentation}\uFE0F?`;
+/**
+ * Match "text-default" emojis (☃, ♥, ☂) that are followed by a Variation
+ * Selector-16 (U+FE0F), enabling their emoji representation (☃ → ☃️).
+ * Negative lookahead prevents matching incomplete keycap sequences.
+ */
+const QUALIFIED_TEXT = r`(?![#*\d])\p{Emoji}\uFE0F`;
+const EMOJI = r`(?:${SUBDIVISION_FLAG}|${KEYCAP}|${EMOJI_WITH_SKIN_TONE}|${EMOJI_PRESENTATION}|${QUALIFIED_TEXT})`;
+export const EMOJI_REGEX = new RegExp(
+    r`\p{Regional_Indicator}{2}|` + // Regional Indicator pairs (e.g., 🇧🇪)
+        r`${EMOJI}(?:\u200D${EMOJI})*`, // Zero Width Joiner sequences (e.g., 👨‍👩‍👧‍👦)
+    "gu"
+);
 
 /**
- * Wrap emojis present in the given text with a title and return a safe HTML
- * string.
+ * Wrap emojis present in `element` with a title.
  *
- * @param {string|ReturnType<markup>} content
- * @returns {ReturnType<markup>}
+ * @param {Element} element modified in place
+ * @returns {Element} the same element
  */
-export function decorateEmojis(content) {
-    if (!loader.loaded || !content) {
-        return content;
+export function decorateEmojis(element) {
+    if (!emojiLoader.loaded) {
+        return element;
     }
-    const doc = createDocumentFragmentFromContent(content);
-    const nodes = doc.evaluate(
+    const nodes = element.ownerDocument.evaluate(
         ".//text()",
-        doc.body,
+        element,
         null,
         XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
         null
@@ -412,18 +650,19 @@ export function decorateEmojis(content) {
         const span = document.createElement("span");
         setElementContent(
             span,
-            htmlReplaceAll(node.textContent, loader.loaded.emojiRegex, (codepoints) =>
-                markup(
-                    `<span class="o-mail-emoji" title="${htmlFormatList(
-                        loader.loaded.emojiValueToShortcodes[codepoints],
-                        { style: "unit-narrow" }
-                    )}">${htmlEscape(codepoints)}</span>`
-                )
-            )
+            htmlReplaceAll(node.textContent, EMOJI_REGEX, (codepoints) => {
+                if (!emojiLoader.map.has(codepoints)) {
+                    return codepoints;
+                }
+                const title = formatList(emojiLoader.map.get(codepoints).shortcodes, {
+                    style: "unit-narrow",
+                });
+                return markup`<span class="o-mail-emoji" title="${title}">${codepoints}</span>`;
+            })
         );
         node.replaceWith(...span.childNodes);
     }
-    return markup(doc.body.innerHTML);
+    return element;
 }
 
 /**

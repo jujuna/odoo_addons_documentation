@@ -5,6 +5,7 @@
         <field name="name">Profit and loss</field>
         <field name="name@bg">Печалба и загуба</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="country_id" ref="base.bg"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
@@ -37,17 +38,22 @@
                         <field name="name@bg">Намаляване на производствените запаси и незавършеното производство</field>
                         <field name="code">bg_pl_expenses_1</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
+                        <field name="foldability">foldable</field>
                         <field name="expression_ids">
                             <record id="l10n_bg_pl_expenses_1_balance" model="account.report.expression">
-                                <field name="label">balance</field>
+                                <field name="label">sum_balance</field>
                                 <field name="engine">domain</field>
                                 <field name="formula" eval="[
                                     '|', ('account_id.code', '=like', '611%'),
                                          ('account_id.code', '=like', '612%')
                                 ]"/>
-                                <field name="subformula">sum_if_pos</field>
+                                <field name="subformula">sum</field>
+                            </record>
+                            <record id="l10n_bg_pl_expenses_1_agg_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="engine">aggregation</field>
+                                <field name="formula">bg_pl_expenses_1.sum_balance</field>
+                                <field name="subformula">if_above(BGN(0))</field>
                                 <field name="green_on_positive" eval="False"/>
                             </record>
                         </field>
@@ -57,8 +63,6 @@
                         <field name="name@bg">Разходи за суровини и външни услуги</field>
                         <field name="code">bg_pl_expenses_2</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_bg_pl_expenses_2_balance" model="account.report.expression">
@@ -74,8 +78,6 @@
                         <field name="name@bg">Разходи за персонала</field>
                         <field name="code">bg_pl_expenses_3</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_bg_pl_expenses_3_balance" model="account.report.expression">
@@ -105,8 +107,6 @@
                                 <field name="name@bg">Загуби от амортизация и обезценка на имоти, машини и съоръжения и нематериални активи</field>
                                 <field name="code">bg_pl_expenses_4_1</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_4_1_balance" model="account.report.expression">
@@ -122,8 +122,6 @@
                                 <field name="name@bg">Загуби от обезценка на текущи активи</field>
                                 <field name="code">bg_pl_expenses_4_2</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_4_2_balance" model="account.report.expression">
@@ -155,8 +153,6 @@
                                 <field name="name@bg">Провизии</field>
                                 <field name="code">bg_pl_expenses_5_1</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_5_1_balance" model="account.report.expression">
@@ -172,8 +168,6 @@
                                 <field name="name@bg">Разходи от последващи оценки на активи</field>
                                 <field name="code">bg_pl_expenses_5_2</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_5_2_balance" model="account.report.expression">
@@ -189,8 +183,6 @@
                                 <field name="name@bg">Други разходи</field>
                                 <field name="code">bg_pl_expenses_5_3</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_5_3_balance" model="account.report.expression">
@@ -206,8 +198,6 @@
                                 <field name="name@bg">Други оперативни разходи</field>
                                 <field name="code">bg_pl_expenses_5_4</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_5_4_balance" model="account.report.expression">
@@ -223,8 +213,6 @@
                                 <field name="name@bg">Отсрочени разходи</field>
                                 <field name="code">bg_pl_expenses_5_5</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_5_5_balance" model="account.report.expression">
@@ -240,8 +228,6 @@
                                 <field name="name@bg">Директни застрахователни разходи</field>
                                 <field name="code">bg_pl_expenses_5_6</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_5_6_balance" model="account.report.expression">
@@ -257,8 +243,6 @@
                                 <field name="name@bg">Разходи за пасивно презастраховане</field>
                                 <field name="code">bg_pl_expenses_5_7</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_5_7_balance" model="account.report.expression">
@@ -274,8 +258,6 @@
                                 <field name="name@bg">Разходи за активно презастраховане</field>
                                 <field name="code">bg_pl_expenses_5_8</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_5_8_balance" model="account.report.expression">
@@ -291,8 +273,6 @@
                                 <field name="name@bg">Извънредни разходи</field>
                                 <field name="code">bg_pl_expenses_5_9</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_bg_pl_expenses_5_9_balance" model="account.report.expression">
@@ -324,8 +304,6 @@
                         <field name="name@bg">Общи финансови разходи</field>
                         <field name="code">bg_pl_expenses_total_financial</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_bg_pl_expenses_total_financial_balance" model="account.report.expression">
@@ -383,8 +361,6 @@
                         <field name="name@bg">Разход за данък върху дохода</field>
                         <field name="code">bg_pl_expenses_10</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_bg_pl_expenses_10_balance" model="account.report.expression">
@@ -400,8 +376,6 @@
                         <field name="name@bg">Други данъци, алтернативни на корпоративния данък</field>
                         <field name="code">bg_pl_expenses_11</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_bg_pl_expenses_11_balance" model="account.report.expression">
@@ -446,8 +420,6 @@
                         <field name="name@bg">Нетни приходи от продажби</field>
                         <field name="code">bg_pl_income_1</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-702 - 703 - 701</field>
                     </record>
                     <record id="l10n_bg_pl_income_2" model="account.report.line">
@@ -455,16 +427,22 @@
                         <field name="name@bg">Увеличаване на запасите и незавършеното производство</field>
                         <field name="code">bg_pl_income_2</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="foldable" eval="True"/>
+                        <field name="foldability">foldable</field>
                         <field name="expression_ids">
                             <record id="l10n_bg_pl_income_2_balance" model="account.report.expression">
-                                <field name="label">balance</field>
+                                <field name="label">sum_balance</field>
                                 <field name="engine">domain</field>
                                 <field name="formula" eval="[
                                     '|', ('account_id.code', '=like', '611%'),
                                          ('account_id.code', '=like', '612%')
                                 ]"/>
-                                <field name="subformula">-sum_if_neg</field>
+                                <field name="subformula">sum</field>
+                            </record>
+                            <record id="l10n_bg_pl_income_2_agg_balance" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="engine">aggregation</field>
+                                <field name="formula">-bg_pl_income_2.sum_balance</field>
+                                <field name="subformula">if_above(BGN(0))</field>
                             </record>
                         </field>
                     </record>
@@ -473,8 +451,6 @@
                         <field name="name@bg">Разходи за придобиване на активи по бизнес начин</field>
                         <field name="code">bg_pl_income_3</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-613</field>
                     </record>
                     <record id="l10n_bg_pl_income_4" model="account.report.line">
@@ -495,8 +471,6 @@
                                 <field name="name@bg">Приходи от приходи от продажби</field>
                                 <field name="code">bg_pl_income_4_1</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-709 - 707 - 705 - 704 - 706</field>
                             </record>
                             <record id="l10n_bg_pl_income_4_2" model="account.report.line">
@@ -504,8 +478,6 @@
                                 <field name="name@bg">Приходи от нестопанска цел</field>
                                 <field name="code">bg_pl_income_4_2</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-71</field>
                             </record>
                         </field>
@@ -528,8 +500,6 @@
                         <field name="name@bg">Финансови приходи</field>
                         <field name="code">bg_pl_income_5</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-72</field>
                     </record>
                     <record id="l10n_bg_pl_income_6" model="account.report.line">
@@ -550,8 +520,6 @@
                                 <field name="name@bg">Приходи от възстановени загуби от обезценка</field>
                                 <field name="code">bg_pl_income_6_1</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-73</field>
                             </record>
                             <record id="l10n_bg_pl_income_6_2" model="account.report.line">
@@ -559,8 +527,6 @@
                                 <field name="name@bg">Отсрочени приходи и финансиране</field>
                                 <field name="code">bg_pl_income_6_2</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-75</field>
                             </record>
                             <record id="l10n_bg_pl_income_6_3" model="account.report.line">
@@ -568,8 +534,6 @@
                                 <field name="name@bg">Приходи от пряка застраховка</field>
                                 <field name="code">bg_pl_income_6_3</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-76</field>
                             </record>
                             <record id="l10n_bg_pl_income_6_4" model="account.report.line">
@@ -577,8 +541,6 @@
                                 <field name="name@bg">Приходи от пасивно презастраховане</field>
                                 <field name="code">bg_pl_income_6_4</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-77</field>
                             </record>
                             <record id="l10n_bg_pl_income_6_5" model="account.report.line">
@@ -586,8 +548,6 @@
                                 <field name="name@bg">Приходи от активно презастраховане</field>
                                 <field name="code">bg_pl_income_6_5</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-78</field>
                             </record>
                             <record id="l10n_bg_pl_income_6_6" model="account.report.line">
@@ -595,8 +555,6 @@
                                 <field name="name@bg">Извънредни доходи</field>
                                 <field name="code">bg_pl_income_6_6</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-79</field>
                             </record>
                         </field>

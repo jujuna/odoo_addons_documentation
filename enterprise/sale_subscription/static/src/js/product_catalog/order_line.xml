@@ -3,8 +3,8 @@
 <templates>
     <t t-inherit="product.ProductCatalogOrderLine"
        t-inherit-mode="extension">
-        <xpath expr="//span[hasclass('o_product_catalog_price')]" position="inside">
-            <span class="ms-1" t-out="props.plan_name"/>
+        <xpath expr="//span[hasclass('o_product_catalog_price')]" position="after">
+            <span class="ms-1" t-out="this.saleSubscriptionProps.plan_name"/>
         </xpath>
     </t>
 </templates>

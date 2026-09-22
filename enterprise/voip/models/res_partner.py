@@ -2,7 +2,7 @@ import unicodedata
 
 from odoo import api, fields, models
 from odoo.fields import Domain
-from odoo.tools import escape_psql
+from odoo.tools.sql import escape_like_value
 
 from odoo.addons.mail.tools.discuss import Store
 
@@ -70,7 +70,12 @@ def unaccent(text):
 
 class ResPartner(models.Model):
     _name = "res.partner"
-    _inherit = ["res.partner", "voip.country.code.mixin", "voip.queue.mixin"]
+    _inherit = [
+        "res.partner",
+        "voip.pbx.destination.mixin",
+        "voip.phone.country.mixin",
+        "voip.activity.mixin",
+    ]
 
     t9_name = fields.Char(
         compute="_compute_t9_name",
@@ -103,31 +108,67 @@ class ResPartner(models.Model):
             # beginning of each word using a pattern like '% 234%'.
             partner.t9_name = " " + partner.t9_name
 
+    def _search_commercial_partners(self, active_test=True):
+        """Return all partners belonging to self's commercial entity, the
+        commercial entity itself included.
+        """
+        self.ensure_one()
+        return self.env["res.partner"].with_context(active_test=active_test).search(
+            [("id", "child_of", self.commercial_partner_id.id)],
+        )
+
     @api.model
-    def get_contacts(self, offset, limit, search_terms, t9_search=False):
+    def get_contacts(self, offset, limit, search_terms, internal_users_first=False, prioritized_contacts_limit=0):
+        """Fetch VoIP contacts matching the search and pagination parameters.
+
+        When ``prioritized_contacts_limit`` is non-zero, up to that many
+        matching contacts are selected by the VoIP call model and inserted
+        before the regular contact search results. The returned page is then
+        computed from that combined list, so ``offset`` and ``limit`` apply as
+        if prioritized contacts were the first rows of the result set. In that
+        mode, the response also includes all prioritized contact ids so the
+        client can keep the same ordering while filtering already-loaded
+        contacts locally. See ``_get_prioritized_contacts`` (e.g. getting
+        recently called partners first).
+        """
         domain = Domain("phone", "!=", False)
         if search_terms:
-            escaped_search_terms = escape_psql(search_terms)
-            subdomain = Domain.OR([
-                [("complete_name", "ilike", escaped_search_terms)],
-                [("email", "ilike", escaped_search_terms)],
-            ])
+            escaped_search_terms = escape_like_value(search_terms)
+            subdomain = Domain("complete_name", "ilike", escaped_search_terms) | Domain("email", "ilike", escaped_search_terms)
             if len(search_terms) >= self._phone_search_min_length:
                 subdomain |= Domain("phone_mobile_search", "like", escaped_search_terms)
-            if t9_search:
-                subdomain = Domain.OR([subdomain, [("t9_name", "ilike", f" {escaped_search_terms}")]])
-            domain = Domain.AND([domain, subdomain])
-        contacts = self.search(domain, offset=offset, limit=limit)
-        return Store().add(contacts, self._voip_get_store_fields()).get_result()
+            subdomain |= Domain("t9_name", "ilike", f" {escaped_search_terms}")
+            domain &= subdomain
 
-    def _voip_get_store_fields(self):
-        return [
-            "commercial_company_name",
-            "email",
-            "function",
-            "is_company",
-            "name",
-            "phone",
-            Store.One("phone_country_id", self.env["res.country"]._voip_get_store_fields()),
-            "t9_name",
-        ]
+        search_kwargs = {"offset": offset, "limit": limit}
+        if internal_users_first:
+            search_kwargs["order"] = f"partner_share ASC, {self._order}"
+
+        if not prioritized_contacts_limit:
+            contacts = self.search(domain, **search_kwargs)
+            return Store().add(contacts, "_store_voip_fields")
+
+        prioritized_contacts = self.env["voip.call"]._get_prioritized_contacts(
+            domain,
+            limit=prioritized_contacts_limit,
+        )
+        if prioritized_contacts:
+            domain &= Domain("id", "not in", prioritized_contacts.ids)
+        if offset < len(prioritized_contacts):
+            prioritized_contacts_page = prioritized_contacts[offset:offset + limit]
+            search_kwargs["offset"] = 0
+            search_kwargs["limit"] = limit - len(prioritized_contacts_page)
+        else:
+            prioritized_contacts_page = self.env["res.partner"]
+            search_kwargs["offset"] = offset - len(prioritized_contacts)
+        contacts = self.search(domain, **search_kwargs) if search_kwargs["limit"] else self.env["res.partner"]
+        return {
+            "store_data": Store().add(prioritized_contacts_page | contacts, "_store_voip_fields"),
+            "prioritized_contact_ids": prioritized_contacts.ids,
+        }
+
+    def _store_voip_fields(self, res: Store.FieldList):
+        res.extend(["complete_name", "parent_name", "email", "function", "is_company", "name", "phone", "phone_formatted", "partner_share"])
+        self._store_im_status_fields(res)
+        res.one("phone_country_id", "_store_voip_fields")
+        res.attr("t9_name")

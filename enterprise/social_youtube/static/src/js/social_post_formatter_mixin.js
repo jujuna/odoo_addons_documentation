@@ -20,11 +20,10 @@ patch(SocialPostFormatterMixinBase, {
             value = htmlReplace(
                 value,
                 SocialPostFormatterRegex.REGEX_HASHTAG,
-                (_, before, hashtag) => {
-                    // markup: the regex safely captures `before` and `hashtag`
-                    before = markup(before);
+                (_, hashtag) => {
+                    // markup: the regex safely captures `hashtag`
                     hashtag = markup(hashtag);
-                    return markup`${before}<a href='https://www.youtube.com/results?search_query=%23${encodeURIComponent(
+                    return markup`<a href='https://www.youtube.com/results?search_query=%23${encodeURIComponent(
                         hashtag
                     )}' target='_blank'>#${hashtag}</a>`;
                 }

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- This group is meant to manage PLM stages -->
     <record model="res.groups.privilege" id="res_groups_privilege_plm">
@@ -31,13 +30,4 @@
        <field eval="[(4,ref('mrp_plm.group_plm_manager'))]" name="group_ids"/>
    	</record>
 
-    <data noupdate="1">
-
-        <record model="ir.rule" id="mrp_eco_comp_rule">
-            <field name="name">Manufacturing ECO company rule</field>
-            <field name="model_id" ref="model_mrp_eco"/>
-            <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
-        </record>
-
-    </data>
-</odoo>
+    </odoo>

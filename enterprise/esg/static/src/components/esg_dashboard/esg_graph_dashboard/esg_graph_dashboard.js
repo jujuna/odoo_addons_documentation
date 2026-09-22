@@ -1,4 +1,4 @@
-import { Component, onMounted, onWillStart, onWillUnmount, useRef } from "@odoo/owl";
+import { Component, onMounted, onWillStart, onWillUnmount, signal, t, useProps } from "@odoo/owl";
 import { loadJS } from "@web/core/assets";
 import { cookie } from "@web/core/browser/cookie";
 import {
@@ -9,20 +9,19 @@ import {
     darkenColor,
 } from "@web/core/colors/colors";
 
-
 const colorScheme = cookie.get("color_scheme");
-const GRAPH_LABEL_COLOR = getCustomColor(colorScheme, "#111827", "#E4E4E4");
+const GRAPH_LABEL_COLOR = getCustomColor(colorScheme, "#111827", "#E4E4E5");
 
 export class EsgGraphDashboard extends Component {
     static template = "esg.GraphDashboard";
-    static props = {
-        config: {
-            type: Object,
-        },
-    };
+
+    props = useProps({
+        config: t.object(),
+    });
+
+    canvasRef = signal.ref();
 
     setup() {
-        this.canvasRef = useRef("canvas");
         onWillStart(() => loadJS("/web/static/lib/Chart/Chart.js"));
         onMounted(() => {
             this.renderChart();
@@ -94,10 +93,10 @@ export class EsgGraphDashboard extends Component {
         return {
             ...config,
             options,
-        }
+        };
     }
 
     renderChart() {
-        this.chart = new Chart(this.canvasRef.el, this.config);
+        this.chart = new Chart(this.canvasRef(), this.config);
     }
 }

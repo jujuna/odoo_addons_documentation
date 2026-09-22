@@ -14,7 +14,6 @@ function moveCover(position) {
  * case, the "Add Cover" button should always open the cover selector.
  */
 registry.category("web_tour.tours").add("knowledge_cover_selector_tour", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {

@@ -21,6 +21,9 @@
                     <span t-if="doc.end_date" class="text-muted small">
                         Until <span t-field="doc.end_date"/>
                     </span>
+                    <span t-if="not doc.start_date and doc.sale_order_template_id and not doc.sale_order_template_id.is_unlimited" class="text-muted small">
+                        For <span t-field="doc.sale_order_template_id.duration_value"/> <span t-field="doc.sale_order_template_id.duration_unit"/>
+                    </span>
                 </div>
             </t>
         </xpath>
@@ -38,21 +41,6 @@
                 <li t-if="quotation_template">Quotation Template: <t t-out="quotation_template"/></li>
             </ul>
         </div>
-    </template>
-
-    <template id="recurring_details" name="Pricing Details">
-        <t t-foreach="rendering_values" t-as="val">
-            <div class="pb-2">
-                <div>
-                    <span class="text-start">Recurring</span>:
-                    <span class="text-end"><t t-out="val['recurring']"/></span>
-                </div>
-                <div>
-                    <span class="text-start">Non Recurring</span>:
-                    <span class="text-end"><t t-out="val['non_recurring']"/></span>
-                </div>
-            </div>
-        </t>
     </template>
 
     <template id="invoice_warning_message" name="Subscription Postpaid Warning">

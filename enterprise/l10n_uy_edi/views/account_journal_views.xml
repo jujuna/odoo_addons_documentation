@@ -11,6 +11,7 @@
                     invisible="country_code != 'UY' or not l10n_latam_use_documents or type != 'sale'"
                     required="country_code == 'UY' and l10n_latam_use_documents and type == 'sale'"/>
                 <field name="l10n_uy_edi_send_print" invisible="l10n_uy_edi_type != 'electronic' or type != 'sale'"/>
+                <field name="l10n_uy_edi_ucfe_terminal_code" invisible="l10n_uy_edi_type != 'electronic' or type != 'sale'"/>
             </field>
             <field name="restrict_mode_hash_table" position="attributes">
                 <attribute name="invisible" separator=" or " add="country_code == 'UY' and l10n_uy_edi_type == 'electronic' and type == 'sale'"/>

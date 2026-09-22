@@ -6,6 +6,8 @@ from odoo import fields, Command
 
 @tagged('post_install', '-at_install')
 class TestPoSEventSale(TestUi):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -28,7 +30,6 @@ class TestPoSEventSale(TestUi):
             "lines": [
                 Command.create({
                     "discount": 0,
-                    "pack_lot_ids": [],
                     "price_unit": 100.0,
                     "product_id": self.product_event.id,
                     "price_subtotal": 100.0,
@@ -59,7 +60,6 @@ class TestPoSEventSale(TestUi):
                     }),
             ],
             "uuid": "12345-123-1234",
-            "last_order_preparation_change": "{}",
             "user_id": self.env.uid,
             "to_invoice": False,
         }
@@ -74,7 +74,6 @@ class TestPoSEventSale(TestUi):
             "lines": [
                 Command.create({
                     "discount": 0,
-                    "pack_lot_ids": [],
                     "price_unit": 100.0,
                     "product_id": self.product_event.id,
                     "price_subtotal": 100.0,
@@ -100,7 +99,6 @@ class TestPoSEventSale(TestUi):
             "sequence_number": 2,
             "payment_ids": [],
             "uuid": "12345-123-4331",
-            "last_order_preparation_change": "{}",
             "user_id": self.env.uid,
             "to_invoice": False,
             "state": "draft",

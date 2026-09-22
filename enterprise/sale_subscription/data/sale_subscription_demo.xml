@@ -59,7 +59,7 @@
             <field name="list_price">200.0</field>
             <field name="invoice_policy">order</field>
             <field name="uom_id" ref="uom.product_uom_unit"/>
-            <field name="image_1920" type="base64" file="sale_subscription/static/img/product_office_cleaning.jpg"/>
+            <field name="image_1920" type="bytes" file="sale_subscription/static/img/product_office_cleaning.jpg"/>
         </record>
 
         <record id="subscription_pricing_1" model="product.pricelist.item">
@@ -92,7 +92,7 @@
             <field name="invoice_policy">delivery</field>
             <field name="uom_id" ref="uom.product_uom_unit"/>
             <field name="description_sale">Monthly lease for city or business driving</field>
-            <field name="image_1920" type="base64" file="sale_subscription/static/img/product_car_leasing.jpg"/>
+            <field name="image_1920" type="bytes" file="sale_subscription/static/img/product_car_leasing.jpg"/>
         </record>
 
         <record id="subscription_pricing_4" model="product.pricelist.item">
@@ -165,7 +165,7 @@
             <field name="user_id" ref="base.user_admin"/>
             <field name="state">draft</field>
             <field name="client_order_ref">subscription_portal_1</field>
-            <field name="require_payment" eval="False"/>
+            <field name="prepayment_percent" eval="0.0"/>
         </record>
 
         <function model="sale.order"
@@ -189,7 +189,7 @@
             <field name="user_id" ref="base.user_admin"/>
             <field name="state">draft</field>
             <field name="client_order_ref">subscription_portal_2</field>
-            <field name="require_payment" eval="False"/>
+            <field name="prepayment_percent" eval="0.0"/>
         </record>
 
         <function model="sale.order"
@@ -204,7 +204,7 @@
             <field name="user_id" ref="base.user_admin"/>
             <field name="state">draft</field>
             <field name="client_order_ref">subscription_portal_3</field>
-            <field name="require_payment" eval="False"/>
+            <field name="prepayment_percent" eval="0.0"/>
         </record>
 
         <record id="rec_line_3" model="sale.order.line">

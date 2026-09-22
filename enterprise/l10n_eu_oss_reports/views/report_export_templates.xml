@@ -14,8 +14,8 @@
                      <ns2:IOSSNumber t-att-issuedBy="IOSSNumber[:2]" t-out="IOSSNumber[2:]"/>
                      <ns2:IntNumber t-att-issuedBy="IntNumber[:2]" t-if="IntNumber" t-out="IntNumber[2:]"/>
                   </ns2:IOSSNumbers>
-                  <ns2:VoesNumber t-elif="VoesNumber" t-att-issuedBy="VoesNumber[:2]" t-esc="VoesNumber[2:]"/>
-                  <ns2:VATNumber t-elif="VATNumber" t-att-issuedBy="VATNumber[:2]" t-esc="VATNumber[2:]"/>
+                  <ns2:VoesNumber t-elif="VoesNumber" t-att-issuedBy="VoesNumber[:2]" t-out="VoesNumber[2:]"/>
+                  <ns2:VATNumber t-elif="VATNumber" t-att-issuedBy="VATNumber[:2]" t-out="VATNumber[2:]"/>
                </ns0:Trader_ID>
                <ns0:Period>
                   <ns2:Year><t t-out="Year"/></ns2:Year>
@@ -37,11 +37,11 @@
                      </t>
                      <ns2:CorrectionsInfo t-if="line['corr_amt']">
                         <ns2:Period>
-                           <ns2:Year t-esc="line['corr_year']"/>
-                           <ns2:Quarter t-if="line['corr_quarter']" t-esc="line['corr_quarter']"/>
-                           <ns2:Month t-if="line['corr_month']" t-esc="line['corr_month']"/>
+                           <ns2:Year t-out="line['corr_year']"/>
+                           <ns2:Quarter t-if="line['corr_quarter']" t-out="line['corr_quarter']"/>
+                           <ns2:Month t-if="line['corr_month']" t-out="line['corr_month']"/>
                         </ns2:Period>
-                        <ns2:TotalVATAmountCorrection t-att-currency="line['currency'].name" t-esc="line['corr_amt']"/>
+                        <ns2:TotalVATAmountCorrection t-att-currency="line['currency'].name" t-out="line['corr_amt']"/>
                      </ns2:CorrectionsInfo>
                   </ns0:OSSDeclarationInfo>
                </t>

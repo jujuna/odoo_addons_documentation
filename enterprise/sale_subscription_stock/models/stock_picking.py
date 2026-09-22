@@ -16,7 +16,7 @@ class StockPicking(models.Model):
         vals_list = super().copy_data(default=default)
         for old_picking, vals in zip(self, vals_list):
             order = old_picking.sale_id
-            if order.is_subscription:
+            if order.sudo().is_subscription:
                 if not 'scheduled_date' in vals:
                     vals['scheduled_date'] = old_picking.scheduled_date
                 if 'move_ids' in vals:
@@ -31,6 +31,14 @@ class StockPicking(models.Model):
                 move_dict['date'] = move.date
         return move_vals_list
 
+    def _prepare_return_move_default_values(self, move_id):
+        vals = super()._prepare_return_move_default_values(move_id)
+        # copy the deadline from the original move so the return counts as an incoming move
+        # for the subscription period
+        if move_id.sale_line_id.recurring_invoice:
+            vals['date'] = move_id.date
+        return vals
+
     def _action_done(self):
         res = super()._action_done()
         picking_per_so = defaultdict(lambda: self.env['stock.picking'])
@@ -42,7 +50,7 @@ class StockPicking(models.Model):
             if not sale_order or move.location_dest_id.usage != 'customer' or not move.picked:
                 continue
 
-            if sale_order.subscription_state == "7_upsell":
+            if sale_order.sudo().subscription_state == "7_upsell":
                 # we need to compute the parent id, because it was not computed when we created the SOL in _subscription_update_line_data
                 self.env.add_to_compute(self.env['sale.order.line']._fields['parent_line_id'], move.sale_line_id)
                 for line in move.sale_line_id:
@@ -51,7 +59,7 @@ class StockPicking(models.Model):
             elif sale_order.subscription_state and sale_order.id not in picking_per_so:
                 for sol in sale_order.order_line:
                     line_invoiced_date = sol.last_invoiced_date
-                    order_invoice_date = sol.order_id.invoice_ids and sol.order_id.last_invoice_date and sol.order_id.last_invoice_date - relativedelta(days=1)
+                    order_invoice_date = sol.order_id.sudo().invoice_ids and sol.order_id.sudo().last_invoice_date and sol.order_id.sudo().last_invoice_date - relativedelta(days=1)
                     last_invoiced_date = line_invoiced_date or order_invoice_date
                     if last_invoiced_date and picking.date_done.date() <= last_invoiced_date:
                         picking_per_so[sol.order_id.id] += move.picking_id

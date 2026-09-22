@@ -14,7 +14,7 @@ export class PlanningGanttController extends GanttController {
         ...GanttController.components,
         Dropdown,
         DropdownItem,
-    }
+    };
     /**
      * @override
      */
@@ -50,7 +50,8 @@ export class PlanningGanttController extends GanttController {
                 return localStartOf(focusDate, scale.unit);
             },
             getStopDate: () => this.model.metaData.stopDate,
-            toggleHighlightPlannedFilter: (highlightPlannedIds) => this.env.searchModel.toggleHighlightPlannedFilter(highlightPlannedIds),
+            toggleHighlightPlannedFilter: (highlightPlannedIds) =>
+                this.env.searchModel.toggleHighlightPlannedFilter(highlightPlannedIds),
             reload: () => this.model.fetchData(),
         });
     }
@@ -62,8 +63,8 @@ export class PlanningGanttController extends GanttController {
         const { scale, globalStart, globalStop } = this.model.metaData;
         const today = DateTime.local().startOf("day");
         if (scale.id !== "day" && globalStart <= today.endOf("day") && today <= globalStop) {
-            let start = today;
-            let stop = today.endOf(scale.interval);
+            const start = today;
+            const stop = today.endOf(scale.interval);
             const context = this.model.getDialogContext({ start, stop, withDefault: true });
             this.create(context);
             return;
@@ -75,19 +76,27 @@ export class PlanningGanttController extends GanttController {
      * @override
      */
     openDialog(props, options) {
+        const event = this.model.data.eventsToSchedule?.records.find((e) => e.id === props.resId);
         const record = this.model.data.records.find((r) => r.id === props.resId);
-        const title = record ? record.display_name : _t("Add Shift");
+        let title;
+        if (event) {
+            title = event.display_name;
+        } else if (record) {
+            title = record.display_name;
+        } else {
+            title = _t("Add Shift");
+        }
         const context = {
             ...props.context,
             my_planning_action: this.props.context.my_planning_action,
-            is_record_created: !record,
+            is_record_created: !event && !record,
             view_start_date: serializeDateTime(this.model.metaData.globalStart),
             view_end_date: serializeDateTime(this.model.metaData.globalStop),
         };
         super.openDialog({ ...props, title, context }, options);
     }
 
-    get previewTitle() {
-        return _t("Preview");
+    async autoPlan() {
+        return await this.planningControllerActions.autoPlan();
     }
 }

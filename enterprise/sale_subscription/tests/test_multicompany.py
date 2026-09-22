@@ -1,8 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import time
 
-from odoo.fields import Command
+from odoo.fields import Command, Date
 from odoo.tests import tagged
 
 from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSubscriptionCommon
@@ -10,6 +9,8 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 
 @tagged('post_install', '-at_install')
 class TestSubscriptionMultiCompany(TestSubscriptionCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -22,7 +23,7 @@ class TestSubscriptionMultiCompany(TestSubscriptionCommon):
         cls.new_currency = cls.env['res.currency'].create({
             'name': 'New Currency',
             'symbol': ':)',
-            'rate_ids': [Command.create({'rate': .5, 'name': time.strftime('%Y-%m-%d')})],
+            'rate_ids': [Command.create({'rate': .5, 'name': Date.subtract(Date.today(), days=1)})],
         })
         cls.pricelist_new_currency = cls.env['product.pricelist'].create({
             'name': 'New Currency pricelist',
@@ -37,7 +38,7 @@ class TestSubscriptionMultiCompany(TestSubscriptionCommon):
             'name': 'Company 2', 'currency_id': cls.new_currency.id
         })
         cls.env.company.currency_id.with_company(cls.company_2).rate_ids = [
-            Command.create({'rate': 2, 'name': time.strftime('%Y-%m-%d')})
+            Command.create({'rate': 2, 'name': Date.subtract(Date.today(), days=1)})
         ]
 
 
@@ -131,3 +132,15 @@ class TestSubscriptionMultiCompany(TestSubscriptionCommon):
 
         moves = sub._create_recurring_invoice()
         self.assertEqual(False, moves.invoice_line_ids.sale_line_ids.id)
+
+    def test_add_recurring_plan_to_company_product(self):
+        """
+        Test that adding a recurring plan to a product(_tmpl) with a
+        company_id set computes the company_id correctly
+        """
+        self.product.product_tmpl_id.company_id = self.env.company.id
+        recurring_plan = self.env['product.pricelist.item'].create({
+            'pricelist_id': False,
+            'product_tmpl_id': self.product.product_tmpl_id.id,
+        })
+        self.assertEqual(recurring_plan.company_id, self.env.company)

@@ -1,17 +1,21 @@
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class ChangeProductionQty extends Component {
     static template = "stock_barcode_mrp.ChangeProductionQty";
-    static props = { ...standardFieldProps };
+
+    props = useProps(standardFieldProps);
 
     setup() {
         this.actionService = useService("action");
     }
 
-    openChangeQtyWizard() {
+    async openChangeQtyWizard() {
+        // Persist pending form edits (e.g. `qty_producing`) before opening the
+        // wizard, otherwise the `onClose` reload would discard them.
+        await this.props.record.save();
         this.actionService.doAction("mrp.action_change_production_qty", {
             additionalContext: {
                 default_product_qty: this.props.value,

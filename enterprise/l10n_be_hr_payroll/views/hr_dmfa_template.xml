@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- https://www.socialsecurity.be/portail/glossaires/dmfa.nsf/ConsultFrImprPDF/149524602BB4229CC125835B00491C32/$FILE/VersComplDMFA191_F.pdf -->
 <odoo>
 <data>
     <template id="dmfa_xml_report">
-        <DmfAOriginal xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DmfAOriginal_20211.xsd">
+        <DmfAOriginal xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" t-att="{'xsi:noNamespaceSchemaLocation': 'DmfAOriginal_' + schema_year_quarter + '.xsd'}">
             <Form>
 
                 <!-- 00296
@@ -38,7 +37,7 @@
                     · MM est le mois
                     . JJ est le jour
                 -->
-                <FormCreationDate t-esc="datetime.date.today()"/>
+                <FormCreationDate t-out="datetime.date.today()"/>
 
                 <!-- 00299
                     DESCRIPTION:    Moment précis, exprimé en heures, minutes, secondes et millièmes de secondes.
@@ -61,7 +60,7 @@
                     . SS sont les secondes
                     . SSS sont les millièmes de secondes
                 -->
-                <FormCreationHour t-esc="datetime.datetime.now().strftime('%H:%M:%S.000')"/>
+                <FormCreationHour t-out="datetime.datetime.now().strftime('%H:%M:%S.000')"/>
 
                 <!-- 00110
                     DESCRIPTION:
@@ -158,7 +157,7 @@
 
                         PRESENCE:   Indispensable
                     -->
-                    <ReferenceNbr t-esc="data.reference"/>
+                    <ReferenceNbr t-out="data.name"/>
                 </Reference>
 
                 <!-- 90007 Bloc fonctionnel permettant de déclarer les données de la déclaration. -->
@@ -176,7 +175,7 @@
                         . AAAA est l'année
                         . T est le trimestre
                      -->
-                    <Quarter t-esc="quarter_repr"/>
+                    <Quarter t-out="quarter_repr"/>
 
                     <!-- 00011
                         DESCRIPTION: Chaque employeur, qu'il soit une personne physique, un groupement de personnes physiques ou une personne morale, qui occupe du personnel soumis à la loi du 27 juin 1969, doit être inscrit à l'ONSS. Il s'agit d'un numéro ONSS définitif.
@@ -189,7 +188,7 @@
                         . NNNNNNN est le numéro
                         · CC est le numéro de contrôle.
                      -->
-                    <NOSSRegistrationNbr t-esc="onss_registration_number"/>
+                    <NOSSRegistrationNbr t-out="onss_registration_number"/>
 
                     <!-- 00012
                         DESCRIPTION:    Code qui indique si une déclaration se rapporte à une période pendant laquelle elle est sous curatelle.
@@ -212,7 +211,7 @@
                         LONGUEUR:   10
                         PRESENCE:   Indispensable
                      -->
-                    <CompanyID t-esc="onss_company_id"/>
+                    <CompanyID t-out="l10n_be_company_number"/>
 
                     <!--  00015
                         DESCRIPTION:    Montant net à payer par l'employeur à l'ONSS.
@@ -221,7 +220,7 @@
                         LONGUEUR:   15
                         PRESENCE: Indispensable
                     -->
-                    <NetOwedAmount t-esc="global_contribution"/>
+                    <NetOwedAmount t-out="global_contribution"/>
 
                     <!-- 00016
                         DESCRIPTION:    Code qui indique que les données de temps de travail (nombre de jours par semaine du régime de travail et nombre de jours de la prestation et les jours de vacances) sont converties.
@@ -234,7 +233,7 @@
                         LONGUEUR:   1
                         PRESENCE:   Obligatoire si le trimestre de déclaration est antérieur au troisième trimestre 2004.
                     -->
-                    <System5 t-esc="system5"/>
+                    <System5 t-out="system5"/>
 
                     <!-- 00017
                         DESCRIPTION:
@@ -253,78 +252,111 @@
                         . JJ est le jour
                      -->
                     <t t-if="holiday_starting_date != -1">
-                        <HolidayStartingDate t-esc="holiday_starting_date"/>
+                        <HolidayStartingDate t-out="holiday_starting_date"/>
                     </t>
 
                     <t t-foreach="natural_persons" t-as="person">
                         <t t-call="l10n_be_hr_payroll.NaturalPerson"/>
                     </t>
 
-                    <ContributionUnrelatedToNP t-if="group_insurance_basis != '00000000000'">
-                        <UnrelatedEmployerClass t-esc="employer_class"/>
-                        <UnrelatedWorkerCode>865</UnrelatedWorkerCode>
-                        <UnrelatedCalculationBasis t-esc="group_insurance_basis"/>
-                        <UnrelatedAmount t-esc="group_insurance_amount"/>
-                    </ContributionUnrelatedToNP>
+                    <t t-foreach="vehicles" t-as="vehicle">
+                        <t t-call="l10n_be_hr_payroll.CompanyVehicle"/>
+                    </t>
 
-                    <!-- 90002: Bloc fonctionnel permettant de déclarer les cotisations non liées à une personne physique dues par l'employeur. -->
-                    <!--
-                        - Cotisation non liée à une personne physique
-                        - CODE : 870 - Cotisation due sur le double pécule de vacances des employés, sur le pécule de vacances ou la prime Copernic des contractuels du secteur public fédéral et sur la prime de restructuration des militaires contractuels  Autres (type travailleurs)
-                        - uniquement autorisé pour le code travailleur pour une cotisation non liée à une personne physique (zone 00020)-->
-                    <ContributionUnrelatedToNP>
-
-                        <!-- 00019
-                            DESCRIPTION:    L'indice de catégorie permet de différencier les employeurs selon leurs obligations en fonction de particularités propres à l'activité exercée. Il est attribué par l'ONSS.
-                            Il s'agit ici de déclarer la catégorie de l'employeur pour laquelle une cotisation non liée à une personne physique est due.
-                            DOMAINE DE DEFINITION:  Nombre de 3 chiffres attribué par l'ONSS.
-                            TYPE:   Numérique
-                            LONGUEUR:   3
-                            PRESENCE:   Indispensable
-                         -->
-                        <UnrelatedEmployerClass t-esc="employer_class"/>
-
-                        <!-- 00020
-                            DESCRIPTION:    Ce code travailleur permet d'identifier une cotisation qui n'est pas liée à une personne physique mais qui est due au niveau de l'indice de catégorie de l'employeur.
-                            DOMAINE DE DEFINITION:  Les codes travailleur correspondant à une cotisation non liée à une personne physique (voir annexe 2 - Liste des codes travailleurs pour lesquels des cotisations sont dues).
-                            TYPE:   Numérique
-                            LONGUEUR:   3
-                            PRESENCE:   Indispensable
-                        -->
-                        <UnrelatedWorkerCode>870</UnrelatedWorkerCode>
-
-                        <!-- 00021
-                            DESCRIPTION:    Montant de base qui permet de calculer le montant de la cotisation non liée à une personne physique.
-                            Aucune base de calcul ne doit être mentionnée pour la cotisation de solidarité sur l’usage d’un véhicule de société (code travailleur 862).
-                            DOMAINE DE DEFINITION:  [0;9999999999999]
-                            TYPE:   Numérique
-                            LONGUEUR:   13
-                            PRESENCE:   Obligatoire si la cotisation déclarée doit être calculée à partir d’une base de calcul.
-                         -->
-                        <t t-if="unrelated_calculation_basis != -1">
-                            <UnrelatedCalculationBasis t-esc="unrelated_calculation_basis"/>
-                        </t>
-
-                        <!-- 00022
-                            DESCRIPTION:    Montant de la cotisation non liée à une personne physique et due par l’indice de catégorie de l'employeur.
-                            DOMAINE DE DEFINITION:  [0;9999999999999]
-                            TYPE:   Numérique
-                            LONGUEUR:   13
-                            PRESENCE:   Indispensable
-                        -->
-                        <UnrelatedAmount t-esc="double_holiday_pay_contribution"/>
-                    </ContributionUnrelatedToNP>
+                    <t t-foreach="company_contributions" t-as="contribution">
+                        <t t-call="l10n_be_hr_payroll.ContributionUnrelatedToNP"/>
+                    </t>
 
                     <t t-if="employer_compensation">
                         <EmployerCompensation>
                             <CompensationCode>1</CompensationCode>
-                            <CompensationAmount t-esc="employer_compensation"/>
+                            <CompensationAmount t-out="employer_compensation"/>
                         </EmployerCompensation>
                     </t>
 
                 </EmployerDeclaration>
             </Form>
         </DmfAOriginal>
+    </template>
+
+    <template id="ContributionUnrelatedToNP">
+            <!-- 90002: Bloc fonctionnel permettant de déclarer les cotisations non liées à une personne physique dues par l'employeur. -->
+            <ContributionUnrelatedToNP>
+                <!-- 00019
+                                DESCRIPTION:    L'indice de catégorie permet de différencier les employeurs selon leurs obligations en fonction de particularités propres à l'activité exercée. Il est attribué par l'ONSS.
+                                Il s'agit ici de déclarer la catégorie de l'employeur pour laquelle une cotisation non liée à une personne physique est due.
+                                DOMAINE DE DEFINITION:  Nombre de 3 chiffres attribué par l'ONSS.
+                                TYPE:   Numérique
+                                LONGUEUR:   3
+                                PRESENCE:   Indispensable
+                             -->
+                <UnrelatedEmployerClass t-out="employer_class"/>
+                <!-- 00020
+                                DESCRIPTION:    Ce code travailleur permet d'identifier une cotisation qui n'est pas liée à une personne physique mais qui est due au niveau de l'indice de catégorie de l'employeur.
+                                DOMAINE DE DEFINITION:  Les codes travailleur correspondant à une cotisation non liée à une personne physique (voir annexe 2 - Liste des codes travailleurs pour lesquels des cotisations sont dues).
+                                TYPE:   Numérique
+                                LONGUEUR:   3
+                                PRESENCE:   Indispensable
+                            -->
+                <UnrelatedWorkerCode t-out="contribution.code"/>
+                <!-- 00021
+                                DESCRIPTION:    Montant de base qui permet de calculer le montant de la cotisation non liée à une personne physique.
+                                Aucune base de calcul ne doit être mentionnée pour la cotisation de solidarité sur l’usage d’un véhicule de société (code travailleur 862).
+                                DOMAINE DE DEFINITION:  [0;9999999999999]
+                                TYPE:   Numérique
+                                LONGUEUR:   13
+                                PRESENCE:   Obligatoire si la cotisation déclarée doit être calculée à partir d’une base de calcul.
+                             -->
+                <t t-if="contribution.code != '862'">
+                    <UnrelatedCalculationBasis t-out="contribution.basis_amount"/>
+                </t>
+                <!-- 00022
+                                DESCRIPTION:    Montant de la cotisation non liée à une personne physique et due par l’indice de catégorie de l'employeur.
+                                DOMAINE DE DEFINITION:  [0;9999999999999]
+                                TYPE:   Numérique
+                                LONGUEUR:   13
+                                PRESENCE:   Indispensable
+                            -->
+                <UnrelatedAmount t-out="contribution.amount"/>
+            </ContributionUnrelatedToNP>
+    </template>
+
+    <template id="CompanyVehicle">
+        <!-- 90294 Bloc fonctionnel permettant de déclarer les informations relatives à un véhicule de société.
+        Un véhicule de société (un numéro de plaque) ne peut se retrouver qu'une seule fois par déclaration. -->
+        <CompanyVehicle>
+            <!-- 00780
+                DESCRIPTION:    Numéro de suite des véhicules de société au sein d’une déclaration
+                DOMAINE DE DEFINITION:  Nombre entier positif et élément de [1;99999]
+
+                TYPE:   Numérique
+                LONGUEUR:   5
+
+                PRESENCE:   Indispensable
+             -->
+            <CompanyVehicleSequenceNbr t-out="vehicle.sequence"/>
+            <!-- 00781
+                DESCRIPTION:    Numéro de plaque d’un véhicule à la DIV
+                DOMAINE DE DEFINITION:  
+
+                TYPE:   Alphanumérique
+                LONGUEUR:   10
+                PRESENCE:   Indispensable
+             -->
+            <LicensePlate t-out="vehicle.license_plate"/>
+            <!-- 01217
+                DESCRIPTION:    Zone dans laquelle il est indiqué si le numéro de plaque concerne un véhicule de société respectueux de l’environnement qui est mis à disposition dans le cadre du budget mobilité.
+                DOMAINE DE DEFINITION:  0 = le numéro de plaque ne concerne pas un véhicule de société respectueux de l’environnement qui est mis à disposition dans le cadre du budget mobilité
+                1 = le numéro de plaque concerne un véhicule de société respectueux de l’environnement qui est mis à disposition dans le cadre du budget mobilité
+
+                TYPE:   Numérique
+                LONGUEUR:   1
+                PRESENCE:   Obligatoire si le numéro de plaque concerne un véhicule de société respectueux de l’environnement qui est mis à disposition dans le cadre du budget mobilité.
+             -->
+            <t t-if="vehicle.eco_vehicle">
+                <EcoVehicle t-out="'1'"/>
+            </t>
+        </CompanyVehicle>
     </template>
 
     <template id="NaturalPerson">
@@ -341,7 +373,7 @@
 
                 PRESENCE:   Indispensable
             -->
-            <NaturalPersonSequenceNbr t-esc="person.sequence"/>
+            <NaturalPersonSequenceNbr t-out="person.sequence"/>
             <!-- 00024
                 DESCRIPTION:    Numéro d'identification d'une personne physique au sein de la sécurité sociale. Il s'agit du numéro d'identification de la personne physique au registre national ou au registre bis des personnes physiques.
 
@@ -358,7 +390,7 @@
                 · NNNNNNNNN est le numéro
                 · CC est le chiffre de contrôle.
              -->
-            <INSS t-esc="person.identification_id"/>
+            <INSS t-out="person.identification_id"/>
             <!-- Note, the following values are now forbidden:
                 - 00025 WorkerName
                 - 00026 WorkerFirstName
@@ -388,7 +420,7 @@
 
                 PRESENCE:   Facultative
              -->
-            <NaturalPersonUserReference t-esc="person.employee.id"/>
+            <NaturalPersonUserReference t-out="person.employee.id"/>
             <t t-foreach="person.worker_records" t-as="worker">
                 <t t-call="l10n_be_hr_payroll.WorkerRecord"/>
             </t>
@@ -410,7 +442,7 @@
                 LONGUEUR:   3
                 PRESENCE:   Indispensable
              -->
-            <EmployerClass t-esc="employer_class"/>
+            <EmployerClass t-out="employer_class"/>
             <!-- 00037
                 DESCRIPTION:    Ce code permet d'identifier le type de travailleur pour lequel une cotisation spécifique est exigée (cotisation ordinaire, cotisation Fedris, cotisation spéciale prépensionné, cotisation spéciale personnel statutaire licencié, cotisation spéciale étudiant ou cotisation spéciale indemnités complémentaires).
                 DOMAINE DE DEFINITION:  Voir annexe 2 - Liste des codes travailleurs pour lesquels des cotisations sont dues ; uniquement les codes travailleurs pour lesquels la présence est égale à 1 ou 3.
@@ -420,7 +452,7 @@
                 LONGUEUR:   3
                 PRESENCE:   Indispensable
              -->
-            <WorkerCode t-esc="worker.worker_code"/>
+            <WorkerCode t-out="worker.worker_code"/>
             <!-- 00038
                 DESCRIPTION:
                 Date de début du trimestre sur lequel porte la déclaration du contrat travailleur.
@@ -442,7 +474,7 @@
                 · MM est le mois
                 . JJ est le jour
              -->
-            <NOSSQuarterStartingDate t-esc="quarter_start"/>
+            <NOSSQuarterStartingDate t-out="quarter_start"/>
             <!-- 00039
                 DESCRIPTION:
                 Date de fin du trimestre sur lequel porte la déclaration du contrat travailleur.
@@ -460,7 +492,7 @@
                 · MM est le mois
                 . JJ est le jour
              -->
-            <NOSSQuarterEndingDate t-esc="quarter_end"/>
+            <NOSSQuarterEndingDate t-out="quarter_end"/>
             <!-- 00040
                 DESCRIPTION:    Code permettant de désigner un travailleur ayant le statut fiscal de frontalier.
                 DOMAINE DE DEFINITION:
@@ -471,7 +503,7 @@
                 LONGUEUR:   1
                 PRESENCE:   Indispensable
              -->
-            <Border t-esc="worker.frontier_worker"/>
+            <Border t-out="worker.frontier_worker"/>
             <!-- 00041
                 DESCRIPTION:    Code se référant à la nomenclature des classes de risques génériques utilisées par les entreprises d'assurance pour la détermination des primes Accidents du Travail (AT). Les conditions précises de déclaration sont reprises dans le document des instructions DMFA à destination des employeurs.
 
@@ -493,12 +525,12 @@
                 du contrat d'assurance Accidents du Travail.
 
               -->
-            <t t-if="worker.activity_with_risk != -1">
-                <ActivityWithRisk t-esc="worker.activity_with_risk"/>
+            <t t-if="worker.activity_with_risk">
+                <ActivityWithRisk t-out="worker.activity_with_risk"/>
             </t>
             <!-- See 00042: Deprecated since 2014-->
             <t t-if="worker.local_unit_id != -1">
-                <LocalUnitID t-esc="worker.local_unit_id"/>
+                <LocalUnitID t-out="worker.local_unit_id"/>
             </t>
             <!-- 00616
                 DESCRIPTION:   Référence.
@@ -509,7 +541,7 @@
                 LONGUEUR:   200
                 PRESENCE:   Facultative
             -->
-            <!-- <WorkerRecordUserReference t-esc="worker.user_reference"/> -->
+            <!-- <WorkerRecordUserReference t-out="worker.user_reference"/> -->
             <t t-foreach="worker.occupations" t-as="occupation">
                 <t t-call="l10n_be_hr_payroll.Occupation"/>
             </t>
@@ -540,7 +572,7 @@
 
                 PRESENCE:   Indispensable
             -->
-            <DeductionCode t-esc="deduction.code"/>
+            <DeductionCode t-out="deduction.code"/>
             <!-- 00088
                 DESCRIPTION:    Montant sur lequel un taux doit être appliqué afin de connaître le montant de la déduction demandée pour cette ligne travailleur ou occupation.
                 DOMAINE DE DEFINITION:  [0;99999999999]
@@ -552,7 +584,7 @@
                 PRESENCE:   Obligatoire si la déduction demandée est calculée à partir d’une base de calcul sur laquelle un taux doit être appliqué.
             -->
             <t t-if="deduction.deduction_calculation_basis != -1">
-                <DeductionCalculationBasis t-esc="deduction.deduction_calculation_basis"/>
+                <DeductionCalculationBasis t-out="deduction.deduction_calculation_basis"/>
             </t>
             <!-- 00089
                 DESCRIPTION:    Montant de la déduction demandée pour cette ligne travailleur ou occupation.
@@ -564,7 +596,7 @@
 
                 PRESENCE:   Obligatoire si la déduction demandée correspond à un montant déductible du montant net à payer.
             -->
-            <DeductionAmount t-esc="deduction.amount"/>
+            <DeductionAmount t-out="deduction.amount"/>
             <!-- 00090
                 DESCRIPTION:
                 Date à laquelle la déduction prend cours pour cette ligne travailleur ou occupation.
@@ -584,7 +616,7 @@
                 . JJ est le jour
             -->
             <t t-if="deduction.deduction_right_starting_date != -1">
-                <DeductionRightStartingDate t-esc="deduction.deduction_right_starting_date"/>
+                <DeductionRightStartingDate t-out="deduction.deduction_right_starting_date"/>
             </t>
             <!-- 00091
                 DESCRIPTION:    Nombre de mois faisant l'objet, au cours du trimestre traité, de la prise en charge temporaire, par l'ONSS, des frais d'administration encourus par l'employeur affilié à un Secrétariat Social Agréé.
@@ -597,7 +629,7 @@
                 PRESENCE:   Obligatoire si le Secrétariat Social revendique l'intervention de l'ONSS dans ses frais d'administration pour cet employeur.
             -->
             <t t-if="deduction.manager_cost_nbr_months != -1">
-                <ManagementCostNbrMonths t-esc="deduction.manager_cost_nbr_months"/>
+                <ManagementCostNbrMonths t-out="deduction.manager_cost_nbr_months"/>
             </t>
             <!-- 00092
                 DESCRIPTION:    Numéro d'identification d'une personne physique au sein de la sécurité sociale. Il s'agit du numéro d'identification de la personne physique au registre national ou au registre bis des personnes physiques.
@@ -617,7 +649,7 @@
                 · CC est le chiffre de contrôle.
             -->
             <t t-if="deduction.replace_inss != -1">
-                <ReplacedINSS t-esc="deduction.replace_inss"/>
+                <ReplacedINSS t-out="deduction.replace_inss"/>
             </t>
             <!-- 00093
                 DESCRIPTION:    Numéro d'identification d'une personne physique au sein de la sécurité sociale. Il s'agit du numéro d'identification de la personne physique au registre national ou au registre bis des personnes physiques.
@@ -637,7 +669,7 @@
                 · CC est le chiffre de contrôle.
             -->
             <t t-if="deduction.applicant_inss != -1">
-                <ApplicantINSS t-esc="deduction.applicant_inss"/>
+                <ApplicantINSS t-out="deduction.applicant_inss"/>
             </t>
             <!-- 00094
                 DESCRIPTION:    Origine de l'attestation nécessaire à l'octroi de la déduction.
@@ -656,7 +688,7 @@
                 PRESENCE:   Facultative
              -->
             <t t-if="deduction.certificate_origin != -1">
-                 <CertificateOrigin t-esc="deduction.certificate_origin"/>
+                 <CertificateOrigin t-out="deduction.certificate_origin"/>
             </t>
              <!-- DeductionDetail: Check annexe 4 to see if mandatory -->
         </WorkerDeduction>
@@ -667,7 +699,6 @@
         - 90011 IndemnityWAPM
         - 90042 EarlyRetirementContribution
         - 90108 DeductionDetail - Présent en fonction du type de Worker Deduction (voir annexe 4)
-        - 90109 OccupationDeduction
         - 90172 SecondPillarInformation
         - 90250 OccupationDeductionDetail
         - 90336 ComplementaryIndemnity - See Annexe 2
@@ -689,7 +720,7 @@
                 LONGUEUR:   9
                 PRESENCE:   Indispensable
              -->
-            <StudentRemunAmount t-esc="contribution.student_remun_amount"/>
+            <StudentRemunAmount t-out="contribution.student_remun_amount"/>
             <!-- 00077
                 DESCRIPTION:    Montant de la cotisation de solidarité due pour les étudiants occupés dans le cadre d'un contrat d'occupation d'étudiants à condition que la durée d'engagement n'excède pas un certain nombre d’heures (à partir du 1/2017) ou de journées de travail (avant 1/2017) sur l’ensemble de l'année civile (voir zones nombre d’heures étudiant ou nombre de jours étudiant).
                 DOMAINE DE DEFINITION:  [0;999999999].
@@ -697,7 +728,7 @@
                 LONGUEUR:   9
                 PRESENCE:   Indispensable
             -->
-            <StudentContributionAmount t-esc="contribution.student_contribution_amount"/>
+            <StudentContributionAmount t-out="contribution.student_contribution_amount"/>
             <!-- 00078
                 DESCRIPTION:    Jusqu’au 4ème trimestre 2016 inclus :
                 Nombre de jours rémunérés à déclarer pour les étudiants occupés dans le cadre d'un contrat d'occupation d'étudiants à condition que la durée d'engagement n'excède pas un certain nombre de journées de travail sur l’ensemble de l’année civile (voir domaine de définition).
@@ -709,7 +740,7 @@
                 Interdit à partir des déclarations du 1/2017.
             -->
             <t t-if="contribution.student_nbr_days != -1">
-                <StudentNbrDays t-esc="contribution.student_nbr_days"/>
+                <StudentNbrDays t-out="contribution.student_nbr_days"/>
             </t>
             <!--
                 DESCRIPTION:    A partir du 1er trimestre 2017 :
@@ -720,9 +751,9 @@
                 PRESENCE:   Obligatoire si le travailleur étudiant est déclaré pour un trimestre postérieur au 4/2016.
                 Interdit pour les déclarations antérieures au 1/2017.
              -->
-            <StudentHoursNbr t-esc="contribution.student_hours_nbr"/>
+            <StudentHoursNbr t-out="contribution.student_hours_nbr"/>
             <!-- See 00042 -->
-            <LocalUnitID t-esc="contribution.local_unit_id"/>
+            <LocalUnitID t-out="contribution.local_unit_id"/>
         </StudentContribution>
     </template>
 
@@ -736,7 +767,7 @@
                 LONGUEUR:   3
                 PRESENCE:   Indispensable
             -->
-            <ContributionWorkerCode t-esc="contribution.worker_code"/>
+            <ContributionWorkerCode t-out="contribution.worker_code"/>
             <!-- 00083
                 DESCRIPTION:    Le type de cotisation permet, en combinaison avec le code travailleur cotisation, d’identifier la cotisation déclarée, de déterminer si la cotisation est due et de connaître le taux ou le forfait de la cotisation.
                 DOMAINE DE DEFINITION:  Les valeurs admises en fonction du code travailleur cotisation se trouvent en annexe 3 - Valeurs autorisées pour le "Type de cotisation" en fonction des codes travailleurs cotisations.
@@ -744,7 +775,7 @@
                 LONGUEUR:   1
                 PRESENCE:   Indispensable
             -->
-            <ContributionType t-esc="contribution.contribution_type"/>
+            <ContributionType t-out="contribution.contribution_type"/>
             <!-- 00084
                 DESCRIPTION:    Montant sur lequel un taux doit être appliqué afin de connaître le montant de la cotisation due pour cette ligne travailleur.
                 DOMAINE DE DEFINITION:  [0;99999999999]
@@ -753,7 +784,7 @@
                 PRESENCE:   Obligatoire si la cotisation déclarée doit être calculée à partir d’une base de calcul sur laquelle un taux doit être appliqué.
             -->
             <t t-if="contribution.calculation_basis != -1">
-                <ContributionCalculationBasis t-esc="contribution.calculation_basis"/>  <!-- Probably not required -->
+                <ContributionCalculationBasis t-out="contribution.calculation_basis"/>  <!-- Probably not required -->
             </t>
             <!-- 00085
                 DESCRIPTION:   Montant de la cotisation due pour cette ligne travailleur ou pour cette indemnité complémentaire.
@@ -762,7 +793,7 @@
                 LONGUEUR:   11
                 PRESENCE:   Indispensable
              -->
-            <ContributionAmount t-esc="contribution.amount"/>
+            <ContributionAmount t-out="contribution.amount"/>
             <!-- 00086
                 DESCRIPTION:
                 Date à laquelle le travailleur a été embauché pour la première fois chez l’employeur
@@ -777,7 +808,7 @@
                 . JJ est le jour
             -->
             <t t-if="contribution.first_hiring_date != -1">
-                <FirstHiringDate t-esc="first_hiring_date"/>
+                <FirstHiringDate t-out="first_hiring_date"/>
             </t>
         </WorkerContribution>
     </template>
@@ -795,7 +826,7 @@
                 LONGUEUR:   2
                 PRESENCE:   Indispensable
              -->
-            <OccupationSequenceNbr t-esc="occupation.sequence"/>
+            <OccupationSequenceNbr t-out="occupation.sequence"/>
 
             <!-- 00044
                 DESCRIPTION:
@@ -818,7 +849,7 @@
                 · MM est le mois
                 . JJ est le jour
              -->
-            <OccupationStartingDate t-esc="occupation.date_start"/>
+            <OccupationStartingDate t-out="occupation.date_start"/>
 
             <!-- 00045
                 DESCRIPTION:
@@ -848,7 +879,7 @@
                 . JJ est le jour
              -->
             <t t-if="occupation.date_stop != -1">
-                <OccupationEndingDate t-esc="occupation.date_stop"/>
+                <OccupationEndingDate t-out="occupation.date_stop"/>
             </t>
 
             <!-- 00046
@@ -864,7 +895,7 @@
                 PRESENCE:   Indispensable
                 FORMAT: CCC ou CCC.CC ou CCC.CC.CC
              -->
-            <JointCommissionNbr t-esc="occupation.commission"/>
+            <JointCommissionNbr t-out="occupation.commission"/>
 
             <!-- 00047
                 DESCRIPTION:    Si le régime de travail hebdomadaire est fixe, il s'agit du nombre de jours par semaine du travailleur. Le régime de travail est dit fixe lorsque le travailleur travaille un nombre fixe de jours par semaine. Il peut alors prendre les valeurs 1, 2, 3, 4, 5, 6 ou 7 jours/semaine.
@@ -886,7 +917,7 @@
                 LONGUEUR:   3
                 PRESENCE:   Indispensable
              -->
-            <WorkingDaysSystem t-esc="occupation.days_per_week"/>
+            <WorkingDaysSystem t-out="occupation.days_per_week"/>
 
             <!-- 00050
                 DESCRIPTION:    Code qui indique si l'occupation est effectuée dans le cadre d'un contrat temps plein ou temps partiel.
@@ -901,7 +932,7 @@
                 LONGUEUR:   1
                 PRESENCE:   Indispensable
              -->
-            <ContractType t-esc="occupation.is_parttime"/>
+            <ContractType t-out="occupation.is_parttime"/>
 
             <!-- 00049
                 DESCRIPTION:    Nombre moyen d'heures par semaine (exprimé en centièmes d’heures) pendant lesquelles la personne de référence est censée effectuer un travail.
@@ -924,7 +955,19 @@
                 A partir du 3/2005 : obligatoire si la déclaration ne concerne pas un tiers payant (déclarations pour des catégories de l'employeur différentes de 033, 099, 199, 299 et 699).
              -->
             <t t-if="occupation.ref_mean_working_hours != -1">
-                <RefMeanWorkingHours t-esc="occupation.ref_mean_working_hours"/>
+                <RefMeanWorkingHours t-out="occupation.ref_mean_working_hours"/>
+            </t>
+            <!-- 00053
+                DESCRIPTION:    Code qui indique si l'occupation est effectuée dans le cadre d’un contrat particulier.
+
+                DOMAINE DE DEFINITION:  Voir annexe 21 - Liste des valeurs autorisées pour le statut du travailleur.
+
+                TYPE:   Alphanumérique
+                LONGUEUR:   2
+                PRESENCE:   Obligatoire si l'occupation du travailleur est effectuée dans le cadre d'un contrat particulier mentionné à l'annexe 21.
+             -->
+            <t t-if="occupation.worker_status != -1">
+                <WorkerStatus t-out="occupation.worker_status"/>
             </t>
 
             <!-- 90015
@@ -948,7 +991,7 @@
                 PRESENCE:   Obligatoire si le travailleur concerné travaille à temps partiel ou, indépendamment du fait que le travailleur est occupé à temps plein ou à temps partiel, s'il s'agit d'un travailleur saisonnier, intérimaire, temporaire, d'un travailleur à domicile, d'un travailleur en interruption de carrière, d'un travailleur ayant repris le travail à temps partiel suite à l'avis du médecin conseil, d'un travailleur en prépension à mi-temps ou d'un travailleur avec des prestations réduites, jusqu'au 2/2005 inclus.
                 A partir du 3/2005 : obligatoire si la déclaration ne concerne pas un tiers payant (déclarations pour des catégories de l'employeur différentes de 033, 099, 199, 299 et 699).
              -->
-            <MeanWorkingHours t-esc="occupation.mean_working_hours"/>
+            <MeanWorkingHours t-out="occupation.mean_working_hours"/>
 
             <!-- 00051
                 DESCRIPTION:    Code qui indique que le travailleur est occupé dans le cadre d'une mesure de réduction du temps de travail, indépendamment du fait qu'une éventuelle réduction des cotisations afférente à la mesure est demandée.
@@ -962,7 +1005,7 @@
                 Indispensable lorsque cette donnée est reprise dans le bloc 90438.
              -->
             <t t-if="occupation.reorganisation_measure != -1">
-                <ReorganisationMeasure t-esc="occupation.reorganisation_measure"/>
+                <ReorganisationMeasure t-out="occupation.reorganisation_measure"/>
             </t>
 
             <!-- 00052
@@ -974,21 +1017,9 @@
                 PRESENCE:   Obligatoire si l'occupation du travailleur est effectuée dans le cadre d'une mesure de promotion de l'emploi susmentionnée.
              -->
             <t t-if="occupation.employment_promotion != -1">
-                <EmploymentPromotion t-esc="occupation.employment_promotion"/>
+                <EmploymentPromotion t-out="occupation.employment_promotion"/>
             </t>
 
-            <!-- 00053
-                DESCRIPTION:    Code qui indique si l'occupation est effectuée dans le cadre d’un contrat particulier.
-
-                DOMAINE DE DEFINITION:  Voir annexe 21 - Liste des valeurs autorisées pour le statut du travailleur.
-
-                TYPE:   Alphanumérique
-                LONGUEUR:   2
-                PRESENCE:   Obligatoire si l'occupation du travailleur est effectuée dans le cadre d'un contrat particulier mentionné à l'annexe 21.
-             -->
-            <t t-if="occupation.worker_status != -1">
-                <WorkerStatus t-esc="occupation.worker_status"/>
-            </t>
 
             <!-- 00054
                 DESCRIPTION:    Code qui indique que la personne continue à exercer une activité professionnelle bien que pensionnée.
@@ -1000,7 +1031,7 @@
                 LONGUEUR:   1
                 PRESENCE:   Indispensable
              -->
-            <Retired t-esc="occupation.retired"/>
+            <Retired t-out="occupation.retired"/>
 
             <!-- 00055
                 DESCRIPTION:    Code permettant de distinguer un apprenti.
@@ -1019,7 +1050,7 @@
                 PRESENCE:   Obligatoire si le travailleur est un apprenti.
             -->
             <t t-if="occupation.apprenticeship != -1">
-                <Apprenticeship t-esc="occupation.apprenticeship"/>
+                <Apprenticeship t-out="occupation.apprenticeship"/>
             </t>
 
             <!-- 00056
@@ -1038,7 +1069,7 @@
                 PRESENCE:   Obligatoire si le travailleur est payé selon un mode de rémunération susmentionné.
             -->
             <t t-if="occupation.remun_method != -1">
-                <RemunMethod t-esc="occupation.remun_method"/>
+                <RemunMethod t-out="occupation.remun_method"/>
             </t>
 
             <!-- 00057
@@ -1055,7 +1086,7 @@
                 PRESENCE:   Obligatoire si le travailleur est rémunéré totalement ou partiellement au pourboire ou au service, ou s’il s’agit d’un marin pêcheur et si la rémunération est déclarée sur une base forfaitaire.
              -->
             <t t-if="occupation.position_code != -1">
-                <PositionCode t-esc="occupation.position_code"/>
+                <PositionCode t-out="occupation.position_code"/>
             </t>
 
             <!-- 00059
@@ -1074,7 +1105,7 @@
                 PRESENCE:   Obligatoire si le travailleur fait partie du personnel volant d’une compagnie aérienne ou s'il est un pilote militaire.
              -->
             <t t-if="occupation.flying_staff_class != -1">
-                <FlyingStaffClass t-esc="occupation.flying_staff_class"/>
+                <FlyingStaffClass t-out="occupation.flying_staff_class"/>
             </t>
 
              <!-- 00060
@@ -1089,7 +1120,7 @@
                 PRESENCE:   Obligatoire si le travailleur exerce une fonction d'enseignant.
             -->
             <t t-if="occupation.TenthOrTwelfth != -1">
-                <TenthOrTwelfth t-esc="occupation.TenthOrTwelfth"/>
+                <TenthOrTwelfth t-out="occupation.TenthOrTwelfth"/>
             </t>
 
             <!-- 00228
@@ -1105,7 +1136,7 @@
                 Facultatif dans le bloc Occupation de la ligne travailleur.
              -->
             <t t-if="occupation.ActivityCode != -1">
-                <ActivityCode t-esc="occupation.ActivityCode"/>
+                <ActivityCode t-out="occupation.ActivityCode"/>
             </t>
 
             <!-- 00617
@@ -1118,7 +1149,7 @@
                 LONGUEUR:   200
                 PRESENCE:   Facultative
              -->
-            <OccupationUserReference t-esc="occupation.contract.id"/>
+            <OccupationUserReference t-out="occupation.contract.id"/>
 
             <!-- 00042
                 DESCRIPTION:    Il s'agit du numéro identifiant une unité d'établissement (numéro attribué par la Banque-Carrefour des Entreprises).
@@ -1150,7 +1181,7 @@
                 Obligatoire si l'employeur a plusieurs sièges d'exploitation pour les déclarations des deuxième et quatrième trimestres de chaque année (du deuxième trimestre 2004 au deuxième trimestre 2006 inclus), sauf pour les codes travailleurs et les catégories d’employeur mentionnés ci-dessus.
                 Obligatoire si la déclaration concerne le quatrième trimestre 2003, sauf pour les codes travailleurs et les catégories d'employeur mentionnés ci-dessus.
             -->
-            <LocalUnitID t-esc="occupation.work_place"/>
+            <LocalUnitID t-out="occupation.work_place"/>
 
             <!-- 00625
                 DESCRIPTION:    Code qui indique que le travailleur est occupé au cours du trimestre selon un cycle de travail particulier
@@ -1169,7 +1200,7 @@
                 PRESENCE:   Obligatoire si l'occupation du travailleur est effectuée selon une particularité reprise ci-dessus.
              -->
             <t t-if="occupation.days_justification != -1">
-                <DaysJustification t-esc="occupation.days_justification"/>
+                <DaysJustification t-out="occupation.days_justification"/>
             </t>
 
             <t t-foreach="occupation.occupation_informations" t-as="info">
@@ -1200,7 +1231,7 @@
                 PRESENCE:   Obligatoire si il s’agit d'un membre du personnel d’un employeur déclaré avec la catégorie employeur 105, 205 ou 305 qui a acquis ces jours de vacances.
                 Cette donnée ne peut pas être utilisée pour les déclarations antérieures au 1er trimestre 2018.
              -->
-            <HolidayDaysNumber t-if="info.six_months_illness_date != -1" t-esc="info.holiday_days_number"/>
+            <HolidayDaysNumber t-if="info.six_months_illness_date != -1" t-out="info.holiday_days_number"/>
 
             <!-- 00728
                 DESCRIPTION:
@@ -1220,7 +1251,7 @@
                 · MM est le mois
                 . JJ est le jour
               -->
-            <SixMonthsIllnessDate t-if="info.six_months_illness_date != -1" t-esc="info.six_months_illness_date"/>
+            <SixMonthsIllnessDate t-if="info.six_months_illness_date != -1" t-out="info.six_months_illness_date"/>
 
             <!-- 00794
                 DESCRIPTION:    Code qui détermine si le travailleur est engagé dans le cadre d'une mesure pour l'emploi pour le secteur non marchand (maribel social et secteur non marchand).
@@ -1246,7 +1277,7 @@
 
                 PRESENCE:   Obligatoire si l'engagement s'effectue dans le secteur public dans le cadre du maribel social ou si le jeune est engagé dans le secteur non marchand en exécution du pacte de solidarité entre les générations
             -->
-            <NOSSLPASocialMaribel t-if="info.maribel != -1" t-esc="info.maribel"/>
+            <NOSSLPASocialMaribel t-if="info.maribel != -1" t-out="info.maribel"/>
 
             <!-- 00795
                 DESCRIPTION:    A partir du 1/2020 travailleur occasionnel occupé dans l'Horeca ou dans le secteur des pompes funèbres.
@@ -1262,7 +1293,7 @@
                 A partir du 3/2007 jusqu'au 3/2013, obligatoire si le travailleur est un occasionnel de l'Horeca déclaré par un bureau d'intérim.
                 A partir du 2/2005 jusqu'au 2/2007, obligatoire si le travailleur est un extra de l'Horeca qui ne bénéficie pas de l'assujettissement réduit.
             -->
-            <HorecaExtra t-if="info.horeca_extra != -1" t-esc="info.horeca_extra"/>
+            <HorecaExtra t-if="info.horeca_extra != -1" t-out="info.horeca_extra"/>
 
             <!-- 00812
                 DESCRIPTION:    Le salaire horaire est le salaire, tel que convenu dans le contrat de travail, qui est dû pour une heure normale de travail prestée dans le trimestre.
@@ -1279,7 +1310,7 @@
 
                 PRESENCE:   Obligatoire si la déclaration concerne le 3ème trimestre et qu’il s’agit d’un ouvrier de la construction, à partir des déclarations du 3/2005 jusqu'aux déclarations du 2/2007.
              -->
-            <HourRemun t-if="info.hour_remun != -1" t-esc="info.hour_remun"/>
+            <HourRemun t-if="info.hour_remun != -1" t-out="info.hour_remun"/>
 
             <!-- 00826
                 DESCRIPTION:    Notion signalant si le travailleur est dispensé ou non, de l’exécution de ses prestations.
@@ -1305,7 +1336,7 @@
 
                 Obligatoire dans le bloc Occupation - Informations (90313), si dispense de prestations durant tout le trimestre ou, si application de la réduction travailleurs âgés - Région flamande (à partir du 1/2018) ou si application de la réduction travailleurs âgés - Communauté germanophone (à partir du 2/2018) ou si application de la réduction travailleurs âgés - Région wallonne (à partir du 3/2018).
             -->
-            <ServiceExemptionNotion t-if="info.service_exemption_notion != -1" t-esc="info.service_exemption_notion"/>
+            <ServiceExemptionNotion t-if="info.service_exemption_notion != -1" t-out="info.service_exemption_notion"/>
 
             <!-- 00862
                 DESCRIPTION:    Le salaire horaire est le salaire, tel que convenu dans le contrat de travail, qui est dû pour une heure normale de travail prestée dans le trimestre.
@@ -1323,7 +1354,7 @@
 
                 PRESENCE:   Obligatoire si la déclaration concerne le 3ème trimestre et qu'il s'agit d'un ouvrier de la construction, à partir des déclarations du 3/2007. A partir de 2011, obligatoire pour chaque trimestre lorsqu'il s'agit d'un ouvrier de la construction.
             -->
-            <HourRemunInThousandthOfEuro t-if="info.hour_remun_thousandth != -1" t-esc="info.hour_remun_thousandth"/>
+            <HourRemunInThousandthOfEuro t-if="info.hour_remun_thousandth != -1" t-out="info.hour_remun_thousandth"/>
 
             <!-- 00893
                 DESCRIPTION:    Code indiquant si le membre du personnel a été mis à disposition par l'employeur chez un autre employeur ou à été mis à disposition chez l'employeur par un autre employeur.
@@ -1337,7 +1368,7 @@
 
                 PRESENCE:   Obligatoire si la déclaration concerne un trimestre à partir du 1/2022 et s'il s'agit d'un travailleur mis à disposition à temps plein auprès d'un employeur pour lequel la cotisation prime syndicale est due.
             -->
-            <PostedWorker t-if="info.posted_employee != -1" t-esc="info.posted_employee"/>
+            <PostedWorker t-if="info.posted_employee != -1" t-out="info.posted_employee"/>
 
             <!-- 01010
                 DESCRIPTION:    Nombre de jours d'incapacité de travail suite à une maladie ou à un accident de droit commun avec salaire garanti la première semaine, non compris le nombre de jours avec rémunération journalière garantie. Les jours de carence sont inclus lorsqu'ils sont payés par l'employeur.
@@ -1351,7 +1382,7 @@
 
                 PRESENCE:   Obligatoire si il s'agit d'un ouvrier de la construction et que les jours sont couverts par un salaire garanti la première semaine ou lorsqu'il y a des jours de carence payés par l'employeur, à partir des déclarations du 1er trimestre 2011.
             -->
-            <FirstWeekGuaranteedSalaryNbrDays t-if="info.first_week_guaranteed_salary != -1" t-esc="info.first_week_guaranteed_salary"/>
+            <FirstWeekGuaranteedSalaryNbrDays t-if="info.first_week_guaranteed_salary != -1" t-out="info.first_week_guaranteed_salary"/>
 
             <!-- 01011
                 DESCRIPTION:    Total des rémunérations brutes, y compris celles qui ne sont pas soumises à des cotisations de sécurité sociale, payées par l'employeur dans le cadre d'une maladie ou d'un accident de droit commun au cours du trimestre concerné, non compris les indemnités payées par l'employeur pour le(s) jour(s) avec rémunération journalière garantie.
@@ -1366,7 +1397,7 @@
                 PRESENCE:   Obligatoire si il s'agit d'un ouvrier de la construction et que des rémunérations sont payées dans le cadre d'une maladie, à partir des déclarations du 1er trimestre 2011 jusqu’au 2020/1.
                 A partir du 2020/2, obligatoire s'il s'agit d’un travailleur contractuel et que des rémunérations sont payées dans le cadre d'une maladie.
             -->
-            <IllnessGrossRemunAmount t-if="info.illness_gross_remun != -1" t-esc="info.illness_gross_remun"/>
+            <IllnessGrossRemunAmount t-if="info.illness_gross_remun != -1" t-out="info.illness_gross_remun"/>
 
             <!-- 01012
                 DESCRIPTION:    Zone qui indique, pour une occupation a priori couverte par le champ d'application de Capelo (combinaison catégorie d'employeur – code travailleur ET employeur faisant partie du champ d'application), que la déclaration des blocs dits Capelo (Données de l'occupation relatives au secteur public, Traitement barémique et Supplément de traitement) n'est pas requise, parce que cette occupation n'est pas susceptible d'ouvrir le droit à une pension secteur public.
@@ -1378,7 +1409,7 @@
 
                 PRESENCE:   Obligatoire si l'occupation n'est pas susceptible d'ouvrir le droit à une pension dans le secteur public pour un travailleur contractuel au service d'un employeur dans le champ d'application de Capelo.
             -->
-            <PSDDclExemption t-if="info.psddcl_exemption != -1" t-esc="info.psddcl_exemption"/>
+            <PSDDclExemption t-if="info.psddcl_exemption != -1" t-out="info.psddcl_exemption"/>
 
             <!-- 01013
                 DESCRIPTION:    Zone qui fournit des informations supplémentaires concernant le champ d’application du régime de pension complémentaire.
@@ -1395,7 +1426,7 @@
                 ou si les régimes de pension complémentaires « contractuels locaux » et « Provant » ne sont pas d'application au travailleur en question d'une administration locale (code 1)
                 ou si une administration locale est affiliée à plusieurs régimes de pension complémentaires et que le travailleur en question relève du régime de « Provant » (code 2).
             -->
-            <SupplPensionContributionExemption t-if="info.suppl_pension_exemption != -1" t-esc="info.suppl_pension_exemption"/>
+            <SupplPensionContributionExemption t-if="info.suppl_pension_exemption != -1" t-out="info.suppl_pension_exemption"/>
 
             <!-- 01063
                 DESCRIPTION:    Information permettant de prendre en compte un travailleur dans le calcul d’une obligation d’un employeur.
@@ -1407,7 +1438,7 @@
 
                 PRESENCE:   Obligatoire si le travailleur est un ancien stagiaire d’intégration engagé immédiatement après le stage par le même employeur et s’il s’agit du trimestre d’engagement ou un des trois trimestres suivant l’engagement.
             -->
-            <ObligationControlInformation t-if="info.obligation_control != -1" t-esc="info.obligation_control"/>
+            <ObligationControlInformation t-if="info.obligation_control != -1" t-out="info.obligation_control"/>
 
             <!-- 01092
                 DESCRIPTION:
@@ -1429,7 +1460,7 @@
                 · MM est le mois
                 . JJ est le jour
             -->
-            <DefinitiveNominationDate t-if="info.definitive_nomination_date != -1" t-esc="info.definitive_nomination_date"/>
+            <DefinitiveNominationDate t-if="info.definitive_nomination_date != -1" t-out="info.definitive_nomination_date"/>
 
             <!-- 01148
                 DESCRIPTION:
@@ -1449,7 +1480,7 @@
                 · MM est le mois
                 . JJ est le jour
             -->
-            <NewMaribelEmploymentDate t-if="info.maribel_date != -1" t-esc="info.maribel_date"/>
+            <NewMaribelEmploymentDate t-if="info.maribel_date != -1" t-out="info.maribel_date"/>
 
             <!-- 01176
                 DESCRIPTION:    Zone qui indique que la cotisation pension du secteur public pour travailleurs statutaires, suite à des circonstances particulières, a une base de calcul dérogatoire.
@@ -1462,7 +1493,7 @@
                 PRESENCE:   Obligatoire si la base de calcul de la cotisation pension du secteur public pour travailleurs statutaires est dérogatoire, à partir du 1/2017.
                 Interdite avant le 1/2017.
             -->
-            <PSPContribCalcBasisDerogation t-if="info.psp_contrib_derogation != -1" t-esc="info.psp_contrib_derogation"/>
+            <PSPContribCalcBasisDerogation t-if="info.psp_contrib_derogation != -1" t-out="info.psp_contrib_derogation"/>
 
             <!-- 01194
                 DESCRIPTION:    Code qui détermine si le travailleur est occupé dans le cadre d’une mesure carrière.
@@ -1479,7 +1510,7 @@
                 PRESENCE:   Obligatoire si l'occupation du travailleur est effectuée dans le cadre d'une mesure carrière susmentionnée.
                 Interdite avant le premier trimestre 2018.
             -->
-            <CareerMeasure t-if="info.career_measure != -1" t-esc="info.career_measure"/>
+            <CareerMeasure t-if="info.career_measure != -1" t-out="info.career_measure"/>
 
             <!-- 01215
                 DESCRIPTION:    Indication du sous-secteur qui relève de la compétence flamande en matière d'activités non marchandes (accord intersectoriel flamand).
@@ -1492,7 +1523,7 @@
                 PRESENCE:   Obligatoire si l’occupation a lieu dans un sous-secteur relevant de la compétence flamande en matière d'activités non marchandes.
                 Cette donnée ne peut pas être utilisée pour les déclarations antérieures au 1er trimestre 2019.
             -->
-            <SectorDetail t-if="info.sector_detail != -1" t-esc="info.sector_detail"/>
+            <SectorDetail t-if="info.sector_detail != -1" t-out="info.sector_detail"/>
 
             <!-- 01216
                 DESCRIPTION:    Budget total qui est attribué au travailleur sur le plan de la mobilité, et qu’il peut consacrer à un ou plusieurs piliers prévus par la législation : un véhicule de société respectueux de l’environnement, modes de transports alternatifs et durables et le paiement du solde du budget.
@@ -1505,7 +1536,10 @@
 
                 PRESENCE:   Obligatoire si le travailleur opte pour le budget mobilité et la partie non utilisée du solde du budget est versée au travailleur.
             -->
-            <MobilityBudget t-if="info.mobility_budget != -1" t-esc="info.mobility_budget"/>
+            <MobilityBudget t-if="info.mobility_budget != -1" t-out="info.mobility_budget"/>
+
+            <!-- Flexi Notion tag -->
+            <FlexiNotion t-if="info.flexi_notion != -1" t-out="info.flexi_notion"/>
 
             <!-- 01232
                 DESCRIPTION:    Nombre d'heures d'absence en vue de suivre une formation dans le cadre d'un congé formation flamand.
@@ -1521,7 +1555,7 @@
 
                 PRESENCE:   Obligatoire si une absence concerne une formation suivie dans le cadre d’un congé formation flamand, à partir du 1/2020.
             -->
-            <FlemishTrainingHolidayHoursNbr t-if="info.flemish_training_hours != -1" t-esc="info.flemish_training_hours"/>
+            <FlemishTrainingHolidayHoursNbr t-if="info.flemish_training_hours != -1" t-out="info.flemish_training_hours"/>
 
             <!-- 01237
                 DESCRIPTION:    Code qui indique que l’occupation du travailleur est effectuée dans le cadre d’une aide régionale à l’emploi.
@@ -1534,13 +1568,13 @@
                 PRESENCE:   Obligatoire si l'occupation du travailleur est effectuée dans le cadre d'une aide régionale à l’emploi susmentionnée.
                 Cette donnée ne peut pas être utilisée pour les déclarations antérieures au 1er trimestre 2021.
             -->
-            <RegionalAidMeasure t-if="info.regional_aid_measure != -1" t-esc="info.regional_aid_measure"/>
+            <RegionalAidMeasure t-if="info.regional_aid_measure != -1" t-out="info.regional_aid_measure"/>
         </OccupationInformations>
         </t>
     </template>
 
     <template id="Service">
-        <t t-if="service.nbr_days != '00000' and service.nbr_hours != '00000'">
+        <t t-if="service.nbr_days != '00000' or service.nbr_hours != '00000'">
         <!-- Service ~= Worked days -->
         <!-- 90018: Bloc fonctionnel permettant de déclarer les prestations d'un travailleur pour une occupation de la ligne travailleur.
             Une prestation donnée (un code prestation) ne peut se retrouver qu'une seule fois par occupation.
@@ -1557,7 +1591,7 @@
 
                 PRESENCE:   Indispensable
             -->
-            <ServiceSequenceNbr t-esc="service.sequence"/>
+            <ServiceSequenceNbr t-out="service.sequence"/>
             <!-- 00062
                 DESCRIPTION:    Code permettant de déterminer le type de la prestation déclarée pour l'occupation du travailleur concerné.
                 DOMAINE DE DEFINITION:  Voir Annexe 8 - Codification des données de temps de travail.
@@ -1565,7 +1599,7 @@
                 LONGUEUR:   3
                 PRESENCE:   Indispensable
             -->
-            <ServiceCode t-esc="service.code"/>
+            <ServiceCode t-out="service.code"/>
             <!-- 00063
                 DESCRIPTION:    Nombre de jours de la prestation à déclarer pour l'occupation du travailleur concerné.
                 Lorsque le nombre de jours de la prestation correspond à des données réelles, il est arrondi au demi-jour. Par contre lorsque le nombre de jours de la prestation est converti, il est arrondi au centième de jour.
@@ -1580,7 +1614,7 @@
 
                 PRESENCE:   Indispensable
             -->
-            <ServiceNbrDays t-esc="service.nbr_days"/>
+            <ServiceNbrDays t-out="service.nbr_days"/>
             <!-- 00064
                 DESCRIPTION:    Nombre d'heures de la prestation (exprimé en centièmes d’heures) lorsque le travailleur concerné travaille à temps partiel ou, indépendamment du fait qu’il est occupé à temps plein ou à temps partiel, s'il s'agit d'un travailleur saisonnier, intermittent, d'un travailleur en interruption partielle de la carrière professionnelle, d’un travailleur en prépension à mi-temps, d'un travailleur ayant repris le travail à temps partiel suite à l'avis du médecin conseil, d’un travailleur avec des prestations réduites, d'un gardien ou gardienne d’enfants qui n'est pas lié par un contrat de travail, d’un travailleur statutaire occupé dans le cadre d’une mesure de réorganisation du temps de travail pour laquelle il peut effectuer des prestations (mesure de réorganisation = 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 514, 531, 541 ou 544), d'un travailleur rémunéré par des titres-services, d'un travailleur de l'Horeca, d’un travailleur Flexi-Job, d'un contractuel dans le secteur public en congé pour prestations partielles temporaires, d'un travailleur occupé par une administration provinciale ou locale.
                 Par travailleur intermittent, on entend :
@@ -1599,7 +1633,7 @@
                 PRESENCE:   Obligatoire si le travailleur concerné travaille à temps partiel ou, indépendamment du fait que le travailleur est occupé à temps plein ou à temps partiel, s'il s'agit d'un travailleur saisonnier, intérimaire, temporaire, d'un travailleur à domicile, d'un travailleur en interruption partielle de la carrière professionnelle, d'un travailleur ayant repris le travail à temps partiel suite à l'avis du médecin conseil, d'un travailleur en prépension à mi-temps, d'un travailleur avec des prestations réduites, d'un gardien ou gardienne d’enfants qui n’est pas lié par un contrat de travail, d'un travailleur statutaire occupé dans le cadre d’une mesure de réorganisation du temps de travail pour laquelle il peut effectuer des prestations (mesure de réorganisation = 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 514, 531, 541 ou 544) d'un travailleur rémunéré par des titres-services, d’un travailleur de l’Horeca, d'un travailleur Flexi-Job, d'un contractuel dans le secteur public en congé pour prestations partielles temporaires, d'un travailleur occupé par une administration provinciale ou locale.
             -->
             <t t-if="service.nbr_hours != -1">
-                <ServiceNbrHours t-esc="service.nbr_hours"/>
+                <ServiceNbrHours t-out="service.nbr_hours"/>
             </t>
             <!-- 00065
                 DESCRIPTION:    Cette zone, destinée essentiellement aux compagnies aériennes, permet d’indiquer le nombre de minutes de vol qu’un travailleur, employé à bord d’un avion, a réellement presté pendant l'occupation déclarée.
@@ -1613,7 +1647,7 @@
                 PRESENCE:   Obligatoire si le travailleur fait partie du personnel volant d’une compagnie aérienne ou s'il est pilote militaire.
             -->
             <t t-if="service.flight_nbr_minutes != -1">
-                <FlightNbrMinutes t-esc="service.flight_nbr_minutes"/>
+                <FlightNbrMinutes t-out="service.flight_nbr_minutes"/>
             </t>
         </Service>
         </t>
@@ -1634,7 +1668,7 @@
 
                 PRESENCE:   Indispensable
              -->
-            <RemunSequenceNbr t-esc="remuneration.sequence"/>
+            <RemunSequenceNbr t-out="remuneration.sequence"/>
             <!-- 00067
                 DESCRIPTION:    Code permettant de déterminer le type de donnée salariale déclarée pour l'occupation du travailleur concerné.
 
@@ -1644,7 +1678,7 @@
                 LONGUEUR:   3
                 PRESENCE:   Indispensable
              -->
-            <RemunCode t-esc="remuneration.code"/>
+            <RemunCode t-out="remuneration.code"/>
             <!--
                 DESCRIPTION:    Fréquence utilisant le mois comme unité de mesure.
                 Exemples :
@@ -1661,7 +1695,7 @@
                 PRESENCE:   Obligatoire si il s’agit d’une prime (code rémunération 02 ou 23).
              -->
             <t t-if="remuneration.frequency != -1">
-                <BonusPaymentFrequency t-esc="remuneration.frequency"/>
+                <BonusPaymentFrequency t-out="remuneration.frequency"/>
             </t>
             <!-- 00069
                 DESCRIPTION:    Ce pourcentage doit être déclaré lorsque la réduction de la durée du travail est introduite au moyen de l’octroi d’une rémunération horaire majorée et d’un repos compensatoire non rémunéré.
@@ -1677,7 +1711,7 @@
                 PRESENCE:   Obligatoire si il s’agit d’une rémunération (code rémunération 01) et le travailleur bénéficie d’une réduction de la durée du travail introduite au moyen de l’octroi d’une rémunération horaire majorée et d’un repos compensatoire non rémunéré.
              -->
             <t t-if="remuneration.percentage_paid != -1">
-                <PercentagePaid t-esc="remuneration.percentage_paid"/>
+                <PercentagePaid t-out="remuneration.percentage_paid"/>
             </t>
             <!-- 00070
                 DESCRIPTION:    Total des rémunérations correspondant au type de rémunération (code rémunération éventuellement en combinaison avec la fréquence en mois de paiement de la prime ou le pourcentage de la rémunération sur base annuelle) pour l'occupation du travailleur.
@@ -1689,12 +1723,12 @@
                 LONGUEUR:   11
                 PRESENCE:   Indispensable
              -->
-            <RemunAmount t-esc="remuneration.amount if remuneration.code != '012' else '0' + remuneration.amount[1:]"/>
+            <RemunAmount t-out="remuneration.amount if remuneration.code != '012' else '0' + remuneration.amount[1:]"/>
         </Remun>
     </template>
 
     <template id="OccupationDeduction">
-        <!-- Bloc fonctionnel permettant de déclarer les déductions demandées pour une occupation. -->
+        <!-- 90109 Bloc fonctionnel permettant de déclarer les déductions demandées pour une occupation. -->
         <OccupationDeduction>
             <!-- 00086 - CODE DÉDUCTION
             DESCRIPTION:    Code qui indique la déduction demandée.
@@ -1702,7 +1736,7 @@
             TYPE:   Numérique
             LONGUEUR:   4
             PRESENCE:   Indispensable -->
-            <DeductionCode t-esc="occupation_deduction.deduction_code"/>
+            <DeductionCode t-out="occupation_deduction.deduction_code"/>
 
             <!-- 00088 - BASE DE CALCUL DE LA DÉDUCTION
             DESCRIPTION:    Montant sur lequel un taux doit être appliqué afin de connaître le montant de la déduction demandée pour cette ligne travailleur ou occupation.
@@ -1710,7 +1744,7 @@
             TYPE:   Numérique
             LONGUEUR:   11
             PRESENCE:   Obligatoire si la déduction demandée est calculée à partir d’une base de calcul sur laquelle un taux doit être appliqué. -->
-            <DeductionCalculationBasis t-if="occupation_deduction.deduction_calculation_basis != -1" t-esc="occupation_deduction.deduction_calculation_basis"/>
+            <DeductionCalculationBasis t-if="occupation_deduction.deduction_calculation_basis != -1" t-out="occupation_deduction.deduction_calculation_basis"/>
 
             <!-- 00089 - MONTANT DE LA DÉDUCTION
             DESCRIPTION:    Montant de la déduction demandée pour cette ligne travailleur ou occupation.
@@ -1718,7 +1752,7 @@
             TYPE:   Numérique
             LONGUEUR:   11
             PRESENCE:   Obligatoire si la déduction demandée correspond à un montant déductible du montant net à payer. -->
-            <DeductionAmount t-if="occupation_deduction.deduction_amount != -1" t-esc="occupation_deduction.deduction_amount"/>
+            <DeductionAmount t-if="occupation_deduction.deduction_amount != -1" t-out="occupation_deduction.deduction_amount"/>
 
             <!-- 00090 - DATE DE DÉBUT DU DROIT À LA DÉDUCTION
             DESCRIPTION:    
@@ -1733,7 +1767,7 @@
             · AAAA est l'année
             · MM est le mois
             . JJ est le jour -->
-            <DeductionRightStartingDate t-if="occupation_deduction.deduction_right_starting_date != -1" t-esc="occupation_deduction.deduction_right_starting_date"/>
+            <DeductionRightStartingDate t-if="occupation_deduction.deduction_right_starting_date != -1" t-out="occupation_deduction.deduction_right_starting_date"/>
 
             <!-- 00091 - NOMBRE DE MOIS FRAIS DE GESTION SSA
             DESCRIPTION:    Nombre de mois faisant l'objet, au cours du trimestre traité, de la prise en charge temporaire, par l'ONSS, des frais d'administration encourus par l'employeur affilié à un Secrétariat Social Agréé.
@@ -1741,7 +1775,7 @@
             TYPE:   Numérique
             LONGUEUR:   1
             PRESENCE:   Obligatoire si le Secrétariat Social revendique l'intervention de l'ONSS dans ses frais d'administration pour cet employeur. -->
-            <ManagementCostNbrMonths t-if="occupation_deduction.management_cost_nbr_months != -1" t-esc="occupation_deduction.management_cost_nbr_months"/>
+            <ManagementCostNbrMonths t-if="occupation_deduction.management_cost_nbr_months != -1" t-out="occupation_deduction.management_cost_nbr_months"/>
 
             <!-- 00092 - NUMÉRO D'IDENTIFICATION DE LA SÉCURITÉ SOCIALE - NISS DE LA PERSONNE REMPLACÉE
             DESCRIPTION:    Numéro d'identification d'une personne physique au sein de la sécurité sociale. Il s'agit du numéro d'identification de la personne physique au registre national ou au registre bis des personnes physiques.
@@ -1754,7 +1788,7 @@
             FORMAT: 0 ou NNNNNNNNNCC
             · NNNNNNNNN est le numéro
             · CC est le chiffre de contrôle. -->
-            <ReplacedINSS t-if="occupation_deduction.replaced_inss != -1" t-esc="occupation_deduction.replaced_inss"/>
+            <ReplacedINSS t-if="occupation_deduction.replaced_inss != -1" t-out="occupation_deduction.replaced_inss"/>
 
             <!-- 00093 - NUMÉRO D'IDENTIFICATION DE LA SÉCURITÉ SOCIALE - NISS DE LA PERSONNE QUI A OUVERT LE DROIT À LA DÉDUCTION
             DESCRIPTION:    Numéro d'identification d'une personne physique au sein de la sécurité sociale. Il s'agit du numéro d'identification de la personne physique au registre national ou au registre bis des personnes physiques.
@@ -1767,7 +1801,7 @@
             FORMAT: 0 ou NNNNNNNNNCC
             · NNNNNNNNN est le numéro
             · CC est le chiffre de contrôle. -->
-            <ApplicantINSS t-if="occupation_deduction.applicant_inss != -1" t-esc="occupation_deduction.applicant_inss"/>
+            <ApplicantINSS t-if="occupation_deduction.applicant_inss != -1" t-out="occupation_deduction.applicant_inss"/>
 
             <!-- 00094 - ORIGINE DE L'ATTESTATION
             DESCRIPTION:    Origine de l'attestation nécessaire à l'octroi de la déduction.
@@ -1781,19 +1815,19 @@
             TYPE:   Numérique
             LONGUEUR:   3
             PRESENCE:   Facultative -->
-            <CertificateOrigin t-if="occupation_deduction.certificate_origin != -1" t-esc="occupation_deduction.certificate_origin"/>
+            <CertificateOrigin t-if="occupation_deduction.certificate_origin != -1" t-out="occupation_deduction.certificate_origin"/>
         </OccupationDeduction>
     </template>
 
     <template id="dmfa_pdf_report">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="wizard">
-                <t t-call="web.internal_layout">
-                    <t t-set="wizard" t-value="wizard.with_context(lang=wizard.env.lang)"/>
+                <t t-set="data" t-value="wizard._get_rendering_data()"/>
+                <t t-call="web.internal_layout" wizard="wizard.with_context(lang=wizard.env.lang)">
                     <div class="page container-fluid">
                         <div class="row text-center fw-bold">
                             <div class="col-12">
-                                <div><h1 style="font-size: 3em;">DmfA Declaration (<t t-esc="data['quarter_display']"/>)</h1></div>
+                                <div><h1 style="font-size: 3em;">DmfA Declaration (<t t-out="data['quarter_display']"/>)</h1></div>
                             </div>
                         </div>
                     </div>
@@ -1808,47 +1842,68 @@
                             <table class="o_dmfa_info">
                                 <tr>
                                     <td>Employer Class:</td>
-                                    <td style="text-align: right;"><t t-esc="data['employer_class']"/></td>
+                                    <td style="text-align: right;"><t t-out="data['employer_class']"/></td>
                                 </tr>
                                 <tr>
-                                    <td>ONSS Company ID:</td>
-                                    <td style="text-align: right;"><t t-esc="data['onss_company_id']"/></td>
+                                    <td>Company Number:</td>
+                                    <td style="text-align: right;"><t t-out="data['l10n_be_company_number']"/></td>
                                 </tr>
                                 <tr>
                                     <td>ONSS Registration Number:</td>
-                                    <td style="text-align: right;"><t t-esc="data['onss_registration_number']"/></td>
+                                    <td style="text-align: right;"><t t-out="data['onss_registration_number']"/></td>
                                 </tr>
                                 <tr>
                                     <td>Quarter Start:</td>
-                                    <td style="text-align: right;"><t t-esc="data['quarter_start']"/></td>
+                                    <td style="text-align: right;"><t t-out="data['quarter_start']"/></td>
                                 </tr>
                                 <tr>
                                     <td>Quarter End:</td>
-                                    <td style="text-align: right;"><t t-esc="data['quarter_end']"/></td>
+                                    <td style="text-align: right;"><t t-out="data['quarter_end']"/></td>
                                 </tr>
                                 <tr>
                                     <td>System 5:</td>
                                     <td style="text-align: right;">No</td>
                                 </tr>
-                                <tr>
-                                    <td>Double Holiday Pay Global Amount:</td>
-                                    <td style="text-align: right;"><t t-esc="pretty_format(data['unrelated_calculation_basis'])"/> €</td>
-                                </tr>
-                                <tr name="double_pay_global">
-                                    <td>Double Holiday Pay Global Contributions:</td>
-                                    <td style="text-align: right;"><t t-esc="pretty_format(data['double_holiday_pay_contribution'])"/> €</td>
-                                </tr>
-                                <tr>
-                                    <td>Group Insurance Global Contributions:</td>
-                                    <td style="text-align: right;"><t t-esc="pretty_format(data['group_insurance_basis'])"/> €</td>
-                                </tr>
+                                <t t-foreach="data['company_contributions']" t-as="cc">
+                                    <t t-if="cc.code == '870'">
+                                        <tr>
+                                            <td>Double Holiday Pay Global Amount:</td>
+                                            <td style="text-align: right;"><t t-out="pretty_format(cc.basis_amount)"/> €</td>
+                                        </tr>
+                                    </t>
+                                    <tr>
+                                        <td><t t-out="cc.name"/>:</td>
+                                        <td style="text-align: right;"><t t-out="pretty_format(cc.amount)"/> €</td>
+                                    </tr>
+                                </t>
                                 <tr>
                                     <td>Total of all Contributions:</td>
-                                    <td style="text-align: right;"><t t-esc="pretty_format(data['global_contribution'])"/> €</td>
+                                    <td style="text-align: right;"><t t-out="pretty_format(data['global_contribution'])"/> €</td>
                                 </tr>
                             </table>
                         </div>
                     </div>
+                    <p style="page-break-before:always;"> </p>
+                    <div class="mt-4 row" name="cars_information">
+                        <div class="col-12">
+                            <div class="fw-bold">Company Cars List</div>
+                        </div>
+                    </div>
+                    <t t-if="data['vehicles']">
+                        <table class="o_dmfa_table">
+                            <tr>
+                                <th>Licence Plate</th>
+                                <th>Eco-Vehicle</th>
+                            </tr>
+                            <t t-foreach="data['vehicles']" t-as="vehicle">
+                                <tr>
+                                    <td><t t-out="vehicle.license_plate"/></td>
+                                    <td><t t-out="'YES' if vehicle.eco_vehicle else ''"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                    </t>
+                    <p style="page-break-before:always;"> </p>
                     <div class="mt-4 row" name="employees_information">
                         <div class="col-12">
                             <div class="fw-bold">Employees Information</div>
@@ -1858,49 +1913,199 @@
                         <p style="page-break-before:always;"> </p>
                         <div class="row">
                             <div class="col-12 border p-2">
-                                <div class="mb-2"><h3>Employee: <t t-esc="natural_person.employee.legal_name"/></h3></div>
-                                <div class="mb-2">NISS: <t t-esc="natural_person.identification_id"/></div>
+                                <div class="mb-2"><h3>Employee: <t t-out="natural_person.employee.legal_name"/></h3></div>
+                                <div class="mb-2">NISS: <t t-out="natural_person.identification_id"/></div>
                                 <t t-foreach="natural_person.worker_records" t-as="worker_record">
-                                    <div class="mb-2">Worker Code: <t t-esc="worker_record.worker_code"/></div>
+                                    <div class="mb-2">Worker Code: <t t-out="worker_record.worker_code"/></div>
+                                    <t t-if="worker_record.activity_with_risk">
+                                        <div class="mb-2">Risk Class: <t t-out="worker_record.activity_with_risk"/></div>
+                                    </t>
                                     <t t-if="worker_record.occupations">
                                         <t t-foreach="worker_record.occupations" t-as="occupation">
                                             <div class="mb-2">
                                                 <h4>
-                                                    <b>Occupations # <t t-esc="occupation.sequence"/>:</b> From <t t-esc="occupation.date_start"/><t t-if="occupation.date_stop"> To <t t-esc="occupation.date_stop"/></t>
+                                                    <b>Occupations # <t t-out="occupation.sequence"/>:</b> From <t t-out="occupation.date_start"/><t t-if="occupation.date_stop"> To <t t-out="occupation.date_stop"/></t>
                                                 </h4>
                                             </div>
                                             <table class="o_dmfa_info">
                                                 <tr>
                                                     <td>Reference Mean Working Hours</td>
-                                                    <td style="text-align: right;"><t t-esc="pretty_format(occupation.ref_mean_working_hours)"/></td>
+                                                    <td style="text-align: right;"><t t-out="pretty_format(occupation.ref_mean_working_hours)"/></td>
                                                 </tr>
                                                 <t t-if="occupation.reorganisation_measure != -1">
                                                     <tr>
                                                         <td>Reorganization Measures:</td>
-                                                        <td style="text-align: right;"><t t-esc="occupation.reorganisation_measure"/></td>
+                                                        <td style="text-align: right;"><t t-out="occupation.reorganisation_measure"/></td>
                                                     </tr>
                                                 </t>
                                                 <tr>
                                                     <td>Days Per Week:</td>
-                                                    <td style="text-align: right;"><t t-esc="pretty_format(occupation.days_per_week)"/></td>
+                                                    <td style="text-align: right;"><t t-out="pretty_format(occupation.days_per_week)"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Mean Working Hours:</td>
-                                                    <td style="text-align: right;"><t t-esc="pretty_format(occupation.mean_working_hours)"/></td>
+                                                    <td style="text-align: right;"><t t-out="pretty_format(occupation.mean_working_hours)"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Part Time:</td>
-                                                    <td style="text-align: right;"><t t-esc="occupation.is_parttime"/></td>
+                                                    <td style="text-align: right;"><t t-out="occupation.is_parttime"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Joint Commission:</td>
-                                                    <td style="text-align: right;"><t t-esc="occupation.commission"/></td>
+                                                    <td style="text-align: right;"><t t-out="occupation.commission"/></td>
+                                                </tr>
+                                                <tr t-if="occupation.worker_status != -1">
+                                                    <td>ONSS Worker Status:</td>
+                                                    <td style="text-align: right;"><t t-out="occupation.worker_status"/></td>
+                                                </tr>
+                                                <tr t-if="occupation.employment_promotion != -1">
+                                                    <td>Employment Promotion:</td>
+                                                    <td style="text-align: right;"><t t-out="occupation.employment_promotion"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Work Place:</td>
-                                                    <td style="text-align: right;"><t t-esc="occupation.work_place"/></td>
+                                                    <td style="text-align: right;"><t t-out="occupation.work_place"/></td>
+                                                </tr>
+                                                <tr t-if="occupation.apprenticeship != -1">
+                                                    <td>Apprenticeship:</td>
+                                                    <td style="text-align: right;"><t t-out="occupation.apprenticeship"/></td>
                                                 </tr>
                                             </table>
+                                            <t t-if="occupation.occupation_informations">
+                                                <t t-foreach="occupation.occupation_informations" t-as="info">
+                                                    <t t-if="info.display_info">
+                                                        <div class="mb-2 mt-2"><b>Occupation Informations:</b></div>
+                                                        <table class="o_dmfa_info">
+                                                            <t t-if="info.holiday_days_number != -1">
+                                                                <tr>
+                                                                    <td>Holiday Days Number:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.holiday_days_number"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.six_months_illness_date != -1">
+                                                                <tr>
+                                                                    <td>Six Months Illness Date:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.six_months_illness_date"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.maribel != -1">
+                                                                <tr>
+                                                                    <td>Social Maribel:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.maribel"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.horeca_extra != -1">
+                                                                <tr>
+                                                                    <td>Horeca Extra:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.horeca_extra"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.hour_remun != -1">
+                                                                <tr>
+                                                                    <td>Hour Remuneration:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.hour_remun"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.service_exemption_notion != -1">
+                                                                <tr>
+                                                                    <td>Service Exemption:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.service_exemption_notion"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.hour_remun_thousandth != -1">
+                                                                <tr>
+                                                                    <td>Hour Remuneration In Thousandth Of Euro:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.hour_remun_thousandth"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.posted_employee != -1">
+                                                                <tr>
+                                                                    <td>Posted Worker:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.posted_employee"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.first_week_guaranteed_salary != -1">
+                                                                <tr>
+                                                                    <td>First Week Guaranteed Salary Days:</td>
+                                                                    <td style="text-align: right;"><t t-out="pretty_format(info.first_week_guaranteed_salary)"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.illness_gross_remun != -1">
+                                                                <tr>
+                                                                    <td>Illness Gross Remuneration:</td>
+                                                                    <td style="text-align: right;"><t t-out="pretty_format(info.illness_gross_remun)"/> €</td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.psddcl_exemption != -1">
+                                                                <tr>
+                                                                    <td>PSD Dcl Exemption:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.psddcl_exemption"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.suppl_pension_exemption != -1">
+                                                                <tr>
+                                                                    <td>Suppl Pension Contribution Exemption:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.suppl_pension_exemption"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.obligation_control != -1">
+                                                                <tr>
+                                                                    <td>Obligation Control:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.obligation_control"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.definitive_nomination_date != -1">
+                                                                <tr>
+                                                                    <td>Definitive Nomination Date:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.definitive_nomination_date"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.maribel_date != -1">
+                                                                <tr>
+                                                                    <td>New Maribel Employment Date:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.maribel_date"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.psp_contrib_derogation != -1">
+                                                                <tr>
+                                                                    <td>PSP Contrib Calc Basis Derogation:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.psp_contrib_derogation"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.career_measure != -1">
+                                                                <tr>
+                                                                    <td>Career Measure:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.career_measure"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.sector_detail != -1">
+                                                                <tr>
+                                                                    <td>Sector Detail:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.sector_detail"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.mobility_budget != -1">
+                                                                <tr>
+                                                                    <td>Mobility Budget:</td>
+                                                                    <td style="text-align: right;"><t t-out="pretty_format(info.mobility_budget)"/> €</td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.flemish_training_hours != -1">
+                                                                <tr>
+                                                                    <td>Flemish Training Holiday Hours:</td>
+                                                                    <td style="text-align: right;"><t t-out="pretty_format(info.flemish_training_hours)"/></td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="info.regional_aid_measure != -1">
+                                                                <tr>
+                                                                    <td>Regional Aid Measure:</td>
+                                                                    <td style="text-align: right;"><t t-out="info.regional_aid_measure"/></td>
+                                                                </tr>
+                                                            </t>
+                                                        </table>
+                                                    </t>
+                                                </t>
+                                            </t>
                                             <t t-if="occupation.services">
                                                 <div class="mb-2 mt-2"><b>Services Summary:</b></div>
                                                 <table class="o_dmfa_table">
@@ -1911,9 +2116,9 @@
                                                     </tr>
                                                     <t t-foreach="occupation.services" t-as="service">
                                                         <tr>
-                                                            <td><t t-esc="service.code"/></td>
-                                                            <td><t t-esc="pretty_format(service.nbr_days)"/></td>
-                                                            <td><t t-esc="pretty_format(service.nbr_hours)"/></td>
+                                                            <td><t t-out="service.code"/></td>
+                                                            <td><t t-out="pretty_format(service.nbr_days)"/></td>
+                                                            <td><t t-out="pretty_format(service.nbr_hours)"/></td>
                                                         </tr>
                                                     </t>
                                                 </table>
@@ -1928,13 +2133,28 @@
                                                     </tr>
                                                     <t t-foreach="occupation.remunerations" t-as="remuneration">
                                                         <tr>
-                                                            <td><t t-esc="remuneration.code"/></td>
+                                                            <td><t t-out="remuneration.code"/></td>
                                                             <td>
                                                                 <t t-if="remuneration.frequency != -1">
-                                                                    <t t-esc="remuneration.frequency"/>
+                                                                    <t t-out="remuneration.frequency"/>
                                                                 </t>
                                                             </td>
-                                                            <td><t t-esc="pretty_format(remuneration.amount)"/> €</td>
+                                                            <td><t t-out="pretty_format(remuneration.amount)"/> €</td>
+                                                        </tr>
+                                                    </t>
+                                                </table>
+                                            </t>
+                                            <t t-if="occupation.occupation_deductions">
+                                                <div class="mb-2 mt-2"><b>Occupation Deductions:</b></div>
+                                                <table class="o_dmfa_table">
+                                                    <tr>
+                                                        <th>Code</th>
+                                                        <th>Amount</th>
+                                                    </tr>
+                                                    <t t-foreach="occupation.occupation_deductions" t-as="occ_deduction">
+                                                        <tr>
+                                                            <td><t t-out="occ_deduction.deduction_code"/></td>
+                                                            <td><t t-out="pretty_format(occ_deduction.deduction_amount)"/> €</td>
                                                         </tr>
                                                     </t>
                                                 </table>
@@ -1950,8 +2170,8 @@
                                             </tr>
                                             <t t-foreach="worker_record.deductions" t-as="deduction">
                                                 <tr>
-                                                    <td><t t-esc="deduction.code"/></td>
-                                                    <td><t t-esc="pretty_format(deduction.amount)"/> €</td>
+                                                    <td><t t-out="deduction.code"/></td>
+                                                    <td><t t-out="pretty_format(deduction.amount)"/> €</td>
                                                 </tr>
                                             </t>
                                         </table>
@@ -1961,16 +2181,20 @@
                                         <table class="o_dmfa_table">
                                             <tr>
                                                 <th>Code</th>
-                                                <th>Calculation Basis</th>
                                                 <th>Contribution Type</th>
+                                                <th>Calculation Basis</th>
                                                 <th>Amount</th>
                                             </tr>
                                             <t t-foreach="worker_record.contributions" t-as="contribution">
                                                 <tr>
-                                                    <td><t t-esc="contribution.worker_code"/></td>
-                                                    <td><t t-esc="contribution.contribution_type"/></td>
-                                                    <td><t t-esc="pretty_format(contribution.calculation_basis)"/> €</td>
-                                                    <td><t t-esc="pretty_format(contribution.amount)"/> €</td>
+                                                    <td><t t-out="contribution.worker_code"/></td>
+                                                    <td><t t-out="contribution.contribution_type"/></td>
+                                                    <td>
+                                                        <t t-if="contribution.calculation_basis != -1">
+                                                            <t t-out="pretty_format(contribution.calculation_basis)"/> €
+                                                        </t>
+                                                    </td>
+                                                    <td><t t-out="pretty_format(contribution.amount)"/> €</td>
                                                 </tr>
                                             </t>
                                         </table>
@@ -1978,15 +2202,108 @@
                                     <t t-if="worker_record.student_contributions">
                                         <div class="mb-2 mt-2"><b>Student Contributions Summary:</b></div>
                                         <t t-foreach="worker_record.student_contributions" t-as="contribution">
-                                            <div class="mb-2">Work Address: <t t-esc="contribution.local_unit_id"/></div>
-                                            <div class="mb-2">Contribution: <t t-esc="pretty_format(contribution.student_contribution_amount)"/> €</div>
-                                            <div class="mb-2"># Hours: <t t-esc="pretty_format(contribution.student_hours_nbr)"/></div>
+                                            <div class="mb-2">Work Address: <t t-out="contribution.local_unit_id"/></div>
+                                            <div class="mb-2">Contribution: <t t-out="pretty_format(contribution.student_contribution_amount)"/> €</div>
+                                            <div class="mb-2"># Hours: <t t-out="pretty_format(contribution.student_hours_nbr)"/></div>
                                         </t>
                                     </t>
                                 </t>
                             </div>
                         </div>
                     </t>
+                    <p style="page-break-before:always;"> </p>
+                    <div class="mt-4 row" name="accounting_summary">
+                        <div class="col-12">
+                            <div class="fw-bold">Accounting Summary</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                            <div class="col-12 border p-2">
+                                <div class="mb-2 mt-2"><b>Employer Contributions:</b></div>
+                                <t t-if="data['company_contributions']">
+                                    <table class="o_dmfa_table">
+                                        <tr>
+                                            <th class="col-3">Employer category</th>
+                                            <th class="col-3">Code</th>
+                                            <th class="col-3">Base amount</th>
+                                            <th class="col-3">Contribution amount</th>
+                                        </tr>
+                                        <t t-foreach="data['company_contributions']" t-as="cc">
+                                            <tr>
+                                                <td><t t-out="data['employer_class']"/></td>
+                                                <td><t t-out="cc.code"/></td>
+                                                <td>
+                                                    <t t-if="cc.code != '862'"><t t-out="pretty_format(cc.basis_amount)"/> €</t>
+                                                </td>
+                                                <td><t t-out="pretty_format(cc.amount)"/> €</td>
+                                            </tr>
+                                        </t>
+                                    </table>
+                                </t>
+                                <div class="mb-2 mt-2"><b>Employee Contributions:</b></div>
+                                <t t-if="data['employer_contributions_summary']">
+                                    <table class="o_dmfa_table">
+                                        <tr>
+                                            <th>Employer category</th>
+                                            <th>Code</th>
+                                            <th>Contribution type</th>
+                                            <th class="col-3">Base amount</th>
+                                            <th class="col-3">Contribution amount</th>
+                                        </tr>
+                                        <t t-foreach="data['employer_contributions_summary']" t-as="contribution">
+                                            <tr>
+                                                <td><t t-out="data['employer_class']"/></td>
+                                                <td><t t-out="contribution['code']"/></td>
+                                                <td>
+                                                    <t t-if="contribution['contribution_type'] != -1">
+                                                        <t t-out="contribution['contribution_type']"/>
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <t t-if="contribution['basis'] > 0"><t t-out="contribution['basis']"/> €</t>
+                                                </td>
+                                                <td><t t-out="contribution['amount']"/> €</td>
+                                            </tr>
+                                        </t>
+                                    </table>
+                                </t>
+                                <div class="mb-2 mt-2"><b>Employee Deductions:</b></div>
+                                <t t-if="data['worker_deductions_summary']">
+                                    <table class="o_dmfa_table">
+                                        <tr>
+                                            <th>Employer category</th>
+                                            <th>Worker code</th>
+                                            <th>Deduction code</th>
+                                            <th class="col-3">Base amount</th>
+                                            <th class="col-3">Contribution amount</th>
+                                        </tr>
+                                        <t t-foreach="data['worker_deductions_summary']" t-as="deduction">
+                                            <t t-if="deduction['amount'] > 0">
+                                                <tr>
+                                                    <td><t t-out="data['employer_class']"/></td>
+                                                    <td><t t-out="deduction['worker_code']"/></td>
+                                                    <td><t t-out="deduction['code']"/></td>
+                                                    <td>
+                                                        <t t-if="deduction['basis'] > 0"><t t-out="deduction['basis']"/> €</t>
+                                                    </td>
+                                                    <td><t t-out="deduction['amount']"/> €</td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                    </table>
+                                </t>
+                                <div class="row">
+                                    <div class="my-3 col-12">
+                                        <table class="o_dmfa_table fw-bold">
+                                            <tr>
+                                                <td>Total amount to pay:</td>
+                                                <td class="col-3"><t t-out="pretty_format(data['global_contribution'])"/> €</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
                 </t>
             </t>
         </t>

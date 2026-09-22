@@ -6,15 +6,18 @@ from odoo import models, api, Command
 class MrpWorkcenterProductivity(models.Model):
     _inherit = "mrp.workcenter.productivity"
 
-    def _create_analytic_entry(self, previous_duration=0, old_dist=None):
+    def _create_analytic_entry(self, previous_duration=0, old_dist=None, previous_employee_id=None):
         """
             Used for updating or creating the employee analytic lines in 2 cases:
                 - Update of the productivity for an employee, in which case old_dist is unused
                 - Update of the project's MO, in which case previous_duration is unused
         """
         self.ensure_one()
+        project = self.workorder_id.production_id.project_id.sudo()
+        distribution = project._get_analytic_distribution() if project and self.production_id.picking_type_id.analytic_costs else {}
+
         employee_aal = self.workorder_id.employee_analytic_account_line_ids.sudo().filtered(
-            lambda line: line.employee_id and line.employee_id == self.employee_id
+            lambda line: line.employee_id and (line.employee_id == self.employee_id or line.employee_id.id == previous_employee_id)
         )
         distribution_update = old_dist and employee_aal
         if distribution_update:
@@ -29,7 +32,11 @@ class MrpWorkcenterProductivity(models.Model):
             amount = - duration * self.employee_cost
 
         line_vals = self.env['account.analytic.account']._perform_analytic_distribution(
-            self.workorder_id.production_id.project_id.sudo()._get_analytic_distribution(), amount, duration, employee_aal, self, not distribution_update)
+            distribution, amount, duration, employee_aal, self, not (distribution_update or previous_employee_id))
+
+        if previous_employee_id:
+            employee_aal.employee_id = self.employee_id
+
         if line_vals:
             self.workorder_id.sudo().employee_analytic_account_line_ids = [Command.create(line_val) for line_val in line_vals]
 
@@ -53,19 +60,21 @@ class MrpWorkcenterProductivity(models.Model):
         return work_center_productivities
 
     def write(self, vals):
-        previous_duration_per_productivity = {
-            productivity: productivity.duration
+        previous_state = {
+            productivity: {'duration': productivity.duration, 'employee_id': productivity.employee_id.id}
             for productivity in self
         }
+
         res = super().write(vals)
-        # if a value triggers a change of duration we adapt the aals
-        if {'date_start', 'date_end'} & vals.keys():
+        # if a value triggers a change of duration or employee we adapt the aals
+        if {'date_start', 'date_end', 'employee_id'} & vals.keys():
             for work_order, productivities in self.sudo().grouped('workorder_id').items():
                 if (
                     work_order.production_id.project_id._get_analytic_distribution()
                     or work_order.employee_analytic_account_line_ids
                 ):
                     for productivity in productivities:
-                        previous_duration = previous_duration_per_productivity[productivity]
-                    productivity._create_analytic_entry(previous_duration)
+                        prev_duration = previous_state[productivity]['duration'] if {'date_start', 'date_end'} & vals.keys() else 0
+                        prev_employee = previous_state[productivity]['employee_id'] if 'employee_id' in vals else None
+                        productivity._create_analytic_entry(prev_duration, previous_employee_id=prev_employee)
         return res

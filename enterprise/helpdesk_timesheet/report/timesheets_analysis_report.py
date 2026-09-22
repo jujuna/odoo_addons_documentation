@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from odoo.tools import SQL
 
 
 class TimesheetsAnalysisReport(models.Model):
@@ -11,6 +11,6 @@ class TimesheetsAnalysisReport(models.Model):
 
     @api.model
     def _select(self):
-        return super()._select() + """,
+        return SQL("""%s,
                 A.helpdesk_ticket_id AS helpdesk_ticket_id
-        """
+        """, super()._select())

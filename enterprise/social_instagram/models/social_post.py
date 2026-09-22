@@ -9,10 +9,18 @@ class SocialPost(models.Model):
     _inherit = 'social.post'
 
     instagram_image_ids = fields.Many2many(relation='instagram_image_ids_rel')
+    instagram_scheduled_date = fields.Datetime(
+        string='Instagram Scheduled for',
+        compute='_compute_scheduled_date_by_media',
+        store=True, readonly=False, copy=False)
 
     @api.depends('live_post_ids.instagram_post_id')
     def _compute_stream_posts_count(self):
         super()._compute_stream_posts_count()
+
+    @api.model
+    def _scheduled_date_fields(self):
+        return {**super()._scheduled_date_fields(), 'instagram': 'instagram_scheduled_date'}
 
     def _check_post_access(self):
         """ See #_get_instagram_image_error() for more information. """
@@ -49,3 +57,21 @@ class SocialPost(models.Model):
             return Domain.OR([domain, [('instagram_post_id', 'in', instagram_post_ids)]])
         else:
             return domain
+
+    @api.model
+    def _cron_publish_scheduled(self):
+        super()._cron_publish_scheduled()
+
+        domain = Domain([
+            ('account_id.media_type', '=', 'instagram'),
+            ('state', '=', 'posting'),
+            ('instagram_post_id', '=like', 'containerID-%'),
+        ]) & (
+            Domain('post_id.instagram_scheduled_date', '=', False)
+            | Domain('post_id.instagram_scheduled_date', '<=', fields.Datetime.now())
+        )
+
+        instagram_live_posts = self.env['social.live.post'].search(domain)
+
+        for live_post in instagram_live_posts:
+            live_post._post_instagram()

@@ -1,6 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from odoo.fields import Command
+from odoo.exceptions import UserError
 
 
 class MrpProductionSerials(models.TransientModel):
@@ -10,6 +12,7 @@ class MrpProductionSerials(models.TransientModel):
     production_id = fields.Many2one('mrp.production', 'Production')
 
     workorder_id = fields.Many2one('mrp.workorder', 'Workorder')
+    qty_produced = fields.Float('Quantity Produced')
 
     lot_name = fields.Char('First SN', compute="_compute_lot_name", store=True, readonly=False)
     lot_quantity = fields.Integer('Number of SN', compute="_compute_lot_quantity", store=True, readonly=False)
@@ -19,12 +22,14 @@ class MrpProductionSerials(models.TransientModel):
     @api.depends('production_id')
     def _compute_lot_name(self):
         for wizard in self:
-            wizard.serial_numbers = '\n'.join(self.production_id.lot_producing_ids.mapped('name'))
+            wizard.serial_numbers = '\n'.join(wizard.production_id.lot_producing_ids.mapped('name'))
             if wizard.lot_name:
                 continue
-            wizard.lot_name = self.production_id.lot_producing_ids[:1].name
+            wizard.lot_name = wizard.production_id.lot_producing_ids[:1].name
             if not wizard.lot_name:
-                wizard.lot_name = self.production_id.product_id.serial_prefix_format + self.production_id.product_id.next_serial
+                sequence = wizard.production_id.product_id.lot_sequence_id
+                wizard.lot_name = sequence.get_next_char(sequence.number_next_actual) if sequence \
+                                 else wizard.production_id.product_id.serial_prefix_format + wizard.production_id.product_id.next_serial
 
     @api.depends('production_id')
     def _compute_lot_quantity(self):
@@ -46,39 +51,59 @@ class MrpProductionSerials(models.TransientModel):
         action['res_id'] = self.id
         return action
 
+    def action_split_and_assign_serials(self):
+        self.ensure_one()
+        if self.qty_produced != self.workorder_id.qty_produced:
+            self.workorder_id.with_context(allow_qty_change=True).qty_produced = self.qty_produced
+        lots, new_lots = self._parse_serial_numbers()
+        split_amounts = {self.production_id: [1] * len(lots)}
+        mos = self.production_id._split_productions(amounts=split_amounts)
+        for mo, serial in zip(mos, lots):
+            mo.lot_producing_ids = [Command.link(serial.id)]
+        if new_lots and self.production_id.picking_type_id.auto_print_generated_mrp_lot:
+            print_action = self.production_id._autoprint_generated_lots(new_lots)
+            print_action['close_on_report_download'] = True
+            return print_action
+        return True
+
     def action_apply(self):
         self.ensure_one()
+        if self.qty_produced != self.workorder_id.qty_produced:
+            self.workorder_id.qty_produced = self.qty_produced
+        lots, new_lots = self._parse_serial_numbers()
+        self.production_id.lot_producing_ids = lots
+        if self.production_id.qty_producing != len(self.production_id.lot_producing_ids):
+            self.production_id.qty_producing = len(self.production_id.lot_producing_ids)
+        (self.workorder_id or self.production_id).set_qty_producing()
+        if new_lots and self.production_id.picking_type_id.auto_print_generated_mrp_lot:
+            print_action = self.production_id._autoprint_generated_lots(new_lots)
+            print_action['close_on_report_download'] = True
+            return print_action
+        return True
+
+    def _parse_serial_numbers(self):
+        self.ensure_one()
+        if not self.serial_numbers:
+            raise UserError(self.env._("There is no serial numbers to apply."))
         lots = list(filter(lambda serial_number: len(serial_number.strip()) > 0, self.serial_numbers.split('\n'))) if self.serial_numbers else []
+        if not lots:
+            raise UserError(self.env._("No valid serial numbers provided."))
         existing_lots = self.env['stock.lot'].search([
             '|', ('company_id', '=', False), ('company_id', '=', self.production_id.company_id.id),
             ('product_id', '=', self.production_id.product_id.id),
             ('name', 'in', lots),
         ])
         existing_lot_names = existing_lots.mapped('name')
-        new_lots = []
+        new_lots_vals = []
+        sequence = self.production_id.product_id.lot_sequence_id
         for lot_name in sorted(lots):
             if lot_name in existing_lot_names:
                 continue
-
-            if lot_name == self.production_id.product_id.serial_prefix_format + self.production_id.product_id.next_serial:
-                if self.production_id.product_id.lot_sequence_id:
-                    self.production_id.product_id.lot_sequence_id.number_next_actual += 1
-            new_lots.append({
+            if sequence and lot_name == sequence.get_next_char(sequence.number_next_actual):
+                sequence.sudo().number_next_actual += 1
+            new_lots_vals.append({
                 'name': lot_name,
-                'product_id': self.production_id.product_id.id
+                'product_id': self.production_id.product_id.id,
             })
-        self.production_id.lot_producing_ids = existing_lots + self.env['stock.lot'].create(new_lots)
-        if self.production_id.qty_producing != len(self.production_id.lot_producing_ids):
-            self.production_id.qty_producing = len(self.production_id.lot_producing_ids)
-        (self.workorder_id or self.production_id).set_qty_producing()
-
-        print_actions = self.production_id._autoprint_mass_generated_lots()
-        if print_actions:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'do_multi_print',
-                'context': {},
-                'params': {
-                    'reports': print_actions,
-                }
-            }
+        new_lots = self.env['stock.lot'].create(new_lots_vals)
+        return existing_lots + new_lots, new_lots

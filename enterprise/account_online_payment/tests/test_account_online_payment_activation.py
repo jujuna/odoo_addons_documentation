@@ -9,6 +9,8 @@ from odoo.addons.account_online_synchronization.tests.common import AccountOnlin
 @tagged('post_install', '-at_install')
 class TestAccountOnlinePaymentActivation(AccountOnlineSynchronizationCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

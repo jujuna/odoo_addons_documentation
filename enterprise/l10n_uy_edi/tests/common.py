@@ -16,6 +16,8 @@ _logger = logging.getLogger(__name__)
 @tagged("-at_install", "post_install", "post_install_l10n")
 class TestUyEdi(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('uy')
     def setUpClass(cls):
@@ -37,8 +39,7 @@ class TestUyEdi(AccountTestInvoicingCommon):
         cls.company_uy = cls.company_data["company"]
         cls.partner_local_tk = cls.env["res.partner"].create({
             "name": "IEB Internacional",
-            "l10n_latam_identification_type_id": cls.env.ref("l10n_uy.it_dni").id,
-            "vat": "218435730016",
+            "additional_identifiers": {"UY_DNI": "218435730016"},
             "street": "Bach 0",
             "city": "Aeroparque",
             "state_id": cls.env.ref("base.state_uy_02").id,
@@ -48,7 +49,6 @@ class TestUyEdi(AccountTestInvoicingCommon):
         })
         cls.partner_local = cls.env["res.partner"].create({
             "name": "IEB Internacional",
-            "l10n_latam_identification_type_id": cls.env.ref("l10n_uy.it_rut").id,
             "vat": "218435730016",
             "street": "Bach 0",
             "city": "Aeroparque",
@@ -59,8 +59,6 @@ class TestUyEdi(AccountTestInvoicingCommon):
 
         cls.foreign_partner = cls.env["res.partner"].create({
             "name": "Foreign Inc",
-            "l10n_latam_identification_type_id": cls.env.ref("l10n_latam_base.it_vat").id,
-            "is_company": True,
             "vat": "17-2038053",
             "zip": "95380",
             "street": "7841 Red Road",

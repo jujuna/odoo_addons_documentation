@@ -11,6 +11,8 @@ class EquityCapTable(models.Model):
     _description = "Cap Table"
     _auto = False
 
+    company_id = fields.Many2one('res.company', related='partner_id.company_id')
+
     partner_id = fields.Many2one('res.partner')
     holder_id = fields.Many2one('res.partner')
     security_class_id = fields.Many2one('equity.security.class')
@@ -26,7 +28,7 @@ class EquityCapTable(models.Model):
     valuation = fields.Float()
 
     @property
-    def _table_query(self):
+    def _table_sql(self):
         self.env['equity.transaction'].flush_model()
         current_date = self.env.context.get('current_date') or datetime.max.date()
 
@@ -38,30 +40,29 @@ class EquityCapTable(models.Model):
         transfer_transactions_query = self.env['equity.transaction']._search(domain & Domain('transaction_type', '=', 'transfer'))
         all_transactions = SQL(" UNION ALL ").join([
             transactions_query.select(
-                'partner_id AS partner_id',
-                'subscriber_id AS holder_id',
-                'security_class_id AS security_class_id',
-                """(CASE
+                SQL('partner_id AS partner_id'),
+                SQL('subscriber_id AS holder_id'),
+                SQL('security_class_id AS security_class_id'),
+                SQL("""(CASE
                         WHEN transaction_type IN ('issuance', 'transfer') THEN securities
                         ELSE -securities
-                    END) AS securities"""
-                ,
+                    END) AS securities"""),
             ),
             exercise_transactions_query.select(
-                'partner_id AS partner_id',
-                'subscriber_id AS holder_id',
-                'destination_class_id AS security_class_id',
-                'securities AS securities',
+                SQL('partner_id AS partner_id'),
+                SQL('subscriber_id AS holder_id'),
+                SQL('destination_class_id AS security_class_id'),
+                SQL('securities AS securities'),
             ),
             transfer_transactions_query.select(
-                'partner_id AS partner_id',
-                'seller_id AS holder_id',
-                'security_class_id AS security_class_id',
-                '-securities AS securities',
+                SQL('partner_id AS partner_id'),
+                SQL('seller_id AS holder_id'),
+                SQL('security_class_id AS security_class_id'),
+                SQL('-securities AS securities'),
             ),
         ])
         return SQL(
-            """
+            """(
                 WITH transactions AS (%(all_transactions)s),
                      security_class AS (
                         SELECT *,
@@ -92,7 +93,7 @@ class EquityCapTable(models.Model):
                      ) last_valuation ON TRUE
             GROUP BY partner_id, holder_id, security_class_id, last_valuation.valuation
               WINDOW by_partner AS (PARTITION BY partner_id)
-            """,
+            )""",
             all_transactions=all_transactions,
             current_date=current_date,
         )

@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:49+0000\n"
-"PO-Revision-Date: 2025-09-16 21:25+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:58+0000\n"
+"PO-Revision-Date: 2026-09-18 00:48+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-master/"
 "web_gantt/sl/>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -18,13 +18,16 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%(hour)sh%(minute)s"
-msgstr "%(hour)su%(minute)s"
+#: model:ir.module.module,description:base.module_web_gantt
+msgid ""
+"\n"
+"Odoo Web Gantt chart view.\n"
+"=============================\n"
+"\n"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -34,9 +37,10 @@ msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%sh"
-msgstr "%sh"
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "%s to schedule"
+msgstr ""
 
 #. module: web_gantt
 #: model:ir.model,name:web_gantt.model_ir_actions_act_window_view
@@ -45,12 +49,14 @@ msgstr "Pogled okna za ukrep"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr ""
@@ -104,7 +110,13 @@ msgstr "Prikazani naziv"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Drop here to unschedule"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Edit"
 msgstr "Uredi"
 
@@ -147,7 +159,7 @@ msgstr "Gantt diagram"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt child can only be field or template, got %s"
+msgid "Gantt child can only be field or popover, got %s"
 msgstr ""
 
 #. module: web_gantt
@@ -171,6 +183,18 @@ msgid ""
 msgstr ""
 
 #. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover can contain only one templates tag"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover child can only be field or template, got %s"
+msgstr ""
+
+#. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_scale_selector.js:0
 msgid "Gantt start date"
@@ -185,7 +209,7 @@ msgstr ""
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt view can contain only one templates tag"
+msgid "Gantt view can contain only one popover tag"
 msgstr ""
 
 #. module: web_gantt
@@ -204,6 +228,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_gantt/models/models.py:0
 msgid "Insufficient fields for Gantt View!"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid ""
+"Invalid attributes (%(invalid_attributes)s) in gantt popover. Attributes "
+"must be in (%(valid_attributes)s)"
 msgstr ""
 
 #. module: web_gantt
@@ -240,27 +272,34 @@ msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Load More"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "Month"
 msgstr "Mesec"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
-msgid "Name"
-msgstr ""
-
-#. module: web_gantt
-#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_controller.xml:0
 msgid "New"
-msgstr "Novo"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_controller.js:0
 msgid "No, keep it"
 msgstr "Ne, obdrži"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "Nothing to schedule"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
@@ -313,7 +352,13 @@ msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Show dependencies"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Start"
 msgstr ""
 
@@ -325,7 +370,7 @@ msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Stop"
 msgstr ""
 
@@ -345,7 +390,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Today"
-msgstr "Danes"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Toggle Side Panel"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
@@ -367,7 +418,7 @@ msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 #: model:ir.model,name:web_gantt.model_ir_ui_view
 msgid "View"
 msgstr "Prikaz"
@@ -379,16 +430,15 @@ msgid "View Type"
 msgstr "Vrsta prikaza"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week"
-msgstr "Teden"
+#: model:ir.module.module,shortdesc:base.module_web_gantt
+msgid "Web Gantt"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week %(week)s, %(startDate)s - %(endDate)s"
-msgstr ""
+msgid "Week"
+msgstr "Teden"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -413,9 +463,3 @@ msgstr "minute"
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "months"
 msgstr "meseci"
-
-#~ msgid "From"
-#~ msgstr "Od"
-
-#~ msgid "to"
-#~ msgstr "do"

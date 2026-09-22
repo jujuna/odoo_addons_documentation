@@ -34,7 +34,8 @@ export async function createXlsxAttachment(env, orm, attachmentRecords) {
         await waitForDataLoaded(model);
 
         const originalAttachment = originalIdToAttachment[doc.attachment_id[0]];
-        const files = model.exportXLSX().files;
+        const exportXLSX =await model.exportXLSX();
+        const files = exportXLSX.files;
         spreadsheetPayload.push({
             name: `${originalAttachment.name}.xlsx`,
             files,

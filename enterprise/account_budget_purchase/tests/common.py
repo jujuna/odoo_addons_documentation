@@ -5,6 +5,8 @@ from odoo.fields import Command
 
 class TestAccountBudgetPurchaseCommon(TestAccountBudgetCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -83,6 +85,33 @@ class TestAccountBudgetPurchaseCommon(TestAccountBudgetCommon):
                     'account_id': account.id,
                 }),
             ]
+        })
+        cls.tax_nd = cls.env['account.tax'].create({
+            'name': '20% Non-Deductible',
+            'amount_type': 'percent',
+            'amount': 20.0,
+            'type_tax_use': 'purchase',
+            'invoice_repartition_line_ids': [
+                Command.create({'repartition_type': 'base', 'factor_percent': 100.0}),
+                Command.create({'repartition_type': 'tax', 'factor_percent': 100.0, 'account_id': False}),
+            ],
+        })
+
+        cls.tax_partial = cls.env['account.tax'].create({
+            'name': '20% Partially Deductible',
+            'amount_type': 'percent',
+            'amount': 20.0,
+            'type_tax_use': 'purchase',
+            'invoice_repartition_line_ids': [
+                Command.create({'repartition_type': 'base', 'factor_percent': 100.0}),
+                Command.create({'repartition_type': 'tax', 'factor_percent': 50.0, 'account_id': cls.company_data['default_account_tax_sale'].id}),
+                Command.create({'repartition_type': 'tax', 'factor_percent': 50.0, 'account_id': False}),
+            ],
+            'refund_repartition_line_ids': [
+                Command.create({'repartition_type': 'base', 'factor_percent': 100.0}),
+                Command.create({'repartition_type': 'tax', 'factor_percent': 50.0, 'account_id': cls.company_data['default_account_tax_sale'].id}),
+                Command.create({'repartition_type': 'tax', 'factor_percent': 50.0, 'account_id': False}),
+            ],
         })
 
     def assertBudgetLine(self, budget_line, *, committed, achieved):

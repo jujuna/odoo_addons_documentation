@@ -8,6 +8,8 @@ from odoo.addons.l10n_ke_edi_oscu.tests.common import TestKeEdiCommon
 
 
 class TestKeEdiStock(TestKeEdiCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestKeEdiCommon.setup_country("ke")
     def setUpClass(cls):
@@ -126,11 +128,10 @@ class TestKeEdiStock(TestKeEdiCommon):
         mocked_trigger.assert_called()
 
         # Step 6: create and validate return pickings
-        wizard_return = self.env['stock.return.picking'].with_context(active_id=picking.id, active_model='stock.picking').create({})
-        for line in wizard_return.product_return_moves:
-            line.quantity = line.move_id.quantity
-        action = wizard_return.action_create_returns()
-        return_pickings = self.env['stock.picking'].browse(action['res_id'])
+        return_pickings = picking._create_return()
+        return_pickings.action_return_all()
+        return_pickings.action_confirm()
+        return_pickings.action_assign()
         return_pickings.button_validate()
 
         # Step 7: create credit note
@@ -232,14 +233,14 @@ class TestKeEdiStock(TestKeEdiCommon):
             }
         expected_vendor_bill_lines = [
             {
-                'name': 'Zaxxon machine',
+                'label': 'Zaxxon machine',
                 'product_id': self.product_a.id,
                 'product_uom_id': self.env.ref('uom.product_uom_unit').id,
                 'quantity': 1,
                 'tax_ids': [self.standard_rate_purchase_tax.id],
                 'balance': 17499,
             }, {
-                'name': 'window pane',
+                'label': 'window pane',
                 'product_id': self.product_b.id,
                 # In this case, the UoM in the JSON is unrecognized, so we take the product's default UoM.
                 # In general, that should be a good guess. However, because in this test we deliberately configured product_b
@@ -249,21 +250,21 @@ class TestKeEdiStock(TestKeEdiCommon):
                 'tax_ids': [self.reduced_rate_purchase_tax.id],
                 'balance': 54000,
             }, {
-                'name': '16%',
+                'label': '16%',
                 'product_id': None,
                 'product_uom_id': False,
                 'quantity': 0,
                 'tax_ids': [],
                 'balance': 2799.84,
             }, {
-                'name': '8%',
+                'label': '8%',
                 'product_id': None,
                 'product_uom_id': False,
                 'quantity': 0,
                 'tax_ids': [],
                 'balance': 4320.00,
             }, {
-                'name': False,
+                'label': False,
                 'product_id': None,
                 'product_uom_id': False,
                 'quantity': 0,
@@ -380,7 +381,7 @@ class TestKeEdiStock(TestKeEdiCommon):
                     'location_dest_id': self.customer_location.id,
                     'product_id': self.product_a.id,
                     'product_uom_qty': 1,
-                    'product_uom': self.product_a.uom_id.id,
+                    'uom_id': self.product_a.uom_id.id,
                     'description_picking': self.product_a.name,
                 })
             ]
@@ -405,7 +406,7 @@ class TestKeEdiStock(TestKeEdiCommon):
                     'location_dest_id': branch_stock_location.id,
                     'product_id': self.product_a.id,
                     'product_uom_qty': 1,
-                    'product_uom': self.product_a.uom_id.id,
+                    'uom_id': self.product_a.uom_id.id,
                     'description_picking': self.product_a.name,
                 })
             ]
@@ -436,14 +437,14 @@ class TestKeEdiStock(TestKeEdiCommon):
         inventory_adjustment_location = self.env['product.template']._fields['property_stock_inventory'].get_company_dependent_fallback(self.env['product.template'])
         expected_stock_move_vals = [{
             'product_id': self.product_a.id,
-            'product_uom': self.product_a.uom_id.id,
+            'uom_id': self.product_a.uom_id.id,
             'product_uom_qty': 1.0,
             'location_id': inventory_adjustment_location.id,
             'location_dest_id': self.stock_location.id,
         }]
         expected_stock_move_line_vals = [{
             'product_id': self.product_a.id,
-            'product_uom_id': self.product_a.uom_id.id,
+            'uom_id': self.product_a.uom_id.id,
             'quantity': 1.0,
             'location_id': inventory_adjustment_location.id,
             'location_dest_id': self.stock_location.id,
@@ -457,6 +458,8 @@ class TestKeEdiStock(TestKeEdiCommon):
 
 @tagged('external', 'external_l10n', 'post_install', '-post_install_l10n', '-at_install', '-standard')
 class TestKeEdiStockLive(TestKeEdiStock):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestKeEdiCommon.setup_country("ke")
     def setUpClass(cls):

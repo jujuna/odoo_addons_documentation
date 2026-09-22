@@ -10,6 +10,7 @@ class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
     attendance_count = fields.Integer(compute='_compute_attendance_count')
+    attendance_based = fields.Boolean(related='version_id.attendance_based')
 
     def _get_attendance_by_payslip(self):
         """
@@ -26,13 +27,14 @@ class HrPayslip(models.Model):
         slip_by_employee = defaultdict(lambda: self.env['hr.payslip'])
         attendance_domains = []
         for slip in self:
-            if slip.version_id.work_entry_source != 'attendance':
+            if not slip.attendance_based:
                 continue
             slip_by_employee[slip.employee_id.id] |= slip
             attendance_domains.append([
                 ('employee_id', '=', slip.employee_id.id),
                 ('check_in', '<=', slip.date_to),
                 ('check_out', '>=', slip.date_from),
+                ('state', '=', 'validated'),
             ])
         attendance_group = self.env['hr.attendance']._read_group(
             Domain.OR(attendance_domains),
@@ -53,14 +55,17 @@ class HrPayslip(models.Model):
 
     def action_open_attendances(self):
         self.ensure_one()
-        attendance = self._get_attendance_by_payslip()[self]
+        gantt_view = self.env.ref('hr_attendance_gantt.hr_attendance_gantt_view_default_scale_month', raise_if_not_found=False)
+
+        views = [[gantt_view.id, 'gantt']] if gantt_view else []
+        views.append([False, 'list'])
         return {
             "type": "ir.actions.act_window",
             "name": _("Attendances"),
             "res_model": "hr.attendance",
-            "views": [[False, "list"]],
+            "views": views,
+            "domain": [('employee_id', '=', self.employee_id.id)],
             "context": {
-                "create": 0
+                'initialDate': self.date_from,
             },
-            "domain": [('id', 'in', attendance.ids)]
         }

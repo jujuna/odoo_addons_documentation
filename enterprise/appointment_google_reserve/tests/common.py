@@ -11,7 +11,6 @@ class GoogleReserveCommon(AppointmentCommon):
         super().setUpClass()
         cls.test_location = cls.env['res.partner'].create({
             'name': 'Test Google Reserve',
-            'is_company': True,
             'street': 'Zboing Street 42',
             'city': 'Bloups',
             'zip': '6666',
@@ -86,7 +85,7 @@ class GoogleReserveCommon(AppointmentCommon):
         cls.apt_resources_google = (cls.apt_type_resources_table_1 + cls.apt_type_resources_table_2)
 
         # cleanup config
-        cls.env['ir.config_parameter'].set_param(
+        cls.env['ir.config_parameter'].set_str(
             'appointment_google_reserve.google_reserve_iap_endpoint',
             'https://google-reserve.api.odoo.com'
         )

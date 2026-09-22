@@ -1,18 +1,27 @@
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { useService } from "@web/core/utils/hooks";
-import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import {
+    ConfirmationDialog,
+    confirmationDialogProps,
+} from "@web/core/confirmation_dialog/confirmation_dialog";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
-import { onWillStart } from "@odoo/owl";
+import { onWillStart, useProps, proxy, t, usePlugin } from "@odoo/owl";
+
+export const newViewDialogProps = {
+    ...confirmationDialogProps,
+    viewType: t.string(),
+};
+delete newViewDialogProps.body;
 
 export class NewViewDialog extends ConfirmationDialog {
     static template = "web_studio.NewViewDialog";
     static GROUPABLE_TYPES = ["many2one", "char", "boolean", "selection", "date", "datetime"];
     static MEASURABLE_TYPES = ["integer", "float"];
-    static props = {
-        ...ConfirmationDialog.props,
-        viewType: String,
-    };
+    props = useProps(newViewDialogProps);
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
         super.setup();
@@ -22,10 +31,10 @@ export class NewViewDialog extends ConfirmationDialog {
 
         this.title = _t("Generate %s View", this.viewType);
 
-        this.fieldsChoice = {
+        this.fieldsChoice = proxy({
             date_start: null,
             date_stop: null,
-        };
+        });
 
         onWillStart(async () => {
             const fieldsGet = await this.orm.call(this.studio.editedAction.res_model, "fields_get");
@@ -93,4 +102,3 @@ export class NewViewDialog extends ConfirmationDialog {
         super._confirm();
     }
 }
-delete NewViewDialog.props.body;

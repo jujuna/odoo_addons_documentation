@@ -1,4 +1,5 @@
-import { Component, useSubEnv, xml } from "@odoo/owl";
+import { Component, t, useProps, xml } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
 
 /**
  * Loads the given props to the environment of the nested components.
@@ -12,8 +13,12 @@ import { Component, useSubEnv, xml } from "@odoo/owl";
  * (i.e: with `this.env.prop1` and `this.env.prop2`)
  */
 export class WithSubEnv extends Component {
-    static template = xml`<t t-slot="default"/>`;
-    static props = ["*"];
+    static template = xml`<t t-call-slot="default"/>`;
+
+    props = useProps({
+        model: t.object(),
+    });
+
     setup() {
         useSubEnv(this.props);
     }

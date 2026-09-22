@@ -1,11 +1,12 @@
 from odoo.addons.point_of_sale.tests.test_frontend import TestPointOfSaleHttpCommon
-from odoo.addons.point_of_sale.tests.common_setup_methods import setup_product_combo_items
 from odoo import Command, api
 from unittest.mock import patch
 import odoo.tests
 
 
 class TestPreparationDisplayHttpCommon(TestPointOfSaleHttpCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def _get_pdis_url(self, pdis=None):
         pdis = pdis or self.pdis
@@ -19,19 +20,24 @@ class TestPreparationDisplayHttpCommon(TestPointOfSaleHttpCommon):
         super().setUpClass()
 
         cls.env['pos.prep.display'].search([]).unlink()
+        cls.stage_to_prepare = cls.env['pos.prep.stage'].create({'name': 'To Prepare', 'sequence': 1})
+        cls.stage_ready = cls.env['pos.prep.stage'].create({'name': 'Ready', 'sequence': 2})
+        cls.stage_completed = cls.env['pos.prep.stage'].create({'name': 'Completed', 'sequence': 3})
         cls.pdis = cls.env['pos.prep.display'].create({
             'name': 'Preparation Display',
             'pos_config_ids': [(4, cls.main_pos_config.id)],
+            'stage_ids': [(4, cls.stage_to_prepare.id), (4, cls.stage_ready.id), (4, cls.stage_completed.id)],
         })
 
 
 @odoo.tests.tagged('post_install', '-at_install')
 class TestUi(TestPreparationDisplayHttpCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_01_preparation_display(self):
         self.main_pos_config.write({
             'iface_tipproduct': True,
-            'tip_product_id': self.tip.id,
         })
 
         self.pdis.write({
@@ -42,7 +48,7 @@ class TestUi(TestPreparationDisplayHttpCommon):
         self.main_pos_config.with_user(self.pos_user).open_ui()
         self.start_pos_tour('PreparationDisplayTour')
 
-        data = self.pdis.get_preparation_display_order(None)
+        data = self.pdis.get_preparation_display_orders()
 
         pdis_line = data['pos.prep.line']
 
@@ -53,13 +59,13 @@ class TestUi(TestPreparationDisplayHttpCommon):
         self.env['pos.printer'].create({
             'name': 'Printer',
             'printer_type': 'epson_epos',
-            'epson_printer_ip': '0.0.0.0',
+            'printer_ip': '0.0.0.0',
             'product_categories_ids': [Command.set(self.env['pos.category'].search([]).ids)],
+            'use_type': 'preparation'
         })
 
         self.main_pos_config.write({
-            'is_order_printer': True,
-            'printer_ids': [Command.set(self.env['pos.printer'].search([]).ids)],
+            'preparation_printer_ids': [Command.set(self.env['pos.printer'].search([('use_type', '=', 'preparation')]).ids)],
         })
 
         self.pdis.write({
@@ -67,7 +73,7 @@ class TestUi(TestPreparationDisplayHttpCommon):
         })
 
         self.main_pos_config.with_user(self.pos_user).open_ui()
-        self.start_tour("/pos/ui/%d" % self.main_pos_config.id, 'PreparationDisplayPrinterTour', login="pos_user")
+        self.start_tour("/pos/ui/%d" % self.main_pos_config.id, 'test_printer_and_order_display', login="pos_user")
 
         order = self.env['pos.order'].search([('amount_paid', '=', 5.28)], limit=1)
         preparation_order = self.env['pos.prep.order'].search([('pos_order_id', '=', order.id)], limit=1)
@@ -78,7 +84,6 @@ class TestUi(TestPreparationDisplayHttpCommon):
     def test_02_preparation_display(self):
         self.main_pos_config.write({
             'iface_tipproduct': True,
-            'tip_product_id': self.tip.id,
         })
         self.configurable_chair.write({
             'pos_categ_ids': [(4, self.letter_tray.pos_categ_ids[0].id)],
@@ -86,12 +91,6 @@ class TestUi(TestPreparationDisplayHttpCommon):
 
         self.pdis.write({
             'category_ids': [(4, self.configurable_chair.pos_categ_ids[0].id)],
-        })
-
-        self.pos_user.write({
-            'group_ids': [
-                (4, self.env.ref('stock.group_stock_manager').id),
-            ]
         })
 
         self.main_pos_config.with_user(self.pos_user).open_ui()
@@ -102,15 +101,6 @@ class TestUi(TestPreparationDisplayHttpCommon):
         prep_line = preparation_order.prep_line_ids[0]
         attribute_names = [attr.name for attr in prep_line.attribute_value_ids]
         self.assertEqual(attribute_names, ['Red', 'Metal', 'Leather'])
-        self.assertEqual(prep_line.customer_note, 'Test customer note - orderline')
-
-    def test_03_preparation_display_front_end(self):
-        setup_product_combo_items(self)
-
-        self.main_pos_config.with_user(self.pos_user).open_ui()
-        self.start_pos_tour('MakePosOrderWithCombo')
-
-        self.start_pdis_tour('PreparationDisplayFrontEndTour')
 
     def test_sending_order_in_preparation_should_not_sync_more(self):
         self.env['pos.prep.display'].create({
@@ -121,8 +111,7 @@ class TestUi(TestPreparationDisplayHttpCommon):
         stats = {'nb_call': 0}
         pos_order = self.env.registry.models['pos.order']
         self.main_pos_config.write({
-            'is_order_printer': True,
-            'printer_ids': [Command.set(self.env['pos.printer'].search([]).ids)],
+            'preparation_printer_ids': [Command.set(self.env['pos.printer'].search([('use_type', '=', 'preparation')]).ids)],
         })
 
         @api.model
@@ -152,11 +141,9 @@ class TestUi(TestPreparationDisplayHttpCommon):
         resource_calendar = self.env['resource.calendar'].create({
             'name': 'Takeaway',
             'attendance_ids': [(0, 0, {
-                'name': 'Takeaway',
                 'dayofweek': str(day),
                 'hour_from': 0,
                 'hour_to': 24,
-                'day_period': 'morning',
             }) for day in range(7)],
         })
         self.preset_takeaway.write({

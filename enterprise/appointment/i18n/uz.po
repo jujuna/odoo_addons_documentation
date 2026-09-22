@@ -14,15 +14,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-09 18:43+0000\n"
-"PO-Revision-Date: 2025-10-08 18:44+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-17 22:46+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"appointment/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: appointment
+#: model:ir.module.module,description:base.module_appointment
+msgid ""
+"\n"
+"Allow clients to Schedule Appointments through the Portal\n"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
@@ -33,9 +42,8 @@ msgstr "\" allaqachon ishlatilmoqda. Iltimos, boshqasini tanlang."
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
 msgid "\" on"
-msgstr "\" da"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -71,11 +79,26 @@ msgid "# Invitation Links"
 msgstr "# Taklif havolalari"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__appointment_leave_count
+msgid "# Leaves"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_count
+msgid "# Ratings"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__suggested_resource_count
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__resource_count
 #, fuzzy
 msgid "# Resources"
 msgstr "# Resurslar"
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_count
+msgid "# Slots"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__suggested_staff_user_count
@@ -116,19 +139,10 @@ msgstr ""
 "(capacity)d ta joy yetishmayapti"
 
 #. module: appointment
-#. odoo-python
-#: code:addons/appointment/controllers/calendar_view.py:0
-#, fuzzy
-msgid "%(name)s - My availabilities"
-msgstr "%(name)s - Mening bo‘sh vaqtlarim"
-
-#. module: appointment
-#. odoo-python
-#: code:addons/appointment/models/appointment_resource.py:0
-#: code:addons/appointment/models/appointment_type.py:0
-#, fuzzy
-msgid "%s (copy)"
-msgstr "%s (nusxa)"
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
+msgid "%(user_name)s - Free Time Slots"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -138,56 +152,283 @@ msgid "%s - Let's meet"
 msgstr "%s - Keling, uchrashamiz"
 
 #. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/appointment_leave.py:0
+msgid "%s closing"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/form/calendar_event_form_controller.js:0
+msgid "%s seats cannot be assigned. Would you like to update the details?"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
-#, fuzzy
-msgid "'e.g. \"John Doe - Tennis Court Booking\""
-msgstr "'masalan, \"Jon Doe - Tennis korti bandlovi\""
+msgid "'e.g. \"John Doe\""
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.js:0
+msgid "+ Add Booking Pages"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_svg.xml:0
-#, fuzzy
 msgid ""
 ".stgrey0{fill:#E3E3E3}\n"
 "                .stgrey1{fill:#F2F2F2}"
-msgstr ".stgrey0{to‘ldirish:#E3E3E3} .stgrey1{to‘ldirish:#F2F2F2}"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
-#, fuzzy
-msgid ""
-"<br/>\n"
-"                                    <span class=\"fw-light\">Duration</span>"
-msgstr "<br/> <span class=\"fw-light\">Davomiyligi</span>"
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "<b>Create your first appointment.</b>"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
-#, fuzzy
+#: model:mail.template,body_html:appointment.appointment_canceled_mail_template
 msgid ""
-"<br/>\n"
-"                                <span class=\"fw-light\">To Confirm</span>"
-msgstr "<br/> <span class=\"fw-light\">Tasdiqlash kerak</span>"
+"<div style=\"font-size: 13px; color: #374151;  background-color: white;\">\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
+"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
+"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
+"ctx.get('mail_tz')\"/>\n"
+"    <t t-set=\"customer\" t-value=\"object.appointment_booker_id or "
+"object.find_partner_customer() or object.partner_id\"/>\n"
+"    <h1 style=\"font-size: 18px; font-weight: bold; color: #374151; margin-"
+"bottom: 28px;\">\n"
+"        Appointment canceled\n"
+"        <img src=\"/calendar/static/src/img/times-circle.png\" "
+"style=\"border:0; width: 24px; height: 24px; margin-left: 10px; text-"
+"decoration:none; vertical-align: bottom;\"/>\n"
+"    </h1>\n"
+"    <p style=\"margin: 0;\">\n"
+"        <t t-if=\"customer\">\n"
+"            Hello <t t-out=\"customer.display_name or ''\">John Booker</t>,\n"
+"        </t>\n"
+"        <t t-else=\"\">\n"
+"            Hello,\n"
+"        </t>\n"
+"        <br/>\n"
+"        <span style=\"display: block; margin-top: 8px;\">Your appointment "
+"for <t t-out=\"object.appointment_type_id.name or ''\">Technical Demo</t> <t "
+"t-if=\"object.appointment_type_id.category not in ['custom', 'anytime'] and "
+"object.appointment_type_id.schedule_based_on == 'users' and "
+"object.partner_id\"> with <t t-out=\"object.partner_id.name or ''\">Brandon "
+"Freeman</t></t> has been canceled.</span>\n"
+"    </p>\n"
+"    <div style=\"margin: 32px 0 0;\">\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Details</h2>\n"
+"        <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-"
+"size: 13px; color: #374151;\">\n"
+"            <tr>\n"
+"                <td style=\"width: 100px; color: #676F7B;\">Date &amp; Time</"
+"td>\n"
+"                <td style=\"font-weight: bold;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='EEEE', lang_code=object.env.lang) "
+"or ''\">Wednesday</t>\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='d', lang_code=object.env.lang) or "
+"''\">1</t>\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format='MMMM y', "
+"lang_code=object.env.lang) or ''\">January 2020</t>\n"
+"                    <t t-if=\"not object.allday\">\n"
+"                        <t t-out=\"format_time(time=object.start, "
+"tz=mail_tz, time_format='short', lang_code=object.env.lang) or ''\">8:00</"
+"t>\n"
+"                        <t t-if=\"not "
+"object.appointment_type_id.hide_timezone and mail_tz\">\n"
+"                            <span style=\"font-size: 11px; font-weight: "
+"normal;\">\n"
+"                                (<t t-out=\"mail_tz\">Europe/Brussels</t>)\n"
+"                            </span>\n"
+"                        </t>\n"
+"                    </t>\n"
+"                </td>\n"
+"            </tr>\n"
+"            <tr t-if=\"recurrent\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
+"\">When</td>\n"
+"                <td style=\"padding-top: 6px;\"><t t-"
+"out=\"object.recurrence_id.name or ''\">Every 1 Weeks, for 3 events</t></"
+"td>\n"
+"            </tr>\n"
+"            <tr t-if=\"not object.appointment_type_id.hide_duration and not "
+"object.allday and object.duration\" style=\"padding-top: 6px;\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
+"\">Duration</td>\n"
+"                <td style=\"padding-top: 6px;\"><t t-out=\"('%dH%02d' % "
+"(object.duration,round(object.duration*60)%60)) or ''\">0H30</t></td>\n"
+"            </tr>\n"
+"            <tr t-if=\"object.location\">\n"
+"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B; "
+"vertical-align: top;\">Location</td>\n"
+"                <td style=\"padding-top: 6px;\">\n"
+"                    <t t-out=\"object.location or ''\">Bruxelles</t>\n"
+"                    <a target=\"_blank\" t-if=\"object.location != "
+"object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{ object.location }}\" style=\"margin-"
+"left: 12px; font-size: 12px; color: #008f8c; text-decoration: underline;"
+"\">View Map</a>\n"
+"                </td>\n"
+"            </tr>\n"
+"        </table>\n"
+"    </div>\n"
+"    <div style=\"margin: 32px 0 0;\">\n"
+"        <t t-set=\"max_shown_attendees\" t-value=\"20\"/>\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Attendees</h2>\n"
+"        <div t-foreach=\"object.attendee_ids[:max_shown_attendees]\" t-"
+"as=\"attendee\" style=\"margin-bottom: 5px;\">\n"
+"            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
+"img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
+"15px; vertical-align: text-bottom;\"/>\n"
+"            <t t-if=\"attendee.common_name\">\n"
+"                <span style=\"margin-left: 5px\" t-"
+"out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
+"            </t>\n"
+"            <t t-else=\"\">\n"
+"                <span style=\"margin-left:5px\">You</span>\n"
+"            </t>\n"
+"        </div>\n"
+"        <div t-if=\"len(object.attendee_ids) &gt; max_shown_attendees\" "
+"style=\"margin-bottom: 5px;\">\n"
+"            ... and <t t-out=\"len(object.attendee_ids) - "
+"max_shown_attendees\">2</t> more\n"
+"        </div>\n"
+"    </div>\n"
+"    <div t-if=\"not is_html_empty(object.description)\" style=\"margin: 32px "
+"0 0;\">\n"
+"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
+"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
+"\">Description of the event</h2>\n"
+"        <div t-out=\"object.description\">Internal product showcase.</div>\n"
+"    </div>\n"
+"</div>\n"
+"            "
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
-#, fuzzy
+#: model:mail.template,body_html:appointment.appointment_feedback_mail_template
 msgid ""
-"<br/>\n"
-"                                <span class=\"fw-light\">Total</span>"
-msgstr "<br/> <span class=\"fw-light\">Jami</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
-#, fuzzy
-msgid ""
-"<br/>\n"
-"                                <span class=\"fw-light\">Upcoming</span>"
-msgstr "<br/> <span class=\"fw-light\">Yaqinlashayotgan</span>"
+"<div style=\"font-size: 13px; color: #374151; background-color: white;\">\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
+"    <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-"
+"size: 13px; color: #374151; width: 100%;\">\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 16px;\">\n"
+"                Hello <t t-out=\"object.appointment_booker_id.name or "
+"''\">John Doe</t>,\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 16px;\">\n"
+"                Thank you for booking with us.<br/>\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 24px;\">\n"
+"                Please take a moment to tell us how your experience was. "
+"Your feedback helps us improve continuously and offer a better service to "
+"our guests.\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td>\n"
+"                <h2 t-attf-style=\"margin: 0 0 8px 0; font-size: 14px; font-"
+"weight: bold; font-style: italic; color: "
+"{{ object.user_id.company_id.email_secondary_color or '#875A7B' }};\">\n"
+"                    Tell us how you feel about your visit\n"
+"                </h2>\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 16px; color: #676F7B; font-style: "
+"italic;\">\n"
+"                Please click on one of the options below:\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"padding-bottom: 24px;\">\n"
+"                <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" "
+"style=\"font-size: 13px; color: #374151;\">\n"
+"                    <tr>\n"
+"                        <td style=\"padding-bottom: 12px; vertical-align: "
+"middle; width: 25px;\">\n"
+"                            <img src=\"/rating/static/src/img/rating_5.png\" "
+"alt=\"Satisfied\" style=\"width: 20px; height: 20px; border: 0; vertical-"
+"align: middle; text-decoration: none;\"/>\n"
+"                        </td>\n"
+"                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
+"vertical-align: middle;\">\n"
+"                            <a t-attf-href=\"/rate/{{ access_token }}/5\" "
+"style=\"text-decoration: none; color: #111827; font-weight: bold;\">\n"
+"                                Great experience\n"
+"                            </a>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                    <tr>\n"
+"                        <td style=\"padding-bottom: 12px; vertical-align: "
+"middle; width: 25px;\">\n"
+"                            <img src=\"/rating/static/src/img/rating_3.png\" "
+"alt=\"Okay\" style=\"width: 20px; height: 20px; border: 0; vertical-align: "
+"middle; text-decoration: none;\"/>\n"
+"                        </td>\n"
+"                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
+"vertical-align: middle;\">\n"
+"                            <a t-attf-href=\"/rate/{{ access_token }}/3\" "
+"style=\"text-decoration: none; color: #111827; font-weight: bold;\">\n"
+"                                It was okay\n"
+"                            </a>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                    <tr>\n"
+"                        <td style=\"padding-bottom: 12px; vertical-align: "
+"middle; width: 25px;\">\n"
+"                            <img src=\"/rating/static/src/img/rating_1.png\" "
+"alt=\"Dissatisfied\" style=\"width: 20px; height: 20px; border: 0; vertical-"
+"align: middle; text-decoration: none;\"/>\n"
+"                        </td>\n"
+"                        <td style=\"padding-bottom: 12px; padding-left: 8px; "
+"vertical-align: middle;\">\n"
+"                            <a t-attf-href=\"/rate/{{ access_token }}/1\" "
+"style=\"text-decoration: none; color: #111827; font-weight: bold;\">\n"
+"                                Not satisfied\n"
+"                            </a>\n"
+"                        </td>\n"
+"                    </tr>\n"
+"                </table>\n"
+"            </td>\n"
+"        </tr>\n"
+"        <tr>\n"
+"            <td style=\"color: #676F7B; font-style: italic;\">\n"
+"                We appreciate your feedback and hope to see you again soon.\n"
+"            </td>\n"
+"        </tr>\n"
+"    </table>\n"
+"</div>\n"
+"            "
+msgstr ""
 
 #. module: appointment
 #: model:mail.template,body_html:appointment.attendee_invitation_mail_template
 msgid ""
-"<div style=\"font-size: 13px; color: #374151;\">\n"
+"<div style=\"font-size: 13px; color: #374151; background-color: white;\">\n"
 "    <t t-set=\"customer\" t-value=\" object.event_id.find_partner_customer()"
 "\"/>\n"
 "    <t t-set=\"target_responsible\" t-value=\"object.partner_id == "
@@ -209,23 +450,23 @@ msgid ""
 "            <t t-if=\"not "
 "object.event_id.appointment_type_id.is_always_confirm\">\n"
 "                <t t-if=\"object.event_id.appointment_status == 'booked'\">\n"
-"                    We're happy to let you know your booking <strong t-"
+"                    Great news! Your booking <strong t-"
 "out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</"
 "strong><t t-if=\"object.event_id.appointment_type_id.category not in "
 "['custom', 'anytime'] and "
 "object.event_id.appointment_type_id.schedule_based_on == 'users'\"> with <t "
-"t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t> has been "
-"confirmed.<br/>\n"
+"t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t> has now been "
+"confirmed.\n"
 "                </t>\n"
 "                <t t-elif=\"object.event_id.appointment_status == "
 "'request'\">\n"
-"                    We've got your booking <strong t-"
+"                    We've received your booking <strong t-"
 "out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</"
 "strong><t t-if=\"object.event_id.appointment_type_id.category not in "
 "['custom', 'anytime'] and "
 "object.event_id.appointment_type_id.schedule_based_on == 'users'\"> with <t "
 "t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t>.<br/>\n"
-"                    We'll notify you once it's confirmed.\n"
+"                    We'll let you know once it's confirmed.\n"
 "                </t>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
@@ -240,9 +481,18 @@ msgid ""
 "        </t>\n"
 "        <t t-elif=\"target_responsible\">\n"
 "            <t t-if=\"customer\">\n"
-"                <t t-out=\"customer.name or ''\"/> scheduled the following "
+"                <t t-if=\"not "
+"object.event_id.appointment_type_id.is_always_confirm and "
+"object.event_id.appointment_status == 'booked'\">\n"
+"                    <t t-out=\"customer.name or ''\">Jesse Brown</t>'s "
 "appointment <strong t-out=\"object.event_id.appointment_type_id.name or "
+"''\">Schedule a Demo</strong> with you has now been confirmed.\n"
+"                </t>\n"
+"                <t t-else=\"\">\n"
+"                    <t t-out=\"customer.name or ''\">Jesse Brown</t> has "
+"booked <strong t-out=\"object.event_id.appointment_type_id.name or "
 "''\">Schedule a Demo</strong> with you.\n"
+"                </t>\n"
 "                <t t-if=\"object.event_id.appointment_type_id and "
 "object.event_id.appointment_status == 'request'\">\n"
 "                    It is awaiting confirmation.\n"
@@ -261,32 +511,16 @@ msgid ""
 "        </t>\n"
 "    </p>\n"
 "    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
-"        <t t-if=\"object.state != 'accepted'\">\n"
-"            <a t-attf-href=\"/calendar/meeting/accept?"
-"token={{object.access_token}}&amp;id={{object.event_id.id}}\" t-attf-"
-"style=\"display: inline-block; padding: 7px 14px; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; text-decoration: none; "
-"background-color: {{user.company_id.email_secondary_color or '#875A7B'}}; "
-"border-radius: 3px\">\n"
-"                Accept</a>\n"
-"            <a t-attf-href=\"/calendar/meeting/decline?"
-"token={{object.access_token}}&amp;id={{object.event_id.id}}\" t-attf-"
-"style=\"display: inline-block; margin-left: 6px; padding: 7px 14px; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; text-decoration: none; "
-"background-color: {{user.company_id.email_secondary_color or '#875A7B'}}; "
-"border-radius: 3px\">\n"
-"                Decline</a>\n"
-"        </t>\n"
 "        <a t-if=\"not target_responsible and not target_customer\" t-attf-"
-"href=\"/calendar/meeting/view?token={{object.access_token}}"
+"href=\"/calendar/meeting/view?token={{object.sudo().access_token}}"
 "&amp;id={{object.event_id.id}}\" style=\"display: inline-block; margin-left: "
 "12px; padding: 5px 10px; color: #111827; text-decoration: none; background-"
 "color: #E7E9ED; border-radius: 3px; border-radius: 3px\">View</a>\n"
 "        <a t-elif=\"not target_customer\" t-attf-href=\"/mail/view?"
-"model=calendar.event&amp;res_id={{object.event_id.id}}\" t-attf-"
-"style=\"display: inline-block; margin-left: 12px; padding: 5px 10px; color: "
-"#111827; text-decoration: none; background-color: #E7E9ED; border-radius: "
-"3px; border-radius: 3px\">View</a>\n"
+"model=calendar.event&amp;res_id={{object.event_id.id}}\" style=\"display: "
+"inline-block; margin-left: 12px; padding: 5px 10px; color: #111827; text-"
+"decoration: none; background-color: #E7E9ED; border-radius: 3px; border-"
+"radius: 3px\">View</a>\n"
 "    </div>\n"
 "    <div style=\"margin: 16px 0 0;\">\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
@@ -355,7 +589,7 @@ msgid ""
 "                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
 "\">For</td>\n"
 "                <td style=\"padding-top: 6px;\"><t t-"
-"out=\"object.event_id.total_capacity_reserved\"/> people</td>\n"
+"out=\"object.event_id.total_capacity_reserved\">2</t> people</td>\n"
 "            </tr>\n"
 "            <tr t-if=\"not "
 "object.event_id.appointment_type_id.is_auto_assign and "
@@ -392,11 +626,12 @@ msgid ""
 "        </table>\n"
 "    </div>\n"
 "    <div style=\"margin: 32px 0 0;\">\n"
+"        <t t-set=\"max_shown_attendees\" t-value=\"20\"/>\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
 "\">Attendees</h2>\n"
-"        <div t-foreach=\"object.event_id.attendee_ids\" t-as=\"attendee\" "
-"style=\"margin-bottom: 5px;\">\n"
+"        <div t-foreach=\"object.event_id.attendee_ids[:max_shown_attendees]"
+"\" t-as=\"attendee\" style=\"margin-bottom: 5px;\">\n"
 "            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
 "img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
 "15px; vertical-align: text-bottom;\"/>\n"
@@ -408,21 +643,27 @@ msgid ""
 "                <span style=\"margin-left:5px\">You</span>\n"
 "            </t>\n"
 "        </div>\n"
+"        <div t-if=\"len(object.event_id.attendee_ids) &gt; "
+"max_shown_attendees\" style=\"margin-bottom: 5px;\">\n"
+"            ... and <t t-out=\"len(object.event_id.attendee_ids) - "
+"max_shown_attendees\">2</t> more\n"
+"        </div>\n"
 "    </div>\n"
 "    <div t-if=\"not is_html_empty(object.event_id.description)\" "
 "style=\"margin: 32px 0 0;\">\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
 "\">Description of the event</h2>\n"
-"        <div t-out=\"object.event_id.description\"/>\n"
+"        <div t-out=\"object.event_id.description\">Internal product showcase."
+"</div>\n"
 "    </div>\n"
 "    <div t-if=\"target_customer\" style=\"margin: 32px 0 0;\">\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
 "\">Make change to this event</h2>\n"
-"        <a t-attf-href=\"/calendar/meeting/view?token={{object.access_token}}"
-"&amp;id={{object.event_id.id}}\" style=\"color: color: #008f8c; text-"
-"decoration: underline;\">Reschedule</a>\n"
+"        <a t-attf-href=\"/calendar/meeting/view?"
+"token={{object.sudo().access_token}}&amp;id={{object.event_id.id}}\" "
+"style=\"color: color: #008f8c; text-decoration: underline;\">Reschedule</a>\n"
 "    </div>\n"
 "    <t t-set=\"upcoming_appointments\" t-"
 "value=\"(object.event_id.appointment_booker_id.upcoming_appointment_ids - "
@@ -442,9 +683,10 @@ msgid ""
 "&quot;medium&quot;, &quot;tz_name&quot;: object.mail_tz}\" style=\"font-"
 "weight: bold;\">June 20th, 15:00</span>\n"
 "                <a t-attf-href=\"/calendar/view/"
-"#{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}\" "
-"target=\"_blank\" style=\"margin-left: 10px; font-size: 12px; color: "
-"#008f8c; text-decoration: underline;\">View Details</a>\n"
+"#{upcoming_appointment.sudo().access_token}?"
+"partner_id=#{appointment_booker_id}\" target=\"_blank\" style=\"margin-left: "
+"10px; font-size: 12px; color: #008f8c; text-decoration: underline;\">View "
+"Details</a>\n"
 "            </li>\n"
 "        </ul>\n"
 "    </div>\n"
@@ -460,203 +702,15 @@ msgid ""
 msgstr ""
 
 #. module: appointment
-#: model:mail.template,body_html:appointment.appointment_canceled_mail_template
-#, fuzzy
+#: model:mail.template,body_html:appointment.appointment_booking_mail_template
 msgid ""
-"<div style=\"font-size: 13px; color: #374151;\">\n"
+"<div style=\"font-size: 13px; color: #374151; background-color: white;\">\n"
 "    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
 "ctx.get('calendar_template_ignore_recurrence')\"/>\n"
 "    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
 "ctx.get('mail_tz')\"/>\n"
-"    <t t-set=\"appointment_booker_name\" t-"
-"value=\"object.appointment_booker_id.display_name\"/>\n"
-"    <h1 style=\"font-size: 18px; font-weight: bold; color: #374151; margin-"
-"bottom: 28px;\">\n"
-"        Appointment canceled\n"
-"        <img src=\"/calendar/static/src/img/times-circle.png\" "
-"style=\"border:0; width: 24px; height: 24px; margin-left: 10px; text-"
-"decoration:none; vertical-align: bottom;\"/>\n"
-"    </h1>\n"
-"    <p style=\"margin: 0;\">\n"
-"        <t t-if=\"appointment_booker_name\">\n"
-"            Hello <t t-out=\"appointment_booker_name\"/>,\n"
-"        </t>\n"
-"        <t t-else=\"\">\n"
-"            Hello,\n"
-"        </t>\n"
-"        <br/>\n"
-"        <span style=\"display: block; margin-top: 8px;\">Your appointment "
-"for <t t-out=\"object.appointment_type_id.name or ''\">Technical Demo</t> <t "
-"t-if=\"object.appointment_type_id.category not in ['custom', 'anytime'] and "
-"object.appointment_type_id.schedule_based_on == 'users' and "
-"object.partner_id\"> with <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t></t> has been canceled.</span>\n"
-"    </p>\n"
-"    <div style=\"margin: 32px 0 0;\">\n"
-"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
-"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
-"\">Details</h2>\n"
-"        <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-"
-"size: 13px; color: #374151;\">\n"
-"            <tr>\n"
-"                <td style=\"width: 100px; color: #676F7B;\">Date &amp; Time</"
-"td>\n"
-"                <td style=\"font-weight: bold;\">\n"
-"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
-"if not object.allday else None, dt_format='EEEE', lang_code=object.env.lang) "
-"or ''\">Wednesday</t>\n"
-"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
-"if not object.allday else None, dt_format='d', lang_code=object.env.lang) or "
-"''\">1</t>\n"
-"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
-"if not object.allday else None, dt_format='MMMM y', "
-"lang_code=object.env.lang) or ''\">January 2020</t>\n"
-"                    <t t-if=\"not object.allday\">\n"
-"                        <t t-out=\"format_time(time=object.start, "
-"tz=mail_tz, time_format='short', lang_code=object.env.lang) or ''\">8:00</"
-"t>\n"
-"                        <t t-if=\"not "
-"object.appointment_type_id.hide_timezone and mail_tz\">\n"
-"                            <span style=\"font-size: 11px; font-weight: "
-"normal;\">\n"
-"                                (<t t-out=\"mail_tz\"/>)\n"
-"                            </span>\n"
-"                        </t>\n"
-"                    </t>\n"
-"                </td>\n"
-"            </tr>\n"
-"            <tr t-if=\"recurrent\">\n"
-"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
-"\">When</td>\n"
-"                <td style=\"padding-top: 6px;\"><t t-"
-"out=\"object.recurrence_id.name or ''\">Every 1 Weeks, for 3 events</t></"
-"td>\n"
-"            </tr>\n"
-"            <tr t-if=\"not object.appointment_type_id.hide_duration and not "
-"object.allday and object.duration\" style=\"padding-top: 6px;\">\n"
-"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
-"\">Duration</td>\n"
-"                <td style=\"padding-top: 6px;\"><t t-out=\"('%dH%02d' % "
-"(object.duration,round(object.duration*60)%60)) or ''\">0H30</t></td>\n"
-"            </tr>\n"
-"            <tr t-if=\"object.location\">\n"
-"                <td style=\"width: 100px; padding-top: 6px; color: #676F7B; "
-"vertical-align: top;\">Location</td>\n"
-"                <td style=\"padding-top: 6px;\">\n"
-"                    <t t-out=\"object.location or ''\">Bruxelles</t>\n"
-"                    <a target=\"_blank\" t-if=\"object.location != "
-"object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
-"maps.google.com/maps?oi=map&amp;q={{ object.location }}\" style=\"margin-"
-"left: 12px; font-size: 12px; color: #008f8c; text-decoration: underline;"
-"\">View Map</a>\n"
-"                </td>\n"
-"            </tr>\n"
-"        </table>\n"
-"    </div>\n"
-"    <div style=\"margin: 32px 0 0;\">\n"
-"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
-"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
-"\">Attendees</h2>\n"
-"        <div t-foreach=\"object.attendee_ids\" t-as=\"attendee\" "
-"style=\"margin-bottom: 5px;\">\n"
-"            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
-"img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
-"15px; vertical-align: text-bottom;\"/>\n"
-"            <t t-if=\"attendee.common_name\">\n"
-"                <span style=\"margin-left: 5px\" t-"
-"out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
-"            </t>\n"
-"            <t t-else=\"\">\n"
-"                <span style=\"margin-left:5px\">You</span>\n"
-"            </t>\n"
-"        </div>\n"
-"    </div>\n"
-"    <div t-if=\"not is_html_empty(object.description)\" style=\"margin: 32px "
-"0 0;\">\n"
-"        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
-"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
-"\">Description of the event</h2>\n"
-"        <div t-out=\"object.description\"/>\n"
-"    </div>\n"
-"</div>\n"
-"            "
-msgstr ""
-"<div style=\"font-size: 13px; color: #374151;\"> <t t-set=\"recurrent\" t-"
-"value=\"object.recurrence_id and not ctx.get "
-"('calendar_template_ignore_recurrence') \"/> <t t-set=\"mail_tz\" t-"
-"value=\"object._get_mail_tz() or ctx.get ('mail_tz') \"/> <t t-"
-"set=\"appointment_booker_name\" t-"
-"value=\"object.appointment_booker_id.display_name\"/> <h1 style=\"font-size: "
-"18px; font-weight: bold; color: #374151; margin-bottom: 28px;\"> Uchrashuv "
-"bekor qilindi <img src=\"/calendar/static/src/img/times-circle.png\" "
-"style=\"border:0; width: 24px; height: 24px; margin-left: 10px; text-"
-"decoration:none; vertical-align: bottom;\"/> </h1> <p style=\"margin: 0;\"> "
-"<t t-if=\"appointment_booker_name\"> Salom <t t-"
-"out=\"appointment_booker_name\"/>, </t> <t t-else=\"\"> Salom, </t> <br/> "
-"<span style=\"display: block; margin-top: 8px;\"><t t-"
-"out=\"object.appointment_type_id.name or ''\">Texnik namoyish</t> <t t-"
-"if=\"object.appointment_type_id.category not in ['custom', 'anytime'] and "
-"object.appointment_type_id.schedule_based_on == 'users' and "
-"object.partner_id\"> uchun <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t> bilan</t> belgilangan uchrashuvingiz bekor qilindi.</span> </p> "
-"<div style=\"margin: 32px 0 0;\"> <h2 t-attf-style=\"margin-bottom: 12px; "
-"font-size: 14px; font-weight: bold; color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}};\">Tafsilotlar</h2> "
-"<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-size: "
-"13px; color: #374151;\"> <tr> <td style=\"width: 100px; color: #676F7B;"
-"\">Sana va vaqt</td> <td style=\"font-weight: bold;\"> <t t-"
-"out=\"format_datetime(dt=object.start, tz=mail_tz if not object.allday else "
-"None, dt_format='EEEE', lang_code=object.env.lang) or ''\">Chorshanba</t> <t "
-"t-out=\"format_datetime(dt=object.start, tz=mail_tz if not object.allday "
-"else None, dt_format='d', lang_code=object.env.lang) or ''\">1</t> <t t-"
-"out=\"format_datetime(dt=object.start, tz=mail_tz if not object.allday else "
-"None, dt_format='MMMM y', lang_code=object.env.lang) or ''\">Yanvar 2020</t> "
-"<t t-if=\"not object.allday\"> <t t-out=\"format_time(time=object.start, "
-"tz=mail_tz, time_format='short', lang_code=object.env.lang) or ''\">8:00</t> "
-"<t t-if=\"not object.appointment_type_id.hide_timezone and mail_tz\"> <span "
-"style=\"font-size: 11px; font-weight: normal;\"> (<t t-out=\"mail_tz\"/>) </"
-"span> </t> </t> </td> </tr> <tr t-if=\"recurrent\"> <td style=\"width: "
-"100px; padding-top: 6px; color: #676F7B;\">Qachon</td> <td style=\"padding-"
-"top: 6px;\"><t t-out=\"object.recurrence_id.name or ''\">Har 1 haftada, 3 ta "
-"tadbir uchun</t></td> </tr> <tr t-if=\"not "
-"object.appointment_type_id.hide_duration and not object.allday and "
-"object.duration\" style=\"padding-top: 6px;\"> <td style=\"width: 100px; "
-"padding-top: 6px; color: #676F7B;\">Davomiyligi</td> <td style=\"padding-"
-"top: 6px;\"><t t-out=\"('%dS%02d' % "
-"(object.duration,round(object.duration*60)%60)) or ''\">0S30</t></td> </tr> "
-"<tr t-if=\"object.location\"> <td style=\"width: 100px; padding-top: 6px; "
-"color: #676F7B; vertical-align: top;\">Manzil</td> <td style=\"padding-top: "
-"6px;\"> <t t-out=\"object.location or ''\">Bryussel</t> <a target=\"_blank\" "
-"t-if=\"object.location != object.appointment_type_id.location_id.name\" t-"
-"attf-href=\"http://maps.google.com/maps?oi=map&amp;q={{ object.location }}\" "
-"style=\"margin-left: 12px; font-size: 12px; color: #008f8c; text-decoration: "
-"underline;\">Xaritada ko‘rish</a> </td> </tr> </table> </div> <div "
-"style=\"margin: 32px 0 0;\"> <h2 t-attf-style=\"margin-bottom: 12px; font-"
-"size: 14px; font-weight: bold; color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}};\">Ishtirokchilar</"
-"h2> <div t-foreach=\"object.attendee_ids\" t-as=\"attendee\" style=\"margin-"
-"bottom: 5px;\"> <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/"
-"src/img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; "
-"height: 15px; vertical-align: text-bottom;\"/> <t t-"
-"if=\"attendee.common_name\"> <span style=\"margin-left: 5px\" t-"
-"out=\"attendee.common_name or ''\">Mitchell Admin</span> </t> <t t-"
-"else=\"\"> <span style=\"margin-left:5px\">Siz</span> </t> </div> </div> "
-"<div t-if=\"not is_html_empty(object.description)\" style=\"margin: 32px 0 "
-"0;\"> <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-weight: "
-"bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
-"\">Tadbir tavsifi</h2> <div t-out=\"object.description\"/> </div> </div>"
-
-#. module: appointment
-#: model:mail.template,body_html:appointment.appointment_booked_mail_template
-#, fuzzy
-msgid ""
-"<div style=\"font-size: 13px; color: #374151;\">\n"
-"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
-"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
-"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
-"ctx.get('mail_tz')\"/>\n"
-"    <t t-set=\"appointment_booker_name\" t-"
-"value=\"object.appointment_booker_id.display_name\"/>\n"
+"    <t t-set=\"customer\" t-value=\"object.appointment_booker_id or "
+"object.find_partner_customer() or object.partner_id\"/>\n"
 "    <h1 style=\"font-size: 18px; font-weight: bold; color: #374151;\">\n"
 "        <t t-if=\"not object.appointment_type_id.is_always_confirm and "
 "object.appointment_status == 'request'\">Appointment requested</t>\n"
@@ -669,7 +723,7 @@ msgid ""
 "    </h1>\n"
 "    <p style=\"margin: 0;\">\n"
 "        <span style=\"display: block; margin-top: 8px;\">\n"
-"            <t t-out=\"appointment_booker_name or ''\">John Booker</t>\n"
+"            <t t-out=\"customer.display_name or ''\">John Booker</t>\n"
 "            <t t-if=\"not object.appointment_type_id.is_always_confirm and "
 "object.appointment_status == 'request'\"> has requested </t>\n"
 "            <t t-else=\"\"> has booked </t>\n"
@@ -686,13 +740,13 @@ msgid ""
 "    <div style=\"text-align: center; padding: 16px 0px 16px 0px; margin-top: "
 "16px;\">\n"
 "        <a t-attf-href=\"/calendar/meeting/join?"
-"token={{ object.access_token }}\" t-attf-style=\"display: inline-block; "
-"padding: 7px 14px; color: {{user.company_id.email_primary_color or "
+"token={{ object.sudo().access_token }}\" t-attf-style=\"display: inline-"
+"block; padding: 7px 14px; color: {{user.company_id.email_primary_color or "
 "'#FFFFFF'}}; text-decoration: none; background-color: "
 "{{user.company_id.email_secondary_color or '#875A7B'}}; border-radius: "
 "3px\">\n"
 "            Join</a>\n"
-"        <a t-attf-href=\"/odoo/calendar.event/{{ object.id }}\" t-attf-"
+"        <a t-attf-href=\"/odoo/calendar.event/{{ object.id }}\" "
 "style=\"display: inline-block; margin-left: 12px; padding: 7px 14px; color: "
 "#111827; text-decoration: none; background-color: #E7E9ED; border-radius: "
 "3px;\">\n"
@@ -725,7 +779,7 @@ msgid ""
 "object.appointment_type_id.hide_timezone and mail_tz\">\n"
 "                            <span style=\"font-size: 11px; font-weight: "
 "normal;\">\n"
-"                                (<t t-out=\"mail_tz\"/>)\n"
+"                                (<t t-out=\"mail_tz\">Europe/Brussels</t>)\n"
 "                            </span>\n"
 "                        </t>\n"
 "                    </t>\n"
@@ -761,7 +815,7 @@ msgid ""
 "                <td style=\"width: 100px; padding-top: 6px; color: #676F7B;"
 "\">For</td>\n"
 "                <td style=\"padding-top: 6px;\"><t t-"
-"out=\"object.total_capacity_reserved\"/> people</td>\n"
+"out=\"object.total_capacity_reserved\">2</t> people</td>\n"
 "            </tr>\n"
 "            <tr t-if=\"not object.appointment_type_id.is_auto_assign and "
 "object.appointment_resource_ids\">\n"
@@ -796,11 +850,12 @@ msgid ""
 "        </table>\n"
 "    </div>\n"
 "    <div style=\"margin: 32px 0 0;\">\n"
+"        <t t-set=\"max_shown_attendees\" t-value=\"20\"/>\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
 "\">Attendees</h2>\n"
-"        <div t-foreach=\"object.attendee_ids\" t-as=\"attendee\" "
-"style=\"margin-bottom: 5px;\">\n"
+"        <div t-foreach=\"object.attendee_ids[:max_shown_attendees]\" t-"
+"as=\"attendee\" style=\"margin-bottom: 5px;\">\n"
 "            <img t-if=\"attendee.state\" t-attf-src=\"/calendar/static/src/"
 "img/state_{{ attendee.state }}.png\" style=\"border:0; width: 15px; height: "
 "15px; vertical-align: text-bottom;\"/>\n"
@@ -812,13 +867,18 @@ msgid ""
 "                <span style=\"margin-left:5px\">You</span>\n"
 "            </t>\n"
 "        </div>\n"
+"        <div t-if=\"len(object.attendee_ids) &gt; max_shown_attendees\" "
+"style=\"margin-bottom: 5px;\">\n"
+"            ... and <t t-out=\"len(object.attendee_ids) - "
+"max_shown_attendees\">2</t> more\n"
+"        </div>\n"
 "    </div>\n"
 "    <div t-if=\"not is_html_empty(object.description)\" style=\"margin: 32px "
 "0 0;\">\n"
 "        <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
 "weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
 "\">Description of the event</h2>\n"
-"        <div t-out=\"object.description\"/>\n"
+"        <div t-out=\"object.description\">Internal product showcase.</div>\n"
 "    </div>\n"
 "    <t t-set=\"upcoming_appointments\" t-"
 "value=\"(object.appointment_booker_id.upcoming_appointment_ids - "
@@ -840,171 +900,53 @@ msgid ""
 "&quot;medium&quot;, &quot;tz_name&quot;: mail_tz}\" style=\"font-weight: "
 "bold;\">June 20th, 15:00</span>\n"
 "                <a t-attf-href=\"/calendar/view/"
-"#{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}\" "
-"target=\"_blank\" style=\"margin-left: 10px; font-size: 12px; color: "
-"#008f8c; text-decoration: underline;\">View Details</a>\n"
+"#{upcoming_appointment.sudo().access_token}?"
+"partner_id=#{appointment_booker_id}\" target=\"_blank\" style=\"margin-left: "
+"10px; font-size: 12px; color: #008f8c; text-decoration: underline;\">View "
+"Details</a>\n"
 "            </li>\n"
 "        </ul>\n"
 "    </div>\n"
 "</div>\n"
 "            "
 msgstr ""
-"<div style=\"font-size: 13px; color: #374151;\"> <t t-set=\"recurrent\" t-"
-"value=\"object.recurrence_id and not ctx.get "
-"('calendar_template_ignore_recurrence') \"/> <t t-set=\"mail_tz\" t-"
-"value=\"object._get_mail_tz () or ctx.get ('mail_tz') \"/> <t t-"
-"set=\"appointment_booker_name\" t-"
-"value=\"object.appointment_booker_id.display_name\"/> <h1 style=\"font-size: "
-"18px; font-weight: bold; color: #374151;\"> <t t-if=\"not "
-"object.appointment_type_id.is_always_confirm and object.appointment_status "
-"=='request'\">Uchrashuv so‘rovi</t> <t t-else=\"\"> Uchrashuv tasdiqlandi "
-"<img src=\"/calendar/static/src/img/check-circle.png\" style=\"border:0; "
-"width: 24px; height: 24px; margin-left: 10px; text-decoration:none; vertical-"
-"align: bottom;\"/> </t> </h1> <p style=\"margin: 0;\"> <span "
-"style=\"display: block; margin-top: 8px;\"> <t t-"
-"out=\"appointment_booker_name or ''\">John Booker</t> <t t-if=\"not "
-"object.appointment_type_id.is_always_confirm and object.appointment_status "
-"== 'request'\"> uchrashuv so‘ragan </t> <t t-else=\"\"> uchrashuv belgilagan "
-"</t>: <t t-out=\"object.appointment_type_id.name or ''\">Texnik namoyish</t> "
-"<t t-if=\"object.appointment_type_id.category not in ['custom', 'anytime'] "
-"and object.appointment_type_id.schedule_based_on == 'users' and "
-"object.partner_id\"> <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t> bilan</t>.         </span> </p> <div style=\"text-align: center; "
-"padding: 16px 0px 16px 0px; margin-top: 16px;\"> <a t-attf-href=\"/calendar/"
-"meeting/join?token={{ object.access_token }}\" t-attf-style=\"display: "
-"inline-block; padding: 7px 14px; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; text-decoration: none; "
-"background-color: {{user.company_id.email_secondary_color or '#875A7B'}}; "
-"border-radius: 3px\"> Qo‘shilish</a> <a t-attf-href=\"/odoo/calendar.event/"
-"{{ object.id }}\" t-attf-style=\"display: inline-block; margin-left: 12px; "
-"padding: 7px 14px; color: #111827; text-decoration: none; background-color: "
-"#E7E9ED; border-radius: 3px;\"> Ko‘rish</a> </div> <div style=\"margin: 16px "
-"0 0;\"> <h2 t-attf-style=\"margin-bottom: 12px; font-size: 14px; font-"
-"weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};"
-"\">Tafsilotlar</h2> <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" "
-"style=\"font-size: 13px; color: #374151;\"> <tr> <td style=\"width: 100px; "
-"color: #676F7B;\">Sana va vaqt</td> <td style=\"font-weight: bold;\"> <t t-"
-"out=\"format_datetime(dt=object.start, tz=mail_tz if not object.allday else "
-"None, dt_format='EEEE', lang_code=object.env.lang) or ''\">Chorshanba</t> <t "
-"t-out=\"format_datetime(dt=object.start, tz=mail_tz if not object.allday "
-"else None, dt_format='d', lang_code=object.env.lang) or ''\">1</t> <t t-"
-"out=\"format_datetime(dt=object.start, tz=mail_tz if not object.allday else "
-"None, dt_format='MMMM y', lang_code=object.env.lang) or ''\">Yanvar 2020</t> "
-"<t t-if=\"not object.allday\"> <t t-out=\"format_time(time=object.start, "
-"tz=mail_tz, time_format='short', lang_code=object.env.lang) or ''\">8:00</t> "
-"<t t-if=\"not object.appointment_type_id.hide_timezone and mail_tz\"> <span "
-"style=\"font-size: 11px; font-weight: normal;\"> (<t t-out=\"mail_tz\"/>) </"
-"span> </t> </t> </td> </tr>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+msgid "<i class=\"oi me-1 fs-4\" data-icon=\"schedule\" title=\"Duration\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
+msgid "<i class=\"oi me-1\" data-icon=\"add\"/>Add"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-check-circle text-success me-3\"/>Appointment Scheduled!"
+msgid "<i class=\"oi me-1\" data-icon=\"add\"/>Add Guests"
 msgstr ""
-"<i class=\"fa fa-check-circle text-success me-3\"/>Qabul rejalashtirildi!"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_gantt_kanban_popover
-#, fuzzy
-msgid "<i class=\"fa fa-circle text-400 me-1\" title=\"Appointment Status\"/>"
-msgstr "<i class=\"fa fa-circle text-400 me-1\" title=\"Qabul holati\"/>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid ""
+"<i class=\"oi me-1\" data-icon=\"calendar_add_on\"/>\n"
+"                                    Book another appointment"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
-#, fuzzy
-msgid "<i class=\"fa fa-circle\" title=\"Status\"/>"
-msgstr "<i class=\"fa-circle\" title=\"Holat\"/>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_gantt_kanban_popover
-#, fuzzy
-msgid "<i class=\"fa fa-clock-o text-400 me-1\" title=\"Date and time\"/>"
-msgstr "<i class=\"fa fa-clock-o text-400 me-1\" title=\"Sana va vaqt\"/>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
-#, fuzzy
-msgid "<i class=\"fa fa-cubes text-600\" title=\"Resources\"/>"
-msgstr "<i class=\"fa fa-cubes text-600\" title=\"Resurslar\"/>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_form
+msgid ""
+"<i class=\"oi me-2\" data-icon=\"warning\"/>\n"
+"                        Your current timezone will be used as a reference "
+"for the selected appointments' closing days.\n"
+"                        Exact timings might differ depending on the "
+"appointment timezone."
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
-#, fuzzy
-msgid "<i class=\"fa fa-info-circle\" title=\"Info\"/>"
-msgstr "<i class=\"fa fa-info-circle\" title=\"Ma'lumot\"/>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-lg fa-calendar-plus-o me-3 text-primary\"/>Schedule another "
-"meeting"
-msgstr ""
-"<i class=\"fa fa-lg fa-calendar-plus-o me-3 text-primary\"/>Boshqa uchrashuv "
-"rejalashtirish"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_gantt_kanban_popover
-#, fuzzy
-msgid "<i class=\"fa fa-map-marker text-400 me-1\" title=\"Location\"/>"
-msgstr "<i class=\"fa fa-map-marker text-400 me-1\" title=\"Manzil\"/>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_gantt_kanban_popover
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-sticky-note text-400 mt-1 me-1\" title=\"Description\"/>"
-msgstr "<i class=\"fa fa-sticky-note text-400 mt-1 me-1\" title=\"Tavsif\"/>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<i class=\"fa fa-thumbs-up me-3 text-info\"/>Appointment Reserved!"
-msgstr "<i class=\"fa fa-thumbs-up me-3 text-info\"/>Qabul band qilindi!"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<i class=\"fa fa-times text-danger me-3\"/>Appointment Cancelled"
-msgstr "<i class=\"fa fa-times text-danger me-3\"/>Qabul bekor qilindi"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_gantt_kanban_popover
-#, fuzzy
-msgid "<i class=\"fa fa-user text-400 me-1\" title=\"Guests\"/>"
-msgstr "<i class=\"fa fa-user text-400 me-1\" title=\"Mehmonlar\"/>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
-#, fuzzy
-msgid "<i class=\"fa fa-user-plus text-600\" title=\"Reserved Capacity\"/>"
-msgstr "<i class=\"fa fa-user-plus text-600\" title=\"Band qilingan sig‘im\"/>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_details
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-video-camera fa-fw me-2 mt-1 text-muted\"/>\n"
-"                <span class=\"o_not_editable\">Online</span>"
-msgstr ""
-"<i class=\"fa fa-video-camera fa-fw me-2 mt-1 text-muted\"/> <span "
-"class=\"o_not_editable\">Onlayn</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_gantt_kanban_popover
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-video-camera text-400 me-1\" title=\"Video Call URL\"/>"
-msgstr ""
-"<i class=\"fa fa-video-camera text-400 me-1\" title=\"Video qo‘ng‘iroq URL "
-"manzili\"/>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-warning me-2\"/>\n"
+"<i class=\"oi me-2\" data-icon=\"warning\"/>\n"
 "                    <span invisible=\"schedule_based_on != "
 "'users'\">Impossible to share a link for an appointment type that has no "
 "user assigned.</span>\n"
@@ -1012,16 +954,11 @@ msgid ""
 "'resources'\">Impossible to share a link for an appointment type that has no "
 "resource assigned.</span>"
 msgstr ""
-"<i class=\"fa fa-warning me-2\"/> <span invisible=\"schedule_based_on!= "
-"'users'\">Foydalanuvchisi bo‘lmagan qabul turi uchun havolani ulashish "
-"imkonsiz.</span> <span invisible=\"schedule_based_on!='resources'\">Resursi "
-"bo‘lmagan qabul turi uchun havolani ulashish imkonsiz.</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-warning me-2\"/>\n"
+"<i class=\"oi me-2\" data-icon=\"warning\"/>\n"
 "                    <span invisible=\"schedule_based_on != 'users'\">You "
 "need to be part of an appointment type to be able to share a personal link.</"
 "span>\n"
@@ -1029,161 +966,194 @@ msgid ""
 "can't create a personal link for an appointment type based on resources.</"
 "span>"
 msgstr ""
-"<i class=\"fa fa-warning me-2\"/> <span invisible=\"schedule_based_on!= "
-"'users'\">Shaxsiy havolani ulashish uchun qabul turining a'zosi bo‘lishingiz "
-"kerak.</span> <span invisible=\"schedule_based_on!='resources'\">Resurslarga "
-"asoslangan qabul turi uchun shaxsiy havola yarata olmaysiz.</span>"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/> Create Resources"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+msgid ""
+"<i class=\"oi o_appointment_kanban_button_icon d-none\" data-icon=\"public\"/"
+">\n"
+"                                    <span "
+"class=\"o_appointment_kanban_button_name\">Preview</span>"
 msgstr ""
-"<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/> Resurslar yaratish"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
-#, fuzzy
-msgid "<i class=\"oi oi-plus me-1\"/> Add Guests"
-msgstr "<i class=\"oi oi-plus me-1\"/> Mehmonlar qo‘shish"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+msgid ""
+"<i class=\"oi oi-filled o_appointment_kanban_button_icon d-none\" data-"
+"icon=\"settings\"/>\n"
+"                                    <span "
+"class=\"o_appointment_kanban_button_name\">Configure</span>"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<i class=\"oi oi-plus me-1\"/>Add Guests"
-msgstr "<i class=\"oi oi-plus me-1\"/>Mehmonlar qo‘shish"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"calendar_today\" aria-"
+"label=\"Date range\"/>"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "<i class=\"oi oi-plus o_button_icon\"/> Add Video"
-msgstr "<i class=\"oi oi-plus o_button_icon\"/> Video qo‘shish"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"location_on\" aria-"
+"label=\"Location\"/>"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_date
-#, fuzzy
-msgid "<small class=\"text-uppercase text-muted\">Date &amp; time</small>"
-msgstr "<small class=\"text-uppercase text-muted\">Sana va vaqt</small>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"person\" aria-"
+"label=\"Users\"/>"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<small>Add to Google Agenda</small>"
-msgstr "<small>Google taqvimiga qo‘shish</small>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"repeat\" aria-"
+"label=\"Schedule\"/>"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<small>Add to iCal/Outlook</small>"
-msgstr "<small>iCal/Outlook'ga qo‘shish</small>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"schedule\" aria-"
+"label=\"Duration\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"tag\" aria-"
+"label=\"Appointment\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"videocam\" aria-"
+"label=\"Video Call Source\"/>"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
-#, fuzzy
 msgid ""
-"<span class=\"me-1\">The following\n"
-"                        <span invisible=\"not "
-"unavailable_partner_ids\">attendees</span>\n"
-"                        <span invisible=\"not unavailable_partner_ids or not "
-"unavailable_resource_ids\">/</span>\n"
-"                        <span invisible=\"not "
-"unavailable_resource_ids\">resources</span> are not available at the "
-"selected time\n"
-"                    </span>"
+"<i class=\"oi oi-filled\" data-icon=\"calendar_today\" title=\"Appointment "
+"Type\"/>"
 msgstr ""
-"<span class=\"me-1\">Quyidagi <span invisible=\"not "
-"unavailable_partner_ids\">ishtirokchilar</span> <span invisible=\"not "
-"unavailable_partner_ids or not unavailable_resource_ids\">/</span> <span "
-"invisible=\"not unavailable_resource_ids\">resurslar</span> tanlangan vaqtda "
-"mavjud emas </span>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
+msgid "<i class=\"oi oi-filled\" data-icon=\"circle\" title=\"Status\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
+msgid ""
+"<i class=\"oi oi-filled\" data-icon=\"person_add\" title=\"Reserved "
+"Capacity\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_list_item
+msgid ""
+"<i class=\"oi oi-fw oi-filled lh-base\" data-icon=\"videocam\" "
+"role=\"presentation\"/>\n"
+"                    <span class=\"o_not_editable\">Online</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_details
+msgid ""
+"<i class=\"oi oi-stack oi-filled flex-shrink-0 rounded-1 text-muted text-"
+"center\" data-icon=\"videocam\" role=\"img\"/>\n"
+"                    <span class=\"o_not_editable mb-0\">Online</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid ""
+"<i class=\"oi text-muted\" data-icon=\"schedule\" aria-label=\"Duration\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
+msgid "<i class=\"oi\" data-icon=\"info\" title=\"Info\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
+msgid "<i class=\"oi\" data-icon=\"inventory_2\" title=\"Resources\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
+msgid "<i class=\"oi\" data-icon=\"inventory_2\" title=\"Staff Member\"/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid ""
+"<small class=\"d-inline d-sm-none\">Google Calendar</small>\n"
+"                                        <small class=\"d-none d-sm-"
+"inline\">Add to Google Calendar</small>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid ""
+"<small class=\"d-inline d-sm-none\">iCal/Outlook</small>\n"
+"                                        <small class=\"d-none d-sm-"
+"inline\">Add to iCal/Outlook</small>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_entity_card_selection
+msgid "<span class=\"fs-6\">No Preference</span>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+msgid ""
+"<span class=\"fw-normal fs-6 lh-1\">\n"
+"                                            to<br/>confirm\n"
+"                                        </span>"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
-#, fuzzy
-msgid "<span class=\"mx-1\">or</span>"
-msgstr "<span class=\"mx-1\">yoki</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid ""
-"<span class=\"text-muted\" invisible=\"category != 'custom'\">Depending on "
-"the Slots</span>"
+msgid "<span class=\"me-1\">Already have an account?</span>"
 msgstr ""
-"<span class=\"text-muted\" invisible=\"category!= 'custom'\">Vaqt "
-"oraliqlariga bog‘liq</span>"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span class=\"text-muted\">Attendees</span>"
-msgstr "<span class=\"text-muted\">Ishtirokchilar</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span class=\"text-muted\">Details</span>"
-msgstr "<span class=\"text-muted\">Tafsilotlar</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span class=\"text-muted\">Duration</span>"
-msgstr "<span class=\"text-muted\">Davomiyligi</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span class=\"text-muted\">For</span>"
-msgstr "<span class=\"text-muted\">Uchun</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span class=\"text-muted\">How to join</span>"
-msgstr "<span class=\"text-muted\">Qanday qo‘shilish mumkin</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span class=\"text-muted\">Resources</span>"
-msgstr "<span class=\"text-muted\">Resurslar</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span class=\"text-muted\">When</span>"
-msgstr "<span class=\"text-muted\">Qachon</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span class=\"text-muted\">Where</span>"
-msgstr "<span class=\"text-muted\">Qayerda</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "<span> hours</span>"
-msgstr "<span> soat</span>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+msgid "<span class=\"me-1\">upcoming</span>"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
-#, fuzzy
-msgid "<span>Add more details about you</span>"
-msgstr "<span>O‘zingiz haqingizda ko‘proq ma'lumot qo‘shing</span>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "<span class=\"mx-1\">-</span>"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span>Not available anymore?</span>"
-msgstr "<span>Endi bo‘sh emas?</span>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid ""
+"<span class=\"o_stat_text\">\n"
+"                                    Rating\n"
+"                                </span>"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "<span>Online</span>"
-msgstr "<span>Onlayn</span>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+msgid ""
+"<span class=\"oi oi-filled\" data-icon=\"calendar_today\" title=\"Upcoming\"/"
+">"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "<span>attendee(s) per slot</span>"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -1192,55 +1162,9 @@ msgid "<span>by visitor</span>"
 msgstr "<span>tashrif buyuruvchi tomonidan</span>"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "<span>hours</span>"
-msgstr "<span>soat</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "<span>seats max</span>"
-msgstr "<span>maksimal o‘rin</span>"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
-#, fuzzy
-msgid ""
-"<strong>Appointment cancelled!</strong>\n"
-"                                        You can now choose a different "
-"schedule that suits you better."
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
+msgid "<span>people</span>"
 msgstr ""
-"<strong>Uchrashuv bekor qilindi!</strong> Endi o‘zingizga mos keladigan "
-"boshqa vaqtni tanlashingiz mumkin."
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
-#, fuzzy
-msgid ""
-"<strong>Appointment failed!</strong>\n"
-"                                            The selected timeslot is not "
-"available anymore.\n"
-"                                            Someone has booked the same time "
-"slot a few\n"
-"                                            seconds before you."
-msgstr ""
-"<strong>Uchrashuv amalga oshmadi!</strong> Tanlangan vaqt oralig‘i endi "
-"mavjud emas. Kimdir sizdan bir necha soniya oldin xuddi shu vaqtni band "
-"qilgan."
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
-#, fuzzy
-msgid ""
-"<strong>Appointment failed!</strong>\n"
-"                                            The selected timeslot is not "
-"available.\n"
-"                                            It appears you already have "
-"another meeting with us at that date."
-msgstr ""
-"<strong>Uchrashuv amalga oshmadi!</strong> Tanlangan vaqt oralig‘i mavjud "
-"emas. Aftidn, sizda o‘sha sanada biz bilan boshqa uchrashuv mavjud."
 
 #. module: appointment
 #. odoo-python
@@ -1256,24 +1180,9 @@ msgid "A default question must be reusable."
 msgstr "Standart savol qayta ishlatilishi shart."
 
 #. module: appointment
-#. odoo-python
-#: code:addons/appointment/controllers/calendar_view.py:0
-#, fuzzy
-msgid ""
-"A list of slots information is needed to create a custom appointment type"
+#: model:ir.model.constraint,message:appointment.constraint_calendar_event_check_no_draft_bookings
+msgid "A event with an appointment_type_id cannot be a draft."
 msgstr ""
-"Maxsus uchrashuv turini yaratish uchun vaqt oraliqlariga oid ma'lumotlar "
-"ro‘yxati kerak"
-
-#. module: appointment
-#. odoo-python
-#: code:addons/appointment/controllers/calendar_view.py:0
-#, fuzzy
-msgid ""
-"A list of slots information is needed to update this custom appointment type"
-msgstr ""
-"Bu maxsus uchrashuv turini yangilash uchun vaqt oraliqlariga oid ma'lumotlar "
-"ro‘yxati kerak"
 
 #. module: appointment
 #. odoo-python
@@ -1287,10 +1196,9 @@ msgstr ""
 "lozim."
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_calendar_event__access_token
-#, fuzzy
-msgid "Access Token"
-msgstr "Kirish tokeni"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "Accept"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__message_needaction
@@ -1320,6 +1228,11 @@ msgid "Activity Exception Decoration"
 msgstr "Faoliyat istisnosi ko‘rinishi"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__activity_state
 #, fuzzy
 msgid "Activity State"
@@ -1333,15 +1246,11 @@ msgstr "Faoliyat turi belgisi"
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
 #: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#: code:addons/appointment/static/src/views/gantt/gantt_renderer.js:0
-#: code:addons/appointment/static/src/views/gantt/gantt_renderer_controls.xml:0
-#: code:addons/appointment/static/src/views/list/list_renderer.js:0
-#: code:addons/appointment/static/src/views/list/list_renderer.xml:0
-#, fuzzy
-msgid "Add Closing Day(s)"
-msgstr "Yopiq kun(lar) qo‘shish"
+#: code:addons/appointment/static/src/views/gantt/gantt_controller.xml:0
+#: code:addons/appointment/static/src/views/list/list_controller.xml:0
+msgid "Add Closing Day"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -1350,6 +1259,22 @@ msgid "Add Guests"
 msgstr "Mehmonlar qo‘shish"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Add Slot"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Add Video"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Add Weekday"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_entity_card_selection
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_user
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated_card
 #, fuzzy
@@ -1364,7 +1289,6 @@ msgstr "Qator qo‘shish"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_user
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated_card
 #, fuzzy
 msgid "Add a resource description here..."
 msgstr "Bu yerga resurs tavsifini yozing..."
@@ -1377,16 +1301,10 @@ msgid "Add a specific appointment"
 msgstr "Aniq uchrashuv qo‘shish"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_details_column
 #, fuzzy
 msgid "Add an intro message here..."
 msgstr "Bu yerga kirish xabarini yozing..."
-
-#. module: appointment
-#: model:ir.model,name:appointment.model_appointment_manage_leaves
-#, fuzzy
-msgid "Add or remove leaves from appointments"
-msgstr "Uchrashuvlarga ta'tillar qo‘shish yoki olib tashlash"
 
 #. module: appointment
 #: model:res.groups,name:appointment.group_appointment_manager
@@ -1403,9 +1321,16 @@ msgstr "Barchasi"
 
 #. module: appointment
 #: model:ir.actions.act_window,name:appointment.calendar_event_action_report_all
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_form
 #, fuzzy
 msgid "All Appointments"
 msgstr "Barcha uchrashuvlar"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/xml/appointment_slots.xml:0
+msgid "All Day"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -1417,9 +1342,13 @@ msgstr "Kun bo‘yi"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "Allow"
-msgstr "Ruxsat berish"
+msgid "All resources"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "All users"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -1429,9 +1358,18 @@ msgstr "Bandlashlarga ruxsat berish"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__allow_guests
-#, fuzzy
-msgid "Allow invitations"
-msgstr "Takliflarga ruxsat berish"
+msgid "Allow guests"
+msgstr ""
+
+#. module: appointment
+#: model:ir.module.module,summary:base.module_appointment
+msgid "Allow people to book meetings in your agenda"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Allow up to"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__country_ids
@@ -1519,6 +1457,10 @@ msgstr "Istalgan foydalanuvchi"
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_type_id
 #: model:res.groups.privilege,name:appointment.res_groups_privilege_appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_question_view_search
+#: model_terms:ir.ui.view,arch_db:appointment.digest_digest_view_form
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_list_appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 #, fuzzy
 msgid "Appointment"
 msgstr "Uchrashuv"
@@ -1583,6 +1525,11 @@ msgid "Appointment Duration should be higher than 0.00."
 msgstr "Uchrashuv davomiyligi 0.00 dan yuqori bo‘lishi kerak."
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_fields_can_edit
+msgid "Appointment Fields Can Edit"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_invite_id
 #, fuzzy
 msgid "Appointment Invitation"
@@ -1607,6 +1554,7 @@ msgid "Appointment Meetings"
 msgstr "Uchrashuv yig‘ilishlari"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 #: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 #, fuzzy
 msgid "Appointment Name"
@@ -1625,6 +1573,18 @@ msgid "Appointment Questions"
 msgstr "Uchrashuv savollari"
 
 #. module: appointment
+#: model:ir.actions.act_window,name:appointment.rating_rating_action_appointment
+msgid "Appointment Ratings"
+msgstr ""
+
+#. module: appointment
+#: model:mail.message.subtype,description:appointment.mt_calendar_event_requested
+#: model:mail.message.subtype,name:appointment.mt_appointment_type_requested
+#: model:mail.message.subtype,name:appointment.mt_calendar_event_requested
+msgid "Appointment Requested"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model,name:appointment.model_appointment_resource
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__appointment_resource_id
 #, fuzzy
@@ -1632,13 +1592,8 @@ msgid "Appointment Resource"
 msgstr "Uchrashuv resursi"
 
 #. module: appointment
-#: model:ir.actions.server,name:appointment.resource_calendar_leaves_action_show_appointment_resources
-#, fuzzy
-msgid "Appointment Resource Leaves"
-msgstr "Uchrashuv resursi bandligi"
-
-#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_resource_ids
+#: model:ir.model.fields,field_description:appointment.field_rating_rating__appointment_resource_ids
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_resource_view_search
 #, fuzzy
 msgid "Appointment Resources"
@@ -1658,6 +1613,7 @@ msgstr ""
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_status
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search
 #, fuzzy
 msgid "Appointment Status"
 msgstr "Uchrashuv holati"
@@ -1675,10 +1631,19 @@ msgstr "Uchrashuv sarlavhasi"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_answer_input_view_search
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_tree
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_alarm_view_search
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_list_appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 #, fuzzy
 msgid "Appointment Type"
 msgstr "Uchrashuv turi"
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__appointment_type_domain
+msgid "Appointment Type Domain"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__appointment_type_ids
@@ -1709,6 +1674,11 @@ msgid "Appointment cancelled by: %(partners)s"
 msgstr "Uchrashuvni bekor qilgan: %(partners)s"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+msgid "Appointment failed!"
+msgstr ""
+
+#. module: appointment
 #. odoo-python
 #: code:addons/appointment/models/calendar_event.py:0
 #, fuzzy
@@ -1716,10 +1686,28 @@ msgid "Appointment re-booked"
 msgstr "Uchrashuv qayta band qilindi"
 
 #. module: appointment
-#: model:mail.template,name:appointment.appointment_booked_mail_template
-#, fuzzy
-msgid "Appointment: Appointment Booked"
-msgstr "Uchrashuv: Uchrashuv band qilindi"
+#. odoo-python
+#: code:addons/appointment/controllers/appointment.py:0
+msgid "Appointment rescheduled"
+msgstr ""
+
+#. module: appointment
+#. odoo-python
+#: code:addons/appointment/controllers/appointment.py:0
+msgid "Appointment rescheduled by: %(name)s"
+msgstr ""
+
+#. module: appointment
+#: model:mail.template,subject:appointment.appointment_booking_mail_template
+msgid ""
+"Appointment {{ 'Booked' if object.appointment_status == 'booked' else "
+"'Reserved' }}: {{ object.appointment_type_id.name }}"
+msgstr ""
+
+#. module: appointment
+#: model:mail.template,name:appointment.appointment_booking_mail_template
+msgid "Appointment: Appointment Booking"
+msgstr ""
 
 #. module: appointment
 #: model:mail.template,name:appointment.appointment_canceled_mail_template
@@ -1734,6 +1722,16 @@ msgid "Appointment: Attendee Invitation"
 msgstr "Uchrashuv: Ishtirokchi taklifi"
 
 #. module: appointment
+#: model:mail.template,name:appointment.appointment_feedback_mail_template
+msgid "Appointment: Feedback Request"
+msgstr ""
+
+#. module: appointment
+#: model:ir.actions.server,name:appointment.ir_cron_appointment_send_feedback_emails_ir_actions_server
+msgid "Appointment: Send Feedback Emails"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model,name:appointment.model_appointment_slot
 #, fuzzy
 msgid "Appointment: Time Slot"
@@ -1744,15 +1742,20 @@ msgstr "Uchrashuv: Vaqt oralig‘i"
 #: code:addons/appointment/controllers/appointment.py:0
 #: model:ir.actions.act_window,name:appointment.appointment_type_action
 #: model:ir.actions.act_window,name:appointment.calendar_event_action_appointment_reporting
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__appointment_type_ids
+#: model:ir.model.fields,field_description:appointment.field_calendar_alarm__appointment_type_ids
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_leave__leave_type__appointments
+#: model:ir.module.module,shortdesc:base.module_appointment
 #: model:ir.ui.menu,name:appointment.appointment_menu_calendar
 #: model:ir.ui.menu,name:appointment.appointment_type_menu
 #: model:ir.ui.menu,name:appointment.main_menu_appointments
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+#: model:portal.entry,name:appointment.portal_appointment_entry
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_tree
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_search
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_graph
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_pivot
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search
 #: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
-#: model_terms:ir.ui.view,arch_db:appointment.portal_my_home_appointment
 #: model_terms:ir.ui.view,arch_db:appointment.portal_my_home_menu_appointment
 #, fuzzy
 msgid "Appointments"
@@ -1784,6 +1787,11 @@ msgid "Ask the right questions, get the right answers"
 msgstr "To‘g‘ri savollar bering, to‘g‘ri javoblar oling"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__assignment_method
+msgid "Assign"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__is_auto_assign
 #, fuzzy
 msgid "Assign automatically"
@@ -1797,14 +1805,9 @@ msgid "Assign to"
 msgstr "Tayinlash"
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_appointment_type__assignment_method
-#, fuzzy
-msgid "Assignment"
-msgstr "Topshiriq"
-
-#. module: appointment
 #. odoo-python
 #: code:addons/appointment/models/appointment_slot.py:0
+#: code:addons/appointment/models/appointment_type.py:0
 #, fuzzy
 msgid ""
 "At least one slot duration is shorter than the meeting duration (%s hours)"
@@ -1854,7 +1857,6 @@ msgstr ""
 "hisoblanadi"
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_ids
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #, fuzzy
 msgid "Availabilities"
@@ -1874,6 +1876,7 @@ msgstr "Mavjud"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__appointment_type_ids
+#: model:ir.model.fields,field_description:appointment.field_res_users__appointment_type_ids
 #, fuzzy
 msgid "Available in"
 msgstr "Mavjud"
@@ -1909,17 +1912,34 @@ msgid "Avatar 512"
 msgstr "Avatar 512"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_avg
+msgid "Average Rating"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_avg_percentage
+msgid "Average Rating (%)"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields,help:appointment.field_appointment_type__slot_interval_capacity
+msgid ""
+"Avoid congestion by setting a maximum capacity that can be booked on any "
+"time slot computed from availabilities.\n"
+"        Any booking starting between the beginning of a slot and the next "
+"will count towards that limit. Set to 0 to disable."
+msgstr ""
+
+#. module: appointment
+#: model_terms:web_tour.tour,rainbow_man_message:appointment.appointment_tour
+msgid "Awesome! Your first appointment is on the schedule!"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__image_1920
 #, fuzzy
 msgid "Background Image"
 msgstr "Fon rasmi"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/fields/badge_selection_icon_mapping_field.js:0
-#, fuzzy
-msgid "Badges with Icon for Selection Field"
-msgstr "Tanlash maydoni uchun belgili nishonlar"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__base_book_url
@@ -1931,6 +1951,7 @@ msgstr "Asosiy havola URL manzili"
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__schedule_based_on
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__schedule_based_on
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_type_schedule_based_on
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_list_item
 #, fuzzy
 msgid "Book"
 msgstr "Band qilish"
@@ -1943,8 +1964,20 @@ msgid "Book a Resource"
 msgstr "Resursni band qilish"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/form/calendar_event_form_controller.js:0
+msgid "Book regardless"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_list_item
+msgid "Book {{0}}"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
 #: model:ir.model.fields.selection,name:appointment.selection__calendar_event__appointment_status__booked
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_progress_bar
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search_booking
 #, fuzzy
@@ -1953,6 +1986,7 @@ msgstr "Band qilingan"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__calendar_event_ids
+#: model:ir.model.fields,field_description:appointment.field_digest_digest__kpi_nbr_of_online_appointment
 #, fuzzy
 msgid "Booked Appointments"
 msgstr "Band qilingan uchrashuvlar"
@@ -1964,10 +1998,26 @@ msgid "Booked Capacity"
 msgstr "Band qilingan sig‘im"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
+msgid "Booked User"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_tree_booking
 #, fuzzy
 msgid "Booked by"
 msgstr "Band qilgan"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
+msgid "Booked resource"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_list_appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
+msgid "Booker"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__calendar_event_id
@@ -1994,27 +2044,26 @@ msgid "Booking Lines"
 msgstr "Bandlov qatorlari"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Booking Pages"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__event_start
 #, fuzzy
 msgid "Booking Start"
 msgstr "Bandlov boshlanishi"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_details
-#, fuzzy
-msgid "Booking details"
-msgstr "Bandlov tafsilotlari"
-
-#. module: appointment
 #. odoo-python
 #: code:addons/appointment/models/appointment_booking_line.py:0
-#, fuzzy
-msgid "Booking line must have a user or resource set."
-msgstr "Bandlov qatorida foydalanuvchi yoki resurs belgilangan bo‘lishi shart."
+msgid "Booking line must have a user set."
+msgstr ""
 
 #. module: appointment
 #: model:ir.ui.menu,name:appointment.menu_appointment_reporting_bookings
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 #, fuzzy
 msgid "Bookings"
@@ -2038,6 +2087,12 @@ msgid "By visitor"
 msgstr "Tashrif buyuruvchi bo‘yicha"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.js:0
+msgid "Bye-bye, record!"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model,name:appointment.model_calendar_attendee
 #, fuzzy
 msgid "Calendar Attendee Information"
@@ -2049,6 +2104,16 @@ msgstr "Taqvim ishtirokchilari haqida ma'lumot"
 #, fuzzy
 msgid "Calendar Event"
 msgstr "Taqvim tadbirlari"
+
+#. module: appointment
+#: model:ir.model,name:appointment.model_calendar_event_archive_or_unlink_wizard
+msgid "Calendar Event Archive Or Unlink Wizard"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model,name:appointment.model_calendar_event_multi_archive_or_unlink_wizard
+msgid "Calendar Event Multi Archive Or Unlink Wizard"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__anytime
@@ -2063,8 +2128,7 @@ msgid "Calendar Links"
 msgstr "Taqvim havolalari"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_manage_leaves_view_form
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
 #, fuzzy
 msgid "Cancel"
@@ -2075,12 +2139,6 @@ msgstr "Bekor qilish"
 #, fuzzy
 msgid "Cancel Before (hours)"
 msgstr "Oldindan bekor qilish (soat)"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "Cancel your appointment"
-msgstr "Uchrashuvni bekor qilish"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -2101,6 +2159,13 @@ msgstr "Bekor qilish xabarnomasi"
 #, fuzzy
 msgid "Cancelled"
 msgstr "Bekor qilindi"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid ""
+"Cancelled. <i class=\"oi text-danger d-none d-sm-inline me-3\" data-"
+"icon=\"close\"/>"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__capacity
@@ -2155,6 +2220,12 @@ msgid "Category"
 msgstr "Turkum"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
+msgid "Check In"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
 #, fuzzy
 msgid "Check in"
@@ -2192,10 +2263,32 @@ msgid "Choose an appointment preset"
 msgstr "Uchrashuv andozasini tanlang"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointments_list_layout
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_form
+msgid "Choose resources"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_form
+msgid "Choose users"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointments_selection
 #, fuzzy
 msgid "Choose your appointment"
 msgstr "Uchrashuvingizni tanlang"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Click Save!"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Click anywhere to create a meeting yourself."
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -2206,11 +2299,51 @@ msgstr "Bu yerga bosing"
 
 #. module: appointment
 #. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid ""
+"Click on the appointment in your schedule to get an overview of its details."
+msgstr ""
+
+#. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/appointment_type.py:0
+msgid "Cloning recurrent slots is not implemented."
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_template_picker_dialog/appointment_template_picker_dialog.xml:0
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 #, fuzzy
 msgid "Close"
 msgstr "Yopish"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Close the appointment overview to continue."
+msgstr ""
+
+#. module: appointment
+#: model:ir.actions.act_window,name:appointment.appointment_leave_action
+#: model:ir.ui.menu,name:appointment.menu_appointment_leave
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_form
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_list
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_search
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Closing Days"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model,name:appointment.model_appointment_leave
+msgid "Closing days for appointments and their users / resources"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
+msgid "Comment"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -2237,13 +2370,20 @@ msgid "Configuration"
 msgstr "Sozlamalar"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
 #, fuzzy
 msgid "Configure"
 msgstr "Sozlash"
+
+#. module: appointment
+#: model:ir.actions.act_window,name:appointment.appointment_edit_slots_action
+msgid "Configure Appointment"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Configure Resources"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.appointment_invite_action
@@ -2259,7 +2399,11 @@ msgstr ""
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/xml/appointment_resources.xml:0
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Configure this appointment"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
 #, fuzzy
 msgid "Confirm"
@@ -2290,17 +2434,22 @@ msgid "Confirmed"
 msgstr "Tasdiqlandi"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid ""
+"Confirmed! <i class=\"oi oi-filled text-success d-none d-sm-inline me-3\" "
+"data-icon=\"check_circle\"/>"
+msgstr ""
+
+#. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_sync_button/appointment_sync_button.xml:0
-#, fuzzy
 msgid "Connect"
-msgstr "Bog‘lash"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__connectors_displayed
-#, fuzzy
 msgid "Connectors Displayed"
-msgstr "Ko‘rsatilgan ulagichlar"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_res_partner
@@ -2316,22 +2465,18 @@ msgid "Contact Details"
 msgstr "Aloqa ma'lumotlari"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointments_list_layout
-#, fuzzy
-msgid "Continue <span class=\"oi oi-arrow-right\"/>"
-msgstr "Davom etish <span class=\"oi oi-arrow-right\"/>"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+msgid "Continue"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
-#, fuzzy
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
 msgid "Copied!"
-msgstr "Nusxalandi!"
+msgstr ""
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/components/appointment_booking_action_helper/appointment_booking_action_helper.xml:0
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_tree
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 #, fuzzy
 msgid "Copy Link"
@@ -2340,22 +2485,48 @@ msgstr "Havolani nusxalash"
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_invite/appointment_invite_copy_close.xml:0
-#, fuzzy
 msgid "Copy Link & Close"
-msgstr "Havolani nusxalash va yopish"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "Copy Meeting link"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/components/appointment_booking_action_helper/appointment_booking_action_helper.xml:0
-#, fuzzy
-msgid "Create Booking"
-msgstr "Buyurtma yaratish"
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Copy invite url to clipboard"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_manage_leaves_view_form
-#, fuzzy
-msgid "Create Closing Day(s)"
-msgstr "Yopiq kun(lar) belgilash"
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Copy the link to your clipboard."
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Create"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.js:0
+msgid "Create \"%s\""
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.js:0
+msgid "Create New"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Create Slots"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model,website_form_label:appointment.model_res_partner
@@ -2366,9 +2537,8 @@ msgstr "Mijoz qo‘shish"
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_type_action_helper/appointment_type_action_helper.xml:0
-#, fuzzy
-msgid "Create a Schedule from scratch or use one of our templates:"
-msgstr "Jadvalni noldan yarating yoki bizning andozalarimizdan foydalaning:"
+msgid "Create a Schedule from scratch or use one of our templates"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
@@ -2385,6 +2555,11 @@ msgstr "Ulashish havolasini yaratish"
 #, fuzzy
 msgid "Create an Appointment Resource"
 msgstr "Uchrashuv resursi qo‘shish"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "Create every"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.appointment_question_action
@@ -2406,7 +2581,7 @@ msgstr "Har safar vaqt oralig‘i yaratish"
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__create_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__create_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__create_uid
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__create_uid
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__create_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__create_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__create_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__create_uid
@@ -2420,7 +2595,7 @@ msgstr "Yaratuvchi"
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__create_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__create_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__create_date
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__create_date
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__create_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__create_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__create_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__create_date
@@ -2430,42 +2605,28 @@ msgid "Created on"
 msgstr "Yaratilgan sana"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#, fuzzy
-msgid "Custom Link"
-msgstr "Maxsus havola"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+msgid "Current reservation:"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__partner_id
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_answer_input_view_search
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_form_appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 #, fuzzy
 msgid "Customer"
 msgstr "Mijoz"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
-#, fuzzy
-msgid ""
-"DROP BUILDING BLOCKS HERE TO MAKE THEM AVAILABLE ACROSS ALL APPOINTMENTS"
-msgstr ""
-"BARCHA UCHRASHUV TURLARIDA MAVJUD BO‘LISHI UCHUN QURILISH BLOKLARINI SHU "
-"YERGA JOYLANG"
-
-#. module: appointment
 #. odoo-python
 #: code:addons/appointment/controllers/portal.py:0
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__select_first__date
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 #: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 #, fuzzy
 msgid "Date"
 msgstr "Sana"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_progress_bar
-#, fuzzy
-msgid "Date &amp; time"
-msgstr "Sana va vaqt"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__punctual
@@ -2475,10 +2636,22 @@ msgid "Date-limited"
 msgstr "Muddati cheklangan"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_manage_leaves_view_form
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_form
 #, fuzzy
 msgid "Dates"
 msgstr "Sanalar"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Decide how long the meeting should last."
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+#, fuzzy
+msgid "Decline"
+msgstr "Rad etilgan"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -2527,13 +2700,26 @@ msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__event_videocall_source
-#, fuzzy
 msgid ""
 "Defines the type of video call link that will be used for the generated "
-"events. Keep it empty to prevent generating meeting url."
+"events.\n"
+"\n"
+"            Can be one of:\n"
+"                - Odoo Discuss: Generates an internal Odoo Discuss meeting "
+"link.\n"
+"                - Google Meet: Generates a Google Meet link. Requires Google "
+"Calendar synchronization to be configured and active. If the staff user did "
+"not synchronize their calendar, no Google Meet link will be added to their "
+"meetings.\n"
+"\n"
+"            Keep it empty to prevent generating meeting url."
 msgstr ""
-"Yaratilgan tadbirlar uchun ishlatiladigan video qo‘ng‘iroq havolasi turini "
-"belgilaydi. Uchrashuv URL manzilini yaratmaslik uchun bo‘sh qoldiring."
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.js:0
+msgid "Delete"
+msgstr ""
 
 #. module: appointment
 #: model:appointment.type,name:appointment.appointment_type_dental_care
@@ -2549,8 +2735,9 @@ msgid "Describe what you need"
 msgstr "Nima kerakligini tavsiflang"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__description
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_resource_view_form
 #, fuzzy
 msgid "Description"
@@ -2563,16 +2750,6 @@ msgid "Destination combination"
 msgstr "Manzil kombinatsiyasi"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_progress_bar
-#, fuzzy
-msgid ""
-"Details<span class=\"d-inline-block mx-sm-3 fa fa-angle-right text-muted "
-"fs-5\"/>"
-msgstr ""
-"Tafsilotlar<span class=\"d-inline-block mx-sm-3 fa fa-angle-right text-muted "
-"fs-5\"/>"
-
-#. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_slot__allday
 #, fuzzy
 msgid ""
@@ -2582,10 +2759,12 @@ msgstr ""
 "oralig‘i turi uchun ishlatiladi"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form_insert_link
+#: model:ir.model,name:appointment.model_digest_digest
+msgid "Digest"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 #, fuzzy
 msgid "Discard"
@@ -2596,7 +2775,7 @@ msgstr "Bekor qilish"
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__display_name
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__display_name
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__display_name
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__display_name
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__display_name
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__display_name
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__display_name
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__display_name
@@ -2604,9 +2783,14 @@ msgstr "Bekor qilish"
 #: model:ir.model.fields,field_description:appointment.field_calendar_alarm__display_name
 #: model:ir.model.fields,field_description:appointment.field_calendar_attendee__display_name
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__display_name
+#: model:ir.model.fields,field_description:appointment.field_calendar_event_archive_or_unlink_wizard__display_name
+#: model:ir.model.fields,field_description:appointment.field_calendar_event_multi_archive_or_unlink_wizard__display_name
+#: model:ir.model.fields,field_description:appointment.field_digest_digest__display_name
 #: model:ir.model.fields,field_description:appointment.field_ir_http__display_name
 #: model:ir.model.fields,field_description:appointment.field_ir_ui_view__display_name
+#: model:ir.model.fields,field_description:appointment.field_rating_rating__display_name
 #: model:ir.model.fields,field_description:appointment.field_res_partner__display_name
+#: model:ir.model.fields,field_description:appointment.field_res_users__display_name
 #, fuzzy
 msgid "Display Name"
 msgstr "Ko‘rsatiladigan nom"
@@ -2651,6 +2835,16 @@ msgid "Does not combine"
 msgstr "Boshqalar bilan birlashmaydi"
 
 #. module: appointment
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category_slot_scheduling__flexible
+msgid "Does not repeat"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+msgid "Drag blocks here to add them on all appointments"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_question__question_type__select
 #, fuzzy
 msgid "Dropdown (one answer)"
@@ -2659,9 +2853,26 @@ msgstr "Ochiluvchi ro‘yxat (bitta javob)"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__duration
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__appointment_duration
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 #, fuzzy
 msgid "Duration"
 msgstr "Davomiyligi"
+
+#. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/appointment_leave.py:0
+msgid ""
+"Each selected appointment type must include at least one of the specified "
+"resources."
+msgstr ""
+
+#. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/appointment_leave.py:0
+msgid ""
+"Each selected appointment type must include at least one of the specified "
+"users."
+msgstr ""
 
 #. module: appointment
 #: model_terms:appointment.type,message_intro:appointment.appointment_type_tennis_court
@@ -2670,6 +2881,24 @@ msgid "Easily reserve tennis courts for your next match, anytime and anywhere."
 msgstr ""
 "Tennis kortlarini keyingi o‘yiningiz uchun istalgan vaqtda va joyda osonlik "
 "bilan band qiling."
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
+msgid "Edit"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Edit Appointment"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Edit Slots"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
@@ -2684,7 +2913,24 @@ msgid "Emails & SMS"
 msgstr "Elektron pochta va SMS xabarlar"
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__leave_end_dt
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Enable Slot Creation"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Enable Slot Deletion"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "End"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__date_to
 #, fuzzy
 msgid "End Date"
 msgstr "Tugash sanasi"
@@ -2708,10 +2954,16 @@ msgid "Ending Hour"
 msgstr "Tugash soati"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid ""
+"Enter the name of someone you would like to invite to your first meeting."
+msgstr ""
+
+#. module: appointment
 #: model:ir.model,name:appointment.model_calendar_alarm
-#, fuzzy
 msgid "Event Alarm"
-msgstr "Hodisa ogohlantiruvchisi"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -2726,12 +2978,6 @@ msgid "Extra Comment"
 msgstr "Qo‘shimcha izoh"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_custom_share
-#, fuzzy
-msgid "Extra Message on Confirmation"
-msgstr "Tasdiqlashda qo‘shimcha xabar"
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_question_view_form
 #, fuzzy
 msgid "Extra comments..."
@@ -2744,10 +2990,9 @@ msgid "Extra information provided once the appointment is booked."
 msgstr "Uchrashuv belgilangandan so‘ng taqdim etiladigan qo‘shimcha ma'lumot."
 
 #. module: appointment
-#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category_slot_scheduling__flexible
-#, fuzzy
-msgid "Flexible"
-msgstr "Moslashuvchan"
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__feedback_mail_template_id
+msgid "Feedback Email"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__custom
@@ -2757,7 +3002,13 @@ msgid "Flexible Schedule"
 msgstr "Moslashuvchan jadval"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.portal_my_home_appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Focus on today to see your new meeting."
+msgstr ""
+
+#. module: appointment
+#: model:portal.entry,description:appointment.portal_appointment_entry
 #, fuzzy
 msgid "Follow, reschedule or cancel your appointments"
 msgstr ""
@@ -2774,18 +3025,6 @@ msgstr "Obunachilar"
 #, fuzzy
 msgid "Followers (Partners)"
 msgstr "Obunachilar (Hamkorlar)"
-
-#. module: appointment
-#: model:ir.model.fields,help:appointment.field_appointment_type__activity_type_icon
-#, fuzzy
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font Awesome belgisi, masalan fa-tasks"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
-#, fuzzy
-msgid "For"
-msgstr "Uchun"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_slot__weekday__5
@@ -2807,13 +3046,6 @@ msgid "Full name*"
 msgstr "To‘liq ism*"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#, fuzzy
-msgid "Get Share Link"
-msgstr "Ulashish havolasini olish"
-
-#. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_invite__suggested_staff_user_ids
 #, fuzzy
 msgid ""
@@ -2824,10 +3056,38 @@ msgstr ""
 "mumkin bo‘lgan foydalanuvchilarga domen qo‘llang"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Give your meeting a title."
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/form/calendar_event_form_controller.js:0
+msgid "Go back"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Go back to the Appointments home screen."
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Go back to the previous screen."
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "Google Agenda"
-msgstr "Google taqvimi"
+msgid "Google Calendar"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Group Bookings"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -2838,7 +3098,10 @@ msgstr ""
 "Mehmonlar foydalanishi unumdorlik sababli 10 ta mijoz bilan cheklangan."
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 #, fuzzy
 msgid "Guests"
 msgstr "Mehmonlar"
@@ -2848,6 +3111,16 @@ msgstr "Mehmonlar"
 #, fuzzy
 msgid "HTTP Routing"
 msgstr "HTTP yo‘naltirish"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Happy"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__has_appointment_type_tz_mismatch
+msgid "Has Appointment Type Tz Mismatch"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__has_message
@@ -2878,11 +3151,16 @@ msgstr ""
 "foydalanuvchilar va resurslar qanday tayinlanishi."
 
 #. module: appointment
+#: model:mail.template,subject:appointment.appointment_feedback_mail_template
+msgid "How was your experience? ({{ object.name }})"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer__id
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__id
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__id
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__id
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__id
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__id
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__id
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__id
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__id
@@ -2890,9 +3168,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:appointment.field_calendar_alarm__id
 #: model:ir.model.fields,field_description:appointment.field_calendar_attendee__id
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__id
+#: model:ir.model.fields,field_description:appointment.field_calendar_event_archive_or_unlink_wizard__id
+#: model:ir.model.fields,field_description:appointment.field_calendar_event_multi_archive_or_unlink_wizard__id
+#: model:ir.model.fields,field_description:appointment.field_digest_digest__id
 #: model:ir.model.fields,field_description:appointment.field_ir_http__id
 #: model:ir.model.fields,field_description:appointment.field_ir_ui_view__id
+#: model:ir.model.fields,field_description:appointment.field_rating_rating__id
 #: model:ir.model.fields,field_description:appointment.field_res_partner__id
+#: model:ir.model.fields,field_description:appointment.field_res_users__id
 #, fuzzy
 msgid "ID"
 msgstr "ID"
@@ -2927,6 +3210,11 @@ msgstr "Agar belgilansa, yangi xabarlar e'tiboringizni talab qiladi."
 #, fuzzy
 msgid "If checked, some messages have a delivery error."
 msgstr "Agar belgilansa, ba'zi xabarlarda yetkazib berish xatosi bor."
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "If empty, Odoo will not ask feedback"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -2982,6 +3270,13 @@ msgid ""
 "cancelled."
 msgstr ""
 "Agar belgilansa, uchrashuv bekor qilinganida mijozga elektron xat yuboriladi."
+
+#. module: appointment
+#: model:ir.model.fields,help:appointment.field_appointment_type__feedback_mail_template_id
+msgid ""
+"If set, an email will be sent to the customer after the appointment to "
+"request some feedback."
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_resource__active
@@ -3064,7 +3359,6 @@ msgstr "Bir xil havolalar yaratilishining oldini olish uchun interfeys maydoni"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__message_intro
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_custom_share
 #, fuzzy
 msgid "Introduction Message"
 msgstr "Kirish xabari"
@@ -3128,9 +3422,8 @@ msgstr "Qayta foydalanish mumkin"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "Join using"
-msgstr "Qo‘shilish usuli"
+msgid "Join your online appointment"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__country_ids
@@ -3144,11 +3437,16 @@ msgstr ""
 "ruxsat beriladi"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_digest_digest__kpi_nbr_of_online_appointment_value
+msgid "Kpi Nbr Of Online Appointment Value"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer__write_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__write_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__write_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__write_uid
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__write_uid
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__write_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__write_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__write_uid
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__write_uid
@@ -3162,7 +3460,7 @@ msgstr "Oxirgi yangilovchi"
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__write_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__write_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__write_date
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__write_date
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__write_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__write_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__write_date
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__write_date
@@ -3170,6 +3468,16 @@ msgstr "Oxirgi yangilovchi"
 #, fuzzy
 msgid "Last Updated on"
 msgstr "Oxirgi yangilangan sana"
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__leave_type
+msgid "Leave Type"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__appointment_leave_ids
+msgid "Leaves"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__allow_guests
@@ -3202,6 +3510,18 @@ msgid "Let others book a meeting in your calendar"
 msgstr "Boshqalarga taqvimingizda uchrashuv belgilashga ruxsat bering"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Let's start by opening the <b>Appointments</b> app."
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Let's start with a simple way to let people <b>book time with you.</b>"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
 #, fuzzy
 msgid "Link"
@@ -3227,25 +3547,12 @@ msgid "Link URL"
 msgstr "Havola URL manzili"
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_appointment_invite__book_url_params
-#, fuzzy
-msgid "Link URL params"
-msgstr "Havola URL parametrlari"
-
-#. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_invite/appointment_invite_copy_close.js:0
-#: code:addons/appointment/static/src/components/appointment_quick_share_button/appointment_quick_share_button.js:0
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
 #, fuzzy
 msgid "Link copied to clipboard!"
 msgstr "Havola vaqtinchalik xotiraga nusxalandi!"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#, fuzzy
-msgid "Link copied to your clipboard!"
-msgstr "Havola vaqtinchalik xotirangizga nusxalandi!"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__linked_resource_ids
@@ -3262,7 +3569,10 @@ msgstr ""
 "ro‘yxati"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__location_id
+#: model:ir.model.fields,field_description:appointment.field_calendar_event__location
 #, fuzzy
 msgid "Location"
 msgstr "Joylashuv"
@@ -3278,13 +3588,6 @@ msgstr "Formatlangan joylashuv"
 #, fuzzy
 msgid "Location formatted for one line uses"
 msgstr "Bir qatorlik foydalanish uchun formatlangan joylashuv"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/xml/appointment_resources.xml:0
-#, fuzzy
-msgid "Make your choice"
-msgstr "Tanlovingizni amalga oshiring"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__manage_capacity
@@ -3305,6 +3608,15 @@ msgstr ""
 "(masalan, 6 kishilik stol, ...)"
 
 #. module: appointment
+#: model:ir.model.fields,help:appointment.field_appointment_type__responsible_id
+msgid ""
+"Manager of this Appointment Type. Can edit schedule, assigned resources or "
+"users, and other settings.\n"
+"             In the case of resource appointments, they will be notified on "
+"new bookings."
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #, fuzzy
 msgid "Mandatory"
@@ -3315,6 +3627,16 @@ msgstr "Majburiy"
 #, fuzzy
 msgid "Mandatory Answer"
 msgstr "Majburiy javob"
+
+#. module: appointment
+#: model:ir.model.fields,help:appointment.field_appointment_type__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_interval_capacity
+msgid "Max slot capacity"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_invite__resources_choice__current_user
@@ -3336,12 +3658,6 @@ msgid "Meeting Subject"
 msgstr "Uchrashuv mavzusi"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_details
-#, fuzzy
-msgid "Meeting details"
-msgstr "Uchrashuv tafsilotlari"
-
-#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__videocall_redirection
 #, fuzzy
 msgid "Meeting redirection URL"
@@ -3353,12 +3669,6 @@ msgstr "Uchrashuvni qayta yo‘naltirish URL manzili"
 #, fuzzy
 msgid "Meeting with %(name)s"
 msgstr "%(name)s bilan uchrashuv"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
-#, fuzzy
-msgid "Meetings"
-msgstr "Uchrashuvlar"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__message_has_error
@@ -3373,10 +3683,23 @@ msgid "Messages"
 msgstr "Xabarlar"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/form/calendar_event_form_controller.js:0
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
+#: model:ir.model.fields,field_description:appointment.field_calendar_event__total_capacity_unassigned
+msgid "Missing Seats"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_slot__weekday__1
 #, fuzzy
 msgid "Monday"
 msgstr "Dushanba"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "More Options"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_question__question_type__text
@@ -3395,13 +3718,6 @@ msgstr "Faoliyatim muddati"
 #, fuzzy
 msgid "My Appointments"
 msgstr "Uchrashuvlarim"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#, fuzzy
-msgid "My Calendar"
-msgstr "Taqvimim"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
@@ -3431,10 +3747,23 @@ msgid "Need to reschedule?"
 msgstr "Qayta rejalashtirish kerakmi?"
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_calendar_alarm__default_for_new_appointment_type
-#, fuzzy
-msgid "New Appointments Default"
-msgstr "Yangi tayinlashlarning standart holati"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Neutral"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/gantt/gantt_controller.js:0
+msgid "New Booking"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
+#: code:addons/appointment/static/src/views/gantt/gantt_controller.js:0
+#: code:addons/appointment/static/src/views/list/list_controller.js:0
+msgid "New Closing Day"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__activity_calendar_event_id
@@ -3461,14 +3790,17 @@ msgid "Next Activity Type"
 msgstr "Keyingi faoliyat turi"
 
 #. module: appointment
+#: model:res.groups.privilege,placeholder:appointment.res_groups_privilege_appointment
+msgid "No"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.appointment_answer_input_action
 #, fuzzy
 msgid "No Answers yet!"
 msgstr "Hali javoblar yo‘q!"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/gantt/gantt_controller.xml:0
 #: model_terms:ir.actions.act_window,help:appointment.calendar_event_action_view_bookings_resources
 #: model_terms:ir.actions.act_window,help:appointment.calendar_event_action_view_bookings_users
 #, fuzzy
@@ -3477,10 +3809,9 @@ msgstr "Hech qanday uchrashuv yoki resurs topilmadi."
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/components/appointment_booking_action_helper/appointment_booking_action_helper.xml:0
-#, fuzzy
-msgid "No Bookings Found"
-msgstr "Hech qanday band qilish topilmadi"
+#: code:addons/appointment/static/src/xml/appointment_resources.xml:0
+msgid "No Preference"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.appointment_invite_action
@@ -3490,6 +3821,8 @@ msgid "No Shared Links yet!"
 msgstr "Hali ulashilgan havolalar yo‘q!"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
 #: model:ir.model.fields.selection,name:appointment.selection__calendar_event__appointment_status__no_show
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search_booking
 #, fuzzy
@@ -3510,16 +3843,27 @@ msgid "No data yet!"
 msgstr "Hozircha ma'lumotlar yo‘q!"
 
 #. module: appointment
+#: model_terms:ir.actions.act_window,help:appointment.rating_rating_action_appointment
+msgid "No ratings yet!"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
 #, fuzzy
 msgid "No show"
 msgstr "Kelmadi"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.js:0
+msgid "No, keep it"
+msgstr ""
+
+#. module: appointment
 #. odoo-python
 #: code:addons/appointment/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_custom_share
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 #, fuzzy
 msgid "None"
 msgstr "Yo‘q"
@@ -3529,14 +3873,6 @@ msgstr "Yo‘q"
 #, fuzzy
 msgid "Not Reusable"
 msgstr "Qayta foydalanib bo‘lmaydi"
-
-#. module: appointment
-#: model:ir.model.fields,help:appointment.field_calendar_event__alarm_ids
-#, fuzzy
-msgid "Notifications sent to all attendees to remind of the meeting."
-msgstr ""
-"Uchrashuvni eslatish uchun barcha ishtirokchilarga bildirishnomalar "
-"yuborildi."
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__message_needaction_counter
@@ -3563,14 +3899,7 @@ msgid "Number of messages with delivery error"
 msgstr "Yetkazib berishda xato bo‘lgan xabarlar soni"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
-#, fuzzy
-msgid "Number of people"
-msgstr "Odamlar soni"
-
-#. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__event_videocall_source__discuss
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 #, fuzzy
 msgid "Odoo Discuss"
 msgstr "Odoo muloqoti"
@@ -3588,8 +3917,13 @@ msgid "One Shot"
 msgstr "Bir martalik"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "Online"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_custom_share
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
 #, fuzzy
 msgid "Online Meeting"
 msgstr "Onlayn uchrashuv"
@@ -3631,6 +3965,11 @@ msgstr "Voy! Kengaytma \""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "Oops! This appointment cannot be rescheduled online.<br/>"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 #, fuzzy
 msgid "Oops! Your appointment is scheduled in less than"
 msgstr ""
@@ -3638,23 +3977,27 @@ msgstr ""
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
-#: code:addons/appointment/static/src/views/custom_appointment_form_dialog/custom_appointment_form_dialog.js:0
-#, fuzzy
-msgid "Open Appointment Type Form"
-msgstr "Uchrashuv turi shaklini ochish"
+#: code:addons/appointment/static/src/views/gantt/gantt_controller.js:0
+msgid "Open"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Open action menu."
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Open menu and select the Appointments."
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_resource_view_form
 #, fuzzy
 msgid "Opening Hours"
 msgstr "Ish vaqti"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_user
-#, fuzzy
-msgid "Operator"
-msgstr "Operator"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -3671,9 +4014,8 @@ msgstr "Tashkilotchi"
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
 msgid "Our first availability is"
-msgstr "Bizning birinchi bo‘sh vaqtimiz"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -3682,11 +4024,28 @@ msgid "Outlook"
 msgstr "Outlook"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "Party of"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+msgid "Party size"
+msgstr ""
+
+#. module: appointment
 #. odoo-python
 #: code:addons/appointment/controllers/portal.py:0
 #, fuzzy
 msgid "Past"
 msgstr "O‘tgan"
+
+#. module: appointment
+#: model:ir.model.fields,help:appointment.field_appointment_type__rating_percentage_satisfaction
+msgid "Percentage of happy ratings"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_booker_id
@@ -3707,11 +4066,21 @@ msgid "Phone number"
 msgstr "Telefon raqami"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "Pick Slots"
+msgstr ""
+
+#. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#, fuzzy
-msgid "Pick your availabilities"
-msgstr "Mavjud vaqtlarni tanlang"
+#: code:addons/appointment/static/src/xml/appointment_slots.xml:0
+msgid "Pick a Time"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
+msgid "Pick your availabilities."
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__placeholder
@@ -3766,23 +4135,37 @@ msgid "Questions"
 msgstr "Savollar"
 
 #. module: appointment
-#. odoo-python
-#: code:addons/appointment/controllers/appointment.py:0
-#, fuzzy
-msgid "Questions & Answers"
-msgstr "Savollar va javoblar"
-
-#. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_question__question_type__radio
 #, fuzzy
 msgid "Radio (one answer)"
 msgstr "Radio (bir javob)"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
+msgid "Rated User"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model,name:appointment.model_rating_rating
+msgid "Rating"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_percentage_satisfaction
+msgid "Rating Satisfaction"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__rating_ids
+#: model:ir.ui.menu,name:appointment.menu_appointment_reporting_ratings
 #, fuzzy
 msgid "Ratings"
 msgstr "Reytinglar"
+
+#. module: appointment
+#: model_terms:ir.actions.act_window,help:appointment.rating_rating_action_appointment
+msgid "Ratings given by bookers after their appointments will appear here."
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
@@ -3792,7 +4175,7 @@ msgid "Ready to make scheduling easy?"
 msgstr "Rejalashtirishni osonlashtirishga tayyormisiz?"
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__reason
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__leave_reason
 #, fuzzy
 msgid "Reason"
 msgstr "Sabab"
@@ -3811,11 +4194,32 @@ msgstr "Oddiy"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__reminder_ids
-#: model:ir.model.fields,field_description:appointment.field_calendar_event__alarm_ids
 #: model:ir.ui.menu,name:appointment.menu_appointment_reminders
 #, fuzzy
 msgid "Reminders"
 msgstr "Eslatmalar"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Remove"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Remove from list"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Repeat Slot"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category_slot_scheduling__weekly
+msgid "Repeats Weekly"
+msgstr ""
 
 #. module: appointment
 #: model:ir.ui.menu,name:appointment.menu_appointment_reporting
@@ -3838,7 +4242,33 @@ msgid "Requests"
 msgstr "So‘rovlar"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_calendar_event__require_appointment_feedback_mail
+msgid "Require feedback mail"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "Reschedule"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+msgid "Reschedule your appointment"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid ""
+"Reserved! <i class=\"oi oi-filled text-info d-none d-sm-inline me-3\" data-"
+"icon=\"thumb_up\"/>"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/xml/appointment_resources.xml:0
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__resource_id
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_search_appointment
 #, fuzzy
 msgid "Resource"
 msgstr "Resurs"
@@ -3858,20 +4288,24 @@ msgid "Resource Bookings"
 msgstr "Resurs bandlovlari"
 
 #. module: appointment
-#: model:ir.ui.menu,name:appointment.menu_appointment_resource_leaves
-#, fuzzy
-msgid "Resource Leaves"
-msgstr "Resurs ta'tillari"
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__resource_domain
+msgid "Resource Domain"
+msgstr ""
 
 #. module: appointment
 #: model:ir.actions.act_window,name:appointment.appointment_resource_action
 #: model:ir.actions.act_window,name:appointment.appointment_resource_action_stat
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__resource_ids
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__appointment_resource_ids
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__resource_ids
+#: model:ir.model.fields,field_description:appointment.field_appointment_slot__appointment_type_resource_ids
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__resource_ids
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__resource_ids
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_leave__leave_type__resources
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__schedule_based_on__resources
+#: model:ir.model.fields.selection,name:appointment.selection__rating_rating__appointment_schedule_based_on__resources
 #: model:ir.ui.menu,name:appointment.menu_appointment_resource
+#: model:ir.ui.menu,name:appointment.menu_appointment_schedule_resource_booking
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_search
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_tree
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
@@ -3880,12 +4314,6 @@ msgstr "Resurs ta'tillari"
 #, fuzzy
 msgid "Resources"
 msgstr "Resurslar"
-
-#. module: appointment
-#: model:ir.ui.menu,name:appointment.menu_appointment_schedule_resource_booking
-#, fuzzy
-msgid "Resources Bookings"
-msgstr "Resurslar bandlovi"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__resources_resource_choice
@@ -3902,6 +4330,7 @@ msgstr "Ta'til vaqti bilan to‘qnashuvchi resurslar"
 #. module: appointment
 #. odoo-python
 #: code:addons/appointment/controllers/portal.py:0
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__responsible_id
 #, fuzzy
 msgid "Responsible"
 msgstr "Mas'ul"
@@ -3963,17 +4392,9 @@ msgstr "Shanba"
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/views/custom_appointment_form_dialog/custom_appointment_form_dialog.xml:0
-#, fuzzy
-msgid "Save & Copy Link"
-msgstr "Saqlash va havolani nusxalash"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/custom_appointment_form_dialog/custom_appointment_form_dialog.xml:0
-#, fuzzy
-msgid "Save and Copy Link"
-msgstr "Saqlash va havolani nusxalash"
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Save Slots"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__category_slot_scheduling
@@ -3984,6 +4405,7 @@ msgstr "Jadvallash"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__schedule_based_on
+#: model:ir.model.fields,field_description:appointment.field_rating_rating__appointment_schedule_based_on
 #, fuzzy
 msgid "Schedule Based On"
 msgstr "Asosida jadvallash"
@@ -4062,12 +4484,6 @@ msgid "Select Appointments to share..."
 msgstr "Ulashish uchun uchrashuvlarni tanlang..."
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_manage_leaves_view_form
-#, fuzzy
-msgid "Select Resources"
-msgstr "Resurslarni tanlash"
-
-#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #, fuzzy
 msgid "Select Resources..."
@@ -4080,23 +4496,16 @@ msgid "Select Users..."
 msgstr "Foydalanuvchilarni tanlang..."
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
-#, fuzzy
-msgid "Select a date &amp; time"
-msgstr "Sana va vaqtni tanlang"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/xml/appointment_slots.xml:0
-#, fuzzy
-msgid "Select a time"
-msgstr "Vaqtni tanlang"
-
-#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__is_date_first
 #, fuzzy
 msgid "Select date and time first"
 msgstr "Avval sana va vaqtni tanlang"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid "Select this attendee."
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer_input__value_answer_id
@@ -4123,10 +4532,14 @@ msgid "Sent to all attendees when an appointment is cancelled"
 msgstr "Uchrashuv bekor qilinganda barcha qatnashchilarga yuboriladi"
 
 #. module: appointment
-#: model:mail.template,description:appointment.appointment_booked_mail_template
-#, fuzzy
-msgid "Sent to followers of an appointment type when a meeting is booked"
-msgstr "Uchrashuv belgilanganda uchrashuv turi kuzatuvchilariga yuboriladi"
+#: model:mail.template,description:appointment.appointment_feedback_mail_template
+msgid "Sent to booker to request feedback after their visit"
+msgstr ""
+
+#. module: appointment
+#: model:mail.template,description:appointment.appointment_booking_mail_template
+msgid "Sent to followers of an appointment type when a meeting is created"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer__sequence
@@ -4139,8 +4552,6 @@ msgstr "Ketma-ketlik"
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/components/appointment_quick_share_button/appointment_quick_share_button.xml:0
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
 #: code:addons/appointment/static/src/views/kanban/kanban_controller.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_tree
@@ -4157,42 +4568,28 @@ msgstr "Uchrashuvni ulashish"
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#, fuzzy
-msgid "Share Appointment Link"
-msgstr "Uchrashuv havolasini ulashish"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_custom_share
-#, fuzzy
-msgid "Share Availabilities"
-msgstr "Mavjud vaqtlarni ulashish"
-
-#. module: appointment
-#. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
 #, fuzzy
 msgid "Share Link"
 msgstr "Havolani ulashish"
 
 #. module: appointment
-#: model:ir.actions.act_window,name:appointment.appointment_invite_action
-#: model:ir.actions.act_window,name:appointment.appointment_invite_action_stat
-#, fuzzy
-msgid "Share Links"
-msgstr "Havolalarni ulashish"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "Share Time Slots"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
-#: code:addons/appointment/static/src/components/appointment_booking_action_helper/appointment_booking_action_helper.xml:0
-#, fuzzy
-msgid ""
-"Share this appointment type via link or schedule an appointment manually"
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+msgid "Share my calendar"
 msgstr ""
-"Ushbu uchrashuv turini havola orqali ulashing yoki uchrashuvni qo‘lda "
-"belgilang"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid ""
+"Share your booking link so anyone can <b>schedule a meeting with you.</b>"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__shareable
@@ -4201,6 +4598,8 @@ msgid "Shareable"
 msgstr "Ulashuvchan"
 
 #. module: appointment
+#: model:ir.actions.act_window,name:appointment.appointment_invite_action
+#: model:ir.actions.act_window,name:appointment.appointment_invite_action_stat
 #: model:ir.ui.menu,name:appointment.menu_appointment_invite
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #, fuzzy
@@ -4238,16 +4637,28 @@ msgid "Single line text"
 msgstr "Bir qatorli matn"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_duration
+msgid "Slot Duration"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_slot__slot_type
 #, fuzzy
 msgid "Slot type"
 msgstr "Vaqt oralig‘i turi"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__slot_ids
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #, fuzzy
 msgid "Slots"
 msgstr "Vaqt oralig‘i"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+msgid "Slots displayed in your timezone ("
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__message_intro
@@ -4265,37 +4676,34 @@ msgstr "Shaklda ba'zi zarur javoblar mavjud emas."
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
 msgid "Sorry,"
-msgstr "Uzr,"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
 msgid "Sorry, it is no longer possible to schedule an appointment."
-msgstr "Kechirasiz, endi uchrashuv belgilash imkoni yo‘q."
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
-msgid "Sorry, there is not any more availability for the asked capacity."
-msgstr "Kechirasiz, so‘ralgan sig‘im uchun boshqa bo‘sh vaqt yo‘q."
+msgid ""
+"Sorry, there is no more availability for the asked capacity. Please select "
+"another party size."
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
 msgid "Sorry, we have no availability for an appointment."
-msgstr "Kechirasiz, uchrashuv uchun bo‘sh vaqtimiz yo‘q."
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
 msgid "Sorry, we have no more slots available for this month."
-msgstr "Kechirasiz, bu oy uchun boshqa bo‘sh vaqt oralig‘imiz qolmadi."
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__source_resource_ids
@@ -4310,28 +4718,39 @@ msgid "Specific Resources"
 msgstr "Maxsus resurslar"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#, fuzzy
-msgid "Specific Slots"
-msgstr "Maxsus vaqt oralig‘i"
-
-#. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_invite__resources_choice__specific_resources
 #, fuzzy
 msgid "Specific Users"
 msgstr "Muayyan foydalanuvchilar"
 
 #. module: appointment
+#: model:ir.ui.menu,name:appointment.menu_appointment_schedule_staff_appointment
+msgid "Staff"
+msgstr ""
+
+#. module: appointment
 #: model:ir.actions.act_window,name:appointment.calendar_event_action_view_bookings_users
 #: model:ir.actions.server,name:appointment.calendar_event_action_all_users_appointments
-#: model:ir.ui.menu,name:appointment.menu_appointment_schedule_staff_appointment
 #, fuzzy
 msgid "Staff Bookings"
 msgstr "Xodimlar uchrashuvi"
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_appointment_manage_leaves__leave_start_dt
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
+#: model_terms:ir.ui.view,arch_db:appointment.rating_rating_view_list_appointment
+msgid "Staff Member"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "Start"
+msgstr ""
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__date_from
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_search
 #, fuzzy
 msgid "Start Date"
 msgstr "Boshlanish sanasi"
@@ -4424,6 +4843,11 @@ msgid "Submitted Answers"
 msgstr "Yuborilgan javoblar"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_details
+msgid "Summary"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_slot__weekday__7
 #, fuzzy
 msgid "Sunday"
@@ -4437,9 +4861,8 @@ msgstr "Alomatlar"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
 msgid "Synchronize your Calendar to avoid double-booking"
-msgstr "Ikki marta band qilmaslik uchun taqvimingizni sinxronlang"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -4501,13 +4924,10 @@ msgstr "Zaxiralangan sig‘im musbat bo‘lishi shart."
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_sync_button/appointment_sync_button.js:0
-#, fuzzy
 msgid ""
 "The configuration has changed and synchronization is not possible anymore. "
 "Please reload the page."
 msgstr ""
-"Konfiguratsiya o‘zgarganligi sababli sinxronlash endi mumkin emas. Iltimos, "
-"sahifani qayta yuklang."
 
 #. module: appointment
 #: model:ir.model.constraint,message:appointment.constraint_appointment_slot_check_start_and_end_hour
@@ -4592,6 +5012,23 @@ msgid "The resource should have at least one capacity."
 msgstr "Resurs kamida bitta sig‘imga ega bo‘lishi shart."
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+msgid ""
+"The selected timeslot is not available anymore.\n"
+"                                            Someone has booked the same time "
+"slot a few\n"
+"                                            seconds before you."
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+msgid ""
+"The selected timeslot is not available.\n"
+"                                            It appears you already have "
+"another meeting with us at that date."
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_resource__sequence
 #, fuzzy
 msgid ""
@@ -4614,12 +5051,11 @@ msgstr ""
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
 msgid "Their first availability is"
-msgstr "Ularning birinchi bo‘sh vaqti:"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointments_list_layout
+#: model_terms:ir.ui.view,arch_db:appointment.appointments_selection
 #, fuzzy
 msgid "There is currently no appointment available"
 msgstr "Hozirda hech qanday uchrashuv mavjud emas"
@@ -4702,6 +5138,11 @@ msgid "This is a preview of the customer appointment form."
 msgstr "Bu mijozlar uchun uchrashuv shakliga namuna"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointments_selection
+msgid "This is a preview of the customer appointment selection."
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_question_view_form
 #, fuzzy
 msgid "This question is used by"
@@ -4718,6 +5159,13 @@ msgstr "Bu uchrashuv shaklidagi savolning ostida ko‘rinadi"
 #, fuzzy
 msgid "Thursday"
 msgstr "Payshanba"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/side_panel/attendee_calendar_side_panel.xml:0
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Time Slots"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__tz
@@ -4759,10 +5207,22 @@ msgid "To make any changes, please contact us."
 msgstr "Har qanday o‘zgartirishlar uchun bizga murojaat qiling"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/interactions/appointment_select_appointment_slot.js:0
+msgid "Today"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__access_token
 #, fuzzy
 msgid "Token"
 msgstr "Token"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/interactions/appointment_select_appointment_slot.js:0
+msgid "Tomorrow"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__max_bookings
@@ -4807,6 +5267,7 @@ msgid "Tuesday"
 msgstr "Seshanba"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_search
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
 #, fuzzy
 msgid "Type"
@@ -4826,9 +5287,19 @@ msgstr "Noaniq"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Unhappy"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #, fuzzy
 msgid "Until (max)"
 msgstr "...gacha (maksimal)"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "Up to"
+msgstr ""
 
 #. module: appointment
 #. odoo-python
@@ -4852,10 +5323,12 @@ msgid "Update a Share Link"
 msgstr "Ulashish havolasini yangilash"
 
 #. module: appointment
-#: model:ir.model.fields,help:appointment.field_calendar_alarm__default_for_new_appointment_type
-#, fuzzy
-msgid "Use as default for new Appointment Types"
-msgstr "Yangi uchrashuv turlari uchun standart sifatida foydalanish"
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid ""
+"Use <b>Upcoming Meetings</b> to jump straight back into your schedule at the "
+"date of the next meeting."
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.calendar_event_action_appointment_reporting
@@ -4896,6 +5369,7 @@ msgstr ""
 "uchrashuv turini yaratadi va boshqa foydalanuvchiga ulashadi"
 
 #. module: appointment
+#: model:ir.model,name:appointment.model_res_users
 #: model:res.groups,name:appointment.group_appointment_user
 #, fuzzy
 msgid "User"
@@ -4908,15 +5382,31 @@ msgid "User / Resource"
 msgstr "Foydalanuvchi / Resurs"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__user_can_manage_slots
+msgid "User Can Manage Slots"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__user_capacity
 #, fuzzy
 msgid "User Capacity"
 msgstr "Foydalanuvchi sig‘imi"
 
 #. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__user_domain
+msgid "User Domain"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__staff_user_ids
+#: model:ir.model.fields,field_description:appointment.field_appointment_leave__user_ids
+#: model:ir.model.fields,field_description:appointment.field_appointment_slot__appointment_type_staff_user_ids
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__staff_user_ids
+#: model:ir.model.fields,field_description:appointment.field_calendar_event__appointment_type_staff_user_ids
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_leave__leave_type__users
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__schedule_based_on__users
+#: model:ir.model.fields.selection,name:appointment.selection__rating_rating__appointment_schedule_based_on__users
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_search
 #, fuzzy
 msgid "Users"
 msgstr "Foydalanuvchilar"
@@ -4929,6 +5419,12 @@ msgid "Video Call"
 msgstr "Video qo‘ng‘iroq"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
+msgid "Video Call URL"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__event_videocall_source
 #, fuzzy
 msgid "Video Link"
@@ -4937,6 +5433,14 @@ msgstr "Video havola"
 #. module: appointment
 #: model:ir.model,name:appointment.model_ir_ui_view
 msgid "View"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/js/tours/appointment_tour.js:0
+msgid ""
+"Want to create one yourself? <b>Open your schedule</b> to create an "
+"appointment."
 msgstr ""
 
 #. module: appointment
@@ -4952,18 +5456,6 @@ msgid "We will come back to you to confirm it."
 msgstr "Tasdiqlash uchun sizga qaytamiz"
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_appointment_type__website_message_ids
-#, fuzzy
-msgid "Website Messages"
-msgstr "Veb-sayt xabarlari"
-
-#. module: appointment
-#: model:ir.model.fields,help:appointment.field_appointment_type__website_message_ids
-#, fuzzy
-msgid "Website communication history"
-msgstr "Veb-sayt aloqa tarixi"
-
-#. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_slot__weekday__3
 #, fuzzy
 msgid "Wednesday"
@@ -4974,12 +5466,6 @@ msgstr "Chorshanba"
 #, fuzzy
 msgid "Week Day"
 msgstr "Hafta kuni"
-
-#. module: appointment
-#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category_slot_scheduling__weekly
-#, fuzzy
-msgid "Weekly"
-msgstr "Haftalik"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__recurring
@@ -5005,16 +5491,12 @@ msgstr ""
 "ko‘rinadi. Standart savollar uchun doim to‘g‘ri"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.staff_user_select
+#. odoo-javascript
+#: code:addons/appointment/static/src/xml/appointment_resources.xml:0
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 #, fuzzy
 msgid "With"
 msgstr "bilan"
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "Within availabilities,"
-msgstr "Mavjud vaqtlar doirasida,"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category_time_display__recurring_fields
@@ -5031,9 +5513,8 @@ msgstr "Ish vaqti"
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
 msgid "You already booked \""
-msgstr "Siz allaqachon \"... ni\" band qilgansiz"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
@@ -5044,23 +5525,50 @@ msgid "You cannot invite more than 10 people"
 msgstr "10 kishidan ortiq mehmon taklif qila olmaysiz"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_details_column
-#, fuzzy
-msgid "Your Appointment"
-msgstr "Uchrashuvingiz"
+#. odoo-python
+#: code:addons/appointment/models/appointment_leave.py:0
+msgid "You cannot set resources on a leave of type 'users'."
+msgstr ""
+
+#. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/appointment_leave.py:0
+msgid "You cannot set users on a leave of type 'resources'."
+msgstr ""
+
+#. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/appointment_leave.py:0
+msgid "You cannot set users or resources on a leave of type 'appointments'."
+msgstr ""
+
+#. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/appointment_leave.py:0
+msgid "You must specify at least one resource on a leave of type 'resources'."
+msgstr ""
+
+#. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/appointment_leave.py:0
+msgid "You must specify at least one user on a leave of type 'users'."
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "Your Details"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_sync_button/appointment_sync_button.js:0
-#, fuzzy
 msgid "Your calendar is already configured and was successfully synchronized."
-msgstr "Taqvimingiz allaqachon sozlangan va muvaffaqiyatli sinxronlashtirildi."
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_user
-#, fuzzy
-msgid "Your choice"
-msgstr "Sizning tanlovingiz"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
+msgid "Your details"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_question_view_form
@@ -5088,6 +5596,31 @@ msgstr "kamida"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "attendee(s) per slot"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "before start time"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "before the booking"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+msgid "bookings"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_quick_edit_slot
+msgid "days"
+msgstr ""
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #, fuzzy
 msgid "days,"
 msgstr "kun,"
@@ -5100,21 +5633,18 @@ msgstr "masalan, \"Yana nimani bilishimiz kerak?\""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_custom_share
 #, fuzzy
 msgid "e.g. \"During this meeting, we will...\""
 msgstr "masalan, \"Ushbu uchrashuv davomida biz...\""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_custom_share
 #, fuzzy
 msgid "e.g. \"Technical Demo\""
 msgstr "masalan, \"Texnik namoyish\""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form_custom_share
 #, fuzzy
 msgid "e.g. \"Thank you for your trust, we look forward to meeting you!\""
 msgstr ""
@@ -5128,7 +5658,7 @@ msgid "e.g. +1 555-555-5555"
 msgstr "masalan, +1 555-555-5555"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_manage_leaves_view_form
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_leave_view_form
 #, fuzzy
 msgid "e.g. Inventory count and valuation"
 msgstr "masalan, Tovar-moddiy boyliklarni hisobga olish va baholash"
@@ -5177,42 +5707,44 @@ msgid "e.g. john.smith@example.com"
 msgstr "masalan, john.smith@example.com"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_gantt_kanban_popover
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
 #, fuzzy
 msgid "guests"
 msgstr "mehmonlar"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
-msgid "has no availability for an appointment."
-msgstr "uchrashuv uchun bo‘sh vaqti yo‘q."
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
+msgid "guests per slot"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
-#, fuzzy
+msgid "has no availability for an appointment."
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/xml/appointment_no_slot.xml:0
 msgid "has no more slots available for this month."
-msgstr "bu oy uchun boshqa bo‘sh joylar mavjud emas."
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "hour(s) and cannot be cancelled at this time.<br/>"
-msgstr "soat va hozirda bekor qilib bo‘lmaydi.<br/>"
+msgid "hour(s) and cannot be rescheduled or cancelled at this time.<br/>"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "hour(s) before start time"
-msgstr "boshlanish vaqtidan soat oldin"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+msgid "meetings"
+msgstr ""
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "hour(s) before the booking"
-msgstr "band qilishdan soat oldin"
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/popover/popover.xml:0
+msgid "missing seats"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -5221,38 +5753,44 @@ msgid "of total capacity"
 msgstr "umumiy sig‘imdan"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_info
+msgid "on"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 #, fuzzy
 msgid "or"
 msgstr "yoki"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/kanban/kanban_header.xml:0
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_kanban
+msgid "p"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_details
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
 #, fuzzy
 msgid "people"
 msgstr "kishi"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
-msgid "seats max"
-msgstr "maksimal o‘rin"
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
+msgid "seats are not assigned to any resource or user."
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
-#, fuzzy
 msgid ""
-"simultaneous appointment(s) \n"
-"                                    per <span invisible=\"schedule_based_on !"
-"= 'users'\">user</span>\n"
-"                                    <span invisible=\"schedule_based_on != "
-"'resources'\">resource</span>"
+"simultaneous appointment(s) per\n"
+"                                <span class=\"ms-1\" "
+"invisible=\"schedule_based_on != 'users'\">user</span>\n"
+"                                <span class=\"ms-1\" "
+"invisible=\"schedule_based_on != 'resources'\">resource</span>"
 msgstr ""
-"bir vaqtning o‘zida <span invisible=\"schedule_based_on != "
-"'users'\">foydalanuvchi</span> <span invisible=\"schedule_based_on != "
-"'resources'\">resurs</span> uchun uchrashuv(lar)"
 
 #. module: appointment
 #. odoo-python
@@ -5269,17 +5807,10 @@ msgid "start"
 msgstr "boshlanish"
 
 #. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-#, fuzzy
-msgid "this link"
-msgstr "bu havola"
-
-#. module: appointment
 #. odoo-javascript
 #: code:addons/appointment/static/src/xml/appointment_slots.xml:0
-#, fuzzy
 msgid "to"
-msgstr "ga"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -5288,20 +5819,132 @@ msgid "up to"
 msgstr "gacha"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
+msgid "upcoming<br/>"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 #, fuzzy
 msgid "with"
 msgstr "bilan"
 
-#. module: appointment
-#: model:mail.template,subject:appointment.appointment_booked_mail_template
 #, fuzzy
-msgid ""
-"{{ 'Appointment Requested: ' if not "
-"object.appointment_type_id.is_always_confirm and object.appointment_status "
-"== 'request' else 'Appointment Booked: ' }}"
-"{{ object.appointment_type_id.name }}"
-msgstr ""
-"{{ 'Uchrashuv so‘rovi:' if not object.appointment_type_id.is_always_confirm "
-"and object.appointment_status == 'request' else 'Uchrashuv band qilindi:' }}"
-"{{ object.appointment_type_id.name }}"
+#~ msgid "'e.g. \"John Doe - Tennis Court Booking\""
+#~ msgstr "'masalan, \"Jon Doe - Tennis korti bandlovi\""
+
+#, fuzzy
+#~ msgid "Booking line must have a user or resource set."
+#~ msgstr ""
+#~ "Bandlov qatorida foydalanuvchi yoki resurs belgilangan bo‘lishi shart."
+
+#, fuzzy
+#~ msgid "Allow invitations"
+#~ msgstr "Takliflarga ruxsat berish"
+
+#, fuzzy
+#~ msgid ""
+#~ "<br/>\n"
+#~ "                                    <span class=\"fw-light\">Duration</"
+#~ "span>"
+#~ msgstr "<br/> <span class=\"fw-light\">Davomiyligi</span>"
+
+#, fuzzy
+#~ msgid ""
+#~ "<br/>\n"
+#~ "                                <span class=\"fw-light\">To Confirm</span>"
+#~ msgstr "<br/> <span class=\"fw-light\">Tasdiqlash kerak</span>"
+
+#, fuzzy
+#~ msgid ""
+#~ "<br/>\n"
+#~ "                                <span class=\"fw-light\">Total</span>"
+#~ msgstr "<br/> <span class=\"fw-light\">Jami</span>"
+
+#, fuzzy
+#~ msgid ""
+#~ "<br/>\n"
+#~ "                                <span class=\"fw-light\">Upcoming</span>"
+#~ msgstr "<br/> <span class=\"fw-light\">Yaqinlashayotgan</span>"
+
+#, fuzzy
+#~ msgid "<small>Add to Google Agenda</small>"
+#~ msgstr "<small>Google taqvimiga qo‘shish</small>"
+
+#, fuzzy
+#~ msgid "<small>Add to iCal/Outlook</small>"
+#~ msgstr "<small>iCal/Outlook'ga qo‘shish</small>"
+
+#, fuzzy
+#~ msgid "<span class=\"mx-1\">or</span>"
+#~ msgstr "<span class=\"mx-1\">yoki</span>"
+
+#, fuzzy
+#~ msgid "<span>Add more details about you</span>"
+#~ msgstr "<span>O‘zingiz haqingizda ko‘proq ma'lumot qo‘shing</span>"
+
+#, fuzzy
+#~ msgid "Add Closing Day(s)"
+#~ msgstr "Yopiq kun(lar) qo‘shish"
+
+#, fuzzy
+#~ msgid "Add or remove leaves from appointments"
+#~ msgstr "Uchrashuvlarga ta'tillar qo‘shish yoki olib tashlash"
+
+#, fuzzy
+#~ msgid "Appointment Resource Leaves"
+#~ msgstr "Uchrashuv resursi bandligi"
+
+#, fuzzy
+#~ msgid "Booking details"
+#~ msgstr "Bandlov tafsilotlari"
+
+#, fuzzy
+#~ msgid "Create Closing Day(s)"
+#~ msgstr "Yopiq kun(lar) belgilash"
+
+#, fuzzy
+#~ msgid "For"
+#~ msgstr "Uchun"
+
+#, fuzzy
+#~ msgid "Google Agenda"
+#~ msgstr "Google taqvimi"
+
+#, fuzzy
+#~ msgid "Make your choice"
+#~ msgstr "Tanlovingizni amalga oshiring"
+
+#, fuzzy
+#~ msgid "Meeting details"
+#~ msgstr "Uchrashuv tafsilotlari"
+
+#, fuzzy
+#~ msgid "Meetings"
+#~ msgstr "Uchrashuvlar"
+
+#, fuzzy
+#~ msgid "Questions & Answers"
+#~ msgstr "Savollar va javoblar"
+
+#, fuzzy
+#~ msgid "Resource Leaves"
+#~ msgstr "Resurs ta'tillari"
+
+#, fuzzy
+#~ msgid "Select Resources"
+#~ msgstr "Resurslarni tanlash"
+
+#, fuzzy
+#~ msgid "Website Messages"
+#~ msgstr "Veb-sayt xabarlari"
+
+#, fuzzy
+#~ msgid "Website communication history"
+#~ msgstr "Veb-sayt aloqa tarixi"
+
+#, fuzzy
+#~ msgid "Notifications sent to all attendees to remind of the meeting."
+#~ msgstr ""
+#~ "Uchrashuvni eslatish uchun barcha ishtirokchilarga bildirishnomalar "
+#~ "yuborildi."

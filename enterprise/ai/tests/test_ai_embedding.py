@@ -2,50 +2,129 @@
 
 from unittest.mock import patch
 
-from odoo.tests import TransactionCase, tagged
+from odoo.tests import tagged
+
+from odoo.addons.ai.tests.common import TestAICommon
 
 
 @tagged("post_install", "-at_install")
-class TestAIEmbeddingBatching(TransactionCase):
-    def _create_embedding(self, content):
+class TestAIEmbedding(TestAICommon):
+    def test_embedding_generation_from_new_source(self):
+        """Test that adding a source to an agent triggers its embedding"""
+        content_to_embed = b"content to embed"
         attachment = self.env["ir.attachment"].create({
-            "name": f"test-{len(content)}.txt",
-            "raw": b"raw",
-        })
-        return self.env["ai.embedding"].create({
-            "attachment_id": attachment.id,
-            "content": content,
-            "embedding_model": "text-embedding-3-small",
+            "name": "shared.txt",
+            "raw": content_to_embed,
         })
 
-    def test_batches_respect_max_batch_size(self):
-        """Ensure batches never exceed the configured max size."""
-        embeddings = [self._create_embedding("short content") for _ in range(5)]
-
-        with patch(
-            "odoo.addons.ai.models.ai_embedding.get_embedding_config",
-            return_value={"max_batch_size": 10, "max_tokens_per_request": 6},
+        with (
+            self.registry_test_mode(),
+            self.mock_embedding_request(),
+            patch("odoo.addons.ai.models.ai_embedding.AIEmbedding._get_default_embedding_model", return_value="default_embedding_model"),
         ):
-            batches = self.env["ai.embedding"]._create_batches(embeddings, "openai")
+            agent = self.env["ai.agent"].create({
+                "name": "Agent",
+            })
+            valid_source = self.env["ai.agent.source"].create({
+                "name": f"Source {agent.name}",
+                "agent_id": agent.id,
+                "type": "binary",
+                "attachment_id": attachment.id,
+            })
+            self.env.ref('ai.ir_cron_generate_embedding').method_direct_trigger()
 
-        self.assertEqual([len(batch) for batch in batches], [2, 2, 1])
+        self.assertEqual(valid_source.status, "indexed")
 
-    def test_batches_split_on_token_limit(self):
-        """Ensure token budget splits batches even when size allows more records."""
-        embeddings = [
-            self._create_embedding("a" * 8),
-            self._create_embedding("b" * 12),
-            self._create_embedding("c" * 12),
-            self._create_embedding("d" * 4),
-        ]
+        created_embedding = self.env["ai.embedding"].search([("res_model", "=", "ir.attachment"), ("res_id", "=", attachment.id)])
+        self.assertTrue(created_embedding, "An embedding should have been created for the source")
+        self.assertEqual(created_embedding.embedding_model, "default_embedding_model")
 
-        with patch(
-            "odoo.addons.ai.models.ai_embedding.get_embedding_config",
-            return_value={"max_batch_size": 10, "max_tokens_per_request": 6},
+        expected_content = (
+            f"{content_to_embed.decode('utf-8')}"
+        )
+        self.assertEqual(created_embedding.content, expected_content)
+        self.assertEqual(created_embedding.embedding_vector, [0.1] * 1536)
+
+    def test_recompute_only_reprocesses_sources_on_deprecated_provider(self):
+        """A source on a still-valid provider must not be affected by another
+        provider's deprecated embedding, even if they share the same checksum."""
+
+        agent_with_deprecated_embedding = self.env["ai.agent"].create({
+            "name": "Deprecated agent",
+            "embedding_model": "deprecated_embedding",
+        })
+        agent_with_valid_embedding = self.env["ai.agent"].create({
+            "name": "Valid agent",
+            "embedding_model": "valid_embedding",
+        })
+        attachment = self.env["ir.attachment"].create({
+            "name": "shared.txt",
+            "raw": b"some content",
+        })
+        attachment_2 = self.env["ir.attachment"].create({
+            "name": "shared.txt",
+            "raw": b"some content",
+        })
+
+        with patch("odoo.addons.ai.models.ai_agent_source.AIAgentSource._trigger_embedding_generation"):
+            deprecated_source = self.env["ai.agent.source"].create({
+                "name": f"Source {agent_with_deprecated_embedding.name}",
+                "agent_id": agent_with_deprecated_embedding.id,
+                "type": "binary",
+                "attachment_id": attachment.id,
+                "status": "indexed",
+                "is_active": True,
+            })
+            valid_source = self.env["ai.agent.source"].create({
+                "name": f"Source {agent_with_valid_embedding.name}",
+                "agent_id": agent_with_valid_embedding.id,
+                "type": "binary",
+                "attachment_id": attachment_2.id,
+                "status": "indexed",
+                "is_active": True,
+            })
+
+        deprecated_embedding = self.env["ai.embedding"].create({
+            "res_model": "ir.attachment",
+            "res_id": attachment.id,
+            "content": "chunk content",
+            "embedding_model": "deprecated_embedding",
+            "embedding_vector": [0.1] * 1536,
+        })
+        valid_embedding = self.env["ai.embedding"].create({
+            "res_model": "ir.attachment",
+            "res_id": attachment_2.id,
+            "content": "chunk content",
+            "embedding_model": "valid_embedding",
+            "embedding_vector": [0.1] * 1536,
+        })
+
+        with (
+            patch(
+                "odoo.addons.ai.models.ai_embedding.AIEmbedding._get_supported_embedding_models",
+                return_value=["valid_embedding"],
+            ),
+            patch(
+                "odoo.addons.base.models.ir_cron.IrCron._trigger",
+                autospec=True,
+            ) as mock_trigger,
+            patch(
+                "odoo.addons.base.models.ir_cron.IrCron._commit_progress",
+            ),
         ):
-            batches = self.env["ai.embedding"]._create_batches(embeddings, "openai")
+            self.env["ai.embedding"]._cron_update_deprecated_embedding_models()
 
-        self.assertEqual([len(batch) for batch in batches], [2, 2])
-        for batch in batches:
-            token_count = sum(self.env["ai.embedding"]._estimate_tokens(emb.content) for emb in batch)
-            self.assertLessEqual(token_count, 6)
+        self.assertFalse(deprecated_embedding.embedding_vector, "Deprecated embedding must be removed")
+        self.assertTrue(valid_embedding.embedding_vector, "Still-valid embedding must be kept")
+
+        self.assertEqual(deprecated_source.status, "processing")
+        self.assertTrue(deprecated_source.is_active, "Active status shouldn't have changed.")
+        self.assertEqual(agent_with_deprecated_embedding.embedding_model, self.env["ai.embedding"]._get_default_embedding_model(), "Agent model should be reset to default")
+        self.assertEqual(
+            valid_source.status, "indexed",
+            "Source on a still-valid provider must not be reprocessed",
+        )
+        self.assertTrue(valid_source.is_active)
+        mock_trigger.assert_called_once()
+        triggered_cron = mock_trigger.call_args.args[0]
+        self.assertEqual(triggered_cron, self.env.ref("ai.ir_cron_generate_embedding"))

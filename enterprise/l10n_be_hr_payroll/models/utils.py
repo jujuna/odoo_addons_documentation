@@ -1,12 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import logging
-
 import xml.etree.ElementTree as ET
 
 from contextlib import contextmanager
 from io import StringIO
+from re import sub
 
 from odoo import modules, tools, _
 from odoo.exceptions import UserError
@@ -25,6 +24,9 @@ SFTP_PORT = 8022
 
 
 def xml_str_to_dict(xml_str):
+    def strip_ns(tag):
+        return tag.split('}', 1)[1] if tag.startswith('{') else tag
+
     def etree_to_dict(elem):
         result = {}
         # Handle Attributes
@@ -38,7 +40,7 @@ def xml_str_to_dict(xml_str):
             children_result = {}
             for child in children:
                 child_dict = etree_to_dict(child)
-                tag = child.tag
+                tag = strip_ns(child.tag)
                 if tag not in children_result:
                     children_result[tag] = []
                 children_result[tag].append(child_dict)
@@ -59,7 +61,7 @@ def xml_str_to_dict(xml_str):
         return result
 
     root = ET.fromstring(xml_str)
-    data_dict = {root.tag: etree_to_dict(root)}
+    data_dict = {strip_ns(root.tag): etree_to_dict(root)}
     return data_dict
 
 
@@ -74,11 +76,8 @@ def open_sftp_connection(ssh_key, username):
     if not ssh_key:
         raise UserError(_("No ONSS technical user private key defined on the payroll configuration"))
     try:
-        # Decode the base64 binary field to get raw PEM key
-        key_data = base64.b64decode(ssh_key.content)
-
         # Convert to StringIO so Paramiko can read it
-        key_stream = StringIO(key_data.decode())
+        key_stream = StringIO(ssh_key.content.decode())
 
         # Load private key from memory
         _logger.info("Loading private key from attachment...")
@@ -120,8 +119,33 @@ def open_sftp_connection(ssh_key, username):
     except Exception as e:  # noqa: BLE001
         error_msg = _("SFTP Connection Failed: %s", e)
         _logger.error(error_msg)
+        client, sftp = None, None
         raise UserError(error_msg)
     finally:
-        sftp.close()
-        client.close()
+        if sftp:
+            sftp.close()
+        if client:
+            client.close()
         _logger.info("Connection closed successfully.")
+
+
+def get_split_name(full_name):
+    names = sub(r"\([^()]*\)", "", full_name).strip().split()
+    first_name = names[-1]
+    last_name = ' '.join(names[:-1])
+    return first_name, last_name
+
+
+def format_amount(amount, width=11, hundredth=True):
+    """
+    Fill a constant 11 characters string with 0
+    """
+    if isinstance(amount, str):
+        amount = int(sub(r'\D', '', amount or '0'))
+    if hundredth:
+        amount = round(amount * 100)
+    return str(amount).zfill(width)
+
+
+def round_eurocent(amount):
+    return tools.float_round(amount, precision_digits=2, rounding_method="HALF-UP")

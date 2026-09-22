@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 
 from odoo import api, fields, models
-from odoo.exceptions import UserError
-from odoo.tools import misc
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import BinaryBytes, misc
 from odoo.tools.translate import _
 
 
@@ -88,6 +86,10 @@ class ResCompany(models.Model):
     _inherit = 'res.company'
 
     l10n_cl_dte_email = fields.Char('DTE Email', related='partner_id.l10n_cl_dte_email', readonly=False)
+    l10n_cl_internal_identifier = fields.Char(
+        'Internal Identifier',
+        help="Code your trading partners put in the SII 'CdgIntRecep' field (field 51, max. 20 characters) to "
+             "identify this branch. Incoming documents are routed to the branch whose identifier matches it.")
     l10n_cl_dte_service_provider = fields.Selection([
         ('SIITEST', 'SII - Test'),
         ('SII', 'SII - Production'),
@@ -112,6 +114,46 @@ class ResCompany(models.Model):
     l10n_cl_certificate_ids = fields.One2many(
         'certificate.certificate', 'company_id', string='Certificates (CL)')
     l10n_cl_is_there_shared_certificate = fields.Boolean('Is There Shared Certificate?', compute='_compute_is_there_shared_cert')
+
+    def _l10n_cl_get_root_company(self):
+        """The legal entity this company issues under: itself if it declares a RUT, else the closest one that does."""
+        self.ensure_one()
+        # sudo: the ancestors up to the RUT bearer are needed even if unallowed to the user
+        company = self.sudo()
+        return next((parent for parent in company.parent_ids[::-1] if parent.vat), company.root_id)
+
+    def _l10n_cl_get_rut_companies(self):
+        """Every company issuing under this one's RUT: its legal entity and the branches trading under it."""
+        root = self._l10n_cl_get_root_company()
+        # a branch declaring a RUT is another taxpayer, and so is every branch under it
+        return self.env['res.company'].sudo().with_context(active_test=False).search(
+            [('id', 'child_of', root.id)],
+        ).filtered(lambda company: company._l10n_cl_get_root_company() == root)
+
+    def _l10n_cl_get_cafs(self, document_type):
+        """The CAF ranges of ``document_type`` this company draws folios from, spent ones included, lowest first."""
+        self.ensure_one()
+        root = self._l10n_cl_get_root_company()
+        cafs = self.env['l10n_cl.dte.caf'].sudo().search([
+            ('l10n_latam_document_type_id', '=', document_type.id),
+            ('company_id', 'in', (self | root).ids),
+        ], order='start_nb, id')
+        # a company ever granted a range of its own never draws on the one above, spent or not
+        return cafs.filtered(lambda caf: caf.company_id == (self if self in cafs.company_id else root))
+
+    def _l10n_cl_get_active_caf(self, document_type):
+        """The range the next folio of ``document_type`` comes from, empty once this company has spent them all."""
+        return self._l10n_cl_get_cafs(document_type).filtered(lambda caf: caf.status == 'in_use')[:1]
+
+    def _get_company_root_delegated_field_names(self):
+        # EXTENDS 'base': a branch shares the SII registration of its parent
+        return super()._get_company_root_delegated_field_names() + [
+            'l10n_cl_dte_service_provider',
+            'l10n_cl_dte_resolution_number',
+            'l10n_cl_dte_resolution_date',
+            'l10n_cl_sii_regional_office',
+            'l10n_cl_company_activity_ids',
+        ]
 
     def _prepare_cl_demo_objects(self):
         for c in self:
@@ -142,15 +184,16 @@ class ResCompany(models.Model):
             enabled_dte_documents = self.env['l10n_latam.document.type'].search(
                 ['|', ('code', 'in', [52, 110, 111, 112]), ('l10n_cl_active', '=', True),
                  ('country_id.code', '=', 'CL')])
-        existing_caf_files = self.env['l10n_cl.dte.caf'].search(
-            [('company_id', '=', self.id)]).mapped('l10n_latam_document_type_id.code')
+        existing_caf_files = self.env['l10n_cl.dte.caf'].search([
+            ('company_id', 'in', self._l10n_cl_get_rut_companies().ids),
+        ]).mapped('l10n_latam_document_type_id.code')
         for dte_caf in enabled_dte_documents:
             if dte_caf.code in existing_caf_files:
                 continue
             caf_file = caf_file_template.replace('<TD></TD>', '<TD>%s</TD>' % dte_caf.code)
             caf_id = self.env['l10n_cl.dte.caf'].sudo().create({
                 'filename': ('FoliosSII%s%s%sDEMO1.xml' % (self.vat, today_string_date, dte_caf.code)).replace('-', ''),
-                'caf_file': base64.b64encode(caf_file.encode('utf-8')),
+                'caf_file': BinaryBytes(caf_file.encode('utf-8')),
                 'l10n_latam_document_type_id': dte_caf.id,
                 'status': 'in_use',
                 'company_id': self.id,
@@ -158,7 +201,7 @@ class ResCompany(models.Model):
             caf_file = caf_file.replace('<D>1</D><H>499999</H>', '<D>500000</D><H>999999</H>')
             caf_id.copy({
                 'filename': ('FoliosSII%s%s%sDEMO2.xml' % (self.vat, today_string_date, dte_caf.code)).replace('-', ''),
-                'caf_file': base64.b64encode(caf_file.encode('utf-8')),
+                'caf_file': BinaryBytes(caf_file.encode('utf-8')),
             })
 
     def _get_digital_signature(self, user_id=None):
@@ -168,24 +211,26 @@ class ResCompany(models.Model):
         otherwise, if the user is false, it is understood that the owner of the signature (which is always
         a natural person) shares it with the rest of the users for that company.
         """
-        if user_id is not None:
-            user_certificates = self.l10n_cl_certificate_ids.filtered(
-                lambda x: x.is_valid and x.user_id.id == user_id and
-                          x.company_id.id == self.id)
-            if user_certificates:
-                return user_certificates[0]
-        shared_certificates = self.l10n_cl_certificate_ids.filtered(
-            lambda x: x.is_valid and not x.user_id and x.company_id.id == self.id)
-        if not shared_certificates:
-            raise UserError(_('There is not a valid certificate for the company: %s') % self.name)
-        return shared_certificates[0]
+        for company in self | self._l10n_cl_get_root_company():
+            certificates = company.l10n_cl_certificate_ids.filtered('is_valid')
+            if user_id is not None and (owned := certificates.filtered(lambda c: c.user_id.id == user_id)):
+                return owned[0]
+            if shared := certificates.filtered(lambda c: not c.user_id):
+                return shared[0]
+        raise UserError(self.env._('There is not a valid certificate for the company: %(company_name)s', company_name=self.name))
 
-    @api.depends('l10n_cl_dte_service_provider')
+    @api.constrains('l10n_cl_company_activity_ids')
+    def _check_l10n_cl_company_activity_ids_limit(self):
+        for company in self:
+            if len(company.l10n_cl_company_activity_ids) > 4:
+                raise ValidationError(self.env._(
+                    "The maximum amount of Activities Names is 4. Please select only 4 or less options."
+                ))
+
+    @api.depends('l10n_cl_dte_service_provider', 'parent_id')
     def _compute_is_there_shared_cert(self):
         cl_certificate = self.env['certificate.certificate']
         for company in self:
-            if company._origin.id:
-                domain = [('user_id', '=', False), ('company_id', '=', company._origin.id)]
-                company.l10n_cl_is_there_shared_certificate = cl_certificate.search(domain, limit=1)
-            else:
-                company.l10n_cl_is_there_shared_certificate = False
+            root_origin = company._l10n_cl_get_root_company()._origin
+            company.l10n_cl_is_there_shared_certificate = bool(root_origin) and bool(cl_certificate.search(
+                [('user_id', '=', False), ('company_id', '=', root_origin.id)], limit=1))

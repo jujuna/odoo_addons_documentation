@@ -15,12 +15,10 @@ test("Call activities are displayed in the “Activities” tab.", async () => {
         {
             name: "Françoise Délire",
             phone: "+1 246 203 6982",
-            company_name: "Boulangerie Vortex",
         },
         {
             name: "Naomi Dag",
             phone: "777 2124",
-            company_name: "Sanit’Hair",
         },
     ]);
     pyEnv["mail.activity"].create([
@@ -41,19 +39,13 @@ test("Call activities are displayed in the “Activities” tab.", async () => {
     ]);
     await start();
     await click(".o_menu_systray button[title='Show Softphone']");
-    await click("button span:contains('Activities')");
+    await click("button[data-tab='activities']");
     await contains(".o-voip-TabEntry", { count: 2 });
     await contains("h2.text-danger", {
         text: "Due: Yesterday",
     });
-    await contains(".o-voip-TabEntry", {
-        text: "Sanit’Hair, Naomi Dag",
-    });
     await contains("h2", {
         text: "Due: Today",
-    });
-    await contains(".o-voip-TabEntry", {
-        text: "Boulangerie Vortex, Françoise Délire",
     });
 });
 
@@ -76,8 +68,10 @@ test("The name of the partner linked to an activity is displayed in the activity
     ]);
     await start();
     await click(".o_menu_systray button[title='Show Softphone']");
-    await click("button span:contains('Activities')");
-    await contains("button[title='Open related record']", {
-        text: "Gwendoline Zumba",
-    });
+    await click("button[data-tab='activities']");
+    await click(".o-voip-TabEntry:contains('Gwendoline Zumba')");
+    await click("button[title='Go to']");
+    await contains("span.o-dropdown-item i[data-icon='person']");
+    await click("span.o-dropdown-item span:contains('Contact')");
+    await contains("div[name='name'] input", { value: "Gwendoline Zumba" });
 });

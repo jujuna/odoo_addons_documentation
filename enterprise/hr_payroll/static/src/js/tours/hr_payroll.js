@@ -4,16 +4,15 @@ import { registry } from "@web/core/registry";
 import { markup } from "@odoo/owl";
 
 registry.category("web_tour.tours").add('payroll_tours', {
-    url: "/odoo",
     steps: () => [
     {
-        trigger: `.o_app[data-menu-xmlid='hr_work_entry_enterprise.menu_hr_payroll_root']`,
+        trigger: `.o_app[data-menu-xmlid='hr_payroll.menu_hr_payroll_root']`,
         content: markup(_t("Click on Payroll to manage your employee's <strong>Work Entries</strong>, <strong>Contracts</strong> and <strong>Payslips</strong>.")),
         tooltipPosition: 'bottom',
         run: "click",
     },
     {
-        trigger: "button[data-menu-xmlid='hr_work_entry_enterprise.menu_hr_payroll_root']",
+        trigger: "button[data-menu-xmlid='hr_payroll.menu_hr_payroll_root']",
         content: markup(_t("First, we'll create a new <strong>Contract</strong>.")),
         tooltipPosition: 'bottom',
         run: "click",
@@ -44,7 +43,7 @@ registry.category("web_tour.tours").add('payroll_tours', {
     },
     {
         isActive: ["auto"],
-        trigger: ".ui-autocomplete > li > a:not(:has(i.fa))",
+        trigger: ".ui-autocomplete > li > a:not(:has(i.oi))",
         id: 'hr_payroll_start',
         run: 'click',
     },
@@ -73,13 +72,13 @@ registry.category("web_tour.tours").add('payroll_tours', {
         run: "click",
     },
     {
-        trigger: `button[data-menu-xmlid='hr_work_entry_enterprise.menu_hr_payroll_work_entries_root']`,
+        trigger: `button[data-menu-xmlid='hr_work_entry.menu_hr_payroll_work_entries_root']`,
         content: markup(_t('Click on the <strong>Work Entries</strong> menu.')),
         tooltipPosition: 'bottom',
         run: "click",
     },
     {
-        trigger: `a[data-menu-xmlid='hr_work_entry_enterprise.menu_work_entry']`,
+        trigger: `a[data-menu-xmlid='hr_work_entry.menu_work_entry']`,
         content: markup(_t('Check the <strong>Work Entries</strong> linked to your newly created Contract.')),
         tooltipPosition: 'right',
         run: "click",

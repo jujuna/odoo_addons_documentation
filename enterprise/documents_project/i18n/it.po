@@ -6,15 +6,15 @@
 # Martin Trigaux, 2023
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-10-20 08:49+0000\n"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 03:26+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
 "documents_project/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +22,14 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents_project
+#: model:ir.module.module,description:base.module_documents_project
+msgid ""
+"\n"
+"Add the ability to create invoices from the document module.\n"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_ir_attachment
@@ -31,8 +38,8 @@ msgstr "Allegato"
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_res_company
-msgid "Companies"
-msgstr "Aziende"
+msgid "Company"
+msgstr "Azienda"
 
 #. module: documents_project
 #. odoo-python
@@ -47,6 +54,11 @@ msgstr ""
 #: model:ir.model,name:documents_project.model_res_config_settings
 msgid "Config Settings"
 msgstr "Opzioni di configurazione"
+
+#. module: documents_project
+#: model:ir.model,website_form_label:documents_project.model_project_task
+msgid "Create a Task"
+msgstr "Crea un lavoro"
 
 #. module: documents_project
 #: model:documents.document,name:documents_project.project_1_document_1
@@ -68,6 +80,7 @@ msgstr "Cartella progetto predefinita"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__display_name
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__display_name
 #: model:ir.model.fields,field_description:documents_project.field_project_project__display_name
+#: model:ir.model.fields,field_description:documents_project.field_project_task__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_company__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__display_name
 msgid "Display Name"
@@ -79,13 +92,18 @@ msgid "Document"
 msgstr "Documento"
 
 #. module: documents_project
-#. odoo-python
-#: code:addons/documents_project/models/project_project.py:0
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents_dashboard
-#: model_terms:ir.ui.view,arch_db:documents_project.project_view_kanban_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.edit_project_document_form_inherit
+#: model_terms:ir.ui.view,arch_db:documents_project.project_view_card_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.view_task_form2
 msgid "Documents"
 msgstr "Documenti"
+
+#. module: documents_project
+#: model:ir.module.module,shortdesc:base.module_documents_project
+msgid "Documents - Projects"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model.fields,field_description:documents_project.field_project_project__documents_folder_id
@@ -119,6 +137,7 @@ msgstr "Cartella dove vengono creati nuovi progetti"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__id
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__id
 #: model:ir.model.fields,field_description:documents_project.field_project_project__id
+#: model:ir.model.fields,field_description:documents_project.field_project_task__id
 #: model:ir.model.fields,field_description:documents_project.field_res_company__id
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__id
 msgid "ID"
@@ -141,15 +160,30 @@ msgid "Project Folder"
 msgstr "Cartella progetti"
 
 #. module: documents_project
+#: model:ir.module.module,summary:base.module_documents_project
+msgid "Project from documents"
+msgstr ""
+
+#. module: documents_project
 #: model:documents.document,name:documents_project.document_project_folder
 #: model:ir.model.fields,field_description:documents_project.field_documents_document__project_ids
 msgid "Projects"
 msgstr "Progetti"
 
 #. module: documents_project
+#: model:ir.model.fields,field_description:documents_project.field_project_task__document_count
+msgid "Related Document Count"
+msgstr "Numero documenti correlati"
+
+#. module: documents_project
 #: model:ir.model,name:documents_project.model_documents_tag
 msgid "Tag"
 msgstr "Tag"
+
+#. module: documents_project
+#: model:ir.model,name:documents_project.model_project_task
+msgid "Task"
+msgstr "Lavoro"
 
 #. module: documents_project
 #. odoo-python
@@ -193,9 +227,9 @@ msgid ""
 "to which it is linked. Please update the company of the \"%(project)s\" "
 "project, or leave the company of this folder empty."
 msgstr ""
-"La cartella dovrebbe restare nella stessa azienda del progetto \"%"
-"(project)s\" al quale è collegata. Aggiorna l'azienda del progetto \"%"
-"(project)s\" o lascia il campo vuoto."
+"La cartella dovrebbe restare nella stessa azienda del progetto \"%(project)"
+"s\" al quale è collegata. Aggiorna l'azienda del progetto \"%(project)s\" o "
+"lascia il campo vuoto."
 
 #. module: documents_project
 #. odoo-python
@@ -221,6 +255,33 @@ msgid "Uh-oh! The project app needs the \"%s\" folder, so you can’t delete it.
 msgstr ""
 "Oh oh! L'app Progetti necessita della cartella \"%s\", quindi non puoi "
 "eliminarla."
+
+#. module: documents_project
+#: model:ir.model.fields,help:documents_project.field_project_task__display_name
+msgid ""
+"Use these keywords in the title to set new tasks:\n"
+"\n"
+"        30h Allocate 30 hours to the task\n"
+"        #tags Set tags on the task\n"
+"        @user Assign the task to a user\n"
+"        ! Set the task a medium priority\n"
+"        !! Set the task a high priority\n"
+"        !!! Set the task a urgent priority\n"
+"\n"
+"        Make sure to use the right format and order e.g. Improve the "
+"configuration screen 5h #feature #v16 @Mitchell !"
+msgstr ""
+"Usa queste parole chiave nel titolo per configurare nuovi lavori:\n"
+"\n"
+"        30h per assegnare 30 ore al lavoro\n"
+"        #tags per configurare tag nel lavoro\n"
+"        @user per assegnare il lavoro a un utente\n"
+"        ! per impostare la priorità su media\n"
+"        !! per impostare la priorità su alta\n"
+"        !!! per impostare la priorità su urgente\n"
+"\n"
+"        Assicurati di utilizzare il formato e l'ordine corretti, ad es. "
+"Migliorare la schermata di configurazione 5h #feature #v16 @Mitchell!"
 
 #. module: documents_project
 #. odoo-python
@@ -255,187 +316,3 @@ msgstr ""
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot set a company on the %s folder."
 msgstr "Non puoi configurare un'azienda per la cartella %s."
-
-#~ msgid "%(project_name)s's Documents"
-#~ msgstr "Documenti relativi a %(project_name)s"
-
-#~ msgid ""
-#~ "A set of condition and actions which will be available to all attachments "
-#~ "matching the conditions"
-#~ msgstr ""
-#~ "Una serie di condizioni e azioni che saranno disponibili per tutti gli "
-#~ "allegati che soddisfano i requisiti"
-
-#~ msgid "Ask for Validation"
-#~ msgstr "Richiedi convalida"
-
-#~ msgid "Categorize and share your documents with your customers"
-#~ msgstr "Categorizza e condividi i tuoi documenti con i clienti"
-
-#~ msgid "Category"
-#~ msgstr "Categoria"
-
-#~ msgid "Create"
-#~ msgstr "Crea"
-
-#~ msgid "Create a Task"
-#~ msgstr "Creare un'attività"
-
-#~ msgid "Default Tags"
-#~ msgstr "Etichette predefinite"
-
-#~ msgid "Deprecate"
-#~ msgstr "Disattiva"
-
-#~ msgid "Deprecated"
-#~ msgstr "Non attivo"
-
-#~ msgid "Documents &amp; Analytics"
-#~ msgstr "Documenti e analitiche"
-
-#~ msgid "Documents Workspace"
-#~ msgstr "Spazio di lavoro documenti"
-
-#~ msgid "Draft"
-#~ msgstr "Bozza"
-
-#~ msgid "Invalid project search"
-#~ msgstr "RIcerca progetto non valida"
-
-#~ msgid "Invalid task search"
-#~ msgstr "Ricerca lavoro non valida"
-
-#~ msgid "Is Shared"
-#~ msgstr "È condiviso"
-
-#~ msgid "Mark As Draft"
-#~ msgstr "Segna come Bozza"
-
-#~ msgid "Merged Workspace"
-#~ msgstr "Spazio di lavoro unito"
-
-#~ msgid "New task from Documents"
-#~ msgstr "Nuova attività da Documenti"
-
-#~ msgid "Number of documents in Project"
-#~ msgstr "Numero di documenti nel progetto"
-
-#~ msgid "Number of documents in Task"
-#~ msgstr "Numero di documenti nel lavoro"
-
-#~ msgid "Shared Documents"
-#~ msgstr "Documenti condivisi"
-
-#~ msgid "Shared Documents Count"
-#~ msgstr "Numero di documenti condivisi"
-
-#~ msgid "Status"
-#~ msgstr "Stato"
-
-#~ msgid "Task"
-#~ msgstr "Lavoro"
-
-#~ msgid "Task created from document %s"
-#~ msgstr "Lavoro creato dal documento %s"
-
-#~ msgid "Task created from documents %s"
-#~ msgstr "Lavoro creato dai documenti %s"
-
-#~ msgid "Task's Documents"
-#~ msgstr "Documenti lavoro"
-
-#~ msgid ""
-#~ "The \"%s\" workspace is required by the Project application and cannot be "
-#~ "deleted."
-#~ msgstr ""
-#~ "Lo spazio di lavoro \"%s\" è richiesto dall'applicazione Progetti e non "
-#~ "può essere eliminato."
-
-#~ msgid ""
-#~ "The \"%s\" workspace should either be in the \"%s\" company like this "
-#~ "project or be open to all companies."
-#~ msgstr ""
-#~ "Lo spazio di lavoro \"%s\" dovrebbe essere presente nell'azienda \"%s\" "
-#~ "come questo progetto oppure essere aperto a tutte le aziende."
-
-#~ msgid ""
-#~ "This workspace should remain in the same company as the \"%s\" project to "
-#~ "which it is linked. Please update the company of the \"%s\" project, or "
-#~ "leave the company of this workspace empty."
-#~ msgstr ""
-#~ "Lo spazio di lavoro dovrebbe restare nella stessa azienda del progetto "
-#~ "\"%s\" al quale è collegato. Aggiorna l'azienda del progetto \"%s\" o "
-#~ "lascia il campo vuoto."
-
-#~ msgid ""
-#~ "This workspace should remain in the same company as the following "
-#~ "projects to which it is linked:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Please update the company of those projects, or leave the company of this "
-#~ "workspace empty."
-#~ msgstr ""
-#~ "Lo spazio di lavoro deve restare nella stessa azienda come i seguenti "
-#~ "progetti ai quali è collegato:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Aggiorna l'azienda dei progetti oppure lascia il campo vuoto."
-
-#~ msgid "To Validate"
-#~ msgstr "Da convalidare"
-
-#~ msgid ""
-#~ "Upload <span class=\"fw-normal\">a file or </span>drag <span class=\"fw-"
-#~ "normal\">it here.</span>"
-#~ msgstr ""
-#~ "Carica un <span class=\"fw-normal\">file</span> o trascinalo <span "
-#~ "class=\"fw-normal\">qui.</span>"
-
-#~ msgid "Use Documents"
-#~ msgstr "Usa Documenti"
-
-#~ msgid "Validate"
-#~ msgstr "Valida"
-
-#~ msgid "Validated"
-#~ msgstr "Validata"
-
-#~ msgid "Workspace"
-#~ msgstr "Spazio di lavoro"
-
-#~ msgid ""
-#~ "Workspace in which all of the documents of this project will be "
-#~ "categorized. All of the attachments of your tasks will be automatically "
-#~ "added as documents in this workspace as well."
-#~ msgstr ""
-#~ "Spazio di lavoro in cui verranno categorizzati tutti i documenti del "
-#~ "progetto. Tutti gli allegati dei tuoi lavori verranno aggiunti "
-#~ "automaticamente come documenti nello spazio di lavoro."
-
-#~ msgid ""
-#~ "You cannot change the company of this project, because its workspace is "
-#~ "linked to the other following projects that are still in the \"%s\" "
-#~ "company:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Please update the company of all projects so that they remain in the same "
-#~ "company as their workspace, or leave the company of the \"%s\" workspace "
-#~ "blank."
-#~ msgstr ""
-#~ "Non è possibile modificare l'azienda di questo progetto perché il suo "
-#~ "spazio di lavoro è collegato ai progetti elencati di seguito che "
-#~ "appartengono ancora all'azienda \"%s\":\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Aggiorna l'azienda per tutti i progetti in modo che abbiano lo stesso "
-#~ "riferimento come spazio di lavoro oppure non riempire il campo dello "
-#~ "spazio di lavoro \"%s\"."
-
-#~ msgid "You cannot set a company on the %s workspace."
-#~ msgstr "Non è possibile configurare un'azienda per lo spazio di lavoro %s."
-
-#~ msgid "documents shared"
-#~ msgstr "documenti condivisi"
-
-#~ msgid "new %s from %s"
-#~ msgstr "nuovo %s da %s"

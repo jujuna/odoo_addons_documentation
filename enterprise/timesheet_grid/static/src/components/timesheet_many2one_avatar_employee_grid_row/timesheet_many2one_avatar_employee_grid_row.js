@@ -1,46 +1,52 @@
-import { Component } from "@odoo/owl";
-
-import { registry } from "@web/core/registry";
-import { Many2OneGridRow, many2OneGridRow } from "@web_grid/components/many2one_grid_row/many2one_grid_row";
-import { EmployeeOvertimeIndication } from "../employee_overtime_indication/employee_overtime_indication";
-import { useTimesheetOvertimeProps } from "../../hooks/useTimesheetOvertimeProps";
-import { TimesheetGridMany2OneGridRow } from "../timesheet_grid_many2one/timesheet_grid_many2one_field";
-import { AvatarCardEmployeePopover } from "@hr/components/avatar_card_employee/avatar_card_employee_popover";
+import { AvatarCard } from "@mail/core/web/avatar_card/avatar_card";
+import { Component, computed, onWillStart, useProps } from "@odoo/owl";
 import { usePopover } from "@web/core/popover/popover_hook";
-
+import { registry } from "@web/core/registry";
+import { user } from "@web/core/user";
+import { useService } from "@web/core/utils/hooks";
+import { omit } from "@web/core/utils/objects";
+import { gridRowProps } from "@web_grid/components/grid_row/grid_row";
+import {
+    Many2OneGridRow,
+    many2OneGridRow,
+    many2OneGridRowProps,
+} from "@web_grid/components/many2one_grid_row/many2one_grid_row";
+import { useTimesheetOvertimeProps } from "../../hooks/useTimesheetOvertimeProps";
+import { EmployeeOvertimeIndication } from "../employee_overtime_indication/employee_overtime_indication";
 
 export class TimesheetMany2OneAvatarEmployeeGridRow extends Component {
     static template = "timesheet_grid.TimesheetMany2OneAvatarEmployeeGridRow";
-
     static components = {
         Many2OneGridRow,
         EmployeeOvertimeIndication,
     };
 
-    static props = {
-        ...TimesheetGridMany2OneGridRow.props,
-    };
+    props = useProps({
+        ...gridRowProps,
+        ...many2OneGridRowProps,
+    });
+
+    many2OneProps = computed(() => omit(this.props, "classNames"));
+
+    resId = computed(() => this.value && this.value[0]);
 
     setup() {
-        super.setup(...arguments);
-        this.employeeOvertimeProps = useTimesheetOvertimeProps();
-        this.avatarCard = usePopover(AvatarCardEmployeePopover);
+        this.employeeOvertimeProps = useTimesheetOvertimeProps(this.resId);
+        this.avatarCard = usePopover(AvatarCard);
+        this.uiService = useService("ui");
+
+        /* Before the component starts, check if the current user belongs to the HR user group.
+        This information is used to determine the appropriate relation for the component.*/
+        onWillStart(async () => {
+            this.isHrUser = await user.hasGroup("hr.group_hr_user");
+        });
     }
 
+    // Chooses employee data visibility based on user role.
     get relation() {
-        return this.props.relation || this.props.model.fieldsInfo[this.props.name].relation;
-    }
-
-    get many2OneProps() {
-        return Object.fromEntries(
-            Object.entries(this.props).filter(
-                ([key,]) => key !== "classNames" && key in this.constructor.components.Many2OneGridRow.props
-            )
-        );
-    }
-
-    get resId() {
-        return this.value && this.value[0];
+        return this.isHrUser
+            ? this.props.model.fieldsInfo[this.props.name].relation
+            : "hr.employee.public";
     }
 
     get displayName() {
@@ -48,11 +54,11 @@ export class TimesheetMany2OneAvatarEmployeeGridRow extends Component {
     }
 
     get value() {
-        return 'value' in this.props ? this.props.value : this.props.row.initialRecordValues[this.props.name];
+        return this.props.value ?? this.props.row.initialRecordValues[this.props.name];
     }
 
     get timesheetOvertimeProps() {
-        const { units_to_work, uom, worked_hours } = this.employeeOvertimeProps.props;
+        const { units_to_work, uom, worked_hours } = this.employeeOvertimeProps();
         return {
             allocated_hours: units_to_work,
             uom,
@@ -61,13 +67,14 @@ export class TimesheetMany2OneAvatarEmployeeGridRow extends Component {
     }
 
     openCard(ev) {
-        if (this.env.isSmall) {
+        if (this.uiService.isSmall) {
             return;
         }
         const target = ev.currentTarget;
         if (!this.avatarCard.isOpen) {
             this.avatarCard.open(target, {
-                id: this.resId,
+                id: this.resId(),
+                model: this.relation,
             });
         }
     }

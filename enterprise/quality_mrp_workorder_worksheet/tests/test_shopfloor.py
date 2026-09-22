@@ -8,17 +8,17 @@ from odoo.addons.mrp_workorder.tests.test_shopfloor import TestShopFloor
 
 @tagged('post_install', '-at_install')
 class TestShopFloorWorksheet(TestShopFloor, TestQualityWorksheet):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_worksheet_quality_check(self):
         final_product, component = self.env['product.product'].create([
             {
                 'name': 'Lovely Product',
                 'is_storable': True,
-                'tracking': 'none',
             },
             {
                 'name': 'Lovely Component',
                 'is_storable': True,
-                'tracking': 'none',
             },
         ])
         self.env['stock.quant']._update_available_quantity(component, self.stock_location, quantity=10)
@@ -56,5 +56,5 @@ class TestShopFloorWorksheet(TestShopFloor, TestQualityWorksheet):
         mo.action_assign()
         self.assertEqual(mo.reservation_state, 'assigned')
         mo.button_plan()
-        self.start_tour('/odoo/shop-floor', "test_worksheet_quality_check", login='admin')
+        self.start_tour('/odoo/shop-floor', "test_worksheet_quality_check", login='shop_floor_user')
         self.assertEqual(mo.workorder_ids.state, "done")

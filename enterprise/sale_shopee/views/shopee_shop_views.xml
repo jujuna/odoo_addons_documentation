@@ -12,6 +12,15 @@
         <field name="model">shopee.shop</field>
         <field name="arch" type="xml">
             <list string="Shopee Shops" create="false">
+                <header>
+                    <button
+                        name="action_create_shop"
+                        string="New"
+                        type="object"
+                        class="btn-primary"
+                        display="always"
+                    />
+                </header>
                 <field name="name"/>
                 <field name="shop_identifier" options="{'enable_formatting': false}"/>
                 <field name="account_id"/>
@@ -98,10 +107,18 @@
                     </div>
                     <div class="oe_button_box" name="button_box">
                         <button
+                            name="action_view_account"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="account_circle"
+                            string="Account"
+                            invisible="not id"
+                        />
+                        <button
                             name="action_view_orders"
                             type="object"
                             class="oe_stat_button"
-                            icon="fa-dollar"
+                            icon="attach_money"
                             invisible="not id"
                         >
                             <field name="order_count" widget="statinfo" string="Orders"/>
@@ -110,7 +127,7 @@
                             name="action_view_shopee_items"
                             type="object"
                             class="oe_stat_button"
-                            icon="fa-dollar"
+                            icon="attach_money"
                             invisible="not id"
                         >
                             <field name="shopee_item_count" widget="statinfo" string="Shopee Items"/>

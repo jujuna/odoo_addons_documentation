@@ -5,7 +5,7 @@
 # Translators:
 # Martin Trigaux, 2022
 # Erwin van der Ploeg <erwin@odooexperts.nl>, 2022
-# Bren Driesen <brdri@odoo.com>, 2025.
+# Bren Driesen <brdri@odoo.com>, 2025, 2026.
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
@@ -13,17 +13,44 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:48+0000\n"
-"PO-Revision-Date: 2025-11-27 14:14+0000\n"
-"Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/voip_crm/"
-"nl/>\n"
+"POT-Creation-Date: 2026-08-28 17:58+0000\n"
+"PO-Revision-Date: 2026-09-18 04:41+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
+"voip_crm/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: voip_crm
+#: model:ir.model,name:voip_crm.model_mail_activity_schedule
+msgid "Activity schedule plan Wizard"
+msgstr "Wizard voor het plannen van activiteiten"
+
+#. module: voip_crm
+#: model:ir.module.module,description:base.module_voip_crm
+msgid "Add CRM leads to your activity queue."
+msgstr ""
+
+#. module: voip_crm
+#: model:ir.actions.server,name:voip_crm.action_add_to_activity_queue
+msgid "Add to activity queue"
+msgstr ""
+
+#. module: voip_crm
+#: model_terms:ir.ui.view,arch_db:voip_crm.voip_activity_schedule_form_view_inherit
+msgid "Choose a Lead"
+msgstr "Lead kiezen"
+
+#. module: voip_crm
+#: model:ir.model.fields,field_description:voip_crm.field_res_partner__commercial_partner_opportunity_count
+#: model:ir.model.fields,field_description:voip_crm.field_res_users__commercial_partner_opportunity_count
+#: model:ir.model.fields,field_description:voip_crm.field_voip_call__commercial_partner_opportunity_count
+msgid "Commercial Partner Opportunity Count"
+msgstr ""
 
 #. module: voip_crm
 #: model:ir.model,name:voip_crm.model_res_partner
@@ -37,7 +64,7 @@ msgstr "Een klant aanmaken"
 
 #. module: voip_crm
 #. odoo-javascript
-#: code:addons/voip_crm/static/src/lead_button.js:0
+#: code:addons/voip_crm/static/src/softphone/action_list_patch.js:0
 msgid "Create a lead"
 msgstr "Maak een lead aan"
 
@@ -49,10 +76,11 @@ msgstr "Maak een verkoopkans aan"
 #. module: voip_crm
 #: model:ir.model.fields,field_description:voip_crm.field_crm_lead__display_name
 #: model:ir.model.fields,field_description:voip_crm.field_ir_http__display_name
+#: model:ir.model.fields,field_description:voip_crm.field_mail_activity_schedule__display_name
 #: model:ir.model.fields,field_description:voip_crm.field_res_partner__display_name
 #: model:ir.model.fields,field_description:voip_crm.field_voip_call__display_name
 msgid "Display Name"
-msgstr "Weergavenaam"
+msgstr "Schermnaam"
 
 #. module: voip_crm
 #: model:ir.model,name:voip_crm.model_ir_http
@@ -62,32 +90,37 @@ msgstr "HTTP routing"
 #. module: voip_crm
 #: model:ir.model.fields,field_description:voip_crm.field_crm_lead__id
 #: model:ir.model.fields,field_description:voip_crm.field_ir_http__id
+#: model:ir.model.fields,field_description:voip_crm.field_mail_activity_schedule__id
 #: model:ir.model.fields,field_description:voip_crm.field_res_partner__id
 #: model:ir.model.fields,field_description:voip_crm.field_voip_call__id
 msgid "ID"
 msgstr "ID"
 
 #. module: voip_crm
-#: model:ir.model.fields,field_description:voip_crm.field_crm_lead__has_call_in_queue
-msgid "Is in the Call Queue"
-msgstr "Staat in de wachtrij"
-
-#. module: voip_crm
 #. odoo-javascript
-#: code:addons/voip_crm/static/src/lead_button.xml:0
+#: code:addons/voip_crm/static/src/softphone/action_list_patch.js:0
 #: model:ir.model,name:voip_crm.model_crm_lead
+#: model:ir.model.fields,field_description:voip_crm.field_mail_activity_schedule__lead_id
 msgid "Lead"
 msgstr "Lead"
 
 #. module: voip_crm
+#. odoo-python
+#: code:addons/voip_crm/wizards/mail_activity_schedule.py:0
+msgid "Lead/Opportunity"
+msgstr "Lead/Verkoopkans"
+
+#. module: voip_crm
+#. odoo-javascript
+#: code:addons/voip_crm/static/src/softphone/action_list_patch.js:0
 #: model_terms:ir.ui.view,arch_db:voip_crm.voip_call_view_form_lead_button
 msgid "Leads"
 msgstr "Leads"
 
 #. module: voip_crm
-#: model:ir.model.fields,field_description:voip_crm.field_voip_call__opportunity_count
-msgid "Opportunity Count"
-msgstr "Aantal verkoopkansen"
+#: model:ir.module.module,shortdesc:base.module_voip_crm
+msgid "Phone - CRM"
+msgstr ""
 
 #. module: voip_crm
 #: model:ir.model,name:voip_crm.model_voip_call
@@ -95,13 +128,21 @@ msgid "Phone call"
 msgstr "Telefoongesprek"
 
 #. module: voip_crm
+#: model:ir.module.module,summary:base.module_voip_crm
+msgid "Phone integration with CRM module."
+msgstr ""
+
+#. module: voip_crm
 #. odoo-javascript
-#: code:addons/voip_crm/static/src/lead_button.js:0
+#: code:addons/voip_crm/static/src/softphone/action_list_patch.js:0
+msgid "View lead"
+msgstr "Lead bekijken"
+
+#. module: voip_crm
+#. odoo-javascript
+#: code:addons/voip_crm/static/src/softphone/action_list_patch.js:0
 msgid "View leads"
 msgstr "Leads bekijken"
 
-#~ msgid "Add to call queue"
-#~ msgstr "Toevoegen aan belwachtrij"
-
-#~ msgid "Lead/Opportunity"
-#~ msgstr "Lead/Verkoopkans"
+msgid "Opportunity Count"
+msgstr "Aantal verkoopkansen"

@@ -12,6 +12,8 @@ from odoo.tools import frozendict
 @tagged('post_install', '-at_install')
 class TestChangeLockDateWizard(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_exception_generation(self):
         """
         Test the exception generation from the wizard.

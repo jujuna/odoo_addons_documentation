@@ -8,7 +8,7 @@
             <xpath expr="//page[@id='other_tab']//field[@name='fiscal_position_id']" position='after'>
                 <label for="release_to_pay_manual" invisible="move_type not in ('in_invoice', 'in_refund')"/>
                 <div class="o_row" col="4" invisible="move_type not in ('in_invoice', 'in_refund')">
-                    <field name="release_to_pay" invisible="True" force_save="1"/>
+                    <field name="release_to_pay" invisible="True" force_save="1"/>  <!-- Used or `release_to_pay_manual` onchange -->
                     <field name="release_to_pay_manual"/>
                     <label class="fw-bold" for="force_release_to_pay" invisible="not force_release_to_pay"/>
                     <field name="force_release_to_pay" invisible="not force_release_to_pay"/>

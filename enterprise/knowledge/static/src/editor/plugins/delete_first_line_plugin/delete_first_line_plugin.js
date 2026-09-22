@@ -34,7 +34,6 @@ export class KnowledgeDeleteFirstLinePlugin extends Plugin {
         }
         if (!current) {
             const newParagraph = this.dependencies.baseContainer.createBaseContainer();
-            newParagraph.appendChild(this.document.createElement("br"));
             this.editable.append(newParagraph);
             current = newParagraph;
         }

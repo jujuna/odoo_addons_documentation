@@ -1,22 +1,7 @@
-const { DateTime } = luxon;
-
 import { registry } from '@web/core/registry';
+import * as tourUtils from '@website_sale/js/tours/tour_utils';
+import * as rentalUtils from '@website_sale_renting/../tests/tours/tour_utils';
 
-function getValidNextStartDatetime() {
-    return DateTime
-            .now()
-            .plus({ weeks: 1 })
-            .set({ weekday: 1 })
-            .toFormat('D TT'); // next monday
-}
-
-function getValidNextEndDatetime() {
-    return DateTime
-            .now()
-            .plus({ weeks: 1 })
-            .set({ weekday: 3 })
-            .toFormat('D TT'); // next wednesday
-}
 
 /**
  * Tests that css_not_available class is applied (removed) when picking an invalid (valid) rental
@@ -25,7 +10,6 @@ function getValidNextEndDatetime() {
 registry
     .category('web_tour.tours')
     .add('website_sale_renting_select_wrong_period', {
-        url: '/shop?search=Computer',
         steps: () => [
             {
                 content: 'Select Computer',
@@ -33,32 +17,20 @@ registry
                 run: 'click',
                 expectUnloadPage: true,
             },
-            {
-                content: "Wait for the daterange picker to be initialized",
-                trigger: '.o_daterange_picker[data-has-default-dates]',
-            },
+            tourUtils.waitForInteractionToLoad(),
             {
                 content: 'Pick an invalid start date',
                 trigger: 'input[name=renting_start_date]',
                 run: 'edit 01/01/2000 && press Tab',
             },
             {
-                content: 'Check that css_not_available has been added to the product form',
-                trigger: 'form.css_not_available'
+                content: 'Check that the add to cart button is disabled',
+                trigger: 'button[name="add_to_cart"][disabled]',
             },
+            ...rentalUtils.chooseFutureRentalDates({ duration: { days: 3 }, select_hours: false }),
             {
-                content: 'Pick a valid end date first (otherwise start date after end date)',
-                trigger: 'input[name=renting_end_date]',
-                run: `edit ${getValidNextEndDatetime()} && press Tab`,
-            },
-            {
-                content: 'Pick a valid start date',
-                trigger: 'input[name=renting_start_date]',
-                run: `edit ${getValidNextStartDatetime()} && press Tab`,
-            },
-            {
-                content: 'Check that css_not_available has been removed',
-                trigger: 'form:not(.css_not_available)'
+                content: 'Check that the add to cart button is enabled',
+                trigger: 'button[name="add_to_cart"]:not([disabled])',
             },
         ],
    });

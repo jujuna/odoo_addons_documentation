@@ -8,23 +8,32 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-13 22:00+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 03:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "approvals/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "%s (copy)"
-msgstr "%s (コピー)"
+#: model:ir.module.module,description:base.module_approvals
+msgid ""
+"\n"
+"This module manages approvals workflow\n"
+"======================================\n"
+"\n"
+"This module manages approval requests like business trips,\n"
+"out of office, overtime, borrow items, general approvals,\n"
+"procurements, contract approval, etc.\n"
+"\n"
+"According to the approval type configuration, a request\n"
+"creates next activities for the related approvers.\n"
+msgstr ""
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
@@ -32,39 +41,19 @@ msgid "'Approval - %s' % object.name"
 msgstr "'承認 - %s' % object.name"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/07/2023 10:00:00"
-msgstr "07/07/2023 10:00:00"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/08/2023 10:00:00"
-msgstr "07/08/2023 10:00:00"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "1200"
-msgstr "1200"
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuse"
+msgstr "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>拒否"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-check text-success me-1\"/>Approve"
-msgstr "<i class=\"fa fa-check text-success me-1\"/>承認する"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-times text-danger me-1\"/>Refuse"
-msgstr "<i class=\"fa fa-times text-danger me-1\"/>拒否"
+msgid "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Approve"
+msgstr "<i class=\"oi text-success me-1\" data-icon=\"check\"/>承認する"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "<span class=\"col-2 fw-bold\">Description:</span>"
 msgstr "<span class=\"col-2 fw-bold\">説明:</span>"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
-msgstr "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -77,6 +66,15 @@ msgid "<span class=\"mx-1\">-</span>"
 msgstr "<span class=\"mx-1\">-</span>"
 
 #. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
+">"
+msgstr ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
+">"
+
+#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
 msgid "Action Needed"
 msgstr "要アクション"
@@ -85,7 +83,7 @@ msgstr "要アクション"
 #: model:ir.model.fields,field_description:approvals.field_approval_category__active
 #: model:ir.model.fields,field_description:approvals.field_approval_request__active
 msgid "Active"
-msgstr "アクティブ"
+msgstr "有効"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_ids
@@ -101,6 +99,11 @@ msgstr "活動"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "例外の活動を示す装飾"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
+msgid "Activity Plans"
+msgstr "活動計画"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
@@ -133,14 +136,6 @@ msgstr "管理者"
 #: model:ir.ui.menu,name:approvals.approvals_approval_menu_all
 msgid "All Approvals"
 msgstr "全ての承認"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,help:approvals.field_approval_request__approval_type
-msgid ""
-"Allows you to define which documents you would like to create once the "
-"request has been approved"
-msgstr "申請が承認された後に作成するドキュメントを定義できます。"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__amount
@@ -218,12 +213,7 @@ msgid "Approval Subject"
 msgstr "承認事項"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approval_type
-msgid "Approval Type"
-msgstr "承認タイプ"
-
-#. module: approvals
+#: model:ir.module.module,shortdesc:base.module_approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_root
 #: model:res.groups.privilege,name:approvals.res_groups_privilege_approvals
 msgid "Approvals"
@@ -264,13 +254,6 @@ msgid "Approver"
 msgstr "承認者"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_category.py:0
-msgid ""
-"Approver Sequence can only be activated with at least 1 minimum approver."
-msgstr "承認者付番は、最低1名の承認者がある場合のみ有効化可能です。"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__user_ids
 msgid "Approver Users"
 msgstr "承認者ユーザ"
@@ -287,12 +270,6 @@ msgstr "承認者"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Approvers"
 msgstr "承認者"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approver_sequence
-msgid "Approvers Sequence?"
-msgstr "承認者の順番"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -344,7 +321,7 @@ msgstr "添付"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
-msgid "Automated Sequence?"
+msgid "Automated Sequence"
 msgstr "自動付番"
 
 #. module: approvals
@@ -412,11 +389,6 @@ msgid "Category Approver"
 msgstr "カテゴリ承認者"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
-msgid "Code"
-msgstr "コード"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category_approver__company_id
@@ -427,13 +399,9 @@ msgstr "会社"
 
 #. module: approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_config
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 msgid "Configuration"
 msgstr "設定"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
-msgid "Confirm Date"
-msgstr "確定日"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__partner_id
@@ -452,9 +420,9 @@ msgid "Contract Approval"
 msgstr "契約承認"
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid "Create a new product variant"
-msgstr "新規プロダクトバリアント作成"
+#: model:ir.module.module,summary:base.module_approvals
+msgid "Create and validate approvals requests"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid
@@ -579,11 +547,6 @@ msgid "Existing User"
 msgstr "既存ユーザ"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "Fields"
-msgstr "フィールド"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
 msgid "Followers"
 msgstr "フォロワー"
@@ -594,19 +557,9 @@ msgid "Followers (Partners)"
 msgstr "フォロワー (取引先)"
 
 #. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesomeのアイコン 例. fa-tasks"
-
-#. module: approvals
 #: model:ir.actions.server,name:approvals.model_approval_request_approve_admin
 msgid "Force Approval"
 msgstr "強制承認"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "From:"
-msgstr "開始:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
@@ -687,18 +640,10 @@ msgstr "参照あり"
 msgid ""
 "How the employee's manager interacts with this type of approval.\n"
 "\n"
-"        Empty: do nothing\n"
-"        Is Approver: the employee's manager will be in the approver list\n"
-"        Is Required Approver: the employee's manager will be required to "
-"approve the request.\n"
+"        if checked the employee's manager is a required approver of the "
+"request, along with the selected users\n"
 "    "
 msgstr ""
-"このタイプの承認に対する従業員の上司の役割\n"
-"\n"
-"空：何もしません。\n"
-"承認者：従業員の上司が承認者リストに表示されます。\n"
-"必要承認者：従業員の上司は依頼を承認する必要があります。\n"
-"    "
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__id
@@ -737,21 +682,11 @@ msgstr "有効にすると、一部のメッセージに配信エラーが発生
 #: model:ir.model.fields,help:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,help:approvals.field_approval_request__automated_sequence
 msgid ""
-"If checked, the Approval Requests will have an automated generated name "
-"based on the given code."
-msgstr "有効化されると、承認依頼は設定されたコードで自動的に付番されます。"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
-msgid ""
-"If checked, the approvers have to approve in sequence (one after the other). "
-"If Employee's Manager is selected as approver, they will be the first in "
-"line."
+"If enabled, the approval request subject will be generated automatically "
+"using the given prefix code."
 msgstr ""
-"チェックした場合、承認者は順番に(相次いで)承認する必要があります。従業員のマ"
-"ネジャーが承認者として選択されている場合、そのマネジャーが最初の順番になりま"
-"す。"
+"有効にすると、承認申請の件名は指定されたプレフィックスコードを使用して自動的"
+"に生成されます。"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -770,19 +705,9 @@ msgid "Invalid Minimum Warning"
 msgstr "無効最小警告"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__approver
-msgid "Is Approver"
-msgstr "承認者である"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_is_follower
 msgid "Is Follower"
 msgstr "フォロー中"
-
-#. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__required
-msgid "Is Required Approver"
-msgstr "必要な承認者である"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_job_referral_award
@@ -855,6 +780,11 @@ msgid "Marc Demo"
 msgstr "Marc Demo"
 
 #. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
 msgid "Message Delivery error"
 msgstr "メッセージ配信エラー"
@@ -869,6 +799,12 @@ msgstr "メッセージ"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__approval_minimum
 msgid "Minimum Approval"
 msgstr "最少承認回数"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Minimum Approval must be at least 1."
+msgstr ""
 
 #. module: approvals
 #. odoo-python
@@ -947,6 +883,11 @@ msgstr "次の活動概要"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_type_id
 msgid "Next Activity Type"
 msgstr "次の活動タイプ"
+
+#. module: approvals
+#: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
+msgid "No"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
@@ -1063,9 +1004,9 @@ msgid "Period:"
 msgstr "期間:"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "Print"
-msgstr "印刷"
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
+msgid "Prefix Code"
+msgstr "プレフィックスコード"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_procurement
@@ -1087,12 +1028,6 @@ msgstr "プロダクト説明"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__product_line_ids
 msgid "Product Line"
 msgstr "プロダクトライン"
-
-#. module: approvals
-#: model:ir.actions.act_window,name:approvals.product_product_action
-#: model:ir.ui.menu,name:approvals.approvals_menu_product_variant
-msgid "Product Variants"
-msgstr "プロダクトバリアント"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.product_template_action
@@ -1216,9 +1151,7 @@ msgid "SMS Delivery error"
 msgstr "SMS送信エラー"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_approver__sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_category_approver__sequence
 msgid "Sequence"
 msgstr "シーケンス"
 
@@ -1257,9 +1190,9 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "活動に基づくステータス\n"
-"期限超過：期限日がすでに過ぎています\n"
+"遅延: 期限が既に過ぎています\n"
 "今日: 活動日は今日です\n"
-"予定: 将来の活動。"
+"予定: 今後の活動です"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1276,6 +1209,12 @@ msgstr "提出"
 #: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__pending
 msgid "Submitted"
 msgstr "申請済"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Submitted Date"
+msgstr "提出日"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1382,7 +1321,7 @@ msgstr "承認待ち"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_kanban
 msgid "To Review:"
-msgstr "未レビュー:"
+msgstr "要確認:"
 
 #. module: approvals
 #: model:ir.model.fields.selection,name:approvals.selection__approval_request__request_status__new
@@ -1397,12 +1336,12 @@ msgstr "本日の活動"
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_request__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "記録上の例外活動の種類。"
+msgstr "レコード上の例外の活動タイプ。"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_kanban
 msgid "Unarchive"
-msgstr "アーカイブキャンセル"
+msgstr "アーカイブ解除"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_product_line__product_uom_id
@@ -1432,22 +1371,6 @@ msgid "Users"
 msgstr "ユーザ"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__waiting
-#: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__waiting
-msgid "Waiting"
-msgstr "待機中"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_request__website_message_ids
-msgid "Website Messages"
-msgstr "ウェブサイトメッセージ"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__website_message_ids
-msgid "Website communication history"
-msgstr "ウェブサイトコミュニケーション履歴"
-
-#. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "Withdraw"
 msgstr "取下げる"
@@ -1463,12 +1386,6 @@ msgstr "ご自身で承認または拒否することはできません。"
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You can't delete an approved request. Archive it instead."
 msgstr "承認済みのリクエストは削除できません。代わりにアーカイブしてください。"
-
-#. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "You cannot approve before the previous approver."
-msgstr "前の承認者より前に承認することはできません。"
 
 #. module: approvals
 #. odoo-python
@@ -1511,15 +1428,6 @@ msgid "You must cancel and then back to draft the approval first."
 msgstr "まず、承認を取消してから、ドラフトに戻してください。"
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid ""
-"You must define a product for everything you sell or purchase,\n"
-"            whether it's a storable product, a consumable or a service."
-msgstr ""
-"販売または購買するものは、在庫品、消耗品、またはサービスかに関わらず、\n"
-"            全てプロダクトとして定義する必要があります。"
-
-#. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Your minimum approval exceeds the total of default approvers."
@@ -1547,10 +1455,25 @@ msgstr "メニュー"
 msgid "new request"
 msgstr "新規申請"
 
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "to:"
-msgstr "宛先:"
+#~ msgid ""
+#~ "Approver Sequence can only be activated with at least 1 minimum approver."
+#~ msgstr "承認者付番は、最低1名の承認者がある場合のみ有効化可能です。"
 
-#~ msgid "<span class=\"fw-bold\">Description:</span>"
-#~ msgstr "<span class=\"fw-bold\">説明:</span>"
+#~ msgid ""
+#~ "How the employee's manager interacts with this type of approval.\n"
+#~ "\n"
+#~ "        if checked the employee's manager must approve the request first, "
+#~ "before proceeding to the rest of the selected users\n"
+#~ "    "
+#~ msgstr ""
+#~ "従業員のマネージャーがこの種類の承認にどのように関与するか。.\n"
+#~ "\n"
+#~ "        チェックを入れると、選択された他のユーザに進む前に、まず従業員のマ"
+#~ "ネジャーがリクエストを承認する必要があります。\n"
+#~ "    "
+
+#~ msgid "Waiting"
+#~ msgstr "待機中"
+
+#~ msgid "You cannot approve before the previous approver."
+#~ msgstr "前の承認者より前に承認することはできません。"

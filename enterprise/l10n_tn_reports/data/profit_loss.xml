@@ -4,6 +4,7 @@
         <field name="name">Income statement</field>
         <field name="name@fr">Etat de résultats</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="country_id" ref="base.tn"/>
@@ -21,7 +22,7 @@
                 <field name="name@fr">PRODUIT D'EXPLOITATION</field>
                 <field name="code">l10n_tn_I_1</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="True"/>
+                <field name="foldability">foldable</field>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_I_1_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -34,7 +35,7 @@
                         <field name="name">Revenues</field>
                         <field name="name@fr">Revenus</field>
                         <field name="code">l10n_tn_I_1_1</field>
-                        <field name="foldable" eval="True"/>
+                        <field name="foldability">foldable</field>
                         <field name="expression_ids">
                             <record id="l10n_tn_pl_I_1_1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -47,8 +48,6 @@
                                 <field name="name">Net sale of goods</field>
                                 <field name="name@fr">Vente nette de marchandise</field>
                                 <field name="code">l10n_tn_I_1_1_1</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tn_pl_I_1_1_1_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -61,8 +60,6 @@
                                 <field name="name">Net sale of production</field>
                                 <field name="name@fr">Vente nette de la production</field>
                                 <field name="code">l10n_tn_I_1_1_2</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tn_pl_I_1_1_2_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -77,8 +74,6 @@
                         <field name="name">Capitalized production</field>
                         <field name="name@fr">Production immobilisée</field>
                         <field name="code">l10n_tn_I_1_2</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tn_pl_I_1_2_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -91,8 +86,6 @@
                         <field name="name">Other operating income</field>
                         <field name="name@fr">Autres produits d'exploitation</field>
                         <field name="code">l10n_tn_I_1_3</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tn_pl_I_1_3_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -108,7 +101,7 @@
                 <field name="name@fr">CHARGES D'EXPLOITATION</field>
                 <field name="code">l10n_tn_I_2</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="True"/>
+                <field name="foldability">foldable</field>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_I_2_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -121,8 +114,6 @@
                         <field name="name">Change in stocks of finished goods and work in progress</field>
                         <field name="name@fr">Variation des stocks des produits finis et des encours</field>
                         <field name="code">l10n_tn_I_2_1</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tn_pl_I_2_1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -135,8 +126,6 @@
                         <field name="name">Purchases of goods consumed</field>
                         <field name="name@fr">Achats de marchandises consommés</field>
                         <field name="code">l10n_tn_I_2_2</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tn_pl_I_2_2_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -149,8 +138,6 @@
                         <field name="name">Purchases of supplies consumed</field>
                         <field name="name@fr">Achats d'approvisionnements consommés</field>
                         <field name="code">l10n_tn_I_2_3</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tn_pl_I_2_3_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -163,8 +150,6 @@
                         <field name="name">Personnel costs</field>
                         <field name="name@fr">Charges de personnel</field>
                         <field name="code">l10n_tn_I_2_4</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tn_pl_I_2_4_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -177,8 +162,6 @@
                         <field name="name">Depreciation and provisions</field>
                         <field name="name@fr">Dotations aux amortissements et aux provisions</field>
                         <field name="code">l10n_tn_I_2_5</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tn_pl_I_2_5_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -191,8 +174,6 @@
                         <field name="name">Other operating expenses</field>
                         <field name="name@fr">Autres charges d'exploitations</field>
                         <field name="code">l10n_tn_I_2_6</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tn_pl_I_2_6_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -207,7 +188,6 @@
                 <field name="name">OPERATING RESULT</field>
                 <field name="name@fr">RESULTAT D'EXPLOITATION</field>
                 <field name="code">l10n_tn_I</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_I_balance" model="account.report.expression">
@@ -222,8 +202,6 @@
                 <field name="name@fr">Charges financières nettes</field>
                 <field name="code">l10n_tn_II_1</field>
                 <field name="hierarchy_level">3</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_II_1_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -237,8 +215,6 @@
                 <field name="name@fr">Produits des placements</field>
                 <field name="code">l10n_tn_II_2</field>
                 <field name="hierarchy_level">3</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_II_2_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -252,8 +228,6 @@
                 <field name="name@fr">Autres gains ordinaires</field>
                 <field name="code">l10n_tn_II_3</field>
                 <field name="hierarchy_level">3</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_II_3_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -267,8 +241,6 @@
                 <field name="name@fr">Autres pertes ordinaires</field>
                 <field name="code">l10n_tn_II_4</field>
                 <field name="hierarchy_level">3</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_II_4_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -282,7 +254,6 @@
                 <field name="name@fr">RESULTAT DES ACTIVITES ORDINAIRES AVANT IMPOT</field>
                 <field name="code">l10n_tn_II</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_II_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -296,8 +267,6 @@
                 <field name="name@fr">Impôt sur les bénéfices</field>
                 <field name="code">l10n_tn_III_1</field>
                 <field name="hierarchy_level">3</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_III_1_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -311,7 +280,6 @@
                 <field name="name@fr">RESULTAT DES ACTIVITES ORDINAIRES APRES IMPOTS</field>
                 <field name="code">l10n_tn_III</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_III_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -325,8 +293,6 @@
                 <field name="name@fr">Éléments extraordinaires</field>
                 <field name="code">l10n_tn_IV_1</field>
                 <field name="hierarchy_level">3</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_IV_1_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -340,7 +306,6 @@
                 <field name="name@fr">RESULTAT NET DE LA PERIODE</field>
                 <field name="code">l10n_tn_IV</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_IV_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -354,8 +319,6 @@
                 <field name="name@fr">Effets des modifications comptables (net d'impôt)</field>
                 <field name="code">l10n_tn_V_1</field>
                 <field name="hierarchy_level">3</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_V_1_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -368,7 +331,6 @@
                 <field name="name">RESULT AFTER ACCOUNTING CHANGES</field>
                 <field name="name@fr">RESULTAT APRES MODIFICATIONS COMPTABLES</field>
                 <field name="code">l10n_tn_V</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="l10n_tn_pl_V_balance" model="account.report.expression">

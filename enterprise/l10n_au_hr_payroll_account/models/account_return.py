@@ -26,19 +26,7 @@ class L10NAUAccountReturn(models.Model):
         if not results:
             return move_vals_lines, tax_group_subtotal
 
-        tax_group = self.env['account.tax'].search([
-            ('amount', '<', 0.0),
-            ('company_id', '=', company.id),
-        ], limit=1).tax_group_id
-
-        if not tax_group:
-            tax_group = self.env['account.tax.group'].search([], limit=1)
-
-        key = (
-            tax_group.advance_tax_payment_account_id.id,
-            tax_group.tax_receivable_account_id.id,
-            tax_group.tax_payable_account_id.id,
-        )
+        key = self._get_tax_closing_accounts(company)
 
         for account, balance in results:
             tax_group_subtotal[key] += balance

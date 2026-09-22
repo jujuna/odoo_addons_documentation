@@ -6,7 +6,6 @@
         <field name="l10n_gt_edi_consignatory_code">0000</field>
         <field name="l10n_gt_edi_phrase_ids"
                eval="[Command.set([ref('l10n_gt_edi.l10n_gt_edi_phrase_type_1_code_1')])]"/>
-        <field name="l10n_latam_identification_type_id" ref="it_nit"/>
     </record>
 
     <record id="l10n_gt_partner_1" model="res.partner">
@@ -17,9 +16,7 @@
         <field name="zip">01066</field>
         <field name="country_id" ref="base.gt"/>
         <field name="vat">2492334</field>
-        <field name="company_type">company</field>
         <field name="email">info@empresaguatemalteca.com</field>
-        <field name="l10n_latam_identification_type_id" ref="it_nit"/>
     </record>
 
     <record id="l10n_gt_partner_2" model="res.partner">
@@ -29,9 +26,7 @@
         <field name="state_id" ref="base.state_gt_ave"/>
         <field name="zip">01051</field>
         <field name="country_id" ref="base.gt"/>
-        <field name="vat">1234567890101</field>
-        <field name="is_company" eval="False"/>
-        <field name="l10n_latam_identification_type_id" ref="it_cui"/>
+        <field name="additional_identifiers" eval="{'GT_CUI': '1234567890101'}"/>
     </record>
 
     <record id="l10n_gt_partner_3" model="res.partner">
@@ -40,9 +35,7 @@
         <field name="state_id" ref="base.state_gt_ave"/>
         <field name="zip">01051</field>
         <field name="country_id" ref="base.gt"/>
-        <field name="company_type">company</field>
         <field name="vat">1669394-9</field>
-        <field name="l10n_latam_identification_type_id" ref="it_nit"/>
     </record>
 
 </odoo>

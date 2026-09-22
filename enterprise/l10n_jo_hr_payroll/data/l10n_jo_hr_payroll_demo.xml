@@ -12,6 +12,7 @@
         <field name="zip">11110</field>
         <field name="city">Amman</field>
         <field name="country_id" ref="base.jo"/>
+        <field name="resource_calendar_id" ref="l10n_jo_hr_payroll.l10n_jo_resource_calender"/>
     </record>
 
     <record id="base.user_admin" model="res.users">
@@ -67,64 +68,46 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_jo'))]"/>
         <field name="company_id" ref="base.demo_company_jo"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_al-image.jpg"/>
-    </record>
-
-    <record id="jo_res_bank_arab" model="res.bank">
-        <field name="name">Arab Bank</field>
-        <field name="bic">ARABJOAXXXX</field>
-        <field name="street">Arab Bank street</field>
-        <field name="city">Amman</field>
-        <field name="zip">11148</field>
-        <field name="state" ref="base.state_jo_am"/>
-        <field name="country" ref="base.jo"/>
-        <field name="phone">099 328 4709</field>
-    </record>
-    <record id="jo_res_bank_arab" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_jo_hr_payroll.jo_res_bank_arab')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="jo_res_bank_of_jordan" model="res.bank">
-        <field name="name">Bank of Jordan</field>
-        <field name="bic">BJORJOAXXXX</field>
-        <field name="street">Bank of Jordan Street</field>
-        <field name="city">Amman</field>
-        <field name="zip">11190</field>
-        <field name="state" ref="base.state_jo_am"/>
-        <field name="country" ref="base.jo"/>
-        <field name="phone">099 238 4900</field>
-    </record>
-    <record id="jo_res_bank_of_jordan" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_jo_hr_payroll.jo_res_bank_of_jordan')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.jpg"/>
     </record>
 
     <record id="res_partner_bank_account_hana" model="res.partner.bank">
-        <field name="acc_number">JO94CBJO0010000000000131000302</field>
+        <field name="account_number">JO94CBJO0010000000000131000302</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_jo_hr_payroll.jo_res_bank_arab"/>
+        <field name="bank_name">Arab Bank</field>
+        <field name="bank_bic">ARABJOAXXXX</field>
+        <field name="street">Arab Bank street</field>
+        <field name="city">Amman</field>
+        <field name="zip">11148</field>
+        <field name="state_id" ref="base.state_jo_am"/>
+        <field name="country_id" ref="base.jo"/>
         <field name="partner_id" ref="res_partner_hana"/>
         <field name="company_id" ref="base.demo_company_jo"/>
-        <field name="currency_id" ref="base.JOD"/>
     </record>
 
     <record id="res_partner_bank_account_jad" model="res.partner.bank">
-        <field name="acc_number">JO71CBJO0000000000001234567890</field>
+        <field name="account_number">JO71CBJO0000000000001234567890</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_jo_hr_payroll.jo_res_bank_of_jordan"/>
+        <field name="bank_name">Bank of Jordan</field>
+        <field name="bank_bic">BJORJOAXXXX</field>
+        <field name="street">Bank of Jordan Street</field>
+        <field name="city">Amman</field>
+        <field name="zip">11190</field>
+        <field name="state_id" ref="base.state_jo_am"/>
+        <field name="country_id" ref="base.jo"/>
         <field name="partner_id" ref="res_partner_jad"/>
         <field name="company_id" ref="base.demo_company_jo"/>
-        <field name="currency_id" ref="base.JOD"/>
     </record>
 
     <record id="hr_employee_hana" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_jo_hr_payroll.res_partner_hana')).name"/>
         <field name="job_id" ref="hr.job_developer"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_mit-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_mit-image.jpg"/>
         <field name="work_phone">99 123 0987</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_jo_hr_payroll.res_partner_hana')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_jo_hr_payroll.res_partner_hana"/>
         <field name="company_id" model="res.partner" eval="obj(ref('l10n_jo_hr_payroll.res_partner_hana')).company_id"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="l10n_jo_hr_payroll.l10n_jo_resource_calender"/>
         <field name="tz">Asia/Amman</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_jo_hr_payroll.res_partner_hana')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_jo_hr_payroll.res_partner_hana')).city"/>
@@ -144,12 +127,11 @@
         <field name="emergency_phone">99 784 5723</field>
         <field name="certificate">master</field>
         <field name="study_field">Mathematics</field>
-        <field name="study_school">University of Jordan</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_jo_hr_payroll.res_partner_bank_account_hana'))]"/>
         <field name="department_id" ref="l10n_jo_hr_payroll.jo_hr_department_marketing"/>
         <field name="structure_type_id" ref="l10n_jo_hr_payroll.structure_type_employee_jo"/>
-        <field name="contract_type_id" ref="hr.contract_type_temporary"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="wage_type">monthly</field>
         <field name="wage">1500</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
@@ -158,18 +140,19 @@
         <field name="l10n_jo_other_allowances">300</field>
         <field name="contract_date_start" eval="DateTime.today() + relativedelta(months=-4, days=-10)"/>
         <field name="date_version" eval="DateTime.today() + relativedelta(months=-4, days=-10)"/>
+        <field name="address_id" ref="base.partner_demo_company_jo"/>
     </record>
 
     <record id="hr_employee_jad" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_jo_hr_payroll.res_partner_jad')).name"/>
         <field name="job_id" ref="hr.job_consultant"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_al-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.jpg"/>
         <field name="work_phone">99 329 1469</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_jo_hr_payroll.res_partner_jad')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_jo_hr_payroll.hr_employee_hana"/>
         <field name="user_id" ref="l10n_jo_hr_payroll.user_jad"/>
         <field name="company_id" ref="base.demo_company_jo"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="l10n_jo_hr_payroll.l10n_jo_resource_calender"/>
         <field name="tz">Asia/Amman</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_jo_hr_payroll.res_partner_jad')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_jo_hr_payroll.res_partner_jad')).city"/>
@@ -189,12 +172,11 @@
         <field name="emergency_phone">99 972 0741</field>
         <field name="certificate">master</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">University of Jordan</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_jo_hr_payroll.res_partner_bank_account_jad'))]"/>
         <field name="department_id" ref="l10n_jo_hr_payroll.jo_hr_department_accounting"/>
         <field name="structure_type_id" ref="l10n_jo_hr_payroll.structure_type_employee_jo"/>
-        <field name="contract_type_id" ref="hr.contract_type_full_time"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="wage">2000</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="date_version" eval="DateTime.today() + relativedelta(years=-3,month=2,day=25)"/>
@@ -202,5 +184,6 @@
         <field name="l10n_jo_housing_allowance">150</field>
         <field name="l10n_jo_transportation_allowance">0</field>
         <field name="l10n_jo_other_allowances">100</field>
+        <field name="address_id" ref="base.partner_demo_company_jo"/>
     </record>
 </odoo>

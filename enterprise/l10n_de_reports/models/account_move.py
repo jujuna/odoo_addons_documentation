@@ -1,26 +1,27 @@
 import uuid
 
 from odoo import api, fields, models
-from odoo.tools.sql import column_exists, create_column
+from odoo.tools import SQL
 
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    l10n_de_datev_main_account_id = fields.Many2one('account.account', compute='_get_datev_account', store=True)
+    l10n_de_datev_main_account_id = fields.Many2one(
+        comodel_name='account.account',
+        compute='_get_datev_account', store=True,
+        init_storage='_init_column_datev_main_account',
+        index='btree_not_null',
+    )
 
-    def _auto_init(self):
-        if column_exists(self.env.cr, "account_move", "l10n_de_datev_main_account_id"):
-            return super()._auto_init()
-
+    def _init_column_datev_main_account(self):
         cr = self.env.cr
-        create_column(cr, "account_move", "l10n_de_datev_main_account_id", "int4")
 
         dach_companies = self.env['res.company'].search([
             ('account_fiscal_country_id.code', 'in', ('DE', 'AT', 'CH')),
         ])
         if not dach_companies:
-            return super()._auto_init()
+            return
 
         # If move has an invoice, return invoice's account_id
         cr.execute(
@@ -78,9 +79,13 @@ class AccountMove(models.Model):
                       JOIN account_journal j
                         ON m.journal_id = j.id
                       JOIN res_company c
-                        ON c.currency_exchange_journal_id = j.id
+                        ON m.company_id = c.id
                      WHERE j.type='general'
-                       AND l.account_id = j.default_account_id
+                       AND j.id = c.currency_exchange_journal_id
+                       AND l.account_id IN (
+                           c.income_currency_exchange_account_id,
+                           c.expense_currency_exchange_account_id
+                       )
                        AND m.company_id IN %(dach_company_ids)s
                      GROUP BY l.move_id,
                               l.account_id
@@ -93,29 +98,28 @@ class AccountMove(models.Model):
         )
 
         # Look for an account used a single time in the move, that has no originator tax
-        query = """
+        def run_query(condition):
+            cr.execute(SQL("""
             UPDATE account_move m
                SET l10n_de_datev_main_account_id = r.aid
               FROM (
                     SELECT l.move_id AS mid,
                            min(l.account_id) AS aid
                       FROM account_move_line l
-                     WHERE {}
-                       AND l.company_id IN %(dach_company_ids)s
+                     WHERE %s
+                       AND l.company_id IN %s
                      GROUP BY move_id
                     HAVING count(*)=1
                    ) r
              WHERE id = r.mid
                AND m.l10n_de_datev_main_account_id IS NULL
-            """
-        cr.execute(query.format("l.debit > 0"), {'dach_company_ids': tuple(dach_companies.ids)})
-        cr.execute(query.format("l.credit > 0"), {'dach_company_ids': tuple(dach_companies.ids)})
-        cr.execute(query.format("l.debit > 0 AND l.tax_line_id IS NULL"), {'dach_company_ids': tuple(dach_companies.ids)})
-        cr.execute(query.format("l.credit > 0 AND l.tax_line_id IS NULL"), {'dach_company_ids': tuple(dach_companies.ids)})
+            """, condition, tuple(dach_companies.ids)))
+        run_query(SQL("l.debit > 0"))
+        run_query(SQL("l.credit > 0"))
+        run_query(SQL("l.debit > 0 AND l.tax_line_id IS NULL"))
+        run_query(SQL("l.credit > 0 AND l.tax_line_id IS NULL"))
 
-        return super()._auto_init()
-
-    @api.depends('journal_id', 'line_ids', 'journal_id.default_account_id')
+    @api.depends('journal_id', 'line_ids', 'line_ids.account_id', 'journal_id.default_account_id')
     def _get_datev_account(self):
         for move in self:
             move.l10n_de_datev_main_account_id = value = False
@@ -134,7 +138,12 @@ class AccountMove(models.Model):
                 continue
             # If the move is an automatic exchange rate entry, take the gain/loss account set on the exchange journal
             elif move.journal_id.type == 'general' and move.journal_id == self.env.company.currency_exchange_journal_id:
-                lines = move.line_ids.filtered(lambda r: r.account_id == move.journal_id.default_account_id)
+                lines = move.line_ids.filtered(
+                    lambda r: r.account_id in (
+                        self.env.company.income_currency_exchange_account_id,
+                        self.env.company.expense_currency_exchange_account_id
+                    )
+                )
 
                 if len(lines) == 1:
                     move.l10n_de_datev_main_account_id = lines.account_id
@@ -167,6 +176,6 @@ class AccountMove(models.Model):
     def _l10n_de_datev_get_guid(self):
         """ Get the unique identifier for the move based on the db UUID and the move id """
         self.ensure_one()
-        dbuuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        dbuuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
         guid = uuid.uuid5(namespace=uuid.UUID(dbuuid), name=str(self.id))
         return str(guid)

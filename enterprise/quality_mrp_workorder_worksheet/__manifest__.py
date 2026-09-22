@@ -1,9 +1,7 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Quality Worksheet for Workorder',
-    'version': '1.0',
     'category': 'Supply Chain/Quality',
     'summary': 'Quality Worksheet for Workorder',
     'depends': ['quality_control_worksheet', 'quality_mrp_workorder'],

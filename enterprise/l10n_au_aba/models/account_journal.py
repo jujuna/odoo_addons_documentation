@@ -17,7 +17,7 @@ class AccountJournal(models.Model):
     aba_self_balancing = fields.Boolean(string='Include Self Balancing Transaction', default=False)
 
     #Needed for "bank account" form, were the account number is directly set with a related field
-    aba_bsb = fields.Char(string='BSB', related='bank_account_id.aba_bsb', help="BSB code of the account associated to this journal", readonly=False)
+    aba_bsb = fields.Char(string='BSB', compute='_compute_aba_bsb', help="BSB code of the account associated to this journal")
 
     @api.constrains('aba_fic')
     def _validate_aba_fic(self):
@@ -46,3 +46,8 @@ class AccountJournal(models.Model):
         if self._is_payment_method_available('aba_ct'):
             res |= self.env.ref('l10n_au_aba.account_payment_method_aba_ct')
         return res
+
+    @api.depends('bank_account_id.clearing_label_id', 'bank_account_id.clearing_number')
+    def _compute_aba_bsb(self):
+        for journal in self:
+            journal.aba_bsb = journal.bank_account_id._get_clearing_number('AU')

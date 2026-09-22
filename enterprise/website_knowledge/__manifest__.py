@@ -1,18 +1,14 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Knowledge Website',
     'summary': 'Publish your articles',
-    'version': '1.0',
     'depends': ['knowledge', 'website'],
     'data': [
-        'security/ir.model.access.csv',
-        'security/ir_rule.xml',
         'views/knowledge_views.xml',
         'views/knowledge_templates_public.xml',
+        'security/ir.access.csv',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
@@ -24,6 +20,8 @@
             'knowledge/static/src/scss/knowledge_variables.scss',
             'knowledge/static/src/portal_webclient/router_utils.js',
             'knowledge/static/src/components/article_search_dialog/article_search_dialog.*',
+            'knowledge/static/src/components/knowledge_readonly_heading_link/knowledge_readonly_heading_link.*',
+            'knowledge/static/src/editor/core/**/*',
             'knowledge/static/src/editor/embedded_components/core/**/*',
             'knowledge/static/src/editor/html_migrations/**/*',
             'website_knowledge/static/src/frontend/**/*',
@@ -44,9 +42,6 @@
         'web.assets_unit_tests': [
             'website_knowledge/static/tests/**/*',
             ('remove', 'website_knowledge/static/tests/tours/**/*'),
-        ],
-        'website.website_builder_assets': [
-            'website_knowledge/static/src/plugins/**/*',
         ],
     },
 }

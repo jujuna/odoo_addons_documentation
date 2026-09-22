@@ -33,31 +33,6 @@ export const BG_COLORS = [
 ];
 
 /**
- * This allows to list Font Awesome icon, independently of the library version
- * Some icons use the same glyph for multiple classes. Those are filtered to only
- * list the icon once
- */
-export function getFontAwesomeIcons() {
-    const styleSheet = [...document.styleSheets].find(
-        (s) => s && s.href && s.href.includes("/web/")
-    );
-    const fontAwesomeStyles = [...styleSheet.cssRules]
-        .filter((e) => /^\.fa-.*:before/.test(e.selectorText))
-        .filter((e) => e && e.style && e.style.length === 1 && e.style[0] === "content");
-    return fontAwesomeStyles.map((rule) => {
-        const classNames = rule.selectorText.split(/:?:before|,/).filter((e) => e.length > 1);
-        const searchTerms = classNames.map((selector) =>
-            selector.replace(".fa-", "").replace(/-o$/g, " (Outline)").replaceAll("-", " ")
-        );
-        return {
-            className: "fa " + classNames[0].slice(1),
-            searchTerms,
-            tooltip: searchTerms[0].charAt(0).toUpperCase() + searchTerms[0].slice(1),
-        };
-    });
-}
-
-/**
  * @param {Integer} string_length
  * @returns {String} A random string with numbers and lower/upper case chars
  */

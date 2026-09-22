@@ -1,20 +1,53 @@
-import { _t } from "@web/core/l10n/translation";
-import { patch } from "@web/core/utils/patch";
-import { PhoneField, phoneField, formPhoneField } from "@web/views/fields/phone/phone_field";
-import { SendWhatsAppButton } from "../whatsapp_button/whatsapp_button.js";
+import { t } from "@odoo/owl";
 
-patch(PhoneField, {
-    components: {
-        ...PhoneField.components,
-        SendWhatsAppButton,
+import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
+import { patch } from "@web/core/utils/patch";
+import { useService } from "@web/core/utils/hooks";
+import { PhoneField, phoneField, phoneFieldProps } from "@web/views/fields/phone/phone_field";
+
+phoneFieldProps.enableWhatsAppButton = t.boolean().optional(true);
+
+patch(PhoneField.prototype, {
+    setup() {
+        super.setup();
+        this.action = useService("action");
     },
-    defaultProps: {
-        ...PhoneField.defaultProps,
-        enableWhatsAppButton: true,
-    },
-    props: {
-        ...PhoneField.props,
-        enableWhatsAppButton: { type: Boolean, optional: true },
+    get actionButtons() {
+        if (!this.props.enableWhatsAppButton || !this.value) {
+            return super.actionButtons;
+        }
+        return [
+            ...super.actionButtons,
+            {
+                icon: "oi_whatsapp",
+                onSelected: async () => {
+                    await this.props.record.save();
+                    this.action.doAction(
+                        {
+                            type: "ir.actions.act_window",
+                            target: "new",
+                            name: _t("Send WhatsApp Message"),
+                            res_model: "whatsapp.composer",
+                            views: [[false, "form"]],
+                            context: {
+                                ...user.context,
+                                active_model: this.props.record.resModel,
+                                active_id: this.props.record.resId,
+                                default_phone: this.dialNumber,
+                            },
+                        },
+                        {
+                            onClose: () => {
+                                this.props.record.load();
+                                this.props.record.model.notify();
+                            },
+                        }
+                    );
+                },
+                name: _t("WhatsApp"),
+            },
+        ];
     },
 });
 
@@ -36,4 +69,3 @@ const patchDescr = {
 };
 
 patch(phoneField, patchDescr);
-patch(formPhoneField, patchDescr);

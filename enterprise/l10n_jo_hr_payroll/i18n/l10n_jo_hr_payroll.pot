@@ -4,16 +4,30 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:07+0000\n"
-"PO-Revision-Date: 2025-12-30 19:07+0000\n"
+"POT-Creation-Date: 2026-09-18 18:20+0000\n"
+"PO-Revision-Date: 2026-09-18 18:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_jo_hr_payroll
+#: model:ir.module.module,description:base.module_l10n_jo_hr_payroll
+msgid ""
+"\n"
+"Jordanian Payroll and Tax Rules\n"
+"========================================\n"
+"\n"
+"- Overtime Computations.\n"
+"- End of Service benefit and remaining leaves compensation rules.\n"
+"- Provisions for End of service benefit and annual leaves.\n"
+"- Income tax withholding and exemptions.\n"
+"- Sick leaves deductions.\n"
+msgstr ""
 
 #. module: l10n_jo_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
@@ -24,13 +38,7 @@ msgstr ""
 #. module: l10n_jo_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
-msgid "<span>/ year</span>"
-msgstr ""
-
-#. module: l10n_jo_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
-msgid "<span>days</span>"
+msgid "<span>days / year</span>"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -42,6 +50,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
 msgid "Allowances"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_res_config_settings__allowed_work_entry_type_ids
+msgid "Allowed Work Entry Type"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -73,7 +86,7 @@ msgstr ""
 
 #. module: l10n_jo_hr_payroll
 #: model:ir.model,name:l10n_jo_hr_payroll.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -91,9 +104,16 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_payroll_structure_type__display_name
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_payslip__display_name
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_version__display_name
+#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_work_entry_type__display_name
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_res_company__display_name
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_res_config_settings__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
+msgid "Eligibility"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -128,6 +148,11 @@ msgid "End of Service Tax Deduction"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
+#: model:hr.salary.rule,name:l10n_jo_hr_payroll.l10n_jo_hr_payroll_structure_jo_employee_salary_expenses_reimbursement
+msgid "Expenses Reimbursement"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_employee__l10n_jo_has_dependants
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_version__l10n_jo_has_dependants
 msgid "Has Dependants"
@@ -149,9 +174,17 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_payroll_structure_type__id
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_payslip__id
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_version__id
+#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_work_entry_type__id
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_res_config_settings__id
 msgid "ID"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
+msgid ""
+"If not checked, the employee will not be eligible for the end of service "
+"benefit upon leaving the company"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -161,23 +194,35 @@ msgid "Is Blind"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
-#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_employee__l10n_jo_is_commission_based
-#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_version__l10n_jo_is_commission_based
-#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
-msgid "Is Commission based"
+#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_res_company__l10n_jo_annual_work_entry_type_id
+#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_res_config_settings__l10n_jo_annual_work_entry_type_id
+msgid "JO Annual Leave Time-off Type"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
-#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_res_company__l10n_jo_annual_leave_type_id
-#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_res_config_settings__l10n_jo_annual_leave_type_id
-msgid "JO Annual Leave Time-off Type"
+#: model:ir.module.module,shortdesc:base.module_l10n_jo_hr_payroll
+msgid "Jordan - Payroll"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.rule.parameter,name:l10n_jo_hr_payroll.l10n_jo_rule_parameter_eos_exemption
+msgid "Jordan EOS Tax Exemption Amount "
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_employee__l10n_jo_housing_allowance
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_version__l10n_jo_housing_allowance
 msgid "Jordan Housing Allowance"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.rule.parameter,name:l10n_jo_hr_payroll.rule_parameter_l10n_jo_min_sse
+msgid "Jordan Minimum Social Security Employee Deduction"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.rule.parameter,name:l10n_jo_hr_payroll.rule_parameter_l10n_jo_min_ssc
+msgid "Jordan Minimum Social Security Employer Contribution"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -198,15 +243,44 @@ msgid "Jordan Payroll"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
-#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_employee__l10n_jo_tax_exemption
-#: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_version__l10n_jo_tax_exemption
-msgid "Jordan Tax Exemption Amount"
+#: model:hr.rule.parameter,name:l10n_jo_hr_payroll.l10n_jo_rule_parameter_rest_days_overtime_rate
+msgid "Jordan Rest days Overtime Rate"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.rule.parameter,name:l10n_jo_hr_payroll.rule_parameter_l10n_jo_sse_rate
+msgid "Jordan Social Security Employee Deduction Rate %"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.rule.parameter,name:l10n_jo_hr_payroll.rule_parameter_l10n_jo_ssc_rate
+msgid "Jordan Social Security Employer Contribution Rate %"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.rule.parameter,name:l10n_jo_hr_payroll.rule_parameter_l10_jo_tax_rates
+msgid "Jordan Tax Bracket Rates"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.rule.parameter,name:l10n_jo_hr_payroll.l10n_jo_rule_parameter_taxable_yearly_gross_exemption
+msgid "Jordan Taxable Yearly Gross Exemption Amount"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_employee__l10n_jo_transportation_allowance
 #: model:ir.model.fields,field_description:l10n_jo_hr_payroll.field_hr_version__l10n_jo_transportation_allowance
 msgid "Jordan Transportation Allowance"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.rule.parameter,name:l10n_jo_hr_payroll.l10n_jo_rule_parameter_work_days_overtime_rate
+msgid "Jordan Work days Overtime Rate"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.payroll.structure.type,name:l10n_jo_hr_payroll.structure_type_employee_jo
+msgid "Jordan: Employee"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -227,12 +301,6 @@ msgstr ""
 #. module: l10n_jo_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
-msgid "Number of Leave"
-msgstr ""
-
-#. module: l10n_jo_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
 msgid "Other"
 msgstr ""
 
@@ -244,6 +312,11 @@ msgstr ""
 #. module: l10n_jo_hr_payroll
 #: model:ir.model,name:l10n_jo_hr_payroll.model_hr_payslip
 msgid "Pay Slip"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:hr.salary.rule,name:l10n_jo_hr_payroll.l10n_jo_hr_payroll_structure_jo_employee_salary_public_holidays_overtime
+msgid "Public Holidays Overtime"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -259,11 +332,6 @@ msgstr ""
 #. module: l10n_jo_hr_payroll
 #: model:hr.salary.rule,name:l10n_jo_hr_payroll.l10n_jo_hr_payroll_structure_jo_employee_salary_rest_days_overtime
 msgid "Rest Days Overtime"
-msgstr ""
-
-#. module: l10n_jo_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_jo_hr_payroll.l10n_jo_input_restdays_overtime_hours
-msgid "Restdays Overtime Hours"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -283,7 +351,7 @@ msgstr ""
 
 #. module: l10n_jo_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.res_config_settings_view_form
-msgid "Set the time off type used as Annual Leave"
+msgid "Set the time type used as Annual Leave"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -307,12 +375,6 @@ msgid "Tax Brackets"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
-msgid "Tax Exemption"
-msgstr ""
-
-#. module: l10n_jo_hr_payroll
 #: model:hr.salary.rule,name:l10n_jo_hr_payroll.l10n_jo_hr_payroll_structure_jo_employee_salary_gross_salary_rule
 msgid "Taxable Salary (Gross)"
 msgstr ""
@@ -320,6 +382,19 @@ msgstr ""
 #. module: l10n_jo_hr_payroll
 #: model:hr.salary.rule,name:l10n_jo_hr_payroll.jordan_yearly_gross
 msgid "Taxable Yearly Gross"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model:ir.model,name:l10n_jo_hr_payroll.model_hr_work_entry_type
+msgid "Time Type"
+msgstr ""
+
+#. module: l10n_jo_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_contract_template_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_jo_hr_payroll.hr_employee_view_form
+msgid ""
+"Total Number of annual leave days the employee is eligible for in the "
+"current year"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
@@ -355,6 +430,7 @@ msgid "Weekdays Overtime"
 msgstr ""
 
 #. module: l10n_jo_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_jo_hr_payroll.l10n_jo_input_weekdays_overtime_hours
-msgid "Weekdays Overtime Hours"
+#. odoo-python
+#: code:addons/l10n_jo_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "month"
 msgstr ""

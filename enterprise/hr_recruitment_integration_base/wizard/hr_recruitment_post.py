@@ -17,7 +17,7 @@ class HrRecruitmentPostJobWizard(models.TransientModel):
             res['job_id'] = self.env.context.get('active_id')
         return res
 
-    campaign_start_date = fields.Date(string="Campaign Start Date", default=fields.Date.today(), required=True)
+    campaign_start_date = fields.Date(string="Campaign Start Date", default=fields.Date.context_today, required=True)
     campaign_end_date = fields.Date(
         string="Campaign End Date",
         help='The date when the campaign will end. If not set, '
@@ -52,8 +52,8 @@ class HrRecruitmentPostJobWizard(models.TransientModel):
             job = post_job_wizard.job_id
             if job and job.alias_id.alias_full_name:
                 post_job_wizard.job_apply_mail = job.alias_id.alias_full_name
-            elif job and job.user_id and job.user_id.employee_id:
-                post_job_wizard.job_apply_mail = job.user_id.work_email
+            elif job and job.recruiter_id and job.recruiter_id.work_email:
+                post_job_wizard.job_apply_mail = job.recruiter_id.work_email
             else:
                 post_job_wizard.job_apply_mail = False
 
@@ -153,6 +153,6 @@ class HrRecruitmentPostJobWizard(models.TransientModel):
     def action_post_job(self):
         self.ensure_one()
         self._check_fields_before_posting()
-        if self.campaign_start_date > fields.Date.today():
+        if self.campaign_start_date > fields.Date.context_today(self):
             return self._postpone_posts()
         return self._post_job()

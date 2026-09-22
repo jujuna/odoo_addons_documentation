@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import unittest
-
 from odoo.tests import tagged
-from odoo.tests.common import can_import
-from odoo.tools import file_open
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
+
 @tagged("post_install", "-at_install")
 class TestBaseImport(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -20,16 +18,11 @@ class TestBaseImport(AccountTestInvoicingCommon):
         coa_file_with_code_mapping_and_no_code = "account_base_import/static/src/csv/coa_import_with_code_mapping_and_no_code.csv"
         journal_items_file = "account_base_import/static/src/xls/journal_items_import.xlsx"
         duplicate_journals_file = "account_base_import/static/src/xls/duplicate_journals_import.xlsx"
-        with file_open(coa_file, "rb") as f:
-            cls.coa_file_content = f.read()
-        with file_open(coa_file_with_code_mapping, "rb") as f:
-            cls.coa_file_with_code_mapping_content = f.read()
-        with file_open(coa_file_with_code_mapping_and_no_code, "rb") as f:
-            cls.coa_file_with_code_mapping_and_no_code_content = f.read()
-        with file_open(journal_items_file, "rb") as f:
-            cls.journal_items_file_content = f.read()
-        with file_open(duplicate_journals_file, "rb") as f:
-            cls.duplicate_journals_file_content = f.read()
+        cls.coa_file_content = cls.file_read(coa_file)
+        cls.coa_file_with_code_mapping_content = cls.file_read(coa_file_with_code_mapping)
+        cls.coa_file_with_code_mapping_and_no_code_content = cls.file_read(coa_file_with_code_mapping_and_no_code)
+        cls.journal_items_file_content = cls.file_read(journal_items_file)
+        cls.duplicate_journals_file_content = cls.file_read(duplicate_journals_file)
 
     def _create_save_import(self, res_model, file, companies=None, is_csv=False):
         if companies is None:
@@ -74,7 +67,6 @@ class TestBaseImport(AccountTestInvoicingCommon):
                     raise
         return self.env[res_model].create(vals)
 
-    @unittest.skipUnless(can_import("xlrd.xlsx") or can_import("openpyxl"), "XLRD module not available")
     def test_account_xlsx_import(self):
         existing_id = self.env["account.account"].with_context(import_file=True).create({"code":"550003", "name": "Existing Account"}).id
 
@@ -89,7 +81,6 @@ class TestBaseImport(AccountTestInvoicingCommon):
         self.assertEqual(existing_account.name, "Bank", "The existing account should have been updated")
         self.assertEqual(existing_account.current_balance, -3500.0, "The balance should have been updated")
 
-    @unittest.skipUnless(can_import('xlrd.xlsx') or can_import("openpyxl"), "XLRD module not available")
     def test_account_xlsx_import_fresh_company(self):
         """ Test importing new accounts in a fresh company with nothing but a MISC journal. """
         new_company = self.env['res.company'].create({'name': 'New Test Company'})
@@ -108,14 +99,19 @@ class TestBaseImport(AccountTestInvoicingCommon):
         self.assertEqual(result['messages'], [], "The import should have been successful without error")
         self.assertEqual(len(result['ids']), 14, "14 Accounts should have been imported")
 
-        bank_account = self.env['account.account'].with_company(new_company).search([('code', '=', '550003')])
+        bank_account = self.env['account.account'].with_company(new_company).search([
+            *self.env['account.account']._check_company_domain(new_company),
+            ('code', '=', '550003'),
+        ])
         self.assertRecordValues(bank_account, [{
             'name': "Bank",
             'current_balance': -3500,
         }])
 
         # Check that there are now 15 accounts in the company: 14 imported + the unaffected earnings account.
-        num_accounts = self.env['account.account'].with_company(new_company).search_count([])
+        num_accounts = self.env['account.account'].with_company(new_company).search_count([
+            *self.env['account.account']._check_company_domain(new_company),
+        ])
         self.assertEqual(num_accounts, 15)
 
     def test_account_csv_import_with_code_mapping(self):
@@ -164,7 +160,6 @@ class TestBaseImport(AccountTestInvoicingCommon):
         }])
         self.assertRecordValues(first_account.with_company(company_2.id), [{'code': '100001'}])
 
-    @unittest.skipUnless(can_import("xlrd.xlsx") or can_import("openpyxl"), "XLRD module not available")
     def test_account_move_line_xlsx_import(self):
         result = self._create_save_import("account.move.line", self.journal_items_file_content)
 
@@ -175,16 +170,15 @@ class TestBaseImport(AccountTestInvoicingCommon):
         account_move_lines.move_id.action_post()
         self.assertTrue(account_move_lines.full_reconcile_id)
 
-    @unittest.skipUnless(can_import("xlrd.xlsx") or can_import("openpyxl"), "XLRD module not available")
     def test_duplicate_journals_import(self):
         existing_journal = self.env["account.journal"].with_context(import_file=True).create({"name": "OD26_18"})
-        self.assertEqual(existing_journal.code, 'OD26_')
+        self.assertEqual(existing_journal.code, 'OD26_18')
 
         result = self._create_save_import("account.move.line", self.duplicate_journals_file_content)
 
         account_move_lines = self.env["account.move.line"].browse(result["ids"])
         self.assertEqual(len(account_move_lines.mapped("move_id").ids), 3, "3 moves should have been created")
-        self.assertEqual(sorted(account_move_lines.mapped("journal_id.code")), ["MISC1", "OD26_", "OD_BL"], "The journals should be set correctly")
+        self.assertEqual(sorted(account_move_lines.mapped("journal_id.code")), ["MISC1", "OD26_19", "OD_BLAB"], "The journals should be set correctly")
 
     def test_import_summary_fields(self):
         import_summary = self.env['account.import.summary'].create({
@@ -209,7 +203,6 @@ class TestBaseImport(AccountTestInvoicingCommon):
         import_summary = self.env['account.import.summary'].create({'import_summary_move_ids': self._create_records('account.move')})
         self.assertTrue(import_summary.import_summary_have_data)
 
-    @unittest.skipUnless(can_import("xlrd.xlsx") or can_import("openpyxl"), "XLRD module not available")
     def test_journal_name_preserved_on_import(self):
         """Test that existing journal names are not overwritten when importing journal items."""
         misc_journal = self.env["account.journal"].search([('code', '=', 'MISC'), ('company_id', '=', self.env.company.id)], limit=1)

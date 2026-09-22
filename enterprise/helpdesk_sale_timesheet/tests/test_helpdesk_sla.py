@@ -7,6 +7,8 @@ from odoo.addons.sale_timesheet.tests.common import TestCommonSaleTimesheet
 
 @tagged("-at_install", "post_install", "helpdesk_sale_timesheet")
 class TestSaleTimesheetInTicket(TestCommonSaleTimesheet):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def get_default_groups(cls):
         return super().get_default_groups() + cls.env.ref('helpdesk.group_helpdesk_manager')
@@ -41,9 +43,8 @@ class TestSaleTimesheetInTicket(TestCommonSaleTimesheet):
         # create an SLA policy that applies to only 1 of those customer
         sla_policy = self.env['helpdesk.sla'].create({
             "name": "SLA Policy",
-            "partner_ids": [partner_in_sla.id],
+            "criteria_domain": "[('partner_id', '=', %d), ('priority', '=', '0')]" % partner_in_sla.id,
             "team_id": self.helpdesk_team.id,
-            "priority": "0",
             "stage_id": helpdesk_stage.id,
         })
         # create a ticket that has the customer with the SLA policy

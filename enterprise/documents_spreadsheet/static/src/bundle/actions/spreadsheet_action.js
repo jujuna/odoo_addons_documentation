@@ -1,13 +1,17 @@
+import { onWillStart, proxy } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
+import { useBus, useService } from "@web/core/utils/hooks";
 
-import { Model, registries } from "@odoo/o-spreadsheet";
+import { Model, registries, helpers } from "@odoo/o-spreadsheet";
 import { UNTITLED_SPREADSHEET_NAME } from "@spreadsheet/helpers/constants";
 import { AbstractSpreadsheetAction } from "@spreadsheet_edition/bundle/actions/abstract_spreadsheet_action";
 import { _t } from "@web/core/l10n/translation";
+import { patchSpreadsheetExternalShareFunctionCheck } from "./external_share_function";
+import { user } from "@web/core/user";
 
-import { useState, useSubEnv } from "@odoo/owl";
 const { topbarMenuRegistry } = registries;
+const { doesCellContainFunction } = helpers;
 
 export class SpreadsheetAction extends AbstractSpreadsheetAction {
     static template = "documents_spreadsheet.SpreadsheetAction";
@@ -19,23 +23,55 @@ export class SpreadsheetAction extends AbstractSpreadsheetAction {
 
     setup() {
         super.setup();
-        this.state = useState({
+        this.state = proxy({
             isFavorited: false,
             spreadsheetName: UNTITLED_SPREADSHEET_NAME,
+            isSharedExternally: false,
         });
         this.threadId = this.params?.thread_id;
         this.notification = useService("notification");
         this.dialogService = useService("dialog");
         this.documentService = useService("document.document");
+        this._canSaveAsTemplate = false;
+        onWillStart(async () => {
+            this._canSaveAsTemplate = await user.hasGroup("documents.group_documents_user");
+        });
         useSubEnv({
             newSpreadsheet: this.createNewSpreadsheet.bind(this),
             makeCopy: this.makeCopy.bind(this),
+            canSaveAsTemplate: this.canSaveAsTemplate.bind(this),
             saveAsTemplate: this.saveAsTemplate.bind(this),
             onShareSpreadsheet: this.shareSpreadsheet.bind(this),
             onFreezeAndShareSpreadsheet: this.freezeAndShareSpreadsheet.bind(this),
-            moveToTrash: this.moveToTrash.bind(this),
             isFrozenSpreadsheet: () => this.data.handler === "frozen_spreadsheet",
-            isArchived: () => Boolean(this.data?.is_archived),
+            moveToTrash: this.moveToTrash.bind(this),
+            takeOutOfTrash: this.takeOutOfTrash.bind(this),
+            isArchived: () => this.data.is_archived,
+            hasWriteAccess: () => this.data.has_write_access,
+            isSharedExternally: () => this.state.isSharedExternally,
+        });
+        const patchedFunctions = patchSpreadsheetExternalShareFunctionCheck();
+        useBus(this.documentService.bus, "DOCUMENT_RELOAD", async () => {
+            const [{ is_shared_externally }] = await this.orm.read(
+                this.resModel,
+                [this.resId],
+                ["is_shared_externally"]
+            );
+            if (this.state.isSharedExternally !== is_shared_externally) {
+                // force an evaluation to invalidate forbidden standalone functions.
+                this.state.isSharedExternally = is_shared_externally;
+                const cellIds = [];
+                for (const sheetId of this.model.getters.getSheetIds()) {
+                    for (const cell of this.model.getters.getCells(sheetId)) {
+                        for (const funcName of patchedFunctions) {
+                            if (doesCellContainFunction(cell, funcName)) {
+                                cellIds.push(cell.id);
+                            }
+                        }
+                    }
+                }
+                this.model.dispatch("EVALUATE_CELLS", cellIds);
+            }
         });
     }
 
@@ -45,6 +81,19 @@ export class SpreadsheetAction extends AbstractSpreadsheetAction {
     _initializeWith(data) {
         super._initializeWith(data);
         this.state.isFavorited = data.is_favorited;
+        this.state.isSharedExternally = data.is_shared_externally;
+        this.isArchived = data.is_archived;
+    }
+
+    get navbarProps() {
+        return {
+            ...super.navbarProps,
+            isReadonly: this.spreadsheetMode === "readonly",
+        };
+    }
+
+    get spreadsheetMode() {
+        return !this.hasWriteAccess || this.isArchived ? "readonly" : "normal";
     }
 
     /**
@@ -53,7 +102,7 @@ export class SpreadsheetAction extends AbstractSpreadsheetAction {
      */
     async _onSpreadSheetFavoriteToggled(ev) {
         this.state.isFavorited = !this.state.isFavorited;
-        return await this.orm.call("documents.document", "toggle_favorited", [[this.resId]]);
+        await this.documentService.toggleFavorites([this.resId], false);
     }
 
     /**
@@ -71,6 +120,9 @@ export class SpreadsheetAction extends AbstractSpreadsheetAction {
         };
     }
 
+    canSaveAsTemplate() {
+        return this._canSaveAsTemplate;
+    }
     /**
      * @private
      * @returns {Promise}
@@ -108,12 +160,14 @@ export class SpreadsheetAction extends AbstractSpreadsheetAction {
         }
 
         const { freezeOdooData } = odoo.loader.modules.get("@spreadsheet/helpers/model");
+        this.model.dispatch("LOG_DATASOURCE_EXPORT", { action: "freeze" });
         const data = await freezeOdooData(this.model);
-
+        const files = await this.model.exportXLSX();
+        this.model.dispatch("LOG_DATASOURCE_EXPORT", { action: "freeze" });
         const record = await this.orm.call("documents.document", "action_freeze_and_copy", [
             this.resId,
             JSON.stringify(data),
-            this.model.exportXLSX().files,
+            files.files,
         ]);
         this.documentService.openSharingDialog([record.id]);
     }
@@ -130,6 +184,11 @@ export class SpreadsheetAction extends AbstractSpreadsheetAction {
         }
         this.notification.add(_t("Spreadsheet moved to trash"), { type: "success" });
     }
+
+    async takeOutOfTrash() {
+        await this.orm.call("documents.document", "action_unarchive", [this.resId]);
+        this.actionService.doAction("reload_context");
+    }
 }
 
 registry.category("actions").add("action_open_spreadsheet", SpreadsheetAction, { force: true });
@@ -140,4 +199,5 @@ topbarMenuRegistry.addChild("move_to_trash", ["file"], {
     isVisible: (env) => env.isArchived && !env.isArchived() && !!env.moveToTrash,
     execute: (env) => env.moveToTrash(),
     icon: "o-spreadsheet-Icon.TRASH_FILLED",
+    isEnabledOnLockedSheet: true,
 });

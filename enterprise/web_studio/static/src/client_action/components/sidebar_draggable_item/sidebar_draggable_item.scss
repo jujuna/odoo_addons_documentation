@@ -100,6 +100,7 @@
 
 .o_web_studio_component {
     padding-left: 40px;
+    z-index: calc(var(--Notebook-header-zindex) - 1);
     width: 49%;
     font: 11px/2.4 $font-family-base;
     background: linear-gradient(90deg, $o-web-studio-bg-light 33px, transparent 33px);
@@ -108,6 +109,9 @@
         &:before {
             background: $o-web-studio-bg-light;
         }
+    }
+    &.o_dragged {
+        z-index: $zindex-popover;
     }
     &.o_web_studio_debug:not(.ui-draggable-helper) {
         height: 40px;

@@ -7,23 +7,36 @@
 # JH CHOI <hwangtog@gmail.com>, 2022
 # Link Up링크업 <linkup.way@gmail.com>, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025.
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-11-16 13:51+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:55+0000\n"
+"PO-Revision-Date: 2026-09-18 02:29+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
 "mrp_maintenance/ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: mrp_maintenance
+#: model:ir.module.module,description:base.module_mrp_maintenance
+msgid ""
+"\n"
+"Maintenance in MRP\n"
+"==================\n"
+"* Preventive vs corrective maintenance\n"
+"* Define different stages for your maintenance requests\n"
+"* Plan maintenance requests (also recurring preventive)\n"
+"* Equipment related to workcenters\n"
+"* MTBF, MTTR, ...\n"
+msgstr ""
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_production_view_form_inherit_maintenance
@@ -49,6 +62,11 @@ msgstr "활동"
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "활동 예외 장식"
+
+#. module: mrp_maintenance
+#: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_plans_ids
+msgid "Activity Plans"
+msgstr "활동 계획"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_state
@@ -83,8 +101,7 @@ msgstr "작업장 차단"
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_maintenance_request__recurring_leaves_count
 msgid "Block the workcenter for this many time slots in the future in advance."
-msgstr ""
-"향후에는 해당 시간대가 많은 작업장의 경우에는 미리 차단하시기 바랍니다."
+msgstr "향후에는 해당 시간대가 많은 작업장의 경우에는 미리 차단하시기 바랍니다."
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__company_id
@@ -111,11 +128,6 @@ msgstr "목공용 톱 : 8 ppi."
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__maintenance_open_count
 msgid "Current Maintenance"
 msgstr "현재 유지보수 단계"
-
-#. module: mrp_maintenance
-#: model_terms:ir.ui.view,arch_db:mrp_maintenance.maintenance_request_view_form_inherit_mrp
-msgid "Discard"
-msgstr "취소"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_equipment__display_name
@@ -187,11 +199,6 @@ msgid "Followers (Partners)"
 msgstr "팔로워 (파트너)"
 
 #. module: mrp_maintenance
-#: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "멋진 아이콘 폰트 예: fa-tasks"
-
-#. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__maintenance_for
 msgid "For"
 msgstr "대상"
@@ -248,8 +255,8 @@ msgid ""
 "It won't be possible to plan work orders or other maintenances on this "
 "workcenter during this time."
 msgstr ""
-"해당 기간 동안에는 이 작업장에 대한 작업 지시나 기타 유지관리 계획을 할 수 없"
-"습니다."
+"해당 기간 동안에는 이 작업장에 대한 작업 지시나 기타 유지관리 계획을 할 수 "
+"없습니다."
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
@@ -289,6 +296,11 @@ msgid "Maintenance"
 msgstr "유지보수"
 
 #. module: mrp_maintenance
+#: model:ir.module.module,shortdesc:base.module_mrp_maintenance
+msgid "Maintenance - MRP"
+msgstr ""
+
+#. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__maintenance_count
 msgid "Maintenance Count"
 msgstr "유지보수 횟수"
@@ -307,8 +319,9 @@ msgstr "유지보수 요청"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/mrp_production.py:0
 #: model:ir.actions.act_window,name:mrp_maintenance.mrp_workcenter_request_action_from_workcenter
+#: model_terms:ir.ui.view,arch_db:mrp_maintenance.maintenance_request_view_gantt_workcenter
 msgid "Maintenance Requests"
 msgstr "유지보수 요청"
 
@@ -330,7 +343,7 @@ msgstr "제조 주문"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "Manufacturing Orders are already scheduled for this time slot."
 msgstr "해당 시간대에 이미 제조 주문이 예약되어 있습니다."
 
@@ -344,6 +357,11 @@ msgid ""
 msgstr ""
 "제조 작업은 작업장에서 처리됩니다. 작업장은 작업자 및/또는 기계,\n"
 "            비용, 일정, 생산 용량 계획 수립과 같은 요소로 구성될 수 있습니다."
+
+#. module: mrp_maintenance
+#: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
@@ -379,7 +397,8 @@ msgstr "내 활동 마감일"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/mrp_production.py:0
+#: code:addons/mrp_maintenance/models/mrp_workorder.py:0
 msgid "New Maintenance Request"
 msgstr "신규 유지보수 요청"
 
@@ -405,7 +424,7 @@ msgstr "다음 활동 유형"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "No available slot within 700 days after the planned start."
 msgstr ""
 
@@ -440,6 +459,12 @@ msgid "Operation"
 msgstr "생산 관리"
 
 #. module: mrp_maintenance
+#: model:ir.actions.act_window,name:mrp_maintenance.maintenance_request_action_view_gantt_workcenter
+#: model:ir.ui.menu,name:mrp_maintenance.maintenance_request_menu_planning_by_workcenter
+msgid "Planning by Workcenter"
+msgstr "작업장별 계획 수립"
+
+#. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__production_company_id
 msgid "Production Company"
 msgstr "생산 기업"
@@ -464,13 +489,7 @@ msgstr "요청 확인"
 #. odoo-javascript
 #: code:addons/mrp_maintenance/static/src/components/menuPopup.xml:0
 msgid "Request Maintenance"
-msgstr "유지보수 요청"
-
-#. module: mrp_maintenance
-#. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
-msgid "Request planned for %s"
-msgstr "%s에 대한 계획 요청"
+msgstr ""
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_user_id
@@ -488,9 +507,19 @@ msgid "Save"
 msgstr "저장"
 
 #. module: mrp_maintenance
+#: model:ir.module.module,summary:base.module_mrp_maintenance
+msgid "Schedule and manage maintenance on machine and tools."
+msgstr ""
+
+#. module: mrp_maintenance
 #: model:maintenance.equipment,name:mrp_maintenance.equipment_furniture2
 msgid "Scrub Plane"
 msgstr "대패"
+
+#. module: mrp_maintenance
+#: model_terms:ir.actions.act_window,help:mrp_maintenance.maintenance_request_action_view_gantt_workcenter
+msgid "Start by adding a new workcenter to use workcenter planning"
+msgstr ""
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_state
@@ -511,14 +540,8 @@ msgid "Technician"
 msgstr "기술자"
 
 #. module: mrp_maintenance
-#. odoo-javascript
-#: code:addons/mrp_maintenance/static/src/components/maintenance_request_form_view.js:0
-msgid "The maintenance request has successfully been created."
-msgstr "유지관리 요청이 성공적으로 생성되었습니다."
-
-#. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid ""
 "The schedule has changed from %(desired_date)s to %(effective_date)s due to "
 "planned manufacturing orders."
@@ -528,7 +551,7 @@ msgstr ""
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "The workcenter is missing for %s."
 msgstr "%s 관련한 작업장이 없습니다."
 
@@ -543,16 +566,6 @@ msgid "Type of the exception activity on record."
 msgstr "레코드에 있는 예외 활동의 유형입니다."
 
 #. module: mrp_maintenance
-#: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__website_message_ids
-msgid "Website Messages"
-msgstr "웹사이트 메시지"
-
-#. module: mrp_maintenance
-#: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__website_message_ids
-msgid "Website communication history"
-msgstr "웹사이트 대화 이력"
-
-#. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_maintenance_stage__create_leaves
 msgid ""
 "When this box is unticked, and the maintenance is of the type 'Work Center', "
@@ -562,8 +575,8 @@ msgid ""
 "listed duration, either at the specified date, or as soon as possible, if "
 "the work center is unavailable then."
 msgstr ""
-"확인란에 표시하지 않은 상태에서 유지관리 유형이 '작업장'인 경우에는, 유지관"
-"리 요청을 생성할 때 해당하는 작업장에 휴가가 생성되지 않습니다.\n"
+"확인란에 표시하지 않은 상태에서 유지관리 유형이 '작업장'인 경우에는, "
+"유지관리 요청을 생성할 때 해당하는 작업장에 휴가가 생성되지 않습니다.\n"
 "확인란에 표시하면, 특정 날짜 혹은 작업장을 사용할 수 없는 경우에는 가장 빠른 "
 "날짜에 해당하는 기간 동안 작업장을 자동으로 차단합니다."
 
@@ -599,9 +612,12 @@ msgstr "일"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "work centers"
 msgstr "작업장"
 
-#~ msgid "Production Order"
-#~ msgstr "생산 주문"
+msgid "Website Messages"
+msgstr "웹사이트 메시지"
+
+msgid "Website communication history"
+msgstr "웹사이트 대화 이력"

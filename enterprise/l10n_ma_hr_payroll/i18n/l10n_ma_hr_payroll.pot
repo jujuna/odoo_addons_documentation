@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-09-18 18:20+0000\n"
+"PO-Revision-Date: 2026-09-18 18:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,25 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: l10n_ma_hr_payroll
+#: model:ir.module.module,description:base.module_l10n_ma_hr_payroll
+msgid ""
+"\n"
+"Morocco Payroll Rules.\n"
+"=========================\n"
+"\n"
+"    * Employee Details\n"
+"    * Employee Contracts\n"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ma_hr_payroll.hr_contract_template_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ma_hr_payroll.hr_employee_form_l10n_ma_payroll
 msgid "<span>/ month</span>"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_amo_employer
+msgid "AMO Participation: Employer Cost (%)"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -32,7 +48,6 @@ msgid "Attachment of Salary"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_ma_hr_payroll.AVS
 #: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_salary_rule_av_sal
 msgid "Avance sur Salaire"
 msgstr ""
@@ -48,8 +63,23 @@ msgid "CIMR"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_cimr
+msgid "CIMR (%)"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_cimr_max
+msgid "CIMR Maximum"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_employee__l10n_ma_cimr_number
 msgid "CIMR Number"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_cimr_employer
+msgid "CIMR: Employer Cost (%)"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -60,6 +90,16 @@ msgstr ""
 #. module: l10n_ma_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_employee__l10n_ma_cnss_number
 msgid "CNSS Number"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_cnss
+msgid "CNSS Value (%)"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_cnss_max
+msgid "CNSS Value Max"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -75,7 +115,7 @@ msgstr ""
 
 #. module: l10n_ma_hr_payroll
 #: model:ir.model,name:l10n_ma_hr_payroll.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -114,6 +154,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_payslip__display_name
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_version__display_name
+#: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_work_entry_type__display_name
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_res_company__display_name
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_res_config_settings__display_name
 msgid "Display Name"
@@ -127,6 +168,11 @@ msgstr ""
 #. module: l10n_ma_hr_payroll
 #: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_payroll_rules_employee_amo
 msgid "Employee AMO"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_amo
+msgid "Employee AMO (%)"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -146,21 +192,28 @@ msgid "Employer's contribution"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_ma_hr_payroll.input_extra_hours_100
+#: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_payroll_salary_ma_structure_base_expenses_reimbursement
+msgid "Expenses Reimbursement"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
 #: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_rule_extra_hours_100
 msgid "Extra Hours 100%"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_ma_hr_payroll.input_extra_hours_25
 #: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_rule_extra_hours_25
 msgid "Extra Hours 25%"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_ma_hr_payroll.input_extra_hours_50
 #: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_rule_extra_hours_50
 msgid "Extra Hours 50%"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_family_allocation_employer
+msgid "Family Allocation: Employer Cost (%)"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -199,6 +252,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_employee__id
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_payslip__id
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_version__id
+#: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_work_entry_type__id
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_res_config_settings__id
 msgid "ID"
@@ -212,6 +266,16 @@ msgstr ""
 #. module: l10n_ma_hr_payroll
 #: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_payroll_rules_job_loss_allowance
 msgid "Job Loss Allowance"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_job_loss
+msgid "Job Loss Allowance (%)"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_job_loss_max
+msgid "Job Loss Allowance Max"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -243,19 +307,24 @@ msgid "Medical Allowance"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_medical_alw
+msgid "Medical Allowance (%)"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
 #: model:ir.model.fields,help:l10n_ma_hr_payroll.field_hr_employee__l10n_ma_medical_allowance
 #: model:ir.model.fields,help:l10n_ma_hr_payroll.field_hr_version__l10n_ma_medical_allowance
 msgid "Medical allowance"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_ma_hr_payroll.input_INDMNTD
-msgid "Miscellaneous non-taxable indemnity"
+#: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_rule_misc_non_taxable_indemnity
+msgid "Miscellaneous Non-Taxable Indemnity"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_ma_hr_payroll.input_INDMTD
-msgid "Miscellaneous taxable indemnity"
+#: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_rule_misc_taxable_indemnity
+msgid "Miscellaneous Taxable Indemnity"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -274,8 +343,38 @@ msgid "Moroccan Payroll Structure"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
+#: model:ir.module.module,shortdesc:base.module_l10n_ma_hr_payroll
+msgid "Morocco - Payroll"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.payroll.structure.type,name:l10n_ma_hr_payroll.structure_type_employee_mar
+msgid "Morocco: Employee"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_hours_per_month
+msgid "Morocco: Hours Per Month"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_income_tax_breakdown
+msgid "Morocco: Income Tax Breakdown"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_seniority
+msgid "Morocco: Seniority"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ma_hr_payroll.field_hr_employee__l10n_ma_mut_number
 msgid "Mutual Insurance Number"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_mutuality_employer
+msgid "Mutuality: Employer Cost (%)"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -320,6 +419,16 @@ msgid "Professional Contribution"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_pro_contribution
+msgid "Professional Contribution (%)"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_professional_training_employer
+msgid "Professional Training: Employer Cost (%)"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
 #: model:hr.department,name:l10n_ma_hr_payroll.ma_hr_department_rd
 msgid "R&D MA"
 msgstr ""
@@ -340,8 +449,33 @@ msgid "Seniority"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_social_benefit_employer_max
+msgid "Social Benefit Maximum: Employer Cost"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_social_benefit_employer
+msgid "Social Benefit: Employer Cost (%)"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
 #: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_rule_social_contribution
 msgid "Social Contribution"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_social_contribution_coef
+msgid "Social Contribution (%)"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_min_net_for_soc_contr
+msgid "Social Contribution: Minimum Net Salary"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.rule.parameter,name:l10n_ma_hr_payroll.l10n_ma_rule_parameter_social_security_ceil
+msgid "Social Security Ceiling"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
@@ -366,6 +500,11 @@ msgid "Taxable Salary"
 msgstr ""
 
 #. module: l10n_ma_hr_payroll
+#: model:ir.model,name:l10n_ma_hr_payroll.model_hr_work_entry_type
+msgid "Time Type"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
 #: model:hr.salary.rule,name:l10n_ma_hr_payroll.l10n_ma_hr_payroll_rules_total_untaxable_ded
 msgid "Total Untaxable Deductions"
 msgstr ""
@@ -380,4 +519,11 @@ msgstr ""
 #. module: l10n_ma_hr_payroll
 #: model:hr.salary.rule.category,name:l10n_ma_hr_payroll.UNTAXABLE_DED
 msgid "Untaxed Deductions"
+msgstr ""
+
+#. module: l10n_ma_hr_payroll
+#: model:hr.salary.rule,input_suffix:l10n_ma_hr_payroll.l10n_ma_hr_rule_extra_hours_100
+#: model:hr.salary.rule,input_suffix:l10n_ma_hr_payroll.l10n_ma_hr_rule_extra_hours_25
+#: model:hr.salary.rule,input_suffix:l10n_ma_hr_payroll.l10n_ma_hr_rule_extra_hours_50
+msgid "hours"
 msgstr ""

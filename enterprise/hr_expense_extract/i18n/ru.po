@@ -5,14 +5,15 @@
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-16 13:35+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 02:09+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "hr_expense_extract/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_expense_extract
 #. odoo-javascript
@@ -56,15 +57,9 @@ msgid "Can show the ocr send button"
 msgstr "Можно показать кнопку отправки ocr"
 
 #. module: hr_expense_extract
-#. odoo-javascript
-#: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
-msgid "Choose a receipt."
-msgstr "Выберите квитанцию."
-
-#. module: hr_expense_extract
 #: model:ir.model,name:hr_expense_extract.model_res_company
-msgid "Companies"
-msgstr "Компании"
+msgid "Company"
+msgstr "Компания"
 
 #. module: hr_expense_extract
 #: model:ir.model,name:hr_expense_extract.model_res_config_settings
@@ -147,9 +142,19 @@ msgid "Expenses created from sample receipt"
 msgstr "Расходы, созданные на основе образца квитанции"
 
 #. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_attachment_id
+msgid "Extract Attachment"
+msgstr ""
+
+#. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_state_processed
 msgid "Extract State Processed"
 msgstr "Состояние извлечения Обработано"
+
+#. module: hr_expense_extract
+#: model:ir.module.module,summary:base.module_hr_expense_extract
+msgid "Extract data from expense scans to fill them automatically"
+msgstr ""
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_state
@@ -160,6 +165,21 @@ msgstr "Состояние экстракта"
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_status
 msgid "Extract status"
 msgstr "Состояние экстракта"
+
+#. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extracted_dates
+msgid "Extracted Dates"
+msgstr ""
+
+#. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extracted_numbers
+msgid "Extracted Numbers"
+msgstr ""
+
+#. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extracted_words
+msgid "Extracted Words"
+msgstr ""
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__message_follower_ids
@@ -175,6 +195,11 @@ msgstr "Подписчики"
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__has_message
 msgid "Has Message"
 msgstr "Есть сообщение"
+
+#. module: hr_expense_extract
+#: model:ir.module.module,shortdesc:base.module_hr_expense_extract
+msgid "Hr Expense Extract"
+msgstr ""
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_expense_sample_receipt__id
@@ -262,6 +287,12 @@ msgid "Ratings"
 msgstr "Рейтинги"
 
 #. module: hr_expense_extract
+#. odoo-python
+#: code:addons/hr_expense_extract/models/hr_expense.py:0
+msgid "Receipt not digitized: the expense already includes Stripe data."
+msgstr "Чек не распознан: расход уже содержит данные Stripe."
+
+#. module: hr_expense_extract
 #. odoo-javascript
 #: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
 msgid "Report this expense to your manager for validation."
@@ -322,16 +353,6 @@ msgid "Upload or drop an expense receipt"
 msgstr "Загрузите или перетащите файл чека"
 
 #. module: hr_expense_extract
-#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__website_message_ids
-msgid "Website Messages"
-msgstr "Веб-сайт сообщения"
-
-#. module: hr_expense_extract
-#: model:ir.model.fields,help:hr_expense_extract.field_hr_expense__website_message_ids
-msgid "Website communication history"
-msgstr "История общений с сайта"
-
-#. module: hr_expense_extract
 #. odoo-python
 #: code:addons/hr_expense_extract/models/hr_expense.py:0
 msgid "You cannot send a expense that is not in draft state!"
@@ -352,202 +373,8 @@ msgstr ""
 msgid "try a sample receipt"
 msgstr "попробуйте тестовый чек"
 
-#~ msgid ""
-#~ "\n"
-#~ "<p class=\"o_view_nocontent_expense_receipt\">\n"
-#~ "    <h2 class=\"d-none d-md-block\">\n"
-#~ "        Drag and drop files to create expenses\n"
-#~ "    </h2>\n"
-#~ "    <p>\n"
-#~ "        Or\n"
-#~ "    </p>\n"
-#~ "    <h2 class=\"d-none d-md-block\">\n"
-#~ "        Did you try the mobile app?\n"
-#~ "    </h2>\n"
-#~ "</p>\n"
-#~ "<p>Snap pictures of your receipts and let Odoo<br/> automatically create "
-#~ "expenses for you.</p>\n"
-#~ "<p class=\"d-none d-md-block\">\n"
-#~ "    <a href=\"https://apps.apple.com/be/app/odoo/id1272543640\" "
-#~ "target=\"_blank\" class=\"o_expense_mobile_app\">\n"
-#~ "        <img alt=\"Apple App Store\" class=\"img img-fluid h-100 "
-#~ "o_expense_apple_store\" src=\"/hr_expense/static/img/app_store.png\"/>\n"
-#~ "    </a>\n"
-#~ "    <a href=\"https://play.google.com/store/apps/details?"
-#~ "id=com.odoo.mobile\" target=\"_blank\" class=\"o_expense_mobile_app\">\n"
-#~ "        <img alt=\"Google Play Store\" class=\"img img-fluid h-100 "
-#~ "o_expense_google_store\" src=\"/hr_expense/static/img/play_store.png\"/>\n"
-#~ "    </a>\n"
-#~ "</p>"
-#~ msgstr ""
-#~ "\n"
-#~ "<p class=\"o_view_nocontent_expense_receipt\">\n"
-#~ "    <h2 class=\"d-none d-md-block\">\n"
-#~ "        Перетаскивайте файлы для создания расходов\n"
-#~ "    </h2>\n"
-#~ "    <p>\n"
-#~ "        Или\n"
-#~ "    </p>\n"
-#~ "    <h2 class=\"d-none d-md-block\">\n"
-#~ "        Вы пробовали использовать мобильное приложение?\n"
-#~ "    </h2>\n"
-#~ "</p>\n"
-#~ "<p>Сфотографируйте свои квитанции и позвольте Odoo<br/> автоматически "
-#~ "создавать для вас расходы.</p>\n"
-#~ "<p class=\"d-none d-md-block\">\n"
-#~ "    <a href=\"https://apps.apple.com/be/app/odoo/id1272543640\" "
-#~ "target=\"_blank\" class=\"o_expense_mobile_app\">\n"
-#~ "        <img alt=\"Apple App Store\" class=\"img img-fluid h-100 "
-#~ "o_expense_apple_store\" src=\"/hr_expense/static/img/app_store.png\"/>\n"
-#~ "    </a>\n"
-#~ "    <a href=\"https://play.google.com/store/apps/details?"
-#~ "id=com.odoo.mobile\" target=\"_blank\" class=\"o_expense_mobile_app\">\n"
-#~ "        <img alt=\"Google Play Store\" class=\"img img-fluid h-100 "
-#~ "o_expense_google_store\" src=\"/hr_expense/static/img/play_store.png\"/>\n"
-#~ "    </a>\n"
-#~ "</p>"
+msgid "Website Messages"
+msgstr "Веб-сайт сообщения"
 
-#~ msgid "<b>Congratulations</b>, you are now an expert of Expenses."
-#~ msgstr "<b>Поздравляем</b>, теперь вы эксперт по расходам."
-
-#~ msgid ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Buy credits"
-#~ msgstr ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Купить кредиты"
-
-#~ msgid ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Refresh"
-#~ msgstr ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Обновить"
-
-#~ msgid ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Retry"
-#~ msgstr ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Повторная попытка"
-
-#~ msgid ""
-#~ "All fields will be automated by Artificial Intelligence, it might take 5 "
-#~ "seconds."
-#~ msgstr ""
-#~ "Все поля будут автоматизированы искусственным интеллектом, это может "
-#~ "занять 5 секунд."
-
-#~ msgid "Amount"
-#~ msgstr "Сумма"
-
-#~ msgid "Attachment"
-#~ msgstr "Вложение"
-
-#~ msgid "Available Payment Method Line"
-#~ msgstr "Строка доступных способов оплаты"
-
-#~ msgid "Cancel"
-#~ msgstr "Отменить"
-
-#~ msgid "Choose a receipt:"
-#~ msgstr "Выберите квитанцию:"
-
-#~ msgid "Company"
-#~ msgstr "Компания"
-
-#~ msgid "Create Payment"
-#~ msgstr "Создать платеж"
-
-#~ msgid "Currency"
-#~ msgstr "Валюта"
-
-#~ msgid "Expense Report"
-#~ msgstr "Отчет о Расходах"
-
-#~ msgid "Hide Partial"
-#~ msgstr "Скрыть частично"
-
-#~ msgid "Hide Payment Method Line"
-#~ msgstr "Скрыть строку способа оплаты"
-
-#~ msgid "Journal"
-#~ msgstr "Журнал"
-
-#~ msgid "Keep open"
-#~ msgstr "Держать открытым"
-
-#~ msgid ""
-#~ "Let's try a sample receipt to test the automated processing of expenses "
-#~ "with Artificial Intelligence."
-#~ msgstr ""
-#~ "Давайте попробуем создать образец квитанции, чтобы проверить "
-#~ "автоматическую обработку расходов с помощью искусственного интеллекта."
-
-#~ msgid ""
-#~ "Manual: Pay or Get paid by any method outside of Odoo.\n"
-#~ "Payment Providers: Each payment provider has its own Payment Method. "
-#~ "Request a transaction on/to a card thanks to a payment token saved by the "
-#~ "partner when buying or subscribing online.\n"
-#~ "Check: Pay bills by check and print it from Odoo.\n"
-#~ "Batch Deposit: Collect several customer checks at once generating and "
-#~ "submitting a batch deposit to your bank. Module account_batch_payment is "
-#~ "necessary.\n"
-#~ "SEPA Credit Transfer: Pay in the SEPA zone by submitting a SEPA Credit "
-#~ "Transfer file to your bank. Module account_sepa is necessary.\n"
-#~ "SEPA Direct Debit: Get paid in the SEPA zone thanks to a mandate your "
-#~ "partner will have granted to you. Module account_sepa is necessary.\n"
-#~ msgstr ""
-#~ "Руководство: Платите или получайте оплату любым способом за пределами "
-#~ "Odoo.\n"
-#~ "Провайдеры платежей: Каждый поставщик платежей имеет свой собственный "
-#~ "метод оплаты. Запросите транзакцию по карте/на карту благодаря платежному "
-#~ "токену, сохраненному партнером при покупке или подписке онлайн.\n"
-#~ "Чек: Оплачивайте счета чеком и распечатывайте его из Odoo.\n"
-#~ "Пакетное пополнение счета: Собирайте несколько чеков клиентов "
-#~ "одновременно, генерируя и отправляя пакетный депозит в ваш банк. "
-#~ "Необходим модуль account_batch_payment.\n"
-#~ "Кредитный перевод SEPA: Платите в зоне SEPA, отправляя файл SEPA Credit "
-#~ "Transfer в ваш банк. Необходим модуль account_sepa.\n"
-#~ "Прямое дебетование SEPA: Получайте оплату в зоне SEPA благодаря мандату, "
-#~ "предоставленному вам вашим партнером. Необходим модуль account_sepa.\n"
-
-#~ msgid "Mark as fully paid"
-#~ msgstr "Отметить как полностью оплаченный"
-
-#~ msgid "Memo"
-#~ msgstr "Памятка"
-
-#~ msgid "Payment Date"
-#~ msgstr "Дата платежа"
-
-#~ msgid "Payment Difference"
-#~ msgstr "Разница в оплате"
-
-#~ msgid "Payment Method"
-#~ msgstr "Способ оплаты"
-
-#~ msgid "Register Payment"
-#~ msgstr "Регистрация оплаты"
-
-#~ msgid "Register Sample Payment"
-#~ msgstr "Регистрация Образец оплаты"
-
-#~ msgid "Register Sample Payments"
-#~ msgstr "Регистрация образцов платежей"
-
-#~ msgid ""
-#~ "The data extraction is not finished yet. The extraction usually takes "
-#~ "between 5 and 10 seconds."
-#~ msgstr ""
-#~ "Извлечение данных еще не завершено. Обычно извлечение занимает от 5 до 10 "
-#~ "секунд."
-
-#~ msgid "Wasting time recording your receipts? Let’s try a better way."
-#~ msgstr "Тратите время на запись квитанций? Давайте попробуем лучший способ."
-
-#~ msgid "You can't mix sample expenses and regular ones"
-#~ msgstr "Нельзя смешивать расходы по образцам и обычные расходы"
-
-#~ msgid "You don't have enough credit to extract data from your expense."
-#~ msgstr "У вас недостаточно кредитов, чтобы извлечь данные из расходов."
+msgid "Website communication history"
+msgstr "История общений с сайта"

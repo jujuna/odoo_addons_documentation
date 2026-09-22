@@ -8,23 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-17 03:19+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 02:07+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
 "documents_spreadsheet/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
-msgid " file preview"
-msgstr ""
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -33,10 +27,10 @@ msgid "\"%s\" saved as template"
 msgstr "บันทึก \"%s\" เป็นเทมเพลตแล้ว"
 
 #. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/models/spreadsheet_template.py:0
-msgid "%s (copy)"
-msgstr "%s (สำเนา)"
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/external_share_function.js:0
+msgid "%(function_name)s is not available in spreadsheets shared externally."
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -55,10 +49,15 @@ msgid "A frozen spreadsheet can not be editable"
 msgstr ""
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__group_ids
+msgid "Access Groups"
+msgstr ""
+
+#. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Actuals vs Target"
-msgstr "ข้อมูลจริงเทียบกับเป้าหมาย"
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -85,9 +84,9 @@ msgid "Can view the spreadsheet. Cannot make changes."
 msgstr ""
 
 #. module: documents_spreadsheet
-#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
-msgid "Cancel"
-msgstr "ยกเลิก"
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__comma
+msgid "Comma"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -99,6 +98,11 @@ msgstr "ยืนยัน"
 #: model:ir.ui.menu,name:documents_spreadsheet.menu_technical_spreadsheet_contributor
 msgid "Contributors"
 msgstr "ผู้ให้ข้อมูล"
+
+#. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_documents_import_to_spreadsheet
+msgid "Convert XLSX and CSV files to Odoo Spreadsheet"
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -113,6 +117,7 @@ msgid "Create a Spreadsheet or select a Template"
 msgstr "สร้างสเปรดชีตหรือเลือกเทมเพลต"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__create_uid
@@ -120,6 +125,7 @@ msgid "Created by"
 msgstr "สร้างโดย"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__create_date
@@ -134,8 +140,22 @@ msgid "Current Revision Uuid"
 msgstr "Uuid ฉบับแก้ไขปัจจุบัน"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__custom
+msgid "Custom"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__csv_separator
+msgid "Custom separator"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__auto_detect
+msgid "Detect automatically"
+msgstr ""
+
+#. module: documents_spreadsheet
 #. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
 #: code:addons/documents_spreadsheet/static/src/spreadsheet_template/template_dialog.xml:0
 msgid "Discard"
 msgstr "ละทิ้ง"
@@ -143,8 +163,10 @@ msgstr "ละทิ้ง"
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_access__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__display_name
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_sharing__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_http__display_name
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__display_name
@@ -161,6 +183,7 @@ msgstr ""
 
 #. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_document
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__document_id
 msgid "Document"
@@ -174,6 +197,13 @@ msgstr "เอกสาร / พาร์ทเนอร์"
 #. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_sharing
 msgid "Documents Sharing"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.module.module,description:base.module_documents_spreadsheet
+#: model:ir.module.module,shortdesc:base.module_documents_spreadsheet
+#: model:ir.module.module,summary:base.module_documents_spreadsheet
+msgid "Documents Spreadsheet"
 msgstr ""
 
 #. module: documents_spreadsheet
@@ -195,12 +225,23 @@ msgstr "ส่งออก Excel"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Expected Revenue by Stage"
-msgstr "รายได้ที่คาดหวังตามขั้นตอน"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__file_name
 msgid "File Name"
 msgstr "ชื่อไฟล์"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.xml:0
+msgid "File is in trash"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.actions.act_window,name:documents_spreadsheet.import_to_spreadsheet_action
+msgid "File preview"
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -261,8 +302,10 @@ msgstr "ตัวจัดการ"
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_access__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__id
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_sharing__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_http__id
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__id
@@ -271,6 +314,12 @@ msgid "ID"
 msgstr "ไอดี"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__is_csv
+msgid "Is Csv"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__write_uid
@@ -278,6 +327,7 @@ msgid "Last Updated by"
 msgstr "อัปเดตครั้งล่าสุดโดย"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__write_date
@@ -293,12 +343,22 @@ msgstr "วันที่อัปเดตล่าสุด"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Lost Opportunities by Stage"
-msgstr "ผู้ที่มีโอกาสจะซื้อที่ไม่สำเร็จตามขั้นตอน"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
 msgid "Make a copy"
 msgstr "ทำสำเนา"
+
+#. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_ir_ui_menu
+msgid "Menu"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__archive_document
+msgid "Move source file to trash"
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -310,6 +370,12 @@ msgstr "ย้ายไปที่ถังขยะ"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/spreadsheet_template/spreadsheet_template_dialog.js:0
 msgid "My Drive"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.actions.act_window,name:documents_spreadsheet.spreadsheet_my_template_action
+#: model:ir.ui.menu,name:documents_spreadsheet.menu_technical_my_spreadsheet_template
+msgid "My Spreadsheet Templates"
 msgstr ""
 
 #. module: documents_spreadsheet
@@ -328,8 +394,7 @@ msgid "New spreadsheet"
 msgstr "สเปรดชีตใหม่"
 
 #. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_import_to_spreadsheet_view_form
 msgid "Open with Odoo Spreadsheet"
 msgstr "เปิดด้วยสเปรดชีต Odoo"
 
@@ -337,7 +402,7 @@ msgstr "เปิดด้วยสเปรดชีต Odoo"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Opportunities by Stage"
-msgstr "โอกาสตามขั้นตอน"
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -391,10 +456,14 @@ msgid "Select one and only one spreadsheet"
 msgstr ""
 
 #. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog.xml:0
-msgid "Send source file to trash"
-msgstr "ส่งไฟล์ต้นฉบับไปที่ถังขยะ"
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__semicolon
+msgid "Semicolon"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__csv_separator_type
+msgid "Separator"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__sequence
@@ -407,6 +476,17 @@ msgstr "ลำดับ"
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_share/spreadsheet_share.xml:0
 msgid "Share"
 msgstr "แชร์"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__is_shared_externally
+msgid "Shared Externally"
+msgstr ""
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_share/spreadsheet_share.xml:0
+msgid "Shared externally"
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -435,6 +515,13 @@ msgstr "ข้อมูลสเปรดชีต"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
 msgstr "ชื่อไฟล์สเปรดชีต"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_image_ids
+msgid "Spreadsheet Image"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_document_view_kanban
@@ -489,7 +576,8 @@ msgstr "ไฟล์สเปรดชีต"
 msgid ""
 "Spreadsheet files cannot be handled from the Trash. Would you like to "
 "restore this document?"
-msgstr "ไฟล์สเปรดชีตไม่สามารถจัดการจากถังขยะได้ คุณต้องการกู้คืนเอกสารนี้หรือไม่"
+msgstr ""
+"ไฟล์สเปรดชีตไม่สามารถจัดการจากถังขยะได้ คุณต้องการกู้คืนเอกสารนี้หรือไม่"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -505,10 +593,15 @@ msgid "Spreadsheets"
 msgstr "สเปรดชีต"
 
 #. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/models/documents_access.py:0
-msgid "Spreadsheets can not be shared in edit mode to non-internal users."
-msgstr "ไม่สามารถแชร์สเปรดชีตในโหมดแก้ไขให้กับผู้ใช้ที่ไม่ใช่ภายในได้"
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__tab
+msgid "Tab"
+msgstr ""
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.xml:0
+msgid "Take out of trash"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__template_id
@@ -545,19 +638,19 @@ msgid "The xlsx file is too big"
 msgstr "ไฟล์ xlsx มีขนาดใหญ่เกินไป"
 
 #. module: documents_spreadsheet
-#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_error_live_data
-msgid "This spreadsheet contains live data, only internal users can view it."
-msgstr "สเปรดชีตนี้ประกอบด้วยข้อมูลสด ซึ่งเฉพาะผู้ใช้ภายในเท่านั้นที่สามารถดูได้"
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_import_to_spreadsheet_view_form
+msgid ""
+"This file type can't be opened directly in Odoo. Convert it to an Odoo "
+"Spreadsheet to view or edit it."
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog.xml:0
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.js:0
 msgid ""
-"This type of file cannot be previewed or edited directly in Odoo. Opening "
-"your file with Odoo Spreadsheet will allow you to do so."
+"This file will be deleted forever in %(deletion_delay)s days. You can still "
+"download it."
 msgstr ""
-"ไฟล์ประเภทนี้ไม่สามารถแสดงตัวอย่างหรือแก้ไขโดยตรงใน Odoo ได้ หากต้องการใช้งานดังกล่าว "
-"กรุณาเปิดไฟล์ด้วย Odoo สเปรดชีต"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__thumbnail
@@ -567,9 +660,16 @@ msgid "Thumbnail"
 msgstr "ภาพขนาดย่อ"
 
 #. module: documents_spreadsheet
-#: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_spreadsheet_access_via_link
-msgid "To share a spreadsheet in edit mode, add the user in the accesses"
-msgstr "หากต้องการแชร์สเปรดชีตในโหมดแก้ไข ให้เพิ่มผู้ใช้ในการเข้าถึง"
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.js:0
+msgid "To access this file, contact the owner to take it out of the trash."
+msgstr ""
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.js:0
+msgid "To access this file, take it out of the trash."
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -614,17 +714,15 @@ msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-python
-#: code:addons/documents_spreadsheet/wizard/documents_sharing.py:0
-msgid ""
-"You can not share spreadsheet(s) in edit mode (%(document_names)s) to non-"
-"internal users."
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You cannot modify this spreadsheet because it is in the trash."
 msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-python
-#: code:addons/documents_spreadsheet/wizard/documents_sharing.py:0
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid ""
-"You cannot share spreadsheet(s) via link in edit mode (%(document_names)s)."
+"You cannot restore this version because the spreadsheet is in the trash."
 msgstr ""
 
 #. module: documents_spreadsheet
@@ -632,3 +730,18 @@ msgstr ""
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You don't have access to this document"
 msgstr "คุณไม่มีสิทธิ์เข้าถึงเอกสารนี้"
+
+#. module: documents_spreadsheet
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_import_to_spreadsheet_view_form
+msgid "e.g. ; or |"
+msgstr ""
+
+msgid "Spreadsheets can not be shared in edit mode to non-internal users."
+msgstr "ไม่สามารถแชร์สเปรดชีตในโหมดแก้ไขให้กับผู้ใช้ที่ไม่ใช่ภายในได้"
+
+msgid "This spreadsheet contains live data, only internal users can view it."
+msgstr ""
+"สเปรดชีตนี้ประกอบด้วยข้อมูลสด ซึ่งเฉพาะผู้ใช้ภายในเท่านั้นที่สามารถดูได้"
+
+msgid "To share a spreadsheet in edit mode, add the user in the accesses"
+msgstr "หากต้องการแชร์สเปรดชีตในโหมดแก้ไข ให้เพิ่มผู้ใช้ในการเข้าถึง"

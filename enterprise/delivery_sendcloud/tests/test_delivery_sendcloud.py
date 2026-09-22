@@ -4,8 +4,11 @@ from unittest.mock import patch, DEFAULT
 import requests
 
 from odoo.exceptions import UserError
-from odoo.tests import TransactionCase, tagged
+from odoo.tests import Form, TransactionCase
 from odoo import Command, _
+from odoo.tools import float_repr, mute_logger
+
+from ..models.sendcloud_service import SendCloud
 
 BALEARES_RANGE = {str(i) for i in range(7025, 7035)}
 CARRIER_CODE_BY_METHOD_ID = {
@@ -13,7 +16,7 @@ CARRIER_CODE_BY_METHOD_ID = {
 }  # as shipping-price has method_id only
 
 @contextmanager
-def _mock_sendcloud_call(warehouse_id):
+def _mock_sendcloud_call(warehouse_id, specific_sendcloud_check=None, disabled_endpoints=[]):
     def is_baleares_carrier_applicable(params, code=None, method_id=None, for_listing=False):
         """
         Returns True if 'spain_express:baleares' is applicable for the given shipping params.
@@ -162,6 +165,7 @@ def _mock_sendcloud_call(warehouse_id):
                         'currency': 'EUR'
                     }],
                 },
+                'shipping-functionalities': {},
                 'addresses': {'sender_addresses': [{'contact_name': warehouse_id.name, 'id': 1}]},
                 'label': 'mock',
             },
@@ -171,7 +175,7 @@ def _mock_sendcloud_call(warehouse_id):
                         'tracking_number': '123',
                         'tracking_url': 'url',
                         'id': 1, 'weight': 10.0,
-                        'shipment': {'id': 8},
+                        'shipment': {'id': 3},
                         'documents': [{'link': '/label', 'type': 'label'}],
                         'colli_uuid': '4dc5e2dc-e0be-4814-a6fd-fdf96dd4a9b6',
                     }],
@@ -181,6 +185,10 @@ def _mock_sendcloud_call(warehouse_id):
         }
         for endpoint, content in responses[method].items():
             if endpoint in url:
+                if specific_sendcloud_check:
+                    specific_sendcloud_check(endpoint, kwargs.get('json', {}))
+                if endpoint in disabled_endpoints:
+                    return []
                 response = requests.Response()
                 if endpoint == 'shipping-products':
                     filtered_products = []
@@ -208,13 +216,13 @@ def _mock_sendcloud_call(warehouse_id):
     with patch.object(requests.Session, 'request', _mock_request):
         yield
 
-@tagged('-standard', 'external')
+
 class TestDeliverySendCloud(TransactionCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.your_company = cls.env.ref("base.main_partner")
+        cls.your_company = cls.env.company
         cls.warehouse_id = cls.env['stock.warehouse'].search([('company_id', '=', cls.your_company.id)], limit=1)
         cls.your_company.write({'name': 'Odoo SA',
                                 'country_id': cls.env.ref('base.be').id,
@@ -224,11 +232,12 @@ class TestDeliverySendCloud(TransactionCase):
                                 'city': 'Ramillies',
                                 'zip': 1367,
                                 'phone': '081813700',
+                                'vat': 'BE0477472701',
                                 })
+        cls.warehouse_id.partner_id.email = "test@odoo.com"
         # deco_art will be in europe
         cls.eu_partner = cls.env['res.partner'].create({
             'name': 'Acme Corporation',
-            'is_company': True,
             'street': '77 Santa Barbara Rd',
             'city': 'Pleasant Hill',
             'country_id': cls.env.ref('base.nl').id,
@@ -240,7 +249,6 @@ class TestDeliverySendCloud(TransactionCase):
         # partner in us (azure)
         cls.us_partner = cls.env['res.partner'].create({
             'name': 'Azure Interior',
-            'is_company': True,
             'street': '4557 De Silva St',
             'city': 'Fremont',
             'country_id': cls.env.ref('base.us').id,
@@ -248,6 +256,7 @@ class TestDeliverySendCloud(TransactionCase):
             'state_id': cls.env.ref('base.state_us_5').id,
             'email': 'azure.Interior24@example.com',
             'phone': '(870)-931-0505',
+            'vat': '12-3456789',
         })
 
         cls.product_to_ship1 = cls.env["product.product"].create({
@@ -279,8 +288,8 @@ class TestDeliverySendCloud(TransactionCase):
             'name': 'test package',
         })
 
-        with _mock_sendcloud_call(cls.warehouse_id):
-            api_res = cls.sendcloud._get_sendcloud()._get_shipping_products('BE')
+        with _mock_sendcloud_call(cls.warehouse_id), SendCloud(cls.sendcloud.sendcloud_public_key, cls.sendcloud.sendcloud_secret_key, cls.sendcloud.log_xml) as api:
+            api_res = api._get_shipping_products('BE')
             user_chosen_product = cls._set_product_local_cache(cls, api_res[0])  # only grab the first response and apply client-side transformations
             cls.sendcloud._set_sendcloud_products(user_chosen_product, False)
 
@@ -415,8 +424,7 @@ class TestDeliverySendCloud(TransactionCase):
         self.sendcloud.sendcloud_product_functionalities = {
             'signature': [True],
         }
-        api = self.sendcloud._get_sendcloud()
-        with _mock_sendcloud_call(self.warehouse_id):
+        with _mock_sendcloud_call(self.warehouse_id), SendCloud(self.sendcloud.sendcloud_public_key, self.sendcloud.sendcloud_secret_key, self.sendcloud.log_xml) as api:
             methods = api._get_shipping_methods(self.sendcloud, 'BE', 'BE')
             self.assertEqual(methods[0]['id'], 3)
 
@@ -444,8 +452,7 @@ class TestDeliverySendCloud(TransactionCase):
             'carrier_id': self.sendcloud.id,
             'order_id': sale_order.id,
         })
-        with _mock_sendcloud_call(self.warehouse_id):
-            api = self.sendcloud._get_sendcloud()
+        with _mock_sendcloud_call(self.warehouse_id), SendCloud(self.sendcloud.sendcloud_public_key, self.sendcloud.sendcloud_secret_key, self.sendcloud.log_xml) as api:
             choose_delivery_carrier.update_price()
             choose_delivery_carrier.button_confirm()
             sale_order.action_confirm()
@@ -493,16 +500,15 @@ class TestDeliverySendCloud(TransactionCase):
             'carrier_id': self.sendcloud.id,
             'order_id': sale_order.id,
         })
-        with _mock_sendcloud_call(self.warehouse_id):
-            api = self.sendcloud._get_sendcloud()
+        with _mock_sendcloud_call(self.warehouse_id), SendCloud(self.sendcloud.sendcloud_public_key, self.sendcloud.sendcloud_secret_key, self.sendcloud.log_xml) as api:
             choose_delivery_carrier.update_price()
             choose_delivery_carrier.button_confirm()
             sale_order.action_confirm()
             self.assertGreater(len(sale_order.picking_ids), 0, "The Sales Order did not generate pickings for ups shipment.")
             picking = sale_order.picking_ids[0]
-            picking.action_assign()
+            picking.do_unreserve()
             # Create packages
-            picking.move_ids[0].quantity_done = 2.0
+            picking.move_ids[0].quantity = 2.0
             wiz_action = picking.action_put_in_pack()
             put_in_pack = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
                 'package_type_id': self.package_type.id,
@@ -510,7 +516,7 @@ class TestDeliverySendCloud(TransactionCase):
             put_in_pack._compute_weight_uom_name()
             put_in_pack._compute_shipping_weight()
             put_in_pack.action_put_in_pack()
-            picking.move_ids[1].quantity_done = 1.0
+            picking.move_ids[1].quantity = 1.0
             wiz_action = picking.action_put_in_pack()
             put_in_pack = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
                 'package_type_id': self.package_type.id,
@@ -525,29 +531,30 @@ class TestDeliverySendCloud(TransactionCase):
             sender_id = api._get_pick_sender_address(picking)
             parcels = api._prepare_parcel(picking, sender_id, is_return=False)
 
-        # Check qty & total weight in parcel(s)
+        # Check qty & average weight in parcel(s)
         # qty in DeliveryPackage commodities are rounded (integer)
         self.assertEqual(len(parcels), 1)
         parcel = parcels[0]
         self.assertEqual(parcel.get('quantity'), 2)
         self.assertEqual(parcel.get('shipment', {}).get('id'), 2)
-        self.assertAlmostEqual(24, float(parcel.get('weight')))
+        self.assertAlmostEqual(12, float(parcel.get('weight')))
 
     def test_extract_house_number(self):
-        api = self.sendcloud._get_sendcloud()
-        addresses = [
-            ('Friedrichstr. 13/1', '13/1'),
-            ('Rue du pont 11 A', '11 A'),
-            ('Place Albert 1er 15B', '15B'),
-            ('123-456 Main Street', '123-456'),
-            ('456B Elm St', '456B'),
-            ('789 C Oak Avenue', '789 C'),
-            ('20A1 Vo Thi Sau Street, Tan Dinh Ward, District 1', '20A1'),
-            ('Innsbruck Straße 8/1/13', '8/1/13'),
-            ('7-3/11A Hochköning Straße', '7-3/11A'),
-        ]
-        for address in addresses:
-            self.assertEqual(api._get_house_number(address[0]), address[1])
+        with SendCloud(self.sendcloud.sendcloud_public_key, self.sendcloud.sendcloud_secret_key, self.sendcloud.log_xml) as api:
+            addresses = [
+                ('Friedrichstr. 13/1', '13/1'),
+                ('Rue du pont 11 A', '11 A'),
+                ('Place Albert 1er 15B', '15B'),
+                ('123-456 Main Street', '123-456'),
+                ('456B Elm St', '456B'),
+                ('789 C Oak Avenue', '789 C'),
+                ('20A1 Vo Thi Sau Street, Tan Dinh Ward, District 1', '20A1'),
+                ('Innsbruck Straße 8/1/13', '8/1/13'),
+                ('7-3/11A Hochköning Straße', '7-3/11A'),
+                ('Place de l\'Alma 1.4', '1.4'),
+            ]
+            for address in addresses:
+                self.assertEqual(api._get_house_number(address[0]), address[1])
 
     def test_sendcloud_picking_batch_validation(self):
         """
@@ -561,6 +568,7 @@ class TestDeliverySendCloud(TransactionCase):
             'login': 'Mars Man',
             'name': 'Spleton',
             'email': 'alien@mars.com',
+            'group_ids': self.env.ref('stock.group_stock_user'),
         })
         sale_orders = self.env['sale.order'].create([
             {
@@ -603,14 +611,14 @@ class TestDeliverySendCloud(TransactionCase):
                 self.assertEqual(sale_orders[i].picking_ids.carrier_id.id, sale_orders[i].carrier_id.id)
             pickings = sale_orders.picking_ids
             pickings.action_assign()
-            pickings.action_set_quantities_to_reservation()
             sendcloud_class = 'odoo.addons.delivery_sendcloud.models.sendcloud_service.SendCloud'
-            with patch(sendcloud_class + '.send_shipment', side_effect=fail_send_shipment(pickings[1])):
+            with patch(sendcloud_class + '._send_shipment', side_effect=fail_send_shipment(pickings[1])):
                 pickings.with_user(alien).button_validate()
         # both pickings should be validated but and activity should have been created for the invalid picking
         self.assertEqual(pickings.mapped('state'), ['done', 'done'])
         self.assertTrue(self.env['mail.activity'].search([('res_model', '=', 'stock.picking'), ('res_id', '=', pickings[1].id), ('user_id', '=', alien.id)], limit=1))
 
+    @mute_logger('odoo.tools.translate')
     def test_sendcloud_zonal_pricing_and_product(self):
         """
         Test zonal shipping:
@@ -627,8 +635,8 @@ class TestDeliverySendCloud(TransactionCase):
             'city': 'Barcelona',
         })  # Non-Balearic Company
 
-        with _mock_sendcloud_call(self.warehouse_id):
-            api_res = self.sendcloud._get_sendcloud()._get_shipping_products('ES')
+        with _mock_sendcloud_call(self.warehouse_id), SendCloud(self.sendcloud.sendcloud_public_key, self.sendcloud.sendcloud_secret_key, self.sendcloud.log_xml) as api:
+            api_res = api._get_shipping_products('ES')
             user_chosen_product = self._set_product_local_cache(api_res[1])
             self.sendcloud._set_sendcloud_products(user_chosen_product, False)
 
@@ -682,6 +690,7 @@ class TestDeliverySendCloud(TransactionCase):
         with self.assertRaises(UserError):
             picking.open_website_url()
 
+    @mute_logger('odoo.tools.translate')
     def test_overweight_individual_products_error_message(self):
         """
         Test that when individual products are too heavy for the shipping method,
@@ -748,7 +757,7 @@ class TestDeliverySendCloud(TransactionCase):
                     'product_id': self.product_to_ship1.id,
                     'product_uom_qty': 1.0,
                     'price_unit': 100,
-                    'tax_id': basic_tax,
+                    'tax_ids': basic_tax,
                 }),
             ]
         })
@@ -781,3 +790,250 @@ class TestDeliverySendCloud(TransactionCase):
             picking.action_assign()
             picking._action_done()
             self.assertTrue(picking.sendcloud_parcel_ref)
+
+    def test_customs_information_1(self):
+        '''
+        Test the content of customs information when the picking originates from a SO.
+        '''
+        def customs_information_check(endpoint, payload):
+            if endpoint == 'parcels' and payload:
+                self.assertTrue(payload.get('parcels'))
+                parcel = payload['parcels'][0]
+                # Verify that only the first picking contains the freight costs
+                self.assertFalse(parcel['parcel_items'][0]['quantity'] > 1 and parcel['customs_information']['freight_costs'] != '0.00')
+                # Verify the customs information contains the correct VAT numbers
+                self.assertDictEqual(
+                    parcel['customs_information']['tax_numbers'],
+                    {
+                        'sender': [{'name': 'VAT', 'country_code': 'BE', 'value': 'BE0477472701'}],
+                        'receiver': [{'name': 'VAT', 'country_code': 'US', 'value': '123456789'}],
+                        'importer_of_record': [{'name': 'VAT', 'country_code': 'US', 'value': '123456789'}]
+                    }
+                )
+
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.us_partner.id,
+            'order_line': [
+                Command.create({
+                    'product_id': self.product_to_ship1.id,
+                    'product_uom_qty': 3,
+                }),
+            ]
+        })
+        wiz_action = sale_order.action_open_delivery_wizard()
+        choose_delivery_carrier = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
+            'carrier_id': self.sendcloud.id,
+            'order_id': sale_order.id
+        })
+        with _mock_sendcloud_call(self.warehouse_id, customs_information_check):
+            choose_delivery_carrier.update_price()
+            choose_delivery_carrier.button_confirm()
+            sale_order.action_confirm()
+            self.assertGreater(len(sale_order.picking_ids), 0)
+
+            # Send only 1, leave 2 for a back order
+            picking = sale_order.picking_ids[0]
+            self.assertEqual(picking.carrier_id.id, sale_order.carrier_id.id)
+            picking.move_ids[0].quantity = 1
+            back_order_wizard_dict = picking.button_validate()
+            back_order_wizard = Form.from_action(self.env, back_order_wizard_dict).save()
+            back_order_wizard.process()
+            back_order = picking.backorder_ids
+            back_order.action_assign()
+            back_order.button_validate()
+
+    def test_customs_information_2(self):
+        '''
+        Test the content of customs information when the picking does not originate from a SO.
+        '''
+        def customs_information_check(endpoint, payload):
+            if endpoint == 'parcels' and payload:
+                # Ensure 'product_to_ship2' is correctly declared for customs (because qty is < 1)
+                declared_properties = next(d for d in payload['parcels'][0]['parcel_items'] if '(0.5 Units)' in d.get('description', ''))
+                self.assertEqual(
+                    (declared_properties['weight'], declared_properties['value']),
+                    (float_repr(self.product_to_ship2.weight * 0.5, 3), self.product_to_ship2.list_price * 0.5)
+                )
+                customs_information = payload['parcels'][0]['customs_information']
+                # Verify there are no freight charges
+                self.assertEqual(customs_information['freight_costs'], '0.00')
+                # Verify the invoice number has a fallback value
+                self.assertTrue(customs_information['customs_invoice_nr'])
+
+        picking = self.env['stock.picking'].create({
+            'partner_id': self.us_partner.id,
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'location_id': self.warehouse_id.lot_stock_id.id,
+            'location_dest_id': self.eu_partner.property_stock_customer.id,
+            'carrier_id': self.sendcloud.id,
+            'move_ids': [
+                Command.create({
+                    'product_id': self.product_to_ship1.id,
+                    'location_id': self.warehouse_id.lot_stock_id.id,
+                    'location_dest_id': self.eu_partner.property_stock_customer.id,
+                    'product_uom_qty': 1,
+                }),
+                Command.create({
+                    'product_id': self.product_to_ship2.id,
+                    'location_id': self.warehouse_id.lot_stock_id.id,
+                    'location_dest_id': self.eu_partner.property_stock_customer.id,
+                    'product_uom_qty': 0.5,
+                }),
+            ],
+        })
+
+        with _mock_sendcloud_call(self.warehouse_id, customs_information_check):
+            picking.button_validate()
+
+    def test_sendcloud_small_weight(self):
+        """ Test that a weight smaller than 1g is does not raise an error"""
+        self.env.ref("product.decimal_stock_weight").digits = 5
+        small_product = self.env["product.product"].create({
+            'name': 'Small product',
+            'type': 'consu',
+            'weight': 0.00005,
+        })
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.eu_partner.id,
+            'order_line': [
+                Command.create({
+                    'product_id': small_product.id,
+                    'product_uom_qty': 1.0,
+                }),
+                Command.create({
+                    'product_id': self.product_to_ship1.id,
+                    'product_uom_qty': 1.0,
+                }),
+            ]
+        })
+        wiz_action = sale_order.action_open_delivery_wizard()
+        choose_delivery_carrier = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
+            'carrier_id': self.sendcloud.id,
+            'order_id': sale_order.id,
+        })
+        with _mock_sendcloud_call(self.warehouse_id), SendCloud(self.sendcloud.sendcloud_public_key, self.sendcloud.sendcloud_secret_key, self.sendcloud.log_xml) as api:
+            choose_delivery_carrier.update_price()
+            choose_delivery_carrier.button_confirm()
+            sale_order.action_confirm()
+            picking = sale_order.picking_ids[0]
+            for move in picking.move_ids:
+                move.quantity = move.product_uom_qty
+                move.picked = True
+            picking.button_validate()
+            sender_id = api._get_pick_sender_address(picking)
+            parcels = api._prepare_parcel(picking, sender_id, is_return=False)
+        items = parcels[0].get('parcel_items', [])
+        self.assertEqual(items[0]['weight'], '0.001')
+        self.assertEqual(items[1]['weight'], '6.000')
+
+    @mute_logger('odoo.tools.translate')
+    def test_get_shipping_prices_no_sendcloud_response(self):
+        '''
+        Ensure no traceback when sendcloud doesn't return any price for 'shipping-price' requests
+        '''
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.us_partner.id,
+            'order_line': [
+                Command.create({
+                    'product_id': self.product_to_ship1.id
+                }),
+            ]
+        })
+        wiz_action = sale_order.action_open_delivery_wizard()
+        choose_delivery_carrier = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
+            'carrier_id': self.sendcloud.id,
+            'order_id': sale_order.id
+        })
+        with _mock_sendcloud_call(self.warehouse_id, disabled_endpoints=['shipping-price']), self.assertRaises(UserError):
+            choose_delivery_carrier.update_price()
+
+    def test_parcel_label_reference(self):
+        """Verify that parcel labels include the package or delivery reference along with the order number."""
+        self.product_to_ship1.write({'is_storable': True, 'weight': 1.0})
+        packages = self.env['stock.package'].create([{'name': 'Pack01'}, {'name': 'Pack02'}])
+        self.env['stock.quant'].create([{
+            'product_id': self.product_to_ship1.id,
+            'location_id': self.warehouse_id.lot_stock_id.id,
+            'quantity': 5,
+            'package_id': pkg and pkg.id,
+        } for pkg in [*packages, False]])
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.eu_partner.id,
+            'order_line': [Command.create({'product_id': self.product_to_ship1.id, 'product_uom_qty': 15.0})],
+            'carrier_id': self.sendcloud.id,
+        })
+        sale_order.action_confirm()
+        picking = sale_order.picking_ids
+        with _mock_sendcloud_call(self.warehouse_id), SendCloud(self.sendcloud.sendcloud_public_key, self.sendcloud.sendcloud_secret_key, self.sendcloud.log_xml) as api:
+            sender_id = api._get_pick_sender_address(picking)
+            parcels = api._prepare_parcel(picking, sender_id, is_return=False)
+        self.assertEqual([parcel['order_number'] for parcel in parcels],
+            [f"{sale_order.name}-{packages[0].name}", f"{sale_order.name}-{packages[1].name}", f"{sale_order.name}-{picking.name}"],
+            "The parcel order number should include the package name, or the delivery name when no package is specified.",
+        )
+
+    def test_sendcloud_delivery_over_max_packaging_weight(self):
+        '''
+        Ensure delivery is correctly split to match the number of packages required for the order's
+        total weight.
+        '''
+        self.product_to_ship1.weight = 0.75
+        self.package_type.max_weight = 2
+        self.sendcloud.sendcloud_default_package_type_id = self.package_type
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.eu_partner.id,
+            'order_line': [
+                Command.create({
+                    'product_id': self.product_to_ship1.id,
+                    'product_uom_qty': 7.0,
+                }),
+            ]
+        })
+        self.assertEqual(sale_order.shipping_weight, 5.25)
+        # SO for 5 products to deliberately "mess" package count up (7 * 0.75 = 5.25) by requesting
+        # for 3 packages when it should be 4 because we have no way to know whether the product can
+        # be split into multiple packages or not. Should be changed if/when indivisible units are
+        # implemented.
+        wiz_action = sale_order.action_open_delivery_wizard()
+        choose_delivery_carrier = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
+            'carrier_id': self.sendcloud.id,
+            'order_id': sale_order.id,
+        })
+        with _mock_sendcloud_call(self.warehouse_id):
+            choose_delivery_carrier.update_price()
+            choose_delivery_carrier.button_confirm()
+        self.assertEqual(sale_order.order_line.filtered(lambda ol: ol.is_delivery).price_total, 3.3)
+
+    def test_enable_return_label(self):
+        '''
+        Test format of the requests when using the "Generate Return Label" feature.
+        '''
+        def return_label_format_check(endpoint, payload):
+            if endpoint == 'parcels' and payload:
+                parcel = payload['parcels'][0]
+                if parcel.get('from_name'):
+                    self.assertEqual(
+                        (parcel['from_house_number'], parcel['from_address_1']),
+                        ('4557', 'De Silva St'),
+                    )
+
+        self.sendcloud.return_label_on_delivery = True
+        self.sendcloud.sendcloud_return_id = self.sendcloud.sendcloud_shipping_id
+        picking = self.env['stock.picking'].create({
+            'partner_id': self.us_partner.id,
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'location_id': self.warehouse_id.lot_stock_id.id,
+            'location_dest_id': self.eu_partner.property_stock_customer.id,
+            'carrier_id': self.sendcloud.id,
+            'move_ids': [
+                Command.create({
+                    'product_id': self.product_to_ship1.id,
+                    'location_id': self.warehouse_id.lot_stock_id.id,
+                    'location_dest_id': self.eu_partner.property_stock_customer.id,
+                    'product_uom_qty': 1,
+                }),
+            ],
+        })
+
+        with _mock_sendcloud_call(self.warehouse_id, return_label_format_check):
+            picking.button_validate()

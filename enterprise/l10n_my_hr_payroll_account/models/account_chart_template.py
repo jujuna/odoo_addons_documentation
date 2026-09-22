@@ -9,9 +9,6 @@ class AccountChartTemplate(models.AbstractModel):
     _inherit = "account.chart.template"
 
     def _configure_payroll_account_my(self, companies):
-        account_codes = [
-        ]
-        default_account = False
         rules_mapping = defaultdict(dict)
 
         # ================================================ #
@@ -21,6 +18,8 @@ class AccountChartTemplate(models.AbstractModel):
         self._configure_payroll_account(
             companies,
             "MY",
-            account_codes=account_codes,
+            account_refs=[
+            ],
             rules_mapping=rules_mapping,
-            default_account=default_account)
+            default_account=False
+        )

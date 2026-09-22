@@ -45,8 +45,6 @@ class WhatsAppSignCommon(TransactionCase):
                 })
             ],
         })
-        cls.env['ir.config_parameter'].sudo().set_param('whatsapp_sign.whatsapp_template_id',
-                                                        cls.sign_request_wa_template.id)
 
         cls.sign_completion_wa_template = cls.env['whatsapp.template'].create({
             "model_id": cls.env['ir.model']._get_id('sign.request.item'),
@@ -73,8 +71,6 @@ class WhatsAppSignCommon(TransactionCase):
                 })
             ],
         })
-        cls.env['ir.config_parameter'].sudo().set_param('whatsapp_sign.whatsapp_completion_template_id',
-                                                        cls.sign_completion_wa_template.id)
 
         cls.sign_refusal_wa_template = cls.env['whatsapp.template'].create({
             "model_id": cls.env['ir.model']._get_id('sign.request.item'),
@@ -106,14 +102,12 @@ class WhatsAppSignCommon(TransactionCase):
                 })
             ],
         })
-        cls.env['ir.config_parameter'].sudo().set_param('whatsapp_sign.whatsapp_refusal_template_id',
-                                                        cls.sign_refusal_wa_template.id)
 
-        cls.whatsapp_template_ids = [
-            cls.sign_request_wa_template.id,
-            cls.sign_completion_wa_template.id,
-            cls.sign_refusal_wa_template.id
-        ]
+        company = cls.env.company
+        company.sign_whatsapp_enabled = True
+        company.sign_send_request_wa_template_id = cls.sign_request_wa_template
+        company.request_completion_wa_template_id = cls.sign_completion_wa_template
+        company.request_refusal_wa_template_id = cls.sign_refusal_wa_template
 
         cls.test_sign_user = new_test_user(
             cls.env,
@@ -156,15 +150,8 @@ class WhatsAppSignCommon(TransactionCase):
 
         return wizard
 
-    def get_sign_request_items(self, template_id):
+    def get_sign_request_and_items(self, template_id):
         sign_request = self.env['sign.request'].search([('template_id', '=', template_id)])
         sign_items = sign_request.request_item_ids.sorted(key=lambda sri: sri.mail_sent_order)
 
-        return sign_items
-
-    def get_whatsapp_templates(self):
-        wa_templates = []
-        for template_id in self.whatsapp_template_ids:
-            wa_templates.append(self.env['whatsapp.template'].browse(int(template_id)))
-
-        return wa_templates
+        return sign_request, sign_items

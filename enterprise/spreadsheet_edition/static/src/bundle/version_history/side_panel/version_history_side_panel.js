@@ -1,4 +1,4 @@
-import { Component, useEffect, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, onPatched, proxy, signal, t, useProps } from "@odoo/owl";
 import { components } from "@odoo/o-spreadsheet";
 import { VersionHistoryItem } from "./version_history_item";
 
@@ -6,35 +6,34 @@ const { Section } = components;
 
 export class VersionHistorySidePanel extends Component {
     static template = "spreadsheet_edition.VersionHistory";
-    static props = {
-        onCloseSidePanel: Function,
-        getRevisions: Function,
-        forkHistory: Function,
-        restoreRevision: Function,
-        renameRevision: Function,
-        loadToRevision: Function,
-        getCurrentRevisionId: Function,
-        getLocale: Function,
-    };
     static components = {
         VersionHistoryItem,
         Section,
     };
 
+    props = useProps({
+        onCloseSidePanel: t.function(),
+        getRevisions: t.function(),
+        forkHistory: t.function(),
+        restoreRevision: t.function(),
+        renameRevision: t.function(),
+        loadToRevision: t.function(),
+        getCurrentRevisionId: t.function(),
+        getLocale: t.function(),
+    });
+
     revNbr = 50;
+    containerRef = signal.ref();
 
     setup() {
-        this.containerRef = useRef("container");
-
-        this.state = useState({
+        this.state = proxy({
             currentRevisionId: this.props.getCurrentRevisionId(),
             isEditingName: false,
             loaded: this.revNbr,
         });
 
-        useEffect(() => {
-            this.focus();
-        });
+        onMounted(() => this.focus());
+        onPatched(() => this.focus());
     }
 
     get revisions() {
@@ -46,7 +45,7 @@ export class VersionHistorySidePanel extends Component {
     }
 
     focus() {
-        this.containerRef.el?.focus();
+        this.containerRef()?.focus();
     }
 
     onRevisionClick(revisionId) {

@@ -5,11 +5,9 @@
 // focus, drag, clone and resize.
 @mixin o-gantt-hover() {
     &:hover,
-    &:focus,
-    &.o_dragged_pill,
-    &.ui-resizable-resize {
-        // Avoid visual feedback if 'o_gantt_renderer' has class 'o_grabbing', 'o_copying' or 'o_no_dragging'
-        @at-root #{selector-replace(&, ".o_gantt_renderer", ".o_gantt_renderer:not(.o_grabbing):not(.o_copying):not(.o_no_dragging)")} {
+    &:focus {
+        // Avoid visual feedback if 'o_gantt_renderer' has some classes
+        @at-root #{selector-replace(&, ".o_gantt_renderer", ".o_gantt_renderer:not(.o_grabbing):not(.o_copying):not(.o_grabbing_locked):not(.o_selecting)")} {
             @content;
         }
     }
@@ -60,7 +58,10 @@
             grid: 0,
             grid-interact: 1,
             folded: 2,
+            // Grid and connector interaction level
+            connector: 3,
             // Pills and pills interactions level
+            pill-buffer: 9,
             pill: 10,
             pill-interact: 11,
             // Interactions => over pills
@@ -71,6 +72,7 @@
             // Top-most elements
             column-header-groups: 35,
             title: 40,
+            pill-drag: 45,
             controls: 50,
             badge: 50,
         ),
@@ -87,5 +89,6 @@ $gantt-row-open-bg: $o-gray-100 !default;
 $gantt-unavailability-bg: $o-gray-200 !default;
 $o-connector-creator-bullet-radius: 3px !default;
 $o-connector-creator-size: 8px !default;
+$o-connector-creator-hitbox-size: 16px !default;
 $o-connector-creator-bullet-diameter: 2 * $o-connector-creator-bullet-radius !default;
 $o-connector-wrapper-height: $o-connector-creator-size + $o-connector-creator-bullet-radius !default;

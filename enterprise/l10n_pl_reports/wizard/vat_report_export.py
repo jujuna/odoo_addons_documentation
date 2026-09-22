@@ -11,7 +11,7 @@ class L10n_Pl_ReportsPeriodicVatXmlExport(models.TransientModel):
         string="Birthdate",
         help="As a natural person, the birthdate is needed",
     )
-    partner_is_company = fields.Boolean(compute="_compute_partner_is_company") # used to show l10n_pl_birthdate
+    partner_is_company = fields.Boolean(compute="_compute_partner_is_company")
     l10n_pl_repayment_timeframe = fields.Selection(
         string='Repayment Timeframe',
         selection=
@@ -33,12 +33,13 @@ class L10n_Pl_ReportsPeriodicVatXmlExport(models.TransientModel):
     l10n_pl_reason_amendment = fields.Char("Reasons for the amendment")
 
     def _compute_partner_is_company(self):
-        self.partner_is_company = self.env.company.partner_id.is_company
+        self.partner_is_company = not self.l10n_pl_birthdate
 
     def print_xml(self):
         options = self.env.context.get('l10n_pl_reports_generation_options')
         options.update({field_name: self[field_name] for field_name in self._fields if field_name[:7] == 'l10n_pl'})
         options.update({'l10n_pl_birthdate': str(self.l10n_pl_birthdate)})
+        options.update({'partner_is_company': bool(self.partner_is_company)})
         return {
             'type': 'ir_actions_account_report_download',
             'data': {

@@ -5,14 +5,15 @@
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:23+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:14+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "account_budget/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,29 +22,35 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_budget
+#: model:ir.module.module,description:base.module_account_budget
+msgid ""
+"\n"
+"Use budgets to compare actual with expected revenues and costs\n"
+"--------------------------------------------------------------\n"
+msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_kanban
 msgid ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
-"title=\"Period\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Period\" title=\"Period\"/>"
 msgstr ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
-"title=\"Период\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Period\" title=\"Период\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+"<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
 msgstr ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"по\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid "<span class=\"o_stat_text\">Budget Report</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Отчет по бюджету</span>"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__achieved_amount
@@ -74,6 +81,11 @@ msgstr "Дело"
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Оформление задачи-исключения"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_state
@@ -112,6 +124,16 @@ msgid "Analytic Budget"
 msgstr "Аналитический бюджет"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_analytic_line
+msgid "Analytic Line"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model,name:account_budget.model_analytic_plan_fields_mixin
+msgid "Analytic Plan Fields"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__analytical_plan_ids
 msgid "Analytic Plans"
 msgstr "Аналитические планы"
@@ -133,7 +155,6 @@ msgstr "Оба"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_analytic
-#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_report__line_type__budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -151,6 +172,8 @@ msgid "Budget %s"
 msgstr "Бюджет %s"
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_account_bank_statement_line__budget_analytic_ids
+#: model:ir.model.fields,field_description:account_budget.field_account_move__budget_analytic_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_analytic_id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_analytic_id
 msgid "Budget Analytic"
@@ -160,6 +183,7 @@ msgstr "Аналитика бюджета"
 #: model:ir.model,name:account_budget.model_budget_line
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__budget_line_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_line_id
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budget Line"
 msgstr "Бюджетная Строка"
 
@@ -176,6 +200,11 @@ msgstr "Бюджетная Строка"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_tree
 msgid "Budget Lines"
 msgstr "Бюджетные статьи"
+
+#. module: account_budget
+#: model:ir.module.module,shortdesc:base.module_account_budget
+msgid "Budget Management"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__name
@@ -215,20 +244,21 @@ msgstr "Тип бюджета"
 #. odoo-python
 #: code:addons/account_budget/models/budget_analytic.py:0
 msgid "Budget end date may not be before the starting date."
-msgstr ""
+msgstr "Дата окончания бюджета не может быть раньше даты начала."
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budgeted"
 msgstr "Запланировано"
 
 #. module: account_budget
 #. odoo-python
+#: code:addons/account_budget/models/account_move.py:0
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 #: model:ir.actions.act_window,name:account_budget.act_budget_analytic_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_account_analytic_account_form_inherit_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:account_budget.view_move_form_inherit_budget
 msgid "Budgets"
 msgstr "Бюджеты"
 
@@ -236,11 +266,6 @@ msgstr "Бюджеты"
 #: model:ir.actions.act_window,name:account_budget.act_budget_lines_view
 msgid "Budgets Analysis"
 msgstr "Анализ бюджетов"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "Cancel"
-msgstr "Отменить"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -256,6 +281,13 @@ msgstr "Отменено"
 #: model_terms:ir.actions.act_window,help:account_budget.act_budget_analytic_view
 msgid "Click to create a new budget."
 msgstr "Нажмите, чтобы создать новый бюджет."
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
+#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
+msgid "Commitment"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__company_id
@@ -286,6 +318,7 @@ msgstr "Валюта"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__date
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
 msgid "Date"
 msgstr "Дата"
@@ -303,6 +336,9 @@ msgstr "Описание"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_move__display_name
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__display_name
@@ -355,16 +391,6 @@ msgid "Followers (Partners)"
 msgstr "Подписчики"
 
 #. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Шрифт, отличный значок, например. к.-а.-задачи"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "From"
-msgstr "От"
-
-#. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Future Activities"
 msgstr "Планируемые действия"
@@ -387,6 +413,9 @@ msgstr "Есть сообщение"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__id
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:account_budget.field_account_move__id
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__id
@@ -432,6 +461,11 @@ msgid "Is Follower"
 msgstr "Является подписчиком"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__write_uid
@@ -449,6 +483,17 @@ msgstr "Дата последнего обновления:"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Late Activities"
 msgstr "Поздние Мероприятия"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__liquidation_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__liquidation
+msgid "Liquidation"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_has_error
@@ -712,16 +757,6 @@ msgid "User"
 msgstr "Пользователь"
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__website_message_ids
-msgid "Website Messages"
-msgstr "Веб-сайт сообщения"
-
-#. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__website_message_ids
-msgid "Website communication history"
-msgstr "История общений с сайта"
-
-#. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_split_wizard__period__year
 msgid "Year"
 msgstr "Год"
@@ -736,7 +771,7 @@ msgstr "Вы не можете создать рекурсивную ревиз�
 #. odoo-python
 #: code:addons/account_budget/models/budget_analytic.py:0
 msgid "budget_analytic_id"
-msgstr ""
+msgstr "budget_analytic_id"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -748,145 +783,3 @@ msgstr "например: Бюджет 2023"
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 msgid "id"
 msgstr "id"
-
-#~ msgid ""
-#~ "\"End Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr ""
-#~ "«Дата Окончания» бюджетной строки должен быть включен в период бюджета"
-
-#~ msgid ""
-#~ "\"Start Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr ""
-#~ "\"Дата начала\" бюджетной статьи должна быть включена в Период бюджета"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Period\" "
-#~ "title=\"Period\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Period\" "
-#~ "title=\"Period\"/>"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
-#~ "title=\"Arrow\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
-#~ "title=\"Arrow\"/>"
-
-#~ msgid "<span class=\"o_stat_text\">Budget</span>"
-#~ msgstr "<span class=\"o_stat_text\">Бюджет</span>"
-
-#~ msgid "Accounts"
-#~ msgstr "Аккаунты"
-
-#~ msgid "Achievement"
-#~ msgstr "Достижение"
-
-#~ msgid "Amount really earned/spent."
-#~ msgstr "Сумма, реально заработанная/потраченная."
-
-#~ msgid "Amount you are supposed to have earned/spent at this date."
-#~ msgstr "Сумма, которую вы должны были заработать/израсходовать на эту дату."
-
-#~ msgid ""
-#~ "Amount you plan to earn/spend. Record a positive amount if it is a "
-#~ "revenue and a negative amount if it is a cost."
-#~ msgstr ""
-#~ "Сумма, которую вы планируете заработать/потратить. Запишите положительную "
-#~ "сумму, если это доход, и отрицательную, если это расход."
-
-#~ msgid "Analytic Plan"
-#~ msgstr "Аналитический план"
-
-#~ msgid "Approve"
-#~ msgstr "Одобрить"
-
-#~ msgid "Budget Items"
-#~ msgstr "Бюджетные статьи"
-
-#~ msgid "Budgetary Position"
-#~ msgstr "Бюджетная позиция"
-
-#~ msgid "Budgetary Positions"
-#~ msgstr "Бюджетные позиции"
-
-#~ msgid "Cancelled"
-#~ msgstr "Отменен"
-
-#~ msgid ""
-#~ "Comparison between practical and theoretical amount. This measure tells "
-#~ "you if you are below or over budget."
-#~ msgstr ""
-#~ "Сравнение между практической и теоретической суммой. Этот показатель "
-#~ "позволяет определить, уложились ли вы в бюджет или превысили его."
-
-#~ msgid "Confirm"
-#~ msgstr "Подтвердить"
-
-#~ msgid "Confirmed"
-#~ msgstr "Подтверждено"
-
-#~ msgid "Entries..."
-#~ msgstr "Записи..."
-
-#~ msgid "Group By"
-#~ msgstr "Группировать по"
-
-#~ msgid "Name"
-#~ msgstr "Имя"
-
-#~ msgid "Paid Date"
-#~ msgstr "Дата оплаты"
-
-#~ msgid "Planned Amount"
-#~ msgstr "Планируемая сумма"
-
-#~ msgid "Planned amount"
-#~ msgstr "Планируемая сумма"
-
-#~ msgid "Practical Amount"
-#~ msgstr "Практическая сумма"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr ""
-#~ "Показать все записи, у которых дата следующего действия наступает до "
-#~ "сегодняшнего дня"
-
-#~ msgid "The budget must have at least one account."
-#~ msgstr "Бюджет должен иметь как минимум один счет."
-
-#~ msgid "Theoretical Amount"
-#~ msgstr "Теоретическая Сумма"
-
-#~ msgid "Theoretical amount"
-#~ msgstr "Теоретическое количество"
-
-#~ msgid "To"
-#~ msgstr "Кому"
-
-#~ msgid "To Approve"
-#~ msgstr "К согласованию"
-
-#~ msgid "To Approve Budgets"
-#~ msgstr "Утвердить бюджеты"
-
-#~ msgid "Total Planned Amount"
-#~ msgstr "Общая запланированная сумма"
-
-#~ msgid "Total Practical Amount"
-#~ msgstr "Общая практическая сумма"
-
-#~ msgid "Validated"
-#~ msgstr "Подтверждено"
-
-#~ msgid ""
-#~ "You have to enter at least a budgetary position or analytic account on a "
-#~ "budget line."
-#~ msgstr ""
-#~ "Вы должны ввести как минимум бюджетную позицию или аналитический счет в "
-#~ "бюджетной строке."
-
-#~ msgid "e.g. Budget 2023: Optimistic"
-#~ msgstr "например, Бюджет 2023: Оптимистичный"

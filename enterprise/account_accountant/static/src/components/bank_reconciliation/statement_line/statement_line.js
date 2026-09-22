@@ -6,8 +6,9 @@ import { formatMonetary } from "@web/views/fields/formatters";
 import { KanbanRecord } from "@web/views/kanban/kanban_record";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
-import { onWillStart, useState, useRef } from "@odoo/owl";
+import { onWillStart, signal, computed } from "@odoo/owl";
 import { useBankReconciliation } from "../bank_reconciliation_service";
+import { floatIsZero } from "@web/core/utils/numbers";
 
 export class BankRecStatementLine extends KanbanRecord {
     static template = "account_accountant.BankRecStatementLine";
@@ -17,19 +18,27 @@ export class BankRecStatementLine extends KanbanRecord {
         DropdownItem,
         BankRecReconciledLineName,
     };
-    static props = [...KanbanRecord.props];
+
+    allLinesInSameForeignCurrency = computed(() => this._computeAllLinesInSameForeignCurrency());
+    accountMoveLines = computed(() => this.recordData.line_ids.records.map((line) => line.data));
+    hasAttachment = computed(() => this._computeHasAttachment());
+    hasInvalidAnalytics = computed(() =>
+        this.linesToReconcile().some((line) => line.has_invalid_analytics)
+    );
+    isUnfolded = signal(false);
+    linesToReconcile = computed(() => this._computeLinesToReconcile());
+    suspenseAccountLine = computed(() => {
+        const suspenseId = this.recordData.journal_id?.suspense_account_id.id;
+        return this.accountMoveLines().find((line) => line.account_id.id === suspenseId);
+    });
 
     setup() {
         super.setup();
         this.orm = useService("orm");
         this.ui = useService("ui");
         this.bankReconciliation = useBankReconciliation();
-        this.state = useState({
-            isUnfolded: false,
-        });
-        this.statementLineRootRef = useRef("root");
         if (this.env.model.config.context?.default_st_line_id === this.props.record.resId) {
-            this.state.isUnfolded = true;
+            this.isUnfolded.set(true);
             this.bankReconciliation.selectStatementLine(this.props.record);
         }
         onWillStart(async () => {
@@ -37,9 +46,10 @@ export class BankRecStatementLine extends KanbanRecord {
         });
     }
 
-    getRecordClasses() {
-        let classes = super.getRecordClasses();
-        if (this.hasStatementLine === 1) {
+    getCardClasses() {
+        let classes = super.getCardClasses();
+        classes += " mb-0";
+        if (this.numberOfStatementLines === 1) {
             classes += " mt-3";
         }
         return classes;
@@ -78,27 +88,58 @@ export class BankRecStatementLine extends KanbanRecord {
         this.record.load();
     }
 
+    async undoReconciliation() {
+        await this.orm.call(
+            "account.bank.statement.line",
+            "action_undo_reconciliation",
+            [this.recordData.id],
+            {
+                context: {
+                    skip_account_move_synchronization: true,
+                },
+            }
+        );
+        this.record.load();
+    }
+
     // -----------------------------------------------------------------------------
     // HELPER
     // -----------------------------------------------------------------------------
-    get reconciledLineName() {
-        const reconciledLine = {};
-        for (const line of this.linesToReconcile) {
-            if (
-                line.reconciled_lines_excluding_exchange_diff_ids.records.length === 1 &&
-                line.reconciled_lines_excluding_exchange_diff_ids.records[0].data.move_name
-            ) {
-                reconciledLine[line.id] = {
-                    move: line.reconciled_lines_excluding_exchange_diff_ids.records[0].data
-                        .move_name,
-                };
-            } else if (line.tax_ids.count) {
-                reconciledLine[line.id] = { tax: line.tax_ids.records };
-            } else {
-                reconciledLine[line.id] = { account: line.account_id.display_name };
-            }
-        }
-        return reconciledLine;
+
+    _computeLinesToReconcile() {
+        const suspenseId = this.recordData.journal_id?.suspense_account_id.id;
+        const defaultId = this.recordData.journal_id?.default_account_id.id;
+        return this.accountMoveLines().filter(
+            (line) => line.account_id.id !== suspenseId && line.account_id.id !== defaultId
+        );
+    }
+
+    _computeAllLinesInSameForeignCurrency() {
+        return (
+            this.recordData.foreign_currency_id &&
+            this.linesToReconcile().length > 0 &&
+            this.linesToReconcile().every(
+                (line) => line.currency_id.id === this.recordData.foreign_currency_id.id
+            )
+        );
+    }
+
+    /**
+     * Checks if there is at least one attachment associated with the bank statement line or its related records.
+     *
+     * This getter aggregates attachment counts from attachment_ids field which is a compute for:
+     * - The bank statement line record itself or the related move since attachment_ids is a related to move_id.attachment_ids.
+     * - The related move lines themselves, if they have attachments directly associated (`line.move_attachment_ids`)
+     *   except the attachments link to the statement.
+     * - The lines reconciled with the related move lines, specifically checking for attachments on the
+     *   move associated with those reconciled lines.
+     *
+     * This check ensures that all attachments from associated invoices, bills, and other related documents are considered.
+     *
+     * @returns {number} The total number of attachments found. A return value greater than 0 indicates the presence of attachments.
+     */
+    _computeHasAttachment() {
+        return this.recordData.has_attachments;
     }
 
     get record() {
@@ -109,44 +150,28 @@ export class BankRecStatementLine extends KanbanRecord {
         return this.props.record.data;
     }
 
-    fold() {
-        if (this.state.isUnfolded) {
-            this.toggleUnfold();
+    toggleUnfold(event) {
+        if (event?.pointerType === "mouse") {
+            this.isUnfolded.set(!this.isUnfolded());
         }
-        this.selectStatementLine();
+        this.selectStatementLine(event);
     }
 
-    unfold() {
-        if (!this.state.isUnfolded) {
-            this.toggleUnfold();
+    selectStatementLine(event) {
+        // In case we are on a mobile device, we want to keep the old onClick behaviour
+        if (this.recordData.is_reconciled && event?.pointerType !== "mouse") {
+            this.isUnfolded.set(!this.isUnfolded());
         }
-        this.selectStatementLine();
-    }
-
-    toggleUnfold() {
-        this.state.isUnfolded = !this.isUnfolded;
-        this.selectStatementLine();
-    }
-
-    selectStatementLine() {
         // Update the chatter with the last selected element
         this.bankReconciliation.selectStatementLine(this.record);
     }
 
     openChatter() {
-        this.selectStatementLine();
+        this.bankReconciliation.selectStatementLine(this.record);
         this.bankReconciliation.openChatter();
     }
 
-    get hasInvalidAnalytics() {
-        return this.linesToReconcile.some((line) => line.has_invalid_analytics);
-    }
-
-    get isUnfolded() {
-        return this.state.isUnfolded;
-    }
-
-    get hasStatementLine() {
+    get numberOfStatementLines() {
         return this.env.model.root.count;
     }
 
@@ -175,38 +200,9 @@ export class BankRecStatementLine extends KanbanRecord {
         return this.recordData.partner_id;
     }
 
-    get linesToReconcile() {
-        return this.accountMoveLines.filter((line) => {
-            return (
-                line.account_id.id !== this.recordData.journal_id?.suspense_account_id.id &&
-                line.account_id.id !== this.recordData.journal_id?.default_account_id.id
-            );
-        });
-    }
-
-    get suspenseAccountLine() {
-        return this.accountMoveLines.filter((line) => {
-            return line.account_id.id === this.recordData.journal_id.suspense_account_id.id;
-        })?.[0];
-    }
-
-    get accountMoveLines() {
-        return [...this.recordData.line_ids.records.map((line) => line.data)];
-    }
-
-    get hasForeignCurrencyAndSameCurrencyForAllLines() {
-        return (
-            this.recordData.foreign_currency_id &&
-            this.linesToReconcile &&
-            this.linesToReconcile.filter((line) => {
-                return line.currency_id.id !== this.recordData.foreign_currency_id.id;
-            }).length === 0
-        );
-    }
-
     get suspenseAccountLineFormattedAmount() {
-        return formatMonetary(this.suspenseAccountLine.amount_currency, {
-            currencyId: this.suspenseAccountLine?.currency_id.id,
+        return formatMonetary(this.suspenseAccountLine().amount_currency, {
+            currencyId: this.suspenseAccountLine()?.currency_id.id,
         });
     }
 
@@ -214,57 +210,17 @@ export class BankRecStatementLine extends KanbanRecord {
         return this.recordData.activity_ids.count;
     }
 
-    /**
-     * Checks if there is at least one attachment associated with the bank statement line or its related records.
-     *
-     * This getter aggregates attachment counts from:
-     * - The bank statement line record itself or the related move since attachment_ids is a related to move_id.attachment_ids.
-     * - The related move lines themselves, if they have attachments directly associated (`line.move_attachment_ids`)
-     *   except the attachments link to the statement.
-     * - The lines reconciled with the related move lines, specifically checking for attachments on the
-     *   move associated with those reconciled lines.
-     *
-     * This check ensures that all attachments from associated invoices, bills, and other related documents are considered.
-     *
-     * @returns {number} The total number of attachments found. A return value greater than 0 indicates the presence of attachments.
-     */
-    get hasAttachment() {
-        const statementAttachment = this.recordData.bank_statement_attachment_ids.records.map(
-            (attachment) => attachment.data.id
-        );
-
-        return (
-            this.recordData.attachment_ids.records.length +
-            this.linesToReconcile
-                .flatMap((line) => line.reconciled_lines_ids.records)
-                .filter((line) => line.data.move_attachment_ids?.count)
-                .reduce(
-                    (accumulator, line) =>
-                        parseInt(accumulator) + parseInt(line.data.move_attachment_ids.count),
-                    0
-                ) +
-            this.linesToReconcile
-                .filter(
-                    (line) =>
-                        line.move_attachment_ids?.count &&
-                        !line.move_attachment_ids.records
-                            .map((attachment) => attachment.data.id)
-                            .every((id) => statementAttachment.includes(id))
-                )
-                .reduce(
-                    (accumulator, line) =>
-                        parseInt(accumulator) + parseInt(line.move_attachment_ids.count),
-                    0
-                )
-        );
-    }
-
     get amountClasses() {
-        const classes = this.recordData.foreign_currency_id ? "w-50" : "w-100";
-        if (this.recordData.amount > 0) {
+        const { foreign_currency_id: foreignCurrencyId, amount } = this.recordData;
+        const classes = foreignCurrencyId ? "w-50" : "w-100";
+        if (this.isDraft && !floatIsZero(amount)) {
+            return `${classes} text-info`;
+        }
+
+        if (amount > 0) {
             return `${classes} fw-bold`;
         }
-        if (this.recordData.amount < 0) {
+        if (amount < 0) {
             return `${classes} text-danger fw-bold`;
         }
         return `${classes} text-secondary`;
@@ -272,15 +228,20 @@ export class BankRecStatementLine extends KanbanRecord {
 
     get buttonListProps() {
         return {
-            statementLineRootRef: this.statementLineRootRef,
+            statementLineRootRef: this.rootRef,
             statementLine: this.record,
             reconcileLineCount:
                 this.bankReconciliation.reconcileCountPerPartnerId[this.recordData.partner_id.id] ??
                 null,
             reconcileModels:
                 this.bankReconciliation.reconcileModelPerStatementLineId[this.recordData.id] ?? [],
-            preSelectedReconciliationModel: this.accountMoveLines
-                .filter((line) => line.reconcile_model_id.id)
+            preSelectedReconciliationModel: this.accountMoveLines()
+                .filter(
+                    (line) =>
+                        line.reconcile_model_id.id &&
+                        // We don't want to show the button for matching rules as they are only automatic.
+                        line.reconcile_model_id.rule_type === "reco_model"
+                )
                 .map((line) => line.reconcile_model_id)?.[0],
         };
     }
@@ -292,10 +253,14 @@ export class BankRecStatementLine extends KanbanRecord {
     }
 
     get isSelected() {
-        return this.recordData.move_id.id === this.bankReconciliation.statementLineMoveId;
+        return this.recordData.id === this.bankReconciliation.statementLineId;
     }
 
     get isChatterOpen() {
         return this.bankReconciliation.chatterState.visible;
+    }
+
+    get isDraft() {
+        return this.recordData.state === "draft";
     }
 }

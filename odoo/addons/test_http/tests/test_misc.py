@@ -1,16 +1,20 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
+import logging
 from importlib import metadata
 from io import StringIO
+from http import HTTPStatus
 from socket import gethostbyname
 from unittest.mock import patch
 
-import odoo
-from odoo.http import content_disposition, root
-from odoo.tests import tagged
+from odoo.http.dispatcher import conceal_debug_traceback, serialize_exception
+from odoo.http.requestlib import Request
+from odoo.http.router import root
+from odoo.http.stream import content_disposition
+from odoo.tests import Like, tagged
 from odoo.tests.common import HOST, BaseCase, get_db_name, new_test_user
-from odoo.tools import config, file_path, mute_logger, parse_version
+from odoo.tools import DotDict, config, file_path, mute_logger, parse_version
 
 from .test_common import TestHttpBase
 from odoo.addons import test_http
@@ -22,7 +26,7 @@ werkzeug_version = metadata.version('werkzeug')
 
 @tagged('post_install', '-at_install')
 class TestHttpMisc(TestHttpBase):
-    def test_misc0_redirect(self):
+    def test_misc00_redirect(self):
         res = self.nodb_url_open('/test_http//greeting')
         awaited_codes = [404]
         if parse_version('2.2.0') <= parse_version(werkzeug_version) <= parse_version('3.0.1'):
@@ -31,7 +35,7 @@ class TestHttpMisc(TestHttpBase):
             awaited_codes.append(308)
         self.assertIn(res.status_code, awaited_codes)
 
-    def test_misc1_reverse_proxy(self):
+    def test_misc01_reverse_proxy(self):
         # client <-> reverse-proxy <-> odoo
         client_ip = '127.0.0.16'
         reverseproxy_ip = gethostbyname(HOST)
@@ -41,7 +45,7 @@ class TestHttpMisc(TestHttpBase):
             'Host': '',
             'X-Forwarded-For': client_ip,
             'X-Forwarded-Host': host,
-            'X-Forwarded-Proto': 'https'
+            'X-Forwarded-Proto': 'https',
         }
 
         # Don't trust client-sent forwarded headers
@@ -58,18 +62,29 @@ class TestHttpMisc(TestHttpBase):
             self.assertEqual(res.json()['REMOTE_ADDR'], client_ip)
             self.assertEqual(res.json()['HTTP_HOST'], host)
 
-    def test_misc2_local_redirect(self):
+    def test_misc02_local_redirect(self):
         def local_redirect(path):
-            fake_req = odoo.tools.misc.DotDict(db=False)
-            return odoo.http.Request.redirect(fake_req, path, local=True).headers['Location']
+            fake_req = DotDict(db=False)
+            return Request.redirect(fake_req, path, local=True).headers['Location']
         self.assertEqual(local_redirect('https://www.example.com/hello?a=b'), '/hello?a=b')
+        self.assertEqual(local_redirect('http://user:pass@www.example.com/hello?a=b'), '/hello?a=b')
         self.assertEqual(local_redirect('/hello?a=b'), '/hello?a=b')
         self.assertEqual(local_redirect('hello?a=b'), '/hello?a=b')
         self.assertEqual(local_redirect('www.example.com/hello?a=b'), '/www.example.com/hello?a=b')
         self.assertEqual(local_redirect('https://www.example.comhttps://www.example2.com/hello?a=b'), '/www.example2.com/hello?a=b')
         self.assertEqual(local_redirect('https://https://www.example.com/hello?a=b'), '/www.example.com/hello?a=b')
+        # https://infra.spec.whatwg.org/#c0-control
+        cO_control = [chr(i) for i in range(0x20)]
+        for char in cO_control:
+            with self.subTest(f"Redirect with control character {char.encode()}"):
+                self.assertEqual(local_redirect(f'{char}/hello?a=b'), '/hello?a=b')
 
-    def test_misc3_is_static_file(self):
+        # https://infra.spec.whatwg.org/#ascii-tab-or-newline
+        for char in "\t\n\r":
+            with self.subTest(f"Redirect with control character {char.encode()}"):
+                self.assertEqual(local_redirect(f'/{char}/hello?a=b'), '/hello?a=b')
+
+    def test_misc03_is_static_file(self):
         uri = 'test_http/static/src/img/gizeh.png'
         path = file_path(uri)
 
@@ -84,14 +99,14 @@ class TestHttpMisc(TestHttpBase):
         self.assertIsNone(root.get_static_file(f'odoo.com/{uri}'), "No host allowed")
         self.assertIsNone(root.get_static_file(f'http://odoo.com/{uri}'), "No host allowed")
 
-    def test_misc4_rpc_qweb(self):
+    def test_misc04_rpc_qweb(self):
         jack = new_test_user(self.env, 'jackoneill', context={'lang': 'en_US'})
         milky_way = self.env.ref('test_http.milky_way')
 
         payload = json.dumps({'jsonrpc': '2.0', 'method': 'call', 'id': None, 'params': {
             'service': 'object', 'method': 'execute', 'args': [
-                get_db_name(), jack.id, 'jackoneill', 'test_http.galaxy', 'render', milky_way.id
-            ]
+                get_db_name(), jack.id, 'jackoneill', 'test_http.galaxy', 'render', milky_way.id,
+            ],
         }})
 
         for method in (self.db_url_open, self.nodb_url_open):
@@ -104,7 +119,7 @@ class TestHttpMisc(TestHttpBase):
                 self.assertNotIn('error', res_rpc.keys(), res_rpc.get('error', {}).get('data', {}).get('message'))
                 self.assertIn(milky_way.name, res_rpc['result'], "QWeb template was correctly rendered")
 
-    def test_misc5_geoip(self):
+    def test_misc05_geoip(self):
         res = self.nodb_url_open('/test_http/geoip')
         res.raise_for_status()
         self.assertEqual(res.json(), {
@@ -122,9 +137,9 @@ class TestHttpMisc(TestHttpBase):
             'Host': '',
             'X-Forwarded-For': TEST_IP,
             'X-Forwarded-Host': 'odoo.com',
-            'X-Forwarded-Proto': 'https'
+            'X-Forwarded-Proto': 'https',
         }
-        with patch.dict(odoo.tools.config.options, {'proxy_mode': True}):
+        with patch.dict(config.options, {'proxy_mode': True}):
             res = self.nodb_url_open('/test_http/geoip', headers=headers)
             res.raise_for_status()
             self.assertEqual(res.json(), {
@@ -137,29 +152,36 @@ class TestHttpMisc(TestHttpBase):
                 'time_zone': 'Europe/Paris',
             })
 
-    def test_misc6_upload_file_retry(self):
+    def test_misc06_upload_file_retry(self):
         file = StringIO("Hello world!")
         with patch.object(test_http.controllers, 'should_fail', True):
             res = self.url_open('/test_http/upload_file', files={'ufile': file})
             res.raise_for_status()
             self.assertEqual(res.text, file.getvalue())
 
-    def test_misc7_robotstxt(self):
+    def test_misc07_robotstxt(self):
         self.nodb_url_open('/robots.txt').raise_for_status()
 
-    def test_misc8_concurrency_error(self):
+    def test_misc08_concurrency_error(self):
         with (
-            self.assertLogs('odoo.service.model') as log_catcher,
+            self.assertLogs('odoo.http') as log_catcher,
             patch.object(test_http.controllers, 'should_fail', True),
         ):
             self.url_open('/test_http/concurrency_error').raise_for_status()
         self.assertIn("A dummy concurrency error occurred", log_catcher.output[0])
 
-    def test_misc9_webversion(self):
+    def test_misc09_webversion(self):
         res = self.nodb_url_open('/web/version')
         res.raise_for_status()
         self.assertEqual(res.headers.get('Content-Type'), 'application/json; charset=utf-8')
         self.assertEqual(set(res.json()), {'version', 'version_info'})
+
+    def test_misc10_request_uri_too_long(self):
+        response = self.url_open('/' + 'a' * 95536)
+        self.assertIn(HTTPStatus(response.status_code), (
+            HTTPStatus.REQUEST_URI_TOO_LONG,
+            HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE,
+        ))
 
 
 @tagged('post_install', '-at_install')
@@ -170,7 +192,7 @@ class TestHttpCors(TestHttpBase):
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Origin'), '*')
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Methods'), 'GET, POST')
         self.assertEqual(res_opt.headers.get('Access-Control-Max-Age'), '86400')  # one day
-        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Range')
 
         res_get = self.url_open('/test_http/cors_http_default')
         self.assertEqual(res_get.status_code, 200)
@@ -183,7 +205,7 @@ class TestHttpCors(TestHttpBase):
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Origin'), '*')
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Methods'), 'GET, PUT')
         self.assertEqual(res_opt.headers.get('Access-Control-Max-Age'), '86400')  # one day
-        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Range')
 
         res_post = self.url_open('/test_http/cors_http_methods')
         self.assertEqual(res_post.status_code, 200)
@@ -196,7 +218,7 @@ class TestHttpCors(TestHttpBase):
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Origin'), '*')
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Methods'), 'POST')
         self.assertEqual(res_opt.headers.get('Access-Control-Max-Age'), '86400')  # one day
-        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Range')
 
         res_post = self.url_open('/test_http/cors_json', data=json.dumps({'params': {}}), headers=CT_JSON)
         self.assertEqual(res_post.status_code, 200)
@@ -223,7 +245,7 @@ class TestHttpEnsureDb(TestHttpBase):
         res.raise_for_status()
         self.assertEqual(res.status_code, 302)
         self.assertURLEqual(res.headers.get('Location'), '/test_http/ensure_db?db=db0')
-        self.assertEqual(odoo.http.root.session_store.get(res.cookies['session_id']).db, 'db0')
+        self.assertEqual(res.session['db'], 'db0')
 
         # follow the redirection
         res = self.multidb_url_open('/test_http/ensure_db')
@@ -232,32 +254,24 @@ class TestHttpEnsureDb(TestHttpBase):
         self.assertEqual(res.text, 'db0')
 
     def test_ensure_db2_use_session_db(self):
-        session = self.authenticate(None, None)
-        session.db = 'db0'
-        odoo.http.root.session_store.save(session)
-
+        self.authenticate(None, None, session_extra={'db': 'db0'})
         res = self.multidb_url_open('/test_http/ensure_db')
         res.raise_for_status()
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.text, 'db0')
 
     def test_ensure_db3_change_db(self):
-        session = self.authenticate(None, None)
-        session.db = 'db0'
-        odoo.http.root.session_store.save(session)
-
+        self.authenticate(None, None, session_extra={'db': 'db0'})
         res = self.multidb_url_open('/test_http/ensure_db?db=db1')
         res.raise_for_status()
         self.assertEqual(res.status_code, 302)
         self.assertURLEqual(res.headers.get('Location'), '/test_http/ensure_db?db=db1')
-
-        new_session = odoo.http.root.session_store.get(res.cookies['session_id'])
-        self.assertNotEqual(session.sid, new_session.sid)
-        self.assertEqual(new_session.db, 'db1')
-        self.assertEqual(new_session.uid, None)
+        self.assertNotEqual(self.session.sid, res.session.sid)
+        self.assertEqual(res.session['db'], 'db1')
+        self.assertEqual(res.session['uid'], None)
 
         # follow redirection
-        self.opener.cookies.set("session_id", new_session.sid, domain=HOST)
+        self.opener.cookies.set("session_id", res.session.sid, domain=HOST)
         res = self.multidb_url_open('/test_http/ensure_db')
         res.raise_for_status()
         self.assertEqual(res.status_code, 200)
@@ -272,9 +286,7 @@ class TestHttpEnsureDb(TestHttpBase):
         self.assertURLEqual(
             res.headers.get('Location'),
             '/test_http/ensure_db?db=basededonnée1')
-        self.assertEqual(
-            odoo.http.root.session_store.get(res.cookies['session_id']).db,
-            'basededonnée1')
+        self.assertEqual(res.session['db'], 'basededonnée1')
 
         # follow the redirection
         res = self.multidb_url_open('/test_http/ensure_db')
@@ -283,6 +295,7 @@ class TestHttpEnsureDb(TestHttpBase):
         self.assertEqual(res.text, 'basededonnée1')
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestContentDisposition(BaseCase):
 
     def test_content_disposition(self):
@@ -308,3 +321,82 @@ class TestContentDisposition(BaseCase):
         ]
         for filename, pct_encoded, hint in assertions:
             self.assertEqual(content_disposition(filename), f"attachment; filename*=UTF-8''{pct_encoded}", f'{hint} should be percent encoded')
+
+
+@tagged('-at_install', 'post_install')
+class TestFragmentToQueryString(TestHttpBase):
+    def test_fragment_to_query_string(self):
+        # This tests several behavior of `fragment_to_query_string`.
+        # To avoid starting a chrome headless client for each test,
+        # we plug the controllers into each other via
+        # `request.redirect`.
+        # The real tests happens in the controllers.
+        fake_success = "console.log('test successful')"
+        test_start = '/test_http/f2qs/step1/no-operation-to-perform?race=Asgard'
+        with self.assertLogs(
+            'odoo.addons.test_http.controllers.test_fragment_to_query_string',
+            logging.INFO,
+        ) as capture:
+            self.browser_js(test_start, fake_success)
+
+        # Ensure all controllers ran
+        self.assertEqual(
+            [
+                Like('...step 1: passed...'),
+                Like('...step 2: passed...'),
+                Like('...step 3: passed...'),
+                Like('...step 4: passed...'),
+                Like('...step 5: passed...'),
+                Like('...step 6: passed...'),
+            ],
+            capture.output,
+            "It seems all the controller testing fragment_to_query_string weren't run.",
+        )
+
+
+@tagged('-at_install', 'post_install')
+class TestConcealDebugTraceback(TestHttpBase):
+    def test_conceal_debug_traceback(self):
+        for exception, is_suppressed in [
+            ('ValueError', True),  # listed in conceal_debug_traceback()
+            ('AccessDenied', True),  # always concealed
+            ('UserError', False),  # not listed
+        ]:
+            with self.assertLogs('odoo.http', 'ERROR') as log_capture:
+                res = self.url_open(f'/test_http/suppress-traceback/{exception}')
+                self.assertNotEqual(res.status_code, 200)
+
+                # The traceback can be suppressed in the response debug
+                if is_suppressed:
+                    self.assertNotIn("Traceback", res.json()['debug'])
+                else:
+                    self.assertIn("Traceback", res.json()['debug'])
+
+            # The traceback is always logged
+            self.assertEqual(log_capture.output, [
+                Like(f'...Traceback...\n{exception}: error message'),
+            ])
+
+        s = conceal_debug_traceback(ZeroDivisionError)
+        try:
+            with s:
+                1 / 0
+        except ZeroDivisionError as exc:
+            self.assertEqual(
+                serialize_exception(exc)['debug'],
+                "ZeroDivisionError: division by zero\n",
+                "The traceback must be concealed from the debug")
+
+        try:
+            with s:
+                [][0]  # ruff: ignore[potential-index-error]
+        except IndexError as exc:
+            self.assertEqual(
+                serialize_exception(exc)['debug'],
+                Like("""\
+Traceback (most recent call last):
+  File ".../odoo/addons/test_http/tests/test_misc.py", line ..., in test_conceal_debug_traceback
+    [][0]  # ruff: ignore[potential-index-error]
+...IndexError: list index out of range
+"""),
+                "The traceback must be visible in the debug")

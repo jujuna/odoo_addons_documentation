@@ -3,6 +3,7 @@ from odoo import api, models
 
 class VoipCall(models.Model):
     _inherit = "voip.call"
+    _name = "voip.call"
 
     @api.depends("partner_id.employee_ids.company_id", "user_id.partner_id.employee_ids.company_id")
     def _compute_is_within_same_company(self):

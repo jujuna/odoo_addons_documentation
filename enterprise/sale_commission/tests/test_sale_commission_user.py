@@ -13,6 +13,8 @@ from odoo.exceptions import ValidationError
 @tagged('post_install', '-at_install')
 class TestSaleCommissionUser(TestSaleCommissionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time('2024-02-02')
     def test_commission_user_achievement(self):
         self.commission_plan_user.write({
@@ -270,6 +272,7 @@ class TestSaleCommissionUser(TestSaleCommissionCommon):
         self.env['res.currency.rate'].create({
             'currency_id': new_currency.id,
             'rate': 2,  # 2 NC = 1 $
+            'name': '2024-02-01',
         })
         new_currency_pricelist = self.env['product.pricelist'].create({'name': 'NC', 'currency_id': new_currency.id})
 
@@ -303,6 +306,70 @@ class TestSaleCommissionUser(TestSaleCommissionCommon):
         self.assertEqual(achievements.related_res_id, SO.id)
         self.assertEqual(len(commissions), 24)
         self.assertEqual(sum(commissions.mapped('commission')), 1000, "2000 * 0.5, currency conversion")
+
+    @freeze_time("2024-02-02")
+    def test_commission_user_achievement_productless_sale_line(self):
+        self.commission_plan_user.write({
+            "periodicity": "month",
+            "type": "achieve",
+            "user_type": "person",
+        })
+        self.commission_plan_user.user_ids = [Command.clear()]
+
+        self.commission_plan_user.achievement_ids = self.env[
+            "sale.commission.plan.achievement"
+        ].create([
+            {"type": "amount_sold", "rate": 0.04, "plan_id": self.commission_plan_user.id},
+            {
+                "type": "amount_sold",
+                "rate": 0.1,
+                "product_id": self.commission_product_1.id,
+                "plan_id": self.commission_plan_user.id,
+            },
+        ])
+
+        so = self.env["sale.order"].create({
+            "partner_id": self.partner.id,
+            "user_id": self.commission_user_1.id,
+            "order_line": [
+                Command.create({
+                    "product_id": self.commission_product_1.id,
+                    "product_uom_qty": 10,
+                    "price_unit": 200,
+                }),
+                Command.create({
+                    "name": "Productless fee",
+                    "product_uom_qty": 2,
+                    "product_uom_id": self.env.ref("uom.product_uom_unit").id,
+                    "price_unit": 100,
+                }),
+            ],
+        })
+        so.action_confirm()
+
+        self.commission_plan_user.user_ids = [
+            Command.create({"user_id": self.commission_user_1.id})
+        ]
+        self.commission_plan_user.action_approve()
+
+        self.env["sale.commission.achievement.report"]._pre_achievement_operation()
+        achievements = self.env["sale.commission.achievement.report"].search([
+            ("plan_id", "=", self.commission_plan_user.id),
+            ("related_res_model", "=", "sale.order"),
+            ("related_res_id", "=", so.id),
+        ])
+        commissions = self.env["sale.commission.report"].search([
+            ("plan_id", "=", self.commission_plan_user.id)
+        ])
+
+        self.assertEqual(len(achievements), 1)
+        self.assertEqual(
+            sum(achievements.mapped("achieved")),
+            288,
+            "Generic amount sold should include productless lines.",
+        )
+        self.assertEqual(len(commissions), 12)
+        self.assertEqual(sum(commissions.mapped("commission")), 288)
 
     @freeze_time('2024-02-02')
     def test_commission_between_different_company(self):
@@ -371,6 +438,8 @@ class TestSaleCommissionUser(TestSaleCommissionCommon):
         self.assertAlmostEqual(sum(achievements.mapped('achieved')), 100, msg="30% of 20000 with a curency rate of 60 (invoice is in another currency)")
         # 90 = is the maximum commission (100%).  20000 * 0.3 / 60 = 100 --> capped as 90
         self.assertAlmostEqual(sum(commissions.mapped('commission')), 90, msg="75 commission (100%) with a curency rate of 60 (invoice is in another currency)")
+        all_targets = [v == 90 for v in commissions.mapped('target_amount')]
+        self.assertTrue(all(all_targets), 'all targets are 5400')
         self.env['sale.commission.achievement.report']._pre_achievement_operation()
         achievements = self.env['sale.commission.achievement.report'].with_company(other_company).search([('plan_id', '=', self.commission_plan_user.id)])
         commissions = self.env['sale.commission.report'].with_company(other_company).search([('plan_id', '=', self.commission_plan_user.id)])
@@ -378,6 +447,8 @@ class TestSaleCommissionUser(TestSaleCommissionCommon):
         self.assertEqual(achievements.currency_id, inr_currency)
         self.assertAlmostEqual(sum(achievements.mapped('achieved')), 6000, msg="30% of 2000 (no curency rate)")
         # 5400 = is the maximum commission (100%) (90 x 60).  20000 * 0.3 = 6000 --> capped as 5400
+        all_targets = [v == 5400 for v in commissions.mapped('target_amount')]
+        self.assertTrue(all(all_targets), 'all targets are 5400')
         self.assertAlmostEqual(sum(commissions.mapped('commission')), 5400, msg="5400 commission (100%) (no rate)")
 
     @freeze_time('2024-02-02')
@@ -450,6 +521,7 @@ class TestSaleCommissionUser(TestSaleCommissionCommon):
             'commission_amount': 2500,
             'user_ids': [Command.create({
                 'user_id': self.commission_user_1.id,
+                'date_from': datetime.date(2024, 1, 1),
             })],
         })
         commission_full_year.action_approve()
@@ -507,6 +579,86 @@ class TestSaleCommissionUser(TestSaleCommissionCommon):
         for user in self.commission_plan_user.user_ids:
             self.assertEqual(user.date_from, self.commission_plan_user.date_from)
 
+    @freeze_time('2026-01-01')
+    def test_plan_other_overlap(self):
+        """Test overlap for other_plans based on salesperson assignment dates"""
+        self.env['sale.commission.plan'].search([]).unlink()
+        # Plan covering 2025-2026, but salesperson assigned only in 2025
+        plan_2025_assignment = self.env['sale.commission.plan'].create({
+            'name': "Plan 2025 assignment",
+            'company_id': self.env.company.id,
+            'date_from': datetime.date(2025, 1, 1),
+            'date_to': datetime.date(2026, 12, 31),
+            'periodicity': 'month',
+            'type': 'target',
+            'user_type': 'person',
+            'commission_amount': 2500,
+            'user_ids': [Command.create({
+                'user_id': self.commission_user_1.id,
+                'date_from': datetime.date(2025, 1, 1),
+                'date_to': datetime.date(2025, 12, 31),
+            })],
+        })
+        self.assertFalse(plan_2025_assignment.user_ids.other_plans)
+
+        # Plan where salesperson is assigned in 2026
+        plan_2026_assignment = self.env['sale.commission.plan'].create({
+            'name': "Plan 2026 assignment",
+            'company_id': self.env.company.id,
+            'date_from': datetime.date(2026, 1, 1),
+            'date_to': datetime.date(2026, 12, 30),
+            'periodicity': 'month',
+            'type': 'target',
+            'user_type': 'person',
+            'commission_amount': 2500,
+            'user_ids': [Command.create({
+                'user_id': self.commission_user_1.id,
+            })],
+        })
+        self.assertNotEqual(plan_2026_assignment.user_ids.other_plans, plan_2025_assignment)
+
+    def test_plan_overlap_with_no_end_date(self):
+        """Test overlap for other_plans when a salesperson has multiple assignments with one of them having no end date"""
+        plan_1 = self.env['sale.commission.plan'].create({
+            'name': "plan with no end date",
+            'company_id': self.env.company.id,
+            'date_from': datetime.date(2026, 1, 1),
+            'date_to': datetime.date(2026, 12, 31),
+            'periodicity': 'month',
+            'type': 'target',
+            'user_type': 'person',
+            'commission_amount': 2500,
+            'user_ids': [
+                Command.create({
+                'user_id': self.commission_user_1.id,
+                'date_from': datetime.date(2026, 1, 1),
+                'date_to': datetime.date(2026, 7, 16),
+            }),
+                Command.create({
+                'user_id': self.commission_user_1.id,
+                'date_from': datetime.date(2026, 9, 8),
+                'date_to': None,
+            })],
+        })
+        plan_2 = self.env['sale.commission.plan'].create({
+            'name': "plan with no end date",
+            'company_id': self.env.company.id,
+            'date_from': datetime.date(2026, 1, 1),
+            'date_to': datetime.date(2026, 12, 31),
+            'periodicity': 'month',
+            'type': 'target',
+            'user_type': 'person',
+            'commission_amount': 2500,
+            'user_ids': [Command.create({
+                'user_id': self.commission_user_1.id,
+                'date_from': datetime.date(2026, 7, 17),
+                'date_to': None,
+            })],
+        })
+        self.assertIn(plan_2, plan_1.user_ids[1].other_plans)
+        self.assertIn(plan_1, plan_2.user_ids.other_plans)
+        self.assertNotIn(plan_2, plan_1.user_ids[0].other_plans)
+
     @freeze_time('2024-02-02')
     def test_commission_target_constraint(self):
         self.commission_plan_user.write({
@@ -516,7 +668,92 @@ class TestSaleCommissionUser(TestSaleCommissionCommon):
         })
         self.commission_plan_user.flush_recordset()
         with self.assertRaises(ValidationError):
-            self.commission_plan_user.write({
-                'periodicity': 'year',
+            self.commission_plan_user.target_ids |= self.env['sale.commission.plan.target'].create({
+                'name': 'Yearly Target',
+                'date_from': datetime.date(year=2024, month=1, day=1),
+                'date_to': datetime.date(year=2024, month=12, day=31),
             })
             self.commission_plan_user.flush_recordset()
+
+    @freeze_time('2024-02-02')
+    def test_commission_user_achievement_category(self):
+        self.commission_plan_user.write({
+            'periodicity': 'month',
+            'type': 'achieve',
+            'user_type': 'person',
+        })
+
+        self.commission_plan_user.action_approve()
+
+        product_category = self.env['product.category'].create({
+            'name': 'Dessert',
+        })
+        product_subcategory = self.env['product.category'].create({
+            'name': 'Cake',
+            'parent_id': product_category.id,
+        })
+        self.commission_product_1.write({
+            'categ_id': product_subcategory.id,
+        })
+        self.commission_product_2.write({
+            'categ_id': product_category.id,
+        })
+        commission_product_no_categ = self.env['product.product'].create({
+            'name': 'Bread',
+        })
+
+        self.commission_plan_user.achievement_ids = self.env['sale.commission.plan.achievement'].create([
+            {
+                'type': 'amount_sold',
+                'rate': 1,
+                'plan_id': self.commission_plan_user.id,
+                'product_categ_id': product_category.id,
+            },
+            {
+                'type': 'amount_invoiced',
+                'rate': 1,
+                'plan_id': self.commission_plan_user.id,
+                'product_categ_id': product_category.id,
+            },
+        ])
+
+        SO1 = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'user_id': self.commission_user_1.id,
+            'order_line': [Command.create({
+                'product_id': self.commission_product_1.id,
+                'price_unit': 10,
+            })],
+        })
+        SO2 = SO1.copy()
+        SO3 = SO1.copy()
+        SO2.order_line.write({
+            'product_id': self.commission_product_2.id,
+            'price_unit': 10,
+        })
+        SO3.order_line.write({
+            'product_id': commission_product_no_categ.id,
+            'price_unit': 10,
+        })
+
+        SO1.action_confirm()
+        SO2.action_confirm()
+        SO3.action_confirm()
+
+        AM1 = SO1._create_invoices()
+        AM2 = SO2._create_invoices()
+        AM3 = SO3._create_invoices()
+        AM1._post()
+        AM2._post()
+        AM3._post()
+
+        self.env['sale.commission.achievement.report']._pre_achievement_operation()
+
+        achievements = self.env['sale.commission.achievement.report'].search([('plan_id', '=', self.commission_plan_user.id)])
+
+        self.assertRecordValues(achievements, [
+            {'related_res_id': AM1.id, 'related_res_model': 'account.move'},
+            {'related_res_id': AM2.id, 'related_res_model': 'account.move'},
+            {'related_res_id': SO1.id, 'related_res_model': 'sale.order'},
+            {'related_res_id': SO2.id, 'related_res_model': 'sale.order'},
+        ])

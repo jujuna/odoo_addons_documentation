@@ -16,4 +16,7 @@ patch(TicketScreen.prototype, {
             super.setPartnerToRefundOrder(...arguments);
         }
     },
+    get showInvoiceButton() {
+        return super.showInvoiceButton && !this.pos.isChileanCompany();
+    },
 });

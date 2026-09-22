@@ -1,24 +1,34 @@
-import { ActionContainer } from "@web/webclient/actions/action_container";
+import { render } from "@web/owl2/utils";
+import { actionContainerProps } from "@web/webclient/actions/action_container";
 import { useService } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
 import { rpc } from "@web/core/network/rpc";
 import { KeepLast } from "@web/core/utils/concurrency";
-import { Component, markup, onWillStart, onWillUnmount, onWillUpdateProps, xml } from "@odoo/owl";
+import {
+    Component,
+    markup,
+    onWillStart,
+    onWillUnmount,
+    onWillUpdateProps,
+    t,
+    useProps,
+    xml,
+} from "@odoo/owl";
 import { useStudioServiceAsReactive } from "@web_studio/studio_service";
 import { resetViewCompilerCache } from "@web/views/view_compiler";
 
 const editorTabRegistry = registry.category("web_studio.editor_tabs");
 
 export class StudioActionContainer extends Component {
-    static props = {
-        ...ActionContainer.props,
-        reloadId: { type: Number },
-    };
+    props = useProps({
+        ...actionContainerProps,
+        reloadId: t.number(),
+    });
 
     static template = xml`
         <t t-name="web.ActionContainer">
         <div class="o_action_manager">
-            <t t-if="info.Component" t-component="info.Component" className="'o_action'" t-props="info.componentProps" t-key="info.id"/>
+            <t t-if="this.info.Component" t-component="this.info.Component" className="'o_action'" t-props="this.info.componentProps" t-key="this.info.id"/>
         </div>
         </t>`;
 
@@ -31,7 +41,7 @@ export class StudioActionContainer extends Component {
         const onUiUpdate = ({ detail: info }) => {
             this.info = info;
             actionKey++;
-            this.render();
+            render(this);
         };
         this.env.bus.addEventListener("ACTION_MANAGER:UPDATE", onUiUpdate);
         onWillUnmount(() => this.env.bus.removeEventListener("ACTION_MANAGER:UPDATE", onUiUpdate));

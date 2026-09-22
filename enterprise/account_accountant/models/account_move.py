@@ -9,7 +9,7 @@ import re
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError
 from odoo.fields import Command, Domain
-from odoo.tools import SQL, float_compare
+from odoo.tools import SQL, float_compare, frozendict
 from odoo.tools.misc import formatLang
 
 
@@ -141,7 +141,7 @@ class AccountMove(models.Model):
     def _get_deferred_entries_method(self):
         self.ensure_one()
         if self.is_entry():
-            move_types = set(self.line_ids.account_id.mapped("internal_group"))
+            move_types = set(self.line_ids.filtered('deferred_start_date').account_id.mapped("internal_group"))
             if (
                 "expense" in move_types and "income" in move_types
                 and self.company_id.generate_deferred_expense_entries_method != self.company_id.generate_deferred_revenue_entries_method
@@ -157,6 +157,12 @@ class AccountMove(models.Model):
         if self.is_purchase_document():
             return self.company_id.generate_deferred_expense_entries_method
         return self.company_id.generate_deferred_revenue_entries_method
+
+    def _get_deferred_entries_periodicity(self):
+        self.ensure_one()
+        if self.is_outbound():
+            return self.company_id.deferred_expense_periodicity
+        return self.company_id.deferred_revenue_periodicity
 
     @api.depends('deferred_original_move_ids')
     def _compute_deferred_entry_type(self):
@@ -291,13 +297,11 @@ class AccountMove(models.Model):
             if not lines:
                 continue
 
-            deferred_account = self.company_id.deferred_expense_account_id if deferred_type == "expense" else self.company_id.deferred_revenue_account_id
+            company_deferred_account = self.company_id.deferred_expense_account_id if deferred_type == "expense" else self.company_id.deferred_revenue_account_id
             deferred_journal = self.company_id.deferred_expense_journal_id if deferred_type == "expense" else self.company_id.deferred_revenue_journal_id
             deferred_method = self.company_id.deferred_expense_amount_computation_method if deferred_type == "expense" else self.company_id.deferred_revenue_amount_computation_method
             if not deferred_journal:
                 raise UserError(_("Please set the deferred journal in the accounting settings."))
-            if not deferred_account:
-                raise UserError(_("Please set the deferred accounts in the accounting settings."))
 
             for line in lines:
                 periods = line._get_deferred_periods()
@@ -322,6 +326,11 @@ class AccountMove(models.Model):
 
                 ref = _("Deferral of %s", line.move_id.name or '')
 
+                # Use the deferred account set on the related account if any, otherwise fall back on the company one.
+                deferred_account = line.account_id.deferred_account_id or company_deferred_account
+                if not deferred_account:
+                    raise UserError(_("Please set a deferred account on the related account or in the accounting settings."))
+
                 moves_vals_to_create.append({
                     'move_type': 'entry',
                     'deferred_original_move_ids': [Command.set(line.move_id.ids)],
@@ -334,7 +343,11 @@ class AccountMove(models.Model):
                     'date': line.move_id.date,
                 })
                 lines_vals_to_create.append([
-                    self.env['account.move.line']._get_deferred_lines_values(account.id, coeff * line.balance, ref, line.analytic_distribution, line)
+                    {
+                        **self.env['account.move.line']._get_deferred_lines_values(account.id, coeff * line.balance, ref, line.analytic_distribution, line),
+                        'partner_id': line.partner_id.id,
+                        'reconciled_lines_ids': line.ids if not line.reconciled and line.account_id == account else None,
+                    }
                     for (account, coeff) in [(line.account_id, -1), (deferred_account, 1)]
                 ])
                 lines_periods.append((line, periods))
@@ -352,6 +365,7 @@ class AccountMove(models.Model):
             deferral_moves_line_vals = []
             # Create the deferred entries for the periods [deferred_start_date, deferred_end_date]
             for (line, periods), move_vals in zip(lines_periods, moves_vals_to_create):
+                deferred_account = line.account_id.deferred_account_id or company_deferred_account
                 remaining_balance = line.balance
                 for period_index, period in enumerate(periods):
                     # For the last deferral move the balance is forced to remaining balance to avoid rounding errors
@@ -448,20 +462,41 @@ class AccountMove(models.Model):
     def _get_mail_thread_data_attachments(self):
         res = super()._get_mail_thread_data_attachments()
         res += self.statement_line_id.statement_id.attachment_ids
-        if self.env.context.get('from_bank_reco'):
-            res += self.line_ids.reconciled_lines_ids.move_attachment_ids
         return res
 
     @contextmanager
     def _get_edi_creation(self):
         with super()._get_edi_creation() as move:
             previous_lines = move.invoice_line_ids
-            yield move.with_context(disable_onchange_name_predictive=True)
+            yield move.with_context(disable_onchange_name_predictive=['all'])  # noqa: RUF075
             for line in move.invoice_line_ids - previous_lines:
                 line._onchange_name_predictive()
 
+    def _get_outstanding_bank_statement_lines_domain(self):
+        """
+        Returns a search domain for move lines for unreconciled bank payments
+        linked to this move's partner.
+        """
+        self.ensure_one()
+        return [
+                ('parent_state', '=', 'posted'),
+                ('partner_id', '=', self.commercial_partner_id.id),
+                ('partner_id', '!=', False),
+                ('account_id.account_type', '=', 'asset_cash'),
+                ('journal_id', 'in', self.env['account.journal']._search([
+                    *self.env['account.journal']._check_company_domain(self.company_id.id),
+                    ('type', '=', 'bank')
+                ])),
+                ('balance', '>' if self.is_inbound() else '<', 0.0),
+                ('statement_line_id', '!=', False),
+                ('move_id.line_ids', 'any', [
+                    ('account_id', '=', self.company_id.account_journal_suspense_account_id.id),
+                    ('reconciled', '=', False),
+                ]),
+            ]
+
     def _compute_payments_widget_to_reconcile_info(self):
-        # EXTENDS
+        # EXTENDS 'account'
         super()._compute_payments_widget_to_reconcile_info()
         for move in self:
             if move.state not in {'draft', 'posted'} \
@@ -476,9 +511,9 @@ class AccountMove(models.Model):
                 ('partner_id', '!=', False),
                 ('account_id.account_type', '=', 'asset_cash'),
                 ('journal_id', 'in', self.env['account.journal']._search([
-                    *self.env['account.journal']._check_company_domain(move.company_id.id),
-                    ('type', '=', 'bank')
-                ])),
+                        *self.env['account.journal']._check_company_domain(move.company_id.id),
+                        ('type', '=', 'bank')
+                    ])),
                 ('balance', '>' if move.is_inbound() else '<', 0.0),
                 ('statement_line_id', '!=', False),
                 ('move_id.line_ids', 'any', [
@@ -508,20 +543,51 @@ class AccountMove(models.Model):
 
                 payments_widget_vals['content'].append({
                     'bank_label': line.name if line.journal_id.type == 'bank' else False,
-                    'journal_name': line.ref or line.move_id.name,
+                    'move_name': line.move_id.name,
                     'amount': amount,
                     'currency_id': move.currency_id.id,
                     'id': line.id,
                     'move_id': line.move_id.id,
                     'date': fields.Date.to_string(line.date),
                     'account_payment_id': line.payment_id.id,
+                    'ref': line.ref,
                 })
 
             if payments_widget_vals['content']:
-                if move.invoice_outstanding_credits_debits_widget:
-                    move.invoice_outstanding_credits_debits_widget['content'].extend(payments_widget_vals['content'])
+                widget = move.invoice_outstanding_credits_debits_widget
+                if widget:
+                    widget['content'].extend(payments_widget_vals['content'])
+                    widget['content'].sort(key=lambda x: (x['date'], x['id']), reverse=True)
                 else:
-                    move.invoice_outstanding_credits_debits_widget = payments_widget_vals
+                    widget = payments_widget_vals
+                move.invoice_outstanding_credits_debits_widget = widget
+
+    def _get_partner_credit_warning_exclude_amount(self):
+        # EXTENDS 'account'
+        exclude_amount = super()._get_partner_credit_warning_exclude_amount()
+        bank_domain = self._get_outstanding_bank_statement_lines_domain()
+        for line in self.env['account.move.line'].search(bank_domain):
+            currency = line.statement_line_id.foreign_currency_id or line.statement_line_id.currency_id
+            exclude_amount += currency._convert(
+                from_amount=abs(line.statement_line_id.amount_residual),
+                to_currency=self.company_id.currency_id,
+                company=self.company_id,
+                date=line.date,
+            )
+
+        matched_credits = self.line_ids.filtered(lambda line: line.account_id.account_type == 'asset_receivable').matched_credit_ids
+        if matched_credits:
+            bank_line_amount = sum(matched_credits.mapped('amount'))
+            payment_date = max(matched_credits.mapped('max_date'))
+            amount_company = matched_credits[0].credit_currency_id._convert(
+                from_amount=bank_line_amount,
+                to_currency=self.company_id.currency_id,
+                company=self.company_id,
+                date=payment_date,
+            )
+            exclude_amount += amount_company
+
+        return exclude_amount
 
     def js_assign_outstanding_line(self, line_id):
         # EXTENDS
@@ -537,7 +603,7 @@ class AccountMove(models.Model):
         # EXTENDS
         if st_line := self.statement_line_id:
             partial = self.env['account.partial.reconcile'].browse(partial_id)
-            st_line.delete_reconciled_line((partial.credit_move_id + partial.debit_move_id).ids)
+            st_line.delete_reconciled_line((partial.credit_move_id + partial.debit_move_id).filtered(lambda m: m.display_type != 'payment_term').ids)
         else:
             super().js_remove_outstanding_partial(partial_id)
 
@@ -563,26 +629,25 @@ class AccountMoveLine(models.Model):
     )
     has_deferred_moves = fields.Boolean(compute='_compute_has_deferred_moves')
     has_abnormal_deferred_dates = fields.Boolean(compute='_compute_has_abnormal_deferred_dates')
+    is_deferred_account = fields.Boolean(related='account_id.is_deferred')
 
     full_amount_switch_html = fields.Html(compute='_compute_full_amount_switch_html')
 
-    def _order_to_sql(self, order, query, alias=None, reverse=False):
-        sql_order = super()._order_to_sql(order, query, alias, reverse)
+    def _order_to_sql(self, table, order, reverse=False):
+        sql_order = super()._order_to_sql(table, order, reverse)
         preferred_aml_residual_value = self.env.context.get('preferred_aml_value')
         preferred_aml_currency_id = self.env.context.get('preferred_aml_currency_id')
         if preferred_aml_residual_value and preferred_aml_currency_id and order == self._order:
             currency = self.env['res.currency'].browse(preferred_aml_currency_id)
             # using round since currency.round(55.55) = 55.550000000000004
             preferred_aml_residual_value = round(preferred_aml_residual_value, currency.decimal_places)
-            sql_residual_currency = self._field_to_sql(alias or self._table, 'amount_residual_currency', query)
-            sql_currency = self._field_to_sql(alias or self._table, 'currency_id', query)
             return SQL(
                 "ROUND(%(residual_currency)s, %(decimal_places)s) = %(value)s "
                 "AND %(currency)s = %(currency_id)s DESC, %(order)s",
-                residual_currency=sql_residual_currency,
+                residual_currency=table.amount_residual_currency,
                 decimal_places=currency.decimal_places,
                 value=preferred_aml_residual_value,
-                currency=sql_currency,
+                currency=table.currency_id,
                 currency_id=currency.id,
                 order=sql_order,
             )
@@ -617,7 +682,7 @@ class AccountMoveLine(models.Model):
     def _compute_full_amount_switch_html(self):
         for line in self:
             # Ignore lines with no reconciled lines or not linked to a bank statement.
-            if not (reconciled_lines := line.reconciled_lines_excluding_exchange_diff_ids) or not line.statement_line_id:
+            if not (reconciled_lines := line.reconciled_lines_excluding_exchange_diff_ids) or len(reconciled_lines) > 1 or not line.statement_line_id:
                 line.full_amount_switch_html = False
                 continue
 
@@ -718,8 +783,8 @@ class AccountMoveLine(models.Model):
     def _onchange_deferred_end_date(self):
         if not self._has_deferred_compatible_account():
             self.deferred_end_date = False
-        if self.deferred_start_date and not self.deferred_end_date:
-            self.deferred_end_date = self.deferred_start_date
+        if self.deferred_end_date and not self.deferred_start_date:
+            self.deferred_start_date = self.deferred_end_date
 
     @api.depends('deferred_end_date', 'move_id.invoice_date', 'move_id.state')
     def _compute_deferred_start_date(self):
@@ -748,6 +813,20 @@ class AccountMoveLine(models.Model):
             start_date = start_date + relativedelta(days=1)  # Go to first day of next month
         return dates
 
+    @api.model
+    def _get_deferred_ends_of_year(self, start_date, end_date):
+        """
+        :return: a list of dates corresponding to the end of each year between start_date and end_date.
+            See test_get_ends_of_year for examples.
+        """
+        dates = []
+        date_end_of_year = start_date
+        while date_end_of_year <= end_date:
+            date_end_of_year = self.env.company.compute_fiscalyear_dates(date_end_of_year)['date_to']  # Go to end of fiscal year
+            dates.append(date_end_of_year)
+            date_end_of_year += relativedelta(days=1)  # Add one day to be in the next fiscal year
+        return dates
+
     def _get_deferred_periods(self):
         """
         :return: a list of tuples (start_date, end_date) during which the deferred expense/revenue is spread.
@@ -756,10 +835,16 @@ class AccountMoveLine(models.Model):
             thus cancel each other.
         """
         self.ensure_one()
-        periods = [
-            (max(self.deferred_start_date, date.replace(day=1)), min(date, self.deferred_end_date), 'current')
-            for date in self._get_deferred_ends_of_month(self.deferred_start_date, self.deferred_end_date)
-        ]
+        if self.move_id._get_deferred_entries_periodicity() == 'month':
+            periods = [
+                (max(self.deferred_start_date, date.replace(day=1)), min(date, self.deferred_end_date), 'current')
+                for date in self._get_deferred_ends_of_month(self.deferred_start_date, self.deferred_end_date)
+            ]
+        elif self.move_id._get_deferred_entries_periodicity() == 'year':
+            periods = [
+                (max(self.deferred_start_date, self.company_id.compute_fiscalyear_dates(date)['date_from']), min(date, self.deferred_end_date), 'current')
+                for date in self._get_deferred_ends_of_year(self.deferred_start_date, self.deferred_end_date)
+            ]
         if not periods or len(periods) == 1 and periods[0][0].replace(day=1) == self.date.replace(day=1):
             return []
         else:
@@ -826,30 +911,44 @@ class AccountMoveLine(models.Model):
         ).new({})
         return wizard._action_open_wizard() if (wizard.is_write_off_required or wizard.force_partials) else wizard.reconcile()
 
+    def action_split_lines(self):
+        return {
+            'name': _("Split"),
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.split.journal.item.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_line_ids': [Command.set(self.ids)],
+            },
+        }
+
     def _get_predict_postgres_dictionary(self):
         lang = self.env.context.get('lang') and self.env.context.get('lang')[:2]
         return {'fr': 'french'}.get(lang, 'english')
 
-    @api.model
-    def _build_predictive_query(self, move_id, additional_domain=None):
-        move_query = self.env['account.move']._search([
-            ('move_type', '=', move_id.move_type),
+    def _get_predictive_domain(self, move):
+        return [
             ('state', '=', 'posted'),
-            ('partner_id', '=', move_id.partner_id.id),
-            ('company_id', '=', move_id.journal_id.company_id.id or self.env.company.id),
-        ], bypass_access=True)
-        move_query.order = 'account_move.invoice_date'
-        move_query.limit = int(self.env["ir.config_parameter"].sudo().get_param(
-            "account.bill.predict.history.limit",
-            '100',
-        ))
-        return self.env['account.move.line']._search([
-            ('move_id', 'in', move_query),
-            ('display_type', '=', 'product'),
-        ] + (additional_domain or []), bypass_access=True)
+            ('move_type', '=', move.move_type),
+            ('partner_id', '=', move.partner_id.id),
+            ('company_id', '=', move.journal_id.company_id.id or self.env.company.id),
+        ]
 
     @api.model
-    def _predicted_field(self, move_id, name, partner_id, field, query=None, additional_queries=None):
+    def _build_predictive_query(self, move, line_domain=()):
+        move_ids = self.env['account.move'].search(
+            self._get_predictive_domain(move),
+            order='invoice_date desc, id desc',
+            limit=self.env["ir.config_parameter"].sudo().get_int("account.bill.predict.history.limit") or 100,
+        ).ids
+        return self.env['account.move.line']._search([
+            ('move_id', 'in', move_ids),
+            ('display_type', '=', 'product'),
+        ] + list(line_domain), bypass_access=True)
+
+    @api.model
+    def _get_predicted_values(self, name, move, line_domain=()):
         r"""Predict the most likely value based on the previous history.
 
         This method uses postgres tsvector in order to try to deduce a field of
@@ -860,214 +959,154 @@ class AccountMoveLine(models.Model):
         configurable by creating a config parameter with the key:
         account.bill.predict.history.limit
 
-        For information, the tests were executed with a dataset of 40 000 bills
-        from a live database, We split the dataset in 2, removing the 5000 most
-        recent entries and we tried to use this method to guess the account of
-        this validation set based on the previous entries.
-        The result is roughly 90% of success.
-
-        :param str field: the sql column that has to be predicted.
-            /!\ it is injected in the query without any checks.
-        :param odoo.tools.query.Query query: the query object on
-            account.move.line that is used to do the ranking, containing the
-            right domain, limit, etc. If it is omitted, a default query is used.
-        :param list[str] additional_queries: can be used in addition to the
-            default query on account.move.line to fetch data coming from other
-            tables, to have starting values for instance.
-            /!\ it is injected in the query without any checks.
+        :param name: the label to match for in the history
+        :param move: the record of the move owning the line, used to filter on similar moves
+        :param line_domain: a domain to restrict the candidate lines to match
         """
-        if not name or not partner_id:
-            return False
+        if not name:
+            return {}
 
+        cache = self.env.cr.cache.setdefault('account_move_prediction', {})
+        cache_key = frozendict(name=name, line_domain=line_domain, move_domain=self._get_predictive_domain(move))
+        if cache_key in cache:
+            return cache[cache_key]
         psql_lang = self._get_predict_postgres_dictionary()
-        description = name + ' account_move_line'  # give more priority to main query than additional queries
-        parsed_description = re.sub(r"[*&()|!':<>=%/~@,.;$\[\]]+", " ", description)
+        parsed_description = re.sub(r"[*&()|!':<>=%/~@,.;$\[\]]+", " ", name)
         parsed_description = ' | '.join(parsed_description.split())
+        getters = self.with_company(move.journal_id.company_id or self.env.company)._predictive_field_getter()
+        sql_getters = SQL(', ').join(sql for fname, formatter, sql in getters)
 
         try:
-            main_source = (query if query is not None else self._build_predictive_query(move_id)).select(
-                SQL("%s AS prediction", field),
-                SQL(
-                    "setweight(to_tsvector(%s, account_move_line.name), 'B') || setweight(to_tsvector('simple', 'account_move_line'), 'A') AS document",
-                    psql_lang
-                ),
-            )
-            if "(" in field.code:  # aggregate function
-                main_source = SQL("%s %s", main_source, SQL("GROUP BY account_move_line.id, account_move_line.name, account_move_line.partner_id"))
-
-            self.env.cr.execute(SQL("""
-                WITH account_move_line AS MATERIALIZED (%(account_move_line)s),
-
-                source AS (%(source)s),
-
-                ranking AS (
-                    SELECT prediction, ts_rank(source.document, query_plain) AS rank
+            aml_query = self._build_predictive_query(move, line_domain)
+            if result := self.env.execute_query_dict(SQL("""
+                      WITH account_move_line AS (%(account_move_line)s),
+                           source AS (%(source)s)
+                    SELECT %(getters)s,
+                           ts_rank(source.document, query_plain) AS rank
                       FROM source, to_tsquery(%(lang)s, %(description)s) query_plain
-                     WHERE source.document @@ query_plain
-                )
-
-                SELECT prediction, MAX(rank) AS ranking, COUNT(*)
-                  FROM ranking
-              GROUP BY prediction
-              ORDER BY ranking DESC, count DESC
-                 LIMIT 2
+                  ORDER BY rank DESC, invoice_date DESC, id DESC
+                     LIMIT 1
                 """,
-                account_move_line=self._build_predictive_query(move_id).select(SQL('*')),
-                source=SQL('(%s)', SQL(') UNION ALL (').join([main_source] + (additional_queries or []))),
+                account_move_line=aml_query.select(SQL('*')),  # force the query planner to only consider the max limit
+                source=aml_query.select(
+                    SQL("account_move_line.*"),
+                    SQL(
+                        "setweight(to_tsvector(%s, CONCAT_WS(' ', %s, %s)), 'B') AS document",
+                        psql_lang,
+                        aml_query.table.product_id.name,
+                        aml_query.table.name,
+                    ),
+                ),
+                getters=sql_getters,
                 lang=psql_lang,
                 description=parsed_description,
-            ))
-            result = self.env.cr.dictfetchall()
-            if result:
-                # Only confirm the prediction if it's at least 10% better than the second one
-                if len(result) > 1 and result[0]['ranking'] < 1.1 * result[1]['ranking']:
-                    return False
-                return result[0]['prediction']
+            )):
+                cache[cache_key] = {
+                    fname: formatter(result[0][fname])
+                    for fname, formatter, sql in getters
+                }
+                return cache[cache_key]
         except Exception:
             # In case there is an error while parsing the to_tsquery (wrong character for example)
             # We don't want to have a blocking traceback, instead return False
             _logger.exception('Error while predicting invoice line fields')
-        return False
+        return {}
 
-    def _predict_taxes(self):
-        field = SQL('array_agg(account_move_line__tax_rel__tax_ids.id ORDER BY account_move_line__tax_rel__tax_ids.id)')
-        query = self._build_predictive_query(self.move_id)
-        query.left_join('account_move_line', 'id', 'account_move_line_account_tax_rel', 'account_move_line_id', 'tax_rel')
-        query.left_join('account_move_line__tax_rel', 'account_tax_id', 'account_tax', 'id', 'tax_ids')
-        query.add_where('account_move_line__tax_rel__tax_ids.active IS NOT FALSE')
-        predicted_tax_ids = self._predicted_field(self.move_id, self.name, self.partner_id, field, query)
-        if predicted_tax_ids == [None]:
-            return False
-        if predicted_tax_ids is not False and set(predicted_tax_ids) != set(self.tax_ids.ids):
-            return predicted_tax_ids
-        return False
+    def _predictive_field_getter(self):
+        """Return the list of fields to predict and how to retrieve them from a result row.
 
-    @api.model
-    def _predict_specific_tax(self, move, name, partner, amount_type, amount, type_tax_use):
-        field = SQL('array_agg(account_move_line__tax_rel__tax_ids.id ORDER BY account_move_line__tax_rel__tax_ids.id)')
-        query = self._build_predictive_query(move)
-        query.left_join('account_move_line', 'id', 'account_move_line_account_tax_rel', 'account_move_line_id', 'tax_rel')
-        query.left_join('account_move_line__tax_rel', 'account_tax_id', 'account_tax', 'id', 'tax_ids')
-        query.add_where("""
-            account_move_line__tax_rel__tax_ids.active IS NOT FALSE
-            AND account_move_line__tax_rel__tax_ids.amount_type = %s
-            AND account_move_line__tax_rel__tax_ids.type_tax_use = %s
-            AND account_move_line__tax_rel__tax_ids.amount = %s
-        """, (amount_type, type_tax_use, amount))
-        return self._predicted_field(move, name, partner, field, query)
-
-    def _predict_product(self):
-        predict_product = int(self.env['ir.config_parameter'].sudo().get_param('account_predictive_bills.predict_product', '1'))
-        if predict_product and self.company_id.predict_bill_product:
-            query = self._build_predictive_query(self.move_id, ['|', ('product_id', '=', False), ('product_id.active', '=', True)])
-            predicted_product_id = self._predicted_field(self.move_id, self.name, self.partner_id, SQL('account_move_line.product_id'), query)
-            if predicted_product_id and predicted_product_id != self.product_id.id:
-                return predicted_product_id
-        return False
-
-    def _predict_account(self):
-        field = SQL('account_move_line.account_id')
-        if self.move_id.is_purchase_document(True):
-            excluded_group = 'income'
-        else:
-            excluded_group = 'expense'
-        account_query = self.env['account.account']._search([
-            *self.env['account.account']._check_company_domain(self.move_id.company_id or self.env.company),
-            ('internal_group', 'not in', (excluded_group, 'off')),
-            ('account_type', 'not in', ('liability_payable', 'asset_receivable')),
-        ], bypass_access=True)
-        account_name = self.env['account.account']._field_to_sql('account_account', 'name')
-        psql_lang = self._get_predict_postgres_dictionary()
-        additional_queries = [SQL(account_query.select(
-            SQL("account_account.id AS account_id"),
-            SQL("setweight(to_tsvector(%(psql_lang)s, %(account_name)s), 'B') AS document", psql_lang=psql_lang, account_name=account_name),
-        ))]
-        query = self._build_predictive_query(self.move_id, [('account_id', 'in', account_query)])
-
-        predicted_account_id = self._predicted_field(self.move_id, self.name, self.partner_id, field, query, additional_queries)
-        if predicted_account_id and predicted_account_id != self.account_id.id:
-            return predicted_account_id
-        return False
-
-    def _predict_deductible_amount(self):
-        if self.account_id and self.partner_id and self.env.user.has_group('account.group_partial_purchase_deductibility'):
-            field = SQL('account_move_line.deductible_amount')
-            query = self._build_predictive_query(self.move_id, [('account_id', '=', self.account_id.id)])
-            predicted_deductible_amount = self._predicted_field(self.move_id, self.name, self.partner_id, field, query)
-            if predicted_deductible_amount and predicted_deductible_amount != self.deductible_amount:
-                return predicted_deductible_amount
-        return False
+        Each entry is a (fname, formatter, sql) tuple where:
+        - fname: the name of the field on account.move.line to set
+        - formatter: a callable to convert the raw SQL value into the expected
+            Python value (e.g. a browse method to get a recordset)
+        - sql: a SQL expression to select the value from an account_move_line
+            row, using the columns of the account_move_line CTE defined
+            in _get_predicted_values
+        """
+        getters = [
+            ('product_id', self.env['product.product'].browse, SQL("""(
+                SELECT product_product.id
+                  FROM product_product
+                 WHERE product_product.id = source.product_id
+                   AND product_product.active
+            ) AS product_id""")),
+            ('account_id', self.env['account.account'].browse, SQL("""(
+                SELECT account_account.id
+                  FROM account_account
+                 WHERE account_account.id = source.account_id
+                   AND account_account.active
+            ) AS account_id""")),
+            ('tax_ids', self.env['account.tax'].browse, SQL("""(
+                SELECT ARRAY_AGG(account_tax_id)
+                  FROM account_move_line_account_tax_rel rel
+                  JOIN account_tax account_tax ON account_tax.id = rel.account_tax_id
+                 WHERE rel.account_move_line_id = source.id
+                   AND account_tax.active IS NOT FALSE
+            ) AS tax_ids""")),
+            ('analytic_distribution', lambda v: v, SQL("analytic_distribution")),
+        ]
+        if self.env.user.has_groups('account.group_partial_purchase_deductibility'):
+            getters.append(('deductible_percentage', lambda v: v, SQL("deductible_percentage")))
+        return getters
 
     @api.onchange('name')
     def _onchange_name_predictive(self):
-        if ((self.move_id.quick_edit_mode or self.move_id.move_type == 'in_invoice') and self.name and self.display_type == 'product'
-            and not self.env.context.get('disable_onchange_name_predictive', False)):
+        disabled_fields = set(self.env.context.get('disable_onchange_name_predictive', []))
+        if (
+            'all' not in disabled_fields
+            and (self.move_id.quick_edit_mode or self.move_id.is_purchase_document(include_receipts=True))
+            and self.display_type == 'product'
+            and self.name
+            and self.partner_id
+            and (not self.move_id.name or self.move_id.name == '/')
+        ):
+            predicted_values = self._get_predicted_values(self.name, self.move_id)
+            protected_fields = ['price_unit', 'account_id', 'tax_ids', 'name']
+            to_update = {fname: value for fname, value in predicted_values.items() if fname not in disabled_fields}
+            to_protect = [self._fields[fname] for fname in protected_fields if self[fname] and fname not in to_update]
+            with self.env.protecting(to_protect, self):
+                self.update(to_update)
 
-            if not self.product_id:
-                predicted_product_id = self._predict_product()
-                if predicted_product_id:
-                    # We only update the price_unit, tax_ids and name in case they evaluate to False
-                    protected_fields = ['price_unit', 'tax_ids', 'name']
-                    to_protect = [self._fields[fname] for fname in protected_fields if self[fname]]
-                    with self.env.protecting(to_protect, self):
-                        self.product_id = predicted_product_id
-
-            # In case no product has been set, the account and taxes
-            # will not depend on any product and can thus be predicted
-            if not self.product_id:
-                # Predict account.
-                predicted_account_id = self._predict_account()
-                if predicted_account_id:
-                    self.account_id = predicted_account_id
-
-                # Predict taxes
-                predicted_tax_ids = self._predict_taxes()
-                if predicted_tax_ids:
-                    self.tax_ids = [Command.set(predicted_tax_ids)]
-
-            # Predict Deductibility
-            predicted_deductible_amount = self._predict_deductible_amount()
-            if predicted_deductible_amount:
-                self.deductible_amount = predicted_deductible_amount
-
-    def _read_group_select(self, aggregate_spec, query):
+    def _read_group_select(self, table, aggregate_spec):
         # Enable to use HAVING clause that sum rounded values depending on the
         # currency precision settings. Limitation: we only handle a having
         # clause of one element with that specific method :sum_rounded.
         fname, __, func = models.parse_read_group_spec(aggregate_spec)
         if func != 'sum_rounded':
-            return super()._read_group_select(aggregate_spec, query)
-        currency_alias = query.make_alias(self._table, 'currency_id')
-        query.add_join('LEFT JOIN', currency_alias, 'res_currency', SQL(
-            "%s = %s",
-            self._field_to_sql(self._table, 'currency_id', query),
-            SQL.identifier(currency_alias, 'id'),
-        ))
+            return super()._read_group_select(table, aggregate_spec)
 
         return SQL(
             'SUM(ROUND(%s, %s))',
-            self._field_to_sql(self._table, fname, query),
-            self.env['res.currency']._field_to_sql(currency_alias, 'decimal_places', query),
+            table[fname],
+            table._sudo().currency_id.decimal_places,
         )
 
-    def _read_group_groupby(self, alias, groupby_spec, query):
+    def _read_group_groupby(self, table, groupby_spec):
         # enable grouping by :abs_rounded on fields, which is useful when trying
         # to match positive and negative amounts
         if ':' in groupby_spec:
             fname, method = groupby_spec.split(':')
             if method == 'abs_rounded':
                 # rounds with the used currency settings
-                currency_alias = query.make_alias(self._table, 'currency_id')
-                query.add_join('LEFT JOIN', currency_alias, 'res_currency', SQL(
-                    "%s = %s",
-                    self._field_to_sql(self._table, 'currency_id', query),
-                    SQL.identifier(currency_alias, 'id'),
-                ))
-
                 return SQL(
                     'ROUND(ABS(%s), %s)',
-                    self._field_to_sql(self._table, fname, query),
-                    self.env['res.currency']._field_to_sql(currency_alias, 'decimal_places', query),
+                    table[fname],
+                    table._sudo().currency_id.decimal_places,
                 )
 
-        return super()._read_group_groupby(alias, groupby_spec, query)
+        return super()._read_group_groupby(table, groupby_spec)
+
+    def onchange(self, values, field_names, fields_spec):
+        return super(AccountMoveLine, self.with_context(
+            disable_onchange_name_predictive=list(values) if self.id else [],
+            disable_onchange_add_to_compute='name' in field_names,
+        )).onchange(values, field_names, fields_spec)
+
+    def _conditional_add_to_compute(self, fname, condition):
+        if self.env.context.get('disable_onchange_add_to_compute'):
+            # In the case where the account/product is modified by the predictive, we do not want
+            # to trigger the onchange/inverse methods in chain. There are indeed triggered after
+            # the snapshot comparison, outside of the `protecting`` context manager used in
+            # `_onchange_name_predictive`
+            return
+        super()._conditional_add_to_compute(fname, condition)

@@ -2,30 +2,30 @@
 <templates xml:space="preserve">
     <t t-name="sign.SignTemplateCustomCogMenu">
         <Dropdown>
-            <button class="btn p-0 ms-1 border-0">
-                <i class="fa fa-cog"/>
+            <button class="btn btn-light border-0 px-1 py-0 lh-sm" title="Actions" data-hotkey="u">
+                <i class="oi oi-fw oi-filled" data-icon="settings"/>
             </button>
             <t t-set-slot="content">
-                <t t-if="showEditButton">
-                    <DropdownItem class="'o_menu_item'" onSelected.bind="props.onEditTemplate">
-                        <i class="fa fa-file-text fa-fw"/> Edit
+                <t t-if="this.showEditButton">
+                    <DropdownItem class="'o_menu_item'" onSelected.bind="this.props.onEditTemplate">
+                        <i class="oi oi-fw oi-filled" data-icon="article"/> Edit
                     </DropdownItem>
                 </t>
-                <t t-if="!props.signTemplate.active &amp;&amp; !state.properties">
-                    <DropdownItem class="'o_menu_item'" onSelected.bind="props.onTemplateSaveClick">
-                        <i class="fa fa-save fa-fw"/> Save as Template
+                <t t-if="!this.props.signTemplate.active &amp;&amp; !this.state.properties">
+                    <DropdownItem class="'o_menu_item'" onSelected.bind="this.props.onTemplateSaveClick">
+                        <i class="oi oi-fw" data-icon="save"/> Save as Template
                     </DropdownItem>
                 </t>
-                <t t-if="props.manageTemplateAccess">
-                    <DropdownItem class="'o_menu_item'" onSelected.bind="onAccessRightsClick">
-                        <i class="fa fa-group fa-fw"/> Access Rights
+                <t t-if="this.props.manageTemplateAccess">
+                    <DropdownItem class="'o_menu_item'" onSelected.bind="this.onAccessRightsClick">
+                        <i class="oi oi-fw oi-filled" data-icon="group"/> Access Rights
                     </DropdownItem>
                 </t>
-                <DropdownItem class="'o_menu_item'" onSelected.bind="onTemplatePropertiesClick">
-                    <i class="fa fa-cog fa-fw"/> Configuration
+                <DropdownItem class="'o_menu_item'" onSelected.bind="this.onTemplatePropertiesClick">
+                    <i class="oi oi-fw oi-filled" data-icon="settings"/> Configuration
                 </DropdownItem>
-                <DropdownItem class="'o_menu_item'" onSelected.bind="onPreviewClick">
-                    <i class="fa fa-eye fa-fw"/> Preview
+                <DropdownItem class="'o_menu_item'" onSelected.bind="this.onPreviewClick">
+                    <i class="oi oi-fw" data-icon="visibility"/> Preview
                 </DropdownItem>
             </t>
         </Dropdown>

@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-12-30 18:44+0000\n"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-08-28 17:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -25,7 +25,12 @@ msgstr ""
 
 #. module: appointment_google_calendar
 #: model_terms:ir.ui.view,arch_db:appointment_google_calendar.appointment_type_view_form
-msgid "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/> Settings"
+msgid "<i class=\"oi oi-fw o_button_icon\" data-icon=\"east\"/> Settings"
+msgstr ""
+
+#. module: appointment_google_calendar
+#: model:ir.module.module,shortdesc:base.module_appointment_google_calendar
+msgid "Appointment Google Calendar"
 msgstr ""
 
 #. module: appointment_google_calendar
@@ -44,10 +49,20 @@ msgid "Connector Google"
 msgstr ""
 
 #. module: appointment_google_calendar
+#: model_terms:ir.ui.view,arch_db:appointment_google_calendar.appointment_validated
+msgid "Copy Google Meet Link"
+msgstr ""
+
+#. module: appointment_google_calendar
 #: model:ir.model.fields,help:appointment_google_calendar.field_appointment_type__event_videocall_source
 msgid ""
-"Defines the type of video call link that will be used for the generated "
-"events. Keep it empty to prevent generating meeting url."
+"Defines the type of video call link that will be used for the generated events.\n"
+"\n"
+"            Can be one of:\n"
+"                - Odoo Discuss: Generates an internal Odoo Discuss meeting link.\n"
+"                - Google Meet: Generates a Google Meet link. Requires Google Calendar synchronization to be configured and active. If the staff user did not synchronize their calendar, no Google Meet link will be added to their meetings.\n"
+"\n"
+"            Keep it empty to prevent generating meeting url."
 msgstr ""
 
 #. module: appointment_google_calendar
@@ -57,8 +72,14 @@ msgid "Display Name"
 msgstr ""
 
 #. module: appointment_google_calendar
+#: model:ir.module.module,description:base.module_appointment_google_calendar
+msgid ""
+"Enable choosing a Google Calendar videoconference link to give to your "
+"clients for an appointment."
+msgstr ""
+
+#. module: appointment_google_calendar
 #: model:ir.model.fields.selection,name:appointment_google_calendar.selection__appointment_type__event_videocall_source__google_meet
-#: model_terms:ir.ui.view,arch_db:appointment_google_calendar.appointment_validated
 msgid "Google Meet"
 msgstr ""
 

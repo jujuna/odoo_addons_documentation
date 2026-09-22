@@ -22,7 +22,7 @@
         <field name="name">employee_commuting.report.pivot</field>
         <field name="model">esg.employee.commuting.report</field>
         <field name="arch" type="xml">
-            <pivot string="Employee Commuting" disable_linking="1" js_class="esg_employee_commuting_report_pivot">
+            <pivot string="Employee Commuting" disable_linking="1">
                 <field name="driver_id" type="row"/>
                 <field name="date_from" interval="year" type="col"/>
                 <field name="total_co2" type="measure"/>
@@ -41,7 +41,7 @@
                 No commuting data available.
             </p>
             <p>
-                Track commuting emissions based on each employee’s distance from home to the office and the emission factor of their vehicle model.
+                Track commuting emissions based on each employee's distance from home to the office and the emission factor of their vehicle model.
             </p>
         </field>
     </record>

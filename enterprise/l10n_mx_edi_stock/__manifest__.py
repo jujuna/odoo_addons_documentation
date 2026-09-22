@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     "name": """Mexico - Electronic Delivery Guide""",
@@ -21,7 +20,6 @@ guide.
         'demo/demo_cfdi.xml',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'data/cfdi_cartaporte.xml',
         'data/l10n_mx_edi_customs_document_type.xml',
         'data/l10n_mx_edi_customs_regime.xml',
@@ -37,8 +35,8 @@ guide.
         'views/report_cartaporte.xml',
         'views/res_partner_views.xml',
         'views/stock_picking_views.xml',
+        'security/ir.access.csv',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

@@ -89,6 +89,23 @@
         </dte:GTDocumento>
     </template>
 
+    <template id="dte_anulacion">
+        <dte:GTAnulacionDocumento xmlns:dte="http://www.sat.gob.gt/dte/fel/0.1.0" Version="0.1">
+            <dte:SAT>
+                <dte:AnulacionDTE ID="DatosCertificados">
+                    <dte:DatosGenerales
+                            ID="DatosAnulacion"
+                            t-att-NumeroDocumentoAAnular="uuid"
+                            t-att-NITEmisor="issuer_vat"
+                            t-att-IDReceptor="recipient_id"
+                            t-att-FechaEmisionDocumentoAnular="issue_datetime"
+                            t-att-FechaHoraAnulacion="cancel_datetime"
+                            t-att-MotivoAnulacion="cancel_reason"/>
+                </dte:AnulacionDTE>
+            </dte:SAT>
+        </dte:GTAnulacionDocumento>
+    </template>
+
     <template id="dte_complemento_exportacion" xmlns:dte="http://www.sat.gob.gt/dte/fel/0.2.0">
         <dte:Complemento
                 IDComplemento="TEXT"

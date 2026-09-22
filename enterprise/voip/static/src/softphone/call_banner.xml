@@ -1,20 +1,24 @@
 <?xml version="1.0"?>
 <templates>
 <t t-name="voip.CallBanner">
-    <div class="d-flex justify-content-between align-items-center w-100 border-bottom border-primary z-3">
-        <button class="btn d-flex flex-column w-100" t-on-click="onClickSwitchCall">
-            <span t-esc="contactName"/>
-            <div class="d-flex align-items-center gap-1">
-                <i t-if="isCallOnHold" class="fa fa-pause text-warning fs-6"/>
-                <span class="fs-2" t-esc="props.call.timerText"/>
-            </div>
+    <div class="o-voip-CallBanner d-flex justify-content-between align-items-center w-100 ps-2 py-1 pe-3" t-att-class="{ 'border-top': !this.props.isFirst }">
+        <button class="btn btn-link d-flex flex-column w-100 ps-2 pe-3 py-1 text-start text-reset" t-on-click="this.onClickSwitchCall">
+            <span class="d-flex flex-column gap-1">
+                <span t-out="this.contactName"/>
+                <span class="d-flex align-items-center gap-1 text-warning">
+                    <i t-if="this.backSession.isOnHold" class="oi oi-filled" data-icon="pause"/>
+                    <span t-out="this.backSession.timerText"/>
+                </span>
+            </span>
         </button>
         <ActionButton
             title.translate="Hang up"
-            icon="'fa-phone'"
+            icon="'phone'"
+            iconClass="'oi-filled'"
             type="'danger'"
-            extraClass="'rounded-circle p-2'"
-            onClick.bind="onClickHangUp"
+            extraClass="'o-voip-CallIcon-end'"
+            isSmall="true"
+            onClick.bind="this.onClickHangUp"
         />
     </div>
 </t>

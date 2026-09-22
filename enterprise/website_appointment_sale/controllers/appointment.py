@@ -14,7 +14,7 @@ class WebsiteAppointmentSale(AppointmentAccountPayment):
         """ Override: when using a payment step, we go through the eCommerce flow instead,
             and link the booking to the SOL as one can go through the flow several times and book
             several slots of the same appointment type """
-        order_sudo = request.cart or request.website._create_cart()
+        order_sudo = request.cart or self.env.website._create_cart()
 
         # Necessary to have a description matching the tz picked by partner.
         # See _prepare_order_line_values on sale.order model.
@@ -43,10 +43,14 @@ class WebsiteAppointmentSale(AppointmentAccountPayment):
                 )
                 if not feedback_dict.get('invalid_fields'):
                     order_sudo._update_address(booked_by_partner.id, ['partner_id'])
+
+            if calendar_booking.appointment_type_id._has_accessory_products():
+                return request.redirect("/shop/cart")
+
             return request.redirect("/shop/checkout?try_skip_step=true")
 
         # Slot not available. We remove booking and redirect to appointment.
         appointment_type = calendar_booking.appointment_type_id
         calendar_booking.sudo().unlink()
         error_state = 'failed-staff-user' if appointment_type.schedule_based_on == 'users' else 'failed-resource'
-        return request.redirect('/appointment/%s?%s' % (appointment_type.id, keep_query('*', state=error_state)))
+        return request.redirect('%s?%s' % (appointment_type.website_url, keep_query('*', state=error_state)))

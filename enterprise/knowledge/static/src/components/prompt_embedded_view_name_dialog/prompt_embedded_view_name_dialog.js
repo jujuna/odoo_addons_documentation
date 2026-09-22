@@ -1,35 +1,30 @@
 import { _t } from "@web/core/l10n/translation";
 import { Dialog } from "@web/core/dialog/dialog";
-import {
-    Component,
-    onMounted,
-    useRef } from "@odoo/owl";
+import { Component, onMounted, signal, t, useProps } from "@odoo/owl";
 
 export class PromptEmbeddedViewNameDialog extends Component {
     static template = "knowledge.PromptEmbeddedViewNameDialog";
     static components = { Dialog };
-    static props = {
-        defaultName: { type: String, optional: true },
-        isNew: { type: Boolean, optional: true },
-        viewType: { type: String },
-        save: { type: Function },
-        close: { type: Function, optional: true }
-    };
 
-    /**
-     * @override
-     */
+    props = useProps({
+        defaultName: t.string().optional(),
+        isNew: t.boolean().optional(),
+        viewType: t.string(),
+        save: t.function(),
+        close: t.function().optional(),
+    });
+
+    inputRef = signal.ref();
+
     setup () {
-        super.setup();
-        this.input = useRef('input');
         onMounted(() => {
             window.setTimeout(() => {
-                this.input.el?.focus(); // auto-focus
+                this.inputRef()?.focus(); // auto-focus
             }, 0);
         });
     }
     async save () {
-        await this.props.save(this.input.el.value);
+        await this.props.save(this.inputRef().value);
         this.props.close();
     }
     /**

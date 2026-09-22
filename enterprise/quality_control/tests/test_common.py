@@ -39,3 +39,4 @@ class TestQualityCommon(common.TransactionCase):
         cls.location_dest_id = cls.env.ref('stock.stock_location_stock').id
         admin_user = cls.env.ref('base.user_admin')
         admin_user.write({'email': 'admin@example.com'})
+        cls.scrap_location_id = cls.env.company.scrap_location_id.id

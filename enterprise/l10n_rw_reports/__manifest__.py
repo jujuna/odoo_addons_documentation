@@ -1,6 +1,5 @@
 {
     'name': 'Rwanda - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Accounting reports for Rwanda
@@ -13,7 +12,6 @@ Accounting reports for Rwanda
         "data/balance_sheet.xml",
         "data/profit_loss.xml",
     ],
-    'installable': True,
     'auto_install': True,
     'website': 'https://www.odoo.com/app/accounting',
     'author': 'Odoo S.A.',

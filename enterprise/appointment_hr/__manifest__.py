@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': "Employees on Appointments",
-    'version': "1.0",
     'category': 'Services/Appointment',
     'sequence': 2140,
     'summary': "Manage Appointments with Employees",
@@ -16,6 +14,11 @@ Take into account the working schedule (sick leaves, part time, ...) of employee
     'data': [
         'views/appointment_type_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'appointment_hr/static/src/views/appointment_calendar/appointment_calendar_model_patch.js',
+        ],
+    },
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

@@ -1,60 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <record id="hr_attendance_gantt_create_view_form" model="ir.ui.view">
-        <field name="name">hr.attendance.form</field>
+    <record id="hr_attendance_view_form" model="ir.ui.view">
+        <field name="name">hr.attendance.view.form.inherit.hr.attendance.gantt</field>
         <field name="model">hr.attendance</field>
-        <field name="mode">primary</field>
         <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//separator" position="attributes">
-                <attribute name="invisible">True</attribute>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-warning text-center" role="alert" invisible="not show_contract_warning">
+                    Employee is not under contract.
+                    <field name="employee_id" widget="correct_employee_button" groups="hr.group_hr_user"/>
+                </div>
             </xpath>
-            <xpath expr="//separator[@name='check_out_separator']" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
-            <xpath expr="//group[@name='check_in_group']" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
-            <xpath expr="//group[@name='check_out_group']" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
-            <notebook position="attributes">
-                <attribute name="invisible">True</attribute>
-            </notebook>
-            <form position="inside">
-                <footer>
-                    <button
-                        string="Save &amp; Close"
-                        special="save"
-                        data-hotkey="s"
-                        class="btn btn-primary"
-                        close="1"
-                        invisible="not is_manager"/>
-                    <button
-                        string="Discard"
-                        special="cancel"
-                        data-hotkey="j"
-                        class="btn-secondary"
-                        close="1"
-                        invisible="not is_manager"/>
-                    <button
-                        string="Delete"
-                        name="unlink"
-                        type="object"
-                        data-hotkey="x"
-                        class="btn btn-danger ms-auto"
-                        close="1"
-                        invisible="not id or not is_manager"/>
-                    <button
-                        string="Close"
-                        special="cancel"
-                        data-hotkey="j"
-                        class="btn-secondary"
-                        close="1"
-                        invisible="is_manager"/>
-                </footer>
-            </form>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_filter" model="ir.ui.view">
+        <field name="name">hr.attendance.view.filter.inherit.hr.attendance.gantt</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <filter name="check_in_filter" position="after">
+                <separator groups="hr_attendance.group_hr_attendance_officer"/>
+                <filter string="Ongoing Contract" name="ongoing_contract"
+                    domain="[('has_active_contract', '=', True)]"
+                    groups="hr_attendance.group_hr_attendance_officer"/>
+                <filter string="No Active Contract" name="no_active_contract"
+                    domain="[('has_active_contract', '=', False)]"
+                    groups="hr_attendance.group_hr_attendance_officer"/>
+            </filter>
         </field>
     </record>
 
@@ -68,17 +41,42 @@
                 date_start="check_in"
                 date_stop="check_out"
                 string="Days"
-                color="color"
+                groups_limit="20"
+                color="wet_color"
                 default_group_by="employee_id"
                 default_scale="day"
                 default_range="day"
                 precision="{'day': 'hour:quarter', 'week': 'day:quarter', 'week_2': 'day:half', 'month': 'day:half'}"
                 plan="0"
-                progress="overtime_progress"
-                progress_bar="employee_id"
                 display_unavailability="1"
-                form_view_id="%(hr_attendance_gantt.hr_attendance_gantt_create_view_form)d"
+                form_view_id="%(hr_attendance.hr_attendance_create_view_form)d"
+                progress_bar="employee_id"
             >
+            </gantt>
+        </field>
+    </record>
+
+    <record id="hr_attendance_gantt_view_default_scale_month" model="ir.ui.view">
+        <field name="name">hr.attendance.gantt.scale.month</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance_gantt.hr_attendance_gantt_view"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//gantt" position="attributes">
+                <attribute name="default_scale">month</attribute>
+                <attribute name="default_range">month</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_attendance_gantt_view_employee_monthly_hours" model="ir.ui.view">
+        <field name="name">hr.attendance.gantt.view.employee.monthly.hours</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance_gantt.hr_attendance_gantt_view_default_scale_month"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <gantt position="attributes">
+                <attribute name="js_class">monthly_attendance_gantt</attribute>
             </gantt>
         </field>
     </record>
@@ -86,4 +84,9 @@
     <record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
         <field name="view_mode">gantt,list,form</field>
     </record>
+
+    <record id="hr_attendance.hr_attendance_my_action" model="ir.actions.act_window">
+        <field name="view_mode">calendar,gantt,list,pivot,graph</field>
+    </record>
+
 </odoo>

@@ -1,4 +1,4 @@
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import tagged, TransactionCase
 
 from odoo.addons.mail.tests.common import mail_new_test_user
 
@@ -25,7 +25,8 @@ class TestEmployeeReportPayGap(TransactionCase):
             "sex": sex,
             "company_id": company.id,
         })
-        employee.current_version_id.wage = wage
+        version = employee.current_version_id
+        version[version._get_contract_wage_field()] = wage
         return employee
 
     def test_pay_gap_multi_company(self):

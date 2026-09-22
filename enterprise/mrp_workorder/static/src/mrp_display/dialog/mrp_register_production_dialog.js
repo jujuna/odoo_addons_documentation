@@ -1,23 +1,26 @@
 import { useService } from "@web/core/utils/hooks";
 import { formatFloat } from "@web/views/fields/formatters";
-import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import {
+    ConfirmationDialog,
+    confirmationDialogProps,
+} from "@web/core/confirmation_dialog/confirmation_dialog";
 import { FloatField } from "@web/views/fields/float/float_field";
 import { Many2ManyTagsField } from "@web/views/fields/many2many_tags/many2many_tags_field";
-import { useState } from "@odoo/owl";
+import { onWillStart, useProps, proxy, t } from "@odoo/owl";
 
 export class MrpRegisterProductionDialog extends ConfirmationDialog {
     static template = "mrp_workorder.MrpRegisterProductionDialog";
-    static props = {
-        ...ConfirmationDialog.props,
-        qtyToProduce: { optional: true, type: Number },
-        record: Object,
-        reload: Function,
-        workorderId: { optional: true, type: Number },
-    };
+    props = useProps({
+        ...confirmationDialogProps,
+        qtyToProduce: t.number().optional(),
+        record: t.object(),
+        reload: t.function(),
+        workorder: t.object().optional(),
+    });
     static components = {
         ...ConfirmationDialog.components,
         FloatField,
-        Many2ManyTagsField
+        Many2ManyTagsField,
     };
 
     setup() {
@@ -28,25 +31,30 @@ export class MrpRegisterProductionDialog extends ConfirmationDialog {
             this.quantityToProduce = this.props.record.data.product_qty;
         }
         this.formatFloat = formatFloat;
-        this.state = useState({ disabled: false });
-        if(["lot", "serial"].includes(this.props.record.data.product_tracking) && !this.props.record.data.lot_producing_ids.count) {
-            this.props.record.load();
-        }
+        this.state = proxy({ disabled: false });
+        onWillStart(async () => {
+            if (
+                ["lot", "serial"].includes(this.props.record.data.product_tracking) &&
+                !this.props.record.data.lot_producing_ids.count
+            ) {
+                await this.props.record.load();
+            }
+        });
         this.actionService = useService("action");
     }
 
     async validate() {
-        const record = this.props.record;
         this.state.disabled = true;
-        await record.save();
-        const resModel = this.props.workorderId ? "mrp.workorder" : "mrp.production";
-        const resId = [this.props.workorderId || record.resId];
-        await record.model.orm.call(resModel, "set_qty_producing", [resId]);
-        await this.props.reload(record);
+        await this.props.record.save();
+        await this.props.workorder?.save();
+        const record = this.props.workorder ? this.props.workorder : this.props.record;
+        await record.model.orm.call(record.resModel, "set_qty_producing", [record.resId]);
+        await this.props.reload(this.props.record);
         this.props.close();
     }
 
     async actionGenerateSerial() {
+        await this.props.record.save();
         const action = await this.props.record.model.orm.call(
             this.props.record.resModel,
             "action_generate_serial",
@@ -91,6 +99,12 @@ export class MrpRegisterProductionDialog extends ConfirmationDialog {
     }
 
     get qtyDoneInfo() {
+        if (this.props.workorder) {
+            return {
+                name: "qty_produced",
+                record: this.props.workorder,
+            };
+        }
         return {
             name: "qty_producing",
             record: this.props.record,

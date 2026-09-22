@@ -9,19 +9,22 @@ class UtmCampaign(models.Model):
 
     social_post_ids = fields.One2many('social.post', 'utm_campaign_id', string="All related social media posts", groups="social.group_social_user")
     social_posts_count = fields.Integer(compute="_compute_social_posts_count", string='Social Media Posts', groups="social.group_social_user")
-    social_engagement = fields.Integer(compute="_compute_social_engagement", string='Number of interactions (likes, shares, comments ...) with the social posts', groups="social.group_social_user")
+    social_engagement = fields.Integer(
+        compute="_compute_social_engagement",
+        string='Number of interactions (likes, comments and shares) with the social posts',
+        groups="social.group_social_user")
 
     def _compute_social_engagement(self):
         campaigns_engagement = {campaign.id: 0 for campaign in self}
 
         posts_data = self.env['social.post'].search_read(
             [('utm_campaign_id', 'in', self.ids)],
-            ['utm_campaign_id', 'engagement']
+            ['utm_campaign_id', 'likes_count', 'comments_count', 'shares_count']
         )
 
         for datum in posts_data:
             campaign_id = datum['utm_campaign_id'][0]
-            campaigns_engagement[campaign_id] += datum['engagement']
+            campaigns_engagement[campaign_id] += datum['likes_count'] + datum['comments_count'] + datum['shares_count']
 
         for campaign in self:
             campaign.social_engagement = campaigns_engagement[campaign.id]

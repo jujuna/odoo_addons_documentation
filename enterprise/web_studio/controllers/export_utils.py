@@ -1,9 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import binascii
 import functools
 import pprint
 import textwrap
-from base64 import b64decode
 from collections import Counter, OrderedDict
 
 from lxml import etree
@@ -152,9 +150,7 @@ class StudioExportSerializer:
         if record_data.studio:
             context.update({'studio': True})
         if record._name in ('product.template', 'product.template.attribute.line'):
-            context.update({'create_product_product': False})
-        if record._name == 'worksheet.template':
-            context.update({'worksheet_no_generation': True})
+            context.update({'create_product_product': False, 'update_product_template_attribute_values': False})
         if exportid.startswith('website.configurator_'):
             exportid = exportid.replace('website.configurator_', 'configurator_')
 
@@ -194,8 +190,10 @@ class StudioExportSerializer:
         if self.has_website and field.name == 'key' and record._name == 'ir.ui.view' and record.website_id:
             value = f"studio_customization.{value}"
 
-        if field.type in ('boolean', 'properties_definition', 'properties'):
+        if field.type in ('boolean', 'properties_definition'):
             return E.field(name=field.name, eval=str(value))
+        elif field.type == 'properties':
+            return E.field(name=field.name, eval=str(field.convert_to_export(value, record)))
         elif field.type == 'many2one_reference':
             reference_model = record[field.model_field]
             reference_value = reference_model and record.env[reference_model].browse(value) or False
@@ -218,7 +216,8 @@ class StudioExportSerializer:
             parser = etree.XMLParser(remove_blank_text=True, resolve_entities=False)
             return E.field(etree.XML(value, parser), name=field.name, type='xml')
         elif field.type == 'binary':
-            return E.field(name=field.name, type="base64", file='studio_customization/' + self.utils.get_binary_field_file_name(field, record))
+            import_type = 'bytes'
+            return E.field(name=field.name, type=import_type, file='studio_customization/' + self.utils.get_binary_field_file_name(field, record))
         elif field.type == 'datetime':
             return E.field(field.to_string(value), name=field.name)
         elif field.type in ('many2one', 'reference'):
@@ -237,7 +236,8 @@ class StudioExportSerializer:
         if model == 'sale.order' and group == 'demo':
             demo_so = self.data.filtered_domain([
                 ("model", "=", model),
-                ("is_demo_data", "=", True)
+                ("is_demo_data", "=", True),
+                ("res_id", "!=", False),
             ])
             demo_so = self.env["sale.order"].browse(demo_so.mapped("res_id"))
             self.demo_sale_orders = demo_so.filtered_domain([
@@ -277,7 +277,7 @@ class StudioExportSerializer:
                     ),
                     E.value(
                         model="ir.module.module",
-                        eval="obj().env.ref('website.default_website')"
+                        eval="obj().env.ref('base.default_website')"
                     ),
                     model="ir.module.module",
                     name="_theme_load",
@@ -319,7 +319,7 @@ class StudioExportSerializer:
                 E.function(
                     E.value(
                         model="website.menu",
-                        eval="obj().search([('website_id', '=', ref('website.default_website')), ('url', '=', '/default-main-menu')]).id"
+                        eval="obj().search([('website_id', '=', ref('base.default_website')), ('url', '=', '/default-main-menu')]).id"
                     ),
                     model="website.menu",
                     name="unlink"
@@ -338,7 +338,7 @@ class StudioExportSerializer:
                     E.function(
                         E.value(
                             model="ir.ui.view",
-                            eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('%s').id" % view['key']
+                            eval="obj().env['website'].with_context(website_id=obj().env.ref('base.default_website').id).viewref('%s').id" % view['key']
                         ),
                         E.value(
                             model="ir.ui.view",
@@ -512,10 +512,7 @@ class StudioExportUtils:
                 # create files for binary fields
                 if field.type == 'binary' and record[field.name]:
                     value = record[field.name]
-                    try:
-                        binary_data = b64decode(value)
-                    except (binascii.Error, TypeError):
-                        binary_data = value.decode('utf-8') if isinstance(value, bytes) else str(value)
+                    binary_data = value.content
                     binary_files.append((self.get_binary_field_file_name(field, record), binary_data))
 
                 # handle relational fields

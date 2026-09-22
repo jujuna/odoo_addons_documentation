@@ -15,6 +15,8 @@ class AccountReportAsyncExport(models.Model):
         ("DGI_EDI_TVA", "DGFiP"),
         ("CEC_EDI_TVA", "Expert Accountant"),
         ("OGA_EDI_TVA", "OGA"),
+        ("DGI_EDI_PART", "EDI PART"),
+        ("DGI_EDI_TDFC", "DGFiP (TDFC)"),
     ], readonly=True)
     document_ids = fields.One2many(comodel_name='account.report.async.document', inverse_name='account_report_async_export_id')
     state = fields.Selection(
@@ -25,6 +27,8 @@ class AccountReportAsyncExport(models.Model):
             ('rejected', "Rejected"),
             ('mixed', "Mixed"),
         ], default='to_send', compute='_compute_state', store=True)
+    company_id = fields.Many2one('res.company')
+    return_id = fields.Many2one('account.return')
 
     @api.depends('document_ids.state')
     def _compute_state(self):
@@ -36,6 +40,20 @@ class AccountReportAsyncExport(models.Model):
                 record.state = states.pop()
             else:
                 record.state = 'mixed'
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'state' in vals:
+            self._sync_account_return_status()
+        return res
+
+    def _sync_account_return_status(self):
+        for record in self:
+            if record.return_id:
+                if record.state == 'accepted':
+                    record.return_id.is_completed = True
+                elif record.state in {'rejected', 'to_send', 'sent', 'mixed'}:
+                    record.return_id.is_completed = False
 
     @api.model
     def _cron_process_all_reports_async_export(self):

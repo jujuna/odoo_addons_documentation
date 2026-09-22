@@ -14,15 +14,40 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 18:44+0000\n"
-"PO-Revision-Date: 2025-10-08 18:44+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 00:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"sale_amazon/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_amazon
+#: model:ir.module.module,description:base.module_sale_amazon
+msgid ""
+"\n"
+"Import your Amazon orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and marketplaces.\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(SKU in Amazon).\n"
+"* Deliveries confirmed in Odoo are synchronized in Amazon.\n"
+"* Support for both Fulfilment by Amazon (FBA) and Fulfilment by Merchant "
+"(FBM):\n"
+"    * FBA: A stock location and stock moves allow to monitor your stock in "
+"Amazon Fulfilment\n"
+"      Centers.\n"
+"    * FBM: Delivery notifications are sent to Amazon for each confirmed "
+"picking (partial delivery\n"
+"      friendly).\n"
+msgstr ""
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
@@ -151,8 +176,8 @@ msgstr ""
 "style> <body><div> <p>Yetkazib berish buyurtmalarini sinxronlash jarayonida "
 "ba'zi xatolar yuz berdi va jarayon tugallanmadi.</p> <p>Boshqa sinxronlash "
 "urinishlari amalga oshirilmasligi sababli, yetkazib berish buyurtmalarini "
-"qayta qo‘lda sinxronlashdan oldin, iltimos, muammoni bartaraf eting.</p> "
-"<p>Quyida Amazon tomonidan yuborilgan xatolar keltirilgan: </p> <table "
+"qayta qo‘lda sinxronlashdan oldin, iltimos, muammoni bartaraf eting.</p> <p>"
+"Quyida Amazon tomonidan yuborilgan xatolar keltirilgan: </p> <table "
 "class=\"amz_table\"> <thead> <tr> <th>Buyurtma raqami</th> <th>Xabar</th> </"
 "tr> </thead> <tbody> <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\"> <th><t t-out=\"error['order_ref']\"/></th> <td> <t t-"
@@ -234,8 +259,8 @@ msgstr ""
 "th { white-space: nowrap; }.amz_table thead th { padding: 0.5em 0.5em; text-"
 "align: center; border-bottom: 1px solid #888; }.amz_table tbody "
 "th,.amz_table tbody td { padding: 0.5em 0.5em 1em; vertical-align: top; } </"
-"style> <body><div> <p><b><t t-out=\"ctx.get('amazon_account') or ''\">REF</"
-"t></b> Amazon hisobi uchun mahsulotlar mavjudligini sinxronlash jarayonida "
+"style> <body><div> <p><b><t t-out=\"ctx.get('amazon_account') or ''\">REF</t>"
+"</b> Amazon hisobi uchun mahsulotlar mavjudligini sinxronlash jarayonida "
 "ba'zi xatoliklar yuz berdi va jarayon yakunlanmadi.</p> <p>Quyida Amazon "
 "tomonidan yuborilgan xatolar ro‘yxati keltirilgan: </p> <table "
 "class=\"amz_table\"> <thead> <tr> <th>SKU</th> <th>Xabar</th> </tr> </thead> "
@@ -307,6 +332,11 @@ msgstr "Amazon hisobi"
 #, fuzzy
 msgid "Amazon Accounts"
 msgstr "Amazon hisoblari"
+
+#. module: sale_amazon
+#: model:ir.module.module,shortdesc:base.module_sale_amazon
+msgid "Amazon Connector"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__amazon_feed_ref
@@ -422,30 +452,6 @@ msgstr ""
 "Amazon jo‘natish manzili uchun ma'lum ma'lumotlarni talab qiladi. Iltimos, "
 "quyidagi ma'lumotlar '%(location_name)s' (%(location)s) uchun "
 "o‘rnatilganligini tekshiring: ko‘cha, mamlakat va mamlakat kodi."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-#, fuzzy
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"Since the current carrier doesn't automatically provide a tracking "
-"reference, you need to set one manually."
-msgstr ""
-"Amazon har bir yetkazib berish uchun kuzatuv raqami taqdim etilishini talab "
-"qiladi. Joriy tashuvchi avtomatik ravishda kuzatuv raqamini taqdim etmagani "
-"sababli, uni qo‘lda kiritishingiz kerak."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-#, fuzzy
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"You need to assign a carrier to this delivery."
-msgstr ""
-"Amazon har bir yetkazib berish uchun kuzatuv raqami taqdim etilishini talab "
-"qiladi. Ushbu yetkazib berish uchun tashuvchi tayinlashingiz kerak."
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -660,12 +666,6 @@ msgid "Back to my account"
 msgstr "Hisobimga qaytish"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
-#, fuzzy
-msgid "Cancel"
-msgstr "Bekor qilish"
-
-#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__company_id
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__company_id
 #, fuzzy
@@ -769,12 +769,6 @@ msgstr "Hisob ma'lumotlari"
 #, fuzzy
 msgid "Default Products"
 msgstr "Standart mahsulotlar"
-
-#. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
-#, fuzzy
-msgid "Discard"
-msgstr "Bekor qilish"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
@@ -962,6 +956,11 @@ msgstr ""
 "ham hisob-faktura yuborish yoki yetkazib berish imkoniyatiga ega bo‘lasiz."
 
 #. module: sale_amazon
+#: model:ir.module.module,summary:base.module_sale_amazon
+msgid "Import Amazon orders and sync deliveries"
+msgstr ""
+
+#. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
 #, fuzzy
 msgid "In Processing by Amazon"
@@ -1049,6 +1048,12 @@ msgstr "Bozor maydoni"
 #, fuzzy
 msgid "Marketplaces"
 msgstr "Bozor maydonlari"
+
+#. module: sale_amazon
+#. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Missing product name"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__name
@@ -1398,8 +1403,8 @@ msgid ""
 "(%(status)s) is not eligible for synchronization for its fulfillment channel "
 "(%(channel)s)."
 msgstr ""
-"%(ref)s raqamli Amazon buyurtmasi tiklanmadi, chunki uning holati (%"
-"(status)s) bajarish kanali (%(channel)s) uchun sinxronlashga mos emas."
+"%(ref)s raqamli Amazon buyurtmasi tiklanmadi, chunki uning holati (%(status)"
+"s) bajarish kanali (%(channel)s) uchun sinxronlashga mos emas."
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_marketplace__region
@@ -1443,13 +1448,10 @@ msgstr "Tovar saqlash birligi (SKU)."
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_channel
-#, fuzzy
 msgid ""
-"The channel will be updated with the incomming orders or during the next "
-"stock synchronization."
+"The channel will be updated with the incomming orders or, if left empty, "
+"during the next stock synchronization."
 msgstr ""
-"Kanal kiruvchi buyurtmalar yoki keyingi aksiya sinxronizatsiyasi paytida "
-"yangilanadi."
 
 #. module: sale_amazon
 #. odoo-python
@@ -1466,8 +1468,8 @@ msgid ""
 "The communication with the API failed.\n"
 "Error code: %(error_code)s; description: %(error_message)s"
 msgstr ""
-"API bilan aloqa o‘rnatish muvaffaqiyatsiz tugadi. Xatolik kodi: %"
-"(error_code)s; tavsifi: %(error_message)s"
+"API bilan aloqa o‘rnatish muvaffaqiyatsiz tugadi. Xatolik kodi: %(error_code)"
+"s; tavsifi: %(error_message)s"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__base_marketplace_id
@@ -1791,8 +1793,7 @@ msgstr "[%(shipping_code)s] %(product)s uchun yetkazib berish xarajatlari"
 msgid ""
 "[%(sku)s] %(item_title)s\n"
 "Condition: %(main_condition)s - %(sub_condition)s"
-msgstr ""
-"[%(sku)s] %(item_title)s Holati: %(main_condition)s - %(sub_condition)s"
+msgstr "[%(sku)s] %(item_title)s Holati: %(main_condition)s - %(sub_condition)s"
 
 #. module: sale_amazon
 #. odoo-python

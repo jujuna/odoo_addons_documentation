@@ -10,6 +10,7 @@
         <field name="default_opening_date_filter">this_year</field>
         <field name="custom_handler_model_id" ref="model_l10n_it_libro_giornale_report_handler"/>
         <field name="root_report_id" ref="account_reports.journal_report"/>
+        <field name="groupby">journal_id, account_id</field>
 
         <!-- Report Columns -->
         <field name="column_ids">
@@ -40,31 +41,31 @@
         <field name="line_ids">
             <record id="libro_giornale_report_line" model="account.report.line">
                 <field name="name">Libro Giornale</field>
-                <field name="groupby">journal_id, account_id</field>
                 <field name="hierarchy_level">0</field>
+                <field name="foldability">always_unfolded</field>
                 <field name="expression_ids">
                     <record id="libro_giornale_report_line_code" model="account.report.expression">
                         <field name="label">code</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_journal_report</field>
+                        <field name="formula">_report_engine_journal_report</field>
                         <field name="subformula">code</field>
                     </record>
                     <record id="libro_giornale_report_line_debit" model="account.report.expression">
                         <field name="label">debit</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_journal_report</field>
+                        <field name="formula">_report_engine_journal_report</field>
                         <field name="subformula">debit</field>
                     </record>
                     <record id="libro_giornale_report_line_credit" model="account.report.expression">
                         <field name="label">credit</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_journal_report</field>
+                        <field name="formula">_report_engine_journal_report</field>
                         <field name="subformula">credit</field>
                     </record>
                     <record id="libro_giornale_report_line_balance" model="account.report.expression">
                         <field name="label">balance</field>
                         <field name="engine">custom</field>
-                        <field name="formula">_report_custom_engine_journal_report</field>
+                        <field name="formula">_report_engine_journal_report</field>
                         <field name="subformula">balance</field>
                     </record>
                 </field>

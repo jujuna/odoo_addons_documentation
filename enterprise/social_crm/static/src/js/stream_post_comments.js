@@ -30,8 +30,12 @@ patch(StreamPostComments.prototype, {
                 default_social_stream_post_id: this.originalPost.id.raw_value,
                 default_social_account_id: this.originalPost.account_id.raw_value,
                 default_post_content: this._formatPost(this.originalPost.message.raw_value),
-                default_post_image_urls: this.originalPost.stream_post_image_urls.raw_value,
-            }
+                default_post_image_urls: JSON.stringify(
+                    JSON.parse(this.originalPost.stream_post_content_json.raw_value)
+                        .filter((p) => p.type === "image")
+                        .map((p) => p.url)
+                ),
+            },
         });
 
         this.env.closeCommentsModal();

@@ -4,6 +4,9 @@
         <field name="name">Balance sheet (2024)</field>
         <field name="name@fr">Bilan comptable (2024)</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="availability_condition">coa</field>
+        <field name="chart_template">fr_comp</field>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
@@ -59,8 +62,6 @@
                                 <field name="name">Subscribed capital - uncalled</field>
                                 <field name="name@fr">Capital souscrit - non appelé</field>
                                 <field name="code">CAPITAL_NON_APPELE_2024</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_01_0_fr_bilan_actif_column3_2024" model="account.report.expression">
                                         <field name="label">net</field>
@@ -121,8 +122,6 @@
                                                 <field name="name">Research and development costs</field>
                                                 <field name="name@fr">Frais de recherche et de développement</field>
                                                 <field name="code">FRAIS_DEVELOPEMENT_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_1_0_2_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -145,8 +144,6 @@
                                                 <field name="name">Concessions, patents, licences, trademarks, rights and similar assets</field>
                                                 <field name="name@fr">Concessions, brevets, licences, marques, droits et valeurs similaires</field>
                                                 <field name="code">CONCESSION_SIMILAIRES_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_1_0_3_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -169,8 +166,6 @@
                                                 <field name="name">Commercial fund</field>
                                                 <field name="name@fr">Fonds commercial</field>
                                                 <field name="code">FONDS_COMMERCIAL_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_1_0_4_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -193,8 +188,6 @@
                                                 <field name="name">Others</field>
                                                 <field name="name@fr">Autres</field>
                                                 <field name="code">AUTRES_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_1_0_5_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -217,8 +210,6 @@
                                                 <field name="name">Intangible assets in progress</field>
                                                 <field name="name@fr">Immobilisations incorporelles en cours</field>
                                                 <field name="code">IMMOBILIS_COURS_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_1_0_6_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -241,8 +232,6 @@
                                                 <field name="name">Advance payments</field>
                                                 <field name="name@fr">Avances et acomptes</field>
                                                 <field name="code">AVANCES_ACOMPTES_CORPORE_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_1_0_7_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -280,8 +269,6 @@
                                                 <field name="name">Land</field>
                                                 <field name="name@fr">Terrains</field>
                                                 <field name="code">TERRAINS_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_2_0_1_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -304,8 +291,6 @@
                                                 <field name="name">Buildings</field>
                                                 <field name="name@fr">Constructions</field>
                                                 <field name="code">CONSTRUCTIONS_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_2_0_2_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -328,8 +313,6 @@
                                                 <field name="name">Technical installations, equipment and tools</field>
                                                 <field name="name@fr">Installations techniques,matériel et outillage</field>
                                                 <field name="code">INSTALLATION_OUTILLAGE_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_2_0_3_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -352,8 +335,6 @@
                                                 <field name="name">Others</field>
                                                 <field name="name@fr">Autres</field>
                                                 <field name="code">AUTRES_CORPORE_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_2_0_4_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -376,8 +357,6 @@
                                                 <field name="name">Property, plant and equipment in progress</field>
                                                 <field name="name@fr">Immobilisations corporelles en cours</field>
                                                 <field name="code">IMMOBILLIS_COURS_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_2_0_5_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -400,8 +379,6 @@
                                                 <field name="name">Advance payments</field>
                                                 <field name="name@fr">Avances et acomptes</field>
                                                 <field name="code">AVANCES_ACOMPTES_CORP_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_2_0_6_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -439,8 +416,6 @@
                                                 <field name="name">Shareholdings</field>
                                                 <field name="name@fr">Participations</field>
                                                 <field name="code">PARTICIPATIONS_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_3_0_1_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -463,8 +438,6 @@
                                                 <field name="name">Receivables from participating interests</field>
                                                 <field name="name@fr">Créances rattachées à des participations</field>
                                                 <field name="code">CREANCES_PARTICIPATIONS_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_3_0_2_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -487,8 +460,6 @@
                                                 <field name="name">Fixed assets of the portfolio activity</field>
                                                 <field name="name@fr">Titres immobilisés de l'activité de portefeuille</field>
                                                 <field name="code">TITRES_PORTEFEUILLE_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_3_0_3_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -511,8 +482,6 @@
                                                 <field name="name">Other fixed assets</field>
                                                 <field name="name@fr">Autres titres immobilisés</field>
                                                 <field name="code">AUTRES_IMMOBILISES_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_3_0_4_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -535,8 +504,6 @@
                                                 <field name="name">Loans</field>
                                                 <field name="name@fr">Prêts</field>
                                                 <field name="code">PRETS_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_3_0_5_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -559,8 +526,6 @@
                                                 <field name="name">Other</field>
                                                 <field name="name@fr">Autres</field>
                                                 <field name="code">AUTRES_FINANCIAL_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_02_3_0_6_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -613,8 +578,6 @@
                                                 <field name="name">Raw materials and other supplies</field>
                                                 <field name="name@fr">Matières premières et autres approvisionnements</field>
                                                 <field name="code">MATIERES_APPROVI_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_3_1_1_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -637,8 +600,6 @@
                                                 <field name="name">Work in progress [goods and services]</field>
                                                 <field name="name@fr">En-cours de production [biens et services]</field>
                                                 <field name="code">EN_COURS_PRODUCTION_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_3_1_2_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -661,8 +622,6 @@
                                                 <field name="name">Intermediate and finished products</field>
                                                 <field name="name@fr">Produits intermédiaires et finis</field>
                                                 <field name="code">PRODUITS_FINIS_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_3_1_3_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -685,8 +644,6 @@
                                                 <field name="name">Stocks from fixed assets</field>
                                                 <field name="name@fr">Stocks provenant d'immobilisations</field>
                                                 <field name="code">STOCK_IMMO_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_3_1_4_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -699,8 +656,6 @@
                                                 <field name="name">Goods</field>
                                                 <field name="name@fr">Marchandises</field>
                                                 <field name="code">MARCHANDISES_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_3_1_5_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -723,8 +678,6 @@
                                                 <field name="name">Stocks in transit</field>
                                                 <field name="name@fr">Stocks en voie d'acheminement</field>
                                                 <field name="code">STOCK_ACHEM_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_3_1_6_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -737,8 +690,6 @@
                                                 <field name="name">Advances and deposits paid on orders</field>
                                                 <field name="name@fr">Avances et acomptes versés sur commandes</field>
                                                 <field name="code">ADVANCES_COMMANDES_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_3_1_7_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -766,8 +717,6 @@
                                                 <field name="name">Trade receivables and related accounts</field>
                                                 <field name="name@fr">Clients et comptes rattachés</field>
                                                 <field name="code">CREANCES_RATTACHES_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_01_2_1_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -790,8 +739,6 @@
                                                 <field name="name">Other receivables</field>
                                                 <field name="name@fr">Autres créances</field>
                                                 <field name="code">AUTRES_CREANCES_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_01_2_2_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                         <field name="label">brut</field>
@@ -814,8 +761,6 @@
                                                 <field name="name">Subscribed capital - called, not paid</field>
                                                 <field name="name@fr">Capital souscrit - appelé , non versé</field>
                                                 <field name="code">CAPITAL_NON_VERSE_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_01_2_3_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -855,8 +800,6 @@
                                                         <field name="name">Own shares</field>
                                                         <field name="name@fr">Actions propres</field>
                                                         <field name="code">ACTIONS_PROPRES_2024</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_line_03_5_1_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                                 <field name="label">brut</field>
@@ -879,8 +822,6 @@
                                                         <field name="name">Other titles</field>
                                                         <field name="name@fr">Autres titres</field>
                                                         <field name="code">AUTRES_TITRES_2024</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_line_03_5_2_fr_bilan_actif_column1_2024" model="account.report.expression">
                                                                 <field name="label">brut</field>
@@ -903,8 +844,6 @@
                                                         <field name="name">Treasury instruments</field>
                                                         <field name="name@fr">Instruments de trésorerie</field>
                                                         <field name="code">INSTRMENTS_TRESORERIE_2024</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_line_03_5_3_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                                 <field name="label">net</field>
@@ -919,8 +858,6 @@
                                                 <field name="name">Availability</field>
                                                 <field name="name@fr">Disponibilités</field>
                                                 <field name="code">DISPONIBILITES_2024</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_03_01_3_2_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                         <field name="label">net</field>
@@ -950,8 +887,6 @@
                                         <field name="name">Prepaid expenses</field>
                                         <field name="name@fr">Charges constatés d'avance</field>
                                         <field name="code">CHARGES_DAVANCE_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_04_01_1_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -964,8 +899,6 @@
                                         <field name="name">Deferred charges (III)</field>
                                         <field name="name@fr">Charges à répartir sur plusieurs exercices (III)</field>
                                         <field name="code">CHARGES_EXERCICES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_04_01_2_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -978,8 +911,6 @@
                                         <field name="name">Loan repayment premiums (IV)</field>
                                         <field name="name@fr">Primes de remboursement des emprunts (IV)</field>
                                         <field name="code">PRIMES_EMPRUNTS_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_04_01_3_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -992,8 +923,6 @@
                                         <field name="name">Translation adjustment assets (V)</field>
                                         <field name="name@fr">Écarts de conversion actif (V)</field>
                                         <field name="code">ECARTS_ACTIF_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_04_01_4_fr_bilan_actif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1036,8 +965,6 @@
                                         <field name="name">Share or individual capital</field>
                                         <field name="name@fr">Capital social ou individuel</field>
                                         <field name="code">CAPITAL_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_01_0_1_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1050,8 +977,6 @@
                                         <field name="name">Trust funds</field>
                                         <field name="name@fr">Fonds fiduciaires</field>
                                         <field name="code">FONDS_FIDUCIAIRES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_01_0_2_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1064,8 +989,6 @@
                                         <field name="name">Share premium, merger premium, contribution premium</field>
                                         <field name="name@fr">Primes d'émission, de fusion, d'apport</field>
                                         <field name="code">PRIMES_DAPPORT_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_01_0_3_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1078,8 +1001,6 @@
                                         <field name="name">Revaluation differences</field>
                                         <field name="name@fr">Écarts de réévaluation</field>
                                         <field name="code">ECARTS_REEVALUTION_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_01_0_4_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1092,8 +1013,6 @@
                                         <field name="name">Equity difference</field>
                                         <field name="name@fr">Écart d'équivalence</field>
                                         <field name="code">ECART_EQUIVALENCE_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_01_0_5_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1121,8 +1040,6 @@
                                         <field name="name">Legal reserve</field>
                                         <field name="name@fr">Réserve légale</field>
                                         <field name="code">RESERVE_LEGALE_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_02_0_1_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1135,8 +1052,6 @@
                                         <field name="name">Regulated reserves</field>
                                         <field name="name@fr">Réserves réglementées</field>
                                         <field name="code">RESERVE_INDISPONIBLE_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_02_0_2_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1149,8 +1064,6 @@
                                         <field name="name">Statutory or contractual reservations</field>
                                         <field name="name@fr">Réserves statutaires ou contractuelles</field>
                                         <field name="code">RESERVE_CONTRACT_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_02_0_3_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1163,8 +1076,6 @@
                                         <field name="name">Regulated reserves</field>
                                         <field name="name@fr">Réserves réglementées</field>
                                         <field name="code">RESERVE_REGLEMENT_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_02_0_4_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1177,8 +1088,6 @@
                                         <field name="name">Other reserves</field>
                                         <field name="name@fr">Autres réserves</field>
                                         <field name="code">AUTRES_RESERVES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_02_0_5_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1195,7 +1104,7 @@
                                             <record id="account_financial_report_line_02_0_6_fr_bilan_passif_past_pnl_2024" model="account.report.expression">
                                                 <field name="label">past_pnl</field>
                                                 <field name="engine">aggregation</field>
-                                                <field name="subformula">cross_report(l10n_fr_reports.account_financial_report_l10n_fr_cdr_2024)</field>
+                                                <field name="subformula">cross_report(l10n_fr_reports.account_financial_report_l10n_fr_cdr_2024, force_date_scope)</field>
                                                 <field name="formula">total_all_2024.balance</field>
                                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
                                             </record>
@@ -1221,7 +1130,7 @@
                                                 <field name="label">net</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">total_all_2024.balance</field>
-                                                <field name="subformula">cross_report(l10n_fr_reports.account_financial_report_l10n_fr_cdr_2024)</field>
+                                                <field name="subformula">cross_report(l10n_fr_reports.account_financial_report_l10n_fr_cdr_2024, force_date_scope)</field>
                                                 <field name="date_scope">from_fiscalyear</field>
                                             </record>
                                         </field>
@@ -1230,8 +1139,6 @@
                                         <field name="name">Investment grants</field>
                                         <field name="name@fr">Subventions d'investissement</field>
                                         <field name="code">SUBVENTIONS_INVEST_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_02_0_8_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1244,8 +1151,6 @@
                                         <field name="name">Regulated provisions</field>
                                         <field name="name@fr">Provisions réglementées</field>
                                         <field name="code">PROVISIONS_REGLEMENT_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_02_0_9_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1273,8 +1178,6 @@
                                         <field name="name">Amount of equity issues</field>
                                         <field name="name@fr">Montant des émissions de titres participatifs</field>
                                         <field name="code">MONTANT_EMISSIONS_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_03_0_1_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1287,8 +1190,6 @@
                                         <field name="name">Conditional advances</field>
                                         <field name="name@fr">Avances conditionnées</field>
                                         <field name="code">AVANCES_CONDITIONNEES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_03_0_2_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1301,8 +1202,6 @@
                                         <field name="name">Liaison accounts</field>
                                         <field name="name@fr">Comptes de liaison</field>
                                         <field name="code">COMPTES_LIAISONS_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_03_0_3_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1330,8 +1229,6 @@
                                         <field name="name">Provisions for risks</field>
                                         <field name="name@fr">Provisions pour risques</field>
                                         <field name="code">PROVISIONS_RISQUES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_04_0_1_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1344,8 +1241,6 @@
                                         <field name="name">Provisions for charges</field>
                                         <field name="name@fr">Provisions pour charges</field>
                                         <field name="code">PROVISIONS_CHARGES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_04_0_2_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1373,8 +1268,6 @@
                                         <field name="name">Convertible bonds</field>
                                         <field name="name@fr">Emprunts obligataires convertibles</field>
                                         <field name="code">EMPRUNTS_CONVERT_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_0_1_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1387,8 +1280,6 @@
                                         <field name="name">Other bonds</field>
                                         <field name="name@fr">Autres emprunts obligataires</field>
                                         <field name="code">AUTRES_OBLIGATAIRES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_0_2_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1401,8 +1292,6 @@
                                         <field name="name">Borrowings and debts with credit institutions</field>
                                         <field name="name@fr">Emprunts et dettes auprès des établissements de crédit</field>
                                         <field name="code">EMPRUNTS_CREDIT_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_0_3_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1415,8 +1304,6 @@
                                         <field name="name">Borrowings and other financial liabilities</field>
                                         <field name="name@fr">Emprunts et dettes financières diverses</field>
                                         <field name="code">EMPRUNTS_DIVERSES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_0_4_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1429,8 +1316,6 @@
                                         <field name="name">Advances and deposits received on orders in progress</field>
                                         <field name="name@fr">Avances et acomptes reçus sur commandes en cours</field>
                                         <field name="code">AVANCES_COURS_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_0_5_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1443,8 +1328,6 @@
                                         <field name="name">Trade payables and related accounts</field>
                                         <field name="name@fr">Dettes fournisseurs et comptes rattachés</field>
                                         <field name="code">DETTES_RATTACHES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_0_6_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1457,8 +1340,6 @@
                                         <field name="name">Tax and social security liabilities</field>
                                         <field name="name@fr">Dettes fiscales et sociales</field>
                                         <field name="code">DETTES_SOCIALES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_0_7_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1471,8 +1352,6 @@
                                         <field name="name">Debts on fixed assets and related accounts</field>
                                         <field name="name@fr">Dettes sur immobilisations et comptes rattachés</field>
                                         <field name="code">DETTES_SUR_RATTACHES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_0_8_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1485,8 +1364,6 @@
                                         <field name="name">Other debts</field>
                                         <field name="name@fr">Autres dettes</field>
                                         <field name="code">AUTRES_DETTES_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_0_9_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1499,8 +1376,6 @@
                                         <field name="name">Deferred income</field>
                                         <field name="name@fr">Produits constatés d'avance</field>
                                         <field name="code">PRODUITS_DAVANCE_2024</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_05_1_0_fr_bilan_passif_column3_2024" model="account.report.expression">
                                                 <field name="label">net</field>
@@ -1516,8 +1391,6 @@
                                 <field name="name">Unrealized foreign exchange gains and losses (V)</field>
                                 <field name="name@fr">Écarts de conversion passif (V)</field>
                                 <field name="code">ECARTS_PASSIF_2024</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_06_0_fr_bilan_passif_column3_2024" model="account.report.expression">
                                         <field name="label">net</field>
@@ -1534,9 +1407,7 @@
                 <field name="name">Off-balance sheet accounts</field>
                 <field name="name@fr">Comptes hors bilan</field>
                 <field name="code">FR_OS_2024</field>
-                <field name="groupby">account_id</field>
                 <field name="hide_if_zero" eval="1"/>
-                <field name="foldable" eval="True"/>
                 <field name="domain_formula">-sum([('account_id.account_type', '=', 'off_balance')])</field>
                 <field name="horizontal_split_side">right</field>
                 <field name="hierarchy_level">0</field>

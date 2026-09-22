@@ -1,8 +1,8 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 
 import { AbstractSpreadsheetAction } from "@spreadsheet_edition/bundle/actions/abstract_spreadsheet_action";
-import { useSubEnv } from "@odoo/owl";
 
 export class SpreadsheetTemplateAction extends AbstractSpreadsheetAction {
     static template = "documents_spreadsheet.SpreadsheetTemplateAction";

@@ -18,7 +18,7 @@ class L10n_AuSuperFund(models.Model):
 
     @api.constrains("bank_account_id", "fund_type", "esa", "usi")
     def _check_bank_account_id(self):
-        smsf_invalid_records = self.filtered(lambda record: record.fund_type == "SMSF" and not (record.bank_account_id and record.bank_account_id.aba_bsb and record.esa))
+        smsf_invalid_records = self.filtered(lambda record: record.fund_type == "SMSF" and not (record.bank_account_id and record.bank_account_id._get_clearing_number('AU') and record.esa))
         if smsf_invalid_records:
             raise ValidationError(_("Electronic service address and a Bank Account with BSB (Bank State Branch) are required for SMSF type Funds."))
         arpa_invalid_records = self.filtered(lambda record: record.fund_type == "APRA" and not record.usi)

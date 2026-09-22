@@ -18,16 +18,16 @@ export class AIRecordsSelectorPlugin extends Plugin {
                 id: "openAIRecordsSelector",
                 title: _t("Records Selector"),
                 description: _t("Insert records"),
-                icon: "fa-tasks",
+                icon: "checklist",
                 run: () => this.open(),
                 isAvailable: (selection) =>
                     !!this.config.recordsSelectorResModel && isHtmlContentSupported(selection),
             },
         ],
-        normalize_handlers: withSequence(-1, this.normalize.bind(this)),
+        normalize_processors: withSequence(-1, this.normalize.bind(this)),
         powerbox_items: { categoryId: "ai_prompt_tools", commandId: "openAIRecordsSelector" },
         selectors_for_feff_providers: () => AI_RECORD_SELECTOR,
-        start_edition_handlers: this.updateDisplayNames.bind(this),
+        on_editor_started_handlers: this.updateDisplayNames.bind(this),
     };
 
     setup() {
@@ -43,6 +43,7 @@ export class AIRecordsSelectorPlugin extends Plugin {
         for (const recordEl of element.querySelectorAll(AI_RECORD_SELECTOR)) {
             recordEl.dataset.oeProtected = true;
         }
+        return element;
     }
 
     async updateDisplayNames() {
@@ -62,7 +63,7 @@ export class AIRecordsSelectorPlugin extends Plugin {
         const recordIds = [...recordEls].map((el) => Number(el.dataset.aiRecordId));
         const displayNames = await this.services.name.loadDisplayNames(
             this.config.recordsSelectorResModel,
-            recordIds,
+            recordIds
         );
         for (const recordEl of recordEls) {
             if (displayNames[recordEl.dataset.aiRecordId] === ERROR_INACCESSIBLE_OR_MISSING) {
@@ -96,7 +97,7 @@ export class AIRecordsSelectorPlugin extends Plugin {
         }
         const displayNames = await this.services.name.loadDisplayNames(
             this.config.recordsSelectorResModel,
-            resIds,
+            resIds
         );
 
         for (const resId of resIds) {
@@ -106,6 +107,6 @@ export class AIRecordsSelectorPlugin extends Plugin {
             this.dependencies.dom.insert(span);
             this.dependencies.dom.insert(resId === resIds.at(-1) ? "\u00A0" : ", ");
         }
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
 }

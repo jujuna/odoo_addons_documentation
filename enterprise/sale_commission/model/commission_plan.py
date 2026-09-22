@@ -5,7 +5,7 @@ import json
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import models, fields, api, Command, _
+from odoo import models, fields, api, Command
 from odoo.exceptions import ValidationError, UserError
 
 
@@ -15,25 +15,39 @@ class SaleCommissionPlan(models.Model):
     _order = 'id'
     _inherit = ['mail.thread']
 
-    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', string='Company', required=True, index=True, default=lambda self: self.env.company)
     active = fields.Boolean(default=True)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', store=True)
 
     name = fields.Char("Name", required=True)
 
-    date_from = fields.Date("From", required=True, default=lambda self: fields.Date.today() + relativedelta(day=1, month=1), tracking=True)
-    date_to = fields.Date("To", required=True, default=lambda self: fields.Date.today() + relativedelta(years=1, day=1, month=1) - relativedelta(days=1), tracking=True)
+    date_from = fields.Date("From", required=True, default=lambda self: fields.Date.context_today(self) + relativedelta(day=1, month=1), tracking=True)
+    date_to = fields.Date("To", required=True, default=lambda self: fields.Date.context_today(self) + relativedelta(years=1, day=1, month=1) - relativedelta(days=1), tracking=True)
     periodicity = fields.Selection([('month', "Monthly"), ('quarter', "Quarterly"), ('year', "Yearly")], required=True, default='quarter', tracking=True)
 
     commission_amount = fields.Monetary("On Target Commission", help='OTC', currency_field='currency_id', default=1000)
 
-    type = fields.Selection([('target', "Targets"), ('achieve', "Achievements")], required=True, default='achieve', tracking=True)
+    type = fields.Selection([('achieve', "Linear"), ('target', "Tiered")], required=True, default='achieve', tracking=True)
     user_type = fields.Selection([('person', "Salesperson"), ('team', "Sales Team")], required=True, default='person', tracking=True)
     team_id = fields.Many2one('crm.team', 'Sale team')
 
     achievement_ids = fields.One2many('sale.commission.plan.achievement', 'plan_id', default=[Command.create({'type': 'amount_invoiced'})], copy=True)
     target_ids = fields.One2many('sale.commission.plan.target', 'plan_id', compute='_compute_targets',
                                  store=True, readonly=False, copy=True)
+    target_type = fields.Selection(
+        [('static', "Static"), ('dynamic', "Dynamic")],
+        compute='_compute_target_type',
+        store=True,
+        help="""Static: Set a target for a given period.\n
+    Dynamic: The target of a salesperson is the sum of the targets of their subordinates on the following plans."""
+    )
+    dynamic_plan_ids = fields.Many2many(
+        'sale.commission.plan',
+        relation='com_dynamic_plan_rel',
+        column1='dynamic_plan_id',
+        column2='other_user_plan_id',
+        help="The dynamic target of a salesperson is the sum of the targets of their subordinates on the following plans. Leave empty to specify a static target in the Targets tab below.",
+    )
     target_commission_ids = fields.One2many('sale.commission.plan.target.commission', 'plan_id',
                                             compute='_compute_target_commission_ids',
                                             inverse='_inverse_target_commission_ids',
@@ -56,19 +70,24 @@ CREATE INDEX IF NOT EXISTS account_move_invoice_user_id_date_idx ON account_move
     def _constrains_target_commission_ids(self):
         for plan in self:
             if plan.type == 'target' and not plan.target_commission_ids.filtered(lambda target: target.target_rate == 0):
-                raise ValidationError(_("The plan should have at least one target with an achievement rate of 0%"))
+                raise ValidationError(self.env._("The plan should have at least one target with an achievement rate of 0%"))
 
     @api.constrains('date_from', 'date_to')
     def _date_constraint(self):
         for plan in self:
             if plan.date_to and plan.date_from and not plan.date_to > plan.date_from:
-                raise ValidationError(_("The start date must be before the end date."))
+                raise ValidationError(self.env._("The start date must be before the end date."))
 
     @api.constrains('team_id', 'user_type')
     def _constrains_team_id(self):
         for plan in self:
             if plan.user_type == 'team' and not plan.team_id:
-                raise ValidationError(_("The team is required in team plan."))
+                raise ValidationError(self.env._("The team is required in team plan."))
+
+    @api.constrains('target_ids', 'target_type')
+    def _constrains_user_ids_date(self):
+        # Ensure the user constraint are enforced on the user_ids
+        self.user_ids._check_dates()
 
     @api.model
     def _date2name(self, dt, periodicity):
@@ -103,10 +122,22 @@ CREATE INDEX IF NOT EXISTS account_move_invoice_user_id_date_idx ON account_move
                 timedelta = relativedelta(years=1, month=1, day=1)
                 date_from = date_from - relativedelta(days=1) + timedelta
 
+            match plan.periodicity:
+                case 'month':
+                    expected_target_duration = range(27, 31)
+                case 'quarter':
+                    expected_target_duration = range(89, 92)
+                case 'year':
+                    expected_target_duration = range(364, 366)
             # Map existing targets and track changes, starting by unlinking out-of-range ones.
             existing_targets = {(t.date_from, t.date_to): t for t in plan.target_ids}
-            target_changes = [Command.unlink(t.id) for t in plan.target_ids if t.date_from < plan.date_from or t.date_to > plan.date_to]
-
+            target_changes = [
+                Command.unlink(t.id) for t in plan.target_ids
+                if (t.date_from < plan.date_from or t.date_to > plan.date_to)      # Doesn't belong to updated period
+                or (t.date_to - t.date_from).days not in expected_target_duration  # Doesn't belong to updated periodicity
+            ]
+            if self.env.context.get('force_target_amount'):
+                plan.target_ids.amount = amount
             while date_from + timedelta - relativedelta(days=1) <= plan.date_to:
                 # Add new targets for missing periods.
                 period_end = date_from + timedelta - relativedelta(days=1)
@@ -120,6 +151,11 @@ CREATE INDEX IF NOT EXISTS account_move_invoice_user_id_date_idx ON account_move
                 date_from += timedelta
             if target_changes:
                 plan.target_ids = target_changes
+
+    @api.depends('dynamic_plan_ids')
+    def _compute_target_type(self):
+        for plan in self:
+            plan.target_type = 'dynamic' if plan.dynamic_plan_ids else 'static'
 
     @api.depends('commission_amount', 'type')
     def _compute_target_commission_ids(self):
@@ -183,7 +219,7 @@ CREATE INDEX IF NOT EXISTS account_move_invoice_user_id_date_idx ON account_move
         return {
             "type": "ir.actions.act_window",
             "res_model": "sale.commission.report",
-            "name": _("Related commissions"),
+            "name": self.env._("Related commissions"),
             "views": [[self.env.ref('sale_commission.sale_commission_report_view_list').id, "list"]],
             "domain": [('plan_id', '=', self.id)],
         }
@@ -196,7 +232,7 @@ CREATE INDEX IF NOT EXISTS account_move_invoice_user_id_date_idx ON account_move
     def copy_data(self, default=None):
         vals_list = super().copy_data(default=default)
         return [
-            dict(vals, name=_("%s (copy)", cp.name), user_ids=self._extract_past_users(vals.get('user_ids', [])))
+            dict(vals, user_ids=self._extract_past_users(vals.get('user_ids', [])))
             for cp, vals in zip(self, vals_list)
         ]
 
@@ -215,7 +251,7 @@ CREATE INDEX IF NOT EXISTS account_move_invoice_user_id_date_idx ON account_move
     def action_export_targets(self):
         self.ensure_one()
         if self.type != 'target':
-            raise UserError(_("Exporting targets is only available for plans based on targets"))
+            raise UserError(self.env._("Exporting targets is only available for plans based on targets"))
         return {
             "type": "ir.actions.act_url",
             "url": f"/sale_commission/export/targets/{self.id}",

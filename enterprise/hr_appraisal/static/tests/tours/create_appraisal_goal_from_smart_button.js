@@ -16,7 +16,7 @@ registry.category("web_tour.tours").add("appraisals_create_appraisal_goal_from_s
             run: "click",
         },
         {
-            trigger: "h1 > div[name='name'] > input",
+            trigger: "h1 > div[name='name'] input",
             content: "Fill mandatory goal name input",
             run: "fill Goal Name",
         },
@@ -39,7 +39,7 @@ registry.category("web_tour.tours").add("employees_create_appraisal_goal_from_sm
             run: "click",
         },
         {
-            trigger: "h1 > div[name='name'] > input",
+            trigger: "h1 > div[name='name'] input",
             content: "Fill mandatory goal name input",
             run: "fill Goal Name",
         },

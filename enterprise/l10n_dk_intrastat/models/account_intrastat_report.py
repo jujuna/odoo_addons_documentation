@@ -2,7 +2,6 @@
 
 import copy
 import io
-import zipfile
 
 from odoo import api, models, _
 from odoo.exceptions import UserError
@@ -71,7 +70,7 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
                 'file_content': xlsx_files[0][1],
                 'file_type': 'xlsx',
             }
-        return self._dk_build_zip_response(report, options, xlsx_files)
+        return self._build_zip_response(report, options, xlsx_files)
 
     @api.model
     def _dk_prepare_options(self, options, col_order, intrastat_type):
@@ -88,9 +87,9 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
 
         options_copy['columns'] = self._dk_format_columns_options(col_order, options_copy)
 
-        Move = self.env['account.move']
-        move_types = Move.get_outbound_types(False) if intrastat_type == 'arrivals' else Move.get_inbound_types(False)
-        options_copy.setdefault('forced_domain', []).append(('move_id.move_type', 'in', move_types))
+        options_copy.setdefault('forced_domain', []).append(
+            ('move_id.move_type', 'in', self._get_move_types_for_intrastat(intrastat_type))
+        )
 
         return options_copy
 
@@ -154,8 +153,7 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
         The first row is the column titles
         """
         expressions = report.line_ids.expression_ids
-        report._init_currency_table(options)
-        lines = self._report_custom_engine_intrastat(expressions, options, expressions[0].date_scope, 'id', None)
+        lines = self._report_engine_intrastat(options, expressions[0].date_scope, expressions.grouped('formula'), 'id', None)[expressions]
         for index, line_result in enumerate(lines):
             lines[index] = line_result[1]
 
@@ -198,17 +196,3 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
         for line_offset, line in enumerate(results):
             for col_offset, value in enumerate(line):
                 sheet.write(line_offset, col_offset, value, title_style if line_offset == 0 else line_style)
-
-    @api.model
-    def _dk_build_zip_response(self, report, options, xlsx_files):
-        """ Build a ZIP response containing both arrivals and dispatches XLSX files """
-        with io.BytesIO() as buffer:
-            with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_DEFLATED) as zipfile_obj:
-                for filename, file_content in xlsx_files:
-                    zipfile_obj.writestr(filename, file_content)
-
-            return {
-                'file_name': report.get_default_report_filename(options, 'zip'),
-                'file_content': buffer.getvalue(),
-                'file_type': 'zip',
-            }

@@ -8,8 +8,8 @@ class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
     @api.model
-    def _generate_all_returns(self, country_code, main_company, tax_unit=None):
-        rslt = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit)
+    def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
+        rslt = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)
 
         oss_tax_domain = [
             ('repartition_line_ids.tag_ids', 'in', self.env.ref('l10n_eu_oss.tag_oss').ids),
@@ -39,14 +39,6 @@ class AccountReturnType(models.Model):
 class AccountReturn(models.Model):
     _inherit = 'account.return'
 
-    def _get_amount_to_pay_additional_tax_domain(self):
-        oss_domain = [('repartition_line_ids', 'any', [('tag_ids', 'in', self.env.ref('l10n_eu_oss.tag_oss').ids)])]
-
-        if self.type_external_id in ('l10n_eu_oss_reports.eu_oss_sales_tax_return_type', 'l10n_eu_oss_reports.eu_oss_imports_tax_return_type'):
-            return oss_domain
-        else:
-            return [*super()._get_amount_to_pay_additional_tax_domain(), '!', *oss_domain]
-
     def _get_vat_closing_entry_additional_domain(self):
         if self.type_external_id == 'l10n_eu_oss_reports.eu_oss_sales_tax_return_type':
             domain = [
@@ -65,13 +57,13 @@ class AccountReturn(models.Model):
         domain += [('tax_tag_ids', 'not in', self.env.ref('l10n_eu_oss.tag_oss').ids)]
         return domain
 
-    def action_submit(self):
+    def _prepare_submission(self):
         oss_wizard_country_codes = ('BE', 'LU')
         oss_return_types = ('l10n_eu_oss_reports.eu_oss_sales_tax_return_type', 'l10n_eu_oss_reports.eu_oss_imports_tax_return_type')
         if self.company_id.account_fiscal_country_id.code in oss_wizard_country_codes and self.type_external_id in oss_return_types:
             return self.env['l10n_eu_oss_reports.return.submission.wizard']._open_submission_wizard(self)
 
-        return super().action_submit()
+        return super()._prepare_submission()
 
     def _run_checks(self, check_codes_to_ignore):
         checks = super()._run_checks(check_codes_to_ignore)

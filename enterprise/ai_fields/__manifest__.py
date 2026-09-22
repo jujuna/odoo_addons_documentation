@@ -9,7 +9,7 @@ using an AI model and a system prompt.
     'category': 'Hidden',
     'version': '0.1',
     'author': 'Odoo S.A.',
-    'license': 'LGPL-3',
+    'license': 'OEEL-1',
     'depends': ['ai'],
     'auto_install': True,
     'data': [

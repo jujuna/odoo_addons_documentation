@@ -9,11 +9,17 @@ class EsgOtherEmission(models.Model):
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company)
     date = fields.Date(required=True)
     date_end = fields.Date()
-    esg_emission_factor_id = fields.Many2one('esg.emission.factor', string='Emission Factor', required=True, index='btree_not_null')
+    esg_emission_factor_id = fields.Many2one(
+        'esg.emission.factor',
+        string='Emission Factor',
+        required=True,
+        index='btree_not_null',
+        help='A value that quantifies the amount of greenhouse gas emissions produced per unit of activity.',
+    )
     note = fields.Text()
     quantity = fields.Integer(default=1, required=True)
-    esg_emissions_value = fields.Float(string='Emissions (kgCO₂e)', compute='_compute_esg_emissions_value')
-    esg_uncertainty_absolute_value = fields.Float(string='Uncertainty (kgCO₂e)', compute='_compute_esg_uncertainty_absolute_value')
+    esg_emissions_value = fields.Float(string='Emissions', compute='_compute_esg_emissions_value', digits='Carbon Emissions')
+    esg_uncertainty_absolute_value = fields.Float(string='Uncertainty (kgCO₂e)', compute='_compute_esg_uncertainty_absolute_value', digits='Carbon Emissions')
     esg_uncertainty_value = fields.Float(related='esg_emission_factor_id.esg_uncertainty_value')
     uom_id = fields.Many2one('uom.uom', string='Unit of Measure', compute='_compute_uom_id', store=True, readonly=False)
     currency_id = fields.Many2one('res.currency', compute='_compute_currency_id', store=True, readonly=False)
@@ -25,12 +31,21 @@ class EsgOtherEmission(models.Model):
         for emission in self:
             if emission.compute_method == 'monetary':
                 if emission.currency_id and emission.esg_emission_factor_id.currency_id:
-                    emission.esg_emission_multiplicator = emission.esg_emission_factor_id.currency_id._convert(emission.quantity, emission.currency_id)
+                    emission.esg_emission_multiplicator = emission.currency_id._convert(
+                        from_amount=emission.quantity,
+                        to_currency=emission.esg_emission_factor_id.currency_id,
+                        date=emission.date,
+                        round=False,
+                    )
                 else:
                     emission.esg_emission_multiplicator = 0
             else:
                 if emission.uom_id and emission.esg_emission_factor_id.uom_id:
-                    emission.esg_emission_multiplicator = emission.esg_emission_factor_id.uom_id._compute_quantity(emission.quantity, emission.uom_id)
+                    emission.esg_emission_multiplicator = emission.uom_id._compute_quantity(
+                        qty=emission.quantity,
+                        to_unit=emission.esg_emission_factor_id.uom_id,
+                        round=False,
+                    )
                 else:
                     emission.esg_emission_multiplicator = 0
 
@@ -59,7 +74,3 @@ class EsgOtherEmission(models.Model):
                 emission.currency_id = False
             else:
                 emission.currency_id = emission.esg_emission_factor_id.currency_id
-
-    def copy_data(self, default=None):
-        vals_list = super().copy_data(default=default)
-        return [dict(vals, name=self.env._("%s (copy)", emission.name)) for emission, vals in zip(self, vals_list)]

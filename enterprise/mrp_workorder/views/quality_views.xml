@@ -6,20 +6,24 @@
         <field name="inherit_id" ref="quality.quality_point_view_form"/>
         <field name="arch" type="xml">
             <field name="test_type_id" position="after">
-                <field name="component_ids" invisible="1"/>
                 <field name="bom_product_ids" invisible="1"/>
-                <field name="component_id" invisible="not is_workorder_step or not operation_id or test_type not in ('register_byproducts', 'register_consumed_materials')" required="test_type in ('register_byproducts', 'register_consumed_materials')" domain="[('id', 'in', component_ids), '|', ('company_id', '=', company_id), ('company_id', '=', False)]"/>
-                <field name="test_report_type" widget="selection" invisible="test_type != 'print_label'"/>
+                <field name="bom_line_id" string="Component To Register" invisible="not is_workorder_step or not operation_id or test_type != 'register_consumed_materials'" required="1" options="{'no_create': True}"/>
+                <field name="byproduct_id" string="By-Product To Register" invisible="not is_workorder_step or not operation_id or test_type != 'register_byproducts'" required="1" options="{'no_create': True}"/>
+                <field name="product_label_format" widget="selection" invisible="test_type != 'print_product_label'"/>
+                <field name="lot_label_format" widget="selection" invisible="test_type != 'print_lot_label'"/>
+            </field>
+            <field name="apply_to" position="attributes">
+                <attribute name="invisible">operation_id</attribute>
             </field>
             <field name="picking_type_ids" position="after">
                 <field string="Work Order Operation" name="operation_id" invisible="not is_workorder_step" groups="mrp.group_mrp_routings" options="{'no_create': True}"/>
                 <field name="is_workorder_step" invisible="1"/>
             </field>
             <field name="product_category_ids" position="attributes">
-                <attribute name="invisible">is_workorder_step and operation_id</attribute>
+                <attribute name="invisible" add="is_workorder_step and operation_id" separator="or"/>
             </field>
             <xpath expr="//page[@name='instructions']" position="after">
-                <page string="Worksheet" name="worksheet">
+                <page string="Attachment" name="worksheet" invisible="not operation_id">
                     <div invisible="worksheet_document" class="d-flex justify-content-center o_nocontent_help">
                         <p class="o_view_nocontent_worksheet">No worksheet yet !</p>
                     </div>
@@ -53,7 +57,7 @@
                 <field name="test_type_id" string="Type"/>
                 <field name="name"/>
                 <field name="worksheet_document" column_invisible="1"/>
-                <button name="action_view_worksheet_document" class="btn-link" string="Worksheet" type="object" invisible="not worksheet_document"/>
+                <button name="action_view_worksheet_document" class="btn-link" string="Attachment" type="object" invisible="not worksheet_document"/>
             </list>
         </field>
     </record>
@@ -65,8 +69,8 @@
         <field name="mode">primary</field>
         <field name="priority">10000</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="invisible">not id</attribute>
+            <xpath expr="//field[@name='apply_to']" position="attributes">
+                <attribute name="invisible">True</attribute>
             </xpath>
             <xpath expr="//field[@name='product_category_ids']" position="attributes">
                 <attribute name="invisible">True</attribute>
@@ -85,6 +89,9 @@
             </xpath>
             <xpath expr="//field[@name='user_id']" position="attributes">
                 <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//page[@name='worksheet']" position="attributes">
+                <attribute name="invisible">0</attribute>
             </xpath>
         </field>
     </record>
@@ -150,7 +157,7 @@
                 </group>
                 <footer>
                     <button class="btn btn-primary" type="object" name="add_check_in_chain" string="Propose Change"/>
-                    <button class="btn btn-secondary" type="object" special="cancel" string="Discard"/>
+                    <button class="btn btn-secondary" type="object" special="cancel"/>
                 </footer>
             </form>
         </field>

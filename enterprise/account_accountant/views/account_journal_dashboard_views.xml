@@ -5,7 +5,7 @@
         <field name="inherit_id" ref="account.account_journal_dashboard_kanban_view"/>
         <field name="arch" type="xml">
             <kanban position="attributes">
-                <attribute name="on_create">account_accountant.action_journal_create_wizard</attribute>
+                <attribute name="create">false</attribute>
             </kanban>
 
             <xpath expr="//div[@id='sale_purchase_refund']" position="after">
@@ -16,15 +16,6 @@
             <!-- The following section handles the reconcile button -->
             <xpath expr="//div[@name='bank_cash_buttons']" position="inside">
                 <button t-if="dashboard.number_to_reconcile > 0" type="object" name="action_open_reconcile" class="btn btn-secondary d-block text-nowrap" groups="account.group_account_basic"><t t-out="dashboard.number_to_reconcile"/> to reconcile</button>
-            </xpath>
-
-            <xpath expr="//div[@name='latest_statement']//span" position="replace">
-                <a type="object"
-                   name="action_open_reconcile_statement"
-                   title="Latest Statement"
-                   t-att-context="{'statement_id': dashboard.last_statement_id}">
-                    Last Statement
-                </a>
             </xpath>
 
             <xpath expr="//div[@id='dashboard_bank_cash_right']" position="inside">

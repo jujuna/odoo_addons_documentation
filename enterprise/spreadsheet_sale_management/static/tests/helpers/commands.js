@@ -1,15 +1,20 @@
-import { helpers } from "@odoo/o-spreadsheet";
+import { helpers, stores } from "@odoo/o-spreadsheet";
 
+import { makeStoreWithModel } from "@spreadsheet/../tests/helpers/stores";
 import { createModelWithDataSource } from "@spreadsheet/../tests/helpers/model";
 import { getSaleOrderSpreadsheetData } from "./data";
 
+const { AutofillStore, ClipboardStore } = stores;
 const { toCartesian, toZone } = helpers;
 
 export async function createSaleOrderSpreadsheetModel() {
     const data = getSaleOrderSpreadsheetData();
-    return createModelWithDataSource({
+    const returnValue = await createModelWithDataSource({
         spreadsheetData: data,
     });
+    makeStoreWithModel(returnValue.model, AutofillStore);
+    makeStoreWithModel(returnValue.model, ClipboardStore);
+    return returnValue;
 }
 
 /**

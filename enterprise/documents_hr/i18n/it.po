@@ -7,15 +7,15 @@
 # Friederike Fasterling-Nesselbosch, 2022
 # Sergio Zanchetta <primes2h@gmail.com>, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-10 11:12+0000\n"
-"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 02:05+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
 "documents_hr/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -23,12 +23,14 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
-msgstr "<i class=\"fa fa-download fa-fw\"/> Scarica file"
+#: model:ir.module.module,description:base.module_documents_hr
+msgid ""
+"\n"
+"Easily access your documents from your employee profile.\n"
+msgstr ""
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
@@ -39,6 +41,11 @@ msgstr "<span class=\"o_form_label\">Tag predefiniti</span>"
 #: model:documents.tag,name:documents_hr.documents_tag_absences
 msgid "Absences"
 msgstr "Assenze"
+
+#. module: documents_hr
+#: model:ir.module.module,summary:base.module_documents_hr
+msgid "Access documents from the employee profile"
+msgstr ""
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
@@ -71,8 +78,8 @@ msgstr ""
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_res_company
-msgid "Companies"
-msgstr "Aziende"
+msgid "Company"
+msgstr "Azienda"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_res_config_settings
@@ -80,8 +87,6 @@ msgid "Config Settings"
 msgstr "Impostazioni di configurazione"
 
 #. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
 #: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_contracts_tags
 msgid "Contracts"
 msgstr "Contratti"
@@ -94,7 +99,6 @@ msgstr "Contratti (HR)"
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_documents_document__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_documents_redirect__display_name
-#: model:ir.model.fields,field_description:documents_hr.field_documents_tag__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_version__display_name
@@ -109,36 +113,26 @@ msgid "Document"
 msgstr "Documento"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__document_count
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__document_count
-msgid "Document Count"
-msgstr "Numero documenti"
-
-#. module: documents_hr
 #: model:ir.model,name:documents_hr.model_documents_redirect
 msgid "Document Redirect"
 msgstr "Rimando documento"
 
 #. module: documents_hr
+#: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__document_count
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_public_view_form
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_view_form
 msgid "Documents"
 msgstr "Documenti"
 
 #. module: documents_hr
+#: model:ir.module.module,shortdesc:base.module_documents_hr
+msgid "Documents - HR"
+msgstr ""
+
+#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_contracts_tags
 msgid "Documents Hr Contracts Tags"
 msgstr "Etichette documenti per contratti RU"
-
-#. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_settings
-msgid "Documents Hr Settings"
-msgstr "Impostazioni documenti RU"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "Download file"
-msgstr "Scarica file"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_employee
@@ -181,9 +175,29 @@ msgid "Employees Subfolders"
 msgstr "Sottocartelle dipendenti"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__hr_employee_contract_folder_id
-msgid "HR Employee Contract Folder"
-msgstr "Cartella contratto dipendente HR"
+#: model:ir.model.fields,help:documents_hr.field_res_company__documents_hr_group_id
+#: model:ir.model.fields,help:documents_hr.field_res_config_settings__documents_hr_group_id
+msgid ""
+"Group given editor access on the employees folders created from now on. "
+"Changing it does not affect the existing folders."
+msgstr ""
+
+#. module: documents_hr
+#. odoo-python
+#: code:addons/documents_hr/models/res_company.py:0
+msgid "HR (%(company_name)s)"
+msgstr ""
+
+#. module: documents_hr
+#: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
+msgid "HR Access Group"
+msgstr ""
+
+#. module: documents_hr
+#: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_group_id
+#: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_group_id
+msgid "HR Documents Default Group"
+msgstr ""
 
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__hr_employee_folder_id
@@ -191,14 +205,8 @@ msgid "HR Employee Folder"
 msgstr "Cartella dipendenti HR"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_settings
-msgid "Human Resources"
-msgstr "Risorse umane"
-
-#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_documents_document__id
 #: model:ir.model.fields,field_description:documents_hr.field_documents_redirect__id
-#: model:ir.model.fields,field_description:documents_hr.field_documents_tag__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_version__id
@@ -210,15 +218,8 @@ msgstr "ID"
 #. module: documents_hr
 #. odoo-python
 #: code:addons/documents_hr/models/documents_document.py:0
-msgid "Impossible to delete employee folder or employee 'Contract' folder"
+msgid "Impossible to delete an employee folder"
 msgstr ""
-"Impossibile eliminare la cartella del dipendente o la cartella \"Contratto\" "
-"del dipendente"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "My documents"
-msgstr "I miei documenti"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_employee_public
@@ -226,19 +227,10 @@ msgid "Public Employee"
 msgstr "Dipendente pubblico"
 
 #. module: documents_hr
-#: model:documents.tag,name:documents_hr.document_tag_signature_request
-msgid "Signature Request"
-msgstr "Richiesta di firma"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "Size:"
-msgstr "Dimensione:"
-
-#. module: documents_hr
-#: model:ir.model,name:documents_hr.model_documents_tag
-msgid "Tag"
-msgstr "Etichetta"
+#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__document_count
+#: model:ir.model.fields,field_description:documents_hr.field_hr_version__document_count
+msgid "Related Document Count"
+msgstr "Numero documenti correlati"
 
 #. module: documents_hr
 #. odoo-python
@@ -246,163 +238,48 @@ msgstr "Etichetta"
 msgid "You cannot access the employee's folder."
 msgstr "Non puoi accedere alla cartella del dipendente."
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/documents_tag.py:0
-msgid ""
-"You cannot delete this tag as it is used to link employee contracts and "
-"signatures."
-msgstr ""
-"Non è possibile eliminare il tag perché utilizzato per collegare contratti e "
-"firme del dipendente."
+#~ msgid "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download file"
+#~ msgstr "<i class=\"oi oi-fw\" data-icon=\"download\"/> Scarica file"
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
-msgid ""
-"You must configure the HR Employee folder in document settings to use "
-"Document's features."
-msgstr ""
-"Per utilizzare le funzioni del modulo Documenti è necessario configurare la "
-"cartella Dipendente HR nelle impostazioni del documento."
+#~ msgid "Document Count"
+#~ msgstr "Numero documenti"
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
-msgid ""
-"You must have a contact linked to the employee in order to use Document's "
-"features."
-msgstr ""
-"Per usare le funzionalità del modulo Documenti è necessario disporre di un "
-"contatto collegato al dipendente."
+#~ msgid "Documents Hr Settings"
+#~ msgstr "Impostazioni documenti RU"
+
+#~ msgid "Download file"
+#~ msgstr "Scarica file"
+
+#~ msgid "HR Employee Contract Folder"
+#~ msgstr "Cartella contratto dipendente HR"
+
+#~ msgid "Human Resources"
+#~ msgstr "Risorse umane"
+
+#~ msgid "Impossible to delete employee folder or employee 'Contract' folder"
+#~ msgstr ""
+#~ "Impossibile eliminare la cartella del dipendente o la cartella "
+#~ "\"Contratto\" del dipendente"
+
+#~ msgid "My documents"
+#~ msgstr "I miei documenti"
+
+#~ msgid "Payroll"
+#~ msgstr "Libro paga"
+
+#~ msgid "Size:"
+#~ msgstr "Dimensione:"
 
 #~ msgid ""
-#~ "<span name=\"documents_hr_tags\" class=\"o_form_label\" invisible=\"1\" "
-#~ "attrs=\"{'invisible' : [('documents_hr_settings', '=', False)]}\">\n"
-#~ "                                Default tags\n"
-#~ "                            </span>"
+#~ "You must configure the HR Employee folder in document settings to use "
+#~ "Document's features."
 #~ msgstr ""
-#~ "<span name=\"documents_hr_tags\" class=\"o_form_label\" invisible=\"1\" "
-#~ "attrs=\"{'invisible' : [('documents_hr_settings', '=', False)]}\">\n"
-#~ "                                Etichette predefinite\n"
-#~ "                            </span>"
+#~ "Per utilizzare le funzioni del modulo Documenti è necessario configurare "
+#~ "la cartella Dipendente HR nelle impostazioni del documento."
 
 #~ msgid ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
-#~ "        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
-#~ "\">\n"
-#~ "            Dear <t t-esc=\"object.name\"></t>, your personal documents "
-#~ "access link is available for you.<br><br>\n"
-#~ "            You'll find all your personal HR documents in this folder."
-#~ "<br><br>\n"
-#~ "            Please keep this link secure.<br><br>\n"
-#~ "            <div style=\"text-align: center; padding: 16px 0px 16px 0px; "
-#~ "font-size: 14px;\">\n"
-#~ "                <a t-attf-href=\"{{ object.documents_share_id.full_url }}"
-#~ "\" target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px "
-#~ "8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-"
-#~ "size:13px;\">\n"
-#~ "                    Your Documents\n"
-#~ "                </a>\n"
-#~ "            </div>\n"
-#~ "            Have a nice day,<br>\n"
-#~ "            The HR Team\n"
-#~ "        </td></tr>\n"
-#~ "    </tbody></table>\n"
-#~ "                "
-#~ msgstr ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-#~ "style=\"width:100%; margin:0px auto;\"><tbody>\n"
-#~ "        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
-#~ "\">\n"
-#~ "            Gentile <t t-esc=\"object.name\"></t>, il link di accesso ai "
-#~ "tuoi documenti personali è disponibile.<br><br>\n"
-#~ "            Troverai tutti i tuoi documenti personali relativi alle "
-#~ "risorse umane in questa cartella.<br><br>\n"
-#~ "            Mantieni al sicuro il link.<br><br>\n"
-#~ "            <div style=\"text-align: center; padding: 16px 0px 16px 0px; "
-#~ "font-size: 14px;\">\n"
-#~ "                <a t-attf-href=\"{{ object.documents_share_id.full_url }}"
-#~ "\" target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px "
-#~ "8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-"
-#~ "size:13px;\">\n"
-#~ "                    I tuoi documenti\n"
-#~ "                </a>\n"
-#~ "            </div>\n"
-#~ "            Ti auguriamo una buona giornata,<br>\n"
-#~ "            Il team risorse umane\n"
-#~ "        </td></tr>\n"
-#~ "    </tbody></table>\n"
-#~ "                "
-
-#~ msgid "Departure Wizard"
-#~ msgstr "Procedura di uscita"
-
-#~ msgid "Documents Share"
-#~ msgstr "Condividere dei documenti"
-
-#~ msgid ""
-#~ "Employee's private email must be set to use \"Send Access Link\" "
-#~ "function:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "L'indirizzo e-mail privato del dipendente deve essere configurato per "
-#~ "utilizzare la funzione \"Invia link accesso\":\n"
-#~ "%s"
-
-#~ msgid "HR"
-#~ msgstr "RU"
-
-#~ msgid "HR Documents: %s"
-#~ msgstr "Documenti HR: %s"
-
-#~ msgid "HR: Document Access Link"
-#~ msgstr "Risorse umane: link accesso documenti"
-
-#~ msgid "Private Email"
-#~ msgstr "E-mail privata"
-
-#~ msgid "Send Access Link"
-#~ msgstr "Invio link di accesso"
-
-#~ msgid "Send HR Documents Access Link"
-#~ msgstr "Invio Link di accesso documenti HR"
-
-#~ msgid ""
-#~ "Send a share link to the private email of the employee with all the HR "
-#~ "files he owns in Documents app"
-#~ msgstr ""
-#~ "Invia un link condiviso all'indirizzo e-mail privato del dipendente con "
-#~ "tutti i file relativi alle risorse umane che possiede nell'app Documenti"
-
-#~ msgid "Sent manually when recording an employee departure"
-#~ msgstr ""
-#~ "E-mail inviata manualmente quando si registra l'esodo di un dipendente"
-
-#~ msgid "The access link has been sent to the employee."
-#~ msgstr "Il link di accesso è stato inviato al dipendente."
-
-#~ msgid "User"
-#~ msgstr "Utente"
-
-#~ msgid "Workspace"
-#~ msgstr "Spazio di lavoro"
-
-#~ msgid ""
-#~ "You must set a private address on the Employee in order to use Document's "
+#~ "You must have a contact linked to the employee in order to use Document's "
 #~ "features."
 #~ msgstr ""
-#~ "È necessario configurare un indirizzo privato per il dipendente per poter "
-#~ "utilizzare le funzionalità di Odoo Documenti."
-
-#~ msgid "hr Workspace"
-#~ msgstr "Spazio di lavoro RU"
-
-#~ msgid "hr default workspace"
-#~ msgstr "Spazio di lavoro predefinito RU"
-
-#~ msgid "{{ object.name }}, your personal documents access link is available"
-#~ msgstr ""
-#~ "{{ object.name }},  il link di accesso ai tuoi documenti personali è "
-#~ "disponibile"
+#~ "Per usare le funzionalità del modulo Documenti è necessario disporre di "
+#~ "un contatto collegato al dipendente."

@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Helpdesk Stock',
     'category': 'Services/Helpdesk',
     'summary': 'Project, Tasks, Stock',
-    'depends': ['helpdesk_sale', 'stock'],
+    'depends': ['helpdesk_sale', 'sale_stock'],
     'description': """
 Manage Product returns from helpdesk tickets
     """,
@@ -14,6 +13,7 @@ Manage Product returns from helpdesk tickets
         'views/stock_picking_views.xml',
         'views/helpdesk_ticket_views.xml',
         'data/mail_templates.xml',
+        'security/ir.access.csv',
     ],
     'demo': ['data/helpdesk_stock_demo.xml'],
     'author': 'Odoo S.A.',

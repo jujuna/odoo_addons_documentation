@@ -4,43 +4,15 @@
         min-width: 3rem;
         field-sizing: content;
     }
-}
-
-.o_gantt_popover:has(.o_appointment_gantt_popover_kanban_card) {
-    max-width: 400px;
-    min-width: 300px;
-    width: auto;
-
-    @for $i from 1 through length($o-web-calendar-colors) {
-        .popover-header.o_gantt_color_#{$i - 1}{
-            $-calendar-colors-map: nth($o-web-calendar-colors, $i);
-            background-color: map-get($-calendar-colors-map, "popover-background-color");
-            color: map-get($-calendar-colors-map, "popover-color");
-        }
+    // fit input to modal width
+    .o_field_many2many_tags[name="resource_ids"] .o_tags_input {
+        width: 100%;
     }
 }
 
-.o_appointment_gantt_popover_kanban_card {
-    // As it's not an actual kanban card, it's not actually clickable
-    &.cursor-pointer { 
-        cursor: default !important;
-    }
-
-    div.d-flex > i.fa {
-        text-align: center;
-        min-width: 1.25rem;
-    }
-
-    .o_field_many2one.o_readonly_modifier {
-        max-width: 17em;
-    }
-    
-    .o_field_CopyClipboardChar {
-        max-width: 17em;
-    }
-    
-    .o_appointment_gantt_popover_html_field {
-        max-height: 8rem;
-        overflow-y: overlay;
+@for $index from 1 through length($o-colors-complete) {
+    .o_appointment_status_btns_container .o_appointment_status_btn_color_#{$index - 1} {
+        $gantt-color: nth($o-colors-complete, $index);
+        @include o-gantt-colors($gantt-color);
     }
 }

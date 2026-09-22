@@ -1,8 +1,10 @@
-import { Component, onMounted, useState } from "@odoo/owl";
+import { Component, onMounted, proxy } from "@odoo/owl";
 
 import { tabComponents } from "@voip/softphone/tab";
 
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { Dropdown } from "@web/core/dropdown/dropdown";
+import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { useDebounced } from "@web/core/utils/timing";
@@ -12,27 +14,28 @@ import { useDebounced } from "@web/core/utils/timing";
  * to handle today.
  */
 export class Agenda extends Component {
-    static components = tabComponents;
-    static defaultProps = { extraClass: "" };
-    static props = { extraClass: { type: String, optional: true } };
+    static components = { ...tabComponents, Dropdown, DropdownItem };
     static template = "voip.Agenda";
 
     setup() {
         this.action = useService("action");
         this.dialog = useService("dialog");
         this.orm = useService("orm");
-        this.userAgent = useService("voip.user_agent");
+        this.store = useService("mail.store");
         this.voip = useService("voip");
+        this.userAgent = this.voip.userAgent;
         this.ui = useService("ui");
         onMounted(() => this.voip.fetchTodayCallActivities());
-        this.state = useState(this.voip.softphone.agenda);
+        this.state = proxy(this.voip.softphone.agenda);
+        // bound once: the Tab receives it as a prop and calls it as its own
+        this.getSectionStyle = this.getSectionStyle.bind(this);
         this.onInputSearch = useDebounced(() => this.voip.fetchTodayCallActivities(), 300);
     }
 
     get activitiesByDate() {
         const activities = [...this.voip.softphone.activities];
         activities.sort((a, b) => a.date_deadline - b.date_deadline);
-        const today = luxon.DateTime.now();
+        const today = this.store.startOfToday;
         const yesterday = today.minus({ days: 1 });
         const tomorrow = today.plus({ days: 1 });
         return Map.groupBy(activities, (activity) => {
@@ -53,7 +56,7 @@ export class Agenda extends Component {
     }
 
     getExtraClass(activity) {
-        const today = luxon.DateTime.now().startOf("day");
+        const today = this.store.startOfToday;
         if (today > activity.date_deadline) {
             return "border-start border-danger border-2";
         }
@@ -64,7 +67,7 @@ export class Agenda extends Component {
     }
 
     getSectionStyle(activity) {
-        const today = luxon.DateTime.now().startOf("day");
+        const today = this.store.startOfToday;
         if (today > activity.date_deadline) {
             return "text-danger";
         }
@@ -72,16 +75,6 @@ export class Agenda extends Component {
             return "text-warning";
         }
         return "";
-    }
-
-    onClickActivity(activity) {
-        this.action.doAction({
-            type: "ir.actions.act_window",
-            res_model: activity.res_model,
-            res_id: activity.res_id,
-            views: [[false, "form"]],
-            target: this.ui.isSmall ? "new" : "current",
-        });
     }
 
     onClickCall(activity) {
@@ -101,7 +94,7 @@ export class Agenda extends Component {
                 activity.remove();
             },
             confirmLabel: _t("Yes, I know what I'm doing"),
-            cancelLabel: _t("Missclicked, sorry"),
+            cancelLabel: _t("Misclicked, sorry"),
         });
     }
 

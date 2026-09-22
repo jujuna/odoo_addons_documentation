@@ -1,14 +1,15 @@
-import { Component, useRef } from "@odoo/owl";
 import { setupDisplayName } from "../planning_hooks";
+import { Component, signal, t, useProps } from "@odoo/owl";
 
 export class PlanningMaterialRole extends Component {
     static template = "planning.PlanningMaterialRole";
-    static props = {
-        displayName: { type: String },
-    };
+
+    props = useProps({
+        displayName: t.string(),
+    });
 
     setup() {
-        const displayNameRef = useRef("displayName");
-        setupDisplayName(displayNameRef);
+        this.displayNameRef = signal.ref();
+        setupDisplayName(this.displayNameRef);
     }
 }

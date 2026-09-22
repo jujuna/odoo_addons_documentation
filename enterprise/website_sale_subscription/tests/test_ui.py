@@ -9,8 +9,10 @@ from odoo.addons.website_sale_subscription.tests.common import WebsiteSaleSubscr
 @tagged('-at_install', 'post_install')
 class TestWebsiteSaleSubscriptionUi(HttpCase, WebsiteSaleSubscriptionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_website_sale_subscription_ui(self):
-        self.start_tour("/odoo", 'shop_buy_subscription_product', login='admin')
+        self.start_tour("/shop", 'shop_buy_subscription_product', login='admin')
 
     def test_website_sale_subscription_product_variants(self):
         product_attribute = self.env['product.attribute'].create({

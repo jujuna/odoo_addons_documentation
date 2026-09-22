@@ -15,20 +15,24 @@ class LazadaItem(models.Model):
     Used for inventory synchronization from Odoo to Lazada.
     """
 
-    _name = 'lazada.item'
+    _name = "lazada.item"
     _description = "Lazada Item"
     _check_company_auto = True
 
     shop_id = fields.Many2one(
-        string="Shop", comodel_name='lazada.shop', ondelete='cascade', required=True, index=True
+        string="Shop", comodel_name="lazada.shop", ondelete="cascade", required=True, index=True
     )
     product_id = fields.Many2one(
-        comodel_name='product.product', ondelete='cascade', required=True, check_company=True
+        comodel_name="product.product",
+        ondelete="cascade",
+        required=True,
+        index=True,
+        check_company=True,
     )
     product_tmpl_id = fields.Many2one(
-        string="Product Template", related='product_id.product_tmpl_id'
+        string="Product Template", related="product_id.product_tmpl_id"
     )
-    company_id = fields.Many2one(related='shop_id.company_id')
+    company_id = fields.Many2one(related="shop_id.company_id")
     lazada_sku = fields.Char(
         string="Lazada SKU",
         help="The SKU of the item in Lazada. Odoo can match the product when the Lazada SKU is "
@@ -47,45 +51,46 @@ class LazadaItem(models.Model):
         string="Synchronize Inventory to Lazada",
         help="Enable this to allow pushing the product inventory quantities from Odoo to Lazada.",
         precompute=True,
-        compute='_compute_sync_lazada_inventory',
+        compute="_compute_sync_lazada_inventory",
         store=True,
         readonly=False,
     )
     fulfillment_type = fields.Selection(
-        selection=[('fbm', "Fulfillment by Merchant"), ('fbl', "Fulfillment by Lazada")],
+        selection=[("fbm", "Fulfillment by Merchant"), ("fbl", "Fulfillment by Lazada")],
         readonly=True,
-        default='fbm',
+        default="fbm",
     )
 
     _unique_lazada_item_extern_id = models.Constraint(
-        'UNIQUE(shop_id, lazada_item_extern_id)',
+        "UNIQUE(shop_id, lazada_item_extern_id)",
         "Item External IDs must be unique for a given shop.",
     )
 
     # === BUSINESS METHODS === #
 
-    @api.constrains('sync_lazada_inventory', 'fulfillment_type', 'product_id')
+    @api.constrains("sync_lazada_inventory", "fulfillment_type", "product_id")
     def _check_sync_to_lazada(self):
-        """Ensure only FBM items can be synced to Lazada and only products that tracks stock in Odoo
+        """Ensure only FBM items can be synced to Lazada and only products that track stock in Odoo
         can be synced to Lazada."""
-        default_sale_product = self.env.ref('sale_lazada.default_sale_product')
+        default_sale_product = self.env.ref("sale_lazada.default_sale_product")
         for item in self.filtered(lambda item: item.product_id != default_sale_product):
-            if not item.product_id.type == 'consu' or not item.product_id.is_storable:
+            if item.product_id.type != "consu":
+                raise ValidationError(self.env._("Only goods are supported with Lazada."))
+            if item.sync_lazada_inventory and item.fulfillment_type != "fbm":
+                raise ValidationError(self.env._("Only FBM items can be synced to Lazada."))
+            if item.sync_lazada_inventory and not item.product_id.is_storable:
                 raise ValidationError(
                     self.env._(
-                        "We do not support syncing services or combo products to Lazada. "
-                        "Only storable products are supported."
+                        "This product does not track inventory and can not be"
+                        " synchronized with Lazada."
                     )
                 )
 
-            if item.fulfillment_type != 'fbm' and item.sync_lazada_inventory:
-                raise ValidationError(self.env._("Only FBM items can be synced to Lazada."))
-
-    @api.depends('fulfillment_type', 'product_id.is_storable')
+    @api.depends("fulfillment_type", "product_id.is_storable")
     def _compute_sync_lazada_inventory(self):
         for item in self:
             item.sync_lazada_inventory = (
-                item.fulfillment_type == 'fbm' and item.product_id.is_storable
+                item.fulfillment_type == "fbm" and item.product_id.is_storable
             )
 
     def _sync_inventory(self, auto_commit=True):
@@ -96,8 +101,8 @@ class LazadaItem(models.Model):
         :param bool auto_commit: Whether to commit after each successful sync
         """
         error_messages = []
-        valid_items = self.filtered('sync_lazada_inventory').sorted('last_inventory_sync_date')
-        for shop, items in valid_items.grouped('shop_id').items():
+        valid_items = self.filtered("sync_lazada_inventory").sorted("last_inventory_sync_date")
+        for shop, items in valid_items.grouped("shop_id").items():
             try:
                 shop = shop.with_prefetch()
                 items = items.with_prefetch()
@@ -106,11 +111,11 @@ class LazadaItem(models.Model):
                     self.env.cr.commit()
             except utils.LazadaApiError as error:
                 error_messages.append({
-                    'default_codes': items.mapped('product_id.default_code'),
-                    'message': str(error),
+                    "default_codes": items.mapped("product_id.default_code"),
+                    "message": str(error),
                 })
         if error_messages:
-            self.shop_id._handle_sync_failure(flow='inventory_sync', error_messages=error_messages)
+            self.shop_id._handle_sync_failure(flow="inventory_sync", error_messages=error_messages)
 
     @api.model
     def _prepare_sync_inventory_payload(self, shop, items):
@@ -136,11 +141,11 @@ class LazadaItem(models.Model):
                 fbm_qty = fbm_qty - fbl_item.product_id.free_qty
             fbm_qty = int(max(fbm_qty, 0))
             vals.append({
-                'SkuId': item.lazada_item_extern_id,
-                'SellerSku': item.lazada_sku,
-                'SellableQuantity': fbm_qty,
+                "SkuId": item.lazada_item_extern_id,
+                "SellerSku": item.lazada_sku,
+                "SellableQuantity": fbm_qty,
             })
-        return json.dumps({'Request': {'Product': {'Skus': {'Sku': vals}}}})
+        return json.dumps({"Request": {"Product": {"Skus": {"Sku": vals}}}})
 
     # === API METHODS === #
 
@@ -158,7 +163,7 @@ class LazadaItem(models.Model):
             current_datetime = fields.Datetime.now()
             payload = self._prepare_sync_inventory_payload(shop, batch_items)
             utils.make_lazada_api_request(
-                'UpdateSellableQuantity', shop, params={'payload': payload}, method='POST'
+                "UpdateSellableQuantity", shop, params={"payload": payload}, method="POST"
             )
 
             batch_items.last_inventory_sync_date = current_datetime

@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-import base64
 
 from odoo import _, fields, models
 from odoo.exceptions import UserError
@@ -36,7 +33,7 @@ class L10n_LuGenerateVatIntraReport(models.TransientModel):
             ('res_field', '=', 'attachment_bin'),
             ('res_id', 'in', self.l10n_lu_stored_report_ids.ids),
         ])
-        comparison_files = [(attachment.name, base64.b64decode(attachment.datas)) for attachment in stored_attachments]
+        comparison_files = [(attachment.name, attachment.raw.content) for attachment in stored_attachments]
         ec_sales_report = self.env.ref('l10n_lu_reports.lux_ec_sales_report')
         forms, year, period, codes = self.env[ec_sales_report.custom_handler_model_name].get_xml_2_0_report_values(report_generation_options, comparison_files)
         declarations = {'declaration_singles': {'forms': forms}, 'declaration_groups': []}

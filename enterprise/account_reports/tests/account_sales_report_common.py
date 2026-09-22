@@ -4,6 +4,8 @@ from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
 
 class AccountSalesReportCommon(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -24,10 +26,14 @@ class AccountSalesReportCommon(TestAccountReportsCommon):
 
     def _create_invoices(self, data, is_refund=False):
         move_vals_list = []
-        for partner, tax, price_unit in data:
+        for move_data in data:
+            partner, tax, price_unit = move_data[:3]
+            partner_shipping_id = move_data[3] if len(move_data) > 3 else None
+
             move_vals_list.append({
                 'move_type': 'out_refund' if is_refund else 'out_invoice',
                 'partner_id': partner.id,
+                'partner_shipping_id': partner_shipping_id.id if partner_shipping_id else None,
                 'invoice_date': fields.Date.from_string('2019-12-01'),
                 'invoice_line_ids': [
                     (0, 0, {

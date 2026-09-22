@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-import base64
-from binascii import Error as binascii_error
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools.image import image_data_uri
 
 
 class SocialPostTemplate(models.Model):
@@ -23,8 +20,6 @@ class SocialPostTemplate(models.Model):
     display_push_notifications_preview = fields.Boolean('Display Push Notifications Preview', compute='_compute_display_push_notifications_preview')
     push_notifications_preview = fields.Html('Push Notifications Preview', compute='_compute_push_notifications_preview')
     # Visitor
-    use_visitor_timezone = fields.Boolean("Send at Visitors' Timezone",
-        help="e.g: If you post at 15:00 your time, all visitors will receive the post at 15:00 their time.")
     visitor_domain = fields.Char(string="Visitor Domain", default=[['has_push_notifications', '!=', False]], help="Domain to send push notifications to visitors.")
 
     @api.constrains('push_notification_message')
@@ -49,15 +44,13 @@ class SocialPostTemplate(models.Model):
             if not post.display_push_notifications_preview:
                 post.push_notifications_preview = False
                 continue
-            icon = False
+            icon = post.push_notification_image
             icon_url = False
-            if post.push_notification_image:
-                try:
-                    base64.b64decode(post.push_notification_image, validate=True)
-                    icon = post.push_notification_image
-                except binascii_error:
-                    if post.id or (post._origin and post._origin.id):
-                        icon_url = '/web/image/social.post/%s/push_notification_image' % (post.id if post.id else post._origin.id)
+            if icon.size > 2000 and post._origin.id:
+                # big icon, link it
+                icon_url = '/web/image/social.post/%s/push_notification_image' % (post._origin.id)
+            elif icon:
+                icon_url = image_data_uri(icon)
             post.push_notifications_preview = self.env['ir.qweb']._render('social_push_notifications.push_notifications_preview', {
                 'title': post.push_notification_title or _('New Message'),
                 'icon': icon,
@@ -99,7 +92,6 @@ class SocialPostTemplate(models.Model):
             'push_notification_title': self.push_notification_title,
             'push_notification_image': self.push_notification_image,
             'push_notification_target_url': self.push_notification_target_url,
-            'use_visitor_timezone': self.use_visitor_timezone,
             'visitor_domain': self.visitor_domain,
         })
         return values

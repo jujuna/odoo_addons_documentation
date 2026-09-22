@@ -3,11 +3,12 @@ from freezegun import freeze_time
 
 from odoo.addons.account_reports.tests.account_sales_report_common import AccountSalesReportCommon
 from odoo.tests import tagged
-from odoo.tools.misc import NON_BREAKING_SPACE
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class DenmarkSalesReportTest(AccountSalesReportCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountSalesReportCommon.setup_chart_template('dk')
     def setUpClass(cls):
@@ -18,7 +19,7 @@ class DenmarkSalesReportTest(AccountSalesReportCommon):
         })
 
     @freeze_time('2019-12-31')
-    def test_ec_sales_report(self):
+    def test_dk_ec_sales_report(self):
         goods_tax = self.env.ref(f"account.{self.company_data['company'].id}_tax_s2")
         triangular_tax = self.env.ref(f"account.{self.company_data['company'].id}_tax_s8")
         services_tax = self.env.ref(f"account.{self.company_data['company'].id}_tax_s3")
@@ -32,21 +33,20 @@ class DenmarkSalesReportTest(AccountSalesReportCommon):
         ])
 
         report = self.env.ref('l10n_dk_reports.denmark_ec_sales_report')
-        options = report.get_options({'date': {'mode': 'range', 'filter': 'this_month'}})
+        options = report.get_options({'date': {'default_opening_date': 'this_month'}})
 
         # We need VAT number without country code, to do that, we're checking if both 2
         # first characters are alpha, and we keep the rest without these 2 characters.
         # We could use get_cc_module from stdnum, but it's a bit overkill in tests.
-        partner_a_vat = self.partner_a.vat[2:] if self.partner_a.vat[:2].isalpha() else self.partner_a.vat
-        partner_b_vat = self.partner_b.vat[2:] if self.partner_b.vat[:2].isalpha() else self.partner_b.vat
 
         self.assertLinesValues(
             report._get_lines(options),
-            [   0,                      1,                                  2,                      3,                                      4,                                      5,                                      6],
+            [   0,                                                     1,                       2,       3,             4,         5,            6],
             [
-                (self.partner_a.name,   self.partner_a.country_id.code,     partner_a_vat,          f'kr{NON_BREAKING_SPACE}6,000',      f'kr{NON_BREAKING_SPACE}7,000',      f'kr{NON_BREAKING_SPACE}0',          f'kr{NON_BREAKING_SPACE}13,000'),
-                (self.partner_b.name,   self.partner_b.country_id.code,     partner_b_vat,          f'kr{NON_BREAKING_SPACE}0',          f'kr{NON_BREAKING_SPACE}4,000',      f'kr{NON_BREAKING_SPACE}2,000',      f'kr{NON_BREAKING_SPACE}6,000'),
-                ('Total',               '',                                 '',                     f'kr{NON_BREAKING_SPACE}6,000',      f'kr{NON_BREAKING_SPACE}11,000',     f'kr{NON_BREAKING_SPACE}2,000',      f'kr{NON_BREAKING_SPACE}19,000'),
+                ('EC Sales Report',                                   '',                      '',    6000.0,      11000.0,     2000.0,      19000.0),
+                (self.partner_a.name,     self.partner_a.country_id.code,   self.partner_a.vat[2:],   6000.0,       7000.0,        0.0,      13000.0),
+                (self.partner_b.name,     self.partner_b.country_id.code,   self.partner_b.vat[2:],      0.0,       4000.0,     2000.0,       6000.0),
+                ('Total EC Sales Report',                             '',                       '',   6000.0,      11000.0,     2000.0,      19000.0),
             ],
             options
         )

@@ -1,5 +1,9 @@
 .o_mrp_display_record {
     break-inside: avoid;
+    
+    .o_mrp_display_name{
+        font-size: 16px;    
+    }
 
     .o_mrp_display_record_title {
         // Set to avatar height to avoid flicker due to height change
@@ -39,6 +43,9 @@
 
     .o_mrp_record_line {
         min-height: calc(var(--interaction-min-size) + var(--list-group-item-padding-y) * 2);
+        .o_mrp_record_line_note {
+            max-height: calc(var(--body-font-size) * var(--body-line-height) * 3);
+        }
     }
 
     .o_mrp_record_line_indented {
@@ -54,6 +61,13 @@
 
         & + .o_mrp_record_line_indented:before {
             height: 100%;
+        }
+    }
+    
+    .o_priority {        
+        color: #f0ad4e;
+        .o_disabled{
+            opacity: 100%;        
         }
     }
 }

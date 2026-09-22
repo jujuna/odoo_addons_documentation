@@ -2,7 +2,6 @@
 
 {
     'name': 'AI Auto Install',
-    'version': '1.0',
     'category': 'Hidden',
     'summary': 'Auto install AI module if pgvector is available',
     'description': '''

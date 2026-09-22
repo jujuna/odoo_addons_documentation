@@ -16,10 +16,12 @@
                 <attribute name="default_group_by"/>
             </optional>
             <optional>
-                <attribute name="allow_resequence"/>
-            </optional>
-            <optional>
-                <attribute name="routing"/>
+                <attribute name="routing">
+                    <choice>
+                        <value>optimized</value>
+                        <value>ordered</value>
+                    </choice>
+                </attribute>
             </optional>
             <optional>
                 <attribute name="hide_name"/>
@@ -28,30 +30,48 @@
                 <attribute name="hide_address"/>
             </optional>
             <optional>
-                <attribute name="panel_title" />
-            </optional>
-            <optional>
-                <attribute name="hide_title"/>
-            </optional>
-            <optional>
                 <attribute name="limit"/>
             </optional>
             <optional>
                 <attribute name="js_class"/>
             </optional>
-            <zeroOrMore>
+            <optional>
+                <attribute name="dialog_size"/>
+            </optional>
+            <optional>
+                <attribute name="create"/>
+            </optional>
+            <interleave>
+                <zeroOrMore>
+                    <optional>
+                        <ref name="field"/>
+                    </optional>
+                </zeroOrMore>
                 <optional>
-                    <ref name="field"/>
+                    <element name="popover">
+                        <optional><attribute name="card_id"/></optional>
+                        <zeroOrMore>
+                            <ref name="field"/>
+                        </zeroOrMore>
+                        <optional>
+                            <element name="templates">
+                                <oneOrMore>
+                                    <ref name="any"/>
+                                </oneOrMore>
+                            </element>
+                        </optional>
+                    </element>
                 </optional>
-            </zeroOrMore>
-
+            </interleave>
         </element>
     </define>
 
     <define name="field">
         <element name="field">
             <attribute name="name"/>
-            <attribute name="string"/>
+            <optional>
+                <attribute name="string"/>
+            </optional>
             <optional>
                 <attribute name="on_change"/>
             </optional>
@@ -64,6 +84,21 @@
             <optional>
                 <attribute name="can_write"/>
             </optional>
+        </element>
+    </define>
+
+    <define name="any">
+        <element>
+            <anyName/>
+            <zeroOrMore>
+                <choice>
+                    <attribute>
+                        <anyName/>
+                    </attribute>
+                    <text/>
+                    <ref name="any"/>
+                </choice>
+            </zeroOrMore>
         </element>
     </define>
 

@@ -6,7 +6,7 @@ from odoo.addons.sale_lazada import utils
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     lazada_order_ref = fields.Char(
         string="Lazada Reference",
@@ -17,36 +17,36 @@ class SaleOrder(models.Model):
     lazada_shop_id = fields.Many2one(
         string="Lazada Shop",
         help="The Lazada shop from which the order was placed.",
-        comodel_name='lazada.shop',
+        comodel_name="lazada.shop",
         copy=False,
-        index='btree_not_null',
+        index="btree_not_null",
     )
     lazada_order_status = fields.Selection(
         string="Lazada Status",
         selection=[
-            ('draft', "Draft"),
-            ('confirmed', "Confirmed"),
-            ('processing', "Processing"),
-            ('delivered', "Delivered"),
-            ('canceled', "Canceled"),
-            ('manual', "Manual"),
+            ("draft", "Draft"),
+            ("confirmed", "Confirmed"),
+            ("processing", "Processing"),
+            ("delivered", "Delivered"),
+            ("canceled", "Canceled"),
+            ("manual", "Manual"),
         ],
-        compute='_compute_lazada_order_status',
+        compute="_compute_lazada_order_status",
     )
     lazada_fulfillment_type = fields.Selection(
         string="Lazada Fulfillment Type",
-        selection=[('fbm', "Fulfillment by Merchant"), ('fbl', "Fulfillment by Lazada")],
+        selection=[("fbm", "Fulfillment by Merchant"), ("fbl", "Fulfillment by Lazada")],
         copy=False,
     )
 
     _unique_lazada_order_ref_lazada_shop_id = models.Constraint(
-        'UNIQUE(lazada_order_ref, lazada_shop_id)',
+        "UNIQUE(lazada_order_ref, lazada_shop_id)",
         "There can only exist one sale order for a given Lazada Order Reference per Shop.",
     )
 
-    @api.depends('picking_ids.lazada_package_status')
+    @api.depends("picking_ids.lazada_package_status")
     def _compute_lazada_order_status(self):
         """Compute delivery status from Lazada order item statuses."""
         for order in self:
-            package_statuses = order.picking_ids.mapped('lazada_package_status')
+            package_statuses = order.picking_ids.mapped("lazada_package_status")
             order.lazada_order_status = utils.get_lazada_aggregated_status(package_statuses)

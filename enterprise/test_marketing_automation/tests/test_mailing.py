@@ -33,7 +33,7 @@ class TestMassMailing(CronMixinCase, TestMACommon):
         """ Check that only non-tests records can be considered as duplicates"""
         test_records = self.test_records.with_env(self.env)
         campaign = self.env['marketing.campaign'].create({
-            'domain': [('id', 'in', test_records.ids)],
+            'enroll_domain': [('id', 'in', test_records.ids)],
             'model_id': self.env['ir.model']._get_id('res.partner'),
             'name': 'Great Campaign',
         })

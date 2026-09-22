@@ -49,7 +49,6 @@ class TestHrRecruitmentSign(HttpCase):
             'email_from': 'caped.baldy@heroassociation.net',
         })
         self.applicant.partner_id.write({
-            'is_company': False,
             'name': self.applicant.partner_name,
             'email': self.applicant.email_from,
         })

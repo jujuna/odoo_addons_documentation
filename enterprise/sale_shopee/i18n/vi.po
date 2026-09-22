@@ -3,22 +3,43 @@
 # * sale_shopee
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Thi Huong Nguyen (thng)" <thng@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-05 18:43+0000\n"
-"Last-Translator: \"Thi Huong Nguyen (thng)\" <thng@odoo.com>\n"
-"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-04 18:03+0000\n"
+"PO-Revision-Date: 2026-09-18 02:45+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-master/"
 "sale_shopee/vi/>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_shopee
+#: model:ir.module.module,description:base.module_sale_shopee
+msgid ""
+"\n"
+"Import your Shopee orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and shops\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(item_id or model_id in\n"
+"  Shopee)\n"
+"* Support for both Fulfillment by Shopee (FBS), Fulfillment by Merchant "
+"(FBM) and Fulfilled by Cross\n"
+"  Border Seller (Hybrid):\n"
+"* FBS: Importing the completed orders\n"
+"* FBM/Hybrid: Delivery information is fetched from Shopee, track and "
+"synchronize the stock level to\n"
+"  Shopee\n"
+msgstr ""
 
 #. module: sale_shopee
 #: model:mail.template,body_html:sale_shopee.order_sync_failure
@@ -318,8 +339,8 @@ msgstr ""
 "            <body><div>\n"
 "                <p>Đã gặp lỗi và không thể hoàn tất việc đồng bộ hóa hàng "
 "tồn kho cho Cửa hàng Shopee\n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></"
-"b>\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></b>"
+"\n"
 "                    .</p>\n"
 "                <p>Đây là lỗi được gửi về từ Shopee: </p>\n"
 "                <table class=\"shopee_table\">\n"
@@ -332,8 +353,8 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></"
-"th>\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></th>"
+"\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
@@ -382,14 +403,14 @@ msgstr ""
 "về bởi Shopee."
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
+msgid "Account"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Account Name"
 msgstr "Tên tài khoản"
-
-#. module: sale_shopee
-#: model:ir.ui.menu,name:sale_shopee.accounts_menu
-msgid "Accounts"
-msgstr "Tài khoản"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__active
@@ -469,7 +490,13 @@ msgid "Authorization Remaining Days"
 msgstr "Ngày uỷ quyền còn lại"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Authorize New Shop"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "Authorize Shop"
 msgstr "Uỷ quyền cửa hàng"
 
@@ -478,11 +505,6 @@ msgstr "Uỷ quyền cửa hàng"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Bundle Deal"
 msgstr "Deal gói"
-
-#. module: sale_shopee
-#: model_terms:ir.ui.view,arch_db:sale_shopee.quick_create_account_form
-msgid "Cancel"
-msgstr "Hủy"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__cancelled
@@ -529,6 +551,11 @@ msgid "Create Shopee Accounts"
 msgstr "Tạo tài khoản Shopee"
 
 #. module: sale_shopee
+#: model:ir.model,name:sale_shopee.model_shopee_shop_create
+msgid "Create Shopee Shop Wizard"
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model,website_form_label:sale_shopee.model_res_partner
 msgid "Create a Customer"
 msgstr "Tạo một khách hàng"
@@ -537,6 +564,7 @@ msgstr "Tạo một khách hàng"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_uid
 msgid "Created by"
 msgstr "Được tạo bởi"
 
@@ -544,6 +572,7 @@ msgstr "Được tạo bởi"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_date
 msgid "Created on"
 msgstr "Được tạo vào"
 
@@ -565,7 +594,7 @@ msgstr "Bộ phận sales mặc định"
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__user_id
 msgid "Default Salesperson"
-msgstr "Nhân viên sales mặc định"
+msgstr "Chuyên viên sales mặc định"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_product_product__display_name
@@ -574,6 +603,7 @@ msgstr "Nhân viên sales mặc định"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__display_name
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__display_name
 msgid "Display Name"
@@ -679,6 +709,7 @@ msgstr "Xử lý bởi Shopee"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__id
 msgid "ID"
@@ -704,6 +735,11 @@ msgstr ""
 #: model:ir.model.fields,help:sale_shopee.field_shopee_account__company_ids
 msgid "If this field is empty, all companies will be allowed."
 msgstr "Nếu trường này để trống, thì tất cả công ty đều được phép."
+
+#. module: sale_shopee
+#: model:ir.module.module,summary:base.module_sale_shopee
+msgid "Import Shopee orders and sync deliveries"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_shop__status__inactive
@@ -745,6 +781,7 @@ msgstr "Ngày đồng bộ cuối cùng"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_uid
 msgid "Last Updated by"
 msgstr "Cập nhật lần cuối bởi"
 
@@ -752,6 +789,7 @@ msgstr "Cập nhật lần cuối bởi"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_date
 msgid "Last Updated on"
 msgstr "Cập nhật lần cuối vào"
 
@@ -759,6 +797,11 @@ msgstr "Cập nhật lần cuối vào"
 #: model_terms:ir.ui.view,arch_db:sale_shopee.view_order_form
 msgid "Lock"
 msgstr "Khoá"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Manage Accounts"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__name
@@ -773,8 +816,19 @@ msgstr "Cần tạo lại lô hàng trên Shopee"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_list
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_list
 msgid "New"
 msgstr "Mới"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "New Account"
+msgstr ""
+
+#. module: sale_shopee
+#: model:ir.actions.act_window,name:sale_shopee.shopee_shop_create_wizard_action
+msgid "New Shop"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__not_available
@@ -785,6 +839,12 @@ msgstr "Không có hàng"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__order_count
 msgid "Order Count"
 msgstr "Số lượng đơn hàng"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Order Discount"
+msgstr ""
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
@@ -827,6 +887,14 @@ msgstr "Khuyến mại sản phẩm"
 #: model:ir.model,name:sale_shopee.model_product_product
 msgid "Product Variant"
 msgstr "Biến thể sản phẩm"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid ""
+"Promotion: %(promotion_type)s - id: %(promotion_id)d\n"
+"Original price: %(price)s"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__ready
@@ -895,6 +963,13 @@ msgid "Save And Authorize"
 msgstr "Lưu và uỷ quyền"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid ""
+"Select the Shopee account on which to authorize the new shop, or register "
+"another account."
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__confirmed
 msgid "Shipment Arranged"
 msgstr "Lô hàng đã được tạo"
@@ -919,6 +994,12 @@ msgstr "Đã vận chuyển qua Shopee"
 #: code:addons/sale_shopee/models/stock_picking.py:0
 msgid "Shipping Label Not Ready"
 msgstr "Nhãn vận chuyển chưa sẵn sàng"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Shipping: %(carrier)s"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__shop_id
@@ -967,14 +1048,9 @@ msgid "Shopee"
 msgstr "Shopee"
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_account.py:0
-msgid "Shopee API Account - %(partner_id)s"
-msgstr "Tài khoản API Shopee - %(partner_id)s"
-
-#. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_shopee_account
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__account_id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__account_id
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shopee Account"
 msgstr "Tài khoản Shopee"
@@ -995,6 +1071,11 @@ msgstr "Điều chỉnh số tiền Shopee"
 #: model:ir.model.fields,field_description:sale_shopee.field_res_users__shopee_buyer_identifier
 msgid "Shopee Buyer ID"
 msgstr "ID người mua Shopee"
+
+#. module: sale_shopee
+#: model:ir.module.module,shortdesc:base.module_sale_shopee
+msgid "Shopee Connector"
+msgstr ""
 
 #. module: sale_shopee
 #. odoo-python
@@ -1027,7 +1108,6 @@ msgstr "ID sản phẩm Shopee"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 #: model:ir.actions.act_window,name:sale_shopee.sale_shopee_item_action
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__shopee_item_ids
-#: model:ir.ui.menu,name:sale_shopee.items_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_item_view_list
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Shopee Items"
@@ -1055,6 +1135,11 @@ msgstr "Đơn hàng Shopee %(order)s tại mock_shopee_shop"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Shopee Order %(shopee_order_ref)s at %(shop_name)s"
 msgstr "Đơn hàng Shopee %(shopee_order_ref)s tại %(shop_name)s"
+
+#. module: sale_shopee
+#: model:product.template,name:sale_shopee.default_discount_product_product_template
+msgid "Shopee Order Discount"
+msgstr ""
 
 #. module: sale_shopee
 #. odoo-python
@@ -1152,8 +1237,7 @@ msgstr "Tài khoản Shopee tương ứng với tài khoản Shopee Seller Centr
 msgid ""
 "Shopee is processing the shipping label. Odoo will try fetching the shipping "
 "label again later."
-msgstr ""
-"Shopee đang xử lý nhãn vận chuyển. Odoo sẽ thử lấy nhãn vận chuyển sau."
+msgstr "Shopee đang xử lý nhãn vận chuyển. Odoo sẽ thử lấy nhãn vận chuyển sau."
 
 #. module: sale_shopee
 #. odoo-python
@@ -1200,6 +1284,7 @@ msgstr "Shopee: đồng bộ nhãn vận chuyển"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_account.py:0
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__shop_ids
+#: model:ir.ui.menu,name:sale_shopee.shops_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shops"
 msgstr "Cửa hàng"
@@ -1273,6 +1358,11 @@ msgstr ""
 "lý với sàn thương mại điện tử mà bạn đang nhắm mục tiêu."
 
 #. module: sale_shopee
+#: model:ir.model.fields,help:sale_shopee.field_shopee_shop_create__account_id
+msgid "The Shopee account on which the new shop is authorized."
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_sale_order__shopee_shop_id
 msgid "The Shopee shop from which the order was placed."
 msgstr "Cửa hàng Shopee mà đơn hàng được đặt."
@@ -1291,7 +1381,7 @@ msgstr "Bộ phận sales mặc định được phân công cho đơn hàng Sho
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__user_id
 msgid "The default salesperson assigned to Shopee orders"
-msgstr "Nhân viên sales mặc định được phân công cho đơn hàng Shopee"
+msgstr "Chuyên viên sales mặc định được phân công cho đơn hàng Shopee"
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__last_orders_sync_date
@@ -1430,22 +1520,6 @@ msgstr ""
 #: code:addons/sale_shopee/controllers/onboarding.py:0
 msgid "You are not allowed to access this page."
 msgstr "Bạn không được phép truy cập trang này."
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid "[%(sku)s] %(product_name)s"
-msgstr "[%(sku)s] %(product_name)s"
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid ""
-"[%(sku)s] %(product_title)s\n"
-"Promotion: %(promotion_type)s - id: %(promotion_id)d"
-msgstr ""
-"[%(sku)s] %(product_title)s\n"
-"Khuyến mại: %(promotion_type)s - id: %(promotion_id)d"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form

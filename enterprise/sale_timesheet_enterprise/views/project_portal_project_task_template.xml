@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="portal_my_task_inherit" inherit_id="sale_timesheet.portal_my_task_inherit">
-        <xpath expr="//span[@t-esc='task.progress * 100']" position="attributes">
-            <attribute name="t-esc">task.portal_progress * 100</attribute>
+        <xpath expr="//span[@t-out='task.progress * 100']" position="attributes">
+            <attribute name="t-out">task.portal_progress * 100</attribute>
         </xpath>
     </template>
 
-    <template id="portal_timesheet_table_inherit" inherit_id="sale_timesheet.portal_timesheet_table_inherit">
-        <xpath expr="//span[@t-esc='timesheets._convert_hours_to_days(task.effective_hours)']" position="attributes">
-            <attribute name="t-esc">timesheets._convert_hours_to_days(task.portal_effective_hours)</attribute>
+    <template id="portal_timesheet_table_with_total_inherit" inherit_id="sale_timesheet.portal_timesheet_table_with_total_inherit">
+        <xpath expr="//span[@t-out='timesheets._convert_hours_to_days(task.effective_hours)']" position="attributes">
+            <attribute name="t-out">timesheets._convert_hours_to_days(task.portal_effective_hours)</attribute>
         </xpath>
-        <xpath expr="//span[@t-esc='task.effective_hours']" position="attributes">
-            <attribute name="t-esc">task.portal_effective_hours</attribute>
+        <xpath expr="//span[@t-out='timesheets._format_portal_hours(task.effective_hours)']" position="attributes">
+            <attribute name="t-out">timesheets._format_portal_hours(task.portal_effective_hours)</attribute>
         </xpath>
         <xpath expr="//div[@t-if='task.subtask_effective_hours']" position="attributes">
             <attribute name="t-if">task.portal_subtask_effective_hours</attribute>
         </xpath>
-        <xpath expr="//span[@t-esc='timesheets._convert_hours_to_days(task.subtask_effective_hours)']" position="attributes">
-            <attribute name="t-esc">timesheets._convert_hours_to_days(task.portal_subtask_effective_hours)</attribute>
+        <xpath expr="//span[@t-out='timesheets._convert_hours_to_days(task.subtask_effective_hours)']" position="attributes">
+            <attribute name="t-out">timesheets._convert_hours_to_days(task.portal_subtask_effective_hours)</attribute>
         </xpath>
-        <xpath expr="//span[@t-esc='task.subtask_effective_hours']" position="attributes">
-            <attribute name="t-esc">task.portal_subtask_effective_hours</attribute>
+        <xpath expr="//span[@t-out='timesheets._format_portal_hours(task.subtask_effective_hours)']" position="attributes">
+            <attribute name="t-out">timesheets._format_portal_hours(task.portal_subtask_effective_hours)</attribute>
         </xpath>
     </template>
 
@@ -28,8 +28,8 @@
         <xpath expr="//t[@t-out='timesheet_ids._convert_hours_to_days(task.total_hours_spent)']" position="replace">
             <t t-out="timesheet_ids._convert_hours_to_days(task.portal_total_hours_spent)"/>
         </xpath>
-        <xpath expr="//span[@t-field='task.total_hours_spent']" position="attributes">
-            <attribute name="t-field">task.portal_total_hours_spent</attribute>
+        <xpath expr="//span[@t-out='timesheet_ids._format_portal_hours(task.total_hours_spent)']" position="attributes">
+            <attribute name="t-out">timesheet_ids._format_portal_hours(task.portal_total_hours_spent)</attribute>
         </xpath>
     </template>
 </odoo>

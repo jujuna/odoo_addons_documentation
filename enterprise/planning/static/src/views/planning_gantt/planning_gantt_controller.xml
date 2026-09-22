@@ -4,7 +4,7 @@
 
     <t t-name="planning.PlanningGanttView.Buttons" t-inherit="web_gantt.GanttView.Buttons">
         <xpath expr="." position="inside">
-            <button t-if="model.metaData.canEdit"
+            <button t-if="this.model.metaData.canEdit and this.model.isManager"
                 class="o_gantt_button_send_all btn btn-primary"
                 title="Send schedule"
                 data-hotkey="w"
@@ -12,7 +12,7 @@
             >
                 Publish
             </button>
-            <button t-if="env.isSmall and model.metaData.canCreate and model.metaData.rangeId === 'week'"
+            <button t-if="this.uiService.isSmall and this.model.metaData.canCreate and this.model.metaData.rangeId === 'week'"
                 class="o_gantt_button_copy_previous_week btn btn-link dropdown-item"
                 title="Copy previous week"
                 data-hotkey="c"
@@ -20,37 +20,30 @@
             >
                 Copy previous week
             </button>
-            <button t-if="env.isSmall and model.metaData.canCreate"
+            <button t-if="this.uiService.isSmall and this.model.metaData.canCreate"
                 class="o_gantt_button_auto_plan btn btn-link dropdown-item"
                 title="Automatically plan open shifts and sales orders"
                 data-hotkey="k"
-                t-on-click="() => this.planningControllerActions.autoPlan()"
+                t-on-click="this.autoPlan.bind(this)"
             >
                 Auto Plan
             </button>
-            <button t-if="env.isSmall and ['week', 'month'].includes(model.metaData.rangeId)"
-                class="o_gantt_button_print btn btn-link dropdown-item"
+            <button t-if="['week', 'month'].includes(this.model.metaData.rangeId) and !this.model.isManager"
+                class="o_gantt_button_print btn btn-secondary"
                 title="Print resource calendar"
                 data-hotkey="p"
-                t-on-click="() => this.planningControllerActions.print(props.groupBy)"
+                t-on-click="() => this.planningControllerActions.print(this.props.groupBy)"
             >
                 Print
             </button>
-            <button t-if="env.isSmall"
-                class="o_gantt_button_preview btn btn-link dropdown-item"
-                title="Preview"
-                data-hotkey="p"
-                t-on-click="() => this.planningControllerActions.previewShift()"
-            >
-                <label><t t-esc="this.previewTitle"/></label>
-            </button>
-            <Dropdown t-if="!env.isSmall and model.metaData.canCreate">
+
+            <Dropdown t-if="!this.uiService.isSmall and this.model.metaData.canCreate">
                 <button class="btn btn-secondary" data-hotkey="o">
                     Actions
-                    <i class="ms-1 fa fa-caret-down"></i>
+                    <i class="oi ms-1" data-icon="arrow_drop_down"></i>
                 </button>
                 <t t-set-slot="content">
-                    <DropdownItem t-if="model.metaData.rangeId === 'week'"
+                    <DropdownItem t-if="this.model.metaData.rangeId === 'week'"
                         class="'o_gantt_button_copy_previous_week btn btn-link dropdown-item'"
                         onSelected="() => this.planningControllerActions.copyPrevious()"
                         attrs="{ 'data-hotkey': 'c', 'title': 'Copy previous week' }"
@@ -59,24 +52,17 @@
                     </DropdownItem>
                     <DropdownItem
                         class="'o_gantt_button_auto_plan btn btn-link dropdown-item'"
-                        onSelected="() => this.planningControllerActions.autoPlan()"
+                        onSelected="this.autoPlan.bind(this)"
                         attrs="{ 'data-hotkey': 'k', 'title': 'Automatically plan open shifts and sales orders' }"
                     >
                         Auto Plan
                     </DropdownItem>
-                    <DropdownItem t-if="['week', 'month'].includes(model.metaData.rangeId)"
+                    <DropdownItem t-if="['week', 'month'].includes(this.model.metaData.rangeId) and this.model.isManager"
                         class="'o_gantt_button_print btn btn-link dropdown-item'"
-                        onSelected="() => this.planningControllerActions.print(props.groupBy)"
+                        onSelected="() => this.planningControllerActions.print(this.props.groupBy)"
                         attrs="{ 'data-hotkey': 'p', 'title': 'Print planning' }"
                     >
                         Print
-                    </DropdownItem>
-                    <DropdownItem
-                        class="'o_gantt_button_preview btn btn-link dropdown-item'"
-                        onSelected="() => this.planningControllerActions.previewShift()"
-                        attrs="{ 'data-hotkey': 'p', title: this.previewTitle }"
-                    >
-                        <label><t t-esc="this.previewTitle"/></label>
                     </DropdownItem>
                 </t>
             </Dropdown>

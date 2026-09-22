@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add('applicant_sign_request_tour', {
-    url: '/odoo',
     steps: () => [
         {
             content: "Access on the recruitment app",
@@ -20,7 +19,7 @@ registry.category("web_tour.tours").add('applicant_sign_request_tour', {
         },
         {
             content: "Open Saitama's application",
-            trigger: '.o_data_cell[data-tooltip="Saitama"]',
+            trigger: '.o_data_cell:text(Saitama)',
             run: 'click',
         },
         {

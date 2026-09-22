@@ -7,8 +7,7 @@ from odoo.addons.mail.tools.discuss import Store
 class MailThread(models.AbstractModel):
     _inherit = 'mail.thread'
 
-    def _thread_to_store(self, store: Store, fields, *, request_list=None):
-        super()._thread_to_store(store, fields, request_list=request_list)
-        if request_list:
-            can_send_whatsapp = self.env["whatsapp.template"]._can_use_whatsapp(self._name)
-            store.add(self, {"canSendWhatsapp": can_send_whatsapp}, as_thread=True)
+    def _store_thread_fields(self, res: Store.FieldList, *, request_list, **kwargs):
+        super()._store_thread_fields(res, request_list=request_list, **kwargs)
+        can_send_whatsapp = self.env["whatsapp.template"]._can_use_whatsapp(self._name)
+        res.attr("canSendWhatsapp", can_send_whatsapp)

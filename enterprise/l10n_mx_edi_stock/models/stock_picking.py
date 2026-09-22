@@ -114,6 +114,20 @@ class StockPicking(models.Model):
         ondelete='restrict',
         copy=False,
         help='The vehicle used for Federal Transport')
+    l10n_mx_edi_driver_id = fields.Many2one(
+        comodel_name='res.partner',
+        compute='_compute_l10n_mx_edi_driver_id',
+        readonly=False,
+        store=True,
+        string='Vehicle Operator',
+        check_company=True,
+        ondelete='restrict',
+        copy=False,
+        help='Vehicle operator that intervenes on the goods transportation'
+    )
+    l10n_mx_edi_show_update_driver = fields.Boolean(
+        compute="_compute_l10n_mx_edi_show_update_driver"
+    )
     l10n_mx_edi_idccp = fields.Char(
         string="IdCCP",
         help="Additional UUID for the Delivery Guide.",
@@ -166,7 +180,8 @@ class StockPicking(models.Model):
     def _l10n_mx_edi_get_cartaporte_pdf_values(self):
         self.ensure_one()
 
-        existing_cfdi_values = self.env['l10n_mx_edi.document']._decode_cfdi_attachment(self.l10n_mx_edi_cfdi_attachment_id.raw)
+        existing_cfdi_values = self.env['l10n_mx_edi.document']._decode_cfdi_attachment(
+            self.l10n_mx_edi_cfdi_attachment_id.raw.content)
         cfdi_values = self.env['l10n_mx_edi.document']._get_company_cfdi_values(self.company_id)
         self.env['l10n_mx_edi.document']._add_certificate_cfdi_values(cfdi_values)
         self._l10n_mx_edi_add_picking_cfdi_values(cfdi_values)
@@ -230,8 +245,7 @@ class StockPicking(models.Model):
             }
 
         # Get stamp date in ISO 8601 Format for the QR code
-        cfdi_infos = self.env['l10n_mx_edi.document']._decode_cfdi_attachment(self.l10n_mx_edi_cfdi_attachment_id.raw)
-        stamp_date = datetime.strptime(cfdi_infos['stamp_date'], "%Y-%m-%d %H:%M:%S").isoformat()
+        stamp_date = datetime.strptime(existing_cfdi_values['stamp_date'], "%Y-%m-%d %H:%M:%S").isoformat()
 
         # Generate QR code of the URL to access the service regarding the current guide document (legal requirement)
         barcode_value = url_quote_plus(f"https://verificacfdi.facturaelectronica.sat.gob.mx/verificaccp/default.aspx?"
@@ -346,7 +360,8 @@ class StockPicking(models.Model):
     def _compute_l10n_mx_edi_cfdi_uuid(self):
         for picking in self:
             if picking.l10n_mx_edi_cfdi_attachment_id:
-                cfdi_infos = self.env['l10n_mx_edi.document']._decode_cfdi_attachment(picking.l10n_mx_edi_cfdi_attachment_id.raw)
+                cfdi_infos = self.env['l10n_mx_edi.document']._decode_cfdi_attachment(
+                    picking.l10n_mx_edi_cfdi_attachment_id.raw.content)
                 picking.l10n_mx_edi_cfdi_uuid = cfdi_infos.get('uuid')
             else:
                 picking.l10n_mx_edi_cfdi_uuid = None
@@ -391,6 +406,20 @@ class StockPicking(models.Model):
                 weight_uom._compute_quantity(picking.l10n_mx_edi_extra_weight, ton_uom, round=False)
             )
 
+    @api.depends('l10n_mx_edi_vehicle_id')
+    def _compute_l10n_mx_edi_driver_id(self):
+        for picking in self:
+            picking.l10n_mx_edi_driver_id = picking.l10n_mx_edi_vehicle_id.driver_id
+
+    @api.depends('l10n_mx_edi_cfdi_state', 'l10n_mx_edi_vehicle_id.driver_id', 'l10n_mx_edi_driver_id')
+    def _compute_l10n_mx_edi_show_update_driver(self):
+        for picking in self:
+            picking.l10n_mx_edi_show_update_driver = (
+                picking.l10n_mx_edi_cfdi_state != 'sent'
+                and picking.l10n_mx_edi_driver_id and picking.l10n_mx_edi_vehicle_id
+                and picking.l10n_mx_edi_driver_id.id != picking.l10n_mx_edi_vehicle_id.driver_id.id
+            )
+
     # -------------------------------------------------------------------------
     # CFDI: Generation
     # -------------------------------------------------------------------------
@@ -413,8 +442,11 @@ class StockPicking(models.Model):
             errors.append(_("All products require a UNSPSC Code"))
         if self.l10n_mx_edi_transport_type == '01' and not self.l10n_mx_edi_distance:
             errors.append(_("Distance in KM must be specified when using federal transport"))
-        if self.l10n_mx_edi_vehicle_id and not self.l10n_mx_edi_gross_vehicle_weight:
-            errors.append(_("Please define a gross vehicle weight."))
+        if self.l10n_mx_edi_vehicle_id:
+            if not self.l10n_mx_edi_gross_vehicle_weight:
+                errors.append(_("Please define a gross vehicle weight."))
+            if not self.l10n_mx_edi_driver_id:
+                errors.append(_("Please define the operator of the vehicle."))
 
         if self.l10n_mx_edi_external_trade:
             if not self.l10n_mx_edi_customs_document_type_code:
@@ -547,6 +579,7 @@ class StockPicking(models.Model):
         self.ensure_one()
 
         document_values = {
+            'company_id': self.company_id.id,
             'picking_id': self.id,
             'state': 'picking_sent_failed',
             'sat_state': None,
@@ -569,6 +602,7 @@ class StockPicking(models.Model):
         self.ensure_one()
 
         document_values = {
+            'company_id': self.company_id.id,
             'picking_id': self.id,
             'state': 'picking_sent',
             'sat_state': 'not_defined',
@@ -581,7 +615,9 @@ class StockPicking(models.Model):
                 'description': "CFDI",
             },
         }
-        return self.env['l10n_mx_edi.document']._create_update_picking_document(self, document_values)
+        result = self.env['l10n_mx_edi.document']._create_update_picking_document(self, document_values)
+
+        return result
 
     def _l10n_mx_edi_cfdi_document_cancel_failed(self, error, cfdi, cancel_reason):
         """ Create/update the invoice document for 'cancel_failed'.
@@ -594,6 +630,7 @@ class StockPicking(models.Model):
         self.ensure_one()
 
         document_values = {
+            'company_id': self.company_id.id,
             'picking_id': self.id,
             'state': 'picking_cancel_failed',
             'sat_state': None,
@@ -613,6 +650,7 @@ class StockPicking(models.Model):
         self.ensure_one()
 
         document_values = {
+            'company_id': self.company_id.id,
             'picking_id': self.id,
             'state': 'picking_cancel',
             'sat_state': 'not_defined',
@@ -757,7 +795,7 @@ class StockPicking(models.Model):
         return fetched_data
 
     def l10n_mx_edi_action_set_partner_coordinates(self):
-        mb_token = self.env['ir.config_parameter'].sudo().get_param('web_map.token_map_box', False)
+        mb_token = self.env['ir.config_parameter'].sudo().get_str('web_map.token_map_box')
         if not mb_token:
             raise UserError(_('Please configure MapBox to use this feature'))
         for record in self:
@@ -781,7 +819,7 @@ class StockPicking(models.Model):
                 record.partner_id.partner_longitude = res['features'][0]['geometry']['coordinates'][1]
 
     def l10n_mx_edi_action_calculate_distance(self):
-        mb_token = self.env['ir.config_parameter'].sudo().get_param('web_map.token_map_box', False)
+        mb_token = self.env['ir.config_parameter'].sudo().get_str('web_map.token_map_box')
         if not mb_token:
             raise UserError(_('Please configure MapBox to use this feature'))
         params = {
@@ -803,3 +841,8 @@ class StockPicking(models.Model):
 
     def l10n_mx_edi_action_print_cartaporte(self):
         return self.env.ref('l10n_mx_edi_stock.action_report_cartaporte').report_action(self)
+
+    def l10n_mx_edi_action_update_driver(self):
+        self.ensure_one()
+        if self.l10n_mx_edi_show_update_driver:
+            self.l10n_mx_edi_vehicle_id.driver_id = self.l10n_mx_edi_driver_id

@@ -1,7 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import base64
 from ..api.swissdec_declarations import SwissdecDeclaration, SwissdecInstitution
 from odoo import models
+from odoo.tools import BinaryBytes
 
 
 class L10nCHInsuranceReport(models.Model):
@@ -44,7 +46,7 @@ class L10nCHInsuranceReport(models.Model):
         if report_pdf:
             attachment = self.env['ir.attachment'].create({
                 'name': f"Statistic_Report_{self.year}_{self.month.zfill(2)}.pdf",
-                'datas': report_pdf,
+                'raw': BinaryBytes(base64.b64decode(report_pdf)),
                 'res_id': self.id,
                 'res_model': self._name,
             })

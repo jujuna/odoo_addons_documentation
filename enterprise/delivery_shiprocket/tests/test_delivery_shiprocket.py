@@ -12,7 +12,10 @@ from odoo.tests import tagged
 _logger = logging.getLogger(__name__)
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDeliveryShiprocket(ShiprocketCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -45,7 +48,7 @@ class TestDeliveryShiprocket(ShiprocketCommon):
         cls.shiprocket.write({
             'shiprocket_default_package_type_id': cls.env.ref('delivery_shiprocket.shiprocket_packaging_box_1kg')
         })
-        cls.database_uuid = cls.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        cls.database_uuid = cls.env['ir.config_parameter'].sudo().get_str('database.uuid')
         cls.order_date = str(datetime.today().date())
 
     def _get_expected_parcel_data(self):
@@ -250,6 +253,8 @@ class TestDeliveryShiprocket(ShiprocketCommon):
 
 @tagged("post_install", "-at_install")
 class TestDeliveryShiprocketPostInstall(TestDeliveryShiprocket):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_shiprocket_delivery_with_discounts(self):
         """
         Ensure both regular and loyaly discount lines are correctly passed to the carrier.
@@ -262,6 +267,7 @@ class TestDeliveryShiprocketPostInstall(TestDeliveryShiprocket):
             'name': 'Basic 15% tax',
             'amount': 15,
         })
+        empty_pricelist = self.env['product.pricelist'].create({'name': 'Empty Pricelist'})
         sale_order = self.env['sale.order'].create({
             'partner_id': self.in_partner.id,
             'order_line': [Command.create({
@@ -272,6 +278,7 @@ class TestDeliveryShiprocketPostInstall(TestDeliveryShiprocket):
                 'price_unit': self.product_to_ship1.lst_price,
                 'tax_ids': basic_tax,
             })],
+            'pricelist_id': empty_pricelist.id,
         })
         self.env['choose.delivery.carrier'].with_context({
             'default_order_id': sale_order.id,

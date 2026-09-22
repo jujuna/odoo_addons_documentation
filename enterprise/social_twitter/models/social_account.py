@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-
+import dateutil.parser
+import logging
+import re
 import requests
+
+from html import unescape
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -11,13 +13,15 @@ from odoo.tools.urls import urljoin as url_join
 
 TWITTER_IMAGES_UPLOAD_ENDPOINT = "https://api.x.com/2/media/upload"
 
+_logger = logging.getLogger(__name__)
+
 
 class SocialAccount(models.Model):
     _inherit = 'social.account'
 
     twitter_user_id = fields.Char('X User ID')
-    twitter_oauth_token = fields.Char('X OAuth Token')
-    twitter_oauth_token_secret = fields.Char('X OAuth Token Secret')
+    twitter_oauth_token = fields.Char('X OAuth Token', groups=fields.NO_ACCESS)
+    twitter_oauth_token_secret = fields.Char('X OAuth Token Secret', groups=fields.NO_ACCESS)
 
     def _compute_statistics(self):
         """ See methods '_get_last_tweets_stats' for more info about Twitter stats. """
@@ -42,6 +46,7 @@ class SocialAccount(models.Model):
 
         for account in twitter_accounts:
             account.stats_link = f"https://analytics.twitter.com/user/{account.social_account_handle}"
+            account.user_link = f"https://x.com/{account.social_account_handle}"
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -49,16 +54,17 @@ class SocialAccount(models.Model):
         res.filtered(lambda account: account.media_type == 'twitter')._create_default_stream_twitter()
         return res
 
-    def twitter_get_user_by_username(self, username):
-        """Search a user based on his username (e.g: "fpodoo").
+    @api.model
+    def search_mention_suggestions(self, search_term, media_type):
+        if media_type != "twitter":
+            return super().search_mention_suggestions(search_term, media_type)
+        twitter_account = self.env['social.account'].search([("media_type", "=", media_type)], limit=1)
+        return twitter_account.twitter_users_search(search_term)
 
-        Can not search by name, can only get user by their usernames
-        See: https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference
-        """
-        user_search_endpoint = url_join(
-            self.env['social.media']._TWITTER_ENDPOINT,
-            '/2/users/by/username/%s' % username)
-        params = {'user.fields': 'id,name,username,description,profile_image_url'}
+    def twitter_users_search(self, username):
+        """Search users based on their names / usernames."""
+        user_search_endpoint = url_join(self.env['social.media']._TWITTER_ENDPOINT, '/2/users/search')
+        params = {'user.fields': 'id,name,username,description,profile_image_url', 'query': username, 'max_results': 10}
         headers = self._get_twitter_oauth_header(
             user_search_endpoint,
             params=params,
@@ -70,7 +76,10 @@ class SocialAccount(models.Model):
             headers=headers,
             timeout=5
         )
-        return response.json().get('data', False) if response.ok else False
+        if not response.ok:
+            _logger.warning("Social Twitter: failed to search users: %s", response.text)
+            return []
+        return response.json().get('data') or []
 
     def _create_default_stream_twitter(self):
         """ This will create a stream of type 'Twitter Follow' for each added accounts.
@@ -161,21 +170,22 @@ class SocialAccount(models.Model):
         }
         for tweet in result.json().get('data', []):
             public_metrics = tweet.get('public_metrics', {})
-            last_tweets_stats['engagement'] += public_metrics.get('like_count', 0)
+            last_tweets_stats['engagement'] += public_metrics.get('like_count', 0) + public_metrics.get('reply_count', 0)
             last_tweets_stats['stories'] += public_metrics.get('retweet_count', 0)
         return last_tweets_stats
 
     def _get_twitter_oauth_header(self, url, headers={}, params={}, method='POST'):
         self.ensure_one()
+        self.check_access("read")
         headers.update({
-            'oauth_token': self.twitter_oauth_token,
-            'oauth_token_secret': self.twitter_oauth_token_secret,
+            'oauth_token': self.sudo().twitter_oauth_token,
+            'oauth_token_secret': self.sudo().twitter_oauth_token_secret,
         })
         return self.media_id._get_twitter_oauth_header(url, headers=headers, params=params, method=method)
 
     def _format_attachments_to_images_twitter(self, image_ids):
         return self._format_images_twitter([{
-            'bytes': base64.decodebytes(image.datas),
+            'bytes': image.raw.content,
             'file_size': image.file_size,
             'mimetype': image.mimetype
         } for image in image_ids])
@@ -231,3 +241,78 @@ class SocialAccount(models.Model):
         url_endpoint = f"{TWITTER_IMAGES_UPLOAD_ENDPOINT}/{media_id}/finalize"
         headers = self._get_twitter_oauth_header(url_endpoint)
         requests.post(url_endpoint, headers=headers, timeout=5)
+
+    def _format_tweet(self, tweet, all_tweets_per_ids=None):
+        """ Formats a tweet returned by the Twitter API to a dict that will be interpreted by our frontend. """
+        self.ensure_one()
+        if 'created_at' in tweet:
+            created_date = fields.Datetime.from_string(
+                dateutil.parser.parse(tweet.get('created_at')).strftime('%Y-%m-%d %H:%M:%S'))
+        else:
+            created_date = fields.Datetime.now()
+
+        in_reply_to_tweet_id = next((referenced['id'] for referenced in tweet.get('referenced_tweets', []) if referenced['type'] == 'replied_to'), None)
+        formatted_tweet = {
+            'id': tweet.get('id'),
+            'message': unescape(tweet.get('text', '')),
+            'from': {
+                'id': tweet.get('author_id'),
+                'name': tweet.get('author', {}).get('name'),
+                'screen_name': tweet.get('author', {}).get('username'),
+                'profile_image_url': tweet.get('author', {}).get('profile_image_url'),
+            },
+            'created_time': tweet.get('created_at'),
+            'formatted_created_time': self.env['social.stream.post']._format_published_date(
+                fields.Datetime.from_string(created_date)),
+            'user_likes': False,
+            'likes': {
+                'summary': {
+                    'total_count': tweet.get('public_metrics', {}).get('like_count', 0),
+                },
+            },
+            'comments': {'data': []},
+            'in_reply_to_tweet_id': in_reply_to_tweet_id,
+        }
+
+        attached_medias = tweet.get('medias')
+        if attached_medias:
+            if attached_medias[0].get('type') == 'photo':
+                formatted_tweet['attachment'] = {
+                    'type': 'photo',
+                    'media': {
+                        'image': {
+                            'src': attached_medias[0].get('url'),
+                        }
+                    }
+                }
+        formatted_tweet['canReply'] = self._twitter_can_reply(tweet, all_tweets_per_ids)
+
+        return formatted_tweet
+
+    def _twitter_can_reply(self, tweet, all_tweets_per_ids=None):
+        """Return True if we can reply to the given tweet:
+
+        :param tweet: The json tweet we want to check
+        :param all_tweets_per_ids: Contains a dict of all tweets referenced by the current tweet
+            (the key is the tweet ID)
+        """
+        self.ensure_one()
+        handle = self.social_account_handle
+        if re.search(
+            f'\\B@{re.escape(handle)}\\b',
+            tweet.get('text', ''),
+            flags=re.IGNORECASE,
+        ):
+            # We are mentioned in the tweet
+            return True
+
+        if tweet.get('author_id') == self.twitter_user_id:
+            # we are the author of the tweet
+            return True
+
+        # the tweet is a quote to one of our tweets
+        # (sent back to the JS so we need to convert `{}` to `False`)
+        return bool(all_tweets_per_ids) and any(
+            all_tweets_per_ids.get(referenced_tweet['id'], {}).get('author_id') == self.twitter_user_id
+            for referenced_tweet in tweet.get('referenced_tweets', ())
+        )

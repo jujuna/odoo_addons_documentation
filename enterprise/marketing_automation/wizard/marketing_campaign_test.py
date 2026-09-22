@@ -54,12 +54,8 @@ class MarketingCampaignTest(models.TransientModel):
             ('state', '=', 'running'),
         ])
         if previous_test_participants:
-            previous_test_participants._action_set_completed(trace_message=_('Another test has been launched for this participant'))
-        participant = self.env['marketing.participant'].create({
-            'campaign_id': self.campaign_id.id,
-            'res_id': self.res_id,
-            'is_test': True,
-        })
+            previous_test_participants.action_set_completed(trace_message=self.env._('Another test has been launched for this participant'))
+        participant = self.campaign_id._create_participants([self.res_id], auto_commit=False, additional_values={"is_test": True})
         return {
             'name': _('Launch a Test'),
             'type': 'ir.actions.act_window',

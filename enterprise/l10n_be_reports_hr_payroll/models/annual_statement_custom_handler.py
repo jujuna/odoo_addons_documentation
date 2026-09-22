@@ -9,9 +9,8 @@ class AnnualStatementReportHandler(models.AbstractModel):
         super_data = super()._get_extra_file_data(options)
 
         sbs_data = self.env['l10n.be.social.balance.sheet'].create({
-            'company_id': self.env.company.id,
-            'date_from': options['date']['date_from'],
-            'date_to': options['date']['date_to'],
+            'date_from': options['xbrl_current_fiscal_date']['date_from'],
+            'date_to': options['xbrl_current_fiscal_date']['date_to'],
         })._get_report_data().get('social_balance_sheet')
 
         if not sbs_data:

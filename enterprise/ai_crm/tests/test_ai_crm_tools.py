@@ -43,13 +43,13 @@ class TestAiCrmTools(TransactionCase):
             'zip_code': '4000',
             'street': 'Quai de Rome 1',
             'job_position': 'Software Engineer',
-        })
+        }, {})
         return self.env['crm.lead'].sudo().search([], order='id desc', limit=1)
 
     @users('public_user')
     def test_get_lead_create_available_params_tool(self):
         tool = self.env.ref('ai_crm.ir_actions_server_ai_get_lead_create_available_params').sudo()
-        prompt = tool._ai_tool_run(None, {})
+        prompt = tool._ai_tool_run(None, {}, {})
         for rec in (*self.tag_ids, *self.team_ids):
             self.assertIn(json.dumps({'id': rec.id, 'display_name': rec.display_name}), prompt)
 
@@ -66,7 +66,7 @@ class TestAiCrmTools(TransactionCase):
         self.assertEqual(self.tag_ids, lead.tag_ids)
         self.assertFalse(lead.user_id)
         self.assertEqual('Website', lead.medium_id.name)
-        self.assertEqual(self.agent.name, lead.source_id.name)
+        self.assertEqual(self.env['utm.mixin']._utm_ref('utm.utm_medium_website'), lead.medium_id)
         self.assertEqual('BE', lead.country_id.code)
         self.assertEqual('WLG', lead.state_id.code)
         self.assertEqual('Liège', lead.city)

@@ -1,10 +1,26 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models
+from odoo import api, models
+from odoo.exceptions import ValidationError
 
 
 class SignRequest(models.Model):
     _inherit = "sign.request"
+
+    @api.constrains('request_item_ids')
+    def _check_no_emsigner_with_external_signature(self):
+        """ Aadhaar signs a document of its own, built from the template, so it cannot share
+        a request with a signer whose signature seals the working copy.
+
+        TODO: drop this once Aadhaar signs through the external signature flow of `sign`,
+        which needs its proxy to sign a digest and return the CMS value instead of signing
+        a whole document of its own.
+        """
+        for sign_request in self:
+            roles = sign_request.request_item_ids.role_id
+            if any(role.auth_method == 'emsigner' for role in roles) and any(roles.mapped('requires_external_signature')):
+                raise ValidationError(self.env._(
+                    "A signer using Aadhaar cannot be part of a request that is signed with a qualified signature."))
 
     def _check_sign_order_with_emsigner(self, request_item):
         """Prevent signing if any sign request item have emsigner as auth_method and it's not the current user's turn."""

@@ -7,10 +7,11 @@ from odoo.addons.web_studio.controllers.keyed_xml_differ import (
     diff_dicts,
     longest_increasing_subsequence,
 )
-from odoo.tests.common import BaseCase
+from odoo.tests.common import tagged, BaseCase
 from odoo.tools.template_inheritance import apply_inheritance_specs
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestXmlDiffer(BaseCase):
     def test_attribute_diff(self):
         d1 = {"k": "v", "k2": "v2", "kignore": "ignore"}
@@ -265,13 +266,7 @@ class TestXmlDiffer(BaseCase):
         self._assertXpathDiffAndReapply(xml_old, xml_new, """
         <data>
             <data>
-                <xpath expr="/div/div" position="inside">
-                    <div o-diff-key="1"/>
-                </xpath>
-                <xpath expr="/div/div/div[2]" position="inside">
-                    <xpath expr="/div/div/div" position="move"/>
-                </xpath>
-                <xpath expr="/div/div" position="replace">
+                <xpath expr="/div/div" position="replace" mode="inner">
                     <xpath expr="/div/div/div" position="move"/>
                 </xpath>
             </data>
@@ -302,16 +297,10 @@ class TestXmlDiffer(BaseCase):
         self._assertXpathDiffAndReapply(xml_old, xml_new, """
         <data>
             <data>
-                <xpath expr="/div/div" position="inside">
-                    <div o-diff-key="1"/>
-                </xpath>
-                <xpath expr="/div/div/div[2]" position="inside">
-                  AB
-                  <xpath expr="/div/div/div" position="move"/>
-                  BC
-                </xpath>
-                <xpath expr="/div/div" position="replace">
+                <xpath expr="/div/div" position="replace" mode="inner">
+                    AB
                     <xpath expr="/div/div/div" position="move"/>
+                    BC
                 </xpath>
             </data>
         </data>
@@ -339,8 +328,8 @@ class TestXmlDiffer(BaseCase):
         self._assertXpathDiffAndReapply(xml_old, xml_new, """
         <data>
           <data>
-            <xpath expr="/div/div" position="replace">
-              <div o-diff-key="1">C</div>
+            <xpath expr="/div/div" position="replace" mode="inner">
+            C
             </xpath>
           </data>
         </data>
@@ -377,18 +366,15 @@ class TestXmlDiffer(BaseCase):
         self._assertXpathDiffAndReapply(xml_old, xml_new, """
         <data>
           <data>
-            <xpath expr="/div/div" position="inside">
-              <div o-diff-key="1" a="changed"/>
+            <xpath expr="/div/div" position="replace" mode="inner">
+                <xpath expr="/div/div/div" position="move"/>
+                C
+                <h1 />
+                <xpath expr="/div/div[2]" position="move"/>
+                B
             </xpath>
-            <xpath expr="/div/div/div[3]" position="inside">
-              <xpath expr="/div/div/div" position="move"/>
-              C
-              <h1/>
-              <xpath expr="/div/div[2]" position="move"/>
-              B
-            </xpath>
-            <xpath expr="/div/div" position="replace">
-              <xpath expr="/div/div/div[2]" position="move"/>
+            <xpath expr="/div/div" position="attributes">
+                <attribute name="a">changed</attribute>
             </xpath>
             <xpath expr="/div/div/h1" position="inside">
               <xpath expr="/div/div/div/div" position="move"/>
@@ -960,6 +946,85 @@ class TestXmlDiffer(BaseCase):
                 B
                 </xpath>
             </data>
+        </data>
+        """
+        self._assertXpathDiffAndReapply(xml_old, xml_new, expected_arch)
+
+    def test_remove_text_after(self):
+        xml_old = """
+        <form o-diff-key="1">
+            <div o-diff-key="2">
+                <br o-diff-key="3" /> A <br o-diff-key="4"/> C
+            </div>
+        </form>
+        """
+        xml_new = """
+        <form o-diff-key="1">
+            <div o-diff-key="2">
+                <br o-diff-key="3" />
+            </div>
+        </form>
+        """
+
+        expected_arch = """<data>
+        <data>
+            <xpath expr="/form/div" position="replace" mode="inner">
+                <xpath expr="/form/div/br" position="move"/>
+            </xpath>
+        </data>
+        </data>
+        """
+        self._assertXpathDiffAndReapply(xml_old, xml_new, expected_arch)
+
+    def test_replace_text_after(self):
+        xml_old = """
+        <form o-diff-key="1">
+            <div o-diff-key="2">
+                <br o-diff-key="3" /> A <br o-diff-key="4"/> C
+            </div>
+        </form>
+        """
+        xml_new = """
+        <form o-diff-key="1">
+            <div o-diff-key="2">
+                <br o-diff-key="3" />A C
+            </div>
+        </form>
+        """
+
+        expected_arch = """
+        <data>
+        <data>
+            <xpath expr="/form/div" position="replace" mode="inner">
+                <xpath expr="/form/div/br" position="move"/>
+                A C
+            </xpath>
+        </data>
+        </data>
+        """
+        self._assertXpathDiffAndReapply(xml_old, xml_new, expected_arch)
+
+    def test_remove_text_before(self):
+        xml_old = """
+        <form o-diff-key="1">
+            <div o-diff-key="2">
+                <br o-diff-key="3" /> A <br o-diff-key="4"/>
+            </div>
+        </form>
+        """
+        xml_new = """
+        <form o-diff-key="1">
+            <div o-diff-key="2">
+               A <br o-diff-key="4" />
+            </div>
+        </form>
+        """
+
+        expected_arch = """<data>
+        <data>
+            <xpath expr="/form/div/br" position="replace"/>
+            <xpath expr="/form/div/br" position="before">A </xpath>
+        </data>
         </data>
         """
         self._assertXpathDiffAndReapply(xml_old, xml_new, expected_arch)

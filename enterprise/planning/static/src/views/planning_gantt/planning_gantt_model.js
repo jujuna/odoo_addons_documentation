@@ -2,23 +2,10 @@ import { user } from "@web/core/user";
 import { router } from "@web/core/browser/router";
 import { Domain } from "@web/core/domain";
 import { deserializeDateTime, serializeDateTime } from "@web/core/l10n/dates";
-import { _t } from "@web/core/l10n/translation";
 import { pick } from "@web/core/utils/objects";
-import { localStartOf } from "@web_gantt/gantt_helpers";
+import { localStartOf, localEndOf } from "@web_gantt/gantt_helpers";
 import { GanttModel } from "@web_gantt/gantt_model";
 import { usePlanningModelActions } from "../planning_hooks";
-
-const GROUPBY_COMBINATIONS = [
-    "role_id",
-    "role_id,resource_id",
-    "role_id,department_id",
-    "department_id",
-    "department_id,role_id",
-    "project_id",
-    "project_id,department_id",
-    "project_id,resource_id",
-    "project_id,role_id",
-];
 
 /**
  * @typedef {import("@web_gantt/gantt_model").Data} Data
@@ -37,7 +24,7 @@ export class PlanningGanttModel extends GanttModel {
         super.setup(...arguments);
         this.getHighlightIds = usePlanningModelActions({
             getHighlightPlannedIds: () => this.env.searchModel.highlightPlannedIds,
-            getContext: () => this.env.searchModel._context,
+            getContext: () => this.env.searchModel.context,
         }).getHighlightIds;
         this.isManager = null;
     }
@@ -45,15 +32,18 @@ export class PlanningGanttModel extends GanttModel {
     /**
      * @override
      */
-    load(searchParams) {
+    async load(searchParams) {
+        if (this.isManager === null) {
+            this.isManager = await user.hasGroup("planning.group_planning_manager");
+        }
+
         const { context, domain } = searchParams;
-        this.hideOpenShift = Boolean(context.hide_open_shift);
         const displayRoleOpenShift = Boolean(context.show_role_open_shifts);
         let displayOpenShift = false;
         for (const node of domain) {
             if (
                 node.length === 3 &&
-                node[0] === "resource_id" &&
+                node[0] === "resource_ids" &&
                 ["!=", "="].includes(node[1]) &&
                 node[2] === false
             ) {
@@ -64,24 +54,28 @@ export class PlanningGanttModel extends GanttModel {
             }
             if (
                 node.length === 3 &&
-                ["department_id", "manager_id", "resource_id", "job_title"].includes(node[0])
+                ["department_id", "manager_id", "resource_ids"].includes(node[0])
             ) {
                 displayOpenShift = true;
             }
         }
-        if (displayRoleOpenShift){
+        if (displayRoleOpenShift) {
             searchParams.domain = Domain.and([domain, [["is_users_role", "=", true]]]).toList();
-        }
-        else if (displayOpenShift) {
-            searchParams.domain = Domain.or([domain, "[('resource_id', '=', false)]"]).toList();
+        } else if (displayOpenShift) {
+            searchParams.domain = Domain.or([
+                domain,
+                Domain.and([
+                    Domain.removeDomainLeaves(domain, [
+                        "department_id",
+                        "manager_id",
+                        "resource_ids",
+                    ]),
+                    [["resource_ids", "=", false]],
+                ]),
+            ]).toList();
         }
 
-        let groupProm;
-        if (this.isManager === null) {
-            groupProm = user.hasGroup("planning.group_planning_manager").then(result => this.isManager = result);
-        }
-
-        return Promise.all([super.load({ ...searchParams, context: { ...context, show_job_title: true } }), groupProm]);
+        return super.load({ ...searchParams, context: { ...context, show_job_title: true } });
     }
 
     get hasMultiCreate() {
@@ -95,18 +89,57 @@ export class PlanningGanttModel extends GanttModel {
     /**
      * @override
      */
-    _processProgressBars(progressBars) {
-        if (!this.orm.isSample) {
-            const resources = Object.values(progressBars.resource_id || []);
-            for (const resource of resources) {
-                if (resource.work_intervals) {
-                    resource.work_intervals = resource.work_intervals.map((work_interval) =>
-                        work_interval.map(deserializeDateTime)
-                    );
-                }
+    _processGanttData(metaData, data, ganttData) {
+        if ("working_periods" in ganttData) {
+            const workingPeriods = {};
+            for (const [resource_id, periods] of Object.entries(ganttData.working_periods)) {
+                workingPeriods[resource_id] = periods.map(({ start, end }) => ({
+                    start: deserializeDateTime(start),
+                    end: end && deserializeDateTime(end),
+                }));
             }
+            data.workingPeriods = workingPeriods;
         }
-        return super._processProgressBars(progressBars);
+        if ("planning_data" in ganttData) {
+            if (!this.orm.isSample) {
+                const workIntervals = {};
+                for (const [resource_id, periods] of Object.entries(ganttData.planning_data.work_intervals)) {
+                    workIntervals[resource_id] = periods.map((work_interval) =>
+                        work_interval.map(deserializeDateTime)
+                    )
+                }
+                data.workIntervals = workIntervals;
+            }
+
+            const isFlexibleHours = {};
+            for (const [resource_id, value] of Object.entries(ganttData.planning_data.is_flexible)) {
+                isFlexibleHours[resource_id] = value
+            }
+            data.isFlexibleHours = isFlexibleHours;
+
+            const avgWorkHours = {};
+            for (const [resource_id, value] of Object.entries(ganttData.planning_data.avg_hours)) {
+                avgWorkHours[resource_id] = value
+            }
+            data.avgWorkHours = avgWorkHours;
+        }
+        super._processGanttData(metaData, data, ganttData);
+    }
+
+    /**
+     * @override
+     */
+    _getUnscheduleData(eventId) {
+        const data = {
+            ...super._getUnscheduleData(...arguments),
+            resource_ids: false,
+            state: "1_draft",
+        };
+        const record = this.data.records.find((r) => r.id === eventId);
+        if (record) {
+            data.allocated_hours = record.allocated_hours;
+        }
+        return data;
     }
 
     //--------------------------------------------------------------------------
@@ -118,12 +151,18 @@ export class PlanningGanttModel extends GanttModel {
      */
     getAdditionalContext() {
         const { records } = this.data;
-        const { startDate, scale, stopDate } = this.metaData;
+        const { startDate, scale, rangeId } = this.metaData;
         const defaultEmployeeIds = new Set();
         for (const record of records) {
-            if (record.employee_id) {
-                defaultEmployeeIds.add(record.employee_id.id);
+            if (record.employee_public_ids) {
+                for (const employeeId of record.employee_public_ids) {
+                    defaultEmployeeIds.add(employeeId);
+                }
             }
+        }
+        let stopDate = this.metaData.stopDate;
+        if (this.metaData.ranges && rangeId in this.metaData.ranges) {
+            stopDate = localEndOf(startDate, rangeId);
         }
         return {
             ...this.searchParams.context,
@@ -144,7 +183,7 @@ export class PlanningGanttModel extends GanttModel {
         const context = super.getDialogContext(...arguments);
         delete context.show_job_title;
         delete context.highlight_planned;
-        delete context.highlight_conflicting;
+        delete context.highlight_needs_attention;
         if (this.metaData.scale.id == 'day') {
             context.planning_keep_default_datetime = true;
         }
@@ -196,7 +235,7 @@ export class PlanningGanttModel extends GanttModel {
         }
         if (records.length) {
             await this.orm.create(this.metaData.resModel, records, {
-                context: { ...this.searchParams.context, multi_create: true },
+                context: { ...this.searchParams.context, multi_create: true, add_materials_assigned_to_employees: true },
             });
             await this.fetchData();
         }
@@ -234,34 +273,16 @@ export class PlanningGanttModel extends GanttModel {
     //--------------------------------------------------------------------------
 
     /**
-     * Check if the given groupedBy includes fields for which an empty fake group will be created
-     *
-     * @protected
-     * @param {string[]} groupedBy
-     * @returns {boolean}
-     */
-    _allowCreateEmptyGroups(groupedBy) {
-        return groupedBy.includes("resource_id");
-    }
-
-    /**
-     * Check if the given groupBy is in the list that has to generate empty lines
-     *
-     * @protected
-     * @param {string[]} groupedBy
-     * @returns {boolean}
-     */
-    _allowedEmptyGroups(groupedBy) {
-        return GROUPBY_COMBINATIONS.includes(groupedBy.join(","));
-    }
-
-    /**
      * @override
      */
-    async _fetchData() {
+    async _fetchData(metaData, additionalContext) {
+        const context = {
+            ...additionalContext,
+            hide_planned_dates: true,
+        }
         const [ highlightIds, ] = await Promise.all([
             this.getHighlightIds(),
-            super._fetchData(...arguments),
+            super._fetchData(metaData, context),
         ])
         const firstRow = this.data?.rows?.[0];
         if (firstRow.isGroup && this.orm.isSample && !this.isClosed(firstRow.id)) {
@@ -273,59 +294,10 @@ export class PlanningGanttModel extends GanttModel {
     /**
      * @override
      */
-    _generateRows(metaData, params) {
-        const { groupedBy, groups, parentGroup } = params;
-        if (!this.hideOpenShift) {
-            if (parentGroup.length === 0) {
-                // _generateRows is a recursive function.
-                // Here, we are generating top level rows.
-                if (this._allowCreateEmptyGroups(groupedBy)) {
-                    // The group with false values for every groupby can be absent from
-                    // groups (= groups returned by formatted_read_group basically).
-                    // Here we add the fake group {} in groups in any case (this simulates the group
-                    // with false values mentionned above).
-                    // This will force the creation of some rows with resId = false
-                    // (e.g. 'Open Shifts') from top level to bottom level.
-                    groups.push({});
-                }
-                if (this._allowedEmptyGroups(groupedBy)) {
-                    params.addOpenShifts = true;
-                }
-            }
-            if (params.addOpenShifts && groupedBy.length === 1) {
-                // Here we are generating some rows on last level under a common
-                // "parent" (if any: first level can be last level).
-                // We make sure that a row with resId = false for
-                // the unique groupby in groupedBy and same "parent" will be
-                // added by adding a suitable fake group to the groups (a subset
-                // of the groups returned by formatted_read_group).
-                const fakeGroup = Object.assign({}, ...parentGroup);
-                groups.push(fakeGroup);
-            }
-        }
-        const rows = super._generateRows(...arguments);
-        // keep empty row to the head and sort the other rows alphabetically
-        if (rows.length > 1) {
-            rows.sort((a, b) => {
-                if (a.resId && !b.resId) {
-                    return 1;
-                } else if (!a.resId && b.resId) {
-                    return -1;
-                } else {
-                    return a.name.localeCompare(b.name);
-                }
-            });
-        }
-        return rows;
-    }
-
-    /**
-     * @override
-     */
     _getGroupedBy(metaData, searchParams) {
         let groupBy = [...searchParams.groupBy];
         if (!this.firstLoad && searchParams.context.planning_groupby_role && !groupBy.length) {
-            groupBy = ["role_id", "resource_id"];
+            groupBy = ["role_id", "resource_ids"];
         }
         return super._getGroupedBy(metaData, { ...searchParams, groupBy });
     }
@@ -362,18 +334,26 @@ export class PlanningGanttModel extends GanttModel {
     }
 
     /**
-     * Rename 'Undefined Resource' and 'Undefined Department' to 'Open Shifts'.
-     *
      * @override
      */
-    _getRowName(_, groupedByField, value) {
-        if (["department_id", "resource_id"].includes(groupedByField)) {
-            const resId = Array.isArray(value) ? value[0] : value;
-            if (!resId) {
-                return _t("Open Shifts");
-            }
-        }
-        return super._getRowName(...arguments);
+    _getEventsToScheduleDomain(metaData) {
+        const { dateStartField, dateStopField } = metaData;
+        let baseDomain = this.searchParams.domain;
+
+        const usersDomain = new Domain(baseDomain)
+            .toList()
+            .some(
+                (leaf) => Array.isArray(leaf) && leaf.length === 3 && ["user_ids"].includes(leaf[0])
+            );
+        baseDomain = usersDomain
+            ? Domain.or([baseDomain, [["resource_ids", "=", false]]])
+            : baseDomain;
+
+        const domain = Domain.and([
+            Domain.removeDomainLeaves(baseDomain, [dateStartField, dateStopField]).toList(),
+            ["&", [dateStartField, "=", false], [dateStopField, "=", false]],
+        ]);
+        return domain.toList();
     }
 
     /**
@@ -387,5 +367,68 @@ export class PlanningGanttModel extends GanttModel {
             ...this.metaData.groupedBy,
         ];
         return pick(schedule, ...allowedFields);
+    }
+
+    /**
+     * @override
+     */
+    _getRescheduleContext() {
+        return {
+            ...super._getRescheduleContext(),
+            add_materials_assigned_to_employees: true,
+        };
+    }
+
+    /**
+     * @override
+     */
+    _getUnscheduleContext() {
+        return {
+            ...super._getUnscheduleContext(),
+            from_slot_unscheduling: true,
+        };
+    }
+
+    async _assignSlot(ids, schedule) {
+        const [resolvedIds, data, context] = this._getRescheduleData(ids, schedule);
+        return this.mutex.exec(async () => {
+            let result;
+            try {
+                result = await this.orm.call(
+                    this.metaData.resModel,
+                    "assign_slot",
+                    [resolvedIds, data],
+                    {
+                        context: {
+                            ...context,
+                            default_end_datetime: serializeDateTime(this.metaData.globalStop),
+                            scale: this.metaData.scale.id,
+                        },
+                    }
+                );
+            } finally {
+                await this.fetchData();
+            }
+            return result;
+        });
+    }
+
+    /**
+     * @override
+     */
+    async _fetchEventsToSchedule(params) {
+        const result = await super._fetchEventsToSchedule(params);
+        const activeId = this.searchParams.context.active_id;
+
+        if (!activeId) {
+            return result;
+        }
+
+        const index = result.records.findIndex(({ id }) => id === activeId);
+        if (index > 0) {
+            result.records.unshift(...result.records.splice(index, 1));
+        }
+
+        return result;
     }
 }

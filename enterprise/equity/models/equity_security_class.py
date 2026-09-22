@@ -64,7 +64,7 @@ class EquitySecurityClass(models.Model):
         securities_per_class = self._get_securities_per_class()
         for security_class in self:
             if (remaining := securities_per_class.get(security_class)) is not None:
-                security_class.display_name += f" \t--{float_repr(remaining, 2)}--"
+                security_class.display_name += f" \v--{float_repr(remaining, 2)}--"
 
     def _get_securities_per_class(self):
         transaction_id = self.env.context.get('transaction_id')

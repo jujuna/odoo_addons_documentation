@@ -16,6 +16,7 @@ from odoo.tools import mute_logger
 
 
 @tagged('social_post_twitter')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class SocialTwitterCase(SocialCase):
     @classmethod
     def setUpClass(cls):
@@ -34,9 +35,9 @@ class SocialTwitterCase(SocialCase):
                 'twitter_user_id': '5678'
             })
 
-            cls.env['ir.config_parameter'].sudo().set_param(
+            cls.env['ir.config_parameter'].sudo().set_str(
                 'social.twitter_consumer_key', 'key')
-            cls.env['ir.config_parameter'].sudo().set_param(
+            cls.env['ir.config_parameter'].sudo().set_str(
                 'social.twitter_consumer_secret_key', 'secret_key')
 
             cls.social_stream_type_1 = cls.env.ref(
@@ -173,8 +174,23 @@ class SocialTwitterCase(SocialCase):
         ])
         self.assertEqual(len(tweets), 2)
 
+    def test_social_user_update_likes(self):
+        tweet = self.env['social.stream.post'].create({
+            'stream_id': self.social_stream_1.id,
+            'twitter_likes_count': 4,
+            'twitter_tweet_id': '5',
+        })
+
+        tweet.with_user(self.social_user)._twitter_update_likes(True)
+        self.assertEqual(tweet.twitter_likes_count, 5)
+        self.assertTrue(tweet.twitter_user_likes)
+
+        tweet.with_user(self.social_user)._twitter_update_likes(False)
+        self.assertEqual(tweet.twitter_likes_count, 4)
+        self.assertFalse(tweet.twitter_user_likes)
+
     def test_remove_mentions(self):
-        self.env['ir.config_parameter'].set_param('social_twitter.disable_mentions', True)
+        self.env['ir.config_parameter'].set_bool('social_twitter.disable_mentions', True)
 
         # without `ignore_mention` parameter
         assert_results = [
@@ -222,23 +238,30 @@ class SocialTwitterCase(SocialCase):
             'message': message_to_post,
             'account_ids': self.social_stream_1.account_id,
         })
-        counter_message = f'{len(message_to_post)} / {social_media.max_post_length} characters to fit in a Post'
 
         # When posting a message exceeding the Twitter limit (280 characters), verify that the
         # preview properly shows that we exceed the limit (with highlighted exceeding text).
-        self.assertEqual(social_post.twitter_post_limit_message, counter_message)
         self.assertTrue('o_social_twitter_message_exceeding' in social_post.twitter_preview)
 
         with self.assertRaises(ValidationError):
-            social_post.action_post()  # Should raise ValidationError when trying to post tweet having content exceeding the limit
+            social_post.action_post_now()  # Should raise ValidationError when trying to post tweet having content exceeding the limit
 
         social_media.max_post_length = 0
-        social_post._compute_twitter_post_limit_message()
+        social_post._compute_is_twitter_post_limit_exceed()
         social_post._compute_twitter_preview()
-        counter_message = f'{len(message_to_post)} / {social_media.max_post_length} characters to fit in a Post'
 
-        self.assertEqual(social_post.twitter_post_limit_message, counter_message)
         # Preview should not have Exceed Content when Max content length is satisfied
         self.assertTrue('o_social_twitter_message_exceeding' not in social_post.twitter_preview)
 
-        social_post.action_post()  # Should not raise ValidationError when trying to post tweet having proper content length
+        social_post.action_post_now()  # Should not raise ValidationError when trying to post tweet having proper content length
+
+    def test_get_tweet_size(self):
+        messages = [
+            ("🙂😆t", 5),
+            ("❤", 2),
+            ("https://example.com/aaaaaaaaaaaaaaaaa test", 28),
+            ("🧑‍🚒", 2),  # 🧑 + ZWJ + 🚒
+            ("❤️", 2)  # ❤ + "unicode variant"
+        ]
+        for messages, expected in messages:
+            self.assertEqual(self.env['social.post.template']._get_tweet_size(messages), expected)

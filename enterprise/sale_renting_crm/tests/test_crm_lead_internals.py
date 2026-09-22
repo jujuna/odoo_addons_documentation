@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from dateutil.relativedelta import relativedelta
+
+from odoo import fields
 from odoo.addons.crm.tests import common as crm_common
-from odoo.tests import Form, users
+from odoo.tests import tagged, Form, users
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestLead(crm_common.TestCrmCommon):
 
     @users('user_sales_leads')
@@ -18,57 +22,45 @@ class TestLead(crm_common.TestCrmCommon):
 
         lead.user_id = self.user_sales_manager
         partner.user_id = self.user_sales_salesman
-        rental_order_form = Form(SaleOrder.with_context(lead._get_action_rental_context()))
+        rental_order_form = Form(SaleOrder.with_context(lead._prepare_opportunity_quotation_context()))
         rental_order = rental_order_form.save()
         self.assertEqual(rental_order.user_id, self.user_sales_manager, 'The salesperson of the lead is set and should be propagated on the rental order.')
 
         lead.user_id = False
-        rental_order_form = Form(SaleOrder.with_context(lead._get_action_rental_context()))
+        rental_order_form = Form(SaleOrder.with_context(lead._prepare_opportunity_quotation_context()))
         rental_order = rental_order_form.save()
         self.assertEqual(rental_order.user_id, self.user_sales_salesman, 'The salesperson of contact is set and should be propagated on the rental order.')
 
         partner.user_id = False
-        rental_order_form = Form(SaleOrder.with_context(lead._get_action_rental_context()))
+        rental_order_form = Form(SaleOrder.with_context(lead._prepare_opportunity_quotation_context()))
         rental_order = rental_order_form.save()
         self.assertEqual(rental_order.user_id, self.user_sales_leads, 'The salesperson of the current user should be propagated on the rental order.')
 
     @users('user_sales_leads')
     def test_rental_and_sale_fields(self):
         lead = self.env['crm.lead'].browse(self.lead_1.ids)
-        recurrence_day = self.env['sale.temporal.recurrence'].sudo().create({'duration': 1, 'unit': 'day'})
         self.contact_1.property_product_pricelist = self.env['product.pricelist'].sudo().create({
             'name': 'Test Pricelist',
         })
-        rental_product = self.env['product.product'].sudo().create({
-            'extra_daily': 10,
-            'extra_hourly': 5,
-            'list_price': 100,
-            'name': 'Rent Product',
-            'rent_ok': True,
-            'type': 'consu',
-            'product_pricing_ids': self.env['product.pricing'].sudo().create({
-                'recurrence_id': recurrence_day.id,
-                'price': 100,
-            }),
+        sale_product = self.env['product.product'].sudo().create({
+            'list_price': 100, 'name': 'Product', 'sale_ok': True, 'type': 'consu'
         })
+        rental_product = sale_product.copy({'name': 'Rent Product', 'rent_periodicity': 'days'})
 
-        base_order_vals = {
-            'is_rental_order': True,
-            'order_line': [
-                (0, 0, {'product_id': rental_product.id,
-                        'product_uom_qty': 2,
-                       }
-                )],
-            'opportunity_id': lead.id,
-            'partner_id': self.contact_1.id,
+        base_order_vals = {'opportunity_id': lead.id, 'partner_id': self.contact_1.id}
+
+        rental_order_vals = {
+            **base_order_vals,
+            'rental_start_date': fields.Datetime.now(),
+            'rental_return_date': fields.Datetime.now() + relativedelta(days=1),
+            'order_line': [(0, 0, {'product_id': rental_product.id, 'product_uom_qty': 2})],
         }
 
         orders = self.env['sale.order'].create([
-            dict(base_order_vals),
-            dict(base_order_vals),
-            dict(base_order_vals)
+            dict(rental_order_vals),
+            dict(rental_order_vals),
+            dict(rental_order_vals),
         ])
-        orders.order_line.update({'is_rental': True})
         orders[0:2].action_confirm()
         self.env.flush_all()
 
@@ -78,11 +70,11 @@ class TestLead(crm_common.TestCrmCommon):
 
         # Check that sale_order_count and, quotation_count and sale_amount_total
         # fields on the lead does not include rental quotations / orders
-        del base_order_vals['is_rental_order']
-        orders = self.env['sale.order'].create([
-            base_order_vals,
-            base_order_vals,
-        ])
+        sale_order_vals = {
+            **base_order_vals,
+            'order_line': [(0, 0, {'product_id': sale_product.id, 'product_uom_qty': 2})],
+        }
+        orders = self.env['sale.order'].create([sale_order_vals, sale_order_vals])
         self.assertEqual(len(lead.order_ids), 5, "'order_ids' contains all the linked orders(rental or not)")
         self.assertEqual(lead.quotation_count, 2, "'quotation_count' should exclude data of rental quotations")
         self.assertEqual(lead.sale_order_count, 0, "'sale_order_count' should exclude data of rental orders")
@@ -96,3 +88,28 @@ class TestLead(crm_common.TestCrmCommon):
         self.assertEqual(lead.rental_quotation_count, 1)
         self.assertEqual(lead.rental_order_count, 2)
         self.assertEqual(lead.rental_amount_total, 2*2*100)
+
+    @users('user_sales_leads')
+    def test_action_view_sale_quotation_excludes_rental_quotations(self):
+        sale_product, rental_product = self.env['product.product'].sudo().create([
+            {'name': 'Product'},
+            {'name': 'Rent Product', 'rent_periodicity': 'days'},
+        ])
+        regular_quotation, rental_quotation = self.env['sale.order'].create([
+            {
+                'opportunity_id': self.lead_1.id,
+                'partner_id': self.contact_1.id,
+                'order_line': [(0, 0, {'product_id': sale_product.id, 'product_uom_qty': 1})],
+            },
+            {
+                'opportunity_id': self.lead_1.id,
+                'partner_id': self.contact_1.id,
+                'rental_start_date': fields.Datetime.now(),
+                'rental_return_date': fields.Datetime.now() + relativedelta(days=1),
+                'order_line': [(0, 0, {'product_id': rental_product.id, 'product_uom_qty': 1})],
+            },
+        ])
+        action = self.lead_1.action_view_sale_quotation()
+        visible_orders = self.env['sale.order'].search_fetch(action['domain'], ['id'])
+        self.assertEqual(visible_orders.ids, [regular_quotation.id])
+        self.assertNotIn(rental_quotation.id, visible_orders.ids)

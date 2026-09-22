@@ -40,7 +40,7 @@ class AppraisalSurvey(Survey):
         user = request.env.user
         if user in appraisal.manager_ids.mapped('user_id') or user.has_group('hr_appraisal.group_hr_appraisal_user'):
             return Domain('appraisal_id', '=', appraisal.id) & user_input_domain
-        if user in appraisal.employee_feedback_ids.mapped('user_id'):
+        if user in appraisal.partner_feedback_ids.mapped('user_id'):
             return Domain('appraisal_id', '=', appraisal.id) & Domain('partner_id', '=', user.partner_id.id) & user_input_domain
         raise AccessDenied()
 
@@ -64,7 +64,7 @@ class AppraisalSurvey(Survey):
             if survey_id:
                 domain = Domain('survey_id', '=', int(survey_id)) & domain
             survey_sudo = request.env['survey.user_input'].sudo().search(domain, limit=1).survey_id
-        if user in appraisal.employee_feedback_ids.mapped('user_id') and not survey_id:
+        if user in appraisal.partner_feedback_ids.mapped('user_id') and not survey_id:
             answer = request.env['survey.user_input'].sudo().search([
                 ('appraisal_id', '=', appraisal.id),
                 ('partner_id', '=', request.env.user.partner_id.id),

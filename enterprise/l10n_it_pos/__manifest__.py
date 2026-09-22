@@ -2,7 +2,6 @@
 
 {
     'name': 'Italy - Point of Sale',
-    'version': '1.0',
     'description': '''Integration of Odoo PoS with the Italian Fiscal Printer''',
     'category': 'Accounting/Localizations/Point of Sale',
     'auto_install': True,
@@ -12,7 +11,7 @@
     ],
     'data': [
         'views/pos_payment_view.xml',
-        'views/res_config_settings_view.xml',
+        'views/pos_printer_views.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [

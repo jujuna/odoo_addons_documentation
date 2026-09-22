@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import fields, models
+from odoo.tools import SQL
 
 
 class SaleOrderLogReport(models.Model):
@@ -10,17 +10,15 @@ class SaleOrderLogReport(models.Model):
     commission_plan_id = fields.Many2one('commission.plan', readonly=True)
 
     def _select(self):
-        select = super()._select()
-        return f"""
-                {select},
+        return SQL("""
+                %s,
                 so.referrer_id AS referrer_id,
                 so.commission_plan_id AS commission_plan_id
-        """
+        """, super()._select())
 
     def _group_by(self):
-        group_by = super()._group_by()
-        return f"""
-            {group_by},
+        return SQL("""
+            %s,
             so.referrer_id,
             so.commission_plan_id
-        """
+        """, super()._group_by())

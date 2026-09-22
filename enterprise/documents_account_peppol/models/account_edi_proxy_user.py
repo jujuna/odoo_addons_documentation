@@ -9,8 +9,8 @@ class Account_Edi_Proxy_ClientUser(models.Model):
         # EXTENDS account_peppol
         """Save new documents in the Documents app, when a folder has been set on the company.
         """
-        if self.company_id.peppol_reception_mode == 'documents':
-            document = self.env['documents.document'].create({
+        if self.company_id.peppol_reception_mode == 'documents' and self.company_id._peppol_allows_document_reception():
+            document = self.env['documents.document'].with_context(documents_source=_('Peppol')).create({
                 'attachment_id': attachment.id,
                 'folder_id': self.company_id.documents_account_peppol_folder_id.id,
                 'tag_ids': [Command.set(self.company_id.documents_account_peppol_tag_ids.ids)],

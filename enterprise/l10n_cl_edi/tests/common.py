@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-import base64
 import logging
-import os
 
-from odoo.addons.account_edi.tests.common import AccountEdiTestCommon
-from odoo.tools import misc
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+from odoo.tools import BinaryBytes
 
 _logger = logging.getLogger(__name__)
 
@@ -18,9 +15,21 @@ def _is_valid_certificate(self):
         certificate.is_valid = True
 
 
-class TestL10nClEdiCommon(AccountEdiTestCommon):
+class TestL10nClEdiCommon(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
-    @AccountEdiTestCommon.setup_country('cl')
+    def _make_caf_file(cls, *replacements):
+        """Build a CAF file out of the template, applying ``replacements`` to it."""
+        value = cls.file_read('l10n_cl_edi/tests/template/caf_file_template.xml').content
+        for src, dest in replacements:
+            if isinstance(src, str):
+                src, dest = src.encode(), dest.encode()
+            value = value.replace(src, dest)
+        return BinaryBytes(value)
+
+    @classmethod
+    @AccountTestInvoicingCommon.setup_country('cl')
     def setUpClass(cls):
         super().setUpClass()
 
@@ -45,10 +54,9 @@ class TestL10nClEdiCommon(AccountEdiTestCommon):
             'country_id': cl_country,
             'l10n_cl_activity_description': 'activity_test',
         })
-        content = misc.file_open('certificate/tests/data/cert.pfx', mode="rb").read()
         cls.certificate = cls.env['certificate.certificate'].create({
             'name': 'CL Test certificate',
-            'content': base64.b64encode(content),
+            'content': cls.file_read('certificate/tests/data/cert.pfx'),
             'pkcs12_password': 'example',
             'subject_serial_number': '23841194-7',
             'company_id': cls.company_data['company'].id,
@@ -60,7 +68,6 @@ class TestL10nClEdiCommon(AccountEdiTestCommon):
 
         cls.partner_sii = cls.env['res.partner'].create({
             'name': 'Partner SII',
-            'is_company': 1,
             'city': 'Pudahuel',
             'country_id': cl_country,
             'street': 'Puerto Test 102',
@@ -68,21 +75,18 @@ class TestL10nClEdiCommon(AccountEdiTestCommon):
             'website': 'http://www.partner_sii.cl',
             'company_id': cls.company_data['company'].id,
             'l10n_cl_dte_email': 'partner@sii.cl',
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_cl.it_RUT').id,
             'l10n_cl_sii_taxpayer_type': '1',
             'l10n_cl_activity_description': 'activity_test',
             'vat': '76086428-5',
         })
         cls.partner_dte_2 = cls.env['res.partner'].create({
             'name': 'CARLOS BOLOMEY SPA',
-            'is_company': 1,
             'city': 'Santiago',
             'country_id': cl_country,
             'street': 'San Pablo N° 1923',
             'phone': '+562 0000 0000',
             'company_id': cls.company_data['company'].id,
             'l10n_cl_dte_email': 'bolomey@test.com',
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_cl.it_RUT').id,
             'l10n_cl_sii_taxpayer_type': '1',
             'l10n_cl_activity_description': 'activity_test',
             'vat': '87590300-4',
@@ -105,42 +109,53 @@ class TestL10nClEdiCommon(AccountEdiTestCommon):
             'default_account_id': cls.env['account.account'].search([
                 ('company_ids', '=', cls.company_data['company'].id), ('code', '=', '310115')]).id
         })
-        caf_file_template = misc.file_open(os.path.join(
-            'l10n_cl_edi', 'tests', 'template', 'caf_file_template.xml')).read()
-
-        caf34_file = caf_file_template.replace('<TD></TD>', '<TD>34</TD>').replace(
-            '<RS>Blanco Martin Asociados EIRL</RS>', '<RS>Blanco Martin &amp; Asociados EIRL</RS>').replace(
-            '<RSAPK><M>xBcfZfii8tMuKkuuWIYxz68CZg55jaPsQQVkGjqDl1b7osuKzJEHtS0M3PrnSF6DxwUxg2XjS0IOregtLf+FwQ==</M><E>Aw==</E></RSAPK>',
-            '<RSAPK><M>bRGTU5RcHmh+CE55s/swgQylOygCFDgxGj0CKpMuvlXEI+z3jy3ekU9AOGenUvupl8iA+VaAjSiXo0yW/NrT7Q==</M><E>AQAB</E></RSAPK>')
+        cls.purchase_journal = cls.env['account.journal'].create({
+            'name': 'Purchase Journal Test',
+            'type': 'purchase',
+            'code': 'BILL2',
+            'l10n_latam_use_documents': True,
+            'default_account_id': cls.env['account.account'].search([
+                ('company_ids', '=', cls.company_data['company'].id), ('code', '=', '410235')]).id
+        })
+        caf34_file = cls._make_caf_file(
+            ('<TD></TD>', '<TD>34</TD>'),
+            ('<RS>Blanco Martin Asociados EIRL</RS>', '<RS>Blanco Martin &amp; Asociados EIRL</RS>'),
+            ('<RSAPK><M>xBcfZfii8tMuKkuuWIYxz68CZg55jaPsQQVkGjqDl1b7osuKzJEHtS0M3PrnSF6DxwUxg2XjS0IOregtLf+FwQ==</M><E>Aw==</E></RSAPK>',
+             '<RSAPK><M>bRGTU5RcHmh+CE55s/swgQylOygCFDgxGj0CKpMuvlXEI+z3jy3ekU9AOGenUvupl8iA+VaAjSiXo0yW/NrT7Q==</M><E>AQAB</E></RSAPK>'),
+        )
         cls.caf_factura_afecta = cls.env['l10n_cl.dte.caf'].sudo().create({
             'filename': 'FoliosSII7620122434221201910221946.xml',
-            'caf_file': base64.b64encode(caf34_file.encode('utf-8')),
+            'caf_file': caf34_file,
             'l10n_latam_document_type_id': cls.env.ref('l10n_cl.dc_y_f_dte').id,
             'status': 'in_use',
         })
 
-        caf33_file = caf_file_template.replace('<TD></TD>', '<TD>33</TD>')
+        caf33_file = cls._make_caf_file(('<TD></TD>', '<TD>33</TD>'))
         cls.caf_33 = cls.env['l10n_cl.dte.caf'].sudo().create({
             'filename': 'FoliosSII7620122433321201910221946.xml',
-            'caf_file': base64.b64encode(caf33_file.encode('utf-8')),
+            'caf_file': caf33_file,
             'l10n_latam_document_type_id': cls.env.ref('l10n_cl.dc_a_f_dte').id,
             'status': 'in_use',
         })
 
-        caf39_file = caf_file_template.replace('<TD></TD>', '<TD>39</TD>').replace(
-            '<RNG><D>001</D><H>100</H></RNG>', '<RNG><D>1</D><H>100</H></RNG>')
+        caf39_file = cls._make_caf_file(
+            ('<TD></TD>', '<TD>39</TD>'),
+            ('<RNG><D>001</D><H>100</H></RNG>', '<RNG><D>1</D><H>100</H></RNG>'),
+        )
         cls.caf_39 = cls.env['l10n_cl.dte.caf'].sudo().create({
             'filename': 'FoliosSII7620122433921201910221946.xml',
-            'caf_file': base64.b64encode(caf39_file.encode('utf-8')),
+            'caf_file': caf39_file,
             'l10n_latam_document_type_id': cls.env.ref('l10n_cl.dc_b_f_dte').id,
             'status': 'in_use',
         })
 
-        caf56_file = caf_file_template.replace('<TD></TD>', '<TD>56</TD>').replace(
-            '<RNG><D>001</D><H>100</H></RNG>', '<RNG><D>122</D><H>200</H></RNG>')
+        caf56_file = cls._make_caf_file(
+            ('<TD></TD>', '<TD>56</TD>'),
+            ('<RNG><D>001</D><H>100</H></RNG>', '<RNG><D>122</D><H>200</H></RNG>'),
+        )
         cls.caf_56 = cls.env['l10n_cl.dte.caf'].sudo().create({
             'filename': 'FoliosSII7620122435621201910221946.xml',
-            'caf_file': base64.b64encode(caf56_file.encode('utf-8')),
+            'caf_file': caf56_file,
             'l10n_latam_document_type_id': cls.env.ref('l10n_cl.dc_nd_f_dte').id,
             'status': 'in_use',
         })
@@ -148,19 +163,21 @@ class TestL10nClEdiCommon(AccountEdiTestCommon):
         l10n_latam_document_type_110 = cls.env.ref('l10n_cl.dc_fe_dte')
         l10n_latam_document_type_110.write({'active': True})
 
-        caf110_file = caf_file_template.replace('<TD></TD>', '<TD>110</TD>')
+        caf110_file = cls._make_caf_file(('<TD></TD>', '<TD>110</TD>'))
         cls.caf_110 = cls.env['l10n_cl.dte.caf'].sudo().create({
             'filename': 'FoliosSII76201224311021201910221946.xml',
-            'caf_file': base64.b64encode(caf110_file.encode('utf-8')),
+            'caf_file': caf110_file,
             'l10n_latam_document_type_id': l10n_latam_document_type_110.id,
             'status': 'in_use',
         })
 
-        caf34_254_file = caf_file_template.replace('<TD></TD>', '<TD>34</TD>').replace(
-            '<RNG><D>001</D><H>100</H></RNG>', '<RNG><D>001</D><H>300</H></RNG>')
+        caf34_254_file = cls._make_caf_file(
+            ('<TD></TD>', '<TD>34</TD>'),
+            ('<RNG><D>001</D><H>100</H></RNG>', '<RNG><D>101</D><H>300</H></RNG>'),
+        )
         cls.caf_34_254 = cls.env['l10n_cl.dte.caf'].sudo().create({
             'filename': 'FoliosSII7620122432921201910221946.xml',
-            'caf_file': base64.b64encode(caf34_254_file.encode('utf-8')),
+            'caf_file': caf34_254_file,
             'l10n_latam_document_type_id': cls.env['l10n_latam.document.type'].search([
                 ('code', '=', '34'),
                 ('country_id.code', '=', 'CL')
@@ -168,13 +185,26 @@ class TestL10nClEdiCommon(AccountEdiTestCommon):
             'status': 'in_use',
         })
 
-        caf33_301_file = caf_file_template.replace('<TD></TD>', '<TD>33</TD>').replace(
-            '<RNG><D>001</D><H>100</H></RNG>', '<RNG><D>001</D><H>310</H></RNG>')
+        caf33_301_file = cls._make_caf_file(
+            ('<TD></TD>', '<TD>33</TD>'),
+            ('<RNG><D>001</D><H>100</H></RNG>', '<RNG><D>101</D><H>310</H></RNG>'),
+        )
         cls.caf_33_301 = cls.env['l10n_cl.dte.caf'].sudo().create({
             'filename': 'FoliosSII7620122431921201910221946.xml',
-            'caf_file': base64.b64encode(caf33_301_file.encode('utf-8')),
+            'caf_file': caf33_301_file,
             'l10n_latam_document_type_id': cls.env['l10n_latam.document.type'].search([
                 ('code', '=', '33'),
+                ('country_id.code', '=', 'CL')
+            ]).id,
+            'status': 'in_use',
+        })
+
+        caf46_file = cls._make_caf_file(('<TD></TD>', '<TD>46</TD>'))
+        cls.caf_46 = cls.env['l10n_cl.dte.caf'].sudo().create({
+            'filename': 'FoliosSII7620122434621201910221946.xml',
+            'caf_file': caf46_file,
+            'l10n_latam_document_type_id': cls.env['l10n_latam.document.type'].search([
+                ('code', '=', '46'),
                 ('country_id.code', '=', 'CL')
             ]).id,
             'status': 'in_use',

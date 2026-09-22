@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Accounting Import',
@@ -10,18 +9,18 @@ Accounting Import
     """,
     'depends': ['account_accountant', 'base_import', 'account_asset'],
     'data': [
-        'security/ir.model.access.csv',
         'views/account_import_views.xml',
         'views/account_account_views.xml',
         'views/account_move_views.xml',
         'views/res_partner_views.xml',
         'views/account_asset_views.xml',
+        'views/account_depreciation_model_views.xml',
         'wizard/account_import_summary_views.xml',
         'wizard/setup_wizards_views.xml',
         'views/res_config_settings_views.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': True,
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'assets': {

@@ -17,6 +17,8 @@ from odoo.addons.sale_subscription.tests.test_sale_subscription import TestSubsc
 @tagged('post_install', '-at_install')
 class TestSubscriptionPaymentFlows(TestSubscriptionCommon, PaymentHttpCommon, MockEmail):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -44,7 +46,7 @@ class TestSubscriptionPaymentFlows(TestSubscriptionCommon, PaymentHttpCommon, Mo
 
     def _my_sub_assign_token(self, **values):
         url = self._build_url(f"/my/subscriptions/assign_token/{self.order.id}")
-        with mute_logger('odoo.addons.base.models.ir_rule', 'odoo.http'):
+        with mute_logger('odoo.addons.base.models.ir_access', 'odoo.http'):
             return self.make_jsonrpc_request(url, params=values)
 
     def test_assign_token_route_with_so_access(self):
@@ -199,25 +201,25 @@ class TestSubscriptionPaymentFlows(TestSubscriptionCommon, PaymentHttpCommon, Mo
 
     def test_subscription_online_payment_with_token(self):
         with freeze_time("2024-05-01"):
-            self.subscription.require_payment = True
+            self.subscription.prepayment_percent = 1
             self.subscription.payment_token_id = self.payment_token.id
-            self.subscription.end_date = '2024-08-01'
             self.subscription.action_confirm()
+            self.subscription.end_date = '2024-08-01'
             with patch('odoo.addons.sale_subscription.models.sale_order.SaleOrder._do_payment', wraps=self._mock_subscription_do_payment):
                 self.env['sale.order']._cron_recurring_create_invoice()
-                self.subscription.transaction_ids._get_last()._post_process()
+                self._run_post_processing()
             # it should create an invoice
             self.assertEqual(self.subscription.invoice_count, 1)
         with freeze_time("2024-06-01"):
             with patch('odoo.addons.sale_subscription.models.sale_order.SaleOrder._do_payment', wraps=self._mock_subscription_do_payment):
                 self.env['sale.order']._cron_recurring_create_invoice()
-                self.subscription.transaction_ids._get_last()._post_process()
+                self._run_post_processing()
             # it should create an invoice
             self.assertEqual(self.subscription.invoice_count, 2)
         with freeze_time("2024-07-01"):
             with patch('odoo.addons.sale_subscription.models.sale_order.SaleOrder._do_payment', wraps=self._mock_subscription_do_payment):
                 self.env['sale.order']._cron_recurring_create_invoice()
-                self.subscription.transaction_ids._get_last()._post_process()
+                self._run_post_processing()
             # it should create an invoice
             self.assertEqual(self.subscription.invoice_count, 3)
         with freeze_time("2024-08-01"):
@@ -277,9 +279,8 @@ class TestSubscriptionPaymentFlows(TestSubscriptionCommon, PaymentHttpCommon, Mo
             wiz = self.env['payment.link.wizard'].with_context(payment_context).create({})
             pay_url = wiz.link
         self.assertFalse(wiz.warning_message, "The wizard has no warning message")
-        action = self.subscription.with_context(tracking_disable=False).prepare_renewal_order()
+        action = self.subscription.prepare_renewal_order()
         renewal_so = self.env['sale.order'].browse(action['res_id'])
-        renewal_so = renewal_so.with_context(tracking_disable=False)
         renewal_so.order_line.product_uom_qty = 3
         renewal_so.name = "Renewal"
         renewal_so.action_confirm()
@@ -306,14 +307,12 @@ class TestSubscriptionPaymentFlows(TestSubscriptionCommon, PaymentHttpCommon, Mo
     @mute_logger('odoo.http')
     def test_invoice_document_generation(self):
         """Check that invoice documents get generated when posting subscription invoices."""
-        self.env['ir.config_parameter'].set_param(
-            'sale.automatic_invoice', self.env.context.get('automatic_invoice', False),
-        )
+        self.env.company.sale_automatic_invoice = self.env.context.get('automatic_invoice', False)
         self.subscription.action_confirm()
 
         AccountMoveSend = self.env.registry['account.move.send']
         with (
-            patch.object(AccountMoveSend, '_get_default_extra_edis', lambda self, move: {'dummy'}),
+            patch.object(AccountMoveSend, '_get_default_extra_edis', lambda self, move: ['dummy']),
             patch.object(AccountMoveSend, '_call_web_service_before_invoice_pdf_render') as mock,
         ):
             response = self._make_http_get_request(
@@ -321,16 +320,16 @@ class TestSubscriptionPaymentFlows(TestSubscriptionCommon, PaymentHttpCommon, Mo
                 params={'access_token': self.subscription.access_token},
             )
             tx_context = self._get_payment_context(response)
-            tx_sudo = self._create_transaction(
+            self._create_transaction(
                 flow='direct',
                 amount=tx_context['amount'],
                 landing_route=tx_context['landing_route'],
                 currency_id=self.subscription.currency_id.id,
+                state='done',
                 sale_order_ids=[Command.set(self.subscription.ids)],
                 subscription_action='assign_token',
             )
-            tx_sudo._set_done()
-            tx_sudo._post_process()
+            self._run_post_processing()
             self.assertEqual(
                 mock.call_count, 1,
                 "Web services should have been called for document generation",
@@ -358,17 +357,16 @@ class TestSubscriptionPaymentFlows(TestSubscriptionCommon, PaymentHttpCommon, Mo
         for sol in upsell_order_line:
             sol.product_uom_qty = 1.0
         upsell_so.action_confirm()
-        upsell_so.require_payment = True
         upsell_so.prepayment_percent = 0.2
         amt = upsell_so.amount_total * upsell_so.prepayment_percent
-        self.env['ir.config_parameter'].sudo().set_param('sale.automatic_invoice', 'True')
-        tx = self._create_transaction(
+        self.env.company.sale_automatic_invoice = True
+        self._create_transaction(
             flow='direct',
             amount=amt,
             sale_order_ids=[upsell_so.id],
             state='done')
         with mute_logger('odoo.addons.sale.models.payment_transaction'):
-            tx._post_process()
+            self._run_post_processing()
         invoice = upsell_so.invoice_ids
         self.assertTrue(len(invoice))
         self.assertTrue(invoice.line_ids[0].is_downpayment)

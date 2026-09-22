@@ -127,7 +127,7 @@ class SaleOrder(models.Model):
         with freeze_time(time_start.replace(day=10)):
             action = sub_1.prepare_renewal_order()
             renew_so_1 = self.env['sale.order'].browse(action['res_id'])
-            renew_so_1.require_payment = False
+            renew_so_1.prepayment_percent = 0
             renew_so_1.order_line[0].product_uom_qty += 10 # 11 --> 21
             self._test_demo_flush_tracking()
             renew_so_1.action_confirm()
@@ -160,7 +160,7 @@ class SaleOrder(models.Model):
         with freeze_time(time_start.replace(day=10)):
             action = sub_2.prepare_renewal_order()
             renew_so_2 = self.env['sale.order'].browse(action['res_id'])
-            renew_so_2.require_payment = False
+            renew_so_2.prepayment_percent = 0
             renew_so_2.order_line[0].product_uom_qty = 12
             self._test_demo_flush_tracking()
             renew_so_2.action_confirm()
@@ -229,8 +229,10 @@ class SaleOrder(models.Model):
         self.env["ir.model.data"]._update_xmlids([{"xml_id":f"test_sale_subscription.test_subscription_portal_{order.id}", "record": order}])
         return order
 
-    def _create_invoices(self, grouped=False, final=False, date=None):
-        invoices = super()._create_invoices(grouped=grouped, final=final, date=date)
-        data = [{"xml_id":f"test_sale_subscription.test_subscription_invoice_{inv.id}", "record": inv} for inv in invoices]
-        self.env["ir.model.data"]._update_xmlids(data)
+    def _create_invoices(self, *args, **kwargs):
+        invoices = super()._create_invoices(*args, **kwargs)
+        self.env["ir.model.data"]._update_xmlids([
+            {"xml_id": f"test_sale_subscription.test_subscription_invoice_{inv.id}", "record": inv}
+            for inv in invoices
+        ])
         return invoices

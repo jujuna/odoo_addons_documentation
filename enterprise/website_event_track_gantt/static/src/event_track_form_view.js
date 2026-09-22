@@ -9,7 +9,9 @@ export class EventTrackFormController extends FormController {
         if (clickParams.name === "unlink") {
             const canProceed = await new Promise((resolve) => {
                 this.dialogService.add(ConfirmationDialog, {
+                    title: _t("Delete Track"),
                     body: _t("Are you sure you want to delete this track?"),
+                    confirmLabel: _t("Delete"),
                     cancel: () => resolve(false),
                     close: () => resolve(false),
                     confirm: () => resolve(true),

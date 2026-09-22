@@ -2,7 +2,6 @@
 
 {
     'name': "Purchase Accounting",
-    'version': "1.0",
     'category': "Supply Chain/Purchase",
     'summary': "Bridge between Purchase and Accounting",
     'description': """
@@ -11,8 +10,8 @@ Add accrued menus and specific filters on purchase order lines for an easier clo
     'depends': ['purchase', 'account_accountant'],
     'data': [
         'views/purchase_order_line_views.xml',
+        'views/res_config_settings_views.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

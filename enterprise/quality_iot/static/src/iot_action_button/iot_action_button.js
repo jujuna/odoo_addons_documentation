@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { useService } from '@web/core/utils/hooks';
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
@@ -9,10 +9,10 @@ import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
  */
 export class IotActionButton extends Component {
     static template = "quality_iot.iotActionButton";
-    static props = {
+    props = useProps({
         ...standardWidgetProps,
-        btn_name: String,
-    }
+        btn_name: t.string(),
+    });
 
     setup() {
         super.setup();

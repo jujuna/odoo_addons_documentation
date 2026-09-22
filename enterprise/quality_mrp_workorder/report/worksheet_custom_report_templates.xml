@@ -14,7 +14,7 @@
                 </div>
             </xpath>
             <xpath expr="//div[@name='lots']" position="replace">
-                <t t-set="lots" t-value="doc.lot_ids or doc.finished_lot_ids"/>
+                <t t-set="lots" t-value="doc.lot_ids"/>
                 <div name="lots" t-if="lots">
                     <strong>Lot/Serial Number: </strong>
                     <t t-foreach="lots" t-as="lot">

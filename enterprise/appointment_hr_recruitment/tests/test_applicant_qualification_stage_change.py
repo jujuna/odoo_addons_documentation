@@ -11,6 +11,7 @@ class TestApplicantQualificationStageChange(HttpCase):
         super().setUpClass()
 
         Users = cls.env['res.users'].with_context(no_reset_password=True)
+        Employees = cls.env['hr.employee']
 
         # Recruitment user groups
         group_recruitment_interviewer = cls.env.ref('hr_recruitment.group_hr_recruitment_interviewer')
@@ -21,6 +22,11 @@ class TestApplicantQualificationStageChange(HttpCase):
             'login': 'bedo',
             'email': 'bedo@example.com',
             'group_ids': [(6, 0, [group_recruitment_user.id])]
+        })
+
+        cls.employee_recruitment_officer = Employees.create({
+            'name': 'Bedo Employee',
+            'user_id': cls.user_recruitment_officer.id,
         })
 
         cls.user_recruitment_interviewer = Users.create({
@@ -44,7 +50,7 @@ class TestApplicantQualificationStageChange(HttpCase):
         cls.applicant = cls.env['hr.applicant'].sudo().create({
             'partner_name': 'Test Applicant',
             'job_id': job.id,
-            'user_id': cls.user_recruitment_officer.id,
+            'recruiter_id': cls.employee_recruitment_officer.id,
         })
 
         # Stage + template
@@ -62,7 +68,7 @@ class TestApplicantQualificationStageChange(HttpCase):
             "lang": "en_US",
             "tz": "Europe/Brussels",
             "uid": self.user_recruitment_interviewer.id,
-            "allowed_company_ids": [1],
+            "allowed_company_ids": [self.env.company.id],
         }
 
         # ----------------------------------------------------------

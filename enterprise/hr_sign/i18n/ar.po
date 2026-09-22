@@ -12,30 +12,30 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-16 17:49+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/hr_sign/"
-"ar/>\n"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 02:27+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
+"hr_sign/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_sign
 #. odoo-python
 #: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
-msgid "%(employee)s and %(responsible)s are the signatories."
-msgstr "%(employee)s و %(responsible)s هم الأطراف الموقِّعة."
+msgid "%(responsible)s, %(employee)s"
+msgstr ""
 
 #. module: hr_sign
 #. odoo-python
 #: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
-msgid "%(user_name)s requested a new signature on the following documents:"
-msgstr "%(user_name)s طلب توقيعاً جديداً للمستندات التالية:"
+msgid "%(signer)s"
+msgstr ""
 
 #. module: hr_sign
 #. odoo-python
@@ -76,6 +76,13 @@ msgid "Attachment"
 msgstr "مرفق"
 
 #. module: hr_sign
+#: model:ir.model.fields,help:hr_sign.field_hr_contract_sign_document_wizard__signing_employee
+msgid ""
+"Choose who will sign the document when the selected template has a single "
+"signer."
+msgstr ""
+
+#. module: hr_sign
 #: model:sign.template,redirect_url_text:hr_sign.template_sign_termination
 msgid "Close"
 msgstr "إغلاق"
@@ -84,6 +91,11 @@ msgstr "إغلاق"
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__version_id
 msgid "Contract"
 msgstr "العقد"
+
+#. module: hr_sign
+#: model:ir.module.module,shortdesc:base.module_hr_sign
+msgid "Contract - Signature"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__cc_partner_ids
@@ -106,11 +118,6 @@ msgid "Customer"
 msgstr "العميل"
 
 #. module: hr_sign
-#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
-msgid "Discard"
-msgstr "إهمال"
-
-#. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__display_name
 #: model:ir.model.fields,field_description:hr_sign.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__display_name
@@ -120,16 +127,6 @@ msgstr "إهمال"
 #: model:ir.model.fields,field_description:hr_sign.field_res_users__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
-
-#. module: hr_sign
-#: model:ir.actions.act_window,name:hr_sign.sign_contract_wizard_action
-msgid "Document Signature"
-msgstr "توقيع المستند"
-
-#. module: hr_sign
-#: model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__sign_template_id
-msgid "Document to sign"
-msgstr "المستند للتوقيع عليه"
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__sign_template_ids
@@ -160,6 +157,7 @@ msgstr ""
 
 #. module: hr_sign
 #: model:ir.model,name:hr_sign.model_hr_employee
+#: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__signing_employee__employee
 #: model:sign.item.role,name:hr_sign.sign_item_role_employee_signatory
 msgid "Employee"
 msgstr "الموظف"
@@ -190,6 +188,7 @@ msgid "Employees"
 msgstr "الموظفون"
 
 #. module: hr_sign
+#: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__signing_employee__hr_responsible
 #: model:sign.item.role,name:hr_sign.sign_item_role_job_responsible
 msgid "HR Responsible"
 msgstr "مسؤول الموارد البشرية"
@@ -211,9 +210,9 @@ msgid "ID"
 msgstr "المُعرف"
 
 #. module: hr_sign
-#: model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__is_signature_request
-msgid "Is Signature Request"
-msgstr "طلب توقيع"
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__is_single_signer
+msgid "Is Single Signer"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__write_uid
@@ -236,6 +235,11 @@ msgid "Mail Options"
 msgstr "خيارات البريد"
 
 #. module: hr_sign
+#: model:ir.module.module,summary:base.module_hr_sign
+msgid "Manage your documents to sign in contracts"
+msgstr ""
+
+#. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__message
 msgid "Message"
 msgstr "رسالة"
@@ -250,12 +254,6 @@ msgstr "لا توجد قوالب منتجات في قاعدة البيانات."
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
 msgid "No template available"
 msgstr "لا توجد قوالب"
-
-#. module: hr_sign
-#. odoo-python
-#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
-msgid "Only %s has to sign."
-msgstr "وحده %s عليه التوقيع."
 
 #. module: hr_sign
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
@@ -303,8 +301,8 @@ msgid ""
 "        "
 msgstr ""
 "حدد فقط المستندات التي تحتوي إما على طرف مُوقّع واحد أو طرفين مختلفين.\n"
-"        تتطلب المستندات التي تحتوي على طرف موقِّع واحد أن يوقِّع عليها الموظف "
-"فقط، بينما تتطلب المستندات التي تحتوي على طرفين موقِّعين توقيع كل من الموظف "
+"        تتطلب المستندات التي تحتوي على طرف موقِّع واحد أن يوقِّع عليها الموظف فقط"
+"، بينما تتطلب المستندات التي تحتوي على طرفين موقِّعين توقيع كل من الموظف "
 "ومسؤول الموارد البشرية.\n"
 "        "
 
@@ -312,6 +310,16 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
 msgid "Send"
 msgstr "إرسال"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__show_sign_now
+msgid "Show Sign Now"
+msgstr ""
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Sign Now"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__sign_request_ids
@@ -346,10 +354,26 @@ msgstr "توقيع المستند في العقد"
 #: code:addons/hr_sign/models/hr_employee.py:0
 #: code:addons/hr_sign/wizard/mail_activity_schedule.py:0
 #: model:ir.actions.server,name:hr_sign.action_signature_request_multi
-#: model_terms:ir.ui.view,arch_db:hr_sign.hr_employee_sign_view_form
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
 msgid "Signature Request"
 msgstr "طلب التوقيع"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "Signature requested for the following document(s):"
+msgstr ""
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "Signer(s): %(signatories)s"
+msgstr ""
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__signing_employee
+msgid "Signing Employee"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__subject
@@ -387,50 +411,3 @@ msgstr "اكتب رسالة بريد إلكتروني أو ابحث عن جهة 
 msgid ""
 "You can't delete a contract linked to a signed document, archive it instead."
 msgstr "لا يمكنك حذف عقد مرتبط بمستند مُوقع. قم بأرشفته عوضاً عن ذلك."
-
-#~ msgid "%s and %s are the signatories."
-#~ msgstr "%s و %s هي الأطراف الموقعة. "
-
-#~ msgid "Contract history"
-#~ msgstr "سِجل العقد "
-
-#~ msgid ""
-#~ "Documents to sign. Only documents with 1 or 2 different responsible are "
-#~ "selectable.\n"
-#~ "        Documents with 1 responsible will only have to be signed by the "
-#~ "employee while documents with 2 different responsible will have to be "
-#~ "signed by both the employee and the responsible.\n"
-#~ "        "
-#~ msgstr ""
-#~ "المستندات لتوقيعها. وحدها المستندات التي لها مسؤول 1 أو 2 يتم تحديدها.\n"
-#~ "        يجب أن تُوقّع المستندات ذات المسؤول الواحد من قِبَل الموظف، بينما "
-#~ "تُوقّع المستندات ذات المسؤولَين المختلفين من قِبَل الموظف والمسؤول معاً.\n"
-#~ "        "
-
-#~ msgid ""
-#~ "No appropriate template could be found, please make sure you configured "
-#~ "them properly."
-#~ msgstr "لم يتم العثور على أي قالب مناسب. يرجى التأكد من تهيئتها بشكل صحيح. "
-
-#~ msgid "Open Link"
-#~ msgstr "فتح الرابط "
-
-#~ msgid "Plan Wizard"
-#~ msgstr "تخطيط المعالج "
-
-#~ msgid "Plan activity type"
-#~ msgstr "تخطيط نوع النشاط "
-
-#~ msgid "Signature Request - %s"
-#~ msgstr "طلب التوقيع - %s"
-
-#~ msgid ""
-#~ "This sign request has been canceled due to the cancellation of the "
-#~ "related contract."
-#~ msgstr "لقد تم إلغاء طلب التوقيع بسبب إلغاء العقد ذو الصلة. "
-
-#~ msgid "document"
-#~ msgstr "مستند"
-
-#~ msgid "documents"
-#~ msgstr "المستندات "

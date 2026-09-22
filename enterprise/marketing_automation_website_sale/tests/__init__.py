@@ -1,3 +1,2 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 from . import test_marketing_campaign
+from . import test_marketing_campaign_enroll

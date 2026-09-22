@@ -13,6 +13,7 @@ from odoo.addons.base.models.res_users import check_identity
 from .._vendor.webauthn import base64url_to_bytes, generate_authentication_options, generate_registration_options, options_to_json, verify_authentication_response, verify_registration_response
 from .._vendor.webauthn.helpers import bytes_to_base64url
 from .._vendor.webauthn.helpers.structs import AuthenticatorSelectionCriteria, ResidentKeyRequirement, UserVerificationRequirement
+from ..mobile_utils import _VALID_APK_KEY_HASHES
 
 _logger = logging.getLogger(__name__)
 
@@ -49,9 +50,8 @@ class AuthPasskeyKey(models.Model):
         return super().unlink()
 
     def _compute_public_key(self):
-        query = 'SELECT public_key FROM auth_passkey_key WHERE id = %s'
         for passkey in self:
-            self.env.cr.execute(SQL(query, passkey.id))
+            self.env.cr.execute(SQL('SELECT public_key FROM auth_passkey_key WHERE id = %s', passkey.id))
             public_key = self.env.cr.fetchone()[0]
             passkey.public_key = public_key
 
@@ -78,10 +78,11 @@ class AuthPasskeyKey(models.Model):
     @api.model
     def _verify_auth(self, auth, public_key, sign_count):
         parsed_url = url_parse(self.get_base_url())
+        expected_origins = [parsed_url.replace(path='').to_url()] + _VALID_APK_KEY_HASHES
         auth_verification = verify_authentication_response(
             credential=auth,
             expected_challenge=base64url_to_bytes(self._get_session_challenge()),
-            expected_origin=parsed_url.replace(path='').to_url(),
+            expected_origin=expected_origins,
             expected_rp_id=parsed_url.host,
             credential_public_key=base64url_to_bytes(public_key),
             credential_current_sign_count=sign_count,
@@ -108,10 +109,11 @@ class AuthPasskeyKey(models.Model):
     @api.model
     def _verify_registration_options(self, registration):
         parsed_url = url_parse(self.get_base_url())
+        expected_origins = [parsed_url.replace(path='').to_url()] + _VALID_APK_KEY_HASHES
         verification = verify_registration_response(
             credential=registration,
             expected_challenge=base64url_to_bytes(self._get_session_challenge()),
-            expected_origin=parsed_url.replace(path='').to_url(),
+            expected_origin=expected_origins,
             expected_rp_id=parsed_url.host,
             require_user_verification=True,
         )
@@ -125,7 +127,7 @@ class AuthPasskeyKey(models.Model):
         for key in self:
             if key.create_uid.id == self.env.user.id:
                 # Force to go through `res.users.auth_passkey_key_ids` to trigger the session token cache invalidation
-                # See `res.users.write` and `_get_invalidation_fields`
+                # See `res.users.write` and `_clear_cache_on_fields`
                 # `self.env.user` is already sudo, so no need to re-apply `sudo` to get delete access right.
                 self.env.user.write({'auth_passkey_key_ids': [Command.delete(key.id)]})
                 new_token = self.env.user._compute_session_token(request.session.sid)
@@ -167,7 +169,7 @@ class AuthPasskeyKeyCreate(models.TransientModel):
         self.ensure_one()
         verification = request.env['auth.passkey.key']._verify_registration_options(registration)
         # Force to go through `res.users.auth_passkey_key_ids` to trigger the session token cache invalidation
-        # See `res.users.write` and `_get_invalidation_fields`
+        # See `res.users.write` and `_clear_cache_on_fields`
         # `self.env.user` is already sudo, so no need to re-apply `sudo` to get create access right.
         self.env.user.write({'auth_passkey_key_ids': [Command.create({
             'name': self.name,

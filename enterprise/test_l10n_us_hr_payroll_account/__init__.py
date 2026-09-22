@@ -9,9 +9,9 @@ from dateutil.relativedelta import relativedelta
 _logger = logging.getLogger(__name__)
 
 
-def _generate_payslips(env):
+def generate_payslips(env):
     # Do this only when demo data is activated
-    if employee_maggie := env.ref('l10n_us_hr_payroll.hr_employee_maggie', raise_if_not_found=False):
+    if env.ref('l10n_us_hr_payroll.hr_employee_maggie', raise_if_not_found=False):
         if not env['hr.payslip'].sudo().search_count([('employee_id.name', '=', 'Maggie Davidson (mda)')]):
             _logger.info('Generating payslips')
             cids = env.ref('l10n_us.demo_company_us').ids
@@ -31,11 +31,6 @@ def _generate_payslips(env):
                 })
             payslip_runs = env['hr.payslip.run'].create(payslis_values)
             for payslip_run in payslip_runs:
-                payslip_run.generate_payslips(employee_ids=[employee_maggie.id])
+                payslip_run._generate_payslips()
             _logger.info('Validating payslips')
-            # after many insertions in work_entries, table statistics may be broken.
-            # In this case, query plan may be randomly suboptimal leading to slow search
-            # Analyzing the table is fast, and will transform a potential ~30 seconds
-            # sql time for _mark_conflicting_work_entries into ~2 seconds
-            env.cr.execute('ANALYZE hr_work_entry')
             payslip_runs.with_context(allowed_company_ids=cids).action_validate()

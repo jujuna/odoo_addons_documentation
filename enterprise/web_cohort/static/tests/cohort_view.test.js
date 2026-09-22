@@ -1,6 +1,6 @@
 import { expect, getFixture, test } from "@odoo/hoot";
 import { queryAll, queryAllTexts } from "@odoo/hoot-dom";
-import { animationFrame, Deferred } from "@odoo/hoot-mock";
+import { animationFrame } from "@odoo/hoot-mock";
 import { markup } from "@odoo/owl";
 import { changeScale } from "@web/../tests/views/calendar/calendar_test_helpers";
 import {
@@ -383,7 +383,7 @@ test("export cohort button should be disabled when no data", async () => {
 test("export cohort", async () => {
     expect.assertions(7);
 
-    const downloadDef = new Deferred();
+    const downloadDef = Promise.withResolvers();
     patchWithCleanup(download, {
         _download: async (options) => {
             const data = JSON.parse(await options.data.data.text());
@@ -406,7 +406,7 @@ test("export cohort", async () => {
     expect("button.o_cohort_download_button").not.toHaveAttribute("disabled");
 
     await contains(".o_cohort_download_button").click();
-    await downloadDef;
+    await downloadDef.promise;
 });
 
 test.tags("desktop");
@@ -702,7 +702,7 @@ test("non empty cohort view with sample data", async () => {
 
 test("concurrent reloads: add a filter, and directly toggle a measure", async () => {
     let def;
-    onRpc("get_cohort_data", () => def);
+    onRpc("get_cohort_data", () => def?.promise);
     await mountView({
         type: "cohort",
         resModel: "subscription",
@@ -719,7 +719,7 @@ test("concurrent reloads: add a filter, and directly toggle a measure", async ()
     });
 
     // Set a domain (this reload is delayed)
-    def = new Deferred();
+    def = Promise.withResolvers();
     await toggleSearchBarMenu();
     await toggleMenuItem("My Filter");
 

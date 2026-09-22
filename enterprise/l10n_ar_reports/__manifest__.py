@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Argentinean Accounting Reports',
-    'version': '1.0',
     'author': 'ADHOC SA',
     'category': 'Accounting/Localizations/Reporting',
     'summary': 'Reporting for Argentinean Localization',
@@ -25,15 +24,17 @@ Official Documentation ARCA
 """,
     'depends': [
         'l10n_ar',
+        'l10n_ar_withholding',
         'account_reports',
     ],
     'data': [
         'data/account_financial_report_data.xml',
         'data/account_return_data.xml',
+        'data/sicore_report.xml',
         'report/account_ar_vat_line_views.xml',
+        'report/pdf_export_template_ar.xml',
         'views/res_config_settings_view.xml',
-        'security/ir.model.access.csv',
-        'security/security.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [
@@ -41,6 +42,5 @@ Official Documentation ARCA
         ],
     },
     'auto_install': ['l10n_ar', 'account_reports'],
-    'installable': True,
     'license': 'OEEL-1',
 }

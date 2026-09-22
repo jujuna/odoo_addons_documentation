@@ -32,10 +32,10 @@
         <field name="inherit_id" ref="appointment.appointment_type_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='options_left_details']" position="inside">
+                <field name="website_url" invisible="1"/>  <!-- We need this for `computePath` used in `onAddContent` to redirect to the appointment after creation. -->
                 <field name="website_id" groups="website.group_multi_website"/>
             </xpath>
-            <xpath expr="//div[hasclass('oe_button_box')]/button[@name='action_calendar_meetings']" position="after">
-                <field name="website_url" invisible="1"/>
+            <xpath expr="//div[hasclass('oe_button_box')]/button[@name='action_edit_custom_slots']" position="after">
                 <field name="is_published" widget="website_redirect_button"/>
             </xpath>
         </field>
@@ -50,7 +50,7 @@
                     <attribute name="js_class">website_new_content_form</attribute>
                 </xpath>
                 <xpath expr="//form" position="inside">
-                    <field name="website_url" invisible="1"/>
+                    <field name="website_url" invisible="1"/>  <!-- We need this for `computePath` used in `onAddContent` to redirect to the appointment after creation. -->
                 </xpath>
                 <xpath expr="//field[@name='appointment_duration']" position="attributes">
                     <attribute name="style" add="max-width: 40%;" separator=" "/>

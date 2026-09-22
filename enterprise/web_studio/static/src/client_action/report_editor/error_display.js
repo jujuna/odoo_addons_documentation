@@ -1,18 +1,19 @@
-import { Component, onWillRender, useState } from "@odoo/owl";
+import { Component, computed, proxy, t, useProps } from "@odoo/owl";
 import { router } from "@web/core/browser/router";
 import { useService } from "@web/core/utils/hooks";
 import { humanReadableError } from "@web_studio/client_action/report_editor/utils";
 
 export class ErrorDisplay extends Component {
     static template = "web_studio.ErrorDisplay";
-    static props = { error: Object };
+    props = useProps({
+        error: t.object(),
+    });
+
+    error = computed(() => humanReadableError(this.props.error));
 
     setup() {
-        this.state = useState({ showTrace: false });
+        this.state = proxy({ showTrace: false });
         this.action = useService("action");
-        onWillRender(() => {
-            this.error = humanReadableError(this.props.error);
-        });
     }
     openRecord(resModel, resId) {
         const action = {

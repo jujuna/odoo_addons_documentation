@@ -13,6 +13,8 @@ from odoo.tools import file_open
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestSodaFile(AccountTestInvoicingCommon, MailCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('be')
     def setUpClass(cls):
@@ -25,6 +27,7 @@ class TestSodaFile(AccountTestInvoicingCommon, MailCommon):
         })
         cls.soda_file_path = 'l10n_be_soda/test_soda_file/soda_testing_file.xml'
         cls.soda_file_path_with_new = 'l10n_be_soda/test_soda_file/soda_testing_file_with_new_account.xml'
+        cls.soda_file_path_with_departments = 'l10n_be_soda/test_soda_file/soda_testing_file_with_departments.xml'
         cls.attachment = False
 
     def test_soda_file_import(self):
@@ -45,7 +48,43 @@ class TestSodaFile(AccountTestInvoicingCommon, MailCommon):
                 {'debit': 15655.10, 'credit': 0, 'name': 'Remuneration'},
             ])
             self.assertRecordValues(result_move.line_ids.account_id, [{'code': '453000'}, {'code': '455000'}, {'code': '618000'}])
-            self.assertEqual(result_move.date.strftime("%Y-%m-%d"), '2021-10-23')
+            self.assertEqual(result_move.date.strftime("%Y-%m-%d"), '2021-10-31')
+
+    def test_soda_multiple_files_import(self):
+        with file_open(self.soda_file_path, 'rb') as soda_file_1:
+            soda_file_1 = soda_file_1.read()
+        with file_open(self.soda_file_path_with_new, 'rb') as soda_file_2:
+            soda_file_2 = soda_file_2.read()
+
+        attachments = self.env['ir.attachment'].create([
+            {
+                'mimetype': 'application/xml',
+                'name': 'soda_testing_file.xml',
+                'raw': soda_file_1,
+            },
+            {
+                'mimetype': 'application/xml',
+                'name': 'soda_file_path_with_new.xml',
+                'raw': soda_file_2,
+            },
+        ])
+
+        wizard_action = self.misc_journal.create_document_from_attachment(attachments.ids)
+        self.assertEqual(wizard_action['res_model'], 'soda.import.wizard')
+        wizard = self.env['soda.import.wizard'].search([('id', '=', wizard_action['res_id'])])
+        result_moves = wizard._action_save_and_import()
+
+        self.assertRecordValues(result_moves[0].line_ids, [
+            {'debit': 0, 'credit': 4000.00, 'name': 'Withholding Taxes'},
+            {'debit': 0, 'credit': 11655.10, 'name': 'Special remuneration'},
+            {'debit': 15655.10, 'credit': 0, 'name': 'Remuneration'},
+        ])
+
+        self.assertRecordValues(result_moves[1].line_ids, [
+            {'debit': 0, 'credit': 4000, 'name': ''},
+            {'debit': 0, 'credit': 11655.1, 'name': 'Special remuneration'},
+            {'debit': 15655.1, 'credit': 0, 'name': 'Remuneration'},
+        ])
 
     def test_soda_file_import_multicompany(self):
         expected_ref = 'social_secretariat-8908749-2021/10'
@@ -194,7 +233,7 @@ class TestSodaFile(AccountTestInvoicingCommon, MailCommon):
 
             --000000000000a47519057e029630--
         ''')
-        entry = self.env['account.move'].browse(self.env['mail.thread'].message_process('account.move', mail))
+        entry = self.env['mail.thread'].message_process('account.move', mail)
         self.assertEqual(entry.move_type, 'entry')
         code_id_map = {acc['code']: acc['id'] for acc in self.env['account.account'].with_company(entry.company_id).search_read(
             [('code', 'in', (453000, 455000, 618000)), ('company_ids', '=', entry.company_id.id)],
@@ -208,3 +247,44 @@ class TestSodaFile(AccountTestInvoicingCommon, MailCommon):
                 {'account_id': code_id_map['618000'], 'balance': 15655.1},
             ],
         )
+
+    def test_soda_file_import_with_analytic(self):
+        self.env.user.group_ids += self.env.ref('analytic.group_analytic_accounting')
+
+        with file_open(self.soda_file_path_with_departments, 'rb') as soda_file:
+            wizard_action = self.misc_journal.create_document_from_attachment(
+                self.env['ir.attachment'].create({
+                    'mimetype': 'application/xml',
+                    'name': 'soda_testing_file.xml',
+                    'raw': soda_file.read(),
+                }).ids
+            )
+            wizard = self.env['soda.import.wizard'].browse(wizard_action['res_id'])
+
+        # There should only be 2 (empty) mappings: 'REM' and 'SPEC'.
+        self.assertEqual(len(wizard.soda_analytic_mapping_ids), 2)
+
+        # Set matching analytic accounts for each department.
+        SODA_analytic_plan = self.env['account.analytic.plan'].create({'name': 'SODA Plan'})
+        REM_analytic_account, SPEC_analytic_account = self.env['account.analytic.account'].create([
+            {'name': 'REM Account', 'plan_id': SODA_analytic_plan.id},
+            {'name': 'SPEC Account', 'plan_id': SODA_analytic_plan.id},
+        ])
+        analytic_mapping = {
+            'REM': REM_analytic_account,
+            'SPEC': SPEC_analytic_account,
+        }
+        for mapping in wizard.soda_analytic_mapping_ids:
+            self.assertTrue(mapping.department in analytic_mapping)
+            mapping.analytic_account_id = analytic_mapping[mapping.department].id
+
+        # Make sure the analytic distribution is set correctly on each move line.
+        result = wizard.action_save_and_import()
+        result_move = self.env['account.move'].browse(result['res_id'])
+        self.assertEqual(len(result_move.line_ids), 4)
+        self.assertRecordValues(result_move.line_ids, [
+            {'name': 'Withholding Taxes',           'analytic_distribution': False},
+            {'name': 'Special remuneration',        'analytic_distribution': {str(SPEC_analytic_account.id): 100.0}},
+            {'name': 'Very Special remuneration',   'analytic_distribution': {str(SPEC_analytic_account.id): 100.0}},
+            {'name': 'Remuneration',                'analytic_distribution': {str(REM_analytic_account.id): 100.0}},
+        ])

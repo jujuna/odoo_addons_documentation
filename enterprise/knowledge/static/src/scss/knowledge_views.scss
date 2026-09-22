@@ -18,9 +18,6 @@
         }
     }
 
-    .o_knowledge_toggle_sidebar i.oi-panel-right {
-        transform: scaleX(-1);
-    }
     .o_knowledge_editor .o_field_html .note-editable{
         padding-top: 0px;
     }
@@ -29,16 +26,16 @@
     .o_knowledge_editor .o_field_html .o_readonly,
     .o_knowledge_editor .o_field_html .o_knowledge_helper {
         padding-left: var(--editor-gutter-size) !important;
-        padding-right: calc(var(--editor-gutter-size) + 40px) !important;
+        padding-right: var(--editor-gutter-size) !important;
     }
-    .o_knowledge_body:has([data-embedded="view"]:first-child) {
+    .o_knowledge_body:has(.note-editable > [data-selection-placeholder] + [data-embedded="view"]:nth-child(2)) {
         > span:first-child {
             display: none;
         }
         .o_knowledge_editor {
             margin-top: 0 !important;
         }
-        .o_knowledge_icon:first-child {
+        span:first-child + .o_knowledge_icon {
             margin-top: 0 !important;
         }
     }
@@ -60,30 +57,29 @@
         }
 
         .o_knowledge_sidebar_trash {
+            box-shadow: 0 -8px 12px 8px $o-gray-100;
+
             ul {
                 display: none;
-            }
-            bottom: 0px;
-
-            .btn {
-                margin-left: $input-btn-padding-x * -1;
             }
 
             a {
                 &:hover {
                     background-color: rgba($knowledge-bg--hover, 0.3);
                 }
-                &:focus {
-                    border: none;
-                }
             }
         }
 
         .o_knowledge_tree.o_dragging {
             .o_knowledge_sidebar_trash {
-                &:hover > div {
-                    outline: solid 3px deepskyblue;
+                box-shadow: none;
+
+                a {
                     pointer-events: none;
+                }
+
+                &:has(.o_nested_sortable_placeholder, .o_nested_sortable_placeholder_realsize) {
+                    background-color: $danger-bg-subtle !important;
                 }
             }
             li >:not(ul) {
@@ -105,6 +101,11 @@
         .o_widget_knowledge_cover + .o_knowledge_icon {
             margin-top: -0.7em;
         }
+    }
+
+    .o_field_widget [data-embedded="whiteboard"] iframe {
+        min-height: -webkit-calc(100vh - 200px);
+        min-height: calc(100vh - 200px);    
     }
 }
 
@@ -128,7 +129,7 @@
             .o_property_field.o_wrap_label {
                 display: block !important;
             }
-            i.oi-draggable {
+            i[data-icon="drag_indicator"] {
                 display: none;
             }
         }
@@ -145,11 +146,10 @@
 }
 
 .o_knowledge_toggle_favorite {
-    i.fa-star-o {
-        @include o-hover-text-color($o-main-color-muted, $o-main-favorite-color);
-    }
-    i.fa-star {
-        color: $o-main-favorite-color;
+    i[data-icon="star"] {
+        &.oi-filled {
+            color: $o-main-favorite-color;
+        }
     }
 }
 
@@ -167,29 +167,6 @@
 
 // Media queries:
 
-@include media-breakpoint-up(lg) {
-    .o_knowledge_form_view {
-        .o_scroll_view_lg {
-            @include o-position-absolute(0, 0, 0, 0);
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-    }
-    .o_widget_knowledge_chatter_panel,
-    .o_widget_knowledge_comments_panel,
-    .o_widget_knowledge_properties_panel {
-        border-left: 1px solid $border-color;
-    }
-}
-
-@include media-breakpoint-down(lg) {
-    .o_widget_knowledge_chatter_panel,
-    .o_widget_knowledge_comments_panel,
-    .o_widget_knowledge_properties_panel {
-        width: 100% !important;
-    }
-}
-
 @include media-breakpoint-up(sm) {
     .o_knowledge_article_view_form_view {
         .o_knowledge_body {
@@ -201,15 +178,56 @@
 }
 
 @include media-breakpoint-up(md) {
+    .o_knowledge_form_view {
+        .o_scroll_view_lg {
+            @include o-position-absolute(0, 0, 0, 0);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .o_knowledge_article_card {
+            border: $border-width solid $border-color;
+            border-radius: $border-radius-lg;
+            margin: 0 var(--knowledge-gutter) var(--knowledge-gutter);
+        }
+    }
+
     .o_knowledge_sidebar {
         transition: width 0.15s linear;
         width: clamp(200px, var(--knowledge-article-sidebar-size), 35%);
     }
+
+    .o_knowledge_form_view {
+        .o_knowledge_header .o_knowledge_toggle_sidebar {
+            display: none;
+        }
+
+        &.o_toggle_aside {
+            .o_knowledge_sidebar {
+                width: 0;
+                min-width: 0;
+                overflow: hidden;
+            }
+
+            .o_knowledge_header .o_knowledge_toggle_sidebar {
+                display: block;
+            }
+        }
+    }
 }
 
 @include media-breakpoint-down(md) {
+    body:has(.o_knowledge_form_view.o_toggle_aside) {
+        .o-toolbar-above-keyboard {
+            display: none !important;
+        }
+    }
+
     .o_knowledge_form_view {
         --editor-gutter-size: 1rem;
+
+        .o_knowledge_header {
+            border-top: $border-width solid $border-color;
+        }
         &:not(.o_toggle_aside) {
             .o_knowledge_backdrop {
                 display: none;
@@ -218,8 +236,10 @@
                 transform: translateX(-100%);
             }
         }
-        .o_knowledge_sidebar,
-        .o_knowledge_main {
+        .o_scroll_view_lg {
+            height: 100%;
+        }
+        .o_knowledge_sidebar {
             transition: transform .2s ease;
         }
         .o_knowledge_sidebar {
@@ -246,8 +266,27 @@
         .o_section_header:not(:hover) .o_knowledge_join_article_members {
             visibility: hidden;
         }
-        .o_article_handle:not(:hover) .o_article_create {
-            display: none;
+        .o_article_handle:is(:hover) {
+            .o_article_create, .o_article_options {
+                display: inline-flex !important;
+            }
+        }
+    }
+}
+
+// = Portal
+// ----------------------------------------------------------------------------
+
+.o_knowledge_portal_view {
+    .o_knowledge_form_view {
+        --knowledge-gutter: #{map-get($spacers, 2)};
+
+        padding-top: var(--knowledge-gutter);
+    }
+
+    @include media-breakpoint-down(md) {
+        .o_knowledge_form_view .o_knowledge_header {
+            border-top: 0;
         }
     }
 }

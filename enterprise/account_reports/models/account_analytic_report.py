@@ -1,12 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import ast
 
 from odoo import _, models, fields, api
 from odoo.fields import Domain
 from odoo.addons.web.controllers.utils import clean_action
-from odoo.tools import SQL, Query
+from odoo.models import Query
+from odoo.tools import SQL
 
 
-class AccountReport(models.AbstractModel):
+class AccountReport(models.Model):
     _inherit = 'account.report'
 
     filter_analytic_groupby = fields.Boolean(
@@ -125,7 +127,7 @@ class AccountReport(models.AbstractModel):
 
         all_stored_aml_fields = {
             field
-            for field, attrs in self.env['account.move.line'].fields_get().items()
+            for field, attrs in self.env['account.move.line'].fields_get(attributes=["type", "store"]).items()
             if attrs['type'] not in ['many2many', 'one2many'] and attrs.get('store')
         }
 
@@ -133,7 +135,7 @@ class AccountReport(models.AbstractModel):
             if aml_field not in change_equivalence_dict:
                 change_equivalence_dict[aml_field] = SQL('"account_move_line".%s', SQL.identifier(aml_field))
 
-        _stored_fields, fields_to_insert = self.env['account.move.line']._prepare_aml_shadowing_for_report(change_equivalence_dict, prefix_fields_to_insert=False)
+        _stored_fields, fields_to_insert = self.env['account.move.line']._prepare_aml_shadowing_for_report(change_equivalence_dict)
 
         return SQL("""
             (
@@ -146,29 +148,27 @@ class AccountReport(models.AbstractModel):
             )
         """, fields_to_insert=fields_to_insert)
 
-    def _get_report_query(self, options, date_scope, domain=None) -> Query:
+    def _get_report_query(self, options, date_scope, domain=None, cta_date_to=None) -> Query:
         # Override to add the context key which will eventually trigger the shadowing of the table
         context_self = self.with_context(account_report_analytic_groupby=options.get('analytic_groupby_option'))
 
-        # We add the domain filter for analytic_distribution here, as the search is not available
-        query = super(AccountReport, context_self)._get_report_query(options, date_scope, domain)
-        if options.get('analytic_accounts'):
-            if 'analytic_accounts_list' in options:
-                # the table `account_move_line` will be shadowed by _prepare_lines_for_analytic_groupby and thus analytic_distribution will be a single ID
-                analytic_account_ids = tuple(str(account_id) for account_id in options['analytic_accounts'])
-                query.add_where(SQL("""account_move_line.analytic_distribution IN %s""", analytic_account_ids))
-            else:
-                # Real `account_move_line` table so real JSON with percentage
-                analytic_account_ids = [[str(account_id) for account_id in options['analytic_accounts']]]
-                query.add_where(SQL('%s && %s', analytic_account_ids, self.env['account.move.line']._query_analytic_accounts()))
-
-        return query
+        return super(AccountReport, context_self)._get_report_query(options, date_scope, domain, cta_date_to=cta_date_to)
 
     def action_audit_cell(self, options, params):
-        column_group_options = self._get_column_group_options(options, params['column_group_key'])
+        column_group_options = self._get_column_group_options(options, params['column_group_index'])
 
         if not column_group_options.get('analytic_groupby_option'):
-            return super(AccountReport, self).action_audit_cell(options, params)
+            action = super().action_audit_cell(options, params)
+            if options.get('column_percent_comparison') == 'analytic_coverage':
+                context = action.get('context', {})
+                context.update({
+                    'selected_analytic_plan': options['analytic_plans_groupby'][0],
+                })
+                action['context'] = context
+                view_id = self.env.ref('account_reports.view_analytic_move_line_tree', raise_if_not_found=False) or False
+                if view_id:
+                    action['views'] = [(view_id.id, 'list')]
+            return action
         else:
             # Start by getting the domain from the options. Note that this domain is targeting account.move.line
             report_line = self.env['account.report.line'].browse(params['report_line_id'])
@@ -187,9 +187,11 @@ class AccountReport(models.AbstractModel):
                 if field.split('.')[0] == 'account_id':
                     field = field.replace('account_id', 'general_account_id')
                     expression = [(field, operator, right_term)]
-                # Replace the 'analytic_distribution' by the account_id domain as we expect for analytic lines.
                 elif field == 'analytic_distribution':
-                    expression = [('auto_account_id', 'in', right_term)]
+                    if options.get('column_percent_comparison') == 'analytic_coverage':
+                        expression = [(1, '=', 1)]
+                    else:
+                        expression = [('auto_account_id', 'in', right_term)]
                 # For other fields not present in on the analytic line model, map them to get the info from the move_line.
                 # Or ignore these conditions if there is no move lines.
                 elif field.split('.')[0] not in AccountAnalyticLine._fields:
@@ -205,6 +207,17 @@ class AccountReport(models.AbstractModel):
 
             action = clean_action(self.env.ref('analytic.account_analytic_line_action_entries')._get_action_dict(), env=self.env)
             action['domain'] = domain
+            action['context'] = ast.literal_eval(action.get('context', "{}"))
+            if options.get('column_percent_comparison') == 'analytic_coverage':
+                action['context'].update({
+                    'selected_analytic_plan': options['analytic_plans_groupby'][0],
+                    'group_by': 'move_line_id',
+                })
+                action['display_name'] += ' - ' + options['selected_analytic_plan_groupby_names'][0]
+                view_id = self.env.ref('account_reports.view_analytic_line_tree', raise_if_not_found=False) or False
+                if view_id:
+                    action['views'] = [(view_id.id, 'list')]
+
             return action
 
     @api.model
@@ -238,5 +251,7 @@ class AccountMoveLine(models.Model):
         """
         query = super()._search(*args, **kwargs)
         if self.env.context.get('account_report_analytic_groupby') and not self.env.context.get('account_report_cash_basis'):
-            query._tables['account_move_line'] = self.env['account.report']._create_aml_shadowing_query_for_analytic_groupby()
+            join, sql, condition = query._joins['account_move_line']
+            sql = self.env['account.report']._create_aml_shadowing_query_for_analytic_groupby()
+            query._joins['account_move_line'] = join, sql, condition
         return query

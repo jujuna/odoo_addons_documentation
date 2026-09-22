@@ -5,11 +5,10 @@
         <field name="model">account_followup.followup.line</field>
         <field name="arch" type="xml">
             <list string="Follow-up Steps" >
-                <field name="name"/>
-                <field name="delay"/>
+                <field name="display_delay"/>
+                <field name="reminder_timing"/>
                 <field name="send_email"/>
                 <field name="send_sms"/>
-                <field name="auto_execute"/>
                 <field name="create_activity" column_invisible="1"/>
                 <field name="activity_type_id" string="Activity" invisible="not create_activity"/>
                 <field name="company_id"  groups="base.group_multi_company"/>
@@ -23,12 +22,8 @@
         <field name="arch" type="xml">
             <form string="Follow-up Steps">
                 <sheet>
-                    <div class="oe_title">
-                        <label for="name"/>
-                        <h1><field name="name" placeholder="e.g. First Reminder Email"/></h1>
-                    </div>
                     <div class="oe_inline">
-                        Remind <field name="delay" class="oe_inline"/> days after due date<label for="delay" string=""/>
+                        Remind <field name="display_delay" style="width: 50px;"/> days <field name="reminder_timing" style="width: 150px;"/>
                     </div>
                     <notebook>
                         <page string="Notification" name="notification">
@@ -42,12 +37,6 @@
                                         <field name="mail_template_id" string="Email Template" invisible="not send_email"/>
                                         <field name="sms_template_id" invisible="not send_sms"/>
                                     </group>
-                                </group>
-                                <group string="Options" name="options" colspan="1">
-                                    <field name="auto_execute"/>
-                                    <field name="join_invoices" invisible="not send_email"/>
-                                    <field name="additional_follower_ids" invisible="not send_email"
-                                           widget="many2many_tags_avatar"/>
                                 </group>
                             </group>
                         </page>
@@ -78,21 +67,19 @@
         <field name="arch" type="xml">
             <search string="Search Follow-up">
                 <field name="company_id" groups="base.group_multi_company"/>
-                <filter string="Automatic" name="auto" domain="[('auto_execute', '=', True)]"/>
-                <filter string="Manual" name="manual" domain="[('auto_execute', '=', False)]"/>
             </search>
         </field>
     </record>
 
     <record id="action_account_followup_line_definition_form" model="ir.actions.act_window">
-        <field name="name">Follow-up Levels</field>
+        <field name="name">Invoice Reminders</field>
         <field name="res_model">account_followup.followup.line</field>
         <field name="path">follow-up-levels</field>
         <field name="search_view_id" ref="view_account_followup_line_filter"/>
         <field name="view_mode">list,kanban,form</field>
         <field name="help" type="html">
           <p class="o_view_nocontent_smiling_face">
-            Define follow-up levels and their related actions
+            Define reminders and their related actions
           </p><p>
             For each step, specify the actions to be taken and delay in days. It is
             possible to use print and e-mail templates to send specific messages to
@@ -101,6 +88,11 @@
       </field>
     </record>
 
-    <menuitem action="action_account_followup_line_definition_form" id="account_followup_menu" parent="account.account_invoicing_menu" name="Follow-up Levels" groups="account.group_account_manager" sequence="11"/>
-
+    <menuitem
+        action="action_account_followup_line_definition_form"
+        id="account_followup_menu"
+        name="Invoice Reminders"
+        parent="account.account_account_menu"
+        groups="account.group_account_manager"
+        sequence="11"/>
 </odoo>

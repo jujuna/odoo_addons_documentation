@@ -7,21 +7,36 @@
 # Jeffery CHEN <jeffery9@gmail.com>, 2022
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 17:58+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-17 23:00+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/quality/zh_Hans/>\n"
+"projects/odoo-master/quality/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: quality
+#: model:ir.module.module,description:base.module_quality
+msgid ""
+"\n"
+"Quality Base\n"
+"===============\n"
+"* Define quality points that will generate quality checks on pickings,\n"
+"  manufacturing orders or work orders (quality_mrp)\n"
+"* Quality alerts can be created independently or related to quality checks\n"
+"* Possibility to add a measure to the quality check with a min/max "
+"tolerance\n"
+"* Define your stages for the quality alerts\n"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -70,6 +85,12 @@ msgstr "活动"
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "活动异常标示"
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_alert__activity_plans_ids
+#: model:ir.model.fields,field_description:quality.field_quality_check__activity_plans_ids
+msgid "Activity Plans"
+msgstr "活动计划"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_state
@@ -160,6 +181,21 @@ msgstr "模型别名"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "All Categories"
+msgstr ""
+
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "All Products"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_point__apply_to
+msgid "Apply to"
+msgstr ""
+
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "Archived"
 msgstr "已归档"
 
@@ -170,6 +206,27 @@ msgstr "已归档"
 #: model:ir.model.fields,field_description:quality.field_quality_point__message_attachment_count
 msgid "Attachment Count"
 msgstr "附件数量"
+
+#. module: quality
+#: model:ir.module.module,summary:base.module_quality
+msgid "Basic Feature for Quality"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_check__batch_id
+msgid "Batch Transfer"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,help:quality.field_quality_check__batch_id
+msgid "Batch associated to this transfer"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__categories
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "Categories"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__reason
@@ -317,11 +374,6 @@ msgid "Email Alias"
 msgstr "电子邮箱别名"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__email_cc
-msgid "Email cc"
-msgstr "邮件抄送"
-
-#. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_domain
 msgid "Email domain e.g. 'example.com' in 'odoo@example.com'"
 msgstr "电子邮件域名，例如 'odoo@example.com' 中的 'example.com'"
@@ -361,12 +413,6 @@ msgstr "关注者"
 #: model:ir.model.fields,field_description:quality.field_quality_point__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "关注者（合作伙伴）"
-
-#. module: quality
-#: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
-#: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font Awesome图标，例如：fa-tasks"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
@@ -512,10 +558,6 @@ msgstr "收件时检测本地的别名域"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__lot_ids
-msgid "Lot"
-msgstr "批次"
-
-#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__lot_ids
 msgid "Lot/Serial"
 msgstr "批次/序列号"
@@ -524,6 +566,12 @@ msgstr "批次/序列号"
 #: model:ir.model.fields.selection,name:quality.selection__quality_alert__priority__1
 msgid "Low"
 msgstr "低"
+
+#. module: quality
+#: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
+#: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_has_error
@@ -596,6 +644,11 @@ msgstr "下一活动摘要"
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_type_id
 msgid "Next Activity Type"
 msgstr "下一活动类型"
+
+#. module: quality
+#: model:res.groups.privilege,placeholder:quality.res_groups_privilege_quality
+msgid "No"
+msgstr ""
 
 #. module: quality
 #. odoo-python
@@ -751,7 +804,7 @@ msgid "Priority"
 msgstr "优先级"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__product_tmpl_id
+#: model:ir.model.fields,field_description:quality.field_quality_alert__product_id
 #: model:ir.model.fields,field_description:quality.field_quality_check__product_id
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
 msgid "Product"
@@ -763,12 +816,8 @@ msgid "Product Categories"
 msgstr "产品类别"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__product_id
-msgid "Product Variant"
-msgstr "产品变体"
-
-#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__product_ids
+#: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__products
 msgid "Products"
 msgstr "产品"
 
@@ -792,6 +841,11 @@ msgstr "质量警报阶段"
 #: model:ir.model,name:quality.model_quality_alert_team
 msgid "Quality Alert Team"
 msgstr "质量警报团队"
+
+#. module: quality
+#: model:ir.module.module,shortdesc:base.module_quality
+msgid "Quality Base"
+msgstr ""
 
 #. module: quality
 #: model:ir.model,name:quality.model_quality_check
@@ -957,6 +1011,13 @@ msgid "Teams"
 msgstr "团队"
 
 #. module: quality
+#: model:ir.model.fields,help:quality.field_quality_alert__product_tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
+
+#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__test_type
 #: model:ir.model.fields,field_description:quality.field_quality_point__test_type
 #: model:ir.model.fields,field_description:quality.field_quality_point_test_type__technical_name
@@ -1015,6 +1076,11 @@ msgid "Today Activities"
 msgstr "今日活动"
 
 #. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_alert__product_tracking
+msgid "Tracking Method"
+msgstr ""
+
+#. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_tree
 msgid "Type"
@@ -1047,22 +1113,6 @@ msgid "Very High"
 msgstr "非常高"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_alert_team__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_check__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_point__website_message_ids
-msgid "Website Messages"
-msgstr "网站消息"
-
-#. module: quality
-#: model:ir.model.fields,help:quality.field_quality_alert__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_alert_team__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_check__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_point__website_message_ids
-msgid "Website communication history"
-msgstr "网站沟通记录"
-
-#. module: quality
 #: model:quality.reason,name:quality.reason_wo
 msgid "Work Operation"
 msgstr "工作操作"
@@ -1077,40 +1127,24 @@ msgstr "工作中心故障"
 msgid "active"
 msgstr "有效"
 
-#~ msgid "Alias domain"
-#~ msgstr "别名域"
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "e.g. Check Dimensions"
+msgstr ""
 
-#~ msgid "Close"
-#~ msgstr "关闭"
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "e.g. Quarantine, Second Inspection"
+msgstr ""
 
-#~ msgid "Group By"
-#~ msgstr "分组方式"
+#~ msgid "Lot"
+#~ msgstr "批次"
 
-#~ msgid ""
-#~ "No quality team found for this company.\n"
-#~ "Please go to configuration and create one first."
-#~ msgstr ""
-#~ "找不到此公司的质量团队。\n"
-#~ "请先转到“配置”并创建一个。"
+#~ msgid "Product Variant"
+#~ msgstr "产品变体"
 
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "需要采取动作消息数量"
+#~ msgid "Website Messages"
+#~ msgstr "网站消息"
 
-#~ msgid "Owner"
-#~ msgstr "所有者"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "显示所有的在今天之前的下一个动作日期的记录"
-
-#~ msgid ""
-#~ "The owner of records created upon receiving emails on this alias. If this "
-#~ "field is not set the system will attempt to find the right owner based on "
-#~ "the sender (From) address, or will use the Administrator account if no "
-#~ "system user is found for that address."
-#~ msgstr ""
-#~ "基于此别名接收到的邮件，创建记录的所有人。若此字段没有设置，系统将试图根据"
-#~ "发送者(From)地址来查找正确的所有者，如果对于那个地址没有系统用户被找到，将"
-#~ "使用系统管理员账户。"
-
-#~ msgid "Viewer"
-#~ msgstr "观众"
+#~ msgid "Website communication history"
+#~ msgstr "网站沟通记录"

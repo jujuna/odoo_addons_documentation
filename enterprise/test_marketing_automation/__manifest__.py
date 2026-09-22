@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -7,8 +6,10 @@
     'summary': "Test Suite for Automated Marketing Campaigns",
     'category': "Hidden",
     'depends': [
+        'ai_marketing_automation',
         'marketing_automation',
         'marketing_automation_sms',
+        'marketing_automation_website',
         'marketing_automation_whatsapp',
         'test_mail',
         'test_mail_enterprise',
@@ -17,7 +18,7 @@
         'test_mass_mailing',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

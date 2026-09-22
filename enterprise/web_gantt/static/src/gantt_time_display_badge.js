@@ -1,25 +1,21 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class GanttTimeDisplayBadge extends Component {
-    static props = {
-        reactive: {
-            type: Object,
-            shape: {
-                position: {
-                    type: Object,
-                    shape: {
-                        top: { type: Number, optional: true },
-                        right: { type: Number, optional: true },
-                        left: { type: Number, optional: true },
-                    },
-                    optional: true,
-                },
-                class: { type: String, optional: true },
-                text: { type: String, optional: true },
-            },
-        },
-    };
     static template = "web_gantt.GanttTimeDisplayBadge";
+
+    props = useProps({
+        reactive: t.object({
+            position: t
+                .object({
+                    top: t.number().optional(),
+                    right: t.number().optional(),
+                    left: t.number().optional(),
+                })
+                .optional(),
+            class: t.string().optional(),
+            text: t.string().optional(),
+        }),
+    });
 
     get positionStyle() {
         const { position } = this.props.reactive;

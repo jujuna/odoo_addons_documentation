@@ -7,7 +7,6 @@
         <field name="priority">2000</field>
         <field name="arch" type="xml">
             <field name="picked" position="after">
-                <field name="manual_consumption" force_save="1" invisible="1"/>
                 <field name="production_id" invisible="1"/>
             </field>
             <xpath expr="(//field[@name='product_id'])" position="attributes">
@@ -23,6 +22,12 @@
             </field>
             <xpath expr="//div[@groups='stock.group_tracking_lot']" position="attributes">
                 <attribute name="invisible">(context.get('newByProduct')) or (picking_code == 'mrp_operation')</attribute>
+            </xpath>
+            <xpath expr="//div[@name='result_package']" position="attributes">
+                <attribute name="invisible">picking_code == 'mrp_operation' and not context.get('newByProduct')</attribute>
+            </xpath>
+            <xpath expr="//div[@name='outermost_package']" position="attributes">
+                <attribute name="invisible">picking_code == 'mrp_operation' and not context.get('newByProduct')</attribute>
             </xpath>
             <xpath expr="//widget[@name='stock_barcode_unlink_button']" position="attributes">
                 <attribute name="invisible">context.get('newByProduct') or context.get('hide_unlink_button')</attribute>

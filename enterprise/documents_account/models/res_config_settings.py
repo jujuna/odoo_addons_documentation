@@ -7,4 +7,4 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     account_folder_id = fields.Many2one(related='company_id.account_folder_id', readonly=False,
-                                     string="account default folder")
+                                        string="account default folder", check_company=True)

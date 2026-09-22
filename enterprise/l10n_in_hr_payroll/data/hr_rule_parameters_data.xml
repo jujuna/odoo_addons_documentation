@@ -18,7 +18,7 @@
         <field name="country_id" ref="base.in"/>
     </record>
     <record id="l10n_in_rule_parameter_basic_percent_value" model="hr.rule.parameter.value">
-        <field name="parameter_value">0.60</field>
+        <field name="parameter_value">0.50</field>
         <field name="rule_parameter_id" ref="l10n_in_rule_parameter_basic_percent"/>
         <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
     </record>
@@ -88,6 +88,19 @@
         <field name="rule_parameter_id" ref="l10n_in_rule_parameter_tds_percent"/>
         <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
     </record>
+    <record id="l10n_in_rule_parameter_tds_percent_value_2025" model="hr.rule.parameter.value">
+        <field name="parameter_value">[
+            (0.0, (0, 400000)),
+            (0.05, (400001, 800000)),
+            (0.1, (800001, 1200000)),
+            (0.15, (1200001, 1600000)),
+            (0.2, (1600001, 2000000)),
+            (0.25, (2000001, 2400000)),
+            (0.3, (2400001, 'inf')),
+        ]</field>
+        <field name="rule_parameter_id" ref="l10n_in_rule_parameter_tds_percent"/>
+        <field name="date_from" eval="datetime(2025, 4, 1).date()"/>
+    </record>
 
     <record id="l10n_in_rule_parameter_surcharg_percent" model="hr.rule.parameter">
         <field name="name">India: Surcharge Rate</field>
@@ -115,6 +128,22 @@
         <field name="rule_parameter_id" ref="l10n_in_rule_parameter_standard_deduction"/>
         <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
     </record>
+    <record id="l10n_in_rule_parameter_standard_deduction_value_2025" model="hr.rule.parameter.value">
+        <field name="parameter_value">75000</field>
+        <field name="rule_parameter_id" ref="l10n_in_rule_parameter_standard_deduction"/>
+        <field name="date_from" eval="datetime(2025, 4, 1).date()"/>
+    </record>
+
+    <record id="l10n_in_rule_parameter_cess_percentage" model="hr.rule.parameter">
+        <field name="name">India: Cess percentage</field>
+        <field name="code">l10n_in_cess_percentage</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="l10n_in_rule_parameter_cess_percentage_value" model="hr.rule.parameter.value">
+        <field name="parameter_value">0.04</field>
+        <field name="rule_parameter_id" ref="l10n_in_rule_parameter_cess_percentage"/>
+        <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
+    </record>
 
     <record id="l10n_in_rule_parameter_min_income_tax_rebate" model="hr.rule.parameter">
         <field name="name">India: Minimun Income for Tax Rebate</field>
@@ -125,6 +154,11 @@
         <field name="parameter_value">700000</field>
         <field name="rule_parameter_id" ref="l10n_in_rule_parameter_min_income_tax_rebate"/>
         <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
+    </record>
+    <record id="l10n_in_rule_parameter_min_income_tax_rebate_value_2025" model="hr.rule.parameter.value">
+        <field name="parameter_value">1200000</field>
+        <field name="rule_parameter_id" ref="l10n_in_rule_parameter_min_income_tax_rebate"/>
+        <field name="date_from" eval="datetime(2025, 4, 1).date()"/>
     </record>
 
     <record id="l10n_in_rule_parameter_min_income_surcharge" model="hr.rule.parameter">
@@ -151,6 +185,17 @@
             (50000000, 14700000, 3675000),
         ]</field>
         <field name="rule_parameter_id" ref="l10n_in_rule_parameter_max_surcharge_tax_rate"/>
+        <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
+    </record>
+
+    <record id="l10n_in_rule_parameter_house_property_std_deduction" model="hr.rule.parameter">
+        <field name="name">India: House Property Standard Deduction</field>
+        <field name="code">l10n_in_house_property_std_deduction</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="l10n_in_rule_parameter_house_property_std_deduction_value" model="hr.rule.parameter.value">
+        <field name="parameter_value">0.30</field>
+        <field name="rule_parameter_id" ref="l10n_in_rule_parameter_house_property_std_deduction"/>
         <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
     </record>
 
@@ -265,6 +310,17 @@
     <record id="l10n_in_rule_parameter_esicf_value" model="hr.rule.parameter.value">
         <field name="parameter_value">21000</field>
         <field name="rule_parameter_id" ref="l10n_in_rule_parameter_esicf"/>
+        <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
+    </record>
+
+    <record id="l10n_in_rule_parameter_esic_pwd" model="hr.rule.parameter">
+        <field name="name">India: ESIC Threshold for Person with Disability (PwDs)</field>
+        <field name="code">l10n_in_esicf_pwd_value</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="l10n_in_rule_parameter_esic_pwd_value" model="hr.rule.parameter.value">
+        <field name="parameter_value">25000</field>
+        <field name="rule_parameter_id" ref="l10n_in_rule_parameter_esic_pwd"/>
         <field name="date_from" eval="datetime(2000, 1, 1).date()"/>
     </record>
 

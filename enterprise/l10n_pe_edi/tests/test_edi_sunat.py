@@ -1,11 +1,15 @@
-# -*- coding: utf-8 -*-
 from odoo.tests import tagged
-from .common import TestPeEdiCommon, _get_pe_current_datetime
+from .common import TestPeEdiCommon, CODE_98_ERROR_MSG, MAX_WAIT_ITER, _get_pe_current_datetime
 
 from datetime import timedelta
+from time import sleep
+from freezegun import freeze_time
+
 
 @tagged('external_l10n', 'post_install', '-at_install', '-standard', 'external')
 class TestEdiSunat(TestPeEdiCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -15,83 +19,134 @@ class TestEdiSunat(TestPeEdiCommon):
 
     def test_10_invoice_edi_flow(self):
         yesterday = _get_pe_current_datetime().date() - timedelta(1)
-        move = self._create_invoice(invoice_date=yesterday, date=yesterday)
+        move = self._create_invoice_pe(invoice_date=yesterday, date=yesterday)
         move.action_post()
 
         # Send
-        doc = move.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        move.action_process_edi_web_services(with_commit=False)
-        self.assertRecordValues(doc, [{'error': False}])
-        self.assertRecordValues(move, [{'edi_state': 'sent'}])
+        move._l10n_pe_edi_post_invoice()
+        self.assertRecordValues(move, [{'l10n_pe_edi_warnings': False}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'sent'}])
 
         # Cancel step 1
         move.l10n_pe_edi_cancel_reason = 'abc'
-        move.button_cancel_posted_moves()
         self.assertFalse(move.l10n_pe_edi_cancel_cdr_number)
-        doc = move.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        move.action_process_edi_web_services(with_commit=False)
+        move.button_request_cancel()
         self.assertTrue(move.l10n_pe_edi_cancel_cdr_number)
-        self.assertRecordValues(move, [{'edi_state': 'to_cancel'}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'sent'}])
 
         # Cancel step 2
-        doc = move.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        move.action_process_edi_web_services(with_commit=False)
-        self.assertRecordValues(doc, [{'error': False}])
-        self.assertRecordValues(move, [{'edi_state': 'cancelled'}])
+        # We need to wait a bit before requesting the cancellation's status
+        # to avoid getting a status code 98 (cancellation still being processed).
+        for _ in range(MAX_WAIT_ITER):
+            sleep(10)
+            move.button_request_cancel()
+            if not move.l10n_pe_edi_warnings or move.l10n_pe_edi_warnings['edi_error']['message'] != CODE_98_ERROR_MSG:
+                break
+
+        self.assertRecordValues(move, [{'l10n_pe_edi_warnings': False}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'cancelled'}])
 
     def test_20_refund_edi_flow(self):
         today = _get_pe_current_datetime().date()
         move = self._create_refund(invoice_date=today, date=today)
-        (move.reversed_entry_id + move).action_post()
+        (move.reversed_entry_id | move).action_post()
 
         # Send
-        doc = move.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        doc_reversed_entry = move.reversed_entry_id.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        (move.reversed_entry_id + move).action_process_edi_web_services(with_commit=False)
-        self.assertRecordValues(doc, [{'error': False}])
-        self.assertTrue(doc_reversed_entry)
-        self.assertRecordValues(doc_reversed_entry, [{'error': False}])
-        self.assertRecordValues(move, [{'edi_state': 'sent'}])
+        move.reversed_entry_id._l10n_pe_edi_post_invoice()
+        move._l10n_pe_edi_post_invoice()
+        self.assertRecordValues(move, [{'l10n_pe_edi_warnings': False}])
+        self.assertRecordValues(move.reversed_entry_id, [{'l10n_pe_edi_warnings': False}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'sent'}])
+        self.assertRecordValues(move.reversed_entry_id, [{'l10n_pe_edi_status': 'sent'}])
 
         # Cancel step 1
         move.l10n_pe_edi_cancel_reason = 'abc'
-        move.button_cancel_posted_moves()
         self.assertFalse(move.l10n_pe_edi_cancel_cdr_number)
-        doc = move.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        move.action_process_edi_web_services(with_commit=False)
+        move.button_request_cancel()
         self.assertTrue(move.l10n_pe_edi_cancel_cdr_number)
-        self.assertRecordValues(move, [{'edi_state': 'to_cancel'}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'sent'}])
+        self.assertRecordValues(move.reversed_entry_id, [{'l10n_pe_edi_status': 'sent'}])
 
         # Cancel step 2
-        doc = move.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        move.action_process_edi_web_services(with_commit=False)
-        self.assertRecordValues(doc, [{'error': False}])
-        self.assertRecordValues(move, [{'edi_state': 'cancelled'}])
+        # We need to wait a bit before requesting the cancellation's status
+        # to avoid getting a status code 98 (cancellation still being processed).
+        for _ in range(MAX_WAIT_ITER):
+            sleep(10)
+            move.button_request_cancel()
+            if not move.l10n_pe_edi_warnings or move.l10n_pe_edi_warnings['edi_error']['message'] != CODE_98_ERROR_MSG:
+                break
+
+        self.assertRecordValues(move, [{'l10n_pe_edi_warnings': False}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'cancelled'}])
 
     def test_30_debit_note_edi_flow(self):
         today = _get_pe_current_datetime().date()
         move = self._create_debit_note(invoice_date=today, date=today)
-        (move.debit_origin_id + move).action_post()
+        (move.debit_origin_id | move).action_post()
 
         # Send
-        doc = move.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        doc_debit_origin = move.debit_origin_id.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        (move.debit_origin_id + move).action_process_edi_web_services(with_commit=False)
-        self.assertRecordValues(doc, [{'error': False}])
-        self.assertRecordValues(doc_debit_origin, [{'error': False}])
-        self.assertRecordValues(move, [{'edi_state': 'sent'}])
+        move.debit_origin_id._l10n_pe_edi_post_invoice()
+        move._l10n_pe_edi_post_invoice()
+        self.assertRecordValues(move, [{'l10n_pe_edi_warnings': False}])
+        self.assertRecordValues(move.debit_origin_id, [{'l10n_pe_edi_warnings': False}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'sent'}])
+        self.assertRecordValues(move.debit_origin_id, [{'l10n_pe_edi_status': 'sent'}])
 
         # Cancel step 1
         move.l10n_pe_edi_cancel_reason = 'abc'
-        move.button_cancel_posted_moves()
         self.assertFalse(move.l10n_pe_edi_cancel_cdr_number)
-        doc = move.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        move.action_process_edi_web_services(with_commit=False)
+        move.button_request_cancel()
         self.assertTrue(move.l10n_pe_edi_cancel_cdr_number)
-        self.assertRecordValues(move, [{'edi_state': 'to_cancel'}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'sent'}])
+        self.assertRecordValues(move.debit_origin_id, [{'l10n_pe_edi_status': 'sent'}])
 
         # Cancel step 2
-        doc = move.edi_document_ids.filtered(lambda d: d.state in ('to_send', 'to_cancel'))
-        move.action_process_edi_web_services(with_commit=False)
-        self.assertRecordValues(doc, [{'error': False}])
-        self.assertRecordValues(move, [{'edi_state': 'cancelled'}])
+        # We need to wait a bit before requesting the cancellation's status
+        # to avoid getting a status code 98 (cancellation still being processed).
+        for _ in range(MAX_WAIT_ITER):
+            sleep(10)
+            move.button_request_cancel()
+            if not move.l10n_pe_edi_warnings or move.l10n_pe_edi_warnings['edi_error']['message'] != CODE_98_ERROR_MSG:
+                break
+
+        self.assertRecordValues(move, [{'l10n_pe_edi_warnings': False}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'cancelled'}])
+        self.assertRecordValues(move.debit_origin_id, [{'l10n_pe_edi_status': 'cancelled'}])
+
+    @freeze_time("2025-11-30 12:00:00")
+    def test_40_catch_error_in_cdr_cancel(self):
+        """
+        Check that we correctly detect errors reported in the ResponseCode field of the CDR
+        when cancelling an invoice.
+        The error in this is that we can only cancel records created within the last few days. So
+        freezetime causes the cancellation to always fail.
+        """
+        today = _get_pe_current_datetime().date()
+        yesterday = today - timedelta(1)
+        move = self._create_invoice_pe(invoice_date=yesterday, date=yesterday, name='F FFI-%s4' % self.time_name)
+        move.action_post()
+
+        move._l10n_pe_edi_post_invoice()
+        self.assertRecordValues(move, [{'l10n_pe_edi_warnings': False}])
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'sent'}])
+
+        # Cancel step 1
+        move.l10n_pe_edi_cancel_reason = 'abc'
+        self.assertFalse(move.l10n_pe_edi_cancel_cdr_number)
+        move.button_request_cancel()
+        self.assertTrue(move.l10n_pe_edi_cancel_cdr_number)
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'sent'}])
+
+        # Cancel step 2
+        # We need to wait a bit before requesting the cancellation's status
+        # to avoid getting a status code 98 (cancellation still being processed).
+        for _ in range(MAX_WAIT_ITER):
+            sleep(10)
+            move.button_request_cancel()
+            if not move.l10n_pe_edi_warnings or move.l10n_pe_edi_warnings['edi_error']['message'] != CODE_98_ERROR_MSG:
+                break
+
+        expected_error = "We got an error response from the OSE.\n*Original message:*\n2957|El comprobante no puede ser dado de baja por exceder el plazo desde su fecha de emision"
+        actual_error = move.l10n_pe_edi_warnings['edi_error']['message']
+        self.assertTrue(actual_error.startswith(expected_error), f'Error response: {actual_error}')
+        self.assertRecordValues(move, [{'l10n_pe_edi_status': 'sent'}])

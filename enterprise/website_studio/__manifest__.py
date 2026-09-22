@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': "Website Studio",
@@ -12,7 +11,6 @@ model. Furthermore, you can create a new website form or edit an existing one.
 
 """,
     'category': 'Hidden',
-    'version': '1.0',
     'depends': [
         'web_studio',
         'website',

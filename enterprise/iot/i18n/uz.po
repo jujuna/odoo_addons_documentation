@@ -14,20 +14,40 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-08 18:44+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-17 23:47+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/iot/"
+"uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: iot
+#: model:ir.module.module,description:base.module_iot
+msgid ""
+"\n"
+"This module provides management of your IoT Boxes inside Odoo.\n"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/iot_restart_odoo.js:0
 msgid "%s is currently restarting"
+msgstr ""
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/view_widgets/iot_reset_password.js:0
+msgid "%s new password: %s"
+msgstr ""
+
+#. module: iot
+#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_kanban
+msgid "<i class=\"oi\" data-icon=\"power\" title=\"device-icon\"/>"
 msgstr ""
 
 #. module: iot
@@ -40,18 +60,6 @@ msgid ""
 msgstr ""
 "<span class=\"spinner-border spinner-border-sm\"/> IoT qutisi qidirilmoqda. "
 "<span id=\"discover_retry_countdown\" class=\"fw-bold\"/>"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_form
-#, fuzzy
-msgid "A fiscal data module has been connected. To use it,"
-msgstr "Fiskal ma'lumotlar moduli ulandi. Undan foydalanish uchun,"
-
-#. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_box__must_install_fdm_module
-#, fuzzy
-msgid "A fiscal data module is connected to this IoT Box"
-msgstr "Fiskal ma'lumotlar moduli ushbu IoT qutisiga ulangan"
 
 #. module: iot
 #: model:ir.model,name:iot.model_add_iot_box
@@ -90,22 +98,15 @@ msgid "Are you sure you want to restart Odoo on the IoT Box?"
 msgstr ""
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_box__drivers_auto_update
-#, fuzzy
-msgid "Automatic drivers update"
-msgstr "Drayverlarni avtomatik yangilash"
-
-#. module: iot
-#: model:ir.model.fields,help:iot.field_iot_box__drivers_auto_update
-#, fuzzy
-msgid "Automatically update drivers when the IoT Box boots"
-msgstr "IoT qutisi ishga tushganda drayverlarni avtomatik yangilash"
-
-#. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__scanner
 #, fuzzy
 msgid "Barcode Scanner"
 msgstr "Shtrix-kod skaneri"
+
+#. module: iot
+#: model:ir.module.module,summary:base.module_iot
+msgid "Basic models and helpers to support Internet of Things."
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -174,9 +175,8 @@ msgstr "Chiroqlarni tekshiring"
 
 #. module: iot
 #: model_terms:ir.actions.act_window,help:iot.iot_box_action
-#, fuzzy
-msgid "Click on the"
-msgstr "ustiga bosing"
+msgid "Click on the connect button to add an IoT Box."
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -192,10 +192,15 @@ msgid "Company"
 msgstr "Kompaniya"
 
 #. module: iot
-#: model:ir.ui.menu,name:iot.view_iot_selected_printer_local_action
+#: model:ir.ui.menu,name:iot.iot_configuration_menu
 #, fuzzy
 msgid "Configuration"
 msgstr "Sozlamalar"
+
+#. module: iot
+#: model:res.groups.privilege,description:iot.res_groups_privilege_iot
+msgid "Configure IoT boxes and devices."
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__add_iot_box__stage__connect
@@ -233,12 +238,17 @@ msgid "Connection"
 msgstr "Ulanish"
 
 #. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_longpolling.js:0
+msgid "Connection to IoT Box failed"
+msgstr ""
+
+#. module: iot
 #: model:ir.model.fields,field_description:iot.field_add_iot_box__create_uid
 #: model:ir.model.fields,field_description:iot.field_iot_box__create_uid
 #: model:ir.model.fields,field_description:iot.field_iot_device__create_uid
 #: model:ir.model.fields,field_description:iot.field_iot_discovered_box__create_uid
 #: model:ir.model.fields,field_description:iot.field_iot_keyboard_layout__create_uid
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__create_uid
 #, fuzzy
 msgid "Created by"
 msgstr "Yaratuvchi"
@@ -249,13 +259,11 @@ msgstr "Yaratuvchi"
 #: model:ir.model.fields,field_description:iot.field_iot_device__create_date
 #: model:ir.model.fields,field_description:iot.field_iot_discovered_box__create_date
 #: model:ir.model.fields,field_description:iot.field_iot_keyboard_layout__create_date
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__create_date
 #, fuzzy
 msgid "Created on"
 msgstr "Yaratilgan sana"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__device_ids
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__device
 #, fuzzy
 msgid "Device"
@@ -269,7 +277,13 @@ msgstr "Qurilmalar soni"
 
 #. module: iot
 #. odoo-javascript
-#: code:addons/iot/static/src/backend/iot_device_form.js:0
+#: code:addons/iot/static/src/view_widgets/test_iot_device.js:0
+msgid "Device is connected and operational"
+msgstr ""
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/view_widgets/test_iot_device.js:0
 #, fuzzy
 msgid "Device is disconnected"
 msgstr "Qurilma uzildi"
@@ -292,10 +306,6 @@ msgstr "Qurilmalar"
 #. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/iot_remote_debug.xml:0
-#: model_terms:ir.ui.view,arch_db:iot.view_add_iot_box
-#: model_terms:ir.ui.view,arch_db:iot.view_enter_pairing_code
-#: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
-#: model_terms:ir.ui.view,arch_db:iot.view_pair_offline
 #, fuzzy
 msgid "Discard"
 msgstr "Bekor qilish"
@@ -325,12 +335,6 @@ msgid "Display"
 msgstr "Ekran"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__display_device_ids
-#, fuzzy
-msgid "Display Device"
-msgstr "Ekran qurilmasi"
-
-#. module: iot
 #: model:ir.model.fields,field_description:iot.field_add_iot_box__display_name
 #: model:ir.model.fields,field_description:iot.field_iot_box__display_name
 #: model:ir.model.fields,field_description:iot.field_iot_channel__display_name
@@ -340,11 +344,18 @@ msgstr "Ekran qurilmasi"
 #: model:ir.model.fields,field_description:iot.field_ir_actions_report__display_name
 #: model:ir.model.fields,field_description:iot.field_ir_config_parameter__display_name
 #: model:ir.model.fields,field_description:iot.field_ir_http__display_name
+#: model:ir.model.fields,field_description:iot.field_ir_websocket__display_name
+#: model:ir.model.fields,field_description:iot.field_printer_printer__display_name
 #: model:ir.model.fields,field_description:iot.field_publisher_warranty_contract__display_name
 #: model:ir.model.fields,field_description:iot.field_select_printers_wizard__display_name
 #, fuzzy
 msgid "Display Name"
 msgstr "Ko‘rsatiladigan nom"
+
+#. module: iot
+#: model:ir.model.fields,field_description:iot.field_iot_device__display_orientation
+msgid "Display Orientation"
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_device__display_url
@@ -353,12 +364,13 @@ msgid "Display URL"
 msgstr "Ko‘rsatish URL manzili"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__do_not_ask_again
-#, fuzzy
-msgid "Do not ask me again"
-msgstr "Menga boshqa so‘ramang"
+#. odoo-javascript
+#: code:addons/iot/static/src/backend/iot_device_form.js:0
+msgid "Display settings updated."
+msgstr ""
 
 #. module: iot
+#: model_terms:ir.actions.act_window,help:iot.iot_box_action
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 #, fuzzy
 msgid "Documentation"
@@ -370,6 +382,31 @@ msgstr "Hujjatlar"
 #, fuzzy
 msgid "Domain Address"
 msgstr "Domen manzili"
+
+#. module: iot
+#: model:ir.actions.act_url,name:iot.action_download_iot_box_image
+msgid "Download IoT Box Image"
+msgstr ""
+
+#. module: iot
+#: model:ir.actions.act_url,name:iot.action_download_virtual_iot
+msgid "Download Virtual IoT Box"
+msgstr ""
+
+#. module: iot
+#: model:ir.model.fields,help:iot.field_iot_box__use_custom_handlers
+msgid "Download custom handlers from the database"
+msgstr ""
+
+#. module: iot
+#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__duplex
+msgid "Duplex"
+msgstr ""
+
+#. module: iot
+#: model:ir.model,name:iot.model_printer_printer
+msgid "External Printer"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -391,6 +428,12 @@ msgstr "%s dan jurnallarni yuklab olish amalga oshmadi"
 #, fuzzy
 msgid "Failed to initiate print"
 msgstr "Chop etishni boshlash amalga oshmadi"
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_longpolling.js:0
+msgid "Failed to reach IoT Box at %s"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -462,7 +505,7 @@ msgstr "Fiskal ma'lumotlar moduli"
 
 #. module: iot
 #. odoo-javascript
-#: code:addons/iot/static/src/backend/iot_device_form.js:0
+#: code:addons/iot/static/src/view_widgets/test_iot_device.js:0
 #, fuzzy
 msgid "Fiscal Data Module is connected and operational"
 msgstr "Fiskal ma'lumotlar moduli ulangan va ishlamoqda"
@@ -525,6 +568,8 @@ msgstr "Bosh sahifa"
 #: model:ir.model.fields,field_description:iot.field_ir_actions_report__id
 #: model:ir.model.fields,field_description:iot.field_ir_config_parameter__id
 #: model:ir.model.fields,field_description:iot.field_ir_http__id
+#: model:ir.model.fields,field_description:iot.field_ir_websocket__id
+#: model:ir.model.fields,field_description:iot.field_printer_printer__id
 #: model:ir.model.fields,field_description:iot.field_publisher_warranty_contract__id
 #: model:ir.model.fields,field_description:iot.field_select_printers_wizard__id
 #, fuzzy
@@ -543,16 +588,6 @@ msgstr "IoT qurilmasi"
 #, fuzzy
 msgid "Identifier"
 msgstr "Identifikator"
-
-#. module: iot
-#: model:ir.model.fields,help:iot.field_select_printers_wizard__do_not_ask_again
-#, fuzzy
-msgid ""
-"If checked, this dialog won't appear the next time you print and the "
-"selected printers will be used automatically."
-msgstr ""
-"Agar belgilansa, keyingi chop etishda ushbu oyna ko‘rinmaydi va tanlangan "
-"printerlar avtomatik ravishda ishlatiladi."
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_pair_offline
@@ -578,6 +613,11 @@ msgid "Internet is connected"
 msgstr "Internet ulangan"
 
 #. module: iot
+#: model:ir.module.module,shortdesc:base.module_iot
+msgid "Internet of Things"
+msgstr ""
+
+#. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/network_utils/iot_http_service.js:0
 #, fuzzy
@@ -592,6 +632,12 @@ msgid "Invalid data in message sent to the blackbox."
 msgstr "Qora qutiga yuborilgan xabardagi ma'lumotlar noto‘g‘ri."
 
 #. module: iot
+#: model:ir.model.fields.selection,name:iot.selection__iot_device__display_orientation__inverted
+msgid "Inverted"
+msgstr ""
+
+#. module: iot
+#: model:ir.model.fields.selection,name:iot.selection__printer_printer__type__iot
 #: model:ir.ui.menu,name:iot.iot_menu_root
 #: model:res.groups.privilege,name:iot.res_groups_privilege_iot
 #, fuzzy
@@ -601,6 +647,7 @@ msgstr "IoT"
 #. module: iot
 #: model:ir.model,name:iot.model_iot_box
 #: model:ir.model.fields,field_description:iot.field_iot_device__iot_id
+#: model_terms:ir.ui.view,arch_db:iot.iot_device_search
 #, fuzzy
 msgid "IoT Box"
 msgstr "IoT qutisi"
@@ -618,6 +665,11 @@ msgstr "IoT qutisi %(serial_n)s %(pairing_code)s"
 #, fuzzy
 msgid "IoT Box %s found. Connecting..."
 msgstr "%s IoT qutisi topildi. Ulanmoqda..."
+
+#. module: iot
+#: model:ir.ui.menu,name:iot.iot_download_iot_box_image_menu
+msgid "IoT Box Image"
+msgstr ""
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_add_iot_box
@@ -641,6 +693,11 @@ msgid ""
 msgstr ""
 
 #. module: iot
+#: model:ir.model.fields,field_description:iot.field_add_iot_box__token
+msgid "IoT Box token"
+msgstr ""
+
+#. module: iot
 #: model:ir.actions.act_window,name:iot.iot_box_action
 #: model:ir.ui.menu,name:iot.iot_box_menu_action
 #, fuzzy
@@ -654,16 +711,20 @@ msgid "IoT Device"
 msgstr "IoT qurilmasi"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_ir_actions_report__device_ids
-#, fuzzy
-msgid "IoT Devices"
-msgstr "IoT qurilmalari"
+#: model:ir.model.fields,field_description:iot.field_printer_printer__iot_device_id
+msgid "IoT Printer"
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_add_iot_box__iot_box_to_connect
 #, fuzzy
 msgid "Iot Box To Connect"
 msgstr "Ulanish uchun IoT qutisi"
+
+#. module: iot
+#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__is_duplex_hidden
+msgid "Is Duplex Hidden"
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_device__is_scanner
@@ -685,18 +746,11 @@ msgid "Keyboard Layout"
 msgstr "Klaviatura tartibi"
 
 #. module: iot
-#: model:ir.model.fields.selection,name:iot.selection__iot_device__subtype__label_printer
-#, fuzzy
-msgid "Label Printer"
-msgstr "Yorliq printeri"
-
-#. module: iot
 #: model:ir.model.fields,field_description:iot.field_add_iot_box__write_uid
 #: model:ir.model.fields,field_description:iot.field_iot_box__write_uid
 #: model:ir.model.fields,field_description:iot.field_iot_device__write_uid
 #: model:ir.model.fields,field_description:iot.field_iot_discovered_box__write_uid
 #: model:ir.model.fields,field_description:iot.field_iot_keyboard_layout__write_uid
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__write_uid
 #, fuzzy
 msgid "Last Updated by"
 msgstr "Oxirgi yangilagan"
@@ -707,7 +761,6 @@ msgstr "Oxirgi yangilagan"
 #: model:ir.model.fields,field_description:iot.field_iot_device__write_date
 #: model:ir.model.fields,field_description:iot.field_iot_discovered_box__write_date
 #: model:ir.model.fields,field_description:iot.field_iot_keyboard_layout__write_date
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__write_date
 #, fuzzy
 msgid "Last Updated on"
 msgstr "Oxirgi yangilangan sana"
@@ -717,6 +770,36 @@ msgstr "Oxirgi yangilangan sana"
 #, fuzzy
 msgid "Layout"
 msgstr "Tartib"
+
+#. module: iot
+#: model:ir.model.fields.selection,name:iot.selection__iot_device__display_orientation__left
+msgid "Left"
+msgstr ""
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
+msgid ""
+"Local Network Access configuration is enabled, but your browser is not "
+"Chromium-based. Please use a Chromium-based browser to benefit from this "
+"feature."
+msgstr ""
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
+msgid ""
+"Local Network Access is enabled for this IoT box, but your browser version "
+"does not support it. Please update your browser to the latest version."
+msgstr ""
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
+msgid ""
+"Local Network Access permission is denied. Some hardware devices might not "
+"work properly. Please allow Local Network Access in your browser settings."
+msgstr ""
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
@@ -731,34 +814,21 @@ msgid "Make sure the Network lights are on."
 msgstr "Tarmoq chiroqlari yoniqligiga ishonch hosil qiling."
 
 #. module: iot
+#: model:ir.ui.menu,name:iot.manage_printers_action
+msgid "Manage Printers"
+msgstr ""
+
+#. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__add_iot_box__stage__manual
 #, fuzzy
 msgid "Manual"
 msgstr "Qo‘llanma"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_device__manual_measurement
-#, fuzzy
-msgid "Manual Measurement"
-msgstr "Qo‘lda o‘lchash"
-
-#. module: iot
-#: model:ir.model.fields,help:iot.field_iot_device__manual_measurement
-#, fuzzy
-msgid "Manually read the measurement from the device"
-msgstr "Qurilmadan o‘lchovni qo‘lda o‘qish"
-
-#. module: iot
 #: model:ir.model.fields,help:iot.field_iot_device__is_scanner
 #, fuzzy
 msgid "Manually switch the device type between keyboard and scanner"
 msgstr "Qurilma turini klaviatura va skaner o‘rtasida qo‘lda almashtirish"
-
-#. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_device__manufacturer
-#, fuzzy
-msgid "Manufacturer"
-msgstr "Ishlab chiqaruvchi"
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_box__name
@@ -783,11 +853,9 @@ msgid "New IoT Box connected!"
 msgstr "Yangi IoT qutisi ulandi!"
 
 #. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/view_widgets/iot_reset_password.js:0
-#, fuzzy
-msgid "New SSH password for %s"
-msgstr "%s uchun yangi SSH paroli"
+#: model:res.groups.privilege,placeholder:iot.res_groups_privilege_iot
+msgid "No"
+msgstr ""
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_enter_pairing_code
@@ -803,6 +871,11 @@ msgid "No IoT Box found!"
 msgstr "IoT qutisi topilmadi!"
 
 #. module: iot
+#: model_terms:ir.actions.act_window,help:iot.iot_device_action
+msgid "No IoT Device found!"
+msgstr ""
+
+#. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/network_utils/iot_http_service.js:0
 #, fuzzy
@@ -810,18 +883,9 @@ msgid "No Vat Signing Card or Vat Signing Card broken."
 msgstr "QQS imzolash kartasi yo‘q yoki buzilgan."
 
 #. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/select_printer_wizard.js:0
-#, fuzzy
-msgid "No printer selected"
-msgstr "Hech qanday printer tanlanmagan"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/client_action/delete_local_storage.xml:0
-#, fuzzy
-msgid "No report to display"
-msgstr "Ko‘rsatish uchun hisobot yo‘q"
+#: model:ir.model.fields.selection,name:iot.selection__iot_device__display_orientation__normal
+msgid "Normal"
+msgstr ""
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
@@ -832,32 +896,12 @@ msgstr ""
 "juftlashtirishga urinib ko‘ring."
 
 #. module: iot
-#: model:ir.model.fields.selection,name:iot.selection__iot_device__subtype__office_printer
-#, fuzzy
-msgid "Office Printer"
-msgstr "Ofis printeri"
-
-#. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__add_iot_box__stage__pair_offline
 #: model_terms:ir.ui.view,arch_db:iot.view_enter_pairing_code
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 #, fuzzy
 msgid "Offline Pairing"
 msgstr "Oflayn juftlashtirish"
-
-#. module: iot
-#. odoo-python
-#: code:addons/iot/models/ir_actions_report.py:0
-#, fuzzy
-msgid ""
-"One of the printer used to print the document has been removed.\n"
-"To reset printers, go to the IoT App, Configuration tab, \"Reset Linked "
-"Printers\" and retry the operation."
-msgstr ""
-"Hujjatni chop etish uchun ishlatilgan printerlardan biri olib tashlandi. "
-"Printerlarni qayta o‘rnatish uchun IoT ilovasining Sozlamalar bo‘limiga "
-"o‘ting, \"Bog‘langan printerlarni qayta o‘rnatish\" tugmasini bosing va "
-"amalni qaytadan bajaring."
 
 #. module: iot
 #. odoo-javascript
@@ -871,13 +915,6 @@ msgstr "Amal qora qutida saqlanmadi"
 #, fuzzy
 msgid "Optional: Plug a screen"
 msgstr "Qo‘shimcha: Ekranni ulang"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
-#, fuzzy
-msgid "Out of paper"
-msgstr "Qog‘oz tugagan"
 
 #. module: iot
 #. odoo-javascript
@@ -906,13 +943,6 @@ msgstr "Juftlashtirish kodi"
 #, fuzzy
 msgid "Pairing code received from a printer or screen"
 msgstr "Printer yoki ekrandan olingan juftlashtirish kodi"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
-#, fuzzy
-msgid "Paper is low"
-msgstr "Qog‘oz kam qolgan"
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__payment
@@ -946,10 +976,9 @@ msgid "Power the box"
 msgstr "Qutini yoqish"
 
 #. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.view_select_printers_wizard
-#, fuzzy
-msgid "Print"
-msgstr "Chop etish"
+#: model:ir.model.fields,help:iot.field_select_printers_wizard__duplex
+msgid "Print duplex if the printer allows it."
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__printer
@@ -961,21 +990,14 @@ msgstr "Printer"
 #. odoo-javascript
 #: code:addons/iot/static/src/network_utils/iot_http_service.js:0
 #, fuzzy
-msgid "Printer is not ready"
-msgstr "Printer tayyor emas"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
-#, fuzzy
 msgid "Printer is unreachable"
 msgstr "Printerga ulanib bo‘lmayapti"
 
 #. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.view_select_printers_wizard
-#, fuzzy
-msgid "Printers"
-msgstr "Printerlar"
+#. odoo-javascript
+#: code:addons/iot/static/src/iot_report_action.js:0
+msgid "Printing document(s) with IoT Box..."
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -991,10 +1013,9 @@ msgid "Publisher Warranty Contract For IoT Box"
 msgstr "IoT qutisi uchun ishlab chiqaruvchi kafolat shartnomasi"
 
 #. module: iot
-#: model:ir.model.fields.selection,name:iot.selection__iot_device__subtype__receipt_printer
-#, fuzzy
-msgid "Receipt Printer"
-msgstr "Chek printeri"
+#: model:ir.model.fields,field_description:iot.field_iot_device__printer_id
+msgid "Related Printer"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -1012,16 +1033,12 @@ msgstr ""
 #. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/iot_remote_debug.xml:0
-#, fuzzy
 msgid ""
 "Remote debug is enabled, the owner of the token you provided has access to "
 "both your IoT Box\n"
 "                and local network. If it's unintended, click on \"Disable\" "
 "below."
 msgstr ""
-"Masofaviy nosozliklarni tuzatish funksiyasi yoqilgan, siz taqdim etgan token "
-"egasi IoT qutingiz va mahalliy tarmoqqa kirish huquqiga ega. Agar bu "
-"kutilmagan bo‘lsa, quyidagi \"O‘chirish\" tugmasini bosing."
 
 #. module: iot
 #. odoo-javascript
@@ -1046,32 +1063,11 @@ msgid "Report xml"
 msgstr "Hisobot XML"
 
 #. module: iot
-#: model:ir.ui.menu,name:iot.iot_settings_menu_action
+#: model:ir.ui.menu,name:iot.iot_configuration_menu_reporting_section
 msgid "Reporting"
 msgstr ""
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_device__report_ids
-#, fuzzy
-msgid "Reports"
-msgstr "Hisobotlar"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_device_view_form
-#, fuzzy
-msgid "Reports to Auto-Print"
-msgstr "Avtomatik chop etish uchun hisobotlar"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/client_action/delete_local_storage.xml:0
-#, fuzzy
-msgid "Reports with linked printers"
-msgstr "Bog‘langan printerli hisobotlar"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/client_action/delete_local_storage.xml:0
 #: model:ir.ui.menu,name:iot.iot_clear_selected_devices
 #, fuzzy
 msgid "Reset Linked Printers"
@@ -1085,16 +1081,15 @@ msgid "Retrying in "
 msgstr "Qayta urinish vaqti:"
 
 #. module: iot
+#: model:ir.model.fields.selection,name:iot.selection__iot_device__display_orientation__right
+msgid "Right"
+msgstr ""
+
+#. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_box__ssl_certificate_end_date
 #, fuzzy
 msgid "SSL Certificate End Date"
 msgstr "SSL sertifikatining amal qilish muddati"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.view_select_printers_wizard
-#, fuzzy
-msgid "Sales Details"
-msgstr "Savdo tafsilotlari"
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__scale
@@ -1116,30 +1111,14 @@ msgid "Select IoT Box to connect"
 msgstr "Ulanish uchun IoT qutisini tanlang"
 
 #. module: iot
-#. odoo-python
-#: code:addons/iot/models/ir_actions_report.py:0
-msgid "Select Printers for %s"
+#: model:ir.model,name:iot.model_select_printers_wizard
+msgid "Select printers to print the report on"
 msgstr ""
 
 #. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/select_printer_wizard.js:0
-#, fuzzy
-msgid "Select at least one printer"
-msgstr "Kamida bitta printerni tanlang"
-
-#. module: iot
-#: model:ir.model,name:iot.model_select_printers_wizard
-#, fuzzy
-msgid "Selection of printers"
-msgstr "Printerlarni tanlash"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/iot_report_action.js:0
-#, fuzzy
-msgid "Sending document to printer %s..."
-msgstr "Hujjat %s printeriga yuborilmoqda..."
+#: model:ir.model.fields,help:iot.field_iot_device__display_orientation
+msgid "Select the orientation of the display for the Kiosk mode"
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__connection__serial
@@ -1203,18 +1182,6 @@ msgid "Status"
 msgstr "Holat"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_device__subtype
-#, fuzzy
-msgid "Subtype"
-msgstr "Kichik tur"
-
-#. module: iot
-#: model:ir.model.fields,help:iot.field_iot_device__subtype
-#, fuzzy
-msgid "Subtype of device."
-msgstr "Qurilmaning kichik turi."
-
-#. module: iot
 #: model:ir.model,name:iot.model_ir_config_parameter
 #, fuzzy
 msgid "System Parameter"
@@ -1227,14 +1194,8 @@ msgid "Technical Information"
 msgstr "Texnik ma'lumot"
 
 #. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_device_view_form
-#, fuzzy
-msgid "Test"
-msgstr "Sinov"
-
-#. module: iot
 #. odoo-javascript
-#: code:addons/iot/static/src/backend/iot_device_form.js:0
+#: code:addons/iot/static/src/view_widgets/test_iot_device.js:0
 #, fuzzy
 msgid "Test page printed"
 msgstr "Sinov sahifasi chop etildi"
@@ -1252,26 +1213,12 @@ msgid "The Websocket IoT Channel"
 msgstr "Websocket IoT kanali"
 
 #. module: iot
-#. odoo-python
-#: code:addons/iot/models/ir_actions_report.py:0
-msgid ""
-"The report you are trying to print requires an IoT Box to be printed.\n"
-"Make sure you linked the report '%s' to the corresponding IoT printer device."
-msgstr ""
-
-#. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_pair_offline
 #, fuzzy
 msgid "Then click on \"Configure\" under \"Odoo database connected\" section."
 msgstr ""
 "So‘ngra \"Odoo ma'lumotlar bazasiga ulangan\" bo‘limidagi \"Sozlash\" "
 "tugmasini bosing."
-
-#. module: iot
-#: model_terms:ir.actions.act_window,help:iot.iot_device_action
-#, fuzzy
-msgid "There is no device connected to your IoT Boxes"
-msgstr "IoT qutilaringizga hech qanday qurilma ulanmagan"
 
 #. module: iot
 #. odoo-javascript
@@ -1284,6 +1231,7 @@ msgstr "Token"
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_device__type
+#: model:ir.model.fields,field_description:iot.field_printer_printer__type
 #, fuzzy
 msgid "Type"
 msgstr "Tur"
@@ -1351,10 +1299,25 @@ msgid "Unsupported"
 msgstr "Qo‘llab-quvvatlanmaydi"
 
 #. module: iot
+#: model:ir.model.fields,field_description:iot.field_iot_box__use_custom_handlers
+msgid "Use Custom Handlers"
+msgstr ""
+
+#. module: iot
+#: model:ir.model.fields,field_description:iot.field_iot_box__use_lna
+msgid "Use Local Network Access"
+msgstr ""
+
+#. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 #, fuzzy
 msgid "Use Pairing Code"
 msgstr "Juftlash kodidan foydalanish"
+
+#. module: iot
+#: model:ir.ui.menu,name:iot.iot_configuration_menu_links_section
+msgid "Useful links"
+msgstr ""
 
 #. module: iot
 #: model:res.groups,name:iot.group_iot_user
@@ -1394,54 +1357,28 @@ msgid "Visible to all"
 msgstr "Hammaga ko‘rinadigan"
 
 #. module: iot
-#: model:ir.model.fields,help:iot.field_ir_actions_report__device_ids
-#, fuzzy
-msgid ""
-"When setting a device here, the report will be printed through this device "
-"on the IoT Box"
-msgstr ""
-"Bu yerda qurilma o‘rnatilganda, hisobot IoT qutisidagi ushbu qurilma orqali "
-"chop etiladi"
-
-#. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_select_box_to_connect
 #, fuzzy
 msgid "Which one do you want to connect?<br/><br/>"
 msgstr "Qaysi birini ulamoqchisiz?<br/><br/>"
 
 #. module: iot
+#: model:ir.ui.menu,name:iot.iot_download_virtual_iot_box_installer_menu
+msgid "Windows IoT Box Installer"
+msgstr ""
+
+#. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/iot_remote_debug.xml:0
-#, fuzzy
 msgid ""
 "You can enable remote debug on your IoT Box by providing a Ngrok authtoken."
 msgstr ""
-"Ngrok autotokenini taqdim etish orqali IoT qutingizda masofaviy tuzatish "
-"funksiyasini yoqishingiz mumkin."
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_form
-#, fuzzy
-msgid "app."
-msgstr "ilova."
-
-#. module: iot
-#: model_terms:ir.actions.act_window,help:iot.iot_box_action
-#, fuzzy
-msgid "connect"
-msgstr "ulanish"
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.iot_device_view_kanban
 #, fuzzy
 msgid "connection_type"
 msgstr "ulanish_turi"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_kanban
-#, fuzzy
-msgid "device-icon"
-msgstr "qurilma-belgisi"
 
 #. module: iot
 #. odoo-javascript
@@ -1477,24 +1414,15 @@ msgid ""
 "                <br/>"
 msgstr ""
 "Wi-Fi uchun.<br/> So‘ngra, juftlash kodini olish maqsadida IoT qurilmasini "
-"printerga (USB kabel orqali) yoki monitorga (mikro HDMI kabel orqali) ulang."
-"<br/> <br/>"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_form
-#, fuzzy
-msgid "install the Fiscal Data Module"
-msgstr "Fiskal ma'lumotlar modulini o‘rnatish"
+"printerga (USB kabel orqali) yoki monitorga (mikro HDMI kabel orqali) "
+"ulang.<br/> <br/>"
 
 #. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/iot_remote_debug.xml:0
-#, fuzzy
 msgid ""
 "it enables remote access to your local network to the owner of the token."
 msgstr ""
-"token egasiga sizning mahalliy tarmog‘ingizga masofadan kirish imkoniyatini "
-"beradi."
 
 #. module: iot
 #: model:ir.actions.client,name:iot.action_iot_delete_linked_devices_menu
@@ -1503,7 +1431,113 @@ msgid "reset.linked.printers"
 msgstr "reset.linked.printers"
 
 #. module: iot
-#: model_terms:ir.actions.act_window,help:iot.iot_box_action
+#: model:ir.model,name:iot.model_ir_websocket
+msgid "websocket message handling"
+msgstr ""
+
 #, fuzzy
-msgid "to add an IoT Box."
-msgstr "IoT qurilmasini qo‘shish uchun."
+msgid "Display Device"
+msgstr "Ekran qurilmasi"
+
+#, fuzzy
+msgid "Do not ask me again"
+msgstr "Menga boshqa so‘ramang"
+
+#, fuzzy
+msgid ""
+"If checked, this dialog won't appear the next time you print and the "
+"selected printers will be used automatically."
+msgstr ""
+"Agar belgilansa, keyingi chop etishda ushbu oyna ko‘rinmaydi va tanlangan "
+"printerlar avtomatik ravishda ishlatiladi."
+
+#, fuzzy
+msgid "IoT Devices"
+msgstr "IoT qurilmalari"
+
+#, fuzzy
+msgid "No printer selected"
+msgstr "Hech qanday printer tanlanmagan"
+
+#, fuzzy
+msgid "No report to display"
+msgstr "Ko‘rsatish uchun hisobot yo‘q"
+
+#, fuzzy
+msgid ""
+"One of the printer used to print the document has been removed.\n"
+"To reset printers, go to the IoT App, Configuration tab, \"Reset Linked "
+"Printers\" and retry the operation."
+msgstr ""
+"Hujjatni chop etish uchun ishlatilgan printerlardan biri olib tashlandi. "
+"Printerlarni qayta o‘rnatish uchun IoT ilovasining Sozlamalar bo‘limiga "
+"o‘ting, \"Bog‘langan printerlarni qayta o‘rnatish\" tugmasini bosing va "
+"amalni qaytadan bajaring."
+
+#, fuzzy
+msgid "Print"
+msgstr "Chop etish"
+
+#, fuzzy
+msgid "Printers"
+msgstr "Printerlar"
+
+#, fuzzy
+msgid "Reports"
+msgstr "Hisobotlar"
+
+#, fuzzy
+msgid "Reports to Auto-Print"
+msgstr "Avtomatik chop etish uchun hisobotlar"
+
+#, fuzzy
+msgid "Reports with linked printers"
+msgstr "Bog‘langan printerli hisobotlar"
+
+#, fuzzy
+msgid "Sales Details"
+msgstr "Savdo tafsilotlari"
+
+#, fuzzy
+msgid "Select at least one printer"
+msgstr "Kamida bitta printerni tanlang"
+
+#, fuzzy
+msgid "Selection of printers"
+msgstr "Printerlarni tanlash"
+
+#, fuzzy
+msgid "Sending document to printer %s..."
+msgstr "Hujjat %s printeriga yuborilmoqda..."
+
+#, fuzzy
+msgid ""
+"When setting a device here, the report will be printed through this device "
+"on the IoT Box"
+msgstr ""
+"Bu yerda qurilma o‘rnatilganda, hisobot IoT qutisidagi ushbu qurilma orqali "
+"chop etiladi"
+
+#, fuzzy
+msgid "Label Printer"
+msgstr "Yorliq printeri"
+
+#, fuzzy
+msgid "Manufacturer"
+msgstr "Ishlab chiqaruvchi"
+
+#, fuzzy
+msgid "Office Printer"
+msgstr "Ofis printeri"
+
+#, fuzzy
+msgid "Receipt Printer"
+msgstr "Chek printeri"
+
+#, fuzzy
+msgid "Subtype"
+msgstr "Kichik tur"
+
+#, fuzzy
+msgid "Subtype of device."
+msgstr "Qurilmaning kichik turi."

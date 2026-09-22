@@ -5,28 +5,25 @@
         <div class="progress position-absolute top-0 start-0 end-0 bg-transparent">
             <div class="progress-bar w-100"/>
         </div>
-        <div class="my-auto">
-            <ContactInfo contact="props.call?.partner_id" phoneNumber="props.call.phone_number"/>
-            <h2 t-esc="statusText" class="m-0 py-3 text-center"/>
+        <button title="Close" class="btn align-self-end p-0 text-decoration-none" aria-label="Close call summary" t-on-click="() => this.softphone.hideCallSummary()">
+            <i class="oi oi-lg" data-icon="close" aria-hidden="true"/>
+        </button>
+        <div class="my-auto w-100">
+            <ContactInfo contact="this.session.call?.partner_id" phoneNumber="this.session.displayedPhoneNumber" alias="this.session.alias"/>
+            <h2 t-out="this.statusText" class="m-0 py-3 text-center"/>
             <div class="d-flex gap-3 justify-content-center flex-wrap">
                 <ActionButton
-                    name.translate="Contact"
-                    title.translate="View contact information"
-                    icon="call.partner_id ? 'oi-user' : 'oi-user-plus'"
-                    onClick.bind="onClickContact"
-                />
-                <t class="o-voip-CallSummary-xpathTarget"/>
-                <ActionButton t-if="call.partner_id"
-                    name.translate="Activity"
-                    title.translate="Schedule an activity"
-                    icon="'oi-activity-plus'"
-                    onClick.bind="onClickActivity"
+                    name.translate="Call"
+                    icon="'phone'"
+                    iconClass="'oi-filled'"
+                    type="'success'"
+                    onClick.bind="this.onClickCall"
                 />
                 <ActionButton
-                    name.translate="Call"
-                    icon="'fa-phone'"
-                    type="'success'"
-                    onClick.bind="onClickCall"
+                    t-if="this.session.call and !this.session.call.activity_id"
+                    name.translate="Log"
+                    icon="'schedule'"
+                    onClick="() => this.session.call.logToChatter()"
                 />
             </div>
         </div>

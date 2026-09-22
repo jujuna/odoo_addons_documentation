@@ -7,7 +7,7 @@ from odoo.tests import tagged, HttpCase
 class TestBrazilianAddress(HttpCase):
     def test_brazilian_address_frontend(self):
         """Test the visibility of fields and autocompletion of Brazilian state and city based on zip."""
-        website = self.env["website"].get_current_website()
+        website = self.env.ref('base.default_website')
         website.company_id.account_fiscal_country_id = website.company_id.country_id = self.env.ref("base.br")
         self.env["product.product"].create(
             {
@@ -16,4 +16,4 @@ class TestBrazilianAddress(HttpCase):
                 "is_published": True,
             }
         )
-        self.start_tour("/", "test_brazilian_address")
+        self.start_tour("/shop?search=Brazilian test product", "test_brazilian_address")

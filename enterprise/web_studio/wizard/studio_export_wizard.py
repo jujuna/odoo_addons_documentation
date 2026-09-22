@@ -25,8 +25,7 @@ DEFAULT_MODELS_TO_EXPORT = [
     "ir.ui.menu",
     "ir.filters",
     "base.automation",
-    "ir.model.access",
-    "ir.rule",
+    "ir.access",
     "ir.default",
     "studio.approval.rule",
 ]
@@ -52,6 +51,14 @@ FIELDS_TO_EXPORT = {
         "trg_selection_field_id",
         "trigger_field_ids",
         "trigger",
+    ],
+    "ir.access": [
+        "active",
+        "group_id",
+        "model_id",
+        "name",
+        "operation",
+        "domain",
     ],
     "ir.actions.act_window": [
         "binding_model_id",
@@ -138,16 +145,6 @@ FIELDS_TO_EXPORT = {
         "state",
         "transient",
     ],
-    "ir.model.access": [
-        "active",
-        "group_id",
-        "model_id",
-        "name",
-        "perm_create",
-        "perm_read",
-        "perm_unlink",
-        "perm_write",
-    ],
     "ir.model.fields": [
         "compute",
         "copied",
@@ -177,17 +174,6 @@ FIELDS_TO_EXPORT = {
         "translate",
         "ttype",
         "currency_field",
-    ],
-    "ir.rule": [
-        "active",
-        "domain_force",
-        "groups",
-        "model_id",
-        "name",
-        "perm_create",
-        "perm_read",
-        "perm_unlink",
-        "perm_write",
     ],
     "ir.ui.menu": [
         "action",
@@ -222,6 +208,7 @@ FIELDS_TO_EXPORT = {
         "model_id",
         "name",
         "partner_to",
+        "partner_cc",
         "ref_ir_act_window",
         "reply_to",
         "report_template_ids",
@@ -249,7 +236,7 @@ FIELDS_TO_EXPORT = {
     "ir.attachment": [
         "name",
         "type",
-        "datas",
+        "raw",
         "url",
         "res_id",
         "res_model",
@@ -273,7 +260,7 @@ FIELDS_TO_EXPORT = {
 # List of models to mark as noupdate.
 MODELS_WITH_NOUPDATE = [
     "ir.attachment",
-    "ir.rule",
+    "ir.access",
 ]
 
 # List of relational fields NOT to export, by model.
@@ -496,6 +483,7 @@ class StudioExportWizard(models.TransientModel):
                     if export_data["model"] == model
                 ]
 
+                model_default_data_ids = set(model_default_data_ids)
                 export_data_vals += [
                     {
                         "model": model,
@@ -539,34 +527,6 @@ class StudioExportWizard(models.TransientModel):
                         ]
                     )
                     add(export_model, "ir.ui.view", website_views)
-
-                if export_model.model_name == "worksheet.template":
-                    model_data = to_export.model_id
-                    add(export_model, "ir.model", model_data)
-
-                    model_rule_data = to_export.model_id.mapped("rule_ids")
-                    add(export_model, "ir.rule", model_rule_data)
-
-                    model_access_data = to_export.model_id.mapped("access_ids")
-                    add(export_model, "ir.model.access", model_access_data)
-
-                    model_group_data = to_export.model_id.mapped("rule_ids").mapped(
-                        "groups"
-                    )
-                    add(export_model, "res.groups", model_group_data)
-
-                    view_data = self.env["ir.ui.view"].search(
-                        [("model", "in", to_export.model_id.mapped("model"))]
-                    )
-                    add(export_model, "ir.ui.view", view_data)
-
-                    action_data = to_export.action_id
-                    add(export_model, "ir.actions.act_window", action_data)
-
-                    field_data = to_export.model_id.field_id.filtered_domain(
-                        [("state", "!=", "base")]
-                    )
-                    add(export_model, "ir.model.fields", field_data)
 
                 if export_model.model_name == "project.task.type":
                     mail_templates = to_export.mail_template_id
@@ -628,7 +588,7 @@ class StudioExportWizard(models.TransientModel):
                 if not records_data:
                     return
 
-                res_ids = records_data.mapped("res_id")
+                res_ids = set(records_data.mapped("res_id"))
                 records = real_records.filtered(lambda r: r.id in res_ids)
 
                 for group, group_fields in fields_by_group.items():
@@ -735,7 +695,7 @@ class StudioExportWizard(models.TransientModel):
             model_records = {}
             for model in model_names:
                 model_grouped_fields[model] = self._get_groups_fields(model, is_demo, fields_by_models[model], demo_records)
-                model_data[model] = data.filtered(lambda r: r.model == model)
+                model_data[model] = data.filtered(lambda r: r.model == model and r.res_id)
                 sudo_model = self.env[model].sudo()
                 model_records[model] = sudo_model.browse(model_data[model].mapped("res_id"))
 
@@ -788,7 +748,7 @@ class StudioExportWizard(models.TransientModel):
         for field_name in fields_to_export:
             related_model = fields_relations.get(field_name)
             if related_model in demo_records:
-                data = all_data.filtered(lambda r: r.model == model and not r.is_demo_data)
+                data = all_data.filtered(lambda r: r.model == model and not r.is_demo_data and r.res_id)
                 records = self.env[model].sudo().browse(data.mapped("res_id"))
                 if any(r[field_name] in demo_records[related_model] for r in records):
                     demo_fields_to_export.append(field_name)

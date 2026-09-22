@@ -9,20 +9,19 @@ patch(DataServiceOptions.prototype, {
                 key: "id",
                 condition: (record) =>
                     record
-                        .backLink("<-pos.order.line.coupon_id")
-                        .find((l) => !(l.order_id?.finalized && l.order_id.isSynced)),
+                        .backLink("<-pos.order.line.card_id")
+                        .find((l) => !l.order_id?.canBeRemovedFromIndexedDB),
+                getRecordsBasedOnLines: (orderlines) =>
+                    orderlines.map((line) => line.card_id).filter((c) => c),
             },
         };
     },
-    get pohibitedAutoLoadedModels() {
+    get prohibitedAutoLoadedModels() {
         return [
-            ...super.pohibitedAutoLoadedModels,
+            ...super.prohibitedAutoLoadedModels,
             "loyalty.program",
             "loyalty.rule",
             "loyalty.reward",
         ];
-    },
-    get cleanupModels() {
-        return [...super.cleanupModels, "loyalty.program"];
     },
 });

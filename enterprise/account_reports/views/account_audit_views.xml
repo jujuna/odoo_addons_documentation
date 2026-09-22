@@ -12,29 +12,25 @@
                         <div class="d-flex flex-column w-100 h-100">
                             <div class="d-flex flex-row justify-content-between w-100 px-2 py-2">
                                 <h5 class="text-truncate" style="width:70%;" t-att-title="record.name.raw_value">
-                                    <field name="name" widget="account_return_name_badge"/>
+                                    <field name="name"/>
                                 </h5>
-                                <div class="pe-3">
-                                    <field
-                                        widget="account_return_selection_badge"
-                                        name="audit_status"
-                                        options="{
-                                            'ongoing': {'decoration': 'muted'},
-                                            'paused': {'decoration': 'danger'},
-                                            'done': {'decoration': 'success'},
-                                        }"
-                                        />
-                                </div>
+                                <field
+                                    widget="account_review_state_selection_badge"
+                                    name="audit_status"
+                                    options="{
+                                        'ongoing': {'decoration': 'muted'},
+                                        'paused': {'decoration': 'danger'},
+                                        'done': {'decoration': 'success'},
+                                    }"
+                                />
                             </div>
 
                             <div class="d-flex flex-column w-100 h-100 px-2 mt-2 gap-3">
-                                <a type="object" class="link_balances_progressbar" name="action_open_audit_balances">
-                                    <div class="w-100">
-                                        <label for="resolved_check_count">Balances</label>
-                                        <field name="audit_balances_count" invisible="1"/>
-                                        <field name="audit_balances_completed_count" class="w-100 audit_return_progressbar" widget="account_audit_progressbar" options="{ 'max_value': 'audit_balances_count'}"/>
-                                    </div>
-                                </a>
+                                <div class="w-100">
+                                    <label for="resolved_check_count">Balances</label>
+                                    <field name="audit_balances_count" invisible="1"/>
+                                    <field name="audit_balances_completed_count" class="w-100 audit_return_progressbar" widget="account_audit_progressbar" options="{ 'max_value': 'audit_balances_count'}"/>
+                                </div>
 
                                 <div class="w-100" >
                                     <label for="resolved_check_count">Checks</label>
@@ -53,12 +49,38 @@
                         <field name="is_completed" invisible="1"/>
                         <a class="dropdown-item" type="object" name="action_mark_completed" string="Mark as Completed" invisible="is_completed"/>
                         <a class="dropdown-item" type="object" name="action_mark_uncompleted" string="Reset" invisible="not is_completed"/>
-                        <a class="dropdown-item" type="object" name="action_archive" string="Archive" invisible="state != 'new' or is_completed or not active"/>
+                        <a class="dropdown-item" type="object" name="action_archive" string="Archive" invisible="state or is_completed or not active"/>
                         <a class="dropdown-item" type="object" name="action_unarchive" string="Unarchive" invisible="active"/>
                         <a class="dropdown-item" type="object" name="action_export_working_files" string="Export"/>
-                        <a invisible="state != 'new'" class="dropdown-item" type="object" name="action_delete" string="Delete"/>
+                        <a class="dropdown-item" type="object" name="action_open_audit_settings" string="Configure"/>
+                        <a invisible="state" class="dropdown-item" type="delete" name="action_delete" groups="account.group_account_user">Delete</a>
                     </t>
                 </kanban>
+            </field>
+        </record>
+
+        <record id="account_audit_form_view" model="ir.ui.view">
+            <field name="name">account.audit.form</field>
+            <field name="model">account.return</field>
+            <field name="arch" type="xml">
+                <form string="Edit Working File">
+                    <group>
+                        <field name="name" style="width: 40%"/>
+                        <label for="date_from" string="Dates"/>
+                        <div class="d-flex align-items-center">
+                            <field name="date_to" invisible="1"/>
+                            <field name="date_from" nolabel="1" style="width: 40%"
+                                widget="daterange" options="{'end_date_field': 'date_to'}"/>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="cycle_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                    </group>
+                    <footer>
+                        <button string="Save" class="btn-primary" special="save" data-hotkey="q"/>
+                        <button class="btn-secondary" special="cancel" data-hotkey="x"/>
+                    </footer>
+                </form>
             </field>
         </record>
 
@@ -99,7 +121,7 @@
         </record>
 
         <record id="action_view_account_audit" model="ir.actions.act_window">
-            <field name="name">Audit</field>
+            <field name="name">Working Files</field>
             <field name="res_model">account.return</field>
             <field name="view_mode">kanban,search</field>
             <field name="domain">[('return_type_category', '=', 'audit')]</field>
@@ -107,9 +129,8 @@
             <field name="search_view_id" ref="account_reports.account_audit_search_view"/>
             <field name="context">{'search_default_todo_returns': 1, 'search_default_paused_returns': 1}</field>
             <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Create a new audit working file with dedicated checks and balance reviews to ensure smooth closings.
-                </p>
+                <p class="o_view_nocontent_smiling_face">No pending working files!</p>
+                <p>Create a new working file to start your next period review.</p>
             </field>
         </record>
 
@@ -131,7 +152,7 @@
                     <field name="audit_var_percentage" widget="percentage" digits="[0,2]" readonly="1"/>
                     <field name="last_message" readonly="1" />
                     <field
-                        widget="account_return_selection_badge"
+                        widget="account_review_state_selection_badge"
                         name="audit_status"
                         options="{
                             'todo': {'decoration': 'info'},
@@ -162,10 +183,10 @@
                     <filter name="account_inactive" string="Inactive Account" domain="[('active', '=', False)]"/>
                     <filter name="groupby_audit_status" string="Account Audit Status" context="{'group_by': 'audit_status'}"/>
                     <filter name="groupby_type" string="Account Type" context="{'group_by': 'account_type'}"/>
-                    <filter name="audit_accounts"
-                            string="Audit Accounts"
-                            invisible="not context.get('currency_exhange_difference_account_ids')"
-                            domain="[('id', 'in', context.get('currency_exhange_difference_account_ids'))]"
+                    <filter string="Audit Accounts"
+                            name="audit_account_ids"
+                            invisible="not context.get('audit_account_ids')"
+                            domain="[('id', 'in', context.get('audit_account_ids'))]"
                     />
                     <searchpanel>
                         <field name="audit_status" select="multi" enable_counters="1"/>
@@ -185,7 +206,7 @@
         </record>
 
         <record id="action_view_account_audit_checks" model="ir.actions.act_window">
-            <field name="name">Cycle</field>
+            <field name="name">Cycles</field>
             <field name="res_model">account.return.check</field>
             <field name="view_mode">kanban</field>
             <field name="view_id" ref="account_reports.account_return_check_kanban_view"/>

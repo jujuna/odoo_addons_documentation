@@ -2,12 +2,13 @@ import { discoverIotBoxes } from "@iot/client_action/discover_iot_boxes";
 import { formView } from "@web/views/form/form_view";
 import { FormController } from "@web/views/form/form_controller";
 import { registry } from "@web/core/registry";
-import { onMounted, onWillUnmount } from "@odoo/owl";
+import { onMounted, onWillUnmount, useScope } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 
-
 export class NoIoTBoxFoundFormController extends FormController {
+    scope = useScope();
+
     setup() {
         super.setup();
         this.actionService = useService("action");
@@ -30,7 +31,7 @@ export class NoIoTBoxFoundFormController extends FormController {
     startCountdown(seconds) {
         const countdownSpinner = document.getElementById("discover_retry_spinner");
         const countdownEl = document.getElementById("discover_retry_countdown");
-        const textToDisplay = _t("Retrying in ")
+        const textToDisplay = _t("Retrying in ");
         let timeLeft = seconds;
         if (countdownEl) {
             countdownEl.textContent = `${textToDisplay}${timeLeft}s`;
@@ -40,7 +41,7 @@ export class NoIoTBoxFoundFormController extends FormController {
                 // Look for new IoT Boxes again
                 if (timeLeft <= 0) {
                     countdownEl.textContent = `${textToDisplay}0s`;
-                    const nextAction = await discoverIotBoxes(this.env)
+                    const nextAction = await this.scope.run(discoverIotBoxes);
                     if (!nextAction.no_iot_found_found) {
                         await this.actionService.doAction(nextAction);
                     }
@@ -61,4 +62,4 @@ export class NoIoTBoxFoundFormController extends FormController {
 
 export const noIoTBoxFound = { ...formView, Controller: NoIoTBoxFoundFormController };
 
-registry.category("views").add('no_iot_box_found_wizard', noIoTBoxFound);
+registry.category("views").add("no_iot_box_found_wizard", noIoTBoxFound);

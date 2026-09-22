@@ -7,6 +7,8 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TestCommittedAchievedAmount(TestAccountBudgetPurchaseCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def create_other_category_aal(self):
         self.env['account.analytic.line'].create({
             'name': 'aal 1',
@@ -183,7 +185,7 @@ class TestCommittedAchievedAmount(TestAccountBudgetPurchaseCommon):
         # Draft the test purchase order.
         self.purchase_order.button_draft()
         # Adapt a tax for price_include testing
-        self.tax_purchase_a.price_include = True
+        self.tax_purchase_a.price_include_override = 'tax_included'
         self.tax_purchase_a.amount_type = 'division'
         # Create a new purchase order
         purchase_order = self.env['purchase.order'].create({
@@ -375,44 +377,6 @@ class TestCommittedAchievedAmount(TestAccountBudgetPurchaseCommon):
         # Product B have 1 PO line line[3] with 10 order and 5 received with analytic_account_partner_b and analytic_account_administratif
         # Committed = ((order - received) * price) + achieved = ((10-5) * -100 + 100 = -400
         self.assertEqual(plan_b_admin_line.committed_amount, -400)
-
-    def test_budget_analytic_misc_entry(self):
-        """ Even if an analytic distribution is set, only the accounts with type 'income'/'expense' should be taken
-        into account for the budgets.
-        """
-        self.purchase_order.button_draft()
-        journal_entry = self.env['account.move'].create({
-            'move_type': 'entry',
-            'partner_id': self.partner_a.id,
-            'invoice_date': '2019-01-10',
-            'date': '2019-01-10',
-            'invoice_line_ids': [
-                Command.create({
-                    'partner_id': self.partner_a.id,
-                    'account_id': self.company_data['default_account_expense'].id,
-                    'analytic_distribution': {self.analytic_account_partner_a.id: 100},
-                    'debit': 100,
-                }),
-                Command.create({
-                    'partner_id': self.partner_a.id,
-                    'account_id': self.company_data['default_account_assets'].id,
-                    'analytic_distribution': {self.analytic_account_partner_a.id: 100},
-                    'credit': 70,
-                }),
-                Command.create({
-                    'partner_id': self.partner_a.id,
-                    'account_id': self.company_data['default_account_assets'].id,
-                    'credit': 30,
-                }),
-            ],
-        })
-        journal_entry.action_post()
-
-        budget_both_line_a = self.budget_analytic_both.budget_line_ids[0]
-        self.assertEqual((budget_both_line_a.committed_amount, budget_both_line_a.achieved_amount), (-100, -100))
-
-        budget_expense_line_a = self.budget_analytic_expense.budget_line_ids[0]
-        self.assertEqual((budget_expense_line_a.committed_amount, budget_expense_line_a.achieved_amount), (100, 100))
 
     def test_budget_analytic_expense_with_credit_note(self):
         """ Test that credit note are taken into account. """
@@ -665,3 +629,87 @@ class TestCommittedAchievedAmount(TestAccountBudgetPurchaseCommon):
         action = line.action_open_budget_entries()
         report_lines = self.env['budget.report'].search(action['domain'])
         self.assertEqual(sum(line.committed for line in report_lines), 100.0)
+
+    def test_budget_analytic_non_deductible_tax_committed_amount(self):
+        """ Test that non-deductible and partially deductible taxes are correctly
+        included in the committed amount of a budget.
+        """
+
+        budget = self.env['budget.analytic'].create(
+            {
+                'name': 'Tax Test Budget',
+                'date_from': '2025-01-01',
+                'date_to': '2025-12-31',
+                'budget_line_ids': [
+                    Command.create(
+                        {
+                            'budget_amount': 1000,
+                            self.project_column_name: self.analytic_account_partner_a.id,
+                        },
+                    ),
+                ],
+            },
+        )
+        budget.action_budget_confirm()
+        budget_line = budget.budget_line_ids[0]
+
+        po_nd = self.env['purchase.order'].create(
+            {
+                'partner_id': self.partner_a.id,
+                'date_order': '2025-01-10',
+                'order_line': [
+                    Command.create(
+                        {
+                            'product_id': self.product_a.id,
+                            'product_qty': 1,
+                            'price_unit': 100,
+                            'tax_ids': [Command.set(self.tax_nd.ids)],
+                            'analytic_distribution': {self.analytic_account_partner_a.id: 100},
+                        },
+                    ),
+                ],
+            },
+        )
+        po_nd.button_confirm()
+
+        self.assertBudgetLine(budget_line, committed=120, achieved=0)
+
+        po_partial = self.env['purchase.order'].create(
+            {
+                'partner_id': self.partner_a.id,
+                'date_order': '2025-01-11',
+                'order_line': [
+                    Command.create(
+                        {
+                            'product_id': self.product_a.id,
+                            'product_qty': 1,
+                            'price_unit': 100,
+                            'tax_ids': [Command.set(self.tax_partial.ids)],
+                            'analytic_distribution': {self.analytic_account_partner_a.id: 100},
+                        },
+                    ),
+                ],
+            },
+        )
+        po_partial.button_confirm()
+
+        self.assertBudgetLine(budget_line, committed=230, achieved=0)
+
+        po_nd.order_line.qty_received = 1
+        bill_nd = self.env['account.move'].browse(po_nd.action_create_invoice()['res_id'])
+        bill_nd.invoice_date = '2025-01-15'
+        bill_nd.action_post()
+
+        self.assertBudgetLine(budget_line, committed=230, achieved=120)
+
+    def test_budget_report_analytic_filter_purchase(self):
+        result = self.env['budget.report'].formatted_read_grouping_sets(
+            domain=[('budget_analytic_id', '=', self.budget_analytic_expense.id)],
+            grouping_sets=[['budget_analytic_id']],
+            aggregates=['budget:sum', 'achieved:sum'],
+        )
+        rows = result[0]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['budget_analytic_id'][0], self.budget_analytic_expense.id)
+        self.assertEqual(rows[0]['budget:sum'], 74000.0)
+        self.assertEqual(rows[0]['achieved:sum'], 0.0)

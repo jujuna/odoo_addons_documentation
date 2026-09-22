@@ -3,16 +3,13 @@ from __future__ import annotations
 
 import itertools
 import typing
-import warnings
 
 if typing.TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from collections.abc import Set as AbstractSet
 
-T = typing.TypeVar('T')
 
-
-def _boundaries(intervals: Intervals[T] | Iterable[tuple[T, T, AbstractSet]], opening: str, closing: str) -> Iterator[tuple[T, str, AbstractSet]]:
+def _boundaries[T](intervals: Intervals[T] | Iterable[tuple[T, T, AbstractSet]], opening: str, closing: str) -> Iterator[tuple[T, str, AbstractSet]]:
     """ Iterate on the boundaries of intervals. """
     for start, stop, recs in intervals:
         if start < stop:
@@ -20,7 +17,7 @@ def _boundaries(intervals: Intervals[T] | Iterable[tuple[T, T, AbstractSet]], op
             yield (stop, closing, recs)
 
 
-class Intervals(typing.Generic[T]):
+class Intervals[T]:
     """ Collection of ordered disjoint intervals with some associated records.
         Each interval is a triple ``(start, stop, records)``, where ``records``
         is a recordset.
@@ -47,8 +44,9 @@ class Intervals(typing.Generic[T]):
                     starts.append(value)
                     if items is None:
                         items = value_items
-                    else:
-                        items = items.union(value_items)
+                    elif value_items:
+                        # make sure we have a copy of items
+                        items = items | value_items
                 else:
                     start = starts.pop()
                     if not starts:
@@ -112,18 +110,45 @@ class Intervals(typing.Generic[T]):
 
         return result
 
-    def remove(self, interval):
-        """ Remove an interval from the set. """
-        warnings.warn("Deprecated since 19.0, do not mutate intervals", DeprecationWarning)
-        self._items.remove(interval)
+    def overlapping_with(self, other: Intervals) -> Intervals:
+        """Return whole intervals from `self` that overlap ANY interval in `other`."""
+        result = Intervals()
+        append = result._items.append
 
-    def items(self):
-        """ Return the intervals. """
-        warnings.warn("Deprecated since 19.0, just iterate over Intervals", DeprecationWarning)
-        return self._items
+        bounds_self = _boundaries(self, 'start', 'stop')
+        bounds_other = _boundaries(other, 'switch', 'switch')
+
+        # We want touching NOT to overlap, so:
+        # - process 'stop' before 'start' at the same timestamp
+        # - process 'switch' before 'start' at the same timestamp (so other ending at t
+        #   is applied before self starting at t)
+        rank = {'stop': 0, 'switch': 0, 'start': 1}
+
+        def _key(item):
+            value, flag, _recs = item
+            return (value, rank[flag])
+
+        cur = None                    # (self_start, self_recs) if a self interval is open, else None
+        overlapped = False            # did current self interval overlap at any moment?
+        active_other = False          # Is an `other` interval currently open
+        for value, flag, recs in sorted(itertools.chain(bounds_self, bounds_other), key=_key):
+            if flag == 'start':
+                cur = (value, recs)
+                overlapped = active_other
+            elif flag == 'stop':
+                if overlapped:
+                    start, s_recs = cur
+                    append((start, value, s_recs))
+                cur = None
+            else:  # 'switch'
+                active_other = not active_other
+                if active_other and cur is not None:
+                    overlapped = True
+
+        return result
 
 
-def intervals_overlap(interval_a: tuple[T, T], interval_b: tuple[T, T]) -> bool:
+def intervals_overlap[T](interval_a: tuple[T, T], interval_b: tuple[T, T]) -> bool:
     """Check whether intervals intersect.
 
     :param interval_a:
@@ -135,7 +160,7 @@ def intervals_overlap(interval_a: tuple[T, T], interval_b: tuple[T, T]) -> bool:
     return start_a < stop_b and stop_a > start_b
 
 
-def invert_intervals(intervals: Iterable[tuple[T, T]], first_start: T, last_stop: T) -> list[tuple[T, T]]:
+def invert_intervals[T](intervals: Iterable[tuple[T, T]], first_start: T, last_stop: T) -> list[tuple[T, T]]:
     """Return the intervals between the intervals that were passed in.
 
     The expected use case is to turn "available intervals" into "unavailable intervals".
@@ -149,10 +174,14 @@ def invert_intervals(intervals: Iterable[tuple[T, T]], first_start: T, last_stop
     items = []
     prev_stop = first_start
     for start, stop in sorted(intervals):
-        if prev_stop and prev_stop < start and start <= last_stop:
+        if start > last_stop:
+            break
+        if prev_stop < start:
             items.append((prev_stop, start))
         prev_stop = max(prev_stop, stop)
-    if last_stop and prev_stop < last_stop:
+        if stop >= last_stop:
+            break
+    if prev_stop < last_stop:
         items.append((prev_stop, last_stop))
     # abuse Intervals to merge contiguous intervals
     return [(start, stop) for start, stop, _ in Intervals([(start, stop, set()) for start, stop in items])]

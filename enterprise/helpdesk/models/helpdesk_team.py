@@ -4,10 +4,10 @@ import ast
 import datetime
 import heapq
 import itertools
-import pytz
+from collections import defaultdict
 
 from dateutil import relativedelta
-from collections import defaultdict
+
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 from odoo.fields import Command, Domain
@@ -30,10 +30,11 @@ class HelpdeskTeam(models.Model):
             if stage:
                 default_stages += stage
         if not default_stages:
+            email_template = self.env.ref('helpdesk.new_ticket_request_email_template', raise_if_not_found=False)
             default_stages = self.env['helpdesk.stage'].create({
                 'name': _("New"),
                 'sequence': 0,
-                'template_id': self.env.ref('helpdesk.new_ticket_request_email_template', raise_if_not_found=False).id or None
+                'template_id': email_template and email_template.id,
             })
         return [Command.set(default_stages.ids)]
 
@@ -101,11 +102,10 @@ class HelpdeskTeam(models.Model):
     use_product_replacements = fields.Boolean('Replacements')
     use_product_repairs = fields.Boolean('Repairs')
     use_twitter = fields.Boolean('X')
-    use_rating = fields.Boolean('Customer Ratings')
     use_sla = fields.Boolean('SLA Policies', default=True)
     unassigned_tickets = fields.Integer(string='Unassigned Tickets', compute='_compute_unassigned_tickets')
     resource_calendar_id = fields.Many2one('resource.calendar', 'Working Hours',
-        default=lambda self: self.env.company.resource_calendar_id, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id), ('flexible_hours', '=', False), ('attendance_ids', '!=', False)]",
+        default=lambda self: self.env.company.resource_calendar_id, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id), ('attendance_ids', '!=', False)]",
         help="Working hours used to determine the deadline of SLA Policies.")
     open_ticket_count = fields.Integer("# Open Tickets", compute='_compute_open_ticket_count')
     sla_policy_count = fields.Integer("# SLA Policy", compute='_compute_sla_policy_count')
@@ -126,11 +126,30 @@ class HelpdeskTeam(models.Model):
         compute="_compute_assign_stage_id", readonly=False, store=True,
         domain="[('id', 'in', stage_ids)]")
     alias_email_from = fields.Char(compute='_compute_alias_email_from', export_string_translation=False)
+    auto_close_ticket_reminder = fields.Boolean('Auto-Close Reminder', default=True)
+    auto_close_reminder_delay = fields.Integer('Inactive delay period(days)', default=2, help='Period of inactivity before the reminder is sent.')
+    reminder_email_template_id = fields.Many2one('mail.template', 'Email Template',
+        default=lambda self: self.env.ref('helpdesk.auto_close_reminder_email_template', raise_if_not_found=False),
+        domain=lambda self: [('model_id', '=', self.env['ir.model']._get('helpdesk.ticket').id)],
+        help='Email template used for the auto-close reminder.')
 
     @api.constrains('use_website_helpdesk_form', 'privacy_visibility')
     def _check_website_privacy(self):
         if any(t.use_website_helpdesk_form and t.privacy_visibility != 'portal' for t in self):
             raise ValidationError(_('Want to use the website form? Just adjust your team\'s visibility to "Invited portal users and all internal users" and watch the magic happen!'))
+
+    @api.onchange('auto_close_reminder_delay', 'auto_close_day')
+    @api.constrains('auto_close_ticket_reminder', 'auto_close_reminder_delay')
+    def _check_auto_close_reminder_delay(self):
+        for team in self:
+            if not team.auto_close_ticket_reminder:
+                return
+
+            if team.auto_close_reminder_delay < 0:
+                team.auto_close_reminder_delay = 0
+
+            if team.auto_close_reminder_delay >= team.auto_close_day:
+                raise ValidationError(self.env._('The auto-close period must be longer than the reminder email delay. Please set a higher inactivity period or a shorter reminder delay.'))
 
     @api.depends('auto_close_ticket', 'stage_ids')
     def _compute_assign_stage_id(self):
@@ -151,7 +170,7 @@ class HelpdeskTeam(models.Model):
             team.alias_email_from = res.get(team.id, False)
 
     def _compute_has_external_mail_server(self):
-        self.has_external_mail_server = self.env['ir.config_parameter'].sudo().get_param('base_setup.default_external_email_server')
+        self.has_external_mail_server = self.env['ir.config_parameter'].sudo().get_bool('base_setup.default_external_email_server')
 
     def _compute_unassigned_tickets(self):
         ticket_data = self.env['helpdesk.ticket']._read_group([
@@ -168,7 +187,8 @@ class HelpdeskTeam(models.Model):
         ticket_data = self.env['helpdesk.ticket']._read_group([
             ('team_id', 'in', self.ids),
             ('stage_id.fold', '=', True),
-            ('close_date', '>=', dt)],
+            ('close_date', '>=', dt),
+            ('close_date', '<', 'today')],
             ['team_id'], ['__count'])
         mapped_data = {team.id: count for team, count in ticket_data}
         for team in self:
@@ -208,7 +228,7 @@ class HelpdeskTeam(models.Model):
         ticket_data = self.env['helpdesk.ticket']._read_group([
             ('team_id', 'in', self.ids),
             ('stage_id.fold', "=", False),
-            ('priority', '=', 3)],
+            ('priority', '=', '3')],
             ['team_id'], ['__count'])
         mapped_data = {team.id: count for team, count in ticket_data}
         for team in self:
@@ -328,7 +348,6 @@ class HelpdeskTeam(models.Model):
     def create(self, vals_list):
         teams = super(HelpdeskTeam, self.with_context(mail_create_nosubscribe=True)).create(vals_list)
         teams.sudo()._check_sla_group()
-        teams.sudo()._check_rating_group()
         teams.sudo()._check_auto_assignment_group()
         teams.sudo()._check_modules_to_install()
         if teams.filtered(lambda x: x.auto_close_ticket):
@@ -348,8 +367,6 @@ class HelpdeskTeam(models.Model):
             self.with_context(active_test=False).mapped('ticket_ids').write({'active': vals['active']})
         if 'use_sla' in vals:
             self.sudo()._check_sla_group()
-        if 'use_rating' in vals:
-            self.sudo()._check_rating_group()
         if 'auto_assignment' in vals:
             self.sudo()._check_auto_assignment_group()
         self.sudo()._check_modules_to_install()
@@ -362,10 +379,6 @@ class HelpdeskTeam(models.Model):
         stages = self.mapped('stage_ids').filtered(lambda stage: stage.team_ids <= self)  # remove stages that only belong to team in self
         stages.unlink()
         return super().unlink()
-
-    def copy_data(self, default=None):
-        vals_list = super().copy_data(default=default)
-        return [dict(vals, name=self.env._("%s (copy)", team.name)) for team, vals in zip(self, vals_list)]
 
     def _change_privacy_visibility(self, new_visibility):
         """
@@ -398,32 +411,21 @@ class HelpdeskTeam(models.Model):
     def _get_helpdesk_use_sla_group(self):
         return self.env.ref('helpdesk.group_use_sla')
 
-    def _get_helpdesk_use_rating_group(self):
-        return self.env.ref('helpdesk.group_use_rating')
-
     def _check_sla_feature_enabled(self, check_user_has_group=False):
-        """ Check if the SLA feature is enabled
+        """
+        Check if the SLA feature is enabled.
 
-            Check if the user can see at least one helpdesk team with `use_sla=True`
-            and if the user has the `group_use_sla` group (only done if the `check_user_has_group` parameter is True)
+        The feature is enabled if the user can see at least one helpdesk team with
+        ``use_sla=True``. Optionally, if ``check_user_has_group`` is ``True``,
+        the user must also belong to the ``helpdesk.group_use_sla`` group.
 
-            :param check_user_has_group: If True, then check if the user has the `group_use_sla`
-            :return True if the feature is enabled otherwise False.
+        :param bool check_user_has_group: If ``True``, also check that the user
+            belongs to the ``helpdesk.group_use_sla`` group.
+        :returns: ``True`` if the feature is enabled, otherwise ``False``.
+        :rtype: bool
         """
         user_has_group = self.env.user.has_group('helpdesk.group_use_sla') if check_user_has_group else True
         return user_has_group and self.env['helpdesk.team'].search([('use_sla', '=', True)], limit=1)
-
-    def _check_rating_feature_enabled(self, check_user_has_group=False):
-        """ Check if the Customer Rating feature is enabled
-
-            Check if the user can see at least one helpdesk team with `use_rating=True`
-            and if the user has the `group_use_rating` group (only done if the `check_user_has_group` parameter is True)
-
-            :param check_user_has_group: If True, then check if the user has the `group_use_rating`
-            :return True if the feature is enabled otherwise False.
-        """
-        user_has_group = self.env.user.has_group('helpdesk.group_use_rating') if check_user_has_group else True
-        return user_has_group and self.env['helpdesk.team'].search([('use_rating', '=', True)], limit=1)
 
     def _check_sla_group(self):
         sla_teams = self.filtered('use_sla')
@@ -448,25 +450,6 @@ class HelpdeskTeam(models.Model):
                 helpdesk_user_group.write({'implied_ids': [Command.unlink(use_sla_group.id)]})
                 use_sla_group.write({'user_ids': [Command.clear()]})
 
-    def _check_rating_group(self):
-        rating_teams = self.filtered('use_rating')
-        user_has_use_rating_group = self.env.user.has_group('helpdesk.group_use_rating')
-        rating_helpdesk_email_template = self.env.ref('helpdesk.rating_ticket_request_email_template')
-
-        if rating_teams and not user_has_use_rating_group:
-            self._get_helpdesk_user_group()\
-                .write({'implied_ids': [Command.link(self._get_helpdesk_use_rating_group().id)]})
-            if not rating_helpdesk_email_template.active:
-                rating_helpdesk_email_template.active = True
-        elif self - rating_teams and user_has_use_rating_group and not self._check_rating_feature_enabled():
-            use_rating_group = self._get_helpdesk_use_rating_group()
-            self._get_helpdesk_user_group()\
-                .write({'implied_ids': [Command.unlink(use_rating_group.id)]})
-            use_rating_group.write({'user_ids': [Command.clear()]})
-            if rating_helpdesk_email_template.active:
-                rating_helpdesk_email_template.active = False
-            self.env['helpdesk.stage'].search([('template_id', '=', self.env.ref('helpdesk.rating_ticket_request_email_template').id)]).template_id = False
-
     def _check_auto_assignment_group(self):
         has_auto_assignment_group = self.env.user.has_group('helpdesk.group_auto_assignment')
         has_auto_assignment = self.env['helpdesk.team'].search_count([('auto_assignment', '=', True)], limit=1)
@@ -481,7 +464,6 @@ class HelpdeskTeam(models.Model):
         # mapping of field names to the function that checks if their feature is enabled
         return {
             'use_sla': self._check_sla_feature_enabled,
-            'use_rating': self._check_rating_feature_enabled,
         }
 
     @api.model
@@ -501,7 +483,7 @@ class HelpdeskTeam(models.Model):
             'use_product_repairs': 'helpdesk_repair',
             'use_coupons': 'helpdesk_sale_loyalty',
             'use_giftcards': 'helpdesk_sale_loyalty',
-            'use_fsm': 'helpdesk_fsm',
+            'use_fsm': 'helpdesk_planning_field_service',
         }
 
     @api.model
@@ -586,6 +568,14 @@ class HelpdeskTeam(models.Model):
         return {alias.alias_name for alias in existing_aliases}
 
     # ------------------------------------------------------------
+    # Mail Thread
+    # ------------------------------------------------------------
+
+    def message_subscribe(self, partner_ids=None, subtype_ids=None):
+        self.check_access('write')
+        return super().message_subscribe(partner_ids=partner_ids, subtype_ids=subtype_ids)
+
+    # ------------------------------------------------------------
     # Business Methods
     # ------------------------------------------------------------
 
@@ -605,7 +595,6 @@ class HelpdeskTeam(models.Model):
             'my_high': {'count': 0, 'hours': 0, 'failed': 0},
             'my_urgent': {'count': 0, 'hours': 0, 'failed': 0},
             'show_demo': show_demo,
-            'rating_enable': False,
             'success_rate_enable': user_uses_sla
         }
 
@@ -662,7 +651,7 @@ class HelpdeskTeam(models.Model):
                         result['today']['success'] += count
             result['today']['count'] += count
 
-        dt = fields.Datetime.to_string((today - relativedelta.relativedelta(days=6)))
+        dt = fields.Datetime.to_string(today - relativedelta.relativedelta(days=6))
         tickets = HelpdeskTicket._read_group(domain + [('stage_id.fold', '=', True), ('close_date', '>=', dt)], group_fields, ['__count'])
         for row in tickets:
             if not user_uses_sla:
@@ -681,30 +670,28 @@ class HelpdeskTeam(models.Model):
         result['my_high']['hours'] = fields.Float.round(result['my_high']['hours'] / (result['my_high']['count'] or 1), 2)
         result['my_urgent']['hours'] = fields.Float.round(result['my_urgent']['hours'] / (result['my_urgent']['count'] or 1), 2)
 
-        if self._check_rating_feature_enabled(check_user_has_group=True):
-            result['rating_enable'] = True
-            # rating of today
-            domain = [('user_id', '=', self.env.uid)]
-            one_week_before = today - relativedelta.relativedelta(weeks=1)
-            helpdesk_ratings = self.env['rating.rating'].search([
-                ('res_model', '=', 'helpdesk.ticket'),
-                ('res_id', '!=', False),
-                ('write_date', '>', fields.Datetime.to_string(one_week_before)),
-                ('write_date', '<=', fields.Date.today()),
-                ('rating', '>=', RATING_LIMIT_MIN),
-                ('consumed', '=', True),
-            ])
-            tickets = HelpdeskTicket.search([('id', 'in', helpdesk_ratings.mapped('res_id')), ('user_id', '=', self.env.uid)])
-            today_rating_stat = {'count': 0.0, 'score': 0.0}
-            rating_stat = {**today_rating_stat}
-            for rating in helpdesk_ratings:
-                if rating.res_id not in tickets.ids:
-                    continue
-                if rating.write_date >= today:
-                    today_rating_stat['count'] += 1
-                    today_rating_stat['score'] += rating.rating
-                rating_stat['score'] += rating.rating
-                rating_stat['count'] += 1
+        # rating of today
+        domain = [('user_id', '=', self.env.uid)]
+        one_week_before = today - relativedelta.relativedelta(weeks=1)
+        helpdesk_ratings = self.env['rating.rating'].search([
+            ('res_model', '=', 'helpdesk.ticket'),
+            ('res_id', '!=', False),
+            ('write_date', '>', fields.Datetime.to_string(one_week_before)),
+            ('write_date', '<=', 'now'),
+            ('rating', '>=', RATING_LIMIT_MIN),
+            ('consumed', '=', True),
+        ])
+        tickets = HelpdeskTicket.search([('id', 'in', helpdesk_ratings.mapped('res_id')), ('user_id', '=', self.env.uid)])
+        today_rating_stat = {'count': 0.0, 'score': 0.0}
+        rating_stat = {**today_rating_stat}
+        for rating in helpdesk_ratings:
+            if rating.res_id not in tickets.ids:
+                continue
+            if rating.write_date >= today:
+                today_rating_stat['count'] += 1
+                today_rating_stat['score'] += rating.rating
+            rating_stat['score'] += rating.rating
+            rating_stat['count'] += 1
 
             def average_score(d):
                 return fields.Float.round(d['score'] / d['count'] if d['count'] > 0 else 0.0, 2)
@@ -725,12 +712,12 @@ class HelpdeskTeam(models.Model):
         context = dict(ast.literal_eval(action.get('context', {})), search_default_my_ratings=True)
         update_views = {}
         if period == 'seven_days':
-            domain += [('close_date', '>=', fields.Datetime.to_string((self._local_midnight_as_utc() - relativedelta.relativedelta(days=6))))]
+            domain += [('close_date', '>=', fields.Datetime.to_string(self._local_midnight_as_utc() - relativedelta.relativedelta(days=6)))]
             update_views[self.env.ref("helpdesk.rating_rating_view_seven_days_pivot_inherit_helpdesk").id] = 'pivot'
             update_views[self.env.ref('helpdesk.rating_rating_view_seven_days_graph_inherit_helpdesk').id] = 'graph'
             context['search_default_filter_rated_on'] = 'custom_rated_on_last_7_days'
         elif period == 'today':
-            context['search_default_filter_rated_on'] = 'custom_rated_on_today'
+            context['search_default_filter_rated_on'] = 'today'
             if '__count__' in context.get('pivot_measures', {}):
                 context.get('pivot_measures').remove('__count__')
             domain += [('close_date', '>=', fields.Datetime.to_string(self._local_midnight_as_utc()))]
@@ -750,15 +737,21 @@ class HelpdeskTeam(models.Model):
         return action
 
     def action_view_ticket(self):
-        action = self.env["ir.actions.actions"]._for_xml_id("helpdesk.helpdesk_ticket_action_team")
+        action = self.env["ir.actions.actions"].with_context(
+            active_model=self._name,
+            active_id=self.id,
+        )._for_xml_id("helpdesk.helpdesk_ticket_action_team")
         action['display_name'] = self.name
         return action
 
     def _get_action_view_ticket_params(self, is_ticket_closed=False):
-        """ Get common params for the actions
+        """
+        Get common parameters for ticket-related actions.
 
-            :param is_ticket_closed: Boolean if True, then we want to see the tickets closed in last 7 days
-            :returns dict containing the params to update into the action.
+        :param bool is_ticket_closed: If ``True``, include tickets closed in the
+            last 7 days.
+        :returns: A dictionary of parameters to update in the action.
+        :rtype: dict
         """
         domain = Domain('team_id', 'in', self.ids)
 
@@ -841,11 +834,11 @@ class HelpdeskTeam(models.Model):
 
     def action_view_rating_today(self):
         #  call this method of on click "Customer Rating" button on dashbord for today rating of teams tickets
-        return self.search([('member_ids', 'in', self.env.uid)])._action_view_rating(period='today', user_id=self.env.uid)
+        return self.search([])._action_view_rating(period='today', user_id=self.env.uid)
 
     def action_view_rating_7days(self):
         #  call this method of on click "Customer Rating" button on dashbord for last 7days rating of teams tickets
-        return self.search([('member_ids', 'in', self.env.uid)])._action_view_rating(period='seven_days', user_id=self.env.uid)
+        return self.search([])._action_view_rating(period='seven_days', user_id=self.env.uid)
 
     def action_view_team_rating(self):
         self.ensure_one()
@@ -888,11 +881,16 @@ class HelpdeskTeam(models.Model):
 
     def _determine_user_to_assign(self, count_per_team):
         """
-        Get a dict with the next n user ids (per team) that should be assigned to the newly created tickets according to the team policy
+        Determine which users should be assigned to new tickets per team.
 
-        :param count_per_team: a dict (key=helpdesk.team, value=count) of teams, with the count of users to get to assign to new tickets
-        :returns a mapping of team identifier with the "to assign" users ids.
-        :rtype: dict(int, List[int])
+        According to each team's assignment policy, this returns a mapping of
+        team identifiers to the next user IDs that should be assigned.
+
+        :param dict[helpdesk.team, int] count_per_team: A mapping where the key is
+            a ``helpdesk.team`` record and the value is the number of users to
+            retrieve for assignment.
+        :returns: A mapping of team IDs to lists of user IDs to assign.
+        :rtype: dict[int, list[int]]
         """
         team_without_manually = self.env['helpdesk.team'].browse({
             team.id
@@ -967,6 +965,8 @@ class HelpdeskTeam(models.Model):
             fields=[
                 'id',
                 'auto_close_day',
+                'auto_close_reminder_delay',
+                'auto_close_ticket_reminder',
                 'from_stage_ids',
                 'to_stage_id']
         )
@@ -974,19 +974,20 @@ class HelpdeskTeam(models.Model):
         today = fields.Datetime.today()
         for team in teams:
             # Compute the threshold_date
+            team['reminder_date'] = today - relativedelta.relativedelta(days=team['auto_close_day'] - team.get('auto_close_reminder_delay', 0))
             team['threshold_date'] = today - relativedelta.relativedelta(days=team['auto_close_day'])
             teams_dict[team['id']] = team
         tickets_domain = [('stage_id.fold', '=', False), ('team_id', 'in', list(teams_dict.keys()))]
         tickets = self.env['helpdesk.ticket'].search(tickets_domain)
 
-        def is_inactive_ticket(ticket):
+        def is_stage_ok(ticket):
             team = teams_dict[ticket.team_id.id]
-            is_write_date_ok = ticket.write_date <= team['threshold_date']
             if team['from_stage_ids']:
-                is_stage_ok = ticket.stage_id.id in team['from_stage_ids']
-            else:
-                is_stage_ok = not ticket.stage_id.fold
-            return is_write_date_ok and is_stage_ok
+                return ticket.stage_id.id in team['from_stage_ids']
+            return not ticket.stage_id.fold
+
+        def is_inactive_ticket(ticket):
+            return ticket.write_date <= teams_dict[ticket.team_id.id]['threshold_date'] and is_stage_ok(ticket)
 
         inactive_tickets = tickets.filtered(is_inactive_ticket)
         for ticket in inactive_tickets:
@@ -994,7 +995,14 @@ class HelpdeskTeam(models.Model):
             if teams_dict[ticket.team_id.id]['to_stage_id']:
                 ticket.write({'stage_id': teams_dict[ticket.team_id.id]['to_stage_id'][0]})
 
+        # only remind tickets that would actually be auto-closed (same stages)
+        reminder_tickets = tickets.filtered(lambda t: teams_dict[t.team_id.id]['auto_close_ticket_reminder'] and teams_dict[t.team_id.id]['reminder_date'].date() == t.write_date.date() and is_stage_ok(t))
+        for ticket in reminder_tickets:
+            template = ticket.team_id.reminder_email_template_id
+            if template:
+                template.send_mail(ticket.id, force_send=True, raise_exception=False)
+
     def _local_midnight_as_utc(self):
         """ local 12am expressed in UTC (naive datetime) """
         now = fields.Datetime.context_timestamp(self, fields.Datetime.now())
-        return datetime.datetime.combine(now.date(), datetime.time.min, now.tzinfo).astimezone(pytz.utc).replace(tzinfo=None)
+        return datetime.datetime.combine(now.date(), datetime.time.min, now.tzinfo).astimezone(datetime.UTC).replace(tzinfo=None)

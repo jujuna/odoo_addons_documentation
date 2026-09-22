@@ -14,6 +14,7 @@ country_unavailable_re = re.compile(
 
 
 @tagged('-standard', 'external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDeliveryUSPS(TransactionCase):
 
     def setUp(self):
@@ -208,7 +209,7 @@ class TestDeliveryUSPS(TransactionCase):
 
         order1_vals = {
                     'product_id': self.iPadMini.id,
-                    'product_uom_id': self.uom_unit.id,
+                    'uom_id': self.uom_unit.id,
                     'product_uom_qty': 1.0,
                     'location_id': self.stock_location.id,
                     'location_dest_id': self.customer_location.id}

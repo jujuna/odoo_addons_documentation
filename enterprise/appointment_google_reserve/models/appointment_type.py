@@ -1,10 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import calendar as cal
-import pytz
 import uuid
-
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, UTC
 
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, ValidationError
@@ -20,7 +18,7 @@ class AppointmentType(models.Model):
     # google reserve fields
     google_reserve_enable = fields.Boolean("Enable Google Booking")
     google_reserve_pending_sync = fields.Boolean("Google Booking Pending Synchronization", copy=False)
-    google_reserve_merchant_id = fields.Many2one('google.reserve.merchant', string='Google Reserve Merchant',
+    google_reserve_merchant_id = fields.Many2one('google.reserve.merchant', string='Google Maps Profile',
                                                  help="Configure your company data for Google Reserve",
                                                  index="btree_not_null",
                                                  groups="appointment.group_appointment_manager")
@@ -173,21 +171,24 @@ class AppointmentType(models.Model):
             return availabilities
 
         if not start_time:
-            start_time = datetime.now().astimezone(pytz.utc)
+            start_time = datetime.now().astimezone(UTC)
 
         if not end_time:
             # 30 days of coverage are needed for google
             max_schedule_days = max(30, self.max_schedule_days)
             # let's avoid spending more than 2 years of availabilities to keep perf under control
             max_schedule_days = min(730, self.max_schedule_days)
-            end_time = datetime.combine(start_time + timedelta(days=max_schedule_days), time.max).astimezone(pytz.utc)
+            end_time = datetime.combine(start_time + timedelta(days=max_schedule_days), time.max).astimezone(UTC)
 
         slots = self._slots_generate(
-            start_time + timedelta(hours=self.min_schedule_hours),
+            start_time,
             end_time,
             'UTC',
             reference_date=start_time.replace(tzinfo=None),
         )
+
+        if not slots:
+            return []
 
         if self.schedule_based_on == 'users':
             self.with_context(slots_check_all_users=True)._slots_fill_users_availability(
@@ -202,7 +203,12 @@ class AppointmentType(models.Model):
             ]
         else:
             availability_values = self._slot_availability_prepare_resources_values(
-                self.resource_ids, start_time + timedelta(hours=self.min_schedule_hours), end_time)
+                self.resource_ids, start_time, end_time)
+
+            # Explicit check to avoid useless sorting.
+            if self.slot_interval_capacity > 0 and availability_values['event_start_to_booking_lines']:
+                slots.sort(key=lambda slot: slot['UTC'][0])
+                slots = self._filter_slots_interval_available(slots, availability_values, add_availability_to_slot=True)
 
             for slot in slots:
                 availabilities += self._google_reserve_format_slot_availabilities_resources(slot, availability_values)
@@ -212,9 +218,11 @@ class AppointmentType(models.Model):
     def _google_reserve_format_slot_availabilities_users(self, slot):
         [start_utc, end_utc] = slot["UTC"]
 
+        spots_total = len(slot["slot"].restrict_to_user_ids or self.staff_user_ids)
+        spots_open = len(slot["available_staff_users"]) if "available_staff_users" in slot else 0
         return {
-            "spots_total": len(slot["slot"].restrict_to_user_ids or self.staff_user_ids),
-            "spots_open": len(slot["available_staff_users"]) if "available_staff_users" in slot else 0,
+            "spots_total": spots_total,
+            "spots_open": min(spots_open, spots_total),
             "duration_sec": int((end_utc - start_utc).total_seconds()),
             "start_sec": cal.timegm(start_utc.timetuple()),
         }
@@ -269,6 +277,7 @@ class AppointmentType(models.Model):
 
         self.ensure_one()
         [start_utc, end_utc] = slot['UTC']
+        slot_interval_availability = slot.pop("slot_interval_availability", False)
 
         remaining_capacity_by_resource = {
             resource: {
@@ -280,13 +289,18 @@ class AppointmentType(models.Model):
                     resource_to_bookings=availability_values.get('resource_to_bookings'),
                 ).items()
                 if isinstance(appointment_resource, models.BaseModel)  # see docstring for explanations
+                and self._resources_available_for_slot(resource, slot, availability_values)
             }
             for resource in self.resource_ids
         }
 
         availabilities = []
-        allowed_max_capacity = int(self.env['ir.config_parameter'].sudo().get_param('appointment.resource_max_capacity_allowed', default=12))
+        allowed_max_capacity = self.env['ir.config_parameter'].sudo().get_int('appointment.resource_max_capacity_allowed', 12)
         max_capacity = min(20, allowed_max_capacity, self.resource_total_capacity)  # see docstring
+
+        if slot_interval_availability:
+            max_capacity = min(max_capacity, slot_interval_availability)
+
         for capacity in range(1, max_capacity + 1):
 
             # total numbers of resources that can accommodate this capacity, regardless of bookings
@@ -326,7 +340,7 @@ class AppointmentType(models.Model):
                         break
 
             availabilities.append({
-                'spots_open': open_spots,
+                'spots_open': min(open_spots, total_spots),
                 'spots_total': total_spots,
                 'duration_sec': int((end_utc - start_utc).total_seconds()),
                 'start_sec': cal.timegm(start_utc.timetuple()),

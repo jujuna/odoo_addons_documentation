@@ -2,7 +2,6 @@ import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
 
 registry.category("web_tour.tours").add("test_sign_flow_tour", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
@@ -13,7 +12,6 @@ registry.category("web_tour.tours").add("test_sign_flow_tour", {
         {
             content: "Click on Template Menu",
             trigger: 'a[data-menu-xmlid="sign.sign_template_menu"]',
-            tooltipPosition: "bottom",
             run: "click",
         },
         {
@@ -45,7 +43,6 @@ registry.category("web_tour.tours").add("test_sign_flow_tour", {
         {
             content: "Click to start",
             trigger: ':iframe .o_sign_sign_item_navigator:contains("Click to start")',
-            tooltipPosition: "bottom",
             run: "click",
         },
         {
@@ -72,48 +69,14 @@ registry.category("web_tour.tours").add("test_sign_flow_tour", {
             run: "click",
         },
         {
+            isActive: ["auto"],
+            trigger: "canvas.o_web_sign_signature",
+            run: "canvasNotEmpty",
+        },
+        {
             content: "Click on auto button",
             trigger: ".o_web_sign_auto_button",
             run: "click",
-        },
-        {
-            content: "Click on style button",
-            trigger: ".o_web_sign_auto_select_style .dropdown-toggle",
-            async run({ click, waitUntil }) {
-                // Select a style but wait before the response of rpc get_fonts/
-                for (let i = 0; i < 50; i++) {
-                    await click();
-                    const items = document.querySelectorAll(".dropdown-menu .dropdown-item");
-                    if (items.length >= 3) {
-                        await click(".dropdown-menu .dropdown-item:nth-child(3)");
-                        break;
-                    }
-                    await new Promise((r) => setTimeout(r, 200));
-                }
-            },
-        },
-        {
-            content: "Click on style button",
-            trigger: ".o_web_sign_auto_select_style > button",
-            run: "click",
-        },
-        {
-            content: "Select a style",
-            trigger: ".dropdown-menu .dropdown-item:nth-child(2)",
-            run: "click",
-        },
-        {
-            content: "Click on style button",
-            trigger: ".o_web_sign_auto_select_style > button",
-            run: "click",
-        },
-        {
-            content: "Select a style",
-            trigger: ".dropdown-menu .dropdown-item:nth-child(3)",
-            run: "click",
-        },
-        {
-            trigger: "canvas.o_web_sign_signature",
         },
         {
             content: "Sign",
@@ -137,7 +100,7 @@ registry.category("web_tour.tours").add("test_sign_flow_tour", {
         },
         {
             content: "view",
-            trigger: "h4:contains('It's signed') + button:btn-close",
+            trigger: "h3:contains('It's signed') + button:btn-close",
             run: "click",
         },
     ],

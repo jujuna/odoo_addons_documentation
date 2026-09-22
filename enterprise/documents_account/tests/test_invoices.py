@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
-import base64
-
 from odoo import Command
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
-from odoo.addons.documents_account.tests.common import DocumentsAccountHelpersCommon, PDF
+from odoo.addons.documents_account.tests.common import DocumentsAccountHelpersCommon, PDF_RAW
 from odoo.tests import tagged
 
 
 @tagged('post_install', '-at_install')
 class TestInvoices(AccountTestInvoicingCommon, DocumentsAccountHelpersCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -17,7 +16,7 @@ class TestInvoices(AccountTestInvoicingCommon, DocumentsAccountHelpersCommon):
         cls.env.user.group_ids += cls.quick_ref('documents.group_documents_manager')
         cls.test_partner = cls.env['res.partner'].create({'name': 'test Azure'})
         cls.document = cls.env['documents.document'].create({
-            'datas': base64.b64encode(b"test_suspense_statement_line_id"),
+            'raw': b"test_suspense_statement_line_id",
             'name': 'file.txt',
             'mimetype': 'text/plain',
             'partner_id': cls.test_partner.id,
@@ -27,7 +26,7 @@ class TestInvoices(AccountTestInvoicingCommon, DocumentsAccountHelpersCommon):
 
     def test_suspense_statement_line_id(self):
         # Remove all autoconfigured journal synchronization settings for documents
-        self.env['documents.account.folder.setting'].search([]).unlink()
+        self.env['documents.account.folder.setting'].search([]).sudo().unlink()
 
         reconcile_activity_type = self.env['mail.activity.type'].create({
             "name": "Reconciliation request",
@@ -55,7 +54,6 @@ class TestInvoices(AccountTestInvoicingCommon, DocumentsAccountHelpersCommon):
             'res_id': move.id,
             'res_model_id': self.env.ref('account.model_account_move').id,
         })
-        activity._onchange_activity_type_id()
 
         # A new document has been created.
         documents = self.env['documents.document'].search([('request_activity_id', '=', activity.id)])
@@ -64,7 +62,7 @@ class TestInvoices(AccountTestInvoicingCommon, DocumentsAccountHelpersCommon):
         # Upload an attachment.
         attachment = self.env['ir.attachment'].create({
             'name': "test_suspense_statement_line_id",
-            'datas': base64.b64encode(b"test_suspense_statement_line_id"),
+            'raw': b"test_suspense_statement_line_id",
             'res_model': move._name,
             'res_id': move.id,
         })
@@ -114,7 +112,7 @@ class TestInvoices(AccountTestInvoicingCommon, DocumentsAccountHelpersCommon):
             'mimetype': 'application/pdf',
             'folder_id': folder.id,
             'partner_id': supplier.id,
-            'datas': PDF,
+            'raw': PDF_RAW,
         })
         action = document.account_create_account_move('in_invoice')
         self.assertTrue(action.get('res_id'), "Vendor bill should be created")

@@ -9,6 +9,8 @@ from odoo.tests import Form, tagged
 @tagged('post_install', '-at_install')
 class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def _generate_draft_sale_order(self, company, partner, user):
         """ Generate sale order and confirm its state """
         sale_order = Form(self.env['sale.order'])
@@ -41,7 +43,7 @@ class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
         self.assertEqual(purchase_order.company_id, partner, "Company is not correspond to purchase order.")
         self.assertEqual(purchase_order.amount_total, 465.75, "Total amount is incorrect.")
         self.assertEqual(purchase_order.order_line[0].product_id, self.product_consultant, "Product in line is incorrect.")
-        self.assertEqual(purchase_order.order_line[0].name, 'Service', "Product name is incorrect.")
+        self.assertEqual(purchase_order.order_line[0].label, 'Service', "Product name is incorrect.")
         self.assertEqual(purchase_order.order_line[0].price_unit, 450, "Price unit is incorrect.")
         self.assertEqual(purchase_order.order_line[0].product_qty, 1, "Product qty is incorrect.")
         self.assertEqual(purchase_order.order_line[0].price_subtotal, 405, "line total is incorrect.")
@@ -156,8 +158,11 @@ class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
         my_service = self.env['product.product'].create({
             'name': 'my service',
             'type': 'service',
-            'service_to_purchase': True,
-            'seller_ids': [(0, 0, {'partner_id': self.company_b.partner_id.id, 'price': 100, 'company_id': self.company_a.id})]
+            'service_tracking': 'subcontract',
+            'seller_ids': [
+                (0, 0, {'partner_id': self.company_b.partner_id.id, 'price': 100, 'company_id': self.company_a.id}),
+                (0, 0, {'partner_id': self.res_users_company_a.partner_id.id, 'price': 80, 'company_id': self.company_b.id})
+            ]
         })
 
         self.company_b.update({
@@ -237,13 +242,13 @@ class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
             'purchase_ok': True,
             'sale_ok': True,
             'type': 'service',
-            'service_to_purchase': True,
+            'service_tracking': 'subcontract',
             'seller_ids': [
                 Command.create({'partner_id': self.company_b.partner_id.id, 'price': 100, 'company_id': self.company_a.id}),
                 Command.create({'partner_id': vendor.id, 'price': 100, 'company_id': self.company_b.id}),
             ],
         })
-        service_purchase.with_company(self.company_b).update({'service_to_purchase': True})
+        service_purchase.with_company(self.company_b).update({'service_tracking': 'subcontract'})
 
         so_a = self._generate_draft_sale_order(self.company_a, buyer, self.res_users_company_a)
         so_a.order_line.product_id = service_purchase

@@ -10,6 +10,8 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TestBalanceSheetReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -17,20 +19,24 @@ class TestBalanceSheetReport(TestAccountReportsCommon):
 
     def test_report_lines_ordering(self):
         """ Check that the report lines are correctly ordered with nested account groups """
-        self.env['account.group'].create([{
-            'name': 'A',
-            'code_prefix_start': '101401',
-            'code_prefix_end': '101601',
-        }, {
-            'name': 'A1',
-            'code_prefix_start': '1014010',
-            'code_prefix_end': '1015010',
-        }])
+        account_parent_1 = self.env['account.account'].create({
+            'code': '101',
+            'name': 'Parent 1',
+            'account_type': 'asset_cash',
+            'active': False,
+        })
+        account_parent_2 = self.env['account.account'].create({
+            'code': '1014',
+            'name': 'Parent 2',
+            'account_type': 'asset_cash',
+            'parent_id': account_parent_1.id,
+            'active': False,
+        })
 
         account_bank = self.company_data['default_journal_bank'].default_account_id
         account_cash = self.company_data['default_journal_cash'].default_account_id
-        account_a = self.env['account.account'].create([{'code': '1014010', 'name': 'A', 'account_type': 'asset_cash'}])
-        account_c = self.env['account.account'].create([{'code': '101600', 'name': 'C', 'account_type': 'asset_cash'}])
+        account_a = self.env['account.account'].create([{'code': '1014010', 'name': 'A', 'account_type': 'asset_cash', 'parent_id': account_parent_2.id}])
+        account_c = self.env['account.account'].create([{'code': '101600', 'name': 'C', 'account_type': 'asset_cash', 'parent_id': account_parent_1.id}])
 
         # Create a journal lines for each account
         move = self.env['account.move'].create({
@@ -48,11 +54,7 @@ class TestBalanceSheetReport(TestAccountReportsCommon):
 
         # Create the report hierarchy with the Bank and Cash Accounts lines unfolded
         line_id = self._get_basic_line_dict_id_from_report_line_ref('account_reports.account_financial_report_bank_view0')
-        options = self._generate_options(
-            self.report,
-            fields.Date.from_string('2020-02-01'),
-            fields.Date.from_string('2020-02-28')
-        )
+        options = self._generate_options(self.report, '2020-02-01', '2020-02-28')
         options['unfolded_lines'] = [line_id]
         options['hierarchy'] = True
         self.env.company.totals_below_sections = False
@@ -61,25 +63,25 @@ class TestBalanceSheetReport(TestAccountReportsCommon):
         # The Bank and Cash Accounts section start at index 2
         # Since we created 4 lines + 2 groups, we keep the 6 following lines
         unfolded_lines = self.report._get_unfolded_lines(lines, line_id)
-        unfolded_lines = [{'name': line['name'], 'level': line['level']} for line in unfolded_lines]
+        unfolded_lines = [{'name': line.name, 'level': line.level} for line in unfolded_lines]
 
         self.assertEqual(
             unfolded_lines,
             [
                 {'level': 5, 'name': 'Bank and Cash Accounts'},
-                {'level': 6, 'name': '101401-101601 A'},
-                {'level': 7, 'name': '101401 Bank'},
-                {'level': 7, 'name': '1014010-1015010 A1'},
+                {'level': 6, 'name': '101 Parent 1'},
+                {'level': 7, 'name': '1014 Parent 2'},
                 {'level': 8, 'name': '1014010 A'},
-                {'level': 8, 'name': '101501 Cash'},
                 {'level': 7, 'name': '101600 C'},
+                {'level': 6, 'name': '101401 Bank'},
+                {'level': 6, 'name': '101501 Cash'},
             ]
         )
 
     def test_balance_sheet_custom_date(self):
         line_id = self.env.ref('account_reports.account_financial_report_bank_view0').id
-        options = self._generate_options(self.report, fields.Date.from_string('2020-02-01'), fields.Date.from_string('2020-02-28'))
-        options['date']['filter'] = 'custom'
+        options = self._generate_options(self.report, '2020-02-01', '2020-02-28')
+        options['date']['period_type'] = 'custom'
         options['unfolded_lines'] = [line_id]
 
         invoices = self.env['account.move'].create([{
@@ -108,28 +110,26 @@ class TestBalanceSheetReport(TestAccountReportsCommon):
                 ('Current Assets',                                 0.00),
                 ('Prepayments',                                    0.00),
                 ('Total Current Assets',                        2300.00),
-                ('Plus Fixed Assets',                              0.00),
-                ('Plus Non-current Assets',                        0.00),
+                ('Fixed Assets',                              0.00),
+                ('Non-current Assets',                        0.00),
                 ('Total ASSETS',                                2300.00),
 
                 ('LIABILITIES',                                 300.00),
                 ('Current Liabilities',                         300.00),
                 ('Current Liabilities',                         300.00),
+                ('Credit Card',                                   0.00),
                 ('Payables',                                       0.00),
                 ('Total Current Liabilities',                   300.00),
-                ('Plus Non-current Liabilities',                   0.00),
+                ('Non-current Liabilities',                   0.00),
                 ('Total LIABILITIES',                           300.00),
 
-                ('EQUITY',                                      2000.00),
-                ('Unallocated Earnings',                        2000.00),
+                ('EQUITY (& EARNINGS)',                         2000.00),
+                ('Equity',                                         0.00),
+                ('Earnings',                                    2000.00),
                 ('Current Year Unallocated Earnings',           2000.00),
-                ('Previous Years Unallocated Earnings',            0.00),
-                ('Total Unallocated Earnings',                  2000.00),
-                ('Retained Earnings',                              0.00),
-                ('Current Year Retained Earnings',                 0.00),
-                ('Previous Years Retained Earnings',               0.00),
-                ('Total Retained Earnings',                        0.00),
-                ('Total EQUITY',                                2000.00),
+                ('Previous Years Earnings',                        0.00),
+                ('Total Earnings',                              2000.00),
+                ('Total EQUITY (& EARNINGS)',                   2000.00),
                 ('LIABILITIES + EQUITY',                        2300.00),
             ],
             options,
@@ -140,11 +140,7 @@ class TestBalanceSheetReport(TestAccountReportsCommon):
         This test only tests the function '_get_lines'. It does not test that the total lines are always handled correctly for manual unfolds in the web UI. """
 
         self.env.company.totals_below_sections = True
-        options = self._generate_options(
-            self.report,
-            fields.Date.from_string('1990-01-01'),
-            fields.Date.from_string('1990-01-01')
-        )
+        options = self._generate_options(self.report, '1990-01-01', '1990-01-01')
 
         bank_journal = self.company_data['default_journal_bank']
         account_bank = bank_journal.default_account_id
@@ -152,7 +148,6 @@ class TestBalanceSheetReport(TestAccountReportsCommon):
             'account_type': 'asset_current',
             'name': 'account_other',
             'code': '121040',
-            'reconcile': True,
         })
         self.env['account.move'].create({
             'move_type': 'entry',
@@ -179,26 +174,24 @@ class TestBalanceSheetReport(TestAccountReportsCommon):
                 ('Current Assets',),
                 ('Prepayments',),
                 ('Total Current Assets',),
-                ('Plus Fixed Assets',),
-                ('Plus Non-current Assets',),
+                ('Fixed Assets',),
+                ('Non-current Assets',),
                 ('Total ASSETS',),
                 ('LIABILITIES',),
                 ('Current Liabilities',),
                 ('Current Liabilities',),
+                ('Credit Card',),
                 ('Payables',),
                 ('Total Current Liabilities',),
-                ('Plus Non-current Liabilities',),
+                ('Non-current Liabilities',),
                 ('Total LIABILITIES',),
-                ('EQUITY',),
-                ('Unallocated Earnings',),
+                ('EQUITY (& EARNINGS)',),
+                ('Equity',),
+                ('Earnings',),
                 ('Current Year Unallocated Earnings',),
-                ('Previous Years Unallocated Earnings',),
-                ('Total Unallocated Earnings',),
-                ('Retained Earnings',),
-                ('Current Year Retained Earnings',),
-                ('Previous Years Retained Earnings',),
-                ('Total Retained Earnings',),
-                ('Total EQUITY',),
+                ('Previous Years Earnings',),
+                ('Total Earnings',),
+                ('Total EQUITY (& EARNINGS)',),
                 ('LIABILITIES + EQUITY',),
             ],
             options,
@@ -221,27 +214,59 @@ class TestBalanceSheetReport(TestAccountReportsCommon):
                 ('Total Current Assets',),
                 ('Prepayments',),
                 ('Total Current Assets',),
-                ('Plus Fixed Assets',),
-                ('Plus Non-current Assets',),
+                ('Fixed Assets',),
+                ('Non-current Assets',),
                 ('Total ASSETS',),
                 ('LIABILITIES',),
                 ('Current Liabilities',),
                 ('Current Liabilities',),
+                ('Credit Card',),
                 ('Payables',),
                 ('Total Current Liabilities',),
-                ('Plus Non-current Liabilities',),
+                ('Non-current Liabilities',),
                 ('Total LIABILITIES',),
-                ('EQUITY',),
-                ('Unallocated Earnings',),
+                ('EQUITY (& EARNINGS)',),
+                ('Equity',),
+                ('Earnings',),
                 ('Current Year Unallocated Earnings',),
-                ('Previous Years Unallocated Earnings',),
-                ('Total Unallocated Earnings',),
-                ('Retained Earnings',),
-                ('Current Year Retained Earnings',),
-                ('Previous Years Retained Earnings',),
-                ('Total Retained Earnings',),
-                ('Total EQUITY',),
+                ('Previous Years Earnings',),
+                ('Total Earnings',),
+                ('Total EQUITY (& EARNINGS)',),
                 ('LIABILITIES + EQUITY',),
             ],
             options,
         )
+
+    def test_balance_sheet_groupby_analytic_account(self):
+        analytic_plan = self.env['account.analytic.plan'].create({
+            'name': 'Analytic Plan',
+        })
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': 'analytic Account',
+            'plan_id': analytic_plan.id,
+        })
+
+        options = self._generate_options(
+            self.report,
+            '2023-01-01',
+            '2023-12-31',
+            default_options={
+                'analytic_accounts_groupby': [analytic_account.id],
+            },
+        )
+
+        report_line = self.report.line_ids[0]
+        lines = self.report._get_lines(options)
+        report_line_dict = next(l for l in lines if l.name == report_line.name)
+
+        audit_params = self._get_audit_params_from_report_line(
+            options,
+            report_line,
+            report_line_dict,
+            column_group_index=options['columns'][0]['column_group_index'],
+        )
+
+        action = self.report.dispatch_report_action(options, 'action_audit_cell', audit_params)
+
+        self.assertTrue(action)
+        self.assertIsInstance(action['context'], dict)

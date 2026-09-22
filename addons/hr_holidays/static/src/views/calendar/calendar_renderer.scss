@@ -1,7 +1,7 @@
 .o_timeoff_calendar {
-    background-color: $o-view-background-color;
     flex-grow: 1;
-    flex-basis: fit-content;
+    flex-basis: 0;
+    min-width: 0;
 
     .o_calendar_renderer .o_calendar_widget {
         .hr_mandatory_day {
@@ -29,14 +29,6 @@
             .hr_mandatory_day_#{$size - 1} {
                 --mandatory-day-color: #{nth($o-colors, $size)};
             }
-        }
-
-        .o_event_half_left {
-          clip-path: polygon(0 0, 50% 0, 50% 100%, 0% 100%);
-        }
-
-        .o_event_half_right {
-          clip-path: polygon(100% 0, 50% 0, 50% 100%, 100% 100%);
-        }
+        }   
     }
 }

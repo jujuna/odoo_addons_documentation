@@ -38,8 +38,6 @@ class AccountEdiXmlPint_Anz(models.AbstractModel):
         if not grouping_key:
             return
 
-        grouping_key['scheme_id'] = 'GST'
-
         # A business not registered for GST cannot issue tax invoices.
         # In this case, the tax category code should be O (Outside scope of tax).
         # See https://docs.peppol.eu/poac/aunz/pint-aunz/bis/#_tax_category_code
@@ -64,18 +62,36 @@ class AccountEdiXmlPint_Anz(models.AbstractModel):
         # see https://docs.peppol.eu/poac/aunz/pint-aunz/bis/#_identifying_the_a_nz_billing_specialisation
         document_node['cbc:ProfileID'] = {'_text': 'urn:peppol:bis:billing'}
 
-    def _get_party_node(self, vals):
-        # EXTENDS account.edi.xml.ubl_bis3
-        party_node = super()._get_party_node(vals)
-        commercial_partner = vals['partner'].commercial_partner_id
+    def _ubl_add_party_legal_entity_nodes(self, vals):
+        # EXTENDS
+        super()._ubl_add_party_legal_entity_nodes(vals)
+        partner = vals['party_vals']['partner']
+        commercial_partner = partner.commercial_partner_id
 
-        party_node['cac:PartyTaxScheme'][0]['cac:TaxScheme']['cbc:ID']['_text'] = 'GST'
-
-        # In both cases the scheme must be set to a value that comes from the eas.
         if commercial_partner.country_code in ('AU', 'NZ'):
-            party_node['cac:PartyLegalEntity']['cbc:CompanyID']['schemeID'] = commercial_partner.peppol_eas
+            if commercial_partner.has_vat:
+                vals['party_node']['cac:PartyLegalEntity'] = [{
+                    'cbc:RegistrationName': {'_text': commercial_partner.name},
+                    'cbc:CompanyID': {
+                        '_text': commercial_partner.vat,
+                        'schemeID': '0151' if commercial_partner.country_code == 'AU' else '0088',
+                    },
+                }]
+            else:
+                identifier_vals = partner._get_preferred_routing_identifier_vals()
+                if identifier_vals:
+                    vals['party_node']['cac:PartyLegalEntity'] = [{
+                        'cbc:RegistrationName': {'_text': commercial_partner.name},
+                        'cbc:CompanyID': {
+                            '_text': identifier_vals['value'],
+                            'schemeID': identifier_vals['scheme'],
+                        },
+                    }]
 
-        return party_node
+    def _ubl_add_customization_id_node(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_customization_id_node(vals)
+        vals['document_node']['cbc:CustomizationID']['_text'] = 'urn:peppol:pint:billing-1@aunz-1'
 
     # -------------------------------------------------------------------------
     # EXPORT: Constraints
@@ -127,9 +143,11 @@ class AccountEdiXmlPint_Anz(models.AbstractModel):
         # ALIGNED-IBR-001-AUNZ and ALIGNED-IBR-002-AUNZ
         for partner_type in ('supplier', 'customer'):
             partner = vals[partner_type]
-            if partner.country_code == 'AU' and partner.peppol_eas != '0151':
+            identifier_vals = partner._get_preferred_routing_identifier_vals()
+            partner_eas = identifier_vals.get('scheme')
+            if partner.country_code == 'AU' and partner_eas != '0151':
                 constraints[f'au_{partner_type}_eas_0151'] = _("The Peppol EAS must be set to ABN (0151) if the partner country is Australia.")
-            elif partner.country_code == 'NZ' and partner.peppol_eas != '0088':
+            elif partner.country_code == 'NZ' and partner_eas != '0088':
                 constraints[f'nz_{partner_type}_eas_0088'] = _("The Peppol EAS must be set to EAN (0088) if the partner country is New Zealand.")
 
         return constraints

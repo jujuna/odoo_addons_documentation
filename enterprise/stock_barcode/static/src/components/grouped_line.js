@@ -32,24 +32,31 @@ export default class GroupedLineComponent extends LineComponent {
         return this.env.model.groupKey(this.line) === this.env.model.unfoldLineKey;
     }
 
-    get sublineProps() {
-        return {
+    getsublineProps(subline) {
+        const sublineProps = {
             displayUOM: this.props.displayUOM,
             editLine: this.props.editLine,
-            line: this.subline,
+            line: subline,
             subline: true,
         };
+        if (this.env.model.resModel === "stock.picking.batch") {
+            // Don't display the picking on sublines if already displayed on grouped line.
+            sublineProps.hidePickingName = Boolean(this.pickingName);
+        }
+        return sublineProps;
     }
 
     get linesToDisplay() {
+        if (this.env.model.resModel === "stock.picking.batch" && !this.pickingName) {
+            return this.props.line.lines;
+        }
         if (!this.env.model.showReservedSns) {
-            return this.props.line.lines.filter((line) => {
-                return (
+            return this.props.line.lines.filter(
+                (line) =>
                     this.env.model.getQtyDone(line) > 0 ||
-                    line.product_id.tracking == "none" ||
+                    !["lot", "serial"].includes(line.product_id.tracking) ||
                     this.env.model.getQtyDemand(line) == 0
-                );
-            });
+            );
         }
         return this.props.line.lines;
     }
@@ -72,7 +79,22 @@ export default class GroupedLineComponent extends LineComponent {
         return super.lotName;
     }
 
+    get mainSubLine() {
+        // In case we don't display unscanned reserved lots, this util can be
+        // used to record the data of the unique relevant representant.
+        if (!this.env.model.showReservedSns && this.linesToDisplay.length === 1) {
+            const line = this.linesToDisplay[0];
+            if (this.env.model.getQtyDone(line) && (line.package_id || line.result_package_id)) {
+                return line;
+            }
+        }
+        return false;
+    }
+
     get displayToggleBtn() {
+        if (this.env.model.resModel === "stock.picking.batch" && !this.pickingName) {
+            return true;
+        }
         return this.linesToDisplay.length > 1;
     }
 

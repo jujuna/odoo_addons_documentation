@@ -23,6 +23,7 @@ class SaleSubscriptionPlan(models.Model):
 
     billing_period_display = fields.Char(compute='_compute_billing_period_display', string="Billing Period", search='_search_billing_period_display')
     billing_period_display_sentence = fields.Char(compute='_compute_billing_period_display_sentence', string="Billing Period Display")
+    delivery_period_display = fields.Char(compute='_compute_delivery_period_display')
 
     billing_first_day = fields.Boolean(string="Align to Period Start", default=False, help="Align all subscription invoices on the first day of each billing period.")
 
@@ -111,8 +112,15 @@ class SaleSubscriptionPlan(models.Model):
             plan.active_subs_count = res.get(plan, 0)
 
     def _compute_active_subscription_line_count(self):
+        domain = [
+            ('order_id.is_subscription', '=', True),
+            ('recurring_invoice', '=', True),
+            ('subscription_plan_id', 'in', self.ids),
+            ('order_id.subscription_state', 'in', ('3_progress', '4_paused')),
+            ('display_type', '=', False),
+        ]
         line_counts = dict(self.env['sale.order.line']._read_group(
-            [('order_id.is_subscription', '=', True), ('subscription_plan_id', 'in', self.ids), ('order_id.subscription_state', 'in', ('3_progress', '4_paused'))],
+            domain,
             ['subscription_plan_id'],
             ['__count'],
         ))
@@ -129,7 +137,11 @@ class SaleSubscriptionPlan(models.Model):
         }
 
     def action_open_active_subscription_lines(self):
-        subscription_items_plan = self.env['sale.order'].search([('plan_id', 'in', self.ids), ('is_subscription', '=', True), ('subscription_state', 'in', ['3_progress', '4_paused'])]).order_line
+        subscription_items_plan = self.env['sale.order'].search([
+            ('plan_id', 'in', self.ids),
+            ('is_subscription', '=', True),
+            ('subscription_state', 'in', ['3_progress', '4_paused'])
+        ]).order_line.filtered(lambda line: not line.display_type and line.recurring_invoice)
         return {
             'name': _('Subscription Items'),
             'view_mode': 'list',
@@ -175,6 +187,26 @@ class SaleSubscriptionPlan(models.Model):
             else:
                 raise ValueError(f"Invalid Billing Period Unit {plan.billing_period_unit!r}")
             plan.billing_period_display_sentence = sentence
+
+    @api.depends_context('lang')
+    @api.depends('billing_period_value', 'billing_period_unit')
+    def _compute_delivery_period_display(self):
+        for plan in self:
+            value = plan.billing_period_value
+            if plan.billing_period_unit == 'week':
+                plan.delivery_period_display = (
+                    plan.env._('Deliver every %s weeks', value) if value > 1 else plan.env._('Deliver every week')
+                )
+            elif plan.billing_period_unit == 'month':
+                plan.delivery_period_display = (
+                    plan.env._('Deliver every %s months', value) if value > 1 else plan.env._('Deliver every month')
+                )
+            elif plan.billing_period_unit == 'year':
+                plan.delivery_period_display = (
+                    plan.env._('Deliver every %s years', value) if value > 1 else plan.env._('Deliver every year')
+                )
+            else:
+                raise ValueError(f"Invalid Billing Period Unit {plan.billing_period_unit!r}")
 
     @api.depends('auto_close_limit')
     def _compute_auto_close_limit_display(self):

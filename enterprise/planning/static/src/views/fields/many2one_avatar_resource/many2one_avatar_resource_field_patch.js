@@ -1,7 +1,7 @@
-import { AvatarCardResourcePopover } from "@resource_mail/components/avatar_card_resource/avatar_card_resource_popover";
+import { AvatarCard } from "@mail/core/web/avatar_card/avatar_card";
 import {
-    kanbanMany2OneAvatarResourceField,
-    KanbanMany2OneAvatarResourceField,
+    cardMany2OneAvatarResourceField,
+    CardMany2OneAvatarResourceField,
 } from "@resource_mail/views/fields/many2one_avatar_resource/kanban_many2one_avatar_resource_field";
 import {
     Many2OneAvatarResourceField,
@@ -14,7 +14,7 @@ function patchFieldComponent(o) {
     patch(o, {
         setup() {
             super.setup();
-            this.materialPopover = usePopover(AvatarCardResourcePopover);
+            this.materialPopover = usePopover(AvatarCard);
         },
         openMaterialPopover(target) {
             if (
@@ -25,14 +25,14 @@ function patchFieldComponent(o) {
             }
             this.materialPopover.open(target, {
                 id: this.props.record.data[this.props.name].id,
-                recordModel: this.props.record.fields[this.props.name].relation,
+                model: this.props.record.fields[this.props.name].relation,
             });
         },
     });
 }
 
 patchFieldComponent(Many2OneAvatarResourceField.prototype);
-patchFieldComponent(KanbanMany2OneAvatarResourceField.prototype);
+patchFieldComponent(CardMany2OneAvatarResourceField.prototype);
 
 function patchFieldDescr(o) {
     patch(o, {
@@ -51,4 +51,4 @@ function patchFieldDescr(o) {
 }
 
 patchFieldDescr(many2OneAvatarResourceField);
-patchFieldDescr(kanbanMany2OneAvatarResourceField);
+patchFieldDescr(cardMany2OneAvatarResourceField);

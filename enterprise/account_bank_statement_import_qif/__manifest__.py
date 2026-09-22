@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Import QIF Bank Statement',
     'category': 'Accounting/Accounting',
-    'version': '1.0',
     'description': r'''
 Module to import QIF bank statements.
 ======================================
@@ -21,7 +19,6 @@ Whenever possible, you should use a more appropriate file format like OFX.
     'data': [
         'views/account_journal_views.xml',
     ],
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

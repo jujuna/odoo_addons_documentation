@@ -1,16 +1,17 @@
 /** @odoo-module */
 
 import { on, queryAll } from "@odoo/hoot-dom";
-import { reactive, useComponent, useEffect, useExternalListener } from "@odoo/owl";
+import { t, useEffect, useListener, validateType } from "@odoo/owl";
 import { isNode } from "@web/../lib/hoot-dom/helpers/dom";
 import {
     isInstanceOf,
     isIterable,
+    isPromise,
     parseRegExp,
     R_WHITE_SPACE,
+    safeToString,
     toSelector,
 } from "@web/../lib/hoot-dom/hoot_dom_utils";
-import { getRunner } from "./main_runner";
 
 /**
  * @typedef {ArgumentPrimitive | `${ArgumentPrimitive}[]` | null} ArgumentType
@@ -32,30 +33,13 @@ import { getRunner } from "./main_runner";
  *  | "url"
  *  | "undefined"} ArgumentPrimitive
  *
- * @typedef {{
- *  ignoreOrder?: boolean;
- *  partial?: boolean;
- * }} DeepEqualOptions
- *
  * @typedef {[string, ArgumentType]} Label
+ *
+ * @typedef {string | RegExp | number | { new(): any }} LooseMatcherType
  *
  * @typedef {"expected" | "group" | "received" | "technical"} MarkupType
  *
- * @typedef {string | RegExp | { new(): any }} Matcher
- *
  * @typedef {QueryRegExp | QueryExactString | QueryPartialString} QueryPart
- *
- * @typedef {{
- *  assertions: number;
- *  failed: number;
- *  passed: number;
- *  skipped: number;
- *  suites: number;
- *  tests: number;
- *  todo: number;
- * }} Reporting
- *
- * @typedef {import("./core/runner").Runner} Runner
  */
 
 /**
@@ -89,7 +73,7 @@ const {
     JSON: { parse: $parse, stringify: $stringify },
     localStorage,
     Map,
-    Math: { floor: $floor, max: $max, min: $min },
+    Math: { floor: $floor, max: $max, min: $min, random: $random },
     Number: { isInteger: $isInteger, isNaN: $isNaN, parseFloat: $parseFloat },
     navigator: { clipboard: $clipboard },
     Object: {
@@ -128,6 +112,24 @@ const $setItem = localStorage.setItem.bind(localStorage);
 const $removeItem = localStorage.removeItem.bind(localStorage);
 /** @type {Clipboard["writeText"]} */
 const $writeText = $clipboard?.writeText.bind($clipboard);
+
+//-----------------------------------------------------------------------------
+// Types
+//-----------------------------------------------------------------------------
+
+/** @type {number} */
+export const T_INTEGER = t.customValidator(t.number(), $isInteger, "value is not an integer");
+export const T_NODE = t.customValidator(t.object(), isNode, "value is not a node");
+export const T_REGEX = t.instanceOf(RegExp);
+/** @type {null} */
+export const T_NULL = t.literal(null);
+/** @type {undefined} */
+export const T_UNDEFINED = t.literal(undefined);
+
+export const T_DEEP_EQUAL_OPTIONS = t.object({
+    ignoreOrder: t.boolean().optional(),
+    partial: t.boolean().optional(),
+});
 
 //-----------------------------------------------------------------------------
 // Internal
@@ -190,11 +192,7 @@ function makeObjectCache() {
  * @returns {T}
  */
 function resolve(value) {
-    if (typeof value === "function") {
-        return value();
-    } else {
-        return value;
-    }
+    return typeof value === "function" ? value() : value;
 }
 
 /**
@@ -369,9 +367,6 @@ function _deepEqual(a, b, ignoreOrder, partial, cache) {
  * @returns {[string, number]}
  */
 function _formatHumanReadable(value, length, cache) {
-    if (!isSafe(value)) {
-        return `<cannot read value of ${getConstructor(value).name}>`;
-    }
     // Primitives
     switch (typeof value) {
         case "function": {
@@ -401,6 +396,10 @@ function _formatHumanReadable(value, length, cache) {
     }
     cache.add(value);
 
+    if (isNode(value)) {
+        return value.nodeType === Node.ELEMENT_NODE ? `<${toSelector(value)}>` : toSelector(value);
+    }
+
     // Generic objects
     const serialize = getGenericSerializer(value);
     if (serialize) {
@@ -415,7 +414,8 @@ function _formatHumanReadable(value, length, cache) {
             return _formatHumanReadable(values[0], length, cache);
         }
         const constructor = getConstructor(value);
-        const constructorPrefix = constructor.name === "Array" ? "" : `${constructor.name} `;
+        const constructorPrefix =
+            !constructor.name || constructor.name === "Array" ? "" : `${constructor.name} `;
         const content = [];
         if (values.length) {
             const bitSize = $max(
@@ -438,7 +438,8 @@ function _formatHumanReadable(value, length, cache) {
     // Non-iterable objects
     const keys = $keys(value);
     const constructor = getConstructor(value);
-    const constructorPrefix = constructor.name === "Object" ? "" : `${constructor.name} `;
+    const constructorPrefix =
+        !constructor.name || constructor.name === "Object" ? "" : `${constructor.name} `;
     const content = [];
     if (constructor.name !== "Window" && keys.length) {
         const bitSize = $max(
@@ -473,9 +474,6 @@ function _formatHumanReadable(value, length, cache) {
  * @returns {string}
  */
 function _formatTechnical(value, depth, isObjectValue, cache) {
-    if (!isSafe(value)) {
-        return `<cannot read value of ${getConstructor(value).name}>`;
-    }
     if (value === S_ANY || value === S_NONE) {
         // Special case: internal symbols
         return "";
@@ -503,6 +501,10 @@ function _formatTechnical(value, depth, isObjectValue, cache) {
         return `${baseIndent}${$isArray(value) ? `[${ELLIPSIS}]` : `{ ${ELLIPSIS} }`}`;
     }
     cache.add(value);
+
+    if (isNode(value)) {
+        return value.nodeType === Node.ELEMENT_NODE ? `<${toSelector(value)}>` : toSelector(value);
+    }
 
     const startIndent = " ".repeat((depth + 1) * 2);
     const endIndent = " ".repeat(depth * 2);
@@ -586,7 +588,6 @@ const GENERIC_SERIALIZERS = new Map([
     [Boolean, (v) => v.valueOf()],
     [Date, (v) => v.toISOString()],
     [Error, (v) => v.toString()],
-    [Node, (v) => (v.nodeType === Node.ELEMENT_NODE ? `<${toSelector(v)}>` : toSelector(v))],
     [Number, (v) => v.valueOf()],
     [RegExp, (v) => v.toString()],
     [String, (v) => v.valueOf()],
@@ -633,6 +634,62 @@ let fuzzyScoreMap = null;
 //-----------------------------------------------------------------------------
 
 /**
+ * @param {ArrayLike<any>} args
+ * @param {any[]} types
+ * @param {boolean} [noOptions]
+ */
+export function assertArguments(args, types, noOptions) {
+    const argsLength = args.length;
+    if (argsLength > types.length) {
+        throw new TypeError(
+            `expected a maximum of ${types.length} arguments and got ${argsLength}`
+        );
+    }
+    const allIssues = [];
+    for (let i = 0; i < argsLength; i++) {
+        const value = args[i];
+        if (!noOptions && i === types.length - 1 && isNil(value)) {
+            // This means that the value for the 'options' argument is empty
+            // -> no need to validate it.
+            break;
+        }
+        const issues = validateType(value, types[i]);
+        if (issues.length) {
+            allIssues.push(formatValidationIssues(`invalid ${ordinal(i + 1)} argument:`, issues));
+        }
+    }
+    if (allIssues.length) {
+        throw new TypeError(allIssues.join("\n"));
+    }
+}
+
+/**
+ * @template {(...args: any[]) => any} T
+ * @param {T} fn
+ */
+export function batch(fn) {
+    /** @type {Parameters<T>[]} */
+    const currentBatch = [];
+
+    /** @type {T} */
+    function batched(...args) {
+        currentBatch.push(args);
+        throttledFlush();
+    }
+
+    function flush() {
+        for (const args of currentBatch) {
+            fn(...args);
+        }
+        currentBatch.length = 0;
+    }
+
+    const throttledFlush = throttle(flush);
+
+    return [batched, flush];
+}
+
+/**
  * @param {string} text
  */
 export async function copy(text) {
@@ -675,88 +732,6 @@ export function copyAndBind(object) {
 }
 
 /**
- * @template {(previous: any, ...args: any[]) => any} T
- * @param {T} instanceGetter
- * @param {() => any} [afterCallback]
- * @returns {(...args: DropFirst<Parameters<T>>) => ReturnType<T>}
- */
-export function createJobScopedGetter(instanceGetter, afterCallback) {
-    /** @type {(...args: DropFirst<Parameters<T>>) => ReturnType<T>} */
-    function getInstance(...args) {
-        if (runner.dry) {
-            return memoized(...args);
-        }
-
-        const currentJob = runner.state.currentTest || runner.suiteStack.at(-1) || runner;
-        if (!instances.has(currentJob)) {
-            const parentInstance = [...instances.values()].at(-1);
-            instances.set(currentJob, instanceGetter(parentInstance, ...args));
-
-            if (canCallAfter) {
-                runner.after(function instanceGetterCleanup() {
-                    instances.delete(currentJob);
-                    canCallAfter = false;
-                    afterCallback?.();
-                    canCallAfter = true;
-                });
-            }
-        }
-
-        return instances.get(currentJob);
-    }
-
-    /** @type {(...args: DropFirst<Parameters<T>>) => ReturnType<T>} */
-    function memoized(...args) {
-        if (!memoizedCalled) {
-            memoizedCalled = true;
-            memoizedValue = instanceGetter(null, ...args);
-        }
-        return memoizedValue;
-    }
-
-    /** @type {Map<Job, Parameters<T>[0]>} */
-    const instances = new Map();
-    const runner = getRunner();
-    let canCallAfter = true;
-    let memoizedCalled = false;
-    let memoizedValue;
-
-    runner.after(() => instances.clear());
-
-    return getInstance;
-}
-
-/**
- * @param {Reporting} [parentReporting]
- */
-export function createReporting(parentReporting) {
-    /**
-     * @param {Partial<Reporting>} values
-     */
-    function add(values) {
-        for (const [key, value] of $entries(values)) {
-            reporting[key] += value;
-        }
-
-        parentReporting?.add(values);
-    }
-
-    const reporting = reactive({
-        assertions: 0,
-        duration: 0,
-        failed: 0,
-        passed: 0,
-        skipped: 0,
-        suites: 0,
-        tests: 0,
-        todo: 0,
-        add,
-    });
-
-    return reporting;
-}
-
-/**
  * @template T
  * @param {T} target
  * @param {Record<keyof T, PropertyDescriptor>} descriptors
@@ -795,32 +770,6 @@ export function createMock(target, descriptors) {
 /**
  * @template {(...args: any[]) => any} T
  * @param {T} fn
- */
-export function batch(fn) {
-    /** @type {Parameters<T>[]} */
-    const currentBatch = [];
-
-    /** @type {T} */
-    function batched(...args) {
-        currentBatch.push(args);
-        throttledFlush();
-    }
-
-    function flush() {
-        for (const args of currentBatch) {
-            fn(...args);
-        }
-        currentBatch.length = 0;
-    }
-
-    const throttledFlush = throttle(flush);
-
-    return [batched, flush];
-}
-
-/**
- * @template {(...args: any[]) => any} T
- * @param {T} fn
  * @param {number} delay
  * @returns {T}
  */
@@ -852,37 +801,11 @@ export function deepCopy(value) {
 /**
  * @param {unknown} a
  * @param {unknown} b
- * @param {DeepEqualOptions} [options]
+ * @param {typeof T_DEEP_EQUAL_OPTIONS} [options]
  * @returns {boolean}
  */
 export function deepEqual(a, b, options) {
     return _deepEqual(a, b, !!options?.ignoreOrder, !!options?.partial, makeObjectCache());
-}
-
-/**
- * @param {any[]} args
- * @param {...(ArgumentType | ArgumentType[])} argumentsDefs
- */
-export function ensureArguments(args, ...argumentsDefs) {
-    if (args.length > argumentsDefs.length) {
-        throw new HootError(
-            `expected a maximum of ${argumentsDefs.length} arguments and got ${args.length}`
-        );
-    }
-    for (let i = 0; i < argumentsDefs.length; i++) {
-        const value = args[i];
-        const acceptedType = argumentsDefs[i];
-        const types = isIterable(acceptedType) ? [...acceptedType] : [acceptedType];
-        if (!types.some((type) => isOfType(value, type))) {
-            const strTypes = types.map(formatHumanReadable);
-            const last = strTypes.pop();
-            throw new TypeError(
-                `expected ${ordinal(i + 1)} argument to be of type ${[strTypes.join(", "), last]
-                    .filter(Boolean)
-                    .join(" or ")}, got ${formatHumanReadable(value)}`
-            );
-        }
-    }
 }
 
 /**
@@ -918,11 +841,27 @@ export function ensureError(value) {
 }
 
 /**
+ * @template T
+ * @template {keyof T} K
+ * @param {T} object
+ * @param {K} method
+ * @returns {T[K]}
+ */
+export function exposeMethod(object, method) {
+    return object[method].bind(object);
+}
+
+/**
  * @param {unknown} value
  * @returns {string}
  */
 export function formatHumanReadable(value) {
-    return _formatHumanReadable(value, 0, makeObjectCache());
+    const cache = makeObjectCache();
+    try {
+        return _formatHumanReadable(value, 0, cache);
+    } catch {
+        return `<cannot display ${getConstructor(value).name || "unknown object"}>`;
+    }
 }
 
 /**
@@ -930,7 +869,12 @@ export function formatHumanReadable(value) {
  * @returns {string}
  */
 export function formatTechnical(value) {
-    return _formatTechnical(value, 0, false, makeObjectCache());
+    const cache = makeObjectCache();
+    try {
+        return _formatTechnical(value, 0, false, cache);
+    } catch {
+        return `<cannot display ${getConstructor(value).name || "unknown object"}>`;
+    }
 }
 
 /**
@@ -972,6 +916,20 @@ export function formatTime(value, unit) {
 }
 
 /**
+ *
+ * @param {string} message
+ * @param {import("@odoo/owl").ValidationIssue[]} issues
+ * @returns
+ */
+export function formatValidationIssues(message, issues) {
+    const formatted = [message];
+    for (const issue of issues) {
+        formatted.push(` - ${issue.message} (received: ${formatHumanReadable(issue.received)})`);
+    }
+    return formatted.join("\n");
+}
+
+/**
  * Based on Java's String.hashCode, a simple but not rigorously collision resistant
  * hashing function.
  *
@@ -992,6 +950,14 @@ export function generateHash(...strings) {
 }
 
 /**
+ * Generates a random 16-digit number.
+ * This function uses the native (unpatched) {@link Math.random} method.
+ */
+export function generateSeed() {
+    return $floor($random() * 1e16);
+}
+
+/**
  * Returns the constructor of the given value, and if it is "Object": tries to
  * infer the actual constructor name from the string representation of the object.
  *
@@ -1001,11 +967,16 @@ export function generateHash(...strings) {
  * @param {unknown} value
  */
 export function getConstructor(value) {
-    const { constructor } = value;
+    let constructor;
+    try {
+        constructor = value.constructor;
+    } catch {
+        return EMPTY_CONSTRUCTOR;
+    }
     if (constructor !== Object) {
         return constructor || EMPTY_CONSTRUCTOR;
     }
-    const str = value.toString();
+    const str = safeToString(value);
     const match = str.match(R_OBJECT);
     if (!match || match[1] === "Object") {
         return constructor;
@@ -1175,7 +1146,7 @@ export function isOfType(value, type) {
         case "null":
         case null:
         case undefined:
-            return value === null || value === undefined;
+            return isNil(value);
         case "any":
             return true;
         case "date":
@@ -1193,20 +1164,6 @@ export function isOfType(value, type) {
         default:
             return typeof value === type;
     }
-}
-
-/**
- * @param {unknown} value
- */
-export function isSafe(value) {
-    if (value && typeof value.valueOf === "function") {
-        try {
-            value.valueOf();
-        } catch {
-            return false;
-        }
-    }
-    return true;
 }
 
 /**
@@ -1309,38 +1266,10 @@ export function makeLabelIcon(className) {
 }
 
 /**
- * @template {keyof Runner} T
- * @param {T} name
- * @returns {Runner[T]}
- */
-export function makeRuntimeHook(name) {
-    return {
-        [name](...callbacks) {
-            const runner = getRunner();
-            if (runner.dry) {
-                return;
-            }
-            let valid = Boolean(runner.suiteStack.length);
-            const last = callbacks.at(-1);
-            if (last && typeof last === "object") {
-                callbacks.pop();
-                valid ||= Boolean(last.global);
-            }
-            if (!valid) {
-                throw new HootError(`cannot call "${name}" callback outside of a suite`, {
-                    level: "critical",
-                });
-            }
-            return runner[name](...callbacks);
-        },
-    }[name];
-}
-
-/**
  * Returns whether one of the given `matchers` matches the given `value`.
  *
  * @param {unknown} value
- * @param {...Matcher} matchers
+ * @param {...LooseMatcherType} matchers
  * @returns {boolean}
  */
 export function match(value, ...matchers) {
@@ -1578,13 +1507,16 @@ export function toExplicitString(value) {
 }
 
 /**
- * @param {{ el?: HTMLElement }} ref
+ * @template {HTMLElement} T
+ * @param {typeof t.ref<T>} ref
  */
 export function useAutofocus(ref) {
-    /**
-     * @param {HTMLElement} el
-     */
-    function autofocus(el) {
+    let displayed = new Set();
+    useEffect(function autofocus() {
+        const el = ref();
+        if (!el) {
+            return;
+        }
         const nextDisplayed = new Set();
         for (const element of el.querySelectorAll("[autofocus]")) {
             if (!displayed.has(element)) {
@@ -1597,10 +1529,7 @@ export function useAutofocus(ref) {
             nextDisplayed.add(element);
         }
         displayed = nextDisplayed;
-    }
-
-    let displayed = new Set();
-    useEffect(autofocus, () => [ref.el]);
+    });
 }
 
 /**
@@ -1608,9 +1537,8 @@ export function useAutofocus(ref) {
  * @param {(ev: KeyboardEvent) => any} callback
  */
 export function useHootKey(keyStroke, callback) {
-    const component = useComponent();
     /** @type {KeyboardEventInit} */
-    const params = { callback: callback.bind(component) };
+    const params = { callback };
     for (const key of keyStroke) {
         switch (key) {
             case "Alt": {
@@ -1640,7 +1568,18 @@ export function useHootKey(keyStroke, callback) {
 
 /** @type {EventTarget["addEventListener"]} */
 export function useWindowListener(type, callback, options) {
-    return useExternalListener(windowTarget, type, (ev) => ev.isTrusted && callback(ev), options);
+    return useListener(windowTarget, type, (ev) => ev.isTrusted && callback(ev), options);
+}
+
+/**
+ * @param {unknown} [seed]
+ */
+export function validateSeed(seed) {
+    if (isNil(seed)) {
+        return generateSeed();
+    }
+    const nSeed = $parseFloat(seed);
+    return $isNaN(nSeed) ? stringToNumber(nSeed) : nSeed;
 }
 
 /**
@@ -1671,7 +1610,7 @@ export class Callbacks {
      * @param {boolean} [once]
      */
     add(type, callback, once) {
-        if (isInstanceOf(callback, Promise)) {
+        if (isPromise(callback)) {
             const promiseValue = callback;
             callback = function waitForPromise() {
                 return Promise.resolve(promiseValue).then(resolve);
@@ -2027,40 +1966,68 @@ export class MockEventTarget extends EventTarget {
     }
 }
 
+export class TestReporting {
+    assertions = 0;
+    duration = 0;
+    failed = 0;
+    passed = 0;
+    skipped = 0;
+    suites = 0;
+    tests = 0;
+    todo = 0;
+
+    /**
+     * @param {TestReporting} [parent]
+     */
+    constructor(parent) {
+        this.parent = parent || null;
+    }
+
+    /**
+     * @param {Partial<TestReporting>} values
+     */
+    add(values) {
+        for (const [key, value] of $entries(values)) {
+            this[key] += value;
+        }
+        this.parent?.add(values);
+    }
+}
+
 export const CASE_EVENT_TYPES = {
     assertion: {
         value: 0b1,
-        icon: "fa-check",
+        icon: "check",
         color: "emerald",
     },
     error: {
         value: 0b10,
-        icon: "fa-exclamation",
+        icon: "priority_high",
         color: "rose",
     },
     interaction: {
         value: 0b100,
-        icon: "fa-bolt",
+        icon: "flash_on",
         color: "purple",
     },
     query: {
         value: 0b1000,
-        icon: "fa-search text-sm",
+        icon: "search",
         color: "amber",
     },
     server: {
         value: 0b10000,
-        icon: "fa-globe",
+        icon: "public",
         color: "lime",
     },
     step: {
         value: 0b100000,
-        icon: "fa-arrow-right text-sm",
+        icon: "arrow_forward",
         color: "orange",
     },
     time: {
         value: 0b1000000,
-        icon: "fa fa-hourglass text-sm",
+        icon: "hourglass_empty",
         color: "blue",
     },
 };
@@ -2076,8 +2043,10 @@ export const INCLUDE_LEVEL = {
 export const MIME_TYPE = {
     formData: "multipart/form-data",
     blob: "application/octet-stream",
+    html: "text/html",
     json: "application/json",
     text: "text/plain",
+    xml: "text/xml",
 };
 
 export const STORAGE = {

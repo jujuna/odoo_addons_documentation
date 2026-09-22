@@ -2,7 +2,6 @@
 
 from . import documents_redirect
 from . import documents_document
-from . import documents_tag
 from . import hr_employee
 from . import hr_employee_public
 from . import hr_version

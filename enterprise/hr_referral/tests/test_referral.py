@@ -2,9 +2,12 @@
 import json
 
 from odoo.exceptions import UserError
+from odoo.tests import tagged
+
 from odoo.addons.hr_referral.tests.common import TestHrReferralBase
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHrReferral(TestHrReferralBase):
 
     def test_referral_share_is_new(self):
@@ -67,8 +70,7 @@ class TestHrReferral(TestHrReferralBase):
             'partner_name': 'Technical worker',
             'company_id': self.company_1.id,
             'job_id': self.job_dev.id,
-            'source_id': self.richard_user.utm_source_id.id,
-            'ref_user_id': self.richard_user.id,
+            'utm_reference': f'{self.richard_user._name},{self.richard_user.id}',
         })
         points_richard_c1 = self.env['hr.referral.points'].search([('ref_user_id', '=', self.richard_user.id), ('company_id', '=', self.company_1.id)])
         points_richard_c2 = self.env['hr.referral.points'].search([('ref_user_id', '=', self.richard_user.id), ('company_id', '=', self.company_2.id)])

@@ -1,14 +1,15 @@
 import { EsgGraphDashboard } from "@esg/components/esg_dashboard/esg_graph_dashboard/esg_graph_dashboard";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 
 export class EsgCarbonAnalyticsBox extends Component {
     static template = "esg.CarbonAnalyticsBox";
     static components = { EsgGraphDashboard };
-    static props = {
-        data: Object,
-    };
+
+    props = useProps({
+        data: t.object(),
+    });
 
     setup() {
         this.actionService = useService("action");
@@ -32,7 +33,7 @@ export class EsgCarbonAnalyticsBox extends Component {
             name: _t("Emissions to define"),
             type: "ir.actions.act_window",
             res_model: "esg.carbon.emission.report",
-            views: [[false, "list"]],
+            views: [[false, "list"], [false, "form"]],
             context: {
                 search_default_missing_factor_emissions: true,
             },

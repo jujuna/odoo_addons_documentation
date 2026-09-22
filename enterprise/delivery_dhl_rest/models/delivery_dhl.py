@@ -1,10 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import base64
-from markupsafe import Markup
 import json
+from datetime import timedelta, UTC
 from json import JSONDecodeError
-import pytz
-from datetime import timedelta
+
+from markupsafe import Markup
 
 from odoo import fields, models, _
 from odoo.exceptions import UserError
@@ -23,6 +23,19 @@ Example of a valid value: ```
 With the above example, the description of each package will be updated.
 For more information, please refer to the DHL API documentation: https://developer.dhl.com/api-reference/dhl-express-mydhl-api.
 """
+
+LABEL_FORMAT_MAPPING = {
+    '8X4_A4_PDF': 'ECOM26_84_A4_001',
+    '8X4_thermal': 'ECOM26_84_001',
+    '8X4_A4_TC_PDF': 'ECOM_TC_A4',
+    '6X4_thermal': 'ECOM26_A6_002',
+    '6X4_A4_PDF': 'ECOM26_A6_002',
+    '8X4_CI_PDF': 'ECOM26_84CI_001',
+    '8X4_CI_thermal': 'ECOM26_84CI_001',
+    '8X4_RU_A4_PDF': 'ECOM_A4_RU_002',
+    '6X4_PDF': 'ECOM26_A6_002',
+    '8X4_PDF': 'ECOM26_84_001',
+}
 
 
 class ProviderDHL(models.Model):
@@ -147,7 +160,7 @@ class ProviderDHL(models.Model):
         product_lines = move_lines.filtered(lambda line: line.product_id.type in ['product', 'consu'])
         for product, lines in groupby(product_lines, lambda x: x.product_id):
             unit_quantity = sum(
-                line.product_uom_id._compute_quantity(
+                line.uom_id._compute_quantity(
                     line.quantity,
                     product.uom_id)
                 for line in lines)
@@ -218,7 +231,7 @@ class ProviderDHL(models.Model):
         return packages
 
     def _convert_to_utc_string(self, datetime_object):
-        return datetime_object.astimezone(tz=pytz.utc).strftime('%Y-%m-%dT%H:%M:%S GMT+00:00')
+        return datetime_object.astimezone(tz=UTC).strftime('%Y-%m-%dT%H:%M:%S GMT+00:00')
 
     def _get_dhl_label_format(self):
         match self.dhl_label_image_format:
@@ -268,9 +281,11 @@ class ProviderDHL(models.Model):
         if self.dhl_dutiable:
             rating_request['monetaryAmount'] = srm._get_dutiable_vals(total_value, currency_id.name)
         rating_request['unitOfMeasurement'] = self.dhl_unit_system
-        if planned_date <= fields.Datetime.now():
-            raise UserError(_("The planned date for the shipment must be in the future."))
+        if not planned_date or planned_date <= fields.Datetime.now():
+            # DHL requires a planned date in the future => +1 hr to now
+            planned_date = fields.Datetime.now() + timedelta(hours=1)
         rating_request['plannedShippingDateAndTime'] = self._convert_to_utc_string(planned_date)
+        rating_request['nextBusinessDay'] = True
         rating_request['accounts'] = srm._get_billing_vals(account_number, "shipper")
         self._dhl_add_extra_data_to_request(rating_request, 'rate')
         rating_request['productsAndServices'] = [{
@@ -303,7 +318,7 @@ class ProviderDHL(models.Model):
                 price = float(shipping_charge)
             else:
                 quote_currency = self.env['res.currency'].search([('name', '=', shipping_currency)], limit=1)
-                price = quote_currency._convert(float(shipping_charge), order_currency, (order or picking).company_id, order.date_order if order else fields.Date.today())
+                price = quote_currency._convert(float(shipping_charge), order_currency, (order or picking).company_id, order and order.date_order)
             if self.supports_shipping_insurance and self.shipping_insurance:
                 for product in products:
                     services = []
@@ -335,10 +350,11 @@ class ProviderDHL(models.Model):
             srm = DHLProvider(self)
             account_number = self.sudo().dhl_account_number
             planned_date = picking.scheduled_date
-            if planned_date <= fields.Datetime.now():
-                raise UserError(_("The planned date for the shipment must be in the future."))
+            if not planned_date or planned_date <= fields.Datetime.now():
+                # DHL requires a planned date in the future => +1 hr to now
+                planned_date = fields.Datetime.now() + timedelta(hours=1)
             shipment_request['plannedShippingDateAndTime'] = self._convert_to_utc_string(planned_date)
-            shipment_request['pickup'] = {'isRequested': True}
+            shipment_request['pickup'] = {'isRequested': False}
             shipment_request['accounts'] = srm._get_billing_vals(account_number, "shipper")
             shipment_request['customerDetails'] = {}
             shipment_request['customerDetails']['receiverDetails'] = srm._get_consignee_vals(picking.partner_id)
@@ -367,7 +383,8 @@ class ProviderDHL(models.Model):
             }
             shipment_request['outputImageProperties']['imageOptions'] = [{
                 'typeCode': 'label',
-                'templateName': self.dhl_label_template,
+                'templateName': LABEL_FORMAT_MAPPING.get(self.dhl_label_template, 'ECOM26_84_001'),
+                'fitLabelsToA4': self.dhl_label_image_format == 'PDF' and 'A4' in self.dhl_label_template,
             }]
             if self.supports_shipping_insurance and self.shipping_insurance:
                 shipment_request['valueAddedServices'] = [srm._get_insurance_vals(self.shipping_insurance, total_value, currency_name)]
@@ -411,8 +428,9 @@ class ProviderDHL(models.Model):
         srm = DHLProvider(self)
         account_number = self.sudo().dhl_account_number
         planned_date = picking.scheduled_date
-        if planned_date <= fields.Datetime.now():
-            raise UserError(_("The planned date for the shipment must be in the future."))
+        if not planned_date or planned_date <= fields.Datetime.now():
+            # DHL requires a planned date in the future => +1 hr to now
+            planned_date = fields.Datetime.now() + timedelta(hours=1)
         shipment_request['plannedShippingDateAndTime'] = self._convert_to_utc_string(planned_date)
         shipment_request['pickup'] = {'isRequested': False}
         shipment_request['accounts'] = srm._get_billing_vals(account_number, "shipper")
@@ -424,7 +442,7 @@ class ProviderDHL(models.Model):
         shipment_request['content'] = {
             'description': picking.sale_id.name if picking.sale_id else picking.name,
             'unitOfMeasurement': self.dhl_unit_system,
-            'incoterm': picking.sale_id.incoterm or self.env.company.incoterm_id.code or 'EXW',
+            'incoterm': picking.sale_id.incoterm.code or self.env.company.incoterm_id.code or 'EXW',
             'isCustomsDeclarable': self.dhl_dutiable,
             'packages': srm._get_shipment_vals(picking)
         }

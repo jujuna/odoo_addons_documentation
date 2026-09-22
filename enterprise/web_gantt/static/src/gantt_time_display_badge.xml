@@ -3,11 +3,11 @@
 
     <t t-name="web_gantt.GanttTimeDisplayBadge">
         <span
-            t-if="props.reactive.position"
+            t-if="this.props.reactive.position"
             class="o_gantt_pill_time_display_badge badge rounded-pill bg-view position-fixed"
-            t-attf-class="{{props.reactive.class}}"
-            t-att-style="positionStyle"
-            t-esc="props.reactive.text"
+            t-attf-class="{{this.props.reactive.class}}"
+            t-att-style="this.positionStyle"
+            t-out="this.props.reactive.text"
         />
     </t>
 

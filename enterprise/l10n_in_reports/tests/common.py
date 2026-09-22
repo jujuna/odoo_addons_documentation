@@ -7,6 +7,8 @@ from odoo.tools import file_open
 
 class L10nInTestAccountReportsCommon(TestAccountReportsCommon, L10nInTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

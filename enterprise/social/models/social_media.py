@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
+from odoo import api, fields, models
 from odoo.http import request
 from odoo.tools import hmac
 
@@ -26,7 +26,8 @@ class SocialMedia(models.Model):
     media_type = fields.Selection([], readonly=True,
         help="Used to make comparisons when we need to restrict some features to a specific media ('facebook', 'x', ...).")
     csrf_token = fields.Char('CSRF Token', compute='_compute_csrf_token',
-        help="This token can be used to verify that an incoming request from a social provider has not been forged.")
+        help="This token can be used to verify that an incoming request from a social provider has not been forged.",
+        groups=fields.NO_ACCESS)
     account_ids = fields.One2many('social.account', 'media_id', string="Social Accounts")
     accounts_count = fields.Integer('# Accounts', compute='_compute_accounts_count')
     has_streams = fields.Boolean('Streams Enabled', default=True, readonly=True, required=True,
@@ -36,6 +37,7 @@ class SocialMedia(models.Model):
     stream_type_ids = fields.One2many('social.stream.type', 'media_id', string="Stream Types")
     max_post_length = fields.Integer('Max Post Length',
         help="Set a maximum number of characters can be posted in post. 0 for no limit.")
+    has_livechat = fields.Boolean("Has Livechat")
 
     def _compute_accounts_count(self):
         for media in self:
@@ -45,14 +47,49 @@ class SocialMedia(models.Model):
         for media in self:
             media.csrf_token = hmac(self.env(su=True), 'social_social-account-csrf-token', media.id)
 
+    def _get_csrf_token(self):
+        self.ensure_one()
+        self.env['social.account'].check_access("create")
+        return self.sudo().csrf_token
+
     def action_add_account(self, company_id=None):
         # Set the company of the futures new accounts (see <social.account>::_get_default_company)
         if company_id is None:
             company_id = self.env.company.id
         request.session['social_company_id'] = company_id
-        return self._action_add_account()
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'social.ConnectAccount',
+            'params': {
+                'url': self._action_add_account(),
+            }
+        }
 
     def _action_add_account(self):
         """ Every social module should override this method.
-        Usually redirects to the social media links that allows accounts to be read by our app. """
+
+        Return the URL to which the user should be redirected
+        for the authentication process."""
         pass
+
+    # MISC / TOOLING
+
+    def _get_utm_source(self):
+        """ Not entirely modular, but it avoids a lot of tiny overrides. """
+        self.ensure_one()
+
+        utm_by_media = {
+            'facebook': self.env['utm.mixin']._utm_ref('utm.utm_source_facebook'),
+            'instagram': self.env['utm.mixin']._utm_ref('utm.utm_source_instagram'),
+            'linkedin': self.env['utm.mixin']._utm_ref('utm.utm_source_linkedin'),
+            'twitter': self.env['utm.mixin']._utm_ref('utm.utm_source_twitter'),
+            'youtube': self.env['utm.mixin']._utm_ref('utm.utm_source_youtube'),
+        }
+
+        return utm_by_media.get(self.media_type, self.env['utm.source'])
+
+    @api.model
+    def _get_webhook_shared_secret(self):
+        """Shared secret between the database and IAP, derived from the database secret."""
+        return hmac(self.env(su=True), 'social-webhook_shared_secret', None)

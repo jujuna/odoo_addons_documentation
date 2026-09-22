@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 from markupsafe import Markup
 
 from odoo.tests.common import HttpCase, tagged
@@ -42,7 +40,7 @@ class TestHelpdeskKnowledgeCrossModuleFeatures(HttpCase):
             })],
         })
         cls.env['ir.attachment'].create({
-            'datas': base64.b64encode(b'Content'),
+            'raw': b'Content',
             'name': 'Onboarding',
             'mimetype': 'text/plain',
             'res_id': article.id,

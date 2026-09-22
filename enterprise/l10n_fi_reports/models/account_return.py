@@ -13,7 +13,7 @@ class AccountReturn(models.Model):
 
         return super()._evaluate_deadline(company, return_type, return_type_external_id, date_from, date_to)
 
-    def action_submit(self):
+    def _prepare_submission(self):
         # EXTENDS account_reports
         if self.type_external_id == 'l10n_fi_reports.fi_ec_sales_list_return_type':
             return self.env['l10n_fi_reports.ec.sales.list.submission.wizard']._open_submission_wizard(self)
@@ -21,4 +21,4 @@ class AccountReturn(models.Model):
         if self.type_external_id == 'l10n_fi_reports.fi_tax_return_type':
             return self.env['l10n_fi_reports.tax.report.submission.wizard']._open_submission_wizard(self)
 
-        return super().action_submit()
+        return super()._prepare_submission()

@@ -12,9 +12,8 @@ import {
 } from "@web/../tests/web_test_helpers";
 
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { click, queryOne, press } from "@odoo/hoot-dom";
+import { click, queryOne } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
-import { MainComponentsContainer } from "@web/core/main_components_container";
 
 class Dummy extends models.Model {
     _name = "dummy";
@@ -79,7 +78,7 @@ test("AI Prompt - Editable", async () => {
     await insertText(htmlEditor, " bloups");
     await click(document.body);
     expect(updatePromptVal).toBe(
-        '<p>Hello <span data-ai-field="name" data-oe-protected="true">World</span> bloups</p>',
+        '<p>Hello <span data-ai-field="name" data-oe-protected="true">World</span> bloups</p>'
     );
 });
 
@@ -106,7 +105,7 @@ test("AI Prompt - Field selector without template editor group", async () => {
     await animationFrame();
     await click(document.body);
     expect(updatePromptVal).toBe(
-        '<p>Hello <span data-ai-field="display_name" data-oe-protected="true">Display name</span>&nbsp;</p>',
+        '<p>Hello <span data-ai-field="display_name" data-oe-protected="true">Display name</span>&nbsp;</p>'
     );
     // clicking on the field should reopen the field selector
     await click("div.o_ai_prompt span[data-ai-field]");
@@ -131,7 +130,9 @@ test("AI Prompt - Field selector with template editor group", async () => {
     await animationFrame();
     await expect(".o_model_field_selector_popover .badge").toHaveCount(1);
     await expect(".o_model_field_selector_popover .badge").toHaveText("Created on");
-    await expect(".o_model_field_selector_popover_item_name:contains('Created on') i.fa-check").toHaveCount(1);
+    await expect(
+        ".o_model_field_selector_popover_item_name:contains('Created on') i[data-icon='check']"
+    ).toHaveCount(1);
     await click(".o_model_field_selector_popover_item_name:contains('Display name')");
     await animationFrame();
     await expect(".o_model_field_selector_popover .badge").toHaveCount(2);
@@ -166,7 +167,7 @@ test("AI prompt - Insert messages", async () => {
     await animationFrame();
     await click(document.body);
     expect(updatePromptVal).toBe(
-        '<p>Messages <span data-ai-field="message_ids" data-oe-protected="true">Messages</span>&nbsp;</p>',
+        '<p>Messages <span data-ai-field="message_ids" data-oe-protected="true">Messages</span>&nbsp;</p>'
     );
 });
 
@@ -219,7 +220,7 @@ test("AI Prompt - With comodel", async () => {
     await animationFrame();
     await click(document.body);
     expect(updatePromptVal).toBe(
-        '<p>Hello <span data-ai-record-id="1" data-oe-protected="true">Bob</span>, <span data-ai-record-id="2" data-oe-protected="true">Patrick</span>&nbsp;</p>',
+        '<p>Hello <span data-ai-record-id="1" data-oe-protected="true">Bob</span>, <span data-ai-record-id="2" data-oe-protected="true">Patrick</span>&nbsp;</p>'
     );
     // clicking on the record should reopen the field selector
     await click("div.o_ai_prompt span[data-ai-record-id]");
@@ -237,29 +238,4 @@ test("AI Prompt - Invalid records", async () => {
         },
     });
     expect(".o_ai_prompt").toHaveText("Hello Invalid Record");
-});
-
-test("does not call rpc on every keystroke", async () => {
-    class AI extends models.Model {
-        _name = "ai.agent";
-    }
-    defineModels([AI]);
-
-    onRpc("ai.agent", "get_ask_ai_agent", () => {
-        expect.step("get_ask_ai_agent");
-        return { id: 1, name: "ASK AI" };
-    });
-
-    await mountWithCleanup(MainComponentsContainer);
-
-    await press(["Control", "k"]);
-    await animationFrame();
-
-    await press("/");
-    await animationFrame();
-
-    await press("a");
-    await animationFrame();
-
-    expect.verifySteps(["get_ask_ai_agent"]);
 });

@@ -28,35 +28,42 @@
 # Ertuğrul Güreş <ertugrulg@projetgrup.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-21 14:41+0000\n"
-"Last-Translator: Odoo Turkish Import <dyki+tr@odoo.com>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/sign/tr/"
-">\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 02:50+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/sign/"
+"tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sign
+#: model:ir.module.module,description:base.module_sign
+msgid ""
+"\n"
+"Sign and complete your documents easily. Customize your documents with text "
+"and signature fields and send them to your recipients.\n"
+"\n"
+"Let your customers follow the signature process easily.\n"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_partner__signature_count
 #: model:ir.model.fields,field_description:sign.field_res_users__signature_count
 msgid "# Signatures"
 msgstr "# İmzalar"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "#7898678"
-msgstr "#7898678"
 
 #. module: sign
 #. odoo-python
@@ -79,6 +86,18 @@ msgstr ""
 
 #. module: sign
 #. odoo-python
+#: code:addons/sign/wizard/sign_send_request.py:0
+msgid "%(request_name)s sent by %(sender_name)s"
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/mail_activity_plan_template.py:0
+msgid "%(summary)s: %(name)s"
+msgstr ""
+
+#. module: sign
+#. odoo-python
 #: code:addons/sign/models/sign_document.py:0
 msgid "%s Company"
 msgstr "%s Şirket"
@@ -94,12 +113,6 @@ msgstr "%skredi yetersiz olduğundan doküman imzalanamadı."
 #: code:addons/sign/models/sign_request.py:0
 msgid "%s has been edited and signed"
 msgstr "%s düzenlendi ve imzalandı"
-
-#. module: sign
-#. odoo-python
-#: code:addons/sign/wizard/sign_send_request.py:0
-msgid "%s has been linked to this sign request."
-msgstr "%s bu imza talebiyle ilişkilendirilmiştir."
 
 #. module: sign
 #. odoo-python
@@ -130,9 +143,23 @@ msgid "&lt;"
 msgstr "&lt;"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_item_type.py:0
+msgid ""
+"'Update Field' requires both a linked model and a linked field to be set."
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "(UTC)"
-msgstr "(UTC)"
+msgid "'s account"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
+msgid ""
+")\n"
+"                    without the requested extra-authentification step ("
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_refused
@@ -153,61 +180,24 @@ msgstr ""
 "        belgede imzanızı istedi"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "******1234"
-msgstr "******1234"
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
+msgid ""
+") due to insufficient credits.\n"
+"                    <br/><br/>\n"
+"                    The signatory was able to complete the signing "
+"operation, but was not requested to authenticate fully.\n"
+"                    <br/><br/>"
+msgstr ""
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid ""
-"-\n"
-"                                            <em>\n"
-"                                                Waiting Signature\n"
-"                                            </em>"
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
+msgid ", while connected as"
 msgstr ""
-"-\n"
-"                                           <em>\n"
-"                                                Bekleyen İmza\n"
-"                                           </em>"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid ""
-"-\n"
-"                                            <em>Cancelled</em>"
-msgstr ""
-"-\n"
-"                                           <em>İptal Edildi</em>"
 
 #. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
 msgid "- or -"
 msgstr "- or -"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "1001"
-msgstr "1001"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "192.168.1.1"
-msgstr "192.168.1.1"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "20-03-2000"
-msgstr "20-03-2000"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "2023-08-18"
-msgstr "2023-08-18"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "2023-08-18 - 12:30:45"
-msgstr "2023-08-18 - 12:30:45"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -276,85 +266,126 @@ msgid "<b>Wood Use:</b> 4 US Short Tons = 4*907.18474 = 3628.73 kg"
 msgstr "<b>Ahşap Kullanımı:</b> 4 ABD Kısa Ton = 4*907.18474 = 3628.73 kg"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
+msgid "<i class=\"oi me-1\" data-icon=\"check\"/>Fully Signed"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid "<br/>(the email access has not been sent)"
-msgstr "<br/>(e-posta gönderilmedi)"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_expired
-msgid ""
-"<i class=\"fa fa-check\"/> A fresh link has just been sent to your inbox!"
+msgid "<i class=\"oi me-1\" data-icon=\"download\"/>Download"
 msgstr ""
-"<i class=\"fa fa-check\"/> Gelen kutunuza yeni bir bağlantı gönderildi!"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "<i class=\"fa fa-check\"/> The document's integrity is valid."
-msgstr "<i class=\"fa fa-check\"/> Belgenin bütünlüğü geçerlidir."
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"<i class=\"fa fa-exclamation-circle\"/> The document's integrity could not "
-"be verified."
-msgstr ""
-"<i class=\"fa fa-exclamation-circle\"/> Belgenin bütünlüğü doğrulanamadı."
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "<i class=\"fa fa-globe\"/> View"
-msgstr "<i class=\"fa fa-globe\"/> Görünüm"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_expired
-msgid ""
-"<i class=\"fa fa-info-circle\"/> Links sent via email expire after a set "
-"delay to increase security."
-msgstr ""
-"<i class=\"fa fa-info-circle\"/> E-posta ile gönderilen bağlantılar, "
-"güvenliği artırmak için belirli bir süre sonra geçerliliğini yitirir."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_terms_conditions_setting_banner
-msgid "<i class=\"oi oi-arrow-right me-1\"/>Back to settings"
-msgstr "<i class=\"oi oi-arrow-right me-1\"/>Ayarlara dön"
+msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Back to settings"
+msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>Ayarlara dön"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
+msgid "<i class=\"oi me-1\" data-icon=\"visibility\"/>Preview"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
+msgid "<i class=\"oi me-1\" data-icon=\"visibility\"/>View"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
+msgid "<i class=\"oi oi-filled me-1\" data-icon=\"edit\"/>Sign"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
+msgid "<i class=\"oi oi-filled me-1\" data-icon=\"edit\"/>Sign Now"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.mail_activity_schedule_view_form
+msgid ""
+"<i class=\"oi oi-filled text-muted\" data-icon=\"description\" "
+"title=\"Template\"/>"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_expired
+msgid ""
+"<i class=\"oi oi-filled\" data-icon=\"info\"/> Links sent via email expire "
+"after a set delay to increase security."
+msgstr ""
+"<i class=\"oi oi-filled\" data-icon=\"info\"/> E-posta ile gönderilen "
+"bağlantılar, güvenliği artırmak için belirli bir süre sonra geçerliliğini "
+"yitirir."
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form
+msgid ""
+"<i class=\"oi text-warning\" data-icon=\"warning\" role=\"img\" aria-"
+"label=\"Warning\"/>\n"
+"                                        <em> Warning: If checked, the value "
+"filled during signing will be written back to the corresponding field using "
+"sender permissions. </em>"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_expired
+msgid ""
+"<i class=\"oi\" data-icon=\"check\"/> A fresh link has just been sent to "
+"your inbox!"
+msgstr ""
+"<i class=\"oi\" data-icon=\"check\"/> Gelen kutunuza yeni bir bağlantı "
+"gönderildi!"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"<i class=\"oi\" data-icon=\"check\"/> The document's integrity is valid."
+msgstr "<i class=\"oi\" data-icon=\"check\"/> Belgenin bütünlüğü geçerlidir."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid ""
-"<i class=\"oi oi-arrow-right\"/>\n"
+"<i class=\"oi\" data-icon=\"east\"/>\n"
 "                                            Preview"
 msgstr ""
-"<i class=\"oi oi-arrow-right\"/>\n"
+"<i class=\"oi\" data-icon=\"east\"/>\n"
 "                                            Önizleme"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
-msgid "<small><i> Cancelled </i></small>"
-msgstr "<small><i> İptal Edildi </i></small>"
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"<i class=\"oi\" data-icon=\"error\"/> The document's integrity could not be "
+"verified."
+msgstr ""
+"<i class=\"oi\" data-icon=\"error\"/> Belgenin bütünlüğü doğrulanamadı."
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
-msgid "<small><i> Waiting Signature </i></small>"
-msgstr "<small><i> Bekleyen İmza </i></small>"
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "<i class=\"oi\" data-icon=\"public\"/> View"
+msgstr "<i class=\"oi\" data-icon=\"public\"/> Görünüm"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
+msgid "<small class=\"text-end\">Status</small>"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
+msgid "<small class=\"text-muted\">Sender</small>"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
+msgid "<small class=\"text-muted\">Signers</small>"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid ""
-"<small>Email Verification: The signatory has confirmed control of their "
-"email inbox by clicking on a unique link</small>"
+"<small>SMS Verification: The signatory has confirmed their control of the "
+"phone number using a unique code sent by SMS</small>"
 msgstr ""
-"<small>E-posta Doğrulaması: İmza sahibi, kendisine özel bir bağlantıya "
-"tıklayarak e-posta gelen kutusunun kontrolünü doğrulamıştır.</small>"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid ""
-"<small>SMS: The signatory has confirmed their control of the phone number "
-"using a unique code sent by SMS</small>"
-msgstr ""
-"<small>SMS: İmza sahibi, SMS ile gönderilen benzersiz bir kod kullanarak "
-"telefon numarası üzerindeki kontrolünü onayladı</small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -380,11 +411,9 @@ msgstr ""
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid ""
-"<span class=\"fw-bold\">Cryptographic signature<i class=\"fa fa-building-o "
-"ms-1\"/></span>"
+"<span class=\"fw-bold\">Cryptographic signature<i class=\"oi oi-lg ms-1\" "
+"data-icon=\"business\"/></span>"
 msgstr ""
-"<span class=\"fw-bold\">Kriptografik imza<i class=\"fa fa-building-o ms-1\"/"
-"></span>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
@@ -392,14 +421,9 @@ msgid "<span class=\"fw-bold\">or</span>"
 msgstr "<span class=\"fw-bold\">veya</span>"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
-msgid "<span class=\"ms-1 text-nowrap\">Add certificate on each page</span>"
-msgstr "<span class=\"ms-1 text-nowrap\">Her sayfaya sertifika ekleyin</span>"
-
-#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_partner_view_form
-msgid "<span class=\"o_stat_text\">Signature Requested</span>"
-msgstr "<span class=\"o_stat_text\">İmza Talep Edildi</span>"
+msgid "<span class=\"o_stat_text\">Signature Requests</span>"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
@@ -407,27 +431,34 @@ msgid "<span class=\"o_stat_text\">Signed Document</span>"
 msgstr "<span class=\"o_stat_text\">İmzalı Belge</span>"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.template_sign_request_completed
+msgid ""
+"<span class=\"oi me-1\" data-icon=\"edit_square\"/>\n"
+"        <span>Signature Request completed</span>"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.mail_activity_schedule_view_form
+msgid "<span class=\"text-center\">or</span>"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "<span class=\"text-muted\">Not available</span>"
 msgstr "<span class=\"text-muted\">Müsait değil</span>"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
-msgid "<span class=\"text-nowrap\">Add certificate on each page</span>"
-msgstr "<span class=\"text-nowrap\">Her sayfaya sertifika ekleyin</span>"
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
+msgid ""
+"<span style=\"text-decoration: underline;\">click here</span> to cancel it."
+msgstr ""
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_role_view_form
 msgid ""
-"<span groups=\"base.group_system\">\n"
-"                                    Certify your documents using a "
-"provided .pfx or .p12 file.\n"
-"                                </span>"
+"<span> credits remaining</span>\n"
+"                                <br/>"
 msgstr ""
-"<span groups=\"base.group_system\">\n"
-"                                    Sağlanan .pfx veya .p12 dosyasını "
-"kullanarak belgelerinizi onaylayın.\n"
-"                               </span>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
@@ -446,43 +477,32 @@ msgstr "<span>Bu, Hüküm ve Koşullarınızın bir önizlemesidir.</span>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid "<strong>Creation Date:</strong>"
-msgstr "<strong>Oluşturulma Tarihi:</strong>"
+msgid "<strong>Documents:</strong>"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid "<strong>Expiry Date: </strong>"
-msgstr "<strong>Sonlanma tarihi: </strong>"
+msgid "<strong>Message:</strong>"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid "<strong>Sent by: </strong>"
-msgstr "<strong>Gönderen: </strong>"
+msgid "<strong>Validity date:</strong>"
+msgstr ""
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid "<strong>Signed on: </strong>"
-msgstr "<strong>İmzalandı: </strong>"
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
+msgid ""
+"<strong>Warning:</strong> do not forward this email to others.<br/>\n"
+"            They will gain access to this document and be able to sign or "
+"reject it on your behalf.<br/>"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_refused
 msgid ""
 "<strong>Warning</strong> do not forward this email to other people!<br/>"
 msgstr "<strong>Uyarı</strong> bu e-postayı başkalarına iletmeyin!<br/>"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
-msgid ""
-"<strong>Warning</strong> do not forward this email to other people!<br/>\n"
-"            They will be able to access this document and sign it as "
-"yourself.<br/>\n"
-"            <span>Your IP address and localization are associated to your "
-"signature to ensure traceability.</span>"
-msgstr ""
-"<strong>Uyarı</strong>Bu e-postayı başkalarına iletmeyin! <br/>\n"
-"Bu belgeye erişebilir ve sizin adınıza imzalayabilirler. <br/>\n"
-"<span>İzlenebilirliği sağlamak için IP adresiniz ve yerelleştirmeniz "
-"imzanızla ilişkilendirilir.</span>"
 
 #. module: sign
 #. odoo-javascript
@@ -495,18 +515,9 @@ msgstr ""
 "güncelleyin."
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.message_signature_link
-msgid "A document has been signed and a copy attached to"
-msgstr "Bir belge imzalanmıştır ve bir kopyası eklenmiştir"
-
-#. module: sign
-#. odoo-python
-#: code:addons/sign/models/sign_request.py:0
-msgid ""
-"A non-shared sign request's should not have any signer with an empty partner"
+#: model:ir.model.constraint,message:sign.constraint_sign_request_document_request_document_uniq
+msgid "A document can only have one working copy per sign request."
 msgstr ""
-"Paylaşılmamış bir imza talebinde, boş bir iş ortağına sahip herhangi bir "
-"imzalayıcı bulunmamalıdır"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
@@ -515,9 +526,17 @@ msgstr "Bir duşta yaklaşık 65 L su kullanılır"
 
 #. module: sign
 #. odoo-python
-#: code:addons/sign/wizard/sign_send_request.py:0
+#: code:addons/sign/models/ir_actions_server.py:0
 msgid "A signature request has been linked to this document: %s"
 msgstr "Bu belgeye bir imza talebi bağlanmıştır: %s"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_item_role.py:0
+msgid ""
+"A signature request using the role %s is already in progress, so its "
+"authentication method cannot be changed."
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -530,6 +549,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "ABCD1234"
 msgstr "ABCD1234"
+
+#. module: sign
+#: model:ir.model,name:sign.model_res_groups
+msgid "Access Groups"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -549,7 +573,7 @@ msgid "Access warning"
 msgstr "Erişim uyarısı"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.portal_my_home_sign
+#: model:portal.entry,description:sign.portal_client_sign
 msgid "Access your signed documents"
 msgstr "İmzalı belgelerinize erişin"
 
@@ -575,6 +599,12 @@ msgid "Action Performed"
 msgstr "Gerçekleştirilen Eylem"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/cog_menu/sign_template_custom_cog_menu.xml:0
+msgid "Actions"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,help:sign.field_mail_activity_type__category
 msgid ""
 "Actions may trigger specific behavior like opening calendar view or "
@@ -597,6 +627,11 @@ msgid "Activities"
 msgstr "Aktiviteler"
 
 #. module: sign
+#: model:ir.model,name:sign.model_mail_activity
+msgid "Activity"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Etkinlik İstisna Dekorasyonu"
@@ -608,12 +643,18 @@ msgid "Activity Logs"
 msgstr "Etkinlik Kayıtları"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_request__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__activity_state
 msgid "Activity State"
 msgstr "Aktivite Durumu"
 
 #. module: sign
 #: model:ir.model,name:sign.model_mail_activity_type
+#: model:ir.model.fields,field_description:sign.field_sign_send_request__activity_type_id
 msgid "Activity Type"
 msgstr "Aktivite Türü"
 
@@ -628,11 +669,21 @@ msgid "Activity logs linked to this request"
 msgstr "Bu istekle bağlantılı etkinlik kayıtları"
 
 #. module: sign
+#: model:ir.model,name:sign.model_mail_activity_plan_template
+msgid "Activity plan template"
+msgstr ""
+
+#. module: sign
+#: model:ir.model,name:sign.model_mail_activity_schedule
+msgid "Activity schedule plan Wizard"
+msgstr ""
+
+#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
 #: code:addons/sign/static/src/views/common.xml:0
 msgid "Add"
-msgstr "Ekle"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -642,9 +693,46 @@ msgstr "Eklenti Ekle"
 
 #. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_documents_panel.xml:0
+msgid "Add Document"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_fields_panel.xml:0
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar_role_items.js:0
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar_role_items.xml:0
+msgid "Add Field"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
 #: code:addons/sign/static/src/backend_components/editable_pdf_iframe_mixin.js:0
 msgid "Add Initials"
 msgstr "Başlangıç Ekle"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_signers_panel.xml:0
+msgid "Add Signer"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.view_certificate_wizard_form
+msgid "Add Signing Certificate"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_fields_panel.xml:0
+msgid "Add a new custom field"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_fields_panel.xml:0
+msgid "Add a signer to place fields."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
@@ -652,9 +740,26 @@ msgid "Add document tags here"
 msgstr "Belge etiketlerini buraya ekleyin"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
+msgid "Add signer"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid "Add terms & conditions to the signature request email"
 msgstr "İmza talebi e-postasına hüküm ve koşulları ekleyin"
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_sign_item_type__authorized_group_ids
+msgid "Additional groups that can use this field while editing templates."
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_sign_item_type__authorized_users
+msgid ""
+"Additional users that can use this custom field while editing templates."
+msgstr ""
 
 #. module: sign
 #: model:res.groups,name:sign.group_sign_manager
@@ -676,6 +781,7 @@ msgstr "İmzadan Sonra"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_item_custom_popover.xml:0
 #: model:ir.model.fields,field_description:sign.field_sign_item__alignment
+#: model:ir.model.fields,field_description:sign.field_sign_item_type__alignment
 msgid "Alignment"
 msgstr "Hizalanma"
 
@@ -695,19 +801,19 @@ msgstr "Tüm Dökümanlar"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_documents_dropdown.xml:0
 msgid "All Documents (zip)"
-msgstr "Tüm Belgeler (zip)"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_cog_menu_form
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
+msgid "All apps"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_status_indicator/sign_status_indicator.xml:0
-msgid "All changes saved"
-msgstr "Tüm değişiklikler kaydedildi"
-
-#. module: sign
-#. odoo-python
-#: code:addons/sign/models/sign_request_item.py:0
-msgid "All signers must have valid email addresses"
-msgstr "Tüm imzalayanların geçerli e-posta adresleri olmalıdır"
+#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
+msgid "All set! We'll let you know when everyone has signed."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
@@ -728,13 +834,28 @@ msgid "An average computer will consume 750 Wh"
 msgstr "Ortalama bir bilgisayar 750 Wh tüketir"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_document.py:0
+msgid ""
+"Another signature is currently in progress, or this document has already "
+"been fully signed."
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Antwrep"
 msgstr "Antwrep"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form_custom_field
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
 msgid "Anyone"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__applied_item_ids
+msgid "Applied Signers"
 msgstr ""
 
 #. module: sign
@@ -759,8 +880,16 @@ msgid "Are you sure you want to cancel this sign request?"
 msgstr "Bu imza talebini iptal etmek istediğinizden emin misiniz?"
 
 #. module: sign
+#: model:iap.service,description:sign.iap_service_sign_qes
+msgid ""
+"Ask document signatories in Odoo Sign to sign with a qualified electronic "
+"signature of their own, produced by a trust service provider. \n"
+"                A qualified signature carries the legal weight of a "
+"handwritten one across the European Union."
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_role__assign_to
-#: model_terms:ir.ui.view,arch_db:sign.sign_item_role_view_form
 msgid "Assign to"
 msgstr "Atanan"
 
@@ -803,7 +932,9 @@ msgid "Authenticate by SMS"
 msgstr "SMS ile Kimlik Doğrulama"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_item_role_view_form
+#: model:ir.model.fields,field_description:sign.field_sign_item_role__auth_method
+#: model:ir.model.fields,field_description:sign.field_sign_request_item__auth_method
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
 msgid "Authentication"
 msgstr "Kimlik Doğrulama"
 
@@ -819,6 +950,7 @@ msgid "Authorized Groups:"
 msgstr "Yetkili Gruplar:"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_item_type__authorized_users
 #: model:ir.model.fields,field_description:sign.field_sign_template__authorized_ids
 msgid "Authorized Users"
 msgstr "Yetkili Kullanıcılar"
@@ -828,6 +960,19 @@ msgstr "Yetkili Kullanıcılar"
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_access_rights.xml:0
 msgid "Authorized Users:"
 msgstr "Yetkili Kullanıcılar:"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid ""
+"Auto-update blocked: request sender lacks permission to update %(record)s"
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Auto-updated fields on %(record)s"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form
@@ -840,14 +985,53 @@ msgid "Autocomplete values and download signed document"
 msgstr "Otomatik tamamlama değerleri ve imzalanmış belgeyi indir"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_item_role__ir_actions_server_id
+msgid "Automated Action"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_item_role__sign_action_partner_id
+msgid "Automated Action Partner"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_sign_item_role__ir_actions_server_id
+msgid "Automated action that configures this role when used in server actions."
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__available_template_ids
 msgid "Available Template"
 msgstr "Mevcut Şablon"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_cog_menu_form
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
+msgid "Available in"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid "Available in supported countries"
 msgstr "Desteklenen ülkelerde mevcuttur"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.xml:0
+#: model:ir.model.fields.selection,name:sign.selection__sign_request_document__state__awaiting_signature
+msgid "Awaiting Signature"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
+msgid "Awaiting Signatures"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/core/web/activity_patch.js:0
+msgid "Awaiting signature"
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -888,11 +1072,15 @@ msgid ""
 "electronic representation of my hand-written signature/initials for all "
 "purposes when it is used on documents, including legally binding contracts."
 msgstr ""
-"İmzalayarak, seçilen imza/baş harflerin, belgelerde kullanıldığında, yasal "
-"olarak bağlayıcı sözleşmeler de dahil olmak üzere, el yazımla attığım imza/"
-"baş harflerin geçerli elektronik bir temsili olacağını kabul ediyorum."
 
 #. module: sign
+#: model:ir.model.fields,help:sign.field_sign_request_document__frozen_file
+msgid ""
+"Bytes an external signature is being computed over, kept until it comes back."
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_template__cc_partner_ids
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "CC"
 msgstr "CC"
@@ -903,15 +1091,19 @@ msgid "CC Message"
 msgstr "CC Mesajı"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_item_view_tree
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
+msgid "Can Delegate"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_role_view_form
 msgid "Can delegate"
 msgstr "Delege edebilir"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/dialogs/public_signer_dialog.xml:0
-#: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
-#: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
+#: code:addons/sign/static/src/dialogs/delegate_sign_dialog.xml:0
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__cancel
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -930,15 +1122,22 @@ msgid "Canceled"
 msgstr "İptal Edildi"
 
 #. module: sign
+#. odoo-javascript
 #. odoo-python
 #: code:addons/sign/controllers/portal.py:0
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.xml:0
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__request_state__canceled
 #: model:ir.model.fields.selection,name:sign.selection__sign_request__state__canceled
 #: model:ir.model.fields.selection,name:sign.selection__sign_request_item__state__canceled
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
-#: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
 msgid "Cancelled"
 msgstr "İptal Edildi"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/res_users.py:0
+msgid "Cannot read the signature of other users"
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -955,6 +1154,7 @@ msgstr "Karbon Emisyonları"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_item_custom_popover.js:0
+#: model:ir.model.fields.selection,name:sign.selection__sign_item_type__alignment__center
 msgid "Center"
 msgstr "Merkez"
 
@@ -962,12 +1162,32 @@ msgstr "Merkez"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_documents_dropdown.xml:0
 msgid "Certificate"
-msgstr "Sertifika"
+msgstr ""
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.doc_sign
-msgid "Certificate <i class=\"fa fa-download\"/>"
-msgstr "Sertifika <i class=\"fa fa-download\"/>"
+#: model_terms:ir.ui.view,arch_db:sign.sign_options_menu_items
+msgid "Certificate <i class=\"oi\" data-icon=\"download\"/>"
+msgstr "Sertifika <i class=\"oi\" data-icon=\"download\"/>"
+
+#. module: sign
+#: model:ir.model,name:sign.model_certificate_wizard
+msgid "Certificate Creation Wizard"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__certificate_data
+msgid "Certificate File"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__certificate_name
+msgid "Certificate Name"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__pkcs12_password
+msgid "Certificate Password"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__certificate_reference
@@ -987,10 +1207,20 @@ msgid "Certificate of completion - %s.pdf"
 msgstr "Tamamlama sertifikası - %s.pdf"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
+msgid "Certify your documents using a provided .pfx or .p12 file."
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_role__change_authorized
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__change_authorized
 msgid "Change Authorized"
 msgstr "Yetkili Değişikliği"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
+msgid "Channel"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__checkbox
@@ -1006,15 +1236,32 @@ msgstr ""
 "kontrol edin"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.mail_activity_schedule_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Choose a template"
 msgstr "Bir şablon seçin"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.ir_actions_server_view_form_sign
+msgid "Choose a template..."
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar_role_items.xml:0
+msgid "Click to add a new custom field"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/components/sign_request/sign_item_navigator.js:0
 msgid "Click to start"
 msgstr "Başlamak için tıklayın"
+
+#. module: sign
+#: model:sign.item.role,name:sign.sign_item_role_demo_4
+msgid "Client (Real Estate Demo)"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -1057,16 +1304,7 @@ msgid "Communication"
 msgstr "İletişim"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid "Communication history"
-msgstr "İletişim Geçmişi"
-
-#. module: sign
 #: model:ir.model,name:sign.model_res_company
-msgid "Companies"
-msgstr "Şirketler"
-
-#. module: sign
 #: model:sign.item.type,name:sign.sign_item_type_company
 #: model:sign.item.type,placeholder:sign.sign_item_type_company
 msgid "Company"
@@ -1090,10 +1328,9 @@ msgid "Company used for communication"
 msgstr "İletişim için kullanılan şirket"
 
 #. module: sign
-#: model:ir.model,name:sign.model_sign_completed_document
-#: model:ir.model.fields,field_description:sign.field_sign_completed_document__file
-msgid "Completed Document"
-msgstr "Tamamlanan Belge"
+#: model:ir.model.fields.selection,name:sign.selection__sign_request_document__state__completed
+msgid "Completed"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__completed_document_attachment_ids
@@ -1101,14 +1338,14 @@ msgid "Completed Documents"
 msgstr "Tamamlanmış Belgeler"
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_sign_request__completed_document_ids
-msgid "Completed Documents Binaries"
-msgstr "Tamamlanmış Belgeler (İkili Dosyalar)"
-
-#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__nb_closed
 msgid "Completed Signatures"
 msgstr "Tamamlanan İmza"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
+msgid "Completed on"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__completion_date
@@ -1123,6 +1360,7 @@ msgstr "Yapılandırma Ayarları"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/cog_menu/sign_template_custom_cog_menu.xml:0
+#: model:ir.actions.act_window,name:sign.action_sign_template_cog_menu
 #: model:ir.ui.menu,name:sign.menu_sign_configuration
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
 msgid "Configuration"
@@ -1169,12 +1407,23 @@ msgstr "CC'deki kişiler"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__cc_partner_ids
+#: model:ir.model.fields,help:sign.field_sign_template__cc_partner_ids
 msgid ""
 "Contacts in copy will be notified by email once the document is either fully "
 "signed or refused."
 msgstr ""
 "Belge tamamen imzalandığında ya da reddedildiğinde CC'deki kişiler e-posta "
 "ile bilgilendirilecektir."
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.mail_activity_schedule_view_form
+msgid "Continue"
+msgstr ""
+
+#. module: sign
+#: model:sign.item.role,name:sign.sign_item_role_demo_3
+msgid "Contributor (CLA Demo)"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_share_view_form
@@ -1188,6 +1437,12 @@ msgid "Copy to"
 msgstr "Kopyala"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Could not resolve auto-field path %(path)s from %(record)s"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_tag_action
 msgid "Create Sign Tags"
 msgstr "İmza Etiketleri Oluşturun"
@@ -1196,7 +1451,7 @@ msgstr "İmza Etiketleri Oluşturun"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_save_template_dialog.xml:0
 msgid "Create Template!"
-msgstr "Şablon Oluşturun!"
+msgstr ""
 
 #. module: sign
 #: model:ir.model,website_form_label:sign.model_res_partner
@@ -1205,12 +1460,17 @@ msgstr "Müşteri Oluşturun"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
-msgid "Create a new signer for signing the fields"
-msgstr "Alanları imzalamak için yeni bir imzalayan oluşturun"
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
+msgid "Create a template"
+msgstr ""
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_sign_completed_document__create_uid
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
+msgid "Created On"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_document__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_item__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_item_option__create_uid
@@ -1219,6 +1479,7 @@ msgstr "Alanları imzalamak için yeni bir imzalayan oluşturun"
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_log__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_request__create_uid
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_request_share__create_uid
@@ -1227,11 +1488,12 @@ msgstr "Alanları imzalamak için yeni bir imzalayan oluşturun"
 #: model:ir.model.fields,field_description:sign.field_sign_template__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_template_preview__create_uid
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__create_uid
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_search
 msgid "Created by"
 msgstr "Tarafından oluşturuldu"
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_sign_completed_document__create_date
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__create_date
 #: model:ir.model.fields,field_description:sign.field_sign_document__create_date
 #: model:ir.model.fields,field_description:sign.field_sign_item__create_date
 #: model:ir.model.fields,field_description:sign.field_sign_item_option__create_date
@@ -1240,6 +1502,7 @@ msgstr "Tarafından oluşturuldu"
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__create_date
 #: model:ir.model.fields,field_description:sign.field_sign_log__create_date
 #: model:ir.model.fields,field_description:sign.field_sign_request__create_date
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__create_date
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__create_date
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__create_date
 #: model:ir.model.fields,field_description:sign.field_sign_request_share__create_date
@@ -1257,15 +1520,25 @@ msgid "Creation"
 msgstr "Oluşturma"
 
 #. module: sign
+#: model:iap.service,unit_name:sign.iap_service_sign_qes
+#: model:ir.model.fields,field_description:sign.field_sign_item_role__auth_credits_remaining
+msgid "Credits"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "Current status of the signature request"
 msgstr "İmza talebinin mevcut durumu"
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
-msgid "Currently in"
-msgstr "Şu anda"
+#: model:ir.model.fields,field_description:sign.field_sign_item_type__custom
+msgid "Custom Item Type"
+msgstr ""
+
+#. module: sign
+#: model:sign.item.role,name:sign.sign_item_role_demo_5
+msgid "Customer (SaaS Demo)"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request_item__access_url
@@ -1273,8 +1546,7 @@ msgid "Customer Portal URL"
 msgstr "Müşteri Portal URL"
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/components/sign_request/signable_PDF_iframe.js:0
+#: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__date
 #: model:sign.item.type,name:sign.sign_item_type_date
 #: model:sign.item.type,placeholder:sign.sign_item_type_date
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
@@ -1283,8 +1555,14 @@ msgstr "Tarih"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "Date (UTC)"
-msgstr "Tarih (UTC)"
+msgid "Date ("
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_document.py:0
+msgid "Date: %s"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -1293,20 +1571,22 @@ msgid "Decline"
 msgstr "Reddet"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.doc_sign
-msgid "Decline To Sign"
-msgstr "İmzalamayı Reddet"
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
+msgid "Decline Signature"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/signable_sign_request_control_panel.xml:0
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.js:0
-#: model_terms:ir.ui.view,arch_db:sign.doc_sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_options_menu_items
 msgid "Decline to sign"
 msgstr "İmzalamayı reddet"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_role__default
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
 msgid "Default"
 msgstr "Öntanımlı"
 
@@ -1326,6 +1606,11 @@ msgid "Default Width"
 msgstr "Varsayılan Genişlik"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
+msgid "Default message sent to recipients."
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_role__sequence
 msgid "Default order"
 msgstr "Varsayılan talep"
@@ -1334,6 +1619,25 @@ msgstr "Varsayılan talep"
 #: model:ir.model.fields,field_description:sign.field_sign_template__signature_request_validity
 msgid "Default signature request validity"
 msgstr "Varsayılan imza isteği geçerliliği"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form
+msgid "Default values"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form_custom_field
+msgid "Defaults"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_request/signable_sign_request_control_panel.xml:0
+#: code:addons/sign/static/src/dialogs/delegate_sign_dialog.js:0
+#: code:addons/sign/static/src/dialogs/delegate_sign_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:sign.sign_options_menu_items
+msgid "Delegate"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -1406,14 +1710,16 @@ msgid "Demo Partner"
 msgstr "Demo Ortağı"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.doc_sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.xml:0
+#: model_terms:ir.ui.view,arch_db:sign.sign_options_menu_items
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
 msgid "Details"
 msgstr "Detaylar"
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_res_users__sign_initials
+#: model:ir.model.fields,field_description:sign.field_res_users__sign_initials_data
 msgid "Digital Initials"
 msgstr "Dijital Paraflar"
 
@@ -1423,7 +1729,7 @@ msgid "Digital Initials Frame"
 msgstr "Dijital Paraf Çerçevesi"
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_res_users__sign_signature
+#: model:ir.model.fields,field_description:sign.field_res_users__sign_signature_data
 msgid "Digital Signature"
 msgstr "Dijital İmza"
 
@@ -1433,18 +1739,20 @@ msgid "Digital Signature Frame"
 msgstr "Dijital İmza Çerçevesi"
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_action.js:0
-#: model_terms:ir.ui.view,arch_db:sign.res_company_view_form_sign_terms
-#: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
-msgid "Discard"
-msgstr "Sil"
+#. odoo-python
+#: code:addons/sign/models/sign_document.py:0
+msgid "Digitally signed by %(common_name)s"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_status_indicator/sign_status_indicator.xml:0
-msgid "Discard all changes"
-msgstr "Tüm değişiklikleri iptal et"
+#: code:addons/sign/static/src/dialogs/delegate_sign_dialog.xml:0
+#: code:addons/sign/static/src/dialogs/public_signer_dialog.xml:0
+#: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
+#: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_cog_menu_form
+msgid "Discard"
+msgstr "Sil"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_view_form
@@ -1457,14 +1765,19 @@ msgid "Display Download Button"
 msgstr "İndir Butonunu Göster"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__display_name
+#: model:ir.model.fields,field_description:sign.field_ir_actions_server__display_name
 #: model:ir.model.fields,field_description:sign.field_ir_http__display_name
+#: model:ir.model.fields,field_description:sign.field_mail_activity__display_name
+#: model:ir.model.fields,field_description:sign.field_mail_activity_plan_template__display_name
+#: model:ir.model.fields,field_description:sign.field_mail_activity_schedule__display_name
 #: model:ir.model.fields,field_description:sign.field_mail_activity_type__display_name
 #: model:ir.model.fields,field_description:sign.field_report_sign_green_savings_report__display_name
 #: model:ir.model.fields,field_description:sign.field_res_company__display_name
 #: model:ir.model.fields,field_description:sign.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:sign.field_res_groups__display_name
 #: model:ir.model.fields,field_description:sign.field_res_partner__display_name
 #: model:ir.model.fields,field_description:sign.field_res_users__display_name
-#: model:ir.model.fields,field_description:sign.field_sign_completed_document__display_name
 #: model:ir.model.fields,field_description:sign.field_sign_document__display_name
 #: model:ir.model.fields,field_description:sign.field_sign_item__display_name
 #: model:ir.model.fields,field_description:sign.field_sign_item_option__display_name
@@ -1473,6 +1786,7 @@ msgstr "İndir Butonunu Göster"
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__display_name
 #: model:ir.model.fields,field_description:sign.field_sign_log__display_name
 #: model:ir.model.fields,field_description:sign.field_sign_request__display_name
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__display_name
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__display_name
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__display_name
 #: model:ir.model.fields,field_description:sign.field_sign_request_share__display_name
@@ -1502,21 +1816,26 @@ msgid "Do you want to add initials to all pages?"
 msgstr "Tüm sayfalara paraf eklemek istiyor musunuz?"
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_sign_completed_document__document_id
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__document_id
 #: model:ir.model.fields,field_description:sign.field_sign_template_preview__document_id
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
 msgid "Document"
 msgstr "Belge"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.doc_sign
-msgid "Document <i class=\"fa fa-download\"/>"
-msgstr "Belge <i class=\"fa fa-download\"/>"
+#: model_terms:ir.ui.view,arch_db:sign.sign_options_menu_items
+msgid "Document <i class=\"oi\" data-icon=\"download\"/>"
+msgstr "Belge <i class=\"oi\" data-icon=\"download\"/>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Document Details"
 msgstr "Belge Detayları"
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__file
+msgid "Document File"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__reference
@@ -1536,24 +1855,22 @@ msgstr "Belge Şablonu"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/dialogs/sign_refusal_dialog.js:0
-msgid "Document refusal submitted."
-msgstr "Belge reddi gönderildi."
-
-#. module: sign
-#. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_action.js:0
 msgid "Document saved as Template."
 msgstr "Belge Şablon olarak kaydedildi."
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
-msgid "Document to send for signature or to sign yourself."
-msgstr "İmza için göndereceğiniz veya kendiniz imzalayacağınız belge."
+#: model:ir.model.fields,field_description:sign.field_mail_activity_plan_template__sign_template_id
+msgid "Document to sign"
+msgstr ""
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.portal_my_home_sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Document was signed locally for all signers using"
+msgstr ""
+
+#. module: sign
+#: model:portal.entry,name:sign.portal_alert_sign
 msgid "Document(s) to sign"
 msgstr "İmzalanacak belge(ler)"
 
@@ -1564,6 +1881,7 @@ msgstr "Doküman / İmza Sahibi"
 
 #. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_shell.js:0
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
 #: model:ir.actions.act_window,name:sign.sign_request_action
 #: model:ir.model.fields,field_description:sign.field_sign_request__template_document_ids
@@ -1581,10 +1899,25 @@ msgid "Documents of Request %s"
 msgstr "Talep Belgeleri %s"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_template.py:0
+msgid ""
+"Documents that require secure signing need to be sent. Click the send button "
+"instead."
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/delegate_sign_dialog.xml:0
+msgid "Done!"
+msgstr ""
+
+#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_documents_dropdown.xml:0
+#: code:addons/sign/static/src/backend_components/sign_request/signable_sign_request_control_panel.xml:0
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
+#: model_terms:ir.ui.view,arch_db:sign.sign_options_menu_items
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Download"
@@ -1592,15 +1925,21 @@ msgstr "İndir"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar_role_items.xml:0
-msgid "Drag and Drop a field in the PDF"
-msgstr "PDF'te bir alanı Sürükle ve Bırak"
+#: code:addons/sign/static/src/backend_components/sign_request/signable_sign_request_control_panel.xml:0
+msgid "Download PDF"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
-msgid "Drag and drop"
-msgstr "Sürükle ve bırak"
+msgid "Drag & drop"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar_role_items.xml:0
+msgid "Drag and Drop a field in the PDF"
+msgstr "PDF'te bir alanı Sürükle ve Bırak"
 
 #. module: sign
 #. odoo-javascript
@@ -1620,21 +1959,27 @@ msgid "Dropdown menu"
 msgstr "Aşağı Açılır Menü"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
+msgid "Due Date"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
 msgid "Duplicate"
 msgstr "Kopyala"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_shell.xml:0
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
+msgid "Duplicate & Edit"
+msgstr ""
 
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_document.py:0
 msgid "ERROR: Invalid PDF file!"
 msgstr "HATA: Geçersiz PDF dosyası!"
-
-#. module: sign
-#. odoo-python
-#: code:addons/sign/models/sign_document.py:0
-msgid "Each item must contain 'name' and 'datas' keys."
-msgstr "Her öğe 'name' ve 'datas' anahtarlarını içermelidir."
 
 #. module: sign
 #. odoo-javascript
@@ -1646,20 +1991,14 @@ msgstr "Düzenle"
 
 #. module: sign
 #. odoo-javascript
-#. odoo-python
-#: code:addons/sign/models/sign_template.py:0
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
-msgid "Edit Template"
-msgstr "Şablonu Düzenle"
-
-#. module: sign
-#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/delegate_sign_dialog.xml:0
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__signer_email
 #: model:ir.model.fields.selection,name:sign.selection__sign_request__send_channel__email
 #: model:sign.item.type,name:sign.sign_item_type_email
 #: model:sign.item.type,placeholder:sign.sign_item_type_email
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
 msgid "Email"
 msgstr "E-Posta"
 
@@ -1672,6 +2011,19 @@ msgstr "E-posta Konusu"
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Email Verification"
 msgstr "E-posta Doğrulama"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"Email Verification: The signatory has confirmed control of their email inbox "
+"by clicking on a unique link"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/fields/signer_partner_many2one_field.js:0
+msgid "Email saved successfully!"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_report_container
@@ -1699,6 +2051,7 @@ msgstr "Mesajınızı girin"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/components/sign_request/document_signable.js:0
+#: code:addons/sign/static/src/dialogs/public_signer_dialog.js:0
 #: code:addons/sign/static/src/dialogs/sms_signer_dialog.js:0
 msgid "Error"
 msgstr "Hata"
@@ -1715,14 +2068,20 @@ msgid "Expired"
 msgstr "Süresi Doldu"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
-msgid "Expiring Soon"
-msgstr "Süresi dolmak üzere"
+#: model:ir.model.fields,field_description:sign.field_sign_request_item__external_signature_failures
+msgid "External Signature Failures"
+msgstr ""
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_sign_item_role__auth_method
-msgid "Extra Authentication Step"
-msgstr "Ekstra Kimlik Doğrulama Adımı"
+#: model:ir.model.fields,field_description:sign.field_sign_request_item__external_signature_session_token
+msgid "External Signature Session Token"
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Failed to auto-update fields on %(record)s"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__favorited_ids
@@ -1733,6 +2092,11 @@ msgstr "Favoriler"
 #: model:ir.model.fields,field_description:sign.field_sign_template__favorited_ids
 msgid "Favorited Users"
 msgstr "Favori Kullanıcılar"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form
+msgid "Field"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item__name
@@ -1746,9 +2110,23 @@ msgid "Field Size"
 msgstr "Alan Büyüklüğü"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_shell.js:0
 #: model:ir.ui.menu,name:sign.sign_item_type_menu
 msgid "Fields"
 msgstr "Alanlar"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Fields auto-updated by signing %(record)s"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_fields_panel.xml:0
+msgid "Fields cannot be edited in view only mode."
+msgstr ""
 
 #. module: sign
 #: model:ir.model,name:sign.model_sign_item
@@ -1756,9 +2134,9 @@ msgid "Fields to be sign on Document"
 msgstr "Belge üzerinde imzalanacak alanlar"
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_sign_document__datas
-msgid "File Content (base64)"
-msgstr "Dosya İçeriği (base64)"
+#: model:ir.model.fields,field_description:sign.field_sign_document__raw
+msgid "File Content (raw)"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -1767,6 +2145,7 @@ msgid "File Error"
 msgstr "Dosya Hatası"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__certificate_filename
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__filename
 msgid "Filename"
 msgstr "Dosya Adı"
@@ -1793,6 +2172,13 @@ msgstr "Final Onaylama"
 
 #. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/fields/ir_action_role_config/ir_action_role_config.js:0
+#: model:ir.model.fields.selection,name:sign.selection__sign_item_role__signer_type__fixed
+msgid "Fixed Signer"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
 #: code:addons/sign/static/src/js/tours/sign.js:0
 msgid "Follow the guide to sign the document."
 msgstr "Belgeyi imzalamak için kılavuzu takip edin."
@@ -1808,11 +2194,6 @@ msgid "Followers (Partners)"
 msgstr "Takipçiler (İş ortakları)"
 
 #. module: sign
-#: model:ir.model.fields,help:sign.field_sign_request__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Yazı tipi harika simgesi ör. fa-görevler"
-
-#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 msgid ""
 "For 1000kg of paper usage, with 10% of recycled paper, environmental savings "
@@ -1823,6 +2204,7 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_item_role__auth_method
+#: model:ir.model.fields,help:sign.field_sign_request_item__auth_method
 msgid "Force the signatory to identify using a second authentication method"
 msgstr ""
 "İmza sahibini ikinci bir kimlik doğrulama yöntemi kullanarak tanımlamaya "
@@ -1851,9 +2233,15 @@ msgid "Frame Value"
 msgstr "Çerçeve Değeri"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
-msgid "Fully Signed"
-msgstr "Tamamen İmzalanmış"
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__frozen_file
+msgid "Frozen File"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.js:0
+msgid "Fully signed"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
@@ -1902,6 +2290,11 @@ msgid "Has Default Template"
 msgstr "Varsayılan Şablonu Var"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_res_config_settings__has_external_signature_service
+msgid "Has External Signature Service"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__has_message
 msgid "Has Message"
 msgstr "Mesaj Var"
@@ -1925,12 +2318,17 @@ msgid "Hello"
 msgstr "Merhaba"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
+msgid "Hide certificate key on pages"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,help:sign.field_sign_item_type__tip
 msgid "Hint displayed in the signing hint"
 msgstr "İmzalama ipucunda görüntülenen ipucu"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.doc_sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_options_menu_items
 msgid "Home"
 msgstr "Ana Sayfa"
 
@@ -1945,19 +2343,32 @@ msgid "How do we calculate?"
 msgstr "Nasıl hesaplıyoruz?"
 
 #. module: sign
+#: model:ir.model.fields,help:sign.field_sign_request_item__external_signature_failures
+msgid ""
+"How many times a signature came back for this signer without being usable. "
+"The service has no way of knowing, so it would keep handing back the same "
+"one."
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 msgid "I've got a total weight, and now?"
 msgstr "Toplam ağırlığım var, ya şimdi?"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__id
+#: model:ir.model.fields,field_description:sign.field_ir_actions_server__id
 #: model:ir.model.fields,field_description:sign.field_ir_http__id
+#: model:ir.model.fields,field_description:sign.field_mail_activity__id
+#: model:ir.model.fields,field_description:sign.field_mail_activity_plan_template__id
+#: model:ir.model.fields,field_description:sign.field_mail_activity_schedule__id
 #: model:ir.model.fields,field_description:sign.field_mail_activity_type__id
 #: model:ir.model.fields,field_description:sign.field_report_sign_green_savings_report__id
 #: model:ir.model.fields,field_description:sign.field_res_company__id
 #: model:ir.model.fields,field_description:sign.field_res_config_settings__id
+#: model:ir.model.fields,field_description:sign.field_res_groups__id
 #: model:ir.model.fields,field_description:sign.field_res_partner__id
 #: model:ir.model.fields,field_description:sign.field_res_users__id
-#: model:ir.model.fields,field_description:sign.field_sign_completed_document__id
 #: model:ir.model.fields,field_description:sign.field_sign_document__id
 #: model:ir.model.fields,field_description:sign.field_sign_item__id
 #: model:ir.model.fields,field_description:sign.field_sign_item_option__id
@@ -1966,6 +2377,7 @@ msgstr "Toplam ağırlığım var, ya şimdi?"
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__id
 #: model:ir.model.fields,field_description:sign.field_sign_log__id
 #: model:ir.model.fields,field_description:sign.field_sign_request__id
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__id
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__id
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__id
 #: model:ir.model.fields,field_description:sign.field_sign_request_share__id
@@ -2034,11 +2446,16 @@ msgstr "İşaretliyse, bazı mesajlar gönderi hatası içermektedir."
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__certificate_reference
 msgid ""
-"If checked, the unique certificate reference will be added on the final "
+"If checked, the unique certificate reference will not be added on the final "
 "signed document."
 msgstr ""
-"İşaretlendiyse, benzersiz sertifika referansı son imzalı belgeye "
-"eklenecektir."
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_sign_item_type__auto_write
+msgid ""
+"If checked, the value filled during signing will be written back to the "
+"corresponding field using sender permissions."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
@@ -2063,13 +2480,9 @@ msgid "If you do not wish to receive future reminders about this document,"
 msgstr "Bu belge hakkında gelecekte hatırlatma almak istemiyorsanız,"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
-msgid ""
-"If you wish, you can request the document again after buying more credits "
-"for the operation."
+#: model:ir.model.fields.selection,name:sign.selection__sign_request_document__state__in_progress
+msgid "In Progress"
 msgstr ""
-"Dilerseniz operasyon için daha fazla kredi satın aldıktan sonra belgeyi "
-"tekrar talep edebilirsiniz."
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template__in_progress_count
@@ -2094,6 +2507,13 @@ msgid "Include a visual security frame around your signature"
 msgstr "İmzanızın etrafına görsel bir güvenlik çerçevesi ekleyin"
 
 #. module: sign
+#: model:ir.model.fields,help:sign.field_sign_template__is_one_time_request
+msgid ""
+"Indicates that this template is intended for single-use, direct signature "
+"requests only."
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_view_form
 msgid "Information"
 msgstr "Bilgi"
@@ -2108,12 +2528,6 @@ msgstr "Başlangıç"
 #: model:sign.item.type,placeholder:sign.sign_item_type_initial
 msgid "Initials"
 msgstr "Başlangıçlar"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/editor/plugins/signature.js:0
-msgid "Insert your signature"
-msgstr "İmzanızı ekleyin"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
@@ -2146,11 +2560,6 @@ msgid "Is Sharing"
 msgstr "Paylaşılıyor"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
-msgid "Is Signing"
-msgstr "İmzalanıyor"
-
-#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__is_user_signer
 msgid "Is User Signer"
 msgstr "Kullanıcı İmza Sahibi Mi?"
@@ -2169,7 +2578,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 msgid "It's signed!"
-msgstr "İmzalandı!"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -2193,7 +2602,7 @@ msgid "Last Action Date"
 msgstr "Son İşlem Tarihi"
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_sign_completed_document__write_uid
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__write_uid
 #: model:ir.model.fields,field_description:sign.field_sign_document__write_uid
 #: model:ir.model.fields,field_description:sign.field_sign_item__write_uid
 #: model:ir.model.fields,field_description:sign.field_sign_item_option__write_uid
@@ -2202,6 +2611,7 @@ msgstr "Son İşlem Tarihi"
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__write_uid
 #: model:ir.model.fields,field_description:sign.field_sign_log__write_uid
 #: model:ir.model.fields,field_description:sign.field_sign_request__write_uid
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__write_uid
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__write_uid
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__write_uid
 #: model:ir.model.fields,field_description:sign.field_sign_request_share__write_uid
@@ -2214,7 +2624,7 @@ msgid "Last Updated by"
 msgstr "Son Güncelleyen"
 
 #. module: sign
-#: model:ir.model.fields,field_description:sign.field_sign_completed_document__write_date
+#: model:ir.model.fields,field_description:sign.field_certificate_wizard__write_date
 #: model:ir.model.fields,field_description:sign.field_sign_document__write_date
 #: model:ir.model.fields,field_description:sign.field_sign_item__write_date
 #: model:ir.model.fields,field_description:sign.field_sign_item_option__write_date
@@ -2223,6 +2633,7 @@ msgstr "Son Güncelleyen"
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__write_date
 #: model:ir.model.fields,field_description:sign.field_sign_log__write_date
 #: model:ir.model.fields,field_description:sign.field_sign_request__write_date
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__write_date
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__write_date
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__write_date
 #: model:ir.model.fields,field_description:sign.field_sign_request_share__write_date
@@ -2251,15 +2662,16 @@ msgid "Latitude"
 msgstr "Enlem"
 
 #. module: sign
-#: model:ir.model.fields,help:sign.field_sign_send_request__validity
-msgid "Leave empty for requests without expiration."
-msgstr "Süresiz talepler için boş bırakın."
-
-#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_item_custom_popover.js:0
+#: model:ir.model.fields.selection,name:sign.selection__sign_item_type__alignment__left
 msgid "Left"
 msgstr "Sol"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
+msgid "Let signatories sign with a qualified electronic signature of their own"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -2279,12 +2691,30 @@ msgid "Link Label"
 msgstr "Bağlantı Etiketi"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_request__sign_activity_ids
+msgid "Linked Activities"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__activity_id
 msgid "Linked Activity"
 msgstr "Bağlanan Etkinlik"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/fields/ir_action_role_config/ir_action_role_config.js:0
+#: model:ir.model.fields.selection,name:sign.selection__sign_item_role__signer_type__linked_field
+msgid "Linked Field"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_item_role__linked_field_id
+msgid "Linked Partner Field"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__reference_doc
+#: model:ir.model.fields,field_description:sign.field_sign_template__model_id
 msgid "Linked To"
 msgstr "İle bağlantılı"
 
@@ -2294,8 +2724,12 @@ msgid "Linked field"
 msgstr "Bağlantılı alan"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_mail_activity_schedule__reference_doc
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__model_id
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__reference_doc
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_search
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
 msgid "Linked to"
 msgstr "Bağlantılı"
 
@@ -2303,6 +2737,11 @@ msgstr "Bağlantılı"
 #: model:ir.model.fields,field_description:sign.field_sign_log__log_date
 msgid "Log Date"
 msgstr "Kayıt Tarihi"
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_send_request__log_request_activity
+msgid "Log Request Activity"
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -2349,10 +2788,20 @@ msgid "Mail Update"
 msgstr "E-posta Güncellemesi"
 
 #. module: sign
+#: model:ir.model.fields,help:sign.field_sign_item_type__shared
+msgid "Make this field available for everyone."
+msgstr ""
+
+#. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_item_type.py:0
 msgid "Malformed expression: %(exp)s"
 msgstr "Hatalı biçimlendirilmiş ifade: %(exp)s"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_role_view_form
+msgid "Manage credits"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_config_settings__group_manage_template_access
@@ -2361,15 +2810,34 @@ msgid "Manage template access"
 msgstr "Şablon erişimini yönetme"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_item_type__required
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form_custom_field
+msgid "Mandatory"
+msgstr ""
+
+#. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_item_custom_popover.xml:0
 msgid "Mandatory field"
-msgstr "Zorunlu alan"
+msgstr ""
 
 #. module: sign
 #: model:sign.item.type,tip:sign.sign_item_type_initial
 msgid "Mark it"
 msgstr "İşaretle"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_item_type.py:0
+msgid ""
+"Mass editing is not allowed for the 'Update Field'. Please edit records "
+"individually."
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_sign_request__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template__message
@@ -2399,7 +2867,6 @@ msgstr "Mesajlar"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__model_name
-#: model:ir.model.fields,field_description:sign.field_sign_template__model_id
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_search
 msgid "Model"
 msgstr "Model"
@@ -2410,16 +2877,23 @@ msgid "Model Name"
 msgstr "Model Adı"
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
-msgid "Move Down"
-msgstr "Aşağı Taşı"
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_cog_menu_form
+msgid "More Options"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar_role_items.xml:0
+msgid "Move Down"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar_role_items.xml:0
 msgid "Move Up"
-msgstr "Yukarı Taşı"
+msgstr ""
 
 #. module: sign
 #: model:sign.item.type,name:sign.sign_item_type_multiline_text
@@ -2454,7 +2928,6 @@ msgid "My Documents"
 msgstr "Belgelerim"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_search
 msgid "My Favorites"
 msgstr "Favorilerim"
@@ -2490,17 +2963,21 @@ msgstr "Gizlilik Sözleşmesi (NDA)"
 
 #. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/dialogs/delegate_sign_dialog.xml:0
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
 #: model:ir.model.fields,field_description:sign.field_sign_document__name
 #: model:ir.model.fields,field_description:sign.field_sign_item_role__name
 #: model:ir.model.fields,field_description:sign.field_sign_template__name
 #: model:sign.item.type,name:sign.sign_item_type_name
 #: model:sign.item.type,placeholder:sign.sign_item_type_name
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form_custom_field
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_cog_menu_form
 msgid "Name"
 msgstr "Adı"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_cog_menu_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
 msgid "Name of the file"
 msgstr "Dosyanın adı"
@@ -2574,15 +3051,25 @@ msgid "Next signatory ("
 msgstr "Sonraki imzalayacak kişi ("
 
 #. module: sign
+#: model:res.groups.privilege,placeholder:sign.res_groups_privilege_sign
+msgid "No"
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid "No configured endpoint for the QES signing host."
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_all_request_action
 #: model_terms:ir.actions.act_window,help:sign.sign_request_action
 msgid "No document yet"
 msgstr "Henüz belge yok"
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
-msgid "No documents here"
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_share_view_form
+msgid "No expiration"
 msgstr ""
 
 #. module: sign
@@ -2590,12 +3077,6 @@ msgstr ""
 #: code:addons/sign/models/sign_request_item.py:0
 msgid "No specified reason"
 msgstr "Belirtilmiş bir neden yok"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
-msgid "No template here"
-msgstr ""
 
 #. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
@@ -2678,11 +3159,6 @@ msgstr ""
 "            "
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
-msgid "On"
-msgstr "Açık"
-
-#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 msgid "One can weighs 15 g"
 msgstr "Bir kutu 15 g ağırlığındadır"
@@ -2699,6 +3175,11 @@ msgid "One uploaded file cannot be read. Is it a valid PDF?"
 msgstr "Yüklenen bir dosya okunamıyor. Bu geçerli bir PDF mi?"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_template__is_one_time_request
+msgid "One-Time Request Template"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__only_autofill_readonly
 msgid "Only Autofill"
 msgstr "Yalnızca Otomatik Doldurma"
@@ -2708,6 +3189,22 @@ msgstr "Yalnızca Otomatik Doldurma"
 #: code:addons/sign/static/src/views/hooks.js:0
 msgid "Only PDF files are allowed."
 msgstr "Sadece PDF dosyalarına izin verilir."
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_template.py:0
+msgid ""
+"Only the template responsible or Sign Administrators can change the "
+"Authorized Users or Authorized Groups."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_template.py:0
+msgid ""
+"Only the template responsible or Sign Administrators can change the "
+"Responsible User."
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -2738,12 +3235,6 @@ msgid "Option of a selection Field"
 msgstr "Seçim alanı seçeneği"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
-#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
-msgid "Optional Message..."
-msgstr "İsteğe Bağlı Mesaj..."
-
-#. module: sign
 #: model:ir.model.fields,help:sign.field_sign_template__redirect_url
 msgid "Optional link for redirection after signature"
 msgstr "İmzadan sonra yeniden yönlendirme için isteğe bağlı bağlantı"
@@ -2755,10 +3246,28 @@ msgstr "Buton bağlantısında görüntülenecek isteğe bağlı metin"
 
 #. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_request/signable_sign_request_control_panel.xml:0
 #: code:addons/sign/static/src/backend_components/sign_template/sign_item_custom_popover.xml:0
-#: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
+#: model_terms:ir.ui.view,arch_db:sign.doc_sign
 msgid "Options"
 msgstr "Seçenekler"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_request/sign_request_documents_dropdown.xml:0
+msgid "Original"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "Other documents waiting for your signature:"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_template__user_id
+msgid "Owner"
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -2778,6 +3287,12 @@ msgid "Paper Savings"
 msgstr "Kağıt Tasarrufu"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_request/sign_request_documents_dropdown.xml:0
+msgid "Partially signed"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Participants"
 msgstr "Katılımcılar"
@@ -2788,6 +3303,16 @@ msgid "Partner"
 msgstr "İş Ortağı"
 
 #. module: sign
+#: model:ir.model.fields,help:sign.field_sign_item_role__sign_action_partner_id
+msgid "Partner used when this role is configured in server actions."
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_certificate_wizard__pkcs12_password
+msgid "Password to decrypt the PKS file."
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_preview__pdf_data
 msgid "Pdf Data"
 msgstr "Pdf Verileri"
@@ -2796,7 +3321,6 @@ msgstr "Pdf Verileri"
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__sms_number
 #: model:sign.item.type,name:sign.sign_item_type_phone
 #: model:sign.item.type,placeholder:sign.sign_item_type_phone
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Phone"
 msgstr "Telefon"
 
@@ -2826,6 +3350,30 @@ msgid "Please provide a reason for refusal"
 msgstr "Lütfen reddetme nedeninizi belirtin"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Please select only one document to save as a template."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Please select only one document to send."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_item_role.py:0
+msgid "Please specify a Fixed Signer for the role '%s'."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_item_role.py:0
+msgid "Please specify a Linked Field for the role '%s'."
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__access_url
 msgid "Portal Access URL"
 msgstr "Portal Erişim URL"
@@ -2848,9 +3396,20 @@ msgid "Preview"
 msgstr "Önizle"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Previous value"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Printed on"
 msgstr "Yazdırıldı"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign._doc_sign
+msgid "Proceed to Signing"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__progress
@@ -2862,6 +3421,18 @@ msgstr "İlerleme"
 #: code:addons/sign/models/sign_request_item.py:0
 msgid "Public User"
 msgstr "Genel Kullanıcılar"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/controllers/main.py:0
+msgid "Public user"
+msgstr ""
+
+#. module: sign
+#: model:iap.service,name:sign.iap_service_sign_qes
+#: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
+msgid "Qualified Electronic Signatures"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__radio
@@ -2893,12 +3464,19 @@ msgstr "Değerlendirmeler"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sms_signer_dialog.xml:0
 msgid "Re-send SMS"
-msgstr "SMS'i tekrar gönder"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form
+msgid "Read Only"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_item_custom_popover.xml:0
 #: model:ir.model.fields,field_description:sign.field_sign_item__constant
+#: model:ir.model.fields,field_description:sign.field_sign_item_type__constant
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form_custom_field
 msgid "Read-only"
 msgstr "sadece okunur"
 
@@ -2929,15 +3507,15 @@ msgid "Redirect signers to a page after signing"
 msgstr ""
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid "Refusal reason:"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__refuse
 msgid "Refuse"
 msgstr "Reddet"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
-msgid "Refused"
-msgstr "Reddedildi"
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__request_state__refused
@@ -2963,6 +3541,7 @@ msgstr "İlgili Döküman Modeli"
 #: model:ir.model.fields,field_description:sign.field_sign_request__reminder
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__reminder
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
 msgid "Reminder"
 msgstr "Hatırlatma"
 
@@ -2971,6 +3550,12 @@ msgstr "Hatırlatma"
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__reminder_enabled
 msgid "Reminder Enabled"
 msgstr "Hatırlatma Etkinleştirildi"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Reminder sent successfully"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
@@ -3006,16 +3591,39 @@ msgid "Reports"
 msgstr "Raporlar"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_request__request_document_ids
+msgid "Request Documents Binaries"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__request_item_infos
 msgid "Request Item Infos"
 msgstr "Gerekli Öğe Bilgileri"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/activity/activity_patch.xml:0
-#: code:addons/sign/static/src/backend_components/cog_menu/sign_request_cog_menu.xml:0
+#: code:addons/sign/static/src/core/web/activity_list_popover_item_patch.xml:0
+#: model:ir.model.fields.selection,name:sign.selection__ir_actions_server__state__sign
 msgid "Request Signature"
 msgstr "İmza İste"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/ir_actions_server.py:0
+msgid "Request Signature for %(template_name)s"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
+msgid "Request a signature"
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/wizard/sign_send_request.py:0
+msgid "Request expiration date is required."
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -3040,28 +3648,21 @@ msgid "Required"
 msgstr "Zorunlu"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_item_role__requires_external_signature
+msgid "Requires External Signature"
+msgstr ""
+
+#. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.js:0
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.xml:0
+#: code:addons/sign/static/src/core/web/activity_list_popover_item_patch.xml:0
+#: code:addons/sign/static/src/core/web/activity_patch.xml:0
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_item_view_tree
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
 msgid "Resend"
 msgstr "Yeniden gönder"
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.js:0
-msgid "Resend the invitation"
-msgstr "Davetiyeyi Tekrar Gönder"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.js:0
-msgid "Resent!"
-msgstr "Yeniden Gönderildi!"
-
-#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item__responsible_id
-#: model:ir.model.fields,field_description:sign.field_sign_template__user_id
 msgid "Responsible"
 msgstr "Sorumlu"
 
@@ -3084,6 +3685,7 @@ msgstr "Geriyükle"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_item_custom_popover.js:0
+#: model:ir.model.fields.selection,name:sign.selection__sign_item_type__alignment__right
 msgid "Right"
 msgstr "Sağ"
 
@@ -3095,9 +3697,14 @@ msgstr "Rol"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_iframe.js:0
-msgid "Rotate Clockwise"
-msgstr "Saat Yönünde Döndür"
+#: code:addons/sign/static/src/fields/ir_action_role_config/ir_action_role_config.js:0
+msgid "Role Configuration"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_template__sign_item_role_ids
+msgid "Roles"
+msgstr "Roller"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__message_has_sms_error
@@ -3108,12 +3715,17 @@ msgstr "SMS İleti hatası"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sms_signer_dialog.xml:0
 msgid "SMS Sent"
-msgstr "SMS Gönderildi"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__sms_token
 msgid "SMS Token"
 msgstr "SMS Token'ı"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "SMS Verification"
+msgstr ""
 
 #. module: sign
 #: model:sign.template.tag,name:sign.sign_template_tag_3
@@ -3132,6 +3744,8 @@ msgstr "Odoo tarafından %s için örnek oluşturuldu."
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_control_panel.xml:0
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__save
 #: model_terms:ir.ui.view,arch_db:sign.res_company_view_form_sign_terms
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_cog_menu_form
+#: model_terms:ir.ui.view,arch_db:sign.view_certificate_wizard_form
 msgid "Save"
 msgstr "Kaydet"
 
@@ -3145,13 +3759,14 @@ msgstr "Kaydet ve kapat"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/cog_menu/sign_template_custom_cog_menu.xml:0
 msgid "Save as Template"
-msgstr "Şablon olarak kaydet"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_status_indicator/sign_status_indicator.xml:0
-msgid "Save manually"
-msgstr "Manuel olarak kaydetme"
+#: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.xml:0
+#: model:ir.actions.server,name:sign.action_sign_save_as_template
+msgid "Save as template"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -3160,14 +3775,36 @@ msgid "Saved"
 msgstr "Kaydedildi"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Saved as a template"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Schedule"
 msgstr "Planla"
 
 #. module: sign
+#: model:ir.model.fields.selection,name:sign.selection__sign_log__request_state__scheduled
+#: model:ir.model.fields.selection,name:sign.selection__sign_request__state__scheduled
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
+msgid "Scheduled"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_request__scheduled_date
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__scheduled_date
 msgid "Scheduled Date"
 msgstr "Planlanan Tarih"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/wizard/mail_activity_schedule.py:0
+msgid ""
+"Scheduling a signature request cannot be done for more than one record at a "
+"time."
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -3188,13 +3825,17 @@ msgstr "Seçim Seçenekleri"
 
 #. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/fields/ir_action_role_config/ir_action_role_config.js:0
+msgid "Select field..."
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
 #: code:addons/sign/static/src/js/tours/sign.js:0
 msgid ""
-"Select the contact who should sign, according to their role.<br>In this "
-"example, select your own contact to sign the document yourself."
+"Select the contact who should sign.<br>In this example, select your own "
+"contact to sign the document yourself."
 msgstr ""
-"Rollerine göre imzalaması gereken kişiyi seçin.<br>Bu örnekte, belgeyi "
-"kendiniz imzalamak için kendi kişinizi seçin."
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__selection
@@ -3217,8 +3858,8 @@ msgstr "Seçim seçenekleri"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.js:0
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_control_panel.xml:0
+#: code:addons/sign/static/src/core/web/activity_patch.xml:0
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_item_view_tree
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
@@ -3230,7 +3871,7 @@ msgstr "Gönder"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sms_signer_dialog.xml:0
 msgid "Send SMS"
-msgstr "SMS Gönder"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__signer_id
@@ -3248,15 +3889,43 @@ msgid "Send a reminder"
 msgstr "Hatırlatma gönderin"
 
 #. module: sign
+#: model:ir.module.module,summary:base.module_sign
+msgid "Send and request electronic signatures."
+msgstr ""
+
+#. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.js:0
-msgid "Send the invitation"
-msgstr "Davet gönderin"
+#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
+msgid "Send by Email"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/components/sign_request/sign_item_navigator.js:0
+msgid "Send it"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
+msgid "Send reminder"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.xml:0
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
+msgid "Send to"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
 msgid "Sent"
 msgstr "Gönderildi"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
+msgid "Sent By"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__nb_wait
@@ -3279,6 +3948,16 @@ msgstr "Gönderildi"
 #: model:ir.model.fields,field_description:sign.field_sign_document__sequence
 msgid "Sequence"
 msgstr "Sıralama"
+
+#. module: sign
+#: model:ir.model,name:sign.model_ir_actions_server
+msgid "Server Action"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_sign_request_item__external_signature_session_token
+msgid "Session token returned by the external signing service."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -3326,10 +4005,30 @@ msgstr "Panoya kopyalanan paylaşım bağlantısı"
 #. module: sign
 #. odoo-python
 #: code:addons/sign/controllers/main.py:0
+#: model:ir.model.fields,field_description:sign.field_sign_item_type__shared
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__request_state__shared
 #: model:ir.model.fields.selection,name:sign.selection__sign_request__state__shared
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form_custom_field
 msgid "Shared"
 msgstr "Paylaşılan"
+
+#. module: sign
+#: model:ir.model.fields.selection,name:sign.selection__sign_request__send_channel__shared
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid "Shared Link"
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
+msgid ""
+"Shared Link Verification: the signature request was shared as a link. Anyone "
+"with access to the link can sign."
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_form
+msgid "Sharing"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__field_size__short_text
@@ -3348,11 +4047,10 @@ msgstr "Bir sonraki etkinlik tarihi geçmiş olan tüm kayıtları göster"
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 #: code:addons/sign/static/src/file_viewer/file_viewer.xml:0
+#: model:ir.module.module,shortdesc:base.module_sign
 #: model:ir.ui.menu,name:sign.menu_document
 #: model:res.groups.privilege,name:sign.res_groups_privilege_sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
 msgid "Sign"
 msgstr "İmzala"
@@ -3378,6 +4076,11 @@ msgid "Sign Default Terms and Conditions as a Web page"
 msgstr "Mevcut Hüküm ve Koşulları Web sayfası olarak imzalayın"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_res_users__sign_initials
+msgid "Sign Initials"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_search
 msgid "Sign Item Type Search"
 msgstr "İmza Öğesi Türü Arama"
@@ -3398,6 +4101,8 @@ msgstr "Sonraki Belgeyi İmzala"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.xml:0
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_control_panel.xml:0
+#: code:addons/sign/static/src/core/web/activity_list_popover_item_patch.xml:0
+#: code:addons/sign/static/src/core/web/activity_patch.xml:0
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_tree
@@ -3412,8 +4117,8 @@ msgstr "İmza Sırası"
 #. module: sign
 #. odoo-python
 #: code:addons/sign/wizard/sign_send_request.py:0
-#: model:ir.model.fields,field_description:sign.field_sign_completed_document__sign_request_id
 #: model:ir.model.fields,field_description:sign.field_sign_log__sign_request_id
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__sign_request_id
 #: model:ir.model.fields,field_description:sign.field_sign_request_share__sign_request_id
 msgid "Sign Request"
 msgstr "İmza İsteği"
@@ -3427,13 +4132,29 @@ msgstr "İmza Talebi "
 #. module: sign
 #. odoo-python
 #: code:addons/sign/wizard/sign_send_request.py:0
-msgid "Sign Request - %s"
-msgstr "İmza Talebi - %s"
+msgid "Sign Request - %(template_name)s - %(res_name)s"
+msgstr ""
+
+#. module: sign
+#: model:ir.model,name:sign.model_sign_request_document
+msgid "Sign Request Document"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_log__sign_request_item_id
 msgid "Sign Request Item"
 msgstr "İmza İsteği Öğesi"
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_mail_activity__sign_request_id
+msgid "Sign Requests"
+msgstr ""
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_ir_actions_server__sign_role_ids
+#: model:ir.model.fields,field_description:sign.field_ir_cron__sign_role_ids
+msgid "Sign Roles"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request_signer__sign_send_request_id
@@ -3446,11 +4167,19 @@ msgid "Sign Settings"
 msgstr "İmza Ayarları"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_res_users__sign_signature
+msgid "Sign Signature"
+msgstr ""
+
+#. module: sign
 #: model:ir.model,name:sign.model_sign_template_preview
 msgid "Sign Tempate Preview"
 msgstr "Sign Şablonu Önizlemesi"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_ir_actions_server__sign_template_id
+#: model:ir.model.fields,field_description:sign.field_ir_cron__sign_template_id
+#: model:ir.model.fields,field_description:sign.field_mail_activity_schedule__sign_template_id
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__template_id
 msgid "Sign Template"
 msgstr "İmza Şablonu"
@@ -3459,6 +4188,11 @@ msgstr "İmza Şablonu"
 #: model:ir.model,name:sign.model_sign_template_tag
 msgid "Sign Template Tag"
 msgstr "İmza Şablonu Etiketi"
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_mail_activity__sign_template_id
+msgid "Sign Templates"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_config_settings__sign_terms
@@ -3547,9 +4281,19 @@ msgid "Sign: Send mail reminder"
 msgstr "İmzala: E-Posta ile hatırlatma gönder"
 
 #. module: sign
+#: model:ir.actions.server,name:sign.ir_cron_sign_state_action_ir_actions_server
+msgid "Sign: Update requests state"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Signatory"
 msgstr "İmza sahibi"
+
+#. module: sign
+#: model:sign.item.role,name:sign.sign_item_role_demo_2
+msgid "Signatory (NDA Demo)"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -3558,28 +4302,34 @@ msgstr "İmza sahibinin kimliği (hash'i):"
 
 #. module: sign
 #. odoo-javascript
-#. odoo-python
-#: code:addons/sign/models/sign_request.py:0
-#: code:addons/sign/models/sign_request_item.py:0
 #: code:addons/sign/static/src/components/sign_request/sign_items.xml:0
-#: code:addons/sign/static/src/editor/plugins/signature.js:0
 #: code:addons/sign/static/src/js/tours/sign.js:0
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__signature
 #: model:ir.model.fields.selection,name:sign.selection__mail_activity_type__category__sign_request
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__signature
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__sign
-#: model:mail.activity.type,name:sign.mail_activity_data_signature_request
 #: model:mail.activity.type,summary:sign.mail_activity_data_signature_request
 #: model:sign.item.type,name:sign.sign_item_type_signature
 #: model:sign.item.type,placeholder:sign.sign_item_type_signature
-#: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
 msgid "Signature"
 msgstr "İmza"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Signature Completion"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
 msgid "Signature Date"
 msgstr "İmza Tarihi"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
+msgid "Signature Declined"
+msgstr ""
 
 #. module: sign
 #: model:ir.model,name:sign.model_sign_document
@@ -3618,16 +4368,28 @@ msgstr "İmza Kalemi Değeri"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_document__sign_item_ids
+#: model:ir.model.fields,field_description:sign.field_sign_item_role__item_ids
 #: model:ir.model.fields,field_description:sign.field_sign_template__sign_item_ids
 msgid "Signature Items"
 msgstr "İmza Kalemleri"
 
 #. module: sign
 #. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Signature Refusal"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+#: code:addons/sign/static/src/core/web/activity_patch.xml:0
+#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
 #: code:addons/sign/wizard/sign_send_request.py:0
 #: model:ir.model,name:sign.model_sign_request
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__sign_request_id
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__sign_request_id
+#: model:mail.activity.type,name:sign.mail_activity_data_signature_request
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Signature Request"
 msgstr "İmza Talebi"
@@ -3655,6 +4417,12 @@ msgid "Signature Request Items"
 msgstr "İmza İsteği Kalemleri"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/ir_actions_server.py:0
+msgid "Signature Request for %(template_name)s"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_item_value__sign_request_item_id
 msgid "Signature Request item"
 msgstr "İmza İsteği Kalemi"
@@ -3663,6 +4431,12 @@ msgstr "İmza İsteği Kalemi"
 #: model:ir.model.fields,field_description:sign.field_sign_template__sign_request_ids
 msgid "Signature Requests"
 msgstr "İmza İstekleri"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
+msgid "Signature Saved"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__start_sign
@@ -3675,9 +4449,9 @@ msgid "Signature Template"
 msgstr "İmza Şablonu"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_tree
-msgid "Signature fields"
-msgstr "İmza alanları"
+#: model:ir.model.fields,help:sign.field_sign_send_request__validity
+msgid "Signature request expiration date."
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -3690,8 +4464,8 @@ msgstr ""
 "İmza sahipleri: %(signatories)s"
 
 #. module: sign
+#: model:portal.entry,name:sign.portal_client_sign
 #: model_terms:ir.ui.view,arch_db:sign.portal_my_home_menu_sign
-#: model_terms:ir.ui.view,arch_db:sign.portal_my_home_sign
 msgid "Signature requests"
 msgstr "İmza talepleri"
 
@@ -3712,8 +4486,10 @@ msgid "Signatures"
 msgstr "İmzalar"
 
 #. module: sign
+#. odoo-javascript
 #. odoo-python
 #: code:addons/sign/controllers/portal.py:0
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.xml:0
 #: model:ir.model.fields.selection,name:sign.selection__sign_request__state__signed
 #: model:ir.model.fields.selection,name:sign.selection__sign_request_item__state__completed
 #: model_terms:ir.ui.view,arch_db:sign.doc_sign
@@ -3739,11 +4515,6 @@ msgid "Signed Without Extra Authentication"
 msgstr "Ekstra Kimlik Doğrulama Olmadan İmzalandı"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
-msgid "Signed document"
-msgstr "İmzalı belge"
-
-#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_tree
 msgid "Signed documents"
 msgstr "İmzalı belgeler"
@@ -3760,20 +4531,12 @@ msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__signing_date
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-#: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
 msgid "Signed on"
 msgstr "İmzalandı"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_tree
-msgid "Signees"
-msgstr "İmzalayıcılar"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.js:0
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__partner_id
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_role_view_form
 msgid "Signer"
 msgstr "İmzalayan"
 
@@ -3782,12 +4545,6 @@ msgstr "İmzalayan"
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_action.js:0
 msgid "Signer "
 msgstr ""
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.js:0
-msgid "Signer %s"
-msgstr "İmzalayan %s"
 
 #. module: sign
 #: model:sign.item.role,name:sign.sign_item_role_default
@@ -3807,12 +4564,27 @@ msgid "Signer Settings"
 msgstr "İmzalayan Ayarları"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_item_role__signer_type
+msgid "Signer Type"
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "Signer(s) not set."
+msgstr ""
+
+#. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_shell.js:0
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.xml:0
 #: model:ir.model.fields,field_description:sign.field_sign_request__request_item_ids
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__signer_ids
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_view_tree
 msgid "Signers"
 msgstr "İmzalayanlar"
 
@@ -3820,6 +4592,17 @@ msgstr "İmzalayanlar"
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__signers_count
 msgid "Signers Count"
 msgstr "İmzalayan Sayısı"
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_sign_request_document__applied_item_ids
+msgid "Signers whose values are already stamped on the file."
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.xml:0
+msgid "Signing"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_company__signing_certificate_id
@@ -3843,9 +4626,20 @@ msgid "Signing Order"
 msgstr "İmza Sırası"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_send_request__signing_order_mandatory
+msgid "Signing Order Mandatory"
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_config_settings__signing_certificate_id
 msgid "Signing certificate"
 msgstr "İmzalama Sertifikası"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
+msgid "Signing link sent"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -3885,6 +4679,14 @@ msgstr "Birisi, bu şablonu kullanarak bir belgeyi çoktan dolduruyor."
 
 #. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/dialogs/delegate_sign_dialog.js:0
+msgid ""
+"Sorry, an error occurred while delegating the signing. Please try again "
+"later."
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
 #: code:addons/sign/static/src/components/sign_request/document_signable.js:0
 msgid "Sorry, an error occurred, please try to fill the document again."
 msgstr "Üzgünüz, bir hata oluştu, lütfen belgeyi tekrar doldurmayı deneyin."
@@ -3897,12 +4699,8 @@ msgstr "Üzgünüz, bu belgeyi reddedemezsiniz"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_template__signature_request_validity
-msgid ""
-"Specify the default validity period (in days) for signature requests. Set to "
-"0 for requests that don't expire."
+msgid "Specify the default validity period (in days) for signature requests."
 msgstr ""
-"İmza talepleri için varsayılan geçerlilik süresini (gün olarak) belirtin. "
-"Süresiz talepler için 0 olarak ayarlayın."
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__set_sign_order
@@ -3931,9 +4729,9 @@ msgstr "Kaşele"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__state
+#: model:ir.model.fields,field_description:sign.field_sign_request_document__state
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__state
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
 msgid "State"
 msgstr "İl/Eyalet"
 
@@ -3946,6 +4744,7 @@ msgstr "İşlem kayıtlarında isteğin durumu"
 #. odoo-python
 #: code:addons/sign/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
+#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
 msgid "Status"
 msgstr "Durumu"
@@ -3993,11 +4792,6 @@ msgid "Subject"
 msgstr "Konu"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid "Summary"
-msgstr "Özet"
-
-#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__name
 msgid "Tag Name"
 msgstr "Etiket Adı"
@@ -4008,6 +4802,8 @@ msgid "Tag name already exists!"
 msgstr "Etiket adı zaten mevcut!"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/sign_header_tags.xml:0
 #: model:ir.actions.act_window,name:sign.sign_template_tag_action
 #: model:ir.model.fields,field_description:sign.field_sign_request__template_tags
 #: model:ir.model.fields,field_description:sign.field_sign_template__tag_ids
@@ -4019,12 +4815,6 @@ msgstr "Etiket adı zaten mevcut!"
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_tree
 msgid "Tags"
 msgstr "Etiketler"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_header_tags.xml:0
-msgid "Tags:"
-msgstr "Etiketler:"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_item_type__auto_field
@@ -4051,7 +4841,6 @@ msgstr "Şablon"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.js:0
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_body.js:0
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_control_panel.js:0
 msgid "Template %s"
 msgstr "Şablon %s"
@@ -4082,6 +4871,11 @@ msgstr "Şablon veya Etiket"
 #: model:ir.ui.menu,name:sign.sign_template_menu
 msgid "Templates"
 msgstr "Şablonlar"
+
+#. module: sign
+#: model:sign.item.role,name:sign.sign_item_role_demo_6
+msgid "Tenant (Rental Demo)"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
@@ -4122,12 +4916,6 @@ msgstr ""
 #: model:sign.item.type,placeholder:sign.sign_item_type_text
 msgid "Text"
 msgstr "Metin"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
-msgid "Thank You!"
-msgstr "Teşekkürler!"
 
 #. module: sign
 #. odoo-javascript
@@ -4191,10 +4979,10 @@ msgid "The document %(template_name)s has been rejected by %(partner_name)s"
 msgstr "Belge %(template_name)s tarafından reddedilmiştir. %(partner_name)s"
 
 #. module: sign
-#. odoo-python
-#: code:addons/sign/models/sign_request.py:0
-msgid "The document %s has been fully signed."
-msgstr "%s belgesi tamamen imzalanmıştır."
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/sign_refusal_dialog.js:0
+msgid "The document has been refused and the sender has been notified."
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -4205,12 +4993,28 @@ msgid ""
 msgstr ""
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid ""
+"The documents of this request are too large to be signed with a qualified "
+"electronic signature. They cannot exceed %s MB in total."
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid ""
 "The final document and this completion history have been sent by email "
 "on&amp;nbsp;"
 msgstr ""
 "Nihai belge ve bu tamamlanma geçmişi on&amp;nbsp; e-postayla gönderildi"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid ""
+"The following signers are missing an email address:\n"
+"%s"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
@@ -4241,8 +5045,15 @@ msgstr "E-posta, kopya olarak kişilere gönderildi: %(contacts)s"
 
 #. module: sign
 #: model:ir.model.constraint,message:sign.constraint_sign_template_signature_request_validity_check
-msgid "The number of days for expiration must be a positive value."
-msgstr "Sona erme için gün sayısı pozitif bir değer olmalıdır."
+msgid "The number of days for expiration must be greater than 0."
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/delegate_sign_dialog.xml:0
+msgid ""
+"The person you have delegated your signature to has been notified by email."
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -4276,31 +5087,24 @@ msgstr "İmza talebi geçerliliği geçmişe yönelik olarak belirlenemez."
 
 #. module: sign
 #. odoo-python
-#: code:addons/sign/controllers/main.py:0
-msgid "The signature has been canceled by %(partner)s (%(role)s)"
-msgstr "İmza %(partner)s (%(role)s) tarafından iptal edilmiştir."
-
-#. module: sign
-#. odoo-python
-#: code:addons/sign/controllers/main.py:0
-msgid "The signature has been canceled by %(partner)s with email (%(email)s)"
-msgstr "İmza %(partner)s tarafından e-posta (%(email)s) ile iptal edilmiştir."
-
-#. module: sign
-#. odoo-python
-#: code:addons/sign/models/sign_request_item.py:0
+#: code:addons/sign/models/ir_actions_server.py:0
 msgid ""
-"The signature has been refused by %(name)s with email (%(email)s), refusal "
-"reason:"
+"The sign roles of the template that you are selecting are currently "
+"automated in another server action. Please select a template with different "
+"sign roles or use different sign roles in the target template."
 msgstr ""
-"İmza %(name)s tarafından e-posta (%(email)s), ret nedeni ile reddedildi:"
 
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request_item.py:0
-msgid ""
-"The signature has been refused by %(partner)s (%(role)s), refusal reason:"
-msgstr "İmza %(partner)s (%(role)s) tarafından reddedildi, ret nedeni:"
+msgid "The signature has been refused by %(name)s with email (%(email)s)."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid "The signature has been refused by %(partner)s (%(role)s)."
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -4312,6 +5116,42 @@ msgstr "İmza postası şu adrese gönderilmiştir: "
 #: model:ir.model.fields,help:sign.field_sign_request_item__is_mail_sent
 msgid "The signature mail has been sent."
 msgstr "İmza postası gönderildi."
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
+msgid "The signature of"
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/core/web/activity_model_patch.js:0
+msgid "The signature request was successfully resent."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid "The signature service could not be found."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid "The signature service could not be reached. Please try again later."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid "The signers before you have not signed yet."
+msgstr ""
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
+msgid "The signing link was sent to"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -4358,12 +5198,6 @@ msgid "There are no values in selection field."
 msgstr "Seçim alanında değer yok."
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
-msgid "There are other documents waiting for your signature:"
-msgstr "İmzanızı bekleyen başka belgeler de var:"
-
-#. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_document.py:0
 msgid ""
@@ -4386,13 +5220,35 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_save_template_dialog.xml:0
 msgid "This document has been used"
-msgstr "Bu belge kullanılmıştır"
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid ""
+"This document is being signed by another signer. Please try again later."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid ""
+"This email address is already used as a mail alias and cannot be used for "
+"signing."
+msgstr ""
 
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request_item.py:0
 msgid "This function can only be called with sudo."
 msgstr "Bu fonksiyon sadece sudo ile çağrılabilir."
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
+msgid ""
+"This is a qualified signature request. You will need to authenticate "
+"yourself using"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__reference
@@ -4467,6 +5323,11 @@ msgid "To produce 1000 kg of wood, we have to cut 12 trees"
 msgstr "1000 kg ahşap üretmek için 12 ağaç kesmemiz gerekiyor"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.mail_activity_view_form_popup
+msgid "To request a signature, create a new activity."
+msgstr ""
+
+#. module: sign
 #. odoo-python
 #: code:addons/sign/controllers/portal.py:0
 msgid "To sign"
@@ -4490,12 +5351,16 @@ msgstr "Odoo İmza'yı deneyin"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
-msgid "Try a sample contract"
-msgstr "Örnek bir sözleşme deneyin"
+msgid "Try a sample document"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
+msgid "Try a sample template"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
 msgid "Try our sample document"
 msgstr "Örnek belgemizi deneyin"
@@ -4507,6 +5372,8 @@ msgid "Try out this sample contract."
 msgstr "Bu örnek sözleşmeyi deneyin."
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_ir_actions_server__state
+#: model:ir.model.fields,field_description:sign.field_ir_cron__state
 #: model:ir.model.fields,field_description:sign.field_sign_item__type_id
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__item_type
 msgid "Type"
@@ -4514,9 +5381,40 @@ msgstr "Tip"
 
 #. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/fields/ir_action_role_config/ir_action_role_config.js:0
 #: code:addons/sign/static/src/fields/signer_x2many.js:0
 msgid "Type a name or email..."
 msgstr "Bir isim veya e-posta yazın..."
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_ir_actions_server__state
+#: model:ir.model.fields,help:sign.field_ir_cron__state
+msgid ""
+"Type of server action. The following values are available:\n"
+"- 'Update a Record': update the values of a record\n"
+"- 'Create Activity': create an activity (Discuss)\n"
+"- 'Send Email': post a message, a note or send an email (Discuss)\n"
+"- 'Send SMS': send SMS, log them on documents (SMS)- 'Add/Remove Followers': "
+"add or remove followers to a record (Discuss)\n"
+"- 'Create Record': create a new record with new values\n"
+"- 'Execute Code': a block of Python code that will be executed\n"
+"- 'Send Webhook Notification': send a POST request to an external system, "
+"also known as a Webhook\n"
+"- 'Multi Actions': define an action that triggers several other server "
+"actions\n"
+msgstr ""
+"Sunucu eylemi türü. Aşağıdaki değerler kullanılabilir:\n"
+"- 'Kayıt Güncelle': bir kaydın değerlerini güncelle\n"
+"- 'Etkinlik Oluştur': bir etkinlik oluştur (Mesajlaşma)\n"
+"- 'E-posta Gönder': bir mesaj, not yayınla veya e-posta gönder (Mesajlaşma)\n"
+"- 'SMS Gönder': SMS gönder, bunları belgelere kaydet (SMS) - 'Takipçileri "
+"Ekle/Kaldır': bir kayda takipçi ekle veya kaldır (Mesajlaşma)\n"
+"- 'Kayıt Oluştur': yeni değerlerle yeni bir kayıt oluşturur\n"
+"- 'Kod Yürüt': yürütülecek bir Python kod bloğu\n"
+"- 'Webhook Bildirimi Gönder': harici bir sisteme POST isteği gönderir; "
+"Webhook olarak da bilinir\n"
+"- 'Çoklu İşlemler': diğer birçok sunucu işlemini tetikleyen bir işlem "
+"tanımlar\n"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__activity_exception_decoration
@@ -4565,6 +5463,12 @@ msgid "Update"
 msgstr "Güncelle"
 
 #. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_item_type__auto_write
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_tree
+msgid "Update Field"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid "Update Terms"
 msgstr "Güncelleştirme Şartları"
@@ -4579,21 +5483,22 @@ msgstr "Hüküm ve Koşulları Güncelleştir"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_action.js:0
 msgid ""
-"Updating a document generates a new template with the same sign items. The "
-"copied items will land in the same coordinates as their originals if the "
-"number of pages match with the previous PDF. Do you want to proceed?"
+"Updating a document will copy the items, and they will land at the same "
+"coordinates as the original ones if the number of pages match with the "
+"previous PDF. Do you want to proceed?"
 msgstr ""
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
 msgid "Upload"
-msgstr "Yükle"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/js/widget/upload_pdf_button.js:0
 #: code:addons/sign/static/src/views/common.xml:0
+#: model_terms:ir.ui.view,arch_db:sign.mail_activity_schedule_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Upload PDF"
 msgstr "PDF Yükle"
@@ -4612,22 +5517,9 @@ msgstr ""
 "Başlamak için bir PDF dosyası yükleyin veya mevcut bir şablonu kullanın."
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
-msgid "Upload a PDF file to create a reusable template."
-msgstr ""
-"Yeniden kullanılabilir bir şablon oluşturmak için bir PDF dosyası yükleyin."
-
-#. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
 msgid "Upload a PDF file to create your first template"
 msgstr "İlk şablonunuzu oluşturmak için bir PDF dosyası yükleyin"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/views/common.xml:0
-msgid "Upload a pdf that you want to sign directly"
-msgstr "Doğrudan imzalamak istediğiniz bir pdf dosyasını yükleyin"
 
 #. module: sign
 #. odoo-javascript
@@ -4636,11 +5528,23 @@ msgid "Upload documents"
 msgstr "Belgeleri yükleyin"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/common.xml:0
+msgid "Upload new PDF"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_tag_action
 msgid "Use Tags to manage your Sign Templates and Sign Requests"
 msgstr ""
 "İşaret Şablonlarınızı ve İşaret Taleplerinizi yönetmek için Etiketleri "
 "kullanın"
+
+#. module: sign
+#: model:ir.model.fields,field_description:sign.field_sign_item_type__authorized_group_ids
+#: model_terms:ir.ui.view,arch_db:sign.sign_item_type_view_search
+msgid "Used by"
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -4714,20 +5618,23 @@ msgstr "Doğrulayın"
 
 #. module: sign
 #. odoo-javascript
+#: code:addons/sign/static/src/core/web/activity_patch.xml:0
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_requests
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
 msgid "View"
 msgstr "Görüntüle"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
-msgid "View Document"
-msgstr "Belgeyi Görüntüle"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_refused
 msgid "View document"
 msgstr "Belgeyi görüntüle"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/backend_components/sign_template/mobile/sign_template_mobile_shell.xml:0
+#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
+msgid "View only mode"
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__open
@@ -4738,16 +5645,6 @@ msgstr "Görüntüle/İndir"
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Viewed/downloaded by"
 msgstr "Görüntüleyen/İndiren"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
-msgid "Waiting for me"
-msgstr "Beni bekliyor"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
-msgid "Waiting for others"
-msgstr "Başkalarını bekliyor"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_report_container
@@ -4790,31 +5687,12 @@ msgstr ""
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
-msgid "We will send you this document by email once everyone has signed."
-msgstr "Herkes imzaladıktan sonra size bu belgeyi e-posta ile göndereceğiz."
-
-#. module: sign
-#. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
 msgid ""
-"We'll notify the sender, signer and copied contacts.\n"
-"                Your refusal reason will be included to keep things clear "
-"and transparent for everyone."
+"We'll notify the sender, signer and copied contacts of the signature "
+"refusal.\n"
+"                Your refusal reason will be included."
 msgstr ""
-"Göndereni, imzalayan kişiyi ve kopyalanan kişileri bilgilendireceğiz.\n"
-"                Her şeyin herkes için açık ve şeffaf olmasını sağlamak için "
-"reddetme nedeniniz de dahil edilecektir."
-
-#. module: sign
-#: model:ir.model.fields,field_description:sign.field_sign_request__website_message_ids
-msgid "Website Messages"
-msgstr "Websitesi Mesajları"
-
-#. module: sign
-#: model:ir.model.fields,help:sign.field_sign_request__website_message_ids
-msgid "Website communication history"
-msgstr "Websitesi iletişim geçmişi"
 
 #. module: sign
 #. odoo-javascript
@@ -4828,6 +5706,13 @@ msgstr "Bravo, belgeniz hazır!<BR>İlk imzamızı almak için gönderelim."
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 msgid "What about those conversions I see?"
 msgstr "Peki ya şu gördüğüm dönüşümler?"
+
+#. module: sign
+#: model:ir.model.fields,help:sign.field_sign_item_role__requires_external_signature
+msgid ""
+"Whether signers with this role cryptographically sign the document "
+"themselves, using an external service."
+msgstr ""
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item__width
@@ -4857,6 +5742,20 @@ msgid "Yes"
 msgstr "Evet"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid ""
+"You already approved this document, so the changes you just made cannot be "
+"part of the signature being produced."
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/ir_actions_server.py:0
+msgid "You are trying to save multiple actions that share the same role!"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.deleted_sign_request
 msgid ""
 "You can contact the person who invited you to sign the document by email for "
@@ -4866,6 +5765,12 @@ msgstr ""
 "üzerinden iletişime geçebilirsiniz."
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/mail_activity_plan_template.py:0
+msgid "You can only set a sign template for activities of type 'Signature'."
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_expired
 msgid ""
 "You can request a new link to access your document and sign it, it will  be "
@@ -4873,6 +5778,22 @@ msgid ""
 msgstr ""
 "Belgenize erişmek ve imzalamak için yeni bir bağlantı talep edebilirsiniz, "
 "hemen gelen kutunuza gönderilecektir."
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid "You cannot change the email of a signatory"
+msgstr ""
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_item_type.py:0
+msgid ""
+"You cannot link the model '%(model)s' on the path '%(path)s'.\n"
+"\n"
+"The field/relationship '%(field)s' contains multiple records (%(type)s), "
+"which cannot be directly linked to an updatable sign item."
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -4900,6 +5821,12 @@ msgstr ""
 "Bu belgelere erişiminiz yok, lütfen bir İmza Yöneticisi ile iletişime geçin."
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid "You don't have access to the linked document."
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_refused
 msgid "You have refused the document"
 msgstr "Belgeyi reddettiniz"
@@ -4914,6 +5841,12 @@ msgstr "Şu ana kadar"
 #: code:addons/sign/models/sign_request.py:0
 msgid "You must specify one signer for each role of your sign template"
 msgstr "İmza şablonunuzun her rolü için bir imzalayan belirtmelisiniz"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_template.py:0
+msgid "You need at least one field type in order to sign a document!"
+msgstr ""
 
 #. module: sign
 #. odoo-python
@@ -4937,8 +5870,8 @@ msgstr "İmzalı belgeyi e-posta ile alacaksınız."
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
 msgid ""
-"You will get the signed document by email. You may also request a paper copy "
-"from the sender."
+"You will get the signed document by email.\n"
+"You may also request a paper copy from the sender."
 msgstr ""
 
 #. module: sign
@@ -4978,10 +5911,10 @@ msgid "Your name"
 msgstr "Adınız"
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
-msgid "Your signature has been saved. Next signatory is"
-msgstr "İmzanız kaydedildi. Bir sonraki imza sahibi"
+#. odoo-python
+#: code:addons/sign/models/sign_request_item.py:0
+msgid "Your signature is being finalized. Please try again in a moment."
+msgstr ""
 
 #. module: sign
 #. odoo-javascript
@@ -4995,7 +5928,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
 msgid "a file"
-msgstr "bir dosya"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
@@ -5013,17 +5946,6 @@ msgid "assign the current user or the customer as a signer by default"
 msgstr "geçerli kullanıcıyı veya müşteriyi varsayılan imzalayan olarak atayın"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
-msgid ""
-"because you don't have enough credits for this operation.\n"
-"                    The signatory was able to finish signing, but was not "
-"asked to authenticate fully."
-msgstr ""
-"çünkü bu işlem için yeterli alacaklarınız yok.\n"
-"                    İmza sahibi imzalamayı tamamlayabildi ancak tam olarak "
-"kimlik doğrulaması yapması istenmedi."
-
-#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__body
 msgid "body"
 msgstr "body"
@@ -5035,15 +5957,16 @@ msgid "can"
 msgstr "kutu"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.js:0
+msgid "cancelled"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_report_container
 #: model_terms:ir.ui.view,arch_db:sign.green_report_container_pdf
 msgid "cans"
 msgstr "kutular"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
-msgid "click here to cancel it."
-msgstr "iptal etmek için buraya tıklayın."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
@@ -5095,14 +6018,26 @@ msgid "every"
 msgstr "her"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/core/web/activity_patch.xml:0
+msgid "from"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
-msgid "has been completed and signed by"
-msgstr "tarafından doldurulmuş ve imzalanmıştır"
+msgid "has been completed by"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
 msgid "has been edited, completed and signed by"
 msgstr "tarafından düzenlenmiş, tamamlanmış ve imzalanmıştır"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
+msgid "has been saved."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
@@ -5142,7 +6077,12 @@ msgstr "ip"
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 msgid "is free, forever, with unlimited users - and it's fun to use!"
 msgstr ""
-"sınırsız kullanıcı ile sonsuza kadar ücretsizdir - ve kullanımı eğlencelidir!"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
+msgid "is next. They can sign now on this device, or later by email."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -5187,21 +6127,9 @@ msgstr "litre araba yakıtı"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
-msgid "mode."
-msgstr "mod."
-
-#. module: sign
-#. odoo-javascript
 #: code:addons/sign/static/src/components/sign_request/signable_PDF_iframe.js:0
 msgid "next"
 msgstr "sonraki"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
-msgid "on"
-msgstr ":"
 
 #. module: sign
 #. odoo-javascript
@@ -5238,6 +6166,12 @@ msgid "sign.message_cc"
 msgstr "sign.message_cc"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.js:0
+msgid "signed"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "that's"
@@ -5247,7 +6181,12 @@ msgstr "bu"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_save_template_dialog.xml:0
 msgid "times."
-msgstr "zamanlar."
+msgstr ""
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
+msgid "to confirm your identity and signature."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
@@ -5272,15 +6211,16 @@ msgid "trees"
 msgstr "ağaçlar"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
+#. odoo-javascript
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.xml:0
 msgid "via"
 msgstr "üzerinden"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_sidebar.xml:0
-msgid "visualization"
-msgstr "görselleştirme"
+#: code:addons/sign/static/src/components/sign_request/signer_status_badge.js:0
+msgid "waiting"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
@@ -5291,11 +6231,6 @@ msgstr "elimizde 1000 kg kağıt kullanımı için bir tüketim listesi var."
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_refused
 msgid "with the following reason"
 msgstr "takip eden gerekçe ile"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
-msgid "without the requested extra-authentification step ("
-msgstr "istenen ekstra doğrulama adımı olmadan ("
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
@@ -5309,214 +6244,22 @@ msgid "{{0}} Summary"
 msgstr "{{0}} Özet"
 
 #~ msgid ""
-#~ "<span class=\"badge rounded-pill text-bg-success\" title=\"Shared\" "
-#~ "invisible=\"not is_sharing\">\n"
-#~ "                                    Shared\n"
-#~ "                                </span>"
+#~ "<strong>Warning</strong> do not forward this email to other people!<br/>\n"
+#~ "            They will be able to access this document and sign it as "
+#~ "yourself.<br/>\n"
+#~ "            <span>Your IP address and localization are associated to your "
+#~ "signature to ensure traceability.</span>"
 #~ msgstr ""
-#~ "<span class=\"badge rounded-pill text-bg-success\" title=\"Shared\" "
-#~ "invisible=\"not is_sharing\">\n"
-#~ "                                    Paylaşılan\n"
-#~ "                               </span>"
+#~ "<strong>Uyarı</strong>Bu e-postayı başkalarına iletmeyin! <br/>\n"
+#~ "Bu belgeye erişebilir ve sizin adınıza imzalayabilirler. <br/>\n"
+#~ "<span>İzlenebilirliği sağlamak için IP adresiniz ve yerelleştirmeniz "
+#~ "imzanızla ilişkilendirilir.</span>"
 
-#~ msgid "Ecological Savings by using Electronic Signatures"
-#~ msgstr "Elektronik İmza Kullanımı ile Ekolojik Tasarruf"
+#~ msgid "Completed Document"
+#~ msgstr "Tamamlanan Belge"
 
-#~ msgid "New Template"
-#~ msgstr "Yeni Şablon"
+#~ msgid "Completed Documents Binaries"
+#~ msgstr "Tamamlanmış Belgeler (İkili Dosyalar)"
 
-#~ msgid "Standard"
-#~ msgstr "Standart"
-
-#~ msgid "Basic Bloc"
-#~ msgstr "Temel Blok"
-
-#~ msgid "Warning"
-#~ msgstr "Uyarı"
-
-#~ msgid "%s validated the signature by SMS with the phone number %s."
-#~ msgstr "%s,%s telefon numarasıyla imzayı SMS ile doğruladı."
-
-#~ msgid "<span>(1.0 = full page size)</span>"
-#~ msgstr "<span>(1.0 = tam sayfa boyutu)</span>"
-
-#~ msgid "<strong>Message and communication history</strong>"
-#~ msgstr "<strong>Mesajlar ve iletişim geçmişi</strong>"
-
-#~ msgid "Attach a file"
-#~ msgstr "Bir dosya ekle"
-
-#~ msgid ""
-#~ "By clicking Adopt & Sign, I agree that the chosen signature/initials will "
-#~ "be a valid electronic representation of my hand-written signature/"
-#~ "initials for all purposes when it is used on documents, including legally "
-#~ "binding contracts."
-#~ msgstr ""
-#~ "Kabul Et ve İmzala'yı tıklayarak, seçilen imzaların / parafların, yasal "
-#~ "olarak bağlayıcı sözleşmeler de dahil olmak üzere, belgeler üzerinde "
-#~ "kullanıldığında, el yazısı imzam / imzalarımın tüm amaçları için geçerli "
-#~ "bir elektronik temsili olacağını kabul ediyorum."
-
-#~ msgid "Completed"
-#~ msgstr "Tamamlandı"
-
-#~ msgid "Confirm"
-#~ msgstr "Onayla"
-
-#~ msgid "Create date"
-#~ msgstr "Tarihi oluştur"
-
-#~ msgid "Customer"
-#~ msgstr "Müşteri"
-
-#~ msgid "Dashboard"
-#~ msgstr "Pano"
-
-#~ msgid "Digital Signatures"
-#~ msgstr "Dijital İmzalar"
-
-#~ msgid "Digitial Initials"
-#~ msgstr "Dijital Harfler"
-
-#~ msgid "Download Document"
-#~ msgstr "Belgeyi İndir"
-
-#~ msgid "Download original document"
-#~ msgstr "Orijinal belgey iindir"
-
-#~ msgid "Drag & Drop a field in the PDF"
-#~ msgstr "PDF içine bir alan Sürükle & Bırak "
-
-#~ msgid "Duplicated Template"
-#~ msgstr "Şablonu Kopyala"
-
-#~ msgid "Edit template name"
-#~ msgstr "Şablon ismini düzenle"
-
-#~ msgid "Employee"
-#~ msgstr "Personel"
-
-#~ msgid "Field Types"
-#~ msgstr "Alan Türleri"
-
-#~ msgid "File name"
-#~ msgstr "Dosya Adı"
-
-#~ msgid "Filled by"
-#~ msgstr "Dolduran"
-
-#~ msgid "Generate PDF"
-#~ msgstr "Genel PDF"
-
-#~ msgid "Group By"
-#~ msgstr "Grupla"
-
-#~ msgid "In favorites, remove it"
-#~ msgstr "Sık kullanılanlardan kaldırın"
-
-#~ msgid "Missing Password"
-#~ msgstr "Eksik Parola"
-
-#~ msgid "Mobile"
-#~ msgstr "Mobil"
-
-#~ msgid "Name for the file"
-#~ msgstr "Dosyanın adı"
-
-#~ msgid "Name or email..."
-#~ msgstr "İsim veya E-Posta"
-
-#~ msgid "Not in favorites, add it"
-#~ msgstr "Sık kullanılanlarda değil, ekleyin"
-
-#~ msgid "Not in favorites, set it"
-#~ msgstr "Favorilerde değil, ayarlayın"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Eylem gerektiren mesaj adedi"
-
-#~ msgid "Open Link"
-#~ msgstr "Bağlantıyı Aç"
-
-#~ msgid "Original File"
-#~ msgstr "Orijinal Dosya"
-
-#~ msgid "PDF is encrypted"
-#~ msgstr "PDF şifreli"
-
-#~ msgid "Password is incorrect."
-#~ msgstr "Şifre yanlış."
-
-#~ msgid "Print original document"
-#~ msgstr "Orijinal belgeyi yazdır"
-
-#~ msgid "Role Name"
-#~ msgstr "Rol Adı"
-
-#~ msgid "Roles"
-#~ msgstr "Roller"
-
-#~ msgid "Share Document by Link"
-#~ msgstr "Belgeyi Bağlantıyla Paylaş"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Bir sonraki eylem tarihi bugünden önce olan tüm kayıtları göster"
-
-#~ msgid "Sign Document"
-#~ msgstr "Belgeyi İmzala"
-
-#~ msgid "Signature Item Party"
-#~ msgstr "İmza Kalemleri"
-
-#~ msgid "Signature Request - %s"
-#~ msgstr "İmza İsteği - %s"
-
-#~ msgid "Signature configuration"
-#~ msgstr "İmza yapılandırma"
-
-#~ msgid "The PDF's password is required to generate the final document."
-#~ msgstr "Nihai belgeyi oluşturmak için PDF şifresi gerekir."
-
-#~ msgid "Validate"
-#~ msgstr "Doğrula"
-
-#~ msgid "Validate &amp; Send Completed Document"
-#~ msgstr "Doğrulama &amp; Tamamlanan Belgeleri Gönder"
-
-#~ msgid "Wrong password"
-#~ msgstr "Yanlış şifre"
-
-#~ msgid ""
-#~ "You can't delete a template for which signature requests exist but you "
-#~ "can archive it instead."
-#~ msgstr ""
-#~ "İmza isteklerinin bulunduğu bir şablonu silemezsiniz, bunun yerine "
-#~ "arşivleyebilirsiniz."
-
-#~ msgid ""
-#~ "Your file is encrypted, PDF's password is required to generate final "
-#~ "document. The final document will be encrypted with the same password."
-#~ msgstr ""
-#~ "Dosyanız şifrelenmiştir, son belgeyi oluşturmak için PDF şifresi gerekir. "
-#~ "Nihai belge aynı şifre ile şifrelenecektir."
-
-#~ msgid "Your signature has been saved."
-#~ msgstr "İmzanız kaydedilmiştir."
-
-#~ msgid "fill in"
-#~ msgstr "doldurun"
-
-#~ msgid "like"
-#~ msgstr "beğen"
-
-#~ msgid "mark it"
-#~ msgstr "İşaretle"
-
-#~ msgid "sign"
-#~ msgstr "işaret"
-
-#~ msgid "sign it"
-#~ msgstr "imzala"
-
-#~ msgid "tags"
-#~ msgstr "etiketler"
+#~ msgid "Extra Authentication Step"
+#~ msgstr "Ekstra Kimlik Doğrulama Adımı"

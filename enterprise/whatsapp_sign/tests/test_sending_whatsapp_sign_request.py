@@ -15,8 +15,7 @@ class TestSignRequest(SignRequestCommon, WhatsAppCommon, WhatsAppSignCommon):
         partner_ids = [self.partner_1.id, self.partner_2.id, self.partner_3.id]
         wizard = self.create_sign_send_request_wizard(self.template_3_roles, partner_ids)
         # Changing the ID of one of the templates to simulate deletion, then returning the ID
-        ICP = self.env['ir.config_parameter'].sudo()
-        ICP.set_param('whatsapp_sign.whatsapp_template_id', 'dummy')
+        self.env.company.sign_send_request_wa_template_id = None
 
         error_msg = 'sign_request model constraints should raise an error as one of the WhatsApp templates doesn\'t exist.'
         with self.assertRaises(ValidationError, msg=error_msg):
@@ -48,45 +47,45 @@ class TestSignRequest(SignRequestCommon, WhatsAppCommon, WhatsAppSignCommon):
         """
         This method checks if WhatsApp signature request and completion messages are sent properly.
         """
-        wa_templates = self.get_whatsapp_templates()
 
         partner_ids = [self.partner_1.id, self.partner_2.id, self.partner_3.id]
         wizard = self.create_sign_send_request_wizard(self.template_3_roles, partner_ids)
         wizard.send_via_whatsapp()
 
-        sign_items = self.get_sign_request_items(self.template_3_roles.id)
+        sign_request, sign_items = self.get_sign_request_and_items(self.template_3_roles.id)
 
-        messages = self.search_for_wa_messages(wa_templates[0].id)
+        send_request_template_id = sign_request.communication_company_id.sign_send_request_wa_template_id.id
+        request_completion_template_id = sign_request.communication_company_id.request_completion_wa_template_id.id
+        messages = self.search_for_wa_messages(send_request_template_id)
         self.assertEqual(len(messages), 1)  # it's only sent to the first one in the list of signers (signing order enabled)
 
         sign_items[0].sign(self.signer_1_sign_values)
-        messages = self.search_for_wa_messages(wa_templates[0].id)
+        messages = self.search_for_wa_messages(send_request_template_id)
         self.assertEqual(len(messages), 2)
 
         sign_items[1].sign(self.signer_2_sign_values)
-        messages = self.search_for_wa_messages(wa_templates[0].id)
+        messages = self.search_for_wa_messages(send_request_template_id)
         self.assertEqual(len(messages), 3)
 
         sign_items[2].sign(self.signer_3_sign_values)
-        messages = self.search_for_wa_messages(wa_templates[1].id)
+        messages = self.search_for_wa_messages(request_completion_template_id)
         self.assertEqual(len(messages), 3)
 
     def test_sign_refusal(self):
         """
         This method checks if WhatsApp signature refusal messages are sent properly.
         """
-        wa_templates = self.get_whatsapp_templates()
 
         partner_ids = [self.partner_1.id, self.partner_2.id, self.partner_3.id]
         wizard = self.create_sign_send_request_wizard(self.template_3_roles, partner_ids)
         wizard.send_via_whatsapp()
 
-        sign_items = self.get_sign_request_items(self.template_3_roles.id)
+        sign_request, sign_items = self.get_sign_request_and_items(self.template_3_roles.id)
 
         sign_items[0].sudo()._refuse('sent', 'Refusal Reason 1')
 
         refusal_messages = self.env['whatsapp.message'].search([
-            ('wa_template_id', '=', wa_templates[2].id)
+            ('wa_template_id', '=', sign_request.communication_company_id.request_refusal_wa_template_id.id)
         ])
 
         self.assertEqual(len(refusal_messages), 3)

@@ -6,11 +6,11 @@
         <record id="project_forecast_slot112" model="planning.slot">
             <field name="start_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() + 7)).strftime('%Y-%m-%d 11:00:00')"/>
             <field name="end_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() + 7)).strftime('%Y-%m-%d 15:00:00')"/>
-            <field name="resource_id" model="resource.resource" eval="obj().env.ref('hr.employee_chs').resource_id.id"/>
+            <field name="resource_ids" model="resource.resource" eval="obj().env.ref('hr.employee_chs').resource_id.ids"/>
             <field name="role_id" ref="planning.planning_role_developer"/>
             <field name="project_id" ref="project.project_project_1"/>
             <field name="publication_warning" eval="False"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
 
         <!-- Wednesday morning -->
@@ -20,29 +20,29 @@
             <field name="role_id" ref="planning.planning_role_developer"/>
             <field name="project_id" ref="project.project_project_1"/>
             <field name="publication_warning" eval="False"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
 
         <!-- Thursday evening -->
         <record id="project_forecast_slot114" model="planning.slot">
             <field name="start_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() + 4)).strftime('%Y-%m-%d 11:00:00')"/>
             <field name="end_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() + 4)).strftime('%Y-%m-%d 15:00:00')"/>
-            <field name="resource_id" model="resource.resource" eval="obj().env.ref('hr.employee_jep').resource_id.id"/>
+            <field name="resource_ids" model="resource.resource" eval="obj().env.ref('hr.employee_jep').resource_id.ids"/>
             <field name="role_id" ref="planning.planning_role_cm"/>
             <field name="project_id" ref="project.project_project_1"/>
             <field name="publication_warning" eval="False"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
 
         <!-- Friday morning -->
         <record id="project_forecast_slot115" model="planning.slot">
             <field name="start_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() + 3)).strftime('%Y-%m-%d 06:00:00')"/>
             <field name="end_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() + 3)).strftime('%Y-%m-%d 10:00:00')"/>
-            <field name="resource_id" model="resource.resource" eval="obj().env.ref('hr.employee_jth').resource_id.id"/>
+            <field name="resource_ids" model="resource.resource" eval="obj().env.ref('hr.employee_jth').resource_id.ids"/>
             <field name="role_id" ref="planning.planning_role_management"/>
             <field name="project_id" ref="project.project_project_1"/>
             <field name="publication_warning" eval="False"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
 
         <!--                                        Week 1                                        -->
@@ -50,11 +50,11 @@
         <record id="project_forecast_slot111" model="planning.slot">
             <field name="start_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday())).strftime('%Y-%m-%d 11:00:00')"/>
             <field name="end_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday())).strftime('%Y-%m-%d 15:00:00')"/>
-            <field name="resource_id" model="resource.resource" eval="obj().env.ref('hr.employee_chs').resource_id.id"/>
+            <field name="resource_ids" model="resource.resource" eval="obj().env.ref('hr.employee_chs').resource_id.ids"/>
             <field name="role_id" ref="planning.planning_role_developer"/>
             <field name="publication_warning" eval="False"/>
             <field name="project_id" ref="project.project_project_1"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
 
         <!-- Wednesday morning -->
@@ -64,27 +64,27 @@
             <field name="role_id" ref="planning.planning_role_developer"/>
             <field name="publication_warning" eval="False"/>
             <field name="project_id" ref="project.project_project_1"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
 
         <!-- Friday morning -->
         <record id="project_forecast_slot151" model="planning.slot">
             <field name="start_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() - 4)).strftime('%Y-%m-%d 06:00:00')"/>
             <field name="end_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() - 4)).strftime('%Y-%m-%d 10:00:00')"/>
-            <field name="resource_id" model="resource.resource" eval="obj().env.ref('hr.employee_jth').resource_id.id"/>
+            <field name="resource_ids" model="resource.resource" eval="obj().env.ref('hr.employee_jth').resource_id.ids"/>
             <field name="role_id" ref="planning.planning_role_management"/>
             <field name="publication_warning" eval="False"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
 
         <record id="project_forecast_slot111" model="planning.slot">
             <field name="start_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() - 4)).strftime('%Y-%m-%d 06:00:00')"/>
             <field name="end_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() - 4)).strftime('%Y-%m-%d 10:00:00')"/>
-            <field name="resource_id" model="resource.resource" eval="obj().env.ref('hr.employee_jep').resource_id.id"/>
+            <field name="resource_ids" model="resource.resource" eval="obj().env.ref('hr.employee_jep').resource_id.ids"/>
             <field name="role_id" ref="planning.planning_role_cm"/>
             <field name="publication_warning" eval="False"/>
             <field name="project_id" ref="project.project_project_1"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
 
         <!--                                        Week 2                                        -->
@@ -93,20 +93,20 @@
         <record id="project_forecast_slot211" model="planning.slot">
             <field name="start_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() - 7)).strftime('%Y-%m-%d 11:00:00')"/>
             <field name="end_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() - 7)).strftime('%Y-%m-%d  15:00:00')"/>
-            <field name="resource_id" model="resource.resource" eval="obj().env.ref('hr.employee_admin').resource_id.id"/>
+            <field name="resource_ids" model="resource.resource" eval="obj().env.ref('hr.employee_admin').resource_id.ids"/>
             <field name="role_id" ref="planning.planning_role_management"/>
             <field name="publication_warning" eval="False"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
 
         <!-- Thursday afternoon -->
         <record id="project_forecast_slot111" model="planning.slot">
             <field name="start_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() - 7 - 3)).strftime('%Y-%m-%d 11:00:00')"/>
             <field name="end_datetime" eval="(datetime.today() - timedelta(days=datetime.today().weekday() - 7 - 3)).strftime('%Y-%m-%d 15:00:00')"/>
-            <field name="resource_id" model="resource.resource" eval="obj().env.ref('hr.employee_jep').resource_id.id"/>
+            <field name="resource_ids" model="resource.resource" eval="obj().env.ref('hr.employee_jep').resource_id.ids"/>
             <field name="role_id" ref="planning.planning_role_cm"/>
             <field name="publication_warning" eval="False"/>
-            <field name="state">published</field>
+            <field name="state">2_published</field>
         </record>
     </data>
     <data>

@@ -1,3 +1,4 @@
+import { HrGanttRendererControls } from "./hr_gantt_renderer_controls";
 import { GanttEmployeeAvatar } from "./hr_gantt_employee_avatar";
 import { GanttRenderer } from "@web_gantt/gantt_renderer";
 
@@ -5,7 +6,11 @@ const { DateTime } = luxon;
 
 export class HrGanttRenderer extends GanttRenderer {
     static rowHeaderTemplate = "hr.HrGanttRenderer.RowHeader";
-    static components = { ...GanttRenderer.components, Avatar: GanttEmployeeAvatar };
+    static components = {
+        ...GanttRenderer.components,
+        GanttRendererControls: HrGanttRendererControls,
+        Avatar: GanttEmployeeAvatar
+    };
     computeDerivedParams() {
         this.rowsWithAvatar = {};
         super.computeDerivedParams();
@@ -28,6 +33,25 @@ export class HrGanttRenderer extends GanttRenderer {
             this.rowsWithAvatar[row.id] = { resModel, resId, displayName: name };
         }
         return super.processRow(...arguments);
+    }
+
+    /**
+     * @override
+     * Implements a diagonal gradient cell color for partial unavailabilities 
+     * preserving the base helper's vertical style elsewhere.
+    */
+    getRowCellColors(row) {
+        const cellColors = super.getRowCellColors(row);
+        const { cellPart } = this.model.metaData.scale;
+        if (cellPart === 2) {
+            for (const columnIndex in cellColors) {
+                const style = cellColors[columnIndex];
+                if (style?.includes("linear-gradient(90deg")) {
+                    cellColors[columnIndex] = style.replace("90deg", "325deg");
+                }
+            }
+        }
+        return cellColors;
     }
 
     /**

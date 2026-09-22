@@ -21,10 +21,9 @@ class TestControllersRoute(HttpCase, TestCommonPlanning):
 
         calendar_bert = cls.env['resource.calendar'].create({
             'name': 'Calendar 2',
-            'tz': 'UTC',
             'hours_per_day': 4,
             'attendance_ids': [
-                (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 13, 'hour_to': 17, 'day_period': 'morning'}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 13, 'hour_to': 17}),
             ],
         })
 
@@ -34,20 +33,17 @@ class TestControllersRoute(HttpCase, TestCommonPlanning):
         cls.resource_bert.write({'default_role_id': role_a})
         cls.slots = cls.env['planning.slot'].create([
             {
-                'resource_id': cls.resource_bert.id,
-                'resource_type': 'user',
+                'resource_ids': cls.resource_bert.ids,
                 'start_datetime': datetime(2023, 6, 2, 8, 0),
                 'end_datetime': datetime(2023, 6, 2, 17, 0),
             },
             {
-                'resource_id': cls.resource_bert.id,
-                'resource_type': 'user',
+                'resource_ids': cls.resource_bert.ids,
                 'start_datetime': datetime(2023, 6, 3, 8, 0),
                 'end_datetime': datetime(2023, 6, 3, 17, 0),
             },
             {
-                'resource_id': cls.resource_bert.id,
-                'resource_type': 'user',
+                'resource_ids': cls.resource_bert.ids,
                 'start_datetime': datetime(2023, 6, 4, 8, 0),
                 'end_datetime': datetime(2023, 6, 4, 17, 0),
             },
@@ -70,22 +66,14 @@ class TestControllersRoute(HttpCase, TestCommonPlanning):
         self.assertIn("text=role+a", google_calendar_url, "The name of the employee and it's default role should be in the google calendar url title")
 
     def test_planning_ics_file(self):
-
         self.slots.action_planning_publish_and_send()
-        start, end = min(self.slots.mapped('start_datetime')), max(self.slots.mapped('end_datetime'))
-        planning_published = self.env['planning.planning'].search([
-            ('start_datetime', "=", start),
-            ('end_datetime', "=", end)
-        ])
-        url_plan = self.employee_bert._planning_get_url(
-            planning_published.start_datetime,
-            planning_published.end_datetime,
-            planning_published.access_token
-        )[self.employee_bert.id]
-        req = self.url_open(url_plan+ ".ics")
+        decoded_content = ""
+        for slot in self.slots:
+            url_plan = slot._get_slot_resource_urls()
+            req = self.url_open(url_plan['iCal'])
+            self.assertEqual(req.status_code, 200, "Response should = OK")
+            decoded_content += req.content.decode('utf-8')
 
-        self.assertEqual(req.status_code, 200, "Response should = OK")
-        decoded_content = req.content.decode('utf-8')
         self.assertEqual(decoded_content.count('BEGIN:VEVENT'), 3, "There should be 3 Calendar events present in the ics file")
 
     def test_planning_fields_import_compatible_export(self):
@@ -113,11 +101,11 @@ class TestControllersRoute(HttpCase, TestCommonPlanning):
         """
         Test that the planning ICS file can be generated when no employee is assigned.
         This ensures that a fallback timezone (current user's or UTC) is used
-        when `resource_id` is not set on the slot.
+        when `resource_ids` is not set on the slot.
         """
-        if self.env.company.resource_calendar_id.tz != 'Europe/Brussels':
-            self.env.company.resource_calendar_id.tz = 'Europe/Brussels'
-        self.slots[0].write({'resource_id': False})
+        if self.env.company.tz != 'Europe/Brussels':
+            self.env.company.tz = 'Europe/Brussels'
+        self.slots[0].write({'resource_ids': False})
         url_res = self.slots[0]._get_slot_resource_urls()
         self.authenticate(None, None)
 

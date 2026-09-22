@@ -2,18 +2,20 @@
 <odoo>
     <data>
 
-        <record id="appointment_booked_mail_template" model="mail.template">
-            <field name="name">Appointment: Appointment Booked</field>
+        <record id="appointment_booking_mail_template" model="mail.template">
+            <field name="name">Appointment: Appointment Booking</field>
             <field name="model_id" ref="calendar.model_calendar_event"/>
-            <field name="subject">{{ 'Appointment Requested: ' if not object.appointment_type_id.is_always_confirm and object.appointment_status == 'request' else 'Appointment Booked: ' }}{{ object.appointment_type_id.name }}</field>
+            <field name="subject">Appointment {{ 'Booked' if object.appointment_status == 'booked' else 'Reserved' }}: {{ object.appointment_type_id.name }}</field>
             <field name="email_from">{{ (user.email_formatted or object.user_id.email_formatted) }}</field>
-            <field name="use_default_to" eval="True"/>
-            <field name="description">Sent to followers of an appointment type when a meeting is booked</field>
+            <field name="use_default_to" eval="False"/>
+            <field name="description">Sent to followers of an appointment type when a meeting is created</field>
+            <field name="email_layout_xmlid">mail.mail_notification_light</field>
+            <field name="partner_to">{{ object.partner_id.ids if (object.partner_id not in object.partner_ids) or object._skip_send_mail_status_update() else [] }}</field>
             <field name="body_html" type="html">
-<div style="font-size: 13px; color: #374151;">
+<div style="font-size: 13px; color: #374151; background-color: white;">
     <t t-set="recurrent" t-value="object.recurrence_id and not ctx.get('calendar_template_ignore_recurrence')" />
     <t t-set="mail_tz" t-value="object._get_mail_tz() or ctx.get('mail_tz')" />
-    <t t-set="appointment_booker_name" t-value="object.appointment_booker_id.display_name"/>
+    <t t-set="customer" t-value="object.appointment_booker_id or object.find_partner_customer() or object.partner_id"/>
     <h1 style="font-size: 18px; font-weight: bold; color: #374151;">
         <t t-if="not object.appointment_type_id.is_always_confirm and object.appointment_status == 'request'">Appointment requested</t>
         <t t-else="">
@@ -23,7 +25,7 @@
     </h1>
     <p style="margin: 0;">
         <span style="display: block; margin-top: 8px;">
-            <t t-out="appointment_booker_name or ''">John Booker</t>
+            <t t-out="customer.display_name or ''">John Booker</t>
             <t t-if="not object.appointment_type_id.is_always_confirm and object.appointment_status == 'request'"> has requested </t>
             <t t-else=""> has booked </t>
             an appointment: <t t-out="object.appointment_type_id.name or ''">Technical Demo</t>
@@ -33,11 +35,11 @@
         </span>
     </p>
     <div style="text-align: center; padding: 16px 0px 16px 0px; margin-top: 16px;">
-        <a t-attf-href="/calendar/meeting/join?token={{ object.access_token }}"
+        <a t-attf-href="/calendar/meeting/join?token={{ object.sudo().access_token }}"
             t-attf-style="display: inline-block; padding: 7px 14px; color: {{user.company_id.email_primary_color or '#FFFFFF'}}; text-decoration: none; background-color: {{user.company_id.email_secondary_color or '#875A7B'}}; border-radius: 3px">
             Join</a>
         <a t-attf-href="/odoo/calendar.event/{{ object.id }}"
-            t-attf-style="display: inline-block; margin-left: 12px; padding: 7px 14px; color: #111827; text-decoration: none; background-color: #E7E9ED; border-radius: 3px;">
+            style="display: inline-block; margin-left: 12px; padding: 7px 14px; color: #111827; text-decoration: none; background-color: #E7E9ED; border-radius: 3px;">
             View</a>
     </div>
     <div style="margin: 16px 0 0;">
@@ -53,7 +55,7 @@
                         <t t-out="format_time(time=object.start, tz=mail_tz, time_format='short', lang_code=object.env.lang) or ''">8:00</t>
                         <t t-if="not object.appointment_type_id.hide_timezone and mail_tz">
                             <span style="font-size: 11px; font-weight: normal;">
-                                (<t t-out="mail_tz"/>)
+                                (<t t-out="mail_tz">Europe/Brussels</t>)
                             </span>
                         </t>
                     </t>
@@ -76,7 +78,7 @@
             </tr>
             <tr t-if="object.appointment_type_id.manage_capacity">
                 <td style="width: 100px; padding-top: 6px; color: #676F7B;">For</td>
-                <td style="padding-top: 6px;"><t t-out="object.total_capacity_reserved"/> people</td>
+                <td style="padding-top: 6px;"><t t-out="object.total_capacity_reserved">2</t> people</td>
             </tr>
             <tr t-if="not object.appointment_type_id.is_auto_assign and object.appointment_resource_ids">
                 <td style="width: 100px; padding-top: 6px; color: #676F7B; vertical-align: top;">Resources</td>
@@ -103,8 +105,9 @@
         </table>
     </div>
     <div style="margin: 32px 0 0;">
+        <t t-set="max_shown_attendees" t-value="20"/>
         <h2 t-attf-style="margin-bottom: 12px; font-size: 14px; font-weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};">Attendees</h2>
-        <div t-foreach="object.attendee_ids" t-as="attendee" style="margin-bottom: 5px;">
+        <div t-foreach="object.attendee_ids[:max_shown_attendees]" t-as="attendee" style="margin-bottom: 5px;">
             <img t-if="attendee.state" t-attf-src="/calendar/static/src/img/state_{{ attendee.state }}.png" style="border:0; width: 15px; height: 15px; vertical-align: text-bottom;" />
             <t t-if="attendee.common_name">
                 <span style="margin-left: 5px" t-out="attendee.common_name or ''">Mitchell Admin</span>
@@ -113,10 +116,13 @@
                 <span style="margin-left:5px">You</span>
             </t>
         </div>
+        <div t-if="len(object.attendee_ids) > max_shown_attendees" style="margin-bottom: 5px;">
+            ... and <t t-out="len(object.attendee_ids) - max_shown_attendees">2</t> more
+        </div>
     </div>
     <div t-if="not is_html_empty(object.description)" style="margin: 32px 0 0;">
         <h2 t-attf-style="margin-bottom: 12px; font-size: 14px; font-weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};">Description of the event</h2>
-        <div t-out="object.description"/>
+        <div t-out="object.description">Internal product showcase.</div>
     </div>
     <t t-set="upcoming_appointments"
         t-value="(object.appointment_booker_id.upcoming_appointment_ids - object).sorted('start')"/>
@@ -128,7 +134,7 @@
                 <span t-out="upcoming_appointment.appointment_type_id.name or ''">Technical Demo</span>
                 <span style="margin: 0 10px;">-</span>
                 <span t-out="upcoming_appointment.start or ''" t-options='{"widget": "datetime", "format": "medium", "tz_name": mail_tz}' style="font-weight: bold;">June 20th, 15:00</span>
-                <a t-attf-href="/calendar/view/#{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}" target="_blank" style="margin-left: 10px; font-size: 12px; color: #008f8c; text-decoration: underline;">View Details</a>
+                <a t-attf-href="/calendar/view/#{upcoming_appointment.sudo().access_token}?partner_id=#{appointment_booker_id}" target="_blank" style="margin-left: 10px; font-size: 12px; color: #008f8c; text-decoration: underline;">View Details</a>
             </li>
         </ul>
     </div>
@@ -142,20 +148,22 @@
             <field name="model_id" ref="calendar.model_calendar_event"/>
             <field name="subject">Appointment Canceled: {{ object.appointment_type_id.name }}</field>
             <field name="email_from">{{ (user.email_formatted or object.user_id.email_formatted) }}</field>
-            <field name="use_default_to" eval="True"/>
+            <field name="use_default_to" eval="False"/>
             <field name="description">Sent to all attendees when an appointment is cancelled</field>
+            <field name="email_layout_xmlid">mail.mail_notification_light</field>
+            <field name="partner_to">{{ (object.partner_ids + object.partner_id).ids if not object._skip_send_mail_status_update() else object.partner_id.ids }}</field>
             <field name="body_html" type="html">
-<div style="font-size: 13px; color: #374151;">
+<div style="font-size: 13px; color: #374151;  background-color: white;">
     <t t-set="recurrent" t-value="object.recurrence_id and not ctx.get('calendar_template_ignore_recurrence')"/>
     <t t-set="mail_tz" t-value="object._get_mail_tz() or ctx.get('mail_tz')" />
-    <t t-set="appointment_booker_name" t-value="object.appointment_booker_id.display_name"/>
+    <t t-set="customer" t-value="object.appointment_booker_id or object.find_partner_customer() or object.partner_id"/>
     <h1 style="font-size: 18px; font-weight: bold; color: #374151; margin-bottom: 28px;">
         Appointment canceled
         <img src="/calendar/static/src/img/times-circle.png" style="border:0; width: 24px; height: 24px; margin-left: 10px; text-decoration:none; vertical-align: bottom;" />
     </h1>
     <p style="margin: 0;">
-        <t t-if="appointment_booker_name">
-            Hello <t t-out="appointment_booker_name"/>,
+        <t t-if="customer">
+            Hello <t t-out="customer.display_name or ''">John Booker</t>,
         </t>
         <t t-else="">
             Hello,
@@ -176,7 +184,7 @@
                         <t t-out="format_time(time=object.start, tz=mail_tz, time_format='short', lang_code=object.env.lang) or ''">8:00</t>
                         <t t-if="not object.appointment_type_id.hide_timezone and mail_tz">
                             <span style="font-size: 11px; font-weight: normal;">
-                                (<t t-out="mail_tz"/>)
+                                (<t t-out="mail_tz">Europe/Brussels</t>)
                             </span>
                         </t>
                     </t>
@@ -200,8 +208,9 @@
         </table>
     </div>
     <div style="margin: 32px 0 0;">
+        <t t-set="max_shown_attendees" t-value="20"/>
         <h2 t-attf-style="margin-bottom: 12px; font-size: 14px; font-weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};">Attendees</h2>
-        <div t-foreach="object.attendee_ids" t-as="attendee" style="margin-bottom: 5px;">
+        <div t-foreach="object.attendee_ids[:max_shown_attendees]" t-as="attendee" style="margin-bottom: 5px;">
             <img t-if="attendee.state" t-attf-src="/calendar/static/src/img/state_{{ attendee.state }}.png" style="border:0; width: 15px; height: 15px; vertical-align: text-bottom;" />
             <t t-if="attendee.common_name">
                 <span style="margin-left: 5px" t-out="attendee.common_name or ''">Mitchell Admin</span>
@@ -210,13 +219,17 @@
                 <span style="margin-left:5px">You</span>
             </t>
         </div>
+        <div t-if="len(object.attendee_ids) > max_shown_attendees" style="margin-bottom: 5px;">
+            ... and <t t-out="len(object.attendee_ids) - max_shown_attendees">2</t> more
+        </div>
     </div>
     <div t-if="not is_html_empty(object.description)" style="margin: 32px 0 0;">
         <h2 t-attf-style="margin-bottom: 12px; font-size: 14px; font-weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};">Description of the event</h2>
-        <div t-out="object.description"/>
+        <div t-out="object.description">Internal product showcase.</div>
     </div>
 </div>
             </field>
+            <field name="lang">{{ (object.appointment_booker_id or object.partner_id).lang }}</field>
             <field name="auto_delete" eval="True"/>
         </record>
 
@@ -229,8 +242,9 @@
             <field name="partner_to" eval="False"/>
             <field name="use_default_to" eval="True"/>
             <field name="description">Invitation email to new attendees of an appointment</field>
+            <field name="email_layout_xmlid">mail.mail_notification_light</field>
             <field name="body_html" type="html">
-<div style="font-size: 13px; color: #374151;">
+<div style="font-size: 13px; color: #374151; background-color: white;">
     <t t-set="customer" t-value=" object.event_id.find_partner_customer()"/>
     <t t-set="target_responsible" t-value="object.partner_id == object.event_id.partner_id"/>
     <t t-set="target_customer" t-value="object.partner_id == customer"/>
@@ -245,11 +259,11 @@
         <t t-if="target_customer">
             <t t-if="not object.event_id.appointment_type_id.is_always_confirm">
                 <t t-if="object.event_id.appointment_status == 'booked'">
-                    We're happy to let you know your booking <strong t-out="object.event_id.appointment_type_id.name or ''">Schedule a Demo</strong><t t-if="object.event_id.appointment_type_id.category not in ['custom', 'anytime'] and object.event_id.appointment_type_id.schedule_based_on == 'users'"> with <t t-out="object.event_id.user_id.name or ''">Ready Mat</t></t> has been confirmed.<br/>
+                    Great news! Your booking <strong t-out="object.event_id.appointment_type_id.name or ''">Schedule a Demo</strong><t t-if="object.event_id.appointment_type_id.category not in ['custom', 'anytime'] and object.event_id.appointment_type_id.schedule_based_on == 'users'"> with <t t-out="object.event_id.user_id.name or ''">Ready Mat</t></t> has now been confirmed.
                 </t>
                 <t t-elif="object.event_id.appointment_status == 'request'">
-                    We've got your booking <strong t-out="object.event_id.appointment_type_id.name or ''">Schedule a Demo</strong><t t-if="object.event_id.appointment_type_id.category not in ['custom', 'anytime'] and object.event_id.appointment_type_id.schedule_based_on == 'users'"> with <t t-out="object.event_id.user_id.name or ''">Ready Mat</t></t>.<br/>
-                    We'll notify you once it's confirmed.
+                    We've received your booking <strong t-out="object.event_id.appointment_type_id.name or ''">Schedule a Demo</strong><t t-if="object.event_id.appointment_type_id.category not in ['custom', 'anytime'] and object.event_id.appointment_type_id.schedule_based_on == 'users'"> with <t t-out="object.event_id.user_id.name or ''">Ready Mat</t></t>.<br/>
+                    We'll let you know once it's confirmed.
                 </t>
             </t>
             <t t-else="">
@@ -258,7 +272,12 @@
         </t>
         <t t-elif="target_responsible">
             <t t-if="customer">
-                <t t-out="customer.name or ''"></t> scheduled the following appointment <strong t-out="object.event_id.appointment_type_id.name or ''">Schedule a Demo</strong> with you.
+                <t t-if="not object.event_id.appointment_type_id.is_always_confirm and object.event_id.appointment_status == 'booked'">
+                    <t t-out="customer.name or ''">Jesse Brown</t>'s appointment <strong t-out="object.event_id.appointment_type_id.name or ''">Schedule a Demo</strong> with you has now been confirmed.
+                </t>
+                <t t-else="">
+                    <t t-out="customer.name or ''">Jesse Brown</t> has booked <strong t-out="object.event_id.appointment_type_id.name or ''">Schedule a Demo</strong> with you.
+                </t>
                 <t t-if="object.event_id.appointment_type_id and object.event_id.appointment_status == 'request'">
                     It is awaiting confirmation.
                 </t>
@@ -272,18 +291,10 @@
         </t>
     </p>
     <div style="text-align: center; padding: 16px 0px 16px 0px;">
-        <t t-if="object.state != 'accepted'">
-            <a t-attf-href="/calendar/meeting/accept?token={{object.access_token}}&amp;id={{object.event_id.id}}"
-                t-attf-style="display: inline-block; padding: 7px 14px; color: {{user.company_id.email_primary_color or '#FFFFFF'}}; text-decoration: none; background-color: {{user.company_id.email_secondary_color or '#875A7B'}}; border-radius: 3px">
-                Accept</a>
-            <a t-attf-href="/calendar/meeting/decline?token={{object.access_token}}&amp;id={{object.event_id.id}}"
-                t-attf-style="display: inline-block; margin-left: 6px; padding: 7px 14px; color: {{user.company_id.email_primary_color or '#FFFFFF'}}; text-decoration: none; background-color: {{user.company_id.email_secondary_color or '#875A7B'}}; border-radius: 3px">
-                Decline</a>
-        </t>
-        <a t-if="not target_responsible and not target_customer" t-attf-href="/calendar/meeting/view?token={{object.access_token}}&amp;id={{object.event_id.id}}"
+        <a t-if="not target_responsible and not target_customer" t-attf-href="/calendar/meeting/view?token={{object.sudo().access_token}}&amp;id={{object.event_id.id}}"
             style="display: inline-block; margin-left: 12px; padding: 5px 10px; color: #111827; text-decoration: none; background-color: #E7E9ED; border-radius: 3px; border-radius: 3px">View</a>
         <a t-elif="not target_customer" t-attf-href="/mail/view?model=calendar.event&amp;res_id={{object.event_id.id}}"
-            t-attf-style="display: inline-block; margin-left: 12px; padding: 5px 10px; color: #111827; text-decoration: none; background-color: #E7E9ED; border-radius: 3px; border-radius: 3px">View</a>
+            style="display: inline-block; margin-left: 12px; padding: 5px 10px; color: #111827; text-decoration: none; background-color: #E7E9ED; border-radius: 3px; border-radius: 3px">View</a>
     </div>
     <div style="margin: 16px 0 0;">
         <h2 t-attf-style="margin-bottom: 12px; font-size: 14px; font-weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};">Details</h2>
@@ -321,7 +332,7 @@
             </tr>
             <tr  t-if="object.event_id.appointment_type_id.manage_capacity">
                 <td style="width: 100px; padding-top: 6px; color: #676F7B;">For</td>
-                <td style="padding-top: 6px;"><t t-out="object.event_id.total_capacity_reserved"/> people</td>
+                <td style="padding-top: 6px;"><t t-out="object.event_id.total_capacity_reserved">2</t> people</td>
             </tr>
             <tr t-if="not object.event_id.appointment_type_id.is_auto_assign and object.event_id.appointment_resource_ids">
                 <td style="width: 100px; padding-top: 6px; color: #676F7B; vertical-align: top;">Resources</td>
@@ -348,8 +359,9 @@
         </table>
     </div>
     <div style="margin: 32px 0 0;">
+        <t t-set="max_shown_attendees" t-value="20"/>
         <h2 t-attf-style="margin-bottom: 12px; font-size: 14px; font-weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};">Attendees</h2>
-        <div t-foreach="object.event_id.attendee_ids" t-as="attendee" style="margin-bottom: 5px;">
+        <div t-foreach="object.event_id.attendee_ids[:max_shown_attendees]" t-as="attendee" style="margin-bottom: 5px;">
             <img t-if="attendee.state" t-attf-src="/calendar/static/src/img/state_{{ attendee.state }}.png" style="border:0; width: 15px; height: 15px; vertical-align: text-bottom;" />
             <t t-if="attendee != object">
                 <span style="margin-left: 5px" t-out="attendee.common_name or ''">Mitchell Admin</span>
@@ -358,14 +370,17 @@
                 <span style="margin-left:5px">You</span>
             </t>
         </div>
+        <div t-if="len(object.event_id.attendee_ids) > max_shown_attendees" style="margin-bottom: 5px;">
+            ... and <t t-out="len(object.event_id.attendee_ids) - max_shown_attendees">2</t> more
+        </div>
     </div>
     <div t-if="not is_html_empty(object.event_id.description)" style="margin: 32px 0 0;">
         <h2 t-attf-style="margin-bottom: 12px; font-size: 14px; font-weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};">Description of the event</h2>
-        <div t-out="object.event_id.description"/>
+        <div t-out="object.event_id.description">Internal product showcase.</div>
     </div>
     <div t-if="target_customer" style="margin: 32px 0 0;">
         <h2 t-attf-style="margin-bottom: 12px; font-size: 14px; font-weight: bold; color: {{user.company_id.email_secondary_color or '#875A7B'}};">Make change to this event</h2>
-        <a t-attf-href="/calendar/meeting/view?token={{object.access_token}}&amp;id={{object.event_id.id}}" style="color: color: #008f8c; text-decoration: underline;">Reschedule</a>
+        <a t-attf-href="/calendar/meeting/view?token={{object.sudo().access_token}}&amp;id={{object.event_id.id}}" style="color: color: #008f8c; text-decoration: underline;">Reschedule</a>
     </div>
     <t t-set="upcoming_appointments"
         t-value="(object.event_id.appointment_booker_id.upcoming_appointment_ids - object.event_id).sorted('start')"/>
@@ -376,7 +391,7 @@
                 <span t-out="upcoming_appointment.appointment_type_id.name or ''">Technical Demo</span>
                 <span style="margin: 0 10px;">-</span>
                 <span t-out="upcoming_appointment.start or ''" t-options='{"widget": "datetime", "format": "medium", "tz_name": object.mail_tz}' style="font-weight: bold;">June 20th, 15:00</span>
-                <a t-attf-href="/calendar/view/#{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}" target="_blank" style="margin-left: 10px; font-size: 12px; color: #008f8c; text-decoration: underline;">View Details</a>
+                <a t-attf-href="/calendar/view/#{upcoming_appointment.sudo().access_token}?partner_id=#{appointment_booker_id}" target="_blank" style="margin-left: 10px; font-size: 12px; color: #008f8c; text-decoration: underline;">View Details</a>
             </li>
         </ul>
     </div>
@@ -386,6 +401,94 @@
             <span style="display: block; margin-top: 8px;"><t t-out="object.event_id.user_id.signature or ''">Mitchell Admin</t></span>
         </t>
     </p>
+</div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
+        <record id="appointment_feedback_mail_template" model="mail.template">
+            <field name="name">Appointment: Feedback Request</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="subject">How was your experience? ({{ object.name }})</field>
+            <field name="email_from">{{ (object.user_id.email_formatted or user.email_formatted or '') }}</field>
+            <field name="partner_to">{{ object.appointment_booker_id.id }}</field>
+            <field name="email_to" eval="False"/>
+            <field name="use_default_to" eval="False"/>
+            <field name="description">Sent to booker to request feedback after their visit</field>
+            <field name="email_layout_xmlid">mail.mail_notification_light</field>
+            <field name="body_html" type="html">
+<div style="font-size: 13px; color: #374151; background-color: white;">
+    <t t-set="access_token" t-value="object._rating_get_access_token()"/>
+    <table cellpadding="0" cellspacing="0" border="0" style="font-size: 13px; color: #374151; width: 100%;">
+        <tr>
+            <td style="padding-bottom: 16px;">
+                Hello <t t-out="object.appointment_booker_id.name or ''">John Doe</t>,
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-bottom: 16px;">
+                Thank you for booking with us.<br/>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-bottom: 24px;">
+                Please take a moment to tell us how your experience was. Your feedback helps us improve continuously and offer a better service to our guests.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h2 t-attf-style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold; font-style: italic; color: {{ object.user_id.company_id.email_secondary_color or '#875A7B' }};">
+                    Tell us how you feel about your visit
+                </h2>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-bottom: 16px; color: #676F7B; font-style: italic;">
+                Please click on one of the options below:
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-bottom: 24px;">
+                <table cellpadding="0" cellspacing="0" border="0" style="font-size: 13px; color: #374151;">
+                    <tr>
+                        <td style="padding-bottom: 12px; vertical-align: middle; width: 25px;">
+                            <img src="/rating/static/src/img/rating_5.png" alt="Satisfied" style="width: 20px; height: 20px; border: 0; vertical-align: middle; text-decoration: none;"/>
+                        </td>
+                        <td style="padding-bottom: 12px; padding-left: 8px; vertical-align: middle;">
+                            <a t-attf-href="/rate/{{ access_token }}/5" style="text-decoration: none; color: #111827; font-weight: bold;">
+                                Great experience
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 12px; vertical-align: middle; width: 25px;">
+                            <img src="/rating/static/src/img/rating_3.png" alt="Okay" style="width: 20px; height: 20px; border: 0; vertical-align: middle; text-decoration: none;"/>
+                        </td>
+                        <td style="padding-bottom: 12px; padding-left: 8px; vertical-align: middle;">
+                            <a t-attf-href="/rate/{{ access_token }}/3" style="text-decoration: none; color: #111827; font-weight: bold;">
+                                It was okay
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 12px; vertical-align: middle; width: 25px;">
+                            <img src="/rating/static/src/img/rating_1.png" alt="Dissatisfied" style="width: 20px; height: 20px; border: 0; vertical-align: middle; text-decoration: none;"/>
+                        </td>
+                        <td style="padding-bottom: 12px; padding-left: 8px; vertical-align: middle;">
+                            <a t-attf-href="/rate/{{ access_token }}/1" style="text-decoration: none; color: #111827; font-weight: bold;">
+                                Not satisfied
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="color: #676F7B; font-style: italic;">
+                We appreciate your feedback and hope to see you again soon.
+            </td>
+        </tr>
+    </table>
 </div>
             </field>
             <field name="auto_delete" eval="True"/>

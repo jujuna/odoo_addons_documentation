@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("StockBarcodeBarcodelookupFlow", {
-    url: "/web",
     steps: () =>
         [
             {
@@ -16,7 +15,8 @@ registry.category("web_tour.tours").add("StockBarcodeBarcodelookupFlow", {
             },
             {
                 content: "Go to receipts",
-                trigger: '.o_kanban_renderer .o_kanban_record div[name=o_kanban_record_title]:contains("Receipts")',
+                trigger:
+                    '.o_kanban_renderer .o_kanban_record div[name=o_kanban_record_title]:contains("Receipts")',
                 run: "click",
             },
             {
@@ -26,13 +26,13 @@ registry.category("web_tour.tours").add("StockBarcodeBarcodelookupFlow", {
             },
             {
                 content: "Open barcode Filling popup",
-                trigger: '.navbar-nav .o_barcode_actions',
-                run: 'click',
+                trigger: ".navbar-nav .o_barcode_actions",
+                run: "click",
             },
             {
                 content: "Click on Create Product",
                 trigger: '.o_barcode_settings button:contains("Create Product")',
-                run: 'click',
+                run: "click",
             },
             {
                 content: "Ensure the product creation popup is opened.",
@@ -41,13 +41,13 @@ registry.category("web_tour.tours").add("StockBarcodeBarcodelookupFlow", {
             {
                 content: "Fill barcode value",
                 trigger: 'div[name="barcode"] input',
-                run: 'edit 610532977349',
+                run: "edit 610532977349",
             },
             // Click outside the input to trigger the onchange event
             {
                 content: "Fill barcode value",
-                trigger: '.modal .modal-title',
-                run: 'click',
+                trigger: ".modal .modal-title",
+                run: "click",
             },
             {
                 content: "Product name should be filled automatically",
@@ -56,7 +56,7 @@ registry.category("web_tour.tours").add("StockBarcodeBarcodelookupFlow", {
             {
                 content: "Save the product",
                 trigger: '.modal-footer .btn-primary:contains("Save")',
-                run: 'click',
+                run: "click",
             },
             {
                 content: "Wait until the modal is closed",

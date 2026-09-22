@@ -61,26 +61,6 @@ class SignRequestItem(models.Model):
             sub_route = 'sign/document/%s/%s' % (sri.sign_request_id.id, access_token)
             sri.document_link = f"{sri.sign_request_id.get_base_url()}/{sub_route}"
 
-    def _check_whatsapp_template_exists(self, check_if_approved=False):
-        """
-        Checks if all required WhatsApp templates are configured.
-        """
-        ICP_sudo = self.env['ir.config_parameter'].sudo()
-        whatsapp_template_ids = [
-            ICP_sudo.get_param('whatsapp_sign.whatsapp_template_id'),
-            ICP_sudo.get_param('whatsapp_sign.whatsapp_completion_template_id'),
-            ICP_sudo.get_param('whatsapp_sign.whatsapp_refusal_template_id')
-        ]
-
-        for template_id in whatsapp_template_ids:
-            if not (template_id and template_id.isdigit()):
-                return False
-            template = self.env['whatsapp.template'].browse(int(template_id)).exists()._filtered_access('read')
-            if not template or (check_if_approved and template.status != 'approved'):
-                return False
-
-        return True
-
     def _get_whatsapp_safe_fields(self):
         return {
             'partner_id.phone', 'display_name', 'create_uid.partner_id.name',
@@ -98,22 +78,29 @@ class SignRequestItem(models.Model):
 
         :return: The result of the parent method if the message is sent via email, otherwise None
         """
-        is_whatsapp = self.sign_request_id.send_channel == 'whatsapp'
-        misconfiguration = is_whatsapp and not self._check_whatsapp_template_exists()
-        if misconfiguration:
-            self.sign_request_id.send_channel = 'email'
-        if misconfiguration or not is_whatsapp:
-            return super()._send_signature_access_message()
 
-        template_id = self.env['ir.config_parameter'].sudo().get_param('whatsapp_sign.whatsapp_template_id')
-        whatsapp_template = self.env['whatsapp.template'].browse(int(template_id))
+        non_whatsapp_items = self.env['sign.request.item']
         for sign_request_item in self:
+            company = sign_request_item.sign_request_id.communication_company_id
+            is_whatsapp = sign_request_item.sign_request_id.send_channel == 'whatsapp'
+            misconfiguration = is_whatsapp and not (company and company._check_if_whatsapp_sign_is_enabled())
+            if misconfiguration:
+                sign_request_item.sign_request_id.send_channel = 'email'
+            if misconfiguration or not is_whatsapp:
+                non_whatsapp_items |= sign_request_item
+                continue
+
             # The sign link is calculated and assigned here to ensure the expiration time reflects the exact moment the sign request was sent
-            sign_link, _ = self._get_sign_and_cancel_links(sign_request_item)
+            sign_link, _ = sign_request_item._get_sign_and_cancel_links(sign_request_item)
             sign_request_item.sudo().sign_link = sign_link  # sudo write to avoid ACL restrictions on sign_link
+
+            wa_template = company.sign_send_request_wa_template_id
             whatsapp_composer = self.env['whatsapp.composer'].with_context({'active_id': sign_request_item.id}).create({
-                'wa_template_id': whatsapp_template.id,
+                'wa_template_id': wa_template.id,
                 'res_model': 'sign.request.item'
             })
             whatsapp_composer.sudo()._send_whatsapp_template(force_send_by_cron=True)
             sign_request_item.is_mail_sent = True
+
+        if non_whatsapp_items:
+            return super(SignRequestItem, non_whatsapp_items)._send_signature_access_message()

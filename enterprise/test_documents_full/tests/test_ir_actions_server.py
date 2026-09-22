@@ -5,6 +5,7 @@ from odoo.tests.common import tagged
 @tagged('post_install', '-at_install', 'test_document_bridge_full')
 class TestIrActionsServerFull(DocumentsAccountActionsServerCommon):
     """Testing server actions linked to documents_account that need extra dependencies"""
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_documents_account_record_create_bank(self):
         """Test documents_account_record_create action for Bank Statements."""

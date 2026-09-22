@@ -2,20 +2,18 @@
 
 from werkzeug.exceptions import NotFound
 
-from odoo import _
 from odoo.exceptions import ValidationError
-from odoo.http import Controller, request, route
+from odoo.http import Controller, route
 
-from odoo.addons.base.models.res_bank import sanitize_account_number
-from odoo.addons.base_iban.models.res_partner_bank import validate_iban
+from odoo.tools.bank_account_number import validate_iban
+from odoo.addons.base.models.res_partner_bank import sanitize_account_number
 from odoo.addons.payment import utils as payment_utils
 
 
 class SepaDirectDebitController(Controller):
-
-    @route('/payment/sepa_direct_debit/set_mandate', type='jsonrpc', auth='public')
+    @route("/payment/sepa_direct_debit/set_mandate", type="jsonrpc", auth="public")
     def sdd_set_mandate(self, reference, iban, access_token):
-        """ Assign the SDD mandate corresponding to the given IBAN to the transaction.
+        """Assign the SDD mandate corresponding to the given IBAN to the transaction.
 
         :param str reference: The reference of the transaction.
         :param str iban: The IBAN of the partner's bank account.
@@ -23,30 +21,33 @@ class SepaDirectDebitController(Controller):
         :return: None
         :raise NotFound: If the access token is invalid.
         """
-        tx_sudo = request.env['payment.transaction'].sudo()._search_by_reference(
-            'custom', {'reference': reference}
+        tx_sudo = (
+            self
+            .env["payment.transaction"]
+            .sudo()
+            ._search_by_reference("custom", {"reference": reference})
         )
         if not tx_sudo:
             return
 
         if not payment_utils.check_access_token(access_token, tx_sudo.reference):
-            raise NotFound()
+            raise NotFound
 
         # Verify that all configuration-specific required parameters are provided.
         iban = self._sdd_validate_and_format_iban(iban)
 
         # Get the mandate from the IBAN
-        tx_sudo.mandate_id = tx_sudo.provider_id._sdd_find_or_create_mandate(
-            tx_sudo.partner_id.id, iban
-        )
+        tx_sudo.with_context(
+            payment_safe_write=True  # No payment was initiated
+        ).mandate_id = tx_sudo.provider_id._sdd_find_or_create_mandate(tx_sudo.partner_id.id, iban)
 
         # Set the transaction as pending until a matching bank statement is found. Transactions
         # created from the form with an IBAN corresponding to an existing mandate are set pending as
         # well to force the customer to actually make the payment.
-        tx_sudo._set_pending()
+        tx_sudo._record({"reference": tx_sudo.reference})
 
     def _sdd_validate_and_format_iban(self, iban):
-        """ Validate the provided IBAN and return its formatted value.
+        """Validate the provided IBAN and return its formatted value.
 
         :param str iban: The IBAN to validate and format
         :return: The formatted IBAN
@@ -54,7 +55,7 @@ class SepaDirectDebitController(Controller):
         :raise: ValidationError if the IBAN is invalid
         """
         iban = sanitize_account_number(iban)
-        validate_iban(iban)
+        validate_iban(self.env, iban)
         if not iban:
-            raise ValidationError(_("Missing or invalid IBAN."))
+            raise ValidationError(self.env._("Missing or invalid IBAN."))
         return iban

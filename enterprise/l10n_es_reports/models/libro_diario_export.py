@@ -91,7 +91,6 @@ class JournalReportCustomHandler(models.AbstractModel):
 
         # Add company data and report dates
         report = self.env['account.report'].browse(options['report_id'])
-        report._init_currency_table(options)
         company = report._get_sender_company_for_export(options)
         company_data = [company.name, company.vat or ""]
         report_data = [_("General Ledger - %(date_from)s_%(date_to)s", date_from=options['date']['date_from'], date_to=options['date']['date_to'])]
@@ -103,7 +102,8 @@ class JournalReportCustomHandler(models.AbstractModel):
 
         # Get General Ledger report handler and use its engine
         gl_handler = self.env['account.general.ledger.report.handler']
-        engine_result = gl_handler._report_custom_engine_general_ledger(None, options, None, 'id_with_accumulated_balance', None)
+        expressions = report.line_ids.expression_ids
+        engine_result = gl_handler._report_engine_general_ledger(options, 'strict_range', expressions.grouped('formula'), 'id_with_accumulated_balance')[expressions]
         # Add lines data
         current_move = ''
         entry_index = 0

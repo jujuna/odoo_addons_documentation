@@ -1,24 +1,36 @@
+import { render } from "@web/owl2/utils";
 import { defineSpreadsheetModels, Partner } from "@spreadsheet/../tests/helpers/data";
 import { describe, expect, getFixture, test, beforeEach } from "@odoo/hoot";
 import { runAllTimers } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
-import { registries, stores } from "@odoo/o-spreadsheet";
+import { registries, stores, owlPlugins } from "@odoo/o-spreadsheet";
 import { createSpreadsheetWithPivot } from "@spreadsheet/../tests/helpers/pivot";
-import { addGlobalFilter, updatePivot } from "@spreadsheet/../tests/helpers/commands";
+import {
+    addGlobalFilter,
+    createSheet,
+    deleteSheet,
+    updatePivot,
+} from "@spreadsheet/../tests/helpers/commands";
 import {
     contains,
     fields,
     makeServerError,
     mountWithCleanup,
+    onRpc,
+    serverState,
 } from "@web/../tests/web_test_helpers";
-import { Component, onMounted, onWillUnmount, xml } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, providePlugins, t, useProps, xml } from "@odoo/owl";
 import { PivotDetailsSidePanel } from "@spreadsheet_edition/bundle/pivot/side_panels/pivot_details_side_panel";
 const { useStore, useStoreProvider, ModelStore, SidePanelStore } = stores;
+import {
+    editSelectComponent,
+    getFieldItem,
+} from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
 
 defineSpreadsheetModels();
 describe.current.tags("desktop");
 
-const { coreViewsPluginRegistry } = registries;
+const { evaluationPluginRegistry, pivotRegistry } = registries;
 
 let target;
 
@@ -30,25 +42,30 @@ class Parent extends Component {
     // We need to wrap the component in a div with `o-spreadsheet` to have a correct portal target for spreadsheet popovers
     static template = xml/* xml */ `
         <div class="o-spreadsheet">
-            <PivotDetailsSidePanel onCloseSidePanel="props.onCloseSidePanel" pivotId="props.pivotId"/>
+            <PivotDetailsSidePanel onCloseSidePanel="this.props.onCloseSidePanel" pivotId="this.props.pivotId"/>
         </div>
     `;
     static components = { PivotDetailsSidePanel };
-    static props = {
-        model: Object,
-        pivotId: String,
-        onCloseSidePanel: Function,
-    };
+
+    props = useProps({
+        model: t.object(),
+        pivotId: t.string(),
+        onCloseSidePanel: t.function(),
+    });
 
     setup() {
+        providePlugins([owlPlugins.PopoverContainerPlugin], {
+            getPopoverContainerRect: () =>
+                getFixture().querySelector(".o-spreadsheet").getBoundingClientRect(),
+        });
         const stores = useStoreProvider();
         stores.inject(ModelStore, this.props.model);
         const sidePanelStore = useStore(SidePanelStore);
         sidePanelStore.open("PivotSidePanel", this.props);
 
         onMounted(() => {
-            this.props.model.on("update", this, () => this.render(true));
-            stores.on("store-updated", this, this.render.bind(this, true));
+            this.props.model.on("update", this, () => render(this, true));
+            stores.on("store-updated", this, () => render(this, true));
         });
         onWillUnmount(() => {
             this.props.model.off("update", this);
@@ -67,12 +84,6 @@ async function replaceSidePanel(model, env, pivotId, onCloseSidePanel = () => {}
     env.notifyUser = env.notifyUser || (() => {});
     env.replaceSidePanel = env.replaceSidePanel || (() => {});
     await mountWithCleanup(Parent, { env, props: { model, pivotId, onCloseSidePanel } });
-}
-
-function getFieldItem(name, fixture) {
-    return fixture.querySelector(
-        `.o_popover_field_selector .o_model_field_selector_popover_item[data-name="${name}"]`
-    );
 }
 
 test("Open pivot properties", async function () {
@@ -130,7 +141,7 @@ test("Removing the measure removes the sortedColumn", async function () {
     await openSidePanel(model, env, pivotId);
     expect(model.getters.getPivot(pivotId).definition.sortedColumn).not.toBe(undefined);
 
-    await contains(".pivot-measure .fa-trash").click();
+    await contains(".pivot-measure [data-icon='delete_f']").click();
     expect(model.getters.getPivot(pivotId).definition.sortedColumn).toBe(undefined);
 });
 
@@ -146,12 +157,12 @@ test("Removing a column removes the sortedColumn", async function () {
     await openSidePanel(model, env, pivotId);
 
     expect(model.getters.getPivot(pivotId).definition.sortedColumn).not.toBe(undefined);
-    await contains(".pivot-dimension .fa-trash").click();
+    await contains(".pivot-dimension [data-icon='delete_f']").click();
     expect(model.getters.getPivot(pivotId).definition.sortedColumn).toBe(undefined);
 });
 
 test("Open pivot properties properties with non-loaded field", async function () {
-    const PivotUIPlugin = coreViewsPluginRegistry.get("pivot_ui");
+    const PivotUIPlugin = evaluationPluginRegistry.get("pivot_ui");
     const { model, pivotId, env } = await createSpreadsheetWithPivot();
     const pivotPlugin = model["handlers"].find((handler) => handler instanceof PivotUIPlugin);
     const dataSource = Object.values(pivotPlugin.pivots)[0];
@@ -184,7 +195,7 @@ test("Duplicate the pivot from the side panel", async function () {
     expect(".os-pivot-title").toHaveValue("Partner Pivot");
 
     await contains(".os-cog-wheel-menu-icon").click();
-    await contains(".o-popover .fa-clone").click();
+    await contains(".o-popover [data-icon='content_copy']").click();
     expect(model.getters.getPivotIds().length).toBe(2);
     const duplicatedPivotId = model.getters.getPivotIds()[1];
     expect.verifySteps(["PivotSidePanel", duplicatedPivotId]);
@@ -199,10 +210,10 @@ test("A warning is displayed in the side panel if the pivot is unused", async fu
 
     expect(".o-validation-warning").toHaveCount(0);
 
-    model.dispatch("CREATE_SHEET", { sheetId: "sh2", name: "Sheet2" });
+    createSheet(model, { sheetId: "sh2", name: "Sheet2" });
     const activeSheetId = model.getters.getActiveSheetId();
     model.dispatch("ACTIVATE_SHEET", { sheetIdFrom: activeSheetId, sheetIdTo: "sh2" });
-    model.dispatch("DELETE_SHEET", { sheetId: activeSheetId });
+    deleteSheet(model, activeSheetId);
     await animationFrame();
 
     expect(".o-validation-warning").toHaveCount(1);
@@ -251,7 +262,7 @@ test("can drag a column dimension to row", async function () {
         { position: "bottom" }
     );
     await animationFrame();
-    expect(".pivot-defer-update .fa-undo").toHaveCount(1);
+    expect(".pivot-defer-update [data-icon='undo']").toHaveCount(1);
     expect(".pivot-defer-update .sp_apply_update").toHaveCount(1);
     // TODO use a snapshot
     definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
@@ -287,7 +298,7 @@ test("remove pivot dimension", async function () {
     const { model, env, pivotId } = await createSpreadsheetWithPivot();
     await openSidePanel(model, env, pivotId);
     await contains(".pivot-defer-update input").click();
-    await contains(".pivot-dimensions .fa-trash").click();
+    await contains(".pivot-dimensions [data-icon='delete_f']").click();
     await animationFrame();
     await contains(".pivot-defer-update .o-button-link").click();
     const definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
@@ -307,7 +318,7 @@ test("remove pivot date time dimension", async function () {
     });
     await openSidePanel(model, env, pivotId);
     await contains(".pivot-defer-update input").click();
-    await contains(".pivot-dimensions .fa-trash").click();
+    await contains(".pivot-dimensions [data-icon='delete_f']").click();
     await animationFrame();
     await contains(".pivot-defer-update .o-button-link").click();
     const definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
@@ -368,7 +379,7 @@ test("add column dimension on a related model", async function () {
     await contains(
         ".o_popover_field_selector .o_model_field_selector_popover_item[data-name='active'] button"
     ).click();
-    expect(".fa-exclamation-triangle").toHaveCount(0);
+    expect("[data-icon='warning']").toHaveCount(0);
     expect(".pivot-dimension:first .o-fw-bold").toHaveText("Product > Active");
     await contains(".pivot-defer-update .o-checkbox").click();
     const definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
@@ -393,7 +404,7 @@ test("add row dimension on a related model", async function () {
     await contains(
         ".o_popover_field_selector .o_model_field_selector_popover_item[data-name='active'] button"
     ).click();
-    expect(".fa-exclamation-triangle").toHaveCount(0);
+    expect("[data-icon='warning']").toHaveCount(0);
     expect(".pivot-dimension:first .o-fw-bold").toHaveText("Product > Active");
     await contains(".pivot-defer-update .o-checkbox").click();
     const definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
@@ -431,6 +442,19 @@ test("date/datetime field can be re-selected because of different granularities"
     expect(item.querySelector(".o_model_field_selector_popover_item_name").disabled).toBe(false);
 });
 
+test("date/datetime field is filtered out once every granularity is used", async function () {
+    const { model, env, pivotId } = await createSpreadsheetWithPivot();
+    const dateGranularities = pivotRegistry.get("ODOO").dateGranularities;
+    updatePivot(model, pivotId, {
+        rows: dateGranularities.map((granularity) => ({ fieldName: "date", granularity })),
+    });
+    await openSidePanel(model, env, pivotId);
+    const fixture = getFixture();
+
+    await contains(".add-dimension.o-button").click();
+    expect(getFieldItem("date", fixture)).toBe(null);
+});
+
 test("relation field cannot be re-selected but subfields stay accessible", async function () {
     const { model, env, pivotId } = await createSpreadsheetWithPivot();
     await openSidePanel(model, env, pivotId);
@@ -442,7 +466,7 @@ test("relation field cannot be re-selected but subfields stay accessible", async
 
     await contains(".add-dimension.o-button").click();
     const item = getFieldItem("product_id", fixture);
-    expect(item.getAttribute("data-tooltip")).toBe("Pivot contains duplicate groupbys");
+    expect(item.getAttribute("data-tooltip")).toBe("Already present in the source");
     expect(item.querySelector(".o_model_field_selector_popover_item_name").disabled).toBe(true);
     expect(item.querySelector(".o_model_field_selector_popover_item_relation").disabled).toBe(
         false
@@ -597,7 +621,7 @@ test("remove pivot measure", async function () {
     const { model, env, pivotId } = await createSpreadsheetWithPivot();
     await openSidePanel(model, env, pivotId);
     await contains(".pivot-defer-update input").click();
-    await contains(".pivot-dimensions .fa-trash:last").click();
+    await contains(".pivot-dimensions [data-icon='delete_f']:last").click();
     await animationFrame();
     await contains(".pivot-defer-update .o-button-link").click();
     const definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
@@ -631,13 +655,11 @@ test("change measure aggregator", async function () {
         `,
     });
     await openSidePanel(model, env, pivotId);
-    const fixture = getFixture();
     await contains(".pivot-defer-update input").click();
-    expect(fixture.querySelector(".pivot-measure select")).toHaveValue("avg");
-    await contains(".pivot-measure select").select("min");
-    expect(".pivot-measure select option:checked").toHaveText("Minimum");
+    expect(".pivot-measure .o-select").toHaveText("Average");
+    await editSelectComponent(".pivot-measure .o-select", "min");
     await contains(".pivot-defer-update .o-button-link").click();
-    expect(fixture.querySelector(".pivot-measure select")).toHaveValue("min");
+    expect(".pivot-measure .o-select").toHaveText("Minimum");
     const definition = model.getters.getPivotCoreDefinition(pivotId);
     expect(definition.measures).toEqual([
         {
@@ -674,8 +696,7 @@ test("pivot with a reference field measure", async function () {
         `,
     });
     await openSidePanel(model, env, pivotId);
-    const fixture = getFixture();
-    expect(fixture.querySelector(".pivot-measure select")).toHaveValue("count_distinct");
+    expect(".pivot-measure .o-select").toHaveText("Count Distinct");
 });
 
 test("change dimension order", async function () {
@@ -690,15 +711,15 @@ test("change dimension order", async function () {
     await openSidePanel(model, env, pivotId);
     await contains(".pivot-defer-update input").click();
     const fixture = getFixture();
-    expect(fixture.querySelector(".pivot-dimensions select")).toHaveValue("");
-    await contains(".pivot-dimensions select").select("desc");
-    expect(fixture.querySelector(".pivot-dimensions select")).toHaveValue("desc");
+    expect(fixture.querySelector(".pivot-dimensions .o-select")).toHaveText("Unsorted");
+    await editSelectComponent(".pivot-dimensions .o-select", "desc");
+    expect(fixture.querySelector(".pivot-dimensions .o-select")).toHaveText("Descending");
     await contains(".pivot-defer-update .o-button-link").click();
     let definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
     expect(definition.rows).toEqual([{ fieldName: "foo", order: "desc" }]);
 
     // reset to automatic
-    await contains(".pivot-dimensions select").select("");
+    await editSelectComponent(".pivot-dimensions .o-select", "");
     await contains(".pivot-defer-update .o-button-link").click();
     definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
     expect(definition.rows).toEqual([{ fieldName: "foo" }]);
@@ -716,9 +737,9 @@ test("change date dimension granularity", async function () {
     await openSidePanel(model, env, pivotId);
     const fixture = getFixture();
     await contains(".pivot-defer-update input").click();
-    expect(fixture.querySelectorAll(".pivot-dimensions select")[0]).toHaveValue("day");
-    await contains(fixture.querySelectorAll(".pivot-dimensions select")[0]).select("week");
-    expect(fixture.querySelectorAll(".pivot-dimensions select")[0]).toHaveValue("week");
+    expect(fixture.querySelector(".pivot-dimensions .o-select")).toHaveText("Day");
+    await editSelectComponent(fixture.querySelector(".pivot-dimensions .o-select"), "week");
+    expect(fixture.querySelector(".pivot-dimensions .o-select")).toHaveText("Week & Year");
     await contains(".pivot-defer-update .o-button-link").click();
     const definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
     expect(definition.rows).toEqual([{ fieldName: "date", granularity: "week" }]);
@@ -736,14 +757,18 @@ test("pivot with twice the same date field with different granularity", async fu
     });
     await openSidePanel(model, env, pivotId);
     const fixture = getFixture();
-    const firstDateGroup = fixture.querySelectorAll(".pivot-dimensions select")[0];
-    const secondDateGroup = fixture.querySelectorAll(".pivot-dimensions select")[2];
-    expect(firstDateGroup).toHaveValue("year");
-    expect(secondDateGroup).toHaveValue("day");
-    expect(firstDateGroup).toHaveText(
+    const firstDateGroup = fixture.querySelectorAll(".pivot-dimensions .o-select")[0];
+    const secondDateGroup = fixture.querySelectorAll(".pivot-dimensions .o-select")[2];
+
+    expect(firstDateGroup).toHaveText("Year");
+    await contains(firstDateGroup).click();
+    expect(".o-spreadsheet .o-popover").toHaveText(
         "Year\nQuarter\nQuarter & Year\nMonth\nMonth & Year\nWeek\nWeek & Year\nDay of Month\nDay of Week"
     );
-    expect(secondDateGroup).toHaveText(
+
+    expect(secondDateGroup).toHaveText("Day");
+    await contains(secondDateGroup).click();
+    expect(".o-spreadsheet .o-popover").toHaveText(
         "Quarter\nQuarter & Year\nMonth\nMonth & Year\nWeek\nWeek & Year\nDay of Month\nDay\nDay of Week"
     );
 });
@@ -755,7 +780,7 @@ test("Can change measure display as from the side panel", async function () {
     };
     await replaceSidePanel(model, env, pivotId);
 
-    await contains(".pivot-measure .fa-cog").click();
+    await contains(".pivot-measure [data-icon='settings_f']").click();
     expect.verifySteps(["PivotMeasureDisplayPanel"]);
 });
 
@@ -778,7 +803,8 @@ test("display pivot related filters panel", async function () {
     expect(".o_side_panel_collapsible_title:contains(Matching 1 / 2 filters)").toHaveCount(1);
 });
 
-test("PivotModelFieldSelectorPopover in debug mode for column", async function () {
+test("SidepanelModelFieldSelectorPopover in debug mode for column", async function () {
+    serverState.debug = "1";
     const { model, env, pivotId } = await createSpreadsheetWithPivot({
         arch: /*xml*/ `
             <pivot>
@@ -786,7 +812,6 @@ test("PivotModelFieldSelectorPopover in debug mode for column", async function (
             </pivot>
         `,
     });
-    env.debug = true;
     await openSidePanel(model, env, pivotId);
     await contains(".add-dimension.o-button:eq(0)").click();
     expect(
@@ -794,7 +819,30 @@ test("PivotModelFieldSelectorPopover in debug mode for column", async function (
     ).toHaveCount(12);
 });
 
-test("PivotModelFieldSelectorPopover in debug mode for row", async function () {
+test("side panel does not blink to the invalid-model state during definition reload", async function () {
+    const { model, env, pivotId } = await createSpreadsheetWithPivot();
+    await openSidePanel(model, env, pivotId);
+    expect(".o_model_name").toHaveCount(1);
+    expect(".o-validation-error").toHaveCount(0);
+
+    const def = Promise.withResolvers();
+    onRpc("partner", "formatted_read_grouping_sets", () => def.promise);
+    await contains(".pivot-dimensions div:nth-child(2)").dragAndDrop(
+        ".pivot-dimensions div:nth-child(4)",
+        { position: "bottom" }
+    );
+    // The side panel must remain in a valid state during the reload.
+    expect(".o_model_name").toHaveCount(1);
+    expect(".o-validation-error").toHaveCount(0);
+
+    def.resolve();
+    await animationFrame();
+    expect(".o_model_name").toHaveCount(1);
+    expect(".o-validation-error").toHaveCount(0);
+});
+
+test("SidepanelModelFieldSelectorPopover in debug mode for row", async function () {
+    serverState.debug = "1";
     const { model, env, pivotId } = await createSpreadsheetWithPivot({
         arch: /*xml*/ `
             <pivot>
@@ -802,7 +850,6 @@ test("PivotModelFieldSelectorPopover in debug mode for row", async function () {
             </pivot>
         `,
     });
-    env.debug = true;
     await openSidePanel(model, env, pivotId);
     await contains(".add-dimension.o-button:eq(1)").click();
     expect(

@@ -1,9 +1,9 @@
+import { proxy, signal } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { CharField, charField } from '@web/views/fields/char/char_field';
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { useService } from "@web/core/utils/hooks";
 import { humanSize } from "@web/core/utils/binary";
-import { useRef, useState } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 
 /**
@@ -30,10 +30,10 @@ import { _t } from "@web/core/l10n/translation";
  */
 export class YoutubeUploadField extends CharField {
     static template = "social_youtube.YoutubeUploadField";
+    fileInputRef = signal.ref();
     setup() {
         super.setup();
-        this.fileInputRef = useRef('fileInput');
-        this.state = useState({
+        this.state = proxy({
             uploading: false,
             showSocialYoutubeBar: true,
             socialYoutubeText: _t("Uploading... 0%"),
@@ -188,7 +188,7 @@ export class YoutubeUploadField extends CharField {
         this.notification.add(_t('Upload failed. Please try again.'), {
             type: 'warning',
         });
-        this.fileInputRef.el.value = '';
+        this.fileInputRef().value = '';
     }
 
     /**
@@ -324,8 +324,7 @@ export class YoutubeUploadField extends CharField {
 
 
         // Strip and keep the last part of file name to get "video.mp4" and not "C:/fakepath/video.mp4".
-        const fileName = this.fileInputRef.el.value
-            .match(/([^\\.]+)\.\w+$/)[0];
+        const fileName = this.fileInputRef().value.match(/([^\\.]+)\.\w+$/)[0];
 
         this.state.uploading = false;
         await this.props.record.update({
@@ -372,7 +371,7 @@ export class YoutubeUploadField extends CharField {
             return;
         }
         this.state.uploadErrorMessage = false;
-        this.fileInputRef.el.click();
+        this.fileInputRef().click();
     }
 }
 

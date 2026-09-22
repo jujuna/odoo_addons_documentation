@@ -4,31 +4,35 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-08 07:39+0000\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 00:37+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "hr_appraisal_survey/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
-msgid "- Feedback requested by -"
-msgstr "- フィードバック依頼者 -"
+#: model:ir.module.module,description:base.module_hr_appraisal_survey
+msgid ""
+"\n"
+"This module adds an integration with Survey to ask feedbacks to any "
+"employee, based on a survey to fill.\n"
+msgstr ""
 
 #. module: hr_appraisal_survey
 #: model:ir.actions.act_window,name:hr_appraisal_survey.survey_survey_action_appraisal
+#: model:ir.module.module,summary:base.module_hr_appraisal_survey
 #: model:ir.ui.menu,name:hr_appraisal_survey.menu_hr_appraisal_surveys
 #: model:mail.message.subtype,description:hr_appraisal_survey.mt_360_feedback
 #: model:mail.message.subtype,name:hr_appraisal_survey.mt_360_feedback
@@ -42,14 +46,10 @@ msgid "360 Feedback Survey"
 msgstr "360度フィードバック調査"
 
 #. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
-msgid "<i class=\"oi oi-fw oi-arrow-right\"/>Go to Appraisal"
-msgstr "<i class=\"oi oi-fw oi-arrow-right\"/>評価へ移動"
-
-#. module: hr_appraisal_survey
 #: model:mail.template,body_html:hr_appraisal_survey.mail_template_appraisal_ask_feedback
 msgid ""
-"<p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: 20px;"
+"\">\n"
 "                    Dear <t t-out=\"object.partner_id.name or "
 "'participant'\">[participant]</t>,\n"
 "                    <br/>\n"
@@ -64,7 +64,7 @@ msgid ""
 "                    It should only take a few minutes, and you can submit "
 "your feedback via the link below:\n"
 "                    <br/>\n"
-"                    </p><div class=\"text-center my-4\">\n"
+"                    <div style=\"text-align: center; margin: 24px 0;\">\n"
 "                        <a t-att-href=\"object.get_start_url()\" t-attf-"
 "style=\"background-color: {{user.company_id.email_secondary_color or "
 "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
@@ -84,47 +84,53 @@ msgid ""
 "comment]</t>\n"
 "                        </div>\n"
 "                    </t>\n"
-"                \n"
+"                </div>\n"
 "            "
 msgstr ""
-"<p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: "
+"20px;\">\n"
 "                    <t t-out=\"object.partner_id.name or 'participant'\">[参"
-"加者]</t>さん\n"
+"加者]</t>様\n"
 "                    <br/>\n"
-"                    当社の 360° フィードバックプロセスの一環として、<t t-"
-"out=\"ctx.get('logged_user')\">[現在のユーザ]</t> が\n"
-"                    <t t-out=\"ctx.get('employee')\">[対象社員]</t>のパフォー"
-"マンスについて、あなたのご意見を伺いたいと考えています。\n"
-"    <br/><br/>\n"
+"                    60度フィードバックの一環として、<t t-out=\"ctx.get"
+"('logged_user')\">[現在のユーザー]</t> より、\n"
+"                     <t t-out=\"ctx.get('employee')\">[従業員]</t>の業務に関"
+"するご意見を伺いたく、ご連絡いたしました。\n"
 "                    <br/>\n"
-"                    あなたのフィードバックは、社員の強みを把握し、成長の機会"
-"を見つけるうえで大変貴重です。\n"
+"                   いただいたフィードバックは、強みの把握や今後の成長に向けた"
+"改善に活かすうえで、大変参考になります。\n"
 "                    <br/>\n"
-"                    回答には数分程度しかかかりません。以下のリンクからご回答"
-"をお願いいたします:\n"
+"                    回答は数分で完了します。以下のリンクからご協力をお願いい"
+"たします。\n"
 "                    <br/>\n"
-"                    </p><div class=\"text-center my-4\">\n"
+"                    <div style=\"text-align: center; margin: 24px 0;\">\n"
 "                        <a t-att-href=\"object.get_start_url()\" t-attf-"
 "style=\"background-color: {{user.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: {"
+"{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\">\n"
 "                            フィードバックを送信する\n"
 "                        </a>\n"
 "                    </div>\n"
-"                    フィードバックのご提出期限は<t t-"
-"out=\"ctx.get('deadline')\">[期日]</t>までとなっております。\n"
+"                    <t t-out=\"ctx.get('deadline')\">[指定期限]</t>までにご回"
+"答ください。\n"
 "                    <br/>\n"
-"                    ご協力、誠にありがとうございます。\n"
+"                    お忙しいところ恐れ入りますが、率直なご意見をお寄せいただ"
+"けますと幸いです。よろしくお願いいたします。\n"
 "                    <br/>\n"
 "                    <t t-if=\"ctx.get('user_body')\">\n"
 "                        <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
-"                            <t t-out=\"ctx.get('user_body')\">[コメント(任"
-"意)]</t>\n"
+"                            <t t-out=\"ctx.get('user_body')\">[任意"
+"コメント]</t>\n"
 "                        </div>\n"
 "                    </t>\n"
-"                \n"
+"                </div>\n"
 "            "
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
+msgid "<i class=\"oi me-2\" data-icon=\"east\"/>Go to Appraisal"
+msgstr ""
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
@@ -143,8 +149,8 @@ msgid ""
 "A new 360 Feedback report has been completed for the appraisal of %"
 "(employee_name)s."
 msgstr ""
-"%(employee_name)sの査定用に、新しい360フィードバックのレポートが完成しまし"
-"た。"
+"%(employee_name)sの査定用に、新しい360フィードバックのレポートが完成しました"
+"。"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_1
@@ -185,8 +191,8 @@ msgstr "新しいアンケートを追加します。"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
-msgid "Add employees..."
-msgstr "従業員を追加..."
+msgid "Add feedback recipients..."
+msgstr "フィードバックの宛先を追加..."
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_2_3
@@ -216,8 +222,8 @@ msgid ""
 "An appraisal feedback was requested. Please take time to fill the <a "
 "href=\"%s\" target=\"_blank\">survey</a>"
 msgstr ""
-"査定フィードバックが依頼されました。<a href=\"%s\" target=\"_blank\">アンケー"
-"ト</a>にご記入下さい。"
+"査定フィードバックが依頼されました。<a href=\"%s\" target=\"_blank\">"
+"アンケート</a>にご記入下さい。"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_11
@@ -235,6 +241,11 @@ msgstr "回答期限"
 #: model:ir.model.fields.selection,name:hr_appraisal_survey.selection__survey_survey__survey_type__appraisal
 msgid "Appraisal"
 msgstr "査定"
+
+#. module: hr_appraisal_survey
+#: model:ir.module.module,shortdesc:base.module_hr_appraisal_survey
+msgid "Appraisal - Survey"
+msgstr ""
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__employee_id
@@ -284,7 +295,7 @@ msgid "Ask Feedback for Appraisal"
 msgstr "査定用のフィードバックを依頼"
 
 #. module: hr_appraisal_survey
-#: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__employee_feedback_ids
+#: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__partner_feedback_ids
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.view_hr_appraisal_tree
 msgid "Asked Feedback"
 msgstr "依頼済フィードバック"
@@ -318,11 +329,6 @@ msgstr "本文はテンプレートと同じです。"
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__can_edit_body
 msgid "Can Edit Body"
 msgstr "本文編集可"
-
-#. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
-msgid "Cancel"
-msgstr "キャンセル"
 
 #. module: hr_appraisal_survey
 #. odoo-python
@@ -420,11 +426,6 @@ msgid "Did not meet standards and expectations"
 msgstr "基準および期待を満たしていない"
 
 #. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_select_survey_view_form
-msgid "Discard"
-msgstr "破棄"
-
-#. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__display_name
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_select_survey__display_name
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__display_name
@@ -439,11 +440,6 @@ msgstr "表示名"
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_10
 msgid "Do you have any comment to tell him/her in order to improve?"
 msgstr "改善のために伝えたいコメントはありますか?"
-
-#. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
-msgid "Employee"
-msgstr "従業員"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_hr_appraisal
@@ -640,13 +636,8 @@ msgid "Meet standards and expectations"
 msgstr "基準および期待に見合う"
 
 #. module: hr_appraisal_survey
-#. odoo-python
-#: code:addons/hr_appraisal_survey/wizard/appraisal_ask_feedback.py:0
-msgid "Missing email"
-msgstr "行方不明のEメール"
-
-#. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_1_1
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_view_partner_tree
 msgid "Name"
 msgstr "名称"
 
@@ -692,6 +683,11 @@ msgstr ""
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid "Overall Purpose Of Employee Appraisal"
 msgstr "従業員査定の全体的な目的"
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
+msgid "Partner"
+msgstr "取引先"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_survey_user_input__requested_by
@@ -740,7 +736,7 @@ msgid "Rarely"
 msgstr "稀に"
 
 #. module: hr_appraisal_survey
-#: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__employee_ids
+#: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__partner_ids
 msgid "Recipients"
 msgstr "宛先"
 
@@ -767,7 +763,7 @@ msgstr "再送"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
 msgid "Resend all"
-msgstr "全て再送"
+msgstr "すべて再送"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
@@ -827,6 +823,11 @@ msgstr "アンケートが送信されました"
 #: model:mail.template,description:hr_appraisal_survey.mail_template_appraisal_ask_feedback
 msgid "Sent to employees to gather appraisal feedback"
 msgstr "査定フィードバックを収集するために従業員に送信されました"
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_survey_view_form
+msgid "Shared with everybody"
+msgstr ""
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_4
@@ -893,7 +894,7 @@ msgstr "アンケートのラベル"
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__survey_template_id
 msgid "Survey Template"
-msgstr "調査テンプレート"
+msgstr "アンケートテンプレート"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_survey_survey__survey_type
@@ -910,8 +911,7 @@ msgstr "アンケート回答データ"
 msgid ""
 "Take part in {{ ctx.get('employee_id') and ctx['employee_id'].name or "
 "'this' }} appraisal"
-msgstr ""
-"{{ ctx.get('employee_id') と ctx['employee_id'].name or 'this' }} 査定に参加"
+msgstr "{{ ctx.get('employee_id') と ctx['employee_id'].name or 'this' }} 査定に参加"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_4
@@ -960,23 +960,13 @@ msgstr ""
 "できます。記入後、従業員が上司に送付します。"
 
 #. module: hr_appraisal_survey
-#. odoo-python
-#: code:addons/hr_appraisal_survey/wizard/appraisal_ask_feedback.py:0
-msgid ""
-"The following employees do not have any email: \n"
-"%s"
-msgstr ""
-"次の従業員にはEメールがありません: \n"
-"%s"
-
-#. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid ""
 "The supervisor synthesizes and integrates all input into the completed "
 "appraisal. The motivation of the evaluation is explained in the ad hoc "
 "fields."
 msgstr ""
-"上司は、全ての入力をまとめ、完了済の査定に統合します。評価の動機は、臨時"
+"上司は、すべての入力をまとめ、完了済の査定に統合します。評価の動機は、臨時"
 "フィールドで説明されます。"
 
 #. module: hr_appraisal_survey
@@ -984,8 +974,7 @@ msgstr ""
 msgid ""
 "The survey templates available to choose from for the appraisals that use "
 "this template."
-msgstr ""
-"このテンプレートを使用する評価で選択できる、利用可能な調査テンプレート。"
+msgstr "このテンプレートを使用する評価で選択できる、利用可能な調査テンプレート。"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.survey,description:hr_appraisal_survey.appraisal_feedback_template
@@ -1006,8 +995,7 @@ msgstr "時間管理：プロジェクトやタスクが時間通りに完了す
 msgid ""
 "To assist employees in their professional growth, through the identification "
 "of strengths and opportunities for development"
-msgstr ""
-"従業員の長所と能力開発の機会を特定し、従業員の職業的成長をサポートします。"
+msgstr "従業員の長所と能力開発の機会を特定し、従業員の職業的成長をサポートします。"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -1127,6 +1115,22 @@ msgid "ask feedback"
 msgstr "フィードバック依頼"
 
 #. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
+msgid "at the request of"
+msgstr "依頼により"
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_fill_form_start
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_page_print
+msgid "for"
+msgstr "対象："
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
+msgid "on"
+msgstr "："
+
+#. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
 msgid "or"
 msgstr "又は"
@@ -1135,3 +1139,7 @@ msgstr "又は"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "to a selection of colleagues you work with."
 msgstr "一緒に働いている同僚の一部に対して。"
+
+#, fuzzy
+msgid "Is Manager"
+msgstr "マネジャー"

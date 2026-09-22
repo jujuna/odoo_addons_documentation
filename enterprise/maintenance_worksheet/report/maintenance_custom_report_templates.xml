@@ -6,14 +6,8 @@
             <div class="page">
                 <h1 class="mt-4 mb-4">Maintenance Request: <span t-field="doc.name"/></h1>
                 <t name="qc_content">
-                    <div t-if="doc.worksheet_template_id.report_view_id and worksheet_map.get(doc.id)">
-                        <hr/>
-                        <div name="worksheet_map" style="page-break-inside: avoid">
-                            <h2>Worksheet</h2>
-                            <t t-set="worksheet" t-value="worksheet_map.get(doc.id)"/>
-                            <t t-call="#{doc.worksheet_template_id.report_view_id.id}"/>
-                            <br/>
-                        </div>
+                    <div t-if="doc.worksheet_template_id">
+                            <t t-call="worksheet.worksheet_template_properties_display" props_formatted="doc._get_props_formatted()"/>
                     </div>
                 </t>
             </div>

@@ -1,11 +1,22 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { ProductImageDialog } from "@stock_barcode/components/product_image_dialog";
+import { BarcodeGenerateDialog } from "./barcode_generate_serial";
+import { useService } from "@web/core/utils/hooks";
 
 export default class LineComponent extends Component {
-    static props = ["displayUOM", "line", "subline?", "editLine"];
     static template = "stock_barcode.LineComponent";
+    static props = {
+        displayUOM: t.any(),
+        line: t.any(),
+        subline: t.any().optional(),
+        editLine: t.any(),
+        hidePickingName: t.any().optional(),
+    };
+
+    props = useProps(this.constructor.props);
 
     setup() {
+        this.orm = useService("orm");
         this.imageSource = this.props.line.product_id.has_image
             ? `/web/image/product.product/${this.props.line.product_id.id}/image_128`
             : null;
@@ -29,6 +40,15 @@ export default class LineComponent extends Component {
     get displayFulfillbutton() {
         return (
             this.incrementQty && this.env.model.getDisplayIncrementBtn(this.line) && !this.isPackage
+        );
+    }
+
+    get displayIncrementSpacer() {
+        return (
+            this.isSelected &&
+            this.qtyDemand &&
+            this.qtyDemand !== 1 &&
+            (!this.displayIncrementButton || !this.displayFulfillbutton)
         );
     }
 
@@ -116,6 +136,22 @@ export default class LineComponent extends Component {
         return this.line.result_package_id.dest_complete_name;
     }
 
+    get pickingName() {
+        if (this.env.model.resModel === "stock.picking.batch") {
+            if (this.line.lines?.length > 1) {
+                // Don't display picking name if line has sublines belonging to different pickings.
+                const pickingId = this.line.picking_id.id;
+                for (const line of this.line.lines) {
+                    if (line.picking_id.id != pickingId) {
+                        return false;
+                    }
+                }
+            }
+            return this.line.picking_id.name;
+        }
+        return false;
+    }
+
     get line() {
         return this.props.line;
     }
@@ -125,6 +161,7 @@ export default class LineComponent extends Component {
             this.isComplete ? "o_line_completed" : "o_line_not_completed",
             this.env.model.lineIsFaulty(this.line) ? "o_faulty" : "",
             this.isSelected ? "o_selected o_highlight" : "",
+            this.line.colorLine !== undefined ? "o_colored_markup" : "",
         ].join(" ");
     }
 
@@ -138,6 +175,26 @@ export default class LineComponent extends Component {
         return (
             this.line.description_picking && !possibleNames.includes(this.line.description_picking)
         );
+    }
+
+    get showCreateSNLN() {
+        const picking_type = this.env.model.pickingTypeId;
+        if (picking_type){
+            return this.line.product_id.tracking && this.incrementQty > 0
+                && picking_type.use_create_lots && picking_type.restrict_scan_tracking_number === 'optional';
+        }
+        return false;
+    }
+
+    get showRemainingQty() {
+        const picking_type = this.env.model.pickingTypeId;
+        if (picking_type) {
+            return (
+                this.line.product_id.tracking !== "serial" ||
+                (picking_type.use_create_lots && picking_type.use_existing_lots)
+            );
+        }
+        return true;
     }
 
     _getLocationPath(rootLocation, currentLocation) {
@@ -170,7 +227,7 @@ export default class LineComponent extends Component {
     }
 
     delete() {
-        return this.env.model.deleteLine(this.line);
+        return this.env.model.deleteLines([this.line]);
     }
 
     select(ev) {
@@ -185,5 +242,30 @@ export default class LineComponent extends Component {
 
     onClickImage() {
         this.env.dialog.add(ProductImageDialog, { record: this.line.product_id });
+    }
+
+    async openDialog() {
+        const sequence = (
+            await this.orm.searchRead(
+                "ir.sequence",
+                [["id", "=", this.line.product_id.lot_sequence_id]],
+                ["number_next", "number_next_actual"]
+            )
+        )[0];
+        const nextCustomSerialNumber = await this.orm.call("ir.sequence", "get_next_char", [
+            sequence.id,
+            sequence.number_next,
+        ]);
+
+        const move =
+            typeof this.line.move_id === "number"
+                ? this.env.model.cache.getRecord("stock.move", this.line.move_id)
+                : this.line.move_id;
+        this.env.dialog.add(BarcodeGenerateDialog, {
+            model: this.env.model,
+            move: move,
+            line: this.props.line,
+            nextCustomSerialNumber: nextCustomSerialNumber,
+        });
     }
 }

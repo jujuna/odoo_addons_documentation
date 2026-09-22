@@ -45,7 +45,7 @@ class ResCompany(models.Model):
         return res
 
     def _create_new_appraisal(self, employees):
-        days = int(self.env['ir.config_parameter'].sudo().get_param('hr_appraisal.appraisal_create_in_advance_days', 8))
+        days = self.env['ir.config_parameter'].sudo().get_int('hr_appraisal.appraisal_create_in_advance_days') or 8
         appraisal_values = [{
             'company_id': employee.company_id.id,
             'department_id': employee.department_id.id,

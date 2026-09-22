@@ -12,7 +12,8 @@
                             invisible="progression == '100' or child_ids"/>
                     <button name="action_save_as_template" type="object"
                             string="Save as Template" class="btn btn-secondary"
-                            invisible="template_goal_id"/>
+                            invisible="template_goal_id"
+                            groups="hr_appraisal.group_hr_appraisal_user"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -31,15 +32,18 @@
                     <group>
                         <group>
                             <field name="employee_ids" domain="[['id', 'in', employee_autocomplete_ids]]"
-                                readonly="not is_manager or not has_edit_right"
+                                readonly="not has_edit_right"
+                                invisible="not is_manager"
+                                groups="hr.group_hr_user"
                                 required="True"
                                 widget="many2many_avatar_employee"/>
-                            <field name="progression" widget="selection_badge" invisible="child_ids"/>
+                            <field name="progression" string="Progress" widget="badges_selection" invisible="child_ids"/>
+                            <field name="progression_display" invisible="not child_ids"/>
                         </group>
                         <group>
-                            <field name="manager_ids" force_save="1" readonly="not is_manager or not has_edit_right" widget="many2many_avatar_employee" required="True"/>
+                            <field name="manager_ids" force_save="1" readonly="not has_edit_right" widget="many2many_avatar_employee" required="True"/>
                             <field name="deadline" readonly="not has_edit_right"/>
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" readonly="not has_edit_right"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" readonly="not has_edit_right"/>
                         </group>
                     </group>
                     <group>
@@ -64,12 +68,12 @@
             <list sample="1" class="o_goal_list" default_order="deadline asc" js_class="goal_list_view">
                 <field name="name"/>
                 <field name="description" optional="hide"/>
-                <field name="progression" widget="badge" decoration-success="progression == '100'"/>
+                <field name="progression_display" widget="badge" decoration-success="progression == '100'"/>
                 <field name="employee_ids" widget="many2many_avatar_employee" options="{'no_open': True}"/>
                 <field name="manager_ids" widget="many2many_avatar_employee" optional="hide" options="{'no_open': True}"/>
                 <field name="activity_ids" widget="list_activity" optional="hide"/>
-                <field name="tag_ids" widget="many2many_tags" readonly="1" optional="hide" options="{'color_field': 'color'}"/>
-                <field name="deadline" widget="remaining_days"/>
+                <field name="tag_ids" widget="many2many_tags" readonly="1" optional="hide" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
+                <field name="deadline" widget="relative_date"/>
                 <field name="create_date" options="{'show_time': False}" optional="hide"/>
             </list>
         </field>
@@ -86,9 +90,9 @@
                         <field name="name" class="fs-4 mb-1" style="max-width: 70%;"/>
                         <span t-if="record.progression.raw_value != 100">
                             Progress:
-                            <field name="progression"/>
+                            <field name="progression_display"/>
                         </span>
-                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" class="pt-2" invisible="not tag_ids"/>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" class="pt-2" invisible="not tag_ids"/>
                         <footer>
                             <field name="deadline" />
                             <field name="activity_ids" widget="kanban_activity" class="ms-auto"/>
@@ -108,7 +112,7 @@
         <field name="arch" type="xml">
             <graph string="Goals" type="bar" stacked="0" order="asc" sample="1">
                 <field name="employee_ids"/>
-                <field name="progression"/>
+                <field name="progression_display"/>
             </graph>
         </field>
     </record>
@@ -122,20 +126,20 @@
                 <field name="name"/>
                 <field name="deadline"/>
                 <field name="tag_ids"/>
-                <field name="progression"/>
+                <field name="progression_display"/>
                 <templates>
                     <t t-name="hierarchy-box">
                         <div class="d-flex flex-column mx-2">
                             <div class="d-flex flex-row pt-2">
                                 <field name="name" class="h4 pb-0 text-wrap flex-grow-1 me-1"/>
-                                <field name="progression" widget="badge" decoration-success="progression == '100'"/>
+                                <field name="progression_display" widget="badge" decoration-success="progression == '100'"/>
                             </div>
                             <div class="d-grid column-gap-2" style="grid-template-columns: min-content minmax(0,1fr);">
                                 <span>Deadline:</span>
                                 <field name="deadline"/>
                                 <span id="span_tag" invisible="not tag_ids">Tags:</span>
                                 <field name="tag_ids" invisible="not tag_ids"
-                                    widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                             </div>
                         </div>
                     </t>

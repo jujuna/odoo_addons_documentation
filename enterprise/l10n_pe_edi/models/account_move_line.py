@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
-from odoo.tools.sql import column_exists, create_column
 
 from .account_tax import CATALOG07
 
@@ -27,16 +25,8 @@ class AccountMoveLine(models.Model):
         selection=CATALOG07,
         string="EDI Affect. Reason",
         store=True, readonly=False, compute='_compute_l10n_pe_edi_affectation_reason',
+        init_storage=lambda model: None,
         help="Type of Affectation to the IGV, Catalog No. 07")
-
-    def _auto_init(self):
-        cr = self.env.cr
-
-        # Skip the computation of the field `l10n_pe_edi_affectation_reason` at the module installation
-        if not column_exists(cr, "account_move_line", "l10n_pe_edi_affectation_reason"):
-            create_column(cr, "account_move_line", "l10n_pe_edi_affectation_reason", "varchar")
-
-        return super()._auto_init()
 
     # -------------------------------------------------------------------------
     # COMPUTE METHODS

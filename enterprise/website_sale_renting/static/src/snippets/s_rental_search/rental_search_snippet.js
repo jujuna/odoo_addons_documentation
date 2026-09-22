@@ -1,28 +1,26 @@
 import { Interaction } from '@web/public/interaction';
 import { registry } from '@web/core/registry';
-import { parseDate, parseDateTime, serializeDateTime } from '@web/core/l10n/dates';
+import { serializeDateTime } from '@web/core/l10n/dates';
 import { redirect } from '@web/core/utils/urls';
-import { RentingMixin } from '@website_sale_renting/js/renting_mixin';
+import daterangePickerUtils from '@website_sale_renting/js/daterange_picker_utils';
 
 export class RentalSearchSnippet extends Interaction {
     static selector = '.s_rental_search';
     dynamicContent = {
         '.s_rental_search_btn': { 't-on-click': this.onClickRentalSearchButton },
-        '.o_website_sale_daterange_picker': { 't-on-toggle_search_btn': this.onToggleSearchBtn },
+        '.o_website_sale_daterange_picker': {
+            't-on-daterange_validity_changed': this.toggleSearchButton,
+        },
     };
 
-    onToggleSearchBtn(ev) {
-        ev.currentTarget.querySelector('.s_rental_search_btn').disabled = Boolean(ev.detail);
+    toggleSearchButton(ev) {
+        ev.currentTarget.querySelector('.s_rental_search_btn').disabled = !ev.detail.isValid;
     }
 
     onClickRentalSearchButton() {
-        const parse = this._isDurationWithHours() ? parseDateTime : parseDate;
-        const startInput = this.el.querySelector('input[name=renting_start_date]');
-        const endInput = this.el.querySelector('input[name=renting_end_date]');
-        this.searchRentals({ detail: {
-            startDate: parse(startInput.value),
-            endDate: parse(endInput.value),
-        }});
+        const daterangePicker = this.el.querySelector('.o_website_sale_daterange_picker');
+        const { startDate, endDate } = daterangePickerUtils.getRentalDates(daterangePicker);
+        this.searchRentals({ detail: { startDate: startDate, endDate: endDate }});
     }
 
     /**
@@ -41,15 +39,13 @@ export class RentalSearchSnippet extends Interaction {
 
         const productAttributeValueId = this.el.querySelector('.s_rental_search_select').value;
         if (productAttributeValueId) {
-            searchParams.append('attribute_values', `${productAttributeId}-${productAttributeValueId}`);
+            // TODO(loti): ideally, we should use slugs instead of ids, but the data is populated in
+            // the frontend, so we don't have the info.
+            searchParams.append(productAttributeId, productAttributeValueId);
         }
         redirect(`/shop?${searchParams.toString()}`);
     }
 }
-
-// TODO(loti): temporary hack. RentingMixin should be converted to a class after converting/deleting
-// VariantMixin.
-Object.assign(RentalSearchSnippet.prototype, RentingMixin);
 
 registry
     .category('public.interactions')

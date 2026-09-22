@@ -16,7 +16,7 @@ class L10n_Ke_EdiCustomsImport(models.Model):
     _check_company_auto = True
 
     _rec_name = 'task_code'
-    _rec_names_search = ['task_code', 'item_seq']
+    _rec_names_search = ('task_code', 'item_seq')
 
     task_code = fields.Char("Task Code", readonly=True, required=True)
     item_seq = fields.Integer("Item Sequence", readonly=True, required=True)
@@ -176,7 +176,7 @@ class L10n_Ke_EdiCustomsImport(models.Model):
                     'name': item_rec.declaration_number + '-' + item_rec.task_code + '-' + str(item_rec.item_seq) + '.json',
                     'res_model': 'l10n_ke_edi.customs.import',
                     'res_id': item_rec.id,
-                    'raw': json.dumps(item, indent=4),
+                    'raw': json.dumps(item, indent=4).encode(),
                 })
                 # Try to match with product
                 matched_item = self.search([
@@ -217,7 +217,7 @@ class L10n_Ke_EdiCustomsImport(models.Model):
                 'name': custimp.item_name,
                 'product_id': custimp.product_id.id,
                 'product_qty': custimp.quantity,
-                'product_uom_id': custimp.uom_id.id or self.env.ref('uom.product_uom_unit').id,
+                'uom_id': custimp.uom_id.id or self.env.ref('uom.product_uom_unit').id,
             }))
         po1 = self.env['purchase.order'].create({
             'partner_id': partners[0].id,

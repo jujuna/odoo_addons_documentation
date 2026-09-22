@@ -7,8 +7,10 @@
             <field name="arch" type="xml">
                 <form>
                     <sheet>
+                        <field name="is_master_data" invisible="1"/>
+                        <field name="is_tax_return_type" invisible="1"/>
                         <group>
-                            <field name="category" widget="radio" options="{'horizontal': true}"/>
+                            <field name="category" widget="radio" options="{'horizontal': true}" readonly="is_master_data"/>
                             <group colspan="2">
                                 <h1>
                                     <field name="name" placeholder="Tax Return" invisible="category != 'account_return'"/>
@@ -23,13 +25,20 @@
                                     <field name="deadline_days_delay" style="width: 15%" class="o_form_field text-center"/>
                                     <span style="width: 85%">days after tax period</span>
                                 </div>
-                                <field name="states_workflow" invisible="category == 'audit'"/>
+                                <field name="states_workflow" invisible="category == 'audit' or is_master_data" required="1"/>
+                                <field name="tax_payable_account_id" invisible="not is_tax_return_type"/>
+                                <field name="tax_receivable_account_id" invisible="not is_tax_return_type"/>
+                                <field name="advance_tax_payment_account_id" invisible="not is_tax_return_type"/>
                             </group>
                             <group>
                                 <field name="country_id" string="Country" invisible="category == 'audit'"/>
                                 <field name="report_id"/>
                                 <field name="payment_partner_id" invisible="category == 'audit'"/>
-                                <field name="payment_partner_bank_id" invisible="category == 'audit'"/>
+                                <field name="payment_partner_bank_id" invisible="category == 'audit'" context="{'default_partner_id': payment_partner_id}"/>
+                            </group>
+                            <group string="Tax Closing Rounding" invisible="not is_tax_return_type">
+                                <field name="tax_closing_rounding_profit_account_id"/>
+                                <field name="tax_closing_rounding_loss_account_id"/>
                             </group>
                         </group>
                     </sheet>
@@ -43,10 +52,29 @@
             <field name="model">account.return.type</field>
             <field name="arch" type="xml">
                 <list>
+                    <field name="is_tax_return_type" column_invisible="1"/>
+                    <field name="tax_closing_account_placeholder" column_invisible="1"/>    <!-- Needed for placeholder_field -->
                     <field name="name" string="Return Name"/>
-                    <field name="category" string="Type"/>
+                    <field name="category" string="Type" optional="hide"/>
                     <field name="deadline_periodicity"/>
+                    <field name="tax_payable_account_id"
+                           widget="account_reports.forced_placeholder"
+                           readonly="not is_tax_return_type"
+                           decoration-muted="not tax_payable_account_id"
+                           options="{'placeholder_field': 'tax_closing_account_placeholder'}"/>
+                    <field name="tax_receivable_account_id"
+                           widget="account_reports.forced_placeholder"
+                           readonly="not is_tax_return_type"
+                           decoration-muted="not tax_receivable_account_id"
+                           options="{'placeholder_field': 'tax_closing_account_placeholder'}"/>
+                    <field name="advance_tax_payment_account_id"
+                           optional="hide"
+                           widget="account_reports.forced_placeholder"
+                           readonly="not is_tax_return_type"
+                           decoration-muted="not advance_tax_payment_account_id"
+                           options="{'placeholder_field': 'tax_closing_account_placeholder'}"/>
                     <field name="country_id"/>
+                    <field name="active" widget="boolean_toggle"/>
                 </list>
             </field>
         </record>
@@ -56,6 +84,7 @@
             <field name="model">account.return.type</field>
             <field name="arch" type="xml">
                 <search>
+                    <field name="name"/>
                     <field name="category"/>
                     <field name="report_id"/>
                     <field name="country_id"/>
@@ -78,6 +107,7 @@
             <field name="name">Return Types</field>
             <field name="res_model">account.return.type</field>
             <field name="view_id" ref="account_reports.account_return_type_list_view"/>
+            <field name="context">{'active_test': False}</field>
         </record>
     </data>
 </odoo>

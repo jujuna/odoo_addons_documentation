@@ -1,11 +1,13 @@
-import { Component } from "@odoo/owl";
+import { Component, usePlugin } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 export class SidebarPropertiesToolbox extends Component {
-    static props = {};
     static template = "web_studio.ViewEditor.InteractiveEditorProperties.Toolbox";
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
         this.orm = useService("orm");
@@ -22,14 +24,27 @@ export class SidebarPropertiesToolbox extends Component {
     }
 
     onRemoveFromView() {
+        const nodeName = this.node.humanName.toLowerCase();
+        let bodyText;
+        if (nodeName === "field") {
+            const fieldName = this.node.field.string;
+            bodyText = _t(
+                "Are you sure you want to remove the %(node)s %(field)s from the view?\nIf you need it back, add it from the list of existing fields.",
+                {
+                    node: nodeName,
+                    field: fieldName,
+                }
+            );
+        } else {
+            bodyText = _t("Are you sure you want to remove this %(node)s from the view?", {
+                node: nodeName,
+            });
+        }
         this.dialog.add(ConfirmationDialog, {
-            body: _t(
-                "Are you sure you want to remove this %s from the view?",
-                this.node.humanName.toLowerCase()
-            ),
-            confirm: () => {
-                return this.removeNodeFromArch();
-            },
+            title: _t("Remove %s from view", nodeName),
+            body: bodyText,
+            confirmLabel: _t("Remove %s", nodeName),
+            confirm: () => this.removeNodeFromArch(),
             cancel: () => {},
         });
     }

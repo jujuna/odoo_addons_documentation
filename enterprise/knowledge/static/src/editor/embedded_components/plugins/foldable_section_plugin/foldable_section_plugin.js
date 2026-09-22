@@ -33,7 +33,8 @@ export class FoldableSectionPlugin extends Plugin {
                 id: "addFoldableSection",
                 title: _t("Foldable Section"),
                 description: _t("Add a foldable section."),
-                icon: "fa-bookmark",
+                icon: "bookmark",
+                iconClass: "oi-filled",
                 run: () => this.insertFoldableSection(),
                 isAvailable: isHtmlContentSupported,
             },
@@ -50,7 +51,7 @@ export class FoldableSectionPlugin extends Plugin {
                 `${hostSelector} ${contentSelector} > ${baseContainerGlobalSelector}:only-child`
             ),
         ],
-        power_buttons_visibility_predicates: this.showPowerButtons.bind(this),
+        should_show_power_buttons_predicates: this.showPowerButtons.bind(this),
         split_element_block_overrides: withSequence(1, this.handleSplitElementBlock.bind(this)),
         powerbox_blacklist_selectors: `${hostSelector} ${titleSelector} > ${baseContainerGlobalSelector}`,
     };
@@ -79,12 +80,11 @@ export class FoldableSectionPlugin extends Plugin {
                 `${hostSelector} ${titleSelector} ${baseContainerSelector}`
             )
         );
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
     showPowerButtons(selection) {
-        return (
-            selection.isCollapsed &&
-            !closestElement(selection.anchorNode, `${hostSelector} ${titleSelector}`)
-        );
+        if (selection.isCollapsed) {
+            return !closestElement(selection.anchorNode, `${hostSelector} ${titleSelector}`);
+        }
     }
 }

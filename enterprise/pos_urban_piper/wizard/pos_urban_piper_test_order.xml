@@ -8,20 +8,27 @@
             <form>
                 <group>
                     <group>
-                        <field name="product_id" required="1"/>
+                        <field name="product_id" required="1" options="{'no_open': True, 'no_create': True}"/>
                         <field name="quantity" required="1"/>
                         <field name="delivery_provider_id" required="1" domain="[('id', 'in', context.get('delivery_provider_ids'))]" options="{'no_open': True, 'no_create': True}"/>
+                        <field name="ptav_ids" widget="many2many_tags" options="{'no_create': True}"/>
                         <field name="delivery_instruction"/>
                     </group>
                     <group>
                         <field name="discount_amount"/>
+                        <label for="line_discount"/>
+                        <div class="o_row">
+                            <field name="line_discount"/>
+                            <span>%</span>
+                        </div>
                         <field name="packaging_charge"/>
                         <field name="delivery_charge"/>
+                        <field name="is_instant_order"/>
                     </group>
                 </group>
                 <footer>
                     <button name="make_test_order" string="Place Order" type="object" class="btn-primary" />
-                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    <button class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>

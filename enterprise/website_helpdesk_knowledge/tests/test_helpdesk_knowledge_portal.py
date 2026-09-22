@@ -9,7 +9,7 @@ from odoo.addons.helpdesk.tests.test_helpdesk_portal import TestHelpdeskPortal
 class TestHelpdeskKnowledgePortalTour(TestHelpdeskPortal):
 
     def test_helpdesk_knowledge_portal_tour(self):
-        website = self.env.ref('website.default_website')
+        website = self.env.ref('base.default_website')
         help_team = self.env['helpdesk.team'].search([('website_id', '=', website.id)], limit=1)
         Article = self.env['knowledge.article']
         Article.search([]).unlink()

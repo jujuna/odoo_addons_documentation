@@ -38,7 +38,7 @@ class AccountMove(models.Model):
         for base_line in base_lines_values:
             res.append({
                 'base_line': base_line,
-                'description': base_line['record'].name,
+                'description': base_line['record'].label,
             })
 
         return res

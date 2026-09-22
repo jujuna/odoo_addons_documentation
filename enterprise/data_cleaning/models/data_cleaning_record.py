@@ -12,12 +12,12 @@ class Data_CleaningRecord(models.Model):
     active = fields.Boolean('Active', default=True)
     name = fields.Char('Record Name', compute='_compute_non_stored_values', compute_sudo=True)
     rule_ids = fields.Many2many('data_cleaning.rule', string='Rule', required=True, ondelete='cascade')
-    field_id = fields.Many2one('ir.model.fields', string='Field')
-    cleaning_model_id = fields.Many2one('data_cleaning.model', string='Cleaning Model', ondelete='cascade')
+    field_id = fields.Many2one('ir.model.fields', string='Field', index='btree_not_null')
+    cleaning_model_id = fields.Many2one('data_cleaning.model', string='Cleaning Model', ondelete='cascade', index='btree_not_null')
     field_name = fields.Char(related='field_id.name')
     action = fields.Char('Actions', compute='_compute_non_stored_values', compute_sudo=True)
 
-    res_id = fields.Integer('Record ID', index=True)
+    res_id = fields.Many2oneReference('Record ID', index=True, model_field='res_model_name')
     res_model_id = fields.Many2one(related='cleaning_model_id.res_model_id', store=True, readonly=True)
     res_model_name = fields.Char(related='cleaning_model_id.res_model_name', store=True, readonly=True)
 
@@ -124,3 +124,6 @@ class Data_CleaningRecord(models.Model):
 
     def action_discard(self):
         self.write({'active': False})
+
+    def action_undiscard(self):
+        self.write({'active': True})

@@ -14,10 +14,12 @@ class PosPreparationDisplayController(http.Controller):
 
         session_info = request.env['ir.http'].session_info()
         session_info['preparation_display'] = preparation_display.read(["id", "name", "access_token"])[0]
+        session_info['nomenclature_id'] = preparation_display.company_id.nomenclature_id.id
 
         context = {
             'session_info': session_info,
             'prep_display_id': preparation_display.id,
+            "pos_config_id": preparation_display._get_pos_config_ids()[0].id,
         }
 
         response = request.render('pos_enterprise.prep_display_index', context)

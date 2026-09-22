@@ -1,10 +1,26 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { setupEditor, testEditor } from "../_helpers/editor";
 import { unformat } from "../_helpers/format";
-import { bold, resetSize, setColor, insertText } from "../_helpers/user_actions";
+import {
+    bold,
+    getElementTouchPosition,
+    insertText,
+    resetSize,
+    setColor,
+    simulateArrowKeyPress,
+} from "../_helpers/user_actions";
 import { getContent, setSelection } from "../_helpers/selection";
-import { press, queryAll, manuallyDispatchProgrammaticEvent } from "@odoo/hoot-dom";
-import { animationFrame, tick } from "@odoo/hoot-mock";
+import {
+    click,
+    keyDown,
+    keyUp,
+    manuallyDispatchProgrammaticEvent,
+    press,
+    queryAll,
+    queryOne,
+    waitFor,
+} from "@odoo/hoot-dom";
+import { advanceTime, animationFrame, tick } from "@odoo/hoot-mock";
 import { nodeSize } from "@html_editor/utils/position";
 
 function expectContentToBe(el, html) {
@@ -48,6 +64,8 @@ describe("custom selection", () => {
         expect(overlayColorTDs[1]).not.toBe("none");
         expect(overlayColorTDs[2]).not.toBe("none");
     });
+
+    test.tags("desktop");
     test("should not deselect cells while resizing table", async () => {
         const content = unformat(`
             <table class="table table-bordered o_table">
@@ -77,20 +95,27 @@ describe("custom selection", () => {
         const clientX = cellRect.right;
         const clientY = cellRect.top + cellRect.height / 2;
 
-        // Simulate mousedown at the right border of first cell.
-        await manuallyDispatchProgrammaticEvent(firstTd, "mousedown", {
+        // Simulate pointermove at the right border of first cell.
+        await manuallyDispatchProgrammaticEvent(firstTd, "pointermove", {
             detail: 1,
             clientX,
             clientY,
         });
 
-        // Simulate mousemove to resize cell.
-        manuallyDispatchProgrammaticEvent(firstTd, "mousemove", {
+        // Simulate pointerdown at the right border of first cell.
+        await manuallyDispatchProgrammaticEvent(firstTd, "pointerdown", {
+            detail: 1,
+            clientX,
+            clientY,
+        });
+
+        // Simulate pointermove to resize cell.
+        manuallyDispatchProgrammaticEvent(firstTd, "pointermove", {
             detail: 1,
             clientX: clientX + 100,
             clientY,
         });
-        manuallyDispatchProgrammaticEvent(firstTd, "mouseup", {
+        manuallyDispatchProgrammaticEvent(firstTd, "pointerup", {
             detail: 1,
             clientX: clientX + 100,
             clientY,
@@ -100,6 +125,294 @@ describe("custom selection", () => {
         expect(firstTd.clientWidth).not.toBe(initialCellWidth); // Resize worked
         expect(firstTd).toHaveClass("o_selected_td");
     });
+
+    test.tags("mobile");
+    test("should extend table cell selection while dragging on touch devices (Forward selection)", async () => {
+        const content = unformat(`
+            <table class="table table-bordered o_table">
+                <tbody>
+                    <tr>
+                        <td class="a"><p>[]<br></p></td>
+                        <td class="b"><p><br></p></td>
+                        <td class="c"><p><br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d"><p><br></p></td>
+                        <td class="e"><p><br></p></td>
+                        <td class="f"><p><br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+        `);
+        const { el } = await setupEditor(content);
+
+        // Moving before the long press delay should keep the touch available for scrolling.
+        await manuallyDispatchProgrammaticEvent(queryOne("td.a"), "touchstart", {
+            touches: [getElementTouchPosition("td.a")],
+        });
+        await manuallyDispatchProgrammaticEvent(queryOne("td.b"), "touchmove", {
+            touches: [getElementTouchPosition("td.b")],
+        });
+        await animationFrame();
+        expect(queryOne("td.a")).not.toHaveClass("o_selected_td");
+        expect(queryOne("td.b")).not.toHaveClass("o_selected_td");
+        await manuallyDispatchProgrammaticEvent(queryOne("td.b"), "touchend", {
+            touches: [getElementTouchPosition("td.b")],
+        });
+
+        // Start touch on cell a and wait for the long press selection.
+        await manuallyDispatchProgrammaticEvent(queryOne("td.a"), "touchstart", {
+            touches: [getElementTouchPosition("td.a")],
+        });
+        await advanceTime(200);
+
+        // Drag to cell b, should select a and b
+        await manuallyDispatchProgrammaticEvent(queryOne("td.b"), "touchmove", {
+            touches: [getElementTouchPosition("td.b")],
+        });
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+            <p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr>
+                        <td class="a o_selected_td"><p>[<br></p></td>
+                        <td class="b o_selected_td"><p>]<br></p></td>
+                        <td class="c"><p><br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d"><p><br></p></td>
+                        <td class="e"><p><br></p></td>
+                        <td class="f"><p><br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+        `)
+        );
+
+        // Drag to cell c, should select a, b, and c
+        await manuallyDispatchProgrammaticEvent(queryOne("td.c"), "touchmove", {
+            touches: [getElementTouchPosition("td.c")],
+        });
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+            <p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr>
+                        <td class="a o_selected_td"><p>[<br></p></td>
+                        <td class="b o_selected_td"><p><br></p></td>
+                        <td class="c o_selected_td"><p>]<br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d"><p><br></p></td>
+                        <td class="e"><p><br></p></td>
+                        <td class="f"><p><br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+        `)
+        );
+
+        // Drag to cell f, should select all cells
+        await manuallyDispatchProgrammaticEvent(queryOne("td.f"), "touchmove", {
+            touches: [getElementTouchPosition("td.f")],
+        });
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+            <p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr>
+                        <td class="a o_selected_td"><p>[<br></p></td>
+                        <td class="b o_selected_td"><p><br></p></td>
+                        <td class="c o_selected_td"><p><br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d o_selected_td"><p><br></p></td>
+                        <td class="e o_selected_td"><p><br></p></td>
+                        <td class="f o_selected_td"><p>]<br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+        `)
+        );
+
+        // End touch
+        await manuallyDispatchProgrammaticEvent(queryOne("td.f"), "touchend", {
+            touches: [getElementTouchPosition("td.f")],
+        });
+        expect(getContent(el)).toBe(
+            unformat(`
+            <p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr>
+                        <td class="a o_selected_td"><p>[<br></p></td>
+                        <td class="b o_selected_td"><p><br></p></td>
+                        <td class="c o_selected_td"><p><br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d o_selected_td"><p><br></p></td>
+                        <td class="e o_selected_td"><p><br></p></td>
+                        <td class="f o_selected_td"><p>]<br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+        `)
+        );
+    });
+
+    test.tags("mobile");
+    test("should extend table cell selection while dragging on touch devices (Backward selection)", async () => {
+        const content = unformat(`
+            <table class="table table-bordered o_table">
+                <tbody>
+                    <tr>
+                        <td class="a"><p><br></p></td>
+                        <td class="b"><p><br></p></td>
+                        <td class="c"><p><br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d"><p><br></p></td>
+                        <td class="e"><p><br></p></td>
+                        <td class="f"><p>[]<br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+        `);
+        const { el } = await setupEditor(content);
+
+        // Moving before the long press delay should keep the touch available for scrolling.
+        await manuallyDispatchProgrammaticEvent(queryOne("td.f"), "touchstart", {
+            touches: [getElementTouchPosition("td.f")],
+        });
+        await manuallyDispatchProgrammaticEvent(queryOne("td.e"), "touchmove", {
+            touches: [getElementTouchPosition("td.e")],
+        });
+        await animationFrame();
+        expect(queryOne("td.f")).not.toHaveClass("o_selected_td");
+        expect(queryOne("td.e")).not.toHaveClass("o_selected_td");
+        await manuallyDispatchProgrammaticEvent(queryOne("td.e"), "touchend", {
+            touches: [getElementTouchPosition("td.e")],
+        });
+
+        // Start touch on cell f and wait for the long press selection.
+        await manuallyDispatchProgrammaticEvent(queryOne("td.f"), "touchstart", {
+            touches: [getElementTouchPosition("td.f")],
+        });
+        await advanceTime(200);
+
+        // Drag to cell e, should select e and f
+        await manuallyDispatchProgrammaticEvent(queryOne("td.e"), "touchmove", {
+            touches: [getElementTouchPosition("td.e")],
+        });
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+            <p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr>
+                        <td class="a"><p><br></p></td>
+                        <td class="b"><p><br></p></td>
+                        <td class="c"><p><br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d"><p><br></p></td>
+                        <td class="e o_selected_td"><p>]<br></p></td>
+                        <td class="f o_selected_td"><p>[<br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+        `)
+        );
+
+        // Drag to cell d, should select d, e, and f
+        await manuallyDispatchProgrammaticEvent(queryOne("td.d"), "touchmove", {
+            touches: [getElementTouchPosition("td.d")],
+        });
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+            <p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr>
+                        <td class="a"><p><br></p></td>
+                        <td class="b"><p><br></p></td>
+                        <td class="c"><p><br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d o_selected_td"><p>]<br></p></td>
+                        <td class="e o_selected_td"><p><br></p></td>
+                        <td class="f o_selected_td"><p>[<br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+        `)
+        );
+
+        // Drag to cell a, should select all cells
+        await manuallyDispatchProgrammaticEvent(queryOne("td.a"), "touchmove", {
+            touches: [getElementTouchPosition("td.a")],
+        });
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+            <p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr>
+                        <td class="a o_selected_td"><p>]<br></p></td>
+                        <td class="b o_selected_td"><p><br></p></td>
+                        <td class="c o_selected_td"><p><br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d o_selected_td"><p><br></p></td>
+                        <td class="e o_selected_td"><p><br></p></td>
+                        <td class="f o_selected_td"><p>[<br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+        `)
+        );
+
+        // End touch
+        await manuallyDispatchProgrammaticEvent(queryOne("td.a"), "touchend", {
+            touches: [getElementTouchPosition("td.a")],
+        });
+        expect(getContent(el)).toBe(
+            unformat(`
+            <p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr>
+                        <td class="a o_selected_td"><p>]<br></p></td>
+                        <td class="b o_selected_td"><p><br></p></td>
+                        <td class="c o_selected_td"><p><br></p></td>
+                    </tr>
+                    <tr>
+                        <td class="d o_selected_td"><p><br></p></td>
+                        <td class="e o_selected_td"><p><br></p></td>
+                        <td class="f o_selected_td"><p>[<br></p></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+        `)
+        );
+    });
 });
 
 describe("select a full table on cross over", () => {
@@ -108,6 +421,14 @@ describe("select a full table on cross over", () => {
             await testEditor({
                 contentBefore:
                     "<p>a[bc</p><table><tbody><tr><td>a]b</td><td>cd</td><td>ef</td></tr></tbody></table>",
+                contentBeforeEdit:
+                    "<p>a[bc</p>" +
+                    '<table class="o_selected_table"><tbody><tr>' +
+                    '<td class="o_selected_td">ab</td>' +
+                    '<td class="o_selected_td">cd</td>' +
+                    '<td class="o_selected_td">ef]</td>' +
+                    "</tr></tbody></table>" +
+                    '<p data-selection-placeholder=""><br></p>',
                 contentAfterEdit:
                     "<p>a[bc</p>" +
                     '<table class="o_selected_table"><tbody><tr>' +
@@ -123,12 +444,18 @@ describe("select a full table on cross over", () => {
             await testEditor({
                 contentBefore:
                     "<table><tbody><tr><td>ab</td><td>cd</td><td>e[f</td></tr></tbody></table><p>a]bc</p>",
+                contentBeforeEdit:
+                    '<p data-selection-placeholder=""><br></p>' +
+                    '<table class="o_selected_table"><tbody><tr>' +
+                    '<td class="o_selected_td">[ab</td>' +
+                    '<td class="o_selected_td">cd</td>' +
+                    '<td class="o_selected_td">ef</td></tr></tbody></table><p>a]bc</p>',
                 contentAfterEdit:
                     '<p data-selection-placeholder=""><br></p>' +
                     '<table class="o_selected_table"><tbody><tr>' +
-                    '<td class="o_selected_td">ab</td>' +
+                    '<td class="o_selected_td">[ab</td>' +
                     '<td class="o_selected_td">cd</td>' +
-                    '<td class="o_selected_td">e[f</td></tr></tbody></table><p>a]bc</p>',
+                    '<td class="o_selected_td">ef</td></tr></tbody></table><p>a]bc</p>',
             });
         });
 
@@ -148,6 +475,16 @@ describe("select a full table on cross over", () => {
             await testEditor({
                 contentBefore:
                     "<p>a[bc</p><table><tbody><tr><td>ab</td><td>cd</td><td>ef</td></tr></tbody></table><p>abc</p><table><tbody><tr><td>a]b</td><td>cd</td><td>ef</td></tr></tbody></table>",
+                contentBeforeEdit:
+                    '<p>a[bc</p><table class="o_selected_table"><tbody><tr>' +
+                    '<td class="o_selected_td">ab</td>' +
+                    '<td class="o_selected_td">cd</td>' +
+                    '<td class="o_selected_td">ef</td></tr></tbody></table>' +
+                    '<p>abc</p><table class="o_selected_table"><tbody><tr>' +
+                    '<td class="o_selected_td">ab</td>' +
+                    '<td class="o_selected_td">cd</td>' +
+                    '<td class="o_selected_td">ef]</td></tr></tbody></table>' +
+                    '<p data-selection-placeholder=""><br></p>',
                 contentAfterEdit:
                     '<p>a[bc</p><table class="o_selected_table"><tbody><tr>' +
                     '<td class="o_selected_td">ab</td>' +
@@ -207,6 +544,14 @@ describe("select a full table on cross over", () => {
                     "<td>cd</td>" +
                     "<td>e[f</td>" +
                     "</tr></tbody></table><p>a]bc</p>",
+                contentBeforeEdit:
+                    '<p data-selection-placeholder=""><br></p>' +
+                    '<table class="o_selected_table"><tbody><tr>' +
+                    '<td class="o_selected_td">[ab</td>' +
+                    '<td class="o_selected_td">cd</td>' +
+                    '<td class="o_selected_td">ef</td>' +
+                    "</tr></tbody></table>" +
+                    "<p>a]bc</p>",
                 stepFunction: bold,
                 contentAfterEdit:
                     '<p data-selection-placeholder=""><br></p>' +
@@ -323,6 +668,18 @@ describe("select a full table on cross over", () => {
                             </tr>
                         </tbody>
                     </table>`),
+                contentBeforeEdit: unformat(`
+                    <p>a[bc</p>
+                    <table class="o_selected_table">
+                        <tbody>
+                            <tr>
+                                <td class="o_selected_td">ab</td>
+                                <td class="o_selected_td">cd</td>
+                                <td class="o_selected_td">ef]</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p data-selection-placeholder=""><br></p>`),
                 stepFunction: async (editor) => {
                     // Table selection happens on selectionchange
                     // event which is fired in the next tick.
@@ -360,19 +717,25 @@ describe("select a full table on cross over", () => {
                     "<td>cd</td>" +
                     "<td>e[f</td>" +
                     "</tr></tbody></table><p>a]bc</p>",
+                contentBeforeEdit:
+                    '<p data-selection-placeholder=""><br></p>' +
+                    '<table class="o_selected_table"><tbody><tr>' +
+                    '<td class="o_selected_td">[ab</td>' +
+                    '<td class="o_selected_td">cd</td>' +
+                    '<td class="o_selected_td">ef</td></tr></tbody></table><p>a]bc</p>',
                 stepFunction: setColor("aquamarine", "color"),
                 contentAfterEdit: unformat(`
                     <p data-selection-placeholder=""><br></p>
                     <table class="o_selected_table">
                         <tbody><tr>
                             <td class="o_selected_td">
-                                <font style="color: aquamarine;">ab</font>
+                                <font style="color: aquamarine;">[ab</font>
                             </td>
                             <td class="o_selected_td">
                                 <font style="color: aquamarine;">cd</font>
                             </td>
                             <td class="o_selected_td">
-                                <font style="color: aquamarine;">e[f</font>
+                                <font style="color: aquamarine;">ef</font>
                             </td>
                         </tr></tbody>
                     </table>
@@ -431,6 +794,20 @@ describe("select a full table on cross over", () => {
                     "<td>cd</td>" +
                     "<td>ef</td>" +
                     "</tr></tbody></table>",
+                contentBeforeEdit:
+                    "<p>a[bc</p>" +
+                    '<table class="o_selected_table"><tbody><tr>' +
+                    '<td class="o_selected_td">ab</td>' +
+                    '<td class="o_selected_td">cd</td>' +
+                    '<td class="o_selected_td">ef</td>' +
+                    "</tr></tbody></table>" +
+                    "<p>abc</p>" +
+                    '<table class="o_selected_table"><tbody><tr>' +
+                    '<td class="o_selected_td">ab</td>' +
+                    '<td class="o_selected_td">cd</td>' +
+                    '<td class="o_selected_td">ef]</td>' +
+                    "</tr></tbody></table>" +
+                    '<p data-selection-placeholder=""><br></p>',
                 stepFunction: async (editor) => {
                     // Table selection happens on selectionchange
                     // event which is fired in the next tick.
@@ -667,8 +1044,8 @@ describe("select columns on cross over", () => {
                 contentAfterEdit:
                     '<p data-selection-placeholder=""><br></p>' +
                     '<table class="o_selected_table"><tbody><tr>' +
-                    '<td class="o_selected_td"><strong>[ab</strong></td>' +
-                    '<td class="o_selected_td"><strong>cd]</strong></td>' +
+                    '<td class="o_selected_td"><strong>a[b</strong></td>' +
+                    '<td class="o_selected_td"><strong>c]d</strong></td>' +
                     "<td>ef</td>" +
                     "</tr></tbody></table>" +
                     '<p data-selection-placeholder=""><br></p>',
@@ -687,9 +1064,9 @@ describe("select columns on cross over", () => {
                 contentAfterEdit:
                     '<p data-selection-placeholder=""><br></p>' +
                     '<table class="o_selected_table"><tbody><tr>' +
-                    '<td class="o_selected_td"><strong>[ab</strong></td>' +
+                    '<td class="o_selected_td"><strong>a[b</strong></td>' +
                     '<td class="o_selected_td"><strong>cd</strong></td>' +
-                    '<td class="o_selected_td"><strong>ef]</strong></td>' +
+                    '<td class="o_selected_td"><strong>e]f</strong></td>' +
                     "</tr><tr><td>ab</td><td>cd</td><td>ef</td></tr></tbody></table>" +
                     '<p data-selection-placeholder=""><br></p>',
             });
@@ -720,7 +1097,7 @@ describe("select columns on cross over", () => {
                     '<p data-selection-placeholder=""><br></p>' +
                     '<table class="o_selected_table"><tbody>' +
                     "<tr>" +
-                    '<td class="o_selected_td"><strong>[ab</strong></td>' +
+                    '<td class="o_selected_td"><strong>a[b</strong></td>' +
                     "<td>cd</td>" +
                     "<td>ef</td>" +
                     "</tr>" +
@@ -730,7 +1107,7 @@ describe("select columns on cross over", () => {
                     "<td>ef</td>" +
                     "</tr>" +
                     "<tr>" +
-                    '<td class="o_selected_td"><strong>ab]</strong></td>' +
+                    '<td class="o_selected_td"><strong>a]b</strong></td>' +
                     "<td>cd</td>" +
                     "<td>ef</td>" +
                     "</tr>" +
@@ -764,13 +1141,13 @@ describe("select columns on cross over", () => {
                     '<p data-selection-placeholder=""><br></p>' +
                     '<table class="o_selected_table"><tbody>' +
                     "<tr>" +
-                    '<td class="o_selected_td"><strong>[ab</strong></td>' +
+                    '<td class="o_selected_td"><strong>a[b</strong></td>' +
                     '<td class="o_selected_td"><strong>cd</strong></td>' +
                     "<td>ef</td>" +
                     "</tr>" +
                     "<tr>" +
                     '<td class="o_selected_td"><strong>ab</strong></td>' +
-                    '<td class="o_selected_td"><strong>cd]</strong></td>' +
+                    '<td class="o_selected_td"><strong>c]d</strong></td>' +
                     "<td>ef</td>" +
                     "</tr>" +
                     "<tr>" +
@@ -808,7 +1185,7 @@ describe("select columns on cross over", () => {
                     '<p data-selection-placeholder=""><br></p>' +
                     '<table class="o_selected_table"><tbody>' +
                     "<tr>" +
-                    '<td class="o_selected_td"><strong>[ab</strong></td>' +
+                    '<td class="o_selected_td"><strong>a[b</strong></td>' +
                     '<td class="o_selected_td"><strong>cd</strong></td>' +
                     '<td class="o_selected_td"><strong>ef</strong></td>' +
                     "</tr>" +
@@ -820,7 +1197,7 @@ describe("select columns on cross over", () => {
                     "<tr>" +
                     '<td class="o_selected_td"><strong>ab</strong></td>' +
                     '<td class="o_selected_td"><strong>cd</strong></td>' +
-                    '<td class="o_selected_td"><strong>ef]</strong></td>' +
+                    '<td class="o_selected_td"><strong>e]f</strong></td>' +
                     "</tr>" +
                     "</tbody></table>" +
                     '<p data-selection-placeholder=""><br></p>',
@@ -829,30 +1206,39 @@ describe("select columns on cross over", () => {
     });
 
     describe("reset size", () => {
+        test.tags("desktop");
         test("should remove any height or width of the table and bring it back to it original form", async () => {
             await testEditor({
-                contentBefore: `<table class="table table-bordered o_table" style="height: 980.5px; width: 736px;"><tbody>
-                                    <tr style="height: 306.5px;">
-                                        <td style="width: 356px;"><p>[]<br></p></td>
-                                        <td style="width: 108.5px;"><p><br></p></td>
-                                        <td style="width: 232.25px;"><p><br></p></td>
-                                        <td style="width: 38.25px;"><p><br></p></td>
-                                    </tr>
-                                    <tr style="height: 252px;">
-                                        <td style="width: 232.25px;"><p><br></p></td>
-                                        <td style="width: 232.25px;"><p><br></p></td>
-                                        <td style="width: 232.25px;"><p><br></p></td>
-                                        <td style="width: 232.25px;"><p><br></p></td>
-                                    </tr>
-                                    <tr style="height: 57px;">
-                                        <td style="width: 232.25px;"><p><br></p></td>
-                                        <td style="width: 232.25px;"><p><br></p></td>
-                                        <td style="width: 232.25px;"><p><br></p></td>
-                                        <td style="width: 232.25px;"><p><br></p></td>
-                                    </tr>
-                                </tbody></table>`,
+                contentBefore:
+                    unformat(`<table class="table table-bordered o_table" style="height: 980.5px; width: 736px;">
+                                    <colgroup>
+                                        <col style="width: 356px;">
+                                        <col style="width: 108.5px;">
+                                        <col style="width: 232.25px;">
+                                        <col style="width: 38.25px;">
+                                    </colgroup>
+                                    <tbody>
+                                        <tr style="height: 306.5px;">
+                                            <td><p>[]<br></p></td>
+                                            <td><p><br></p></td>
+                                            <td><p><br></p></td>
+                                            <td><p><br></p></td>
+                                        </tr>
+                                        <tr style="height: 252px;">
+                                            <td><p><br></p></td>
+                                            <td><p><br></p></td>
+                                            <td><p><br></p></td>
+                                            <td><p><br></p></td>
+                                        </tr>
+                                        <tr style="height: 57px;">
+                                            <td><p><br></p></td>
+                                            <td><p><br></p></td>
+                                            <td><p><br></p></td>
+                                            <td><p><br></p></td>
+                                        </tr>
+                                </tbody></table>`),
                 stepFunction: resetSize,
-                contentAfter: `<table class="table table-bordered o_table"><tbody>
+                contentAfter: unformat(`<table class="table table-bordered o_table"><tbody>
                                     <tr>
                                         <td><p>[]<br></p></td>
                                         <td><p><br></p></td>
@@ -871,44 +1257,53 @@ describe("select columns on cross over", () => {
                                         <td><p><br></p></td>
                                         <td><p><br></p></td>
                                     </tr>
-                                </tbody></table>`,
+                                </tbody></table>`),
             });
         });
 
+        test.tags("desktop");
         test("should remove any height or width of the table without loosing the style of the element inside it.", async () => {
             await testEditor({
-                contentBefore: `<table class="table table-bordered o_table" style="width: 472.182px; height: 465.403px;"><tbody>
-                                    <tr style="height: 104.872px;">
-                                        <td style="width: 191.273px;"><h1>[]TESTTEXT</h1></td>
-                                        <td style="width: 154.009px;"><p><br></p></td>
-                                        <td style="width: 126.003px;">
-                                            <ul>
-                                                <li>test</li>
-                                                <li>test</li>
-                                                <li>test</li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                    <tr style="height: 254.75px;">
-                                        <td style="width: 229.673px;"><p><br></p></td>
-                                        <td style="width: 229.687px;">
-                                            <blockquote>TESTTEXT</blockquote>
-                                        </td>
-                                        <td style="width: 229.73px;"><p><br></p></td>
-                                    </tr>
-                                    <tr style="height: 104.872px;">
-                                        <td style="width: 229.673px;"><pre>codeTEST</pre></td>
-                                        <td style="width: 229.687px;"><p><br></p></td>
-                                        <td style="width: 229.73px;">
-                                            <ol>
-                                                <li>text</li>
-                                                <li>text</li>
-                                                <li>text</li>
-                                            </ol>
+                contentBefore:
+                    unformat(`<table class="table table-bordered o_table" style="width: 472.182px; height: 465.403px;">
+                                        <colgroup>
+                                        <col style="width: 191.273px;">
+                                        <col style="width: 154.009px;">
+                                        <col style="width: 126.003px;">
+                                    </colgroup>
+                                    <tbody>
+                                        <tr style="height: 104.872px;">
+                                            <td><h1>[]TESTTEXT</h1></td>
+                                            <td><p><br></p></td>
+                                            <td>
+                                                <ul>
+                                                    <li>test</li>
+                                                    <li>test</li>
+                                                    <li>test</li>
+                                                </ul>
                                             </td>
-                                    </tr></tbody></table>`,
+                                        </tr>
+                                        <tr style="height: 254.75px;">
+                                            <td><p><br></p></td>
+                                            <td>
+                                                <blockquote>TESTTEXT</blockquote>
+                                            </td>
+                                            <td><p><br></p></td>
+                                        </tr>
+                                        <tr style="height: 104.872px;">
+                                            <td><pre>codeTEST</pre></td>
+                                            <td><p><br></p></td>
+                                            <td>
+                                                <ol>
+                                                    <li>text</li>
+                                                    <li>text</li>
+                                                    <li>text</li>
+                                                </ol>
+                                                </td>
+                                        </tr>
+                                    </tbody></table>`),
                 stepFunction: resetSize,
-                contentAfter: `<table class="table table-bordered o_table"><tbody>
+                contentAfter: unformat(`<table class="table table-bordered o_table"><tbody>
                                     <tr>
                                         <td><h1>[]TESTTEXT</h1></td>
                                         <td><p><br></p></td>
@@ -937,31 +1332,40 @@ describe("select columns on cross over", () => {
                                                 <li>text</li>
                                             </ol>
                                             </td>
-                                    </tr></tbody></table>`,
+                                    </tr></tbody></table>`),
             });
         });
 
+        test.tags("desktop");
         test("should remove any height or width of the table without removig the style of the table.", async () => {
             await testEditor({
-                contentBefore: `<table class="table table-bordered o_table" style="height: 594.5px; width: 807px;"><tbody>
-                                    <tr style="height: 229.5px;">
-                                        <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255); width: 500px;"><p>[]<br></p></td>
-                                        <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255); width: 119.328px;"><p><br></p></td>
-                                        <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255); width: 186.672px;"><p><br></p></td>
-                                    </tr>
-                                    <tr style="height: 260px;">
-                                        <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255); width: 309.656px;"><p><br></p></td>
-                                        <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255); width: 309.672px;"><p><br></p></td>
-                                        <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255); width: 309.672px;"><p><br></p></td>
-                                    </tr>
-                                    <tr style="height: 104px;">
-                                        <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255); width: 309.656px;"><p><br></p></td>
-                                        <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255); width: 309.672px;"><p><br></p></td>
-                                        <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255); width: 309.672px;"><p><br></p></td>
-                                    </tr>
-                                </tbody></table>`,
+                contentBefore:
+                    unformat(`<table class="table table-bordered o_table" style="height: 594.5px; width: 807px;">
+                    <colgroup>
+                        <col style="width: 500px;">
+                        <col style="width: 119.328px;">
+                        <col style="width: 186.672px;">
+                    </colgroup>
+                    <tbody>
+                        <tr style="height: 229.5px;">
+                            <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p>[]<br></p></td>
+                            <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
+                            <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
+                        </tr>
+                        <tr style="height: 260px;">
+                            <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
+                            <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
+                            <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
+                        </tr>
+                        <tr style="height: 104px;">
+                            <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
+                            <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
+                            <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
+                        </tr>
+                    </tbody>
+                </table>`),
                 stepFunction: resetSize,
-                contentAfter: `<table class="table table-bordered o_table"><tbody>
+                contentAfter: unformat(`<table class="table table-bordered o_table"><tbody>
                                     <tr>
                                         <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p>[]<br></p></td>
                                         <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
@@ -977,7 +1381,7 @@ describe("select columns on cross over", () => {
                                         <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
                                         <td style="background-color: rgb(206, 231, 247); color: rgb(0, 0, 255);"><p><br></p></td>
                                     </tr>
-                                </tbody></table>`,
+                                </tbody></table>`),
             });
         });
     });
@@ -1440,6 +1844,97 @@ describe("move cursor with arrow keys", () => {
                 `),
             });
         });
+        test("should move the cursor up across cells with colspan using ArrowUp", async () => {
+            const { el } = await setupEditor(
+                unformat(`
+                    <table class="table table-bordered o_table">
+                        <tbody>
+                            <tr><td><br></td><td><br></td><td><br></td></tr>
+                            <tr><td><br></td><td colspan="2"><br></td></tr>
+                            <tr><td><br></td><td><br></td><td>[]<br></td></tr>
+                        </tbody>
+                    </table>
+                `)
+            );
+            press(["ArrowUp"]);
+            await animationFrame();
+
+            expectContentToBe(
+                el,
+                `<p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><br></td><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td colspan="2">[]<br></td></tr>
+                        <tr><td><br></td><td><br></td><td><br></td></tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+            );
+
+            press(["ArrowUp"]);
+            await animationFrame();
+
+            expectContentToBe(
+                el,
+                `<p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><br></td><td>[]<br></td><td><br></td></tr>
+                        <tr><td><br></td><td colspan="2"><br></td></tr>
+                        <tr><td><br></td><td><br></td><td><br></td></tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+            );
+        });
+        test("should move the cursor down across cells with rowspan using ArrowUp", async () => {
+            const { el } = await setupEditor(
+                unformat(`
+                    <table class="table table-bordered o_table">
+                        <tbody>
+                            <tr><td><br></td><td><br></td></tr>
+                            <tr><td><br></td><td rowspan="2"><br></td></tr>
+                            <tr><td><br></td></tr>
+                            <tr><td><br></td><td>[]<br></td></tr>
+                        </tbody>
+                    </table>
+                `)
+            );
+            press(["ArrowUp"]);
+            await animationFrame();
+
+            expectContentToBe(
+                el,
+                `<p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td rowspan="2">[]<br></td></tr>
+                        <tr><td><br></td></tr>
+                        <tr><td><br></td><td><br></td></tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+            );
+
+            press(["ArrowUp"]);
+            await animationFrame();
+
+            expectContentToBe(
+                el,
+                `<p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><br></td><td>[]<br></td></tr>
+                        <tr><td><br></td><td rowspan="2"><br></td></tr>
+                        <tr><td><br></td></tr>
+                        <tr><td><br></td><td><br></td></tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+            );
+        });
     });
 
     describe("arrowdown", () => {
@@ -1673,6 +2168,97 @@ describe("move cursor with arrow keys", () => {
                 `),
             });
         });
+        test("should move the cursor down across cells with colspan using ArrowDown", async () => {
+            const { el } = await setupEditor(
+                unformat(`
+                    <table class="table table-bordered o_table">
+                        <tbody>
+                            <tr><td><br></td><td><br></td><td>[]<br></td></tr>
+                            <tr><td><br></td><td colspan="2"><br></td></tr>
+                            <tr><td><br></td><td><br></td><td><br></td></tr>
+                        </tbody>
+                    </table>
+                `)
+            );
+            press(["ArrowDown"]);
+            await animationFrame();
+
+            expectContentToBe(
+                el,
+                `<p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><br></td><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td colspan="2">[]<br></td></tr>
+                        <tr><td><br></td><td><br></td><td><br></td></tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+            );
+
+            press(["ArrowDown"]);
+            await animationFrame();
+
+            expectContentToBe(
+                el,
+                `<p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><br></td><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td colspan="2"><br></td></tr>
+                        <tr><td><br></td><td>[]<br></td><td><br></td></tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+            );
+        });
+        test("should move the cursor down across cells with rowspan using ArrowDown", async () => {
+            const { el } = await setupEditor(
+                unformat(`
+                    <table class="table table-bordered o_table">
+                        <tbody>
+                            <tr><td><br></td><td>[]<br></td></tr>
+                            <tr><td><br></td><td rowspan="2"><br></td></tr>
+                            <tr><td><br></td></tr>
+                            <tr><td><br></td><td><br></td></tr>
+                        </tbody>
+                    </table>
+                `)
+            );
+            press(["ArrowDown"]);
+            await animationFrame();
+
+            expectContentToBe(
+                el,
+                `<p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td rowspan="2">[]<br></td></tr>
+                        <tr><td><br></td></tr>
+                        <tr><td><br></td><td><br></td></tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+            );
+
+            press(["ArrowDown"]);
+            await animationFrame();
+
+            expectContentToBe(
+                el,
+                `<p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td rowspan="2"><br></td></tr>
+                        <tr><td><br></td></tr>
+                        <tr><td><br></td><td>[]<br></td></tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+            );
+        });
     });
 });
 
@@ -1764,6 +2350,312 @@ describe("symmetrical selection", () => {
                 <tbody>
                     <tr><td class="o_selected_td">[]<br></td><td><br></td><td><br></td></tr>
                     <tr><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+    });
+
+    test("Shift + arrow key navigation selects cells symmetrically across colspan", async () => {
+        const { el } = await setupEditor(
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td>[]<br></td><td><br></td><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td colspan="2"><br></td><td><br></td></tr>
+                        <tr><td><br></td><td><br></td><td><br></td><td><br></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+
+        press(["Shift", "ArrowRight"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[]<br></td><td><br></td><td><br></td><td><br></td></tr>
+                    <tr><td><br></td><td colspan="2"><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowRight"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td">]<br></td><td><br></td><td><br></td></tr>
+                    <tr><td><br></td><td colspan="2"><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowDown"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td colspan="2" class="o_selected_td">]<br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowDown"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td colspan="2" class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td class="o_selected_td">]<br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowRight"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td colspan="2" class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td><td class="o_selected_td">]<br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowRight"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td colspan="2" class="o_selected_td"><br></td><td class="o_selected_td"><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td><td class="o_selected_td">]<br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowLeft"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td colspan="2" class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td><td class="o_selected_td">]<br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowLeft"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td colspan="2" class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td class="o_selected_td">]<br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowLeft"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td><br></td><td><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td colspan="2"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td">]<br></td><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowUp"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td><br></td><td><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td">]<br></td><td colspan="2"><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+    });
+
+    test("Shift + arrow key selection with rowspan (start from first row first td)", async () => {
+        const { el } = await setupEditor(
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td>[]<br></td><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td rowspan="2"><br></td><td><br></td></tr>
+                        <tr><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td><br></td><td><br></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        press(["Shift", "ArrowRight"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[]<br></td><td><br></td><td><br></td></tr>
+                    <tr><td><br></td><td rowspan="2"><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowRight"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td">]<br></td><td><br></td></tr>
+                    <tr><td><br></td><td rowspan="2"><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowDown"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td rowspan="2" class="o_selected_td">]<br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowRight"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td rowspan="2" class="o_selected_td"><br></td><td class="o_selected_td">]<br></td></tr>
+                    <tr><td><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowDown"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td rowspan="2" class="o_selected_td"><br></td><td class="o_selected_td"><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td class="o_selected_td">]<br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowDown"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td rowspan="2" class="o_selected_td"><br></td><td class="o_selected_td"><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td class="o_selected_td"><br></td><td class="o_selected_td">]<br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowLeft"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td rowspan="2" class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td class="o_selected_td">]<br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        press(["Shift", "ArrowLeft"]);
+        await animationFrame();
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[<br></td><td><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td rowspan="2"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td"><br></td><td><br></td></tr>
+                    <tr><td class="o_selected_td">]<br></td><td><br></td><td><br></td></tr>
                 </tbody>
             </table>
             <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
@@ -2161,6 +3053,7 @@ describe("deselecting table", () => {
 
         press(["Shift", "ArrowUp"]);
         await animationFrame();
+        await waitFor("table:not(.o_selected_table)");
 
         expectContentToBe(
             el,
@@ -2173,5 +3066,585 @@ describe("deselecting table", () => {
             </table>
             <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
         );
+    });
+    test("deselect table when clicking outside of editor", async () => {
+        const { el } = await setupEditor(
+            unformat(
+                `<table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td>[]<br></td><td><br></td><td><br></td></tr>
+                        <tr><td><br></td><td><br></td><td><br></td></tr>
+                    </tbody>
+                </table>`
+            )
+        );
+
+        const BORDER_SENSITIVITY = 5;
+        const firstTd = el.querySelector("td");
+        const offset = BORDER_SENSITIVITY + 5;
+
+        await manuallyDispatchProgrammaticEvent(firstTd, "mousedown", {
+            detail: 2,
+            clientX: offset,
+            clientY: offset,
+        });
+        await manuallyDispatchProgrammaticEvent(firstTd, "mouseup", {
+            detail: 2,
+            clientX: offset,
+            clientY: offset,
+        });
+        await animationFrame();
+
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table o_selected_table">
+                <tbody>
+                    <tr><td class="o_selected_td">[]<br></td><td><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+
+        const selection = document.getSelection();
+        await click(document.body);
+        selection.setPosition(document.body);
+        await tick();
+
+        expectContentToBe(
+            el,
+            `<p data-selection-placeholder=""><br></p>
+            <table class="table table-bordered o_table">
+                <tbody>
+                    <tr><td><br></td><td><br></td><td><br></td></tr>
+                    <tr><td><br></td><td><br></td><td><br></td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+        );
+    });
+});
+
+describe("keyboard navigation with multiline", () => {
+    describe("move", () => {
+        test("should reach above cell when pressing up from text's first line", async () => {
+            const { el } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1[]L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            const events = await press("ArrowUp");
+            expect(events[0].defaultPrevented).toBe(true);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2[]</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should allow default text navigation when pressing up from text's second line", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1[]L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, "ArrowUp");
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1[]L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should reach cell below when pressing down from text's last line", async () => {
+            const { el } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2[]L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            const events = await press("ArrowDown");
+            expect(events[0].defaultPrevented).toBe(true);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>[]C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should allow default text navigation when pressing down from text's non-last line", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2[]L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, "ArrowDown");
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2[]L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should reach begin of cell when pressing Ctrl+ArrowUp", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2[]L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, ["Control", "ArrowUp"]);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        []<div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should reach end of cell when pressing Ctrl+ArrowDown", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2[]L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, ["Control", "ArrowDown"]);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>[]
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+    });
+    describe("select", () => {
+        test("should select current cell when pressing shift+up from text's first line", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1[]L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, ["Shift", "ArrowUp"]);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table class="o_selected_table"><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td class="o_selected_td">
+                        <div class="o-paragraph">P1[]L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should allow default text selection when pressing shift+up from text's second line", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1[]L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, ["Shift", "ArrowUp"]);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1]L1<br>P1[L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should select current cell when pressing shift+down from text's last line", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2[]L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, ["Shift", "ArrowDown"]);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table class="o_selected_table"><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td class="o_selected_td">
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2[]L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should allow default text selection when pressing shift+down from text's non-last line", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2[]L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, ["Shift", "ArrowDown"]);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2[L1<br>P2]L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should select whole cell when pressing Ctrl+Shift+ArrowUp", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2[]L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, ["Control", "Shift", "ArrowUp"]);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table class="o_selected_table"><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td class="o_selected_td">
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2[]L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should select whole cell when pressing Ctrl+Shift+ArrowDown", async () => {
+            const { el, editor } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2[]L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await simulateArrowKeyPress(editor, ["Control", "Shift", "ArrowDown"]);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table class="o_selected_table"><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td class="o_selected_td">
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2[]L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+    });
+    describe("select then move", () => {
+        test("should move from reached selection (upwards)", async () => {
+            const { el } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1[]L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await keyDown("Shift");
+            let events = await press("ArrowUp");
+            expect(events[0].defaultPrevented).toBe(true);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table class="o_selected_table"><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td class="o_selected_td">
+                        <div class="o-paragraph">P1[]L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+            events = await press("ArrowUp");
+            await keyUp("Shift");
+            await tick();
+            expect(events[0].defaultPrevented).toBe(true);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table class="o_selected_table"><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td class="o_selected_td">C2]</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td class="o_selected_td">
+                        <div class="o-paragraph">P1[L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+            events = await press("ArrowUp");
+            await tick();
+            expect(events[0].defaultPrevented).toBe(true);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1[]</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+        test("should move from reached selection (downwards)", async () => {
+            const { el } = await setupEditor(
+                unformat(`
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2[]L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                `)
+            );
+            await keyDown("Shift");
+            let events = await press("ArrowDown");
+            expect(events[0].defaultPrevented).toBe(true);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table class="o_selected_table"><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td class="o_selected_td">
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2[]L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+            events = await press("ArrowDown");
+            await keyUp("Shift");
+            await tick();
+            expect(events[0].defaultPrevented).toBe(true);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table class="o_selected_table"><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td class="o_selected_td">
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2[L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td class="o_selected_td">]C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+            events = await press("ArrowDown");
+            await tick();
+            expect(events[0].defaultPrevented).toBe(true);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table><tbody>
+                    <tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td><td>E1</td></tr>
+                    <tr><td>A2</td><td>B2</td><td>C2</td><td>D2</td><td>E2</td></tr>
+                    <tr><td>A3</td><td>B3</td><td>
+                        <div class="o-paragraph">P1L1<br>P1L2</div><div class="o-paragraph">P2L1<br>P2L2</div>
+                    </td><td>D3</td><td>E3</td></tr>
+                    <tr><td>A4</td><td>B4</td><td>C4</td><td>D4</td><td>E4</td></tr>
+                    <tr><td>A5</td><td>B5</td><td>[]C5</td><td>D5</td><td>E5</td></tr>
+                    </tbody></table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
     });
 });

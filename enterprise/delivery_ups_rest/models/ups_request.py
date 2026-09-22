@@ -4,13 +4,13 @@ import base64
 import io
 # activate PDF support in PIL
 import PIL.PdfImagePlugin  # pylint: disable=W0611
-from PIL import Image
 from json.decoder import JSONDecodeError
 from requests.exceptions import RequestException
 
 from odoo import _
 from odoo.exceptions import ValidationError
 from odoo.tools import float_repr
+from odoo.tools.image import binary_to_image
 from odoo.tools.urls import urljoin as url_join
 
 TEST_BASE_URL = "https://wwwcie.ups.com"
@@ -95,12 +95,14 @@ class UPSRequest:
     def _clean_phone_number(self, phone):
         return re.sub('[^0-9]', '', phone)
 
+    def _check_phone_number(self, phone):
+        return 1 <= len(self._clean_phone_number(phone)) <= 15
+
     def _save_label(self, image64, label_file_type='GIF'):
         img_decoded = base64.decodebytes(image64.encode('utf-8'))
         if label_file_type == 'GIF':
             # Label format is GIF, so need to rotate and convert as PDF
-            image_string = io.BytesIO(img_decoded)
-            im = Image.open(image_string)
+            im = binary_to_image(img_decoded)
             label_result = io.BytesIO()
             im.save(label_result, 'pdf')
             return label_result.getvalue()
@@ -124,7 +126,7 @@ class UPSRequest:
         required_field = {'city': 'City', 'country_id': 'Country', 'phone': 'Phone'}
         # Check required field for shipper
         res = [required_field[field] for field in required_field if not shipper[field]]
-        if shipper.country_id.code in ('US', 'CA', 'IE') and not shipper.state_id.code:
+        if shipper.country_id.code in ('US', 'CA', 'IE', 'VN') and not shipper.state_id.code:
             res.append('State')
         if not shipper.street and not shipper.street2:
             res.append('Street')
@@ -132,11 +134,11 @@ class UPSRequest:
             res.append('ZIP code')
         if res:
             return _("The address of your company is missing or wrong.\n(Missing field(s) : %s)", ",".join(res))
-        if len(self._clean_phone_number(shipper.phone)) < 10:
-            return _("Shipper Phone must be at least 10 alphanumeric characters.")
+        if not self._check_phone_number(shipper.phone):
+            return _("Shipper Phone must be between 1 and 15 alphanumeric characters.")
         # Check required field for warehouse address
         res = [required_field[field] for field in required_field if not ship_from[field]]
-        if ship_from.country_id.code in ('US', 'CA', 'IE') and not ship_from.state_id.code:
+        if ship_from.country_id.code in ('US', 'CA', 'IE', 'VN') and not ship_from.state_id.code:
             res.append('State')
         if not ship_from.street and not ship_from.street2:
             res.append('Street')
@@ -144,11 +146,11 @@ class UPSRequest:
             res.append('ZIP code')
         if res:
             return _("The address of your warehouse is missing or wrong.\n(Missing field(s) : %s)", ",".join(res))
-        if len(self._clean_phone_number(ship_from.phone)) < 10:
-            return _("Warehouse Phone must be at least 10 alphanumeric characters."),
+        if not self._check_phone_number(ship_from.phone):
+            return _("Warehouse Phone must be between 1 and 15 alphanumeric characters.")
         # Check required field for recipient address
         res = [required_field[field] for field in required_field if field != 'phone' and not ship_to[field]]
-        if ship_to.country_id.code in ('US', 'CA', 'IE') and not ship_to.state_id.code:
+        if ship_to.country_id.code in ('US', 'CA', 'IE', 'VN') and not ship_to.state_id.code:
             res.append('State')
         if not ship_to.street and not ship_to.street2 and not is_express_checkout_partial_delivery_address:
             res.append('Street')
@@ -179,8 +181,8 @@ class UPSRequest:
             res.append('Phone')
         if res:
             return _("The recipient address is missing or wrong.\n(Missing field(s) : %s)", ",".join(res))
-        if phone and len(self._clean_phone_number(phone)) < 10:
-            return _("Recipient Phone must be at least 10 alphanumeric characters."),
+        if phone and not self._check_phone_number(phone):
+            return _("Recipient Phone must be between 1 and 15 alphanumeric characters.")
         return False
 
     def _set_package_details(self, packages, carrier, ship_from, ship_to, cod_info, ship=False, is_return=False):
@@ -248,6 +250,20 @@ class UPSRequest:
             res_packages.append(package)
         return res_packages
 
+    def _sanitize_province_code(self, partner_id):
+        province_code = partner_id.state_id.code
+        if not province_code or not partner_id.country_id.code in ['US', 'CA', 'IE', 'VN']:
+            return ''
+        if len(province_code) > 5:
+            return province_code[:5]
+        return province_code
+
+    def _sanitize_zip_code(self, zip):
+        # Returns a string with only alphanumerical characters of len() <= 9
+        if not zip:
+            return ''
+        return re.sub(r'[^A-Za-z0-9]', '', zip)[:9]
+
     def _get_ship_data_from_partner(self, partner, shipper_no=None):
         return {
             'AttentionName': (partner.name or '')[:35],
@@ -260,11 +276,19 @@ class UPSRequest:
             'Address': {
                 'AddressLine': [partner.street or '', partner.street2 or ''],
                 'City': partner.city or '',
-                'PostalCode': partner.zip or '',
+                'PostalCode': self._sanitize_zip_code(partner.zip),
                 'CountryCode': partner.country_id.code or '',
-                'StateProvinceCode': partner.state_id.code or '',
+                'StateProvinceCode': self._sanitize_province_code(partner),
             },
         }
+
+    def _get_delivery_confirmation_origin_destination_pair_type(self, ship_from, ship_to):
+        # Check whether delivery confirmation should be requested at package level or shipment level
+        # (the default case)
+        if (ship_from.country_code in ['US', 'PR'] and (ship_to.country_code in ['US', 'PR'])) or\
+           (ship_from.country_code == 'CA' and ship_to.country_code == 'CA'):
+            return 'Package'
+        return 'Shipment'
 
     def _get_shipping_price(self, shipper, ship_from, ship_to, total_qty, packages, carrier, cod_info=None):
         service_type = carrier.ups_default_service_type
@@ -272,10 +296,14 @@ class UPSRequest:
         url = f'/api/rating/{API_VERSION}/Rate'
 
         shipment_service_options = {}
+        package_service_options = {}
         if saturday_delivery:
             shipment_service_options['SaturdayDeliveryIndicator'] = saturday_delivery
         if carrier.ups_require_signature:
-            shipment_service_options['DeliveryConfirmation'] = {'DCISType': '1'}
+            if self._get_delivery_confirmation_origin_destination_pair_type(ship_from, ship_to) == 'Package':
+                package_service_options['DeliveryConfirmation'] = {'DCISType': '2'}
+            else:
+                shipment_service_options['DeliveryConfirmation'] = {'DCISType': '1'}
 
         data = {
             'RateRequest': {
@@ -292,6 +320,7 @@ class UPSRequest:
                     },
                     'NumOfPieces': str(int(total_qty)) if service_type == '96' else None,
                     'ShipmentServiceOptions': shipment_service_options if shipment_service_options else None,
+                    'PackageServiceOptions': package_service_options or None,
                     'ShipmentRatingOptions': {
                         'NegotiatedRatesIndicator': "1",
                     }
@@ -316,6 +345,7 @@ class UPSRequest:
             'alert_message': self._process_alerts(res['RateResponse']['Response']),
         }
 
+    # NOTE: `ship_to` should actually be the invoicing partner_id and not the delivery partner_id
     def _set_invoice(self, shipment_info, commodities, ship_to, is_return):
         invoice_products = []
         for commodity in commodities:
@@ -339,13 +369,13 @@ class UPSRequest:
         contacts = {
             'SoldTo': {
                 'Name': ship_to.commercial_partner_id.name,
-                'AttentionName': ship_to.name,
+                'AttentionName': ship_to.name or ship_to.commercial_partner_id.name,
                 'Address': {
                     'AddressLine': [line for line in (ship_to.street, ship_to.street2) if line],
                     'City': ship_to.city,
-                    'PostalCode': ship_to.zip,
+                    'PostalCode': self._sanitize_zip_code(ship_to.zip),
                     'CountryCode': ship_to.country_id.code,
-                    'StateProvinceCode': ship_to.state_id.code or '' if ship_to.country_id.code in ('US', 'CA', 'IE') else None
+                    'StateProvinceCode': self._sanitize_province_code(ship_to),
                 }
             }
         }
@@ -370,7 +400,7 @@ class UPSRequest:
             shipment_charge['BillReceiver'] = {
                 'AccountNumber': ups_carrier_account,
                 'Address': {
-                    'PostalCode': ship_to.zip,
+                    'PostalCode': self._sanitize_zip_code(ship_to.zip),
                 }
             }
         else:
@@ -383,15 +413,33 @@ class UPSRequest:
                 'BillShipper': {'AccountNumber': self.shipper_number},
             })
         shipment_service_options = {}
+        package_service_options = {}
         if shipment_info.get('require_invoice'):
+            picking = packages[0].picking_id
+            if picking.sale_id:
+                sold_to = picking.sale_id.partner_invoice_id
+            else:
+                sold_to = ship_to.commercial_partner_id
+            if sold_to.country_id != ship_to.country_id:
+                msg = _('Detected a problem when validating delivery %(delivery_name)s. Invoicing address of the commercial invoice has been defaulted to %(ship_to_partner)s instead of %(sold_to_partner)s to avoid the following error from UPS: "The Sold To party\'s country code must be the same as the Ship To party\'s country code with the exception of Canada and satellite countries."', delivery_name=picking._get_html_link(), ship_to_partner=ship_to._get_html_link(), sold_to_partner=sold_to._get_html_link())
+                record_to_notify = picking.sale_id or picking
+                record_to_notify.message_post(
+                    body=msg,
+                    message_type='notification',
+                )
+                sold_to = ship_to
             shipment_service_options['InternationalForms'] = self._set_invoice(shipment_info, [c for pkg in packages for c in pkg.commodities],
-                                                                               ship_to, is_return)
+                                                                               sold_to, is_return)
             shipment_service_options['InternationalForms']['PurchaseOrderNumber'] = shipment_info.get('purchase_order_number')
             shipment_service_options['InternationalForms']['TermsOfShipment'] = shipment_info.get('terms_of_shipment')
+            shipment_service_options['InternationalForms']['FreightCharges'] = {'MonetaryValue': float_repr(shipment_info.get('freight_charge', 0.0), 2)}
         if saturday_delivery:
             shipment_service_options['SaturdayDeliveryIndicator'] = saturday_delivery
         if carrier.ups_require_signature:
-            shipment_service_options['DeliveryConfirmation'] = {'DCISType': '1'}
+            if self._get_delivery_confirmation_origin_destination_pair_type(ship_from, ship_to) == 'Package':
+                package_service_options['DeliveryConfirmation'] = {'DCISType': '2'}
+            else:
+                shipment_service_options['DeliveryConfirmation'] = {'DCISType': '1'}
 
         request = {
             'ShipmentRequest': {
@@ -416,6 +464,7 @@ class UPSRequest:
                     },
                     'NumOfPiecesInShipment': int(shipment_info.get('total_qty')) if service_type == '96' else None,
                     'ShipmentServiceOptions': shipment_service_options if shipment_service_options else None,
+                    'PackageServiceOptions': package_service_options or None,
                     'ShipmentRatingOptions': {
                         'NegotiatedRatesIndicator': '1',
                     },

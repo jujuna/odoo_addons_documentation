@@ -13,7 +13,7 @@ class MailTestActivityBlSmsVoip(models.Model):
         'mail.thread.blacklist',
         'mail.thread.phone',
         'mail.activity.mixin',
-        'voip.queue.mixin',
+        'voip.activity.mixin',
     ]
     _mailing_enabled = True
     _order = 'name asc, id asc'

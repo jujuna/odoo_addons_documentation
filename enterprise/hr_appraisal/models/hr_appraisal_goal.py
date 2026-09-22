@@ -17,7 +17,8 @@ class HrAppraisalGoal(models.Model):
     name = fields.Char(required=True)
     employee_ids = fields.Many2many(
         'hr.employee', 'hr_appraisal_goal_hr_employee_rel', 'hr_appraisal_goal_id',
-        string="Employee", ondelete='cascade', tracking=True)
+        default=lambda self: self.env['hr.employee'].sudo().search([('user_id', '=', self.env.uid), ('company_id', '=', self.env.company.id)], limit=1),
+        string="Employee", ondelete='cascade', tracking=True, bypass_search_access=True)
     employee_autocomplete_ids = fields.Many2many('hr.employee', compute='_compute_employee_autocomplete', compute_sudo=True)
     company_id = fields.Many2one('res.company', related="employee_ids.company_id", store=True)
     manager_ids = fields.Many2many(
@@ -31,8 +32,10 @@ class HrAppraisalGoal(models.Model):
         ('050', '50%'),
         ('075', '75%'),
         ('100', '100%')
-    ], string="Progress", default="000", tracking=True, required=True, copy=False, compute="_compute_progression",
+    ], string="Progression", default="000", required=True, copy=False, compute="_compute_progression",
         store=True, readonly=False, recursive=True)
+    children_progression = fields.Float(string="Children Progression", compute="_compute_children_progression", recursive=True)
+    progression_display = fields.Char(string="Progress", compute="_compute_progression_display", store=True, tracking=True)
     description = fields.Html()
     deadline = fields.Date(tracking=True)
     is_manager = fields.Boolean(compute='_compute_is_manager', search='_search_is_manager')
@@ -40,7 +43,7 @@ class HrAppraisalGoal(models.Model):
     tag_ids = fields.Many2many('hr.appraisal.goal.tag', string="Tags")
     template_goal_id = fields.Many2one("hr.appraisal.goal", "Goal Template")
     number_of_sibling_goals = fields.Integer(compute='_compute_number_of_sibling_goals', store=True)
-    number_of_completed_sibling_goals = fields.Integer(compute='compute_number_of_completed_sibling_goals', store=True)
+    number_of_completed_sibling_goals = fields.Integer(compute='_compute_number_of_completed_sibling_goals', store=True)
     sibling_goals_ratio = fields.Float(compute="_compute_sibling_goals_ratio", store=True)
     # Goal Template
     active = fields.Boolean(default=True)
@@ -66,7 +69,7 @@ class HrAppraisalGoal(models.Model):
     def _compute_is_manager(self):
         self.is_manager =\
             self.env.user.has_group('hr_appraisal.group_hr_appraisal_user')\
-            or len(self.employee_autocomplete_ids) > 1
+            or len(self.sudo().employee_autocomplete_ids) > 1
 
     def _search_is_manager(self, operator, value):
         if operator != 'in':
@@ -89,7 +92,7 @@ class HrAppraisalGoal(models.Model):
                 goal.number_of_sibling_goals = len(goal.parent_id.child_ids)
 
     @api.depends('parent_id.child_ids.progression')
-    def compute_number_of_completed_sibling_goals(self):
+    def _compute_number_of_completed_sibling_goals(self):
         for goal in self:
             if not goal.parent_id:
                 goal.number_of_completed_sibling_goals = 0
@@ -111,6 +114,23 @@ class HrAppraisalGoal(models.Model):
             else:
                 goal.progression = '000'
 
+    @api.depends('progression', 'child_ids.children_progression')
+    def _compute_children_progression(self):
+        for goal in self:
+            if not goal.child_ids:
+                goal.children_progression = int(goal.progression) / 100
+            else:
+                goal.children_progression = sum(goal_child.children_progression for goal_child in goal.child_ids) / len(goal.child_ids)
+
+    @api.depends('children_progression')
+    def _compute_progression_display(self):
+        for goal in self:
+            percentage_progression = goal.children_progression * 100
+            if percentage_progression.is_integer():
+                goal.progression_display = f"{int(percentage_progression)}%"
+            else:
+                goal.progression_display = f"{percentage_progression:.2f}%"
+
     @api.depends("employee_ids.department_id")
     def _compute_department_ids(self):
         for goal in self:
@@ -121,12 +141,14 @@ class HrAppraisalGoal(models.Model):
         for goal in self:
             goal.job_ids = goal.employee_ids.job_id
 
-    def _notify_by_email_prepare_rendering_context(self, message, msg_vals=False, model_description=False,
+    def _notify_by_email_prepare_rendering_context(self, message, model_description=False,
                                                    force_email_company=False, force_email_lang=False,
+                                                   force_header=False, force_footer=False,
                                                    force_record_name=False):
         render_context = super()._notify_by_email_prepare_rendering_context(
-            message, msg_vals=msg_vals, model_description=model_description,
+            message, model_description=model_description,
             force_email_company=force_email_company, force_email_lang=force_email_lang,
+            force_header=force_header, force_footer=force_footer,
             force_record_name=force_record_name,
         )
         if self.deadline:
@@ -165,7 +187,7 @@ class HrAppraisalGoal(models.Model):
             'name': self.name,
             'description': self.description,
             'tag_ids': self.tag_ids.ids,
-            'deadline': fields.Date.today() + relativedelta(months=self.usual_duration_month) if self.usual_duration_month else False,
+            'deadline': fields.Date.context_today(self) + relativedelta(months=self.usual_duration_month) if self.usual_duration_month else False,
             'employee_ids': [employee_id],
             'parent_id': goal_parent_id,
             'template_goal_id': self.id,
@@ -180,6 +202,7 @@ class HrAppraisalGoal(models.Model):
             'usual_duration_month': relativedelta(goal.deadline, goal.create_date.date()).months
                 if goal.deadline and goal.deadline > goal.create_date.date() else 0,
             'tag_ids': goal.tag_ids,
+            'employee_ids': False,
         } for goal in self])
         for goal_template, goal in zip(goal_templates, self):
             goal.template_goal_id = goal_template
@@ -233,9 +256,9 @@ class HrAppraisalGoal(models.Model):
 
     def copy_data(self, default=None):
         vals_list = super().copy_data(default)
+        today = fields.Date.context_today(self)
         for goal, vals in zip(self, vals_list):
-            vals['name'] = self.env._('%s (copy)', goal.name)
-            if goal.deadline and goal.deadline < fields.Date.today():
+            if goal.deadline and goal.deadline < today:
                 vals['deadline'] = False
         return vals_list
 

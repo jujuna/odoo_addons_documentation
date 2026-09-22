@@ -11,6 +11,8 @@ from odoo.tests import tagged, HttpCase, Form
 @tagged('post_install', '-at_install')
 class TestDeferredReports(TestAccountReportsCommon, HttpCase):
     # ruff: noqa: E226
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -51,30 +53,28 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
             [cls.revenue_accounts[2],  225, '2023-04-01', '2023-04-15'],  # 15 days (=450/month)
         ]
 
-    def create_invoice(self, invoice_lines, move_type='in_invoice', invoice_date='2023-01-01', post=True):
-        journal = self.company_data['default_journal_sale']
+    @classmethod
+    def _create_invoice_deferred(cls, invoice_lines, move_type='in_invoice', invoice_date='2023-01-01', post=True):
+        journal = cls.company_data['default_journal_sale']
         if move_type.startswith('in_'):
-            journal = self.company_data['default_journal_purchase']
-        move = self.env['account.move'].create({
-            'move_type': move_type,
-            'partner_id': self.partner_a.id,
-            'date': invoice_date,
-            'invoice_date': invoice_date,
-            'journal_id': journal.id,
-            'invoice_line_ids': [
-                Command.create({
-                    'product_id': self.product_a.id,
-                    'quantity': 1,
-                    'account_id': invoice_line[0].id,
-                    'price_unit': invoice_line[1],
-                    'deferred_start_date': invoice_line[2],
-                    'deferred_end_date': invoice_line[3],
-                }) for invoice_line in invoice_lines
-            ]
-        })
-        if post:
-            move.action_post()
-        return move
+            journal = cls.company_data['default_journal_purchase']
+        return cls._create_invoice(
+            move_type=move_type,
+            date=invoice_date,
+            invoice_date=invoice_date,
+            journal_id=journal,
+            invoice_line_ids=[
+                cls._prepare_invoice_line(
+                    product_id=cls.product_a,
+                    account_id=account,
+                    price_unit=price,
+                    deferred_start_date=start_date,
+                    deferred_end_date=end_date,
+                )
+                for account, price, start_date, end_date in invoice_lines
+            ],
+            post=post,
+        )
 
     def get_options(self, from_date, to_date, report=None):
         report = report or self.deferred_expense_report
@@ -99,7 +99,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         We use multiple report months/quarters/years to check that the computation is correct.
         """
         self.company.deferred_expense_amount_computation_method = 'month'
-        self.create_invoice(self.expense_lines)
+        self._create_invoice_deferred(self.expense_lines)
 
         # December 2022
         options = self.get_options('2022-12-01', '2022-12-31')
@@ -117,13 +117,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before   Current              Recognized         Later
-            [    0,                  1,             2,            3,       4,                   5,                 6                       ],
+            #    Name                Total          Not Started   Before   Current              Recognized         <= 12 Months               > 12 Months
+            [    0,                  1,             2,            3,       4,                   5,                 6,                         7 ],
             [
-                ('EXP0 Expense 0',   1000 + 1050,   0,            0,       250 + 150,           400,               750 + 900               ),
-                ('EXP1 Expense 1',   1225,          0,            0,       350,                 350,               875                     ),
-                ('EXP2 Expense 2',   1680 + 225,    225,          0,       600 * (10/30) + 0,   600 * (10/30),     600 * (2 + 14/30) + 225 ),
-                ('Total',            5180,          225,          0,       950,                 950,               4230                    ),
+                ('EXP0 Expense 0',   1000 + 1050,   0,            0,       250 + 150,           400,               750 + 900,                 0 ),
+                ('EXP1 Expense 1',   1225,          0,            0,       350,                 350,               875,                       0 ),
+                ('EXP2 Expense 2',   1680 + 225,    225,          0,       600 * (10/30) + 0,   600 * (10/30),     600 * (2 + 14/30) + 225,   0 ),
+                ('Total',            5180,          225,          0,       950,                 950,               4230,                      0 ),
             ],
             options,
         )
@@ -133,13 +133,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before               Current      Recognized                Later
-            [    0,                  1,             2,            3,                   4,           5,                        6                       ],
+            #    Name                Total          Not Started   Before               Current      Recognized                <= 12 Months              > 12 Months
+            [    0,                  1,             2,            3,                   4,           5,                        6,                        7 ],
             [
-                ('EXP0 Expense 0',   1000 + 1050,   0,            250 + 150,           250 + 300,   950,                      500 + 600               ),
-                ('EXP1 Expense 1',   1225,          0,            350,                 350,         700,                      525                     ),
-                ('EXP2 Expense 2',   1680 + 225,    225,          600 * (10/30) + 0,   600 + 0,     600 * (10/30) + 600,      600 * (1 + 14/30) + 225 ),
-                ('Total',            5180,          225,          950,                 1500,        950 + 1500,               2730                    ),
+                ('EXP0 Expense 0',   1000 + 1050,   0,            250 + 150,           250 + 300,   950,                      500 + 600,                0 ),
+                ('EXP1 Expense 1',   1225,          0,            350,                 350,         700,                      525,                      0 ),
+                ('EXP2 Expense 2',   1680 + 225,    225,          600 * (10/30) + 0,   600 + 0,     600 * (10/30) + 600,      600 * (1 + 14/30) + 225,  0 ),
+                ('Total',            5180,          225,          950,                 1500,        950 + 1500,               2730,                     0 ),
             ],
             options,
         )
@@ -149,13 +149,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before               Current               Recognized                                      Later
-            [    0,                  1,             2,            3,                   4,                    5,                                              6     ],
+            #    Name                Total          Not Started   Before               Current               Recognized                                      <= 12 Months   > 12 Months
+            [    0,                  1,             2,            3,                   4,                    5,                                              6,             7 ],
             [
-                ('EXP0 Expense 0',   1000 + 1050,   0,            750 + 750,           250 + 300,            2050,                                           0     ),
-                ('EXP1 Expense 1',   1225,          0,            1050,                175,                  1225,                                           0     ),
-                ('EXP2 Expense 2',   1680 + 225,    0,            600 * (2 + 10/30),   600 * (14/30)+ 225,   600 * (2 + 10 / 30) + 600 * (14 / 30) + 225,    0     ),
-                ('Total',            5180,          0,            3950,                1230,                 3950 + 1230,                                    0     ),
+                ('EXP0 Expense 0',   1000 + 1050,   0,            750 + 750,           250 + 300,            2050,                                           0,             0 ),
+                ('EXP1 Expense 1',   1225,          0,            1050,                175,                  1225,                                           0,             0 ),
+                ('EXP2 Expense 2',   1680 + 225,    0,            600 * (2 + 10/30),   600 * (14/30)+ 225,   600 * (2 + 10 / 30) + 600 * (14 / 30) + 225,    0,             0 ),
+                ('Total',            5180,          0,            3950,                1230,                 3950 + 1230,                                    0,             0 ),
             ],
             options,
         )
@@ -176,13 +176,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before   Current                  Recognized          Later
-            [    0,                  1,             2,            3,       4,                       5,                  6         ],
+            #    Name                Total          Not Started   Before   Current                  Recognized          <= 12 Months   > 12 Months
+            [    0,                  1,             2,            3,       4,                       5,                  6,             7 ],
             [
-                ('EXP0 Expense 0',   1000 + 1050,   0,            0,       750 + 750,               750 + 750,          550       ),
-                ('EXP1 Expense 1',   1225,          0,            0,       1050,                    1050,               175       ),
-                ('EXP2 Expense 2',   1680 + 225,    225,          0,       600 * (2 + 10/30) + 0,   600 * (2 + 10/30),  280 + 225 ),
-                ('Total',            5180,          225,          0,       3950,                    3950,               1230      ),
+                ('EXP0 Expense 0',   1000 + 1050,   0,            0,       750 + 750,               750 + 750,          550,           0 ),
+                ('EXP1 Expense 1',   1225,          0,            0,       1050,                    1050,               175,           0 ),
+                ('EXP2 Expense 2',   1680 + 225,    225,          0,       600 * (2 + 10/30) + 0,   600 * (2 + 10/30),  280 + 225,     0 ),
+                ('Total',            5180,          225,          0,       3950,                    3950,               1230,          0 ),
             ],
             options,
         )
@@ -192,13 +192,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before               Current               Recognized                                    Later
-            [    0,                  1,             2,            3,                   4,                    5,                                            6     ],
+            #    Name                Total          Not Started   Before               Current               Recognized                                    <= 12 Months   > 12 Months
+            [    0,                  1,             2,            3,                   4,                    5,                                            6,             7 ],
             [
-                ('EXP0 Expense 0',   1000 + 1050,   0,            750 + 750,           250 + 300,            750 + 750 + 250 + 300,                        0     ),
-                ('EXP1 Expense 1',   1225,          0,            1050,                175,                  1050 + 175,                                   0     ),
-                ('EXP2 Expense 2',   1680 + 225,    0,            600 * (2 + 10/30),   600 * (14/30)+ 225,   600 * (2 + 10 / 30) + 600 * (14 / 30) + 225,  0     ),
-                ('Total',            5180,          0,            3950,                1230,                 3950 + 1230,                                  0     ),
+                ('EXP0 Expense 0',   1000 + 1050,   0,            750 + 750,           250 + 300,            750 + 750 + 250 + 300,                        0,             0 ),
+                ('EXP1 Expense 1',   1225,          0,            1050,                175,                  1050 + 175,                                   0,             0 ),
+                ('EXP2 Expense 2',   1680 + 225,    0,            600 * (2 + 10/30),   600 * (14/30)+ 225,   600 * (2 + 10 / 30) + 600 * (14 / 30) + 225,  0,             0 ),
+                ('Total',            5180,          0,            3950,                1230,                 3950 + 1230,                                  0,             0 ),
             ],
             options,
         )
@@ -231,7 +231,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         We use multiple report months/quarters/years to check that the computation is correct.
         """
         self.company.deferred_revenue_amount_computation_method = 'month'
-        self.create_invoice(self.revenue_lines, 'out_invoice')
+        self._create_invoice_deferred(self.revenue_lines, 'out_invoice')
 
         # December 2022
         options = self.get_options('2022-12-01', '2022-12-31', self.deferred_revenue_report)
@@ -249,13 +249,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options, self.deferred_revenue_report)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before   Current              Recognized        Later
-            [    0,                  1,             2,            3,       4,                   5,                6                       ],
+            #    Name                Total          Not Started   Before   Current              Recognized        <= 12 Months               > 12 Months
+            [    0,                  1,             2,            3,       4,                   5,                6,                         7 ],
             [
-                ('REV0 Revenue 0',   1000 + 1050,   0,            0,       250 + 150,           250 + 150,        750 + 900               ),
-                ('REV1 Revenue 1',   1225,          0,            0,       350,                 350,              875                     ),
-                ('REV2 Revenue 2',   1680 + 225,    225,          0,       600 * (10/30) + 0,   600 * (10/30),    600 * (2 + 14/30) + 225 ),
-                ('Total',            5180,          225,          0,       950,                 950,              4230                    ),
+                ('REV0 Revenue 0',   1000 + 1050,   0,            0,       250 + 150,           250 + 150,        750 + 900,                 0 ),
+                ('REV1 Revenue 1',   1225,          0,            0,       350,                 350,              875,                       0 ),
+                ('REV2 Revenue 2',   1680 + 225,    225,          0,       600 * (10/30) + 0,   600 * (10/30),    600 * (2 + 14/30) + 225,   0 ),
+                ('Total',            5180,          225,          0,       950,                 950,              4230,                      0 ),
             ],
             options,
         )
@@ -265,13 +265,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options, self.deferred_revenue_report)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before               Current      Recognized                     Later
-            [    0,                  1,             2,            3,                   4,           5,                             6                       ],
+            #    Name                Total          Not Started   Before               Current      Recognized                     <= 12 Months              > 12 Months
+            [    0,                  1,             2,            3,                   4,           5,                             6,                        7 ],
             [
-                ('REV0 Revenue 0',   1000 + 1050,   0,            250 + 150,           250 + 300,   250 + 150 + 250 + 300,         500 + 600               ),
-                ('REV1 Revenue 1',   1225,          0,            350,                 350,         350 + 350,                     525                     ),
-                ('REV2 Revenue 2',   1680 + 225,    225,          600 * (10/30) + 0,   600,         600 * (10/30) + 0 + 600 + 0,   600 * (1 + 14/30) + 225 ),
-                ('Total',            5180,          225,          950,                 1500,        950 + 1500,                    2730                    ),
+                ('REV0 Revenue 0',   1000 + 1050,   0,            250 + 150,           250 + 300,   250 + 150 + 250 + 300,         500 + 600,                0 ),
+                ('REV1 Revenue 1',   1225,          0,            350,                 350,         350 + 350,                     525,                      0 ),
+                ('REV2 Revenue 2',   1680 + 225,    225,          600 * (10/30) + 0,   600,         600 * (10/30) + 0 + 600 + 0,   600 * (1 + 14/30) + 225,  0 ),
+                ('Total',            5180,          225,          950,                 1500,        950 + 1500,                    2730,                     0 ),
             ],
             options,
         )
@@ -281,13 +281,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options, self.deferred_revenue_report)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before               Current               Recognized                                  Later
-            [    0,                  1,             2,            3,                   4,                    5,                                          6     ],
+            #    Name                Total          Not Started   Before               Current               Recognized                                  <= 12 Months   > 12 Months
+            [    0,                  1,             2,            3,                   4,                    5,                                          6,             7 ],
             [
-                ('REV0 Revenue 0',   1000 + 1050,   0,            750 + 750,           250 + 300,            750 + 750 + 250 + 300,                      0     ),
-                ('REV1 Revenue 1',   1225,          0,            1050,                175,                  1050 + 175,                                 0     ),
-                ('REV2 Revenue 2',   1680 + 225,    0,            600 * (2 + 10/30),   600 * (14/30)+ 225,   600 * (2 + 10/30) + 600 * (14/30) + 225,    0     ),
-                ('Total',            5180,          0,            3950,                1230,                 3950 + 1230,                                0     ),
+                ('REV0 Revenue 0',   1000 + 1050,   0,            750 + 750,           250 + 300,            750 + 750 + 250 + 300,                      0,             0 ),
+                ('REV1 Revenue 1',   1225,          0,            1050,                175,                  1050 + 175,                                 0,             0 ),
+                ('REV2 Revenue 2',   1680 + 225,    0,            600 * (2 + 10/30),   600 * (14/30)+ 225,   600 * (2 + 10/30) + 600 * (14/30) + 225,    0,             0 ),
+                ('Total',            5180,          0,            3950,                1230,                 3950 + 1230,                                0,             0 ),
             ],
             options,
         )
@@ -308,13 +308,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options, self.deferred_revenue_report)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before   Current                  Recognized               Later
-            [    0,                  1,             2,            3,       4,                       5,                       6         ],
+            #    Name                Total          Not Started   Before   Current                  Recognized               <= 12 Months   > 12 Months
+            [    0,                  1,             2,            3,       4,                       5,                       6,             7 ],
             [
-                ('REV0 Revenue 0',   1000 + 1050,   0,            0,       750 + 750,               750 + 750,               550       ),
-                ('REV1 Revenue 1',   1225,          0,            0,       1050,                    1050,                    175       ),
-                ('REV2 Revenue 2',   1680 + 225,    225,          0,       600 * (2 + 10/30) + 0,   600 * (2 + 10/30) + 0,   280 + 225 ),
-                ('Total',            5180,          225,          0,       3950,                    3950,                    1230      ),
+                ('REV0 Revenue 0',   1000 + 1050,   0,            0,       750 + 750,               750 + 750,               550,           0 ),
+                ('REV1 Revenue 1',   1225,          0,            0,       1050,                    1050,                    175,           0 ),
+                ('REV2 Revenue 2',   1680 + 225,    225,          0,       600 * (2 + 10/30) + 0,   600 * (2 + 10/30) + 0,   280 + 225,     0 ),
+                ('Total',            5180,          225,          0,       3950,                    3950,                    1230,          0 ),
             ],
             options,
         )
@@ -324,13 +324,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         lines = self.get_lines(options, self.deferred_revenue_report)
         self.assertLinesValues(
             lines,
-            #    Name                Total          Not Started   Before               Current               Recognized                                  Later
-            [    0,                  1,             2,            3,                   4,                    5,                                          6     ],
+            #    Name                Total          Not Started   Before               Current               Recognized                                  <= 12 Months   > 12 Months
+            [    0,                  1,             2,            3,                   4,                    5,                                          6,             7 ],
             [
-                ('REV0 Revenue 0',   1000 + 1050,   0,            750 + 750,           250 + 300,            750 + 750 + 250 + 300,                      0     ),
-                ('REV1 Revenue 1',   1225,          0,            1050,                175,                  1050 + 175,                                 0     ),
-                ('REV2 Revenue 2',   1680 + 225,    0,            600 * (2 + 10/30),   600 * (14/30)+ 225,   600 * (2 + 10/30) + 600 * (14/30) + 225,    0     ),
-                ('Total',            5180,          0,            3950,                1230,                 3950 + 1230,                                0     ),
+                ('REV0 Revenue 0',   1000 + 1050,   0,            750 + 750,           250 + 300,            750 + 750 + 250 + 300,                      0,             0 ),
+                ('REV1 Revenue 1',   1225,          0,            1050,                175,                  1050 + 175,                                 0,             0 ),
+                ('REV2 Revenue 2',   1680 + 225,    0,            600 * (2 + 10/30),   600 * (14/30)+ 225,   600 * (2 + 10/30) + 600 * (14/30) + 225,    0,             0 ),
+                ('Total',            5180,          0,            3950,                1230,                 3950 + 1230,                                0,             0 ),
             ],
             options,
         )
@@ -357,13 +357,71 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
             options,
         )
 
+    def test_deferred_expense_report_short_long_term_split(self):
+        """
+        Test that the deferred expense report is split between
+        the expense to be recognized within 12 months of the reporting date
+        and the expense to be recognized after 12 months.
+        """
+        self.company.deferred_expense_amount_computation_method = 'month'
+        # 2400 spread over 24 full months (=100/month), crossing the 12-month horizon.
+        self._create_invoice_deferred(
+            [[self.expense_accounts[0], 2400, '2023-01-01', '2024-12-31']],
+            'in_invoice',
+        )
+
+        # Report for January 2023: the 12-month horizon ends on 2024-01-31.
+        # <= 12 Months: Feb 2023 -> Jan 2024 (12 months = 1200)
+        #  > 12 Months: Feb 2024 -> Dec 2024 (11 months = 1100)
+        options = self.get_options('2023-01-01', '2023-01-31')
+        lines = self.get_lines(options)
+        self.assertLinesValues(
+            lines,
+            #    Name                Total   Not Started   Before   Current   Recognized   <= 12 Months   > 12 Months
+            [    0,                  1,      2,            3,       4,        5,           6,             7 ],
+            [
+                ('EXP0 Expense 0',   2400,   0,            0,       100,      100,         1200,          1100 ),
+                ('Total',            2400,   0,            0,       100,      100,         1200,          1100 ),
+            ],
+            options,
+        )
+
+    def test_deferred_revenue_report_short_long_term_split(self):
+        """
+        Test that the deferred revenue report is split between
+        the revenue to be recognized within 12 months of the reporting date
+        and the revenue to be recognized after 12 months.
+        """
+        self.company.deferred_revenue_amount_computation_method = 'month'
+        # 2400 spread over 24 full months (=100/month), crossing the 12-month horizon.
+        self._create_invoice_deferred(
+            [[self.revenue_accounts[0], 2400, '2023-01-01', '2024-12-31']],
+            'out_invoice',
+        )
+
+        # Report for January 2023: the 12-month horizon ends on 2024-01-31.
+        # <= 12 Months: Feb 2023 -> Jan 2024 (12 months = 1200)
+        #  > 12 Months: Feb 2024 -> Dec 2024 (11 months = 1100)
+        options = self.get_options('2023-01-01', '2023-01-31', self.deferred_revenue_report)
+        lines = self.get_lines(options, self.deferred_revenue_report)
+        self.assertLinesValues(
+            lines,
+            #    Name                Total   Not Started   Before   Current   Recognized   <= 12 Months   > 12 Months
+            [    0,                  1,      2,            3,       4,        5,           6,             7 ],
+            [
+                ('REV0 Revenue 0',   2400,   0,            0,       100,      100,         1200,          1100 ),
+                ('Total',            2400,   0,            0,       100,      100,         1200,          1100 ),
+            ],
+            options,
+        )
+
     def test_deferred_expense_report_days(self):
         """
         Test the deferred expense report with the 'day' method.
         We use multiple report months/quarters/years to check that the computation is correct.
         """
         self.company.deferred_expense_amount_computation_method = 'day'
-        self.create_invoice(self.expense_lines)
+        self._create_invoice_deferred(self.expense_lines)
 
         # December 2022
         options = self.get_options('2022-12-01', '2022-12-31')
@@ -448,8 +506,8 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         Test the 'All entries' option on the deferred expense report.
         """
         self.company.deferred_expense_amount_computation_method = 'day'
-        self.create_invoice(self.expense_lines, post=True)
-        self.create_invoice(self.expense_lines, post=False)
+        self._create_invoice_deferred(self.expense_lines, post=True)
+        self._create_invoice_deferred(self.expense_lines, post=False)
 
         # Only posted entries
         options = self.get_options('2023-02-01', '2023-02-28')
@@ -472,7 +530,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         Test the the comparison tool on the deferred expense report.
         For instance, we select April 2023 and compare it with the last 4 months
         """
-        self.create_invoice(self.expense_lines)
+        self._create_invoice_deferred(self.expense_lines)
 
         # April 2023 + period comparison of last 4 months
         options = self.get_options('2023-04-01', '2023-04-30')
@@ -579,7 +637,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         Test the credit notes on the deferred expense report.
         """
         self.company.deferred_expense_amount_computation_method = 'day'
-        self.create_invoice(self.expense_lines, move_type='in_refund')
+        self._create_invoice_deferred(self.expense_lines, move_type='in_refund')
 
         options = self.get_options('2023-02-01', '2023-02-28')
         lines = self.get_lines(options)
@@ -601,25 +659,25 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         Test the full_months method on the deferred expense report.
         """
         self.company.deferred_expense_amount_computation_method = 'full_months'
-        self.create_invoice([[self.expense_accounts[0], 1200, '2023-01-31', '2024-01-30']])
-        self.create_invoice([[self.expense_accounts[1], 1200, '2023-02-01', '2023-03-31']])
-        self.create_invoice([[self.expense_accounts[2], 1200, '2023-02-01', '2023-03-16']])
-        self.create_invoice([[self.expense_accounts[3], 1200, '2023-02-05', '2023-03-16']])
-        self.create_invoice([[self.expense_accounts[4], 1200, '2023-02-05', '2023-03-31']])
-        self.create_invoice([[self.expense_accounts[5], 1200, '2023-02-13', '2023-04-30']])
-        self.create_invoice([[self.expense_accounts[6], 1200, '2023-03-01', '2023-06-18']])
-        self.create_invoice([[self.expense_accounts[7], 1200, '2023-03-05', '2023-06-30']])
-        self.create_invoice([[self.expense_accounts[8], 1200, '2023-03-13', '2024-03-12']])
-        self.create_invoice([[self.expense_accounts[9], 1200, '2023-03-14', '2023-03-18']])
+        self._create_invoice_deferred([[self.expense_accounts[0], 1200, '2023-01-31', '2024-01-30']])
+        self._create_invoice_deferred([[self.expense_accounts[1], 1200, '2023-02-01', '2023-03-31']])
+        self._create_invoice_deferred([[self.expense_accounts[2], 1200, '2023-02-01', '2023-03-16']])
+        self._create_invoice_deferred([[self.expense_accounts[3], 1200, '2023-02-05', '2023-03-16']])
+        self._create_invoice_deferred([[self.expense_accounts[4], 1200, '2023-02-05', '2023-03-31']])
+        self._create_invoice_deferred([[self.expense_accounts[5], 1200, '2023-02-13', '2023-04-30']])
+        self._create_invoice_deferred([[self.expense_accounts[6], 1200, '2023-03-01', '2023-06-18']])
+        self._create_invoice_deferred([[self.expense_accounts[7], 1200, '2023-03-05', '2023-06-30']])
+        self._create_invoice_deferred([[self.expense_accounts[8], 1200, '2023-03-13', '2024-03-12']])
+        self._create_invoice_deferred([[self.expense_accounts[9], 1200, '2023-03-14', '2023-03-18']])
 
         options = self.get_options('2023-03-01', '2023-03-31')
         lines = self.get_lines(options)
 
         for line in lines:
-            total = line['columns'][0]['no_format']
-            before = line['columns'][2]['no_format']  # 1 is "Not Started"
-            current = line['columns'][3]['no_format']
-            later = line['columns'][5]['no_format']
+            total = line.columns[0].no_format
+            before = line.columns[2].no_format  # 1 is "Not Started"
+            current = line.columns[3].no_format
+            later = line.columns[5].no_format
             self.assertAlmostEqual(total, before + current + later, 3)
 
         self.assertLinesValues(
@@ -656,7 +714,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         Test that the accounting date is taken into account for the deferred expense report.
         """
         self.company.generate_deferred_expense_entries_method = 'manual'
-        self.create_invoice([self.expense_lines[0]], invoice_date='2023-02-15')
+        self._create_invoice_deferred([self.expense_lines[0]], invoice_date='2023-02-15')
 
         # In january, the move is not accounted yet (accounting date is in 15 Feb), so nothing should be displayed.
         options = self.get_options('2023-01-01', '2023-01-31')
@@ -736,7 +794,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
 
         # Create 3 different invoices (instead of one with 3 lines)
         for expense_line in self.expense_lines[:3]:
-            self.create_invoice([expense_line])
+            self._create_invoice_deferred([expense_line])
 
         # Check that no deferred move has been created
         self.assertEqual(self.env['account.move.line'].search_count([('account_id', '=', self.deferral_account.id)]), 0)
@@ -781,6 +839,45 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         ]
         self.assert_invoice_lines(deferred_move_february, expected_values_february)
 
+    def test_deferred_grouped_account_override(self):
+        """
+        Test that deferred accounts set on the income/expense accounts are used
+        (instead of the generic company one) when generating grouped deferral entries.
+        """
+        self.company.generate_deferred_expense_entries_method = 'manual'
+        custom_deferred_expense = self.env['account.account'].create({
+            'name': 'Custom Deferred Expense',
+            'code': 'CUSTDEFEXP',
+            'account_type': 'asset_current',
+        })
+        # Override only on expense_accounts[0]; expense_accounts[1] falls back on the company account.
+        self.expense_accounts[0].deferred_account_id = custom_deferred_expense
+
+        for expense_line in self.expense_lines[:3]:
+            self._create_invoice_deferred([expense_line])
+
+        options = self.get_options('2023-01-01', '2023-01-31')
+        deferred_move_january = self.generate_deferral_entries(options)[0]
+
+        # The original-account lines are unchanged
+        self.assertRecordValues(
+            deferred_move_january.line_ids.filtered(lambda l: l.account_id == self.expense_accounts[0]).sorted('balance'),
+            [{'debit': 0, 'credit': 1000 + 1050}, {'debit': 250 + 150, 'credit': 0}],
+        )
+        self.assertRecordValues(
+            deferred_move_january.line_ids.filtered(lambda l: l.account_id == self.expense_accounts[1]).sorted('balance'),
+            [{'debit': 0, 'credit': 1225}, {'debit': 350, 'credit': 0}],
+        )
+        # The counterpart is split: the override for accounts[0], the company account for accounts[1].
+        self.assertRecordValues(
+            deferred_move_january.line_ids.filtered(lambda l: l.account_id == custom_deferred_expense),
+            [{'debit': 1000 + 1050 - 250 - 150, 'credit': 0}],
+        )
+        self.assertRecordValues(
+            deferred_move_january.line_ids.filtered(lambda l: l.account_id == self.deferral_account),
+            [{'debit': 1225 - 350, 'credit': 0}],
+        )
+
     def _test_deferred_expense_partially_generate_grouped_entries_method_common(self):
         """
         Test that if we generate the deferrals for a period, we don't re-generate them if they already exist.
@@ -791,8 +888,8 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         options = self.get_options('2023-01-01', '2023-01-31')
 
         # Create 2 different invoices (instead of one with 2 lines)
-        self.create_invoice([self.expense_lines[0]])
-        self.create_invoice([self.expense_lines[1]])
+        self._create_invoice_deferred([self.expense_lines[0]])
+        self._create_invoice_deferred([self.expense_lines[1]])
 
         # Generate the grouped deferred entries
         generated_entries_january = self.generate_deferral_entries(options)
@@ -819,7 +916,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         self.assertFalse(self.generate_deferral_entries(options).exists())
 
         # Let's create a new invoice that should be shown in the January period
-        self.create_invoice([self.expense_lines[2]])
+        self._create_invoice_deferred([self.expense_lines[2]])
 
         # Now, even though we have already generated the grouped deferral for January,
         # we must re-generate it because we have a new invoice that should be included in the January period.
@@ -871,8 +968,8 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         options = self.get_options('2023-02-01', '2023-02-28')
 
         # Create 2 different invoices (instead of one with 2 lines)
-        self.create_invoice([self.expense_lines[0]])
-        self.create_invoice([self.expense_lines[1]])
+        self._create_invoice_deferred([self.expense_lines[0]])
+        self._create_invoice_deferred([self.expense_lines[1]])
 
         # Generate the grouped deferred entries
         generated_entries_february = self.generate_deferral_entries(options)
@@ -901,7 +998,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         self.assertFalse(self.generate_deferral_entries(options).exists())
 
         # Let's create a new invoice that should be shown in the february period
-        self.create_invoice([self.expense_lines[2]])
+        self._create_invoice_deferred([self.expense_lines[2]])
 
         # Now, even though we have already generated the grouped deferral for february,
         # we must re-generate it because we have a new invoice that should be included in the february period.
@@ -927,7 +1024,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         """
         self.company.deferred_expense_amount_computation_method = 'month'
         self.company.generate_deferred_expense_entries_method = 'manual'
-        self.create_invoice([[self.expense_accounts[0], 750, '2023-03-01', '2023-04-15']])
+        self._create_invoice_deferred([[self.expense_accounts[0], 750, '2023-03-01', '2023-04-15']])
 
         # JANUARY
         generated_entries_january = self.generate_deferral_entries(self.get_options('2023-01-01', '2023-01-31'))
@@ -1036,7 +1133,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         options = self.get_options('2023-01-01', '2023-01-31', self.deferred_revenue_report)
         revenue_handler = self.env['account.deferred.revenue.report.handler']
 
-        self.create_invoice([[revenue_account_with_taxes, 1000, '2023-01-01', '2023-04-30']], move_type='out_invoice')
+        self._create_invoice_deferred([[revenue_account_with_taxes, 1000, '2023-01-01', '2023-04-30']], move_type='out_invoice')
 
         # Check that no deferred move has been created
         self.assertEqual(self.env['account.move.line'].search_count([('account_id', '=', deferral_account.id)]), 0)
@@ -1068,9 +1165,9 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         """
         self.company.generate_deferred_expense_entries_method = 'manual'
         self.company.deferred_expense_amount_computation_method = 'day'
-        self.create_invoice([[self.expense_accounts[0], 600, '2023-04-04', '2023-05-25']])
-        self.create_invoice([[self.expense_accounts[1], 600, '2023-04-05', '2023-05-16']])
-        self.create_invoice([[self.expense_accounts[0], 600, '2023-04-04', '2023-05-08']])
+        self._create_invoice_deferred([[self.expense_accounts[0], 600, '2023-04-04', '2023-05-25']])
+        self._create_invoice_deferred([[self.expense_accounts[1], 600, '2023-04-05', '2023-05-16']])
+        self._create_invoice_deferred([[self.expense_accounts[0], 600, '2023-04-04', '2023-05-08']])
 
         # This shouldn't raise an error like this 'The total of debits equals $1,800.01 and the total of credits equals $1,800.00.'
         self.generate_deferral_entries(self.get_options('2023-04-01', '2023-04-30'))
@@ -1083,7 +1180,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         """
         self.company.generate_deferred_expense_entries_method = 'manual'
         self.company.deferred_expense_amount_computation_method = 'month'
-        self.create_invoice([[self.expense_accounts[0], 4.95, '2023-01-01', '2023-10-31']])
+        self._create_invoice_deferred([[self.expense_accounts[0], 4.95, '2023-01-01', '2023-10-31']])
 
         # This shouldn't raise an error like this 'The total of debits equals $4.96 and the total of credits equals $4.95.'
         generated_entries = self.generate_deferral_entries(self.get_options('2023-01-01', '2023-01-31'))
@@ -1108,7 +1205,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
 
         # The report should be empty because the invoice date, and the deferred dates are all in inside the report period
         # Nothing should be reversed, displayed or generated because the invoice is already in the correct period
-        move1 = self.create_invoice([[self.expense_accounts[0], 600, '2023-01-15', '2023-01-30']], invoice_date='2023-01-15')
+        move1 = self._create_invoice_deferred([[self.expense_accounts[0], 600, '2023-01-15', '2023-01-30']], invoice_date='2023-01-15')
         options_january = self.get_options('2023-01-01', '2023-01-31')
         lines = self.get_lines(options_january)
         self.assertLinesValues(
@@ -1125,7 +1222,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         # The report should be NOT empty because the invoice date is prior the report date (even if
         # the deferred dates are all in inside the report period) because we need to be able to
         # reverse the invoice in january and account for it in the correct period (in february here).
-        self.create_invoice([[self.expense_accounts[0], 1000, '2023-02-10', '2023-02-28']], invoice_date='2023-01-01')
+        self._create_invoice_deferred([[self.expense_accounts[0], 1000, '2023-02-10', '2023-02-28']], invoice_date='2023-01-01')
 
         # In january, the invoice exists, and the 'To defer' (Later) column should not be empty
         lines = self.get_lines(options_january)
@@ -1177,7 +1274,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         """
         self.company.generate_deferred_expense_entries_method = 'manual'
         self.company.deferred_expense_amount_computation_method = 'month'
-        self.create_invoice([[self.expense_accounts[0], 1000, '2023-10-30', '2023-10-30']])
+        self._create_invoice_deferred([[self.expense_accounts[0], 1000, '2023-10-30', '2023-10-30']])
 
         options_sept = self.get_options('2023-09-01', '2023-09-30')
         lines = self.get_lines(options_sept)
@@ -1209,7 +1306,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         """
         self.company.generate_deferred_expense_entries_method = 'on_validation'
 
-        self.create_invoice([self.expense_lines[0]])
+        self._create_invoice_deferred([self.expense_lines[0]])
         self.assertEqual(self.env['account.move.line'].search_count([('account_id', '=', self.deferral_account.id)]), 5)  # 4 months + 1 for the initial deferred invoice
 
         # When changing the method to manual, the deferred entries should not be re-generated
@@ -1223,13 +1320,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         """
         self.company.generate_deferred_expense_entries_method = 'manual'
 
-        self.create_invoice([[self.expense_accounts[0], 1000, '2023-01-01', '2023-04-30']])
+        self._create_invoice_deferred([[self.expense_accounts[0], 1000, '2023-01-01', '2023-04-30']])
         self.generate_deferral_entries(self.get_options('2023-03-01', '2023-03-31'))
         self.assertEqual(self.env['account.move.line'].search_count([('account_id', '=', self.deferral_account.id)]), 2)
 
         self.assertFalse(self.generate_deferral_entries(self.get_options('2023-04-01', '2023-04-30')).exists())
 
-        move2 = self.create_invoice([[self.expense_accounts[1], 1000, '2023-01-01', '2023-05-31']])
+        move2 = self._create_invoice_deferred([[self.expense_accounts[1], 1000, '2023-01-01', '2023-05-31']])
         generated_entry = self.generate_deferral_entries(self.get_options('2023-04-01', '2023-04-30'))[0]
         self.assertEqual(len(generated_entry.line_ids), 3)  # 3 lines, not 6 because move1 is totally deferred
         self.assertEqual(generated_entry.deferred_original_move_ids, move2)  # not move1
@@ -1241,7 +1338,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         """
         self.company.generate_deferred_expense_entries_method = 'manual'
 
-        self.create_invoice([self.expense_lines[0]], post=False)
+        self._create_invoice_deferred([self.expense_lines[0]], post=False)
         options = self.get_options('2023-01-01', '2023-01-31')
         options['all_entries'] = True
         self.assertFalse(self.generate_deferral_entries(options).exists())
@@ -1254,13 +1351,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         same period.
         """
         # First post an invoice with the on_validation method, creating deferrals
-        move = self.create_invoice([self.expense_lines[0]])
+        move = self._create_invoice_deferred([self.expense_lines[0]])
         # Check that the deferral moves have been created (1 + 4)
         self.assertEqual(len(move.deferred_move_ids), 5)
 
         # Switch to manual mode
         self.company.generate_deferred_expense_entries_method = 'manual'
-        self.create_invoice([self.expense_lines[0]])
+        self._create_invoice_deferred([self.expense_lines[0]])
 
         options = self.get_options('2023-01-01', '2023-01-31')
         generated_entries_jan = self.generate_deferral_entries(options)
@@ -1297,8 +1394,8 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         self.company.generate_deferred_expense_entries_method = 'manual'
         self.company.deferred_expense_amount_computation_method = 'month'
 
-        self.create_invoice([(self.expense_accounts[0], 1200, '2022-01-01', '2022-12-31')])
-        self.create_invoice([(self.expense_accounts[0], 1200, '2023-01-01', '2023-12-31')])
+        self._create_invoice_deferred([(self.expense_accounts[0], 1200, '2022-01-01', '2022-12-31')])
+        self._create_invoice_deferred([(self.expense_accounts[0], 1200, '2023-01-01', '2023-12-31')])
 
         options = self.get_options('2023-03-01', '2023-03-31')
         lines = self.get_lines(options)
@@ -1327,7 +1424,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         self.company.generate_deferred_expense_entries_method = 'manual'
         self.company.deferred_expense_amount_computation_method = 'month'
 
-        self.create_invoice([self.expense_lines[0]])
+        self._create_invoice_deferred([self.expense_lines[0]])
         self.expense_accounts[0].active = False
 
         options = self.get_options('2023-03-01', '2023-03-31')
@@ -1368,7 +1465,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         options_august = self.get_options('2023-08-01', '2023-08-31')
         self.assertFalse(self.generate_deferral_entries(options_august).exists())
 
-        self.create_invoice([[self.expense_accounts[0], 600, '2023-07-01', '2023-09-30']])
+        self._create_invoice_deferred([[self.expense_accounts[0], 600, '2023-07-01', '2023-09-30']])
 
         # Check that no deferred move has been created yet
         self.assertEqual(self.env['account.move.line'].search_count([('account_id', '=', self.deferral_account.id)]), 0)
@@ -1426,7 +1523,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         self.company.deferred_expense_amount_computation_method = 'month'
         self.company.generate_deferred_expense_entries_method = 'manual'
 
-        self.create_invoice([[self.expense_accounts[0], 1000, '2023-02-01', '2023-02-28']])
+        self._create_invoice_deferred([[self.expense_accounts[0], 1000, '2023-02-01', '2023-02-28']])
 
         self.generate_deferral_entries(self.get_options('2023-01-01', '2023-01-31'))
         self.assertEqual(self.env['account.move.line'].search_count([('account_id', '=', self.deferral_account.id)]), 2)
@@ -1438,7 +1535,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         self.company.deferred_expense_amount_computation_method = 'month'
         self.company.generate_deferred_expense_entries_method = 'manual'
 
-        move = self.create_invoice([[self.expense_accounts[0], 1000, '2023-01-01', '2023-04-30']])
+        move = self._create_invoice_deferred([[self.expense_accounts[0], 1000, '2023-01-01', '2023-04-30']])
 
         move.company_id.fiscalyear_lock_date = fields.Date.to_date('2023-02-28')
 
@@ -1450,7 +1547,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
 
         # On validation, we can reset to draft
         self.company.deferred_expense_amount_computation_method = 'month'
-        move = self.create_invoice([(self.expense_accounts[0], 1680, '2023-01-21', '2023-04-14')])
+        move = self._create_invoice_deferred([(self.expense_accounts[0], 1680, '2023-01-21', '2023-04-14')])
         self.assertEqual(len(move.deferred_move_ids), 5)
         move.button_draft()
         self.assertFalse(move.deferred_move_ids)
@@ -1464,14 +1561,14 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         self.assertFalse(move.deferred_move_ids)
 
         # If the grouped deferral entry is the aggregation of only one invoice, we can reset the invoice to draft
-        move3 = self.create_invoice([(self.expense_accounts[0], 1680, '2023-03-21', '2023-06-14')])
+        move3 = self._create_invoice_deferred([(self.expense_accounts[0], 1680, '2023-03-21', '2023-06-14')])
         self.generate_deferral_entries(self.get_options('2023-03-01', '2023-03-31'))
         move3.button_draft()
         self.assertFalse(move.deferred_move_ids)
 
         # If the grouped deferral entry is the aggregation of more than one invoice, we cannot reset to draft any of those to draft
-        move4 = self.create_invoice([(self.expense_accounts[0], 1680, '2023-03-21', '2023-06-14')])
-        move5 = self.create_invoice([(self.expense_accounts[0], 1680, '2023-03-21', '2023-06-14')])
+        move4 = self._create_invoice_deferred([(self.expense_accounts[0], 1680, '2023-03-21', '2023-06-14')])
+        move5 = self._create_invoice_deferred([(self.expense_accounts[0], 1680, '2023-03-21', '2023-06-14')])
         self.generate_deferral_entries(self.get_options('2023-03-01', '2023-03-31'))
         with self.assertRaisesRegex(UserError, 'You cannot reset to draft an invoice that is grouped in deferral entry. You can create a credit note instead.'):
             move4.button_draft()
@@ -1492,7 +1589,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
             'name': 'Account A2',
             'plan_id': analytic_plan_a.id
         })
-        move = self.create_invoice([self.expense_lines[0]], post=False)
+        move = self._create_invoice_deferred([self.expense_lines[0]], post=False)
         move.write({'invoice_line_ids': [
             Command.update(move.invoice_line_ids.id, {'analytic_distribution': {str(aa_a1.id): 60.0, str(aa_a2.id): 40.0}}),
         ]})
@@ -1551,7 +1648,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
             [self.expense_accounts[1], 1200, '2023-01-01', '2023-12-31'],
             [self.expense_accounts[1], 1200, '2023-01-01', '2023-12-31'],
         ]
-        move = self.create_invoice(invoice_lines, post=False)
+        move = self._create_invoice_deferred(invoice_lines, post=False)
         move.write({'invoice_line_ids': [
             Command.update(move.invoice_line_ids[0].id,
                 {'analytic_distribution': {str(aa_a1.id): 60.0, str(aa_a2.id): 40.0, str(aa_b1.id): 50.0, str(aa_b2.id): 50.0}}
@@ -1647,32 +1744,12 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
                 fname, idx = (fname_a, 0) if al[fname_a] else (fname_b, 1)
                 self.assertAlmostEqual(al.amount, -expected_analytic_amount[index][al[fname].id][idx])
 
-    def test_deferred_revenue_manual_generation_analytic_distribution(self):
-        """
-        Test if deferred revenues have the right analytic distribution when manually generated.
-        """
-        self.company.generate_deferred_expense_entries_method = 'manual'
-        move = self.create_invoice(self.revenue_lines)
-        analytic_plan = self.env['account.analytic.plan'].create({'name': 'Plan'})
-        analytic_account = self.env['account.analytic.account'].create({
-            'name': 'Account',
-            'plan_id': analytic_plan.id,
-        })
-        move.invoice_line_ids[0]['analytic_distribution'] = {analytic_account.id: 100}
-        options = self.get_options('2023-02-01', '2023-02-28', report=self.deferred_revenue_report)
-        options['analytic_accounts'] = [analytic_account.id]
-        revenue_handler = self.env['account.deferred.revenue.report.handler']
-        deferral_move = self.generate_deferral_entries(options, report_handler=revenue_handler)[0]
-        analytic_distributions = deferral_move.line_ids.mapped('analytic_distribution')
-        expected_distributions = [{str(analytic_account.id): 100}] * 3
-        self.assertEqual(analytic_distributions, expected_distributions)
-
     def test_deferred_expense_report_invalid_period(self):
         """
         Only periods that start on the first day of a month and end on the last day of a month are allowed.
         """
         self.company.generate_deferred_expense_entries_method = 'manual'
-        self.create_invoice([self.expense_lines[0]])
+        self._create_invoice_deferred([self.expense_lines[0]])
 
         options = self.get_options('2023-03-01', '2023-03-15')
         lines = self.get_lines(options)
@@ -1692,12 +1769,12 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
 
     def audit_cell(self, options, line, column_name):
         audit_cell_res = self.handler.action_audit_cell(options, {
-            'report_line_id': line['id'],
-            'calling_line_dict_id': line['id'],
+            'report_line_id': line.id,
+            'calling_line_dict_id': line.id,
             'expression_label': column_name,
-            'column_group_key': next(iter(options['column_groups'])),
+            'column_group_index': 0,
         })
-        __, account_id = self.deferred_expense_report._get_model_info_from_id(line['id'])
+        __, account_id = self.deferred_expense_report._get_model_info_from_id(line.id)
         return self.env['account.move.line']\
                    .search(audit_cell_res['domain'])\
                    .filtered(lambda l: l.account_id.id == account_id)\
@@ -1713,13 +1790,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         """
         self.company.generate_deferred_expense_entries_method = 'on_validation'
 
-        inv1 = self.create_invoice([[self.expense_accounts[0],  1000, '2023-01-01', '2023-04-30']])  # Basic example, 4 full months, in period
-        inv2 = self.create_invoice([[self.expense_accounts[0],   100, '2023-04-01', '2023-05-31']])  # 2 full months, Not Started yet
-        inv3 = self.create_invoice([
+        inv1 = self._create_invoice_deferred([[self.expense_accounts[0], 1000, '2023-01-01', '2023-04-30']])  # Basic example, 4 full months, in period
+        inv2 = self._create_invoice_deferred([[self.expense_accounts[0], 100, '2023-04-01', '2023-05-31']])  # 2 full months, Not Started yet
+        inv3 = self._create_invoice_deferred([
             [self.expense_accounts[0],  10, '2023-01-01', '2023-02-28'],  # 2 full months, fully deferred so shouldn't appear at all
             [self.expense_accounts[0],   1, '2023-01-01', '2023-05-31'],  # 5 full months
         ])
-        inv4 = self.create_invoice([
+        inv4 = self._create_invoice_deferred([
             [self.expense_accounts[0], 10000, '2023-03-01', '2023-04-30'],  # 2 full months
             [self.expense_accounts[0],  1998, '2023-03-01', '2023-03-31'],  # fully inside period -> nothing to defer/show/audit
         ], invoice_date='2023-03-01')
@@ -1772,7 +1849,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         # Total = 10000 - 10000 + 5000 + 250 + 0.2 = 5250.2 for March 23
 
         # Later than March 2023
-        audit_lines = self.audit_cell(options, lines[0], 'later')
+        audit_lines = self.audit_cell(options, lines[0], 'within_year')
         self.assertRecordValues(audit_lines, [
             self.get_audited_line_to_assert('2023-04-30',  250),     # Amount for April 23 of Inv 1
             self.get_audited_line_to_assert('2023-04-30',   50),     # Amount for April 23 of Inv 2
@@ -1793,13 +1870,13 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
 
         self.company.generate_deferred_expense_entries_method = 'manual'
 
-        inv1 = self.create_invoice([[self.expense_accounts[0],  1000, '2023-01-01', '2023-04-30']])  # Basic example, 4 full months, in period
-        inv2 = self.create_invoice([[self.expense_accounts[0],   100, '2023-04-01', '2023-05-31']])  # 2 full months, Not Started yet
-        inv3 = self.create_invoice([
+        inv1 = self._create_invoice_deferred([[self.expense_accounts[0], 1000, '2023-01-01', '2023-04-30']])  # Basic example, 4 full months, in period
+        inv2 = self._create_invoice_deferred([[self.expense_accounts[0], 100, '2023-04-01', '2023-05-31']])  # 2 full months, Not Started yet
+        inv3 = self._create_invoice_deferred([
             [self.expense_accounts[0],  10, '2023-01-01', '2023-02-28'],  # 2 full months, fully deferred so shouldn't appear at all
             [self.expense_accounts[0],   1, '2023-01-01', '2023-05-31'],  # 5 full months
         ])
-        inv4 = self.create_invoice([
+        inv4 = self._create_invoice_deferred([
             [self.expense_accounts[0], 10000, '2023-03-01', '2023-04-30'],  # 2 full months
             [self.expense_accounts[0],  1998, '2023-03-01', '2023-03-31'],  # fully inside period -> nothing to defer/show/audit
         ], invoice_date='2023-03-01')
@@ -1834,7 +1911,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         ])
 
         # Later than March 2023 (April + May)
-        audit_lines = self.audit_cell(options, lines[0], 'later')
+        audit_lines = self.audit_cell(options, lines[0], 'within_year')
         self.assertRecordValues(audit_lines, [
             {'id': inv1.invoice_line_ids.id},
             {'id': inv2.invoice_line_ids.id},
@@ -1892,7 +1969,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         # Total = 10000 + 1111 - 510.4 - 11101 + 5750.6 = 5250.2 for March 23 = 250 + 0.2 + 5000 OK
 
         # Later than March 2023 (April + May)
-        audit_lines = self.audit_cell(options, lines[0], 'later')
+        audit_lines = self.audit_cell(options, lines[0], 'within_year')
         self.assertRecordValues(audit_lines, [
         # Only the Reversal of previous period exist as we've only generated entries up to March and not after
             self.get_audited_line_to_assert('2023-04-01',  11101),
@@ -1903,7 +1980,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         # Let's generate for April too (not May as everything is totally deferred in May)
         # Now we'll have to include inv2 too
         self.generate_deferral_entries(self.get_options('2023-04-01', '2023-04-30'))
-        audit_lines = self.audit_cell(options, lines[0], 'later')
+        audit_lines = self.audit_cell(options, lines[0], 'within_year')
         self.assertRecordValues(audit_lines, [
         # Reversal of grouped of March
             self.get_audited_line_to_assert('2023-04-01',  11101),
@@ -1918,7 +1995,7 @@ class TestDeferredReports(TestAccountReportsCommon, HttpCase):
         # Total = Just reversal of grouped of March, so same as previous
 
         # Now, let's create a new bill such that we have a mix of generated deferrals and candidates
-        inv5 = self.create_invoice([[self.expense_accounts[0],  100000, '2023-01-01', '2023-05-31']])
+        inv5 = self._create_invoice_deferred([[self.expense_accounts[0], 100000, '2023-01-01', '2023-05-31']])
 
         # Generate deferrals for previous months, but not March 23 yet.
         for report_date_from, report_date_to in (('2023-01-01', '2023-01-31'), ('2023-02-01', '2023-02-28')):

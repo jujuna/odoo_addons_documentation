@@ -1,17 +1,18 @@
 import { Dialog } from "@web/core/dialog/dialog";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 
 export class ConfirmQuantDialog extends Component {
     static components = { Dialog };
     static template = "stock_barcode.ConfirmQuantDialog";
-    static props = {
-        close: Function,
-        onConfirm: Function,
-        onWaitReview: Function,
-    };
+
+    props = useProps({
+        close: t.function(),
+        onConfirm: t.function(),
+        onWaitReview: t.function(),
+    });
 
     setup() {
-        this.inventoryReason = useState({ value: "Physical Inventory" });
+        this.inventoryReason = proxy({ value: "Physical Inventory" });
     }
 
     onConfirm() {

@@ -32,10 +32,10 @@
         </field>
      </record>
 
-     <record id="project_sharing_project_task_view_kanban_inherited" model="ir.ui.view">
-        <field name="name">project.sharing.project.task.view.kanban.inherit</field>
+     <record id="project_sharing_project_task_view_card_inherited" model="ir.ui.view">
+        <field name="name">project.sharing.project.task.view.card.inherit</field>
         <field name="model">project.task</field>
-        <field name="inherit_id" ref="project.project_sharing_project_task_view_kanban"/>
+        <field name="inherit_id" ref="project.project_sharing_project_task_view_card"/>
         <field name="arch" type="xml">
             <field name="date_deadline" position="attributes">
                 <attribute name="invisible">planned_date_begin or not date_deadline or state in ['1_done', '1_canceled']</attribute>
@@ -75,7 +75,7 @@
                 <footer>
                     <button string="Save" special="save" data-hotkey="q" class="btn btn-primary" close="1"/>
                     <button name="action_unschedule_task" string="Unschedule" type="object" data-hotkey="u" class="btn btn-secondary" close="1" invisible="not id"/>
-                    <button string="Discard" special="cancel" data-hotkey="x" class="btn btn-secondary" close="1"/>
+                    <button special="cancel" data-hotkey="x" class="btn btn-secondary" close="1"/>
                 </footer>
             </xpath>
         </field>
@@ -93,25 +93,23 @@
                 string="Planning"
                 js_class="task_sharing_gantt"
                 precision="{'day': 'hour:quarter', 'week': 'day:half', 'month': 'day:half'}"
-                default_group_by="stage_id"
+                default_group_by="name"
                 pill_label="True"
                 total_row="True"
                 cell_create="False"
                 dependency_field="depend_on_ids"
-                dependency_inverted_field="dependent_ids">
-                <templates>
-                    <div t-name="gantt-popover">
-                        <footer replace="0">
-                           <button name="action_unschedule_task" type="object" string="Unschedule" class="btn btn-sm btn-secondary"/>
-                        </footer>
-                    </div>
-                </templates>
+                dependency_inverted_field="dependent_ids"
+                create="False"
+                plan="False"
+                edit="False">
                 <field name="project_id"/>
-                <field name="allow_milestones"/>
-                <field name="milestone_id"/>
-                <field name="portal_user_names"/>
-                <field name="partner_id"/>
-                <field name="dependent_tasks_count"/>
+                <popover>
+                    <templates>
+                        <div t-name="popover-footer" replace="0">
+                            <button name="action_unschedule_task" type="object" string="Unschedule" class="btn btn-sm btn-secondary"/>
+                        </div>
+                    </templates>
+                </popover>
             </gantt>
         </field>
     </record>

@@ -5,13 +5,13 @@
         <field name="inherit_id" ref="quality_control.quality_alert_view_form"/>
         <field name="arch" type="xml">
             <field name="lot_ids" position="after">
-                <field name="workcenter_id" groups="mrp.group_mrp_routings"/>
+                <field name="workcenter_id" groups="mrp.group_mrp_routings" invisible="not workcenter_id"/>
             </field>
             <xpath expr="//chatter" position="after">
                 <div invisible="not context.get('discard_on_footer_button', False)">
                     <footer class="oe_edit_only">
                         <button special="save" data-hotkey="q" string="Save" class="oe_highlight"/>
-                        <button string="Discard" special="cancel" data-hotkey="x"/>
+                        <button special="cancel" data-hotkey="x"/>
                     </footer>
                 </div>
             </xpath>
@@ -43,20 +43,6 @@
         </field>
     </record>
 
-    <record id="quality_check_view_search_inherit_quality_mrp_workorder" model="ir.ui.view">
-        <field name="name">quality.check.view.search.inherit.quality.mrp.workorder</field>
-        <field name="model">quality.check</field>
-        <field name="inherit_id" ref="quality_control.quality_check_view_search"/>
-        <field name="arch" type="xml">
-            <field name="lot_ids" position="after">
-                <field name="finished_lot_ids" widget="many2many_tags" options="{'edit_tags': True}"/>
-            </field>
-            <filter name="groupby_team_id" position="before">
-                <filter string="Finished Lot/Serial" name="groupby_finished_lot_ids" context="{'group_by': 'finished_lot_ids'}"/>
-            </filter>
-        </field>
-    </record>
-
     <record id="quality_check_view_form_inherit_mrp_workorder" model="ir.ui.view">
         <field name="name">quality.check.view.form.inherit.mrp.workorder</field>
         <field name="model">quality.check</field>
@@ -65,13 +51,17 @@
             <field name="lot_ids" position="after">
                 <field name="workorder_id" invisible="1"/>
                 <field name="production_id" invisible="1"/>
-                <field name="finished_lot_ids" invisible="not finished_lot_ids" groups="stock.group_production_lot" widget="many2many_tags" options="{'edit_tags': True}"/>
             </field>
             <xpath expr="//field[@name='measure_on']" position="after">
                 <field name="operation_id" string="Work Order Operation" invisible="not operation_id" groups="mrp.group_mrp_routings"/>
             </xpath>
             <xpath expr="//field[@name='point_id']" position="attributes">
                 <attribute name="domain">[('operation_id', '=', False)]</attribute>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Attachment" name="worksheet" invisible="not worksheet_document">
+                    <field   name="worksheet_document" widget="pdf_viewer" style="flex-grow: 1"/>
+                </page>
             </xpath>
         </field>
     </record>
@@ -81,9 +71,6 @@
         <field name="model">quality.check</field>
         <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
         <field name="arch" type="xml">
-            <field name="lot_name" position="after">
-                <field name="finished_lot_ids" optional="hide" groups="stock.group_production_lot" widget="many2many_tags" options="{'edit_tags': True}"/>
-            </field>
             <xpath expr="//field[@name='measure_on']" position="after">
                 <field name="operation_id" optional="hide" string="Work Order Operation" groups="mrp.group_mrp_routings"/>
             </xpath>
@@ -115,9 +102,9 @@
             <filter name="control_date" position="after">
                 <separator/>
                 <filter string="Quality Checks" name="quality_checks"
-                    domain="['|', ('point_id', '=', False), ('point_id.operation_id', '=', False), ('test_type', 'not in', ('register_consumed_materials', 'register_byproducts', 'print_label'))]"/>
+                    domain="['|', ('point_id', '=', False), ('point_id.operation_id', '=', False), ('test_type', 'not in', ('register_consumed_materials', 'register_byproducts', 'print_product_label', 'print_lot_label'))]"/>
                 <filter string="Manufacturing Steps" name="manufacturing_steps"
-                    domain="['|', ('point_id.operation_id', '!=', False), ('test_type', 'in', ('register_consumed_materials', 'register_byproducts', 'print_label'))]"/>
+                    domain="['|', ('point_id.operation_id', '!=', False), ('test_type', 'in', ('register_consumed_materials', 'register_byproducts', 'print_product_label', 'print_lot_label'))]"/>
             </filter>
         </field>
     </record>

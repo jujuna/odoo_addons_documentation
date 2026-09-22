@@ -6,7 +6,7 @@ registry.category("web_tour.tours").add("web_enterprise.test_studio_list_upsell"
             trigger: ".o_list_view",
         },
         {
-            trigger: ".o_optional_columns_dropdown > button",
+            trigger: ".o_optional_columns > button",
             run: "click",
         },
         {
@@ -21,7 +21,7 @@ registry.category("web_tour.tours").add("web_enterprise.test_studio_no_list_upse
             trigger: ".o_list_view",
         },
         {
-            trigger: ".o_optional_columns_dropdown > button",
+            trigger: ".o_optional_columns > button",
             run: "click",
         },
         {

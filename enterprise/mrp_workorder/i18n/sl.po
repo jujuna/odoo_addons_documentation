@@ -15,15 +15,15 @@
 # Martin Trigaux, 2023
 # Tomaž Jug <tomaz@editor.si>, 2023
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-16 17:56+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 03:52+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-master/"
 "mrp_workorder/sl/>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,13 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/wizard/propose_change.py:0
+msgid "%(user_name)s suggests to add this picture to the instruction"
+msgstr ""
 
 #. module: mrp_workorder
 #. odoo-python
@@ -41,14 +47,47 @@ msgstr ""
 
 #. module: mrp_workorder
 #. odoo-python
-#: code:addons/mrp_workorder/wizard/propose_change.py:0
-msgid "%(user_name)s suggests to use this document as instruction"
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "4 x 12 - One per lot/SN"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "4 x 12 - One per unit"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "4x12_units"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+msgid ""
+"<i class=\"oi oi-filled px-1 o-pt-0_5\" data-icon=\"settings\" role=\"img\" "
+"title=\"Work Center\"/>"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+msgid ""
+"<i class=\"oi oi-filled px-1\" data-icon=\"calendar_today\" role=\"img\" "
+"title=\"Date\"/>"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+msgid ""
+"<i class=\"oi px-1\" data-icon=\"build\" role=\"img\" title=\"Manufacturing "
+"Order\"/>"
 msgstr ""
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.res_config_settings_view_form
-msgid "<i class=\"fa fa-print\"/> Print barcode commands"
-msgstr "<i class=\"fa fa-print\"/> Natisnite ukaze črtne kode"
+msgid "<i class=\"oi\" data-icon=\"print\"/> Print barcode commands"
+msgstr "<i class=\"oi\" data-icon=\"print\"/> Natisnite ukaze črtne kode"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_bom_form_view_inherited
@@ -61,26 +100,32 @@ msgid "<span class=\"o_stat_text order-2\">Operations</span>"
 msgstr ""
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "<span invisible=\"employee_name\">Log In </span>"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+msgid ""
+"<span invisible=\"state != 'done'\" class=\"align-self-center text-"
+"success\">This work order is done</span>"
 msgstr ""
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
-msgid "<strong>Start Date: </strong>"
-msgstr "<strong>Datum začetka: </strong>"
+#, fuzzy
+msgid "<strong>Start: </strong>"
+msgstr "<strong>Začetek: </strong>"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
-msgid "<strong>Stop Date: </strong>"
-msgstr "<strong>Datum ustavitve: </strong>"
+#, fuzzy
+msgid "<strong>Stop: </strong>"
+msgstr "<strong>Ustaviti: </strong>"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
 msgid "<strong>Workcenter: </strong>"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_res_groups
+msgid "Access Groups"
 msgstr ""
 
 #. module: mrp_workorder
@@ -101,6 +146,12 @@ msgid "Activity Exception Decoration"
 msgstr "Izjema pri oznaki aktivnosti"
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__activity_plans_ids
+#, fuzzy
+msgid "Activity Plans"
+msgstr "Načrti dejavnosti"
+
+#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__activity_state
 msgid "Activity State"
 msgstr "Stanje aktivnosti"
@@ -119,14 +170,27 @@ msgstr "Dodaj"
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+#, fuzzy
 msgid "Add By-product"
 msgstr "Dodaj stranski produkt"
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+#, fuzzy
 msgid "Add Component"
 msgstr "Dodaj komponento"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Add Note"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields.selection,name:mrp_workorder.selection__propose_change__change_type__set_picture
+msgid "Add Picture"
+msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -146,6 +210,12 @@ msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Add a New picture"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
 #. odoo-python
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
@@ -159,21 +229,14 @@ msgid "Add line: %(productName)s"
 msgstr ""
 
 #. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/mrp_production.py:0
-msgid "Add log note"
-msgstr "Dodaj zapis v beležko"
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Add/Modify Step"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_mrp_production_additional_workorder
 msgid "Additional Workorder"
-msgstr ""
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_form_view
-msgid ""
-"Additional instructions that can be created and visualised from both here "
-"and the shop floor interface."
 msgstr ""
 
 #. module: mrp_workorder
@@ -200,6 +263,11 @@ msgid ""
 msgstr ""
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__allowed_bom_line_ids
+msgid "Allowed Bom Line"
+msgstr ""
+
+#. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_form_view_inherit
 msgid "Allowed Employees"
 msgstr "Dovoljeni zaposleni"
@@ -223,9 +291,22 @@ msgid "Assigned"
 msgstr "Dodeljeno"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_employee_form_account
-msgid "Attendance/Point of Sale/Manufacturing"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_routing_view_tree
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
+msgid "Attachment"
 msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "Attachment Preview"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_employee_form_account
+#, fuzzy
+msgid "Attendance/Point of Sale/Manufacturing"
+msgstr "Prisotnost/Prodajna točka/Proizvodnja"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_tree_view_planning
@@ -233,11 +314,23 @@ msgid "Availability"
 msgstr "Razpoložljivost"
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__available_packaging_ids
+msgid "Available Packaging"
+msgstr ""
+
+#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.xml:0
+#, fuzzy
 msgid "Back"
 msgstr "Nazaj"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/components/product_catalog/kanban_controller.js:0
+msgid "Back to ShopFloor"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_barcode
@@ -246,15 +339,15 @@ msgid "Barcode"
 msgstr "Črtna koda"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder___barcode_scanned
-msgid "Barcode Scanned"
-msgstr "Skenirana črtna koda"
-
-#. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_mrp_bom
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_id
 msgid "Bill of Material"
 msgstr "Kosovnica"
+
+#. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_mrp_bom_line
+msgid "Bill of Material Line"
+msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -265,6 +358,7 @@ msgstr "Binarna datoteka"
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+#, fuzzy
 msgid "Block"
 msgstr "Blok"
 
@@ -287,8 +381,18 @@ msgid "BoM feedback (%(production)s - %(operation)s)"
 msgstr ""
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_line_id
+msgid "Bom Line"
+msgstr ""
+
+#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_product_ids
 msgid "Bom Product"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
+msgid "By-Product To Register"
 msgstr ""
 
 #. module: mrp_workorder
@@ -298,20 +402,16 @@ msgid "By-product: %(productName)s"
 msgstr ""
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "CONTINUE"
-msgstr ""
+#: model:ir.model,name:mrp_workorder.model_mrp_bom_byproduct
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__byproduct_id
+#, fuzzy
+msgid "Byproduct"
+msgstr "Stranski izdelek"
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.xml:0
-msgid "Cancel"
-msgstr "Prekliči"
-
-#. module: mrp_workorder
-#: model:ir.model,name:mrp_workorder.model_change_production_qty
-msgid "Change Production Qty"
+msgid "C"
 msgstr ""
 
 #. module: mrp_workorder
@@ -334,6 +434,7 @@ msgstr ""
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_register_production_dialog.xml:0
+#, fuzzy
 msgid "Clear"
 msgstr "Počisti"
 
@@ -354,10 +455,9 @@ msgid "Close Manufacturing Orders"
 msgstr ""
 
 #. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
-msgid "Close Production"
-msgstr "Končaj Proizvodnjo"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__columns
+msgid "Columns"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__comment
@@ -371,10 +471,14 @@ msgstr "Podjetje"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_id
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__component_ids
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_filter_shop_floor
 msgid "Component"
 msgstr "Komponenta"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
+msgid "Component To Register"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_uom_id
@@ -405,13 +509,14 @@ msgid "Confirm"
 msgstr "Potrdi"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__connected_employee_ids
-msgid "Connected Employee"
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_workorder_gantt/mrp_workorder_gantt_controller.xml:0
+msgid "Confirm Planning"
 msgstr ""
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__consumption
-msgid "Consumption"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__custom_quantity
+msgid "Copies"
 msgstr ""
 
 #. module: mrp_workorder
@@ -424,6 +529,15 @@ msgstr "Lastna cena"
 #: code:addons/mrp_workorder/static/src/components/viewer.js:0
 msgid "Could not display the selected %s"
 msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mrp_workorder/models/mrp_workorder.py:0
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_employee_dialog.xml:0
+#, fuzzy
+msgid "Create Employee"
+msgstr "Ustvari kader"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -445,19 +559,16 @@ msgstr ""
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__create_uid
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__create_uid
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__create_uid
 msgid "Created by"
 msgstr "Ustvaril"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__create_date
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__create_date
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__create_date
 msgid "Created on"
 msgstr "Ustvarjeno"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Creates a new serial/lot number"
-msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workcenter__currency_id
@@ -502,21 +613,19 @@ msgid "Delete a Step"
 msgstr ""
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__is_deleted
-msgid "Deleted in production"
-msgstr ""
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.add_quality_check_from_tablet
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_additional_workorder_wizard
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_propose_change_wizard
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_employee_dialog.xml:0
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.xml:0
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.xml:0
 msgid "Discard"
 msgstr "Opusti"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_change_production_qty__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom_byproduct__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom_line__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_backorder__display_name
@@ -527,15 +636,23 @@ msgstr "Opusti"
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_alert__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point_test_type__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_report_mrp_report_mo_overview__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_res_groups__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move_line__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_picking_type__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_stock_rule__display_name
 msgid "Display Name"
 msgstr "Prikazani naziv"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.res_config_settings_view_form
+msgid "Display timer on work order cards in the shop floor app"
+msgstr ""
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.add_quality_check_from_tablet
@@ -591,20 +708,25 @@ msgid "Employee Name"
 msgstr "Ime zaposlenega"
 
 #. module: mrp_workorder
+#: model:ir.ui.menu,name:mrp_workorder.mrp_workorder_menu_employee
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_view_employee_filter
 msgid "Employees"
 msgstr "Kadri"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,help:mrp_workorder.field_quality_check__component_tracking
-#: model:ir.model.fields,help:mrp_workorder.field_quality_check__product_tracking
-msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr "Zagotovite sledljivost skladiščenega izdelka v vašem skladišču."
-
-#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
 msgid "Enter your pin"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.module.module,description:base.module_mrp_workorder
+msgid ""
+"Enterprise extension for MRP\n"
+"* Work order planning.  Check planning by Gantt views grouped by production "
+"order / work center\n"
+"* Traceability report\n"
+"* Cost Structure report (mrp_account)"
 msgstr ""
 
 #. module: mrp_workorder
@@ -620,20 +742,33 @@ msgid "Estimated employee cost: %(operation_name)s"
 msgstr ""
 
 #. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_form_view_inherit
+#, fuzzy
+msgid "Everyone"
+msgstr "Vsi"
+
+#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__duration_expected
 msgid "Expected Duration"
 msgstr "Pričakovano trajanje"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__extra_html
+msgid "Extra Content"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+#, fuzzy
+msgid "Failure"
+msgstr "Neuspeh"
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.xml:0
 msgid "Feedback Loop"
 msgstr ""
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_inherit_workorder
-msgid "Finished Lot/Serial Number"
-msgstr "Končan lot/serijska številka"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__finished_product_check_ids
@@ -646,9 +781,9 @@ msgid "Finished Product Sequence Number"
 msgstr ""
 
 #. module: mrp_workorder
-#: model:ir.model.fields,help:mrp_workorder.field_mrp_bom__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font izjemna ikona npr. fa-tasks"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__print_format
+msgid "Format"
+msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -663,9 +798,10 @@ msgid "Generate Serial"
 msgstr ""
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_change_production_qty__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_hr_employee__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom_byproduct__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom_line__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_backorder__id
@@ -676,13 +812,16 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_alert__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point_test_type__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_report_mrp_report_mo_overview__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_res_config_settings__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_res_groups__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move_line__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_picking_type__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_stock_rule__id
 msgid "ID"
 msgstr "ID"
 
@@ -701,12 +840,6 @@ msgstr "Ikona za označevanje izjemne aktivnosti."
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__worksheet_document
 msgid "Image/PDF"
 msgstr ""
-
-#. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-msgid "Improvement Suggestion"
-msgstr "Predlog za izboljšavo"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -734,6 +867,7 @@ msgstr "Vstavi za operacijo"
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.xml:0
+#, fuzzy
 msgid "Install App"
 msgstr "Namestite aplikacijo"
 
@@ -750,6 +884,8 @@ msgid "Instruction:"
 msgstr ""
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_worksheet_dialog.xml:0
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_routing_workcenter__quality_point_count
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_operation_form_view
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_inherit_workorder
@@ -766,6 +902,12 @@ msgstr ""
 #: model:ir.model.fields,help:mrp_workorder.field_stock_move__product_barcode
 msgid "International Article Number used for product identification."
 msgstr "EAN za mednarodno identifikacijo izdelkov"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.js:0
+msgid "Invalid duration"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workorder__move_line_ids
@@ -803,14 +945,22 @@ msgid "Is the Current User Working"
 msgstr ""
 
 #. module: mrp_workorder
+#: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_production
+#, fuzzy
+msgid "Kanban"
+msgstr "Kanban"
+
+#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__write_uid
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__write_uid
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__write_uid
 msgid "Last Updated by"
 msgstr "Zadnji posodobil"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__write_date
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__write_date
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__write_date
 msgid "Last Updated on"
 msgstr "Zadnjič posodobljeno"
 
@@ -835,15 +985,9 @@ msgstr ""
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_view_form_log_note
+#, fuzzy
 msgid "Log Note"
 msgstr "Beležka"
-
-#. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__log_note
-msgid "Log note"
-msgstr "Zabeleži"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -858,14 +1002,9 @@ msgid "Logged out!"
 msgstr "Odjava!"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Lot"
-msgstr "Sklop"
-
-#. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__finished_lot_ids
-msgid "Lot/Serial Number"
-msgstr "Lot/serijska številka"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__lot_label_format
+msgid "Lot/SN Label Format"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_report_mrp_report_mo_overview
@@ -881,6 +1020,11 @@ msgstr "Čakajoči PN"
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_filter_shop_floor
 msgid "MO Ready"
 msgstr "Pripravljeni PN"
+
+#. module: mrp_workorder
+#: model:ir.module.module,shortdesc:base.module_mrp_workorder
+msgid "MRP II"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:res.groups,name:mrp_workorder.group_mrp_wo_tablet_timer
@@ -904,6 +1048,7 @@ msgid "Manufacturing Order"
 msgstr "Proizvodni nalog"
 
 #. module: mrp_workorder
+#: model:ir.actions.act_window,name:mrp_workorder.mrp_production_products_gantt
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_gantt_view
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_tree_view_planning
 msgid "Manufacturing Orders"
@@ -912,14 +1057,14 @@ msgstr "Proizvodni nalogi"
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_inherit_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
 msgid "Mark as Done"
 msgstr "Označi kot opravljeno"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Mark as Done and Close MO"
+#: model:ir.model.fields,help:mrp_workorder.field_mrp_bom__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
 msgstr ""
 
 #. module: mrp_workorder
@@ -928,15 +1073,14 @@ msgid "Maximum number of cards per page"
 msgstr ""
 
 #. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/mrp_workorder.py:0
-msgid "Menu"
-msgstr "Meni"
-
-#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Modify Routing"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__move_ids
+msgid "Move"
 msgstr ""
 
 #. module: mrp_workorder
@@ -947,6 +1091,7 @@ msgstr ""
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+#, fuzzy
 msgid "Move to work center"
 msgstr "Premakni na delovno postajo"
 
@@ -1006,11 +1151,6 @@ msgid "New Title suggested:"
 msgstr ""
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_view_employee_filter
-msgid "Newly Hired"
-msgstr "Novo zaposleni"
-
-#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
 msgstr "Naslednji dogodek v koledarju"
@@ -1036,12 +1176,18 @@ msgid "Next Check"
 msgstr ""
 
 #. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/employees_panel.xml:0
-msgid "No operators connected"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_split_mo_form
+msgid "No Backorder"
 msgstr ""
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/employees_panel.xml:0
+msgid "No operators connected."
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.actions.act_window,help:mrp_workorder.action_mrp_planning_gantt
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid "No work orders to do!"
 msgstr "Ni delovnih nalogov za opraviti!"
@@ -1057,7 +1203,11 @@ msgid "Note"
 msgstr "Opomba"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_form_view
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mrp_workorder/models/mrp_production.py:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_view_form_log_note
 msgid "Notes"
 msgstr "Beležke"
 
@@ -1069,8 +1219,15 @@ msgstr ""
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+#, fuzzy
 msgid "Open Manufacturing Order"
 msgstr "Odpri proizvodni nalog"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_production_gantt/mrp_production_gantt_renderer.js:0
+msgid "Open Manufacturing Orders"
+msgstr ""
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_inherit_workorder
@@ -1080,6 +1237,7 @@ msgstr "Odpri pogled delavnice"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_alert__workorder_id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__workorder_id
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_workorders_tree_view
 msgid "Operation"
 msgstr "Postopek"
 
@@ -1117,20 +1275,15 @@ msgid "Overview"
 msgstr "Pregled"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "PAUSE"
-msgstr ""
-
-#. module: mrp_workorder
-#: model:ir.model.fields.selection,name:mrp_workorder.selection__quality_point__test_report_type__pdf
-msgid "PDF"
-msgstr "PDF"
-
-#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/components/viewer.xml:0
 msgid "PDF file"
 msgstr "PDF datoteka"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__packaging_id
+msgid "Packaging"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_stock_picking_type
@@ -1144,14 +1297,29 @@ msgid "Picture"
 msgstr "Slika"
 
 #. module: mrp_workorder
-#: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_production
-msgid "Planning by Production"
-msgstr "Načrtovanje po delovnih nalogih"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_workorders_tree_view
+#, fuzzy
+msgid "Plan"
+msgstr "Plan"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_workorder_gantt/mrp_workorder_gantt_controller.xml:0
+msgid "Plan MO"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/mrp_workcenter.py:0
+msgid "Plan Work Orders in %(workcenter)s"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_employee
 #: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_workcenter
-msgid "Planning by Workcenter"
-msgstr "Načrtovanje po delovnih postajah"
+#, fuzzy
+msgid "Planning"
+msgstr "Načrtovanje"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1159,12 +1327,6 @@ msgstr "Načrtovanje po delovnih postajah"
 msgid ""
 "Please set the quantity you are currently producing. It should be different "
 "from zero."
-msgstr ""
-
-#. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/mrp_workorder.py:0
-msgid "Please unblock the work center to start the work order"
 msgstr ""
 
 #. module: mrp_workorder
@@ -1185,18 +1347,70 @@ msgid "Previous Check"
 msgstr ""
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__pricelist_id
+msgid "Pricelist"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__pricer_tags_pricelist_id
+msgid "Pricer Tags Pricelist"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:quality.point.test_type,name:mrp_workorder.test_type_print_lot_label
+msgid "Print Lot/SN Label"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__print_packaging
+msgid "Print Packaging"
+msgstr ""
+
+#. module: mrp_workorder
 #: model:quality.point.test_type,name:mrp_workorder.test_type_print_label
-msgid "Print label"
+msgid "Print Product Label"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__with_price
+msgid "Print With Price"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,help:mrp_workorder.field_quality_check_label_layout__print_packaging
+msgid "Print labels with each delivery order line's packaging."
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
+msgid "Produce"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__product_ids
+msgid "Product"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__product_label_format
+msgid "Product Label Format"
 msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_stock_move_line
+#, fuzzy
 msgid "Product Moves (Stock Move Line)"
+msgstr "Premiki zaloge"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__product_tmpl_ids
+msgid "Product Tmpl"
 msgstr ""
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__component_id
-msgid "Product To Register"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__product_uom_ids
+msgid "Product Uom"
 msgstr ""
 
 #. module: mrp_workorder
@@ -1209,11 +1423,6 @@ msgstr "Proizvodnja"
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__production_id
 msgid "Production Order"
 msgstr "Proizvodni nalog"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Production Workcenter"
-msgstr "Proizvodni delovni center"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__product_ids
@@ -1244,12 +1453,18 @@ msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_quality_check
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__quality_check_id
 msgid "Quality Check"
 msgstr "Preverjanje kakovosti"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__quality_check_fail
 msgid "Quality Check Fail"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_quality_check_label_layout
+msgid "Quality Check Label Layout"
 msgstr ""
 
 #. module: mrp_workorder
@@ -1308,15 +1523,15 @@ msgid "Quantity Produced"
 msgstr "Proizvedena količina"
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__move_quantity
+msgid "Quantity to print"
+msgstr ""
+
+#. module: mrp_workorder
 #. odoo-python
 #: code:addons/mrp_workorder/wizard/propose_change.py:0
 msgid "Reason:"
 msgstr "Razlog:"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Record production"
-msgstr ""
 
 #. module: mrp_workorder
 #: model:quality.point.test_type,name:mrp_workorder.test_type_register_byproducts
@@ -1343,15 +1558,15 @@ msgstr "Registriraj izdelavo"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-msgid "Register Production / Serial"
-msgstr ""
-
-#. module: mrp_workorder
-#. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
 msgid "Register Production: %s"
 msgstr "Registriraj izdelavo: %s"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Register Quantity / Lot"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_active
@@ -1376,9 +1591,10 @@ msgid "Remove Current Step"
 msgstr ""
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__test_report_type
-msgid "Report Type"
-msgstr "Tip poročila"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
+msgid "Replan"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__user_id
@@ -1392,12 +1608,19 @@ msgstr "Odgovorni uporabnik"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__result
+#, fuzzy
 msgid "Result"
+msgstr "Rezultat"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__rows
+msgid "Rows"
 msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+#, fuzzy
 msgid "Scrap"
 msgstr "Odpis"
 
@@ -1430,22 +1653,6 @@ msgid "Select the step you want to modify"
 msgstr ""
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Serial"
-msgstr "Serijska"
-
-#. module: mrp_workorder
-#: model:ir.model.fields.selection,name:mrp_workorder.selection__propose_change__change_type__set_picture
-msgid "Set Picture"
-msgstr ""
-
-#. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-msgid "Set a New picture"
-msgstr ""
-
-#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
@@ -1454,6 +1661,7 @@ msgstr ""
 #: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_root
 #: model:ir.ui.menu,name:mrp_workorder.menu_shop_floor
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_form_view
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_view_kanban_inherit_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_picking_type_form_inherit_mrp_workorder
 msgid "Shop Floor"
 msgstr "Delavnica"
@@ -1461,6 +1669,7 @@ msgstr "Delavnica"
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.xml:0
+#, fuzzy
 msgid "Shop Floor Control Panel"
 msgstr "Nadzorna plošča delavnice"
 
@@ -1471,11 +1680,6 @@ msgid "Shop Floor Onboarding Image"
 msgstr ""
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.res_config_settings_view_form
-msgid "Show the timer on the work order screen"
-msgstr "Prikaži časovnik na prikazu delovnega naloga"
-
-#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/components/viewer.xml:0
 msgid "Slides viewer"
@@ -1484,6 +1688,25 @@ msgstr ""
 #. module: mrp_workorder
 #: model:product.template,description_sale:mrp_workorder.product_template_stool
 msgid "Small wooden stool"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_split_mo_form
+msgid "Split MO"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_split_mo_form
+msgid "Split Manufacturing Order"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_split_mo_form
+msgid ""
+"Split the manufacturing order if you expect to process the\n"
+"                        remaining quantities later. Don't split if you won't "
+"process the\n"
+"                        remaining products."
 msgstr ""
 
 #. module: mrp_workorder
@@ -1527,9 +1750,16 @@ msgid "Stock Move"
 msgstr "Premik zaloge"
 
 #. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_stock_rule
+#, fuzzy
+msgid "Stock Rule"
+msgstr "Pravilo zaloge"
+
+#. module: mrp_workorder
 #: model:product.template,name:mrp_workorder.product_template_stool
+#, fuzzy
 msgid "Stool"
-msgstr ""
+msgstr "Stol"
 
 #. module: mrp_workorder
 #: model:product.template,name:mrp_workorder.product_template_stool_foot
@@ -1542,14 +1772,25 @@ msgid "Stool Top"
 msgstr ""
 
 #. module: mrp_workorder
-#: model:ir.actions.client,name:mrp_workorder.tablet_client_action
-msgid "Tablet Client Action"
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+#, fuzzy
+msgid "Success"
+msgstr "Uspešno"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,help:mrp_workorder.field_quality_check__component_tracking
+#: model:ir.model.fields,help:mrp_workorder.field_quality_check__product_tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
 msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__test_type
+#, fuzzy
 msgid "Technical name"
-msgstr ""
+msgstr "Tehnično ime"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__test_type_id
@@ -1558,8 +1799,25 @@ msgid "Test Type"
 msgstr "Vrsta testa"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_kanban_view_inherit
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_card_view_inherit
 msgid "The deadline of this MO is on"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.js:0
+msgid "The employee time log has been successfully updated"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.js:0
+msgid "The maintenance request has been successfully created."
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.constraint,message:mrp_workorder.constraint_res_config_settings_check_wo_shop_floor_maximum_card_count
+msgid "The maximum number of cards per page should be positive."
 msgstr ""
 
 #. module: mrp_workorder
@@ -1603,11 +1861,15 @@ msgid "This Station"
 msgstr ""
 
 #. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/mrp_workorder.py:0
-msgid ""
-"This workcenter isn't expected to have open workorders during this period. "
-"Work hours :"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
+msgid "This workorder has conflicts"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
+msgid "This workorder is scheduled before its dependencies"
 msgstr ""
 
 #. module: mrp_workorder
@@ -1653,6 +1915,12 @@ msgid "To Process"
 msgstr "Za obdelavo"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.xml:0
+msgid "Total Duration"
+msgstr ""
+
+#. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_tree_view_planning
 msgid "Total Qty"
 msgstr "Skupna količina"
@@ -1669,10 +1937,11 @@ msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__product_tracking
-msgid "Tracking"
-msgstr "Sledenje"
+msgid "Tracking Method"
+msgstr ""
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__barcode_format
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_workorder_form
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_routing_view_tree
 msgid "Type"
@@ -1698,7 +1967,6 @@ msgstr ""
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
 msgid "Unblock"
 msgstr ""
 
@@ -1728,9 +1996,28 @@ msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.xml:0
+msgid "Update Duration"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
+msgid "Update Employee Time Spent on Work Order"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+#, fuzzy
 msgid "Update Instructions"
 msgstr "Posodobi navodila"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Update Time Spent"
+msgstr ""
 
 #. module: mrp_workorder
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
@@ -1747,11 +2034,6 @@ msgstr ""
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_register_production_dialog.xml:0
 msgid "Validate"
 msgstr "Potrditev"
-
-#. module: mrp_workorder
-#: model:ir.model.fields,help:mrp_workorder.field_mrp_workorder___barcode_scanned
-msgid "Value of the last barcode scanned."
-msgstr "Vrednost zadnje skenirane črtne kode."
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1811,23 +2093,31 @@ msgid "Work Order Operation"
 msgstr ""
 
 #. module: mrp_workorder
+#: model:ir.actions.act_window,name:mrp_workorder.mrp_workcenter_workorders_gantt
 #: model:ir.actions.act_window,name:mrp_workorder.mrp_workorder_action_tablet
 #: model:ir.ui.menu,name:mrp_workorder.mrp_workorder_menu_planning
 msgid "Work Orders"
 msgstr "Delovni nalogi"
 
 #. module: mrp_workorder
-#: model:ir.actions.server,name:mrp_workorder.action_mrp_workorder_dependencies_production
+#: model:ir.actions.act_window,name:mrp_workorder.action_mrp_planning_gantt
+#: model:ir.actions.server,name:mrp_workorder.action_mrp_workorder_dependencies_employee
 #: model:ir.actions.server,name:mrp_workorder.action_mrp_workorder_dependencies_workcenter
 msgid "Work Orders Planning"
 msgstr "Načrtovanje delovnih nalogov"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_view_kanban_inherit_workorder
-msgid "Work orders"
+#: model:ir.actions.server,name:mrp_workorder.action_mrp_workorder_dependencies_production
+msgid "Work Orders Planning Kanban"
 msgstr ""
 
 #. module: mrp_workorder
+#: model:ir.module.module,summary:base.module_mrp_workorder
+msgid "Work Orders, Planning, Stock Reports."
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.actions.act_window,help:mrp_workorder.action_mrp_planning_gantt
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid ""
 "Work orders are operations to do as part of a manufacturing order.\n"
@@ -1864,22 +2154,8 @@ msgid "Workorder"
 msgstr ""
 
 #. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_worksheet_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_routing_view_tree
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
-msgid "Worksheet"
-msgstr "Poročilo"
-
-#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move__worksheet_document
 msgid "Worksheet Image/PDF"
-msgstr ""
-
-#. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/quality.py:0
-msgid "Worksheet Preview"
 msgstr ""
 
 #. module: mrp_workorder
@@ -1907,14 +2183,6 @@ msgstr ""
 
 #. module: mrp_workorder
 #. odoo-python
-#: code:addons/mrp_workorder/wizard/change_production_qty.py:0
-msgid ""
-"You cannot update the quantity to do of an ongoing manufacturing order for "
-"which quality checks have been performed."
-msgstr ""
-
-#. module: mrp_workorder
-#. odoo-python
 #: code:addons/mrp_workorder/models/quality.py:0
 msgid "You did not set a lot/serial number for the final product"
 msgstr ""
@@ -1923,6 +2191,18 @@ msgstr ""
 #. odoo-python
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
 msgid "You must be logged in to process some of these work orders."
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_employee_dialog.xml:0
+msgid "You must create an employee to log in as an operator in Shopfloor."
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/employees_panel.xml:0
+msgid "You must log in to process work orders."
 msgstr ""
 
 #. module: mrp_workorder
@@ -1947,7 +2227,15 @@ msgstr ""
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
 msgid ""
 "You need to link this user to an employee of this company to process the "
-"work order"
+"work order."
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/mrp_workorder.py:0
+msgid ""
+"You need to link this user to an employee of this company to process these "
+"work orders."
 msgstr ""
 
 #. module: mrp_workorder
@@ -1969,14 +2257,68 @@ msgid "Your suggestion to delete the %s step was successfully created."
 msgstr ""
 
 #. module: mrp_workorder
-#: model:ir.model.fields.selection,name:mrp_workorder.selection__quality_point__test_report_type__zpl
-msgid "ZPL"
-msgstr "ZPL"
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "ZPL Labels - One per lot/SN"
+msgstr ""
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "back"
-msgstr "nazaj"
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "ZPL Labels - One per unit"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__zpl_preview
+msgid "ZPL Preview"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__zpl_template
+msgid "ZPL Template"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid "^FO14,67^BY2^BCN,74,N^FH^FD"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid "^FO14,90^A0N,22^FB378,1,0,C^FDNo barcode available^FS"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid "^FO222,159^A0N,21,16^FB170,1,0,R^FH^FD"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid "^FS"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid ""
+"^FS\n"
+"^FO14,159^A0N,21,16^FB170,1,0,L^FH^FD"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid ""
+"^FS\n"
+"^FO250,23^A0N,23,18^FB142,1,0,R^FH^FD"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid ""
+"^PW406\n"
+"^LL203\n"
+"^FO14,23^A0N,23^FB235,1,0,L^FH^FD"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workcenter_productivity__employee_id
@@ -1995,15 +2337,15 @@ msgid "employees with access"
 msgstr ""
 
 #. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_workorders_tree_view
+msgid "expected duration"
+msgstr ""
+
+#. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workcenter__employee_ids
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workorder__allowed_employees
 msgid "if left empty, all employees can log in to the workcenter"
 msgstr ""
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "menu"
-msgstr "meni"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_form_view_inherit
@@ -2031,52 +2373,29 @@ msgstr ""
 msgid "working employees"
 msgstr ""
 
-#~ msgid "Add product"
-#~ msgstr "Dodaj izdelek"
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "zpl_lots"
+msgstr ""
 
-#~ msgid "Category"
-#~ msgstr "Kategorija"
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "zpl_units"
+msgstr ""
 
-#~ msgid "Color"
-#~ msgstr "Barva"
+#~ msgid "Ensure the traceability of a storable product in your warehouse."
+#~ msgstr "Zagotovite sledljivost skladiščenega izdelka v vašem skladišču."
 
-#~ msgid ""
-#~ "Conversion between Units of Measure can only occur if they belong to the "
-#~ "same category. The conversion will be made based on the ratios."
-#~ msgstr "Pretvorba med enotami mere je možna samo v isti kategoriji."
+#~ msgid "PDF"
+#~ msgstr "PDF"
 
-#~ msgid "Custom"
-#~ msgstr "Prilagojeno"
+#~ msgid "Report Type"
+#~ msgstr "Tip poročila"
 
-#~ msgid "Good Job!"
-#~ msgstr "Dobro opravljeno!"
+#~ msgid "Tracking"
+#~ msgstr "Sledenje"
 
-#~ msgid "Lot/Serial"
-#~ msgstr "Lot/serijska številka"
-
-#~ msgid "Next"
-#~ msgstr "Naprej"
-
-#~ msgid "Product"
-#~ msgstr "Proizvod"
-
-#~ msgid "Quality"
-#~ msgstr "Kakovost"
-
-#~ msgid "Unit of Measure"
-#~ msgstr "Enota mere"
-
-#~ msgid "UoM"
-#~ msgstr "EM"
-
-#~ msgid "Upload your PDF file."
-#~ msgstr "Naložite svojo datoteko PDF."
-
-#~ msgid "Worksheet Page"
-#~ msgstr "Stran poročila"
-
-#~ msgid "minutes"
-#~ msgstr "minute"
-
-#~ msgid "title"
-#~ msgstr "naziv"
+#~ msgid "ZPL"
+#~ msgstr "ZPL"

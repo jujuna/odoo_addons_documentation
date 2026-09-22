@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from odoo import Command
 
+from odoo.fields import Domain
 from odoo.exceptions import UserError, ValidationError
-from odoo.tests import Form, TransactionCase
+from odoo.tests import tagged, Form, TransactionCase
 
 
 class TestMultiCompany(TransactionCase):
@@ -12,12 +14,21 @@ class TestMultiCompany(TransactionCase):
         group_user = cls.env.ref('base.group_user')
         group_stock_manager = cls.env.ref('stock.group_stock_manager')
 
+        cls.interco_location = cls.env.ref('stock.stock_location_inter_company')
         cls.company_a = cls.env['res.company'].create({'name': 'Company A'})
         cls.company_b = cls.env['res.company'].create({'name': 'Company B'})
+        cls.branch_company_a = cls.env['res.company'].create({
+            'name': 'Branch of company A',
+            'parent_id': cls.company_a.id,
+        })
         cls.warehouse_a = cls.env['stock.warehouse'].search([('company_id', '=', cls.company_a.id)], limit=1)
+        cls.warehouse_a.code = 'WHA'
         cls.warehouse_b = cls.env['stock.warehouse'].search([('company_id', '=', cls.company_b.id)], limit=1)
+        cls.warehouse_b.code = 'WHB'
+        cls.warehouse_branch_a = cls.env['stock.warehouse'].search([('company_id', '=', cls.branch_company_a.id)], limit=1)
         cls.stock_location_a = cls.warehouse_a.lot_stock_id
         cls.stock_location_b = cls.warehouse_b.lot_stock_id
+        cls.stock_location_branch_a = cls.warehouse_branch_a.lot_stock_id
 
         cls.user_a = cls.env['res.users'].create({
             'name': 'user company a with access to company b',
@@ -197,7 +208,7 @@ class TestMultiCompany(TransactionCase):
             'location_id': picking.location_id.id,
             'location_dest_id': picking.location_dest_id.id,
             'product_id': product.id,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
             'product_uom_qty': 1.0,
             'picking_id': picking.id,
             'company_id': picking.company_id.id,
@@ -379,7 +390,7 @@ class TestMultiCompany(TransactionCase):
             'location_id': self.stock_location_a.id,
             'location_dest_id': self.stock_location_a.id,
             'product_id': product.id,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
         })
         with self.assertRaises(UserError):
             move._action_confirm()
@@ -401,7 +412,7 @@ class TestMultiCompany(TransactionCase):
             'location_id': self.stock_location_a.id,
             'location_dest_id': self.stock_location_b.id,
             'product_id': product.id,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
         })
         with self.assertRaises(UserError):
             move._action_confirm()
@@ -424,7 +435,7 @@ class TestMultiCompany(TransactionCase):
             'location_id': self.stock_location_a.id,
             'location_dest_id': self.stock_location_a.id,
             'product_id': product.id,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
         })
         with self.assertRaises(UserError):
             move._action_confirm()
@@ -480,7 +491,7 @@ class TestMultiCompany(TransactionCase):
             'location_id': supplier_location.id,
             'location_dest_id': self.stock_location_a.id,
             'product_id': product_lot.id,
-            'product_uom': product_lot.uom_id.id,
+            'uom_id': product_lot.uom_id.id,
             'product_uom_qty': 0.1,
             'picking_type_id': self.warehouse_a.in_type_id.id,
         })
@@ -497,7 +508,7 @@ class TestMultiCompany(TransactionCase):
             'location_id': self.stock_location_a.id,
             'location_dest_id': intercom_location.id,
             'product_id': product_lot.id,
-            'product_uom': product_lot.uom_id.id,
+            'uom_id': product_lot.uom_id.id,
             'product_uom_qty': 0.1,
             'picking_type_id': picking_type_to_transit.id,
             'route_ids': [(4, route.id)],
@@ -546,7 +557,7 @@ class TestMultiCompany(TransactionCase):
             'is_storable': True,
             'tracking': 'lot',
             'name': 'product lot',
-            'route_ids': [(4, resupply_route.id), (4, self.env.ref('stock.route_warehouse0_mto').id)],
+            'route_ids': [Command.set([resupply_route.id])],
         })
 
         move_sup_to_whb = self.env['stock.move'].create({
@@ -554,7 +565,7 @@ class TestMultiCompany(TransactionCase):
             'location_id': supplier_location.id,
             'location_dest_id': self.warehouse_b.lot_stock_id.id,
             'product_id': product_lot.id,
-            'product_uom': product_lot.uom_id.id,
+            'uom_id': product_lot.uom_id.id,
             'product_uom_qty': 1.0,
             'picking_type_id': self.warehouse_b.in_type_id.id,
         })
@@ -577,7 +588,7 @@ class TestMultiCompany(TransactionCase):
         move_wha_to_cus = self.env['stock.move'].create({
             'product_id': product_lot.id,
             'product_uom_qty': 1,
-            'product_uom': product_lot.uom_id.id,
+            'uom_id': product_lot.uom_id.id,
             'picking_id': picking_out.id,
             'location_id': self.stock_location_a.id,
             'location_dest_id': customer_location.id,
@@ -658,7 +669,7 @@ class TestMultiCompany(TransactionCase):
         self.assertEqual(out_move.state, 'cancel')
 
         # Propagate cancel
-        self.env['ir.config_parameter'].sudo().set_param('stock.cancel_moves_origin', True)
+        self.env['ir.config_parameter'].sudo().set_bool('stock.cancel_moves_origin', True)
         orderpoint._procure_orderpoint_confirm()
         moves = self.env['stock.move'].search([('product_id', '=', product.id), ('state', '!=', 'cancel')])
         self.assertEqual(len(moves), 2)
@@ -668,31 +679,198 @@ class TestMultiCompany(TransactionCase):
         self.assertEqual(in_move.state, 'cancel')
         self.assertEqual(out_move.state, 'cancel')
 
-    def test_route_rules_company_consistency(self):
-        route = self.env['stock.route'].create({
-            'name': 'Test Route',
+    def test_intercompany_unpack(self):
+        """Packages are not multi-company: when 'stock.intercompany_auto_unpack' is enabled and
+        the user has access to packages, delivering a package to another company through the
+        inter-company transit location should unpack it so it doesn't carry over to the
+        receiving company.
+        """
+        self.user_a.group_ids += self.env.ref('stock.group_tracking_lot')
+        self.env['ir.config_parameter'].sudo().set_bool('stock.intercompany_auto_unpack', True)
+        intercom_location = self.env.ref('stock.stock_location_inter_company')
+        intercom_location.write({'active': True})
+
+        product = self.env['product.product'].create({
+            'name': 'product',
+            'is_storable': True,
+        })
+        package = self.env['stock.package'].create({'name': 'Transfer Package'})
+        self.env['stock.quant']._update_available_quantity(product, self.stock_location_a, 1, package_id=package)
+
+        picking = self.env['stock.picking'].with_user(self.user_a).create({
             'company_id': self.company_a.id,
-            'rule_ids': [
-                (0, 0, {
-                    'name': 'Buy',
-                    'action': 'pull_push',
-                    'company_id': self.company_a.id,
-                    'location_dest_id': self.stock_location_a.id,
-                    'picking_type_id': self.warehouse_a.in_type_id.id,
-                })
-            ]
+            'partner_id': self.company_b.partner_id.id,
+            'picking_type_id': self.warehouse_a.out_type_id.id,
+            'location_id': self.stock_location_a.id,
+            'location_dest_id': intercom_location.id,
+        })
+        self.env['stock.move'].create({
+            'picking_id': picking.id,
+            'company_id': self.company_a.id,
+            'product_id': product.id,
+            'uom_id': product.uom_id.id,
+            'product_uom_qty': 1.0,
+            'location_id': self.stock_location_a.id,
+            'location_dest_id': intercom_location.id,
+        })
+        picking.with_user(self.user_a).action_confirm()
+        picking.with_user(self.user_a).action_assign()
+        move_line = picking.move_line_ids
+        move_line.result_package_id = package
+        move_line.quantity = 1.0
+        picking.move_ids.picked = True
+        picking.with_user(self.user_a).button_validate()
+
+        self.assertEqual(picking.state, 'done')
+        self.assertFalse(package.quant_ids, "The package should have been unpacked after the intercompany transfer")
+        quant = self.env['stock.quant'].search([
+            ('product_id', '=', product.id),
+            ('location_id', '=', intercom_location.id),
+        ])
+        self.assertRecordValues(quant, [{'quantity': 1, 'package_id': False}])
+
+    def test_quants_visibility_with_multi_company_receipt(self):
+        """Tests that validating a receipt with both companies selected
+        doesn't leak the negative vendor quant to Company B's reports.
+        """
+        product = self.env['product.product'].create({
+            'name': 'Test Storable Product',
+            'type': 'consu',
+            'is_storable': True,
+            'company_id': self.company_a.id,
         })
 
-        with self.assertRaises(ValidationError):
-            route.write({'company_id': self.company_b.id})
+        supplier_location = self.env.ref('stock.stock_location_suppliers')
+        receipt = self.env['stock.picking'].with_company(self.company_a).create({
+            'picking_type_id': self.warehouse_a.in_type_id.id,
+            'location_id': supplier_location.id,
+            'location_dest_id': self.stock_location_a.id,
+            'move_ids': [Command.create({
+                'product_id': product.id,
+                'location_id': supplier_location.id,
+                'location_dest_id': self.stock_location_a.id,
+                'product_uom_qty': 1,
+            })],
+        })
+        receipt.button_validate()
 
-        with self.assertRaises(ValidationError):
-            route.write({'rule_ids': [
-                (0, 0, {
-                    'name': 'Buy',
-                    'action': 'pull_push',
-                    'company_id': self.company_b.id,
-                    'location_dest_id': self.stock_location_b.id,
-                    'picking_type_id': self.warehouse_b.in_type_id.id,
-                })
-            ]})
+        base_domain = [('product_id', '=', product.id)]
+        domain_a = Domain.AND([base_domain, self.env['stock.quant'].with_context(allowed_company_ids=self.company_a.ids)._get_quants_action().get('domain') or []])
+        domain_b = Domain.AND([base_domain, self.env['stock.quant'].with_context(allowed_company_ids=self.company_b.ids)._get_quants_action().get('domain') or []])
+        quants_company_a = self.env['stock.quant'].with_company(self.company_a).search(domain_a)
+        quants_company_b = self.env['stock.quant'].with_company(self.company_b).search(domain_b)
+        self.assertTrue(quants_company_a)
+        self.assertFalse(quants_company_b)
+
+    def test_quants_visibility_in_branch_company(self):
+        '''
+        Ensure quants present in a branch company are visible in its' report, even when the product
+        is set for the parent company.
+        '''
+        product = self.env['product.product'].create({
+            'name': 'Test Storable Product',
+            'type': 'consu',
+            'is_storable': True,
+            'company_id': self.company_a.id,
+        })
+        self.env['stock.quant'].create([{
+            'location_id': self.stock_location_branch_a.id,
+            'product_id': product.id,
+            'inventory_quantity': 10,
+        }])
+        base_domain = [('product_id', '=', product.id)]
+        domain = Domain.AND([base_domain, self.env['stock.quant'].with_company(self.branch_company_a)._get_quants_action()['domain']])
+        quants_branch = self.env['stock.quant'].with_company(self.branch_company_a).search(domain)
+        self.assertTrue(quants_branch)
+
+    def test_resupply_intercompany_warehouse(self):
+        """ Ensure that when resupplying from a warehouse from another company, the partner are correctly set on each side.
+        """
+        product = self.env['product.product'].create({
+            'name': 'Something',
+            'is_storable': True,
+        })
+        self.warehouse_a.resupply_wh_ids = [Command.link(self.warehouse_b.id)]
+        self.env['stock.quant']._update_available_quantity(product, self.stock_location_b, 10)
+
+        orderpoint = self.env['stock.warehouse.orderpoint'].with_user(self.user_a).create({
+            'location_id': self.stock_location_a.id,
+            'trigger': 'manual',
+            'product_id': product.id,
+            'product_min_qty': 10,
+            'product_max_qty': 10,
+            'route_id': self.warehouse_a.resupply_route_ids.id,
+        })
+        op_name = orderpoint.name
+        orderpoint.action_replenish()
+        pickings = self.env['stock.picking'].sudo().search([('origin', '=', op_name)])
+        in_from_b = pickings.filtered(lambda p: p.picking_type_code == 'incoming')
+        out_to_a = pickings - in_from_b
+
+        self.assertRecordValues(in_from_b, [{
+            'company_id': self.company_a.id,
+            'partner_id': self.warehouse_b.partner_id.id,
+            'location_id': self.interco_location.id,
+            'location_dest_id': self.stock_location_a.id,
+            'state': 'waiting',
+        }])
+
+        self.assertRecordValues(out_to_a, [{
+            'company_id': self.company_b.id,
+            'partner_id': self.warehouse_a.partner_id.id,
+            'location_id': self.stock_location_b.id,
+            'location_dest_id': self.interco_location.id,
+            'state': 'assigned',
+        }])
+
+        out_to_a.button_validate()
+        self.assertEqual(in_from_b.state, 'assigned')
+
+    def test_resupply_inter_warehouse(self):
+        """ Ensure that when resupplying from another warehouse, the partner are correctly set on each side.
+        """
+        product = self.env['product.product'].create({
+            'name': 'Something',
+            'is_storable': True,
+        })
+        other_warehouse = self.env['stock.warehouse'].create({
+            'name': 'Other warehouse',
+            'code': 'OWH',
+            'company_id': self.company_a.id,
+        })
+        inter_wh_location = self.company_a.internal_transit_location_id
+        self.warehouse_a.resupply_wh_ids = [Command.link(other_warehouse.id)]
+        self.env['stock.quant']._update_available_quantity(product, other_warehouse.lot_stock_id, 10)
+
+        orderpoint = self.env['stock.warehouse.orderpoint'].with_company(self.company_a).create({
+            'location_id': self.stock_location_a.id,
+            'trigger': 'manual',
+            'product_id': product.id,
+            'product_min_qty': 10,
+            'product_max_qty': 10,
+            'route_id': self.warehouse_a.resupply_route_ids.id,
+        })
+        op_name = orderpoint.name
+        orderpoint.action_replenish()
+        pickings = self.env['stock.picking'].search([('origin', '=', op_name)])
+        in_from_other = pickings.filtered(lambda p: p.picking_type_code == 'incoming')
+        out_to_a = pickings - in_from_other
+
+        self.assertRecordValues(in_from_other, [{
+            'company_id': self.company_a.id,
+            'partner_id': other_warehouse.partner_id.id,
+            'location_id': inter_wh_location.id,
+            'location_dest_id': self.stock_location_a.id,
+            'state': 'waiting',
+        }])
+
+        self.assertRecordValues(out_to_a, [{
+            'company_id': self.company_a.id,
+            'partner_id': self.warehouse_a.partner_id.id,
+            'location_id': other_warehouse.lot_stock_id.id,
+            'location_dest_id': inter_wh_location.id,
+            'state': 'assigned',
+        }])
+
+        out_to_a.button_validate()
+        self.assertEqual(in_from_other.state, 'assigned')

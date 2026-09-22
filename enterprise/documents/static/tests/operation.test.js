@@ -52,8 +52,6 @@ DocumentsModels.DocumentsDocument._views = {
     </form>`,
 };
 DocumentsModels.DocumentsOperation._views = { form: basicDocumentsOperationFormArch };
-onRpc("/documents/touch/accessTokenRequest", () => ({}));
-onRpc("/documents/touch/accessTokenDuplicateTestDoc", () => ({}));
 onRpc("action_confirm", () => ({}));
 
 test("Duplicate a document in a Newly made folder", async function () {
@@ -66,7 +64,7 @@ test("Duplicate a document in a Newly made folder", async function () {
 
     await contains(".o_kanban_record:contains('Duplicate Test Doc') .o_record_selector").click();
     await contains(".o_dropdown_title").click();
-    await contains(".o-dropdown-item .fa-copy").click();
+    await contains(".o-dropdown-item:contains('Duplicate')").click();
     await animationFrame();
 
     expect(".btn-primary:contains('Duplicate in My Drive')").toHaveCount(1);
@@ -99,7 +97,7 @@ test('Internal users can always move to "My Drive"', async function () {
     await contains(".o_kanban_record:contains('Request') .o_record_selector").click();
     await contains(".o_dropdown_title").click();
 
-    await contains(".o-dropdown-item .fa-sign-in").click(); // Move (not 'to Trash')
+    await contains(".o-dropdown-item:contains('Move')").click();
     await animationFrame();
     expect(".btn-primary:contains('Move to My Drive')").not.toHaveAttribute("disabled");
     expect(".btn-secondary:contains('Create a folder in My Drive')").toHaveCount(1);
@@ -130,7 +128,7 @@ test("Portal user without edit folder has no Move button", async function () {
     await contains(".o_kanban_record:contains('Request') .o_record_selector").click();
     await contains(".o_dropdown_title").click();
     await waitFor(".o-dropdown-item");
-    expect(".o-dropdown-item .fa-sign-in").toHaveCount(0); // Move (not 'to Trash')
+    expect(".o-dropdown-item:contains('Move')").toHaveCount(0);
 });
 
 test("Portal user with any edit folder has the Move button", async function () {
@@ -151,7 +149,7 @@ test("Portal user with any edit folder has the Move button", async function () {
 
     await contains(".o_kanban_record:contains('Request') .o_record_selector").click();
     await contains(".o_dropdown_title").click();
-    await contains(".o-dropdown-item .fa-sign-in").click(); // Move (not 'to Trash')
+    await contains(".o-dropdown-item:contains('Move')").click();
     await waitFor(".btn-primary:contains('Move to Folder 1')");
     expect(".btn-secondary:contains('Create a folder')").toHaveCount(0);
 });

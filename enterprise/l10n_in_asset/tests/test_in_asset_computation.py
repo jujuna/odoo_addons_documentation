@@ -9,6 +9,8 @@ from odoo.addons.account_asset.tests.common import TestAccountAssetCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestIndianAccountAsset(TestAccountAssetCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountAssetCommon.setup_country('in')
     def setUpClass(cls):
@@ -16,7 +18,7 @@ class TestIndianAccountAsset(TestAccountAssetCommon):
 
     @freeze_time("2024-12-01")
     def test_degressive_3_years_no_depreciated_amount(self):
-        in_asset = self.create_asset(value=100000, periodicity="yearly", periods=3, method='degressive', acquisition_date="2023-04-01", salvage_value=5000, method_progress_factor=0.6316)
+        in_asset = self.create_asset(value=100000, method_period="12", method_number=3, method='degressive', acquisition_date="2023-04-01", salvage_value=5000, method_progress_factor=0.6316)
         in_asset.validate()
 
         self.assertEqual(in_asset.state, 'open')
@@ -29,7 +31,7 @@ class TestIndianAccountAsset(TestAccountAssetCommon):
 
     @freeze_time("2024-12-01")
     def test_degressive_3_years(self):
-        in_asset = self.create_asset(value=100000, periodicity="yearly", periods=3, method='degressive', acquisition_date="2023-04-01", salvage_value=5000, method_progress_factor=0.6316, already_depreciated_amount_import=30000)
+        in_asset = self.create_asset(value=100000, method_period="12", method_number=3, method='degressive', acquisition_date="2023-04-01", salvage_value=5000, method_progress_factor=0.6316, already_depreciated_amount_import=30000)
         in_asset.validate()
 
         self.assertEqual(in_asset.state, 'open')
@@ -42,7 +44,7 @@ class TestIndianAccountAsset(TestAccountAssetCommon):
 
     @freeze_time("2024-12-01")
     def test_degressive_negative_3_years(self):
-        in_asset = self.create_asset(value=-100000, periodicity="yearly", periods=3, method='degressive', acquisition_date="2023-04-01", salvage_value=-5000, method_progress_factor=0.6316, already_depreciated_amount_import=-30000)
+        in_asset = self.create_asset(value=-100000, method_period="12", method_number=3, method='degressive', acquisition_date="2023-04-01", salvage_value=-5000, method_progress_factor=0.6316, already_depreciated_amount_import=-30000)
         in_asset.validate()
 
         self.assertEqual(in_asset.state, 'open')
@@ -55,10 +57,10 @@ class TestIndianAccountAsset(TestAccountAssetCommon):
 
     @freeze_time("2024-12-01")
     def test_degressive_5_years_then_increase(self):
-        in_asset = self.create_asset(value=100000, periodicity="yearly", periods=5, method='degressive', acquisition_date="2023-04-01", salvage_value=5000, method_progress_factor=0.4507, already_depreciated_amount_import=45070)
+        in_asset = self.create_asset(value=100000, method_period="12", method_number=5, method='degressive', acquisition_date="2023-04-01", salvage_value=5000, method_progress_factor=0.4507, already_depreciated_amount_import=45070)
         in_asset.validate()
         self.env['asset.modify'].create({
-            'asset_id': in_asset.id,
+            'asset_variant_id': in_asset.main_variant_id.id,
             'name': 'Test reason',
             'date':  fields.Date.to_date("2024-03-31"),
             'l10n_in_value_residual': 2 * in_asset.l10n_in_value_residual,
@@ -72,10 +74,10 @@ class TestIndianAccountAsset(TestAccountAssetCommon):
             self._get_depreciation_move_values(date='2027-03-31', depreciation_value=7469.93, depreciated_value=90895.87, remaining_value=9104.13, state='draft'),
             self._get_depreciation_move_values(date='2028-03-31', depreciation_value=4104.13, depreciated_value=95000.00, remaining_value=5000.00, state='draft'),
         ])
-        self.assertEqual(in_asset.children_ids[0].original_value, 54930.00)
-        self.assertEqual(in_asset.children_ids[0].salvage_value, 5000.00)
-        self.assertEqual(in_asset.children_ids[0].l10n_in_value_residual, 49930.00)
-        self.assertRecordValues(in_asset.children_ids[0].depreciation_move_ids.sorted(lambda mv: (mv.date, mv.id)), [
+        self.assertEqual(in_asset.main_variant_id.children_ids[0].original_value, 54930.00)
+        self.assertEqual(in_asset.main_variant_id.children_ids[0].salvage_value, 5000.00)
+        self.assertEqual(in_asset.main_variant_id.children_ids[0].l10n_in_value_residual, 49930.00)
+        self.assertRecordValues(in_asset.main_variant_id.children_ids[0].depreciation_move_ids.sorted(lambda mv: (mv.date, mv.id)), [
             self._get_depreciation_move_values(date='2025-03-31', depreciation_value=24756.95, depreciated_value=24756.95, remaining_value=30173.05, state='draft'),
             self._get_depreciation_move_values(date='2026-03-31', depreciation_value=13598.99, depreciated_value=38355.94, remaining_value=16574.06, state='draft'),
             self._get_depreciation_move_values(date='2027-03-31', depreciation_value=7469.93, depreciated_value=45825.87, remaining_value=9104.13, state='draft'),
@@ -84,10 +86,10 @@ class TestIndianAccountAsset(TestAccountAssetCommon):
 
     @freeze_time("2024-12-01")
     def test_degressive_5_years_then_decrease(self):
-        in_asset = self.create_asset(value=100000, periodicity="yearly", periods=5, method='degressive', acquisition_date="2023-04-01", salvage_value=5000, method_progress_factor=0.4507, already_depreciated_amount_import=45070)
+        in_asset = self.create_asset(value=100000, method_period="12", method_number=5, method='degressive', acquisition_date="2023-04-01", salvage_value=5000, method_progress_factor=0.4507, already_depreciated_amount_import=45070)
         in_asset.validate()
         self.env['asset.modify'].create({
-            'asset_id': in_asset.id,
+            'asset_variant_id': in_asset.main_variant_id.id,
             'name': 'Test reason',
             'date':  fields.Date.to_date("2024-03-31"),
             'l10n_in_value_residual': in_asset.l10n_in_value_residual - 500,

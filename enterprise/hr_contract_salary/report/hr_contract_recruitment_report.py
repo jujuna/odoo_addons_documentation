@@ -2,6 +2,7 @@
 
 from odoo import tools
 from odoo import fields, models, _
+from odoo.tools import SQL
 
 
 class HrContractRecruitmentReport(models.Model):
@@ -45,8 +46,8 @@ class HrContractRecruitmentReport(models.Model):
             "target": "current",
         }
 
-    def _query(self, fields=""):
-        return (
+    def _query(self):
+        return SQL(
             """
             SELECT
             o.id as id,
@@ -62,13 +63,13 @@ class HrContractRecruitmentReport(models.Model):
             CASE WHEN o.state='cancelled' THEN 1 ELSE 0 END as cancelled,
             CASE WHEN o.state='expired' THEN 1 ELSE 0 END as expired
             FROM hr_contract_salary_offer o
-            %s
             """
-            % fields
         )
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute(
-            """CREATE or REPLACE VIEW %s as (%s)""" % (self._table, self._query())
-        )
+        self.env.cr.execute(SQL(
+            """CREATE or REPLACE VIEW %s as (%s)""",
+            SQL.identifier(self._table),
+            self._query(),
+        ))

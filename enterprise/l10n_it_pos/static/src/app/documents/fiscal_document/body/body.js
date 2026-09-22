@@ -1,8 +1,8 @@
-import { Component } from "@odoo/owl";
-import { usePos } from "@point_of_sale/app/hooks/pos_hook";
+import { Component, useProps, t } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { formatFloat } from "@web/core/utils/numbers";
 import { comp, EQ } from "@point_of_sale/app/utils/numbers";
+import { PosOrder } from "@point_of_sale/app/models/pos_order";
 
 import {
     PrintRecMessage,
@@ -11,6 +11,7 @@ import {
     PrintRecRefund,
     PrintRecItemAdjustment,
     PrintRecSubtotalAdjustment,
+    PrintNormal,
 } from "@l10n_it_pos/app/fiscal_printer/commands";
 
 export class Body extends Component {
@@ -23,18 +24,17 @@ export class Body extends Component {
         PrintRecRefund,
         PrintRecItemAdjustment,
         PrintRecSubtotalAdjustment,
+        PrintNormal,
     };
 
-    static props = {
-        order: {
-            type: Object,
-            optional: true, // To keep backward compatibility
-        },
-    };
+    props = useProps({
+        order: t.instanceOf(PosOrder),
+        isBasicPrint: t.boolean().optional(false),
+        isEarlyPrint: t.boolean().optional(false),
+    });
 
     setup() {
-        this.pos = usePos();
-        this.order = this.props.order || this.pos.getOrder();
+        this.order = this.props.order;
         this.adjustment = this.order.appliedRounding && {
             description: _t("Rounding"),
             amount: this._itFormatCurrency(Math.abs(this.order.appliedRounding)),
@@ -43,14 +43,14 @@ export class Body extends Component {
     }
 
     _itFormatCurrency(amount) {
-        const decPlaces = this.order.currency_id.decimal_places;
+        const decPlaces = this.order.currency.decimal_places;
         return formatFloat(amount, {
             thousandsSep: "",
             digits: [0, decPlaces],
         });
     }
     _itFormatQty(qty) {
-        const ProductUnit = this.pos.models["decimal.precision"].find(
+        const ProductUnit = this.order.models["decimal.precision"].find(
             (dp) => dp.name === "Product Unit"
         );
         const decimal_places = Math.min(3, ProductUnit.digits);
@@ -84,6 +84,8 @@ export class Body extends Component {
             const unitPriceFormatted = this._itFormatCurrency(
                 isGlobalDiscount ? -unitPrice : unitPrice
             );
+            const description = isRefund ? _t("%s (refund)", productName) : productName;
+            const totalPriceFormatted = this._itFormatCurrency(quantity * unitPrice);
 
             return {
                 isRefund,
@@ -107,6 +109,8 @@ export class Body extends Component {
                             : calculateDiscountAmount(line)
                     ),
                 },
+                message: this._itFormatQty(quantity) + " x " + description,
+                priceTotal: totalPriceFormatted,
             };
         });
     }
@@ -121,5 +125,9 @@ export class Body extends Component {
                 index: payment.payment_method_id.it_payment_index,
                 id: payment.id,
             }));
+    }
+
+    get subtotal() {
+        return _t("Subtotal: ") + this._itFormatCurrency(this.order.totalDue);
     }
 }

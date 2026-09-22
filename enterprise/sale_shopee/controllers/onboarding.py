@@ -2,24 +2,31 @@
 
 import hmac
 
-from odoo import _, http
+from odoo import http
 from odoo.exceptions import AccessError, ValidationError
 from odoo.http import request
+
 from odoo.addons.sale_shopee import const, utils
 
 
 class ShopeeController(http.Controller):
-
     @http.route(
-        '/shopee/return_from_authorization/<int:account_id>/<int:company_id>/<int:timestamp>/<string:sign>',
-        type='http',
-        methods=['GET'],
-        auth='user',
+        "/shopee/return_from_authorization/<int:account_id>/<int:company_id>/<int:timestamp>/<string:sign>",
+        type="http",
+        methods=["GET"],
+        auth="user",
     )
     def shopee_return_from_authorization(
-        self, account_id, company_id, timestamp, sign, code=False, shop_id=False, main_account_id=False
+        self,
+        account_id,
+        company_id,
+        timestamp,
+        sign,
+        code=False,
+        shop_id=False,
+        main_account_id=False,
     ):
-        """ Callback from Shopee after the user has authorized the app.
+        """Handle the callback from Shopee after the user has authorized the app.
 
         The authorization code is stored in the database and used to retrieve the access token.
 
@@ -30,20 +37,20 @@ class ShopeeController(http.Controller):
         :param str code: The authorization code provided by Shopee.
         :param str shop_id: The shop identifier provided by Shopee.
         :param str main_account_id: The main account identifier provided by Shopee.
-        :rtype: http.response
-        """
-        if not request.env.user.has_group('sales_team.group_sale_manager'):
-            raise AccessError(_("You are not allowed to access this page."))
+        :rtype: odoo.http.response.Response
+        """  # noqa: D401
+        if not self.env.user.has_group("sales_team.group_sale_manager"):
+            raise AccessError(self.env._("You are not allowed to access this page."))
 
-        path = const.API_OPERATIONS_MAPPING['auth_partner']['url_path']
-        account = request.env['shopee.account'].browse(account_id)
+        path = const.API_OPERATIONS_MAPPING["auth_partner"]["url_path"]
+        account = self.env["shopee.account"].browse(account_id)
         if not account:
-            raise ValidationError(_(
-                "Could not find Shopee account with id %(account)s", account=account_id
-            ))
+            raise ValidationError(
+                self.env._("Could not find Shopee account with id %(account)s", account=account_id)
+            )
 
         if not hmac.compare_digest(sign, utils.get_public_sign(account, path, timestamp)):
-            raise AccessError(_("The request signature is not valid."))
+            raise AccessError(self.env._("The request signature is not valid."))
 
         shop_identifiers = [shop_id]
         shop_vals = {}
@@ -51,30 +58,30 @@ class ShopeeController(http.Controller):
             # A temporary shop is created to retrieve the shop_identifiers returned from
             # request_access_token. The temporary shop is then deleted after the shop_identifiers
             # are retrieved. This allows a cleaner code.
-            temp_shop = request.env['shopee.shop'].create({
-                'name': 'temporary shop',
-                'shop_identifier': 1,
-                'account_id': account_id,
+            temp_shop = self.env["shopee.shop"].create({
+                "name": "temporary shop",
+                "shop_identifier": 1,
+                "account_id": account_id,
             })
-            shop_identifiers = utils.with_context(authorization_code=code).request_access_token(
-                temp_shop, main_account_id=main_account_id
+            shop_identifiers = utils.request_access_token(
+                temp_shop.with_context(authorization_code=code), main_account_id=main_account_id
             )
             shop_vals.update({
-                'access_token': temp_shop.access_token,
-                'refresh_token': temp_shop.refresh_token,
-                'access_token_expiration_date': temp_shop.access_token_expiration_date,
+                "access_token": temp_shop.access_token,
+                "refresh_token": temp_shop.refresh_token,
+                "access_token_expiration_date": temp_shop.access_token_expiration_date,
             })
             temp_shop.unlink()
 
-        shop = request.env['shopee.shop']
+        shop = self.env["shopee.shop"]
         for identifier in shop_identifiers:
-            shop = shop.with_context(
-                authorization_code=code
-            ).create_or_update_shop(company_id, account.id, identifier, shop_vals)
+            shop = shop.with_context(authorization_code=code).create_or_update_shop(
+                company_id, account.id, identifier, shop_vals
+            )
 
         # Craft the URL of the Shopee Shop form view
-        redirect_url = f'/odoo/action-sale_shopee.action_shopee_account_list/{account.id}'
+        redirect_url = f"/odoo/action-sale_shopee.action_shopee_account_list/{account.id}"
         if shop_id and shop:
-            redirect_url = f'{redirect_url}/action-sale_shopee.action_shopee_shop_list/{shop.id}'
+            redirect_url = f"{redirect_url}/action-sale_shopee.action_shopee_shop_list/{shop.id}"
 
         return request.redirect(redirect_url, local=False)

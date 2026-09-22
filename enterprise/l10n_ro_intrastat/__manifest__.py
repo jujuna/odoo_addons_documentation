@@ -1,7 +1,6 @@
 {
     'name': "Romania - Intrastat Declaration",
     'category': 'Accounting/Localizations/Reporting',
-    'version': '1.0',
     'description': """
         Romania - Intrastat Declaration
     """,

@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import json
 import logging
 import requests
@@ -11,25 +9,23 @@ from werkzeug.exceptions import Forbidden
 
 from odoo import http, _
 from odoo.http import request
-from odoo.tools import consteq
+from odoo.tools import BinaryBytes, consteq
 from odoo.tools.urls import urljoin as url_join
-from odoo.addons.auth_oauth.controllers.main import fragment_to_query_string
-from odoo.addons.social.controllers.main import SocialController
+
 from odoo.addons.social.controllers.main import SocialValidationException
+from odoo.addons.social_facebook.controllers.meta import SocialMetaController
 
 _logger = logging.getLogger(__name__)
 
 
-class SocialFacebookController(SocialController):
+class SocialFacebookController(SocialMetaController):
     # ========================================================
     # ACCOUNTS MANAGEMENT
     # ========================================================
 
-    @http.route(['/social_facebook/callback'], type='http', auth='user')
-    @fragment_to_query_string
+    @http.route('/social_facebook/callback', type='http', auth='user')
     def social_facebook_account_callback(self, access_token=None, is_extended_token=False, **kw):
-        """ Facebook returns to the callback URL with all its own arguments as hash parameters.
-        We use this very handy 'fragment_to_query_string' decorator to convert them to server readable parameters. """
+        """Facebook returns to the callback URL with all its own arguments as hash parameters."""
         if not request.env.user.has_group('social.group_social_manager'):
             return request.render('social.social_http_error_view',
                                   {'error_message': _('Unauthorized. Please contact your administrator. ')})
@@ -48,7 +44,7 @@ class SocialFacebookController(SocialController):
                 except SocialValidationException as e:
                     return request.render('social.social_http_error_view', {'error_message': e.get_message(), 'documentation_data': e.get_documentation_data()})
 
-        return request.redirect('/odoo/action-social.action_social_stream_post')
+        return request.render('social.social_http_authentication_done')
 
     # ========================================================
     # COMMENTS / LIKES
@@ -64,6 +60,7 @@ class SocialFacebookController(SocialController):
 
         if comment_id and is_edit:
             result = stream_post._facebook_comment_post(
+                stream_post.stream_id.account_id,
                 url_join(request.env['social.media']._FACEBOOK_ENDPOINT_VERSIONED, comment_id),
                 message,
                 existing_attachment_id=existing_attachment_id,
@@ -71,6 +68,7 @@ class SocialFacebookController(SocialController):
             )
         elif comment_id:
             result = stream_post._facebook_comment_post(
+                stream_post.stream_id.account_id,
                 url_join(request.env['social.media']._FACEBOOK_ENDPOINT_VERSIONED, "%s/comments" % (comment_id)),
                 message,
                 existing_attachment_id=existing_attachment_id,
@@ -78,6 +76,7 @@ class SocialFacebookController(SocialController):
             )
         else:
             result = stream_post._facebook_comment_post(
+                stream_post.stream_id.account_id,
                 url_join(request.env['social.media']._FACEBOOK_ENDPOINT_VERSIONED, "%s/comments" % (stream_post.facebook_post_id)),
                 message,
                 existing_attachment_id=existing_attachment_id,
@@ -106,6 +105,20 @@ class SocialFacebookController(SocialController):
     def social_facebook_like_post(self, stream_post_id, like):
         stream_post = self._get_social_stream_post(stream_post_id, 'facebook')
         stream_post._facebook_like(stream_post.facebook_post_id, like)
+        stream_post._facebook_update_likes(like)
+
+    @http.route('/social_facebook/webhook', type='http', auth='public', methods=['GET', 'POST'], csrf=False, readonly=False)
+    def social_facebook_webhook(self, **kwargs):
+        if request.httprequest.method == 'GET':
+            webhook_verify_token = self.env['ir.config_parameter'].sudo().get_str(
+                'social.facebook_webhook_verify_token')
+            return self._meta_verify_webhook(kwargs, webhook_verify_token)
+
+        webhook_client_secret = None
+        if self.env['ir.config_parameter'].sudo().get_bool('social.facebook_use_own_account'):
+            webhook_client_secret = self.env['ir.config_parameter'].sudo().get_str('social.facebook_client_secret')
+
+        return self._meta_process_webhook("facebook_account_id", "facebook_access_token", webhook_client_secret)
 
     # ========================================================
     # MISC / UTILITY
@@ -137,20 +150,25 @@ class SocialFacebookController(SocialController):
         accounts.unlink()
         return 'OK'
 
-    @http.route(['/social_facebook/redirect_to_profile/<int:account_id>/<facebook_user_id>'], type='http', auth='user')
-    def social_facebook_redirect_to_profile(self, account_id, facebook_user_id, name=''):
+    @http.route(['/social_facebook/redirect_to_profile/<facebook_user_id>'], type='http', auth='user')
+    def social_facebook_redirect_to_profile(self, facebook_user_id, account_ids='[]', name=''):
         """
         All profiles are not available through a direct link so we need to
         - Try to get a direct link to their profile
         - If we can't, we perform a search on Facebook with their name
         """
+        account_ids = json.loads(account_ids)
+        if account_ids:
+            account_id = request.env['social.account'].search([("id", "in", account_ids), ("media_type", "=", "facebook")], limit=1).id
+        else:
+            return request.redirect(f'https://www.facebook.com/search/?q={urllib.parse.quote(name)}', local=False)
         account = request.env['social.account'].browse(account_id)
 
         json_response = requests.get(
             url_join(request.env['social.media']._FACEBOOK_ENDPOINT_VERSIONED, facebook_user_id),
             params={
                 'fields': 'name,link',
-                'access_token': account.facebook_access_token
+                'access_token': account._get_facebook_access_token()
             },
             timeout=5
         ).json()
@@ -187,7 +205,7 @@ class SocialFacebookController(SocialController):
             message = _('You need to be the manager of a Facebook Page to post with Odoo Social.\n Please create one and make sure it is linked to your account.')
             documentation_link = 'https://facebook.com/business/pages/manage'
             documentation_link_label = _('Read More about Facebook Pages')
-            documentation_link_icon_class = 'fa fa-facebook'
+            documentation_link_icon_class = 'oi_facebook'
             raise SocialValidationException(message, documentation_link, documentation_link_label, documentation_link_icon_class)
 
         accounts_to_create = []
@@ -199,7 +217,7 @@ class SocialFacebookController(SocialController):
             if existing_accounts.get(account_id):
                 # update access token
                 # TODO awa: maybe check for name/picture update?
-                existing_accounts.get(account_id).write({
+                existing_accounts.get(account_id).sudo().write({
                     'active': True,
                     'facebook_access_token': access_token,
                     'social_account_handle': social_account_handle,
@@ -217,7 +235,7 @@ class SocialFacebookController(SocialController):
                 })
 
         if accounts_to_create:
-            request.env['social.account'].create(accounts_to_create)
+            self.env['social.account'].sudo().create(accounts_to_create)
 
     def _facebook_get_extended_access_token(self, access_token, media):
         """ The way that it works is Facebook sends you a token that is valid for 2 hours
@@ -230,8 +248,8 @@ class SocialFacebookController(SocialController):
 
         More details on this mechanic: https://www.devils-heaven.com/facebook-access-tokens/ """
 
-        facebook_app_id = request.env['ir.config_parameter'].sudo().get_param('social.facebook_app_id')
-        facebook_client_secret = request.env['ir.config_parameter'].sudo().get_param('social.facebook_client_secret')
+        facebook_app_id = request.env['ir.config_parameter'].sudo().get_str('social.facebook_app_id')
+        facebook_client_secret = request.env['ir.config_parameter'].sudo().get_str('social.facebook_client_secret')
         extended_token_url = url_join(request.env['social.media']._FACEBOOK_ENDPOINT, "/oauth/access_token")
         extended_token_request = requests.post(extended_token_url,
             params={
@@ -246,7 +264,7 @@ class SocialFacebookController(SocialController):
 
     def _facebook_get_profile_image(self, account_id):
         profile_image_url = url_join(request.env['social.media']._FACEBOOK_ENDPOINT_VERSIONED, '%s/picture?height=300' % account_id)
-        return base64.b64encode(requests.get(profile_image_url, timeout=10).content)
+        return BinaryBytes(requests.get(profile_image_url, timeout=10).content)  # FIXME check response status
 
     def _facebook_get_existing_accounts(self, media_id, json_response):
         """ Returns the social.accounts already created as:

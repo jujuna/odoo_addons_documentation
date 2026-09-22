@@ -1,29 +1,30 @@
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
-import { Component, useState, useExternalListener, onWillStart, onMounted } from "@odoo/owl";
+import { Component, onWillStart, onMounted, proxy, t, useListener, useProps } from "@odoo/owl";
 
 export class SignItemCustomPopover extends Component {
     static template = "sign.SignItemCustomPopover";
     static components = {};
-    static props = {
-        id: { type: Number },
-        alignment: { type: String },
-        header_title: {type: String },
-        placeholder: { type: String },
-        required: { type: Boolean },
-        constant: { type: Boolean },
-        option_ids: { type: Array },
-        onValidate: { type: Function },
-        type: { type: String },
-        onDelete: { type: Function },
-        onDuplicate: { type: Function },
-        onClose: { type: Function },
-        debug: { type: String },
-        close: { type: Function },
-        onCopyItem: { type: Function },
-        num_options: {type: Number, optional: true},
-        radio_set_id: {type: Number, optional: true},
-    };
+
+    props = useProps({
+        id: t.number(),
+        alignment: t.string(),
+        header_title: t.string(),
+        placeholder: t.string(),
+        required: t.boolean(),
+        constant: t.boolean(),
+        option_ids: t.array(),
+        onValidate: t.function(),
+        type: t.string(),
+        onDelete: t.function(),
+        onDuplicate: t.function(),
+        onClose: t.function(),
+        debug: t.string(),
+        close: t.function(),
+        onCopyItem: t.function(),
+        num_options: t.number().optional(),
+        radio_set_id: t.number().optional(),
+    });
 
     setup() {
         this.alignmentOptions = [
@@ -31,7 +32,7 @@ export class SignItemCustomPopover extends Component {
             { title: _t("Center"), key: "center" },
             { title: _t("Right"), key: "right" },
         ];
-        this.state = useState({
+        this.state = proxy({
             alignment: this.props.alignment,
             placeholder: this.props.placeholder,
             constant: this.props.constant,
@@ -42,36 +43,40 @@ export class SignItemCustomPopover extends Component {
             selectionOptionsText: "",
         });
         this.orm = useService("orm");
-        onWillStart(async() => {
-            const options = await this.orm.searchRead(
-                "sign.item.option",
-                [["id", "in", this.props.option_ids]],
-            );
-            this.state.selectionOptionsText = options.map(option => option.value).join('\n');
+        onWillStart(async () => {
+            const options = await this.orm.searchRead("sign.item.option", [
+                ["id", "in", this.props.option_ids],
+            ]);
+            this.state.selectionOptionsText = options.map((option) => option.value).join("\n");
         });
 
+        this.isMounted = false;
         /**
          * Focuses the selection options textarea when the popover is rendered
          */
         onMounted(() => {
             if (this.props.type === "selection") {
-                const textarea = document.querySelector('.o_sign_selection_input_option textarea');
+                const textarea = document.querySelector(".o_sign_selection_input_option textarea");
                 if (textarea) {
                     textarea.focus();
                 }
             }
+            this.isMounted = true;
         });
 
         this.notification = useService("notification");
-        this.typesWithAlignment = new Set(["text", "textarea"]);
-        useExternalListener(window, "keydown", this.onGlobalKeyDown, { capture: true });
+        this.typesWithAlignment = new Set(["text", "textarea", "date"]);
+        useListener(window, "keydown", this.onGlobalKeyDown.bind(this), { capture: true });
     }
 
     onGlobalKeyDown(event) {
-        if(event.key == 'c' && (event.ctrlKey || event.metaKey)) {
-            this.notification.add(("Sign Item Copied"), {type: "success"});
+        if (!this.isMounted) {
+            return;
+        }
+        if (event.key == "c" && (event.ctrlKey || event.metaKey)) {
+            this.notification.add("Sign Item Copied", { type: "success" });
             this.props.onCopyItem(this.props.id);
-        } else if (event.key == 'Delete') {
+        } else if (event.key == "Delete") {
             this.props.onDelete();
         }
     }
@@ -80,7 +85,7 @@ export class SignItemCustomPopover extends Component {
         if (Number(value) < 2) {
             return;
         }
-        this.state['num_options'] = Number(value);
+        this.state["num_options"] = Number(value);
     }
 
     onChange(key, value) {
@@ -98,14 +103,24 @@ export class SignItemCustomPopover extends Component {
 
     async onValidate() {
         if (this.props.type === "selection" && !this.state.selectionOptionsText) {
-            this.notification.add(_t("Selection field cannot be empty. Please add at least one option."), {
-                type: "warning",
-            });
+            this.notification.add(
+                _t("Selection field cannot be empty. Please add at least one option."),
+                {
+                    type: "warning",
+                }
+            );
             return;
         }
 
-        const options = this.state.selectionOptionsText.split('\n').map(opt => opt.trim()).filter(opt => opt);
-        this.state.option_ids = await this.orm.call('sign.item.option', 'get_selection_ids_from_value', [null, options]);
+        const options = this.state.selectionOptionsText
+            .split("\n")
+            .map((opt) => opt.trim())
+            .filter((opt) => opt);
+        this.state.option_ids = await this.orm.call(
+            "sign.item.option",
+            "get_selection_ids_from_value",
+            [null, options]
+        );
         this.props.onValidate(this.state);
     }
 

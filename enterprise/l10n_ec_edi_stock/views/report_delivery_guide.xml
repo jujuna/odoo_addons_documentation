@@ -13,10 +13,7 @@
                                         <span t-field="o.company_id.l10n_ec_legal_name"/>
                                     </h4>
                                     <div style="font-size: 12px;">
-                                        <strong>
-                                            <t t-if="o.company_id.partner_id.l10n_latam_identification_type_id" t-esc="o.company_id.partner_id.l10n_latam_identification_type_id.name" id="inv_tax_id_label"/>
-                                            <t t-else="">RUC/Cédula</t>:
-                                        </strong>
+                                        <strong id="inv_tax_id_label">RUC/Cédula:</strong>
                                         <span t-field="o.company_id.partner_id.vat"/>
                                         <br/>
                                         <t t-if="o.company_id.l10n_ec_special_taxpayer_number">
@@ -43,6 +40,10 @@
                                             RIMPE Contributor Type
                                             <br/>
                                         </t>
+                                        <t t-if="o.company_id.l10n_ec_extra_header_legend_ride">
+                                            <t t-out="o.company_id.l10n_ec_extra_header_legend_ride"/>
+                                            <br/>
+                                        </t>
                                     </div>
                                 </td>
                             </tr>
@@ -55,7 +56,7 @@
                                     <h4 style="letter-spacing: 2px;">
                                         Delivery Guide
                                         <br/>
-                                        <span t-esc="o.l10n_ec_edi_document_number or '/'"/>
+                                        <span t-out="o.l10n_ec_edi_document_number or '/'"/>
                                     </h4>
                                     <t t-if="o.l10n_ec_authorization_number">
                                         <div class="text-center" style="font-size: 12px">
@@ -82,64 +83,64 @@
         </template>
 
         <template id="report_delivery_guide_lang">
+            <t t-set="custom_header" t-value="'l10n_ec_edi_stock.custom_header'"/>
             <t t-call="web.html_container">
-                <t t-call="web.external_layout">
+                <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                <t t-call="web.external_layout" o="o" colspan="6">
                     <div class="clearfix">
                         <div class="page mb-4">
-                            <t t-set="o" t-value="o.with_context(lang=lang)"/>
-                            <t t-call="l10n_ec_edi_stock.custom_header"/>
                             <div id="informations" class="mb-4">
                                 <div class="row">
                                     <div class="col">
                                         <strong>Identification (Carrier): </strong>
-                                        <span t-esc="o.l10n_ec_transporter_id.vat"/>
+                                        <span t-out="o.l10n_ec_transporter_id._get_preferred_legal_entity_identifier_vals().get('value', '')"/>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
                                         <strong>Company Name / Name and Surname: </strong>
-                                        <span t-esc="o.l10n_ec_transporter_id.name"/>
+                                        <span t-out="o.l10n_ec_transporter_id.name"/>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
                                         <strong>License Plate: </strong>
-                                        <span t-esc="o.l10n_ec_plate_number"/>
+                                        <span t-out="o.l10n_ec_plate_number"/>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
                                         <strong>Departure Address: </strong>
-                                        <span t-esc="o.picking_type_id.warehouse_id.partner_id._display_address()"/>
+                                        <span t-out="o.picking_type_id.warehouse_id.partner_id.contact_address"/>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-6">
                                         <strong>Departure Date: </strong>
-                                        <span t-esc="o.l10n_ec_delivery_start_date"/>
+                                        <span t-out="o.l10n_ec_delivery_start_date"/>
                                     </div>
                                     <div class="col-6">
                                         <strong>Arrival Date: </strong>
-                                        <span t-esc="o.l10n_ec_delivery_end_date"/>
+                                        <span t-out="o.l10n_ec_delivery_end_date"/>
                                     </div>
                                 </div>
                                 <br/>
                                 <div class="row">
                                     <div class="col">
                                         <strong>Move Reason: </strong>
-                                        <span t-esc="o.l10n_ec_transfer_reason"/>
+                                        <span t-out="o.l10n_ec_transfer_reason"/>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
                                         <strong>Identification (Recipient): </strong>
-                                        <span t-esc="o.partner_id.commercial_partner_id.vat"/>
+                                        <span t-out="o.partner_id.commercial_partner_id.vat"/>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
                                         <strong>Company Name / Name and Surname: </strong>
-                                        <span t-esc="o.partner_id.commercial_partner_id.name"/>
+                                        <span t-out="o.partner_id.commercial_partner_id.name"/>
                                     </div>
                                 </div>
                             </div>
@@ -149,7 +150,6 @@
                                     <table class="table table-sm o_main_table table-borderless" name="delivery_guide_line" id="delivery_guide_line_table">
                                         <thead>
                                             <tr>
-                                                <t t-set="colspan" t-value="6"/>
                                                 <th name="th_qty" class="text-start"><span>Quantity</span></th>
                                                 <th name="th_description" class="text-start"><span>Description</span></th>
                                                 <th name="th_code" class="text-start"><span>Main Code</span></th>
@@ -164,8 +164,8 @@
                                                 <tr>
                                                     <td><span t-field="line.quantity"/></td>
                                                     <td><span t-field="line.product_id.partner_ref" t-options="{'widget': 'text'}"/></td>
-                                                    <td><span t-esc="line.product_id.barcode or line.product_id.default_code or ''"/></td>
-                                                    <td><span t-esc="line.product_id.l10n_ec_auxiliary_code or ''"/></td>
+                                                    <td><span t-out="line.product_id.barcode or line.product_id.default_code or ''"/></td>
+                                                    <td><span t-out="line.product_id.l10n_ec_auxiliary_code or ''"/></td>
                                                     <td groups="stock.group_lot_on_delivery_slip"><span t-field="line.lot_id" /></td>
                                                 </tr>
                                             </t>
@@ -184,10 +184,10 @@
                                                     <t t-foreach="additional_info.items()" t-as="item">
                                                         <tr t-if="item[1]">
                                                             <td>
-                                                                <span t-esc="str(item[0])"/>
+                                                                <span t-out="str(item[0])"/>
                                                             </td>
                                                             <td>
-                                                                <span t-esc="str(item[1])"/>
+                                                                <span t-out="str(item[1])"/>
                                                             </td>
                                                         </tr>
                                                     </t>
@@ -215,7 +215,6 @@
             <field name="model">stock.picking</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">l10n_ec_edi_stock.report_delivery_guide</field>
-            <field name="report_file">l10n_ec_edi_stock.report_delivery_guide</field>
             <field name="print_report_name">'GuíRe %s' % (object.l10n_ec_edi_document_number or 's/n')</field>
             <field name="binding_model_id" ref="model_stock_picking"/>
             <field name="binding_type">report</field>

@@ -1,9 +1,9 @@
-import { describe, test } from "@odoo/hoot";
-import { click, contains, start, startServer } from "@mail/../tests/mail_test_helpers";
+import { expect, test } from "@odoo/hoot";
+import { click, contains, patchUiSize, start, startServer } from "@mail/../tests/mail_test_helpers";
 import { setupVoipTests } from "@voip/../tests/voip_test_helpers";
-import { serverState } from "@web/../tests/web_test_helpers";
+import { patchWithCleanup, serverState } from "@web/../tests/web_test_helpers";
+import { Voip } from "@voip/core/web/voip_service";
 
-describe.current.tags("desktop");
 setupVoipTests();
 
 test("Clicking on systray item when softphone is hidden shows the softphone.", async () => {
@@ -37,5 +37,25 @@ test("Clicking on VoIP systray button with missed calls opens the softphone on r
     });
     await start();
     await click(".o_menu_systray button[title='Show Softphone']");
-    await contains("button.active span:contains('Recent')");
+    await contains("button[data-tab='recent'].active");
+    await contains(".o-voip-TabEntry", { text: "+494066969669" });
+});
+
+test.tags("mobile");
+test("VoIP systray button should be hidden when this is not configured for the current user", async () => {
+    patchWithCleanup(Voip.prototype, {
+        get canCall() {
+            return false;
+        },
+    });
+    await patchUiSize({ width: 500 });
+    await start();
+    expect(".o_menu_systray button[title='Show Softphone']").toHaveClass("d-none");
+});
+
+test.tags("mobile");
+test("VoIP systray button should be displayed when this is configured for the current user", async () => {
+    await patchUiSize({ width: 500 });
+    await start();
+    expect(".o_menu_systray button[title='Show Softphone']").not.toHaveClass("d-none");
 });

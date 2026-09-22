@@ -4,21 +4,45 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 18:07+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/sale_amazon/"
-"th/>\n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 00:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
+"sale_amazon/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_amazon
+#: model:ir.module.module,description:base.module_sale_amazon
+msgid ""
+"\n"
+"Import your Amazon orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and marketplaces.\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(SKU in Amazon).\n"
+"* Deliveries confirmed in Odoo are synchronized in Amazon.\n"
+"* Support for both Fulfilment by Amazon (FBA) and Fulfilment by Merchant "
+"(FBM):\n"
+"    * FBA: A stock location and stock moves allow to monitor your stock in "
+"Amazon Fulfilment\n"
+"      Centers.\n"
+"    * FBM: Delivery notifications are sent to Amazon for each confirmed "
+"picking (partial delivery\n"
+"      friendly).\n"
+msgstr ""
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
@@ -48,24 +72,23 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"            <p>การซิงโครไนซ์คำสั่งซื้อของ Amazon กับข้อมูลอ้างอิง <t t-"
-"out=\"ctx.get('amazon_order_ref') or ''\">อ้างอิง</t> พบข้อผิดพลาดและไม่สมบูรณ์</"
-"p>\n"
-"            <p>เว้นแต่คำสั่งซื้อจะถูกยกเลิกใน SellerCentral "
-"และไม่มีความพยายามในการซิงโครไนซ์อื่น ๆ</p>\n"
-"            หากต้องการกำหนดเวลาสำหรับความพยายามในการซิงโครไนซ์ใหม่ "
-"ให้ดำเนินการดังนี้:\n"
+"            <p>การซิงโครไนซ์คำสั่งซื้อของ Amazon กับข้อมูลอ้างอิง <t t-out=\"ctx.get"
+"('amazon_order_ref') or ''\">อ้างอิง</t> พบข้อผิดพลาดและไม่สมบูรณ์</p>\n"
+"            <p>เว้นแต่คำสั่งซื้อจะถูกยกเลิกใน SellerCentral และไม่มีความพยายามในการซิงโค"
+"รไนซ์อื่น ๆ</p>\n"
+"            หากต้องการกำหนดเวลาสำหรับความพยายามในการซิงโครไนซ์ใหม่ ให้ดำเนินการดัง"
+"นี้:\n"
 "                <p><ol>\n"
 "                    <li>เข้าสู่เครื่องมือสำหรับนักพัฒนา</li>\n"
 "                    <li>เปิดแบบฟอร์มบัญชี Amazon ที่จะสั่งซื้อ</li>\n"
 "                    <li>ไปที่แถบนำทางคำสั่ง</li>\n"
-"                    <li>ตั้งค่าวันที่สำหรับ <em>การซิงค์คำสั่งสุดท้าย</em> "
-"ซึ่งอยู่ก่อนหน้าการอัปเดตสถานะล่าสุดของคำสั่งซื้อ</li>\n"
+"                    <li>ตั้งค่าวันที่สำหรับ <em>การซิงค์คำสั่งสุดท้าย</em> ซึ่งอยู่ก่อนหน้าการอัป"
+"เดตสถานะล่าสุดของคำสั่งซื้อ</li>\n"
 "                    <li>บันทึกการเปลี่ยนแปลงและคลิกที่ปุ่ม <em>ซิงค์คำสั่ง</em> </li>\n"
 "                </ol>\n"
 "            \n"
-"            <p>หากปัญหายังคงอยู่ โปรดติดต่อ <a href=\"https://www.odoo.com/help/"
-"\">Odoo ช่วยเหลือ</a></p>\n"
+"            <p>หากปัญหายังคงอยู่ โปรดติดต่อ <a href=\"https://www.odoo.com/help/\">"
+"Odoo ช่วยเหลือ</a></p>\n"
 "        </div>\n"
 "        "
 
@@ -168,8 +191,8 @@ msgstr ""
 "            </style>\n"
 "            <div>\n"
 "                <p>การซิงโครไนซ์ใบสั่งจัดส่งพบข้อผิดพลาดบางอย่างและไม่เสร็จสมบูรณ์</p>\n"
-"                <p>โปรดแก้ไขปัญหาก่อนที่จะซิงโครไนซ์คำสั่งซื้อการจัดส่งด้วยตนเองอีกครั้ง "
-"เนื่องจากจะไม่มีการพยายามซิงโครไนซ์อื่นๆ</p>\n"
+"                <p>โปรดแก้ไขปัญหาก่อนที่จะซิงโครไนซ์คำสั่งซื้อการจัดส่งด้วยตนเองอีกครั้ง เนื่องจ"
+"ากจะไม่มีการพยายามซิงโครไนซ์อื่นๆ</p>\n"
 "                <p>นี่คือข้อผิดพลาดที่ส่งมาจาก Amazon: </p>\n"
 "                <table class=\"amz_table\">\n"
 "                    <thead>\n"
@@ -185,10 +208,10 @@ msgstr ""
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"></t>\n"
-"                                <t t-"
-"else=\"\">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุระหว่างการซิงโครไนซ์กับ Amazon\n"
-"                                    ขออภัย "
-"คุณต้องตรวจสอบด้วยตนเองว่าสถานะของคำสั่งซื้อนั้นถูกต้องหรือไม่\n"
+"                                <t t-else=\"\">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุระหว่างก"
+"ารซิงโครไนซ์กับ Amazon\n"
+"                                    ขออภัย คุณต้องตรวจสอบด้วยตนเองว่าสถานะของคำสั่งซื้"
+"อนั้นถูกต้องหรือไม่\n"
 "                                    คุณสามารถค้นหาข้อมูลทั้งหมดเกี่ยวกับเรื่องนี้\n"
 "                                    <a href=\"https://www.odoo.com/"
 "documentation/latest/applications/sales/sales/amazon_connector/"
@@ -295,8 +318,8 @@ msgstr ""
 "            </style>\n"
 "            <div>\n"
 "                <p>การซิงโครไนซ์ความพร้อมของสินค้าสำหรับบัญชี Amazon\n"
-"                    <b><t t-out=\"ctx.get('amazon_account') or ''\">อ้างอิง</"
-"t></b>\n"
+"                    <b><t t-out=\"ctx.get('amazon_account') or ''\">อ้างอิง</t>"
+"</b>\n"
 "                    พบข้อผิดพลาดบางอย่างและไม่เสร็จสมบูรณ์</p>\n"
 "                <p>นี่คือข้อผิดพลาดที่ส่งมาจาก Amazon: </p>\n"
 "                <table class=\"amz_table\">\n"
@@ -313,10 +336,10 @@ msgstr ""
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"></t>\n"
-"                                <t t-"
-"else=\"\">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุระหว่างการซิงโครไนซ์กับ Amazon\n"
-"                                    ขออภัย "
-"คุณต้องตรวจสอบด้วยตนเองว่าปริมาณที่มีอยู่สำหรับสินค้านั้นถูกต้องหรือไม่\n"
+"                                <t t-else=\"\">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุระหว่างก"
+"ารซิงโครไนซ์กับ Amazon\n"
+"                                    ขออภัย คุณต้องตรวจสอบด้วยตนเองว่าปริมาณที่มีอยู่สำหรั"
+"บสินค้านั้นถูกต้องหรือไม่\n"
 "                                </t>\n"
 "                            </td>\n"
 "                        </tr>\n"
@@ -376,6 +399,11 @@ msgstr "บัญชี Amazon"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.res_config_settings_view_form
 msgid "Amazon Accounts"
 msgstr "บัญชี Amazon"
+
+#. module: sale_amazon
+#: model:ir.module.module,shortdesc:base.module_sale_amazon
+msgid "Amazon Connector"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__amazon_feed_ref
@@ -473,27 +501,6 @@ msgid ""
 msgstr ""
 "Amazon ต้องการข้อมูลบางอย่างสำหรับสถานที่จัดส่ง โปรดตรวจสอบให้แน่ใจว่ามีข้อมูลดังต่อไปนี้ใน '%"
 "(location_name)s' (%(location)s): ถนน, ประเทศ และรหัสประเทศ"
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"Since the current carrier doesn't automatically provide a tracking "
-"reference, you need to set one manually."
-msgstr ""
-"Amazon กำหนดให้ต้องมีการอ้างอิงการติดตามในการจัดส่งแต่ละครั้ง "
-"เนื่องจากผู้ให้บริการปัจจุบันไม่ได้ให้การอ้างอิงการติดตามโดยอัตโนมัติ คุณจึงต้องตั้งค่าด้วยตนเอง"
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"You need to assign a carrier to this delivery."
-msgstr ""
-"Amazon กำหนดให้ต้องมีการอ้างอิงการติดตามในการจัดส่งแต่ละครั้ง "
-"คุณต้องมอบหมายผู้ให้บริการขนส่งให้กับการจัดส่งนี้"
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -608,7 +615,8 @@ msgstr "Amazon.sg"
 #. module: sale_amazon
 #: model:mail.template,name:sale_amazon.inventory_sync_failure
 msgid "Amazon: Available Inventory for Offers Synchronization Failure"
-msgstr "Amazon: พื้นที่โฆษณาที่พร้อมใช้งานสำหรับข้อเสนอที่ล้มเหลวในการซิงโครไนซ์"
+msgstr ""
+"Amazon: พื้นที่โฆษณาที่พร้อมใช้งานสำหรับข้อเสนอที่ล้มเหลวในการซิงโครไนซ์"
 
 #. module: sale_amazon
 #: model:mail.template,name:sale_amazon.picking_sync_failure
@@ -623,7 +631,7 @@ msgstr "Amazon: ความล้มเหลวในการซิงโค�
 #. module: sale_amazon
 #: model:ir.actions.server,name:sale_amazon.ir_cron_sync_amazon_inventory_ir_actions_server
 msgid "Amazon: sync available inventory"
-msgstr "Amazon: ซิงค์สินค้าคงคลังที่มีอยู่"
+msgstr "Amazon: ซิงค์คลังสินค้าที่มีอยู่"
 
 #. module: sale_amazon
 #: model:ir.actions.server,name:sale_amazon.ir_cron_sync_amazon_pickings_ir_actions_server
@@ -670,11 +678,6 @@ msgstr "ตลาดที่สามารถใช้ได้"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.authorization_error
 msgid "Back to my account"
 msgstr "กลับไปที่บัญชีของฉัน"
-
-#. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
-msgid "Cancel"
-msgstr "ยกเลิก"
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__company_id
@@ -765,11 +768,6 @@ msgstr "ข้อมูลประจำตัว"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Default Products"
 msgstr "สินค้าเริ่มต้น"
-
-#. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
-msgid "Discard"
-msgstr "ละทิ้ง"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
@@ -921,10 +919,10 @@ msgid ""
 "If the date is set in the future, orders placed on this Amazon Account "
 "between the previous and the new date will not be synchronized with Odoo."
 msgstr ""
-"หากวันที่ถูกตั้งไว้ในอดีต คำสั่งซื้อที่ดำเนินการในบัญชี Amazon "
-"นี้ก่อนการซิงโครไนซ์โมดูลครั้งแรกอาจถูกซิงโครไนซ์กับ Odoo\n"
-"หากกำหนดวันที่ในอนาคต คำสั่งซื้อที่ดำเนินการในบัญชี Amazon "
-"นี้ระหว่างวันที่ก่อนหน้าและวันที่ใหม่จะไม่ซิงโครไนซ์กับ Odoo"
+"หากวันที่ถูกตั้งไว้ในอดีต คำสั่งซื้อที่ดำเนินการในบัญชี Amazon นี้ก่อนการซิงโครไนซ์โมดูลครั้งแรกอาจถูกซิ"
+"งโครไนซ์กับ Odoo\n"
+"หากกำหนดวันที่ในอนาคต คำสั่งซื้อที่ดำเนินการในบัญชี Amazon นี้ระหว่างวันที่ก่อนหน้าและวันที่ใหม่จะไม่ซิ"
+"งโครไนซ์กับ Odoo"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_order_view_form
@@ -932,8 +930,13 @@ msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
 msgstr ""
-"หากการขายถูกล็อก คุณจะไม่สามารถแก้ไขได้อีกต่อไป อย่างไรก็ตาม "
-"คุณจะยังสามารถออกใบแจ้งหนี้หรือจัดส่งได้"
+"หากการขายถูกล็อก คุณจะไม่สามารถแก้ไขได้อีกต่อไป อย่างไรก็ตาม คุณจะยังสามารถออกใบแจ้งหนี้หรือจั"
+"ดส่งได้"
+
+#. module: sale_amazon
+#: model:ir.module.module,summary:base.module_sale_amazon
+msgid "Import Amazon orders and sync deliveries"
+msgstr ""
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
@@ -1007,7 +1010,13 @@ msgstr "ตลาดกลาง"
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__active_marketplace_ids
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__active_marketplace_ids
 msgid "Marketplaces"
-msgstr "ตลาดกลาง"
+msgstr "มาร์เก็ตเพลส"
+
+#. module: sale_amazon
+#. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Missing product name"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__name
@@ -1106,8 +1115,8 @@ msgid ""
 "the same package. Operations related to the product %s were not all "
 "confirmed at once."
 msgstr ""
-"สินค้าที่จัดส่งให้กับลูกค้าของ Amazon ต้องมีชิ้นส่วนที่เกี่ยวข้องในแพ็คเกจเดียวกัน "
-"การดำเนินงานที่เกี่ยวข้องกับสินค้า%s จะไม่ได้รับการยืนยันทั้งหมดในครั้งเดียว"
+"สินค้าที่จัดส่งให้กับลูกค้าของ Amazon ต้องมีชิ้นส่วนที่เกี่ยวข้องในแพ็คเกจเดียวกัน การดำเนินงานที่เกี่ยวข้"
+"องกับสินค้า%s จะไม่ได้รับการยืนยันทั้งหมดในครั้งเดียว"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
@@ -1231,7 +1240,7 @@ msgstr "ซิงค์การจัดส่ง"
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Sync FBM Inventory"
-msgstr "ซิงค์สินค้าคงคลัง FBM"
+msgstr "ซิงค์คลังสินค้า FBM"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
@@ -1252,7 +1261,8 @@ msgstr "การซิงโครไนซ์สต็อกของ Amazon �
 #: model:mail.template,subject:sale_amazon.order_sync_failure
 msgid ""
 "Synchronization of Amazon order {{ ctx.get('amazon_order_ref') }} has failed"
-msgstr "การซิงโครไนซ์คำสั่งซื้อของ Amazon {{ ctx.get('amazon_order_ref') }} ล้มเหลว"
+msgstr ""
+"การซิงโครไนซ์คำสั่งซื้อของ Amazon {{ ctx.get('amazon_order_ref') }} ล้มเหลว"
 
 #. module: sale_amazon
 #: model:mail.template,subject:sale_amazon.picking_sync_failure
@@ -1292,8 +1302,8 @@ msgid ""
 "The Amazon order with reference %(ref)s was not recovered because its "
 "currency was missing from the Amazon order data."
 msgstr ""
-"คำสั่งซื้อของ Amazon ที่มีการอ้างอิง %(ref)s ไม่สามารถกู้คืนได้ "
-"เนื่องจากสกุลเงินของคำสั่งซื้อหายไปจากข้อมูลคำสั่งซื้อของ Amazon"
+"คำสั่งซื้อของ Amazon ที่มีการอ้างอิง %(ref)s ไม่สามารถกู้คืนได้ เนื่องจากสกุลเงินของคำสั่งซื้อหายไป"
+"จากข้อมูลคำสั่งซื้อของ Amazon"
 
 #. module: sale_amazon
 #. odoo-python
@@ -1303,8 +1313,8 @@ msgid ""
 "(%(status)s) is not eligible for synchronization for its fulfillment channel "
 "(%(channel)s)."
 msgstr ""
-"คำสั่งซื้อ Amazon ที่มีเลขที่อ้างอิง %(ref)s ไม่ได้รับการกู้คืนเนื่องจากสถานะ (%(status)s) "
-"ไม่มีสิทธิ์ในการซิงโครไนซ์สำหรับช่องทางการเติมสินค้า (%(channel)s)"
+"คำสั่งซื้อ Amazon ที่มีเลขที่อ้างอิง %(ref)s ไม่ได้รับการกู้คืนเนื่องจากสถานะ (%(status)s) ไม่มีสิท"
+"ธิ์ในการซิงโครไนซ์สำหรับช่องทางการเติมสินค้า (%(channel)s)"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_marketplace__region
@@ -1312,8 +1322,8 @@ msgid ""
 "The Amazon region of the marketplace. Please refer to the Selling Partner "
 "API documentation to find the correct region."
 msgstr ""
-"ภูมิภาค Amazon ของตลาด โปรดดูเอกสารประกอบของพาร์ทเนอร์การขาย API "
-"เพื่อค้นหาภูมิภาคที่ถูกต้อง"
+"ภูมิภาค Amazon ของตลาด โปรดดูเอกสารประกอบของพาร์ทเนอร์การขาย API เพื่อค้นหาภูมิภาคที่ถูกต้อ"
+"ง"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_sale_order_line__amazon_item_ref
@@ -1343,8 +1353,8 @@ msgstr "หน่วยเก็บสต็อก"
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_channel
 msgid ""
-"The channel will be updated with the incomming orders or during the next "
-"stock synchronization."
+"The channel will be updated with the incomming orders or, if left empty, "
+"during the next stock synchronization."
 msgstr ""
 
 #. module: sale_amazon
@@ -1375,8 +1385,8 @@ msgid ""
 "whose status has not changed since this date will not be created nor updated "
 "in Odoo."
 msgstr ""
-"วันที่ซิงโครไนซ์ล่าสุดสำหรับคำสั่งซื้อในบัญชีนี้ "
-"คำสั่งซื้อที่สถานะไม่เปลี่ยนแปลงนับตั้งแต่วันที่นี้จะไม่ถูกสร้างหรืออัปเดตใน Odoo"
+"วันที่ซิงโครไนซ์ล่าสุดสำหรับคำสั่งซื้อในบัญชีนี้ คำสั่งซื้อที่สถานะไม่เปลี่ยนแปลงนับตั้งแต่วันที่นี้จะไม่ถูกสร้างห"
+"รืออัปเดตใน Odoo"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__location_id
@@ -1388,7 +1398,8 @@ msgstr "ตำแหน่งของสต็อกที่จัดการ
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__refresh_token
 msgid "The long-lived token that can be exchanged for a new access token."
-msgstr "โทเค็นที่มีอายุการใช้งานยาวนานที่สามารถแลกเปลี่ยนเป็นโทเค็นการเข้าถึงใหม่ได้"
+msgstr ""
+"โทเค็นที่มีอายุการใช้งานยาวนานที่สามารถแลกเปลี่ยนเป็นโทเค็นการเข้าถึงใหม่ได้"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__marketplace_id
@@ -1424,8 +1435,8 @@ msgid ""
 "already been delivered. Please create a return for this order to adjust the "
 "stock."
 msgstr ""
-"ลูกค้า Amazon ยกเลิกคำสั่งซื้อแล้ว ในขณะที่สินค้าบางรายการได้รับการจัดส่งไปแล้ว "
-"โปรดสร้างการคืนสินค้าสำหรับคำสั่งซื้อนี้เพื่อปรับสต็อก"
+"ลูกค้า Amazon ยกเลิกคำสั่งซื้อแล้ว ในขณะที่สินค้าบางรายการได้รับการจัดส่งไปแล้ว โปรดสร้างการคืนสิ"
+"นค้าสำหรับคำสั่งซื้อนี้เพื่อปรับสต็อก"
 
 #. module: sale_amazon
 #. odoo-python
@@ -1461,7 +1472,8 @@ msgstr "บัญชีผู้ขายที่ใช้จัดการส
 msgid ""
 "The short-lived token used instead of the LWA Access Token to access "
 "restricted data"
-msgstr "โทเค็นอายุการใช้งานสั้นที่ใช้แทนโทเค็นการเข้าถึง LWA เพื่อเข้าถึงข้อมูลที่ถูกจำกัด"
+msgstr ""
+"โทเค็นอายุการใช้งานสั้นที่ใช้แทนโทเค็นการเข้าถึง LWA เพื่อเข้าถึงข้อมูลที่ถูกจำกัด"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__access_token
@@ -1505,7 +1517,8 @@ msgstr ""
 msgid ""
 "The synchronization with Amazon failed. Amazon gave us this information "
 "about the problem:"
-msgstr "การซิงโครไนซ์กับ Amazon ล้มเหลว Amazon ให้ข้อมูลนี้แก่เราเกี่ยวกับปัญหา:"
+msgstr ""
+"การซิงโครไนซ์กับ Amazon ล้มเหลว Amazon ให้ข้อมูลนี้แก่เราเกี่ยวกับปัญหา:"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__name
@@ -1520,13 +1533,15 @@ msgstr "มีตลาดกลางได้เพียงแห่งเด
 #. module: sale_amazon
 #: model:ir.model.constraint,message:sale_amazon.constraint_sale_order_unique_amazon_order_ref
 msgid "There can only exist one sale order for a given Amazon Order Reference."
-msgstr "สามารถมีคำสั่งขายได้เพียงหนึ่งรายการสำหรับการอ้างอิงคำสั่งของ Amazon ที่กำหนด"
+msgstr ""
+"สามารถมีคำสั่งขายได้เพียงหนึ่งรายการสำหรับการอ้างอิงคำสั่งของ Amazon ที่กำหนด"
 
 #. module: sale_amazon
 #: model:ir.model.constraint,message:sale_amazon.constraint_sale_order_line_unique_amazon_item_ref
 msgid ""
 "There can only exist one sale order line for a given Amazon Item Reference."
-msgstr "มีรายการใบสั่งขายได้เพียงรายการเดียวสำหรับการอ้างอิงรายการ Amazon ที่กำหนด"
+msgstr ""
+"มีรายการใบสั่งขายได้เพียงรายการเดียวสำหรับการอ้างอิงรายการ Amazon ที่กำหนด"
 
 #. module: sale_amazon
 #. odoo-python
@@ -1599,7 +1614,8 @@ msgstr "คุณต้องตั้งค่าตลาดกลางให
 msgid ""
 "You reached the maximum number of requests for this operation; please try "
 "again later."
-msgstr "คุณได้มีคำขอถึงจำนวนสูงสุดสำหรับการดำเนินการนี้แล้ว กรุณาลองใหม่อีกครั้งในภายหลัง"
+msgstr ""
+"คุณได้มีคำขอถึงจำนวนสูงสุดสำหรับการดำเนินการนี้แล้ว กรุณาลองใหม่อีกครั้งในภายหลัง"
 
 #. module: sale_amazon
 #. odoo-python

@@ -24,13 +24,11 @@ class AccountReturn(models.Model):
 
         return super()._postprocess_vat_closing_entry_results(company, options, results)
 
-    def action_submit(self):
+    def _prepare_submission(self):
         # Extends account_reports
         if self.type_external_id == "l10n_ee_reports.ee_tax_return_type":
             return self.env["l10n_ee_reports.tax.return.submission.wizard"]._open_submission_wizard(self)
         if self.type_external_id == "l10n_ee_reports.ee_ec_sales_list_return_type":
             return self.env["l10n_ee_reports.ec.sales.list.submission.wizard"]._open_submission_wizard(self)
-        if self.type_external_id == "l10n_ee_reports.ee_kmd_inf_tax_return_type":
-            return self.env["l10n_ee_reports.kmd.inf.return.submission.wizard"]._open_submission_wizard(self)
 
-        return super().action_submit()
+        return super()._prepare_submission()

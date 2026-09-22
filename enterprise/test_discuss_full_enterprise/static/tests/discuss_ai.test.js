@@ -23,7 +23,6 @@ test("can handle command and disable mentions in AI composer", async () => {
         channel_type: "ai_composer",
         name: "my-ai-composer",
     });
-    pyEnv["discuss.channel"].create({ name: "my-channel" });
     await start();
     await openDiscuss(channelId);
     await insertText(".o-mail-Composer-input", "/help");
@@ -31,7 +30,5 @@ test("can handle command and disable mentions in AI composer", async () => {
     await contains(".o-mail-Message");
     await insertText(".o-mail-Composer-input", "@");
     await animationFrame();
-    await expectElementCount(".o-mail-NavigableList-item", 0);
-    await insertText(".o-mail-Composer-input", "#", { replace: true });
     await expectElementCount(".o-mail-NavigableList-item", 0);
 });

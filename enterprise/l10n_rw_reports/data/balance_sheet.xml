@@ -3,6 +3,7 @@
     <record id="l10n_rw_balance_sheet" model="account.report">
         <field name="name">Balance sheet</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_period_comparison" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
         <field name="country_id" ref="base.rw"/>
@@ -41,8 +42,6 @@
                             <record id="account_financial_report_rw_infra_plant_equipment" model="account.report.line">
                                 <field name="name">Property, plant and equipment and Investment Property</field>
                                 <field name="code">rw_infra_plant_equipment</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_infra_plant_equipment_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -54,8 +53,6 @@
                             <record id="account_financial_report_rw_goodwill" model="account.report.line">
                                 <field name="name">Goodwill</field>
                                 <field name="code">rw_goodwill</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_goodwill_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -67,8 +64,6 @@
                             <record id="account_financial_report_rw_advance_capital_assets" model="account.report.line">
                                 <field name="name">Advances for Capital Assets</field>
                                 <field name="code">rw_advance_capital_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_advance_capital_assets_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -80,8 +75,6 @@
                             <record id="account_financial_report_rw_intangible_assets" model="account.report.line">
                                 <field name="name">Intangible assets</field>
                                 <field name="code">rw_intangible_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_intangible_assets_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -93,8 +86,6 @@
                             <record id="account_financial_report_rw_investments" model="account.report.line">
                                 <field name="name">Investments</field>
                                 <field name="code">rw_investments</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_investments_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -106,8 +97,6 @@
                             <record id="account_financial_report_rw_investments_associate" model="account.report.line">
                                 <field name="name">Investments in associate</field>
                                 <field name="code">rw_investments_associate</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_investments_associate_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -119,8 +108,6 @@
                             <record id="account_financial_report_rw_available_sale_investments" model="account.report.line">
                                 <field name="name">Available for sale investments</field>
                                 <field name="code">rw_available_sale_investments</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_available_sale_investments_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -132,8 +119,6 @@
                             <record id="account_financial_report_rw_receivables_other_non_current" model="account.report.line">
                                 <field name="name">Receivables and other non-current asstes</field>
                                 <field name="code">rw_receivables_other_non_current</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_receivables_other_non_current_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -145,8 +130,6 @@
                             <record id="account_financial_report_rw_deferred_tax_assets" model="account.report.line">
                                 <field name="name">Deferred tax assets</field>
                                 <field name="code">rw_deferred_tax_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_deferred_tax_assets_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -171,8 +154,6 @@
                             <record id="account_financial_report_rw_inventories" model="account.report.line">
                                 <field name="name">Inventories</field>
                                 <field name="code">rw_inventories</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_inventories_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -184,8 +165,6 @@
                             <record id="account_financial_report_rw_trade_receivables" model="account.report.line">
                                 <field name="name">Trade receivables</field>
                                 <field name="code">rw_trade_receivables</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_trade_receivables_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -197,8 +176,6 @@
                             <record id="account_financial_report_rw_other_current_assets" model="account.report.line">
                                 <field name="name">Other current assets</field>
                                 <field name="code">rw_other_financial_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_other_current_assets_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -210,8 +187,6 @@
                             <record id="account_financial_report_rw_income_tax_assets" model="account.report.line">
                                 <field name="name">Income tax assets</field>
                                 <field name="code">rw_income_tax_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_income_tax_assets_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -223,8 +198,6 @@
                             <record id="account_financial_report_rw_investments_financial_receivables" model="account.report.line">
                                 <field name="name">Investments and financial receivables</field>
                                 <field name="code">rw_investments_financial_receivables</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_investments_financial_receivables_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -236,8 +209,6 @@
                             <record id="account_financial_report_rw_cash" model="account.report.line">
                                 <field name="name">Cash and cash equivalents</field>
                                 <field name="code">rw_cash</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_cash_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -277,8 +248,6 @@
                             <record id="account_financial_report_rw_shared_capital" model="account.report.line">
                                 <field name="name">Share capital</field>
                                 <field name="code">rw_shared_capital</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_shared_capital_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -290,8 +259,6 @@
                             <record id="account_financial_report_rw_reserve" model="account.report.line">
                                 <field name="name">Reserves</field>
                                 <field name="code">rw_reserve</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_reserve_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -303,8 +270,6 @@
                             <record id="account_financial_report_rw_retained_earnings" model="account.report.line">
                                 <field name="name">Retained earnings</field>
                                 <field name="code">rw_retained_earnings</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_rw_retained_earnings_expr" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -321,7 +286,8 @@
                                         <field name="label">balance</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">rw_profit_loss_year.balance</field>
-                                        <field name="subformula">cross_report(l10n_rw_reports.account_financial_report_rw_pnl)</field>
+                                        <field name="subformula">cross_report(l10n_rw_reports.account_financial_report_rw_pnl, force_date_scope)</field>
+                                        <field name="date_scope">from_fiscalyear</field>
                                     </record>
                                 </field>
                             </record>
@@ -352,8 +318,6 @@
                                     <record id="account_financial_report_rw_interest_bearing_loans_0" model="account.report.line">
                                         <field name="name">Interest-bearing loans and short term borrowings</field>
                                         <field name="code">rw_interest_bearing_loans_0</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_interest_bearing_loans_0_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -365,8 +329,6 @@
                                     <record id="account_financial_report_rw_employee_benefits" model="account.report.line">
                                         <field name="name">Employee benefits liabilities</field>
                                         <field name="code">rw_employee_benefits</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_employee_benefits_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -378,8 +340,6 @@
                                     <record id="account_financial_report_rw_provisions_0" model="account.report.line">
                                         <field name="name">Provisions</field>
                                         <field name="code">rw_provisions_0</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_provisions_0_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -391,8 +351,6 @@
                                     <record id="account_financial_report_rw_deferred_tax_liabilities" model="account.report.line">
                                         <field name="name">Deferred tax liabilities</field>
                                         <field name="code">rw_deferred_tax_liabilities</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_deferred_tax_liabilities_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -417,8 +375,6 @@
                                     <record id="account_financial_report_rw_bank_overdraft" model="account.report.line">
                                         <field name="name">Banks overdrafts and short-term borrowings</field>
                                         <field name="code">rw_bank_overdraft</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_bank_overdraft_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -430,8 +386,6 @@
                                     <record id="account_financial_report_rw_interest_bearing_loans_1" model="account.report.line">
                                         <field name="name">Interest-bearing loans and short term borrowings</field>
                                         <field name="code">rw_interest_bearing_loans_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_interest_bearing_loans_1_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -443,8 +397,6 @@
                                     <record id="account_financial_report_rw_trade_payables" model="account.report.line">
                                         <field name="name">Trade payables</field>
                                         <field name="code">rw_trade_payables</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_trade_payables_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -456,8 +408,6 @@
                                     <record id="account_financial_report_rw_provisions_1" model="account.report.line">
                                         <field name="name">Provisions</field>
                                         <field name="code">rw_provisions_1</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_provisions_1_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -469,8 +419,6 @@
                                     <record id="account_financial_report_rw_income_tax_liabilities" model="account.report.line">
                                         <field name="name">Income tax liabilities</field>
                                         <field name="code">rw_income_tax_liabilities</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_income_tax_liabilities_expr" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -482,8 +430,6 @@
                                     <record id="account_financial_report_rw_other_liabilities" model="account.report.line">
                                         <field name="name">Other liabilities</field>
                                         <field name="code">rw_other_liabilities</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_rw_other_liabilities_expr" model="account.report.expression">
                                                 <field name="label">balance</field>

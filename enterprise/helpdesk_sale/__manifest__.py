@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -13,7 +12,6 @@ Manage the after sale of the products from helpdesk tickets.
     'data': [
         'security/helpdesk_security.xml',
         'views/helpdesk_ticket_views.xml',
-        'views/helpdesk_sla_views.xml',
     ],
     'demo': ['data/helpdesk_sale_demo.xml'],
     'author': 'Odoo S.A.',

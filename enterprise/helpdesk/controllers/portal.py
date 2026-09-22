@@ -10,25 +10,17 @@ from odoo.fields import Domain
 from odoo.http import request
 from odoo.tools.translate import _
 from odoo.tools import groupby as groupbyelem
+from odoo.addons.mail.models.mail_message import SHARE_DOMAIN
 from odoo.addons.portal.controllers import portal
 from odoo.addons.portal.controllers.portal import pager as portal_pager
 
 
 class CustomerPortal(portal.CustomerPortal):
 
-    def _prepare_portal_layout_values(self):
-        values = super()._prepare_portal_layout_values()
-        return values
-
-    def _prepare_home_portal_values(self, counters):
-        values = super()._prepare_home_portal_values(counters)
-        if 'ticket_count' in counters:
-            values['ticket_count'] = (
-                request.env['helpdesk.ticket'].search_count(self._prepare_helpdesk_tickets_domain())
-                if request.env['helpdesk.ticket'].has_access('read')
-                else 0
-            )
-        return values
+    def _prepare_portal_counter_values(self, counter):
+        if counter == 'ticket_count':
+            return 'helpdesk.ticket', self._prepare_helpdesk_tickets_domain(), 'read'
+        return super()._prepare_portal_counter_values(counter)
 
     def _prepare_helpdesk_tickets_domain(self):
         return []
@@ -44,7 +36,7 @@ class CustomerPortal(portal.CustomerPortal):
         }
         return self._get_page_view_values(ticket, access_token, values, 'my_tickets_history', False, **kwargs)
 
-    def _ticket_get_searchbar_inputs(self):
+    def _ticket_get_searchbar_inputs(self, **kwargs):
         return {
             'name': {'input': 'name', 'label': _(
                 'Search%(left)s Tickets%(right)s',
@@ -52,12 +44,12 @@ class CustomerPortal(portal.CustomerPortal):
                 right=Markup('</span>'),
             ), 'sequence': 10},
             'user_id': {'input': 'user_id', 'label': _('Search in Assigned to'), 'sequence': 20},
-            'partner_id': {'input': 'partner_id', 'label': _('Search in Customer'), 'sequence': 30},
-            'team_id': {'input': 'team_id', 'label': _('Search in Helpdesk Team'), 'sequence': 40},
+            'description': {'input': 'description', 'label': self.env._('Search in Description'), 'sequence': 30},
+            'message': {'input': 'message', 'label': self.env._('Search in Messages'), 'sequence': 40},
             'stage_id': {'input': 'stage_id', 'label': _('Search in Stage'), 'sequence': 50},
         }
 
-    def _ticket_get_searchbar_groupby(self):
+    def _ticket_get_searchbar_groupby(self, **kwargs):
         return {
             'none': {'label': _('None'), 'sequence': 10},
             'user_id': {'label': _('Assigned to'), 'sequence': 20},
@@ -67,18 +59,20 @@ class CustomerPortal(portal.CustomerPortal):
             'partner_id': {'label': _('Customer'), 'sequence': 60},
         }
 
-    def _ticket_get_search_domain(self, search_in, search):
+    def _ticket_get_search_domain(self, search_in, search, **kwargs):
         if search_in == 'name':
             return ['|', ('name', 'ilike', search), ('ticket_ref', 'ilike', search)]
         elif search_in == 'user_id':
             assignees = request.env['res.users'].sudo()._search([('name', 'ilike', search)])
             return [('user_id', 'in', assignees)]
-        elif search_in in self._ticket_get_searchbar_inputs():
+        elif search_in == 'message':
+            return [('message_ids', 'any', SHARE_DOMAIN & Domain('body', 'ilike', search))]
+        elif search_in in self._ticket_get_searchbar_inputs(**kwargs):
             return [(search_in, 'ilike', search)]
         else:
             return ['|', ('name', 'ilike', search), ('ticket_ref', 'ilike', search)]
 
-    def _prepare_my_tickets_values(self, page=1, date_begin=None, date_end=None, sortby=None, filterby='all', search=None, groupby='none', search_in='name'):
+    def _prepare_my_tickets_values(self, page=1, date_begin=None, date_end=None, sortby=None, filterby='all', search=None, groupby='none', search_in='name', **kwargs):
         values = self._prepare_portal_layout_values()
         domain = Domain(self._prepare_helpdesk_tickets_domain())
 
@@ -96,8 +90,11 @@ class CustomerPortal(portal.CustomerPortal):
             'open': {'label': _('Open'), 'domain': [('close_date', '=', False)]},
             'closed': {'label': _('Closed'), 'domain': [('close_date', '!=', False)]},
         }
-        searchbar_inputs = dict(sorted(self._ticket_get_searchbar_inputs().items(), key=lambda item: item[1]['sequence']))
-        searchbar_groupby = dict(sorted(self._ticket_get_searchbar_groupby().items(), key=lambda item: item[1]['sequence']))
+        searchbar_inputs = dict(sorted(self._ticket_get_searchbar_inputs(**kwargs).items(), key=lambda item: item[1]['sequence']))
+        searchbar_groupby = dict(sorted(self._ticket_get_searchbar_groupby(**kwargs).items(), key=lambda item: item[1]['sequence']))
+
+        if request.env.user._is_internal():
+            domain = Domain('partner_id', '=', request.env.user.partner_id.id) | Domain('user_id', '=', request.env.user.id)
 
         # default sort by value
         if not sortby:
@@ -110,7 +107,7 @@ class CustomerPortal(portal.CustomerPortal):
 
         # search
         if search and search_in:
-            domain &= Domain(self._ticket_get_search_domain(search_in, search))
+            domain &= Domain(self._ticket_get_search_domain(search_in, search, **kwargs))
 
         # pager
         tickets_count = request.env['helpdesk.ticket'].search_count(domain)
@@ -129,7 +126,7 @@ class CustomerPortal(portal.CustomerPortal):
         if not tickets:
             grouped_tickets = []
         elif groupby != 'none':
-            grouped_tickets = [request.env['helpdesk.ticket'].concat(*g) for k, g in groupbyelem(tickets, itemgetter(groupby))]
+            grouped_tickets = [request.env['helpdesk.ticket'].concat(g) for k, g in groupbyelem(tickets, itemgetter(groupby))]
         else:
             grouped_tickets = [tickets]
 

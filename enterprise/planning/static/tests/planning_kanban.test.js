@@ -5,12 +5,8 @@ import { contains } from "@mail/../tests/mail_test_helpers";
 import { onRpc, mountWithCleanup, getService, defineActions } from "@web/../tests/web_test_helpers";
 import { WebClient } from "@web/webclient/webclient";
 
-import {
-    definePlanningModels,
-    planningModels,
-    ResourceResource,
-    PlanningRole,
-} from "./planning_mock_models";
+import { definePlanningModels, planningModels, PlanningRole } from "./planning_mock_models";
+import { resourceModels } from "@resource/../tests/resource_test_helpers";
 
 describe.current.tags("desktop");
 
@@ -56,10 +52,10 @@ beforeEach(() => {
             name: "First Record",
             start_datetime: "2019-03-11 08:00:00",
             end_datetime: "2019-03-11 12:00:00",
-            resource_id: 1,
+            resource_ids: [1],
             color: 7,
             role_id: 1,
-            state: "draft",
+            state: "1_draft",
             repeat: true,
         },
         {
@@ -67,13 +63,13 @@ beforeEach(() => {
             name: "Second Record",
             start_datetime: "2019-03-13 08:00:00",
             end_datetime: "2019-03-13 12:00:00",
-            resource_id: 2,
+            resource_ids: [2],
             color: 9,
             role_id: 2,
-            state: "published",
+            state: "2_published",
         },
     ];
-    ResourceResource._records = [
+    resourceModels.ResourceResource._records = [
         { id: 1, name: "Chaganlal" },
         { id: 2, name: "Maganlal" },
     ];
@@ -94,7 +90,7 @@ test("Display modal to choose recurrence type when deleting recurrent task", asy
     await mountWithCleanup(WebClient);
     await getService("action").doAction(1);
 
-    await click("div button span.oi-ellipsis-v");
+    await click(".o_kanban_record:contains('First Record') i[data-icon='more_vert']");
     await contains("a.dropdown-item", { count: 2 });
     await click("a.dropdown-item.oe_kanban_action");
 
@@ -106,7 +102,7 @@ test("Display confirm delete modal when deleting non recurrent task", async () =
     await mountWithCleanup(WebClient);
     await getService("action").doAction(1);
 
-    await target.querySelectorAll("div button span.oi-ellipsis-v")[1].click();
+    await click(".o_kanban_record:contains('Second Record') i[data-icon='more_vert']");
     await contains("a.dropdown-item", { count: 2 });
     await click("a.dropdown-item.oe_kanban_action");
 

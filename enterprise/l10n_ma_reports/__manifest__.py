@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -24,8 +23,9 @@ This module has been built with the help of Caudigef.
         "views/res_partner_views.xml",
         "views/account_move_views.xml",
         "wizard/account_payment_register_views.xml",
+        "wizard/vat_listing_submission_wizard.xml",
+        'security/ir.access.csv',
     ],
-    'installable': True,
     'auto_install': [
         'l10n_ma',
         'account_reports',

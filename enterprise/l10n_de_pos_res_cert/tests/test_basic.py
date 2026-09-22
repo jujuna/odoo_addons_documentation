@@ -8,12 +8,14 @@ from odoo.addons.point_of_sale.controllers.main import PosController
 
 @tagged('post_install', '-at_install', 'post_install_l10n')
 class TestFiskalyPoS(TestFrontend):
+    _test_user_groups = None  # FIXME list needed groups
+
     def setUp(self):
         super().setUp()
         self.install_fiskalyhook()
         server_url = self.env['ir.config_parameter'].sudo().get_base_url()
-        self.env['ir.config_parameter'].sudo().set_param('l10n_de_fiskaly_kassensichv_url', f"{server_url}/fake_fiskaly")
-        self.env['ir.config_parameter'].sudo().set_param('l10n_de_fiskaly_dsfinvk_url', f"{server_url}/fake_fiskaly")
+        self.env['ir.config_parameter'].sudo().set_str('l10n_de_fiskaly_kassensichv_url', f"{server_url}/fake_fiskaly")
+        self.env['ir.config_parameter'].sudo().set_str('l10n_de_fiskaly_dsfinvk_url', f"{server_url}/fake_fiskaly")
 
         self.company.write({
             "country_id": self.env.ref('base.de'),
@@ -29,10 +31,6 @@ class TestFiskalyPoS(TestFrontend):
         })
         self.env['res.partner'].create({
             "name": "AA Test Partner",
-        })
-        self.pos_admin.write({
-            "street": "POS Street",
-            "zip": "1234",
         })
         self.env['pos.printer'].search([]).write({
             "product_categories_ids": [Command.clear()],
@@ -69,7 +67,7 @@ class TestFiskalyPoS(TestFrontend):
         def fake_receipt_printer(self, devid, **kwargs):
             test_object.received_receipt_count += 1
 
-        self.env.registry.clear_cache('routing')
+        self.env.transaction.invalidate_ormcache('routing')
         PosController.auth_hook_v0 = http.route("/fake_fiskaly/api/v0/auth", type="jsonrpc", methods=["POST"], csrf=False)(auth_hook)
         PosController.auth_hook_v1 = http.route("/fake_fiskaly/api/v1/auth", type="jsonrpc", methods=["POST"], csrf=False)(auth_hook)
         PosController.tss_hook = http.route(["/fake_fiskaly/api/v1/tss/<int:tss_id>/tx/<string:tx_id>"], methods=["PUT"], type="http", csrf=False)(tss_hook)
@@ -83,17 +81,17 @@ class TestFiskalyPoS(TestFrontend):
             del PosController.tss_hook
             del PosController.vat_definition_hook
             del PosController.fake_receipt_printer
-            self.env.registry.clear_cache('routing')
+            self.env.transaction.invalidate_ormcache('routing')
 
-    def get_vat_definition_export_id(self):
+    def _get_vat_definition_export_id(self):
         return
 
     def test_fiskaly_basic_order(self):
-        with patch.object(self.env.registry['account.tax'], 'get_vat_definition_export_id', self.get_vat_definition_export_id):
+        with patch.object(self.env.registry['account.tax'], '_get_vat_definition_export_id', self._get_vat_definition_export_id):
             self.start_tour("/pos/ui/%d" % self.main_pos_config.id, 'FiskalyTour', login="pos_user")
 
     def test_fiskaly_tss_payload(self):
-        with patch.object(self.env.registry['account.tax'], 'get_vat_definition_export_id', self.get_vat_definition_export_id):
+        with patch.object(self.env.registry['account.tax'], '_get_vat_definition_export_id', self._get_vat_definition_export_id):
             # Change the payment method name to anything else than "Cash"
             self.main_pos_config.payment_method_ids.filtered(lambda p: p.type == 'cash').name = "Random Name"
             self.main_pos_config.with_user(self.pos_user).open_ui()
@@ -102,11 +100,18 @@ class TestFiskalyPoS(TestFrontend):
     def test_fiskaly_receipt_printer(self):
         """This test make sure that the receipt is printed only once.
            We use a route that will receive all the receipts and increment a counter."""
-        with patch.object(self.env.registry['account.tax'], 'get_vat_definition_export_id', self.get_vat_definition_export_id):
+        pos_printer = self.env['pos.printer'].create({
+            'name': 'Fiskaly Printer',
+            'printer_type': 'epson_epos',
+            'printer_ip': '127.0.0.1:8069/receipt_receiver',
+            'use_type': 'receipt',
+            'use_lna': True,
+        })
+        with patch.object(self.env.registry['account.tax'], '_get_vat_definition_export_id', self._get_vat_definition_export_id):
             self.main_pos_config.write({
-                "iface_print_auto": True,
-                "other_devices": True,
-                "epson_printer_ip": "127.0.0.1:8069/receipt_receiver",
+                'iface_print_auto': True,
+                'other_devices': True,
+                'receipt_printer_ids': [Command.set(pos_printer.ids)],
             })
             self.main_pos_config.with_user(self.pos_user).open_ui()
             self.start_tour("/pos/ui/%d" % self.main_pos_config.id, 'test_fiskaly_receipt_printer', login="pos_user")

@@ -7,10 +7,10 @@
             <form string="Generate Budget">
                 <sheet>
                     <group>
-                        <label for="date_from" string="From"/>
+                        <label for="date_from" string="Date"/>
                         <div class="o_row">
                             <field name="date_from" nolabel="1" class="oe_inline"/>
-                            <i class="fa fa-long-arrow-right mx-2" aria-label="to" title="to"/>
+                            <i class="oi mx-2" data-icon="east" aria-label="to" title="To"/>
                             <field name="date_to" nolabel="1" class="oe_inline"/>
                         </div>
                         <field name="period" widget="radio"/>
@@ -19,7 +19,7 @@
                 </sheet>
                 <footer>
                     <button name="action_budget_split" string="Split" type="object" class="btn-primary"/>
-                    <button string="Cancel" class="btn-default" special="cancel"/>
+                    <button class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>

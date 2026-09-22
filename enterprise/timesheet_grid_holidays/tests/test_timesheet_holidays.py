@@ -4,44 +4,26 @@
 from freezegun import freeze_time
 
 from odoo import fields, SUPERUSER_ID
-from odoo.exceptions import UserError
 from datetime import date, datetime
 
 from odoo.addons.mail.tests.common import MailCase, mail_new_test_user
 
+from odoo.tests import tagged
+
 from odoo.addons.hr_timesheet.tests.test_timesheet import TestCommonTimesheet
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestTimesheetGridHolidays(TestCommonTimesheet, MailCase):
 
-    @freeze_time('2018-2-6')
-    def test_timer_methods_handle_project_access_restrictions(self):
-        """Ensure timer visibility computation does not raise AccessError for restricted users.
-            1. Create a private project with a task and a linked timesheet.
-            2. Use a Timesheet Manager user without project access.
-            3. Call _should_not_display_timer() and action_timer_start() as that user.
-            4. Verify that no AccessError is raised due to the use of sudo() within these methods.
-        """
-        self.timesheet.date = fields.Date.today()
-        self.timesheet_manager_no_project_user.action_create_employee()
-        employee = self.timesheet_manager_no_project_user.employee_id
-        timesheet = self.timesheet.with_user(self.timesheet_manager_no_project_user)
-        timesheet.employee_id = employee
-        self.assertFalse(
-            timesheet._should_not_display_timer(),
-            "_should_not_display_timer() should be True"
-        )
-        timesheet.action_timer_start()
-        self.assertTrue(
-            timesheet.is_timer_running,
-            "Timer should be running after action_timer_start()"
-        )
+    def setUp(self):
+        super().setUp()
+        self.user_employee.group_ids |= self.env.ref('hr_holidays.group_hr_holidays_employee')
 
     def test_overtime_calcution_timesheet_holiday_flow(self):
         """ Employee's leave is not calculated as overtime hours when employee is on time off."""
         self.empl_employee.write({
             'create_date': date(2021, 1, 1),
-            'employee_type': 'freelance',  # Avoid searching the contract if hr_contract module is installed before this module.
         })
         start_date = '2021-10-04'
         end_date = '2021-10-09'
@@ -51,17 +33,20 @@ class TestTimesheetGridHolidays(TestCommonTimesheet, MailCase):
 
         # all company have those internal project/task (created by default)
         internal_project = self.env.company.internal_project_id
-        internal_task_leaves = self.env.company.leave_timesheet_task_id
-        hr_leave_type = self.env['hr.leave.type'].create({
+        hr_work_entry_type = self.env['hr.work.entry.type'].create({
             'name': 'Leave Type with timesheet generation',
+            'code': 'Leave Type with timesheet generation',
             'requires_allocation': False,
+            'request_unit': 'day',
+            'unit_of_measure': 'day',
+            'count_as': 'absence',
         })
-        HrLeave = self.env['hr.leave'].with_context(mail_create_nolog=True, mail_notrack=True)
+        HrLeave = self.env['hr.leave']
         # employee creates a leave request
         holiday = HrLeave.with_user(self.user_employee).create({
             'name': 'Leave 1',
             'employee_id': self.empl_employee.id,
-            'holiday_status_id': hr_leave_type.id,
+            'work_entry_type_id': hr_work_entry_type.id,
             'request_date_from': '2021-10-05',
             'request_date_to': '2021-10-05',
         })
@@ -86,21 +71,25 @@ class TestTimesheetGridHolidays(TestCommonTimesheet, MailCase):
 
     @freeze_time('2018-02-06')
     def test_grid_update_holiday(self):
-        Requests = self.env['hr.leave'].with_context(mail_create_nolog=True, mail_notrack=True)
-        hr_leave_type_with_ts = self.env['hr.leave.type'].create({
+        Requests = self.env['hr.leave']
+        hr_work_entry_type_with_ts = self.env['hr.work.entry.type'].create({
             'name': 'Leave Type with timesheet generation',
+            'code': 'Leave Type with timesheet generation',
             'requires_allocation': False,
+            'request_unit': 'day',
+            'unit_of_measure': 'day',
+            'count_as': 'absence',
         })
         # employee creates a leave request
         holiday = Requests.with_user(self.user_employee).create({
             'name': 'Leave 1',
             'employee_id': self.empl_employee.id,
-            'holiday_status_id': hr_leave_type_with_ts.id,
+            'work_entry_type_id': hr_work_entry_type_with_ts.id,
             'request_date_from': '2018-02-05',
             'request_date_to': '2018-02-05',
             'request_hour_from': 8,
             'request_hour_to': 9,
-            'request_unit_hours': True,
+            'work_entry_type_request_unit': 'hour',
         })
         # validate leave request and create timesheet
         holiday.with_user(SUPERUSER_ID).action_approve()
@@ -137,22 +126,6 @@ class TestTimesheetGridHolidays(TestCommonTimesheet, MailCase):
         self.assertEqual(timesheets.project_id, holiday.timesheet_ids.project_id, "The new timesheet should have the same project as the timesheet generated by the leave request")
         self.assertEqual(timesheets.task_id, holiday.timesheet_ids.task_id, "The new timesheet should have the same task as the timesheet generated by the leave request")
 
-    def test_start_timer_in_timeoff_task(self):
-        common_vals = {
-            'project_id': self.env.company.internal_project_id.id,
-            'task_id': self.env.company.leave_timesheet_task_id.id,
-        }
-        Timesheet = self.env['account.analytic.line'].with_user(self.user_manager)
-        timesheet = Timesheet.sudo().create({
-            'name': "my timesheet 1",
-            **common_vals,
-        })
-        with self.assertRaises(UserError, msg="a user cannot start timer in timesheet in time off task"):
-            timesheet.action_timer_start()
-
-        with self.assertRaises(UserError, msg="the user cannot create a timesheet and start a timer in time off task"):
-            timesheet.action_start_new_timesheet_timer(common_vals)
-
     def test_employee_timesheet_reminder_skips_holidays_and_leaves(self):
         """
         Reminder mail should be sent to employees, skipping holidays and approved leaves.
@@ -168,16 +141,18 @@ class TestTimesheetGridHolidays(TestCommonTimesheet, MailCase):
         user_hruser = mail_new_test_user(self.env, login='armande1', groups='base.group_user,hr_holidays.group_hr_holidays_user')
         user_hruser.action_create_employee()
 
-        Requests = self.env['hr.leave'].with_context(mail_create_nolog=True, mail_notrack=True)
-        hr_leave_type = self.env['hr.leave.type'].create({
+        Requests = self.env['hr.leave']
+        hr_work_entry_type = self.env['hr.work.entry.type'].create({
             'name': 'Leave Type with timesheet generation',
+            'code': 'Leave Type with timesheet generation',
             'requires_allocation': False,
+            'count_as': 'absence',
         })
 
         time_off = Requests.with_user(user_hruser).create({
             'name': 'Test Time Off',
             'employee_id': user_hruser.employee_id.id,
-            'holiday_status_id': hr_leave_type.id,
+            'work_entry_type_id': hr_work_entry_type.id,
             'request_date_from': '2022-01-31',
             'request_date_to': '2022-01-31',
         })

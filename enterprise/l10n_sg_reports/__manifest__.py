@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -16,12 +15,13 @@ This module allow to generate the IRAS Audit File.
         'l10n_sg', 'account_reports'
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'data/balance_sheet.xml',
+        'data/profit_and_loss.xml',
         'data/account_return_data.xml',
         'data/account_iras_audit_file_data.xml',
-        'views/iaf_template.xml'
+        'views/iaf_template.xml',
+        'security/ir.access.csv',
     ],
-    'installable': True,
     'auto_install': ['l10n_sg', 'account_reports'],
     'license': 'OEEL-1',
 }

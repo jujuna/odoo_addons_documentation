@@ -1,52 +1,50 @@
-from odoo import api, fields, models
-from odoo.fields import Domain
+from logging import getLogger
 
-PROMPT_MODULE_MAP = {
-    "mass_mailing": ["ai_prompt_optout_reason"],
-    "stock": ["ai_prompt_low_stock_pivot", "ai_prompt_stock_move"],
-    "sale": [
-        "ai_prompt_sales_by_country",
-        "ai_prompt_top_sales_reps",
-        "ai_prompt_sales_by_category",
-        "ai_prompt_top_selling_products_chart",
-        "ai_prompt_profit_margin_by_category",
-        "ai_prompt_blog_ideas_catalog"
-    ],
-    "calendar": ["ai_prompt_agenda_today"],
-    "project": ["ai_prompt_most_expensive_project"],
-    "accounting": ["ai_prompt_cash_flow_status"],
-    "helpdesk": ["ai_prompt_top_ticket_cause"],
-    "purchase": ["ai_prompt_latest_po_azure"]
-}
+from odoo import api, fields, models
+from odoo.tools import is_html_empty
+
+from odoo.addons.ai.utils.ai_fields_tools import parse_ai_prompt_values
+
+_logger = getLogger(__name__)
 
 
 class AIPromptButton(models.Model):
     _name = "ai.prompt.button"
+    _inherit = ["mail.render.mixin"]
     _description = "Prompt that can be attached to AI UI rules for quick access by the user."
 
     name = fields.Char(
-        "AI Prompt", help="The prompt sent to the AI when clicked on"
+        "Title", help="The text shown on the button", required=True
+    )
+    prompt = fields.Html(
+        help="The prompt that will be sent to the AI when the button is clicked",
+        render_engine='qweb', render_options={'post_process': True}, prefetch=True,
+        translate=True, sanitize=True, sanitize_output_method='xml'
     )
     sequence = fields.Integer(string="Sequence", default=10)
     composer_id = fields.Many2one("ai.composer", index='btree_not_null')
 
-    @api.model
-    def _search(self, domain, *args, **kwargs):
-        """Only include prompts if their related modules are installed.
-           Hack to not have lots of 3-lines bridge modules
-        """
-        installed_modules = self.env['ir.module.module']._installed()
+    @api.depends('composer_id.focused_model_id.model')
+    def _compute_render_model(self):
+        for button in self:
+            button.render_model = button.composer_id.focused_model_id.model
 
-        # collect ids of prompts whose module are not installed
-        skip_ids = []
-        for module, record_ref in PROMPT_MODULE_MAP.items():
-            if module not in installed_modules:
-                for rec_id in record_ref:
-                    record = self.env.ref(f"ai.{rec_id}", raise_if_not_found=False)
-                    if record:
-                        skip_ids.append(record.id)
+    def _render_prompt(self, rendering_record_id=None):
+        self.ensure_one()
 
-        if skip_ids:
-            domain = Domain.AND([Domain('id', 'not in', skip_ids), domain])
-
-        return super()._search(domain, *args, **kwargs)
+        rendering_record = None
+        # sudo: ir_model records can't be accessed by base.group_user. If the user doesn't have access to the record,
+        # the search method will return an empty recordset.
+        if render_model := self.sudo().render_model:
+            rendering_record = self.env[render_model].search([('id', '=', rendering_record_id)])
+        if not is_html_empty(self.prompt) and rendering_record:
+            # Perform any qweb rendering other than replacing field references.
+            prompt = self._render_field(field="prompt", res_ids=rendering_record.ids)[rendering_record.id]
+            # Replace field references
+            prompt, field_names, __ = parse_ai_prompt_values(env=self.env, prompt=prompt, comodel=None)
+            field_values, message_parts = rendering_record._get_ai_context(field_names)
+            prompt += f"\n# field values\n{field_values}"
+            message_parts.insert(0, {'type': 'text', 'text': prompt})
+        else:
+            message_parts = [{'type': 'text', 'text': self.prompt if not is_html_empty(self.prompt) else self.name}]
+        return message_parts

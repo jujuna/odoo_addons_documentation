@@ -18,7 +18,7 @@ class ApprovalProductLine(models.Model):
     company_id = fields.Many2one(
         string='Company', related='approval_request_id.company_id',
         store=True, readonly=True, index=True)
-    product_id = fields.Many2one('product.product', string="Products", check_company=True)
+    product_id = fields.Many2one('product.product', string="Products", check_company=True, index=True)
     product_uom_id = fields.Many2one(
         'uom.uom', string="Unit",
         compute="_compute_product_uom_id", store=True, readonly=False, precompute=True)

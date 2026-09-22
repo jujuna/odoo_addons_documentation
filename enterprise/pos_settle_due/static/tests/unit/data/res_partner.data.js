@@ -8,44 +8,22 @@ patch(ResPartner.prototype, {
             "credit_limit",
             "total_due",
             "use_partner_credit_limit",
-            "pos_orders_amount_due",
             "invoices_amount_due",
             "commercial_partner_id",
         ];
     },
-
-    async get_all_total_due(partner_ids, config_id) {
-        return partner_ids.map((id) => ({
-            "res.partner": [
-                {
-                    id,
-                    total_due: 0,
-                    pos_orders_amount_due: 0,
-                    invoices_amount_due: 0,
-                },
-            ],
-        }));
-    },
-
-    async get_total_due(partner_id, config_id) {
-        return {
-            "res.partner": [
-                {
-                    id: partner_id,
-                    total_due: 0,
-                    pos_orders_amount_due: 0,
-                    invoices_amount_due: 0,
-                },
-            ],
-        };
-    },
 });
 
 ResPartner._records = [
-    ...ResPartner._records,
+    ...ResPartner._records.map((record) => ({
+        ...record,
+        credit_limit: 0.0,
+        use_partner_credit_limit: false,
+    })),
     {
         id: 5,
         name: "User on budget",
+        commercial_partner_id: 5,
         street: false,
         street2: false,
         city: false,
@@ -60,9 +38,8 @@ ResPartner._records = [
         write_date: "2025-08-03 12:12:12",
         property_product_pricelist: false,
         parent_name: false,
-        pos_contact_address: "\n\n  \n",
+        address: "\n\n  \n",
         invoice_emails: "",
-        company_type: "person",
         fiscal_position_id: false,
         credit_limit: 10,
         use_partner_credit_limit: true,

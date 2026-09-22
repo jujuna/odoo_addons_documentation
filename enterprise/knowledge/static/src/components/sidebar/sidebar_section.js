@@ -1,9 +1,9 @@
-import { KnowledgeSidebarRow } from "./sidebar_row";
+import { Component, onWillStart, proxy, t, useEffect, useProps } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { user } from "@web/core/user";
-import { useRecordObserver } from "@web/model/relational_model/utils";
 import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, useChildSubEnv, useState } from "@odoo/owl";
+import { useEnv, useSubEnv } from "@web/owl2/utils";
+import { KnowledgeSidebarRow } from "./sidebar_row";
 
 /**
  * This file defines the different sections used in the sidebar.
@@ -11,27 +11,30 @@ import { Component, onWillStart, useChildSubEnv, useState } from "@odoo/owl";
  * their children.
  */
 
+/**
+ * @abstract
+ */
 export class KnowledgeSidebarSection extends Component {
     static template = "";
-    static props = {
-        rootIds: Array,
-        unfoldedIds: Set,
-        record: Object,
-    };
     static components = {
         KnowledgeSidebarRow,
     };
 
+    props = useProps({
+        rootIds: t.array(),
+        unfoldedIds: t.instanceOf(Set),
+        record: t.object(),
+    });
+
     setup() {
-        super.setup();
         const foldedSections = JSON.parse(browser.localStorage.getItem("knowledge.folded.sections") ?? "{}");
-        this.state = useState({
+        this.state = proxy({
             isFolded: foldedSections[this.getSectionIdentifier()] || this.props.rootIds.length === 0,
         });
 
         // Unfold the section of the current article:
-        useRecordObserver((record) => {
-            if (record.data.category === this.getSectionIdentifier()) {
+        useEffect(() => {
+            if (this.props.record.data.category === this.getSectionIdentifier()) {
                 this.state.isFolded = false;
             }
         });
@@ -57,10 +60,12 @@ export class KnowledgeSidebarFavoriteSection extends KnowledgeSidebarSection {
     setup() {
         super.setup();
 
+        const env = useEnv();
         // (Un)fold in the favorite tree by default.
-        useChildSubEnv({
-            fold: id => this.env.fold(id, true),
-            unfold: id => this.env.unfold(id, true),
+        useSubEnv({
+            fold: id => env.fold(id, true),
+            sidebarScrollOrigin: "favorites",
+            unfold: id => env.unfold(id, true),
         });
     }
 

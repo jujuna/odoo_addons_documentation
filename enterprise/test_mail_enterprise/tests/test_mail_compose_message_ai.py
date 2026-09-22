@@ -3,10 +3,11 @@
 from unittest.mock import patch
 
 from odoo import Command
-from odoo.addons.test_mail_enterprise.tests.common_ai import MailCommonAI
 from odoo.exceptions import AccessError
-from odoo.tests import tagged, users, Form
+from odoo.tests import Form, tagged, users
 from odoo.tools import mute_logger
+
+from odoo.addons.test_mail_enterprise.tests.common_ai import MailCommonAI
 
 
 @tagged("post_install", "-at_install")
@@ -22,7 +23,7 @@ class TestMailComposeMessageAI(MailCommonAI):
     @users("employee")
     def test_composer_rendering_ai_prompt_multi(self):
         with self._patch_agent_generate_response(
-            response=["Test response"],
+            response=["<p>Test response</p>", "<p>Test response</p>"],
             body_html=f"""<div><t t-out="object.name"/> +++ <t t-out="object.customer_id.name"/>{self._wrap_prompt("Test prompt")}</div>""",
         ):
             composer_form = Form(self.env['mail.compose.message'].with_context(
@@ -53,7 +54,7 @@ class TestMailComposeMessageAI(MailCommonAI):
     @users("employee")
     def test_composer_rendering_ai_prompt_single(self):
         with self._patch_agent_generate_response(
-            response=["Test response"],
+            response=["<p>Test response</p>"],
             body_html=f"""<div><t t-out="object.name"/> +++ <t t-out="object.customer_id.name"/>{self._wrap_prompt("Test prompt")}</div>""",
         ):
             with Form(self.env['mail.compose.message'].with_context(self._get_web_context(
@@ -69,7 +70,7 @@ class TestMailComposeMessageAI(MailCommonAI):
             body_html = f"""<div>{self._wrap_prompt('Greet <t t-out="object.name"/> and his buddy <t t-out="object.customer_id.name"/>')}</div>"""
             expected_html_to_eval = f"""<div>{self._wrap_prompt('Greet A and his buddy Cust A')}</div>"""
             with self._patch_agent_generate_response(
-                response=["Test response"],
+                response=["<p>Test response</p>"],
                 body_html=body_html,
             ):
                 composer_form = Form(self.env['mail.compose.message'].with_context(self._get_web_context(
@@ -88,7 +89,7 @@ class TestMailComposeMessageAI(MailCommonAI):
     def test_composer_dynamic_content_access_error(self):
         with self._patch_template_eval_prompts() as get_html_to_eval:
             with self._patch_agent_generate_response(
-                response=["Test response"],
+                response=["<p>Test response</p>"],
                 body_html=f"""<div>{self._wrap_prompt('<t t-out="object.name"/> +++ <t t-out="object.phone_number"/>')}</div>""",
             ):
                 # clear the user's groups to simulate no access rights to the models used in the template
@@ -138,3 +139,14 @@ class TestMailComposeMessageAI(MailCommonAI):
                 )))
                 composer = composer_form.save()
                 self.assertEqual(composer.body, """<div>Test</div>""", msg="The body should not contain the prompt if the default agent is missing.")
+
+    @users("employee")
+    def test_eval_ai_prompt_with_single_prompt_element(self):
+        default_agent = self.env.ref("ai.ai_default_agent", raise_if_not_found=True)
+
+        with self._patch_agent_generate_response(response=["Hello A and B. I hope you are doing well."]):
+            html_to_eval = self._wrap_prompt('Greet A and B')
+            self.assertIn("Hello A and B. I hope you are doing well.",
+                default_agent._eval_ai_prompts(rendered_html=html_to_eval),
+                msg="The prompt should be evaluated even if it is the only element in the HTML.",
+            )

@@ -1,17 +1,17 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import contextlib
-import json
 import logging
 
 from markupsafe import Markup
 from stdnum.br.cnpj import format as format_cnpj
-from stdnum.br.cpf import format as format_cpf
+from stdnum.br.cpf import compact as compact_cpf
 
 from odoo import models, fields, api, _, Command
 from odoo.addons.iap import InsufficientCreditError
 from odoo.exceptions import UserError
 from odoo.tools import html2plaintext
 from odoo.tools.xml_utils import find_xml_value
+from odoo.addons.l10n_br_avatax.models.account_external_tax_mixin import COUNTRY_TO_AVATAX_CODE
 
 _logger = logging.getLogger(__name__)
 
@@ -44,13 +44,12 @@ PAYMENT_METHOD_SELECTION = [
     ("99", "Others"),
 ]
 
+AVATAX_CODE_TO_COUNTRY = {v: k for k, v in COUNTRY_TO_AVATAX_CODE.items()}
+
 
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    l10n_br_edi_avatax_data = fields.Text(
-        help="Brazil: technical field that remembers the last tax summary returned by Avatax.", copy=False
-    )
     l10n_br_edi_is_needed = fields.Boolean(
         compute="_compute_l10n_br_edi_is_needed",
         help="Brazil: technical field to determine if this invoice is eligible to be e-invoiced.",
@@ -124,6 +123,17 @@ class AccountMove(models.Model):
         help="Brazil: After an NFS-e invoice is issued and confirmed by the municipality, a unique code is provided for online verification of its authenticity.",
     )
 
+    def _get_line_data_for_external_taxes(self):
+        """ Override to set the operation_type per line. """
+        res = super()._get_line_data_for_external_taxes()
+        if not self.company_id.l10n_br_is_icbs:
+            return res
+
+        for line in res:
+            line['cbs_ibs_deduction'] = line['base_line']['record'].l10n_br_cbs_ibs_deduction
+
+        return res
+
     def _l10n_br_call_avatax_taxes(self, company, document_data):
         # EXTENDS 'account.external.tax.mixin' to store the retrieved Avatax data.
         api_response = super()._l10n_br_call_avatax_taxes(company, document_data)
@@ -141,13 +151,11 @@ class AccountMove(models.Model):
                 with contextlib.suppress(ValueError):  # To be defensive, already checked with constrains.
                     line["cfop"] = int(cfop)
 
-        self.l10n_br_edi_avatax_data = json.dumps(
-            {
+        self.l10n_br_edi_avatax_data = {
                 "header": api_response.get("header"),
                 "lines": lines,
                 "summary": api_response.get("summary"),
-            }
-        )
+        }
 
         return api_response
 
@@ -226,18 +234,20 @@ class AccountMove(models.Model):
             return {}
 
         partners_missing_fields = self.env["res.partner"]
-        for partner in partners:
+        for partner in partners.filtered(lambda p: p.country_code == "BR"):
             requires_minimal_info = (
                 self.l10n_br_is_service_transaction and
                 partner.l10n_br_tax_regime == "individual" and
                 partner.l10n_br_activity_sector == "finalConsumer" and
-                partner.l10n_latam_identification_type_id == self.env.ref("l10n_br.cpf")
+                not partner.vat and partner._get_additional_identifier('BR_CN')
             )
-            required_fields = ("zip",) if requires_minimal_info else ("street", "street2", "zip", "vat", "l10n_latam_identification_type_id")
+            required_fields = ("zip",) if requires_minimal_info else ("street", "street2", "zip")
 
-            for field in required_fields:
-                if not partner[field]:
-                    partners_missing_fields |= partner
+            if (
+                any(not partner[field] for field in required_fields)
+                or (not requires_minimal_info and not partner._get_preferred_legal_entity_identifier_vals().get('value', ''))
+            ):
+                partners_missing_fields |= partner
 
         if partners_missing_fields:
             return {
@@ -289,6 +299,11 @@ class AccountMove(models.Model):
                 **move._l10n_br_check_origin_access_key(move._get_l10n_br_avatax_service_params()),
             }
 
+    @api.depends('l10n_br_last_edi_status', 'l10n_br_is_service_transaction')
+    def _compute_alerts(self):
+        # EXTENDS 'account'
+        super()._compute_alerts()
+
     def _depends_l10n_br_avatax_warnings(self):
         """Override."""
         return super()._depends_l10n_br_avatax_warnings() + ["partner_id", "l10n_br_edi_avatax_data", "l10n_br_edi_transporter_id"]
@@ -296,6 +311,41 @@ class AccountMove(models.Model):
     def _need_cancel_request(self):
         # EXTENDS 'account'
         return super()._need_cancel_request() or self.l10n_br_last_edi_status == "accepted"
+
+    def _get_invoice_legal_documents(self, filetype, allow_fallback=False):
+        # EXTENDS account
+        if filetype == 'nfe':
+            xml_files = [
+                {
+                    'filename': attachment.name,
+                    'filetype': 'xml',
+                    'content': attachment.raw,
+                }
+                for attachment in (
+                    self.l10n_br_edi_xml_attachment_id  # Approved NFE files
+                    | self.attachment_ids.filtered(lambda att: att.mimetype == 'application/xml' and 'NFe' in att.name)  # Additional NFE files for correction or cancellation
+                )
+            ]
+            if xml_files:
+                return xml_files
+        return super()._get_invoice_legal_documents(filetype, allow_fallback=allow_fallback)
+
+    def get_extra_print_items(self):
+        # EXTENDS account
+        print_items = super().get_extra_print_items()
+        moves_ready_to_download = self.filtered(lambda m:
+            m.l10n_br_last_edi_status in {'accepted', 'canceled'} and
+            (m.l10n_br_edi_xml_attachment_id or m.attachment_ids.filtered(lambda att: att.mimetype == 'application/xml' and 'NFe' in att.name))
+        )
+        if moves_ready_to_download:
+            print_items.append({
+                'key': 'download_nfe_xml',
+                'description': _('XML NFE'),
+                'type': 'ir.actions.act_url',
+                'url': f'/account/download_invoice_documents/{",".join(map(str, moves_ready_to_download.ids))}/nfe',
+                'target': 'download',
+            })
+        return print_items
 
     def button_request_cancel(self):
         # EXTENDS 'account'
@@ -429,7 +479,7 @@ class AccountMove(models.Model):
                 "res_id": self.id,
                 "res_field": "invoice_pdf_report_file",
                 "name": self._get_invoice_report_filename(),
-                "datas": response["pdf"]["base64"],
+                "raw": response["pdf"]["base64"],
             }
         )
         # make sure latest PDF shows to the right of the chatter
@@ -441,7 +491,7 @@ class AccountMove(models.Model):
                 "res_id": self.id,
                 "res_field": "l10n_br_edi_xml_attachment_file",
                 "name": self._l10n_br_edi_get_xml_attachment_name(),
-                "datas": response["xml"]["base64"],
+                "raw": response["xml"]["base64"],  # assign b64 which gets decoded
             }
         )
         self.invalidate_recordset(
@@ -469,9 +519,6 @@ class AccountMove(models.Model):
                     body=_("E-invoice submitted successfully."),
                     attachment_ids=invoice._l10n_br_edi_attachments_from_response(response).ids,
                 )
-
-                # Now that the invoice is submitted and accepted we no longer need the saved tax computation data.
-                invoice.l10n_br_edi_avatax_data = False
 
         return None
 
@@ -544,7 +591,7 @@ class AccountMove(models.Model):
         # These return errors when null in /v3/invoices
         keys_to_remove_when_null = ("ruleId", "ruleCode")
 
-        tax_calculation_response = json.loads(self.l10n_br_edi_avatax_data)
+        tax_calculation_response = self.l10n_br_edi_avatax_data
         for line in tax_calculation_response.get("lines", []):
             for detail in line.get("taxDetails", []):
                 for key in keys_to_remove_when_null:
@@ -602,17 +649,28 @@ class AccountMove(models.Model):
         # Remove informative taxes when submitting the invoice. These informative taxes change after invoice posting,
         # based on when a customer pays. These need to be handled manually in a separate misc journal entry when needed,
         # and should not be included in the legal XML and PDF.
+        is_icbs = self.company_id.l10n_br_is_icbs
+
+        def is_kept_informative(code):
+            # Under the fiscal reform the IS/IBS/CBS taxes stay even when informative.
+            return is_icbs and any(code.startswith(prefix) for prefix in ("is", "ibs", "cbs"))
+
         for line in payload.get("lines", []):
             line["taxDetails"] = [
-                detail for detail in line["taxDetails"] if detail["taxImpact"]["impactOnFinalPrice"] != "Informative"
+                detail for detail in line["taxDetails"]
+                if detail["taxImpact"]["impactOnFinalPrice"] != "Informative" or is_kept_informative(detail["taxType"])
             ]
 
         tax_highlights = payload.get("summary", {}).get("taxImpactHighlights", {})
         if "informative" in tax_highlights:
-            for informative_tax in tax_highlights.get("informative", []):
-                del payload["summary"]["taxByType"][informative_tax["taxType"]]
+            for informative_tax in tax_highlights["informative"]:
+                if not is_kept_informative(informative_tax["taxType"]):
+                    del payload["summary"]["taxByType"][informative_tax["taxType"]]
 
-            del tax_highlights["informative"]
+            if is_icbs:
+                tax_highlights["informative"] = [highlight for highlight in tax_highlights["informative"] if is_kept_informative(highlight["taxType"])]
+            else:
+                del tax_highlights["informative"]
 
     def _l10n_br_type_specific_header(self, tax_data_header):
         """Pieces of the header that change depending on whether the transaction is a service or goods one."""
@@ -638,42 +696,13 @@ class AccountMove(models.Model):
                 },
             }
 
-    def _l10n_br_get_location_dict(self, partner):
-        return {
-            "name": partner.name,
-            "businessName": partner.name,
-            "type": self._l10n_br_get_partner_type(partner),
-            "federalTaxId": partner.vat,
-            "cityTaxId": partner.l10n_br_im_code,
-            "stateTaxId": partner.l10n_br_ie_code,
-            "suframa": partner.l10n_br_isuf_code,
-            "address": {
-                "neighborhood": partner.street2,
-                "street": partner.street_name,
-                "zipcode": partner.zip,
-                "cityName": partner.city,
-                "state": partner.state_id.code,
-                "countryCode": partner.country_id.l10n_br_edi_code,
-                "number": partner.street_number,
-                "complement": partner.street_number2,
-                "phone": partner.phone,
-                "email": partner.email,
-            },
-        }
-
-    def _l10n_br_get_locations(self, customer, company_partner, transporter):
-        locations = {
-            "entity": self._l10n_br_get_location_dict(customer),
-            "establishment": self._l10n_br_get_location_dict(company_partner),
-        }
-
-        if not self.l10n_br_is_service_transaction:
-            locations["transporter"] = self._l10n_br_get_location_dict(transporter)
-
-        return locations
-
     def _l10n_br_get_additional_info(self):
         info = self.narration and html2plaintext(self.narration)  # html2plaintext turns False into "False"
+        tax_data, _ = self._l10n_br_edi_get_tax_data()  # TODO: Pass as a parameter in master
+        informative_taxes = tax_data.get('summary', {}).get('taxImpactHighlights', {}).get('informative', [])
+        approximate_taxes = {tax['taxType']: tax['tax'] for tax in informative_taxes if tax['taxType'] in ('aproxtribState', 'aproxtribFed', 'aproxtribCity')}
+        aprox_line = f"Trib. Aprox. R$ {approximate_taxes.get('aproxtribFed', 0.0)} Federal, R$ {approximate_taxes.get('aproxtribState', 0.0)} Estadual e R$ {approximate_taxes.get('aproxtribCity', 0.0)} Municipal. Fonte: IBPT"
+        info = "\n".join(line for line in (info, aprox_line) if line)  # skip the None line if there's no narration since we always want the approx line
         return {
             "additionalInfo": {"otherInfo" if self.l10n_br_is_service_transaction else "complementaryInfo": info}
         }
@@ -690,35 +719,12 @@ class AccountMove(models.Model):
         return transporter
 
     def _l10n_br_prepare_invoice_payload(self):
-        def deep_update(d, u):
-            """Like {}.update but handles nested dicts recursively. Based on https://stackoverflow.com/a/3233356."""
-            for k, v in u.items():
-                if isinstance(v, dict):
-                    d[k] = deep_update(d.get(k, {}), v)
-                else:
-                    d[k] = v
-            return d
-
-        def deep_clean(d):
-            """Recursively removes keys with a falsy value in dicts. Based on https://stackoverflow.com/a/48152075."""
-            cleaned_dict = {}
-            for k, v in d.items():
-                if isinstance(v, dict):
-                    v = deep_clean(v)
-                if v:
-                    cleaned_dict[k] = v
-            return cleaned_dict or None
-
         # The /transaction payload requires a superset of the /calculate payload we use for tax calculation.
         service_params = self._get_l10n_br_avatax_service_params()
         payload = self._prepare_l10n_br_avatax_document_service_call(service_params)
 
-        customer = self.partner_id
         company_partner = self.company_id.partner_id
         transporter = self._l10n_br_get_transporter()
-        partner_shipping_id = service_params['partner_shipping']
-        if partner_shipping_location := (payload['header']['locations'].get('rendered', {}) or payload['header']['locations'].get('delivery', {})):
-            partner_shipping_location['address']['countryCode'] = partner_shipping_id.country_id.l10n_br_edi_code
 
         tax_data_to_include, tax_data_header = self._l10n_br_edi_get_tax_data()
         extra_payload = {
@@ -727,11 +733,7 @@ class AccountMove(models.Model):
                 **service_params['invoice_refs_edi'],
                 **self._l10n_br_type_specific_header(tax_data_header),
                 "locations": {
-                    **self._l10n_br_get_locations(
-                    customer,
-                    company_partner,
-                    transporter,
-                    ),
+                    "transporter": self._l10n_br_get_location_dict(transporter),
                 },
                 "payment": {
                     "paymentInfo": {
@@ -748,7 +750,7 @@ class AccountMove(models.Model):
         # extra_payload is cleaned before it's used to avoid e.g. "cityName": False or "number": "". These make
         # Avatax return various errors: e.g. "Falha na estrutura enviada". This is to avoid having lots of if
         # statements.
-        deep_update(payload, deep_clean(extra_payload))
+        self._l10n_br_deep_update_dict(payload, self._l10n_br_deep_clean_dict(extra_payload))
 
         # This adds the "lines" and "summary" dicts received during tax calculation.
         payload.update(tax_data_to_include)
@@ -757,12 +759,54 @@ class AccountMove(models.Model):
 
         if self.l10n_br_is_service_transaction:
             self._l10n_br_remove_informative_taxes(payload)
+        else:
+            self._l10n_br_apply_tax_overrides(payload)
 
         return payload
+
+    def _l10n_br_apply_tax_overrides(self, payload):
+        """
+        Manually overrides CST, benefit code, and any other fields for EDI Goods requests,
+        since Avalara does not provide a direct configuration for setting exact values.
+        """
+        move_lines_map = {line.id: line for line in self.invoice_line_ids}
+
+        for payload_line in payload.get('lines', []):
+            if move_line := move_lines_map.get(payload_line.get('lineCode')):
+                if op_type := move_line.l10n_br_goods_operation_type_id or self.l10n_br_goods_operation_type_id:
+                    override_by_code = {
+                        line.tax_id.l10n_br_avatax_code: line
+                        for line in op_type.operation_tax_override_ids
+                    }
+
+                    for tax in payload_line.get('taxDetails') or ():
+                        if override := override_by_code.get(tax.get('taxType')):
+                            self._l10n_br_override_tax(tax, override)
+
+    def _l10n_br_override_tax(self, tax, override):
+        if override.cst_code:
+            tax['cst'] = override.cst_code
+        if override.benefit_code:
+            tax['exemptionCode'] = override.benefit_code
+        if override.c_class_trib:
+            tax['cClassTrib'] = override.c_class_trib
 
     def _l10n_br_get_error_from_response(self, response):
         if error := response.get("error"):
             return f"Code {error['code']}: {error['message']}"
+
+        # from "4.4.1. Tabela de Códigos de Resultado de Processamento" in
+        # MOC 7.0 - Anexo I, Leiaute e Regras de Validação da NF-e e da NFC-e
+        successful_codes = {
+            '100', '101', '102', '103', '104', '105', '106', '107',
+            '108', '109', '110', '111', '112', '124', '128', '135',
+            '136', '137', '138', '139', '140', '142', '150', '151',
+        }
+        status = response.get('status', {})
+        if 'code' in status and status['code'] not in successful_codes:
+            return f"Code {status['code']}: {status.get('desc', '')}"
+
+        return None
 
     def _l10n_br_submit_invoice(self, invoice, payload):
         try:
@@ -774,9 +818,21 @@ class AccountMove(models.Model):
             return None, str(e)
 
     def _cron_l10n_br_get_invoice_statuses(self, batch_size=10):
-        pending_invoices = self.search([("l10n_br_last_edi_status", "=", "pending")], limit=batch_size)
+        pending_invoices = self.search([("l10n_br_last_edi_status", "=", "pending")], limit=batch_size + 1)
         for invoice in pending_invoices[:batch_size]:
-            invoice.button_l10n_br_edi_get_service_invoice()
+            if (fields.Datetime.now() - invoice.l10n_br_edi_xml_attachment_id.create_date).days > 10:
+                invoice.l10n_br_last_edi_status = 'error'
+                invoice.message_post(
+                    body=Markup("%s<br/><br/><b>%s</b><br/>%s") % (
+                        self.env._("The NFS-e has remained in pending status for more than 10 days."),
+                        self.env._("The system has stopped checking the NFS-e status automatically."),
+                        self.env._("Please verify the situation with your city hall before trying again."),
+                    )
+                )
+            else:
+                invoice.button_l10n_br_edi_get_service_invoice()
+                if self._can_commit():
+                    self.env.cr.commit()
 
         if len(pending_invoices) > batch_size:
             self.env.ref("l10n_br_edi.ir_cron_l10n_br_edi_check_status")._trigger()
@@ -806,20 +862,18 @@ class AccountMove(models.Model):
 
             Partner = self.env['res.partner']
             partner_tree = partner_tree[0]
-            cnpj_id = self.env.ref('l10n_br.cnpj').id
             if cnpj := get_xml_text(partner_tree, './/nfe:CNPJ'):
-                if partner := Partner.search([('l10n_latam_identification_type_id', '=', cnpj_id), ('vat', 'in', (cnpj, format_cnpj(cnpj)))], limit=1):
+                if partner := Partner.search([('vat', 'in', (cnpj, format_cnpj(cnpj)))], limit=1):
                     return partner.id
 
-            cpf_id = self.env.ref('l10n_br.cpf').id
             if cpf := get_xml_text(partner_tree, './/nfe:CPF'):
-                if partner := Partner.search([('l10n_latam_identification_type_id', '=', cpf_id), ('vat', 'in', (cpf, format_cpf(cpf)))], limit=1):
-                    return partner.id
+                if partner := Partner._retrieve_partner(additional_identifiers={'BR_CN': compact_cpf(cpf)}):
+                    return partner[:1].id
 
             if create_if_not_found:
                 country_id = False
                 if c_pays := get_xml_text(partner_tree, './/nfe:cPais'):
-                    country_id = self.env['res.country'].search([('l10n_br_edi_code', '=', c_pays)], limit=1).id
+                    country_id = self.env['res.country'].search([('code', '=', AVATAX_CODE_TO_COUNTRY.get(c_pays))], limit=1).id
 
                 state_id = False
                 if uf := get_xml_text(partner_tree, './/nfe:UF'):
@@ -834,9 +888,8 @@ class AccountMove(models.Model):
                     city_id = self.env['res.city'].search(city_domain, limit=1).id
 
                 return Partner.create({
-                    'is_company': True,
-                    'vat': cnpj or cpf,
-                    'l10n_latam_identification_type_id': cnpj_id if cnpj else cpf_id,
+                    'vat': cnpj or False,
+                    'additional_identifiers': {'BR_CN': compact_cpf(cpf)} if cpf and not cnpj else False,
                     'name': get_xml_text(partner_tree, './/nfe:xNome'),
                     'street_name': get_xml_text(partner_tree, './/nfe:xLgr'),
                     'street_number': get_xml_text(partner_tree, './/nfe:nro'),
@@ -941,7 +994,7 @@ class AccountMove(models.Model):
         """ Identify NFe files. """
         # EXTENDS 'account'
 
-        if b"<nfeProc " in file_data['raw'] and b"<NFe " in file_data['raw']:
+        if b"<nfeProc " in file_data['raw'] and b"<NFe" in file_data['raw']:
             return 'l10n_br.nfe'
 
         return super()._get_import_file_type(file_data)
@@ -954,3 +1007,15 @@ class AccountMove(models.Model):
                 'decoder': self._l10n_br_edi_import_invoice,
             }
         return super()._get_edi_decoder(file_data, new)
+
+    def _get_alerts(self):
+        # EXTENDS 'account'
+        alerts = super()._get_alerts()
+        if self.l10n_br_last_edi_status == 'pending' and self.l10n_br_is_service_transaction:
+            alerts['l10n_br_edi_pending_status'] = {
+                'level': 'warning',
+                'message': self.env._(
+                    "This NFS-e is pending. The system automatically checks the status daily for up to 10 days. Manual checks consume 1 IAP credit per request."
+                )
+            }
+        return alerts

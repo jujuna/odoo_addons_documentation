@@ -1,5 +1,5 @@
 import { patch } from "@web/core/utils/patch";
-import { FileViewer } from "@documents/attachments/document_file_viewer";
+import { FileViewer } from "@documents/core/web/document_file_viewer";
 
 patch(FileViewer.prototype, {
     /**

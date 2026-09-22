@@ -1,10 +1,14 @@
+import { MobilePlugin } from "@web_mobile/js/mobile_plugin";
+import { render, useSubEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
-import { Chatter } from "@mail/chatter/web_portal/chatter";
+import { Chatter } from "@mail/chatter/web_portal_project/chatter";
 import { COMMANDS } from "@barcodes/barcode_handlers";
 import BarcodePickingModel from "@stock_barcode/models/barcode_picking_model";
+import BarcodePickingBatchModel from "@stock_barcode/models/barcode_picking_batch_model";
 import BarcodeQuantModel from "@stock_barcode/models/barcode_quant_model";
 import GroupedLineComponent from "@stock_barcode/components/grouped_line";
 import LineComponent from "@stock_barcode/components/line";
+import OptionLine from "@stock_barcode/components/option_line";
 import PackageLineComponent from "@stock_barcode/components/package_line";
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
@@ -12,24 +16,23 @@ import { useService, useBus } from "@web/core/utils/hooks";
 import { Mutex } from "@web/core/utils/concurrency";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { View } from "@web/views/view";
-import {
-    BarcodeVideoScanner,
-    isBarcodeScannerSupported,
-} from "@web/core/barcode/barcode_video_scanner";
 import { url } from "@web/core/utils/urls";
-import { utils as uiUtils } from "@web/core/ui/ui_service";
+import { utils as uiUtils } from "@web/core/ui/ui_utils";
 import {
     Component,
     EventBus,
     onPatched,
     onWillStart,
     onWillUnmount,
-    useState,
-    useSubEnv,
+    proxy,
+    usePlugin,
+    t,
+    useProps,
 } from "@odoo/owl";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
-import { BarcodeInput } from "@barcodes/components/manual_barcode";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
+import { BarcodeView } from "@barcodes/components/barcode_view";
+import { decode, isValidEpcFormat } from "@barcodes_gs1_nomenclature/js/epc_utils";
 import { CountScreenRFID } from "./count_screen_rfid";
 
 // Lets `barcodeGenericHandlers` knows those commands exist so it doesn't warn when scanned.
@@ -40,7 +43,9 @@ const bus = new EventBus();
 
 class StockBarcodeUnlinkButton extends Component {
     static template = "stock_barcode.UnlinkButton";
-    static props = { ...standardWidgetProps };
+
+    props = useProps(standardWidgetProps);
+
     setup() {
         this.orm = useService("orm");
     }
@@ -58,11 +63,12 @@ registry.category("view_widgets").add("stock_barcode_unlink_button", {
  * TODO: stock_barcode should not depend on base_import.
  */
 export class ImportBlockUI extends Component {
-    static props = {
-        message: { type: String, optional: true },
-        blockComponent: { type: Object, optional: true },
-    };
     static template = "stock_barcode.BlockUI";
+
+    props = useProps({
+        message: t.string().optional(),
+        blockComponent: t.object().optional(),
+    });
 }
 
 /**
@@ -72,19 +78,20 @@ export class ImportBlockUI extends Component {
  */
 
 class MainComponent extends Component {
-    static props = { ...standardActionServiceProps };
     static template = "stock_barcode.MainComponent";
     static components = {
-        BarcodeInput,
-        BarcodeVideoScanner,
+        BarcodeView,
         Chatter,
         CountScreenRFID,
         GroupedLineComponent,
         ImportBlockUI,
         LineComponent,
+        OptionLine,
         PackageLineComponent,
         View,
     };
+
+    props = useProps(standardActionServiceProps);
 
     //--------------------------------------------------------------------------
     // Lifecycle
@@ -98,6 +105,10 @@ class MainComponent extends Component {
         this.actionMutex = new Mutex();
         this.resModel = this.props.action.res_model;
         this.resId = this.props.action.context.active_id || false;
+        this.barcodeService = useService("barcode");
+        useBus(this.barcodeService.bus, "barcode_scanned", (ev) =>
+            this.onBarcodeScanned(ev.detail.barcode)
+        );
         const model = this._getModel();
         model.newScrapProduct = this.newScrapProduct.bind(this);
         useSubEnv({
@@ -106,7 +117,7 @@ class MainComponent extends Component {
         });
         this._scrollBehavior = "smooth";
         this.isMobile = uiUtils.isSmall();
-        this.state = useState({
+        this.state = proxy({
             cameraScannedEnabled: false,
             view: "barcodeLines", // Could be also 'printMenu' or 'editFormView'.
             displayNote: false,
@@ -120,11 +131,7 @@ class MainComponent extends Component {
         this.receivedRFIDs = [];
         this.totalRFIDs = [];
         this.bufferingTimeout = null;
-        this.barcodeService = useService("barcode");
-        useBus(this.barcodeService.bus, "barcode_scanned", (ev) =>
-            this.onBarcodeScanned(ev.detail.barcode)
-        );
-        this.mobileService = useService("mobile");
+        this.mobileService = usePlugin(MobilePlugin);
         useBus(this.mobileService.bus, "mobile_reader_scanned", (ev) =>
             this.onMobileReaderScanned(ev.detail.data)
         );
@@ -199,7 +206,7 @@ class MainComponent extends Component {
 
     unblockUI() {
         this.state.uiBlocked = false;
-        this.render(true);
+        render(this, true);
     }
 
     playSound(ev) {
@@ -246,16 +253,21 @@ class MainComponent extends Component {
         }
         this.setupCameraScanner();
         this.groups = barcodeData.groups;
-        this.env.model.setData(barcodeData);
+        const preSelectedLineId = this.props.action.context.selected_move_line_id || false;
+        this.env.model.setData(barcodeData, preSelectedLineId);
         this.state.displayNote = Boolean(this.env.model.record.note);
         this.env.model.addEventListener("process-action", this._onDoAction.bind(this));
         this.env.model.addEventListener("refresh", (ev) => this._onRefreshState(ev.detail));
         this.env.model.addEventListener("update", () => {
             if (!this.state.uiBlocked) {
-                this.render(true);
+                render(this, true);
             }
         });
         this.env.model.addEventListener("history-back", () => this._exit());
+    }
+
+    get isConfiguring() {
+        return this.env.model.needPickingType || this.env.model.needPickings;
     }
 
     get isTransfer() {
@@ -288,7 +300,11 @@ class MainComponent extends Component {
     }
 
     get displayActionButtons() {
-        return this.state.view === "barcodeLines" && this.env.model.canBeProcessed;
+        return (
+            this.state.view === "barcodeLines" &&
+            this.env.model.canBeProcessed &&
+            !this.isConfiguring
+        );
     }
 
     //--------------------------------------------------------------------------
@@ -298,6 +314,8 @@ class MainComponent extends Component {
     _getBarcodeModel() {
         if (this.resModel === "stock.picking") {
             return BarcodePickingModel;
+        } else if (this.resModel === "stock.picking.batch") {
+            return BarcodePickingBatchModel;
         } else if (this.resModel === "stock.quant") {
             return BarcodeQuantModel;
         }
@@ -310,6 +328,7 @@ class MainComponent extends Component {
             orm: this.orm,
             notification: this.notification,
             action: this.action,
+            barcodeService: this.barcodeService,
         };
         const BarcodeModel = this._getBarcodeModel();
         return new BarcodeModel(this.resModel, this.resId, services);
@@ -329,7 +348,6 @@ class MainComponent extends Component {
     }
 
     setupCameraScanner() {
-        this.cameraScannerSupported = isBarcodeScannerSupported();
         this.barcodeVideoScannerProps = {
             delayBetweenScan: this.config.delay_between_scan || 2000,
             facingMode: "environment",
@@ -348,7 +366,7 @@ class MainComponent extends Component {
 
     get cameraScannerClassState() {
         if (!this.state.readyToToggleCamera) {
-            return "bg-secondary";
+            return "bg-300";
         }
         return this.state.cameraScannedEnabled ? "bg-success text-white" : "text-primary";
     }
@@ -373,11 +391,20 @@ class MainComponent extends Component {
         });
     }
 
+    confirm(ev) {
+        ev.stopPropagation();
+        this.env.model.confirmSelection();
+    }
+
     onBarcodeScanned(barcode) {
         if (this.state.view !== "barcodeLines") {
             return;
         }
         if (barcode) {
+            if (isValidEpcFormat(barcode)) {
+                this.onMobileReaderScanned([decode(barcode)]);
+                return;
+            }
             this.actionMutex.exec(async () => this.env.model.processBarcode(barcode));
             if ("vibrate" in window.navigator) {
                 window.navigator.vibrate(100);
@@ -427,9 +454,21 @@ class MainComponent extends Component {
     }
 
     async exit(ev) {
+        if (
+            this.state.view === "barcodeLines" &&
+            this.env.model.canBeProcessed &&
+            this.env.model.needPickings &&
+            !this.env.model.needPickingType &&
+            this.env.model.pickingTypes
+        ) {
+            this.env.model.record.picking_type_id = false;
+            return this.env.model.trigger("update");
+        }
         this.state.cameraScannedEnabled = false;
         if (this.state.view === "barcodeLines") {
-            await this.env.model.beforeQuit();
+            await this.actionMutex.exec(async () => {
+                await this.env.model.beforeQuit();
+            });
             this._exit();
         } else {
             this.toggleBarcodeLines();
@@ -443,8 +482,11 @@ class MainComponent extends Component {
             this.action.doAction("stock_barcode.stock_barcode_action_main_menu");
         } else {
             const previousPath = breadcrumbs[breadcrumbs.length - 2].url.split("/");
-
-            if (isNaN(previousPath[previousPath.length - 1])) {
+            let lastPathPart = previousPath[previousPath.length - 1];
+            if (lastPathPart.includes("?")) {
+                lastPathPart = lastPathPart.split("?")[0];
+            }
+            if (isNaN(lastPathPart)) {
                 this.env.config.historyBack();
             } else {
                 // If previous controller path's last part is a number, it will
@@ -603,10 +645,21 @@ class MainComponent extends Component {
         );
     }
 
+    getlocationLineClass(location) {
+        const currentLocation = this.env.model.location;
+        const needAttention = this.env.model.locationNeedsAttention(location);
+        if (currentLocation?.id == location.id) {
+            return needAttention ? "text-bg-warning" : "text-bg-400";
+        } else if (needAttention) {
+            return "bg-opacity-75 text-bg-warning text-black";
+        }
+        return "text-muted bg-300";
+    }
+
     get scrapViewProps() {
         const context = this.env.model.scrapContext;
         return {
-            resModel: "stock.scrap",
+            resModel: "stock.move",
             context: context,
             viewId: this.env.model.scrapViewId,
             display: { controlPanel: false },
@@ -629,6 +682,18 @@ class MainComponent extends Component {
         this.changeView("productPage");
     }
 
+    async onDisplayAllocationReport() {
+        await this.env.model.save();
+        const reportAction = await this.orm.call(this.resModel, "action_view_allocation_report", [
+            this.resId,
+        ]);
+        const docids = [this.resId];
+        // reportAction.binding_model_id = this.resModel;
+        const data = { docids };
+        const context = { active_ids: docids, active_model: this.resModel };
+        return this.action.doAction({ ...reportAction, context, data });
+    }
+
     async _onRefreshState(paramsRefresh) {
         const { recordId, lineId } = paramsRefresh || {};
         const { route, params } = this.env.model.getActionRefresh(recordId);
@@ -637,7 +702,7 @@ class MainComponent extends Component {
             const result = await rpc(route, params);
             await this.env.model.refreshCache(result.data.records);
             await this.toggleBarcodeLines(lineId);
-            this.render();
+            render(this);
         });
     }
 

@@ -6,38 +6,36 @@ import { formatFloat } from "../formatters";
 import { parseFloat } from "../parsers";
 import { standardFieldProps } from "../standard_field_props";
 
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, signal, t, useProps } from "@odoo/owl";
+
+export const floatFieldProps = {
+    ...standardFieldProps,
+    formatNumber: t.boolean().optional(true),
+    inputType: t.string().optional("text"),
+    step: t.number().optional(),
+    digits: t.array().optional(),
+    minDigits: t.number().optional(),
+    humanReadable: t.boolean().optional(false),
+    decimals: t.number().optional(0),
+    trailingZeros: t.boolean().optional(true),
+};
 
 export class FloatField extends Component {
     static template = "web.FloatField";
-    static props = {
-        ...standardFieldProps,
-        formatNumber: { type: Boolean, optional: true },
-        inputType: { type: String, optional: true },
-        step: { type: Number, optional: true },
-        digits: { type: Array, optional: true },
-        humanReadable: { type: Boolean, optional: true },
-        decimals: { type: Number, optional: true },
-        trailingZeros: { type: Boolean, optional: true },
-    };
-    static defaultProps = {
-        formatNumber: true,
-        inputType: "text",
-        humanReadable: false,
-        decimals: 0,
-        trailingZeros: true,
-    };
+    props = useProps(floatFieldProps);
+
+    numpadDecimalRef = signal.ref();
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             hasFocus: false,
         });
         this.inputRef = useInputField({
             getValue: () => this.formattedValue,
-            refName: "numpadDecimal",
+            ref: this.numpadDecimalRef,
             parse: (v) => this.parse(v),
         });
-        useNumpadDecimal();
+        useNumpadDecimal(this.numpadDecimalRef);
     }
 
     onFocusIn() {
@@ -63,6 +61,7 @@ export class FloatField extends Component {
         }
         const options = {
             digits: this.props.digits,
+            minDigits: this.props.minDigits,
             field: this.props.record.fields[this.props.name],
             trailingZeros: this.props.trailingZeros,
         };
@@ -98,6 +97,11 @@ export const floatField = {
         {
             label: _t("Digits"),
             name: "digits",
+            type: "digits",
+        },
+        {
+            label: _t("Minimum Digits"),
+            name: "minDigits",
             type: "digits",
         },
         {
@@ -151,6 +155,7 @@ export const floatField = {
             humanReadable: !!options.human_readable,
             step: options.step,
             digits,
+            minDigits: options.min_display_digits,
             decimals: options.decimals || 0,
             trailingZeros: !options.hide_trailing_zeros,
         };

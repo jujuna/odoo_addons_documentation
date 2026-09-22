@@ -1,4 +1,4 @@
-import { Component, onWillPatch, useState } from "@odoo/owl";
+import { Component, onWillPatch, proxy, t, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { graphView } from "@web/views/graph/graph_view";
@@ -12,18 +12,19 @@ import { useEditNodeAttributes } from "@web_studio/client_action/view_editor/vie
 
 export class GraphEditorSidebar extends Component {
     static template = "web_studio.ViewEditor.GraphEditorSidebar";
-    static props = {
-        openViewInForm: { type: Function, optional: true },
-        openDefaultValues: { type: Function, optional: true },
-    };
     static components = {
         InteractiveEditorSidebar,
         Property,
         SidebarViewToolbox,
     };
 
+    props = useProps({
+        openViewInForm: t.function().optional(),
+        openDefaultValues: t.function().optional(),
+    });
+
     setup() {
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
         this.editArchAttributes = useEditNodeAttributes({ isRoot: true });
 
         onWillPatch(() => {

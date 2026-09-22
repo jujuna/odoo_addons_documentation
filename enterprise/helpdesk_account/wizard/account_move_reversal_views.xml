@@ -13,7 +13,7 @@
                             <field name="suitable_move_ids" invisible="1"/>
                             <field name="helpdesk_ticket_id" invisible="1"/>
                             <field name="helpdesk_sale_order_id" options="{'no_create': True}"/>
-                            <field name="move_ids" string="Invoices to Refund" options="{'create': False}" widget="many2many_tags" domain="[('id', 'in', suitable_move_ids)]"/>
+                            <field name="move_ids" string="Invoices to Refund" create="False" widget="many2many_tags" domain="[('id', 'in', suitable_move_ids)]"/>
                         </group>
                 </xpath>
             </field>

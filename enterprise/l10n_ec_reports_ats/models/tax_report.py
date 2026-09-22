@@ -4,7 +4,7 @@
 from odoo import models, fields, _, api
 from odoo.tools import float_repr, float_round, groupby
 from odoo.exceptions import RedirectWarning, ValidationError
-from odoo.addons.l10n_ec.models.res_partner import PartnerIdTypeEc
+from odoo.addons.l10n_ec.models.res_partner import EC_PARTNER_ID_CODES
 from odoo.addons.l10n_ec_edi.models.account_move import L10N_EC_VAT_TAX_NOT_ZERO_GROUPS
 
 import unicodedata
@@ -52,7 +52,9 @@ class AccountTaxReportHandler(models.AbstractModel):
     def _generate_ats(self, options):
         # Generate ATS report
         # 2.1 Company information
-        company = self.env.company
+        report = self.env['account.report'].browse(options['report_id'])
+        company_ids = report.get_report_company_ids(options)
+        company = report._get_sender_company_for_export(options)
         if not company.account_fiscal_country_id.code == 'EC':
             raise ValidationError(_('This report is only available for Ecuadorian companies.'))
         date_start = fields.Date.to_date(options['date']['date_from'])
@@ -60,14 +62,14 @@ class AccountTaxReportHandler(models.AbstractModel):
 
         sale_journals = self.env['account.journal'].search([
             ('type', '=', 'sale'),
-            ('company_id', '=', company.id),
+            ('company_id', 'in', company_ids),
             ('l10n_ec_entity', '!=', False),
         ])
         num_estab_ruc = len(set(sale_journals.mapped('l10n_ec_entity')))
 
         values = {
-            'company': self.env.company,
-            'latam_identification_type': self._l10n_ec_get_ats_identification_type_code(company.partner_id.l10n_latam_identification_type_id),
+            'company': company,
+            'latam_identification_type': self._l10n_ec_get_ats_identification_type_code(company.partner_id),
             'anio': date_finish.year,
             'mes': f'{date_finish.month:02}',
             'num_estab_ruc': f'{num_estab_ruc:03}',
@@ -75,15 +77,15 @@ class AccountTaxReportHandler(models.AbstractModel):
         }
 
         # Purchase documents
-        purchase_vals, purchase_errors = self._get_purchase_values(date_start, date_finish)
-        sale_vals, sale_errors = self._get_sale_values(date_start, date_finish)
+        purchase_vals, purchase_errors = self._get_purchase_values(date_start, date_finish, company_ids)
+        sale_vals, sale_errors = self._get_sale_values(date_start, date_finish, company_ids)
         withhold_journals = self.env['account.journal'].search([
             ('type', '=', 'general'),
-            ('company_id', '=', company.id),
+            ('company_id', 'in', company_ids),
             ('l10n_ec_withhold_type', '=', 'in_withhold'),
         ]) # In withhold Journals
         journals = sale_journals + withhold_journals
-        void_moves = self._get_void_moves(date_start, date_finish, journals)
+        void_moves = self._get_void_moves(date_start, date_finish, journals, company_ids)
         values.update({
             'purchase_vals': purchase_vals,
             'void_moves': void_moves,
@@ -95,7 +97,7 @@ class AccountTaxReportHandler(models.AbstractModel):
         return self.env['ir.qweb']._render('l10n_ec_reports_ats.ats_report_template', values), errors
 
     @api.model
-    def _get_purchase_values(self, date_start, date_finish):
+    def _get_purchase_values(self, date_start, date_finish, company_ids):
         """ Provide the values for the purchase section.
         For this section, invoice lines are grouped by invoice and by tax support. """
 
@@ -114,8 +116,8 @@ class AccountTaxReportHandler(models.AbstractModel):
 
         # Get all VAT taxes, including the ones that are archived like 12% since 29/02/2024
         ec_vat_taxes = self.env['account.tax'].with_context(active_test=False).search([
+            *self.env['account.tax']._check_company_domain(company_ids),
             ('tax_group_id.l10n_ec_type', 'not in', (False, 'ice', 'irbpnr', 'other')),
-            ('company_id', '=', self.env.company.id),
         ])
 
         errors = []
@@ -128,7 +130,7 @@ class AccountTaxReportHandler(models.AbstractModel):
                 ('l10n_latam_document_type_id.code', 'in', LOCAL_PURCHASE_DOCUMENT_CODES),
                 ('date', '>=', date_start),
                 ('date', '<=', date_finish),
-                ('company_id', '=', self.env.company.id)
+                ('company_id', 'in', company_ids)
             ],
             order='invoice_date, move_type, l10n_latam_document_type_id, create_date',
         )
@@ -174,7 +176,7 @@ class AccountTaxReportHandler(models.AbstractModel):
 
             # 1. INVOICE-RELATED FIELDS
             # 1.1. General fields
-            transaction_type = PartnerIdTypeEc.get_ats_code_for_partner(in_inv.partner_id, in_inv.move_type).value
+            transaction_type = in_inv.partner_id._l10n_ec_get_ats_code(in_inv.move_type)
             id_prov, validation_errors = self._l10n_ec_get_validated_partner_vat(in_inv.partner_id)
             errors += validation_errors
             parte_rel = 'SI' if in_inv.commercial_partner_id.l10n_ec_related_party else 'NO'
@@ -200,7 +202,7 @@ class AccountTaxReportHandler(models.AbstractModel):
             # 1.2. Provide the partner name if ID is passport/foreign
             if transaction_type == '03':
                 natural_society = in_inv.commercial_partner_id._get_l10n_ec_edi_supplier_identification_type_code()
-                natural_society_name = self._l10n_ec_get_normalized_name(in_inv.partner_id.commercial_company_name or in_inv.partner_id.name)
+                natural_society_name = self._l10n_ec_get_normalized_name(in_inv.partner_id.parent_name or in_inv.partner_id.name)
                 inv_values.update({
                     'tipoProv': natural_society,
                     'denoProv': natural_society_name,
@@ -354,10 +356,10 @@ class AccountTaxReportHandler(models.AbstractModel):
         _append_error_messages_partner_vat(in_inv.l10n_ec_reimbursement_ids)
 
         def _get_ats_code_prov_reimbursement(reimbursement):
-            partner_type_id = reimbursement._get_identification_type()
-            if partner_type_id == 'ruc':
-                return PartnerIdTypeEc.IN_RUC.value
-            return PartnerIdTypeEc.IN_PASSPORT.value
+            partner = reimbursement.partner_id
+            if partner and partner._l10n_ec_get_identification_type()[0] == 'ruc':
+                return EC_PARTNER_ID_CODES['in_ruc']
+            return EC_PARTNER_ID_CODES['in_passport']
 
         reimbursements_vals = []
         # Whether there are more than one reimbursement with the same document_number, it's because this invoice has multiple vat tax
@@ -412,7 +414,7 @@ class AccountTaxReportHandler(models.AbstractModel):
             'ice_amount': 0.0,  # ICE is not supported yet
         }
 
-    def _get_void_moves(self, date_start, date_finish, journals):
+    def _get_void_moves(self, date_start, date_finish, journals, company_ids):
         # Creates the cancelled document section
         void_invoices = self.env['account.move'].search(
             [
@@ -422,7 +424,7 @@ class AccountTaxReportHandler(models.AbstractModel):
                 ('l10n_latam_document_type_id.code', 'in', SALE_DOCUMENT_CODES + LOCAL_PURCHASE_DOCUMENT_CODES),
                 ('date', '>=', date_start),
                 ('date', '<=', date_finish),
-                ('company_id', '=', self.env.company.id)
+                ('company_id', 'in', company_ids)
             ],
             order='invoice_date, move_type, l10n_latam_document_type_id, create_date',
         )
@@ -438,7 +440,7 @@ class AccountTaxReportHandler(models.AbstractModel):
                 ('date', '>=', date_start),
                 ('date', '<=', date_finish),
                 ('l10n_ec_authorization_number', '!=', False),
-                ('company_id', '=', self.env.company.id)
+                ('company_id', 'in', company_ids)
             ],
             order='invoice_date, move_type, l10n_latam_document_type_id, create_date',
         )
@@ -446,10 +448,10 @@ class AccountTaxReportHandler(models.AbstractModel):
         return void_moves
 
     @api.model
-    def _get_sale_values(self, date_start, date_finish):
+    def _get_sale_values(self, date_start, date_finish, company_ids):
         total_sales = 0.0
 
-        invoices_values, errors = self._get_invoices_values(date_start, date_finish)
+        invoices_values, errors = self._get_invoices_values(date_start, date_finish, company_ids)
         # Order sale invoice by partner RUC. _get_sales_info_by_partner groups invoices by partner vat.
         sale_vals, sales_info_errors = self._get_sales_info_by_partner(invoices_values)
         errors += sales_info_errors
@@ -463,7 +465,7 @@ class AccountTaxReportHandler(models.AbstractModel):
             # Get all the establishments registered at the SRI
             sale_journals = self.env['account.journal'].search([
                 ('type', '=', 'sale'),
-                ('company_id', '=', self.env.company.id),
+                ('company_id', 'in', company_ids),
                 ('l10n_ec_entity', '!=', False),
             ])
             entities = list(set(sale_journals.mapped('l10n_ec_entity')))
@@ -482,15 +484,15 @@ class AccountTaxReportHandler(models.AbstractModel):
         return values, errors
 
     @api.model
-    def _get_invoices_values(self, date_start, date_finish):
+    def _get_invoices_values(self, date_start, date_finish, company_ids):
 
         def get_ec_type(taxes):
             return (taxes & ec_vat_taxes).tax_group_id.l10n_ec_type or 'zero_vat'
 
         # Get all VAT taxes, including the ones that are archived like 12% since 29/02/2024
         ec_vat_taxes = self.env['account.tax'].with_context(active_test=False).search([
+            *self.env['account.tax']._check_company_domain(company_ids),
             ('tax_group_id.l10n_ec_type', 'not in', (False, 'ice', 'irbpnr', 'other')),
-            ('company_id', '=', self.env.company.id),
         ])
         ec_ice_taxes = self.env['account.tax'].with_context(active_test=False).search([
             ('tax_group_id.l10n_ec_type', '=', 'ice'),
@@ -505,7 +507,7 @@ class AccountTaxReportHandler(models.AbstractModel):
                 ('l10n_latam_document_type_id.code', 'in', SALE_DOCUMENT_CODES),
                 ('date', '>=', date_start),
                 ('date', '<=', date_finish),
-                ('company_id', '=', self.env.company.id),
+                ('company_id', 'in', company_ids),
             ],
             order='partner_id, l10n_latam_document_type_id, invoice_date, l10n_ec_authorization_number, create_date',
         )
@@ -573,7 +575,7 @@ class AccountTaxReportHandler(models.AbstractModel):
         # The ATS validates by partner identification number. We must get the commercial partner instead of the partner
         for id_partner, partner_invoices_values in groupby(invoices_values, key=lambda m: (m['partner'].commercial_partner_id, m['latam_document_type_code'], m['tipoEmision'])):
             partner = partner_invoices_values[0]['partner']
-            identification_type_code = PartnerIdTypeEc.get_ats_code_for_partner(partner, 'out_').value
+            identification_type_code = partner._l10n_ec_get_ats_code('out_')
             id_cliente, validation_errors = self._l10n_ec_get_validated_partner_vat(partner)
             errors += validation_errors
 
@@ -615,33 +617,21 @@ class AccountTaxReportHandler(models.AbstractModel):
             if identification_type_code == '06':
                 values.update({
                     'tipoCliente': '02' if partner.is_company else '01',
-                    'denoCli': partner.commercial_partner_id.commercial_company_name or partner.commercial_partner_id.name
+                    'denoCli': partner.commercial_partner_id.parent_name or partner.commercial_partner_id.name
                 })
             group_sales[id_partner] = values
         return group_sales, errors
 
     # =====  HELPERS  =====
     @api.model
-    def _l10n_ec_get_ats_identification_type_code(self, identificaction_type):
-        id_types_by_xmlid = {
-            'l10n_ec.ec_dni': 'C',  # DNI
-            'l10n_ec.ec_ruc': 'R',  # RUC
-            'l10n_ec.ec_passport': 'P',  # EC passport
-            'l10n_latam_base.it_pass': 'P',  # Passport
-            'l10n_latam_base.it_fid': 'P',  # Foreign ID
-            'l10n_latam_base.it_vat': 'P', # Foreign Vat
+    def _l10n_ec_get_ats_identification_type_code(self, partner):
+        ats_id_type_by_ec_type = {
+            'cedula': 'C',
+            'ruc': 'R',
+            'passport': 'P',
+            'foreign': 'P',
         }
-        ats_id_type_code = '' # If there is no identification type, returns an empty string
-        xmlid_by_res_id = {
-            self.env['ir.model.data']._xmlid_to_res_model_res_id(xmlid, raise_if_not_found=True)[1]: xmlid
-            for xmlid in id_types_by_xmlid
-        }
-        id_type_xmlid = xmlid_by_res_id.get(identificaction_type.id)
-        if id_type_xmlid in id_types_by_xmlid:
-            ats_id_type_code = id_types_by_xmlid[id_type_xmlid]
-        if identificaction_type.country_id.code != 'EC':
-            ats_id_type_code = 'P'
-        return ats_id_type_code
+        return ats_id_type_by_ec_type.get(partner._l10n_ec_get_identification_type()[0], '')
 
     @api.model
     def _l10n_ec_get_total_by_entity(self, invoices_values):
@@ -667,19 +657,17 @@ class AccountTaxReportHandler(models.AbstractModel):
         - Other ID types are not allowed.
         """
         errors = []
-        partner_vat = partner.commercial_partner_id.vat
-        ec_id_type = partner._l10n_ec_get_identification_type()
+        ec_id_type, partner_vat = partner._l10n_ec_get_identification_type()
         if (partner_vat and len(partner_vat) < 3) or not partner_vat:
             errors.append(_("The identification number of contact %s must have at least 3 characters.", partner.name))
-        elif ec_id_type in ['passport', 'ec_passport', 'foreign']:
+        elif ec_id_type in ('foreign', 'passport'):
             # The regulations indicate that the first 13 digits be chosen.
             partner_vat = (partner_vat and partner_vat[:13]) or ''
         elif not ec_id_type:
             errors.append(
                 _(
-                    'Valid types of identification for the ATS report are: Cédula, Ruc, Passport, Foreign ID. Contact %(partner)s has type "%(type)s".',
+                    'Valid types of identification for the ATS report are: Cédula, Ruc, Passport, Foreign ID. Contact %(partner)s has no valid identification.',
                     partner=partner.name,
-                    type=partner.l10n_latam_identification_type_id.name,
                 )
             )
         return partner_vat, errors

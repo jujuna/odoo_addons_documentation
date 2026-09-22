@@ -7,8 +7,8 @@ class TestCommonForecast(TestCommonPlanning):
 
     @classmethod
     def setUpProjects(cls):
-        Project = cls.env['project.project'].with_context(tracking_disable=True)
-        Task = cls.env['project.task'].with_context(tracking_disable=True)
+        Project = cls.env['project.project']
+        Task = cls.env['project.task']
 
         cls.project_opera = Project.create({
             'name': 'Opera',
@@ -30,4 +30,4 @@ class TestCommonForecast(TestCommonPlanning):
         })
 
     def get_by_employee(self, employee):
-        return self.env['planning.slot'].search([('employee_id', '=', employee.id)])
+        return self.env['planning.slot'].search([('resource_ids', 'in', employee.resource_id.id)])

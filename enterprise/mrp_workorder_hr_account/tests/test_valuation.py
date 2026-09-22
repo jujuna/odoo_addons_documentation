@@ -1,17 +1,19 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from freezegun import freeze_time
 
 from odoo.addons.mrp_account.tests.common import TestBomPriceOperationCommon
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 
 from datetime import datetime, timedelta
 
 PRICE = 1637.51
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMrpWorkorderHrValuation(TestBomPriceOperationCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):

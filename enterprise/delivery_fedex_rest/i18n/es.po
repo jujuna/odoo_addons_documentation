@@ -3,21 +3,22 @@
 # * delivery_fedex_rest
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-09-18 02:46+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 00:50+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-master/"
 "delivery_fedex_rest/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_fedex_rest
 #: model_terms:ir.ui.view,arch_db:delivery_fedex_rest.view_delivery_carrier_form_with_provider_fedex
@@ -38,8 +39,8 @@ msgid ""
 "                                <br/>"
 msgstr ""
 "<b>Tras la creación de su cuenta, vaya a la pestaña “Mis proyectos” y cree "
-"un nuevo proyecto API. Asegúrese de seleccionar las siguientes opciones:</"
-"b>\n"
+"un nuevo proyecto API. Asegúrese de seleccionar las siguientes opciones:</b>"
+"\n"
 "                                <br/>"
 
 #. module: delivery_fedex_rest
@@ -52,11 +53,11 @@ msgid ""
 "that you contact the FedEx support team by email."
 msgstr ""
 "<b>El último paso para crear etiquetas de envío FedEx es el proceso de "
-"certificación. Haga clic en “Ir a certificación API” y siga los pasos "
-"necesarios para certificar su cuenta para la creación de etiquetas.</b>\n"
-"                                <br/>Para estas certificaciones, normalmente "
-"tendrá que ponerse en contacto con el equipo de asistencia de FedEx por "
-"correo electrónico."
+"certificación. Haz clic en «Ir a la certificación API» y sigue los pasos "
+"necesarios para certificar tu cuenta y crear etiquetas.</b>\n"
+"                                <br/>En general, para obtener estas "
+"certificaciones es necesario ponerse en contacto con el equipo de soporte de "
+"FedEx a través del correo electrónico."
 
 #. module: delivery_fedex_rest
 #: model_terms:ir.ui.view,arch_db:delivery_fedex_rest.view_delivery_carrier_form_with_provider_fedex
@@ -143,6 +144,11 @@ msgstr "Contacte con FedEx para la recogida"
 #: code:addons/delivery_fedex_rest/models/fedex_request.py:0
 msgid "Could not decode response"
 msgstr "No se pudo decodificar la respuesta"
+
+#. module: delivery_fedex_rest
+#: model:ir.model,name:delivery_fedex_rest.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,help:delivery_fedex_rest.field_delivery_carrier__fedex_rest_residential_address
@@ -468,6 +474,11 @@ msgid "Fedex Rest Weight Unit"
 msgstr "Unidad de peso de FedEx para cantidad restante"
 
 #. module: delivery_fedex_rest
+#: model:ir.module.module,shortdesc:base.module_delivery_fedex_rest
+msgid "Fedex Shipping"
+msgstr ""
+
+#. module: delivery_fedex_rest
 #: model_terms:ir.ui.view,arch_db:delivery_fedex_rest.view_delivery_carrier_form_with_provider_fedex
 msgid "Fedex Tutorial"
 msgstr "Tutorial de FedEx"
@@ -494,6 +505,13 @@ msgstr ""
 "enviada de vuelta a FedEx como un archivo PDF para imprimir y adjuntar al "
 "envío o para su transmisión electrónica manual. También puede enviarse "
 "directamente a FedEx como información ETD una vez confirmado el envío."
+
+#. module: delivery_fedex_rest
+#. odoo-python
+#: code:addons/delivery_fedex_rest/models/delivery_fedex.py:0
+msgid "Freight services for Fedex are not implemented."
+msgstr ""
+"Los servicios de transporte de mercancías de Fedex no están disponibles."
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,field_description:delivery_fedex_rest.field_delivery_carrier__fedex_rest_documentation_type
@@ -717,6 +735,15 @@ msgid "Secret Key"
 msgstr "Clave secreta"
 
 #. module: delivery_fedex_rest
+#: model:ir.module.module,description:base.module_delivery_fedex_rest
+msgid ""
+"Send your shippings through Fedex and track them online. This version of the "
+"FedEx connector iscompatible with the FedEx REST API available at https://"
+"developer.fedex.com/. It is no longercompatible with the older FedEx SOAP "
+"APIs (which have their own credentials)."
+msgstr ""
+
+#. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_duty_payment__sender
 msgid "Sender"
 msgstr "Remitente"
@@ -734,15 +761,10 @@ msgid "Shipment created into Fedex"
 msgstr "Envío creado en FedEx"
 
 #. module: delivery_fedex_rest
-#: model:ir.model,name:delivery_fedex_rest.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Métodos de envío"
-
-#. module: delivery_fedex_rest
 #. odoo-python
 #: code:addons/delivery_fedex_rest/models/fedex_request.py:0
 msgid "Something went wrong, please try again later!!"
-msgstr "Ocurrió un error, vuelva a intentarlo más tarde."
+msgstr "Se ha producido un error. Vuelve a intentarlo más tarde."
 
 #. module: delivery_fedex_rest
 #: model:ir.model,name:delivery_fedex_rest.model_stock_package_type

@@ -29,49 +29,93 @@ export function useSpreadsheetCurrencies() {
                 context: { active_test: false },
             }
         );
-        return odooCurrencies.map((currency) => {
-            return {
-                code: currency.name,
-                symbol: currency.symbol,
-                position: currency.position || "after",
-                name: currency.full_name || _t("Currency"),
-                decimalPlaces: currency.decimal_places || 2,
-            };
-        });
+        return odooCurrencies.map((currency) => ({
+            code: currency.name,
+            symbol: currency.symbol,
+            position: currency.position || "after",
+            name: currency.full_name || _t("Currency"),
+            decimalPlaces: currency.decimal_places || 2,
+        }));
     }
     return loadCurrencies;
 }
 
 /**
- * @returns {String}
+ * @returns {() => (string | undefined)}
  */
 export function useSpreadsheetThumbnail() {
     return () => {
         const dimensions = SPREADSHEET_DIMENSIONS;
+        const dpr = window.devicePixelRatio || 1;
         const canvas = document.querySelector(".o-grid canvas:not(.o-figure-canvas)");
+        if (!canvas) {
+            return undefined;
+        }
         const canvasResizer = document.createElement("canvas");
-        const size = 500;
-        canvasResizer.width = size;
-        canvasResizer.height = size;
+        const height = 500;
+        const aspectRatio = 200 / 140;
+        const width = height * aspectRatio;
+        canvasResizer.width = width;
+        canvasResizer.height = height;
         const canvasCtx = canvasResizer.getContext("2d");
         // use only 25 first rows in thumbnail
-        const sourceSize = Math.min(
+        const sourceHeight = Math.min(
             25 * dimensions.DEFAULT_CELL_HEIGHT,
-            canvas.width,
+            canvas.width / aspectRatio,
             canvas.height
         );
+        const sourceWidth = sourceHeight * aspectRatio;
+        const sizeRatio = (height / sourceHeight) * dpr;
         if (canvas.width !== 0 && canvas.height !== 0) {
             canvasCtx.drawImage(
                 canvas,
-                dimensions.HEADER_WIDTH - 1,
-                dimensions.HEADER_HEIGHT - 1,
-                sourceSize,
-                sourceSize,
+                dimensions.HEADER_WIDTH * dpr - 1,
+                dimensions.HEADER_HEIGHT * dpr - 1,
+                sourceWidth,
+                sourceHeight,
                 0,
                 0,
-                size,
-                size
+                width,
+                height
             );
+            let { top: canvasTop, left: canvasLeft } = canvas.getBoundingClientRect();
+            canvasLeft += dimensions.HEADER_WIDTH - 1;
+            canvasTop += dimensions.HEADER_HEIGHT - 1;
+            for (const chart of document.querySelectorAll(".o-figure .o-chart-container")) {
+                const figureCanvas = chart.querySelector(".o-figure-canvas");
+                if (!figureCanvas) {
+                    continue;
+                }
+                const {
+                    top: figureTop,
+                    left: figureLeft,
+                    width: figureWidth,
+                    height: figureHeight,
+                } = figureCanvas.getBoundingClientRect();
+                const divBGColor = chart.children[0].style.backgroundColor;
+                if (divBGColor) {
+                    canvasCtx.save();
+                    canvasCtx.fillStyle = divBGColor;
+                    canvasCtx.fillRect(
+                        (figureLeft - canvasLeft) * sizeRatio,
+                        (figureTop - canvasTop) * sizeRatio,
+                        figureWidth * sizeRatio,
+                        figureHeight * sizeRatio
+                    );
+                    canvasCtx.restore();
+                }
+                canvasCtx.drawImage(
+                    figureCanvas,
+                    0,
+                    0,
+                    figureCanvas.width,
+                    figureCanvas.height,
+                    (figureLeft - canvasLeft) * sizeRatio,
+                    (figureTop - canvasTop) * sizeRatio,
+                    figureWidth * sizeRatio,
+                    figureHeight * sizeRatio
+                );
+            }
         }
         const type = "image/webp";
         const quality = 0;

@@ -12,6 +12,6 @@ class ProductTemplate(models.Model):
         if 'list_price' in vals:
             for record in self:
                 for product in record.product_variant_ids:
-                    product.pricer_product_to_create_or_update = True
+                    product.needs_pricer_update = True
 
         return super().write(vals)

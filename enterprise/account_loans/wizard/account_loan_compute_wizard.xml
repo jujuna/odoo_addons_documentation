@@ -15,13 +15,13 @@
                                 <label for="interest_rate" string="Interest Rate"/>
                                 <div>
                                     <field name="interest_rate" class="oe_inline"/>
-                                    <span class="oe_inline">%</span>
+                                    %
                                 </div>
                                 <label for="loan_term" string="Loan Term"/>
                                 <div>
                                     <field name="loan_term" class="oe_inline"/>
-                                    <span class="oe_inline" invisible="loan_term == 1">years</span>
-                                    <span class="oe_inline" invisible="loan_term != 1">year</span>
+                                    <span invisible="loan_term == 1">years</span>
+                                    <span invisible="loan_term != 1">year</span>
                                 </div>
                             </group>
                             <group name="loan_dates">
@@ -36,7 +36,7 @@
                     </sheet>
                     <footer>
                         <button string="Apply" name="action_save" type="object" class="btn-primary" data-hotkey="q"/>
-                        <button string="Discard" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                        <button class="btn-secondary" special="cancel" data-hotkey="x"/>
                     </footer>
                </form>
             </field>

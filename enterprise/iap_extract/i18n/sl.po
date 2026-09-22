@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-09-16 21:28+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-17 23:46+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-master/"
 "iap_extract/sl/>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: iap_extract
 #: model:mail.template,body_html:iap_extract.iap_extract_no_credit
@@ -52,13 +52,12 @@ msgid ""
 "All fields will be automatically populated by Artificial Intelligence, it "
 "might take 5 seconds."
 msgstr ""
-"Vsa polja bo samodejno izpolnila umetna inteligenca, kar lahko traja 5 "
-"sekund."
 
 #. module: iap_extract
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__error_status
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__error_status
@@ -94,8 +93,8 @@ msgstr ""
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "Buy credits"
-msgstr "Kupite kredite"
+msgid "Buy"
+msgstr ""
 
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__extract_can_show_send_button
@@ -104,7 +103,13 @@ msgid "Can show the ocr send button"
 msgstr "Lahko prikaže gumb za pošiljanje OCR"
 
 #. module: iap_extract
+#: model:ir.module.module,summary:base.module_iap_extract
+msgid "Common module for requesting data from the extract server"
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__done
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__done
@@ -129,6 +134,11 @@ msgid "Display Name"
 msgstr "Prikazani naziv"
 
 #. module: iap_extract
+#: model:iap.service,name:iap_extract.iap_service_ocr
+msgid "Document Digitization"
+msgstr ""
+
+#. module: iap_extract
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 msgid "Document is being digitized"
@@ -144,7 +154,7 @@ msgstr "Dokument poslan v digitalizacijo"
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Document successfully parsed. Please refresh."
-msgstr "Dokument je bil uspešno razčlenjen. Osvežite stran."
+msgstr ""
 
 #. module: iap_extract
 #: model:iap.service,unit_name:iap_extract.iap_service_ocr
@@ -238,6 +248,11 @@ msgid "ID of the request to IAP-OCR"
 msgstr "ID zahteve za IAP-OCR"
 
 #. module: iap_extract
+#: model:ir.module.module,shortdesc:base.module_iap_extract
+msgid "Iap Extract"
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields,help:iap_extract.field_extract_mixin__message_needaction
 #: model:ir.model.fields,help:iap_extract.field_extract_mixin_with_words__message_needaction
 msgid "If checked, new messages require your attention."
@@ -293,6 +308,7 @@ msgstr "Sporočila"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__no_extract_requested
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__no_extract_requested
@@ -302,7 +318,14 @@ msgid "No extract requested"
 msgstr "Ni zahtevanega izvlečka"
 
 #. module: iap_extract
+#. odoo-javascript
+#: code:addons/iap_extract/static/src/components/status_header/status.xml:0
+msgid "Not enough credit to scan your document."
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__not_enough_credit
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__not_enough_credit
@@ -351,13 +374,13 @@ msgstr "Ocene"
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Refresh"
-msgstr "Osvežite"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Retry"
-msgstr "Ponovno"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-python
@@ -407,6 +430,7 @@ msgstr "Izbrani dokumenti so že digitalizirani"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__to_validate
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__to_validate
@@ -429,6 +453,7 @@ msgstr ""
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__waiting_extraction
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__waiting_extraction
@@ -439,6 +464,7 @@ msgstr "Čakanje na ekstrakcijo"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__waiting_validation
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__waiting_validation
@@ -446,13 +472,6 @@ msgstr "Čakanje na ekstrakcijo"
 #: model:ir.model.fields.selection,name:iap_extract.selection__hr_expense__extract_state__waiting_validation
 msgid "Waiting validation"
 msgstr "Čakanje na potrditev"
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "You don't have enough credit to extract data from your document."
-msgstr ""
-"Nimate dovolj kreditne sposobnosti za izluščitev podatkov iz dokumenta."
 
 #. module: iap_extract
 #. odoo-python
@@ -471,6 +490,7 @@ msgstr "Vaš dokument vsebuje preveč strani"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__extract_not_ready
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__extract_not_ready

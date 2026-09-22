@@ -17,21 +17,10 @@
                     class="btn-primary"
                     invisible="not lines_count"/>
             </header>
-            <button name="action_generate_declarations" class="btn-primary" position="attributes">
-                <attribute name="options">{'reload_on_button': true}</attribute>
-            </button>
-            <button name="action_generate_declarations" class="btn-secondary" position="attributes">
-                <attribute name="options">{'reload_on_button': true}</attribute>
-            </button>
-            <group name="group_start" position="after">
-                <group>
-                    <field name="end_year" class="o_hr_narrow_field" options="{'type': 'number'}" />
-                    <field name="end_month" class="o_hr_narrow_field"/>
-                </group>
+            <group name="first_group" position="replace"/>
+             <group name="extra_group" position="attributes">
+                <attribute name="string"/>
             </group>
-            <p name="xml_name" position="inside">
-                IR56B
-            </p>
         </field>
     </record>
 

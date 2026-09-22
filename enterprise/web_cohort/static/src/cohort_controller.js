@@ -8,28 +8,27 @@ import { CogMenu } from "@web/search/cog_menu/cog_menu";
 import { Widget } from "@web/views/widgets/widget";
 import { ActionHelper } from "@web/views/action_helper";
 
-import { Component, toRaw, useRef } from "@odoo/owl";
+import { Component, signal, t, toRaw, useProps } from "@odoo/owl";
 
 export class CohortController extends Component {
     static template = "web_cohort.CohortView";
     static components = { Layout, SearchBar, CogMenu, Widget, ActionHelper };
-    static props = {
+    props = useProps({
         ...standardViewProps,
-        Model: Function,
-        modelParams: Object,
-        Renderer: Function,
-        buttonTemplate: String,
-    };
+        Model: t.function(),
+        modelParams: t.object(),
+        Renderer: t.function(),
+        buttonTemplate: t.string(),
+    });
+    rootRef = signal.ref();
 
     setup() {
         this.actionService = useService("action");
         this.model = useModelWithSampleData(this.props.Model, toRaw(this.props.modelParams));
 
         useSetupAction({
-            rootRef: useRef("root"),
-            getLocalState: () => {
-                return { metaData: this.model.metaData };
-            },
+            rootRef: this.rootRef,
+            getLocalState: () => ({ metaData: this.model.metaData }),
             getContext: () => this.getContext(),
         });
     }

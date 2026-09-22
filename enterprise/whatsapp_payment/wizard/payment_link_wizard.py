@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from odoo.tools import format_amount
 
 
 class PaymentLinkWizard(models.TransientModel):
@@ -16,6 +17,14 @@ class PaymentLinkWizard(models.TransientModel):
 
     def action_send_whatsapp(self):
         self.ensure_one()
+        record = self.env[self.res_model].browse(self.res_id)
+        if 'message_ids' in record._fields:
+            record._message_log(
+                body=self.env._(
+                    "Payment link of %s has been generated for whatsapp",
+                    format_amount(self.env, self.amount, self.currency_id)
+                )
+            )
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'whatsapp.composer',

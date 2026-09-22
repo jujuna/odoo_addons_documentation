@@ -9,14 +9,19 @@
             <form position="attributes">
                 <attribute name="string">IR56E Sheet</attribute>
             </form>
+            <header position="inside">
+                <button
+                    string="Create XML"
+                    name="action_generate_xml"
+                    type="object"
+                    class="btn-primary"
+                    invisible="not lines_count"/>
+            </header>
             <group name="extra_group" position="attributes">
                 <attribute name="string"/>
             </group>
-            <header position="replace"/>
             <group name="first_group" position="replace"/>
-            <field name="type_of_form" position="replace"/>
             <field name="year_of_employer_return" position="replace"/>
-            <div name="div_xml" position="replace"/>
         </field>
     </record>
 

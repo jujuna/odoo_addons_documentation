@@ -6,12 +6,17 @@ import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { getCommonEmbeddedActions } from "@documents/views/utils";
 
-export const DocumentsModelMixin = (component) =>
-    class extends component {
+/**
+ * @template {typeof import("@web/model/relational_model/relational_model").RelationalModel} T
+ * @param {T} RelationalModel
+ */
+export const DocumentsModelMixin = (RelationalModel) =>
+    class extends RelationalModel {
         setup(params) {
             super.setup(...arguments);
             if (this.config.resModel === "documents.document") {
-                this.originalSelection = params.state?.sharedSelection;
+                this.originalSelection =
+                    params.state?.sharedSelection ?? this.env.documentsView?.sharedSelection;
             }
             this.dialogService = useService("dialog");
             this.documentService = useService("document.document");
@@ -30,9 +35,6 @@ export const DocumentsModelMixin = (component) =>
             const selection = this.root?.selection;
             if (!this.originalSelection && selection && selection.length > 0) {
                 this.originalSelection = selection.map((rec) => rec.resId);
-            }
-            for (const arg of arguments) {
-                arg.context["skip_res_field_check"] = true;
             }
             const res = await super.load(...arguments);
             if (this.config.resModel !== "documents.document") {
@@ -59,6 +61,8 @@ export const DocumentsModelMixin = (component) =>
                 records.forEach((record) => {
                     record.selected = originalSelection.has(record.resId);
                 });
+            }
+            if (this.originalSelection) {
                 delete this.originalSelection;
             }
         }
@@ -137,8 +141,8 @@ export const DocumentsModelMixin = (component) =>
         }
 
         get targetRecords() {
-            return this.documentService.rightPanelReactive.previewedDocument
-                ? [this.documentService.rightPanelReactive.previewedDocument.record]
+            return this.documentService.state.previewedDocument
+                ? [this.documentService.state.previewedDocument.record]
                 : this.root.selection;
         }
 
@@ -153,7 +157,6 @@ export const DocumentsModelMixin = (component) =>
                 singleSelection &&
                 currentFolder?.id !== "TRASH" &&
                 singleSelection.data.type === "binary" &&
-                singleSelection.data.attachment_id &&
                 !singleSelection.data.lock_uid
             );
         }
@@ -225,7 +228,6 @@ export const DocumentsModelMixin = (component) =>
                         await this.orm.call("documents.document", "toggle_lock", [record.data.id]);
                         await this._notifyChange();
                     },
-                    cancelLabel: _t("Discard"),
                     cancel: () => {},
                 });
             } else {
@@ -235,10 +237,13 @@ export const DocumentsModelMixin = (component) =>
         }
 
         /**
-         * Open/Close the chatter (the info will be stored in the local storage of the current user).
+         * Call search model to search inside targetRecord if a single folder is selected
          */
-        async onToggleRightPanel() {
-            await this.documentService.toggleRightPanelVisibility();
+        async onDeepSearch() {
+            if (this.targetRecords.length !== 1 || this.targetRecords[0].data.type !== "folder") {
+                return;
+            }
+            return this.env.searchModel.deepSearchFolder(this.targetRecords[0].data.id);
         }
 
         /**
@@ -274,7 +279,6 @@ export const DocumentsModelMixin = (component) =>
                                   "Are you sure you want to permanently erase the selected document?"
                               ),
                     confirmLabel: _t("Delete permanently"),
-                    cancelLabel: _t("Discard"),
                     confirm: async () => resolve(true),
                     cancel: () => resolve(false),
                 };
@@ -366,13 +370,22 @@ export const DocumentsModelMixin = (component) =>
         }
 
         /**
+         * Toggle the favorite on selected records.
+         */
+        async onToggleFavorited() {
+            await this.documentService.toggleFavorites(this.targetRecords.map((r) => r.data.id));
+        }
+
+        /**
          * Open the "rename" form view on the selected record.
          */
         async onRename() {
             if (this.targetRecords.length !== 1) {
                 return;
             }
-            await this.documentService.openDialogRename(this.targetRecords[0].data.id);
+            await this.documentService.openDocumentFormDialog({
+                documentId: this.targetRecords[0].data.id,
+            });
             await this._notifyChange();
         }
 
@@ -380,8 +393,10 @@ export const DocumentsModelMixin = (component) =>
          * Open the permission panel of the selected document.
          */
         async onShare() {
-            const documents = this.targetRecords;
-            await this.documentService.openSharingDialog(documents.map((d) => d.data.id));
+            const selectedIds = this.isDomainSelected
+                ? await this.getResIds()
+                : this.targetRecords.map((d) => d.data.id);
+            await this.documentService.openSharingDialog(selectedIds);
         }
 
         /**
@@ -470,13 +485,20 @@ export const DocumentsModelMixin = (component) =>
                     ...config,
                     domain: Domain.and([
                         config.domain,
-                        [["id", "=", documentIdToRestore]],
+                        [
+                            ["id", "=", documentIdToRestore],
+                            ["active", "in", [true, false]],
+                        ],
                     ]).toList(),
                     limit: 1,
                 });
                 if (missingData?.records?.length) {
-                    data.records.splice(0, 0, missingData.records[0]); // put it at the top of the list
+                    const addedRecord = missingData.records[0];
+                    data.records.splice(0, 0, addedRecord); // put it at the top of the list
                     data.records.pop(); // Remove the last item to not overflow page
+                    if (!addedRecord.active) {
+                        this.documentService.archivedDocumentRestored = addedRecord;
+                    }
                     this.documentService.documentIdToRestore = documentIdToRestore;
                 } else {
                     this.notification.add(_t("Document not found or inaccessible."), {
@@ -484,5 +506,27 @@ export const DocumentsModelMixin = (component) =>
                     });
                 }
             }
+        }
+
+        getContainerRecord() {
+            const folder = this.env.searchModel.getSelectedFolder();
+            const folderData = this.env.searchModel.getFolderAndParents(folder);
+            const folderId =
+                typeof folder.folder_id === "object"
+                    ? folder.folder_id
+                    : folderData?.length > 1 && typeof folderData[1].id === "number"
+                    ? [folderData[1].id, folderData[1].display_name]
+                    : false;
+
+            const data = Object.assign({}, folder, {
+                folder_id: folderId,
+                name: folder.display_name,
+                type: "folder",
+                file_size: (this.fileSize || 0) * 1e6, // from MB to B to be precise on single doc.
+            });
+            const config = { ...this.config, resId: data.id };
+            const record = new this.constructor.Record(this, config, data);
+            record.isContainer = true;
+            return record;
         }
     };

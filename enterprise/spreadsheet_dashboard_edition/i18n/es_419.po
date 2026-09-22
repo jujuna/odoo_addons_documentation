@@ -4,22 +4,22 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025.
-# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-10-22 22:32+0000\n"
-"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
+"POT-Creation-Date: 2026-08-28 17:57+0000\n"
+"PO-Revision-Date: 2026-09-17 23:05+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/spreadsheet_dashboard_edition/es_419/>\n"
+"odoo-master/spreadsheet_dashboard_edition/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: spreadsheet_dashboard_edition
 #: model_terms:ir.ui.view,arch_db:spreadsheet_dashboard_edition.spreadsheet_dashboard_creation_dialog_view_form
@@ -75,11 +75,15 @@ msgstr "Mostrar miniatura"
 #. odoo-javascript
 #: code:addons/spreadsheet_dashboard_edition/static/src/bundle/components/dashboard_edit/dashboard_edit.js:0
 #: code:addons/spreadsheet_dashboard_edition/static/src/bundle/components/dashboard_edit/dashboard_edit.xml:0
+msgid "Edit"
+msgstr "Editar"
+
+#. module: spreadsheet_dashboard_edition
 #: model:ir.actions.server,name:spreadsheet_dashboard_edition.action_spreadsheet_dashboard_edit
 #: model_terms:ir.ui.view,arch_db:spreadsheet_dashboard_edition.spreadsheet_dashboard_kanban_view_inherit
 #: model_terms:ir.ui.view,arch_db:spreadsheet_dashboard_edition.spreadsheet_dashboard_view_list
-msgid "Edit"
-msgstr "Editar"
+msgid "Edit in Spreadsheet"
+msgstr "Editar en Hojas de cálculo"
 
 #. module: spreadsheet_dashboard_edition
 #: model_terms:ir.ui.view,arch_db:spreadsheet_dashboard_edition.spreadsheet_dashboard_view_list
@@ -113,6 +117,16 @@ msgid "ID"
 msgstr "ID"
 
 #. module: spreadsheet_dashboard_edition
+#. odoo-python
+#: code:addons/spreadsheet_dashboard_edition/models/spreadsheet_dashboard.py:0
+msgid ""
+"List columns in dashboard '%(dashboard)s' must not define 'string' "
+"explicitly. They should fall back to the translated field label."
+msgstr ""
+"Las columnas de la lista en el tablero \"%(dashboard)s\" no deben definir "
+"'string' de forma explícita, deben usar la etiqueta traducida del campo."
+
+#. module: spreadsheet_dashboard_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_dashboard_edition/static/src/bundle/components/dashboard_publish/dashboard_publish.xml:0
 msgid "Published"
@@ -122,6 +136,12 @@ msgstr "Publicado"
 #: model:ir.model,name:spreadsheet_dashboard_edition.model_spreadsheet_dashboard
 msgid "Spreadsheet Dashboard"
 msgstr "Tablero de Hojas de cálculo"
+
+#. module: spreadsheet_dashboard_edition
+#: model:ir.module.module,description:base.module_spreadsheet_dashboard_edition
+#: model:ir.module.module,summary:base.module_spreadsheet_dashboard_edition
+msgid "Spreadsheet Dashboard edition"
+msgstr ""
 
 #. module: spreadsheet_dashboard_edition
 #: model:ir.model.fields,field_description:spreadsheet_dashboard_edition.field_spreadsheet_dashboard__spreadsheet_data
@@ -134,6 +154,11 @@ msgid "Spreadsheet File Name"
 msgstr "Nombre del archivo de la hoja de cálculo"
 
 #. module: spreadsheet_dashboard_edition
+#: model:ir.model.fields,field_description:spreadsheet_dashboard_edition.field_spreadsheet_dashboard__spreadsheet_image_ids
+msgid "Spreadsheet Image"
+msgstr "Imagen de la hoja de cálculo"
+
+#. module: spreadsheet_dashboard_edition
 #: model:ir.model.fields,field_description:spreadsheet_dashboard_edition.field_spreadsheet_dashboard__spreadsheet_revision_ids
 msgid "Spreadsheet Revision"
 msgstr "Revisión de la hoja de cálculo"
@@ -142,6 +167,11 @@ msgstr "Revisión de la hoja de cálculo"
 #: model:ir.model.fields,field_description:spreadsheet_dashboard_edition.field_spreadsheet_dashboard__spreadsheet_snapshot
 msgid "Spreadsheet Snapshot"
 msgstr "Panorama de la hoja de cálculo"
+
+#. module: spreadsheet_dashboard_edition
+#: model:ir.module.module,shortdesc:base.module_spreadsheet_dashboard_edition
+msgid "Spreadsheet dashboard edition"
+msgstr ""
 
 #. module: spreadsheet_dashboard_edition
 #: model:ir.model,name:spreadsheet_dashboard_edition.model_spreadsheet_cell_thread

@@ -2,14 +2,11 @@
 
 from odoo.http import route
 
-from odoo.addons.sale.controllers.product_configurator import (
-    SaleProductConfiguratorController,
-)
+from odoo.addons.sale.controllers.product_configurator import SaleProductConfiguratorController
 from odoo.addons.sale_renting.controllers.utils import _convert_rental_dates
 
 
 class SaleRentingProductConfiguratorController(SaleProductConfiguratorController):
-
     @route()
     def sale_product_configurator_get_values(self, *args, **kwargs):
         _convert_rental_dates(kwargs)

@@ -15,7 +15,7 @@
                                 <div class="d-flex flex-column flex-shrink-1">
                                     <div class="d-flex">
                                         <field name="start_time" widget="float_time" class="oe_inline"/>
-                                        <i class="fa fa-long-arrow-right my-1 mx-1" aria-label="Arrow icon" title="Arrow"/>
+                                        <i class="oi my-1 mx-1" data-icon="east" aria-label="Arrow icon" title="Arrow"/>
                                         <field name="end_time" widget="float_time" class="flex-shrink-1 oe_inline"/>
                                     </div>
                                 </div>
@@ -28,6 +28,7 @@
                                         </p>
                                     </div>
                                 </div>
+                                <field name="company_id" placeholder="Visible to all" groups="base.group_multi_company"/>
                             </group>
                             <group>
                                 <field name="active" invisible="1" />
@@ -47,6 +48,7 @@
                     <field name="sequence" widget="handle"/>
                     <field name="name" />
                     <field name="role_id" optional="show"/>
+                    <field name="company_id" optional="hide" groups="base.group_multi_company"/>
                 </list>
             </field>
         </record>
@@ -58,11 +60,16 @@
                 <kanban>
                     <templates>
                         <t t-name="card">
-                            <div class="fw-bolder">
-                                <i class="fa fa-clock-o" role="img" aria-label="Hours" title="Hours"/>
-                                <field name="name" class="ms-2"/>
+                            <div class="d-flex flex-column fw-bolder">
+                                <div class="d-flex gap-1" name="hours" title="Hours">
+                                    <i class="oi px-1 mt-1" data-icon="schedule"/>
+                                    <field name="name"/>
+                                </div>
+                                <div t-if="record.role_id.raw_value" class="d-flex gap-1" name="role" title="Role">
+                                    <i class="oi oi-fw px-1 mt-1" data-icon="verified"/>
+                                    <field name="role_id"/>
+                                </div>
                             </div>
-                            <field name="role_id" class="fw-bolder"/>
                         </t>
                     </templates>
                 </kanban>
@@ -75,12 +82,14 @@
             <field name="arch" type="xml">
                 <search>
                     <field name="role_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
                     <separator/>
                     <filter name="my_role" string="My Roles" domain="[('role_id.resource_ids.user_id', '=', uid)]"/>
                     <separator/>
                     <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
                     <group>
                         <filter string="Role" name="group_by_role" context="{'group_by':'role_id'}"/>
+                        <filter string="Company" name="group_by_company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
                     </group>
                 </search>
             </field>

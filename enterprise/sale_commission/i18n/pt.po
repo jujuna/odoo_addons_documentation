@@ -8,17 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-17 07:00+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Portuguese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 02:41+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Portuguese <https://translate.odoo.com/projects/odoo-master/"
 "sale_commission/pt/>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_commission
 #. odoo-python
@@ -34,9 +34,9 @@ msgstr "%(user)s - %(plan)s"
 
 #. module: sale_commission
 #. odoo-python
-#: code:addons/sale_commission/model/commission_plan.py:0
-msgid "%s (copy)"
-msgstr "%s (cópia)"
+#: code:addons/sale_commission/model/commission_plan_achievement.py:0
+msgid "%s"
+msgstr ""
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
@@ -52,7 +52,6 @@ msgstr "Atingido"
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__target_rate
-#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__achieved_rate
 msgid "Achieved Rate"
 msgstr "Taxa alcançada"
 
@@ -72,23 +71,34 @@ msgid "Achievement"
 msgstr "Conquista"
 
 #. module: sale_commission
-#: model:ir.model.fields,field_description:sale_commission.field_res_config_settings__group_commission_forecast
-msgid "Achievement Forecast"
-msgstr "Previsão de conquistas"
-
-#. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
 msgid "Achievement Report"
 msgstr "Relatório de conquistas"
 
 #. module: sale_commission
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Achievement ÷ target = target completion"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.actions.act_window,name:sale_commission.sale_achievement_action_report
-#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__type__achieve
 #: model:ir.ui.menu,name:sale_commission.sale_commission_achievement_report_menu
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_list
 msgid "Achievements"
 msgstr "Conquistas"
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Achievements Rules"
+msgstr ""
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_issue_user_wizard_form
+msgid ""
+"Achievements whose users are present in different plans. Period overlap and\n"
+"                        gaps are detected."
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__message_needaction
@@ -108,18 +118,23 @@ msgstr "Planos ativos"
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_wizard
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
-msgid "Add Multiple Salespersons"
-msgstr "Adicionar vários vendedores"
+msgid "Add Multiple Salespeople"
+msgstr ""
 
 #. module: sale_commission
-#: model:ir.actions.act_window,name:sale_commission.sale_subscription_change_customer_wizard_action
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__add_plan_id
+msgid "Add Plan"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.actions.act_window,name:sale_commission.sale_commission_change_customer_wizard_action
 msgid "Add Salespersons"
 msgstr "Adicionar vendedores"
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
-msgid "Add a new Sales Person"
-msgstr "Adicionar um novo vendedor"
+msgid "Add a new Salesperson"
+msgstr ""
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
@@ -135,6 +150,14 @@ msgstr "Adicionar um novo nível de comissão"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__add_user_id
 msgid "Add to"
 msgstr "Adicionar a"
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_achievement.py:0
+msgid ""
+"Added values (user and plan) must be coherent: set or unset. Same for "
+"Reduced values"
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
@@ -174,27 +197,14 @@ msgstr ""
 "para um período e plano de comissão específicos."
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_forecast
-msgid ""
-"Allows you to manually set a salesperson's forecast\n"
-"                for a specific period and commission plan."
-msgstr ""
-"Permite definir manualmente a previsão de um vendedor\n"
-"para um período e plano de comissão específicos."
-
-#. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_my_forecast
-msgid ""
-"Allows you to manually set your sales' forecast\n"
-"                for a specific period and commission plan."
-msgstr ""
-"Permite definir manualmente a previsão de vendas\n"
-"para um período e plano de comissão específicos."
-
-#. module: sale_commission
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan_achievement__type__amount_invoiced
 msgid "Amount Invoiced"
 msgstr "Valor faturado"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan_achievement__type__amount_paid
+msgid "Amount Paid in Full"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan_achievement__type__amount_sold
@@ -208,7 +218,9 @@ msgstr "Aprovar"
 
 #. module: sale_commission
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__state__approved
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_search
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 msgid "Approved"
 msgstr "Aprovado"
 
@@ -223,12 +235,11 @@ msgid "Attachment Count"
 msgstr "Total de anexos"
 
 #. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
-msgid "Based on"
-msgstr "Baseado em"
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__blocked
+msgid "Blocked"
+msgstr ""
 
 #. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_wizard
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 msgid "Cancel"
 msgstr "Cancelar"
@@ -242,6 +253,11 @@ msgstr "Cancelado"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__product_categ_id
 msgid "Category"
 msgstr "Categoria"
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_issue_user_wizard_form
+msgid "Close"
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
@@ -363,23 +379,34 @@ msgid "Completed"
 msgstr "Concluído"
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_plan
-msgid ""
-"Compute commissions of your sales people based on their achievements and "
-"targets"
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__date_from
+msgid "Conflict From"
 msgstr ""
-"Calcule as comissões de seu pessoal de vendas com base em suas realizações e "
-"metas"
 
 #. module: sale_commission
-#: model:ir.model,name:sale_commission.model_res_config_settings
-msgid "Config Settings"
-msgstr "Configurações"
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__date_to
+msgid "Conflict To"
+msgstr ""
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_plan
-msgid "Create a new commission plan"
-msgstr "Criar um novo plano de comissão"
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__issue_type
+msgid "Conflict Type"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__conflicting_plan_id
+msgid "Conflicting Plan"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.actions.act_window,name:sale_commission.duplicated_user_wizard_action
+msgid "Conflicting lines"
+msgstr ""
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_issue_user_wizard_form
+msgid "Congratulations, no conflicting line has been found!"
+msgstr ""
 
 #. module: sale_commission
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_achievement
@@ -387,20 +414,16 @@ msgid "Create an adjustment"
 msgstr "Criar um ajuste"
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_forecast
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_my_forecast
-msgid "Create an forecast"
-msgstr "Criar uma previsão"
-
-#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__create_uid
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__create_uid
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__create_uid
 msgid "Created by"
 msgstr "Criado por"
 
@@ -408,11 +431,13 @@ msgstr "Criado por"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__create_date
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__create_date
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__create_date
 msgid "Created on"
 msgstr "Criado em"
 
@@ -473,25 +498,33 @@ msgid "Details"
 msgstr "Detalhes"
 
 #. module: sale_commission
+#: model:ir.actions.server,name:sale_commission.model_sale_commission_plan_duplicates
+msgid "Detect users conflicts"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_crm_team__display_name
-#: model:ir.model.fields,field_description:sale_commission.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_res_users__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__display_name
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__display_name
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__display_name
 msgid "Display Name"
 msgstr "Exibir nome"
 
 #. module: sale_commission
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__state__done
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_search
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 msgid "Done"
 msgstr "Concluído"
 
@@ -502,14 +535,24 @@ msgid "Draft"
 msgstr "Rascunho"
 
 #. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__target_type__dynamic
+msgid "Dynamic"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__dynamic_plan_ids
+msgid "Dynamic Plan"
+msgstr ""
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Dynamic Target"
+msgstr ""
+
+#. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 msgid "Effective Period"
 msgstr "Período efetivo"
-
-#. module: sale_commission
-#: model:res.groups,name:sale_commission.group_commission_forecast
-msgid "Enable Commission Forecast"
-msgstr "Habilitar previsão de comissão"
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_list
@@ -517,7 +560,6 @@ msgid "End Date"
 msgstr "Data de término"
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_my_report
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_report
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_report_sale
 msgid ""
@@ -526,6 +568,12 @@ msgid ""
 msgstr ""
 "Certifique-se de estar atribuído a um plano de comissões e de ter efetuado "
 "vendas qualificadas para receber comissões"
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_report__forecast
+msgid ""
+"Entered manually by the salesperson. No impact on commission calculation."
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
@@ -549,13 +597,15 @@ msgid "Followers (Partners)"
 msgstr "Seguidores (usuários)"
 
 #. module: sale_commission
-#: model:ir.actions.act_window,name:sale_commission.sale_commission_action_forecast
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_user__other_plans
+msgid ""
+"For reference only. Useful to quickly control the consistency between "
+"salespeople."
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__amount
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__forecast
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_graph
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_list
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_pivot
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 msgid "Forecast"
 msgstr "Previsão"
 
@@ -568,10 +618,9 @@ msgid "From"
 msgstr "De"
 
 #. module: sale_commission
-#. odoo-python
-#: code:addons/sale_commission/model/commission_plan_user.py:0
-msgid "From must be before To"
-msgstr "De deve estar antes de Até"
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_problematic_user_wizard__issue_type__gap
+msgid "Gap"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__has_message
@@ -580,20 +629,26 @@ msgstr "Há mensagens"
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_crm_team__id
-#: model:ir.model.fields,field_description:sale_commission.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_commission.field_res_users__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__id
 msgid "ID"
 msgstr "ID"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__id_str
+msgid "Id Str"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,help:sale_commission.field_sale_commission_plan__message_needaction
@@ -607,19 +662,42 @@ msgid "If checked, some messages have a delivery error."
 msgstr "Se marcado, há mensagens com erros de entrega."
 
 #. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__in_payment
+msgid "In Payment"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Invoices,"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__invoicing_legacy
+msgid "Invoicing App Legacy"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__message_is_follower
 msgid "Is Follower"
 msgstr "É um seguidor"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__issue_user_ids
+msgid "Issue User"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__write_uid
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__write_uid
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__write_uid
 msgid "Last Updated by"
 msgstr "Última atualização por"
 
@@ -627,11 +705,13 @@ msgstr "Última atualização por"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__write_date
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__write_date
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__write_date
 msgid "Last Updated on"
 msgstr "Última atualização em"
 
@@ -639,6 +719,33 @@ msgstr "Última atualização em"
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 msgid "Last Year"
 msgstr "Último ano"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__type__achieve
+msgid "Linear"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__move_id
+msgid "Linked Invoice"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__order_id
+msgid "Linked Order"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_achievement__readonly
+msgid ""
+"Lock records to prevent their modification (typically after running "
+"payroll). Only users with a high-enough access right can unlock records."
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__readonly
+msgid "Locked"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_target_forecast__team_id
@@ -650,6 +757,11 @@ msgstr ""
 "vendas ou para definir a equipe de vendas em faturamento ou assinatura."
 
 #. module: sale_commission
+#: model:ir.module.module,summary:base.module_sale_commission
+msgid "Manage your salespersons' commissions"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model,name:sale_commission.model_sale_commission_achievement
 msgid "Manual Commission Achievement"
 msgstr "Conquista de comissão (manual)"
@@ -658,6 +770,12 @@ msgstr "Conquista de comissão (manual)"
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 msgid "Mark as done"
 msgstr "Marcar como concluída"
+
+#. module: sale_commission
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Measure × rate = achievement"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__message_has_error
@@ -680,22 +798,20 @@ msgid "My Achievements"
 msgstr "Minhas conquistas"
 
 #. module: sale_commission
-#: model:ir.actions.act_window,name:sale_commission.sale_commission_action_my_report
-#: model:ir.ui.menu,name:sale_commission.sale_commission_my_menu
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 msgid "My Commissions"
 msgstr "Minhas comissões"
-
-#. module: sale_commission
-#: model:ir.actions.act_window,name:sale_commission.sale_commission_action_my_forecast
-msgid "My Forecast"
-msgstr "Minha previsão"
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__name
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_search
 msgid "Name"
 msgstr "Nome"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__not_paid
+msgid "Not Paid"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__note
@@ -759,12 +875,37 @@ msgid "Other plans"
 msgstr "Outros planos"
 
 #. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_problematic_user_wizard__issue_type__overlap
+msgid "Overlap"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model,name:sale_commission.model_sale_commission_problematic_user_wizard
+msgid "Overlap/Gap period per plan and user"
+msgstr ""
+
+#. module: sale_commission
 #. odoo-python
 #: code:addons/sale_commission/model/commission_plan_target.py:0
 msgid ""
 "Overlapping periods detected for plan '%(plan)s':\n"
 "- %(c_name)s [%(c_from)s → %(c_to)s]\n"
 "- %(n_name)s [%(n_from)s → %(n_to)s]"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__paid
+msgid "Paid"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__paid_ratio
+msgid "Paid Ratio"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__partial
+msgid "Partially Paid"
 msgstr ""
 
 #. module: sale_commission
@@ -780,6 +921,11 @@ msgid "Payment Date"
 msgstr "Data de pagamento"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__payment_state
+msgid "Payment State"
+msgstr ""
+
+#. module: sale_commission
 #. odoo-python
 #: code:addons/sale_commission/controllers/main.py:0
 msgid "Performance"
@@ -791,7 +937,6 @@ msgstr "Desempenho"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__target_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__target_id
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_list
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_list
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 msgid "Period"
@@ -809,14 +954,26 @@ msgid "Periods"
 msgstr "Períodos"
 
 #. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_achievement_report__document_user_id
+msgid "Person assigned to the source document"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__plan_id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__plan_ids
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__plan_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__plan_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__plan_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__plan_id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__plan_id
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_view_search
 msgid "Plan"
 msgstr "Plano"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__plan_user_id
+msgid "Plan User"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__product_id
@@ -854,9 +1011,19 @@ msgid "Reduce From"
 msgstr "Reduzir de"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__reduce_plan_id
+msgid "Reduce Plan"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__related_res_id
 msgid "Related"
 msgstr "Relacionado"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__related_res_name
+msgid "Related Document"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__related_res_model
@@ -875,9 +1042,32 @@ msgid "Reset to draft"
 msgstr "Voltar para provisório"
 
 #. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__reversed
+msgid "Reversed"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Erro de entrega de SMS"
+
+#. module: sale_commission
+#: model:ir.module.module,shortdesc:base.module_sale_commission
+msgid "Sale Commission"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_user__user_ids
+msgid ""
+"Sale Order and invoices of these users will be added to the achievements of "
+"the salesperson"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Sale Orders, ..."
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__team_id
@@ -895,11 +1085,6 @@ msgid "Sales Commission Report"
 msgstr "Relatório de comissão de vendas"
 
 #. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
-msgid "Sales People"
-msgstr "Pessoal de vendas"
-
-#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__user_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__user_id
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_search
@@ -911,15 +1096,19 @@ msgstr "Vendedor"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__team_id
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__user_type__team
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 msgid "Sales Team"
 msgstr "Equipe de vendas"
 
 #. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Salespeople"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__user_id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__sale_user_id
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__user_type__person
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 msgid "Salesperson"
 msgstr "Vendedor"
@@ -940,14 +1129,43 @@ msgid "Start Date"
 msgstr "Data de início"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__state
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__state
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__state
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__state
 msgid "State"
 msgstr "Estado"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__target_type__static
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Static"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan__target_type
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_target__target_type
+msgid ""
+"Static: Set a target for a given period.\n"
+"\n"
+"    Dynamic: The target of a salesperson is the sum of the targets of their "
+"subordinates on the following plans."
+msgstr ""
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Structure"
+msgstr ""
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_wizard
 msgid "Submit"
 msgstr "Enviar"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__user_ids
+msgid "Sum of achievements"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_target__payment_amount
@@ -957,6 +1175,11 @@ msgstr ""
 #. module: sale_commission
 #: model:ir.model.fields,help:sale_commission.field_sale_commission_achievement_report__commission_target_amount
 msgid "Sum of target amount per plan paid on the same date"
+msgstr ""
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_issue_user_wizard_form
+msgid "TODO"
 msgstr ""
 
 #. module: sale_commission
@@ -989,21 +1212,81 @@ msgid "Target Frequency"
 msgstr "Frequência alvo"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__target_type
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__target_type
+msgid "Target Type"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__achieved_rate
+msgid "Target completion"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__target_rate
 msgid "Target completion (%)"
 msgstr "Realização da meta (%)"
 
 #. module: sale_commission
-#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__type__target
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Target completion on the commission graph = commission"
+msgstr ""
+
+#. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 msgid "Targets"
 msgstr "Metas"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__user_id
+msgid "Team Member"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_plan_user.py:0
+msgid ""
+"The 'From' date value (%(df)s) of the Sales People must correspond to the "
+"target periods.\n"
+"e.g. %(adf)s"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_plan_user.py:0
+msgid ""
+"The 'To' date value (%(dt)s) of the Sales People must correspond to the "
+"target periods.\n"
+"e.g. %(adt)s"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_plan_user.py:0
+msgid "The assignment start date must be before the end date"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan__dynamic_plan_ids
+msgid ""
+"The dynamic target of a salesperson is the sum of the targets of their "
+"subordinates on the following plans. Leave empty to specify a static target "
+"in the Targets tab below."
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
 #: code:addons/sale_commission/model/commission_plan.py:0
 msgid "The plan should have at least one target with an achievement rate of 0%"
 msgstr "O plano deve ter pelo menos uma meta com uma taxa de conquista de 0%"
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_plan_user.py:0
+msgid ""
+"The sales person's assignment must be within the commission plan period."
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
@@ -1026,20 +1309,14 @@ msgid "The team is required in team plan."
 msgstr "A equipe é necessária no plano de equipe."
 
 #. module: sale_commission
-#: model:ir.model.constraint,message:sale_commission.constraint_sale_commission_plan_user_user_uniq
-msgid "The user is already present in the plan"
-msgstr "O usuário já está presente no plano"
-
-#. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
-msgid "This Month"
-msgstr "Este mês"
-
-#. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 msgid "This Year"
 msgstr "Este ano"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__type__target
+msgid "Tiered"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__date_to
@@ -1078,7 +1355,6 @@ msgid "Type"
 msgstr "Tipo"
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_my_report
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_report
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_report_sale
 msgid "Unfortunately, there are no commissions for you"
@@ -1091,9 +1367,11 @@ msgstr "Próximos"
 
 #. module: sale_commission
 #: model:ir.model,name:sale_commission.model_res_users
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__document_user_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__user_ids
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__user_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__user_ids
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_view_search
 msgid "User"
 msgstr "Usuário"
@@ -1105,6 +1383,7 @@ msgstr "Equipe de vendas do usuário"
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__user_type
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__user_type
 msgid "User Type"
 msgstr "Tipo de usuário"
 
@@ -1117,18 +1396,20 @@ msgstr "O período do usuário não pode terminar após o plano."
 #. module: sale_commission
 #. odoo-python
 #: code:addons/sale_commission/model/commission_plan_user.py:0
-msgid "User period cannot start before the plan."
-msgstr "O período do usuário não pode começar antes do plano."
+msgid "User period cannot start after the plan."
+msgstr ""
 
 #. module: sale_commission
-#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__website_message_ids
-msgid "Website Messages"
-msgstr "Mensagens do site"
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__wizard_id
+msgid "Wizard"
+msgstr ""
 
 #. module: sale_commission
-#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan__website_message_ids
-msgid "Website communication history"
-msgstr "Histórico de comunicação do site"
+#: model:ir.model,name:sale_commission.model_sale_commission_plan_issue_wizard
+msgid ""
+"Wizard for detecting user appearing in multiple sale.commission.plan.user "
+"user_ids record"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model,name:sale_commission.model_sale_commission_plan_user_wizard
@@ -1161,3 +1442,18 @@ msgstr "i.e. Plano de comissões 2025"
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 msgid "per"
 msgstr "para"
+
+#~ msgid "Website Messages"
+#~ msgstr "Mensagens do site"
+
+#~ msgid "Website communication history"
+#~ msgstr "Histórico de comunicação do site"
+
+#~ msgid "Add Multiple Salespersons"
+#~ msgstr "Adicionar vários vendedores"
+
+#~ msgid "From must be before To"
+#~ msgstr "De deve estar antes de Até"
+
+#~ msgid "The user is already present in the plan"
+#~ msgstr "O usuário já está presente no plano"

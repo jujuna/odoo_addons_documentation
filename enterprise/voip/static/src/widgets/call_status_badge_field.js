@@ -1,3 +1,4 @@
+import { Call } from "@voip/core/common/call_model";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
@@ -8,44 +9,60 @@ export class CallStatusBadgeField extends BadgeField {
 
     setup() {
         super.setup();
-        this.userAgent = useService("voip.user_agent");
+        const voip = useService("voip");
+        this.userAgent = voip.userAgent;
     }
 
     /** @returns {string} */
-    get iconClass() {
+    get icon() {
         const direction = this.props.record.data.direction;
         if (direction === "outgoing") {
-            return "oi oi-arrow-up-right";
+            return "north_east";
         }
         if (direction === "incoming") {
-            return "oi oi-arrow-down-left";
+            return "south_west";
         }
         return "";
     }
 
+    isInProgress(call) {
+        return this.userAgent.isInProgress(call);
+    }
+
     /** @returns {ReturnType<_t>} */
     get statusLabel() {
-        switch (this.props.record.data.state) {
-            case "missed":
-                return _t("Missed Call");
+        const call = { id: this.props.record.resId, ...this.props.record.data };
+        const { state } = call;
+        const isInProgress = this.isInProgress(call);
+        return Call.getStatus({ isInProgress, state });
+    }
+
+    /** @returns {ReturnType<_t>} */
+    get statusTooltip() {
+        const call = { id: this.props.record.resId, ...this.props.record.data };
+        let { state } = call;
+        if (["calling", "ongoing"].includes(state) && !this.isInProgress(call)) {
+            state = "ended_unexpectedly";
+        }
+        switch (state) {
             case "aborted":
-                return _t("Cancelled Call");
-            case "terminated":
-                return this.props.record.data.direction === "incoming"
-                    ? _t("Incoming call")
-                    : _t("Outgoing call");
-            case "rejected":
-                return _t("Rejected Call");
-            case "ongoing":
-                return this.userAgent.activeSession?.call?.id === this.props.record.data.id
-                    ? _t("Ongoing Call")
-                    : _t("Ended unexpectedly");
+                return _t("The caller ended the call before pickup.");
             case "calling":
-                return this.userAgent.activeSession?.call?.id === this.props.record.data.id
-                    ? _t("Trying to call")
-                    : _t("Ended unexpectedly");
+                return _t("The callee's phone is ringing right now.");
+            case "completed_elsewhere":
+                return _t("The call was answered on another device.");
+            case "ended_unexpectedly":
+                return _t("Call ended for another reason than a hangup.");
+            case "missed":
+                return _t("The callee did not pick up.");
+            case "ongoing":
+                return _t("Both parties are in the call right now.");
+            case "rejected":
+                return _t("The callee pressed the hangup key while ringing.");
+            case "terminated":
+                return _t("The call ended successfully.");
             default:
-                return _t("Unknown");
+                return "";
         }
     }
 
@@ -58,7 +75,7 @@ export class CallStatusBadgeField extends BadgeField {
         if (state === "aborted") {
             return "text-bg-secondary";
         }
-        if (state === "calling" || state === "ongoing") {
+        if (state === "calling" || state === "ongoing" || state === "ended_unexpectedly") {
             return "text-bg-warning";
         }
         return "text-bg-success";

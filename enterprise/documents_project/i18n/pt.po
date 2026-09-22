@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-16 17:46+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Portuguese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 03:26+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Portuguese <https://translate.odoo.com/projects/odoo-master/"
 "documents_project/pt/>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,14 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents_project
+#: model:ir.module.module,description:base.module_documents_project
+msgid ""
+"\n"
+"Add the ability to create invoices from the document module.\n"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_ir_attachment
@@ -35,8 +42,8 @@ msgstr "Anexo"
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_res_company
-msgid "Companies"
-msgstr "Empresas"
+msgid "Company"
+msgstr ""
 
 #. module: documents_project
 #. odoo-python
@@ -50,6 +57,11 @@ msgstr ""
 #: model:ir.model,name:documents_project.model_res_config_settings
 msgid "Config Settings"
 msgstr "Definições de Configuração"
+
+#. module: documents_project
+#: model:ir.model,website_form_label:documents_project.model_project_task
+msgid "Create a Task"
+msgstr ""
 
 #. module: documents_project
 #: model:documents.document,name:documents_project.project_1_document_1
@@ -71,6 +83,7 @@ msgstr "Pasta padrão do projeto"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__display_name
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__display_name
 #: model:ir.model.fields,field_description:documents_project.field_project_project__display_name
+#: model:ir.model.fields,field_description:documents_project.field_project_task__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_company__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__display_name
 msgid "Display Name"
@@ -82,13 +95,18 @@ msgid "Document"
 msgstr "Documento"
 
 #. module: documents_project
-#. odoo-python
-#: code:addons/documents_project/models/project_project.py:0
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents_dashboard
-#: model_terms:ir.ui.view,arch_db:documents_project.project_view_kanban_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.edit_project_document_form_inherit
+#: model_terms:ir.ui.view,arch_db:documents_project.project_view_card_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.view_task_form2
 msgid "Documents"
 msgstr "Documentos"
+
+#. module: documents_project
+#: model:ir.module.module,shortdesc:base.module_documents_project
+msgid "Documents - Projects"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model.fields,field_description:documents_project.field_project_project__documents_folder_id
@@ -121,6 +139,7 @@ msgstr "Pasta onde são criados novos projetos"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__id
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__id
 #: model:ir.model.fields,field_description:documents_project.field_project_project__id
+#: model:ir.model.fields,field_description:documents_project.field_project_task__id
 #: model:ir.model.fields,field_description:documents_project.field_res_company__id
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__id
 msgid "ID"
@@ -143,15 +162,30 @@ msgid "Project Folder"
 msgstr "Pasta Projeto"
 
 #. module: documents_project
+#: model:ir.module.module,summary:base.module_documents_project
+msgid "Project from documents"
+msgstr ""
+
+#. module: documents_project
 #: model:documents.document,name:documents_project.document_project_folder
 #: model:ir.model.fields,field_description:documents_project.field_documents_document__project_ids
 msgid "Projects"
 msgstr "Projetos"
 
 #. module: documents_project
+#: model:ir.model.fields,field_description:documents_project.field_project_task__document_count
+msgid "Related Document Count"
+msgstr ""
+
+#. module: documents_project
 #: model:ir.model,name:documents_project.model_documents_tag
 msgid "Tag"
 msgstr "Etiqueta"
+
+#. module: documents_project
+#: model:ir.model,name:documents_project.model_project_task
+msgid "Task"
+msgstr ""
 
 #. module: documents_project
 #. odoo-python
@@ -219,6 +253,22 @@ msgstr ""
 "pode excluí-la."
 
 #. module: documents_project
+#: model:ir.model.fields,help:documents_project.field_project_task__display_name
+msgid ""
+"Use these keywords in the title to set new tasks:\n"
+"\n"
+"        30h Allocate 30 hours to the task\n"
+"        #tags Set tags on the task\n"
+"        @user Assign the task to a user\n"
+"        ! Set the task a medium priority\n"
+"        !! Set the task a high priority\n"
+"        !!! Set the task a urgent priority\n"
+"\n"
+"        Make sure to use the right format and order e.g. Improve the "
+"configuration screen 5h #feature #v16 @Mitchell !"
+msgstr ""
+
+#. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot archive the project base folder (%s)."
@@ -243,56 +293,3 @@ msgstr ""
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot set a company on the %s folder."
 msgstr "Não é possível definir uma empresa na pasta %s."
-
-#~ msgid ""
-#~ "A set of condition and actions which will be available to all attachments "
-#~ "matching the conditions"
-#~ msgstr ""
-#~ "Um conjunto de condições e ações que estarão disponíveis para todos os "
-#~ "anexos que correspondem às condições."
-
-#~ msgid "Categorize and share your documents with your customers"
-#~ msgstr "Categorize e compartilhe seus documentos com seus clientes"
-
-#~ msgid "Category"
-#~ msgstr "Categoria"
-
-#~ msgid "Create"
-#~ msgstr "Criar"
-
-#~ msgid "Create a Task"
-#~ msgstr "Criar Tarefa"
-
-#~ msgid "Default Tags"
-#~ msgstr "Marcadores Padrão"
-
-#~ msgid "Deprecated"
-#~ msgstr "Obsoleto"
-
-#~ msgid "Documents &amp; Analytics"
-#~ msgstr "Documentos e análise"
-
-#~ msgid "Draft"
-#~ msgstr "Rascunho"
-
-#~ msgid "Status"
-#~ msgstr "Estado"
-
-#~ msgid "Task"
-#~ msgstr "Tarefa"
-
-#~ msgid ""
-#~ "Upload <span class=\"fw-normal\">a file or </span>drag <span class=\"fw-"
-#~ "normal\">it here.</span>"
-#~ msgstr ""
-#~ "Envie <span class=\"fw-normal\">um ficheiro ou</span> arraste-o <span "
-#~ "class=\"fw-normal\">aqui.</span>"
-
-#~ msgid "Validate"
-#~ msgstr "Validar"
-
-#~ msgid "Validated"
-#~ msgstr "Validado"
-
-#~ msgid "Workspace"
-#~ msgstr "Espaço de trabalho"

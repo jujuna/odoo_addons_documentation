@@ -3,11 +3,11 @@
 
     <div t-name="spreadsheet_edition.DashboardPublish" class="o_sp_publish_dashboard">
         <CheckBox
-            onChange.bind="toggleDashboardPublished"
-            disabled="isReadonly"
-            value="state.isPublished"
+            onChange.bind="this.toggleDashboardPublished"
+            disabled="this.isReadonly"
+            value="this.state.isPublished"
             className="'boolean_toggle form-switch d-flex align-items-center gap-2 mb-0'">
-            <t t-if="state.isPublished">Published</t>
+            <t t-if="this.state.isPublished">Published</t>
             <t t-else="">Unpublished</t>
         </CheckBox>
     </div>

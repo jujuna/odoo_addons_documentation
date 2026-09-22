@@ -13,8 +13,13 @@
                             <field name="documents_account_create_model" string="Create"
                                    placeholder="Choose an accounting document type..."
                                    required="state == 'documents_account_record_create'"/>
-                            <field name="documents_account_journal_id" string="Journal"
+                            <field name="documents_account_journal_id" string="In Journal"
                                    placeholder="Choose a journal..."/>
+                            <field name="documents_folder_id" placeholder="Keep in existing folder"/>
+                            <field name="documents_add_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"
+                                   placeholder="None"/>
+                            <field name="documents_remove_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"
+                                   placeholder="None"/>
                         </group>
                     </group>
                 </xpath>

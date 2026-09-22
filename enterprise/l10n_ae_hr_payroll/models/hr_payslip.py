@@ -1,16 +1,17 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import calendar
 from collections import defaultdict
+from datetime import date
 from dateutil.relativedelta import relativedelta
-from itertools import chain
-from odoo import Command, api, fields, models
+from odoo import api, fields, models
 
 
 class HrPayslip(models.Model):
     _inherit = "hr.payslip"
-
+    year_to_date_sick_days = fields.Float(compute='_compute_year_to_date_sick_days')
+    days_on_leave_for_period = fields.Float(compute='_compute_days_on_leave_for_period', store=True, readonly=False)
     l10n_ae_basic_salary = fields.Monetary(string="Basic Salary", compute="_compute_l10n_ae_basic_salary", currency_field="currency_id")
-    l10n_ae_hourly_wage = fields.Monetary(string="Hourly Wage", compute="_compute_l10n_ae_hourly_wage", currency_field="currency_id")
+    l10n_ae_hourly_wage = fields.Monetary(string="SA Hourly Wage", compute="_compute_l10n_ae_hourly_wage", currency_field="currency_id")
     l10n_ae_hours_worked = fields.Float(string="Hours Worked", compute="_compute_l10n_ae_worked_values")
     l10n_ae_total_paid_hours = fields.Float(string="Total Paid Hours", compute="_compute_l10n_ae_worked_values")
 
@@ -20,6 +21,7 @@ class HrPayslip(models.Model):
         'worked_days_line_ids.is_paid',
     )
     def _compute_l10n_ae_worked_values(self):
+        excluded_paid_entries = ['158.00', '000.00', '040.00']
         all_lines = self.env['hr.payslip.worked_days']._read_group(
             domain=[('payslip_id', 'in', self.ids)],
             groupby=['payslip_id', 'code', 'is_paid'],
@@ -30,10 +32,10 @@ class HrPayslip(models.Model):
             # line = (hr.payslip(), code, is_paid, number_of_hours)
             payslip_id = line[0]
 
-            if line[1] == 'WORK100':
+            if line[1] == '002.00':
                 values_by_payslip[payslip_id.id]['l10n_ae_hours_worked'] += line[3]
 
-            if line[2]:
+            if line[2] and line[1] not in excluded_paid_entries:
                 values_by_payslip[payslip_id.id]['l10n_ae_total_paid_hours'] += line[3]
 
         for record in self:
@@ -51,29 +53,58 @@ class HrPayslip(models.Model):
             if record.version_id.wage_type == 'hourly':
                 record.l10n_ae_hourly_wage = record.version_id.hourly_wage
             else:
-                hours = sum(self.worked_days_line_ids.mapped('number_of_days')) * record.version_id.resource_calendar_id.hours_per_day
+                hours = sum(record.worked_days_line_ids.mapped('number_of_days')) * record.version_id.resource_calendar_id.hours_per_day
                 gross = record.version_id.wage + record.version_id.l10n_ae_housing_allowance + record.version_id.l10n_ae_transportation_allowance + record.version_id.l10n_ae_other_allowances
                 record.l10n_ae_hourly_wage = gross / hours if hours > 0 else 0
 
+    def _get_l10n_ae_total_work_hours(self):
+        self.ensure_one()
+
+        calendar = self.version_id.resource_calendar_id
+        if calendar:
+            date_from = fields.Datetime.to_datetime(self.date_from)
+            date_to = fields.Datetime.to_datetime(self.date_to) + relativedelta(days=1) - relativedelta(microseconds=1)
+            hours = calendar.get_work_duration_data(date_from, date_to).get('hours', 0)
+            return hours
+
+        return self.sum_worked_hours
+
     def _get_l10n_ae_hourly_allowance_value(self, allowance_type):
         self.ensure_one()
-        if allowance_type not in ('housing', 'transportation', 'other') or self.sum_worked_hours <= 0:
+        total_hours = self._get_l10n_ae_total_work_hours()
+        if allowance_type not in ('housing', 'transportation', 'other') or total_hours <= 0:
             return 0
         field = f'l10n_ae_{allowance_type}_allowance{"s" if allowance_type == "other" else ""}'
-        return self.version_id[field] / self.sum_worked_hours
+        return self.version_id[field] / total_hours
 
-    @api.depends(
-        'sum_worked_hours',
-        'l10n_ae_hours_worked',
-        'version_id.work_entry_source',
-        'version_id.wage'
-    )
+    @api.depends(lambda self: self._get_ae_compute_basic_salary_fields())
     def _compute_l10n_ae_basic_salary(self):
         for record in self:
-            if record.version_id.work_entry_source == 'calendar':
+            if record.version_id.has_static_work_entries():
                 record.l10n_ae_basic_salary = record.version_id.wage
             else:
-                record.l10n_ae_basic_salary = record.l10n_ae_hours_worked * (record.version_id.wage / record.sum_worked_hours) if record.sum_worked_hours > 0 else 0
+                total_hours = record._get_l10n_ae_total_work_hours()
+                record.l10n_ae_basic_salary = (
+                    record.l10n_ae_hours_worked * (record.version_id.wage / total_hours)
+                    if total_hours > 0 else 0
+                )
+
+    def _get_ae_compute_basic_salary_fields(self):
+        fields = ['sum_worked_hours', 'l10n_ae_hours_worked', 'version_id.wage']
+        if self.env['ir.module.module']._get('hr_holidays_attendance').state == 'installed':
+            fields = fields + ['version_id.attendance_based']
+        return fields
+
+    def _get_data_files_to_update(self):
+        # Note: file order should be maintained
+        return super()._get_data_files_to_update() + [(
+            'l10n_ae_hr_payroll', [
+                'data/hr_rule_parameter_data.xml',
+                'data/hr_payroll_structure_type_data.xml',
+                'data/hr_payroll_structure_data.xml',
+                'data/hr_salary_rule_regular_pay_data.xml',
+                'data/hr_salary_rule_instant_pay_data.xml',
+            ])]
 
     def _l10n_ae_get_eos_daily_salary(self):
         years = relativedelta(self.date_to, self.employee_id._get_first_version_date()).years
@@ -108,41 +139,68 @@ class HrPayslip(models.Model):
 
         for payslip in self:
             employee = payslip.employee_id
-            unpaid_leave_days = payslip.worked_days_line_ids.filtered(
-                lambda x: x.work_entry_type_id in payslip.struct_id.unpaid_work_entry_type_ids)
-            unpaid_leave_day_count = sum(unpaid_leave_days.mapped('number_of_days'))
-            evp_inputs = [inputs_dict[code][payslip.id]['total'] for code in input_codes]
-            total_evp = sum(evp_inputs)
+            variable_inputs = [inputs_dict[code][payslip.id]['total'] for code in input_codes]
+            total_variable = sum(variable_inputs)
 
+            bank_account = employee.primary_bank_account_id
+            l10n_ae_routing_code = bank_account._get_clearing_number('AE')
             rows.append([
                 "EDR",
                 (employee.identification_id or '').zfill(14),
-                employee.primary_bank_account_id.bank_id.l10n_ae_routing_code or '',
-                employee.primary_bank_account_id.acc_number or '',
+                (l10n_ae_routing_code or '').zfill(9),
+                bank_account.account_number or '',
                 payslip.date_from.strftime('%Y-%m-%d'),
                 payslip.date_to.strftime('%Y-%m-%d'),
                 (payslip.date_to - payslip.date_from).days + 1,
-                self._l10n_ae_get_wps_formatted_amount(payslip.net_wage - total_evp),
-                self._l10n_ae_get_wps_formatted_amount(total_evp),
-                unpaid_leave_day_count
+                self._l10n_ae_get_wps_formatted_amount(payslip.net_wage - total_variable),
+                self._l10n_ae_get_wps_formatted_amount(total_variable),
+                payslip.days_on_leave_for_period
             ])
 
-            if not payslip.currency_id.is_zero(total_evp):
+            if not payslip.currency_id.is_zero(total_variable):
                 rows.append([
-                    "EVP",
+                    "Variable",
                     (employee.identification_id or '').zfill(14),
-                    employee.primary_bank_account_id.bank_id.l10n_ae_routing_code or '',
-                    *map(self._l10n_ae_get_wps_formatted_amount, evp_inputs)
+                    (l10n_ae_routing_code or '').zfill(9),
+                    *map(self._l10n_ae_get_wps_formatted_amount, (max(0, v) for v in variable_inputs)),
                 ])
 
         return rows
 
-    @api.depends('employee_id', 'version_id', 'struct_id', 'date_from', 'date_to')
+    def _weekdays_between(self, start, end):
+        """Return number of weekdays between two dates inclusive."""
+        attendances_by_date = self.employee_id.resource_calendar_id._get_attendances_by_date(start, end)
+        return sum(1 for atts in attendances_by_date.values() if any(a._is_work_period() for a in atts))
+
+    @api.depends('date_from', 'date_to', 'state')
+    def _compute_year_to_date_sick_days(self):
+        employee_ids = self.mapped('employee_id').ids
+        all_leaves = self.env['hr.leave'].search([
+            ('employee_id', 'in', employee_ids),
+            ('state', '=', 'validate'),
+            ('work_entry_type_id.code', '=', '013.00')
+        ])
+        for slip in self:
+            total_leave_days = 0
+            for leave in all_leaves.filtered(lambda leave: leave.employee_id.id == slip.employee_id.id):
+                if not leave.request_date_from or not leave.request_date_to:
+                    continue
+                if leave.request_date_from > slip.date_to:
+                    continue
+                year_start = date(slip.date_to.year, 1, 1)
+                start = max(leave.request_date_from, year_start)
+                end = min(leave.request_date_to, slip.date_to)
+                if start <= end:
+                    total_leave_days += slip._weekdays_between(start, end)
+            slip.year_to_date_sick_days = total_leave_days
+
     def _compute_input_line_ids(self):
-        super()._compute_input_line_ids()
+        # Seed an advance-recovery input row whenever the employee has an
+        # outstanding balance.
+        res = super()._compute_input_line_ids()
         balance_by_employee = self._get_salary_advance_balances_by_employee()
         uae_employee_struct = self.env.ref('l10n_ae_hr_payroll.uae_employee_payroll_structure')
-
+        input_advance_recovery_rule = self.env.ref('l10n_ae_hr_payroll.l10n_ae_uae_employee_payroll_structure_advance_recovery')
         for slip in self:
             if not slip.employee_id or slip.country_code != "AE":
                 continue
@@ -150,35 +208,33 @@ class HrPayslip(models.Model):
                 balance = balance_by_employee[slip.employee_id]
                 if balance <= 0:
                     continue
-                sal_adv_rec_type = self.env.ref('l10n_ae_hr_payroll.l10n_ae_input_advance_recovery')
-                new_input_lines = [
-                    Command.unlink(line.id)
-                    for line in slip.input_line_ids.filtered_domain([('input_type_id', '=', sal_adv_rec_type.id)])
-                ]
-                new_input_lines.append(Command.create({
-                    'name': self.env._('Salary Advance Recovery'),
-                    'amount': balance,
-                    'input_type_id': sal_adv_rec_type.id,
-                }))
-                slip.write({'input_line_ids': new_input_lines})
+                slip._set_input_value(input_advance_recovery_rule.code, balance)
+        return res
 
     def _get_salary_advance_balances_by_employee(self):
+        input_salary_advance_rule_code = self.env.ref('l10n_ae_hr_payroll.l10n_ae_uae_instant_pay_salary_advance').sudo().code
+        input_advance_recovery_rule_code = self.env.ref('l10n_ae_hr_payroll.l10n_ae_uae_employee_payroll_structure_advance_recovery').sudo().code
+        ae_codes = [input_salary_advance_rule_code, input_advance_recovery_rule_code]
         payslips_by_employee = self._read_group(
             domain=[
                 ('state', 'in', ('validated', 'paid')),
                 ('employee_id', 'in', self.employee_id.ids),
-                ('input_line_ids.code', 'in', ('ADV', 'ADVREC')),
+                ('input_line_ids.code', 'in', ae_codes),
             ],
             groupby=['employee_id'],
             aggregates=['id:recordset']
         )
         balance_by_employee = defaultdict(float)
         for employee_id, payslips in payslips_by_employee:
-            for input_line in chain.from_iterable(payslip.input_line_ids for payslip in payslips):
-                if input_line.code == 'ADV':
-                    balance_by_employee[employee_id] += input_line.amount
-                elif input_line.code == 'ADVREC':
-                    balance_by_employee[employee_id] -= input_line.amount
+            for payslip in payslips:
+                # Check for ADV (Salary Advance)
+                adv_amount = payslip._get_input_line_amount(input_salary_advance_rule_code)
+                if adv_amount:
+                    balance_by_employee[employee_id] += adv_amount
+                # Check for ADVREC (Advance Recovery)
+                advrec_amount = payslip._get_input_line_amount(input_advance_recovery_rule_code)
+                if advrec_amount:
+                    balance_by_employee[employee_id] -= advrec_amount
         return balance_by_employee
 
     def action_payslip_payment_report(self, export_format='l10n_ae_wps'):
@@ -195,7 +251,30 @@ class HrPayslip(models.Model):
 
     def compute_sheet(self):
         ae_payslips = self.filtered(lambda payslip: payslip.country_code == 'AE')
+        ae_payslips._compute_year_to_date_sick_days()
         ae_payslips._compute_l10n_ae_hourly_wage()
         ae_payslips._compute_l10n_ae_worked_values()
         ae_payslips._compute_l10n_ae_basic_salary()
         return super().compute_sheet()
+
+    @api.depends('date_from', 'date_to', 'state')
+    def _compute_days_on_leave_for_period(self):
+        for rec in self:
+            leave_days = 0
+            line_ids = rec.worked_days_line_ids
+            for line in line_ids:
+                if line.code == '000.00' or line.code == '158.00' or line.code == '013.00':
+                    leave_days += line.number_of_days
+            rec.days_on_leave_for_period = leave_days
+
+    @api.model
+    def _issues_dependencies(self):
+        dependencies = super()._issues_dependencies()
+        dependencies += [
+            'company_id.l10n_ae_bank_account_id',
+            'company_id.l10n_ae_employer_code',
+            'employee_id.bank_account_ids.clearing_label_id',
+            'employee_id.bank_account_ids.clearing_number',
+            'employee_id.identification_id',
+        ]
+        return dependencies

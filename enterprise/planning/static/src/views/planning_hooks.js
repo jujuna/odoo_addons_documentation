@@ -1,7 +1,10 @@
+import { useEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
-import { markup, useEnv, onWillUnmount, useEffect } from "@odoo/owl";
+import { markup, onWillUnmount, proxy, useEffect } from "@odoo/owl";
 import { serializeDateTime } from "@web/core/l10n/dates";
 import { useService } from "@web/core/utils/hooks";
+import { ConfirmationDialog, deleteConfirmationMessage } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { AddressRecurrencyConfirmationDialog } from "@planning/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog";
 
 /**
  * @param {Object} params
@@ -48,7 +51,7 @@ export class PlanningControllerActions {
         ]);
         if (result) {
             const notificationRemove = this.notifications.add(
-                markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${_t(
+                markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${_t(
                     "Previous week's shifts copied"
                 )}</span>`,
                 {
@@ -57,7 +60,7 @@ export class PlanningControllerActions {
                     className: "planning_notification",
                     buttons: [{
                         name: 'Undo',
-                        icon: 'fa-undo',
+                        icon: 'undo',
                         onClick: async () => {
                             await this.orm.call(
                                 resModel,
@@ -66,7 +69,7 @@ export class PlanningControllerActions {
                             );
                             this.toggleHighlightPlannedFilter(false);
                             this.notifications.add(
-                                markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${_t(
+                                markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${_t(
                                     "Previous week's copied shifts removed"
                                 )}</span>`,
                                 { type: 'success' },
@@ -111,26 +114,36 @@ export class PlanningControllerActions {
         });
     }
 
-    async autoPlan() {
+    async autoPlan(callback = async () => {}) {
         const additionalContext = this.getAdditionalContext();
-        const res = await this.orm.call(this.getResModel(), "auto_plan_ids", [this.autoPlanDomain()], {
-            context: additionalContext,
-        });
+        const res = await this.orm.call(
+            this.getResModel(),
+            "auto_plan_ids",
+            [this.autoPlanDomain()],
+            {
+                context: {
+                    ...additionalContext,
+                    add_materials_assigned_to_employees: true,
+                },
+            }
+        );
         const { open_shift_assigned = [], sale_line_planned = [] } = res;
         if (!open_shift_assigned.length && !sale_line_planned.length) {
             this.notifications.add(this.autoPlanFailureNotification(), { type: "danger" });
-            return;
+            return res;
         }
+        await callback(res);
+
         let multipleClickProtection = false;
         const notificationRemove = this.notifications.add(
-            markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${this.autoPlanSuccessNotification()}</span>`,
+            markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${this.autoPlanSuccessNotification()}</span>`,
             {
                 type: "success",
                 sticky: true,
                 buttons: [
                     {
                         name: "Undo",
-                        icon: "fa-undo",
+                        icon: "undo",
                         onClick: async () => {
                             if (multipleClickProtection) {
                                 return;
@@ -143,9 +156,8 @@ export class PlanningControllerActions {
                             );
                             await this.reload();
                             this.notifications.add(
-                                markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${
-                                    this.autoPlanRollbackSuccessNotification()
-                                }</span>`,
+                                markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${this.autoPlanRollbackSuccessNotification()
+                                    }</span>`,
                                 { type: "success" }
                             );
                             this.toggleHighlightPlannedFilter(false);
@@ -157,20 +169,7 @@ export class PlanningControllerActions {
         );
         this.toggleHighlightPlannedFilter([...open_shift_assigned, ...sale_line_planned]);
         this.notificationFn = notificationRemove;
-    }
-
-    previewShift() {
-        const additionalContext = this.getAdditionalContext();
-        const adjustedEndDate = this.getStopDate();
-        if (adjustedEndDate) {
-            additionalContext.default_end_datetime = serializeDateTime(
-                adjustedEndDate.plus({ days: 1 }).minus({ minutes: 1 })
-            );
-        }
-        return this.actionService.doAction("planning.resource_preview_action", {
-            additionalContext,
-            onClose: this.reload,
-        });
+        return res;
     }
 
     async print(groupBy = null) {
@@ -225,54 +224,41 @@ export function usePlanningControllerActions() {
     return planningControllerActions;
 }
 
-export function usePlanningModelActions({
-    getHighlightPlannedIds,
-    getContext,
-}) {
+export function usePlanningModelActions({ getHighlightPlannedIds, getContext }) {
     const orm = useService("orm");
     return {
         async getHighlightIds() {
             const context = getContext();
-            if (!context.highlight_conflicting && !context.highlight_planned) {
+            if (!context.highlight_needs_attention && !context.highlight_planned) {
                 return;
             }
-
-            if (context.highlight_conflicting) {
-                const highlightConflictingIds = await orm.search(
-                    "planning.slot",
-                    [["overlap_slot_count", ">", 0]],
-                );
-
-                if (context.highlight_planned) {
-                    return Array.from(
-                        new Set([...highlightConflictingIds, ...getHighlightPlannedIds()])
-                    );
-                }
-                return highlightConflictingIds;
-            }
-            return getHighlightPlannedIds() || [];
+            const highlightedPlannedIds = context.highlight_planned ? getHighlightPlannedIds() : [];
+            const needsAttentionIds = context.highlight_needs_attention
+                ? await orm.call("planning.slot", "get_needs_attention_slot_ids", [])
+                : [];
+            return Array.from(new Set([...needsAttentionIds, ...highlightedPlannedIds]));
         },
     };
 }
 
 export function setupDisplayName(displayNameRef) {
-    useEffect(
-        (displayNameEl) => {
-            const displayNameMatch = displayNameEl.textContent.match(/^(.*)(\(.*\))$/);
-            if (displayNameMatch) {
-                const textMuted = document.createElement("span");
-                textMuted.className = "text-muted text-truncate";
-                textMuted.textContent = displayNameMatch[2];
-                const displayNameText = document.createElement("span");
-                displayNameText.textContent = displayNameMatch[1];
-                displayNameEl.replaceChildren(displayNameText);
-                displayNameEl.appendChild(textMuted);
-            } else {
-                displayNameEl.replaceChildren(document.createTextNode(displayNameEl.textContent));
-            }
-        },
-        () => [displayNameRef.el]
-    );
+    useEffect(() => {
+        if (!displayNameRef()) {
+            return;
+        }
+        const displayNameMatch = displayNameRef().textContent.match(/^(.*)(\(.*\))$/);
+        if (displayNameMatch) {
+            const textMuted = document.createElement("span");
+            textMuted.className = "text-muted text-truncate";
+            textMuted.textContent = displayNameMatch[2];
+            const displayNameText = document.createElement("span");
+            displayNameText.textContent = displayNameMatch[1];
+            displayNameRef().replaceChildren(displayNameText);
+            displayNameRef().appendChild(textMuted);
+        } else {
+            displayNameRef().replaceChildren(document.createTextNode(displayNameRef().textContent));
+        }
+    });
 }
 
 export function usePlanningRecurringDeleteAction() {
@@ -289,6 +275,66 @@ export function usePlanningRecurringDeleteAction() {
         },
         _setRecurrenceUpdate(recurrenceUpdate) {
             this.state.recurrenceUpdate = recurrenceUpdate;
+        },
+    };
+}
+
+/**
+ * Builds the "Unschedule"/"Delete" popover actions shared by the gantt and
+ * map renderers' getPopoverProps: same recurrence-aware delete confirmation,
+ * same unschedule call, only the orm/resModel/reload differ per view.
+ */
+export function usePlanningPopoverActions() {
+    const dialogService = useService("dialog");
+    const state = proxy({ recurrenceUpdate: "this" });
+    const planningRecurrenceDeletion = usePlanningRecurringDeleteAction();
+
+    return {
+        makeOnUnschedule({ orm, resModel, record, reload }) {
+            if (["1_draft", "2_published"].includes(record.state) && record.start_datetime) {
+                return async () => {
+                    await orm.call(resModel, "action_unschedule", [record.id]);
+                    await reload();
+                };
+            }
+            return;
+        },
+        makeOnDelete({ orm, resModel, record, reload }) {
+            return async () => {
+                const recurrenceProps = { resId: record.id, resModel };
+                const canProceed = await new Promise((resolve) => {
+                    if (record.repeat) {
+                        dialogService.add(AddressRecurrencyConfirmationDialog, {
+                            cancel: () => resolve(false),
+                            close: () => resolve(false),
+                            confirm: async () => {
+                                await planningRecurrenceDeletion._actionAddressRecurrency(
+                                    recurrenceProps,
+                                    state.recurrenceUpdate
+                                );
+                                resolve(true);
+                            },
+                            onChangeRecurrenceUpdate: (value) => {
+                                state.recurrenceUpdate = value;
+                            },
+                            selected: state.recurrenceUpdate,
+                        });
+                    } else {
+                        dialogService.add(ConfirmationDialog, {
+                            title: _t("Bye-bye, record!"),
+                            body: deleteConfirmationMessage,
+                            confirmLabel: _t("Delete"),
+                            cancel: () => resolve(false),
+                            close: () => resolve(false),
+                            confirm: () => resolve(true),
+                        });
+                    }
+                });
+                if (canProceed) {
+                    await orm.unlink(resModel, [record.id]);
+                    await reload();
+                }
+            };
         },
     };
 }

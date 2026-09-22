@@ -52,20 +52,20 @@
                                             groups="base.group_no_one"
                                             confirm="Creating a new account will permanently remove your current Avatax account from Odoo, but it won't delete the account on the Avatax side. Do you wish to proceed?">
                                         <i title="Create a new account" role="img" aria-label="Create a new account"
-                                           class="fa fa-plug fa-fw"/>
+                                           class="oi oi-fw" data-icon="power"/>
                                         Create a new account
                                     </button>
                                     <button name="create_account" type="object" class="btn-link" noSaveDialog="1"
                                             invisible="l10n_br_avatax_show_overwrite_warning or not l10n_br_avatax_show_existing_account_warning"
                                             confirm="Warning: An Avalara account already exists in this database. Creating a new one may cause issues when issuing electronic invoices if credentials or certificates are linked incorrectly. Only continue if you intend to manage separate Avalara accounts per company (e.g., with different IT teams). Otherwise, it is recommended to add your company to the existing Avalara account.">
                                         <i title="Create account" role="img" aria-label="Create account"
-                                           class="fa fa-plug fa-fw"/>
+                                           class="oi oi-fw" data-icon="power"/>
                                         Create account
                                     </button>
                                     <button name="create_account" type="object" class="btn-link" noSaveDialog="1"
                                             invisible="l10n_br_avatax_show_overwrite_warning or l10n_br_avatax_show_existing_account_warning">
                                         <i title="Create account" role="img" aria-label="Create account"
-                                           class="fa fa-plug fa-fw"/>
+                                           class="oi oi-fw" data-icon="power"/>
                                         Create account
                                     </button>
                                 </div>
@@ -74,18 +74,18 @@
                                  invisible="l10n_br_avatax_api_identifier in (False, '') or l10n_br_avatax_api_key in (False, '')">
                                 <button name="button_l10n_br_avatax_ping" type="object" class="btn-link">
                                     <i title="Test connection" role="img" aria-label="Test connection"
-                                       class="fa fa-plug fa-fw"/>
+                                       class="oi oi-fw" data-icon="power"/>
                                     Test connection
                                 </button>
                             </div>
                             <div class="mt16">
                                 <button name="button_l10n_br_avatax_log" type="object" class="btn-link">
                                     <i title="Start logging for 30 minutes" role="img"
-                                       aria-label="Start logging for 30 minutes" class="fa fa-file-text-o"/>
+                                       aria-label="Start logging for 30 minutes" class="oi" data-icon="article"/>
                                     Start logging for 30 minutes
                                 </button>
                                 <button name="l10n_br_avatax.ir_logging_avalara_action" type="action" class="btn-link">
-                                    <i title="Show logs" role="img" aria-label="Show logs" class="fa fa-file-text-o"/>
+                                    <i title="Show logs" role="img" aria-label="Show logs" class="oi" data-icon="article"/>
                                     Show logs
                                 </button>
                             </div>
@@ -116,16 +116,22 @@
                             <div class="row" title="Main CNAE code registered with the government.">
                                 <label string="CNAE Code" for="l10n_br_cnae_code_id"
                                        class="col-lg-3 o_light_label"/>
-                                <field name="l10n_br_cnae_code_id" class="w-50"/>
+                                <div class="col-lg-9">
+                                    <field name="l10n_br_cnae_code_id" class="w-100"/>
+                                </div>
                             </div>
                             <field name="l10n_br_tax_regime" invisible="1"/>
-                            <div class="row" title="This only applies if you are a simplified tax regime company."
-                                 invisible="l10n_br_tax_regime != 'simplified'">
-                                <label for="l10n_br_icms_rate" class="col-lg-3 o_light_label"/>
-                                <field name="l10n_br_icms_rate" class="w-50"/>
+                            <div class="row" invisible="l10n_br_tax_regime != 'simplified'">
+                                <div class="col-lg-7">
+                                    <label string="ICMS Simplified Credit Rate" for="l10n_br_icms_rate" class="o_light_label"/>
+                                    <div class="oi oi-filled" data-icon="help" title="Brazil: Use only when ICMS credit applies. The rate may vary based on revenue, tax annex, and specific transaction rules."/>
+                                </div>
+                                <div class="col-lg-5">
+                                    <field name="l10n_br_icms_rate" class="w-100"/>
+                                </div>
                             </div>
                             <div class="d-flex mt4 align-items-center">
-                                <button name="button_l10n_br_avatax_open_company_partner" type="object" icon="oi-arrow-right" string="Configure your company" class="btn-link"/>
+                                <button name="button_l10n_br_avatax_open_company_partner" type="object" icon="east" string="Configure your company" class="btn-link"/>
                             </div>
                         </div>
                     </setting>

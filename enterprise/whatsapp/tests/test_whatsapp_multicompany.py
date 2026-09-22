@@ -5,6 +5,7 @@ from odoo.tests import tagged, HttpCase
 
 
 @tagged("multi_company")
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppMultiCompany(WhatsAppCommon, HttpCase):
     def test_read_whatsapp_channel_in_multi_company(self):
         wa_account_company_c3 = self.env["whatsapp.account"].create(
@@ -34,7 +35,7 @@ class WhatsAppMultiCompany(WhatsAppCommon, HttpCase):
         )
         self.authenticate(self.user_employee_c2.login, self.user_employee_c2.login)
         data = self.make_jsonrpc_request(
-            "/mail/data",
+            "/mail/store",
             {
                 "fetch_params": [
                     ["discuss.channel", [channel_company_c3.id]],

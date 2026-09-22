@@ -4,7 +4,7 @@
 import datetime
 
 from odoo import fields
-from odoo.tests import common
+from odoo.tests import tagged, common
 
 TYPE_SIZE = 8
 TYPE = ['Type %s' % i for i in range(1,TYPE_SIZE + 1)]
@@ -23,6 +23,8 @@ class TestCohortCommon(common.TransactionCase):
         for t in TYPE:
             cls.type_ids.append(cls.CohortType.create({'name': t}).id)
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestCohortForward(TestCohortCommon):
 
     @classmethod
@@ -187,7 +189,33 @@ class TestCohortForward(TestCohortCommon):
             'All percentages should be positive',
         )
 
+    def test_weighted_average(self):
+        self.WebCohortSimpleModel.create([
+            {
+                'name': 'weighted average',
+                'date_start': datetime.date(2017, 1, 1),
+                'date_stop': datetime.date(2017, 1, 1),
+            },
+            *[{
+                'name': 'weighted average',
+                'date_start': datetime.date(2017, 1, 2),
+            } for _ in range(9)],
+        ])
 
+        result = self.WebCohortSimpleModel.get_cohort_data(
+            'date_start', 'date_stop', '__count', 'day',
+            [('name', '=', 'weighted average')], 'retention', 'forward',
+        )
+        first_column_average = result['avg']['columns_avg'][0]
+
+        self.assertEqual(
+            first_column_average['percentage'] / first_column_average['count'],
+            90,
+            'The average retention should be weighted by the initial cohort size',
+        )
+
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestCohortBackward(TestCohortCommon):
     def setUp(self):
         super().setUp()
@@ -277,6 +305,7 @@ class TestCohortBackward(TestCohortCommon):
         self.assertEqual(result[0]['columns'][-1]['percentage'], 100 - 51)
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestCohortEmptyFuturBackward(TestCohortCommon):
     def setUp(self):
         super().setUp()
@@ -306,6 +335,8 @@ class TestCohortEmptyFuturBackward(TestCohortCommon):
         self.assertEqual(result[0]['columns'][0]['value'], 100)
         self.assertEqual(result[0]['columns'][-1]['value'], 0)
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestCohortEmpty(TestCohortCommon):
     def test_empty_backward(self):
         """

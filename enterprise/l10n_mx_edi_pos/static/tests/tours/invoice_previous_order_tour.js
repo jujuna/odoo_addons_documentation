@@ -2,6 +2,7 @@ import { registry } from "@web/core/registry";
 import * as Chrome from "@point_of_sale/../tests/pos/tours/utils/chrome_util";
 import * as Dialog from "@point_of_sale/../tests/generic_helpers/dialog_util";
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
+import * as FeedbackScreen from "@point_of_sale/../tests/pos/tours/utils/feedback_screen_util";
 
 registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_previous_order", {
     steps: () =>
@@ -13,7 +14,12 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_previous_o
             },
             {
                 content: "Open POS session from backend",
-                trigger: "button[name='open_ui']",
+                trigger: "button:contains('Open Register')",
+                run: "click",
+            },
+            {
+                content: "Select tax inclusion",
+                trigger: "button:contains('Tax Included')",
                 run: "click",
                 expectUnloadPage: true,
             },
@@ -38,11 +44,8 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_previous_o
                 run: "click",
             },
             ...PaymentScreen.clickValidate(),
-            {
-                content: "click on New Order",
-                trigger: "div button:contains('New Order')",
-                run: "click",
-            },
+            ...FeedbackScreen.isShown(),
+            ...FeedbackScreen.clickNextOrder(),
             Chrome.clickOrders(),
             {
                 content: "Select dropdown",
@@ -84,10 +87,6 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_previous_o
                 trigger: ".modal button:contains(ok)",
                 run: "click",
             },
-            {
-                content: "The 'Invoice' button should have now turned to 'Reprint Invoice'",
-                trigger: "span:contains('Reprint Invoice')",
-            },
         ].flat(),
 });
 
@@ -103,7 +102,12 @@ registry
                 },
                 {
                     content: "Open POS session from backend",
-                    trigger: "button[name='open_ui']",
+                    trigger: "button:contains('Open Register')",
+                    run: "click",
+                },
+                {
+                    content: "Select tax inclusion",
+                    trigger: "button:contains('Tax Included')",
                     run: "click",
                     expectUnloadPage: true,
                 },
@@ -128,11 +132,8 @@ registry
                     run: "click",
                 },
                 ...PaymentScreen.clickValidate(),
-                {
-                    content: "click on New Order",
-                    trigger: "div button:contains('New Order')",
-                    run: "click",
-                },
+                ...FeedbackScreen.isShown(),
+                ...FeedbackScreen.clickNextOrder(),
                 Chrome.clickOrders(),
                 {
                     content: "Select dropdown",
@@ -168,10 +169,6 @@ registry
                 {
                     trigger: ".modal .modal-footer .btn-primary",
                     run: "click",
-                },
-                {
-                    content: "The 'Invoice' button should have now turned to 'Reprint Invoice'",
-                    trigger: "span:contains('Reprint Invoice')",
                 },
             ].flat(),
     });

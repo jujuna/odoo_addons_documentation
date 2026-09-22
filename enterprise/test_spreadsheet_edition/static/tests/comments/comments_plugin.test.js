@@ -1,17 +1,19 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { Model, helpers } from "@odoo/o-spreadsheet";
-import { addColumns, deleteColumns, redo, undo } from "@spreadsheet/../tests/helpers/commands";
+import { Model, helpers, stores } from "@odoo/o-spreadsheet";
+import { addColumns, createSheet, deleteColumns, deleteSheet, redo, undo } from "@spreadsheet/../tests/helpers/commands";
 import { getBasicServerData } from "@spreadsheet/../tests/helpers/data";
 import {
     setupCollaborativeEnv,
     spExpect,
 } from "@spreadsheet_edition/../tests/helpers/collaborative_helpers";
 import { defineTestSpreadsheetEditionModels } from "@test_spreadsheet_edition/../tests/helpers/data";
+import { makeStoreWithModel } from "@spreadsheet/../tests/helpers/stores";
 
 describe.current.tags("headless");
 defineTestSpreadsheetEditionModels();
 
 const { toCartesian, toZone } = helpers;
+const { ClipboardStore } = stores;
 
 test("Simple thread creation", () => {
     const model = new Model({ sheets: [{ id: "sh1" }] });
@@ -88,12 +90,12 @@ test("Thread on merged cell", () => {
 
 test("Thread removed on sheet deletion", () => {
     const model = new Model();
-    model.dispatch("CREATE_SHEET", { sheetId: "sh2" });
+    createSheet(model, { sheetId: "sh2" });
     model.dispatch("ADD_COMMENT_THREAD", { sheetId: "sh2", col: 1, row: 1, threadId: 1 });
     expect(model.getters.getSpreadsheetThreads(["sh2"])).toEqual([
         { sheetId: "sh2", col: 1, row: 1, threadId: 1, isResolved: false },
     ]);
-    model.dispatch("DELETE_SHEET", { sheetId: "sh2" });
+    deleteSheet(model, "sh2");
     expect(model.getters.getSpreadsheetThreads(["sh2"])).toEqual([]);
 });
 
@@ -133,6 +135,7 @@ test("Thread moved on sheet structure change", () => {
 
 test("Can cut/paste a thread", () => {
     const model = new Model();
+    makeStoreWithModel(model, ClipboardStore);
     const sheetId = model.getters.getActiveSheetId();
     model.dispatch("ADD_COMMENT_THREAD", {
         sheetId,

@@ -15,26 +15,24 @@ from unittest.mock import patch
 
 
 @tagged('mail_push')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMailMobile(SMSCommon):
 
     @classmethod
     def setUpClass(cls):
         super(TestMailMobile, cls).setUpClass()
-        cls.original_domain = cls.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        cls.env['ir.config_parameter'].sudo().set_param('web.base.url', 'http://yourcompany.odoo.com')
+        cls.original_domain = cls.env['ir.config_parameter'].sudo().get_str('web.base.url')
+        cls.env['ir.config_parameter'].sudo().set_str('web.base.url', 'http://yourcompany.odoo.com')
 
     @classmethod
     def tearDownClass(cls):
-        cls.env['ir.config_parameter'].sudo().set_param('web.base.url', cls.original_domain)
+        cls.env['ir.config_parameter'].sudo().set_str('web.base.url', cls.original_domain)
         super(TestMailMobile, cls).tearDownClass()
 
     def test_override_url_in_mail(self):
         url = self.env['mail.thread']._notify_get_action_link('view', model='mail.activity', res_id=1)
         original_expected_link = 'http://yourcompany.odoo.com/mail/view?model=mail.activity&res_id=1'
-        expected_url = 'https://redirect-url.email/?link={0}&apn={1}&afl={0}&ibi={1}&ifl={0}'.format(
-            urllib.parse.quote(original_expected_link, safe=''),
-            'com.odoo.mobile',
-        )
+        expected_url = f'https://redirect-url.email/?link={urllib.parse.quote(original_expected_link, safe="")}'
         self.assertEqual(url, expected_url)
 
     def test_blacklist_not_override_url_in_mail(self):
@@ -49,10 +47,10 @@ class TestPushNotification(SMSCommon):
     def setUpClass(cls):
         super(TestPushNotification, cls).setUpClass()
         sudo_icp = cls.env['ir.config_parameter'].sudo()
-        sudo_icp.set_param('odoo_ocn.project_id', 'Test')
-        sudo_icp.set_param('mail_mobile.enable_ocn', True)
+        sudo_icp.set_str('odoo_ocn.project_id', 'Test')
+        sudo_icp.set_bool('mail_mobile.enable_ocn', True)
 
-        channel = cls.env['discuss.channel'].with_context(cls._test_context)
+        channel = cls.env['discuss.channel']
 
         cls.user_email = cls.user_employee
         cls.user_email.notification_type = 'email'
@@ -64,7 +62,7 @@ class TestPushNotification(SMSCommon):
         )
         cls.user_inbox.partner_id.ocn_token = 'Test OCN Inbox'
 
-        cls.record_simple = cls.env['mail.test.simple'].with_context(cls._test_context).create({
+        cls.record_simple = cls.env['mail.test.simple'].create({
             'name': 'Test',
             'email_from': 'ignasse@example.com'
         })
@@ -120,11 +118,10 @@ class TestPushNotification(SMSCommon):
         jsonrpc.reset_mock()
 
         # Test Tracking Message
-        mail_test_ticket = self.env['mail.test.ticket'].with_context(self._test_context)
+        mail_test_ticket = self.env['mail.test.ticket']
         record_full = mail_test_ticket.with_user(self.user_email).create({
             'name': 'Test',
         })
-        record_full = record_full.with_context(mail_notrack=False)
 
         container = self.env['mail.test.container'].create({'name': 'Container'})
         record_full.message_subscribe(
@@ -151,11 +148,12 @@ class TestPushNotification(SMSCommon):
         })
         self.flush_tracking()
         jsonrpc.assert_called_once()
-        # As the tracking values are converted to text. We check the '→' added by ocn_client.
+        # As the tracking values are in html, they are now simply converted into
+        # plaintext, which is ugly but hey, unforseen side effect :shrug:
         self.assertIn(
-            '→',
+            f'{container.name} → *{container2.name}* (Container)',
             jsonrpc.call_args[1]['params']['data']['body'],
-            'No Tracking Message found'
+            'Tracking changes should be included in push notif payload'
         )
 
     @patch('odoo.addons.mail_mobile.models.mail_thread.iap_jsonrpc')

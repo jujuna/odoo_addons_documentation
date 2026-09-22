@@ -1,7 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import models, fields, api
 from odoo.fields import Domain
-from odoo.tools import SQL, Query
+from odoo.models import Query
+from odoo.tools import SQL
 from odoo.tools.sql import table_columns
 
 
@@ -47,11 +48,11 @@ class AccountReport(models.Model):
         changed_fields = ['date', 'amount_currency', 'amount_residual', 'balance', 'debit', 'credit']
         unchanged_fields = list(all_fields - set(changed_fields))
         selected_journals = tuple(self.env.context.get('journal_ids', []))
-        sql = """   -- Create a temporary table
+        sql = SQL("""   -- Create a temporary table
             CREATE TEMPORARY TABLE IF NOT EXISTS cash_basis_temp_account_move_line () INHERITS (account_move_line) ON COMMIT DROP;
 
-            INSERT INTO cash_basis_temp_account_move_line ({all_fields}) SELECT
-                {unchanged_fields},
+            INSERT INTO cash_basis_temp_account_move_line (%(all_fields)s) SELECT
+                %(unchanged_fields)s,
                 "account_move_line".date,
                 "account_move_line".amount_currency,
                 "account_move_line".amount_residual,
@@ -68,7 +69,7 @@ class AccountReport(models.Model):
                     WHERE account.account_type IN ('asset_receivable', 'liability_payable')
                 )
             )
-            {where_journals};
+            %(where_journals)s;
 
             WITH payment_table AS (
                 SELECT
@@ -103,8 +104,8 @@ class AccountReport(models.Model):
                 JOIN account_account account ON aml.account_id = account.id
                 WHERE account.account_type IN ('asset_receivable', 'liability_payable')
             )
-            INSERT INTO cash_basis_temp_account_move_line ({all_fields}) SELECT
-                {unchanged_fields},
+            INSERT INTO cash_basis_temp_account_move_line (%(all_fields)s) SELECT
+                %(unchanged_fields)s,
                 ref.date,
                 CASE WHEN "account".id = ref.account_id
                     THEN ref.matched_percentage * "account_move_line".amount_currency
@@ -139,21 +140,18 @@ class AccountReport(models.Model):
                 )
             )
             AND ("account".id = ref.account_id OR "account".account_type NOT IN ('asset_receivable', 'liability_payable'))
-            {where_journals};
+            %(where_journals)s;
 
             -- Create an composite index to avoid seq.scan
             CREATE INDEX IF NOT EXISTS cash_basis_temp_account_move_line_composite_idx on cash_basis_temp_account_move_line(date, journal_id, company_id, parent_state);
             -- Update statistics for correct planning
             ANALYZE cash_basis_temp_account_move_line;
-        """.format(
-            all_fields=', '.join(f'"{f}"' for f in (unchanged_fields + changed_fields)),
-            unchanged_fields=', '.join([f'"account_move_line"."{f}"' for f in unchanged_fields]),
-            where_journals=selected_journals and 'AND "account_move_line".journal_id IN %(journal_ids)s' or ''
+            """,
+            all_fields=SQL(', ').join(SQL.identifier(f) for f in (unchanged_fields + changed_fields)),
+            unchanged_fields=SQL(', ').join(SQL.identifier("account_move_line", f) for f in unchanged_fields),
+            where_journals=SQL('AND "account_move_line".journal_id IN %s', selected_journals) if selected_journals else SQL(),
         )
-        params = {
-            'journal_ids': selected_journals,
-        }
-        self.env.cr.execute(sql, params)
+        self.env.execute_query(sql)
 
     @api.model
     def _prepare_lines_for_analytic_groupby_with_cash_basis(self):
@@ -221,15 +219,10 @@ class AccountReport(models.Model):
 
         self.env.cr.execute(query)
 
-    def _get_report_query(self, options, date_scope, domain=None) -> Query:
+    def _get_report_query(self, options, date_scope, domain=None, cta_date_to=None) -> Query:
         # Override to add the context key which will eventually trigger the shadowing of the table
         context_self = self.with_context(account_report_cash_basis=options.get('report_cash_basis'))
-        return super(AccountReport, context_self)._get_report_query(options, date_scope, domain=domain)
-
-    def open_document(self, options, params=None):
-        action = super().open_document(options, params)
-        action['context'].pop('cash_basis', '')
-        return action
+        return super(AccountReport, context_self)._get_report_query(options, date_scope, domain=domain, cta_date_to=cta_date_to)
 
     def action_audit_cell(self, options, params):
         action = super().action_audit_cell(options, params)

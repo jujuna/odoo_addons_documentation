@@ -21,8 +21,9 @@ class SocialAccountRevokeYoutube(models.TransientModel):
 
     def action_revoke(self):
         self.ensure_one()
+        self.account_id.check_access("unlink")
 
-        params = {'token': self.account_id.youtube_access_token}
+        params = {'token': self.account_id._get_youtube_access_token()}
         response = requests.post(
             f'{self._YOUTUBE_REVOKE_URL}?{url_encode(params)}',
             timeout=10,

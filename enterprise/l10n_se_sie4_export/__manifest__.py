@@ -3,7 +3,6 @@
 {
     'name': 'Sweden - SIE 4 Export',
     'summary': 'Export Accounting Data to SIE 4 files',
-    'version': '1.0',
     'description': """
         Module for the export of accounting data to SIE 4 standard files.
         Official website: https://sie.se/
@@ -15,7 +14,6 @@
         'account_reports',
         'l10n_se',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

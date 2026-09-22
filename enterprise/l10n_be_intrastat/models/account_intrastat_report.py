@@ -45,11 +45,9 @@ class AccountIntrastatReportHandler(models.AbstractModel):
         report = self.env['account.report'].browse(options['report_id'])
         options = report.get_options(previous_options={**options, 'export_mode': 'file'})
         self._check_date_range(options)
-        report._init_currency_table(options)
         query = self._get_intrastat_report_query(report, options, 'intrastat_grouping')
         self.env.cr.flush()
-        self.env.cr.execute(query)
-        return self.env.cr.dictfetchall()
+        return self.env.execute_query_dict(query)
 
     @api.model
     def be_intrastat_export_to_csv(self, options):
@@ -81,7 +79,7 @@ class AccountIntrastatReportHandler(models.AbstractModel):
     def be_intrastat_export_to_xml(self, options):
         results = self._be_intrastat_get_report_results_for_file_export(options)
         company = self.env.company
-        if not company.company_registry:
+        if not company.partner_id._get_additional_identifier('BE_EN'):
             error_msg = _('Missing company registry information on the company')
             action_error = {
                 'name': _('company %s', company.name),

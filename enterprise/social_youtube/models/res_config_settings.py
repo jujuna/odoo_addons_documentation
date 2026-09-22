@@ -17,28 +17,28 @@ class ResConfigSettings(models.TransientModel):
     def _compute_youtube_oauth_client_id(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager') and record.youtube_use_own_account:
-                record.youtube_oauth_client_id = self.env['ir.config_parameter'].sudo().get_param('social.youtube_oauth_client_id')
+                record.youtube_oauth_client_id = self.env['ir.config_parameter'].sudo().get_str('social.youtube_oauth_client_id') or False
             else:
-                record.youtube_oauth_client_id = None
+                record.youtube_oauth_client_id = False
 
     def _inverse_youtube_oauth_client_id(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager') and record.youtube_use_own_account:
-                self.env['ir.config_parameter'].sudo().set_param('social.youtube_oauth_client_id', record.youtube_oauth_client_id)
+                self.env['ir.config_parameter'].sudo().set_str('social.youtube_oauth_client_id', record.youtube_oauth_client_id or None)
             elif self.env.user.has_group('social.group_social_manager'):
-                self.env['ir.config_parameter'].sudo().set_param('social.youtube_oauth_client_id', '')
+                self.env['ir.config_parameter'].sudo().set_str('social.youtube_oauth_client_id', None)
 
     @api.depends('youtube_use_own_account')
     def _compute_youtube_oauth_client_secret(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager') and record.youtube_use_own_account:
-                record.youtube_oauth_client_secret = self.env['ir.config_parameter'].sudo().get_param('social.youtube_oauth_client_secret')
+                record.youtube_oauth_client_secret = self.env['ir.config_parameter'].sudo().get_str('social.youtube_oauth_client_secret')
             else:
                 record.youtube_oauth_client_secret = None
 
     def _inverse_youtube_oauth_client_secret(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager') and record.youtube_use_own_account:
-                self.env['ir.config_parameter'].sudo().set_param('social.youtube_oauth_client_secret', record.youtube_oauth_client_secret)
+                self.env['ir.config_parameter'].sudo().set_str('social.youtube_oauth_client_secret', record.youtube_oauth_client_secret or None)
             elif self.env.user.has_group('social.group_social_manager'):
-                self.env['ir.config_parameter'].sudo().set_param('social.youtube_oauth_client_secret', '')
+                self.env['ir.config_parameter'].sudo().set_str('social.youtube_oauth_client_secret', None)

@@ -5,6 +5,8 @@ from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestL10nROTrialBalanceReport(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('ro')
     def setUpClass(cls):
@@ -33,7 +35,7 @@ class TestL10nROTrialBalanceReport(TestAccountReportsCommon):
         report = self.env.ref('l10n_ro_reports.l10n_ro_trial_balance_4_column')
         report.filter_hierarchy = 'never'
 
-        options = self._generate_options(report, fields.Date.from_string('2024-02-01'), fields.Date.from_string('2024-02-29'))
+        options = self._generate_options(report, '2024-02-01', '2024-02-29')
 
         self.assertLinesValues(
             report._get_lines(options),
@@ -44,7 +46,7 @@ class TestL10nROTrialBalanceReport(TestAccountReportsCommon):
                 ("401100 Providers - resumed in a period of up to one year",    2000.0,        0.0,     100.0,         0.0,      2100.0,        0.0,      2100.0,        0.0),
                 ("601000 Raw material expenses",                                2000.0,        0.0,     200.0,         0.0,      2200.0,        0.0,      2200.0,        0.0),
                 ("701500 Revenue from the sale of finished products",              0.0,     3000.0,       0.0,       300.0,         0.0,     3300.0,         0.0,     3300.0),
-                ('Undistributed Profits/Losses - company_1_data',               2000.0,     3000.0,       0.0,         0.0,      2000.0,     3000.0,         0.0,     1000.0),
+                ('Result Brought Forward - company_1_data',                     2000.0,     3000.0,       0.0,         0.0,      2000.0,     3000.0,         0.0,     1000.0),
                 ("Total",                                                       6000.0,     6000.0,     300.0,       300.0,      6300.0,     6300.0,      4300.0,     4300.0),
             ],
             options,
@@ -68,7 +70,7 @@ class TestL10nROTrialBalanceReport(TestAccountReportsCommon):
                 ("401100 Providers - resumed in a period of up to one year",  1000.0,         0.0,     1000.0,        0.0,     2000.0,        0.0,     2000.0,        0.0),
                 ("601000 Raw material expenses",                                 0.0,         0.0,     2000.0,        0.0,     2000.0,        0.0,     2000.0,        0.0),
                 ("701500 Revenue from the sale of finished products",            0.0,         0.0,        0.0,     3000.0,        0.0,     3000.0,        0.0,     3000.0),
-                ("Undistributed Profits/Losses - company_1_data",             2000.0,      3000.0,        0.0,        0.0,     2000.0,     3000.0,        0.0,     1000.0),
+                ("Result Brought Forward - company_1_data",                   2000.0,      3000.0,        0.0,        0.0,     2000.0,     3000.0,        0.0,     1000.0),
                 ("Total",                                                     3000.0,      3000.0,     3000.0,     3000.0,     6000.0,     6000.0,     4000.0,     4000.0),
             ],
             options,
@@ -89,7 +91,7 @@ class TestL10nROTrialBalanceReport(TestAccountReportsCommon):
                 ("401100 Providers - resumed in a period of up to one year",  1000.0,         0.0,     2100.0,        0.0,    1000.0,         0.0,     4100.0,        0.0,     4100.0,        0.0),
                 ("601000 Raw material expenses",                                 0.0,         0.0,     4200.0,        0.0,    2000.0,         0.0,     6200.0,        0.0,     6200.0,        0.0),
                 ("701500 Revenue from the sale of finished products",            0.0,         0.0,        0.0,     6300.0,       0.0,      3000.0,        0.0,     9300.0,        0.0,     9300.0),
-                ("Undistributed Profits/Losses - company_1_data",             2000.0,      3000.0,        0.0,        0.0,       0.0,         0.0,     2000.0,     3000.0,        0.0,     1000.0),
+                ("Result Brought Forward - company_1_data",                   2000.0,      3000.0,        0.0,        0.0,       0.0,         0.0,     2000.0,     3000.0,        0.0,     1000.0),
                 ("Total",                                                     3000.0,      3000.0,     6300.0,     6300.0,    3000.0,      3000.0,    12300.0,    12300.0,    10300.0,    10300.0),
             ],
             options,

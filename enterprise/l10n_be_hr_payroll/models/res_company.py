@@ -1,62 +1,107 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models, _
-from odoo.tools import ormcache
-from odoo.exceptions import ValidationError
+from odoo import api, fields, models
 
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    onss_company_id = fields.Char(string="ONSS Company ID", help="10-digit code given by ONSS")
-    onss_registration_number = fields.Char(string="ONSS Registration Number", help="9-digit code given by ONSS")
-    dmfa_employer_class = fields.Char(string="DMFA Employer Class", help="3-digit code given by ONSS")
-    dmfa_location_unit_ids = fields.One2many('l10n_be.dmfa.location.unit', 'company_id', string="Work address DMFA codes")
-    l10n_be_company_number = fields.Char('Company Number')
-    l10n_be_revenue_code = fields.Char('Revenue Code')
-    l10n_be_ffe_employer_type = fields.Selection([
-        ('commercial', 'Employers with industrial or commercial purposes'),
-        ('non_commercial', 'Employers without industrial or commercial purposes'),
-    ], default='commercial')
+    dmfa_location_unit_ids = fields.One2many('hr.work.location', 'company_id', string="Establishment unit codes")
     onss_expeditor_number = fields.Char(
-        string="ONSS Expeditor Number", groups="base.group_system",
-        help="ONSS Expeditor Number provided when registering service on the technical user")
+        string="ONSS Client ID", groups="hr_payroll.group_hr_payroll_user",
+        help="ONSS Expeditor Number provided when registering service on the technical user. Eg: self_service_chaman_123456_98jdnvh63y")
     onss_certificate_id = fields.Many2one(
         string="ONSS Certificate",
         comodel_name="certificate.certificate",
         domain=[('is_valid', '=', True)],
         help="Certificate to allow access to batch declarations")
-    accident_insurance_name = fields.Char()
-    accident_insurance_number = fields.Char()
     onss_technical_user_name = fields.Char(string="ONSS Technical User Name", groups="base.group_system",
         help="ONSS Technical User Name provided when registering service on the ONSS platform")
     onss_sftp_private_key = fields.Many2one('certificate.key', string="ONSS Technical User Private Key", groups="base.group_system")
+    nsso_immatriculation_date = fields.Date(string="NSSO Immatriculation Date", groups="hr_payroll.group_hr_payroll_user")
+    l10n_be_dimona_environment = fields.Selection([
+        ('production', 'Production'),
+        ('test', 'Test'),
+        ('sandbox', 'Sandbox'),
+    ], string="Dimona Environment", default='production', required=True)
+    l10n_be_joint_committee_id = fields.Many2one('l10n.be.joint.committee', string="Joint Committee")
+    l10n_be_cash_register_active = fields.Boolean(string="Cash Register Active")
+    l10n_be_cash_register_number = fields.Char(string="Cash Register Number")
+    l10n_be_cash_register_registration_start = fields.Date(string="Cash Register Registration Start")
+    l10n_be_cash_register_registration_end = fields.Date(string="Cash Register Registration End")
+    l10n_be_daily_registration_recording = fields.Selection([
+        ('1', '1 - Only use daily registration system'),
+        ('2', '2 - Use cash register system'),
+        ('3', '3 - Use both systems'),
+    ], string="Daily Registration Recording")
+    l10n_be_has_employees = fields.Boolean(string="Has Non-Director Employees", compute='_compute_l10n_be_has_employees')
+    l10n_be_has_workers = fields.Boolean(compute='_compute_l10n_be_has_workers')
+    l10n_be_employer_category_has_cp302 = fields.Boolean(
+        string="Employer Category Allows CP302",
+        compute='_compute_l10n_be_employer_category_has_cp302')
+    l10n_be_cbe_inscription = fields.Date(string="CBE Inscription")
+    l10n_be_temporary_car_option = fields.Boolean(string='Temporary Car Option')
+    l10n_be_max_unused_cars = fields.Integer(string='Maximum unused cars')
+    l10n_be_has_white_cash_register = fields.Boolean(
+        string="White Cash Register",
+        help="If checked, the company has a white cash register, which impacts the extra hours cap for CP302 employees in the 274.XX withholding tax exemption. The cap is raised from 300h to 360h.")
 
-    # Deprecated
-    l10n_be_legal_time_off_type = fields.Many2one('hr.leave.type', string="Legal Time Off Type",
-        help="Define the Time Off Type used for legal allocation of holidays",
-        default=lambda self: self.env.ref('hr_holidays.leave_type_paid_time_off', raise_if_not_found=False))
+    def _compute_l10n_be_has_employees(self):
+        director_jc_id = self.env['l10n.be.joint.committee'].search([('egov3_code', '=', '999')], limit=1).id
+        for company in self:
+            origin_id = company._origin.id
+            if not origin_id:
+                company.l10n_be_has_employees = False
+                continue
+            company.l10n_be_has_employees = bool(
+                self.env["hr.employee"].search(
+                    [("company_id", "=", origin_id), ("l10n_be_joint_committee_id", "!=", director_jc_id)],
+                    limit=1,
+                ),
+            )
 
-    @ormcache('self.id')
-    def _get_workers_count(self):
+    def _compute_l10n_be_has_workers(self):
+        origin_companies = self._origin.filtered('id')
+        employees_by_company = (
+            self.env["hr.employee"]
+            .search([("company_id", "in", origin_companies.ids)])
+            .grouped('company_id')
+        ) if origin_companies else {}
+
+        for company in self:
+            origin = company._origin
+            if not origin.id:
+                company.l10n_be_has_workers = False
+                continue
+            employees = employees_by_company.get(origin, [])
+            company.l10n_be_has_workers = any(
+               e.version_id and e.version_id.is_worker() for e in employees
+            )
+
+    @api.depends('payroll_config_ids.l10n_be_employer_category_id.allowed_joint_committee_ids')
+    def _compute_l10n_be_employer_category_has_cp302(self):
+        cp302 = self.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_302', raise_if_not_found=False)
+        for company in self:
+            category = company.current_payroll_config_id.l10n_be_employer_category_id
+            company.l10n_be_employer_category_has_cp302 = bool(
+                cp302 and cp302 in category.allowed_joint_committee_ids
+            )
+
+    def _l10n_be_dimona_can_declare(self, payroll_config=None):
+        """Whether Dimona declarations can be filed for this company."""
         self.ensure_one()
-        today = fields.Date.today()
-        return self.env['hr.employee'].search_count([
-            ('company_id', '=', self.id),
-            ('current_version_id', '!=', False),
-            ('contract_date_start', '<=', today),
-            '|',
-                ('contract_date_end', '=', False),
-                ('contract_date_end', '>=', today),
-        ])
+        if self.l10n_be_dimona_environment == 'sandbox':
+            return True
+        config = self.current_payroll_config_id if payroll_config is None else payroll_config
+        return bool(config.onss_registration_number and self.onss_certificate_id)
 
-    @api.constrains('l10n_be_company_number')
-    def _check_l10n_be_company_number(self):
-        for company in self.filtered(lambda c: c.l10n_be_company_number):
-            number = company.l10n_be_company_number
-            if not number.isdecimal() or len(number) != 10 or (not number.startswith('0') and not number.startswith('1')):
-                raise ValidationError(_("The company number should contain digits only, starts with a '0' or a '1' and be 10 characters long."))
+    def _l10n_be_dimona_uses_rest_api(self):
+        """Whether this company talks to the ONSS Dimona REST API itself.
+
+        A database that does not file over REST must not poll over REST either.
+        """
+        self.ensure_one()
+        return self.l10n_be_dimona_environment in ('production', 'test', 'sandbox')
 
     def _prepare_resource_calendar_values(self):
         """
@@ -66,25 +111,28 @@ class ResCompany(models.Model):
         vals = super()._prepare_resource_calendar_values()
         if self.country_id.code == 'BE':
             vals.update({
-                'name': _('Standard 38 hours/week'),
+                'name': self.env._('38 hours/week'),
                 'hours_per_day': 7.6,
                 'full_time_required_hours': 38.0,
                 'attendance_ids': [
-                    (0, 0, {'name': 'Monday Morning', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': 'Monday Lunch', 'dayofweek': '0', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': 'Monday Afternoon', 'dayofweek': '0', 'hour_from': 13, 'hour_to': 16.6, 'day_period': 'afternoon'}),
-                    (0, 0, {'name': 'Tuesday Morning', 'dayofweek': '1', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': 'Tuesday Lunch', 'dayofweek': '1', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': 'Tuesday Afternoon', 'dayofweek': '1', 'hour_from': 13, 'hour_to': 16.6, 'day_period': 'afternoon'}),
-                    (0, 0, {'name': 'Wednesday Morning', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': 'Wednesday Lunch', 'dayofweek': '2', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': 'Wednesday Afternoon', 'dayofweek': '2', 'hour_from': 13, 'hour_to': 16.6, 'day_period': 'afternoon'}),
-                    (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': 'Thursday Lunch', 'dayofweek': '3', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': 'Thursday Afternoon', 'dayofweek': '3', 'hour_from': 13, 'hour_to': 16.6, 'day_period': 'afternoon'}),
-                    (0, 0, {'name': 'Friday Morning', 'dayofweek': '4', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': 'Friday Lunch', 'dayofweek': '4', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': 'Friday Afternoon', 'dayofweek': '4', 'hour_from': 13, 'hour_to': 16.6, 'day_period': 'afternoon'})
+                    (0, 0, {'dayofweek': '0', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '1', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '2', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '3', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '4', 'duration_hours': 7.6, 'hour_from': 0, 'hour_to': 0}),
                 ],
             })
         return vals
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        companies = super().create(vals_list)
+        for company in companies:
+            if company.country_id.code == 'BE':
+                self.env['hr.work.location'].sudo().create({
+                    "name": f"{company.name} - {self.env._('Work Location')}",
+                    "company_id": company.id,
+                    "address_id": company.partner_id.id,
+                    "location_type": "dmfa_unit",
+                })
+        return companies

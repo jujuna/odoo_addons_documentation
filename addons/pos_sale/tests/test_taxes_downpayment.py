@@ -8,9 +8,16 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TestTaxesDownPaymentPOS(TestTaxCommonPOS, TestTaxCommonSale, TestTaxesDownPayment):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.pos_user.write({
+            'group_ids': [
+                Command.link(cls.env.ref('sales_team.group_sale_salesman_all_leads').id),
+            ],
+        })
         cls.main_pos_config.down_payment_product_id = cls.env['product.product'].create({
             'name': 'downpayment',
             'available_in_pos': True,

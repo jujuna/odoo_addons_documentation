@@ -5,6 +5,8 @@ from odoo.addons.partnership.tests.common import PartnershipCommon
 
 class SubscriptionsPartnershipCommon(PartnershipCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="documents.DocumentsListRenderer" t-inherit="web.ListRenderer" t-inherit-mode="primary">
+    <t t-name="documents.DocumentsListRendererCommon" t-inherit="web.ListRenderer" t-inherit-mode="primary">
+        <table position="before">
+            <DocumentsFileViewer t-props="this.documentsAttachmentViewerProps"/>
+        </table>
+    </t>
+
+    <t t-name="documents.DocumentsListRenderer" t-inherit="documents.DocumentsListRendererCommon" t-inherit-mode="primary">
         <xpath expr="//div[hasclass('o_list_renderer')]" position="attributes">
-            <attribute name="class">o_list_renderer o_documents_view o_renderer_with_searchpanel overflow-auto position-relative</attribute>
-            <attribute name="t-on-keydown">onGlobalKeydown</attribute>
-            <attribute name="t-on-click">onGlobalClick</attribute>
+            <attribute name="class">o_list_renderer o_renderer o_documents_view overflow-auto position-relative</attribute>
+            <attribute name="t-on-keydown">this.onGlobalKeydown</attribute>
+            <attribute name="t-on-click">this.onGlobalClick</attribute>
         </xpath>
         <xpath expr="//div[hasclass('o_list_renderer')]" position="after">
-            <DocumentsRightPanel nbViewItems="getNbViewItems()" t-if="!this.env.searchModel.context.documents_view_secondary"/>
+            <DocumentsRightPanel nbViewItems="this.getNbViewItems()" t-if="!this.env.searchModel.context.documents_view_secondary"/>
         </xpath>
         <table position="before">
-            <DocumentsDropZone parentRoot="root"/>
-            <DocumentsFileViewer parentRoot="root" t-props="getDocumentsAttachmentViewerProps()"/>
-            <FileUploadProgressContainer fileUploads="this.documentUploads" Component="constructor.components.FileUploadProgressDataRow"
+            <DocumentsDropZone parentRoot="this.rootRef"/>
+            <FileUploadProgressContainer fileUploads="this.documentUploads" Component="this.constructor.components.FileUploadProgressDataRow"
                                          shouldDisplay="(upload) => !upload.data.get('document_id') &amp;&amp; !upload.data.get('thread_id')"/>
         </table>
         <ActionHelper position="replace">
-            <t t-if="showNoContentHelper">
-                <DocumentsActionHelper noContentHelp="props.noContentHelp"/>
+            <t t-if="this.showNoContentHelper">
+                <DocumentsActionHelper noContentHelp="this.props.noContentHelp"/>
             </t>
         </ActionHelper>
     </t>
@@ -25,7 +30,7 @@
     <t t-name="documents.DocumentsListRenderer.RecordRow" t-inherit="web.ListRenderer.RecordRow" t-inherit-mode="primary">
         <xpath expr="//tr[hasclass('o_data_row')]" position="attributes">
             <attribute name="t-att-data-value-id">record.data.id</attribute>
-            <attribute name="t-att-focused">record === this.rightPanelState.focusedRecord</attribute>
+            <attribute name="t-att-focused">record === this.documentService.state.focusedRecord</attribute>
         </xpath>
     </t>
 </templates>

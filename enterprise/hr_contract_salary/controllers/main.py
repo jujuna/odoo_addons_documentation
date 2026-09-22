@@ -3,17 +3,19 @@
 import hashlib
 
 from collections import defaultdict, OrderedDict
-from odoo import fields, http, models, _, Command
+from odoo import fields, http, models, Command, _
 
+from odoo.addons.hr_contract_salary.utils.hr_version import hr_version_context
 from odoo.addons.sign.controllers.main import Sign
 from odoo.exceptions import UserError
 from odoo.http import request
-from odoo.tools import consteq
+from odoo.tools import consteq, float_compare, float_is_zero
 from odoo.tools.image import image_data_uri
 from werkzeug.exceptions import NotFound
 from werkzeug.wsgi import get_current_url
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime, timedelta
+from markupsafe import escape
 
 
 class SignContract(Sign):
@@ -23,16 +25,18 @@ class SignContract(Sign):
         result = super().sign(sign_request_id, token, sms_token=sms_token, signature=signature, **kwargs)
         if result.get('success'):
             request_item = request.env['sign.request.item'].sudo().search([('access_token', '=', token)])
+            offer = request.env['hr.contract.salary.offer'].sudo().search([
+                ('sign_request_ids', 'in', request_item.sign_request_id.ids)])
+            if not offer:
+                return result
+            if offer.state in ['expired', 'refused']:
+                raise UserError(self.env._('This offer is outdated, please request an updated link...'))
             version = request.env['hr.version'].sudo().search([
                 ('sign_request_ids', 'in', request_item.sign_request_id.ids),
                 '|',
                     ('active', '=', True),
                     ('active', '=', False)
             ])
-            offer = request.env['hr.contract.salary.offer'].sudo().search([
-                ('sign_request_ids', 'in', request_item.sign_request_id.ids)])
-            if offer.state in ['expired', 'refused']:
-                raise UserError(_('This offer is outdated, please request an updated link...'))
             request_template_id = request_item.sign_request_id.template_id.id
             # Only if the signed document is the document to sign from the salary package
             version_documents = [
@@ -46,13 +50,11 @@ class SignContract(Sign):
         return result
 
     def _update_version_on_signature(self, request_item, version, offer):
-        wage_to_apply = version._get_wage_to_apply()
         # Only the applicant/employee has signed
         if request_item.sign_request_id.nb_closed == 1:
             version.hash_token = False
             if version.applicant_id:
                 version.applicant_id.employee_id = version.employee_id
-            version.wage_on_signature = wage_to_apply
 
             if not request_item.sign_request_id.nb_wait:
                 if version.employee_id:
@@ -71,17 +73,15 @@ class SignContract(Sign):
 
         # All signers have signed
         if request_item.sign_request_id.nb_wait == 0:
-            current_employee_version = version.employee_id.version_id
+            offer.state = "full_signed"
+            offer._archive_future_versions()
+            current_employee_version = offer.employee_version_id if offer.employee_id else version.employee_id.current_version_id
             must_archive_current_version = version.applicant_id or False
-            # If you are an employee with an existing version already, close the existing version
-            if not version.applicant_id and current_employee_version.contract_date_start:
-                current_employee_version.contract_date_end = (
-                    version.contract_date_start - timedelta(days=1)
-                )
             if current_employee_version.date_version >= version.date_version:
-                # then remplace the current version with the new one signed. We must 'fake' the date_version in order
-                # to be able to unarchive the new version without triggering the constraint if the two dates are equal
-                current_employee_version.date_version = version.date_version - timedelta(days=1)
+                # then replace the current version with the new one signed. We must 'fake' the date_version
+                # to current date_version + 1 day (future has no versions) in order to be able to unarchive the
+                # new version without triggering the constraint if the two dates are equal
+                current_employee_version.date_version = version.date_version + timedelta(days=1)
                 must_archive_current_version = True
             request.env.flush_all()
             version.write({'active': True})
@@ -95,7 +95,6 @@ class SignContract(Sign):
                 version.employee_id.work_contact_id.active = True
             self._create_activity_benefit(version, ('countersigned'))
             self._send_benefit_sign_request(version)
-            offer.state = "full_signed"
 
     def _create_activity_benefit(self, version, contract_states):
         benefits = request.env['hr.contract.salary.benefit'].sudo().search([
@@ -147,8 +146,8 @@ class SignContract(Sign):
                 sign_request_sudo = SignRequestSudo.create({
                     'template_id': sign_template.id,
                     'request_item_ids': request_items,
-                    'reference': _('Signature Request - %s', benefit.name or version.name),
-                    'subject': _('Signature Request - %s', benefit.name or version.name),
+                    'reference': self.env._('Signature Request - %s', benefit.name or version.name),
+                    'subject': self.env._('Signature Request - %s', benefit.name or version.name),
                 })
                 sign_request_sudo.message_subscribe(partner_ids=benefit.sign_copy_partner_id.ids)
                 sign_request_sudo.toggle_favorited()
@@ -156,6 +155,9 @@ class SignContract(Sign):
                 version.sign_request_ids += sign_request_sudo
 
 class HrContractSalary(http.Controller):
+
+    def _get_payslip_line_values(self, payslip):
+        return payslip._get_payslip_lines()
 
     def _get_default_template_values(self, version, offer):
         values = self._get_salary_package_values(version, offer)
@@ -170,17 +172,18 @@ class HrContractSalary(http.Controller):
             'whitelist': False,
             'part_time': False,
             'final_yearly_costs': offer.final_yearly_costs,
+            'is_simulation_offer': offer.is_simulation_offer,
         })
         return values
 
     @http.route(['/salary_package/simulation/version/<int:version_id>'], type='http', auth="public", website=True, sitemap=False)
     def salary_package_deprecated(self, version_id=None, **kw):
         return request.render('http_routing.http_error', {
-            'status_code': _('Oops'),
-            'status_message': _('This offer is outdated, please request an updated link...')})
+            'status_code': self.env._('Oops'),
+            'status_message': self.env._('This offer is outdated, please request an updated link...')})
 
     def _can_submit_offer(self, values):
-        return not values['redirect_to_job']
+        return not values['redirect_to_job'] and not values.get('is_simulation_offer', False)
 
     def check_access_to_salary_configurator(self, request_token, offer, version):
         """
@@ -228,6 +231,46 @@ class HrContractSalary(http.Controller):
             'status_code': self.env._('Oops'),
             'status_message': error_msg})
 
+    def _compute_salary_package(self, version, offer, **kw):
+        if offer.applicant_id:
+            version = version.with_context(is_applicant=True)
+
+        values = self._get_default_template_values(version, offer)
+        for field_name, value in kw.items():
+            if field_name == 'job_id':
+                values['redirect_to_job'] = value
+            if field_name == 'allow':
+                values['whitelist'] = value
+            if field_name == 'part':
+                values['part_time'] = True
+            # Allow simulation on url's in public offers
+            if field_name == 'final_yearly_costs' and not (offer.applicant_id or offer.employee_id or offer.access_token):
+                values['final_yearly_costs'] = float(value)
+        new_wage = version.sudo()._get_wage_from_yearly_costs(values['final_yearly_costs'])
+        version.write({
+            'wage': new_wage,
+            'final_yearly_costs': values['final_yearly_costs'],
+        })
+        refusal_reasons = request.env['hr.contract.salary.offer.refusal.reason'].search([])
+        resume_line_count = request.env['hr.contract.salary.resume'].sudo().with_company(version.company_id).search_count([
+                ('structure_type_id', '=', version.structure_type_id.id)
+            ])
+        values.update({
+            'need_personal_information': self._can_submit_offer(values),
+            'submit': self._can_submit_offer(values),
+            'default_mobile': request.env['ir.default'].sudo()._get('hr.version', 'mobile'),
+            'original_link': get_current_url(request.httprequest.environ),
+            'token': kw.get('token'),
+            'offer_id': offer.id,
+            'resume_line_count': resume_line_count,
+            'master_department_id': request.env['hr.department'].sudo().browse(int(values['department_id'])).master_department_id.id if values['department_id'] else False,
+            'refusal_reasons': refusal_reasons,
+        })
+
+        response = request.render("hr_contract_salary.salary_package", values)
+        response.flatten()
+        return response
+
     @http.route(['/salary_package/simulation/offer/<int:offer_id>'], type='http', auth="public", website=True, sitemap=False)
     def salary_package(self, offer_id=None, **kw):
         response = False
@@ -236,11 +279,7 @@ class HrContractSalary(http.Controller):
         for bundle_name in ["web.assets_frontend", "web.assets_frontend_lazy"]:
             request.env["ir.qweb"]._get_asset_nodes(bundle_name, debug=debug, js=True, css=True)
 
-        # THE REST OF THE TRANSACTION WILL BE ROLLED-BACK
-        # This is just a simulation.
-
-        request.env.flush_all()
-        with request.env.cr.savepoint(flush=False) as sp:
+        with hr_version_context(request, invalidate=True):
             offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id)
             version = offer._get_version()
             has_access, error_page = self.check_access_to_salary_configurator(kw.get('token'), offer, version)
@@ -252,57 +291,26 @@ class HrContractSalary(http.Controller):
                     'status_code': _('Oops'),
                     'status_message': _('This offer has been fully signed, you can not sign it again..')})
 
-            if offer.applicant_id:
-                version = version.with_context(is_applicant=True)
+            response = self._compute_salary_package(version, offer, **kw)
 
-            values = self._get_default_template_values(version, offer)
-            for field_name, value in kw.items():
-                if field_name == 'job_id':
-                    values['redirect_to_job'] = value
-                if field_name == 'allow':
-                    values['whitelist'] = value
-                if field_name == 'part':
-                    values['part_time'] = True
-                # Allow simulation on url's in public offers
-                if field_name == 'final_yearly_costs' and not (offer.applicant_id or offer.employee_id or offer.access_token):
-                    values['final_yearly_costs'] = float(value)
-            new_gross = version.sudo()._get_gross_from_employer_costs(values['final_yearly_costs'])
-            version.write({
-                'wage': new_gross,
-                'final_yearly_costs': values['final_yearly_costs'],
-            })
-            refusal_reasons = request.env['hr.contract.salary.offer.refusal.reason'].search([])
-            values.update({
-                'need_personal_information': self._can_submit_offer(values),
-                'submit': self._can_submit_offer(values),
-                'default_mobile': request.env['ir.default'].sudo()._get('hr.version', 'mobile'),
-                'original_link': get_current_url(request.httprequest.environ),
-                'token': kw.get('token'),
-                'offer_id': offer.id,
-                'master_department_id': request.env['hr.department'].sudo().browse(int(values['department_id'])).master_department_id.id if values['department_id'] else False,
-                'refusal_reasons': refusal_reasons,
-            })
+        return response
 
-            response = request.render("hr_contract_salary.salary_package", values)
-            response.flatten()
-            request.env.flush_all()
-            sp.rollback()
+    def _compute_salary_package_thank_you(self, version, offer, **kw):
+        response = request.render("hr_contract_salary.salary_package_thank_you", {
+            'responsible_name': version.hr_responsible_id.partner_id.name or version.job_id.recruiter_id.name,
+            'responsible_email': version.hr_responsible_id.work_email or version.job_id.recruiter_id.work_email,
+            'responsible_phone': version.hr_responsible_id.work_phone or version.job_id.recruiter_id.work_phone,
+        })
         return response
 
     @http.route(['/salary_package/thank_you/<int:offer_id>'], type='http', auth="public", website=True, sitemap=False)
     def salary_package_thank_you(self, offer_id=None, **kw):
-        offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id)
-        request.env.flush_all()
-        with request.env.cr.savepoint(flush=False) as sp:
+        with hr_version_context(request, invalidate=True):
+            offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id)
             version = offer._get_version()
-            result = request.render("hr_contract_salary.salary_package_thank_you", {
-                'responsible_name': version.hr_responsible_id.partner_id.name or version.job_id.user_id.partner_id.name,
-                'responsible_email': version.hr_responsible_id.work_email or version.job_id.user_id.partner_id.email,
-                'responsible_phone': version.hr_responsible_id.work_phone or version.job_id.user_id.partner_id.phone,
-            })
-            request.env.flush_all()
-            sp.rollback()
-        return result
+            response = self._compute_salary_package_thank_you(version, offer, **kw)
+
+        return response
 
     def _get_personal_infos_countries(self, version, personal_info):
         return request.env['res.country'].search([])
@@ -313,12 +321,15 @@ class HrContractSalary(http.Controller):
     def _get_personal_infos_langs(self, version, personal_info):
         return request.env['res.lang'].search([])
 
+    def _should_add_personal_info(self, personal_info, version):
+        return True
+
     def _get_personal_infos(self, version, offer):
         initial_values = {}
         dropdown_options = {}
         targets = {
             'version_personal': version.with_context(active_test=False).employee_id.version_ids.sorted(
-                'create_date', reverse=True
+                'id', reverse=True
             )[0],  # force prefill from the employee's last created version to get last up-to-date info
             'employee': version.employee_id,
             'bank_account': version.employee_id.primary_bank_account_id,
@@ -330,18 +341,19 @@ class HrContractSalary(http.Controller):
             ('structure_type_id', '=', False),
             ('structure_type_id', '=', version.structure_type_id.id)]).sorted(lambda info: (info.info_type_id.sequence, info.sequence))
         mapped_personal_infos = defaultdict(lambda: request.env['hr.contract.salary.personal.info'])
-
         for personal_info in personal_infos:
+            if not self._should_add_personal_info(personal_info, version):
+                continue
             mapped_personal_infos[personal_info.info_type_id.name] |= personal_info
 
             target = targets[personal_info.applies_on]
 
             if personal_info.display_type == 'document':
-                if personal_info.field in target and target[personal_info.field]:
-                    if target[personal_info.field][:7] == b'JVBERi0':
-                        content = "data:application/pdf;base64,%s" % (target[personal_info.field].decode())
+                if field_value := target[personal_info.field]:
+                    if field_value.content[:5] == b'%PDF-':
+                        content = "data:application/pdf;base64,%s" % (field_value.to_base64())
                     else:
-                        content = image_data_uri(target[personal_info.field])
+                        content = image_data_uri(field_value.content)
                 else:
                     content = False
                 initial_values[personal_info.field] = content
@@ -369,12 +381,27 @@ class HrContractSalary(http.Controller):
                 elif personal_info.dropdown_selection == 'lang':
                     values = [(lang.code, lang.name) for lang in self._get_personal_infos_langs(version, personal_info)]
                 dropdown_options[personal_info.field] = values
+        if not offer.is_simulation_offer:
+            return mapped_personal_infos, dropdown_options, initial_values
 
-        return mapped_personal_infos, dropdown_options, initial_values
+        new_dropdown_options, new_initial_values = dropdown_options, initial_values
+        new_mapped_personal_infos = defaultdict(lambda: request.env['hr.contract.salary.personal.info'])
+
+        for key, personal_infos in mapped_personal_infos.items():
+            for personal_info in personal_infos:
+                if personal_info.impacts_net_salary:
+                    new_mapped_personal_infos[key] |= personal_info
+                else:
+                    new_initial_values.pop(personal_info.field, None)
+                    new_initial_values.pop(personal_info.field + '_filename', None)
+                    new_dropdown_options.pop(personal_info.field, None)
+
+        return new_mapped_personal_infos, new_dropdown_options, new_initial_values
 
     def _get_benefits(self, version_vals, offer):
         return request.env['hr.contract.salary.benefit'].sudo().search([
-            ('structure_type_id', '=', version_vals.get('structure_type_id'))])
+            ('structure_type_id', '=', version_vals.get('structure_type_id')),
+             ('is_configurable_benefit', '=', True)])
 
     def _get_benefits_values(self, version, offer):
         initial_values = {}
@@ -389,6 +416,14 @@ class HrContractSalary(http.Controller):
             field = benefit.field
             initial_values[field] = version[field] if benefit.source == 'field' else version._get_property_input_value(benefit.salary_rule_id.code)
 
+            if benefit.display_type == 'radio':
+                radio_value = initial_values[field]
+                radio_values = benefit.value_ids.filtered(lambda value: value.display_type == 'line').mapped(
+                    lambda value: value._get_value()
+                )
+                if set(radio_values) == {0.0, 1.0} and radio_value not in radio_values:
+                    radio_value = 1.0 if radio_value else 0.0
+                initial_values['%s_radio' % field] = radio_value
             if benefit.folded:
                 fold_field = 'fold_%s' % (benefit.field)
                 benefit_fold_field = benefit.fold_field or benefit.field
@@ -408,7 +443,7 @@ class HrContractSalary(http.Controller):
         dropdown_benefits = benefits.filtered(lambda a: a.display_type == 'dropdown')
         for dropdown_benefit in dropdown_benefits:
             dropdown_options[dropdown_benefit.field] = \
-                [(value.value, value.value) for value in dropdown_benefit.value_ids.filtered(lambda v: v.display_type == 'line')]
+                [(value._get_value(), value._get_value()) for value in dropdown_benefit.value_ids.filtered(lambda v: v.display_type == 'line')]
         dropdown_group_benefits = benefits.filtered(lambda a: a.display_type == 'dropdown-group')
         for dropdown_group_benefit in dropdown_group_benefits:
             values = OrderedDict()
@@ -419,7 +454,7 @@ class HrContractSalary(http.Controller):
                     current_section = value.name
                     values[current_section] = []
                 else:
-                    values[current_section].append((value.value, value.value))
+                    values[current_section].append((value._get_value(), value._get_value()))
             dropdown_group_options[dropdown_group_benefit.field] = values
         benefit_types = sorted(benefits.mapped('benefit_type_id'), key=lambda x: x.sequence)
         mapped_dependent_benefits = defaultdict(lambda: '')
@@ -453,7 +488,7 @@ class HrContractSalary(http.Controller):
         mapped_personal_infos, dropdown_options_1, initial_values_1 = self._get_personal_infos(version, offer)
         mapped_benefits, mapped_dependent_benefits, mandatory_benefits, mandatory_benefits_names, benefit_types, dropdown_options_2, dropdown_group_options, initial_values_2 = self._get_benefits_values(version, offer)
         all_initial_values = {**initial_values_1, **initial_values_2}
-        all_initial_values = {key: round(value, 2) if isinstance(value, float) else value for key, value in all_initial_values.items()}
+        all_initial_values = {key: round(value, 5) if isinstance(value, float) else value for key, value in all_initial_values.items()}
         all_dropdown_options = {**dropdown_options_1, **dropdown_options_2}
         return {
             'version': version,
@@ -473,9 +508,14 @@ class HrContractSalary(http.Controller):
     def _get_new_version_values(self, version_vals, employee, benefits, offer):
         version_benefits = self._get_benefits(version_vals, offer)
         company = self.env['res.company'].browse(version_vals.get('company_id'))
+        # During simulation, the offer temporarily becomes an amendment. After rollback and cache invalidation, compute isn't triggered automatically!
+        offer._compute_is_contract_amendment()
+        effective_date = offer.contract_start_date or fields.Date.today().replace(day=1)
+        contract_date_start = offer.employee_version_id.contract_date_start if offer.is_contract_amendment else effective_date
+        contract_date_end = offer.employee_version_id.contract_date_end if offer.is_contract_amendment else offer.contract_end_date
         new_version_vals = {
             'active': False,
-            'name': version_vals.get('name') or _("Package Simulation"),
+            'name': version_vals.get('name') or self.env._("Package Simulation"),
             'job_id': offer.employee_job_id.id or version_vals.get('job_id') or employee.job_id.id,
             'department_id': offer.department_id.id or version_vals.get('department_id') or employee.department_id.id,
             'company_id': company.id,
@@ -488,17 +528,19 @@ class HrContractSalary(http.Controller):
             'contract_template_id': offer.contract_template_id.id,
             'hr_responsible_id': version_vals.get('hr_responsible_id'),
             'sign_template_id': offer.sign_template_id.id,
-            'contract_update_template_id': version_vals.get('contract_update_template_id'),
-            'date_version': offer.contract_start_date or fields.Date.today().replace(day=1),
-            'contract_date_start': offer.contract_start_date or fields.Date.today().replace(day=1),
-            'contract_date_end': offer.contract_end_date,
-            'contract_type_id': version_vals.get('contract_type_id'),
+            'contract_update_template_id': version_vals.get('contract_update_template_id') or offer.contract_template_id.contract_update_template_id.id,
+            'date_version': effective_date,
+            'contract_date_start': contract_date_start,
+            'contract_date_end': contract_date_end,
+            'employee_type_id': version_vals.get('employee_type_id'),
             'originated_offer_id': offer.id,
             'address_id': employee.address_id.id,
             'work_location_id': employee.work_location_id.id,
         }
-        if 'work_entry_source' in version_vals:
-            new_version_vals['work_entry_source'] = version_vals.get('work_entry_source')
+        if 'attendance_based' in version_vals:
+            new_version_vals['attendance_based'] = version_vals.get('attendance_based')
+        if version_vals.get('wage_type') == 'hourly':
+            new_version_vals['hourly_wage'] = version_vals.get('hourly_wage')
 
         for benefit in version_benefits:
             if not benefit.res_field_id or benefit.field not in version_vals:
@@ -507,7 +549,8 @@ class HrContractSalary(http.Controller):
                 new_version_vals.update(getattr(self.env['hr.version'], '_get_benefit_values_%s' % (benefit.field))(version_vals, benefits))
                 continue
             if benefit.folded:
-                new_version_vals[benefit.fold_field or benefit.field] = benefits['fold_%s' % (benefit.field)]
+                new_version_vals[benefit.fold_field] = benefits['fold_%s' % (benefit.field)]
+                new_version_vals[benefit.field] = benefits[benefit.field]
             if benefit.display_type == 'dropdown':
                 new_version_vals[benefit.field] = benefits[benefit.field]
             if benefit.display_type in ['manual', 'text']:
@@ -588,22 +631,20 @@ class HrContractSalary(http.Controller):
             partner.write(work_contact_vals)
         else:
             work_contact_vals['active'] = False
-            partner = request.env['res.partner'].sudo().with_context(lang=None, tracking_disable=True).create(work_contact_vals)
+            partner = request.env['res.partner'].sudo().with_context(lang=None).create(work_contact_vals)
 
         # Update personal info on the employee
         if bank_account_vals:
-            bank_account_vals['partner_id'] = partner.id
-            existing_bank_account = request.env['res.partner.bank'].sudo().search([
-                ('partner_id', '=', partner.id),
-                ('acc_number', '=', bank_account_vals['acc_number'])], limit=1)
-            if existing_bank_account:
-                bank_account = existing_bank_account
-                if bank_account_vals.get('acc_holder_name'):
-                    bank_account.sudo().acc_holder_name = bank_account_vals['acc_holder_name']
-            else:
-                bank_account = request.env['res.partner.bank'].sudo().create(bank_account_vals)
-
-            employee_vals['bank_account_ids'] = [Command.link(bank_account.id)]
+            bank_account = request.env['res.partner.bank'].sudo()._find_or_create_bank_account(
+                account_number=bank_account_vals['account_number'],
+                partner=partner,
+                company=employee.company_id,
+                extra_create_vals=bank_account_vals,
+            )
+            employee_vals['bank_account_ids'] = [Command.set([bank_account.id])]
+            holder_name = bank_account_vals.get('holder_name')
+            if holder_name and bank_account.sudo().holder_name != holder_name:
+                bank_account.sudo().holder_name = holder_name
 
         employee_vals['work_contact_id'] = partner.id
 
@@ -611,13 +652,15 @@ class HrContractSalary(http.Controller):
             employee_vals['address_id'] = job.address_id.id
 
         if not no_name_write:
-            employee_vals['name'] = employee_infos.get('name', '')
+            employee_vals['name'] = employee_vals['legal_name'] = employee_infos.get('name', '')
+        # unclear why, but was done due to 'selection field issue', to check at some point
+        # but don't want to break salary simulator
         employee.with_context(tracking_disable=True).write(employee_vals)
         version.with_context(tracking_disable=True).write(version_vals)
         if attachment_create_vals:
             request.env['ir.attachment'].sudo().create(attachment_create_vals)
 
-    def create_new_version(self, version_vals, offer_id, benefits, no_write=False, **kw):
+    def create_new_version(self, version_vals, offer, benefits, no_write=False, **kw):
         # Generate a new version with the current modifications
         version_diff = []
         benefits_values = benefits['version']
@@ -627,7 +670,6 @@ class HrContractSalary(http.Controller):
             'address': benefits['address'],
             'bank_account': benefits['bank_account'],
         }
-        offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id).exists()
         applicant = offer.applicant_id
         employee = kw.get('employee') or applicant.employee_id or offer.employee_id
         if not employee and applicant:
@@ -658,7 +700,6 @@ class HrContractSalary(http.Controller):
                     for skill in offer.applicant_id.current_applicant_skill_ids
                 ]
             employee = request.env['hr.employee'].sudo().with_context(
-                tracking_disable=True,
                 salary_simulation=not no_write,
             ).create(employee_vals)
 
@@ -700,7 +741,6 @@ class HrContractSalary(http.Controller):
                             version_diff.append((employee_field_name, current_value, new_value))
 
         new_version = request.env['hr.version'].with_context(
-            tracking_disable=True,
             salary_simulation=True,
         ).sudo().create(self._get_new_version_values(version_vals, employee, benefits_values, offer))
         self._update_personal_info(employee, new_version, personal_infos, no_name_write=bool(kw.get('employee')))
@@ -721,49 +761,73 @@ class HrContractSalary(http.Controller):
             if start_date:
                 new_version.date_version = datetime.strptime(start_date[0], '%Y-%m-%d').date()
 
-        new_version.wage_with_holidays = benefits_values['wage']
+        # Activating the Mobility budget will change the final yearly cost, that should be reset to match the offer.
+        # The wage should be realigned based on the final yearly cost.
+        # (The wage should not change based on holidays or mobility budget, only the wage with sacrifice should)
         new_version.final_yearly_costs = float(benefits_values['final_yearly_costs'] or 0.0)
-        new_version._inverse_wage_with_holidays()
+
+        benefits_values = benefits['version']
+        with hr_version_context(request):
+            version = offer._get_version()
+            new_version.write({
+                'payroll_properties': dict(version.payroll_properties),
+            })
+        self._update_version_payroll_properties(new_version, benefits_values)
 
         return new_version, version_diff
 
+    def _compute_update_salary(self, version, offer, benefits, **kw):
+        result = {}
+        version_vals = version._get_values_dict()
+        new_version = self.create_new_version(version_vals, offer, benefits, no_write=True)[0]
+        final_yearly_costs = float(benefits['version']['final_yearly_costs'] or 0.0)
+        new_version.write({
+            'final_yearly_costs': final_yearly_costs,
+        })
+
+        result['new_gross'] = round(new_version.wage, 2)
+        new_version = new_version.with_context(
+            origin_version_id=version.id,
+            simulation_working_schedule=kw.get('simulation_working_schedule', False))
+        result.update(self._get_compute_results(new_version))
+        return result
+
     @http.route('/salary_package/update_salary', type="jsonrpc", auth="public")
     def update_salary(self, offer_id=None, benefits=None, **kw):
-        result = {}
-
-        request.env.flush_all()
-        with request.env.cr.savepoint(flush=False) as sp:
-
+        with hr_version_context(request, invalidate=True):
             offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id)
             version = offer._get_version()
             has_access, error_page = self.check_access_to_salary_configurator(kw.get('token'), offer, version)
             if not has_access:
                 return error_page
-            version_vals = version._get_values_dict()
-            new_version = self.create_new_version(version_vals, offer_id, benefits, no_write=True)[0]
-            final_yearly_costs = float(benefits['version']['final_yearly_costs'] or 0.0)
-            new_gross = new_version._get_gross_from_employer_costs(final_yearly_costs)
-            new_version.write({
-                'wage': new_gross,
-                'final_yearly_costs': final_yearly_costs,
-            })
 
-            result['new_gross'] = round(new_gross, 2)
-            new_version = new_version.with_context(
-                origin_version_id=version.id,
-                simulation_working_schedule=kw.get('simulation_working_schedule', False))
-            result.update(self._get_compute_results(new_version))
+            result = self._compute_update_salary(version, offer, benefits, **kw)
 
-            request.env.flush_all()
-            sp.rollback()
         return result
 
     def _get_compute_results(self, new_version):
-        wage_to_apply = new_version._get_wage_to_apply()
-        new_version.wage_on_signature = wage_to_apply
+        schedule_pay_label = dict(request.env['hr.version']._fields['schedule_pay']._description_selection(request.env))
 
+        def _get_period_name(category_id, version):
+            if category_id == request.env.ref("hr_contract_salary.hr_contract_salary_resume_category_monthly_salary"):
+                # ISSUE:
+                # The salary configurator was originally designed with the assumption that
+                # the pay schedule is always "monthly". When we changed the schedule pay
+                # selection labels (e.g., "monthly" -> "month"), the configurator started
+                # displaying "month Salary" instead of the expected "Monthly Salary"
+                # and "Gross (Incl. Comm)" instead of "Gross".
+                # FIX:
+                # As a temporary workaround, we return the category_id.name (to fetch the correct translated name depending on the language, e.g. "Monthly Salary" in English)
+                # when version.schedule_pay == 'monthly' because the configurator is not adapted for other pay schedule than monthly.
+                # For all other schedule_pay values, we keep using the schedule_pay_label mapping,
+                # until the configurator is properly adapted to support non-monthly schedules.
+                if version.schedule_pay == 'monthly':
+                    return category_id.name
+                period_name = schedule_pay_label.get(version.schedule_pay, "Monthly")
+                return f"{period_name} Salary"
+            return category_id.name
         result = {}
-        result['wage_with_holidays'] = round(wage_to_apply, 2)
+        result['wage'] = round(new_version.wage, 2)
         # Allowed company ids might not be filled or request.env.user.company_ids might be wrong
         # since we are in route context, force the company to make sure we load everything
         resume_lines = request.env['hr.contract.salary.resume'].sudo().with_company(new_version.company_id).search([
@@ -778,7 +842,7 @@ class HrContractSalary(http.Controller):
         monthly_total = 0
         monthly_total_lines = resume_lines.filtered(lambda l: l.value_type == 'monthly_total')
 
-        uoms = {'days': _('Days'), 'percent': '%', 'currency': new_version.company_id.currency_id.symbol, 'position': new_version.company_id.currency_id.position}
+        uoms = {'days': self.env._('Days'), 'percent': '%', 'currency': new_version.company_id.currency_id.symbol, 'position': new_version.company_id.currency_id.position}
 
         resume_explanation = False
         for resume_line in resume_lines - monthly_total_lines:
@@ -790,7 +854,7 @@ class HrContractSalary(http.Controller):
             if resume_line.value_type == 'version':
                 value = new_version[resume_line.code] if resume_line.code in new_version else 0  # noqa: SIM401
             if resume_line.value_type == 'sum':
-                resume_explanation = _('Equals to the sum of the following values:\n\n%s',
+                resume_explanation = self.env._('Equals to the sum of the following values:\n\n%s',
                     '\n+ '.join(resume_line.benefit_ids.res_field_id.sudo().mapped('field_description')))
                 for benefit in resume_line.benefit_ids:
                     if not benefit.fold_field or (benefit.fold_field and new_version[benefit.fold_field]):
@@ -805,7 +869,90 @@ class HrContractSalary(http.Controller):
             result['resume_lines_mapped'][resume_line.category_id.name][resume_line.code] = (resume_line.name, value, uom, resume_explanation, new_version.company_id.currency_id.position, resume_line.uom)
         for resume_line in monthly_total_lines:
             result['resume_lines_mapped'][resume_line.category_id.name][resume_line.code] = (resume_line.name, round(float(monthly_total), 2), uoms['currency'], uoms['position'], resume_explanation, resume_line.uom)
+
+        payslip = new_version._generate_salary_simulation_payslip()
+        payslip_lines = payslip._get_payslip_lines()
+
+        salary_rules = request.env['hr.salary.rule'].sudo().browse([line['salary_rule_id'] for line in payslip_lines])
+        appears_on_payslip_mapped = {rule.id: rule.appears_on_payslip for rule in salary_rules}
+
+        result['payslip_lines'] = [(
+            line['name'],
+            f'{line['total']:.2f}',
+            line['code'],
+            'total' if line['code'] in ['BASIC', 'SALARY', 'GROSS', 'NET', 'GROSSIP'] else float_compare(line['total'], 0, precision_digits=2),
+            new_version.company_id.currency_id.position,
+            new_version.company_id.currency_id.symbol
+        ) for line in payslip_lines if (appears_on_payslip_mapped[line['salary_rule_id']] == 'always'
+            or (appears_on_payslip_mapped[line['salary_rule_id']] == 'non_zero' and not float_is_zero(line['amount'], 2)))]
+        # Allowed company ids might not be filled or request.env.user.company_ids might be wrong
+        # since we are in route context, force the company to make sure we load everything
+        resume_lines = request.env['hr.contract.salary.resume'].sudo().with_company(new_version.company_id).search([
+            '|',
+            ('structure_type_id', '=', False),
+            ('structure_type_id', '=', new_version.structure_type_id.id),
+            ('value_type', 'in', ['payslip', 'monthly_total'])])
+        monthly_total = 0
+        monthly_total_lines = resume_lines.filtered(lambda l: l.value_type == 'monthly_total')
+
+        # new categories could be introduced at this step
+        # recreate resume_categories
+        resume_categories = request.env['hr.contract.salary.resume'].sudo().with_company(new_version.company_id).search([
+            '|', '&', '|',
+                    ('structure_type_id', '=', False),
+                    ('structure_type_id', '=', new_version.structure_type_id.id),
+                ('value_type', 'in', ['fixed', 'version', 'monthly_total', 'sum']),
+            ('id', 'in', resume_lines.ids)]).category_id
+        result['resume_categories'] = [_get_period_name(c, new_version) for c in sorted(resume_categories, key=lambda x: x.sequence)]
+
+        payslip_lines = self._get_payslip_line_values(payslip)
+        for resume_line in resume_lines - monthly_total_lines:
+            value = round(sum(line['total'] for line in payslip_lines if line['code'] == resume_line.code), 2)
+            resume_explanation = False
+            if resume_line.code == 'GROSS' and new_version.wage_type == 'hourly':
+                hours = payslip.worked_days_line_ids.number_of_hours
+                resume_explanation = self.env._('This is the gross calculated for the current month with a total of %s hours.', hours)
+            result['resume_lines_mapped'][_get_period_name(resume_line.category_id, new_version)][resume_line.code] = (resume_line.name, value, new_version.company_id.currency_id.symbol, resume_explanation, new_version.company_id.currency_id.position, resume_line.uom)
+            if resume_line.impacts_monthly_total:
+                monthly_total += value / 12.0 if resume_line.category_id.periodicity == 'yearly' else value
+
+        for resume_line in monthly_total_lines:
+            super_line = result['resume_lines_mapped'][_get_period_name(resume_line.category_id, new_version)][resume_line.code]
+            line_name = super_line[0]
+            if resume_line.category_id == request.env.ref("hr_contract_salary.hr_contract_salary_resume_category_total"):
+                period_name = schedule_pay_label.get(new_version.schedule_pay, "Monthly")
+                line_name = f"{period_name} Equivalent"
+            new_value = (line_name, round(super_line[1] + float(monthly_total), 2), super_line[2], False, new_version.company_id.currency_id.position, resume_line.uom)
+            result['resume_lines_mapped'][_get_period_name(resume_line.category_id, new_version)][resume_line.code] = new_value
+
         return result
+
+    def _update_version_payroll_properties(self, version, benefits):
+        version_benefits = request.env['hr.contract.salary.benefit'].sudo().search([
+            ('structure_type_id', '=', version.structure_type_id.id),
+            ('source', '=', 'rule')])
+        variants = [
+                '',
+                "_manual",
+                "_radio",
+                "_slider",
+        ]
+        for benefit in version_benefits:
+            fields = ['%s%s' % (benefit.field, k) for k in variants]
+            value = next((benefits[field] for field in fields if field in benefits), None) or 0.0
+            version._set_property_input_value(benefit.salary_rule_id.code, float(value))
+
+    def _compute_onchange_benefit(self, version, benefit_field, new_value, offer, benefits, **kw):
+        benefit = request.env['hr.contract.salary.benefit'].sudo().search([
+            ('structure_type_id', '=', version.structure_type_id.id),
+            ('field', '=', benefit_field)], limit=1)
+        if hasattr(version, '_get_description_%s' % benefit_field):
+            description = getattr(version, '_get_description_%s' % benefit_field)(new_value)
+        else:
+            description = benefit.description
+        if description:
+            description = escape(description)
+        return {'new_value': new_value, 'description': description, 'extra_values': False}
 
     @http.route(['/salary_package/onchange_benefit'], type='jsonrpc', auth='public')
     def onchange_benefit(self, benefit_field, new_value, offer_id, benefits, **kw):
@@ -816,23 +963,14 @@ class HrContractSalary(http.Controller):
         #                to the benefit new_value
         # Override this controllers to add customize
         # the returned value for a specific benefit
-        offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id)
-        request.env.flush_all()
-        with request.env.cr.savepoint(flush=False) as sp:
+        with hr_version_context(request, invalidate=True):
+            offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id)
             version = offer._get_version()
             has_access, error_page = self.check_access_to_salary_configurator(kw.get('token'), offer, version)
             if not has_access:
                 return error_page
-            benefit = request.env['hr.contract.salary.benefit'].sudo().search([
-                ('structure_type_id', '=', version.structure_type_id.id),
-                ('field', '=', benefit_field)], limit=1)
-            if hasattr(version, '_get_description_%s' % benefit_field):
-                description = getattr(version, '_get_description_%s' % benefit_field)(new_value)
-            else:
-                description = benefit.description
-            request.env.flush_all()
-            sp.rollback()
-        return {'new_value': new_value, 'description': description, 'extra_values': False}
+            result = self._compute_onchange_benefit(version, benefit_field, new_value, offer, benefits)
+        return result
 
     @http.route(['/salary_package/onchange_personal_info'], type='jsonrpc', auth='public')
     def onchange_personal_info(self, field, value):
@@ -846,20 +984,18 @@ class HrContractSalary(http.Controller):
         return {'hide_children': not bool(value), 'field': field}
 
     def _get_email_info(self, version, **kw):
-        wage_to_apply = version._get_wage_to_apply()
-
         field_names = {
             model: {
                 field.name: field.field_description for field in request.env['ir.model.fields'].sudo().search([('model', '=', model)])
             } for model in ['hr.employee', 'hr.version', 'res.partner', 'res.partner.bank']}
         result = {
-            _('Salary Package Summary'): {
+            self.env._('Salary Package Summary'): {
                 'General Information': [
-                    (_('Employee Name'), version.employee_id.name),
-                    (_('Job Position'), version.job_id.name),
-                    (_('Job Title'), version.employee_id.job_title),
-                    (_('Contract Type'), version.contract_type_id.name),
-                    (_('Original Link'), kw.get('original_link'))
+                    (self.env._('Employee Name'), version.employee_id.name),
+                    (self.env._('Job Position'), version.job_id.name),
+                    (self.env._('Job Title'), version.employee_id.job_title),
+                    (self.env._('Contract Type'), version.employee_type_id.name),
+                    (self.env._('Original Link'), kw.get('original_link'))
                 ],
             }
         }
@@ -868,7 +1004,7 @@ class HrContractSalary(http.Controller):
         version_info = {benefit_type.name: [] for benefit_type in sorted(version_benefits.mapped('benefit_type_id'), key=lambda x: x.sequence)}
         for benefit in version_benefits:
             if benefit.folded and benefit.fold_field:
-                value = _('Yes') if version[benefit.fold_field] else _('No')
+                value = self.env._('Yes') if version[benefit.fold_field] else self.env._('No')
                 version_info[benefit.benefit_type_id.name].append((field_names['hr.version'][benefit.fold_field], value))
             field_name = benefit.field
             if not field_name or field_name not in version:
@@ -882,11 +1018,11 @@ class HrContractSalary(http.Controller):
             self._append_additional_benefit_info(version_info[benefit.benefit_type_id.name], version, field_names, field_name)
 
         # Add wage information
-        version_info[_('Wage')] = [
-            (_('Monthly Gross Salary'), wage_to_apply),
-            (_('Annual Employer Cost'), version.final_yearly_costs),
+        version_info[self.env._('Wage')] = [
+            (self.env._('Monthly Gross Salary'), version.wage),
+            (self.env._('Annual Employer Cost'), version.final_yearly_costs),
         ]
-        result[_('Contract Information:')] = version_info
+        result[self.env._('Contract Information:')] = version_info
         # Personal Information
         infos = request.env['hr.contract.salary.personal.info'].sudo().search([('display_type', '!=', 'document'), '|', ('structure_type_id', '=', False), ('structure_type_id', '=', version.structure_type_id.id)])
         personal_infos = {personal_info_type.name: [] for personal_info_type in sorted(infos.mapped('info_type_id'), key=lambda x: x.sequence)}
@@ -905,7 +1041,7 @@ class HrContractSalary(http.Controller):
             elif isinstance(field_value, float):
                 field_value = round(field_value, 2)
             personal_infos[info.info_type_id.name].append((field_label, field_value))
-        result[_('Personal Information')] = personal_infos
+        result[self.env._('Personal Information')] = personal_infos
         return {'mapped_data': result}
 
     def _append_additional_benefit_info(self, benefit_info, version, field_names, field_name):
@@ -936,26 +1072,28 @@ class HrContractSalary(http.Controller):
             {'differences': differences},
             new_version_id)
 
+    def _compute_submit(self, version, offer, benefits, **kw):
+        if version.employee_id.user_id == request.env.user:
+            kw['employee'] = version.employee_id
+        return version._get_values_dict()
+
     @http.route(['/salary_package/submit'], type='jsonrpc', auth='public')
     def submit(self, offer_id=None, benefits=None, **kw):
-        offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id).exists()
-        if not offer.applicant_id and not offer.employee_version_id:
-            raise UserError(_('This link is invalid. Please contact the HR Responsible to get a new one...'))
+        with hr_version_context(request, invalidate=True):
+            offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id).exists()
+            if offer.is_simulation_offer:
+                raise UserError(self.env._('This offer is a simulation. You cannot submit this salary package.'))
+            if not offer.applicant_id and not offer.employee_version_id:
+                raise UserError(self.env._('This link is invalid. Please contact the HR Responsible to get a new one...'))
 
-        request.env.flush_all()
-        with request.env.cr.savepoint(flush=False) as sp:
             version = offer._get_version()
             has_access, error_page = self.check_access_to_salary_configurator(kw.get('token'), offer, version)
             if not has_access:
                 return error_page
-            if version.employee_id.user_id == request.env.user:
-                kw['employee'] = version.employee_id
-            version_vals = version._get_values_dict()
-            request.env.flush_all()
-            sp.rollback()
+            version_vals = self._compute_submit(version, offer, benefits, **kw)
 
         kw['package_submit'] = True
-        new_version = self.create_new_version(version_vals, offer_id, benefits, no_write=True, **kw)
+        new_version = self.create_new_version(version_vals, offer, benefits, no_write=True, **kw)
 
         if isinstance(new_version, dict) and new_version.get('error'):
             return new_version
@@ -993,16 +1131,17 @@ class HrContractSalary(http.Controller):
         sign_template = offer.sign_template_id
         signatories = offer.sign_template_signatories_ids
         if not sign_template:
-            return {'error': 1, 'error_msg': _('No signature template defined on the version. Please contact the HR responsible.')}
+            return {'error': 1, 'error_msg': self.env._('No signature template defined on the version. Please contact the HR responsible.')}
         if not new_version.hr_responsible_id and 'hr' in signatories.mapped('signatory'):
-            return {'error': 1, 'error_msg': _('No HR responsible defined on the job position. Please contact an administrator.')}
+            return {'error': 1, 'error_msg': self.env._('No HR responsible defined on the job position. Please contact an administrator.')}
 
         # ask the contract responsible to create a sign request
         SignRequestSudo = request.env['sign.request'].with_user(new_version.hr_responsible_id).sudo()
 
+        hr_responsible = new_version.hr_responsible_id.partner_id.id if offer.contract_template_id else self.env.user.partner_id.id
         signatory_dict = {
             'employee': new_version.employee_id.work_contact_id.id,
-            'hr': new_version.hr_responsible_id.work_contact_id.id or new_version.hr_responsible_id.partner_id.id
+            'hr': new_version.hr_responsible_id.work_contact_id.id or hr_responsible
         }
 
         signatories_command = [
@@ -1012,50 +1151,20 @@ class HrContractSalary(http.Controller):
                  'mail_sent_order': signatory.order})
             for signatory in signatories
         ]
+        # sign_request_sudo should be linked to a hr.version record to handle both
+        # applicant and employee flows. We need it to auto fill employee values but the
+        # employee_version_id field of the offer is not always filled.
+        # The sign request is then attached to the offer later to ease follow up of HR
         sign_request_sudo = SignRequestSudo.create({
             'template_id': sign_template.id,
             'request_item_ids': signatories_command,
-            'reference': _('Signature Request - %s', new_version.name),
-            'subject': _('Signature Request - %s', new_version.name),
-            'reference_doc': f'hr.contract.salary.offer,{offer.id}'
+            'reference': self.env._('Signature Request - %s', new_version.name),
+            'subject': self.env._('Signature Request - %s', new_version.name),
+            'reference_doc': f'hr.version,{new_version.id}'
         })
         sign_request_sudo.toggle_favorited()
-
-        # Prefill the sign boxes
-        sign_items = request.env['sign.item'].sudo().search([
-            ('template_id', '=', sign_template.id),
-            ('name', '!=', '')
-        ])
-        sign_values_by_role = defaultdict(lambda: defaultdict(lambda: request.env['sign.item']))
-        for item in sign_items:
-            try:
-                new_value = None
-                if item.name == 'car' and new_version.transport_mode_car:
-                    if not new_version.new_car and new_version.car_id:
-                        new_value = new_version.car_id.model_id.name
-                    elif new_version.new_car and new_version.new_car_model_id:
-                        new_value = new_version.new_car_model_id.name
-                # YTI FIXME: Clean that brol
-                elif item.name == 'l10n_be_group_insurance_rate':
-                    new_value = 1 if new_version.get(item.name) else 0
-                elif item.name == "ip_wage_rate":
-                    new_value = new_value if new_version.ip else 0
-                else:
-                    new_values = new_version.mapped(item.name)
-                    if not new_values or isinstance(new_values, models.BaseModel):
-                        raise Exception
-                    new_value = new_values[0]
-                    if isinstance(new_value, float):
-                        new_value = round(new_value, 2)
-                    if item.type_id.item_type == "checkbox":
-                        new_value = 'on' if new_value else 'off'
-                if new_value is not None:
-                    sign_values_by_role[item.responsible_id][str(item.id)] = new_value
-            except Exception:
-                pass
-        for sign_request_item in sign_request_sudo.request_item_ids:
-            if sign_request_item.role_id in sign_values_by_role:
-                sign_request_item._fill(sign_values_by_role[sign_request_item.role_id])
+        # Reset the reference to the doc as the automatic constant values have been created.
+        sign_request_sudo.reference_doc = f'hr.contract.salary.offer,{offer.id}'
 
         access_token = request.env['sign.request.item'].sudo().search([
             ('sign_request_id', '=', sign_request_sudo.id),
@@ -1078,6 +1187,9 @@ class HrContractSalary(http.Controller):
         if new_version:
             if offer.applicant_id:
                 new_version.sudo().applicant_id = offer.applicant_id
+                applicant_attachments = self.env['ir.attachment'].sudo().search([('res_model', '=', 'hr.applicant'), ('res_id', '=', offer.applicant_id.id)])
+                applicant_attachments.copy({'res_model': 'hr.employee', 'res_id': new_version.employee_id.id})
+
             if offer.employee_version_id:
                 new_version.sudo().origin_version_id = offer.employee_version_id
 
@@ -1089,23 +1201,22 @@ class HrContractSalary(http.Controller):
             'new_version_id': new_version.id
         }
 
+    def _compute_refuse(self, version, offer, feedback, token):
+        if not version and (not token or not consteq(offer.access_token, token)):
+            raise UserError(self.env._('This link is invalid. Please contact the HR Responsible to get a new one...'))
+
     @http.route(['/salary_package/post_feedback'], type='jsonrpc', auth='public')
     def refuse(self, offer_id, feedback=None, token=None):
-        offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id).exists()
-        if not offer.applicant_id and not offer.employee_version_id:
-            raise UserError(_('This link is invalid. Please contact the HR Responsible to get a new one...'))
+        with hr_version_context(request, invalidate=True):
+            offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id).exists()
+            if not offer.applicant_id and not offer.employee_version_id:
+                raise UserError(self.env._('This link is invalid. Please contact the HR Responsible to get a new one...'))
 
-        request.env.flush_all()
-        with request.env.cr.savepoint(flush=False) as sp:
             version = offer._get_version()
             has_access, error_page = self.check_access_to_salary_configurator(token, offer, version)
             if not has_access:
                 return error_page
-            if not version and (not token or not consteq(offer.access_token, token)):
-                raise UserError(_('This link is invalid. Please contact the HR Responsible to get a new one...'))
-
-            request.env.flush_all()
-            sp.rollback()
+            self._compute_refuse(version, offer, feedback, token)
 
         if feedback:
             partner = offer.applicant_id.partner_id or offer.employee_id.work_contact_id

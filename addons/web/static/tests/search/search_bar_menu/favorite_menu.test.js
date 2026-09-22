@@ -1,4 +1,4 @@
-import { after, expect, test } from "@odoo/hoot";
+import { expect, test } from "@odoo/hoot";
 import { queryFirst } from "@odoo/hoot-dom";
 import { mockDate } from "@odoo/hoot-mock";
 import { editValue } from "@web/../tests/core/tree_editor/condition_tree_editor_test_helpers";
@@ -24,13 +24,7 @@ const favoriteMenuRegistry = registry.category("favoriteMenu");
 defineSearchBarModels();
 
 test("simple rendering with no favorite (without ability to save)", async () => {
-    const registryItem = favoriteMenuRegistry.content["custom-favorite-item"];
     favoriteMenuRegistry.remove("custom-favorite-item");
-    after(() => {
-        favoriteMenuRegistry.add("custom-favorite-item", registryItem[1], {
-            sequence: registryItem[1],
-        });
-    });
 
     await mountWithSearch(
         SearchBarMenu,
@@ -43,7 +37,7 @@ test("simple rendering with no favorite (without ability to save)", async () => 
     );
 
     await toggleSearchBarMenu();
-    expect(`.o_favorite_menu .fa.fa-star`).toHaveCount(1);
+    expect(`.o_favorite_menu [data-icon="star"].oi-filled`).toHaveCount(1);
     expect(`.o_favorite_menu .o_dropdown_title`).toHaveText(/^favorites$/i);
     expect(`.o_favorite_menu`).toHaveCount(1);
     expect(`.o_favorite_menu .o_menu_item`).toHaveCount(0);
@@ -63,7 +57,7 @@ test("simple rendering with no favorite", async () => {
     );
 
     await toggleSearchBarMenu();
-    expect(`.o_favorite_menu .fa.fa-star`).toHaveCount(1);
+    expect(`.o_favorite_menu [data-icon="star"].oi-filled`).toHaveCount(1);
     expect(`.o_favorite_menu .o_dropdown_title`).toHaveText(/^favorites$/i);
     expect(`.o_favorite_menu`).toHaveCount(1);
     expect(`.o_favorite_menu .dropdown-divider`).toHaveCount(0);
@@ -139,6 +133,82 @@ test("default favorite is not activated if activateFavorite is set to false", as
     expect(isItemSelected("My favorite")).toBe(false);
     expect(searchBarMenu.env.searchModel.domain).toEqual([]);
     expect(getFacetTexts()).toEqual([]);
+});
+
+test("a private default favorite is activated over shared default favorites", async () => {
+    // irFilters ordered following ir.filters._order
+    const irFilters = [
+        {
+            context: "{}",
+            domain: "[('foo', '=', 'a')]",
+            id: 1,
+            is_default: true,
+            name: "A shared favorite",
+            sort: "[]",
+            user_ids: [],
+        },
+        {
+            context: "{}",
+            domain: "[('foo', '=', 'b')]",
+            id: 2,
+            is_default: true,
+            name: "B shared favorite",
+            sort: "[]",
+            user_ids: [2, 3],
+        },
+        {
+            context: "{}",
+            domain: "[('foo', '=', 'c')]",
+            id: 3,
+            is_default: true,
+            name: "Z private favorite",
+            sort: "[]",
+            user_ids: [2],
+        },
+    ];
+    await mountWithSearch(SearchBarMenu, {
+        resModel: "foo",
+        searchMenuTypes: ["favorite"],
+        searchViewId: false,
+        irFilters,
+    });
+    await toggleSearchBarMenu();
+    expect(isItemSelected("Z private favorite")).toBe(true);
+    expect(isItemSelected("A shared favorite")).toBe(false);
+    expect(isItemSelected("B shared favorite")).toBe(false);
+});
+
+test("among several default favorites in the same group, the first one by name is activated", async () => {
+    // irFilters ordered following ir.filters._order
+    const irFilters = [
+        {
+            context: "{}",
+            domain: "[('foo', '=', 'a')]",
+            id: 1,
+            is_default: true,
+            name: "A favorite",
+            sort: "[]",
+            user_ids: [],
+        },
+        {
+            context: "{}",
+            domain: "[('foo', '=', 'b')]",
+            id: 2,
+            is_default: true,
+            name: "Z favorite",
+            sort: "[]",
+            user_ids: [2, 3],
+        },
+    ];
+    await mountWithSearch(SearchBarMenu, {
+        resModel: "foo",
+        searchMenuTypes: ["favorite"],
+        searchViewId: false,
+        irFilters,
+    });
+    await toggleSearchBarMenu();
+    expect(isItemSelected("A favorite")).toBe(true);
+    expect(isItemSelected("Z favorite")).toBe(false);
 });
 
 test(`toggle favorite correctly clears filter, groupbys and field "options"`, async () => {
@@ -264,4 +334,43 @@ test("shared favorites are partially shown if there is more than 4", async () =>
     await contains(".o_favorite_menu .o_expand_shared_favorites").click();
     expect(".o_favorite_menu .o_expand_shared_favorites").toHaveCount(0);
     expect(".o_favorite_menu .o_favorite_item").toHaveCount(5);
+});
+
+test("display unparseable filter", async () => {
+    const irFilters = [
+        {
+            context: "{123}", // unparseable context
+            domain: "[('foo', '=', 'a')]",
+            id: 987,
+            is_default: false,
+            name: "My favorite",
+            sort: "[]",
+            user_ids: [],
+        },
+    ];
+
+    mockService("action", {
+        doAction(action) {
+            expect.step(`doAction ${action.res_model}: ${action.res_id}`);
+        },
+    });
+
+    const searchBarMenu = await mountWithSearch(SearchBarMenu, {
+        resModel: "foo",
+        searchMenuTypes: ["favorite"],
+        searchViewId: false,
+        irFilters,
+        activateFavorite: false,
+    });
+    await toggleSearchBarMenu();
+    expect(".o_favorite_menu .o_favorite_item").toHaveCount(1);
+    expect(".o_favorite_menu .o_favorite_item span[title]").toHaveAttribute(
+        "data-tooltip",
+        "Disabled due to invalid configuration"
+    );
+    expect(".o_favorite_menu .o_favorite_item span[title]").toHaveClass("text-muted");
+    await contains(".o_favorite_menu .o_favorite_item").click();
+    expect(searchBarMenu.env.searchModel.domain).toEqual([]);
+    await editFavorite("My favorite");
+    expect.verifySteps(["doAction ir.filters: 987"]);
 });

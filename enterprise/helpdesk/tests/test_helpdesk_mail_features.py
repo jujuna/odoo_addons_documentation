@@ -14,7 +14,7 @@ class TestHelpdeskMailFeatures(HelpdeskCommon, MailCommon):
         super().setUpClass()
 
         # set high threshold to be sure to not hit mail limit during tests for a model
-        cls.env['ir.config_parameter'].sudo().set_param('mail.gateway.loop.threshold', 50)
+        cls.env['ir.config_parameter'].sudo().set_int('mail.gateway.loop.threshold', 50)
 
         # test partners
         cls.partner_1, cls.partner_2, cls.partner_3 = cls.env['res.partner'].create([
@@ -195,7 +195,6 @@ class TestHelpdeskMailFeatures(HelpdeskCommon, MailCommon):
                 )
 
                 self.assertIn('Please call me as soon as possible', ticket.description)
-                self.assertEqual(ticket.email_cc, f'"New Cc" <new.cc@test.agrolait.com>, {self.partner_2.email_formatted}')
                 self.assertEqual(ticket.name, f'Test from {author.email_formatted}')
                 self.assertEqual(ticket.partner_id, author)
                 self.assertEqual(ticket.stage_id, self.stage_new)
@@ -232,7 +231,8 @@ class TestHelpdeskMailFeatures(HelpdeskCommon, MailCommon):
                                 # already received the email)
                                 'notified_partner_ids': internal_followers,
                                 # deduced from 'To' and 'Cc' (recognized partners)
-                                'partner_ids': self.partner_1 + self.partner_2,
+                                'partner_ids': self.partner_1,
+                                'partner_cc_ids': self.partner_2,
                                 'parent_id': self.env['mail.message'],
                                 'reply_to': expected_chatter_reply_to,
                                 'subject': f'Test from {author.email_formatted}',
@@ -301,6 +301,7 @@ class TestHelpdeskMailFeatures(HelpdeskCommon, MailCommon):
                             'email': self.helpdesk_portal.email_normalized,
                             'name': self.helpdesk_portal.name,
                             'partner_id': self.helpdesk_portal.partner_id.id,
+                            'recipient_type': 'to',
                         },
                     ]
                 elif not test_user:
@@ -310,6 +311,7 @@ class TestHelpdeskMailFeatures(HelpdeskCommon, MailCommon):
                             'email': author.email_normalized,
                             'name': author.name,
                             'partner_id': author.id,
+                            'recipient_type': 'to',
                         },
                     ]
                 else:
@@ -389,10 +391,6 @@ class TestHelpdeskMailFeatures(HelpdeskCommon, MailCommon):
                     cc=f'"Another Cc" <another.cc@test.agrolait.com>, {self.partner_3.email}',
                     target_model='helpdesk.ticket',
                 )
-                self.assertEqual(
-                    ticket.email_cc,
-                    '"Another Cc" <another.cc@test.agrolait.com>, valid.poilboeuf@gmail.com, "New Cc" <new.cc@test.agrolait.com>, "Valid Poilvache" <valid.other@gmail.com>',
-                    'Updated with new Cc')
                 self.assertEqual(len(ticket.message_ids), 4, 'Incoming email + acknowledgement + chatter reply + customer reply')
                 self.assertEqual(
                     ticket.message_partner_ids,
@@ -416,7 +414,8 @@ class TestHelpdeskMailFeatures(HelpdeskCommon, MailCommon):
                                 'notified_partner_ids': internal_followers,
                                 'parent_id': responsible_answer,
                                 # same reasoning as email_to/cc
-                                'partner_ids': external_partners + self.partner_3,
+                                'partner_ids': external_partners,
+                                'partner_cc_ids': self.partner_3,
                                 'subject': f'Re: Re: {ticket.name}',
                                 'subtype_id': self.env.ref('mail.mt_comment'),
                             },
@@ -474,7 +473,6 @@ class TestHelpdeskMailFeatures(HelpdeskCommon, MailCommon):
             'partner_name': 'Test Name',
             'partner_email': 'testmail@test.com',
             'name': 'Ticket Name',
-            'email_cc': 'testcc@test.com',
         })
         follow = self.env['mail.followers'].search([
             ('res_model', '=', 'helpdesk.ticket'),
@@ -544,30 +542,60 @@ Content-Type: text/html;
 </div>
 """
         with self.mock_mail_gateway():
-            gmail_ticket_id = self.env['mail.thread'].message_process(
+            gmail_ticket = self.env['mail.thread'].message_process(
                 model='helpdesk.ticket',
                 message=gmail_email_source,
                 custom_values={'team_id': self.test_team.id}
             )
-            outlook_ticket_id = self.env['mail.thread'].message_process(
+            outlook_ticket = self.env['mail.thread'].message_process(
                 model='helpdesk.ticket',
                 message=outlook_email_source,
                 custom_values={'team_id': self.test_team.id}
             )
 
         # 1. Verify Gmail signature removal
-        self.assertTrue(gmail_ticket_id, "Gmail ticket creation should return a valid ID.")
-        gmail_ticket = self.env['helpdesk.ticket'].browse(gmail_ticket_id)
-
         self.assertIn("This is the main helpdesk ticket content", gmail_ticket.description, "The main content should be present.")
         self.assertNotIn("--", gmail_ticket.description, "The Gmail signature separator should have been removed.")
         self.assertNotIn("Valid Lelitre", gmail_ticket.description, "The Gmail signature should have been removed.")
         self.assertNotIn("Concerned Customer", gmail_ticket.description, "The Gmail signature should have been removed.")
 
         # 2. Verify Outlook signature removal
-        self.assertTrue(outlook_ticket_id, "Outlook ticket creation should return a valid ID.")
-        outlook_ticket = self.env['helpdesk.ticket'].browse(outlook_ticket_id)
-
         self.assertIn("This is the main helpdesk ticket content", outlook_ticket.description, "The main content should be present.")
         self.assertNotIn("Valid Poilvache", outlook_ticket.description, "The Outlook signature should have been removed.")
         self.assertNotIn("Valued Client", outlook_ticket.description, "The Outlook signature should have been removed.")
+
+    def test_ticket_access_action(self):
+        """ Test that the access action link is correctly generated for internal and portal users """
+
+        # 1. Internal User + Ticket with Team -> Deep Link
+        ticket_internal = self.env['helpdesk.ticket'].create({
+            'name': 'Test Ticket Internal',
+            'team_id': self.test_team.id,
+        })
+
+        action = ticket_internal.with_user(self.helpdesk_user)._get_access_action()
+        self.assertEqual(
+            action['type'],
+            'ir.actions.act_url',
+            "Internal user should get an act_url instead of act_window",
+        )
+        self.assertIn(
+            f'/odoo/helpdesk/{self.test_team.id}/tickets/{ticket_internal.id}',
+            action['url'],
+            "URL should contain team and ticket IDs",
+        )
+
+        # 2. Portal User -> Standard Portal Link
+        ticket_portal = self.env['helpdesk.ticket'].create({
+            'name': 'Test Ticket Portal',
+            'team_id': self.test_team.id,
+        })
+
+        ticket_portal.message_subscribe(partner_ids=[self.helpdesk_portal.partner_id.id])
+        action = ticket_portal.with_user(self.helpdesk_portal)._get_access_action()
+        self.assertEqual(action['type'], 'ir.actions.act_url')
+        self.assertIn(
+            '/my/ticket',
+            action['url'],
+            "Portal user should get a link to /my/ticket",
+        )

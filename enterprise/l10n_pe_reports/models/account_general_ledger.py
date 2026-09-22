@@ -44,9 +44,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
     def _l10n_pe_get_file_txt(self, options, data, report_number):
         txt_result = ""
         if data:
-            csv.register_dialect("pipe_separator", delimiter="|", skipinitialspace=True, lineterminator='|\n')
             output = StringIO()
-            writer = csv.DictWriter(output, dialect="pipe_separator", fieldnames=data[0].keys())
+            writer = csv.DictWriter(output, delimiter="|", skipinitialspace=True, lineterminator='\n', fieldnames=[*data[0], object()])
             writer.writerows(data)
             txt_result = output.getvalue()
 
@@ -100,42 +99,32 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         # Prepare query to get lines
         domain = ledger._get_options_domain(options, "strict_range")
         query = self.env['account.move.line']._search(domain)
-
-        query.left_join('account_move_line', 'move_id', 'account_move', 'id', 'move')
-        query.left_join('account_move_line', 'currency_id', 'res_currency', 'id', 'currency')
-        query.left_join('account_move_line', 'account_id', 'account_account', 'id', 'account')
-        query.left_join('account_move_line', 'journal_id', 'account_journal', 'id', 'journal')
-        query.left_join('account_move_line__move', 'partner_id', 'res_partner', 'id', 'partner')
-
-        query.left_join('account_move_line__move__partner', 'country_id', 'res_country', 'id', 'country')
-        query.left_join('account_move_line__move', 'l10n_latam_document_type_id', 'l10n_latam_document_type', 'id', 'doctype')
-        query.left_join('account_move_line__move__partner', 'l10n_latam_identification_type_id', 'l10n_latam_identification_type', 'id',
-                        'idtype')
-        query.order = 'account_move_line.date, account_move_line.id'
-        account_code = self.env['account.account']._field_to_sql('account_move_line__account', 'code', query)
-        qu = query.select('account_move_line.id',
-                          'account_move_line.name',
-                          'account_move_line.date',
-                          'amount_currency',
-                          'debit',
-                          'credit',
-                          SQL('%s AS account_code', account_code),
-                          'account_move_line__move.l10n_pe_sunat_transaction_type',
-                          'account_move_line__currency.name AS currency_name',
-                          'account_move_line.move_id',
-                          'account_move_line__move.date AS move_date',
-                          'account_move_line__move.name AS move_name',
-                          'account_move_line__move.invoice_date_due AS move_date_due',
-                          'account_move_line__move.invoice_date AS move_invoice_date',
-                          'account_move_line__move.move_type',
-                          'account_move_line__move__doctype.code AS document_type',
-                          'account_move_line__move__partner.vat AS partner_vat',
-                          'account_move_line__move__partner__idtype.l10n_pe_vat_code AS partner_document_type',
-                          'account_move_line__move__partner__country.code AS country_code',
-                          )
-
-        self.env.cr.execute(qu)
-        lines_data = self.env.cr.dictfetchall()
+        aml = query.table
+        move = aml.move_id
+        move_partner = move.partner_id
+        query.order = SQL("%s, %s", aml.date, aml.id)
+        qu = query.select(
+            aml.id,
+            aml.name,
+            aml.date,
+            aml.amount_currency,
+            aml.debit,
+            aml.credit,
+            SQL("%s AS account_code", aml.account_id.code),
+            move.l10n_pe_sunat_transaction_type,
+            SQL("%s AS currency_name", aml.currency_id.name),
+            move,
+            SQL("%s AS move_date", move.date),
+            SQL("%s AS move_name", move.name),
+            SQL("%s AS move_date_due", move.invoice_date_due),
+            SQL("%s AS move_invoice_date", move.invoice_date),
+            SQL("%s AS move_type", move.move_type),
+            SQL("%s AS document_type", move.l10n_latam_document_type_id.code),
+            SQL("%s AS partner_vat", move_partner.vat),
+            SQL("%s AS partner_document_type", move_partner.l10n_pe_sunat_id_code),
+            SQL("%s AS country_code", move_partner.country_id.code),
+        )
+        lines_data = self.env.execute_query_dict(qu)
 
         data = []
         ple = self.env["l10n_pe.tax.ple.report.handler"]

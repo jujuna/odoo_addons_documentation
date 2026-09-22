@@ -3,7 +3,6 @@ import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
 
 registry.category("web_tour.tours").add("knowledge_sidebar_readonly_tour", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
@@ -19,7 +18,7 @@ registry.category("web_tour.tours").add("knowledge_sidebar_readonly_tour", {
             // Unfold the private article and check that articles are in the correct
             // order to make the move possible
             trigger: '.o_article.readonly .o_article_handle:contains("Private Article") .o_article_icon',
-            run: 'hover && click .o_article.readonly .o_article_handle:contains("Private Article") .o_article_caret .fa-caret-right',
+            run: 'hover && click .o_article.readonly .o_article_handle:contains("Private Article") .o_article_caret [data-icon="arrow_right"]',
         },
         {
             // Check that article has been unfolded and move an article under a readonly article (fails)
@@ -27,7 +26,7 @@ registry.category("web_tour.tours").add("knowledge_sidebar_readonly_tour", {
             run: ({ queryOne }) => {
                 dragAndDropArticle(
                     queryOne(
-                        'section[data-section="workspace"] .o_article_name:contains("Workspace Article")'
+                        'section[data-section="workspace"] .o_article:contains("Workspace Article")'
                     ),
                     queryOne(
                         'section[data-section="workspace"] .o_article_name:contains("Private Article")'
@@ -50,7 +49,7 @@ registry.category("web_tour.tours").add("knowledge_sidebar_readonly_tour", {
             run: ({ queryOne }) => {
                 dragAndDropArticle(
                     queryOne(
-                        'section[data-section="workspace"] .o_article_name:contains("Private Article")'
+                        'section[data-section="workspace"] .o_article:contains("Private Article")'
                     ),
                     queryOne(
                         'section[data-section="workspace"] .o_article_name:contains("Workspace Article")'
@@ -64,7 +63,8 @@ registry.category("web_tour.tours").add("knowledge_sidebar_readonly_tour", {
         },
         {
             // Check that article did not move and try to change icon of readable article (fails)
-            trigger: '.o_article:contains("Private Article") .o_article_emoji:contains("📄")',
+            trigger:
+                '.o_article:contains("Private Article") .o_article_emoji:has(i[data-icon="description"])',
             run: "click",
         },
         {

@@ -5,10 +5,10 @@
             <field name="name">Direct debit payments to collect</field>
             <field name="res_model">account.payment</field>
             <field name="view_mode">list,form</field>
-            <field name="view_id" ref="sdd_account_payment_with_mandates_tree"/>
+            <field name="view_id" ref="account_direct_debit.account_payment_with_mandates_tree"/>
             <field name="domain">
                 [('payment_method_code','in', ('sdd', 'sepa_direct_debit')),
-                 ('state', '=', 'in_process'),
+                 ('state', '=', 'paid'),
                  ('is_sent', '=', False),
                 ]
             </field>

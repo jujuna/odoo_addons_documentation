@@ -22,7 +22,7 @@
                         type="object"
                         invisible="move_type in ['out_invoice', 'out_refund'] or l10n_cl_dte_acceptation_status in ['claimed', 'accepted', 'goods', 'accepted_goods'] or not l10n_latam_use_documents or country_code != 'CL'"/>
             </xpath>
-            
+
             <notebook>
                 <page string="Cross Reference Documents" name="cross_reference_docs" invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'] or country_code != 'CL'">
                     <field name="l10n_cl_reference_ids" mode="list" readonly="state != 'draft'">
@@ -64,7 +64,6 @@
                 <label for="l10n_cl_dte_status" invisible="l10n_latam_manual_document_number or not l10n_latam_use_documents or country_code != 'CL'"/>
                 <div invisible="not l10n_latam_use_documents or l10n_latam_manual_document_number or country_code != 'CL'">
                     <field name="l10n_cl_dte_status" invisible="l10n_latam_manual_document_number" readonly="True" class="oe_inline" />
-                    <button name="l10n_cl_send_dte_to_sii" type="object" invisible="l10n_cl_dte_status != 'not_sent'" string="⇒ Send Now to SII" class="oe_inline oe_link" groups="base.group_user"/>
                     <button name="l10n_cl_verify_dte_status" type="object" invisible="l10n_cl_dte_status != 'ask_for_status'" context="{'send_immediately': True}" string="⇒ Verify on SII" class="oe_inline oe_link" groups="base.group_user"/>
                 </div>
                 <label for="l10n_cl_dte_acceptation_status" invisible="country_code != 'CL' or not l10n_cl_dte_acceptation_status"/>

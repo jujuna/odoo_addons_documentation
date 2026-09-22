@@ -1,12 +1,11 @@
+import { KnowledgeFormStatusIndicator } from "@knowledge/components/form_status_indicator/form_status_indicator";
+import KnowledgeIcon from "@knowledge/components/knowledge_icon/knowledge_icon";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
-import { KnowledgeFormStatusIndicator } from "@knowledge/components/form_status_indicator/form_status_indicator";
 import { useService } from "@web/core/utils/hooks";
-import { useRecordObserver } from "@web/model/relational_model/utils";
+import { useStatusIndicator } from "@web/views/form/form_status_indicator/form_status_indicator";
 
-import KnowledgeIcon from "@knowledge/components/knowledge_icon/knowledge_icon";
-
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useEffect, useProps } from "@odoo/owl";
 
 export default class KnowledgeHierarchy extends Component {
     static components = {
@@ -15,20 +14,27 @@ export default class KnowledgeHierarchy extends Component {
         KnowledgeIcon,
         KnowledgeFormStatusIndicator,
     };
-    static props = { record: Object };
     static template = "knowledge.KnowledgeHierarchy";
 
+    props = useProps({
+        record: t.object(),
+    });
+
     setup() {
-        super.setup();
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             articleName: this.props.record.data.name,
             isLoadingArticleHierarchy: false,
         });
-        useRecordObserver((record) => {
-            if (this.state.articleName !== record.data.name) {
-                this.state.articleName = record.data.name;
+        useEffect(() => {
+            if (this.state.articleName !== this.props.record.data.name) {
+                this.state.articleName = this.props.record.data.name;
             }
+        });
+
+        this.statusIndicator = useStatusIndicator(this.props.record.model, {
+            save: () => this.env.save(),
+            discard: () => this.env.discard(),
         });
     }
 
@@ -49,12 +55,20 @@ export default class KnowledgeHierarchy extends Component {
         return this.props.record.data.parent_id?.id;
     }
 
+    get parentIcon() {
+        return this.props.record.data.parent_emoji;
+    }
+
     get parentName() {
         return this.props.record.data.parent_id?.display_name;
     }
 
     get rootId() {
         return this.props.record.data.root_article_id.id;
+    }
+
+    get rootIcon() {
+        return this.props.record.data.root_article_emoji;
     }
 
     get rootName() {
@@ -69,7 +83,7 @@ export default class KnowledgeHierarchy extends Component {
             "knowledge.article",
             "get_article_hierarchy",
             [this.props.record.resId],
-            { exclude_article_ids: [this.rootId, this.parentId, this.props.record.resId] },
+            { exclude_article_ids: [this.rootId, this.parentId, this.props.record.resId] }
         );
         this.state.isLoadingArticleHierarchy = false;
     }

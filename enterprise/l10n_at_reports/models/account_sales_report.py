@@ -8,34 +8,43 @@ from odoo import models
 
 class L10n_AtEcSalesReportHandler(models.AbstractModel):
     _name = 'l10n_at.ec.sales.report.handler'
-    _inherit = ['account.ec.sales.report.handler']
+    _inherit = ['account.ec.sales.with.tags.report.handler']
     _description = 'Austrian EC Sales Report Custom Handler'
 
     def _custom_options_initializer(self, report, options, previous_options):
-        """
-        Add the invoice lines search domain that is specific to the country.
-        Typically, the taxes account.report.expression ids relative to the country for the triangular, sale of goods
-        or services.
-        :param dict options: Report options
-        :return dict: The modified options dictionary
-        """
-        super()._init_core_custom_options(report, options, previous_options)
-        ec_operation_category = options.setdefault('sales_report_taxes', {})
+        at_tax_tags = self._get_ec_sales_tax_tags()
+        options.update({
+            'sales_report_operation_types': {
+                'goods': {
+                    'tax_tag_ids': at_tax_tags['goods'],
+                    'name': self.env._('Goods'),
+                    'shortcut': 'L',
+                },
+                'services': {
+                    'tax_tag_ids': at_tax_tags['services'],
+                    'name': self.env._('Services'),
+                    'shortcut': 'S',
+                },
+                'triangular': {
+                    'tax_tag_ids': at_tax_tags['triangular'],
+                    'name': self.env._('Triangular'),
+                    'shortcut': 'D'
+                },
+            }
+        })
+        super()._custom_options_initializer(report, options, previous_options)
 
-        goods = self.env.ref('l10n_at.tax_report_line_l10n_at_tva_line_4_8_tag')
-        goods |= self.env.ref('l10n_at.tax_report_line_l10n_at_tva_line_4_9_tag')
+    def _get_ec_sales_tax_tags(self):
+        goods = (
+            self.env.ref('l10n_at.tax_report_line_l10n_at_tva_line_3_zm_igl_tag') +
+            self.env.ref('l10n_at.tax_report_line_l10n_at_tva_line_4_8_tag') +
+            self.env.ref('l10n_at.tax_report_line_l10n_at_tva_line_4_9_tag')
+        )
         triangular = self.env.ref('l10n_at.tax_report_line_l10n_at_tva_line_3_zm_igl3_tag')
         services = self.env.ref('l10n_at.tax_report_line_l10n_at_tva_line_3_zm_dl_tag')
 
-        ec_operation_category['goods'] = tuple(goods._get_matching_tags().ids)
-        ec_operation_category['triangular'] = tuple(triangular._get_matching_tags().ids)
-        ec_operation_category['services'] = tuple(services._get_matching_tags().ids)
-
-        # Change the names of the taxes to specific ones that are dependant to the tax type
-        ec_operation_category['operation_category'] = {
-            'goods': 'L',
-            'triangular': 'D',
-            'services': 'S',
+        return {
+            'goods': tuple(goods._get_matching_tags().ids),
+            'triangular': tuple(triangular._get_matching_tags().ids),
+            'services': tuple(services._get_matching_tags().ids),
         }
-
-        options.update({'sales_report_taxes': ec_operation_category})

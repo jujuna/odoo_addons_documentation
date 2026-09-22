@@ -38,6 +38,8 @@ class MRPStockBarcode(StockBarcodeController):
                         vals[key] = request.env[sub_model].create(vals[key]).ids
                 record.write(vals)
         target_record = record if model == 'mrp.production' else record.production_id
+        if not target_record and model == 'stock.move.line' and record.move_id.production_id:
+            target_record = record.move_id.production_id
         if target_record.state == 'draft':
             target_record.action_confirm()
         return target_record._get_stock_barcode_data()
@@ -85,7 +87,7 @@ class MRPStockBarcode(StockBarcodeController):
     def _get_picking_type_domain(self, barcode_type, allowed_company_ids):
         if barcode_type == 'barcode_mrp_commands_and_operation_types':
             return [
-                ('active', '=', 'True'),
+                ('active', '=', True),
                 ('code', '=', 'mrp_operation'),
                 ('barcode', '!=', ''),
                 ('company_id', 'in', allowed_company_ids)]

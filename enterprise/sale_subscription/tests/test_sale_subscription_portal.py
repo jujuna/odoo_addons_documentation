@@ -6,21 +6,24 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 
 @tagged('post_install', '-at_install')
 class TestSubscription(TestSubscriptionCommon, HttpCase):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_pay_button_enabled_in_portal(self):
         # Check that the pay button is enabled when having only one payment provider enabled
         self.env['payment.provider'].search([]).write({'is_published': False})
         self.dummy_provider = self.env['payment.provider'].create({
             'name': "Dummy Provider",
             'code': 'none',
-            'state': 'test',
             'is_published': True,
-            'payment_method_ids': [Command.set([self.env.ref('payment.payment_method_unknown').id])],
             'allow_tokenization': True,
             'redirect_form_view_id': self.env['ir.ui.view'].search([('type', '=', 'qweb')], limit=1).id,
         })
-        self.env.ref('payment.payment_method_unknown').write({
-            'active': True,
-            'support_tokenization': True,
+        self.env["payment.method"].create({
+            "name": "Payment method",
+            "code": "dummy",
+            "provider_id": self.dummy_provider.id,
+            "active": True,
+            "support_tokenization": True,
         })
         sub = self.subscription
         sub.action_confirm()
@@ -67,3 +70,50 @@ class TestSubscription(TestSubscriptionCommon, HttpCase):
         preview_vals = sale_order.action_preview_sale_order()
         url = preview_vals.get('url')
         self.assertEqual(self.url_open(url).status_code, 200, "Preview URL's response status should be 200")
+
+    def test_sales_portal_redirects_to_subscription(self):
+        """Accessing a record from the sales portal should render:
+            - the subscription portal when the order is a subscription
+            - the sales order portal when it is not
+        """
+
+        subscription = self.subscription
+        subscription.action_confirm()
+
+        url = '/my/orders/%d?access_token=%s' % (
+            subscription.id,
+            subscription.access_token,
+        )
+
+        # Case 1: order is a subscription → subscription portal template
+        response = self.url_open(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'o_sale_subscription_subscription_portal_template',
+            response.content,
+            "Subscription portal template should be rendered for subscription orders"
+        )
+
+        # Case 2: order is no longer a subscription → sales order portal template
+        subscription.is_subscription = False
+
+        response = self.url_open(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'o_sale_sale_order_portal_template',
+            response.content,
+            "Sales order portal template should be rendered for non-subscription orders"
+        )
+
+    def test_preview_cancelled_subscription_order(self):
+        """Test previewing the cancelled subscription order."""
+        self.subscription.end_date = '2026-06-30'
+        self.subscription.action_cancel()
+
+        preview_vals = self.subscription.action_preview_sale_order()
+        response = self.url_open(preview_vals.get('url'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'o_sale_sale_order_portal_template', response.content)

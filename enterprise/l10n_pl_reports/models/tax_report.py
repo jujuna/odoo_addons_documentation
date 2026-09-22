@@ -1,12 +1,11 @@
+from datetime import datetime, UTC
+
+from lxml import etree
+
 from odoo import models, fields, api, _
 from odoo.tools import date_utils, float_repr, float_is_zero, float_compare, SQL
 from odoo.tools.xml_utils import cleanup_xml_node
 from odoo.exceptions import UserError, RedirectWarning
-
-from datetime import datetime
-from lxml import etree
-
-import pytz
 
 
 class L10n_PlTaxReportHandler(models.AbstractModel):
@@ -93,8 +92,9 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
             like the tax amounts that are grouped by tax grid and move """
 
         query = report._get_report_query(options, 'strict_range')
-        tag_rel_alias = query.left_join(query.table, 'id', 'account_account_tag_account_move_line_rel', 'account_move_line_id', 'tag_rel')
-        tag_alias = query.left_join(tag_rel_alias, 'account_account_tag_id', 'account_account_tag', 'id', 'tag')
+        aml_t = query.table._sudo()
+        tag_t = aml_t._join('tax_tag_ids')
+        tag_t = tag_t._with_model(tag_t._model.with_context(lang='en_US'))
 
         # To get if the line contains a tag, we get the expression (if needed), to get the id. It is then given to the params
         oss_tag = self.env.ref('l10n_eu_oss.tag_oss', raise_if_not_found=False)
@@ -111,6 +111,9 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
 
         i_63_expression = self.env.ref('l10n_pl.account_tax_report_line_intracom_procedure_i_63_tag', raise_if_not_found=False)
         i_63_tags_ids = tuple(i_63_expression._get_matching_tags().ids) if i_63_expression else ()
+
+        has_ksef_number_field = 'l10n_pl_edi_number' in self.env['account.move']._fields
+        ksef_number_sql = SQL('"account_move_line__move_id".l10n_pl_edi_number') if has_ksef_number_field else SQL('NULL')
 
         return SQL(
                 r"""
@@ -171,7 +174,9 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
                    country.code AS country_code,
                    partn.complete_name AS partner_complete_name,
                    "account_move_line__move_id".name AS move_name,
+                   "account_move_line__move_id".ref AS reference,
                    "account_move_line__move_id".id AS move_id,
+                    %(ksef_number_sql)s AS ksef_number,
                    min(partial_reconcile_date.invoice_date_due) AS reversed_move_date_due,
                    -- If the first payment/delivery arrives before the invoice date else null
                    NULLIF(
@@ -194,10 +199,10 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
             WHERE %(search_condition)s
             GROUP BY "account_move_line__move_id".id, partn.id, country.code;
                 """,
-                tag_id=self.env['account.account.tag']._field_to_sql(tag_alias, 'id', query),
-                tag_name=self.with_context(lang='en_US').env['account.account.tag']._field_to_sql(tag_alias, 'name'),
-                tag_country_id=self.env['account.account.tag']._field_to_sql(tag_alias, 'country_id', query),
-                balance_negate=self.env['account.account.tag']._field_to_sql(tag_alias, 'balance_negate', query),
+                tag_id=tag_t.id,
+                tag_name=tag_t.name,
+                tag_country_id=tag_t.country_id,
+                balance_negate=tag_t.balance_negate,
                 move_to_group_by=move_to_group_by or SQL('account_move_line__move_id.id'),
                 additional_joined_table_for_aml_aggregates=additional_joined_table_for_aml_aggregates or SQL(),
                 country_id=self.env.ref('base.pl').id,
@@ -206,6 +211,7 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
                 triangular_purchase_tags_ids=triangular_purchase_tags_ids,
                 i_42_tags_ids=i_42_tags_ids,
                 i_63_tags_ids=i_63_tags_ids,
+                ksef_number_sql=ksef_number_sql,
                 additional_select_list=additional_select_list or SQL(),
                 additional_joined_table=additional_joined_table or SQL(),
                 table_references=query.from_clause,
@@ -213,18 +219,26 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
             )
 
     @api.model
+    def _l10n_pl_get_ksef_reference(self, move_data):
+        """Return JPK V3 KSeF reference value: number or legal fallback designation."""
+        if move_data.get('ksef_number'):
+            return move_data['ksef_number']
+        if move_data.get('move_type') == 'entry':
+            return 'DI'
+        return 'BFK'
+
+    @api.model
     def _l10n_pl_get_record_values_grouped_by_move(self, options, report):
         """ Get the result of the query to get all values for each move """
         query = self._l10n_pl_get_query(report, options)
-        self.env.cr.execute(query)
-        return self.env.cr.dictfetchall()
+        return self.env.execute_query_dict(query)
 
     @api.model
     def _l10n_pl_prepare_values(self, options):
         """ Prepare miscellaneous information and function needed for the JPK template rendering """
-        now = datetime.strftime(pytz.utc.localize(fields.Datetime.now()), '%Y-%m-%dT%H:%M:%SZ')
-        if options.get('date').get('period_type') == 'month':
-            date_to = fields.Date.from_string(options.get('date').get('date_to'))
+        now = datetime.strftime(fields.Datetime.now().replace(tzinfo=UTC), '%Y-%m-%dT%H:%M:%SZ')
+        if options['date']['period_type'] == 'month':
+            date_to = fields.Date.to_date(options['date']['date_to'])
             date_month = datetime.strftime(date_to, '%-m')
             date_year = datetime.strftime(date_to, '%Y')
         else:
@@ -250,6 +264,7 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
         input_tax_moves = []
         for move_data in list_values:
             move_data['tax_values'] = move_data.get('tax_values') or {}
+            move_data['ksef_reference'] = self._l10n_pl_get_ksef_reference(move_data)
             tax_keys = move_data['tax_values'].keys()
 
             if any(int(key) in range(10, 37) for key in tax_keys) or move_data.get('oss_tag') or move_data.get('pos_order_id'):
@@ -300,7 +315,7 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
 
             # Need the values for the whole quarter, so we get all the values by getting the values for all the
             # expressions of the tax report, for a different date scope than the moves
-            new_options_date = report._get_dates_period(*date_utils.get_quarter(fields.Date.to_date(options['date']['date_from'])), 'range', 'quarter')
+            new_options_date = report._build_date_dict(options, *date_utils.get_quarter(fields.Date.to_date(options['date']['date_from'])), period_type='quarter')
             new_options = report.get_options(previous_options={
                 **options,
                 'date': new_options_date,
@@ -383,7 +398,7 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
 
         if self.env.company.account_return_periodicity == 'trimester':
             values.update({
-                'xmlns':  "http://crd.gov.pl/wzor/2021/12/27/11149/"
+                'xmlns': "http://crd.gov.pl/wzor/2025/12/19/14089/",
             })
             audit_content = self.env['ir.qweb']._render('l10n_pl_reports.jpk_export_quarterly_template', values)
             return {
@@ -393,7 +408,7 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
             }
         else:
             values.update({
-                'xmlns':  "http://crd.gov.pl/wzor/2021/12/27/11148/"
+                'xmlns': "http://crd.gov.pl/wzor/2025/12/19/14090/",
             })
             audit_content = self.env['ir.qweb']._render('l10n_pl_reports.jpk_export_monthly_template', values)
             return {

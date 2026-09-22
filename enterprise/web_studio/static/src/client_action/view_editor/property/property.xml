@@ -2,74 +2,84 @@
 <templates>
 
     <t t-name="web_studio.Property">
-        <div t-ref="root" t-attf-class="o_web_studio_property {{this.className}}">
-            <div t-if="props.type === 'selection'" class="o_web_studio_sidebar_select mt-2 mb-2">
-                <label t-att-for="props.name">
-                    <t t-slot="default" />
-                    <sup t-if="props.tooltip" class="text-info p-1" t-att-data-tooltip="props.tooltip" t-esc="'?'"/>
+        <div t-ref="this.rootRef" t-attf-class="o_web_studio_property {{this.className}}">
+            <div t-if="this.props.type === 'selection'" class="o_web_studio_sidebar_select mt-2 mb-2">
+                <label t-att-for="this.props.name">
+                    <t t-call-slot="default" />
+                    <sup t-if="this.props.tooltip" class="text-info p-1" t-att-data-tooltip="this.props.tooltip" t-out="'?'"/>
                 </label>
-                <t t-set="choices" t-value="props.childProps.choices" />
+                <t t-set="choices" t-value="this.props.childProps.choices" />
                 <SelectMenu t-if="choices"
-                    t-props="props.childProps"
-                    id="props.name"
-                    name="props.name"
-                    value="props.value"
-                    placeholder="props.inputAttributes?.placeholder"
+                    t-props="this.props.childProps"
+                    autoSort="false"
+                    id="this.props.name"
+                    name="this.props.name"
+                    value="this.props.value"
+                    placeholder="this.props.inputAttributes?.placeholder"
                     onSelect="(value) => this.props.onChange(value, this.props.name)"
                     class="'border-0'"
-                    required="props.childProps.required !== false"
-                    disabled="props.isReadonly"
+                    required="this.props.childProps.required === true"
+                    disabled="this.props.isReadonly"
                 />
             </div>
 
-            <t t-elif="props.type === 'boolean'">
+            <t t-elif="this.props.type === 'boolean'">
                 <div class="clearfix o_web_studio_sidebar_checkbox d-flex">
                     <CheckBox
-                        id="props.name"
-                        name="props.name"
-                        value="!!props.value"
+                        id="this.props.name"
+                        name="this.props.name"
+                        value="!!this.props.value"
                         onChange="(value) => this.props.onChange(value, this.props.name)"
-                        disabled="props.isReadonly"
+                        disabled="this.props.isReadonly"
                     >
-                        <t t-slot="default" />
-                        <sup t-if="props.tooltip" class="text-info p-1" t-att-data-tooltip="props.tooltip" t-esc="'?'"/>
+                        <t t-call-slot="default" />
+                        <sup t-if="this.props.tooltip" class="text-info p-1" t-att-data-tooltip="this.props.tooltip" t-out="'?'"/>
                     </CheckBox>
                 </div>
             </t>
-            <div t-elif="props.type === 'domain'" class="o_web_studio_sidebar_text my-2 d-flex flex-column">
-                <label t-att-for="props.name">
-                    <t t-slot="default" />
-                    <sup t-if="props.tooltip" class="text-info p-1" t-att-data-tooltip="props.tooltip" t-esc="'?'"/>
+            <div t-elif="this.props.type === 'domain'" class="o_web_studio_sidebar_text my-2 d-flex flex-column">
+                <label t-att-for="this.props.name">
+                    <t t-call-slot="default" />
+                    <sup t-if="this.props.tooltip" class="text-info p-1" t-att-data-tooltip="this.props.tooltip" t-out="'?'"/>
                 </label>
-                <span t-if="props.isReadonly" t-att-name="props.name" t-esc="props.value"  class="ps-2"/>
+                <span t-if="this.props.isReadonly" t-att-name="this.props.name" t-out="this.props.value"  class="ps-2"/>
                 <input
                     t-else=""
-                    t-att="props.inputAttributes"
-                    t-att-name="props.name"
-                    t-att-id="props.name"
-                    t-att-type="props.type"
-                    t-att-value="props.value"
-                    t-att-class="`form-${props.type}-input`"
-                    t-on-click.prevent.stop="onDomainClicked"
+                    t-att="this.props.inputAttributes"
+                    t-att-name="this.props.name"
+                    t-att-id="this.props.name"
+                    t-att-value="this.props.value"
+                    t-on-click.prevent.stop="this.onDomainClicked"
                 />
             </div>
 
-            <div t-else="" class="o_web_studio_sidebar_text my-2 d-flex flex-column">
-                <label t-att-for="props.name">
-                    <t t-slot="default" />
-                    <sup t-if="props.tooltip" class="text-info p-1" t-att-data-tooltip="props.tooltip" t-esc="'?'"/>
+            <div t-elif="this.props.type === 'icon'" class="o_web_studio_sidebar_select my-2 d-flex flex-column">
+                <label t-att-for="this.props.name">
+                    <t t-call-slot="default" />
+                    <sup t-if="this.props.tooltip" class="text-info p-1" t-att-data-tooltip="this.props.tooltip" t-out="'?'"/>
                 </label>
-                <span t-if="props.isReadonly" t-att-name="props.name" t-esc="props.value" class="ps-2" />
+                <div class="fs-2">
+                    <StudioIconSelector
+                        className="'o_select_menu btn btn-light bg-light w-100'"
+                        onSelect="(value) => this.props.onChange(value, this.props.name)"
+                        value="this.props.value || ''"
+                        required="this.props.childProps.required ?? false"/>
+                </div>
+            </div>
+
+            <div t-else="" class="o_web_studio_sidebar_text my-2 d-flex flex-column">
+                <label t-att-for="this.props.name">
+                    <t t-call-slot="default" />
+                    <sup t-if="this.props.tooltip" class="text-info p-1" t-att-data-tooltip="this.props.tooltip" t-out="'?'"/>
+                </label>
+                <span t-if="this.props.isReadonly" t-att-name="this.props.name" t-out="this.props.value" class="ps-2" />
                 <input
                     t-else=""
-                    t-att-name="props.name"
-                    t-att-id="props.name"
-                    t-att="props.inputAttributes"
-                    t-att-type="props.type"
-                    t-att-value="props.value"
-                    t-att-class="`form-${props.type}-input`"
+                    t-att-name="this.props.name"
+                    t-att-id="this.props.name"
+                    t-att="this.props.inputAttributes"
+                    t-att-value="this.props.value"
                     t-on-change="(ev) => this.props.onChange(ev.target.value, this.props.name)"
-                    t-ref="autofocus"
                 />
             </div>
         </div>

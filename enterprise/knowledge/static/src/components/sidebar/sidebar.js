@@ -1,3 +1,4 @@
+import { useLayoutEffect, useSubEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
 import { ArticleSearchDialog } from "@knowledge/components/article_search_dialog/article_search_dialog";
 import { ArticleTemplatePickerDialog } from "@knowledge/components/article_template_picker_dialog/article_template_picker_dialog";
@@ -13,17 +14,22 @@ import { localization } from "@web/core/l10n/localization";
 import { user } from "@web/core/user";
 import { throttleForAnimation } from "@web/core/utils/timing";
 import { useNestedSortable } from "@web/core/utils/nested_sortable";
+import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { useBus, useService } from "@web/core/utils/hooks";
+import { memoize } from "@web/core/utils/functions";
+import { closestScrollableY } from "@web/core/utils/scrolling";
 import { useRecordObserver } from "@web/model/relational_model/utils";
 
 import {
     Component,
     onWillStart,
-    reactive,
-    useRef,
-    useState,
-    useChildSubEnv,
-    useExternalListener,
+    proxy,
+    signal,
+    t,
+    untrack,
+    useEffect,
+    useListener,
+    useProps,
 } from "@odoo/owl";
 
 export const SORTABLE_TOLERANCE = 10;
@@ -35,6 +41,7 @@ export const SORTABLE_TOLERANCE = 10;
  * The articles are stored in the state and have the following shape:
  * - {string} category,
  * - {array} child_ids,
+ * - {boolean} children_loaded,
  * - {string} icon,
  * - {boolean} is_article_item,
  * - {boolean} is_locked,
@@ -45,9 +52,6 @@ export const SORTABLE_TOLERANCE = 10;
  * - {boolean} has_article_children,
  */
 export class KnowledgeSidebar extends Component {
-    static props = {
-        record: Object,
-    };
     static template = "knowledge.Sidebar";
     static components = {
         KnowledgeSidebarFavoriteSection,
@@ -55,6 +59,14 @@ export class KnowledgeSidebar extends Component {
         KnowledgeSidebarSharedSection,
         KnowledgeSidebarWorkspaceSection,
     };
+
+    props = useProps({
+        record: t.object(),
+    });
+
+    favoriteTreeRef = signal.ref();
+    mainTreeRef = signal.ref();
+    sidebarTrashRef = signal.ref();
 
     setup() {
         super.setup();
@@ -66,8 +78,10 @@ export class KnowledgeSidebar extends Component {
         this.hotkey = useService("hotkey");
         this.orm = useService("orm");
 
-        this.favoriteTree = useRef("favoriteTree");
-        this.mainTree = useRef("mainTree");
+        useHotkey("escape", () => this.focusSidebar(), {
+            bypassEditableProtection: true,
+            isAvailable: (target) => Boolean(target?.closest?.(".o_knowledge_body")),
+        });
 
         this.currentData = {};
 
@@ -79,23 +93,29 @@ export class KnowledgeSidebar extends Component {
 
         // Get set of unfolded ids and sync it with the local storage (any
         // change will trigger a write in the local storage)
-        this.unfoldedArticlesIds = reactive(
-            new Set(localStorage.getItem(this.storageKeys.unfoldedArticles)?.split(";").map(Number)),
-            () => localStorage.setItem(this.storageKeys.unfoldedArticles, Array.from(this.unfoldedArticlesIds).join(";"))
+        this.unfoldedArticlesIds = proxy(
+            new Set(localStorage.getItem(this.storageKeys.unfoldedArticles)?.split(";").map(Number))
         );
-        this.unfoldedFavoritesIds = reactive(
-            new Set(localStorage.getItem(this.storageKeys.unfoldedFavorites)?.split(";").map(Number)),
-            () => localStorage.setItem(this.storageKeys.unfoldedFavorites, Array.from(this.unfoldedFavoritesIds).join(";"))
+        useEffect(() => {
+            localStorage.setItem(this.storageKeys.unfoldedArticles, Array.from(this.unfoldedArticlesIds).join(";"));
+        });
+        this.unfoldedFavoritesIds = proxy(
+            new Set(localStorage.getItem(this.storageKeys.unfoldedFavorites)?.split(";").map(Number))
         );
+        useEffect(() => {
+            localStorage.setItem(this.storageKeys.unfoldedFavorites, Array.from(this.unfoldedFavoritesIds).join(";"));
+        });
 
-        useChildSubEnv({
+        useSubEnv({
             fold: this.fold.bind(this),
             getArticle: this.getArticle.bind(this),
             model: this.props.record.model,
             unfold: this.unfold.bind(this),
+            updateSidebarArticles: this.updateArticles.bind(this),
+            getArticleRecord: memoize(this.getNewArticleRecord.bind(this)),
         });
 
-        this.state = useState({
+        this.state = proxy({
             dragging: false,
             sidebarSize: localStorage.getItem(this.storageKeys.size) || 300,
             resizing: false,
@@ -109,7 +129,7 @@ export class KnowledgeSidebar extends Component {
 
         // Reassign the Control+k hotkey for portal users from the CommandPalette
         // to the article search feature.
-        useExternalListener(
+        useListener(
             browser,
             "keydown",
             (ev) => {
@@ -124,7 +144,7 @@ export class KnowledgeSidebar extends Component {
 
         // Resequencing of the favorite articles
         useNestedSortable({
-            ref: this.favoriteTree,
+            ref: this.favoriteTreeRef,
             edgeScrolling: {
                 speed: 10,
                 threshold: 15,
@@ -166,12 +186,13 @@ export class KnowledgeSidebar extends Component {
 
         // Resequencing and rehierarchisation of articles
         useNestedSortable({
-            ref: this.mainTree,
+            ref: this.mainTreeRef,
             elements: "li.o_article",
             groups: () => this.isInternalUser ? ".o_section" : ".o_section[data-section='private']",
             connectGroups: () => this.isInternalUser,
             nest: true,
-            preventDrag: (el) => el.classList.contains("readonly"),
+            preventDrag: (el) =>
+                el.classList.contains("readonly") || Boolean(el.closest(".o_favorite_container")),
             tolerance: SORTABLE_TOLERANCE,
             onDragStart: () => this.state.dragging = true,
             onDragEnd: () => this.state.dragging = false,
@@ -242,100 +263,9 @@ export class KnowledgeSidebar extends Component {
             this.canCreateArticle = await user.checkAccessRight('knowledge.article', 'create');
         });
 
-        useRecordObserver(async (record) => {
-            const nextDataParentId = record.data.parent_id ? record.data.parent_id.id : false;
-            // During the first load, `loadArticles` is still pending and the component is in its
-            // loading state. However, because of OWL reactive implementation (uses a Proxy),
-            // record data still has to be read in order to subscribe to later changes, even if
-            // nothing is done with that data on the first call. This subscription is what allows
-            // this callback to be called i.e. when the name of the article is changed, reflecting
-            // the change in the sidebar. See useRecordObserver, effect, reactive implementations
-            // for further details.
-            const article = this.getArticle(record.resId) || {
-                id: record.resId,
-                name: record.data.name,
-                icon: record.data.icon,
-                category: record.data.category,
-                parent_id: nextDataParentId,
-                is_locked: record.data.is_locked,
-                user_can_write: record.data.user_can_write,
-                is_article_item: record.data.is_article_item,
-                is_user_favorite: record.data.is_user_favorite,
-                child_ids: [],
-            };
-            if (this.state.articles[record.resId]) {
-                if (record.data.is_article_item !== article.is_article_item) {
-                    if (record.data.is_article_item) {
-                        // Article became item, remove it from the sidebar
-                        this.removeArticle(article);
-                    } else {
-                        // Item became article, add it in the sidebar
-                        this.insertArticle(article, {
-                            parentId: article.parent_id
-                        });
-                        this.showArticle(article);
-                    }
-                }
-                if (record.data.is_user_favorite !== article.is_user_favorite) {
-                    if (record.data.is_user_favorite) {
-                        // Add the article to the favorites tree
-                        this.state.favoriteIds.push(article.id);
-                    } else {
-                        // Remove the article from the favorites tree
-                        this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(article.id), 1);
-                    }
-                }
-                if ((nextDataParentId !== article.parent_id || record.data.category !== article.category) &&
-                    (record.data.parent_id !== this.currentData.parent_id || record.data.category !== this.currentData.category)) {
-                    // Article changed position ("Moved to")
-                    if (!this.getArticle(nextDataParentId)) {
-                        // Parent is not loaded, reload the tree to show moved
-                        // article in the sidebar
-                        await this.loadArticles();
-                        this.showArticle(this.getArticle(record.resId));
-                    } else {
-                        this.repositionArticle(article, {
-                            parentId: nextDataParentId,
-                            category: record.data.category,
-                        });
-                    }
-                }
-                // Update values used to display the current article in the sidebar
-                Object.assign(article, {
-                    name: record.data.name,
-                    icon: record.data.icon,
-                    is_locked: record.data.is_locked,
-                    user_can_write: record.data.user_can_write,
-                    is_article_item: record.data.is_article_item,
-                    is_user_favorite: record.data.is_user_favorite,
-                });
-            } else if (!this.state.loading) {  // New article, add it in the state and sidebar
-                if (record.data.is_user_favorite) {
-                    // Favoriting an article that is not shown in the main
-                    // tree (hidden child, item, or child of restricted)
-                    this.state.favoriteIds.push(record.resId);
-                }
-                this.state.articles[article.id] = article;
-                // Don't add new items in the sidebar
-                if (!record.data.is_article_item) {
-                    await this.insertArticle(article, {
-                        category: article.category,
-                        parentId: article.parent_id,
-                    });
-                    // Make sure the article is visible
-                    this.showArticle(article);
-                    if (nextDataParentId && this.getArticle(nextDataParentId)?.is_user_favorite) {
-                        this.unfold(nextDataParentId, true);
-                    }
-                }
-            }
+        useRecordObserver(this.updateArticles.bind(this));
 
-            this.currentData = {
-                parent_id: record.data.parent_id,
-                category: record.data.category,
-            };
-        });
-        this.env.bus.addEventListener("knowledge.sidebar.insertNewArticle", async ({ detail }) => {
+        useListener(this.env.bus, "knowledge.sidebar.insertNewArticle", async ({ detail }) => {
             if (this.getArticle(detail.articleId)) {
                 // Article already in the sidebar
                 return;
@@ -359,6 +289,156 @@ export class KnowledgeSidebar extends Component {
                 category: parent ? parent.category : false
             });
         });
+
+        useLayoutEffect(
+            () => {
+                // Ensures the active article is fully visible inside the scroll container.
+                // Partially replicates the generic `scrollTo` behavior with modified logic when
+                // scrolling down, as generic one does not work correctly here.
+                // Some articles may remain hidden behind `.o_knowledge_sidebar_trash`. According to
+                // the default `scrollTo` bottom alignment logic, such elements are considered visible,
+                // even though they are actually hidden by the overlay and not truly visible to the user.
+                // Only clicks coming from the favorites tree should skip the workspace auto-scroll.
+                // Other openings (e.g. direct links) should still reveal the article in the main tree.
+
+                if (this.env.sidebarScrollState.origin === "favorites") {
+                    return;
+                }
+                const activeEl = this.mainTreeRef()?.querySelector(".o_article_active");
+                if (!activeEl) {
+                    return;
+                }
+
+                const scrollable = closestScrollableY(activeEl);
+                if (!scrollable) {
+                    return;
+                }
+
+                const elementRect = activeEl.getBoundingClientRect();
+                const scrollRect = scrollable.getBoundingClientRect();
+                const sidebarTrashHeight =
+                    this.sidebarTrashRef()?.getBoundingClientRect().height ?? 0;
+                let newScrollTop = scrollable.scrollTop;
+
+                if (scrollRect.bottom - sidebarTrashHeight < elementRect.bottom) {
+                    // scroll down align element to bottom
+                    newScrollTop +=
+                        elementRect.top -
+                        scrollRect.bottom +
+                        3 * elementRect.height + // Multiply by 3 to ensure some bottom articles also remain visible.
+                        sidebarTrashHeight; // Extra offset to push element above sidebar trash.
+                } else if (elementRect.top < scrollRect.top) {
+                    // scroll up align element to top
+                    newScrollTop += elementRect.top - scrollRect.top;
+                } else {
+                    return;
+                }
+
+                scrollable.scrollTo({
+                    top: newScrollTop,
+                    behavior: "smooth",
+                });
+            },
+            () => [this.props.record.resId, untrack(this.mainTreeRef)]
+        );
+    }
+
+    async updateArticles(record) {
+        const nextDataParentId = record.data.parent_id ? record.data.parent_id.id : false;
+        // During the first load, `loadArticles` is still pending and the component is in its
+        // loading state. However, because of OWL reactive implementation (uses a Proxy),
+        // record data still has to be read in order to subscribe to later changes, even if
+        // nothing is done with that data on the first call. This subscription is what allows
+        // this callback to be called i.e. when the name of the article is changed, reflecting
+        // the change in the sidebar. See useRecordObserver, effect, reactive implementations
+        // for further details.
+        const article = this.getArticle(record.resId) || {
+            id: record.resId,
+            name: record.data.name,
+            icon: record.data.icon,
+            category: record.data.category,
+            parent_id: nextDataParentId,
+            is_locked: record.data.is_locked,
+            user_can_write: record.data.user_can_write,
+            is_article_item: record.data.is_article_item,
+            is_user_favorite: record.data.is_user_favorite,
+            last_edition_date: record.data.last_edition_date,
+            last_edition_uid: record.data.last_edition_uid,
+            child_ids: [],
+        };
+        if (this.state.articles[record.resId]) {
+            if (record.data.is_article_item !== article.is_article_item) {
+                if (record.data.is_article_item) {
+                    // Article became item, remove it from the sidebar
+                    this.removeArticle(article);
+                } else {
+                    // Item became article, add it in the sidebar
+                    this.insertArticle(article, {
+                        parentId: article.parent_id,
+                    });
+                    this.showArticle(article);
+                }
+            }
+            if (record.data.is_user_favorite !== article.is_user_favorite) {
+                if (record.data.is_user_favorite) {
+                    // Add the article to the favorites tree
+                    this.state.favoriteIds.push(article.id);
+                } else {
+                    // Remove the article from the favorites tree
+                    this.state.favoriteIds.splice(this.state.favoriteIds.indexOf(article.id), 1);
+                }
+            }
+            if ((nextDataParentId !== article.parent_id || record.data.category !== article.category) &&
+                (record.data.parent_id !== this.currentData.parent_id || record.data.category !== this.currentData.category)) {
+                // Article changed position ("Moved to")
+                if (!this.getArticle(nextDataParentId)) {
+                    // Parent is not loaded, reload the tree to show moved
+                    // article in the sidebar
+                    await this.loadArticles();
+                    this.showArticle(this.getArticle(record.resId));
+                } else {
+                    this.repositionArticle(article, {
+                        parentId: nextDataParentId,
+                        category: record.data.category,
+                    });
+                }
+            }
+            // Update values used to display the current article in the sidebar
+            Object.assign(article, {
+                name: record.data.name,
+                icon: record.data.icon,
+                is_locked: record.data.is_locked,
+                user_can_write: record.data.user_can_write,
+                is_article_item: record.data.is_article_item,
+                is_user_favorite: record.data.is_user_favorite,
+                last_edition_date: record.data.last_edition_date,
+                last_edition_uid: record.data.last_edition_uid,
+            });
+        } else if (!this.state.loading) {  // New article, add it in the state and sidebar
+            if (record.data.is_user_favorite) {
+                // Favoriting an article that is not shown in the main
+                // tree (hidden child, item, or child of restricted)
+                this.state.favoriteIds.push(record.resId);
+            }
+            this.state.articles[article.id] = article;
+            // Don't add new items in the sidebar
+            if (!record.data.is_article_item) {
+                await this.insertArticle(article, {
+                    category: article.category,
+                    parentId: article.parent_id,
+                });
+                // Make sure the article is visible
+                this.showArticle(article);
+                if (nextDataParentId && this.getArticle(nextDataParentId)?.is_user_favorite) {
+                    this.unfold(nextDataParentId, true);
+                }
+            }
+        }
+
+        this.currentData = {
+            parent_id: record.data.parent_id,
+            category: record.data.category,
+        };
     }
 
     /**
@@ -468,12 +548,91 @@ export class KnowledgeSidebar extends Component {
     }
 
     /**
+     * Keyboard navigation of the article tree (SearchPanel-style): each row
+     * handle is a tab stop, ArrowUp/Down move between rows, and Enter/Space
+     * opens the article, expanding/collapsing it when it has children.
+     * @param {KeyboardEvent} ev
+     */
+    onTreeKeydown(ev) {
+        const handle = ev.target.closest(".o_article_handle");
+        if (!handle) {
+            return;
+        }
+        if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            this.activateArticleRow(handle);
+        } else if (ev.key === "ArrowDown" || ev.key === "ArrowUp") {
+            ev.preventDefault();
+            const handles = [...this.mainTreeRef().querySelectorAll(".o_article_handle")];
+            const next = handles[handles.indexOf(handle) + (ev.key === "ArrowDown" ? 1 : -1)];
+            next?.focus();
+        }
+    }
+
+    /**
+     * Activate the given row handle: opens the article (autofocusing the body),
+     * and for a parent also expands its subtree (or collapses it when it is
+     * already the open, expanded one).
+     * @param {HTMLElement} handle - the focused `.o_article_handle`
+     */
+    activateArticleRow(handle) {
+        const article = this.getArticle(parseInt(handle.closest(".o_article").dataset.articleId));
+        if (!article) {
+            return;
+        }
+        if (article.has_article_children) {
+            const isActive = this.props.record.resId === article.id;
+            const isFavorite = Boolean(handle.closest(".o_favorite_container"));
+            const unfoldedIds = isFavorite ? this.unfoldedFavoritesIds : this.unfoldedArticlesIds;
+            if (isActive && unfoldedIds.has(article.id)) {
+                this.fold(article.id, isFavorite);
+            } else {
+                this.unfold(article.id, isFavorite);
+            }
+        }
+        this.env.openArticle(article.id);
+    }
+
+    /**
+     * Move keyboard focus back to the sidebar, onto the active article row.
+     */
+    focusSidebar() {
+        const tree = this.mainTreeRef();
+        const row =
+            tree?.querySelector(".o_article_handle.o_article_active") ||
+            tree?.querySelector(".o_article_handle");
+        row?.focus();
+    }
+
+    /**
      * Get the article stored in the state given its id.
      * @param {integer} articleId - Id of the article
      * @returns {Object} article
      */
     getArticle(articleId) {
         return this.state.articles[articleId];
+    }
+
+    async getNewArticleRecord(articleId) {
+        const model = this.props.record.model;
+        if (this.props.record.resId === articleId) {
+            return this.props.record;
+        }
+        const { activeFields, context, fields } = model.config;
+        const config = {
+            activeFields,
+            context,
+            fields,
+            resId: articleId,
+            resIds: [],
+            resModel: "knowledge.article",
+            isMonoRecord: true,
+            mode: "edit",
+        };
+        const data = await model._loadData({
+            ...config,
+        });
+        return model._createRoot(config, data);
     }
 
     /**
@@ -576,6 +735,7 @@ export class KnowledgeSidebar extends Component {
             this.state.articles[article.id] = {
                 ...article,
                 child_ids: children[article.id] ? children[article.id] : [],
+                children_loaded: false,
             };
             // Items could be shown in the favorite tree as root articles, but
             // they should not be shown as children of other articles
@@ -624,8 +784,8 @@ export class KnowledgeSidebar extends Component {
                 'order': 'sequence, id',
             }
         );
+        article.child_ids = children.map((child) => child.id);
         for (const child of children) {
-            article.child_ids.push(child.id);
             if (this.getArticle(child.id)) {
                 // Article was already loaded (if it is in the favorites)
                 continue;
@@ -634,11 +794,13 @@ export class KnowledgeSidebar extends Component {
                 ...child,
                 parent_id: article.id,
                 child_ids: [],
+                children_loaded: false,
                 category: article.category,
                 is_article_item: false,
                 is_user_favorite: false,
             };
         }
+        article.children_loaded = true;
     }
 
     /**
@@ -916,13 +1078,19 @@ export class KnowledgeSidebar extends Component {
      */
     resetUnfoldedArticles() {
         this.unfoldedArticlesIds.forEach(id => {
-            if (!this.getArticle(id)) {
+            const article = this.getArticle(id);
+            if (!article) {
                 this.unfoldedArticlesIds.delete(id);
+            } else {
+                article.children_loaded = true;
             }
         });
         this.unfoldedFavoritesIds.forEach(id => {
-            if (!this.getArticle(id)) {
+            const article = this.getArticle(id);
+            if (!article) {
                 this.unfoldedFavoritesIds.delete(id);
+            } else {
+                article.children_loaded = true;
             }
         });
     }
@@ -973,8 +1141,8 @@ export class KnowledgeSidebar extends Component {
      */
     async unfold(articleId, isFavorite) {
         const article = this.getArticle(articleId);
-        // Load the children of the article if it has not been unfolded yet
-        if (article.has_article_children && !article.child_ids.length) {
+        // Load the children of the article if they have not been loaded yet
+        if (article.has_article_children && !article.children_loaded) {
             await this.loadChildren(article);
         }
         if (isFavorite) {

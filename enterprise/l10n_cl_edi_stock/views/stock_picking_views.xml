@@ -9,11 +9,12 @@
                 <field name="l10n_cl_sii_send_file" invisible="1"/>
                 <button name="create_delivery_guide" string="Create Delivery Guide" type="object" invisible="state != 'done' or l10n_cl_dte_status in ['accepted', 'objected', 'ask_for_status', 'rejected', 'cancelled'] or picking_type_code != 'outgoing' or l10n_cl_draft_status or country_code != 'CL'"/>
                 <button name="print_delivery_guide_pdf" string="Print Delivery Guide" type="object" invisible="not l10n_cl_sii_send_file"/>
+                <button name="print_delivery_guide_yield_pdf" string="Print Yield Copy" type="object" invisible="not l10n_cl_sii_send_file or state != 'done' or picking_type_code != 'outgoing'"/>
             </xpath>
             <xpath expr="//header" position="after">
                 <field name="l10n_cl_dte_file" invisible="1"/>
                 <field name="l10n_cl_is_return" invisible="1"/>
-                <div class="alert alert-warning text-center" role="alert" invisible="l10n_cl_is_return or l10n_cl_dte_file or not l10n_cl_draft_status">Sequence not found for delivery guide. Please, set the first number into Delivery Guide Number field</div>
+                <div class="alert alert-warning text-center" role="alert" invisible="l10n_cl_is_return or l10n_cl_dte_file or not l10n_cl_draft_status">No delivery guide has been numbered for this CAF yet. Please set the first number in the Delivery Guide Number field.</div>
             </xpath>
             <xpath expr="//field[@name='origin']" position="after">
                 <field name="l10n_cl_draft_status" invisible="1"/>

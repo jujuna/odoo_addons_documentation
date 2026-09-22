@@ -1,13 +1,16 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { computeM2OProps, Many2One } from "@web/views/fields/many2one/many2one";
-import { buildM2OFieldDescription, Many2OneField } from "@web/views/fields/many2one/many2one_field";
+import {
+    buildM2OFieldDescription,
+    many2OneFieldProps,
+} from "@web/views/fields/many2one/many2one_field";
 
 export class Many2OneSpreadsheetField extends Component {
     static template = "spreadsheet_edition.Many2OneSpreadsheetField";
     static components = { Many2One };
-    static props = { ...Many2OneField.props };
+    props = useProps({ ...many2OneFieldProps });
 
     setup() {
         this.action = useService("action");

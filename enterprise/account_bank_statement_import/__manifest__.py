@@ -1,8 +1,6 @@
-# -*- encoding: utf-8 -*-
 {
     'name': 'Account Bank Statement Import',
     'category': 'Accounting/Accounting',
-    'version': '1.0',
     'depends': ['account_accountant', 'base_import'],
     'description': """Generic Wizard to Import Bank Statements.
 
@@ -15,7 +13,6 @@ OFX and QIF imports are available in Enterprise version.""",
     'demo': [
         'demo/partner_bank.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'assets': {
         'web.assets_backend': [

@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="portal_my_home_equity" name="Equity" inherit_id="portal.portal_my_home" customize_show="True" priority="100">
-        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
-            <t t-set="portal_service_category_enable" t-value="True"/>
-        </xpath>
-        <div id="portal_service_category" position="inside">
-            <t t-call="portal.portal_docs_entry">
-                <t t-set="icon" t-value="'/equity/static/src/img/equity.svg'"/>
-                <t t-set="title">Equity</t>
-                <t t-set="url" t-value="'/my/equity'"/>
-                <t t-set="text">See your shares and transactions</t>
-                <t t-set="placeholder_count" t-value="'transaction_count'"/>
-            </t>
-        </div>
-    </template>
-
     <template id="portal_breadcrumbs_equity" name="Portal layout : equity" inherit_id="portal.portal_breadcrumbs" priority="30">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
             <li name="equity_breadcrumb" t-if="page_name == 'equity'" t-attf-class="breadcrumb-item #{'active ' if not partner_id else ''}">
@@ -28,12 +13,9 @@
     </template>
 
     <template id="portal_my_equity" name="My Companies">
-        <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+        <t t-call="portal.portal_layout" breadcrumbs_searchbar="True">
 
-            <t t-call="portal.portal_searchbar">
-                <t t-set="title">My Companies</t>
-            </t>
+            <t t-call="portal.portal_searchbar" breadcrumbs_searchbar="True" title.translate="My Companies"/>
             <t t-if="not partners">
                 <p class="alert alert-warning">There is currently no equity for your account.</p>
             </t>
@@ -63,12 +45,9 @@
     </template>
 
     <template id="portal_my_company_equity" name="My Company Equity">
-        <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+        <t t-call="portal.portal_layout" breadcrumbs_searchbar="True">
 
-            <t t-call="portal.portal_searchbar">
-                <t t-set="title">Equity</t>
-            </t>
+            <t t-call="portal.portal_searchbar" breadcrumbs_searchbar="True" title.translate="Equity"/>
             <t t-if="not transactions">
                 <p class="alert alert-warning">There are currently no transactions for your account.</p>
             </t>

@@ -8,34 +8,41 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-17 06:58+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Catalan <https://translate.odoo.com/projects/odoo-19/mrp_mps/"
-"ca/>\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-17 23:54+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Catalan <https://translate.odoo.com/projects/odoo-master/"
+"mrp_mps/ca/>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: mrp_mps
-#. odoo-python
-#: code:addons/mrp_mps/wizard/mrp_mps_forecast_suggestion.py:0
-msgid "%(month)s %(day)s %(year)s"
-msgstr ""
-
-#. module: mrp_mps
-#. odoo-python
-#: code:addons/mrp_mps/wizard/mrp_mps_forecast_suggestion.py:0
-msgid "%(month)s %(year)s"
-msgstr ""
-
-#. module: mrp_mps
-#. odoo-python
-#: code:addons/mrp_mps/wizard/mrp_mps_forecast_suggestion.py:0
-msgid "%(year)s"
+#: model:ir.module.module,description:base.module_mrp_mps
+msgid ""
+"\n"
+"Master Production Schedule\n"
+"==========================\n"
+"\n"
+"Sometimes you need to create the purchase orders for the components of\n"
+"manufacturing orders that will only be created later.  Or for production "
+"orders\n"
+"where you will only have the sales orders later.  The solution is to "
+"predict\n"
+"your sale forecasts and based on that you will already create some "
+"production\n"
+"orders or purchase orders.\n"
+"\n"
+"You need to choose the products you want to add to the report.  You can "
+"choose\n"
+"the period for the report: day, week, month, ...  It is also possible to "
+"define\n"
+"safety stock, minimum to supply and to manually override the amount you "
+"will\n"
+"procure.\n"
 msgstr ""
 
 #. module: mrp_mps
@@ -104,6 +111,12 @@ msgid "Add a Product"
 msgstr "Afegeix un producte"
 
 #. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/mps_selection.js:0
+msgid "All Periods"
+msgstr ""
+
+#. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__allowed_route_ids
 msgid "Allowed Route"
 msgstr "Ruta permesa"
@@ -116,14 +129,18 @@ msgstr "Aplica"
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/models/master_production_schedule_model.js:0
-msgid "Are you sure you want to delete these records?"
-msgstr "Esteu segur que voleu esborrar aquests registres?"
+msgid ""
+"Are you sure you want to remove these products from your schedule?\n"
+"All forecasts will be gone for good."
+msgstr ""
 
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/models/master_production_schedule_model.js:0
-msgid "Are you sure you want to delete this record?"
-msgstr "Esteu segur que voleu esborrar aquest registre?"
+msgid ""
+"Are you sure you want to remove this product from your schedule?\n"
+"All forecasts will be gone for good."
+msgstr ""
 
 #. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_trigger__automated
@@ -139,11 +156,6 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/search/group_menu.xml:0
 msgid "Available to Promise"
-msgstr "Disponible per prometre"
-
-#. module: mrp_mps
-#: model:ir.model.fields,field_description:mrp_mps.field_mrp_mps_forecast_suggestion__based_on_readonly
-msgid "Based On Readonly"
 msgstr ""
 
 #. module: mrp_mps
@@ -162,21 +174,12 @@ msgid "Bill of Materials"
 msgstr "Llista de materials"
 
 #. module: mrp_mps
-#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_production_schedule_form_view
-msgid "Cancel"
-msgstr "Cancel·la"
-
-#. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_details_form_view
 msgid "Close"
 msgstr "Tancar"
 
 #. module: mrp_mps
 #: model:ir.model,name:mrp_mps.model_res_company
-msgid "Companies"
-msgstr "Empreses"
-
-#. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__company_id
 msgid "Company"
 msgstr "Empresa"
@@ -185,12 +188,6 @@ msgstr "Empresa"
 #: model:ir.model,name:mrp_mps.model_res_config_settings
 msgid "Config Settings"
 msgstr "Paràmetres de configuració"
-
-#. module: mrp_mps
-#. odoo-javascript
-#: code:addons/mrp_mps/static/src/models/master_production_schedule_model.js:0
-msgid "Confirmation"
-msgstr "Confirmació"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_mps_forecast_details__create_uid
@@ -230,10 +227,9 @@ msgid "Default Time Range"
 msgstr ""
 
 #. module: mrp_mps
-#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__product_uom_id
+#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__uom_id
 msgid "Default unit of measure used for all stock operations."
-msgstr ""
-"Unit de mesura per defecte utilitzada per totes les operacions d'estoc."
+msgstr "Unit de mesura per defecte utilitzada per totes les operacions d'estoc."
 
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_res_company__manufacturing_period
@@ -255,11 +251,6 @@ msgstr "Eliminar"
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_product_forecast__forecast_qty
 msgid "Demand Forecast"
 msgstr "Previsió de demanda"
-
-#. module: mrp_mps
-#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_suggestion_form_view
-msgid "Discard"
-msgstr "Descartar"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_res_company__mrp_mps_show_actual_demand
@@ -332,6 +323,18 @@ msgid "Display To Replenish"
 msgstr "Mostra per aprovisionar"
 
 #. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_production_schedule_form_view
+msgid "Don't Import"
+msgstr ""
+
+#. module: mrp_mps
+#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__route_id
+msgid ""
+"Either the route specified directly or the one computed to be used for "
+"replenishing this product."
+msgstr ""
+
+#. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_state__excessive_replenishment
 msgid "Excessive Replenishment"
 msgstr ""
@@ -361,6 +364,13 @@ msgstr ""
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_suggestion_form_view
 msgid "Forecast Quantity for"
+msgstr ""
+
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_suggestion_form_view
+msgid ""
+"Forecast Quantity for <span class=\"fw-bold\">selected products</span> based "
+"on historical date or actual demand."
 msgstr ""
 
 #. module: mrp_mps
@@ -411,12 +421,6 @@ msgstr "ID"
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__bom_id
 msgid "If set, the bill of materials components will also be imported."
-msgstr ""
-
-#. module: mrp_mps
-#. odoo-python
-#: code:addons/mrp_mps/models/mrp_mps.py:0
-msgid "Import Template for Master Production Schedule"
 msgstr ""
 
 #. module: mrp_mps
@@ -478,6 +482,11 @@ msgstr "Última actualització per"
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__write_date
 msgid "Last Updated on"
 msgstr "Última actualització el"
+
+#. module: mrp_mps
+#: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_mps_forecast_suggestion__based_on__last_year
+msgid "Last Year"
+msgstr ""
 
 #. module: mrp_mps
 #: model:ir.ui.menu,name:mrp_mps.mrp_mps_menu_planning
@@ -549,6 +558,8 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/main.js:0
 #: model:ir.actions.client,name:mrp_mps.action_mrp_mps
+#: model:ir.module.module,shortdesc:base.module_mrp_mps
+#: model:ir.module.module,summary:base.module_mrp_mps
 #: model:ir.ui.menu,name:mrp_mps.mrp_mps_report_menu
 #: model:ir.ui.menu,name:mrp_mps.stock_mrp_mps_report_menu
 msgid "Master Production Schedule"
@@ -581,7 +592,7 @@ msgid "Moves String"
 msgstr ""
 
 #. module: mrp_mps
-#: model:ir.model.fields,field_description:mrp_mps.field_mrp_mps_forecast_suggestion__mrp_mps_id
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_mps_forecast_suggestion__mrp_mps_ids
 msgid "Mrp Mps"
 msgstr ""
 
@@ -595,7 +606,6 @@ msgstr "Mai"
 #: code:addons/mrp_mps/static/src/components/main.xml:0
 msgid "No product yet. Add one to start scheduling."
 msgstr ""
-"Encara no hi ha cap producte. Afegiu-ne un per començar la planificació."
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
@@ -680,16 +690,6 @@ msgid "Period"
 msgstr "Període"
 
 #. module: mrp_mps
-#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__route_id
-msgid "Preferred Route"
-msgstr "Ruta preferida"
-
-#. module: mrp_mps
-#: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_mps_forecast_suggestion__based_on__last_year
-msgid "Previous Year"
-msgstr "Any anterior"
-
-#. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_product_forecast__procurement_launched
 msgid "Procurement has been run for this forecast"
 msgstr "S'ha executat el pagament d'aquesta previsió"
@@ -717,7 +717,7 @@ msgid "Product Template"
 msgstr "Plantilla de producte"
 
 #. module: mrp_mps
-#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__product_uom_id
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__uom_id
 msgid "Product UoM"
 msgstr "UdM de producte"
 
@@ -796,6 +796,18 @@ msgstr "Recepcions"
 
 #. module: mrp_mps
 #. odoo-javascript
+#: code:addons/mrp_mps/static/src/models/master_production_schedule_model.js:0
+msgid "Remove Product Lines"
+msgstr ""
+
+#. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/models/master_production_schedule_model.js:0
+msgid "Remove lines"
+msgstr ""
+
+#. module: mrp_mps
+#. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
 msgid "Replenish"
 msgstr "Reaprovisionar"
@@ -809,6 +821,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_product_forecast__replenish_qty_updated
 msgid "Replenish_qty has been manually updated"
 msgstr "Replenishqty s'ha actualitzat manualment"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__route_id
+msgid "Replenishment Route"
+msgstr ""
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
@@ -855,8 +872,13 @@ msgid "Route"
 msgstr "Ruta"
 
 #. module: mrp_mps
-#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__route_id
-msgid "Route to replenish your product."
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__route_id_placeholder
+msgid "Route Id Placeholder"
+msgstr ""
+
+#. module: mrp_mps
+#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__specified_route_id
+msgid "Route for replenishing this product."
 msgstr ""
 
 #. module: mrp_mps
@@ -909,10 +931,15 @@ msgid "Show Vendor"
 msgstr "Mostrar proveïdor"
 
 #. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__specified_route_id
+msgid "Specified Route"
+msgstr ""
+
+#. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/search/group_menu.xml:0
 msgid "Starting Inventory"
-msgstr "Iniciant Inventari"
+msgstr ""
 
 #. module: mrp_mps
 #: model:ir.model,name:mrp_mps.model_stock_rule
@@ -930,6 +957,12 @@ msgstr ""
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__replenish_state
 msgid "Technical field to support filtering by replenish state"
+msgstr ""
+
+#. module: mrp_mps
+#. odoo-python
+#: code:addons/mrp_mps/models/mrp_mps.py:0
+msgid "Template for Master Production Schedule"
 msgstr ""
 
 #. module: mrp_mps
@@ -987,13 +1020,6 @@ msgid ""
 "constraints such as: safety stock, production capacity, lead times.\n"
 "                    It's the perfect tool to support your S&OP meetings."
 msgstr ""
-"L'horari mestre tradueix les vostres previsions de vendes i demanda en una "
-"planificació de producció i compra per a cada component.\n"
-"                    Garanteix que tot es programi a temps, basant-se en "
-"limitacions com: estoc de seguretat, capacitat de producció, temps de "
-"caducitat.\n"
-"                    És l'eina perfecta per donar suport a les vostres "
-"reunions SOP."
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -1038,12 +1064,6 @@ msgid "To Replenish"
 msgstr "Per aprovisionar"
 
 #. module: mrp_mps
-#. odoo-javascript
-#: code:addons/mrp_mps/static/src/components/main.js:0
-msgid "Toggle Indirect Demand"
-msgstr ""
-
-#. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_state__under_replenishment
 msgid "Under Replenishment"
 msgstr ""
@@ -1056,6 +1076,12 @@ msgstr ""
 "Tret que la demanda sigui 0, Odoo sempre reomplirà almenys aquesta quantitat."
 
 #. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/main.js:0
+msgid "Update forecast"
+msgstr ""
+
+#. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__supplier_id
 msgid "Vendor"
 msgstr "Proveïdor"
@@ -1065,12 +1091,6 @@ msgstr "Proveïdor"
 #: code:addons/mrp_mps/static/src/components/main.js:0
 msgid "Week"
 msgstr "Setmana"
-
-#. module: mrp_mps
-#. odoo-python
-#: code:addons/mrp_mps/wizard/mrp_mps_forecast_suggestion.py:0
-msgid "Week %(week)s (%(start_day)s-%(end_day)s/%(month)s) %(year)s"
-msgstr ""
 
 #. module: mrp_mps
 #. odoo-python
@@ -1108,7 +1128,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
 msgid "by"
-msgstr "per"
+msgstr ""
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_suggestion_form_view
@@ -1120,8 +1140,7 @@ msgstr "unitats"
 msgid "units x"
 msgstr ""
 
-#~ msgid ""
-#~ "The quantity to replenish through Purchase Orders or Manufacturing Orders."
-#~ msgstr ""
-#~ "La quantitat per aprovisionar a través de les ordres de compra o de "
-#~ "fabricació."
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_suggestion_form_view
+msgid "x"
+msgstr ""

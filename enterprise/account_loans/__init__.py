@@ -8,28 +8,12 @@ from . import models
 from . import wizard
 
 
-def _account_loans_post_init(env):
-    # If in demo, import the demo amortization schedule in the loan
-    if env.ref('base.module_account_loans').demo:
-        _account_loans_import_loan_demo(
-            env,
-            env.ref('account_loans.account_loans_loan_demo1'),
-            env.ref('account_loans.account_loans_loan_demo_file_csv')
-        )
-
-        _account_loans_import_loan_demo(
-            env,
-            env.ref('account_loans.account_loans_loan_demo2'),
-            env.ref('account_loans.account_loans_loan_demo_file_xlsx')
-        )
-
-
 def _account_loans_add_date_column(csv_attachment):
     # Modify the CSV such that one part of the loan lines are in the past (so their related
     # generated entries are posted), and the other part in the future (so in draft)
     data = io.StringIO()
     writer = csv.writer(data, delimiter=',')
-    reader = csv.reader(io.StringIO(csv_attachment.raw.decode()), quotechar='"', delimiter=',')
+    reader = csv.reader(io.StringIO(csv_attachment.raw.content.decode()), quotechar='"', delimiter=',')
     current_date = fields.Date.today() - relativedelta(years=1)
     for i, row in enumerate(reader):
         if i == 0:

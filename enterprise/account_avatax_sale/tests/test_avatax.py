@@ -11,6 +11,8 @@ from .mocked_so_response import generate_response
 
 @tagged("-at_install", "post_install")
 class TestSaleAvalara(TestTaxCommonSale, TestAccountAvataxSaleCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         res = super().setUpClass()
@@ -31,7 +33,6 @@ class TestSaleAvalara(TestTaxCommonSale, TestAccountAvataxSaleCommon):
             'name': 'Customers - Payments on account received on orders',
             'account_type': 'liability_current',
             'code': '419100',
-            'reconcile': True,
         })
         cls.env.user.company_id.downpayment_account_id = cls.downpayment_account
 
@@ -195,6 +196,7 @@ class TestSaleAvalara(TestTaxCommonSale, TestAccountAvataxSaleCommon):
 @tagged("-at_install", "post_install")
 class TestAccountAvalaraSalesTaxItemsIntegration(TestAccountAvataxSaleCommon):
     """https://developer.avalara.com/certification/avatax/sales-tax-badge/"""
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -320,6 +322,7 @@ class TestAccountAvalaraSalesTaxItemsIntegration(TestAccountAvataxSaleCommon):
 
         with self._capture_request({'lines': [], 'summary': []}) as capture:
             invoice.action_post()
+            self.env.cr.postcommit.run()
         self.assertTrue(capture.val['json']['createTransactionModel']['commit'])
 
     def test_commit_tax(self):
@@ -329,6 +332,8 @@ class TestAccountAvalaraSalesTaxItemsIntegration(TestAccountAvataxSaleCommon):
             self.sale_order.action_confirm()
             invoice = self.sale_order._create_invoices()
             invoice.action_post()
+            self.env.cr.postcommit.run()
+
         self.assertTrue(capture.val['json']['createTransactionModel']['commit'])
 
     def test_merge_sale_orders(self):

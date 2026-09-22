@@ -2,8 +2,6 @@ import logging
 
 from markupsafe import Markup
 
-import base64
-
 from odoo import api, fields, models, Command
 from odoo.tools.float_utils import float_repr
 from odoo.tools.translate import _
@@ -115,7 +113,7 @@ class AECGenerator(models.TransientModel):
                 "res_id": account_entry.id,
                 "res_field": "l10n_cl_aec_attachment_file",
                 "name": f'AEC_{record_ref}_{move.company_id.vat}_{timestamp}.xml',
-                "datas": base64.b64encode(final_aec.encode('ISO-8859-1', 'replace')),
+                "raw": final_aec.encode('ISO-8859-1', 'replace'),
                 "type": "binary",
             }
         )

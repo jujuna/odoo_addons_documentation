@@ -6,7 +6,7 @@ import dateutil.parser
 import requests
 from werkzeug.urls import url_quote
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.tools.urls import urljoin as url_join
 
 
@@ -18,6 +18,9 @@ class SocialStreamPost(models.Model):
     instagram_post_id = fields.Char('Instagram Post ID', index=True)
     instagram_comments_count = fields.Integer('Instagram Comments')
     instagram_likes_count = fields.Integer('Instagram Likes')
+    instagram_saved_count = fields.Integer('Instagram Saved')
+    instagram_views_count = fields.Integer('Instagram Views')
+
     instagram_post_link = fields.Char('Instagram Post URL')
     instagram_comments_disabled = fields.Boolean('Instagram Comments Disabled', default=False)
 
@@ -50,19 +53,17 @@ class SocialStreamPost(models.Model):
     # COMMENTS / LIKES
     # ========================================================
 
-    def _instagram_comment_add(self, message, object_id, comment_type="comment"):
+    @api.model
+    def _instagram_comment_add(self, account_id, message, object_id, comment_type="comment"):
         """ Publishes a comment on an Instagram stream post or on another comment.
         We specify a 'fields' parameter to retrieve information about the created comment
         and return the data to display a properly formatted comment in the frontend.  """
-
-        self.ensure_one()
-
         comment_endpoint = url_join(
             self.env['social.media']._INSTAGRAM_ENDPOINT,
             '%s/%s' % (object_id, 'replies' if comment_type == 'reply' else 'comments'))
         response = requests.post(comment_endpoint,
             params={
-                'access_token': self.account_id.instagram_access_token,
+                'access_token': account_id._get_instagram_access_token(),
                 'message': message,
                 'fields': 'id,like_count,text,timestamp,username,user',
                 'order': 'reverse'
@@ -86,7 +87,7 @@ class SocialStreamPost(models.Model):
             '/v17.0/%s/comments' % self.instagram_post_id)
 
         params = {
-            'access_token': self.account_id.instagram_access_token,
+            'access_token': self.account_id._get_instagram_access_token(),
             'fields': 'id,like_count,text,timestamp,username,replies{like_count,text,timestamp,username},user',
             'summary': 1,
             'limit': count
@@ -104,7 +105,7 @@ class SocialStreamPost(models.Model):
         self.ensure_one()
         comments_endpoint_url = url_join(self.env['social.media']._INSTAGRAM_ENDPOINT, "/v17.0/%s" % comment_id)
         requests.delete(comments_endpoint_url, data={
-            'access_token': self.account_id.instagram_access_token,
+            'access_token': self.account_id._get_instagram_access_token(),
         })
 
     # ========================================================
@@ -121,6 +122,7 @@ class SocialStreamPost(models.Model):
         else:
             return super()._fetch_matching_post()
 
+    @api.model
     def _instagram_format_comment(self, comment):
         return {
             'id': comment.get('id'),

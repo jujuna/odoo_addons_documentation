@@ -3,7 +3,7 @@
 from collections import defaultdict
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.fields import Command, Domain
 from odoo.tools.misc import groupby as tools_groupby
@@ -36,10 +36,7 @@ class SaleOrderLine(models.Model):
         copy=False,
     )
     unavailable_lot_ids = fields.Many2many(
-        'stock.lot',
-        'unreturned_reserved_serial',
-        compute='_compute_unavailable_lots',
-        store=False,
+        'stock.lot', 'unreturned_reserved_serial', compute='_compute_unavailable_lots', store=False
     )
 
     @api.depends('reserved_lot_ids', 'reservation_begin', 'return_date')
@@ -51,9 +48,17 @@ class SaleOrderLine(models.Model):
         self.available_reserved_lots = True
         if not self._are_rental_pickings_enabled():
             return
-        lines_to_check = self.filtered(lambda l: l.is_rental and l.reserved_lot_ids and l.product_template_id.tracking == 'serial')
+        lines_to_check = self.filtered(
+            lambda sol: (
+                sol.is_rental
+                and sol.reserved_lot_ids
+                and sol.product_template_id.tracking == 'serial'
+            )
+        )
 
-        partner_location_ids = self.env['stock.location'].search([('usage', 'in', ['customer', 'supplier'])])
+        partner_location_ids = self.env['stock.location'].search([
+            ('usage', 'in', ['customer', 'supplier'])
+        ])
 
         for line in lines_to_check:
             company_id = line.order_id.company_id.id
@@ -63,19 +68,25 @@ class SaleOrderLine(models.Model):
                 ('lot_id', 'in', line.reserved_lot_ids.ids),
             ]
             leaving_move_lines_groups = self.env['stock.move.line']._read_group(
-                Domain.AND([domain, [
-                            ('location_usage', '=', 'internal'),
-                            ('location_dest_id', 'child_of', partner_location_ids.ids),
-                        ]]),
+                Domain.AND([
+                    domain,
+                    [
+                        ('location_usage', '=', 'internal'),
+                        ('location_dest_id', 'child_of', partner_location_ids.ids),
+                    ],
+                ]),
                 groupby=['lot_id'],
                 aggregates=['id:recordset'],
             )
             leaving_move_by_lot = {g[0].id: g[1] for g in leaving_move_lines_groups}
             incoming_move_lines_groups = self.env['stock.move.line']._read_group(
-                Domain.AND([domain, [
-                            ('location_id', 'child_of', partner_location_ids.ids),
-                            ('location_dest_usage', '=', 'internal'),
-                        ]]),
+                Domain.AND([
+                    domain,
+                    [
+                        ('location_id', 'child_of', partner_location_ids.ids),
+                        ('location_dest_usage', '=', 'internal'),
+                    ],
+                ]),
                 groupby=['lot_id'],
                 aggregates=['id:recordset'],
             )
@@ -84,40 +95,59 @@ class SaleOrderLine(models.Model):
                 lot_id = lot.ids[0]
                 if lot_id in line.move_ids.lot_ids.ids:
                     continue
-                in_stock = bool(sum(
-                    lot.quant_ids.filtered(
-                        lambda q: q.location_id.usage in ['internal', 'transit']
-                            and q.location_id not in partner_location_ids.child_internal_location_ids
-                            and q.company_id.id == company_id).mapped('quantity')
-                    ))
+                in_stock = bool(
+                    sum(
+                        lot.quant_ids.filtered(
+                            lambda q: (
+                                q.location_id.usage in ['internal', 'transit']
+                                and q.location_id
+                                not in partner_location_ids.child_internal_location_ids
+                                and q.company_id.id == company_id
+                            )
+                        ).mapped('quantity')
+                    )
+                )
                 if in_stock:
                     leaving_move_line = leaving_move_by_lot.get(lot_id, False)
-                    leaving = bool(leaving_move_line and (
-                        leaving_move_line.move_id.date_deadline <= line.return_date
-                        and not (
-                            # will return in time from an other renting
-                            leaving_move_line.move_id.sale_line_id.return_date
-                            and leaving_move_line.move_id.sale_line_id.return_date <= line.reservation_begin
-                        ))
+                    leaving = bool(
+                        leaving_move_line
+                        and (
+                            leaving_move_line.move_id.date_deadline <= line.return_date
+                            and not (
+                                # will return in time from an other renting
+                                leaving_move_line.move_id.sale_line_id.return_date
+                                and leaving_move_line.move_id.sale_line_id.return_date
+                                <= line.reservation_begin
+                            )
+                        )
                     )
                     in_stock = not leaving
                 else:
                     incoming_move_line = incoming_move_by_lot.get(lot_id, False)
-                    incoming = bool(incoming_move_line and incoming_move_line.move_id.date_deadline <= line.reservation_begin)
+                    incoming = bool(
+                        incoming_move_line
+                        and incoming_move_line.move_id.date_deadline <= line.reservation_begin
+                    )
                     in_stock = incoming
                 if not in_stock:
                     line.available_reserved_lots = False
                     break
 
     def _partition_so_lines_by_rental_period(self):
-        """ Return a partition of sale.order.line based on (from_date, to_date, warehouse_id)
-        """
+        """Return a partition of sale.order.line based on (from_date, to_date, warehouse_id)."""
         now = fields.Datetime.now()
         lines_grouping_key = {
             line.id: (line.reservation_begin, line.return_date, line.order_id.warehouse_id.id)
             for line in self
         }
-        keyfunc = lambda line_id: (max(lines_grouping_key[line_id][0], now), lines_grouping_key[line_id][1], lines_grouping_key[line_id][2])
+
+        def keyfunc(line_id):
+            return (
+                max(lines_grouping_key[line_id][0], now),
+                lines_grouping_key[line_id][1],
+                lines_grouping_key[line_id][2],
+            )
+
         return tools_groupby(self._ids, key=keyfunc)
 
     @api.depends('reservation_begin', 'return_date', 'product_id')
@@ -125,7 +155,7 @@ class SaleOrderLine(models.Model):
         non_rental = self.filtered(lambda sol: not sol.is_rental)
         super(SaleOrderLine, non_rental)._compute_qty_at_date()
         rented_product_lines = (self - non_rental).filtered(
-            lambda l: l.product_id and l.product_id.is_storable
+            lambda sol: sol.product_id and sol.product_id.is_storable
         )
         line_default_values = {
             'virtual_available_at_date': 0.0,
@@ -134,22 +164,24 @@ class SaleOrderLine(models.Model):
             'free_qty_today': 0.0,
             'qty_available_today': False,
         }
-        for (from_date, to_date, warehouse_id), line_ids in rented_product_lines._partition_so_lines_by_rental_period():
+        for (
+            from_date,
+            to_date,
+            warehouse_id,
+        ), line_ids in rented_product_lines._partition_so_lines_by_rental_period():
             lines = self.env['sale.order.line'].browse(line_ids)
             for line in lines:
                 if from_date <= fields.Datetime.now():
                     rentable_qty = line.product_id.with_context(
-                        from_date=from_date,
-                        to_date=to_date,
-                        warehouse_id=warehouse_id).qty_available
+                        from_date=from_date, to_date=to_date, warehouse_id=warehouse_id
+                    ).qty_available
                 else:
-                    # For performance reason it is not reasonable to find the minimal forecasted quantity
-                    # during the rental period so that we fallback on the forecasted quantity at the
-                    # first day of the rental period.
+                    # For performance reason it is not reasonable to find the minimal forecasted
+                    # quantity during the rental period so that we fallback on the forecasted
+                    # quantity at the first day of the rental period.
                     rentable_qty = line.product_id.with_context(
-                        from_date=False,
-                        to_date=from_date,
-                        warehouse_id=warehouse_id).virtual_available
+                        from_date=False, to_date=from_date, warehouse_id=warehouse_id
+                    ).virtual_available
                     # The rented_qty_during_period can overlap with planned
                     # incoming/outgoing moves taken into account by the virtual_available qty
                     rentable_qty += line.product_id._get_virtual_unavailable_qty_in_rent(
@@ -158,15 +190,19 @@ class SaleOrderLine(models.Model):
                         warehouse_id=line.order_id.warehouse_id.id,
                     )
                 rented_qty_during_period = line.product_id._get_unavailable_qty(
-                    from_date, to_date,
+                    from_date,
+                    to_date,
                     ignored_soline_id=line and line.id,
                     warehouse_id=line.order_id.warehouse_id.id,
                 )
                 virtual_available_at_date = max(rentable_qty - rented_qty_during_period, 0)
-                line.update(dict(line_default_values,
-                    virtual_available_at_date=virtual_available_at_date,
-                    scheduled_date=from_date,
-                    free_qty_today=virtual_available_at_date)
+                line.update(
+                    dict(
+                        line_default_values,
+                        virtual_available_at_date=virtual_available_at_date,
+                        scheduled_date=from_date,
+                        free_qty_today=virtual_available_at_date,
+                    )
                 )
         ((self - non_rental) - rented_product_lines).update(line_default_values)
 
@@ -178,7 +214,7 @@ class SaleOrderLine(models.Model):
         rental_lines.qty_delivered_method = 'manual'
 
     def _read_group_expand_reserved_lot_ids(self, lots, domain):
-        domain = Domain.AND([domain, Domain('product_id.tracking', '!=', 'none')])
+        domain = Domain.AND([domain, Domain('product_id.tracking', '!=', False)])
         products = self.env['sale.order.line'].search_fetch(domain, ['product_id']).product_id
         return lots + self.env['stock.lot']._get_available_lots(products)
 
@@ -187,17 +223,23 @@ class SaleOrderLine(models.Model):
 
         When qty_delivered or qty_returned are changed (and/or pickedup_lot_ids/returned_lot_ids),
         we need to move those quants to make sure they aren't seen as available in the stock.
-        For quantities, the quantity is requested in the warehouse (self.order_id.warehouse_id) through stock move generation.
-        For serial numbers(lots), lots are found one by one and then a stock move is generated based on the quant location itself.
+        For quantities, the quantity is requested in the warehouse (self.order_id.warehouse_id)
+        through stock move generation.
+        For serial numbers(lots), lots are found one by one and then a stock move is generated based
+        on the quant location itself.
 
-        The destination location is the independent internal location of the company dedicated to stock in rental, to still count
-        in inventory valuation and company assets.
+        The destination location is the independent internal location of the company dedicated to
+        stock in rental, to still count in inventory valuation and company assets.
 
-        When quantity/lots are decreased/removed, we decrease the quantity in the stock moves made by previous corresponding write call.
+        When quantity/lots are decreased/removed, we decrease the quantity in the stock moves made
+        by previous corresponding write call.
         """
         if (
-            not any(key in vals for key in ['qty_delivered', 'pickedup_lot_ids', 'qty_returned', 'returned_lot_ids'])
-            or self._are_rental_pickings_enabled()
+            not any(
+                key in vals
+                for key in ['qty_delivered', 'pickedup_lot_ids', 'qty_returned', 'returned_lot_ids']
+            )
+            or (self._are_rental_pickings_enabled() and not self.env.context.get('rental_direct_stock_move'))
         ):
             # If nothing to catch for rental: usual write behavior
             return super().write(vals)
@@ -205,14 +247,20 @@ class SaleOrderLine(models.Model):
         # TODO add context for disabling stock moves in write ?
         old_vals = dict()
         movable_confirmed_rental_lines = self.filtered(
-            lambda sol: sol.is_rental
-                and sol.state == 'sale'
-                and sol.product_id.type == "consu")
+            lambda sol: sol.is_rental and sol.state == 'sale' and sol.product_id.type == "consu"
+        )
         for sol in movable_confirmed_rental_lines:
-            old_vals[sol.id] = (sol.pickedup_lot_ids, sol.returned_lot_ids) if sol.product_id.tracking == 'serial' else (sol.qty_delivered, sol.qty_returned)
+            old_vals[sol.id] = (
+                (sol.pickedup_lot_ids, sol.returned_lot_ids)
+                if sol.product_id.tracking == 'serial'
+                else (sol.qty_delivered, sol.qty_returned)
+            )
             if vals.get('pickedup_lot_ids', False) and vals['pickedup_lot_ids'][0][0] == 6:
                 pickedup_lot_ids = vals['pickedup_lot_ids'][0][2]
-                if sol.product_uom_qty == len(pickedup_lot_ids) and pickedup_lot_ids != sol.reserved_lot_ids.ids:
+                if (
+                    sol.product_uom_qty == len(pickedup_lot_ids)
+                    and pickedup_lot_ids != sol.reserved_lot_ids.ids
+                ):
                     """ When setting the pickedup_lots:
                     If the total reserved quantity is picked_up we need to unreserve
                     the reserved_lots not picked to ensure the consistency of rental reservations.
@@ -230,7 +278,9 @@ class SaleOrderLine(models.Model):
         if not lines:
             return
 
-        lines.mapped('company_id').filtered(lambda company: not company.rental_loc_id)._create_rental_location()
+        lines.mapped('company_id').filtered(
+            lambda company: not company.rental_loc_id
+        )._create_rental_location()
         # to undo stock moves partially: what if location has changed? :x
         # can we ascertain the warehouse_id.lot_stock_id of a sale.order doesn't change???
 
@@ -238,7 +288,9 @@ class SaleOrderLine(models.Model):
             sol = sol.with_company(sol.company_id)
             rented_location = sol.company_id.rental_loc_id
             stock_location = sol.order_id.warehouse_id.lot_stock_id
-            if sol.product_id.tracking == 'serial' and (vals.get('pickedup_lot_ids', False) or vals.get('returned_lot_ids', False)):
+            if sol.product_id.tracking == 'serial' and (
+                vals.get('pickedup_lot_ids', False) or vals.get('returned_lot_ids', False)
+            ):
                 # for product tracked by serial numbers: move the lots
                 if vals.get('pickedup_lot_ids', False):
                     pickedup_lots = sol.pickedup_lot_ids - old_vals[sol.id][0]
@@ -250,7 +302,9 @@ class SaleOrderLine(models.Model):
                     removed_returned_lots = old_vals[sol.id][1] - sol.returned_lot_ids
                     sol._move_serials(returned_lots, rented_location, stock_location)
                     sol._return_serials(removed_returned_lots, stock_location, rented_location)
-            elif sol.product_id.tracking != 'serial' and any(k in vals for k in ('qty_delivered', 'qty_returned')):
+            elif sol.product_id.tracking != 'serial' and any(
+                k in vals for k in ('qty_delivered', 'qty_returned')
+            ):
                 # for products not tracked: move quantities
                 qty_delivered_change = sol.qty_delivered - old_vals[sol.id][0]
                 qty_returned_change = sol.qty_returned - old_vals[sol.id][1]
@@ -276,7 +330,7 @@ class SaleOrderLine(models.Model):
         rental_stock_move = self.env['stock.move'].create({
             'product_id': self.product_id.id,
             'product_uom_qty': len(lot_ids),
-            'product_uom': self.product_id.uom_id.id,
+            'uom_id': self.product_id.uom_id.id,
             'location_id': location_id.id,
             'location_dest_id': location_dest_id.id,
             'partner_id': self.order_partner_id.id,
@@ -287,12 +341,21 @@ class SaleOrderLine(models.Model):
             lot_quant = self.env['stock.quant']._gather(self.product_id, location_id, lot_id)
             lot_quant = lot_quant.filtered(lambda quant: quant.quantity == 1.0)
             if not lot_quant:
-                raise ValidationError(_("No valid quant has been found in location %(location)s for serial number %(serial_number)s!", location=location_id.name, serial_number=lot_id.name))
+                raise ValidationError(
+                    self.env._(
+                        "No valid quant has been found in location %(location)s for serial number"
+                        " %(serial_number)s!",
+                        location=location_id.name,
+                        serial_number=lot_id.name,
+                    )
+                )
                 # Best fallback strategy??
                 # Make a stock move without specifying quants and lots?
                 # Let the move be created with the erroneous quant???
             # As we are using serial numbers, only one quant is expected
-            ml = self.env['stock.move.line'].create(rental_stock_move._prepare_move_line_vals(reserved_quant=lot_quant))
+            ml = self.env['stock.move.line'].create(
+                rental_stock_move._prepare_move_line_vals(reserved_quant=lot_quant)
+            )
             ml['quantity'] = 1
 
         rental_stock_move.picked = True
@@ -311,7 +374,7 @@ class SaleOrderLine(models.Model):
         rental_stock_move = self.env['stock.move'].search([
             ('sale_line_id', '=', self.id),
             ('location_id', '=', location_id.id),
-            ('location_dest_id', '=', location_dest_id.id)
+            ('location_dest_id', '=', location_dest_id.id),
         ])
         for ml in rental_stock_move.mapped('move_line_ids'):
             # update move lines qties.
@@ -330,7 +393,7 @@ class SaleOrderLine(models.Model):
         rental_stock_move = self.env['stock.move'].create({
             'product_id': self.product_id.id,
             'product_uom_qty': qty,
-            'product_uom': self.product_id.uom_id.id,
+            'uom_id': self.product_id.uom_id.id,
             'location_id': location_id.id,
             'location_dest_id': location_dest_id.id,
             'partner_id': self.order_partner_id.id,
@@ -352,11 +415,14 @@ class SaleOrderLine(models.Model):
         :param stock.location location_dest_id:
         """
         # VFE NOTE: or use stock moves to undo return/pickups???
-        rental_stock_move = self.env['stock.move'].search([
-            ('sale_line_id', '=', self.id),
-            ('location_id', '=', location_id.id),
-            ('location_dest_id', '=', location_dest_id.id)
-        ], order='date desc')
+        rental_stock_move = self.env['stock.move'].search(
+            [
+                ('sale_line_id', '=', self.id),
+                ('location_id', '=', location_id.id),
+                ('location_dest_id', '=', location_dest_id.id),
+            ],
+            order='date desc',
+        )
 
         for ml in rental_stock_move.mapped('move_line_ids'):
             # update move lines qties.
@@ -390,26 +456,30 @@ class SaleOrderLine(models.Model):
             return result
 
         # Check for stock quantity consistency, and warn in case there is not enough stock.
-        stock_quants = dict(self.env['stock.quant']._read_group(
-            Domain([
-                ('product_id', 'in', storable_products.ids),
-                ('location_id.usage', '=', 'internal'),
-            ]),
-            groupby=['product_id'],
-            aggregates=['quantity:sum'],
-        ))
-        reserved_quants = dict(self.env['sale.order.line']._read_group(
-            Domain([
-                ('product_id', 'in', storable_products.ids),
-                ('is_rental', '=', True),
-                ('state', '=', 'sale'),
-                # Filter the SOLs that intersect with the current SOL
-                ('start_date', '<=', self.return_date),
-                ('return_date', '>=', self.start_date),
-            ]),
-            groupby=['product_id'],
-            aggregates=['product_uom_qty:sum'],
-        ))
+        stock_quants = dict(
+            self.env['stock.quant']._read_group(
+                Domain([
+                    ('product_id', 'in', storable_products.ids),
+                    ('location_id.usage', '=', 'internal'),
+                ]),
+                groupby=['product_id'],
+                aggregates=['quantity:sum'],
+            )
+        )
+        reserved_quants = dict(
+            self.env['sale.order.line']._read_group(
+                Domain([
+                    ('product_id', 'in', storable_products.ids),
+                    ('is_rental', '=', True),
+                    ('state', '=', 'sale'),
+                    # Filter the SOLs that intersect with the current SOL
+                    ('start_date', '<=', self.return_date),
+                    ('return_date', '>=', self.start_date),
+                ]),
+                groupby=['product_id'],
+                aggregates=['product_uom_qty:sum'],
+            )
+        )
         for product in stock_quants.keys() | reserved_quants.keys():
             if stock_quants.get(product, 0) < reserved_quants.get(product, 0):
                 result['notifications'].append({
@@ -429,17 +499,22 @@ class SaleOrderLine(models.Model):
 
         # Check for lot consistency, and warn if lots are reserved on multiple SOLs at the same time
         order_reserved_lots = order_lines.reserved_lot_ids
-        lots_reserved_in_different_order = self.env['sale.order.line'].search_fetch(
-            Domain([
-                ('reserved_lot_ids', 'in', order_reserved_lots.ids),
-                ('id', 'not in', order_lines.ids),
-                ('is_rental', '=', True),
-                # Filter the SOLs that intersect with the current SOL
-                ('start_date', '<=', self.return_date),
-                ('return_date', '>=', self.start_date),
-            ]),
-            ['reserved_lot_ids'],
-        ).reserved_lot_ids & order_reserved_lots
+        lots_reserved_in_different_order = (
+            self.env['sale.order.line']
+            .search_fetch(
+                Domain([
+                    ('reserved_lot_ids', 'in', order_reserved_lots.ids),
+                    ('id', 'not in', order_lines.ids),
+                    ('is_rental', '=', True),
+                    # Filter the SOLs that intersect with the current SOL
+                    ('start_date', '<=', self.return_date),
+                    ('return_date', '>=', self.start_date),
+                ]),
+                ['reserved_lot_ids'],
+            )
+            .reserved_lot_ids
+            & order_reserved_lots
+        )
         if lots_reserved_in_different_order:
             result['notifications'].append({
                 'type': 'warning',
@@ -478,12 +553,17 @@ class SaleOrderLine(models.Model):
         for line in self.filtered('is_rental'):
             moves = line.move_ids.filtered(lambda m: m.state != 'cancel')
             if moves and moves.mapped('product_id') != line.product_id:
-                raise ValidationError(_("You cannot change the product of lines linked to stock moves."))
+                raise ValidationError(
+                    line.env._("You cannot change the product of lines linked to stock moves.")
+                )
 
     def _create_procurements(self, product_qty, procurement_uom, values):
-        """ Change the destination for rental procurement. """
+        """Change the destination for rental procurement."""
         if self.is_rental and self._are_rental_pickings_enabled():
-            values['route_ids'] = values.get('route_ids') or self.env.ref('sale_stock_renting.route_rental')
+            values['route_ids'] = values.get('route_ids', self.env['stock.route']) | (
+                self.env.ref('sale_stock_renting.route_rental', raise_if_not_found=False)
+                or self.env['stock.route']
+            )
             delivery_values = {
                 **values,
                 'date_planned': self.order_id.rental_start_date,
@@ -496,27 +576,48 @@ class SaleOrderLine(models.Model):
             }
             return [
                 self.env['stock.rule'].Procurement(
-                    self.product_id, product_qty, procurement_uom, self.order_id.company_id.rental_loc_id,
-                    self.product_id.display_name, self.order_id.name, self.order_id.company_id, delivery_values),
+                    self.product_id,
+                    product_qty,
+                    procurement_uom,
+                    self.order_id.company_id.rental_loc_id,
+                    self.product_id.display_name,
+                    self.order_id.name,
+                    self.order_id.company_id,
+                    delivery_values,
+                ),
                 self.env['stock.rule'].Procurement(
-                    self.product_id, product_qty, procurement_uom, self.order_id.warehouse_id.lot_stock_id,
-                    self.product_id.display_name, self.order_id.name, self.order_id.company_id, return_values)]
+                    self.product_id,
+                    product_qty,
+                    procurement_uom,
+                    self.order_id.warehouse_id.lot_stock_id,
+                    self.product_id.display_name,
+                    self.order_id.name,
+                    self.order_id.company_id,
+                    return_values,
+                ),
+            ]
         return super()._create_procurements(product_qty, procurement_uom, values)
 
     def _action_launch_stock_rule(self, **kwargs):
-        """ If the rental picking setting is deactivated:
+        """If the rental picking setting is deactivated:
         Disable stock moves for rental order lines.
         Stock moves for rental orders are created on pickup/return.
         The rental reservations are not propagated in the stock
         until the effective pickup or returns.
 
         If the rental picking setting is activated:
-        Process all lines at the same time. """
+        Process all lines at the same time."""
         if not self or self._are_rental_pickings_enabled():
             super()._action_launch_stock_rule(**kwargs)
-            returns = self.move_ids.filtered(lambda m: m.location_id == self.company_id.rental_loc_id)
-            picks = self.move_ids.filtered(lambda m: m.location_id == self.warehouse_id.lot_stock_id)
-            moves_by_order_line = defaultdict(lambda: {'picks': self.env['stock.move'], 'returns': self.env['stock.move']})
+            returns = self.move_ids.filtered(
+                lambda m: m.location_id == self.company_id.rental_loc_id
+            )
+            picks = self.move_ids.filtered(
+                lambda m: m.location_id == self.warehouse_id.lot_stock_id
+            )
+            moves_by_order_line = defaultdict(
+                lambda: {'picks': self.env['stock.move'], 'returns': self.env['stock.move']}
+            )
             for move in picks:
                 if move.state in ('done', 'cancel'):
                     continue
@@ -529,9 +630,9 @@ class SaleOrderLine(models.Model):
             for moves in moves_by_order_line.values():
                 moves['returns'].write({
                     'move_orig_ids': [Command.link(pick.id) for pick in moves['picks']],
-                    'procure_method': 'make_to_order'
+                    'procure_method': 'make_to_order',
                 })
-                moves['returns'].picking_id.return_id = moves['picks'].picking_id
+                moves['returns'].picking_id.return_id = moves['picks'].picking_id[:1]
             returns._recompute_state()
         else:
             other_lines = self.filtered(lambda sol: not sol.is_rental)
@@ -540,10 +641,16 @@ class SaleOrderLine(models.Model):
     def _get_outgoing_incoming_moves(self, strict=True):
         outgoing_moves, incoming_moves = super()._get_outgoing_incoming_moves(strict)
         if self.is_rental and self._are_rental_pickings_enabled():
-            for move in self.move_ids.filtered(lambda r: r.state != 'cancel' and r.location_dest_usage != 'inventory' and self.product_id == r.product_id):
-                if (
-                        strict and move.location_dest_id == self.company_id.rental_loc_id or
-                        not strict and move.location_id._child_of(self.order_id.warehouse_id.lot_stock_id)
+            for move in self.move_ids.filtered(
+                lambda r: (
+                    r.state != 'cancel'
+                    and r.location_dest_usage != 'inventory'
+                    and self.product_id == r.product_id
+                )
+            ):
+                if (strict and move.location_dest_id == self.company_id.rental_loc_id) or (
+                    not strict
+                    and move.location_id._child_of(self.order_id.warehouse_id.lot_stock_id)
                 ):
                     outgoing_moves |= move
                 elif strict and move.location_id == self.company_id.rental_loc_id:
@@ -560,11 +667,13 @@ class SaleOrderLine(models.Model):
         for line in self:
             if line.is_rental and line.product_id.type == 'consu':
                 qty = 0.0
-                outgoing_moves, dummy = line._get_outgoing_incoming_moves()
+                outgoing_moves, _dummy = line._get_outgoing_incoming_moves()
                 for move in outgoing_moves:
                     if move.state != 'done':
                         continue
-                    qty += move.product_uom._compute_quantity(move.quantity, line.product_uom_id, rounding_method='HALF-UP')
+                    qty += move.uom_id._compute_quantity(
+                        move.quantity, line.product_uom_id, rounding_method='HALF-UP'
+                    )
                 delivered_qties[line] = qty
         return delivered_qties
 
@@ -572,7 +681,9 @@ class SaleOrderLine(models.Model):
     def _compute_unavailable_lots(self):
         """Unavailable lots = reserved_lots U pickedup_lots - returned_lots."""
         for line in self:
-            line.unavailable_lot_ids = (line.reserved_lot_ids | line.pickedup_lot_ids) - line.returned_lot_ids
+            line.unavailable_lot_ids = (
+                line.reserved_lot_ids | line.pickedup_lot_ids
+            ) - line.returned_lot_ids
 
     @api.depends('start_date', 'is_rental')
     def _compute_reservation_begin(self):
@@ -583,7 +694,7 @@ class SaleOrderLine(models.Model):
         (self - lines).reservation_begin = None
 
     def _get_rented_quantities(self, mandatory_dates):
-        """ Return the quantities that are picked up (positive value) or returned (negative value),
+        """Return the quantities that are picked up (positive value) or returned (negative value),
         keyed by their pickup/return dates.
 
         This method also returns a sorted list of dates of interest, which is the union of the
@@ -618,7 +729,9 @@ class SaleOrderLine(models.Model):
 
     @api.model
     def _are_rental_pickings_enabled(self):
-        return self.env['res.groups']._is_feature_enabled('sale_stock_renting.group_rental_stock_picking')
+        return self.env['res.groups']._is_feature_enabled(
+            'sale_stock_renting.group_rental_stock_picking'
+        )
 
     def _prepare_procurement_values(self):
         values = super()._prepare_procurement_values()

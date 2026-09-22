@@ -21,8 +21,14 @@ class Website(models.Model):
             })
         return cta_data
 
+    def _get_search_scopes(self):
+        return {
+            **super()._get_search_scopes(),
+            'appointments': {'label': self.env._("Appointments"), 'url': '/appointment'},
+        }
+
     def _search_get_details(self, search_type, order, options):
         result = super()._search_get_details(search_type, order, options)
-        if search_type in ['all', 'appointments']:
+        if search_type in ['all', 'appointments', 'appointment_type']:
             result.append(self.env['appointment.type']._search_get_detail(self, order, options))
         return result

@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import csv
 import io
 
@@ -10,6 +9,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.tools import BinaryBytes
 
 
 class L10nUsW2(models.Model):
@@ -22,7 +22,7 @@ class L10nUsW2(models.Model):
             raise UserError(_('You must be logged in a US company to use this feature'))
         return super().default_get(fields)
 
-    date_start = fields.Date("Start Date", default=lambda s: fields.Date.today() + relativedelta(day=1, month=1))
+    date_start = fields.Date("Start Date", default=lambda s: fields.Date.context_today(s) + relativedelta(day=1, month=1))
     date_end = fields.Date("End Date", compute='_compute_date_end', store=True, readonly=False)
     company_id = fields.Many2one(
         'res.company',
@@ -37,7 +37,6 @@ class L10nUsW2(models.Model):
         readonly=False,
         domain="[('id', 'in', allowed_payslip_ids)]")
     csv_file = fields.Binary("CSV file", readonly=True)
-    csv_filename = fields.Char()
 
     @api.depends('date_start')
     def _compute_date_end(self):
@@ -191,7 +190,7 @@ class L10nUsW2(models.Model):
                 self.company_id.zip or "",
                 self.company_id.phone or "",
                 self.company_id.email or "",
-                version.ssnid or "",
+                employee.l10n_us_ssn or "",
                 employee.name or "",
                 "",
                 employee.name or "",
@@ -233,7 +232,7 @@ class L10nUsW2(models.Model):
                 "",
                 "",
                 version.address_id.state_id.code or "",
-                self.company_id.company_registry or "",
+                self.company_id.l10n_us_state_identifier or "",
                 abs(line_values['TAXABLE']['sum']['total']),
                 self._get_box17_state_income_tax(line_values),
                 self._get_box18_local_wage(version.address_id.state_id.code, line_values),
@@ -245,5 +244,4 @@ class L10nUsW2(models.Model):
                 "",
             ])
 
-        self.csv_file = base64.b64encode(output.getvalue().encode())
-        self.csv_filename = f"form_w2_{self.date_end.year}.csv"
+        self.csv_file = BinaryBytes(output.getvalue().encode(), filename=f"form_w2_{(self.date_end or date.today()).year}.csv")

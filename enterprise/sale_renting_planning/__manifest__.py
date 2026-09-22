@@ -10,7 +10,13 @@
         'views/planning_slot_views.xml',
         'views/sale_order_views.xml',
     ],
+    'demo': ['data/demo.xml'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'assets': {
+        'web.assets_backend': [
+            'sale_renting_planning/static/src/**/*',
+        ],
+    },
     'uninstall_hook': 'uninstall_hook',
 }

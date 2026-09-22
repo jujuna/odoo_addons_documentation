@@ -2,13 +2,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from lxml import etree
 from lxml.builder import E
+from collections import defaultdict
 import functools
 import json
 import uuid
 import random
 
 from odoo import api, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from ..controllers.keyed_xml_differ import KeyedXmlDiffer
 from odoo.tools.template_inheritance import apply_inheritance_specs
 
@@ -64,14 +65,21 @@ class IrUiView(models.Model):
         'web.internal_layout',
         'web.basic_layout',
         'web.minimal_layout',
-        'web.external_layout_striped',
-        'web.external_layout_boxed',
-        'web.external_layout_bold',
         'web.external_layout_standard',
         'web.external_layout_folder',
         'web.external_layout_wave',
         'web.external_layout_bubble',
+        'web.external_layout_center',
+        'web.external_layout_dual',
+        'web.external_layout_lines',
+        'web.external_layout_compact',
     ]
+
+    def create_studio_model_data(self, name):
+        model_data = super().create_studio_model_data(name)
+        if model_data and not self.key:
+            self.key = model_data.complete_name
+        return model_data
 
     def _get_closest_primary_view(self):
         self.ensure_one()
@@ -119,7 +127,7 @@ class IrUiView(models.Model):
             group_definitions = self.env['res.groups']._get_group_definitions()
 
             node_groups = {}
-            set_invisible_nodes = set()
+            set_invisible_nodes = dict()
 
             for node in tree.xpath('//*[@groups]'):
                 if node.get('groups'):
@@ -136,7 +144,7 @@ class IrUiView(models.Model):
                 if not has_access(node.attrib.pop('__groups_key__')):
                     # Make invisible nodes for which the user is not part of the group,
                     # and remove the `groups` from the node before calling super so the nodes are not deleted.
-                    set_invisible_nodes.add(node)
+                    set_invisible_nodes[node] = node.get("invisible") or node.get("column_invisible") or "False"
 
                 if node.tag == 'field' and 'model_groups' in node.attrib and not has_access(node.attrib.pop('model_groups')):
                     # fields with `groups` in the Python model cannot be read at all by users not part of the group.
@@ -150,13 +158,14 @@ class IrUiView(models.Model):
                 parent = node.getparent()
                 return parent is not None and parent.tag == "list"
 
-            for node in set_invisible_nodes:
+            for node, invisible_value in set_invisible_nodes.items():
                 if is_in_list(node):
                     column_invisible = 'True'
                     node.set('column_invisible', column_invisible)
                 else:
                     invisible = 'True'
                     node.set('invisible', invisible)
+                node.set('actual_invisible', invisible_value)
 
             model = tree.get('model_access_rights')
             res = super()._postprocess_access_rights(tree)
@@ -260,17 +269,21 @@ class IrUiView(models.Model):
             fields.append(E.field(name='x_studio_currency_id', invisible='1'))
             fields.append(E.field(name='x_studio_value', sum=_("Total")))
         if 'x_studio_tag_ids' in model._fields:
-            fields.append(E.field(name='x_studio_tag_ids', widget='many2many_tags', options="{'color_field': 'x_color'}"))
+            fields.append(E.field(name='x_studio_tag_ids', widget='many2many_tags', options="{'color_field': 'x_color', 'on_tag_click': 'edit_color'}"))
         if 'x_color' in model._fields:
             fields.append(E.field(name='x_color', widget='color_picker'))
-        order = ['id desc']
-        if 'x_studio_sequence' in model._fields:
-            order.append('x_studio_sequence asc')
-        if 'x_studio_priority' in model._fields:
-            order.append('x_studio_priority desc')
-        order = ','.join(reversed(order))
+
         tree_params = {} if not self.env.context.get('list_editable') else {'editable': self.env.context.get('list_editable')}
-        tree = E.list(**tree_params, default_order=order)
+        tree = E.list(**tree_params)
+        if self.env[res_model]._order == models.BaseModel._order:
+            order = ['id desc']
+            if 'x_studio_sequence' in model._fields:
+                order.append('x_studio_sequence asc')
+            if 'x_studio_priority' in model._fields:
+                order.append('x_studio_priority desc')
+            order = ','.join(reversed(order))
+            tree.set("default_order", order)
+
         tree.extend(fields)
         arch = etree.tostring(tree, encoding='unicode', pretty_print=True)
 
@@ -317,7 +330,7 @@ class IrUiView(models.Model):
             right_group_content.append(E.field(name='x_studio_currency_id', invisible='1'))
             right_group_content.append(E.field(name='x_studio_value'))
         if 'x_studio_tag_ids' in model._fields:
-            right_group_content.append(E.field(name='x_studio_tag_ids', widget='many2many_tags', options="{'color_field': 'x_color'}"))
+            right_group_content.append(E.field(name='x_studio_tag_ids', widget='many2many_tags', options="{'color_field': 'x_color', 'on_tag_click': 'edit_color'}"))
         if 'x_studio_company_id' in model._fields:
             right_group_content.append(E.field(name='x_studio_company_id', groups='base.group_multi_company', options="{'no_create': True}"))
         if 'x_studio_date' in model._fields:
@@ -367,6 +380,25 @@ class IrUiView(models.Model):
         filters = list()
         groupbys = list()
         fields.append(E.field(name=rec_name))
+        if isinstance(model, self.pool['mail.activity.mixin']):
+            filters.append(E.filter(
+                invisible="1", string=_('My Activities'), name="filter_activities_my",
+                domain="[['activity_user_id', '=', uid]]")
+            )
+            filters.append(E.separator())
+            filters.append(E.filter(
+                invisible="1", string=_('Late Activities'), name='activities_overdue',
+                domain="[('my_activity_date_deadline', '<', 'today')]")
+            )
+            filters.append(E.filter(
+                invisible="1", string=_('Today Activities'), name='activities_today',
+                domain="[('my_activity_date_deadline', '=', 'today')]")
+            )
+            filters.append(E.filter(
+                invisible="1", string=_('Future Activities'), name='activities_upcoming_all',
+                domain="[('my_activity_date_deadline', '>', 'today')]")
+            )
+            filters.append(E.separator())
         if 'x_studio_partner_id' in model._fields:
             fields.append(E.field(name='x_studio_partner_id', operator='child_of'))
             groupbys.append(E.filter(name='groupby_x_partner', string=_('Partner'), context="{'group_by': 'x_studio_partner_id'}", domain="[]"))
@@ -498,7 +530,7 @@ class IrUiView(models.Model):
             img = E.field({
                 'class': 'ms-1',
                 'name': 'x_studio_user_id',
-                'widget': 'kanban.many2one_avatar_user',
+                'widget': 'card.many2one_avatar_user',
             })
             bottom_right_div.append(img)
         if 'x_studio_value' and 'x_studio_currency_id' in model._fields:
@@ -525,8 +557,10 @@ class IrUiView(models.Model):
             E.field({'widget': 'kanban_color_picker', 'name': 'x_color'})
         ])
         templates = E.templates(kanban_menu, kanban_card)
-        order = 'x_studio_priority desc,x_studio_sequence asc,id desc' if 'x_studio_sequence' in model._fields else 'x_studio_priority desc,id desc'
-        kanban = E.kanban(default_group_by='x_studio_stage_id', default_order=order, highlight_color="x_color")
+        kanban = E.kanban(default_group_by='x_studio_stage_id', highlight_color="x_color")
+        if self.env[res_model]._order == models.BaseModel._order:
+            order = 'x_studio_priority desc,x_studio_sequence asc,id desc' if 'x_studio_sequence' in model._fields else 'x_studio_priority desc,id desc'
+            kanban.set("default_order", order)
         kanban.extend(pre_fields)
         if 'x_studio_value' in model._fields:
             progressbar = E.progressbar(field='x_studio_kanban_state', colors='{"normal": "200", "done": "success", "blocked": "danger"}', sum_field='x_studio_value')
@@ -542,10 +576,6 @@ class IrUiView(models.Model):
             'arch': arch,
             'name': "Default %s view for %s" % ('kanban', res_model),
         })
-
-    # Returns "true" if the view_id is the id of the studio view.
-    def _is_studio_view(self):
-        return self.xml_id.startswith('studio_customization')
 
     # Based on inherit_branding of ir_ui_view
     # This will add recursively the groups ids on the spec node.
@@ -577,6 +607,17 @@ class IrUiView(models.Model):
             # Propogate group info for all children
             self._set_groups_info(spec, node.get('studio-view-group-ids'))
 
+    def _inline_kanban_card(self, source):
+        # The client edits the postprocessed arch, where the referenced card is inlined,
+        # while inheritance specs are applied before that postprocessing takes place.
+        if source.tag != 'kanban' or not (card_id := source.get('card_id')):
+            return
+
+        card_arch = self.browse(int(card_id))._get_combined_arch()
+        source.append(card_arch)
+        # Prevent the regular postprocessing from appending the unmodified card again.
+        source.attrib.pop('card_id')
+
     # Used for studio views only.
     # Apply spec by spec studio view.
     def _apply_studio_specs(self, source, specs_tree):
@@ -598,12 +639,16 @@ class IrUiView(models.Model):
 
     @api.model
     def apply_inheritance_specs(self, source, specs_tree, pre_locate=None):
+        is_studio_view = self.key and self.key.startswith('studio_customization')
+        if self.env.context.get('studio') or is_studio_view:
+            self._inline_kanban_card(source)
+
         # Add branding for groups if studio mode is on
         if self.env.context.get('studio'):
             self._groups_branding(specs_tree)
 
         # If this is studio view, we want to apply it spec by spec
-        if self and self._is_studio_view():
+        if is_studio_view:
             return self._apply_studio_specs(source, specs_tree)
         else:
             # Remove branding added by '_groups_branding' before locating a node
@@ -637,10 +682,15 @@ class IrUiView(models.Model):
         :return: Returns the normalized studio arch
         """
         old_tree = etree.fromstring(base_arch)
+        self._inline_kanban_card(old_tree)
         KeyedXmlDiffer.assign_node_ids_for_diff(old_tree)
         old_str = etree.tostring(old_tree)
 
-        new_tree = apply_inheritance_specs(old_tree, etree.fromstring(arch_to_normalize))
+        try:
+            new_tree = apply_inheritance_specs(old_tree, etree.fromstring(arch_to_normalize))
+        except ValueError as e:
+            # Convert so edit_view() can fall back gracefully instead of crashing.
+            raise ValidationError(str(e)) from e
 
         # Assign names to some node added to the tree, if they don't have one
         def on_new_node(node):
@@ -657,6 +707,29 @@ class IrUiView(models.Model):
             return ("field", node.get("name")) if node.tag == "field" else None
 
         return KeyedXmlDiffer(on_new_node=on_new_node, is_subtree=is_subtree, get_moving_candidate_key=get_moving_candidate_key).diff_xpath(old_str, etree.tostring(new_tree), flat=True)
+
+    @api.model
+    def _prepare_arch_for_diff(self, main_arch, last_arch, diff_attribute=None):
+        if isinstance(main_arch, str):
+            main_arch = etree.fromstring(main_arch)
+        KeyedXmlDiffer.assign_node_ids_for_diff(main_arch, diff_attribute)
+        if last_arch:
+            if isinstance(last_arch, str):
+                last_arch = etree.fromstring(last_arch)
+            self.apply_inheritance_specs(main_arch, last_arch)
+        return main_arch
+
+    def _get_qweb_xpath_diff(self, origin, new_arch):
+        def is_subtree(node):
+            attribs = node.attrib
+            return any(att in attribs for att in ("t-set", "t-call", "t-name", "t-field"))
+
+        differ = KeyedXmlDiffer(
+            ignore_attributes=["ws-view-id", "ws-call-key", "ws-call-group-key", "ws-view-name"],
+            is_subtree=is_subtree,
+            xpath_with_meta=True
+        )
+        return differ.diff_xpath(origin, new_arch, flat=True)
 
     def copy_qweb_template(self):
         new = self.copy()
@@ -712,9 +785,16 @@ class IrUiView(models.Model):
             'arch_base': etree.tostring(arch_tree, encoding='unicode'),
         })
 
-        fields_to_ignore = (field for field in self._fields if field != 'arch_base')
+        field = self._fields['arch_db']
+        term_translations = defaultdict(dict)
         for view in combined_views - self:
-            view.copy_translations(new, fields_to_ignore)
+            translations = view._get_stored_translations('arch_db')
+            if not translations:
+                continue
+            for lang, src2term in translations.extract_term_translations(self.env, field, 'en_US').items():
+                term_translations[lang].update(src2term)
+        if term_translations:
+            new.update_field_translations('arch_db', term_translations, source_lang='en_US')
 
         return new
 
@@ -730,7 +810,7 @@ class IrUiView(models.Model):
     def _contains_branded(self, node):
         if not self.env.context.get("studio"):
             return super()._contains_branded(node)
-        if node.tag == "t" and ('t-raw' in node.attrib or 't-call' in node.attrib):
+        if node.tag == "t" and 't-call' in node.attrib:
             return True
         return any(self.is_node_branded(child) for child in node.iterdescendants())
 
@@ -740,7 +820,7 @@ class IrUiView(models.Model):
                 return True
             if node.tag is etree.ProcessingInstruction and node.target == 'apply-inheritance-specs-node-removal':
                 return True
-            if any([att in ("t-out", "t-raw", "t-esc") and node.get(att) == "0" for att in node.attrib]):
+            if node.get("t-out") == "0":
                 return True
             if node.tag == 't' and "t-set" in node.attrib and len(node) > 0:
                 return True
@@ -749,12 +829,21 @@ class IrUiView(models.Model):
             return False
         return super().is_node_branded(node)
 
-    @api.model
-    def save_embedded_field(self, el):
-        # never save the content of a t-field as the DB's column value
-        if self.env.context.get("studio"):
-            return
-        return super().save_embedded_field(el)
+    def distribute_branding(self, e, *args, **kwargs):
+        self_ = self
+        if self_.env.context.get("inherit_branding") and self_.env.context.get("web_studio.clickable_branding"):
+            [model, field] = [e.get(att) for att in ['data-oe-model', 'data-oe-field']]
+            if model == "ir.ui.view" and field in ("arch_db", "arch"):
+                # Reset parser to have correct sourcelines
+                arch_tree_copy = etree.fromstring(etree.tostring(e, encoding="unicode"))
+                view_id = e.get('data-oe-id')
+                for origin, copy in zip(e.iter(etree.Element), arch_tree_copy.iter(etree.Element)):
+                    if origin.tag == "t":
+                        continue
+                    origin.set("data-ws-main-view-id", view_id)
+                    origin.set("data-ws-main-sourceline", str(copy.sourceline))
+                self_ = self.with_context({**self.env.context, "web_studio.clickable_branding": False})
+        return super(IrUiView, self_).distribute_branding(e, *args, **kwargs)
 
 
 class ResetViewArchWizard(models.TransientModel):
@@ -772,3 +861,6 @@ class ResetViewArchWizard(models.TransientModel):
                     defaults['reset_mode'] = 'other_view'
                     defaults['compare_view_id'] = copy.id
         return defaults
+
+
+IrUiView._apply_studio_specs.__override__ = False  # whitelist super()

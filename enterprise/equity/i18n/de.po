@@ -7,29 +7,29 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2026-01-28 12:29+0000\n"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-17 22:50+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-19/equity/de/"
-">\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
+"equity/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__securities
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__securities
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
 msgid "# Securities"
-msgstr "# Wertpapiere"
+msgstr "Anzahl Wertpapiere"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__shares
 msgid "# Shares"
-msgstr "# Anteile"
+msgstr "Anzahl Anteile"
 
 #. module: equity
 #. odoo-python
@@ -96,11 +96,6 @@ msgid "(object._get_ubo_report_filename())"
 msgstr "(object._get_ubo_report_filename())"
 
 #. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-msgid "/ Security"
-msgstr "/ Wertpapier"
-
-#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid ""
 "<br/>\n"
@@ -115,67 +110,27 @@ msgid "<br/> Nationality:"
 msgstr "<br/> Nationalität:"
 
 #. module: equity
-#: model:mail.template,body_html:equity.equity_shareholder_email_template
-msgid ""
-"<div>\n"
-"                    <p> Hello <t t-out=\"ctx.get('holder_name')\"/>,<br/>\n"
-"                        You will find your latest transaction and valuations "
-"in the following link: <br/>\n"
-"                        <a t-attf-href=\"/my/equity?"
-"access_token={{ctx.get('equity_access_token')}}\" class=\"btn btn-"
-"primary\">Show Equity</a> <br/> <br/>\n"
-"                        Best,\n"
-"                        <t t-if=\"user_id.signature\">\n"
-"                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
-"<div>\n"
-"                    <p> Hallo <t t-out=\"ctx.get('holder_name')\"/>,<br/>\n"
-"                        Ihre aktuellen Transaktionen und Abschätzungen "
-"finden Sie unter folgendem Link: <br/>\n"
-"                        <a t-attf-href=\"/my/equity?"
-"access_token={{ctx.get('equity_access_token')}}\" class=\"btn btn-"
-"primary\">Eigenkapital anzeigen</a> <br/> <br/>\n"
-"                        Mit freundlichen Grüßen\n"
-"                        <t t-if=\"user_id.signature\">\n"
-"                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-
-#. module: equity
 #: model:mail.template,body_html:equity.equity_ubo_form_email_template
 msgid ""
 "<div>\n"
-"                    <p> Hello <t t-out=\"object.name\"/>,<br/>\n"
+"                    <p> Hello,<br/>\n"
 "                        Following our legal obligations to identify clients, "
 "we need to report natural persons who directly or indirectly\n"
 "                        hold or control at least 25% in the capital or "
 "voting rights of <b><t t-out=\"user_id.company_id.name\"/></b>. <br/> <br/>\n"
-"                        Please fill in the UBO request:<br/>\n"
-"                        <a t-attf-href=\"/my/ubo?"
-"{{object._get_equity_url_params()}}\" class=\"btn btn-primary\">Fill UBO</a> "
-"<br/> <br/>\n"
+"                        Please fill in the UBO request through the link "
+"above.<br/> <br/>\n"
 "                        Thank you,\n"
 "                        <t t-if=\"user_id.signature\">\n"
 "                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div>\n"
-"                    <p> Hallo <t t-out=\"object.name\"/>,<br/>\n"
+"                    <p> Guten Tag,<br/>\n"
 "                        gemäß unseren gesetzlichen Verpflichtungen zur "
 "Identifizierung von Kunden sind wir verpflichtet, natürliche Personen zu "
 "melden, die direkt oder indirekt\n"
@@ -183,15 +138,40 @@ msgstr ""
 "von <b><t t-out=\"user_id.company_id.name\"/></b> halten oder kontrollieren. "
 "<br/> <br/>\n"
 "                        Bitte füllen Sie den Antrag zu wirtschaftlich "
-"Berechtigten aus:<br/>\n"
-"                        <a t-attf-href=\"/my/ubo?"
-"{{object._get_equity_url_params()}}\" class=\"btn btn-primary\">Fill UBO</a> "
-"<br/> <br/>\n"
-"                        Vielen Dank!\n"
+"Berechtigten über den obigen Link aus.<br/> <br/>\n"
+"                        Vielen Dank,\n"
+"                       <t t-if=\"user_id.signature\">\n"
+"                            <br/> --<br/>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
+"                       </t>\n"
+"                    </p> \n"
+"               </div>\n"
+"            "
+
+#. module: equity
+#: model:mail.template,body_html:equity.equity_shareholder_email_template
+msgid ""
+"<div>\n"
+"                    <p> Hello,<br/>\n"
+"                        You will find your latest transaction and valuations "
+"in the link above. <br/> <br/>\n"
+"                        Best,\n"
 "                        <t t-if=\"user_id.signature\">\n"
 "                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div>\n"
+"                    <p> Hello,<br/>\n"
+"                        Ihre letzten Transaktionen und Bewertungen finden "
+"Sie unter dem oben angegebenen Link. <br/> <br/>\n"
+"                        Mit freundlichen Grüßen\n"
+"                        <t t-if=\"user_id.signature\">\n"
+"                            <br/>--<br/>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
@@ -200,37 +180,37 @@ msgstr ""
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
 msgid ""
-"<i class=\"fa fa-envelope ms-2 mt-1\" aria-label=\"Email Address\" "
-"title=\"Email Address\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"mail\" aria-label=\"Email "
+"Address\" title=\"Email Address\"/>"
 msgstr ""
-"<i class=\"fa fa-envelope ms-2 mt-1\" aria-label=\"E-Mail-Adresse\" "
-"title=\"E-Mail-Adresse\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"mail\" aria-label=\"E-Mail-"
+"Adresse\" title=\"E-Mail-Adresse\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
 msgid ""
-"<i class=\"fa fa-phone ms-2 mt-1\" aria-label=\"Phone Number\" title=\"Phone "
-"Number\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"phone\" aria-label=\"Phone "
+"Number\" title=\"Phone Number\"/>"
 msgstr ""
-"<i class=\"fa fa-phone ms-2 mt-1\" aria-label=\"Telefonnummer\" "
-"title=\"Telefonnummer\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"phone\" aria-"
+"label=\"Telefonnummer\" title=\"Telefonnummer\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_kanban
 msgid ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"To\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'exercise'\"/>"
 msgstr ""
-"<i title=\"An\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"An\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'exercise'\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_kanban
 msgid ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"To\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'transfer'\"/>"
 msgstr ""
-"<i title=\"An\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"An\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'transfer'\"/>"
 
 #. module: equity
@@ -249,8 +229,8 @@ msgid ""
 "<span> Shareholder<span invisible=\"equity_shareholders_count == 1\">s</"
 "span></span>"
 msgstr ""
-"<span>Anteilseigner<span invisible=\"equity_shareholders_count == 1\"></"
-"span></span>"
+"<span>Anteilseigner<span invisible=\"equity_shareholders_count == 1\"></span>"
+"</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -258,8 +238,8 @@ msgid ""
 "<span> Transaction<span invisible=\"equity_transaction_count == 1\">s</"
 "span></span>"
 msgstr ""
-"<span> Transaktion<span invisible=\"equity_transaction_count == 1\">en</"
-"span></span>"
+"<span> Transaktion<span invisible=\"equity_transaction_count == 1\">en</span>"
+"</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
@@ -327,6 +307,12 @@ msgstr ""
 "oder"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid "A partner cannot have transactions in different currencies."
+msgstr "Ein Partner kann keine Transaktionen in verschiedenen Währungen haben."
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid ""
 "According to laws related to anti money laundering, the notary must identify "
@@ -389,6 +375,11 @@ msgid "Auditor"
 msgstr "Prüfer"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__author_id
+msgid "Author"
+msgstr "Autor"
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 #: model:ir.model.fields,help:equity.field_equity_ubo__auth_rep_role
@@ -428,8 +419,8 @@ msgstr ""
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
-#: model:ir.model.fields,field_description:equity.field_res_partner__ubo_birth_date
-#: model:ir.model.fields,field_description:equity.field_res_users__ubo_birth_date
+#: model:ir.model.fields,field_description:equity.field_res_partner__birth_date
+#: model:ir.model.fields,field_description:equity.field_res_users__birth_date
 msgid "Birth Date"
 msgstr "Geburtsdatum"
 
@@ -445,6 +436,11 @@ msgid "Board Member"
 msgstr "Vorstandsmitglied"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__body_has_template_value
+msgid "Body content is the same as the template"
+msgstr "Der Textinhalt entspricht der Vorlage"
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Buyer"
 msgstr "Käufer"
@@ -453,6 +449,16 @@ msgstr "Käufer"
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__ceo
 msgid "CEO"
 msgstr "Geschäftsführer"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_transaction__can_change_currency
+msgid "Can Change Currency"
+msgstr "Kann Währung ändern"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__can_edit_body
+msgid "Can Edit Body"
+msgstr "Darf Inhalt bearbeiten"
 
 #. module: equity
 #. odoo-python
@@ -509,6 +515,7 @@ msgid "Clear"
 msgstr "Bereinigen"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_cap_table__company_id
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__partner_id
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__partner_id
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__partner_id
@@ -534,6 +541,18 @@ msgid "Company - Cat 3. Executive officer"
 msgstr "Unternehmen – Kat. 3. Führungskraft"
 
 #. module: equity
+#: model:ir.model.fields,help:equity.field_equity_transaction__company_id
+#: model:ir.model.fields,help:equity.field_equity_ubo__company_id
+#: model:ir.model.fields,help:equity.field_equity_valuation__company_id
+msgid "Company to which this record is visible"
+msgstr "Unternehmen, für das dieser Datensatz sichtbar ist"
+
+#. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+msgid "Compose Email"
+msgstr "E-Mail verfassen"
+
+#. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_configuration
 msgid "Configuration"
 msgstr "Konfiguration"
@@ -545,6 +564,11 @@ msgstr "Konfiguration"
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
 msgid "Contact"
 msgstr "Kontakt"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__body
+msgid "Contents"
+msgstr "Inhalte"
 
 #. module: equity
 #. odoo-javascript
@@ -604,6 +628,7 @@ msgid "Create a Customer"
 msgstr "Kunden erstellen"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__create_uid
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__create_uid
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__create_uid
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__create_uid
@@ -612,6 +637,7 @@ msgid "Created by"
 msgstr "Erstellt von"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__create_date
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__create_date
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__create_date
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__create_date
@@ -676,6 +702,7 @@ msgstr "Verwerfen"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__display_name
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__display_name
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__display_name
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__display_name
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__display_name
@@ -713,11 +740,12 @@ msgstr "Wirtschaftlich Berechtigten bearbeiten"
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 #: model:ir.actions.server,name:equity.action_equity_dashboard_res_partner
+#: model:ir.module.module,shortdesc:base.module_equity
 #: model:ir.ui.menu,name:equity.menu_equity
+#: model:portal.entry,name:equity.equity_portal_entry
 #: model:res.groups.privilege,name:equity.res_groups_privilege_equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_breadcrumbs_equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
-#: model_terms:ir.ui.view,arch_db:equity.portal_my_home_equity
 msgid "Equity"
 msgstr "Eigenkapital"
 
@@ -728,11 +756,37 @@ msgid "Equity Access Token"
 msgstr "Zugriffstoken für Eigenkapital"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button
+msgid "Equity Button"
+msgstr "Eigenkapitalsschaltfläche"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button_text
+msgid "Equity Button Text"
+msgstr "Text der Eigenkapitalsschaltfläche"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button_url
+msgid "Equity Button Url"
+msgstr "URL der Eigenkapitalsschaltfläche"
+
+#. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__equity_currency_id
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_currency_id
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_currency_id
 msgid "Equity Currency"
 msgstr "Währung des Eigenkapitals"
+
+#. module: equity
+#: model:ir.model,name:equity.model_equity_mail_compose_message
+msgid "Equity Email composition wizard"
+msgstr "Assistent zut Erstellung der E-Mail für Eigenkapital"
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
+msgid "Equity Invitation"
+msgstr "Einladung zu Eigenkapital"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_kanban_dashboard_graph
@@ -835,6 +889,12 @@ msgstr ""
 "                        die Eltern;"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
+msgid "Fill UBO"
+msgstr "Wirtschaftlichen Eigentümer ausfüllen"
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "First and Last Name:"
 msgstr "Vor- und Nachname:"
@@ -872,6 +932,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_formation_date
 msgid "Formation Date"
 msgstr "Gründungsdatum"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__email_from
+msgid "From"
+msgstr "Von"
 
 #. module: equity
 #. odoo-javascript
@@ -969,6 +1034,7 @@ msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__id
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__id
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__id
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__id
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__id
@@ -1059,10 +1125,9 @@ msgid "Invalid token"
 msgstr "Ungültiges Token"
 
 #. module: equity
-#. odoo-python
-#: code:addons/equity/models/res_partner.py:0
-msgid "Invite %s"
-msgstr "%s einladen"
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__is_mail_template_editor
+msgid "Is Editor"
+msgstr "Ist Editor"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_is_follower
@@ -1083,6 +1148,12 @@ msgid "Job Position:"
 msgstr "Stelle:"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__lang
+msgid "Language"
+msgstr "Sprache"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__write_uid
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__write_uid
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__write_uid
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__write_uid
@@ -1091,6 +1162,7 @@ msgid "Last Updated by"
 msgstr "Zuletzt aktualisiert von"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__write_date
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__write_date
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__write_date
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__write_date
@@ -1113,6 +1185,16 @@ msgstr "Juristische Personen des öffentlichen Rechts;"
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__liquidator
 msgid "Liquidator"
 msgstr "Insolvenzverwalter"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__template_id
+msgid "Mail Template"
+msgstr "E-Mail-Vorlage"
+
+#. module: equity
+#: model:ir.module.module,summary:base.module_equity
+msgid "Manage securities, transactions, and cap tables."
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -1150,6 +1232,11 @@ msgstr "Nachrichten"
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_ubo_search
 msgid "Missing Documents"
 msgstr "Fehlende Dokumente"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__model
+msgid "Model"
+msgstr "Modell"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_equity
@@ -1257,20 +1344,21 @@ msgid "New Valuation"
 msgstr "Neue Bewertung"
 
 #. module: equity
+#: model:res.groups.privilege,placeholder:equity.res_groups_privilege_equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "No"
 msgstr "Nein"
 
 #. module: equity
-#. odoo-python
-#: code:addons/equity/models/equity_transaction.py:0
-msgid "No %s was set!"
-msgstr "%s nicht festgelegt!"
-
-#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "No UBOs recorded for this company."
 msgstr "Keine wirtschaftlich Berechtigten für dieses Unternehmen."
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid "No holders were set!"
+msgstr "Keine Eigentümer festgelegt!"
 
 #. module: equity
 #. odoo-javascript
@@ -1379,6 +1467,20 @@ msgid "Option Pool"
 msgstr "Optionspool"
 
 #. module: equity
+#: model:ir.model.fields,help:equity.field_equity_mail_compose_message__lang
+msgid ""
+"Optional translation language (ISO code) to select when sending out an "
+"email. If not set, the main partner's language will be used. This should "
+"usually be a placeholder expression that provides the appropriate language, "
+"e.g. {{ object.partner_id.lang }}."
+msgstr ""
+"Optionale Übersetzungssprache (ISO-Code), die beim Versenden einer E-Mail "
+"ausgewählt werden kann. Wenn keine Einstellung vorgenommen wird, wird die "
+"Hauptsprache des Partners verwendet. In der Regel sollte dies ein "
+"Platzhalterausdruck sein, der die entsprechende Sprache angibt, z. B. {{ "
+"object.partner_id.lang }}."
+
+#. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_security_class__class_type__options
 msgid "Options"
 msgstr "Optionen"
@@ -1415,6 +1517,11 @@ msgstr "PEP - Politisch exponierte Person"
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__partner_id
 msgid "Partner"
 msgstr "Partner"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids_all_have_email
+msgid "Partner Ids All Have Email"
+msgstr "Die Partner-ID haben alle E-Mails"
 
 #. module: equity
 #. odoo-javascript
@@ -1474,6 +1581,11 @@ msgid "Recipient of the securities of the transaction."
 msgstr "Empfänger der Wertpapiere der Transaktion."
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids
+msgid "Recipients"
+msgstr "Empfänger"
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_end_dialog.xml:0
 msgid "Remove Shareholder"
@@ -1486,14 +1598,24 @@ msgid "Remove holder exit date."
 msgstr "Entfernen Sie das Austrittsdatum des Inhabers."
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__render_model
+msgid "Rendering Model"
+msgstr "Rendering-Modell"
+
+#. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_reporting
 msgid "Reporting"
 msgstr "Berichtswesen"
 
 #. module: equity
-#: model:ir.actions.act_window,name:equity.action_equity_request_ubo_form
+#: model:ir.actions.server,name:equity.action_equity_request_ubo_form
 msgid "Request UBO Form"
 msgstr "Antragsformular für wirtschaftlich Berechtigten"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__res_ids
+msgid "Res"
+msgstr "Res"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__auth_rep_role
@@ -1544,9 +1666,9 @@ msgid "Security Price"
 msgstr "Wertpapierpreis"
 
 #. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.portal_my_home_equity
+#: model:portal.entry,description:equity.equity_portal_entry
 msgid "See your shares and transactions"
-msgstr "Anteile und Transaktionen einsehen"
+msgstr "Sehen Sie sich Ihre Anteile und Transaktionen an"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__seller_id
@@ -1574,18 +1696,10 @@ msgstr ""
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/cap_table/cap_table.xml:0
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Send"
 msgstr "Senden"
-
-#. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-msgid "Send to Seller"
-msgstr "An Verkäufer senden"
-
-#. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-msgid "Send to Subscriber"
-msgstr "An Abonnement senden"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__sequence
@@ -1630,6 +1744,11 @@ msgid "Strike Price"
 msgstr "Ausübungspreis"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__subject
+msgid "Subject"
+msgstr "Betreff"
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.xml:0
 msgid "Submit"
@@ -1672,9 +1791,9 @@ msgid ""
 "The \"Transaction Price\" total is not counting the prices of options "
 "issuance transactions because that is a strike price."
 msgstr ""
-"Die Summe „# Wertpapiere“ berücksichtigt nicht die Transaktionen "
-"„Optionsausübung“ (da diese zum Zeitpunkt der „Optionsausgabe“ erfasst "
-"werden). Die Summe „Transaktionspreis“ berücksichtigt nicht die Preise von "
+"Die Summe „# Wertpapiere“ berücksichtigt nicht die Transaktionen „"
+"Optionsausübung“ (da diese zum Zeitpunkt der „Optionsausgabe“ erfasst werden)"
+". Die Summe „Transaktionspreis“ berücksichtigt nicht die Preise von "
 "Optionsausgabetransaktionen, da es sich hierbei um einen Ausübungspreis "
 "handelt."
 
@@ -1764,7 +1883,6 @@ msgstr "Gesamtwert"
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_valuation__event__transaction
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_form
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_search
 msgid "Transaction"
 msgstr "Transaktion"
@@ -1785,7 +1903,6 @@ msgstr "Transaktionstyp"
 #: model:ir.actions.act_window,name:equity.action_equity_transaction
 #: model:ir.ui.menu,name:equity.menu_equity_ownership_transactions
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_list
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 msgid "Transactions"
 msgstr "Transaktionen"
 
@@ -1815,6 +1932,8 @@ msgid "UBO"
 msgstr "Wirtschaftlich Berechtigter"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
 #: model:mail.activity.type,name:equity.equity_ubo_form_mail_activity
 msgid "UBO Form Request"
 msgstr "Antragsformular für wirtschaftlich Berechtigte"
@@ -1901,12 +2020,14 @@ msgstr "Formular für wirtschaftlich Berechtigten hochladen"
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__valuation
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__valuation
 #: model:ir.ui.menu,name:equity.menu_equity_reporting_valuation
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_form
 msgid "Valuation"
 msgstr "Bewertung"
 
 #. module: equity
 #: model:ir.actions.act_window,name:equity.action_equity_valuation
 #: model:ir.ui.menu,name:equity.menu_equity_ownership_valuations
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 msgid "Valuations"
 msgstr "Bewertungen"
 
@@ -1916,9 +2037,22 @@ msgid "Vesting period, exercise deadline, etc."
 msgstr "Sperrfrist, Ausübungsfrist usw."
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
+msgid "View Equity"
+msgstr "Eigenkapital anzeigen"
+
+#. module: equity
 #: model:res.groups,name:equity.group_equity_viewer
 msgid "Viewer"
 msgstr "Betrachter"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_transaction__company_id
+#: model:ir.model.fields,field_description:equity.field_equity_ubo__company_id
+#: model:ir.model.fields,field_description:equity.field_equity_valuation__company_id
+msgid "Visible to"
+msgstr "Sichtbar für"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__votes
@@ -1941,20 +2075,6 @@ msgstr "Stimmen pro Anteil"
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__voting_rights
 msgid "Voting Rights"
 msgstr "Stimmrechte"
-
-#. module: equity
-#: model:ir.model.fields,field_description:equity.field_equity_transaction__website_message_ids
-#: model:ir.model.fields,field_description:equity.field_equity_ubo__website_message_ids
-#: model:ir.model.fields,field_description:equity.field_equity_valuation__website_message_ids
-msgid "Website Messages"
-msgstr "Website-Nachrichten"
-
-#. module: equity
-#: model:ir.model.fields,help:equity.field_equity_transaction__website_message_ids
-#: model:ir.model.fields,help:equity.field_equity_ubo__website_message_ids
-#: model:ir.model.fields,help:equity.field_equity_valuation__website_message_ids
-msgid "Website communication history"
-msgstr "Website-Kommunikationsverlauf"
 
 #. module: equity
 #. odoo-javascript
@@ -1983,6 +2103,11 @@ msgid "Who should complete and sign the declaration?"
 msgstr "Wer sollte die Erklärung ausfüllen und unterzeichnen?"
 
 #. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+msgid "Write your message here..."
+msgstr "Verfassen Sie hier Ihre Nachricht ..."
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "Yes"
 msgstr "Ja"
@@ -1996,6 +2121,16 @@ msgid ""
 msgstr ""
 "Sie können alle Anteilseigner entfernen, die weniger als 25 % der Anteile "
 "oder Stimmrechte halten."
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid ""
+"You cannot change the equity currency because this partner already has "
+"existing transactions."
+msgstr ""
+"Sie können die Währung des Eigenkapitals nicht ändern, da für diesen Partner "
+"bereits Transaktionen vorhanden sind."
 
 #. module: equity
 #. odoo-javascript
@@ -2104,6 +2239,11 @@ msgid "e.g. Seed, Series A, ..."
 msgstr "z. B. Startkapital, Serie A …"
 
 #. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+msgid "e.g. Welcome to MyCompany!"
+msgstr "z. B. Willkommen bei MeinUnternehmen!"
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "in"
 msgstr "in"
@@ -2132,6 +2272,11 @@ msgid "or"
 msgstr "oder"
 
 #. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
+msgid "per security"
+msgstr "pro Wertpapier"
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "please keep percentages between 0 and 100"
@@ -2142,18 +2287,6 @@ msgstr "Prozentsätze sollten zwischen 0 und 100 liegen"
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "remaining"
 msgstr "verbleibend"
-
-#. module: equity
-#. odoo-python
-#: code:addons/equity/models/equity_transaction.py:0
-msgid "seller"
-msgstr "Verkäufer"
-
-#. module: equity
-#. odoo-python
-#: code:addons/equity/models/equity_transaction.py:0
-msgid "subscriber"
-msgstr "Abonnent"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
@@ -2171,6 +2304,3 @@ msgstr "Jahr"
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "years"
 msgstr "Jahre"
-
-#~ msgid "Recipient of the shares/options of the transaction."
-#~ msgstr "Empfänger der Aktionen/Optionen der Transaktion."

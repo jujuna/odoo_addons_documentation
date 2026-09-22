@@ -16,7 +16,7 @@ class TestApprovalsActivity(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
                 "exclusive_user": True,
             },
             {
@@ -25,7 +25,7 @@ class TestApprovalsActivity(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
                 "exclusive_user": True,
             }
         ])
@@ -45,10 +45,13 @@ class TestApprovalsActivity(TestStudioApprovalsCommon):
         self.assertEqual(len(spec["rules"]), 2)
         self.assertTrue(spec["entries"][0]["approved"])
 
-        model_action.activity_ids.action_feedback()
+        model_action.activity_ids.action_feedback("Losing my religion")
         spec = self.env["studio.approval.rule"].get_approval_spec([dict(model="test.studio.model_action", method="action_confirm", action_id=False, res_id=model_action.id)])
         spec = dict(spec["test.studio.model_action"])[model_action.id, "action_confirm", False]
         self.assertEqual(len(spec["entries"]), 2)
         self.assertEqual(len(spec["rules"]), 2)
         self.assertTrue(all(e["approved"] for e in spec["entries"]))
         self.assertFalse(model_action.activity_ids)
+
+        message_feedback = [m for m in model_action.message_ids if "Losing my religion" in m.body]
+        self.assertEqual(len(message_feedback), 1)

@@ -110,9 +110,11 @@ test("Action action_download_spreadsheet is correctly fired with topbar menu", a
     const file = topbarMenuRegistry.getAll().find((item) => item.id === "file");
     const download = file.children.find((item) => item.id === "download");
     await download.execute(env);
+    const xlsxData = await model.exportXLSX();
     expect(actionParam).toEqual({
-        xlsxData: model.exportXLSX(),
+        xlsxData: xlsxData,
         name: UNTITLED_SPREADSHEET_NAME.toString(),
+        sources: [],
     });
 });
 

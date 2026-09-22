@@ -1,8 +1,13 @@
-import { getNumberOfListFormulas } from "@spreadsheet/list/list_helpers";
+import { hasListFormula } from "@spreadsheet/list/list_helpers";
 import { containsReferences } from "@spreadsheet/helpers/helpers";
 import * as spreadsheet from "@odoo/o-spreadsheet";
+import {
+    getNextListValue,
+    getTooltipListFormula,
+} from "@spreadsheet_edition/bundle/list/plugins/list_autofill_plugin";
 
 const { autofillModifiersRegistry, autofillRulesRegistry } = spreadsheet.registries;
+const { CompiledFormula } = spreadsheet;
 
 //--------------------------------------------------------------------------
 // Autofill Rules
@@ -10,14 +15,10 @@ const { autofillModifiersRegistry, autofillRulesRegistry } = spreadsheet.registr
 
 autofillRulesRegistry.add("autofill_list", {
     condition: (cell) =>
-        cell &&
-        cell.isFormula &&
-        getNumberOfListFormulas(cell.compiledFormula.tokens) === 1 &&
-        !containsReferences(cell),
+        cell && cell.isFormula && hasListFormula(cell.compiledFormula) && !containsReferences(cell),
     generateRule: (cell, cells) => {
         const increment = cells.filter(
-            (cell) =>
-                cell && cell.isFormula && getNumberOfListFormulas(cell.compiledFormula.tokens) === 1
+            (cell) => cell && cell.isFormula && hasListFormula(cell.compiledFormula)
         ).length;
         return { type: "LIST_UPDATER", increment, current: 0 };
     },
@@ -30,6 +31,9 @@ autofillRulesRegistry.add("autofill_list", {
 
 autofillModifiersRegistry.add("LIST_UPDATER", {
     apply: (rule, data, getters, direction) => {
+        if (!data.cell.isFormula || !hasListFormula(data.cell.compiledFormula)) {
+            throw new Error("Trying to list autofill on a non-list cell");
+        }
         rule.current += rule.increment;
         let isColumn;
         let steps;
@@ -50,16 +54,18 @@ autofillModifiersRegistry.add("LIST_UPDATER", {
                 isColumn = true;
                 steps = rule.current;
         }
-        const content = getters.getNextListValue(data.cell.content, isColumn, steps);
+        const content = getNextListValue(getters, data.cell.compiledFormula, isColumn, steps);
         let tooltip = {
             props: {
                 content,
             },
         };
         if (content && content !== data.content) {
+            const sheetId = data.cell.compiledFormula.sheetId;
+            const compiledFormula = CompiledFormula.Compile(content, sheetId, getters);
             tooltip = {
                 props: {
-                    content: getters.getTooltipListFormula(content, isColumn),
+                    content: getTooltipListFormula(getters, compiledFormula, isColumn),
                 },
             };
         }

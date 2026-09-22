@@ -9,6 +9,8 @@ from odoo.addons.payment.tests.http_common import PaymentHttpCommon
 @tagged('post_install', '-at_install', 'is_tour')
 class TestSubscriptionPaymentIntegration(PaymentHttpCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -47,7 +49,7 @@ class TestSubscriptionPaymentIntegration(PaymentHttpCommon):
     def create_demo_payment_token(self):
         return self._create_token(
             provider_id=self.demo_provider.id,
-            payment_method_id=self.demo_provider.payment_method_ids.id,
+            payment_method_id=self.demo_provider.payment_method_ids[:1].id,
             demo_simulated_state='done',
         )
 
@@ -64,6 +66,7 @@ class TestSubscriptionPaymentIntegration(PaymentHttpCommon):
           - Share the portal link;
           - pay without logging in.
         """
+        self._disable_process_patcher()
         if self.env['ir.module.module']._get('payment_demo').state != 'installed':
             self.skipTest("payment_demo not found")
 
@@ -78,6 +81,7 @@ class TestSubscriptionPaymentIntegration(PaymentHttpCommon):
           - Share the portal link;
           - save payment method without logging in.
         """
+        self._disable_process_patcher()
         if self.env['ir.module.module']._get('payment_demo').state != 'installed':
             self.skipTest("payment_demo not found")
 
@@ -94,6 +98,7 @@ class TestSubscriptionPaymentIntegration(PaymentHttpCommon):
           - Share the portal link;
           - automate payment without logging in.
         """
+        self._disable_process_patcher()
         if self.env['ir.module.module']._get('payment_demo').state != 'installed':
             self.skipTest("payment_demo not found")
 
@@ -108,6 +113,7 @@ class TestSubscriptionPaymentIntegration(PaymentHttpCommon):
           - Share the portal link;
           - pay with saved token without logging in.
         """
+        self._disable_process_patcher()
         if self.env['ir.module.module']._get('payment_demo').state != 'installed':
             self.skipTest("payment_demo not found")
 
@@ -123,6 +129,7 @@ class TestSubscriptionPaymentIntegration(PaymentHttpCommon):
           - Share the portal link;
           - automate payment with saved token without logging in.
         """
+        self._disable_process_patcher()
         if self.env['ir.module.module']._get('payment_demo').state != 'installed':
             self.skipTest("payment_demo not found")
 

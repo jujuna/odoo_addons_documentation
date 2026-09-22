@@ -9,6 +9,8 @@ from odoo.addons.sale_commission.tests.test_sale_commission_common import TestSa
 @tagged('post_install', '-at_install')
 class TestSaleCommissionManager(TestSaleCommissionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time('2024-02-02')
     def test_commission_manager_achievement(self):
         self.commission_plan_manager.write({

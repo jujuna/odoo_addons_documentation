@@ -2,18 +2,19 @@ import { _t } from "@web/core/l10n/translation";
 import { localization } from "@web/core/l10n/localization";
 import { registry } from "@web/core/registry";
 
-import { Component, useState } from "@odoo/owl";
+import { Component, onWillStart, onWillUpdateProps, proxy, t, useProps } from "@odoo/owl";
 import { useStudioServiceAsReactive } from "@web_studio/studio_service";
+import { useService } from "@web/core/utils/hooks";
 const editorTabRegistry = registry.category("web_studio.editor_tabs");
 
 class Breadcrumbs extends Component {
     static template = "web_studio.EditorMenu.Breadcrumbs";
-    static props = {
-        currentTab: { type: Object },
-        switchTab: Function,
-    };
+    props = useProps({
+        currentTab: t.object(),
+        switchTab: t.function(),
+    });
     setup() {
-        this.editionFlow = useState(this.env.editionFlow);
+        this.editionFlow = proxy(this.env.editionFlow);
         this.nextCrumbId = 1;
     }
     get breadcrumbs() {
@@ -31,81 +32,82 @@ class Breadcrumbs extends Component {
             crumbs.push(crumb);
         });
         for (const crumb of crumbs) {
-            crumb.id = this.nextCrumbId++;
+            crumb.id = crumb.id || this.nextCrumbId++;
         }
         return crumbs;
     }
 }
 
 export class EditorMenu extends Component {
-    static props = {
-        switchTab: Function,
-        switchView: Function,
-    };
+    static components = { Breadcrumbs };
     static template = "web_studio.EditorMenu";
     static viewTypes = [
         {
             title: _t("Form"),
             type: "form",
-            iconClasses: "fa fa-address-card",
+            icon: "contact_mail",
         },
         {
             title: _t("List"),
             type: "list",
-            iconClasses: "oi oi-view-list",
+            icon: "view_list",
         },
         {
             title: _t("Kanban"),
             type: "kanban",
-            iconClasses: "oi oi-view-kanban",
+            icon: "oi_view-kanban",
         },
         {
             title: _t("Map"),
             type: "map",
-            iconClasses: "fa fa-map-marker",
+            icon: "location_on",
         },
         {
             title: _t("Calendar"),
             type: "calendar",
-            iconClasses: "fa fa-calendar",
+            icon: "calendar_today",
         },
         {
             title: _t("Graph"),
             type: "graph",
-            iconClasses: "fa fa-area-chart",
+            icon: "area_chart",
         },
         {
             title: _t("Pivot"),
             type: "pivot",
-            iconClasses: "oi oi-view-pivot",
+            icon: "oi_view-pivot",
         },
         {
             title: _t("Gantt"),
             type: "gantt",
-            iconClasses: "fa fa-tasks",
+            icon: "view_timeline",
         },
         {
             title: _t("Cohort"),
             type: "cohort",
-            iconClasses: "oi oi-view-cohort",
+            icon: "oi_view-cohort",
         },
         {
             title: _t("Activity"),
             type: "activity",
-            iconClasses: "fa fa-clock-o",
+            icon: "schedule",
         },
         {
             title: _t("Search"),
             type: "search",
-            iconClasses: "oi oi-search",
+            icon: "search",
         },
     ];
 
-    static components = { Breadcrumbs };
+    props = useProps({
+        switchTab: t.function(),
+        switchView: t.function(),
+    });
+
     setup() {
         this.l10n = localization;
         this.studio = useStudioServiceAsReactive();
-        this.editionFlow = useState(this.env.editionFlow);
+        this.editionFlow = proxy(this.env.editionFlow);
     }
 
     get activeViews() {
@@ -133,5 +135,39 @@ editorTabRegistry
     .add("automations", { name: _t("Automations") }, { sequence: 20 })
     .add("actions_server", { name: _t("Actions") }, { sequence: 30 })
     .add("automation_webhooks", { name: _t("Webhooks") }, { sequence: 40 })
-    .add("acl", { name: _t("Access Control") }, { sequence: 50 })
+    .add("access", { name: _t("Security") }, { sequence: 50 })
     .add("filters", { name: _t("Filter Rules") }, { sequence: 60 });
+
+export class BaseEditorTabComponent extends Component {
+    static template = "web_studio.EditorMenu.BaseEditorTabComponent";
+    props = useProps({
+        tab: t.object(),
+        editedAction: t.object(),
+        openTab: t.function(),
+    });
+
+    setup() {
+        this.studio = useService("studio");
+        onWillStart(() => this.updateFromModel(this.props.editedAction.res_model));
+        onWillUpdateProps((next) => this.updateFromModel(next.editedAction.res_model));
+    }
+
+    onClick() {
+        if (this.isDisabled) {
+            return;
+        }
+        this.props.openTab(this.props.tab.id);
+    }
+
+    get isDisabled() {
+        return false;
+    }
+
+    get tooltip() {
+        return false;
+    }
+
+    async updateFromModel(resModel) {
+        this.modelInfo = await this.studio.IrModelInfo.read(resModel);
+    }
+}

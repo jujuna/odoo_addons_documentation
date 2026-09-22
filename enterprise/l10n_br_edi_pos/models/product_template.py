@@ -7,6 +7,11 @@ class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     l10n_br_pos_warning = fields.Text("Brazilian POS Warning", compute="_compute_l10n_br_pos_warning")
+    l10n_br_operation_type_pos_id = fields.Many2one(
+        'l10n_br.operation.type',
+        string='POS Operation Type',
+        help='Brazil: if an Operation Type is selected, it will be added on Point of Sale orders.'
+    )
 
     @api.depends("available_in_pos", "sale_ok", "taxes_id")
     def _compute_l10n_br_pos_warning(self):
@@ -16,11 +21,11 @@ class ProductTemplate(models.Model):
                 product.l10n_br_pos_warning = _("Products with price-excluded taxes will not be loaded in NFC-e Point of Sales.")
 
     @api.model
-    def _load_pos_data_domain(self, data, config):
+    def _load_pos_data_domain(self, data):
         """Override."""
-        domain = super()._load_pos_data_domain(data, config)
-        if config.l10n_br_is_nfce:
-            taxes_domain = [*self.env["account.tax"]._check_company_domain(config.company_id.id), ("price_include", "=", False)]
+        domain = super()._load_pos_data_domain(data)
+        if data['pos.config'].l10n_br_is_nfce:
+            taxes_domain = Domain.AND([self.env["account.tax"]._check_company_domain(data['pos.config'].company_id.id), [("price_include", "=", False)]])
             domain = Domain.AND(
                 [
                     domain,

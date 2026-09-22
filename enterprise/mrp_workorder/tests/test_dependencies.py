@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import Command
@@ -7,6 +6,8 @@ from odoo.tests import Form
 
 
 class TestWorkOrderDependencies(TestMrpWorkorderCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -47,6 +48,7 @@ class TestWorkOrderDependencies(TestMrpWorkorderCommon):
                 Command.create({'name': 'Operation#C', 'workcenter_id': cls.wkct3.id}),
             ],
             'allow_operation_dependencies': True,
+            'continuous': True,
         })
         cls.env['stock.quant']._update_available_quantity(cls.component1, cls.stock_location, 100)
         cls.env['stock.quant']._update_available_quantity(cls.component2, cls.stock_location, 100)
@@ -155,7 +157,7 @@ class TestWorkOrderDependencies(TestMrpWorkorderCommon):
         self.assertEqual(mo.state, 'done')
 
         mo_2 = mo.production_group_id.production_ids - mo
-        wo_4, wo_5, wo_6 = mo_2.workorder_ids
+        wo_6, wo_4, wo_5 = mo_2.workorder_ids
 
         self.assertEqual(wo_4.state, 'ready')
         self.assertEqual(wo_5.state, 'cancel')

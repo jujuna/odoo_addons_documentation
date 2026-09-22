@@ -8,10 +8,11 @@ import re
 import psycopg2.errors
 from dateutil.relativedelta import relativedelta
 
-from odoo import api, fields, models
+from odoo import api, fields, models, modules
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import SQL
 
+DR_CREATE_STEP_AUTO = 1000
 _logger = logging.getLogger(__name__)
 
 # Merge list of list based on their common element
@@ -60,7 +61,8 @@ class Data_MergeModel(models.Model):
     rule_ids = fields.One2many('data_merge.rule', 'model_id', string="Deduplication Rules", help='Suggest to merge records matching at least one of these rules')
     records_to_merge_count = fields.Integer(compute='_compute_records_to_merge_count')
 
-    mix_by_company = fields.Boolean('Cross-Company', default=False, help="When enabled, duplicates across different companies will be suggested")
+    mix_by_company = fields.Boolean('Cross-Company', default=False, help="In Manual Mode, the system identifies duplicates across your selected companies for review. "
+                                                                         "In Automated Mode, duplicates across all existing companies are merged automatically.")
 
     ### User Notifications for Manual merge
     notify_user_ids = fields.Many2many('res.users', string='Notify Users',
@@ -73,9 +75,12 @@ class Data_MergeModel(models.Model):
         ('months', 'Months')], string='Notify Frequency Period', default='weeks')
     last_notification = fields.Datetime(readonly=True)
 
-    ### Similarity Threshold for Automatic merge
-    merge_threshold = fields.Integer(string='Similarity Threshold', default=75, help='Records with a similarity percentage above this threshold will be automatically merged')
-    create_threshold = fields.Integer(string='Suggestion Threshold', default=0, help='Duplicates with a similarity below this threshold will not be suggested')
+    ### Similarity Threshold
+    similarity_threshold = fields.Integer(
+        string='Similarity Threshold', default=75,
+        help='Manual merge mode: Duplicates with a similarity percentage below this threshold will not be suggested.\n'
+             'Automatic merge mode: Duplicates with a similarity percentage above this threshold will be merged automatically.'
+    )
 
     ### Contextual menu action
     is_contextual_merge_action = fields.Boolean(string='Merge action attached', help='If True, this record is used for contextual menu action "Merge" on the target model.')
@@ -102,13 +107,24 @@ class Data_MergeModel(models.Model):
         if any(rule.field_id.model_id != self.res_model_id for rule in self.rule_ids):
             self.rule_ids = [(5, 0, 0)]
 
+    @api.onchange('merge_mode')
+    def _onchange_merge_mode(self):
+        if self.merge_mode == 'automatic':
+            return {
+                'warning': {
+                    'title': "Automatic Mode",
+                    'message': "When enabling automatic mode your rules will run periodically without manual validation. "
+                               "Please note that these changes are permanent and cannot be reversed."
+                }
+            }
+
     def _compute_records_to_merge_count(self):
         count_data = self.env['data_merge.record'].with_context(data_merge_model_ids=tuple(self.ids))._read_group([('model_id', 'in', self.ids)], ['model_id'], ['__count'])
         counts = {model.id: count for model, count in count_data}
         for dm_model in self:
             dm_model.records_to_merge_count = counts[dm_model.id] if dm_model.id in counts else 0
 
-    @api.onchange('res_model_name')
+    @api.depends('res_model_name')
     def _compute_custom_merge_method(self):
         for dm_model in self:
             if dm_model.res_model_name:
@@ -154,6 +170,7 @@ class Data_MergeModel(models.Model):
         if num_records:
             partner_ids = self.notify_user_ids.partner_id.ids
             menu_id = self.env.ref('data_recycle.menu_data_cleaning_root').id
+            # TDE note: use with_source
             self.env['mail.thread'].sudo().message_notify(
                 body=self.env['ir.qweb']._render(
                     'data_cleaning.data_merge_duplicate',
@@ -188,18 +205,17 @@ class Data_MergeModel(models.Model):
         for dm_model in self:
             t1 = timeit.default_timer()
             ids = []
+            current_valid_ids = set()
             res_model = self.env[dm_model.res_model_name]
-            table = res_model._table
 
             for rule in dm_model.rule_ids:
                 domain = ast.literal_eval(dm_model.domain or '[]')
                 query = res_model._search(domain, bypass_access=True)
-                sql_field = res_model._field_to_sql(table, rule.field_id.name, query)
                 if rule.field_id.relation:
-                    related_model = self.env[rule.field_id.relation]
-                    lhs_alias, lhs_column = re.findall(r'"([^"]+)"', sql_field.code)
-                    rhs_alias = query.join(lhs_alias, lhs_column, related_model._table, 'id', lhs_column)
-                    sql_field = related_model._field_to_sql(rhs_alias, related_model._rec_name, query)
+                    related_table = query.table._join(rule.field_id.name, kind='JOIN')
+                    sql_field = related_table[related_table._model._rec_name]
+                else:
+                    sql_field = query.table[rule.field_id.name]
 
                 if rule.match_mode == 'accent':
                     # Since unaccent is case sensitive, we must add a lower to make sql_field insensitive
@@ -209,7 +225,7 @@ class Data_MergeModel(models.Model):
                 multi_company = self.env['res.company'].with_context(active_test=False).search_count([]) > 1
                 company_field = res_model._fields.get('company_id')
                 if multi_company and company_field and not dm_model.mix_by_company:
-                    sql_group_by = SQL(', %s', res_model._field_to_sql(table, 'company_id', query))
+                    sql_group_by = SQL(', %s', query.table.company_id)
 
                 # Get all the rows matching the rule defined
                 # (e.g. exact match of the name) having at least 2 records
@@ -225,7 +241,7 @@ class Data_MergeModel(models.Model):
                     HAVING COUNT(%(field)s) > 1
                     """,
                     field=sql_field,
-                    table_id=SQL.identifier(table, 'id'),
+                    table_id=query.table.id,
                     tables=query.from_clause,
                     where_clause=query.where_clause or SQL("TRUE"),
                     group_by=sql_group_by,
@@ -237,22 +253,38 @@ class Data_MergeModel(models.Model):
                     raise UserError(self.env._('Missing required PostgreSQL extension: unaccent')) from None
 
                 rows = self.env.cr.fetchall()
-                ids = ids + [row[1] for row in rows]
+                for row in rows:
+                    current_valid_ids.update(row[1])
+                    ids.append(row[1])
+
+            # Remove previously created duplicate records that no longer
+            # match any deduplication rule to keep groups updated.
+            domain = [('model_id', '=', dm_model.id)]
+            if current_valid_ids:
+                # we only keep the records which are still valid according to the rules,
+                # so we remove the ones which are not in the current_valid_ids list
+                domain.append(('res_id', 'not in', current_valid_ids))
+            self.env['data_merge.record'].search(domain).unlink()
 
             # Fetches the IDs of all the records who already matched (and are not merged),
             # as well as the discarded ones.
             # This prevents creating twice the same groups.
             self.env.cr.execute("""
                 SELECT
+                    group_id,
                     ARRAY_AGG(res_id ORDER BY res_id ASC)
                 FROM data_merge_record
                 WHERE model_id = %s
                 GROUP BY group_id""", [dm_model.id])
-            done_groups_res_ids = [set(x[0]) for x in self.env.cr.fetchall()]
+
+            existing_groups = {
+                group_id: set(res_ids)
+                for group_id, res_ids in self.env.cr.fetchall()
+            }
 
             _logger.info('Query identification done after %s' % str(timeit.default_timer() - t1))
             t1 = timeit.default_timer()
-            if ast.literal_eval(self.env['ir.config_parameter'].get_param('data_merge.merge_lists', 'True')):
+            if self.env['ir.config_parameter'].get_bool('data_merge.merge_lists', True):
                 merge_list = merge_common_lists
             else:
                 merge_list = lambda x: x
@@ -272,28 +304,62 @@ class Data_MergeModel(models.Model):
                 #   The group with records A B C already exists:
                 #       1/ If group_to_create equals A B, do not create a new group
                 #       2/ If group_to_create equals A D, create the new group (A D is not a subset of A B C)
-                if any(group_to_create <= x for x in done_groups_res_ids):
+                #       3/ If group_to_create equals A B C D, add D to the existing group A B C
+
+                matched_group_id = None
+                skip_creation = False
+
+                for group_id, existing_ids in existing_groups.items():
+                    # If the group to create is already part of an existing group, we skip the creation (case 1)
+                    if group_to_create <= existing_ids:
+                        skip_creation = True
+                        break
+
+                    # If the group to create has common records with an existing group, we add the missing records to this existing group (case 3)
+                    if existing_ids <= group_to_create:
+                        matched_group_id = group_id
+                        break
+
+                if skip_creation:
+                    continue
+
+                if matched_group_id:
+                    missing_ids = group_to_create - existing_groups[matched_group_id]
+                    if missing_ids:
+                        # Since the group already exists, we only create the missing records for the new group and link them to the existing group.
+                        self.env['data_merge.record'].create([
+                            {'group_id': matched_group_id, 'res_id': res_id}
+                            for res_id in missing_ids
+                        ])
+                        existing_groups[matched_group_id].update(missing_ids)
                     continue
 
                 group = self.env['data_merge.group'].with_context(prefetch_fields=False).create({'model_id': dm_model.id})
                 d = [{'group_id': group.id, 'res_id': rec} for rec in group_to_create]
                 self.env['data_merge.record'].with_context(prefetch_fields=False).create(d)
 
-                if groups_created % 1000 == 0 and batch_commits:
+                if groups_created % DR_CREATE_STEP_AUTO == 0 and batch_commits:
                     self.env.cr.commit()
 
                 group._elect_master_record()
 
-                if dm_model.create_threshold > 0 and group.similarity * 100 <= dm_model.create_threshold:
+                if group.similarity * 100 < dm_model.similarity_threshold:
                     group.unlink()
-                    continue
-
-                if dm_model.merge_mode == 'automatic':
-                    if group.similarity * 100 >= dm_model.merge_threshold:
-                        group.merge_records()
-                        group.unlink()
 
             _logger.info('Record creation done after %s' % str(timeit.default_timer() - t1))
+
+            if dm_model.merge_mode == 'automatic' and not self.env.context.get('manual_find_duplicates_trigger', False):
+                existing_groups = self.env['data_merge.group'].search([
+                    ('model_id', '=', dm_model.id),
+                    ('similarity', '>=', dm_model.similarity_threshold / 100.0),
+                ])
+                for idx in range(0, len(existing_groups), DR_CREATE_STEP_AUTO):
+                    existing_batch = existing_groups[idx:idx + DR_CREATE_STEP_AUTO]
+                    for group in existing_batch:
+                        group.merge_records()
+                    existing_batch.unlink()
+                    if batch_commits and not modules.module.current_test:
+                        self.env.cr.commit()
 
     ##############
     ### Overrides
@@ -305,16 +371,14 @@ class Data_MergeModel(models.Model):
             if model_name and hasattr(self.env[model_name], '_prevent_merge') and self.env[model_name]._prevent_merge:
                 raise ValidationError(self.env._('Deduplication is forbidden on the model: %s', model_name))
 
-    def copy_data(self, default=None):
-        vals_list = super().copy_data(default=default)
-        return [dict(vals, name=self.env._("%s (copy)", merge_model.name)) for merge_model, vals in zip(self, vals_list)]
-
     def write(self, vals):
         if 'active' in vals and not vals['active']:
             self.env['data_merge.group'].search([('model_id', 'in', self.ids)]).unlink()
 
-        if 'create_threshold' in vals and vals['create_threshold']:
-            self.env['data_merge.group'].search([('model_id', 'in', self.ids), ('similarity', '<=', vals['create_threshold'] / 100)]).unlink()
+        similarity_threshold = vals.get('similarity_threshold')
+        if similarity_threshold is not None:
+            self.env['data_merge.group'].search(
+                [('model_id', 'in', self.ids), ('similarity', '<=', similarity_threshold / 100)]).unlink()
 
         return super().write(vals)
 
@@ -336,5 +400,23 @@ class Data_MergeModel(models.Model):
         return action
 
     def action_find_duplicates(self):
-        self.sudo().find_duplicates()
+        self.sudo().with_context(manual_find_duplicates_trigger=True).find_duplicates()
         return self.open_records()
+
+    def refresh_duplicates_records(self):
+        """
+        Refresh duplicate records and reopen the Data Merge view.
+        Preserves the selected search panel rule by passing `model_id`
+        from the domain into the action context.
+        """
+        self.search([]).find_duplicates(batch_commits=True)
+        model_id = self.env.context.get('model_id')
+        action = self.env["ir.actions.actions"]._for_xml_id("data_cleaning.action_data_merge_record")
+        context = action.get('context', {})
+        if isinstance(context, str):
+            context = ast.literal_eval(context)
+        if model_id:
+            context['searchpanel_default_model_id'] = model_id
+        action['context'] = context
+        action['target'] = 'main'
+        return action

@@ -3,9 +3,12 @@
 
 from lxml import etree
 
+from odoo.tests import tagged
+
 from odoo.addons.base.tests.common import TransactionCaseWithUserDemo
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestACL(TransactionCaseWithUserDemo):
     def setUp(self):
         super().setUp()

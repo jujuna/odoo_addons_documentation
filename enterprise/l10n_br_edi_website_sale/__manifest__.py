@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     "name": "Brazilian Accounting EDI for eCommerce",
-    "version": "1.0",
     "description": """
 Brazilian Accounting EDI for eCommerce
 ======================================
@@ -14,6 +13,7 @@ Allows tax calculation and EDI for eCommerce users.
     "data": [
         "data/delivery_data.xml",
         "views/delivery_carrier_views.xml",
+        "views/product_template_views.xml",
     ],
     "demo": ["data/delivery_demo.xml"],
     "auto_install": True,

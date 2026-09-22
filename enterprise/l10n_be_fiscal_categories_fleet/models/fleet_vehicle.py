@@ -8,7 +8,7 @@ class FleetVehicle(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         vehicles = super().create(vals_list)
         new_rates = []
         for vehicle in vehicles:
@@ -24,7 +24,7 @@ class FleetVehicle(models.Model):
 
     def write(self, vals):
         result = super().write(vals)
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         # Check if we modified fields that could impact the actual tax_deduction
         if any(key in vals for key in ['fuel_type', 'co2', 'horsepower']):
             new_rates = []

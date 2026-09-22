@@ -7,6 +7,8 @@ from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestLibroGiornaleReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('it')
     def setUpClass(cls):

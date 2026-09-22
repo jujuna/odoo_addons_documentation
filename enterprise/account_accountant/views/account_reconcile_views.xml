@@ -119,7 +119,7 @@
         <field name="view_mode">list</field>
         <field name="search_view_id" ref="view_account_move_line_reconcile_search"/>
         <field name="view_id" ref="view_move_line_reconcile_tree"/>
-        <field name="domain">[('display_type', 'not in', ('line_section', 'line_subsection', 'line_note')), ('account_id.reconcile', '=', True), ('full_reconcile_id', '=', False)]</field>
+        <field name="domain">[('display_type', 'not in', ('line_section', 'line_subsection', 'line_note')), ('account_id.reconcile', '=', True), ('full_reconcile_id', '=', False), ('parent_state', '!=', 'cancel')]</field>
         <field name="context">{'auto_statement_processing': True, 'journal_type': 'general', 'search_default_posted_lines': True, 'search_default_unreconciled': True, 'search_default_group_by_account': True, 'search_default_group_by_partner': True}</field>
     </record>
 
@@ -135,8 +135,31 @@
         </field>
     </record>
 
+    <record id="view_account_reconcile_model_form" model="ir.ui.view">
+        <field name="name">account.reconcile.model.form</field>
+        <field name="model">account.reconcile.model</field>
+        <field name="inherit_id" ref="account.view_account_reconcile_model_form"/>
+        <field name="arch" type="xml">
+            <group id="counterpart_entry_right_column" position="inside">
+                <field name="is_asking_for_autopost" invisible="not created_automatically"/>
+            </group>
+        </field>
+    </record>
+
     <record id="account.action_account_reconcile_model" model="ir.actions.act_window">
         <field name="context">{'search_default_created_by_user':1}</field>
+    </record>
+
+    <record id="action_schedule_activity_bank_statement_line" model="ir.actions.server">
+        <field name="name">Activity</field>
+        <field name="model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="binding_model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="binding_view_types">kanban</field>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                action = records.action_schedule_activity()
+        </field>
     </record>
 
 </odoo>

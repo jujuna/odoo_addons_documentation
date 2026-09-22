@@ -6,16 +6,16 @@
             <EmbeddedComponentToolbar>
                 <t t-set-slot="buttons">
                     <EmbeddedComponentToolbarButton
-                        buttonRef="copyToClipboardButtonRef"
-                        icon="'fa-clipboard'"
+                        buttonRef="this.copyToClipboardButtonRef"
+                        icon="'assignment'"
                         label.translate="Copy"
                         name="'copyToClipboard'"
-                        onClick.bind="onClickCopyToClipboard"
+                        onClick.bind="this.onClickCopyToClipboard"
                         title.translate="Copy to Clipboard"
                     />
                 </t>
             </EmbeddedComponentToolbar>
         </div>
-        <div class="o_embedded_content" t-ref="clipboardContent"/>
+        <div class="o_embedded_content" t-ref="this.descendantRefs.clipboardContent"/>
     </t>
 </templates>

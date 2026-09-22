@@ -22,7 +22,7 @@ class HrContractSalaryResume(models.Model):
     _order = 'sequence'
 
     def _get_available_fields(self):
-        return [(field, description['string']) for field, description in self.env['hr.version'].fields_get().items()]
+        return [(field, description['string']) for field, description in self.env['hr.version'].fields_get().items()] + [('BASIC', 'Basic'), ('SALARY', 'Salary'), ('GROSS', 'Taxable Salary'), ('NET', 'Net')]
 
     name = fields.Char(translate=True)
     sequence = fields.Integer(default=100)
@@ -30,7 +30,9 @@ class HrContractSalaryResume(models.Model):
         ('fixed', 'Fixed Value'),
         ('version', 'Employee Record Value'),
         ('sum', 'Sum of Benefits Values'),
-        ('monthly_total', 'Monthly Total')], required=True, default='fixed',
+        ('monthly_total', 'Monthly Total'),
+        ('payslip', 'Payslip Value'),
+        ('sum', 'Sum')], required=True, default='fixed',
         help='Pick how the value of the information is computed:\n'
              'Fixed value: Set a determined value static for all links\n'
              'Employee Record value: Get the value from a field on the Employee Record\n'
@@ -40,10 +42,16 @@ class HrContractSalaryResume(models.Model):
     code = fields.Selection(_get_available_fields)
     fixed_value = fields.Float()
     category_id = fields.Many2one('hr.contract.salary.resume.category', required=True, help='Pick a category to display this information')
-    structure_type_id = fields.Many2one('hr.payroll.structure.type', string="Salary Structure Type")
+    structure_type_id = fields.Many2one('hr.payroll.structure.type', string="Salary Structure Type", index='btree_not_null')
     impacts_monthly_total = fields.Boolean(help="If checked, the value of this information will be computed in all information set as Monthly Total")
     uom = fields.Selection([
         ('days', 'Days'),
         ('percent', 'Percent'),
         ('currency', 'Currency')], string="Unit of Measure", default='currency')
     active = fields.Boolean('Active', default=True)
+    country_id = fields.Many2one(
+        'res.country',
+        related='structure_type_id.country_id',
+        string='Country',
+        store=True,
+        readonly=True)

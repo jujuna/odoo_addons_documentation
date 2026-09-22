@@ -16,8 +16,17 @@ export class Project extends models.Model {
     ];
 }
 
+class MailThread extends models.Model {
+    _name = "mail.thread";
+}
+
+class MailActivityMixin extends models.Model {
+    _name = "mail.activity.mixin";
+}
+
 export class ResUsers extends models.Model {
     _name = "res.users";
+    _inherit = ["mail.thread", "mail.activity.mixin"];
 
     name = fields.Char();
 
@@ -28,6 +37,16 @@ export class ResUsers extends models.Model {
     _records = [
         { id: 1, name: "User 1" },
         { id: 2, name: "User 2" },
+    ];
+}
+
+export class Resource extends models.Model {
+    name = fields.Char();
+
+    _records = [
+        { id: 1, name: "Resource 1" },
+        { id: 2, name: "Resource 2" },
+        { id: 3, name: "Resource 3" },
     ];
 }
 
@@ -69,10 +88,13 @@ export class Tasks extends models.Model {
     });
     color = fields.Integer();
     progress = fields.Integer();
+    buffer_start = fields.Float();
+    buffer_stop = fields.Float();
     exclude = fields.Boolean({ string: "Excluded from Consolidation" });
     project_id = fields.Many2one({ relation: "project" });
     stage_id = fields.Many2one({ relation: "stage" });
     user_id = fields.Many2one({ string: "Assign To", relation: "res.users" });
+    resource_ids = fields.Many2many({ relation: "resource" });
 
     _records = [
         {
@@ -86,6 +108,7 @@ export class Tasks extends models.Model {
             user_id: 1,
             color: 0,
             progress: 0,
+            resource_ids: [1],
         },
         {
             id: 2,
@@ -158,6 +181,7 @@ export class Tasks extends models.Model {
             user_id: 2,
             color: 10,
             progress: 80,
+            resource_ids: [2, 3],
         },
         {
             id: 8,
@@ -216,5 +240,14 @@ export class WorkOrders extends models.Model {
 }
 
 export function defineGanttModels() {
-    defineModels([Stage, Project, ResUsers, Tasks, WorkOrders]);
+    defineModels([
+        Stage,
+        Project,
+        ResUsers,
+        Tasks,
+        WorkOrders,
+        Resource,
+        MailThread,
+        MailActivityMixin,
+    ]);
 }

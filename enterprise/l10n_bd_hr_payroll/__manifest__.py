@@ -13,17 +13,18 @@ Bangladesh Payroll Rules.
     'depends': ['hr_payroll'],
     'auto_install': ['hr_payroll'],
     'data': [
+        'data/resource_calendar_data.xml',
         'data/hr_rule_parameters_data.xml',
         'data/hr_payroll_structure_type_data.xml',
+        'data/hr_work_entry_type_data.xml',
         'data/hr_payroll_structure_data.xml',
         'data/hr_salary_rule_category_data.xml',
-        'data/hr_payslip_input_type_data.xml',
         'data/hr_salary_rule_data.xml',
-        'views/hr_employee_views.xml',
     ],
     'demo': [
         'data/l10n_bd_hr_payroll_demo.xml',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'post_init_hook': '_l10n_bd_hr_payroll_post_install',
 }

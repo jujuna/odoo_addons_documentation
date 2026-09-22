@@ -6,7 +6,7 @@ from odoo import api, models, fields, _
 from odoo.fields import Domain
 from odoo.tools import SQL
 
-from odoo.addons.resource.models.utils import filter_domain_leaf
+from odoo.addons.resource.models.utils import filter_map_domain
 
 
 class SaleCommissionReport(models.Model):
@@ -16,17 +16,19 @@ class SaleCommissionReport(models.Model):
     _auto = False
 
     target_id = fields.Many2one('sale.commission.plan.target', "Period", readonly=True)
-    target_amount = fields.Monetary("Target Amount", readonly=True, currency_field='currency_id')
+    target_amount = fields.Monetary("Target Amount", readonly=True, currency_field='currency_id', aggregator='avg')
     plan_id = fields.Many2one('sale.commission.plan', "Commission Plan", readonly=True)
+    state = fields.Selection(related='plan_id.state')
     user_id = fields.Many2one('res.users', "Sales Person", readonly=True)
+    plan_user_id = fields.Many2one('sale.commission.plan.user', readonly=True)
     achieved = fields.Monetary("Achieved", readonly=True, currency_field='currency_id')
-    achieved_rate = fields.Float("Achieved Rate", readonly=True, aggregator='avg')
+    achieved_rate = fields.Float("Target completion", readonly=True, aggregator=None)
     commission = fields.Monetary("Commission", readonly=True, currency_field='currency_id')
     currency_id = fields.Many2one('res.currency', "Currency", readonly=True)
     company_id = fields.Many2one('res.company', string='Company', readonly=True)
     forecast_id = fields.Many2one('sale.commission.plan.target.forecast', 'fc')
     payment_date = fields.Date("Payment Date", readonly=True)
-    forecast = fields.Monetary("Forecast", readonly=True, currency_field='currency_id')
+    forecast = fields.Monetary("Forecast", help="Entered manually by the salesperson. No impact on commission calculation.", readonly=True, currency_field='currency_id')
     date_from = fields.Date(related='target_id.date_from')
     date_to = fields.Date(related='target_id.date_to')
     notes = fields.Text(related='forecast_id.notes', readonly=True)
@@ -66,7 +68,15 @@ class SaleCommissionReport(models.Model):
         # take date_to but not plan_id.date_to
         model = self
         domain = Domain(domain)
-        date_to_domain = filter_domain_leaf(domain, lambda field: 'date_to' in field and not 'plan_id' in field)
+
+        # We want all "date_to" fields except for the one on plan_id
+        def _map_condition(condition):
+            field_expr = condition.field_expr
+            if 'date_to' in field_expr and field_expr != 'plan_id.date_to':
+                return condition
+            return None
+
+        date_to_domain = filter_map_domain(domain, _map_condition)
         date_to_domain = date_to_domain.optimize_full(model)
         date_to_list = [cond.value for cond in date_to_domain.iter_conditions() if isinstance(cond.value, date)]
         if date_to_list:
@@ -95,7 +105,11 @@ class SaleCommissionReport(models.Model):
             team_ids = self.env['crm.team'].search([('user_id', '=', self.user_id.id)])
             context.update({'commission_team_ids': self.user_id.sale_team_id.ids + team_ids.ids})
         else:
-            context.update({'commission_user_ids': self.user_id.ids})
+            if self.plan_id.target_type == 'static':
+                user_ids = self.user_id.ids
+            else:
+                user_ids = (self.user_id | self.plan_user_id.user_ids).ids
+            context.update({'commission_user_ids': user_ids})
         return {
             "type": "ir.actions.act_window",
             "res_model": "sale.commission.achievement.report",
@@ -110,33 +124,33 @@ class SaleCommissionReport(models.Model):
         if 'forecast' in vals or 'notes' in vals:
             forecast = vals.get('forecast')
             notes = vals.get('notes')
+            # Using sudo as conversion can require access unpriviledged user don't have
+            currency_sudo = self.env.company.currency_id.sudo()
             for line in self:
+                converted_forecast = currency_sudo._convert(forecast, line.sudo().plan_id.currency_id, line.sudo().plan_id.company_id) if forecast else 0
                 if line.forecast_id:
                     if forecast is not None:
-                        line.sudo().forecast_id.amount = forecast
+                        line.sudo().forecast_id.amount = converted_forecast
                     if notes:
                         line.sudo().forecast_id.notes = notes
                 else:
                     line.forecast_id = self.env['sale.commission.plan.target.forecast'].sudo().create({
                         'target_id': line.target_id.id,
-                        'amount': forecast or 0,
+                        'amount': converted_forecast,
                         'plan_id': line.plan_id.id,
                         'user_id': line.user_id.id,
                         'notes': notes or False,
                     })
             # Update the field's cache otherwise the field reset to the original value on the field
             if forecast:
-                self.env.cache._set_field_cache(self, self._fields.get('forecast')).update(dict.fromkeys(self.ids, forecast))
+                self._fields['forecast']._update_cache(self, forecast)
             if notes:
-                self.env.cache._set_field_cache(self, self._fields.get('notes')).update(dict.fromkeys(self.ids, notes))
+                self._fields['notes']._update_cache(self, notes)
         return True
 
     @property
-    def _table_query(self):
-        # Deactivate the jit for this transaction
-        query = self._query()
-        table_query = SQL(query)
-        return table_query
+    def _table_sql(self):
+        return SQL("(%s)", self._query())
 
     def _query(self):
         users = self.env.context.get('commission_user_ids', [])
@@ -145,12 +159,14 @@ class SaleCommissionReport(models.Model):
         teams = self.env.context.get('commission_team_ids', [])
         if teams:
             teams = self.env['crm.team'].browse(teams).exists()
-        achievement_view = self.env['sale.commission.achievement.report']._get_report_view()
-        if not self.env['sale.commission.achievement.report']._is_materialized_view() and achievement_view:
-            self.env.cr.execute(achievement_view)
+        achievement_report = self.env['sale.commission.achievement.report']
+        achievement_view = achievement_report._get_report_view()
+        if not achievement_report._is_materialized_view() and achievement_view:
+            self.env.execute_query(achievement_view)
         # First, convert the achievement to allow sum them by period
-        res = f"""
-WITH {self.env['sale.commission.achievement.report']._get_currency_rate()},
+        return SQL("""
+        WITH %(currency_rate)s,
+        %(target_query)s,
 commission_lines AS (
     SELECT id,
            target_id,
@@ -170,18 +186,15 @@ LEFT JOIN currency_rate cr
            ON cr.company_id = ca.achievement_company_id
 ), achievement AS (
     SELECT
-        (
-            COALESCE(era.plan_id, 0) * 10^13 +
-            COALESCE(u.user_id, 0) +
-            10^5 * COALESCE(to_char(era.date_from, 'YYMMDD')::integer, 0)
-        )::bigint AS id,
+        ROW_NUMBER() OVER (ORDER BY era.plan_id, u.user_id, scp.company_id, era.id) AS id,
         era.id AS target_id,
         era.plan_id AS plan_id,
         u.user_id AS user_id,
-        MAX(scp.company_id) AS company_id,
+        MAX(era.plan_user_id) AS plan_user_id,
+        MAX(era.company_id) AS company_id,
         SUM(achieved) AS achieved,
         CASE
-            WHEN MAX(era.amount) > 0 THEN GREATEST(SUM(achieved), 0) / (MAX(era.amount) * cr.rate)
+            WHEN MAX(era.amount) > 0 THEN GREATEST(SUM(achieved), 0) / (MAX(era.amount))
             ELSE 0
         END AS achieved_rate,
         MAX(era.amount) AS amount,
@@ -189,7 +202,7 @@ LEFT JOIN currency_rate cr
         MAX(scpf.id) AS forecast_id,
         MAX(scpf.amount) AS forecast,
         MAX(scpf.notes) AS notes
-        FROM sale_commission_plan_target era
+        FROM targets era
         LEFT JOIN sale_commission_plan_user u
                ON u.plan_id=era.plan_id
               AND COALESCE(u.date_from, era.date_from)<era.date_to
@@ -201,12 +214,14 @@ LEFT JOIN currency_rate cr
               AND cl.user_id = u.user_id
     LEFT JOIN sale_commission_plan_target_forecast scpf
            ON (scpf.target_id = era.id AND u.user_id = scpf.user_id)
-    LEFT JOIN sale_commission_plan scp ON scp.id = u.plan_id
+    LEFT JOIN sale_commission_plan scp ON scp.id = era.plan_id
     LEFT JOIN currency_rate cr ON cr.company_id = scp.company_id
    WHERE scp.active
-     AND scp.state = 'approved'
+     AND scp.state IN ('approved', 'done')
+     AND era.plan_user_id=u.id
     GROUP BY
         era.id,
+        era.date_from,
         era.plan_id,
         u.user_id,
         scp.company_id,
@@ -228,14 +243,18 @@ LEFT JOIN currency_rate cr
         min(a.target_id) as target_id,
         a.plan_id,
         a.user_id,
+        MAX(a.plan_user_id) AS plan_user_id,
         a.company_id,
-        {self.env.company.currency_id.id} AS currency_id,
+        %(company_currency_id)s AS currency_id,
         MIN(a.forecast_id) as forecast_id,
         MIN(a.payment_date) as payment_date,
         SUM(a.achieved) AS achieved,
-        CASE WHEN SUM(a.amount) > 0 THEN SUM(a.achieved) / (SUM(a.amount) * cr.rate) ELSE 0.0 END AS achieved_rate,
-        SUM(a.amount) * cr.rate AS target_amount,
-        SUM(a.forecast) * cr.rate AS forecast,
+        CASE
+          WHEN (SUM(a.amount) > 0 AND SUM(a.achieved) > 0 ) THEN SUM(a.achieved) / (SUM(a.amount))
+          ELSE 0
+        END AS achieved_rate,
+        SUM(a.amount) AS target_amount,
+        SUM(a.forecast) AS forecast,
         MAX(a.notes) AS notes,
         COUNT(1) AS ct
     FROM achievement a
@@ -256,5 +275,8 @@ SELECT
         tc.rate_low <= a.achieved_rate AND
         (tc.rate_high IS NULL OR tc.rate_high > a.achieved_rate)
     )
-"""
-        return res
+""",
+            currency_rate=achievement_report._get_currency_rate(),
+            target_query=achievement_report._get_target_query(),
+            company_currency_id=self.env.company.currency_id.id,
+        )

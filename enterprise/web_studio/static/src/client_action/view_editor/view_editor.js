@@ -1,4 +1,5 @@
-import { Component, onWillUpdateProps, useState, useSubEnv, useRef, markRaw } from "@odoo/owl";
+import { render, useSubEnv } from "@web/owl2/utils";
+import { Component, onWillUpdateProps, markRaw, useProps, proxy, signal, t } from "@odoo/owl";
 
 import { useBus, useService } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
@@ -6,20 +7,23 @@ import { StudioView } from "@web_studio/client_action/view_editor/studio_view";
 
 import { InteractiveEditor } from "./interactive_editor/interactive_editor";
 import { useViewEditorModel } from "./view_editor_hook";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { getDefaultConfig } from "@web/views/view";
 
-import { XmlResourceEditor } from "@web_studio/client_action/xml_resource_editor/xml_resource_editor";
+import {
+    XmlResourceEditor,
+    xmlResourceEditorProps,
+} from "@web_studio/client_action/xml_resource_editor/xml_resource_editor";
 import { useSetupAction } from "@web/search/action_hook";
 import { _t } from "@web/core/l10n/translation";
 
 class ViewXmlEditor extends XmlResourceEditor {
-    static props = { ...XmlResourceEditor.props, studioViewArch: { type: String } };
+    props = useProps({ ...xmlResourceEditorProps, studioViewArch: t.string() });
     setup() {
         super.setup();
         this.viewEditorModel = this.env.viewEditorModel;
-        useBus(this.viewEditorModel.bus, "error", () => this.render(true));
-        this.studioViewState = useState({ arch: this.props.studioViewArch });
+        useBus(this.viewEditorModel.bus, "error", () => render(this, true));
+        this.studioViewState = proxy({ arch: this.props.studioViewArch });
 
         onWillUpdateProps((nextProps) => {
             if (nextProps.studioViewArch !== this.props.studioViewArch) {
@@ -37,11 +41,16 @@ class ViewXmlEditor extends XmlResourceEditor {
 }
 
 export class ViewEditor extends Component {
-    static props = { ...standardActionServiceProps };
     static components = { StudioView, InteractiveEditor, ViewXmlEditor };
     static template = "web_studio.ViewEditor";
 
     static displayName = _t("View Editor");
+
+    props = useProps(standardActionServiceProps);
+
+    // Useful for drag/drop
+    rootRef = signal.ref();
+    viewRendererRef = signal.ref();
 
     setup() {
         /* Services */
@@ -52,10 +61,6 @@ export class ViewEditor extends Component {
         // Set config compatible with View.js
         useSubEnv({ config: getDefaultConfig() });
 
-        // Usefull for drag/drop
-        this.rootRef = useRef("root");
-        this.rendererRef = useRef("viewRenderer");
-
         const initialState = {};
         const breadcrumbs = this.env.editionFlow.breadcrumbs;
         if (breadcrumbs.length) {
@@ -63,7 +68,7 @@ export class ViewEditor extends Component {
             initialState.activeNodeXpath = breadcrumbs.at(-1).initialState.activeNodeXpath;
         }
 
-        this.viewEditorModel = useViewEditorModel(this.rendererRef, { initialState });
+        this.viewEditorModel = useViewEditorModel(this.viewRendererRef, { initialState });
 
         useSetupAction({
             getLocalState: () => {

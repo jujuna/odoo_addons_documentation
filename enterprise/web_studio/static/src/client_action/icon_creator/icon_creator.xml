@@ -3,32 +3,33 @@
 
 <t t-name="web_studio.IconCreator">
     <div class="o_web_studio_icon_creator">
-        <div t-if="props.type === 'base64'" class="o_web_studio_uploaded_image mx-auto mb-4 rounded-3 shadow bg-white"
-            t-attf-style="background-image: url({{props.webIconData}})"
+        <div t-if="this.props.type === 'base64'" class="o_web_studio_uploaded_image mx-auto mb-4 rounded-3 shadow bg-white"
+            t-attf-style="background-image: url({{this.props.webIconData}})"
         />
         <t t-else="">
-            <h6 t-if="props.editable">Design your Icon</h6>
+            <h6 t-if="this.props.editable">Design your Icon</h6>
             <div class="o_web_studio_icon float-start">
-                <div class="o_app_icon d-flex align-items-center justify-content-center rounded-3 shadow border-2" t-attf-style="border: solid #00000050;background-color: {{props.backgroundColor}};">
-                    <i t-att-class="props.iconClass"
-                        t-attf-style="color: {{props.color}};"
-                        t-key="props.iconClass"
+                <div class="o_app_icon d-flex align-items-center justify-content-center rounded-3 shadow border-2" t-attf-style="border: solid #00000050;background-color: {{this.props.backgroundColor}};">
+                    <i class="oi"
+                        t-att-data-icon="this.props.icon"
+                        t-attf-style="color: {{this.props.color}};"
+                        t-key="this.props.icon"
                     />
                 </div>
             </div>
-            <t t-if="props.editable">
+            <t t-if="this.props.editable">
                 <div class="o_web_studio_selectors float-end mt-2">
                     <SelectMenu
                         autoSort="false"
                         class="'o_web_studio_selector o_web_studio_selector_background rounded-2 p-0 border-0 m-3'"
                         menuClass="'o_web_studio_selector_menu'"
                         togglerClass="'p-0'"
-                        value="props.backgroundColor"
-                        choices="backgroundColorChoices"
+                        value="this.props.backgroundColor"
+                        choices="this.backgroundColorChoices"
                         onSelect="(value) => this.onPaletteItemClick('backgroundColor', value)"
                         required="true"
                         searchable="false">
-                        <div class="w-100 h-100 rounded-2" t-attf-style="background-color: {{props.backgroundColor}};"> </div>
+                        <div class="w-100 h-100 rounded-2" t-attf-style="background-color: {{this.props.backgroundColor}};"> </div>
                         <span class="o_web_studio_selector_pointer" />
                         <t t-set-slot="choice" t-slot-scope="choice">
                             <div
@@ -42,12 +43,12 @@
                         class="'o_web_studio_selector o_web_studio_selector_color rounded-2 overflow-visible p-0 border-0 m-3'"
                         menuClass="'o_web_studio_selector_menu'"
                         togglerClass="'p-0'"
-                        value="props.color"
-                        choices="colorChoices"
+                        value="this.props.color"
+                        choices="this.colorChoices"
                         onSelect="(value) => this.onPaletteItemClick('color', value)"
                         required="true"
                         searchable="false">
-                        <div class="w-100 h-100 rounded-2" t-attf-style="background-color: {{props.color}};"> </div>
+                        <div class="w-100 h-100 rounded-2" t-attf-style="background-color: {{this.props.color}};"> </div>
                         <span class="o_web_studio_selector_pointer" />
                         <t t-set-slot="choice" t-slot-scope="choice">
                             <div
@@ -56,27 +57,26 @@
                             />
                         </t>
                     </SelectMenu>
-                    <FontAwesomeIconSelector
-                        className="'o_web_studio_selector o_web_studio_selector_icon rounded-2 m-3'"
-                        menuClassName="'o_web_studio_selector_menu o_web_studio_selector_icon_menu'"
-                        value="props.iconClass"
-                        onSelect="(value) => this.onPaletteItemClick('iconClass', value)"
+                    <StudioIconSelector
+                        className="'o_web_studio_selector o_web_studio_selector_icon rounded-2 m-3 p-0 border-0'"
+                        value="this.props.icon"
+                        onSelect="(value) => this.onPaletteItemClick('icon', value)"
                     >
-                        <i t-att-class="props.iconClass" />
+                        <i class="oi" t-att-data-icon="this.props.icon" />
                         <span class="o_web_studio_selector_pointer" />
-                    </FontAwesomeIconSelector>
+                    </StudioIconSelector>
                 </div>
                 <div class="clearfix" />
             </t>
         </t>
-        <div t-if="props.editable" class="o_web_studio_upload">
-            <a t-if="props.type === 'base64'" href="#" t-on-click.prevent.stop="onDesignIconClick">
+        <div t-if="this.props.editable" class="o_web_studio_upload">
+            <a t-if="this.props.type === 'base64'" href="#" t-on-click.prevent.stop="this.onDesignIconClick">
                 Design your Icon
             </a>
             <span> or </span>
-            <FileInput t-props="fileInputProps" onUpload.bind="onFileUploaded">
+            <FileInput t-props="this.fileInputProps" onUpload.bind="this.onFileUploaded">
                 <a href="#">
-                    <t t-if="props.type === 'base64'">upload one</t>
+                    <t t-if="this.props.type === 'base64'">upload one</t>
                     <t t-else="">upload it</t>
                 </a>
             </FileInput>

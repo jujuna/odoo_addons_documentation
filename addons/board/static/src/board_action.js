@@ -3,17 +3,18 @@ import { useService } from "@web/core/utils/hooks";
 import { View } from "@web/views/view";
 import { makeContext } from "@web/core/context";
 import { user } from "@web/core/user";
-import { Component, onWillStart } from "@odoo/owl";
+import { Component, onWillStart, t, useProps } from "@odoo/owl";
 
 export class BoardAction extends Component {
     static template = "board.BoardAction";
     static components = { View };
-    static props = {
-        action: Object,
-        actionId: { type: Number, optional: true },
-        className: { type: String, optional: true },
-    };
     static cache = {};
+
+    props = useProps({
+        action: t.object(),
+        actionId: t.number().optional(),
+        className: t.string().optional(),
+    });
     setup() {
         this.actionService = useService("action");
         const action = this.props.action;
@@ -39,7 +40,8 @@ export class BoardAction extends Component {
                 resModel: result.res_model,
                 type: viewMode,
                 display: { controlPanel: false },
-                selectRecord: (resId) => this.selectRecord(result.res_model, resId),
+                selectRecord: (resId, { newWindow } = {}) =>
+                    this.selectRecord(result.res_model, resId, newWindow),
             };
             const view = result.views.find((v) => v[1] === viewMode);
             if (view) {
@@ -66,12 +68,15 @@ export class BoardAction extends Component {
             }
         });
     }
-    selectRecord(resModel, resId) {
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            res_model: resModel,
-            views: [[this.formViewId, "form"]],
-            res_id: resId,
-        });
+    selectRecord(resModel, resId, newWindow) {
+        this.actionService.doAction(
+            {
+                type: "ir.actions.act_window",
+                res_model: resModel,
+                views: [[this.formViewId, "form"]],
+                res_id: resId,
+            },
+            { newWindow }
+        );
     }
 }

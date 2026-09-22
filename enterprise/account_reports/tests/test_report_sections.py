@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=C0326
 
+from os import getenv
+
 from freezegun import freeze_time
+from unittest import skipIf
 from unittest.mock import patch
 
 from odoo.addons.account.tests.common import AccountTestInvoicingHttpCommon
@@ -12,6 +15,8 @@ from odoo.tests import tagged
 
 @tagged('post_install', '-at_install')
 class TestReportSections(AccountTestInvoicingHttpCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -83,6 +88,8 @@ class TestReportSections(AccountTestInvoicingHttpCommon):
             'report_id': cls.composite_report.id,
             'deadline_start_date': '2024-01-01',
             'states_workflow': 'generic_state_tax_report',
+            'tax_payable_account_id': cls.company_data['default_tax_account_payable'].id,
+            'tax_receivable_account_id': cls.company_data['default_tax_account_receivable'].id,
         })
 
     def test_sections_options_report_selection_variant(self):
@@ -131,7 +138,7 @@ class TestReportSections(AccountTestInvoicingHttpCommon):
         self.assertEqual(options['selected_section_id'], self.section_2.id, "Section 2 should be selected.")
         self.assertEqual(options['report_id'], self.section_2.id, "Selecting the second section from the first one should open it.")
 
-    @freeze_time('2026-01-01 12:00:00')
+    @skipIf(getenv("ODOO_FAKETIME_TEST_MODE"), "Faketime mode doesn't play well with interval selection in the report filter")
     def test_sections_tour(self):
         def patched_init_options_custom(report, options, previous_options):
             # Emulates a custom handler modifying the export buttons
@@ -146,7 +153,7 @@ class TestReportSections(AccountTestInvoicingHttpCommon):
         self.section_1.filter_journals = True
 
         with patch.object(type(self.env['account.report']), '_init_options_custom', patched_init_options_custom):
-            self.start_tour("/odoo", 'account_reports_sections', login=self.env.user.login)
+            self.start_tour("/odoo/action-account_reports.action_account_report_gt", 'account_reports_sections', login=self.env.user.login)
 
     def test_exported_xlsx_unique_names(self):
         composite_report = self.env['account.report'].create({
@@ -169,7 +176,7 @@ class TestReportSections(AccountTestInvoicingHttpCommon):
             'date_from': '2024-01-01',
             'date_to': '2024-01-31',
         })
-        tax_tag = self.env['account.account.tag'].search([('name', '=', '+tag1_1')])
+        tax_tag = self.env['account.account.tag'].search([('name', '=', 'tag1_1')])
         invoice_previous_period = self.env['account.move'].create({
             'partner_id': self.partner.id,
             'move_type': 'out_invoice',
@@ -200,6 +207,20 @@ class TestReportSections(AccountTestInvoicingHttpCommon):
             invoice.invoice_line_ids.tax_tag_ids = [tax_tag.id]
         # To be sure we will compute amount_to_pay
         tax_return.is_tax_return = True
-        tax_return._proceed_with_locking()
         tax_return.action_submit()
         self.assertEqual(tax_return.total_amount_to_pay, 150)
+
+    def test_composite_report_with_journal_report_pdf_export(self):
+        """
+        Test that exporting a composite report containing a journal report to PDF
+        works correctly.
+        """
+        journal_report = self.env.ref('account_reports.journal_report')
+        composite_with_journal = self.env['account.report'].create({
+            'name': 'Test Composite with Journal Report',
+            'section_report_ids': [Command.set([journal_report.id])],
+        })
+        options = composite_with_journal.get_options({})
+        result = composite_with_journal.export_to_pdf(options)
+        self.assertTrue(result.get('file_content'), 'PDF should be generated successfully')
+        self.assertEqual(result.get('file_type'), 'pdf', 'File type should be PDF')

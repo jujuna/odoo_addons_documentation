@@ -6,6 +6,8 @@ from odoo.addons.point_of_sale.tests.common import TestPoSCommon
 
 class TestEcEdiPosCommon(TestEcEdiCommon, TestPoSCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -23,8 +25,10 @@ class TestEcEdiPosCommon(TestEcEdiCommon, TestPoSCommon):
     def with_pos_session(self):
         session = self.open_new_session(0.0)
         yield session
-        session.post_closing_cash_details(0.0)
-        session.close_session_from_ui()
+        cash_pm = self.config._get_cash_payment_method()
+        session.close_session_from_ui({
+            cash_pm.id: 0,
+        })
 
     def _create_order(self, ui_data):
         order_data = self.create_ui_order_data(**ui_data)

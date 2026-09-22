@@ -38,11 +38,11 @@ class SocialStreamPost(models.Model):
     company_id = fields.Many2one('res.company', 'Company', related='account_id.company_id')
     is_author = fields.Boolean('Is Author', compute='_compute_is_author')
 
-    stream_post_image_ids = fields.One2many('social.stream.post.image', 'stream_post_id', string="Stream Post Images",
-        help="Images that were shared with this post.")
-    # JSON array capturing the URLs of the images to make it easy to display them in the kanban view
-    stream_post_image_urls = fields.Text("Stream Post Images URLs",
-        compute='_compute_stream_post_image_urls')
+    stream_post_attachment_ids = fields.One2many('social.stream.post.attachment', 'stream_post_id', string="Stream Post Attachments",
+        help="Attachments shared with this post.")
+    # JSON array capturing the attachments data to make it easy to display them in the kanban view
+    stream_post_content_json = fields.Text("Stream Post Attachments data",
+        compute='_compute_stream_post_content_json')
 
     # Some social.medias (ex: Facebook) provide information on the link shared with the post.
     # We store those infomation to render a nice block on the kanban view with the title, image and description.
@@ -51,10 +51,14 @@ class SocialStreamPost(models.Model):
     link_image_url = fields.Char("Link Image URL")
     link_url = fields.Char("Link URL")
 
-    def _compute_stream_post_image_urls(self):
+    def _compute_stream_post_content_json(self):
         """ See field 'help' for more information. """
         for stream_post in self:
-            stream_post.stream_post_image_urls = json.dumps([image.image_url for image in stream_post.stream_post_image_ids])
+            stream_post.stream_post_content_json = json.dumps([{
+                'type': content.attachment_content_type,
+                'url': content.content_url,
+                'thumbnail_url': content.thumbnail_url if content.attachment_content_type == 'video' else False,
+            } for content in stream_post.stream_post_attachment_ids])
 
     def _compute_author_link(self):
         """ Every social module should override this method and handle its own

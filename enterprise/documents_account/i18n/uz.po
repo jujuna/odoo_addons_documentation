@@ -14,15 +14,27 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 18:46+0000\n"
-"PO-Revision-Date: 2025-10-08 18:46+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 02:02+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"documents_account/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents_account
+#: model:ir.module.module,description:base.module_documents_account
+msgid ""
+"\n"
+"Bridge module between the accounting and documents apps. It enables\n"
+"the creation invoices from the Documents module, and adds a\n"
+"button on Accounting's reports allowing to save the report into the\n"
+"Documents app in the desired format(s).\n"
+msgstr ""
 
 #. module: documents_account
 #. odoo-python
@@ -32,13 +44,31 @@ msgid "\"New Journal Entry\" can only be applied to Document."
 msgstr "\"Yangi jurnal yozuvi\" faqat Hujjatga qo‘llanilishi mumkin."
 
 #. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "%(model_name)s"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "%(model_name)s (%(journal_name)s)"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "%(operation)s tag %(tag)s"
+msgstr ""
+
+#. module: documents_account
 #. odoo-javascript
 #: code:addons/documents_account/static/src/js/tour.js:0
 #, fuzzy
 msgid "<b>Deselect this page</b> as we plan to process all bills first."
 msgstr ""
-"Barcha to‘lovlarni avval qayta ishlashni rejalashtirganligimiz sababli, "
-"<b>bu sahifani belgilamang</b>."
+"Barcha to‘lovlarni avval qayta ishlashni rejalashtirganligimiz sababli, <b>"
+"bu sahifani belgilamang</b>."
 
 #. module: documents_account
 #. odoo-javascript
@@ -58,6 +88,11 @@ msgstr "<span class=\"o_stat_text\">Hujjatlar</span>"
 #, fuzzy
 msgid "A setting already exists for this journal"
 msgstr "Bu jurnal uchun sozlama allaqachon mavjud"
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_documents_document__account_setting_ids
+msgid "Account Setting"
+msgstr ""
 
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.res_config_settings_view_form
@@ -84,6 +119,12 @@ msgstr "Buxgalteriya hisoboti"
 #, fuzzy
 msgid "Action"
 msgstr "Harakat"
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_add_tag_ids
+#: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_add_tag_ids
+msgid "Add Tags"
+msgstr ""
 
 #. module: documents_account
 #. odoo-javascript
@@ -116,10 +157,22 @@ msgid "Attachment"
 msgstr "Ilova"
 
 #. module: documents_account
+#: model:ir.model,name:documents_account.model_account_bank_statement
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_bank_statement
 #, fuzzy
 msgid "Bank Statement"
 msgstr "Bank ko‘chirmasi"
+
+#. module: documents_account
+#: model:ir.model,name:documents_account.model_account_document_import_mixin
+msgid "Business document import mixin"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Cannot add and remove tags at the same time: %s"
+msgstr ""
 
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.res_config_settings_view_form
@@ -186,11 +239,6 @@ msgstr "Yopish (Esc)"
 
 #. module: documents_account
 #: model:ir.model,name:documents_account.model_res_company
-#, fuzzy
-msgid "Companies"
-msgstr "Kompaniyalar"
-
-#. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__company_id
 #, fuzzy
 msgid "Company"
@@ -216,43 +264,8 @@ msgid "Create"
 msgstr "Yaratish"
 
 #. module: documents_account
-#. odoo-python
-#: code:addons/documents_account/models/ir_actions_server.py:0
-#, fuzzy
-msgid "Create %(model_name)s"
-msgstr "%(model_name)s yaratish"
-
-#. module: documents_account
-#. odoo-python
-#: code:addons/documents_account/models/ir_actions_server.py:0
-#, fuzzy
-msgid "Create %(model_name)s (%(journal_name)s)"
-msgstr "%(model_name)s (%(journal_name)s) yaratish"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note_code
-#, fuzzy
-msgid "Create Credit Note"
-msgstr "Kredit qaydnomasini yaratish"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note
-#, fuzzy
-msgid "Create Customer Credit Note"
-msgstr "Mijoz kredit qaydnomasini yaratish"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice_code
-#, fuzzy
-msgid "Create Customer Invoice"
-msgstr "Mijoz hisobini yaratish"
-
-#. module: documents_account
 #. odoo-javascript
 #: code:addons/documents_account/static/src/js/tour.js:0
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry_code
 #, fuzzy
 msgid "Create Misc Entry"
 msgstr "Turli yozuvlar yaratish"
@@ -260,24 +273,9 @@ msgstr "Turli yozuvlar yaratish"
 #. module: documents_account
 #. odoo-javascript
 #: code:addons/documents_account/static/src/js/tour.js:0
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill_code
 #, fuzzy
 msgid "Create Vendor Bill"
 msgstr "Yetkazib beruvchi hisobini yaratish"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund_code
-#, fuzzy
-msgid "Create Vendor Credit Note"
-msgstr "Yetkazib beruvchi kredit qaydnomasini yaratish"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_receipt
-#, fuzzy
-msgid "Create Vendor Receipt"
-msgstr "Yetkazib beruvchi kvitansiyasini yaratish"
 
 #. module: documents_account
 #. odoo-javascript
@@ -305,12 +303,32 @@ msgid "Credit Note"
 msgstr "Kredit qaydnomasi"
 
 #. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note
+msgid "Customer Credit Note"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Customer Credit Notes"
+msgstr ""
+
+#. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_out_invoice
 #, fuzzy
 msgid "Customer Invoice"
 msgstr "Mijoz hisobi"
 
 #. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Customer Invoices"
+msgstr ""
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_account_bank_statement__display_name
+#: model:ir.model.fields,field_description:documents_account.field_account_document_import_mixin__display_name
 #: model:ir.model.fields,field_description:documents_account.field_account_journal__display_name
 #: model:ir.model.fields,field_description:documents_account.field_account_move__display_name
 #: model:ir.model.fields,field_description:documents_account.field_account_report__display_name
@@ -331,6 +349,11 @@ msgstr "Ko‘rsatiladigan nom"
 #, fuzzy
 msgid "Document"
 msgstr "Hujjat"
+
+#. module: documents_account
+#: model:ir.module.module,shortdesc:base.module_documents_account
+msgid "Documents - Accounting"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_account_create_model
@@ -378,6 +401,12 @@ msgstr "Buxgalteriya hisobotlari uchun eksport formati"
 #, fuzzy
 msgid "Export wizard for accounting's reports"
 msgstr "Buxgalteriya hisobotlari uchun eksport yordamchisi"
+
+#. module: documents_account
+#. odoo-javascript
+#: code:addons/documents_account/static/src/components/mail_attachments/mail_attachments_selector_patch.js:0
+msgid "Failed to paste links: "
+msgstr ""
 
 #. module: documents_account
 #. odoo-javascript
@@ -430,6 +459,8 @@ msgid "Has Embedded PDF"
 msgstr "Joylashtirilgan PDF mavjud"
 
 #. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_account_bank_statement__id
+#: model:ir.model.fields,field_description:documents_account.field_account_document_import_mixin__id
 #: model:ir.model.fields,field_description:documents_account.field_account_journal__id
 #: model:ir.model.fields,field_description:documents_account.field_account_move__id
 #: model:ir.model.fields,field_description:documents_account.field_account_report__id
@@ -447,22 +478,33 @@ msgstr "ID"
 
 #. module: documents_account
 #: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement
-#: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement_code
-#, fuzzy
-msgid "Import Bank Statement"
-msgstr "Bank ko‘chirmasini import qilish"
+msgid "Import Statement"
+msgstr ""
+
+#. module: documents_account
+#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
+msgid "In Journal"
+msgstr ""
 
 #. module: documents_account
 #. odoo-python
-#: code:addons/documents_account/models/documents_document.py:0
-#, fuzzy
-msgid "Invoices"
-msgstr "Hisob-fakturalar"
+#: code:addons/documents_account/models/account_move.py:0
+msgid "Invalid attachment ids: IDs must be integers."
+msgstr ""
+
+#. module: documents_account
+#: model:documents.document,name:documents_account.documents_vendor_bill_inv_007
+msgid "Invoice-INV_2018_0007.pdf"
+msgstr ""
+
+#. module: documents_account
+#: model:ir.module.module,summary:base.module_documents_account
+msgid "Invoices from Documents"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model,name:documents_account.model_account_journal
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__journal_id
-#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
 #, fuzzy
 msgid "Journal"
 msgstr "Jurnal"
@@ -490,6 +532,11 @@ msgstr "Jurnallar"
 #, fuzzy
 msgid "Journals to synchronize"
 msgstr "Sinxronlashtiriladigan jurnallar"
+
+#. module: documents_account
+#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
+msgid "Keep in existing folder"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__write_uid
@@ -543,42 +590,56 @@ msgstr ""
 "muvofiq jarayoningizga moslashtirilishi mumkin.</i>"
 
 #. module: documents_account
+#. odoo-javascript
+#: code:addons/documents_account/static/src/components/mail_attachments/mail_attachments_selector_patch.js:0
+msgid "Links pasted"
+msgstr ""
+
+#. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry
+msgid "Misc Entry"
+msgstr ""
+
+#. module: documents_account
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_entry
 #, fuzzy
 msgid "Miscellaneous Operations"
 msgstr "Turli xil operatsiyalar"
 
 #. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note_move
-#, fuzzy
-msgid "Move Document To Taxes"
-msgstr "Hujjatni soliqlarga ko‘chirish"
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Move to %s"
+msgstr ""
 
 #. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice_move
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill_move
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund_move
-#, fuzzy
-msgid "Move Document to Taxes"
-msgstr "Hujjatni soliqlarga ko‘chirish"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry_move
-#, fuzzy
-msgid "Move Documents to Annual Closing"
-msgstr "Hujjatlarni yillik yakunlashga ko‘chirish"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement_move
-#, fuzzy
-msgid "Move to Annual Closing"
-msgstr "Yillik yakunlashga o‘tkazish"
+#: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_folder_id
+#: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_folder_id
+msgid "Move to Folder"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__state__documents_account_record_create
 #, fuzzy
 msgid "New Journal Entry"
 msgstr "Yangi jurnal yozuvi"
+
+#. module: documents_account
+#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
+msgid "None"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Only one folder move is allowed per action."
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Only tag/folder updates are allowed as child actions."
+msgstr ""
 
 #. module: documents_account
 #. odoo-javascript
@@ -592,6 +653,12 @@ msgstr "Amallar menyusini ochish"
 #, fuzzy
 msgid "Purchase Receipt"
 msgstr "Xarid tilxati"
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_remove_tag_ids
+#: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_remove_tag_ids
+msgid "Remove Tags"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_account_bank_statement_line__suspense_statement_line_id
@@ -684,16 +751,35 @@ msgstr ""
 "serverning boshqa bir nechta amallarini keltirib chiqaradigan amalni aniqlash"
 
 #. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_in_invoice
 #, fuzzy
 msgid "Vendor Bill"
 msgstr "Yetkazib beruvchi hisob-fakturasi"
 
 #. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Vendor Bills"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Vendor Receipts"
+msgstr ""
+
+#. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_in_refund
-#, fuzzy
-msgid "Vendor Credit Note"
-msgstr "Yetkazib beruvchi krediti eslatmasi"
+msgid "Vendor Refund"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Vendor Refunds"
+msgstr ""
 
 #. module: documents_account
 #. odoo-javascript
@@ -719,15 +805,19 @@ msgstr ""
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/documents_document.py:0
-#, fuzzy
-msgid "You can not create account move on folder."
-msgstr "Jildda buxgalteriya harakatini yarata olmaysiz."
+msgid "You can not create a journal entry from a folder."
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_res_config_settings__account_folder_id
 #, fuzzy
 msgid "account default folder"
 msgstr "hisob standart jildi"
+
+#. module: documents_account
+#: model:documents.document,name:documents_account.documents_vendor_bill_extract_ready_mat_document
+msgid "ready_mat.xml"
+msgstr ""
 
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.view_account_move_form_inherit_documents_account

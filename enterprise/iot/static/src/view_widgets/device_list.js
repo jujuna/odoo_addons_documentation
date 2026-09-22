@@ -18,11 +18,8 @@ export class DeviceListField extends X2ManyField {
      * for the device, working around the issue.
      * @override
      */
-    async openRecord(record) {
-        const action = await this.orm.call(record.resModel, "get_formview_action", [[record.resId]], {
-            context: this.props.context,
-        });
-        await this.action.doAction(action);
+    async openRecord(record, options = {}) {
+        return this.switchToForm(record, options);
     }
 }
 

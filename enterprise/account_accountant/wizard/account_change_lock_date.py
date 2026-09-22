@@ -330,12 +330,11 @@ class AccountChangeLockDate(models.TransientModel):
         if lock_date_values is None:
             lock_date_values = self._prepare_lock_date_values()
 
-        # Possibly create default report external values for tax
         tax_lock_date = lock_date_values.get('tax_lock_date', None)
         if tax_lock_date and tax_lock_date != self.env.company['tax_lock_date']:
+
             self._create_default_report_external_values('tax_lock_date')
 
-        # Possibly create default report external values for fiscal year
         fiscalyear_lock_date = lock_date_values.get('fiscalyear_lock_date', None)
         hard_lock_date = lock_date_values.get('hard_lock_date', None)
         if fiscalyear_lock_date or hard_lock_date:
@@ -348,6 +347,7 @@ class AccountChangeLockDate(models.TransientModel):
                 self.env.company.hard_lock_date or date.min,
             )
             if fiscal_lock_date != company_fiscal_lock_date:
+
                 self._create_default_report_external_values(field)
 
         self.env.company.sudo().write(lock_date_values)

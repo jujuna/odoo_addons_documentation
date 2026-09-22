@@ -6,7 +6,8 @@ import logging
 import psycopg2
 
 from odoo import _, fields, models
-from odoo.addons.ai_fields.tools import parse_ai_prompt_values
+from odoo.addons.ai.utils.ai_fields_tools import parse_ai_prompt_values
+from odoo.exceptions import RedirectWarning
 
 _logger = logging.getLogger(__name__)
 
@@ -25,16 +26,18 @@ class IrActionsServer(models.Model):
         if not self.ai_autosort_folder_id or record._name != 'documents.document':
             return super()._ai_action_run(record)
 
-        record = record.with_context(ai_executed_action=self, ai_documents_skip_autosort=True)
+        record = record.with_context(ai_executed_action=self, ai_documents_skip_autosort=True, ai_max_pdf_pages=5)
 
         ret, tool_calls_history = [], []
         try:
             ret, tool_calls_history = super()._ai_action_run(record)
         except psycopg2.errors.SerializationFailure:
             raise
+        except RedirectWarning as e:
+            error = e.args[0]
+            _logger.error("AI error: %s", error)
         except Exception as e:  # noqa: BLE001
             # We don't want to raise, to not break the flow like documents upload
-            # (e.g., if the OpenAI key is not set)
             error = e
             _logger.error("AI error: %s", error)
         else:
@@ -45,8 +48,7 @@ class IrActionsServer(models.Model):
                 record._message_log(body=_("AI: An error occurred: %s", error), author_id=self._ai_partner().id)
 
             if self.env.user.active:
-                self.env["bus.bus"]._sendone(
-                    self.env.user.partner_id,
+                self.env.user._bus_send(
                     "ai_documents.auto_sort_notification",
                     {
                         "message": str(error),
@@ -62,8 +64,7 @@ class IrActionsServer(models.Model):
             tool_history = " ".join(t["result"] for t in tool_calls_history if t["result"])
             message = tool_history or self._ai_get_action_description(record)
 
-            self.env["bus.bus"]._sendone(
-                self.env.user.partner_id,
+            self.env.user._bus_send(
                 "ai_documents.auto_sort_notification",
                 {
                     "message": message,

@@ -1,66 +1,12 @@
-from odoo import api, fields, models
-from dateutil.relativedelta import relativedelta
-from odoo.tools import split_every
+from odoo import _, api, models
 
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    product_invoice_policy = fields.Selection(related='product_id.invoice_policy')
-
-    deferred_revenue = fields.Boolean(
-        string='Deferred Revenue', search="_search_deferred_revenue",
-        store=False)
-    invoice_to_be_issued = fields.Boolean(
-        string='Invoice to be Issued', search="_search_invoice_to_be_issued",
-        store=False)
-
-    def _search_deferred_revenue(self, operator, value):
-        if operator != 'in':
-            return NotImplemented
-        return [('id', 'in', self._get_accrual_line_ids('deferred'))]
-
-    def _search_invoice_to_be_issued(self, operator, value):
-        if operator != 'in':
-            return NotImplemented
-        return [('id', 'in', self._get_accrual_line_ids('invoice_issued'))]
-
     @api.model
     def _read_group(self, domain, groupby=(), aggregates=(), having=(), offset=0, limit=None, order=None) -> list[tuple]:
         return self._read_group_for_accrual(domain, groupby, aggregates, having, offset, limit, order)
-
-    @api.model
-    def _get_accrual_line_ids(self, mode):
-        result_ids = []
-        so_lines = self.env['sale.order.line'].search_fetch(
-            self._get_accrual_domain(),
-            ['qty_invoiced', 'qty_delivered'],
-            order='id',
-        )
-        for lines in split_every(5000, so_lines):
-            for line in lines:
-                if mode == 'deferred':
-                    if line.qty_invoiced_at_date > line.qty_delivered_at_date:
-                        result_ids.append(line.id)
-                elif mode == 'invoice_issued':
-                    if line.qty_invoiced_at_date < line.qty_delivered_at_date:
-                        result_ids.append(line.id)
-                else:
-                    raise ValueError('Invalid accrual mode')
-        return result_ids
-
-    @api.model
-    def _get_accrual_domain(self):
-        accrual_date = self.env.context.get('accrual_entry_date')
-        ref_date = (fields.Date.to_date(accrual_date) if accrual_date else fields.Date.today())
-        date_from = ref_date - relativedelta(years=1)
-        domain = [
-            ('product_id', '!=', False),
-            ('state', '=', 'sale'),
-            ('order_id.date_order', '>=', date_from),
-            ('order_id.date_order', '<=', ref_date),
-        ]
-        return domain
 
     @api.model
     def _get_aggregates_to_skip_and_fields_to_patch(self):
@@ -68,3 +14,24 @@ class SaleOrderLine(models.Model):
         aggregates_to_skip.insert(0, 'qty_delivered_at_date:sum')
         fields_to_patch.insert(0, 'qty_delivered_at_date')
         return (aggregates_to_skip, fields_to_patch)
+
+    def action_open_accrual_wizard(self):
+        match accrual_type := self.env.context.get('accrual_type'):
+            case 'invoice_to_be_issued':
+                action_name = _('Create Invoices to be Issued Entry')
+            case 'invoiced_not_delivered':
+                action_name = _('Create Invoiced Not Delivered Entry')
+            case _other:
+                action_name = _('Accrued Revenue Entry')
+
+        return {
+            'name': action_name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.accrued.orders.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                **self.env.context,
+                'default_accrual_type': accrual_type,
+            },
+        }

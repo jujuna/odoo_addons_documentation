@@ -28,9 +28,9 @@ class SaleOrderLine(models.Model):
             domain = Domain(lines_by_timesheet._timesheet_compute_delivered_quantity_domain())
             refund_account_moves = so.invoice_ids.filtered(
                 lambda am: am.state == 'posted' and am.move_type == 'out_refund').reversed_entry_id
-            timesheet_domain = Domain('timesheet_invoice_id', '=', False) | Domain('timesheet_invoice_id.state', '=', 'cancel')
+            timesheet_domain = Domain('reinvoice_move_id', '=', False) | Domain('reinvoice_move_id.state', '=', 'cancel')
             if refund_account_moves:
-                credited_timesheet_domain = Domain('timesheet_invoice_id.state', '=', 'posted') & Domain('timesheet_invoice_id', 'in', refund_account_moves.ids)
+                credited_timesheet_domain = Domain('reinvoice_move_id.state', '=', 'posted') & Domain('reinvoice_move_id', 'in', refund_account_moves.ids)
                 timesheet_domain = timesheet_domain | credited_timesheet_domain
             # Shortcut to allow computing the domain for a bunch of lines without using _get_deferred_date that does not work in batch.
             # Side effect: It won't work for the first period if the invoice cron never run. (the next invoice date has never been incremented)
@@ -44,3 +44,14 @@ class SaleOrderLine(models.Model):
             for line in lines:
                 delivered_qties[line] = mapping[line.id]
         return delivered_qties
+
+    def _compute_display_name(self):
+        subscriptions_sudo = self.sudo().filtered(lambda sol: sol.order_id.is_subscription)
+        super(SaleOrderLine, subscriptions_sudo.with_context(skip_remaining_hours=True))._compute_display_name()
+        super(SaleOrderLine, self - subscriptions_sudo)._compute_display_name()
+
+    def _compute_remaining_hours_available(self):
+        subscription_lines = self.filtered(lambda sol: sol.order_id.is_subscription)
+        super(SaleOrderLine, self - subscription_lines)._compute_remaining_hours_available()
+        for line in subscription_lines:
+            line.remaining_hours_available = False

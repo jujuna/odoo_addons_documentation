@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from . import test_planning_overlap
 from . import test_gantt_reschedule_dates
+from . import test_portal
+from . import test_project_template
 from . import test_smart_schedule_common
 from . import test_smart_schedule
 from . import test_task_dependencies

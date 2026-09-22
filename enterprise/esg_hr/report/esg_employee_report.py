@@ -1,6 +1,7 @@
 import statistics
 
 from odoo import api, fields, models, tools
+from odoo.tools import SQL
 
 
 class EsgEmployeeReport(models.Model):
@@ -21,10 +22,10 @@ class EsgEmployeeReport(models.Model):
     country_id = fields.Many2one("res.country", readonly=True)
     wage = fields.Float("Wage", aggregator="avg", readonly=True, groups="hr.group_hr_manager")
     job_id = fields.Many2one("hr.job", string="Job Position", readonly=True, groups="hr.group_hr_user")
-    contract_type_id = fields.Many2one("hr.contract.type", string="Contract Type", readonly=True, groups="hr.group_hr_manager")
+    employee_type_id = fields.Many2one("hr.employee.type", string="Employee Type", readonly=True, groups="hr.group_hr_manager")
 
     def _select(self):
-        return """
+        return SQL("""
             e.id,
             v.sex,
             e.company_id,
@@ -45,27 +46,27 @@ class EsgEmployeeReport(models.Model):
             comprp.country_id,
             v.wage,
             v.job_id,
-            v.contract_type_id
-        """
+            v.employee_type_id
+        """)
 
     def _from(self):
-        return f"""
+        return SQL("""
             hr_employee e
                 LEFT JOIN hr_version v ON v.id = e.current_version_id
                 LEFT JOIN hr_employee ee ON e.id = ee.parent_id
                 LEFT JOIN resource_calendar rc ON v.resource_calendar_id = rc.id
-                LEFT JOIN ({self._leadership_level_subquery()}) ll ON e.id = ll.employee_id
+                LEFT JOIN (%s) ll ON e.id = ll.employee_id
                 LEFT JOIN res_company rcomp ON e.company_id = rcomp.id
                 LEFT JOIN res_partner comprp ON rcomp.partner_id = comprp.id
-        """
+        """, self._leadership_level_subquery())
 
     def _where(self):
-        return """
+        return SQL("""
             e.active = TRUE
-        """
+        """)
 
     def _group_by(self):
-        return """
+        return SQL("""
             e.id,
             v.sex,
             e.company_id,
@@ -77,11 +78,11 @@ class EsgEmployeeReport(models.Model):
             comprp.country_id,
             v.wage,
             v.job_id,
-            v.contract_type_id
-        """
+            v.employee_type_id
+        """)
 
     def _leadership_level_subquery(self):
-        return """
+        return SQL("""
             WITH RECURSIVE leadership_level AS (
                 SELECT
                     e.id AS employee_id,
@@ -105,18 +106,18 @@ class EsgEmployeeReport(models.Model):
                 MAX(level) AS level
             FROM leadership_level
             GROUP BY employee_id
-        """
+        """)
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute(f"""
-            CREATE OR REPLACE VIEW {self._table} AS (
-                  SELECT {self._select()}
-                    FROM {self._from()}
-                   WHERE {self._where()}
-                GROUP BY {self._group_by()}
+        self.env.cr.execute(SQL("""
+            CREATE OR REPLACE VIEW %s AS (
+                  SELECT %s
+                    FROM %s
+                   WHERE %s
+                GROUP BY %s
             )
-        """)
+        """, SQL.identifier(self._table), self._select(), self._from(), self._where(), self._group_by()))
 
     @api.model
     def get_overall_pay_gap(self):

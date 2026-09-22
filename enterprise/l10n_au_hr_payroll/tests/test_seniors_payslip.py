@@ -37,7 +37,7 @@ class TestSeniorPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 23, 174.8, 5000),
+                (self.work_entry_types['002.00'].id, 23, 174.8, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -88,7 +88,7 @@ class TestSeniorPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 23, 174.8, 5000),
+                (self.work_entry_types['002.00'].id, 23, 174.8, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -140,7 +140,7 @@ class TestSeniorPayslip(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 23, 174.8, 5000),
+                (self.work_entry_types['002.00'].id, 23, 174.8, 5000),
             ],
             expected_lines=[
                 # (code, total)

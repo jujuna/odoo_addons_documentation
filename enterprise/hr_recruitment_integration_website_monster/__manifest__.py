@@ -2,7 +2,6 @@
 
 {
     'name': 'Job Board - Monster.com (Website)',
-    'version': '1.0',
     'category': 'Human Resources/Recruitment/Integration',
     'summary': 'Manage Monster Job board integrations with website',
     'description': """

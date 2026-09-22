@@ -32,7 +32,7 @@
 
         <record id="project_project_renovation_architect_document_1" model="documents.document">
             <field name="name">plan.jpg</field>
-            <field name="datas" type="base64" file="documents_project_sale/data/files/plan.jpg"/>
+            <field name="raw" type="bytes" file="documents_project_sale/data/files/plan.jpg"/>
             <field name="folder_id" model="documents.document" eval="obj().search([('name', '=', 'Plans')], order='id desc', limit=1)"/>
             <field name="owner_id" ref="base.user_admin"/>
             <field name="partner_id" ref="base.res_partner_2"/>
@@ -41,16 +41,10 @@
 
         <record id="project_task_visit_customer_document_1" model="documents.document">
             <field name="name">welcome.jpg</field>
-            <field name="datas" type="base64" file="documents_project_sale/data/files/welcome.jpg"/>
+            <field name="raw" type="bytes" file="documents_project_sale/data/files/welcome.jpg"/>
             <field name="folder_id" ref="documents_renovations_projects"/>
             <field name="partner_id" ref="base.res_partner_2"/>
             <field name="tag_ids" eval="[Command.link(ref('documents_folder_tag_unsorted'))]"/>
-        </record>
-
-        <record id="project_project_renovation_architect_follower_portal" model="mail.followers">
-            <field name="res_model">project.project</field>
-            <field name="res_id" ref="project_project_renovation_architect"/>
-            <field name="partner_id" ref="base.partner_demo_portal"/>
         </record>
 
         <record id="product_1" model="product.template">

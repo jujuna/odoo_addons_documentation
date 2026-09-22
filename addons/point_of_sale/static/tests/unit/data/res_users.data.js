@@ -14,12 +14,25 @@ export class ResUsers extends MailResUsers {
             name: "Administrator",
             partner_id: 3,
             role: "manager",
+            write_date: "2025-01-01 10:00:00",
         },
         {
             id: 3,
             name: "User1",
             partner_id: 4,
             role: "cashier",
+            write_date: "2025-01-01 10:00:00",
         },
     ];
+
+    _post_read_pos_data(records) {
+        records.forEach((user) => {
+            if (user.id === 2) {
+                user._role = "manager";
+            } else {
+                user._role = "cashier";
+            }
+        });
+        return records;
+    }
 }

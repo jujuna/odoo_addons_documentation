@@ -1,7 +1,10 @@
-
+from odoo.fields import Date
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
+
 class TestEsAccountReportsCommon(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestAccountReportsCommon.setup_country('es')
@@ -69,12 +72,47 @@ class TestEsAccountReportsCommon(TestAccountReportsCommon):
 
         cls.env.company.vat = "ESA12345674"
 
-    def _check_boe_export(self, report, options, modelo_number, additional_context=None):
-        wizard_model = self.env[report.custom_handler_model_name]
-        if additional_context:
-            wizard_model = wizard_model.with_context(**additional_context)
-        wizard_action = wizard_model.open_boe_wizard(options, modelo_number)
-        self.assertEqual(f'l10n_es_reports.aeat.boe.mod{modelo_number}.export.wizard', wizard_action['res_model'], "Wrong BOE export wizard returned")
-        wizard = self.env[wizard_action['res_model']].with_context(wizard_action['context']).create({})
+    def _check_boe_export(self, modelo_number, additional_context=None, wizard_values=None):
+        account_return = self.env['account.return'].create({
+            'name': 'Tax Return',
+            'type_id': self.env.ref(f'l10n_es_reports.es_mod{modelo_number}_tax_return_type').id,
+            'company_id': self.company.id,
+            'date_from': '2020-01-01',
+            'date_to': '2020-12-31',
+        })
+        context = additional_context or {}
+        wizard = self.env[f'l10n_es_reports.mod{modelo_number}.submission.wizard'].with_context(**context).create({
+            'return_id': account_return.id
+        })
+
+        if wizard_values:
+            wizard.write(wizard_values)
+        with self.allow_pdf_render():
+            account_return.action_submit()
+            wizard.action_proceed_with_submission()
+
+        boe_file = account_return.attachment_ids.filtered(lambda a: a.name.endswith(".txt"))
+
+        self.assertTrue(boe_file.raw.size, f"BOE generation returned empty for modelo {modelo_number}")
+
+        return boe_file  # For additional checks
+
+    def _get_report_boe(self, report, modelo_number, options):
+        account_return = self.env['account.return'].create({
+            'name': 'Tax Return',
+            'type_id': self.env.ref(f'l10n_es_reports.es_mod{modelo_number}_tax_return_type').id,
+            'company_id': self.env.company.id,
+            'date_from': options['date']['date_from'],
+            'date_to': options['date']['date_to'],
+        })
+        date_from = Date.from_string(options['date']['date_from'])
+        date_to = Date.from_string(options['date']['date_to'])
+        options = self._generate_options(report, date_from, date_to)
+        wizard = self.env[f'l10n_es_reports.mod{modelo_number}.submission.wizard'] \
+            .with_context(default_date_from=date_from, default_date_to=date_to, options=options) \
+            .create({'return_id': account_return.id})
         options['l10n_es_reports_boe_wizard_id'] = wizard.id
-        self.assertTrue(self.env[report.custom_handler_model_name].export_boe(options), "Empty BOE")
+        tax_report_handler = self.env[f'l10n_es.mod{modelo_number}.tax.report.handler']
+        boe_file = tax_report_handler.export_boe(options)
+        boe_file['file_content'] = boe_file['file_content'].decode()
+        return boe_file

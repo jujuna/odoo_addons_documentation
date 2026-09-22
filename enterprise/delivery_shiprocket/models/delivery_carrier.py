@@ -64,6 +64,11 @@ class DeliveryCarrier(models.Model):
         help="Create a pickup request for your order shipment using Validate button of the Delivery Order."
     )
 
+    def _compute_supports_cash_on_delivery(self):
+        shiprocket_carriers = self.filtered(lambda carrier: carrier.delivery_type == 'shiprocket')
+        super(DeliveryCarrier, self - shiprocket_carriers)._compute_supports_cash_on_delivery()
+        shiprocket_carriers.supports_cash_on_delivery = True
+
     def action_shiprocket_test_connection(self):
         """
         Test connection by generate access token from shiprocket email and password.
@@ -109,7 +114,7 @@ class DeliveryCarrier(models.Model):
             channels = sr._fetch_shiprocket_channels()
             if not channels:
                 raise ValidationError(_('Failed to fetch Shiprocket Channel(s), Please try again later.'))
-            # multiple shipping method(s) can use same channels
+            # multiple delivery method(s) can use same channels
             current_channels = self.env['shiprocket.channel'].search([('shiprocket_email', '=', carrier.shiprocket_email)])
             new_channel_vals = []
             for name, code in channels.items():
@@ -139,7 +144,7 @@ class DeliveryCarrier(models.Model):
             couriers_list = sr._fetch_shiprocket_couriers()
             if not couriers_list:
                 raise ValidationError(_('Failed to fetch Shiprocket Couriers(s), Please try again later.'))
-            # multiple shipping method(s) can use same couriers
+            # multiple delivery method(s) can use same couriers
             current_couriers = self.env['shiprocket.courier'].search([('shiprocket_email', '=', carrier.shiprocket_email)])
             new_courier_vals = []
             for courier in couriers_list:
@@ -173,12 +178,11 @@ class DeliveryCarrier(models.Model):
             price_inr,
             order.currency_id,
             order.company_id,
-            fields.Date.context_today(self)
         )
 
     def shiprocket_rate_shipment(self, order):
         """
-        Returns shipping rate for the order and chosen shipping method.
+        Returns shipping rate for the order and chosen delivery method.
         """
         sr = ShipRocket(self, self.log_xml)
         result = sr._rate_request(
@@ -227,6 +231,8 @@ class DeliveryCarrier(models.Model):
             for pack in shippings['all_pack'].values():
                 response = pack.get('response')
                 courier_name = response.get('courier_name')
+                if courier_name:
+                    picking.shiprocket_courier_name = courier_name
                 carrier_tracking_ref = response.get('awb_code')
                 if response.get('warning_message'):
                     picking.message_post(body='%s' % (response['warning_message']))
@@ -242,7 +248,7 @@ class DeliveryCarrier(models.Model):
                     attachments = [("Manifest - %s-%s.pdf" % (courier_name, carrier_tracking_ref), manifest_data)]
                     log_message = _("Manifest generated of %s", courier_name)
                     picking.message_post(body=log_message, attachments=attachments)
-            # when carrier is in test mode, need to cancel shiprocket order.
+            # when delivery method is in test mode, need to cancel shiprocket order.
             if not self.prod_environment:
                 # Need carrier_tracking_ref to cancel shipment
                 picking.carrier_tracking_ref = " + ".join(shippings.get('tracking_numbers'))

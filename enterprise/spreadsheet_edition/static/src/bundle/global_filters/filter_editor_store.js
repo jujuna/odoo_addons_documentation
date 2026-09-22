@@ -4,7 +4,11 @@ import { Domain } from "@web/core/domain";
 import { user } from "@web/core/user";
 import { _t } from "@web/core/l10n/translation";
 import { CommandResult } from "@spreadsheet/o_spreadsheet/cancelled_reason";
-import { globalFieldMatchingRegistry } from "@spreadsheet/global_filters/helpers";
+import {
+    getDefaultOperator,
+    globalFieldMatchingRegistry,
+    isEmptyFilterValue,
+} from "@spreadsheet/global_filters/helpers";
 
 const { UuidGenerator } = helpers;
 
@@ -26,7 +30,7 @@ export class FilterEditorStore extends SpreadsheetStore {
     constructor(get, initialProps, type) {
         super(get);
         this.isNew = !initialProps.id;
-        this.filterId = initialProps.id || new UuidGenerator().smallUuid();
+        this.filterId = initialProps.id || UuidGenerator.smallUuid();
         if (this.isNew) {
             this.draft = {
                 id: this.filterId,
@@ -237,7 +241,7 @@ export class FilterEditorStore extends SpreadsheetStore {
     }
 
     selectRelatedModel(technical, label) {
-        if (this.filter.type !== "relation") {
+        if (this.filter.type !== "relation" || !technical) {
             return;
         }
         if (!this.filter.label) {
@@ -329,6 +333,21 @@ export class FilterEditorStore extends SpreadsheetStore {
             });
             return;
         }
+        if (filter.defaultValue && isEmptyFilterValue(filter, filter.defaultValue)) {
+            const defaultOperator = getDefaultOperator(filter.type);
+            if (defaultOperator === filter.defaultValue.operator) {
+                delete filter.defaultValue;
+            } else {
+                this.notificationStore.notifyUser({
+                    text: _t(
+                        "You cannot change the operator without a value. If default value is not needed, select the first operator."
+                    ),
+                    type: "danger",
+                    sticky: false,
+                });
+                return;
+            }
+        }
         if (filter.rangesOfAllowedValues) {
             // rangesOfAllowedValues is an array of RangeData in the command
             filter = {
@@ -385,7 +404,7 @@ export class FilterEditorStore extends SpreadsheetStore {
             const el = globalFieldMatchingRegistry.get(type);
             for (const dataSourceId of el.getIds(this.model.getters)) {
                 const model = el.getModel(this.model.getters, dataSourceId);
-                const tag = await el.getTag(this.model.getters, dataSourceId);
+                const tag = el.getTag(this.model.getters, dataSourceId);
                 this._fieldsMatching.push({
                     id,
                     name: el.getDisplayName(this.model.getters, dataSourceId),

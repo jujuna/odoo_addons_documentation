@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import csv
 import io
 
@@ -8,7 +7,7 @@ from datetime import date
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.tools import date_utils
+from odoo.tools import BinaryBytes, date_utils
 
 
 class L10nUsForm940(models.Model):
@@ -40,7 +39,7 @@ class L10nUsForm940(models.Model):
     - Electronic Federal Tax Payment System (EFTPS)
     - Check or Money order
     - Credit Card""")
-    year = fields.Char(required=True, default=lambda self: fields.Date.today().year, string="Tax Year")
+    year = fields.Char(required=True, default=lambda self: fields.Date.context_today(self).year, string="Tax Year")
     company_id = fields.Many2one(
         'res.company',
         default=lambda self: self.env.company,
@@ -54,7 +53,6 @@ class L10nUsForm940(models.Model):
         readonly=False,
         domain="[('id', 'in', allowed_payslip_ids)]")
     csv_file = fields.Binary("CSV file", readonly=True)
-    csv_filename = fields.Char()
 
     @api.depends('year')
     def _compute_display_name(self):
@@ -215,8 +213,8 @@ class L10nUsForm940(models.Model):
             "",
             dict(self._fields['irs_payment_option']._description_selection(self.env)).get(self.irs_payment_option),
             dict(bank_account._fields['l10n_us_bank_account_type']._description_selection(self.env)).get(bank_account.l10n_us_bank_account_type),
-            bank_account.acc_number,
-            bank_account.clearing_number,
+            bank_account.account_number,
+            bank_account._get_clearing_number('US'),
             company.phone,
             quarter_to_futa.get(1),
             quarter_to_futa.get(2),
@@ -234,5 +232,4 @@ class L10nUsForm940(models.Model):
         ]
         writer.writerow([col or "" for col in row])  # never write False
 
-        self.csv_file = base64.b64encode(output.getvalue().encode())
-        self.csv_filename = f"form_940_{self.year}.csv"
+        self.csv_file = BinaryBytes(output.getvalue().encode(), filename=f"form_940_{self.year}.csv")

@@ -9,6 +9,7 @@
                 <field name="create_uid" widget="many2one_avatar"/>
                 <field name="mobile_number" string="Sent to"/>
                 <field name="wa_template_id" optional="hidden"/>
+                <field name="wa_interactive_id" optional="hidden"/>
                 <field name="body" optional="hidden"/>
                 <field name="state"
                        decoration-info="state == 'sent'"
@@ -17,8 +18,8 @@
                        widget="badge"/>
                 <field name="failure_type" optional="hidden"/>
                 <field name="failure_reason" optional="hidden"/>
-                <button name="button_resend" string="Retry" type="object" icon="fa-repeat" invisible="state not in ['error', 'cancel']"/>
-                <button name="button_cancel_send" string="Cancel WhatsApp" type="object" icon="fa-times-circle" invisible="state != 'draft'"/>
+                <button name="button_resend" string="Retry" type="object" icon="redo" invisible="state not in ['error', 'cancel']"/>                
+                <button name="button_cancel_send" string="Cancel WhatsApp" type="object" icon="cancel" icon_class="oi-filled" invisible="state != 'draft'"/>
             </list>
         </field>
      </record>
@@ -53,7 +54,8 @@
                         </group>
                         <group>
                             <field name="create_date" readonly="1"/>
-                            <field name="wa_template_id" readonly="1"/>
+                            <field name="wa_template_id" readonly="1" invisible="not wa_template_id"/>
+                            <field name="wa_interactive_id" readonly="1" invisible="not wa_interactive_id"/>
                             <field name="msg_uid" readonly="1"/>
                         </group>
                     </group>
@@ -79,9 +81,9 @@
                 <filter string="Failed Messages" name="filter_state_error"
                     domain="[('state', '=', 'error')]"/>
                 <separator/>
-                <filter string="Last Week" name="last_week" domain="[('create_date','&gt;=', 'today -7d')]"/>
-                <filter string="Last Month" name="last_month" domain="[('create_date','&gt;=', 'today -30d')]"/>
-                <filter string="Last Year" name="Last Year" domain="[('create_date','&gt;=', 'today -365d')]"/>
+                <filter string="Last Week" name="last_week" domain="[('create_date','&gt;=', 'today -7d'), ('create_date', '&lt;', 'today')]"/>
+                <filter string="Last Month" name="last_month" domain="[('create_date','&gt;=', 'today -30d'), ('create_date', '&lt;', 'today')]"/>
+                <filter string="Last Year" name="Last Year" domain="[('create_date','&gt;=', 'today -365d'), ('create_date', '&lt;', 'today')]"/>
                 <separator/>
                 <filter string="Create Date" name="filter_create_date" date="create_date"/>
                 <group>
@@ -91,6 +93,8 @@
                         context="{'group_by': 'state'}"/>
                     <filter string="Template" name="groupby_wa_template_id"
                         context="{'group_by': 'wa_template_id'}"/>
+                    <filter string="Interactive" name="groupby_wa_interactive_id"
+                        context="{'group_by': 'wa_interactive_id'}"/>
                 </group>
             </search>
         </field>

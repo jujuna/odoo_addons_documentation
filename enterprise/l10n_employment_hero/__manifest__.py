@@ -7,7 +7,6 @@
     'depends': [
         'account_accountant',
     ],
-    'version': '1.0',
     'description': """
 Employment Hero Payroll Integration
 This Module will synchronise all payrun journals from Employment Hero to Odoo.
@@ -23,6 +22,5 @@ This Module will synchronise all payrun journals from Employment Hero to Odoo.
         'views/account_views.xml',
         'views/res_config_settings.xml',
     ],
-    'installable': True,
     'license': 'OEEL-1',
 }

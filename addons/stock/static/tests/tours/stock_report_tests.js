@@ -10,7 +10,7 @@ registry.category("web_tour.tours").add("test_stock_route_diagram_report", {
         run: "click",
     },
     {
-        trigger: '.nav-item > a:contains("Inventory")',
+        trigger: '.nav-item > button:contains("Inventory")',
         run: "click",
     },
     {
@@ -38,10 +38,16 @@ registry.category("web_tour.tours").add("test_context_from_warehouse_filter", {
             trigger: ".o-dropdown-item:contains(Warehouse):contains(foo)",
             run: "click",
         },
+        {
+            trigger: "body:not(:has(.o_popover))",
+        },
         // Add warehouse A's id to the warehouse context key
         {
             trigger: ".o_searchview_input",
             run: "click",
+        },
+        {
+            trigger: "body:has(.o_popover)",
         },
         {
             trigger: ".o_searchview_input",

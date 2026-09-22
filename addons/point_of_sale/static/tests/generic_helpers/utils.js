@@ -1,6 +1,14 @@
 /* global posmodel */
 
-import { simulateBarCode } from "@barcodes/../tests/legacy/helpers";
+import { patch } from "@web/core/utils/patch";
+import { TourHelpers } from "@web_tour/tour_helpers/tour_helpers";
+
+patch(TourHelpers.prototype, {
+    async scan(barcode) {
+        odoo.__WOWL_DEBUG__.root.env.services.barcode.bus.trigger("barcode_scanned", { barcode });
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+    },
+});
 
 export function negate(selector, parent = "body") {
     return `${parent}:not(:has(${selector}))`;
@@ -13,9 +21,7 @@ export function scan_barcode(barcode) {
         {
             content: `PoS model scan barcode '${barcode}'`,
             trigger: "body", // The element here does not really matter as long as it is present
-            run: () => {
-                simulateBarCode([...barcode, "Enter"]);
-            },
+            run: ({ scan }) => scan(barcode),
         },
     ];
 }
@@ -44,21 +50,21 @@ export function refresh() {
                     checkTransaction();
                 }, 305);
                 setTimeout(() => {
-                    throw new Error("Timeout waiting indexedDB for transactions to finish");
-                }, 2000);
+                    const activeTx = posmodel.data.indexedDB.activeTransactions;
+                    const storeNames = Array.from(activeTx).flatMap((tx) =>
+                        Array.from(tx.objectStoreNames)
+                    );
+                    const uniqueStores = [...new Set(storeNames)].join(", ");
+                    throw new Error(
+                        `Timeout waiting indexedDB for transactions to finish. Stores open: [${uniqueStores}]`
+                    );
+                }, 5000);
             });
         },
         "refresh page",
         true
     );
 }
-export function elementDoesNotExist(selector) {
-    return {
-        content: `Check that element "${selector}" don't exist.`,
-        trigger: negate(selector),
-    };
-}
-
 export function assertCurrentOrderDirty(dirty = true) {
     return {
         trigger: "body",

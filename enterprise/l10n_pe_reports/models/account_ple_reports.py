@@ -38,10 +38,17 @@ class L10n_PeTaxPleReportHandler(models.AbstractModel):
             values["folio"] = last_number_match.group() or ""
         return values
 
+    def _report_engine_ple(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        if current_groupby:
+            report = self.env["account.report"].browse(options["report_id"])
+            report._check_groupby_fields([current_groupby])
+        return {next(iter(formulas_dict.values())):  self._get_ple_report_data(options, current_groupby)}
+
     def _get_ple_report_data(self, options, current_groupby):
         def build_result(query_res_lines):
             def build_result_dict(query_res_lines):
                 result = {
+                    "has_sublines": True,
                     "document_type": None,
                     "date": None,
                     "customer_vat": None,
@@ -66,23 +73,27 @@ class L10n_PeTaxPleReportHandler(models.AbstractModel):
                 if current_groupby and query_res_lines:
                     sign_total = -1 if query_res_lines[0]["move_type"] in ("out_invoice", "out_refund") else 1
                     rate = (
-                        (query_res_lines[0]["amount_currency"] / query_res_lines[0]["total"])
-                        if query_res_lines[0]["total"]
+                        1 / query_res_lines[0]["move_rate"]
+                        if query_res_lines[0]["move_rate"]
                         else 1
                     )
                     refund = query_res_lines[0]["reversed_entry_name"]
+                    # SUNAT expects the gross total, so the IGV withholding deducted by the tax is added back
+                    gross_total = self.env.company.currency_id.round(
+                        query_res_lines[0]["amount_currency"] + (query_res_lines[0]["vat_igv_withholding"] or 0),
+                    )
                     result = {
+                        "has_sublines": True,
                         "move_name": query_res_lines[0]["move_name"],
                         "invoice_date": query_res_lines[0]["invoice_date"],
                         "date": query_res_lines[0]["date"],
                         "date_due": query_res_lines[0]["invoice_date_due"],
                         "document_type": query_res_lines[0]["document_type"],
-                        "partner_lit": query_res_lines[0]["partner_lit"],
                         "partner_lit_code": query_res_lines[0]["partner_lit_code"],
                         "id_number": query_res_lines[0]["partner_vat"],
                         "customer_vat": query_res_lines[0]["partner_vat"],
                         "customer": query_res_lines[0]["partner_name"],
-                        "amount_total": query_res_lines[0]["amount_currency"] * (sign_total * -1),
+                        "amount_total": gross_total * (sign_total * -1),
                         "currency": query_res_lines[0]["currency_name"],
                         "rate": abs(rate),
                         "base_igv": (query_res_lines[0]["base_igv"] or 0) * sign_total,
@@ -163,6 +174,7 @@ class L10n_PeTaxPleReportHandler(models.AbstractModel):
             tax_group_gra = ref(f"account.{cid}_tax_group_gra").id
             tax_group_other = ref(f"account.{cid}_tax_group_other").id
             tax_group_ret = ref(f"account.{cid}_tax_group_ret").id
+            tax_group_igv_withholding = ref(f"account.{cid}_tax_group_igv_withholding").id
         except ValueError:
             raise UserError(_("In order to generate the PLE reports, please update l10n_pe module to update the required data."))
 
@@ -172,12 +184,12 @@ SELECT
     account_move_line__move_id.id,
     account_move_line__move_id.name as move_name,
     account_move_line__move_id.ref as move_ref,
-    account_move_line__move_id.edi_state,
+    account_move_line__move_id.l10n_pe_edi_status as edi_state,
+    account_move_line__move_id.invoice_currency_rate as move_rate,
     rp.name as partner_name,
     rp.vat as partner_vat,
     rp.street as partner_street,
-    lit.name->>'en_US' as partner_lit,
-    lit.l10n_pe_vat_code as partner_lit_code,
+    rp.l10n_pe_sunat_id_code as partner_lit_code,
     rp.country_id as partner_country_id,
     rpc.l10n_pe_code as partner_country_code,
     rpc.l10n_pe_agreement_code as partner_country_agreement_code,
@@ -262,7 +274,8 @@ SELECT
         THEN account_move_line.balance ELSE Null END) as base_withholding,
     sum(CASE WHEN ntg.id = %(tax_group_ret)s
         THEN account_move_line.balance ELSE Null END) as vat_withholding,
-    account_move_line__move_id.amount_total as total,
+    sum(CASE WHEN ntg.id = %(tax_group_igv_withholding)s
+        THEN account_move_line.balance ELSE Null END) as vat_igv_withholding,
     account_move_line__move_id.amount_total_signed as amount_currency
 FROM
     account_move_line
@@ -292,9 +305,6 @@ LEFT JOIN
 LEFT JOIN
     res_country AS rpc
     ON rpc.id = rp.country_id
-LEFT JOIN
-    l10n_latam_identification_type AS lit
-    ON rp.l10n_latam_identification_type_id = lit.id
 LEFT JOIN
     res_currency AS rc
     ON rc.id = account_move_line__move_id.currency_id
@@ -336,7 +346,7 @@ WHERE
     AND (account_move_line.tax_line_id is not null or btg.l10n_pe_edi_code is not null)
     AND aj.l10n_latam_use_documents
 GROUP BY
-    account_move_line__move_id.id, rp.id, lit.id, rc.id, account_move_line__move_id__l10n_latam_document_type_id.id,
+    account_move_line__move_id.id, rp.id, rc.id, account_move_line__move_id__l10n_latam_document_type_id.id,
     reversed_entry.id, ldt_reversed_entry.id, debit_origin.id,
     ldt_debit_origin.id, dua.id, ldt_dua.id, rpc.id, lprt.id, company.id, partner_company.id
 ORDER BY
@@ -354,6 +364,7 @@ ORDER BY
             tax_group_gra=tax_group_gra,
             tax_group_other=tax_group_other,
             tax_group_ret=tax_group_ret,
+            tax_group_igv_withholding=tax_group_igv_withholding,
             search_condition=query.where_clause,
         )
         self.env.flush_all()
@@ -394,9 +405,8 @@ ORDER BY
     def _get_file_txt(self, options, data):
         txt_result = ""
         if data:
-            csv.register_dialect("pipe_separator", delimiter="|", skipinitialspace=True)
             output = StringIO()
-            writer = csv.DictWriter(output, dialect="pipe_separator", fieldnames=data[0].keys())
+            writer = csv.DictWriter(output, delimiter="|", skipinitialspace=True, fieldnames=data[0].keys())
             writer.writerows(data)
             txt_result = output.getvalue()
 

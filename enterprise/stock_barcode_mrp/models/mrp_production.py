@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class MrpProduction(models.Model):
@@ -23,6 +24,13 @@ class MrpProduction(models.Model):
     def _compute_is_completed(self):
         for order in self:
             order.is_completed = order.qty_produced == order.product_qty
+
+    def write(self, vals):
+        res = super().write(vals)
+        for production in self:
+            if 'qty_producing' in vals and self.env.context.get('barcode_view'):
+                production.with_context(skip_raw_moves=True)._change_producing()
+        return res
 
     def action_open_barcode_client_action(self):
         self.ensure_one()
@@ -50,7 +58,7 @@ class MrpProduction(models.Model):
             'location_src_id',
             'location_dest_id',
             'product_id',
-            'product_uom_id',
+            'uom_id',
             'product_qty',
             'qty_producing',
             'lot_producing_ids',
@@ -62,19 +70,21 @@ class MrpProduction(models.Model):
             'production_group_id',
             'backorder_ids',
             'use_create_components_lots',
+            'finished_move_line_ids',
         ]
 
     def _get_stock_barcode_data(self):
         # Avoid to get the products full name because code and name are separate in the barcode app.
         self = self.with_context(display_default_code=False)
-        move_lines = self.move_raw_line_ids | self.move_byproduct_line_ids
+        final_product_lines = self.finished_move_line_ids - self.move_byproduct_line_ids
+        move_lines = self.move_raw_line_ids | self.move_byproduct_line_ids | final_product_lines
         lots = move_lines.lot_id | self.lot_producing_ids
         owners = move_lines.owner_id
         # Fetch all implied products in `self`
         products = self.product_id | (self.move_raw_ids + self.move_byproduct_ids).product_id
         moves = self.move_raw_ids | self.move_byproduct_ids
 
-        uoms = products.uom_id | move_lines.product_uom_id | products.uom_ids
+        uoms = products.uom_id | move_lines.uom_id | products.uom_ids | self.bom_id.uom_id | moves.bom_line_id.uom_id | products.extra_uom_ids
         # If UoM setting is active, fetch all UoM's data.
         if self.env.user.has_group('uom.group_uom'):
             uoms |= self.env['uom.uom'].search([])
@@ -82,7 +92,8 @@ class MrpProduction(models.Model):
         # Fetch `stock.location`
         source_locations = self.env['stock.location'].search([('id', 'child_of', self.location_src_id.ids)])
         destination_locations = self.env['stock.location'].search([('id', 'child_of', self.location_dest_id.ids)])
-        locations = move_lines.location_id | move_lines.location_dest_id | source_locations | destination_locations | self.production_location_id
+        scrap_location = self.env.company.scrap_location_id
+        locations = move_lines.location_id | move_lines.location_dest_id | source_locations | destination_locations | self.production_location_id | scrap_location
 
         # Fetch `stock.package` and `stock.package.type` if group_tracking_lot.
         packages = self.env['stock.package']
@@ -160,7 +171,7 @@ class MrpProduction(models.Model):
                     mo_nums = self.search_count(base_domain + [('move_raw_ids.product_id', '=', product.id)])
                     additional_context['search_default_move_raw_ids'] = barcode
         if not barcode_type and not mo_nums:  # Nothing found yet, try to find picking by name.
-            mo_nums = self.search_count(base_domain + [('name', '=', barcode)])
+            mo_nums = self.search_count(base_domain + [('name', 'ilike', barcode)])
             additional_context['search_default_name'] = barcode
 
         if not mo_nums:
@@ -189,4 +200,18 @@ class MrpProduction(models.Model):
         return {'action': action}
 
     def _should_return_records(self):
-        return super()._should_return_records() and not self.env.context.get('barcode_trigger', False)
+        return super()._should_return_records() and not self.env.context.get('barcode_view', False)
+
+    def action_put_in_pack(self, *, package_id=False, package_type_id=False, package_name=False, move_line_ids=[]):
+        self.ensure_one()
+        if self.state == 'cancel':
+            raise UserError(self.env._("Manufacturing order was cancelled."))
+        lines_to_pack = self.finished_move_line_ids.filtered(lambda ml: ml.product_id == self.product_id)
+        if move_line_ids:
+            lines_to_pack = self.env['stock.move.line'].browse(move_line_ids)
+        return lines_to_pack.action_put_in_pack(package_id=package_id, package_type_id=package_type_id, package_name=package_name)
+
+    def barcode_update_qty_producing(self, qty_producing):
+        self.ensure_one()
+        self.with_context(barcode_view=True).qty_producing = qty_producing
+        return self.finished_move_line_ids.ids

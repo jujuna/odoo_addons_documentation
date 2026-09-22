@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class AccountReportFileDownloadErrorWizard(models.TransientModel):
@@ -10,6 +10,12 @@ class AccountReportFileDownloadErrorWizard(models.TransientModel):
     actionable_errors = fields.Json()
     file_name = fields.Char()
     file_content = fields.Binary()
+    has_danger_actionable_errors = fields.Boolean(compute='_compute_has_danger_actionable_errors')
+
+    @api.depends('actionable_errors')
+    def _compute_has_danger_actionable_errors(self):
+        for record in self:
+            record.has_danger_actionable_errors = any(error.get('level') == 'danger' for error in record.actionable_errors.values())
 
     def button_download(self):
         self.ensure_one()

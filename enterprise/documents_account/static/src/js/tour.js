@@ -3,7 +3,6 @@ import { registry } from "@web/core/registry";
 import { markup } from "@odoo/owl";
 
 registry.category("web_tour.tours").add("documents_account_tour", {
-    url: "/odoo",
     steps: () => [
         {
             trigger: '.o_app[data-menu-xmlid="documents.menu_root"]',
@@ -20,7 +19,8 @@ registry.category("web_tour.tours").add("documents_account_tour", {
             trigger: "span.o_documents_in_folder",
         },
         {
-            trigger: 'body:not(:has(.o-FileViewer)) img[src="https://img.youtube.com/vi/Ayab6wZ_U1A/0.jpg"]',
+            trigger:
+                'body:not(:has(.o-FileViewer)) img[src="https://img.youtube.com/vi/Ayab6wZ_U1A/0.jpg"]',
             content: markup(_t("Click on a thumbnail to <b>preview the document</b>.")),
             tooltipPosition: "bottom",
             run: "click",
@@ -82,13 +82,18 @@ registry.category("web_tour.tours").add("documents_account_tour", {
             run: "click",
         },
         {
-            trigger: ".o_documents_action_dropdown button.dropdown-item:contains('" + _t("Split PDF") + "')",
-            content: _t("As this PDF contains multiple documents, let's split and process in bulk."),
+            trigger:
+                ".o_documents_action_dropdown button.dropdown-item:contains('" +
+                _t("Split PDF") +
+                "')",
+            content: _t(
+                "As this PDF contains multiple documents, let's split and process in bulk."
+            ),
             tooltipPosition: "left",
             run: "click",
         },
         {
-            trigger: '.o_page_splitter_wrapper:eq(3)',
+            trigger: ".o_page_splitter_wrapper:eq(3)",
             content: markup(
                 _t(
                     "Click on the <b>page separator</b>: we don't want to split these two pages as they belong to the same document."
@@ -98,7 +103,7 @@ registry.category("web_tour.tours").add("documents_account_tour", {
             run: "click",
         },
         {
-            trigger: '.o_documents_pdf_page_selector:eq(5)',
+            trigger: ".o_documents_pdf_page_selector:eq(5)",
             content: markup(_t("<b>Deselect this page</b> as we plan to process all bills first.")),
             tooltipPosition: "left",
             run: "click",
@@ -110,7 +115,7 @@ registry.category("web_tour.tours").add("documents_account_tour", {
             run: "click",
         },
         {
-            trigger: '.o_documents_pdf_page_selector',
+            trigger: ".o_documents_pdf_page_selector",
             content: markup(_t("<b>Select</b> this page to continue.")),
             tooltipPosition: "bottom",
             run: "click",

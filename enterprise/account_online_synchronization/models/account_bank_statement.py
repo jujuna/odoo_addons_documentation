@@ -11,13 +11,10 @@ class AccountBankStatementLine(models.Model):
     _inherit = 'account.bank.statement.line'
 
     online_transaction_identifier = fields.Char("Online Transaction Identifier", readonly=True)
-    online_partner_information = fields.Char(readonly=True)
-    online_account_id = fields.Many2one(comodel_name='account.online.account', readonly=True)
-    online_link_id = fields.Many2one(
-        comodel_name='account.online.link',
-        related='online_account_id.account_online_link_id',
-        store=True,
+    online_account_id = fields.Many2one(
+        comodel_name='account.online.account',
         readonly=True,
+        index=True,
     )
 
     @api.model_create_multi

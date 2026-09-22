@@ -11,6 +11,8 @@ from odoo.addons.sale_subscription.tests.test_sale_subscription import TestSubsc
 @tagged('post_install', '-at_install')
 @freeze_time("2021-01-03")
 class TestSubscriptionInvoiceSignature(TestInvoiceSignature, TestSubscription):
+    _test_user_groups = None  # FIXME list needed groups
+
     def setUp(self):
         super().setUp()
         self.sale_subscription_cron = self.env.ref("sale_subscription.account_analytic_cron_for_invoice")
@@ -172,7 +174,7 @@ class TestSubscriptionInvoiceSignature(TestInvoiceSignature, TestSubscription):
             'standard_price': 5,
             'list_price': 10,
             'can_be_expensed': True,
-            'expense_policy': 'sales_price',
+            'reinvoice_policy': 'sales_price',
             'purchase_method': 'purchase',
         })
         subscription1, subscription2 = self.env['sale.order'].create([{
@@ -253,3 +255,7 @@ class TestSubscriptionInvoiceSignature(TestInvoiceSignature, TestSubscription):
         action = subscription.prepare_upsell_order()
         upsell = self.env['sale.order'].browse(action['res_id'])
         self.assertEqual(set(upsell.order_line.mapped('discount')), {0, 50}, 'Upsell discounts should match subscription discounts')
+
+    def test_plan_field_automatic_price_unit_update(self):
+        self.another_user.group_ids += self.env.ref("product.group_product_manager")
+        super().test_plan_field_automatic_price_unit_update()

@@ -1,3 +1,4 @@
+import { proxy } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { ListRenderer } from "@web/views/list/list_renderer";
 import { PayslipActionHelper } from "../../components/payslip_action_helper/payslip_action_helper";
@@ -8,31 +9,24 @@ export class PayslipListRenderer extends ListRenderer {
         ...ListRenderer.components,
         PayslipActionHelper,
     };
-    static props = [
-        ...ListRenderer.props,
-        "onGenerate",
-        "payRunInfo",
-    ];
 
     setup() {
         super.setup();
+        this.state = proxy({ payRunReactive: this.env.payRunReactive });
         this.keyPayrunOptionalFields = `payrun_${this.keyOptionalFields}`;
     }
 
     get payslipActionHelperProps() {
         const helperProps = {
-            onClickCreate: this.props.onAdd.bind(this.onClickCreate),
-            onClickGenerate: this.props.onGenerate.bind(this.onGenerate),
+            onClickCreate: this.props.onAdd,
         };
-        if (this.props.payRunInfo.id) {
-            helperProps.payrunId = this.props.payRunInfo.id;
-        }
+        helperProps.payrunId = this.state.payRunReactive.payRunId || undefined;
         return helperProps;
     }
 
-    /** utils **/
-    get inPayrun() {
-        return this.props?.payRunInfo?.id;
+    get showNoContentHelper() {
+        const { model } = this.props.list;
+        return this.props.noContentHelp && (model.useSampleModel || !model.hasData());
     }
 
     /** overrides **/
@@ -40,7 +34,7 @@ export class PayslipListRenderer extends ListRenderer {
      * @override
      */
     getActiveColumns(list) {
-        if (this.inPayrun) {
+        if (this.state.payRunReactive.payRunId) {
             this.allColumns = this.allColumns.map((col) => (
                 col.options && 'payrun_optional' in col.options
                     ? {...col, optional: col.options.payrun_optional}
@@ -51,7 +45,9 @@ export class PayslipListRenderer extends ListRenderer {
     }
 
     saveOptionalActiveFields() {
-        const storageKey = this.inPayrun ? this.keyPayrunOptionalFields : this.keyOptionalFields;
+        const storageKey = this.state.payRunReactive.payRunId
+            ? this.keyPayrunOptionalFields
+            : this.keyOptionalFields;
         browser.localStorage.setItem(
             storageKey,
             Object.keys(this.optionalActiveFields).filter(
@@ -61,10 +57,15 @@ export class PayslipListRenderer extends ListRenderer {
     }
 
     computeOptionalActiveFields() {
-        const storageKey = this.inPayrun ? this.keyPayrunOptionalFields : this.keyOptionalFields;
+        const storageKey = this.state.payRunReactive.payRunId
+            ? this.keyPayrunOptionalFields
+            : this.keyOptionalFields;
         const localStorageValue = browser.localStorage.getItem(storageKey);
         const optionalColumn = this.allColumns.filter(
-            (col) => col.type === "field" && (col.optional || this.inPayrun && col.options?.payrun_optional)
+            (col) =>
+                col.type === "field" &&
+                (col.optional ||
+                    (this.state.payRunReactive.payRunId && col.options?.payrun_optional))
         );
         const optionalActiveFields = {};
         if (localStorageValue !== null) {
@@ -76,7 +77,7 @@ export class PayslipListRenderer extends ListRenderer {
             }
         } else {
             for (const col of optionalColumn) {
-                if (this.inPayrun && col.options?.payrun_optional) {
+                if (this.state.payRunReactive.payRunId && col.options?.payrun_optional) {
                     optionalActiveFields[col.name] = col.options?.payrun_optional === "show";
                 }
                 else {

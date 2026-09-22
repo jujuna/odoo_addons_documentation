@@ -24,28 +24,28 @@ class ResConfigSettings(models.TransientModel):
     @api.depends('linkedin_use_own_account')
     def _compute_linkedin_app_id(self):
         user_is_manager = self.env.user.has_group('social.group_social_manager')
-        linkedin_app_id = self.env['ir.config_parameter'].sudo().get_param('social.linkedin_app_id')
+        linkedin_app_id = self.env['ir.config_parameter'].sudo().get_str('social.linkedin_app_id') or False
         for setting in self:
-            setting.linkedin_app_id = linkedin_app_id if user_is_manager else None
+            setting.linkedin_app_id = linkedin_app_id if user_is_manager else False
 
     def _inverse_linkedin_app_id(self):
         user_is_manager = self.env.user.has_group('social.group_social_manager')
         for setting in self:
             if user_is_manager:
-                self.env['ir.config_parameter'].sudo().set_param(
+                self.env['ir.config_parameter'].sudo().set_str(
                     'social.linkedin_app_id', setting.linkedin_app_id)
 
     @api.depends('linkedin_use_own_account')
     def _compute_linkedin_client_secret(self):
         user_is_manager = self.env.user.has_group('social.group_social_manager')
-        linkedin_client_secret = self.env['ir.config_parameter'].sudo().get_param('social.linkedin_client_secret')
+        linkedin_client_secret = self.env['ir.config_parameter'].sudo().get_str('social.linkedin_client_secret') or False
         for setting in self:
-            setting.linkedin_client_secret = linkedin_client_secret if user_is_manager else None
+            setting.linkedin_client_secret = linkedin_client_secret if user_is_manager else False
 
     def _inverse_linkedin_client_secret(self):
         user_is_manager = self.env.user.has_group('social.group_social_manager')
         for setting in self:
             if user_is_manager:
-                self.env['ir.config_parameter'].sudo().set_param(
+                self.env['ir.config_parameter'].sudo().set_str(
                     'social.linkedin_client_secret',
                     setting.linkedin_client_secret)

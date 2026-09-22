@@ -14,7 +14,7 @@ class SignSendRequest(models.TransientModel):
         """
         Checks if all required WhatsApp templates are configured and approved.
         """
-        self.is_whatsapp_feature_enabled = self.env['sign.request.item']._check_whatsapp_template_exists(check_if_approved=True)
+        self.is_whatsapp_feature_enabled = self.env.company._check_if_whatsapp_sign_is_enabled(check_if_approved=True)
 
     def send_via_whatsapp(self):
         self.ensure_one()

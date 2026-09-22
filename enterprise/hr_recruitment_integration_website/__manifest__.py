@@ -2,7 +2,6 @@
 
 {
     'name': 'Recruitment Integration website',
-    'version': '1.0',
     'category': 'Human Resources/Recruitment/Integration',
     'summary': 'Manage Job board integrations with website',
     'description': """

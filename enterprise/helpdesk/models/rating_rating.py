@@ -8,7 +8,7 @@ class RatingRating(models.Model):
 
     @api.depends('res_id', 'res_model')
     def _compute_ticket_id(self):
-        if self.env['helpdesk.team'].search_count([('use_rating', '=', True)], limit=1):
+        if self.env['helpdesk.stage'].search_count([('rating_active', '=', True)], limit=1):
             if helpdesk_ratings := self.filtered(lambda r: r.res_model == 'helpdesk.ticket' and r.res_id):
                 helpdesk_tickets = self.env['helpdesk.ticket'].search([('id', 'in', helpdesk_ratings.mapped('res_id'))])
                 ticket_map = {ticket.id: ticket for ticket in helpdesk_tickets}

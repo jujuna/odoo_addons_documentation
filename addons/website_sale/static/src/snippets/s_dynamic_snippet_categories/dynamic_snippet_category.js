@@ -1,6 +1,6 @@
 import { _t } from '@web/core/l10n/translation';
 import { registry } from '@web/core/registry';
-import { utils as uiUtils } from '@web/core/ui/ui_service';
+import { utils as uiUtils } from '@web/core/ui/ui_utils';
 import { DynamicSnippet } from '@website/snippets/s_dynamic_snippet/dynamic_snippet';
 
 
@@ -60,4 +60,8 @@ registry
 
 registry
     .category('public.interactions.edit')
+    .add('website_sale.dynamic_snippet_category', {Interaction: DynamicSnippetCategory});
+
+registry
+    .category("public.interactions.preview")
     .add('website_sale.dynamic_snippet_category', {Interaction: DynamicSnippetCategory});

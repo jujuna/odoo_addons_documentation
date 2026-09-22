@@ -3,13 +3,26 @@
 import datetime
 from freezegun import freeze_time
 
-from odoo import fields
+from odoo import Command, fields
 from odoo.tests import Form, tagged
+from odoo.exceptions import UserError
 from odoo.addons.stock_account.tests.common import TestStockValuationCommon
 
 
 @tagged('post_install', '-at_install')
 class TestSaleStockMargin(TestStockValuationCommon):
+
+    _test_user_groups = (
+        'sales_team.group_sale_salesman',  # sale.order margins are the subject
+        'stock.group_stock_manager',  # deliveries feeding the margin valuation
+        'product.group_product_manager',  # product/category create & cost writes
+        'account.group_account_invoice',
+        # FIXME: closing/valuation reads account.fiscal.year via
+        # account_accountant.res_company.compute_fiscalyear_dates() without sudo.
+        'account.group_account_readonly',
+    )
+
+    _test_user_name = 'Test Sales User'
 
     @classmethod
     def setUpClass(cls):
@@ -57,12 +70,12 @@ class TestSaleStockMargin(TestStockValuationCommon):
         usd = self.env.ref('base.USD')
         self.company_currency = self.env.company.currency_id
         self.other_currency = self.env.ref('base.EUR') if self.company_currency == usd else usd
-        date = fields.Date.today()
-        self.env['res.currency.rate'].create([
+        date = fields.Date.subtract(fields.Date.today(), days=1)
+        self.env['res.currency.rate'].sudo().create([
             {'currency_id': self.company_currency.id, 'rate': 1, 'name': date},
             {'currency_id': self.other_currency.id, 'rate': 2, 'name': date},
         ])
-        return self.company_currency, self.other_currency
+        return self.company_currency + self.other_currency
 
     #########
     # TESTS #
@@ -247,17 +260,19 @@ class TestSaleStockMargin(TestStockValuationCommon):
         main_company_currency = main_company.currency_id
         new_company_currency = self.env.ref('base.EUR') if main_company_currency == self.env.ref('base.USD') else self.env.ref('base.USD')
 
-        date = fields.Date.today()
-        self.env['res.currency.rate'].create([
+        date = fields.Date.subtract(fields.Date.today(), days=1)
+        self.env['res.currency.rate'].sudo().create([
             {'currency_id': main_company_currency.id, 'rate': 1, 'name': date, 'company_id': False},
             {'currency_id': new_company_currency.id, 'rate': 3, 'name': date, 'company_id': False},
         ])
 
-        new_company = self.env['res.company'].create({
+        new_company = self.env['res.company'].sudo().create({
             'name': 'Super Company',
             'currency_id': new_company_currency.id,
         })
-        self.env.user.company_id = new_company.id
+        self.env.user.sudo().company_ids += new_company
+        self.env.user.sudo().company_id = new_company.id
+        self.env = self.env.user.with_company(new_company.id).env
 
         self.pricelist.currency_id = new_company_currency.id
 
@@ -277,7 +292,7 @@ class TestSaleStockMargin(TestStockValuationCommon):
             'product_id': product.id,
             'location_id': production_location.id,
             'location_dest_id': incoming_picking_type.default_location_dest_id.id,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
             'product_uom_qty': 1,
             'picking_type_id': incoming_picking_type.id,
             'picking_id': picking.id,
@@ -424,6 +439,24 @@ class TestSaleStockMargin(TestStockValuationCommon):
         delivery.button_validate()
         self.assertEqual(sale_order.order_line.filtered(lambda sol: sol.product_id == product2).purchase_price, 10)
 
+    def test_avco_different_uom(self):
+        pack_of_6 = self.ref('uom.product_uom_pack_6')
+        self.product_avco.write({
+                'standard_price': 1,
+                'list_price': 3,
+                'uom_ids': [pack_of_6],
+            })
+        sale_order = self._create_sale_order()
+        sale_order_line = self.env['sale.order.line'].create({
+            'name': 'Sale order',
+            'order_id': sale_order.id,
+            'product_id': self.product_avco.id,
+            'product_uom_qty': 1,
+            'product_uom_id': pack_of_6,
+        })
+        sale_order.action_confirm()
+        self.assertEqual(sale_order_line.margin, 12.0)
+
     def test_avco_does_not_mix_products_on_compute_avg_price(self):
         """
         Ensure that when stock moves are duplicated and their product changed,
@@ -450,12 +483,10 @@ class TestSaleStockMargin(TestStockValuationCommon):
         second_delivery.move_ids.quantity = 1
         second_delivery.button_validate()
         self.assertEqual(second_delivery.move_ids.sale_line_id, sale_order.order_line - sale_order_line)
-        stock_picking_return = self.env['stock.return.picking'].create({
-            'picking_id': second_delivery.id,
-        })
-        stock_picking_return.product_return_moves.quantity = 1
-        return_picking = stock_picking_return._create_return()
-        return_picking.move_ids.quantity = 1
+        return_picking = second_delivery._create_return()
+        return_picking.move_ids.product_uom_qty = 1
+        return_picking.action_confirm()
+        return_picking.action_assign()
         return_picking.button_validate()
         self.assertEqual(return_picking.state, 'done')
 
@@ -463,24 +494,6 @@ class TestSaleStockMargin(TestStockValuationCommon):
         first_delivery.button_validate()
         self.assertEqual(first_delivery.state, 'done')
         self.assertEqual(sale_order_line.purchase_price, 10)
-
-    def test_avco_different_uom(self):
-        pack_of_6 = self.ref('uom.product_uom_pack_6')
-        self.product_avco.write({
-                'standard_price': 1,
-                'list_price': 3,
-                'uom_ids': [pack_of_6],
-            })
-        sale_order = self._create_sale_order()
-        sale_order_line = self.env['sale.order.line'].create({
-            'name': 'Sale order',
-            'order_id': sale_order.id,
-            'product_id': self.product_avco.id,
-            'product_uom_qty': 1,
-            'product_uom_id': pack_of_6,
-        })
-        sale_order.action_confirm()
-        self.assertEqual(sale_order_line.margin, 12.0)
 
     def test_avco_calc(self):
         """ test purchase_price and margin correct calculation for avco product"""
@@ -571,11 +584,10 @@ class TestSaleStockMargin(TestStockValuationCommon):
             self._make_in_move(self.product_avco_auto, 2, 5)
             self.assertEqual(self.product_avco_auto.standard_price, 30, "standard_price for avco = (5 * 40 + 2 * 5) / (5 + 2) = 30: 1 delivered, 5 remaining + 2 added to stock")
             freeze.tick(delta=datetime.timedelta(seconds=2))
-            stock_return_picking_form = Form(self.env['stock.return.picking'].with_context(active_id=delivery.id, active_model='stock.picking'))
-            stock_return_picking = stock_return_picking_form.save()
-            stock_return_picking.product_return_moves.quantity = 3.0
-            stock_return_picking_action = stock_return_picking.action_create_returns()
-            return_pick = self.env['stock.picking'].browse(stock_return_picking_action['res_id'])
+            return_pick = delivery._create_return()
+            return_pick.move_ids.product_uom_qty = 3
+            return_pick.action_confirm()
+            return_pick.action_assign()
             return_pick.button_validate()
             self.assertEqual(sol.product_uom_qty, 1)
             self.assertEqual(sol.qty_delivered, -2)
@@ -618,14 +630,64 @@ class TestSaleStockMargin(TestStockValuationCommon):
             self._make_in_move(self.product_avco_auto, 2, 17.5)  # force different standard_price
             self.assertEqual(self.product_avco_auto.standard_price, 30, "standard_price for avco = (10 * 32.5 + 2 * 17.5) / (10 + 2) = 30: 2 delivered, 10 remaining + 2 added to stock")
             freeze.tick(delta=datetime.timedelta(seconds=2))
-            stock_return_picking_form = Form(self.env['stock.return.picking'].with_context(active_id=delivery.id, active_model='stock.picking'))
-            stock_return_picking = stock_return_picking_form.save()
-            stock_return_picking.product_return_moves.quantity = 1.0
-            stock_return_picking_action = stock_return_picking.action_create_returns()
-            return_pick = self.env['stock.picking'].browse(stock_return_picking_action['res_id'])
+            return_pick = delivery._create_return()
+            return_pick.move_ids.product_uom_qty = 1.0
+            return_pick.action_confirm()
+            return_pick.action_assign()
             return_pick.button_validate()
             self.assertEqual(sol3.product_uom_qty, 0)
             self.assertEqual(sol3.qty_delivered, 1)
             # purchase_unit_from_delivery = line.move_ids(done)._get_price_unit = (2 * 32.5 + 1 * 32.5) / (2 + 1) = 32.5
             self.assertEqual(sol3.purchase_price, 32.5, "purchase_price = 2 * 32.5 + 1 * 32.5) / (2 + 1) = 32.5")
             self.assertEqual(sol3.margin, -32.5, "margin = SOL qty * sale price - purchase_price * qty_delivered = (0 - 32.5) * 1 = -32.5")
+
+    def test_dropship_fifo_purchase_price(self):
+        """ Check that when the product is dropshipped, the purchase_price used is based on the unit
+        price of the purchase order.
+        """
+        try:
+            dropship_route = self.env.ref('stock_dropshipping.route_drop_shipping')
+        except ValueError:
+            self.skipTest('This test requires the following module: stock_dropshipping')
+
+        self.product_fifo_auto.write({
+            'seller_ids': [Command.create({'partner_id': self.vendor.id, 'price': 20})],
+            'route_ids': [Command.link(dropship_route.id)]
+        })
+        # create and confirm SO and PO
+        so = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'order_line': [Command.create({
+                'product_id': self.product_fifo_auto.id,
+                'product_uom_qty': 1.0,
+            })],
+        })
+        so.action_confirm()
+        po = self.env['purchase.order'].search([
+            ('origin', '=', so.name),
+            ('partner_id', '=', self.vendor.id),
+        ], limit=1)
+        po.button_confirm()
+
+        # untill dropship validation, purchase price of the sale order line is the product's standard price
+        self.assertEqual(self.product_fifo_auto.standard_price, 10)
+        self.assertEqual(so.order_line.purchase_price, 10)
+
+        # after dropship validation, purchase price of the sale order line is the PO's unit cost
+        so.picking_ids.button_validate()
+        self.assertEqual(po.order_line.price_unit, 20)
+        self.assertEqual(so.order_line.purchase_price, 20)
+
+    def test_reduce_ordered_quantity_after_delivery(self):
+        """Ensure the ordered quantity cannot be reduced after the product has been delivered."""
+        sale_order = self._create_sale_order()
+        product = self._create_product()
+
+        order_line = self._create_sale_order_line(sale_order, product, 1, 50)
+        sale_order.action_confirm()
+
+        sale_order.picking_ids.move_ids.write({'quantity': 1, 'picked': True})
+        sale_order.picking_ids.button_validate()
+
+        with self.assertRaises(UserError):
+            order_line.product_uom_qty = 0

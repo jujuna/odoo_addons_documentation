@@ -1,27 +1,22 @@
 import { registry } from '@web/core/registry';
 import { stepUtils } from '@web_tour/tour_utils';
 import configuratorTourUtils from '@sale/js/tours/combo_configurator_tour_utils';
-import tourUtils from '@sale/js/tours/tour_utils';
+import * as tourUtils from '@sale/js/tours/tour_utils';
 
 registry
     .category('web_tour.tours')
     .add('sale_subscription_combo_configurator', {
-        url: '/odoo',
         steps: () => [
             ...stepUtils.goToAppSteps('sale_subscription.menu_sale_subscription_root', "Open the subscription app"),
-            {
-                content: "Create a new SO",
-                trigger: '.o_list_button_add',
-                run: 'click',
-            },
+            ...tourUtils.createNewSalesOrder(),
             ...tourUtils.selectCustomer("Test Partner"),
             ...tourUtils.addProduct("Combo product"),
             // Assert that the default subscription price and plan are correct.
             configuratorTourUtils.assertPrice('5.00'),
             configuratorTourUtils.assertPriceInfo("per week"),
             {
-                content: "Cancel the configurator",
-                trigger: 'button:contains(Cancel)',
+                content: "Discard the configurator",
+                trigger: 'button:contains(Discard)',
                 run: 'click',
             },
             {

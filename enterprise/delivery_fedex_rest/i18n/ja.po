@@ -3,22 +3,22 @@
 # * delivery_fedex_rest
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Junko Augias (juau)" <juau@odoo.com>, 2025.
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-10-09 19:15+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 00:51+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "delivery_fedex_rest/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_fedex_rest
 #: model_terms:ir.ui.view,arch_db:delivery_fedex_rest.view_delivery_carrier_form_with_provider_fedex
@@ -27,8 +27,8 @@ msgid ""
 "secret key and account number:</b>\n"
 "                                <br/>"
 msgstr ""
-"<b>プロジェクトの作成が完了すると、テスト用のAPIキー、シークレットキー、アカ"
-"ウント番号が表示されます:</b>\n"
+"<b>プロジェクトの作成が完了すると、テスト用のAPIキー、シークレットキー、"
+"アカウント番号が表示されます:</b>\n"
 "                                <br/>"
 
 #. module: delivery_fedex_rest
@@ -38,9 +38,9 @@ msgid ""
 "API project. Make sure to select the options indicated below:</b>\n"
 "                                <br/>"
 msgstr ""
-"<b>アカウントが作成されたら、マイプロジェクトタブに移動し、新しいAPIプロジェ"
-"クトを作成します。 以下のオプションが選択されていることを確認して下さい:</"
-"b>\n"
+"<b>アカウントが作成されたら、マイプロジェクトタブに移動し、新しいAPI"
+"プロジェクトを作成します。 以下のオプションが選択されていることを確認して下さ"
+"い:</b>\n"
 "                                <br/>"
 
 #. module: delivery_fedex_rest
@@ -52,9 +52,9 @@ msgid ""
 "                                <br/>These certifications usually require "
 "that you contact the FedEx support team by email."
 msgstr ""
-"<b>FedExの発送ラベルを作成できるようにするには、最後のステップとして認証プロ"
-"セスが必要です。 'API認証に進む' をクリックし、ラベル作成用のアカウントを認証"
-"するための必要な手順に従って下さい。</b>\n"
+"<b>FedExの発送ラベルを作成できるようにするには、最後のステップとして認証"
+"プロセスが必要です。 'API認証に進む' をクリックし、ラベル作成用のアカウントを"
+"認証するための必要な手順に従って下さい。</b>\n"
 "                                <br/>認証には、通常、FedExサポートチームへの"
 "メール連絡が必要です。"
 
@@ -143,6 +143,11 @@ msgstr "FedExに集荷の連絡をする"
 #: code:addons/delivery_fedex_rest/models/fedex_request.py:0
 msgid "Could not decode response"
 msgstr "応答をデコードできませんでした"
+
+#. module: delivery_fedex_rest
+#: model:ir.model,name:delivery_fedex_rest.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "配送方法"
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,help:delivery_fedex_rest.field_delivery_carrier__fedex_rest_residential_address
@@ -466,6 +471,11 @@ msgid "Fedex Rest Weight Unit"
 msgstr "FedexFedEx余剰重量単位"
 
 #. module: delivery_fedex_rest
+#: model:ir.module.module,shortdesc:base.module_delivery_fedex_rest
+msgid "Fedex Shipping"
+msgstr ""
+
+#. module: delivery_fedex_rest
 #: model_terms:ir.ui.view,arch_db:delivery_fedex_rest.view_delivery_carrier_form_with_provider_fedex
 msgid "Fedex Tutorial"
 msgstr "Fedexチュートリアル"
@@ -491,6 +501,12 @@ msgstr ""
 "に基づいて作成し、印刷して配送品に添付したり、FedExに手動で電子送信したりする"
 "ためのPDF形式で返送されます。また、配送品の検証が済んだ時点でFedExに直接ETD情"
 "報として提出することもできます。"
+
+#. module: delivery_fedex_rest
+#. odoo-python
+#: code:addons/delivery_fedex_rest/models/delivery_fedex.py:0
+msgid "Freight services for Fedex are not implemented."
+msgstr "FedExの貨物サービスは実装されていません。"
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields,field_description:delivery_fedex_rest.field_delivery_carrier__fedex_rest_documentation_type
@@ -714,6 +730,15 @@ msgid "Secret Key"
 msgstr "シークレットキー"
 
 #. module: delivery_fedex_rest
+#: model:ir.module.module,description:base.module_delivery_fedex_rest
+msgid ""
+"Send your shippings through Fedex and track them online. This version of the "
+"FedEx connector iscompatible with the FedEx REST API available at https://"
+"developer.fedex.com/. It is no longercompatible with the older FedEx SOAP "
+"APIs (which have their own credentials)."
+msgstr ""
+
+#. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_duty_payment__sender
 msgid "Sender"
 msgstr "送信者"
@@ -729,11 +754,6 @@ msgstr "配送 %s がキャンセルされました"
 #: code:addons/delivery_fedex_rest/models/delivery_fedex.py:0
 msgid "Shipment created into Fedex"
 msgstr "Fedexで配送が作成されました"
-
-#. module: delivery_fedex_rest
-#: model:ir.model,name:delivery_fedex_rest.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "配送方法"
 
 #. module: delivery_fedex_rest
 #. odoo-python
@@ -757,8 +777,8 @@ msgid ""
 "More info on https://www.developer.fedex.com"
 msgstr ""
 "FedExの追加データは、jsonファイルの内部のように構成されています。\n"
-"この機能は高度な技術設定であるため、操作方法をご存知の場合のみご利用下さ"
-"い。\n"
+"この機能は高度な技術設定であるため、操作方法をご存知の場合のみご利用下さい"
+"。\n"
 "詳細については、https://www.developer.fedex.com をご覧下さい。"
 
 #. module: delivery_fedex_rest
@@ -819,7 +839,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_fedex_rest/models/fedex_request.py:0
 msgid "You must setup a client ID and secret on the carrier first"
-msgstr "最初にキャリアでクライアントIDとシークレットを設定する必要があります。"
+msgstr "最初にキャリアでClient IDとシークレットを設定する必要があります。"
 
 #. module: delivery_fedex_rest
 #: model:ir.model.fields.selection,name:delivery_fedex_rest.selection__delivery_carrier__fedex_rest_label_file_type__zplii

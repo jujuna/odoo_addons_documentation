@@ -14,6 +14,7 @@
         <field name="city">Bucuresti</field>
         <field name="state_id" ref="base.RO_B"/>
         <field name="country_id" ref="base.ro"/>
+        <field name="resource_calendar_id" ref="l10n_ro_hr_payroll.resource_calendar_def_40h"/>
     </record>
 
     <record id="base.user_admin" model="res.users">
@@ -65,63 +66,45 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_ro'))]"/>
         <field name="company_id" ref="base.demo_company_ro"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="l10n_ro_hr_payroll/static/img/hr_employe_demetra_voinea.jpg"/>
-    </record>
-
-    <record id="ro_res_bank_transilvania" model="res.bank">
-        <field name="name">Banca Transilvania</field>
-        <field name="bic">BTRLRO22XXX</field>
-        <field name="street">Strada Banca Transilvania</field>
-        <field name="city">Bucuresti</field>
-        <field name="zip">099090</field>
-        <field name="state" ref="base.RO_B"/>
-        <field name="country" ref="base.ro"/>
-        <field name="phone">0999 932 381</field>
-    </record>
-    <record id="ro_res_bank_transilvania" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_ro_hr_payroll.ro_res_bank_transilvania')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="ro_res_bank_commerciala_romana" model="res.bank">
-        <field name="name">Banca Comerciala Romana</field>
-        <field name="bic">RNCBROBUXXX</field>
-        <field name="street">Calea Banca Comerciala Romana</field>
-        <field name="city">Bucuresti</field>
-        <field name="zip">099192</field>
-        <field name="state" ref="base.RO_B"/>
-        <field name="country" ref="base.ro"/>
-        <field name="phone">0999 978 421</field>
-    </record>
-    <record id="ro_res_bank_commerciala_romana" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_ro_hr_payroll.ro_res_bank_commerciala_romana')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="image_1920" type="bytes" file="l10n_ro_hr_payroll/static/img/hr_employe_demetra_voinea.jpg"/>
     </record>
 
     <record id="res_partner_bank_account_ionel" model="res.partner.bank">
-        <field name="acc_number">RO66BACX0000003214569870</field>
+        <field name="account_number">RO66BACX0000003214569870</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_ro_hr_payroll.ro_res_bank_transilvania"/>
+        <field name="bank_name">Banca Transilvania</field>
+        <field name="bank_bic">BTRLRO22XXX</field>
+        <field name="street">Strada Banca Transilvania</field>
+        <field name="city">Bucuresti</field>
+        <field name="zip">099090</field>
+        <field name="state_id" ref="base.RO_B"/>
+        <field name="country_id" ref="base.ro"/>
         <field name="partner_id" ref="l10n_ro_hr_payroll.res_partner_ionel"/>
         <field name="company_id" ref="base.demo_company_ro"/>
-        <field name="currency_id" ref="base.RON"/>
     </record>
 
     <record id="res_partner_bank_account_demetra" model="res.partner.bank">
-        <field name="acc_number">RO030103599935698356</field>
+        <field name="account_number">RO030103599935698356</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_ro_hr_payroll.ro_res_bank_commerciala_romana"/>
+        <field name="bank_name">Banca Comerciala Romana</field>
+        <field name="bank_bic">RNCBROBUXXX</field>
+        <field name="street">Calea Banca Comerciala Romana</field>
+        <field name="city">Bucuresti</field>
+        <field name="zip">099192</field>
+        <field name="state_id" ref="base.RO_B"/>
+        <field name="country_id" ref="base.ro"/>
         <field name="partner_id" ref="l10n_ro_hr_payroll.res_partner_demetra"/>
         <field name="company_id" ref="base.demo_company_ro"/>
-        <field name="currency_id" ref="base.RON"/>
     </record>
 
     <record id="hr_employee_ionel" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_ionel')).name"/>
-        <field name="image_1920" type="base64" file="l10n_ro_hr_payroll/static/img/hr_employee_ionel_oprea.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_ro_hr_payroll/static/img/hr_employee_ionel_oprea.jpg"/>
         <field name="work_phone">0999 381 213</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_ionel')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_ro_hr_payroll.res_partner_ionel"/>
         <field name="company_id" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_ionel')).company_id"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="l10n_ro_hr_payroll.resource_calendar_def_40h"/>
         <field name="tz">Europe/Bucharest</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_ionel')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_ionel')).city"/>
@@ -141,7 +124,6 @@
         <field name="emergency_phone">0999 098 459</field>
         <field name="certificate">master</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Universitatea din București</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_ro_hr_payroll.res_partner_bank_account_ionel'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -152,18 +134,18 @@
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
-        <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_ro').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <record id="hr_employee_demetra" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_demetra')).name"/>
-        <field name="image_1920" type="base64" file="l10n_ro_hr_payroll/static/img/hr_employe_demetra_voinea.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_ro_hr_payroll/static/img/hr_employe_demetra_voinea.jpg"/>
         <field name="work_phone">0999 318 214</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_demetra')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_ro_hr_payroll.hr_employee_ionel"/>
         <field name="user_id" ref="l10n_ro_hr_payroll.user_demetra"/>
         <field name="company_id" ref="base.demo_company_ro"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="l10n_ro_hr_payroll.resource_calendar_def_40h"/>
         <field name="tz">Europe/Bucharest</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_demetra')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_ro_hr_payroll.res_partner_demetra')).city"/>
@@ -183,7 +165,6 @@
         <field name="emergency_phone">0999 106 374</field>
         <field name="certificate">master</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Technical University of Cluj-Napoca</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_ro_hr_payroll.res_partner_bank_account_demetra'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -195,7 +176,7 @@
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-2, month=1, day=1))"/>
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-2, month=1, day=1))"/>
         <field name="contract_date_end" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-2))"/>
-        <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_ro').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <function name="create_version" model="hr.employee">

@@ -1,10 +1,10 @@
+import { proxy } from "@odoo/owl";
 import { Plugin } from "@html_editor/plugin";
-import { reactive } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { rotate } from "@web/core/utils/arrays";
 import { Powerbox } from "./powerbox";
 import { withSequence } from "@html_editor/utils/resource";
-import { omit, pick } from "@web/core/utils/objects";
+import { deepEqual, omit, pick } from "@web/core/utils/objects";
 import { baseContainerGlobalSelector } from "@html_editor/utils/base_container";
 import { closestElement } from "@html_editor/utils/dom_traversal";
 
@@ -23,7 +23,7 @@ import { closestElement } from "@html_editor/utils/dom_traversal";
  * @property {Object} [commandParams] Passed to the command's `run` function - optional
  * @property {TranslatedString} [title] Inheritable
  * @property {TranslatedString} [description] Inheritable
- * @property {string} [icon] fa-class - Inheritable
+ * @property {string} [icon] oi class - Inheritable
  * @property {TranslatedString[]} [keywords]
  * @property {(selection: EditorSelection) => boolean} [isAvailable] Optional and inheritable
  */
@@ -40,6 +40,7 @@ import { closestElement } from "@html_editor/utils/dom_traversal";
  * @property {Function} run
  * @property {TranslatedString[]} [keywords]
  * @property { (selection: EditorSelection) => boolean } isAvailable
+ * @property {string} shorthandLiteral Optional
  */
 
 /**
@@ -71,7 +72,7 @@ import { closestElement } from "@html_editor/utils/dom_traversal";
  *                  run: myCommandFunction,
  *                  title: _t("My Command"),
  *                  description: _t("My command's description"),
- *                  icon: "fa-bug",
+ *                  icon: "bug_report",
  *              },
  *          ],
  *          powerbox_categories: [
@@ -101,24 +102,11 @@ export class PowerboxPlugin extends Plugin {
     ];
     /** @type {import("plugins").EditorResources} */
     resources = {
-        user_commands: {
-            id: "openPowerbox",
-            run: () =>
-                this.openPowerbox({
-                    commands: this.getAvailablePowerboxCommands(),
-                    categories: this.getResource("powerbox_categories"),
-                }),
-        },
         powerbox_categories: [
             withSequence(10, { id: "structure", name: _t("Structure") }),
             withSequence(60, { id: "widget", name: _t("Widget") }),
             withSequence(100, { id: "modules", name: _t("Modules") }),
         ],
-        power_buttons: withSequence(100, {
-            commandId: "openPowerbox",
-            description: _t("More options"),
-            icon: "oi-ellipsis-v",
-        }),
         hints: withSequence(30, {
             selector: baseContainerGlobalSelector,
             text: _t('Type "/" for commands'),
@@ -129,7 +117,7 @@ export class PowerboxPlugin extends Plugin {
         /** @type {import("@html_editor/core/overlay_plugin").Overlay} */
         this.overlay = this.dependencies.overlay.createOverlay(Powerbox);
 
-        this.state = reactive({});
+        this.state = proxy({});
         this.overlayProps = {
             document: this.document,
             close: () => this.overlay.close(),
@@ -140,7 +128,9 @@ export class PowerboxPlugin extends Plugin {
             applyCommand: this.applyCommand.bind(this),
         };
         this.powerboxCommands = this.makePowerboxCommands();
-        this.addDomListener(this.editable.ownerDocument, "keydown", this.onKeyDown);
+        this.addDomListener(this.editable.ownerDocument, "keydown", this.onKeyDown, {
+            capture: true,
+        });
     }
 
     /**
@@ -166,12 +156,18 @@ export class PowerboxPlugin extends Plugin {
         const categoryDict = Object.fromEntries(
             categories.map((category) => [category.id, category])
         );
+        const shorthands = this.getResource("shorthands");
         return powerboxItems.map((/** @type {PowerboxItem} */ item) => {
             const command = this.dependencies.userCommand.getCommand(item.commandId);
+            const shorthandLiteral = shorthands.find(
+                ({ commandId, commandParams }) =>
+                    commandId === command.id && deepEqual(commandParams, item.commandParams)
+            )?.literals[0];
             return {
-                ...pick(command, "title", "description", "icon"),
+                ...pick(command, "title", "description", "icon", "iconClass"),
                 ...omit(item, "commandId", "commandParams"),
                 categoryName: categoryDict[item.categoryId].name,
+                ...(shorthandLiteral && { shorthandLiteral }),
                 run: (context) => command.run(item.commandParams, context),
                 isAvailable: (selection) =>
                     [command.isAvailable, item.isAvailable]
@@ -246,11 +242,13 @@ export class PowerboxPlugin extends Plugin {
                 break;
             case "ArrowUp": {
                 ev.preventDefault();
+                ev.stopImmediatePropagation();
                 this.state.currentIndex = rotate(this.state.currentIndex, this.state.commands, -1);
                 break;
             }
             case "ArrowDown": {
                 ev.preventDefault();
+                ev.stopImmediatePropagation();
                 this.state.currentIndex = rotate(this.state.currentIndex, this.state.commands, 1);
                 break;
             }

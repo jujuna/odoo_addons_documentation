@@ -2,12 +2,13 @@
 
 {
     'name': 'Project Accounting Assets',
-    'version': '1.0',
     'category': 'Services/assets',
     'summary': 'Project accounting assets',
     'description': 'Bridge created to add the number of assets linked to an AA to a project form',
     'depends': ['project', 'account_asset'],
-    'installable': True,
+    'data': [
+        'views/project_project_views.xml',
+    ],
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

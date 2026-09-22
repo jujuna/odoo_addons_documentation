@@ -1,14 +1,16 @@
+import { useEnv, useSubEnv } from "@web/owl2/utils";
 import { Reactive } from "@web_studio/client_action/utils";
 import {
     EventBus,
     markRaw,
+    onMounted,
     onWillStart,
-    reactive,
-    toRaw,
-    useEnv,
-    useState,
-    useSubEnv,
     onWillDestroy,
+    signal,
+    untrack,
+    useEffect,
+    proxy,
+    usePlugin,
 } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
 import { useService } from "@web/core/utils/hooks";
@@ -20,14 +22,15 @@ import { KeepLast } from "@web/core/utils/concurrency";
 import { renderToMarkup } from "@web/core/utils/render";
 import { makeActiveField } from "@web/model/relational_model/utils";
 import { humanReadableError } from "@web_studio/client_action/report_editor/utils";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 const notificationErrorTemplate = "web_studio.ReportEditor.NotificationError";
 const errorQweb = `<html><div>The report could not be rendered due to an error</div><html>`;
 
 export class ReportEditorModel extends Reactive {
-    constructor({ services, debug }) {
+    constructor({ services }) {
         super();
-        this.debug = debug;
+        this.debugMode = usePlugin(DebugModePlugin);
         this.bus = markRaw(new EventBus());
         this._inPreview = false;
         this.mode = "wysiwyg";
@@ -52,6 +55,7 @@ export class ReportEditorModel extends Reactive {
                 name: "group_ids",
                 type: "many2many",
                 relation: "res.groups",
+                string: _t("Access Groups"),
                 relatedFields: {
                     display_name: { type: "char" },
                 },
@@ -60,10 +64,17 @@ export class ReportEditorModel extends Reactive {
                 name: "paperformat_id",
                 type: "many2one",
                 relation: "report.paperformat",
+                string: _t("Paper format"),
             },
-            binding_model_id: { name: "binding_model_id", type: "many2one", relation: "ir.model" },
+            binding_model_id: {
+                name: "binding_model_id",
+                type: "many2one",
+                relation: "ir.model",
+                string: _t("Models"),
+            },
             attachment_use: { name: "attachment_use", type: "boolean" },
             attachment: { name: "attachment", type: "char" },
+            domain: { name: "domain", type: "char" },
             // fake field
             display_in_print_menu: { name: "display_in_print_menu", type: "boolean" },
         });
@@ -83,19 +94,25 @@ export class ReportEditorModel extends Reactive {
             binding_model_id: makeActiveField(),
             attachment_use: makeActiveField(),
             attachment: makeActiveField(),
+            domain: makeActiveField(),
             // fake field
             display_in_print_menu: makeActiveField(),
         });
         this.reportEnv = {};
         this.loadHtmlKeepLast = markRaw(new KeepLast());
 
-        this._reportArchs = {};
+        this._reportArchs = signal({});
         this.renderKey = 1;
         this.routesContext = pick(user.context, "allowed_company_ids");
+
+        this.resources = markRaw({});
+        this.sharedReport = signal(null);
     }
 
     get reportData() {
-        return this._reportChanges || this._reportData;
+        const changes = this._reportChanges;
+        const data = this._reportData;
+        return changes || data;
     }
 
     set reportData(_data) {
@@ -126,11 +143,11 @@ export class ReportEditorModel extends Reactive {
     }
 
     get reportQweb() {
-        return this._reportArchs.reportQweb;
+        return this._reportArchs().reportQweb;
     }
 
     get reportHtml() {
-        return this._reportArchs.reportHtml;
+        return this._reportArchs().reportHtml;
     }
 
     get isDirty() {
@@ -145,23 +162,15 @@ export class ReportEditorModel extends Reactive {
         return this._isInEdition;
     }
 
-    get inPreview() {
-        return this._inPreview || this.mode === "xml";
-    }
-
-    set inPreview(bool) {
-        this._inPreview = bool;
-    }
-
     get fullErrorDisplay() {
-        return this.debug ? this._errorMessage : false;
+        return this.debugMode.isActive() ? this._errorMessage : false;
     }
 
     setInEdition(value) {
         // Reactivity limitation: if we used a setter, the reactivity will trigger the getter
         // thus subscribing us to the key. This is not what we want here.
         value = !!value; // enforce boolean
-        if (reactive(this)._isInEdition === value) {
+        if (untrack(() => this._isInEdition) === value) {
             return;
         }
         this._isInEdition = value;
@@ -176,7 +185,9 @@ export class ReportEditorModel extends Reactive {
         // We do this by explicitly bypassing reactivity, we don't want any re-render doing this.
         // _reportsArchs acts as flag, meaning that if one of the arch is not present
         // the relevant function will fetch them. see @loadReportQweb and @loadReportHtml
-        toRaw(this)._reportArchs = {};
+        const archs = this._reportArchs();
+        delete archs.reportQweb;
+        delete archs.reportHtml;
     }
 
     async loadReportEditor() {
@@ -200,7 +211,8 @@ export class ReportEditorModel extends Reactive {
         Object.assign(this.paperFormat, data.paperformat);
 
         this._errorMessage = data.qweb_error;
-        this._reportArchs.reportQweb = data.report_qweb || errorQweb;
+        this._reportArchs().reportQweb = data.report_qweb || errorQweb;
+        signal.trigger(this._reportArchs);
         this._isLoaded = true;
     }
 
@@ -208,7 +220,7 @@ export class ReportEditorModel extends Reactive {
         if (!this._isLoaded) {
             return;
         }
-        if (this._reportArchs.reportQweb) {
+        if (this._reportArchs().reportQweb) {
             return;
         }
 
@@ -220,10 +232,12 @@ export class ReportEditorModel extends Reactive {
                 })
             );
             this._errorMessage = false;
-            this._reportArchs.reportQweb = reportQweb;
+            this._reportArchs().reportQweb = reportQweb;
+            signal.trigger(this._reportArchs);
         } catch (e) {
             this._errorMessage = e;
-            this._reportArchs.reportQweb = errorQweb;
+            this._reportArchs().reportQweb = errorQweb;
+            signal.trigger(this._reportArchs);
         }
         this.setInEdition(false);
     }
@@ -232,7 +246,7 @@ export class ReportEditorModel extends Reactive {
         if (!this._isLoaded) {
             return;
         }
-        if (resId === undefined && this._reportArchs.reportHtml) {
+        if (resId === undefined && this._reportArchs().reportHtml) {
             return;
         }
         this.reportEnv.currentId = resId !== undefined ? resId : this.reportEnv.currentId;
@@ -245,10 +259,12 @@ export class ReportEditorModel extends Reactive {
                 })
             );
             this._errorMessage = false;
-            this._reportArchs.reportHtml = reportHtml;
+            this._reportArchs().reportHtml = reportHtml;
+            signal.trigger(this._reportArchs);
         } catch (e) {
             this._errorMessage = e;
-            this._reportArchs.reportHtml = errorQweb;
+            this._reportArchs().reportHtml = errorQweb;
+            signal.trigger(this._reportArchs);
         }
         this.setInEdition(false);
     }
@@ -320,8 +336,10 @@ export class ReportEditorModel extends Reactive {
 
         this.isDirty = false;
         if (!urgent) {
-            this._reportArchs.reportHtml = report_html;
-            this._reportArchs.reportQweb = report_qweb;
+            this._reportArchs.set({
+                reportHtml: report_html,
+                reportQweb: report_qweb,
+            });
         }
         this.setInEdition(false);
     }
@@ -354,22 +372,12 @@ export class ReportEditorModel extends Reactive {
             domain: result.domain,
             ids: result.record_ids,
             currentId: result.record_ids[0] || false,
+            display_name: result.name,
         };
     }
 
     getModelDomain() {
         return this.reportEnv.domain;
-    }
-
-    async resetReport(includeHeaderFooter = true) {
-        this.setInEdition(true);
-        await rpc("/web_studio/reset_report_archs", {
-            report_id: this.editedReportId,
-            include_web_layout: includeHeaderFooter,
-        });
-
-        this._resetInternalArchs();
-        await this.loadReportQweb();
     }
 
     _parseFakeFields(reportData) {
@@ -383,21 +391,22 @@ export function useReportEditorModel() {
     const env = useEnv();
     services.studio = { ...env.services.studio };
     services.unProtectedNotification = env.services.notification;
-    const reportEditorModel = new ReportEditorModel({ services, debug: env.debug });
+    const reportEditorModel = new ReportEditorModel({ services });
     useSubEnv({ reportEditorModel });
 
-    function getName(rem) {
-        return rem.reportData?.name;
-    }
-    const crumb = reactive({});
-    const rem = reactive(reportEditorModel, () => {
-        crumb.name = getName(rem);
+    const crumb = proxy({});
+    const rem = proxy(reportEditorModel);
+    const breadcrumbs = useEditorBreadcrumbs();
+    onMounted(() => {
+        breadcrumbs.crumbs.length = 0;
+        breadcrumbs.push(crumb);
     });
-    crumb.name = getName(rem);
-    useEditorBreadcrumbs(crumb);
+    useEffect(() => {
+        crumb.name = rem.reportData?.name;
+    });
 
     onWillStart(() => reportEditorModel.loadReportEditor());
     onWillDestroy(() => (reportEditorModel.isDestroyed = true));
 
-    return useState(reportEditorModel);
+    return proxy(reportEditorModel);
 }

@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-30 17:15+0000\n"
-"Last-Translator: Cuciureanu Larisa <larisa.cuciureanu@nexterp.ro>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 01:15+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "account_iso20022/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -25,13 +25,38 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_iso20022
+#: model:ir.module.module,description:base.module_account_iso20022
+msgid ""
+"\n"
+"Generate XML payment orders as recommended by the SEPA and ISO20022 norms.\n"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "A bank account is not defined."
 msgstr "Un cont de bancă nu este definit"
+
+#. module: account_iso20022
+#: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__is_third_party
+#: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__is_third_party
+msgid "Account owned by someone else than the employee"
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "All payments in the batch must share the same SEPA pain version."
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "All payments in the batch must share the same payment method line."
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_batch_payment__iso20022_batch_booking
@@ -43,14 +68,20 @@ msgstr ""
 "plăți într-o singură tranzacție."
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03_austrian_004
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03_austrian_004
 msgid "Austrian"
 msgstr "Austriac"
 
 #. module: account_iso20022
-#: model:ir.model,name:account_iso20022.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Linie extras bancar"
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__available_iso20022_priority
+msgid "Available Iso20022 Priority"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model,name:account_iso20022.model_res_partner_bank
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__bank_account_id
+msgid "Bank Account"
+msgstr ""
 
 #. module: account_iso20022
 #: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
@@ -69,8 +100,8 @@ msgstr "Suport costuri"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_company
-msgid "Companies"
-msgstr "Companii"
+msgid "Company"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_config_settings
@@ -116,14 +147,15 @@ msgid "Default Priority"
 msgstr "Prioritate implicită"
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__display_name
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_partner__display_name
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__display_name
 msgid "Display Name"
 msgstr "Nume afișat"
 
@@ -134,10 +166,10 @@ msgid "Employee %s has no country in their address."
 msgstr "Angajatul %s nu are țara specificată în adresă."
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__end_to_end_uuid
-#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__end_to_end_uuid
-msgid "End to End ID"
-msgstr "ID cap la cap"
+#: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__third_party_beneficiary_id
+#: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__third_party_beneficiary_id
+msgid "Entity managing the third-party account"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -149,7 +181,12 @@ msgstr ""
 "IV)."
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03_de
+#: model:ir.module.module,summary:base.module_account_iso20022
+msgid "Export payments as SEPA Credit Transfer or ISO20022 files"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03_de
 msgid "German"
 msgstr "Germană"
 
@@ -176,14 +213,15 @@ msgid "Has Sepa Ct Payment Method"
 msgstr "Are metodă de plată Sepa Ct"
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__id
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_partner__id
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__id
 msgid "ID"
 msgstr "ID"
 
@@ -206,8 +244,19 @@ msgstr "Identificare"
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_id
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_orgid_id
-msgid "Identification assigned by an institution (eg. VAT number)."
-msgstr "Identificare atribuită de o instituție (de exemplu, numărul TVA)."
+msgid "Identification assigned by an institution (eg. Tax ID)."
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "Invalid Partners"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__invalid_sct_partners_ids
+msgid "Invalid Sct Partners"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__payment_method_is_iso20022
@@ -215,6 +264,11 @@ msgstr "Identificare atribuită de o instituție (de exemplu, numărul TVA)."
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__is_iso20022
 msgid "Is Iso20022"
 msgstr "Este Iso20022"
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__is_sepa_ct_payment_method
+msgid "Is Sepa Ct Payment Method"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -248,6 +302,12 @@ msgid "NORM - Normal"
 msgstr "NORMAL - Normal"
 
 #. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__partner_name
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__partner_name
+msgid "Name"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_initiating_party_name
 msgid ""
 "Name of the Creditor Reference Party. Usage Rule: Limited to 70 characters "
@@ -275,24 +335,19 @@ msgid "Partner %s has not bank account defined."
 msgstr "Partenerul %s nu are contul de bancă definit."
 
 #. module: account_iso20022
-#: model:ir.model,name:account_iso20022.model_account_payment_method
-msgid "Payment Methods"
-msgstr "Metode de plată"
-
-#. module: account_iso20022
-#: model_terms:ir.ui.view,arch_db:account_iso20022.account_journal_dashboard_kanban_view_inherited
-msgid "Payment to send via SEPA"
-msgstr "Plata de trimis prin SEPA"
-
-#. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_account_payment
-msgid "Payments"
-msgstr "Plăți"
+msgid "Payment"
+msgstr ""
 
 #. module: account_iso20022
-#: model_terms:ir.ui.view,arch_db:account_iso20022.account_journal_dashboard_kanban_view_inherited
-msgid "Payments to send via SEPA"
-msgstr "Plăți de trimis prin SEPA"
+#: model:ir.model,name:account_iso20022.model_account_payment_method
+msgid "Payment Method"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model,name:account_iso20022.model_account_payment_method_line
+msgid "Payment Method Line"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -311,21 +366,25 @@ msgid "SCT Batch Booking"
 msgstr "Rezervare lot SCT"
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_account_payment_search_inherit_account_sepa_pain_09
+msgid "SEPA / ISO20022"
+msgstr ""
+
+#. module: account_iso20022
 #: model:account.payment.method,name:account_iso20022.account_payment_method_sepa_ct
 msgid "SEPA Credit Transfer"
 msgstr "Transfer de credite SEPA"
+
+#. module: account_iso20022
+#: model:ir.module.module,shortdesc:base.module_account_iso20022
+msgid "SEPA Credit Transfer / ISO20022"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_journal_dashboard.py:0
 msgid "SEPA Credit Transfers to Send"
 msgstr "Transferuri de credite SEPA de trimis"
-
-#. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_journal__sepa_pain_version
-#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
-msgid "SEPA XML Format"
-msgstr "Format XML SEPA"
 
 #. module: account_iso20022
 #. odoo-python
@@ -341,8 +400,8 @@ msgid ""
 msgstr "SEPA acceptă doar plăți în EUR. Unele plăți folosesc altă monedă."
 
 #. module: account_iso20022
-#: model:ir.model.fields,help:account_iso20022.field_account_journal__sepa_pain_version
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__sepa_pain_version
+#: model:ir.model.fields,help:account_iso20022.field_account_payment_method_line__sepa_pain_version
 msgid ""
 "SEPA version to use to generate Credit Transfer XML files from this journal"
 msgstr ""
@@ -372,16 +431,6 @@ msgstr "Partajat"
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Some payments are above the maximum amount allowed."
 msgstr "Unele plăți depășesc suma maximă permisă."
-
-#. module: account_iso20022
-#. odoo-python
-#: code:addons/account_iso20022/models/account_journal_sepa_ct.py:0
-msgid ""
-"Some payments are missing a value for 'UETR', required for the SEPA "
-"Pain.001.001.09 format."
-msgstr ""
-"Unele plăți nu au o valoare pentru 'UETR', necesară pentru formatul SEPA "
-"Pain.001.001.09."
 
 #. module: account_iso20022
 #. odoo-python
@@ -440,20 +489,6 @@ msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
-#: code:addons/account_iso20022/models/res_partner.py:0
-msgid ""
-"The LEI number must contain 20 characters and match the following "
-"structure:\n"
-"- 18 alphanumeric characters with capital letters\n"
-"- 2 digits in the end\n"
-msgstr ""
-"Numărul LEI trebuie să conțină 20 de caractere și să respecte următoarea "
-"structură:\n"
-"- 18 caractere alfanumerice cu majuscule\n"
-"- 2 cifre la final\n"
-
-#. module: account_iso20022
-#. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
 "The Name Identification and Issuer details are required to proceed. Please "
@@ -474,6 +509,11 @@ msgstr ""
 "Este necesar un cont IBAN valid pentru a utiliza funcționalitățile SEPA."
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "The country or city of"
+msgstr ""
+
+#. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
@@ -492,6 +532,18 @@ msgid ""
 msgstr ""
 "Jurnalul '%s' necesită un cont IBAN corect pentru a plăti prin SEPA. Vă "
 "rugăm să îl configurați mai întâi."
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__is_third_party
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__is_third_party
+msgid "Third-Party Account"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__third_party_beneficiary_id
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__third_party_beneficiary_id
+msgid "Third-Party Beneficiary"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -522,12 +574,6 @@ msgid "URGP - Critical urgency"
 msgstr "URGP - Urgență critică"
 
 #. module: account_iso20022
-#: model:ir.model.fields,help:account_iso20022.field_account_bank_statement_line__end_to_end_uuid
-#: model:ir.model.fields,help:account_iso20022.field_account_payment__end_to_end_uuid
-msgid "Unique end-to-end assigned by the initiating party"
-msgstr "Identificator unic cap la cap atribuit de partea inițiatoare"
-
-#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__iso20022_uetr
 msgid "Unique end-to-end transaction reference"
 msgstr "Referință unică de tranzacție cap la cap"
@@ -556,10 +602,21 @@ msgstr ""
 "70 de caractere."
 
 #. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__sepa_pain_version
+msgid "XML Version"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_initiating_party_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__iso20022_initiating_party_name
 msgid "Your Company Name"
 msgstr "Numele companiei dvs."
+
+#. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "is not set, which could cause the file to be refused by the bank."
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -568,12 +625,12 @@ msgid "is_sent"
 msgstr "este_trimisa"
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03
 msgid "pain.001.001.03"
 msgstr "pain.001.001.03"
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_09
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_09
 msgid "pain.001.001.09"
 msgstr "pain.001.001.09"
 
@@ -590,6 +647,11 @@ msgid "state"
 msgstr "stare"
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "these partners"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_journal__iso20022_default_priority
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__iso20022_priority
 msgid ""
@@ -603,67 +665,8 @@ msgstr ""
 "• URGP: Critic, necesită procesare imediată.\n"
 "• SVDA: Plățile trebuie să fie decontate în aceeași zi cu transmiterea."
 
-#~ msgid "Please set a bank on the journal '%(journal_name)s'."
-#~ msgstr "Vă rugăm să setați o bancă pe jurnalul '%(journal_name)s'."
+#~ msgid "SEPA XML Format"
+#~ msgstr "Format XML SEPA"
 
-#~ msgid "Please set an account number on the journal '%(journal_name)s'."
-#~ msgstr "Vă rugăm să setați un număr de cont pe jurnalul '%(journal_name)s'."
-
-#~ msgid ""
-#~ "Please set the bank identifier code (BIC) on this bank: %(bank_name)s"
-#~ msgstr ""
-#~ "Vă rugăm să setați codul de identificare bancară (BIC) pentru această "
-#~ "bancă: %(bank_name)s"
-
-#~ msgid "A bank account must be set on the following documents: "
-#~ msgstr "Trebuie setat un cont bancar pe următoarele documente: "
-
-#~ msgid "Generic"
-#~ msgstr "Generic"
-
-#~ msgid "Maximum amount is %s for payments in Euros, %s for other currencies."
-#~ msgstr ""
-#~ "Valoare maximă este de %s pentru plățile in Euro, %s pentru alte valute."
-
-#~ msgid ""
-#~ "Please first set a SEPA identification number in the accounting settings."
-#~ msgstr ""
-#~ "Vă rugăm să setați mai întâi un număr de identificare SEPA în setările "
-#~ "contabile."
-
-#~ msgid "Register Payment"
-#~ msgstr "Înregistrează Plată"
-
-#~ msgid "Request batch booking from the bank for the related bank statements."
-#~ msgstr ""
-#~ "Solicitați rezervarea lotului de la bancă pentru extrasele bancare "
-#~ "aferente."
-
-#~ msgid "SEPA Pain Version"
-#~ msgstr "Versiunea SEPA Pain"
-
-#~ msgid ""
-#~ "Some payments are not made on an IBAN recipient account. This batch might "
-#~ "not be accepted by certain banks because of that."
-#~ msgstr ""
-#~ "Unele plăți nu se efectuează pe un cont destinatar IBAN. Acest lot ar "
-#~ "putea să nu fie acceptat de anumite bănci din această cauză."
-
-#~ msgid ""
-#~ "Some payments were instructed in another currency than Euro. This batch "
-#~ "might not be accepted by certain banks because of that."
-#~ msgstr ""
-#~ "Unele plăți au fost instruite într-o altă monedă decât euro. Acest lot ar "
-#~ "putea să nu fie acceptat de anumite bănci din această cauză."
-
-#~ msgid ""
-#~ "Technical feature used during the file creation. A SEPA message is said "
-#~ "to be 'generic' if it cannot be considered as a standard european credit "
-#~ "transfer. That is if the bank journal is not in €, a transaction is not "
-#~ "in € or a payee is not identified by an IBAN account number."
-#~ msgstr ""
-#~ "Caracteristică tehnică utilizată în timpul creării fișierului. Se spune "
-#~ "că un mesaj SEPA este „generic” dacă nu poate fi considerat un transfer "
-#~ "de credit european standard. Asta dacă jurnalul bancar nu este în €, o "
-#~ "tranzacție nu este în € sau un beneficiar nu este identificat printr-un "
-#~ "număr de cont IBAN."
+#~ msgid "Identification assigned by an institution (eg. VAT number)."
+#~ msgstr "Identificare atribuită de o instituție (de exemplu, numărul TVA)."

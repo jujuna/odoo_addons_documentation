@@ -37,21 +37,3 @@ class ProjectProject(models.Model):
             action["views"] = [[False, 'form']]
             action["res_id"] = assets[0].id
         return action
-
-    # ----------------------------
-    #  Project Updates
-    # ----------------------------
-
-    def _get_stat_buttons(self):
-        buttons = super()._get_stat_buttons()
-        if self.env.user.has_group('account.group_account_readonly'):
-            buttons.append({
-                'icon': 'pencil-square-o',
-                'text': self.env._('Assets'),
-                'number': self.assets_count,
-                'action_type': 'object',
-                'action': 'action_open_project_assets',
-                'show': self.assets_count > 0,
-                'sequence': 40,
-            })
-        return buttons

@@ -4,21 +4,22 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:48+0000\n"
-"PO-Revision-Date: 2025-11-08 20:16+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:58+0000\n"
+"PO-Revision-Date: 2026-09-17 23:14+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "spreadsheet_edition/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -28,19 +29,12 @@ msgstr "%(field name)s tilauksittain %(order)s"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/list_init_callback.js:0
-msgid "%(list_name)s (List #%(list_id)s)"
-msgstr "%(list_name)s (Luettelo #%(list_id)s)"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/version_history_action.js:0
 msgid "%(name)s (restored from %(timestamp)s)"
 msgstr "%(name)s (palautettu %(timestamp)s)"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/pivot_init_callback.js:0
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/plugins/pivot_odoo_insertion.js:0
 msgid "%(pivot_name)s (Pivot #%(pivot_id)s)"
 msgstr "%(pivot_name)s (Pivot #%(pivot_id)s)"
@@ -60,8 +54,14 @@ msgstr "%(pivot_title)s kohdistuen %(group_by)s (%(granularity)s)"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
-msgid "%s (copy)"
-msgstr "%s (kopio)"
+msgid "%(record_count)s records"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
+msgid "%(record_count)s+ records"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -104,7 +104,7 @@ msgstr "Aktiivinen"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/odoo_pivot_layout_configurator/odoo_pivot_layout_configurator.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/components/sidepanel_model_field_selector/sidepanel_model_field_selector.xml:0
 msgid "Add"
 msgstr "Lisää"
 
@@ -117,15 +117,27 @@ msgstr "Lisää kommentti..."
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
+msgid "Add calculated column"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/comments/index.js:0
 msgid "All Comments"
 msgstr "Näytä kaikki kommentit"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.js:0
 msgid "All sheets"
 msgstr "Kaikki sivut"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/components/sidepanel_model_field_selector/sidepanel_model_field_selector.js:0
+msgid "Already present in the source"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -135,7 +147,8 @@ msgstr "Oletko Varma että haluat poistaa tämän?"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.js:0
 msgid "Ascending"
 msgstr "Nouseva"
 
@@ -180,16 +193,6 @@ msgstr "Tyhjä laskentataulukko"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/actions/input_dialog/input_dialog.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/global_filter_footer/global_filter_footer.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/ir_menu_selector/ir_menu_selector.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/new_pivot_side_panel/new_pivot_side_panel.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
-msgid "Cancel"
-msgstr "Peruuta"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.js:0
 msgid ""
 "Changing the pivot definition requires to reload the data. It may take some "
@@ -197,6 +200,18 @@ msgid ""
 msgstr ""
 "Pivot-määrityksen muuttaminen edellyttää tietojen lataamista uudelleen. Tämä "
 "voi kestää jonkin aikaa."
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Charts"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_item/global_filter_item.xml:0
+msgid "Clear"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -272,6 +287,12 @@ msgstr "Nykyisen version UUID"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/link_datasource/odoo_link_selector.js:0
+msgid "Data source"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_side_panel.xml:0
 msgid "Date"
 msgstr "Päivämäärä"
@@ -287,6 +308,12 @@ msgstr "Päivä"
 #: code:addons/spreadsheet_edition/static/src/assets/pivot_view/pivot_view.js:0
 msgid "Day of Month"
 msgstr "Kuukauden päivä"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/link_datasource/odoo_link_selector.js:0
+msgid "Default menu"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -307,15 +334,21 @@ msgstr "Lykkää päivityksiä"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_item/global_filter_item.js:0
+msgid "Delete"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.xml:0
 msgid "Delete Chart"
-msgstr ""
+msgstr "Poista kaavio"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
 msgid "Delete List"
-msgstr ""
+msgstr "Poista lista"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -325,7 +358,8 @@ msgstr "Poista Pivot"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.js:0
 msgid "Descending"
 msgstr "Laskeva"
 
@@ -343,6 +377,12 @@ msgstr ""
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/input_dialog/input_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/global_filter_footer/global_filter_footer.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/ir_menu_selector/ir_menu_selector.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/new_list_sidepanel/new_list_sidepanel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/new_pivot_side_panel/new_pivot_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Discard"
 msgstr "Hylkää"
 
@@ -360,6 +400,12 @@ msgstr "Näyttönimi"
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_mixin__display_thumbnail
 msgid "Display Thumbnail"
 msgstr "Näytä pikkukuva"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Documention"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -385,6 +431,12 @@ msgstr "Lataa JSON-muodossa"
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/filter_editor_store.js:0
 msgid "Duplicated filter label"
 msgstr "Tuplasuodattimen nimi"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_item/global_filter_item.js:0
+msgid "Edit"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -436,7 +488,7 @@ msgstr "Suodattimen arvo"
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/filter_component.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/index.js:0
 msgid "Filters"
-msgstr "Suotimet"
+msgstr "Suodattimet"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__message_follower_ids
@@ -462,21 +514,15 @@ msgstr "Vaihteluvälistä"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/filter_component.xml:0
-msgid "Global Filters"
-msgstr "Yleiset suodattimet"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/components/collaborative_status/collaborative_status.js:0
 msgid "Go to %(userName)s"
-msgstr ""
+msgstr "Siirry %(userName)s"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
 msgid "Graph name"
-msgstr ""
+msgstr "Kaavion nimi"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__has_message
@@ -488,6 +534,12 @@ msgstr "Sisältää viestin"
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/version_history_action.js:0
 msgid "Heads up!"
 msgstr "Huomio!"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Help"
+msgstr ""
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_ir_websocket__id
@@ -545,14 +597,11 @@ msgstr "Lisää kommentti"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
-#: code:addons/spreadsheet_edition/static/src/assets/graph_view/graph_view.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/pivot.xml:0
 msgid "Insert in Spreadsheet"
 msgstr "Lisää laskentataulukkoon"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/assets/kanban/kanban_controller.js:0
 #: code:addons/spreadsheet_edition/static/src/assets/list_view/list_controller.js:0
 msgid "Insert in spreadsheet"
 msgstr "Lisää laskentataulukkoon"
@@ -577,7 +626,7 @@ msgstr "On seuraaja"
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/selection_filter_editor_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/text_filter_editor_side_panel.xml:0
 msgid "Label"
-msgstr "Otsikko"
+msgstr "Nimike"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -607,17 +656,13 @@ msgstr "Viimeksi päivitetty osoitteessa"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/ir_ui_menu/index.js:0
-msgid "Link an Odoo menu"
-msgstr "Linkitä Odoo-valikko"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/related_filters/related_filters.xml:0
 msgid ""
 "Link each filter to a corresponding field in the data source to enable "
 "filtering."
 msgstr ""
+"Linkitä kukin suodatin vastaavaan tietolähdekenttään suodattamisen "
+"mahdollistamiseksi."
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -629,18 +674,24 @@ msgstr "Linkkivalikko laskentataulukossa"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
 msgid "Link name"
-msgstr ""
+msgstr "Linkin nimi"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/odoo_menu/chart_panel.xml:0
-msgid "Link to Odoo menu"
-msgstr "Linkki Odoo-valikkoon"
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/link_datasource/chart_panel.xml:0
+msgid "Link to Odoo"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/related_filters/related_filters.xml:0
 msgid "Link to the filter"
+msgstr "Linkki suodattimeen"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "List"
 msgstr ""
 
 #. module: spreadsheet_edition
@@ -658,12 +709,8 @@ msgstr "Luettelon nimi"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
-msgid ""
-"List duplicated. Use the \"Re-insert list\" menu item to insert it in a "
-"sheet."
+msgid "List duplicated."
 msgstr ""
-"Luettelo on päällekkäinen. Käytä \"Lisää lista uudelleen\" -toimintoa "
-"lisätäksesi sen arkille."
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -675,13 +722,19 @@ msgstr "Luettelon kopiointi epäonnistui"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
 msgid "List name"
-msgstr ""
+msgstr "Luettelon nimi"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "Load More"
 msgstr "Lataa lisää"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/plugins/list_autofill_plugin.js:0
+msgid "Loading..."
+msgstr "Ladataan..."
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -704,9 +757,9 @@ msgstr "Sovita tämä suodatin kunkin tietolähteen kenttään"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/related_filters_section/related_fitlers_section.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/related_filters_section/related_filters_section.js:0
 msgid "Matching %(matching)s / %(total)s filters"
-msgstr ""
+msgstr "%(matching)s / %(total)s -suodattimien yhteensopivuus"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -717,7 +770,7 @@ msgstr "Valikon valinnat"
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__message_has_error
 msgid "Message Delivery error"
-msgstr "Ongelma viestin toimituksessa"
+msgstr "Viestin toimitusvirhe"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__message_ids
@@ -747,6 +800,7 @@ msgstr "Puuttuva pivot #%s"
 #: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/selection_filter_editor_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/new_list_sidepanel/new_list_sidepanel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/new_pivot_side_panel/new_pivot_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.xml:0
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__res_model
@@ -791,13 +845,25 @@ msgstr "Uusi Odoo Pivot"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+msgid "New Odoo list"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
+msgid "New calculated column"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.js:0
 msgid "Next"
 msgstr "Seuraava"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.js:0
 msgid "No offset"
 msgstr "Ei siirtymää"
 
@@ -806,6 +872,12 @@ msgstr "Ei siirtymää"
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_grid/spreadsheet_selector_grid.xml:0
 msgid "No preview"
 msgstr "Ei esikatselua"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+msgid "No sorting"
+msgstr ""
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__message_needaction_counter
@@ -831,13 +903,13 @@ msgstr "Toimitusvirheellisten viestien määrä"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.xml:0
 msgid "Number of records to insert into the spreadsheet"
-msgstr ""
+msgstr "Datataulukkoon lisättävien tietueiden lukumäärä"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_side_panel.xml:0
 msgid "Numeric"
-msgstr ""
+msgstr "Numeerinen"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -845,6 +917,12 @@ msgstr ""
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/version_history_action.js:0
 msgid "Odoo Spreadsheet"
 msgstr "Odoo Datataulukot"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Odoo list"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -890,7 +968,6 @@ msgstr "Kaudet"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/pivot_view/pivot_view.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/odoo_pivot_layout_configurator/odoo_pivot_layout_configurator.js:0
 msgid "Pivot contains duplicate groupbys"
 msgstr "Pivot sisältää päällekkäisiä ryhmiä"
 
@@ -921,15 +998,9 @@ msgstr "Mahdolliset arvot"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.js:0
 msgid "Previous"
 msgstr "Edellinen"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
-msgid "Print"
-msgstr "Tulosta"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -944,9 +1015,21 @@ msgid "Quarter & Year"
 msgstr "Vuosineljännes ja vuosi"
 
 #. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Quick access"
+msgstr ""
+
+#. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__rating_ids
 msgid "Ratings"
-msgstr "Arviointi"
+msgstr "Arvostelut"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Re-insert dynamic list"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -957,7 +1040,6 @@ msgstr "Aseta dynaaminen pivot uudelleen"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/abstract_spreadsheet_action.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "Re-insert list"
 msgstr "Lisää luettelo uudelleen"
 
@@ -966,6 +1048,12 @@ msgstr "Lisää luettelo uudelleen"
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "Re-insert pivot cell"
 msgstr "Lisää pivot-solu uudelleen"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Re-insert static list"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1024,7 +1112,7 @@ msgstr "Poista"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/control_panel/spreadsheet_name.xml:0
 msgid "Rename"
-msgstr "Uudelleennimeä"
+msgstr "Nimeä uudelleen"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1065,7 +1153,7 @@ msgstr "Rajoita arvoja toimialueella"
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__revision_date
 msgid "Revision Date"
-msgstr ""
+msgstr "Tarkistuspäivä"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__revision_uuid
@@ -1091,6 +1179,7 @@ msgstr "Tekstiviestin toimitusvirhe"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/global_filter_footer/global_filter_footer.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/new_list_sidepanel/new_list_sidepanel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/new_pivot_side_panel/new_pivot_side_panel.xml:0
 msgid "Save"
 msgstr "Tallenna"
@@ -1103,13 +1192,13 @@ msgstr "Tallenna mallipohjana"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_navbar/spreadsheet_navbar.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_sync_status/spreadsheet_sync_status.xml:0
 msgid "Saved"
 msgstr "Tallennettu"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_navbar/spreadsheet_navbar.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_sync_status/spreadsheet_sync_status.xml:0
 msgid "Saving"
 msgstr "Tallennetaan"
 
@@ -1130,6 +1219,12 @@ msgstr "Katso luettelo ominaisuuksista"
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/index.js:0
 msgid "See version history"
 msgstr "Katso versiohistoria"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/link_datasource/chart_panel.xml:0
+msgid "Select a data source..."
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1159,7 +1254,7 @@ msgstr "Valinta"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/selection_filter_editor_side_panel.xml:0
 msgid "Selection field"
-msgstr ""
+msgstr "Valintakenttä"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1175,17 +1270,36 @@ msgstr "Tilannekuva"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+msgid "Sort list"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
 msgid "Sorting"
 msgstr "Lajittelu"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/assets/graph_view/graph_view.xml:0
+#: code:addons/spreadsheet_edition/static/src/assets/kanban/kanban_controller.js:0
 #: code:addons/spreadsheet_edition/static/src/assets/spreadsheet_cog_menu/spreadsheet_cog_menu.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_navbar/spreadsheet_navbar.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/pivot.xml:0
+#: model:ir.module.module,description:base.module_spreadsheet_edition
+#: model:ir.module.module,shortdesc:base.module_spreadsheet_edition
+#: model:ir.module.module,summary:base.module_spreadsheet_edition
 #: model:ir.ui.menu,name:spreadsheet_edition.menu_technical_spreadsheet
 msgid "Spreadsheet"
 msgstr "Taulukkolaskenta"
+
+#. module: spreadsheet_edition
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard_share__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_mixin__spreadsheet_image_ids
+msgid "Spreadsheet Image"
+msgstr ""
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard__spreadsheet_revision_ids
@@ -1301,7 +1415,6 @@ msgstr "Taulukkolaskentataulukkoa kohti voi olla vain yksi alkuperäinen versio"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/icons.xml:0
 msgid "This list is not used"
 msgstr "Tätä luetteloa ei käytetä"
 
@@ -1313,7 +1426,7 @@ msgstr "Tätä niveltä ei käytetä"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.js:0
 msgid "This sheet"
 msgstr "Tämä arkki"
 
@@ -1325,8 +1438,26 @@ msgstr "Yhteensä"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
+msgid "Translate headers"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/plugins/pivot_autofill_plugin.js:0
+msgid "Unknown"
+msgstr "Tuntematon"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/related_filters/related_filters.xml:0
 msgid "Unlink from the filter"
+msgstr "Poista linkki suodattimesta"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+msgid "Unused lists"
 msgstr ""
 
 #. module: spreadsheet_edition
@@ -1340,16 +1471,6 @@ msgstr "Versiohistoria"
 #: code:addons/spreadsheet_edition/models/spreadsheet_mixin.py:0
 msgid "Version restored"
 msgstr "Versio palautettu"
-
-#. module: spreadsheet_edition
-#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__website_message_ids
-msgid "Website Messages"
-msgstr "Verkkosivun ilmoitukset"
-
-#. module: spreadsheet_edition
-#: model:ir.model.fields,help:spreadsheet_edition.field_spreadsheet_cell_thread__website_message_ids
-msgid "Website communication history"
-msgstr "Verkkosivun viestihistoria"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1382,6 +1503,26 @@ msgid "Yes/No"
 msgstr "Kyllä/Ei"
 
 #. module: spreadsheet_edition
+#. odoo-python
+#: code:addons/spreadsheet_edition/models/spreadsheet_mixin.py:0
+msgid "You can only undo or redo your own revisions."
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/filter_editor_store.js:0
+msgid ""
+"You cannot change the operator without a value. If default value is not "
+"needed, select the first operator."
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-python
+#: code:addons/spreadsheet_edition/models/spreadsheet_mixin.py:0
+msgid "You don't have the access rights to perform this operation."
+msgstr ""
+
+#. module: spreadsheet_edition
 #: model_terms:ir.ui.view,arch_db:spreadsheet_edition.mail_notification_layout
 msgid "mentioned you in a comment:"
 msgstr "mainitsi sinut kommentissa:"
@@ -1399,5 +1540,8 @@ msgstr "ei koskaan"
 msgid "websocket message handling"
 msgstr "websocket-viestien käsittely"
 
-#~ msgid "Models"
-#~ msgstr "Mallit"
+msgid "Website Messages"
+msgstr "Verkkosivun ilmoitukset"
+
+msgid "Website communication history"
+msgstr "Verkkosivun viestihistoria"

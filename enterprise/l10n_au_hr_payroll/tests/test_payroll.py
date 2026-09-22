@@ -32,7 +32,6 @@ class TestPayroll(TestPayrollCommon):
         ]
         today = date.today()
         payslip = self.env["hr.payslip"].create({
-            "name": "Test Payslip AU",
             "employee_id": self.employee_id.id,
             "date_from": today,
             "date_to": today,
@@ -57,7 +56,6 @@ class TestPayroll(TestPayrollCommon):
         today = date.today()
         self.employee_id.marital = "married"
         payslip = self.env["hr.payslip"].create({
-            "name": "Test Payslip AU",
             "employee_id": self.employee_id.id,
             "date_from": today,
             "date_to": today,
@@ -82,7 +80,6 @@ class TestPayroll(TestPayrollCommon):
     def test_compute_loan_withhold(self):
         today = date.today()
         payslip = self.env["hr.payslip"].create({
-            "name": "Test Payslip AU",
             "employee_id": self.employee_id.id,
             "date_from": today,
             "date_to": today,
@@ -116,7 +113,6 @@ class TestPayroll(TestPayrollCommon):
         self.employee_id.children = 5
         self.employee_id.l10n_au_tax_free_threshold = True
         payslip_id = self.env["hr.payslip"].create({
-            "name": "payslip",
             "employee_id": self.employee_id.id,
             "version_id": self.version_ids[0].id,
             "struct_id": self.default_payroll_structure.id,
@@ -139,7 +135,6 @@ class TestPayroll(TestPayrollCommon):
         self.employee_id.l10n_au_tax_free_threshold = True
         self.employee_id.l10n_au_nat_3093_amount = 1645
         payslip_id = self.env["hr.payslip"].create({
-            "name": "payslip",
             "employee_id": self.employee_id.id,
             "version_id": self.version_ids[0].id,
             "struct_id": self.default_payroll_structure.id,
@@ -163,7 +158,6 @@ class TestPayroll(TestPayrollCommon):
         self.employee_id.l10n_au_tax_free_threshold = True
         self.employee_id.l10n_au_nat_3093_amount = 1365
         payslip_id = self.env["hr.payslip"].create({
-            "name": "payslip",
             "employee_id": self.employee_id.id,
             "version_id": self.version_ids[0].id,
             "struct_id": self.default_payroll_structure.id,
@@ -189,7 +183,6 @@ class TestPayroll(TestPayrollCommon):
         self.tax_treatment_category = 'R'
         employee_id, version_id = self.create_employee_and_contract(5000, {'schedule_pay': 'monthly', "l10n_au_training_loan": False, "l10n_au_tax_free_threshold": True})
         payslip_id = self.env["hr.payslip"].create({
-            "name": "payslip",
             "employee_id": employee_id.id,
             "version_id": version_id.id,
             "struct_id": self.default_payroll_structure.id,
@@ -291,7 +284,7 @@ class TestPayroll(TestPayrollCommon):
         # Scenario 14: Withholding variation
         payslip_id.employee_id.write({
             "l10n_au_withholding_variation": 'salaries',
-            "l10n_au_withholding_variation_amount": 15,
+            "l10n_au_withholding_variation_amount": 0.15,
         })
         payslip_id.compute_sheet()
         lbc = self.lines_by_code(payslip_id.line_ids)
@@ -303,7 +296,6 @@ class TestPayroll(TestPayrollCommon):
     def test_withholding_weekly_regular_employee(self):
         employee_id, version_id = self.create_employee_and_contract(1000, {'schedule_pay': 'weekly', "l10n_au_training_loan": False, 'l10n_au_tax_free_threshold': True})
         payslip_id = self.env["hr.payslip"].create({
-            "name": "payslip",
             "employee_id": employee_id.id,
             "version_id": version_id.id,
             "struct_id": self.default_payroll_structure.id,
@@ -411,7 +403,7 @@ class TestPayroll(TestPayrollCommon):
         # Scenario 39: Withholding variation
         payslip_id.employee_id.write({
             "l10n_au_withholding_variation": 'salaries',
-            "l10n_au_withholding_variation_amount": 15,
+            "l10n_au_withholding_variation_amount": 0.15,
         })
         payslip_id.compute_sheet()
         lbc = self.lines_by_code(payslip_id.line_ids)
@@ -425,7 +417,7 @@ class TestPayroll(TestPayrollCommon):
         # Allocate Holidays
         self.env['hr.leave.allocation'].create([{
             'name': 'Paid Time Off 2023-24',
-            'holiday_status_id': self.annual_leave_type.id,
+            'work_entry_type_id': self.annual_work_entry_type.id,
             'number_of_days': 15,
             'employee_id': employee_id.id,
             'state': 'confirm',
@@ -437,7 +429,6 @@ class TestPayroll(TestPayrollCommon):
         version_id.date_end = date(2023, 8, 31)
 
         payslip_term = self.env["hr.payslip"].create({
-            "name": "Termination Payment",
             "employee_id": employee_id.id,
             "version_id": version_id.id,
             "struct_id": self.env.ref("l10n_au_hr_payroll.hr_payroll_structure_au_regular").id,
@@ -445,9 +436,9 @@ class TestPayroll(TestPayrollCommon):
             "date_from": date(2023, 8, 1),
             "date_to": date(2023, 8, 31),
             "input_line_ids": [
-                Command.create({'input_type_id': self.env.ref('l10n_au_hr_payroll.input_severance_pay').id, 'amount': 15000}),
-                Command.create({'input_type_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id, 'amount': 20000}),
-                Command.create({'input_type_id': self.env.ref('l10n_au_hr_payroll.input_genuine_redundancy').id, 'amount': 5000}),
+                Command.create({'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_severance_pay').id, 'amount': 15000}),
+                Command.create({'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id, 'amount': 20000}),
+                Command.create({'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_genuine_redundancy').id, 'amount': 5000}),
             ]
         })
         # Scenario 1: Tax free threshold claimed

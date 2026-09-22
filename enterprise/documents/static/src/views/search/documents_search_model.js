@@ -3,6 +3,7 @@ import { SearchModel } from "@web/search/search_model";
 import { browser } from "@web/core/browser/browser";
 import { router } from "@web/core/browser/router";
 import { Domain } from "@web/core/domain";
+import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 
 export class DocumentsSearchModel extends SearchModel {
@@ -10,7 +11,9 @@ export class DocumentsSearchModel extends SearchModel {
         super.setup(services);
         this.documentService = useService("document.document");
         this.orm = useService("orm");
+        this.uiService = useService("ui");
         this.skipLoadClosePreview = false;
+        this.deepSearchItemId = null;
         useSetupAction({
             beforeLeave: () => {
                 this._updateRouteState({ folder_id: undefined });
@@ -39,20 +42,24 @@ export class DocumentsSearchModel extends SearchModel {
         }
 
         await super.load(config);
+        if (this._isFetchSectionsRequired()) {
+            await this._fetchSections(this.categories, this.filters);
+        }
 
-        let folderId = router.current.user_folder_id || this.getSelectedFolderId();
-
-        if (folderId) {
+        if (this.getSelectedFolderId()) {
+            let folderId = router.current.user_folder_id || this.getSelectedFolderId();
             const folderSection = this.getSections()[0];
             if (!folderSection.values.has(folderId)) {
                 folderId = false;
             }
             this.toggleCategoryValue(folderSection.id, folderId);
+        } else {
+            this.documentService.currentFolderAccessToken = undefined;
         }
     }
 
     /**
-     * Override to add rootId
+     * Override to add rootId and pre-process user_folder_id.
      *
      * @override
      */
@@ -62,6 +69,12 @@ export class DocumentsSearchModel extends SearchModel {
         for (const folderId of category.values.keys()) {
             if (typeof folderId === "number") {
                 category.values.delete(folderId);
+            }
+        }
+        // Match ids to construct tree
+        for (const value of result.values) {
+            if (!isNaN(value.user_folder_id)) {
+                value.user_folder_id = Number(value.user_folder_id);
             }
         }
         super._createCategoryTree(...arguments);
@@ -151,7 +164,7 @@ export class DocumentsSearchModel extends SearchModel {
 
     /**
      * Returns the folder and all its parents, if any.
-     * @returns {Object | []}
+     * @returns {Object[]}
      */
     getFolderAndParents(folder) {
         const folders = [];
@@ -167,7 +180,7 @@ export class DocumentsSearchModel extends SearchModel {
 
     /**
      * Returns the current selected folder and all its parents, if any.
-     * @returns {Object | []}
+     * @returns {Object[]}
      */
     getSelectedFolderAndParents() {
         const folderSection = this.getSections()[0];
@@ -192,11 +205,20 @@ export class DocumentsSearchModel extends SearchModel {
      * Overridden to write the new value in the local storage.
      * And to write the folder_id in the url.
      * @override
+     * @param {number} sectionId
+     * @param {number|false} valueId
      */
     toggleCategoryValue(sectionId, valueId) {
+        const oldValueId = this.getSelectedFolderId();
         super.toggleCategoryValue(...arguments);
-
-        const selectedFolder = this.getSelectedFolder();
+        const folderAndParents = this.getSelectedFolderAndParents();
+        if (this.isDeepSearch && !folderAndParents.find((f) => f.id === oldValueId)) {
+            this.toggleSearchItem(this.documentService.deepSearchItemId);
+            this.documentService.state.shouldFocusSearchBar = false;
+        } else {
+            this.documentService.state.shouldFocusSearchBar = true;
+        }
+        const selectedFolder = folderAndParents[0];
         if (!this.context.documents_view_secondary) {
             browser.localStorage.setItem("searchpanel_documents_document", valueId);
             this.documentService.updateDocumentURL(selectedFolder);
@@ -212,6 +234,21 @@ export class DocumentsSearchModel extends SearchModel {
                 });
             }
         }
+        if (!this.uiService.isSmall) {
+            this.trigger("focus-search");
+        }
+    }
+
+    /**
+     * Add/modify search filters to search inside passed folder
+     * @param {Number} folderId
+     */
+    deepSearchFolder(folderId) {
+        this.toggleCategoryValue(this.getSections()[0].id, folderId);
+        if (this._ensureDeepSearchItemId()) {
+            this.toggleSearchItem(this.documentService.deepSearchItemId);
+        }
+        this.documentService.state.shouldFocusSearchBar = true;
     }
 
     /**
@@ -272,7 +309,12 @@ export class DocumentsSearchModel extends SearchModel {
         }
         if (!userFolderCategory.activeValueId) {
             if (this.context.documents_unique_folder_id) {
-                return [["id", "child_of", this.context.documents_unique_folder_id]];
+                const domain = [["folder_id", "child_of", this.context.documents_unique_folder_id]];
+                const doc_domain = this.context.documents_linked_records_domain;
+                if (doc_domain) {
+                    return Domain.or([domain, doc_domain]);
+                }
+                return domain;
             }
             return [];
         }
@@ -285,14 +327,48 @@ export class DocumentsSearchModel extends SearchModel {
             (leaf) => leaf[0] === "user_folder_id" && leaf[1] === "="
         );
         if (folderLeafIdx !== -1) {
-            result.splice(folderLeafIdx, 1, ...[["folder_id", "=", folderIdToOpen]]);
+            const domain = this.isDeepSearch
+                ? ["&", ["folder_id", "child_of", folderIdToOpen], ["id", "!=", folderIdToOpen]]
+                : [["folder_id", "=", folderIdToOpen]];
+            result.splice(folderLeafIdx, 1, ...domain);
         }
         return result;
     }
 
+    get isDeepSearch() {
+        return (
+            !!this.documentService.deepSearchItemId &&
+            this.query.some((item) => item.searchItemId === this.documentService.deepSearchItemId)
+        );
+    }
+
     /**
-     * @override Force specific ordering in RECENT and TRASH
-     * and use write_date desc as default otherwise.
+     * @return {boolean} True if existed
+     */
+    _ensureDeepSearchItemId() {
+        if (this.documentService.deepSearchItemId) {
+            return true;
+        }
+        for (const searchItem of Object.values(this.searchItems)) {
+            if (searchItem.name === "is_deep_search") {
+                this.documentService.deepSearchItemId = searchItem.id;
+                return true;
+            }
+        }
+        // Fallback if not on the search view
+        this.createNewFilters([
+            {
+                description: _t("All children"),
+                domain: [],
+                name: "is_deep_search",
+            },
+        ]);
+        this.documentService.deepSearchItemId = this.nextId - 1;
+        return false;
+    }
+
+    /**
+     * @override Force specific ordering in RECENT and TRASH.
      */
     get orderBy() {
         if (this.sections.get(1).activeValueId === "TRASH") {
@@ -308,11 +384,7 @@ export class DocumentsSearchModel extends SearchModel {
                 { name: "write_date", asc: false },
             ];
         }
-        const orderBy = super.orderBy;
-        if (!orderBy.length) {
-            orderBy.push({ name: "create_date", asc: false });
-        }
-        return orderBy;
+        return super.orderBy;
     }
 
     get groupBy() {
@@ -347,9 +419,9 @@ export class DocumentsSearchModel extends SearchModel {
         }
         if (
             !this.documentService.initData.folder_id &&
-            this._context.documents_init_folder_id !== undefined
+            this.context.documents_init_folder_id !== undefined
         ) {
-            category.activeValueId = this._context.documents_init_folder_id || false;
+            category.activeValueId = this.context.documents_init_folder_id || false;
             return;
         }
         // If not set in context, or set to an unknown value, set active value
@@ -398,5 +470,40 @@ export class DocumentsSearchModel extends SearchModel {
 
     _updateRouteState(state) {
         router.pushState(state);
+    }
+
+    _isFetchSectionsRequired() {
+        return false;
+    }
+
+    /**
+     * Knowledge embeddings dedicated methods, preventing leaking information.
+     * Not in a bridge module as it should never be deactivated.
+     */
+    exportKnowledgeState() {
+        const state = super.exportState(...arguments);
+        const user_folder_id = this.getSelectedFolderId();
+        if (!user_folder_id) {
+            throw new Error(_t("Not allowed, select a folder")); // safety, shouldn't be possible
+        }
+        state.sections.forEach((section) => {
+            section[1].values = [section[1].values[0]]; // Keep "All"
+            section[1].activeValueId = false;
+        });
+        Object.assign(state.searchPanelInfo, { loaded: false, shouldReload: true });
+        return state;
+    }
+
+    get knowledgeViewContext() {
+        const folder = this.getSelectedFolder();
+        const folderOrTarget = folder.shortcut_document_id
+            ? { id: folder.shortcut_document_id[0], access_token: folder.target_access_token }
+            : { id: folder.id, access_token: folder.access_token };
+        return {
+            documents_show_default_breadcrumb: true,
+            documents_view_secondary: true,
+            searchpanel_default_user_folder_id: folderOrTarget.id,
+            documents_shared_access_token: folderOrTarget.access_token,
+        };
     }
 }

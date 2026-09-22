@@ -8,17 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2026-01-02 11:37+0000\n"
-"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 01:53+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
 "appointment_google_reserve/ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: appointment_google_reserve
 #. odoo-python
@@ -37,8 +37,8 @@ msgid ""
 "%(appointment_type_name)s: Please configure your Google Reserve Merchant for "
 "Google Reserve."
 msgstr ""
-"%(appointment_type_name)s: Google 예약에 적용할 Google 예약 판매자를 설정하세"
-"요."
+"%(appointment_type_name)s: Google 예약에 적용할 Google 예약 판매자를 "
+"설정하세요."
 
 #. module: appointment_google_reserve
 #. odoo-python
@@ -51,22 +51,41 @@ msgstr ""
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid ""
-"<i class=\"ms-2 fa fa-info-circle\" title=\"Required for Google Reserve\"/>"
+"<i class=\"oi oi-filled ms-2\" data-icon=\"info\" title=\"Required for "
+"Google Reserve\"/>"
 msgstr ""
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid ""
-"<span class=\"fa fa-check fa-fw me-1\"/>Your Google Reserve Synchronization "
-"is active."
+"<span class=\"oi me-1\" data-icon=\"hourglass_empty\"/>Synchronization with "
+"Google Reserve in progress. This can take up to 24 hours."
 msgstr ""
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid ""
-"<span class=\"fa fa-check fa-hourglass me-1\"/>Your Appointment Type is "
-"being synchronized with Google Reserve.<br/>\n"
-"                                This can take up to 24 hours to be active."
+"<span class=\"oi oi-fw me-1\" data-icon=\"check\"/>\n"
+"                                <span>Your Google Reserve Synchronization is "
+"active. </span>"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid ""
+"<span class=\"oi oi-fw me-1\" data-icon=\"map\"/>\n"
+"                                <span>Synchronize your establishment with "
+"Google Reserve. </span>"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "<span> if you encounter any issues.</span>"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "<span> to learn more.</span>"
 msgstr ""
 
 #. module: appointment_google_reserve
@@ -78,6 +97,11 @@ msgstr "필요한 작업"
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__location_id
 msgid "Address"
 msgstr "주소"
+
+#. module: appointment_google_reserve
+#: model:ir.module.module,shortdesc:base.module_appointment_google_reserve
+msgid "Appointment Google Reserve"
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model:ir.model,name:appointment_google_reserve.model_appointment_resource
@@ -125,6 +149,16 @@ msgid "Calendar Event"
 msgstr "행사 일정표"
 
 #. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "Click here"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__name
+msgid "Company Name"
+msgstr "회사명"
+
+#. module: appointment_google_reserve
 #: model:ir.model.fields,help:appointment_google_reserve.field_appointment_type__google_reserve_merchant_id
 msgid "Configure your company data for Google Reserve"
 msgstr ""
@@ -169,13 +203,18 @@ msgid "Enable Google Booking"
 msgstr "Google 예약 활성화"
 
 #. module: appointment_google_reserve
+#: model:ir.module.module,description:base.module_appointment_google_reserve
+msgid "Enable a link between your appointment type and the google API"
+msgstr ""
+
+#. module: appointment_google_reserve
 #: model:ir.model.fields,help:appointment_google_reserve.field_google_reserve_merchant__phone_sanitized
 msgid ""
 "Field used to store sanitized phone number. Helps speeding up searches and "
 "comparisons."
 msgstr ""
-"삭제된 전화 번호를 저장하는 데 사용되는 필드입니다. 검색 및 비교 속도를 높이"
-"는 데 도움이 됩니다."
+"삭제된 전화 번호를 저장하는 데 사용되는 필드입니다. 검색 및 비교 속도를 "
+"높이는 데 도움이 됩니다."
 
 #. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__message_follower_ids
@@ -198,14 +237,20 @@ msgid "Google Booking Pending Synchronization"
 msgstr "Google 예약 동기화 대기 중"
 
 #. module: appointment_google_reserve
+#: model:ir.ui.menu,name:appointment_google_reserve.menu_appointment_google_reserve_merchants
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid "Google Bookings"
 msgstr "Google 예약"
 
 #. module: appointment_google_reserve
-#: model:ir.ui.menu,name:appointment_google_reserve.menu_appointment_google_reserve_merchants
-msgid "Google Reserve"
-msgstr "Google 예약"
+#: model:ir.model.fields,field_description:appointment_google_reserve.field_appointment_type__google_reserve_merchant_id
+msgid "Google Maps Profile"
+msgstr "Google 지도 프로필"
+
+#. module: appointment_google_reserve
+#: model:ir.actions.act_window,name:appointment_google_reserve.google_reserve_merchant_action
+msgid "Google Maps Profiles"
+msgstr "Google 지도 프로필"
 
 #. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_appointment_type__google_reserve_access_token
@@ -214,13 +259,7 @@ msgstr "Google 예약 액세스 토큰"
 
 #. module: appointment_google_reserve
 #: model:ir.model,name:appointment_google_reserve.model_google_reserve_merchant
-#: model:ir.model.fields,field_description:appointment_google_reserve.field_appointment_type__google_reserve_merchant_id
 msgid "Google Reserve Merchant"
-msgstr "Google Reserve 판매자"
-
-#. module: appointment_google_reserve
-#: model:ir.actions.act_window,name:appointment_google_reserve.google_reserve_merchant_action
-msgid "Google Reserve Merchants"
 msgstr "Google Reserve 판매자"
 
 #. module: appointment_google_reserve
@@ -274,8 +313,8 @@ msgid ""
 "If the sanitized phone number is on the blacklist, the contact won't receive "
 "mass mailing sms anymore, from any list"
 msgstr ""
-"검증한 전화번호가 블랙리스트에 있는 번호인 경우, 어느 목록에서도 해당 연락처"
-"에 대해서는 더 이상 대량 발송 SMS를 보내지 않게 됩니다."
+"검증한 전화번호가 블랙리스트에 있는 번호인 경우, 어느 목록에서도 해당 "
+"연락처에 대해서는 더 이상 대량 발송 SMS를 보내지 않게 됩니다."
 
 #. module: appointment_google_reserve
 #: model:ir.model.fields,help:appointment_google_reserve.field_google_reserve_merchant__phone_blacklisted
@@ -284,9 +323,9 @@ msgid ""
 "distinguish which number is blacklisted             when there is both a "
 "mobile and phone field in a model."
 msgstr ""
-"해당 전화번호가 블랙리스트에 오른 번호인지 여부를 나타냅니다. 모델에 핸드폰"
-"과 유선전화 필드 양쪽이 있는 경우 블랙리스트에 올라 있는 번호를 구분하는데 사"
-"용합니다."
+"해당 전화번호가 블랙리스트에 오른 번호인지 여부를 나타냅니다. 모델에 "
+"핸드폰과 유선전화 필드 양쪽이 있는 경우 블랙리스트에 올라 있는 번호를 "
+"구분하는데 사용합니다."
 
 #. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__message_is_follower
@@ -302,11 +341,6 @@ msgstr "최근 업데이트 작업자"
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__write_date
 msgid "Last Updated on"
 msgstr "최근 갱신 일자"
-
-#. module: appointment_google_reserve
-#: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__name
-msgid "Merchant Name"
-msgstr "판매자 이름"
 
 #. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__message_has_error
@@ -373,6 +407,12 @@ msgid "Phone Number"
 msgstr "전화번호"
 
 #. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.google_reserve_merchant_view_form
+msgid ""
+"Please fill in the information exactly as it is displayed on Google Maps"
+msgstr ""
+
+#. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__rating_ids
 msgid "Ratings"
 msgstr "평점"
@@ -411,6 +451,11 @@ msgstr "동기화 중지"
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "Synchronize"
+msgstr "동기화"
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid "Synchronize with Google Reserve"
 msgstr "Google 예약 동기화"
 
@@ -427,21 +472,26 @@ msgid "Used by Google to try to match your physical address to your business."
 msgstr ""
 
 #. module: appointment_google_reserve
-#: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__website_message_ids
-msgid "Website Messages"
-msgstr "웹사이트 메시지"
-
-#. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__website_url
 msgid "Website URL"
 msgstr "웹 사이트 URL"
 
 #. module: appointment_google_reserve
-#: model:ir.model.fields,help:appointment_google_reserve.field_google_reserve_merchant__website_message_ids
-msgid "Website communication history"
-msgstr "웹사이트 커뮤니케이션 이력"
+#. odoo-python
+#: code:addons/appointment_google_reserve/models/google_reserve_merchant.py:0
+msgid ""
+"You cannot delete this merchant as it is used in '%(appointment_name)s' to "
+"synchronize with Google Maps Reserve.\n"
+"Turn off the integration first."
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.google_reserve_merchant_view_form
 msgid "e.g Restaurant"
 msgstr "예: 레스토랑"
+
+msgid "Website Messages"
+msgstr "웹사이트 메시지"
+
+msgid "Website communication history"
+msgstr "웹사이트 커뮤니케이션 이력"

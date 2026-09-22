@@ -99,20 +99,21 @@ class KnowledgePerformanceCase(KnowledgeCommonWData):
         with self.assertQueryCount(employee=20):
             self.env['knowledge.article'].action_home_page()
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.addons.mail.models.mail_mail', 'odoo.models.unlink', 'odoo.tests')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.addons.mail.models.mail_mail', 'odoo.models.unlink', 'odoo.tests')
     @users('employee')
     @warmup
     def test_article_invite_members(self):
-        with self.assertQueryCount(employee=83):
+        with self.assertQueryCount(employee=92):
             shared_article = self.shared_children[0].with_env(self.env)
-            partners = (self.customer + self.partner_employee_manager + self.partner_employee2).with_env(self.env)
+            partners = (self.customer + self.partner_employee_manager + self.partner_employee2)
+            partners = partners.with_env(self.env).with_prefetch()
             shared_article.invite_members(partners, 'write')
 
     @users('employee')
     @warmup
     def test_article_move_to(self):
         before_id = self.workspace_children[0].id
-        with self.assertQueryCount(employee=25):
+        with self.assertQueryCount(employee=25):  # knowledge: 18
             writable_article = self.workspace_children[1].with_env(self.env)
             writable_article.move_to(parent_id=writable_article.parent_id.id, before_article_id=before_id)
 
@@ -163,7 +164,7 @@ class KnowledgePerformancePermissionCase(KnowledgeArticlePermissionsCase):
             self.article_read_contents[0].with_user(self.env.user).user_has_access_parent_path
 
         # article_read_contents[1:3] => ('Open Paranoïa'), ('Proprietary RPGs')
-        with self.assertQueryCount(employee=3):
+        with self.assertQueryCount(employee=0):  # prefetched
             for article in self.article_read_contents[1:3]:
                 article.with_user(self.env.user).user_has_access_parent_path
 
@@ -190,7 +191,7 @@ class KnowledgePerformanceSidebarCase(KnowledgeCommonWData):
     @users('employee')
     @warmup
     def test_article_tree_panel(self):
-        with self.assertQueryCount(employee=22):
+        with self.assertQueryCount(employee=23):
             self.wkspace_grand_children[0].with_user(self.env.user.id).get_sidebar_articles([self.article_shared.id])
 
     @users('employee')
@@ -201,5 +202,5 @@ class KnowledgePerformanceSidebarCase(KnowledgeCommonWData):
             'article_id': article_id
         } for article_id in (self.workspace_children | self.wkspace_grand_children).ids])
 
-        with self.assertQueryCount(employee=19):
+        with self.assertQueryCount(employee=20):
             self.wkspace_grand_children[0].with_user(self.env.user.id).get_sidebar_articles([self.article_shared.id])

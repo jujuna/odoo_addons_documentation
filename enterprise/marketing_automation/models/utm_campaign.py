@@ -1,13 +1,15 @@
 # -*- coding:utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import _, api, models
+from odoo import _, api, fields, models
 
 from odoo.exceptions import UserError
 
 
 class UtmCampaign(models.Model):
     _inherit = 'utm.campaign'
+
+    user_id = fields.Many2one(index=True)
 
     @api.ondelete(at_uninstall=False)
     def _unlink_except_linked_marketing_campaigns(self):

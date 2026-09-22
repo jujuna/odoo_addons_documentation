@@ -4,9 +4,10 @@
 from odoo.addons.social.tests import common
 from odoo.addons.social.tests.tools import mock_void_external_calls
 from odoo.exceptions import AccessError, ValidationError
-from odoo.tests.common import users
+from odoo.tests.common import tagged, users
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSocialMultiCompany(common.SocialCase):
     @classmethod
     def setUpClass(cls):
@@ -126,7 +127,7 @@ class TestSocialMultiCompany(common.SocialCase):
 
         self.assertFalse(post.company_id)
 
-        post.action_post()
+        post.action_post_now()
 
         self.env.invalidate_all()
 
@@ -145,61 +146,6 @@ class TestSocialMultiCompany(common.SocialCase):
             'The post is read by the social user who is in both companies. '
             'He should see the live post of both companies.'
         )
-
-    @users('social_manager')
-    @mock_void_external_calls()
-    def test_social_post_click_count(self):
-        # An UTM medium is created for each social account
-        # That's how we can compute the click based on the current company
-        self.assertTrue(self.account_1.utm_medium_id)
-        self.assertTrue(self.account_2.utm_medium_id)
-        self.assertNotEqual(self.account_1.utm_medium_id, self.account_2.utm_medium_id)
-
-        url = 'https://odoo.com/test/click/count/computation'
-        message = f"""
-            Hi social users :)
-            Visit {url}
-        """
-
-        post = self.env['social.post'].create({
-            'message': message,
-            'account_ids': (self.account_1 | self.account_2).ids,
-            'company_id': False,
-        })
-
-        self.assertFalse(post.company_id)
-
-        post.action_post()
-
-        live_post_1 = post.live_post_ids.filtered(lambda l: l.company_id == self.company_1)
-        live_post_2 = post.live_post_ids.filtered(lambda l: l.company_id == self.company_2)
-
-        self.assertEqual(len(live_post_1), 1)
-        self.assertEqual(len(live_post_2), 1)
-
-        self.env['mail.render.mixin'].sudo()._shorten_links_text(post.message, live_post_1._get_utm_values())
-        link_tracker_1 = self.env['link.tracker'].search([('url', '=', url), ('medium_id', '=', self.account_1.utm_medium_id.id)])
-
-        self.env['mail.render.mixin'].sudo()._shorten_links_text(post.message, live_post_2._get_utm_values())
-        link_tracker_2 = self.env['link.tracker'].search([('url', '=', url), ('medium_id', '=', self.account_2.utm_medium_id.id)])
-
-        self.assertEqual(len(link_tracker_1), 1)
-        self.assertEqual(len(link_tracker_2), 1)
-
-        # 13 clicks on the first account, in the first company
-        self.env['link.tracker.click'].sudo().create([{'link_id': link_tracker_1.id} for _ in range(13)])
-        # 7 clicks on the first account, in the first company
-        self.env['link.tracker.click'].sudo().create([{'link_id': link_tracker_2.id} for _ in range(7)])
-
-        self.assertEqual(link_tracker_1.count, 13)
-        self.assertEqual(link_tracker_2.count, 7)
-
-        self.env.invalidate_all()
-        self.assertEqual(post.click_count, 20, 'There should be 20 clicks across all the companies')
-        self.env.invalidate_all()
-        self.assertEqual(post.with_company(self.company_1).click_count, 13, 'There should be 13 clicks for a user who is only in the first company')
-        self.env.invalidate_all()
-        self.assertEqual(post.with_company(self.company_2).click_count, 7, 'There should be 7 clicks for a user who is only in the second company')
 
     @users('social_user')
     @mock_void_external_calls()

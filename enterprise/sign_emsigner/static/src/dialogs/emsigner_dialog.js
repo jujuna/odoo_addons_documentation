@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { addLoadingEffect } from "@web/core/utils/ui";
 import { rpc } from "@web/core/network/rpc";
 import { Dialog } from "@web/core/dialog/dialog";
@@ -10,12 +10,13 @@ export class EmsignerDialog extends Component {
     static components = {
         Dialog,
     };
-    static props = {
-        route: String,
-        params: Object,
-        onSuccess: Function,
-        close: Function,
-    };
+
+    props = useProps({
+        route: t.string(),
+        params: t.object(),
+        onSuccess: t.function(),
+        close: t.function(),
+    });
 
     setup() {
         this.dialog = useService("dialog");

@@ -7,18 +7,23 @@ from freezegun import freeze_time
 from odoo import Command
 
 from odoo.addons.helpdesk.tests.common import HelpdeskCommon
+from odoo.tests import tagged
+
 from odoo.addons.hr_holidays.tests.common import TestHrHolidaysCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHelpdeskHolidays(HelpdeskCommon, TestHrHolidaysCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.leave_type = cls.env['hr.leave.type'].create({
+        cls.work_entry_type = cls.env['hr.work.entry.type'].create({
             'name': 'Legal Leaves',
-            'time_type': 'leave',
+            'code': 'Legal Leaves',
+            'count_as': 'absence',
             'requires_allocation': False,
+            'unit_of_measure': 'day',
         })
 
         cls.user_hruser.group_ids |= cls.env.ref('helpdesk.group_helpdesk_user')
@@ -53,7 +58,7 @@ class TestHelpdeskHolidays(HelpdeskCommon, TestHrHolidaysCommon):
     def test_random_assignment_employee_time_off(self):
         leave = self.env['hr.leave'].create({
             'employee_id': self.employee_hruser.id,
-            'holiday_status_id': self.leave_type.id,
+            'work_entry_type_id': self.work_entry_type.id,
             'request_date_from': date.today(),
             'request_date_to': date.today() + timedelta(days=6),
         })
@@ -62,6 +67,21 @@ class TestHelpdeskHolidays(HelpdeskCommon, TestHrHolidaysCommon):
         self.assertEqual(self.new_ticket().user_id, self.user_hrmanager, "The created ticket should be automatically assigned to hrmanager")
         self.assertEqual(self.new_ticket().user_id, self.user_employee, "The created ticket should be automatically assigned to employee")
         self.assertEqual(self.new_ticket().user_id, self.user_hrmanager, "The created ticket should be automatically assigned to hrmanager")
+
+    def test_random_assignment_employee_time_off_without_access(self):
+        leave = self.env['hr.leave'].create({
+            'employee_id': self.employee_hruser.id,
+            'work_entry_type_id': self.work_entry_type.id,
+            'request_date_from': date.today(),
+            'request_date_to': date.today() + timedelta(days=6),
+        })
+        leave.action_approve()
+
+        ticket = self.env['helpdesk.ticket'].with_user(self.helpdesk_user).create({
+            'name': 'Ticket',
+            'team_id': self.test_team.id,
+        })
+        self.assertEqual(ticket.user_id, self.user_hrmanager, "The ticket created by a user without access to time off should be automatically assigned to hrmanager")
 
     def test_balanced_assignment_employee_time_off(self):
         self.test_team.assign_method = 'balanced'
@@ -79,7 +99,7 @@ class TestHelpdeskHolidays(HelpdeskCommon, TestHrHolidaysCommon):
 
         leave = self.env['hr.leave'].create({
             'employee_id': self.employee_hrmanager.id,
-            'holiday_status_id': self.leave_type.id,
+            'work_entry_type_id': self.work_entry_type.id,
             'request_date_from': date.today(),
             'request_date_to': date.today() + timedelta(days=6),
         })
@@ -103,7 +123,7 @@ class TestHelpdeskHolidays(HelpdeskCommon, TestHrHolidaysCommon):
 
         leave = self.env['hr.leave'].create({
             'employee_id': self.employee_hruser.id,
-            'holiday_status_id': self.leave_type.id,
+            'work_entry_type_id': self.work_entry_type.id,
             'request_date_from': date.today(),
             'request_date_to': date.today() + timedelta(days=6),
         })
@@ -134,13 +154,11 @@ class TestHelpdeskHolidays(HelpdeskCommon, TestHrHolidaysCommon):
             'name': 'Half Week',
             'hours_per_day': 8.0,
             'attendance_ids': [
-                (0, 0, {'name': 'Wednesday Afternoon', 'dayofweek': '2', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Thursday Lunch', 'dayofweek': '3', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                (0, 0, {'name': 'Thursday Afternoon', 'dayofweek': '3', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Friday Morning', 'dayofweek': '4', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Friday Lunch', 'dayofweek': '4', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                (0, 0, {'name': 'Friday Afternoon', 'dayofweek': '4', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'})
+                (0, 0, {'dayofweek': '2', 'hour_from': 13, 'hour_to': 17}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 13, 'hour_to': 17}),
+                (0, 0, {'dayofweek': '4', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '4', 'hour_from': 13, 'hour_to': 17})
             ]
         })
 

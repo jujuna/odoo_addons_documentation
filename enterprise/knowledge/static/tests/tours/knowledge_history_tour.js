@@ -43,7 +43,6 @@ function changeArticleContentAndSave(newContent) {
 
 
 registry.category("web_tour.tours").add('knowledge_history_tour', {
-    url: '/odoo?debug=1,tests',
     steps: () => [stepUtils.showAppsMenuItem(), {
         // open Knowledge App
         trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
@@ -76,21 +75,15 @@ registry.category("web_tour.tours").add('knowledge_history_tour', {
     }, {
         trigger: ".modal .html-history-dialog.html-history-loaded",
     }, {
-        // check that we have the correct number of revision (5)
-        trigger: ".html-history-dialog .revision-list .btn",
-        run: function () {
-            const items = document.querySelectorAll(".revision-list .btn");
-            if (items.length !== 5) {
-                throw new Error('Expect 5 Revisions in the history dialog, got ' + items.length);
-            }
-        },
+        content: "check that we have the correct number of revision (5)",
+        trigger: ".html-history-dialog .o_revision_panel:has(.list-group-item:count(5))",
     }, {
         // check the first revision content is correct
         trigger: '.history-container .history-content-view:contains("Modified Title 03")',
         run: "click",
     }, {
         // click on the 3rd revision
-        trigger: '.html-history-dialog .revision-list .btn:nth-child(4)',
+        trigger: '.html-history-dialog .o_revision_panel .list-group-item:nth-child(4)',
         run: "click",
     }, {
         trigger: ".modal .html-history-dialog.html-history-loaded",
@@ -100,7 +93,7 @@ registry.category("web_tour.tours").add('knowledge_history_tour', {
         run: "click",
     }, {
         // click on the split comparison tab
-        trigger: '.history-container .history-view-top-bar a:contains(Comparison)',
+        trigger: '.history-container .history-view-top-bar label:contains(Show comparison)',
         run: "click",
     }, {
         // check the comparison unified content is correct

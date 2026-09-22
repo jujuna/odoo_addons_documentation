@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models, _
 from odoo.tools import SQL
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
 from collections import OrderedDict
 from datetime import timedelta
@@ -12,10 +13,10 @@ class L10n_ClReportHandler(models.AbstractModel):
     _description = 'Chilean Report Custom Handler'
 
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
-        # dict of the form {account_id: {column_group_key: {expression_label: value}}}
+        # dict of the form {account_id: {column_group_index: {expression_label: value}}}
         lines_dict = {}
 
-        # totals dictionaries: dicts of the form {column_group_key: {expression_label: total_value}}
+        # totals dictionaries: dicts of the form {column_group_index: {expression_label: total_value}}
         subtotals_dict = {}
         fiscalyear_result_dict = {}
         previous_years_unallocated_earnings_dict = {}
@@ -23,12 +24,12 @@ class L10n_ClReportHandler(models.AbstractModel):
 
         # Build query
         query_list = []
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
-            query = self._prepare_query(report, column_group_options, column_group_key)
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
+            query = self._prepare_query(report, column_group_options, column_group_index)
             query_list.append(SQL("(%s)", query))
 
-            # Set defaults here since the results of the query for this column_group_key might be empty
-            subtotals_dict[column_group_key] = dict.fromkeys([col['expression_label'] for col in column_group_options['columns']], 0.0)
+            # Set defaults here since the results of the query for this column_group_index might be empty
+            subtotals_dict[column_group_index] = dict.fromkeys([col['expression_label'] for col in column_group_options['columns']], 0.0)
 
         full_query = SQL(" UNION ALL ").join(query_list)
         self.env.cr.execute(full_query)
@@ -36,28 +37,28 @@ class L10n_ClReportHandler(models.AbstractModel):
         # Fill lines and subtotals dictionaries
         for result in self.env.cr.dictfetchall():
             account_id = result['id']
-            column_group_key = result['column_group_key']
+            column_group_index = result['column_group_index']
 
             lines_dict.setdefault(account_id, {})
 
             lines_dict[account_id]['full_name'] = f"{result['code']} {result['name']}" if result['code'] else result['name']
-            lines_dict[account_id][column_group_key] = result
+            lines_dict[account_id][column_group_index] = result
 
-            for expression_label in subtotals_dict[column_group_key]:
-                subtotals_dict[column_group_key][expression_label] += result[expression_label]
+            for expression_label in subtotals_dict[column_group_index]:
+                subtotals_dict[column_group_index][expression_label] += result[expression_label]
 
         # Compute other 'total' lines
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
-            subtotals = subtotals_dict[column_group_key]
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
+            subtotals = subtotals_dict[column_group_index]
 
             fiscalyear_result = self._calculate_fiscalyear_result(column_group_options, subtotals)
-            fiscalyear_result_dict[column_group_key] = fiscalyear_result
+            fiscalyear_result_dict[column_group_index] = fiscalyear_result
 
             previous_years_unallocated_earnings = self._calculate_previous_years_unallocated_earnings(report, column_group_options)
-            previous_years_unallocated_earnings_dict[column_group_key] = previous_years_unallocated_earnings
+            previous_years_unallocated_earnings_dict[column_group_index] = previous_years_unallocated_earnings
 
             totals = self._calculate_totals(column_group_options, subtotals, fiscalyear_result, previous_years_unallocated_earnings)
-            totals_dict[column_group_key] = totals
+            totals_dict[column_group_index] = totals
 
         lines = []
         for account_id, line_vals in lines_dict.items():
@@ -71,7 +72,7 @@ class L10n_ClReportHandler(models.AbstractModel):
         # Previous year unallocated earnings line
         unalloc_line = self._create_report_total_line(
             report, options, previous_years_unallocated_earnings_dict, _("Previous years unallocated earnings"), 3, markup='previous_years_unallocated_earnings')
-        if any(not self.env.company.currency_id.is_zero(column['no_format']) for column in unalloc_line['columns']):
+        if any(not self.env.company.currency_id.is_zero(column.no_format) for column in unalloc_line.columns):
             lines.append((0, unalloc_line))
         # General total line
         lines.append((0, self._create_report_total_line(report, options, totals_dict, _("Total"), 1, markup='general_total')))
@@ -79,7 +80,7 @@ class L10n_ClReportHandler(models.AbstractModel):
         return lines
 
     @api.model
-    def _prepare_query(self, report, options, column_group_key) -> SQL:
+    def _prepare_query(self, report, options, column_group_index) -> SQL:
         domain = [
             '|',
             ('date', '>=', options['date']['date_from']),
@@ -94,7 +95,7 @@ class L10n_ClReportHandler(models.AbstractModel):
 
         sql_query = SQL(
             """
-            SELECT %(column_group_key)s AS column_group_key,
+            SELECT %(column_group_index)s AS column_group_index,
                    aa.id, %(account_code)s AS code, %(account_name)s AS name,
                    SUM(account_move_line.debit) AS debit,
                    SUM(account_move_line.credit) AS credit,
@@ -109,7 +110,7 @@ class L10n_ClReportHandler(models.AbstractModel):
             GROUP BY aa.id, %(account_code)s, %(account_name)s
             ORDER BY %(account_code)s
             """,
-            column_group_key=column_group_key,
+            column_group_index=column_group_index,
             account_code=account_code,
             account_name=account_name,
             table_references=query.from_clause,
@@ -128,16 +129,16 @@ class L10n_ClReportHandler(models.AbstractModel):
 
         columns = []
         for column in options['columns']:
-            col_value = vals.get(column['column_group_key'], {}).get(column['expression_label'], False)
-            columns.append(report._build_column_dict(col_value, column, options=options))
+            col_value = vals.get(column['column_group_index'], {}).get(column['expression_label'], False)
+            columns.append(report._build_column_data(col_value, column, options=options))
 
-        return {
-            'id': report._get_generic_line_id('account.account', vals_id),
-            'caret_options': 'account.account',
-            'name': vals['full_name'],
-            'columns': columns,
-            'level': 2,
-        }
+        return AccountReportLineData(
+            id=report._get_generic_line_id('account.account', vals_id),
+            caret_options='account.account',
+            name=vals['full_name'],
+            columns=columns,
+            level=2,
+        )
 
     def _create_report_total_line(self, report, options, total_vals, name, level=1, markup=''):
         """ Create a total line for the report
@@ -151,14 +152,14 @@ class L10n_ClReportHandler(models.AbstractModel):
 
         columns = []
         for column in options['columns']:
-            col_value = total_vals.get(column['column_group_key'], {}).get(column['expression_label'], False)
-            columns.append(report._build_column_dict(col_value, column, options=options))
-        return {
-            'id': report._get_generic_line_id(None, None, markup=markup),
-            'name': name,
-            'level': level,
-            'columns': columns,
-        }
+            col_value = total_vals.get(column['column_group_index'], {}).get(column['expression_label'], False)
+            columns.append(report._build_column_data(col_value, column, options=options))
+        return AccountReportLineData(
+            id=report._get_generic_line_id(None, None, markup=markup),
+            name=name,
+            level=level,
+            columns=columns,
+        )
 
     def _calculate_fiscalyear_result(self, options, subtotal_line):
         exercise_result = OrderedDict.fromkeys([col['expression_label'] for col in options['columns']], 0)
@@ -179,14 +180,15 @@ class L10n_ClReportHandler(models.AbstractModel):
         """
         new_options = options.copy()
         date_from_str = new_options.get('date', {}).get('date_from', '')
-        date_from = fields.Date.from_string(date_from_str) or fields.Date.today()
+        date_from = fields.Date.from_string(date_from_str) or fields.Date.context_today(self)
         fiscal_dates = self.env.company.compute_fiscalyear_dates(date_from)
-        new_options['date'] = report._get_dates_period(
-            None,
-            fiscal_dates['date_from'] - timedelta(days=1),
-            'range',
-            period_type='custom')
-        query = report._get_report_query(new_options, 'strict_range')
+        date_to = fiscal_dates['date_from'] - timedelta(days=1)
+        new_options['date'] = report._build_date_dict(
+            new_options,
+            date_to,
+            date_to,
+        )
+        query = report._get_report_query(new_options, 'from_beginning')
         account_types = (
             'equity_unaffected',
             'income',
@@ -202,7 +204,7 @@ class L10n_ClReportHandler(models.AbstractModel):
             WHERE %(search_condition)s
             AND aa.id = account_move_line.account_id
             AND aa.account_type IN %(account_types)s
-            """.strip('\n'),
+            """,
             table_references=query.from_clause,
             search_condition=query.where_clause,
             account_types=account_types,

@@ -2,13 +2,11 @@
 
 {
     'name': 'Documents - Approvals',
-    'version': '1.0',
     'category': 'Productivity/Documents',
     'summary': 'Approval from documents',
     'description': """
 Adds approvals data to documents
 """,
-    'website': ' ',
     'depends': ['documents', 'approvals'],
     'data': [
         "views/res_config_settings_views.xml",
@@ -16,7 +14,6 @@ Adds approvals data to documents
         "data/documents_folder_data.xml",
         "data/res_company_data.xml"
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

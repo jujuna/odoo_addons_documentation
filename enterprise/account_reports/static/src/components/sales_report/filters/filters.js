@@ -1,6 +1,6 @@
 import { _t } from "@web/core/l10n/translation";
 
-import { AccountReport } from "@account_reports/components/account_report/account_report";
+import { AccountReportController } from "@account_reports/components/account_report/controller";
 import { AccountReportFilters } from "@account_reports/components/account_report/filters/filters";
 
 export class SalesReportFilters extends AccountReportFilters {
@@ -9,13 +9,13 @@ export class SalesReportFilters extends AccountReportFilters {
     //------------------------------------------------------------------------------------------------------------------
     // Getters
     //------------------------------------------------------------------------------------------------------------------
-    get selectedEcTaxName() {
-        const selected = this.controller.cachedFilterOptions.ec_tax_filter_selection.filter(
-            (ecTax) => ecTax.selected,
+    get selectedECSaleType() {
+        const selected = this.controller.cachedFilterOptions().filter_sale_type_selection.filter(
+            (saleType) => saleType.selected,
         );
 
         switch (selected.length) {
-            case this.controller.cachedFilterOptions.ec_tax_filter_selection.length:
+            case this.controller.cachedFilterOptions().filter_sale_type_selection.length:
                 return _t("All");
             case 0:
                 return _t("None");
@@ -25,4 +25,4 @@ export class SalesReportFilters extends AccountReportFilters {
     }
 }
 
-AccountReport.registerCustomComponent(SalesReportFilters);
+AccountReportController.registerCustomComponent(SalesReportFilters);

@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
 <odoo>
+<data>
     <record id="res_groups_privilege_voip" model="res.groups.privilege">
         <field name="name">VoIP</field>
         <field name="category_id" ref="base.module_category_productivity"/>
@@ -9,7 +9,7 @@
         <field name="name">Officer</field>
         <field name="privilege_id" ref="res_groups_privilege_voip"/>
         <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
-        <field name="comment">can view and report on all calls.</field>
+        <field name="comment">can view, report on, and manage calls in their allowed companies.</field>
     </record>
 
     <record id="group_voip_admin" model="res.groups">
@@ -22,40 +22,5 @@
     <record id="base.group_system" model="res.groups">
         <field name="implied_ids" eval="[Command.link(ref('group_voip_admin'))]"/>
     </record>
-
-    <data noupdate="1">
-
-    <record id="voip_call_rule_user" model="ir.rule">
-        <field name="name">voip.call: users can read their own records</field>
-        <field name="model_id" ref="model_voip_call"/>
-        <field name="groups" eval="[Command.link(ref('base.group_user'))]"/>
-        <field name="domain_force">[("user_id", "=", user.id)]</field>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="False"/>
-        <field name="perm_create" eval="False"/>
-        <field name="perm_unlink" eval="False"/>
-    </record>
-
-    <record id="voip_call_officer_rule" model="ir.rule">
-        <field name="name">voip.call: officers have full access to records in their companies.</field>
-        <field name="model_id" ref="model_voip_call"/>
-        <field name="groups" eval="[Command.link(ref('group_voip_officer'))]"/>
-        <field name="domain_force">[("user_id.company_id", "in", company_ids + [False])]</field>
-    </record>
-
-    <record id="voip_provider_user_rule" model="ir.rule">
-        <field name="name">voip.provider: users can only read records in their companies.</field>
-        <field name="model_id" ref="model_voip_provider"/>
-        <field name="groups" eval="[Command.link(ref('base.group_user'))]"/>
-        <field name="domain_force">[("company_id", "in", company_ids + [False])]</field>
-    </record>
-
-    <record id="voip_provider_administrator_rule" model="ir.rule">
-        <field name="name">voip.provider: administrators have full access to records in their companies.</field>
-        <field name="model_id" ref="model_voip_provider"/>
-        <field name="groups" eval="[Command.link(ref('group_voip_admin'))]"/>
-        <field name="domain_force">[("company_id", "in", company_ids + [False])]</field>
-    </record>
-
-    </data>
+</data>
 </odoo>

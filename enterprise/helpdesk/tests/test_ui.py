@@ -17,4 +17,4 @@ class TestUi(odoo.tests.HttpCase, HelpdeskCommon):
             'name': 'lamp stand',
             'team_id': self.test_team.id,
         })
-        self.start_tour('/odoo', 'helpdesk_search_ticket_on_portal_tour', login=self.helpdesk_portal.login)
+        self.start_tour('/my/tickets', 'helpdesk_search_ticket_on_portal_tour', login=self.helpdesk_portal.login)

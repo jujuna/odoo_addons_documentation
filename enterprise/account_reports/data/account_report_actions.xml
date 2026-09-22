@@ -89,12 +89,21 @@
         <record id="action_account_report_customer_statement" model="ir.actions.client">
             <field name="name">Customer Statement</field>
             <field name="tag">account_report</field>
+            <field name="path">customer-statement</field>
             <field name="context" eval="{'report_id': ref('account_reports.customer_statement_report')}"/>
         </record>
 
-        <record id="action_account_report_followup" model="ir.actions.client">
-            <field name="name">Follow-up Report</field>
+        <record id="action_account_report_interco_comparison" model="ir.actions.client">
+            <field name="name">Interco Comparison</field>
             <field name="tag">account_report</field>
+            <field name="path">interco-comparison</field>
+            <field name="context" eval="{'report_id': ref('account_reports.interco_comparison_report')}"/>
+        </record>
+
+        <record id="action_account_report_followup" model="ir.actions.client">
+            <field name="name">Open Items</field>
+            <field name="tag">account_report</field>
+            <field name="path">open-items</field>
             <field name="context" eval="{'report_id': ref('account_reports.followup_report')}"/>
         </record>
 
@@ -118,7 +127,7 @@
             <field name="context" eval="{'report_id': ref('account_reports.deferred_revenue_report')}"/>
         </record>
 
-        <record id="account_financial_current_year_earnings0" model="account.report.line">
+        <record id="account_financial_report_current_years_earnings" model="account.report.line">
             <field name="action_id" ref="action_account_report_pl"/>
         </record>
 
@@ -158,7 +167,7 @@ if records:
         </record>
 
         <record id="action_account_report_bank_reconciliation" model="ir.actions.client">
-            <field name="name">Bank Matching</field>
+            <field name="name">Bank Reconciliation Summary</field>
             <field name="path">reconciliation-report</field>
             <field name="tag">account_report</field>
             <field name="context" eval="{'report_id': ref('account_reports.bank_reconciliation_report')}"/>

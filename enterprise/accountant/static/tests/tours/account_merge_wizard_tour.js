@@ -2,7 +2,6 @@ import { accountTourSteps } from "@account/js/tours/account";
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("account_merge_wizard_tour", {
-    url: "/odoo",
     steps: () => [
         ...accountTourSteps.goToAccountMenu("Go to Accounting"),
         {
@@ -54,6 +53,7 @@ registry.category("web_tour.tours").add("account_merge_wizard_tour", {
         {
             content: "Check that there are now exactly 2 accounts",
             trigger: ".o_pager_limit:contains(2)",
+            timeout: 20000,
         },
     ],
 });

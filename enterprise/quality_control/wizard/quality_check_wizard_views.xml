@@ -67,7 +67,7 @@
                         invisible="test_type != 'spreadsheet'" data-hotkey="w"/>
                     <button name="action_generate_previous_window" type="object" class="btn-secondary" string="Previous" invisible="position_current_check == 1"/>
                     <button name="action_generate_next_window" type="object" class="btn-secondary" string="Next" invisible="is_last_check"/>
-                    <button string="Discard" class="btn btn-secondary" special="cancel" data-hotkey="x" />
+                    <button class="btn btn-secondary" special="cancel" data-hotkey="x"/>
                 </footer>
             </form>
         </field>
@@ -92,9 +92,9 @@
                             <field name="qty_failed" required="True" class="oe_inline"/>
                             <field name="uom_id" widget="many2one_uom" class="oe_inline"/>
                         </div>
-                        <field name="lot_name" string="Lot/SN" invisible="measure_on != 'move_line' or not show_lot_text or product_tracking == 'none'"/>
-                        <field name="lot_line_id" string="Lot/SN" invisible="measure_on != 'move_line' or show_lot_text or product_tracking == 'none'"/>
-                        <field name="failure_location_id" invisible="not potential_failure_location_ids" widget="selection_badge" domain="[('id', 'in', potential_failure_location_ids)]"/>
+                        <field name="lot_name" string="Lot/SN" invisible="measure_on != 'move_line' or not show_lot_text or product_tracking not in ['lot', 'serial']"/>
+                        <field name="lot_line_id" string="Lot/SN" invisible="measure_on != 'move_line' or show_lot_text or product_tracking not in ['lot', 'serial']"/>
+                        <field name="failure_location_id" invisible="not potential_failure_location_ids" widget="badges_many2one" domain="[('id', 'in', potential_failure_location_ids)]"/>
                     </group>
                     <group >
                         <div class="alert" role="alert" colspan="2" invisible="test_type != 'measure'" >
@@ -110,11 +110,13 @@
                     <button name="confirm_measure" type="object" class="btn-primary" string="Confirm Measure"
                         invisible="test_type != 'measure'" data-hotkey="w"/>
                     <button name="confirm_fail" type="object" class="btn-primary" string="Confirm"
-                            invisible="test_type == 'measure'" data-hotkey="w"/>
+                            invisible="test_type == 'measure' or context.get('from_shopfloor')" data-hotkey="w"/>
                     <button name="correct_measure" type="object" class="btn-secondary" string="Correct Measure"
                         invisible="test_type != 'measure'" data-hotkey="q"/>
                     <button name="action_generate_previous_window" type="object" class="btn-secondary" string="Back"
-                        invisible="test_type == 'measure'" data-hotkey="q"/>
+                        invisible="test_type == 'measure' or context.get('from_shopfloor') or context.get('hide_back_button')" data-hotkey="q"/>
+                    <button string="OK" special="cancel" class="oe_highlight"
+                        invisible="test_type == 'measure' or not context.get('from_shopfloor')" data-hotkey="x"/>
                 </footer>
             </form>
         </field>

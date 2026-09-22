@@ -44,6 +44,11 @@ class StockPicking(models.Model):
         _logger.info("Starshipit Cron: Finished processing pending prices.")
         return True
 
+    def _reset_carrier_id(self, picking):
+        """ For starshipit, we want to keep the provider when generating a return. """
+        if picking.carrier_id.delivery_type != 'starshipit' or not picking.carrier_id.can_generate_return:
+            super()._reset_carrier_id(picking)
+
     def action_print_starshipit_labels(self):
         """ Returns the starshipit labels for all pickings in self. """
         labels = self.env['ir.attachment'].search([

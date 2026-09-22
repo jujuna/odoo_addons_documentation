@@ -1,20 +1,13 @@
-import { BaseOptionComponent } from "@html_builder/core/utils";
 import { Plugin } from "@html_editor/plugin";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { BuilderAction } from "@html_builder/core/builder_action";
 
-export class RentalSearchOption extends BaseOptionComponent {
-    static template = "website_sale_renting.RentalSearchOption";
-    static selector = ".s_rental_search";
-}
-
-class RentalSearchOptionPlugin extends Plugin {
+export class RentalSearchOptionPlugin extends Plugin {
     static id = "rentalSearchOption";
 
     resources = {
-        so_content_addition_selector: [".s_rental_search"],
-        builder_options: [RentalSearchOption],
+        so_content_addition_selectors: [".s_rental_search"],
         builder_actions: {
             SetRentalSearchTimingAction,
             SetRentalSearchProductAttributeAction,
@@ -24,11 +17,14 @@ class RentalSearchOptionPlugin extends Plugin {
         // .product_attribute_search_rental_name and make an upgrade: it's only
         // used to keep track of an ID. This should be kept somewhere else and
         // should not use an empty div.
-        invalid_for_base_container_predicates: [
-            (node) =>
+        is_valid_for_base_container_predicates: (node) => {
+            if (
                 node.nodeType === Node.ELEMENT_NODE &&
-                node.classList.contains("product_attribute_search_rental_name"),
-        ],
+                node.classList.contains("product_attribute_search_rental_name")
+            ) {
+                    return false;
+            }
+        },
     };
 }
 
@@ -36,13 +32,13 @@ export class SetRentalSearchTimingAction extends BuilderAction {
     static id = "setRentalSearchTiming";
     isApplied({ editingElement, params: { mainParam: timing } }) {
         if (!editingElement.dataset.timing) {
-            editingElement.dataset.timing = "day";
+            editingElement.dataset.timing = "days";
         }
         return editingElement.dataset.timing === timing;
     }
     apply({ editingElement, params: { mainParam: timing } }) {
         editingElement.dataset.timing = timing;
-        editingElement.querySelector(".s_rental_search_rental_duration_unit").value = timing;
+        editingElement.querySelector(".o_website_sale_daterange_picker").dataset.rentalDurationUnit = timing;
     }
 }
 

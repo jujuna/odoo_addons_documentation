@@ -1,6 +1,8 @@
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { useService } from "@web/core/utils/hooks";
 import { SpreadsheetSelectorDialog } from "@spreadsheet_edition/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog";
+import { omit } from "@web/core/utils/objects";
+import { user } from "@web/core/user";
 
 import { Component } from "@odoo/owl";
 
@@ -9,7 +11,6 @@ import { Component } from "@odoo/owl";
  * @extends Component
  */
 export class InsertViewSpreadsheet extends Component {
-    static props = {};
     static template = "spreadsheet_edition.InsertActionSpreadsheet";
     static components = { DropdownItem };
 
@@ -30,11 +31,12 @@ export class InsertViewSpreadsheet extends Component {
             preProcessingAction: "insertLink",
             preProcessingActionData: actionToLink,
         };
-
+        const context = omit(this.env.searchModel.context, ...Object.keys(user.context));
         this.dialogManager.add(SpreadsheetSelectorDialog, {
             type: "LINK",
             actionOptions,
             name: this.env.config.getDisplayName(),
+            context,
         });
     }
 

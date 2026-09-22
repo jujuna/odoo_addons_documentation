@@ -1,11 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.exceptions import AccessError
-from odoo.tests import Form, new_test_user
+from odoo.tests import tagged, Form, new_test_user
 from odoo.addons.helpdesk.tests.common import HelpdeskCommon
 from odoo.addons.project.tests.test_project_base import TestProjectCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestTasksTicketsConversion(TestProjectCommon, HelpdeskCommon):
     @classmethod
     def setUpClass(cls):
@@ -24,6 +25,15 @@ class TestTasksTicketsConversion(TestProjectCommon, HelpdeskCommon):
         cls.task_stage = cls.env['project.task.type'].search([('project_ids', '=', cls.project_goats.id), ('name', '=', 'New')])
 
     def test_convert_task_to_ticket(self):
+        # Create attachment and message on task
+        attachment = self.env['ir.attachment'].create({
+            'name': 'Test Attachment Task',
+            'raw': b'test',
+            'res_model': 'project.task',
+            'res_id': self.task_1.id,
+        })
+        msg = self.task_1.message_post(body='Test Task', subtype_xmlid='mail.mt_comment', message_type='comment')
+
         form = Form(self.env['project.task.convert.wizard'].with_context({'to_convert': [self.task_1.id]}))
 
         form.team_id = self.test_team
@@ -41,6 +51,12 @@ class TestTasksTicketsConversion(TestProjectCommon, HelpdeskCommon):
         self.assertEqual(view['view_mode'], 'form', "Wizard should redirect to a form view")
         self.assertEqual(view['res_model'], 'helpdesk.ticket', "Wizard should redirect to a helpdesk.ticket view")
         self.assertEqual(view['res_id'], ticket.id, "Wizard should redirect to a form view of the created ticket")
+
+        # Verify attachment moved
+        self.assertEqual(attachment.res_model, 'helpdesk.ticket', "Attachment should move to ticket")
+        self.assertEqual(attachment.res_id, ticket.id, "Attachment should link to new ticket")
+        # Verify message moved
+        self.assertIn(msg, ticket.message_ids, "Chatter message should move to ticket")
 
     def test_convert_tasks_to_tickets(self):
         form = Form(self.env['project.task.convert.wizard'].with_context({'to_convert': [self.task_1.id, self.task_2.id]}))
@@ -67,6 +83,15 @@ class TestTasksTicketsConversion(TestProjectCommon, HelpdeskCommon):
             Form(self.env['project.task.convert.wizard'].with_user(user).with_context({'to_convert': [self.task_1.id]}))
 
     def test_convert_ticket_to_task(self):
+        # Create attachment and message on ticket
+        attachment = self.env['ir.attachment'].create({
+            'name': 'Test Attachment',
+            'raw': b'test',
+            'res_model': 'helpdesk.ticket',
+            'res_id': self.ticket_1.id,
+        })
+        msg = self.ticket_1.message_post(body='Test Ticket', subtype_xmlid='mail.mt_comment', message_type='comment')
+
         form = Form(self.env['helpdesk.ticket.convert.wizard'].with_context({'to_convert': [self.ticket_1.id]}))
 
         form.project_id = self.project_goats
@@ -84,6 +109,12 @@ class TestTasksTicketsConversion(TestProjectCommon, HelpdeskCommon):
         self.assertEqual(view['view_mode'], 'form', "Wizard should redirect to a form view")
         self.assertEqual(view['res_model'], 'project.task', "Wizard should redirect to a project.task view")
         self.assertEqual(view['res_id'], task.id, "Wizard should redirect to a form view of the created task")
+
+        # Verify attachment moved
+        self.assertEqual(attachment.res_model, 'project.task', "Attachment should move to task")
+        self.assertEqual(attachment.res_id, task.id, "Attachment should link to new task")
+        # Verify message moved
+        self.assertIn(msg, task.message_ids, "Chatter message should move to task")
 
     def test_convert_tickets_to_tasks(self):
         form = Form(self.env['helpdesk.ticket.convert.wizard'].with_context({'to_convert': [self.ticket_1.id, self.ticket_2.id]}))

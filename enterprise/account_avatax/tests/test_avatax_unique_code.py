@@ -5,6 +5,8 @@ from odoo.exceptions import UserError
 
 @tagged("-at_install", "post_install")
 class TestAvataxUniqueCode(TestAccountAvataxCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         res = super().setUpClass()

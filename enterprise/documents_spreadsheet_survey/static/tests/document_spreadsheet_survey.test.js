@@ -7,6 +7,8 @@ import {
     createModelWithSurvey,
     defineDocumentSpreadsheetSurveyModels,
 } from "./helpers";
+import { waitForDataLoaded } from "@spreadsheet/helpers/model";
+
 const { cellMenuRegistry } = registries;
 
 defineDocumentSpreadsheetSurveyModels();
@@ -73,4 +75,17 @@ test("See record is not present on wrong survey formulas", async function () {
     setCellContent(model, "A20", "=ODOO.SURVEY(25689)"); // Survey does not exist
     setSelection(model, "A20");
     expect(root.isVisible(env)).toBe(false);
+});
+
+test("Survey data is updated when refreshing the data sources", async () => {
+    const model = await createModelWithSurvey();
+    expect(getCellValue(model, "B1")).toBe("How are you ?");
+
+    const originalQuestion = MOCK_SURVEY_DATA.survey_table[1][0].value;
+    MOCK_SURVEY_DATA.survey_table[1][0].value = "Updated question";
+    model.dispatch("REFRESH_ALL_DATA_SOURCES");
+    await waitForDataLoaded(model);
+
+    expect(getCellValue(model, "B1")).toBe("Updated question");
+    MOCK_SURVEY_DATA.survey_table[1][0].value = originalQuestion;
 });

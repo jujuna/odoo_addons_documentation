@@ -4,19 +4,18 @@ import { redirect } from "@web/core/utils/urls";
 export const salaryConfigTourStart = () => [
     {
         content: "Log into Belgian Company",
-        trigger: ".o_menu_systray .o_switch_company_menu button.dropdown-toggle",
+        trigger: ".o_menu_systray .o_switch_company_menu",
         run: "click",
     },
     {
         content: "Log into Belgian Company",
-        trigger:
-            ".o-dropdown--menu .dropdown-item div span:contains('My Belgian Company - TEST')",
+        trigger: ".o-dropdown--menu .dropdown-item div span:contains('My Belgian Company - TEST')",
         run: "click",
         expectUnloadPage: true,
     },
     {
         trigger:
-            ".o_menu_systray .o_switch_company_menu button.dropdown-toggle span:contains('My Belgian Company - TEST')",
+            ".o_menu_systray .o_switch_company_menu span:contains('My Belgian Company - TEST')",
     },
     {
         content: "Recruitment",
@@ -52,7 +51,7 @@ export const salaryConfigTourStart = () => [
     {
         content: "Applicant Name",
         trigger: '.oe_title [name="partner_name"] input',
-        run: "edit Mitchell Admin 3",
+        run: "edit Mitchell",
     },
     {
         content: "Add Email Address",
@@ -64,7 +63,6 @@ export const salaryConfigTourStart = () => [
         trigger: ".o_control_panel button.o_form_button_save",
         run: "click",
     },
-
     {
         content: "Generate Offer",
         trigger: ".o_statusbar_buttons > button:contains('Generate Offer')",
@@ -104,7 +102,7 @@ export const salaryConfigTourPersonalInfo = () => [
         content: "BirthDate",
         trigger: 'input[name="birthday"]',
         run() {
-            this.anchor.value = "2017-09-01";
+            this.anchor.value = "1992-02-29";
         },
     },
     {
@@ -115,9 +113,14 @@ export const salaryConfigTourPersonalInfo = () => [
         },
     },
     {
+        content: "Name",
+        trigger: 'input[name="name"]',
+        run: "edit Mitchell Admin 3",
+    },
+    {
         content: "National Identification Number",
-        trigger: 'input[name="identification_id"]',
-        run: "edit 11.11.11-111.11",
+        trigger: 'input[name="identification_id"], input[name="niss"]',
+        run: "edit 92.02.29-333.64",
     },
     {
         content: "Street",
@@ -160,24 +163,14 @@ export const salaryConfigTourPersonalInfo = () => [
         run: "selectByLabel Master",
     },
     {
-        content: "School",
-        trigger: 'input[name="study_school"]',
-        run: "edit UCL",
-    },
-    {
         content: "School Level",
         trigger: 'input[name="study_field"]',
         run: "edit Civil Engineering, Applied Mathematics",
     },
     {
         content: "Bank Account",
-        trigger: 'input[name="acc_number"]',
+        trigger: 'input[name="account_number"]',
         run: "edit BE10 3631 0709 4104",
-    },
-    {
-        content: "Private License Plate",
-        trigger: 'input[name="private_car_plate"]',
-        run: "edit 1-ABC-123",
     },
     {
         content: "Emergency Contact",
@@ -217,7 +210,11 @@ export const salaryConfigTourSubmitAndSign = () => [
     {
         content: "Type Date",
         trigger: ":iframe input.ui-selected",
-        run: "edit 17/09/2018",
+        run: "edit 09/17/2018",
+    },
+    {
+        content: "Check for correct name",
+        trigger: ':iframe div.o_sign_sign_item:has(.sign_item_body:contains("Mitchell Admin 3"))',
     },
     // fill signature
     {
@@ -253,7 +250,7 @@ export const salaryConfigTourSubmitAndSign = () => [
     {
         content: "Type Date",
         trigger: ":iframe input.ui-selected",
-        run: "edit 17/09/2018",
+        run: "edit 09/17/2018",
     },
     {
         content: "Validate and Sign",
@@ -264,22 +261,18 @@ export const salaryConfigTourSubmitAndSign = () => [
 ];
 
 registry.category("web_tour.tours").add("hr_contract_salary_applicant_flow_tour", {
-    url: "/odoo",
-    wait_for: Promise.resolve(odoo.__TipTemplateDef),
     steps: () => [
         ...salaryConfigTourStart(),
         ...salaryConfigTourPersonalInfo(),
         ...salaryConfigTourSubmitAndSign(),
-    ]
+    ],
 });
 
 registry.category("web_tour.tours").add("hr_contract_salary_applicant_flow_tour_counter_sign", {
-    url: "/odoo",
-    wait_for: Promise.resolve(odoo.__TipTemplateDef),
     steps: () => [
         {
             content: "Log into Belgian Company",
-            trigger: ".o_menu_systray .o_switch_company_menu button.dropdown-toggle",
+            trigger: ".o_menu_systray .o_switch_company_menu",
             run: "click",
         },
         {

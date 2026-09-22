@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from base64 import b64decode
 import logging
 from hashlib import sha256
 from markupsafe import Markup
@@ -80,7 +79,7 @@ class L10n_AuSTP(models.Model):
         params = {
             "payevent_type": self.payevent_type,
             "submission_id": self.submission_id,
-            "xml_file": b64decode(self.xml_file).decode("utf-8"),
+            "xml_file": self.xml_file.decode("utf-8"),
         }
         if self.payevent_type == "update":
             iap_proxy._l10n_au_payroll_request("/superchoice/payrollReportingUpdatePreSubmission", params)
@@ -88,7 +87,6 @@ class L10n_AuSTP(models.Model):
             iap_proxy._l10n_au_payroll_request("/superchoice/payrollReportingPreSubmission", params)
         if self.state == "draft":
             self.xml_file = False
-            self.xml_filename = False
             self.xml_validation_state = "done"
 
     def submit(self):
@@ -97,7 +95,7 @@ class L10n_AuSTP(models.Model):
 
         super().submit()
 
-        content = b64decode(self.xml_file)
+        content = self.xml_file
         document_hash = sha256(content).hexdigest()
         if self.message_id == document_hash:
             raise ValidationError(_("The document has already been submitted."))
@@ -152,7 +150,6 @@ class L10n_AuSTP(models.Model):
         self.write({
             "state": "draft",
             "xml_file": False,
-            "xml_filename": False,
             "xml_validation_state": "normal",
             "error_message": False,
             "submission_id": False,

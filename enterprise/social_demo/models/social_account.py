@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
-from odoo import models
+from odoo import api, models
 
 
 class SocialAccount(models.Model):
@@ -32,12 +32,41 @@ class SocialAccount(models.Model):
         """ Overridden to bypass third-party API calls. """
         return
 
-    def twitter_get_user_by_username(self, query):
-        """ Returns some fake suggestion """
+    @api.model
+    def search_mention_suggestions(self, search_term, media_type):
+        """ Return a fake result to show the feature. """
         partner = self.env.ref('social_demo.res_partner_2', raise_if_not_found=False)
-        return {
+        common_result = {
+            'name': search_term,
+            'profile_image_url': f'/web/image/res.partner/{partner.id}/avatar_128',
+            'description': "A Full description of the user",
+        }
+        match media_type:
+            case "twitter":
+                return self.twitter_users_search(search_term)
+            case "linkedin":
+                return [{
+                    **common_result,
+                    'full_name': partner.name,
+                    'member': "12345678",
+                    'vanity_name': search_term,
+                }]
+            case "facebook":
+                return [{
+                    **common_result,
+                    'id': "12345678",
+                }]
+            case "instagram":
+                return [common_result]
+            case _:
+                return []
+
+    def twitter_users_search(self, query):
+        """ Returns some fake suggestion """
+        partner = self.env.ref('base.res_partner_2', raise_if_not_found=False)
+        return [{
             'name': partner.name,
             'profile_image_url': f'/web/image/res.partner/{partner.id}/avatar_128',
             'username': partner.name.replace(' ', '').lower(),
             'description': "https://example.com",
-        }
+        }]

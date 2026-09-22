@@ -1,39 +1,38 @@
 import {
     Component,
+    computed,
     markup,
-    onWillRender,
+    onMounted,
+    onPatched,
     onWillStart,
     onWillUnmount,
-    onWillUpdateProps,
-    reactive,
+    proxy,
+    signal,
+    t,
     useEffect,
-    useExternalListener,
-    useRef,
-    useState,
+    useListener,
+    useProps,
 } from "@odoo/owl";
+import { browser } from "@web/core/browser/browser";
 import { hasTouch, isMobileOS } from "@web/core/browser/feature_detection";
 import { Domain } from "@web/core/domain";
 import { serializeDate, serializeDateTime, toLocaleDateTimeString } from "@web/core/l10n/dates";
-import { localization } from "@web/core/l10n/localization";
 import { is24HourFormat } from "@web/core/l10n/time";
 import { _t } from "@web/core/l10n/translation";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { evaluateBooleanExpr } from "@web/core/py_js/py";
-import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
 import { zipWith } from "@web/core/utils/arrays";
 import { KeepLast } from "@web/core/utils/concurrency";
 import { useBus, useService } from "@web/core/utils/hooks";
+import { range } from "@web/core/utils/numbers";
 import { omit, pick } from "@web/core/utils/objects";
-import { nbsp } from "@web/core/utils/strings";
 import { debounce, throttleForAnimation } from "@web/core/utils/timing";
 import { url } from "@web/core/utils/urls";
-import { parseXML } from "@web/core/utils/xml";
 import { useVirtualGrid } from "@web/core/virtual_grid_hook";
-import { extractFieldsFromArchInfo } from "@web/model/relational_model/utils";
+import { onWillRender, render } from "@web/owl2/utils";
 import { useCallbackRecorder } from "@web/search/action_hook";
 import { formatFloatTime } from "@web/views/fields/formatters";
-import { KanbanRecord } from "@web/views/kanban/kanban_record";
 import { SelectCreateDialog } from "@web/views/view_dialogs/select_create_dialog";
 import { GanttConnector } from "./gantt_connector";
 import {
@@ -46,9 +45,11 @@ import {
     getHoveredCellPart,
     localEndOf,
     localStartOf,
+    rtl,
     useGanttConnectorDraggable,
     useGanttDraggable,
     useGanttResizable,
+    useGanttSchedulable,
     useGanttSelectable,
     useGanttUndraggable,
     useMultiHover,
@@ -56,19 +57,15 @@ import {
 import { GanttMultiSelectionButtons } from "./gantt_multi_selection_buttons";
 import { GanttPopover } from "./gantt_popover";
 import { GanttRendererControls } from "./gantt_renderer_controls";
-import { GanttRowProgressBar } from "./gantt_row_progress_bar";
+import { GanttSidePanel } from "./gantt_side_panel";
 import { GanttTimeDisplayBadge } from "./gantt_time_display_badge";
 
-const viewRegistry = registry.category("views");
-
-const { DateTime, Interval } = luxon;
+const { DateTime } = luxon;
 
 /**
  * @typedef {`__connector__${number | "new"}`} ConnectorId
  * @typedef {import("./gantt_connector").ConnectorProps} ConnectorProps
  * @typedef {luxon.DateTime} DateTime
- * @typedef {"copy" | "reschedule"} DragActionMode
- * @typedef {"drag" | "locked" | "resize"} InteractionMode
  * @typedef {`__pill__${number}`} PillId
  * @typedef {import("./gantt_model").RowId} RowId
  *
@@ -95,17 +92,13 @@ const { DateTime, Interval } = luxon;
  * @property {Document} arch
  * @property {string} class
  * @property {(context: Record<string, any>)} create
- * @property {{ content?: Point }} [scrollPosition]
- * @property {{ el: HTMLDivElement | null }} [contentRef]
+ * @property {Point} [scrollPosition]
+ * @property {import("@odoo/owl").Signal<HTMLDivElement>} [contentRef]
  *
  * @typedef HoveredInfo
  * @property {Element | null} connector
  * @property {HTMLElement | null} hoverable
  * @property {HTMLElement | null} pill
- *
- * @typedef Interaction
- * @property {InteractionMode | null} mode
- * @property {DragActionMode} dragAction
  *
  * @typedef Pill
  * @property {PillId} id
@@ -122,16 +115,16 @@ const { DateTime, Interval } = luxon;
  * @property {number} _progress
  *
  * @typedef Point
- * @property {number} [x]
- * @property {number} [y]
+ * @property {number} [left]
+ * @property {number} [top]
  *
  * @typedef {Record<string, any>} RelationalRecord
  * @property {number | false} id
  *
- * @typedef ResizeBadge
- * @property {Point & { right?: number }} position
- * @property {number} diff
- * @property {string} scale
+ * @typedef TimeDisplayBadge
+ * @property {Point} position
+ * @property {string} class
+ * @property {string} text
  *
  * @typedef {import("./gantt_model").Row & {
  *  grid: GridPosition,
@@ -147,17 +140,24 @@ const { DateTime, Interval } = luxon;
  * @property {DateTime} stop
  */
 
-/** @type {[Omit<InteractionMode, "drag"> | DragActionMode, string][]} */
+/**
+ * @typedef {"reschedule" | "copy" | "left_resize" | "right_resize" | "connect" | "locked" | "selection"} InteractionMode
+ *
+ * @typedef Interaction
+ * @property {InteractionMode | null} mode
+ */
+
+/** @type {[InteractionMode, string][]} */
 const INTERACTION_CLASSNAMES = [
-    ["connect", "o_connect"],
-    ["copy", "o_copying"],
-    ["locked", "o_grabbing_locked"],
     ["reschedule", "o_grabbing"],
-    ["resize", "o_resizing"],
+    ["copy", "o_copying"],
+    ["left_resize", "o_left_resizing"],
+    ["right_resize", "o_right_resizing"],
+    ["connect", "o_connect"],
+    ["locked", "o_grabbing_locked"],
+    ["selection", "o_selecting"],
 ];
 const NEW_CONNECTOR_ID = "__connector__new";
-
-const rtl = () => localization.direction === "rtl";
 
 const clearObject = (obj) => {
     for (const key in obj) {
@@ -175,22 +175,10 @@ export class GanttRenderer extends Component {
         GanttConnector,
         GanttRendererControls,
         GanttTimeDisplayBadge,
-        GanttRowProgressBar,
+        GanttSidePanel,
         Popover: GanttPopover,
         MultiSelectionButtons: GanttMultiSelectionButtons,
     };
-    static props = [
-        "model",
-        "arch",
-        "class",
-        "create",
-        "openDialog",
-        "scrollPosition?",
-        "multiCreateValues?",
-        "contentRef?",
-        "context?",
-    ];
-
     static template = "web_gantt.GanttRenderer";
     static connectorCreatorTemplate = "web_gantt.GanttRenderer.ConnectorCreator";
     static headerTemplate = "web_gantt.GanttRenderer.Header";
@@ -199,26 +187,64 @@ export class GanttRenderer extends Component {
     static rowContentTemplate = "web_gantt.GanttRenderer.RowContent";
     static rowHeaderTemplate = "web_gantt.GanttRenderer.RowHeader";
     static totalRowTemplate = "web_gantt.GanttRenderer.TotalRow";
+    static progressBarLabelTemplate = "web_gantt.GanttRenderer.ProgressBarLabel";
 
     static getRowHeaderWidth = (width) => 100 / (width > 768 ? 6 : 3);
 
+    props = useProps({
+        model: t.any(),
+        arch: t.any(),
+        class: t.any(),
+        create: t.any(),
+        openDialog: t.any(),
+        scrollPosition: t.any().optional(),
+        multiCreateValues: t.any().optional(),
+        contentRef: t.any().optional(),
+        context: t.any().optional(),
+    });
+
+    shouldComputeSomeWidths = true;
+    shouldComputeGridColumns = true;
+    shouldComputeGridRows = true;
+
+    scrollRef = signal.ref();
+    virtualGrid = useVirtualGrid({
+        scrollableRef: this.scrollRef,
+        initialScroll: this.props.scrollPosition,
+        bufferCoef: 0.1,
+    });
+
+    visibleColumns = computed(() => {
+        const startIndex = this.getIndexInTotalGrid(this.virtualGrid.firstColumn());
+        const endIndex = this.getIndexInTotalGrid(this.virtualGrid.lastColumn());
+        const { cellPart } = this.model.metaData.scale;
+        const firstVisibleCol = 1 + cellPart * startIndex;
+        const lastVisibleCol = 1 + cellPart * (endIndex + 1);
+        return [firstVisibleCol, lastVisibleCol];
+    });
+    visibleRows = computed(() => {
+        const firstVisibleRow = this.virtualGrid.firstRow() + 1;
+        const lastVisibleRow = this.virtualGrid.lastRow() + 1;
+        return [firstVisibleRow, lastVisibleRow];
+    });
+
+    gridRef = signal.ref();
+    cellContainerRef = signal.ref();
+
     setup() {
         this.model = this.props.model;
-
-        this.gridRef = useRef("grid");
-        this.cellContainerRef = useRef("cellContainer");
 
         this.actionService = useService("action");
         this.dialogService = useService("dialog");
         this.notificationService = useService("notification");
         this.orm = useService("orm");
-        this.viewService = useService("view");
+        this.uiService = useService("ui");
 
         this.keepLast = new KeepLast();
 
-        this.defaultkanbanViewParams = null;
-
         this.is24HourFormat = is24HourFormat();
+
+        this.initialScrollPosition = this.props.scrollPosition;
 
         /** @type {HoveredInfo} */
         this.hovered = {
@@ -229,20 +255,28 @@ export class GanttRenderer extends Component {
         };
 
         /** @type {Interaction} */
-        this.interaction = reactive(
-            {
-                mode: null,
-                dragAction: "reschedule",
-            },
-            () => this.onInteractionChange()
-        );
-        this.onInteractionChange(); // Used to hook into "interaction"
+        this.interaction = proxy({ mode: null });
+        useEffect(() => {
+            this.onInteractionChange();
+        });
         /** @type {Record<ConnectorId, ConnectorProps>} */
-        this.connectors = reactive({});
-        this.progressBarsReactive = reactive({ hoveredRowId: null });
-        /** @type {ResizeBadge} */
-        this.timeDisplayBadgeReactiveStart = reactive({});
-        this.timeDisplayBadgeReactiveStop = reactive({});
+        this.connectors = proxy({});
+        this.timeDisplayBadgeReactiveStart = proxy({});
+        this.timeDisplayBadgeReactiveStop = proxy({});
+
+        this.keyShowConnectors = `gantt_show_connectors,${this.env.config.viewId},${this.env.config.actionId}`;
+        const showConnectorsStored = browser.localStorage.getItem(this.keyShowConnectors);
+        this.showConnectorsState = proxy({
+            value: showConnectorsStored != null ? JSON.parse(showConnectorsStored) : true,
+        });
+
+        this.keyExpandSidePanel = `gantt_sidepanel_expanded,${this.env.config.viewId},${this.env.config.actionId}`;
+        const showSidePanel = browser.localStorage.getItem(this.keyExpandSidePanel);
+        this.sidePanelState = proxy({
+            sidePanelExpanded: Boolean(showSidePanel != null ? JSON.parse(showSidePanel) : true),
+            showUnscheduledZone: false,
+            sidePanelWidth: 262,
+        });
 
         /** @type {Object[]} */
         this.columnsGroups = [];
@@ -258,6 +292,9 @@ export class GanttRenderer extends Component {
         this.subColumns = [];
         /** @type {Record<RowId, Pill[]>} */
         this.rowPills = {};
+
+        this.lastSelectedCol = null;
+        this.lastSelectedRow = null;
 
         this.mappingColToColumn = new Map();
         this.mappingColToSubColumn = new Map();
@@ -279,17 +316,17 @@ export class GanttRenderer extends Component {
             this.computeHoverParams(ev)
         );
 
-        this.offHoursState = useState({});
+        this.offHoursState = proxy({});
 
-        useExternalListener(window, "keydown", (ev) => this.onWindowKeyDown(ev));
-        useExternalListener(window, "keyup", (ev) => this.onWindowKeyUp(ev));
+        useListener(window, "keydown", (ev) => this.onWindowKeyDown(ev));
+        useListener(window, "keyup", (ev) => this.onWindowKeyUp(ev));
 
-        useExternalListener(
+        useListener(
             window,
             "resize",
             debounce(() => {
                 this.shouldComputeSomeWidths = true;
-                this.render();
+                render(this);
             }, 100)
         );
 
@@ -306,16 +343,17 @@ export class GanttRenderer extends Component {
         // Draggable pills
         this.cellForDrag = { el: null, part: 0 };
         const dragState = useGanttDraggable({
-            enable: () => Boolean(this.cellForDrag.el),
             // Refs and selectors
-            ref: this.gridRef,
+            ref: this.props.contentRef,
+            scrollRef: this.scrollRef,
             hoveredCell: this.cellForDrag,
             elements: ".o_draggable",
             ignore: ".o_resize_handle,.o_connector_creator_bullet",
             cells: ".o_gantt_cell:not(.o_gantt_readonly)",
+            enableEdgeScrolling: () =>
+                !(this.hasSidePanel && this.sidePanelState.sidePanelExpanded),
             // Style classes
             cellDragClassName: "o_gantt_cell o_drag_hover",
-            ghostClassName: "o_dragged_pill_ghost",
             rtl,
             scale,
             getBadgesInitialDates: () => ({
@@ -323,24 +361,92 @@ export class GanttRenderer extends Component {
                 stop: this.badgeInitialStopDate,
             }),
             addStickyCoordinates: this.addStickyCoordinates.bind(this),
-            onWillStartDrag: this.cleanMultiSelection.bind(this),
+            onWillStartDrag: ({ addCleanup }) => {
+                this.cleanMultiSelection();
+                addCleanup(() => {
+                    this.updateConnectorTargets();
+                });
+            },
+            getRowHeaderWidth: () => this.rowHeaderWidth,
             // Handlers
             onDragStart: ({ pill }) => {
                 this.initBadges(pill);
                 this.popover.close();
                 this.setStickyPill(pill);
                 this.toggleRowsReadonly(false);
-                this.interaction.mode = "drag";
+                this.interaction.mode = this.ctrlPressed ? "copy" : "reschedule";
+                this.sidePanelState.showUnscheduledZone = true;
             },
-            onDrag: this.updateBadges.bind(this),
+            onDrag: (params) => {
+                if (params.startBadge) {
+                    this.updateBadges(params);
+                } else {
+                    this.clearBadges();
+                }
+                this.updateConnectorTargets();
+            },
             onDragEnd: () => {
-                this.clearBadges();
+                this.cleanupBadges();
                 this.toggleRowsReadonly(true);
                 this.setStickyPill();
                 this.removeStickyCoordinates();
                 this.interaction.mode = null;
+                this.sidePanelState.showUnscheduledZone = false;
             },
-            onDrop: (params) => this.dragPillDrop(params),
+            onDrop: (params) => {
+                if (params.unschedule) {
+                    this.unschedulePill(params.pill);
+                } else {
+                    this.dragPillDrop(params);
+                }
+            },
+        });
+
+        const scheduleState = useGanttSchedulable({
+            enable: () => Boolean(this.sidePanelState.sidePanelExpanded),
+            // Refs and selectors
+            ref: this.props.contentRef,
+            hoveredCell: this.cellForDrag,
+            elements: ".o_event_to_schedule_draggable",
+            edgeScrolling: { enabled: false },
+            cells: ".o_gantt_cell:not(.o_gantt_readonly)",
+            // Style classes
+            cellDragClassName: "o_gantt_cell o_drag_hover",
+            addStickyCoordinates: this.addStickyCoordinates.bind(this),
+            rtl,
+            scale,
+            onWillStartDrag: this.cleanMultiSelection.bind(this),
+            // Handlers
+            onDragStart: () => {
+                this.popover.close();
+                this.toggleRowsReadonly(false);
+                this.interaction.mode = "reschedule";
+            },
+            onDrag: (params) => {
+                if (params.cellGhost) {
+                    const startDate = this.getSubColumnFromColNumber(params.startCol).start;
+                    const stopDate = this.getSubColumnFromColNumber(params.endCol).start;
+                    this.updateBadges(
+                        getBadges(params.cellGhost, [startDate], [stopDate], {
+                            rtl: rtl(),
+                            scale: scale(),
+                        })
+                    );
+                } else {
+                    this.clearBadges();
+                }
+            },
+            onDragEnd: () => {
+                this.clearBadges();
+                this.toggleRowsReadonly(true);
+                this.interaction.mode = null;
+            },
+            onDrop: (params) => {
+                const { startCol, endCol, resId, rowId } = params;
+                const start = this.getSubColumnFromColNumber(startCol).start;
+                const stop = this.getSubColumnFromColNumber(endCol).start;
+                this.scheduleEvent({ start, stop, resId, rowId });
+            },
         });
 
         // Resizable pills
@@ -360,6 +466,9 @@ export class GanttRenderer extends Component {
             }),
             showHandles: (pillEl) => {
                 const pill = this.pills[pillEl.dataset.pillId];
+                if (!pill) {
+                    return;
+                }
                 const hideHandles = this.connectorDragState.dragging;
                 return {
                     start: !pill.disableStartResize && !hideHandles,
@@ -368,19 +477,18 @@ export class GanttRenderer extends Component {
             },
             rtl,
             onWillStartDrag: this.cleanMultiSelection.bind(this),
+            getRowHeaderWidth: () => this.rowHeaderWidth,
             // Handlers
-            onDragStart: ({ pill, addClass }) => {
+            onDragStart: ({ pill, mode }) => {
                 this.initBadges(pill);
                 this.popover.close();
                 this.setStickyPill(pill);
-                addClass(pill, "o_resized");
-                this.interaction.mode = "resize";
+                this.interaction.mode = mode;
             },
             onDrag: this.updateBadges.bind(this),
-            onDragEnd: ({ pill, removeClass }) => {
-                this.clearBadges();
+            onDragEnd: () => {
+                this.cleanupBadges();
                 this.setStickyPill();
-                removeClass(pill, "o_resized");
                 this.interaction.mode = null;
             },
             onDrop: (params) => this.resizePillDrop(params),
@@ -393,6 +501,7 @@ export class GanttRenderer extends Component {
             elements: ".o_connector_creator_bullet",
             parentWrapper: ".o_gantt_cells .o_gantt_pill_wrapper",
             onWillStartDrag: this.cleanMultiSelection.bind(this),
+            getRowHeaderWidth: () => this.rowHeaderWidth,
             onDragStart: ({ sourcePill, x, y, addClass }) => {
                 this.popover.close();
                 initialPillId = sourcePill.dataset.pillId;
@@ -428,7 +537,7 @@ export class GanttRenderer extends Component {
             },
         });
 
-        this.dragStates = [dragState, resizeState];
+        this.dragStates = [dragState, resizeState, scheduleState];
 
         if (!this.model.hasMultiCreate) {
             // Un-draggable pills
@@ -452,43 +561,38 @@ export class GanttRenderer extends Component {
 
         this.prepareSelectionFeature();
 
-        onWillStart(this.computeDerivedParams);
-        onWillUpdateProps(this.computeDerivedParams);
+        onWillStart(this.onWillStart);
+        useBus(this.model.bus, "update", () => this.computeDerivedParams());
 
-        this.virtualGrid = useVirtualGrid({
-            scrollableRef: this.props.contentRef,
-            initialScroll: this.props.scrollPosition,
-            bufferCoef: 0.1,
-            onChange: (changed) => {
-                if ("columnsIndexes" in changed) {
-                    this.shouldComputeGridColumns = true;
-                }
-                if ("rowsIndexes" in changed) {
-                    this.shouldComputeGridRows = true;
-                }
-                this.render();
-            },
+        useEffect(() => {
+            // Re-compute grid columns on change
+            this.virtualGrid.firstColumn();
+            this.virtualGrid.lastColumn();
+            this.shouldComputeGridColumns = true;
         });
+        useEffect(() => {
+            // Re-compute grid rows on change
+            this.virtualGrid.firstRow();
+            this.virtualGrid.lastRow();
+            this.shouldComputeGridRows = true;
+        });
+        useListener(this.scrollRef, "scroll", this.throttledComputeHoverParams);
 
         onWillRender(this.onWillRender);
         onWillUnmount(this.onWillUnmount);
 
-        useEffect(
-            (content) => {
-                content.addEventListener("scroll", this.throttledComputeHoverParams);
-                return () => {
-                    content.removeEventListener("scroll", this.throttledComputeHoverParams);
-                };
-            },
-            () => [this.gridRef.el?.parentElement]
-        );
-
-        useEffect(() => {
-            if (this.useFocusDate) {
-                this.useFocusDate = false;
+        const applyScrollOrFocus = () => {
+            if (this.initialScrollPosition) {
+                this.scrollRef().scrollTop = this.initialScrollPosition.top;
+                this.scrollRef().scrollLeft = this.initialScrollPosition.left;
+                delete this.initialScrollPosition;
+            } else if (this.useFocusDate) {
                 this.focusDate(this.model.metaData.focusDate);
             }
-        });
+            delete this.useFocusDate;
+        };
+        onMounted(applyScrollOrFocus);
+        onPatched(applyScrollOrFocus);
 
         useCallbackRecorder(
             this.env.getCurrentFocusDateCallBackRecorder,
@@ -510,7 +614,31 @@ export class GanttRenderer extends Component {
             model: this.model,
             focusToday: () => this.focusToday(),
             getCurrentFocusDate: () => this.getCurrentFocusDate(),
+            showConnectors: this.showConnectorsState.value,
+            toggleShowConnectors: () => {
+                this.showConnectorsState.value = !this.showConnectorsState.value;
+                browser.localStorage.setItem(
+                    this.keyShowConnectors,
+                    this.showConnectorsState.value
+                );
+            },
+            hasSidePanel: this.hasSidePanel,
+            sidePanelExpanded: this.sidePanelExpanded,
+            toggleSidePanel: () => this.toggleSidePanel(),
+            toScheduleString: this.toScheduleString,
         };
+    }
+
+    get sidePanelExpanded() {
+        return this.sidePanelState.sidePanelExpanded;
+    }
+
+    get toScheduleString() {
+        const { eventsToSchedule } = this.model.data;
+        if (eventsToSchedule && eventsToSchedule.length) {
+            return _t("%s to schedule", eventsToSchedule.length);
+        }
+        return _t("Nothing to schedule");
     }
 
     /**
@@ -520,6 +648,23 @@ export class GanttRenderer extends Component {
         const { groupedBy } = this.model.metaData;
         const { displayMode } = this.model.displayParams;
         return groupedBy.length || displayMode === "sparse";
+    }
+
+    get hasSidePanel() {
+        return this.model.canScheduleEvents;
+    }
+
+    get sidePanelProps() {
+        return {
+            showUnscheduledZone: this.sidePanelState.showUnscheduledZone,
+            editRecord: (resId) => this.props.openDialog({ resId }),
+            onResize: (width) => {
+                this.shouldComputeSomeWidths = true;
+                this.sidePanelState.sidePanelWidth = width;
+            },
+            model: this.model,
+            width: this.sidePanelState.sidePanelWidth,
+        };
     }
 
     get isDragging() {
@@ -544,9 +689,22 @@ export class GanttRenderer extends Component {
         return false;
     }
 
+    get showBufferTimes() {
+        return this.model.metaData.bufferStartField || this.model.metaData.bufferStopField;
+    }
+
     //-------------------------------------------------------------------------
     // Methods
     //-------------------------------------------------------------------------
+
+    toggleSidePanel() {
+        this.sidePanelState.sidePanelExpanded = !this.sidePanelState.sidePanelExpanded;
+        browser.localStorage.setItem(
+            this.keyExpandSidePanel,
+            this.sidePanelState.sidePanelExpanded
+        );
+        this.shouldComputeSomeWidths = true;
+    }
 
     addStickyCoordinates(rows, columns) {
         this.stickyGridRows = Object.assign({}, ...rows.map((row) => ({ [row]: true })));
@@ -569,7 +727,7 @@ export class GanttRenderer extends Component {
             column: [startCol, endCol],
         });
         this.addStickyCoordinates([startRow, endRow], [startCol, endCol]);
-        this.cellContainerRef.el.append(this.cellGhost);
+        this.cellContainerRef().append(this.cellGhost);
     }
 
     drawCellGhosts(selectedCells) {
@@ -582,7 +740,7 @@ export class GanttRenderer extends Component {
             const row = [startRow, endRow];
             const column = [startCol, endCol];
             clone.style = this.getGridPosition({ row, column });
-            this.cellContainerRef.el.append(clone);
+            this.cellContainerRef().append(clone);
             rows.push(...row);
             columns.push(...column);
         }
@@ -590,7 +748,7 @@ export class GanttRenderer extends Component {
     }
 
     removeCellGhosts() {
-        for (const ghost of this.gridRef.el.querySelectorAll(".o_cell_ghost")) {
+        for (const ghost of this.gridRef().querySelectorAll(".o_cell_ghost")) {
             ghost.remove();
         }
         this.removeStickyCoordinates();
@@ -658,10 +816,11 @@ export class GanttRenderer extends Component {
         this.multiSelectionButtonsReactive.nbSelected = 0;
         delete this.multiSelectionButtonsReactive.onPlan;
         this.removeCellGhosts();
+        this.setLastSelectedHeader(null, null);
     }
 
     prepareMultiSelectionButtonsReactive() {
-        return reactive({
+        return proxy({
             onCancel: this.cleanMultiSelection.bind(this),
             onAdd: (multiCreateData) => {
                 this.onMultiCreate(multiCreateData, this.selectedCells);
@@ -733,8 +892,10 @@ export class GanttRenderer extends Component {
             hasMultiCreate: () => this.model.hasMultiCreate,
             rtl,
             scale,
+            getRowHeaderWidth: () => this.rowHeaderWidth,
             onDragStart: ({ startCol, endCol, startRow, endRow }) => {
                 action = this.ctrlPressed ? "add" : "replace";
+                this.interaction.mode = "selection";
                 update({ startCol, endCol, startRow, endRow });
             },
             onDrag: update,
@@ -744,10 +905,13 @@ export class GanttRenderer extends Component {
                     shouldCleanupOnDragEnd = false;
                 } else {
                     this.onCreate(rowId, startCol, endCol - 1);
+                    shouldCleanupOnDragEnd = false;
+                    this.cleanupBadges();
                 }
                 action = null;
             },
             onDragEnd: () => {
+                this.interaction.mode = null;
                 if (!shouldCleanupOnDragEnd) {
                     shouldCleanupOnDragEnd = true;
                     return;
@@ -758,7 +922,7 @@ export class GanttRenderer extends Component {
                 } else {
                     this.removeCellGhost();
                 }
-                this.clearBadges();
+                this.cleanupBadges();
             },
         });
 
@@ -778,6 +942,7 @@ export class GanttRenderer extends Component {
                 hasMultiCreate: () => true,
                 rtl,
                 scale,
+                getRowHeaderWidth: () => this.rowHeaderWidth,
                 onDragStart: ({ startCol, endCol, startRow, endRow }) => {
                     action = this.ctrlPressed ? "add" : "replace";
                     update({ startCol, endCol, startRow, endRow });
@@ -805,8 +970,9 @@ export class GanttRenderer extends Component {
      *
      * @param {Object} param
      * @param {Object} param.grid
+     * @param {Object} param.buffer
      */
-    addCoordinatesToCoarseGrid({ grid }) {
+    addCoordinatesToCoarseGrid({ grid, buffer }) {
         if (grid.row) {
             this.coarseGridRows[this.getFirstGridRow({ grid })] = true;
             this.coarseGridRows[this.getLastGridRow({ grid })] = true;
@@ -814,6 +980,10 @@ export class GanttRenderer extends Component {
         if (grid.column) {
             this.coarseGridCols[this.getFirstGridCol({ grid })] = true;
             this.coarseGridCols[this.getLastGridCol({ grid })] = true;
+        }
+        if (buffer) {
+            this.coarseGridCols[buffer.column[0]] = true;
+            this.coarseGridCols[buffer.column[1]] = true;
         }
     }
 
@@ -937,7 +1107,8 @@ export class GanttRenderer extends Component {
     }
 
     computeVisibleColumns() {
-        const [firstIndex, lastIndex] = this.virtualGrid.columnsIndexes;
+        const firstIndex = this.virtualGrid.firstColumn();
+        const lastIndex = this.virtualGrid.lastColumn();
         this.columnsGroups = [];
         this.columns = [];
         this.subColumns = [];
@@ -1043,7 +1214,8 @@ export class GanttRenderer extends Component {
             1: true,
             [this.getLastGridRow(this.rows[this.rows.length - 1])]: true,
         };
-        const [rowStart, rowEnd] = this.virtualGrid.rowsIndexes;
+        const rowStart = this.virtualGrid.firstRow();
+        const rowEnd = this.virtualGrid.lastRow();
         this.rowsToRender = new Set();
         for (const row of this.rows) {
             const [first, last] = row.grid.row;
@@ -1095,41 +1267,24 @@ export class GanttRenderer extends Component {
         }
     }
 
-    /**
-     * give bounds only
-     */
-    getVisibleCols() {
-        const [firstIndex, lastIndex] = this.virtualGrid.columnsIndexes;
-        const startIndex = this.getIndexInTotalGrid(firstIndex);
-        const endIndex = this.getIndexInTotalGrid(lastIndex);
-        const { cellPart } = this.model.metaData.scale;
-        const firstVisibleCol = 1 + cellPart * startIndex;
-        const lastVisibleCol = 1 + cellPart * (endIndex + 1);
-        return [firstVisibleCol, lastVisibleCol];
-    }
-
-    /**
-     * give bounds only
-     */
-    getVisibleRows() {
-        const [firstIndex, lastIndex] = this.virtualGrid.rowsIndexes;
-        const firstVisibleRow = firstIndex + 1;
-        const lastVisibleRow = lastIndex + 1;
-        return [firstVisibleRow, lastVisibleRow];
-    }
-
     computeVisiblePills() {
         this.pillsToRender = new Set();
 
-        const [firstVisibleCol, lastVisibleCol] = this.getVisibleCols();
-        const [firstVisibleRow, lastVisibleRow] = this.getVisibleRows();
+        const [firstVisibleCol, lastVisibleCol] = this.visibleColumns();
+        const [firstVisibleRow, lastVisibleRow] = this.visibleRows();
 
-        const isOut = (pill, filterOnRow = true) =>
-            this.getFirstGridCol(pill) > lastVisibleCol ||
-            this.getLastGridCol(pill) < firstVisibleCol ||
-            (filterOnRow &&
-                (this.getFirstGridRow(pill) > lastVisibleRow ||
-                    this.getLastGridRow(pill) - 1 < firstVisibleRow));
+        const isOut = (pill, filterOnRow = true) => {
+            const [firstGridCol, lastGridCol] = pill.buffer
+                ? pill.buffer.column
+                : [this.getFirstGridCol(pill), this.getLastGridCol(pill)];
+            return (
+                firstGridCol > lastVisibleCol ||
+                lastGridCol < firstVisibleCol ||
+                (filterOnRow &&
+                    (this.getFirstGridRow(pill) > lastVisibleRow ||
+                        this.getLastGridRow(pill) - 1 < firstVisibleRow))
+            );
+        };
 
         const getRowPills = (row, filterOnRow) =>
             (this.rowPills[row.id] || []).filter((pill) => !isOut(pill, filterOnRow));
@@ -1143,8 +1298,8 @@ export class GanttRenderer extends Component {
             }
         }
 
-        if (this.stickyPillId) {
-            this.addToPillsToRender(this.pills[this.stickyPillId]);
+        if (this.stickyPill) {
+            this.addToPillsToRender(this.pills[this.stickyPill.id]);
         }
 
         if (this.totalRow) {
@@ -1252,7 +1407,12 @@ export class GanttRenderer extends Component {
 
     computeSomeWidths() {
         const { cellPart, minimalColumnWidth } = this.model.metaData.scale;
-        this.contentRefWidth = this.props.contentRef.el?.clientWidth ?? document.body.clientWidth;
+        this.contentRefWidth = this.props.contentRef()?.clientWidth ?? document.body.clientWidth;
+        this.sidePanelWidth = this.hasSidePanel
+            ? this.sidePanelState.sidePanelExpanded
+                ? this.sidePanelState.sidePanelWidth
+                : 0
+            : 0;
         const rowHeaderWidthPercentage = this.hasRowHeaders
             ? this.constructor.getRowHeaderWidth(this.contentRefWidth)
             : 0;
@@ -1261,14 +1421,15 @@ export class GanttRenderer extends Component {
             : 0;
         if (this.foldedGridColumnCount === 1) {
             this.cellPartWidth = Math.floor(
-                (this.contentRefWidth - this.rowHeaderWidth) / cellPart
+                (this.contentRefWidth - this.rowHeaderWidth - this.sidePanelWidth) / cellPart
             );
             this.columnWidth = this.cellPartWidth * cellPart;
-            this.virtualGrid.setColumnsWidths([this.columnWidth]);
+            this.virtualGrid.setColumnWidths([this.columnWidth]);
             this.totalWidth = null;
             return;
         }
-        this.visibleCellContainerWidth = this.contentRefWidth - this.rowHeaderWidth;
+        this.visibleCellContainerWidth =
+            this.contentRefWidth - this.rowHeaderWidth - this.sidePanelWidth;
         const hiddenColumnsCount =
             this.offHoursState.foldedColumns?.reduce(
                 (sum, folded) => (folded ? sum + 1 : sum),
@@ -1301,7 +1462,7 @@ export class GanttRenderer extends Component {
                   return res;
               }, [])
             : new Array(this.foldedGridColumnCount).fill(this.columnWidth);
-        this.virtualGrid.setColumnsWidths(columnWidths);
+        this.virtualGrid.setColumnWidths(columnWidths);
         if (columnWidth <= minimalColumnWidth) {
             // overflow
             this.totalWidth = columnWidths.reduce((sum, w) => sum + w, 0) + this.rowHeaderWidth;
@@ -1401,30 +1562,29 @@ export class GanttRenderer extends Component {
         }
 
         if (this.isDragging) {
-            this.progressBarsReactive.hoveredRowId = null;
             return;
         }
 
         if (!this.connectorDragState.dragging) {
-            // Highlight connector
             const hoveredConnectorId = connector?.dataset.connectorId;
+            const hoveredPillId = this.hovered.pill?.dataset.pillId;
+            const pillConnectorIds = new Set(
+                hoveredPillId ? this.mappingPillToConnectors?.[hoveredPillId] || [] : []
+            );
             for (const connectorId in this.connectors) {
-                if (connectorId !== hoveredConnectorId) {
+                if (connectorId !== hoveredConnectorId && !pillConnectorIds.has(connectorId)) {
                     this.toggleConnectorHighlighting(connectorId, false);
                 }
             }
             if (hoveredConnectorId) {
-                this.progressBarsReactive.hoveredRowId = null;
                 return this.toggleConnectorHighlighting(hoveredConnectorId, true);
+            }
+            for (const connectorId of pillConnectorIds) {
+                this.toggleConnectorHighlighting(connectorId, true);
             }
         }
 
         this.toggleCollapsableColumnHeaderHighlighting(collapsableColumnHeader);
-        // Update progress bars
-        this.progressBarsReactive.hoveredRowId =
-            hoverable && !hoverable.classList.contains("o_gantt_cell_folded")
-                ? hoverable.dataset.rowId
-                : null;
     }
 
     /**
@@ -1437,6 +1597,16 @@ export class GanttRenderer extends Component {
 
     get isAutoPlan() {
         return ["consumeBuffer", "maintainBuffer"].includes(this.model.metaData.rescheduleMethod);
+    }
+
+    async scheduleEvent(params) {
+        const schedule = this.model.getSchedule(params);
+        await this.model.reschedule(params.resId, schedule, this.openPlanDialogCallback.bind(this));
+    }
+
+    unschedulePill(pill) {
+        const { record } = this.pills[pill.dataset.pillId];
+        return this.model.unscheduleEvent(record.id);
     }
 
     /**
@@ -1452,7 +1622,8 @@ export class GanttRenderer extends Component {
         const { cellTime, time } = scale;
         const { record } = this.pills[pill.dataset.pillId];
         const params = this.getScheduleParams(pill);
-        const isCopyMode = this.interaction.dragAction === "copy";
+        const { mode } = this.interaction;
+        const isCopyMode = mode === "copy";
 
         params.start =
             (diff || isCopyMode) &&
@@ -1478,6 +1649,12 @@ export class GanttRenderer extends Component {
                 rowId: cellSrc.dataset.rowId,
             };
             fallbackSchedule = this.model.getSchedule(fallbackParams);
+            const { fields, groupedBy } = this.model.metaData;
+            for (const fieldName of groupedBy) {
+                if (fieldName in fallbackSchedule && fields[fieldName].type === "many2many") {
+                    fallbackSchedule[fieldName] = record[fieldName];
+                }
+            }
             if (this.isAutoPlan) {
                 await this.model.rescheduleAccordingToDependency(
                     record.id,
@@ -1498,20 +1675,17 @@ export class GanttRenderer extends Component {
             this.model.toggleRow(rowId);
         }
 
-        this.displayUndoNotificationAfterDrag(
-            copyResId || record.id,
-            this.interaction.dragAction,
-            fallbackSchedule
-        );
+        this.displayUndoNotificationAfterDrag(copyResId || record.id, mode, fallbackSchedule);
     }
 
     /**
      * @param {number} resId
-     * @param {string} dragAction
+     * @param {"copy" | "reschedule"} dragAction
      * @param {Object} [fallbackData]
      */
     displayUndoNotificationAfterDrag(resId, dragAction, fallbackData = {}) {
-        if (!(dragAction === "copy" || dragAction === "reschedule")) {
+        if (!["copy", "reschedule"].includes(dragAction)) {
+            // should not happen
             return;
         }
         if (dragAction === "reschedule" && this.isAutoPlan) {
@@ -1520,38 +1694,52 @@ export class GanttRenderer extends Component {
         const messages = this.getUndoAfterDragMessages(dragAction);
         this.closeNotificationFn?.();
         this.closeNotificationFn = this.notificationService.add(
-            markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${messages.success}</span>`,
+            markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${messages.success}</span>`,
             {
                 type: "success",
                 buttons: [
                     {
                         name: "Undo",
-                        icon: "fa-undo",
-                        onClick: async () => {
-                            // Undo the last drag & drop action
-                            const result = await this.model.orm.call(
-                                this.model.metaData.resModel,
-                                "gantt_undo_drag_drop",
-                                [resId, dragAction, fallbackData]
-                            );
-                            this.closeNotificationFn?.();
-                            if (result) {
-                                this.closeNotificationFn = this.notificationService.add(
-                                    markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${messages.undo}</span>`,
-                                    { type: "success" }
-                                );
-                            } else {
-                                this.closeNotificationFn = this.notificationService.add(
-                                    markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${messages.failure}</span>`,
-                                    { type: "danger" }
-                                );
-                            }
-                            this.model.fetchData();
-                        },
+                        icon: "undo",
+                        onClick: async () =>
+                            await this.undoDragDropAction(
+                                resId,
+                                dragAction,
+                                fallbackData,
+                                messages
+                            ),
                     },
                 ],
             }
         );
+    }
+
+    /**
+     * @param {number} resId
+     * @param {string} dragAction
+     * @param {Object} fallbackData
+     * @param {Object} messages
+     */
+    async undoDragDropAction(resId, dragAction, fallbackData, messages) {
+        // Undo the last drag & drop action
+        const result = await this.model.orm.call(
+            this.model.metaData.resModel,
+            "gantt_undo_drag_drop",
+            [resId, dragAction, fallbackData]
+        );
+        this.closeNotificationFn?.();
+        if (result) {
+            this.closeNotificationFn = this.notificationService.add(
+                markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${messages.undo}</span>`,
+                { type: "success" }
+            );
+        } else {
+            this.closeNotificationFn = this.notificationService.add(
+                markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${messages.failure}</span>`,
+                { type: "danger" }
+            );
+        }
+        this.model.fetchData();
     }
 
     /**
@@ -1590,7 +1778,14 @@ export class GanttRenderer extends Component {
      * @returns {Pill}
      */
     enrichPill(pill) {
-        const { colorField, fields, pillDecorations, progressField } = this.model.metaData;
+        const {
+            colorField,
+            fields,
+            pillDecorations,
+            progressField,
+            bufferStartField,
+            bufferStopField,
+        } = this.model.metaData;
 
         pill.displayName = this.getDisplayName(pill);
 
@@ -1622,6 +1817,43 @@ export class GanttRenderer extends Component {
                 }
             }
         }
+        if (this.showBufferTimes) {
+            const { dateStartField, dateStopField, globalStart, globalStop, scale } =
+                this.model.metaData;
+            const { cellTime, time } = scale;
+            if (bufferStartField) {
+                const duration = pill.record[bufferStartField];
+                if (duration) {
+                    const pillDateStart = pill.record[dateStartField];
+                    const bufferDateStart = pillDateStart.plus({ hours: -duration });
+                    const visualDateStart = DateTime.max(bufferDateStart, globalStart);
+                    if (visualDateStart < pillDateStart) {
+                        const difference =
+                            pillDateStart.diff(visualDateStart, time).as(time) / cellTime;
+                        if (!pill.buffer) {
+                            pill.buffer = { column: [...pill.grid.column] };
+                        }
+                        pill.buffer.column[0] -= Math.round(difference);
+                    }
+                }
+            }
+            if (bufferStopField) {
+                const duration = pill.record[bufferStopField];
+                if (duration) {
+                    const pillDateStop = pill.record[dateStopField];
+                    const bufferDateStop = pillDateStop.plus({ hours: duration });
+                    const visualDateStop = DateTime.min(bufferDateStop, globalStop);
+                    if (visualDateStop > pillDateStop) {
+                        const difference =
+                            visualDateStop.diff(pillDateStop, time).as(time) / cellTime;
+                        if (!pill.buffer) {
+                            pill.buffer = { column: [...pill.grid.column] };
+                        }
+                        pill.buffer.column[1] += Math.round(difference);
+                    }
+                }
+            }
+        }
 
         if (colorField) {
             pill._color = getColorIndex(pill.record[colorField]);
@@ -1637,26 +1869,26 @@ export class GanttRenderer extends Component {
         return pill;
     }
 
-    focusDate(date, focusGroup = true) {
+    focusDate(date) {
         const { globalStart, globalStop, scale } = this.model.metaData;
-        const { cellPart, interval, unit } = scale;
-        const focusedDate = focusGroup ? localStartOf(date, unit) : date;
-        const diff = focusedDate.diff(globalStart);
+        const { cellPart, interval } = scale;
+        const diff = date.diff(globalStart);
         const totalDiff = globalStop.diff(globalStart);
         const factor = diff / totalDiff;
-        if (!focusGroup && (factor < 0 || 1 < factor)) {
+        if (factor < 0 || 1 <= factor) {
             return false;
         }
         const rtlFactor = rtl() ? -1 : 1;
+        const halfViewport = this.visibleCellContainerWidth / 2;
         if (this.columnCount === this.foldedGridColumnCount) {
-            const scrollLeft = factor * this.cellContainerRef.el.clientWidth;
-            this.props.contentRef.el.scrollLeft = rtlFactor * scrollLeft;
+            const scrollLeft = factor * this.cellContainerRef().clientWidth - halfViewport;
+            this.scrollRef().scrollLeft = rtlFactor * Math.max(0, scrollLeft);
             return true;
         }
-        const { column, delta } = this.getSubColumnFromDate(focusedDate);
+        const { column, delta } = this.getSubColumnFromDate(date);
         const col = 1 + diffColumn(globalStart, column, interval) * cellPart + delta;
         const { distance } = this.getSubColumnsDistance(1, col, this.cellPartWidth);
-        this.props.contentRef.el.scrollLeft = rtlFactor * distance;
+        this.scrollRef().scrollLeft = rtlFactor * Math.max(0, distance - halfViewport);
         return true;
     }
 
@@ -1670,7 +1902,7 @@ export class GanttRenderer extends Component {
     }
 
     focusToday() {
-        return this.focusDate(DateTime.local().startOf("day"), false);
+        return this.focusDate(DateTime.local().startOf("day"));
     }
 
     generateConnectors() {
@@ -1785,6 +2017,7 @@ export class GanttRenderer extends Component {
             o_gantt_hoverable: this.isHoverable(row),
             o_group_open: !this.model.isClosed(row.id),
             o_gantt_readonly: row.readonly,
+            o_gantt_last_column: column.grid.column[1] === this.columns.at(-1).grid.column[1],
         };
     }
 
@@ -1792,9 +2025,11 @@ export class GanttRenderer extends Component {
         const { globalStart, globalStop } = this.model.metaData;
         const rtlFactor = rtl() ? -1 : 1;
         const cellGridMiddleX =
-            rtlFactor * this.props.contentRef.el.scrollLeft +
-            (this.contentRefWidth + this.rowHeaderWidth) / 2;
-        let factor = (cellGridMiddleX - this.rowHeaderWidth) / this.cellContainerRef.el.clientWidth;
+            rtlFactor * this.scrollRef().scrollLeft +
+            (this.contentRefWidth + this.rowHeaderWidth + this.sidePanelWidth) / 2;
+        let factor =
+            (cellGridMiddleX - this.rowHeaderWidth - this.sidePanelWidth) /
+            this.cellContainerRef().clientWidth;
         if (this.columnCount !== this.foldedGridColumnCount) {
             let columnWidthSum = 0;
             for (let i = 0; i < this.foldedGridColumnCount; i++) {
@@ -1803,7 +2038,7 @@ export class GanttRenderer extends Component {
                 } else {
                     columnWidthSum += this.columnWidth;
                 }
-                if (columnWidthSum > cellGridMiddleX - this.rowHeaderWidth) {
+                if (columnWidthSum > cellGridMiddleX - this.rowHeaderWidth - this.sidePanelWidth) {
                     factor = (this.getIndexInTotalGrid(i) + 1) / this.columnCount;
                     break;
                 }
@@ -1861,15 +2096,7 @@ export class GanttRenderer extends Component {
         const stopDate = record[dateStopField];
         const yearlessDateFormat = omit(DateTime.DATE_SHORT, "year");
 
-        const daysDelta = Interval.fromDateTimes(
-            startDate.startOf("day"),
-            stopDate.startOf("day")
-        ).toDuration(["day", "hour"]).days;
-        const spanAccrossDays =
-            daysDelta &&
-            (daysDelta > 2 ||
-                (startDate.endOf("day").diff(startDate, "hours").toObject().hours >= 3 &&
-                    stopDate.diff(stopDate.startOf("day"), "hours").toObject().hours >= 3));
+        const spanAccrossDays = stopDate.startOf("day") > startDate.startOf("day");
 
         /** @type {string[]} */
         const labels = [];
@@ -1910,9 +2137,7 @@ export class GanttRenderer extends Component {
      * @param {RelationalRecord} record
      */
     getDurationStr(record) {
-        const durationStr = formatFloatTime(record.allocated_hours, {
-            noLeadingZeroHour: true,
-        }).replace(/(:00|:)/g, "h");
+        const durationStr = formatFloatTime(record.allocated_hours);
         return ` (${durationStr})`;
     }
 
@@ -1947,8 +2172,8 @@ export class GanttRenderer extends Component {
     setSomeGridStyleProperties() {
         const rowsTemplate = this.computeRowsTemplate();
         const colsTemplate = this.computeColsTemplate();
-        this.gridRef.el.style.setProperty("--Gantt__GridRows-grid-template-rows", rowsTemplate);
-        this.gridRef.el.style.setProperty(
+        this.gridRef().style.setProperty("--Gantt__GridRows-grid-template-rows", rowsTemplate);
+        this.gridRef().style.setProperty(
             "--Gantt__GridColumns-grid-template-columns",
             colsTemplate
         );
@@ -2021,7 +2246,7 @@ export class GanttRenderer extends Component {
 
     getSubColumnFromDate(date, onLeft = true) {
         const { interval, cellPart, cellTime, time } = this.model.metaData.scale;
-        const column = date.startOf(interval);
+        const column = localStartOf(date, interval);
         let delta;
         if (onLeft) {
             delta = 0;
@@ -2091,11 +2316,8 @@ export class GanttRenderer extends Component {
     /**
      * @param {Object} group
      * @param {number} maxAggregateValue
-     * @param {boolean} consolidate
      */
-    getPillFromGroup(group, maxAggregateValue, consolidate) {
-        const { excludeField, field, maxValue } = this.model.metaData.consolidationParams;
-
+    getPillFromGroup(group, maxAggregateValue) {
         const minColor = 215;
         const maxColor = 100;
 
@@ -2106,31 +2328,11 @@ export class GanttRenderer extends Component {
             grid: group.grid,
         };
 
-        // Enrich the aggregates with consolidation data
-        if (consolidate && field) {
-            newPill.consolidationValue = 0;
-            for (const pill of group.pills) {
-                if (!pill.record[excludeField]) {
-                    newPill.consolidationValue += pill.record[field];
-                }
-            }
-            newPill.consolidationMaxValue = maxValue;
-            newPill.consolidationExceeded =
-                newPill.consolidationValue > newPill.consolidationMaxValue;
-        }
-
-        if (consolidate && maxValue) {
-            const status = newPill.consolidationExceeded ? "danger" : "success";
-            newPill.className = `bg-${status} border-${status}`;
-            newPill.displayName = newPill.consolidationValue;
-        } else {
-            const color =
-                minColor -
-                Math.round((newPill.aggregateValue - 1) / maxAggregateValue) *
-                    (minColor - maxColor);
-            newPill.style = `background-color:rgba(${color},${color},${color},0.6)`;
-            newPill.displayName = this.getGroupPillDisplayName(newPill);
-        }
+        const color =
+            minColor -
+            Math.round((newPill.aggregateValue - 1) / maxAggregateValue) * (minColor - maxColor);
+        newPill.style = `background-color:rgba(${color},${color},${color},0.6)`;
+        newPill.displayName = this.getGroupPillDisplayName(newPill);
 
         return newPill;
     }
@@ -2166,7 +2368,7 @@ export class GanttRenderer extends Component {
      */
     getPillWrapperEl(pillId) {
         const pillSelector = `:scope > [data-pill-id="${pillId}"]`;
-        return this.cellContainerRef.el?.querySelector(pillSelector);
+        return this.cellContainerRef()?.querySelector(pillSelector);
     }
 
     /**
@@ -2192,9 +2394,10 @@ export class GanttRenderer extends Component {
      * @param {boolean} onRight
      */
     getPoint(pillId, onRight) {
-        if (rtl()) {
-            onRight = !onRight;
-        }
+        // In LTR: Outgoing is Right (true), Incoming is Left (false)
+        // In RTL: Outgoing is Left (false), Incoming is Right (true)
+        onRight = rtl() ? !onRight : onRight;
+
         const pillEl = this.getPillEl(pillId);
         const pillRect = pillEl.getBoundingClientRect();
         return {
@@ -2203,121 +2406,49 @@ export class GanttRenderer extends Component {
         };
     }
 
-    async _getKanbanViewParams() {
-        const { dateStartField, dateStopField, kanbanViewId, fields, resModel } =
-            this.model.metaData;
-
-        if (kanbanViewId !== undefined) {
-            const result = await this.viewService.loadViews({
-                resModel,
-                views: [[kanbanViewId, "kanban"]],
-            });
-
-            const arch = result.views.kanban.arch;
-            const archXmlDoc = parseXML(arch.replace(/&amp;nbsp;/g, nbsp));
-            // remove some elements/attributes from archXmlDoc
-            archXmlDoc.removeAttribute("highlight_color");
-            const menu = archXmlDoc.querySelector(
-                `templates [t-name=${KanbanRecord.KANBAN_MENU_ATTRIBUTE}]`
-            );
-            menu?.remove();
-
-            const { relatedModels } = result;
-            const { ArchParser } = viewRegistry.get("kanban");
-            const archInfo = new ArchParser().parse(archXmlDoc, relatedModels, resModel);
-            return {
-                archInfo,
-                ...extractFieldsFromArchInfo(archInfo, fields),
-            };
-        }
-        if (!this.defaultkanbanViewParams) {
-            // These values to be assigned outside of arch to properly generate POT files.
-            const nameString = _t("Name");
-            const startString = _t("Start");
-            const stopString = _t("Stop");
-            const arch = `
-                <kanban>
-                    <templates>
-                        <field name="${dateStartField}"/>
-                        <field name="${dateStopField}"/>
-                        <t t-name="${KanbanRecord.KANBAN_CARD_ATTRIBUTE}">
-                            <ul class="p-0 mb-0 list-unstyled">
-                                <li class="pe-2">
-                                    <strong>${nameString}</strong>: <field name="display_name"/>
-                                </li>
-                                <li class="pe-2">
-                                    <strong>${startString}</strong>: <span t-esc="luxon.DateTime.fromISO(record.${dateStartField}.raw_value).toFormat('f')"/>
-                                </li>
-                                <li class="pe-2">
-                                    <strong>${stopString}</strong>: <span t-esc="luxon.DateTime.fromISO(record.${dateStopField}.raw_value).toFormat('f')"/>
-                                </li>
-                            </ul>
-                        </t>
-                    </templates>
-                </kanban>
-            `;
-            const archXmlDoc = parseXML(arch.replace(/&amp;nbsp;/g, nbsp));
-
-            const relatedModels = { [resModel]: { fields } };
-            const { ArchParser } = viewRegistry.get("kanban");
-            const archInfo = new ArchParser().parse(archXmlDoc, relatedModels, resModel);
-            this.defaultkanbanViewParams = {
-                archInfo,
-                ...extractFieldsFromArchInfo(archInfo, fields),
-            };
-        }
-        return this.defaultkanbanViewParams;
-    }
-
     /**
      * @param {Pill} pill
      */
-    async getPopoverProps(pill) {
-        const { record } = pill;
-        const { id: resId, display_name: displayName } = record;
-        const { canEdit, popoverArchParams, resModel } = this.model.metaData;
-        const kanbanViewParams = popoverArchParams.bodyTemplate
-            ? {}
-            : await this._getKanbanViewParams();
+    getPopoverProps(pill) {
         return {
-            ...popoverArchParams,
-            kanbanViewParams,
-            KanbanRecord,
-            title: displayName,
-            context: { ...record },
-            actionContext: this.props.context,
-            resId,
-            resModel,
+            model: this.model,
+            resId: pill.record.id,
+            openRecord: () => this.props.openDialog({ resId: pill.record.id }),
             reloadOnClose: () => {
                 this.onCloseCurrentPopover = () => {
                     delete this.onCloseCurrentPopover;
                     this.model.fetchData();
                 };
             },
-            buttons: [
-                {
-                    id: "open_view_edit_dialog",
-                    text: canEdit ? _t("Edit") : _t("View"),
-                    class: "btn btn-sm btn-primary",
-                    // Sync with the mutex to wait for potential changes on the view
-                    onClick: () =>
-                        this.model.mutex.exec(
-                            () => this.props.openDialog({ resId }) // (canEdit is also considered in openDialog)
-                        ),
-                },
-            ],
         };
+    }
+
+    /**
+     * @param {Object} progressBar
+     * @returns {"danger"|"success"|null}
+     */
+    getProgressBarStatus(progressBar) {
+        const { ratio } = progressBar;
+        return ratio > 100 ? "danger" : ratio > 0 ? "success" : null;
+    }
+
+    /**
+     * @param {Object} progressBar
+     * @returns {string|false}
+     */
+    getProgressBarTooltip(progressBar) {
+        const { value_formatted, max_value_formatted, ratio, max_value } = progressBar;
+        if (!max_value) {
+            return false;
+        }
+        return `${value_formatted}/${max_value_formatted} (${Math.round(ratio)}%)`;
     }
 
     /**
      * @param {Row} row
      */
-    getProgressBarProps(row) {
-        return {
-            progressBar: row.progressBar,
-            reactive: this.progressBarsReactive,
-            rowId: row.id,
-        };
+    progressBarIsVisible(row) {
+        return row.progressBar && row.name && row.progressBar.max_value;
     }
 
     /**
@@ -2394,11 +2525,12 @@ export class GanttRenderer extends Component {
      * @returns {number}
      */
     getRowTypeHeight(type) {
-        return { t0: 24, t1: 25, t2: 10 }[type];
+        return { t0: 40, t1: 25, t2: 16 }[type];
     }
 
     getRowTitleStyle(row) {
-        return `grid-column: ${row.groupLevel + 2} / -1`;
+        const col = row.isGroup ? row.groupLevel + 2 : 2;
+        return `grid-column: ${col} / -1`;
     }
 
     openPlanDialogCallback() {}
@@ -2478,7 +2610,7 @@ export class GanttRenderer extends Component {
     /**
      * @param {Row} row
      */
-    isHoverable(row) {
+    isHoverable(row = null) {
         return !this.model.useSampleModel;
     }
 
@@ -2503,6 +2635,10 @@ export class GanttRenderer extends Component {
         return [...left, ...right];
     }
 
+    async onWillStart() {
+        this.computeDerivedParams();
+    }
+
     onWillRender() {
         if (this.noDisplayedConnectors && this.shouldRenderConnectors()) {
             delete this.noDisplayedConnectors;
@@ -2518,7 +2654,7 @@ export class GanttRenderer extends Component {
         }
 
         if (this.shouldComputeGridRows) {
-            this.virtualGrid.setRowsHeights(this.gridRows);
+            this.virtualGrid.setRowHeights(this.gridRows);
             this.computeVisibleRows();
         }
 
@@ -2527,9 +2663,9 @@ export class GanttRenderer extends Component {
             this.shouldComputeGridColumns ||
             this.shouldComputeGridRows
         ) {
-            delete this.shouldComputeSomeWidths;
-            delete this.shouldComputeGridColumns;
-            delete this.shouldComputeGridRows;
+            this.shouldComputeSomeWidths = false;
+            this.shouldComputeGridColumns = false;
+            this.shouldComputeGridRows = false;
             this.computeVisiblePills();
             if (this.shouldRenderConnectors()) {
                 this.computeVisibleConnectors();
@@ -2542,9 +2678,9 @@ export class GanttRenderer extends Component {
             this.setupInitialReadonly();
         }
 
-        delete this.shouldComputeSomeWidths;
-        delete this.shouldComputeGridColumns;
-        delete this.shouldComputeGridRows;
+        this.shouldComputeSomeWidths = false;
+        this.shouldComputeGridColumns = false;
+        this.shouldComputeGridRows = false;
     }
 
     onWillUnmount() {
@@ -2625,13 +2761,27 @@ export class GanttRenderer extends Component {
         let rowPills = [];
         const groupPills = [];
         const isMany2many = groupedByField && fields[groupedByField].type === "many2many";
+        const isProperty = !!(groupedByField && fields[groupedByField].propertyName);
         for (const pill of pills) {
             const { record } = pill;
             const pushPill = recordIds.includes(record.id);
             let keepPill = false;
             if (pushPill && isMany2many) {
-                const value = record[groupedByField];
-                if (Array.isArray(value) && value.length > 1) {
+                let value;
+                if (isProperty) {
+                    const [propField, subField] = groupedByField.split(".");
+                    const field = record[propField]?.find((el) => el.name === subField);
+                    value = field?.value;
+                } else {
+                    value = record[groupedByField];
+                }
+                // keep processing this pill if:
+                // - this is the empty row, and the record belongs in other rows anyways (useful when grouping through multiple relations)
+                // - this is a record row and it belongs to more than 1 group
+                if (
+                    Array.isArray(value) &&
+                    ((row.resId && value.length > 1) || (!row.resId && value.length))
+                ) {
                     keepPill = true;
                 }
             }
@@ -2652,7 +2802,7 @@ export class GanttRenderer extends Component {
 
         const isGroup = displayMode === "sparse" ? processAsGroup : Boolean(rows);
 
-        const gridRowTypes = isGroup ? { t0: 1 } : { t1: 1, t2: +!this.isTouchDevice };
+        const gridRowTypes = isGroup ? { t0: 1 } : { t1: 1, t2: 1 };
         if (rowPills.length) {
             if (isGroup) {
                 if (this.shouldComputeAggregateValues(row)) {
@@ -2673,10 +2823,6 @@ export class GanttRenderer extends Component {
         }
 
         const progressBar = this.getRowProgressBar(groupedByField, resId);
-        if (progressBar && this.isTouchDevice && (!gridRowTypes.t1 || gridRowTypes.t1 === 1)) {
-            // In mobile: rows span over 2 rows to alllow progressbars to properly display
-            gridRowTypes.t1 = (gridRowTypes.t1 || 0) + 1;
-        }
         if (row.id !== "[]") {
             this.pushGridRows(gridRowTypes);
         }
@@ -2740,9 +2886,11 @@ export class GanttRenderer extends Component {
             grid: { row: gridRow },
         };
         if (displayUnavailability && !isGroup) {
+            // false on the "Undefined X" row, as no record stands behind it
+            processedRow.unavailabilityResId = parentResId ?? resId;
             processedRow.unavailabilities = this.getRowUnavailabilities(
                 parentGroupedField || groupedByField,
-                parentResId ?? resId
+                processedRow.unavailabilityResId
             );
         }
 
@@ -2816,12 +2964,20 @@ export class GanttRenderer extends Component {
         const fallbackParams = this.getUndoAfterDragRecordData(record);
         const fallbackSchedule = this.model.getSchedule(fallbackParams);
 
-        await this.model.reschedule(record.id, schedule, this.openPlanDialogCallback.bind(this));
-        this.displayUndoNotificationAfterDrag(
-            record.id,
-            this.interaction.dragAction,
-            fallbackSchedule
-        );
+        this.displayUndoNotificationAfterDrag(record.id, "reschedule", fallbackSchedule);
+        if (this.isAutoPlan) {
+            await this.model.rescheduleAccordingToDependency(
+                record.id,
+                schedule,
+                this.rescheduleAccordingToDependencyCallback.bind(this)
+            );
+        } else {
+            await this.model.reschedule(
+                record.id,
+                schedule,
+                this.openPlanDialogCallback.bind(this)
+            );
+        }
     }
 
     /**
@@ -2879,7 +3035,7 @@ export class GanttRenderer extends Component {
      * @param {HTMLElement} [pillEl]
      */
     setStickyPill(pillEl) {
-        this.stickyPillId = pillEl ? pillEl.dataset.pillId : null;
+        this.stickyPill = pillEl ? { id: pillEl.dataset.pillId, el: pillEl } : null;
     }
 
     /**
@@ -2922,10 +3078,10 @@ export class GanttRenderer extends Component {
      * @param {boolean} addReadonly: whether to add or remove the readonly class
      */
     toggleRowsReadonly(addReadonly) {
-        if (!this.stickyPillId || !this.containsReadonlyGroup()) {
+        if (!this.stickyPill || !this.containsReadonlyGroup()) {
             return;
         }
-        const startingRowId = this.pills[this.stickyPillId].rowId;
+        const startingRowId = this.pills[this.stickyPill.id].rowId;
         const rowIdx = this.rows.findIndex((r) => r.id === startingRowId);
         this.toggleReadonly(this.rows[rowIdx], addReadonly);
         // Also update rows that are part of the same "child group"
@@ -2946,7 +3102,7 @@ export class GanttRenderer extends Component {
     }
 
     toggleReadonly(row, addReadonly) {
-        for (const cell of getCellsOnRow(this.gridRef.el, row.id)) {
+        for (const cell of getCellsOnRow(this.gridRef(), row.id)) {
             if (addReadonly) {
                 cell.classList.add("o_gantt_readonly");
             } else {
@@ -2975,7 +3131,9 @@ export class GanttRenderer extends Component {
      */
     shouldRenderConnectors() {
         return (
-            this.model.metaData.dependencyField && !this.model.useSampleModel && !this.env.isSmall
+            this.model.metaData.dependencyField &&
+            !this.model.useSampleModel &&
+            !this.uiService.isSmall
         );
     }
 
@@ -3020,13 +3178,18 @@ export class GanttRenderer extends Component {
 
     computeUnavailabilityPeriods() {
         const { cellPart, unit } = this.model.metaData.scale;
-        const columns = [...Array(this.columnCount).keys()].map((i) =>
+        const columns = range(this.columnCount).map((i) =>
             this.getColumnFromColNumber(i * cellPart + 1)
         );
+        const isGrouped = this.model.metaData.groupedBy.length > 0;
         this.foldableColumns = Array(this.columnCount);
         let allNull = true;
         for (const row of this.rows) {
-            if (row.isGroup) {
+            // The server sends no unavailability for the "Undefined X" row,
+            // which would read as "available at all times" and prevent any
+            // folding: ignore it, its pills are still unfolded below. The row
+            // of an ungrouped view is kept, as it is the only one available.
+            if (row.isGroup || (isGrouped && !row.unavailabilityResId)) {
                 continue;
             }
             const { unavailabilities } = row;
@@ -3190,7 +3353,9 @@ export class GanttRenderer extends Component {
         const { startIndex, stopIndex } = this.foldableColumnsMapping[column.index];
         this.offHoursState.foldedColumns.fill(fold ? 1 : 0, startIndex, stopIndex + 1);
         this.computeFoldedGrid();
-        this.cleanMultiSelection();
+        if (!this.ctrlPressed) {
+            this.cleanMultiSelection();
+        }
     }
 
     toggleCollapsableColumnHeaderHighlighting(collapsableColumnHeader) {
@@ -3198,13 +3363,13 @@ export class GanttRenderer extends Component {
             !collapsableColumnHeader ||
             collapsableColumnHeader.classList.contains("o_gantt_header_folded")
         ) {
-            const columnHeaders = this.gridRef.el.querySelectorAll(".o_gantt_foldable_hovered");
+            const columnHeaders = this.gridRef().querySelectorAll(".o_gantt_foldable_hovered");
             for (const columnHeader of columnHeaders) {
                 columnHeader.classList.remove("o_gantt_foldable_hovered");
             }
             return;
         }
-        const columnHeaders = this.gridRef.el.querySelectorAll(".o_gantt_foldable");
+        const columnHeaders = this.gridRef().querySelectorAll(".o_gantt_foldable");
         const foldableColumnsGroup =
             this.foldableColumnsMapping[+collapsableColumnHeader.dataset.columnIndex];
         for (const columnHeader of columnHeaders) {
@@ -3233,8 +3398,53 @@ export class GanttRenderer extends Component {
     clearBadges() {
         clearObject(this.timeDisplayBadgeReactiveStart);
         clearObject(this.timeDisplayBadgeReactiveStop);
+    }
+
+    cleanupBadges() {
+        this.clearBadges();
         delete this.badgeInitialStartDate;
         delete this.badgeInitialStopDate;
+    }
+
+    updateConnectorTargets() {
+        const pillId = this.stickyPill?.id;
+        if (!pillId || !this.mappingPillToConnectors || !this.connectors) {
+            return;
+        }
+
+        const connectors = this.mappingPillToConnectors[pillId];
+        if (!connectors?.length) {
+            return;
+        }
+
+        const targetElement = this.stickyPill?.el;
+        if (!targetElement) {
+            return;
+        }
+
+        for (const connectorId of connectors) {
+            const mapping = this.mappingConnectorToPills[connectorId];
+            if (!mapping) {
+                continue;
+            }
+
+            const { sourcePillId, targetPillId } = mapping;
+            const rect = targetElement.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+
+            if (sourcePillId === pillId) {
+                this.connectors[connectorId].sourcePoint = () => ({
+                    left: rect.right,
+                    top: midY,
+                });
+            }
+            if (targetPillId === pillId) {
+                this.connectors[connectorId].targetPoint = () => ({
+                    left: rect.left,
+                    top: midY,
+                });
+            }
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -3321,6 +3531,11 @@ export class GanttRenderer extends Component {
     }
 
     onCellClicked(rowId, column, row) {
+        // Reset header-click anchors so a subsequent shift+header-click
+        // doesn't extend from a stale position.
+        if (!this.ctrlPressed) {
+            this.setLastSelectedHeader(null, null);
+        }
         const startCol = column.grid.column[0];
         if (this.model.hasMultiCreate) {
             if (column.isFolded) {
@@ -3372,13 +3587,12 @@ export class GanttRenderer extends Component {
     }
 
     onInteractionChange() {
-        let { dragAction, mode } = this.interaction;
-        if (mode === "drag") {
-            mode = dragAction;
-        }
-        if (this.gridRef.el) {
+        const { mode } = this.interaction;
+        if (this.gridRef()) {
+            this.gridRef().classList.toggle("o_interacting", Boolean(mode));
+            this.props.contentRef().classList.toggle("o_interacting", Boolean(mode));
             for (const [action, className] of INTERACTION_CLASSNAMES) {
-                this.gridRef.el.classList.toggle(className, mode === action);
+                this.gridRef().classList.toggle(className, mode === action);
             }
         }
     }
@@ -3439,12 +3653,25 @@ export class GanttRenderer extends Component {
      * @param {Pill} pill
      */
     async onPillClicked(ev, pill) {
-        if (this.popover.isOpen) {
+        const isDoubleClick = this.pillClickTimeout && this.pillClickTimeoutId === pill.record.id;
+        clearTimeout(this.pillClickTimeout);
+        this.pillClickTimeout = null;
+        if (isDoubleClick) {
+            this.pillClickTimeoutId = null;
+            this.popover.close();
+            this.props.openDialog({ resId: pill.record.id });
             return;
         }
-        const target = ev.target.closest(".o_gantt_pill_wrapper");
-        const props = await this.keepLast.add(this.getPopoverProps(pill));
-        this.popover.open(target, props);
+        this.pillClickTimeoutId = pill.record.id;
+        // delay the simple click handler so that it doesn't fire on double click
+        this.pillClickTimeout = setTimeout(async () => {
+            const target = ev.target.closest(".o_gantt_pill_wrapper");
+            this.pillClickTimeout = null;
+            this.pillClickTimeoutId = null;
+            if (!this.popover.isOpen) {
+                this.popover.open(target, this.getPopoverProps(pill));
+            }
+        }, 200);
     }
 
     onPlan(rowId, startCol, stopCol) {
@@ -3481,9 +3708,9 @@ export class GanttRenderer extends Component {
             );
         }
         this.closeNotificationFn?.();
-        const icon = isWarning ? "fa-warning" : "fa-check";
+        const icon = isWarning ? "warning" : "check";
         this.closeNotificationFn = this.notificationService.add(
-            markup`<i class="fa ${icon}"></i><span class="ms-1">${result["message"]}</span>`,
+            markup`<i class="oi" data-icon="${icon}"></i><span class="ms-1">${result["message"]}</span>`,
             {
                 type: result["type"],
                 sticky: true,
@@ -3493,7 +3720,7 @@ export class GanttRenderer extends Component {
                         : [
                               {
                                   name: "Undo",
-                                  icon: "fa-undo",
+                                  icon: "undo",
                                   onClick: async () => {
                                       const ids = Object.keys(result["old_vals_per_pill_id"]).map(
                                           Number
@@ -3512,15 +3739,112 @@ export class GanttRenderer extends Component {
         );
     }
 
+    onColumnHeaderClick(column) {
+        if (!this.handleFoldableColumnClick(column)) {
+            return;
+        }
+        if (!this.model.hasMultiCreate) {
+            return;
+        }
+        const rowsRange = [1, this.getLastGridRow(this.rows.at(-1))];
+        this.applyHeaderMultiSelection("col", column.grid.column, rowsRange);
+    }
+
+    handleFoldableColumnClick(column) {
+        if (!column.isFoldable) {
+            return true;
+        }
+        if (this.shiftPressed) {
+            return true;
+        }
+        if (column.isFolded) {
+            this.toggleFoldableColumn(column, false);
+            return this.ctrlPressed;
+        }
+        if (!this.ctrlPressed) {
+            this.toggleFoldableColumn(column, true);
+            return false;
+        }
+        return true;
+    }
+
+    onRowHeaderClick(row) {
+        if (row.isGroup) {
+            this.model.toggleRow(row.id);
+            return;
+        }
+        this.focusFirstPill(row.id);
+        if (!this.model.hasMultiCreate) {
+            return;
+        }
+        const columnsRange = [1, this.columnCount * this.model.metaData.scale.cellPart + 1];
+        this.applyHeaderMultiSelection("row", row.grid.row, columnsRange);
+    }
+
+    /**
+     * Shared multi-selection logic for column and row header clicks.
+     *
+     * @param {"col"|"row"} headerType
+     * @param {[number,number]} clickedRange    Grid [start, end] of the clicked header.
+     * @param {[number,number]} oppositeRange   Full [start, end] of the other dimension.
+     */
+    applyHeaderMultiSelection(headerType, clickedRange, oppositeRange) {
+        const isColumnHeader = headerType === "col";
+        const lastAnchor = isColumnHeader ? this.lastSelectedCol : this.lastSelectedRow;
+        const oppositeAnchor = isColumnHeader ? this.lastSelectedRow : this.lastSelectedCol;
+        const [clickedStart, clickedEnd] = clickedRange;
+        const [oppositeStart, oppositeEnd] = oppositeRange;
+        const getSelectionBlock = (rangeStart, rangeEnd) =>
+            isColumnHeader
+                ? {
+                      startCol: rangeStart,
+                      endCol: rangeEnd,
+                      startRow: oppositeStart,
+                      endRow: oppositeEnd,
+                  }
+                : {
+                      startCol: oppositeStart,
+                      endCol: oppositeEnd,
+                      startRow: rangeStart,
+                      endRow: rangeEnd,
+                  };
+        if (this.shiftPressed && lastAnchor) {
+            // Extend the selection from the saved anchor to the clicked header.
+            const extendedStart = Math.min(lastAnchor[0], clickedStart);
+            const extendedEnd = Math.max(lastAnchor[1], clickedEnd);
+            this.updateMultiSelection(getSelectionBlock(extendedStart, extendedEnd), "replace");
+        } else {
+            if (oppositeAnchor) {
+                this.cleanMultiSelection();
+            }
+            const action = this.ctrlPressed ? "toggle" : "replace";
+            this.updateMultiSelection(getSelectionBlock(clickedStart, clickedEnd), action);
+            if (isColumnHeader) {
+                this.setLastSelectedHeader(null, clickedRange);
+            } else {
+                this.setLastSelectedHeader(clickedRange, null);
+            }
+        }
+        this.drawCellGhosts(this.selectedCells);
+    }
+
+    setLastSelectedHeader(row, col) {
+        this.lastSelectedRow = row;
+        this.lastSelectedCol = col;
+    }
+
     /**
      * @param {KeyboardEvent} ev
      */
     onWindowKeyDown(ev) {
         if (ev.key === "Control") {
-            this.prevDragAction =
-                this.interaction.dragAction === "copy" ? "reschedule" : this.interaction.dragAction;
-            this.interaction.dragAction = "copy";
+            if (this.interaction.mode === "reschedule") {
+                this.interaction.mode = "copy";
+            }
             this.ctrlPressed = true;
+        }
+        if (ev.key === "Shift") {
+            this.shiftPressed = true;
         }
     }
 
@@ -3529,8 +3853,13 @@ export class GanttRenderer extends Component {
      */
     onWindowKeyUp(ev) {
         if (ev.key === "Control") {
-            this.interaction.dragAction = this.prevDragAction || "reschedule";
+            if (this.interaction.mode === "copy") {
+                this.interaction.mode = "reschedule";
+            }
             this.ctrlPressed = false;
+        }
+        if (ev.key === "Shift") {
+            this.shiftPressed = false;
         }
     }
 }

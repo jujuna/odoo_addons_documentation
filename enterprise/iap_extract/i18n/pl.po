@@ -3,15 +3,15 @@
 # * iap_extract
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Marta (wacm)" <wacm@odoo.com>, 2025.
+# "Marta (wacm)" <wacm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-13 11:35+0000\n"
-"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
-"Language-Team: Polish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-17 23:46+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
 "iap_extract/pl/>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: iap_extract
 #: model:mail.template,body_html:iap_extract.iap_extract_no_credit
@@ -53,13 +53,12 @@ msgid ""
 "All fields will be automatically populated by Artificial Intelligence, it "
 "might take 5 seconds."
 msgstr ""
-"Wszystkie pola zostaną automatycznie wypełnione przez sztuczną inteligencję, "
-"może to potrwać 5 sekund."
 
 #. module: iap_extract
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__error_status
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__error_status
@@ -94,8 +93,8 @@ msgstr ""
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "Buy credits"
-msgstr "Kup kredyty"
+msgid "Buy"
+msgstr ""
 
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__extract_can_show_send_button
@@ -104,7 +103,13 @@ msgid "Can show the ocr send button"
 msgstr "Można wyświetlić przycisk wysyłania ocr"
 
 #. module: iap_extract
+#: model:ir.module.module,summary:base.module_iap_extract
+msgid "Common module for requesting data from the extract server"
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__done
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__done
@@ -129,6 +134,11 @@ msgid "Display Name"
 msgstr "Nazwa wyświetlana"
 
 #. module: iap_extract
+#: model:iap.service,name:iap_extract.iap_service_ocr
+msgid "Document Digitization"
+msgstr ""
+
+#. module: iap_extract
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 msgid "Document is being digitized"
@@ -144,7 +154,7 @@ msgstr "Dokument wysłany do digitalizacji"
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Document successfully parsed. Please refresh."
-msgstr "Dokument został pomyślnie przeanalizowany. Odśwież."
+msgstr ""
 
 #. module: iap_extract
 #: model:iap.service,unit_name:iap_extract.iap_service_ocr
@@ -205,13 +215,13 @@ msgstr "Wyekstrahowane słowa"
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__message_follower_ids
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin_with_words__message_follower_ids
 msgid "Followers"
-msgstr "Obserwatorzy"
+msgstr "Obserwujący"
 
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__message_partner_ids
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin_with_words__message_partner_ids
 msgid "Followers (Partners)"
-msgstr "Obserwatorzy (partnerzy)"
+msgstr "Obserwujący (partnerzy)"
 
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__has_message
@@ -236,6 +246,11 @@ msgstr "ID"
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin_with_words__extract_document_uuid
 msgid "ID of the request to IAP-OCR"
 msgstr "ID wniosku do IAP-OCR"
+
+#. module: iap_extract
+#: model:ir.module.module,shortdesc:base.module_iap_extract
+msgid "Iap Extract"
+msgstr ""
 
 #. module: iap_extract
 #: model:ir.model.fields,help:iap_extract.field_extract_mixin__message_needaction
@@ -294,6 +309,7 @@ msgstr "Wiadomości"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__no_extract_requested
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__no_extract_requested
@@ -303,7 +319,14 @@ msgid "No extract requested"
 msgstr "Nie żądano wyciągu"
 
 #. module: iap_extract
+#. odoo-javascript
+#: code:addons/iap_extract/static/src/components/status_header/status.xml:0
+msgid "Not enough credit to scan your document."
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__not_enough_credit
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__not_enough_credit
@@ -352,13 +375,13 @@ msgstr "Oceny"
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Refresh"
-msgstr "Odśwież"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Retry"
-msgstr "Ponów"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-python
@@ -410,6 +433,7 @@ msgstr "Wybrane dokumenty są już zdigitalizowane"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__to_validate
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__to_validate
@@ -432,6 +456,7 @@ msgstr "Wersja nie jest obsługiwana"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__waiting_extraction
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__waiting_extraction
@@ -442,6 +467,7 @@ msgstr "Oczekująca ekstrakcja"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__waiting_validation
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__waiting_validation
@@ -449,12 +475,6 @@ msgstr "Oczekująca ekstrakcja"
 #: model:ir.model.fields.selection,name:iap_extract.selection__hr_expense__extract_state__waiting_validation
 msgid "Waiting validation"
 msgstr "Oczekiwanie na zatwierdzenie"
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "You don't have enough credit to extract data from your document."
-msgstr "Nie masz wystarczającego kredytów, aby wyodrębnić dane z dokumentu."
 
 #. module: iap_extract
 #. odoo-python
@@ -472,6 +492,7 @@ msgstr "Dokument zawiera zbyt wiele stron"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__extract_not_ready
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__extract_not_ready

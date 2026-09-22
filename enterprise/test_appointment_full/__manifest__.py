@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Appointment Testing Module',
-    'version': "1.0",
     'category': 'Hidden/Tests',
     'sequence': 9999,
     'summary': 'Appointment Testing Module',

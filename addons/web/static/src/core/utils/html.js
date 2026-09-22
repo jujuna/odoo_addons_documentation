@@ -93,8 +93,8 @@ export function htmlFormatList(values, options) {
 /**
  * Applies list join on content and returns a markup result built for HTML.
  *
- * @param {Iterable<string | Markup>} list
- * @param {string | Markup} [separator]
+ * @param {Iterable<TranslatedString>} list
+ * @param {TranslatedString} [separator]
  * @returns {Markup}
  */
 export function htmlJoin(list, separator = "") {
@@ -155,7 +155,7 @@ export function htmlReplaceAll(content, search, replacer) {
  * using `markup()` they are set as it is. Otherwise they are escaped.
  *
  * @param {string} str The string with placeholders (%s) to insert values into.
- * @param  {...unknown[]} substitutions Primitive values to insert in place of placeholders.
+ * @param  {...unknown} substitutions Primitive values to insert in place of placeholders.
  * @returns {string | Markup}
  */
 export function htmlSprintf(str, ...substitutions) {
@@ -204,6 +204,7 @@ export function isMarkup(content) {
  *  - \`text\` => puts `text` in a rounded badge (bg-primary).
  *  - \n => inserts a line break.
  *  - \t => inserts the equivalent of 4 spaces.
+ *  - \v => Aligns what follows to the right.
  *
  * @param {string | Markup} text
  * @returns {string | Markup} the formatted text
@@ -224,6 +225,8 @@ export function odoomark(text) {
         ["\n", markup`<br>`],
         // Larger spacing
         ["\t", markup`<span style="margin-left: 2em"></span>`],
+        // Align to the right
+        [/\v(.*)/g, (_, content) => markup(`<span class="float-end ms-3">${content}</span>`)],
         // Bold
         [/\*\*(.+?)\*\*/g, (_, content) => markup(`<b>${content}</b>`)],
         // Muted
@@ -233,7 +236,7 @@ export function odoomark(text) {
             /&#x60;(.+?)&#x60;/g,
             (_, content) =>
                 markup(
-                    `<span class="o_tag position-relative d-inline-flex align-items-center mw-100 o_badge badge rounded-pill lh-1 o_tag_color_0">${content}</span>`
+                    `<span class="o_tag position-relative d-inline-flex align-items-center align-baseline mw-100 o_badge badge rounded-pill lh-1 o_tag_color_0">${content}</span>`
                 ),
         ],
     ];

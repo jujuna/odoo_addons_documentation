@@ -8,6 +8,8 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TestPurchaseOrder(TestAccountBudgetPurchaseCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_access_purchase_order(self):
         """ Make sure a purchase manager can access a purchase order linked to a budget. """
 
@@ -20,7 +22,7 @@ class TestPurchaseOrder(TestAccountBudgetPurchaseCommon):
         })
 
         self.assertFalse(
-            self.purchase_order.with_user(purchase_user).order_line.budget_line_ids,
+            self.purchase_order.with_user(purchase_user).is_above_budget,
             " Purchase Order should be accessible by purchase manager even without accounting rights. "
         )
 
@@ -73,3 +75,19 @@ class TestPurchaseOrder(TestAccountBudgetPurchaseCommon):
         self.assertTrue(po_2.is_above_budget)
         self.assertTrue(po_2.order_line[0].is_above_budget)
         self.assertFalse(po_2.order_line[1].is_above_budget)
+
+        po_3 = self.env['purchase.order'].create({
+            'partner_id': self.partner_a.id,
+            'date_order': '2019-01-10',
+            'order_line': [
+                Command.create({
+                    'product_id': self.product_b.id,
+                    'price_unit': 9000.0,
+                    'product_qty': 1,
+                    'tax_ids': [Command.set(self.tax_nd.ids)],
+                    'analytic_distribution': {"%s,%s" % (self.analytic_account_partner_b.id, self.analytic_account_administratif.id): 100},
+                }),
+            ],
+        })
+        self.assertTrue(po_3.is_above_budget)
+        self.assertTrue(po_3.order_line[0].is_above_budget)

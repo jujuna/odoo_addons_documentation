@@ -60,9 +60,8 @@ class AccountCashFlowReportHandler(models.AbstractModel):
             Domain('matching_number', '=', False),
         ))
         query = self.env['account.move.line']._search(domain)
-        journal_alias = query.join(lhs_alias='account_move_line', lhs_column='journal_id', rhs_table='account_journal', rhs_column='id', link='journal_id')
-        account_alias = query.join(lhs_alias=journal_alias, lhs_column='default_account_id', rhs_table='account_account', rhs_column='id', link='default_account_id')
-        account_code = self.env['account.account']._field_to_sql(account_alias, 'code', query)
+        journal_t = query.table._sudo()._join('journal_id', kind='JOIN')
+        account_t = journal_t._join('default_account_id', kind='JOIN')
 
         sql = SQL("""
                SELECT bank_statement_line.id,
@@ -102,7 +101,7 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                       aml_currency.name
              ORDER BY bank_statement_move.journal_id, bank_statement_move.date, bank_statement_line.id
             """,
-            account_code=account_code,
+            account_code=account_t.code,
             from_clause=query.from_clause,
             where_clause=query.where_clause or SQL("TRUE"))
         for model in (
@@ -188,11 +187,11 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                       bank_statement_move.date,
                       account_move.name AS move_name,
                       account_move_line.move_id,
-                      bank.l10n_pe_edi_code,
-                      banc_account.acc_number,
+                      (CASE WHEN clearing_label_country.code = 'PE' THEN banc_account.clearing_number END) AS l10n_pe_edi_code,
+                      banc_account.account_number,
                       partner.vat,
                       partner.name AS partner_name,
-                      partner_latam_idtype.l10n_pe_vat_code
+                      partner.l10n_pe_sunat_id_code
                  FROM %s
                  JOIN account_move AS account_move ON account_move_line.move_id = account_move.id
             LEFT JOIN account_move_line AS account_move_line_bs ON account_move.id = account_move_line_bs.move_id
@@ -202,9 +201,9 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                  JOIN account_move AS bank_statement_move ON bank_statement_line.move_id = bank_statement_move.id
                  JOIN account_journal AS journal ON account_move_line.journal_id = journal.id
             LEFT JOIN res_partner_bank AS banc_account ON journal.bank_account_id = banc_account.id
-            LEFT JOIN res_bank AS bank ON banc_account.bank_id = bank.id
+            LEFT JOIN clearing_label AS clearing_label ON banc_account.clearing_label_id = clearing_label.id
+            LEFT JOIN res_country AS clearing_label_country ON clearing_label.country_id = clearing_label_country.id
             LEFT JOIN res_partner AS partner ON account_move.partner_id = partner.id
-            LEFT JOIN l10n_latam_identification_type AS partner_latam_idtype ON partner.l10n_latam_identification_type_id = partner_latam_idtype.id
             LEFT JOIN l10n_latam_document_type AS latam_doctype ON account_move.l10n_latam_document_type_id = latam_doctype.id
             LEFT JOIN res_currency AS aml_currency ON account_move_line.currency_id = aml_currency.id
                 WHERE %s
@@ -215,11 +214,12 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                       bank_statement_move.date,
                       account_move.name,
                       account_move_line.move_id,
-                      bank.l10n_pe_edi_code,
-                      banc_account.acc_number,
+                      clearing_label_country.code,
+                      banc_account.clearing_number,
+                      banc_account.account_number,
                       partner.vat,
                       partner.name,
-                      partner_latam_idtype.l10n_pe_vat_code
+                      partner.l10n_pe_sunat_id_code
              ORDER BY bank_statement_move.journal_id, bank_statement_move.date, bank_statement_line.id
         """, query.from_clause, query.where_clause or SQL("TRUE"))
         for model in (
@@ -246,11 +246,11 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                     'cuo': line['move_id'],
                     'number': 'M1',  # The first digit should be 'M' to denote entries for movements or adjustments within the month. Therefore, 'M1' indicates this is the first such entry.
                     'bank_code': line['l10n_pe_edi_code'] or '99',
-                    'bank_account_number': line['acc_number'],
+                    'bank_account_number': line['account_number'],
                     'date': line['date'].strftime('%d/%m/%Y') if line['date'] else '',
                     'payment_method': '003',
                     'desc': (line['payment_ref'] or '').replace(' ', '').replace('/', ''),
-                    'identification_type': line['l10n_pe_vat_code'] or '-',
+                    'identification_type': line['l10n_pe_sunat_id_code'] or '-',
                     'partner_vat': line['vat'] or '-',
                     'partner_name': line['partner_name'] or '-',
                     'transaction': (line['move_name'] or '').replace(' ', '').replace('/', ''),

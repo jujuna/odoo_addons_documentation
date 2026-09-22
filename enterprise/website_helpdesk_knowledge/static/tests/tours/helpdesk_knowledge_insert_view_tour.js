@@ -1,19 +1,23 @@
 import { endKnowledgeTour } from '@knowledge/../tests/tours/knowledge_tour_utils';
 import { registry } from "@web/core/registry";
 
-
 registry.category("web_tour.tours").add('helpdesk_insert_graph_view_in_knowledge', {
-    url: '/odoo/action-helpdesk.helpdesk_ticket_analysis_action',
     steps: () => [{ // open the search menu
     trigger: '.o_control_panel .o_searchview_dropdown_toggler',
     run: "click",
+}, { // open the priority submenu
+    trigger: '.o_filter_menu .o_menu_item:contains("Priority")',
+    run: "click",
 }, { // pick a filter
-    trigger: '.o_filter_menu .dropdown-item:contains("Urgent")',
+    trigger: '.o_filter_menu .o_menu_item:contains("Priority") + * .dropdown-item:contains("Urgent")',
     run: "click",
 }, { // check that the facet is now active
     trigger: '.o_searchview .o_facet_value:contains("Urgent")',
     run: "click",
-},{ // reopen the search menu
+}, { // close the modal to avoid it blocking the next step
+    trigger: '.modal-header button.btn-close',
+    run: "click",
+}, { // reopen the search menu
     trigger: '.o_control_panel .o_searchview_dropdown_toggler',
     run: "click",
 }, { // pick a group by

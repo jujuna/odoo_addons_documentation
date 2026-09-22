@@ -1,10 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import re
 from markupsafe import Markup
 
 from odoo import SUPERUSER_ID, api, models, _
-from odoo.tools import is_html_empty
 
 
 class ProposeChange(models.TransientModel):
@@ -29,7 +27,7 @@ class ProposeChange(models.TransientModel):
             ('bom_id', '=', self.workorder_id.production_id.bom_id.id),
             ('state', 'in', ('confirmed', 'progress')),
         ], limit=1)
-        type_id = self.env.ref('mrp_plm.ecotype_bom_update')
+        type_id = self.env.ref('mrp_plm.ecotype_product_revision')
         if not eco:
             wo_name = f'{self.workorder_id.name}/{self.workorder_id.production_id.name}'
             name = _("Instruction Suggestions (%(wo_name)s)", wo_name=wo_name)
@@ -84,16 +82,7 @@ class ProposeChange(models.TransientModel):
         # get the step on the new bom related to the one we want to update
         new_step = eco.new_bom_id.operation_ids.quality_point_ids.filtered(lambda p: p._get_sync_values() == self.step_id.point_id._get_sync_values())
         if new_step:
-            # remove existing images, but keep existing text + append image after text
-            existing_text = False
-            image = Markup('<img style="max-width: 75%%" class="img-fluid" src="%s"/>') % self.image_url(self, 'picture')
-            if not is_html_empty(new_step.note):
-                existing_text = Markup(re.sub(self.IMG_REGEX, '', new_step.note))
-            if existing_text and not is_html_empty(existing_text):
-                new_step.note = existing_text + image
-            else:
-                new_step.note = image
-            new_step.worksheet_document = False
+            new_step.note = (new_step.note or Markup()) + self._create_picture_markup(new_step)
             # Write reason in chatter for record keeping in case of multiple suggestions before approval
             new_step.message_post(body=self._get_set_picture_note())
         else:
@@ -103,5 +92,5 @@ class ProposeChange(models.TransientModel):
                 'user_id': self.workorder_id.product_id.responsible_id.id or SUPERUSER_ID,
                 'activity_type_id': self.env.ref('mail.mail_activity_data_todo').id,
                 'summary': _('BoM feedback for not found step: %(step)s (%(production)s - %(operation)s)', step=self.step_id.point_id.title, production=self.workorder_id.production_id.name, operation=self.workorder_id.operation_id.name),
-                'note': self._get_set_picture_note(),
+                'note': self._get_set_picture_note() + self._create_picture_markup(eco),
             })

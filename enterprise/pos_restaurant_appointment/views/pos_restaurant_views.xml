@@ -15,7 +15,7 @@
         <field name="model">restaurant.floor</field>
         <field name="inherit_id" ref="pos_restaurant.view_restaurant_floor_form"></field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='table_ids']//field[@name='shape']" position="after">
+            <xpath expr="//field[@name='table_ids']//field[@name='active']" position="before">
                 <field name="appointment_resource_id" optional="hide"/>
             </xpath>
         </field>

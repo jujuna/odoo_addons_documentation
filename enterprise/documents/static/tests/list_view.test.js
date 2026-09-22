@@ -2,11 +2,14 @@ import { describe, expect, test } from "@odoo/hoot";
 import { waitFor, waitForNone } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import {
+    MockServer,
     contains,
     defineModels,
+    getService,
     mockService,
     onRpc,
     patchWithCleanup,
+    selectFieldDropdownItem,
     serverState,
 } from "@web/../tests/web_test_helpers";
 import { user } from "@web/core/user";
@@ -32,7 +35,6 @@ defineModels(DocumentsModels);
 const dp = (selector) => `.o_documents_details_panel ${selector}`;
 
 test("Open share with view user_permission", async function () {
-    onRpc("/documents/touch/accessTokenFolder1", () => ({}));
     const serverData = getDocumentsTestServerModelsData();
     const { id: folder1Id, name: folder1Name } = serverData["documents.document"][0];
     mockService("document.document", {
@@ -44,14 +46,12 @@ test("Open share with view user_permission", async function () {
     await makeDocumentsMockEnv({ serverData });
     await mountDocumentsListView();
     await contains(`.o_data_row:contains(${folder1Name}) .o_list_record_selector`).click();
-    await contains("button:contains(Share)").click();
+    await contains(".o_control_panel_actions button:contains(Share)").click();
 
     expect.verifySteps(["open_share"]);
 });
 
 test("Right panel shows and updates focused or container record only", async function () {
-    onRpc("/documents/touch/<access_token>", () => ({}));
-
     const file2Id = 3;
     const serverData = getDocumentsTestServerModelsData([
         makeDocumentRecordData(2, "File 1", { attachment_id: 1, folder_id: 1 }),
@@ -76,7 +76,7 @@ test("Right panel shows and updates focused or container record only", async fun
     await mountDocumentsListView();
 
     // Open right panel
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     await waitFor(".documents_chatter_disabled_overlay");
     // Focus without selection
     await contains(`.o_data_row td[name='name']:contains(${folder1Name})`).click();
@@ -86,7 +86,7 @@ test("Right panel shows and updates focused or container record only", async fun
 
     await waitFor(".documents_chatter_disabled_overlay"); // As we're in all/company
     // Enter folder
-    await contains(`.o_data_row:contains(${folder1Name}) .fa-folder-o`).click();
+    await contains(`.o_data_row:contains(${folder1Name}) [data-icon="folder"]`).click();
     await animationFrame();
     expect(`.o_data_row .o_list_record_selector`).toHaveCount(3);
     expect(dp(".o_documents_details_panel_name input")).toHaveValue(folder1Name);
@@ -114,7 +114,6 @@ test("Right panel shows and updates focused or container record only", async fun
 });
 
 test("Document actions are hidden when focused record is not selected", async function () {
-    onRpc("/documents/touch/<access_token>", () => ({}));
     onRpc("ir.model", "display_name_for", ({ args }) =>
         args[0].map((model) => ({ model, display_name: model }))
     );
@@ -141,6 +140,24 @@ test("Document actions are hidden when focused record is not selected", async fu
     // Select it to show actions again
     await contains(".o_data_row:contains('File 2') .o_list_record_selector").click();
     await waitFor(".o_control_panel_actions:contains('Download')");
+});
+
+test("Actions menu opens after selecting multiple records", async function () {
+    const serverData = getDocumentsTestServerModelsData([
+        makeDocumentRecordData(2, "File 1", { attachment_id: 1, folder_id: 1 }),
+        makeDocumentRecordData(3, "File 2", { attachment_id: 2, folder_id: 1 }),
+    ]);
+    serverData["ir.attachment"] = [
+        { id: 1, name: "One" },
+        { id: 2, name: "Two" },
+    ];
+    await makeDocumentsMockEnv({ serverData });
+    await mountDocumentsListView();
+    await contains(".o_data_row:contains('File 1') .o_list_record_selector").click();
+    await contains(".o_data_row:contains('File 2') .o_list_record_selector").click();
+    await waitFor(".o_selection_box:contains('2')");
+    await contains(".o_cp_action_menus button:contains('Actions')").click();
+    await waitFor(".o-dropdown--menu .o_menu_item");
 });
 
 test("only show common available actions", async function () {
@@ -180,10 +197,10 @@ test("Required document name", async function () {
         expect(".o_notification").toHaveCount(1);
         expect(".o_notification").toHaveText("Name cannot be empty.");
         await contains(".o_notification .o_notification_close").click();
-        await expect(lr(documentName, ".o_data_cell[name='name'] input")).toHaveValue(documentName);
+        await expect(lr(documentName, ".o_data_cell[name='name']")).toHaveText(documentName);
+        await expect(lr(documentName, ".o_data_cell[name='name'] input")).toHaveCount(0);
         // Remove selection and close record edition
         await contains(".o_list_renderer").click();
-        await contains(".o_list_button_discard").click();
         await animationFrame();
     }
 });
@@ -255,12 +272,8 @@ test("file sharing via link with multiple subfolders", async function () {
         accessFolder2 = true;
         return { reload: true };
     });
-    onRpc("/documents/touch/accessTokenFolder3", () => {
-        return { reload: true };
-    });
-    onRpc("/documents/touch/accessTokenFolder4", () => {
-        return { reload: true };
-    });
+    onRpc("/documents/touch/accessTokenFolder3", () => ({ reload: true }));
+    onRpc("/documents/touch/accessTokenFolder4", () => ({ reload: true }));
 
     // Set active true/false to control the folders display
     const folder2 = makeDocumentRecordData(2, "Folder 2", {
@@ -286,20 +299,21 @@ test("file sharing via link with multiple subfolders", async function () {
     });
     const serverData = getDocumentsTestServerModelsData([folder2, folder3, folder4]);
 
-    const docEnv = await makeDocumentsMockEnv({ serverData });
+    await makeDocumentsMockEnv({ serverData });
     const activateFolders = ({ args }) => {
-        folder2.active = accessFolder1;
-        folder3.active = accessFolder2;
+        const DocumentsDocument = MockServer.current.env["documents.document"];
+        DocumentsDocument.write(folder2.id, { active: accessFolder1 });
+        DocumentsDocument.write(folder3.id, { active: accessFolder2 });
         if (addFolder4) {
-            folder4.active = accessFolder2;
+            DocumentsDocument.write(folder4.id, { active: accessFolder2 });
             // Ensure only one folder button available
-            folder3.active = false;
+            DocumentsDocument.write(folder3.id, { active: false });
         }
     };
     onRpc("search_panel_select_range", activateFolders);
     onRpc("web_search_read", activateFolders);
 
-    const docService = docEnv.services["document.document"];
+    const docService = getService("document.document");
     // Avoid logAccess 1000ms debounce timer
     patchWithCleanup(docService, {
         logAccess: (token) => docService._logAccess(token),
@@ -327,4 +341,40 @@ test("file sharing via link with multiple subfolders", async function () {
     await contains(`.o_data_row .o_field_cell .o_field_documents_type_icon`).click();
     expect(`.o_search_panel_label[data-tooltip="Folder 4"]`).toHaveCount(1);
     expect.verifySteps(["touch 2"]);
+});
+
+test("edit mode is preserved when interacting with modals or control panel", async function () {
+    onRpc("/documents/touch/<access_token>", () => ({}));
+    const serverData = getDocumentsTestServerModelsData();
+    serverData["documents.document"][0].tag_ids = [1, 2];
+    await makeDocumentsMockEnv({ serverData });
+    await mountDocumentsListView();
+
+    // Enter edit mode and open "Search More" modal
+    await contains(".o_data_row:nth-child(1) td.o_list_record_selector").click();
+    expect(".o_data_row_selected").toHaveCount(1);
+    await contains('.o_data_row:nth-child(1) td.o_list_many2one[name="partner_id"]').click();
+    await selectFieldDropdownItem("partner_id", "Search more...");
+    
+    // Clicks inside the modal do not exit edit mode
+    await contains(`.modal-title:contains("Search: Contact")`).click();
+    await animationFrame();
+    expect(".modal-title").toHaveText("Search: Contact");
+    expect(".o_data_row_selected").toHaveCount(1);
+    await contains(".modal-footer .btn-secondary").click();
+
+    // Clicks inside the row do not exit edit mode (e.g. deleting a tag)
+    await contains('.o_data_row:nth-child(1) td[name="tag_ids"]').click();
+    await expect('.o_data_row:nth-child(1) .o_field_many2many_tags .o_tag').toHaveCount(2);
+    await contains('.o_data_row:nth-child(1) .o_field_many2many_tags .o_delete:eq(0)').click();
+    await expect('.o_data_row:nth-child(1) .o_field_many2many_tags .o_tag').toHaveCount(1);
+
+    // Clicks near searchbar exit edit mode
+    await contains(".o_control_panel_breadcrumbs").click();
+    expect(".o_list_button_discard").toHaveCount(0);
+    expect(".o_data_row_selected").toHaveCount(1);
+
+    // Click below the list panel unselects the row
+    await contains("div.o_list_renderer.o_documents_view.o_renderer").click();
+    expect(".o_data_row_selected").toHaveCount(0);
 });

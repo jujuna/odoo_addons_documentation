@@ -4,15 +4,15 @@
 from ast import literal_eval
 from bisect import bisect_left
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta, UTC
 
 from dateutil.relativedelta import relativedelta
-from pytz import utc
 
 from odoo import Command, api, fields, models, _
+from odoo.fields import Domain
 from odoo.addons.web.controllers.utils import clean_action
-from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_compare, float_is_zero
+from odoo.exceptions import UserError, ValidationError, RedirectWarning
+from odoo.tools import float_compare
 from odoo.tools.intervals import Intervals
 from odoo.tools.date_utils import sum_intervals
 from odoo.http import request
@@ -20,7 +20,7 @@ from odoo.http import request
 
 class MrpWorkorder(models.Model):
     _name = 'mrp.workorder'
-    _inherit = ['hr.mixin', 'mrp.workorder', 'barcodes.barcode_events_mixin']
+    _inherit = ['hr.mixin', 'mrp.workorder']
 
     quality_point_ids = fields.Many2many('quality.point', compute='_compute_quality_point_ids', store=True)
     quality_point_count = fields.Integer('Steps', compute='_compute_quality_point_count')
@@ -34,7 +34,7 @@ class MrpWorkorder(models.Model):
     quality_alert_count = fields.Integer(compute="_compute_quality_alert_count")
 
     current_quality_check_id = fields.Many2one(
-        'quality.check', "Current Quality Check", check_company=True)
+        'quality.check', "Current Quality Check", check_company=True, index=True)
 
     # QC-related fields
     allow_producing_quantity_change = fields.Boolean('Allow Changes to Producing Quantity', default=True)
@@ -57,13 +57,11 @@ class MrpWorkorder(models.Model):
     employee_name = fields.Char(compute='_compute_employee_id')
 
     # employees that started working on the wo
-    employee_ids = fields.Many2many('hr.employee', string='Working employees', copy=False)
+    employee_ids = fields.Many2many('hr.employee', bypass_search_access=True, string='Working employees', copy=False)
     # employees assigned to the wo
     employee_assigned_ids = fields.Many2many('hr.employee', 'mrp_workorder_employee_assigned',
-                                             'workorder_id', 'employee_id', string='Assigned',
+                                             'workorder_id', 'employee_id', string='Assigned', tracking=True, falsy_value_label='Unassigned Work Orders',
                                              domain="[('company_id', 'in', allowed_company_ids)]")
-    # employees connected
-    connected_employee_ids = fields.Many2many('hr.employee', search='search_is_assigned_to_connected', store=False)
 
     # list of employees allowed to work on the workcenter
     allowed_employees = fields.Many2many(related='workcenter_id.employee_ids')
@@ -89,8 +87,7 @@ class MrpWorkorder(models.Model):
     @api.depends('qty_producing', 'qty_remaining')
     def _compute_is_last_lot(self):
         for wo in self:
-            precision = wo.production_id.product_uom_id.rounding
-            wo.is_last_lot = float_compare(wo.qty_producing, wo.qty_remaining, precision_rounding=precision) >= 0
+            wo.is_last_lot = wo.production_id.uom_id.compare(wo.qty_producing, wo.qty_remaining) >= 0
 
     @api.depends('production_id.workorder_ids')
     def _compute_is_last_unfinished_wo(self):
@@ -109,6 +106,10 @@ class MrpWorkorder(models.Model):
     def _compute_done_check_ids(self):
         for wo in self:
             wo.done_check_ids = wo.check_ids.filtered(lambda c: c.quality_state != 'none')
+
+    @api.depends('time_ids.total_cost')
+    def _compute_cost(self):
+        super()._compute_cost()
 
     def unlink(self):
         self.check_ids.sudo().unlink()
@@ -131,12 +132,7 @@ class MrpWorkorder(models.Model):
                 'search_default_ready': False,
                 'from_manufacturing_order': True,
             }
-        elif self.env.context.get('from_production_order'):
-            # from workorder list view
-            action = self.env["ir.actions.actions"]._for_xml_id("mrp.mrp_workorder_todo")
-            action['target'] = 'main'
-            action['context'] = dict(literal_eval(action['context']), no_breadcrumbs=True)
-        elif self.env.context.get('mrp_display'):
+        elif self.env.context.get('mrp_display') or self.env.context.get('check_create_backorder'):
             return
         else:
             # from workcenter kanban view
@@ -154,7 +150,7 @@ class MrpWorkorder(models.Model):
         return clean_action(action, self.env)
 
     def action_cancel(self):
-        self.mapped('check_ids').filtered(lambda c: c.quality_state == 'none').sudo().unlink()
+        self.mapped('check_ids').sudo().unlink()
         return super().action_cancel()
 
     def action_generate_serial(self):
@@ -196,16 +192,6 @@ class MrpWorkorder(models.Model):
         })
         return check.id
 
-    def action_menu(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'mrp.workorder',
-            'views': [[self.env.ref('mrp_workorder.mrp_workorder_view_form_tablet_menu').id, 'form']],
-            'name': _('Menu'),
-            'target': 'new',
-            'res_id': self.id,
-        }
-
     def action_add_component(self):
         self.ensure_one()
         return self.production_id.with_context(workorder_id=self.id).action_add_component()
@@ -236,7 +222,21 @@ class MrpWorkorder(models.Model):
             if not self.env.context.get('mrp_display'):
                 main_employee = self.env.user.employee_id.id
                 if not self.env.user.employee_id:
-                    raise UserError(_("You need to link this user to an employee of this company to process the work order"))
+                    if self.env.user.has_group('hr.group_hr_user'):
+                        raise RedirectWarning(
+                            message=_("You need to link this user to an employee of this company to process the work order."),
+                            action={
+                                'name': _("Create Employee"),
+                                'type': 'ir.actions.act_window',
+                                'res_model': 'hr.employee',
+                                'views': [[False, 'form']],
+                                'target': 'new',
+                                'context': {'default_user_id': self.env.user.id},
+                            },
+                            button_text=_("Create Employee"),
+                        )
+                    else:
+                        raise UserError(_("You need to link this user to an employee of this company to process the work order."))
             else:
                 connected_employees = self.env['hr.employee'].get_employees_connected()
                 if len(connected_employees) == 0:
@@ -279,7 +279,7 @@ class MrpWorkorder(models.Model):
                 raise UserError(_("You need to complete Quality Checks using the Shop Floor before marking Work Order as Done."))
 
     def action_propose_change(self, change_type, check_id):
-        change_type_to_title = {'update_step': 'Update Instructions', 'remove_step': 'Remove Step', 'set_picture': 'Change Picture'}
+        change_type_to_title = {'update_step': 'Update Instructions', 'remove_step': 'Remove Step', 'set_picture': 'Add a Picture'}
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'propose.change',
@@ -375,13 +375,13 @@ class MrpWorkorder(models.Model):
                         'worksheet_document': point.worksheet_document,
                     }
                     if point.test_type == 'register_byproducts':
-                        moves = move_finished_ids.filtered(lambda m: m.product_id == point.component_id)
+                        moves = move_finished_ids.filtered(lambda m: m.byproduct_id == point.byproduct_id)
                         if not moves:
-                            moves = production.move_finished_ids.filtered(lambda m: not m.operation_id and m.product_id == point.component_id)
+                            moves = production.move_finished_ids.filtered(lambda m: not m.operation_id and m.byproduct_id == point.byproduct_id)
                     elif point.test_type == 'register_consumed_materials':
-                        moves = move_raw_ids.filtered(lambda m: m.product_id == point.component_id)
+                        moves = move_raw_ids.filtered(lambda m: m.bom_line_id == point.bom_line_id)
                         if not moves:
-                            moves = production.move_raw_ids.filtered(lambda m: not m.operation_id and m.product_id == point.component_id)
+                            moves = production.move_raw_ids.filtered(lambda m: not m.operation_id and m.bom_line_id == point.bom_line_id)
                     else:
                         check = self.env['quality.check'].create(values)
                         previous_check.next_check_id = check
@@ -389,9 +389,11 @@ class MrpWorkorder(models.Model):
                     # Create 'register ...' checks
                     for move in moves:
                         check_vals = values.copy()
-                        check_vals.update(wo._defaults_from_move(move))
                         # Create quality check and link it to the chain
-                        check_vals.update({'previous_check_id': previous_check.id})
+                        check_vals.update({
+                            'previous_check_id': previous_check.id,
+                            'move_id': move.id,
+                        })
                         check = self.env['quality.check'].create(check_vals)
                         previous_check.next_check_id = check
                         previous_check = check
@@ -400,16 +402,12 @@ class MrpWorkorder(models.Model):
             # Set default quality_check
             wo._change_quality_check(position='first')
 
-    def _get_byproduct_move_to_update(self):
-        moves = super()._get_byproduct_move_to_update()
-        return moves.filtered(lambda m: m.product_id.tracking == 'none')
-
     def pre_record_production(self):
         self.ensure_one()
         self._check_company()
         if any(x.quality_state == 'none' for x in self.check_ids if x.test_type != 'instructions'):
             raise UserError(_('You still need to do the quality checks!'))
-        if float_compare(self.qty_producing, 0, precision_rounding=self.product_uom_id.rounding) <= 0:
+        if self.uom_id.compare(self.qty_producing, 0) <= 0 and not self.production_bom_id.continuous:
             raise UserError(_('Please set the quantity you are currently producing. It should be different from zero.'))
 
     def record_production(self):
@@ -420,7 +418,8 @@ class MrpWorkorder(models.Model):
 
         backorder = False
         # Trigger the backorder process if we produce less than expected
-        if float_compare(self.qty_producing, self.qty_remaining, precision_rounding=self.product_uom_id.rounding) == -1 and self.is_first_started_wo:
+        if self.uom_id.compare(self.qty_producing, self.qty_to_produce) == -1 and self.is_first_started_wo \
+            and not self.production_bom_id.continuous:
             match self.production_id.picking_type_id.create_backorder:
                 case "ask":
                     return self.production_id.with_context(workorder_id_to_finish=self.id)._action_generate_backorder_wizard(self.production_id)
@@ -452,37 +451,13 @@ class MrpWorkorder(models.Model):
             for wo in (self.production_id | backorders).workorder_ids:
                 if wo.state in ('done', 'cancel'):
                     continue
-                wo.current_quality_check_id.update(wo._defaults_from_move(wo.move_id))
+                wo.current_quality_check_id.move_id = wo.move_id
 
         return self.action_back()
 
-    def _defaults_from_move(self, move):
-        self.ensure_one()
-        vals = {'move_id': move.id}
-        move_line_id = move.move_line_ids[:1]
-        if move_line_id:
-            vals.update({
-                'lot_ids': move_line_id.lot_id.ids,
-            })
-        return vals
     # --------------------------
     # Buttons from quality.check
     # --------------------------
-
-    def open_tablet_view(self):
-        self.ensure_one()
-        self.env['hr.employee'].login_user_employee()
-        if self._should_start():
-            self.button_start()
-        action = self.env["ir.actions.actions"]._for_xml_id("mrp_workorder.tablet_client_action")
-        action['target'] = 'fullscreen'
-        action['res_id'] = self.id
-        action['context'] = {
-            'active_id': self.id,
-            'from_production_order': self.env.context.get('from_production_order'),
-            'from_manufacturing_order': self.env.context.get('from_manufacturing_order')
-        }
-        return action
 
     def action_open_manufacturing_order(self):
         no_start_next = self.env.context.get("no_start_next", True)
@@ -510,6 +485,11 @@ class MrpWorkorder(models.Model):
         return action
 
     def do_finish(self):
+        for wo in self:
+            if wo.state == 'ready' and not wo.qty_produced:
+                wo.qty_produced = wo.qty_to_produce
+                if not wo.production_bom_id.continuous:
+                    wo.qty_producing = wo.qty_to_produce
         self.end_all()
         if self.state != 'done':
             loss_id = self.env['mrp.workcenter.productivity.loss'].search([('loss_type', '=', 'productive')], limit=1)
@@ -532,7 +512,7 @@ class MrpWorkorder(models.Model):
         last30op = self.env['mrp.workorder'].search_read([
             ('operation_id', '=', self.operation_id.id),
             ('state', '=', 'done'),
-            ('date_finished', '>', fields.Date.today() - relativedelta(days=30)),
+            ('date_finished', '>', fields.Date.context_today(self) - relativedelta(days=30)),
         ], ['duration', 'qty_produced'])
         last30op = sorted([item['duration'] / item['qty_produced'] for item in last30op])
         # show rainbow man only for the best time in the last 30 days.
@@ -557,7 +537,7 @@ class MrpWorkorder(models.Model):
         return res
 
     def _update_qty_producing(self, quantity):
-        if float_is_zero(quantity, precision_rounding=self.product_uom_id.rounding):
+        if self.uom_id.is_zero(quantity):
             self.check_ids.unlink()
         super()._update_qty_producing(quantity)
 
@@ -584,8 +564,8 @@ class MrpWorkorder(models.Model):
         planned_hours = defaultdict(float)
         workcenters_work_intervals, dummy = workcenters.resource_id._get_valid_work_intervals(start, stop)
         for workorder in workorders:
-            max_start = max(start, utc.localize(workorder.date_start))
-            min_finished = min(stop, utc.localize(workorder.date_finished))
+            max_start = max(start, workorder.date_start.replace(tzinfo=UTC))
+            min_finished = min(stop, workorder.date_finished.replace(tzinfo=UTC))
             interval = Intervals([(max_start, min_finished, self.env['resource.calendar.attendance'])])
             work_intervals = interval & workcenters_work_intervals[workorder.workcenter_id.resource_id.id]
             planned_hours[workorder.workcenter_id] += sum_intervals(work_intervals)
@@ -600,52 +580,136 @@ class MrpWorkorder(models.Model):
             for workcenter in workcenters
         }
 
+    def _web_gantt_progress_bar_employee_assigned_ids(self, res_ids, start, stop):
+        self.env['mrp.workorder'].check_access('read')
+        employees = self.env['hr.employee'].search([('id', 'in', res_ids)])
+        workorders = self.env['mrp.workorder'].search([
+            ('employee_assigned_ids', 'in', res_ids),
+            ('state', 'not in', ['done', 'cancel']),
+            ('date_start', '<=', stop.replace(tzinfo=None)),
+            ('date_finished', '>=', start.replace(tzinfo=None)),
+        ])
+        planned_hours = defaultdict(float)
+        employees_work_intervals, _dummy = employees.resource_id._get_valid_work_intervals(start, stop)
+        for workorder in workorders:
+            max_start = max(start, workorder.date_start.replace(tzinfo=UTC))
+            min_finished = min(stop, workorder.date_finished.replace(tzinfo=UTC))
+            for employee in workorder.employee_assigned_ids:
+                interval = Intervals([(max_start, min_finished, self.env['resource.calendar.attendance'])])
+                work_intervals = interval & employees_work_intervals[employee.resource_id.id]
+                planned_hours[employee] += sum_intervals(work_intervals)
+        work_hours = {
+            id: sum_intervals(work_intervals) for id, work_intervals in employees_work_intervals.items()
+        }
+        return {
+            employee.id: {
+                'value': planned_hours[employee],
+                'max_value': work_hours.get(employee.resource_id.id, 0.0),
+            }
+            for employee in employees
+        }
+
+    def _get_employee_domain(self):
+        """
+        Returns a domain for employees, who satisfy the following:
+         - Employee currently assigned to any work order (not done, not cancelled)
+         - Employee assigned to any work order in the last 30 days
+        """
+        date_limit = fields.Datetime.now() - timedelta(days=30)
+
+        workorders = self.search_read(
+            ['&',
+                ('employee_assigned_ids', '!=', False),
+                '|',
+                    ('state', 'not in', ['done', 'cancel']),
+                    ('date_start', '>=', date_limit),
+            ],
+            ['employee_assigned_ids'],
+        )
+
+        employee_ids = set()
+        for wo in workorders:
+            employee_ids.update(wo['employee_assigned_ids'])
+
+        return [('id', 'in', list(employee_ids))]
+
     @api.model
     def get_gantt_data(self, domain, groupby, read_specification, limit=None, offset=0, unavailability_fields=None, progress_bar_fields=None, start_date=None, stop_date=None, scale=None):
-        gantt_data = super(MrpWorkorder, self.with_context(prefix_product=True)).get_gantt_data(domain, groupby, read_specification, limit=limit, offset=offset, unavailability_fields=unavailability_fields, progress_bar_fields=progress_bar_fields, start_date=start_date, stop_date=stop_date, scale=scale)
-        if 'workcenter_id' not in gantt_data['unavailabilities']:
+        gantt_data = super(MrpWorkorder, self.with_context(display_complete_name=True)).get_gantt_data(domain, groupby, read_specification, limit=limit, offset=offset, unavailability_fields=unavailability_fields, progress_bar_fields=progress_bar_fields, start_date=start_date, stop_date=stop_date, scale=scale)
+        if groupby == ['employee_assigned_ids']:
+            employee_domain = []
+            for leaf in domain:
+                if isinstance(leaf, list) and leaf[0] == 'employee_assigned_ids':
+                    employee_domain.append([('name', leaf[1], leaf[2])])
+            search_domain = Domain.AND([self._get_employee_domain(), employee_domain and Domain.OR(employee_domain)])
+            employees = self.env['hr.employee'].search_read(search_domain, ['id', 'name'])
+            employees_ids = set()
             workcenter_ids = set()
-            if groupby and 'workcenter_id' in groupby:
-                for group in gantt_data['groups']:
-                    res_id = group['workcenter_id'][0] if group['workcenter_id'] else False
-                    workcenter_ids.add(res_id)
-            else:
-                for record in gantt_data['records']:
-                    res_id = record['workcenter_id']['id'] if record.get('workcenter_id') else False
-                    workcenter_ids.add(res_id)
+            group_records = {
+                group['employee_assigned_ids']: group['__record_ids'] for group in gantt_data['groups']
+            }
+            groups = []
+            if False in group_records:
+                groups.append({
+                    'employee_assigned_ids': False,
+                    '__record_ids': group_records.get(False)
+                })
+            for employee in employees:
+                employees_ids.add(employee['id'])
+                groups.append({
+                    'employee_assigned_ids': (employee['id'], employee['name']),
+                    '__record_ids': group_records.get((employee['id'], employee['name']), [])
+                })
+            for workorder in gantt_data.get('records', []):
+                if workcenter := workorder.get('workcenter_id'):
+                    workcenter_ids.add(workcenter['id'])
+            gantt_data['groups'] = groups
+            gantt_data['length'] = len(groups)
+            # re-fill unavailabilities since we added groups
             start, stop = fields.Datetime.from_string(start_date), fields.Datetime.from_string(stop_date)
+            gantt_data['unavailabilities']['employee_assigned_ids'] = self._gantt_unavailability('employee_assigned_ids', employees_ids, start, stop, scale)
             gantt_data['unavailabilities']['workcenter_id'] = self._gantt_unavailability('workcenter_id', workcenter_ids, start, stop, scale)
         return gantt_data
 
     @api.model
     def _gantt_progress_bar(self, field, res_ids, start, stop):
-        start, stop = utc.localize(start), utc.localize(stop)
-        today = datetime.now(utc).replace(hour=0, minute=0, second=0, microsecond=0)
+        start, stop = start.replace(tzinfo=UTC), stop.replace(tzinfo=UTC)
+        today = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
         start = max(start, today)
         if field == 'workcenter_id':
-            return dict(
-                self._web_gantt_progress_bar_workcenter_id(res_ids, start, stop),
-                warning=_("This workcenter isn't expected to have open workorders during this period. Work hours :"),
-            )
+            return self._web_gantt_progress_bar_workcenter_id(res_ids, start, stop)
+        if field == 'employee_assigned_ids':
+            return self._web_gantt_progress_bar_employee_assigned_ids(res_ids, start, stop)
         raise NotImplementedError("This Progress Bar is not implemented.")
 
     @api.model
     def _gantt_unavailability(self, field, res_ids, start, stop, scale):
         """Get unavailabilities data to display in the Gantt view."""
-        if field != 'workcenter_id':
-            return super()._gantt_unavailability(field, res_ids, start, stop, scale)
-
-        workcenters = self.env['mrp.workcenter'].browse(res_ids)
-        unavailability_mapping = workcenters._get_unavailability_intervals(start, stop)
-
-        result = {}
-        for workcenter in workcenters:
-            result[workcenter.id] = [{'start': interval[0], 'stop': interval[1]} for interval in unavailability_mapping[workcenter.id]]
-        return result
+        if field == 'workcenter_id':
+            workcenters = self.env['mrp.workcenter'].browse(res_ids)
+            unavailable_intervals = workcenters.resource_id._get_unavailable_intervals(start, stop)
+            result = {}
+            for workcenter in workcenters:
+                result[workcenter.id] = [
+                    {'start': interval[0], 'stop': interval[1]}
+                    for interval in unavailable_intervals.get(workcenter.resource_id.id, [])
+                ]
+            return result
+        if field == 'employee_assigned_ids':
+            employees = self.env['hr.employee'].browse(res_ids)
+            unavailable_intervals = employees.resource_id._get_unavailable_intervals(start, stop)
+            result = {}
+            for employee in employees:
+                result[employee.id] = [
+                    {'start': interval[0], 'stop': interval[1]}
+                    for interval in unavailable_intervals.get(employee.resource_id.id, [])
+                ]
+            return result
+        return super()._gantt_unavailability(field, res_ids, start, stop, scale)
 
     @api.model
     def get_shopfloor_limit(self):
-        return self.env['ir.config_parameter'].sudo().get_param("mrp_workorder.wo_shop_floor_maximum_card_count")
+        return self.env['ir.config_parameter'].sudo().get_int("mrp_workorder.wo_shop_floor_maximum_card_count") or 40
 
     def _should_be_pending(self):
         return self.is_user_working and self.working_state != 'blocked' and len(self.employee_ids.ids) == 0
@@ -658,31 +722,11 @@ class MrpWorkorder(models.Model):
                 self.button_start(bypass=True)
         return False
 
-    def _compute_duration(self):
-        wo_ids_without_employees = set()
-        for wo in self:
-            wo.duration = wo.get_duration()
-            wo.duration_unit = round(wo.duration / max(wo.qty_produced, 1), 2)
-            if wo.duration_expected:
-                wo.duration_percent = max(-2147483648, min(2147483647, 100 * (wo.duration_expected - wo.duration) / wo.duration_expected))
-            else:
-                wo.duration_percent = 0
-        return super(MrpWorkorder, self.env['mrp.workorder'].browse(wo_ids_without_employees))._compute_duration()
-
     @api.depends('employee_ids')
     def _compute_employee_id(self):
         main_employee_connected = self.env['hr.employee'].get_session_owner()
         self.employee_id = main_employee_connected
         self.employee_name = self.env['hr.employee'].browse(main_employee_connected).name
-
-    def search_is_assigned_to_connected(self, operator, value):
-        # retrieving employees connected in the session
-        main_employee_connected = self.env['hr.employee'].get_session_owner()
-        # if no one is connected, all records are valid
-        if not main_employee_connected:
-            return []
-        search_query = self.env['mrp.workorder']._search([('employee_assigned_ids', '=', main_employee_connected)])
-        return [('id', operator, search_query)]
 
     @api.depends('all_employees_allowed')
     def _all_employees_allowed(self):
@@ -707,53 +751,20 @@ class MrpWorkorder(models.Model):
             ('date_end', '=', False)
         ])._close()
 
+    def get_employee_duration(self, employee_id):
+        self.ensure_one()
+        now = self.env.cr.now()
+        closed_duration = sum(self.time_ids.filtered(lambda t: t.employee_id.id == employee_id).mapped('duration'))
+        opened_duration = sum(self.time_ids.filtered(lambda t: t.employee_id.id == employee_id and not t.date_end).mapped(lambda t: t and max((now - t.date_start).total_seconds() / 60, 0)), False)
+        return closed_duration, opened_duration
+
+    def set_employee_duration(self, employee_id, duration):
+        return self._set_duration(employee_id, duration)
+
     def _should_start_timer(self):
         """ Return True if the timer should start once the workorder is opened."""
         self.ensure_one()
         return False
-
-    def _intervals_duration(self, intervals):
-        """ Return the duration of the given intervals.
-        If intervals overlaps the duration is only counted once.
-
-        The timer could be share between several intervals. However it is not
-        an issue since the purpose is to make a difference between employee time and
-        blocking time.
-
-        :param list intervals: list of tuple (date_start, date_end, timer)
-        """
-        if not intervals:
-            return 0.0
-        duration = 0
-        for date_start, date_stop, timer in Intervals(intervals):
-            duration += timer.loss_id._convert_to_duration(date_start, date_stop, timer.workcenter_id)
-        return duration
-
-    def get_duration(self):
-        self.ensure_one()
-        now = self.env.cr.now()
-        loss_type_times = defaultdict(lambda: self.env['mrp.workcenter.productivity'])
-        for time in self.time_ids:
-            loss_type_times[time.loss_id.loss_type] |= time
-        duration = 0
-        for times in loss_type_times.values():
-            duration += self._intervals_duration([(t.date_start or now, t.date_end or now, t) for t in times])
-        return duration
-
-    def get_working_duration(self):
-        self.ensure_one()
-        now = self.env.cr.now()
-        return self._intervals_duration([(t.date_start, now, t) for t in self.time_ids if not t.date_end])
-
-    def get_productive_duration(self):
-        self.ensure_one()
-        now = fields.Datetime.now()
-        productive_times = []
-        for time in self.time_ids:
-            if time.loss_id.loss_type == "productive":
-                productive_times.append(time)
-        duration = self._intervals_duration([(t.date_start, t.date_end or now, t) for t in productive_times])
-        return duration
 
     def _cal_cost(self, date=False):
         total_workcenter_cost = super()._cal_cost(date)
@@ -784,23 +795,38 @@ class MrpWorkorder(models.Model):
     def action_mark_as_done(self):
         if self.env.context.get('mrp_display'):
             main_employee_connected = self.env['hr.employee'].get_session_owner()
-        else:
-            main_employee_connected = self.env.user.employee_id.id
-
-        for wo in self:
             if not main_employee_connected:
                 raise UserError(_('You must be logged in to process some of these work orders.'))
+        else:
+            main_employee_connected = self.env.user.employee_id.id
+            if not main_employee_connected:
+                if self.env.user.has_group('hr.group_hr_user'):
+                    raise RedirectWarning(
+                        message=_("You need to link this user to an employee of this company to process these work orders."),
+                        action={
+                            'name': _("Create Employee"),
+                            'type': 'ir.actions.act_window',
+                            'res_model': 'hr.employee',
+                            'views': [[False, 'form']],
+                            'target': 'new',
+                            'context': {'default_user_id': self.env.user.id},
+                        },
+                        button_text=_("Create Employee"),
+                    )
+                else:
+                    raise UserError(_("You need to link this user to an employee of this company to process these work orders."))
+        for wo in self:
             if len(wo.allowed_employees) != 0 and main_employee_connected not in [wo.id for wo in wo.allowed_employees]:
                 raise UserError(_('You are not allow to work on some of these work orders.'))
-            if wo.working_state == 'blocked':
-                raise UserError(_('Please unblock the work center to start the work order'))
-        self.button_finish()
+        res = self.button_finish()
+        if isinstance(res, dict) and res.get('res_model') == 'mrp.production.backorder':
+            return res
 
         loss_id = self.env['mrp.workcenter.productivity.loss'].search([('loss_type', '=', 'productive')], limit=1)
         if len(loss_id) < 1:
             raise UserError(_("You need to define at least one productivity loss in the category 'Productive'. Create one from the Manufacturing app, menu: Configuration / Productivity Losses."))
 
-        wo.state = 'done'
+        self.state = 'done'
         self._set_default_time_log(loss_id)
 
     def _set_default_time_log(self, loss_id):
@@ -831,15 +857,6 @@ class MrpWorkorder(models.Model):
         expected_labour_cost = (self.duration_expected / 60) * self.workcenter_id.employee_costs_hour * (self.operation_id.employee_ratio or 1)
         return expected_machine_cost + expected_labour_cost
 
-    def _get_current_theorical_operation_cost(self, without_employee_cost=False):
-        current_machine_cost = super()._get_current_theorical_operation_cost()
-        if without_employee_cost:
-            return current_machine_cost
-        return current_machine_cost + self._get_current_theorical_employee_cost()
-
-    def _get_current_theorical_employee_cost(self):
-        return (self.get_duration() / 60) * self.workcenter_id.employee_costs_hour * (self.operation_id.employee_ratio or 1)
-
     def _compute_current_operation_cost(self):
         current_machine_cost = super()._compute_current_operation_cost()
         current_labour_cost = sum(self.time_ids.mapped('total_cost'))
@@ -849,24 +866,57 @@ class MrpWorkorder(models.Model):
         self.employee_ids = [Command.clear()]
         return super().end_all()
 
-    def action_mrp_workorder_dependencies(self, action_name):
-        action = self.env['ir.actions.act_window']._for_xml_id('mrp.action_mrp_workorder_%s' % action_name)
-        ref = 'mrp_workorder.workcenter_line_gantt_production_dependencies' if action_name == 'production' else 'mrp_workorder.mrp_workorder_view_gantt_dependencies'
-
-        if self.env.user.has_group('mrp.group_mrp_workorder_dependencies'):
-            action['views'] = [(self.env.ref(ref).id, 'gantt')] + [(id, kind) for id, kind in action['views'] if kind != 'gantt']
+    def action_mrp_workorder_dependencies(self, planning_by):
+        action = self.env['ir.actions.act_window']._for_xml_id('mrp.action_mrp_workorder_production')
+        refs = {
+            'workcenter': 'mrp_workorder.mrp_workorder_view_gantt',
+            'employee': 'mrp_workorder.mrp_workorder_view_gantt_employee',
+        }
+        ref = refs[planning_by]
+        action['views'] = [
+            (self.env.ref(ref).id, 'gantt'),
+            (self.env.ref('mrp.workcenter_line_kanban').id, 'kanban'),
+        ] + [(id, kind) for id, kind in action['views'] if kind not in ['kanban', 'gantt']]
+        action['domain'] = [('state', '!=', 'cancel')]
+        action['context'] = {}
+        if planning_by == 'workcenter':
+            action['context'] = {
+                'show_workcenter_status': True,
+                'search_default_filter_planned': True,
+                'search_default_ready': True,
+                'search_default_blocked': True,
+                'search_default_progress': True,
+            }
         return action
 
-    def _prepare_timeline_vals(self, duration, date_start, date_end=False):
+    def action_mrp_workorder_planning(self):
+        action = self.env["ir.actions.act_window"]._for_xml_id("mrp.action_mrp_workorder_production")
+        gantt_view = 'mrp_workorder.mrp_workorder_view_gantt'
+        action['views'] = [
+            (self.env.ref('mrp.workcenter_line_kanban').id, 'kanban'),
+            (self.env.ref(gantt_view).id, 'gantt'),
+        ] + [(id, kind) for id, kind in action['views'] if kind not in ['kanban', 'gantt']]
+        action["context"] = {
+            "search_default_ready": True,
+            "search_default_blocked": True,
+            "search_default_filter_planned": True,
+            "search_default_progress": True,
+            "show_workcenter_status": True,
+        }
+        return action
+
+    def _prepare_timeline_vals(self, duration, date_start, date_end=False, employee_id=None):
         time_data = super()._prepare_timeline_vals(duration=duration, date_start=date_start, date_end=date_end)
-        employee = self._get_connected_employee()
+        employee = self.env['hr.employee'].browse(employee_id) if employee_id is not None else self._get_connected_employee()
         time_data['employee_id'] = employee.id
         time_data['description'] = _('Time Tracking: %(user)s', user=employee.name)
         return time_data
 
     def set_qty_producing(self):
         self.ensure_one()
-        self.production_id.set_qty_producing()
+        if not self.production_bom_id.continuous:
+            self.production_id.qty_producing = self.qty_produced
+            self.production_id.set_qty_producing()
 
         # Find first uncompleted step of type register production (if it exists) in the chain
         current_check = self.check_ids.filtered(lambda c: not c.previous_check_id)[:1]

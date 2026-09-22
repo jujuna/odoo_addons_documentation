@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 # Based on the module developped by Richard de Meester, from Willdoo IT
 {
@@ -102,7 +101,6 @@ Use
     be regenerated.  This file can then be uploaded to the bank.
 """,
     'category': 'Accounting/Localizations/EDI',
-    'version': '1.0',
     'depends': ['account_batch_payment', 'l10n_au'],
     'data': [
         'data/aba_data.xml',
@@ -111,7 +109,6 @@ Use
         'views/account_payment_views.xml',
         'views/res_partner.xml',
     ],
-    'installable': True,
     'auto_install': ['l10n_au'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

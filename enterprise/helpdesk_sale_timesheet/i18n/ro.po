@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-16 13:47+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 00:34+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "helpdesk_sale_timesheet/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,14 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.module.module,description:base.module_helpdesk_sale_timesheet
+msgid ""
+"\n"
+"Bill timesheets logged on helpdesk tickets.\n"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:helpdesk.sla,name:helpdesk_sale_timesheet.helpdesk_sla_4
@@ -32,23 +39,23 @@ msgstr "4 ore pentru a finaliza"
 
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
+msgid "<span class=\"o_stat_text\">Sales Order</span>"
+msgstr "<span class=\"o_stat_text\">Comandă de vânzare</span>"
+
+#. module: helpdesk_sale_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
 msgid ""
-"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"The sales "
+"<span class=\"oi text-warning\" data-icon=\"warning\" title=\"The sales "
 "order associated with this ticket has been cancelled. We recommend either "
 "updating the sales order item or cancelling this ticket in alignment with "
 "the cancellation of the sales order.\" invisible=\"sale_order_state != "
 "'cancel'\"/>"
 msgstr ""
-"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"Comanda de "
+"<span class=\"oi text-warning\" data-icon=\"warning\" title=\"Comanda de "
 "vânzare asociată acestui tichet a fost anulată. Vă recomandăm fie să "
 "actualizați articolul din comanda de vânzare, fie să anulați acest tichet "
 "pentru a fi în concordanță cu anularea comenzii de vânzare.\" "
 "invisible=\"sale_order_state != 'cancel'\"/>"
-
-#. module: helpdesk_sale_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
-msgid "<span class=\"o_stat_text\">Sales Order</span>"
-msgstr "<span class=\"o_stat_text\">Comandă de vânzare</span>"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_account_analytic_line
@@ -69,6 +76,11 @@ msgstr "Convertiți tichetele de asistență în sarcini"
 #: model:ir.model,name:helpdesk_sale_timesheet.model_project_task_convert_wizard
 msgid "Convert Project Tasks to Tickets"
 msgstr "Convertiți sarcinile proiectului în tichete"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.actions.server,name:helpdesk_sale_timesheet.helpdesk_ticket_action_create_invoice
+msgid "Create Invoice"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,website_form_label:helpdesk_sale_timesheet.model_helpdesk_ticket
@@ -106,8 +118,8 @@ msgstr "Angajat"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_helpdesk_sla
-msgid "Helpdesk SLA Policies"
-msgstr "Helpdesk SLA Politici"
+msgid "Helpdesk SLA Policy"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_helpdesk_team
@@ -146,6 +158,28 @@ msgid "No Ticket"
 msgstr "Fără tichet"
 
 #. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because none of the selected tickets are billable."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because none of the selected tickets have sale orders "
+"ready to be invoiced."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because some of the selected tickets are not billable."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.tickets_followup_timesheet
 msgid "Non-billable"
@@ -155,11 +189,6 @@ msgstr "Nefacturabil"
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.portal_helpdesk_ticket_timesheet
 msgid "Not Billed"
 msgstr "Nefacturat"
-
-#. module: helpdesk_sale_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_sla_view_form_inherit_sale_timesheet
-msgid "OR"
-msgstr "SAU"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_team__project_id
@@ -174,6 +203,11 @@ msgid ""
 msgstr ""
 "Proiectul la care timpii de tichete ale acestei echipe de helpdesk vor fi "
 "legate."
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.module.module,summary:base.module_helpdesk_sale_timesheet
+msgid "Project, Helpdesk, Timesheet and Sale Orders"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_ticket__sale_order_id
@@ -252,6 +286,11 @@ msgid "Search in Ticket"
 msgstr "Caută în tichet"
 
 #. module: helpdesk_sale_timesheet
+#: model:ir.module.module,shortdesc:base.module_helpdesk_sale_timesheet
+msgid "Sell Helpdesk Timesheet"
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla__product_ids
 msgid "Services"
 msgstr "Servicii"
@@ -290,6 +329,7 @@ msgid "Tickets"
 msgstr "Tichete"
 
 #. module: helpdesk_sale_timesheet
+#: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_account_analytic_line__has_billable_helpdesk_team
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla__use_helpdesk_sale_timesheet
 msgid "Time Billing"
 msgstr "Facturare timp"
@@ -340,73 +380,3 @@ msgstr ""
 #: code:addons/helpdesk_sale_timesheet/models/sale_order.py:0
 msgid "[Helpdesk] %(ticket_name)s"
 msgstr ""
-
-#~ msgid "Analytic Account"
-#~ msgstr "Cont analitic"
-
-#~ msgid "Days"
-#~ msgstr "Zile"
-
-#~ msgid "Days Spent"
-#~ msgstr "Zile Petrecute"
-
-#~ msgid "Days:"
-#~ msgstr "Zile:"
-
-#~ msgid "Display Sol"
-#~ msgstr "Afișați Sol"
-
-#~ msgid "Helpdesk"
-#~ msgstr "Serviciu de asistenta tehnica"
-
-#~ msgid "Hours"
-#~ msgstr "Ore"
-
-#~ msgid "Hours Spent"
-#~ msgstr "Ore petrecute"
-
-#~ msgid "Hours:"
-#~ msgstr "Ore:"
-
-#~ msgid "Product"
-#~ msgstr "Produs"
-
-#~ msgid "Project's sale order"
-#~ msgstr "Comanda de vânzare a proiectului"
-
-#~ msgid "Remaining Days on SO"
-#~ msgstr "Zile rămase pe SO"
-
-#~ msgid "Remaining Days on SO:"
-#~ msgstr "Zile rămase pe SO:"
-
-#~ msgid "Remaining Hours Available"
-#~ msgstr "Restul de ore disponibile"
-
-#~ msgid "Remaining Hours on SO:"
-#~ msgstr "Ore rămase pe SO:"
-
-#~ msgid "SLA Policy"
-#~ msgstr "Politica SLA"
-
-#~ msgid ""
-#~ "SLA Policy that will automatically apply to the tickets linked to a sales "
-#~ "order item containing this service."
-#~ msgstr ""
-#~ "Politica SLA care va fi aplicată automat la tichetele legate de un "
-#~ "element de comandă de vânzare care conține acest serviciu."
-
-#~ msgid "Sales Order Items"
-#~ msgstr "Elemente comandă de vânzare"
-
-#~ msgid "Sales order to which the project is linked."
-#~ msgstr "Comanda de vânzare la care este legat proiectul."
-
-#~ msgid "Spent"
-#~ msgstr "Cheltuit"
-
-#~ msgid "Tickets in Overtime"
-#~ msgstr "Tichete în timpul suplimentar"
-
-#~ msgid "Total"
-#~ msgstr "Total"

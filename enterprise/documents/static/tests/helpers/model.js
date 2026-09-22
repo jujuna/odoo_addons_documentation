@@ -1,5 +1,14 @@
-import { getMockEnv, makeMockEnv, serverState } from "@web/../tests/web_test_helpers";
+import { startServer } from "@mail/../tests/mail_test_helpers";
+import { Store } from "@mail/../tests/mock_server/store";
+
+import {
+    getTestApp,
+    makeTestApp,
+    serverState,
+    patchWithCleanup,
+} from "@web/../tests/web_test_helpers";
 import { getDocumentsModel } from "./data";
+import { session } from "@web/session";
 
 /**
  * Create a mocked server environment
@@ -16,12 +25,16 @@ export async function makeDocumentsMockEnv(params) {
             if (!PyModel) {
                 throw new Error(`Model ${modelName} not found inside DocumentsModels`);
             }
-            PyModel._records = records;
+            PyModel._records = structuredClone(records);
         }
     }
-    const env = getMockEnv() || (await makeMockEnv());
-    env.services["document.document"].store.odoobot = {
-        userId: serverState.odoobotId,
-    };
-    return env;
+    const pyEnv = await startServer();
+    pyEnv["res.users"].write(serverState.userId, { notification_type: "inbox" });
+    const ResUsers = pyEnv["res.users"];
+    const store = new Store();
+    ResUsers._init_store_data(store);
+    patchWithCleanup(session, { storeData: store.as_dict() });
+    if (!getTestApp()) {
+        await makeTestApp();
+    }
 }

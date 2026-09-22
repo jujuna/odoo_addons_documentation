@@ -4,6 +4,7 @@ from unittest.mock import patch
 from odoo import Command
 from odoo.exceptions import UserError, ValidationError, RedirectWarning
 from odoo.tests.common import tagged
+from odoo.tools import mute_logger
 from odoo.modules.neutralize import get_neutralization_queries
 from .common import TestAccountAvataxCommon
 
@@ -11,6 +12,8 @@ from .mocked_refund_1_response import generate_response as generate_response_ref
 
 
 class TestAccountAvalaraInternalCommon(TestAccountAvataxCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def assertInvoice(self, invoice, test_exact_response):
         self.assertEqual(
             len(invoice.invoice_line_ids.tax_ids),
@@ -58,6 +61,8 @@ class TestAccountAvalaraInternalCommon(TestAccountAvataxCommon):
 
 @tagged("-at_install", "post_install")
 class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_01_odoo_invoice(self):
         invoice, response = self._create_invoice_01_and_expected_response()
         with self._capture_request(return_value=response):
@@ -132,19 +137,13 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
                 self.assertLess(line['amount'], 0)
 
     def test_02_odoo_refund(self):
-        refund = self.env['account.move'].create({
-            'move_type': 'out_refund',
-            'partner_id': self.partner.id,
-            'fiscal_position_id': self.fp_avatax.id,
-            'invoice_date': '2024-01-24',
-            'invoice_line_ids': [
-                (0, 0, {
-                    'product_id': self.product_user.id,
-                    'tax_ids': None,
-                    'price_unit': self.product_user.list_price,
-                }),
-            ]
-        })
+        refund = self._create_invoice_one_line(
+            product_id=self.product_user,
+            move_type='out_refund',
+            partner_id=self.partner,
+            fiscal_position_id=self.fp_avatax,
+            invoice_date='2024-01-24',
+        )
         response = generate_response_refund_1(refund.invoice_line_ids)
         with self._capture_request(return_value=response):
             refund.button_external_tax_calculation()
@@ -179,6 +178,28 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
             invoice.unlink()
 
         self.assertEqual(capture.val['json']['code'], 'DocVoided', 'Should have tried to void without raising on EntityNotFoundError.')
+
+    @mute_logger('odoo.addons.account_avatax.models.account_external_tax_mixin')
+    def test_handle_response_includes_detail_message(self):
+        invoice, _ = self._create_invoice_01_and_expected_response()
+
+        mock_response = {'error': {'code': 'GetTaxError',
+           'details': [{'code': 'GetTaxError',
+                        'description': 'UOM Code',
+                        'faultCode': 'Client',
+                        'faultSubCode': 'InvalidValueError',
+                        'helpLink': 'https://developer.avalara.com/avatax/errors/GetTaxError/',
+                        'message': "'123' is not a valid Parameter Bag Validation for ParameterName NetVolume",
+                        'number': 300,
+                        'refersTo': 'Parameter Bag Validation for "ParameterName NetVolume"',
+                        'severity': 'Error'}],
+           'message': "'123' is not a valid Parameter Bag Validation for ParameterName NetVolume",
+           'target': 'Unknown'}}
+
+        with self._capture_request(return_value=mock_response), self.assertRaisesRegex(
+            UserError, r"UOM Code: '123' is not a valid Parameter Bag Validation"
+        ):
+            invoice.action_post()
 
     def test_journal_entry(self):
         entry, _ = self._create_invoice_01_and_expected_response()
@@ -231,7 +252,7 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
         })
         self.cr.precommit.run()  # load the CoA
 
-        invoice = self._create_invoice(post=False, company_id=child_branch.id)
+        invoice = self._create_invoice_avatax(post=False, company_id=child_branch.id)
 
         # Avalara configuration defined on parent company
         # Should not raise RedirectWarning: ('Please add your AvaTax credentials')
@@ -245,6 +266,7 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
                 invoice.button_external_tax_calculation()
 
         child_branch.write({
+            'avalara_connection_method': 'manual',
             'avalara_api_id': "AVALARA_LOGIN_ID",
             'avalara_api_key': "AVALARA_API_KEY",
             'avalara_environment': 'sandbox',
@@ -264,6 +286,23 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
             invoice.button_external_tax_calculation()
 
         self.assertIsNone(capture.val, "Should not update taxes of posted invoices.")
+
+    def test_access_right_invoicing(self):
+        self.env.user.group_ids = self.env.ref('account.group_account_user')
+        with self._capture_request(return_value={'lines': [], 'summary': []}):
+            invoice = self._create_invoice_avatax()
+        with self._capture_request(return_value={'lines': [], 'summary': []}):
+            invoice.button_draft()
+
+    def test_check_address_no_credentials(self):
+        """Address validation shouldn't crash when no company has Avatax credentials."""
+        with self._capture_request(return_value={'lines': [], 'summary': []}):
+            invoice = self._create_invoice(post=True)
+        self.env.company.write({
+            'avalara_api_id': False,
+            'avalara_api_key': False,
+        })
+        invoice._check_address()
 
     def test_check_address_constraint(self):
         invoice, _ = self._create_invoice_01_and_expected_response()
@@ -364,7 +403,7 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
         #  CA COUNTY 6%                   |         0.0        |    0.0  |  0.0  |  0.0
         tax_line = invoice.line_ids.filtered(lambda l: l.tax_line_id.name == 'CA STATE 4%')
         self.assertRecordValues(tax_line, [{'amount_currency': -4.0, 'balance': -2.0, 'debit': 0.0, 'credit': 2.0}])
-        exempted_tax_line = invoice.line_ids.filtered(lambda l: l.tax_line_id.name == 'CA COUNTY 6%')
+        exempted_tax_line = invoice.line_ids.filtered(lambda l: (l.tax_line_id.name or '').startswith('CA COUNTY 6%'))
         self.assertRecordValues(exempted_tax_line, [{'amount_currency': 0.0, 'balance': 0.0, 'debit': 0.0, 'credit': 0.0}])
 
     def test_invoice_multi_taxline(self):
@@ -543,19 +582,96 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
         self.assertRecordValues(
             invoice.line_ids.sorted('balance'),
             [
-                {'name': 'Accounting', 'balance': -295.00},  # Income account
-                {'name': 'CA STATE 6%', 'balance': -17.7},
-                {'name': 'CA SPECIAL 3%', 'balance': -8.85},
-                {'name': 'CA SPECIAL 1%', 'balance': -2.95},
-                {'name': 'CA COUNTY 0.25%', 'balance': -0.74},
-                {'name': False, 'balance': sum(t['tax'] for t in response['summary'])},  # AR
-                {'name': 'Odoo User Initial Discount', 'balance': 295.00},  # Income account
+                {'label': 'Accounting', 'balance': -295.00},  # Income account
+                {'label': 'CA STATE 6%', 'balance': -17.7},
+                {'label': 'CA SPECIAL 3%', 'balance': -8.85},
+                {'label': 'CA SPECIAL 1%', 'balance': -2.95},
+                {'label': 'CA COUNTY 0.25%', 'balance': -0.74},
+                {'label': False, 'balance': sum(t['tax'] for t in response['summary'])},  # AR
+                {'label': 'Odoo User Initial Discount', 'balance': 295.00},  # Income account
             ]
         )
+
+    def test_zero_tax_amount_on_recomputation(self):
+        """Avatax returns the usual rate with a $0 amount when an exemption applies. The tax lines
+        should follow the amount, not the rate."""
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner.id,
+            'fiscal_position_id': self.fp_avatax.id,
+            'invoice_date': '2021-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_user.id,
+                    'tax_ids': None,
+                    'price_unit': 100.00,
+                }),
+            ]
+        })
+
+        def make_response(tax_amount):
+            return {
+                'lines': [{
+                    'details': [{
+                        'jurisCode': '06',
+                        'rate': 0.06,
+                        'taxName': 'CA STATE TAX',
+                        'tax': tax_amount,
+                    }],
+                    'lineAmount': 100.0,
+                    'lineNumber': 'account.move.line,' + str(invoice.invoice_line_ids.id),
+                    'tax': tax_amount,
+                }],
+                'summary': [{
+                    'jurisCode': '06',
+                    'rate': 0.06,
+                    'tax': tax_amount,
+                    'taxCalculated': tax_amount,
+                    'taxName': 'CA STATE TAX',
+                    'taxable': 100.0,
+                }],
+            }
+
+        with self._capture_request(return_value=make_response(6.0)):
+            invoice.button_external_tax_calculation()
+        self.assertRecordValues(invoice, [{'amount_tax': 6.0, 'amount_total': 106.0}])
+
+        # The customer becomes exempt, the rate stays 6% but there is no tax to collect.
+        with self._capture_request(return_value=make_response(0.0)):
+            invoice.button_external_tax_calculation()
+
+        self.assertEqual(
+            invoice.tax_totals['total_amount_currency'],
+            invoice.amount_total,
+            "The total shown on the invoice should match the total of the journal items."
+        )
+        tax_line = invoice.line_ids.filtered(lambda l: l.tax_line_id.name == 'CA STATE 6%')
+        self.assertRecordValues(tax_line, [{'amount_currency': 0.0, 'balance': 0.0}])
+        self.assertRecordValues(invoice, [{'amount_tax': 0.0, 'amount_total': 100.0}])
+
+    def test_other_move_type(self):
+        """ Test the system works as expected with receipts
+        """
+        move = self.env['account.move'].create({
+            'move_type': 'in_receipt',
+            'partner_id': self.partner_a.id,
+            'fiscal_position_id': self.fp_avatax.id,
+            'invoice_date': '2024-01-24',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_user.id,
+                    'tax_ids': None,
+                    'price_unit': self.product_user.list_price,
+                }),
+            ]
+        })
+        move.action_post()
 
 
 @tagged("external_l10n", "external", "-at_install", "post_install", "-standard")
 class TestAccountAvalaraInternalIntegration(TestAccountAvalaraInternalCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_integration_01_odoo_invoice(self):
         with self._skip_no_credentials():
             invoice, _ = self._create_invoice_01_and_expected_response()
@@ -572,6 +688,7 @@ class TestAccountAvalaraInternalIntegration(TestAccountAvalaraInternalCommon):
 @tagged("-at_install", "post_install")
 class TestAccountAvalaraSalesTaxAdministration(TestAccountAvataxCommon):
     """https://developer.avalara.com/certification/avatax/sales-tax-badge/"""
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -598,15 +715,15 @@ class TestAccountAvalaraSalesTaxAdministration(TestAccountAvataxCommon):
         independent of any other Avalara product or service.
         """
         self.fp_avatax.is_avatax = False
-        with patch('odoo.addons.account_avatax.lib.avatax_client.AvataxClient.request') as mocked_request:
-            self._create_invoice()
+        with patch('odoo.addons.account_avatax.lib.avatax_client.AvataxClient._dispatch') as mocked_request:
+            self._create_invoice_avatax()
             mocked_request.assert_not_called()
 
     def test_disable_avatax_neutralize(self):
         """ORM's neutralization feature works."""
         self.cr.execute(next(get_neutralization_queries(['account_avatax'])))
-        with patch('odoo.addons.account_avatax.lib.avatax_client.AvataxClient.request') as mocked_request:
-            self._create_invoice()
+        with patch('odoo.addons.account_avatax.lib.avatax_client.AvataxClient._dispatch') as mocked_request:
+            self._create_invoice_avatax()
             mocked_request.assert_not_called()
 
     def test_integration_connect_button(self):

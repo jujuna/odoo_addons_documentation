@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Website Documents',
-    'version': '1.0',
     'category': 'Productivity/Documents',
     'sequence': 8010,
     'summary': 'Choose the website on which documents/folder are shared',

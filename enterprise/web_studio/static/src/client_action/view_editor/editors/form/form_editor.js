@@ -90,10 +90,6 @@ const HOOK_CLASS_WHITELIST = [
 ];
 const HOOK_TYPE_BLACKLIST = ["genericTag", "afterGroup", "afterNotebook", "insideSheet"];
 
-const isBlackListedHook = (draggedEl, hookEl) =>
-    !HOOK_CLASS_WHITELIST.some((cls) => draggedEl.classList.contains(cls)) &&
-    HOOK_TYPE_BLACKLIST.some((t) => hookEl.dataset.type === t);
-
 function canDropNotebook(hookEl) {
     if (hookEl.dataset.type === "page") {
         return false;
@@ -103,6 +99,10 @@ function canDropNotebook(hookEl) {
     }
     return true;
 }
+
+const isBlackListedHook = (draggedEl, hookEl) =>
+    !HOOK_CLASS_WHITELIST.some((cls) => draggedEl.classList.contains(cls)) &&
+    HOOK_TYPE_BLACKLIST.some((t) => hookEl.dataset.type === t);
 
 function canDropGroup(hookEl) {
     if (hookEl.dataset.type === "insideGroup") {
@@ -137,6 +137,21 @@ function isValidFormHook({ hook, element }) {
     return true;
 }
 formEditor.isValidHook = isValidFormHook;
+formEditor.highlightHooks = ({ element, hooks }) => {
+    const toHighlight = new Set();
+    for (const hook of hooks) {
+        const parent = hook.closest(".o_inner_group,.o_group,.o_notebook_content .tab-pane.active");
+        toHighlight.add(parent || hook);
+    }
+    for (const element of toHighlight) {
+        element.classList.add("o_web_studio_hook-highlight");
+    }
+    return () => {
+        for (const element of toHighlight) {
+            element.classList.remove("o_web_studio_hook-highlight");
+        }
+    };
+};
 
 function addFormViewStructure(structure) {
     switch (structure) {

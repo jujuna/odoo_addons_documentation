@@ -24,13 +24,14 @@ export const basicDocumentsKanbanArch = /* xml */ `
         <field name="access_internal"/>
         <field name="access_via_link"/>
         <field name="is_access_via_link_hidden"/>
+        <field name="checksum"/>
         <t t-name="card">
             <div>
                 <div name="document_preview" class="o_kanban_image_wrapper">a thumbnail</div>
-                <i class="fa fa-circle o_record_selector"/>
+                <i class="oi oi-filled o_record_selector" data-icon="circle"/>
                 <field name="name"/>
                 <t t-if="record.lock_uid.raw_value">
-                    <i class="fa fa-lock"/>
+                    <i class="oi" data-icon="lock"/>
                 </t>
             </div>
         </t>

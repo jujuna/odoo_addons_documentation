@@ -1,18 +1,17 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { getEmbeddedProps } from "@html_editor/others/embedded_component_utils";
 import { EMBEDDED_VIEW_LINK_STYLES } from "@knowledge/editor/embedded_components/core/embedded_view_link/embedded_view_link_style";
 import { makeContext } from "@web/core/context";
 
+export const readonlyViewLinkProps = {
+    viewProps: t.object(),
+    linkStyle: t.string().optional("link"),
+};
+
 export class ReadonlyViewLinkComponent extends Component {
     static template = "knowledge.ReadonlyEmbeddedViewLink";
-    static props = {
-        viewProps: { type: Object },
-        linkStyle: { type: String, optional: true },
-    };
-    static defaultProps = {
-        linkStyle: "link",
-    };
+    props = useProps(readonlyViewLinkProps);
 
     get displayName() {
         return this.props.viewProps.displayName;

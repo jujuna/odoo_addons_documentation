@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import tools
 from odoo import api, fields, models
+from odoo.tools import SQL
 
 
 class StockReport(models.Model):
@@ -45,7 +45,7 @@ class StockReport(models.Model):
             report.display_name = f'{report.reference} - {report.product_id.display_name}'
 
     def _select(self):
-        select_str = """
+        return SQL("""
             sm.id as id,
             sp.name as picking_name,
             sp.date_done as date_done,
@@ -65,12 +65,10 @@ class StockReport(models.Model):
             sm.product_qty as product_qty,
             sm.company_id as company_id,
             cat.id as categ_id
-        """
-
-        return select_str
+        """)
 
     def _from(self):
-        from_str = """
+        return SQL("""
             stock_move sm
             LEFT JOIN (
                 SELECT
@@ -99,12 +97,10 @@ class StockReport(models.Model):
             INNER JOIN product_template t ON p.product_tmpl_id = t.id
             INNER JOIN product_category cat ON t.categ_id = cat.id
             WHERE t.is_storable = true
-        """
-
-        return from_str
+        """)
 
     def _group_by(self):
-        group_by_str = """
+        return SQL("""
             sm.id,
             sm.reference,
             sm.picking_id,
@@ -124,17 +120,20 @@ class StockReport(models.Model):
             p.id,
             is_late,
             cat.id
-        """
-
-        return group_by_str
+        """)
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute("""CREATE or REPLACE VIEW %s as (
+        self.env.cr.execute(SQL("""CREATE or REPLACE VIEW %s as (
                             SELECT
                                 %s
                             FROM
                                 %s
                             GROUP BY
                                 %s
-            )""" % (self._table, self._select(), self._from(), self._group_by(),))
+            )""",
+            SQL.identifier(self._table),
+            self._select(),
+            self._from(),
+            self._group_by(),
+        ))

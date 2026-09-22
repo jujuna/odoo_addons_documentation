@@ -12,11 +12,13 @@ from odoo.tests import tagged, users
 
 
 @tagged('wa_message')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls._prepare_interactive_templates()
 
         cls.public_user = mail_new_test_user(
             cls.env, login='public_test', groups='base.group_public',
@@ -125,6 +127,54 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
         self.assertEqual(self.whatsapp_account.notify_user_ids, self.user_wa_admin)
         self.assertEqual(self.whatsapp_account_2.notify_user_ids, self.user_wa_admin)
 
+    def test_blacklist_enforcement_cross_country(self):
+        """ Test that blacklist enforcement works correctly when the company country
+        differs from the partner's phone number country. Check both possible
+        block lists: phone and whatsapp. """
+        company_de = self.env.ref('base.de')
+        self.company_admin.write({'country_id': company_de.id})
+        self.user_wa_admin.write({'country_id': False})
+
+        phone_numbers_local = ["+32456001122", "+32456001133"]
+        phone_numbers_wa = ["32456001122", "32456001133"]
+
+        partner_phone, partner_wa = self.env['res.partner'].create([
+            {
+                'name': 'Test Partner (Blocked Phone)',
+                'country_id': False,
+                'phone': phone_numbers_local[0],
+            }, {
+                'name': 'Test Partner (Blocked WA)',
+                'country_id': False,
+                'phone': phone_numbers_local[1],
+            }
+        ])
+
+        with self.mockWhatsappGateway():
+            self._receive_whatsapp_message(self.whatsapp_account, "STOP", phone_numbers_wa[0])
+        blacklist_entries = self.env['phone.blacklist'].sudo().search([('number', '=', phone_numbers_local[0])])
+        self.assertTrue(blacklist_entries, "Blacklist entry should be created")
+        with self.mockWhatsappGateway():
+            self.env['whatsapp.blocklist'].create({
+                'number': phone_numbers_local[1],
+                'wa_account_id': self.whatsapp_account.id,
+            })
+
+        # any blocklist usage should set message as failed
+        for partner in partner_phone + partner_wa:
+            composer = self._instanciate_wa_composer_from_records(
+                self.simple_whatsapp_template, partner, with_user=self.user_wa_admin
+            )
+            with self.mockWhatsappGateway():
+                composer.action_send_whatsapp_template()
+            self.assertWAMessageFromRecord(
+                partner,
+                status='error',
+                fields_values={
+                    'failure_type': 'blacklisted',
+                }
+            )
+
     @users('employee')
     def test_message_values_from_composer(self):
         """ Check values produced when sending a message using composer """
@@ -153,6 +203,97 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
                         'message_type': 'whatsapp_message',
                         'partner_ids': partner_ids,
                         'subtype_id': self.env.ref('mail.mt_note'),
+                    },
+                )
+
+    def test_message_values_from_interactive_message(self):
+        """ Check values produced when sending and receiving
+        an interactive message """
+        # Create discuss channel as interactive messages can be sent in active conversation only
+        exp_msg_count = 2
+        exp_wa_msg_count = 1
+        test_wa_channel = self.simulate_conversation(
+            self.whatsapp_template, self.test_base_record_nopartner, '32499123456',
+            exp_msg_count=exp_msg_count,
+            exp_wa_msg_count=exp_wa_msg_count,
+        )
+
+        for interactive, received_interactive_msg_values, exp_interactive_msg_body in zip(
+            (
+                self.test_interactive_list,
+                self.test_interactive_reply,
+            ), (
+                # interactive list reply
+                {
+                    'type': 'list_reply',
+                    'list_reply': {
+                        'title': 'Question 3',
+                        'description': 'Description 3',
+                    },
+                },
+                # interactive button reply
+                {
+                    'type': 'button_reply',
+                    'button_reply': {
+                        'title': 'Test Reply Button 2',
+                    },
+                },
+            ), (
+                '<p>Question 3</p><p>Description 3</p>',
+                '<p>Test Reply Button 2</p>',
+            ),
+        ):
+            with self.subTest(interactive=interactive.name):
+                # send interactive message
+                composer = self._instantiate_wa_interactive_composer_from_channel(
+                    interactive, test_wa_channel,
+                )
+                with self.mockWhatsappGateway():
+                    composer.action_send_whatsapp_interactive()
+
+                # check interactive message posted in discuss channel
+                exp_msg_count += 1
+                exp_wa_msg_count += 1
+                self.assertWhatsAppDiscussChannel(
+                    '32499123456',
+                    msg_count=exp_msg_count,
+                    wa_msg_count=exp_wa_msg_count,
+                    wa_mail_message_values={
+                        'body': f'<p>{interactive.body}</p>',
+                    },
+                    wa_message_fields_values={
+                        'body': f'<p>{interactive.body}</p>',
+                        'state': 'sent',
+                    },
+                )
+
+                # receive interactive message reply
+                additional_message_values = {
+                    'context': {
+                        'from': '32499123456',
+                        'id': self._new_wa_msg.msg_uid,
+                    },
+                }
+                with self.mockWhatsappGateway():
+                    self._receive_whatsapp_interactive_message(
+                        self.whatsapp_account,
+                        received_interactive_msg_values,
+                        '32499123456',
+                        additional_message_values=additional_message_values,
+                    )
+
+                # check interactive message reply posted in discuss channel
+                exp_msg_count += 1
+                exp_wa_msg_count += 1
+                self.assertWhatsAppDiscussChannel(
+                    '32499123456',
+                    msg_count=exp_msg_count,
+                    wa_msg_count=exp_wa_msg_count,
+                    wa_mail_message_values={
+                        'body': exp_interactive_msg_body,
+                    },
+                    wa_message_fields_values={
+                        'body': exp_interactive_msg_body,
                     },
                 )
 
@@ -300,7 +441,7 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
         )
         channel_message = self._new_msgs.filtered(lambda msg: msg.model == 'discuss.channel')
         self.assertEqual(len(channel_message.attachment_ids), 1)
-        self.assertEqual(channel_message.attachment_ids.datas, self.image_attachment_wa_admin.datas)
+        self.assertEqual(channel_message.attachment_ids.raw.content, self.image_attachment_wa_admin.raw.content)
         # Voice
         with self.mockWhatsappGateway(), self.mock_mail_app():
             self._wa_document_store['audio_doc_id'] = self.audio_attachment_wa_admin.raw
@@ -323,7 +464,7 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
         self.assertEqual(len(self._new_msgs), 1)
         attachment = self._new_msgs.attachment_ids
         self.assertEqual(len(attachment), 1)
-        self.assertEqual(attachment.datas, self.audio_attachment_wa_admin.datas)
+        self.assertEqual(attachment.raw.content, self.audio_attachment_wa_admin.raw.content)
         self.assertEqual(attachment.name, "audio.ogg")
         self.assertTrue(attachment.voice_ids)
 

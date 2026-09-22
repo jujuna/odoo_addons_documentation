@@ -70,10 +70,10 @@ class ResPartner(models.Model):
             if not partner.l10n_uk_reports_cis_verification_number:
                 partner.l10n_uk_reports_cis_deduction_rate = 'unmatched'
 
-    @api.depends('company_type', 'name', 'l10n_uk_cis_enabled')
+    @api.depends('is_company', 'name', 'l10n_uk_cis_enabled')
     def _compute_l10n_uk_cis_name_fields(self):
         for partner in self:
-            if partner.company_type not in 'person' or partner.l10n_uk_reports_cis_forename or partner.l10n_uk_reports_cis_surname\
+            if partner.is_company or partner.l10n_uk_reports_cis_forename or partner.l10n_uk_reports_cis_surname\
                 or not partner.name or not partner.l10n_uk_cis_enabled:
                 continue
 

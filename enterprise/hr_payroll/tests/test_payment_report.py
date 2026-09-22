@@ -1,15 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-import csv
-import io
-
 from datetime import date
-from odoo import Command, fields
+from odoo import Command
+from odoo.tests import tagged
+from odoo.exceptions import ValidationError
+
 from odoo.addons.hr_payroll.tests.common import TestPayslipBase
-from odoo.tools.misc import format_date
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHrPayslipPaymentReport(TestPayslipBase):
 
     @classmethod
@@ -17,12 +16,11 @@ class TestHrPayslipPaymentReport(TestPayslipBase):
         super().setUpClass()
 
         cls.partner_bank_account = cls.env['res.partner.bank'].create({
-            'acc_number': "9876543210",
+            'account_number': "9876543210",
             'partner_id': cls.richard_emp.work_contact_id.id,
-            'acc_type': 'bank',
             'allow_out_payment': True,
         })
-        cls.richard_emp.bank_account_ids = [Command.link(cls.partner_bank_account.id)]
+        cls.richard_emp.bank_account_ids = [Command.set([cls.partner_bank_account.id])]
         cls.payslip = cls.env['hr.payslip'].create({
             'name': 'Test Payslip',
             'employee_id': cls.richard_emp.id,
@@ -66,7 +64,85 @@ class TestHrPayslipPaymentReport(TestPayslipBase):
         self.assertFalse(self.payslip.payment_report_date, "Date should be cleared.")
         self.assertEqual(attachment_count, 0, "Attachment should be deleted after clearing.")
 
+    def test_generate_payslip_payment_report_with_include_unpaid_enabled(self):
+        """Test that the payslip payment report is generated with 'include_unpaid' enabled."""
+        self.payslip.compute_sheet()
+        self.payslip.action_payslip_done()
 
+        action = self.payslip.action_payslip_payment_report()
+        wizard = self.env['hr.payroll.payment.report.wizard'].with_context(
+            action['context']
+        ).create({'include_unpaid': True})
+        wizard.generate_payment_report()
+
+        self.assertEqual(wizard.unpaid_payslips, self.payslip)
+        self.assertTrue(self.payslip.payment_report)
+
+    def _create_extra_validated_payslip(self):
+        """A second validated payslip of the same version, outside the wizard's payslip_ids."""
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Test Payslip 2',
+            'employee_id': self.richard_emp.id,
+            'date_from': date(2025, 2, 1),
+            'date_to': date(2025, 2, 28),
+        })
+        payslip.compute_sheet()
+        payslip.action_payslip_done()
+        return payslip
+
+    def test_mark_as_paid_marks_every_payslip_of_the_report(self):
+        """Payslips added through 'include_unpaid' end up paid, not only the wizard's own ones."""
+        self.payslip.compute_sheet()
+        self.payslip.action_payslip_done()
+        other_payslip = self._create_extra_validated_payslip()
+
+        action = self.payslip.action_payslip_payment_report()
+        wizard = self.env['hr.payroll.payment.report.wizard'].with_context(
+            action['context']
+        ).create({'include_unpaid': True})
+
+        self.assertEqual(wizard.unpaid_payslips, self.payslip | other_payslip)
+
+        wizard.mark_as_paid()
+
+        self.assertEqual(self.payslip.state, 'paid')
+        self.assertEqual(other_payslip.state, 'paid', "The extra payslip of the report should be paid too.")
+
+    def test_mark_as_paid_without_include_unpaid_ignores_other_payslips(self):
+        """Without 'include_unpaid' only the wizard's own payslips are paid."""
+        self.payslip.compute_sheet()
+        self.payslip.action_payslip_done()
+        other_payslip = self._create_extra_validated_payslip()
+
+        action = self.payslip.action_payslip_payment_report()
+        wizard = self.env['hr.payroll.payment.report.wizard'].with_context(
+            action['context']
+        ).create({'include_unpaid': False})
+        wizard.mark_as_paid()
+
+        self.assertEqual(self.payslip.state, 'paid')
+        self.assertEqual(other_payslip.state, 'validated', "A payslip left out of the report should stay unpaid.")
+
+    def test_mark_as_paid_follows_the_unpaid_payslips_selection(self):
+        """The user can narrow down the selection, and only that selection is paid."""
+        self.payslip.compute_sheet()
+        self.payslip.action_payslip_done()
+        other_payslip = self._create_extra_validated_payslip()
+
+        action = self.payslip.action_payslip_payment_report()
+        wizard = self.env['hr.payroll.payment.report.wizard'].with_context(
+            action['context']
+        ).create({
+            'include_unpaid': True,
+            'unpaid_payslips': [Command.set(other_payslip.ids)],
+        })
+        wizard.mark_as_paid()
+
+        self.assertEqual(other_payslip.state, 'paid')
+        self.assertEqual(self.payslip.state, 'validated', "A payslip removed from the report should stay unpaid.")
+
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHrPayrunPaymentReport(TestHrPayslipPaymentReport):
 
     @classmethod
@@ -77,6 +153,7 @@ class TestHrPayrunPaymentReport(TestHrPayslipPaymentReport):
             'name': 'Test Batch',
             'date_start': date(2025, 1, 1),
             'date_end': date(2025, 1, 31),
+            'structure_id': cls.developer_pay_structure.id,
         })
         cls.payslip.payslip_run_id = cls.payslip_run
 
@@ -89,7 +166,7 @@ class TestHrPayrunPaymentReport(TestHrPayslipPaymentReport):
             'payslip_run_id': self.payslip.payslip_run_id.id,
             'export_format': 'csv',
         })
-        wizard.generate_payment_report()
+        wizard.mark_as_paid()
 
         attachment_count = self.env['ir.attachment'].search_count([
             ('res_model', '=', 'hr.payslip.run'),
@@ -103,90 +180,6 @@ class TestHrPayrunPaymentReport(TestHrPayslipPaymentReport):
         self.assertTrue(self.payslip_run.payment_report_date)
         self.assertEqual(attachment_count, 1, "Payrun report attachment should exist before clearing.")
 
-        self.payslip_run.action_draft()
-        self.env.cr.flush()
-
-        attachment_count = self.env['ir.attachment'].search_count([
-            ('res_model', '=', 'hr.payslip.run'),
-            ('res_id', '=', self.payslip_run.id),
-            ('res_field', '=', 'payment_report'),
-        ])
-
-        self.assertFalse(self.payslip_run.payment_report, "Payrun payment report should be cleared.")
-        self.assertFalse(self.payslip_run.payment_report_filename, "Payment report filename should be cleared.")
-        self.assertFalse(self.payslip_run.payment_report_format, "Payment report file format should be cleared")
-        self.assertFalse(self.payslip_run.payment_report_date, "Payment report date should be cleared.")
-        self.assertEqual(attachment_count, 0, "Payrun report attachment should be deleted after clearing.")
-
-    def test_payrun_payment_report_with_multiple_payslips(self):
-        self.payslip.compute_sheet()
-        self.payslip.action_payslip_done()
-
-        test_structure = self.env['hr.payroll.structure'].create({
-            'name': 'Test Salary Structure',
-            'type_id': self.structure_type.id,
-        })
-
-        net_salary_rule = test_structure.rule_ids.filtered(lambda r: r.code == "NET")
-        net_salary_rule.write({
-            'amount_select': 'fix',
-            'amount_fix': 0.0,
-
-        })
-
-        self.env['hr.payslip'].create({
-            'name': 'Test Payslip with 0.0 net salary',
-            'employee_id': self.richard_emp.id,
-            'date_from': date(2025, 1, 1),
-            'date_to': date(2025, 1, 31),
-            'payslip_run_id': self.payslip_run.id,
-            'struct_id': test_structure.id,
-        })
-
-        self.payslip_run.action_confirm()
-        self.payslip_run.action_validate()
-
-        wizard = self.env['hr.payroll.payment.report.wizard'].create({
-            'payslip_ids': self.payslip_run.slip_ids.ids,
-            'payslip_run_id': self.payslip_run.id,
-            'export_format': 'csv',
-        })
-        wizard.generate_payment_report()
-
-        attachment_count = self.env['ir.attachment'].search_count([
-            ('res_model', '=', 'hr.payslip.run'),
-            ('res_id', '=', self.payslip_run.id),
-            ('res_field', '=', 'payment_report'),
-        ])
-
-        self.assertTrue(self.payslip_run.payment_report, "Payrun payment report should be set.")
-        self.assertTrue(self.payslip_run.payment_report_filename)
-        self.assertTrue(self.payslip_run.payment_report_format)
-        self.assertTrue(self.payslip_run.payment_report_date)
-        self.assertEqual(attachment_count, 1, "Payrun report attachment should exist.")
-
-        csv_data = base64.b64decode(self.payslip_run.payment_report)
-        content = csv_data.decode('utf-8')
-        reader = csv.reader(io.StringIO(content), delimiter=',')
-
-        expected_values = [
-            # Header row
-            [
-                'Sequence', 'Payment Date', 'Report Date', 'Payslip Period',
-                'Employee name', 'Bank account', 'BIC', 'Amount to pay'
-            ],
-            # First data row
-            [
-                '1',
-                format_date(wizard.env, wizard.effective_date),
-                format_date(wizard.env, fields.Date.today()),
-                format_date(wizard.env, self.payslip.date_from) + ' - ' + format_date(wizard.env, self.payslip.date_to),
-                'Richard',
-                '9876543210',
-                '',
-                '$ 7,205.42',
-            ],
-        ]
-
-        for idx, content in enumerate(reader):
-            self.assertSequenceEqual(expected_values[idx], content)
+        #  Because the payslips are marked as "paid" upon report generation.So, payrun cannot be set to draft
+        with self.assertRaises(ValidationError):
+            self.payslip_run.action_draft()

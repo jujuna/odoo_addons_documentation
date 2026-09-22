@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Website Generator',
-    'version': '1.0.0',
     'category': 'Website/Website',
     'summary': 'Import a pre-existing website',
     'description': """
@@ -9,21 +8,23 @@
     """,
     'depends': ['website', 'website_enterprise'],
     'data': [
-        'security/ir.model.access.csv',
-        'cron/cron.xml',
+        'data/cron.xml',
         'views/website_generator_views.xml',
+        'views/res_config_settings_views.xml',
         'data/mail_template.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [
-            'website_generator/static/src/client_actions/*/*',
-            'website_generator/static/src/systray_items/*',
+            'website_generator/static/src/client_actions/configurator/*',
+            'website_generator/static/src/client_actions/generator_wait/*',
+            'website_generator/static/src/client_actions/import_form/*',
         ],
         'website.website_builder_assets': [
             'website_generator/static/src/builder/**/*',
         ],
     },
-    'installable': True,
+    'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

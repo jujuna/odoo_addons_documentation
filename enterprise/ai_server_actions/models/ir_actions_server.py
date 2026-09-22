@@ -7,6 +7,7 @@ from odoo.tools import _
 
 class IrActionsServer(models.Model):
     _inherit = "ir.actions.server"
+    _explanation = "AI extensions for server actions, adding the capability to update record fields using AI-generated content based on a specified prompt."
 
     evaluation_type = fields.Selection(
         selection_add=[("ai_computed", "Update with AI")],

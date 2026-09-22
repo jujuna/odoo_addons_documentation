@@ -7,5 +7,6 @@ export const signKanbanView = {
     ...kanbanView,
     Controller: SignKanbanController,
     Renderer: SignKanbanRenderer,
+    buttonTemplate: "sign.SignViews.buttons",
 };
 registry.category("views").add("sign_kanban", signKanbanView);

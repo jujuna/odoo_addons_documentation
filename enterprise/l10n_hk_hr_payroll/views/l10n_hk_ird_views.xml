@@ -6,6 +6,15 @@
         <field name="inherit_id" ref="hr_payroll.hr_payroll_declaration_mixin_view_form"/>
         <field name="mode">primary</field>
         <field name="arch" type="xml">
+            <!-- Avoid showing the populate button for adjustment-only reports, as these won't concern most employees. -->
+            <button name="action_generate_declarations" class="btn-primary" position="attributes">
+                <attribute name="options">{'reload_on_button': true}</attribute>
+                <attribute name="invisible" separator=" or " add="type_of_form == 'ARS'"/>
+            </button>
+            <button name="action_generate_declarations" class="btn-secondary" position="attributes">
+                <attribute name="options">{'reload_on_button': true}</attribute>
+                <attribute name="invisible" separator=" or " add="type_of_form == 'ARS'"/>
+            </button>
             <group name="first_group" position="replace">
                 <group name="first_group">
                     <group name="group_start">
@@ -14,29 +23,19 @@
                     </group>
                 </group>
                 <group string="Extra" name="extra_group">
-                    <field name="type_of_form" />
+                    <field name="type_of_form" invisible="not separate_original_from_adjustments" required="separate_original_from_adjustments"/>
                     <field name="submission_date" />
-                    <field name="year_of_employer_return" placeholder="YYYY" required="type_of_form == 'O'"/>
+                    <field name="year_of_employer_return" placeholder="YYYY" required="type_of_form == 'O'" invisible="type_of_form != 'O'"/>
                     <field name="name_of_signer" />
                     <field name="designation_of_signer" />
                 </group>
-                <div name="div_xml" class="mt-3" invisible="state not in ['waiting', 'done']">
-                    <h2>Generation Complete</h2>
-                    <p invisible="not xml_file" class="oe_inline">
-                        Download the <p name="xml_name"/> XML file: <field name="xml_file" readonly="1" filename="xml_filename"/>
-                        <field name="xml_validation_state" class="ms-2 mb-0" widget="state_selection" nolabel="1"/>
-                        <field name="error_message" invisible="xml_validation_state != 'invalid'" nolabel="1"/>
-                    </p>
-                </div>
-                <div class="mt-3" invisible="not pdf_error" >
-                    <p class="oe_inline">
-                        <field name="pdf_error" readonly="1" nolabel="1"/>
-                    </p>
-                </div>
             </group>
             <p name="save_warning" position="attributes">
                 <attribute name="invisible">state != 'done'</attribute>
             </p>
+            <sheet position="after">
+                <chatter reload_on_post="True"/>
+            </sheet>
         </field>
     </record>
 

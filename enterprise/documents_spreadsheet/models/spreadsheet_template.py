@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
 
 class SpreadsheetTemplate(models.Model):
@@ -12,18 +12,12 @@ class SpreadsheetTemplate(models.Model):
     name = fields.Char(required=True, translate=True)
     sequence = fields.Integer(default=100)
     file_name = fields.Char(compute="_compute_file_name")
+    group_ids = fields.Many2many('res.groups', string="Access Groups", default=lambda self: self.env.ref('base.group_user'))
 
     @api.depends("name")
     def _compute_file_name(self):
         for template in self:
             template.file_name = f"{template.name}.osheet.json"
-
-    def copy_data(self, default=None):
-        default = dict(default or {})
-        vals_list = super().copy_data(default=default)
-        for template, vals in zip(self, vals_list):
-            vals['name'] = default.get("name", _("%s (copy)", template.name))
-        return vals_list
 
     def action_edit_template(self):
         self.ensure_one()

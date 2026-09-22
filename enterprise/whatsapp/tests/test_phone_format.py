@@ -9,6 +9,7 @@ from odoo.tests import tagged
 
 
 @tagged('phone_validation')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class PhoneFormat(WhatsAppCommon):
 
     def test_phone_format(self):

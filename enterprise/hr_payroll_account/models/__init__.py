@@ -12,5 +12,5 @@ from . import hr_version
 from . import hr_payroll_structure
 from . import res_company
 from . import res_config_settings
-from . import res_partner_bank
 from . import account_move_line
+from . import hr_payroll_warning

@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 19:03+0000\n"
-"PO-Revision-Date: 2026-01-30 19:03+0000\n"
+"POT-Creation-Date: 2026-09-18 18:16+0000\n"
+"PO-Revision-Date: 2026-09-18 18:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,59 @@ msgid ""
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model:ir.module.module,description:base.module_l10n_cl_edi
+msgid ""
+"\n"
+"EDI Chilean Localization\n"
+"========================\n"
+"This module facilitates the generation of DTE (Electronic Taxable Document) for Chilean invoicing. Key features include:\n"
+"- DTE Format in XML: The document is structured in XML format for standardized electronic transactions.\n"
+"- Direct Communication with SII: Enables direct interaction with the Servicio de Impuestos Internos (SII) to send invoices and other tax documents related to sales.\n"
+"- Customer Communication: Sends sales DTEs to customers.\n"
+"- Supplier Communication: Accepts DTEs from suppliers (vendors).\n"
+"- SII Notifications: Informs SII about the acceptance or rejection of vendor bills or other DTEs.\n"
+"\n"
+"Note: To display barcodes on invoices, the `pdf417gen` library is required.\n"
+"\n"
+"Electronic Receipts Compliance\n"
+"==============================\n"
+"\n"
+"As per SII requirements, starting March 2021, all boletas transactions must be sent to SII using a different web service than the one used for electronic invoices. Previously, only a daily report was required.\n"
+"\n"
+"Recent Changes\n"
+"==============\n"
+"\n"
+"- Elimination of Daily Sales Book Requirement: As of August 1st, 2022, the daily sales book (\"Libro de ventas diarias\") is no longer required by the authorities and has been removed from this version of Odoo.\n"
+"\n"
+"Differences between Electronic Boletas and Electronic Invoicing Workflows\n"
+"=========================================================================\n"
+"\n"
+"1. Dedicated Servers for Boletas:\n"
+"- Production environment: `palena.sii.cl`\n"
+"- Test environment: `maullin.sii.cl`\n"
+"\n"
+"2. Different Authentication and Status Services:\n"
+"- Authentication services and methods for querying delivery and document status differ between electronic boletas and electronic invoices.\n"
+"\n"
+"3. Authentication Token:\n"
+"- The process for obtaining authentication tokens varies.\n"
+"\n"
+"4. Updated XML Schema:\n"
+"- New tags have been incorporated into the XML schema for electronic boletas.\n"
+"\n"
+"5. Validation Diagnosis:\n"
+"- Electronic boletas receive validation diagnoses through a REST web service using the delivery track-id.\n"
+"- Electronic invoices continue to receive diagnoses via email.\n"
+"\n"
+"6. Track-ID Length:\n"
+"- Electronic boletas: 15 digits\n"
+"- Electronic invoices: 10 digits\n"
+"\n"
+"For detailed guidance, refer to the [SII Guide](https://www.sii.cl/factura_electronica/factura_mercado/Instructivo_Emision_Boleta_Elect.pdf).\n"
+"\n"
+msgstr ""
+
+#. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
 msgid " -- Response simulated in Demo Mode"
@@ -40,18 +93,41 @@ msgstr ""
 #. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
+msgid ""
+"%(type1)s not found: You can generate this %(type2)s manually with the "
+"following information:"
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/account_move.py:0
 msgid "%s COPY"
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/account_move.py:0
+msgid ""
+"%s cannot be imported because the company's VAT does not match either "
+"RutEmisor or RutReceptor."
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/account_move.py:0
+msgid "%s should be imported into a purchase journal."
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/account_move.py:0
+msgid "%s should be imported into a sales journal."
 msgstr ""
 
 #. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/l10n_cl_edi_util.py:0
 msgid "- It was not possible to get a response after %s retries."
-msgstr ""
-
-#. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.dte_subtemplate
-msgid "01"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -72,11 +148,6 @@ msgid "1. Cancels Referenced Document"
 msgstr ""
 
 #. module: l10n_cl_edi
-#: model:ir.actions.server,name:l10n_cl_edi.ir_cron_send_send_ir_actions_server
-msgid "1. Cron Job - Send document to SII"
-msgstr ""
-
-#. module: l10n_cl_edi
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__account_payment_term__l10n_cl_sii_code__1
 msgid "1: Cash payment"
 msgstr ""
@@ -86,11 +157,6 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__account_move_reversal__l10n_cl_edi_reference_doc_code__2
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__l10n_cl_edi_reference__reference_doc_code__2
 msgid "2. Corrects Referenced Document Text"
-msgstr ""
-
-#. module: l10n_cl_edi
-#: model:ir.actions.server,name:l10n_cl_edi.ir_cron_sii_request_ir_actions_server
-msgid "2. Cron Job - General Jobs with SII and electronic invoicing for Chile"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -302,8 +368,8 @@ msgid "Accepted with objections"
 msgstr ""
 
 #. module: l10n_cl_edi
-#: model:ir.model,name:l10n_cl_edi.model_account_move_reversal
-msgid "Account Move Reversal"
+#: model:ir.model,name:l10n_cl_edi.model_account_chart_template
+msgid "Account Chart Template"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -481,11 +547,6 @@ msgid "CAFs"
 msgstr ""
 
 #. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.barcode_stamp_footer
-msgid "CEDIBLE"
-msgstr ""
-
-#. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/l10n_cl_dte_caf.py:0
 msgid ""
@@ -552,6 +613,11 @@ msgstr ""
 #. module: l10n_cl_edi
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__res_company__l10n_cl_sii_regional_office__ur_chn
 msgid "Chañaral"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model:ir.module.module,shortdesc:base.module_l10n_cl_edi
+msgid "Chile - E-invoicing"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -636,6 +702,15 @@ msgid "Cochrane"
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model:ir.model.fields,help:l10n_cl_edi.field_res_company__l10n_cl_internal_identifier
+#: model:ir.model.fields,help:l10n_cl_edi.field_res_config_settings__l10n_cl_internal_identifier
+msgid ""
+"Code your trading partners put in the SII 'CdgIntRecep' field (field 51, "
+"max. 20 characters) to identify this branch. Incoming documents are routed "
+"to the branch whose identifier matches it."
+msgstr ""
+
+#. module: l10n_cl_edi
 #: model:mail.template,subject:l10n_cl_edi.email_template_receipt_commercial_accept
 msgid "Commercial Acceptance Response - {{ object.name }}"
 msgstr ""
@@ -647,10 +722,6 @@ msgstr ""
 
 #. module: l10n_cl_edi
 #: model:ir.model,name:l10n_cl_edi.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: l10n_cl_edi
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_l10n_cl_dte_caf__company_id
 msgid "Company"
 msgstr ""
@@ -664,6 +735,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
 msgid "Company Not Authorized to Send Files"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model:ir.model.fields,help:l10n_cl_edi.field_l10n_cl_dte_caf__company_id
+msgid ""
+"Company drawing folios from this CAF, together with the branches under it "
+"sharing its RUT. Set it on the parent to share the range with the whole "
+"group, on a branch to reserve it."
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -752,6 +831,11 @@ msgid "Created on"
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model:ir.actions.server,name:l10n_cl_edi.ir_cron_sii_request_ir_actions_server
+msgid "Cron Job - General Jobs with SII and electronic invoicing for Chile"
+msgstr ""
+
+#. module: l10n_cl_edi
 #: model:ir.model,name:l10n_cl_edi.model_l10n_cl_edi_reference
 msgid "Cross Reference Docs for Chilean Electronic Invoicing"
 msgstr ""
@@ -767,8 +851,8 @@ msgid "Curicó"
 msgstr ""
 
 #. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.barcode_stamp_footer
-msgid "DATE:"
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.dte_subtemplate
+msgid "D"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -803,6 +887,11 @@ msgstr ""
 #. module: l10n_cl_edi
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi.ack_template
 msgid "DTE Has been Successfully Received"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model:ir.model.fields.selection,name:l10n_cl_edi.selection__account_move__l10n_cl_claim__pag
+msgid "DTE Paid with Cash"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -896,10 +985,12 @@ msgid "Delivery Received According"
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model:ir.model.fields,field_description:l10n_cl_edi.field_account_chart_template__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_debit_note__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_journal__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_move__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_move_reversal__display_name
+#: model:ir.model.fields,field_description:l10n_cl_edi.field_account_move_send__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_payment_term__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_certificate_certificate__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_fetchmail_server__display_name
@@ -966,6 +1057,14 @@ msgid "Economical Activities Information"
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.cedible_block
+msgid ""
+"El acuse de recibo que se declara en este acto, de acuerdo a lo dispuesto en la \n"
+"                            letra b) del Art.4° y la letra c) del Art.5° de la Ley 19.983, acredita que la \n"
+"                            entrega de mercadería(s) o servicio(s) prestado(s) ha(n) sido recibido(s)."
+msgstr ""
+
+#. module: l10n_cl_edi
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi.view_invoice_form
 msgid "Electronic Invoice"
 msgstr ""
@@ -989,6 +1088,12 @@ msgstr ""
 #. module: l10n_cl_edi
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi.res_config_settings_view_cl_form
 msgid "Email Box Electronic Invoicing"
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/l10n_cl_edi_util.py:0
+msgid "Empty response when checking DTE status."
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -1020,6 +1125,16 @@ msgid "Exception error parsing the response: %s"
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.cedible_block
+msgid "FECHA:"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.cedible_block
+msgid "FIRMA:"
+msgstr ""
+
+#. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
 msgid ""
@@ -1039,6 +1154,15 @@ msgid "File Size Error (Too Big or Too Small)"
 msgstr ""
 
 #. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/l10n_latam_document_type.py:0
+msgid ""
+"Folio %(folio)s is in none of the CAF ranges %(company)s still has for "
+"%(document_type)s. Please upload its next CAF file or ask for a new one at "
+"www.sii.cl website."
+msgstr ""
+
+#. module: l10n_cl_edi
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_res_config_settings__l10n_cl_activity_description
 msgid "Glosa Giro"
 msgstr ""
@@ -1051,10 +1175,12 @@ msgid ""
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model:ir.model.fields,field_description:l10n_cl_edi.field_account_chart_template__id
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_debit_note__id
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_journal__id
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_move__id
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_move_reversal__id
+#: model:ir.model.fields,field_description:l10n_cl_edi.field_account_move_send__id
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_account_payment_term__id
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_certificate_certificate__id
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_fetchmail_server__id
@@ -1143,6 +1269,13 @@ msgid "Internal Error"
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model:ir.model.fields,field_description:l10n_cl_edi.field_res_company__l10n_cl_internal_identifier
+#: model:ir.model.fields,field_description:l10n_cl_edi.field_res_config_settings__l10n_cl_internal_identifier
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.res_config_settings_view_cl_form
+msgid "Internal Identifier"
+msgstr ""
+
+#. module: l10n_cl_edi
 #: model:ir.model.fields,field_description:l10n_cl_edi.field_l10n_cl_edi_reference__l10n_cl_reference_doc_internal_type
 msgid "Internal Type"
 msgstr ""
@@ -1214,6 +1347,11 @@ msgstr ""
 #. module: l10n_cl_edi
 #: model:ir.model,name:l10n_cl_edi.model_account_move
 msgid "Journal Entry"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model:ir.model,name:l10n_cl_edi.model_account_move_reversal
+msgid "Journal Entry Reversal"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -1327,6 +1465,17 @@ msgid "Melipilla"
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model:ir.model.fields.selection,name:l10n_cl_edi.selection__account_move__l10n_cl_claim__eri
+msgid "Merchandise and Service Receipt Acknowledge Printed in Previous Month"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model:ir.model.fields.selection,name:l10n_cl_edi.selection__account_move__l10n_cl_claim__erg
+msgid ""
+"Merchandise and Service Receipt Acknowledge in Delivery Guide Previous Month"
+msgstr ""
+
+#. module: l10n_cl_edi
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__l10n_cl_company_activities__tax_category__nd
 msgid "ND"
 msgstr ""
@@ -1335,11 +1484,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
 msgid "Name"
-msgstr ""
-
-#. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.barcode_stamp_footer
-msgid "Name:"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -1358,6 +1502,16 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/l10n_cl_edi_util.py:0
 msgid "No response trying to get a token"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.cedible_block
+msgid "Nombre:"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model:product.template,name:l10n_cl_edi.product_product_non_billable_amounts_product_template
+msgid "Non-Billable Amounts"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -1516,11 +1670,6 @@ msgid "Porvenir"
 msgstr ""
 
 #. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.barcode_stamp_footer
-msgid "Premises:"
-msgstr ""
-
-#. module: l10n_cl_edi
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__account_move__l10n_cl_claim__erm
 msgid "Provide Receipt of Merchandise or Services"
 msgstr ""
@@ -1563,7 +1712,7 @@ msgid "RUT validation error"
 msgstr ""
 
 #. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.barcode_stamp_footer
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.cedible_block
 msgid "RUT:"
 msgstr ""
 
@@ -1607,6 +1756,16 @@ msgstr ""
 #. module: l10n_cl_edi
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__account_move__l10n_cl_claim__nca
 msgid "Reception of Cancellation that References Document"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model:ir.model.fields.selection,name:l10n_cl_edi.selection__account_move__l10n_cl_claim__enc
+msgid "Reception of Credit note different to Cancellation"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.cedible_block
+msgid "Recinto:"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -1841,6 +2000,18 @@ msgstr ""
 
 #. module: l10n_cl_edi
 #. odoo-python
+#: code:addons/l10n_cl_edi/models/account_move_send.py:0
+msgid "Send the e-invoice data to SII."
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/account_move_send.py:0
+msgid "Send to SII"
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
 msgid "Sender Does Not Have Permission To Send"
 msgstr ""
@@ -1865,13 +2036,13 @@ msgid "Sent"
 msgstr ""
 
 #. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.res_config_settings_view_cl_form
-msgid "Signature Certificates"
+#: model:ir.model,name:l10n_cl_edi.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
 msgstr ""
 
 #. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.barcode_stamp_footer
-msgid "Signature:"
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.res_config_settings_view_cl_form
+msgid "Signature Certificates"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -1944,6 +2115,11 @@ msgid "TAX Category"
 msgstr ""
 
 #. module: l10n_cl_edi
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.cedible_block
+msgid "TRANSFERABLE"
+msgstr ""
+
+#. module: l10n_cl_edi
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__res_company__l10n_cl_sii_regional_office__ur_tat
 msgid "Tal-Tal"
 msgstr ""
@@ -2002,14 +2178,6 @@ msgid ""
 msgstr ""
 
 #. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.barcode_stamp_footer
-msgid ""
-"The acknowledgement of receipt declared in this act, in accordance with the\n"
-"                                    provisions of Art. 4 letter b) and Art. 5 letter c) of Law 19.983, certifies\n"
-"                                    that the delivery of goods or service(s) rendered has/have been received."
-msgstr ""
-
-#. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
 msgid "The document type %s is not a vendor bill."
@@ -2019,6 +2187,22 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/account_move.py:0
 msgid "The document type with code %(code)s cannot be %(status)s"
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/account_move.py:0
+msgid ""
+"The maximum amount of Activities Names is 4. Please go to your company and "
+"select only 4 or less options."
+msgstr ""
+
+#. module: l10n_cl_edi
+#. odoo-python
+#: code:addons/l10n_cl_edi/models/res_company.py:0
+msgid ""
+"The maximum amount of Activities Names is 4. Please select only 4 or less "
+"options."
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -2077,7 +2261,7 @@ msgstr ""
 msgid ""
 "There are no CAFs available for folio %(folio)s in the sequence of "
 "%(document_type)s. Please upload a CAF file or ask for a new one at "
-"www.sii.cl website"
+"www.sii.cl website."
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -2124,7 +2308,7 @@ msgstr ""
 #. module: l10n_cl_edi
 #. odoo-python
 #: code:addons/l10n_cl_edi/models/res_company.py:0
-msgid "There is not a valid certificate for the company: %s"
+msgid "There is not a valid certificate for the company: %(company_name)s"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -2203,6 +2387,14 @@ msgid ""
 "This alias will be used as sender in the outgoing emails when you send "
 "invoices attached to your customers and with invoice acknowledge / "
 "acceptation or claim sent to your vendors."
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.view_company_l10n_cl_edi_form
+msgid ""
+"This company declares a RUT of its own, so the SII sees it as a taxpayer apart from its parent: it issues\n"
+"                        its documents under that RUT and needs its own CAF files and digital certificate. Leave the Tax ID empty\n"
+"                        for a branch trading under the RUT of its parent company."
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -2357,14 +2549,6 @@ msgid "Valparaíso"
 msgstr ""
 
 #. module: l10n_cl_edi
-#. odoo-python
-#: code:addons/l10n_cl_edi/models/account_move.py:0
-msgid ""
-"Vendor not found: You can generate this vendor manually with the following "
-"information:"
-msgstr ""
-
-#. module: l10n_cl_edi
 #: model:ir.model.fields.selection,name:l10n_cl_edi.selection__res_company__l10n_cl_sii_regional_office__ur_vic
 msgid "Victoria"
 msgstr ""
@@ -2395,6 +2579,11 @@ msgstr ""
 #: code:addons/l10n_cl_edi/models/account_move.py:0
 #: code:addons/l10n_cl_edi/wizard/account_move_debit.py:0
 msgid "Where it says: %(original_text)s should say: %(corrected_text)s"
+msgstr ""
+
+#. module: l10n_cl_edi
+#: model:ir.model.fields.selection,name:l10n_cl_edi.selection__account_move__l10n_cl_claim__ced
+msgid "Yielded DTE"
 msgstr ""
 
 #. module: l10n_cl_edi
@@ -2500,11 +2689,6 @@ msgstr ""
 #. module: l10n_cl_edi
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi.invoice_status_form_cl
 msgid "⇒ Reprocess Acknowledge"
-msgstr ""
-
-#. module: l10n_cl_edi
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi.invoice_status_form_cl
-msgid "⇒ Send Now to SII"
 msgstr ""
 
 #. module: l10n_cl_edi

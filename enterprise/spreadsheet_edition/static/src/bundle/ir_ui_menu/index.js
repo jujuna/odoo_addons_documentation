@@ -1,15 +1,9 @@
-import { _t } from "@web/core/l10n/translation";
 import * as spreadsheet from "@odoo/o-spreadsheet";
 import { initCallbackRegistry } from "@spreadsheet/o_spreadsheet/init_callbacks";
-import {
-    buildIrMenuIdLink,
-    buildViewLink,
-    buildIrMenuXmlLink,
-} from "@spreadsheet/ir_ui_menu/odoo_menu_link_cell";
-import { IrMenuSelectorDialog } from "@spreadsheet_edition/bundle/ir_menu_selector/ir_menu_selector";
+import { buildViewLink } from "@spreadsheet/ir_ui_menu/odoo_menu_link_cell";
 
 const { markdownLink } = spreadsheet.links;
-const { linkMenuRegistry } = spreadsheet.registries;
+const { UuidGenerator } = spreadsheet.helpers;
 
 /**
  * Helper to get the function to be called when the spreadsheet is opened
@@ -20,11 +14,12 @@ const { linkMenuRegistry } = spreadsheet.registries;
 function insertLink(actionToLink) {
     return (model) => {
         if (!this.isEmptySpreadsheet) {
-            const sheetId = model.uuidGenerator.smallUuid();
+            const sheetId = UuidGenerator.smallUuid();
             const sheetIdFrom = model.getters.getActiveSheetId();
             model.dispatch("CREATE_SHEET", {
                 sheetId,
                 position: model.getters.getSheetIds().length,
+                name: model.getters.getNextSheetName(),
             });
             model.dispatch("ACTIVATE_SHEET", { sheetIdFrom, sheetIdTo: sheetId });
         }
@@ -39,21 +34,3 @@ function insertLink(actionToLink) {
 }
 
 initCallbackRegistry.add("insertLink", insertLink);
-
-linkMenuRegistry.add("odooMenu", {
-    name: _t("Link an Odoo menu"),
-    sequence: 20,
-    execute: async (env) =>
-        new Promise((resolve) => {
-            const closeDialog = env.services.dialog.add(IrMenuSelectorDialog, {
-                onMenuSelected: (menuId) => {
-                    closeDialog();
-                    const menu = env.services.menu.getMenu(menuId);
-                    const xmlId = menu && menu.xmlid;
-                    const url = xmlId ? buildIrMenuXmlLink(xmlId) : buildIrMenuIdLink(menuId);
-                    const label = menu.name;
-                    resolve(markdownLink(label, url));
-                },
-            });
-        }),
-});

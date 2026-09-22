@@ -72,7 +72,7 @@ class L10nChLocationUnit(models.Model):
 
     @api.depends("partner_id.zip")
     def _compute_autocomplete_canton_municipality(self):
-        ZIP_DATA = self.env['hr.rule.parameter']._get_parameter_from_code("l10n_ch_bfs_municipalities", fields.Date.today(), raise_if_not_found=False)
+        ZIP_DATA = self.env['hr.rule.parameter']._get_parameter_from_code("l10n_ch_bfs_municipalities", fields.Date.context_today(self), raise_if_not_found=False)
         if ZIP_DATA:
             for record in self:
                 if record.partner_id.zip:

@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import _, api, models
-import base64
+from odoo.tools import BinaryBytes
 
 
 class AccountMoveSend(models.AbstractModel):
@@ -18,8 +18,12 @@ class AccountMoveSend(models.AbstractModel):
     def _get_all_extra_edis(self) -> dict:
         # EXTENDS 'account'
         res = super()._get_all_extra_edis()
-        res.update({'it_edi_send': {'label': _("Send to Tax Agency"), 'is_applicable': self._is_it_edi_applicable, 'help': _("Send the e-invoice XML to the Italian Tax Agency.")}})
+        res.update({'it_edi_send': {'label': _("Send to SDI"), 'is_applicable': self._is_it_edi_applicable, 'help': _("Send the e-invoice XML to the Italian Tax Agency.")}})
         return res
+
+    @api.model
+    def _display_attachments_widget(self, edi_format, sending_methods):
+        return 'it_edi_send' in sending_methods or super()._display_attachments_widget(edi_format, sending_methods)
 
     # -------------------------------------------------------------------------
     # ALERTS
@@ -28,7 +32,7 @@ class AccountMoveSend(models.AbstractModel):
     def _get_alerts(self, moves, moves_data):
         # EXTENDS 'account'
         alerts = super()._get_alerts(moves, moves_data)
-        if it_moves := moves.filtered(lambda m: 'it_edi_send' in moves_data[m]['extra_edis'] or moves_data[m]['invoice_edi_format'] == 'it_edi_xml'):
+        if it_moves := moves.filtered(lambda m: 'it_edi_send' in moves_data[m]['extra_edis']):
             if it_alerts := it_moves._l10n_it_edi_export_data_check():
                 alerts.update(**it_alerts)
 
@@ -83,8 +87,11 @@ class AccountMoveSend(models.AbstractModel):
                 or (invoice_data['invoice_edi_format'] == 'it_edi_xml' and invoice._l10n_it_edi_ready_for_xml_export())
             )
         ):
+            pdf_values = invoice_data['pdf_attachment_values']
             invoice_data['l10n_it_edi_values'] = invoice._l10n_it_edi_get_attachment_values(
-                pdf_values=invoice_data['pdf_attachment_values'])
+                pdf_values=pdf_values,
+                extra_attachments=[attachment for attachment in invoice_data.get('mail_attachments_widget', []) if attachment.get('manual')],
+            )
 
     def _call_web_service_after_invoice_pdf_render(self, invoices_data):
         # EXTENDS 'account'
@@ -102,7 +109,7 @@ class AccountMoveSend(models.AbstractModel):
         # Prepare attachment data
         for move, move_data in moves_data.items():
             if attachment := move.l10n_it_edi_attachment_file:
-                attachments_vals[move] = {'name': move.l10n_it_edi_attachment_name, 'raw': base64.b64decode(attachment)}
+                attachments_vals[move] = {'name': move.l10n_it_edi_attachment_name, 'raw': attachment.content}
                 moves |= move
             elif edi_values := move_data.get('l10n_it_edi_values'):
                 attachments_vals[move] = edi_values
@@ -119,7 +126,7 @@ class AccountMoveSend(models.AbstractModel):
                 attachment_name = attachment['name']
             attachment_data = results.get(attachment_name, {})
             if attachment_data.get('signed') and (signed_data := attachment_data.get('signed_data')):
-                attachment['raw'] = signed_data.encode()
+                move.l10n_it_edi_attachment_file = BinaryBytes(signed_data.encode())
                 # Show that those moves couldn't be sent
             if 'error_message' in attachment_data:
                 moves_data[move]['error'] = {'error_title': attachment_data['error_message']}
@@ -131,7 +138,7 @@ class AccountMoveSend(models.AbstractModel):
         move_ids_to_names = {}
         for move, data in invoices_data.items():
             if values := data.get('l10n_it_edi_values'):
-                move.l10n_it_edi_attachment_file = base64.b64encode(values['raw'])
+                move.l10n_it_edi_attachment_file = BinaryBytes(values['raw'])
                 move.l10n_it_edi_attachment_name = values['name']
                 move.invalidate_recordset(fnames=['l10n_it_edi_attachment_name', 'l10n_it_edi_attachment_file'])
                 move_ids_to_names[move.id] = values['name']

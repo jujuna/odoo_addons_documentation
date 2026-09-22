@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-import pytz
+import datetime
+from zoneinfo import ZoneInfo
 
 from babel.dates import format_datetime
 from werkzeug.exceptions import NotFound
@@ -48,7 +48,7 @@ class AppointmentAccountPayment(AppointmentController):
         timezone = (request.session.get('timezone') or
                     request.env.context.get('tz') or
                     booking_sudo.appointment_type_id.appointment_tz)
-        start_tz = fields.Datetime.from_string(booking_sudo.start).replace(tzinfo=pytz.utc).astimezone(pytz.timezone(timezone))
+        start_tz = fields.Datetime.from_string(booking_sudo.start).replace(tzinfo=datetime.UTC).astimezone(ZoneInfo(timezone))
         locale = get_lang(request.env).code
         start_dt = f"{format_datetime(start_tz, 'EEE', locale=locale)} {format_datetime(start_tz, locale=locale)}"
 
@@ -70,10 +70,7 @@ class AppointmentAccountPayment(AppointmentController):
             instead of creating an calendar.event. This prevents synchronizing calendars with non-confirmed events. It will
             be transformed to a calendar.event on payment (or confirmation). See _make_event_from_paid_booking on calendar.booking.
             Redirects to payment if needed. See _redirect_to_payment"""
-        if appointment_type.has_payment_step and (
-            appointment_type.product_id.service_tracking in ['task_in_project', 'project_only', 'task_global_project']
-            or appointment_type.product_id.lst_price
-        ):
+        if appointment_type.has_payment_step and appointment_type.product_id.lst_price:
             calendar_booking = request.env['calendar.booking'].sudo().create([{
                 'allday': bool(allday),
                 'appointment_answer_input_ids': [Command.create(vals) for vals in answer_input_values],

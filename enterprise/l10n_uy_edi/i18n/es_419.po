@@ -3,21 +3,22 @@
 # * l10n_uy_edi
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:10+0000\n"
-"PO-Revision-Date: 2025-11-18 17:13+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-09-11 18:15+0000\n"
+"PO-Revision-Date: 2026-09-18 05:07+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19-l10n/l10n_uy_edi/es_419/>\n"
+"odoo-master/l10n_uy_edi/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -33,6 +34,79 @@ msgstr ""
 "Monto mínimo = 5000 Unidades Indexadas Uruguayas (>%(min_amount)s)"
 
 #. module: l10n_uy_edi
+#: model:ir.module.module,description:base.module_l10n_uy_edi
+msgid ""
+"\n"
+"This module integrate Odoo so you can issue electronic documents (CFE) to "
+"DGI. Example: e-Ticket, e-Invoice and related Debit and Credit Notes.\n"
+"\n"
+"After the CFE has been issued, and since the invoice validation is "
+"asynchronous, Odoo will run a scheduled action that will connect to DGI to "
+"check/update CFE state (Waiting DGI Response, Approved or Rejected)\n"
+"\n"
+"NOTE: Every connection is made using a third-party software named Uruware\n"
+"\n"
+"Configuration\n"
+"-------------\n"
+"\n"
+"1. Need to have an Uruguayan Company (with the Uruguayan COA installed)\n"
+"2. Go to Settings / Accounting / Uruguay Localization section and configure "
+"the fields to connect to UCFE: Uruware's platform for connecting to the "
+"Dirección General Impositiva (DGI)\n"
+"3. Go to Settings / Users / Companies / Companies and set the Tax ID number, "
+"DGI Main House or Branch Code, all your Address related  fields.\n"
+"4. Go to Invoices and validate them. Then use Send and Print to send to the "
+"government and generate a CFE. You will see a new field \"CFE Status\" that "
+"will show you the status of the electronic document: initially, it will be "
+"in \"Waiting DGI response\", and after some time it will be automatically "
+"updated to Approved/Rejected. You will also receive the legal PDF and XML "
+"files related to the CFE as attachments to the document.\n"
+"\n"
+"Known issues / Roadmap\n"
+"======================\n"
+"\n"
+"* Contingency documents not implemented\n"
+"* Future implementation will have auto synchronization of Vendor bills.\n"
+msgstr ""
+"\n"
+"Este módulo integra Odoo para que puedas emitir documentos electrónicos "
+"(Comprobantes Fiscales Electrónicos) a la DGI. Por ejemplo, e-Ticket, e-"
+"Factura y notas de débito y crédito relacionadas.\n"
+"\n"
+"Luego de emitir el CFE, y dado que la validación de la factura es "
+"asincrónica, Odoo ejecutará una acción programada que se conectará a la DGI "
+"para verificar o actualizar el estado del CFE (Esperando respuesta de DGI, "
+"Aprobado o Rechazado).\n"
+"\n"
+"NOTA: Todas las conexiones se realizan con un software externo llamado "
+"Uruware.\n"
+"\n"
+"Configuración\n"
+"-------------\n"
+"\n"
+"1. Es necesario que cuentes con una empresa uruguaya (y que tenga el plan de "
+"cuentas de Uruguay instalado).\n"
+"2. Ve a Ajustes / Contabilidad / sección de Localización para Uruguay y "
+"configura los campos para conectarte a UCFE: la plataforma de Uruware para "
+"conectar con la Dirección General Impositiva (DGI).\n"
+"3. Ve a Ajustes / Usuarios / Empresas / Empresas y proporciona el número de "
+"identificación tributaria, el código de casa principal o sucursal de la DGI "
+"y todos los campos relacionados con tu dirección.\n"
+"4. Ve a Facturas y valídalas. Luego usa Enviar e imprimir para enviarlas al "
+"gobierno y generar un CFE. Aparecerá el nuevo campo \"Estado del CFE\" que "
+"te mostrará el estado del documento electrónico. Al inicio este corresponde "
+"a \"Esperando respuesta de DGI\" y después se actualiza en automático a "
+"Aprobado o Rechazado. También recibirás los archivos PDF y XML jurídico "
+"relacionados con el CFE como archivos adjuntos al documento.\n"
+"\n"
+"Problemas conocidos / Plan de desarrollo\n"
+"======================\n"
+"\n"
+"* Los documentos de contingencia no están implementados.\n"
+"* La próxima implementación incluirá la sincronización automática de las "
+"facturas de proveedores.\n"
+
+#. module: l10n_uy_edi
 #: model:ir.model.fields,help:l10n_uy_edi.field_res_company__l10n_uy_edi_branch_code
 msgid ""
 " This value is part of the XML when creating CFE. If not set properly all "
@@ -46,33 +120,22 @@ msgid ""
 "4. Open the generated PDF. Get the number on section 'Domicilio Fiscal -> "
 "Número de Local'"
 msgstr ""
-" Este valor es parte del XML al crear el CFE. Si no es configurado "
-"correctamente todos los CFE serán rechazados\n"
-"Para obtener este número puedes seguir los siguientes pasos:\n"
-"1. Ve a la página 'Servicios en linea DGI'.\n"
-"2. Selecciona la opción 'Registro único tributario -> Consulta de datos' "
-"(enlace de menu del lado derecho).\n"
-"3. Selecciona la opción 'Consulta de Datos Registrales -> Consulta de Datos "
-"de Entidades'.\n"
-"4. Abre el PDF generado. Obtén el numero de la sección 'Domicilio Fiscal -> "
-"Número de Local'"
-
-#. module: l10n_uy_edi
-#. odoo-python
-#: code:addons/l10n_uy_edi/models/account_move.py:0
-msgid ""
-"%(dtype)s is not an Uruguayan Identification Type or a Generic one (VAT, "
-"Passport, or Foreign ID). You need to select a valid ID to be able to invoice"
-msgstr ""
-"%(dtype)s no es un tipo de identificación Uruguayo o Genérico (VAT, "
-"Pasaporte o Cédula Extranjera). Debes seleccionar un ID válido para poder "
-"facturar"
+" Este valor forma parte del XML al crear un CFE. Si no lo configuras de "
+"forma correcta, se rechazarán todos los CFE.\n"
+"Para obtener este número, sigue estos pasos:\n"
+"1. Ve a la página de 'Servicios en línea DGI'\n"
+"2. Selecciona la opción 'Registro Único Tributario -> Consulta de datos' "
+"(enlace del menú del lado derecho)\n"
+"3. Selecciona la opción 'Consulta de datos registrales -> Consulta de datos "
+"de entidades'\n"
+"4. Abre el PDF que se genera. Obtén el número de la sección 'Domicilio "
+"fiscal → Número de local'"
 
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/l10n_uy_edi_addenda.py:0
 msgid "%(name)s (%(type)s)"
-msgstr ""
+msgstr "%(name)s (%(type)s)"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -83,12 +146,17 @@ msgstr "%(name)s (Leyenda Obligatoria - %(type)s)"
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.view_move_form_inherit_l10n_uy_edi
 msgid ""
-"<i class=\"fa fa-warning\" role=\"img\" title=\"EDI (Uruguay)\"/>\n"
+"<i class=\"oi\" data-icon=\"warning\" role=\"img\" title=\"EDI (Uruguay)\"/"
+">\n"
 "                        <span class=\"mx-1\">E-invoicing (Uruguay)</span>"
 msgstr ""
-"<i class=\"fa fa-warning\" role=\"img\" title=\"EDI (Uruguay)\"/>\n"
-"                        <span class=\"mx-1\">Facturación Electrónica "
-"(Uruguay)</span>"
+
+#. module: l10n_uy_edi
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi.view_partner_latam_form
+msgid ""
+"<i title=\"Fetch from DGI\" role=\"img\" aria-label=\"Fetch from DGI\" "
+"class=\"oi oi-fw\" data-icon=\"refresh\"/>"
+msgstr ""
 
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
@@ -99,16 +167,28 @@ msgid ""
 "enter these parameters here. Test your connection. Note: Only one test and "
 "production environment are allowed per subscription</span>"
 msgstr ""
+"<span>Para crear tu cuenta, asegúrate de contar con una suscripción válida. "
+"Haz clic en \"Crear cuenta de proveedor UCFE\", configúrala en el portal del "
+"proveedor UCFE, obtén la contraseña del WS, el código de comercio y el "
+"código de la terminal, e ingresa estos parámetros aquí. Prueba la conexión. "
+"Nota: Solo puedes tener un entorno de prueba y uno de producción por "
+"suscripción</span>"
 
 #. module: l10n_uy_edi
-#: model:ir.model,name:l10n_uy_edi.model_account_move_send
-msgid "Account Move Send"
-msgstr "Enviar movimiento de cuenta"
+#. odoo-python
+#: code:addons/l10n_uy_edi/models/product_template.py:0
+msgid ""
+"A non-billable product cannot have sales taxes. Please remove the taxes from "
+"product '%(product_name)s' to continue."
+msgstr ""
 
 #. module: l10n_uy_edi
-#: model:ir.model,name:l10n_uy_edi.model_account_move_send_wizard
-msgid "Account Move Send Wizard"
-msgstr "Asistente de envío de movimientos de cuenta"
+#. odoo-python
+#: code:addons/l10n_uy_edi/models/account_move.py:0
+msgid ""
+"A non-billable product cannot have taxes. Please remove the taxes from line "
+"'%(line_name)s' to continue."
+msgstr ""
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__l10n_uy_edi_addenda__type__addenda
@@ -119,7 +199,7 @@ msgstr "Adenda"
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_bank_statement_line__l10n_uy_edi_addenda_ids
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_move__l10n_uy_edi_addenda_ids
 msgid "Addenda & Disclosure"
-msgstr "Adenda & Leyendas"
+msgstr "Adenda y leyendas"
 
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.l10n_uy_edi_addenda_view_tree
@@ -260,10 +340,6 @@ msgstr "Código de Comercio"
 
 #. module: l10n_uy_edi
 #: model:ir.model,name:l10n_uy_edi.model_res_company
-msgid "Companies"
-msgstr "Empresas"
-
-#. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__company_id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__company_id
 msgid "Company"
@@ -308,12 +384,12 @@ msgstr "Crear CFE"
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
 msgid "Create UCFE Provider Account"
-msgstr ""
+msgstr "Crear cuenta de proveedor UCFE"
 
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
 msgid "Create UCFE Provider Test Account"
-msgstr ""
+msgstr "Crear cuenta de prueba de proveedor UCFE"
 
 #. module: l10n_uy_edi
 #: model:ir.model,website_form_label:l10n_uy_edi.model_res_partner
@@ -335,12 +411,17 @@ msgstr "Creado en"
 #. module: l10n_uy_edi
 #: model:ir.ui.menu,name:l10n_uy_edi.menu_dgi_config
 msgid "DGI"
-msgstr ""
+msgstr "DGI"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__l10n_uy_edi_branch_code
 msgid "DGI Main-House or Branch Code"
 msgstr "DGI Código Casa Principal o Sucursal"
+
+#. module: l10n_uy_edi
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
+msgid "Default Terminal Code"
+msgstr ""
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__res_company__l10n_uy_edi_ucfe_env__demo
@@ -357,10 +438,11 @@ msgstr "Descuento"
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move.py:0
 msgid ""
-"Discount with Tax %s can only exist if match with regular line with same tax"
+"Discount line '%(line_name)s' must be associated to another line having the "
+"same taxes (%(tax_names)s)."
 msgstr ""
-"El descuento con Impuesto %s solo puede existir si coincide con una línea "
-"regular con el mismo impuesto"
+"La línea de descuento %(line_name)s debe estar asociada a otra línea que "
+"tenga los mismos impuestos (%(tax_names)s)."
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_journal__display_name
@@ -371,6 +453,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_latam_document_type__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__display_name
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_template__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_partner__display_name
@@ -385,10 +468,9 @@ msgid ""
 "email associated with your Odoo subscription account. This process will take "
 "around 24 to 48 hours."
 msgstr ""
-"¿Quieres crear una cuenta? Por favor verifique primero si ya tiene una. Este "
-"paso es irreversible. Tus credenciales de acceso serán envaidos a el email "
-"asociado a la suscripción. Este proceso tardará entre 24 y 48 horas "
-"aproximadamente."
+"¿Quieres crear una cuenta? Primero revisa si ya tienes una. Este paso es "
+"irreversible. Enviaremos tus credenciales de acceso al correo asociado a tu "
+"cuenta de suscripción de Odoo. Este proceso tarda entre 24 y 48 horas."
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__l10n_latam_document_type_id
@@ -438,7 +520,7 @@ msgstr "Respuesta VACIA"
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__l10n_uy_edi_document__state__error
 msgid "ERROR"
-msgstr ""
+msgstr "ERROR"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -462,19 +544,22 @@ msgstr "Documento Fiscal Electrónico (CFE - UY)"
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
 msgid "Electronic Invoicing Provider (UCFE) Credentials"
-msgstr ""
+msgstr "Credenciales del proveedor de facturación electrónica (UCFE)"
 
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/res_config_settings.py:0
 msgid "Error connection to Odoo IAP to create UCFE Provider account"
 msgstr ""
+"Error de conexión con las compras dentro de la aplicación de Odoo al crear "
+"la cuenta de proveedor UCFE"
 
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/res_config_settings.py:0
 msgid "Error creating the UCFE Provider account. Please contact support: "
 msgstr ""
+"Error al crear la cuenta de proveedor UCFE. Contacta al equipo de soporte: "
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -492,7 +577,7 @@ msgstr "Error procesando la respuesta %(exp_rep)s"
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move_send.py:0
 msgid "Errors occurred while creating the EDI document (CFE):"
-msgstr "Errores ocurridos en la creacion del documento electronico (CFE):"
+msgstr "Errores ocurridos en la creación del documento electrónico (CFE):"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -513,8 +598,13 @@ msgid ""
 "Export CFE can only have 0%% vat taxes. Check line '%(line_name)s' (Id "
 "Invoice: %(move_id)s)"
 msgstr ""
-"CFE de exportación solo pueden tenes impuestos de IVA 0%. Verifique línea '%"
-"(line_name)s' (Id Factura: %(move_id)s)"
+"El CFE de exportación solo puede tener impuestos de IVA 0%, verifica la "
+"línea '%(line_name)s' (ID de la factura: %(move_id)s)"
+
+#. module: l10n_uy_edi
+#: model:ir.model.fields.selection,name:l10n_uy_edi.selection__account_move__l10n_uy_edi_cfe_sale_mode__91
+msgid "Export under Mandate"
+msgstr "Exportar bajo mandato"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -533,7 +623,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move.py:0
 msgid "For now it is not possible to create %(latam_document_name)s documents"
-msgstr ""
+msgstr "Por ahora no puedes crear documentos %(latam_document_name)s"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -565,6 +655,7 @@ msgstr "Terrestre"
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_latam_document_type__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__id
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_template__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_partner__id
@@ -584,13 +675,15 @@ msgid ""
 "Incomplete Data to connect to UCFE Provider on company %(company)s: Please "
 "complete the UCFE data to test the connection: %(missing)s"
 msgstr ""
+"Datos incompletos para conectarse al proveedor UCFE en la empresa %(company)"
+"s: Completa los datos de UCFE para probar la conexión: %(missing)s"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_bank_statement_line__l10n_uy_edi_journal_type
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_journal__l10n_uy_edi_type
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_move__l10n_uy_edi_journal_type
 msgid "Invoicing Type"
-msgstr "Tipo de Faturación"
+msgstr "Tipo de facturación"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__is_legend
@@ -638,13 +731,13 @@ msgstr "CFE Llave o UUID"
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__l10n_latam_document_number
 msgid "L10N Latam Document Number"
-msgstr ""
+msgstr "Número de documento"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_bank_statement_line__l10n_uy_edi_is_needed
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_move__l10n_uy_edi_is_needed
 msgid "L10N Uy Edi Is Needed"
-msgstr ""
+msgstr "Se necesita el EDI"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__write_uid
@@ -656,7 +749,7 @@ msgstr "Última actualización por"
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__write_date
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__write_date
 msgid "Last Updated on"
-msgstr "Última actualización en"
+msgstr "Última actualización el"
 
 #. module: l10n_uy_edi
 #: model:ir.model,name:l10n_uy_edi.model_l10n_latam_document_type
@@ -724,6 +817,12 @@ msgstr "Nombre"
 #: code:addons/l10n_uy_edi/models/l10n_uy_edi_document.py:0
 msgid "No response"
 msgstr "No hay respuesta"
+
+#. module: l10n_uy_edi
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_product__l10n_uy_edi_is_non_billable
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_template__l10n_uy_edi_is_non_billable
+msgid "Non-Billable"
+msgstr ""
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -797,6 +896,11 @@ msgid "Problem with Receiver identification number: %(exp_msg)s"
 msgstr "Problema con el número de Identificación del receptor: %(exp_msg)s"
 
 #. module: l10n_uy_edi
+#: model:ir.model,name:l10n_uy_edi.model_product_template
+msgid "Product"
+msgstr ""
+
+#. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__l10n_uy_edi_addenda__type__item
 msgid "Product/Service Detail"
 msgstr "Detalle Producto/Servicio"
@@ -814,6 +918,12 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__res_company__l10n_uy_edi_ucfe_env__production
 msgid "Production"
 msgstr "Producción"
+
+#. module: l10n_uy_edi
+#: model:ir.model.fields,help:l10n_uy_edi.field_product_product__l10n_uy_edi_is_non_billable
+#: model:ir.model.fields,help:l10n_uy_edi.field_product_template__l10n_uy_edi_is_non_billable
+msgid "Products with indicator 6 and 7 for EDI."
+msgstr ""
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__l10n_uy_edi_addenda__type__receiver
@@ -848,10 +958,15 @@ msgid "Search Description"
 msgstr "Descripción Búsqueda"
 
 #. module: l10n_uy_edi
+#: model:ir.model,name:l10n_uy_edi.model_account_move_send_wizard
+msgid "Send Invoice Wizard"
+msgstr "Asistente para enviar facturas"
+
+#. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/res_company.py:0
 msgid "Set a valid RUT in your company"
-msgstr "Configure un RUT valido en su Compañía"
+msgstr "Configura un RUT válido en tu empresa"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -884,6 +999,11 @@ msgid "Set your company state"
 msgstr "Configure la provincia de su compañía"
 
 #. module: l10n_uy_edi
+#: model:ir.model,name:l10n_uy_edi.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr "Funciones compartidas del asistente para enviar facturas"
+
+#. module: l10n_uy_edi
 #: model:ir.model.fields,help:l10n_uy_edi.field_account_bank_statement_line__l10n_uy_edi_cfe_state
 #: model:ir.model.fields,help:l10n_uy_edi.field_account_move__l10n_uy_edi_cfe_state
 #: model:ir.model.fields,help:l10n_uy_edi.field_l10n_uy_edi_document__state
@@ -893,9 +1013,13 @@ msgstr ""
 "automáticamente cuando el estado del documento cambie"
 
 #. module: l10n_uy_edi
-#: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
-msgid "Terminal Code"
-msgstr "Código Terminal"
+#: model:ir.model.fields,help:l10n_uy_edi.field_account_journal__l10n_uy_edi_ucfe_terminal_code
+msgid ""
+"Terminal code (point of invoicing) declared in Uruware for this journal. "
+"When set, it is used instead of the company default terminal code when "
+"sending the CFE of the documents issued from this journal. Leave empty to "
+"fall back to the company terminal code."
+msgstr ""
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__res_company__l10n_uy_edi_ucfe_env__testing
@@ -910,6 +1034,9 @@ msgid ""
 "Please, you will need to manually check the reject reason and generate/send "
 "a new CFE with the fixes"
 msgstr ""
+"La DGI rechazó el CFE, por lo tanto cancelamos este registro de forma "
+"automática. Revisa el motivo del rechazo de forma manual y genera o envía un "
+"nuevo CFE con las correcciones."
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -926,7 +1053,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move.py:0
 msgid "The currency does not exist on DGI currencies table %s"
-msgstr "La moneda no existe en la tabla de monedas de DGI"
+msgstr "La moneda no existe en la tabla de monedas de DGI %s"
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -937,8 +1064,8 @@ msgstr "La factura electrónica fue creada exitosamente"
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move.py:0
-msgid "The partner of the CFE needs to have an Identification Type"
-msgstr "El receptor del CFE necesita tener un Tipo de Identificación"
+msgid "The partner of the CFE needs to have a valid Uruguayan identification."
+msgstr ""
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -994,6 +1121,9 @@ msgid ""
 "communication and data exchange between Odoo and UCFE. It is distinct from "
 "the password used to log in to UCFE's portal."
 msgstr ""
+"Esta contraseña se usa solo para acceder a los web services de UCFE, lo que "
+"permite la comunicación y el intercambio de datos entre Odoo y UCFE. No es "
+"la misma contraseña que usas para iniciar sesión en el portal de UCFE."
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -1071,43 +1201,48 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__l10n_uy_edi_ucfe_commerce_code
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__l10n_uy_edi_ucfe_commerce_code
 msgid "UCFE Provider Commerce code"
-msgstr ""
+msgstr "Código de comercio del proveedor UCFE"
 
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/l10n_uy_edi_document.py:0
 msgid "UCFE Provider Inbox URL"
-msgstr ""
+msgstr "URL de la bandeja de entrada del proveedor UCFE"
 
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/l10n_uy_edi_document.py:0
 msgid "UCFE Provider Query URL"
+msgstr "URL de consulta del proveedor UCFE"
+
+#. module: l10n_uy_edi
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_account_journal__l10n_uy_edi_ucfe_terminal_code
+msgid "UCFE Provider Terminal Code"
 msgstr ""
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__l10n_uy_edi_ucfe_terminal_code
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__l10n_uy_edi_ucfe_terminal_code
 msgid "UCFE Provider Terminal code"
-msgstr ""
+msgstr "Código de terminal del proveedor UCFE"
 
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/l10n_uy_edi_document.py:0
 msgid "UCFE Provider Username"
-msgstr ""
+msgstr "Nombre de usuario del proveedor UCFE"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__l10n_uy_edi_ucfe_password
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__l10n_uy_edi_ucfe_password
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
 msgid "UCFE Provider WS Password"
-msgstr ""
+msgstr "Contraseña WS del proveedor UCFE"
 
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
 msgid "UCFE Web Services"
-msgstr ""
+msgstr "Web services de UCFE"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,help:l10n_uy_edi.field_res_company__l10n_uy_edi_ucfe_env
@@ -1126,6 +1261,11 @@ msgstr ""
 #: code:addons/l10n_uy_edi/models/account_move.py:0
 msgid "UNKNOWN INDICATOR %(ind_fact)s"
 msgstr "INDICADOR DESCONOCIDO %(ind_fact)s"
+
+#. module: l10n_uy_edi
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi.product_template_form_view
+msgid "UY"
+msgstr ""
 
 #. module: l10n_uy_edi
 #: model:ir.actions.server,name:l10n_uy_edi.ir_cron_get_vendor_bills_received_ir_actions_server
@@ -1155,12 +1295,19 @@ msgid ""
 "Up to now it is not possible to create %(doc_type_name)s documents. IdReq: %"
 "(l10n_uy_idreq)s"
 msgstr ""
+"Hasta ahora no es posible crear documentos %(doc_type_name)s. IdReq: %"
+"(l10n_uy_idreq)s"
 
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.l10n_uy_edi_document_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.view_move_form_inherit_l10n_uy_edi
 msgid "Update DGI Status"
 msgstr "Actualizar Estado DGI"
+
+#. module: l10n_uy_edi
+#: model:ir.module.module,shortdesc:base.module_l10n_uy_edi
+msgid "Uruguay - Electronic Invoice"
+msgstr ""
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_account_bank_statement_line__l10n_uy_edi_document_id
@@ -1191,6 +1338,7 @@ msgstr "Localización Uruguaya"
 #: model:ir.model.fields,help:l10n_uy_edi.field_account_move__l10n_uy_edi_xml_attachment_id
 msgid "Uruguay: the most recent e-invoice XML returned by UCFE Provider."
 msgstr ""
+"El XML de factura electrónica más reciente que devolvió el proveedor UCFE."
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -1202,17 +1350,17 @@ msgid ""
 "If this is not intended, please check if an UCFE Uruware is properly set or "
 "if the invoice isn't already e-invoiced.\n"
 msgstr ""
-"Se habilitó la facturación electrónica en Uruguay, pero las siguientes "
-"facturas no se pueden facturar electrónicamente:\n"
+"La facturación electrónica en Uruguay está habilitada, pero las siguientes "
+"facturas no se pueden facturar de forma electrónica:\n"
 "%s\n"
-"Si esto no es intencional, verifique si una UCFE Uruware está configurada "
-"correctamente o si la factura no está hecha electrónicamente aún."
+"Si esto no es intencional, revisa si UCFE Uruware está configurado "
+"correctamente o si la factura ya se facturó de forma electrónica.\n"
 
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move_send.py:0
 msgid "View Invoice(s)"
-msgstr "Ver Facturas(s)"
+msgstr "Ver factura(s)"
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__l10n_uy_edi_document__state__received
@@ -1242,7 +1390,7 @@ msgstr ""
 #: code:addons/l10n_uy_edi/models/l10n_uy_edi_document.py:0
 msgid ""
 "We found an error while consulting a notification %(joined_errors_msg)s."
-msgstr ""
+msgstr "Ocurrió un error al consultar una notificación %(joined_errors_msg)s."
 
 #. module: l10n_uy_edi
 #. odoo-python
@@ -1302,6 +1450,9 @@ msgid ""
 "the credentials to. Make sure it is correct. This process will take around "
 "24 to 48 hours."
 msgstr ""
+"Tu correo de inicio de sesión será el contacto al que el proveedor UCFE "
+"enviará las credenciales. Verifica que sea correcto. Este proceso tarda "
+"entre 24 y 48 horas."
 
 #. module: l10n_uy_edi
 #: model:ir.model.fields,help:l10n_uy_edi.field_account_bank_statement_line__l10n_uy_edi_error
@@ -1310,86 +1461,17 @@ msgstr ""
 msgid "error details for CFEs in the 'error' state."
 msgstr "Uruguay: detalle de errores de los CFE en estado 'error'"
 
-#~ msgid "Document Number"
-#~ msgstr "Número de documento"
-
 #~ msgid ""
-#~ "<span>To create your account, ensure you have a valid subscription. Click "
-#~ "\"Create Uruware Account\", configure it directly in Uruware's portal, "
-#~ "get the WS password, Commerce Code, and Terminal Code from them, and "
-#~ "enter these parameters here. Test your connection. Note: Only one test "
-#~ "and production environment are allowed per subscription</span>"
+#~ "%(dtype)s is not an Uruguayan Identification Type or a Generic one (VAT, "
+#~ "Passport, or Foreign ID). You need to select a valid ID to be able to "
+#~ "invoice"
 #~ msgstr ""
-#~ "<span> Para crear su cuenta, asegúrese de tener una suscripción válida. "
-#~ "Haga clic en \"Crear cuenta Uruware\", luego configúrela directamente en "
-#~ "el portal del Uruware, obtenga de ahi la contraseña de WS, el Código de "
-#~ "Comercio y el Código de Terminal, e ingrese estos parámetros acá. Pruebe "
-#~ "su conexión. Nota: Solo se permite un entorno de prueba y producción por "
-#~ "suscripción.</span>"
+#~ "%(dtype)s no es un tipo de identificación Uruguayo o Genérico (VAT, "
+#~ "Pasaporte o Cédula Extranjera). Debes seleccionar un ID válido para poder "
+#~ "facturar"
 
-#~ msgid "Create Uruware Account"
-#~ msgstr "Cree Cuenta Uruware"
+#~ msgid "Terminal Code"
+#~ msgstr "Código Terminal"
 
-#~ msgid "Create Uruware Test Account"
-#~ msgstr "Cree Cuenta de Prueba Uruware"
-
-#~ msgid "Error connection to Odoo IAP to create Uruware account"
-#~ msgstr "Error en la conexión con Odoo IAP para crear cuenta en Uruware"
-
-#~ msgid "Error creating the Uruware account. Please contact support: "
-#~ msgstr "Error creando la cuenta de Uruware. Por favor contacte a soporte: "
-
-#~ msgid ""
-#~ "Incomplete Data to connect to Uruware on company %(company)s: Please "
-#~ "complete the UCFE data to test the connection: %(missing)s"
-#~ msgstr ""
-#~ "Datos incompletos para conectarse a Uruware en la compañía %(company)s: "
-#~ "Por favor complete los datos UCFE para probar la conexión %(missing)s"
-
-#~ msgid ""
-#~ "This password is used exclusively for accessing Uruware webservices, "
-#~ "enabling communication and data exchange between Odoo and Uruware. It is "
-#~ "distinct from the password used to log in to Uruware's portal."
-#~ msgstr ""
-#~ "Esta contraseña se utiliza exclusivamente para acceder a los servicios "
-#~ "web de Uruware, lo que permite la comunicación y el intercambio de datos "
-#~ "entre Odoo y Uruware. Es distinta de la contraseña utilizada para iniciar "
-#~ "sesión en el portal de Uruware."
-
-#~ msgid "Uruguay: the most recent e-invoice XML returned by Uruware."
-#~ msgstr ""
-#~ "Uruguay: el XML de factura electrónica más reciente devuelto por Uruware."
-
-#~ msgid "Uruware Commerce code"
-#~ msgstr "Uruware Código de Comercio"
-
-#~ msgid "Uruware Credentials"
-#~ msgstr "Credenciales Uruware"
-
-#~ msgid "Uruware Inbox URL"
-#~ msgstr "URL Inbox Uruware"
-
-#~ msgid "Uruware Query URL"
-#~ msgstr "URL Query Uruware"
-
-#~ msgid "Uruware Terminal code"
-#~ msgstr "Uruware Código de Terminal"
-
-#~ msgid "Uruware Username"
-#~ msgstr "Usuario Uruware"
-
-#~ msgid "Uruware WS Password"
-#~ msgstr "Contraseña WS Uruware"
-
-#~ msgid ""
-#~ "Your login email will be used as the contact that Uruware will send the "
-#~ "credentials to. Make sure it is correct. This process will take around 24 "
-#~ "to 48 hours."
-#~ msgstr ""
-#~ "Tu correo electrónico de inicio de sesión se utilizará como el contacto "
-#~ "al que Uruware enviará las credenciales. Asegúrate de que sea correcto. "
-#~ "Este proceso tomará entre 24 y 48 horas."
-
-#~ msgid ""
-#~ "Up to now it is not possible to create e-Resguardo or e-Delivery documents"
-#~ msgstr "Hasta ahora no es posible crear documentos e-Resguardo o e-Delivery"
+#~ msgid "The partner of the CFE needs to have an Identification Type"
+#~ msgstr "El receptor del CFE necesita tener un Tipo de Identificación"

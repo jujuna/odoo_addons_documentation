@@ -1,7 +1,9 @@
 from . import models
-from . import controllers
 
 
 def _documents_hr_post_init(env):
-    env['res.company'].search([])._generate_employee_documents_main_folders()
-    env['hr.employee'].search([('hr_employee_folder_id', '=', False)])._generate_employee_documents_folders()
+    active_companies = env['res.company'].search([])
+    if employees_without_folder := env['hr.employee'].search(
+        [('hr_employee_folder_id', '=', False), ('company_id', 'in', active_companies.ids)],
+    ):
+        employees_without_folder._generate_employee_documents_folders()

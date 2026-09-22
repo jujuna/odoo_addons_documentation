@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -6,13 +5,11 @@
     'summary': 'Send text messages when ticket stage move',
     'description': "Send text messages when ticket stage move",
     'category': 'Services/Helpdesk',
-    'version': '1.0',
     'depends': ['helpdesk', 'sms'],
     'data': [
         'views/helpdesk_stage_views.xml',
         'views/helpdesk_sms_views.xml',
-        'security/ir.model.access.csv',
-        'security/helpdesk_sms_security.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',

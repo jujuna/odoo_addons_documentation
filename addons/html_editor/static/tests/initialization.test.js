@@ -91,19 +91,21 @@ describe("No orphan inline elements compatibility mode", () => {
         });
     });
 
-    test("should transform root .fa", async () => {
+    test("should transform root .oi", async () => {
         await testEditor({
-            contentBefore: '<p>ab</p><i class="fa fa-beer"></i><p>c</p>',
-            contentAfter: '<p>ab</p><div><i class="fa fa-beer"></i></div><p>c</p>',
+            contentBefore: '<p>ab</p><i class="oi" data-icon="sports_bar"></i><p>c</p>',
+            contentAfter: '<p>ab</p><div><i class="oi" data-icon="sports_bar"></i></div><p>c</p>',
         });
     });
 
-    test("should wrap a div.o_image direct child of the editable into a block", async () => {
+    test("should wrap a div.o_file_box direct child of the editable into a block", async () => {
         await testEditor({
-            contentBefore: '<p>abc</p><div class="o_image"></div><p>def</p>',
+            contentBefore:
+                '<p>abc</p><span class="o_file_box" contenteditable="false"><a href="#" title="document" data-mimetype="application/pdf"></a></span><p>def</p>',
             contentBeforeEdit:
-                '<p>abc</p><div><div class="o_image" contenteditable="false"></div></div><p>def</p>',
-            contentAfter: '<p>abc</p><div><div class="o_image"></div></div><p>def</p>',
+                '<p>abc</p><div class="o-paragraph">\ufeff<span class="o_file_box" contenteditable="false"><a href="#" title="document" data-mimetype="application/pdf"></a></span>\ufeff</div><p>def</p>',
+            contentAfter:
+                '<p>abc</p><div><span class="o_file_box"><a href="#" title="document" data-mimetype="application/pdf"></a></span></div><p>def</p>',
         });
     });
 });

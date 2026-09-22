@@ -164,7 +164,7 @@ test(`non empty gantt with sample="1"`, async () => {
         `,
     });
     expect(SELECTORS.viewContent).not.toHaveClass("o_view_sample_data");
-    expect(SELECTORS.cell).toHaveCount(18);
+    expect(SELECTORS.cell).toHaveCount(17);
     expect(SELECTORS.pill).toHaveCount(7);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
 
@@ -173,7 +173,7 @@ test(`non empty gantt with sample="1"`, async () => {
     expect(SELECTORS.viewContent).not.toHaveClass("o_view_sample_data");
     expect(SELECTORS.pill).toHaveCount(0);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
-    expect(SELECTORS.cell).toHaveCount(18);
+    expect(SELECTORS.cell).toHaveCount(17);
 });
 
 test(`non empty grouped gantt with sample="1"`, async () => {
@@ -188,7 +188,7 @@ test(`non empty grouped gantt with sample="1"`, async () => {
         `,
     });
     expect(SELECTORS.viewContent).not.toHaveClass("o_view_sample_data");
-    expect(SELECTORS.cell).toHaveCount(36);
+    expect(SELECTORS.cell).toHaveCount(51);
     expect(SELECTORS.pill).toHaveCount(7);
 
     await toggleSearchBarMenu();
@@ -196,7 +196,7 @@ test(`non empty grouped gantt with sample="1"`, async () => {
     expect(SELECTORS.viewContent).not.toHaveClass("o_view_sample_data");
     expect(SELECTORS.pill).toHaveCount(0);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
-    expect(SELECTORS.cell).toHaveCount(18);
+    expect(SELECTORS.cell).toHaveCount(17);
 });
 
 test("no content helper from action when no data and sample mode", async () => {

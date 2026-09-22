@@ -2,7 +2,6 @@
 
 import base64
 import json
-import psycopg2
 
 from markupsafe import Markup
 from psycopg2 import IntegrityError
@@ -12,7 +11,7 @@ from werkzeug.exceptions import BadRequest
 from odoo import http, SUPERUSER_ID
 from odoo.addons.base.models.ir_qweb_fields import nl2br, nl2br_enclose
 from odoo.http import request
-from odoo.tools import plaintext2html
+from odoo.tools import BinaryBytes, plaintext2html
 from odoo.exceptions import AccessDenied, ValidationError, UserError
 from odoo.tools.misc import hmac, consteq
 from odoo.tools.translate import _, LazyTranslate
@@ -39,22 +38,15 @@ class WebsiteForm(http.Controller):
             raise BadRequest('Session expired (invalid CSRF token)')
 
         try:
-            # The except clause below should not let what has been done inside
-            # here be committed. It should not either roll back everything in
-            # this controller method. Instead, we use a savepoint to roll back
-            # what has been done inside the try clause.
-            with request.env.cr.savepoint() as sp:
-                # request.params was modified, update kwargs to reflect the changes
-                kwargs = dict(request.params)
-                kwargs.pop('model_name')
-                res = self._handle_website_form(model_name, **kwargs)
-                # ignore savepoint closing error if the transaction was committed
-                try:
-                    sp.close(rollback=False)
-                except psycopg2.errors.InvalidSavepointSpecification:
-                    sp.closed = True
-                return res
+            # request.params was modified, update kwargs to reflect the changes
+            kwargs = dict(request.params)
+            kwargs.pop('model_name')
+            res = self._handle_website_form(model_name, **kwargs)
+            # try to save here
+            self.env.cr.commit()
+            return res
         except (ValidationError, UserError) as e:
+            self.env.cr.rollback()
             return json.dumps({
                 'error': e.args[0],
             })
@@ -85,8 +77,8 @@ class WebsiteForm(http.Controller):
                         'email_cc' in kwargs["website_form_signature"]
                     # remove the email_cc information from the signature
                     kwargs["website_form_signature"] = kwargs["website_form_signature"].split(':')[0]
-                    if kwargs.get("email_to"):
-                        value = kwargs['email_to'] + (':email_cc' if form_has_email_cc else '')
+                    if kwargs.get("email_to") or form_has_email_cc:
+                        value = kwargs.get('email_to', '') + (':email_cc' if form_has_email_cc else '')
                         hash_value = hmac(model_record.env, 'website_form_signature', value)
                         if not consteq(kwargs["website_form_signature"], hash_value):
                             raise AccessDenied(self.env._('invalid website_form_signature'))
@@ -189,9 +181,9 @@ class WebsiteForm(http.Controller):
                 # If it's an actual binary field, convert the input file
                 # If it's not, we'll use attachments instead
                 if field_name in authorized_fields and authorized_fields[field_name]['type'] == 'binary':
-                    data['record'][field_name] = base64.b64encode(field_value.read())
+                    data['record'][field_name] = BinaryBytes(field_value.read())
                     field_value.stream.seek(0)  # do not consume value forever
-                    if authorized_fields[field_name]['manual'] and field_name + "_filename" in dest_model:
+                    if field_name + "_filename" in dest_model:
                         data['record'][field_name + "_filename"] = field_value.filename
                 else:
                     field_value.field_name = field_name
@@ -236,7 +228,7 @@ class WebsiteForm(http.Controller):
         data['custom'] = "\n".join([u"%s : %s" % v for v in custom_fields])
 
         # Add metadata if enabled  # ICP for retrocompatibility
-        if request.env['ir.config_parameter'].sudo().get_param('website_form_enable_metadata'):
+        if request.env['ir.config_parameter'].sudo().get_bool('website_form_enable_metadata'):
             environ = request.httprequest.headers.environ
             data['meta'] += "%s : %s\n%s : %s\n%s : %s\n%s : %s\n" % (
                 "IP", environ.get("REMOTE_ADDR"),
@@ -307,7 +299,7 @@ class WebsiteForm(http.Controller):
             custom_field = file.field_name not in authorized_fields
             attachment_value = {
                 'name': file.filename,
-                'datas': base64.encodebytes(file.read()),
+                'raw': BinaryBytes(file.read()),
                 'res_model': model_name,
                 'res_id': record.id,
             }

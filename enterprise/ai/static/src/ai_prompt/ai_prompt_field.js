@@ -2,25 +2,26 @@ import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { AiPrompt } from "./ai_prompt";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class AiPromptField extends Component {
     static template = "ai.AiPromptField";
-    static props = {
+
+    props = useProps({
         ...standardFieldProps,
         // Field containing the model name that will be updated
-        modelReferenceField: { type: String },
+        modelReferenceField: t.string(),
         // Field containing the field name that will be updated
-        fieldReferenceField: { type: String, optional: true },
+        fieldReferenceField: t.string().optional(),
 
-        placeholder: { type: String, optional: true },
+        placeholder: t.string().optional(),
 
         // If we update a relational field, field containing the model for which we will choose candidate values
-        recordSelectorRelationField: { type: String, optional: true },
-        recordSelectorDomain: { type: String, optional: true },
+        recordSelectorRelationField: t.string().optional(),
+        recordSelectorDomain: t.string().optional(),
 
-        showMissingRecordsWarning: { Boolean: String, optional: true },
-    };
+        showMissingRecordsWarning: t.boolean().optional(),
+    });
     static components = { AiPrompt };
 
     get updatedFieldName() {

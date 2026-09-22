@@ -15,7 +15,6 @@ The extra tab only appears if:
 - the company linked to the website is mexican
 - the option 'automatic_invoice' is enabled in the website settings ("Invoice automatically on payment")
     ''',
-    'version': '1.0',
     'category': 'Accounting/Localizations/EDI',
     'depends': [
         'website_sale',
@@ -28,13 +27,11 @@ The extra tab only appears if:
     'assets': {
         'web.assets_frontend': [
             'l10n_mx_edi_website_sale/static/src/interactions/**/*',
-            'l10n_mx_edi_website_sale/static/src/js/invoicing_info.js',
         ],
         'web.assets_tests': [
             'l10n_mx_edi_website_sale/static/tests/tours/*.js',
         ],
     },
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

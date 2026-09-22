@@ -3,7 +3,9 @@
 from datetime import timedelta
 
 from odoo import api, fields, models, tools
-from odoo.service.model import PG_CONCURRENCY_EXCEPTIONS_TO_RETRY
+from odoo.sql_db import PG_CONCURRENCY_EXCEPTIONS_TO_RETRY
+
+from odoo.addons.mail.tools.discuss import Store
 
 UPDATE_PRESENCE_DELAY = 60
 DISCONNECTION_TIMER = UPDATE_PRESENCE_DELAY + 5
@@ -91,22 +93,21 @@ class MailPresence(models.Model):
             # sudo: res.users/mail.guest can update presence of accessible user/guest
             self.env["mail.presence"].sudo().create(values)
 
-    def _send_presence(self, im_status=None, bus_target=None):
+    def _send_presence(self, im_status=None):
         """Send notification related to bus presence update.
 
         :param im_status: 'online', 'away' or 'offline'
         """
+        stores = Store.Stores()
         for presence in self:
-            target = bus_target or presence.guest_id or presence.user_id.partner_id
-            target._bus_send(
-                "bus.bus/im_status_updated",
-                {
-                    "presence_status": im_status or presence.status,
-                    "im_status": target.im_status,
-                    "guest_id": presence.guest_id.id,
-                    "partner_id": presence.user_id.partner_id.id,
-                },
-                subchannel="presence" if not bus_target else None,
+            persona = presence.guest_id or presence.user_id
+            stores[persona, "presence"].add(
+                persona,
+                {"im_status": im_status or persona.im_status},
+            )
+            stores[persona].add(
+                persona,
+                {"presence_status": im_status or presence.status},
             )
 
     @api.autovacuum

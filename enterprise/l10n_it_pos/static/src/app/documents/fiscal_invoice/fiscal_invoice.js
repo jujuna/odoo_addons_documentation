@@ -1,7 +1,7 @@
-import { Component } from "@odoo/owl";
-import { usePos } from "@point_of_sale/app/hooks/pos_hook";
+import { Component, useProps, t } from "@odoo/owl";
 import { Header, Body, Footer } from "@l10n_it_pos/app/documents/fiscal_document";
 import { PrintRecMessage } from "@l10n_it_pos/app/fiscal_printer/commands";
+import { PosOrder } from "@point_of_sale/app/models/pos_order";
 
 export class FiscalInvoice extends Component {
     static template = "l10n_it_pos.FiscalInvoice";
@@ -13,16 +13,12 @@ export class FiscalInvoice extends Component {
         Footer,
     };
 
-    static props = {
-        order: {
-            type: Object,
-            optional: true, // To keep backward compatibility
-        },
-    };
+    props = useProps({
+        order: t.instanceOf(PosOrder),
+    });
 
     setup() {
-        this.pos = usePos();
-        this.order = this.props.order || this.pos.getOrder();
+        this.order = this.props.order;
     }
 
     get client() {

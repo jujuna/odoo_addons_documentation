@@ -19,7 +19,6 @@ class DocumentsTag(models.Model):
     name = fields.Char(required=True, translate=True)
     sequence = fields.Integer('Sequence', default=10)
     color = fields.Integer('Color', default=_get_default_color)
-    tooltip = fields.Char(help="Text shown when hovering on this tag", string="Tooltip")  # Deprecated
     document_ids = fields.Many2many('documents.document', 'document_tag_rel')
 
     _tag_name_unique = models.Constraint(

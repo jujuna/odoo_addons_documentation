@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
 {
     'name': 'Sale Subscriptions Stock',
-    'version': '1.0',
     'depends': ['sale_subscription', 'sale_stock'],
     'category': 'Sales/Subscriptions',
     'summary': 'Allow to create recurring order on storable product',
@@ -22,14 +20,12 @@ Features:
 """,
     'website': 'https://www.odoo.com/app/subscriptions',
     'data': [
-        'views/product_template_views.xml',
         'views/sale_order_views.xml',
         'data/sale_subscription_stock_data.xml',
     ],
     'demo': [
         'data/sale_subscription_stock_demo.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'assets': {
         'web.assets_backend': [

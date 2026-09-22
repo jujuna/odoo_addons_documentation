@@ -33,9 +33,9 @@ def contactDetails(contact):
 
 def bankAccount(bank_account):
     return {
-        "accountName": bank_account.acc_holder_name,
-        "bsb": bank_account.aba_bsb,
-        "accountNumber": bank_account.acc_number,
+        "accountName": bank_account.holder_name,
+        "bsb": bank_account._get_clearing_number('AU'),
+        "accountNumber": bank_account.account_number,
     }
 
 

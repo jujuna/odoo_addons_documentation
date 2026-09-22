@@ -1,16 +1,16 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { formatMonetary } from "@web/views/fields/formatters";
 import { useService } from "@web/core/utils/hooks";
 
 export class BankRecLineInfoPopOver extends Component {
     static template = "account_accountant.BankRecLineInfoPopOver";
-    static props = {
-        lineData: { type: Object, optional: true },
-        statementLineData: { type: Object, optional: true },
-        exchangeMove: { type: Object, optional: true },
-        isPartiallyReconciled: { type: Boolean, optional: true },
-        close: { type: Function, optional: true },
-    };
+    props = useProps({
+        lineData: t.object().optional(),
+        statementLineData: t.object().optional(),
+        exchangeMove: t.object().optional(),
+        isPartiallyReconciled: t.boolean().optional(),
+        close: t.function().optional(),
+    });
 
     setup() {
         this.action = useService("action");
@@ -47,7 +47,7 @@ export class BankRecLineInfoPopOver extends Component {
     }
 
     get reconciledLineData() {
-        return this.props.lineData.reconciled_lines_ids.records[0].data;
+        return this.props.lineData.first_reconciled_lines_id;
     }
 
     get formattedLineDataAmountCurrency() {
@@ -61,7 +61,7 @@ export class BankRecLineInfoPopOver extends Component {
     }
 
     get exchangeMoveBalance() {
-        return this.props.exchangeMove.line_ids[0].balance;
+        return this.props.exchangeMove.amount_total_signed;
     }
 
     get formattedExchangeMoveBalance() {

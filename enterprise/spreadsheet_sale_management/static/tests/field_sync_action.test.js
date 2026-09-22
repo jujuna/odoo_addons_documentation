@@ -3,7 +3,7 @@ import { click } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 
 import { defineModels, onRpc } from "@web/../tests/web_test_helpers";
-import { x2ManyCommands } from "@web/core/orm_service";
+import { x2ManyCommands } from "@web/core/orm_plugin";
 
 import { mailModels } from "@mail/../tests/mail_test_helpers";
 
@@ -131,15 +131,16 @@ test("auto resize list columns", async () => {
                 sheetId: data.sheets[0].id,
                 col: 0,
                 row: 0,
-                id: "1",
+                listId: "1",
                 linesNumber: 20,
-                columns: [{ name: "product_uom_qty", type: "float" }],
+                columns: [{ name: "product_uom_qty" }],
+                mode: "static",
             },
         ];
         return {
             name: "my spreadsheet",
             data,
-            isReadonly: false,
+            has_write_access: true,
             revisions: [
                 {
                     serverRevisionId: "START_REVISION",
@@ -163,7 +164,7 @@ test("hover field sync highlights matching list formulas", async () => {
     const hoverStore = env.getStore(DelayedHoveredCellStore);
     const highlightStore = env.getStore(HighlightStore);
     addFieldSync(model, "B1", "product_uom_qty", 0);
-    setCellContent(model, "A1", '=ODOO.LIST(1,1,"product_uom_qty")');
+    setCellContent(model, "A1", '=ODOO.LIST.VALUE(1,1,"product_uom_qty")');
     expect(highlightStore.highlights).toHaveLength(0);
     hoverStore.hover({ col: 1, row: 0 });
     expect(highlightStore.highlights).toHaveLength(1);
@@ -172,7 +173,7 @@ test("hover field sync highlights matching list formulas", async () => {
     expect(highlightStore.highlights[0].sheetId).toBe(model.getters.getActiveSheetId());
 
     // with computed list args
-    setCellContent(model, "A1", "=ODOO.LIST(A2, A3, A4)");
+    setCellContent(model, "A1", "=ODOO.LIST.VALUE(A2, A3, A4)");
     expect(highlightStore.highlights).toHaveLength(0);
     setCellContent(model, "A2", "1");
     setCellContent(model, "A3", "1");

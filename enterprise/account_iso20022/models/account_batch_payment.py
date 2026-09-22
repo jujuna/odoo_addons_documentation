@@ -1,10 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-from odoo.exceptions import RedirectWarning, UserError
+from odoo.exceptions import RedirectWarning, UserError, ValidationError
+from odoo.tools import BinaryBytes
 
-import base64
 from datetime import datetime
+
+ISO20022_PAYMENT_METHODS = {'sepa_ct', 'iso20022', 'iso20022_se', 'iso20022_ch', 'iso20022_us'}
 
 
 class AccountBatchPayment(models.Model):
@@ -17,13 +19,47 @@ class AccountBatchPayment(models.Model):
     )
 
     payment_method_is_iso20022 = fields.Boolean(related='payment_method_id.is_iso20022')
+    invalid_sct_partners_ids = fields.Many2many('res.partner', compute='_compute_invalid_sct_partners_ids')
+
+    @api.constrains('batch_type', 'journal_id', 'payment_ids', 'payment_method_id')
+    def _check_payments_constrains(self):
+        # EXTENDS account_batch_payment
+        super()._check_payments_constrains()
+
+        for record in self:
+            if record.payment_method_code not in ISO20022_PAYMENT_METHODS:
+                continue
+            if len(set(record.payment_ids.mapped('sepa_pain_version'))) > 1:
+                raise ValidationError(_("All payments in the batch must share the same SEPA pain version."))
+            if len(record.payment_ids.payment_method_line_id) > 1:
+                raise ValidationError(_("All payments in the batch must share the same payment method line."))
+
+    @api.depends('payment_method_id', 'payment_ids.commercial_partner_id.country_id', 'payment_ids.commercial_partner_id.city')
+    def _compute_invalid_sct_partners_ids(self):
+        sepa_batches = self.filtered(lambda b: b.payment_method_id.code == 'sepa_ct')
+        for batch in sepa_batches:
+            invalid_partners = self.env['res.partner']
+            for partner in batch.payment_ids.commercial_partner_id:
+                addresses = partner._get_all_addr()
+                has_valid_address = any(
+                    addr.get('city') and addr.get('country')
+                    for addr in addresses
+                )
+                if not has_valid_address:
+                    invalid_partners |= partner
+
+            batch.invalid_sct_partners_ids = invalid_partners
+        (self - sepa_batches).invalid_sct_partners_ids = self.env['res.partner']
+
+    def action_invalid_partners_from_sct(self):
+        return self.invalid_sct_partners_ids._get_records_action(name=_("Invalid Partners"))
 
     def _get_methods_generating_files(self):
         rslt = super()._get_methods_generating_files()
-        rslt.extend(['sepa_ct', 'iso20022', 'iso20022_se', 'iso20022_ch', 'iso20022_us'])
+        rslt.extend(list(ISO20022_PAYMENT_METHODS))
         return rslt
 
-    def validate_batch(self):
+    def validate_batch(self, initiate_payment=False):
         self.ensure_one()
         if self.payment_method_id.code == 'iso20022_se' and not self.env.company.iso20022_orgid_id:
             action = self.env.ref('account.action_account_config')
@@ -37,11 +73,11 @@ class AccountBatchPayment(models.Model):
             )
 
         if self.payment_method_code and self.payment_method_code == 'sepa_ct':
-            if self.journal_id.bank_account_id.acc_type != 'iban':
+            if self.journal_id.bank_account_id.account_type != 'iban':
                 raise RedirectWarning(
                     _(
                         "The bank account %(account)s, of journal '%(journal)s', is not of type IBAN.\nA valid IBAN account is required to use SEPA features.",
-                        account=self.journal_id.bank_account_id.acc_number,
+                        account=self.journal_id.bank_account_id.account_number,
                         journal=self.journal_id.name,
                     ),
                     {
@@ -53,7 +89,7 @@ class AccountBatchPayment(models.Model):
                     },
                     _("Configure Journal"),
                 )
-            if no_iban_payments := self.payment_ids.filtered(lambda x: x.partner_bank_id.acc_type != 'iban'):
+            if no_iban_payments := self.payment_ids.filtered(lambda x: x.partner_bank_id.account_type != 'iban'):
                 raise RedirectWarning(
                     _("The customer bank account set on some payments does not have an IBAN number. This is required for SEPA."),
                     no_iban_payments._get_records_action(name=_("Payments without IBAN")),
@@ -65,12 +101,12 @@ class AccountBatchPayment(models.Model):
                     no_eur_payments._get_records_action(name=_("Non-EUR Payments")),
                     _("View Payments"),
                 )
-        return super().validate_batch()
+        return super().validate_batch(initiate_payment=initiate_payment)
 
     def check_payments_for_errors(self):
         rslt = super().check_payments_for_errors()
 
-        if self.payment_method_code not in ['sepa_ct', 'iso20022', 'iso20022_se', 'iso20022_ch', 'iso20022_us']:
+        if self.payment_method_code not in ISO20022_PAYMENT_METHODS:
             return rslt
 
         no_bank_acc_payments = self.env['account.payment']
@@ -103,17 +139,19 @@ class AccountBatchPayment(models.Model):
         return "SCT-" if self.payment_method_code == 'sepa_ct' else "PAIN-"
 
     def _generate_export_file(self):
-        if self.payment_method_code in ['sepa_ct', 'iso20022', 'iso20022_se', 'iso20022_ch', 'iso20022_us']:
+        if self.payment_method_code in ISO20022_PAYMENT_METHODS:
             payments = self.payment_ids.sorted(key=lambda r: r.id)
             payment_dicts = self._generate_payment_template(payments)
-            xml_doc = self.journal_id.create_iso20022_credit_transfer(
+            xml_doc = self.with_context(
+                bban=self.payment_method_code == 'iso20022_se' and len({'bban_se', 'plusgiro', 'bankgiro', *self.payment_ids.mapped('partner_bank_id.account_type')}) == 3
+            ).journal_id.create_iso20022_credit_transfer(
                 payment_dicts,
-                self.payment_method_code,
+                self.payment_ids.payment_method_line_id,
                 batch_booking=self.iso20022_batch_booking,
             )
             prefix = self._get_export_file_name_prefix()
             return {
-                'file': base64.encodebytes(xml_doc),
+                'file': BinaryBytes(xml_doc),
                 'filename': "%s%s-%s.xml" % (prefix, self.journal_id.code, datetime.now().strftime('%Y%m%d%H%M%S')),
             }
         return super()._generate_export_file()
@@ -121,7 +159,7 @@ class AccountBatchPayment(models.Model):
     def _get_payment_vals(self, payment):
         return {
             'id': payment.id,
-            'name': str(payment.id) + '-' + (payment.memo or self.journal_id.code + '-' + str(fields.Date.today())),
+            'name': str(payment.id) + '-' + (payment.memo or self.journal_id.code + '-' + str(fields.Date.context_today(self))),
             'payment_date': payment.date,
             'amount': payment.amount,
             'journal_id': self.journal_id.id,
@@ -131,7 +169,7 @@ class AccountBatchPayment(models.Model):
             'partner_id': payment.partner_id.id,
             'partner_bank_id': payment.partner_bank_id.id,
             'partner_country_code': payment.partner_id.country_id.code,
-            'end_to_end_uuid': payment.end_to_end_uuid,
+            'transaction_uuid': payment.transaction_uuid,
             'iso20022_uetr': payment.iso20022_uetr,
             'iso20022_charge_bearer': payment.iso20022_charge_bearer,
             'iso20022_priority': payment.iso20022_priority,

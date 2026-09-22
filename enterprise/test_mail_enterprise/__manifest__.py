@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 
 {
     'name': 'Mail Tests (Enterprise)',
-    'version': '1.0',
     'category': 'Hidden',
     'sequence': 9876,
     'summary': 'Mail Tests: performances and tests specific to mail with all sub-modules',
@@ -30,18 +28,18 @@ in order to test the whole mail codebase. """,
         'test_mail_full',
         'test_mass_mailing',
         'test_mail_sms',
+        'test_base',
         'voip',
         'test_whatsapp',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_unit_tests': [
             'test_mail_enterprise/static/tests/**/*',
         ],
     },
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

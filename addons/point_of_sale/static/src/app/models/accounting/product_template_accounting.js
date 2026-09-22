@@ -7,10 +7,13 @@ import { formatCurrency } from "@web/core/currency";
 export class ProductTemplateAccounting extends Base {
     static pythonModel = "product.template";
 
+    get config() {
+        return this.models["pos.config"].get(odoo.pos_config_id);
+    }
+
     prepareProductBaseLineForTaxesComputationExtraValues(opts = {}) {
         const { price = false, pricelist = false, fiscalPosition = false, priceExtra = 0 } = opts;
         const isVariant = Boolean(this?.product_tmpl_id);
-        const config = this.models["pos.config"].getFirst();
         const productTemplate = isVariant ? this.product_tmpl_id : this;
         const baseP = productTemplate.getPrice(
             pricelist,
@@ -20,7 +23,7 @@ export class ProductTemplateAccounting extends Base {
             isVariant ? this : false
         );
         const priceUnit = price || price === 0 ? price : baseP;
-        const currency = config.currency_id;
+        const currency = this.config.currency_id;
 
         let taxes = this.taxes_id;
 
@@ -89,39 +92,65 @@ export class ProductTemplateAccounting extends Base {
             quantity = related_lines.reduce((sum, line) => sum + line.getQuantity(), 0);
         }
 
-        const tmplRules = (productTmpl.backLink("<-product.pricelist.item.product_tmpl_id") || [])
-            .filter((rule) => rule.pricelist_id.id === pricelist.id && !rule.product_id)
-            .sort((a, b) => b.min_quantity - a.min_quantity);
-        const productRules = (product?.backLink?.("<-product.pricelist.item.product_id") || [])
-            .filter((rule) => rule.pricelist_id.id === pricelist.id)
-            .sort((a, b) => b.min_quantity - a.min_quantity);
+        let rule = null;
 
-        const tmplRulesSet = new Set(tmplRules.map((rule) => rule.id));
-        const productRulesSet = new Set(productRules.map((rule) => rule.id));
-        const generalRulesIds = pricelist.getGeneralRulesIdsByCategories(this.parentCategories);
-        const rules = this.models["product.pricelist.item"]
-            .readMany([...productRulesSet, ...tmplRulesSet, ...generalRulesIds])
-            .filter((r) => !r.min_quantity || r.min_quantity <= quantity);
+        // 1. Variant Rules
+        if (product) {
+            const productRules = pricelist.getRulesByProductId(product.id);
+            rule = pricelist.findBestRule(productRules, quantity);
+        }
 
-        const rule = rules.length && rules[0];
+        // 2. Template Rules
+        if (!rule) {
+            const tmplRules = pricelist.getRulesByTmplId(productTmpl.id);
+            rule = pricelist.findBestRule(tmplRules, quantity);
+        }
+
+        // 3. Category Rules
+        if (!rule) {
+            const categoryRulesIds = pricelist.getCategoryRulesIds(this.parentCategories);
+            if (categoryRulesIds.length > 0) {
+                const categoryRules =
+                    this.models["product.pricelist.item"].readMany(categoryRulesIds);
+                rule = pricelist.findBestRule(categoryRules, quantity);
+            }
+        }
+
+        // 4. Global Rules
+        if (!rule) {
+            const globalRulesIds = pricelist.getGlobalRulesIds();
+            if (globalRulesIds.length > 0) {
+                const globalRules = this.models["product.pricelist.item"].readMany(globalRulesIds);
+                rule = pricelist.findBestRule(globalRules, quantity);
+            }
+        }
+
         if (!rule) {
             return price;
         }
+
         if (rule.base === "pricelist") {
             if (rule.base_pricelist_id) {
-                price = this.getPrice(rule.base_pricelist_id, quantity, 0, true, variant);
+                price = this.getPrice(rule.base_pricelist_id, quantity, price_extra, true, variant);
             }
         } else if (rule.base === "standard_price") {
             price = standardPrice;
         }
 
+        const posCurrency = this.config.currency_id;
+        const pricelistCurrency = pricelist.currency_id;
+        const needsCurrencyConversion =
+            pricelistCurrency && posCurrency && pricelistCurrency.id !== posCurrency.id;
+
+        if (needsCurrencyConversion) {
+            price *= pricelistCurrency.rate / posCurrency.rate;
+        }
+
         if (rule.compute_price === "fixed") {
             price = rule.fixed_price;
-        } else if (rule.compute_price === "percentage") {
-            price = price - price * (rule.percent_price / 100);
         } else {
             var price_limit = price;
-            price -= price * (rule.price_discount / 100);
+            price -= price * ((rule.price_discount || 0) / 100);
             if (rule.price_round) {
                 price = roundPrecision(price, rule.price_round);
             }
@@ -134,6 +163,10 @@ export class ProductTemplateAccounting extends Base {
             if (rule.price_max_margin) {
                 price = Math.min(price, price_limit + rule.price_max_margin);
             }
+        }
+
+        if (needsCurrencyConversion) {
+            price *= posCurrency.rate / pricelistCurrency.rate;
         }
 
         // This return value has to be rounded with round_di before
@@ -160,7 +193,7 @@ export class ProductTemplateAccounting extends Base {
     }
 
     getTaxDetails(opts = {}) {
-        const config = this.models["pos.config"].getFirst();
+        const config = this.config;
         const baseLine = this.getBaseLine(opts);
         accountTaxHelpers.add_tax_details_in_base_line(baseLine, config.company_id);
         accountTaxHelpers.round_base_lines_tax_details([baseLine], config.company_id);
@@ -168,11 +201,195 @@ export class ProductTemplateAccounting extends Base {
     }
 
     get displayPriceUnit() {
-        const config = this.models["pos.config"].getFirst();
+        const config = this.config;
         const price =
             config.iface_tax_included === "total"
                 ? this.getTaxDetails().total_included
                 : this.getTaxDetails().total_excluded;
         return formatCurrency(price, config.currency_id.id);
+    }
+
+    getComboTaxDetails(opts = {}) {
+        const choices = [];
+        const extraChoices = [];
+        for (const combo of this.combo_ids) {
+            let cheaps;
+            const items = combo.combo_item_ids;
+
+            if (combo.qty_free === 0) {
+                cheaps = [...items].sort((a, b) => a.product_id.lst_price - b.product_id.lst_price);
+            } else {
+                cheaps = [...items].sort((a, b) => a.extra_price - b.extra_price);
+            }
+
+            const item = cheaps[0];
+            let configuration = undefined;
+
+            if (item.product_id.isConfigurable()) {
+                const attrValIds = [];
+                let priceExtra = 0;
+                for (const attr of item.product_id.attribute_line_ids) {
+                    const attrVals = attr.product_template_value_ids;
+                    const sortedByCheaper = [...attrVals].sort(
+                        (a, b) => a.price_extra - b.price_extra
+                    );
+                    attrValIds.push(sortedByCheaper[0].id);
+                    priceExtra += sortedByCheaper[0].price_extra;
+                }
+
+                configuration = {
+                    attribute_custom_values: [],
+                    attribute_value_ids: attrValIds,
+                    price_extra: priceExtra,
+                };
+            }
+
+            const data = {
+                combo_item_id: item,
+                qty: combo.qty_free || 1,
+                configuration: configuration,
+            };
+
+            if (combo.qty_free === 0) {
+                extraChoices.push(data);
+            } else {
+                choices.push(data);
+            }
+        }
+
+        const combos = this.getComboPrice(
+            choices,
+            extraChoices,
+            opts.overridedValues?.pricelist || false
+        );
+        const overridedValues = opts.overridedValues || {};
+        const baseLines = combos.map((combo) =>
+            combo.combo_item_id.product_id.getBaseLine({
+                ...opts,
+                overridedValues: {
+                    product_id: combo.combo_item_id.product_id,
+                    quantity: combo.qty,
+                    price: combo.price_unit,
+                    ...overridedValues,
+                },
+            })
+        );
+        accountTaxHelpers.add_tax_details_in_base_lines(baseLines, this.config.company_id);
+        accountTaxHelpers.round_base_lines_tax_details(baseLines, this.config.company_id);
+
+        let taxDetails = baseLines.length > 0 ? baseLines[0].tax_details : null;
+        for (let i = 1; i < baseLines.length; i++) {
+            taxDetails = accountTaxHelpers.merge_tax_details(taxDetails, baseLines[i].tax_details);
+        }
+        return taxDetails;
+    }
+
+    getComboPrice(childLineConf = [], childLineExtra = [], pricelist = false) {
+        const comboItems = [];
+        const productTemplateAttributeValueById =
+            this.models["product.template.attribute.value"].getAllBy("id");
+        const decimalPrecision = this.models["decimal.precision"].getAll();
+        const isVariant = Boolean(this.product_tmpl_id);
+        const productTmpl = isVariant ? this.product_tmpl_id : this;
+        const variant = isVariant ? this : this.product_variant_ids?.[0] || false;
+        const parentLstPrice = productTmpl.getPrice(pricelist, 1, 0, false, variant);
+        let originalTotal = childLineConf.reduce((acc, conf) => {
+            const originalPrice = conf.combo_item_id.combo_id.base_price * conf.qty;
+            return acc + originalPrice;
+        }, 0);
+
+        const getAttributesPriceExtra = (attributeValueIds) =>
+            (attributeValueIds ?? [])
+                .filter((attr) => attr?.attribute_id?.create_variant !== "always")
+                .map((attr) => attr?.price_extra || 0)
+                .reduce((acc, price) => acc + price, 0);
+
+        let remainingTotal = parentLstPrice;
+        const ProductPrice =
+            this.config.currency_id || decimalPrecision.find((dp) => dp.name === "Product Price");
+        if (childLineConf[childLineConf.length - 1]?.qty > 1) {
+            childLineConf[childLineConf.length - 1].qty -= 1;
+            childLineConf.push({ ...childLineConf[childLineConf.length - 1], qty: 1 });
+        }
+        for (const conf of childLineConf) {
+            const comboItem = conf.combo_item_id;
+            const combo = comboItem.combo_id;
+            let priceUnit = ProductPrice.round((combo.base_price * parentLstPrice) / originalTotal);
+            remainingTotal -= priceUnit * conf.qty;
+            if (conf === childLineConf[childLineConf.length - 1]) {
+                priceUnit += remainingTotal;
+                remainingTotal = 0;
+            }
+            const attribute_value_ids = conf.configuration?.attribute_value_ids?.map(
+                (id) => productTemplateAttributeValueById[id]
+            );
+
+            const totalPriceExtra =
+                priceUnit + getAttributesPriceExtra(attribute_value_ids) + comboItem.extra_price;
+            comboItems.push({
+                combo_item_id: comboItem,
+                price_unit: totalPriceExtra,
+                attribute_value_ids:
+                    attribute_value_ids ||
+                    comboItem.product_id?.product_template_attribute_value_ids,
+                attribute_custom_values: conf.configuration?.attribute_custom_values || {},
+                qty: conf.qty,
+            });
+        }
+
+        if (remainingTotal !== 0) {
+            originalTotal = childLineExtra.reduce((acc, conf) => {
+                const originalPrice = conf.combo_item_id.combo_id.base_price * conf.qty;
+                return acc + originalPrice;
+            }, 0);
+        }
+
+        // Process extra child lines using combo 'base_price'
+        for (const extra of childLineExtra) {
+            const comboItem = extra.combo_item_id;
+            const combo = comboItem.combo_id;
+            let priceUnit = ProductPrice.round(combo.base_price);
+            if (remainingTotal !== 0) {
+                const remaining = ProductPrice.round(
+                    (combo.base_price * parentLstPrice) / originalTotal
+                );
+                priceUnit += remaining;
+                remainingTotal -= remaining * extra.qty;
+
+                if (comboItem.id == childLineExtra[childLineExtra.length - 1].combo_item_id.id) {
+                    priceUnit += remainingTotal / extra.qty;
+                }
+            }
+            const attribute_value_ids = extra.configuration?.attribute_value_ids.map(
+                (id) => productTemplateAttributeValueById[id]
+            );
+
+            const totalPriceExtra =
+                priceUnit + getAttributesPriceExtra(attribute_value_ids) + comboItem.extra_price;
+            comboItems.push({
+                combo_item_id: comboItem,
+                price_unit: totalPriceExtra,
+                attribute_value_ids:
+                    attribute_value_ids ||
+                    comboItem.product_id?.product_template_attribute_value_ids,
+                attribute_custom_values: extra.configuration?.attribute_custom_values || {},
+                qty: extra.qty,
+            });
+        }
+
+        let sequenceCounter = 0;
+        const mapSequence = this.combo_ids.reduce((acc, combo) => {
+            combo.combo_item_ids.forEach((item) => {
+                acc[item.id] = sequenceCounter++;
+            });
+            return acc;
+        }, {});
+
+        comboItems.sort(
+            (a, b) =>
+                (mapSequence[a.combo_item_id.id] ?? Infinity) -
+                (mapSequence[b.combo_item_id.id] ?? Infinity)
+        );
+        return comboItems;
     }
 }

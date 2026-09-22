@@ -5,15 +5,36 @@ from odoo import Command, _, api, fields, models
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    l10n_br_shipping_state_id = fields.Many2one(
+        string="Shipping State",
+        comodel_name="res.country.state",
+        domain=[('country_id.code', '=', 'BR')],
+        help="Brazil: the state from which the products will be shipped internationally."
+    )
+    l10n_br_partner_country_code = fields.Char(
+        string="Partner Country Code",
+        related="partner_id.country_code"
+    )
+
     def _depends_l10n_br_avatax_warnings(self):
         """account.external.tax.mixin override."""
-        return super()._depends_l10n_br_avatax_warnings() + ["invoice_line_ids.product_id", "partner_shipping_id"]
+        return super()._depends_l10n_br_avatax_warnings() + [
+            "invoice_line_ids.product_id",
+            "l10n_br_goods_operation_type_id",
+            "invoice_line_ids.l10n_br_goods_operation_type_id",
+            "partner_shipping_id",
+            "incoterm_location",
+            "l10n_br_shipping_state_id",
+        ]
 
     def _get_line_data_for_external_taxes(self):
-        """ Override to set the operation_type per line. """
+        """ Override to set the operation_type, order_number, order_item_number per line. """
         res = super()._get_line_data_for_external_taxes()
         for line in res:
-            line['operation_type'] = line['base_line']['record'].l10n_br_goods_operation_type_id or line['base_line']['record'].move_id.l10n_br_goods_operation_type_id
+            aml = line['base_line']['record']
+            line['operation_type'] = aml.l10n_br_goods_operation_type_id or aml.move_id.l10n_br_goods_operation_type_id
+            line['order_number'] = aml.l10n_br_order_number
+            line['order_item_number'] = aml.l10n_br_item_number
         return res
 
     def _compute_l10n_br_is_avatax_depends(self):
@@ -56,7 +77,8 @@ class AccountMove(models.Model):
             # already existing taxes to ensure that previous tax calculations haven't altered the down payment lines.
             if invoice.l10n_br_is_service_transaction and invoice._get_l10n_br_avatax_service_params().get('installments'):
                 invoice.invoice_line_ids.filtered('tax_ids').write({
-                    'tax_ids': [Command.clear()]
+                    'tax_ids': [Command.clear()],
+                    'extra_tax_data': False,
                 })
 
         return super()._get_external_taxes()
@@ -71,6 +93,14 @@ class AccountMove(models.Model):
         else:
             warning_fields += ["l10n_br_ncm_code_id", "l10n_br_sped_type", "l10n_br_source_origin"]
 
+        # These fields can also be resolved through the operation type cascade, so warn only when the resolved
+        # payload value is empty rather than the raw product field.
+        resolved_field_values = {
+            "l10n_br_use_type": lambda line: line["useType"],
+            "l10n_br_sped_type": lambda line: line["itemDescriptor"].get("productType"),
+            "l10n_br_source_origin": lambda line: line["itemDescriptor"].get("source"),
+        }
+
         incomplete_products = self.env['product.product']
         fields = set()
 
@@ -80,14 +110,16 @@ class AccountMove(models.Model):
                 continue
 
             for field in warning_fields:
-                if not product[field]:
+                resolver = resolved_field_values.get(field)
+                value = resolver(line) if resolver else product[field]
+                if not value:
                     incomplete_products |= product
                     fields.add(product._fields[field])
 
         if incomplete_products:
             res["invoice_products_missing_fields_warning"] = {
                 "message": _(
-                    "To avoid tax miscalculations make sure to set up %(fields)s on the following:\n%(products)s",
+                    "To avoid tax miscalculations make sure to set up %(fields)s on an operation type or on the following:\n%(products)s",
                     fields=[field._description_string(self.env) for field in fields],
                     products=incomplete_products.mapped("display_name"),
                 ),
@@ -117,8 +149,38 @@ class AccountMove(models.Model):
 
         return res
 
+    def _l10n_br_avatax_check_missing_export_fields(self, params):
+        res = {}
+        if params['is_export_goods']:
+            if not params['incoterm_location']:
+                res['missing_incoterm_location'] = {
+                    "message": _("Incoterm Location is required to calculate taxes with Avatax for export of goods."),
+                    "level": "danger",
+                }
+            if not params['shipping_state_id']:
+                res['missing_shipping_state'] = {
+                    "message": _("Shipping State is required to calculate taxes with Avatax for export of goods."),
+                    "level": "danger",
+                }
+        return res
+
+    def _compute_l10n_br_avatax_warnings(self):
+        """account.external.tax.mixin override."""
+        super()._compute_l10n_br_avatax_warnings()
+
+        for move in self:
+            if not move.l10n_br_is_avatax:
+                move.l10n_br_avatax_warnings = False
+                continue
+
+            move.l10n_br_avatax_warnings = {
+                **(move.l10n_br_avatax_warnings or {}),
+                **move._l10n_br_avatax_check_missing_export_fields(move._get_l10n_br_avatax_service_params())
+            }
+
     def _get_l10n_br_avatax_service_params(self):
         params = super()._get_l10n_br_avatax_service_params()
+
         if origin := self.debit_origin_id or self.reversed_entry_id:
             params['origin_record'] = origin
             params['invoice_refs'] = {
@@ -156,6 +218,9 @@ class AccountMove(models.Model):
         params.update({
             'document_date': self.invoice_date,
             'partner_shipping': self.partner_shipping_id,
+            'is_export_goods': self.partner_id.country_id != self.env.ref('base.br') and self.l10n_latam_document_type_id == self.env.ref('l10n_br.dt_55'),
+            'shipping_state_id': self.l10n_br_shipping_state_id,
+            'incoterm_location': self.incoterm_location,
         })
 
         return params

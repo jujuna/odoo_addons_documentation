@@ -1,17 +1,20 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import Command
+
 from odoo.addons.mrp.tests.common import TestMrpCommon
 
+
 class TestBoMHr(TestMrpCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_bom_report_operation_cost(self):
         """ Test report bom overview with variant-exclusive operations, see if the bom cost matches.
         """
         self.workcenter_2.employee_costs_hour = 120
         bom = self.env['mrp.bom'].create({
             'product_tmpl_id': self.product_template_sofa.id,
-            'product_uom_id': self.uom_unit.id,
+            'uom_id': self.uom_unit.id,
             'product_qty': 1,
             'type': 'normal',
             'bom_line_ids': [

@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from ast import literal_eval
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class WebsiteControllerPage(models.Model):
@@ -10,6 +11,7 @@ class WebsiteControllerPage(models.Model):
         'website.published.multi.mixin',
         'website.searchable.mixin',
     ]
+    _check_inherits_access = False
     _description = 'Model Page'
     _order = 'website_id, id DESC'
     _unique_name_slugified = models.Constraint(
@@ -51,8 +53,11 @@ class WebsiteControllerPage(models.Model):
     )
 
     def _check_user_has_model_access(self):
-        for record in self:
-            self.env[record.model_id.model].check_access('read')
+        for model_id in self.mapped("model_id"):
+            Model = self.env[model_id.model]
+            if Model._transient or Model._abstract or not Model._auto:
+                raise ValidationError(self.env._("A page must be set to display a concrete model."))
+            Model.check_access('read')
 
     @api.depends("view_id")
     def _compute_name(self):
@@ -118,7 +123,7 @@ class WebsiteControllerPage(models.Model):
 
         # Make sure website.is_menu_cache_disabled() will be recomputed
         if self:
-            self.env.registry.clear_cache('templates')
+            self.env.transaction.invalidate_ormcache('templates')
         return super().unlink()
 
     def open_website_url(self):

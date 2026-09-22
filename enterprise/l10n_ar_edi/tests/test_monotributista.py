@@ -6,6 +6,8 @@ from odoo.tests import tagged
 @tagged('post_install', 'post_install_l10n', '-at_install', *TestArEdiCommon.extra_tags)
 class TestArEdiWsfeMono(TestArEdiCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestArEdiCommon.setup_afip_ws('wsfe')
     def setUpClass(cls):

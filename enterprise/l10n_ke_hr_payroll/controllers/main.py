@@ -155,7 +155,7 @@ class L10nKeHrPayrollNssfReportController(http.Controller):
         ]
 
         vertical_data = [
-            wizard.company_id.company_registry or '',
+            wizard.company_id.l10n_ke_employer_code or '',
             wizard.company_id.name,
             '%s-%s' % (wizard.reference_year, wizard.reference_month),
         ]
@@ -240,7 +240,7 @@ class L10nKeHrPayrollNssfReportController(http.Controller):
         ]
 
         vertical_data = [
-            wizard.company_id.company_registry or '',
+            wizard.company_id.l10n_ke_employer_code or '',
             wizard.company_id.name,
             '%s-%s' % (wizard.reference_year, wizard.reference_month),
         ]

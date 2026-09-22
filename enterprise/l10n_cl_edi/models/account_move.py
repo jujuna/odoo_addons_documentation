@@ -13,9 +13,10 @@ from markupsafe import Markup
 from psycopg2 import OperationalError
 
 
-from odoo import fields, models, Command
+from odoo import api, fields, models, Command
 from odoo.addons.l10n_cl_edi.models.l10n_cl_edi_util import UnexpectedXMLResponse, InvalidToken
 from odoo.exceptions import LockError, UserError, ValidationError
+from odoo.tools import SQL
 from odoo.tools.misc import formatLang
 from odoo.tools.translate import _, LazyTranslate
 from odoo.tools.float_utils import float_repr
@@ -126,10 +127,15 @@ services reception has been received as well.
         ('RFP', 'Claim for Partial Lack of Merchandise'),
         ('RFT', 'Claim for Total Lack of Merchandise'),
         ('NCA', 'Reception of Cancellation that References Document'),
+        ('ENC', 'Reception of Credit note different to Cancellation'),
+        ('PAG', 'DTE Paid with Cash'),
+        ('ERG', 'Merchandise and Service Receipt Acknowledge in Delivery Guide Previous Month'),
+        ('ERI', 'Merchandise and Service Receipt Acknowledge Printed in Previous Month'),
+        ('CED', 'Yielded DTE'),
     ], string='Claim', copy=False, help='The reason why the DTE was accepted or claimed by the customer')
     l10n_cl_claim_description = fields.Char(string='Claim Detail', readonly=True, copy=False)
-    l10n_cl_sii_send_file = fields.Many2one('ir.attachment', string='SII Send file', copy=False, groups='base.group_system')
-    l10n_cl_dte_file = fields.Many2one('ir.attachment', string='DTE file', copy=False, groups='base.group_system')
+    l10n_cl_sii_send_file = fields.Many2one('ir.attachment', string='SII Send file', copy=False, groups='base.group_system', index='btree_not_null')
+    l10n_cl_dte_file = fields.Many2one('ir.attachment', string='DTE file', copy=False, groups='base.group_system', index='btree_not_null')
     l10n_cl_sii_send_ident = fields.Text(string='SII Send Identification(Track ID)', copy=False, tracking=True)
     l10n_cl_journal_point_of_sale_type = fields.Selection(related='journal_id.l10n_cl_point_of_sale_type')
     l10n_cl_reference_ids = fields.One2many('l10n_cl.edi.reference', 'move_id', string='Reference Records')
@@ -199,13 +205,17 @@ services reception has been received as well.
                     'name': 'SII_{}'.format(file_name),
                     'res_id': move.id,
                     'res_model': 'account.move',
-                    'datas': base64.b64encode(dte_signed.encode('ISO-8859-1', 'replace')),
+                    'raw': dte_signed.encode('ISO-8859-1', 'replace'),
                     'type': 'binary',
                 })
                 move.sudo().l10n_cl_sii_send_file = attachment.id
                 move.message_post(
                     body=_('DTE has been created%s', msg_demo),
                     attachment_ids=attachment.ids)
+        for move in self.filtered(lambda move: move.name != '/' and move._l10n_cl_is_caf_numbered()):
+            # spent only once the document is out, as its DTE is stamped while the CAF is in use
+            move.company_id._l10n_cl_get_active_caf(move.l10n_latam_document_type_id).filtered(
+                lambda caf: caf.final_nb <= move.sequence_number).action_spend()
         return res
 
     def action_reverse(self):
@@ -240,7 +250,11 @@ services reception has been received as well.
         Extension to ensure the document type for customer invoices is computed based on the partner's taxpayer type and allows
         the SII, the fiscal authority of Chile, to properly validate the record.
         """
-        taxpayer_moves = self.filtered(lambda m: m.partner_id.l10n_cl_sii_taxpayer_type in ['1', '3', '4'] and m.move_type == 'out_invoice')
+        taxpayer_moves = self.filtered(lambda m:
+            m.country_code == 'CL'
+            and m.partner_id.l10n_cl_sii_taxpayer_type in ['1', '3', '4']
+            and m.move_type == 'out_invoice'
+        )
         grouped_doc_types = {doc_type.code: doc_type for doc_type in self.l10n_latam_available_document_type_ids._origin}
         for move in taxpayer_moves:
             taxpayer_type = move.partner_id.l10n_cl_sii_taxpayer_type
@@ -257,6 +271,14 @@ services reception has been received as well.
                 else:
                     move.l10n_latam_document_type_id = grouped_doc_types.get('110', False)
         super(AccountMove, self - taxpayer_moves)._compute_l10n_latam_document_type()
+
+    @api.depends('l10n_cl_dte_status')
+    def _compute_display_send_button(self):
+        # EXTENDS 'account' to display the "Send" button on unsent vendor bills
+        super()._compute_display_send_button()
+        for move in self:
+            if move.l10n_cl_dte_status == 'not_sent':
+                move.display_send_button |= move.state == 'posted'
 
     # SII Customer Invoice Buttons
 
@@ -285,9 +307,9 @@ services reception has been received as well.
             return None
         response = self._send_xml_to_sii_rest(
             self.company_id.l10n_cl_dte_service_provider,
-            self.company_id.vat,
+            self.company_id._l10n_cl_get_root_company().vat,
             self.sudo().l10n_cl_sii_send_file.name,
-            base64.b64decode(self.sudo().l10n_cl_sii_send_file.datas),
+            self.sudo().l10n_cl_sii_send_file.raw.content,
             digital_signature_sudo,
         )
         if not response:
@@ -320,14 +342,15 @@ services reception has been received as well.
                                      'it won\'t be sent to SII.'))
             self.l10n_cl_dte_status = 'accepted'
             return None
+        root_vat = self._l10n_cl_format_vat(self.company_id._l10n_cl_get_root_company().vat)
         params = {
             'rutSender': digital_signature_sudo.subject_serial_number[:-2],
             'dvSender': digital_signature_sudo.subject_serial_number[-1],
-            'rutCompany': self._l10n_cl_format_vat(self.company_id.vat)[:-2],
-            'dvCompany': self._l10n_cl_format_vat(self.company_id.vat)[-1],
+            'rutCompany': root_vat[:-2],
+            'dvCompany': root_vat[-1],
             'archivo': (
                 self.sudo().l10n_cl_sii_send_file.name,
-                base64.b64decode(self.sudo().l10n_cl_sii_send_file.datas),
+                self.sudo().l10n_cl_sii_send_file.raw.content,
                 'application/xml'),
         }
         response = self._send_xml_to_sii(
@@ -369,7 +392,7 @@ services reception has been received as well.
         response = self._get_send_status_rest(
             self.company_id.l10n_cl_dte_service_provider,
             self.l10n_cl_sii_send_ident,
-            self._l10n_cl_format_vat(self.company_id.vat),
+            self._l10n_cl_format_vat(self.company_id._l10n_cl_get_root_company().vat),
             digital_signature_sudo,
         )
         if not response:
@@ -389,7 +412,7 @@ services reception has been received as well.
         response = self._get_send_status(
             self.company_id.l10n_cl_dte_service_provider,
             self.l10n_cl_sii_send_ident,
-            self._l10n_cl_format_vat(self.company_id.vat),
+            self._l10n_cl_format_vat(self.company_id._l10n_cl_get_root_company().vat),
             digital_signature_sudo)
         if not response:
             self.l10n_cl_dte_status = 'ask_for_status'
@@ -429,7 +452,7 @@ services reception has been received as well.
             raise UserError(_('This feature is not available in certification/test mode'))
         response = self._get_dte_claim(
             self.company_id.l10n_cl_dte_service_provider,
-            self.company_id.vat,
+            self.company_id._l10n_cl_get_root_company().vat,
             self.company_id.sudo()._get_digital_signature(user_id=self.env.user.id),
             self.l10n_latam_document_type_id.code,
             self.l10n_latam_document_number
@@ -520,7 +543,7 @@ services reception has been received as well.
             'res_model': self._name,
             'res_id': self.id,
             'type': 'binary',
-            'datas': base64.b64encode(bytes(signed_response, 'utf-8')),
+            'raw': bytes(signed_response, 'utf-8'),
         })
         self.sudo().l10n_cl_dte_file = dte_attachment.id
         # If we are sending a reception of goods or services we must use an envelope and sign it the same
@@ -545,7 +568,7 @@ services reception has been received as well.
         dte_attachment = self.sudo().l10n_cl_dte_file
         if not dte_attachment:
             raise UserError(_('DTE attachment not found => %s') % attch_name)
-        xml_dte = base64.b64decode(dte_attachment.datas)
+        xml_dte = dte_attachment.raw.content
         xml_content = etree.fromstring(xml_dte)
         response_id = self.env['ir.sequence'].browse(self.env.ref('l10n_cl_edi.response_sequence').id).next_by_id()
         xml_ack_template = self.env['ir.qweb']._render('l10n_cl_edi.ack_template', {
@@ -574,7 +597,7 @@ services reception has been received as well.
             'res_model': self._name,
             'res_id': self.id,
             'type': 'binary',
-            'datas': base64.b64encode(bytes(xml_ack, 'utf-8')),
+            'raw': bytes(xml_ack, 'utf-8'),
         })
         self.env.ref('l10n_cl_edi.email_template_receipt_ack').send_mail(self.id, force_send=True, email_values={
             'attachment_ids': attachment.ids})
@@ -655,24 +678,44 @@ services reception has been received as well.
         self._l10n_cl_action_response('claimed')
 
     # DTE creation
-    def _get_last_sequence(self, relaxed=False, with_prefix=None):
-        """
-        This method extends the base sequence retrieval to handle Chilean electronic documents.
-        It checks if there's an available CAF (Código de Autorización de Folios)
-        for the current folio number and adjusts the sequence accordingly.
-        """
-        res = super()._get_last_sequence(relaxed=relaxed, with_prefix=with_prefix)
-        if res and self.country_code == "CL" and self.is_sale_document() and self.l10n_latam_document_type_id:
-            match = re.search(r'(\d+)$', res)
-            if match:
-                folio = int(match.group(1))
-                available_caf = self.env['l10n_cl.dte.caf'].sudo().search([
-                ('final_nb', '>=', folio), ('start_nb', '<=', folio), ('l10n_latam_document_type_id', '=', self.l10n_latam_document_type_id.id),
-                ('status', '=', 'in_use'), ('company_id', '=', self.company_id.id)], limit=1)
-                if not available_caf:
-                    start_nb = self.l10n_latam_document_type_id._get_start_number()
-                    res = f"{self.l10n_latam_document_type_id.doc_code_prefix} {start_nb - 1:06d}"
-        return res
+    def _l10n_cl_is_caf_numbered(self):
+        self.ensure_one()
+        return bool(
+            self.country_code == "CL"
+            and self.l10n_latam_use_documents
+            and self.l10n_latam_document_type_id
+            # a journal that is not online registers documents issued elsewhere, numbered there
+            and (self.journal_id.l10n_cl_point_of_sale_type == 'online'
+                 or self.l10n_latam_document_type_id._is_doc_type_vendor()),
+        )
+
+    def _get_last_sequence_domain(self, relaxed=False):
+        # EXTENDS 'l10n_cl'
+        condition = super()._get_last_sequence_domain(relaxed)
+        code, args, to_flush = condition._sql_tuple
+        company_clause = ' AND company_id = %s'
+        if (company_clause in code and self._l10n_cl_is_caf_numbered()
+                and (caf := self.company_id._l10n_cl_get_active_caf(self.l10n_latam_document_type_id))):
+            # branches sharing a range continue one series, and each range is a series apart
+            code = code.replace(company_clause, ' AND %s IS NOT NULL')
+            condition = SQL(code, *args, to_flush=to_flush)  # pylint: disable=sql-injection
+            condition = SQL(
+                "%s AND company_id IN %s AND sequence_number BETWEEN %s AND %s",
+                condition,
+                tuple(self.company_id._l10n_cl_get_rut_companies().ids),
+                caf.start_nb,
+                caf.final_nb,
+            )
+        return condition
+
+    def _get_next_sequence_format(self):
+        # EXTENDS 'account'
+        format_string, format_values = super()._get_next_sequence_format()
+        # the domain is bounded to the range, so finding nothing means it is untouched
+        if (not format_values['seq'] and self._l10n_cl_is_caf_numbered()
+                and (caf := self.company_id._l10n_cl_get_active_caf(self.l10n_latam_document_type_id))):
+            format_values['seq'] = caf.start_nb - 1
+        return format_string, format_values
 
     def _l10n_cl_create_dte(self):
         folio = int(self.l10n_latam_document_number)
@@ -702,7 +745,7 @@ services reception has been received as well.
             'res_model': self._name,
             'res_id': self.id,
             'type': 'binary',
-            'datas': base64.b64encode(signed_dte.encode('ISO-8859-1', 'replace'))
+            'raw': signed_dte.encode('ISO-8859-1', 'replace')
         })
         self.sudo().l10n_cl_dte_file = dte_attachment.id
 
@@ -714,7 +757,7 @@ services reception has been received as well.
             'res_model': self._name,
             'res_id': self.id,
             'type': 'binary',
-            'datas': base64.b64encode(dte_signed.encode('ISO-8859-1', 'replace'))
+            'raw': dte_signed.encode('ISO-8859-1', 'replace')
         })
         self.message_post(
             body=_('Partner DTE has been generated'),
@@ -730,7 +773,7 @@ services reception has been received as well.
         dte = Markup(dte.replace('<?xml version="1.0" encoding="ISO-8859-1" ?>', ''))
         dte_rendered = self.env['ir.qweb']._render(template.id, {
             'move': self,
-            'RutEmisor': self._l10n_cl_format_vat(self.company_id.vat),
+            'RutEmisor': self._l10n_cl_format_vat(self.company_id._l10n_cl_get_root_company().vat),
             'RutEnvia': digital_signature_sudo.subject_serial_number,
             'RutReceptor': receiver_rut,
             'FchResol': self.company_id.l10n_cl_dte_resolution_date,
@@ -763,9 +806,10 @@ services reception has been received as well.
         return True
 
     def _l10n_cl_edi_post_validation(self):
+        root_company = self.company_id._l10n_cl_get_root_company()
         if (self.l10n_cl_journal_point_of_sale_type == 'online' and
                 not ((self.partner_id.l10n_cl_dte_email or self.commercial_partner_id.l10n_cl_dte_email) and
-                     self.company_id.l10n_cl_dte_email) and
+                     root_company.l10n_cl_dte_email) and
                 not self.l10n_latam_document_type_id._is_doc_type_export() and
                 not self.l10n_latam_document_type_id._is_doc_type_ticket()):
             raise UserError(
@@ -780,7 +824,7 @@ services reception has been received as well.
             raise UserError(_(
                 'You have not selected an invoicing service provider for your company. '
                 'Please go to your company and select one'))
-        if not self.company_id.l10n_cl_activity_description:
+        if not root_company.l10n_cl_activity_description:
             raise UserError(_(
                 'Your company has not an activity description configured. This is mandatory for electronic '
                 'invoicing. Please go to your company and set the correct one (www.sii.cl - Mi SII)'))
@@ -788,6 +832,9 @@ services reception has been received as well.
             raise UserError(_(
                 'There are no activity codes configured in your company. This is mandatory for electronic '
                 'invoicing. Please go to your company and set the correct activity codes (www.sii.cl - Mi SII)'))
+        if len(self.company_id.l10n_cl_company_activity_ids) > 4:
+            raise UserError(self.env._(
+                'The maximum amount of Activities Names is 4. Please go to your company and select only 4 or less options.'))
         if not self.company_id.l10n_cl_sii_regional_office:
             raise UserError(_(
                 'There is no SII Regional Office configured in your company. This is mandatory for electronic '
@@ -932,7 +979,7 @@ services reception has been received as well.
             'dd': dd,
             'frmt': self.env['certificate.key']._sign_with_key(
                 re.sub(b'\n\\s*', b'', dd.encode('ISO-8859-1', 'replace')),
-                base64.b64encode(caf_file.findtext('RSASK').encode('utf-8')),
+                caf_file.findtext('RSASK').encode('utf-8'),
                 hashing_algorithm='sha1',
                 formatting='base64',
             ).decode(),
@@ -992,7 +1039,7 @@ services reception has been received as well.
 
     def _l10n_cl_ask_claim_status(self):
         for move in self.search([('l10n_cl_dte_acceptation_status', 'in', ['accepted', 'claimed']),
-                                 ('move_type', 'in', ['out_invoice', 'out_refund']),
+                                 ('move_type', '=', 'out_invoice'),
                                  ('l10n_cl_claim', '=', False)]):
             if move.company_id.l10n_cl_dte_service_provider in ['SIITEST', 'SIIDEMO']:
                 continue
@@ -1008,7 +1055,7 @@ services reception has been received as well.
         image = pdf417gen.render_image(bc, padding=15, scale=1)
         image.save(barcode_file, 'PNG')
         data = barcode_file.getvalue()
-        return base64.b64encode(data)
+        return base64.b64encode(data).decode()
 
     # cron jobs
     def cron_run_sii_workflow(self):
@@ -1023,11 +1070,6 @@ services reception has been received as well.
         self_skip._l10n_cl_ask_dte_status()
         self_skip._l10n_cl_send_dte_to_partner_multi()
         self_skip._l10n_cl_ask_claim_status()
-
-    def cron_send_dte_to_sii(self):
-        for record in self.search([('l10n_cl_dte_status', '=', 'not_sent')]):
-            record.with_context(cron_skip_connection_errs=True).l10n_cl_send_dte_to_sii()
-            self.env.cr.commit()
 
     # ------------------------------------------------------------
     # IMPORT
@@ -1069,12 +1111,28 @@ services reception has been received as well.
         invoice.l10n_cl_dte_file = file_data['attachment']
         invoice.l10n_cl_dte_acceptation_status = 'received'
 
+        company_vat = self.company_id._l10n_cl_get_root_company().vat
+        journal_type = self.journal_id.type
+        receptor_vat = xml_tree.findtext('.//ns0:RUTRecep', namespaces=XML_NAMESPACES).upper()
+        emisor_vat = xml_tree.findtext('.//ns0:RUTEmisor', namespaces=XML_NAMESPACES).upper()
+        if company_vat not in [emisor_vat, receptor_vat]:
+            raise ValidationError(_("%s cannot be imported because the company's VAT does not match either RutEmisor or RutReceptor.", file_data['name']))
+        elif company_vat == emisor_vat and journal_type != 'sale':
+            raise ValidationError(_("%s should be imported into a sales journal.", file_data['name']))
+        elif company_vat == receptor_vat and journal_type != 'purchase':
+            raise ValidationError(_("%s should be imported into a purchase journal.", file_data['name']))
+
         vals = {}
         messages = []
 
         origin_type = self.env['fetchmail.server']._get_xml_origin_type(xml_tree)
         if origin_type == 'not_classified':
             messages.append(_('Failed to determine origin type of the attached document, attempting to process as a vendor bill'))
+
+        # The file may contain several DTEs: only the first one belongs to this vendor bill.
+        dte_nodes = xml_tree.findall('.//ns0:DTE', namespaces=XML_NAMESPACES)
+        if len(dte_nodes) > 1:
+            xml_tree = dte_nodes[0]
 
         invoice._l10n_cl_fill_partner_vals_from_xml(xml_tree, vals, messages)
         invoice._l10n_cl_fill_document_number_vals_from_xml(xml_tree, vals, messages)
@@ -1089,9 +1147,13 @@ services reception has been received as well.
         invoice._l10n_cl_check_total_amount_from_xml(xml_tree)
 
     def _l10n_cl_fill_partner_vals_from_xml(self, xml_tree, vals, messages):
+        is_sale_journal = self.journal_id.type == 'sale'
+        partner_vat_tag_1 = './/ns0:RUTRecep' if is_sale_journal else './/ns0:RUTEmisor'
+        partner_vat_tag_2 = './/ns0:RutReceptor' if is_sale_journal else './/ns0:RutEmisor'
+
         partner_vat = (
-            xml_tree.findtext('.//ns0:RUTEmisor', namespaces=XML_NAMESPACES).upper() or
-            xml_tree.findtext('.//ns0:RutEmisor', namespaces=XML_NAMESPACES).upper()
+            xml_tree.findtext(partner_vat_tag_1, namespaces=XML_NAMESPACES).upper() or
+            xml_tree.findtext(partner_vat_tag_2, namespaces=XML_NAMESPACES).upper()
         )
         if partner_vat and (partner := self.env['res.partner'].search(
             [
@@ -1103,8 +1165,10 @@ services reception has been received as well.
             vals['partner_id'] = partner.id
             return
 
-        partner_name = xml_tree.findtext('.//ns0:RznSoc', namespaces=XML_NAMESPACES)
-        partner_street = xml_tree.findtext('.//ns0:DirOrigen', namespaces=XML_NAMESPACES)
+        partner_name_tag = './/ns0:RznSocRecep' if is_sale_journal else './/ns0:RznSoc'
+        partner_name = xml_tree.findtext(partner_name_tag, namespaces=XML_NAMESPACES)
+        partner_street_tag = './/ns0:DirRecep' if is_sale_journal else './/ns0:DirOrigen'
+        partner_street = xml_tree.findtext(partner_street_tag, namespaces=XML_NAMESPACES)
 
         if partner_name and partner_vat and partner_street:
             with contextlib.suppress(ValidationError):
@@ -1113,7 +1177,6 @@ services reception has been received as well.
                     'vat': partner_vat,
                     'street': partner_street,
                     'country_id': self.env.ref('base.cl').id,
-                    'l10n_latam_identification_type_id': self.env.ref('l10n_cl.it_RUT').id,
                     'l10n_cl_sii_taxpayer_type': '1'
                 }).id
                 return
@@ -1126,7 +1189,11 @@ services reception has been received as well.
             '<li><b>%(rut_l)s</b>: %(rut)s</li>'
             '<li><b>%(address_l)s</b>: %(address)s</li>'
         ) % {
-            'explanation': _('Vendor not found: You can generate this vendor manually with the following information:'),
+            'explanation': _(
+                '%(type1)s not found: You can generate this %(type2)s manually with the following information:',
+                type1='Customer' if is_sale_journal else 'Vendor',
+                type2='customer' if is_sale_journal else 'vendor'
+            ),
             'name_l': _("Name"), 'name': partner_name or '',
             'rut_l': _("RUT"), 'rut': partner_vat or '',
             'address_l': _("Address"), 'address': partner_street or ''
@@ -1151,9 +1218,11 @@ services reception has been received as well.
                 ('partner_id', '=', False),
                 ('narration', '=', vals['narration']),
             ]
+        is_sale_journal = self.journal_id.type == 'sale'
+        move_type_domain = ('move_type', 'in', ['out_invoice', 'out_refund']) if is_sale_journal else ('move_type', 'in', ['in_invoice', 'in_refund'])
         if self.search([
             *duplicate_domain,
-            ('move_type', 'in', ['in_invoice', 'in_refund']),
+            move_type_domain,
             ('name', 'ilike', document_number),
             ('l10n_latam_document_type_id', '=', document_type.id),
             *self.env['account.move']._check_company_domain(self.company_id.id),
@@ -1161,7 +1230,7 @@ services reception has been received as well.
             messages.append(_('E-invoice already exist: %s', document_number))
 
         if document_type_code == '61':
-            vals['move_type'] = 'in_refund'
+            vals['move_type'] = 'out_refund' if is_sale_journal else 'in_refund'
         vals['l10n_latam_document_type_id'] = document_type
         vals['l10n_latam_document_number'] = document_number
 
@@ -1182,9 +1251,9 @@ services reception has been received as well.
         if currency_name.isnumeric():
             currency_name = CURRENCY_CODES.get(currency_name)
         if currency := self.env['res.currency'].with_context(active_test=False).search([('name', '=', currency_name)]):
-            vals['currency_id'] = currency
+            vals['currency_id'] = currency.id
         else:
-            vals['currency_id'] = self.env.ref('base.CLP')
+            vals['currency_id'] = self.env.ref('base.CLP').id
 
     def _l10n_cl_fill_lines_vals_from_xml(self, xml_tree, vals, messages):
         vals['invoice_line_ids'] = [
@@ -1201,7 +1270,7 @@ services reception has been received as well.
         use_default_tax = xml_tree.findtext('.//ns0:TasaIVA', namespaces=XML_NAMESPACES) is not None
         default_purchase_tax = (self.company_id.account_purchase_tax_id or
                                 self.env['account.chart.template'].with_company(self.company_id).ref('OTAX_19'))
-        currency = vals['currency_id']
+        currency = self.env['res.currency'].browse(vals['currency_id'])
         lines_vals_list = []
         for dte_line in xml_tree.findall('.//ns0:Detalle', namespaces=XML_NAMESPACES):
             product_code = dte_line.findtext('.//ns0:VlrCodigo', namespaces=XML_NAMESPACES)
@@ -1297,6 +1366,18 @@ services reception has been received as well.
                     line_vals['tax_ids'] = [Command.link(default_purchase_tax.id)]
 
             lines_vals_list.append(line_vals)
+
+        if monto_nf := float(xml_tree.findtext('.//ns0:MontoNF', namespaces=XML_NAMESPACES) or 0.0):
+            line_vals = {
+                'product_id': (
+                    self.env.ref('l10n_cl_edi.product_product_non_billable_amounts', raise_if_not_found=False)
+                    or self.env['product.product']
+                ).id,
+                'quantity': 1.0,
+                'price_unit': monto_nf,
+            }
+            lines_vals_list.append(line_vals)
+
         return lines_vals_list
 
     def _l10n_cl_get_default_tax(self, product):

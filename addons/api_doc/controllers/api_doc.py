@@ -9,18 +9,21 @@ import json
 import logging
 import typing
 from http import HTTPStatus
+from typing import Self
 
 import docutils.core
+from docutils import parsers, readers, writers
+from docutils.writers.html4css1 import Writer as HtmlWriter
 from werkzeug.exceptions import NotFound
 from werkzeug.http import is_resource_modified, parse_cache_control_header
 
 import odoo
 from odoo import http, models
-from odoo.api import Self
 from odoo.exceptions import AccessError
 from odoo.http import request
+from odoo.http.stream import content_disposition
+from odoo.models import get_public_method
 from odoo.modules.module_graph import ModuleGraph
-from odoo.service.model import get_public_method
 from odoo.tools import hmac, json_default, lazy_classproperty, py_to_js_locale
 
 logger = logging.getLogger(__name__)
@@ -43,7 +46,7 @@ class DocController(http.Controller):
         res.headers['X-Frame-Options'] = 'deny'
         return res
 
-    @http.route('/doc-bearer/index.json', type='json2', auth='bearer')
+    @http.route('/doc-bearer/index.json', type='json2', auth='bearer', bearer_scope='rpc')
     def doc_bearer_index(self):
         return self.doc_index()
 
@@ -78,6 +81,18 @@ class DocController(http.Controller):
                 "This page is only accessible to %s users.",
                 self.env.ref('api_doc.group_allow_doc').sudo().name))
 
+        # Client requested no cache, generate the document and send it.
+        if parse_cache_control_header(request.httprequest.headers.get('Cache-Control')).no_cache:
+            modules, models = self._doc_index()
+            return request.make_json_response(
+                {'modules': modules, 'models': models},
+                headers={
+                    'Cache-Control': 'no-store',
+                    'Content-Disposition': content_disposition('odoo-doc-index.json'),
+                    'Content-Language': py_to_js_locale(self.env.lang),
+                },
+            )
+
         # Cache key
         db_registry_sequence, _ = self.env.registry.get_sequences(self.env.cr)
         unique = hmac(
@@ -91,21 +106,14 @@ class DocController(http.Controller):
         )
 
         # Client cache
-        use_cache = not parse_cache_control_header(
-            request.httprequest.headers.get('Cache-Control')).no_cache
-        if use_cache and not is_resource_modified(request.httprequest.environ, etag=unique):
+        if not is_resource_modified(request.httprequest.environ, etag=unique):
             return request.make_response('', status=HTTPStatus.NOT_MODIFIED)
 
-        # Server cache, use an attachment and not ormcache because the
-        # index gets very large (>1MiB) when there are many modules
-        # installed.
-        # TODO: gzip
+        # Server cache, use an attachment because the index gets very
+        # large (>1MiB) when there are many modules installed.
         filename = f'odoo-doc-index-{db_registry_sequence}-{unique}.json'
         index_attach = self.env['ir.attachment'].sudo().search([('name', '=', filename)], limit=1)
-        if not use_cache:
-            modules, models = self._doc_index()
         if not index_attach:
-            # No cache, generate the index and save it.
             modules, models = self._doc_index()
             index_attach = index_attach.create({
                 'name': filename,
@@ -120,7 +128,7 @@ class DocController(http.Controller):
                     {'modules': modules, 'models': models},
                     ensure_ascii=False,
                     default=json_default,
-                ),
+                ).encode(),
                 'public': False,
             })
             logger.info("new index attachment: %s", filename)
@@ -135,12 +143,13 @@ class DocController(http.Controller):
             {
                 'model': ir_model.model,
                 'name': ir_model.name,
+                'doc': ir_model.explanation,
                 'fields': {
                     field.name: {'string': field.field_description}
                     for field in ir_model.field_id
                     # sorted(ir_model.field_id, key=partial(sort_key_field, modules, Model))
                     if field.name in Model._fields  # band-aid, see task 5172546
-                    if Model._has_field_access(Model._fields[field.name], 'read')
+                    if Model.has_field_access(Model._fields[field.name], 'read')
                 },
                 'methods': [
                     method_name
@@ -155,7 +164,7 @@ class DocController(http.Controller):
         ]
         return modules, models
 
-    @http.route('/doc-bearer/<model_name>.json', type='json2', auth='bearer', readonly=True)
+    @http.route('/doc-bearer/<model_name>.json', type='json2', auth='bearer', bearer_scope='rpc', readonly=True)
     def doc_bearer_modec(self, model_name):
         return self.doc_model(model_name)
 
@@ -211,7 +220,7 @@ class DocController(http.Controller):
         result = {
             'model': model_name,
             'name': ir_model.name,
-            'doc': None,  # TODO
+            'doc': ir_model.explanation or '',
             'fields': {
                 field['name']: dict(
                     field,
@@ -478,6 +487,8 @@ def stringify_annotation(annotation) -> str | None:
         return None
     if isinstance(annotation, str):
         return annotation
+    if hasattr(annotation, '__origin__'):
+        return str(annotation)
     if isinstance(annotation, type):
         return annotation.__name__
     return str(annotation)
@@ -603,8 +614,14 @@ class _DocUtils:
 
     @classmethod
     def _make_settings(cls, writer_name, settings_overrides):
-        pub = docutils.core.Publisher()
-        pub.set_components('standalone', 'restructuredtext', writer_name)
+        parser = parsers.get_parser_class('restructuredtext')()
+        reader = readers.get_reader_class('standalone')(parser)
+        writer = writers.get_writer_class(writer_name)()
+        pub = docutils.core.Publisher(
+            reader=reader,
+            parser=parser,
+            writer=writer,
+        )
         pub.process_programmatic_settings(None, settings_overrides, None)
         return pub.settings
 
@@ -644,7 +661,7 @@ class _DocUtils:
         root.append(tree)
         html = docutils.core.publish_from_doctree(
             root,
-            writer_name='html',
+            writer=HtmlWriter(),
             settings=cls._settings_html,
         )
         head = b'\n</head>\n<body>\n<div class="document">'

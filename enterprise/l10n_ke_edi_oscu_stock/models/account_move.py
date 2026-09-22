@@ -106,7 +106,7 @@ class AccountMove(models.Model):
             vals.append(Command.create({
                 'product_id': line.product_id.id,
                 'product_qty': line.quantity,
-                'product_uom_id': line.product_uom_id.id,
+                'uom_id': line.product_uom_id.id,
                 'price_unit': line.price_unit,
                 'invoice_lines': line.ids,
                 'date_planned': fields.Date.context_today(self),

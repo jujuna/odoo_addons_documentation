@@ -5,25 +5,34 @@
             <field name="name">Deduplication Record List</field>
             <field name="model">data_merge.record</field>
             <field name="arch" type="xml">
-                <list expand="true" js_class="data_merge_list" decoration-danger="is_deleted" create="0" export_xlsx="0">
+                <list expand="true" js_class="data_merge_list" decoration-danger="is_deleted" create="0" delete="0" export_xlsx="0">
+                    <header>
+                        <button icon="check" name="action_validate_merge" type="object" string="Merge" class="btn-secondary"/>
+                        <button icon="close" name="action_discard_selected_records" type="object" string="Archive Suggestions" class="btn-secondary"/>
+                        <button icon="undo" name="action_undiscard_selected_records" type="object" string="Unarchive Suggestions" class="btn-secondary"/>
+                    </header>
+                    <field name="is_discarded" column_invisible="True" />
                     <field name="is_deleted" column_invisible="True" />
                     <field name="res_model_name" column_invisible="True" />
                     <field name="group_id" column_invisible="True" />
-                    <field name="record_create_date" optional="show" />
+                    <field name="record_create_date" optional="hide" />
                     <field name="record_create_uid" optional="hide" />
-                    <field name="record_write_date" optional="hide" />
-                    <field name="record_write_uid" optional="hide" />
+                    <field name="record_write_date" string="Last updated on" optional="show" />
+                    <field name="record_write_uid" string="Last Updated By" optional="show" />
                     <field name="name" />
-                    <field name="field_values" optional="show" />
-                    <field name="differences" optional="hide" />
-                    <field name="used_in" optional="show" />
-                    <field name="res_id" string="ID" optional="show" />
+                    <button name="action_merge_details" type="object" icon="visibility" string="Merge Details"
+                            invisible="is_master or is_discarded or is_deleted"/>
+                    <field name="used_in" optional="hide" />
+                    <field name="active" string="Archived" optional="hide"/>
+                    <field name="res_id" string="ID" widget="many2one_reference_integer" optional="show" />
                     <field name="is_master" widget="boolean_toggle" />
 
                     <groupby name="group_id">
                         <field name="active" invisible="1" />
-                        <button type="object" name="merge_records" string="Merge" />
-                        <button type="object" name="discard_records" string="Discard" class="text-danger text-uppercase o_data_merge_discard_btn" invisible="not active"/>
+                        <field name="model_id" invisible="1"/>
+                        <button type="object" name="merge_records" string="Merge" invisible="context.get('hide_discard_btn')" />
+                        <button type="object" name="discard_records" string="Archive Suggestion" invisible="context.get('hide_discard_btn')"/>
+                        <button type="object" name="undiscard_records" string="Unarchive Suggestion" invisible="not context.get('hide_discard_btn')"/>
                     </groupby>
                 </list>
             </field>
@@ -34,11 +43,16 @@
             <field name="model">data_merge.record</field>
             <field name="arch" type="xml">
                 <search string="Records">
-                    <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
-                    <field name="model_id" string="Model" />
-                    <filter string="Discarded" name="discarded" domain="[('is_discarded', '=', True), ('active', '=', False)]" context="{'active_test': False}" />
+                    <field name="name" string="Name"/>
+                    <field name="model_id" string="Model Rule"/>
+                    <field name="create_uid" string="Created By"/>
+                    <field name="write_uid" string="Last Updated By"/>
+                    <field name="res_model_id" string="Model"/>
+                    <filter string="Create Date" name="filter_create_date" date="create_date"/>
+                    <filter string="Last Updated" name="filter_write_date" date="write_date"/>
+                    <filter string="Archived" name="discarded" domain="[('is_discarded', '=', True), ('active', '=', False)]" context="{'active_test': False, 'hide_discard_btn': True}" />
                     <searchpanel>
-                        <field name="model_id" icon="fa-bars" string="Rule" enable_counters="1"/>
+                        <field name="model_id" icon="menu" string="Model Rules" enable_counters="1"/>
                     </searchpanel>
                 </search>
             </field>

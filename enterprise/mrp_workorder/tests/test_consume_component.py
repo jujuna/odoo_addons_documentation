@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests import Form, tagged
+from odoo.tests import Form
 from odoo.addons.mrp.tests.test_consume_component import TestConsumeComponentCommon
 
-@tagged('post_install', '-at_install')
+
 class TestConsumeTrackedComponent(TestConsumeComponentCommon):
 
     @classmethod
     def setUpClass(cls):
-        super(TestConsumeTrackedComponent, cls).setUpClass()
+        super().setUpClass()
 
         cls.consume_quality_point = cls.env.ref('mrp_workorder.test_type_register_consumed_materials')
 
@@ -28,7 +27,7 @@ class TestConsumeTrackedComponent(TestConsumeComponentCommon):
             'product_ids': [(4, cls.produced_serial.id)],
             'operation_id': cls.routing_workcenter_serial.id,
             'test_type_id': cls.consume_quality_point.id,
-            'component_id': cls.raw_serial.id,
+            'bom_line_id': cls.bom_serial_line_serial.id,
             'sequence': 1,
             'note': 'Please enter the Raw Serial serial number',
             'title': 'Component Registration : Raw Serial',
@@ -47,8 +46,8 @@ class TestConsumeTrackedComponent(TestConsumeComponentCommon):
         mo_serial = self.create_mo(self.mo_serial_tmpl, 1)
         mo_serial.action_confirm()
 
-        self.assertTrue(self.raw_serial in mo_serial.workorder_ids.quality_point_ids.component_id)
-        self.assertTrue(self.routing_workcenter_serial in mo_serial.move_raw_ids.operation_id)
+        self.assertEqual(self.raw_serial, mo_serial.workorder_ids.quality_point_ids.bom_line_id.product_id)
+        self.assertEqual(self.routing_workcenter_serial, mo_serial.move_raw_ids.operation_id)
 
         quant = self.create_quant(self.raw_none, 3)
         quant |= self.create_quant(self.raw_lot, 2)
@@ -79,8 +78,8 @@ class TestConsumeTrackedComponent(TestConsumeComponentCommon):
         mo_serial = self.create_mo(self.mo_serial_tmpl, 1)
         mo_serial.action_confirm()
 
-        self.assertFalse(self.raw_serial in mo_serial.workorder_ids.quality_point_ids.component_id)
-        self.assertTrue(self.routing_workcenter_serial in mo_serial.move_raw_ids.operation_id)
+        self.assertNotEqual(self.raw_serial, mo_serial.workorder_ids.quality_point_ids.bom_line_id.product_id)
+        self.assertEqual(self.routing_workcenter_serial, mo_serial.move_raw_ids.operation_id)
 
         quant = self.create_quant(self.raw_none, 3)
         quant |= self.create_quant(self.raw_lot, 2)
@@ -112,8 +111,8 @@ class TestConsumeTrackedComponent(TestConsumeComponentCommon):
         mo_serial = self.create_mo(self.mo_serial_tmpl, 1)
         mo_serial.action_confirm()
 
-        self.assertTrue(self.raw_serial in mo_serial.workorder_ids.quality_point_ids.component_id)
-        self.assertFalse(self.routing_workcenter_serial in mo_serial.move_raw_ids.operation_id)
+        self.assertEqual(self.raw_serial, mo_serial.workorder_ids.quality_point_ids.bom_line_id.product_id)
+        self.assertNotEqual(self.routing_workcenter_serial, mo_serial.move_raw_ids.operation_id)
 
         quant = self.create_quant(self.raw_none, 3)
         quant |= self.create_quant(self.raw_lot, 2)
@@ -144,8 +143,8 @@ class TestConsumeTrackedComponent(TestConsumeComponentCommon):
         mo_serial = self.create_mo(self.mo_serial_tmpl, 1)
         mo_serial.action_confirm()
 
-        self.assertFalse(self.raw_serial in mo_serial.workorder_ids.quality_point_ids.component_id)
-        self.assertFalse(self.routing_workcenter_serial in mo_serial.move_raw_ids.operation_id)
+        self.assertNotEqual(self.raw_serial, mo_serial.workorder_ids.quality_point_ids.bom_line_id.product_id)
+        self.assertNotEqual(self.routing_workcenter_serial, mo_serial.move_raw_ids.operation_id)
 
         quant = self.create_quant(self.raw_none, 3)
         quant |= self.create_quant(self.raw_lot, 2)
@@ -170,7 +169,7 @@ class TestConsumeTrackedComponent(TestConsumeComponentCommon):
         bom = self.bom_serial
         bom.product_id = self.produced_serial
         components = self.bom_serial.bom_line_ids.mapped('product_id')
-        components.tracking = 'none'
+        components.tracking = False
         components[0].is_storable = False
         self.env['stock.quant']._update_available_quantity(components[1], self.env.ref('stock.warehouse0').lot_stock_id, 10)
         mo = self.env['mrp.production'].create({
@@ -197,8 +196,8 @@ class TestConsumeTrackedComponent(TestConsumeComponentCommon):
         self.assertTrue(mo.lot_producing_ids)
         self.assertRecordValues(mo, [{'qty_producing': 1.0, 'product_uom_qty': 3.0}])
         self.assertRecordValues(mo.move_raw_ids, [
-                {'should_consume_qty': 3.0, 'quantity': 3.0, 'picked': True},
-                {'should_consume_qty': 2.0, 'quantity': 2.0, 'picked': True},
-                {'should_consume_qty': 1.0, 'quantity': 0.0, 'picked': False},
+                {'should_consume_qty': 3.0, 'quantity': 3.0, 'picked': False},
+                {'should_consume_qty': 2.0, 'quantity': 2.0, 'picked': False},
+                {'should_consume_qty': 1.0, 'quantity': 1.0, 'picked': False},
             ]
         )

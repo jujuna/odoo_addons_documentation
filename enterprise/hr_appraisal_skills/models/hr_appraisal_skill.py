@@ -9,15 +9,13 @@ from odoo.fields import Domain
 class HrAppraisalSkill(models.Model):
     _name = 'hr.appraisal.skill'
     _inherit = 'hr.individual.skill.mixin'
-    _description = "Appraisal Skills"
-    _order = "skill_type_id, skill_level_id"
+    _description = "Appraisal Skill"
 
     appraisal_id = fields.Many2one('hr.appraisal', required=True, ondelete='cascade')
     skill_level_id = fields.Many2one('hr.skill.level', required=False)  # To handle Target Job
     employee_id = fields.Many2one(related="appraisal_id.employee_id", store=True)
     previous_skill_level_id = fields.Many2one('hr.skill.level')
     justification = fields.Char()
-    manager_ids = fields.Many2many('hr.employee', compute='_compute_manager_ids', store=True)
     goal_ids = fields.Many2many('hr.appraisal.goal', compute='_compute_goal_ids', store=True)
     goals_completion_percentage = fields.Integer(compute='_compute_goals_completion_percentage', string="Current Goals", store=True)
     number_of_recommended_goals = fields.Integer(compute='_compute_number_of_recommended_goals')
@@ -56,11 +54,6 @@ class HrAppraisalSkill(models.Model):
                     app_skill.target_job_skill_progress = target_job_skill.level_progress / 100
                 else:
                     app_skill.target_job_skill_progress = False
-
-    @api.depends('appraisal_id.manager_ids')
-    def _compute_manager_ids(self):
-        for appraisal_skill in self:
-            appraisal_skill.manager_ids = appraisal_skill.appraisal_id.manager_ids
 
     @api.depends('skill_id', 'skill_level_id')
     def _compute_display_name(self):

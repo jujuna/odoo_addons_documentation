@@ -5,12 +5,12 @@ from collections import defaultdict
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.addons.l10n_au_hr_payroll.models.hr_version import INCOME_STREAM_TYPES
-from odoo.tools import create_index
 
 
 class L10n_AuPayslipYtd(models.Model):
     _name = 'l10n_au.payslip.ytd'
     _description = "YTD Opening Balances"
+    _order = "sequence, id"
 
     name = fields.Char(string="Description", compute="_compute_name", required=True)
     start_date = fields.Date(string="Fiscal Start Date", inverse="_fiscal_start_date", required=True, help="The date should be the start of the fiscal year.")
@@ -30,6 +30,7 @@ class L10n_AuPayslipYtd(models.Model):
         required=True,
     )
     rule_id = fields.Many2one("hr.salary.rule", string="Salary Rule", required=True)
+    sequence = fields.Integer(related="rule_id.sequence", string="Sequence")
     requires_inputs = fields.Boolean("Requires Inputs")
     l10n_au_payslip_ytd_input_ids = fields.One2many("l10n_au.payslip.ytd.input", "l10n_au_payslip_ytd_id", string="Inputs")
     start_value = fields.Monetary(string="Start Value")
@@ -38,6 +39,7 @@ class L10n_AuPayslipYtd(models.Model):
 
     _unique_employee = models.Constraint("unique(employee_id, rule_id, l10n_au_income_stream_type, start_date)",
         "Opening balances for an employee with the same income stream type can only be imported once.")
+    _employee_date = models.Index("(employee_id, start_date)")
 
     ####################################################
     # HELPER METHODS
@@ -56,15 +58,11 @@ class L10n_AuPayslipYtd(models.Model):
 
     @api.model
     def _is_past_fiscal_year(self, start_date):
-        return self._get_start_date(start_date) < self._get_start_date(fields.Date.today())
+        return self._get_start_date(start_date) < self._get_start_date(fields.Date.context_today(self))
 
     ####################################################
     # ORM METHODS
     ####################################################
-
-    def _auto_init(self):
-        super()._auto_init()
-        create_index(self.env.cr, 'l10n_au_payslip_ytd_employee_date', 'l10n_au_payslip_ytd', ["employee_id", "start_date"])
 
     def _fiscal_start_date(self):
         for rec in self:
@@ -94,7 +92,7 @@ class L10n_AuPayslipYtd(models.Model):
         for rec in self:
             start_date = self._get_start_date(rec.start_date)
             end_date = start_date + relativedelta(years=1, days=-1)
-            if self.env["hr.payslip"].search_count([
+            if not self.env.context.get("allow_regenerate") and self.env["hr.payslip"].search_count([
                 ("employee_id", "=", rec.employee_id.id),
                 ("state", "in", ("validated", "paid")),
                 ("date_from", "<=", end_date),
@@ -127,9 +125,15 @@ class L10n_AuPayslipYtd(models.Model):
         })
 
     @api.model
+    def action_regenerate_ytd_values(self, kwargs=None):
+        grouped_ytd = self._read_group([("finalised", "=", False)], ["start_date:day"], ["employee_id:recordset"])
+        for start_date, employees in grouped_ytd:
+            self.env.company._regenerate_ytd_values(employees, start_date)
+
+    @api.model
     def _get_ote_total(self, employee_ids, start_date):
         start_date = self._get_start_date(start_date)
-        ote_input_type_ids = self.env["hr.payslip.input.type"].search([
+        ote_input_type_ids = self.env["hr.salary.rule"].search([
             ("l10n_au_superannuation_treatment", "=", "ote")
         ]).ids
         ote_work_entry_type_ids = self.env["hr.work.entry.type"].search([
@@ -141,7 +145,7 @@ class L10n_AuPayslipYtd(models.Model):
                 ("l10n_au_payslip_ytd_id.start_date", "=", start_date),
                 '|',
                     '&',
-                        ('res_model', '=', 'hr.payslip.input.type'),
+                        ('res_model', '=', 'hr.salary.rule'),
                         ('res_id', 'in', ote_input_type_ids),
                     '&',
                         ('res_model', '=', 'hr.work.entry.type'),
@@ -173,8 +177,8 @@ class L10nAUPayslipYTDInput(models.Model):
     res_id = fields.Many2oneReference('Input', model_field='res_model', readonly=True)
     res_model = fields.Selection(
         selection=[
-            ("hr.payslip.input.type", "Other Input"),
-            ("hr.work.entry.type", "Work Entry Type"),
+            ("hr.salary.rule", "Other Input"),
+            ("hr.work.entry.type", "Time Type"),
         ],
         string="Model",
         readonly=True,
@@ -187,20 +191,26 @@ class L10nAUPayslipYTDInput(models.Model):
     @api.depends("res_id")
     def _compute_name(self):
         for rec in self:
-            if rec.res_model == "hr.payslip.input.type":
+            if rec.res_model == "hr.salary.rule":
                 rec.name = rec.input_type.name
             elif rec.res_model == "hr.work.entry.type":
                 rec.name = rec.work_entry_type.name
 
     @property
     def work_entry_type(self):
-        work_entry_ids = self.filtered(lambda l: l.res_model == "hr.work.entry.type").mapped("res_id")
-        return self.env["hr.work.entry.type"].browse(work_entry_ids)
+        return self.env["hr.work.entry.type"].browse(
+            entry.res_id
+            for entry in self
+            if entry.res_model == "hr.work.entry.type" and entry.res_id
+        )
 
     @property
     def input_type(self):
-        input_ids = self.filtered(lambda l: l.res_model == "hr.payslip.input.type").mapped("res_id")
-        return self.env["hr.payslip.input.type"].browse(input_ids)
+        return self.env["hr.salary.rule"].browse(
+            entry.res_id
+            for entry in self
+            if entry.res_model == "hr.salary.rule" and entry.res_id
+        )
 
     def write(self, vals):
         # Should be negative

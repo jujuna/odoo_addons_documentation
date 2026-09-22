@@ -1,8 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import re
 
-from odoo.tests import TransactionCase
-from odoo.addons.ai.utils.tools_schema import validators
+from odoo.tests import tagged, TransactionCase
+from odoo.addons.ai.utils.tools_schema.param_schema_validator import validate_schema
+
 
 DUMMY_ATTRIBUTES = {'type': 'string', 'description': '...'}
 DUMMY_ARRAY_ATTRIBUTES = {
@@ -21,6 +22,7 @@ DUMMY_OBJECT_ATTRIBUTES = {
 }
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestParamSchemaValidation(TransactionCase):
 
     @classmethod
@@ -28,7 +30,8 @@ class TestParamSchemaValidation(TransactionCase):
         super().setUpClass()
         cls.wrong_array_item_type_error_message = (
             "The types of the items of the 'array' param 'array_param' are not defined correctly. "
-            "The types of the items must be defined as ('items': {'type': 'string'}) if all items are of the same type "
+            "The types of the items must be defined as ('items': {'type': 'string'}) if all items are of the same primitive type, "
+            "('items': {'type': 'object', 'properties': {...}, 'required': [...]}) for objects, "
             "or ('items': { 'anyOf': [ {'type': 'string'}, {'type': 'number'} ] }) if items are of different types"
         )
 
@@ -89,9 +92,9 @@ class TestParamSchemaValidation(TransactionCase):
 
         if error_message:
             with self.assertRaisesRegex(error_type, re.escape(error_message)):
-                validators.validate_schema(full_schema)
+                validate_schema(full_schema)
         else:
-            validators.validate_schema(full_schema)
+            validate_schema(full_schema)
 
     def test_valid_schema(self):
         schema = {
@@ -172,6 +175,36 @@ class TestParamSchemaValidation(TransactionCase):
                 "The pattern attribute cannot be defined for the parameter 'param'. "
                 "The pattern attribute can only be defined for string parameters or arrays whose items are only of the type string."
             )
+        )
+
+    def test_minimum_with_numeric_parameter(self):
+        for param_type in ('integer', 'number'):
+            with self.subTest(param_type=param_type):
+                schema = self.create_param(
+                    param_attributes={'type': param_type, 'minimum': 1}
+                )
+                self.validate_schema(schema=schema)
+
+    def test_minimum_with_non_numeric_parameter(self):
+        schema = self.create_param(
+            param_attributes={'type': 'string', 'minimum': 1}
+        )
+        self.validate_schema(
+            schema=schema,
+            error_message=(
+                "The minimum attribute cannot be defined for the parameter 'param'. "
+                "The minimum attribute can only be defined for integer or number parameters."
+            ),
+        )
+
+    def test_minimum_must_be_numeric(self):
+        schema = self.create_param(
+            param_attributes={'type': 'integer', 'minimum': True}
+        )
+        self.validate_schema(
+            schema=schema,
+            error_type=TypeError,
+            error_message="The minimum attribute for the parameter 'param' must be a number.",
         )
 
     def test_array_parameter_with_different_item_types(self):
@@ -255,7 +288,7 @@ class TestParamSchemaValidation(TransactionCase):
         )
         self.validate_schema(
             schema=schema,
-            error_message="The type '{'type': 'array'}' of the items of the 'array' parameter 'array_param' is wrong."
+            error_message="The type 'array' of the items of the 'array' parameter 'array_param' is wrong. The available types are"
         )
 
     def test_2d_array_parameter(self):
@@ -268,7 +301,7 @@ class TestParamSchemaValidation(TransactionCase):
         )
         self.validate_schema(
             schema=schema,
-            error_message="The type '{'type': 'array'}' of the items of the 'array' parameter 'array_param' is wrong.",
+            error_message="The type 'array' of the items of the 'array' parameter 'array_param' is wrong. The available types are",
         )
 
     def test_pattern_with_string_array_items(self):
@@ -360,5 +393,63 @@ class TestParamSchemaValidation(TransactionCase):
         )
         self.validate_schema(
             schema=outer_object_definition,
-            error_message="Nested objects are not supported. The parameter 'inner_object' is defined as an object inside another object.",
+        )
+
+    def test_deeply_nested_objects(self):
+        schema = {
+            'user': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string'},
+                    'address': {
+                        'type': 'object',
+                        'properties': {
+                            'street': {'type': 'string'},
+                            'location': {
+                                'type': 'object',
+                                'properties': {
+                                    'city': {'type': 'string'},
+                                    'country': {'type': 'string'},
+                                },
+                                'required': ['city'],
+                            },
+                        },
+                        'required': ['location'],
+                    },
+                },
+                'required': ['name'],
+            },
+        }
+        self.validate_schema(schema=schema)
+
+    def test_array_of_objects_parameter(self):
+        schema = self.create_array_param(
+            param_attributes={
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'field_name': {'type': 'string'},
+                        'selected_periods': {
+                            'type': 'array',
+                            'items': {'type': 'string'},
+                        },
+                    },
+                    'required': ['field_name', 'selected_periods'],
+                },
+            },
+        )
+        self.validate_schema(schema=schema)
+
+    def test_array_of_objects_missing_required(self):
+        schema = self.create_array_param(
+            param_attributes={
+                'items': {
+                    'type': 'object',
+                    'properties': {'field_name': {'type': 'string'}},
+                },
+            },
+        )
+        self.validate_schema(
+            schema=schema,
+            error_message="The required properties should be specified as a list.",
         )

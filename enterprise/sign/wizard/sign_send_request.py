@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, Command
 from odoo.exceptions import UserError
 from odoo.tools import format_date
+from odoo.tools.image import image_data_uri
 
 
 class SignSendRequest(models.TransientModel):
@@ -15,7 +16,7 @@ class SignSendRequest(models.TransientModel):
         return [(model.model, model.name) for model in self.env['ir.model'].sudo().search(
             [
                 ('model', '!=', 'sign.request'),
-                ('is_mail_thread', '=', 'True'),
+                ('is_mail_thread', '=', True),
             ]
         )]
 
@@ -27,13 +28,15 @@ class SignSendRequest(models.TransientModel):
 
     signer_ids = fields.One2many('sign.send.request.signer', 'sign_send_request_id', string="Signers", compute='_compute_signer_ids', store=True)
     set_sign_order = fields.Boolean(string="Signing Order",
+                                    compute='_compute_set_sign_order', store=True, readonly=False,
                                     help="""Specify the order for each signer. The signature request only gets sent to \
                                     the next signers in the sequence when all signers from the previous level have \
                                     signed the document.
                                     """)
+    signing_order_mandatory = fields.Boolean(compute='_compute_signing_order_mandatory')
     signer_id = fields.Many2one('res.partner', string="Send To")
     signers_count = fields.Integer(compute='_compute_signers_count')
-    cc_partner_ids = fields.Many2many('res.partner', string="Copy to", help="Contacts in copy will be notified by email once the document is either fully signed or refused.")
+    cc_partner_ids = fields.Many2many('res.partner', string="Copy to", compute='_compute_cc_partner_ids', store=True, readonly=False, help="Contacts in copy will be notified by email once the document is either fully signed or refused.")
     is_user_signer = fields.Boolean(compute='_compute_is_user_signer')
 
     subject = fields.Char(string="Subject", compute='_compute_subject', store=True, readonly=False)
@@ -43,10 +46,10 @@ class SignSendRequest(models.TransientModel):
     filename = fields.Char("Filename", compute='_compute_filename', store=True)
 
     validity = fields.Date(compute='_compute_validity', store=True, readonly=False,
-                           string='Valid Until', help="Leave empty for requests without expiration.")
+                           string='Valid Until', help="Signature request expiration date.")
     reminder_enabled = fields.Boolean(default=False)
     reminder = fields.Integer(string='Reminder', default=7)
-    certificate_reference = fields.Boolean(string="Certificate Reference", default=False, help="If checked, the unique certificate reference will be added on the final signed document.")
+    certificate_reference = fields.Boolean(string="Certificate Reference", default=False, help="If checked, the unique certificate reference will not be added on the final signed document.")
     model = fields.Char('Related Document Model')
     res_ids = fields.Text('Related Document IDs')
     scheduled_date = fields.Char('Scheduled Date')
@@ -61,9 +64,14 @@ class SignSendRequest(models.TransientModel):
         store=False
     )
 
+    log_request_activity = fields.Boolean(default=False)
+    activity_type_id = fields.Many2one("mail.activity.type")
+
     @api.constrains('validity')
     def _check_validity(self):
-        if self.validity and self.validity < fields.Date.today():
+        if not self.validity:
+            raise UserError(self.env._('Request expiration date is required.'))
+        if self.validity < fields.Date.context_today(self):
             raise UserError(self.env._('Request expiration date must be set in the future.'))
 
     @api.onchange('reminder')
@@ -97,9 +105,23 @@ class SignSendRequest(models.TransientModel):
 
         return self.env.context.get("default_signer_id", self.env.user.partner_id.id)
 
+    @api.depends('template_id.sign_item_ids.responsible_id.requires_external_signature')
+    def _compute_signing_order_mandatory(self):
+        """ A signer sealing the document himself must cover the other signers' values, so a
+        request with such a signer is bound to a strict signing order. """
+        for wiz in self:
+            roles = wiz.template_id.sign_item_ids.responsible_id
+            wiz.signing_order_mandatory = len(roles) > 1 and any(roles.mapped('requires_external_signature'))
+
+    @api.depends('signing_order_mandatory')
+    def _compute_set_sign_order(self):
+        for wiz in self.filtered('signing_order_mandatory'):
+            wiz.set_sign_order = True
+
     @api.depends('template_id', 'set_sign_order', 'template_id.sign_item_ids')
     def _compute_signer_ids(self):
-        default_signer = self._get_default_signer()
+        ctx = self.env.context
+        default_signer = self._get_default_signer() if not ctx.get('no_default_signer') else False
         for wiz in self:
             template = wiz.template_id
             roles = template.sign_item_ids.responsible_id.sorted()
@@ -122,13 +144,15 @@ class SignSendRequest(models.TransientModel):
                         }
                     ))
             else:
+                default_signer_used = False
                 for default_signing_order, role in enumerate(roles):
-                    # First signer logic
-                    if default_signing_order == 0:
-                        # If role has assign_to, use it; else use default_signer
-                        partner_id = role.assign_to.id if role.assign_to else default_signer
+                    if not role.assign_to and not default_signer_used:
+                        # Use the default signer for the first role that has no explicit assignee
+                        partner_id = default_signer
+                        default_signer_used = True
                     else:
-                        # For other roles, check assign_to
+                        # Assign the role to its explicit assignee,
+                        # or leave unassigned if no assignee exists
                         partner_id = role.assign_to.id if role.assign_to else False
                     signer_vals = {
                         'role_id': role.id,
@@ -148,7 +172,7 @@ class SignSendRequest(models.TransientModel):
         for wiz in self:
             display_name = self.env._("Sign Request ")
             if wiz.reference_doc:
-                display_name = self.env._("Sign Request - %s", wiz.reference_doc.display_name)
+                display_name = self.env._("Sign Request - %(template_name)s - %(res_name)s", template_name=wiz.template_id.display_name, res_name=wiz.reference_doc.display_name or '')
             wiz.display_name = display_name
 
     @api.depends('template_id', 'reference_doc')
@@ -166,19 +190,26 @@ class SignSendRequest(models.TransientModel):
         for wiz in self:
             filename = self.env._("Sign Request")
             if wiz.reference_doc:
-                filename = self.env._("Sign Request - %s", wiz.reference_doc.display_name)
+                filename = self.env._("Sign Request - %(template_name)s - %(res_name)s", template_name=wiz.template_id.display_name, res_name=wiz.reference_doc.display_name or '')
             elif wiz.template_id:
                 filename = wiz.template_id.display_name
             wiz.filename = filename
 
     @api.depends('template_id')
     def _compute_validity(self):
+        today = fields.Date.context_today(self)
         for wiz in self:
-            if wiz.template_id:
-                if wiz.template_id.signature_request_validity:
-                    wiz.validity = fields.Date.today() + relativedelta(days=wiz.template_id.signature_request_validity)
-                else:
-                    wiz.validity = None
+            template = wiz.template_id
+            if template:
+                validity_days = template.signature_request_validity
+            else:
+                validity_days = 60  # default validity
+
+            wiz.validity = (
+                today + relativedelta(days=validity_days)
+                if validity_days
+                else None
+            )
 
     @api.depends('signer_ids.partner_id', 'signer_id', 'signers_count')
     def _compute_is_user_signer(self):
@@ -219,7 +250,32 @@ class SignSendRequest(models.TransientModel):
             if wiz.template_id:
                 wiz.body = wiz.template_id.message
 
+    @api.depends('template_id')
+    def _compute_cc_partner_ids(self):
+        """Copy template cc partners as a default.
+        The user can change the list in the wizard.
+        """
+        for wiz in self:
+            wiz.cc_partner_ids = wiz.template_id.cc_partner_ids
+
     # ==== Business methods ====
+
+    def _log_activity(self, sign_request_id):
+        if not (self.activity_type_id.id and sign_request_id and self.reference_doc):
+            return
+        for ref in self.reference_doc:
+            activity = ref.with_context(mail_activity_quick_update=True).activity_schedule(
+                date_deadline=self.validity,
+                activity_type_id=self.activity_type_id.id,
+                automated=False,
+                user_id=sign_request_id.create_uid.id,
+                summary=self.env._(
+                    "%(request_name)s sent by %(sender_name)s",
+                    request_name=sign_request_id.reference,
+                    sender_name=sign_request_id.create_uid.name,
+                ),
+            )
+            sign_request_id.sign_activity_ids = [Command.link(activity.id)]
 
     def _activity_done(self):
         signatories = self.signer_id.name or self.signer_ids.partner_id.mapped('name')
@@ -243,7 +299,7 @@ class SignSendRequest(models.TransientModel):
         reference_doc = None
         if self.reference_doc:
             reference_doc = f"{self.reference_doc._name},{self.reference_doc.id}"
-        sign_request = self.env['sign.request'].with_context(scheduled_date=scheduled_date).create({
+        sign_request = self.env['sign.request'].create({
             'template_id': template_id,
             'request_item_ids': [Command.create({
                 'partner_id': signer['partner_id'],
@@ -259,14 +315,16 @@ class SignSendRequest(models.TransientModel):
             'reminder': self.reminder,
             'reminder_enabled': self.reminder_enabled,
             'reference_doc': reference_doc,
-            'certificate_reference': self.certificate_reference,
+            'certificate_reference': not self.certificate_reference,
             'send_channel': send_channel,
+            'scheduled_date': scheduled_date,
         })
         sign_request.message_subscribe(partner_ids=cc_partner_ids)
         return sign_request
 
     def _create_log_and_close(self, request):
-        self._create_request_log_note(request)
+        if self.log_request_activity:
+            self._log_activity(request)
         if self.activity_id:
             self._activity_done()
 
@@ -291,18 +349,11 @@ class SignSendRequest(models.TransientModel):
         request = self.create_request()
         return self._create_log_and_close(request)
 
-    def _create_request_log_note(self, request):
-        if request.reference_doc:
-            model = request.reference_doc and self.env['ir.model']._get(request.reference_doc._name)
-            if model.is_mail_thread:
-                body = self.env._("A signature request has been linked to this document: %s", request._get_html_link())
-                request.reference_doc.message_post(body=body)
-                body = self.env._("%s has been linked to this sign request.", request.reference_doc._get_html_link())
-                request.message_post(body=body)
-
     def sign_directly(self):
         self.ensure_one()
         request = self.create_request()
+        if self.log_request_activity:
+            self._log_activity(request)
         if self.activity_id:
             self._activity_done()
         if self.env.context.get('sign_all'):
@@ -318,7 +369,7 @@ class SignSendRequest(models.TransientModel):
         :return: returns the signature/initials if present or False if not or if signature_type is an invalid value.
         """
         if all(self.mapped('is_user_signer')) and signature_type in ['sign_signature', 'sign_initials']:
-            return user[signature_type]
+            return user[signature_type].content
         return False
 
     @api.depends("template_id", "signer_ids")
@@ -384,13 +435,14 @@ class SignSendRequest(models.TransientModel):
             }
 
         # Build the dictionary with the information taken from the user profile as the _fill function expects it
+        today = fields.Date.context_today(self)
         sign_request_item = request.request_item_ids
         corrected_dict = sign_values.copy()
         frames = {}
         for key, value in sign_values.items():
             corrected_dict[key] = value["name"]
             # All autofillable fields except for Signature, Initials and Date have an auto_field property set which can be used to get the value from the profile
-            if value.get("auto_field"):
+            if value.get("auto_field") or value.get("custom"):
                 corrected_dict[key] = sign_request_item._get_auto_field_value({
                     "id": value.get("type_id"),
                     "auto_field": value.get("auto_field")
@@ -400,14 +452,14 @@ class SignSendRequest(models.TransientModel):
                 signature_field_name = 'sign_signature' if value.get("type_name") == "Signature" else 'sign_initials'
                 user_signature = sign_request_item._get_user_signature(signature_field_name)
                 user_signature_frame = sign_request_item.sudo()._get_user_signature_frame(signature_field_name + '_frame')
-                corrected_dict[key] = 'data:image/png;base64,%s' % user_signature.decode() if user_signature else False
+                corrected_dict[key] = user_signature and image_data_uri(user_signature)
                 frames[key] = {
-                    'frameValue': 'data:image/png;base64,%s' % user_signature_frame.decode() if user_signature_frame else False,
+                    'frameValue': user_signature_frame and image_data_uri(user_signature_frame),
                     'frameHash': False,
                 }
             # The Date field can be autofilled but doesn't have a auto_field because it's always filled with today's date
             elif value.get("type_name") == "Date":
-                corrected_dict[key] = format_date(self.env, fields.Date.today())
+                corrected_dict[key] = format_date(self.env, today)
 
         # Fill the fields with the values contained in corrected_dict, set the request state as signed and generate the document.
         sign_request_item.sudo()._sign(corrected_dict, frame=frames)

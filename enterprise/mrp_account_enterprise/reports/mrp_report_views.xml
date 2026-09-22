@@ -36,10 +36,10 @@
             <field name="arch" type="xml">
                 <pivot string="Order Overview" sample="1">
                     <field name="product_id" type="row"/>
-                    <field name="unit_cost" type="measure" string="Average Total Cost / Unit"/>
-                    <field name="unit_component_cost" type="measure" string="Average Component Cost / Unit"/>
-                    <field name="unit_operation_cost" type="measure" string="Average Operation Cost / Unit" groups="mrp.group_mrp_routings"/>
-                    <field name="qty_produced" type="measure" string="Quantity Produced"/>
+                    <field name="unit_cost" type="measure" string="Total Cost / Unit"/>
+                    <field name="unit_component_cost" type="measure"/>
+                    <field name="unit_workcenter_cost" type="measure" groups="mrp.group_mrp_routings"/>
+                    <field name="qty_produced" type="measure"/>
                 </pivot>
             </field>
         </record>
@@ -70,13 +70,13 @@
                                 <field name="product_id"/>
                                 <field name="unit_cost"/>
                                 <field name="unit_component_cost"/>
-                                <field name="unit_operation_cost" string="Average Workcenter Cost / Unit" groups="mrp.group_mrp_routings"/>
+                                <field name="unit_workcenter_cost" groups="mrp.group_mrp_routings"/>
                             </group>
                             <group>
                                 <field name="qty_produced"/>
                                 <field name="total_cost"/>
                                 <field name="component_cost"/>
-                                <field name="operation_cost" string="Total Workcenter Cost" groups="mrp.group_mrp_routings"/>
+                                <field name="workcenter_cost" groups="mrp.group_mrp_routings"/>
                                 <field name="byproduct_cost" groups="mrp.group_mrp_byproducts"/>
                             </group>
                         </group>

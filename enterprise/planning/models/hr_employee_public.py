@@ -13,5 +13,5 @@ class HrEmployeePublic(models.Model):
 
     def action_view_planning(self):
         self.ensure_one()
-        if self.is_user:
+        if self.is_user or self.env.user.has_group('planning.group_planning_user'):
             return self.employee_id.action_view_planning()

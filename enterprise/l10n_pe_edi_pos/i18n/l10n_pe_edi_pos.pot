@@ -4,16 +4,21 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-08-28 18:22+0000\n"
+"PO-Revision-Date: 2026-08-28 18:22+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_pe_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_pos.pos_order_receipt
+msgid "<b>Amount In Word:</b>"
+msgstr ""
 
 #. module: l10n_pe_edi_pos
 #. odoo-javascript
@@ -68,9 +73,23 @@ msgstr ""
 
 #. module: l10n_pe_edi_pos
 #: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_account_move__display_name
+#: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_l10n_latam_document_type__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_pos_config__display_name
 #: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_pos_order__display_name
+#: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_pos_order_receipt__display_name
+#: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_pos_session__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: l10n_pe_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_pe_edi_pos/static/src/app/screens/feedback_screen/feedback_screen.js:0
+msgid "EDI Processing Issue"
+msgstr ""
+
+#. module: l10n_pe_edi_pos
+#: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_pos_order__l10n_pe_edi_data
+msgid "Edi Data"
 msgstr ""
 
 #. module: l10n_pe_edi_pos
@@ -80,8 +99,11 @@ msgstr ""
 
 #. module: l10n_pe_edi_pos
 #: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_account_move__id
+#: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_l10n_latam_document_type__id
 #: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_pos_config__id
 #: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_pos_order__id
+#: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_pos_order_receipt__id
+#: model:ir.model.fields,field_description:l10n_pe_edi_pos.field_pos_session__id
 msgid "ID"
 msgstr ""
 
@@ -98,6 +120,11 @@ msgid "Journal Entry"
 msgstr ""
 
 #. module: l10n_pe_edi_pos
+#: model:ir.model,name:l10n_pe_edi_pos.model_l10n_latam_document_type
+msgid "Latam Document Type"
+msgstr ""
+
+#. module: l10n_pe_edi_pos
 #. odoo-javascript
 #: code:addons/l10n_pe_edi_pos/static/src/app/components/popups/add_info_popup/add_info_popup.xml:0
 msgid "Ok"
@@ -109,13 +136,28 @@ msgid "Other concepts"
 msgstr ""
 
 #. module: l10n_pe_edi_pos
+#: model:ir.module.module,shortdesc:base.module_l10n_pe_edi_pos
+msgid "Peruvian Localization for the Point of Sale"
+msgstr ""
+
+#. module: l10n_pe_edi_pos
 #: model:ir.model,name:l10n_pe_edi_pos.model_pos_config
 msgid "Point of Sale Configuration"
 msgstr ""
 
 #. module: l10n_pe_edi_pos
 #: model:ir.model,name:l10n_pe_edi_pos.model_pos_order
-msgid "Point of Sale Orders"
+msgid "Point of Sale Order"
+msgstr ""
+
+#. module: l10n_pe_edi_pos
+#: model:ir.model,name:l10n_pe_edi_pos.model_pos_order_receipt
+msgid "Point of Sale Order Receipt Generator"
+msgstr ""
+
+#. module: l10n_pe_edi_pos
+#: model:ir.model,name:l10n_pe_edi_pos.model_pos_session
+msgid "Point of Sale Session"
 msgstr ""
 
 #. module: l10n_pe_edi_pos
@@ -130,8 +172,35 @@ msgid "Refund per item"
 msgstr ""
 
 #. module: l10n_pe_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_pos.pos_order_receipt
+msgid "Summary:"
+msgstr ""
+
+#. module: l10n_pe_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_pe_edi_pos/static/src/app/screens/feedback_screen/feedback_screen.js:0
+msgid ""
+"The electronic invoice process returned an error.\n"
+"Please review the invoice details from the backend to print the SUNAT compliant electronic document."
+msgstr ""
+
+#. module: l10n_pe_edi_pos
 #: model:ir.model.fields.selection,name:l10n_pe_edi_pos.selection__pos_order__l10n_pe_edi_refund_reason__06
 msgid "Total refund"
+msgstr ""
+
+#. module: l10n_pe_edi_pos
+#. odoo-python
+#: code:addons/l10n_pe_edi_pos/models/pos_order.py:0
+msgid "You cannot consolidate refund and non-refund orders together."
+msgstr ""
+
+#. module: l10n_pe_edi_pos
+#. odoo-python
+#: code:addons/l10n_pe_edi_pos/models/pos_order.py:0
+msgid ""
+"You cannot consolidate refund orders that don't share the same refund "
+"reason."
 msgstr ""
 
 #. module: l10n_pe_edi_pos

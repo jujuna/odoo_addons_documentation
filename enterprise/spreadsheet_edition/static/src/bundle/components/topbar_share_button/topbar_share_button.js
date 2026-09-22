@@ -9,7 +9,6 @@ export class TopbarShareButton extends Component {
     static components = {
         SpreadsheetShareButton,
     };
-    static props = {};
 
     get buttonProps() {
         return {

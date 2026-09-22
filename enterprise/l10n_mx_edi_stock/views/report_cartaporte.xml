@@ -139,8 +139,8 @@
                                 </tr>
                                 <t t-foreach="o.l10n_mx_edi_vehicle_id.l10n_mx_trailer_ids" t-as="trailer">
                                     <tr>
-                                        <td name="td_l10n_mx_edi_trailer_name"><t t-esc="trailer.name"/></td>
-                                        <td name="td_l10n_mx_edi_trailer_sub_type"><t t-esc="trailer.sub_type"/></td>
+                                        <td name="td_l10n_mx_edi_trailer_name"><t t-out="trailer.name"/></td>
+                                        <td name="td_l10n_mx_edi_trailer_sub_type"><t t-out="trailer.sub_type"/></td>
                                     </tr>
                                 </t>
                             </table>
@@ -156,15 +156,15 @@
                                 </tr>
                                 <tr t-if="o.l10n_mx_edi_vehicle_id.driver_id">
                                     <td name="td_l10n_mx_edi_driver_type">01</td>
-                                    <td name="td_l10n_mx_edi_driver" t-esc="o.l10n_mx_edi_vehicle_id.driver_id.name"/>
-                                    <td name="td_l10n_mx_edi_driver_license" t-esc="o.l10n_mx_edi_vehicle_id.driver_id.l10n_mx_edi_operator_licence" />
+                                    <td name="td_l10n_mx_edi_driver" t-out="o.l10n_mx_edi_vehicle_id.driver_id.name"/>
+                                    <td name="td_l10n_mx_edi_driver_license" t-out="o.l10n_mx_edi_vehicle_id.driver_id.l10n_mx_edi_operator_licence" />
                                 </tr>
                                 <t t-foreach="o.l10n_mx_edi_vehicle_id.l10n_mx_figure_ids" t-as="figure">
                                     <tr>
-                                        <td name="td_l10n_mx_edi_intermediaries_type" t-esc="figure.type"/>
-                                        <td name="td_l10n_mx_edi_intermediaries_operator" t-esc="figure.operator_id.display_name"/>
-                                        <td name="td_l10n_mx_edi_intermediaries_license" t-esc="figure.operator_id.l10n_mx_edi_operator_licence" t-if="figure.type == '01'"/>
-                                        <td name="td_l10n_mx_edi_intermediaries_parts" t-esc="', '.join(figure.part_ids.mapped('code'))" t-if="figure.type in ('02', '03')"/>
+                                        <td name="td_l10n_mx_edi_intermediaries_type" t-out="figure.type"/>
+                                        <td name="td_l10n_mx_edi_intermediaries_operator" t-out="figure.operator_id.display_name"/>
+                                        <td name="td_l10n_mx_edi_intermediaries_license" t-out="figure.operator_id.l10n_mx_edi_operator_licence" t-if="figure.type == '01'"/>
+                                        <td name="td_l10n_mx_edi_intermediaries_parts" t-out="', '.join(figure.part_ids.mapped('code'))" t-if="figure.type in ('02', '03')"/>
                                     </tr>
                                 </t>
                             </table>
@@ -232,7 +232,6 @@
         <field name="model">stock.picking</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_mx_edi_stock.report_cartaporte</field>
-        <field name="report_file">l10n_mx_edi_stock.report_cartaporte</field>
         <field name="print_report_name">'Carta Porte - %s - %s' % (object.partner_id.name or '', object.name)</field>
         <field name="binding_model_id" ref="model_stock_picking"/>
         <field name="binding_type">report</field>

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import Command, models, fields, api
 from odoo.tools.translate import _
 from odoo.exceptions import UserError
 
@@ -9,7 +9,7 @@ class AccountMoveReversal(models.TransientModel):
     Account move reversal wizard, it cancel an account move by reversing it.
     """
     _name = 'account.move.reversal'
-    _description = 'Account Move Reversal'
+    _description = 'Journal Entry Reversal'
     _check_company_auto = True
 
     move_ids = fields.Many2many('account.move', 'account_move_reversal_move', 'reversal_id', 'move_id', domain=[('state', '=', 'posted')])
@@ -60,7 +60,7 @@ class AccountMoveReversal(models.TransientModel):
     @api.constrains('journal_id', 'move_ids')
     def _check_journal_type(self):
         for record in self:
-            if record.journal_id.type not in record.move_ids.journal_id.mapped('type'):
+            if record.move_ids and record.journal_id.type not in record.move_ids.journal_id.mapped('type'):
                 raise UserError(_('Journal should be the same type as the reversed entry.'))
 
     @api.model
@@ -87,7 +87,12 @@ class AccountMoveReversal(models.TransientModel):
             move_ids = record.move_ids._origin
             record.residual = len(move_ids) == 1 and move_ids.amount_residual or 0
             record.currency_id = len(move_ids.currency_id) == 1 and move_ids.currency_id or False
-            record.move_type = move_ids.move_type if len(move_ids) == 1 else (any(move.move_type in ('in_invoice', 'out_invoice') for move in move_ids) and 'some_invoice' or False)
+            record.move_type = (
+                move_ids.move_type if len(move_ids) == 1
+                else 'entry' if all(m.move_type == 'entry' for m in move_ids)
+                else 'some_invoice' if any(m.move_type in ('in_invoice', 'out_invoice') for m in move_ids)
+                else False
+            )
 
     def _prepare_default_reversal(self, move):
         reverse_date = self.date
@@ -112,21 +117,10 @@ class AccountMoveReversal(models.TransientModel):
         moves = self.move_ids
 
         # Create default values.
-        partners = moves.company_id.partner_id + moves.commercial_partner_id
-
-        bank_ids = self.env['res.partner.bank'].search([
-            ('partner_id', 'in', partners.ids),
-            ('company_id', 'in', moves.company_id.ids + [False]),
-        ], order='sequence DESC')
-        partner_to_bank = {bank.partner_id: bank for bank in bank_ids}
         default_values_list = []
         for move in moves:
-            if move.is_outbound():
-                partner = move.company_id.partner_id
-            else:
-                partner = move.commercial_partner_id
             default_values_list.append({
-                'partner_bank_id': partner_to_bank.get(partner, self.env['res.partner.bank']).id,
+                'partner_bank_id': False,  # Resets the partner_bank_id as we'll force its recomputation
                 **self._prepare_default_reversal(move),
             })
 
@@ -145,8 +139,18 @@ class AccountMoveReversal(models.TransientModel):
         moves_to_redirect = self.env['account.move']
         for moves, default_values_list, is_cancel_needed in batches:
             new_moves = moves._reverse_moves(default_values_list, cancel=is_cancel_needed)
+            new_moves._compute_partner_bank_id()
             moves._message_log_batch(
-                bodies={move.id: move.env._('This entry has been %s', reverse._get_html_link(title=move.env._("reversed"))) for move, reverse in zip(moves, new_moves)}
+                bodies={
+                    move.id: move.env._(
+                        'This entry has been reversed by %s',
+                        reverse._get_html_link(title=reverse.name),
+                    ) if reverse.name and reverse.name != '/' else move.env._(
+                        'This entry has been %s',
+                        reverse._get_html_link(title=move.env._("reversed")),
+                    )
+                    for move, reverse in zip(moves, new_moves)
+                }
             )
 
             if is_modify:
@@ -156,6 +160,7 @@ class AccountMoveReversal(models.TransientModel):
                     data['line_ids'] = [line for line in data['line_ids'] if line[2]['display_type'] in ('product', 'line_section', 'line_subsection', 'line_note')]
                     moves_vals_list.append(data)
                 new_moves = self.env['account.move'].create(moves_vals_list)
+                new_moves._compute_partner_bank_id()
 
             moves_to_redirect |= new_moves
 
@@ -189,6 +194,17 @@ class AccountMoveReversal(models.TransientModel):
         return self.reverse_moves(is_modify=True)
 
     def _modify_default_reverse_values(self, origin_move):
-        return {
-            'date': self.date
+        data = {
+            'date': self.date,
+            'invoice_origin': origin_move.invoice_origin,
         }
+
+        # if has vendor attachment, keep it
+        if origin_move.move_type.startswith('in_') and origin_move.message_main_attachment_id:
+            new_main_attachment_id = origin_move.message_main_attachment_id.copy({'res_id': False}).id
+            data.update({
+                'message_main_attachment_id': new_main_attachment_id,
+                'attachment_ids': [Command.link(new_main_attachment_id)],
+            })
+
+        return data

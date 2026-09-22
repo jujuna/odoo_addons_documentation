@@ -4,6 +4,7 @@ import { DRAGGED_CLASS } from "@web/core/utils/draggable_hook_builder";
 import { makeDraggableHook } from "@web/core/utils/draggable_hook_builder_owl";
 import { createDocumentFragmentFromContent } from "@web/core/utils/html";
 import { closestScrollableX, closestScrollableY } from "@web/core/utils/scrolling";
+import { debounce } from "@web/core/utils/timing";
 
 export const useDraggableDocuments = makeDraggableHook({
     name: "useDraggableDocuments",
@@ -24,12 +25,13 @@ export const useDraggableDocuments = makeDraggableHook({
         this.initialPositions = [];
         this.lastDragTime = 0;
         this.isInvalidTarget = false;
+        this.debouncedFolderExpand = null;
     },
 
     onDragStart({ ctx, callHandler, addClass, addCleanup, addStyle, addListener, removeClass }) {
         const { current, model, ref, targetSelector } = ctx;
         const { element } = current;
-        addClass(ref.el, "o_documents_dragging");
+        addClass(ref(), "o_documents_dragging");
         removeClass(element, DRAGGED_CLASS);
         const searchPanelEl = document.querySelector(".o_documents_search_panel");
         const currentElementId = parseInt(element.dataset.valueId);
@@ -47,11 +49,11 @@ export const useDraggableDocuments = makeDraggableHook({
         const recordData = model.root.records.find((r) => r.data.id === currentElementId).data;
         current.dragMessageText = recordData.display_name;
         current.dragMessage = this._createDnDElement(recordData, model.root.selection.length);
-        ref.el.append(current.dragMessage);
+        ref().append(current.dragMessage);
 
-        const allElements = ref.el.classList.contains("o_kanban_renderer")
-            ? ref.el.querySelectorAll(".o_kanban_record:not(.o_kanban_ghost)")
-            : ref.el.querySelectorAll(".o_data_row");
+        const allElements = ref().classList.contains("o_kanban_renderer")
+            ? ref().querySelectorAll(".o_kanban_record:not(.o_kanban_ghost)")
+            : ref().querySelectorAll(".o_data_row");
         this.selectedElements = Array.from(allElements).filter((el) =>
             this.draggedRecords.all.includes(parseInt(el.dataset.valueId))
         );
@@ -111,7 +113,7 @@ export const useDraggableDocuments = makeDraggableHook({
                     true
                 );
                 if (!ev.ctrlKey) {
-                    ref.el.classList.remove("o_documents_dnd_shortcut");
+                    ref().classList.remove("o_documents_dnd_shortcut");
                 }
 
                 const allSelected = searchPanelEl.querySelectorAll(":scope .o_drag_over_selector");
@@ -120,9 +122,15 @@ export const useDraggableDocuments = makeDraggableHook({
                 }
                 addClass(valueEl, "o_drag_over_selector");
                 if (!this.isInvalidTarget) {
-                    model.env.documentsView.bus.trigger("documents-expand-folder", {
-                        folderId: targetFolder.id,
-                    });
+                    if (this.debouncedFolderExpand) {
+                        this.debouncedFolderExpand.cancel();
+                    }
+                    this.debouncedFolderExpand = debounce(() => {
+                        model.env.documentsView.bus.trigger("documents-expand-folder", {
+                            folderId: targetFolder.id,
+                        });
+                    }, 1000);
+                    this.debouncedFolderExpand();
                 }
             }
         };
@@ -132,7 +140,7 @@ export const useDraggableDocuments = makeDraggableHook({
         };
 
         const onSearchPanelFolderPointerLeave = (ev) => {
-            switchContainer(ref.el);
+            switchContainer(ref());
             if (this.isInvalidTarget) {
                 this.isInvalidTarget = false;
                 this._resetDragMessage(current.dragMessage, current.dragMessageText);
@@ -169,7 +177,7 @@ export const useDraggableDocuments = makeDraggableHook({
             callHandler("onTargetPointerLeave", { target: ev.currentTarget });
         };
 
-        for (const targetFolder of ref.el.querySelectorAll(targetSelector)) {
+        for (const targetFolder of ref().querySelectorAll(targetSelector)) {
             addListener(targetFolder, "pointerenter", onTargetFolderPointerEnter);
             addListener(targetFolder, "pointerleave", onTargetFolderPointerLeave);
         }
@@ -257,7 +265,7 @@ export const useDraggableDocuments = makeDraggableHook({
         await model.documentService.moveOrCreateShortcut(
             this.draggedRecords,
             targetFolder,
-            ref.el.classList.contains("o_documents_dnd_shortcut"),
+            ref().classList.contains("o_documents_dnd_shortcut"),
             expectedAccessRightsChanges
         );
 
@@ -297,7 +305,7 @@ export const useDraggableDocuments = makeDraggableHook({
                 <span class="o_documents_dnd_text ps-2">${recordData.display_name}</span>
                 <div class="o_documents_dnd_pill_container d-flex position-absolute top-0 start-100 translate-middle">
                     <div class="o_documents_dnd_pill o_documents_dnd_modifier bg-info border border-light rounded-circle p-1">
-                        <i class="fa fa-external-link-square"></i>
+                        <i class="oi" data-icon="open_in_new"></i>
                     </div>
                     ${docCountPill}
                 </div>

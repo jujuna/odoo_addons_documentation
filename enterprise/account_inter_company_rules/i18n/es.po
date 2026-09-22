@@ -6,14 +6,16 @@
 # Martin Trigaux, 2022
 # Pedro M. Baeza <pedro.baeza@tecnativa.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-23 13:56+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 01:33+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-master/"
 "account_inter_company_rules/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -21,18 +23,13 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: account_inter_company_rules
 #. odoo-python
 #: code:addons/account_inter_company_rules/models/account_move.py:0
 msgid "%(company)s Invoice: %(entry)s"
 msgstr "Factura de %(company)s: %(entry)s"
-
-#. module: account_inter_company_rules
-#: model:ir.model,name:account_inter_company_rules.model_account_move_send
-msgid "Account Move Send"
-msgstr "Enviar movimiento de cuenta"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_bank_statement_line__auto_generated
@@ -54,8 +51,9 @@ msgstr "Automatización"
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_res_company
-msgid "Companies"
-msgstr "Compañías"
+#, fuzzy
+msgid "Company"
+msgstr "Compañía"
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_res_config_settings
@@ -68,8 +66,7 @@ msgid "Create Vendor Bills"
 msgstr "Crear facturas de proveedores"
 
 #. module: account_inter_company_rules
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_user_id
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_user_id
+#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
 msgid "Create as"
 msgstr "Crear como"
 
@@ -90,7 +87,6 @@ msgstr "Borrador"
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_generate_bills_refund
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_generate_bills_refund
-#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.view_company_inter_change_inherit_form
 msgid "Generate Bills and Refunds"
 msgstr "Generar facturas y reembolsos"
 
@@ -104,9 +100,23 @@ msgid "ID"
 msgstr "ID"
 
 #. module: account_inter_company_rules
-#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.view_company_inter_change_inherit_form
-msgid "Inter-Company Transactions"
-msgstr "Transacciones dentro de la compañía"
+#: model:ir.model.fields,help:account_inter_company_rules.field_res_company__intercompany_generate_bills_refund
+#: model:ir.model.fields,help:account_inter_company_rules.field_res_config_settings__intercompany_generate_bills_refund
+#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
+msgid ""
+"If another company confirms an invoice with this company, a bill will be "
+"created in the chosen Purchase journal."
+msgstr ""
+
+#. module: account_inter_company_rules
+#: model:ir.module.module,shortdesc:base.module_account_inter_company_rules
+msgid "Inter Company Module for Sale/Purchase Orders and Invoices"
+msgstr ""
+
+#. module: account_inter_company_rules
+#: model:ir.module.module,summary:base.module_account_inter_company_rules
+msgid "Intercompany SO/PO/INV rules"
+msgstr ""
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_account_move
@@ -119,19 +129,26 @@ msgid "Journal Item"
 msgstr "Apunte contable"
 
 #. module: account_inter_company_rules
+#: model:ir.module.module,description:base.module_account_inter_company_rules
+msgid ""
+"Module for synchronization of Documents between several companies. For "
+"example, this allow you to have a Sales Order created automatically when a "
+"Purchase Order is validated with another company of the system as vendor, "
+"and inversely.\n"
+"\n"
+"   Supported documents are invoices/credit notes.\n"
+msgstr ""
+
+#. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_purchase_journal_id
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_purchase_journal_id
 msgid "Purchase Journal"
 msgstr "Diario de compra"
 
 #. module: account_inter_company_rules
-#: model:ir.model.fields,help:account_inter_company_rules.field_res_company__intercompany_user_id
-#: model:ir.model.fields,help:account_inter_company_rules.field_res_config_settings__intercompany_user_id
-msgid ""
-"Responsible user for creation of documents triggered by intercompany rules."
-msgstr ""
-"El usuario responsable por crear documentos originados por normas dentro de "
-"la compañía."
+#: model:ir.model,name:account_inter_company_rules.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr "Funciones compartidas del asistente para enviar facturas"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_bank_statement_line__auto_invoice_id
@@ -146,28 +163,15 @@ msgstr "Validado"
 
 #. module: account_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
-msgid "as"
-msgstr "como"
+msgid "in Journal"
+msgstr ""
 
-#~ msgid "%s Invoice: %s"
-#~ msgstr "%sFactura:%s"
+#~ msgid "Inter-Company Transactions"
+#~ msgstr "Transacciones dentro de la compañía"
 
-#~ msgid "Do not synchronize"
-#~ msgstr "No sincronizar"
-
-#~ msgid "Intercompany Transaction Message"
-#~ msgstr "Mensaje de transacción entre empresas"
-
-#~ msgid "Rule"
-#~ msgstr "Regla"
-
-#~ msgid "Select Company"
-#~ msgstr "Seleccione una empresa"
-
-#~ msgid "Select the type to setup inter company rules in selected company."
+#~ msgid ""
+#~ "Responsible user for creation of documents triggered by intercompany "
+#~ "rules."
 #~ msgstr ""
-#~ "Seleccione el tipo para establecer normas interempresariales en la "
-#~ "compañía seleccionada."
-
-#~ msgid "Synchronize invoices/bills"
-#~ msgstr "Sincronizar facturas de cliente/proveedor"
+#~ "El usuario responsable por crear documentos originados por normas dentro "
+#~ "de la compañía."

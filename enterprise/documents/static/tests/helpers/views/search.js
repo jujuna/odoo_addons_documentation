@@ -1,6 +1,8 @@
 export function getEnrichedSearchArch(searchArch = "<search></search>") {
     const addons = `
         <separator/>
+        <filter string="All children" name="is_deep_search" domain="[]"/>
+        <separator/>
         <filter invisible="1" string="My Activities" name="filter_activities_my"
             domain="[('activity_user_id', '=', uid)]"/>
         <separator/>

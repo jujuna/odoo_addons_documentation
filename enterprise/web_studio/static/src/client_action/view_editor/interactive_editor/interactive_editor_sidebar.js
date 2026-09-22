@@ -1,9 +1,10 @@
+import { render } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
-import { onWillStart, useState, onWillUpdateProps, Component } from "@odoo/owl";
+import { onWillStart, onWillUpdateProps, Component, proxy, signal, t, useProps } from "@odoo/owl";
 
 import { Notebook } from "@web/core/notebook/notebook";
 import { useBus } from "@web/core/utils/hooks";
-import { useActiveElement } from "@web/core/ui/ui_service";
+import { useActiveElement } from "@web/core/ui/ui_plugin";
 
 const tabsDisplay = {
     new: {
@@ -23,21 +24,23 @@ const tabsDisplay = {
 export class InteractiveEditorSidebar extends Component {
     static components = { Notebook };
     static template = "web_studio.ViewEditor.InteractiveEditorSidebar";
-    static props = {
-        slots: { type: Object },
-    };
+    props = useProps({
+        slots: t.object(),
+    });
+
+    rootRef = signal.ref();
 
     setup() {
-        this.editorModel = useState(this.env.viewEditorModel);
+        this.editorModel = proxy(this.env.viewEditorModel);
         this.tabsDisplay = tabsDisplay;
-        useBus(this.editorModel.bus, "error", () => this.render(true));
-        useActiveElement("root");
+        useBus(this.editorModel.bus, "error", () => render(this, true));
+        useActiveElement(this.rootRef);
 
         this._defaultTab = this.computeDefaultTab(this.props);
         this.editorModel.sidebarTab = this._defaultTab;
 
         onWillStart(() => {
-            this.editorModel.resetSidebar();
+            this.editorModel.resetSidebar(this._defaultTab);
         });
         onWillUpdateProps(() => {
             // This component takes slots: it is always re-rendered
@@ -50,9 +53,9 @@ export class InteractiveEditorSidebar extends Component {
 
     get icons() {
         return {
-            new: "fa-plus",
-            view: "fa-television",
-            properties: "fa-server",
+            new: "add",
+            view: "tv",
+            properties: "dns",
         };
     }
 

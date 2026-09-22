@@ -1,12 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import calendar
 import io
 from datetime import date, datetime
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import BinaryBytes
 
 from .report_hr_epf import MONTH_SELECTION
 
@@ -23,12 +23,11 @@ class HrESICReport(models.Model):
     month = fields.Selection(MONTH_SELECTION, default=lambda self: str(datetime.today().month), required=True)
     year = fields.Selection(selection='_get_year_selection', required=True, default=lambda self: str(datetime.now().year))
     export_report_type = fields.Selection(
-        [('esi', 'ESI Summary'), ('esic', 'ESIC')],
+        [('esi', 'ESI Summary'), ('esic', 'ESIC Report')],
         default='esi', required=True, string="Report Type"
     )
     period_has_payslips = fields.Boolean(compute='_compute_period_has_payslips')
     xlsx_file = fields.Binary(string="Generated File")
-    xlsx_filename = fields.Char()
 
     _unique_esic_report_per_month_year = models.Constraint(
         'UNIQUE(company_id, month, year, export_report_type)',
@@ -154,10 +153,10 @@ class HrESICReport(models.Model):
         self.ensure_one()
 
         worksheet = workbook.add_worksheet(_('Employee_ESI_report'))
+        style_main_heading = workbook.add_format({'align': 'center', 'font_size': 20})
         style_highlight = workbook.add_format({'bold': True, 'pattern': 1, 'bg_color': '#E0E0E0', 'align': 'center'})
+        style_sub_highlight = workbook.add_format({'bold': True, 'font_size': 11})
         style_normal = workbook.add_format({'font_size': 12})
-        row = 0
-        worksheet.set_row(row, 20)
 
         headers = [
             _("EMPLOYEE NAME"),
@@ -169,6 +168,21 @@ class HrESICReport(models.Model):
             _("TOTAL REMITTED"),
         ]
 
+        worksheet.merge_range(0, 0, 0, len(headers) - 1,
+            self.env._('ESIC - Summary'),
+            style_main_heading,
+        )
+        sub_headers_x_values = {
+            self.env._('Establishment Name'): self.company_id.name,
+            self.env._('Establishment ID'): self.company_id.l10n_in_esic_ip_number or '',
+        }
+        row = 1
+        for sub_header, value in sub_headers_x_values.items():
+            worksheet.write(row, 0, sub_header, style_sub_highlight)
+            worksheet.write(row, 1, value, style_normal)
+            row += 1
+        row += 1  # Adding an empty row before the main headers
+        worksheet.set_row(row, 20)
         rows = self._get_employee_esi_data()
 
         if not rows:
@@ -178,7 +192,7 @@ class HrESICReport(models.Model):
             worksheet.write(row, col, header, style_highlight)
             worksheet.set_column(col, col, 33)
 
-        row = 1
+        row += 1
         for data_row in rows:
             col = 0
             worksheet.set_row(row, 20)
@@ -190,8 +204,7 @@ class HrESICReport(models.Model):
         workbook.close()
         xlsx_data = output.getvalue()
 
-        self.xlsx_file = base64.encodebytes(xlsx_data)
-        self.xlsx_filename = _("%(display_name)s ESI Report.xlsx", display_name=self.display_name)
+        self.xlsx_file = BinaryBytes(xlsx_data, filename=self.env._("%(display_name)s ESI Summary Report.xlsx", display_name=self.display_name))
 
     def action_export_esic_xlsx(self, output, workbook):
         self.ensure_one()
@@ -200,6 +213,7 @@ class HrESICReport(models.Model):
         instruction_worksheet = workbook.add_worksheet(_('Instructions & Reason Codes'))
 
         # Header style with bold and background color, including text wrapping
+        style_main_heading = workbook.add_format({'align': 'center', 'font_size': 20})
         style_highlight = workbook.add_format({
             'bold': True,
             'pattern': 1,
@@ -210,8 +224,8 @@ class HrESICReport(models.Model):
             'border': 1,
             'border_color': '#000000',
         })
+        style_sub_highlight = workbook.add_format({'bold': True, 'font_size': 11})
         style_normal = workbook.add_format({'font_size': 12})
-        row = 0
         esic_headers = [
             _("IP Number (10 Digits)"),
             _("IP Name (Only alphabets and space)"),
@@ -221,6 +235,21 @@ class HrESICReport(models.Model):
             _("Last Working Day (Format DD/MM/YYYY or DD-MM-YYYY)"),
         ]
 
+        esic_worksheet.merge_range(0, 0, 0, len(esic_headers) - 1,
+            self.env._('ESIC - Monthly Statement'),
+            style_main_heading,
+        )
+
+        sub_headers_x_values = {
+            self.env._('Establishment Name'): self.company_id.name,
+            self.env._('Establishment ID'): self.company_id.l10n_in_esic_ip_number or '',
+        }
+        row = 1
+        for sub_header, value in sub_headers_x_values.items():
+            esic_worksheet.write(row, 0, sub_header, style_sub_highlight)
+            esic_worksheet.write(row, 1, value, style_normal)
+            row += 1
+        row += 1  # Adding an empty row before the main headers
         esic_rows = self._get_employee_esic_data()
 
         # Writing the esic_headers
@@ -229,7 +258,7 @@ class HrESICReport(models.Model):
             esic_worksheet.write(row, col, header, style_highlight)
             esic_worksheet.set_column(col, col, 40)
 
-        row = 1
+        row += 1
         for data_row in esic_rows:
             col = 0
             for data in data_row:
@@ -338,5 +367,4 @@ class HrESICReport(models.Model):
         workbook.close()
         xlsx_data = output.getvalue()
 
-        self.xlsx_file = base64.encodebytes(xlsx_data)
-        self.xlsx_filename = _("%(display_name)s ESIC Report.xlsx", display_name=self.display_name)
+        self.xlsx_file = BinaryBytes(xlsx_data, filename=self.env._("%(display_name)s ESIC Report.xlsx", display_name=self.display_name))

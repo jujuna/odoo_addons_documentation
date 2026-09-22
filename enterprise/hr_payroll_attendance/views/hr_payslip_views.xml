@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <div class="oe_button_box" position="inside">
                 <button type="object" class="oe_stat_button" id="open_attendances"
-                    icon="fa-clock-o" name="action_open_attendances" invisible="attendance_count == 0">
+                    icon="schedule" name="action_open_attendances" invisible="not employee_id or not attendance_based">
                     <field name="attendance_count" widget="statinfo" string="Attendances"/>
                 </button>
             </div>

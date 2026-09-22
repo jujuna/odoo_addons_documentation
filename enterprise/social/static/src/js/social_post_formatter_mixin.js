@@ -5,9 +5,9 @@ import { markup } from "@odoo/owl";
 import { htmlReplace } from "@web/core/utils/html";
 
 export const SocialPostFormatterRegex = {
-    REGEX_AT: /\B@([\w\dÀ-ÿ-.]+)/g,
-    REGEX_HASHTAG: /(^|\s|<br>)#([a-zA-Z\d\-_]+)/g,
-    REGEX_URL: /http(s)?:\/\/(www\.)?[a-zA-Z0-9@:%_+~#=?&/\-;!.,()'*$]{3,2000}/g,
+    REGEX_AT: /(?<=(?:^|\s|<br>))@([\w\dÀ-ÿ-.]+)/g,
+    REGEX_HASHTAG: /(?<=(?:^|\s|<br>))#([a-zA-Z\d\-_]+)/g,
+    REGEX_URL: /(?<=(?:^|\s|<br>))http(s)?:\/\/(www\.)?[a-zA-Z0-9@:%_+~#=?&/\-;!.,()'*$]{3,2000}/g,
 };
 
 export const SocialPostFormatterMixinBase = {

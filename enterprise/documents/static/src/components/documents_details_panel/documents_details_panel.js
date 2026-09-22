@@ -13,7 +13,7 @@ import { DocumentsDetailsMany2ManyTagsField } from "@documents/views/fields/docu
 import { DocumentsDetailsMany2OneField } from "@documents/views/fields/documents_details_many2one/documents_details_many2one_field";
 import { DocumentsTypeIcon } from "@documents/views/fields/documents_type_icon/documents_type_icon";
 
-import { Component, onWillRender, onWillUpdateProps, reactive, useState } from "@odoo/owl";
+import { Component, computed, useProps, proxy, t, useEffect } from "@odoo/owl";
 
 // Small hack, memoize uses the first argument as cache key, but we need the orm which will not be the same.
 const getDetailsPanelResModels = memoize((_null, orm) =>
@@ -30,10 +30,10 @@ export class DocumentsDetailsPanel extends Component {
         Many2OneField,
         ModelSelector,
     };
-    static props = {
-        record: { type: Object, optional: true },
-        nbViewItems: { type: Number, optional: true },
-    };
+    props = useProps({
+        record: t.object().optional(),
+        nbViewItems: t.number().optional(),
+    });
     static template = "documents.DocumentsDetailsPanel";
 
     setup() {
@@ -41,26 +41,28 @@ export class DocumentsDetailsPanel extends Component {
         /** @type {import("@documents/core/document_service").DocumentService} */
         this.documentService = useService("document.document");
         this.orm = useService("orm");
+        this.notification = useService("notification");
         this.dialog = useService("dialog");
-        onWillRender(() => {
-            this.record = new Proxy(reactive(this.props.record), isDetailsPanelRecordHandler);
-        });
+        this.record = computed(
+            () => new Proxy(proxy(this.props.record), isDetailsPanelRecordHandler)
+        );
 
         // Use a state for the model to not write on the record the model without record id
-        this.state = useState({
+        this.state = proxy({
             resModel: this.props.record.data.res_model,
             resModelName: this.props.record.data.res_model_name || "",
             models: [],
         });
         getDetailsPanelResModels(null, this.orm).then((models) => (this.state.models = models));
-        onWillUpdateProps((nextProps) => {
-            this.state.resModel = nextProps.record.data.res_model;
-            this.state.resModelName = nextProps.record.data.res_model_name || "";
+        useEffect(() => {
+            const data = this.props.record.data;
+            this.state.resModel = data.res_model;
+            this.state.resModelName = data.res_model_name || "";
         });
     }
 
     async openLinkedRecord() {
-        const { res_model, res_id } = this.record.data || {};
+        const { res_model, res_id } = this.record().data || {};
         if (!res_id?.resId || !res_model) {
             return;
         }
@@ -73,20 +75,28 @@ export class DocumentsDetailsPanel extends Component {
         });
     }
 
+    get canChangeOwner() {
+        return (
+            !this.userPermissionViewOnly &&
+            (this.documentService.userIsDocumentManager ||
+                (!this.record().data?.owner_id && this.record().data?.user_can_move) ||
+                this.record().data?.owner_id?.id === user.userId)
+        );
+    }
+
     get userPermissionViewOnly() {
         return (
-            !!this.record.data?.lock_uid ||
-            this.record.data?.user_permission !== "edit" ||
-            (!this.documentService.userIsDocumentManager &&
-                this.record.data?.user_folder_id === "COMPANY")
+            !!this.record().data?.lock_uid ||
+            this.record().data?.user_permission !== "edit" ||
+            Boolean(this.record().data?.is_protected)
         );
     }
 
     get fileSize() {
-        if (this.record.data?.type !== "folder" || this.props.record.isContainer) {
-            const nBytes = this.record.data.file_size || 0;
+        if (this.record().data?.type !== "folder" || this.props.record.isContainer) {
+            const nBytes = this.record().data.file_size || 0;
             if (nBytes) {
-                return `${this.record.isContainer ? "~" : ""}${formatFloat(nBytes, {
+                return `${this.record().isContainer ? "~" : ""}${formatFloat(nBytes, {
                     humanReadable: true,
                 })}B`;
             }
@@ -107,45 +117,48 @@ export class DocumentsDetailsPanel extends Component {
     }
 
     async onModelSelected(value) {
-        this.state.resModel = value.technical;
-        this.state.resModelName = value.label || "";
-        await this.props.record.update({ res_id: false, res_model: false }, { save: true });
-        if (this.state.resModel) {
-            this.dialog.add(
-                SelectCreateDialog,
-                {
-                    title: _t("Select a Record To Link"),
-                    noCreate: true,
-                    multiSelect: false,
-                    resModel: this.state.resModel,
-                    onSelected: async (resIds) => {
-                        if (resIds.length) {
-                            await this.onResIdUpdate(resIds);
-                        }
-                    },
-                },
-                {
-                    onClose: () => {
-                        if (!this.record.data.res_id) {
-                            this.onRecordReset();
-                        }
-                    },
-                }
-            );
+        const { technical: resModel, label: resModelName } = value;
+        this.state.resModel = resModel;
+        this.state.resModelName = resModelName || "";
+        if (!resModel) {
+            await this.props.record.update({ res_id: false, res_model: false }, { save: true });
+            return;
         }
+        this.notification.add(
+            _t("Anyone with access to the linked record will be able to access the attachment."),
+            {
+                title: _t("Caution"),
+                type: "warning",
+            }
+        );
+        this.dialog.add(
+            SelectCreateDialog,
+            {
+                title: _t("Select a Record To Link"),
+                noCreate: true,
+                multiSelect: false,
+                resModel,
+                onSelected: async (resIds) => {
+                    if (resIds.length) {
+                        await this.props.record.update(
+                            { res_id: resIds[0], res_model: resModel },
+                            { save: true }
+                        );
+                    }
+                },
+            },
+            {
+                onClose: () => {
+                    if (!this.record().data.res_id) {
+                        this.onRecordReset();
+                    }
+                },
+            }
+        );
     }
 
     async onRecordReset() {
         await this.onModelSelected({ technical: false, label: false });
-    }
-
-    async onResIdUpdate(value) {
-        if (this.state.resModel) {
-            await this.props.record.update(
-                { res_id: value[0], res_model: this.state.resModel },
-                { save: true }
-            );
-        }
     }
 }
 

@@ -5,6 +5,8 @@ from odoo.addons.sale_purchase_inter_company_rules.tests.common import TestInter
 
 class TestInterCompanyRulesCommonStock(TestInterCompanyRulesCommonSOPO):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -14,12 +16,6 @@ class TestInterCompanyRulesCommonStock(TestInterCompanyRulesCommonSOPO):
             + cls.env.ref('account.group_delivery_invoice_address')
             + cls.env.ref('sale.group_discount_per_so_line')
         )
-
-        # Set warehouse on company A
-        cls.company_a.intercompany_warehouse_id = cls.env['stock.warehouse'].search([('company_id', '=', cls.company_a.id)])
-
-        # Set warehouse on company B
-        cls.company_b.intercompany_warehouse_id = cls.env['stock.warehouse'].search([('company_id', '=', cls.company_b.id)])
 
         cls.res_users_company_a.group_ids += (
             cls.env.ref('sales_team.group_sale_salesman')

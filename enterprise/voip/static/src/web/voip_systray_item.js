@@ -1,39 +1,48 @@
-import { Component, useState } from "@odoo/owl";
-
-import { SessionRecorder } from "@voip/core/session_recorder";
-
+import { Component, useListener } from "@odoo/owl";
+import { SessionRecorder } from "@voip/core/web/session_recorder";
 import { useCommand } from "@web/core/commands/command_hook";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
+import { render } from "@web/owl2/utils";
 
 export class VoipSystrayItem extends Component {
-    static props = {};
     static template = "voip.SystrayItem";
 
     setup() {
         this.voip = useService("voip");
-        this.ringtoneService = useService("voip.ringtone");
-        this.userAgent = useService("voip.user_agent");
+        this.ui = useService("ui");
+        useListener(this.voip.bus, "session_changed", () => render(this, true));
+        this.userAgent = this.voip.userAgent;
         this.softphone = this.voip.softphone;
-        this.pendingUploads = useState(SessionRecorder.pendingUploads);
+        this.uploadsByRecorder = SessionRecorder.uploadsByRecorder;
         useCommand(_t("Toggle Softphone"), () => this.toggleSoftphone(), { hotkey: "Alt+Shift+S" });
+    }
+
+    /**
+     * Checks if any SessionRecorder instance currently has active upload promises.
+     * Used to display the "Processing..." state in the systray.
+     *
+     * @returns {boolean}
+     */
+    get isUploadInProgress() {
+        return SessionRecorder.isUploadInProgress();
+    }
+
+    get frontSession() {
+        return this.userAgent.frontSession;
     }
 
     /** @returns {boolean} */
     get hasOngoingCall() {
-        const call = this.userAgent.activeSession?.call;
-        if (!call) {
-            return false;
-        }
-        return call.isInProgress && call.state === "ongoing";
+        return this.frontSession?.isOngoing;
     }
 
     /** @returns {string} */
-    get iconClass() {
-        if (this.userAgent.activeSession?.isOnHold) {
-            return "fa fa-pause";
+    get icon() {
+        if (this.frontSession?.isOnHold) {
+            return "pause";
         }
-        return "oi oi-voip";
+        return "phone";
     }
 
     /**
@@ -56,13 +65,16 @@ export class VoipSystrayItem extends Component {
 
     /** @returns {string} */
     get systrayButtonClasses() {
+        if (this.ui.isSmall && !this.voip.canCall) {
+            return "d-none";
+        }
         if (this.userAgent.hasCallInvitation) {
             return "text-success";
         }
-        if (this.pendingUploads.size !== 0) {
+        if (this.isUploadInProgress) {
             return "rounded-pill px-2 bg-warning text-warning-emphasis";
         }
-        if (this.userAgent.activeSession?.isOnHold) {
+        if (this.frontSession?.isOnHold) {
             return "rounded-pill px-2 bg-warning-subtle text-warning-emphasis";
         }
         if (this.hasOngoingCall) {
@@ -73,10 +85,10 @@ export class VoipSystrayItem extends Component {
 
     /** @returns {ReturnType<_t>|""} */
     get systrayButtonText() {
-        if (SessionRecorder.pendingUploads.size !== 0) {
+        if (this.isUploadInProgress) {
             return _t("Processing…");
         }
-        return this.userAgent.activeSession?.statusText ?? "";
+        return this.frontSession?.statusText ?? "";
     }
 
     /** @param {MouseEvent} ev */
@@ -87,17 +99,16 @@ export class VoipSystrayItem extends Component {
     async toggleSoftphone() {
         if (this.softphone.isDisplayed) {
             this.softphone.hide();
-            if (this.userAgent.hasCallInvitation) {
-                this.ringtoneService.stopPlaying();
-            }
         } else {
             document.activeElement.blur();
             if (this.voip.missedCalls > 0) {
-                this.softphone.activeTab = "recent";
                 this.voip.resetMissedCalls();
             }
+            if (!this.voip.canCall) {
+                await this.voip.refreshConfig();
+            }
+            this.voip.prefillFromActiveForm();
             this.softphone.show();
-            this.userAgent.requestIncomingRingtone();
         }
     }
 }

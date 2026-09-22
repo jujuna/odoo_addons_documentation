@@ -1,16 +1,17 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 import datetime
-import pytz
 import json
+from zoneinfo import ZoneInfo
+from lxml import html
+from lxml.etree import ParserError, XMLSyntaxError
+from markupsafe import Markup
 
-from odoo import models
+from odoo import api, models
 from odoo.api import NewId
 from odoo.exceptions import AccessError
 from odoo.tools import OrderedSet
 from odoo.tools.mail import html_to_inner_content
 from odoo.tools.misc import formatLang
-from odoo.tools.mimetypes import guess_mimetype
 
 AI_SUPPORTED_IMG_TYPES = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
 
@@ -28,21 +29,25 @@ class Model(models.AbstractModel):
         return ('name', 'display_name')
 
     def _ai_serialize_fields_data(self):
+        if self._name != 'ir.attachment':
+            try:
+                self.env['ai.tool']._check_agent_model_access(self._name)
+            except ValueError:
+                return f"Data of {self._name} records cannot be used by AI Agents"
         fields_info = self.fields_get()
         result = {}
 
         for field_name, field_attrs in fields_info.items():
-            field_type = field_attrs["type"]
-            field_value = self[field_name]
-
-            if field_type == 'char' and field_name in self._ai_field_names_to_truncate():
-                field_value = self._ai_truncate(field_value)
-
             try:
+                field_type = field_attrs["type"]
+                field_value = self[field_name]
+
+                if field_type == 'char' and field_name in self._ai_field_names_to_truncate():
+                    field_value = self._ai_truncate(field_value)
                 # Handle relational fields
-                if field_type == "many2one":
+                elif field_type == "many2one":
                     result[field_name] = (
-                        self._ai_truncate(field_value.display_name) if field_value else None
+                        {'id': field_value.id, field_value._rec_name: self._ai_truncate(field_value.display_name)} if field_value else None
                     )
                 elif field_type in ["one2many", "many2many"]:
                     linked_records = self.env[field_value._name].browse(field_value.ids)
@@ -52,14 +57,14 @@ class Model(models.AbstractModel):
                         continue
                     else:
                         result[field_name] = [
-                            self._ai_truncate(record.display_name) for record in linked_records
+                            {'id': record.id, field_value._rec_name: self._ai_truncate(record.display_name)} for record in linked_records
                         ]
                 elif field_type == "binary":
                     continue  # we don't include binary fields in the record info JSON
                 else:
                     # Handle basic field types (dates, etc.)
                     if isinstance(field_value, datetime.datetime):
-                        user_tz = pytz.timezone(self.env.user.tz or 'UTC')
+                        user_tz = ZoneInfo(self.env.user.tz or 'UTC')
                         result[field_name] = (
                             field_value.astimezone(user_tz).strftime(
                                 "%Y-%m-%d %H:%M:%S"
@@ -77,31 +82,10 @@ class Model(models.AbstractModel):
 
         return json.dumps(result, default=str)
 
-    def _ai_initialise_context(
-        self, caller_component, text_selection=None, front_end_info=None
-    ):
-        context = []
-
-        # If we have record info available from the front-end, pass it to the model's context
-        if caller_component in ["html_field_record", "chatter_ai_button"]:
-            context.append(f"You were called within an Odoo {self._name} record. Your answers should take the record's details into account. The following JSON contains all of the record's details: {front_end_info}")
-
-        # If we don't have record info from the front-end and it's required, fetch the record information and pass it to the model's context
-        if caller_component == "mail_composer":
-            context.append(f"You were called within an Odoo {self._name} record. Your answers should take the record's details into account. The following JSON contains all of the records details: {self._ai_serialize_fields_data()}")
-
-        # Add some additional details for some special cases and finish the context by the "first" message sent by the assistant
-        if caller_component == "html_field_text_select":
-            context.append(f"The text that you will be rewritting is the following: {text_selection}")
-        else:
-            context.append("ALWAYS FORMAT YOUR ANSWERS USING MARKDOWN, AVOID USING HTML. Don't use unecessary formatting like code blocks if not needed.")
-
-        return context
-
     ################
     #  Extensions  #
     ################
-    def _ai_read(self, fnames, files_dict):
+    def _ai_read(self, fnames=None, files_parts=None, files_checksums=None):
         """Retrieve and format field values for LLM processing.
         If no field names are given, return the display name.
         This method can be overridden on any model that requires sending more than just the display
@@ -109,53 +93,70 @@ class Model(models.AbstractModel):
         Files are handled separately, as they must be sent independently to LLMs.
 
         :param fnames: list of field names to read and format
-        :param files_dict: dict mapping file checksums to metadata dicts each with keys:
-            'mimetype', 'value', and 'file_ref'
+        :param files_parts: AIMessageParts
+        :param files_checksums: set of the checksums of files whose data has already been retrieved
 
-        :return: (vals_list, files_dict) where vals_list is a list of dicts mapping field names to
-            their formatted values with one dictionary per record, and files_dict is a dict mapping
-            file checksums to metadata dicts each with keys 'mimetype', 'value' and 'fileref'
+        :return: (vals_list, files_parts, files_checksums) where vals_list is a list of dicts mapping field names to
+            their formatted values with one dictionary per record.
+            files_parts is AIMessageParts of the files (it also includes the files_parts from the input :param: 'files_parts')
+            files_checksums is a set of the checksums of files whose data
+            has already been retrieved (it also includes the checksums from the input :param: 'files_checksums')
         """
         if not fnames:
             fnames = ['display_name']  # by default, send display names
+
+        if not files_parts:
+            files_parts = []
+        if files_checksums is None:
+            files_checksums = set()
+
         vals_list = self.read(fnames, load=None)
+
         for fname in fnames:
             field = self._fields.get(fname)
             if field.type in ('binary', 'image'):
-                if field.attachment and self.ids:  # attachment is not created yet in quick creation
-                    attachments = self.env['ir.attachment'].search([
-                        ('res_model', '=', self._name),
-                        ('res_field', '=', fname),
-                        ('res_id', 'in', self.ids)  # ._origin?
-                    ])
-                    __, files_dict = attachments._ai_read(None, files_dict)  # populate file dict
-                for vals in vals_list:
-                    if not vals[fname]:
+                if field.attachment:
+                    attachments = self.env['ir.attachment']._get_field_attachments(self, [fname])
+                    __, files_parts, files_checksums = attachments._ai_read(None, files_parts, files_checksums)
+                for record, vals in zip(self, vals_list):
+                    raw = record[fname]
+                    if not raw:
                         continue
-                    checksum = self.env['ir.attachment']._compute_checksum(vals[fname])
-                    if checksum not in files_dict:
-                        raw = base64.b64decode(vals[fname])
-                        mimetype = guess_mimetype(raw)
+                    checksum = self.env['ir.attachment']._compute_checksum(raw)
+                    if checksum not in files_checksums:
+                        mimetype = raw.mimetype
                         extension = mimetype.split("/")[-1]
-                        file_ref = f'<file_#{len(files_dict) + 1}>'
-                        if extension in (*AI_SUPPORTED_IMG_TYPES, 'pdf'):
+                        if (is_supported_mimetype := extension in (*AI_SUPPORTED_IMG_TYPES, 'pdf')):
                             # todo: keep 5 pages max and resize images
-                            value = vals[fname].decode()
+                            content = vals[fname]
+                            if content:
+                                content = content['content']
                         else:
                             try:
-                                value = self.env['ir.attachment']._index(vals[fname], mimetype, checksum=checksum)
+                                content = self.env['ir.attachment']._index(raw, mimetype, checksum=checksum)
                             except TypeError:
-                                value = self.env['ir.attachment']._index(vals[fname], mimetype)
-                        files_dict[checksum] = {
-                            'mimetype': mimetype,
-                            'value': value,
-                            'file_ref': file_ref,
-                        }
-                    vals[fname] = files_dict[checksum]['file_ref']
+                                content = self.env['ir.attachment']._index(raw, mimetype)
+                        if is_supported_mimetype:
+                            files_checksums.add(checksum)
+                            files_parts.append({
+                                'type': 'inline_data',
+                                'mimetype': mimetype,
+                                'data': content or '',
+                                'metadata': {
+                                    'image_path': f'/web/image/{self._name}/{vals["id"]}/{fname}'
+                                }
+                            })
+                        else:
+                            files_checksums.add(checksum)
+                            files_parts.append({
+                                'type': 'text',
+                                'text': content or '',
+                            })
+                    vals[fname] = f"<file_{checksum}/>"
             elif field.type in ('date', 'datetime'):
                 for vals in vals_list:
                     vals[fname] = field.to_string(vals[fname])
-            elif field.type == 'html':
+            elif field.type == 'html' and not self.env.context.get('ai_read_preserve_html'):
                 for vals in vals_list:
                     vals[fname] = html_to_inner_content(vals[fname])
             elif field.type in ('many2many', 'many2one', 'many2one_reference', 'one2many', 'reference'):
@@ -181,7 +182,7 @@ class Model(models.AbstractModel):
                 for vals in vals_list:
                     vals[fname] = self._ai_truncate(vals[fname])
 
-        return vals_list, files_dict
+        return vals_list, files_parts, files_checksums
 
     def _get_ai_context(self, field_paths):
         """ Get the json-encoded context dict for a record given a list of field paths.
@@ -248,10 +249,11 @@ class Model(models.AbstractModel):
             _map_to_models(self, path.split("."))
 
         snapshot = {}
-        files_dict = {}  # files are sent separately to LLMs
+        files_parts = []  # files are sent separately to LLMs
+        files_checksums = set()
         for model, info in models.items():
             records = self.env[model].browse(info['ids'])
-            snapshot[model], files_dict = records._ai_read(info['fields'], files_dict)
+            snapshot[model], files_parts, files_checksums = records._ai_read(list(info['fields']), files_parts, files_checksums)
 
         def _ai_context_json_default(obj):
             """NewId is not json serializable, use its string representation"""
@@ -259,7 +261,7 @@ class Model(models.AbstractModel):
                 return obj.origin or str(obj)
             return obj
 
-        return json.dumps(snapshot, default=_ai_context_json_default, ensure_ascii=False, indent=2), list(files_dict.values())
+        return json.dumps(snapshot, default=_ai_context_json_default, ensure_ascii=False), files_parts
 
     def _ai_format_records(self):
         """Format what will be in the prompt when we inserted records.
@@ -268,3 +270,71 @@ class Model(models.AbstractModel):
         the value of the dict can be anything.
         """
         return {record.id: record.display_name for record in self}
+
+    def _process_html_fields(self, vals):
+        """
+        Scan values for HTML fields, parse them to find AI-inserted images,
+        extract their attachment IDs to save them from the vacuum, and
+        clean the `data-ai-channel-id` attribute from the HTML before saving.
+        """
+        if not vals:
+            return
+
+        # vals can contain keys that aren't fields on the model
+        html_fields = [fname for fname in vals if vals[fname] and fname in self._fields and self._fields[fname].type == 'html']
+        if not html_fields:
+            return
+
+        attachment_ids_to_mark = []
+        for fname in html_fields:
+            # Handle both single string and dict of translations
+            value = vals[fname]
+            is_dict = isinstance(value, dict)
+            contents = value if is_dict else {None: value}
+
+            for lang, html_content in contents.items():
+                if not isinstance(html_content, str):
+                    continue
+                is_markup = isinstance(html_content, Markup)
+                try:
+                    root = html.fragment_fromstring(html_content, create_parent='div')
+                except (ParserError, XMLSyntaxError):
+                    continue
+
+                for el in root.xpath('//img[@data-ai-channel-id]'):
+                    att_id = el.get('data-attachment-id')
+                    if att_id and att_id.isdigit():
+                        attachment_ids_to_mark.append(int(att_id))
+
+                    # Remove the attribute
+                    del el.attrib['data-ai-channel-id']
+
+                # Convert back to string and strip the temporary <div>...</div> wrapper
+                # <div> is 5 chars, </div> is 6 chars.
+                cleaned_html = html.tostring(root, encoding='unicode')[5:-6]
+                if is_markup:
+                    cleaned_html = Markup(cleaned_html)
+                if is_dict:
+                    value[lang] = cleaned_html
+                else:
+                    vals[fname] = cleaned_html
+
+        if attachment_ids_to_mark:
+            self.env['ai.attachment.vacuum'].mark_attachments_used(attachment_ids_to_mark)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            self._process_html_fields(vals)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        self._process_html_fields(vals)
+        return super().write(vals)
+
+    def _ai_get_preview_metadata(self):
+        """Build preview metadata list. To be overridden to add model-specific frontend fields."""
+        return [
+            {'id': record.id, 'preview_name': record.display_name}
+            for record in self
+        ]

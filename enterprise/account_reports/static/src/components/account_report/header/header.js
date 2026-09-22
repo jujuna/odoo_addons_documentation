@@ -1,44 +1,58 @@
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
-import { useService } from "@web/core/utils/hooks"
+import { registry } from "@web/core/registry";
 
-import { Component, useState } from "@odoo/owl";
+import { Component, usePlugin } from "@odoo/owl";
+
+import { AccountReportController } from "@account_reports/components/account_report/controller";
+
 
 export class AccountReportHeader extends Component {
     static template = "account_reports.AccountReportHeader";
-    static props = {};
     static components = {
         Dropdown,
         DropdownItem,
-    }
+    };
 
-    setup() {
-        this.orm = useService("orm");
-        this.controller = useState(this.env.controller);
-    }
+    controller = usePlugin(AccountReportController);
     // -----------------------------------------------------------------------------------------------------------------
     // Headers
     // -----------------------------------------------------------------------------------------------------------------
     get columnHeaders() {
-        let columnHeaders = [];
+        const columnHeaders = [];
 
-        this.controller.options.column_headers.forEach((columnHeader, columnHeaderIndex) => {
+        this.controller.options().column_headers.forEach((columnHeader, columnHeaderIndex) => {
             let columnHeadersRow = [];
-
-            for (let i = 0; i < this.controller.columnHeadersRenderData.level_repetitions[columnHeaderIndex]; i++) {
-                columnHeadersRow = [ ...columnHeadersRow, ...columnHeader];
+            if (columnHeader.length !== 1) {
+                for (let i = 0; i < this.controller.columnHeadersRenderData.level_repetitions[columnHeaderIndex]; i++) {
+                    columnHeadersRow = [ ...columnHeadersRow, ...columnHeader];
+                }
+                columnHeaders.push(columnHeadersRow);
             }
-
-            columnHeaders.push(columnHeadersRow);
         });
-
         return columnHeaders;
     }
 
+    get companiesHeaderColspan() {
+        let colspan = this.controller.options().columns.length;
+
+        if (this.controller.needsColumnPercentComparison) {
+            colspan ++;
+        }
+        if (this.controller.hasDebugColumn) {
+            colspan ++;
+        }
+        return colspan + 1; // extra +1 because to add colspan for the line name column
+    }
+
     columnHeadersColspan(column_index, header, compactOffset = 0) {
+        const firstRowHeader = this.controller.options().column_headers[0];
+        if (firstRowHeader.length === 1) {
+            column_index += 1;
+        }
         let colspan = header.colspan || this.controller.columnHeadersRenderData.level_colspan[column_index]
         // In case of we need the total column for horizontal we need to increase the colspan of the first row
-        if(this.controller.options.show_horizontal_group_total && column_index === 0) {
+        if(this.controller.options().show_horizontal_group_total && column_index === 0) {
            colspan += 1;
         }
         return colspan;
@@ -46,7 +60,7 @@ export class AccountReportHeader extends Component {
 
     columnHeadersRowspan(header) {
         return header?.forced_options?.no_subheader_division
-            ? this.controller.options.column_headers.length - 1
+            ? this.controller.options().column_headers.length - 1
             : 1;
     }
 
@@ -54,16 +68,16 @@ export class AccountReportHeader extends Component {
     // Subheaders
     //------------------------------------------------------------------------------------------------------------------
     get subheaders() {
-        const columns = JSON.parse(JSON.stringify(this.controller.options.columns));
+        const columns = JSON.parse(JSON.stringify(this.controller.options().columns));
         const columnsPerGroupKey = {};
 
         columns.forEach((column) => {
-            columnsPerGroupKey[`${column.column_group_key}_${column.expression_label}`] = column;
+            columnsPerGroupKey[`${column.column_group_index}_${column.expression_label}`] = column;
         });
 
         return this.controller.lines[0].columns.map((column) => {
-            if (columnsPerGroupKey[`${column.column_group_key}_${column.expression_label}`]) {
-                return columnsPerGroupKey[`${column.column_group_key}_${column.expression_label}`];
+            if (columnsPerGroupKey[`${column.column_group_index}_${column.expression_label}`]) {
+                return columnsPerGroupKey[`${column.column_group_index}_${column.expression_label}`];
             } else {
                 return {
                     expression_label: "",
@@ -79,7 +93,7 @@ export class AccountReportHeader extends Component {
     // Custom subheaders
     // -----------------------------------------------------------------------------------------------------------------
     get customSubheaders() {
-        let customSubheaders = [];
+        const customSubheaders = [];
 
         this.controller.columnHeadersRenderData.custom_subheaders.forEach(customSubheader => {
             customSubheaders.push(customSubheader);
@@ -91,14 +105,14 @@ export class AccountReportHeader extends Component {
     // -----------------------------------------------------------------------------------------------------------------
     // Sortable
     // -----------------------------------------------------------------------------------------------------------------
-    sortableClasses(columIndex) {
-        switch (this.controller.linesCurrentOrderByColumn(columIndex)) {
+    sortableClasses(columnIndex) {
+        switch (this.controller.linesCurrentOrderByColumn(columnIndex)) {
             case "ASC":
-                return "fa fa-long-arrow-up";
+                return "north";
             case "DESC":
-                return "fa fa-long-arrow-down";
+                return "south";
             default:
-                return "fa fa-arrows-v";
+                return "swap_vert";
         }
     }
 
@@ -120,3 +134,5 @@ export class AccountReportHeader extends Component {
         }
     }
 }
+
+registry.category("account_reports.default_components").add("AccountReportHeader", AccountReportHeader);

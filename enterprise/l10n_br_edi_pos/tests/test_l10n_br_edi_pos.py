@@ -2,9 +2,14 @@
 import re
 from unittest.mock import patch
 
+from odoo.tools import SQL
 from odoo.addons.point_of_sale.tests.test_frontend import TestPointOfSaleHttpCommon
+from odoo.addons.l10n_br_avatax.models.account_external_tax_mixin import (
+    AccountExternalTaxMixin,
+)
 from odoo.addons.l10n_br_avatax.tests.test_br_avatax import TestBRMockedRequests
 from odoo.addons.l10n_br_edi.tests.test_l10n_br_edi import TestL10nBREDICommon
+from odoo.addons.l10n_br_edi.tests.data_invoice_1 import invoice_1_cancel_success_response, invoice_1_cancel_fail_response
 from odoo.addons.l10n_br_edi_pos.tests.common import CommonPosBrEdiTest
 from odoo.addons.l10n_br_edi_pos.models.pos_order import PosOrder
 from odoo.exceptions import UserError
@@ -18,6 +23,8 @@ TEST_DATETIME = "2025-02-05T22:55:17+00:00"
 
 
 class TestL10nBREDIPOSCommon(TestL10nBREDICommon, TestBRMockedRequests):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(self):
         super().setUpClass()
@@ -28,7 +35,7 @@ class TestL10nBREDIPOSCommon(TestL10nBREDICommon, TestBRMockedRequests):
         self.company.write(
             {
                 "l10n_br_edi_csc_number": "00001",
-                "l10n_br_edi_csc_identifier": "000000000000000000000000000000000000",
+                "l10n_br_edi_csc_identifier": "00000",
                 "l10n_br_avatax_api_identifier": "TEST",
                 "l10n_br_avatax_api_key": "TEST",
                 "vat": "49233848000150",
@@ -43,6 +50,8 @@ class TestL10nBREDIPOSCommon(TestL10nBREDICommon, TestBRMockedRequests):
 
 @tagged("post_install_l10n", "post_install", "-at_install")
 class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def setUp(self):
         super().setUp()
@@ -76,14 +85,14 @@ class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
             order_payment.with_context(**payment_context).check()
 
         current_session = self.pos_config_usd.current_session_id
-        current_session.action_pos_session_close()
+        current_session.close_session_from_ui()
         self.assertEqual(current_session.state, "closed")
 
     def _test_adjustment_entry(self, order, expected_communications, expected_adjustment_line_vals):
         order.l10n_br_last_avatax_status = "error"
         current_session = self.pos_config_usd.current_session_id
         self.env["pos.make.payment"].with_context(active_id=order.id).create({"amount": order.amount_total}).check()
-        current_session.action_pos_session_close()
+        current_session.close_session_from_ui()
         self.assertEqual(current_session.state, "closed", "Session should be closed without differences.")
 
         with self._with_mocked_l10n_br_iap_request(expected_communications):
@@ -91,8 +100,9 @@ class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
 
         adjustment_entry = self.env["account.move"].search([("ref", "like", order.name)])
         self.assertEqual(len(adjustment_entry), 1, f"There should be one adjustment journal entry for {order.name}.")
+        sorted_lines = adjustment_entry.line_ids.sorted(key=lambda line: line.amount_currency)
         self.assertRecordValues(
-            adjustment_entry.line_ids,
+            sorted_lines,
             expected_adjustment_line_vals,
         )
 
@@ -112,12 +122,12 @@ class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
         ]
         expected_adjustment_line_vals = [
             {
-                "account_id": order.lines.product_id._get_product_accounts()["income"].id,
-                "amount_currency": 0.58,
-            },
-            {
                 "account_id": self.env["account.account"].search([("code", "=", "2.01.01.09.03")]).id,  # icms
                 "amount_currency": -0.58,
+            },
+            {
+                "account_id": order.lines.product_id._get_product_accounts()["income"].id,
+                "amount_currency": 0.58,
             },
         ]
         self._test_adjustment_entry(
@@ -159,16 +169,16 @@ class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
         ]
         expected_adjustment_line_vals = [
             {
+                "account_id": self.env["account.account"].search([("code", "=", "2.01.01.09.03")]).id,  # icms
+                "amount_currency": -3.51,
+            },
+            {
                 "account_id": self.product_screens._get_product_accounts()["income"].id,
                 "amount_currency": 0.58,
             },
             {
                 "account_id": other_income_account.id,
                 "amount_currency": 2.93,
-            },
-            {
-                "account_id": self.env["account.account"].search([("code", "=", "2.01.01.09.03")]).id,  # icms
-                "amount_currency": -3.51,
             },
         ]
         self._test_adjustment_entry(
@@ -202,16 +212,16 @@ class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
         ]
         expected_adjustment_line_vals = [
             {
+                "account_id": self.env["account.account"].search([("code", "=", "2.01.01.09.03")]).id,  # icms
+                "amount_currency": -3.51,
+            },
+            {
                 "account_id": income_account.id,
                 "amount_currency": 0.58,
             },
             {
                 "account_id": income_account.id,
                 "amount_currency": 2.93,
-            },
-            {
-                "account_id": self.env["account.account"].search([("code", "=", "2.01.01.09.03")]).id,  # icms
-                "amount_currency": -3.51,
             },
         ]
         self._test_adjustment_entry(
@@ -283,7 +293,7 @@ class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
             order_payment.with_context(**payment_context).check()
 
         current_session = self.pos_config_usd.current_session_id
-        current_session.action_pos_session_close()
+        current_session.close_session_from_ui()
         self.assertEqual(current_session.state, "closed", "Session should be closed without differences.")
 
         # Order B is accepted so it can't be sent.
@@ -386,7 +396,64 @@ class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
         self.assertEqual(order_2.name, 'PoS Config USD - 6')
 
     @freeze_time(TEST_DATETIME)
-    def test_10_refund_with_reference(self):
+    def test_10_cancel_nfce(self):
+        order, _ = self.create_backend_pos_order({
+            'order_data': {
+                'name': 'Order/0001',
+            },
+            'line_data': [{
+                'qty': 3,
+                'price_unit': 1.0,
+                'product_id': self.product_screens.product_variant_id.id,
+            }],
+        })
+        order.l10n_br_last_avatax_status = 'accepted'
+        order.l10n_br_access_key = '12345678901234567890123456789012345678901234'
+
+        wizard = self.env['l10n_br_edi_pos.cancel.nfce'].create({
+            'order_id': order.id,
+            'reason': 'This is a justification to cancel NFC-e for testing'
+        })
+
+        with patch(
+            f'{AccountExternalTaxMixin.__module__}.AccountExternalTaxMixin._l10n_br_iap_request',
+            return_value=invoice_1_cancel_success_response
+        ):
+            wizard.action_cancel()
+
+        self.assertEqual(order.l10n_br_last_avatax_status, 'cancelled', "EDI status should be Cancelled")
+
+    @freeze_time(TEST_DATETIME)
+    def test_11_cancel_nfce_error(self):
+        order, _ = self.create_backend_pos_order({
+            'order_data': {'name': 'Order/0002'},
+            'line_data': [{
+                'qty': 3,
+                'price_unit': 1.0,
+                'product_id': self.product_screens.product_variant_id.id,
+            }],
+        })
+        order.l10n_br_last_avatax_status = 'accepted'
+        order.l10n_br_access_key = '12345678901234567890123456789012345678901234'
+
+        wizard = self.env['l10n_br_edi_pos.cancel.nfce'].create({
+            'order_id': order.id,
+            'reason': 'This is a justification to cancel NFC-e for testing',
+        })
+
+        with patch(
+            f'{AccountExternalTaxMixin.__module__}.AccountExternalTaxMixin._l10n_br_iap_request',
+            return_value=invoice_1_cancel_fail_response,
+        ), self.assertRaisesRegex(
+            UserError,
+            "Rejei\u00e7\u00e3o: Evento n\u00e3o atende o Schema XML espec\u00edfico",
+        ):
+            wizard.action_cancel()
+
+        self.assertEqual(order.l10n_br_last_avatax_status, 'accepted', "EDI status should be Accepted")
+
+    @freeze_time(TEST_DATETIME)
+    def test_12_refund_with_reference(self):
         """
         Tests that the refund has an invoice_refs, which is required to make a refund
         """
@@ -397,10 +464,82 @@ class TestL10nBREDIPOS(TestL10nBREDIPOSCommon, CommonPosBrEdiTest):
         res = refund_move._get_l10n_br_avatax_service_params()
         self.assertTrue(res['invoice_refs'])
 
+    def test_pos_order_redistribute_amounts_after_api_call(self):
+        """Test that _process_external_taxes correctly distributes tax values back to all pos order lines."""
+        order = self.create_backend_pos_order({
+            'order_data': {'name': 'Order/001'},
+            'line_data': [
+                {'product_id': self.product_screens.product_variant_id.id, 'price_unit': 100.0},
+                {'product_id': self.product_screens.product_variant_id.id, 'price_unit': 50.0},
+                {'product_id': self.product_screens.product_variant_id.id, 'price_unit': -30.0}
+            ],
+        })[0]
+
+        service_params = order._get_l10n_br_avatax_service_params()
+        line_data_list = service_params['line_data']
+        self.assertEqual(len(line_data_list), 2)  # No discount line
+
+        base_lines = [line_data['base_line'] for line_data in line_data_list]
+
+        tax_group_values = {'name': 'Avatax Brazil', 'company_id': order.company_id.id}
+        icms = {'name': 'icms', 'l10n_br_avatax_code': 'icms'}
+        pis = {'name': 'pis', 'l10n_br_avatax_code': 'pis'}
+        base_line_with_tax_values = [
+            (base_lines[0], [
+                (tax_group_values, icms, {'base_amount_currency': 80.0, 'tax_amount_currency': 8.0}),
+                (tax_group_values, pis, {'base_amount_currency': 80.0, 'tax_amount_currency': 1.6}),
+            ]),
+            (base_lines[1], [
+                (tax_group_values, icms, {'base_amount_currency': 40.0, 'tax_amount_currency': 4.0}),
+                (tax_group_values, pis, {'base_amount_currency': 40.0, 'tax_amount_currency': 0.8}),
+            ]),
+        ]
+
+        result = order._process_external_taxes(
+            order.company_id,
+            base_line_with_tax_values,
+            'l10n_br_avatax_code',
+        )
+
+        self.assertEqual(len(result), 3)  # Discount line should be brought back
+
+        icms_id = str(self.env['account.tax'].search([('l10n_br_avatax_code', '=', 'icms')], limit=1).id)
+        pis_id = str(self.env['account.tax'].search([('l10n_br_avatax_code', '=', 'pis')], limit=1).id)
+
+        discount_record = order.lines.filtered(lambda l: l.price_unit < 0)
+        discount_amounts = result[discount_record]['manual_tax_amounts']
+        self.assertAlmostEqual(discount_amounts[icms_id]['tax_amount_currency'], -20 / 80 * 8 - 10 / 40 * 4)
+        self.assertAlmostEqual(discount_amounts[pis_id]['tax_amount_currency'], -20 / 80 * 1.6 - 10 / 40 * 0.8)
+
+        # Totals should stay the same: ICMS = 12.0, PIS = 2.4
+        total_icms = sum(result[r]['manual_tax_amounts'][icms_id]['tax_amount_currency'] for r in result)
+        total_pis = sum(result[r]['manual_tax_amounts'][pis_id]['tax_amount_currency'] for r in result)
+        self.assertAlmostEqual(total_icms, 12.0)
+        self.assertAlmostEqual(total_pis, 2.4)
+
+    def test_find_tax_for_avatax_code_is_a_sale_tax(self):
+        purchase_tax = self.env["account.tax"].with_context(active_test=False).search([
+            ("l10n_br_avatax_code", "=", "icms"),
+            ("price_include_override", "=", "tax_included"),
+            ("company_id", "=", self.company.id),
+            ("type_tax_use", "=", "purchase"),
+        ], limit=1)
+        # The error was undeterministic since it depended on the order of creation of the taxes.
+        # Hack below reproduce the breaking case.
+        self.env.cr.execute(SQL(
+            "UPDATE account_tax SET create_date = create_date + interval '1 second' WHERE id = %s",
+            purchase_tax.id,
+        ))
+        order = self.env["pos.order"].new({"company_id": self.company.id})
+        tax = order._l10n_br_find_tax_for_l10n_br_avatax_code("icms")
+        self.assertEqual(tax.type_tax_use, "sale")
+
 
 @freeze_time(TEST_DATETIME)
 @tagged("post_install_l10n", "post_install", "-at_install")
 class TestUi(TestL10nBREDIPOSCommon, TestPointOfSaleHttpCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(self):
         super().setUpClass()
@@ -444,6 +583,8 @@ class TestUi(TestL10nBREDIPOSCommon, TestPointOfSaleHttpCommon):
             )
 
     def test_02_customer_order(self):
+        self.partner_customer.vat = False
+        self.partner_customer._set_additional_identifier('BR_CN', '92355690448')
         with self._with_mocked_l10n_br_iap_request(
             [
                 ("calculate_tax", "customer_tax_request", "customer_tax_response"),
@@ -455,11 +596,9 @@ class TestUi(TestL10nBREDIPOSCommon, TestPointOfSaleHttpCommon):
             )
 
             order = self.env['pos.order'].search([], limit=1, order='id desc')
-            self.assertEqual(order.is_invoiced, False)
+            self.assertEqual(order.is_singly_invoiced, False)
 
     def test_03_company_order(self):
-        self.partner_customer.company_type = 'company'
-
         with self._with_mocked_l10n_br_iap_request(
             [
                 ("calculate_tax", "company_tax_request", "company_tax_response"),
@@ -471,16 +610,19 @@ class TestUi(TestL10nBREDIPOSCommon, TestPointOfSaleHttpCommon):
             )
 
             order = self.env['pos.order'].search([], limit=1, order='id desc')
-            self.assertEqual(order.is_invoiced, False)
+            self.assertEqual(order.is_singly_invoiced, False)
 
 
 @tagged('post_install', '-at_install', 'post_install_l10n')
 class TestGenericBR(TestGenericLocalization, TestL10nBREDIPOSCommon):
+
+    _pos_partner_pos_form_fields = ['vat', 'additional_identifiers']
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('br')
     def setUpClass(cls):
         super().setUpClass()
-        cls.main_pos_config.company_id.name = 'Company BR'
         cls.main_pos_config.write(
             {
                 "l10n_br_is_nfce": True,
@@ -496,3 +638,7 @@ class TestGenericBR(TestGenericLocalization, TestL10nBREDIPOSCommon):
         cls.whiteboard_pen.write({
             'taxes_id': False,
         })
+
+    def test_generic_localization(self):
+        _, html = super().test_generic_localization()
+        self.assertTrue("RECEIPT WITHOUT FISCAL VALUE" in html)

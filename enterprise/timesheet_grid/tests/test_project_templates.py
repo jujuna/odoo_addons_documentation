@@ -1,24 +1,25 @@
 from datetime import date, datetime
 
-from odoo.tests import TransactionCase, freeze_time
+from odoo.tests import tagged, TransactionCase, freeze_time
 
 
 @freeze_time("2025-07-17")  # Thursday
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestProjectTemplates(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
+        cls.env.company.tz = 'UTC'
         cls.irregular_calendar = cls.env["resource.calendar"].create({
             "name": "Irregular 3.5-day Week",
             "attendance_ids": [
-                (0, 0, {"name": "Monday Morning", "dayofweek": "0", "hour_from": 9, "hour_to": 12}),
-                (0, 0, {"name": "Monday Evening", "dayofweek": "0", "hour_from": 13, "hour_to": 17}),
-                (0, 0, {"name": "Tuesday Morning", "dayofweek": "1", "hour_from": 9, "hour_to": 12}),
-                (0, 0, {"name": "Thursday Morning", "dayofweek": "3", "hour_from": 9, "hour_to": 12}),
-                (0, 0, {"name": "Thursday Evening", "dayofweek": "3", "hour_from": 13, "hour_to": 17}),
+                (0, 0, {"dayofweek": "0", "hour_from": 9, "hour_to": 12}),
+                (0, 0, {"dayofweek": "0", "hour_from": 13, "hour_to": 17}),
+                (0, 0, {"dayofweek": "1", "hour_from": 9, "hour_to": 12}),
+                (0, 0, {"dayofweek": "3", "hour_from": 9, "hour_to": 12}),
+                (0, 0, {"dayofweek": "3", "hour_from": 13, "hour_to": 17}),
             ],
-            "tz": "UTC",
         })
         cls.env.company.resource_calendar_id = cls.irregular_calendar.id
 

@@ -8,6 +8,9 @@ from odoo import api, models
 from odoo.exceptions import UserError
 from requests.exceptions import RequestException
 
+from odoo.addons.ai.utils.ai_utils import get_text_from_parts
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -43,9 +46,9 @@ class WebsitePage(models.Model):
             snippet_key = el_en.attrib['data-snippet']
             # Because the templates are generated from specific
             # t-snippet-calls such as:
-            # "website.new_page_template_about_0_s_text_block",
+            # "website.new_page_template_about_us_0_s_text_block",
             # the generated data-snippet looks like:
-            # "new_page_template_about_0_s_text_block"
+            # "new_page_template_about_us_0_s_text_block"
             # while it should be "s_text_block" only.
             if '_s_' in snippet_key:
                 el_en.attrib['data-snippet'] = f's_{snippet_key.split("_s_")[-1]}'
@@ -87,10 +90,12 @@ class WebsitePage(models.Model):
         agent = self.env.ref('ai_website.website_page_generator_agent')
         batch = {str(i + 1): placeholder for i, placeholder in enumerate(placeholders)}
         prompt = json.dumps(batch, ensure_ascii=False)
+        message_parts = [{'type': 'text', 'text': prompt}]
         try:
-            response = agent.get_direct_response(prompt, content_context)
-            if len(response) > 0 and isinstance(response[0], str):
-                response_dict = json.loads(response[0])
+            response = agent._generate_single_response(message_parts, extra_instructions=content_context)
+            response_text = response and get_text_from_parts(response)
+            if response_text:
+                response_dict = json.loads(response_text)
                 result = {}
                 for i, placeholder in enumerate(placeholders):
                     key = str(i + 1)
@@ -112,7 +117,7 @@ class WebsitePage(models.Model):
         :return: The HTML string of the generated page
         :rtype: str
         """
-        website = self.env['website'].get_current_website()
+        website = self.env.website or self.env.website.browse(self.env.context.get('host_id')) or self.env.ref('base.default_website')
         text_generation_target_lang = website.default_lang_id.code
         text_must_be_translated_for_openai = not text_generation_target_lang.startswith('en_')
         IrQweb = self.env['ir.qweb'].with_context(

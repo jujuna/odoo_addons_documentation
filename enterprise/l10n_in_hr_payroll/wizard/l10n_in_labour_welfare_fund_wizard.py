@@ -1,20 +1,27 @@
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, Command, fields, models
+from odoo.exceptions import UserError
 
 
 class L10nInLabourWelfareFundWizard(models.TransientModel):
     _name = 'l10n.in.labour.welfare.fund.wizard'
     _description = 'Labour Welfare Fund'
 
-    date_from = fields.Date(default=lambda self: fields.Date.today() + relativedelta(day=1, month=1))
-    date_to = fields.Date(default=lambda self: fields.Date.today() + relativedelta(day=31, month=12))
+    date_from = fields.Date(default=lambda self: fields.Date.context_today(self) + relativedelta(day=1, month=1))
+    date_to = fields.Date(default=lambda self: fields.Date.context_today(self) + relativedelta(day=31, month=12))
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     currency_id = fields.Many2one(related="company_id.currency_id")
     department_id = fields.Many2one('hr.department', string='Department', domain="[('company_id', '=', company_id)]")
     line_ids = fields.One2many(
         'l10n.in.labour.welfare.fund.line.wizard', 'wizard_id',
         compute='_compute_line_ids', store=True, readonly=False)
+
+    @api.model
+    def default_get(self, fields):
+        if self.env.company.country_id.code != "IN":
+            raise UserError(self.env._('You must be logged in a Indian company to use this feature'))
+        return super().default_get(fields)
 
     @api.depends('department_id')
     def _compute_line_ids(self):
@@ -57,7 +64,7 @@ class L10nInLabourWelfareFundLineWizard(models.TransientModel):
         employee_ids = [val_list.get('employee_id') for val_list in vals_list]
         payslips = self.env['hr.payslip'].search([
                     ('employee_id', 'in', employee_ids),
-                    ('state', '=', 'paid'),
+                    ('state', 'in', ('paid', 'validated')),
                 ])
         for val_list in vals_list:
             employee = self.env['hr.employee'].browse(val_list.get('employee_id'))

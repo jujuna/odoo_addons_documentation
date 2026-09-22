@@ -1,17 +1,17 @@
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
-import { CharField } from "@web/views/fields/char/char_field";
+import { charFieldProps } from "@web/views/fields/char/char_field";
 
-import { Component, toRaw } from "@odoo/owl";
+import { Component, useProps, toRaw, t } from "@odoo/owl";
 import { DocumentsSearchPanelUserFolderId } from "@documents/views/fields/documents_user_folder_id_char/documents_search_panel_user_folder_id";
 
 export class DocumentsUserFolderIdCharField extends Component {
     static components = { DocumentsSearchPanelUserFolderId };
-    static props = {
-        ...CharField.props,
-        extraFields: { type: Array, optional: true },
-        ulClass: { type: String, optional: true },
-    };
+    props = useProps({
+        ...charFieldProps,
+        extraFields: t.array().optional(),
+        ulClass: t.string().optional(),
+    });
     static template = "documents.DocumentsUserFolderIdChar";
 
     /**

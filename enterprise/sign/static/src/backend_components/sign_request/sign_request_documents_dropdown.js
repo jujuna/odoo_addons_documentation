@@ -1,6 +1,7 @@
+import { SignInfoPlugin } from "@sign/services/sign_info_plugin";
 /** @odoo-module **/
 
-import { Component, onWillStart } from "@odoo/owl";
+import { Component, onWillStart, t, usePlugin, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
@@ -18,15 +19,16 @@ export class SignRequestDocumentsDropdown extends Component {
         Dropdown,
         DropdownItem,
     };
-    static props = {
+
+    props = useProps({
         ...standardFieldProps,
-        name: { type: String, optional: true },
-        record: { type: Object, optional: true },
-    };
+        name: t.string().optional(),
+        record: t.object().optional(),
+    });
 
     setup() {
         super.setup();
-        this.signInfo = useService("signInfo");
+        this.signInfo = usePlugin(SignInfoPlugin);
         this.orm = useService("orm");
         this.action = useService("action");
         onWillStart(async () => {
@@ -52,9 +54,9 @@ export class SignRequestDocumentsDropdown extends Component {
         const signRequestId = evalContext?.id || context?.active_id;
         if (signRequestId) {
             const signRequestData = await this.orm.read(
-                'sign.request',
+                "sign.request",
                 [signRequestId],
-                ['access_token', 'state']
+                ["access_token", "state"]
             );
             if (signRequestData?.length) {
                 // Initialize signInfo with the fetched data
@@ -71,13 +73,15 @@ export class SignRequestDocumentsDropdown extends Component {
      * Fetch sign request documents (original or completed)
      */
     async fetchSignRequestDocuments() {
-        const signRequestState = this.signInfo?.get('signRequestState');
-        const documentId = this.signInfo?.get('documentId');
-        const signRequestToken = this.signInfo?.get('signRequestToken');
+        const signRequestState = this.signInfo?.get("signRequestState");
+        const documentId = this.signInfo?.get("documentId");
+        const signRequestToken = this.signInfo?.get("signRequestToken");
 
-        if (!signRequestState || !documentId || !signRequestToken) return;
+        if (!signRequestState || !documentId || !signRequestToken) {
+            return;
+        }
 
-        if (signRequestState === 'signed') {
+        if (signRequestState === "signed") {
             // Fetch completed (signed) documents
             const { completed_documents } = await rpc(
                 `/sign/get_completed_documents/${documentId}/${signRequestToken}`
@@ -85,14 +89,31 @@ export class SignRequestDocumentsDropdown extends Component {
             this.signInfo.set({ completed_documents });
         } else {
             // Fetch original (unsigned) documents
-            const { original_documents } = await rpc(
+            const { original_documents, is_partially_signed } = await rpc(
                 `/sign/get_original_documents/${documentId}/${signRequestToken}`
             );
-            this.signInfo.set({ original_documents });
+            this.signInfo.set({ original_documents, is_partially_signed });
         }
     }
 
-    downloadDocument(url) {
+    /**
+     * Triggers the download of signature documents
+     *
+     * @param {string} type - The download category:
+     * 'origin' (original files),
+     * 'completed' (signed files),
+     * 'log' (audit certificate).
+     * @param {number|string} [docId=''] - Optional ID for a specific document.
+     * If omitted, the server returns a
+     * compressed zip of all documents.
+     * @returns {Promise} Resolves when the action is triggered.
+     */
+    downloadDocument(type, docId = "") {
+        const docIdPath = docId ? `/${docId}` : "";
+        const base = `/sign/download/${this.signInfo.get("documentId")}/${this.signInfo.get(
+            "signRequestToken"
+        )}`;
+        const url = `${base}/${type}${docIdPath}`;
         return this.action.doAction({
             type: "ir.actions.act_url",
             target: "download",
@@ -102,4 +123,6 @@ export class SignRequestDocumentsDropdown extends Component {
 }
 
 // Register this component as a field widget to use in the sign_request form view
-registry.category("fields").add("sign_request_documents_dropdown", {component: SignRequestDocumentsDropdown});
+registry
+    .category("fields")
+    .add("sign_request_documents_dropdown", { component: SignRequestDocumentsDropdown });

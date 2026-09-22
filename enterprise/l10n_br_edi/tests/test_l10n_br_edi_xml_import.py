@@ -8,6 +8,8 @@ from odoo.tools import file_open
 
 @tagged("post_install_l10n", "post_install", "-at_install")
 class TestL10nBrEDIXMLImport(AccountTestInvoicingCommon, ProductVariantsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country("br")
     def setUpClass(cls):
@@ -36,14 +38,12 @@ class TestL10nBrEDIXMLImport(AccountTestInvoicingCommon, ProductVariantsCommon):
         vendor = self.env["res.partner"].create(
             {
                 "name": "test",
-                "l10n_latam_identification_type_id": self.env.ref("l10n_br.cnpj").id,
                 "vat": "37.842.696/0001-03",
             }
         )
         transporter = self.env["res.partner"].create(
             {
                 "name": "transporter",
-                "l10n_latam_identification_type_id": self.env.ref("l10n_br.cnpj").id,
                 "vat": "03007331000141",
             }
         )
@@ -94,9 +94,7 @@ class TestL10nBrEDIXMLImport(AccountTestInvoicingCommon, ProductVariantsCommon):
             self._create_invoice_from_xml("NFe3224023.xml").partner_id,
             [
                 {
-                    "is_company": True,
                     "vat": "37842696000103",
-                    "l10n_latam_identification_type_id": self.env.ref("l10n_br.cnpj").id,
                     "name": "A G CANDIDO LOJA DE DEPARTAMENTO EIRELI",
                     "street_name": "Rua Josias Cerutti",
                     "street_number": "2",
@@ -137,7 +135,6 @@ class TestL10nBrEDIXMLImport(AccountTestInvoicingCommon, ProductVariantsCommon):
         vendor = self.env["res.partner"].create(
             {
                 "name": "test",
-                "l10n_latam_identification_type_id": self.env.ref("l10n_br.cnpj").id,
                 "vat": "37.842.696/0001-03",
             }
         )

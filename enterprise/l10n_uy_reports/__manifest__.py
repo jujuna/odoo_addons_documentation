@@ -1,6 +1,5 @@
 {
     'name': 'Uruguay - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Uruguay
 ============================================

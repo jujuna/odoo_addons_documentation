@@ -1,13 +1,5 @@
-.o_widget_knowledge_properties_panel {
-    &:empty {
-        display: none,
-    }
-    min-width: 250px;
-    width: 25%;
-    background: var(--knowledge-properties-bg, $o-gray-100);
-
+.o_knowledge_properties_panel {
     .o_properties_helper {
-        background: var(--knowledge-properties-bg, $o-gray-100);
         .o_view_nocontent_smiling_face:before {
             @extend %o-nocontent-init-image;
             width: 120px;
@@ -49,11 +41,7 @@
         }
     }
     .o_field_property_add {
-        margin-left: -0.5rem !important;
-        button {
-            --btn-bg: var(--knowledge-properties-btn-bg, $o-gray-200);
-            --btn-border-color: var(--knowledge-properties-btn-bg, $o-gray-200);
-        }
+        margin-left: 0 !important;
     }
     .o_properties_external_button {
         background: transparent;
@@ -62,10 +50,10 @@
 }
 
 @media (hover: hover) { // Devices supporting hover
-    .o_widget_knowledge_properties_panel {
+    .o_knowledge_properties_panel {
         .o_field_property_label:not(:hover) {
             .o_field_property_open_popover,
-            .oi-draggable {
+            [data-icon="drag_indicator"] {
                 opacity: 0;
             }
         }

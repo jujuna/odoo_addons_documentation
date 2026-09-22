@@ -84,9 +84,13 @@ class AppointmentResource(models.Model):
             display_name = resource_name_capacity if resource.capacity > 1 else resource.name
             resource.display_name = display_name
 
-    def copy_data(self, default=None):
-        vals_list = super().copy_data(default=default)
-        return [dict(vals, name=self.env._("%s (copy)", resource.name)) for resource, vals in zip(self, vals_list)]
+    @api.ondelete(at_uninstall=False)
+    def _unlink_related_appointment_leaves(self):
+        """ Unlink related appointment leaves if all their resources have been unlinked.
+        This prevents having 'resources' appointment leaves set on no resource.
+        """
+        leaves = self.env['appointment.leave'].sudo().search([('resource_ids', 'in', self.ids)])
+        leaves.filtered(lambda leave: leave.resource_ids and not (leave.resource_ids - self)).unlink()
 
     def _get_filtered_possible_capacity_combinations(self, asked_capacity, capacity_info):
         """ Get combinations of resources with total capacity based on the capacity needed and the resources we want.

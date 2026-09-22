@@ -61,4 +61,7 @@ class HrEmployee(models.Model):
             'res_model': 'hr.contract.sign.document.wizard',
             'view_mode': 'form',
             'target': 'new',
+            'context': {
+                'default_version_id': self.version_id.id,
+            },
         }

@@ -3,14 +3,13 @@
 {
     'name': 'Morocco - Payroll with Accounting',
     'category': 'Human Resources',
-    'countries': ['ma'],
     'depends': ['l10n_ma_hr_payroll', 'hr_payroll_account', 'l10n_ma'],
     'description': """
 Accounting Data for Moroccan Payroll Rules.
 =================================================
     """,
 
-    'auto_install': True,
+    'auto_install': ['l10n_ma_hr_payroll', 'hr_payroll_account'],
     'data': [
         'data/hr_salary_rule_data.xml',
     ],

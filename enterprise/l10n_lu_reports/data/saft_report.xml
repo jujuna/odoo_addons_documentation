@@ -4,7 +4,7 @@
     <template id="tax_information_inherit_l10n_lu_saft" inherit_id="account_saft.tax_information">
         <xpath expr="//TaxCode" position="before">
             <t t-if="company.account_fiscal_country_id.code == 'LU'">
-                <TaxType>TVA-<t t-out="tax_vals['tax_id']"/></TaxType>
+                <TaxType>TVA</TaxType>
             </t>
         </xpath>
         <xpath expr="//TaxBaseDescription" position="before">
@@ -22,20 +22,18 @@
             <InvoiceNo t-out="invoice_vals['name'][:70]"/>
                 <t t-set="partner_id" t-value="invoice_vals['partner_id']"/>
                 <t t-set="partner_vals" t-value="partner_detail_map[partner_id]"/>
-                <CustomerInfo t-if="partner_vals['type'] == 'customer'">
+                <CustomerInfo t-if="invoice_vals['type'] in ('out_invoice', 'out_refund')">
                     <CustomerID t-out="partner_id"/>
                     <BillingAddress>
-                        <t t-if="partner_vals['addresses']" t-call="account_saft.address">
-                            <t t-set="partner_address" t-value="partner_vals['addresses'][0]"/>
-                        </t>
+                        <t t-if="partner_vals['addresses']" t-call="account_saft.address"
+                            partner_address="partner_vals['addresses'][0]"/>
                     </BillingAddress>
                 </CustomerInfo>
-                <SupplierInfo t-if="partner_vals['type'] == 'supplier'">
+                <SupplierInfo t-if="invoice_vals['type'] in ('in_invoice', 'in_refund')">
                     <SupplierID t-out="partner_id"/>
                     <BillingAddress>
-                        <t t-if="partner_vals['addresses']"  t-call="account_saft.address">
-                            <t t-set="partner_address" t-value="partner_vals['addresses'][0]"/>
-                        </t>
+                        <t t-if="partner_vals['addresses']"  t-call="account_saft.address"
+                            partner_address="partner_vals['addresses'][0]"/>
                     </BillingAddress>
                 </SupplierInfo>
                 <Period t-out="format_date(invoice_vals['date'], '%m')"/>
@@ -44,9 +42,9 @@
                 <InvoiceType t-out="invoice_vals['type'][:9]"/>
                 <SourceID t-if="invoice_vals['invoice_origin']" t-out="invoice_vals['invoice_origin'][:35]"/>
                 <GLPostingDate t-out="invoice_vals['date']"/>
-                <TransactionID t-out="invoice_vals['id']"/>
+                <TransactionID t-out="invoice_vals['name']"/>
                 <Line t-foreach="invoice_vals['invoice_line_vals_list']" t-as="line_vals">
-                    <AccountID t-out="line_vals['account_id']"/>
+                    <AccountID t-out="line_vals['account_code']"/>
                     <OrderReferences>
                         <OriginatingON t-out="invoice_vals['name'][:70]"/>
                         <OrderDate t-out="invoice_vals['invoice_date']"/>
@@ -59,16 +57,16 @@
                     <TaxPointDate t-out="invoice_vals['invoice_date']"/>
                     <Description t-out="(line_vals['name'] or invoice_vals['name'])[:256]"/>
                     <InvoiceLineAmount>
-                        <Amount t-out="format_float(line_vals['balance'] * invoice_vals['sign'])"/>
+                        <Amount t-out="format_float(abs(line_vals['balance']))"/>
                         <t t-if="line_vals['currency_id'] != company.currency_id.id">
                             <CurrencyCode t-out="line_vals['currency_code']"/>
-                            <CurrencyAmount t-out="format_float(line_vals['amount_currency'] * invoice_vals['sign'])"/>
+                            <CurrencyAmount t-out="format_float(abs(line_vals['amount_currency']))"/>
                             <ExchangeRate t-out="format_float(line_vals['rate'], digits=8)"/>
                         </t>
                     </InvoiceLineAmount>
-                    <DebitCreditIndicator t-out="'C' if invoice_vals['type'] == 'out_invoice' else 'D'"/>
+                    <DebitCreditIndicator t-out="'C' if line_vals['credit'] else 'D'"/>
                     <TaxInformation t-foreach="line_vals.get('tax_detail_vals_list', [])" t-as="tax_vals">
-                        <t t-set="sign" t-value="invoice_vals['sign']"/>
+                        <t t-set="sign" t-value="-1 if line_vals['credit'] else 1"/>
                         <t t-call="account_saft.tax_information"/>
                     </TaxInformation>
                 </Line>
@@ -117,8 +115,8 @@
                 </UOMTable>
                 <Products t-if="product_vals_list">
                     <Product t-foreach="product_vals_list" t-as="product_vals">
-                        <ProductCode t-out="product_vals['default_code'][:70]"/>
-                        <ProductGroup t-out="product_vals['product_category'][:70]"/>
+                        <ProductCode t-out="(product_vals.get('default_code') or '')[:70]"/>
+                        <ProductGroup t-out="(product_vals.get('product_category') or '')[:70]"/>
                         <Description t-out="product_vals['name'][:256]"/>
                         <UOMStandard t-out="product_vals['standard_uom'][:9]"/>
                     </Product>
@@ -127,7 +125,7 @@
         </xpath>
         <xpath expr="//TaxCodeDetails" position="before">
             <t t-if="company.account_fiscal_country_id.code == 'LU'">
-                <TaxType>TVA-<t t-out="tax_vals['id']"/></TaxType>
+                <TaxType>TVA</TaxType>
                 <Description>Taxe sur la valeur ajoutée</Description>
             </t>
         </xpath>

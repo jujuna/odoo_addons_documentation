@@ -2,16 +2,16 @@
 <templates id="template" xml:space="preserve">
 
 <t t-name="website_generator.WebsiteGenerator">
-    <div class="o_configurator_container" t-if="state.error">
+    <div class="o_configurator_container" t-if="this.state.error">
         <div class="o_configurator_screen h-100 d-flex flex-column">
             <div style="height: 31px;">
-                <a href="/odoo" style="position: absolute; right: 0; top: 0; margin: 15px;"><span class="fa fa-close fa-2x"/></a>
+                <a href="/odoo" style="position: absolute; right: 0; top: 0; margin: 15px;"><span class="oi oi-2x" data-icon="close"/></a>
             </div>
             <div class="o_configurator_screen_content d-flex h-100">
                 <div class="container align-self-center o_configurator_show">
                     <div class="display-2 mb-2">Something went wrong</div>
                     <div class="h1 fw-light mb-4 text-600">We could not convert your website, please try again later</div>
-                    <p t-esc="state.error"/>
+                    <p t-out="this.state.error"/>
                 </div>
             </div>
         </div>

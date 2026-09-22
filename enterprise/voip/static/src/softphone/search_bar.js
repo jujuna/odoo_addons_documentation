@@ -1,36 +1,38 @@
-import { Component, useEffect, useRef } from "@odoo/owl";
+import { Component, computed, useProps, signal, t, useEffect } from "@odoo/owl";
 
-import { isCurrentFocusEditable } from "@voip/utils/utils";
-
+import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
+import { useDebounced } from "@web/core/utils/timing";
 
 /**
  * Search bar component used in softphone tabs to filter entries.
  */
 export class SearchBar extends Component {
     static template = "voip.SearchBar";
-    static props = {
-        state: { type: Object },
-        onInputSearch: { type: Function },
-        onClickBack: { type: Function, optional: true },
-        slots: { type: Object, optional: true },
-    };
+    props = useProps({
+        state: t.object(),
+        onInputSearch: t.function(),
+        onClickBack: t.function().optional(),
+        placeholder: t.string().optional(_t("Search…")),
+        trailingIcon: t.string().optional(),
+        onTrailingIconClick: t.function().optional(),
+        trailingIconTitle: t.string().optional(),
+    });
+    showPendingIcon = signal(false);
 
     setup() {
         this.voip = useService("voip");
         this.softphone = this.voip.softphone;
-        this.searchInput = useRef("searchInput");
-        useEffect(
-            (shouldFocus) => {
-                if (shouldFocus) {
-                    if (this.searchInput.el && !this.voip.error && !isCurrentFocusEditable()) {
-                        this.searchInput.el.focus();
-                    }
-                    this.softphone.shouldFocus = false;
-                }
-            },
-            () => [this.softphone.shouldFocus]
-        );
+        this.showPendingSearchIcon = useDebounced(() => this.showPendingIcon.set(true), 400);
+        const hasPendingRequest = computed(() => this.voip.hasPendingRequest);
+        useEffect(() => {
+            if (hasPendingRequest()) {
+                this.showPendingSearchIcon();
+            } else {
+                this.showPendingSearchIcon.cancel();
+                this.showPendingIcon.set(false);
+            }
+        });
     }
 
     /**
@@ -39,9 +41,20 @@ export class SearchBar extends Component {
      * @returns {string}
      */
     get searchBarIcon() {
-        if (this.voip.hasPendingRequest) {
-            return "fa fa-spin fa-circle-o-notch";
+        if (this.showPendingIcon()) {
+            return "autorenew";
         }
-        return "oi oi-search";
+        return this.props.trailingIcon || "search";
+    }
+
+    /**
+     * @returns {string}
+     */
+    get searchBarIconClasses() {
+        return this.showPendingIcon() ? "oi-spin" : "";
+    }
+
+    get trailingIconTitle() {
+        return this.props.trailingIconTitle || "";
     }
 }

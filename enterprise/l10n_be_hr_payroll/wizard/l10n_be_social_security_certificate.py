@@ -1,13 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 from io import BytesIO
 
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.tools.misc import format_date
+from odoo.tools import BinaryBytes
+from odoo.tools.misc import format_date, format_time
 
 
 class L10nBeSocialSecurityCertificate(models.TransientModel):
@@ -20,8 +20,8 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
             raise UserError(_('This feature seems to be as exclusive as Belgian chocolates. You must be logged in to a Belgian company to use it.'))
         return super().default_get(fields)
 
-    date_from = fields.Date(default=lambda s: fields.Date.today() + relativedelta(day=1, month=1, years=-1))
-    date_to = fields.Date(default=lambda s: fields.Date.today() + relativedelta(day=31, month=12, years=-1))
+    date_from = fields.Date(default=lambda s: fields.Date.context_today(s) + relativedelta(day=1, month=1, years=-1))
+    date_to = fields.Date(default=lambda s: fields.Date.context_today(s) + relativedelta(day=31, month=12, years=-1))
     state = fields.Selection([
         ('draft', 'Draft'),
         ('done', 'Done'),
@@ -55,16 +55,15 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
         holiday_pay_n1 = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_departure_n1_holidays')
         double_pay = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_double_holiday')
         thirteen_pay = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month')
-        student_pay = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_student_regular_pay')
         warrant_pay = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_structure_warrant')
         salary_advance_pay = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_salary_advance')
 
         all_payslips = self.env['hr.payslip'].search([
             ('state', 'in', ['validated', 'paid']),
-            ('struct_id', '!=', warrant_pay.id),
             ('company_id', '=', self.company_id.id),
             ('date_from', '>=', date_from),
-            ('date_to', '<=', date_to)])
+            ('date_to', '<=', date_to),
+            '|', ('version_id.l10n_be_joint_committee_id', '=', False), ('version_id.l10n_be_joint_committee_id.egov3_code', '!=', '999')])
 
         grouped_payslips = []
         if self.aggregation_level == 'company':
@@ -79,60 +78,66 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
         report_data = []
         for aggregate_name, aggregate_payslips in grouped_payslips:
             monthly_slips = aggregate_payslips.filtered(lambda p: p.struct_id == monthly_pay)
-            termination_slips = aggregate_payslips.filtered(lambda p: p.struct_id == termination_pay)
+            termination_slips = aggregate_payslips.filtered(lambda p: p.struct_id in termination_pay)
             holiday_slips = aggregate_payslips.filtered(lambda p: p.struct_id in [holiday_pay_n, holiday_pay_n1])
             double_slips = aggregate_payslips.filtered(lambda p: p.struct_id == double_pay)
             thirteen_slips = aggregate_payslips.filtered(lambda p: p.struct_id == thirteen_pay)
-            student_slips = aggregate_payslips.filtered(lambda p: p.struct_id == student_pay)
+            student_slips = aggregate_payslips.filtered(lambda p: p.version_id.is_student())
             salary_advance_slips = aggregate_payslips.filtered(lambda p: p.struct_id == salary_advance_pay)
-            unclassified_slips = aggregate_payslips - monthly_slips - termination_slips - holiday_slips - double_slips - thirteen_slips - student_slips
+            warrant_slips = aggregate_payslips.filtered(lambda p: p.struct_id == warrant_pay)
+            unclassified_slips = aggregate_payslips - monthly_slips - termination_slips - holiday_slips - double_slips - thirteen_slips - student_slips - warrant_slips
             monthly_slips += unclassified_slips
 
             code_list = [
-                'BASIC', 'HolPayRecN', 'HolPayRecN1', 'COMMISSION', 'AFTERPUB', 'HIRINGBONUS',
-                'ADDITIONALGROSS', 'SIMPLE.DECEMBER', 'ATN.INT', 'ATN.MOB', 'ATN.LAP', 'BASIC',
-                'D.P', 'EU.LEAVE.DEDUC', 'ATN.CAR', 'PAY_SIMPLE', 'PAY DOUBLE', 'PUB.TRANS',
-                'PAY DOUBLE COMPLEMENTARY', 'SALARY', 'SALARY', 'ONSSTOTAL', 'ONSSEMPLOYER', 'ONSS1',
-                'ONSS2', 'ONSS', 'ONSS', 'ONSS', 'REP.FEES', 'REP.FEES.VOLATILE', 'CAR.PRIV', 'P.P', 'M.ONSS',
-                'ATTACH_SALARY', 'ATN.CAR.2', 'ATN.MOB.2', 'ATN.INT.2', 'ATN.LAP.2', 'MEAL_V_EMP',
-                'IMPULSION25', 'IMPULSION12', 'ASSIG_SALARY', 'SALARYADVREC', 'NET', 'P.P.DED',
-                'ONSSEMPLOYERBASIC', 'ONSSEMPLOYERFFE', 'ONSSEMPLOYERMFFE', 'ONSSEMPLOYERCPAE',
-                'ONSSEMPLOYERRESTREINT', 'ONSSEMPLOYERUNEMP', 'CYCLE', 'CANTEEN']
+                'BASIC', 'HolPayRec', 'COMMISSION', 'HIRINGBONUS', 'BONUS_BASIC',
+                'ADDITIONALGROSS', 'SIMPLE_DECEMBER', 'ATN.INT', 'ATN.MOB', 'ATN.LAP', 'ATN.PHONE_AMT', 'ATN.TAB',
+                'ATN_ELEC', 'ATN_HEATING', 'ATN_HOUSING_ONSS', 'ATN_HOUSING_FISCAL', 'ATN_RENT', 'ATN_PENSION', 'WARRANT_ATN',
+                'TERM_BASIC', 'D.P', 'EU_LEAVE_DEDUC', 'ATN.CAR', 'PAY_SIMPLE', 'PAY_DOUBLE', 'PUB.TRANS', 'TRAIN',
+                'PAY_DOUBLE_COMPLEMENTARY', 'SALARY', 'BONUS_SALARY', 'DH_SALARY', 'ONSSTOTAL', 'ONSSEMPLOYER', 'ONSS_HOLIDAY_TERM_SIMPLE',
+                'ONSS_HOLIDAY_TERM_DOUBLE', 'ONSS', 'WARRANT_SALARY', 'WARRANT_ONSS', 'REP.FEES', 'REP.FEES.VOLATILE', 'CAR.PRIV', 'P.P', 'WARRANT_PP', 'M.ONSS',
+                'ATTACH_SALARY', 'ATN_DED', 'WARRANT_ATN_DED', 'MEAL_V_EMP', 'IMPULSION25', 'IMPULSION12', 'ASSIG_SALARY', 'SALARYADVREC', 'NET', 'P.P.DED',
+                'ONSSEMPLOYERBASIC', 'ONSSEMPLOYER_809', 'ONSSEMPLOYER_810', 'ONSSEMPLOYER_831',
+                'ONSSEMPLOYER_855', 'ONSSEMPLOYER_859', 'ONSSEMPLOYER_255', 'ONSSEMPLOYER_256',
+                'CYCLE', 'CANTEEN']
             all_values = aggregate_payslips._get_line_values(code_list, vals_list=['total', 'quantity'])
 
             gross_before_onss = _get_total(monthly_slips, all_values, [
-                'BASIC', 'HolPayRecN', 'HolPayRecN1', 'COMMISSION', 'AFTERPUB', 'HIRINGBONUS',
-                'ADDITIONALGROSS', 'SIMPLE.DECEMBER'])
-            atn = _get_total(monthly_slips, all_values, ['ATN.INT', 'ATN.MOB', 'ATN.LAP'])
-            termination_fees = _get_total(termination_slips, all_values, ['BASIC'])
+                'BASIC', 'HolPayRec', 'COMMISSION', 'HIRINGBONUS',
+                'ADDITIONALGROSS', 'SIMPLE_DECEMBER'])
+            atn = _get_total(monthly_slips, all_values, ['ATN.INT', 'ATN.MOB', 'ATN.LAP', 'ATN.PHONE_AMT', 'ATN.TAB', 'ATN_ELEC', 'ATN_HEATING', 'ATN_HOUSING_ONSS', 'ATN_RENT', 'ATN_PENSION'])
+            termination_fees = _get_total(termination_slips, all_values, ['TERM_BASIC'])
             student = _get_total(student_slips, all_values, ['BASIC'])
-            thirteen_month = _get_total(thirteen_slips, all_values, ['BASIC'])
-            double_pay = _get_total(double_slips, all_values, ['D.P', 'EU.LEAVE.DEDUC'])
-            total_gross_before_onss = gross_before_onss + atn + termination_fees + student + thirteen_month + double_pay
-            atn_without_onss = _get_total(monthly_slips, all_values, ['ATN.CAR'])
+            thirteen_month = _get_total(thirteen_slips, all_values, ['BONUS_BASIC'])
+            double_pay = _get_total(double_slips, all_values, ['D.P', 'EU_LEAVE_DEDUC'])
+            warrant_with_onss = _get_total(warrant_slips, all_values, ['WARRANT_SALARY'])
+            total_gross_before_onss = gross_before_onss + atn + termination_fees + student + thirteen_month + double_pay + warrant_with_onss
+            atn_without_onss = _get_total(monthly_slips, all_values, ['ATN.CAR', 'ATN_HOUSING_FISCAL'])
+            warrant_without_onss = _get_total(warrant_slips, all_values, ['WARRANT_ATN']) - warrant_with_onss
             early_holiday_pay = _get_total(holiday_slips, all_values, ['PAY_SIMPLE'])
-            holiday_pay_supplement = _get_total(holiday_slips, all_values, ['PAY DOUBLE'])
-            other_exempted_amount = _get_total(holiday_slips, all_values, ['PAY DOUBLE COMPLEMENTARY'])
-            thirteen_month_gross = _get_total(thirteen_slips, all_values, ['SALARY'])
-            double_gross = _get_total(double_slips, all_values, ['SALARY'])
-            subtotal_gross = total_gross_before_onss + atn_without_onss + early_holiday_pay + holiday_pay_supplement + other_exempted_amount + double_gross
+            holiday_pay_supplement = _get_total(holiday_slips, all_values, ['PAY_DOUBLE'])
+            other_exempted_amount = _get_total(holiday_slips, all_values, ['PAY_DOUBLE_COMPLEMENTARY'])
+            thirteen_month_gross = _get_total(thirteen_slips, all_values, ['BONUS_SALARY'])
+            double_gross = _get_total(double_slips, all_values, ['DH_SALARY'])
+            subtotal_gross = total_gross_before_onss + atn_without_onss + warrant_without_onss + early_holiday_pay + holiday_pay_supplement + other_exempted_amount + double_gross
             onss_cotisation = _get_total(monthly_slips, all_values, ['ONSSTOTAL'])
             onss_cotisation_termination_fees = _get_total(termination_slips, all_values, ['ONSSTOTAL'])
-            anticipated_holiday_pay_retenue = _get_total(holiday_slips, all_values, ['ONSS1'])
-            holiday_pay_supplement_retenue = _get_total(holiday_slips, all_values, ['ONSS2'])
-            onss_thirteen_month = _get_total(thirteen_slips, all_values, ['ONSS'])
-            onss_double = _get_total(double_slips, all_values, ['ONSS'])
-            onss_student = _get_total(student_slips, all_values, ['ONSS'])
+            anticipated_holiday_pay_retenue = -_get_total(holiday_slips, all_values, ['ONSS_HOLIDAY_TERM_SIMPLE'])
+            holiday_pay_supplement_retenue = -_get_total(holiday_slips, all_values, ['ONSS_HOLIDAY_TERM_DOUBLE'])
+            onss_thirteen_month = _get_total(thirteen_slips, all_values, ['ONSSTOTAL'])
+            onss_double = _get_total(double_slips, all_values, ['ONSSTOTAL'])
+            onss_student = _get_total(student_slips, all_values, ['ONSSTOTAL'])
+            onss_warrant = _get_total(warrant_slips, all_values, ['ONSSTOTAL'])
             representation_fees = _get_total(monthly_slips, all_values, ['REP.FEES', 'REP.FEES.VOLATILE'])
             private_car = _get_total(monthly_slips + student_slips, all_values, ['CAR.PRIV'])
             public_transport = _get_total(monthly_slips + student_slips, all_values, ['PUB.TRANS'])
             cycle_allowance = _get_total(monthly_slips + student_slips, all_values, ['CYCLE'])
             canteen_costs = _get_total(monthly_slips, all_values, ['CANTEEN'])
-            atn_car = atn_without_onss
-            withholding_taxes = _get_total(aggregate_payslips, all_values, ['P.P'])
+            atn_car = _get_total(monthly_slips, all_values, ['ATN.CAR'])
+            withholding_taxes = _get_total(aggregate_payslips, all_values, ['P.P', 'WARRANT_PP'])
             misc_onss = _get_total(aggregate_payslips, all_values, ['M.ONSS'])
             salary_attachment = _get_total(aggregate_payslips, all_values, ['ATTACH_SALARY'])
-            atn_deduction = _get_total(monthly_slips, all_values, ['ATN.CAR.2', 'ATN.MOB.2', 'ATN.INT.2', 'ATN.LAP.2'])
+            atn_deduction = _get_total(monthly_slips, all_values, ['ATN_DED'])
+            warrant_deduction = _get_total(warrant_slips, all_values, ['WARRANT_ATN_DED'])
             meal_voucher_employee = _get_total(monthly_slips + student_slips, all_values, ['MEAL_V_EMP'])
             net_third_party = _get_total(monthly_slips, all_values, ['IMPULSION25', 'IMPULSION12'])
             salary_assignment = _get_total(aggregate_payslips, all_values, ['ASSIG_SALARY'])
@@ -144,9 +149,9 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
             # Cotisation patronnale de base =
             # Global Rate (without employee part) + FFE + Special FFE + CPAE + Modération Salariale + Chomage temporaire
             # global_rate = 0.3810 + 0.0023 + (0.0169 if worker_count >= 10 else 0) + 0.0010 - 0.1307
-            emp_onss = _get_total(monthly_slips + thirteen_slips + holiday_slips, all_values, ['ONSSEMPLOYER'])
+            emp_onss = _get_total(monthly_slips + thirteen_slips + holiday_slips + warrant_slips, all_values, ['ONSSEMPLOYER'])
             emp_termination_onss = _get_total(termination_slips, all_values, ['ONSSEMPLOYER'])
-            closure_fund = _get_total(termination_slips + monthly_slips + thirteen_slips + holiday_slips, all_values, ['ONSSEMPLOYERFFE', 'ONSSEMPLOYERMFFE'])
+            closure_fund = _get_total(termination_slips + monthly_slips + thirteen_slips + holiday_slips + warrant_slips, all_values, ['ONSSEMPLOYER_809', 'ONSSEMPLOYER_810'])
             charges_redistribution = 0
 
             if 'vehicle_id' in self.env['hr.payslip']:
@@ -171,6 +176,7 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
             for offset in range(1, wizard_range + 1):
                 date_end = self.date_to if wizard_range == offset else date_start + relativedelta(day=31)
                 wizard_274 = self.env['l10n_be.274_xx'].new({
+                    'company_id': self.company_id,
                     'date_start': date_start,
                     'date_end': date_end,
                 })
@@ -181,7 +187,9 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                 withholding_taxes_exemption_32 += wizard_274.deducted_amount_32
                 withholding_taxes_exemption_33 += wizard_274.deducted_amount_33
                 withholding_taxes_exemption_34 += wizard_274.deducted_amount_34
-                withholding_taxes_capping -= wizard_274.capped_amount_34
+                # deducted_amount_34 is the raw (uncapped) bachelor total; capped_amount_34 is what is actually granted.
+                denied_exemption = wizard_274.deducted_amount_34 - wizard_274.capped_amount_34
+                withholding_taxes_capping -= denied_exemption
                 if offset == 1:
                     date_start = date_start.replace(day=1)
                 date_start += relativedelta(months=1)
@@ -193,8 +201,10 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                 'student': student,
                 'thirteen_month': thirteen_month,
                 'double_pay': double_pay,
+                'warrant_with_onss': warrant_with_onss,
                 'total_gross_before_onss': total_gross_before_onss,
                 'atn_without_onss': atn_without_onss,
+                'warrant_without_onss': warrant_without_onss,
                 'early_holiday_pay': early_holiday_pay,
                 'holiday_pay_supplement': holiday_pay_supplement,
                 'other_exempted_amount': other_exempted_amount,
@@ -208,6 +218,7 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                 'onss_student': onss_student,
                 'onss_thirteen_month': onss_thirteen_month,
                 'onss_double': onss_double,
+                'onss_warrant': onss_warrant,
                 'taxable_adaptation': 0,
                 'taxable_325': 0,
                 'gift_in_kind': 0,
@@ -221,6 +232,7 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                 'misc_onss': misc_onss,
                 'salary_attachment': salary_attachment,
                 'atn_deduction': atn_deduction,
+                'warrant_deduction': warrant_deduction,
                 'meal_voucher_employee': meal_voucher_employee,
                 'net_third_party': net_third_party,
                 'salary_assignment': salary_assignment,
@@ -258,7 +270,7 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
             res_ids=self.ids, data={'report_data': report_data})
 
         self.social_security_filename = filename
-        self.social_security_sheet = base64.encodebytes(export_274_sheet_pdf)
+        self.social_security_sheet = BinaryBytes(export_274_sheet_pdf)
 
         self.state = 'done'
         return {
@@ -306,11 +318,15 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
             },
             'onss': {
                 'header': _('ONSS Number'),
-                'value': self.company_id.onss_registration_number,
+                'value': self.company_id._get_payroll_config(self.date_from).onss_registration_number,
             },
             'established': {
                 'header': _('Established on'),
-                'value': self.create_date.strftime("%d %B %Y at %H:%M:%S"),
+                'value': _(
+                    "%(established_date)s at %(established_time)s",
+                    established_date=format_date(self.env, self.create_date, date_format='long'),
+                    established_time=format_time(self.env, self.create_date),
+                )
             },
             'joint_committees': {
                 'header': _('Number of joint committees'),
@@ -318,7 +334,11 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
             },
             'period': {
                 'header': _('Period'),
-                'value': _('%(date_from)s to %(date_to)s', date_from=self.date_from.strftime("%d %B %Y"), date_to=self.date_to.strftime("%d %B %Y")),
+                'value': _(
+                    "%(date_from)s to %(date_to)s",
+                    date_from=format_date(self.env, self.date_from, date_format="long"),
+                    date_to=format_date(self.env, self.date_to, date_format="long"),
+                ),
             },
             'currency': {
                 'header': _('Currency'),
@@ -424,6 +444,14 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                         '',
                     ],
                 },
+                'warrant_with_onss': {
+                    'header': _('Warrants subject to ONSS'),
+                    'values': [
+                        report_data['warrant_with_onss'],
+                        report_data['warrant_with_onss'],
+                        '',
+                    ],
+                },
                 'total_gross_before_onss': {
                     'header': _('Total Gross Before ONSS'),
                     'values': [
@@ -437,6 +465,14 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                     'values': [
                         report_data['atn_without_onss'],
                         report_data['atn_without_onss'],
+                        '',
+                    ],
+                },
+                'warrant_without_onss': {
+                    'header': _('Warrants exempted from ONSS'),
+                    'values': [
+                        report_data['warrant_without_onss'],
+                        report_data['warrant_without_onss'],
                         '',
                     ],
                 },
@@ -536,6 +572,14 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                         '',
                     ],
                 },
+                'onss_warrant': {
+                    'header': _('ONSS Warrants'),
+                    'values': [
+                        report_data['onss_warrant'],
+                        report_data['onss_warrant'],
+                        '',
+                    ],
+                },
                 'taxable_adaptation': {
                     'header': _('Taxable Adaptation'),
                     'values': [
@@ -617,7 +661,7 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                     ],
                 },
                 'misc_onss': {
-                    'header': _('Special Social Cotisation'),
+                    'header': _('Special Social Contribution'),
                     'values': [
                         report_data['misc_onss'],
                         report_data['misc_onss'],
@@ -625,7 +669,7 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                     ],
                 },
                 'salary_attachment': {
-                    'header': _('Salary Adjustment'),
+                    'header': _('Payslip Adjustment'),
                     'values': [
                         report_data['salary_attachment'],
                         report_data['salary_attachment'],
@@ -637,6 +681,14 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                     'values': [
                         report_data['atn_deduction'],
                         report_data['atn_deduction'],
+                        '',
+                    ],
+                },
+                'warrant_deduction': {
+                    'header': _('Warrants deduction'),
+                    'values': [
+                        report_data['warrant_deduction'],
+                        report_data['warrant_deduction'],
                         '',
                     ],
                 },
@@ -825,7 +877,7 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
                     ],
                 },
                 'withholding_taxes_capping': {
-                    'header': _('Withholding Taxes Capping (Bachelors)'),
+                    'header': _('Withholding Taxes Capping (Scientific Research)'),
                     'values': [
                         report_data['withholding_taxes_capping'],
                         report_data['withholding_taxes_capping'],
@@ -842,7 +894,7 @@ class L10nBeSocialSecurityCertificate(models.TransientModel):
 
         workbook.close()
 
-        base64_xlsx = base64.encodebytes(output.getvalue())
+        base64_xlsx = BinaryBytes(output.getvalue())
         filename = _(
             'SocialBalance-%(date_from)s-%(date_to)s.xlsx',
             date_from=format_date(self.env, self.date_from),

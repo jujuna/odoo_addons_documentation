@@ -2,7 +2,6 @@
 
 {
     'name': 'Malaysia - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Base module for Malaysian reports
@@ -15,6 +14,8 @@ Base module for Malaysian reports
     'data': [
         "data/account_return_data.xml",
         "data/sst_02_b1_report.xml",
+        "data/mpers_balance_sheet.xml",
+        "data/mpers_profit_loss.xml",
         "views/account_followup_views.xml",
         'views/res_config_settings_view.xml',
         "report/statement_account_templates.xml",
@@ -26,7 +27,6 @@ Base module for Malaysian reports
         ],
     },
     'auto_install': True,
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

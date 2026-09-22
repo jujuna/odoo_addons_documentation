@@ -61,7 +61,7 @@ export class CommentBeaconManager {
         peerId,
         readonly = false,
         source,
-        onStep = () => {},
+        commit = () => {},
         removeBeacon = () => {},
         setSelection = () => {},
     } = {}) {
@@ -79,7 +79,7 @@ export class CommentBeaconManager {
         this.peerId = peerId;
         this.readonly = readonly;
         this.commentsState = commentsState;
-        this.onStep = onStep;
+        this.commit = commit;
         this.removeBeacon = removeBeacon;
         this.setSelection = setSelection;
         this.drawThreadOverlays = throttleForAnimation(this.drawThreadOverlays.bind(this));
@@ -173,7 +173,7 @@ export class CommentBeaconManager {
                         this.cleanupThread(beaconPair.start.dataset.id);
                         this.removeBeacon(beaconPair.start);
                         this.removeBeacon(beaconPair.end);
-                        this.onStep();
+                        this.commit();
                     },
                     setSelectionInBeaconPair: (beaconPair) => {
                         if (this.validate(beaconPair)) {
@@ -187,7 +187,7 @@ export class CommentBeaconManager {
                     setBeaconPairId: (beaconPair, id) => {
                         beaconPair.start.dataset.id = id;
                         beaconPair.end.dataset.id = id;
-                        this.onStep();
+                        this.commit();
                     },
                     enableBeaconPair: (beaconPair) => {
                         if (this.isDisabled(beaconPair.start)) {
@@ -202,7 +202,7 @@ export class CommentBeaconManager {
                             this.commentsState.editorThreads[threadId] = editorThread;
                             delete this.commentsState.disabledEditorThreads[threadId];
                         }
-                        this.onStep();
+                        this.commit();
                     },
                     disableBeaconPair: (beaconPair) => {
                         if (!this.isDisabled(beaconPair.start)) {
@@ -217,7 +217,7 @@ export class CommentBeaconManager {
                             this.commentsState.disabledEditorThreads[threadId] = editorThread;
                             delete this.commentsState.editorThreads[threadId];
                         }
-                        this.onStep();
+                        this.commit();
                     },
                     isOwned: (beaconPair) => {
                         if (!this.peerId) {

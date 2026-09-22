@@ -1,14 +1,13 @@
 import io
 import json
-import zipfile
-
-from odoo import http
 
 from odoo.addons.project.tests.test_project_base import TestProjectCommon
 from odoo.tests.common import HttpCase, RecordCapturer
+from odoo.addons.documents.tests.test_documents_common import get_document_creation_message
+from odoo.addons.mail.tests.common import MailCommon
 
 
-class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon):
+class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon, MailCommon):
 
     def test_upload_attachment_to_task_through_activity_with_folder(self):
         """Test the flow of uploading an attachment on a task through an activity with a folder.
@@ -37,7 +36,7 @@ class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon):
         document = self.env["documents.document"].search(
             [
                 ("request_activity_id", "=", self.task_1.activity_ids.id),
-                ("attachment_id", "=", False),
+                ("type", "=", "request"),
             ]
         )
         self.assertEqual(
@@ -54,7 +53,7 @@ class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon):
                     "activity_id": activity.id,
                     "thread_id": self.task_1.id,
                     "thread_model": self.task_1._name,
-                    "csrf_token": http.Request.csrf_token(self),
+                    "csrf_token": self.csrf_token(),
                 },
             )
             self.assertEqual(response.status_code, 200)
@@ -62,13 +61,15 @@ class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon):
 
         # Check that one document is now in the task's project
         self.assertEqual(
-            self.task_1.project_id.document_ids.filtered(lambda d: d.type == "binary"),
+            self.task_1.project_id.document_ids,
             document,
             "Only document linked to the activity should be linked to the task",
         )
         attachment_id = response_content["data"]["attachment_id"]
         self.assertIn(attachment_id, [a["id"] for a in response_content["data"]["store_data"]["ir.attachment"]])
         activity._action_done(attachment_ids=[attachment_id])
+        self.assertEqual(document.type, 'binary')
+        self.assertEqual(document.attachment_id.id, attachment_id)
         # Ensure the document is not linked to the activity anymore after the action is done
         self.assertFalse(
             document.request_activity_id,
@@ -84,7 +85,7 @@ class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon):
 
         with RecordCapturer(self.env['documents.document'], []) as capture:
             res = self.url_open(f'/documents/upload/{self.project_pigs.documents_folder_id.access_token}',
-                                data={'csrf_token': http.Request.csrf_token(self)},
+                                data={'csrf_token': self.csrf_token()},
                                 files={'ufile': ('hello.txt', b"Hello", 'text/plain')},
                                 allow_redirects=False,
                                 )
@@ -110,9 +111,9 @@ class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon):
             access_via_link='none'
         )
 
-        with RecordCapturer(self.env['documents.document'], []) as capture:
+        with self.mock_mail_app(), RecordCapturer(self.env["documents.document"], []) as capture:
             res = self.url_open(f'/documents/upload/{folder.access_token}',
-                data={'csrf_token': http.Request.csrf_token(self)},
+                data={'csrf_token': self.csrf_token(), 'active_model': 'project.project'},
                 files={'ufile': ('hello.txt', io.BytesIO(b"Hello"), 'text/plain')},
                 allow_redirects=False)
             res.raise_for_status()
@@ -120,3 +121,7 @@ class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon):
         self.assertEqual(document.name, 'hello.txt')
         self.assertEqual(document.mimetype, 'text/plain')
         self.assertEqual(document.folder_id, folder)
+        self.assertTrue(self._new_msgs)
+        self.assertMessageFields(
+            self._new_msgs[0], {"body_content": get_document_creation_message("Chell Gladys", "hello.txt", "Project")}
+        )

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from odoo import fields
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.l10n_uk_bacs.models.account_journal import format_communication
@@ -9,10 +7,11 @@ import itertools
 
 import datetime
 
-import base64
 
 @tagged('post_install', '-at_install')
 class TestBACS(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -20,23 +19,15 @@ class TestBACS(AccountTestInvoicingCommon):
         cls.env.user.group_ids |= cls.env.ref('account.group_validate_bank_account')
         cls.env.ref('base.GBP').active = True
 
-        cls.bank_barclays = cls.env['res.bank'].create({
-            'name': 'BARCLAYS BANK PLC',
-            'bic': 'BARCGB22XXX',
-        })
-        cls.bank_hsbc = cls.env['res.bank'].create({
-            'name': 'HSBC',
-            'bic': 'HBUKGB4BXXX',
-        })
-
         cls.company_data['company'].write({
             'country_id': cls.env.ref('base.be').id,
             'bacs_sun': '123456',
         })
         cls.bank_journal = cls.company_data['default_journal_bank']
         cls.bank_journal.write({
-            'bank_id': cls.bank_barclays.id,
-            'bank_acc_number': 'GB11BARC20039525689371',
+            'bank_name': 'BARCLAYS BANK PLC',
+            'bank_bic': 'BARCGB22XXX',
+            'bank_account_number': 'GB11BARC20039525689371',
             'currency_id': cls.env.ref('base.GBP').id,
         })
 
@@ -46,24 +37,24 @@ class TestBACS(AccountTestInvoicingCommon):
         cls.bacs_dd = cls.bank_journal.inbound_payment_method_line_ids.filtered(lambda l: l.code == 'bacs_dd')
         cls.bacs_dd_method = cls.env.ref('l10n_uk_bacs.payment_method_bacs_dd')
 
-    def create_account(self, number, partner, bank):
+    def create_account(self, number, partner, bank_name, bank_bic):
         return self.env['res.partner.bank'].create({
-            'acc_number': number,
+            'account_number': number,
             'partner_id': partner.id,
-            'bank_id': bank.id,
+            'bank_name': bank_name,
+            'bank_bic': bank_bic,
             'allow_out_payment': True,
         })
 
-    def create_ddi(self, partner, partner_bank, company, payment_journal):
+    def create_ddi(self, partner, partner_bank, company):
         return self.env['bacs.ddi'].create({
             'partner_bank_id': partner_bank.id,
             'start_date': fields.Date.today(),
             'partner_id': partner.id,
             'company_id': company.id,
-            'payment_journal_id': payment_journal.id
         })
 
-    def create_invoice(self, partner):
+    def _create_invoice_uk(self, partner):
         invoice = self.env['account.move'].create({
             'move_type': 'out_invoice',
             'partner_id': partner.id,
@@ -79,10 +70,10 @@ class TestBACS(AccountTestInvoicingCommon):
         invoice.action_post()
         return invoice
 
-    def pay_with_mandate(self, invoice, mandate):
+    def pay_with_mandate(self, invoice):
         self.env['account.payment.register'].with_context(active_model='account.move', active_ids=invoice.ids).create({
             'payment_date': invoice.invoice_date_due or invoice.invoice_date,
-            'journal_id': mandate.payment_journal_id.id,
+            'journal_id': self.bank_journal.id,
             'payment_method_line_id': self.bacs_dd.id,
         })._create_payments()
 
@@ -135,10 +126,10 @@ class TestBACS(AccountTestInvoicingCommon):
 
     def verify_contra_line(self, company, payments, contra_line, is_multi, payment_method_code):
         self.assertEqual(len(contra_line), 106 if is_multi else 100)
-        self.assertEqual(contra_line[:14], self.bank_journal.bank_account_id.sanitized_acc_number[8:])
+        self.assertEqual(contra_line[:14], self.bank_journal.bank_account_id.sanitized_account_number[8:])
         self.assertEqual(contra_line[14:15], '0')
         self.assertEqual(contra_line[15:17], '99' if payment_method_code == 'bacs_dd' else '17')
-        self.assertEqual(contra_line[17:31], self.bank_journal.bank_account_id.sanitized_acc_number[8:])
+        self.assertEqual(contra_line[17:31], self.bank_journal.bank_account_id.sanitized_account_number[8:])
         self.assertEqual(contra_line[31:35], ' ' * 4)
         contra_amount = sum([int(payment.amount * 100) for payment in payments])
         self.assertEqual(contra_line[35:46], str(contra_amount).rjust(11, '0'))
@@ -150,10 +141,10 @@ class TestBACS(AccountTestInvoicingCommon):
 
     def verify_payment_line(self, company, payment, line, is_multi, payment_method_code):
         self.assertEqual(len(line), 106 if is_multi else 100)
-        self.assertEqual(line[:14], payment.partner_bank_id.sanitized_acc_number[8:] if payment_method_code == 'bacs_dc' else payment.bacs_ddi_id.partner_bank_id.sanitized_acc_number[8:])
+        self.assertEqual(line[:14], payment.partner_bank_id.sanitized_account_number[8:] if payment_method_code == 'bacs_dc' else payment.bacs_ddi_id.partner_bank_id.sanitized_account_number[8:])
         self.assertEqual(line[14:15], '0')
         self.assertIn(line[15:17], ['01', '17', '18', '19'] if payment_method_code == 'bacs_dd' else ['99'])
-        self.assertEqual(line[17:31], self.bank_journal.bank_account_id.sanitized_acc_number[8:])
+        self.assertEqual(line[17:31], self.bank_journal.bank_account_id.sanitized_account_number[8:])
         self.assertEqual(line[31:35], ' ' * 4)
         self.assertEqual(line[35:46], str(int(payment.amount * 100)).rjust(11, '0'))
         self.assertEqual(line[46:64], format_communication(company.name[:18]).ljust(18))
@@ -214,8 +205,7 @@ class TestBACS(AccountTestInvoicingCommon):
         self.assertEqual(footer_lines[2][44:], ' ' * 36)
 
     def verify_bacs_file(self, company, batch):
-        binary_data = base64.b64decode(batch.export_file)
-        file_string = binary_data.decode('utf-8')
+        file_string = batch.export_file.decode('utf-8')
         split_file = file_string.rstrip('\n').split('\n')
         header_lines = split_file[:4]
         payment_lines = split_file[4:-3]
@@ -251,11 +241,11 @@ class TestBACS(AccountTestInvoicingCommon):
     def testBacsDirectDebit(self):
         company = self.env.company
         partner_boundagani = self.env['res.partner'].create({'name': 'Boundagani'})
-        partner_bank_boundagani = self.create_account('GB03BARC20031819726663', partner_boundagani, self.bank_hsbc)
-        ddi_boundagani = self.create_ddi(partner_boundagani, partner_bank_boundagani, self.env.company, self.bank_journal)
+        partner_bank_boundagani = self.create_account('GB03BARC20031819726663', partner_boundagani, 'HSBC', 'HBUKGB4BXXX')
+        ddi_boundagani = self.create_ddi(partner_boundagani, partner_bank_boundagani, self.env.company)
         ddi_boundagani.action_validate_ddi()
-        invoice_boundagani = self.create_invoice(partner_boundagani)
-        self.pay_with_mandate(invoice_boundagani, ddi_boundagani)
+        invoice_boundagani = self._create_invoice_uk(partner_boundagani)
+        self.pay_with_mandate(invoice_boundagani)
         payment_boundagani = invoice_boundagani.matched_payment_ids
         self.assertEqual(invoice_boundagani.payment_state, self.env['account.move']._get_invoice_in_payment_state(), 'This invoice should have been paid thanks to the mandate')
         self.assertEqual(invoice_boundagani.bacs_ddi_id, ddi_boundagani, 'The invoice should have the right mandate')
@@ -289,7 +279,7 @@ class TestBACS(AccountTestInvoicingCommon):
     def testBacsDirectCredit(self):
         company = self.env.company
         vendor_superlux = self.env['res.partner'].create({'name': 'Superlux'})
-        vendor_bank_superlux = self.create_account('GB70BARC20038066716256', vendor_superlux, self.bank_hsbc)
+        vendor_bank_superlux = self.create_account('GB70BARC20038066716256', vendor_superlux, 'HSBC', 'HBUKGB4BXXX')
         payment_superlux = self.create_payment(vendor_superlux, 42, self.bacs_dc, self.bank_journal, datetime.date.today() + datetime.timedelta(days=10), 'outbound', vendor_bank_superlux)
         payment_superlux.action_post()
 

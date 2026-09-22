@@ -67,17 +67,56 @@ class PosOrder(models.Model):
                 'code': 'l10n.ke.oscu.sale.sequence',
             })
 
-        content['invcNo'] = sequence.next_by_id()
+        # If a previous attempt failed, the invcNo that was sent to eTIMS is stored in
+        # l10n_ke_order_json. Fetch from eTIMS first to idempotently recover without sending
+        # a duplicate, which would cause eTIMS error 924 (Invoice number already exists).
+        pending_invc_no = None
+        if not self.l10n_ke_oscu_order_number:
+            invc_no = (self.l10n_ke_order_json or {}).get('invcNo')
+            if invc_no:
+                pending_invc_no = int(invc_no)
 
-        if not self.failed_pickings:
-            error, data, _date = company._l10n_ke_call_etims('saveTrnsSalesOsdc', content)
+        error = data = None
+        fresh_sequence_consumed = False
+
+        if pending_invc_no:
+            fetch_error, fetch_data, _dt = company._l10n_ke_call_etims(
+                'selectInvoiceDetails', {'invcNo': pending_invc_no}
+            )
+            if not fetch_error and fetch_data.get('salesList'):
+                # eTIMS already has this invoice: recover receipt data and skip resend.
+                # Normalize sdcDateTime to the format parse_etims_datetime expects.
+                receipt = fetch_data['salesList'][0]['receipt']
+                dt_str = receipt['sdcDateTime'].split('.')[0]
+                receipt['sdcDateTime'] = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S').replace(
+                    tzinfo=ZoneInfo('Africa/Nairobi')
+                ).strftime('%Y%m%d%H%M%S')
+                error, data = {}, receipt
+                content['invcNo'] = pending_invc_no
+            elif fetch_error and fetch_error['code'] in ('TIM', 'CON'):
+                # Can't determine whether eTIMS has the order; don't retry blindly.
+                return {"content": content, "error": fetch_error}
+            else:
+                # eTIMS confirmed it doesn't have this invoice (e.g. error '001' - not found).
+                # Safe to resend with the same invcNo.
+                content['invcNo'] = pending_invc_no
         else:
-            error = {
-                'code': 'Out of stock',
-                'message': _('One or more product(s) are out of stock.')
-            }
+            content['invcNo'] = int(sequence.next_by_id())
+            fresh_sequence_consumed = True
+
+        if data is None:
+            if not self.failed_pickings:
+                error, data, _dt = company._l10n_ke_call_etims('saveTrnsSalesOsdc', content)
+            else:
+                error = {
+                    'code': 'Out of stock',
+                    'message': _('One or more product(s) are out of stock.')
+                }
 
         if not error:
+            # Advance the sequence past this invcNo in case it was rolled back for a prior error
+            if sequence.number_next <= content['invcNo']:
+                sequence.number_next = content['invcNo'] + 1
             self.write({
                 'l10n_ke_oscu_receipt_number': data['curRcptNo'],
                 'l10n_ke_oscu_order_number': content['invcNo'],
@@ -87,36 +126,30 @@ class PosOrder(models.Model):
                 'l10n_ke_control_unit': company.l10n_ke_control_unit,
                 'l10n_ke_order_json': content,
             })
-
             for pick in self.picking_ids:
                 pick.move_ids._l10n_ke_oscu_process_moves()
-
-            if self.is_invoiced and self.account_move:
-                # As the order has been sent, no need to send the invoice as well, just copy the fields
+            if self.is_singly_invoiced and self.account_move:
                 self._copy_etims_vals_from_pos_order_to_invoice(self.account_move)
-
                 template = self.env.ref('account.email_template_edi_invoice')
                 self.account_move.with_context(skip_invoice_sync=True)._generate_and_send(template)
         else:
-            self.write({
-                'l10n_ke_order_json': content,
-            })
-            # Just in case of error, we don't want to create gaps in the sequence
-            sequence.number_next -= 1
-            # If there is an error, we want to be sure the sequence and the l10n_ke_order_json are commited in the db before throwing the error
+            self.write({'l10n_ke_order_json': content})
+            if fresh_sequence_consumed and error['code'] not in ('TIM', 'CON'):
+                # Non-timeout error with a fresh sequence number: eTIMS never received this
+                # invoice, so roll back to reuse the number and avoid gaps in the sequence.
+                sequence.number_next -= 1
+            # For timeout errors: don't decrement. The invcNo is preserved in l10n_ke_order_json
+            # and the fetch-first logic above will recover it idempotently on the next retry.
             if self._can_commit():
                 self.env.cr.commit()
 
-        return {
-            "content": content,
-            "error": error,
-        }
+        return {"content": content, "error": error}
 
     def _l10n_ke_oscu_get_json_from_order_lines(self):
         """ Return the values that should be sent to eTIMS for the lines in self. """
         self.ensure_one()
         lines_values = []
-        for index, line in enumerate(self.lines):
+        for index, line in enumerate(self.lines.filtered(lambda l: l.product_id.type != 'combo')):
             product = line.product_id  # for ease of reference
             product_uom_qty = line.product_uom_id._compute_quantity(line.qty, product.uom_id)
 
@@ -170,7 +203,8 @@ class PosOrder(models.Model):
         self.l10n_ke_oscu_confirmation_datetime = fields.Datetime.now()
         confirmation_datetime = format_etims_datetime(self.l10n_ke_oscu_confirmation_datetime)
         order_date = (self.date_order and self.date_order.strftime('%Y%m%d')) or ''
-        order_number = self.sequence_number
+        # For a refund, eTIMS needs the KRA invoice number of the order being refunded, not this order's own number.
+        order_number = self.refunded_order_id.l10n_ke_oscu_order_number if self.refunded_order_id else self.sequence_number
         line_items = self._l10n_ke_oscu_get_json_from_order_lines()
 
         tax_codes, tax_rates, taxable_amounts, tax_amounts = self.env["account.move"]._get_taxes_data(line_items)
@@ -178,7 +212,7 @@ class PosOrder(models.Model):
         content = {
             'invcNo':           '',                                         # KRA Invoice Number (set at the point of sending)
             'trdInvcNo':        (self.name or '')[:50],                     # Trader system pos order number
-            'orgInvcNo':        order_number,                               # Original pos order number
+            'orgInvcNo':        order_number,                               # Original pos order number (or original invoice number if a refund)
             'cfmDt':            confirmation_datetime,                      # Validated date
             'pmtTyCd':          self.l10n_ke_payment_method_id.code or '',  # Payment type code
             'rcptTyCd': 'S' if not self.refunded_order_id else 'R',         # Receipt code
@@ -209,15 +243,12 @@ class PosOrder(models.Model):
 
     def _generate_pos_order_invoice(self):
         if self.config_id.is_kenyan:
-            return super(PosOrder, self.with_context(generate_pdf=self.l10n_ke_oscu_order_number))._generate_pos_order_invoice()
+            invoice = super(PosOrder, self.with_context(generate_pdf=self.l10n_ke_oscu_order_number))._generate_pos_order_invoice()
+            if self.l10n_ke_order_send_status == 'sent':
+                self._copy_etims_vals_from_pos_order_to_invoice(invoice)
+                invoice.message_post(body="This invoice has already been sent to eTIMS from the linked POS order.")
+            return invoice
         return super()._generate_pos_order_invoice()
-
-    def _create_invoice(self, move_vals):
-        invoice = super()._create_invoice(move_vals)
-        if self.config_id.is_kenyan and self.l10n_ke_order_send_status == 'sent':
-            self._copy_etims_vals_from_pos_order_to_invoice(invoice)
-            invoice.message_post(body="This invoice has already been sent to eTIMS from the linked POS order.")
-        return invoice
 
     ###################################################
     # ACTION                                          #
@@ -228,10 +259,9 @@ class PosOrder(models.Model):
         if etims_response.get('error'):
             raise UserError(f"{etims_response['error']['code']} : {etims_response['error']['message']}")  # pylint: disable=missing-gettext
 
-    def action_post_selected_orders(self, order_ids):
-        orders = self.env['pos.order'].browse(order_ids)
+    def action_post_selected_orders(self):
         errors = []
-        for order in orders:
+        for order in self:
             if order.l10n_ke_order_send_status == 'not_sent':
                 etims_response = order.post_order_to_etims()
                 if etims_response.get('error'):
@@ -246,7 +276,7 @@ class PosOrder(models.Model):
 
     def _get_l10n_ke_edi_oscu_pos_qrurl(self):
         self.ensure_one()
-        res = self._l10n_ke_oscu_get_receipt_url() if self.l10n_ke_order_send_status == 'sent' else None
+        res = self._l10n_ke_oscu_get_receipt_url() if self.l10n_ke_oscu_signature else None
         return res
 
     def _l10n_ke_oscu_get_receipt_url(self):

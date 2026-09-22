@@ -1,5 +1,4 @@
 import ast
-import base64
 import datetime
 import json
 import uuid
@@ -10,11 +9,11 @@ from dateutil.relativedelta import relativedelta
 from odoo import Command, _, api, fields, models, SUPERUSER_ID
 from odoo.exceptions import AccessError, RedirectWarning, UserError, ValidationError
 from odoo.fields import Domain
-from odoo.tools import SQL, date_utils
+from odoo.tools import SQL, date_utils, html2plaintext
 from odoo.tools.misc import format_date
 from odoo.tools.translate import LazyTranslate, LazyGettext
-
-from .account_audit_account_status import STATUS_SELECTION
+from odoo.addons.account.models.account_move import REVIEW_STATE_SELECTION
+from ast import literal_eval
 
 _lt = LazyTranslate(__name__)
 
@@ -43,7 +42,6 @@ CHECK_TYPES = [
     ('file', "Upload Document"),
 ]
 
-
 LIMIT_CHECK_ENTRIES = 21
 
 
@@ -71,26 +69,55 @@ class AccountReturnType(models.Model):
         required=True,
         tracking=True,
     )
+    active = fields.Boolean(compute="_compute_active", compute_sql="_compute_sql_active", inverse="_inverse_active", compute_sudo=True)
+    active_fallback = fields.Boolean(default=True)
+    # In this case we need a selection field because in DB a False boolean is just not set, in this case we need a differenciation of Null an False
+    active_selection = fields.Selection(
+        selection=[
+            ('False', "False"),
+            ('True', "True"),
+        ],
+        company_dependent=True,
+    )
     report_id = fields.Many2one(string="Report", comodel_name='account.report', index='btree', tracking=True)
     is_tax_return_type = fields.Boolean(string="Is a Tax Return Return Type", compute="_compute_report_return_type")
     is_ec_sales_list_return_type = fields.Boolean(string="Is an EC Sales List Return Type", compute="_compute_report_return_type")
 
     auto_generate = fields.Boolean(string="Auto Generated", compute='_compute_auto_generate', copy=False, readonly=False, store=True)
     country_id = fields.Many2one(comodel_name='res.country', string="Country", tracking=True, store=True, compute="_compute_country_id", readonly=False)
-    payment_partner_bank_id = fields.Many2one(comodel_name='res.partner.bank', string="Payment Partner Bank", tracking=True)
-    payment_partner_id = fields.Many2one(comodel_name='res.partner', string="Payment Partner", related='payment_partner_bank_id.partner_id', tracking=True)
+    payment_partner_id = fields.Many2one(comodel_name='res.partner', string="Payment Partner",
+        tracking=True, domain="[('parent_id', '=', False)]")
+    payment_partner_bank_id = fields.Many2one(
+        comodel_name='res.partner.bank', string="Payment Partner Bank", tracking=True,
+        compute='_compute_payment_partner_bank_id', inverse="_inverse_payment_partner_bank_id",
+        store=True, readonly=False, domain="[('partner_id', '=', payment_partner_id)]"
+    )
+    tax_closing_rounding_profit_account_id = fields.Many2one(
+        comodel_name='account.account',
+        string="Tax Closing Rounding Profit Account",
+        company_dependent=True,
+        help="Account on which a rounding gain of the tax closing entry is posted.",
+    )
+    tax_closing_rounding_loss_account_id = fields.Many2one(
+        comodel_name='account.account',
+        string="Tax Closing Rounding Loss Account",
+        company_dependent=True,
+        help="Account on which a rounding loss of the tax closing entry is posted.",
+    )
     states_workflow = fields.Selection(
         selection=[
-            ('generic_state_review', "Review"),
-            ('generic_state_review_submit', "Review, Submit"),
-            ('generic_state_tax_report', "Review, Submit, Pay"),
-            ('generic_state_only_pay', "Pay"),
+            ('generic_state_review', "Reviewed"),
+            ('generic_state_review_submit', "Reviewed, Submitted"),
+            ('generic_state_tax_report', "Reviewed, Submitted, Paid"),
+            ('generic_state_only_pay', "Paid"),
         ],
         string="States",
         help="Determines the workflow of the return.",
         compute="_compute_states_workflow",
         readonly=False,
         store=True,
+        required=True,
+        precompute=True,
     )
 
     deadline_periodicity = fields.Selection(
@@ -114,15 +141,136 @@ class AccountReturnType(models.Model):
         company_dependent=True,
     )
     default_deadline_days_delay = fields.Integer(string="Default Deadline")
+    company_advance_tax_payment_account_id = fields.Many2one(
+        comodel_name='account.account',
+        company_dependent=True,
+        check_company=True,
+        ondelete='restrict',
+    )
+    company_tax_payable_account_id = fields.Many2one(
+        comodel_name='account.account',
+        company_dependent=True,
+        check_company=True,
+        ondelete='restrict',
+    )
+    company_tax_receivable_account_id = fields.Many2one(
+        comodel_name='account.account',
+        company_dependent=True,
+        check_company=True,
+        ondelete='restrict',
+    )
+    advance_tax_payment_account_id = fields.Many2one(
+        comodel_name='account.account',
+        string="Advance Account",
+        compute=lambda self: self._compute_closing_account('advance_tax_payment_account_id'),
+        depends=['company_advance_tax_payment_account_id'],
+        depends_context=('company',),
+        compute_sql=lambda self, table: self._compute_sql_closing_account(table, 'advance_tax_payment_account_id'),
+        inverse=lambda self: self._inverse_closing_account('advance_tax_payment_account_id'),
+        compute_sudo=True,
+        help="Downpayments posted on this account will be considered by the Tax Closing Entry.",
+    )
+    tax_payable_account_id = fields.Many2one(
+        comodel_name='account.account',
+        string="Payable Account",
+        compute=lambda self: self._compute_closing_account('tax_payable_account_id'),
+        depends=['company_tax_payable_account_id'],
+        depends_context=('company',),
+        compute_sql=lambda self, table: self._compute_sql_closing_account(table, 'tax_payable_account_id'),
+        inverse=lambda self: self._inverse_closing_account('tax_payable_account_id'),
+        compute_sudo=True,
+        domain="[('account_type', '=', 'liability_payable'), ('non_trade', '=', True)]",
+        help="Tax current account used as a counterpart to the Tax Closing Entry when in favor of the authorities.",
+    )
+    tax_receivable_account_id = fields.Many2one(
+        comodel_name='account.account',
+        string="Receivable Account",
+        compute=lambda self: self._compute_closing_account('tax_receivable_account_id'),
+        depends=['company_tax_receivable_account_id'],
+        depends_context=('company',),
+        compute_sql=lambda self, table: self._compute_sql_closing_account(table, 'tax_receivable_account_id'),
+        inverse=lambda self: self._inverse_closing_account('tax_receivable_account_id'),
+        compute_sudo=True,
+        domain="[('account_type', '=', 'asset_receivable'), ('non_trade', '=', True)]",
+        help="Tax current account used as a counterpart to the Tax Closing Entry when in favor of the company.",
+    )
+    tax_closing_account_placeholder = fields.Char(compute="_compute_tax_closing_account_placeholder")
+    is_master_data = fields.Boolean(compute="_compute_is_master_data")
+    is_country_in_active_country = fields.Boolean(string="Is Country Fiscal Active", compute_sql='_compute_sql_is_country_in_active_country', compute='_compute_is_country_in_active_country', compute_sudo=False)
 
     @api.model_create_multi
     def create(self, vals_list):
+        self._check_no_active_use_in_data_files(vals_list)
+
         return_types = super().create(vals_list)
 
         all_companies = self.env['res.company'].sudo().search([])
         return_types.sudo()._set_default_values(all_companies)
 
         return return_types
+
+    def _load_records(self, data_list, update=False):
+        return_types = super()._load_records(data_list, update=update)
+
+        all_companies = self.env['res.company'].sudo().search([])
+        for company in all_companies:
+            if not company.vat_disabled:
+                continue
+            company._toggle_account_return_types_on_vat_disabled(return_types)
+
+        return return_types
+
+    @api.model
+    def _check_no_active_use_in_data_files(self, vals_list):
+        """ account.return.type's active field should never be directly written to in data files. If someone does that, only the active company
+        will receive the data, as a company-dependent value in active_selection. To prevent mistakes (especially with forward-ports),
+        this check is called in write() and create(), making sure active isn't used in the provided values when a module is being installed.
+        """
+        if install_filename := self.env.context.get('install_filename'):
+            if any('active' in vals for vals in vals_list):
+                raise UserError(_(
+                    "'active' field of account.return.type shouldn't be directly written to in data files. Use active_fallback. (Detected while loading %(file_path)s)",
+                    file_path=install_filename,
+                ))
+
+    @api.depends_context('company_id')
+    @api.depends('active_selection', 'active_fallback')
+    def _compute_active(self):
+        for record in self:
+            record.active = record.active_selection == 'True' if record.active_selection else record.active_fallback
+
+    def _compute_sql_active(self, table):
+        return SQL("COALESCE(%s = 'True', %s)", table.active_selection, table.active_fallback)
+
+    @api.depends_context('company')
+    def _compute_is_country_in_active_country(self):
+        for record in self:
+            record.is_country_in_active_country = record.country_id in self.env.company.account_enabled_tax_country_ids
+
+    def _compute_sql_is_country_in_active_country(self, table):
+        return SQL("country_id IN %s", tuple(self.env.company.account_enabled_tax_country_ids.ids))
+
+    @api.onchange('active')
+    def _inverse_active(self):
+        for record in self:
+            record.active_selection = str(bool(record.active))
+
+    @api.depends('payment_partner_id')
+    def _compute_payment_partner_bank_id(self):
+        banks_by_partner = dict(self.env['res.partner.bank']._read_group(
+            domain=[('partner_id', 'in', self.payment_partner_id.ids)],
+            groupby=['partner_id'],
+            aggregates=['id:array_agg'],
+        ))
+
+        for return_type in self:
+            bank_ids = banks_by_partner.get(return_type.payment_partner_id, [])
+            return_type.payment_partner_bank_id = bank_ids[0] if len(bank_ids) == 1 else False
+
+    def _inverse_payment_partner_bank_id(self):
+        for return_type in self:
+            if return_type.payment_partner_bank_id:
+                return_type.payment_partner_id = return_type.payment_partner_bank_id.partner_id
 
     def _set_default_values(self, companies):
         for company in companies:
@@ -140,6 +288,26 @@ class AccountReturnType(models.Model):
             record.is_tax_return_type = report and tax_report in (report, report.root_report_id)
             record.is_ec_sales_list_return_type = report and generic_ec_sales_report in (report, report.root_report_id)
 
+    def _compute_closing_account(self, field_name):
+        """ The accounts belong to the company tree root rather than to the individual branch."""
+        for return_type in self:
+            return_type[field_name] = return_type.with_company(self.env.company.root_id)[f'company_{field_name}']
+
+    def _inverse_closing_account(self, field_name):
+        """ Store the edit on the company tree's root, where _compute_closing_account reads it back."""
+        for return_type in self:
+            return_type.with_company(self.env.company.root_id).sudo()[f'company_{field_name}'] = return_type[field_name]
+
+    def _compute_sql_closing_account(self, table, field_name):
+        """Compute the root company closing account value in sql."""
+        table = table._with_model(self.with_company(self.env.company.root_id))
+        return table[f'company_{field_name}']
+
+    @api.depends('is_tax_return_type')
+    def _compute_tax_closing_account_placeholder(self):
+        for return_type in self:
+            return_type.tax_closing_account_placeholder = False if return_type.is_tax_return_type else self.env._("No closing entry")
+
     @api.depends('report_id.country_id')
     def _compute_country_id(self):
         for return_type in self:
@@ -149,7 +317,19 @@ class AccountReturnType(models.Model):
     def _constrains_country_id(self):
         for return_type in self:
             if return_type.report_id.country_id and return_type.report_id.country_id != return_type.country_id:
-                raise ValueError(_("The return type country must be the same as the report country"))
+                raise ValidationError(_("The return type country must be the same as the report country"))
+
+    @api.constrains('company_tax_payable_account_id', 'company_tax_receivable_account_id')
+    def _constrains_payable_receivable_account(self):
+        for return_type in self:
+            payable = return_type.company_tax_payable_account_id
+            receivable = return_type.company_tax_receivable_account_id
+            if payable and payable.account_type != 'liability_payable':
+                raise ValidationError(self.env._("You must select a payable account for 'Tax Payable Account'."))
+            if receivable and receivable.account_type != 'asset_receivable':
+                raise ValidationError(self.env._("You must select a receivable account for 'Tax Receivable Account'."))
+            if (payable and not payable.non_trade) or (receivable and not receivable.non_trade):
+                raise ValidationError(self.env._("You must use non-trade accounts for tax returns."))
 
     @api.depends('category')
     def _compute_auto_generate(self):
@@ -168,17 +348,83 @@ class AccountReturnType(models.Model):
             else:
                 return_type.states_workflow = 'generic_state_review'
 
-    def copy_data(self, default=None):
-        default = dict(default or {})
-        vals_list = super().copy_data(default=default)
-        if 'name' not in default:
-            for return_type, vals in zip(self, vals_list):
-                vals['name'] = self.env._("%s (copy)", return_type.name)
-        return vals_list
+    def _compute_is_master_data(self):
+        xml_id = self.get_external_id()
+        for record in self:
+            record.is_master_data = bool(xml_id.get(record.id))
+
+    def write(self, vals):
+        self._check_no_active_use_in_data_files([vals])
+
+        if 'active' in vals:
+            self.report_id.active = vals['active']
+
+            for return_type in self:
+                self._generate_or_refresh_all_returns(self.env.company, return_type)
+
+        if new_states_workflow := vals.get('states_workflow'):
+            self.env['account.return'].flush_model()
+
+            for record in self.filtered(lambda r: r.states_workflow and r.states_workflow != new_states_workflow):
+                orig_terminal_state = self.env['account.return']._fields[record.states_workflow].selection[-1][0]
+                new_terminal_state = self.env['account.return']._fields[new_states_workflow].selection[-1][0]
+                allowed_new_states = {new_state for new_state, _dummy in self.env['account.return']._fields[new_states_workflow].selection}
+
+                need_to_force_terminal_sql = SQL(
+                    "state = %(orig_terminal_state)s AND NOT(is_completed AND (state IN %(allowed_new_states)s OR state IS NULL))",
+                    orig_terminal_state=orig_terminal_state,
+                    allowed_new_states=tuple(allowed_new_states),
+                )
+
+                self.env.cr.execute(SQL(
+                    """
+                        WITH updated_states AS (
+                            UPDATE account_return
+                            SET
+                                %(new_states_workflow)s = CASE
+                                    WHEN %(need_to_force_terminal_sql)s
+                                        THEN %(new_terminal_state)s
+                                    ELSE
+                                        state
+                                    END,
+                                state = CASE
+                                    WHEN %(need_to_force_terminal_sql)s
+                                        THEN %(new_terminal_state)s
+                                    ELSE
+                                        state
+                                    END,
+                                %(old_states_workflow)s = NULL,
+                                is_completed=is_completed OR (%(need_to_force_terminal_sql)s) OR state = %(new_terminal_state)s
+                            WHERE
+                                type_id = %(type_id)s
+                            RETURNING state
+                        )
+
+                        SELECT DISTINCT state
+                        FROM updated_states
+                    """,
+                    type_id=record.id,
+                    need_to_force_terminal_sql=need_to_force_terminal_sql,
+                    new_states_workflow=SQL.identifier(new_states_workflow),
+                    old_states_workflow=SQL.identifier(record.states_workflow),
+                    new_terminal_state=new_terminal_state,
+                ))
+
+                states = self.env.cr.fetchall()
+                if any(state not in allowed_new_states | {None} for (state,) in states):
+                    raise UserError(self.env._(
+                        "Some returns made for return type '%s' keep an inconsistent state after changing the workflow. "
+                        "This likely comes from a missing upgrade script.",
+                        record.name
+                    ))
+
+                self.env['account.return']._invalidate_cache(fnames=[record.states_workflow, new_states_workflow, 'is_completed', 'state'])
+
+        return super().write(vals)
 
     def _can_return_exist(self, company, tax_unit=False):
         """ Returns whether a return can exist for this type with the provided company and tax units. This is used to know which returns need
-        to be deleted when a change of configuration has occured.
+        to be deleted when a change of configuration has occurred.
         """
         is_foreign_vat = self.report_id and company.account_fiscal_country_id.code != self.report_id.country_id.code
 
@@ -209,8 +455,24 @@ class AccountReturnType(models.Model):
                 cron = self.env.ref('account_reports.ir_cron_generate_account_return')
                 cron._trigger()
 
+            else:
+                self._send_submission_reminder()
+
     @api.model
-    def _generate_or_refresh_all_returns(self, root_companies):
+    def _send_submission_reminder(self):
+        if not (mail_template := self.env.ref('account_reports.email_template_tax_return_deadline', raise_if_not_found=False)):
+            return
+
+        returns_to_submit = self.env['account.return'].search([
+            ('state', 'not in', ('submitted', 'paid')),
+            ('date_deadline', '=', fields.Date.context_today(self) + relativedelta(days=7)),
+        ]).filtered('is_tax_return')
+        for account_return in returns_to_submit:
+            for user in self.env.ref('account.group_account_manager').user_ids.filtered(lambda user: set(user.company_ids) & set(account_return.company_ids)):
+                mail_template.with_context(partner=user.partner_id).send_mail(account_return.id)
+
+    @api.model
+    def _generate_or_refresh_all_returns(self, root_companies, return_types=None):
         """
         Generates or update all returns for every companies
         It calls _generate_all_returns which can be overridden to add new return types.
@@ -229,18 +491,18 @@ class AccountReturnType(models.Model):
         for company in root_companies:
             fiscal_country = company.account_fiscal_country_id
             domestic_tax_unit = all_tax_units.filtered(lambda x: x.country_id == fiscal_country and company in x.company_ids)  # At most 1
-            self._generate_all_returns(fiscal_country.code, company, domestic_tax_unit)
+            self._generate_all_returns(fiscal_country.code, company, tax_unit=domestic_tax_unit, return_types=return_types)
             all_domestic_tax_units += domestic_tax_unit
 
         for tax_unit in (all_tax_units - all_domestic_tax_units):
-            self._generate_all_returns(tax_unit.country_id.code, tax_unit.main_company_id, tax_unit)
+            self._generate_all_returns(tax_unit.country_id.code, tax_unit.main_company_id, tax_unit, return_types)
 
         # Create returns for foreign VAT fiscal positions
         fpos_root_company_domain = [('company_id', 'child_of', root_companies.ids)]
         all_foreign_vat_fpos = self.env['account.fiscal.position'].sudo().search([('foreign_vat', '!=', False), *fpos_root_company_domain])
         for company, fiscal_positions in all_foreign_vat_fpos.grouped(lambda x: x.company_id).items():
             for country_code in {fpos.country_id.code for fpos in fiscal_positions}:
-                self._generate_all_returns(country_code, company, None)
+                self._generate_all_returns(country_code, company, None, return_types)
 
         # Post generation -> we need to vacuum all returns that should not exist anymore
         return_root_company_domain = [('company_ids', 'in', root_companies.ids)]
@@ -253,20 +515,33 @@ class AccountReturnType(models.Model):
         returns_to_unlink = self.env['account.return']
         for return_to_check in all_return_that_might_be_deleted:
             if (
-                not return_to_check.type_id._can_return_exist(return_to_check.company_id, return_to_check.tax_unit_id)
+                not return_to_check.company_id.account_opening_date
+                or not return_to_check.type_id._can_return_exist(return_to_check.company_id, return_to_check.tax_unit_id)
                 or return_to_check.date_deadline < return_to_check.company_id.account_opening_date
             ):
                 returns_to_unlink |= return_to_check
-        returns_to_unlink.unlink()
+        returns_to_unlink.sudo().unlink()
 
     @api.model
-    def _generate_all_returns(self, country_code, main_company, tax_unit=None):
+    def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
         """
         Hook to override to enable the generation of new return types.
 
         :param country_code: the country code for which we want to generate returns. It can be fpos country_code or main_company country_code
         :param main_company: the main company for which we generate returns
         """
+
+        # Generate ec sales reports
+        generic_ec_sales_report = self.env.ref('account_reports.generic_ec_sales_report')
+        ec_sales_return_type = self.env['account.return.type'].search(
+            [
+                ('country_id.code', '=', country_code),
+                ('auto_generate', '=', False),
+                '|', ('report_id.root_report_id', '=', generic_ec_sales_report.id), ('report_id', '=', generic_ec_sales_report.id)
+            ]
+        )
+        if ec_sales_return_type:
+            self._generate_ec_sales_returns(main_company, tax_unit, ec_sales_return_type)
 
         if self.env.context.get('only_refresh_conditional_types'):
             return
@@ -285,9 +560,13 @@ class AccountReturnType(models.Model):
                 Domain('country_id.code', '=', country_code),
                 Domain('auto_generate', '=', True)
             ])
-
-        for report_type in self.env['account.return.type'].sudo().search(search_domain):
-            report_type._try_create_returns_for_fiscal_year(main_company, tax_unit=tax_unit)
+        if return_types:
+            search_domain = Domain.AND([
+                search_domain,
+                Domain('id', 'in', return_types.ids)
+            ])
+        for return_type_to_generate in self.env['account.return.type'].sudo().with_company(main_company).search(search_domain):
+            return_type_to_generate._try_create_returns_for_fiscal_year(main_company, tax_unit=tax_unit)
 
     @api.onchange('category')
     def _onchange_category(self):
@@ -319,7 +598,7 @@ class AccountReturnType(models.Model):
             date_to = fields.Date.from_string(self.env.context['forced_date_to'])
         else:
             date_from = today - relativedelta(years=1)
-            date_to = next_year
+            date_to = today
 
         if not self._can_return_exist(main_company, tax_unit):
             returns_to_unlink = self.env['account.return'].sudo().search([
@@ -331,7 +610,7 @@ class AccountReturnType(models.Model):
                 ('date_from', '<=', date_to),
                 ('manually_created', '=', False),
             ])
-            returns_to_unlink.unlink()
+            returns_to_unlink.sudo().unlink()
             return
 
         # We do not want to traverse children if we are using a tax_unit or using a fiscal_position
@@ -403,7 +682,7 @@ class AccountReturnType(models.Model):
                     unmatched_existing_periods_posted_returns |= existing_periods[period]
 
             # We can safely unlink these as they are not posted. We will create new returns for these periods
-            unmatched_existing_periods_unposted_returns.filtered(lambda r: not r.manually_created).unlink()
+            unmatched_existing_periods_unposted_returns.filtered(lambda r: not r.manually_created).sudo().unlink()
 
             # So now we are only left with existing one that cannot be unlinked
             # We should create new returns for periods after the last posted return
@@ -431,6 +710,9 @@ class AccountReturnType(models.Model):
         return account_returns
 
     def _try_create_return_for_period(self, date_in_period, main_company, tax_unit, allow_duplicates=False):
+        if self.report_id.filter_multi_company != 'tax_units':
+            tax_unit = False
+
         period_start, period_end = self._get_period_boundaries(main_company, date_in_period)
         existing_return = self.env['account.return'].with_context(active_test=False).search([
             *self.env['account.return']._check_company_domain(main_company),
@@ -456,7 +738,43 @@ class AccountReturnType(models.Model):
             }])
             account_return._update_translated_name()
 
-    def _get_return_name(self, main_company, period_from=None, period_to=None, minimal=False, all_lang=False):
+    def _generate_ec_sales_returns(self, main_company, tax_unit, ec_sales_return_type):
+        """Generates EC Sales list return for the 3 last months if intracom tags are used"""
+        custom_handler = self.env[ec_sales_return_type.report_id._get_custom_handler_model()]
+        tax_tags_info = custom_handler._get_ec_sales_tax_tags()
+        if tax_tags_info:
+            today = fields.Date.context_today(self)
+            months_offset = ec_sales_return_type._get_periodicity_months_delay(main_company)
+            company_ids = self.env['account.return'].sudo()._get_company_ids(main_company, tax_unit, ec_sales_return_type.report_id)
+            ec_sales_tag_ids = {tax_tag for sale_type in tax_tags_info.values() for tax_tag in sale_type}
+
+            # Generate EC sales returns for the past periods, as well as the current and next one (if data exists).
+            ranges = (-1, 4) if months_offset == 1 else (-1, 1)
+            periods = [today - relativedelta(months=months_offset * i) for i in range(*ranges)]
+
+            # Map each period to whether it has move lines
+            periods_has_move_lines_map = {
+                period_bounds: bool(self.env['account.move.line'].search(
+                    domain=Domain([
+                        ('tax_tag_ids', 'in', ec_sales_tag_ids),
+                        ('company_id', 'in', company_ids.ids),
+                        ('date', '>=', period_bounds[0]),
+                        ('date', '<=', period_bounds[1]),
+                        ('parent_state', '=', 'posted'),
+                    ]),
+                    limit=1,
+                ))
+                for period_bounds in (
+                    ec_sales_return_type._get_period_boundaries(main_company, period)
+                    for period in periods
+                )
+            }
+
+            for (start, end), has_lines in periods_has_move_lines_map.items():
+                if has_lines:
+                    ec_sales_return_type._try_create_return_for_period(start, main_company, tax_unit)
+
+    def _get_return_name(self, main_company, period_from=None, period_to=None, all_lang=False):
         main_company = main_company.sudo()
         country_code = ""
         if self.report_id and self.report_id.country_id and main_company.account_fiscal_country_id != self.report_id.country_id:
@@ -469,7 +787,7 @@ class AccountReturnType(models.Model):
             return self.env._(
                 "%(return_type_name)s %(period_suffix)s %(country_code)s",
                 return_type_name=self.name,
-                period_suffix=self._get_period_name(main_company, period_from=period_from, period_to=period_to, minimal=minimal),
+                period_suffix=self._get_period_name(main_company, period_from=period_from, period_to=period_to),
                 country_code=country_code,
             )
         else:
@@ -479,14 +797,14 @@ class AccountReturnType(models.Model):
                 return_dict[lang_code] = self.with_context(lang=lang_code).env._(
                     "%(return_type_name)s %(period_suffix)s %(country_code)s",
                     return_type_name=self.with_context(lang=lang_code).name,
-                    period_suffix=self._get_period_name(main_company, period_from=period_from, period_to=period_to, minimal=minimal, lang_code=lang_code),
+                    period_suffix=self._get_period_name(main_company, period_from=period_from, period_to=period_to, lang_code=lang_code),
                     country_code=country_code,
                 )
 
             return return_dict
 
     @api.model
-    def _get_period_name(self, main_company=None, period_from=None, period_to=None, start_day=1, start_month=1, minimal=False, lang_code=None):
+    def _get_period_name(self, main_company=None, period_from=None, period_to=None, start_day=1, start_month=1, lang_code=None):
         def infer_periodicity(period_from, period_to):
             def match(dt_from, dt_to):
                 return (dt_from, dt_to) == (period_from, period_to)
@@ -495,8 +813,6 @@ class AccountReturnType(models.Model):
                 return 'year'
             elif match(*date_utils.get_month(period_to)):
                 return 'monthly'
-            elif match(*date_utils.get_quarter(period_to)):
-                return 'trimester'
             else:
                 return 'other'
 
@@ -519,31 +835,23 @@ class AccountReturnType(models.Model):
                 inferred_periodicity = infer_periodicity(period_from, period_to)
                 if inferred_periodicity == 'year':
                     period_suffix = f"{period_from.year}"
-                elif inferred_periodicity == 'trimester':
-                    date_format = 'qqq yyyy' if not minimal else 'qqq'
-                    period_suffix = format_date(self.env, period_from, date_format=date_format, lang_code=lang_code)
                 elif inferred_periodicity == 'monthly':
-                    date_format = 'LLLL yyyy' if not minimal else 'LLL'
-                    period_suffix = format_date(self.env, period_from, date_format=date_format, lang_code=lang_code)
+                    period_suffix = format_date(self.env, period_from, date_format='LLLL yyyy', lang_code=lang_code)
                 elif period_from == fields.Date.start_of(period_from, 'month') and period_to == fields.Date.end_of(period_to, 'month'):
-                    period_suffix = f"{format_date(self.env, period_from, date_format='LLL YYYY', lang_code=lang_code)} - {format_date(self.env, period_to, date_format='LLL YYYY', lang_code=lang_code)}"
+                    period_suffix = f"{format_date(self.env, period_from, date_format='LLL yyyy', lang_code=lang_code)} - {format_date(self.env, period_to, date_format='LLL yyyy', lang_code=lang_code)}"
                 else:
                     period_suffix = f"{format_date(self.env, period_from, lang_code=lang_code)} - {format_date(self.env, period_to, lang_code=lang_code)}"
         return period_suffix
 
     def _get_periodicity(self, company):
-        self.ensure_one()
         return self.with_company(company).sudo().deadline_periodicity or company.sudo().account_return_periodicity
 
     def _get_start_date(self):
-        self.ensure_one()
-
         return self.sudo().deadline_start_date or fields.Date.from_string('2025-01-01')
 
     def _get_periodicity_months_delay(self, company, date=None):
         """ Returns the number of months separating two returns
         """
-        self.ensure_one()
         periodicity = self._get_periodicity(company)
         if periodicity == 'fiscalyear':
             if date:
@@ -576,7 +884,6 @@ class AccountReturnType(models.Model):
 
         This function needs to stay consistent with the one inside Javascript in the filters for the tax report
         """
-        self.ensure_one()
         if self._get_periodicity(company_id) == 'fiscalyear':
             fy_dates = company_id.compute_fiscalyear_dates(date)
             return fy_dates['date_from'], fy_dates['date_to']
@@ -589,24 +896,7 @@ class AccountReturnType(models.Model):
         else:
             start_day, start_month = self._get_start_date_elements(company_id)
 
-        aligned_date = date + relativedelta(days=-(start_day - 1))  # we offset the date back from start_day amount of day - 1 so we can compute months periods aligned to the start and end of months
-        year = aligned_date.year
-        month_offset = aligned_date.month - start_month
-        period_number = (month_offset // period_months) + 1
-
-        # If the date is before the start date and start month of this year, this mean we are in the previous period
-        # So the initial_date should be one year before and the period_number should be computed in reverse because month_offset is negative
-        if date < datetime.date(date.year, start_month, start_day):
-            year -= 1
-            period_number = ((12 + month_offset) // period_months) + 1
-
-        month_delta = period_number * period_months
-
-        # We need to work with offsets because it handle automatically the end of months (28, 29, 30, 31)
-        end_date = datetime.date(year, start_month, 1) + relativedelta(months=month_delta, days=start_day - 2)  # -1 because the first days is aldready counted and -1 because the first day of the next period must not be in this range
-        start_date = datetime.date(year, start_month, 1) + relativedelta(months=month_delta - period_months, day=start_day)
-
-        return start_date, end_date
+        return self.env['account.report']._compute_period_range(date, period_months, start_day, start_month)
 
     @api.depends_context('company')
     @api.depends('name', 'report_id')
@@ -629,13 +919,14 @@ class AccountReturn(models.Model):
     _name = "account.return"
     _inherit = ['mail.thread.main.attachment', 'mail.activity.mixin']
     _description = "Accounting Return"
-    _order = "date_deadline, name, id"
+    _order = "is_completed, date_deadline, name, id"
     _check_company_domain = check_company_domain_account_return
 
     active = fields.Boolean(string="Active", default=True, tracking=True)
-    name = fields.Char(string="Name", required=True, translate=True)
-    date_from = fields.Date(string="Date From", required=True)
-    date_to = fields.Date(string="Date To", required=True)
+    name = fields.Char(string="Name", required=True, translate=True, tracking=True)
+    date_from = fields.Date(string="Date From", required=True, tracking=True)
+    date_to = fields.Date(string="Date To", required=True, tracking=True)
+    period_match_periodicity = fields.Boolean(string="Is Period Matching Periodicity", compute="_compute_period_match_periodicity")
     type_id = fields.Many2one(comodel_name='account.return.type', string="Return Type", required=True)
 
     # IMPORTANT: To change the state of a return you should always use the field state as it will rewrite the value in the correct field implementation using 'get_state_field'
@@ -644,43 +935,35 @@ class AccountReturn(models.Model):
     generic_state_tax_report = fields.Selection(
         string="Generic State",
         selection=[
-            ('new', 'New'),
-            ('reviewed', 'Review'),
-            ('submitted', 'Submit'),
-            ('paid', 'Pay'),
+            ('reviewed', 'Reviewed'),
+            ('submitted', 'Submitted'),
+            ('paid', 'Paid'),
         ],
-        default='new',
         help="The state of the return for generic tax report flows",
         tracking=True,
     )
     generic_state_only_pay = fields.Selection(
         string="Generic State Only Pay",
         selection=[
-            ('new', 'New'),
-            ('paid', 'Pay'),
+            ('paid', 'Paid'),
         ],
-        default='new',
         help="The state of the return for report flows when only payment is needed",
         tracking=True,
     )
     generic_state_review_submit = fields.Selection(
         string="Generic State Review Submit",
         selection=[
-            ('new', 'New'),
-            ('reviewed', 'Review'),
-            ('submitted', 'Submit'),
+            ('reviewed', 'Reviewed'),
+            ('submitted', 'Submitted'),
         ],
-        default='new',
         help="The state of the return for report flows when review and submission are needed",
         tracking=True,
     )
     generic_state_review = fields.Selection(
         string="Generic State Review",
         selection=[
-            ('new', 'New'),
-            ('reviewed', 'Review'),
+            ('reviewed', 'Reviewed'),
         ],
-        default='new',
         help="The default state for audit and custom generated return types",
         tracking=True,
     )
@@ -703,7 +986,7 @@ class AccountReturn(models.Model):
     # Tax return fields
     total_amount_to_pay = fields.Monetary(currency_field='amount_to_pay_currency_id')
     period_amount_to_pay = fields.Monetary(currency_field='amount_to_pay_currency_id')
-    amount_to_pay_currency_id = fields.Many2one(comodel_name='res.currency', compute='_compute_amount_to_pay_currency_id')
+    amount_to_pay_currency_id = fields.Many2one(comodel_name='res.currency', compute='_compute_amount_to_pay_currency_id', compute_sql='_compute_sql_amount_to_pay_currency_id', compute_sudo=True)
     show_amount_to_pay = fields.Boolean(compute='_compute_show_amount_to_pay')
 
     # view helper fields
@@ -713,6 +996,7 @@ class AccountReturn(models.Model):
     report_opened_once = fields.Boolean(help="Has the report been opened once", default=False)
     report_name = fields.Char(string="Report Name", related="type_id.report_id.display_name")
     show_companies = fields.Boolean(compute="_compute_show_companies")
+    show_companies_mismatch_warning = fields.Boolean(compute="_compute_show_companies_mismatch_warning")
     is_main_company_active = fields.Boolean(compute="_compute_is_main_company_active")
     return_type_category = fields.Selection(related="type_id.category")
     visible_states = fields.Json(string="Visible States", compute="_compute_visible_states")
@@ -735,7 +1019,11 @@ class AccountReturn(models.Model):
     audit_account_status_ids = fields.One2many(string="Account Status", comodel_name='account.audit.account.status', inverse_name='audit_id')
     audit_balances_count = fields.Integer(string="Balances Count", compute="_compute_audit_balances_count")
     audit_balances_completed_count = fields.Integer(string="Completed Balances Count", compute="_compute_audit_balances_completed_count")
-    skipped_check_cycles = fields.Char(string="Skipped Check Cycles")
+    cycle_ids = fields.Many2many(
+        comodel_name='account.return.audit.cycle',
+        string="Cycles",
+        tracking=True,
+    )
 
     def _update_translated_name(self):
         specified_lang = self.env.context.get('update_returns_translation_lang')
@@ -747,7 +1035,6 @@ class AccountReturn(models.Model):
                     account_return.company_id,
                     account_return.date_from,
                     account_return.date_to,
-                    minimal=False,
                     all_lang=False,
                 )}
 
@@ -756,7 +1043,6 @@ class AccountReturn(models.Model):
                     account_return.company_id,
                     account_return.date_from,
                     account_return.date_to,
-                    minimal=False,
                     all_lang=True,
                 )
 
@@ -791,21 +1077,27 @@ class AccountReturn(models.Model):
                             ('status', '!=', False),
                         ],
                     ).account_id
-                aml_count_by_accounts = dict(self.env['account.move.line']._read_group(
-                    domain=[
-                        ('date', '>=', record.date_from),
-                        ('date', '<=', record.date_to),
-                        ('parent_state', '=', 'posted'),
-                    ],
-                    groupby=['account_id'],
-                    aggregates=['id:count_distinct'],
-                ))
 
+                query_line = self.env['account.move.line']._search([
+                    ('date', '>=', record.date_from),
+                    ('date', '<=', record.date_to),
+                    ('parent_state', '=', 'posted'),
+                ], limit=1)
+                query_line.add_where(SQL('account_account.id = account_move_line.account_id'))
+
+                query_account = self.env['account.account']._search([
+                    ('company_ids', 'in', record.company_ids.ids),
+                    ('code', '!=', False),
+                ])
+                query_account.add_where(SQL('EXISTS(%s)', query_line.select()))
+                account_ids_used_during_period = {account[0] for account in self.env.execute_query(query_account.select())}
+
+                allowed_account_ids = set(previous_accounts_with_status.ids) | account_ids_used_during_period
                 account_status_create_vals += [
                     {
                         'audit_id': record.id,
                         'account_id': account['id'],
-                        'status': 'todo' if (account in previous_accounts_with_status) or (account in aml_count_by_accounts) else False,
+                        'status': 'todo' if account.id in allowed_account_ids else False,
                     } for account in accounts
                 ]
         self.env['account.audit.account.status'].create(account_status_create_vals)
@@ -820,8 +1112,19 @@ class AccountReturn(models.Model):
 
             if 'audit_status' in vals:
                 if record.audit_status in ('ongoing', 'paused'):
-                    record.state = 'new'
+                    record.state = False
+
+            if 'cycle_ids' in vals:
+                record.refresh_checks()
+
         return result
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_not_manually_created_new(self):
+        if not self.env.user.has_group('account.group_account_user') and not self.env.su:
+            raise UserError(self.env._("Only an Accountant can delete a return."))
+        if any(not account_return.manually_created or account_return.state for account_return in self) and not self.env.su:
+            raise UserError(self.env._("Only manually created returns in 'new' state can be deleted."))
 
     @api.model
     def action_refresh_all_returns(self):
@@ -837,7 +1140,7 @@ class AccountReturn(models.Model):
         delay = return_type_delay if return_type_delay else company.account_return_reminder_day
         return date_to + relativedelta(days=delay)
 
-    @api.depends('date_to', 'company_id.account_return_reminder_day', 'type_id.deadline_days_delay', 'is_completed')
+    @api.depends('date_to', 'type_id.deadline_days_delay', 'is_completed')
     def _compute_deadline(self):
         for account_return in self:
             if account_return.is_completed:
@@ -853,6 +1156,9 @@ class AccountReturn(models.Model):
 
     @api.model
     def _get_company_ids(self, main_company, tax_unit, report):
+        if report.filter_multi_company != 'tax_units':
+            tax_unit = False
+
         companies = tax_unit.company_ids if tax_unit else self.env['res.company'].sudo().search([('id', 'child_of', main_company.id)])
 
         if report:
@@ -889,29 +1195,48 @@ class AccountReturn(models.Model):
 
     @api.depends_context('allowed_company_ids')
     @api.depends('company_ids')
+    def _compute_show_companies_mismatch_warning(self):
+        for record in self:
+            record.show_companies_mismatch_warning = bool(record.company_ids - self.env.companies)
+
+    @api.depends_context('allowed_company_ids')
+    @api.depends('company_ids')
     def _compute_is_main_company_active(self):
         for account_return in self:
             account_return.is_main_company_active = account_return.company_id in self.env.companies
 
-    @api.depends('is_tax_return', 'closing_move_ids')
+    @api.depends('is_tax_return', 'closing_move_ids', 'state', 'type_id.states_workflow')
     def _compute_show_amount_to_pay(self):
         for record in self:
-            record.show_amount_to_pay = record.is_tax_return and record.closing_move_ids
+            states = [state for state, _label in record._get_all_states()]
+            if record.is_tax_return:
+                record.show_amount_to_pay = record.closing_move_ids
+            elif record.state and 'paid' in states:
+                # This assumes it cannot have two times the same state name in the same flow at different steps.
+                index_of_paid = states.index('paid')
+                index_of_current_state = states.index(record.state)
+                record.show_amount_to_pay = index_of_current_state >= index_of_paid
+            else:
+                record.show_amount_to_pay = False
 
     @api.depends('type_id')
     def _compute_state(self):
         for record in self:
-            record.state = record[record.type_id.states_workflow]
+            if state_field := record.type_id.states_workflow:
+                record.state = record[state_field]
+            else:
+                record.state = False
 
     @api.depends('state')
     def _compute_next_state(self):
         for record in self:
-            state_keys = [s[0] for s in record._fields[record.type_id.states_workflow].selection]
+            states = record._get_all_states()
+            state_keys = [s[0] for s in states]
+            if not record.state:
+                record.next_state = state_keys[0]
+                continue
             next_state_index = state_keys.index(record.state) + 1
-            if next_state_index < len(state_keys):
-                record.next_state = state_keys[next_state_index]
-            else:
-                record.next_state = False
+            record.next_state = state_keys[next_state_index] if next_state_index < len(state_keys) else False
 
     def _inverse_state(self):
         for record in self:
@@ -920,25 +1245,27 @@ class AccountReturn(models.Model):
     @api.depends('type_id', 'state')
     def _compute_visible_states(self):
         for record in self:
-            current_state = record.state
-            visible_states = []
-            active = True
-            for state, label in self._fields[record.type_id.states_workflow]._description_selection(record.env):
-                if state == current_state:
-                    active = False
-
-                if state != 'new':
-                    visible_states.append({
-                        'active': active or state == current_state or record.is_completed,
-                        'name': state,
-                        'label': label,
-                    })
-            record.visible_states = visible_states
+            selection = self._fields[record.type_id.states_workflow]._description_selection(self.env)
+            state_keys = [s[0] for s in selection]
+            current_idx = state_keys.index(record.state) if record.state in state_keys else -1
+            record.visible_states = [
+                {
+                    'name': state,
+                    'label': label,
+                    'active': record.is_completed or i <= current_idx,
+                    'alert_type': False,
+                    'error_msg': False,
+                }
+                for i, (state, label) in enumerate(selection)
+            ]
 
     @api.depends('tax_unit_id', 'company_id')
     def _compute_amount_to_pay_currency_id(self):
         for record in self:
             record.amount_to_pay_currency_id = record.tax_unit_id.main_company_id.sudo().currency_id or record.company_id.sudo().currency_id
+
+    def _compute_sql_amount_to_pay_currency_id(self, table):
+        return SQL("COALESCE(%s, %s)", table.tax_unit_id.main_company_id.currency_id, table.company_id.currency_id)
 
     @api.depends('check_ids')
     def _compute_check_count(self):
@@ -991,21 +1318,52 @@ class AccountReturn(models.Model):
         for record in self:
             record.audit_balances_completed_count = len(record.audit_account_status_ids.filtered(lambda r: r.status in ('reviewed', 'supervised')))
 
-    @api.depends('next_state')
+    @api.depends('type_id', 'next_state', 'unresolved_check_count')
     def _compute_show_submit_button(self):
         for record in self:
-            record.show_submit_button = record.next_state == "submitted"
+            record.show_submit_button = (
+                record.next_state == 'submitted'
+                or (
+                    record.type_id.states_workflow in ('generic_state_review_submit', 'generic_state_tax_report')
+                    and record.next_state == 'reviewed'
+                    and not record.unresolved_check_count
+                )
+            )
+
+    @api.depends('date_from', 'date_to', 'type_id', 'company_id')
+    def _compute_period_match_periodicity(self):
+        for record in self:
+            aligned_date_from, aligned_date_to = record.type_id._get_period_boundaries(record.company_id, record.date_from)
+            record.period_match_periodicity = record.date_from == aligned_date_from and record.date_to == aligned_date_to
+
+    def _create_mail_tracking_values(self, initial_value, new_value, col_name, col_info):
+        # override to force 'State' label to different 'states_workflow' fields
+        # as various fields may be used for the workflow review process, as
+        # designed by the 'states_workflow' field that gives the field to check
+        tracking_values = super()._create_mail_tracking_values(initial_value, new_value, col_name, col_info)
+        if len(self) != 1:
+            return tracking_values
+        state_string = self.env['ir.model.fields'].get_field_string('account.return')['state']
+        toupdate_field_name = self.type_id.states_workflow
+        if col_name == toupdate_field_name:
+            tracking_values['field_label'] = state_string
+        return tracking_values
 
     @api.model
     def _get_return_from_report_options(self, options):
         report = self.env['account.report'].browse(options['report_id'])
         sender_company = report._get_sender_company_for_export(options)
-        return self.env['account.return'].search([
+        domain = [
             ('company_id', '=', sender_company.id),
             ('date_from', '=', options['date']['date_from']),
             ('date_to', '=', options['date']['date_to']),
             ('type_id.report_id', '=', report.id),
-        ], limit=1)
+        ]
+
+        if return_type_id := options.get('return_periodicity', {}).get('return_type_id'):
+            domain.append(('type_id', '=', return_type_id))
+
+        return self.env['account.return'].search(domain, limit=1)
 
     @api.model
     def get_next_returns_ids(self, journal_id=False, additional_domain=None, allow_multiple_by_types=False):
@@ -1039,59 +1397,40 @@ class AccountReturn(models.Model):
 
     @api.model
     def get_next_return_for_dashboard(self, journal_id=False):
+        today = fields.Date.context_today(self)
+        thirty_days_later = fields.Date.add(today, days=30)
+
         additional_domain = [
-            ('date_to', '<', fields.Date.context_today(self)),
             ('return_type_category', '=', 'account_return'),
+            ('date_deadline', '<=', thirty_days_later),
         ]
         return_ids = self.get_next_returns_ids(journal_id=journal_id, additional_domain=additional_domain, allow_multiple_by_types=True)
 
         account_returns = self.browse(return_ids)
         dashboard_return_dicts = []
-        grouped_by_type = defaultdict(list)
+        grouped_by_type = defaultdict(self.env['account.return'].browse)
 
         for account_return in account_returns:
             return_type = account_return.type_id
-            grouped_by_type[return_type] += account_return
+            grouped_by_type[return_type] |= account_return
 
         for return_type, returns in grouped_by_type.items():
-            returns.sort(key=lambda x: x.date_deadline)
-            dashboard_return_dicts.append(
-                {
-                    'id': returns[0].id,
-                    'date_deadline': returns[0].date_deadline,
-                    'name': return_type.name,
-                    'type_id': return_type.id,
-                    'matched_returns_count': len(returns),
-                })
+            first_return = min(returns, key=lambda x: x.date_deadline)
+
+            dashboard_return_dicts.append({
+                'id': first_return.id,
+                'date_deadline': first_return.date_deadline,
+                'name': return_type.name,
+                'type_id': return_type.id,
+                'matched_returns_count': len(returns),
+            })
+
         return dashboard_return_dicts
 
     @api.model
     def action_open_tax_return_view(self, additional_return_domain=None, additional_context=None):
-        company = self.env.company
-
         if not additional_context:
             additional_context = {}
-
-        company._check_tax_return_configuration()
-        # Fiscal year is automatically setup with default values as it is a required field
-        if not company.account_opening_date:
-            if not self.env.user.has_group('account.group_account_manager'):
-                raise UserError(_("You first need to define an opening date for your accounting. Please contact your administrator."))
-
-            new_wizard = self.env['account.financial.year.op'].create({'company_id': company.id})
-            return {
-                'type': 'ir.actions.act_window',
-                'name': _('Accounting Periods'),
-                'view_mode': 'form',
-                'res_model': 'account.financial.year.op',
-                'res_id': new_wizard.id,
-                'target': 'new',
-                'views': [[self.env.ref('account.setup_financial_year_opening_form').id, 'form']],
-                'context': {
-                    'dialog_size': 'medium',
-                    'open_account_return_on_save': True,
-                },
-            }
 
         return_action = self.env['ir.actions.act_window']._for_xml_id('account_reports.action_view_account_return')
 
@@ -1105,8 +1444,9 @@ class AccountReturn(models.Model):
 
     def action_open_audit_return(self):
         self.ensure_one()
+        audit_action = self.with_context(active_id=self.id, active_model=self._name).env["ir.actions.act_window"]._for_xml_id('account_reports.action_view_account_audit_checks')
         return {
-            **self.with_context(active_id=self.id, active_model=self._name).env["ir.actions.act_window"]._for_xml_id('account_reports.action_view_account_audit_checks'),
+            **audit_action,
             'domain': [('return_id', '=', self.id)],
             'context': {
                 'account_return_view_id': self.env.ref('account_reports.account_return_kanban_view').id,
@@ -1114,21 +1454,19 @@ class AccountReturn(models.Model):
                 'active_model': 'account.return',
                 'active_id': self.id,
                 'max_number_opened_groups': 100000,
-            }
+            },
         }
 
-    def action_open_audit_balances(self):
-        self.ensure_one
+    def action_open_audit_settings(self):
+        self.ensure_one()
         return {
-            **self.with_context(active_id=self.id, active_model=self._name).env["ir.actions.act_window"]._for_xml_id('account_reports.action_view_account_balances'),
-            'context': {
-                'account_return_view_id': self.env.ref('account_reports.account_return_kanban_view').id,
-                'search_default_groupby_cycle': 1,
-                'active_model': 'account.return',
-                'active_id': self.id,
-                'max_number_opened_groups': 100000,
-                'working_file_id': self.id,
-            }
+            'type': 'ir.actions.act_window',
+            'name': self.env._('Edit Working File'),
+            'res_model': 'account.return',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'view_id': self.env.ref('account_reports.account_audit_form_view').id,
+            'target': 'new',
         }
 
     def _get_pay_wizard(self):
@@ -1152,7 +1490,7 @@ class AccountReturn(models.Model):
     ####  State Actions
     ####################################################################################################
 
-    def action_validate(self, bypass_failing_tests=False):
+    def action_validate(self):
         """
         Validating return consists of:
         - Review the checks with optionally bypassing failing ones
@@ -1161,23 +1499,13 @@ class AccountReturn(models.Model):
         """
         self.ensure_one()
 
-        self._review_checks(bypass_failing_tests)
-
         if self.return_type_category == 'audit':
             self.state = 'reviewed'
             return self._mark_completed()
 
-        return self._proceed_with_locking()
+        self._proceed_with_locking()
 
-    def _review_checks(self, bypass_failing_tests):
-        self.refresh_checks()
-
-        if bypass_failing_tests:
-            self.check_ids.filtered(lambda check: check.result == 'anomaly').result = 'reviewed'
-
-        self._check_failing_checks_in_current_stage()
-
-    def _proceed_with_locking(self, options_to_inject=None):
+    def _proceed_with_locking(self):
         """
         Called at the end of the locking process.
         It creates:
@@ -1200,14 +1528,13 @@ class AccountReturn(models.Model):
         if count:
             raise UserError(_("You cannot lock this return as there are previous returns that are waiting to be posted."))
 
-        self._check_failing_checks_in_current_stage()
-
         if report := self.type_id.report_id:
-            options = {**self._get_closing_report_options(), **(options_to_inject or {}), 'export_mode': 'file'}
+            options = {**self._get_closing_report_options(), 'export_mode': 'file'}
 
             report.with_context(allowed_company_ids=self.company_ids.ids)._generate_carryover_external_values(options)
-            self._generate_locking_attachments(options)
-
+            state_keys = [s[0] for s in self._get_all_states()]
+            if 'submitted' not in state_keys:
+                self._generate_locking_attachments(options)
             if self.is_tax_return:
                 # Create the tax closing move
                 self._generate_tax_closing_entries(options)
@@ -1230,7 +1557,7 @@ class AccountReturn(models.Model):
                 # Generate the carryover values.
                 payable_accounts, receivable_accounts = self._get_tax_closing_payable_and_receivable_accounts()
                 self.period_amount_to_pay = self._evaluate_period_amount_to_pay_from_tax_closing_accounts(payable_accounts, receivable_accounts)
-                self.total_amount_to_pay = self._evaluate_total_amount_to_pay_from_tax_closing_accounts(payable_accounts, receivable_accounts)
+                self.total_amount_to_pay = self._evaluate_total_amount_to_pay_from_tax_closing_accounts(receivable_accounts)
 
         self.date_lock = fields.Date.context_today(self)
 
@@ -1238,29 +1565,14 @@ class AccountReturn(models.Model):
         if self.type_id.states_workflow == 'generic_state_review':
             return self._mark_completed()
 
-        if self.is_tax_return:
-            return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'type': 'success',
-                        'title': self.env._("Checks Validated"),
-                        'message': self.env._("Closing entry posted and lock date applied."),
-                        'next': {'type': 'ir.actions.act_window_close'},
-                    },
-                }
-
     def _get_tax_closing_payable_and_receivable_accounts(self):
-        country = self.type_id.report_id.country_id or self.company_id.account_fiscal_country_id
-        tax_groups_sudo = self.env['account.tax'].sudo()._read_group(
-            domain=[
-                ('company_id', 'in', self.company_ids.ids),
-                ('country_id', '=', country.id),
-                *self._get_amount_to_pay_additional_tax_domain(),
-            ],
-            aggregates=['tax_group_id:recordset'],
-        )[0][0]
-        return tax_groups_sudo.tax_payable_account_id, tax_groups_sudo.tax_receivable_account_id
+        """The accounts this return settles on, used to evaluate the amounts left to pay."""
+        payable_accounts = self.env['account.account']
+        receivable_accounts = self.env['account.account']
+        for company in self.company_ids:
+            payable_accounts |= self.type_id.with_company(company).tax_payable_account_id
+            receivable_accounts |= self.type_id.with_company(company).tax_receivable_account_id
+        return payable_accounts, receivable_accounts
 
     def _evaluate_period_amount_to_pay_from_tax_closing_accounts(self, payable_accounts, receivable_accounts):
         amount = -sum(
@@ -1271,7 +1583,7 @@ class AccountReturn(models.Model):
 
         return self.amount_to_pay_currency_id.round(amount)
 
-    def _evaluate_total_amount_to_pay_from_tax_closing_accounts(self, payable_accounts, receivable_accounts):
+    def _evaluate_total_amount_to_pay_from_tax_closing_accounts(self, receivable_accounts):
         recoverable_amount_to_pay = self.env['account.move.line'].sudo()._read_group(
             [
                 ('date', '<=', self.date_to),
@@ -1284,9 +1596,6 @@ class AccountReturn(models.Model):
         )[0][0]
         return self.amount_to_pay_currency_id.round(-recoverable_amount_to_pay + self.period_amount_to_pay)
 
-    def _get_amount_to_pay_additional_tax_domain(self):
-        return []
-
     def _generate_locking_attachments(self, options):
         self.ensure_one()
         self._add_attachment(self.type_id.report_id.export_to_pdf(options))
@@ -1294,26 +1603,33 @@ class AccountReturn(models.Model):
     def _add_attachment(self, file_data):
         self.ensure_one()
         data = file_data['file_content']
-        if isinstance(data, str):
-            data = data.encode()
-        self.attachment_ids = [Command.create({
+        attachment = self.env['ir.attachment'].create({
             'name': file_data['file_name'],
-            'datas': base64.b64encode(data),
+            'raw': data,
             'type': 'binary',
             'description': file_data['file_name'],
             'res_model': self._name,
             'res_id': self.id,
-        })]
+        })
+        self.attachment_ids = [Command.link(attachment.id)]
+        return attachment
 
     def action_submit(self):
         self.ensure_one()
+        if self.next_state == 'reviewed':
+            self.action_validate()
         self._check_all_branches_allowed()
+        return self._prepare_submission()
+
+    def _prepare_submission(self):
         return self._proceed_with_submission()
 
-    def _proceed_with_submission(self):
-        self._check_failing_checks_in_current_stage()
+    def _proceed_with_submission(self, options_to_inject=None):
         self.state = 'submitted'
         self.date_submission = fields.Date.context_today(self)
+        if self.type_id.report_id:
+            options = {**self._get_closing_report_options(), **(options_to_inject or {}), 'export_mode': 'file'}
+            self._generate_locking_attachments(options)
         return self._on_post_submission_event()
 
     def _on_post_submission_event(self):
@@ -1325,9 +1641,8 @@ class AccountReturn(models.Model):
 
     def action_pay(self):
         self.ensure_one()
-        self._check_failing_checks_in_current_stage()
-        is_positive_amount = self.amount_to_pay_currency_id.compare_amounts(self.total_amount_to_pay, 0) > 0
-        if is_positive_amount or self.state == 'new':
+        is_positive_amount = self.amount_to_pay_currency_id.compare_amounts(self.period_amount_to_pay, 0) > 0
+        if is_positive_amount or not self.state:
             return (self._get_pay_wizard() or self._action_finalize_payment())
         return self._action_finalize_payment()
 
@@ -1337,16 +1652,16 @@ class AccountReturn(models.Model):
         if self.type_id.states_workflow in ('generic_state_only_pay', 'generic_state_tax_report'):
             return self._mark_completed()
 
+    def _get_all_states(self):
+        self.ensure_one()
+        return self._fields[self.type_id.states_workflow]._description_selection(self.env)
+
     ####################################################################################################
     ####  Revert Actions
     ####################################################################################################
 
-    def action_delete(self):
-        valid_moves = self.filtered(lambda account_return: account_return.manually_created and account_return.state == 'new')
-        valid_moves.unlink()
-
     def action_archive(self):
-        super(AccountReturn, self.filtered(lambda record: record.state == 'new')).action_archive()
+        super(AccountReturn, self.filtered(lambda record: not record.state)).action_archive()
 
     def action_unarchive(self):
         self.ensure_one()
@@ -1433,14 +1748,22 @@ class AccountReturn(models.Model):
                                 lock_date_info=self.env['res.company']._format_lock_dates(violated_lock_dates)))
 
             carryover_values.unlink()
-
-            main_company = self.tax_unit_id.main_company_id or self.company_id
-            if report.country_id == main_company.account_fiscal_country_id and main_company.tax_lock_date and self.date_to <= main_company.tax_lock_date:
-                for company in self.company_ids:
-                    company.sudo().tax_lock_date = self.date_from + relativedelta(days=-1)
-
             self.total_amount_to_pay = 0
             self.period_amount_to_pay = 0
+
+        # Unreconcile closing entries
+        move_lines = self.closing_move_ids.line_ids._all_reconciled_lines()
+        move_lines.remove_move_reconcile()
+
+        # Find Reconciliation moves and unlink them
+        payable_accounts, receivable_accounts = self._get_tax_closing_payable_and_receivable_accounts()
+        reconciliation_moves = (move_lines.move_id - self.closing_move_ids).filtered(
+            lambda m: len(m.line_ids) == 2
+            and (m.line_ids.account_id & receivable_accounts)
+            and (m.line_ids.account_id & payable_accounts)
+        )
+        reconciliation_moves.button_draft()
+        reconciliation_moves.unlink()
 
         self.date_lock = False
         self._reset_common()
@@ -1469,8 +1792,10 @@ class AccountReturn(models.Model):
         return True
 
     def _reset_common(self):
-        self._reset_checks_for_states([state for state, _label in self._fields[self.type_id.states_workflow].selection])
-        self.state = 'new'
+        states = self._get_all_states()
+        states_to_reset = [False] + [state for state, _label in states]
+        self._reset_checks_for_states(states_to_reset)
+        self.state = False
         self._mark_uncompleted()
         self.report_opened_once = False
         self.attachment_ids.unlink()
@@ -1490,8 +1815,6 @@ class AccountReturn(models.Model):
 
     def action_mark_completed(self):
         self.ensure_one()
-        if self.state != 'new':
-            raise UserError(_("You can only revert a completed return if the previous state was new."))
         return self._mark_completed()
 
     def _mark_completed(self):
@@ -1512,6 +1835,7 @@ class AccountReturn(models.Model):
                         'tag': 'action_return_refresh',
                         'params': {
                             'return_ids': self.ids,
+                            'next_action': {'type': 'ir.actions.act_window_close'},
                         },
                     }
                 }
@@ -1530,14 +1854,13 @@ class AccountReturn(models.Model):
             self.audit_status = 'ongoing'
 
     def action_export_working_files(self):
+        self.ensure_one()
         report = self.env.ref('account_reports.trial_balance_report').with_company(self.company_id.id)
         options = report.get_options({
             'selected_variant_id': report.id,
             'date': {
                 'date_from': self.date_from,
                 'date_to': self.date_to,
-                'mode': 'range',
-                'filter': 'custom',
             },
             'show_account': True,
             'show_currency': True,
@@ -1545,6 +1868,19 @@ class AccountReturn(models.Model):
             'unfold_all': True,
             'report_title': self.name.strip(),
         })
+
+        results = dict(self.env['account.return.check']._fields['result']._description_selection(self.env))
+        options['working_file_export_checks'] = [{
+            'cycle_name': cycle.name,
+            'checks': [{
+                'name': check.name,
+                'message': html2plaintext(check.message or ''),
+                'notes': html2plaintext(check.notes or ''),
+                'badge_label': results[check.result],
+                'badge_state': check.result,
+            } for check in checks]
+        } for cycle, checks in self.check_ids.grouped('cycle_id').items()]
+
         return {
             'type': 'ir_actions_account_report_download',
             'data': {
@@ -1559,47 +1895,48 @@ class AccountReturn(models.Model):
         name = _("Closing Entries") if len(self.closing_move_ids) > 1 else _("Closing Entry")
         return self.closing_move_ids._get_records_action(name=name)
 
+    def _get_report_client_action(self, report):
+        """ Returns the stored account_report client action for this report or its root report. """
+        report_ids = [report.id] + report.root_report_id.ids
+
+        return self.env['ir.actions.client'].sudo().search(
+            [('tag', '=', 'account_report')],
+            order='path desc, id asc',
+        ).filtered(lambda a: literal_eval(a.context or '{}').get('report_id') in report_ids)[:1]
+
     def action_open_report(self):
         self.ensure_one()
-        if self.has_access('write') and self.state == 'reviewed':
+        if self.has_access('write'):
             self.report_opened_once = True
-        options = self._get_closing_report_options()
-        return {
+        report = self.type_id.report_id
+        client_action = self._get_report_client_action(report)
+        action = client_action._get_action_dict() if client_action else {
             'type': 'ir.actions.client',
-            'name': self.type_id.report_id.display_name,
+            'name': report.display_name,
             'tag': 'account_report',
-            'context': {'report_id': self.type_id.report_id.id},
-            'params': {'options': options, 'ignore_session': True},
+            'context': {'report_id': report.id},
         }
+        action['params'] = {'options': self._get_closing_report_options(), 'ignore_session': True}
+        return action
 
     def _get_closing_report_options(self):
         report = self.type_id.report_id
-        start_day, start_month = self.type_id._get_start_date_elements(self.company_id)
 
-        date_filter = 'custom_return_period'
+        period_type = 'return_period'
         periodicity = self.type_id._get_periodicity(self.company_id)
-        if periodicity == 'fiscalyear' or not self._period_match_periodicity():
-            date_filter = 'custom'
+        if (periodicity == 'fiscalyear' and not report.use_fiscal_periods) or (periodicity == 'year' and report.use_fiscal_periods) or not self._period_match_periodicity():
+            period_type = 'custom'
 
         options = {
             'date': {
                 'date_from': fields.Date.to_string(self.date_from),
                 'date_to': fields.Date.to_string(self.date_to),
-                'filter': date_filter,
-                # use custom period in case of anormal dates
-                'mode': 'range',
+                'period_type': period_type,
             },
             'selected_variant_id': report.id,
             'sections_source_id': report.id,
             'tax_unit': 'company_only' if not self.tax_unit_id else self.tax_unit_id.id,
-            'return_periodicity': {
-                'periodicity': self.type_id._get_periodicity(self.company_id),
-                'months_per_period': self.type_id._get_periodicity_months_delay(self.company_id, date=self.date_from),
-                'start_day': start_day,
-                'start_month': start_month,
-                'return_type_id': self.type_id.id,
-                'report_id': report.id,
-            },
+            'selected_return_type_id': self.type_id.id,
         }
         current_company = self.env.company
         company_ids = self.company_ids.ids
@@ -1623,6 +1960,7 @@ class AccountReturn(models.Model):
             'mail_notify_author': True,
             'reply_to_force_new': False,
             'default_email_layout_xmlid': 'mail.mail_notification_layout_with_responsible_signature',
+            'account_return_finalize_payment': True,
         }
 
         if (wizard and 'qr_code' in wizard):
@@ -1658,14 +1996,22 @@ class AccountReturn(models.Model):
         :param options: report options
         :return: The closing moves.
         """
-        self.ensure_one()
-        self._ensure_tax_group_configuration_for_tax_closing()
+        closing_moves_to_create = self._generate_tax_closing_entries_create_values(options)
+        moves = self.env['account.move'].sudo().create(closing_moves_to_create)
 
-        closing_move_vals = []
+        # If the lock date has been set before the return is submitted, we don't want the tax lock date check to raise
+        bypass_lock = self.company_ids[-1]._get_user_lock_date('tax_lock_date') == self.date_to
+
+        moves.with_context(account_bypass_tax_closing_lock_check=bypass_lock).action_post()
+
+    def _generate_tax_closing_entries_create_values(self, options):
+        self.ensure_one()
+
+        closing_move_to_create = []
         for company in self.company_ids:
             line_ids_vals, tax_group_subtotal = self.sudo()._compute_tax_closing_entry(company, options)
             line_ids_vals += self.sudo()._add_tax_group_closing_items(tax_group_subtotal)
-            closing_move_vals.append({
+            closing_move_to_create.append({
                 'company_id': company.id,  # Important to specify together with the journal, for branches
                 'journal_id': company._get_tax_closing_journal().id,
                 'date': self.date_to,
@@ -1674,42 +2020,30 @@ class AccountReturn(models.Model):
                 'line_ids': line_ids_vals,
             })
 
-        moves = self.env['account.move'].sudo().create(closing_move_vals)
-        moves.action_post()
+        return closing_move_to_create
 
-    def _ensure_tax_group_configuration_for_tax_closing(self):
-        """ Raises a RedirectWarning informing the user his tax groups are missing configuration
-        for a given company, redirecting him to the list view of account.tax.group, filtered
-        accordingly to the provided countries.
-        """
+    def _ensure_tax_closing_accounts_configured(self, company):
+        """Raises a RedirectWarning when the accounts the closing entry needs are not configured on the return type."""
         self.ensure_one()
 
-        tax_with_incomplete_group_domain = [
-            *self.env['account.tax']._check_company_domain(self.company_ids),
-            '|',
-            ('tax_group_id.tax_payable_account_id', '=', False),
-            ('tax_group_id.tax_receivable_account_id', '=', False),
-        ]
+        if (
+            self.type_id.with_company(company).tax_payable_account_id
+            and self.type_id.with_company(company).tax_receivable_account_id
+        ):
+            return
 
-        country = self.type_id.report_id.country_id
-        if country:
-            tax_with_incomplete_group_domain.append(('country_id', '=', country.id))
-
-        if self.env['account.tax'].search(tax_with_incomplete_group_domain, limit=1):
-            tax_groups_domain = [('country_id', 'in', (False, country.id))] if country else []
-
-            raise RedirectWarning(
-                _('Please specify the accounts necessary for the tax closing entry.'),
-                {
-                    'type': 'ir.actions.act_window',
-                    'name': 'Tax groups',
-                    'res_model': 'account.tax.group',
-                    'view_mode': 'list',
-                    'views': [[False, 'list']],
-                    'domain': tax_groups_domain,
-                },
-                _('Configure accounts'),
-            )
+        raise RedirectWarning(
+            self.env._('Please specify the accounts necessary for the tax closing entry.'),
+            {
+                'type': 'ir.actions.act_window',
+                'name': self.env._("Tax Return Type"),
+                'res_model': 'account.return.type',
+                'res_id': self.type_id.id,
+                'view_mode': 'form',
+                'views': [[False, 'form']],
+            },
+            self.env._('Configure accounts'),
+        )
 
     def _compute_tax_closing_entry(self, company, options):
         """Compute the tax closing entry.
@@ -1719,10 +2053,15 @@ class AccountReturn(models.Model):
         """
         self.env.flush_all()
 
+        company_options = {
+            **options,
+            'forced_domain': options.get('forced_domain', []) + [('company_id', '=', company.id)]
+        }
+
         query = self.type_id.report_id._get_report_query(
-            options,
+            company_options,
             'strict_range',
-            domain=[('company_id', '=', company.id)] + self._get_vat_closing_entry_additional_domain(),
+            domain=self._get_vat_closing_entry_additional_domain(),
         )
 
         # Check whether it is multilingual, in order to get the translation from the JSON value if present
@@ -1748,7 +2087,10 @@ class AccountReturn(models.Model):
         )
         self.env.cr.execute(query)
         results = self.env.cr.dictfetchall()
-        results = self._postprocess_vat_closing_entry_results(company, options, results)
+        results = self._postprocess_vat_closing_entry_results(company, company_options, results)
+
+        if results:
+            self._ensure_tax_closing_accounts_configured(company)
 
         tax_group_ids = [r['tax_group_id'] for r in results]
         tax_groups = defaultdict(lambda: defaultdict(list))
@@ -1764,11 +2106,9 @@ class AccountReturn(models.Model):
         move_vals_lines = []
         tax_group_subtotal = defaultdict(float)
         currency = company.currency_id
-        for tg, values in tax_groups.items():
+        closing_accounts = self._get_tax_closing_accounts(company)
+        for values in tax_groups.values():
             total = 0
-            # ignore line that have no property defined on tax group
-            if not tg.tax_receivable_account_id or not tg.tax_payable_account_id:
-                continue
             for value in values.values():
                 for tax_name, account_id, amt in value:
                     # Line to balance
@@ -1782,13 +2122,7 @@ class AccountReturn(models.Model):
 
             if not currency.is_zero(total):
                 # Add total to correct group
-                key = (
-                    tg.advance_tax_payment_account_id.id or False,
-                    tg.tax_receivable_account_id.id,
-                    tg.tax_payable_account_id.id
-                )
-
-                tax_group_subtotal[key] += total
+                tax_group_subtotal[closing_accounts] += total
 
         # If the tax report is completely empty, we add two 0-valued lines, using the first in in and out
         # account id we find on the taxes.
@@ -1848,14 +2182,14 @@ class AccountReturn(models.Model):
         report = self.env['account.report'].browse(options['report_id'])
 
         for line in report._get_lines(options):
-            model, record_id = report._get_model_info_from_id(line['id'])
+            model, record_id = report._get_model_info_from_id(line.id)
 
             if model != 'account.report.line':
                 continue
 
             for (operation_type, report_line_id, column_expression_label) in vat_results_summary:
-                for column in line['columns']:
-                    if record_id != report_line_id or column['expression_label'] != column_expression_label:
+                for column in line.columns:
+                    if record_id != report_line_id or column.expression_label != column_expression_label:
                         continue
 
                     # We accept 3 types of operations:
@@ -1863,9 +2197,9 @@ class AccountReturn(models.Model):
                     # lines for the reclaimable vat.
                     # 3) total - This is used for reports that have a single line with the payable/reclaimable vat.
                     if operation_type in {'due', 'total'}:
-                        total_amount += column['no_format']
+                        total_amount += column.no_format
                     elif operation_type == 'deductible':
-                        total_amount -= column['no_format']
+                        total_amount -= column.no_format
 
         currency = company.currency_id
         total_difference = currency.round(total_amount)
@@ -1887,30 +2221,40 @@ class AccountReturn(models.Model):
     def _get_vat_closing_entry_additional_domain(self):
         return []
 
+    def _get_tax_closing_accounts(self, company):
+        """ Resolve the (advance, receivable, payable) accounts the closing entry is keyed on."""
+        return (
+            self.type_id.with_company(company).advance_tax_payment_account_id.id,
+            self.type_id.with_company(company).tax_receivable_account_id.id,
+            self.type_id.with_company(company).tax_payable_account_id.id,
+        )
+
+    def _create_tax_payable_receivable_line(self, total, payable_account_id, receivable_account_id):
+        return Command.create({
+            'name': _('Payable tax amount') if total < 0 else _('Receivable tax amount'),
+            'debit': total if total > 0 else 0,
+            'credit': abs(total) if total < 0 else 0,
+            'account_id': payable_account_id if total < 0 else receivable_account_id,
+        })
+
+    def _get_carryover_accounts_to_balance(self, key):
+        return [(key[0], self.env._('Balance tax advance payment account'))]
+
     def _add_tax_group_closing_items(self, tax_group_subtotal):
         """Transform the parameter tax_group_subtotal dictionnary into one2many commands.
 
         Used to balance the tax group accounts for the creation of the vat closing entry.
         """
-        def _add_line(account_id, name, company_currency):
-            advance_balance = self.env['account.move.line']._read_group(
+        def _get_closing_account_balance(account_id):
+            return self.env['account.move.line']._read_group(
                 [
                     ('date', '<=', self.date_to),
                     ('account_id', '=', account_id),
                     ('company_id', '=', self.company_id.id),
+                    ('parent_state', '=', 'posted'),
                 ],
                 aggregates=['balance:sum'],
             )[0][0]
-
-            # Deduct/Add advance payment
-            if not company_currency.is_zero(advance_balance):
-                line_ids_vals.append(Command.create({
-                    'name': name,
-                    'debit': abs(advance_balance) if advance_balance < 0 else 0,
-                    'credit': abs(advance_balance) if advance_balance > 0 else 0,
-                    'account_id': account_id,
-                }))
-            return advance_balance
 
         currency = self.company_id.currency_id
         line_ids_vals = []
@@ -1918,53 +2262,50 @@ class AccountReturn(models.Model):
         account_already_balanced = []
         for key, value in tax_group_subtotal.items():
             total = value
-            # Search if any advance payment done for that configuration
-            if key[0] and key[0] not in account_already_balanced:
-                total += _add_line(key[0], _('Balance tax advance payment account'), currency)
-                account_already_balanced.append(key[0])
-            if key[1] and key[1] not in account_already_balanced:
-                total += _add_line(key[1], _('Balance tax current account (receivable)'), currency)
-                account_already_balanced.append(key[1])
+            receivable_account_id = key[1]
+            payable_account_id = key[2]
+
+            for account_id, label in self._get_carryover_accounts_to_balance(key):
+                if not account_id or account_id in account_already_balanced:
+                    continue
+                balance = _get_closing_account_balance(account_id)
+                if not currency.is_zero(balance):
+                    line_ids_vals.append(Command.create({
+                        'name': label,
+                        'debit': abs(balance) if balance < 0 else 0,
+                        'credit': abs(balance) if balance > 0 else 0,
+                        'account_id': account_id,
+                    }))
+                total += balance
+                account_already_balanced.append(account_id)
 
             # Balance on the receivable/payable tax account
             if not currency.is_zero(total):
-                line_ids_vals.append(Command.create({
-                    'name': _('Payable tax amount') if total < 0 else _('Receivable tax amount'),
-                    'debit': total if total > 0 else 0,
-                    'credit': abs(total) if total < 0 else 0,
-                    'account_id': key[2] if total < 0 else key[1],
-                }))
+                line_ids_vals.append(self._create_tax_payable_receivable_line(total, payable_account_id, receivable_account_id))
         return line_ids_vals
 
     ####################################################################################################
     ####  Checks
     ####################################################################################################
 
-    def _check_failing_checks_in_current_stage(self):
-        self.ensure_one()
-        domain = [
-            ('return_id', '=', self.id),
-            ('state', '=', self.state),
-            ('result', 'in', ('todo', 'anomaly')),
-        ]
-        if self.env['account.return.check'].search_count(domain, limit=1):
-            raise UserError(_("Some checks fail in the current stage, please solve them before proceeding."))
-
     def refresh_checks(self):
         """
         Recompute all checks for every return in self of the current state
         """
-        if not self.env['account.return.check'].has_access('write'):
+        # Lock the return records before processing to ensure only one worker can
+        # modify them at a time, preventing race conditions in parallel execution.
+        locked_returns = self.try_lock_for_update()
+        if not self.env['account.return.check'].has_access('write') or not locked_returns:
             return
 
         to_create = []
         to_unlink = self.env['account.return.check']
-        for record in self:
+        for record in locked_returns:
             if record.company_id not in self.env.companies:  # We do not run checks if the main company is not selected
                 continue
 
             if record._should_run_checks():
-                check_codes_to_ignore = set(record.check_ids.filtered(lambda x: x.state == record.state))
+                check_codes_to_ignore = set(record.check_ids.filtered(lambda x: x.state != record.state).mapped('code'))
                 rslt = record._run_checks(check_codes_to_ignore)
                 rslt += record._execute_template_checks(check_codes_to_ignore)
 
@@ -1990,17 +2331,59 @@ class AccountReturn(models.Model):
     def _should_run_checks(self):
         # To override in order to run checks in other custom-made states
         self.ensure_one()
-        return self.state == 'new'
+        return not self.state
 
     def _execute_template_checks(self, codes_to_ignore):
         def filter_template(template):
             return template.code not in codes_to_ignore \
                 and (not template.country_ids or self.company_id.account_fiscal_country_id in template.country_ids)
+
+        def get_action_based_on_account_domain(domain):
+            account_domain_context = {}
+            if len(domain) == 1:
+                field_name, _operator, value = domain[0]
+                if field_name == 'account_type':
+                    # More user-friendly to activate the side panel filter instead of the audit filter in the search bar
+                    account_types = value if isinstance(value, list) else [value]
+                    account_domain_context = {
+                        'searchpanel_default_account_type': account_types,
+                    }
+
+            if not account_domain_context:
+                account_domain_context = {
+                    'search_default_audit_account_ids': True,
+                    'audit_account_ids': self.env['account.account'].search(domain).ids,
+                }
+
+            balance_list_view = self.env.ref('account_reports.account_audit_account_balances_list_view')
+            balance_search_view = self.env.ref('account_reports.account_audit_account_balances_search_view')
+
+            return {
+                'type': 'ir.actions.act_window',
+                'name': template.name,
+                'views': [(balance_list_view.id, 'list'), [False, 'form']],
+                'search_view_id': [balance_search_view.id, 'search'],
+                'view_mode': 'list',
+                'res_model': model._name,
+                'context': {
+                    'working_file_id': self.id,
+                    **account_domain_context,
+                },
+            }
+
         return_type = self.type_id
-        check_templates = self.env['account.return.check.template'].search([
-            ('return_type', '=', return_type.id),
-            ('cycle', 'not in', (self.skipped_check_cycles or '').split(',')),
-        ])
+        check_templates = self.env['account.return.check.template']
+        check_template_domain = [('return_type', '=', return_type.id)]
+        if self.return_type_category == 'audit':
+            check_template_domain.append(('cycle_id', 'in', self.cycle_ids.ids))
+
+            if 'equity' in self.cycle_ids.mapped('code'):
+                # Little hack to have it in every l10n-specific audits as well, without needing to redefine it every time
+                interco_reco = self.env.ref('account_reports.account_return_check_template_intercompany_account_reconciliation', raise_if_not_found=False)
+                if interco_reco:  # In case it's been manually deleted
+                    check_templates |= interco_reco
+
+        check_templates |= self.env['account.return.check.template'].search(check_template_domain)
 
         existing_checks_from_template = self.check_ids.filtered(lambda r: r.template_id)
         existing_check_by_template_id = {
@@ -2046,37 +2429,61 @@ class AccountReturn(models.Model):
                 model = self.env[template.model]
                 domain = []
                 if template.domain:
-                    domain = ast.literal_eval(template.domain)
-                domain = [
-                    *domain,
-                    ('date', '>=', fields.Date.to_string(self.date_from)),
-                    ('date', '<=', fields.Date.to_string(self.date_to)),
-                    ('company_id', 'in', self.company_ids.ids),
-                ]
-                entries = model.sudo().search(domain, limit=LIMIT_CHECK_ENTRIES)
-                if entries:
-                    if action := template._get_default_check_action_from_model():
-                        action['domain'] = [
-                            *action.get('domain', []),
-                            *domain
-                        ]
-                    else:
-                        action = {
-                            'type': 'ir.actions.act_window',
-                            'name': template.name,
-                            'view_mode': 'list',
-                            'res_model': model._name,
-                            'domain': domain,
-                            'views': [[False, 'list'], [False, 'form']],
-                        }
-                    vals_dict.update({
-                        'action': action,
-                        'records_count': len(entries),
-                        'records_model': ir_model.id,
-                        'result': 'anomaly',
-                    })
+                    evaluation_context = self._get_evaluation_context()
+                    domain = self.env['account.return.check']._parse_expression(template.domain, evaluation_context)
+
+                if model._name == 'account.account':
+                    query_account = self.env['account.account']._search(domain)
+                    account_status = self.env['account.audit.account.status'].search([('audit_id', '=', self.id), ('account_id', 'in', query_account)])
+                    status_priority = {'anomaly': 0, 'todo': 1, 'reviewed': 2, 'supervised': 3}
+                    minimum_status = min(
+                        (entry.status or 'reviewed' for entry in account_status),
+                        key=lambda s: status_priority[s]
+                    ) if account_status else 'reviewed'
+
+                    vals_dict.update({'result': minimum_status})
+
+                    if not template.action_id:
+                        vals_dict['action'] = get_action_based_on_account_domain(domain)
+
                 else:
-                    vals_dict['result'] = 'reviewed'
+                    domain = template._transform_custom_check_template_domain([
+                        *domain,
+                        ('date', '>=', fields.Date.to_string(self.date_from)),
+                        ('date', '<=', fields.Date.to_string(self.date_to)),
+                        ('company_id', 'in', self.company_ids.ids),
+                    ])
+                    entries = model.sudo().search(domain, limit=LIMIT_CHECK_ENTRIES)
+                    if entries:
+                        if action := template._get_default_check_action_from_model():
+                            action['domain'] = [
+                                *action.get('domain', []),
+                                *domain
+                            ]
+                        else:
+                            action = {
+                                'type': 'ir.actions.act_window',
+                                'name': template.name,
+                                'view_mode': 'list',
+                                'res_model': model._name,
+                                'domain': domain,
+                                'views': [[False, 'list'], [False, 'form']],
+                            }
+                        action['context'] = {
+                            'working_file_id': self.id,
+                            **action.get('context', {}),
+                        }
+                        vals_dict.update({
+                            'action': action,
+                            'records_count': len(entries),
+                            'records_model': ir_model.id,
+                            'result': 'anomaly',
+                        })
+                    else:
+                        vals_dict.update({
+                            'records_count': 0,
+                            'result': 'reviewed'
+                        })
 
             vals_list.append(vals_dict)
 
@@ -2102,6 +2509,11 @@ class AccountReturn(models.Model):
 
         return checks
 
+    def _get_company_required_fields(self):
+        self.ensure_one()
+        company = self.company_id
+        return [company.vat, company.country_id, company.phone, company.email]
+
     def _check_suite_common_vat_report(self, check_codes_to_ignore):
         checks = []
         # check company configuration
@@ -2114,15 +2526,14 @@ class AccountReturn(models.Model):
                 'views': [(self.env.ref('account.res_company_form_view_onboarding').id, "form")],
                 'target': 'new',
             }
-            company = self.company_id
-            required_fields = [company.vat, company.country_id, company.phone, company.email]
-            invalid_fields_count = sum(1 for field in required_fields if not field)
+            invalid_fields_count = sum(1 for field in self._get_company_required_fields() if not field)
 
             checks.append({
                 'name': _lt("Company data"),
-                'message': _lt("""Missing company details (like VAT number or country) can cause errors in your report,
-such as using the wrong VAT rate, wrongly exempting transactions.
-                """),
+                'message': _lt(
+                    "Missing company details (like VAT number or country) can cause errors in your report, "
+                    "such as using the wrong VAT rate, wrongly exempting transactions."
+                ),
                 'code': 'check_company_data',
                 'records_count': invalid_fields_count,
                 'action': review_action,
@@ -2133,15 +2544,24 @@ such as using the wrong VAT rate, wrongly exempting transactions.
             checks.append(self._check_match_all_bank_entries(
                     code='check_match_all_bank_entries',
                     name=_lt("Bank Matching"),
-                    message=_lt("Bank matching isn’t required for VAT returns but helps spot missing bills."),
+                    message=_lt("Bank transactions are reconciled to avoid any missing VAT invoices or bills."),
+                )
+            )
+
+        if self.company_id.tax_exigibility and 'check_caba_sequence' not in check_codes_to_ignore:
+            checks.append(self._check_caba_sequence(
+                    code='check_caba_sequence',
+                    name=_lt("Cash Basis sequences"),
+                    message=_lt("All the Journal Entries used to record received taxes amounts in the Cash Basis journal are in sequence."),
                 )
             )
 
         if 'check_draft_entries' not in check_codes_to_ignore:
+            check_codes_to_ignore.add('check_draft_entries')
             checks.append(self._check_draft_entries(
                     code='check_draft_entries',
-                    name=_lt("Draft entries"),
-                    message=_lt("Review and post draft invoices and bills in the period, or change their accounting date."),
+                    name=_lt("Drafts & Reviews"),
+                    message=_lt("Review Abnormal/To Review invoices and bills, and post drafts."),
                     exclude_entries=True,
                 )
             )
@@ -2149,6 +2569,7 @@ such as using the wrong VAT rate, wrongly exempting transactions.
         if 'check_bills_attachment' not in check_codes_to_ignore:
             domain = [
                 ('attachment_ids', '=', False),
+                ('message_main_attachment_id', '=', False),
                 ('move_type', '=', 'in_invoice'),
                 ('company_id', 'in', self.company_ids.ids),
                 ('date', '<=', fields.Date.to_string(self.date_to)),
@@ -2163,7 +2584,7 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                 'view_mode': 'list',
                 'res_model': 'account.move',
                 'domain': domain,
-                'views': [[False, 'list'], [False, 'form']],
+                'views': [[self.env.ref('account_reports.view_audit_check_invoices_list').id, 'list'], [False, 'form']],
             }
 
             checks.append({
@@ -2191,7 +2612,7 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                 JOIN res_partner partner
                     ON partner.id = move.commercial_partner_id
                 WHERE
-                    state = 'posted'
+                    move.state = 'posted'
                     AND move.company_id IN %(company_ids)s
                     AND move.move_type IN %(invoice_types)s
                     AND move.date >= %(date_from)s
@@ -2223,7 +2644,7 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                 'view_mode': 'list',
                 'res_model': 'account.move',
                 'domain': [('id', 'in', country_error_move_ids)],
-                'views': [[False, 'list'], [False, 'form']],
+                'views': [[self.env.ref('account_reports.view_audit_check_invoices_list').id, 'list'], [False, 'form']],
             }
 
             checks.append({
@@ -2236,30 +2657,89 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                 'result': 'anomaly' if country_error_move_ids else 'reviewed',
             })
 
+        if 'check_inactive_tags' not in check_codes_to_ignore:
+            domain = [
+                ('date', '<=', fields.Date.to_string(self.date_to)),
+                ('date', '>=', fields.Date.to_string(self.date_from)),
+                ('company_id', 'in', self.company_ids.ids),
+                ('parent_state', '=', 'posted'),
+                ('tax_tag_ids', 'any', [
+                    ('applicability', '=', 'taxes'),
+                    ('active', '=', False),
+                    '|', ('country_id', '=', False), ('country_id', '=', self.type_id.country_id.id),
+                ]),
+            ]
+            nb_inactive_tag = self.env['account.move.line'].search_count(domain)
+            if nb_inactive_tag or self.check_ids.filtered(lambda check: check.code == 'check_inactive_tags'):
+                # This check is not created if there is no inactive tag and is never deleted
+                review_action = {
+                    'type': 'ir.actions.act_window',
+                    'name': _("Journal Items with Archived Tax Grids"),
+                    'view_mode': 'list',
+                    'res_model': 'account.move.line',
+                    'domain': domain,
+                    'views': [[False, 'list'], [False, 'form']],
+                }
+                checks.append({
+                    'name': _lt("Archived Tax Grids"),
+                    'code': 'check_inactive_tags',
+                    'message': _lt('Some journal items appear to point to obsolete report lines. '
+                                   'Check them, and correct their tax grids if necessary.'),
+                    'records_count': nb_inactive_tag,
+                    'records_model': self.env['ir.model']._get('account.move.line').id,
+                    'action': review_action,
+                    'result': 'anomaly' if nb_inactive_tag else 'reviewed',
+                })
+
+        if 'check_vat_reconciliation' not in check_codes_to_ignore:
+            action = {
+                'name': self.env._("Journal Items"),
+                'type': 'ir.actions.act_window',
+                'res_model': 'account.move.line',
+                'view_mode': 'pivot',
+                'views': [(False, 'pivot')],
+                'domain': [('move_type', 'in', ('out_invoice', 'out_receipt', 'out_refund'))],
+                'context': {
+                    'active_test': False,
+                    'pivot_row_groupby': ['tax_tag_ids', 'account_id'],
+                    'pivot_column_groupby': ['fiscal_position_id', 'commercial_partner_country'],
+                },
+            }
+
+            checks.append({
+                'name': _lt("VAT Reconciliation"),
+                'message': _lt("Audit journal items and accounts to ensure they are correctly assigned to tax grids."),
+                'code': 'check_vat_reconciliation',
+                'result': 'todo',
+                'action': action,
+            })
+
         return checks
 
     def _check_suite_annual_closing(self, check_codes_to_ignore):
-        def get_unknown_partner_aml_ids(report):
-            options = report.get_options({})
-            unknown_partner_line = next(
-                (line for line in report._get_lines(options) if report._get_model_info_from_id(line['id']) == ('res.partner', None)),
-                None,
-            )
-            aml_ids = []
-            if unknown_partner_line:
-                options['unfolded_lines'] = [unknown_partner_line['id']]
-                aml_ids = [
-                    report._get_res_id_from_line_id(line['id'], 'account.move.line')
-                    for line in report._get_lines(options)
-                    if line.get('parent_id') == unknown_partner_line['id']
-                ]
-            return aml_ids
+        def get_unknown_partner_aml_ids(internal_type):
+            report = self.env.ref("account_reports.aged_payable_report") if internal_type == 'liability_payable' else self.env.ref("account_reports.aged_receivable_report")
+            options = report.get_options({
+                'date': {
+                    'date_to': self.date_to,
+                },
+            })
+            query = report._get_report_query(options, 'strict_range', domain=[('account_id.account_type', '=', internal_type), ('partner_id', '=', False)])
+            return [r[0] for r in self.env.execute_query(query.select(SQL("account_move_line.id")))]
 
-        def has_overdue_aged_balance(report, older_expr):
-            options = report.get_options({'aging_interval': 15})  # 15-day intervals so amounts aged over 60 fall under 'Older' column
-            expression_totals = report._compute_expression_totals_for_each_column_group(older_expr, options)
-            expr_value = next(iter(expression_totals.values()), {}).get(older_expr, {})
-            return expr_value.get('value')
+        def has_overdue_aged_balance(internal_type):
+            report = self.env.ref("account_reports.aged_payable_report") if internal_type == 'liability_payable' else self.env.ref("account_reports.aged_receivable_report")
+            options = report.get_options({
+                'date': {
+                    'date_to': self.date_to,
+                },
+            })
+            threshold_date = self.date_to - relativedelta(days=60)
+            aging_date_field = SQL.identifier('invoice_date') if options['aging_based_on'] == 'base_on_invoice_date' else SQL.identifier('date_maturity')
+            query = report._get_report_query(options, 'strict_range', domain=[('account_id.account_type', '=', internal_type)])
+            query.add_where(SQL("COALESCE(account_move_line.%s, account_move_line.date) <= %s", aging_date_field, threshold_date))
+            query.limit = 1
+            return self.env.execute_query(query.select(SQL("1")))
 
         checks = []
         if 'check_bank_reconcile' not in check_codes_to_ignore:
@@ -2279,27 +2759,34 @@ such as using the wrong VAT rate, wrongly exempting transactions.
             )
 
         if 'check_unkown_partner_receivables' not in check_codes_to_ignore:
-            receivable_report = self.env.ref('account_reports.aged_receivable_report')
-            aml_ids = self.env['account.move.line'].browse(get_unknown_partner_aml_ids(receivable_report))
+            aml_ids = get_unknown_partner_aml_ids('asset_receivable')
+            action = {
+                'type': 'ir.actions.act_window',
+                'name': self.env._("Unknown partner receivables"),
+                'view_mode': 'list',
+                'res_model': 'account.move.line',
+                'domain': [('id', 'in', aml_ids)],
+                'views': [[False, 'list']],
+            }
             checks.append({
                 'name': _lt("Aged receivables per partner"),
                 'message': _lt("Review receivables without a partner."),
                 'code': 'check_unkown_partner_receivables',
-                'action': aml_ids._get_records_action() if aml_ids else None,
+                'action': action if aml_ids else None,
                 'result': 'anomaly' if aml_ids else 'reviewed',
             })
 
         if 'check_overdue_receivables' not in check_codes_to_ignore:
-            receivable_report = self.env.ref('account_reports.aged_receivable_report')
-            older_expr = self.env.ref("account_reports.aged_receivable_line_period5")
-            has_overdue_receivables = has_overdue_aged_balance(receivable_report, older_expr)
+            has_overdue_receivables = has_overdue_aged_balance('asset_receivable')
             action = None
             if has_overdue_receivables:
-                action = self.env['ir.actions.actions']._for_xml_id("account_reports.action_account_report_ar")
-                action['params'] = {'ignore_session': True}
+                action = self.env['account.return.check'].action_audit_report(self.id, "account_reports.action_account_report_ar")
             checks.append({
                 'name': _lt("Overdue receivables"),
-                'message': _lt("Review overdue receivables aged over 60 days and assess the need for an allowance for doubtful accounts or expected credit loss provision, as per IFRS 9 guidelines."),
+                'message': _lt(
+                    "Review overdue receivables aged over 60 days and assess the need for an allowance for doubtful "
+                    "accounts or expected credit loss provision, as per IFRS 9 guidelines."
+                ),
                 'code': 'check_overdue_receivables',
                 'action': action,
                 'result': 'anomaly' if has_overdue_receivables else 'reviewed',
@@ -2314,24 +2801,28 @@ such as using the wrong VAT rate, wrongly exempting transactions.
             })
 
         if 'check_unkown_partner_payables' not in check_codes_to_ignore:
-            payable_report = self.env.ref('account_reports.aged_payable_report')
-            aml_ids = self.env['account.move.line'].browse(get_unknown_partner_aml_ids(payable_report))
+            aml_ids = get_unknown_partner_aml_ids('liability_payable')
+            action = {
+                'type': 'ir.actions.act_window',
+                'name': self.env._("Unknown partner payables"),
+                'view_mode': 'list',
+                'res_model': 'account.move.line',
+                'domain': [('id', 'in', aml_ids)],
+                'views': [[False, 'list']],
+            }
             checks.append({
                 'name': _lt("Aged payables per partner"),
                 'message': _lt("Review payables without a partner."),
                 'code': 'check_unkown_partner_payables',
-                'action': aml_ids._get_records_action() if aml_ids else None,
+                'action': action if aml_ids else None,
                 'result': 'anomaly' if aml_ids else 'reviewed',
             })
 
         if 'check_overdue_payables' not in check_codes_to_ignore:
-            payable_report = self.env.ref('account_reports.aged_payable_report')
-            older_expr = self.env.ref("account_reports.aged_payable_line_period5")
-            has_overdue_payables = has_overdue_aged_balance(payable_report, older_expr)
+            has_overdue_payables = has_overdue_aged_balance('liability_payable')
             action = None
             if has_overdue_payables:
-                action = self.env['ir.actions.actions']._for_xml_id("account_reports.action_account_report_ap")
-                action['params'] = {'ignore_session': True}
+                action = self.env['account.return.check'].action_audit_report(self.id, "account_reports.action_account_report_ap")
             checks.append({
                 'name': _lt("Overdue payables"),
                 'message': _lt("Review overdue payables aged over 60 days and assess the need for an allowance for uncertain liabilities."),
@@ -2359,7 +2850,10 @@ such as using the wrong VAT rate, wrongly exempting transactions.
             if not deferred_entries_count:
                 checks.append({
                     'name': _lt("Deferred Entries"),
-                    'message': _lt("Odoo manages your deferred entries automatically. No deferred entries were found for this period. Ensure your start and end dates are correctly set on your bills and invoices."),
+                    'message': _lt(
+                        "Odoo manages your deferred entries automatically. No deferred entries were found for this period. "
+                        "Ensure your start and end dates are correctly set on your bills and invoices."
+                    ),
                     'code': 'check_deferred_entries',
                     'records_count': deferred_entries_count,
                     'records_model': self.env['ir.model']._get('account.move').id,
@@ -2375,10 +2869,7 @@ such as using the wrong VAT rate, wrongly exempting transactions.
             })
 
         if 'earnings_allocation' not in check_codes_to_ignore:
-            action = self.env['ir.actions.actions']._for_xml_id("account_reports.action_account_report_bs")
-            action['params'] = {
-                'ignore_session': True,
-            }
+            action = self.env['account.return.check'].action_audit_report(self.id, "account_reports.action_account_report_bs")
             checks.append({
                 'name': _lt("Earnings Allocation"),
                 'message': _lt("After adjustements, transfer the undistributed Profits/Losses to an equity account."),
@@ -2386,6 +2877,14 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                 'action': action,
                 'result': 'todo',
             })
+
+        if self.company_id.tax_exigibility and 'check_caba_sequence' not in check_codes_to_ignore:
+            checks.append(self._check_caba_sequence(
+                    code='check_caba_sequence',
+                    name=_lt("Cash Basis sequences"),
+                    message=_lt("All the Journal Entries used to record received taxes amounts in the Cash Basis journal are in sequence."),
+                )
+            )
 
         return checks
 
@@ -2396,8 +2895,8 @@ such as using the wrong VAT rate, wrongly exempting transactions.
         return checks
 
     def _generic_vies_vat_check(self, check_codes_to_ignore, checks):
-        is_base_vat_installed = 'base_vat' in self.env['ir.module.module']._installed()
-        use_vies = is_base_vat_installed and self.company_id.vat_check_vies
+        is_l10n_eu_account_vies_installed = 'l10n_eu_account_vies' in self.env['ir.module.module']._installed()
+        use_vies = is_l10n_eu_account_vies_installed and self.company_id.vat_check_vies
         if 'check_partner_vies' not in check_codes_to_ignore and use_vies:
             european_country_group = self.env.ref('base.europe')
             invalid_vies_partners = self.env['account.move'].sudo()._read_group(
@@ -2408,6 +2907,7 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                     ('company_id', 'in', self.company_ids.ids),
                     ('date', '<=', fields.Date.to_string(self.date_to)),
                     ('date', '>=', fields.Date.to_string(self.date_from)),
+                    ('fiscal_position_id.vat_required', '=', True),
                 ],
                 aggregates=['partner_id:recordset'],
             )[0][0]
@@ -2416,8 +2916,12 @@ such as using the wrong VAT rate, wrongly exempting transactions.
             checks.append({
                 'name': _lt("Valid VAT Numbers"),
                 'code': 'check_partner_vies',
-                'message': _lt("""All customer VAT numbers are valid under <a href="https://ec.europa.eu/taxation_customs/vies" target="_blank">VIES</a>."""),
-                'state': 'new',
+                'message': _lt(
+                    'All customer VAT numbers are valid under %s.',
+                    Markup('<a href="https://ec.europa.eu/taxation_customs/vies" target="_blank">')
+                    + _lt('VIES')
+                    + Markup('</a>'),
+                ),
                 'records_count': invalid_vies_partners_count,
                 'records_model': self.env['ir.model']._get('res.partner').id,
                 'action': (
@@ -2431,18 +2935,24 @@ such as using the wrong VAT rate, wrongly exempting transactions.
     def _check_suite_common_ec_sales_list(self, check_codes_to_ignore):
         checks = []
 
-        if 'goods_service_classification' not in check_codes_to_ignore or 'reverse_charge_mentioned' not in check_codes_to_ignore:
-            options = self._get_closing_report_options()
+        options = self._get_closing_report_options()
+        is_using_taxes = 'ec_sales_taxes_to_include' in options
 
-            tax_criterium_ids = options['sales_report_taxes']['goods'] + options['sales_report_taxes']['triangular'] + options['sales_report_taxes']['services']
-            if options['sales_report_taxes'].get('use_taxes_instead_of_tags'):
-                tax_criterium = ('tax_ids', 'in', tax_criterium_ids)
+        if 'goods_service_classification' not in check_codes_to_ignore or 'reverse_charge_mentioned' not in check_codes_to_ignore:
+
+            if is_using_taxes:
+                ec_sales_tax_or_tag_domain = ('tax_ids', 'in', options.get('ec_sales_taxes_to_include', []))
             else:
-                tax_criterium = ('tax_tag_ids', 'in', tax_criterium_ids)
+                tax_tag_ids = list({
+                    tag
+                    for sale_type in options['sales_report_operation_types'].values()
+                    for tag in sale_type['tax_tag_ids']
+                })
+                ec_sales_tax_or_tag_domain = ('tax_tag_ids', 'in', tax_tag_ids)
 
             ec_sales_aml_domain = [
                 *self.type_id.report_id._get_options_domain(options, 'strict_range'),
-                tax_criterium,
+                ec_sales_tax_or_tag_domain,
             ]
 
             if 'goods_service_classification' not in check_codes_to_ignore:
@@ -2475,17 +2985,35 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                     },
                 })
 
-        if any(code not in check_codes_to_ignore for code in ('eu_cross_border', 'only_b2b', 'no_partners_without_vat')):
+        if any(code not in check_codes_to_ignore for code in ('eu_cross_border', 'no_partners_without_vat')):
             warnings = {}
             custom_handler = self.env[self.type_id.report_id._get_custom_handler_model()]
-            options = self._get_closing_report_options()
-            partner_results = custom_handler._query_partners(self.type_id.report_id, options, warnings)
+
+            ec_sales_report = self.env['account.report'].browse(options['report_id'])
+
+            engine_results = custom_handler._report_engine_ec_sales_report(
+                options,
+                'strict_range',
+                ec_sales_report.line_ids[0].expression_ids.grouped('formula'),
+                'partner_id',
+            )
+
+            custom_handler._report_engine_ec_sales_report(
+                options,
+                'strict_range',
+                ec_sales_report.line_ids[0].expression_ids.grouped('formula'),
+                None,
+                warnings=warnings,
+            )
+
+            partner_ids = self.env['res.partner'].browse([partner_id for formula_res in engine_results.values() for partner_id, _ec_results in formula_res])
 
             if 'eu_cross_border' not in check_codes_to_ignore:
-                cross_border_failure = 'account_reports.sales_report_warning_non_ec_country' in warnings or 'account_report.sales_report_warning_same_country' in warnings
+                cross_border_failure = 'account_reports.sales_report_warning_non_ec_country' in warnings or 'account_reports.sales_report_warning_same_country' in warnings
 
                 cross_border_action = False
                 if cross_border_failure:
+                    options['same_country_warning'] = self.company_id.country_id.code
                     same_country_action = custom_handler.get_warning_act_window(options, {'type': 'same_country', 'model': 'partner'})
                     non_ec_country_action = custom_handler.get_warning_act_window(options, {'type': 'non_ec_country', 'model': 'partner'})
                     cross_border_action = {
@@ -2502,25 +3030,8 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                     'action': cross_border_action,
                 })
 
-            if 'only_b2b' not in check_codes_to_ignore:
-                non_b2b_partners = self.env['res.partner'].browse(
-                    partner.id for partner, _partner_result in partner_results if not partner.is_company
-                )
-                checks.append({
-                    'name': _lt("Only business customers"),
-                    'message': _lt("Exclude any private customers."),
-                    'code': 'only_b2b',
-                    'result': 'anomaly' if non_b2b_partners else 'reviewed',
-                    'action': (
-                        non_b2b_partners._get_records_action(name=self.env._("Private Customers"))
-                        if non_b2b_partners else None
-                    ),
-                })
-
             if 'no_partners_without_vat' not in check_codes_to_ignore:
-                no_vat_partners = self.env['res.partner'].browse(
-                    partner.id for partner, _partner_result in partner_results if not partner.vat
-                )
+                no_vat_partners = partner_ids.filtered(lambda partner: not partner.vat)
                 checks.append({
                     'name': _lt("VAT Numbers"),
                     'message': _lt("All customers have a VAT number."),
@@ -2531,6 +3042,60 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                         if no_vat_partners else None
                     ),
                 })
+
+            if 'no_duplicate_vat' not in check_codes_to_ignore:
+                vat_count = defaultdict(int)
+                duplicate_vats = set()
+
+                for formula_res in engine_results.values():
+                    for partner_id, partner_info in formula_res:
+                        vat_key = f"{partner_info['country_code']}{partner_info['vat_number']}"
+                        vat_count[vat_key] += 1
+                        if vat_count[vat_key] == 2:
+                            duplicate_vats.add(vat_key)
+
+                action = custom_handler._get_duplicate_vat_partners(list(duplicate_vats))
+                checks.append({
+                    'name': _lt("Duplicate VAT"),
+                    'message': _lt("All customers have a different VAT number."),
+                    'code': 'no_partners_with_duplicate_vat',
+                    'result': 'anomaly' if duplicate_vats else 'reviewed',
+                    'action': action if duplicate_vats else None
+                })
+
+            if 'no_service_sales_to_xi_customers' not in check_codes_to_ignore and not is_using_taxes:
+                xi_partner_with_service_sales = [
+                    partner_id
+                    for partner_id, partner_info in next(iter(engine_results.values()))
+                    if partner_info.get('country_code') == 'XI' and partner_info.get('services')
+                ]
+
+                if xi_partner_with_service_sales:
+                    services_tags = self.env['account.account.tag'].browse(custom_handler._get_ec_sales_tax_tags().get('services'))
+                    checks.append({
+                        'name': _lt("Service Sales to North-Irish Customers"),
+                        'message': _lt(
+                            "Inconsistent tax on service sale to Northern Ireland. Such services must be treated "
+                            "strictly as a third country (non-EU) transaction, and should not use intra-community taxes."
+                        ),
+                        'code': 'no_service_sales_to_xi_customers',
+                        'result': 'anomaly',
+                        'action': {
+                            'type': 'ir.actions.act_window',
+                            'name': self.env._("North-Irish customers with intra-com service sales"),
+                            'res_model': 'account.move',
+                            'domain': [
+                                ('partner_id', 'in', xi_partner_with_service_sales),
+                                ('state', '=', 'posted'),
+                                ('date', '<=', self.date_to),
+                                ('date', '>=', self.date_from),
+                                ('company_id', 'in', self.company_ids.ids),
+                                ('line_ids', 'any', [('tax_tag_ids', 'in', services_tags.ids)])
+                            ],
+                            'view_mode': 'list',
+                            'views': [[False, 'list'], [False, 'form']],
+                        },
+                    })
 
         self._generic_vies_vat_check(check_codes_to_ignore, checks)
 
@@ -2582,14 +3147,24 @@ such as using the wrong VAT rate, wrongly exempting transactions.
                 'active_ids': [self.id],
                 'account_return_view_id': self.env.ref('account_reports.account_return_kanban_view').id,
                 'max_number_opened_groups': 100000,
+                'open_attachments_in_chatter': True,
             },
             'domain': [['return_id', '=', self.id]],
-            'views': [(self.env.ref('account_reports.account_return_check_kanban_view').id, 'kanban')],
+            'views': [(self._get_checks_kanban_view_id(), 'kanban')],
         }
+
+    def _get_checks_kanban_view_id(self):
+        """
+        Can be overidden to allow some conditional extension to the check view.
+        """
+        self.ensure_one()
+        return self.env.ref('account_reports.account_return_check_kanban_view').id
 
     def _check_draft_entries(self, code, name, message, exclude_entries=False):
         domain = [
+            '|',
             ('state', '=', 'draft'),
+            ('review_state', 'in', ['anomaly', 'todo']),
             ('company_id', 'in', self.company_ids.ids),
             ('date', '<=', fields.Date.to_string(self.date_to)),
             ('date', '>=', fields.Date.to_string(self.date_from)),
@@ -2604,7 +3179,7 @@ such as using the wrong VAT rate, wrongly exempting transactions.
             'view_mode': 'list',
             'res_model': 'account.move',
             'domain': domain,
-            'views': [[self.env.ref('account_reports.view_draft_entries_tree').id, 'list'], [False, 'form']],
+            'views': [[self.env.ref('account_reports.view_audit_check_invoices_list').id, 'list'], [False, 'form']],
         }
 
         return {
@@ -2617,6 +3192,41 @@ such as using the wrong VAT rate, wrongly exempting transactions.
             'result': 'anomaly' if draft_entries_count else 'reviewed',
         }
 
+    def _check_caba_sequence(self, code, name, message):
+        caba_journal = self.company_id.tax_cash_basis_journal_id
+        domain = [
+            ('state', '=', 'posted'),
+            ('company_id', 'in', self.company_ids.ids),
+            ('date', '<=', fields.Date.to_string(self.date_to)),
+            ('date', '>=', fields.Date.to_string(self.date_from)),
+            ('journal_id', '=', caba_journal.id),
+            ('tax_cash_basis_rec_id', '!=', False),
+        ]
+        needs_resequence = bool(
+            self.env['account.move'].sudo().search_count(
+                domain + [('made_sequence_gap', '=', 'true')],
+                limit=1,
+            ))
+
+        review_action = {
+            'type': 'ir.actions.act_window',
+            'name': str(name),  # If it is _lt, we need to stringify it because it cannot be json dumped
+            'view_mode': 'list',
+            'res_model': 'account.move',
+            'domain': domain,
+            'views': [[self.env.ref('account_reports.view_audit_check_invoices_list').id, 'list'], [False, 'form']],
+        } if needs_resequence else None
+
+        return {
+            'name': name,
+            'code': code,
+            'message': message,
+            'records_count': 0,
+            'records_model': self.env['ir.model']._get('account.move').id,
+            'action': review_action,
+            'result': 'anomaly' if needs_resequence else 'reviewed',
+        }
+
     def get_kanban_view_and_search_view_id(self):
         if self.return_type_category == 'audit':
             kanban_view_xml_id = 'account_reports.account_audit_kanban_view'
@@ -2625,6 +3235,62 @@ such as using the wrong VAT rate, wrongly exempting transactions.
             kanban_view_xml_id = 'account_reports.account_return_kanban_view'
             search_view_xml_id = 'account_reports.account_return_search_view'
         return (self.env.ref(kanban_view_xml_id).id, self.env.ref(search_view_xml_id).id)
+
+    @api.model
+    def _get_nth_working_day(self, from_date, n):
+        """
+        Calculate the date of the Nth working day starting from a given date.
+
+        A working day is defined as a weekday (Monday to Friday).
+        Weekends (Saturday and Sunday) are skipped.
+
+        :param from_date : The start date (inclusive).
+        :param n : The Nth working day to find (e.g., n=1 returns the first working day on or after `from_date`).
+
+        :returns: The date of the Nth working day after `from_date`.
+        :rtype: datetime.date
+        :raises UserError: if n is less than 1
+        """
+
+        def is_working_day(day):
+            return day.isoweekday() <= 5
+
+        if n <= 0:
+            raise UserError(self.env._("n must be a positive integer."))
+
+        current_date = from_date
+        n -= int(is_working_day(current_date))
+        while n > 0:
+            current_date += relativedelta(days=1)
+            n -= int(is_working_day(current_date))
+        return current_date
+
+    def _get_evaluation_context(self):
+        def generate_journals_options():
+            options = self.env.ref('account_reports.trial_balance_report').get_options({})
+            journals = options.get('journals', [])
+            for journal in journals:
+                journal['selected'] = journal['type'] == 'cash'
+            return journals
+
+        self.ensure_one()
+
+        company = self.company_id
+        return {
+            'active_id': self.id,
+            'active_ids': [self.id],
+            'active_model': self._name,
+            'return_start_date': fields.Date.to_string(self.date_from),
+            'return_end_date': fields.Date.to_string(self.date_to),
+            'return_last_month_start': fields.Date.to_string(fields.Date.start_of(self.date_to, 'month')),
+            'ref': lambda xml_id: self.env.ref(xml_id).id,
+            'internal_transfer_account_id': company.transfer_account_id.id,
+            'currency_exchange_difference_account_ids': (company.income_currency_exchange_account_id + company.expense_currency_exchange_account_id).ids,
+            'company_currency_id': company.currency_id.id,
+            'company_country_code': company.account_fiscal_country_id.code,
+            'company_id': company.id,
+            'cash_journal_options': generate_journals_options(),
+        }
 
 
 class AccountReturnCheck(models.Model):
@@ -2647,14 +3313,14 @@ class AccountReturnCheck(models.Model):
 
     # Refreshed fields
     name = fields.Char(string="Name", required=True, translate=True)
-    message = fields.Text(string="Description", translate=True)
-    state = fields.Char(string="Return State To Check For", default='new', required=True)
+    message = fields.Html(string="Description", translate=True)
+    state = fields.Char(string="Return State To Check For")
     records_count = fields.Integer(readonly=True)
     records_name = fields.Char(compute='_compute_records_name', compute_sudo=True)  # sudo is necessary because we're accessing ir.model
     records_model = fields.Many2one(string="Model", comodel_name='ir.model')
     action = fields.Json()
     result = fields.Selection(
-        selection=STATUS_SELECTION,
+        selection=REVIEW_STATE_SELECTION,
         default='todo',
         required=True,
     )
@@ -2670,6 +3336,7 @@ class AccountReturnCheck(models.Model):
     return_state = fields.Char(string="Return State", related="return_id.state", store=True)
     return_name = fields.Char(string="Return Name", related="return_id.name")
     date_deadline = fields.Date("Deadline", related="return_id.date_deadline")
+    is_main_company_active = fields.Boolean(related="return_id.is_main_company_active")
 
     # Editable fields
     refresh_result = fields.Boolean(default=True)
@@ -2686,8 +3353,14 @@ class AccountReturnCheck(models.Model):
         compute='_compute_approver_supervisor_ids',
         context={"active_test": False},
     )
+    notes = fields.Text(string="Notes")
 
-    cycle = fields.Selection(related="template_id.cycle")
+    cycle_id = fields.Many2one(related="template_id.cycle_id")
+
+    _unique_code_per_return = models.Constraint(
+        'UNIQUE(return_id, code)',
+        'You can only have a unique check code for each return.'
+    )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -2704,7 +3377,11 @@ class AccountReturnCheck(models.Model):
         all_langs = self.env['res.lang'].get_installed()
         for vals_dict, record in zip(vals_list, records):
             for lang_code, _lang_name in all_langs:
-                record = record.with_context(lang=lang_code)
+                # When trying to write a value on an translatable html field, It will try to translate it to other languages.
+                # This is an issue since we want to manually set the value for every langauge.
+                # By using delay_translate=True, we can avoid the automatic translation and set the value for each language
+                # as long as `update_field_translations` is never called.
+                record = record.with_context(lang=lang_code, delay_translations=True)
                 for check_field, template_field in translatable_fields:
                     if record.template_id:
                         record[check_field] = record.template_id[template_field]
@@ -2720,31 +3397,21 @@ class AccountReturnCheck(models.Model):
                 raise AccessError(self.env._("Only an accounting administrator can set/unset a supervisor."))
 
             if 'result' in vals:
-                if check.return_state != 'new':
+                if check.return_state:
                     raise UserError(self.env._("You're only allowed to change the check state when the return hasn't been reviewed."))
 
                 if user.id != SUPERUSER_ID:
-                    check.refresh_result = False
-
                     result_selection = dict(self._fields['result']._description_selection(self.env))
-                    msg_body = Markup("""
-                        <i>{check_name}</i> {check_updated}:
-                        <ul class='mb-0 ps-4'>
-                            <li>
-                                <span class='o-mail-Message-trackingOld me-1 px-1 text-muted fw-bold'>{old_result}</span>
-                                <i class='o-mail-Message-trackingSeparator fa fa-long-arrow-right mx-1 text-600'/>
-                                <span class='o-mail-Message-trackingNew me-1 fw-bold text-info'>{new_result}</span>
-                                <span class='o-mail-Message-trackingField fst-italic text-muted'>({tracking_field})</span>
-                            </li>
-                        </ul>
-                    """).format(
-                        check_updated=self.env._("check updated"),
-                        check_name=check.name,
-                        old_result=result_selection[check.result],
-                        new_result=result_selection[vals['result']],
-                        tracking_field=self.env._("Check State")
+                    check.refresh_result = False
+                    check.return_id._track_add(
+                        {check.return_id.id: {'result': result_selection[check.result]}},
+                        end_values={check.return_id.id: {'result': result_selection[vals['result']]}},
+                        fields_info={'result': {'type': 'char', 'string': self.env._("Check State")}},
+                        body=Markup("<i>{check_name}</i> {check_updated}").format(
+                            check_updated=self.env._("check updated"),
+                            check_name=check.name,
+                        ),
                     )
-                    check.return_id.message_post(body=msg_body)
 
                 if vals['result'] in ('anomaly', 'todo'):
                     check.approver_ids = False
@@ -2786,43 +3453,12 @@ class AccountReturnCheck(models.Model):
         for check in self:
             check.records_name = check.records_model.name if check.records_model else self.env._("Missing")
 
-    @api.constrains('code')
-    def _check_code(self):
-        for record in self:
-            if len(record.return_id.check_ids.filtered(lambda check: check.code == record.code)) > 1:
-                raise ValidationError(_("You can only have a unique check code for each return."))
-
     @api.depends('approver_ids', 'supervisor_id')
     def _compute_approver_supervisor_ids(self):
         for check in self:
             check.approver_supervisor_ids = check.approver_ids | check.supervisor_id
 
-    def _get_evaluation_context(self):
-        def generate_journals_options():
-            options = self.env.ref('account_reports.trial_balance_report').get_options({})
-            journals = options.get('journals', [])
-            for journal in journals:
-                if journal['model'] == 'account.journal':
-                    journal['selected'] = journal['type'] == 'cash'
-                elif journal['model'] == 'account.journal.group':
-                    journal['selected'] = False
-            return journals
-
-        company = self.return_id.company_id
-        return {
-            'active_id': self.return_id.id,
-            'active_ids': [self.return_id.id],
-            'active_model': self.return_id._name,
-            'return_start_date': fields.Date.to_string(self.return_id.date_from),
-            'return_end_date': fields.Date.to_string(self.return_id.date_to),
-            'return_last_month_start': fields.Date.to_string(fields.Date.start_of(self.return_id.date_to, 'month')),
-            'ref': lambda xml_id: self.env.ref(xml_id).id,
-            'internal_transfer_account_id': company.transfer_account_id.id,
-            'currency_exhange_difference_account_ids': (company.income_currency_exchange_account_id.id, company.expense_currency_exchange_account_id.id),
-            'company_currency_id': company.currency_id.id,
-            'cash_journal_options': generate_journals_options(),
-        }
-
+    @api.model
     def _parse_expression(self, value, context):
         """
         This parser extracts the expression such as context, domain, or params from string.
@@ -2853,7 +3489,7 @@ class AccountReturnCheck(models.Model):
                 **self.action
             }
 
-            evaluation_context = self._get_evaluation_context()
+            evaluation_context = self.return_id._get_evaluation_context()
 
             if 'context' in self.action and isinstance(self.action['context'], str):
                 action['context'] = self._parse_expression(self.action['context'], evaluation_context)
@@ -2888,6 +3524,35 @@ class AccountReturnCheck(models.Model):
 
             return action
 
+    @api.model
+    def action_audit_custom_target(self, audit_id, target):
+        """
+        Hook defining which action is opened when an audit check is clicked.
+        Can be extended by localizations to provide target-specific behavior.
+        """
+        pass
+
+    @api.model
+    def action_audit_report(self, audit_id, action_xml_id):
+        action_ref = action_xml_id and self.env.ref(action_xml_id, raise_if_not_found=False)
+        if not action_ref:
+            return
+        action_dict = action_ref._get_action_dict()
+        if audit_id:
+            audit = self.env['account.return'].browse(audit_id)
+            additional_options = self.env.context.get('additional_options', {})
+            action_dict['params'] = {
+                'options': {
+                    'date': {
+                        'date_from': audit.date_from,
+                        'date_to': audit.date_to,
+                    },
+                    **additional_options,
+                },
+                'ignore_session': True,
+            }
+        return action_dict
+
     def action_open_document(self):
         return {
             "type": "ir.actions.act_url",
@@ -2910,23 +3575,11 @@ class AccountReturnCheckTemplate(models.Model):
     code = fields.Char(string="Code", default=lambda r: f"_template_check_{uuid.uuid4()}", copy=False)
     return_type = fields.Many2one(comodel_name='account.return.type', string="Tax Return/Audit", required=True)
     country_ids = fields.Many2many(comodel_name='res.country', string='Applicable Countries')
-    cycle = fields.Selection(
-        selection=[
-            ('regulatory_compliance', "Regulatory compliance"),
-            ('treasury_financing', "Treasury and financing"),
-            ('purchases', "Purchases"),
-            ('operating_expenses', "Operating expenses"),
-            ('sales', "Sales"),
-            ('inventory', "Inventory"),
-            ('fixed_assets', "Fixed assets"),
-            ('payroll', "Payroll"),
-            ('state', "Government"),
-            ('equity', "Equity"),
-            ('other', "Others"),
-        ],
+    cycle_id = fields.Many2one(
+        comodel_name='account.return.audit.cycle',
         string="Cycle",
-        default='other',
-        required=True
+        required=True,
+        default=lambda self: self.env.ref('account_reports.audit_cycle_other', raise_if_not_found=False),
     )
     type = fields.Selection(
         selection=CHECK_TYPES,
@@ -2951,6 +3604,7 @@ class AccountReturnCheckTemplate(models.Model):
             ('account.move', "Journal Entry"),
             ('account.bank.statement.line', "Bank Statement Line"),
             ('account.payment', "Payments"),
+            ('account.account', "Accounts"),
         ],
         string="Model",
     )
@@ -2969,6 +3623,12 @@ class AccountReturnCheckTemplate(models.Model):
             }
 
         return False
+
+    def _transform_custom_check_template_domain(self, domain):
+        """
+        Transform complex Python domains that cannot be represented directly in XML for specific check templates.
+        """
+        return domain
 
 
 class CheckActionExpressionTransformer(ast.NodeTransformer):
@@ -2989,3 +3649,17 @@ class CheckActionExpressionTransformer(ast.NodeTransformer):
     def visit_Call(self, node):
         if node.func.id in self.evaluation_context:
             return ast.Constant(self.evaluation_context[node.func.id](*self.get_call_args(node.args)))
+
+
+class AccountReturnAuditCycle(models.Model):
+    _name = 'account.return.audit.cycle'
+    _description = 'Account Return Audit Cycle'
+    _order = 'name, id'
+
+    name = fields.Char(string="Name", required=True, translate=True)
+    code = fields.Char(string="Code", required=True)
+
+    _code_uniq = models.Constraint(
+        'unique (code)',
+        'Audit cycles codes must be unique.',
+    )

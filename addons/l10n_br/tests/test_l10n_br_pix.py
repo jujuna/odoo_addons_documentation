@@ -7,13 +7,15 @@ from odoo.tests import tagged
 
 @tagged("post_install_l10n", "post_install", "-at_install")
 class TestL10nBrPix(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('br')
     def setUpClass(cls):
         super().setUpClass()
         cls.partner_bank = cls.env["res.partner.bank"].create(
             {
-                "acc_number": "123456789012345678",
+                "account_number": "123456789012345678",
                 "partner_id": cls.company_data["company"].partner_id.id,
                 "proxy_type": "br_random",
                 "proxy_value": "71d6c6e1-64ea-4a11-9560-a10870c40ca2",
@@ -49,6 +51,12 @@ class TestL10nBrPix(AccountTestInvoicingCommon):
         with self.assertRaises(ValidationError, msg="The random key"):
             self.partner_bank.proxy_value = "not a random key"
 
+        with self.assertRaises(ValidationError, msg="not a valid CPF"):
+            self.partner_bank.write({"proxy_type": "br_cpf_cnpj", "proxy_value": False})
+
+        with self.assertRaises(ValidationError, msg="not a valid random key"):
+            self.partner_bank.write({"proxy_type": "br_random", "proxy_value": False})
+
     def _get_qr_code_string(self):
         self.invoice.qr_code_method = "emv_qr"
         demo_payment_reference = "NFe TÉST 0001"  # É and spaces should be removed
@@ -67,14 +75,14 @@ class TestL10nBrPix(AccountTestInvoicingCommon):
     def test_get_qr_vals(self):
         self.assertEqual(
             self._get_qr_code_string(),
-            "00020101021226580014br.gov.bcb.pix013671d6c6e1-64ea-4a11-9560-a10870c40ca2520400005303986540512.305802BR5914COMPANY_1_DATA62150511NFeTEST000163044CCF",
+            "00020101021226580014br.gov.bcb.pix013671d6c6e1-64ea-4a11-9560-a10870c40ca2520400005303986540512.305802BR5912COMPANY1DATA62150511NFeTEST00016304A5C7",
         )
 
     def test_get_qr_vals_without_reference(self):
         self.partner_bank.include_reference = False
         self.assertEqual(
             self._get_qr_code_string(),
-            "00020101021226580014br.gov.bcb.pix013671d6c6e1-64ea-4a11-9560-a10870c40ca2520400005303986540512.305802BR5914COMPANY_1_DATA62070503***6304B27F",
+            "00020101021226580014br.gov.bcb.pix013671d6c6e1-64ea-4a11-9560-a10870c40ca2520400005303986540512.305802BR5912COMPANY1DATA62070503***6304F1E4",
         )
 
     def test_get_qr_vals_for_pos_default_qr(self):
@@ -82,7 +90,7 @@ class TestL10nBrPix(AccountTestInvoicingCommon):
         self.invoice.invoice_line_ids.price_unit = 0
         qr_code_str = (
             "00020101021226580014br.gov.bcb.pix013671d6c6e1-64ea-4a11-9560-"
-            "a10870c40ca25204000053039865802BR5914COMPANY_1_DATA62070503***63044FC8"
+            "a10870c40ca25204000053039865802BR5912COMPANY1DATA62070503***630490CA"
         )
         self.assertEqual(
             self._get_qr_code_string(),
@@ -93,4 +101,12 @@ class TestL10nBrPix(AccountTestInvoicingCommon):
             self._get_qr_code_string(),
             qr_code_str,
             "An invoice line of $0.01 shouldn't return the same code as $0.00",
+        )
+
+    def test_get_qr_vals_company_with_emoji(self):
+        self.partner_bank.include_reference = False
+        self.env.company.name = "Company with émoji 😇"
+        self.assertEqual(
+            self._get_qr_code_string(),
+            "00020101021226580014br.gov.bcb.pix013671d6c6e1-64ea-4a11-9560-a10870c40ca2520400005303986540512.305802BR5919COMPANY WITH EMOJI 62070503***63043984",
         )

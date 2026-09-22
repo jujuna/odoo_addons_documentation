@@ -1,19 +1,16 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Leads statistics and generation on social',
     'category': 'Marketing/Social Marketing',
-    'version': '1.0',
     'summary': 'Add crm UTM info on social',
     'description': """UTM and posts on crm""",
     'depends': ['social', 'crm'],
     'data': [
-        'security/ir.model.access.csv',
-        'data/social_crm_data.xml',
         'data/social_post_to_lead_templates.xml',
         'views/social_post_views.xml',
         'wizard/social_post_to_lead_views.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': True,
     'assets': {

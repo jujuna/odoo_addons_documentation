@@ -1,28 +1,27 @@
-import { Component, onWillStart, onWillRender } from "@odoo/owl";
-import { Field } from "@web/views/fields/field";
+import { Component, computed, onWillStart, useProps, proxy, t } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { user } from "@web/core/user";
+import { useService } from "@web/core/utils/hooks";
+import { Field } from "@web/views/fields/field";
 
 export class MoreInfo extends Component {
     static template = "hr_payroll.MoreInfo";
-    static props = {
-        slots: { type: Object, optional: true },
-    };
-    static defaultProps = {
-        slots: {},
-    };
+    props = useProps({
+        slots: t.object().optional({}),
+    });
+
+    allowedSlots = computed(() =>
+        this.computeMoreInfo(this.props.slots, this.cacheAllowedGroups)
+    );
 
     setup() {
         this.moreInfoCard = usePopover(MoreInfoCardPopover);
-        this.cacheAllowedGroups = [];
+        this.cacheAllowedGroups = proxy([]);
         onWillStart(async () => {
             if (Object.values(this.props.slots).some((slot) => slot.group)) {
                 await this.computeAllowedGroups(this.props.slots);
             }
-        });
-        onWillRender(() => {
-            this.computeMoreInfo(this.props.slots, this.cacheAllowedGroups);
         });
     }
 
@@ -44,13 +43,13 @@ export class MoreInfo extends Component {
             }
             return !slot.group || cacheAllowedGroups.includes(slot.group) ? [slotName, slot] : null;
         });
-        this.allowedSlots = Object.fromEntries(result.filter(Boolean));
+        return Object.fromEntries(result.filter(Boolean));
     }
 
     onClickMoreInfo(ev) {
         if (!this.moreInfoCard.isOpen) {
             this.moreInfoCard.open(ev.currentTarget, {
-                slots: this.allowedSlots,
+                slots: this.allowedSlots(),
             });
         }
     }
@@ -66,12 +65,17 @@ export class MoreInfoCardPopover extends Component {
         popover: "hr_payroll.MoreInfoCardPopover.popover",
         body: "hr_payroll.MoreInfoCardPopover.body",
     };
-    static props = {
-        slots: { type: Object, optional: true },
-        close: { type: Function, optional: true },
-    };
+    props = useProps({
+        slots: t.object().optional(),
+        close: t.function().optional(),
+    });
+
     static components = {
         Field,
         Dialog,
     };
+
+    setup() {
+        this.uiService = useService("ui");
+    }
 }

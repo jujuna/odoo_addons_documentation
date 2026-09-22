@@ -1,66 +1,24 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { click, queryOne } from "@odoo/hoot-dom";
+import { click, queryAll, queryOne } from "@odoo/hoot-dom";
 import { animationFrame, mockDate, advanceTime, runAllTimers } from "@odoo/hoot-mock";
-import {
-    defineModels,
-    defineParams,
-    fields,
-    models,
-    onRpc,
-    contains,
-} from "@web/../tests/web_test_helpers";
+import { defineModels, defineParams, onRpc, contains } from "@web/../tests/web_test_helpers";
 import {
     getCell,
     getGridContent,
     mountGanttView,
     SELECTORS,
 } from "@web_gantt/../tests/web_gantt_test_helpers";
+import {
+    Attendances,
+    Employees,
+    mountGanttViewWithProgressBars,
+} from "@hr_attendance_gantt/../tests/attendance_gantt_test_helpers";
 
 describe.current.tags("desktop");
 
-class Attendances extends models.Model {
-    name = fields.Char();
-    check_in = fields.Datetime({ string: "Start Date" });
-    check_out = fields.Datetime({ string: "Stop Date" });
-    user_id = fields.Many2one({ string: "Attendance Of", relation: "users" });
-
-    _records = [
-        {
-            id: 1,
-            check_in: "2018-12-10 09:00:00",
-            check_out: "2018-12-10 12:00:00",
-            name: "Attendance 1",
-            user_id: 1,
-        },
-        {
-            id: 2,
-            check_in: "2018-12-10 13:00:00",
-            check_out: false,
-            name: "Attendance 2",
-            user_id: 1,
-        },
-        {
-            id: 3,
-            check_in: "2018-12-10 08:00:00",
-            check_out: "2018-12-10 16:00:00",
-            name: "Attendance 3",
-            user_id: 2,
-        },
-    ];
-}
-
-class Users extends models.Model {
-    name = fields.Char();
-
-    _records = [
-        { id: 1, name: "User 1" },
-        { id: 2, name: "User 2" },
-    ];
-}
-
 defineMailModels();
-defineModels([Attendances, Users]);
+defineModels([Attendances, Employees]);
 
 beforeEach(() => {
     defineParams({
@@ -74,7 +32,7 @@ test("Open Ended record today", async () => {
     mockDate("2018-12-10 16:00:00", +0);
     await mountGanttView({
         resModel: "attendances",
-        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='user_id' date_stop="check_out"/>`,
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='employee_id' date_stop="check_out"/>`,
         context: {
             default_start_date: "2018-12-10",
             default_stop_date: "2018-12-10",
@@ -86,27 +44,27 @@ test("Open Ended record today", async () => {
         {
             pills: [
                 {
-                    colSpan: "9am December 10, 2018 -> 11am December 10, 2018",
+                    colSpan: "9am Monday, December 10, 2018 -> 11am Monday, December 10, 2018",
                     level: 0,
                     title: "Attendance 1",
                 },
                 {
-                    colSpan: "1pm December 10, 2018 -> 4pm December 10, 2018",
+                    colSpan: "1pm Monday, December 10, 2018 -> 4pm Monday, December 10, 2018",
                     level: 0,
                     title: "Attendance 2",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
         {
             pills: [
                 {
-                    colSpan: "8am December 10, 2018 -> 3pm December 10, 2018",
+                    colSpan: "8am Monday, December 10, 2018 -> 3pm Monday, December 10, 2018",
                     level: 0,
                     title: "Attendance 3",
                 },
             ],
-            title: "User 2",
+            title: "Employee 2",
         },
     ]);
 });
@@ -115,7 +73,7 @@ test("Future Open Ended record not displayed", async () => {
     mockDate("2018-12-10 12:00:00", +0);
     await mountGanttView({
         resModel: "attendances",
-        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='user_id' date_stop="check_out"/>`,
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='employee_id' date_stop="check_out"/>`,
         context: {
             default_start_date: "2018-12-10",
             default_stop_date: "2018-12-10",
@@ -127,22 +85,22 @@ test("Future Open Ended record not displayed", async () => {
         {
             pills: [
                 {
-                    colSpan: "9am December 10, 2018 -> 11am December 10, 2018",
+                    colSpan: "9am Monday, December 10, 2018 -> 11am Monday, December 10, 2018",
                     level: 0,
                     title: "Attendance 1",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
         {
             pills: [
                 {
-                    colSpan: "8am December 10, 2018 -> 3pm December 10, 2018",
+                    colSpan: "8am Monday, December 10, 2018 -> 3pm Monday, December 10, 2018",
                     level: 0,
                     title: "Attendance 3",
                 },
             ],
-            title: "User 2",
+            title: "Employee 2",
         },
     ]);
 });
@@ -151,7 +109,7 @@ test("Open Ended record spanning multiple days", async () => {
     mockDate("2018-12-12 14:00:00", +0);
     await mountGanttView({
         resModel: "attendances",
-        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='user_id' date_stop="check_out"/>`,
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='employee_id' date_stop="check_out"/>`,
         context: {
             default_start_date: "2018-12-12",
             default_stop_date: "2018-12-12",
@@ -163,12 +121,12 @@ test("Open Ended record spanning multiple days", async () => {
         {
             pills: [
                 {
-                    colSpan: "12am December 12, 2018 -> 2pm December 12, 2018",
+                    colSpan: "12am Wednesday, December 12, 2018 -> 2pm Wednesday, December 12, 2018",
                     level: 0,
                     title: "Attendance 2",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
     ]);
     await click(queryOne(SELECTORS.previousButton));
@@ -180,12 +138,12 @@ test("Open Ended record spanning multiple days", async () => {
         {
             pills: [
                 {
-                    colSpan: "12am December 11, 2018 -> 11pm December 11, 2018",
+                    colSpan: "12am Tuesday, December 11, 2018 -> 11pm Tuesday, December 11, 2018",
                     level: 0,
                     title: "Attendance 2",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
     ]);
     await click(queryOne(SELECTORS.previousButton));
@@ -197,27 +155,27 @@ test("Open Ended record spanning multiple days", async () => {
         {
             pills: [
                 {
-                    colSpan: "9am December 10, 2018 -> 11am December 10, 2018",
+                    colSpan: "9am Monday, December 10, 2018 -> 11am Monday, December 10, 2018",
                     level: 0,
                     title: "Attendance 1",
                 },
                 {
-                    colSpan: "1pm December 10, 2018 -> 11pm December 10, 2018",
+                    colSpan: "1pm Monday, December 10, 2018 -> 11pm Monday, December 10, 2018",
                     level: 0,
                     title: "Attendance 2",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
         {
             pills: [
                 {
-                    colSpan: "8am December 10, 2018 -> 3pm December 10, 2018",
+                    colSpan: "8am Monday, December 10, 2018 -> 3pm Monday, December 10, 2018",
                     level: 0,
                     title: "Attendance 3",
                 },
             ],
-            title: "User 2",
+            title: "Employee 2",
         },
     ]);
 });
@@ -230,20 +188,20 @@ test("Concurrent open-ended records", async () => {
             check_in: "2018-12-20 08:00:00",
             check_out: false,
             name: "Attendance 4",
-            user_id: 1,
+            employee_id: 1,
         },
         {
             id: 5,
             check_in: "2018-12-20 09:00:00",
             check_out: false,
             name: "Attendance 5",
-            user_id: 1,
+            employee_id: 1,
         },
     ];
 
     await mountGanttView({
         resModel: "attendances",
-        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='user_id' date_stop="check_out"/>`,
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='employee_id' date_stop="check_out"/>`,
         context: {
             default_start_date: "2018-12-20",
             default_stop_date: "2018-12-20",
@@ -255,17 +213,17 @@ test("Concurrent open-ended records", async () => {
         {
             pills: [
                 {
-                    colSpan: "8am December 20, 2018 -> 3pm December 20, 2018",
+                    colSpan: "8am Thursday, December 20, 2018 -> 3pm Thursday, December 20, 2018",
                     level: 0,
                     title: "Attendance 4",
                 },
                 {
-                    colSpan: "9am December 20, 2018 -> 3pm December 20, 2018",
+                    colSpan: "9am Thursday, December 20, 2018 -> 3pm Thursday, December 20, 2018",
                     level: 1,
                     title: "Attendance 5",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
     ]);
 });
@@ -278,13 +236,13 @@ test("Open ended record Precision", async () => {
             check_in: "2018-12-20 08:00:00",
             check_out: false,
             name: "Attendance 4",
-            user_id: 1,
+            employee_id: 1,
         },
     ];
 
     await mountGanttView({
         resModel: "attendances",
-        arch: `<gantt js_class="attendance_gantt" date_start="check_in" precision="{'day': 'hour:quarter'}" default_group_by='user_id' date_stop="check_out"/>`,
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" precision="{'day': 'hour:quarter'}" default_group_by='employee_id' date_stop="check_out"/>`,
         context: {
             default_start_date: "2018-12-20",
             default_stop_date: "2018-12-20",
@@ -296,12 +254,12 @@ test("Open ended record Precision", async () => {
         {
             pills: [
                 {
-                    colSpan: "8am December 20, 2018 -> 3pm (3/4) December 20, 2018",
+                    colSpan: "8am Thursday, December 20, 2018 -> 3pm (3/4) Thursday, December 20, 2018",
                     level: 0,
                     title: "Attendance 4",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
     ]);
 });
@@ -314,13 +272,13 @@ test("Open ended record updated correctly", async () => {
             check_in: "2018-12-20 08:00:00",
             check_out: false,
             name: "Attendance 4",
-            user_id: 1,
+            employee_id: 1,
         },
     ];
 
     await mountGanttView({
         resModel: "attendances",
-        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='user_id' date_stop="check_out"/>`,
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='employee_id' date_stop="check_out"/>`,
         context: {
             default_start_date: "2018-12-20",
             default_stop_date: "2018-12-20",
@@ -332,12 +290,12 @@ test("Open ended record updated correctly", async () => {
         {
             pills: [
                 {
-                    colSpan: "8am December 20, 2018 -> 2pm December 20, 2018",
+                    colSpan: "8am Thursday, December 20, 2018 -> 2pm Thursday, December 20, 2018",
                     level: 0,
                     title: "Attendance 4",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
     ]);
     mockDate("2018-12-20 18:00:00", +0);
@@ -356,12 +314,12 @@ test("Open ended record updated correctly", async () => {
         {
             pills: [
                 {
-                    colSpan: `8am December 20, 2018 -> ${endHour}pm December 20, 2018`,
+                    colSpan: `8am Thursday, December 20, 2018 -> ${endHour}pm Thursday, December 20, 2018`,
                     level: 0,
                     title: "Attendance 4",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
     ]);
 });
@@ -374,20 +332,20 @@ test("Future Open ended record not shown before it happens and appears after sta
             check_in: "2018-11-02 09:00:00",
             check_out: "2018-11-02 12:00:00",
             name: "Attendance 5",
-            user_id: 1,
+            employee_id: 1,
         },
         {
             id: 6,
             check_in: "2018-11-02 14:00:00",
             check_out: false,
             name: "Attendance 6",
-            user_id: 1,
+            employee_id: 1,
         },
     ];
 
     await mountGanttView({
         resModel: "attendances",
-        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='user_id' date_stop="check_out"/>`,
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='employee_id' date_stop="check_out"/>`,
         context: {
             default_start_date: "2018-11-02",
             default_stop_date: "2018-11-02",
@@ -399,12 +357,12 @@ test("Future Open ended record not shown before it happens and appears after sta
         {
             pills: [
                 {
-                    colSpan: "9am November 2, 2018 -> 11am November 2, 2018",
+                    colSpan: "9am Friday, November 2, 2018 -> 11am Friday, November 2, 2018",
                     level: 0,
                     title: "Attendance 5",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
     ]);
     mockDate("2018-11-02 17:00:00", +0);
@@ -420,17 +378,17 @@ test("Future Open ended record not shown before it happens and appears after sta
         {
             pills: [
                 {
-                    colSpan: "9am November 2, 2018 -> 11am November 2, 2018",
+                    colSpan: "9am Friday, November 2, 2018 -> 11am Friday, November 2, 2018",
                     level: 0,
                     title: "Attendance 5",
                 },
                 {
-                    colSpan: "2pm November 2, 2018 -> 5pm November 2, 2018",
+                    colSpan: "2pm Friday, November 2, 2018 -> 5pm Friday, November 2, 2018",
                     level: 0,
                     title: "Attendance 6",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
     ]);
 });
@@ -443,28 +401,28 @@ test("Domain correctly applied when allow_open_ended=1.", async () => {
             check_in: "2018-11-02 15:00:00",
             check_out: "2018-11-02 19:00:00",
             name: "Attendance 7",
-            user_id: 2,
+            employee_id: 2,
         },
         {
             id: 8,
             check_in: "2018-11-02 14:00:00",
             check_out: false,
             name: "Attendance 8",
-            user_id: 1,
+            employee_id: 1,
         },
         {
             id: 9,
             check_in: "2018-11-02 08:00:00",
             check_out: "2018-11-02 14:00:00",
             name: "Attendance 9",
-            user_id: 1,
+            employee_id: 1,
         },
     ];
 
     await mountGanttView({
         resModel: "attendances",
-        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='user_id' date_stop="check_out"/>`,
-        domain: ["|", ["user_id", "=", 2], ["check_out", "=", false]],
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='employee_id' date_stop="check_out"/>`,
+        domain: ["|", ["employee_id", "=", 2], ["check_out", "=", false]],
         context: {
             default_start_date: "2018-11-02",
             default_stop_date: "2018-11-02",
@@ -476,22 +434,22 @@ test("Domain correctly applied when allow_open_ended=1.", async () => {
         {
             pills: [
                 {
-                    colSpan: "2pm November 2, 2018 -> 7pm November 2, 2018",
+                    colSpan: "2pm Friday, November 2, 2018 -> 7pm Friday, November 2, 2018",
                     level: 0,
                     title: "Attendance 8",
                 },
             ],
-            title: "User 1",
+            title: "Employee 1",
         },
         {
             pills: [
                 {
-                    colSpan: "3pm November 2, 2018 -> 6pm November 2, 2018",
+                    colSpan: "3pm Friday, November 2, 2018 -> 6pm Friday, November 2, 2018",
                     level: 0,
                     title: "Attendance 7",
                 },
             ],
-            title: "User 2",
+            title: "Employee 2",
         },
     ]);
 });
@@ -505,7 +463,7 @@ test("Dragging half column in week scale preserves checkout context", async () =
                 <field name="name"/>
                 <field name="check_in"/>
                 <field name="check_out"/>
-                <field name="user_id"/>
+                <field name="employee_id"/>
             </form>
         `,
     };
@@ -515,7 +473,7 @@ test("Dragging half column in week scale preserves checkout context", async () =
     });
     await mountGanttView({
         resModel: "attendances",
-        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='user_id' default_scale="week" date_stop="check_out" plan="false"/>`,
+        arch: `<gantt js_class="attendance_gantt" date_start="check_in" default_group_by='employee_id' default_scale="week" date_stop="check_out" plan="false"/>`,
         context: {
             default_start_date: "2025-08-01",
             default_stop_date: "2025-08-07",
@@ -526,4 +484,61 @@ test("Dragging half column in week scale preserves checkout context", async () =
     await runAllTimers(); // Pointer move is subjected to throttleForAnimation in gantt
     await drop();
     await animationFrame();
+});
+
+test("Progress bar shown with correct label and color", async () => {
+    mockDate("2018-12-10 16:00:00", +0);
+    await mountGanttViewWithProgressBars({
+        1: { value: 6, max_value: 8 },
+        2: { value: 10, max_value: 8 },
+    });
+
+    // both employees should have their progress bar shown.
+    expect(SELECTORS.progressBar).toHaveCount(2);
+
+    const [pb1, pb2] = queryAll(SELECTORS.progressBar);
+    // below max, text color should be normal
+    expect(pb1.querySelector("span")).not.toHaveClass("bg-warning");
+    // overtime, should show as warning/orange
+    expect(pb2.querySelector("span")).toHaveClass("bg-warning");
+
+    // check that progress bars are filled corectly
+    expect(queryAll(SELECTORS.progressBarBackground).map((el) => el.style.width)).toEqual([
+        "75%",
+        "100%",
+    ]);
+
+    // below max shows "X left", overtime shows "+Y"
+    const [label1, label2] = queryAll(SELECTORS.progressBarForeground);
+    expect(label1.textContent).toInclude("6h / 8h");
+    expect(label1.textContent).toInclude("2h left");
+    expect(label2.textContent).toInclude("10h / 8h");
+    expect(label2.textContent).toInclude("+2h");
+
+    // a progress bar label that is at success status should not be colored
+    expect(label1).not.toHaveClass("text-warning");
+    expect(label1).not.toHaveClass("text-success");
+
+    // when there is overtime, the label is colored in orange (warning)
+    expect(label2).toHaveClass("text-warning");
+});
+
+test("Progress bar shown for employees without attendances", async () => {
+    mockDate("2018-12-10 16:00:00", +0);
+    await mountGanttViewWithProgressBars({
+        // employee with no attendances at all
+        1: { value: 0, max_value: 8 },
+        2: { value: 4, max_value: 8 },
+    });
+
+    // the progress bar must be shown but empty
+    expect(SELECTORS.progressBar).toHaveCount(2);
+    const [emptyBar] = queryAll(SELECTORS.progressBar);
+    expect(emptyBar.querySelector("span").style.width).toBe("0%");
+
+    // an empty employee is not considered a warning. It stays at "success"
+    // (i.e. no color)
+    const [emptyLabel] = queryAll(SELECTORS.progressBarForeground);
+    expect(emptyLabel.textContent).toEqual("0h / 8h");
+    expect(emptyLabel).not.toHaveClass("text-warning");
 });

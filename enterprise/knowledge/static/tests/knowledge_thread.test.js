@@ -1,13 +1,14 @@
 import { defineKnowledgeModels } from "@knowledge/../tests/knowledge_test_helpers";
-import { click, start, startServer } from "@mail/../tests/mail_test_helpers";
+import { click, openMessagingMenu, start, startServer, MENU_ACTIVE_IDS } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
-import { asyncStep, mockService, serverState, waitForSteps } from "@web/../tests/web_test_helpers";
+import { mockService, serverState } from "@web/../tests/web_test_helpers";
 
 describe.current.tags("desktop");
 defineKnowledgeModels();
 
 test("Expand article.thread opens linked article", async () => {
     const pyEnv = await startServer();
+    pyEnv["res.users"].write(serverState.userId, { notification_type: "inbox" });
     const articleId = pyEnv["knowledge.article"].create({
         name: "Thread tests",
         body: `
@@ -35,11 +36,11 @@ test("Expand article.thread opens linked article", async () => {
         doAction(action, params) {
             expect(Boolean(params?.additionalContext?.res_id)).toBe(true);
             expect(action).toBe("knowledge.ir_actions_server_knowledge_home_page");
-            asyncStep("knowledge_action_called");
+            expect.step("knowledge_action_called");
         },
     });
     await start();
-    await click(".o-mail-DiscussSystray-class .fa-comments");
+    await openMessagingMenu(MENU_ACTIVE_IDS.NOTIFICATION);
     await click(".o-mail-NotificationItem");
-    await waitForSteps(["knowledge_action_called"]);
+    await expect.waitForSteps(["knowledge_action_called"]);
 });

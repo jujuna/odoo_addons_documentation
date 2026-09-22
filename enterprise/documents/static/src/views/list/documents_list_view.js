@@ -4,7 +4,7 @@ import { listView } from "@web/views/list/list_view";
 import { DocumentsControlPanel } from "../search/documents_control_panel";
 import { DocumentsListController } from "./documents_list_controller";
 import { DocumentsListModel } from "./documents_list_model";
-import { DocumentsSecondaryListRenderer, DocumentsListRenderer } from "./documents_list_renderer";
+import { DocumentsListRenderer, DocumentsListRendererCommon } from "./documents_list_renderer";
 import { DocumentsSearchModel } from "../search/documents_search_model";
 import { DocumentsSearchPanel } from "../search/documents_search_panel";
 
@@ -15,13 +15,14 @@ export const DocumentsListView = Object.assign({}, listView, {
     Controller: DocumentsListController,
     Model: DocumentsListModel,
     Renderer: DocumentsListRenderer,
+    buttonTemplate: "documents.DocumentsListView.Buttons",
     searchMenuTypes: ["filter", "groupBy", "favorite"],
 });
 
 registry.category("views").add("documents_list", DocumentsListView);
 
 export const DocumentsListViewSecondary = Object.assign({}, DocumentsListView, {
-    Renderer: DocumentsSecondaryListRenderer,
+    Renderer: DocumentsListRendererCommon,
 });
 
 registry.category("views").add("documents_list_secondary", DocumentsListViewSecondary);

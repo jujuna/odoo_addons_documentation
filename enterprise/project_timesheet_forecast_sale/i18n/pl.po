@@ -10,14 +10,15 @@
 # Łukasz Grzenkowicz <lukasz.grzenkowicz@gmail.com>, 2022
 # Tadeusz Karpiński <tadeuszkarpinski@gmail.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-10-17 13:22+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Polish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:56+0000\n"
+"PO-Revision-Date: 2026-09-18 02:35+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
 "project_timesheet_forecast_sale/pl/>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -26,13 +27,44 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
 "(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
 "n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: project_timesheet_forecast_sale
+#: model:ir.module.module,description:base.module_project_timesheet_forecast_sale
+msgid ""
+"\n"
+"Compare timesheets and forecast for your projects.\n"
+"==================================================\n"
+"\n"
+"In your project plan, you can compare your timesheets and your forecast to "
+"better schedule your resources.\n"
+msgstr ""
 
 #. module: project_timesheet_forecast_sale
 #. odoo-python
 #: code:addons/project_timesheet_forecast_sale/models/project_project.py:0
 msgid "%(name)s's Timesheets and Planning Analysis"
 msgstr "%(name)s Arkusze czasu pracy i analiza planowania"
+
+#. module: project_timesheet_forecast_sale
+#: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__effective_billable_hours
+msgid "Actual Billable Time"
+msgstr ""
+
+#. module: project_timesheet_forecast_sale
+#: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__effective_margin
+msgid "Actual Margin"
+msgstr ""
+
+#. module: project_timesheet_forecast_sale
+#: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__effective_non_billable_hours
+msgid "Actual Non-Billable Time"
+msgstr ""
+
+#. module: project_timesheet_forecast_sale
+#: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__effective_revenues
+msgid "Actual Revenues"
+msgstr ""
 
 #. module: project_timesheet_forecast_sale
 #: model:ir.model,name:project_timesheet_forecast_sale.model_account_analytic_line
@@ -42,12 +74,22 @@ msgstr "Pozycja analityczna"
 #. module: project_timesheet_forecast_sale
 #: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_planning_analysis_report__billable_allocated_hours
 msgid "Billable Time Allocated"
+msgstr "Przydzielony czas rozliczeniowy"
+
+#. module: project_timesheet_forecast_sale
+#: model:ir.module.module,shortdesc:base.module_project_timesheet_forecast_sale
+msgid "Compare timesheets and forecast for your projects"
 msgstr ""
 
 #. module: project_timesheet_forecast_sale
 #: model:planning.role,name:project_timesheet_forecast_sale.planning_role_consultant
 msgid "Consultant"
 msgstr "Konsultant"
+
+#. module: project_timesheet_forecast_sale
+#: model:ir.model,website_form_label:project_timesheet_forecast_sale.model_planning_slot
+msgid "Create a Shift"
+msgstr ""
 
 #. module: project_timesheet_forecast_sale
 #: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_account_analytic_line__display_name
@@ -58,26 +100,6 @@ msgstr "Konsultant"
 #: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_sale_order_line__display_name
 msgid "Display Name"
 msgstr "Nazwa wyświetlana"
-
-#. module: project_timesheet_forecast_sale
-#: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__effective_billable_hours
-msgid "Effective Billable Time"
-msgstr ""
-
-#. module: project_timesheet_forecast_sale
-#: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__effective_margin
-msgid "Effective Margin"
-msgstr ""
-
-#. module: project_timesheet_forecast_sale
-#: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__effective_non_billable_hours
-msgid "Effective Non-Billable Time"
-msgstr "Rzeczywisty czas niepodlegający rozliczeniu"
-
-#. module: project_timesheet_forecast_sale
-#: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__effective_revenues
-msgid "Effective Revenues"
-msgstr ""
 
 #. module: project_timesheet_forecast_sale
 #: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_account_analytic_line__id
@@ -97,12 +119,12 @@ msgstr "Przypisany czas niepodlegający rozliczeniu"
 #. module: project_timesheet_forecast_sale
 #: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__planned_billable_hours
 msgid "Planned Billable Time"
-msgstr ""
+msgstr "Planowany czas rozliczeniowy"
 
 #. module: project_timesheet_forecast_sale
 #: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__planned_margin
 msgid "Planned Margin"
-msgstr ""
+msgstr "Planowana marża"
 
 #. module: project_timesheet_forecast_sale
 #: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__planned_non_billable_hours
@@ -111,12 +133,12 @@ msgstr "Zaplanowany czas niepodlegający rozliczeniu"
 
 #. module: project_timesheet_forecast_sale
 #: model:ir.model.fields,field_description:project_timesheet_forecast_sale.field_project_timesheet_forecast_report_analysis__planned_revenues
-msgid "Planned Revenues"
+msgid "Planned Revenue"
 msgstr ""
 
 #. module: project_timesheet_forecast_sale
 #: model:ir.model,name:project_timesheet_forecast_sale.model_project_timesheet_forecast_report_analysis
-msgid "Planning / Timesheets Analysis"
+msgid "Planning & Timesheets Analysis"
 msgstr ""
 
 #. module: project_timesheet_forecast_sale
@@ -160,33 +182,6 @@ msgid "Sum of hours allocated to shifts not linked to a SOL."
 msgstr "Suma godzin przydzielonych do zmian niepowiązanych z SOL."
 
 #. module: project_timesheet_forecast_sale
-#. odoo-python
-#: code:addons/project_timesheet_forecast_sale/models/project_project.py:0
-msgid "Timesheets and Planning"
-msgstr "Arkusze czasu i planowanie"
-
-#. module: project_timesheet_forecast_sale
-#: model_terms:ir.ui.view,arch_db:project_timesheet_forecast_sale.project_timesheet_forecast_view_kanban_inherit_sale_timesheet
+#: model_terms:ir.ui.view,arch_db:project_timesheet_forecast_sale.project_timesheet_forecast_view_card_inherit_sale_timesheet
 msgid "Timesheets and Planning Analysis"
 msgstr "Arkusze czasu i analiza planowania"
-
-#~ msgid "Analytic Account"
-#~ msgstr "Konto analityczne"
-
-#~ msgid "Billable Hours Allocated"
-#~ msgstr "Przydzielone godziny rozliczeniowe"
-
-#~ msgid "Display Planning Timesheet Analysis"
-#~ msgstr "Planowanie wyświetlania Analiza arkusza czasu"
-
-#~ msgid "Non-billable Hours Allocated"
-#~ msgstr "Przydzielone godziny nie-rozliczeniowe"
-
-#~ msgid "Planned"
-#~ msgstr "Zaplanowane"
-
-#~ msgid "Project Update"
-#~ msgstr "Aktualizacja projektu"
-
-#~ msgid "Should we display the planning and timesheet analysis button?"
-#~ msgstr "Czy należy wyświetlić przycisk planowania i analizy czasu pracy?"

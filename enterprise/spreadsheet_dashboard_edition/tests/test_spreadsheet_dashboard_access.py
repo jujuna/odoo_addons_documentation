@@ -1,9 +1,10 @@
 import base64
 
 from odoo import Command
-from odoo.tests.common import TransactionCase, new_test_user
+from odoo.tests.common import tagged, TransactionCase, new_test_user
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class SpreadsheetDashboardAccess(TransactionCase):
 
     @classmethod
@@ -38,13 +39,13 @@ class SpreadsheetDashboardAccess(TransactionCase):
                 "dashboard_group_id": dashboard_group.id,
             }
         )
-        dashboard.dispatch_spreadsheet_message({
+        dashboard._dispatch_spreadsheet_message({
             "type": "REMOTE_REVISION",
             "serverRevisionId": "rev-1-id",
             "nextRevisionId": "rev-2-id",
             "commands": [],
         })
-        dashboard.dispatch_spreadsheet_message({
+        dashboard._dispatch_spreadsheet_message({
             "type": "SNAPSHOT",
             "serverRevisionId": "rev-2-id",
             "nextRevisionId": "rev-3-id",

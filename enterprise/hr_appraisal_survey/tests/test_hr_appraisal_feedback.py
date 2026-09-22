@@ -19,9 +19,15 @@ class TestHrAppraisalFeedback(TransactionCase):
             'notification_type': 'email',
         })
 
+        self.user_work_contact = self.env['res.partner'].create({
+            'name': 'Me Myself and I',
+            'email': 'mymyselfandi@example.com',
+        })
+
         self.user_employee = self.env['hr.employee'].create({
             'name': 'Me Myself and I',
-            'user_id': self.user.id
+            'user_id': self.user.id,
+            'work_contact_id': self.user_work_contact.id
         })
         self.test_employee = self.env['hr.employee'].create({
             'name': 'John Smith'
@@ -47,7 +53,7 @@ class TestHrAppraisalFeedback(TransactionCase):
     def test_appraisal_feedback_deadline(self):
         feedback = self.env['appraisal.ask.feedback'].create({
             'appraisal_id': self.appraisal.id,
-            'employee_ids': [self.user_employee.id],
+            'partner_ids': [self.user_employee.work_contact_id.id],
             'deadline': date.today(),
             'survey_template_id': self.appraisal_survey.id,
         })

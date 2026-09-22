@@ -1,4 +1,4 @@
-from odoo import fields, models, _
+from odoo import fields, models
 from odoo.fields import Domain
 
 
@@ -13,7 +13,7 @@ class WhatsappMessage(models.Model):
     )
 
     def set_clicked(self):
-        self.write({'links_click_datetime': fields.Datetime.now()})
+        self.write({'links_click_datetime': self.env.cr.now()})
         if self.marketing_trace_ids:
             self.marketing_trace_ids.process_event('whatsapp_click')
         return self
@@ -22,9 +22,9 @@ class WhatsappMessage(models.Model):
         """Process statuses of whatsapp messages like: 'send', 'delivered' and 'read'."""
         processed_msgs = super()._process_statuses(value)
         status_mapping = {
-            'send': 'whatsapp_send',
-            'delivered': 'whatsapp_delivered',
-            'read': 'whatsapp_read',
+            # 'send': 'whatsapp_send',  # unsupported at activity level
+            # 'delivered': 'whatsapp_delivered',  # unsupported at activity level
+            'read': 'whatsapp_open',
         }
 
         for processed_msg in processed_msgs:
@@ -37,7 +37,7 @@ class WhatsappMessage(models.Model):
     def _get_whatsapp_gc_domain(self):
         return Domain.AND([
             super()._get_whatsapp_gc_domain(),
-            [('marketing_trace_ids', '!=', 'False')],
+            [('marketing_trace_ids', '!=', False)],
         ])
 
     def _handle_error(self, failure_type=False, whatsapp_error_code=False, error_message=False):
@@ -45,11 +45,7 @@ class WhatsappMessage(models.Model):
         traces = self.sudo().marketing_trace_ids
         if not traces:
             return
-        traces.write({
-                'state': 'canceled',
-                'schedule_date': self.env.cr.now(),
-                'state_msg': _('WhatsApp canceled')
-        })
+        traces.action_set_canceled(message=self.env._('WhatsApp canceled'))
         if self.state == 'bounced':
             for trace in traces:
-                trace.process_event('whatsapp_bounced')
+                trace.process_event('whatsapp_bounce')

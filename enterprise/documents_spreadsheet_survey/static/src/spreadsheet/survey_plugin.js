@@ -1,18 +1,18 @@
-import { astToFormula, helpers, registries, EvaluationError } from "@odoo/o-spreadsheet";
-import { OdooUIPlugin } from "@spreadsheet/plugins";
-import { _t } from "@web/core/l10n/translation";
+import { astToFormula, helpers, registries } from "@odoo/o-spreadsheet";
+import { OdooEvaluationPlugin } from "@spreadsheet/plugins";
 
-const { getFunctionsFromTokens, toNumber } = helpers;
+const { toNumber } = helpers;
+const { evaluationPluginRegistry } = registries;
 
-export class SurveyPlugin extends OdooUIPlugin {
+export class SurveyPlugin extends OdooEvaluationPlugin {
     static getters = [
         "getSurveyResults",
         "getSurveyIdFromPosition",
         "getSurveyUserInputIdFromPosition",
     ];
-    constructor(config) {
-        super(config);
-        this.serverData = config.custom.odooDataProvider?.serverData;
+
+    get serverData() {
+        return this.getters.getServerData();
     }
 
     getSurveyResults(surveyId) {
@@ -21,9 +21,6 @@ export class SurveyPlugin extends OdooUIPlugin {
             "get_survey_results_for_spreadsheet",
             surveyId
         );
-        if (!data) {
-            throw new EvaluationError(_t("Survey %s not available", surveyId));
-        }
         return data;
     }
 
@@ -34,10 +31,10 @@ export class SurveyPlugin extends OdooUIPlugin {
             return undefined;
         }
         const sheetId = position.sheetId;
-        if (cell && cell.isFormula && cell.content.startsWith("=ODOO.SURVEY(")) {
-            const surveyFunction = getFunctionsFromTokens(cell.compiledFormula.tokens, [
+        if (cell && cell.isFormula && cell.compiledFormula.toFormulaString(this.getters).startsWith("=ODOO.SURVEY(")) {
+            const surveyFunction = cell.compiledFormula.getFunctionsFromTokens([
                 "ODOO.SURVEY",
-            ])[0];
+            ], this.getters)[0];
             if (surveyFunction) {
                 try {
                     const content = astToFormula(surveyFunction.args[0]);
@@ -54,10 +51,11 @@ export class SurveyPlugin extends OdooUIPlugin {
 
     getSurveyUserInputIdFromPosition(position) {
         const surveyId = this.getSurveyIdFromPosition(position);
-        if (!surveyId) {
+        const surveyResults = this.getSurveyResults(surveyId);
+        if (!surveyId || !surveyResults) {
             return undefined;
         }
-        const surveyUserInputIds = this.getSurveyResults(surveyId).user_input_ids;
+        const surveyUserInputIds = surveyResults.user_input_ids;
         const surveyCell = this.getters.getCorrespondingFormulaCell(position);
         const surveyCellPosition = this.getters.getCellPosition(surveyCell.id);
         const userInputIndex = position.row - surveyCellPosition.row - 1;
@@ -65,4 +63,4 @@ export class SurveyPlugin extends OdooUIPlugin {
     }
 }
 
-registries.featurePluginRegistry.add("SurveyPlugin", SurveyPlugin);
+evaluationPluginRegistry.add("SurveyPlugin", SurveyPlugin);

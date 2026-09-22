@@ -1,6 +1,5 @@
 {
     'name': 'Guinea-Bissau - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Guinea-Bissau
 ============================================

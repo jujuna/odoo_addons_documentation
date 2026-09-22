@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import logging
 import requests
 from datetime import datetime, timedelta
@@ -9,6 +7,7 @@ from urllib.parse import quote
 
 from odoo import _, models, fields, api
 from odoo.exceptions import UserError
+from odoo.tools import BinaryBytes
 from odoo.tools.urls import urljoin as url_join
 
 from odoo.addons.social.controllers.main import SocialValidationException
@@ -22,7 +21,9 @@ class SocialAccount(models.Model):
 
     linkedin_account_urn = fields.Char('LinkedIn Account URN', readonly=True, help='LinkedIn Account URN')
     linkedin_account_id = fields.Char('LinkedIn Account ID', compute='_compute_linkedin_account_id')
-    linkedin_access_token = fields.Char('LinkedIn access token', readonly=True, help='The access token is used to perform request to the REST API')
+    linkedin_access_token = fields.Char('LinkedIn access token', readonly=True, help='The access token is used to perform request to the REST API',
+        groups=fields.NO_ACCESS)
+    linkedin_is_personal_account = fields.Boolean('LinkedIn Is Personal Account', compute='_compute_linkedin_is_personal_account')
 
     @api.depends('linkedin_account_urn')
     def _compute_linkedin_account_id(self):
@@ -36,12 +37,18 @@ class SocialAccount(models.Model):
             else:
                 social_account.linkedin_account_id = False
 
+    @api.depends('linkedin_is_personal_account')
     def _compute_stats_link(self):
         linkedin_accounts = self._filter_by_media_types(['linkedin'])
         super(SocialAccount, (self - linkedin_accounts))._compute_stats_link()
 
         for account in linkedin_accounts:
-            account.stats_link = 'https://www.linkedin.com/company/%s/admin/analytics/visitors/' % account.linkedin_account_id
+            if not account.linkedin_is_personal_account:
+                account.user_link = f'https://www.linkedin.com/company/{account.linkedin_account_id}'
+                account.stats_link = f'{account.user_link}/admin/analytics/visitors/'
+            else:
+                account.user_link = False
+                account.stats_link = False
 
     def _compute_statistics(self):
         linkedin_accounts = self._filter_by_media_types(['linkedin'])
@@ -56,22 +63,95 @@ class SocialAccount(models.Model):
             # store statistics
             account.write(all_stats_dict)
 
-    def _linkedin_fetch_followers_count(self):
+    @api.depends('linkedin_account_urn')
+    def _compute_linkedin_is_personal_account(self):
+        for account in self:
+            urn = account.linkedin_account_urn or ''
+            account.linkedin_is_personal_account = urn and not urn.startswith("urn:li:organization:")
+
+    def _get_linkedin_access_token(self):
+        """Return the access token to use for API calls."""
+        self.ensure_one()
+        self.check_access("read")
+        return self.sudo().linkedin_access_token
+
+    def _get_social_account_values(self):
+        self.ensure_one()
+        return {
+            **super()._get_social_account_values(),
+            'linkedin_is_personal_account': self.linkedin_is_personal_account,
+        }
+
+    def _linkedin_fetch_followers_count(self, last_30d=False):
         """Fetch number of followers from the LinkedIn API."""
         self.ensure_one()
-        endpoint = url_join(self.env['social.media']._LINKEDIN_ENDPOINT, 'networkSizes/urn:li:organization:%s' % self.linkedin_account_id)
-        # removing X-Restli-Protocol-Version header for this endpoint as it is not required according to LinkedIn Doc.
-        # using this header with an endpoint that doesn't support it will cause the request to fail
-        headers = self._linkedin_bearer_headers()
-        headers.pop('X-Restli-Protocol-Version', None)
-        response = requests.get(
-            endpoint,
-            params={'edgeType': 'COMPANY_FOLLOWED_BY_MEMBER'},
-            headers=headers,
-            timeout=3)
-        if response.status_code != 200:
-            return 0
-        return response.json().get('firstDegreeSize', 0)
+        follower_count = 0
+
+        if self.linkedin_is_personal_account:
+            # https://learn.microsoft.com/en-us/linkedin/marketing/community-management/members/follower-statistics
+            endpoint = url_join(self.env['social.media']._LINKEDIN_ENDPOINT, 'memberFollowersCount')
+            if last_30d:
+                end = datetime.now() + timedelta(days=1)
+                start = datetime.now() - timedelta(days=30)
+                endpoint += f'?q=dateRange&dateRange=(start:(year:{start.year},month:{start.month},day:{start.day}),end:(year:{end.year},month:{end.month},day:{end.day}))'
+            else:
+                endpoint += '?q=me'
+
+            response = requests.get(
+                endpoint,
+                headers=self._linkedin_bearer_headers(),
+                timeout=3)
+
+            if response.ok:
+                follower_count = sum(
+                    el.get('memberFollowersCount', 0)
+                    for el in response.json().get('elements', [])
+                )
+            else:
+                _logger.error('Failed to get the personal account followers: %s', response.text)
+
+        elif last_30d:
+            # The LinkedIn API time interval take timestamp in milliseconds
+            end = int((datetime.now() + timedelta(days=1)).timestamp() * 1000)
+            start = int((datetime.now() - timedelta(days=30)).timestamp() * 1000)
+            endpoint = url_join(self.env['social.media']._LINKEDIN_ENDPOINT, 'organizationalEntityFollowerStatistics')
+            endpoint += f'?timeIntervals=(timeRange:(start:{start},end:{end}),timeGranularityType:MONTH)'
+            params = {
+              "q": "organizationalEntity",
+              "organizationalEntity": self.linkedin_account_urn,
+            }
+            response = requests.get(
+                endpoint,
+                params=params,
+                headers=self._linkedin_bearer_headers(),
+                timeout=3)
+
+            if response.ok:
+                follower_count = sum(
+                    sum(el.get('followerGains', {}).values())
+                    for el in response.json().get('elements', [])
+                )
+            else:
+                _logger.error('Failed to get the page followers trend: %s', response.text)
+
+        else:
+            endpoint = url_join(self.env['social.media']._LINKEDIN_ENDPOINT, f'networkSizes/{self.linkedin_account_urn}')
+            # removing X-Restli-Protocol-Version header for this endpoint as it is not required according to LinkedIn Doc.
+            # using this header with an endpoint that doesn't support it will cause the request to fail
+            headers = self._linkedin_bearer_headers()
+            headers.pop('X-Restli-Protocol-Version', None)
+            response = requests.get(
+                endpoint,
+                params={'edgeType': 'COMPANY_FOLLOWED_BY_MEMBER'},
+                headers=headers,
+                timeout=3)
+
+            if response.ok:
+                follower_count = response.json().get('firstDegreeSize', 0)
+            else:
+                _logger.error('Failed to get the page followers: %s', response.text)
+
+        return follower_count
 
     def _compute_statistics_linkedin(self, last_30d=False):
         """Fetch statistics from the LinkedIn API.
@@ -88,17 +168,24 @@ class SocialAccount(models.Model):
         """
         self.ensure_one()
 
+        if self.linkedin_is_personal_account:
+            return {
+                'audience': self._linkedin_fetch_followers_count(last_30d),
+                'engagement': 0,
+                'stories': 0,
+            }
+
         endpoint = url_join(self.env['social.media']._LINKEDIN_ENDPOINT, 'organizationalEntityShareStatistics')
         params = {
             'q': 'organizationalEntity',
-            'organizationalEntity': self.linkedin_account_urn
+            'organizationalEntity': self.linkedin_account_urn,
         }
 
         if last_30d:
             # The LinkedIn API take timestamp in milliseconds
-            end = int((datetime.now() + timedelta(days=2)).timestamp() * 1000)
+            end = int((datetime.now() + timedelta(days=1)).timestamp() * 1000)
             start = int((datetime.now() - timedelta(days=30)).timestamp() * 1000)
-            endpoint += '?timeIntervals=%s' % '(timeRange:(start:%i,end:%i),timeGranularityType:MONTH)' % (start, end)
+            endpoint += f'?timeIntervals=(timeRange:(start:{start},end:{end}),timeGranularityType:MONTH)'
 
         response = requests.get(
             endpoint,
@@ -109,10 +196,10 @@ class SocialAccount(models.Model):
         if response.status_code != 200:
             return {}
 
-        data = response.json().get('elements', [{}])[0].get('totalShareStatistics', {})
+        data = (response.json().get('elements') or [{}])[0].get('totalShareStatistics', {})
 
         return {
-            'audience': self._linkedin_fetch_followers_count(),
+            'audience': self._linkedin_fetch_followers_count(last_30d),
             'engagement': data.get('clickCount', 0) + data.get('likeCount', 0) + data.get('commentCount', 0),
             'stories': data.get('shareCount', 0) + data.get('shareMentionsCount', 0),
         }
@@ -129,7 +216,7 @@ class SocialAccount(models.Model):
 
     def _linkedin_bearer_headers(self, linkedin_access_token=None):
         if linkedin_access_token is None:
-            linkedin_access_token = self.linkedin_access_token
+            linkedin_access_token = self._get_linkedin_access_token()
         return {
             'Authorization': 'Bearer %s' % linkedin_access_token,
             'cache-control': 'no-cache',
@@ -137,8 +224,33 @@ class SocialAccount(models.Model):
             'LinkedIn-Version': '202511',
         }
 
-    def _get_linkedin_accounts(self, linkedin_access_token):
+    def _get_linkedin_accounts(self, linkedin_access_token, link_personal=False):
         """Make an API call to get all LinkedIn pages linked to the actual access token."""
+        # https://learn.microsoft.com/en-us/linkedin/shared/integrations/people/profile-api
+        if link_personal:
+            response = requests.get(
+                "https://api.linkedin.com/v2/me",
+                headers=self._linkedin_bearer_headers(linkedin_access_token),
+                timeout=5,
+            )
+            if not response.ok:
+                raise SocialValidationException(_('An error occurred when fetching your account: “%s”.', response.text))
+
+            user = response.json()
+            user_name = ' '.join(filter(bool, (user.get('localizedLastName'), user.get('localizedFirstName'))))
+            user_values = {
+                'name': user_name,
+                'linkedin_account_urn': f"urn:li:person:{user.get('id')}",
+                'linkedin_access_token': linkedin_access_token,
+                'social_account_handle': user.get('vanityName'),
+            }
+            user_image_id = user.get('profilePicture', {}).get('displayImage', '').split(':')[-1]
+            image_url_by_id = self._linkedin_request_images([user_image_id], linkedin_access_token)
+            if image_url := image_url_by_id.get(user_image_id):
+                image_data = requests.get(image_url, timeout=10).content
+                user_values['image'] = image_data and BinaryBytes(image_data)
+            return [user_values]
+
         response = self._linkedin_request(
             'organizationAcls',
             params={
@@ -177,24 +289,23 @@ class SocialAccount(models.Model):
         for account_id, organization in organization_results.items():
             image_id = urn_to_id(organization.get('logoV2', {}).get('original'))
             image_url = image_id and image_url_by_id.get(image_id)
-            image_data = image_url and requests.get(image_url, timeout=10).content
+            image_data = BinaryBytes(requests.get(image_url, timeout=10).content) if image_url else False  # FIXME check response status
             accounts.append({
                 'name': organization.get('localizedName'),
                 'linkedin_account_urn': f"urn:li:organization:{account_id}",
                 'linkedin_access_token': linkedin_access_token,
                 'social_account_handle': organization.get('vanityName'),
-                'image': base64.b64encode(image_data) if image_data else False,
+                'image': image_data,
             })
-
         return accounts
 
-    def _create_linkedin_accounts(self, access_token, media):
-        linkedin_accounts = self._get_linkedin_accounts(access_token)
+    def _create_linkedin_accounts(self, access_token, media, link_personal=False):
+        linkedin_accounts = self._get_linkedin_accounts(access_token, link_personal=link_personal)
         if not linkedin_accounts:
             message = _('You need a Business Account to post on LinkedIn with Odoo Social.\n Please create one and make sure it is linked to your account')
             documentation_link = 'https://business.linkedin.com/marketing-solutions/linkedin-pages'
             documentation_link_label = _('Read More about Business Accounts')
-            documentation_link_icon_class = 'fa fa-linkedin'
+            documentation_link_icon_class = 'oi_linkedin'
             raise SocialValidationException(message, documentation_link, documentation_link_label, documentation_link_icon_class)
 
         social_accounts = self.sudo().with_context(active_test=False).search([
@@ -230,17 +341,18 @@ class SocialAccount(models.Model):
                 })
                 accounts_to_create.append(account)
 
-        self.create(accounts_to_create)
+        self.sudo().create(accounts_to_create)
 
     def _create_default_stream_linkedin(self):
         """Create a stream for each organization page."""
         page_posts_stream_type = self.env.ref('social_linkedin.stream_type_linkedin_company_post')
 
+        # Add stream for each page, but skip personal account
         streams_to_create = [{
             'media_id': account.media_id.id,
             'stream_type_id': page_posts_stream_type.id,
-            'account_id': account.id
-        } for account in self if account.linkedin_account_urn]
+            'account_id': account.id,
+        } for account in self if account.linkedin_account_urn and not account.linkedin_is_personal_account]
 
         if streams_to_create:
             self.env['social.stream'].create(streams_to_create)
@@ -302,6 +414,84 @@ class SocialAccount(models.Model):
             timeout=5,
         )
 
+    @api.model
+    def search_mention_suggestions(self, search_term, media_type):
+        """
+        This override for LinkedIn is a bit more complex to process since their API uses a really specific
+        system.
+
+        First, we search users that have the same vanityName as the one provided by the
+        mention. A `vanityName` is the public identifying a specific Linkedin
+        Profile/Page, e.g. `https://www.linkedin.com/in/vanityName/` for a user and
+        `https://www.linkedin.com/company/vanityName/` for a company.
+
+        If we find a match then we use the info provided by the API and search for the
+        profile image to display the correct user on the widget.
+        If we don't find a match there, the search is then done for organizations as it
+        may not be a user's `vanityName`.
+        """
+        if media_type != "linkedin":
+            return super().search_mention_suggestions(search_term, media_type)
+
+        if not search_term:
+            return False
+        linkedin_account = self.env['social.account'].search([("media_type", "=", media_type)], limit=1)
+        response = linkedin_account._linkedin_request(
+            "vanityUrl",
+            params={
+                'q': "vanityUrlAsOrganization",
+                'vanityUrl': f"https://www.linkedin.com/in/{search_term}",
+                'organization': linkedin_account.linkedin_account_urn
+            },
+            linkedin_access_token=linkedin_account._get_linkedin_access_token()
+        )
+
+        # No user found or the endpoint errored out, let's search on organizations
+        if not response.ok:
+            response = linkedin_account._linkedin_request(
+                "organizations",
+                params={
+                    'q': "vanityName",
+                    'vanityName': search_term
+                },
+                fields=("id", "localizedDescription", "localizedName", "logoV2:(original)"),
+                linkedin_access_token=linkedin_account._get_linkedin_access_token(),
+            )
+            if not response.ok:
+                _logger.error("The request encountered an issue and couldn't retrieve the organization linked to %s", search_term)
+                return []
+
+            elements_returned_json = response.json().get('elements', [{}])
+            if not elements_returned_json or not (elements_returned_json := elements_returned_json[0]):
+                return []
+
+            member_id = f"urn:li:organization:{elements_returned_json.get('id')}"
+        else:
+            member_id = response.json().get('elements', [{}])[0].get('member')
+            if member_id is None:
+                _logger.warning("No member has been returned for %s", search_term)
+                return []
+
+            # TODO @THJO: when the endpoint is deprecated update it (remove or change).
+            response = requests.get(
+                f"https://api.linkedin.com/v2/people/(id:{urn_to_id(member_id)})",
+                headers=linkedin_account._linkedin_bearer_headers(),
+                timeout=5)
+            elements_returned_json = response.json()
+
+        element_found = {
+            'name': search_term,
+            'full_name': " ".join([elements_returned_json.get('localizedFirstName', ''), elements_returned_json.get('localizedLastName', ''), elements_returned_json.get('localizedName', '')]).strip() or search_term,
+            'description': elements_returned_json.get("localizedHeadline", '') or elements_returned_json.get("localizedDescription", ''),
+            'member': member_id,
+            'vanity_name': search_term,
+        }
+        image_id = elements_returned_json.get('profilePicture', {}).get('displayImage') or elements_returned_json.get('logoV2', {}).get('original')
+        if image_id is not None:
+            image_url_by_id = linkedin_account._linkedin_request_images([image_id], linkedin_access_token=linkedin_account._get_linkedin_access_token())
+            element_found['profile_image_url'] = image_url_by_id.get(urn_to_id(image_id))
+        return [element_found]
+
     def _linkedin_request_images(self, images_ids, linkedin_access_token=None):
         """Make an API call to get the downloadable URL of the images.
 
@@ -320,6 +510,7 @@ class SocialAccount(models.Model):
         return {
             urn_to_id(image_urn): image_values['downloadUrl']
             for image_urn, image_values in response.json().get('results', {}).items()
+            if 'downloadUrl' in image_values
         } if response.ok else {}
 
     def _linkedin_upload_image(self, image_data):

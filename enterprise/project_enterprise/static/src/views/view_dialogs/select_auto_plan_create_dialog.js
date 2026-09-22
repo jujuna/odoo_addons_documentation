@@ -1,11 +1,15 @@
-import { SelectCreateDialog } from "@web/views/view_dialogs/select_create_dialog"
+import { useProps, t } from "@odoo/owl";
+import {
+    SelectCreateDialog,
+    selectCreateDialogProps,
+} from "@web/views/view_dialogs/select_create_dialog"
 
 export class SelectCreateAutoPlanDialog extends SelectCreateDialog {
     static template = "project_enterprise.SelectCreateAutoPlanDialog";
-    static props = {
-        ...SelectCreateDialog.props,
-        onSelectedNoSmartSchedule: { type: Function },
-    }
+    props = useProps({
+        ...selectCreateDialogProps,
+        onSelectedNoSmartSchedule: t.function(),
+    });
 
     select(resIds) {
         if (this.props.onSelectedNoSmartSchedule) {

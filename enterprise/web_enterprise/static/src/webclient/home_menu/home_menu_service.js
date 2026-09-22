@@ -1,3 +1,4 @@
+import { render } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
@@ -7,15 +8,15 @@ import { computeAppsAndMenuItems, reorderApps } from "@web/webclient/menus/menu_
 import {
     ControllerNotFoundError,
     standardActionServiceProps,
-} from "@web/webclient/actions/action_service";
+} from "@web/webclient/actions/action_plugin";
 import { HomeMenu } from "./home_menu";
 
-import { Component, onMounted, onWillUnmount, reactive, xml } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, proxy, useProps, xml } from "@odoo/owl";
 
 export const homeMenuService = {
     dependencies: ["action"],
-    start(env) {
-        const state = reactive({
+    start(env, { action }) {
+        const state = proxy({
             hasHomeMenu: false, // true iff the HomeMenu is currently displayed
             hasBackgroundAction: false, // true iff there is an action behind the HomeMenu
             toggle,
@@ -24,27 +25,27 @@ export const homeMenuService = {
         class HomeMenuAction extends Component {
             static components = { HomeMenu };
             static target = "current";
-            static props = { ...standardActionServiceProps };
-            static template = xml`<HomeMenu t-props="homeMenuProps"/>`;
+            static template = xml`<HomeMenu t-props="this.homeMenuProps"/>`;
             static displayName = _t("Home");
+
+            props = useProps(standardActionServiceProps);
 
             setup() {
                 this.menus = useService("menu");
                 onMounted(() => this.onMounted());
                 onWillUnmount(this.onWillUnmount);
-                useBus(this.env.bus, "MENUS:APP-CHANGED", () => this.render());
+                useBus(this.env.bus, "MENUS:APP-CHANGED", () => render(this));
             }
             get homeMenuProps() {
                 const homemenuConfig = JSON.parse(user.settings?.homemenu_config || "null");
-                const apps = reactive(
-                    computeAppsAndMenuItems(this.menus.getMenuAsTree("root")).apps
-                );
+                const apps = computeAppsAndMenuItems(this.menus.getMenuAsTree("root")).apps;
                 if (homemenuConfig) {
                     reorderApps(apps, homemenuConfig);
                 }
+                const reactiveApps = proxy(apps);
                 return {
-                    apps,
-                    reorderApps: (order) => reorderApps(apps, order),
+                    apps: reactiveApps,
+                    reorderApps: (order) => reorderApps(reactiveApps, order),
                 };
             }
             async onMounted() {
@@ -71,10 +72,10 @@ export const homeMenuService = {
                 show = show === undefined ? !state.hasHomeMenu : Boolean(show);
                 if (show !== state.hasHomeMenu) {
                     if (show) {
-                        await env.services.action.doAction("menu");
+                        await action.doAction("menu");
                     } else {
                         try {
-                            await env.services.action.restore();
+                            await action.restore();
                         } catch (err) {
                             if (!(err instanceof ControllerNotFoundError)) {
                                 throw err;

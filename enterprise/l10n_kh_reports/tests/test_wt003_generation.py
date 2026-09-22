@@ -9,6 +9,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestWT003Generation(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('kh')
     def setUpClass(cls):
@@ -29,7 +31,7 @@ class TestWT003Generation(TestAccountReportsCommon):
             'l10n_kh_tax_purchase_14_wht_nr_s',
             'l10n_kh_tax_purchase_10_m',
         ]
-        cls.wth_tax_set = cls.env['account.tax'].union(*[cls.ChartTemplate.ref(tax_xml_id) for tax_xml_id in wth_tax_xml_ids])
+        cls.wth_tax_set = cls.env['account.tax'].union(cls.ChartTemplate.ref(tax_xml_id) for tax_xml_id in wth_tax_xml_ids)
 
         cls.withholding_sequence = cls.env['ir.sequence'].create({
             'implementation': 'no_gap',
@@ -44,7 +46,6 @@ class TestWT003Generation(TestAccountReportsCommon):
         cls.company_data['company'].withholding_tax_base_account_id = cls.env['account.account'].create({
             'code': 'WITHB',
             'name': 'Withholding Tax Base Account',
-            'reconcile': True,
             'account_type': 'asset_current',
         })
 
@@ -109,7 +110,7 @@ class TestWT003Generation(TestAccountReportsCommon):
             ("in_invoice", self.partner_a, "2025-01-15", [(100 * i, tax)])
             for i, tax in enumerate(self.wth_tax_set, start=1)
         ]
-        self.wth_tax_set.is_withholding_tax_on_payment = False
+        self.wth_tax_set.is_withholding_tax = False
 
         invoice_vals = []
         for move_type, partner, invoice_date, lines_data in invoice_data:

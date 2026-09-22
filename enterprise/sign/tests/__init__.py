@@ -6,6 +6,8 @@ from . import test_attachment_access
 from . import test_sign_template
 from . import sign_request_common
 from . import test_sign_request
+from . import test_sign_request_document
+from . import test_qes_flow
 from . import test_sign_multicompany
 from . import test_ui
 from . import test_sign_controllers

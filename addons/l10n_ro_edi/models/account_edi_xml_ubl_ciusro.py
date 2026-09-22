@@ -31,71 +31,172 @@ class AccountEdiXmlUbl_Ro(models.AbstractModel):
     # EXPORT: Templates
     # -------------------------------------------------------------------------
 
-    def _ubl_add_values_tax_currency_code(self, vals):
+    def _ubl_add_tax_currency_code_node(self, vals):
         # EXTENDS account.edi.xml.ubl_bis3
-        self._ubl_add_values_tax_currency_code_company_currency(vals)
+        self._ubl_add_tax_currency_code_node_company_currency(vals)
 
-    def _add_invoice_header_nodes(self, document_node, vals):
+    def _ubl_add_customization_id_node(self, vals):
         # EXTENDS account.edi.xml.ubl_bis3
-        super()._add_invoice_header_nodes(document_node, vals)
-        document_node['cbc:CustomizationID'] = {
-            '_text': 'urn:cen.eu:en16931:2017#compliant#urn:efactura.mfinante.ro:CIUS-RO:1.0.1'
+        super()._ubl_add_customization_id_node(vals)
+        vals['document_node']['cbc:CustomizationID']['_text'] = 'urn:cen.eu:en16931:2017#compliant#urn:efactura.mfinante.ro:CIUS-RO:1.0.1'
+
+    def _ubl_get_partner_address_node(self, vals, partner):
+        # EXTENDS account.edi.xml.ubl_bis3
+        node = super()._ubl_get_partner_address_node(vals, partner)
+
+        if not partner.state_id:
+            return node
+
+        node['cbc:CountrySubentity']['_text'] = f'{partner.country_code}-{partner.state_id.code}'
+
+        # Romania requires the CityName to be in the format of "SECTORX" if the address state is in Bucharest.
+        if partner.state_id.code == 'B' and partner.city:
+            node['cbc:CityName']['_text'] = get_formatted_sector_ro(partner.city)
+
+        return node
+
+    def _ubl_add_accounting_supplier_party_tax_scheme_nodes(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_accounting_supplier_party_tax_scheme_nodes(vals)
+        partner = vals['party_vals']['partner']
+        commercial_partner = partner.commercial_partner_id
+        company_id = None
+
+        ro_vat = commercial_partner.vat or commercial_partner._get_additional_identifier('RO_VAT')
+        if not _has_vat(ro_vat):
+            company_id = commercial_partner._get_additional_identifier('RO_EN')
+        else:
+            company_id = ro_vat
+
+        vals['party_node']['cac:PartyTaxScheme'] = [{
+            'cbc:CompanyID': {'_text': company_id},
+            'cac:TaxScheme': {
+                'cbc:ID': {'_text': 'VAT' if company_id[:2].isalpha() else 'NOT_EU_VAT'},
+            },
+        }] if company_id else []
+
+    def _ubl_add_accounting_supplier_party_legal_entity_nodes(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_accounting_supplier_party_legal_entity_nodes(vals)
+        partner = vals['party_vals']['partner']
+        commercial_partner = partner.commercial_partner_id
+
+        ro_vat = commercial_partner.vat or commercial_partner._get_additional_identifier('RO_VAT')
+        if _has_vat(ro_vat):
+            # RO legal registration id is the (RO-prefixed) VAT, not the bare CUI/RO_EN.
+            vals['party_node']['cac:PartyLegalEntity'] = [{
+                'cbc:RegistrationName': {'_text': commercial_partner.name},
+                'cbc:CompanyID': {
+                    '_text': ro_vat,
+                    'schemeID': None,
+                },
+            }]
+        else:
+            value = commercial_partner._get_additional_identifier('RO_EN')
+            if value:
+                vals['party_node']['cac:PartyLegalEntity'] = [{
+                    'cbc:RegistrationName': {'_text': commercial_partner.name},
+                    'cbc:CompanyID': {
+                        '_text': value,
+                        'schemeID': None,
+                    },
+                }]
+            else:
+                vals['party_node']['cac:PartyLegalEntity'] = []
+
+    def _ubl_add_accounting_customer_party_tax_scheme_nodes(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_accounting_customer_party_tax_scheme_nodes(vals)
+        partner = vals['party_vals']['partner']
+        commercial_partner = partner.commercial_partner_id
+        company_id = None
+
+        ro_vat = commercial_partner.vat or commercial_partner._get_additional_identifier('RO_VAT')
+        if not _has_vat(ro_vat):
+            company_id = DEFAULT_VAT
+        else:
+            company_id = ro_vat
+
+        vals['party_node']['cac:PartyTaxScheme'] = [{
+            'cbc:CompanyID': {'_text': company_id},
+            'cac:TaxScheme': {
+                'cbc:ID': {'_text': 'VAT' if company_id[:2].isalpha() else 'NOT_EU_VAT'},
+            },
+        }] if company_id else []
+
+    def _ubl_add_accounting_customer_party_legal_entity_nodes(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_accounting_customer_party_legal_entity_nodes(vals)
+        partner = vals['party_vals']['partner']
+        commercial_partner = partner.commercial_partner_id
+
+        ro_vat = commercial_partner.vat or commercial_partner._get_additional_identifier('RO_VAT')
+        if _has_vat(ro_vat):
+            # RO legal registration id is the (RO-prefixed) VAT, not the bare CUI/RO_EN.
+            vals['party_node']['cac:PartyLegalEntity'] = [{
+                'cbc:RegistrationName': {'_text': commercial_partner.name},
+                'cbc:CompanyID': {
+                    '_text': ro_vat,
+                    'schemeID': None,
+                },
+            }]
+        else:
+            vals['party_node']['cac:PartyLegalEntity'] = [{
+                'cbc:RegistrationName': {'_text': commercial_partner.name},
+                'cbc:CompanyID': {
+                    '_text': DEFAULT_VAT,
+                    'schemeID': None,
+                },
+            }]
+
+    def _add_invoice_line_item_nodes(self, line_node, vals):
+        super()._add_invoice_line_item_nodes(line_node, vals)
+
+        product = vals['base_line']['product_id']
+        line_node['cac:Item']['cac:CommodityClassification'] = {
+            'cbc:ItemClassificationCode': {
+                '_text': product.cpv_code_id.code,
+                'listID': 'STI',
+            }
         }
 
-    def _get_address_node(self, vals):
-        address_node = super()._get_address_node(vals)
-        partner = vals['partner']
+    def _ubl_add_line_item_name_description_nodes(self, vals):
+        # EXTENDS account.edi.ubl
+        super()._ubl_add_line_item_name_description_nodes(vals)
+        item_node = vals['item_node']
 
-        if partner._name == 'res.bank':
-            state = partner.state
-        else:
-            state = partner.state_id
+        if name := item_node['cbc:Name'] and item_node['cbc:Name'].get('_text'):
+            item_node['cbc:Name']['_text'] = name[:100]
+        if description := item_node['cbc:Description'] and item_node['cbc:Description'].get('_text'):
+            item_node['cbc:Description']['_text'] = description[:200]
 
-        if state:
-            address_node['cbc:CountrySubentity']['_text'] = partner.country_code + '-' + state.code
+    def _ubl_add_notes_nodes(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_notes_nodes(vals)
+        document_node = vals['document_node']
 
-            # Romania requires the CityName to be in the format of "SECTORX" if the address state is in Bucharest.
-            if state.code == 'B' and partner.city:
-                address_node['cbc:CityName']['_text'] = get_formatted_sector_ro(partner.city)
-
-        return address_node
-
-    def _get_party_node(self, vals):
-        party_node = super()._get_party_node(vals)
-        commercial_partner = vals['partner'].commercial_partner_id
-
-        # Use the default VAT if the VAT is not filled or just has a placeholder
-        if not _has_vat(commercial_partner.vat):
-            if vals['role'] == 'supplier' and commercial_partner.company_registry:
-                # Use company_registry (Company ID) as the VAT replacement
-                vat_replacement = commercial_partner.company_registry
-            else:
-                vat_replacement = DEFAULT_VAT
-
-            party_node['cac:PartyTaxScheme'][0]['cbc:CompanyID']['_text'] = vat_replacement
-            party_node['cac:PartyTaxScheme'][0]['cac:TaxScheme']['cbc:ID']['_text'] = (
-                'VAT' if vat_replacement[:2].isalpha() else 'NOT_EU_VAT'
-            )
-            party_node['cac:PartyLegalEntity']['cbc:CompanyID']['_text'] = vat_replacement
-
-        return party_node
+        if note := document_node['cbc:Note']['_text']:
+            document_node['cbc:Note']['_text'] = note[:300]
 
     # -------------------------------------------------------------------------
     # EXPORT: Constraints
     # -------------------------------------------------------------------------
 
     def _export_invoice_constraints(self, invoice, vals):
-        # EXTENDS 'account_edi_ubl_cii'
-        constraints = super()._export_invoice_constraints(invoice, vals)
+        # OVERRIDE 'account.edi.xml.ubl_bis3': don't apply Peppol rules
+        constraints = self.env['account.edi.xml.ubl_20']._export_invoice_constraints(invoice, vals)
+        constraints.update(
+            self._invoice_constraints_cen_en16931_ubl(invoice, vals)
+        )
 
         # Default VAT is only allowed for the receiver (customer), not the provider (supplier)
         supplier = vals['supplier'].commercial_partner_id
         if (
             not _has_vat(supplier.vat)
-            and not vals['supplier'].commercial_partner_id.company_registry
+            and not supplier._get_additional_identifier('RO_EN')
         ):
             constraints["ciusro_supplier_tax_identifier_required"] = _(
-                "The following partner doesn't have a VAT nor Company ID: %s. "
+                "The following partner doesn't have a VAT nor any other Peppol-routable identifier: %s. "
                 "At least one of them is required. ",
                 vals['supplier'].display_name)
 
@@ -128,11 +229,8 @@ class AccountEdiXmlUbl_Ro(models.AbstractModel):
     def _import_retrieve_partner_vals(self, tree, role):
         # EXTENDS account.edi.xml.ubl_bis3
         partner_vals = super()._import_retrieve_partner_vals(tree, role)
-        if 'peppol_endpoint' in partner_vals:
-            # ANAF allows for endpoints to be an address mail, since we don't want to create a new
-            # user with an address mail as a PEPPOL endpoint, we simply remove it in that case.
-            error = self.env['res.partner']._build_error_peppol_endpoint(False, partner_vals['peppol_endpoint'])
-            if error:
-                partner_vals['peppol_endpoint'] = False
-                partner_vals['peppol_eas'] = False
+        # ANAF allows for endpoints to be an email address; we don't want to create
+        # a partner whose routing endpoint is an email, so drop it in that case.
+        if (endpoint := partner_vals.get('routing_identifier')) and '@' in endpoint:
+            partner_vals['routing_identifier'] = False
         return partner_vals

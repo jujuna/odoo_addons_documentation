@@ -11,17 +11,26 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-12-06 09:50+0000\n"
-"Last-Translator: \"Thi Huong Nguyen (thng)\" <thng@odoo.com>\n"
-"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 23:33+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-master/"
 "account_transfer/vi/>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_transfer
+#: model:ir.module.module,description:base.module_account_transfer
+msgid ""
+"\n"
+"Account Transfers\n"
+"===========================\n"
+"A helper model for managing transfers between accounts.\n"
+msgstr ""
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -62,6 +71,11 @@ msgstr "Đối tượng kết chuyển"
 #: model:ir.model,name:account_transfer.model_account_transfer_model_line
 msgid "Account Transfer Model Line"
 msgstr "Chi tiết đối tượng kết chuyển"
+
+#. module: account_transfer
+#: model:ir.module.module,shortdesc:base.module_account_transfer
+msgid "Account Transfers"
+msgstr ""
 
 #. module: account_transfer
 #: model:ir.actions.server,name:account_transfer.ir_cron_auto_transfer_ir_actions_server
@@ -195,6 +209,13 @@ msgstr "Có bút toán nháp"
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model_line__id
 msgid "ID"
 msgstr "ID"
+
+#. module: account_transfer
+#. odoo-python
+#: code:addons/account_transfer/demo/account_demo.py:0
+#: model:account.journal.group,name:account_transfer.ifrs_group
+msgid "IFRS"
+msgstr ""
 
 #. module: account_transfer
 #. odoo-python
@@ -435,86 +456,3 @@ msgstr "ví dụ. Chi phí kết chuyển hàng tháng"
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "forever"
 msgstr "mãi mãi"
-
-#~ msgid "Activate"
-#~ msgstr "Kích hoạt"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these analytic accounts to the destination account"
-#~ msgstr ""
-#~ "Thêm một điều kiện để chỉ chuyển tổng các dòng từ tài khoản gốc khớp với "
-#~ "các tài khoản phân tích này sang tài khoản đích"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these partners to the destination account"
-#~ msgstr ""
-#~ "Thêm một điều kiện để chỉ chuyển tổng số dòng từ tài khoản gốc khớp với "
-#~ "các đối tác này sang tài khoản đích"
-
-#~ msgid "Analytic Filter"
-#~ msgstr "Bộ lọc phân tích"
-
-#~ msgid "Automated Transfer"
-#~ msgstr "Tự động kết chuyển"
-
-#~ msgid "Automatic Transfer (%s%% from account %s)"
-#~ msgstr "Tự động kết chuyển (%s%% từ tài khoản %s)"
-
-#~ msgid "Automatic Transfer (-%s%%)"
-#~ msgstr "Tự động kết chuyển (-%s%%)"
-
-#~ msgid ""
-#~ "Automatic Transfer (entries with analytic account(s): %s and partner(s): "
-#~ "%s)"
-#~ msgstr ""
-#~ "Tự động kết chuyển (bút toàn từ tài khoản phân tích %s và đối tác: %s)"
-
-#~ msgid "Automatic Transfer (entries with analytic account(s): %s)"
-#~ msgstr "Tự động kết chuyển (bút toàn từ tài khoản phân tích: %s)"
-
-#~ msgid "Automatic Transfer (entries with partner(s): %s)"
-#~ msgstr "Tự động kết chuyển (bút toàn từ đối tác: %s)"
-
-#~ msgid ""
-#~ "Automatic Transfer (from account %s with analytic account(s): %s and "
-#~ "partner(s): %s)"
-#~ msgstr ""
-#~ "Tự động kết chuyển (từ tài khoản %s với tài khoản phân tích: %s và đối "
-#~ "tác: %s)"
-
-#~ msgid "Automatic Transfer (from account %s with analytic account(s): %s)"
-#~ msgstr "Tự động kết chuyển (từ tài khoản %s với tài khoản phân tích: %s)"
-
-#~ msgid "Automatic Transfer (from account %s with partner(s): %s)"
-#~ msgstr "Tự động kết chuyển (từ tài khoản %s với đối tác: %s)"
-
-#~ msgid "Automatic Transfer (to account %s)"
-#~ msgstr "Tự động kết chuyển (tới tài khoản %s)"
-
-#~ msgid "Automatic Transfers"
-#~ msgstr "Tự động kết chuyểns"
-
-#~ msgid "Partner Filter"
-#~ msgstr "Bộ lọc đối tác"
-
-#~ msgid "Percent (%)"
-#~ msgstr "Phần trăm (%)"
-
-#~ msgid "Percent Is Readonly"
-#~ msgstr "Phần trăm là chỉ đọc"
-
-#~ msgid "Running"
-#~ msgstr "Đang chạy"
-
-#~ msgid "The analytic filter %s is duplicated"
-#~ msgstr "Bộ lọc phân tích %s bị trùng"
-
-#~ msgid ""
-#~ "The partner filter %s in combination with the analytic filter %s is "
-#~ "duplicated"
-#~ msgstr "Bộ lọc đối tác %s kết hợp với bộ lọc phân tích %s bị trùng"
-
-#~ msgid "The partner filter %s is duplicated"
-#~ msgstr "Bộ lọc đối tác %s bị trùng"

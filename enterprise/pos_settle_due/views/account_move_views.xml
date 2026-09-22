@@ -8,9 +8,9 @@
                 <field name="currency_id" column_invisible="True"/>  <!-- Monetary field -->
                 <field name="name"/>
                 <field string="Invoice Date" name="invoice_date"/>
-                <field name="invoice_date_due" widget="remaining_days" optional="show" invisible="payment_state in ('paid', 'in_payment', 'reversed') or state == 'cancel'"/>
+                <field name="invoice_date_due" widget="relative_date" optional="show" invisible="payment_state in ('paid', 'in_payment', 'reversed') or state == 'cancel'"/>
                 <field name="amount_total" sum="Amount total" widget="monetary" decoration-bf="1"/>
-                <field string="Due" name="pos_amount_unsettled" sum="Total due" widget="monetary"/>
+                <field string="Due" name="amount_residual" sum="Total due" widget="monetary"/>
                 <field name="payment_state" optional="show"
                         decoration-info="payment_state in ('partial','in_payment')"
                         decoration-success="payment_state == 'paid'"

@@ -10,7 +10,6 @@ from odoo.addons.mail.tests.common import mail_new_test_user
 
 
 class TestRentalCommon(common.TransactionCase):
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -18,21 +17,20 @@ class TestRentalCommon(common.TransactionCase):
         cls.rental_return_date = Datetime.today() + timedelta(days=7)
         cls.warehouse_id = cls.env.user._get_default_warehouse_id()
 
-        cls.env.company.extra_product = cls.env['product.product'].create({'name': 'Late fee', 'type': 'service'})
-
         cls.product_id = cls.env['product.product'].create({
             'name': 'Test1',
             'uom_id': cls.env.ref('uom.product_uom_unit').id,
-            'rent_ok': True,
+            'sale_ok': True,
             'is_storable': True,
-            'extra_daily': 10.0
+            'rent_periodicity': 'hours',
         })
         cls.tracked_product_id = cls.env['product.product'].create({
             'name': 'Test2',
             'uom_id': cls.env.ref('uom.product_uom_unit').id,
-            'rent_ok': True,
+            'sale_ok': True,
             'is_storable': True,
             'tracking': 'serial',
+            'rent_periodicity': 'days',
         })
 
         # Set Stock quantities
@@ -55,25 +53,25 @@ class TestRentalCommon(common.TransactionCase):
         quants = cls.env['stock.quant'].create({
             'product_id': cls.product_id.id,
             'inventory_quantity': 4.0,
-            'location_id': cls.env.user._get_default_warehouse_id().lot_stock_id.id
+            'location_id': cls.env.user._get_default_warehouse_id().lot_stock_id.id,
         })
         quants |= cls.env['stock.quant'].create({
             'product_id': cls.tracked_product_id.id,
             'inventory_quantity': 1.0,
             'lot_id': cls.lot_id1.id,
-            'location_id': cls.env.user._get_default_warehouse_id().lot_stock_id.id
+            'location_id': cls.env.user._get_default_warehouse_id().lot_stock_id.id,
         })
         quants |= cls.env['stock.quant'].create({
             'product_id': cls.tracked_product_id.id,
             'inventory_quantity': 1.0,
             'lot_id': cls.lot_id2.id,
-            'location_id': cls.env.user._get_default_warehouse_id().lot_stock_id.id
+            'location_id': cls.env.user._get_default_warehouse_id().lot_stock_id.id,
         })
         quants |= cls.env['stock.quant'].create({
             'product_id': cls.tracked_product_id.id,
             'inventory_quantity': 1.0,
             'lot_id': cls.lot_id3.id,
-            'location_id': cls.env.user._get_default_warehouse_id().lot_stock_id.id
+            'location_id': cls.env.user._get_default_warehouse_id().lot_stock_id.id,
         })
         quants.action_apply_inventory()
 
@@ -105,7 +103,6 @@ class TestRentalCommon(common.TransactionCase):
             'product_uom_qty': 0.0,
             'price_unit': 150,
         })
-        cls.order_line_id1.update({'is_rental': True})
 
         cls.sale_order_id.action_confirm()
 
@@ -114,6 +111,8 @@ class TestRentalCommon(common.TransactionCase):
             'partner_invoice_id': cls.cust1.id,
             'partner_shipping_id': cls.cust1.id,
             'user_id': cls.user_id.id,
+            'rental_start_date': fields.Datetime.today(),
+            'rental_return_date': fields.Datetime.today() + timedelta(days=3),
         })
 
         cls.order_line_id2 = cls.env['sale.order.line'].create({
@@ -122,7 +121,6 @@ class TestRentalCommon(common.TransactionCase):
             'product_uom_qty': 0.0,
             'price_unit': 250,
         })
-        cls.order_line_id2.update({'is_rental': True})
 
         cls.order_line_id3 = cls.env['sale.order.line'].create({
             'order_id': cls.lots_rental_order.id,
@@ -130,7 +128,6 @@ class TestRentalCommon(common.TransactionCase):
             'product_uom_qty': 0.0,
             'price_unit': 250,
         })
-        cls.order_line_id3.update({'is_rental': True})
 
     @classmethod
     def get_default_groups(cls):

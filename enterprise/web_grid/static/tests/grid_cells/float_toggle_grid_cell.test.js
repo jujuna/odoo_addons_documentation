@@ -82,6 +82,34 @@ test("FloatToggleGridCell: click to focus", async () => {
     });
 });
 
+test("FloatToggleGridCell: clicking cycles through the whole range", async () => {
+    await mountView({
+        type: "grid",
+        resModel: "grid",
+    });
+
+    const cell = queryOne(
+        ".o_grid_row:not(.o_grid_row_total,.o_grid_row_title,.o_grid_column_total)"
+    );
+    await hover(cell);
+    await runAllTimers();
+    await contains(".o_grid_cell").click();
+    await animationFrame();
+    expect(".o_grid_cell").toHaveText("0.50", {
+        message: "the first click should set the cell to the second value of the range",
+    });
+    await contains(".o_grid_cell button.o_field_float_toggle").click();
+    await animationFrame();
+    expect(".o_grid_cell").toHaveText("1.00", {
+        message: "the cell being in edit mode should not freeze the value it displays",
+    });
+    await contains(".o_grid_cell button.o_field_float_toggle").click();
+    await animationFrame();
+    expect(".o_grid_cell").toHaveText("0.00", {
+        message: "the last value of the range should cycle back to the first one",
+    });
+});
+
 test("FloatToggleGridCell: keyboard navigation", async () => {
     await mountView({
         type: "grid",

@@ -4,10 +4,20 @@ import { _t } from "@web/core/l10n/translation";
 
 registerComposerAction("revive-whatsapp-conversation", {
     condition: ({ composer, owner }) =>
-        composer.thread?.channel_type === "whatsapp" && !owner.state.active,
-    icon: "fa fa-whatsapp",
+        composer.thread?.channel?.channel_type === "whatsapp" &&
+        !owner.state.active &&
+        !composer.thread?.channel?.whatsapp_channel_blocked,
+    icon: "oi_whatsapp",
     name: _t("Revive WhatsApp Conversation"),
     onSelected: ({ owner }) => owner.onclickWhatsAppChat(),
+    sequenceQuick: 10,
+});
+
+registerComposerAction("send-interactive-message", {
+    condition: ({ composer }) => composer.thread?.channel?.channel_type === "whatsapp",
+    icon: "tune",
+    name: _t("Send Interactive Message"),
+    onSelected: ({ owner }) => owner.onClickSendInteractive(),
     sequenceQuick: 10,
 });
 
@@ -15,7 +25,7 @@ patch(ComposerAction.prototype, {
     _condition({ composer, owner }) {
         if (
             ["upload-files", "voice-start"].includes(this.id) &&
-            composer.targetThread?.channel_type === "whatsapp" &&
+            composer.targetThread?.channel?.channel_type === "whatsapp" &&
             (composer.attachments.length > 0 || owner.voiceRecorder?.recording)
         ) {
             return false;
@@ -25,7 +35,7 @@ patch(ComposerAction.prototype, {
     _disabledCondition({ composer, owner }) {
         const inactiveActions = ["revive-whatsapp-conversation", "more-actions"];
         if (
-            composer.targetThread?.channel_type === "whatsapp" &&
+            composer.targetThread?.channel?.channel_type === "whatsapp" &&
             owner.state &&
             !owner.state.active &&
             !inactiveActions.includes(this.id)

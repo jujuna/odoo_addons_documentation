@@ -27,11 +27,11 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_customer_invoices" type="object"
-                    invisible="invoice_commission_count == 0" icon="fa-pencil-square-o">
+                    invisible="invoice_commission_count == 0" icon="edit_square">
                     <field string="Source Invoices" name="invoice_commission_count" widget="statinfo"/>
                 </button>
             </xpath>
-            <xpath expr="//page[@name='purchase_delivery_invoice']//group[@name='other_info']" position="inside">
+            <xpath expr="//page[@name='purchase_delivery_invoice']//group[@name='purchase_info']" position="inside">
                 <field name="purchase_type" groups="base.group_no_one"/>
             </xpath>
         </field>

@@ -13,17 +13,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2026-01-27 22:48+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/quality/"
-"ja/>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-17 22:59+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
+"quality/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: quality
+#: model:ir.module.module,description:base.module_quality
+msgid ""
+"\n"
+"Quality Base\n"
+"===============\n"
+"* Define quality points that will generate quality checks on pickings,\n"
+"  manufacturing orders or work orders (quality_mrp)\n"
+"* Quality alerts can be created independently or related to quality checks\n"
+"* Possibility to add a measure to the quality check with a min/max "
+"tolerance\n"
+"* Define your stages for the quality alerts\n"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -61,7 +75,7 @@ msgstr "対策提案済"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__active
 msgid "Active"
-msgstr "アクティブ"
+msgstr "有効"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_ids
@@ -74,6 +88,12 @@ msgstr "活動"
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "例外の活動を示す装飾"
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_alert__activity_plans_ids
+#: model:ir.model.fields,field_description:quality.field_quality_check__activity_plans_ids
+msgid "Activity Plans"
+msgstr "活動計画"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_state
@@ -164,6 +184,21 @@ msgstr "エイリアス対象モデル"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "All Categories"
+msgstr ""
+
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "All Products"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_point__apply_to
+msgid "Apply to"
+msgstr ""
+
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "Archived"
 msgstr "アーカイブ済"
 
@@ -174,6 +209,27 @@ msgstr "アーカイブ済"
 #: model:ir.model.fields,field_description:quality.field_quality_point__message_attachment_count
 msgid "Attachment Count"
 msgstr "添付数"
+
+#. module: quality
+#: model:ir.module.module,summary:base.module_quality
+msgid "Basic Feature for Quality"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_check__batch_id
+msgid "Batch Transfer"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,help:quality.field_quality_check__batch_id
+msgid "Batch associated to this transfer"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__categories
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "Categories"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__reason
@@ -321,11 +377,6 @@ msgid "Email Alias"
 msgstr "Eメールエイリアス"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__email_cc
-msgid "Email cc"
-msgstr "メールCC"
-
-#. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_domain
 msgid "Email domain e.g. 'example.com' in 'odoo@example.com'"
 msgstr "Eメールドメイン例 'example.com' in 'odoo@example.com'"
@@ -365,12 +416,6 @@ msgstr "フォロワー"
 #: model:ir.model.fields,field_description:quality.field_quality_point__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "フォロワー (取引先)"
-
-#. module: quality
-#: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
-#: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesomeのアイコン 例. fa-tasks"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
@@ -454,8 +499,8 @@ msgstr ""
 "品質検査に不合格の場合、以下の条件に応じて、このリストから宛先ロケーションが"
 "選択されます。\n"
 "- 検査が数量ごとの場合は、不合格の各特定プロダクトの数量\n"
-" /- 検査がプロダクトごとの場合はプロダクトの全ての数量\n"
-" /- 工程ごとの場合は、工程内の全てのプロダクト数量"
+" /- 検査がプロダクトごとの場合はプロダクトのすべての数量\n"
+" /- 工程ごとの場合は、工程内のすべてのプロダクト数量"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_bounced_content
@@ -521,10 +566,6 @@ msgstr "ローカルパートに基づく着信検知"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__lot_ids
-msgid "Lot"
-msgstr "ロット"
-
-#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__lot_ids
 msgid "Lot/Serial"
 msgstr "ロット/シリアル"
@@ -533,6 +574,12 @@ msgstr "ロット/シリアル"
 #: model:ir.model.fields.selection,name:quality.selection__quality_alert__priority__1
 msgid "Low"
 msgstr "低"
+
+#. module: quality
+#: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
+#: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_has_error
@@ -605,6 +652,11 @@ msgstr "次の活動概要"
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_type_id
 msgid "Next Activity Type"
 msgstr "次の活動タイプ"
+
+#. module: quality
+#: model:res.groups.privilege,placeholder:quality.res_groups_privilege_quality
+msgid "No"
+msgstr ""
 
 #. module: quality
 #. odoo-python
@@ -764,7 +816,7 @@ msgid "Priority"
 msgstr "優先度"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__product_tmpl_id
+#: model:ir.model.fields,field_description:quality.field_quality_alert__product_id
 #: model:ir.model.fields,field_description:quality.field_quality_check__product_id
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
 msgid "Product"
@@ -776,12 +828,8 @@ msgid "Product Categories"
 msgstr "プロダクトカテゴリ"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__product_id
-msgid "Product Variant"
-msgstr "プロダクトバリアント"
-
-#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__product_ids
+#: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__products
 msgid "Products"
 msgstr "プロダクト"
 
@@ -807,6 +855,11 @@ msgid "Quality Alert Team"
 msgstr "品質アラートチーム"
 
 #. module: quality
+#: model:ir.module.module,shortdesc:base.module_quality
+msgid "Quality Base"
+msgstr ""
+
+#. module: quality
 #: model:ir.model,name:quality.model_quality_check
 msgid "Quality Check"
 msgstr "品質検査"
@@ -826,12 +879,13 @@ msgstr "品質管理テストタイプ"
 msgid ""
 "Quality Point will apply to every Products in the selected Product "
 "Categories."
-msgstr "選択されたプロダクトカテゴリの全てのプロダクトに適用される品質ポイント"
+msgstr ""
+"選択されたプロダクトカテゴリのすべてのプロダクトに適用される品質ポイント"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_point__product_ids
 msgid "Quality Point will apply to every selected Products."
-msgstr "全ての選択されたプロダクトに適用される品質ポイント"
+msgstr "すべての選択されたプロダクトに適用される品質ポイント"
 
 #. module: quality
 #: model:ir.model,name:quality.model_quality_tag
@@ -938,9 +992,9 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "活動に基づくステータス\n"
-"期限超過：期限日がすでに過ぎています\n"
+"遅延: 期限が既に過ぎています\n"
 "今日: 活動日は今日です\n"
-"予定: 将来の活動。"
+"予定: 今後の活動です"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_tag__name
@@ -968,6 +1022,13 @@ msgstr "チーム"
 #: model:ir.model.fields,field_description:quality.field_quality_alert_stage__team_ids
 msgid "Teams"
 msgstr "チーム"
+
+#. module: quality
+#: model:ir.model.fields,help:quality.field_quality_alert__product_tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__test_type
@@ -1029,6 +1090,11 @@ msgid "Today Activities"
 msgstr "本日の活動"
 
 #. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_alert__product_tracking
+msgid "Tracking Method"
+msgstr ""
+
+#. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_tree
 msgid "Type"
@@ -1038,7 +1104,7 @@ msgstr "タイプ"
 #: model:ir.model.fields,help:quality.field_quality_alert__activity_exception_decoration
 #: model:ir.model.fields,help:quality.field_quality_check__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "記録上の例外活動の種類。"
+msgstr "レコード上の例外の活動タイプ。"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_tag__color
@@ -1061,22 +1127,6 @@ msgid "Very High"
 msgstr "とても高い"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_alert_team__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_check__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_point__website_message_ids
-msgid "Website Messages"
-msgstr "ウェブサイトメッセージ"
-
-#. module: quality
-#: model:ir.model.fields,help:quality.field_quality_alert__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_alert_team__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_check__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_point__website_message_ids
-msgid "Website communication history"
-msgstr "ウェブサイト通信履歴"
-
-#. module: quality
 #: model:quality.reason,name:quality.reason_wo
 msgid "Work Operation"
 msgstr "作業工程"
@@ -1089,35 +1139,26 @@ msgstr "作業区不良"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point_test_type__active
 msgid "active"
-msgstr "アクティブ"
+msgstr "有効"
 
-#~ msgid "Alias domain"
-#~ msgstr "エイリアスドメイン"
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "e.g. Check Dimensions"
+msgstr ""
 
-#~ msgid "Close"
-#~ msgstr "閉じる"
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "e.g. Quarantine, Second Inspection"
+msgstr ""
 
-#~ msgid "Group By"
-#~ msgstr "グループ化"
+#~ msgid "Lot"
+#~ msgstr "ロット"
 
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "アクションを必要とするメッセージの数"
+#~ msgid "Product Variant"
+#~ msgstr "プロダクトバリアント"
 
-#~ msgid "Owner"
-#~ msgstr "オーナー"
+#~ msgid "Website Messages"
+#~ msgstr "ウェブサイトメッセージ"
 
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "次のアクションの日付が今日より前のすべてのレコードを表示する"
-
-#~ msgid ""
-#~ "The owner of records created upon receiving emails on this alias. If this "
-#~ "field is not set the system will attempt to find the right owner based on "
-#~ "the sender (From) address, or will use the Administrator account if no "
-#~ "system user is found for that address."
-#~ msgstr ""
-#~ "このエイリアスに電子メールを受信した時に作成されるレコードのオーナー。この"
-#~ "フィールドが設定されない場合、システムは送信者(From)アドレスに基づいた適切"
-#~ "なオーナーを見つけるか、見つからなければ管理者アカウントを使用します。"
-
-#~ msgid "Viewer"
-#~ msgstr "ビューア"
+#~ msgid "Website communication history"
+#~ msgstr "ウェブサイト通信履歴"

@@ -17,6 +17,8 @@ class TestInGstrPosBase(TestInPosBase):
     This class sets up the company, products, and configuration required
     for any test involving GSTR in a POS environment.
     """
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestTaxCommon.setup_country('in')
     def setUpClass(cls):

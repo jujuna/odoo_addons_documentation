@@ -2,7 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 # mixin
-from . import documents_unlink_mixin
 from . import documents_mixin
 
 # documents
@@ -23,6 +22,7 @@ from . import ir_embedded_actions
 from . import kpi_provider
 from . import mail_activity
 from . import mail_activity_type
+from . import mail_thread
 from . import res_partner
 from . import res_users
 from . import res_company

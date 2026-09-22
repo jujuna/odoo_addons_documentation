@@ -6,7 +6,6 @@ from odoo.addons.iot_drivers.interface import Interface
 
 
 class USBInterface(Interface):
-    connection_type = 'usb'
     allow_unsupported = True
 
     @staticmethod
@@ -27,6 +26,8 @@ class USBInterface(Interface):
             return dev.product != "USB2.0-Ser!"
         except ValueError:
             return True
+        except core.USBError:  # Thrown for some printers like POS80D
+            return False
 
     def get_devices(self):
         """

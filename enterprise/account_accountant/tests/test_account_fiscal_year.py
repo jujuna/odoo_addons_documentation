@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+from odoo.exceptions import ValidationError
 from odoo.tests import tagged
 from odoo import fields
 
 
 @tagged('post_install', '-at_install')
 class TestFiscalPosition(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def check_compute_fiscal_year(self, company, date, expected_date_from, expected_date_to):
         '''Compute the fiscal year at a certain date for the company passed as parameter.
@@ -126,3 +129,81 @@ class TestFiscalPosition(AccountTestInvoicingCommon):
             '2017-06-01',
             '2017-09-30',
         )
+
+    def test_sequencing_invoice(self):
+        self.ensure_installed("account_fiscal_year")
+        self.env['account.fiscal.year'].create([
+            {
+                'name': 'end 2024 - 2026',
+                'date_from': '2024-12-01',
+                'date_to': '2026-03-31',
+                'company_id': self.company.id,
+            },
+            {
+                'name': '2026 - 2027',
+                'date_from': '2026-04-01',
+                'date_to': '2027-12-31',
+                'company_id': self.company.id,
+            },
+        ])
+        for date, expected_name in [
+            ('2024-12-04', 'INV/24-26/0001'),
+            ('2025-05-15', 'INV/24-26/0002'),
+            ('2026-03-15', 'INV/24-26/0003'),
+            ('2026-04-15', 'INV/26-27/0001'),
+            ('2027-01-01', 'INV/26-27/0001'),
+            # Back to normal years
+            ('2028-02-02', 'INV/2028/0001'),
+        ]:
+            move = self._create_invoice(date=date, journal=self.company_data['default_journal_sale'], post=True)
+            self.assertEqual(move.name, expected_name)
+
+    def test_fiscal_year_overlap_constrain(self):
+        company = self.env.company
+
+        self.env['account.fiscal.year'].create({
+            'name': 'FY 2026',
+            'date_from': '2026-01-01',
+            'date_to': '2026-12-31',
+            'company_id': company.id
+        })
+
+        with self.assertRaises(ValidationError):
+            self.env['account.fiscal.year'].create({
+                'name': 'FY 2026 (invalid dates)',
+                'date_from': '2026-01-01',
+                'date_to': '2025-12-31',
+                'company_id': company.id
+            })
+
+        with self.assertRaises(ValidationError):
+            self.env['account.fiscal.year'].create({
+                'name': 'FY 2026 (start overlap)',
+                'date_from': '2026-05-01',
+                'date_to': '2027-05-01',
+                'company_id': company.id
+            })
+
+        with self.assertRaises(ValidationError):
+            self.env['account.fiscal.year'].create({
+                'name': 'FY 2026 (end overlap)',
+                'date_from': '2025-05-01',
+                'date_to': '2026-05-01',
+                'company_id': company.id
+            })
+
+        with self.assertRaises(ValidationError):
+            self.env['account.fiscal.year'].create({
+                'name': 'FY 2026 (smaller year)',
+                'date_from': '2026-05-01',
+                'date_to': '2026-08-01',
+                'company_id': company.id
+            })
+
+        with self.assertRaises(ValidationError):
+            self.env['account.fiscal.year'].create({
+                'name': 'FY 2026 (larger year)',
+                'date_from': '2025-05-01',
+                'date_to': '2027-08-01',
+                'company_id': company.id
+            })

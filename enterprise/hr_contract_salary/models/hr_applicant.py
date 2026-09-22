@@ -90,8 +90,8 @@ class HrApplicant(models.Model):
         if not self.partner_name:
             raise UserError(_('Offer link can not be sent without an applicant name.'))
 
-        offer_validity_period = int(self.env['ir.config_parameter'].sudo().get_param(
-            'hr_contract_salary.access_token_validity', default=30))
+        offer_validity_period = self.env['ir.config_parameter'].sudo().get_int(
+            'hr_contract_salary.access_token_validity') or 30
         offer_values = self._get_offer_values()
 
         offer_values['validity_days_count'] = offer_validity_period
@@ -124,6 +124,8 @@ class HrApplicant(models.Model):
             'contract_template_id': contract_template.id,
             'applicant_id': self.id,
             'final_yearly_costs': contract_template.sudo().final_yearly_costs,
+            'salary_amount': contract_template.sudo().final_yearly_costs,
+            'budget_type': 'yearly_employer',
             'job_title': self.job_id.name,
             'employee_job_id': self.job_id.id,
             'department_id': self.department_id.id,
@@ -139,11 +141,11 @@ class HrApplicant(models.Model):
         return contract_template
 
     def unlink_archived_versions(self):
+        # TODO: depereceated method remove me in master
         archived_versions = self.env['hr.version'].search([
             ('applicant_id', 'in', self.ids),
             ('active', '=', False)
         ])
         if archived_versions:
             archived_versions.sign_request_ids.write({'state': 'canceled', 'active': False})
-            archived_versions.employee_id.unlink()
             archived_versions.unlink()

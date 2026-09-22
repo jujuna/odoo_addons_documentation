@@ -3,27 +3,56 @@ from datetime import datetime
 
 from ..models.gstr_document_summary import DOCUMENT_TYPE_LIST
 
+GSTR1_RETURN_TYPE = 'l10n_in_reports.in_gstr1_return_type'
+GSTR_IFF_RETURN_TYPE = 'l10n_in_reports.in_gstr_iff_return_type'
+
+ALL_SHEETS = ['b2b', 'b2cl', 'b2cs', 'cdnr', 'cdnur', 'exp', 'nil', 'hsn', 'doc_issue']
+
+RETURN_TYPE_SHEETS = {
+    GSTR1_RETURN_TYPE: ALL_SHEETS,
+    GSTR_IFF_RETURN_TYPE: ['b2b', 'cdnr'],
+}
+
 
 class GSTR1SpreadsheetGenerator:
 
-    def __init__(self, gstr1_json):
+    def __init__(self, gstr1_json, return_type=GSTR1_RETURN_TYPE):
         self.gstr1_json = gstr1_json
+        self._return_type = return_type
 
-    def _prepare_sheet_values(self, workbook, cell_formats):
-        self._prepare_b2b_sheet(self.gstr1_json.get('b2b', {}), workbook, cell_formats)
-        self._prepare_b2cl_sheet(self.gstr1_json.get('b2cl', {}), workbook, cell_formats)
-        self._prepare_b2cs_sheet(self.gstr1_json.get('b2cs', {}), workbook, cell_formats)
-        self._prepare_cdnr_sheet(self.gstr1_json.get('cdnr', {}), workbook, cell_formats)
-        self._prepare_cdnur_sheet(self.gstr1_json.get('cdnur', {}), workbook, cell_formats)
-        self._prepare_exp_sheet(self.gstr1_json.get('exp', {}), workbook, cell_formats)
-        self._prepare_nil_sheet(self.gstr1_json.get('nil', {}), workbook, cell_formats)
-        hsn_json = self.gstr1_json.get('hsn', {})
+    def _get_allowed_sheets(self):
+        return RETURN_TYPE_SHEETS.get(self._return_type, ALL_SHEETS)
+
+    def _get_sheet_handlers(self):
+        return {
+            'b2b': self._prepare_b2b_sheet,
+            'b2cl': self._prepare_b2cl_sheet,
+            'b2cs': self._prepare_b2cs_sheet,
+            'cdnr': self._prepare_cdnr_sheet,
+            'cdnur': self._prepare_cdnur_sheet,
+            'exp': self._prepare_exp_sheet,
+            'nil': self._prepare_nil_sheet,
+            'doc_issue': self._prepare_doc_issue_sheet,
+        }
+
+    def _prepare_hsn(self, hsn_json, workbook, cell_formats):
         if 'data' in hsn_json:
             self._prepare_hsn_sheet(hsn_json, workbook, cell_formats)
         else:
             self._prepare_hsn_sheet(hsn_json, workbook, cell_formats, 'hsn_b2b')
-            self._prepare_hsn_sheet(hsn_json, workbook, cell_formats, 'hsn_b2c')
-        self._prepare_doc_issue_sheet(self.gstr1_json.get('doc_issue', {}), workbook, cell_formats)
+            if 'hsn_b2c' in hsn_json:
+                self._prepare_hsn_sheet(hsn_json, workbook, cell_formats, 'hsn_b2c')
+
+    def _prepare_sheet_values(self, workbook, cell_formats):
+        handlers = self._get_sheet_handlers()
+        for sheet in self._get_allowed_sheets():
+            if sheet == 'hsn':
+                self._prepare_hsn(self.gstr1_json.get('hsn', {}), workbook, cell_formats)
+                continue
+            handler = handlers.get(sheet)
+            if not handler:
+                continue
+            handler(self.gstr1_json.get(sheet, {}), workbook, cell_formats)
         # self._prepare_supeco_sheet(gstr1_json.get('supeco', {}), 'clttx', workbook, cell_formats) # Table 14(a) u/s 52(TCS)
         # self._prepare_supeco_sheet(gstr1_json.get('supeco', {}), 'paytx', workbook, cell_formats) # Table 14 (b) u/s 9(5)
 

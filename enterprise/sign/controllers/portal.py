@@ -16,19 +16,25 @@ from odoo.tools import groupby as groupbyelem
 
 class CustomerPortal(portal.CustomerPortal):
 
-    def _prepare_home_portal_values(self, counters):
-        values = super(CustomerPortal, self)._prepare_home_portal_values(counters)
-        if 'to_sign_count' in counters:
-            partner_id = request.env.user.partner_id
-            values['to_sign_count'] = request.env['sign.request.item'].sudo().search_count([
-                ('partner_id', '=', partner_id.id), ('sign_request_id.state', '=', 'sent'), ('is_mail_sent', '=', True),
-            ])
-        if 'sign_count' in counters:
-            partner_id = request.env.user.partner_id
-            values['sign_count'] = request.env['sign.request.item'].sudo().search_count([
-                ('partner_id', '=', partner_id.id), '|', ('state', '=', 'completed'), ('is_mail_sent', '=', True)
-            ])
-        return values
+    def _prepare_portal_counter_values(self, counter):
+        partner_id = request.env.user.partner_id
+        if counter == 'to_sign_count':
+            domain = [
+                ('partner_id', '=', partner_id.id),
+                ('sign_request_id.state', '=', 'sent'),
+                ('state', '=', 'sent'),
+                ('is_mail_sent', '=', True),
+            ]
+            return 'sign.request.item', domain, 'sudo'
+        if counter == 'sign_count':
+            domain = [
+                ('partner_id', '=', partner_id.id),
+                '|',
+                    ('state', '=', 'completed'),
+                    ('is_mail_sent', '=', True),
+            ]
+            return 'sign.request.item', domain, 'sudo'
+        return super()._prepare_portal_counter_values(counter)
 
     @http.route(['/my/signatures', '/my/signatures/page/<int:page>'], type='http', auth='user', website=True)
     def portal_my_signatures(self, page=1, date_begin=None, date_end=None, sortby=None, search=None, search_in='all',
@@ -37,7 +43,7 @@ class CustomerPortal(portal.CustomerPortal):
         values = self._prepare_portal_layout_values()
         partner_id = request.env.user.partner_id
         SignRequestItem = request.env['sign.request.item'].sudo()
-        default_domain = Domain([('partner_id', '=', partner_id.id), '|', ('state', 'in', ['completed', 'canceled']), ('is_mail_sent', '=', True), ('sign_request_id.state', '!=', 'expired')])
+        default_domain = Domain([('partner_id', '=', partner_id.id), '|', ('state', 'in', ['completed', 'canceled']), ('is_mail_sent', '=', True), ('sign_request_id.state', 'not in', ('scheduled', 'expired'))])
 
         searchbar_sortings = {
             'state': {'label': _('Status'), 'order': 'state desc'},
@@ -93,7 +99,7 @@ class CustomerPortal(portal.CustomerPortal):
                                                      offset=pager['offset'])
         request.session['my_signatures_history'] = sign_requests_items.ids[:100]
         if groupby == 'state':
-            grouped_signatures = [SignRequestItem.concat(*g)
+            grouped_signatures = [SignRequestItem.concat(g)
                                   for k, g in groupbyelem(sign_requests_items, itemgetter('state'))]
         else:
             grouped_signatures = [sign_requests_items]
@@ -121,14 +127,14 @@ class CustomerPortal(portal.CustomerPortal):
         sign_item_sudo = request.env['sign.request.item'].sudo().browse(item_id)
         if not sign_item_sudo.exists()\
                 or sign_item_sudo.partner_id != partner_id \
-                or sign_item_sudo.sign_request_id.state == 'canceled' \
                 or (sign_item_sudo.state == 'sent' and sign_item_sudo.is_mail_sent is False):
             return request.redirect('/my/')
         url = f'/sign/document/{sign_item_sudo.sign_request_id.id}/{sign_item_sudo.access_token}?portal=1'
         values = {
             'page_name': 'signature',
             'my_sign_item': sign_item_sudo,
-            'url': url
+            'url': url,
+            'sign_documents': sign_item_sudo.sign_request_id.template_document_ids,
         }
         # exclude access_token from kwargs to prevent redundant passing
         kwargs.pop('access_token', None)

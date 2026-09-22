@@ -24,7 +24,7 @@ patch(CashMovePopup.prototype, {
         if (this.pos.isCountryGermanyAndFiskaly()) {
             return (
                 this.state.amount &&
-                this.env.utils.isValidFloat(this.state.amount) &&
+                this.pos.isValidFloat(this.state.amount) &&
                 this.state.reason_type.trim() !== ""
             );
         }

@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="account_reports.account_return_kanban_view"/>
         <field name="arch" type="xml">
             <a name="action_reset_tax_return_common" position="after">
-                <a invisible="state == 'new' and not is_completed or not is_intrastat_return"
+                <a invisible="not state and not is_completed or not is_intrastat_return"
                    class="dropdown-item"
                    type="object"
                    name="action_reset_2_states"

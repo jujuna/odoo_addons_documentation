@@ -7,7 +7,6 @@ from odoo.addons.mail.tools.discuss import Store
 class ResUsers(models.Model):
     _inherit = "res.users"
 
-    def _init_store_data(self, store: Store):
-        super()._init_store_data(store)
-        has_group = self.env.user.has_group("documents.group_documents_user")
-        store.add_global_values(hasDocumentsUserGroup=has_group)
+    def _store_init_global_fields(self, res: Store.FieldList):
+        super()._store_init_global_fields(res)
+        res.attr("hasDocumentsUserGroup", self.has_group("documents.group_documents_user"))

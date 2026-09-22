@@ -6,7 +6,7 @@ from odoo.tests import Form, new_test_user, tagged, HttpCase
 from odoo.exceptions import AccessError, UserError
 from odoo.fields import Command
 
-from datetime import datetime
+from datetime import datetime, date
 from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
 
@@ -38,6 +38,12 @@ class TestUserAccess(HttpCase):
                                            groups='planning.group_planning_user',
                                            name='Planning User',
                                            email='user@example.com')
+        # create a planning manager
+        self.planning_manager = new_test_user(self.env,
+                                           login='planmanager',
+                                           groups='planning.group_planning_manager',
+                                           name='Planning Manager',
+                                           email='manager@example.com')
 
         self.hr_planning_user = self.env['hr.employee'].create({
             'name': 'Planning User',
@@ -69,30 +75,30 @@ class TestUserAccess(HttpCase):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 27, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 27, 17, 0, 0),
-            'resource_id': self.res_planning_user.id,
+            'resource_ids': self.res_planning_user.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_until': datetime(2022, 6, 27, 17, 0, 0),
             'repeat_interval': 1,
-            'state': 'published',
+            'state': '2_published',
         })
 
         self.slot = self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 28, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 28, 17, 0, 0),
-            'resource_id': self.res_internal_user.id,
+            'resource_ids': self.res_internal_user.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_until': datetime(2022, 6, 28, 17, 0, 0),
             'repeat_interval': 1,
-            'state': 'published',
+            'state': '2_published',
         })
 
     def test_public_user_access_rights(self):
         # create
         with self.assertRaises(AccessError):
             self.env['planning.slot'].with_user(self.user_public.id).create({
-                'resource_id': self.res_planning_user.id,
+                'resource_ids': self.res_planning_user.ids,
                 'start_datetime': datetime(2019, 6, 5, 8),
                 'end_datetime': datetime(2019, 6, 5, 17),
                 'allocated_hours': 8,
@@ -111,7 +117,7 @@ class TestUserAccess(HttpCase):
         # create
         with self.assertRaises(AccessError):
             self.env['planning.slot'].with_user(self.user_portal.id).create({
-                'resource_id': self.res_planning_user.id,
+                'resource_ids': self.res_planning_user.ids,
                 'start_datetime': datetime(2019, 6, 5, 8),
                 'end_datetime': datetime(2019, 6, 5, 17),
                 'allocated_hours': 8,
@@ -131,7 +137,7 @@ class TestUserAccess(HttpCase):
         An internal user shall be able to read its own slots.
         """
         my_slot = self.env['planning.slot'].with_user(self.internal_user).search(
-            [('user_id', '=', self.internal_user.id)],
+            [('resource_ids.user_id', '=', self.internal_user.id)],
             limit=1)
 
         self.assertNotEqual(my_slot.id, False,
@@ -140,10 +146,10 @@ class TestUserAccess(HttpCase):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 5, 28, 8, 0, 0),
             'end_datetime': datetime(2019, 5, 28, 17, 0, 0),
-            'resource_id': self.res_internal_user.id,
-            'state': 'draft',
+            'resource_ids': self.res_internal_user.ids,
+            'state': '1_draft',
         })
-        unpublished_count = self.env['planning.slot'].with_user(self.internal_user).search_count([('state', '=', 'draft')])
+        unpublished_count = self.env['planning.slot'].with_user(self.internal_user).search_count([('state', '=', '1_draft')])
         self.assertEqual(unpublished_count, 0, "An internal user shouldn't see unpublished slots")
 
     def test_02_internal_user_read_other_slots(self):
@@ -151,11 +157,11 @@ class TestUserAccess(HttpCase):
         An internal user shall NOT be able to read other slots.
         """
         other_slot = self.env['planning.slot'].with_user(self.internal_user).search(
-                [('user_id', '=', self.planning_user.id)],
+                [('resource_ids.user_id', '=', self.planning_user.id)],
                 limit=1)
 
         planning_user_slot = self.env['planning.slot'].with_user(self.planning_user).search(
-                [('user_id', '=', self.planning_user.id)],
+                [('resource_ids.user_id', '=', self.planning_user.id)],
                 limit=1)
 
         self.assertFalse(
@@ -170,13 +176,13 @@ class TestUserAccess(HttpCase):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 5, 28, 8, 0, 0),
             'end_datetime': datetime(2019, 5, 28, 17, 0, 0),
-            'resource_id': self.res_planning_user.id,
-            'state': 'draft',
+            'resource_ids': self.res_planning_user.ids,
+            'state': '1_draft',
         })
-        unpublished_count = self.env['planning.slot'].with_user(self.planning_user).search_count([('state', '=', 'draft')])
+        unpublished_count = self.env['planning.slot'].with_user(self.planning_user).search_count([('state', '=', '1_draft')])
         self.assertEqual(unpublished_count, 0, "A planning user shouldn't see unpublished slots")
 
-        mgr_unpublished_count = self.env['planning.slot'].with_user(self.planning_mgr).search_count([('state', '=', 'draft')])
+        mgr_unpublished_count = self.env['planning.slot'].with_user(self.planning_mgr).search_count([('state', '=', '1_draft')])
         self.assertNotEqual(mgr_unpublished_count, 0, "A planning manager should see unpublished slots")
 
     def test_03_internal_user_write_own_slots(self):
@@ -184,7 +190,7 @@ class TestUserAccess(HttpCase):
         An internal user shall NOT be able to write its own slots.
         """
         my_slot = self.env['planning.slot'].with_user(self.internal_user).search(
-            [('user_id', '=', self.internal_user.id)],
+            [('resource_ids.user_id', '=', self.internal_user.id)],
             limit=1)
 
         with self.assertRaises(AccessError):
@@ -200,7 +206,7 @@ class TestUserAccess(HttpCase):
             self.env['planning.slot'].with_user(self.internal_user).create({
                 'start_datetime': datetime(2019, 7, 28, 8, 0, 0),
                 'end_datetime': datetime(2019, 7, 28, 17, 0, 0),
-                'resource_id': self.res_internal_user.id,
+                'resource_ids': self.res_internal_user.ids,
                 'repeat': True,
                 'repeat_type': 'until',
                 'repeat_until': datetime(2022, 7, 28, 17, 0, 0),
@@ -212,7 +218,7 @@ class TestUserAccess(HttpCase):
         An internal user shall be able to see its own progress bar.
         """
         self.env['planning.slot'].with_user(self.internal_user)._gantt_progress_bar(
-            'resource_id', self.res_internal_user.ids, datetime(2015, 11, 8), datetime(2015, 11, 28, 23, 59, 59)
+            'resource_ids', self.res_internal_user.ids, datetime(2015, 11, 8), datetime(2015, 11, 28, 23, 59, 59)
         )
 
     def test_internal_user_can_see_others_progress_bar(self):
@@ -220,7 +226,7 @@ class TestUserAccess(HttpCase):
         An internal user shall be able to see others progress bar.
         """
         self.env['planning.slot'].with_user(self.internal_user)._gantt_progress_bar(
-            'resource_id', self.res_internal_user.ids, datetime(2015, 11, 8), datetime(2015, 11, 28, 23, 59, 59)
+            'resource_ids', self.res_internal_user.ids, datetime(2015, 11, 8), datetime(2015, 11, 28, 23, 59, 59)
         )
 
     def test_portal_user_cannot_access_progress_bar(self):
@@ -228,7 +234,7 @@ class TestUserAccess(HttpCase):
         A portal user shall not be able to see any progress bar.
         """
         progress_bar = self.env['planning.slot'].with_user(self.portal_user)._gantt_progress_bar(
-            'resource_id', [], datetime(2015, 11, 8), datetime(2015, 11, 28, 23, 59, 59)
+            'resource_ids', [], datetime(2015, 11, 8), datetime(2015, 11, 28, 23, 59, 59)
         )
         self.assertFalse(progress_bar, "Progress bar should be empty for non-planning users")
 
@@ -242,8 +248,8 @@ class TestUserAccess(HttpCase):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 25, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 25, 17, 0, 0),
-            'resource_id': self.res_internal_user.id,
-            'state': 'published',
+            'resource_ids': self.res_internal_user.ids,
+            'state': '2_published',
         })
         with self.assertRaises(AccessError):
             self.env['planning.slot'].with_user(self.internal_user).action_copy_previous_week(
@@ -253,7 +259,7 @@ class TestUserAccess(HttpCase):
 
     def test_planning_user_cannot_create_slots(self):
         """ Planning user shall not be able to create slots. """
-        my_slot = self.env['planning.slot'].with_user(self.planning_user).search([('user_id', '=', self.planning_user.id)], limit=1)
+        my_slot = self.env['planning.slot'].with_user(self.planning_user).search([('resource_ids.user_id', '=', self.planning_user.id)], limit=1)
 
         self.assertNotEqual(my_slot.id, False, "An Planning user can see the slots")
 
@@ -261,18 +267,18 @@ class TestUserAccess(HttpCase):
             self.env['planning.slot'].with_user(self.planning_user).create({
                 'start_datetime': datetime(2019, 5, 28, 8, 0, 0),
                 'end_datetime': datetime(2019, 5, 28, 17, 0, 0),
-                'resource_id': self.res_internal_user.id,
-                'state': 'draft',
+                'resource_ids': self.res_internal_user.ids,
+                'state': '1_draft',
             })
 
     def test_planning_user_read_own_and_other_slots(self):
         """ Planning user can read its own and other slots. """
         other_slot = self.env['planning.slot'].with_user(self.planning_user).search(
-                [('user_id', '=', self.internal_user.id)],
+                [('resource_ids.user_id', '=', self.internal_user.id)],
                 limit=1)
 
         planning_user_slot = self.env['planning.slot'].with_user(self.planning_user).search(
-                [('user_id', '=', self.planning_user.id)],
+                [('resource_ids.user_id', '=', self.planning_user.id)],
                 limit=1)
 
         self.assertTrue(
@@ -287,10 +293,10 @@ class TestUserAccess(HttpCase):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 5, 28, 8, 0, 0),
             'end_datetime': datetime(2019, 5, 28, 17, 0, 0),
-            'resource_id': self.res_internal_user.id,
-            'state': 'draft',
+            'resource_ids': self.res_internal_user.ids,
+            'state': '1_draft',
         })
-        unpublished_count = self.env['planning.slot'].with_user(self.planning_user).search_count([('state', '=', 'draft')])
+        unpublished_count = self.env['planning.slot'].with_user(self.planning_user).search_count([('state', '=', '1_draft')])
         self.assertEqual(unpublished_count, 0, "A planning user shouldn't see unpublished slots")
 
     @freeze_time("2019-05-28 08:00:00")
@@ -299,10 +305,10 @@ class TestUserAccess(HttpCase):
         test_slot = self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 5, 28, 8, 0, 0),
             'end_datetime': datetime(2019, 5, 28, 17, 0, 0),
-            'state': 'published',
+            'state': '2_published',
         })
         test_slot.with_user(self.planning_user).action_self_assign()
-        self.assertEqual(test_slot.resource_id, self.res_planning_user, "Planning user can take slot")
+        self.assertEqual(test_slot.resource_ids, self.res_planning_user, "Planning user can take slot")
 
     def test_planning_user_can_unassign_slots(self):
         """ Planning user can unassign their own slots. """
@@ -314,13 +320,12 @@ class TestUserAccess(HttpCase):
         test_slot = self.env['planning.slot'].create({
             'start_datetime': datetime.now() + relativedelta(days=2),
             'end_datetime': datetime.now() + relativedelta(days=3),
-            'state': 'published',
-            'employee_id': self.planning_user.employee_id.id,
-            'resource_id': self.res_planning_user.id,
+            'state': '2_published',
+            'resource_ids': self.res_planning_user.ids,
             'unassign_deadline':  datetime.now() + relativedelta(days=1),
         })
         test_slot.with_user(self.planning_user).action_self_unassign()
-        self.assertFalse(test_slot.resource_id, "Planning user can unassign their slot")
+        self.assertFalse(test_slot.resource_ids, "Planning user can unassign their slot")
 
     def test_planning_user_cannot_unassign_slots(self):
         """ Test unassignment when the planning user cannot unassign their own slots. """
@@ -331,9 +336,8 @@ class TestUserAccess(HttpCase):
         test_slot = self.env['planning.slot'].create({
             'start_datetime': datetime.now() + relativedelta(days=2),
             'end_datetime': datetime.now() + relativedelta(days=3),
-            'state': 'published',
-            'employee_id': self.planning_user.employee_id.id,
-            'resource_id': self.res_planning_user.id,
+            'state': '2_published',
+            'resource_ids': self.res_planning_user.ids,
             'unassign_deadline': datetime.now() + relativedelta(days=1),
         })
         with self.assertRaises(UserError):
@@ -349,8 +353,8 @@ class TestUserAccess(HttpCase):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 25, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 25, 17, 0, 0),
-            'resource_id': self.res_planning_user.id,
-            'state': 'published',
+            'resource_ids': self.res_planning_user.ids,
+            'state': '2_published',
         })
         with self.assertRaises(AccessError):
             self.env['planning.slot'].with_user(self.planning_user).action_copy_previous_week(
@@ -365,7 +369,7 @@ class TestUserAccess(HttpCase):
         test_slot = self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 25, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 25, 17, 0, 0),
-            'resource_id': self.res_planning_user.id,
+            'resource_ids': self.res_planning_user.ids,
         })
         self.env['planning.slot'].with_user(self.planning_mgr).action_copy_previous_week(
             '2019-07-01 00:00:00',
@@ -401,7 +405,7 @@ class TestUserAccess(HttpCase):
         slot = self.env['planning.slot'].with_user(out_user).create({
             'start_datetime': datetime(2019, 7, 28, 8, 0, 0),
             'end_datetime': datetime(2019, 7, 28, 17, 0, 0),
-            'employee_id': out_user.employee_id.id,
+            'resource_ids': out_user.employee_id.resource_id.ids,
             'repeat': False,
         })
         send = self.env['planning.send'].with_user(in_user).create({
@@ -437,12 +441,12 @@ class TestUserAccess(HttpCase):
                 {
                     'start_datetime': datetime(2019, 7, 28, 8, 0, 0),
                     'end_datetime': datetime(2019, 7, 28, 17, 0, 0),
-                    'employee_id': employee_1.id,
+                    'resource_ids': employee_1.resource_id.ids,
                     'repeat': False,
                 }, {
                     'start_datetime': datetime(2019, 7, 28, 8, 0, 0),
                     'end_datetime': datetime(2019, 7, 28, 17, 0, 0),
-                    'employee_id': employee_2.id,
+                    'resource_ids': employee_2.resource_id.ids,
                     'repeat': False,
                 },
             ])
@@ -463,26 +467,31 @@ class TestUserAccess(HttpCase):
             - Create 2 slots
             - Archive employee
         """
+        has_payroll_module = self.env['ir.module.module'].search_count([
+            ('name', '=', 'hr_payroll'),
+            ('state', '=', 'installed'),
+        ])
+        group = 'hr_payroll.group_hr_payroll_user' if has_payroll_module else 'hr.group_hr_user'
         hr_officer = new_test_user(
-            self.env, login='hr_user', groups='hr.group_hr_user',
+            self.env, login='hr_user', groups=group,
             name='HR Officer', email='hro@example.com')
 
         employee_eren = self.env['hr.employee'].with_user(hr_officer).create({
             'name': 'bert',
             'work_email': 'bert@a.be',
             'tz': 'UTC',
-            'employee_type': 'freelance',
         })
+        employee_eren.version_id.date_version = date(2019, 1, 1)
 
         with freeze_time("2020-04-22"):
             slot_1, slot_2 = self.env['planning.slot'].create([
                 {
-                    'resource_id': employee_eren.resource_id.id,
+                    'resource_ids': employee_eren.resource_id.ids,
                     'start_datetime': datetime(2020, 4, 20, 8, 0),
                     'end_datetime': datetime(2020, 4, 24, 17, 0),
                 },
                 {
-                    'resource_id': employee_eren.resource_id.id,
+                    'resource_ids': employee_eren.resource_id.ids,
                     'start_datetime': datetime(2020, 4, 23, 8, 0),
                     'end_datetime': datetime(2020, 4, 24, 17, 0),
                 },
@@ -490,10 +499,13 @@ class TestUserAccess(HttpCase):
 
             initial_end_date = slot_1.end_datetime
 
-            employee_eren.with_user(hr_officer).action_archive()
+            self.env['hr.employee.departure'].with_user(hr_officer).create([{
+                'employee_id': employee_eren.id,
+                'dismissal_date': date(2020, 4, 21)
+            }]).action_register()
 
             self.assertNotEqual(slot_1.end_datetime, initial_end_date, 'End date should be updated')
-            self.assertFalse(slot_2.resource_id, 'Resource should be the False for archeived resource shifts')
+            self.assertFalse(slot_2.resource_ids, 'Resource should be the False for archeived resource shifts')
 
     def test_avatar_card_access_non_hr_user(self):
         """
@@ -515,19 +527,19 @@ class TestUserAccess(HttpCase):
             'default_role_id': role_fablab_room.id,
         })
 
-        # 2. Launching tour as planning user with no additional hr right
-        self.start_tour("/", 'planning_avatar_card_non_hr_user', login='planuser')
+        # 2. Launching tour as planning manager with no additional hr right
+        self.start_tour("/odoo?debug=tests", 'planning_avatar_card_non_hr_user', login='planmanager')
 
     def test_resource_conflicts_with_user(self):
         planning_slots = self.env['planning.slot'].create([
             {
-                'resource_id': self.res_internal_user.id,
+                'resource_ids': self.res_internal_user.ids,
                 'allocated_hours': 4,
                 'start_datetime': datetime(2019, 6, 6, 8, 0, 0),
                 'end_datetime': datetime(2019, 6, 6, 12, 0, 0),
-                'state': 'published',
+                'state': '2_published',
             }, {
-                'resource_id': self.res_internal_user.id,
+                'resource_ids': self.res_internal_user.ids,
                 'allocated_hours': 4,
                 'start_datetime': datetime(2019, 6, 6, 8, 0, 0),
                 'end_datetime': datetime(2019, 6, 6, 12, 0, 0),
@@ -543,17 +555,17 @@ class TestUserAccess(HttpCase):
     def test_user_cannot_self_assign_shift_in_past(self):
         assigned_shift, open_shift = self.env['planning.slot'].create([
             {
-                'resource_id': self.res_internal_user.id,
-                'request_to_switch': True,
+                'resource_ids': self.res_internal_user.ids,
+                'switch_employee_ids': self.res_internal_user.employee_id.ids,
                 'start_datetime': datetime(2019, 6, 6, 8, 0, 0),
                 'end_datetime': datetime(2019, 6, 6, 12, 0, 0),
-                'state': 'published',
+                'state': '2_published',
             },
             {
-                'resource_id': False,
+                'resource_ids': False,
                 'start_datetime': datetime(2019, 6, 6, 8, 0, 0),
                 'end_datetime': datetime(2019, 6, 6, 12, 0, 0),
-                'state': 'published',
+                'state': '2_published',
             },
         ])
         with self.assertRaises(UserError, msg="The user cannot assign himself to a shift in the past"):
@@ -566,11 +578,38 @@ class TestUserAccess(HttpCase):
             'planning_employee_unavailabilities': 'unassign',
         }).execute()
         assigned_shift = self.env['planning.slot'].create({
-            'resource_id': self.planning_user.employee_id.resource_id.id,
-            'request_to_switch': True,
+            'resource_ids': self.planning_user.employee_id.resource_id.ids,
+            'switch_employee_ids': self.planning_user.employee_id.ids,
             'start_datetime': datetime(2019, 6, 6, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 6, 12, 0, 0),
-            'state': 'published',
+            'state': '2_published',
         })
         with self.assertRaises(UserError, msg="The user cannot unassign himself from a shift in the past"):
             assigned_shift.with_user(self.planning_user).action_self_unassign()
+
+    def test_shift_conflicts_only_visible_to_planning_manager(self):
+        planning_slots = self.env['planning.slot'].create([
+            {
+                'resource_ids': [self.hr_planning_mgr.resource_id.id, self.res_internal_user.id],
+                'allocated_hours': 4,
+                'start_datetime': datetime(2019, 6, 6, 8, 0, 0),
+                'end_datetime': datetime(2019, 6, 6, 12, 0, 0),
+                'state': '2_published',
+            }, {
+                'resource_ids': self.hr_planning_mgr.resource_id.ids,
+                'allocated_hours': 4,
+                'start_datetime': datetime(2019, 6, 6, 8, 0, 0),
+                'end_datetime': datetime(2019, 6, 6, 12, 0, 0),
+                'state': '2_published',
+            }
+        ])
+        with Form(planning_slots[0].with_user(self.internal_user)) as slot:
+            self.assertFalse(
+                slot.record.conflicting_slot_ids,
+                "Planning user should not have access to conflicting slots."
+            )
+        with Form(planning_slots[0].with_user(self.planning_mgr)) as slot:
+            self.assertEqual(
+                slot.record.conflicting_slot_ids, planning_slots[1],
+                "Planning manager should have access to conflicting slots."
+            )

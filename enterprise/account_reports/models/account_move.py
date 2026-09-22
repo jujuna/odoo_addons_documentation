@@ -7,20 +7,7 @@ class AccountMove(models.Model):
     closing_return_id = fields.Many2one(comodel_name='account.return', index='btree_not_null', copy=False)
 
     def action_open_tax_return(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'name': self.closing_return_id.name,
-            'res_model': 'account.return.check',
-            'view_mode': 'kanban',
-            'context': {
-                'active_model': 'account.return',
-                'active_id': self.closing_return_id.id,
-                'active_ids': self.closing_return_id.ids,
-                'account_return_view_id': self.env.ref('account_reports.account_return_kanban_view').id,
-            },
-            'domain': [['return_id', '=', self.closing_return_id.id]],
-            'views': [(self.env.ref('account_reports.account_return_check_kanban_view').id, 'kanban')],
-        }
+        return self.closing_return_id.action_open_account_return()
 
     def unlink(self):
         for move in self:
@@ -52,9 +39,10 @@ class AccountMove(models.Model):
         if not self:
             return
 
-        all_statuses = self.env['account.audit.account.status'].search([
+        all_statuses = self.env['account.audit.account.status'].sudo().search([
             ('account_id', 'in', self.line_ids.account_id.ids),
             ('status', 'in', (False, 'reviewed', 'supervised')),
+            ('audit_id.company_ids', 'in', self.company_id.ids),
         ])
 
         if not all_statuses:

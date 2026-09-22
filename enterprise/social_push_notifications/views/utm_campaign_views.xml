@@ -6,11 +6,11 @@
         <field name="inherit_id" ref="utm.utm_campaign_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_send_push_notification" type="object" class="oe_highlight order-3" string="Send Push" groups="social.group_social_user"/>
+                <button name="action_send_push_notification" type="object" class="oe_highlight order-3" string="New Push" groups="social.group_social_user"/>
             </xpath>
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                 <button name="action_redirect_to_push_notifications"
-                    type="object" class="oe_stat_button order-11 border-end" icon="fa-bell"
+                    type="object" class="oe_stat_button border-end" icon="notifications" icon_class="oi-filled"
                     invisible="social_push_notifications_count == 0" groups="social.group_social_user">
                     <field name="social_push_notifications_count" widget="statinfo" string="Notifications"/>
                 </button>
@@ -30,8 +30,8 @@
         <field name="inherit_id" ref="utm.utm_campaign_view_kanban"/>
         <field name="arch" type="xml">
             <xpath expr="//ul[@id='o_utm_actions']">
-                <a name="action_redirect_to_push_notifications" type="object"
-                    t-attf-class="pe-2 #{record.social_push_notifications_count.raw_value === 0 ? 'text-muted' : ''}" groups="social.group_social_user">
+                <a name="action_redirect_to_push_notifications" type="object" class="pe-2"
+                    t-if="record.social_push_notifications_count.raw_value !== 0" groups="social.group_social_user">
                     <field name="social_push_notifications_count" /> Notifications
                 </a>
             </xpath>

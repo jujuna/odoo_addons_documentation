@@ -183,13 +183,6 @@
         <field name="info_type_id" ref="hr_contract_salary_personal_info_type_certificate"/>
     </record>
 
-    <record id="hr_contract_salary_personal_info_study_school" model="hr.contract.salary.personal.info">
-        <field name="name">School</field>
-        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.employee'), ('name', '=', 'study_school')])"/>
-        <field name="applies_on">employee</field>
-        <field name="info_type_id" ref="hr_contract_salary_personal_info_type_certificate"/>
-    </record>
-
     <record id="hr_contract_salary_personal_info_type_contact" model="hr.contract.salary.personal.info.type">
         <field name="name">Contact Information</field>
         <field name="sequence">200</field>
@@ -212,18 +205,9 @@
 
     <record id="hr_contract_salary_personal_info_acc_number" model="hr.contract.salary.personal.info">
         <field name="name">Bank account</field>
-        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'res.partner.bank'), ('name', '=', 'acc_number')])"/>
+        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'res.partner.bank'), ('name', '=', 'account_number')])"/>
         <field name="applies_on">bank_account</field>
         <field name="info_type_id" ref="hr_contract_salary_personal_info_type_contact"/>
-    </record>
-
-    <record id="hr_contract_salary_personal_info_private_license_plate" model="hr.contract.salary.personal.info">
-        <field name="name">Private License Plate</field>
-        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.employee'), ('name', '=', 'private_car_plate')])"/>
-        <field name="applies_on">employee</field>
-        <field name="info_type_id" ref="hr_contract_salary_personal_info_type_contact"/>
-        <field name="is_required">False</field>
-        <field name="sequence">245</field>
     </record>
 
     <record id="hr_contract_salary_personal_info_type_emergency" model="hr.contract.salary.personal.info.type">

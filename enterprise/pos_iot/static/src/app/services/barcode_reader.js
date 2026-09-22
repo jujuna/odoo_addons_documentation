@@ -1,20 +1,39 @@
 import { patch } from "@web/core/utils/patch";
-import { BarcodeReader } from "@point_of_sale/app/services/barcode_reader_service";
+import {
+    BarcodeReader,
+    barcodeReaderService,
+} from "@point_of_sale/app/services/barcode_reader_service";
+
+patch(barcodeReaderService, {
+    dependencies: [...barcodeReaderService.dependencies, "iot_http"],
+});
 
 patch(BarcodeReader.prototype, {
-    connectToProxy() {
-        this.scanners = this.hardwareProxy.deviceControllers.scanners;
+    setup(parser, { iot_http }) {
+        super.setup(...arguments);
+        this.iotHttp = iot_http;
+    },
+    /**
+     * @param {Object} iotBarcodeReaders
+     */
+    setupListeners(iotBarcodeReaders) {
+        this.scanners = iotBarcodeReaders ??= {};
         for (const scanner of Object.values(this.scanners)) {
-            scanner.addListener((barcode) => this.scan(barcode.value));
+            this.keepListening(scanner);
         }
     },
-
-    // the barcode scanner will stop listening on the hw_proxy/scanner remote interface
-    disconnectFromProxy() {
-        if (this.scanners) {
-            for (const scanner of Object.values(this.scanners)) {
-                scanner.removeListener();
-            }
-        }
+    /**
+     * @param {Object} scanner
+     */
+    keepListening(scanner) {
+        this.iotHttp.onMessage(
+            scanner.iot_id,
+            scanner.identifier,
+            (barcode) => {
+                this.scan(barcode.value);
+                this.keepListening(scanner);
+            },
+            () => this.keepListening(scanner)
+        );
     },
 });

@@ -15,7 +15,7 @@ export const stepUtils = {
     },
     inputManuallyBarcode(barcode) {
         return [
-            { trigger: ".o_barcode_actions", run: "click" },
+            { trigger: ".o_stock_mobile_barcode", run: "click" },
             { trigger: "input#manual_barcode", run: "click" },
             { trigger: "input#manual_barcode", run: `edit ${barcode}` },
             { trigger: "input#manual_barcode+button", run: "click" },

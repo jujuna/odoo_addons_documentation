@@ -1,9 +1,11 @@
-import { registry } from "@web/core/registry"
+import { EventBus } from "@odoo/owl";
+import { registry } from "@web/core/registry";
 
 
-export async function AccountReturnRefreshHandler(env, action) {
+export async function AccountReturnRefreshHandler(_, action) {
     const params = action.params || {};
-    env.bus.trigger("return_reload_model", {resIds: params.return_ids});
+    const bus = new EventBus();
+    bus.trigger("return_reload_model", {resIds: params.return_ids});
     return params.next_action;
 }
 

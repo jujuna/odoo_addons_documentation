@@ -3,7 +3,7 @@ import * as Dialog from "@point_of_sale/../tests/generic_helpers/dialog_util";
 import * as Chrome from "@point_of_sale/../tests/pos/tours/utils/chrome_util";
 import * as ProductScreen from "@point_of_sale/../tests/pos/tours/utils/product_screen_util";
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
-import * as ReceiptScreen from "@point_of_sale/../tests/pos/tours/utils/receipt_screen_util";
+import * as FeedbackScreen from "@point_of_sale/../tests/pos/tours/utils/feedback_screen_util";
 import * as TicketScreen from "@point_of_sale/../tests/pos/tours/utils/ticket_screen_util";
 import * as TextInputPopup from "@point_of_sale/../tests/generic_helpers/text_input_popup_util";
 
@@ -16,7 +16,7 @@ registry.category("web_tour.tours").add("test_refund_with_gift_card_mx", {
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Cash"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.clickNextOrder(),
+            FeedbackScreen.clickNextOrder(),
             ProductScreen.clickRefund(),
             TicketScreen.selectOrder("-0001"),
             ProductScreen.clickNumpad("1"),
@@ -29,7 +29,7 @@ registry.category("web_tour.tours").add("test_refund_with_gift_card_mx", {
             PaymentScreen.isShown(),
             PaymentScreen.clickPaymentMethod("Cash"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.isShown(),
+            FeedbackScreen.isShown(),
         ].flat(),
 });
 
@@ -39,17 +39,19 @@ registry.category("web_tour.tours").add("test_refund_with_discount", {
             Chrome.startPoS(),
             Dialog.confirm("Open Register"),
             ProductScreen.clickDisplayedProduct("Whiteboard Pen"),
+            ProductScreen.totalAmountIs("3.20"),
             ProductScreen.clickControlButton("Discount"),
             Dialog.confirm(),
+            ProductScreen.totalAmountIs("2.88"),
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Cash"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.clickNextOrder(),
+            FeedbackScreen.clickNextOrder(),
             ProductScreen.clickRefund(),
             TicketScreen.selectOrder("-000001"),
             ProductScreen.clickNumpad("1"),
             TicketScreen.confirmRefund(),
-            Dialog.is({ title: "Refund Amount Exceeds Original Order" }),
-            Dialog.confirm(),
+            PaymentScreen.isShown(),
+            PaymentScreen.totalIs("-2.88"),
         ].flat(),
 });

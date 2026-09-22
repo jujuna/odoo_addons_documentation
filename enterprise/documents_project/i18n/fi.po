@@ -11,22 +11,29 @@
 # Ossi Mantylahti <ossi.mantylahti@obs-solutions.fi>, 2023
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# Saara Hakanen <sahak@odoo.com>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-12-30 14:59+0000\n"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 03:26+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "documents_project/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents_project
+#: model:ir.module.module,description:base.module_documents_project
+msgid ""
+"\n"
+"Add the ability to create invoices from the document module.\n"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_ir_attachment
@@ -35,8 +42,8 @@ msgstr "Liite"
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_res_company
-msgid "Companies"
-msgstr "Yritykset"
+msgid "Company"
+msgstr "Yritys"
 
 #. module: documents_project
 #. odoo-python
@@ -49,6 +56,11 @@ msgstr "Yrityksen projektikansioita ei voi liittää toiseen yritykseen.%s"
 #: model:ir.model,name:documents_project.model_res_config_settings
 msgid "Config Settings"
 msgstr "Asetukset"
+
+#. module: documents_project
+#: model:ir.model,website_form_label:documents_project.model_project_task
+msgid "Create a Task"
+msgstr "Luo tehtävä"
 
 #. module: documents_project
 #: model:documents.document,name:documents_project.project_1_document_1
@@ -70,6 +82,7 @@ msgstr "Oletusprojektikansio"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__display_name
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__display_name
 #: model:ir.model.fields,field_description:documents_project.field_project_project__display_name
+#: model:ir.model.fields,field_description:documents_project.field_project_task__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_company__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__display_name
 msgid "Display Name"
@@ -81,13 +94,18 @@ msgid "Document"
 msgstr "Dokumentti"
 
 #. module: documents_project
-#. odoo-python
-#: code:addons/documents_project/models/project_project.py:0
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents_dashboard
-#: model_terms:ir.ui.view,arch_db:documents_project.project_view_kanban_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.edit_project_document_form_inherit
+#: model_terms:ir.ui.view,arch_db:documents_project.project_view_card_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.view_task_form2
 msgid "Documents"
 msgstr "Asiakirjat"
+
+#. module: documents_project
+#: model:ir.module.module,shortdesc:base.module_documents_project
+msgid "Documents - Projects"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model.fields,field_description:documents_project.field_project_project__documents_folder_id
@@ -120,6 +138,7 @@ msgstr "Kansio, johon uudet projektit luodaan"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__id
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__id
 #: model:ir.model.fields,field_description:documents_project.field_project_project__id
+#: model:ir.model.fields,field_description:documents_project.field_project_task__id
 #: model:ir.model.fields,field_description:documents_project.field_res_company__id
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__id
 msgid "ID"
@@ -133,7 +152,7 @@ msgstr "Tärkeä asiakaskirje"
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_project_project
 msgid "Project"
-msgstr "Projektit"
+msgstr "Projekti"
 
 #. module: documents_project
 #: model:ir.model.fields,field_description:documents_project.field_res_company__documents_project_folder_id
@@ -142,15 +161,30 @@ msgid "Project Folder"
 msgstr "Projektikansio"
 
 #. module: documents_project
+#: model:ir.module.module,summary:base.module_documents_project
+msgid "Project from documents"
+msgstr ""
+
+#. module: documents_project
 #: model:documents.document,name:documents_project.document_project_folder
 #: model:ir.model.fields,field_description:documents_project.field_documents_document__project_ids
 msgid "Projects"
 msgstr "Projektit"
 
 #. module: documents_project
+#: model:ir.model.fields,field_description:documents_project.field_project_task__document_count
+msgid "Related Document Count"
+msgstr "Liittyvien asiakirjojen määrä"
+
+#. module: documents_project
 #: model:ir.model,name:documents_project.model_documents_tag
 msgid "Tag"
 msgstr "Tunniste"
+
+#. module: documents_project
+#: model:ir.model,name:documents_project.model_project_task
+msgid "Task"
+msgstr "Tehtävä"
 
 #. module: documents_project
 #. odoo-python
@@ -192,9 +226,9 @@ msgid ""
 "to which it is linked. Please update the company of the \"%(project)s\" "
 "project, or leave the company of this folder empty."
 msgstr ""
-"Tämän kansion tulee kuulua samaan yritykseen kuin projektin  \"%"
-"(project)s\", johon se on linkitetty. Päivitä projektin \"%(project)s\" "
-"yritys tai jätä kansion yritystiedot tyhjäksi."
+"Tämän kansion tulee kuulua samaan yritykseen kuin projektin  \"%(project)"
+"s\", johon se on linkitetty. Päivitä projektin \"%(project)s\" yritys tai "
+"jätä kansion yritystiedot tyhjäksi."
 
 #. module: documents_project
 #. odoo-python
@@ -219,6 +253,33 @@ msgstr ""
 msgid "Uh-oh! The project app needs the \"%s\" folder, so you can’t delete it."
 msgstr ""
 "Oi ei! Projekti-sovellus tarvitsee kansion \"%s\", joten et voi poistaa sitä."
+
+#. module: documents_project
+#: model:ir.model.fields,help:documents_project.field_project_task__display_name
+msgid ""
+"Use these keywords in the title to set new tasks:\n"
+"\n"
+"        30h Allocate 30 hours to the task\n"
+"        #tags Set tags on the task\n"
+"        @user Assign the task to a user\n"
+"        ! Set the task a medium priority\n"
+"        !! Set the task a high priority\n"
+"        !!! Set the task a urgent priority\n"
+"\n"
+"        Make sure to use the right format and order e.g. Improve the "
+"configuration screen 5h #feature #v16 @Mitchell !"
+msgstr ""
+"Käytä näitä avansanoja otsikossa määrittääksesi uusia tehtäviä:\n"
+"\n"
+"                     30h Varaa 30 tuntia tehtävään\n"
+"                     #tunnisteet Aseta tunnisteita tehtävälle\n"
+"                     @käytttäjä Määritä tehtävä käyttäjälle\n"
+"                     ! Aseta tehtävälle keskisuuri prioriteetti\n"
+"                     !! Aseta tehtävälle korkea prioriteetti\n"
+"                     !!! Aseta tehtävä kiireelliseksi\n"
+"\n"
+"                    Varmista, että käytät oikeaa muotoa ja järjestystä, "
+"esim. Paranna ruudun konfiguraatiota 5h #ominaisuus #v16 @Mitchell !"
 
 #. module: documents_project
 #. odoo-python
@@ -251,166 +312,3 @@ msgstr ""
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot set a company on the %s folder."
 msgstr "Et voi asettaa yritystä %s-kansioon."
-
-#~ msgid "%(project_name)s's Documents"
-#~ msgstr "%(project_name)s:n asiakirjat"
-
-#~ msgid ""
-#~ "A set of condition and actions which will be available to all attachments "
-#~ "matching the conditions"
-#~ msgstr ""
-#~ "Joukko ehtoja ja toimia, jotka ovat kaikkien ehtoja vastaavien "
-#~ "liitetiedostojen käytettävissä"
-
-#~ msgid "Ask for Validation"
-#~ msgstr "Pyydä varmistusta"
-
-#~ msgid "Categorize and share your documents with your customers"
-#~ msgstr "Luokittele ja jaa asiakirjoja asiakkaidesi kanssa"
-
-#~ msgid "Category"
-#~ msgstr "Kategoria"
-
-#~ msgid "Create"
-#~ msgstr "Luo"
-
-#~ msgid "Create a Task"
-#~ msgstr "Luo tehtävä"
-
-#~ msgid "Default Tags"
-#~ msgstr "Oletustunnisteet"
-
-#~ msgid "Deprecate"
-#~ msgstr "Poista käytöstä"
-
-#~ msgid "Deprecated"
-#~ msgstr "Vanhentunut"
-
-#~ msgid "Documents &amp; Analytics"
-#~ msgstr "Asiakirjat &amp; analytiikka"
-
-#~ msgid "Documents Workspace"
-#~ msgstr "Asiakirjat-työtila"
-
-#~ msgid "Draft"
-#~ msgstr "Luonnos"
-
-#~ msgid "Is Shared"
-#~ msgstr "On jaettu"
-
-#~ msgid "Mark As Draft"
-#~ msgstr "Merkitse luonnokseksi"
-
-#~ msgid "Merged Workspace"
-#~ msgstr "Yhdistetty työtila"
-
-#~ msgid "New task from Documents"
-#~ msgstr "Uusi tehtävä asiakirjoista"
-
-#~ msgid "Number of documents in Project"
-#~ msgstr "Asiakirjojen määrä projektissa"
-
-#~ msgid "Number of documents in Task"
-#~ msgstr "Asiakirjojen määrä tehtävässä"
-
-#~ msgid "Shared Documents"
-#~ msgstr "Jaetut asiakirjat"
-
-#~ msgid "Shared Documents Count"
-#~ msgstr "Jaettujen asiakirjojen määrä"
-
-#~ msgid "Status"
-#~ msgstr "Tila"
-
-#~ msgid "Task"
-#~ msgstr "Tehtävä"
-
-#~ msgid ""
-#~ "The \"%s\" workspace is required by the Project application and cannot be "
-#~ "deleted."
-#~ msgstr "Project-sovellus tarvitsee työtilan \"%s\", eikä sitä voi poistaa."
-
-#~ msgid ""
-#~ "The \"%s\" workspace should either be in the \"%s\" company like this "
-#~ "project or be open to all companies."
-#~ msgstr ""
-#~ "Työtilan \"%s\" pitäisi olla joko \"%s\" -yrityksessä, kuten tässä "
-#~ "projektissa, tai sen pitäisi olla avoin kaikille yrityksille."
-
-#~ msgid ""
-#~ "This workspace should remain in the same company as the \"%s\" project to "
-#~ "which it is linked. Please update the company of the \"%s\" project, or "
-#~ "leave the company of this workspace empty."
-#~ msgstr ""
-#~ "Tämän työtilan tulisi pysyä samassa yrityksessä kuin \"%s\" -projekti, "
-#~ "johon se on linkitetty. Päivitä \"%s-projektin yritys tai jätä tämän "
-#~ "työtilan yritys tyhjäksi."
-
-#~ msgid ""
-#~ "This workspace should remain in the same company as the following "
-#~ "projects to which it is linked:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Please update the company of those projects, or leave the company of this "
-#~ "workspace empty."
-#~ msgstr ""
-#~ "Tämän työtilan tulisi pysyä samassa yrityksessä kuin seuraavat projektit, "
-#~ "joihin se on linkitetty:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Päivitä näiden projektien yritys tai jätä tämän työtilan yritys tyhjäksi."
-
-#~ msgid "To Validate"
-#~ msgstr "Vahvistettavaksi"
-
-#~ msgid ""
-#~ "Upload <span class=\"fw-normal\">a file or </span>drag <span class=\"fw-"
-#~ "normal\">it here.</span>"
-#~ msgstr ""
-#~ "Lähetä <span class=\"fw-normal\">tiedosto tai</span> vedä <span "
-#~ "class=\"fw-normal\">se tänne.</span>"
-
-#~ msgid "Use Documents"
-#~ msgstr "Käytä asiakirjoja"
-
-#~ msgid "Validate"
-#~ msgstr "Hyväksy"
-
-#~ msgid "Validated"
-#~ msgstr "Vahvistettu"
-
-#~ msgid "Workspace"
-#~ msgstr "Työtila"
-
-#~ msgid ""
-#~ "Workspace in which all of the documents of this project will be "
-#~ "categorized. All of the attachments of your tasks will be automatically "
-#~ "added as documents in this workspace as well."
-#~ msgstr ""
-#~ "Työtila, johon kaikki tämän projektin asiakirjat luokitellaan. Kaikki "
-#~ "tehtävien liitetiedostot lisätään automaattisesti asiakirjoiksi myös "
-#~ "tähän työtilaan."
-
-#~ msgid ""
-#~ "You cannot change the company of this project, because its workspace is "
-#~ "linked to the other following projects that are still in the \"%s\" "
-#~ "company:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Please update the company of all projects so that they remain in the same "
-#~ "company as their workspace, or leave the company of the \"%s\" workspace "
-#~ "blank."
-#~ msgstr ""
-#~ "Et voi muuttaa tämän projektin yritystä, koska sen työtila on linkitetty "
-#~ "muihin seuraaviin projekteihin, jotka ovat edelleen \"%s\" -yrityksessä:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Päivitä kaikkien projektien yritys niin, että ne pysyvät samassa "
-#~ "yrityksessä kuin niiden työtila, tai jätä \"%s\" -työtilan yritys "
-#~ "tyhjäksi."
-
-#~ msgid "documents shared"
-#~ msgstr "jaetut asiakirjat"
-
-#~ msgid "new %s from %s"
-#~ msgstr "uusi %s kohteesta %s"

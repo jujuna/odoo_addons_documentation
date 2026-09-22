@@ -1,9 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from collections import defaultdict
-import re
-from odoo import fields, models, _
-from ..api.swissdec_declarations import SwissdecDeclaration, SwissdecInstitution
+import base64
 import math
+import time
+import re
+from collections import defaultdict
+
+from odoo import _, fields, models
+from odoo.tools import BinaryBytes
+
+from ..api.swissdec_declarations import SwissdecDeclaration, SwissdecInstitution
 
 
 class L10nChSalaryCertificate(models.Model):
@@ -51,7 +56,7 @@ class L10nChSalaryCertificate(models.Model):
         if report_pdf.get('tax_accounting_global.pdf'):
             attachment = self.env['ir.attachment'].create({
                 'name': f"Tax_Accounting_Report_{self.year}.pdf",
-                'datas': report_pdf.get('tax_accounting_global.pdf'),
+                'raw': BinaryBytes(base64.b64decode(report_pdf.get('tax_accounting_global.pdf'))),
                 'res_id': self.id,
                 'res_model': self._name,
             })
@@ -104,6 +109,7 @@ class L10nChSalaryCertificate(models.Model):
             if not match:
                 continue
             registration = match.group(1)
+            pdf_raw = BinaryBytes(base64.b64decode(pdf_b64))
 
             employee = employees_mapped_by_registration_number.get(registration, self.env['hr.employee'])
 
@@ -112,15 +118,15 @@ class L10nChSalaryCertificate(models.Model):
                     'employee_id': employee.id,
                     'res_model': self._name,
                     'res_id': self.id,
-                    'pdf_filename': _("Wage_statement_%(year)s_%(name)s", year=self.year, name=employee.name),
+                    'pdf_filename': _("Wage_statement_correction_%(year)s_%(name)s_%(timestamp)s", year=self.year, name=employee.name, timestamp=time.time_ns()),
                     'pdf_to_generate': False,
                     'state': 'pdf_generated',
-                    'pdf_file': pdf_b64
+                    'pdf_file': pdf_raw,
                 })
             else:
                 attachment = self.env['ir.attachment'].create({
                     'name': f"Tax_Accounting_Report_{self.year}_{registration}.pdf",
-                    'datas': pdf_b64,
+                    'raw': pdf_raw,
                     'res_id': self.id,
                     'res_model': self._name,
                 })
@@ -159,3 +165,9 @@ class L10nChSalaryCertificate(models.Model):
             substitution_declaration_id=self.substituted_declaration_id.swissdec_declaration_id,
             CurrentMonth=(self.year, int(self.month), False)
         )
+
+    def _get_posted_mail_template(self):
+        return self.env.ref('documents_hr_payroll.mail_template_new_declaration', raise_if_not_found=False)
+
+    def _get_posted_document_owner(self, employee):
+        return employee.user_id

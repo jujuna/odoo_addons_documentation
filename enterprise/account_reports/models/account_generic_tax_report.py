@@ -5,6 +5,7 @@ from odoo import models, api, _
 from odoo.exceptions import UserError
 from odoo.fields import Domain
 from odoo.tools import SQL
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
 
 class AccountTaxReportHandler(models.AbstractModel):
@@ -21,23 +22,6 @@ class AccountTaxReportHandler(models.AbstractModel):
                 limit=1,
             ):
                 warnings.pop('account_reports.common_warning_draft_in_period')
-
-        # Chek the use of inactive tags in the period
-        query = report._get_report_query(options, 'strict_range')
-        rows = self.env.execute_query(SQL("""
-            SELECT 1
-            FROM %s
-            JOIN account_account_tag_account_move_line_rel aml_tag
-                ON account_move_line.id = aml_tag.account_move_line_id
-            JOIN account_account_tag tag
-                ON aml_tag.account_account_tag_id = tag.id
-            WHERE %s
-            AND NOT tag.active
-            LIMIT 1
-        """, query.from_clause, query.where_clause))
-        if rows:
-            warnings['account_reports.tax_report_warning_inactive_tags'] = {}
-
 
     # -------------------------------------------------------------------------
     # TAX CLOSING
@@ -170,8 +154,9 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
                 SELECT
                     account_tax.id,
                     account_tax.type_tax_use,
-                    ARRAY_AGG(child_tax.id) AS child_tax_ids,
-                    ARRAY_AGG(DISTINCT child_tax.type_tax_use) AS child_types
+                    ARRAY_AGG(child_tax.id ORDER BY child_tax.id) AS child_tax_ids,
+                    ARRAY_AGG(child_tax.type_tax_use ORDER BY child_tax.id) AS child_types,
+                    ARRAY_AGG(child_tax.tax_exigibility ORDER BY child_tax.id) as child_exigibility
                 FROM account_tax_filiation_rel account_tax_rel
                 JOIN account_tax ON account_tax.id = account_tax_rel.parent_tax
                 JOIN account_tax child_tax ON child_tax.id = account_tax_rel.child_tax
@@ -183,31 +168,31 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
         group_of_taxes_info = {}
         child_to_group_of_taxes = {}
         for row in self.env.cr.dictfetchall():
-            row['to_expand'] = row['child_types'] != ['none']
+            row['to_expand'] = set(row['child_types']) != {'none'}
             group_of_taxes_info[row['id']] = row
             for child_id in row['child_tax_ids']:
                 child_to_group_of_taxes[child_id] = row['id']
 
         results = defaultdict(lambda: {  # key: type_tax_use
-            'base_amount': {column_group_key: 0.0 for column_group_key in options['column_groups']},
-            'tax_amount': {column_group_key: 0.0 for column_group_key in options['column_groups']},
-            'tax_non_deductible': {column_group_key: 0.0 for column_group_key in options['column_groups']},
-            'tax_deductible': {column_group_key: 0.0 for column_group_key in options['column_groups']},
-            'tax_due': {column_group_key: 0.0 for column_group_key in options['column_groups']},
+            'base_amount': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
+            'tax_amount': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
+            'tax_non_deductible': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
+            'tax_deductible': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
+            'tax_due': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
             'children': defaultdict(lambda: {  # key: tax_id
-                'base_amount': {column_group_key: 0.0 for column_group_key in options['column_groups']},
-                'tax_amount': {column_group_key: 0.0 for column_group_key in options['column_groups']},
-                'tax_non_deductible': {column_group_key: 0.0 for column_group_key in options['column_groups']},
-                'tax_deductible': {column_group_key: 0.0 for column_group_key in options['column_groups']},
-                'tax_due': {column_group_key: 0.0 for column_group_key in options['column_groups']},
+                'base_amount': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
+                'tax_amount': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
+                'tax_non_deductible': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
+                'tax_deductible': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
+                'tax_due': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
             }),
         })
 
-        for column_group_key, options in options_by_column_group.items():
+        for column_group_index, options in options_by_column_group.items():
             query = report._get_report_query(options, 'strict_range')
             # make sure account_move is always joined
             if 'account_move_line__move_id' not in query._joins:
-                query.join('account_move_line', 'move_id', 'account_move', 'id', 'move_id')
+                query.table._sudo()._join('move_id', kind='JOIN')
 
             # Fetch the base amounts.
             self.env.cr.execute(SQL(
@@ -277,19 +262,20 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
                         group_tax_id = child_to_group_of_taxes[row['tax_id']]
                         if group_tax_id not in group_of_taxes_with_extra_base_amount:
                             group_tax_info = group_of_taxes_info[group_tax_id]
-                            results[group_tax_info['type_tax_use']]['children'][group_tax_id]['base_amount'][column_group_key] += row['base_amount']
+                            results[group_tax_info['type_tax_use']]['children'][group_tax_id]['base_amount'][column_group_index] += row['base_amount']
                             group_of_taxes_with_extra_base_amount.add(group_tax_id)
                     else:
                         tax_type_tax_use = row['src_group_tax_type_tax_use'] or row['src_tax_type_tax_use']
-                        results[tax_type_tax_use]['children'][row['tax_id']]['base_amount'][column_group_key] += row['base_amount']
+                        results[tax_type_tax_use]['children'][row['tax_id']]['base_amount'][column_group_index] += row['base_amount']
                 else:
                     if row['tax_id'] in group_of_taxes_info and group_of_taxes_info[row['tax_id']]['to_expand']:
                         # Expand the group of taxes since it contains at least one tax with a type != 'none'.
                         group_info = group_of_taxes_info[row['tax_id']]
-                        for child_tax_id in group_info['child_tax_ids']:
-                            results[group_info['type_tax_use']]['children'][child_tax_id]['base_amount'][column_group_key] += row['base_amount']
+                        for child_tax_id, child_exigibility in zip(group_info['child_tax_ids'], group_info['child_exigibility']):
+                            if child_exigibility != 'on_payment':
+                                results[group_info['type_tax_use']]['children'][child_tax_id]['base_amount'][column_group_index] += row['base_amount']
                     else:
-                        results[row['tax_type_tax_use']]['children'][row['tax_id']]['base_amount'][column_group_key] += row['base_amount']
+                        results[row['tax_type_tax_use']]['children'][row['tax_id']]['base_amount'][column_group_index] += row['base_amount']
 
             # Fetch the tax amounts.
 
@@ -342,13 +328,13 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
                 tax_id = row['tax_id']
                 if row['group_tax_id']:
                     tax_type_tax_use = row['group_tax_type_tax_use']
-                    if not group_of_taxes_info[row['group_tax_id']]['to_expand']:
+                    if row['group_tax_id'] not in group_of_taxes_info or not group_of_taxes_info[row['group_tax_id']]['to_expand']:
                         tax_id = row['group_tax_id']
                 else:
                     tax_type_tax_use = row['group_tax_type_tax_use'] or row['tax_type_tax_use']
 
-                results[tax_type_tax_use]['tax_amount'][column_group_key] += row['tax_amount']
-                results[tax_type_tax_use]['children'][tax_id]['tax_amount'][column_group_key] += row['tax_amount']
+                results[tax_type_tax_use]['tax_amount'][column_group_index] += row['tax_amount']
+                results[tax_type_tax_use]['children'][tax_id]['tax_amount'][column_group_index] += row['tax_amount']
 
                 if options.get('account_journal_report_tax_deductibility_columns'):
                     tax_detail_label = False
@@ -358,8 +344,8 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
                         tax_detail_label = 'tax_due'
 
                     if tax_detail_label:
-                        results[tax_type_tax_use][tax_detail_label][column_group_key] += row['tax_amount'] * row['trl_factor']
-                        results[tax_type_tax_use]['children'][tax_id][tax_detail_label][column_group_key] += row['tax_amount'] * row['trl_factor']
+                        results[tax_type_tax_use][tax_detail_label][column_group_index] += row['tax_amount'] * row['trl_factor']
+                        results[tax_type_tax_use]['children'][tax_id][tax_detail_label][column_group_index] += row['tax_amount'] * row['trl_factor']
 
         return results
 
@@ -400,7 +386,7 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
                     group_of_taxes_to_expand.add(group.id)
 
         res = {}
-        for column_group_key, options in options_by_column_group.items():
+        for column_group_index, options in options_by_column_group.items():
             query = report._get_report_query(options, 'strict_range')
             tax_details_query = self.env['account.move.line']._get_query_tax_details(query.from_clause, query.where_clause)
 
@@ -456,16 +442,16 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
                     cumulated_row_key_tuple = tuple(cumulated_row_key)
 
                     node.setdefault(row_key, {
-                        'base_amount': {column_group_key: 0.0 for column_group_key in options['column_groups']},
-                        'tax_amount': {column_group_key: 0.0 for column_group_key in options['column_groups']},
+                        'base_amount': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
+                        'tax_amount': {column_group_index: 0.0 for column_group_index in range(len(options['column_groups']))},
                         'children': {},
                     })
                     sub_node = node[row_key]
 
                     # Add amounts.
                     if cumulated_row_key_tuple not in row_keys:
-                        sub_node['base_amount'][column_group_key] += row['base_amount']
-                    sub_node['tax_amount'][column_group_key] += row['tax_amount']
+                        sub_node['base_amount'][column_group_index] += row['base_amount']
+                    sub_node['tax_amount'][column_group_index] += row['tax_amount']
 
                     node = sub_node['children']
                     row_keys.add(cumulated_row_key_tuple)
@@ -511,8 +497,8 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
             tax_amounts = tax_amount_dict['tax_amount']
 
             for column in options['columns']:
-                tax_base_amount = tax_base_amounts[column['column_group_key']]
-                tax_amount = tax_amounts[column['column_group_key']]
+                tax_base_amount = tax_base_amounts[column['column_group_index']]
+                tax_amount = tax_amounts[column['column_group_index']]
 
                 expr_label = column.get('expression_label')
                 col_value = ''
@@ -523,31 +509,25 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
                 if expr_label == 'tax':
                     col_value = sign * tax_amount
 
-                columns.append(report._build_column_dict(col_value, column, options=options))
+                columns.append(report._build_column_data(col_value, column, options=options))
 
                 # Add the non-deductible, deductible and due tax amounts.
                 if expr_label == 'tax' and options.get('account_journal_report_tax_deductibility_columns'):
                     for deduct_type in ('tax_non_deductible', 'tax_deductible', 'tax_due'):
-                        columns.append(report._build_column_dict(
-                            col_value=sign * tax_amount_dict[deduct_type][column['column_group_key']],
-                            col_data={
+                        columns.append(report._build_column_data(
+                            sign * tax_amount_dict[deduct_type][column['column_group_index']],
+                            {
                                 'figure_type': 'monetary',
-                                'column_group_key': column['column_group_key'],
+                                'column_group_index': column['column_group_index'],
                                 'expression_label': deduct_type,
                             },
                             options=options,
                         ))
 
-            # Prepare line.
-            default_vals = {
-                'columns': columns,
-                'level': index if index == 0 else index + 1,
-                'unfoldable': False,
-            }
-            report_line = self._build_report_line(report, options, default_vals, groupby_key, sorting_map[key][0], parent_line_id, warnings)
+            report_line = self._build_report_line(report, options, columns, index if index == 0 else index + 1, groupby_key, sorting_map[key][0], parent_line_id, warnings)
 
             if groupby_key == 'src_tax_id':
-                report_line['caret_options'] = 'generic_tax_report'
+                report_line.caret_options = 'generic_tax_report'
 
             lines.append((0, report_line))
 
@@ -561,11 +541,11 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
                 tax_amount_dict.get('children'),
                 index=index + 1,
                 type_tax_use=type_tax_use,
-                parent_line_id=report_line['id'],
+                parent_line_id=report_line.id,
                 warnings=warnings,
             )
 
-    def _build_report_line(self, report, options, default_vals, groupby_key, value, parent_line_id, warnings=None):
+    def _build_report_line(self, report, options, columns, level, groupby_key, value, parent_line_id, warnings=None):
         """ Build the report line accordingly to its type.
         :param options:         The report options.
         :param default_vals:    The pre-computed report line values.
@@ -575,49 +555,54 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
         :param warnings:        The warnings dictionary.
         :return:                A python dictionary.
         """
-        report_line = dict(default_vals)
+        base_line = AccountReportLineData(
+            columns=columns,
+            level=level,
+            unfoldable=False,
+        )
+
         if parent_line_id is not None:
-            report_line['parent_id'] = parent_line_id
+            base_line.parent_id = parent_line_id
 
         if groupby_key == 'src_tax_type_tax_use':
             type_tax_use_option = value
-            report_line['id'] = report._get_generic_line_id(None, None, markup=type_tax_use_option[0], parent_line_id=parent_line_id)
-            report_line['name'] = type_tax_use_option[1]
+            base_line.id = report._get_generic_line_id(None, None, markup=type_tax_use_option[0], parent_line_id=parent_line_id)
+            base_line.name = type_tax_use_option[1]
 
         elif groupby_key == 'src_tax_id':
             tax = value
-            report_line['id'] = report._get_generic_line_id(tax._name, tax.id, parent_line_id=parent_line_id)
+            base_line.id = report._get_generic_line_id(tax._name, tax.id, parent_line_id=parent_line_id)
 
             if tax.amount_type == 'percent':
-                report_line['name'] = f"{tax.name} ({tax.amount}%)"
+                base_line.name = f"{tax.name} ({tax.amount}%)"
 
                 if warnings is not None:
-                    self._check_line_consistency(report, options, report_line, tax, warnings)
+                    self._check_line_consistency(report, options, base_line, tax, warnings)
             elif tax.amount_type == 'fixed':
-                report_line['name'] = f"{tax.name} ({tax.amount})"
+                base_line.name = f"{tax.name} ({tax.amount})"
             else:
-                report_line['name'] = tax.name
+                base_line.name = tax.name
 
             if options.get('multi-company'):
-                report_line['name'] = f"{report_line['name']} - {tax.company_id.display_name}"
+                base_line.name = f"{base_line.name} - {tax.company_id.display_name}"
 
         elif groupby_key == 'account_id':
             account = value
-            report_line['id'] = report._get_generic_line_id(account._name, account.id, parent_line_id=parent_line_id)
+            base_line.id = report._get_generic_line_id(account._name, account.id, parent_line_id=parent_line_id)
 
             if options.get('multi-company'):
-                report_line['name'] = f"{account.display_name} - {account.company_id.display_name}"
+                base_line.name = f"{account.display_name} - {account.company_id.display_name}"
             else:
-                report_line['name'] = account.display_name
+                base_line.name = account.display_name
 
-        return report_line
+        return base_line
 
     def _check_line_consistency(self, report, options, report_line, tax, warnings=None):
         tax_applied = tax.amount * sum(tax.invoice_repartition_line_ids.filtered(lambda tax_rep: tax_rep.repartition_type == 'tax').mapped('factor')) / 100
 
-        for column_group_key in report._split_options_per_column_group(options):
-            net_value = next((col['no_format'] for col in report_line['columns'] if col['column_group_key'] == column_group_key and col['expression_label'] == 'net'), 0)
-            tax_value = next((col['no_format'] for col in report_line['columns'] if col['column_group_key'] == column_group_key and col['expression_label'] == 'tax'), 0)
+        for column_group_index in report._split_options_per_column_group(options):
+            net_value = next((col.no_format for col in report_line.columns if col.column_group_index == column_group_index and col.expression_label == 'net'), 0)
+            tax_value = next((col.no_format for col in report_line.columns if col.column_group_index == column_group_index and col.expression_label == 'tax'), 0)
 
             if net_value == '':  # noqa: PLC1901
                 continue
@@ -627,11 +612,11 @@ class AccountGenericTaxReportHandler(models.AbstractModel):
             is_inconsistent = currency.compare_amounts(computed_tax_amount, tax_value)
 
             if is_inconsistent:
-                error = abs(abs(tax_value) - abs(computed_tax_amount)) / float(net_value or 1)
+                error = abs((abs(tax_value) - abs(computed_tax_amount)) / float(net_value or 1))
 
                 # Error is bigger than 0.1%. We can not ignore it.
                 if error > 0.001:
-                    report_line['alert'] = True
+                    report_line.get_custom()['alert'] = True  # Custom here means that the line has an alert
                     warnings['account_reports.tax_report_warning_lines_consistency'] = {'alert_type': 'danger'}
 
                     return

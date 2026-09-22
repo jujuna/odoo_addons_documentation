@@ -6,7 +6,7 @@ import requests
 from urllib.parse import quote, unquote
 from datetime import datetime
 
-from odoo import _, models, fields
+from odoo import _, api, models, fields
 
 from odoo.exceptions import UserError
 from odoo.addons.social_linkedin.utils import urn_to_id, id_to_urn
@@ -113,13 +113,14 @@ class SocialStreamPost(models.Model):
             _logger.error('Error during comment like / dislike %r', response.text)
             raise UserError(_('Could not like / dislike this comment.'))
 
-    def _linkedin_comment_add(self, message, comment_urn=None, attachment=None):
+    @api.model
+    def _linkedin_comment_add(self, account_id, post_urn, message, comment_urn=None, attachment=None):
         data = {
-            'actor': self.account_id.linkedin_account_urn,
+            'actor': account_id.linkedin_account_urn,
             'message': {
                 'text': message,
             },
-            'object': self.linkedin_post_urn,
+            'object': post_urn,
         }
 
         if comment_urn:
@@ -128,11 +129,11 @@ class SocialStreamPost(models.Model):
 
         if attachment:
             # we upload an image with our comment
-            image_urn = self.account_id._linkedin_upload_image(attachment)
+            image_urn = account_id._linkedin_upload_image(attachment)
             data['content'] = [{'entity': {'image': image_urn}}]
 
-        response = self.account_id._linkedin_request(
-            f'socialActions/{quote(self.linkedin_post_urn)}/comments',
+        response = account_id._linkedin_request(
+            f'socialActions/{quote(post_urn)}/comments',
             json=data,
         )
 
@@ -144,14 +145,14 @@ class SocialStreamPost(models.Model):
 
         result = response.json()
         result['from'] = {  # fill with our own information to save an API call
-            'id': self.account_id.linkedin_account_urn,
-            'name': self.account_id.name,
-            'authorUrn': self.account_id.linkedin_account_urn,
-            'picture': f"/web/image?model=social.account&id={self.account_id.id}&field=image",
+            'id': account_id.linkedin_account_urn,
+            'name': account_id.name,
+            'authorUrn': account_id.linkedin_account_urn,
+            'picture': f"/web/image?model=social.account&id={account_id.id}&field=image",
             'isOrganization': True,
         }
         if attachment:
-            urls = self.account_id._linkedin_request_images([urn_to_id(image_urn)])
+            urls = account_id._linkedin_request_images([urn_to_id(image_urn)])
             result['content'][0]['url'] = next(iter(urls.values()), None)
 
         return self._linkedin_format_comment(result)

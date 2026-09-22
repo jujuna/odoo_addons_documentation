@@ -1,26 +1,27 @@
 import json
+from copy import deepcopy
+
+from lxml import etree
 
 import odoo
 from odoo import api
+from odoo.http import request_var
+from odoo.tests.common import TransactionCase, tagged
+from odoo.exceptions import ValidationError
 from odoo.tools import DotDict
-from odoo.http import _request_stack
-from odoo.tests.common import TransactionCase
+
 from odoo.addons.web_studio.controllers.main import WebStudioController
-from copy import deepcopy
-from lxml import etree
+
 
 class TestStudioController(TransactionCase):
 
     def setUp(self):
         super().setUp()
         self.env = api.Environment(self.cr, odoo.SUPERUSER_ID, {'load_all_views': True})
-        _request_stack.push(self)
+        request_reset = request_var.set(self)
+        self.addCleanup(request_var.reset, request_reset)
         self.session = DotDict({'debug': ''})
         self.studio_controller = WebStudioController()
-
-    def tearDown(self):
-        super().tearDown()
-        _request_stack.pop()
 
     def _transform_arch_for_assert(self, arch_string):
         parser = etree.XMLParser(remove_blank_text=True)
@@ -38,6 +39,7 @@ class TestStudioController(TransactionCase):
         self.env = self.env(context=dict(self.env.context, **overrides))
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestEditView(TestStudioController):
 
     def edit_view(self, base_view, studio_arch="", operations=None, model=None, context=None):
@@ -209,7 +211,7 @@ class TestEditView(TestStudioController):
                 'attrs': {
                     'name': 'group_ids',
                     'widget': 'many2many_tags',
-                    'options': "{'color_field': 'color'}",
+                    'options': "{'color_field': 'color', 'on_tag_click': 'edit_color'}",
                 },
                 'children': [],
                 'has_label': True
@@ -230,7 +232,7 @@ class TestEditView(TestStudioController):
                                 <form>
                                     <sheet>
                                         <field name="display_name" />
-                                        <field name="group_ids" widget='many2many_tags' options="{'color_field': 'color'}"/>
+                                        <field name="group_ids" widget='many2many_tags' options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                                     </sheet>
                                 </form>
                             </field>
@@ -519,6 +521,49 @@ class TestEditView(TestStudioController):
         </form>"""
         self.assertViewArchEqual(base_view.get_combined_arch(), expected_arch)
 
+    def test_edit_view_unlocatable_target_raises_validation_error(self):
+        """ The client may send an operation whose target xpath doesn't match
+        anything in the actual stored arch.
+
+        `normalize()` must not let the resulting ValueError escape as a raw,
+        unhandled exception: it has to be a ValidationError, like any other
+        unlocatable studio spec, so that `edit_view()` can fall back to the
+        un-optimized arch instead of crashing with a traceback.
+        """
+        base_view = self.env['ir.ui.view'].create({
+            'name': 'TestForm',
+            'type': 'form',
+            'model': 'res.partner',
+            'arch': """
+                <form>
+                    <div>
+                        <field name="display_name"/>
+                    </div>
+                </form>""",
+        })
+
+        # There is only one <field/> inside the <div/>: this targets a
+        # second one that doesn't exist, the same situation as a client
+        # xpath computed against a field the server doesn't statically have.
+        operation = {
+            'type': 'attributes',
+            'target': {
+                'tag': 'field',
+                'attrs': {'name': 'display_name'},
+                'xpath_info': [
+                    {'tag': 'form', 'indice': 1},
+                    {'tag': 'div', 'indice': 1},
+                    {'tag': 'field', 'indice': 2},
+                ],
+            },
+            'position': 'attributes',
+            'node': {'tag': 'field', 'attrs': {'name': 'display_name'}},
+            'new_attrs': {'invisible': 'False'},
+        }
+
+        with self.assertRaises(ValidationError):
+            self.edit_view(base_view, operations=[operation])
+
     def test_edit_attribute_studio_groups_tree_column_invisible(self):
         test_group = self.env['res.groups'].create({'name': 'test_group'})
         self.env['ir.model.data'].create({
@@ -665,7 +710,7 @@ class TestEditView(TestStudioController):
             """
               <form>
                 <field name="display_name" />
-                <field name="x_studio_many2one_field_sNT7g" options="{'create_name_field': 'acc_number'}"/>
+                <field name="x_studio_many2one_field_sNT7g" options="{'create_name_field': 'account_number'}"/>
               </form>
             """
         )
@@ -690,17 +735,141 @@ class TestEditView(TestStudioController):
             """
         })
         op = {
-            'type': 'attributes',
+            'type': 'add',
+            'node': {
+                'tag': 'field',
+                'attrs': {
+                    'name': 'name'
+                }
+            },
             'target': {
-                'tag': 'list',
+                'tag': 'field',
                 'attrs': {},
                 'xpath_info': [
                     {'tag': 'list', 'indice': 1},
+                    {'tag': 'field', 'indice': 2}
                 ],
             },
-            'position': 'attributes',
-            'new_attrs': {'create': True}
+            'position': 'after',
         }
         res = self.edit_view(inherit, "", [op])
         studio_view_id = self.env["ir.ui.view"].browse(res["studio_view_id"])
         self.assertEqual(studio_view_id.inherit_id, main)
+        self.assertViewArchEqual(studio_view_id.arch, """
+        <data>
+          <xpath expr="/list//field[@name='function']" position="after">
+            <field name="name"/>
+          </xpath>
+        </data>
+        """)
+
+    def test_edit_kanban_with_card_view(self):
+        card_view = self.env["ir.ui.view"].create({
+            "name": "test.card",
+            "model": "res.partner",
+            "type": "card",
+            "arch": """
+                <card>
+                    <templates>
+                        <t t-name="card">
+                            <field name="display_name"/>
+                        </t>
+                    </templates>
+                </card>
+            """,
+        })
+        self.env["ir.ui.view"].create({
+            "name": "test.card.extension",
+            "model": "res.partner",
+            "type": "card",
+            "inherit_id": card_view.id,
+            "arch": """
+                <field name="display_name" position="after">
+                    <field name="email"/>
+                </field>
+            """,
+        })
+        kanban_view = self.env["ir.ui.view"].create({
+            "name": "test.kanban",
+            "model": "res.partner",
+            "type": "kanban",
+            "arch": f'<kanban card_id="{card_view.id}"/>',
+        })
+        inherited_kanban_view = self.env["ir.ui.view"].create({
+            "name": "test.kanban.primary",
+            "model": "res.partner",
+            "type": "kanban",
+            "inherit_id": kanban_view.id,
+            "mode": "primary",
+            "arch": """
+                <kanban position="attributes">
+                    <attribute name="default_group_by">country_id</attribute>
+                </kanban>
+            """,
+        })
+        target = {
+            "tag": "field",
+            "attrs": {"name": "display_name"},
+            "xpath_info": [
+                {"tag": "kanban", "indice": 1},
+                {"tag": "card", "indice": 1},
+                {"tag": "templates", "indice": 1},
+                {"tag": "t", "indice": 1},
+                {"tag": "field", "indice": 1},
+            ],
+        }
+        operations = [
+            {
+                "type": "add",
+                "target": target,
+                "position": "after",
+                "node": {"tag": "field", "attrs": {"name": "phone"}},
+            },
+            {
+                "type": "remove",
+                "target": target,
+            },
+        ]
+
+        self.edit_view(inherited_kanban_view, operations=operations)
+
+        self.assertViewArchEqual(
+            inherited_kanban_view.get_combined_arch(),
+            """
+                <kanban default_group_by="country_id">
+                    <card>
+                        <templates>
+                            <t t-name="card">
+                                <field name="phone"/>
+                                <field name="email"/>
+                            </t>
+                        </templates>
+                    </card>
+                </kanban>
+            """,
+        )
+
+    def test_view_has_studio_key(self):
+        view = self.env["ir.ui.view"].create({
+            "name": "test",
+            "type": "form",
+            "model": "res.partner",
+            "arch": """<form><field name="display_name" /></form>"""
+        })
+
+        self.assertFalse(view.key)
+        self.assertFalse(view.xml_id)
+
+        view.with_context(studio=1).write({"name": "test_written"})
+        view.invalidate_recordset()
+        self.assertTrue(view.key.startswith("studio_customization."))
+        self.assertEqual(view.key, view.xml_id)
+
+        view_2 = self.env["ir.ui.view"].with_context(studio=1).create({
+            "name": "test",
+            "type": "form",
+            "model": "res.partner",
+            "arch": """<form><field name="display_name" /></form>"""
+        })
+        self.assertTrue(view_2.key.startswith("studio_customization."))
+        self.assertEqual(view_2.key, view_2.xml_id)

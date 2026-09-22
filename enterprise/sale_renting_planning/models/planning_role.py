@@ -20,11 +20,11 @@ class PlanningRole(models.Model):
     def _compute_rental_product_count(self):
         if not any(self._ids):
             for role in self:
-                role.rental_product_count = len(role.product_ids.filtered('rent_ok'))
+                role.rental_product_count = len(role.product_ids.filtered('rent_periodicity'))
             return
         rental_product_count_per_role = dict(
             self.env['product.template']._read_group(
-                [('planning_role_id', 'in', self.ids), ('rent_ok', '=', True)],
+                [('planning_role_id', 'in', self.ids), ('rent_periodicity', '!=', False)],
                 ['planning_role_id'],
                 ['__count'],
             )

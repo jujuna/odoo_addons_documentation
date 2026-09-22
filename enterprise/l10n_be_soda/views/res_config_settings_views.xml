@@ -9,18 +9,18 @@
                 <block title="SODA" invisible="country_code != 'BE'" id="l10n_be_soda" groups="account.group_account_user">
                     <setting string="SODA Settings" id="l10n_be_soda_settings">
                         <div class="group-content" id="l10n_be_soda_open_soda_mapping">
-                            <button name="l10n_be_soda_open_soda_mapping" type="object" class="btn btn-primary" string="Open SODA Mapping"/>
+                            <div class="d-flex gap-2" invisible="not group_analytic_accounting">
+                                <field name="l10n_be_soda_use_analytic" string="Analytic Plan"/>
+                                <label for="l10n_be_soda_use_analytic"/>
+                                <field name="l10n_be_soda_analytic_plan" invisible="not l10n_be_soda_use_analytic" required="l10n_be_soda_use_analytic"/>
+                            </div>
+                            <div class="mt-2">
+                                <button name="l10n_be_soda_open_soda_mapping" type="object" class="btn btn-primary" string="Open SODA Mapping"/>
+                            </div>
                         </div>
                     </setting>
                 </block>
             </xpath>
         </field>
-    </record>
-
-    <record id="action_open_accounting_settings" model="ir.actions.act_window">
-        <field name="name">Settings</field>
-        <field name="res_model">res.config.settings</field>
-        <field name="view_mode">form</field>
-        <field name="context">{'module': 'account', 'bin_size': False}</field>
     </record>
 </odoo>

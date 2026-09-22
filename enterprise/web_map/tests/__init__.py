@@ -1,1 +1,1 @@
-from . import test_web_map
+from . import test_map_view

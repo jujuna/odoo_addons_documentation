@@ -2,7 +2,7 @@ import { registry } from "@web/core/registry";
 import { resetViewCompilerCache } from "@web/views/view_compiler";
 import { _t } from "@web/core/l10n/translation";
 
-import { EventBus, onWillUnmount, useState } from "@odoo/owl";
+import { EventBus, onWillUnmount, proxy } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { router, routerBus } from "@web/core/browser/router";
 import { Cache } from "@web/core/utils/cache";
@@ -68,6 +68,11 @@ function isStudioEditable(action) {
             // we set them to not editable too.
             return false;
         }
+        if (action.res_model === "marketing.campaign") {
+            // The new marketing automation view is now extremely customised and it doesn't make sense
+            // to edit it.
+            return false;
+        }
         if (action.view_id && action.view_id[1] === "res.users.preferences.form.inherit") {
             // The employee profile view is too complex to handle inside studio.
             // @see SELF_READABLE_FIELDS.
@@ -83,7 +88,7 @@ function isStudioEditable(action) {
 
 /**
  * Whether the actionService will actually load this.
- * @see action_service.js:_getActionParams
+ * @see action_plugin.js:_getActionParams
  */
 function isActionStateValid(actionState) {
     return (
@@ -125,9 +130,9 @@ function getStateToLoad(state) {
 
 export const studioService = {
     dependencies: ["action", "home_menu", "menu", "notification", "orm"],
-    async start(env, { menu, notification, orm }) {
+    async start(env, { action: actionService, home_menu: homeMenu, menu, notification, orm }) {
         function _getCurrentAction() {
-            const currentController = env.services.action.currentController;
+            const currentController = actionService.currentController;
             return currentController && !currentController.virtual
                 ? currentController.action
                 : null;
@@ -135,7 +140,7 @@ export const studioService = {
         async function loadState(state) {
             router.pushState(getStateToLoad(state), { sync: true, replace: true });
             await Promise.resolve();
-            return env.services.action.loadState();
+            return actionService.loadState();
         }
 
         const bus = new EventBus();
@@ -174,6 +179,7 @@ export const studioService = {
         async function _loadParamsFromURL() {
             const urlState = router.current;
             if (urlState.action !== "studio") {
+                state.studioMode = null;
                 return;
             }
 
@@ -191,7 +197,10 @@ export const studioService = {
             const routerActionState = urlState.actionStack?.at(-2);
             const additionalContext = {};
             if (state.studioMode === MODES.EDITOR || (!state.studioMode && routerActionState)) {
-                const { active_id, active_ids } = urlState;
+                let { active_id, active_ids } = routerActionState;
+                if (!active_id) {
+                    active_id = urlState.active_id;
+                }
                 if (active_id) {
                     additionalContext.active_id = active_id;
                     additionalContext.active_ids = [active_id];
@@ -202,7 +211,7 @@ export const studioService = {
                 if (routerActionState?.action || routerActionState?.model) {
                     const { action, model, resId } = routerActionState;
                     if (action) {
-                        state.editedAction = await env.services.action.loadAction(
+                        state.editedAction = await actionService.loadAction(
                             action,
                             additionalContext
                         );
@@ -251,7 +260,7 @@ export const studioService = {
                 let controllerState;
                 if (!action) {
                     // systray open
-                    const currentController = env.services.action.currentController;
+                    const currentController = actionService.currentController;
                     if (currentController) {
                         actionStack = currentController.state.actionStack || [];
                         action = {
@@ -303,7 +312,7 @@ export const studioService = {
                     [URL_VIEW_KEY]: state.editedViewType,
                     [URL_REPORT_ID_KEY]: state.editedReport?.id,
                 });
-                await loadState({ actionStack });
+                await loadState({ actionStack, active_id: undefined });
             } catch (e) {
                 Object.assign(state, previousState);
                 throw e;
@@ -315,11 +324,11 @@ export const studioService = {
                 throw new Error("can't already be in studio");
             }
             if (!mode) {
-                mode = env.services.home_menu.hasHomeMenu ? MODES.HOME_MENU : MODES.EDITOR;
+                mode = homeMenu.hasHomeMenu ? MODES.HOME_MENU : MODES.EDITOR;
             }
             let action;
             if (actionId) {
-                action = await env.services.action.loadAction(actionId);
+                action = await actionService.loadAction(actionId);
             }
             resetViewCompilerCache();
             return _openStudio(mode, action);
@@ -378,7 +387,7 @@ export const studioService = {
                 if (actionId === "menu" && lastValidActionIndex >= 0) {
                     options = { index: lastValidActionIndex + 1 };
                 }
-                await env.services.action.doAction(actionId, options);
+                await actionService.doAction(actionId, options);
             }
             // force rendering of the main navbar to allow adaptation of the size
             env.bus.trigger("MENUS:APP-CHANGED");
@@ -398,10 +407,7 @@ export const studioService = {
                     active_ids: actionContext.active_ids,
                 });
             }
-            const action = await env.services.action.loadAction(
-                state.editedAction.id,
-                additionalContext
-            );
+            const action = await actionService.loadAction(state.editedAction.id, additionalContext);
             setParams({ action, ...params }, reset);
         }
 
@@ -422,6 +428,9 @@ export const studioService = {
         }
 
         function pushState() {
+            if (!state.studioMode) {
+                return;
+            }
             const search = {};
             let replace;
             if (state._pushActionState) {
@@ -440,10 +449,6 @@ export const studioService = {
                 search[URL_VIEW_KEY] = state.editedViewType || undefined;
                 search[URL_TAB_KEY] = state.editorTab;
             }
-            if (state.editedAction?.context?.active_id) {
-                search.active_id = state.editedAction.context.active_id;
-            }
-
             if (state.editorTab === "reports" && state.editedReport) {
                 search[URL_REPORT_ID_KEY] = state.editedReport.res_id;
             }
@@ -546,7 +551,7 @@ registry.category("services").add("studio", studioService);
 
 export function useStudioServiceAsReactive() {
     const studio = useService("studio");
-    const state = useState({ ...studio });
+    const state = proxy({ ...studio });
     state.requestId = 1;
 
     function onUpdate({ detail }) {
@@ -561,8 +566,9 @@ export function useStudioServiceAsReactive() {
 }
 
 function actionLeave(env, action) {
+    const studio = useService("studio");
     const actionId = action.context.action_id;
-    return env.services.studio.leave(actionId);
+    return studio.leave(actionId);
 }
 
 registry.category("actions").add("action_web_studio_leave_with", actionLeave);

@@ -23,7 +23,6 @@ class SocialStream(models.Model):
         if self.media_id.media_type != 'youtube':
             return super()._fetch_stream_data()
 
-        self.account_id._refresh_youtube_token()
         if self.stream_type_id.stream_type == 'youtube_channel_videos':
             return self._fetch_channel_videos()
 
@@ -40,13 +39,14 @@ class SocialStream(models.Model):
         Then we use the retrieved videos IDs to query the '/videos' endpoint to fetch
         all the necessary data (title, description, thumbnail, statistics, ...).
         This also costs one quota point, for a total of 2 points VS 100 points for the search. """
+        access_token = self.account_id._get_youtube_access_token()
 
         # 1. get the playlist items from the "all uploads" playlist
         # results are returned by published desc by default
         playlist_items_endpoint = url_join(self.env['social.media']._YOUTUBE_ENDPOINT, "youtube/v3/playlistItems")
         playlist_items_response = requests.get(playlist_items_endpoint,
             params={
-                'access_token': self.account_id.youtube_access_token,
+                'access_token': access_token,
                 'playlistId': self.account_id.youtube_upload_playlist_id,
                 'part': 'snippet,status',
                 'maxResults': 50,
@@ -70,7 +70,7 @@ class SocialStream(models.Model):
         video_endpoint = url_join(self.env['social.media']._YOUTUBE_ENDPOINT, "youtube/v3/videos")
         video_items_response = requests.get(video_endpoint,
             params={
-                'access_token': self.account_id.youtube_access_token,
+                'access_token': access_token,
                 'part': 'id,snippet,statistics,contentDetails',
                 'id': ','.join(youtube_video_ids),
             },

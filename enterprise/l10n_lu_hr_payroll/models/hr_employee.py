@@ -1,4 +1,5 @@
-from odoo import fields, models
+from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class HrEmployee(models.Model):
@@ -45,3 +46,9 @@ class HrEmployee(models.Model):
     l10n_lu_tax_credit_cis = fields.Boolean(readonly=False, related="version_id.l10n_lu_tax_credit_cis", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_lu_tax_credit_cip = fields.Boolean(readonly=False, related="version_id.l10n_lu_tax_credit_cip", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_lu_tax_credit_cim = fields.Boolean(readonly=False, related="version_id.l10n_lu_tax_credit_cim", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+
+    @api.constrains('l10n_lu_indexed_wage')
+    def _check_l10n_lu_indexed_wage_positive(self):
+        for version in self:
+            if version.l10n_lu_indexed_wage < 0:
+                raise ValidationError(self.env._('The indexed wage must be a positive value.'))

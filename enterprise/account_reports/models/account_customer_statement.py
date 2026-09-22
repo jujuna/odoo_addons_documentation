@@ -16,17 +16,20 @@ class CustomerStatementCustomHandler(models.AbstractModel):
             'always_show': True,
         })
         options['custom_display_config']['css_custom_class'] += ' customer_statement'
-        options['custom_display_config']['components']['AccountReportLine'] = 'PartnerLedgerFollowupLine'
-        options['custom_display_config']['templates']['AccountReportHeader'] = 'account_reports.PartnerLedgerFollowupHeader'
 
         if self.env.ref('account_reports.pdf_export_main_customer_report', raise_if_not_found=False):
             options['custom_display_config'].setdefault('pdf_export', {})['pdf_export_main'] = 'account_reports.pdf_export_main_customer_report'
+
+    def _get_subformulas_rules(self):
+        return super()._get_subformulas_rules() | {
+            'amount': {'field': 'balance', 'from_beginning': True}
+        }
 
     def action_send_statements(self, options):
         template = self.env.ref('account_reports.email_template_customer_statement', False)
         partners = self.env['res.partner'].browse(options.get('partner_ids', []))
         return {
-            'name': _("Send %s Statement", partners.name) if len(partners) == 1 else _("Send Partner Ledgers"),
+            'name': _("Send %s Statement", partners.name) if len(partners) == 1 else _("Send Customer Statements"),
             'type': 'ir.actions.act_window',
             'views': [[False, 'form']],
             'res_model': 'account.report.send',

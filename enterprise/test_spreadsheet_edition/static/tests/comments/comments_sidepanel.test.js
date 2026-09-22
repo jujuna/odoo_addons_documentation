@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
+import { waitFor, waitForNone } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { helpers, stores } from "@odoo/o-spreadsheet";
 import { CommentsStore } from "@spreadsheet_edition/bundle/comments/comments_store";
 import { defineTestSpreadsheetEditionModels } from "@test_spreadsheet_edition/../tests/helpers/data";
 import { createThread, setupWithThreads } from "@test_spreadsheet_edition/../tests/helpers/helpers";
 import { contains } from "@web/../tests/web_test_helpers";
+import { editSelectComponent } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
+import { createSheet } from "@spreadsheet/../tests/helpers/commands";
 
 describe.current.tags("desktop");
 defineTestSpreadsheetEditionModels();
@@ -35,7 +38,7 @@ test("Side panel filter 'active sheet'/'all sheets'", async () => {
     const { model, env, pyEnv } = await setupWithThreads();
     const sheetId = model.getters.getActiveSheetId();
     const sheetId2 = "sh2";
-    model.dispatch("CREATE_SHEET", { sheetId: sheetId2, position: 1 });
+    createSheet(model, { sheetId: sheetId2, position: 1 });
     await createThread(model, pyEnv, { sheetId, ...toCartesian("A2") }, ["wave"]);
     await createThread(model, pyEnv, { sheetId, ...toCartesian("A3") }, ["wave"]);
     await createThread(model, pyEnv, { sheetId: sheetId2, ...toCartesian("A3") }, ["wave"]);
@@ -43,7 +46,7 @@ test("Side panel filter 'active sheet'/'all sheets'", async () => {
     env.openSidePanel("Comments");
     await animationFrame();
     expect(".o-threads-side-panel .o-thread-item").toHaveCount(3);
-    await contains(".o-threads-side-panel select").select("activeSheet");
+    await editSelectComponent(".o-threads-side-panel .o-select", "activeSheet");
     expect(".o-threads-side-panel .o-thread-item").toHaveCount(2);
     model.dispatch("ACTIVATE_SHEET", { sheetIdTo: sheetId2, sheetIdFrom: sheetId });
     await animationFrame();
@@ -95,9 +98,8 @@ test("Resolve/Re-open thread from the side panel", async () => {
     const cellPosition = { sheetId, ...toCartesian("A2") };
     await createThread(model, pyEnv, cellPosition, ["wave"]);
     env.openSidePanel("Comments");
-    await animationFrame();
-    const thread = fixture.querySelector(".o-sidePanel .o-thread-item");
-    await contains(thread).click();
+    const thread = await waitFor(".o-sidePanel .o-thread-item");
+    thread.click();
     expect(popoverStore.persistentCellPopover).toEqual({
         isOpen: true,
         col: 0,
@@ -110,7 +112,7 @@ test("Resolve/Re-open thread from the side panel", async () => {
     await contains(menuItems[0]).click();
     let threadIds = model.getters.getCellThreads(cellPosition);
     expect(threadIds).toEqual([{ threadId: 1, isResolved: true }]);
-    expect(".o-sidePanel .o-thread-item span.resolved").toHaveCount(1);
+    await waitFor(".o-sidePanel .o-thread-item span.resolved:count(1)");
     expect(popoverStore.persistentCellPopover).toEqual({ isOpen: false });
 
     await contains(thread.querySelector("span.thread-menu")).click();
@@ -118,7 +120,7 @@ test("Resolve/Re-open thread from the side panel", async () => {
     await contains(menuItems[0]).click();
     threadIds = model.getters.getCellThreads(cellPosition);
     expect(threadIds).toEqual([{ threadId: 1, isResolved: false }]);
-    expect(".o-sidePanel .o-thread-item span.resolved").toHaveCount(0);
+    await waitForNone(".o-sidePanel .o-thread-item span.resolved");
     expect(popoverStore.persistentCellPopover).toEqual({
         isOpen: true,
         col: 0,

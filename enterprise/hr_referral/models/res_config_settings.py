@@ -10,4 +10,4 @@ class ResConfigSettings(models.TransientModel):
 
     def restore_default_referral_background(self):
         self.hr_referral_background = self.env['res.company']._get_default_referral_background()
-        self.env["ir.config_parameter"].sudo().set_param('hr_referral.show_grass', 'true')
+        self.env["ir.config_parameter"].sudo().set_bool('hr_referral.show_grass', True)

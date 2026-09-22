@@ -5,18 +5,21 @@ from odoo.addons.pos_restaurant.tests import test_frontend
 from odoo.addons.pos_enterprise.tests.test_frontend import TestPreparationDisplayHttpCommon
 from unittest.mock import patch
 import odoo.tests
-import json
+from odoo import Command
 
 
 @odoo.tests.tagged('post_install', '-at_install')
 class TestUi(test_frontend.TestFrontendCommon, TestPreparationDisplayHttpCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_01_preparation_display_resto(self):
         self.pdis.write({
             'pos_config_ids': [(4, self.pos_config.id)],
         })
 
         # open a session, the /pos/ui controller will redirect to it
-        self.pos_config.printer_ids.unlink()
+        self.pos_config.preparation_printer_ids.unlink()
         self.pos_config.with_user(self.pos_user).open_ui()
         self.start_pos_tour('PreparationDisplayTourResto')
 
@@ -47,7 +50,7 @@ class TestUi(test_frontend.TestFrontendCommon, TestPreparationDisplayHttpCommon)
         })
 
         # open a session, the /pos/ui controller will redirect to it
-        self.pos_config.printer_ids.unlink()
+        self.pos_config.preparation_printer_ids.unlink()
         self.pos_config.with_user(self.pos_user).open_ui()
         self.start_pos_tour('PreparationDisplayTourResto2')
 
@@ -58,25 +61,6 @@ class TestUi(test_frontend.TestFrontendCommon, TestPreparationDisplayHttpCommon)
         ])
         self.assertEqual(len(prep_line), 2)
         self.assertEqual(sum(prep_line.mapped('quantity')), 2)
-
-    def test_preparation_display_with_internal_note(self):
-        self.pdis.write({
-            'pos_config_ids': [(4, self.pos_config.id)],
-        })
-        self.pos_config.printer_ids.unlink()
-        self.pos_config.with_user(self.pos_user).open_ui()
-        self.start_pos_tour('PreparationDisplayTourInternalNotes')
-
-        self.start_pdis_tour('PreparationDisplayFrontEndNoteTour')
-
-        # Order 1 should have 2 preparation orderlines (Coca-Cola and Water)
-        order1 = self.env['pos.order'].search([('pos_reference', 'ilike', '%-000001')], limit=1)
-        pdis_order1 = self.env['pos.prep.order'].search([('pos_order_id', '=', order1.id)])
-        self.assertEqual(len(pdis_order1.prep_line_ids), 2, "Should have 2 preparation orderlines")
-        self.assertEqual(pdis_order1.prep_line_ids[0].quantity, 1)
-        self.assertEqual(json.loads(pdis_order1.prep_line_ids[0].internal_note)[0]['text'], "Test Internal Notes")
-        self.assertEqual(pdis_order1.prep_line_ids[1].quantity, 1)
-        self.assertEqual(pdis_order1.prep_line_ids[1].internal_note, "[]")
 
     def test_cancel_order_notifies_display(self):
         category = self.env['pos.category'].create({'name': 'Food'})
@@ -99,7 +83,7 @@ class TestUi(test_frontend.TestFrontendCommon, TestPreparationDisplayHttpCommon)
 
         # open a session, the /pos/ui controller will redirect to it
         with patch('odoo.addons.pos_enterprise.models.pos_prep_display.PosPrepDisplay._send_load_orders_message', new=_send_load_orders_message):
-            self.pos_config.printer_ids.unlink()
+            self.pos_config.preparation_printer_ids.unlink()
             self.pos_config.with_user(self.pos_user).open_ui()
             self.start_pos_tour('PreparationDisplayCancelOrderTour')
 
@@ -110,7 +94,7 @@ class TestUi(test_frontend.TestFrontendCommon, TestPreparationDisplayHttpCommon)
         self.pdis.write({
             'pos_config_ids': [(4, self.pos_config.id)],
         })
-        self.pos_config.printer_ids.unlink()
+        self.pos_config.preparation_printer_ids.unlink()
         self.pos_config.with_user(self.pos_user).open_ui()
         self.start_tour("/pos/ui/%d" % self.main_pos_config.id, 'PreparationDisplayPaymentNotCancelDisplayTour', login="pos_user")
         pos_order = self.env['pos.order'].search([], limit=1)
@@ -160,18 +144,17 @@ class TestUi(test_frontend.TestFrontendCommon, TestPreparationDisplayHttpCommon)
         self.assertEqual(order_lines[0]['cancelled'], 0)
 
         self.assertEqual(order_lines[1]['product_id'].id, product_1.id)
-        self.assertEqual(order_lines[1]['internal_note'], '[]')
         self.assertEqual(order_lines[1]['quantity'], 1)
         self.assertEqual(order_lines[1]['cancelled'], 1)
 
-    def test_receipt_screen_after_unsent_order_dialog(self):
+    def test_feedback_screen_after_unsent_order_dialog(self):
         self.env['pos.prep.display'].create({
             'name': 'Preparation Display',
             'pos_config_ids': [(4, self.pos_config.id)],
         })
-        self.pos_config.printer_ids.unlink()
+        self.pos_config.preparation_printer_ids.unlink()
         self.main_pos_config.with_user(self.pos_user).open_ui()
-        self.start_pos_tour('test_receipt_screen_after_unsent_order_dialog')
+        self.start_pos_tour('test_feedback_screen_after_unsent_order_dialog')
         order = self.env['pos.order'].search([('pos_reference', 'ilike', '%-000001')], limit=1)
         pdis_order = self.env['pos.prep.order'].search([('pos_order_id', '=', order.id)], limit=1)
         self.assertEqual(len(pdis_order.prep_line_ids), 1, "Should have 1 preparation orderline")
@@ -183,14 +166,15 @@ class TestUi(test_frontend.TestFrontendCommon, TestPreparationDisplayHttpCommon)
             'pos_config_ids': [(4, self.pos_config.id)],
         })
 
-        self.pos_config.write({'module_pos_restaurant': False})
         self.pos_config.with_user(self.pos_admin).open_ui()
         self.start_tour("/pos/ui?config_id=%d" % self.pos_config.id, 'test_order_preparation_preparation_printer', login='pos_admin')
 
         current_session = self.pos_config.current_session_id
-        current_session.post_closing_cash_details(0)
-        current_session.close_session_from_ui()
-        self.pos_config.write({'printer_ids': [], 'is_order_printer': False, 'module_pos_restaurant': True})
+        cash_pm = self.main_pos_config._get_cash_payment_method()
+        current_session.close_session_from_ui({
+            cash_pm.id: 0,
+        })
+        self.pos_config.write({'preparation_printer_ids': [], 'module_pos_restaurant': True})
         self.pos_config.with_user(self.pos_admin).open_ui()
         self.start_tour("/pos/ui?config_id=%d" % self.pos_config.id, 'test_order_preparation_preparation_display', login='pos_admin')
         last_orders = self.pos_config.current_session_id.order_ids
@@ -207,226 +191,107 @@ class TestUi(test_frontend.TestFrontendCommon, TestPreparationDisplayHttpCommon)
         product_cancelled = preparation_change.prep_line_ids.mapped('cancelled')
         self.assertEqual(product_cancelled, product_quantity, "A two-times order must be successfully cancelled")
 
-    def setup_table_actions(self):
-        drinks_category = self.env['pos.category'].search([('name', '=', 'Drinks')], limit=1)
+    def test_table_merge_with_unsynced_order(self):
+        self.pos_config.preparation_printer_ids.unlink()
         self.env['pos.prep.display'].create({
-            'name': 'Preparation Display (Drinks only)',
+            'name': 'Prep Display 101',
             'pos_config_ids': [(4, self.pos_config.id)],
-            'category_ids': [(4, drinks_category.id)],
         })
-
-        self.fanta = self.env['product.product'].create({
-            'available_in_pos': True,
-            'list_price': 2.00,
-            'name': 'Fanta',
-            'weight': 0.01,
-            'pos_categ_ids': [(4, drinks_category.id)],
-            'taxes_id': [(6, 0, [])],
-        })
-        self.espresso = self.env['product.product'].create({
-            'available_in_pos': True,
-            'list_price': 3.00,
-            'name': 'Espresso',
-            'weight': 0.01,
-            'pos_categ_ids': [(4, drinks_category.id)],
-            'taxes_id': [(6, 0, [])],
-        })
-        self.cocktail = self.env['product.product'].create({
-            'available_in_pos': True,
-            'list_price': 5.00,
-            'name': 'Cocktail',
-            'weight': 0.01,
-            'pos_categ_ids': [(4, drinks_category.id)],
-            'taxes_id': [(6, 0, [])],
-        })
-        self.beer = self.env['product.product'].create({
-            'available_in_pos': True,
-            'list_price': 2.50,
-            'name': 'Beer',
-            'weight': 0.01,
-            'pos_categ_ids': [(4, drinks_category.id)],
-            'taxes_id': [(6, 0, [])],
-        })
-        self.champagne = self.env['product.product'].create({
-            'available_in_pos': True,
-            'list_price': 10.00,
-            'name': 'Champagne',
-            'weight': 0.01,
-            'pos_categ_ids': [(4, drinks_category.id)],
-            'taxes_id': [(6, 0, [])],
-        })
-
-    def _assert_pdis_order(self, pdis_order, triples):
-        for product_name, quantity, cancelled in triples:
-            prep_line = pdis_order.prep_line_ids.filtered(lambda prep_line: prep_line.product_id.name == product_name and prep_line.quantity == quantity and prep_line.cancelled == cancelled)
-            self.assertEqual(len(prep_line), 1)
-
-    def test_table_actions_transfer(self):
-        self.setup_table_actions()
-        self.pos_config.printer_ids.unlink()
-        self.pos_config.with_user(self.pos_user).open_ui()
-        self.start_pos_tour('table_action_transfer')
-
-        pos_order = self.env['pos.order'].search([('pos_reference', 'ilike', '%-000001')])
-        pdis_orders = self.env['pos.prep.order'].search([('pos_order_id', '=', pos_order.id)]).sorted('id')
-
-        self.assertEqual(len(pos_order), 1)
-        self.assertEqual(len(pos_order.lines), 4)
-        self.assertTrue(all(line.qty == 3 for line in pos_order.lines))
-
-        self.assertEqual(len(pdis_orders), 3)
-        self._assert_pdis_order(pdis_orders[0], [
-            ("Coca-Cola", 3, 3),
-            ("Water", 3, 3),
-            ("Minute Maid", 3, 3),
-            ("Fanta", 3, 3),
-        ])
-        self._assert_pdis_order(pdis_orders[1], [
-            ("Minute Maid", 5, 2),
-            ("Fanta", 5, 2),
-        ])
-        self._assert_pdis_order(pdis_orders[2], [
-            ("Coca-Cola", 5, 2),
-            ("Water", 5, 2),
-        ])
-
-    def test_table_actions_merge(self):
-        self.setup_table_actions()
-        self.pos_config.printer_ids.unlink()
-        self.pos_config.with_user(self.pos_user).open_ui()
-        self.start_pos_tour('table_action_merge')
-
-        pos_order = self.env['pos.order'].search([('pos_reference', 'ilike', '%-000001')])
-        pdis_orders = self.env['pos.prep.order'].search([('pos_order_id', '=', pos_order.id)]).sorted('id')
-
-        self.assertEqual(len(pos_order), 1)
-        self.assertEqual(len(pos_order.lines), 8)
-        self.assertTrue(all(line.qty == 3 for line in pos_order.lines))
-
-        self.assertEqual(len(pdis_orders), 5)
-        self._assert_pdis_order(pdis_orders[0], [
-            ("Coca-Cola", 3, 3),
-            ("Water", 3, 3),
-            ("Minute Maid", 3, 3),
-            ("Fanta", 3, 3),
-        ])
-        self._assert_pdis_order(pdis_orders[1], [
-            ("Minute Maid", 5, 2),
-            ("Fanta", 5, 2),
-        ])
-        self._assert_pdis_order(pdis_orders[2], [
-            ("Espresso", 3, 3),
-            ("Cocktail", 3, 3),
-            ("Beer", 3, 3),
-            ("Champagne", 3, 3),
-        ])
-        self._assert_pdis_order(pdis_orders[3], [
-            ("Beer", 5, 2),
-            ("Champagne", 5, 2),
-        ])
-        self._assert_pdis_order(pdis_orders[4], [
-            ("Coca-Cola", 5, 2),
-            ("Water", 5, 2),
-            ("Espresso", 5, 2),
-            ("Cocktail", 5, 2),
-        ])
-
-    def test_table_actions_link(self):
-        self.setup_table_actions()
-        self.pos_config.printer_ids.unlink()
         self.pos_config.with_user(self.pos_admin).open_ui()
-        self.start_pos_tour('table_action_link', login='pos_admin')
+        self.start_pos_tour('test_table_merge_with_unsynced_order', login='pos_admin')
 
-        pos_order = self.env['pos.order'].search([('pos_reference', 'ilike', '%-000001')])
-        pdis_orders = self.env['pos.prep.order'].search([('pos_order_id', '=', pos_order.id)]).sorted('id')
+        pos_order = self.pos_config.current_session_id.order_ids[-2]
+        self.assertTrue(pos_order.table_id.parent_id)
 
-        self.assertEqual(len(pos_order), 1)
-        self.assertEqual(len(pos_order.lines), 8)
-        self.assertTrue(all(qty == 3.0 for qty in pos_order.lines.mapped("qty")))
+    def test_apply_best_combo_multi_qty(self):
+        food_category = self.env['pos.category'].create({'name': 'Food'})
+        maki = self.env['product.product'].create({
+            'name': 'Maki',
+            'available_in_pos': True,
+            'list_price': 5,
+            'taxes_id': [(5,)],
+            'pos_categ_ids': [(4, food_category.id)],
+        })
+        salmon = self.env['product.product'].create({
+            'name': 'Salmon',
+            'available_in_pos': True,
+            'list_price': 6,
+            'taxes_id': [(5,)],
+        })
+        coke = self.env['product.product'].create({
+            'name': 'Coke',
+            'available_in_pos': True,
+            'list_price': 3,
+            'taxes_id': [(5,)],
+        })
+        sushi_combo = self.env['product.combo'].create({
+            'name': 'Sushi',
+            'qty_free': 2,
+            'qty_max': 4,
+            'combo_item_ids': [
+                Command.create({'product_id': maki.id, 'extra_price': 0}),
+                Command.create({'product_id': salmon.id, 'extra_price': 0}),
+            ],
+        })
+        drinks_combo = self.env['product.combo'].create({
+            'name': 'Drinks',
+            'qty_free': 1,
+            'qty_max': 1,
+            'combo_item_ids': [
+                Command.create({'product_id': coke.id, 'extra_price': 0}),
+            ],
+        })
+        self.env['product.product'].create({
+            'name': 'Sushi Lunch Combo',
+            'available_in_pos': True,
+            'list_price': 20,
+            'type': 'combo',
+            'taxes_id': [(5,)],
+            'combo_ids': [(6, 0, [sushi_combo.id, drinks_combo.id])],
+        })
+        self.pdis.write({
+            'pos_config_ids': [(4, self.pos_config.id)],
+            'category_ids': [(4, food_category.id)],
+        })
+        self.main_pos_config.with_user(self.pos_user).open_ui()
+        self.start_pos_tour('applyBestComboMultiQty', login="pos_user")
 
-        self.assertEqual(len(pdis_orders), 5)
-        self._assert_pdis_order(pdis_orders[0], [
-            ("Coca-Cola", 3, 3),
-            ("Water", 3, 3),
-            ("Minute Maid", 3, 3),
-            ("Fanta", 3, 3),
-        ])
-        self._assert_pdis_order(pdis_orders[1], [
-            ("Minute Maid", 5, 2),
-            ("Fanta", 5, 2),
-        ])
-        self._assert_pdis_order(pdis_orders[2], [
-            ("Espresso", 3, 3),
-            ("Cocktail", 3, 3),
-            ("Beer", 3, 3),
-            ("Champagne", 3, 3),
-        ])
-        self._assert_pdis_order(pdis_orders[3], [
-            ("Beer", 5, 2),
-            ("Champagne", 5, 2),
-        ])
-        self._assert_pdis_order(pdis_orders[4], [
-            ("Coca-Cola", 5, 2),
-            ("Water", 5, 2),
-            ("Espresso", 5, 2),
-            ("Cocktail", 5, 2),
-        ])
+        order = self.env['pos.order'].search(
+            [('session_id', 'in', self.main_pos_config.session_ids.ids)],
+            order='id desc', limit=1,
+        )
+        prep_order = self.env['pos.prep.order'].search([('pos_order_id', '=', order.id)], limit=1)
+        prep_lines = prep_order.prep_line_ids
 
-    def test_table_actions_unlink(self):
-        self.setup_table_actions()
-        self.pos_config.printer_ids.unlink()
-        self.pos_config.with_user(self.pos_admin).open_ui()
-        self.start_pos_tour('table_action_unlink', login='pos_admin')
+        self.assertEqual(len(prep_lines), 3, "Should have 3 prep lines")
 
-        last_orders = self.env['pos.order'].search([], limit=3, order='id desc')
-        pos_order_1 = last_orders[2]
-        pos_order_2 = last_orders[0]
-        pdis_orders_1 = self.env['pos.prep.order'].search([('pos_order_id', '=', pos_order_1.id)]).sorted('id')
-        pdis_orders_2 = self.env['pos.prep.order'].search([('pos_order_id', '=', pos_order_2.id)]).sorted('id')
+        combo_line = prep_lines.filtered(lambda l: l.product_id.name == 'Sushi Lunch Combo')
+        self.assertEqual(len(combo_line), 1, "Should have 1 prep line for the combo product")
 
-        self.assertEqual(len(pos_order_1), 1)
-        self.assertEqual(len(pos_order_1.lines), 6)
-        self.assertEqual(sorted(pos_order_1.lines.mapped('qty')), [0.0, 1.0, 2.0, 3.0, 3.0, 5.0])
+        maki_lines = prep_lines.filtered(lambda l: l.product_id.id == maki.id)
+        self.assertEqual(len(maki_lines), 2, "Should have 2 prep lines for Maki")
+        self.assertTrue(all(l.quantity == 2 for l in maki_lines), "Each Maki prep line should have quantity 2")
 
-        self.assertEqual(len(pos_order_2), 1)
-        self.assertEqual(len(pos_order_2.lines), 4)
-        self.assertEqual(sorted(pos_order_2.lines.mapped('qty')), [1.0, 1.0, 3.0, 5.0])
+    def test_course_preparation_display(self):
+        notifications = []
 
-        self.assertEqual(len(pdis_orders_1), 4)
-        self._assert_pdis_order(pdis_orders_1[0], [
-            ("Coca-Cola", 3, 3),
-            ("Water", 3, 3),
-            ("Minute Maid", 3, 3),
-            ("Fanta", 3, 3),
-        ])
-        self._assert_pdis_order(pdis_orders_1[1], [
-            ("Minute Maid", 5, 2),
-            ("Fanta", 5, 2),
-        ])
-        self._assert_pdis_order(pdis_orders_1[2], [
-            ("Coca-Cola", 5, 2),
-            ("Water", 5, 5),
-            ("Espresso", 5, 5),
-            ("Cocktail", 5, 3),
-        ])
-        self._assert_pdis_order(pdis_orders_1[3], [
-            ("Coca-Cola", 2, 0),
-            ("Water", 2, 1),
-        ])
+        def _send_load_orders_message(self, sound=False, notification=None, orderId=None):
+            if notification:
+                notifications.append(notification)
 
-        self.assertEqual(len(pdis_orders_2), 3)
-        self._assert_pdis_order(pdis_orders_2[0], [
-            ("Espresso", 3, 3),
-            ("Cocktail", 3, 3),
-            ("Beer", 3, 3),
-            ("Champagne", 3, 3),
-        ])
-        self._assert_pdis_order(pdis_orders_2[1], [
-            ("Beer", 5, 2),
-            ("Champagne", 5, 5),
-        ])
-        self._assert_pdis_order(pdis_orders_2[2], [
-            ("Espresso", 5, 0),
-            ("Cocktail", 1, 0),
-            ("Champagne", 2, 1),
-        ])
+        self.pdis.write({'pos_config_ids': [(4, self.pos_config.id)]})
+        self.pos_config.preparation_printer_ids.unlink()
+
+        with patch(
+            'odoo.addons.pos_enterprise.models.pos_prep_display.PosPrepDisplay._send_load_orders_message',
+            new=_send_load_orders_message,
+        ):
+            self.pos_config.with_user(self.pos_user).open_ui()
+            self.start_pos_tour('PreparationDisplayCourseTour')
+
+        order = self.env['pos.order'].search([('pos_reference', 'ilike', '%-000001')], limit=1)
+        self.assertEqual(len(order.course_ids.filtered(lambda c: c.fired)), 2, "Both courses should be fired")
+        self.assertTrue(
+            any("Course 2" in n for n in notifications),
+            "Preparation display should be notified when Course 2 is fired",
+        )

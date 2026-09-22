@@ -6,7 +6,7 @@ export class IotBox extends models.ServerModel {
     _name = "iot.box";
 
     _load_pos_data_fields() {
-        return ["ip", "ip_url", "name"];
+        return ["ip", "name", "identifier"];
     }
 
     _records = [

@@ -55,4 +55,4 @@ class SignItem(models.Model):
 
     def _valid_item_name_field(self, field):
         model = self.env[field.model_name]
-        return model._has_field_access(field, "read") and model.has_access("read")
+        return model.has_field_access(field, "read") and model.has_access("read")

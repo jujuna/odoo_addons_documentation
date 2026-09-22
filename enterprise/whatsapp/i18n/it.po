@@ -3,22 +3,22 @@
 # * whatsapp
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-14 08:09+0000\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-17 23:23+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/whatsapp/"
-"it/>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
+"whatsapp/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: whatsapp
 #. odoo-python
@@ -26,12 +26,6 @@ msgstr ""
 msgid "%(create_count)s were created, %(update_count)s were updated"
 msgstr ""
 "%(create_count)s sono stati creati, %(update_count)s sono stati aggiornati"
-
-#. module: whatsapp
-#. odoo-python
-#: code:addons/whatsapp/models/whatsapp_template.py:0
-msgid "%(original_name)s (copy)"
-msgstr "%(original_name)s (copia)"
 
 #. module: whatsapp
 #. odoo-python
@@ -69,13 +63,35 @@ msgstr ""
 "- Il numero di telefono configurato in \"Pulsanti\" non sembra corretto."
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.template_message_preview
+msgid ""
+"<i class=\"oi fs-5\" data-icon=\"format_list_bulleted\"/> See all options"
+msgstr ""
+"<i class=\"oi fs-5\" data-icon=\"format_list_bulleted\"/> Vedi tutte le "
+"opzioni"
+
+#. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_kanban
 msgid ""
-"<i class=\"fa fa-whatsapp me-1\" title=\"Messages Count\" aria-"
+"<i class=\"oi me-1\" data-icon=\"oi_whatsapp\" title=\"Messages Count\" aria-"
 "label=\"Messages Count\"/>"
 msgstr ""
-"<i class=\"fa fa-whatsapp me-1\" title=\"Messages Count\" aria-"
+"<i class=\"oi me-1\" data-icon=\"oi_whatsapp\" title=\"Messages Count\" aria-"
 "label=\"Messages Count\"/>"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
+msgid ""
+"<i class=\"oi\" data-icon=\"east\"/>\n"
+"                        Register"
+msgstr ""
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
+msgid ""
+"<i class=\"oi\" data-icon=\"warning\"/> Register your phone number to send "
+"WhatsApp messages."
+msgstr ""
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.template_message_preview
@@ -95,8 +111,8 @@ msgstr "<span class=\"o_stat_text text-danger\">Nessun debug</span>"
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.view_partner_form
-msgid "<span class=\"o_stat_text\">Chats</span>"
-msgstr "<span class=\"o_stat_text\">Chat</span>"
+msgid "<span class=\"o_stat_text\">WhatsApp</span>"
+msgstr "<span class=\"o_stat_text\">WhatsApp</span>"
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.template_message_preview
@@ -117,6 +133,11 @@ msgid "<span class=\"text-success\">Debug requests</span>"
 msgstr "<span class=\"text-success\">Richieste debug</span>"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.authorization_error
+msgid "<strong>Details</strong>"
+msgstr ""
+
+#. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_composer_view_form
 msgid ""
 "<strong>Invalid number: </strong>\n"
@@ -126,6 +147,23 @@ msgstr ""
 "<strong>Numero non valido:</strong>\n"
 "                        <span> assicurati di aver configurato una nazione "
 "per il contatto o di aver specificato il codice paese.</span>"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_composer_view_form
+msgid ""
+"<strong>Note: </strong>\n"
+"                        <span>If you leave a free text field blank, the "
+"sample value from the template will be used.</span>"
+msgstr ""
+"<strong>Nota bene: </strong>\n"
+"                        <span>se lasci vuoto un campo di testo libero, verrà "
+"utilizzato il valore di esempio dal modello.</span>"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "A 'CTA URL' message type should only have one button."
+msgstr "Un messaggio di tipo \"URL CTA\" deve contenere un solo pulsante."
 
 #. module: whatsapp
 #. odoo-python
@@ -156,12 +194,14 @@ msgid "Access Token"
 msgstr "Token di accesso"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 msgid "Accessible to all Users"
 msgstr "Accessibile a tutti gli utenti"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__wa_account_id
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_blocklist_view_search
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_search
 msgid "Account"
 msgstr "Account"
@@ -177,16 +217,52 @@ msgid "Account ID"
 msgstr "ID account"
 
 #. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid ""
+"Account [%(account)s]: %(updated_count)d %(state_label)s, %(failed_count)d "
+"failed."
+msgstr ""
+"Account [%(account)s]: %(updated_count)d %(state_label)s, %(failed_count)d "
+"falliti."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid ""
+"Account [%(account)s]: Failed to %(operation)s %(count)d %(number_word)s: %"
+"(error)s"
+msgstr ""
+"Account [%(account)s]: si è verificato un errore con %(operation)s %(count)d "
+"%(number_word)s: %(error)s"
+
+#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_needaction
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_needaction
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_needaction
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_needaction
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_needaction
 msgid "Action Needed"
 msgstr "Azione richiesta"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__active
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__active
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__active
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__active
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__active
 msgid "Active"
 msgstr "Attivo"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+msgid "Add a section"
+msgstr "Aggiungi sezione"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+msgid "Add an option"
+msgstr "Aggiungi opzione"
 
 #. module: whatsapp
 #: model:res.groups,name:whatsapp.group_whatsapp_admin
@@ -210,6 +286,12 @@ msgid "All dynamic urls must have a placeholder."
 msgstr "Tutti gli URL dinamici devono avere un segnaposto."
 
 #. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid "All selected numbers are already %(state_label)s."
+msgstr "Tutti i numeri selezionati sono già nello stato %(state_label)s."
+
+#. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 msgid "Allow Multi"
 msgstr "Consenti multi"
@@ -223,6 +305,32 @@ msgstr "Aziende autorizzate"
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
 msgid "Allowed companies"
 msgstr "Aziende autorizzate"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid ""
+"An 'Interactive Reply Buttons' message type must have between 1 and 3 "
+"buttons."
+msgstr ""
+"Un tipo di messaggio \"Pulsanti di risposta interattivi\" deve avere da 1 a "
+"3 pulsanti."
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.authorization_error
+msgid "An error occurred"
+msgstr ""
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.authorization_error
+msgid "An error occurred while connecting your WhatsApp account."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "An interactive template must have at least one button."
+msgstr "Un modello interattivo deve avere almeno un pulsante."
 
 #. module: whatsapp
 #. odoo-javascript
@@ -239,6 +347,13 @@ msgstr "ID app"
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__app_secret
 msgid "App Secret"
 msgstr "Secret app"
+
+#. module: whatsapp
+#: model:ir.model.constraint,message:whatsapp.constraint_whatsapp_account_check_app_credentials
+msgid ""
+"App Secret and Access Token are required unless the account was onboarded "
+"through OAuth."
+msgstr ""
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__model_id
@@ -284,6 +399,10 @@ msgstr "Arabo (UAE)"
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_search
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_blocklist_view_form
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_blocklist_view_search
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_search
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_search
 msgid "Archived"
@@ -296,6 +415,9 @@ msgstr "Allegato"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_attachment_count
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_attachment_count
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_attachment_count
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_attachment_count
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_attachment_count
 msgid "Attachment Count"
 msgstr "Numero allegati"
@@ -334,6 +456,11 @@ msgid "Azerbaijani"
 msgstr "Azerbaijani"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.authorization_error
+msgid "Back to WhatsApp accounts"
+msgstr ""
+
+#. module: whatsapp
 #: model:ir.model,name:whatsapp.model_base
 msgid "Base"
 msgstr "Base"
@@ -359,11 +486,44 @@ msgid "Blacklisted Phone Number"
 msgstr "Numeri di telefono in lista nera"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_blocklist_view_form
+msgid "Block Number"
+msgstr "Blocca numero"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
+msgid "Blocked Recipients"
+msgstr "Destinatari bloccati"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__blocklist_count
+msgid "Blocklist Count"
+msgstr "Numero di numeri bloccati"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_account.py:0
+msgid "Blocklist of %(account_name)s"
+msgstr "Contatti bloccati di %(account_name)s"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__blocklisted_phone_number_count
+msgid "Blocklisted Phone Number Count"
+msgstr "Quantità di numeri di telefono bloccati"
+
+#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__body
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template_variable__line_type__body
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_search
 msgid "Body"
 msgstr "Corpo"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "Body cannot exceed 4096 characters."
+msgstr "Il corpo del testo non può superare i 4096 caratteri."
 
 #. module: whatsapp
 #. odoo-python
@@ -390,9 +550,28 @@ msgid "Button"
 msgstr "Pulsante"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__list_button_label
+msgid "Button Label"
+msgstr "Etichetta pulsante"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive_button.py:0
+msgid "Button Label cannot exceed %(max_length)s characters."
+msgstr "L'etichetta del pulsante non può superare i %(max_length)s caratteri."
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template_button__name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__name
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__name
 msgid "Button Text"
 msgstr "Testo pulsante"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_base_template_button.py:0
+msgid "Button Text cannot exceed 25 characters."
+msgstr "Il testo del pulsante non può superare i 25 caratteri."
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__button_dynamic_url_1
@@ -411,12 +590,24 @@ msgstr "I nomi del pulsante devono essere univoci per un determinato modello"
 
 #. module: whatsapp
 #. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid ""
+"Button types for a '%(interactive_type)s' interactive template must be one "
+"of: %(allowed_types)s."
+msgstr ""
+"I tipi di pulsante per un modello interattivo \"%(interactive_type)s\" "
+"devono essere uno dei seguenti: %(allowed_types)s."
+
+#. module: whatsapp
+#. odoo-python
 #: code:addons/whatsapp/models/whatsapp_template_variable.py:0
 msgid "Button variables must be linked to a button."
 msgstr "Le variabili del pulsante devono essere collegate ad un pulsante."
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__button_ids
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__button_ids
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
 msgid "Buttons"
 msgstr "Pulsanti"
 
@@ -433,12 +624,19 @@ msgid "Call Number"
 msgstr "Chiama numero"
 
 #. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive__interactive_type__cta_url
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_search
+msgid "Call-to-action button"
+msgstr "Pulsante di invito all’azione"
+
+#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__callback_url
 msgid "Callback URL"
 msgstr "URL di callback"
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_message_view_form
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_register_phone_form
 msgid "Cancel"
 msgstr "Annulla"
 
@@ -466,11 +664,6 @@ msgstr "Categoria"
 #: model:ir.model,name:whatsapp.model_discuss_channel_member
 msgid "Channel Member"
 msgstr "Membro canale"
-
-#. module: whatsapp
-#: model:ir.model.fields,field_description:whatsapp.field_discuss_channel__channel_type
-msgid "Channel Type"
-msgstr "Tipo di canale"
 
 #. module: whatsapp
 #: model:ir.model.fields,help:whatsapp.field_discuss_channel__channel_type
@@ -503,7 +696,21 @@ msgid "Choose a template..."
 msgstr "Scegli un modello..."
 
 #. module: whatsapp
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_template__variable_type
+msgid ""
+"Choose how variables are written in the template:\n"
+"    - Number: {{1}}, {{2}}, ...\n"
+"    - Name: {{user_name}}, {{order_id}}, ...\n"
+"    "
+msgstr ""
+"Scegli come scrivere le variabili nel modello:\n"
+"    - Numero: {{1}}, {{2}}, ...\n"
+"    - Nome: {{user_name}}, {{order_id}}, ...\n"
+"    "
+
+#. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_composer_view_form
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_composer_view_form
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_preview_view_form
 msgid "Close"
 msgstr "Chiudi"
@@ -514,15 +721,16 @@ msgid "Configuration"
 msgstr "Configurazione"
 
 #. module: whatsapp
-#: model_terms:ir.ui.view,arch_db:whatsapp.res_config_settings_view_form
-msgid "Configure Meta Accounts"
-msgstr "Configura account Meta"
-
-#. module: whatsapp
 #. odoo-python
 #: code:addons/whatsapp/wizard/whatsapp_composer.py:0
+#: code:addons/whatsapp/wizard/whatsapp_interactive_composer.py:0
 msgid "Configure Templates"
 msgstr "Configura modelli"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.res_config_settings_view_form
+msgid "Configure WhatsApp Business Accounts"
+msgstr "Configura account WhatsApp Business"
 
 #. module: whatsapp
 #. odoo-python
@@ -531,9 +739,31 @@ msgid "Configure Whatsapp Business Account"
 msgstr "Configura account WhatsApp Business"
 
 #. module: whatsapp
+#. odoo-javascript
+#: code:addons/whatsapp/static/src/views/whatsapp_account_list/whatsapp_account_list_view.xml:0
+msgid "Connect"
+msgstr ""
+
+#. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_account__state__connected
+msgid "Connected"
+msgstr ""
+
+#. module: whatsapp
 #: model:ir.model,name:whatsapp.model_res_partner
 msgid "Contact"
 msgstr "Contatto"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_discuss_channel__channel_type
+msgid "Conversation Type"
+msgstr "Tipo di conversazione"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/wizard/whatsapp_interactive_composer.py:0
+msgid "Conversation closed, replies are only allowed within 24 hours."
+msgstr "Conversazione chiusa, le risposte sono consentite solo entro 24 ore."
 
 #. module: whatsapp
 #. odoo-javascript
@@ -563,9 +793,14 @@ msgstr "Data creazione"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__create_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__create_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__create_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__create_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__create_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_composer__create_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__create_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_preview__create_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_register_phone__create_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__create_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__create_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_variable__create_uid
@@ -574,9 +809,14 @@ msgstr "Creato da"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__create_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__create_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__create_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__create_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__create_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_composer__create_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__create_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_preview__create_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_register_phone__create_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__create_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__create_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_variable__create_date
@@ -615,6 +855,11 @@ msgid "Debug logging"
 msgstr "Registrazione richieste"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__use_default_recipient
+msgid "Default Recipient"
+msgstr "Destinatario predefinito"
+
+#. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
 msgid "Default Users"
 msgstr "Uteni predefiniti"
@@ -635,6 +880,17 @@ msgid "Delivered Messages"
 msgstr "Messaggi consegnati"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__description
+msgid "Description"
+msgstr "Descrizione"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive_button.py:0
+msgid "Description cannot exceed 72 characters."
+msgstr "La descrizione non può superare i 72 caratteri."
+
+#. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__status__disabled
 msgid "Disabled"
 msgstr "Disabilitato"
@@ -645,7 +901,20 @@ msgid "Disallow Multi"
 msgstr "Disattiva multi"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
+msgid "Disconnect"
+msgstr ""
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
+msgid ""
+"Disconnect this WhatsApp account? This will stop sending and receiving "
+"WhatsApp messages."
+msgstr ""
+
+#. module: whatsapp
 #: model:ir.model,name:whatsapp.model_discuss_channel
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_composer__discuss_channel_id
 msgid "Discussion Channel"
 msgstr "Canale di discussione"
 
@@ -656,11 +925,18 @@ msgstr "Canale di discussione"
 #: model:ir.model.fields,field_description:whatsapp.field_mail_message__display_name
 #: model:ir.model.fields,field_description:whatsapp.field_mail_thread__display_name
 #: model:ir.model.fields,field_description:whatsapp.field_res_partner__display_name
-#: model:ir.model.fields,field_description:whatsapp.field_res_users_settings__display_name
+#: model:ir.model.fields,field_description:whatsapp.field_utm_mixin__display_name
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__display_name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__display_name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template_button__display_name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__display_name
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__display_name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__display_name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__display_name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_composer__display_name
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__display_name
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_preview__display_name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_register_phone__display_name
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__display_name
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__display_name
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_variable__display_name
@@ -668,6 +944,8 @@ msgid "Display Name"
 msgstr "Nome visualizzato"
 
 #. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_base_template__header_type__document
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive__header_type__document
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__header_type__document
 msgid "Document"
 msgstr "Documento"
@@ -731,6 +1009,18 @@ msgstr ""
 "pulsante corrispondente"
 
 #. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "Each button must have a unique name."
+msgstr "Ogni pulsante deve avere un nome univoco."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "Each section must be followed by at least one question."
+msgstr "Ogni sezione deve essere seguita da almeno una domanda."
+
+#. module: whatsapp
 #: model:ir.model.constraint,message:whatsapp.constraint_whatsapp_message_unique_msg_uid
 msgid "Each whatsapp message should correspond to a single message uuid."
 msgstr ""
@@ -746,6 +1036,17 @@ msgstr "Discussione e-mail"
 #: code:addons/whatsapp/static/src/components/phone_field/phone_field.js:0
 msgid "Enable WhatsApp"
 msgstr "Abilita WhatsApp"
+
+#. module: whatsapp
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_template__use_default_recipient
+msgid ""
+"Enable this option to send the message to the default recipient linked to "
+"the record (e.g., partner). When disabled, you must specify the phone field "
+"path manually."
+msgstr ""
+"Abilita questa opzione per inviare il messaggio al destinatario predefinito "
+"associato al record (ad es., partner). Se disabilitata, è necessario "
+"specificare manualmente il percorso del campo del numero di telefono."
 
 #. module: whatsapp
 #. odoo-python
@@ -838,6 +1139,11 @@ msgid "English (ZAF)"
 msgstr "Inglese (ZAF)"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_register_phone_form
+msgid "Enter a two-step verification PIN to register phone."
+msgstr ""
+
+#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__error_msg
 msgid "Error Message"
 msgstr "Messaggio di errore"
@@ -887,7 +1193,7 @@ msgstr ""
 
 #. module: whatsapp
 #. odoo-python
-#: code:addons/whatsapp/models/whatsapp_template.py:0
+#: code:addons/whatsapp/models/whatsapp_base_template.py:0
 msgid "File type %(file_type)s not supported for header type %(header_type)s"
 msgstr ""
 "Tipo di file %(file_type)s non supportato per il tipo di intestazione %"
@@ -905,20 +1211,34 @@ msgstr "Finlandese"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_follower_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_follower_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_follower_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_follower_ids
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_follower_ids
 msgid "Followers"
 msgstr "Seguaci"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_partner_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_partner_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_partner_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_partner_ids
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Seguaci (partner)"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__footer_text
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__footer_text
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__footer_text
 msgid "Footer Message"
 msgstr "Messaggio piè di pagina"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "Footer Text cannot exceed 60 characters."
+msgstr "Il testo del piè di pagina non può superare i 60 caratteri."
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template_variable__field_type__free_text
@@ -985,6 +1305,16 @@ msgstr "Parametri modello testo libero"
 #: code:addons/whatsapp/models/whatsapp_template_variable.py:0
 msgid "Free Text template variables must have a demo value."
 msgstr "Le variabili del modello testo libero devono avere un valore demo."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_template.py:0
+msgid ""
+"Free text variable in the header should be a valid named placeholder like "
+"{{user_name}}"
+msgstr ""
+"La variabile di testo libero nell’intestazione deve essere un segnaposto con "
+"nome valido, come {{user_name}}"
 
 #. module: whatsapp
 #. odoo-python
@@ -1078,6 +1408,9 @@ msgstr "Numero non valido"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__has_message
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__has_message
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__has_message
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__has_message
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__has_message
 msgid "Has Message"
 msgstr "Ha messaggio"
@@ -1104,13 +1437,28 @@ msgid "Header Free Text"
 msgstr "Testo libero intestazione"
 
 #. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_base_template.py:0
+msgid "Header Text cannot exceed 60 characters."
+msgstr "Il testo dell’intestazione non può superare i 60 caratteri."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_base_template.py:0
+msgid "Header Text is required for text headers."
+msgstr ""
+"Il testo dell’intestazione è obbligatorio per le intestazioni di testo."
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__header_type
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__header_type
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__header_type
 msgid "Header Type"
 msgstr "Tipo di intestazione"
 
 #. module: whatsapp
 #. odoo-python
-#: code:addons/whatsapp/models/whatsapp_template.py:0
+#: code:addons/whatsapp/models/whatsapp_base_template.py:0
 msgid "Header document is required"
 msgstr "È richiesta l'intestazione del documento"
 
@@ -1131,6 +1479,20 @@ msgid "Hello {{1}}, here is your order with the reference {{2}} ..."
 msgstr "Ciao {{1}}, ecco il tuo ordine con riferimento {{2}} ..."
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
+msgid ""
+"Hello {{customer_name}}, here is your order with the reference "
+"{{reference_id}} ..."
+msgstr ""
+"Ciao {{customer_name}}, ecco il tuo ordine con il riferimento "
+"{{reference_id}}..."
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+msgid "Hello, here is your order!"
+msgstr "Ciao, ecco il tuo ordine!"
+
+#. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__hi
 msgid "Hindi"
 msgstr "Hindi"
@@ -1147,11 +1509,18 @@ msgstr "Ungherese"
 #: model:ir.model.fields,field_description:whatsapp.field_mail_message__id
 #: model:ir.model.fields,field_description:whatsapp.field_mail_thread__id
 #: model:ir.model.fields,field_description:whatsapp.field_res_partner__id
-#: model:ir.model.fields,field_description:whatsapp.field_res_users_settings__id
+#: model:ir.model.fields,field_description:whatsapp.field_utm_mixin__id
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template_button__id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__id
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_composer__id
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__id
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_preview__id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_register_phone__id
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__id
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__id
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_variable__id
@@ -1165,6 +1534,9 @@ msgstr "Errore individuato"
 
 #. module: whatsapp
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_account__message_needaction
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_base_template__message_needaction
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_blocklist__message_needaction
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_interactive__message_needaction
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_template__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "Se selezionata, nuovi messaggi richiedono attenzione."
@@ -1172,17 +1544,16 @@ msgstr "Se selezionata, nuovi messaggi richiedono attenzione."
 #. module: whatsapp
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_account__message_has_error
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_account__message_has_sms_error
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_base_template__message_has_error
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_base_template__message_has_sms_error
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_blocklist__message_has_error
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_blocklist__message_has_sms_error
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_interactive__message_has_error
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_interactive__message_has_sms_error
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_template__message_has_error
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_template__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Se selezionata, alcuni messaggi presentano un errore di consegna."
-
-#. module: whatsapp
-#: model:ir.model.fields,help:whatsapp.field_res_users_settings__is_discuss_sidebar_category_whatsapp_open
-msgid "If checked, the WhatsApp category is open in the discuss sidebar"
-msgstr ""
-"Se selezionato, la categoria WhatsApp è aperta nella barra laterale di "
-"discussione"
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
@@ -1190,6 +1561,14 @@ msgid "If the URL has no domain, your domain will be added."
 msgstr "Se l'URL non presenta un dominio, verrà aggiunto il tuo dominio."
 
 #. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "If there are sections, the first item must be a section."
+msgstr "Se sono presenti sezioni, il primo elemento deve essere una sezione."
+
+#. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_base_template__header_type__image
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive__header_type__image
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__header_type__image
 msgid "Image"
 msgstr "Immagine"
@@ -1221,9 +1600,46 @@ msgid "Insert variable"
 msgstr "Inserisci variabile"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_message_view_search
+msgid "Interactive"
+msgstr "Interattivo"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_composer__wa_interactive_id
+msgid "Interactive Template"
+msgstr "Modello interattivo"
+
+#. module: whatsapp
+#: model:ir.actions.act_window,name:whatsapp.whatsapp_preview_action_from_interactive
+msgid "Interactive Template Preview"
+msgstr "Anteprima modello interattivo"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_preview__wa_interactive_id
+#: model:ir.ui.menu,name:whatsapp.whatsapp_interactive_template_menu
+msgid "Interactive Templates"
+msgstr "Modelli interattivi"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__interactive_type
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__interactive_type
+msgid "Interactive Type"
+msgstr "Tipo interattivo"
+
+#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__invalid_phone_number_count
 msgid "Invalid Phone Number Count"
 msgstr "Numero di numeri di telefono non validi"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_template.py:0
+msgid ""
+"Invalid variables: %(variables)s\n"
+"Variable type \"%(type)s\" expects format like %(expected)s."
+msgstr ""
+"Variabili non valide: %(variables)s\n"
+"Il tipo di variabile \"%(type)s\" richiede un formato di tipo %(expected)s."
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__ga
@@ -1237,6 +1653,9 @@ msgstr "Il pulsante è dinamico"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_is_follower
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_is_follower
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_is_follower
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_is_follower
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_is_follower
 msgid "Is Follower"
 msgstr "Sta seguendo"
@@ -1250,6 +1669,16 @@ msgstr "È testo libero intestazione"
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__batch_mode
 msgid "Is Multiple Records"
 msgstr "È record multipli"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__is_number_blocked
+msgid "Is Number Blocked"
+msgstr "Il numero è bloccato"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_discuss_channel__whatsapp_channel_blocked
+msgid "Is WhatsApp Channel Blocked"
+msgstr "Il canale WhatsApp è bloccato"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_discuss_channel__whatsapp_channel_active
@@ -1308,9 +1737,14 @@ msgstr "Mese scorso"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__write_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__write_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__write_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__write_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__write_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_composer__write_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__write_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_preview__write_uid
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_register_phone__write_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__write_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__write_uid
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_variable__write_uid
@@ -1319,9 +1753,14 @@ msgstr "Ultimo aggiornamento di"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__write_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__write_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__write_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__write_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__write_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_composer__write_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__write_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_preview__write_date
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_register_phone__write_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__write_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__write_date
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_variable__write_date
@@ -1352,6 +1791,42 @@ msgstr "Lettone"
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__status__limit_exceeded
 msgid "Limit Exceeded"
 msgstr "Limite superato"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "List Button Text cannot exceed 20 characters."
+msgstr "Il testo del pulsante Elenco non può superare i 20 caratteri."
+
+#. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive__interactive_type__list
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_search
+msgid "List of detailed options"
+msgstr "Elenco delle opzioni dettagliate"
+
+#. module: whatsapp
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_interactive__interactive_type
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_interactive_button__interactive_type
+msgid ""
+"List of detailed options - Allow you to present WhatsApp users with a list "
+"of options to choose from\n"
+"List of replies -  Allow you to send up to three predefined replies for "
+"users to choose from.\n"
+"Call-to-action button - Allow you to map any URL to a button so you don't "
+"have to include the raw URL in the message body."
+msgstr ""
+"Elenco delle opzioni dettagliate - Consente di presentare agli utenti di "
+"WhatsApp un elenco di opzioni tra cui scegliere\n"
+"Elenco delle risposte - Consente di inviare fino a tre risposte predefinite "
+"tra cui gli utenti possono scegliere.\n"
+"Pulsante di invito all’azione - Consente di associare qualsiasi URL a un "
+"pulsante in modo da non dover includere l’URL grezzo nel corpo del messaggio."
+
+#. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive__interactive_type__button
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_search
+msgid "List of replies"
+msgstr "Elenco risposte"
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__lt
@@ -1421,9 +1896,20 @@ msgid "Malayalam"
 msgstr "Malayalam"
 
 #. module: whatsapp
+#: model_terms:ir.actions.act_window,help:whatsapp.whatsapp_blocklist_action
+msgid "Manage WhatsApp numbers and block or unblock them."
+msgstr "Gestisci i numeri di WhatsApp e bloccali o sbloccali."
+
+#. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__mr
 msgid "Marathi"
 msgstr "Marathi"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "Markdown is not allowed inside Header Text."
+msgstr "Il markdown non è consentito all’interno del testo dell’intestazione."
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__template_type__marketing
@@ -1441,6 +1927,18 @@ msgstr "Massimo 1 pulsante Chiama numero consentito."
 #: code:addons/whatsapp/models/whatsapp_template.py:0
 msgid "Maximum 10 buttons allowed."
 msgstr "Massimo 10 pulsanti consentiti."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "Maximum 10 questions are allowed."
+msgstr "Sono consentite al massimo 10 domande."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "Maximum 10 sections are allowed."
+msgstr "Sono consentite al massimo 10 sezioni."
 
 #. module: whatsapp
 #. odoo-python
@@ -1465,12 +1963,16 @@ msgstr "Numero di messaggi"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_has_error
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_has_error
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_has_error
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_has_error
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_has_error
 msgid "Message Delivery error"
 msgstr "Errore consegna messaggio"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__preview_whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_composer__preview_whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_preview__preview_whatsapp
 msgid "Message Preview"
 msgstr "Anteprima messaggio"
@@ -1482,12 +1984,20 @@ msgid "Message Statistics Of %(template_name)s"
 msgstr "Statistiche messaggio di %(template_name)s"
 
 #. module: whatsapp
+#: model:ir.ui.menu,name:whatsapp.whatsapp_message_template_menu
+msgid "Message Templates"
+msgstr "Modelli di messaggio"
+
+#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__message_type
 msgid "Message Type"
 msgstr "Tipo di messaggio"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_ids
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_ids
 #: model:ir.ui.menu,name:whatsapp.whatsapp_message_menu
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
@@ -1525,13 +2035,21 @@ msgid "Monitor all recent outgoing and incoming messages"
 msgstr "Monitora tutti i messaggi in entrata e in uscita"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_search
+msgid "My Interactive Templates"
+msgstr "I miei modelli interattivi"
+
+#. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_search
 msgid "My Templates"
 msgstr "I miei modelli"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__name
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__name
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__name
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__variable_type__named
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 msgid "Name"
@@ -1543,9 +2061,19 @@ msgid "Network Error"
 msgstr "Errore di rete"
 
 #. module: whatsapp
+#: model:res.groups.privilege,placeholder:whatsapp.res_groups_privilege_whatsapp
+msgid "No"
+msgstr "No"
+
+#. module: whatsapp
 #: model_terms:ir.actions.act_window,help:whatsapp.whatsapp_account_action
 msgid "No Account Configured yet!"
 msgstr "Ancora nessun account configurato!"
+
+#. module: whatsapp
+#: model_terms:ir.actions.act_window,help:whatsapp.whatsapp_interactive_action
+msgid "No Interactive Template Found!"
+msgstr "Nessun modello interattivo trovato!"
 
 #. module: whatsapp
 #: model_terms:ir.actions.act_window,help:whatsapp.whatsapp_template_action
@@ -1553,9 +2081,27 @@ msgid "No Templates Found!"
 msgstr "Nessun modello trovato!"
 
 #. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid "No WhatsApp Business Account was found for the access token."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/wizard/whatsapp_interactive_composer.py:0
+msgid "No WhatsApp Interactive Templates are available."
+msgstr "Non sono disponibili modelli interattivi per WhatsApp."
+
+#. module: whatsapp
 #: model_terms:ir.actions.act_window,help:whatsapp.whatsapp_message_action
 msgid "No WhatsApp Messages found"
 msgstr "Nessun messaggio WhatsApp trovato"
+
+#. module: whatsapp
+#. odoo-javascript
+#: code:addons/whatsapp/static/src/core/public_web/messaging_menu_model_patch.js:0
+msgid "No WhatsApp conversations yet."
+msgstr "Non ci sono ancora conversazioni su WhatsApp."
 
 #. module: whatsapp
 #. odoo-python
@@ -1566,11 +2112,19 @@ msgstr ""
 
 #. module: whatsapp
 #. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid "No numbers to update"
+msgstr "Nessun numero da aggiornare"
+
+#. module: whatsapp
+#. odoo-python
 #: code:addons/whatsapp/tools/whatsapp_api.py:0
 msgid "Non-descript Error"
 msgstr "Errore non-descript"
 
 #. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_base_template__header_type__none
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive__header_type__none
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__header_type__none
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__quality__none
 msgid "None"
@@ -1580,6 +2134,11 @@ msgstr "Nessuno"
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__nb
 msgid "Norwegian"
 msgstr "Norvegese"
+
+#. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_account__state__disconnected
+msgid "Not Connected"
+msgstr ""
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
@@ -1592,13 +2151,29 @@ msgid "Notify User"
 msgstr "Notifica utenti"
 
 #. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__variable_type__positional
+msgid "Number"
+msgstr "Numero"
+
+#. module: whatsapp
+#: model:ir.model.constraint,message:whatsapp.constraint_whatsapp_blocklist_unique_number_per_account
+msgid "Number already exists for this WhatsApp account"
+msgstr "Il numero esiste già per questo account WhatsApp"
+
+#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_needaction_counter
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_needaction_counter
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_needaction_counter
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_needaction_counter
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_needaction_counter
 msgid "Number of Actions"
 msgstr "Numero di azioni"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_has_error_counter
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_has_error_counter
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_has_error_counter
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_has_error_counter
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_has_error_counter
 msgid "Number of errors"
 msgstr "Numero di errori"
@@ -1615,21 +2190,43 @@ msgstr "Numero di pulsanti testo libero"
 
 #. module: whatsapp
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_account__message_needaction_counter
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_base_template__message_needaction_counter
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_blocklist__message_needaction_counter
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_interactive__message_needaction_counter
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_template__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "Numero di messaggi che richiedono un'azione"
 
 #. module: whatsapp
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_account__message_has_error_counter
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_base_template__message_has_error_counter
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_blocklist__message_has_error_counter
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_interactive__message_has_error_counter
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_template__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Numero di messaggi con errore di consegna"
+
+#. module: whatsapp
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_blocklist__number
+msgid "Number should be E164 formatted"
+msgstr "Il numero deve avere il formato E164"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__is_oauth_onboarded
+msgid "OAuth Onboarded"
+msgstr ""
 
 #. module: whatsapp
 #. odoo-python
 #: code:addons/whatsapp/models/whatsapp_template.py:0
 msgid "Only 10 free text is allowed in body of template"
 msgstr "Sono consentiti solo 10 testi liberi nel corpo del modello"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_account.py:0
+msgid "Only accounts connected through the onboarding can be disconnected."
+msgstr ""
 
 #. module: whatsapp
 #. odoo-python
@@ -1645,7 +2242,7 @@ msgstr "Per ogni messaggi è consentito un solo allegato"
 
 #. module: whatsapp
 #. odoo-python
-#: code:addons/whatsapp/models/whatsapp_template.py:0
+#: code:addons/whatsapp/models/whatsapp_base_template.py:0
 msgid "Only templates using media header types may have header documents"
 msgstr ""
 "Solo i modelli che utilizzano tipi di intestazione multimediali possono "
@@ -1660,6 +2257,11 @@ msgstr "Altri errori tecnici"
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_message__message_type__outbound
 msgid "Outbound"
 msgstr "In uscita"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_register_phone__pin
+msgid "PIN"
+msgstr ""
 
 #. module: whatsapp
 #. odoo-python
@@ -1715,6 +2317,11 @@ msgid "Phone Number ID"
 msgstr "Numero di telefono"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__is_phone_registered
+msgid "Phone Registered"
+msgstr ""
+
+#. module: whatsapp
 #. odoo-python
 #: code:addons/whatsapp/tools/whatsapp_api.py:0
 msgid "Phone number Id is wrong."
@@ -1762,6 +2369,7 @@ msgid "Portuguese (POR)"
 msgstr "Portoghese (POR)"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 msgid "Preview"
 msgstr "Anteprima"
@@ -1777,6 +2385,11 @@ msgid "Preview template"
 msgstr "Mostra anteprima modello"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__proxy_webhook_url
+msgid "Proxy Webhook URL"
+msgstr ""
+
+#. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__pa
 msgid "Punjabi"
 msgstr "Punjabi"
@@ -1787,12 +2400,22 @@ msgid "Quality"
 msgstr "Qualità"
 
 #. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive_button__button_type__question
+msgid "Question"
+msgstr "Domanda"
+
+#. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_base_template_button__button_type__quick_reply
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive_button__button_type__quick_reply
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template_button__button_type__quick_reply
 msgid "Quick Reply"
 msgstr "Risposta rapida"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__rating_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__rating_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__rating_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__rating_ids
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__rating_ids
 msgid "Ratings"
 msgstr "Valutazioni"
@@ -1827,6 +2450,22 @@ msgstr "Riceve messaggi"
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__quality__red
 msgid "Red"
 msgstr "Rosso"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_register_phone_form
+msgid "Register Phone"
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_account.py:0
+msgid "Register Phone Number"
+msgstr ""
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_register_phone_form
+msgid "Register your Phone number"
+msgstr ""
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__status__rejected
@@ -1893,6 +2532,9 @@ msgstr "Russo"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__message_has_sms_error
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__message_has_sms_error
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__message_has_sms_error
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__message_has_sms_error
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Errore di consegna SMS"
@@ -1903,15 +2545,9 @@ msgid "Sample Value"
 msgstr "Valore"
 
 #. module: whatsapp
-#. odoo-javascript
-#: code:addons/whatsapp/static/src/core/public_web/discuss_app_model_patch.js:0
-msgid "Search WhatsApp Channel"
-msgstr "Cerca canale WhatsApp"
-
-#. module: whatsapp
-#: model_terms:ir.ui.view,arch_db:whatsapp.template_message_preview
-msgid "See all options"
-msgstr "Vedi tutte le opzioni"
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive_button__button_type__section
+msgid "Section"
+msgstr "Sezione"
 
 #. module: whatsapp
 #. odoo-python
@@ -1920,7 +2556,20 @@ msgid "Send %(template_name)s"
 msgstr "Invia %(template_name)s"
 
 #. module: whatsapp
+#. odoo-javascript
+#: code:addons/whatsapp/static/src/core/common/composer_actions_patch.js:0
+#: code:addons/whatsapp/static/src/core/common/composer_patch.js:0
+msgid "Send Interactive Message"
+msgstr "Invia messaggio interattivo"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_composer_view_form
+msgid "Send Interactive Template"
+msgstr "Invia modello interattivo"
+
+#. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_composer_view_form
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_composer_view_form
 msgid "Send Message"
 msgstr "Invia messaggio"
 
@@ -1931,9 +2580,14 @@ msgid "Send WhatsApp"
 msgstr "Invia Whatsapp"
 
 #. module: whatsapp
+#: model:ir.model,name:whatsapp.model_whatsapp_interactive_composer
+msgid "Send WhatsApp Interactive Wizard"
+msgstr "Procedura guidata interattiva invio WhatsApp"
+
+#. module: whatsapp
 #. odoo-javascript
 #: code:addons/whatsapp/static/src/chatter/web/chatter_patch.js:0
-#: code:addons/whatsapp/static/src/components/whatsapp_button/whatsapp_button.js:0
+#: code:addons/whatsapp/static/src/components/phone_field/phone_field.js:0
 #: code:addons/whatsapp/static/src/core/common/composer_patch.js:0
 msgid "Send WhatsApp Message"
 msgstr "Invia messaggio Whatsapp"
@@ -1945,13 +2599,21 @@ msgstr "Procedura guidata invio Whatsapp"
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.res_config_settings_view_form
-msgid "Send and receive message through your WhatsApp Business account."
-msgstr "Invia e ricevi messaggi attraverso il tuo account WhatsApp Business."
+msgid "Send and receive messages via your WhatsApp Business account"
+msgstr "Invia e ricevi messaggi tramite il tuo account WhatsApp Business"
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
 msgid "Sending Messages"
 msgstr "Invia messaggi"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_account.py:0
+msgid ""
+"Sending still works, but the webhook is not pointing to Odoo, so incoming "
+"messages will not reach this database."
+msgstr ""
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_message__state__sent
@@ -1975,6 +2637,9 @@ msgid "Sent to"
 msgstr "Inviato a"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template_button__sequence
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__sequence
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__sequence
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__sequence
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__sequence
 msgid "Sequence"
@@ -1991,9 +2656,19 @@ msgid "Server Action"
 msgstr "Azione server"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__shared_webhook_secret
+msgid "Shared Webhook Secret"
+msgstr ""
+
+#. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__si_lk
 msgid "Sinhala"
 msgstr "Sinhala"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_composer_view_form
+msgid "Skipping"
+msgstr "Salta"
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__sk
@@ -2081,6 +2756,7 @@ msgid "Spanish (URY)"
 msgstr "Spagnolo (URY)"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__state
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__state
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_message_view_search
 msgid "State"
@@ -2101,6 +2777,17 @@ msgstr "Stato"
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 msgid "Submit for Approval"
 msgstr "Invia per approvazione"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
+msgid "Subscribe Webhook"
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_account.py:0
+msgid "Successfully subscribed to webhook!"
+msgstr ""
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__sw
@@ -2133,6 +2820,8 @@ msgid "Telugu"
 msgstr "Telugu"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_ir_actions_server__wa_template_id
+#: model:ir.model.fields,field_description:whatsapp.field_ir_cron__wa_template_id
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_composer__wa_template_id
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_message_view_search
 msgid "Template"
@@ -2161,6 +2850,8 @@ msgid "Template Guidelines"
 msgstr "Linee guida modello"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__header_text
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__header_text
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__header_text
 msgid "Template Header Text"
 msgstr "Testo intestazione modello"
@@ -2181,7 +2872,9 @@ msgid "Template Quality Rating Too Low"
 msgstr "Valutazione qualità modello troppo bassa"
 
 #. module: whatsapp
-#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__header_attachment_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__header_attachment_id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__header_attachment_id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__header_attachment_id
 msgid "Template Static Header"
 msgstr "Intestazione statica modello"
 
@@ -2191,6 +2884,8 @@ msgid "Template Variables"
 msgstr "Variabili modello"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__body
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__body
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__body
 msgid "Template body"
 msgstr "Corpo modello"
@@ -2200,16 +2895,6 @@ msgstr "Corpo modello"
 #: code:addons/whatsapp/models/whatsapp_template.py:0
 msgid "Template category is missing"
 msgstr "Categoria modello mancante"
-
-#. module: whatsapp
-#. odoo-python
-#: code:addons/whatsapp/models/whatsapp_template_variable.py:0
-msgid ""
-"Template variable should be in format {{number}}. Cannot parse \"%"
-"(placeholder)s\""
-msgstr ""
-"La variabile del modello dovrebbe avere il formato {{number}}. Impossibile "
-"analizzare \"%(placeholder)s\""
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_preview__wa_template_id
@@ -2242,9 +2927,16 @@ msgid "Test Credentials"
 msgstr "Prova credenziali"
 
 #. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_base_template__header_type__text
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive__header_type__text
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__header_type__text
 msgid "Text"
 msgstr "Testo"
+
+#. module: whatsapp
+#: model:ir.module.module,summary:base.module_whatsapp
+msgid "Text your Contacts on WhatsApp"
+msgstr "Invia messaggi ai tuoi contatti su WhatsApp"
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__th
@@ -2253,16 +2945,56 @@ msgstr "Thai"
 
 #. module: whatsapp
 #. odoo-python
-#: code:addons/whatsapp/models/whatsapp_template.py:0
-msgid "The Header Text must either contain no variable or the first one {{1}}."
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid "The Enterprise subscription could not be validated."
 msgstr ""
-"Il testo dell'intestazione non deve contenere variabili oppure contenere la "
-"prima {{1}}."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_template.py:0
+msgid "The Header Text must contain at most one variable."
+msgstr "Il testo dell’intestazione deve contenere al massimo una variabile."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid "The WhatsApp proxy did not return an access token."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/controller/onboarding.py:0
+msgid "The WhatsApp proxy did not return the required information."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid "The WhatsApp proxy did not unregister the webhook."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid "The WhatsApp proxy rejected the request."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid "The WhatsApp proxy returned an unknown error: %s"
+msgstr ""
 
 #. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_message__failure_type__outdated_channel
 msgid "The channel is no longer active"
 msgstr "Il canale non è più attivo"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive.py:0
+msgid "The last list item must be a question."
+msgstr "L'ultimo elemento dell'elenco deve essere una domanda."
 
 #. module: whatsapp
 #. odoo-javascript
@@ -2307,6 +3039,30 @@ msgid "The message is being processed."
 msgstr "Il messaggio è stato elaborato."
 
 #. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid ""
+"The onboarded WhatsApp Business Account does not have any Cloud API phone "
+"numbers."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_account.py:0
+msgid ""
+"The phone number is not registered and the webhook is not pointing to Odoo, "
+"so this account can neither send nor receive messages."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_account.py:0
+msgid ""
+"The phone number is not registered, so this account can neither send nor "
+"receive messages."
+msgstr ""
+
+#. module: whatsapp
 #: model:ir.model.fields,help:whatsapp.field_whatsapp_account__phone_number
 msgid "The phone number used in the Whatsapp Business Account."
 msgstr "Il numero di telefono utilizzato nell'account WhatsApp Business."
@@ -2327,6 +3083,11 @@ msgstr "Il destinatario ha risposto al messaggio."
 #: model:ir.model.constraint,message:whatsapp.constraint_whatsapp_account_phone_uid_unique
 msgid "The same phone number ID already exists"
 msgstr "Il numero di telefono esiste già"
+
+#. module: whatsapp
+#: model:ir.model.fields,help:whatsapp.field_whatsapp_account__shared_webhook_secret
+msgid "The secret used to validate incoming webhook calls from the proxy."
+msgstr ""
 
 #. module: whatsapp
 #. odoo-javascript
@@ -2361,11 +3122,37 @@ msgstr "Si è verificato un errore durante l'invio del messaggio."
 #. odoo-javascript
 #: code:addons/whatsapp/static/src/core/common/thread_patch.xml:0
 msgid ""
+"This WhatsApp contact is blocked. Sending and receiving messages is disabled."
+msgstr ""
+"Questo contatto WhatsApp è bloccato. L'invio e la ricezione di messaggi sono "
+"disabilitati."
+
+#. module: whatsapp
+#. odoo-javascript
+#: code:addons/whatsapp/static/src/core/common/thread_patch.xml:0
+msgid ""
 "This conversation has been closed as more than 24 hours have passed since "
 "the last message received."
 msgstr ""
 "Questa conversazione è stata chiusa in quanto sono passate più di 24 ore "
 "dall'ultimo messaggio ricevuto."
+
+#. module: whatsapp
+#: model:ir.module.module,description:base.module_whatsapp
+msgid ""
+"This module integrates Odoo with WhatsApp to use WhatsApp messaging service"
+msgstr ""
+"Questo modulo integra Odoo con WhatsApp per utilizzare la messaggistica "
+"WhatsApp"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_composer_view_form
+msgid ""
+"This number is <strong>blocklisted</strong> for WhatsApp. Unblock it to send "
+"messages."
+msgstr ""
+"Questo numero è <strong>inserito nella lista dei numeri bloccati</strong> "
+"per WhatsApp. Sbloccalo per inviare messaggi."
 
 #. module: whatsapp
 #. odoo-python
@@ -2383,8 +3170,12 @@ msgstr "Turco"
 #: model:ir.model.fields,field_description:whatsapp.field_ir_cron__state
 #: model:ir.model.fields,field_description:whatsapp.field_mail_mail__message_type
 #: model:ir.model.fields,field_description:whatsapp.field_mail_message__message_type
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template_button__button_type
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__button_type
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__button_type
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_variable__field_type
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_search
 msgid "Type"
 msgstr "Tipo"
 
@@ -2420,11 +3211,23 @@ msgstr ""
 "server\n"
 
 #. module: whatsapp
+#: model:ir.model,name:whatsapp.model_utm_mixin
+msgid "UTM Mixin"
+msgstr "Mixin UTM"
+
+#. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__uk
 msgid "Ukrainian"
 msgstr "Ucraino"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_blocklist_view_form
+msgid "Unblock Number"
+msgstr "Sblocca numero"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_message__failure_type__unknown
 msgid "Unknown Error"
 msgstr "Errore sconosciuto"
@@ -2436,6 +3239,12 @@ msgid "Unknown error when processing whatsapp request."
 msgstr "Errore sconosciuto durante l'elaborazione della richiesta whatsapp."
 
 #. module: whatsapp
+#. odoo-javascript
+#: code:addons/whatsapp/static/src/core/public_web/messaging_menu_model_patch.js:0
+msgid "Unread"
+msgstr "Non letto"
+
+#. module: whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__lang_code__ur
 msgid "Urdu"
 msgstr "Urdu"
@@ -2444,6 +3253,19 @@ msgstr "Urdu"
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__url_type
 msgid "Url Type"
 msgstr "Tipo di URL"
+
+#. module: whatsapp
+#: model_terms:ir.actions.act_window,help:whatsapp.whatsapp_interactive_action
+msgid ""
+"Use the \"Send Interactive Message\" action in a WhatsApp conversation to "
+"pick an interactive template.<br>\n"
+"                Those let your customers pick options from the lists you "
+"define (e.g. customer service, ...)"
+msgstr ""
+"Utilizza l’azione “Invia messaggio interattivo” in una conversazione su "
+"WhatsApp per selezionare un modello interattivo.<br>\n"
+"                Questi modelli consentono ai tuoi clienti di scegliere "
+"opzioni dagli elenchi da te definiti (ad es. assistenza clienti...)"
 
 #. module: whatsapp
 #: model:ir.model.fields,help:whatsapp.field_mail_mail__message_type
@@ -2479,11 +3301,6 @@ msgid "User Phone"
 msgstr "Telefono utente"
 
 #. module: whatsapp
-#: model:ir.model,name:whatsapp.model_res_users_settings
-msgid "User Settings"
-msgstr "Impostazioni utente"
-
-#. module: whatsapp
 #. odoo-python
 #: code:addons/whatsapp/models/whatsapp_message.py:0
 msgid "User has been opt out of receiving WhatsApp messages"
@@ -2505,6 +3322,8 @@ msgstr ""
 "configurato nel profilo utente."
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template__allowed_user_ids
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive__allowed_user_ids
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__allowed_user_ids
 msgid "Users"
 msgstr "Utenti"
@@ -2545,6 +3364,21 @@ msgid "Variable"
 msgstr "Variabile"
 
 #. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_template_variable.py:0
+msgid ""
+"Variable %(placeholder)s is incorrectly formatted. Variable type \"%"
+"(type)s\" expects format like %(expected)s."
+msgstr ""
+"La variabile %(placeholder)s è formattata in modo errato. Il tipo di "
+"variabile \"%(type)s\" richiede un formato del tipo %(expected)s."
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__variable_type
+msgid "Variable Type"
+msgstr "Tipo di variabile"
+
+#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_variable__line_type
 msgid "Variable location"
 msgstr "Luogo variabile"
@@ -2557,6 +3391,26 @@ msgstr ""
 
 #. module: whatsapp
 #. odoo-python
+#: code:addons/whatsapp/models/whatsapp_template.py:0
+msgid ""
+"Variable type \"Name\" expects placeholders like {{customer_name}} in the "
+"header text."
+msgstr ""
+"Il tipo di variabile \"Nome\" richiede la presenza di segnaposto come "
+"{{customer_name}} nel testo dell'intestazione."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_template.py:0
+msgid ""
+"Variable type \"Number\" only supports {{1}} as a placeholder in the header "
+"text."
+msgstr ""
+"Il tipo di variabile \"Numero\" supporta solo {{1}} come segnaposto nel "
+"testo dell'intestazione."
+
+#. module: whatsapp
+#. odoo-python
 #: code:addons/whatsapp/models/whatsapp_template_variable.py:0
 msgid ""
 "Variables %(field_names)s do not seem to be valid field path for model %"
@@ -2566,6 +3420,8 @@ msgstr ""
 "per il modello %(model_name)s."
 
 #. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_base_template__header_type__video
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive__header_type__video
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__header_type__video
 msgid "Video"
 msgstr "Video"
@@ -2576,15 +3432,22 @@ msgid "Vietnamese"
 msgstr "Vietnamita"
 
 #. module: whatsapp
-#. odoo-javascript
-#: code:addons/whatsapp/static/src/core/web/thread_actions.js:0
-msgid "View Contact"
-msgstr "Mostra contatto"
-
-#. module: whatsapp
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_base_template_button__button_type__url
+#: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_interactive_button__button_type__url
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template_button__button_type__url
 msgid "Visit Website"
 msgstr "Visita il sito web"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_register_phone__wa_account_id
+msgid "Wa Account"
+msgstr ""
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__wa_interactive_id
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__wa_interactive_id
+msgid "Wa Interactive"
+msgstr "Wa interattivo"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_message__wa_template_id
@@ -2605,40 +3468,54 @@ msgid "Warning Message"
 msgstr "Messaggio di avviso"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__is_webhook_subscribed
+msgid "Webhook Subscribed"
+msgstr ""
+
+#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__webhook_verify_token
 msgid "Webhook Verify Token"
 msgstr "Token di verifica Webhook"
 
 #. module: whatsapp
-#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_account__website_message_ids
-#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template__website_message_ids
-msgid "Website Messages"
-msgstr "Messaggi sito web"
+#. odoo-python
+#: code:addons/whatsapp/controller/onboarding.py:0
+msgid ""
+"Webhook subscription failed after onboarding.%(br)sPlease subscribe it "
+"manually.%(br)sError: %(error)s"
+msgstr ""
 
 #. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_interactive_button.py:0
+msgid "Website Link cannot exceed 2000 characters."
+msgstr "Il link al sito web non può superare i 2000 caratteri."
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_base_template_button__website_url
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_interactive_button__website_url
 #: model:ir.model.fields,field_description:whatsapp.field_whatsapp_template_button__website_url
 msgid "Website URL"
 msgstr "URL sito web"
 
 #. module: whatsapp
-#: model:ir.model.fields,help:whatsapp.field_whatsapp_account__website_message_ids
-#: model:ir.model.fields,help:whatsapp.field_whatsapp_template__website_message_ids
-msgid "Website communication history"
-msgstr "Cronologia comunicazioni sito web"
-
-#. module: whatsapp
 #. odoo-javascript
 #: code:addons/whatsapp/static/src/chatter/web/chatter_patch.xml:0
-#: code:addons/whatsapp/static/src/components/whatsapp_button/whatsapp_button.xml:0
+#: code:addons/whatsapp/static/src/components/phone_field/phone_field.js:0
 #: code:addons/whatsapp/static/src/core/common/thread_icon_patch.xml:0
-#: code:addons/whatsapp/static/src/core/public_web/discuss_app_model_patch.js:0
-#: code:addons/whatsapp/static/src/core/public_web/messaging_menu_patch.js:0
+#: code:addons/whatsapp/static/src/core/public_web/messaging_menu_model_patch.js:0
+#: model:ir.model.fields.selection,name:whatsapp.selection__discuss_channel__channel_type__whatsapp
 #: model:ir.model.fields.selection,name:whatsapp.selection__mail_message__message_type__whatsapp_message
 #: model:ir.ui.menu,name:whatsapp.whatsapp_menu_main
 #: model:res.groups.privilege,name:whatsapp.res_groups_privilege_whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.res_config_settings_view_form
 msgid "WhatsApp"
 msgstr "WhatsApp"
+
+#. module: whatsapp
+#: model:ir.actions.server,name:whatsapp.ir_cron_refresh_onboarded_account_state_ir_actions_server
+msgid "WhatsApp : Refresh Onboarded Accounts"
+msgstr ""
 
 #. module: whatsapp
 #: model:ir.actions.server,name:whatsapp.ir_actions_server_resend_whatsapp_queue
@@ -2651,9 +3528,27 @@ msgid "WhatsApp : Send In Queue Messages"
 msgstr "WhatsApp: invia messaggi in coda"
 
 #. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__wa_account_id
 #: model_terms:ir.actions.act_window,help:whatsapp.whatsapp_template_action
 msgid "WhatsApp Account"
 msgstr "Account WhatsApp"
+
+#. module: whatsapp
+#: model:ir.model,name:whatsapp.model_whatsapp_base_template
+msgid "WhatsApp Base Template"
+msgstr "Modello di base WhatsApp"
+
+#. module: whatsapp
+#: model:ir.model,name:whatsapp.model_whatsapp_base_template_button
+msgid "WhatsApp Base Template Button"
+msgstr "Pulsante modello di base WhatsApp"
+
+#. module: whatsapp
+#: model:ir.actions.act_window,name:whatsapp.whatsapp_blocklist_action
+#: model:ir.model,name:whatsapp.model_whatsapp_blocklist
+#: model:ir.ui.menu,name:whatsapp.whatsapp_blocklist_menu
+msgid "WhatsApp Blocklist"
+msgstr "Numeri bloccati WhatsApp"
 
 #. module: whatsapp
 #: model:ir.actions.act_window,name:whatsapp.whatsapp_account_action
@@ -2675,11 +3570,6 @@ msgid "WhatsApp Business Accounts"
 msgstr "Account WhatsApp Business"
 
 #. module: whatsapp
-#: model:ir.model.fields,field_description:whatsapp.field_res_users_settings__is_discuss_sidebar_category_whatsapp_open
-msgid "WhatsApp Category Open"
-msgstr "Categoria Whatsapp aperta"
-
-#. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_res_partner__wa_channel_count
 #: model:ir.model.fields,field_description:whatsapp.field_res_users__wa_channel_count
 msgid "WhatsApp Channel Count"
@@ -2699,13 +3589,23 @@ msgid "WhatsApp Chats"
 msgstr "Chat WhatsApp"
 
 #. module: whatsapp
-#: model:ir.model.fields.selection,name:whatsapp.selection__discuss_channel__channel_type__whatsapp
-msgid "WhatsApp Conversation"
-msgstr "Conversazione WhatsApp"
+#: model:ir.model,name:whatsapp.model_whatsapp_interactive_button
+msgid "WhatsApp Interactive Button"
+msgstr "Pulsante interattivo di WhatsApp"
+
+#. module: whatsapp
+#: model:ir.actions.act_window,name:whatsapp.whatsapp_interactive_action
+#: model:ir.model,name:whatsapp.model_whatsapp_interactive
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_list
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_search
+msgid "WhatsApp Interactive Template"
+msgstr "Modello interattivo WhatsApp"
 
 #. module: whatsapp
 #. odoo-python
 #: code:addons/whatsapp/models/whatsapp_template.py:0
+#: model:ir.model,name:whatsapp.model_whatsapp_message
 msgid "WhatsApp Message"
 msgstr "Messaggio WhatsApp"
 
@@ -2716,11 +3616,20 @@ msgstr "ID messaggio WhatsApp"
 
 #. module: whatsapp
 #: model:ir.actions.act_window,name:whatsapp.whatsapp_message_action
-#: model:ir.model,name:whatsapp.model_whatsapp_message
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_message_view_form
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_message_view_graph
 msgid "WhatsApp Messages"
 msgstr "Messaggi WhatsApp"
+
+#. module: whatsapp
+#: model:ir.module.module,shortdesc:base.module_whatsapp
+msgid "WhatsApp Messaging"
+msgstr "Messaggistica WhatsApp"
+
+#. module: whatsapp
+#: model:ir.model.fields,field_description:whatsapp.field_whatsapp_blocklist__number
+msgid "WhatsApp Number"
+msgstr "Numero WhatsApp"
 
 #. module: whatsapp
 #: model:ir.model.fields,field_description:whatsapp.field_discuss_channel__whatsapp_partner_id
@@ -2728,10 +3637,13 @@ msgid "WhatsApp Partner"
 msgstr "Partner WhatsApp"
 
 #. module: whatsapp
+#: model:ir.model,name:whatsapp.model_whatsapp_register_phone
+msgid "WhatsApp Registration Phone Number Wizard"
+msgstr ""
+
+#. module: whatsapp
 #: model:ir.actions.act_window,name:whatsapp.whatsapp_template_action
 #: model:ir.model,name:whatsapp.model_whatsapp_template
-#: model:ir.model.fields,field_description:whatsapp.field_ir_actions_server__wa_template_id
-#: model:ir.model.fields,field_description:whatsapp.field_ir_cron__wa_template_id
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_tree
 msgid "WhatsApp Template"
@@ -2754,10 +3666,28 @@ msgstr "Variabile modello WhatsApp"
 
 #. module: whatsapp
 #. odoo-javascript
-#: code:addons/whatsapp/static/src/core/common/im_status_patch.xml:0
-#: code:addons/whatsapp/static/src/discuss/core/common/channel_member_list_patch.xml:0
+#: code:addons/whatsapp/static/src/core/common/im_status_patch.js:0
+#: code:addons/whatsapp/static/src/discuss/core/common/discuss_channel_model_patch.js:0
 msgid "WhatsApp User"
 msgstr "Utente WhatsApp"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid "WhatsApp authorization is temporarily unavailable."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid "WhatsApp could not be reached, please try again later."
+msgstr ""
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/tools/whatsapp_api.py:0
+msgid "WhatsApp returned an unexpected response, please try again later."
+msgstr ""
 
 #. module: whatsapp
 #. odoo-python
@@ -2793,6 +3723,23 @@ msgstr "Numero con formato errato"
 #: model:ir.model.fields.selection,name:whatsapp.selection__whatsapp_template__quality__yellow
 msgid "Yellow"
 msgstr "Giallo"
+
+#. module: whatsapp
+#. odoo-javascript
+#: code:addons/whatsapp/static/src/core/common/discuss_channel_model_patch.js:0
+msgid ""
+"You are about to leave this whatsapp conversation and will no longer have "
+"access to it unless you are invited again. Are you sure you want to continue?"
+msgstr ""
+"Stai per uscire da questa conversazione su WhatsApp e non potrai più "
+"accedervi a meno che tu non venga invitato nuovamente. Sei sicuro di voler "
+"continuare?"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/controller/onboarding.py:0
+msgid "You are not allowed to access this page."
+msgstr ""
 
 #. module: whatsapp
 #. odoo-python
@@ -2840,7 +3787,7 @@ msgstr "È possibile configurare un massimo di 10 variabili."
 
 #. module: whatsapp
 #. odoo-python
-#: code:addons/whatsapp/models/discuss_channel.py:0
+#: code:addons/whatsapp/models/discuss_channel_member.py:0
 msgid ""
 "You can't leave this channel. As you are the owner of this WhatsApp channel, "
 "you can only delete it."
@@ -2853,12 +3800,6 @@ msgstr ""
 #: code:addons/whatsapp/models/whatsapp_template.py:0
 msgid "You cannot modify a template model when it is linked to server actions."
 msgstr "Non è possibile modificare un modello se collegato ad azioni server."
-
-#. module: whatsapp
-#. odoo-python
-#: code:addons/whatsapp/models/whatsapp_template.py:0
-msgid "You may only use one header attachment for each template"
-msgstr "Puoi utilizzare un solo allegato intestazione per ogni modello"
 
 #. module: whatsapp
 #. odoo-python
@@ -2879,6 +3820,23 @@ msgstr "un altro documento"
 
 #. module: whatsapp
 #. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid "block"
+msgstr "blocco"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid "blocked"
+msgstr "bloccato"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_composer_view_form
+msgid "blocklisted recipient(s)."
+msgstr "destinatari inseriti nella lista dei numeri bloccati."
+
+#. module: whatsapp
+#. odoo-python
 #: code:addons/whatsapp/models/res_partner.py:0
 msgid "channel_partner_ids"
 msgstr "channel_partner_ids"
@@ -2895,6 +3853,11 @@ msgid "e.g. \"Acme Inc. Business Account\""
 msgstr "ad es. \"Acme Inc. Account business\""
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+msgid "e.g. \"Order Confirmation\""
+msgstr "ad es. \"Conferma dell'ordine\""
+
+#. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 msgid "e.g. \"Send Order Document\""
 msgstr "ad es. \"Invia documento ordine\""
@@ -2903,6 +3866,11 @@ msgstr "ad es. \"Invia documento ordine\""
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
 msgid "e.g. 00112233445566778899aabbccddeeff"
 msgstr "ad es. 00112233445566778899aabbccddeeff"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_register_phone_form
+msgid "e.g. 123456"
+msgstr ""
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_account_view_form
@@ -2915,14 +3883,42 @@ msgid "e.g. EGTRWHRTHETHWRBTEJETHGQEGWRHWR"
 msgstr "ad es. EGTRWHRTHETHWRBTEJETHGQEGWRHWR"
 
 #. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+msgid "e.g. Invitation for Meeting"
+msgstr "ad es. Invito riunione"
+
+#. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 msgid "e.g. Invitation for {{1}}"
 msgstr "ad es. Invito per {{1}}"
 
 #. module: whatsapp
 #: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
+msgid "e.g. Invitation for {{user_name}}"
+msgstr "ad es. Invito per {{user_name}}"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+msgid "e.g. Show options"
+msgstr "ad es. Mostra opzioni"
+
+#. module: whatsapp
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_interactive_view_form
+#: model_terms:ir.ui.view,arch_db:whatsapp.whatsapp_template_view_form
 msgid "e.g. https://www.example.com"
 msgstr "ad es. http://www.example.com"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid "number"
+msgstr "numero"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid "numbers"
+msgstr "numeri"
 
 #. module: whatsapp
 #: model_terms:ir.actions.act_window,help:whatsapp.whatsapp_account_action
@@ -2934,6 +3930,18 @@ msgstr "piattaforma per poi collegarlo al database Odoo"
 msgid "recipients have an invalid phone number and will be skipped."
 msgstr ""
 "i destinatari hanno un numero di telefono non valido e verranno saltati."
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid "unblock"
+msgstr "sblocca"
+
+#. module: whatsapp
+#. odoo-python
+#: code:addons/whatsapp/models/whatsapp_blocklist.py:0
+msgid "unblocked"
+msgstr "sbloccato"
 
 #. module: whatsapp
 #. odoo-javascript

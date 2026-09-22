@@ -25,6 +25,32 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
         }
         options['buttons'].append(xml_button)
 
+    @api.model
+    def _fill_missing_values(self, vals_list):
+        # EXTENDS 'account_intrastat'
+        vals_list = super()._fill_missing_values(vals_list)
+
+        if self.env.company.account_fiscal_country_id.code != 'DE':
+            return vals_list
+
+        for vals in vals_list:
+            if vals['intrastat_type_code'] == 'dispatch' and vals['intrastat_product_origin_country_code'] != 'DE':
+                vals['region_code'] = '99'
+        return vals_list
+
+    def _build_intrastat_custom_domain_blocks(self, grouping_key_dict):
+        # EXTENDS 'account_intrastat'
+        domain_dict = super()._build_intrastat_custom_domain_blocks(grouping_key_dict)
+        if self.env.company.account_fiscal_country_id.code != 'DE':
+            return domain_dict
+        if (
+            grouping_key_dict['region_code'] == '99'
+            and grouping_key_dict['intrastat_type_code'] == 'dispatch'
+            and grouping_key_dict['intrastat_product_origin_country_code'] != 'DE'
+        ):
+            del domain_dict['region_code']
+        return domain_dict
+
     def _get_exporting_query_data(self):
         res = super()._get_exporting_query_data()
         return SQL('%s %s', res, SQL("""
@@ -55,9 +81,8 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
         in_vals = []
         out_vals = []
 
-        report._init_currency_table(options)
         expressions = report.line_ids.expression_ids
-        results = self._report_custom_engine_intrastat(expressions, options, expressions[0].date_scope, 'id', None)
+        results = self._report_engine_intrastat(options, expressions[0].date_scope, expressions.grouped('formula'), 'id', None)[expressions]
         for index, line_result in enumerate(results):
             results[index] = line_result[1]
         results = self._prepare_values_for_de_export(results)
@@ -76,8 +101,8 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
             'user': self.env.user,
             'in_vals': in_vals,
             'out_vals': out_vals,
-            'in_vals_total_weight': float_round(sum(float(elem['weight'] or 0.0) for elem in in_vals), 3),
-            'out_vals_total_weight': float_round(sum(float(elem['weight'] or 0.0) for elem in out_vals), 3),
+            'in_vals_total_weight': sum(elem['weight'] for elem in in_vals),
+            'out_vals_total_weight': sum(elem['weight'] for elem in out_vals),
             'in_vals_total_amount': float_round(sum(elem['value'] for elem in in_vals), 3),
             'out_vals_total_amount': float_round(sum(elem['value'] for elem in out_vals), 3),
             'date': date,
@@ -98,5 +123,6 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
         for count, vals in enumerate(vals_list, start=1):
             vals['value'] = float_round(vals['value'], 3)
             vals['itemNumber'] = count
-            vals['quantity'] = float_round(vals['quantity'] * float(vals['supplementary_units']) if vals['supplementary_units'] else vals['quantity'], 2)
+            vals['weight'] = int(float_round(float((vals['weight'] or '0.0').replace(',', '.')), 0))
+            vals['quantity'] = float_round(vals['quantity'] * float(vals['supplementary_units'].replace(',', '.')) if vals['supplementary_units'] else vals['quantity'], 2)
         return vals_list

@@ -28,6 +28,9 @@ class StockPickingType(models.Model):
         help="Allow to create new lot/serial numbers for the components",
         default=False,
     )
+    auto_confirm_production = fields.Boolean(
+        "Auto Confirm Production", default=True,
+        help="Uncheck this option if you want to create a draft production order on replenishment, instead of a confirmed one.")
 
     auto_print_done_production_order = fields.Boolean(
         "Auto Print Done Production Order",
@@ -36,14 +39,16 @@ class StockPickingType(models.Model):
         "Auto Print Produced Product Labels",
         help="If this checkbox is ticked, Odoo will automatically print the product labels of a MO when it is done.")
     mrp_product_label_to_print = fields.Selection(
-        [('pdf', 'PDF'), ('zpl', 'ZPL')],
-        "Product Label to Print", default='pdf')
+        selection='_get_mrp_product_label_to_print_selection',
+        string="Product Label to Print",
+        default='pdf',
+    )
     auto_print_done_mrp_lot = fields.Boolean(
         "Auto Print Produced Lot Label",
         help="If this checkbox is ticked, Odoo will automatically print the lot/SN label of a MO when it is done.")
     done_mrp_lot_label_to_print = fields.Selection(
-        [('pdf', 'PDF'), ('zpl', 'ZPL')],
-        "Lot/SN Label to Print", default='pdf')
+        selection='_get_lot_label_format_selection',
+        string="Lot/SN Label to Print", default='4x12_lots')
     auto_print_mrp_reception_report = fields.Boolean(
         "Auto Print Allocation Report",
         help="If this checkbox is ticked, Odoo will automatically print the allocation report of a MO when it is done and has assigned moves.")
@@ -54,8 +59,17 @@ class StockPickingType(models.Model):
         "Auto Print Generated Lot/SN Label",
         help='Automatically print the lot/SN label when the "Create a new serial/lot number" button is used.')
     generated_mrp_lot_label_to_print = fields.Selection(
-        [('pdf', 'PDF'), ('zpl', 'ZPL')],
-        "Generated Lot/SN Label to Print", default='pdf')
+        selection='_get_lot_label_format_selection',
+        string="Generated Lot/SN Label to Print", default='4x12_lots')
+    wo_properties_definition = fields.PropertiesDefinition('Workorder Properties')
+
+    @api.model
+    def _get_mrp_product_label_to_print_selection(self):
+        return [
+            ('pdf', 'Finished Product PDF'),
+            ('zpl', 'Finished Product ZPL'),
+            *self._get_product_label_format_selection(),
+        ]
 
     @api.depends('code')
     def _compute_use_create_lots(self):
@@ -85,7 +99,7 @@ class StockPickingType(models.Model):
         domains = {
             'count_mo_waiting': [('reservation_state', '=', 'waiting')],
             'count_mo_todo': [('state', '=', 'confirmed')],
-            'count_mo_late': [('date_start', '<', fields.Date.today()), ('state', '=', 'confirmed')],
+            'count_mo_late': [('date_start', '<', 'today'), ('state', '=', 'confirmed')],
             'count_mo_in_progress': [('state', '=', 'progress')],
             'count_mo_to_close': [('state', '=', 'to_close')],
         }
@@ -134,7 +148,8 @@ class StockPicking(models.Model):
 
     production_ids = fields.One2many(
         'mrp.production',
-        related='move_ids.production_group_id.production_ids',
+        compute='_compute_production_ids',
+        string="Manufacturing Orders",
         groups='mrp.group_mrp_user')
     production_group_id = fields.Many2one(
         'mrp.production.group',
@@ -146,6 +161,11 @@ class StockPicking(models.Model):
     def _compute_has_kits(self):
         for picking in self:
             picking.has_kits = any(picking.move_ids.mapped('bom_line_id'))
+
+    @api.depends('reference_ids.production_ids')
+    def _compute_production_ids(self):
+        for picking in self:
+            picking.production_ids = picking.move_ids.production_group_id.production_ids
 
     @api.depends('production_ids')
     def _compute_mrp_production_ids(self):

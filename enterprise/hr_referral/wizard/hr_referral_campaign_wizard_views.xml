@@ -7,14 +7,10 @@
             <form>
                 <field name="job_id" invisible="1"/>
                 <div class="col">
-                    <label for="target" string="Contacted Employees" class="me-2"/>
-                    <field name="target" widget="radio" options="{'horizontal': true}"/>
-                </div>
-                <div class="col" invisible="target == 'all'">
                     <label for="employee_ids" string="To" class="me-2"/>
                     <field name="employee_ids"
                         widget="many2many_avatar_employee"
-                        placeholder="All Employees"/>
+                        placeholder="All Employee Users"/>
                 </div>
                 <hr/>
                 <group name="email">
@@ -27,8 +23,7 @@
                     <button name="action_send" string="Send"
                             type="object" class="btn btn-primary"
                             data-hotkey="q"/>
-                    <button string="Cancel" class="btn btn-secondary"
-                            special="cancel" data-hotkey="x"/>
+                    <button class="btn btn-secondary" special="cancel" data-hotkey="x"/>
                 </footer>
             </form>
         </field>

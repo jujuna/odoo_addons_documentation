@@ -1,5 +1,4 @@
 import { onMounted } from "@odoo/owl";
-import { Deferred } from "@odoo/hoot-mock";
 import { getService, patchWithCleanup, mountWithCleanup } from "@web/../tests/web_test_helpers";
 import { WebClient } from "@web/webclient/webclient";
 
@@ -14,7 +13,7 @@ import { QualityCheckSpreadsheetAction } from "@quality_control/spreadsheet_bund
  * @param {number} [params.spreadsheetId]
  */
 export async function mountQualitySpreadsheetAction(params = {}) {
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     let spreadsheetAction = {};
     patchWithCleanup(QualityCheckSpreadsheetAction.prototype, {
         setup() {
@@ -34,7 +33,7 @@ export async function mountQualitySpreadsheetAction(params = {}) {
             ...params,
         },
     });
-    await def;
+    await def.promise;
     const model = getSpreadsheetActionModel(spreadsheetAction);
     const env = getSpreadsheetActionEnv(spreadsheetAction);
     return { model, env, webClient };

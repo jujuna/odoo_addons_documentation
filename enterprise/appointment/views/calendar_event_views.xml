@@ -9,7 +9,7 @@
             <header position="inside">
                 <button name="action_set_appointment_booked" class="btn btn-primary" type="object" string="Confirm"
                     invisible="not appointment_type_id or appointment_status != 'request'"/>
-                <button name="action_set_appointment_attended" class="btn btn-primary" type="object" string="Check in"
+                <button name="action_set_appointment_attended" class="btn btn-secondary" type="object" string="Check in"
                     invisible="not appointment_type_id or appointment_status != 'booked'"/>
                 <button name="action_set_appointment_no_show" class="btn btn-secondary" type="object" string="No show"
                     invisible="not appointment_type_id or appointment_status != 'booked'"/>
@@ -18,13 +18,21 @@
                 <button name="action_set_appointment_cancelled" class="btn btn-secondary" type="object" string="Cancel"
                     invisible="not appointment_type_id or appointment_status == 'cancelled'"/>
             </header>
+            <header position="after">
+                <div class="alert alert-warning" role="alert"
+                    invisible="not total_capacity_unassigned">
+                    <field name="total_capacity_unassigned" readonly="1" nolabel="1" class="d-inline"/> seats are not assigned to any resource or user.
+                </div>
+            </header>
             <field name="categ_ids" position="after">
-                <field name="appointment_type_id" invisible="not appointment_type_id"/>
-                <field name="appointment_status" string="Appointment Status" required="appointment_type_id" invisible="not appointment_type_id"/>
+                <field name="appointment_type_id" readonly="not appointment_fields_can_edit"/>
+                <field name="appointment_status" string="Appointment Status" required="appointment_type_id"
+                    invisible="not appointment_type_id" readonly="not appointment_fields_can_edit"
+                />
                 <field name="resource_ids" options="{'no_create': True}"
                     invisible="not appointment_type_id or appointment_type_schedule_based_on != 'resources'"
-                    domain="[('appointment_type_ids', 'in', appointment_type_id)]" widget="many2many_tags"/>
-                <field name="total_capacity_reserved" string="Booked Capacity" invisible="not appointment_type_manage_capacity"/>
+                    domain="[('appointment_type_ids', 'in', appointment_type_id)]" widget="many2many_tags" readonly="not appointment_fields_can_edit"/>
+                <field name="total_capacity_reserved" string="Booked Capacity" invisible="not appointment_type_manage_capacity" widget="appointment_integer_keydown"/>
                 <field name="appointment_type_schedule_based_on" invisible="1"/>
                 <field name="appointment_type_manage_capacity" invisible="1"/>
             </field>
@@ -83,9 +91,9 @@
         <field name="model">calendar.event</field>
         <field name="inherit_id" ref="calendar.view_calendar_event_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='duration']" position="after">
+            <xpath expr="//field[@name='partner_ids']" position="after">
                 <field name="appointment_type_id" groups="base.group_no_one"/>
-                <field name="appointment_resource_ids" widget="many2many_tags" groups="base.group_no_one"/>
+                <field name="appointment_resource_ids" widget="many2many_tags" groups="base.group_no_one" optional="hidden"/>
             </xpath>
         </field>
     </record>
@@ -103,6 +111,7 @@
             <xpath expr="//filter[@name='responsible']" position="after">
                 <field name="appointment_type_id"/>
                 <filter string="Appointment Type" name="group_by_appointment_type_id" context="{'group_by': 'appointment_type_id'}"/>
+                <filter string="Appointment Status" name="group_by_appointment_status" context="{'group_by': 'appointment_status'}"/>
             </xpath>
         </field>
     </record>
@@ -146,10 +155,12 @@
                 <field name="appointment_type_id"/>
                 <field name="attendee_ids" string="Booked by" widget="many2many_tags"/>
                 <field name="appointment_resource_ids" widget="many2many_tags"/>
+                <field name="partner_ids" invisible="1"/>
                 <field name="start"/>
                 <field name="stop"/>
                 <field name="total_capacity_reserved" sum="Total Capacity Reserved"/>
                 <field name="total_capacity_used" optional="show" sum="Total Capacity Used"/>
+                <field name="user_id"/>
                 <field name="appointment_status" string="Status"/>
            </list>
         </field>
@@ -166,89 +177,72 @@
                 <attribute name="class" add="o_appointment_calendar_event_form_gantt_booking" separator=" "/>
             </xpath>
             <field name="name" position="attributes">
-                <attribute name="placeholder">'e.g. "John Doe - Tennis Court Booking"</attribute>
+                <attribute name="placeholder">'e.g. "John Doe"</attribute>
                 <attribute name="required">1</attribute>
             </field>
-            <xpath expr="//form/*[1]" position="before">
-                <div class="alert alert-warning d-flex flex-wrap m-0 mb-3" role="alert" invisible="not unavailable_partner_ids and not unavailable_resource_ids">
-                    <span class="me-1">The following
-                        <span invisible="not unavailable_partner_ids">attendees</span>
-                        <span invisible="not unavailable_partner_ids or not unavailable_resource_ids">/</span>
-                        <span invisible="not unavailable_resource_ids">resources</span> are not available at the selected time
-                    </span>
-                    <field name="unavailable_partner_ids" widget="many2many_tags"/>
-                    <field name="unavailable_resource_ids" widget="many2many_tags"/>
+            <xpath expr="//div[hasclass('o_unavailability_alert')]" position="attributes">
+                <attribute name="invisible">not unavailable_partner_ids and not unavailable_resource_ids</attribute>
+            </xpath>
+            <field name="unavailable_partner_ids" position="after">
+                <field name="unavailable_resource_ids" widget="many2many_tags"/>
+            </field>
+            <xpath expr="//div[hasclass('o_unavailability_alert')]" position="after">
+                <div class="o_unavailability_alert alert alert-warning border-0 d-flex flex-wrap m-0 mb-3" role="alert"
+                    invisible="not total_capacity_unassigned">
+                    <span class="me-1"><field name="total_capacity_unassigned" readonly="1"/> seats are not assigned to any resource or user.</span>
                 </div>
             </xpath>
             <xpath expr="//div[./field[@name='partner_ids']]" position="after">
-                <div class="d-flex align-items-center" invisible="not appointment_type_manage_capacity">
-                    <i class="fa fa-user-plus text-600" title="Reserved Capacity"/>
-                    <field name="total_capacity_reserved" widget="integer"
+                <div class="o_outlined d-flex align-items-center mb-3 gap-2" invisible="not appointment_type_manage_capacity">
+                    <i class="oi oi-filled" data-icon="person_add" title="Reserved Capacity"/>
+                    <field name="total_capacity_reserved" widget="appointment_integer_keydown"
                         options="{'type': 'number', 'min': 1}" class="mb-0 o_appointment_form_gantt_capacity_field"
                     />
-                    people
+                    <span>people</span>
                 </div>
-                <div class="d-flex align-items-center" colspan="2"
+                <div class="o_outlined d-flex align-items-center mb-3 gap-2" invisible="context.get('default_appointment_type_id')">
+                    <i class="oi oi-filled" data-icon="calendar_today" title="Appointment Type"/>
+                    <field name="appointment_type_id"
+                        class="w-100 mb-0"
+                        options="{'no_create': True, 'no_open': True}"
+                        placeholder="Appointment Type"
+                        domain="[('schedule_based_on', 'in', context.get('appointment_schedule_based_on', ['resources', 'users']))]"
+                        required="1"
+                    />
+                </div>
+                <div class="o_outlined d-flex align-items-center mb-3 gap-2"
                     invisible="not appointment_type_id or appointment_type_schedule_based_on != 'resources'">
-                    <i class="fa fa-cubes text-600" title="Resources"/>
+                    <i class="oi" data-icon="inventory_2" title="Resources"/>
                     <field name="resource_ids" nolabel="1"
                         widget="many2many_tags" class="w-100 mb-0" placeholder="Resources"
                         domain="[('appointment_type_ids', 'in', appointment_type_id)]"
                         options="{'no_create': True}"
                     />
                 </div>
-            </xpath>
-            <xpath expr="//div[./button[@name='clear_videocall_location']]" position="replace"/>
-            <xpath expr="//div[./field[@name='location']]" position="replace"/>
-            <xpath expr="//div[./field[@name='privacy']]" position="replace">
-                <div class="d-flex align-items-center text-600" colspan="2">
-                    <field name="appointment_type_id" invisible="1"/><!--required for default values computation-->
-                    <i class="fa fa-circle" title="Status"/>
-                    <field name="appointment_status" nolabel="1"
-                        placeholder="Status"
-                        class="w-100 mb-0"
+                <div class="o_outlined d-flex align-items-center mb-3 gap-2"
+                    invisible="not appointment_type_id or appointment_type_schedule_based_on != 'users'">
+                    <i class="oi" data-icon="inventory_2" title="Staff Member"/>
+                    <field name="user_id" nolabel="1"
+                        class="w-100 mb-0" placeholder="Staff Member"
+                        domain="[('id', 'in', appointment_type_staff_user_ids)]"
+                        options="{'no_create': True, 'no_open': True}"
+                        required="appointment_type_schedule_based_on == 'users'"
                     />
                 </div>
             </xpath>
-        </field>
-    </record>
-    
-    <record id="calendar_event_view_gantt_kanban_popover" model="ir.ui.view">
-        <field name="name">calendar.event.view.gantt.kanban.popover</field>
-        <field name="model">calendar.event</field>
-        <field name="priority">90</field><!--this view aims to be used in gantt pop-ups, not as a full kanban view.-->
-        <field name="arch" type="xml">
-            <kanban>
-                <templates>
-                <t t-name="card" class="o_appointment_gantt_popover_kanban_card gap-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fa fa-clock-o text-400 me-1" title="Date and time"/>
-                        <field name="start" widget="daterange" options="{'end_date_field': 'stop'}"/>
-                        <field name="stop" invisible="1"/>
-                    </div>
-                    <div class="d-flex align-items-center" invisible="not location">
-                        <i class="fa fa-map-marker text-400 me-1" title="Location"/>
-                        <field name="location"/>
-                    </div>
-                    <div class="d-flex align-items-center" invisible="not videocall_location">
-                        <i class="fa fa-video-camera text-400 me-1" title="Video Call URL"/>
-                        <field name="videocall_location" widget="CopyClipboardChar"/>
-                    </div>
-                    <div class="d-flex align-items-center" invisible="not appointment_type_manage_capacity">
-                        <i class="fa fa-user text-400 me-1" title="Guests"/>
-                        <field name="total_capacity_reserved" class="me-1"/>guests
-                    </div>
-                    <div class="o_field_selection d-flex align-items-center" invisible="not appointment_status">
-                        <i class="fa fa-circle text-400 me-1" title="Appointment Status"/>
-                        <field name="appointment_status" widget="selection"/>
-                    </div>
-                    <div class="d-flex" invisible="not description">
-                        <i class="fa fa-sticky-note text-400 mt-1 me-1" title="Description"/>
-                        <field class="d-inline-block w-100 o_appointment_gantt_popover_html_field" name="description"/>
-                    </div>
-                </t>
-                </templates>
-            </kanban>
+            <xpath expr="//div[./button[@name='clear_videocall_location']]" position="replace"/>
+            <xpath expr="//div[./field[@name='location']]" position="replace"/>
+            <xpath expr="//div[./field[@name='show_as']]" position="replace"/>
+            <xpath expr="//div[./field[@name='privacy']]" position="replace">
+                <div class="o_outlined d-flex align-items-center mb-3 gap-2">
+                    <field name="appointment_type_id" invisible="1"/><!--required for default values computation-->
+                    <i class="oi oi-filled" data-icon="circle" title="Status"/>
+                    <field name="appointment_status" nolabel="1"
+                        placeholder="Status"
+                        class="w-100"
+                    />
+                </div>
+            </xpath>
         </field>
     </record>
 
@@ -266,24 +260,32 @@
                 display_unavailability="1"
                 form_view_id="%(calendar_event_view_form_gantt_booking)d"
                 js_class="appointment_booking_gantt"
-                kanban_view_id="%(calendar_event_view_gantt_kanban_popover)d"
                 precision="{'day': 'hour:quarter', 'week': 'day:half', 'month': 'day:half', 'year': 'day:full'}"
                 sample="0"
                 string="Resources"
-                total_row="0">
+                total_row="1">
 
                 <field name="active"/>
                 <field name="appointment_booker_id"/>
                 <field name="appointment_resource_ids"/>
+                <field name="appointment_status"/>
                 <field name="appointment_type_id"/>
                 <field name="appointment_type_manage_capacity"/>
                 <field name="appointment_type_schedule_based_on"/>
+                <field name="attendee_ids"/>
+                <field name="attendees_count"/>
                 <field name="booking_line_ids"/>
+                <field name="current_attendee"/>
+                <field name="current_status"/>
                 <field name="description"/>
+                <field name="duration"/>
+                <field name="location"/>
                 <field name="total_capacity_reserved"/>
+                <field name="total_capacity_unassigned"/>
                 <field name="start"/>
                 <field name="stop"/>
                 <field name="user_id"/>
+                <field name="videocall_location"/>
                 <field name="partner_id"/>
                 <field name="partner_ids"/>
             </gantt>
@@ -309,18 +311,33 @@
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <xpath expr="/calendar" position="attributes">
+                <attribute name="js_class">appointment_calendar</attribute>
                 <attribute name="quick_create_view_id">%(appointment.calendar_event_view_form_gantt_booking)d</attribute>
+                <!-- Do not show unusual days, it should be handled by background events  -->
+                <attribute name="show_unusual_days">0</attribute>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="invisible">appointment_type_schedule_based_on == 'resources'</attribute>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="appointment_resource_ids" widget="many2many_tags" options="{'icon': 'fa fa-cubes'}"
+                <field name="appointment_resource_ids" widget="many2many_tags" options="{'icon': 'inventory_2'}"
                     invisible="appointment_type_schedule_based_on != 'resources'" 
                 />
             </xpath>
+            <xpath expr="//field[@name='location']" position="after">
+                <field name="total_capacity_reserved" options="{'icon': 'person_add', 'icon_class': 'oi-filled'}"/>
+                <field name="total_capacity_unassigned" invisible="not total_capacity_unassigned"
+                    options="{'icon': 'warning', 'icon_class': 'oi-filled'}"/>
+            </xpath>
             <xpath expr="//field[@name='privacy']" position="replace">
-                <field name="appointment_status" options="{'icon': 'fa fa-circle'}" invisible="not appointment_type_id"/>
+                <field name="appointment_status" options="{'icon': 'circle', 'icon_class': 'oi-filled'}"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_ids']" position="attributes">
+                <attribute name="filters"/>
+                <attribute name="write_model"/>
+                <attribute name="write_field"/>
+                <attribute name="filter_field"/>
+                <attribute name="avatar_field"/>
             </xpath>
             <field name="res_model_name" position="replace"/>
         </field>
@@ -345,6 +362,79 @@
         </field>
     </record>
 
+    <record id="calendar_event_view_graph" model="ir.ui.view">
+        <field name="name">calendar.event.view.graph</field>
+        <field name="model">calendar.event</field>
+        <field name="arch" type="xml">
+            <graph string="Appointments" sample="1">
+                <field name="start" interval="day"/>
+                <field name="appointment_status"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="calendar_event_view_kanban" model="ir.ui.view">
+        <field name="name">calendar.event.view.kanban</field>
+        <field name="model">calendar.event</field>
+        <field name="arch" type="xml">
+            <kanban
+                default_group_by="appointment_status"
+                default_order="start desc"
+                js_class="appointment_calendar_event_kanban"
+                quick_create_view="appointment.calendar_event_view_form_gantt_booking">
+                <field name="appointment_status"/>
+                <field name="appointment_type_id"/>
+                <field name="appointment_type_manage_capacity"/>
+                <field name="attendee_ids"/>
+                <field name="attendees_count"/>
+                <field name="description"/>
+                <field name="display_name"/>
+                <field name="duration"/>
+                <field name="location"/>
+                <field name="partner_id"/>
+                <field name="partner_ids"/>
+                <field name="total_capacity_reserved"/>
+                <field name="recurrency"/>
+                <field name="videocall_location"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="row">
+                            <div class="o_appointment_calendar_event_kanban_data_container text-truncate gap-2 d-flex flex-column">
+                                <strong class="text-truncate">
+                                    <field name="name" class="fs-3"/>
+                                </strong>
+                                <div class="d-inline-flex gap-2 align-items-center">
+                                    <div t-if="record.appointment_type_manage_capacity.raw_value" class="rounded bg-300 p-1">
+                                        <span>
+                                            <field name="total_capacity_reserved"/>p
+                                        </span>
+                                    </div>
+                                    <field name="start" options="{'time_only': 'true', 'hide_seconds': 'true'}"/>
+                                </div>
+                                <small class="text-muted">
+                                    <field name="notes" class="footer"/>
+                                </small>
+                                <field name="resource_ids" widget="card.many2many_tags"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="calendar_event_view_pivot" model="ir.ui.view">
+        <field name="name">calendar.event.view.pivot</field>
+        <field name="model">calendar.event</field>
+        <field name="arch" type="xml">
+            <pivot string="Appointments" display_quantity="1" sample="1">
+                <field name="start" type="row"/>
+                <field name="appointment_type_id" type="row"/>
+                <field name="appointment_status" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
     <record id="calendar_event_action_view_bookings_resources" model="ir.actions.act_window">
         <field name="name">Resource Bookings</field>
         <field name="type">ir.actions.act_window</field>
@@ -354,12 +444,19 @@
             (0, 0, {'view_mode': 'calendar', 'view_id': ref('appointment.calendar_event_view_calendar_booking_resource')}),
             (0, 0, {'view_mode': 'list', 'view_id': ref('appointment.calendar_event_view_tree_booking')}),
         ]"/>
-        <field name="view_mode">gantt,calendar,list,form</field>
+        <field name="view_mode">gantt,calendar,kanban,list,pivot,form,graph,activity</field>
         <field name="search_view_id" ref="appointment.calendar_event_view_search_booking"/>
-        <field name="context">{'appointment_booking_gantt_domain': [('appointment_resource_ids', '!=', False)],
-                               'appointment_default_assign_user_attendees': False,
+        <field name="context">{'appointment_default_assign_user_attendees': False,
+                               'appointment_schedule_based_on': 'resources',
+                               'show_calendar_event_name_with_count': True,
                                'default_partner_ids': []}</field>
-        <field name="domain">['|', ('appointment_resource_ids.company_id', '=', False), ('appointment_resource_ids.company_id', 'in', allowed_company_ids)]</field>
+        <field name="domain">[
+            ('appointment_type_schedule_based_on', '=', 'resources'),
+            '|', ('booking_line_ids', '=', False),
+            '|', ('booking_line_ids.appointment_resource_id', '=', False),
+            '|', ('appointment_resource_ids.company_id', '=', False), ('appointment_resource_ids.company_id', 'in', allowed_company_ids),
+            ]
+        </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No Appointment or Resource were found.
@@ -376,10 +473,13 @@
             (0, 0, {'view_mode': 'calendar', 'view_id': ref('appointment.calendar_event_view_calendar')}),
             (0, 0, {'view_mode': 'list', 'view_id': ref('appointment.calendar_event_view_tree_booking')}),
         ]"/>
-        <field name="view_mode">gantt,calendar,list,form</field>
+        <field name="view_mode">gantt,calendar,kanban,list,pivot,form,graph,activity</field>
         <field name="search_view_id" ref="appointment.calendar_event_view_search_booking"/>
         <field name="context">{'appointment_default_assign_user_attendees': True,
+                               'appointment_schedule_based_on': 'users',
+                               'show_calendar_event_name_with_count': True,
                                'default_partner_ids': []}</field>
+        <field name="domain">[('appointment_type_id', '!=', False)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No Appointment or Resource were found.
@@ -405,34 +505,10 @@
     </record>
 
     <!-- Calendar Reporting -->
-    <record id="calendar_event_view_graph" model="ir.ui.view">
-        <field name="name">calendar.event.view.graph</field>
-        <field name="model">calendar.event</field>
-        <field name="arch" type="xml">
-            <graph string="Appointments" type="line" sample="1">
-                <field name="start"/>
-                <field name="res_id" invisible="1"/>
-            </graph>
-        </field>
-    </record>
-
-    <record id="calendar_event_view_pivot" model="ir.ui.view">
-        <field name="name">calendar.event.view.pivot</field>
-        <field name="model">calendar.event</field>
-        <field name="arch" type="xml">
-            <pivot string="Appointments" display_quantity="1" sample="1">
-                <field name="start" type="row"/>
-                <field name="categ_ids" type="row"/>
-                <field name="name" type="row"/>
-                <field name="user_id" type="col"/>
-            </pivot>
-        </field>
-    </record>
-
     <record id="calendar_event_action_report_all" model="ir.actions.act_window">
         <field name="name">All Appointments</field>
         <field name="res_model">calendar.event</field>
-        <field name="view_mode">graph,pivot,calendar,list,form</field>
+        <field name="view_mode">pivot,graph,calendar,list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No data yet!

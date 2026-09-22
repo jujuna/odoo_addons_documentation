@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
 {
     'name': 'Appointment Lead Generation',
-    'version': '1.0',
     'category': 'Services/Appointment',
     'sequence': 2150,
     'summary': 'Generate leads when prospects schedule appointments',
@@ -14,7 +12,7 @@ Allow to generate lead from Scheduled Appointments through your Website
 -----------------------------------------------------------------------
 
 """,
-    'depends': ['appointment', 'crm'],
+    'depends': ['appointment', 'crm_enterprise'],
     'data': [
         'views/appointment_type_views.xml',
     ],
@@ -24,6 +22,7 @@ Allow to generate lead from Scheduled Appointments through your Website
     'assets': {
         'web.assets_backend': [
             'appointment_crm/static/src/views/**/*',
+            'appointment_crm/static/src/components/**/*',
         ],
         'web.assets_tests': [
             'appointment_crm/static/tests/tours/**/*',

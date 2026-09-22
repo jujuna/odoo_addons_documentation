@@ -3,8 +3,8 @@ from odoo import api, models, fields
 
 class AvataxExemption(models.Model):
     _name = 'avatax.exemption'
-    _description = "Avatax Partner Exemption Codes"
-    _rec_names_search = ['name', 'code']
+    _description = "Avatax Partner Exemption Code"
+    _rec_names_search = ('name', 'code')
 
     name = fields.Char(required=True)
     code = fields.Char(required=True)

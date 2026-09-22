@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-import base64
-
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import uuid
@@ -15,7 +12,7 @@ class L10n_De_PosDsfinvk_Export(models.Model):
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
     l10n_de_fiskaly_export_uuid = fields.Char(string="Export Uuid", readonly=True, copy=False, default=lambda s: uuid.uuid4(), help='The uuid of the export at Fiskaly')
     start_datetime = fields.Datetime(string="Start Datetime", required=True, help='Only export data with dates larger than or equal to the given start date')
-    end_datetime = fields.Datetime(string="End Datetime", required=True, help='Only export data with dates smaller than or equal to the given start date')
+    end_datetime = fields.Datetime(string="End Datetime", required=True, help='Only export data with dates smaller than or equal to the given end date')
     state = fields.Selection([('pending', "Pending"), ('working', "Working"), ('completed', "Completed"), ('cancelled', "Cancelled"),
                               ('expired', "Expired"), ('deleted', "Deleted"), ('error', "Error")], readonly=True)
 
@@ -86,7 +83,7 @@ class L10n_De_PosDsfinvk_Export(models.Model):
 
             attachment = self.env['ir.attachment'].create({
                 'name': "dsfinvk-%s-%s.tar" % (self.start_datetime.strftime("%Y-%m-%d %H:%M:%S"), self.end_datetime.strftime("%Y-%m-%d %H:%M:%S")),
-                'datas': base64.b64encode(download_resp.content),
+                'raw': download_resp.content,
                 'res_model': 'l10n_de_pos.dsfinvk_export',
                 'res_id': self.id
             })

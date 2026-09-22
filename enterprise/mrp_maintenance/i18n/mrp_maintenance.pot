@@ -4,16 +4,29 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-12-30 18:46+0000\n"
+"POT-Creation-Date: 2026-08-28 17:55+0000\n"
+"PO-Revision-Date: 2026-08-28 17:55+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: mrp_maintenance
+#: model:ir.module.module,description:base.module_mrp_maintenance
+msgid ""
+"\n"
+"Maintenance in MRP\n"
+"==================\n"
+"* Preventive vs corrective maintenance\n"
+"* Define different stages for your maintenance requests\n"
+"* Plan maintenance requests (also recurring preventive)\n"
+"* Equipment related to workcenters\n"
+"* MTBF, MTTR, ...\n"
+msgstr ""
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_production_view_form_inherit_maintenance
@@ -38,6 +51,11 @@ msgstr ""
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_exception_decoration
 msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: mrp_maintenance
+#: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_plans_ids
+msgid "Activity Plans"
 msgstr ""
 
 #. module: mrp_maintenance
@@ -100,11 +118,6 @@ msgstr ""
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__maintenance_open_count
 msgid "Current Maintenance"
-msgstr ""
-
-#. module: mrp_maintenance
-#: model_terms:ir.ui.view,arch_db:mrp_maintenance.maintenance_request_view_form_inherit_mrp
-msgid "Discard"
 msgstr ""
 
 #. module: mrp_maintenance
@@ -174,11 +187,6 @@ msgstr ""
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__message_partner_ids
 msgid "Followers (Partners)"
-msgstr ""
-
-#. module: mrp_maintenance
-#: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
 msgstr ""
 
 #. module: mrp_maintenance
@@ -277,6 +285,11 @@ msgid "Maintenance"
 msgstr ""
 
 #. module: mrp_maintenance
+#: model:ir.module.module,shortdesc:base.module_mrp_maintenance
+msgid "Maintenance - MRP"
+msgstr ""
+
+#. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__maintenance_count
 msgid "Maintenance Count"
 msgstr ""
@@ -295,8 +308,9 @@ msgstr ""
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/mrp_production.py:0
 #: model:ir.actions.act_window,name:mrp_maintenance.mrp_workcenter_request_action_from_workcenter
+#: model_terms:ir.ui.view,arch_db:mrp_maintenance.maintenance_request_view_gantt_workcenter
 msgid "Maintenance Requests"
 msgstr ""
 
@@ -318,7 +332,7 @@ msgstr ""
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "Manufacturing Orders are already scheduled for this time slot."
 msgstr ""
 
@@ -327,6 +341,11 @@ msgstr ""
 msgid ""
 "Manufacturing operations are processed at Work Centers. A Work Center can be composed of\n"
 "            workers and/or machines, they are used for costing, scheduling, capacity planning, etc."
+msgstr ""
+
+#. module: mrp_maintenance
+#: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
 msgstr ""
 
 #. module: mrp_maintenance
@@ -363,7 +382,8 @@ msgstr ""
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/mrp_production.py:0
+#: code:addons/mrp_maintenance/models/mrp_workorder.py:0
 msgid "New Maintenance Request"
 msgstr ""
 
@@ -389,7 +409,7 @@ msgstr ""
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "No available slot within 700 days after the planned start."
 msgstr ""
 
@@ -424,6 +444,12 @@ msgid "Operation"
 msgstr ""
 
 #. module: mrp_maintenance
+#: model:ir.actions.act_window,name:mrp_maintenance.maintenance_request_action_view_gantt_workcenter
+#: model:ir.ui.menu,name:mrp_maintenance.maintenance_request_menu_planning_by_workcenter
+msgid "Planning by Workcenter"
+msgstr ""
+
+#. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__production_company_id
 msgid "Production Company"
 msgstr ""
@@ -451,12 +477,6 @@ msgid "Request Maintenance"
 msgstr ""
 
 #. module: mrp_maintenance
-#. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
-msgid "Request planned for %s"
-msgstr ""
-
-#. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_user_id
 msgid "Responsible User"
 msgstr ""
@@ -472,8 +492,18 @@ msgid "Save"
 msgstr ""
 
 #. module: mrp_maintenance
+#: model:ir.module.module,summary:base.module_mrp_maintenance
+msgid "Schedule and manage maintenance on machine and tools."
+msgstr ""
+
+#. module: mrp_maintenance
 #: model:maintenance.equipment,name:mrp_maintenance.equipment_furniture2
 msgid "Scrub Plane"
+msgstr ""
+
+#. module: mrp_maintenance
+#: model_terms:ir.actions.act_window,help:mrp_maintenance.maintenance_request_action_view_gantt_workcenter
+msgid "Start by adding a new workcenter to use workcenter planning"
 msgstr ""
 
 #. module: mrp_maintenance
@@ -491,14 +521,8 @@ msgid "Technician"
 msgstr ""
 
 #. module: mrp_maintenance
-#. odoo-javascript
-#: code:addons/mrp_maintenance/static/src/components/maintenance_request_form_view.js:0
-msgid "The maintenance request has successfully been created."
-msgstr ""
-
-#. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid ""
 "The schedule has changed from %(desired_date)s to %(effective_date)s due to "
 "planned manufacturing orders."
@@ -506,7 +530,7 @@ msgstr ""
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "The workcenter is missing for %s."
 msgstr ""
 
@@ -518,16 +542,6 @@ msgstr ""
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr ""
-
-#. module: mrp_maintenance
-#: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__website_message_ids
-msgid "Website Messages"
-msgstr ""
-
-#. module: mrp_maintenance
-#: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__website_message_ids
-msgid "Website communication history"
 msgstr ""
 
 #. module: mrp_maintenance
@@ -569,6 +583,6 @@ msgstr ""
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "work centers"
 msgstr ""

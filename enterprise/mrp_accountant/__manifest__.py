@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': "Mrp Accounting",
-    'version': "1.0",
     'category': 'Supply Chain/Inventory',
     'summary': "Bridge between Mrp and Accounting",
     'description': """
@@ -13,7 +11,6 @@ Automatic accounting for MRP
     'data': [
         'views/res_config_settings_views.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

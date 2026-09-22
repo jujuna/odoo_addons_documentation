@@ -14,17 +14,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 17:57+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Norwegian Bokmål <https://translate.odoo.com/projects/odoo-19/"
-"quality/nb_NO/>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-17 22:59+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Norwegian Bokmål <https://translate.odoo.com/projects/odoo-"
+"master/quality/nb_NO/>\n"
 "Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: quality
+#: model:ir.module.module,description:base.module_quality
+msgid ""
+"\n"
+"Quality Base\n"
+"===============\n"
+"* Define quality points that will generate quality checks on pickings,\n"
+"  manufacturing orders or work orders (quality_mrp)\n"
+"* Quality alerts can be created independently or related to quality checks\n"
+"* Possibility to add a measure to the quality check with a min/max "
+"tolerance\n"
+"* Define your stages for the quality alerts\n"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -75,6 +89,12 @@ msgstr "Aktiviteter"
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Dekorering for Aktivitetsunntak"
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_alert__activity_plans_ids
+#: model:ir.model.fields,field_description:quality.field_quality_check__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_state
@@ -165,6 +185,21 @@ msgstr "Modell med alias"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "All Categories"
+msgstr ""
+
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "All Products"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_point__apply_to
+msgid "Apply to"
+msgstr ""
+
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "Archived"
 msgstr "Arkivert"
 
@@ -175,6 +210,27 @@ msgstr "Arkivert"
 #: model:ir.model.fields,field_description:quality.field_quality_point__message_attachment_count
 msgid "Attachment Count"
 msgstr "Antall vedlegg"
+
+#. module: quality
+#: model:ir.module.module,summary:base.module_quality
+msgid "Basic Feature for Quality"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_check__batch_id
+msgid "Batch Transfer"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,help:quality.field_quality_check__batch_id
+msgid "Batch associated to this transfer"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__categories
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "Categories"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__reason
@@ -322,11 +378,6 @@ msgid "Email Alias"
 msgstr "E-postalias"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__email_cc
-msgid "Email cc"
-msgstr "Email cc"
-
-#. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_domain
 msgid "Email domain e.g. 'example.com' in 'odoo@example.com'"
 msgstr "E-postdomene f.eks 'example.com' i 'odoo@example.com'"
@@ -366,12 +417,6 @@ msgstr "Følgere"
 #: model:ir.model.fields,field_description:quality.field_quality_point__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Følgere (partnere)"
-
-#. module: quality
-#: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
-#: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font Awesome-ikon, for eksempel fa-tasks"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
@@ -513,10 +558,6 @@ msgstr "Inngående deteksjon basert på lokal del"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__lot_ids
-msgid "Lot"
-msgstr "Parti"
-
-#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__lot_ids
 msgid "Lot/Serial"
 msgstr "Lot/Serie"
@@ -525,6 +566,12 @@ msgstr "Lot/Serie"
 #: model:ir.model.fields.selection,name:quality.selection__quality_alert__priority__1
 msgid "Low"
 msgstr "Lav"
+
+#. module: quality
+#: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
+#: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_has_error
@@ -597,6 +644,11 @@ msgstr "Oppsummering av neste aktivitet"
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_type_id
 msgid "Next Activity Type"
 msgstr "Neste aktivitetstype"
+
+#. module: quality
+#: model:res.groups.privilege,placeholder:quality.res_groups_privilege_quality
+msgid "No"
+msgstr ""
 
 #. module: quality
 #. odoo-python
@@ -744,7 +796,7 @@ msgid "Priority"
 msgstr "Prioritet"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__product_tmpl_id
+#: model:ir.model.fields,field_description:quality.field_quality_alert__product_id
 #: model:ir.model.fields,field_description:quality.field_quality_check__product_id
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
 msgid "Product"
@@ -756,12 +808,8 @@ msgid "Product Categories"
 msgstr "Produktkategorier"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__product_id
-msgid "Product Variant"
-msgstr "Produktvariant"
-
-#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__product_ids
+#: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__products
 msgid "Products"
 msgstr "Produkter"
 
@@ -785,6 +833,11 @@ msgstr "Kvalitetsvarselstadium"
 #: model:ir.model,name:quality.model_quality_alert_team
 msgid "Quality Alert Team"
 msgstr "Kvalitetsvarselteam"
+
+#. module: quality
+#: model:ir.module.module,shortdesc:base.module_quality
+msgid "Quality Base"
+msgstr ""
 
 #. module: quality
 #: model:ir.model,name:quality.model_quality_check
@@ -950,6 +1003,13 @@ msgid "Teams"
 msgstr "Team"
 
 #. module: quality
+#: model:ir.model.fields,help:quality.field_quality_alert__product_tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
+
+#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__test_type
 #: model:ir.model.fields,field_description:quality.field_quality_point__test_type
 #: model:ir.model.fields,field_description:quality.field_quality_point_test_type__technical_name
@@ -1006,6 +1066,11 @@ msgid "Today Activities"
 msgstr "Dagens aktiviteter"
 
 #. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_alert__product_tracking
+msgid "Tracking Method"
+msgstr ""
+
+#. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_tree
 msgid "Type"
@@ -1038,22 +1103,6 @@ msgid "Very High"
 msgstr "Svært høy"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_alert_team__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_check__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_point__website_message_ids
-msgid "Website Messages"
-msgstr "Meldinger fra nettsted"
-
-#. module: quality
-#: model:ir.model.fields,help:quality.field_quality_alert__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_alert_team__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_check__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_point__website_message_ids
-msgid "Website communication history"
-msgstr "Kommunikasjonshistorikk for nettsted"
-
-#. module: quality
 #: model:quality.reason,name:quality.reason_wo
 msgid "Work Operation"
 msgstr ""
@@ -1068,20 +1117,24 @@ msgstr ""
 msgid "active"
 msgstr "aktiv"
 
-#~ msgid "Alias domain"
-#~ msgstr "Aliasdomene"
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "e.g. Check Dimensions"
+msgstr ""
 
-#~ msgid "Close"
-#~ msgstr "Lukk"
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "e.g. Quarantine, Second Inspection"
+msgstr ""
 
-#~ msgid "Group By"
-#~ msgstr "Grupper etter"
+#~ msgid "Lot"
+#~ msgstr "Parti"
 
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Antall meldinger som krever handling"
+#~ msgid "Product Variant"
+#~ msgstr "Produktvariant"
 
-#~ msgid "Owner"
-#~ msgstr "Eier"
+#~ msgid "Website Messages"
+#~ msgstr "Meldinger fra nettsted"
 
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Vis alle poster som har neste handlingsdato før dagen i dag"
+#~ msgid "Website communication history"
+#~ msgstr "Kommunikasjonshistorikk for nettsted"

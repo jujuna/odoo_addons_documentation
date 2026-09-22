@@ -13,7 +13,8 @@ patch(PosOrder.prototype, {
         super.initState();
         this.uiState.selected_course_uuid = undefined;
         if (this.config.module_pos_restaurant) {
-            this.uiState.mappingOrderlinesUuid = {};
+            // uiState is device-local: an order from the server was asked on its own device
+            this.uiState.guestSetted = this.isSynced && Boolean(this.preset_id?.use_guest);
         }
     },
     getCustomerCount() {
@@ -24,6 +25,12 @@ patch(PosOrder.prototype, {
     },
     getTable() {
         return this.table_id;
+    },
+    isEmptyOrder() {
+        if (this.config.module_pos_restaurant && this.table_id) {
+            return false;
+        }
+        return super.isEmptyOrder(...arguments);
     },
     get isBooked() {
         const res = super.isBooked;
@@ -57,28 +64,42 @@ patch(PosOrder.prototype, {
                 for (const child_table of child_tables) {
                     name += ` & ${child_table.table_number}`;
                 }
+                name += ` - ${this.tracking_number}`;
                 return name;
             }
         }
         return super.getName(...arguments);
     },
-    get isDirectSale() {
+    get isDirectSaleCandidate() {
         return Boolean(
             this.config.module_pos_restaurant &&
                 !this.table_id &&
-                !this.floating_order_name &&
-                this.state == "draft" &&
+                this.state === "draft" &&
                 !this.isRefund
         );
+    },
+    get isDirectSale() {
+        return this.isDirectSaleCandidate && !this.floating_order_name;
     },
     get isFilledDirectSale() {
         return this.isDirectSale && !this.isEmpty();
     },
-    setPartner(partner) {
-        if (this.config.module_pos_restaurant && this.isDirectSale) {
-            this.floating_order_name = partner.name;
+    setPartner(newPartner) {
+        const partner = this.getPartner();
+        const isPreviouslyPartnerName = partner && this.floating_order_name === partner.name;
+
+        if (this.isDirectSaleCandidate && (this.isDirectSale || isPreviouslyPartnerName)) {
+            this.floating_order_name = newPartner ? newPartner.name : "";
         }
         return super.setPartner(...arguments);
+    },
+    removeOrderline(line, deep = true) {
+        const courseId = line.course_id;
+        const result = super.removeOrderline(...arguments);
+        if (courseId && !this.lines.some((l) => l.course_id === courseId)) {
+            courseId.delete();
+        }
+        return result;
     },
     cleanCourses() {
         if (!this.hasCourses()) {
@@ -96,7 +117,10 @@ patch(PosOrder.prototype, {
         const removedCourses = [];
         const cleanedCourses = courses
             .filter((course, index) => {
-                const shouldKeep = index <= lastFiredIndex || !course.isEmpty();
+                const hasLines = this.lines.some(
+                    (line) => !line.combo_parent_id && line.course_id === course
+                );
+                const shouldKeep = index <= lastFiredIndex || (hasLines && !course.isEmpty());
                 if (!shouldKeep) {
                     removedCourses.push(course);
                 }
@@ -106,15 +130,40 @@ patch(PosOrder.prototype, {
                 course.index = newIndex + 1;
                 return course;
             });
-        removedCourses.forEach((course) => {
-            course.delete();
-        });
+        removedCourses.forEach((course) => course.delete());
         if (cleanedCourses.length !== originalLength) {
             this.course_ids = cleanedCourses;
         }
     },
     get courses() {
-        return this.course_ids.toSorted((a, b) => a.index - b.index);
+        // Sort courses first by thier sequences, then by their index.
+        // Course that have sequence are backend created ones.
+        return this.course_ids.toSorted((a, b) => {
+            const aHasSeq = a.course_id?.sequence !== undefined;
+            const bHasSeq = b.course_id?.sequence !== undefined;
+
+            if (aHasSeq && bHasSeq) {
+                return a.course_id.sequence - b.course_id.sequence || a.index - b.index;
+            }
+
+            // If only one has sequence, keep original order (don't force top/bottom)
+            if (aHasSeq !== bHasSeq) {
+                return a.index - b.index;
+            }
+
+            // Neither has sequence sort by index
+            return a.index - b.index;
+        });
+    },
+    get isTippedAfterPayment() {
+        if (
+            this.state === "paid" &&
+            this.config.set_tip_after_payment &&
+            this.totalDue != this.amount_paid
+        ) {
+            return true;
+        }
+        return false;
     },
     hasCourses() {
         return this.course_ids.length > 0;

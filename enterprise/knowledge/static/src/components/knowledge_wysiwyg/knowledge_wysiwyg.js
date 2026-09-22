@@ -1,7 +1,8 @@
+import { proxy } from "@odoo/owl";
 import { Wysiwyg } from "@html_editor/wysiwyg";
 import { isEmptyBlock } from "@html_editor/utils/dom_info";
 import { WysiwygArticleHelper } from "@knowledge/components/wysiwyg_article_helper/wysiwyg_article_helper";
-import { useState } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 
 export class KnowledgeWysiwyg extends Wysiwyg {
     static template = "knowledge.KnowledgeWysiwyg";
@@ -12,7 +13,7 @@ export class KnowledgeWysiwyg extends Wysiwyg {
 
     setup() {
         super.setup();
-        this.articleHelperState = useState({
+        this.articleHelperState = proxy({
             isVisible: false,
         });
     }
@@ -22,6 +23,7 @@ export class KnowledgeWysiwyg extends Wysiwyg {
         const config = super.getEditorConfig();
         return {
             ...config,
+            placeholder: _t("New Article"),
             onChange: () => {
                 this.articleHelperState.isVisible = isEmptyBlock(this.editor.editable);
                 config.onChange?.();

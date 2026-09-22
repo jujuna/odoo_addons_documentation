@@ -31,7 +31,7 @@ class ApplicantGetRefuseReason(models.TransientModel):
         compute="_compute_duplicate_applicant_ids",
         store=True, readonly=False,
     )
-    duplicate_applicant_ids_domain = fields.Binary(compute="_compute_duplicate_applicant_ids_domain")
+    duplicate_applicant_ids_domain = fields.Json(compute="_compute_duplicate_applicant_ids_domain")
     attachment_ids = fields.Many2many(
         'ir.attachment', string='Attachments',
         compute="_compute_from_template_id", readonly=False, store=True, bypass_search_access=True,
@@ -41,12 +41,13 @@ class ApplicantGetRefuseReason(models.TransientModel):
         compute='_compute_from_template_id', readonly=False, store=True,
         help="send emails after that date. This date is considered as being in UTC timezone."
     )
+    model = fields.Char('Related Document Model', compute='_compute_model')
 
-    @api.depends('refuse_reason_id', 'applicant_without_email')
+    @api.depends('refuse_reason_id', 'applicant_without_email', 'template_id')
     def _compute_send_mail(self):
         for wizard in self:
-            template = wizard.refuse_reason_id.template_id
-            wizard.send_mail = template and not wizard.applicant_without_email
+            template = wizard.template_id
+            wizard.send_mail = template.active and not wizard.applicant_without_email
 
     @api.depends('applicant_ids')
     def _compute_applicant_without_email(self):
@@ -68,7 +69,7 @@ class ApplicantGetRefuseReason(models.TransientModel):
                 & Domain('id', 'not in', self.applicant_ids.ids)
                 & Domain('application_status', 'not in', ['hired', 'refused', 'archived'])
             )
-            wizard.duplicate_applicant_ids_domain = domain
+            wizard.duplicate_applicant_ids_domain = list(domain)
             wizard.duplicates_count = self.env['hr.applicant'].search_count(wizard.duplicate_applicant_ids_domain)
 
     @api.depends('duplicates', 'duplicate_applicant_ids_domain')
@@ -78,6 +79,9 @@ class ApplicantGetRefuseReason(models.TransientModel):
         else:
             self.duplicate_applicant_ids = self.env['hr.applicant']
 
+    def _compute_model(self):
+        self.model = 'hr.applicant'
+
     # Overrides of mail.composer.mixin
     @api.depends('refuse_reason_id')  # fake trigger otherwise not computed in new mode
     def _compute_render_model(self):
@@ -86,8 +90,8 @@ class ApplicantGetRefuseReason(models.TransientModel):
     @api.depends('refuse_reason_id')
     def _compute_template_id(self):
         for wizard in self:
-            if wizard.refuse_reason_id:
-                wizard.template_id = wizard.refuse_reason_id.template_id
+            if wizard.refuse_reason_id and (template := wizard.refuse_reason_id.template_id):
+                wizard.template_id = template.active and template
             else:
                 wizard.template_id = False
 
@@ -101,11 +105,16 @@ class ApplicantGetRefuseReason(models.TransientModel):
             'subject': 'subject',
         }
         for wizard in self:
+            template = wizard.template_id
             for wizard_field_name, template_field_name in fields_to_copy_name_mapping.items():
-                if wizard.template_id:
-                    wizard[wizard_field_name] = wizard.template_id[template_field_name]
-                else:
-                    wizard[wizard_field_name] = False
+                wizard[wizard_field_name] = template[template_field_name] if template else False
+
+            if template and len(wizard.applicant_ids) == 1:
+                rendered_values = self._prepare_mail_values(wizard.applicant_ids._origin)
+                wizard.update({
+                    'subject': rendered_values.get('subject'),
+                    'body': rendered_values.get('body'),
+                })
 
     def action_refuse_reason_apply(self):
         if self.send_mail:
@@ -130,7 +139,8 @@ class ApplicantGetRefuseReason(models.TransientModel):
                     for duplicate in self.duplicate_applicant_ids
                 }
             )
-        refused_applications.write({'refuse_reason_id': self.refuse_reason_id.id, 'active': False, 'refuse_date': datetime.now()})
+        refused_applications.write({'refuse_reason_id': self.refuse_reason_id.id, 'refuse_date': datetime.now()})
+        refused_applications.action_archive()
 
         if self.send_mail:
             self._prepare_send_refusal_mails()
@@ -155,12 +165,9 @@ class ApplicantGetRefuseReason(models.TransientModel):
         return related_original_applicants
 
     def _prepare_send_refusal_mails(self):
-        mail_values = []
         for applicant in self.applicant_ids:
-            mail_value = self._prepare_mail_values(applicant)
-            applicant.message_post(body=mail_value.get('body_html'))
-            mail_values.append(mail_value)
-        self.env['mail.mail'].sudo().create(mail_values)
+            mail_values = self._prepare_mail_values(applicant)
+            applicant.message_post(**mail_values)
 
     def _prepare_mail_values(self, applicant):
         """ Create mail specific for recipient """
@@ -168,17 +175,84 @@ class ApplicantGetRefuseReason(models.TransientModel):
         subject = self._render_field('subject', applicant.ids, set_lang=lang)[applicant.id]
         body = self._render_field('body', applicant.ids, set_lang=lang)[applicant.id]
         email_from = self.template_id.email_from if self.template_id and self.template_id.email_from else self.env.user.email_formatted
-        mail_values = {
-            'attachment_ids': [(4, att.id) for att in self.attachment_ids],
-            'author_id': self.env.user.partner_id.id,
-            'auto_delete': True,
-            'body_html': body,
-            'email_to': applicant.email_from or applicant.partner_id.email,
+        return {
+            'body': body,
             'email_from': email_from,
-            'model': None,
-            'res_id': None,
             'subject': subject,
+            'author_id': self.env.user.partner_id.id,
             'scheduled_date': self.scheduled_date,
+            'attachment_ids': [(4, att.id) for att in self.attachment_ids],
+            'partner_ids': applicant.partner_id.ids
         }
 
-        return mail_values
+
+class ApplicantRefuseSingle(models.TransientModel):
+    _name = 'applicant.refuse.single'
+    _inherit = ['applicant.get.refuse.reason']
+    _description = 'Refuse a single applicant'
+
+    applicant_id = fields.Many2one('hr.applicant', string='Applicant', compute='_compute_applicant_id', readonly=True)
+    applicant_ids = fields.Many2many('hr.applicant', string='Applicants')
+    duplicate_applicant_ids = fields.Many2many(
+        'hr.applicant',
+        relation='applicant_refuse_single_duplicate_applicants_rel',
+        string='Duplicate Applications',
+        compute="_compute_duplicate_applicant_ids",
+        store=True, readonly=False,
+    )
+
+    @api.depends('applicant_ids')
+    def _compute_applicant_id(self):
+        """ Set the applicant to the only record this wizard refuses. """
+        for wizard in self:
+            wizard.applicant_id = wizard.applicant_ids[:1]
+
+    @api.depends('applicant_ids')
+    def _compute_can_edit_body(self):
+        """ Always allow editing the body since it is already rendered. """
+        self.can_edit_body = True
+
+    def _render_single(self, field):
+        """ Render the given template field for the applicant, in their own language. """
+        self.ensure_one()
+        applicant = self.applicant_id._origin
+        lang = self._render_lang(applicant.ids)[applicant.id]
+        return self._render_field(field, applicant.ids, set_lang=lang)[applicant.id]
+
+    @api.depends('template_id', 'applicant_ids')
+    def _compute_body(self):
+        """ Render the template body up-front so the user can edit it. """
+        super()._compute_body()
+        for wizard in self:
+            if wizard.template_id and wizard.applicant_ids:
+                wizard.body = wizard._render_single('body')
+
+    @api.depends('template_id', 'applicant_ids')
+    def _compute_subject(self):
+        """ Render the template subject up-front so the user can edit it. """
+        super()._compute_subject()
+        for wizard in self:
+            if wizard.template_id and wizard.applicant_ids:
+                wizard.subject = wizard._render_single('subject')
+
+    @api.depends('template_id')
+    def _compute_from_template_id(self):
+        """ Copy the attachments and the scheduled date from the template. """
+        for wizard in self:
+            template = wizard.template_id
+            wizard.attachment_ids = template.attachment_ids if template else False
+            wizard.scheduled_date = template.scheduled_date if template else False
+
+    def _prepare_send_refusal_mails(self):
+        """ Post the edited subject and body as is, without rendering them again. """
+        self.ensure_one()
+        email_from = self.template_id.email_from or self.env.user.email_formatted
+        self.applicant_id.message_post(
+            body=self.body or '',
+            subject=self.subject,
+            email_from=email_from,
+            author_id=self.env.user.partner_id.id,
+            scheduled_date=self.scheduled_date,
+            attachment_ids=[(4, att.id) for att in self.attachment_ids],
+            partner_ids=self.applicant_id.partner_id.ids,
+        )

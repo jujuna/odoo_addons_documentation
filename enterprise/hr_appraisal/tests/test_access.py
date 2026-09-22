@@ -1,11 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import tagged, TransactionCase
 from odoo.addons.mail.tests.common import mail_new_test_user
-from odoo.tests import tagged, users
+from odoo.tests import users
 
 
-@tagged('post_install', '-at_install')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestAppraisalPublicAccess(TransactionCase):
 
     @classmethod
@@ -51,6 +51,7 @@ class TestAppraisalPublicAccess(TransactionCase):
             'contract_date_start': '2019-12-05',
             'next_appraisal_date': '2059-12-05',
         })
+        cls.assessment_note = cls.env["hr.appraisal.note"].create({"name": "Meets expectations"})
 
     def test_manager(self):
         with self.with_user(self.user_without_hr_right.login):
@@ -83,5 +84,6 @@ class TestAppraisalPublicAccess(TransactionCase):
         appraisal = self.env['hr.appraisal'].create({'employee_id': self.employee_a.id, 'manager_ids': self.env.user.employee_ids.ids})
         # A manager without hr right should be able to confirm an appraisal of one of his subordinate
         appraisal.action_confirm()
+        appraisal.assessment_note = self.assessment_note
         # A manager without hr right should be able to mark as done an appraisal of one of his subordinate
         appraisal.action_done()

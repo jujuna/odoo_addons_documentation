@@ -2,6 +2,8 @@ import { _t } from "@web/core/l10n/translation";
 
 import * as spreadsheet from "@odoo/o-spreadsheet";
 import { EvaluationError } from "@odoo/o-spreadsheet";
+import { computeFormatFromCurrency } from "@spreadsheet/currency/helpers";
+
 const { functionRegistry } = spreadsheet.registries;
 const { arg, toBoolean, toString, toNumber, toJsDate } = spreadsheet.helpers;
 
@@ -107,9 +109,9 @@ function parseAccountingDay(dateRange, locale) {
     const dateNumber = toNumber(dateRange?.value, locale);
     return {
         rangeType: "day",
-        year: functionRegistry.get("YEAR").compute.bind({ locale })(dateNumber),
-        month: functionRegistry.get("MONTH").compute.bind({ locale })(dateNumber),
-        day: functionRegistry.get("DAY").compute.bind({ locale })(dateNumber),
+        year: functionRegistry.get("YEAR").compute.bind({ locale })(dateNumber).value,
+        month: functionRegistry.get("MONTH").compute.bind({ locale })(dateNumber).value,
+        day: functionRegistry.get("DAY").compute.bind({ locale })(dateNumber).value,
     };
 }
 
@@ -135,12 +137,26 @@ export function parseAccountingDate(dateRange, locale) {
     }
 }
 
-const YEAR_OFFSET_ARG = arg("offset (number, default=0)", _t("Offset applied to the years."))
-const COMPANY_ARG = arg("company_id (number, optional)", _t("The company to target (Advanced)."))
+/**
+ * @param {DateRange} dateRange
+ * @param {number} offset
+ */
+function assertDateRangeIsValid(dateRange) {
+    // Excel dates start at 1899-12-30, we should not support date ranges
+    // that do not cover dates prior to it.
+    // Unfortunately, this check needs to be done right before the server
+    // call as a date too low (year <= 1) can raise an error server side.
+    if (dateRange < 1900) {
+        throw new EvaluationError(_t("%s is not a valid year.", dateRange));
+    }
+}
+
+const YEAR_OFFSET_ARG = arg("offset (number, default=0)", _t("Offset applied to the years."));
+const COMPANY_ARG = arg("company_id (number, optional)", _t("The company to target (Advanced)."));
 const POSTED_ARG = arg(
     "include_unposted (boolean, default=FALSE)",
     _t("Set to TRUE to include unposted entries.")
-)
+);
 
 const ODOO_FIN_ARGS = () => [
     arg("account_codes (string)", _t("The prefix of the accounts.")),
@@ -156,7 +172,9 @@ const ODOO_FIN_ARGS = () => [
 const ODOO_RESIDUAL_ARGS = () => [
     arg(
         "account_codes (string, optional)",
-        _t("The prefix of the accounts. If none provided, all receivable and payable accounts will be used.")
+        _t(
+            "The prefix of the accounts. If none provided, all receivable and payable accounts will be used."
+        )
     ),
     arg(
         "date_range (string, date, optional)",
@@ -170,6 +188,19 @@ const ODOO_RESIDUAL_ARGS = () => [
 const ODOO_PARTNER_BALANCE_ARGS = () => {
     const partner_arg = arg("partner_ids (string)", _t("The partner ids (separated by a comma)."));
     return [partner_arg, ...ODOO_RESIDUAL_ARGS()];
+};
+
+/**
+ * @param {object} getters
+ * @param {number | null} companyId
+ * @returns {string}
+ */
+function getCurrencyFormatOrThrow(getters, companyId) {
+    const currency = getters.getCompanyCurrency(companyId);
+    if (currency === false) {
+        throw new EvaluationError(_t("Currency not available for this company."));
+    }
+    return computeFormatFromCurrency(currency) || "#,##0.00";
 }
 
 functionRegistry.add("ODOO.CREDIT", {
@@ -190,7 +221,8 @@ functionRegistry.add("ODOO.CREDIT", {
             .sort();
         const _offset = toNumber(offset, this.locale);
         const _dateRange = parseAccountingDate(dateRange, this.locale);
-        const _companyId = companyId?.value;
+        assertDateRangeIsValid(_dateRange.year + _offset);
+        const _companyId = companyId.value === null ? null : toNumber(companyId.value, this.locale);
         const _includeUnposted = toBoolean(includeUnposted);
         return {
             value: this.getters.getAccountPrefixCredit(
@@ -200,7 +232,7 @@ functionRegistry.add("ODOO.CREDIT", {
                 _companyId,
                 _includeUnposted
             ),
-            format: this.getters.getCompanyCurrencyFormat(_companyId) || "#,##0.00",
+            format: getCurrencyFormatOrThrow(this.getters, _companyId),
         };
     },
 });
@@ -223,7 +255,8 @@ functionRegistry.add("ODOO.DEBIT", {
             .sort();
         const _offset = toNumber(offset, this.locale);
         const _dateRange = parseAccountingDate(dateRange, this.locale);
-        const _companyId = companyId?.value;
+        assertDateRangeIsValid(_dateRange.year + _offset);
+        const _companyId = companyId.value === null ? null : toNumber(companyId.value, this.locale);
         const _includeUnposted = toBoolean(includeUnposted);
         return {
             value: this.getters.getAccountPrefixDebit(
@@ -233,7 +266,7 @@ functionRegistry.add("ODOO.DEBIT", {
                 _companyId,
                 _includeUnposted
             ),
-            format: this.getters.getCompanyCurrencyFormat(_companyId) || "#,##0.00",
+            format: getCurrencyFormatOrThrow(this.getters, _companyId),
         };
     },
 });
@@ -256,7 +289,8 @@ functionRegistry.add("ODOO.BALANCE", {
             .sort();
         const _offset = toNumber(offset, this.locale);
         const _dateRange = parseAccountingDate(dateRange, this.locale);
-        const _companyId = companyId?.value;
+        assertDateRangeIsValid(_dateRange.year + _offset);
+        const _companyId = companyId.value === null ? null : toNumber(companyId.value, this.locale);
         const _includeUnposted = toBoolean(includeUnposted);
         const value =
             this.getters.getAccountPrefixDebit(
@@ -273,7 +307,7 @@ functionRegistry.add("ODOO.BALANCE", {
                 _companyId,
                 _includeUnposted
             );
-        return { value, format: this.getters.getCompanyCurrencyFormat(_companyId) || "#,##0.00" };
+        return { value, format: getCurrencyFormatOrThrow(this.getters, _companyId) };
     },
 });
 
@@ -286,12 +320,15 @@ functionRegistry.add("ODOO.FISCALYEAR.START", {
     category: "Odoo",
     returns: ["NUMBER"],
     compute: function (date, companyId = { value: null }) {
-        const startDate = this.getters.getFiscalStartDate(
+        const fiscalDates = this.getters.getFiscalDates(
             toJsDate(date, this.locale),
             companyId.value === null ? null : toNumber(companyId, this.locale)
         );
+        if (fiscalDates === false) {
+            return new EvaluationError(_t("The company fiscal year could not be found."));
+        }
         return {
-            value: toNumber(startDate, this.locale),
+            value: toNumber(fiscalDates.start, this.locale),
             format: this.locale.dateFormat,
         };
     },
@@ -306,12 +343,15 @@ functionRegistry.add("ODOO.FISCALYEAR.END", {
     category: "Odoo",
     returns: ["NUMBER"],
     compute: function (date, companyId = { value: null }) {
-        const endDate = this.getters.getFiscalEndDate(
+        const fiscalDates = this.getters.getFiscalDates(
             toJsDate(date, this.locale),
             companyId.value === null ? null : toNumber(companyId, this.locale)
         );
+        if (fiscalDates === false) {
+            return new EvaluationError(_t("The company fiscal year could not be found."));
+        }
         return {
-            value: toNumber(endDate, this.locale),
+            value: toNumber(fiscalDates.end, this.locale),
             format: this.locale.dateFormat,
         };
     },
@@ -350,7 +390,7 @@ functionRegistry.add("ODOO.ACCOUNT.GROUP", {
     returns: ["NUMBER"],
     compute: function (accountType) {
         const accountTypes = this.getters.getAccountGroupCodes(toString(accountType));
-        return accountTypes.join(",");
+        return { value: accountTypes.join(",") };
     },
 });
 
@@ -371,24 +411,31 @@ functionRegistry.add("ODOO.RESIDUAL", {
             .map((code) => code.trim())
             .sort();
         const _offset = toNumber(offset, this.locale);
-        if ( !dateRange?.value ) {
-            dateRange = { value: new Date().getFullYear() }
+        if (!dateRange?.value) {
+            dateRange = { value: new Date().getFullYear() };
         }
         const _dateRange = parseAccountingDate(dateRange, this.locale);
+        assertDateRangeIsValid(_dateRange.year + _offset);
         const _companyId = toNumber(companyId, this.locale);
         const _includeUnposted = toBoolean(includeUnposted);
+        const _accountResidual = this.getters.getAccountResidual(
+            _accountCodes,
+            _dateRange,
+            _offset,
+            _companyId,
+            _includeUnposted
+        );
+        if (_accountResidual === false) {
+            return new EvaluationError(
+                _t("The residual amount for given accounts could not be computed.")
+            );
+        }
         return {
-            value: this.getters.getAccountResidual(
-                _accountCodes,
-                _dateRange,
-                _offset,
-                _companyId,
-                _includeUnposted
-            ),
-            format: this.getters.getCompanyCurrencyFormat(_companyId) || "#,##0.00",
+            value: _accountResidual.amount_residual,
+            format: getCurrencyFormatOrThrow(this.getters, _companyId),
         };
     },
-})
+});
 
 functionRegistry.add("ODOO.PARTNER.BALANCE", {
     description: _t("Return the partner balance for the specified account(s) and period"),
@@ -413,25 +460,30 @@ functionRegistry.add("ODOO.PARTNER.BALANCE", {
             .sort();
         const _offset = toNumber(offset, this.locale);
 
-        if ( !dateRange?.value ) {
-            dateRange = { value: new Date().getFullYear() }
+        if (!dateRange?.value) {
+            dateRange = { value: new Date().getFullYear() };
         }
         const _dateRange = parseAccountingDate(dateRange, this.locale);
+        assertDateRangeIsValid(_dateRange.year + _offset);
         const _companyId = toNumber(companyId, this.locale);
         const _includeUnposted = toBoolean(includeUnposted);
+        const _accountPartnerData = this.getters.getAccountPartnerData(
+            _accountCodes,
+            _dateRange,
+            _offset,
+            _companyId,
+            _includeUnposted,
+            _partnerIds
+        );
+        if (_accountPartnerData === false) {
+            return new EvaluationError(_t("The balance for given partners could not be computed."));
+        }
         return {
-            value: this.getters.getAccountPartnerData(
-                _accountCodes,
-                _dateRange,
-                _offset,
-                _companyId,
-                _includeUnposted,
-                _partnerIds
-            ),
-            format: this.getters.getCompanyCurrencyFormat(_companyId) || "#,##0.00",
+            value: _accountPartnerData.balance,
+            format: getCurrencyFormatOrThrow(this.getters, _companyId),
         };
     },
-})
+});
 
 functionRegistry.add("ODOO.BALANCE.TAG", {
     description: _t("Return the balance of accounts for the specified tag(s) and period"),
@@ -439,7 +491,9 @@ functionRegistry.add("ODOO.BALANCE.TAG", {
         arg("account_tag_ids (string)", _t("The tag ids (separated by a comma).")),
         arg(
             "date_range (string, date, optional)",
-            _t(`The date range. Supported formats are "21/12/2022", "Q1/2022", "12/2022", and "2022".`)
+            _t(
+                `The date range. Supported formats are "21/12/2022", "Q1/2022", "12/2022", and "2022".`
+            )
         ),
         YEAR_OFFSET_ARG,
         COMPANY_ARG,
@@ -460,21 +514,28 @@ functionRegistry.add("ODOO.BALANCE.TAG", {
             .sort();
         const _offset = toNumber(offset, this.locale);
 
-        if ( !dateRange?.value ) {
-            dateRange = { value: new Date().getFullYear() }
+        if (!dateRange?.value) {
+            dateRange = { value: new Date().getFullYear() };
         }
         const _dateRange = parseAccountingDate(dateRange, this.locale);
+        assertDateRangeIsValid(_dateRange.year + _offset);
         const _companyId = toNumber(companyId, this.locale);
         const _includeUnposted = toBoolean(includeUnposted);
+        const _accountTagData = this.getters.getAccountTagData(
+            _accountTagIds,
+            _dateRange,
+            _offset,
+            _companyId,
+            _includeUnposted
+        );
+        if (_accountTagData === false) {
+            return new EvaluationError(
+                _t("The balance for given account tag could not be computed.")
+            );
+        }
         return {
-            value: this.getters.getAccountTagData(
-                _accountTagIds,
-                _dateRange,
-                _offset,
-                _companyId,
-                _includeUnposted,
-            ),
-            format: this.getters.getCompanyCurrencyFormat(_companyId) || "#,##0.00",
+            value: _accountTagData.balance,
+            format: getCurrencyFormatOrThrow(this.getters, _companyId),
         };
     },
-})
+});

@@ -1,18 +1,20 @@
 # pylint: disable=C0326
 from .common import TestAccountReportsCommon
-from odoo import fields, Command
+from odoo import Command
 from odoo.tests import tagged
 
 
 @tagged('post_install', '-at_install')
 class TestReconciliationReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
         cls.other_currency = cls.setup_other_currency('EUR')
-        cls.other_currency_2 = cls.setup_other_currency('GBP', rates=[('2016-01-01', 10.0), ('2017-01-01', 20.0)])
+        cls.other_currency_2 = cls.setup_other_currency('GBP', rates=[('2015-12-31', 10.0), ('2016-12-31', 20.0)])
 
     def test_reconciliation_report_single_currency(self):
         """
@@ -26,86 +28,118 @@ class TestReconciliationReport(TestAccountReportsCommon):
             'company_id': self.company_data['company'].id,
         })
 
-        # ==== Statements ====
-
-        self.env['account.bank.statement'].create({
-            'name': 'statement_1',
-            'date': '2014-12-31',
-            'balance_start': 0.0,
-            'balance_end_real': 100.0,
-            'line_ids': [
-                Command.create({'payment_ref': 'line_1', 'amount': 600.0, 'date': '2014-12-31', 'journal_id': bank_journal.id}),
-                Command.create({'payment_ref': 'line_2', 'amount': -500.0, 'date': '2014-12-31', 'journal_id': bank_journal.id}),
-            ],
-        })
-
-        statement_2 = self.env['account.bank.statement'].create({
-            'name': 'statement_2',
-            'date': '2015-01-05',
-            'balance_start': 200.0,  # create an unexplained difference of 100.0.
-            'balance_end_real': - 200.0,
-            'journal_id': bank_journal.id,
-            'line_ids': [
-                Command.create({'payment_ref': 'line_1',    'amount': 100.0,    'date': '2015-01-01',    'partner_id': self.partner_a.id, 'journal_id': bank_journal.id}),
-                Command.create({'payment_ref': 'line_2',    'amount': 200.0,    'date': '2015-01-02',                                    'journal_id': bank_journal.id}),
-                Command.create({'payment_ref': 'line_3',    'amount': -300.0,    'date': '2015-01-03',    'partner_id': self.partner_a.id, 'journal_id': bank_journal.id}),
-                Command.create({'payment_ref': 'line_4',    'amount': -400.0,    'date': '2015-01-04',                                    'journal_id': bank_journal.id}),
-            ],
-        })
-
         # ==== Payments ====
         self.inbound_payment_method_line.journal_id = bank_journal.id
         self.outbound_payment_method_line.journal_id = bank_journal.id
-        payment_1 = self.env['account.payment'].create({
-            'amount': 150.0,
-            'payment_type': 'inbound',
-            'partner_type': 'customer',
+        payments = self.env['account.payment'].create([
+            {
+                'amount': 600.0,
+                'payment_type': 'inbound',
+                'partner_type': 'customer',
+                'date': '2015-01-01',
+                'journal_id': bank_journal.id,
+                'partner_id': self.partner_a.id,
+                'payment_method_line_id': self.inbound_payment_method_line.id,
+            },
+            {
+                'amount': 500.0,
+                'payment_type': 'outbound',
+                'partner_type': 'supplier',
+                'date': '2015-01-01',
+                'journal_id': bank_journal.id,
+                'partner_id': self.partner_a.id,
+                'payment_method_line_id': self.outbound_payment_method_line.id,
+            },
+            {
+                'amount': 100.0,
+                'payment_type': 'inbound',
+                'partner_type': 'customer',
+                'date': '2015-01-02',
+                'journal_id': bank_journal.id,
+                'partner_id': self.partner_a.id,
+                'payment_method_line_id': self.inbound_payment_method_line.id,
+            },
+            {
+                'amount': 200.0,
+                'payment_type': 'inbound',
+                'partner_type': 'customer',
+                'date': '2015-01-03',
+                'journal_id': bank_journal.id,
+                'partner_id': self.partner_a.id,
+                'payment_method_line_id': self.inbound_payment_method_line.id,
+            },
+            {
+                'amount': 300.0,
+                'payment_type': 'outbound',
+                'partner_type': 'supplier',
+                'date': '2015-01-04',
+                'journal_id': bank_journal.id,
+                'partner_id': self.partner_a.id,
+                'payment_method_line_id': self.outbound_payment_method_line.id,
+            },
+            {
+                'amount': 400.0,
+                'payment_type': 'outbound',
+                'partner_type': 'supplier',
+                'date': '2015-01-05',
+                'journal_id': bank_journal.id,
+                'partner_id': self.partner_a.id,
+                'payment_method_line_id': self.outbound_payment_method_line.id,
+            },
+        ])
+        payments.action_post()
+
+        # ==== Misc ====
+        self.env['account.move'].create({
+            'journal_id': bank_journal.id,
+            'date': '2014-12-31',
+            'line_ids': [
+                (0, 0, {
+                    'name': 'Source',
+                    'debit': 1000,
+                    'credit': 0,
+                    'account_id': bank_journal.default_account_id.id,
+                }),
+                (0, 0, {
+                    'name': 'Destination',
+                    'debit': 0,
+                    'credit': 1000,
+                    'account_id': self.company_data['default_account_expense'].id,
+                }),
+            ]
+        }).action_post()
+
+        # ==== Statements ====
+        self.env['account.bank.statement'].create({
+            'name': 'statement_1',
             'date': '2015-01-01',
-            'journal_id': bank_journal.id,
-            'partner_id': self.partner_a.id,
-            'payment_method_line_id': self.inbound_payment_method_line.id,
+            'balance_start': 1000.0,
+            'balance_end_real': 1100.0,
+            'line_ids': [
+                Command.create({'payment_ref': 'line_1', 'amount': 600.0, 'date': '2015-01-01', 'journal_id': bank_journal.id}),
+                Command.create({'payment_ref': 'line_2', 'amount': -500.0, 'date': '2015-01-01', 'journal_id': bank_journal.id}),
+            ],
         })
 
-        payment_2 = self.env['account.payment'].create({
-            'amount': 250.0,
-            'payment_type': 'outbound',
-            'partner_type': 'supplier',
-            'date': '2015-01-02',
+        statement_2 = self.env['account.bank.statement'].with_context(auto_statement_processing=True).create({
+            'name': 'statement_2',
+            'date': '2015-01-05',
+            'balance_start': 1100.0,
+            'balance_end_real': - 200.0,
             'journal_id': bank_journal.id,
-            'partner_id': self.partner_a.id,
-            'payment_method_line_id': self.outbound_payment_method_line.id,
+            'line_ids': [
+                Command.create({'payment_ref': 'line_1',    'amount': 100.0,    'date': '2015-01-02',    'partner_id': self.partner_a.id, 'journal_id': bank_journal.id}),
+                Command.create({'payment_ref': 'line_2',    'amount': 200.0,    'date': '2015-01-03',                                     'journal_id': bank_journal.id}),
+                Command.create({'payment_ref': 'line_3',    'amount': -300.0,   'date': '2015-01-04',    'partner_id': self.partner_a.id, 'journal_id': bank_journal.id}),
+                Command.create({'payment_ref': 'line_4',    'amount': -400.0,   'date': '2015-01-05',                                     'journal_id': bank_journal.id}),
+            ],
         })
-
-        payment_3 = self.env['account.payment'].create({
-            'amount': 350.0,
-            'payment_type': 'outbound',
-            'partner_type': 'customer',
-            'date': '2015-01-03',
-            'journal_id': bank_journal.id,
-            'partner_id': self.partner_a.id,
-            'payment_method_line_id': self.inbound_payment_method_line.id,
-        })
-
-        payment_4 = self.env['account.payment'].create({
-            'amount': 450.0,
-            'payment_type': 'inbound',
-            'partner_type': 'supplier',
-            'date': '2015-01-04',
-            'journal_id': bank_journal.id,
-            'partner_id': self.partner_a.id,
-            'payment_method_line_id': self.outbound_payment_method_line.id,
-        })
-
-        (payment_1 + payment_2 + payment_3 + payment_4).action_post()
 
         # ==== Reconciliation ====
 
-        st_line = statement_2.line_ids.filtered(lambda line: line.payment_ref == 'line_1')
-        payment_line = payment_1.move_id.line_ids.filtered(lambda line: line.account_id == payment_1.payment_method_line_id.payment_account_id)
-        st_line.set_line_bank_statement_line(payment_line.id)
-
-        st_line = statement_2.line_ids.filtered(lambda line: line.payment_ref == 'line_3')
-        payment_line = payment_2.move_id.line_ids.filtered(lambda line: line.account_id == payment_2.payment_method_line_id.payment_account_id)
+        st_line = statement_2.line_ids.filtered(lambda line: line.payment_ref == 'line_2')
+        payment_4 = payments[3]
+        payment_line = payment_4.move_id.line_ids.filtered(lambda line: line.account_id == payment_4.payment_method_line_id.payment_account_id)
         st_line.set_line_bank_statement_line(payment_line.id)
 
         # ==== Report ====
@@ -114,38 +148,81 @@ class TestReconciliationReport(TestAccountReportsCommon):
             active_id=bank_journal.id,
             active_model=bank_journal._name
         )
+        account_name = bank_journal.default_account_id.display_name
 
-        options = self._generate_options(report, '2016-01-02', '2016-01-02')
+        options = self._generate_options(report, '2015-01-01', '2015-01-31')
         options['unfold_all'] = True
         lines = report._get_lines(options)
-        account = bank_journal.default_account_id.display_name
-
         self.assertLinesValues(
             lines,
-            #   Name                                            Date            Amount
-            [0,                                                   1,                3],
+            #   Name                                                       Date            Label        Amount
+            [   0,                                                         1,              2,               3],
             [
-                (f'Balance of \'{account}\'',                    '',           -200.0),
-                ('Last statement balance',                       '',           -200.0),
-                ('Including Unreconciled Receipts',              '',            200.0),
-                ('BNKKK/2015/00002',                   '01/02/2015',            200.0),
-                ('Including Unreconciled Payments',              '',           -450.0),
-                ('BNKKK/2015/00004',                   '01/04/2015',           -400.0),
-                ('BNKKK/2015/00003',                   '01/03/2015',            -50.0),
-                ('Transactions without statement',               '',              0.0),
-                ('Including Unreconciled Receipts',              '',              0.0),
-                ('Including Unreconciled Payments',              '',              0.0),
-                ('Misc. operations',                             '',              0.0),
-                ('Outstanding Receipts/Payments',                '',            150.0),
-                ('(+) Outstanding Receipts',                     '',            500.0),
-                ('PBNKKK/2015/00004',                  '01/04/2015',            450.0),
-                ('PBNKKK/2015/00001',                  '01/01/2015',             50.0),
-                ('(-) Outstanding Payments',                     '',           -350.0),
-                ('PBNKKK/2015/00003',                  '01/03/2015',           -350.0),
+                (account_name,                                             '',             '',             ''),
+                ('Opening Bank Balance as of January 01 2015',             '',             '',         1000.0),
+                ('Reconciled Transactions',                                '',             '',            0.0),
+                ('Receipts',                                               '',             '',          300.0),
+                ('BNKKK/2015/00004',                                       '01/03/2015',   'line_2',    200.0),
+                ('BNKKK/2015/00003',                                       '01/02/2015',   'line_1',    100.0),
+                ('Total Receipts',                                         '',             '',          300.0),
+                ('Payments',                                               '',             '',         -300.0),
+                ('BNKKK/2015/00005',                                       '01/04/2015',   'line_3',   -300.0),
+                ('Total Payments',                                         '',             '',         -300.0),
+                ('Total Reconciled Transactions',                          '',             '',            0.0),
+                ('Unreconciled Transactions',                              '',             '',         -300.0),
+                ('Receipts',                                               '',             '',          600.0),
+                ('BNKKK/2015/00001',                                       '01/01/2015',   'line_1',    600.0),
+                ('Total Receipts',                                         '',             '',          600.0),
+                ('Payments',                                               '',             '',         -900.0),
+                ('BNKKK/2015/00006',                                       '01/05/2015',   'line_4',   -400.0),
+                ('BNKKK/2015/00002',                                       '01/01/2015',   'line_2',   -500.0),
+                ('Total Payments',                                         '',             '',         -900.0),
+                ('Total Unreconciled Transactions',                        '',             '',         -300.0),
+                ('Misc. operations',                                       '',             '',            0.0),
+                ('Calculated Ending Bank Balance as of January 31 2015',   '',             '',          700.0),
+                ('Ending General Ledger Balance as of January 31 2015',    '',             '',          700.0),
+                ('Outstanding Receipts/Payments',                          '',             '',         -300.0),
+                ('(+) Outstanding Receipts',                               '',             '',          600.0),
+                ('PBNKKK/2015/00001',                                      '01/01/2015',   '',          600.0),
+                ('Total (+) Outstanding Receipts',                         '',             '',          600.0),
+                ('(-) Outstanding Payments',                               '',             '',         -900.0),
+                ('PBNKKK/2015/00006',                                      '01/05/2015',   '',         -400.0),
+                ('PBNKKK/2015/00002',                                      '01/01/2015',   '',         -500.0),
+                ('Total (-) Outstanding Payments',                         '',             '',         -900.0),
+                ('Total Outstanding Receipts/Payments',                    '',             '',         -300.0),
             ],
             options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
+        )
+
+        options = self._generate_options(report, '2014-12-01', '2014-12-31')
+        options['unfold_all'] = True
+        lines = report._get_lines(options)
+        self.assertLinesValues(
+            lines,
+            #   Name                                                        Date            Label        Amount
+            [   0,                                                          1,              2,               3],
+            [
+                (account_name,                                              '',             '',             ''),
+                ('Opening Bank Balance as of December 01 2014',             '',             '',            0.0),
+                ('Reconciled Transactions',                                 '',             '',            0.0),
+                ('Receipts',                                                '',             '',            0.0),
+                ('Payments',                                                '',             '',            0.0),
+                ('Total Reconciled Transactions',                           '',             '',            0.0),
+                ('Unreconciled Transactions',                               '',             '',            0.0),
+                ('Receipts',                                                '',             '',            0.0),
+                ('Payments',                                                '',             '',            0.0),
+                ('Total Unreconciled Transactions',                         '',             '',            0.0),
+                ('Misc. operations',                                        '',             '',         1000.0),
+                ('BNKKK/2014/00001',                                        '12/31/2014',   '',         1000.0),
+                ('Total Misc. operations',                                  '',             '',         1000.0),
+                ('Calculated Ending Bank Balance as of December 31 2014',   '',             '',         1000.0),
+                ('Ending General Ledger Balance as of December 31 2014',    '',             '',         1000.0),
+                ('Outstanding Receipts/Payments',                           '',             '',            0.0),
+                ('(+) Outstanding Receipts',                                '',             '',            0.0),
+                ('(-) Outstanding Payments',                                '',             '',            0.0),
+                ('Total Outstanding Receipts/Payments',                     '',             '',            0.0),
+            ],
+            options,
         )
 
     def test_reconciliation_report_multi_currencies(self):
@@ -297,55 +374,63 @@ class TestReconciliationReport(TestAccountReportsCommon):
             active_id=bank_journal.id,
             active_model=bank_journal._name
         )
+        account_name = bank_journal.default_account_id.display_name
 
         with self.debug_mode():
-            options = self._generate_options(report, '2016-01-02', '2016-01-02')
+            options = self._generate_options(report, '2016-01-01', '2016-01-31')
             options['unfold_all'] = True
             lines = report._get_lines(options)
-            account = bank_journal.default_account_id.display_name
 
             self.assertLinesValues(
                 lines,
-                #   Name                                                Date   Am. Cur.                  Cur.       Amount
-                [0,                                                       1,       3,                      4,           5],
+                #   Name                                                       Date            Label       Amount Currency     Amount
+                [   0,                                                         1,              2,          3,                      4],
                 [
-                    (f'Balance of \'{account}\'',                       '',      '',                     '',       400.0),
-                    ('Last statement balance',                           '',      '',                     '',       200.0),
-                    ('Including Unreconciled Receipts',                  '',      '',                     '',       170.005),
-                    ('BNKKK/2016/00002',                       '01/01/2016',  900.00,    choco_currency.name,        90.001),
-                    ('BNKKK/2016/00001',                       '01/01/2016',   40.01,  company_currency.name,        80.004),
-                    ('Including Unreconciled Payments',                  '',      '',                     '',         0.0),
-                    ('Transactions without statement',                   '',      '',                     '',         0.0),
-                    ('Including Unreconciled Receipts',                  '',      '',                     '',         0.0),
-                    ('Including Unreconciled Payments',                  '',      '',                     '',         0.0),
-                    ('Misc. operations',                                 '',      '',                     '',       200.0),
-                    ('Outstanding Receipts/Payments',                    '',      '',                     '',      5900.0),
-                    ('(+) Outstanding Receipts',                         '',      '',                     '',      5900.0),
-                    ('PBNKKK/2016/00003',                      '01/01/2016',  3000.0,    choco_currency.name,       900.0),
-                    ('PBNKKK/2016/00002',                      '01/01/2016',      '',                     '',      2000.0),
-                    ('PBNKKK/2016/00001',                      '01/01/2016',  1000.0,  company_currency.name,      3000.0),
-                    ('(-) Outstanding Payments',                         '',      '',                     '',         0.0),
+                    (account_name,                                             '',             '',         '',                    ''),
+                    ('Opening Bank Balance as of January 01 2016',             '',             '',         '',                   0.0),
+                    ('Reconciled Transactions',                                '',             '',         '',                  30.0),
+                    ('Receipts',                                               '',             '',         '',                  30.0),
+                    ('BNKKK/2016/00002',                                       '01/01/2016',   'line_3',   '£\xa099.99',        10.0),
+                    ('BNKKK/2016/00001',                                       '01/01/2016',   'line_1',   '$\xa010.00',        20.0),
+                    ('Total Receipts',                                         '',             '',         '',                  30.0),
+                    ('Payments',                                               '',             '',         '',                   0.0),
+                    ('Total Reconciled Transactions',                          '',             '',         '',                  30.0),
+                    ('Unreconciled Transactions',                              '',             '',         '',                 170.0),
+                    ('Receipts',                                               '',             '',         '',                 170.0),
+                    ('BNKKK/2016/00002',                                       '01/01/2016',   'line_3',   '£\xa0900.00',       90.0),
+                    ('BNKKK/2016/00001',                                       '01/01/2016',   'line_1',   '$\xa040.01',        80.0),
+                    ('Total Receipts',                                         '',             '',         '',                 170.0),
+                    ('Payments',                                               '',             '',         '',                   0.0),
+                    ('Total Unreconciled Transactions',                        '',             '',         '',                 170.0),
+                    ('Misc. operations',                                       '',             '',         '',                 200.0),
+                    ('MISC/2016/01/0001',                                      '01/01/2016',   '',         '',                 200.0),
+                    ('Total Misc. operations',                                 '',             '',         '',                 200.0),
+                    ('Calculated Ending Bank Balance as of January 31 2016',   '',             '',         '',                 400.0),
+                    ('Ending General Ledger Balance as of January 31 2016',    '',             '',         '',                 400.0),
+                    ('Outstanding Receipts/Payments',                          '',             '',         '',                5900.0),
+                    ('(+) Outstanding Receipts',                               '',             '',         '',                5900.0),
+                    ('PBNKKK/2016/00003',                                      '01/01/2016',   '',         '£\xa03,000.00',    900.0),
+                    ('PBNKKK/2016/00002',                                      '01/01/2016',   '',         '',                2000.0),
+                    ('PBNKKK/2016/00001',                                      '01/01/2016',   '',         '$\xa01,000.00',   3000.0),
+                    ('Total (+) Outstanding Receipts',                         '',             '',         '',                5900.0),
+                    ('(-) Outstanding Payments',                               '',             '',         '',                   0.0),
+                    ('Total Outstanding Receipts/Payments',                    '',             '',         '',                5900.0),
                 ],
                 options,
-                currency_map={
-                    3: {'currency_code_index': 4},
-                    5: {'currency': journal_currency},
-                },
-                ignore_folded=False,
+                currency_map={4: {'currency': journal_currency}},
             )
 
     def test_reconciliation_change_date(self):
         """
-            Tests the impact of positive/negative payments/statements on the reconciliation report in a single-currency
-            environment.
+            Tests that openeing/ending balance and transactions are correct with change in report date options..
         """
         bank_journal = self.company_data['default_journal_bank']
 
         statement = self.env['account.bank.statement'].create({
             'name': 'statement_1',
             'date': '2019-01-10',
-            'balance_start': 0.0,
-            'balance_end_real': 130.0,
+            'balance_start': 1000.0,
+            'balance_end_real': 1130.0,
             'line_ids': [
                 (0, 0, {'payment_ref': 'line_1', 'amount': 10.0, 'date': '2019-01-01', 'journal_id': bank_journal.id}),
                 (0, 0, {'payment_ref': 'line_2', 'amount': 20.0, 'date': '2019-01-02', 'journal_id': bank_journal.id}),
@@ -357,7 +442,7 @@ class TestReconciliationReport(TestAccountReportsCommon):
         })
 
         # This will allow to test if the balance of the bank account is changed
-        statement['balance_end_real'] = 140.0
+        statement['balance_end_real'] = 1140.0
 
         payment = self.env['account.payment'].create({
             'amount': 1000.0,
@@ -373,65 +458,77 @@ class TestReconciliationReport(TestAccountReportsCommon):
             active_id=bank_journal.id,
             active_model='account.journal'
         )
+        account_name = bank_journal.default_account_id.display_name
 
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-01-01'))
-        options['all_entries'] = True
+        options = self._generate_options(report, '2019-01-01', '2019-01-02')
         options['unfold_all'] = True
-
-        # The last statement is taken into account cause it has a line corresponding to the date of the report.
         lines = report._get_lines(options)
         self.assertLinesValues(
             lines,
-            #   Name                                                             Date            Amount
-            [0,                                                                    1,               3],
+            #   Name                                                         Date            Label        Amount
+            [   0,                                                           1,              2,               3],
             [
-                ('Balance of \'101401 Bank\'',                                    '',           140.0),
-                ('Last statement balance',                                        '',           140.0),
-                ('Including Unreconciled Receipts',                               '',            10.0),
-                ('BNK1/2019/00001',                                     '01/01/2019',            10.0),
-                ('Including Unreconciled Payments',                               '',             0.0),
-                ('Transactions without statement',                                '',             0.0),
-                ('Including Unreconciled Receipts',                               '',             0.0),
-                ('Including Unreconciled Payments',                               '',             0.0),
-                ('Misc. operations',                                              '',             0.0),
-                ('Outstanding Receipts/Payments',                                 '',             0.0),
-                ('(+) Outstanding Receipts',                                      '',             0.0),
-                ('(-) Outstanding Payments',                                      '',             0.0),
+                (account_name,                                               '',             '',             ''),
+                ('Opening Bank Balance as of January 01 2019',               '',             '',         1000.0),
+                ('Reconciled Transactions',                                  '',             '',            0.0),
+                ('Receipts',                                                 '',             '',            0.0),
+                ('Payments',                                                 '',             '',            0.0),
+                ('Total Reconciled Transactions',                            '',             '',            0.0),
+                ('Unreconciled Transactions',                                '',             '',           30.0),
+                ('Receipts',                                                 '',             '',           30.0),
+                ('BNK1/2019/00002',                                          '01/02/2019',   'line_2',     20.0),
+                ('BNK1/2019/00001',                                          '01/01/2019',   'line_1',     10.0),
+                ('Total Receipts',                                           '',             '',           30.0),
+                ('Payments',                                                 '',             '',            0.0),
+                ('Total Unreconciled Transactions',                          '',             '',           30.0),
+                ('Misc. operations',                                         '',             '',            0.0),
+                ('Calculated Ending Bank Balance as of January 02 2019',     '',             '',         1030.0),
+                ('Ending General Ledger Balance as of January 02 2019',      '',             '',           30.0),
+                ('Outstanding Receipts/Payments',                            '',             '',            0.0),
+                ('(+) Outstanding Receipts',                                 '',             '',            0.0),
+                ('(-) Outstanding Payments',                                 '',             '',            0.0),
+                ('Total Outstanding Receipts/Payments',                      '',             '',            0.0),
             ],
             options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
         )
 
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-01-04'))
-        options['all_entries'] = True
+        options = self._generate_options(report, '2019-01-01', '2019-01-31')
         options['unfold_all'] = True
         lines = report._get_lines(options)
         self.assertLinesValues(
             lines,
-            #   Name                                                             Date            Amount
-            [0,                                                                    1,               3],
+            #   Name                                                             Date             Label       Amount
+            [   0,                                                               1,               2,              3],
             [
-                ('Balance of \'101401 Bank\'',                                    '',           140.0),
-                ('Last statement balance',                                        '',           140.0),
-                ('Including Unreconciled Receipts',                               '',            60.0),
-                ('BNK1/2019/00003',                                     '01/03/2019',            30.0),
-                ('BNK1/2019/00002',                                     '01/02/2019',            20.0),
-                ('BNK1/2019/00001',                                     '01/01/2019',            10.0),
-                ('Including Unreconciled Payments',                               '',           -40.0),
-                ('BNK1/2019/00004',                                     '01/04/2019',           -40.0),
-                ('Transactions without statement',                                '',             0.0),
-                ('Including Unreconciled Receipts',                               '',             0.0),
-                ('Including Unreconciled Payments',                               '',             0.0),
-                ('Misc. operations',                                              '',             0.0),
-                ('Outstanding Receipts/Payments',                                 '',          1000.0),
-                ('(+) Outstanding Receipts',                                      '',          1000.0),
-                ('PBNK1/2019/00001',                                    '01/03/2019',          1000.0),
-                ('(-) Outstanding Payments',                                      '',             0.0),
+                (account_name,                                                   '',             '',             ''),
+                ('Opening Bank Balance as of January 01 2019',                   '',             '',         1000.0),
+                ('Reconciled Transactions',                                      '',             '',            0.0),
+                ('Receipts',                                                     '',             '',            0.0),
+                ('Payments',                                                     '',             '',            0.0),
+                ('Total Reconciled Transactions',                                '',             '',            0.0),
+                ('Unreconciled Transactions',                                    '',             '',          130.0),
+                ('Receipts',                                                     '',             '',          170.0),
+                ('BNK1/2019/00006',                                              '01/06/2019',   'line_6',     60.0),
+                ('BNK1/2019/00005',                                              '01/05/2019',   'line_5',     50.0),
+                ('BNK1/2019/00003',                                              '01/03/2019',   'line_3',     30.0),
+                ('BNK1/2019/00002',                                              '01/02/2019',   'line_2',     20.0),
+                ('BNK1/2019/00001',                                              '01/01/2019',   'line_1',     10.0),
+                ('Total Receipts',                                               '',             '',          170.0),
+                ('Payments',                                                     '',             '',          -40.0),
+                ('BNK1/2019/00004',                                              '01/04/2019',   'line_4',    -40.0),
+                ('Total Payments',                                               '',             '',          -40.0),
+                ('Total Unreconciled Transactions',                              '',             '',          130.0),
+                ('Misc. operations',                                             '',             '',            0.0),
+                ('Calculated Ending Bank Balance as of January 31 2019',         '',             '',         1130.0),
+                ('Ending General Ledger Balance as of January 31 2019',          '',             '',          130.0),
+                ('Outstanding Receipts/Payments',                                '',             '',         1000.0),
+                ('(+) Outstanding Receipts',                                     '',             '',         1000.0),
+                ('PBNK1/2019/00001',                                             '01/03/2019',   '',         1000.0),
+                ('Total (+) Outstanding Receipts',                               '',             '',         1000.0),
+                ('(-) Outstanding Payments',                                     '',             '',            0.0),
+                ('Total Outstanding Receipts/Payments',                          '',             '',         1000.0),
             ],
             options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
         )
 
     def test_reconciliation_report_non_statement_payment(self):
@@ -492,122 +589,39 @@ class TestReconciliationReport(TestAccountReportsCommon):
             active_id=bank_journal.id,
             active_model='account.journal'
         )
+        account_name = bank_journal.default_account_id.display_name
 
         options = self._generate_options(report, '2016-01-02', '2016-01-02')
         options['unfold_all'] = True
         lines = report._get_lines(options)
-        account = bank_journal.default_account_id.display_name
 
         self.assertLinesValues(
             lines,
-            #   Name                                                  Date         Amount
-            [0,                                                         1,             3],
+            #   Name                                                         Date            Label         Amount
+            [   0,                                                           1,              2,                3],
             [
-                (f'Balance of \'{account}\'',                          '',           0.0),
-                ('Last statement balance',                             '',           0.0),
-                ('Including Unreconciled Receipts',                    '',           0.0),
-                ('Including Unreconciled Payments',                    '',           0.0),
-                ('Transactions without statement',                     '',           0.0),
-                ('Including Unreconciled Receipts',                    '',           0.0),
-                ('Including Unreconciled Payments',                    '',           0.0),
-                ('Misc. operations',                                   '',           0.0),
-                ('Outstanding Receipts/Payments',                      '',       -1300.0),
-                ('(+) Outstanding Receipts',                           '',           0.0),
-                ('(-) Outstanding Payments',                           '',       -1300.0),
-                ('BNKKK/2015/00001',                         '12/31/2015',       -500.00),
-                ('BNKKK/2014/00001',                         '12/31/2014',       -800.00),
+                (account_name,                                               '',             '',              ''),
+                ('Opening Bank Balance as of January 02 2016',               '',             '',             0.0),
+                ('Reconciled Transactions',                                  '',             '',             0.0),
+                ('Receipts',                                                 '',             '',             0.0),
+                ('Payments',                                                 '',             '',             0.0),
+                ('Total Reconciled Transactions',                            '',             '',             0.0),
+                ('Unreconciled Transactions',                                '',             '',             0.0),
+                ('Receipts',                                                 '',             '',             0.0),
+                ('Payments',                                                 '',             '',             0.0),
+                ('Total Unreconciled Transactions',                          '',             '',             0.0),
+                ('Misc. operations',                                         '',             '',             0.0),
+                ('Calculated Ending Bank Balance as of January 02 2016',     '',             '',             0.0),
+                ('Ending General Ledger Balance as of January 02 2016',      '',             '',             0.0),
+                ('Outstanding Receipts/Payments',                            '',             '',         -1300.0),
+                ('(+) Outstanding Receipts',                                 '',             '',             0.0),
+                ('(-) Outstanding Payments',                                 '',             '',         -1300.0),
+                ('BNKKK/2015/00001',                                         '12/31/2015',   '',          -500.0),
+                ('BNKKK/2014/00001',                                         '12/31/2014',   '',          -800.0),
+                ('Total (-) Outstanding Payments',                           '',             '',         -1300.0),
+                ('Total Outstanding Receipts/Payments',                      '',             '',         -1300.0),
             ],
             options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
-        )
-
-    def test_reconciliation_report_misc_entry(self):
-        """ This test will check if the report correctly display the misc entry """
-        bank_journal = self.env['account.journal'].create({
-            'name': 'Bank',
-            'code': 'BNKKK',
-            'type': 'bank',
-            'company_id': self.company_data['company'].id,
-        })
-
-        # ==== Misc ====
-        self.env['account.move'].create({
-            'journal_id': bank_journal.id,
-            'date': '2016-01-02',
-            'line_ids': [
-                (0, 0, {
-                    'name': 'Source',
-                    'debit': 800,
-                    'credit': 0,
-                    'account_id': bank_journal.default_account_id.id,
-                }),
-                (0, 0, {
-                    'name': 'Destination',
-                    'debit': 0,
-                    'credit': 800,
-                    'account_id': self.company_data['default_account_expense'].id,
-                }),
-            ]
-        }).action_post()
-
-        report = self.env.ref('account_reports.bank_reconciliation_report').with_context(
-            active_id=bank_journal.id,
-            active_model='account.journal'
-        )
-
-        options = self._generate_options(report, '2016-01-02', '2016-01-02')
-        options['unfold_all'] = True
-        lines = report._get_lines(options)
-        account = bank_journal.default_account_id.display_name
-
-        self.assertLinesValues(
-            lines,
-            #   Name                                                  Date         Amount
-            [0,                                                         1,             3],
-            [
-                (f'Balance of \'{account}\'',                          '',         800.0),
-                ('Last statement balance',                             '',           0.0),
-                ('Including Unreconciled Receipts',                    '',           0.0),
-                ('Including Unreconciled Payments',                    '',           0.0),
-                ('Transactions without statement',                     '',           0.0),
-                ('Including Unreconciled Receipts',                    '',           0.0),
-                ('Including Unreconciled Payments',                    '',           0.0),
-                ('Misc. operations',                                   '',         800.0),
-                ('Outstanding Receipts/Payments',                      '',           0.0),
-                ('(+) Outstanding Receipts',                           '',           0.0),
-                ('(-) Outstanding Payments',                           '',           0.0),
-            ],
-            options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
-        )
-
-        # With the domain, since the date of the misc is not in the same year, the misc is not present
-        options = self._generate_options(report, '2014-01-02', '2014-01-02')
-        options['unfold_all'] = True
-        lines = report._get_lines(options)
-
-        self.assertLinesValues(
-            lines,
-            #   Name                                                  Date         Amount
-            [0,                                                         1,             3],
-            [
-                (f'Balance of \'{account}\'',                          '',           0.0),
-                ('Last statement balance',                             '',           0.0),
-                ('Including Unreconciled Receipts',                    '',           0.0),
-                ('Including Unreconciled Payments',                    '',           0.0),
-                ('Transactions without statement',                     '',           0.0),
-                ('Including Unreconciled Receipts',                    '',           0.0),
-                ('Including Unreconciled Payments',                    '',           0.0),
-                ('Misc. operations',                                   '',           0.0),
-                ('Outstanding Receipts/Payments',                      '',           0.0),
-                ('(+) Outstanding Receipts',                           '',           0.0),
-                ('(-) Outstanding Payments',                           '',           0.0),
-            ],
-            options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
         )
 
     def test_reconciliation_report_delete_statement(self):
@@ -618,10 +632,10 @@ class TestReconciliationReport(TestAccountReportsCommon):
         statement = self.env['account.bank.statement'].create({
             'name': 'statement_1',
             'date': '2019-01-10',
-            'balance_start': 0.0,
-            'balance_end_real': 130.0,
+            'balance_start': 1000.0,
+            'balance_end_real': 1130.0,
             'line_ids': [
-                (0, 0, {'payment_ref': 'line_1', 'amount': 10.0, 'date': '2019-01-01', 'journal_id': bank_journal.id}),
+                (0, 0, {'payment_ref': 'line_1', 'amount': 10.0, 'date': '2018-12-31', 'journal_id': bank_journal.id}),
                 (0, 0, {'payment_ref': 'line_2', 'amount': 20.0, 'date': '2019-01-02', 'journal_id': bank_journal.id}),
                 (0, 0, {'payment_ref': 'line_3', 'amount': 30.0, 'date': '2019-01-03', 'journal_id': bank_journal.id}),
                 (0, 0, {'payment_ref': 'line_4', 'amount': -40.0, 'date': '2019-01-04', 'journal_id': bank_journal.id}),
@@ -634,170 +648,78 @@ class TestReconciliationReport(TestAccountReportsCommon):
             active_id=bank_journal.id,
             active_model='account.journal'
         )
-
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-01-12'))
-        options['all_entries'] = True
+        account_name = bank_journal.default_account_id.display_name
+        options = self._generate_options(report, '2019-01-01', '2019-01-12')
         options['unfold_all'] = True
 
         lines = report._get_lines(options)
         self.assertLinesValues(
             lines,
-            #   Name                                                             Date            Amount
-            [0,                                                                     1,              3],
+            #   Name                                                             Date            Label        Amount
+            [   0,                                                               1,              2,               3],
             [
-                ('Balance of \'101401 Bank\'',                                     '',          130.0),
-                ('Last statement balance',                                         '',          130.0),
-                ('Including Unreconciled Receipts',                                '',          170.0),
-                ('BNK1/2019/00006',                                      '01/06/2019',           60.0),
-                ('BNK1/2019/00005',                                      '01/05/2019',           50.0),
-                ('BNK1/2019/00003',                                      '01/03/2019',           30.0),
-                ('BNK1/2019/00002',                                      '01/02/2019',           20.0),
-                ('BNK1/2019/00001',                                      '01/01/2019',           10.0),
-                ('Including Unreconciled Payments',                                '',          -40.0),
-                ('BNK1/2019/00004',                                      '01/04/2019',          -40.0),
-                ('Transactions without statement',                                 '',            0.0),
-                ('Including Unreconciled Receipts',                                '',            0.0),
-                ('Including Unreconciled Payments',                                '',            0.0),
-                ('Misc. operations',                                               '',            0.0),
-                ('Outstanding Receipts/Payments',                                  '',            0.0),
-                ('(+) Outstanding Receipts',                                       '',            0.0),
-                ('(-) Outstanding Payments',                                       '',            0.0),
+                (account_name,                                                   '',             '',             ''),
+                ('Opening Bank Balance as of January 01 2019',                   '',             '',         1010.0),
+                ('Reconciled Transactions',                                      '',             '',            0.0),
+                ('Receipts',                                                     '',             '',            0.0),
+                ('Payments',                                                     '',             '',            0.0),
+                ('Total Reconciled Transactions',                                '',             '',            0.0),
+                ('Unreconciled Transactions',                                    '',             '',          120.0),
+                ('Receipts',                                                     '',             '',          160.0),
+                ('BNK1/2019/00005',                                              '01/06/2019',   'line_6',     60.0),
+                ('BNK1/2019/00004',                                              '01/05/2019',   'line_5',     50.0),
+                ('BNK1/2019/00002',                                              '01/03/2019',   'line_3',     30.0),
+                ('BNK1/2019/00001',                                              '01/02/2019',   'line_2',     20.0),
+                ('Total Receipts',                                               '',             '',          160.0),
+                ('Payments',                                                     '',             '',          -40.0),
+                ('BNK1/2019/00003',                                              '01/04/2019',   'line_4',    -40.0),
+                ('Total Payments',                                               '',             '',          -40.0),
+                ('Total Unreconciled Transactions',                              '',             '',          120.0),
+                ('Misc. operations',                                             '',             '',            0.0),
+                ('Calculated Ending Bank Balance as of January 12 2019',         '',             '',         1130.0),
+                ('Ending General Ledger Balance as of January 12 2019',          '',             '',          130.0),
+                ('Outstanding Receipts/Payments',                                '',             '',            0.0),
+                ('(+) Outstanding Receipts',                                     '',             '',            0.0),
+                ('(-) Outstanding Payments',                                     '',             '',            0.0),
+                ('Total Outstanding Receipts/Payments',                          '',             '',            0.0),
             ],
             options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
         )
 
         statement.unlink()
 
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-01-12'))
-        options['all_entries'] = True
-        options['unfold_all'] = True
-
         lines = report._get_lines(options)
         self.assertLinesValues(
             lines,
-            #   Name                                                             Date            Amount
-            [0,                                                                    1,                3],
+            #   Name                                                              Date            Label       Amount
+            [   0,                                                                1,              2,              3],
             [
-                ('Balance of \'101401 Bank\'',                                    '',            130.0),
-                ('Last statement balance',                                        '',              0.0),
-                ('Including Unreconciled Receipts',                               '',              0.0),
-                ('Including Unreconciled Payments',                               '',              0.0),
-                ('Transactions without statement',                                '',            130.0),
-                ('Including Unreconciled Receipts',                               '',            170.0),
-                ('BNK1/2019/00006',                                     '01/06/2019',             60.0),
-                ('BNK1/2019/00005',                                     '01/05/2019',             50.0),
-                ('BNK1/2019/00003',                                     '01/03/2019',             30.0),
-                ('BNK1/2019/00002',                                     '01/02/2019',             20.0),
-                ('BNK1/2019/00001',                                     '01/01/2019',             10.0),
-                ('Including Unreconciled Payments',                               '',            -40.0),
-                ('BNK1/2019/00004',                                     '01/04/2019',            -40.0),
-                ('Misc. operations',                                              '',              0.0),
-                ('Outstanding Receipts/Payments',                                 '',              0.0),
-                ('(+) Outstanding Receipts',                                      '',              0.0),
-                ('(-) Outstanding Payments',                                      '',              0.0),
+                (account_name,                                                   '',             '',             ''),
+                ('Opening Bank Balance as of January 01 2019',                   '',             '',           10.0),
+                ('Reconciled Transactions',                                      '',             '',            0.0),
+                ('Receipts',                                                     '',             '',            0.0),
+                ('Payments',                                                     '',             '',            0.0),
+                ('Total Reconciled Transactions',                                '',             '',            0.0),
+                ('Unreconciled Transactions',                                    '',             '',          120.0),
+                ('Receipts',                                                     '',             '',          160.0),
+                ('BNK1/2019/00005',                                              '01/06/2019',   'line_6',     60.0),
+                ('BNK1/2019/00004',                                              '01/05/2019',   'line_5',     50.0),
+                ('BNK1/2019/00002',                                              '01/03/2019',   'line_3',     30.0),
+                ('BNK1/2019/00001',                                              '01/02/2019',   'line_2',     20.0),
+                ('Total Receipts',                                               '',             '',          160.0),
+                ('Payments',                                                     '',             '',          -40.0),
+                ('BNK1/2019/00003',                                              '01/04/2019',   'line_4',    -40.0),
+                ('Total Payments',                                               '',             '',          -40.0),
+                ('Total Unreconciled Transactions',                              '',             '',          120.0),
+                ('Misc. operations',                                             '',             '',            0.0),
+                ('Calculated Ending Bank Balance as of January 12 2019',         '',             '',          130.0),
+                ('Ending General Ledger Balance as of January 12 2019',          '',             '',          130.0),
+                ('Outstanding Receipts/Payments',                                '',             '',            0.0),
+                ('(+) Outstanding Receipts',                                     '',             '',            0.0),
+                ('(-) Outstanding Payments',                                     '',             '',            0.0),
+                ('Total Outstanding Receipts/Payments',                          '',             '',            0.0),
             ],
             options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
-        )
-
-    def test_reconciliation_report_transaction_without_statement(self):
-        """
-            This test will ensure that the section transaction without statement section contains the reconcile entries.
-            So the section should not always be the sum of his children.
-        """
-        bank_journal = self.company_data['default_journal_bank']
-
-        bank_statement_lines = self.env['account.bank.statement.line'].create([
-            {
-                'payment_ref': 'Initial balance',
-                'journal_id': bank_journal.id,
-                'partner_id': self.partner_a.id,
-                'amount': 1000.0,
-                'date': '2019-01-01',
-            },
-            {
-                'payment_ref': 'To be reconciled',
-                'journal_id': bank_journal.id,
-                'partner_id': self.partner_a.id,
-                'amount': 100.0,
-                'date': '2019-01-01',
-            }
-        ])
-
-        report = self.env.ref('account_reports.bank_reconciliation_report').with_context(
-            active_id=bank_journal.id,
-            active_model='account.journal'
-        )
-        options = self._generate_options(report, '2019-01-01', '2019-01-12')
-        options['all_entries'] = True
-        options['unfold_all'] = True
-
-        lines = report._get_lines(options)
-        self.assertLinesValues(
-            lines,
-            #   Name                                                             Date            Amount
-            [0, 1, 3],
-            [
-                ('Balance of \'101401 Bank\'',                                      '',         1100.0),
-                ('Last statement balance',                                          '',            0.0),
-                ('Including Unreconciled Receipts',                                 '',            0.0),
-                ('Including Unreconciled Payments',                                 '',            0.0),
-                ('Transactions without statement',                                  '',         1100.0),
-                ('Including Unreconciled Receipts',                                 '',         1100.0),
-                ('BNK1/2019/00002',                                       '01/01/2019',          100.0),
-                ('BNK1/2019/00001',                                       '01/01/2019',         1000.0),
-                ('Including Unreconciled Payments',                                 '',            0.0),
-                ('Misc. operations',                                                '',            0.0),
-                ('Outstanding Receipts/Payments',                                   '',            0.0),
-                ('(+) Outstanding Receipts',                                        '',            0.0),
-                ('(-) Outstanding Payments',                                        '',            0.0),
-            ],
-            options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
-        )
-
-        payment = self.env['account.payment'].create({
-            'amount': 100.0,
-            'payment_type': 'inbound',
-            'date': '2019-01-01',
-            'journal_id': bank_journal.id,
-            'partner_id': self.partner_a.id,
-        })
-        payment.action_post()
-
-        payment_line = payment.move_id.line_ids.filtered(lambda line: line.account_id == payment.payment_method_line_id.payment_account_id)
-        bank_statement_lines[1].set_line_bank_statement_line(payment_line.id)
-
-        options = self._generate_options(report, '2019-01-01', '2019-01-12')
-        options['all_entries'] = True
-        options['unfold_all'] = True
-
-        lines = report._get_lines(options)
-        self.assertLinesValues(
-            lines,
-            #   Name                                                             Date            Amount
-            [0,                                                                    1,               3],
-            [
-                ('Balance of \'101401 Bank\'',                                    '',          1100.0),
-                ('Last statement balance',                                        '',             0.0),
-                ('Including Unreconciled Receipts',                               '',             0.0),
-                ('Including Unreconciled Payments',                               '',             0.0),
-                ('Transactions without statement',                                '',          1100.0),
-                ('Including Unreconciled Receipts',                               '',          1000.0),
-                ('BNK1/2019/00001',                                     '01/01/2019',          1000.0),
-                ('Including Unreconciled Payments',                               '',             0.0),
-                ('Misc. operations',                                              '',             0.0),
-                ('Outstanding Receipts/Payments',                                 '',             0.0),
-                ('(+) Outstanding Receipts',                                      '',             0.0),
-                ('(-) Outstanding Payments',                                      '',             0.0),
-            ],
-            options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
         )
 
     def test_reconciliation_report_exchange_entry(self):
@@ -828,32 +750,37 @@ class TestReconciliationReport(TestAccountReportsCommon):
                 ]
         })
         move_a.action_post()
+
         report = self.env.ref('account_reports.bank_reconciliation_report').with_context(
             active_id=bank_journal.id,
             active_model='account.journal'
         )
-
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-01-12'))
-
+        account_name = bank_journal.default_account_id.display_name
+        options = self._generate_options(report, '2019-01-01', '2019-01-12')
         lines = report._get_lines(options)
+
         self.assertLinesValues(
             lines,
-            #   Name                                                             Date            Amount
-            [0,                                                                     1,              3],
+            #   Name                                                             Date            Label        Amount
+            [   0,                                                               1,              2,               3],
             [
-                ('Balance of \'101401 Bank\'',                                     '',            0.0),
-                ('Last statement balance',                                         '',            0.0),
-                ('Including Unreconciled Receipts',                                '',            0.0),
-                ('Including Unreconciled Payments',                                '',            0.0),
-                ('Transactions without statement',                                 '',            0.0),
-                ('Including Unreconciled Receipts',                                '',            0.0),
-                ('Including Unreconciled Payments',                                '',            0.0),
-                ('Misc. operations',                                               '',            0.0),
-                ('Outstanding Receipts/Payments',                                  '',            0.0),
-                ('(+) Outstanding Receipts',                                       '',            0.0),
-                ('(-) Outstanding Payments',                                       '',            0.0),
+                (account_name,                                                   '',             '',             ''),
+                ('Opening Bank Balance as of January 01 2019',                   '',             '',            0.0),
+                ('Reconciled Transactions',                                      '',             '',            0.0),
+                ('Receipts',                                                     '',             '',            0.0),
+                ('Payments',                                                     '',             '',            0.0),
+                ('Total Reconciled Transactions',                                '',             '',            0.0),
+                ('Unreconciled Transactions',                                    '',             '',            0.0),
+                ('Receipts',                                                     '',             '',            0.0),
+                ('Payments',                                                     '',             '',            0.0),
+                ('Total Unreconciled Transactions',                              '',             '',            0.0),
+                ('Misc. operations',                                             '',             '',            0.0),
+                ('Calculated Ending Bank Balance as of January 12 2019',         '',             '',            0.0),
+                ('Ending General Ledger Balance as of January 12 2019',          '',             '',         1000.0),
+                ('Outstanding Receipts/Payments',                                '',             '',            0.0),
+                ('(+) Outstanding Receipts',                                     '',             '',            0.0),
+                ('(-) Outstanding Payments',                                     '',             '',            0.0),
+                ('Total Outstanding Receipts/Payments',                          '',             '',            0.0),
             ],
             options,
-            currency_map={3: {'currency': bank_journal.currency_id}},
-            ignore_folded=False,
         )

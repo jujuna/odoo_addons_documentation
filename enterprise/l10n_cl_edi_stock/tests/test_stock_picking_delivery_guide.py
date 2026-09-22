@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-import base64
 import logging
 from freezegun import freeze_time
 from lxml import etree
@@ -7,7 +5,7 @@ from unittest.mock import patch
 
 from odoo import Command, fields
 from odoo.tests import tagged, Form
-from odoo.tools import misc
+from odoo.tools import BinaryBytes, misc
 from odoo.addons.l10n_cl_edi_stock.tests.common import TestL10nClEdiStockCommon
 from odoo.addons.l10n_cl_edi.tests.common import _check_with_xsd_patch, _is_valid_certificate
 
@@ -18,6 +16,8 @@ _logger = logging.getLogger(__name__)
 @patch('odoo.tools.xml_utils._check_with_xsd', _check_with_xsd_patch)
 @patch('odoo.addons.certificate.models.certificate.CertificateCertificate._compute_is_valid', _is_valid_certificate)
 class TestL10nClEdiStock(TestL10nClEdiStockCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @freeze_time('2019-10-24T20:00:00', tz_offset=3)
     def test_l10n_cl_edi_delivery_with_taxes_from_inventory(self):
@@ -30,7 +30,7 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         })
         self.env['stock.move'].create({
             'product_id': self.product_with_taxes_a.id,
-            'product_uom': self.product_with_taxes_a.uom_id.id,
+            'uom_id': self.product_with_taxes_a.uom_id.id,
             'product_uom_qty': 10.00,
             'quantity': 10.00,
             'procure_method': 'make_to_stock',
@@ -41,7 +41,7 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         })
         self.env['stock.move'].create({
             'product_id': self.product_with_taxes_b.id,
-            'product_uom': self.product_with_taxes_b.uom_id.id,
+            'uom_id': self.product_with_taxes_b.uom_id.id,
             'product_uom_qty': 1,
             'quantity': 1,
             'procure_method': 'make_to_stock',
@@ -65,7 +65,7 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         xml_expected_dte = misc.file_open('l10n_cl_edi_stock/tests/expected_dtes/delivery_guide_products_with_taxes.xml').read()
 
         self.assertXmlTreeEqual(
-            etree.fromstring(base64.b64decode(picking.l10n_cl_sii_send_file.with_context(bin_size=False).datas)),
+            etree.fromstring(picking.l10n_cl_sii_send_file.raw.content),
             etree.fromstring(xml_expected_dte.encode())
         )
 
@@ -112,7 +112,7 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         xml_expected_dte = misc.file_open('l10n_cl_edi_stock/tests/expected_dtes/delivery_guide_products_with_taxes.xml').read()
 
         self.assertXmlTreeEqual(
-            etree.fromstring(base64.b64decode(picking.l10n_cl_sii_send_file.with_context(bin_size=False).datas)),
+            etree.fromstring(picking.l10n_cl_sii_send_file.raw.content),
             etree.fromstring(xml_expected_dte.encode())
         )
 
@@ -160,7 +160,7 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         xml_expected_dte = misc.file_open('l10n_cl_edi_stock/tests/expected_dtes/delivery_guide_products_without_taxes.xml').read()
 
         self.assertXmlTreeEqual(
-            etree.fromstring(base64.b64decode(picking.l10n_cl_sii_send_file.with_context(bin_size=False).datas)),
+            etree.fromstring(picking.l10n_cl_sii_send_file.raw.content),
             etree.fromstring(xml_expected_dte.encode())
         )
 
@@ -243,7 +243,7 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         xml_expected_dte = misc.file_open('l10n_cl_edi_stock/tests/expected_dtes/delivery_guide_products_with_reference.xml').read()
 
         self.assertXmlTreeEqual(
-            etree.fromstring(base64.b64decode(final_delivery.l10n_cl_sii_send_file.with_context(bin_size=False).datas)),
+            etree.fromstring(final_delivery.l10n_cl_sii_send_file.raw.content),
             etree.fromstring(xml_expected_dte.encode()),
         )
 
@@ -286,7 +286,7 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         xml_expected_dte = misc.file_open('l10n_cl_edi_stock/tests/expected_dtes/delivery_guide_no_price.xml').read()
 
         self.assertXmlTreeEqual(
-            etree.fromstring(base64.b64decode(picking.l10n_cl_sii_send_file.with_context(bin_size=False).datas)),
+            etree.fromstring(picking.l10n_cl_sii_send_file.raw.content),
             etree.fromstring(xml_expected_dte.encode())
         )
 
@@ -413,7 +413,7 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         })
         self.env['stock.move'].create({
             'product_id': self.product_with_taxes_a.id,
-            'product_uom': self.product_with_taxes_a.uom_id.id,
+            'uom_id': self.product_with_taxes_a.uom_id.id,
             'product_uom_qty': 10.00,
             'quantity': 8.00,
             'procure_method': 'make_to_stock',
@@ -428,9 +428,100 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         picking.l10n_latam_document_number = 100
         picking.l10n_cl_confirm_draft_delivery_guide()
 
-        xml_bytes = base64.b64decode(picking.l10n_cl_sii_send_file.with_context(bin_size=False).datas)
+        xml_bytes = picking.l10n_cl_sii_send_file.raw.content
         root = etree.fromstring(xml_bytes)
         qty = root.find(".//sii:QtyItem", namespaces={"sii": "http://www.sii.cl/SiiDte"})
 
         self.assertIsNotNone(qty, "QtyItem tag should exist in XML")
         self.assertEqual(qty.text, "8.000000")
+
+    def test_l10n_cl_delivery_guide_kit_component_uom(self):
+        # A kit component in kg must be priced from its own product, not by
+        # converting its qty into the kit's Units UoM
+        kg = self.env.ref('uom.product_uom_kgm')
+        kit_product = self.env['product.product'].create({
+            'name': 'A kit',
+            'type': 'consu',
+            'uom_id': self.env.ref('uom.product_uom_unit').id,
+            'list_price': 500.0,
+        })
+        kit_component = self.env['product.product'].create({
+            'name': 'A component of the kit',
+            'type': 'consu',
+            'uom_id': kg.id,
+            'list_price': 100.0,
+        })
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.chilean_partner_a.id,
+            'order_line': [Command.create({
+                'product_id': kit_product.id,
+                'product_uom_qty': 1.0,
+                'price_unit': 700.0,
+            })],
+        })
+        # component move linked to the kit's sale line, as a kit BoM would produce
+        picking = self.env['stock.picking'].create({
+            'partner_id': self.chilean_partner_a.id,
+            'picking_type_id': self.warehouse.out_type_id.id,
+            'location_id': self.stock_location,
+            'location_dest_id': self.customer_location,
+            'move_ids': [Command.create({
+                'product_id': kit_component.id,
+                'uom_id': kit_component.uom_id.id,
+                'product_uom_qty': 0.6,
+                'quantity': 0.6,
+                'sale_line_id': sale_order.order_line.id,
+                'location_id': self.stock_location,
+                'location_dest_id': self.customer_location,
+            })],
+        })
+        component_move = picking.move_ids
+        self.assertEqual(picking.sale_id, sale_order)
+        self.assertEqual(self.chilean_partner_a.l10n_cl_delivery_guide_price, 'sale_order')
+
+        _totals, _retentions, line_amounts = picking._l10n_cl_get_tax_amounts()
+        amounts = line_amounts[component_move]
+        # 0.6 kg at the component's own price of 100/kg = 60, not the kit price scaled by the kg factor
+        self.assertEqual(amounts['price_unit'], self.env.company.currency_id.round(100.0))
+        self.assertEqual(amounts['total_amount'], self.env.company.currency_id.round(60.0))
+
+    def _create_delivery_picking(self):
+        """A validated outgoing picking of one unit, ready to be given a delivery guide."""
+        picking = self.env['stock.picking'].create({
+            'partner_id': self.chilean_partner_a.id,
+            'picking_type_id': self.warehouse.out_type_id.id,
+            'location_id': self.stock_location,
+            'location_dest_id': self.customer_location,
+            'move_ids': [Command.create({
+                'product_id': self.product_with_taxes_a.id,
+                'uom_id': self.product_with_taxes_a.uom_id.id,
+                'product_uom_qty': 1,
+                'quantity': 1,
+                'procure_method': 'make_to_stock',
+                'location_id': self.stock_location,
+                'location_dest_id': self.customer_location,
+            })],
+        })
+        picking.button_validate()
+        return picking
+
+    @freeze_time('2019-10-24T20:00:00', tz_offset=3)
+    def test_delivery_guide_opens_the_next_caf_range_at_its_own_first_folio(self):
+        """A range spent leaves the counter short of the next one, which the SII granted apart."""
+        next_caf = self.env['l10n_cl.dte.caf'].sudo().create({
+            'filename': 'FoliosSII7620122435222201910221946.xml',
+            'caf_file': BinaryBytes(self.file_read('l10n_cl_edi_stock/tests/template/caf_file_template.xml').content
+                                    .replace(b'<TD></TD>', b'<TD>52</TD>')
+                                    .replace(b'<RNG><D>001</D><H>100</H></RNG>', b'<RNG><D>200</D><H>300</H></RNG>')),
+            'l10n_latam_document_type_id': self.env.ref('l10n_cl.dc_gd_dte').id,
+            'status': 'in_use',
+        })
+        first = self._create_delivery_picking()
+        first.create_delivery_guide()
+        first.l10n_latam_document_number = 100
+        first.l10n_cl_confirm_draft_delivery_guide()
+        self.assertEqual(self.caf52_file.status, 'spent')
+
+        second = self._create_delivery_picking()
+        second.create_delivery_guide()
+        self.assertEqual(int(second.l10n_latam_document_number), next_caf.start_nb)

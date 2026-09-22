@@ -8,7 +8,7 @@ class PosFiskalyDetailsWizard(models.TransientModel):
 
     start_date = fields.Datetime(required=True, default=lambda self: fields.Datetime.now() - relativedelta(months=3))
     end_date = fields.Datetime(required=True, default=fields.Datetime.now)
-    pos_config_ids = fields.Many2many('pos.config', string='Point of Sale', domain=[("company_id.l10n_at_fiskaly_access_token", "!=", False)])
+    pos_config_ids = fields.Many2many('pos.config', string='Point of Sale', domain=[("company_id.l10n_at_fiskaly_organization_id", "!=", False)])
 
     @api.onchange('start_date')
     def _onchange_start_date(self):
@@ -21,5 +21,5 @@ class PosFiskalyDetailsWizard(models.TransientModel):
             self.start_date = self.end_date
 
     def action_dep_audit_report(self):
-        if self.pos_config_ids:
-            return self.pos_config_ids.print_dep7_report(self.start_date, self.end_date)
+        configs = self.pos_config_ids or self.env['pos.config'].search(self._check_company_domain(self.env.company))
+        return configs.print_dep7_report(self.start_date, self.end_date)

@@ -1,3 +1,4 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
@@ -6,9 +7,9 @@ class HrSalaryRuleSection(models.Model):
     _name = 'hr.salary.rule.section'
     _description = 'Salary Input Section'
 
-    name = fields.Char()
+    name = fields.Char(required=True, translate=True)
     sequence = fields.Integer()
-    struct_ids = fields.Many2many('hr.payroll.structure')
+    struct_ids = fields.Many2many('hr.payroll.structure', string="Available in Salary Structure")
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_not_used_in_salary_structure(self):

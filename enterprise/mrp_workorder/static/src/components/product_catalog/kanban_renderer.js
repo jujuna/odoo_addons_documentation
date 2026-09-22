@@ -1,9 +1,12 @@
-/** @odoo-module **/
-
 import { ProductCatalogKanbanRenderer } from "@product/product_catalog/kanban_renderer";
 import { patch } from "@web/core/utils/patch";
-import { KanbanRenderer } from "@web/views/kanban/kanban_renderer";
+import { useProps, t } from "@odoo/owl";
 
-patch(ProductCatalogKanbanRenderer, {
-    props: [...KanbanRenderer.props, "pushCatalogKanbanUpdate?"],
+patch(ProductCatalogKanbanRenderer.prototype, {
+    setup() {
+        super.setup();
+        this.productCatalogProps = useProps({
+            pushCatalogKanbanUpdate: t.function().optional(),
+        });
+    },
 });

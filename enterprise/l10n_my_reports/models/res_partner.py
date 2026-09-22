@@ -9,11 +9,12 @@ class ResPartner(models.Model):
 
     def action_print_report_statement_account(self, options=None):
         domain = Domain.TRUE
+        today = fields.Date.context_today(self)
         if options:
-            date_to = options.get("date", {}).get("date_to", fields.Date.today())
+            date_to = options.get("date", {}).get("date_to", today)
             domain &= Domain(self.env['account.report']._get_options_account_type_domain(options))
         else:
-            date_to = fields.Date.today()
+            date_to = today
         domain &= Domain('date', '<=', date_to)
         return self.env.ref('l10n_my_reports.action_report_statement_account').report_action(self, data={
             'date_to': date_to,

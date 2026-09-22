@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
-import base64
 
 from .common import SpreadsheetTestCommon
 from odoo.tests.common import new_test_user, tagged
@@ -17,15 +16,15 @@ class SpreadsheetCollaborative(SpreadsheetTestCommon):
     def test_compute_revision_with_session(self):
         spreadsheet = self.create_spreadsheet()
         commands = self.new_revision_data(spreadsheet)
-        spreadsheet.dispatch_spreadsheet_message(commands)
+        spreadsheet._dispatch_spreadsheet_message(commands)
         revision_data2 = self.new_revision_data(spreadsheet, nextRevisionId="nextone")
-        spreadsheet.dispatch_spreadsheet_message(revision_data2)
+        spreadsheet._dispatch_spreadsheet_message(revision_data2)
         self.assertEqual(spreadsheet.current_revision_uuid, "nextone")
 
     def test_dispatch_new_revision(self):
         spreadsheet = self.create_spreadsheet()
         commands = self.new_revision_data(spreadsheet)
-        spreadsheet.dispatch_spreadsheet_message(commands)
+        spreadsheet._dispatch_spreadsheet_message(commands)
         self.assertEqual(
             len(spreadsheet.spreadsheet_revision_ids),
             1,
@@ -46,14 +45,14 @@ class SpreadsheetCollaborative(SpreadsheetTestCommon):
         spreadsheet = self.create_spreadsheet()
         start_revision = spreadsheet.current_revision_uuid
         revision1 = self.new_revision_data(spreadsheet, serverRevisionId=start_revision)
-        spreadsheet.dispatch_spreadsheet_message(revision1)
+        spreadsheet._dispatch_spreadsheet_message(revision1)
         self.assertEqual(
             len(spreadsheet.spreadsheet_revision_ids),
             1,
             "It should have recorded the revision",
         )
         revision2 = self.new_revision_data(spreadsheet, serverRevisionId=start_revision)
-        spreadsheet.dispatch_spreadsheet_message(revision2)
+        spreadsheet._dispatch_spreadsheet_message(revision2)
         self.assertEqual(
             len(spreadsheet.spreadsheet_revision_ids),
             1,
@@ -67,7 +66,7 @@ class SpreadsheetCollaborative(SpreadsheetTestCommon):
 
     def test_snapshot_spreadsheet_save_data(self):
         spreadsheet = self.create_spreadsheet()
-        spreadsheet.dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
+        spreadsheet._dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
         self.assertEqual(
             len(spreadsheet.spreadsheet_revision_ids), 1, "It should have 1 revision"
         )
@@ -87,7 +86,7 @@ class SpreadsheetCollaborative(SpreadsheetTestCommon):
             {"type": "SNAPSHOT_CREATED", "version": 1},
             "It should have saved a snapshot revision"
         )
-        self.assertEqual(base64.decodebytes(spreadsheet.spreadsheet_snapshot), b'{"sheets": [], "revisionId": "snapshot-revision-id"}', "It should have saved the data")
+        self.assertEqual(spreadsheet.spreadsheet_snapshot.content, b'{"sheets": [], "revisionId": "snapshot-revision-id"}', "It should have saved the data")
         self.assertEqual(
             spreadsheet.current_revision_uuid,
             "snapshot-revision-id",
@@ -106,7 +105,7 @@ class SpreadsheetCollaborative(SpreadsheetTestCommon):
     def test_snapshot_spreadsheet_with_invalid_revision(self):
         spreadsheet = self.create_spreadsheet()
         first_revision = spreadsheet.current_revision_uuid
-        spreadsheet.dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
+        spreadsheet._dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
         current_data = spreadsheet.spreadsheet_snapshot
         current_revision = spreadsheet.current_revision_uuid
         self.assertEqual(
@@ -114,7 +113,7 @@ class SpreadsheetCollaborative(SpreadsheetTestCommon):
         )
         is_accepted = self.snapshot(spreadsheet, first_revision, "snapshot-revision-id", {"revisionId": "snapshot-revision-id"})
         self.assertFalse(is_accepted, "It should not have accepted the snapshot")
-        self.assertEqual(spreadsheet.spreadsheet_snapshot, current_data, "It should not have saved the data")
+        self.assertEqual(spreadsheet.spreadsheet_snapshot.content, current_data.content, "It should not have saved the data")
         self.assertEqual(
             current_revision,
             spreadsheet.current_revision_uuid,
@@ -123,7 +122,7 @@ class SpreadsheetCollaborative(SpreadsheetTestCommon):
 
     def test_unlink_revisions(self):
         spreadsheet = self.create_spreadsheet()
-        spreadsheet.dispatch_spreadsheet_message(
+        spreadsheet._dispatch_spreadsheet_message(
             self.new_revision_data(spreadsheet)
         )
         ids = spreadsheet.spreadsheet_revision_ids.ids
@@ -132,7 +131,7 @@ class SpreadsheetCollaborative(SpreadsheetTestCommon):
 
     def test_unlink_archived_revisions(self):
         spreadsheet = self.create_spreadsheet()
-        spreadsheet.dispatch_spreadsheet_message(
+        spreadsheet._dispatch_spreadsheet_message(
             self.new_revision_data(spreadsheet)
         )
         self.snapshot(
@@ -147,6 +146,7 @@ class SpreadsheetCollaborative(SpreadsheetTestCommon):
 
 
 @tagged("collaborative_spreadsheet")
+@tagged("-post_install", "at_install")  # test_read_user_with_doc_access breaks post install with access rights
 class SpreadsheetORMAccess(SpreadsheetTestCommon):
     @classmethod
     def setUpClass(cls):
@@ -227,7 +227,7 @@ class SpreadsheetORMAccess(SpreadsheetTestCommon):
             self.env["spreadsheet.revision"].with_user(self.user).search([])
 
     def test_read_manager(self):
-        self.spreadsheet.dispatch_spreadsheet_message(
+        self.spreadsheet._dispatch_spreadsheet_message(
             self.new_revision_data(self.spreadsheet)
         )
         self.env.invalidate_all()
@@ -249,7 +249,7 @@ class SpreadsheetORMAccess(SpreadsheetTestCommon):
             self.spreadsheet.with_user(self.user).spreadsheet_revision_ids.write({})
 
     def test_write_manager(self):
-        self.spreadsheet.dispatch_spreadsheet_message(
+        self.spreadsheet._dispatch_spreadsheet_message(
             self.new_revision_data(self.spreadsheet)
         )
         self.env.invalidate_all()
@@ -268,7 +268,7 @@ class SpreadsheetORMAccess(SpreadsheetTestCommon):
             self.spreadsheet.with_user(self.user).spreadsheet_revision_ids.unlink()
 
     def test_unlink_manager(self):
-        self.spreadsheet.dispatch_spreadsheet_message(
+        self.spreadsheet._dispatch_spreadsheet_message(
             self.new_revision_data(self.spreadsheet)
         )
         self.assertTrue(self.spreadsheet.spreadsheet_revision_ids)
@@ -281,7 +281,7 @@ class SpreadsheetORMAccess(SpreadsheetTestCommon):
 
         self.env.invalidate_all()
         with self.assertRaises(AccessError):
-            self.spreadsheet.with_user(self.user).dispatch_spreadsheet_message(
+            self.spreadsheet.with_user(self.user)._dispatch_spreadsheet_message(
                 self.new_revision_data(self.spreadsheet)
             )
 
@@ -294,7 +294,7 @@ class SpreadsheetORMAccess(SpreadsheetTestCommon):
 
     def test_snapshot_user_with_doc_access(self):
         self._give_user_access('edit')
-        self.spreadsheet.dispatch_spreadsheet_message(
+        self.spreadsheet._dispatch_spreadsheet_message(
             # add at least one revision
             self.new_revision_data(self.spreadsheet)
         )
@@ -324,13 +324,13 @@ class SpreadsheetORMAccess(SpreadsheetTestCommon):
         })
         # can't write
         with self.assertRaises(AccessError):
-            self.spreadsheet.with_user(portal_user).dispatch_spreadsheet_message(
+            self.spreadsheet.with_user(portal_user)._dispatch_spreadsheet_message(
                 self.new_revision_data(self.spreadsheet)
             )
 
     def test_dispatch_user(self):
         with self.assertRaises(AccessError):
-            self.spreadsheet.with_user(self.user).dispatch_spreadsheet_message(
+            self.spreadsheet.with_user(self.user)._dispatch_spreadsheet_message(
                 self.new_revision_data(self.spreadsheet)
             )
 
@@ -338,7 +338,7 @@ class SpreadsheetORMAccess(SpreadsheetTestCommon):
         self._give_user_access('edit')
         commands = self.new_revision_data(self.spreadsheet)
         self.env.invalidate_all()
-        self.spreadsheet.with_user(self.user).dispatch_spreadsheet_message(commands)
+        self.spreadsheet.with_user(self.user)._dispatch_spreadsheet_message(commands)
         self.assertEqual(
             json.loads(self.spreadsheet.spreadsheet_revision_ids.commands),
             {"commands": commands["commands"], "id": self.spreadsheet.id, "type": commands["type"]},
@@ -348,13 +348,13 @@ class SpreadsheetORMAccess(SpreadsheetTestCommon):
         self._give_user_access()
         commands = self.new_revision_data(self.spreadsheet)
         with self.assertRaises(AccessError):
-            self.spreadsheet.with_user(self.user).dispatch_spreadsheet_message(
+            self.spreadsheet.with_user(self.user)._dispatch_spreadsheet_message(
                 commands
             )
 
     def test_dispatch_user_with_partner_read_doc_access_move(self):
         self._give_user_access()
         self.env.invalidate_all()
-        self.spreadsheet.with_user(self.user).dispatch_spreadsheet_message(
+        self.spreadsheet.with_user(self.user)._dispatch_spreadsheet_message(
             {"type": "CLIENT_MOVED"}
         )

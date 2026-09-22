@@ -121,8 +121,10 @@ export function hasTextColorClass(element, mode) {
 export function hasColor(element, mode) {
     const style = element.style;
     const parent = element.parentNode;
-    if (element.classList.contains("btn")) {
-        // Ignore style applied on buttons from color detection
+    // Ignore class applied on links as those are hard coded in the templates
+    // and should not be considered as user defined colors.
+    if (element.classList.contains("btn") || element.tagName === "A") {
+        // Ignore style applied on buttons from color detection.
         return false;
     }
     if (isColorGradient(style["background-image"])) {
@@ -161,16 +163,26 @@ export function hasAnyNodesColor(nodes, mode) {
     return false;
 }
 
-export function getTextColorOrClass(node) {
+export function getColorOrClass(node, mode = "color") {
     if (!node) {
         return null;
     }
-    if (node.style.color) {
-        return { type: "style", value: node.style.color };
+    const classRegex = mode === "color" ? TEXT_CLASSES_REGEX : BG_CLASSES_REGEX;
+    const colorClass = [...node.classList].find((cls) => classRegex.test(cls));
+    if (colorClass) {
+        return { type: "class", value: colorClass };
     }
-    const textColorClass = [...node.classList].find((cls) => TEXT_CLASSES_REGEX.test(cls));
-    if (textColorClass) {
-        return { type: "class", value: textColorClass };
+    if (isColorGradient(node.style["background-image"])) {
+        const isTextGradient = node.classList.contains("text-gradient");
+        if (
+            (mode === "color" && isTextGradient) ||
+            (mode === "backgroundColor" && !isTextGradient)
+        ) {
+            return { type: "gradient", value: node.style["background-image"] };
+        }
+    }
+    if (node.style[mode] && node.style[mode] !== "inherit") {
+        return { type: "style", value: node.style[mode] };
     }
     return null;
 }

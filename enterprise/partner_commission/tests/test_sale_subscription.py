@@ -11,10 +11,7 @@ from odoo import fields
 @tagged('commission_subscription', 'post_install', '-at_install')
 class TestSaleSubscription(TestCommissionsSetup):
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.env.ref('base.group_user').write({"implied_ids": [(4, cls.env.ref('sale_management.group_sale_order_template').id)]})
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_referrer_commission_plan_changed(self):
         """When the referrer's commission plan changes, its new commission plan should be set on the subscription,
@@ -86,12 +83,17 @@ class TestSaleSubscription(TestCommissionsSetup):
         """Some data should be forwarded from the subscription to the renewal's sale order."""
         self.referrer.commission_plan_id = self.gold_plan
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True),
-                    view=self.env.ref('sale_subscription.sale_subscription_primary_form_view'))
+        form = Form(
+            self.env['sale.order']
+                .with_user(self.salesman)
+                .with_context(default_subscription_state='1_draft'),
+            view=self.env.ref('sale_subscription.sale_subscription_primary_form_view')
+        )
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         # form.commission_plan_frozen = False
         form.plan_id = self.plan_month
+
         with form.order_line.new() as line:
             line.name = self.worker.name
             line.product_id = self.worker
@@ -111,7 +113,7 @@ class TestSaleSubscription(TestCommissionsSetup):
     def test_compute_commission(self):
         self.referrer.commission_plan_id = self.gold_plan
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         # We test the non recurring flow: recurring_invoice is False on the product
@@ -134,7 +136,7 @@ class TestSaleSubscription(TestCommissionsSetup):
         self.referrer.commission_plan_id = self.gold_plan
 
         # Test that it works even when the commission plan is Falsy.
-        form = Form(self.env['sale.order'].with_context(tracking_disable=True), view=self.env.ref('sale_subscription.sale_subscription_primary_form_view'))
+        form = Form(self.env['sale.order'], view=self.env.ref('sale_subscription.sale_subscription_primary_form_view'))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         form.sale_order_template_id = self.template_yearly

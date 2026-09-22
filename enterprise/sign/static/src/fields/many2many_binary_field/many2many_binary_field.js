@@ -1,8 +1,19 @@
 import { registry } from "@web/core/registry";
-import { Many2ManyBinaryField, many2ManyBinaryField } from "@web/views/fields/many2many_binary/many2many_binary_field";
+import {
+    Many2ManyBinaryField,
+    many2ManyBinaryField,
+} from "@web/views/fields/many2many_binary/many2many_binary_field";
+import { Many2XBinary } from "@web/views/fields/many2x_binary/many2x_binary";
+
+export class Many2XBinarySignRequest extends Many2XBinary {
+    static template = "sign.Many2XBinarySignRequest";
+}
 
 export class Many2ManyBinaryFieldSignRequest extends Many2ManyBinaryField {
-    static template = "sign.Many2ManyBinaryField";
+    static components = {
+        ...Many2ManyBinaryField.components,
+        Many2XBinary: Many2XBinarySignRequest,
+    };
 }
 
 export const many2ManyBinaryFieldSignRequest = {

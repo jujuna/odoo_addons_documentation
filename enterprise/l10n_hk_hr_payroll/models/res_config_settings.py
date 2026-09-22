@@ -6,17 +6,9 @@ from odoo import fields, models
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    default_l10n_hk_internet = fields.Float(
-        string="HK: Internet Subscription",
+    default_l10n_hk_internet = fields.Monetary(
+        string="Internet Allowance",
         default_model="hr.version",
-    )
-    l10n_hk_autopay = fields.Boolean(
-        related='company_id.l10n_hk_autopay',
-        string="Payroll with HSBC Autopay payment", readonly=False,
-    )
-    l10n_hk_autopay_type = fields.Selection(
-        related='company_id.l10n_hk_autopay_type', readonly=False,
-        string="Autopay Type", help="H2H Submission: Directly submit to HSBC. HSBCnet File Upload: Upload file to HSBCnet.",
     )
     l10n_hk_autopay_partner_bank_id = fields.Many2one(
         related='company_id.l10n_hk_autopay_partner_bank_id',
@@ -30,6 +22,8 @@ class ResConfigSettings(models.TransientModel):
         help='This name will be shown on the ird report.'
     )
     l10n_hk_employer_file_number = fields.Char("Employer's File Number", related='company_id.l10n_hk_employer_file_number', readonly=False)
-    l10n_hk_manulife_mpf_scheme = fields.Char("Manulife MPF Scheme", related='company_id.l10n_hk_manulife_mpf_scheme', readonly=False)
     l10n_hk_eoy_pay_month = fields.Selection(related='company_id.l10n_hk_eoy_pay_month', readonly=False)
-    l10n_hk_use_mpf_offsetting = fields.Boolean(related='company_id.l10n_hk_use_mpf_offsetting', readonly=False)
+
+    def open_mpf_scheme_list(self):
+        self.ensure_one()
+        return self.env['l10n_hk.mpf.scheme'].search([])._get_records_action(name=self.env._("MPF Schemes"))

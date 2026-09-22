@@ -1,7 +1,7 @@
+import { proxy, signal, t, useProps } from "@odoo/owl";
 import { MrpWorkorder } from "./mrp_workorder";
 import { useService } from "@web/core/utils/hooks";
 import { FileUploader } from "@web/views/fields/file_handler";
-import { useRef, useState } from "@odoo/owl";
 import { MrpWorksheetDialog } from "../dialog/mrp_worksheet_dialog";
 
 export class QualityCheck extends MrpWorkorder {
@@ -10,18 +10,18 @@ export class QualityCheck extends MrpWorkorder {
         ...MrpWorkorder.components,
         FileUploader,
     };
-    static props = {
-        ...MrpWorkorder.props,
-        registerProduction: { type: Function, optional: true },
-        qtyProducing: { type: String, optional: true },
-        isCurrent: Boolean,
-        startWorking: Function,
-    };
+
+    qualityCheckProps = useProps({
+        registerProduction: t.function().optional(),
+        isCurrent: t.boolean(),
+        startWorking: t.function(),
+    });
+
+    fileUploaderToggleRef = signal.ref();
 
     setup() {
         this.action = useService("action");
-        this.fileUploaderToggle = useRef("fileUploaderToggle");
-        this.unique = useState({ epoch: Date.now() });
+        this.unique = proxy({ epoch: Date.now() });
         this.dialog = useService("dialog");
     }
 
@@ -61,13 +61,14 @@ export class QualityCheck extends MrpWorkorder {
     get icon() {
         switch (this.type) {
             case "picture":
-                return this.passed ? "mw" : "fa fa-camera";
+                return this.passed ? "mw" : "photo_camera";
             case "instructions":
-                return this.passed ? "fa fa-undo" : "fa fa-check";
-            case "print_label":
-                return "fa fa-print";
+                return this.passed ? "undo" : "check";
+            case "print_product_label":
+            case "print_lot_label":
+                return "print";
             case "register_production":
-                return "fa fa-plus";
+                return "add";
             default:
                 return "";
         }
@@ -75,7 +76,8 @@ export class QualityCheck extends MrpWorkorder {
 
     get barcode() {
         switch (this.type) {
-            case "print_label":
+            case "print_product_label":
+            case "print_lot_label":
                 return "PRPL";
             default:
                 return "NEXT";
@@ -83,7 +85,7 @@ export class QualityCheck extends MrpWorkorder {
     }
 
     get isActive() {
-        return this.props.isCurrent;
+        return this.qualityCheckProps.isCurrent;
     }
 
     get activeClass() {
@@ -102,13 +104,11 @@ export class QualityCheck extends MrpWorkorder {
                 return lot_ids.count ? lot_ids.records[0].data.display_name : false;
             }
             if (product_tracking == "serial") {
-                const { product_qty, qty_producing } = this.props.record.data.production_id;
+                const product_qty = this.props.record.data.production_id.product_qty;
                 if (product_qty == 1) {
                     return lot_ids.count ? lot_ids.records[0].data.display_name : false;
                 }
-                return qty_producing ? this.props.qtyProducing : false;
             }
-            return this.passed ? this.props.qtyProducing : false;
         }
         return false;
     }
@@ -122,10 +122,11 @@ export class QualityCheck extends MrpWorkorder {
                 } else {
                     return this.doActionAndNext("action_next");
                 }
-            case "print_label":
+            case "print_product_label":
+            case "print_lot_label":
                 return this.doActionAndNext("action_print");
             case "picture":
-                return this.fileUploaderToggle.el.click();
+                return this.fileUploaderToggleRef().click();
             case "register_production":
                 if (
                     ["lot", "serial"].includes(this.check.product_tracking) &&
@@ -133,7 +134,7 @@ export class QualityCheck extends MrpWorkorder {
                 ) {
                     await this.props.record.load();
                 }
-                return this.props.registerProduction();
+                return this.qualityCheckProps.registerProduction();
         }
     }
 
@@ -146,7 +147,11 @@ export class QualityCheck extends MrpWorkorder {
 
     async doActionAndNext(action, stateToSet = "pass") {
         const { model, resModel, resId, data, _parentRecord } = this.props.record;
-        const result = await model.orm.call(resModel, action, [resId]);
+        const result = await model.orm.call(resModel, action, [resId], {
+            context: {
+                from_shopfloor: true,
+            },
+        });
         if ("next_check_id" in result) {
             data.quality_state = stateToSet;
             _parentRecord.data.current_quality_check_id = { id: result.next_check_id };
@@ -159,7 +164,7 @@ export class QualityCheck extends MrpWorkorder {
             }
             await this.action.doAction(result, params);
         }
-        return this.props.startWorking();
+        return this.qualityCheckProps.startWorking();
     }
 
     async showWorksheet() {
@@ -179,8 +184,8 @@ export class QualityCheck extends MrpWorkorder {
             };
         }
         this.dialog.add(MrpWorksheetDialog, {
-            worksheetText: this.check.note,
             worksheetData,
+            record: this.props.record,
         });
     }
 }

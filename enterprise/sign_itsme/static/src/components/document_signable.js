@@ -1,50 +1,31 @@
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { patch } from "@web/core/utils/patch";
-import { SignablePDFIframe } from "@sign/components/sign_request/signable_PDF_iframe";
 import { Document } from "@sign/components/sign_request/document_signable";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { ItsmeDialog } from "@sign_itsme/dialogs/itsme_dialog";
 
 
-patch(SignablePDFIframe.prototype, {
-    postRender() {
-        const res = super.postRender();
-        const errorCode = this.props.errorCode;
-        if (errorCode) {
-            const [errorMessage, title] = processErrorMessage.call(this, errorCode);
-            this.dialog.add(
-                AlertDialog,
-                {
-                    title: title || _t("Error"),
-                    body: errorMessage,
-                },
-                {
-                    onClose: () => {
-                        deleteQueryParamFromURL("error_message");
-                    },
-                }
-            );
-        }
-        return res;
-    },
-});
-
 patch(Document.prototype, {
     async getAuthDialog() {
-        if (this.authMethod === "itsme") {
-            const credits = await rpc("/itsme/has_itsme_credits");
+        if (this.authMethod === "itsme" || this.authMethod === "itsme_qes") {
+            // a qualified signature can never fall back to signing without itsme.
+            // always open the dialog and let the server enforce the credit check
+            const credits =
+                this.authMethod === "itsme_qes" || (await rpc("/itsme/has_itsme_credits"));
             if (credits) {
                 const [route, params] = await this._getRouteAndParams();
+                const props = {
+                    route,
+                    params,
+                    isQualifiedSignature: this.authMethod === "itsme_qes",
+                    onSuccess: () => {
+                        this.openThankYouDialog();
+                    },
+                };
                 return {
                     component: ItsmeDialog,
-                    props: {
-                        route,
-                        params,
-                        onSuccess: () => {
-                            this.openThankYouDialog();
-                        },
-                    },
+                    props,
                 };
             }
         }
@@ -52,17 +33,20 @@ patch(Document.prototype, {
     },
 
     getDataFromHTML() {
-        super.getDataFromHTML();
-        const { el: parentEl } = this.props.parent;
+        if (!super.getDataFromHTML()) {
+            return false;
+        }
+        const parentEl = this.props.parent();
         this.errorMessage = parentEl.querySelector("#o_sign_show_error_message")?.value;
-    },
-
-    getIframeProps(sign_document_id) {
-        const props = super.getIframeProps(sign_document_id);
-        return {
-            ...props,
-            errorMessage: this.errorMessage,
-        };
+        if (this.errorMessage) {
+            const [errorMessage, title] = processErrorMessage(this.errorMessage);
+            this.dialog.add(
+                AlertDialog,
+                { title: title || _t("Error"), body: errorMessage },
+                { onClose: () => deleteQueryParamFromURL("error_message") }
+            );
+        }
+        return true;
     },
 });
 

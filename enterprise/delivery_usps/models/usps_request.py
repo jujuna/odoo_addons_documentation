@@ -7,7 +7,7 @@ import re
 import requests
 from lxml import etree
 
-from odoo import fields, _
+from odoo import _
 
 
 # This re should match postcodes like 12345 and 12345-6789
@@ -91,7 +91,7 @@ class USPSRequest():
         else:
             quote_currency = order.currency_id
             price = quote_currency._convert(
-                total_value, currency, order.company_id, order.date_order or fields.Date.today())
+                total_value, currency, order.company_id, order.date_order)
 
         rate_detail = {
             'api': 'RateV4' if carrier.usps_delivery_nature == 'domestic' else 'IntlRateV2',
@@ -193,8 +193,7 @@ class USPSRequest():
             else:
                 quote_currency = picking.env['res.currency'].search([('name', '=', shipper_currency.name)], limit=1)
                 amount = line.product_id.lst_price * line.product_uom_qty
-                price = quote_currency._convert(
-                    amount, USD, company, order.date_order or fields.Date.today())
+                price = quote_currency._convert(amount, USD, company, order.date_order)
             weight = carrier._usps_convert_weight(line.product_id.weight * line.product_uom_qty)
             itemdetail.append(self._item_data(line, weight, price))
 

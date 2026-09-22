@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import datetime
 
-from odoo import models, fields, _
-from odoo.tools import SQL
-from odoo.tools.misc import format_date
-
 from dateutil.relativedelta import relativedelta
-from itertools import chain
+from odoo import _, fields, models
+from odoo.tools import SQL
 
 
 class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
@@ -67,28 +63,29 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
 
         # Sort line dicts by partner
         for line in lines:
-            model, model_id = report._get_model_info_from_id(line['id'])
-            if model == 'res.partner':
+            model, model_id = report._get_model_info_from_id(line.id)
+            if model == 'res.partner' and model_id:
                 partner_lines_map[model_id] = line
 
         if partner_lines_map:
-            for partner, line_dict in zip(
+            for partner, line_data in zip(
                     self.env['res.partner'].browse(partner_lines_map),
                     partner_lines_map.values()
             ):
-                line_dict['trust'] = partner.with_company(partner.company_id or self.env.company).trust
+                line_data.get_custom()['trust'] = partner.with_company(partner.company_id or self.env.company).trust
 
         return lines
 
-    def _report_custom_engine_aged_receivable(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
-        return self._aged_partner_report_custom_engine_common(options, 'asset_receivable', current_groupby, next_groupby, offset=offset, limit=limit)
+    def _report_engine_aged_receivable(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        return self._aged_partner_report_custom_engine_common(options, 'asset_receivable', current_groupby, formulas_dict)
 
-    def _report_custom_engine_aged_payable(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
-        return self._aged_partner_report_custom_engine_common(options, 'liability_payable', current_groupby, next_groupby, offset=offset, limit=limit)
+    def _report_engine_aged_payable(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        return self._aged_partner_report_custom_engine_common(options, 'liability_payable', current_groupby, formulas_dict)
 
-    def _aged_partner_report_custom_engine_common(self, options, internal_type, current_groupby, next_groupby, offset=0, limit=None):
+    def _aged_partner_report_custom_engine_common(self, options, internal_type, current_groupby, formulas_dict):
         report = self.env['account.report'].browse(options['report_id'])
-        report._check_groupby_fields((next_groupby.split(',') if next_groupby else []) + ([current_groupby] if current_groupby else []))
+        if current_groupby:
+            report._check_groupby_fields([current_groupby])
 
         def minus_days(date_obj, days):
             return fields.Date.to_string(date_obj - relativedelta(days=days))
@@ -98,7 +95,8 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
         interval = options['aging_interval']
         periods = [(False, fields.Date.to_string(date_to))]
         # Since we added the first period in the list we have to do one less iteration
-        nb_periods = len([column for column in options['columns'] if column['expression_label'].startswith('period')]) - 1
+        nb_column_groups = len(options['column_groups'])
+        nb_periods = len([column for column in options['columns'] if column['expression_label'].startswith('period')]) // nb_column_groups - 1
         for i in range(nb_periods):
             start_date = minus_days(date_to, (interval * i) + 1)
             # The last element of the list will have False for the end date
@@ -144,21 +142,23 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
             return rslt
 
         # Build period table
-        period_table_format = ('(VALUES %s)' % ','.join("(%s, %s, %s)" for period in periods))
-        params = list(chain.from_iterable(
-            (period[0] or None, period[1] or None, i)
-            for i, period in enumerate(periods)
-        ))
-        period_table = SQL(period_table_format, *params)
+        period_table = SQL('(VALUES %s)', SQL(',').join(
+            SQL("(%s, %s, %s)", from_ or None, to or None, i)
+            for i, (from_, to) in enumerate(periods))
+        )
 
         # Build query
+        if not report._get_option_recon_date(options):
+            # Ensure the residual is computed at the report date_to
+            options['recon_date'] = {
+                'date_to': options['date']['date_to'],
+            }
         query = report._get_report_query(options, 'strict_range', domain=[('account_id.account_type', '=', internal_type)])
-        account_alias = query.left_join(lhs_alias='account_move_line', lhs_column='account_id', rhs_table='account_account', rhs_column='id', link='account_id')
-        account_code = self.env['account.account']._field_to_sql(account_alias, 'code', query)
+        account_code = query.table._sudo().account_id.code
 
         always_present_groupby = SQL("period_table.period_index")
         if current_groupby:
-            groupby_field_sql = self.env['account.move.line']._field_to_sql("account_move_line", current_groupby, query)
+            groupby_field_sql = query.table[current_groupby]
             select_from_groupby = SQL("%s AS grouping_key,", groupby_field_sql)
             groupby_clause = SQL("%s, %s", groupby_field_sql, always_present_groupby)
         else:
@@ -174,28 +174,21 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
                 period_index=i,
                 multiplicator=multiplicator,
                 column_name=SQL.identifier(f"period{i}"),
-                balance_select=report._currency_table_apply_rate(SQL(
-                    "account_move_line.balance - COALESCE(part_debit.amount, 0) + COALESCE(part_credit.amount, 0)"
-                )),
+                balance_select=SQL("%s * %s", query.table.residual_at_date, query.table.consolidation_rate),
             )
             for i in range(len(periods))
         )
 
-        tail_query = report._get_engine_query_tail(offset, limit)
         query = SQL(
             """
             WITH period_table(date_start, date_stop, period_index) AS (%(period_table)s)
 
             SELECT
                 %(select_from_groupby)s
-                %(multiplicator)s * (
-                    SUM(account_move_line.amount_currency)
-                    - COALESCE(SUM(part_debit.debit_amount_currency), 0)
-                    + COALESCE(SUM(part_credit.credit_amount_currency), 0)
-                ) AS amount_currency,
+                %(multiplicator)s * SUM(%(residual_currency_at_date)s) AS amount_currency,
                 ARRAY_AGG(DISTINCT account_move_line.partner_id) AS partner_id,
                 ARRAY_AGG(account_move_line.payment_id) AS payment_id,
-                ARRAY_AGG(DISTINCT account_move_line.invoice_date) AS invoice_date,
+                ARRAY_AGG(DISTINCT COALESCE(account_move_line.invoice_date, account_move_line.date)) AS invoice_date,
                 ARRAY_AGG(DISTINCT COALESCE(account_move_line.%(aging_date_field)s, account_move_line.date)) AS report_date,
                 ARRAY_AGG(DISTINCT %(account_code)s) AS account_name,
                 ARRAY_AGG(DISTINCT COALESCE(account_move_line.%(aging_date_field)s, account_move_line.date)) AS due_date,
@@ -207,28 +200,6 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
             FROM %(table_references)s
 
             JOIN account_journal journal ON journal.id = account_move_line.journal_id
-            %(currency_table_join)s
-
-            LEFT JOIN LATERAL (
-                SELECT
-                    SUM(part.amount) AS amount,
-                    SUM(part.debit_amount_currency) AS debit_amount_currency,
-                    part.debit_move_id
-                FROM account_partial_reconcile part
-                WHERE part.max_date <= %(date_to)s AND part.debit_move_id = account_move_line.id
-                GROUP BY part.debit_move_id
-            ) part_debit ON TRUE
-
-            LEFT JOIN LATERAL (
-                SELECT
-                    SUM(part.amount) AS amount,
-                    SUM(part.credit_amount_currency) AS credit_amount_currency,
-                    part.credit_move_id
-                FROM account_partial_reconcile part
-                WHERE part.max_date <= %(date_to)s AND part.credit_move_id = account_move_line.id
-                GROUP BY part.credit_move_id
-            ) part_credit ON TRUE
-
             JOIN period_table ON
                 (
                     period_table.date_start IS NULL
@@ -245,35 +216,28 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
             GROUP BY %(groupby_clause)s
 
             HAVING
-                ROUND(SUM(%(having_debit)s), %(currency_precision)s) != 0
-                OR ROUND(SUM(%(having_credit)s), %(currency_precision)s) != 0
+                ROUND(SUM(%(residual_at_date)s), %(currency_precision)s) != 0
 
             ORDER BY %(groupby_clause)s
-
-            %(tail_query)s
             """,
             account_code=account_code,
             period_table=period_table,
             select_from_groupby=select_from_groupby,
+            residual_at_date=query.table.residual_at_date,
+            residual_currency_at_date=query.table.residual_currency_at_date,
             select_period_query=select_period_query,
             multiplicator=multiplicator,
             aging_date_field=aging_date_field,
             table_references=query.from_clause,
-            currency_table_join=report._currency_table_aml_join(options),
-            date_to=date_to,
             search_condition=query.where_clause,
             groupby_clause=groupby_clause,
-            having_debit=report._currency_table_apply_rate(SQL("CASE WHEN account_move_line.balance > 0  THEN account_move_line.balance else 0 END - COALESCE(part_debit.amount, 0)")),
-            having_credit=report._currency_table_apply_rate(SQL("CASE WHEN account_move_line.balance < 0  THEN -account_move_line.balance else 0 END - COALESCE(part_credit.amount, 0)")),
             currency_precision=self.env.company.currency_id.decimal_places,
-            tail_query=tail_query,
         )
 
-        self.env.cr.execute(query)
-        query_res_lines = self.env.cr.dictfetchall()
+        query_res_lines = self.env.execute_query_dict(query)
 
         if not current_groupby:
-            return build_result_dict(report, query_res_lines)
+            return {next(iter(formulas_dict.values())): build_result_dict(report, query_res_lines)}
         else:
             rslt = []
 
@@ -285,7 +249,7 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
             for grouping_key, query_res_lines in all_res_per_grouping_key.items():
                 rslt.append((grouping_key, build_result_dict(report, query_res_lines)))
 
-            return rslt
+            return {next(iter(formulas_dict.values())): rslt}
 
     def open_journal_items(self, options, params):
         params['view_ref'] = 'account.view_move_line_tree_grouped_partner'
@@ -295,11 +259,6 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
         action.get('context', {}).update({'search_default_group_by_account': 0, 'search_default_group_by_partner': 1})
         return action
 
-    def open_customer_statement(self, options, params):
-        report = self.env['account.report'].browse(options['report_id'])
-        record_model, record_id = report._get_model_info_from_id(params.get('line_id'))
-        return self.env[record_model].browse(record_id).open_customer_statement()
-
     def _common_custom_unfold_all_batch_data_generator(self, internal_type, report, options, lines_to_expand_by_function):
         rslt = {} # In the form {full_sub_groupby_key: all_column_group_expression_totals for this groupby computation}
         report_periods = 6 # The report has 6 periods
@@ -307,22 +266,24 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
         for expand_function_name, lines_to_expand in lines_to_expand_by_function.items():
             for line_to_expand in lines_to_expand: # In standard, this loop will execute only once
                 if expand_function_name == '_report_expand_unfoldable_line_with_groupby':
-                    report_line_id = report._get_res_id_from_line_id(line_to_expand['id'], 'account.report.line')
+                    report_line_id = report._get_res_id_from_line_id(line_to_expand.id, 'account.report.line')
                     expressions_to_evaluate = report.line_ids.expression_ids.filtered(lambda x: x.report_line_id.id == report_line_id and x.engine == 'custom')
 
                     if not expressions_to_evaluate:
                         continue
 
-                    for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+                    formulas_dict = {expressions_to_evaluate[0].formula: expressions_to_evaluate}  # We assume they all share the same custom engine
+                    for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
                         # Get all aml results by partner
                         aml_data_by_partner = {}
-                        for aml_id, aml_result in self._aged_partner_report_custom_engine_common(column_group_options, internal_type, 'id', None):
-                            aml_result['aml_id'] = aml_id
-                            aml_data_by_partner.setdefault(aml_result['partner_id'], []).append(aml_result)
+                        for formula_result in self._aged_partner_report_custom_engine_common(column_group_options, internal_type, 'id', formulas_dict).values():
+                            for aml_id, aml_result in formula_result:
+                                aml_result['aml_id'] = aml_id
+                                aml_data_by_partner.setdefault(aml_result['partner_id'], []).append(aml_result)
 
                         # Iterate on results by partner to generate the content of the column group
                         partner_expression_totals = rslt.setdefault(f"[{report_line_id}]=>partner_id", {})\
-                                                        .setdefault(column_group_key, {expression: {'value': [], 'sublines_info': set()} for expression in expressions_to_evaluate})
+                                                        .setdefault(column_group_index, {expression: {'value': [], 'sublines_info': set()} for expression in expressions_to_evaluate})
                         for partner_id, aml_data_list in aml_data_by_partner.items():
                             partner_values = self._prepare_partner_values()
                             for i in range(report_periods):
@@ -330,7 +291,7 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
 
                             # Build expression totals under the right key
                             partner_aml_expression_totals = rslt.setdefault(f"[{report_line_id}]partner_id:{partner_id}=>id", {})\
-                                                                .setdefault(column_group_key, {expression: {'value': [], 'sublines_info': set()} for expression in expressions_to_evaluate})
+                                                                .setdefault(column_group_index, {expression: {'value': [], 'sublines_info': set()} for expression in expressions_to_evaluate})
                             for aml_data in aml_data_list:
                                 for i in range(report_periods):
                                     period_value = aml_data[f'period{i}']
@@ -376,12 +337,18 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
         if options:
             domain = [
                 ('account_id.reconcile', '=', True),
+                ('residual_at_date', '!=', 0),
                 ('journal_id.type', '!=', journal_type_to_exclude.get(journal_type)),
                 *self._build_domain_from_period(options, params['expression_label']),
                 *report._get_options_domain(options, 'from_beginning'),
                 *report._get_audit_line_groupby_domain(params['calling_line_dict_id']),
             ]
             action['domain'] = domain
+            action['context'] = {
+                'recon_limit': options['date']['date_to'],
+            }
+            if recon_date := report._get_option_recon_date(options):
+                action['context']['search_default_open_on'] = recon_date.strftime('%Y-%m-%d')
         return action
 
     def _build_domain_from_period(self, options, period):
@@ -412,6 +379,23 @@ class AccountAgedPartnerBalanceReportHandler(models.AbstractModel):
             domain = []
         return domain
 
+    def open_followup_report(self, options, params):
+        partner_id = self.env['account.report']._get_res_id_from_line_id(params['line_id'], 'res.partner')
+        followup_report = self.env.ref('account_reports.followup_report')
+        followup_options = followup_report.get_options(options)
+
+        followup_options['unfold_all'] = True
+        if partner_id:
+            followup_options['partner_ids'] = [partner_id]
+
+        action_vals = self.env['ir.actions.actions']._for_xml_id('account_reports.action_account_report_followup')
+        action_vals['params'] = {
+            'options': followup_options,
+            'ignore_session': True,
+        }
+
+        return action_vals
+
 
 class AccountAgedPayableReportHandler(models.AbstractModel):
     _name = 'account.aged.payable.report.handler'
@@ -431,12 +415,12 @@ class AccountAgedPayableReportHandler(models.AbstractModel):
     def _custom_unfold_all_batch_data_generator(self, report, options, lines_to_expand_by_function):
         # We only optimize the unfold all if the groupby value of the report has not been customized. Else, we'll just run the full computation
         aged_payable_line = self.env.ref('account_reports.aged_payable_line')
-        if aged_payable_line._get_groupby(options).replace(' ', '') == aged_payable_line.groupby.replace(' ', ''):
+        if aged_payable_line._get_groupby(options).replace(' ', '') == (aged_payable_line.groupby or report.groupby).replace(' ', ''):
             return self._common_custom_unfold_all_batch_data_generator('liability_payable', report, options, lines_to_expand_by_function)
         return {}
 
     def action_audit_cell(self, options, params):
-        return super().aged_partner_balance_audit(options, params, 'purchase')
+        return self.aged_partner_balance_audit(options, params, 'purchase')
 
 
 class AccountAgedReceivableReportHandler(models.AbstractModel):
@@ -457,9 +441,9 @@ class AccountAgedReceivableReportHandler(models.AbstractModel):
     def _custom_unfold_all_batch_data_generator(self, report, options, lines_to_expand_by_function):
         # We only optimize the unfold all if the groupby value of the report has not been customized. Else, we'll just run the full computation
         aged_receivable_line = self.env.ref('account_reports.aged_receivable_line')
-        if aged_receivable_line._get_groupby(options).replace(' ', '') == aged_receivable_line.groupby.replace(' ', ''):
+        if aged_receivable_line._get_groupby(options).replace(' ', '') == (aged_receivable_line.groupby or report.groupby).replace(' ', ''):
             return self._common_custom_unfold_all_batch_data_generator('asset_receivable', report, options, lines_to_expand_by_function)
         return {}
 
     def action_audit_cell(self, options, params):
-        return super().aged_partner_balance_audit(options, params, 'sale')
+        return self.aged_partner_balance_audit(options, params, 'sale')

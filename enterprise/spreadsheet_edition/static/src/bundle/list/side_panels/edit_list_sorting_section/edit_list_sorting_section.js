@@ -1,50 +1,26 @@
-import { Component, useRef } from "@odoo/owl";
+import { Component, signal, t, useProps } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { CheckBox } from "@web/core/checkbox/checkbox";
-import { useSortable } from "@web/core/utils/sortable_owl";
-import { components } from "@odoo/o-spreadsheet";
-const { AddDimensionButton, Section } = components;
+import { localeCompare } from "@web/core/l10n/utils";
+import { components, helpers, hooks } from "@odoo/o-spreadsheet";
+import { _t } from "@web/core/l10n/translation";
+
+const { AddDimensionButton, Section, Select } = components;
+const { hasInteractiveElementInEventTree, getBoundingRectWithMargins } = helpers;
 
 export class EditListSortingSection extends Component {
     static template = "spreadsheet_edition.EditListSortingSection";
-    static components = { Dialog, CheckBox, AddDimensionButton, Section };
-    static props = {
-        onUpdateSorting: Function,
-        orderBy: Array,
-        fields: Object,
-        resModel: String,
-    };
+    static components = { Dialog, CheckBox, AddDimensionButton, Section, Select };
 
-    setup() {
-        this.mainRef = useRef("main");
-        useSortable({
-            enable: true,
-            ref: this.mainRef,
-            elements: ".o_draggable",
-            cursor: "move",
-            delay: 100,
-            tolerance: 10,
-            ignore: "select",
-            onDrop: (params) => this._onSortDrop(params),
-        });
-    }
+    props = useProps({
+        onUpdateSorting: t.function(),
+        orderBy: t.array(),
+        fields: t.object(),
+        resModel: t.string(),
+    });
 
-    /**
-     * @param {Object} params
-     * @param {HTMLElement} params.element
-     * @param {HTMLElement} params.previous
-     */
-    _onSortDrop({ element, previous }) {
-        const orderByArray = [...this.props.orderBy];
-        const elementIndex = orderByArray.findIndex((order) => order.name === element.dataset.id);
-        const orderBy = orderByArray[elementIndex];
-        orderByArray.splice(elementIndex, 1);
-        const newIndex = previous
-            ? orderByArray.findIndex((order) => order.name === previous.dataset.id) + 1
-            : 0;
-        orderByArray.splice(newIndex, 0, orderBy);
-        this.updateSorting(orderByArray);
-    }
+    mainRef = signal.ref();
+    dnd = hooks.useDragAndDropListItems();
 
     updateSorting(orderBy) {
         this.props.onUpdateSorting(orderBy);
@@ -57,7 +33,7 @@ export class EditListSortingSection extends Component {
     getAllowedFields() {
         return Object.values(this.props.fields)
             .filter((field) => this.isFieldAllowed(field))
-            .sort((a, b) => a.string.localeCompare(b.string));
+            .sort((a, b) => localeCompare(a.string, b.string));
     }
 
     onAddSortingRule(fieldName) {
@@ -78,5 +54,44 @@ export class EditListSortingSection extends Component {
             asc: !orderByArray[ruleIndex].asc,
         };
         this.updateSorting(orderByArray);
+    }
+
+    getSortingRuleElementsRects() {
+        return Array.from(this.mainRef().children).map((el) => getBoundingRectWithMargins(el));
+    }
+
+    startDragAndDrop(rule, event) {
+        if (event.button !== 0 || hasInteractiveElementInEventTree(event)) {
+            return;
+        }
+        const rects = this.getSortingRuleElementsRects();
+        const items = this.props.orderBy.map((r, index) => ({
+            id: r.name,
+            size: rects[index].height,
+            position: rects[index].y,
+        }));
+        this.dnd.start("vertical", {
+            draggedItemId: rule.name,
+            initialMousePosition: event.clientY,
+            items,
+            scrollableContainerEl: this.mainRef().closest(".o-sidePanelBody") || this.mainRef(),
+            onDragEnd: (ruleName, finalIndex) => {
+                const orderByArray = [...this.props.orderBy];
+                const originalIndex = orderByArray.findIndex((r) => r.name === ruleName);
+                if (originalIndex === finalIndex) {
+                    return;
+                }
+                const [movedRule] = orderByArray.splice(originalIndex, 1);
+                orderByArray.splice(finalIndex, 0, movedRule);
+                this.updateSorting(orderByArray);
+            },
+        });
+    }
+
+    get sortingOptions() {
+        return [
+            { value: "true", label: _t("Ascending") },
+            { value: "false", label: _t("Descending") },
+        ];
     }
 }

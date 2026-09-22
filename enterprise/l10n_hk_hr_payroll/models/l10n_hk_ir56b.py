@@ -1,13 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 from collections import defaultdict
+from datetime import date
 
-from lxml.html import etree
+from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
-from odoo.fields import Command
+from odoo.fields import Domain
 from odoo.tools import format_date
 
 
@@ -17,56 +17,30 @@ class L10n_HkIr56b(models.Model):
     _description = 'IR56B Sheet'
     _order = 'start_period'
 
-    type_of_form = fields.Selection(selection_add=[('S', "Supplementary")], ondelete={'S': 'cascade'})
+    # ------------------
+    # Fields declaration
+    # ------------------
 
-    @api.depends('xml_file')
-    def _compute_validation_state(self):
-        annual_xsd_schema_file_path = self._get_xml_resource('ir56b_annual.xsd')
-        extra_xsd_schema_file_path = self._get_xml_resource('ir56b_additional_replacement_supplementary.xsd')
+    year_of_employer_return = fields.Char("Year of Employer's Return",
+                                compute="_compute_year_of_employer_return", store=True, readonly=False)
 
-        annual_xsd_root = etree.parse(annual_xsd_schema_file_path)
-        extra_xsd_root = etree.parse(extra_xsd_schema_file_path)
-
-        annual_schema = etree.XMLSchema(annual_xsd_root)
-        extra_schema = etree.XMLSchema(extra_xsd_root)
-
-        no_xml_file_records = self.filtered(lambda record: not record.xml_file)
-        no_xml_file_records.update({
-            'xml_validation_state': 'normal',
-            'error_message': False,
-        })
-        for record in self - no_xml_file_records:
-            xml_root = etree.fromstring(base64.b64decode(record.xml_file))
-            schema = annual_schema if record.type_of_form == 'O' else extra_schema
-            try:
-                schema.assertValid(xml_root)
-                record.xml_validation_state = 'done'
-            except etree.DocumentInvalid as err:
-                record.xml_validation_state = 'invalid'
-                record.error_message = str(err)
-
-    def action_generate_declarations(self):
+    @api.depends('submission_date')
+    def _compute_year_of_employer_return(self):
         for sheet in self:
-            all_payslips = self.env['hr.payslip'].search([
-                ('state', 'in', ['validated', 'paid']),
-                ('company_id', '=', sheet.company_id.id),
-                ('date_from', '>=', sheet.start_period),
-                ('date_to', '<=', sheet.end_period),
-            ])
-            valid_employees = all_payslips.employee_id.filtered(lambda e: e.is_in_contract)
+            sheet.year_of_employer_return = str(sheet.submission_date.year) if sheet.submission_date else str(date.today().year)
 
-            line_item_values = []
-            # Due to the usage of Many2oneReference, we cannot rely on Command.Clear to unlink the values.
-            sheet.line_ids.unlink()
-            for employee in valid_employees:
-                line_item_values.append(Command.create({
-                    'employee_id': employee.id,
-                    'res_model': 'l10n_hk.ir56b',
-                    'res_id': sheet.id,
-                }))
-            sheet.line_ids = line_item_values
+    @api.depends('year_of_employer_return', 'start_month', 'end_month')
+    def _compute_period(self):
+        for sheet in self:
+            sheet.start_period = date(int(sheet.year_of_employer_return) - 1, int(sheet.start_month), 1)
+            sheet.end_period = date(int(sheet.year_of_employer_return), int(sheet.end_month), 1) + relativedelta(day=31)
 
-        return super().action_generate_declarations()
+    def _compute_separate_original_from_adjustments(self):
+        self.separate_original_from_adjustments = True
+
+    # --------------------------------
+    # Compute, inverse, search methods
+    # --------------------------------
 
     @api.depends('start_period', 'end_period')
     def _compute_display_name(self):
@@ -80,6 +54,41 @@ class L10n_HkIr56b(models.Model):
                 )
             else:
                 sheet.display_name = sheet.env._("IR56B Sheet")
+
+    # ----------------
+    # Business methods
+    # ----------------
+
+    def _get_report_version_domain(self):
+        """
+        Domain used to filter the employees that should appear in the report.
+        This should pick all employees eligible for declarations in the report; a separate check will be done to remove
+        those that were already declared in the same period.
+        """
+        self.ensure_one()
+        relevant_payslips = self.env['hr.payslip'].search_read(
+            domain=[
+                ("state", "in", ["validated", "paid"]),
+                ("company_id", "=", self.company_id.id),
+                ("date_to", ">=", self.start_period),
+                ("date_to", "<=", self.end_period),
+                ("version_id.employee_type_id", "not in", [
+                    self.env.ref("l10n_hk_hr_payroll.l10n_hk_contract_type_non_employee").id,
+                    self.env.ref("l10n_hk_hr_payroll.l10n_hk_contract_type_contractor").id,
+                ]),
+            ],
+            fields=['version_id'],
+            order='id',
+        )
+        return Domain([
+            ('company_id', '=', self.company_id.id),
+            ('contract_date_start', '!=', False),
+            ('contract_date_start', '<=', self.end_period),
+            '|',
+            ('contract_date_end', '=', False),
+            ('contract_date_end', '>', self.end_period),
+            ('id', 'in', {payslip['version_id'][0] for payslip in relevant_payslips}),
+        ])
 
     def _get_rendering_data(self, employees):
         self.ensure_one()
@@ -98,118 +107,98 @@ class L10n_HkIr56b(models.Model):
         all_payslips = payslip_info['all_payslips']
 
         employee_payslips = defaultdict(lambda: self.env['hr.payslip'])
-        for payslip in all_payslips:
+        for payslip in all_payslips.sorted('employee_id'):
             employee_payslips[payslip.employee_id] |= payslip
 
-        line_codes = ['BASIC', 'COMMISSION', 'REFERRAL_FEE', 'END_OF_YEAR_PAYMENT', 'BACKPAY', 'ALW.INT', 'HRA', 'MPF_GROSS', 'EEMC', 'ERMC', 'EEVC', 'ERVC']
-        all_line_values = all_payslips._get_line_values(line_codes, vals_list=['total', 'quantity'])
+        all_lines_values = all_payslips._get_line_values(set(all_payslips.line_ids.mapped('code')), compute_sum=True)
 
-        sequence = 0
+        employee_declarations = self.line_ids.grouped('employee_id')
         employees_data = []
-        for employee in employee_payslips:
+        for sequence, employee in enumerate(employee_payslips, start=1):
             payslips = employee_payslips[employee]
-            sequence += 1
-
             mapped_total = {
-                code: sum(all_line_values[code][p.id]['total'] for p in payslips)
-                for code in line_codes}
+                code: sum(all_lines_values[code][p.id]['total'] for p in payslips)
+                for code in all_lines_values
+            }
 
             start_date = self.start_period if self.start_period > employee._get_first_version_date() else employee._get_first_version_date()
+            _, categories_totals = payslips._l10n_hk_aggregate_totals(all_lines_values)
 
-            rental_ids = employee.l10n_hk_rental_ids.filtered_domain([
-                ('state', 'in', ['open', 'close']),
-                ('date_start', '<=', self.end_period),
-                '|', ('date_end', '>', start_date), ('date_end', '=', False),
-            ]).sorted('date_start')
-
-            sheet_values = {
+            employees_data.append({
                 **self._get_employee_data(employee),
                 **self._get_employee_spouse_data(employee),
+                **self._get_employee_rental_data(employee, payslips, all_lines_values),
+                **self._get_employee_rap_data(payslips, all_lines_values),
                 'date_from': self.start_period,
                 'date_to': self.end_period,
                 'SheetNo': sequence,
-                'TypeOfForm': self.type_of_form,
-                'RTN_ASS_YR': self.end_year,
+                'TypeOfForm': employee_declarations.get(employee).l10n_hk_hr_payroll_type_of_form,
+                'RTN_ASS_YR': self.year_of_employer_return,
                 'StartDateOfEmp': start_date,
                 'EndDateOfEmp': self.end_period,
-                'AmtOfSalary': int(mapped_total['BASIC']),
-                'AmtOfCommFee': int(mapped_total['COMMISSION']) + int(mapped_total['REFERRAL_FEE']),
-                'AmtOfBonus': int(mapped_total['END_OF_YEAR_PAYMENT']),
-                'AmtOfBpEtc': int(mapped_total['BACKPAY']),
-                'NatureOtherRAP1': 'Internet Allowance' if int(mapped_total['ALW.INT']) else '',
-                'AmtOfOtherRAP1': int(mapped_total['ALW.INT']),
-                'TotalIncome': int(mapped_total['MPF_GROSS']),
-                'PlaceOfResInd': int(bool(rental_ids)),
-                'AddrOfPlace1': '',
-                'NatureOfPlace1': '',
-                'PerOfPlace1': '',
-                'RentPaidEe1': 0,
-                'RentRefund1': 0,
-                'AddrOfPlace2': '',
-                'NatureOfPlace2': '',
-                'PerOfPlace2': '',
-                'RentPaidEe2': 0,
-                'RentRefund2': 0,
-                'AmtOfEEMC': int(mapped_total['EEMC']),
-                'AmtOfERMC': int(mapped_total['ERMC']),
-                'AmtOfEEVC': int(mapped_total['EEVC']),
-                'AmtOfERVC': int(mapped_total['ERVC']),
-            }
-
-            for count, rental in enumerate(rental_ids):
-                payslips_rental = payslips.filtered_domain([
-                    ('date_from', '>=', rental.date_start),
-                    ('date_to', '<=', rental.date_end or self.end_period),
-                ])
-                date_start_rental = rental.date_start if rental.date_start > start_date else start_date
-                date_end_rental = rental.date_end or self.end_period
-
-                date_start_rental_str = date_start_rental.strftime('%Y%m%d') if date_start_rental else ''
-                date_end_rental_str = date_end_rental.strftime('%Y%m%d') if date_end_rental else ''
-                period_rental_str = '{} - {}'.format(date_start_rental_str, date_end_rental_str)
-
-                amount_rental = sum(all_line_values['HRA'][p.id]['total'] for p in payslips_rental)
-
-                sheet_values.update({
-                    'AddrOfPlace%s' % (count + 1): rental.address,
-                    'NatureOfPlace%s' % (count + 1): rental.nature,
-                    'PerOfPlace%s' % (count + 1): period_rental_str,
-                    'RentPaidEe%s' % (count + 1): int(amount_rental),
-                    'RentRefund%s' % (count + 1): int(amount_rental),
-                })
-
-            employees_data.append(sheet_values)
+                'AmtOfSalary': self._format_ird_amount(categories_totals['HK_BASIC']),
+                'AmtOfLeavePay': self._format_ird_amount(categories_totals['LEAVE_PAY']),
+                'AmtOfDirectorFee': self._format_ird_amount(categories_totals['DIRECTOR_FEE']),
+                'AmtOfBpEtc': self._format_ird_amount(categories_totals['BACKPAY'] + categories_totals['PILON']),
+                'AmtOfPayRetire': self._format_ird_amount(categories_totals['RETIREMENT']),
+                'AmtOfPension': self._format_ird_amount(categories_totals['PENSION']),
+                'AmtPaidOverseaCo': self._format_ird_amount(categories_totals['OVERSEAS_INCOME']),
+                'AmtOfCommFee': self._format_ird_amount(categories_totals['COMMISSION']),
+                'AmtOfBonus': self._format_ird_amount(categories_totals['BONUS']),
+                'AmtOfSalTaxPaid': self._format_ird_amount(categories_totals['TAX_PAID']),
+                'AmtOfEduBen': self._format_ird_amount(categories_totals['EDUCATION']),
+                'AmtOfGainShareOption': self._format_ird_amount(categories_totals['SHARE_OPTION']),
+                'TotalIncome': self._format_ird_amount(categories_totals['GROSS'] - mapped_total.get('HRA', 0)),
+                'AmtOfEEMC': self._format_ird_amount(mapped_total.get('EEMC', 0)),
+                'AmtOfERMC': self._format_ird_amount(mapped_total.get('ERMC', 0)),
+                'AmtOfEEVC': self._format_ird_amount(mapped_total.get('EEVC', 0)),
+                'AmtOfERVC': self._format_ird_amount(mapped_total.get('ERVC', 0)),
+            })
 
         sheets_count = len(employees_data)
 
         total_data = {
             'NoRecordBatch': '{:05}'.format(sheets_count),
-            'TotIncomeBatch': int(sum(all_line_values['MPF_GROSS'][p.id]['total'] for p in all_payslips)),
+            'TotIncomeBatch': self._format_ird_amount(sum(ed['TotalIncome'] for ed in employees_data)),
         }
 
         return {'data': report_info, 'employees_data': employees_data, 'total_data': total_data}
 
-    def action_generate_xml(self):
+    # XML export - for government submission
+
+    def _get_xml_report_xsd_schemas(self, type_of_form):
         self.ensure_one()
-        self.xml_filename = f'IR56B_-_{self.start_year}.xml'
-        data = self._get_rendering_data(self.line_ids.employee_id)
-        if 'error' in data:
-            raise UserError(data['error'])
-        xml_str = self.env['ir.qweb']._render('l10n_hk_hr_payroll.ir56b_xml_report', data)
+        return {
+            'O': self._get_xml_resource('ir56b_annual.xsd'),
+            'ARS': self._get_xml_resource('ir56b_additional_replacement_supplementary.xsd'),
+        }.get(type_of_form)
 
-        # Prettify xml string
-        root = etree.fromstring(xml_str, parser=etree.XMLParser(remove_blank_text=True))
-        xml_formatted_str = etree.tostring(root, pretty_print=True, encoding='utf-8', xml_declaration=True, standalone=True)
+    def _get_xml_report_filename(self, file_number=False):
+        """
+        Returns the IR56B report filename.
+        In case of the report generating multiple files, we will append a file number to the name.
+        """
+        self.ensure_one()
+        company_name = self.company_id.name.replace(' ', '_')
+        if file_number:
+            xml_filename = f'{company_name}_IR56B_{self.year_of_employer_return}_{self.type_of_form}_{file_number}.xml'
+        else:
+            xml_filename = f'{company_name}_IR56B_{self.year_of_employer_return}_{self.type_of_form}.xml'
+        return xml_filename
 
-        self.xml_file = base64.encodebytes(xml_formatted_str)
-        self.state = 'waiting'
+    def _get_xml_report_template(self):
+        self.ensure_one()
+        return 'l10n_hk_hr_payroll.ir56b_xml_report'
+
+    # PDF export - for employee information
 
     def _get_pdf_report(self):
         return self.env.ref('l10n_hk_hr_payroll.action_report_employee_ir56b')
 
     def _get_pdf_filename(self, employee):
         self.ensure_one()
-        return self.env._('%(employee_name)s_-_IR56B_-_%(start_year)s', employee_name=employee.name, start_year=self.start_year)
+        employee_name = employee.name.replace(' ', '_')
+        return self.env._('%(employee_name)s_IR56B_%(start_year)s', employee_name=employee_name, start_year=self.start_year)
 
     def _post_process_rendering_data_pdf(self, rendering_data):
         result = {}

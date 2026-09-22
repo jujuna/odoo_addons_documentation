@@ -276,7 +276,7 @@
                                         <field name="label">cross_report</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">REG_RESULTADO_LIQUIDO_DO_PERIODO.balance</field>
-                                        <field name="subformula">cross_report(l10n_pt_reports.account_financial_report_l10n_pt_ddr)</field>
+                                        <field name="subformula">cross_report(l10n_pt_reports.account_financial_report_l10n_pt_ddr, force_date_scope)</field>
                                         <field name="date_scope">to_beginning_of_fiscalyear</field>
                                     </record>
                                     <record id="account_financial_report_line_pt_balanco_capital_proprio_resultados_transitados_accounts" model="account.report.expression">
@@ -314,7 +314,7 @@
                                         <field name="label">balance</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">REG_RESULTADO_LIQUIDO_DO_PERIODO.balance</field>
-                                        <field name="subformula">cross_report(l10n_pt_reports.account_financial_report_l10n_pt_ddr)</field>
+                                        <field name="subformula">cross_report(l10n_pt_reports.account_financial_report_l10n_pt_ddr, force_date_scope)</field>
                                         <field name="date_scope">from_fiscalyear</field>
                                     </record>
                                 </field>

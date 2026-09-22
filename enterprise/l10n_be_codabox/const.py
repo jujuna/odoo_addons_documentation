@@ -32,4 +32,4 @@ def get_error_msg(error):
 
 
 def get_iap_endpoint(env):
-    return env["ir.config_parameter"].sudo().get_param("l10n_be_codabox.iap_endpoint", DEFAULT_IAP_ENDPOINT).strip()
+    return (env["ir.config_parameter"].sudo().get_str("l10n_be_codabox.iap_endpoint") or DEFAULT_IAP_ENDPOINT).strip()

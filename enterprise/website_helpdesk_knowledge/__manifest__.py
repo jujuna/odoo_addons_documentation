@@ -1,9 +1,7 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Helpdesk Knowledge',
-    'version': '1.0',
     'category': 'Website/Website',
     'summary': 'Helpdesk integration with knowledge',
     'depends': [
@@ -17,6 +15,9 @@ Helpdesk integration with knowledge
         'views/helpdesk_templates.xml',
         'views/helpdesk_views.xml',
         'data/knowledge_data.xml',
+    ],
+    'demo': [
+        'data/website_helpdesk_knowledge_demo.xml',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',

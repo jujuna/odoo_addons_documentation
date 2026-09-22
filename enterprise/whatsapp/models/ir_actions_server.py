@@ -13,7 +13,7 @@ class IrActionsServer(models.Model):
     ], ondelete={'whatsapp': 'cascade'})
     # WhatsApp
     wa_template_id = fields.Many2one(
-        'whatsapp.template', 'WhatsApp Template',
+        'whatsapp.template', 'Template',
         compute='_compute_wa_template_id',
         ondelete='restrict', readonly=False, store=True,
         domain="[('model_id', '=', model_id), ('status', '=', 'approved')]",

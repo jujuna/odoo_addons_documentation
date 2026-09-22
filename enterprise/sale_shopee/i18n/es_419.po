@@ -3,21 +3,44 @@
 # * sale_shopee
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-09-17 09:38+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
+"POT-Creation-Date: 2026-09-04 18:03+0000\n"
+"PO-Revision-Date: 2026-09-18 02:44+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/sale_shopee/es_419/>\n"
+"odoo-master/sale_shopee/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_shopee
+#: model:ir.module.module,description:base.module_sale_shopee
+msgid ""
+"\n"
+"Import your Shopee orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and shops\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(item_id or model_id in\n"
+"  Shopee)\n"
+"* Support for both Fulfillment by Shopee (FBS), Fulfillment by Merchant "
+"(FBM) and Fulfilled by Cross\n"
+"  Border Seller (Hybrid):\n"
+"* FBS: Importing the completed orders\n"
+"* FBM/Hybrid: Delivery information is fetched from Shopee, track and "
+"synchronize the stock level to\n"
+"  Shopee\n"
+msgstr ""
 
 #. module: sale_shopee
 #: model:mail.template,body_html:sale_shopee.order_sync_failure
@@ -55,17 +78,17 @@ msgstr ""
 "                <p>Para programar un nuevo intento de sincronización siga "
 "los siguientes pasos:\n"
 "                    </p><ol>\n"
-"                        <li>Ingrese a las herramientas de desarrollador.</"
-"li>\n"
+"                        <li>Ingrese a las herramientas de desarrollador.</li>"
+"\n"
 "                        <li>Abra el formulario de la tienda Shopee en el que "
 "se realizó la orden.</li>\n"
-"                        <li>Vaya a la pestaña \"Seguimiento de órdenes\"</"
-"li>\n"
+"                        <li>Vaya a la pestaña \"Seguimiento de órdenes\"</li>"
+"\n"
 "                        <li>Establezca una fecha para la <em>sincronización "
 "de los últimos pedidos</em>, esta debe ser anterior a la última "
 "actualización del estado del pedido.</li>\n"
-"                        <li>Guarde los cambios y haga clic en el botón "
-"<em>Sincronizar órdenes</em>.</li>\n"
+"                        <li>Guarde los cambios y haga clic en el botón <em>"
+"Sincronizar órdenes</em>.</li>\n"
 "                    </ol>\n"
 "                \n"
 "                <p>Si el problema persiste póngase en contacto con el <a "
@@ -322,10 +345,10 @@ msgstr ""
 "            </style>\n"
 "            <body><div>\n"
 "                <p>La sincronización del inventario de la tienda de Shopee\n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></"
-"b>\n"
-"                    tuvo algunos errores por lo que no se pudo completar.</"
-"p>\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></b>"
+"\n"
+"                    tuvo algunos errores por lo que no se pudo completar.</p>"
+"\n"
 "                <p>Estos son los errores que envió Shopee: </p>\n"
 "                <table class=\"shopee_table\">\n"
 "                    <thead>\n"
@@ -337,8 +360,8 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></"
-"th>\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></th>"
+"\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
@@ -388,14 +411,14 @@ msgstr ""
 "proporciona Shopee."
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
+msgid "Account"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Account Name"
 msgstr "Nombre de la cuenta"
-
-#. module: sale_shopee
-#: model:ir.ui.menu,name:sale_shopee.accounts_menu
-msgid "Accounts"
-msgstr "Cuentas"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__active
@@ -476,7 +499,13 @@ msgid "Authorization Remaining Days"
 msgstr "Días restantes de la autorización"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Authorize New Shop"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "Authorize Shop"
 msgstr "Autorizar tienda"
 
@@ -485,11 +514,6 @@ msgstr "Autorizar tienda"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Bundle Deal"
 msgstr "Oferta del paquete"
-
-#. module: sale_shopee
-#: model_terms:ir.ui.view,arch_db:sale_shopee.quick_create_account_form
-msgid "Cancel"
-msgstr "Cancelar"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__cancelled
@@ -538,6 +562,11 @@ msgid "Create Shopee Accounts"
 msgstr "Crear cuentas de Shopee"
 
 #. module: sale_shopee
+#: model:ir.model,name:sale_shopee.model_shopee_shop_create
+msgid "Create Shopee Shop Wizard"
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model,website_form_label:sale_shopee.model_res_partner
 msgid "Create a Customer"
 msgstr "Crear un cliente"
@@ -546,6 +575,7 @@ msgstr "Crear un cliente"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_uid
 msgid "Created by"
 msgstr "Creado por"
 
@@ -553,6 +583,7 @@ msgstr "Creado por"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_date
 msgid "Created on"
 msgstr "Creado el"
 
@@ -583,6 +614,7 @@ msgstr "Vendedor predeterminado"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__display_name
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__display_name
 msgid "Display Name"
@@ -675,7 +707,7 @@ msgstr "Suministro del proveedor transfronterizo"
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_fulfillment_type__fbm
 msgid "Fulfillment by Merchant"
-msgstr "Logística hecha por el vendedor"
+msgstr "Logística del vendedor"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_fulfillment_type__fbs
@@ -689,6 +721,7 @@ msgstr "Suministro de Shopee"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__id
 msgid "ID"
@@ -706,13 +739,18 @@ msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
 msgstr ""
-"La venta no se puede modificar si está bloqueada. Sin embargo, todavía la "
-"podrá facturar o entregar."
+"No podrás modificar la venta si está bloqueada, pero todavía la podrás "
+"facturar o entregar."
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_account__company_ids
 msgid "If this field is empty, all companies will be allowed."
 msgstr "Si este campo está vacío, todas las empresas tendrán permiso."
+
+#. module: sale_shopee
+#: model:ir.module.module,summary:base.module_sale_shopee
+msgid "Import Shopee orders and sync deliveries"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_shop__status__inactive
@@ -755,6 +793,7 @@ msgstr "Fecha de la última sincronización"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_uid
 msgid "Last Updated by"
 msgstr "Última actualización por"
 
@@ -762,6 +801,7 @@ msgstr "Última actualización por"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_date
 msgid "Last Updated on"
 msgstr "Última actualización el"
 
@@ -769,6 +809,11 @@ msgstr "Última actualización el"
 #: model_terms:ir.ui.view,arch_db:sale_shopee.view_order_form
 msgid "Lock"
 msgstr "Bloquear"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Manage Accounts"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__name
@@ -783,8 +828,19 @@ msgstr "Debe volver a organizar el envío en Shopee"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_list
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_list
 msgid "New"
 msgstr "Nuevo"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "New Account"
+msgstr ""
+
+#. module: sale_shopee
+#: model:ir.actions.act_window,name:sale_shopee.shopee_shop_create_wizard_action
+msgid "New Shop"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__not_available
@@ -795,6 +851,12 @@ msgstr "No disponible"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__order_count
 msgid "Order Count"
 msgstr "Número de órdenes"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Order Discount"
+msgstr "Descuento de la orden"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
@@ -837,6 +899,16 @@ msgstr "Promoción de los productos"
 #: model:ir.model,name:sale_shopee.model_product_product
 msgid "Product Variant"
 msgstr "Variante del producto"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid ""
+"Promotion: %(promotion_type)s - id: %(promotion_id)d\n"
+"Original price: %(price)s"
+msgstr ""
+"Promoción: %(promotion_type)s - ID: %(promotion_id)d\n"
+"Precio original: %(price)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__ready
@@ -906,6 +978,13 @@ msgid "Save And Authorize"
 msgstr "Guardar y autorizar"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid ""
+"Select the Shopee account on which to authorize the new shop, or register "
+"another account."
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__confirmed
 msgid "Shipment Arranged"
 msgstr "Envío organizado"
@@ -930,6 +1009,12 @@ msgstr "Enviado a través de Shopee"
 #: code:addons/sale_shopee/models/stock_picking.py:0
 msgid "Shipping Label Not Ready"
 msgstr "La etiqueta de envío no está lista"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Shipping: %(carrier)s"
+msgstr "Envío: %(carrier)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__shop_id
@@ -978,14 +1063,9 @@ msgid "Shopee"
 msgstr "Shopee"
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_account.py:0
-msgid "Shopee API Account - %(partner_id)s"
-msgstr "Cuenta de la API de Shopee - %(partner_id)s"
-
-#. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_shopee_account
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__account_id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__account_id
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shopee Account"
 msgstr "Cuenta Shopee"
@@ -1006,6 +1086,11 @@ msgstr "Ajuste de cantidad Shopee"
 #: model:ir.model.fields,field_description:sale_shopee.field_res_users__shopee_buyer_identifier
 msgid "Shopee Buyer ID"
 msgstr "ID de comprador de Shopee"
+
+#. module: sale_shopee
+#: model:ir.module.module,shortdesc:base.module_sale_shopee
+msgid "Shopee Connector"
+msgstr ""
 
 #. module: sale_shopee
 #. odoo-python
@@ -1038,7 +1123,6 @@ msgstr "ID del artículo de Shopee"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 #: model:ir.actions.act_window,name:sale_shopee.sale_shopee_item_action
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__shopee_item_ids
-#: model:ir.ui.menu,name:sale_shopee.items_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_item_view_list
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Shopee Items"
@@ -1066,6 +1150,11 @@ msgstr "Orden %(order)s de Shopee en mock_shopee_shop"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Shopee Order %(shopee_order_ref)s at %(shop_name)s"
 msgstr "Orden %(shopee_order_ref)s de Shopee en %(shop_name)s"
+
+#. module: sale_shopee
+#: model:product.template,name:sale_shopee.default_discount_product_product_template
+msgid "Shopee Order Discount"
+msgstr "Descuento de la orden de Shopee"
 
 #. module: sale_shopee
 #. odoo-python
@@ -1213,6 +1302,7 @@ msgstr "Shopee: sincronizar etiquetas de envío"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_account.py:0
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__shop_ids
+#: model:ir.ui.menu,name:sale_shopee.shops_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shops"
 msgstr "Tiendas"
@@ -1284,6 +1374,11 @@ msgstr ""
 "El punto final de conexión la API que se utilizará para las llamadas a la "
 "API de Shopee. Hay puntos finales de producción y de prueba. Elija el punto "
 "final que se encuentre más cerca al marketplace que tiene como objetivo."
+
+#. module: sale_shopee
+#: model:ir.model.fields,help:sale_shopee.field_shopee_shop_create__account_id
+msgid "The Shopee account on which the new shop is authorized."
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_sale_order__shopee_shop_id
@@ -1451,22 +1546,6 @@ msgid "You are not allowed to access this page."
 msgstr "No tiene autorización para acceder a esta página."
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid "[%(sku)s] %(product_name)s"
-msgstr "[%(sku)s] %(product_name)s"
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid ""
-"[%(sku)s] %(product_title)s\n"
-"Promotion: %(promotion_type)s - id: %(promotion_id)d"
-msgstr ""
-"[%(sku)s] %(product_title)s\n"
-"Promoción: %(promotion_type)s - ID: %(promotion_id)d"
-
-#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "e.g. American Market"
 msgstr "Por ejemplo, Mercado estadounidense"
@@ -1474,7 +1553,7 @@ msgstr "Por ejemplo, Mercado estadounidense"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "e.g. Indonesian Shop"
-msgstr "por ejemplo, tienda de Indonesia"
+msgstr "Por ejemplo, Tienda indonesia"
 
 #. module: sale_shopee
 #. odoo-python

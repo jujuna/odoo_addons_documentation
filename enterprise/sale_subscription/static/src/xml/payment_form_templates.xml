@@ -8,10 +8,10 @@
                 following active subscriptions:
             </p>
             <ul>
-                <li t-foreach="linkedRecordsInfo" t-as="documentInfo" t-key="documentInfoIndex">
+                <li t-foreach="this.linkedRecordsInfo" t-as="documentInfo" t-key="this.documentInfoIndex">
                     <a t-att-title="documentInfo.description"
                         t-att-href="documentInfo.url"
-                        t-esc="documentInfo.name"
+                        t-out="documentInfo.name"
                     />
                 </li>
             </ul>

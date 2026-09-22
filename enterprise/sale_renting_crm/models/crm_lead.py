@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, _
+from odoo import _, fields, models
 from odoo.fields import Domain
 
 
@@ -11,7 +11,7 @@ class CrmLead(models.Model):
         compute="_compute_rental_count", string="Number of Rental Quotations")
     rental_amount_total = fields.Monetary(
         compute='_compute_rental_count', string="Sum of Rental Orders",
-        help="Untaxed Total of Confirmed Orders", currency_field='company_currency')
+        help="Total of Confirmed Orders", currency_field='company_currency')
     rental_order_count = fields.Integer(
         compute='_compute_rental_count', string="Number of Rental Orders")
     rental_order_ids = fields.One2many(
@@ -25,7 +25,7 @@ class CrmLead(models.Model):
             sale_orders = lead.rental_order_ids.filtered(lambda l: l.state == 'sale')
             for order in sale_orders:
                 total += order.currency_id._convert(
-                    order.amount_untaxed, company_currency, order.company_id, order.date_order or fields.Date.today())
+                    order.amount_total, company_currency, order.company_id, order.date_order)
             lead.rental_quotation_count = len(lead.rental_order_ids.filtered(lambda l: l.state in ["draft", "sent"]))
             lead.rental_order_count = len(sale_orders)
             lead.rental_amount_total = total
@@ -50,13 +50,6 @@ class CrmLead(models.Model):
             return self.env["ir.actions.actions"]._for_xml_id("sale_renting_crm.crm_lead_to_rental_action")
         return self.action_new_rental_quotation()
 
-    def _get_action_rental_context(self):
-        self.ensure_one()
-        return dict(
-            self._prepare_opportunity_quotation_context(),
-            in_rental_app=True,
-        )
-
     def action_new_rental_quotation(self):
         return {
             "type": "ir.actions.act_window",
@@ -64,14 +57,14 @@ class CrmLead(models.Model):
             "res_model": "sale.order",
             "view_mode": "form",
             "views": [(self.env.ref("sale_renting.rental_order_primary_form_view").id, "form")],
-            "context": self._get_action_rental_context(),
+            "context": self._prepare_opportunity_quotation_context(),
         }
 
     def action_view_rental_quotation(self):
         action = self.env["ir.actions.actions"]._for_xml_id("sale_renting.rental_order_action")
         action.update({
-            'context': self._get_action_rental_context(),
-            'domain': [("opportunity_id", "=", self.id), ('is_rental_order', '=', True)]
+            "context": self._prepare_opportunity_quotation_context(),
+            "domain": [("opportunity_id", "=", self.id), ("is_rental_order", "=", True)],
         })
 
         if not self.env.context.get('is_rental_order'):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -28,7 +27,10 @@ Features:
         'views/chatbot_script_step_views.xml',
         'views/discuss_channel_views.xml',
         'views/helpdesk_view.xml',
-        'views/helpdesk_ticket_attachment_template.xml',
+        'security/ir.access.csv',
+    ],
+    'demo': [
+        'data/helpdesk_demo.xml',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',
@@ -36,10 +38,14 @@ Features:
     'post_init_hook': '_create_livechat_channel',
     'assets': {
         'web.assets_backend': [
-            'website_helpdesk_livechat/static/src/**/*',
+            'website_helpdesk_livechat/static/src/core/common/**/*',
+            'website_helpdesk_livechat/static/src/core/web/**/*',
         ],
         'mail.assets_public': [
             'website_helpdesk_livechat/static/src/core/common/**/*',
+        ],
+        "portal.assets_chatter_helpers": [
+            "website_helpdesk_livechat/static/src/core/common/**/*",
         ],
         'web.assets_unit_tests': [
             'website_helpdesk_livechat/static/tests/**/*',
@@ -53,6 +59,9 @@ Features:
         ],
         'im_livechat.embed_assets_unit_tests_setup': [
             ('remove', 'website_helpdesk_livechat/static/src/core/web/**/*'),
+        ],
+        'im_livechat.assets_embed_core': [
+            'website_helpdesk_livechat/static/src/core/common/**/*',
         ],
 
     },

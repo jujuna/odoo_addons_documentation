@@ -1,25 +1,25 @@
-import { Component, useState, xml } from "@odoo/owl";
+import { Component, xml, proxy, t, useProps } from "@odoo/owl";
 import { SidebarPropertiesToolbox } from "@web_studio/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox";
 
 class DefaultProperties extends Component {
-    static props = {
-        node: { type: Object },
-    };
     static template = xml`
         <SidebarPropertiesToolbox/>
     `;
     static components = { SidebarPropertiesToolbox };
+    props = useProps({
+        node: t.object(),
+    });
 }
 
 export class Properties extends Component {
     static template = "web_studio.ViewEditor.InteractiveEditorProperties";
-    static props = {
-        propertiesComponents: { type: Object },
-    };
     static components = { DefaultProperties };
+    props = useProps({
+        propertiesComponents: t.object(),
+    });
 
     setup() {
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
     }
 
     get iconClass() {

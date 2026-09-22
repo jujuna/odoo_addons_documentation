@@ -1,15 +1,17 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { CheckBox } from "@web/core/checkbox/checkbox";
 import { useOwnedDialogs } from "@web/core/utils/hooks";
 import { ExpressionEditorDialog } from "@web/core/expression_editor_dialog/expression_editor_dialog";
+import { ModifiersSimpleDialog } from "./modifiers_simple_dialog";
 
 export class ModifiersProperties extends Component {
     static template = "web_studio.ViewEditor.InteractiveEditorProperties.Modifiers";
     static components = { CheckBox };
-    static props = {
-        node: { type: Object },
-        availableOptions: { type: Array },
-    };
+    props = useProps({
+        node: t.object(),
+        availableOptions: t.array(),
+        useSimpleDialog: t.boolean().optional(false),
+    });
 
     setup() {
         this.addDialog = useOwnedDialogs();
@@ -30,6 +32,10 @@ export class ModifiersProperties extends Component {
         const isTruthy = encodesBoolean ? this.isBoolTrue(value) : !!value;
         const newAttrs = {};
         const oldAttrs = { ...this.props.node.attrs };
+
+        if (name in oldAttrs && oldAttrs[name] === value) {
+            return;
+        }
 
         const changingInvisible = name === "invisible";
         const isInList = this.env.viewEditorModel.viewType === "list";
@@ -96,12 +102,19 @@ export class ModifiersProperties extends Component {
         if (typeof value !== "string" || value === "") {
             value = "False"; // See py.js:evaluateBooleanExpr default value is False
         }
-        const { fields, resModel } = this.env.viewEditorModel;
-        this.addDialog(ExpressionEditorDialog, {
-            resModel,
-            fields,
-            expression: value,
-            onConfirm: (expression) => this.onChangeModifier(name, expression),
-        });
+        if (this.props.useSimpleDialog) {
+            this.addDialog(ModifiersSimpleDialog, {
+                expression: value,
+                onConfirm: (expression) => this.onChangeModifier(name, expression),
+            });
+        } else {
+            const { fields, resModel } = this.env.viewEditorModel;
+            this.addDialog(ExpressionEditorDialog, {
+                resModel,
+                fields,
+                expression: value,
+                onConfirm: (expression) => this.onChangeModifier(name, expression),
+            });
+        }
     }
 }

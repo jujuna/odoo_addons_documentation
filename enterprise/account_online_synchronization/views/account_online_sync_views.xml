@@ -47,6 +47,7 @@
                                     <field name="last_sync" groups="account.group_account_manager"/>
                                     <field name="balance" readonly="1"/>
                                     <field name="available_balance" readonly="1"/>
+                                    <field name="currency_id" readonly="True"/>
                                     <field name="inverse_balance_sign" groups="base.group_no_one" optional="hide"/>
                                     <field name="inverse_transaction_sign" groups="base.group_no_one" optional="hide"/>
                                     <button name="action_reset_fetching_status" type="object" string="Reset" help="This button will reset the fetching status"/>
@@ -93,6 +94,7 @@
             <field name="arch" type="xml">
                 <list decoration-danger="state != 'connected'" create="false">
                     <field name="name" readonly="1"/>
+                    <field name="client_id" optional="hide"/>
                     <field name="state"/>
                     <field name="provider_type" readonly="1"/>
                     <field name="last_refresh" readonly="1"/>

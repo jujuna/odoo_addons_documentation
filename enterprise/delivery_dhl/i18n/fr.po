@@ -7,15 +7,15 @@
 # Cécile Collart <cco@odoo.com>, 2022
 # Jolien De Paepe, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-10-15 16:32+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-09-18 00:32+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "delivery_dhl/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -220,6 +220,11 @@ msgid "DHL EU -> International"
 msgstr "DHL EU -> International"
 
 #. module: delivery_dhl
+#: model:ir.module.module,shortdesc:base.module_delivery_dhl
+msgid "DHL Express Shipping (Legacy)"
+msgstr ""
+
+#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "Mot de passe DHL"
@@ -282,6 +287,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
 msgid "DHLxw Package Type"
 msgstr "Type de colis DHLxw"
+
+#. module: delivery_dhl
+#: model:ir.model,name:delivery_dhl.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "Mode de livraison"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
@@ -502,11 +512,6 @@ msgid "Shipment created into DHL <br/> <b>Tracking Number: </b>%s"
 msgstr "Envoi créé dans DHL <br/> <b>Numéro de suivi : </b>%s"
 
 #. module: delivery_dhl
-#: model:ir.model,name:delivery_dhl.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Modes d'expédition"
-
-#. module: delivery_dhl
 #: model:ir.model,name:delivery_dhl.model_stock_package_type
 msgid "Stock package type"
 msgstr "Type de colis de stock"
@@ -534,8 +539,8 @@ msgid ""
 "field(s) :\n"
 " %s)"
 msgstr ""
-"L'adresse de votre entrepôt est manquante ou incorrecte (Champ(s) "
-"manquant(s) : %s)"
+"L'adresse de votre entrepôt est manquante ou incorrecte (Champ(s) manquant"
+"(s) : %s)"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,help:delivery_dhl.field_delivery_carrier__dhl_custom_data_request
@@ -572,6 +577,14 @@ msgid ""
 msgstr ""
 "Il n'y a pas de prix disponible pour cette expédition, vous devriez plutôt "
 "essayer avec le produit DHL %s"
+
+#. module: delivery_dhl
+#: model:ir.module.module,description:base.module_delivery_dhl
+msgid ""
+"This is the legacy integration with DHL Express that is no longer "
+"supported.         Please install the new \"DHL Express Shipping\" module "
+"and uninstall this one as soon as possible."
+msgstr ""
 
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_product_code__u
@@ -619,12 +632,3 @@ msgstr "Z - Frais de destination"
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_label_image_format__zpl2
 msgid "ZPL2"
 msgstr "ZPL2"
-
-#~ msgid "DHL"
-#~ msgstr "DHL"
-
-#~ msgid "DHL Package Type"
-#~ msgstr "Type de colis DHL"
-
-#~ msgid "DHL Shipping Methods"
-#~ msgstr "Modes d'expédition DHL"

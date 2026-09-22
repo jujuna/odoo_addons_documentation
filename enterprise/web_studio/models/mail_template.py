@@ -6,5 +6,5 @@ from odoo import models
 
 class MailTemplate(models.Model):
     _name = 'mail.template'
-    _description = 'Email Templates'
+    _description = 'Email Template'
     _inherit = ['studio.mixin', 'mail.template']

@@ -9,7 +9,7 @@ from odoo.exceptions import UserError, ValidationError
 class AccountLoan(models.Model):
     _name = 'account.loan'
     _description = 'Loan'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'analytic.mixin']
     _order = 'date'
 
     @api.model
@@ -32,7 +32,7 @@ class AccountLoan(models.Model):
         return values
 
     name = fields.Char("Name", required=True, index="trigram", tracking=True)
-    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', string='Company', required=True, index=True, default=lambda self: self.env.company)
     currency_id = fields.Many2one(related='company_id.currency_id')
     active = fields.Boolean(default=True)
     state = fields.Selection(
@@ -63,7 +63,7 @@ class AccountLoan(models.Model):
         comodel_name='account.account',
         string='Expense Account',
         tracking=True,
-        domain="[('account_type', 'in', ('expense', 'expense_depreciation'))]",
+        domain="[('account_type', 'in', ('expense', 'expense_depreciation', 'expense_other'))]",
     )
     journal_id = fields.Many2one(
         comodel_name='account.journal',
@@ -202,13 +202,15 @@ class AccountLoan(models.Model):
                 if loan.skip_until_date and line.date < loan.skip_until_date:
                     continue
 
+                accounting_date = max(line.date.replace(day=1), loan.date)
+
                 # Principal and interest (to match with the bank statement)
                 payment_moves_values.append({
                     'company_id': loan.company_id.id,
                     'auto_post': 'at_date',
                     'generating_loan_line_id': line.id,
                     'is_loan_payment_move': True,
-                    'date': line.date + relativedelta(day=31),
+                    'date': accounting_date,
                     'journal_id': loan.journal_id.id,
                     'ref': f"{loan.name} - {_('Principal & Interest')} {format_date(self.env, line.date, date_format='MM/y')}",
                     'line_ids': [
@@ -216,17 +218,21 @@ class AccountLoan(models.Model):
                             'account_id': loan.long_term_account_id.id,
                             'debit': line.principal,
                             'name': f"{loan.name} - {_('Principal')} {format_date(self.env, line.date, date_format='MM/y')}",
+                            'analytic_distribution': loan.analytic_distribution,
                         }),
                         Command.create({
                             'account_id': loan.short_term_account_id.id,
                             'credit': line.payment,
                             'name': f"{loan.name} - {_('Due')} {format_date(self.env, line.date, date_format='MM/y')} "
                                     f"({_('Principal')} {loan.currency_id.format(line.principal)} + {_('Interest')} {loan.currency_id.format(line.interest)})",
+                            'analytic_distribution': loan.analytic_distribution,
+                            'date_maturity': line.date,
                         }),
                         Command.create({
                             'account_id': loan.expense_account_id.id,
                             'debit': line.interest,
                             'name': f"{loan.name} - {_('Interest')} {format_date(self.env, line.date, date_format='MM/y')}",
+                            'analytic_distribution': loan.analytic_distribution,
                         }),
                     ],
                 })
@@ -246,36 +252,40 @@ class AccountLoan(models.Model):
                 }
                 reclassification_moves_values.append({
                     **common_reclassification_values,
-                    'date': line.date + relativedelta(day=31),
+                    'date': accounting_date,
                     'ref': f"{loan.name} - {_('Reclassification LT - ST')} {from_date} to {to_date}",
                     'line_ids': [
                         Command.create({
                             'account_id': loan.long_term_account_id.id,
                             'debit': sum(next_lines.mapped('principal')),
                             'name': f"{loan.name} - {_('Reclassification LT - ST')} {from_date} to {to_date} (To {loan.short_term_account_id.code})",
+                            'analytic_distribution': loan.analytic_distribution,
                         }),
                         Command.create({
                             'account_id': loan.short_term_account_id.id,
                             'credit': sum(next_lines.mapped('principal')),
                             'name': f"{loan.name} - {_('Reclassification LT - ST')} {from_date} to {to_date} (From {loan.long_term_account_id.code})",
+                            'analytic_distribution': loan.analytic_distribution,
                         }),
                     ],
                 })
                 # Manually create the reverse (instead of using _reverse_moves()) for optimization reasons
                 reclassification_reversed_moves_values.append({
                     **common_reclassification_values,
-                    'date': line.date + relativedelta(day=31) + relativedelta(days=1),  # first day of next month
+                    'date': accounting_date + relativedelta(months=1, day=1),  # first day of next month
                     'ref': f"{loan.name} - {_('Reversal reclassification LT - ST')} {from_date} to {to_date}",
                     'line_ids': [
                         Command.create({
                             'account_id': loan.long_term_account_id.id,
                             'credit': sum(next_lines.mapped('principal')),
                             'name': f"{loan.name} - {_('Reversal reclassification LT - ST')} {from_date} to {to_date} (To {loan.short_term_account_id.code})",
+                            'analytic_distribution': loan.analytic_distribution,
                         }),
                         Command.create({
                             'account_id': loan.short_term_account_id.id,
                             'debit': sum(next_lines.mapped('principal')),
                             'name': f"{loan.name} - {_('Reversal reclassification LT - ST')} {from_date} to {to_date} (From {loan.long_term_account_id.code})",
+                            'analytic_distribution': loan.analytic_distribution,
                         }),
                     ],
                 })

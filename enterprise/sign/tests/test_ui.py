@@ -1,11 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-
-from .sign_request_common import SignRequestCommon
 import odoo.tests
 
-from odoo.tools.misc import file_open
+from .sign_request_common import SignRequestCommon
 
 
 @odoo.tests.tagged('-at_install', 'post_install')
@@ -16,12 +13,6 @@ class TestUi(odoo.tests.HttpCase, SignRequestCommon):
         cls.env.ref('base.user_admin').email = "admin@yourcompany.example.com"
 
     def test_ui(self):
-        # If not enabled (like in demo data), landing on res.config will try
-        # to disable module_sale_quotation_builder and raise an issue
-        group_order_template = self.env.ref('sale_management.group_sale_order_template', raise_if_not_found=False)
-        if group_order_template:
-            self.env.ref('base.group_user').write({"implied_ids": [(4, group_order_template.id)]})
-
         # make sure that we only have the required template.
         self.env['sign.template'].search([('name', '!=', 'template_1_role')]).write({'active': False})
 
@@ -76,11 +67,9 @@ class TestUi(odoo.tests.HttpCase, SignRequestCommon):
             'width': 0.200,
             'height': 0.050,
         }])
-        with file_open('sign/static/demo/signature.png', "rb") as f:
-            img_content = base64.b64encode(f.read())
 
         self.user_1.write({
-            'sign_signature': img_content,
+            'sign_signature': self.file_read('sign/static/demo/signature.png'),
         })
         self.start_tour("/odoo", 'test_sign_flow_tour', login=self.user_1.login)
 

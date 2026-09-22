@@ -75,15 +75,15 @@ class EasypostRequest():
         """
         # check carrier credentials
         if carrier.prod_environment and not carrier.sudo().easypost_production_api_key:
-            raise UserError(_("The %s carrier is missing (Missing field(s) :\n Production API Key)", carrier.name))
+            raise UserError(_("The %s delivery method is missing (Missing field(s) :\n Production API Key)", carrier.name))
         elif not carrier.sudo().easypost_test_api_key:
-            raise UserError(_("The %s carrier is missing (Missing field(s) :\n Test API Key)", carrier.name))
+            raise UserError(_("The %s delivery method is missing (Missing field(s) :\n Test API Key)", carrier.name))
 
         if not carrier.easypost_delivery_type:
-            raise UserError(_("The %s carrier is missing (Missing field(s) :\n Delivery Carrier Type)", carrier.name))
+            raise UserError(_("The %s delivery method is missing (Missing field(s) :\n Delivery Carrier Type)", carrier.name))
 
         if not carrier.easypost_default_package_type_id:
-            raise UserError(_("The %s carrier is missing (Missing field(s) :\n Default Package Type)", carrier.name))
+            raise UserError(_("The %s delivery method is missing (Missing field(s) :\n Default Package Type)", carrier.name))
 
         if not order and not picking:
             raise UserError(_("Sale Order/Stock Picking is missing."))
@@ -127,8 +127,8 @@ class EasypostRequest():
         if addr_obj.state_id:
             address['order[%s][state]' % addr_type] = addr_obj.state_id.code
         address['order[%s][country]' % addr_type] = addr_obj.country_id.code
-        if addr_obj.commercial_company_name:
-            address['order[%s][company]' % addr_type] = addr_obj.commercial_company_name[:25]
+        if addr_obj.parent_name:
+            address['order[%s][company]' % addr_type] = addr_obj.parent_name[:25]
         return address
 
     def _prepare_shipments(self, carrier, packages, is_return=False):
@@ -143,7 +143,8 @@ class EasypostRequest():
         shipment = {}
         for shp_id, pkg in enumerate(packages):
             shipment.update(self._prepare_parcel(carrier, shp_id, pkg, carrier.easypost_label_file_type))
-            shipment.update(self._customs_info(carrier, shp_id, pkg.commodities, pkg.currency_id))
+            currency_id = pkg.picking_id.sale_id.currency_id if (pkg.picking_id and pkg.picking_id.sale_id) else pkg.currency_id
+            shipment.update(self._customs_info(carrier, shp_id, pkg.commodities, currency_id))
             shipment.update(self._options(shp_id, carrier))
         if is_return:
             shipment.update({'order[is_return]': True})
@@ -157,6 +158,7 @@ class EasypostRequest():
         - delivery_package: custom 'DeliveryPackage' -> used package for shipement.
         - Weight float(oz): Product's weight contained in package
         - label_format str: Format for label to print.
+        - label_size str: Size of the label to print.
         return dict: a dict with necessary keys in order to create
         a easypost parcel for the easypost shipement with shipment_id
         """
@@ -167,6 +169,13 @@ class EasypostRequest():
             'order[shipments][%d][options][print_custom_1]' % shipment_id:
                 delivery_package.picking_id.display_name if delivery_package.picking_id else delivery_package.order_id.display_name,
         }
+
+        # Add label size only if selected. Otherwise, EasyPost will handle the default size based on the selected label format.
+        if carrier.easypost_label_size:
+            shipment.update({
+                'order[shipments][%d][options][label_size]' % shipment_id: carrier.easypost_label_size
+            })
+
         # If this is not an EasyPost predefined package, then we give the dimensions.
         packages = carrier._easypost_get_services_and_package_types()[0]
         if delivery_package.packaging_type and any(delivery_package.packaging_type in pkg_names for pkg_names in packages.values()):
@@ -230,10 +239,10 @@ class EasypostRequest():
         - shipper address (check _prepare_address for more info)
         - prepare shipments (with parcel/customs info)
         - Do the API request
-        If a service level is defined on the delivery carrier it will
+        If a service level is defined on the delivery method it will
         returns the rate for this service or an error if there is no
         rate for this service.
-        If there is no service level on the delivery carrier, it will
+        If there is no service level on the delivery method, it will
         return the cheapest rate. this behavior could be override with
         the method _sort_rates.
         return
@@ -297,16 +306,16 @@ class EasypostRequest():
         # it will return an empty JSON or a message asking to contact
         # their support. In this case a good practice would be to check
         # the order_payload sent and try to find missing or erroneous value.
-        # DON'T FORGET DEBUG MODE ON DELIVERY CARRIER.
+        # DON'T FORGET DEBUG MODE ON DELIVERY METHOD.
         if not rates:
             error_message = _("It seems Easypost do not provide shipments for this order.\
                 We advise you to try with another package type or service level.")
         elif rates and not carrier.easypost_default_service_id:
             # Get cheapest rate.
             rate = self._sort_rates(rates)[0]
-            # Complete service level on the delivery carrier.
+            # Complete service level on the delivery method.
             carrier._generate_services(rates)
-        # If the user ask for a specific service level on its carrier.
+        # If the user ask for a specific service level on its delivery method.
         elif rates and carrier.easypost_default_service_id:
             rate = [rate for rate in rates if rate['service'] == carrier.easypost_default_service_id.name]
             if not rate:
@@ -315,7 +324,7 @@ class EasypostRequest():
                 rate = rate[0]
 
         # warning_message could contains useful information
-        # in order to correct the delivery carrier or SO/picking.
+        # in order to correct the delivery method or SO/picking.
         if error_message and warning_message:
             error_message += warning_message
 
@@ -389,7 +398,9 @@ class EasypostRequest():
         endpoint = "orders/%s" % order_id
         response = self._make_api_request(endpoint)
         for shipment in response.get('shipments'):
-            tracking_public_urls.append([shipment['tracking_code'], shipment['tracker']['public_url']])
+            public_url = (shipment.get('tracker') or {}).get('public_url')
+            if public_url:
+                tracking_public_urls.append([shipment['tracking_code'], public_url])
         return tracking_public_urls
 
     def get_tracking_link_from_code(self, code):
@@ -420,7 +431,7 @@ class EasypostRequest():
         """
         # With multiples shipments, some carrier will return a message explaining that
         # the rates are on the first shipments and not on the next ones.
-        if response.get('messages') and carrier.easypost_delivery_type in ['Purolator', 'DPD UK', 'UPS'] and \
+        if response.get('messages') and carrier.easypost_delivery_type in ['Purolator', 'DPD UK', 'UPS', 'DHL Express'] and \
                 len(response.get('shipments', [])) > 1 and \
                 len(response.get('shipments')[0].get('rates', [])) > 0 and \
                 all(len(s.get('rates', [])) == 0 for s in response['shipments'][1:]):
@@ -428,11 +439,11 @@ class EasypostRequest():
                 # UPS also send a message on following shipments explaining that their rates is in the
                 # first shipment (other carrier just return an empty list).
                 return response
-            if carrier.easypost_delivery_type in ['Purolator', 'DPD UK'] and (
+            if carrier.easypost_delivery_type in ['Purolator', 'DPD UK', 'DHL Express'] and (
                     len(response['messages']) != 1 or
                     response['messages'][0].get('type', '') != 'rate_error' or
                     "multi-shipment rate includes this shipment." not in response['messages'][0].get('message', '')):
-                # Purolator & DPD UK send a rate_error message for this situation.
+                # Purolator, DPD UK & DHL Express send a rate_error message for this situation.
                 return response
 
             if picking:

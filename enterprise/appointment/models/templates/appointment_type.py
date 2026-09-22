@@ -12,9 +12,15 @@ class AppointmentType(models.Model):
     _inherit = 'appointment.type'
 
     @api.model
-    def action_setup_appointment_type_template(self, template_key):
+    def action_setup_appointment_type_template(self, template_key, additional_values=None):
+        '''
+        :param template_key: The string key of the template to load
+        :param additional_values: Optional parameter to pass default values to the template
+        '''
         action = self.env['ir.actions.act_window']._for_xml_id('appointment.appointment_type_action')
         template_values = self._get_appointment_type_template_values(template_key)
+        if additional_values:
+            template_values = template_values | additional_values
         action['res_id'] = self.env['appointment.type'].create(template_values).id
         action['views'] = [[self.env.ref('appointment.appointment_type_view_form').id, 'form']]
         return action

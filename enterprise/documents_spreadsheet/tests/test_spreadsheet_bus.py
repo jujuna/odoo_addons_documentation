@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from .common import SpreadsheetTestCommon
-from odoo.tests.common import new_test_user
+from odoo.tests.common import tagged, new_test_user
 from odoo.addons.bus.models.bus import channel_with_db
 from odoo.addons.mail.tests.common import MailCase
 
@@ -21,7 +21,8 @@ class TestSpreadsheetBus(SpreadsheetTestCommon, MailCase):
 
     def poll_spreadsheet(self, spreadsheet_id, access_token=None):
         if access_token:
-            external_channel = f"spreadsheet_collaborative_session:documents.document:{spreadsheet_id}:{access_token}"
+            share_id = 0
+            external_channel = f"spreadsheet_collaborative_session:documents.document:{spreadsheet_id}:{share_id}:{access_token}"
         else:
             external_channel = f"spreadsheet_collaborative_session:documents.document:{spreadsheet_id}"
         notifs = self.poll(external_channel)
@@ -38,18 +39,7 @@ class TestSpreadsheetBus(SpreadsheetTestCommon, MailCase):
     def test_active_spreadsheet(self):
         spreadsheet = self.create_spreadsheet()
         commands = self.new_revision_data(spreadsheet)
-        spreadsheet.dispatch_spreadsheet_message(commands)
-        self.assertEqual(
-            self.poll_spreadsheet(spreadsheet.id),
-            [commands],
-            "It should have received the revision"
-        )
-
-    def test_archived_active_spreadsheet(self):
-        spreadsheet = self.create_spreadsheet()
-        spreadsheet.active = False
-        commands = self.new_revision_data(spreadsheet)
-        spreadsheet.dispatch_spreadsheet_message(commands)
+        spreadsheet._dispatch_spreadsheet_message(commands)
         self.assertEqual(
             self.poll_spreadsheet(spreadsheet.id),
             [commands],
@@ -95,7 +85,7 @@ class TestSpreadsheetBus(SpreadsheetTestCommon, MailCase):
     def test_poll_access(self):
         spreadsheet = self.create_spreadsheet()
         commands = self.new_revision_data(spreadsheet)
-        spreadsheet.dispatch_spreadsheet_message(commands)
+        spreadsheet._dispatch_spreadsheet_message(commands)
         spreadsheet.folder_id.access_via_link = 'none'
         spreadsheet.folder_id.access_internal = 'none'
         spreadsheet.access_via_link = 'none'
@@ -125,7 +115,7 @@ class TestSpreadsheetBus(SpreadsheetTestCommon, MailCase):
         spreadsheet = self.create_spreadsheet()
         new_test_user(self.env, login="raoul", groups="base.group_public")
         revision = self.new_revision_data(spreadsheet)
-        spreadsheet.dispatch_spreadsheet_message(revision)
+        spreadsheet._dispatch_spreadsheet_message(revision)
 
         # without token
         with self.with_user("raoul"):

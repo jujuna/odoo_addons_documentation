@@ -15,10 +15,12 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 from odoo import Command, fields, _
 from odoo.exceptions import UserError
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
+from odoo.tools import frozendict, DEFAULT_SERVER_DATE_FORMAT
 from odoo.tools.misc import formatLang, file_open
 
 class TestAccountReportsCommon(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -27,6 +29,20 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
         cls.company_data_2 = cls.setup_other_company()
         cls.company_data_2['company'].currency_id = cls.other_currency
         cls.company_data_2['currency'] = cls.other_currency
+
+        cls.garbage_account = cls.env['account.account'].create({
+            'code': "turlututu",
+            'name': "turlututu",
+            'account_type': "asset_current",
+        })
+
+        cls.fake_country = cls.env['res.country'].create({
+            'name': "L'Île de la Mouche",
+            'code': 'YY',
+        })
+
+        cls.snapshot_creation_cron = cls.env.ref('account_reports.ir_cron_create_snapshots')
+        cls.snapshot_garbage_collection_cron = cls.env.ref('account_reports.ir_cron_garbage_collect_snapshots')
 
     @classmethod
     def _generate_options(cls, report, date_from, date_to, default_options=None):
@@ -54,15 +70,29 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
             'date': {
                 'date_from': date_from_str,
                 'date_to': date_to_str,
-                'mode': 'range',
-                'filter': 'custom',
             },
             'show_account': True,
             'show_currency': True,
+            'consolidation': False,
             **default_options,
         })
 
-    def _update_comparison_filter(self, options, report, comparison_type, number_period, date_from=None, date_to=None):
+    @classmethod
+    def _cleanup_snapshot_cron_triggers(cls):
+        cls.env['ir.cron.trigger'].search([('cron_id', 'in', (cls.snapshot_garbage_collection_cron + cls.snapshot_creation_cron).ids)]).unlink()
+
+    def _run_snapshot_crons(self):
+        self.env['account.report.snapshot'].sudo()._cron_garbage_collect_snapshots()
+        while creation_trigger := self.env['ir.cron.trigger'].search([('cron_id', '=', self.snapshot_creation_cron.id)], limit=1):
+            creation_trigger.unlink()
+            self.env['account.report.snapshot'].sudo()._cron_create_snapshots()
+
+    def _press_journal_filter(self, options, journals):
+        for option_journal in options['journals']:
+            if option_journal.get('id') in journals.ids:
+                option_journal['selected'] = not option_journal['selected']
+
+    def _update_comparison_filter(self, options, report, comparison_type, number_period, date_from=None, date_to=None, period_order=None):
         ''' Modify the existing options to set a new filter_comparison.
         :param options:         The report options.
         :param report:          The report.
@@ -78,6 +108,7 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
             'date_to': date_to and date_to.strftime(DEFAULT_SERVER_DATE_FORMAT),
             'filter': comparison_type,
             'number_period': number_period,
+            'period_order': period_order or options['comparison']['period_order'],
         }}
         return report.get_options(previous_options)
 
@@ -101,10 +132,20 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
 
         for value, expected_value in zip(filtered_lines, expected_values):
             # Check number of columns.
-            key = 'column_percent_comparison_data'
-            self.assertEqual(len(value[key]) + 1, len(expected_value))
+            self.assertEqual(3, len(expected_value))
             # Check name, value and class.
-            self.assertEqual((value['name'], value[key]['name'], value[key]['mode']), expected_value)
+            self.assertEqual((value.name, value.column_percent_comparison_data.name, value.column_percent_comparison_data.comparison_mode), expected_value)
+
+    def assertColumnAmountComparisonValues(self, lines, expected_values):
+        """ Like assertColumnPercentComparisonValues but asserts the underlying numeric delta
+        (column_percent_comparison_data.no_format) instead of the rendered string, so tests don't
+        depend on locale/currency formatting. """
+        filtered_lines = self._filter_folded_lines(lines)
+        self.assertEqual(len(filtered_lines), len(expected_values))
+
+        for value, expected_value in zip(filtered_lines, expected_values):
+            self.assertEqual(3, len(expected_value))
+            self.assertEqual((value.name, value.column_percent_comparison_data.no_format, value.column_percent_comparison_data.comparison_mode), expected_value)
 
     def assertHorizontalGroupTotal(self, lines, expected_values):
         filtered_lines = self._filter_folded_lines(lines)
@@ -112,11 +153,11 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
         # Check number of lines.
         self.assertEqual(len(filtered_lines), len(expected_values))
         for line_dict_list, (_title, *expected_columns) in zip(filtered_lines, expected_values):
-            column_values = [column['no_format'] for column in line_dict_list['columns']]
+            column_values = [column.no_format for column in line_dict_list.columns]
             # Compare the Total column, Total column is there only under certain condition
-            if line_dict_list.get('horizontal_group_total_data'):
+            if line_dict_list.horizontal_group_total_data:
                 *expected_columns, total = expected_columns
-                self.assertEqual(line_dict_list['horizontal_group_total_data']['no_format'], total)
+                self.assertEqual(line_dict_list.horizontal_group_total_data.no_format, total)
 
             self.assertEqual(column_values, expected_columns)
 
@@ -207,14 +248,14 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
             compared_values = [[], []]
             for j, index in enumerate(columns):
                 if index == 0:
-                    current_value = line['name']
+                    current_value = line.name
                 else:
                     # Some lines may not have columns, like title lines. In such case, no values should be provided for these.
                     # Note that the function expect a tuple, so the line still need a comma after the name value.
                     if j > len(expected_values[i]) - 1:
                         break
-                    current_value = line['columns'][index-1].get('name', '')
-                    current_figure_type = line['columns'][index - 1].get('figure_type', '')
+                    current_value = line.columns[index - 1].name or ''
+                    current_figure_type = line.columns[index - 1].figure_type or ''
 
                 expected_value = expected_values[i][j]
                 currency_data = currency_map.get(index, {})
@@ -222,7 +263,7 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
                 if 'currency' in currency_data:
                     used_currency = currency_data['currency']
                 elif 'currency_code_index' in currency_data:
-                    currency_code = line['columns'][currency_data['currency_code_index'] - 1].get('name', '')
+                    currency_code = line.columns[currency_data['currency_code_index'] - 1].name
                     if currency_code:
                         used_currency = self.env['res.currency'].search([('name', '=', currency_code)], limit=1)
                         assert used_currency, "Currency having name=%s not found." % currency_code
@@ -251,13 +292,13 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
                     "Expected Values: %s" % str(to_compare[1]),
                 ]
 
-        id_counts = Counter(line['id'] for line in lines)
+        id_counts = Counter(line.id for line in lines)
         duplicate_ids = {k: v for k, v in id_counts.items() if v > 1}
         if duplicate_ids:
             index_to_id = [
-                f"index={index:<6} name={line.get('name', 'no line name?!')} \tline_id={line.get('id', 'no line id?!')}"
+                f"index={index:<6} name={line.name} \tline_id={line.id}"
                 for index, line in enumerate(lines)
-                if line.get('id', 'no line id?!') in duplicate_ids
+                if line.id in duplicate_ids
             ]
             errors += [
                 "\n==== There are lines sharing the same id ====",
@@ -275,11 +316,11 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
         filtered_lines = []
         folded_lines = set()
         for line in lines:
-            if line.get('parent_id') in folded_lines:
-                folded_lines.add(line['id'])
+            if line.parent_id in folded_lines:
+                folded_lines.add(line.id)
             else:
-                if line.get('unfoldable') and not line.get('unfolded'):
-                    folded_lines.add(line['id'])
+                if line.unfoldable and not line.unfolded:
+                    folded_lines.add(line.id)
                 filtered_lines.append(line)
         return filtered_lines
 
@@ -345,12 +386,12 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
         return cls._get_basic_line_dict_id_from_report_line(cls.env.ref(report_line_xmlid))
 
     @classmethod
-    def _get_audit_params_from_report_line(cls, options, report_line, report_line_dict, **kwargs):
+    def _get_audit_params_from_report_line(cls, options, report_line, report_line_data, **kwargs):
         return {
             'report_line_id': report_line.id,
-            'calling_line_dict_id': report_line_dict['id'],
+            'calling_line_dict_id': report_line_data.id,
             'expression_label': 'balance',
-            'column_group_key': next(iter(options['column_groups'])),
+            'column_group_index': 0,
             **kwargs,
         }
 
@@ -371,6 +412,209 @@ class TestAccountReportsCommon(AccountTestInvoicingCommon):
             'date': fields.Date.from_string(date),
             'value': amount,
         })
+
+    # -------------------------------------------------------------------------
+    # REPORT CREATION AND POPULATION HELPERS
+    # -------------------------------------------------------------------------
+
+    def _prepare_test_external_values(self, value, date, figure_type=False):
+        field_name = 'text_value' if figure_type == 'string' else 'value'
+        return {
+            'name': date,
+            field_name: value,
+            'date': date,
+        }
+
+    def _prepare_test_expression(self, formula, label='balance', **kwargs):
+        return {
+            'expression_values': {
+                'label': label,
+                'formula': formula,
+                **kwargs,
+            },
+        }
+
+    def _prepare_test_expression_tax_tags(self, formula, **kwargs):
+        return self._prepare_test_expression(engine='tax_tags', formula=formula, **kwargs)
+
+    def _prepare_test_expression_domain(self, formula, subformula, **kwargs):
+        return self._prepare_test_expression(engine='domain', formula=formula, subformula=subformula, **kwargs)
+
+    def _prepare_test_expression_account_codes(self, formula, **kwargs):
+        return self._prepare_test_expression(engine='account_codes', formula=formula, **kwargs)
+
+    def _prepare_test_expression_external(self, formula, external_value_generators, **kwargs):
+        return {
+            **self._prepare_test_expression(engine='external', formula=formula, **kwargs),
+            'external_value_generators': external_value_generators,
+        }
+
+    def _prepare_test_expression_reference(self, formula, external_value_generators, **kwargs):
+        return {
+            **self._prepare_test_expression(engine='reference', formula=formula, **kwargs),
+            'external_value_generators': external_value_generators,
+        }
+
+    def _prepare_test_expression_custom(self, formula, **kwargs):
+        return self._prepare_test_expression(engine='custom', formula=formula, **kwargs)
+
+    def _prepare_test_expression_aggregation(self, formula, subformula=None, column='balance', date_scope=None):
+        expression_values = {
+            'label': column,
+            'engine': 'aggregation',
+            'formula': formula,
+            'subformula': subformula,
+        }
+
+        if date_scope:
+            expression_values['date_scope'] = date_scope
+
+        return {
+            'expression_values': expression_values,
+        }
+
+    def _prepare_test_report_line(self, *expression_generators, **kwargs):
+        return {
+            'report_line_values': {
+                **kwargs,
+                'expression_ids': [
+                    Command.create({
+                        'date_scope': 'strict_range',
+                        **expression_values['expression_values'],
+                    })
+                    for expression_values in expression_generators
+                ],
+            },
+            'expression_generators': expression_generators,
+        }
+
+    def _create_report(self, test_report_line_values_list, columns=None, **kwargs):
+        if not columns:
+            columns = ['balance']
+
+        # Create a new report
+        report = self.env['account.report'].create({
+            'name': "_run_report",
+            'filter_date_range': True,
+            'filter_unfold_all': True,
+            **kwargs,
+            'column_ids': [
+                Command.create({
+                    'name': column,
+                    'expression_label': column,
+                    'sequence': i,
+                })
+                for i, column in enumerate(columns)
+            ],
+            'line_ids': [
+                Command.create({
+                    'name': f"test_line_{i}",
+                    **test_report_line_values['report_line_values'],
+                    'sequence': i,
+                })
+                for i, test_report_line_values in enumerate(test_report_line_values_list, start=1)
+            ],
+        })
+
+        # Create the external values
+        external_values_create_list = []
+        for report_line, test_report_line_values in zip(report.line_ids, test_report_line_values_list):
+            for expression, expression_values in zip(report_line.expression_ids, test_report_line_values['expression_generators']):
+                for external_values in expression_values.get('external_value_generators', []):
+                    external_values_create_list.append({
+                        **external_values,
+                        'target_report_expression_id': expression.id,
+                    })
+        self.env['account.report.external.value'].create(external_values_create_list)
+
+        return report
+
+    def _prepare_test_account_move_line(self, balance, account_code=None, tax_tags=None, date='2020-01-01', **kwargs):
+        if tax_tags:
+            tags = self.env['account.account.tag'].search([
+                ('applicability', '=', 'taxes'),
+                ('country_id', '=', self.fake_country.id),
+                ('name', 'in', tax_tags),
+            ])
+        else:
+            tags = self.env['account.account.tag']
+
+        return {
+            'account_move_line_values': {
+                'name': "turlututu",
+                'account_id': self.garbage_account.id,
+                **kwargs,
+                'debit': balance if balance > 0.0 else 0.0,
+                'credit': -balance if balance < 0.0 else 0.0,
+                'tax_tag_ids': [Command.set(tags.ids)],
+            },
+            'account_move_values': {'date': date, 'company_id': kwargs.get('company_id', self.env.company.id)},
+            'account_code': account_code,
+        }
+
+    def _create_test_account_moves(self, test_account_move_line_values_list):
+        # Create the missing account on-the-fly.
+        accounts_to_create_by_code = set()
+        all_company_ids = set()
+        for test_account_move_line_values in test_account_move_line_values_list:
+            if test_account_move_line_values.get('account_code'):
+                accounts_to_create_by_code.add(test_account_move_line_values['account_code'])
+            all_company_ids.add(test_account_move_line_values['account_move_values']['company_id'])
+
+        if accounts_to_create_by_code:
+            accounts = self.env['account.account']
+            accounts += self.env['account.account'].create([
+                {
+                    'code_mapping_ids': [
+                        Command.create({'company_id': company_id, 'code': account_code})
+                        for company_id in all_company_ids
+                    ],
+                    'name': account_code,
+                    'company_ids': [Command.link(comp_id) for comp_id in all_company_ids],
+                    'account_type': "asset_current",
+                }
+                for account_code in accounts_to_create_by_code
+            ])
+            account_by_code = {x.code: x for x in accounts}
+
+            for test_account_move_line_values in test_account_move_line_values_list:
+                account = account_by_code.get(test_account_move_line_values.get('account_code'))
+                if account:
+                    test_account_move_line_values['account_move_line_values']['account_id'] = account.id
+
+        # Create the journal entries.
+        to_create = {}
+        for test_account_move_line_values in test_account_move_line_values_list:
+            account_move_key = frozendict(test_account_move_line_values['account_move_values'])
+            account_move_line_values = test_account_move_line_values['account_move_line_values']
+            account_move_to_create = to_create.setdefault(account_move_key, {
+                'account_move_values': {'line_ids': []},
+                'balance': 0.0,
+            })
+            account_move_to_create['account_move_values']['line_ids'].append(Command.create(account_move_line_values))
+            account_move_to_create['balance'] += account_move_line_values['debit'] - account_move_line_values['credit']
+
+        account_move_create_list = []
+        for account_move_dict, account_move_to_create in to_create.items():
+            open_balance = account_move_to_create['balance']
+            account_move_values = account_move_to_create['account_move_values']
+            if not self.env.company.currency_id.is_zero(open_balance):
+                account_move_values['line_ids'].append(Command.create({
+                    'name': 'open balance',
+                    'account_id': self.garbage_account.id,
+                    'debit': -open_balance if open_balance < 0.0 else 0.0,
+                    'credit': open_balance if open_balance > 0.0 else 0.0,
+                }))
+            account_move_create_list.append({
+                **account_move_dict,
+                **account_move_values,
+            })
+
+        moves = self.env['account.move'].create(account_move_create_list)
+        moves.action_post()
+        return moves
+
+    # -------------------------------------------------------------------------
 
     def _test_xlsx_file(self, file_content, expected_values):
         """ Takes in the binary content of a xlsx file and a dict of expected values.

@@ -13,6 +13,8 @@ class ResConfigSettings(models.TransientModel):
         compute='_compute_facebook_app_id', inverse='_inverse_facebook_app_id')
     facebook_client_secret = fields.Char("Facebook App Secret",
         compute='_compute_facebook_client_secret', inverse='_inverse_facebook_client_secret')
+    facebook_webhook_verify_token = fields.Char("Facebook Webhook Verify Token",
+        compute='_compute_facebook_webhook_verify_token', inverse='_inverse_facebook_webhook_verify_token')
 
     @api.onchange('facebook_use_own_account')
     def _onchange_facebook_use_own_account(self):
@@ -24,24 +26,40 @@ class ResConfigSettings(models.TransientModel):
     def _compute_facebook_app_id(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager'):
-                record.facebook_app_id = self.env['ir.config_parameter'].sudo().get_param('social.facebook_app_id')
+                record.facebook_app_id = self.env['ir.config_parameter'].sudo().get_str('social.facebook_app_id') or False
             else:
-                record.facebook_app_id = None
+                record.facebook_app_id = False
 
     def _inverse_facebook_app_id(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager'):
-                self.env['ir.config_parameter'].sudo().set_param('social.facebook_app_id', record.facebook_app_id)
+                self.env['ir.config_parameter'].sudo().set_str('social.facebook_app_id', record.facebook_app_id)
 
     @api.depends('facebook_use_own_account')
     def _compute_facebook_client_secret(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager'):
-                record.facebook_client_secret = self.env['ir.config_parameter'].sudo().get_param('social.facebook_client_secret')
+                record.facebook_client_secret = self.env['ir.config_parameter'].sudo().get_str('social.facebook_client_secret') or False
             else:
-                record.facebook_client_secret = None
+                record.facebook_client_secret = False
 
     def _inverse_facebook_client_secret(self):
         for record in self:
             if self.env.user.has_group('social.group_social_manager'):
-                self.env['ir.config_parameter'].sudo().set_param('social.facebook_client_secret', record.facebook_client_secret)
+                self.env['ir.config_parameter'].sudo().set_str('social.facebook_client_secret', record.facebook_client_secret)
+
+    @api.depends('facebook_use_own_account')
+    def _compute_facebook_webhook_verify_token(self):
+        for record in self:
+            if self.env.user.has_group('social.group_social_manager'):
+                record.facebook_webhook_verify_token = self.env['ir.config_parameter'].sudo().get_str(
+                    'social.facebook_webhook_verify_token') or False
+            else:
+                record.facebook_webhook_verify_token = False
+
+    def _inverse_facebook_webhook_verify_token(self):
+        for record in self:
+            if self.env.user.has_group('social.group_social_manager'):
+                self.env['ir.config_parameter'].sudo().set_str(
+                    'social.facebook_webhook_verify_token',
+                    record.facebook_webhook_verify_token)

@@ -23,7 +23,7 @@ class Webhook(http.Controller):
         for entry in data['entry']:
             account_id = entry['id']
             account = request.env['whatsapp.account'].sudo().search(
-                [('account_uid', '=', account_id)])
+                [('account_uid', '=', account_id)], limit=1)
             if not self._check_signature(account):
                 raise Forbidden()
 
@@ -92,17 +92,33 @@ class Webhook(http.Controller):
 
     def _check_signature(self, business_account):
         """Whatsapp will sign all requests it makes to our endpoint."""
-        signature = request.httprequest.headers.get('X-Hub-Signature-256')
+        if not business_account:
+            _logger.warning("Received a webhook for an unknown WhatsApp Business Account.")
+            return False
+        if business_account.is_oauth_onboarded:
+            # The proxy re-signs the event with the secret shared at registration,
+            # Meta's own signature uses the app secret, which only the proxy holds.
+            return self._check_request_signature(business_account, 'IAP-Signature-256', 'shared_webhook_secret')
+        return self._check_request_signature(business_account)
+
+    def _check_request_signature(self, business_account, header_sign_key='X-Hub-Signature-256', account_fname='app_secret'):
+        """Check a request signed with a secret held on the account.
+
+        :param str header_sign_key: Header carrying the signature.
+        :param str account_fname: Field holding the secret it was signed with.
+        """
+        signature = request.httprequest.headers.get(header_sign_key)
         if not signature or not signature.startswith('sha256=') or len(signature) != 71:
             # Signature must be valid SHA-256 (sha256=<64 hex digits>)
             _logger.warning('Invalid signature header %r', signature)
             return False
-        if not business_account.app_secret:
-            _logger.warning('App-secret is missing, can not check signature')
+        secret = business_account[account_fname]
+        if not secret:
+            _logger.warning('%s is missing, can not check signature', account_fname)
             return False
 
         expected = hmac.new(
-            business_account.app_secret.encode(),
+            secret.encode(),
             msg=request.httprequest.data,
             digestmod=hashlib.sha256,
         ).hexdigest()

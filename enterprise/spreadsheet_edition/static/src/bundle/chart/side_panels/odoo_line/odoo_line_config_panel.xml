@@ -1,34 +1,18 @@
 <odoo>
     <t t-name="spreadsheet_edition.OdooLineChartConfigPanel"
-        t-inherit="spreadsheet_edition.CommonOdooChartConfigPanel"
-        t-inherit-mode="primary"
+        t-inherit="o-spreadsheet-LineConfigPanel"
+        t-inherit-mode="extension"
     >
-        <xpath expr="//Section[1]" position="before">
-            <Section class="'pt-0'">
+        <xpath expr="//Checkbox[@name=&quot;'cumulative'&quot;]" position="after">
+            <div class="ms-3" t-if="this.props.definition.dataSource?.type === 'odoo'">
                 <Checkbox
-                    name="'stackedBar'"
-                    label="stackedLabel"
-                    value="props.definition.stacked"
-                    onChange.bind="onUpdateStacked"
-                    className="'mb-2'"
-                />
-                <Checkbox
-                    name="'cumulative'"
-                    label="chartTerms.CumulativeData"
-                    value="props.definition.cumulative"
-                    onChange.bind="onUpdateCumulative"
-                    className="'mb-2'"
-                />
-                <div class="ms-3">
-                    <Checkbox
-                    t-if="props.definition.cumulative"
+                    t-if="this.props.definition.cumulative"
                     name="'cumulatedStart'"
                     label.translate="Include historical data"
-                    value="props.definition.cumulatedStart"
-                    onChange.bind="onUpdateCumulatedStart"
-                    />
-                </div>
-            </Section>
+                    value="this.props.definition.dataSource.cumulatedStart"
+                    onChange.bind="this.onUpdateCumulatedStart"
+                />
+            </div>
         </xpath>
     </t>
 </odoo>

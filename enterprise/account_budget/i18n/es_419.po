@@ -3,38 +3,50 @@
 # * account_budget
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2026.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-09-17 09:36+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:13+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/account_budget/es_419/>\n"
+"odoo-master/account_budget/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_budget
+#: model:ir.module.module,description:base.module_account_budget
+msgid ""
+"\n"
+"Use budgets to compare actual with expected revenues and costs\n"
+"--------------------------------------------------------------\n"
+msgstr ""
+"\n"
+"Usa presupuestos para comparar los ingresos y costos reales con los "
+"esperados\n"
+"--------------------------------------------------------------\n"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_kanban
 msgid ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
-"title=\"Period\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Period\" title=\"Period\"/>"
 msgstr ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Periodo\" "
-"title=\"Periodo\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Periodo\" title=\"Periodo\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
-msgstr ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"a\" title=\"a\"/>"
+"<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
+msgstr "<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"a\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -70,6 +82,11 @@ msgstr "Actividades"
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Decoración de la actividad de excepción"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_plans_ids
+msgid "Activity Plans"
+msgstr "Planes de actividad"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_state
@@ -108,6 +125,16 @@ msgid "Analytic Budget"
 msgstr "Presupuesto analítico"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_analytic_line
+msgid "Analytic Line"
+msgstr "Línea analítica"
+
+#. module: account_budget
+#: model:ir.model,name:account_budget.model_analytic_plan_fields_mixin
+msgid "Analytic Plan Fields"
+msgstr "Campos de planes analíticos"
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__analytical_plan_ids
 msgid "Analytic Plans"
 msgstr "Planes analíticos"
@@ -129,7 +156,6 @@ msgstr "Ambos"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_analytic
-#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_report__line_type__budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -147,6 +173,8 @@ msgid "Budget %s"
 msgstr "Presupuesto%s"
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_account_bank_statement_line__budget_analytic_ids
+#: model:ir.model.fields,field_description:account_budget.field_account_move__budget_analytic_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_analytic_id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_analytic_id
 msgid "Budget Analytic"
@@ -156,6 +184,7 @@ msgstr "Presupuesto analítico"
 #: model:ir.model,name:account_budget.model_budget_line
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__budget_line_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_line_id
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budget Line"
 msgstr "Línea del presupuesto"
 
@@ -172,6 +201,11 @@ msgstr "Línea del presupuesto"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_tree
 msgid "Budget Lines"
 msgstr "Líneas del presupuesto"
+
+#. module: account_budget
+#: model:ir.module.module,shortdesc:base.module_account_budget
+msgid "Budget Management"
+msgstr "Gestión de presupuesto"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__name
@@ -215,17 +249,18 @@ msgstr ""
 "La fecha final del presupuesto no puede ser antes que la fecha de inicio."
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budgeted"
 msgstr "En el presupuesto"
 
 #. module: account_budget
 #. odoo-python
+#: code:addons/account_budget/models/account_move.py:0
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 #: model:ir.actions.act_window,name:account_budget.act_budget_analytic_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_account_analytic_account_form_inherit_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:account_budget.view_move_form_inherit_budget
 msgid "Budgets"
 msgstr "Presupuestos"
 
@@ -233,11 +268,6 @@ msgstr "Presupuestos"
 #: model:ir.actions.act_window,name:account_budget.act_budget_lines_view
 msgid "Budgets Analysis"
 msgstr "Análisis de presupuestos"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "Cancel"
-msgstr "Cancelar"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -253,6 +283,13 @@ msgstr "Cancelado"
 #: model_terms:ir.actions.act_window,help:account_budget.act_budget_analytic_view
 msgid "Click to create a new budget."
 msgstr "Haga clic aquí para crear un nuevo presupuesto."
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
+#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
+msgid "Commitment"
+msgstr "Compromiso"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__company_id
@@ -283,6 +320,7 @@ msgstr "Moneda"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__date
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
 msgid "Date"
 msgstr "Fecha"
@@ -300,6 +338,9 @@ msgstr "Descripción"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_move__display_name
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__display_name
@@ -352,16 +393,6 @@ msgid "Followers (Partners)"
 msgstr "Seguidores (contactos)"
 
 #. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Icono de Font Awesome, por ejemplo, fa-tasks"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "From"
-msgstr "Desde"
-
-#. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Future Activities"
 msgstr "Actividades futuras"
@@ -384,6 +415,9 @@ msgstr "Tiene un mensaje"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__id
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:account_budget.field_account_move__id
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__id
@@ -428,6 +462,11 @@ msgid "Is Follower"
 msgstr "Es un seguidor"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_move
+msgid "Journal Entry"
+msgstr "Asiento contable"
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__write_uid
@@ -445,6 +484,17 @@ msgstr "Última actualización el"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Late Activities"
 msgstr "Actividades atrasadas"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__liquidation_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__liquidation
+msgid "Liquidation"
+msgstr "Liquidación"
+
+#. module: account_budget
+#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr "Icono de Material Symbols, por ejemplo, checklist"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_has_error
@@ -708,16 +758,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "User"
 msgstr "Usuario"
-
-#. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__website_message_ids
-msgid "Website Messages"
-msgstr "Mensajes del sitio web"
-
-#. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__website_message_ids
-msgid "Website communication history"
-msgstr "Historial de comunicación del sitio web"
 
 #. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_split_wizard__period__year

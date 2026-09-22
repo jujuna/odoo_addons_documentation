@@ -17,19 +17,12 @@
     }
 
     .o-livechat-LivechatStatusLabel {
-        &.o-waiting {
-            transform: rotate(180deg);
-            transition: transform 1s;
-        }
         &.o-help {
             animation: none;
         }
     }
 
     button.active .o-livechat-LivechatStatusLabel {
-        &.o-waiting {
-            transform: none;
-        }
         &.o-help {
             animation: shakeX .5s;
         }
@@ -69,16 +62,6 @@
         }
     }
 
-    button.active.o-waiting {
-        --list-group-active-color: var(--body-color);
-        --list-group-active-border-color: map-get($o-theme-text-colors, 'warning');
-
-        .form-check-input {
-            background-color: map-get($o-theme-text-colors, 'warning');
-            border-color: map-get($o-theme-text-colors, 'warning');
-        }
-    }
-
     // Dropdown
     .o_popover & {
         --list-group-border-radius: 0;
@@ -93,4 +76,9 @@
 .o-livechat-LivechatStatusLabel.position-absolute {
     background-color: rgba($white, var(--bg-opacity, 1));
     border-radius: 50%;
+}
+
+.o_country_flag {
+    width:24px;
+    height: 16px;
 }

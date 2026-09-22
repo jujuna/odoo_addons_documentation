@@ -1,30 +1,21 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from urllib.parse import urlparse
-
 from odoo import api, fields, models, _
 from odoo.addons.phone_validation.tools import phone_validation
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools.urls import urljoin as url_join
 
 
 class WhatsappTemplateButton(models.Model):
     _name = 'whatsapp.template.button'
+    _inherit = ['whatsapp.base.template.button']
     _description = 'WhatsApp Template Button'
-    _order = 'sequence,id'
 
-    sequence = fields.Integer()
-    name = fields.Char(string="Button Text", size=25)
     wa_template_id = fields.Many2one(comodel_name='whatsapp.template', required=True, index=True, ondelete='cascade')
 
-    button_type = fields.Selection([
-        ('url', 'Visit Website'),
-        ('phone_number', 'Call Number'),
-        ('quick_reply', 'Quick Reply')], string="Type", required=True, default='quick_reply')
+    button_type = fields.Selection(selection_add=[('phone_number', 'Call Number')], ondelete={'phone_number': 'set default'})
     url_type = fields.Selection([
         ('static', 'Static'),
         ('dynamic', 'Dynamic')], string="Url Type", default='static')
-    website_url = fields.Char(string="Website URL")
     call_number = fields.Char(string="Call Number")
     has_invalid_number = fields.Boolean(compute="_compute_has_invalid_number")
     variable_ids = fields.One2many(
@@ -101,12 +92,3 @@ class WhatsappTemplateButton(models.Model):
                 raise ValidationError(_('All dynamic urls must have a placeholder.'))
             if button.variable_ids.name != "{{1}}":
                 raise ValidationError(_('The placeholder for a button can only be {{1}}.'))
-
-    @api.onchange('website_url')
-    def _onchange_website_url(self):
-        if self.website_url:
-            if self.website_url.startswith('/'):
-                if (base_url := self.get_base_url()) and 'localhost' not in base_url:
-                    self.website_url = url_join(base_url, self.website_url)
-            elif (parsed_url := urlparse(self.website_url)) and not parsed_url.scheme:
-                self.website_url = f"https://{self.website_url}"

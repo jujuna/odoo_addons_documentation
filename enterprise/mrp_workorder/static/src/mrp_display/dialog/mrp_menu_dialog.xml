@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="mrp_workorder.MrpDisplayMenuDialog">
-        <Dialog size="'md'" title="props.title" modalRef="modalRef" footer="false" withBodyPadding="false" bodyClass="'overflow-x-hidden'">
-            <div t-if="state.menu === 'main'" class="o_mrp_menu_dialog p-3">
+        <Dialog size="'md'" title="this.props.title" modalRef="this.modalRef" footer="false" withBodyPadding="false" bodyClass="'overflow-x-hidden'">
+            <div t-if="this.state.menu === 'main'" class="o_mrp_menu_dialog p-3">
                 <div class="row px-2">
                     <!-- Invisible checkbox to avoid focus on the first button when entering the modals -->
                     <input type="checkbox" hidden="hidden"/>
@@ -10,133 +10,139 @@
                         <button class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3"
                                 name="register_production"
                                 t-on-click="() => this.props.registerProduction() &amp;&amp; this.props.close()">
-                            <i class="fa fa-plus"/> Register Production / Serial
+                            <i class="oi" data-icon="add"/> Register Quantity / Lot
                         </button>
                     </div>
                     <div class="col-6 p-1">
                         <button class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3"
                                 name="action_scrap"
-                                t-on-click="() => this.callAction('button_scrap')">
-                            <i class="fa fa-random"/> Scrap
+                                t-on-click="() => this.callAction('action_scrap')">
+                            <i class="oi" data-icon="shuffle"/> Scrap
                         </button>
                     </div>
-                    <div class="col-6 p-1" t-if="props.record.resModel === 'mrp.workorder'">
+                    <div class="col-6 p-1" t-if="this.props.record.resModel === 'mrp.workorder'">
                         <button
-                                t-on-click="displayModifyRoutingMenu"
+                                t-on-click="this.displayModifyRoutingMenu"
                                 class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3">
-                            <i class="fa fa-mail-forward"/>Modify Routing
+                            <i class="oi" data-icon="share"/>Modify Routing
                         </button>
                     </div>
-                    <div class="col-6 p-1" t-if="props.record.resModel === 'mrp.production'">
+                    <div class="col-6 p-1" t-if="this.workOrdersEnabled and this.props.record.resModel === 'mrp.production'">
                         <button
                                 class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3"
                                 t-on-click="() => this.callAction('action_add_workorder')">
-                            <i class="fa fa-plus"/>Add Work Order
+                            <i class="oi" data-icon="add"/>Add Work Order
                         </button>
                     </div>
                     <div class="col-6 p-1">
                         <button class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3"
                                 t-on-click="() => this.callAddComponentAction()"
                                 name="addComponent">
-                            <i class="fa fa-plus"/>Add Component
+                            <i class="oi" data-icon="add"/>Add Component
                         </button>
                     </div>
-                    <div class="col-6 p-1" t-if="props.groups.byproducts">
+                    <div class="col-6 p-1" t-if="this.props.groups.byproducts">
                         <button class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3"
                                 t-on-click="() => this.callAddByProductAction()"
                                 name="addByProduct">
-                            <i class="fa fa-plus"/>Add By-product
+                            <i class="oi" data-icon="add"/>Add By-product
                         </button>
                     </div>
-                    <div class="col-6 p-1">
+                    <div t-if="this.props.groups.regularUser" class="col-6 p-1">
                         <button class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3"
-                            t-on-click="openMO" name="openMO">
-                            <i class="fa fa-external-link"/>Open Manufacturing Order
+                            t-on-click="this.openMO" name="openMO">
+                            <i class="oi" data-icon="open_in_new"/>Open Manufacturing Order
                         </button>
                     </div>
-                    <div class="col-6 p-1" t-if="props.record.resModel === 'mrp.workorder'">
+                    <div class="col-6 p-1" t-if="this.props.record.resModel === 'mrp.workorder'">
                         <button class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3"
-                            t-on-click="displayInstructionsMenu" name="displayInstructionsMenu">
-                            <i class="fa fa-edit"/>Update Instructions
+                            t-on-click="this.displayInstructionsMenu" name="displayInstructionsMenu">
+                            <i class="oi oi-filled" data-icon="edit"/>Update Instructions
                         </button>
                     </div>
-                    <div class="col-6 p-1" t-if="props.record.resModel !== 'mrp.workorder'">
+                    <div class="col-6 p-1" t-if="this.props.record.resModel !== 'mrp.workorder'">
                         <button class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3"
                                 t-on-click="() => this.callAction('action_log_note')">
-                            <i class="fa fa-sticky-note-o"/>Log Note
+                            <i class="oi" data-icon="sticky_note_2"/>Log Note
                         </button>
                     </div>
-                    <div class="col-12 p-1" name="block" t-if="props.record.resModel === 'mrp.workorder'">
-                        <button t-if="props.record.data.working_state !== 'blocked'"
+                    <div class="col-6 p-1" t-if="this.props.record.resModel === 'mrp.workorder'">
+                        <button class="d-flex flex-column gap-1 btn btn-secondary fs-3 w-100 h-100 py-3"
+                            t-on-click="() => this.props.logTime() &amp;&amp; this.props.close()">
+                            <i class="oi" data-icon="schedule"/>Update Time Spent
+                        </button>
+                    </div>
+                    <div class="col-12 p-1" name="block" t-if="this.props.record.resModel === 'mrp.workorder'">
+                        <button t-if="this.props.record.data.working_state !== 'blocked'"
                                 class="d-flex flex-column gap-1 btn btn-danger fs-3 w-100 h-100 py-3"
-                                t-on-click="block" name="block">
+                                t-on-click="this.block" name="block">
                             Block
                         </button>
-                        <button t-if="props.record.data.working_state === 'blocked'"
+                        <button t-if="this.props.record.data.working_state === 'blocked'"
                                 class="d-flex flex-column gap-1 btn btn-success fs-3 w-100 h-100 py-3"
-                                t-on-click="unblock" name="unblock">
+                                t-on-click="this.unblock" name="unblock">
                             Unblock
                         </button>
                     </div>
                 </div>
             </div>
-            <div t-if="state.menu === 'instructions'"
+            <div t-if="this.state.menu === 'instructions'"
                  class="d-flex flex-column gap-1 p-3">
-                <button class="btn btn-light p-3 fs-3 text-start" t-on-click="displayMainMenu">
-                    <i class="oi oi-chevron-left me-2"/> Back
+                <button class="btn btn-light p-3 fs-3 text-start" t-on-click="this.displayMainMenu">
+                    <i class="oi me-2" data-icon="chevron_backward"/> Back
                 </button>
                 <div class="btn-group-vertical">
                     <button class="btn btn-outline-secondary d-flex justify-content-between align-items-center p-3 fs-3"
                             t-on-click="() => this.callAction('action_log_note')">
-                        Log Note <i class="oi oi-chevron-right"/>
+                        Add Note <i class="oi" data-icon="chevron_forward"/>
                     </button>
                     <button class="btn btn-outline-secondary d-flex justify-content-between align-items-center p-3 fs-3"
-                            t-on-click="displayImprovementMenu" name="displayImprovementMenu">
-                        Improvement Suggestion <i class="oi oi-chevron-right"/>
+                            t-on-click="this.displayImprovementMenu" name="displayImprovementMenu">
+                        Add/Modify Step <i class="oi" data-icon="chevron_forward"/>
                     </button>
                 </div>
             </div>
-            <div t-if="state.menu === 'improvement'"
+            <div t-if="this.state.menu === 'improvement'"
                 class="o_mrp_menu_update_instruction d-flex flex-column gap-1 p-3">
                 <button class="btn btn-light p-3 fs-3 text-start"
-                        t-on-click="displayInstructionsMenu">
-                    <i class="oi oi-chevron-left me-2"/> Back
+                        t-on-click="this.displayInstructionsMenu">
+                    <i class="oi me-2" data-icon="chevron_backward"/> Back
                 </button>
                 <div class="btn-group-vertical">
-                    <button t-if="props.params.checks.length"
+                    <button t-if="this.props.params.checks.length"
                             class="btn btn-outline-secondary d-flex justify-content-between align-items-center p-3 fs-3"
-                            t-on-click="updateStep">
-                        Update Instructions <i class="oi oi-chevron-right"/>
+                            t-on-click="this.updateStep">
+                        Update Instructions <i class="oi" data-icon="chevron_forward"/>
                     </button>
-                    <button t-if="props.params.checks.length"
+                    <button t-if="this.props.params.checks.length"
                             class="btn btn-outline-secondary d-flex justify-content-between align-items-center p-3 fs-3"
-                            t-on-click="removeStep">
-                        Delete a Step <i class="oi oi-chevron-right"/>
+                            t-on-click="this.removeStep">
+                        Delete a Step <i class="oi" data-icon="chevron_forward"/>
                     </button>
                     <button class="btn btn-outline-secondary d-flex justify-content-between align-items-center p-3 fs-3"
-                            t-on-click="addStep">
-                        Add a Step <i class="oi oi-chevron-right"/>
+                            t-on-click="this.addStep">
+                        Add a Step <i class="oi" data-icon="chevron_forward"/>
                     </button>
-                    <button t-if="props.params.checks.length"
+                    <button t-if="this.props.params.checks.length"
                             class="btn btn-outline-secondary d-flex justify-content-between align-items-center p-3 fs-3"
-                            t-on-click="setPicture">
-                        Set a New picture <i class="oi oi-chevron-right"/>
+                            t-on-click="this.setPicture">
+                        Add a New picture <i class="oi" data-icon="chevron_forward"/>
                     </button>
                 </div>
             </div>
-            <div t-if="state.menu === 'routing'"
+            <div t-if="this.state.menu === 'routing'"
                  class="d-flex flex-column gap-1 p-3">
-                <button class="btn btn-light p-3 fs-3 text-start" t-on-click="displayMainMenu">
-                    <i class="oi oi-chevron-left me-2"/> Back
+                <button class="btn btn-light p-3 fs-3 text-start" t-on-click="this.displayMainMenu">
+                     <i class="oi me-2" data-icon="chevron_backward"/> Back
                 </button>
                 <div class="btn-group-vertical">
                     <button class="btn btn-outline-secondary d-flex justify-content-between align-items-center p-3 fs-3"
-                            t-on-click="moveToWorkcenter" name="moveToWorkCenter">
-                        Move to work center <i class="oi oi-chevron-right"/>
+                            t-on-click="this.moveToWorkcenter" name="moveToWorkCenter">
+                        Move to work center <i class="oi" data-icon="chevron_forward"/>
                     </button>
                     <button class="btn btn-outline-secondary d-flex justify-content-between align-items-center p-3 fs-3"
                              t-on-click="() => this.callAction('action_add_workorder')">
-                        Add Work Order <i class="oi oi-chevron-right"/>
+                        Add Work Order <i class="oi" data-icon="chevron_forward"/>
                     </button>
                 </div>
             </div>

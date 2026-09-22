@@ -8,6 +8,10 @@ from odoo.tools import convert
 class MarketingCampaign(models.Model):
     _inherit = 'marketing.campaign'
 
+    @property
+    def _ENROLL_ACTION_TARGET_MODELS(self):
+        return super()._ENROLL_ACTION_TARGET_MODELS | {'crm.lead'}
+
     # --------------------------------------
     # Prepare actions data
     # --------------------------------------
@@ -76,13 +80,11 @@ class MarketingCampaign(models.Model):
                     'scheduled_calls': {
                         'title': _('Schedule Calls'),
                         'description': _('If lead is created for existing contact, schedule a call with their salesperson.'),
-                        'icon': '/marketing_automation_crm/static/img/phone.svg',
                         'function': '_get_marketing_template_scheduled_calls_values',
                     },
                     'prioritize_hot_leads': {
                         'title': _('Prioritize Hot Leads'),
                         'description': _('Send an email to new leads and assign them a high priority if they open it.'),
-                        'icon': '/marketing_automation_crm/static/img/star.svg',
                         'function': '_get_marketing_template_prioritize_hot_leads_values',
                     }
                 }
@@ -93,9 +95,10 @@ class MarketingCampaign(models.Model):
     def _get_marketing_template_scheduled_calls_values(self):
         campaign = self.env['marketing.campaign'].create({
             'name': _('Schedule Calls'),
-            'domain': [("user_id", "!=", False)],
+            'enroll_type': 'domain',
+            'enroll_domain': [("user_id", "!=", False)],
+            'enroll_unique_field_id': self.env['ir.model.fields']._get('crm.lead', 'email_from').id,
             'model_id': self.env['ir.model']._get_id('crm.lead'),
-            'unique_field_id': self.env['ir.model.fields']._get('crm.lead', 'email_from').id
         })
         create_xmls = {
             'ir.actions.server': [
@@ -107,7 +110,6 @@ class MarketingCampaign(models.Model):
             'trigger_type': 'begin',
             'activity_type': 'action',
             'interval_type': 'hours',
-            'mass_mailing_id': None,
             'interval_number': 2,
             'server_action_id': self.env.ref('marketing_automation_crm.ir_actions_server_crm_schedule_call').id,
             'name': _('Schedule Call'),
@@ -129,9 +131,11 @@ class MarketingCampaign(models.Model):
                 'subject': _('Send welcome Email'),
                 'body_arch': rendered_template,
                 'body_html': rendered_template,
+                'email_from': self.env.company.email_formatted,
                 'mailing_model_id': self.env['ir.model']._get_id('crm.lead'),
-                'reply_to_mode': 'update',
                 'mailing_type': 'mail',
+                'reply_to_mode': 'update',
+                'state': 'done',
                 'use_in_marketing_automation': True,
             }],
         }
@@ -142,9 +146,10 @@ class MarketingCampaign(models.Model):
 
         campaign = self.env['marketing.campaign'].create({
             'name': _('Prioritize Hot Leads'),
-            'domain': [("user_id", "!=", False)],
+            'enroll_type': 'domain',
+            'enroll_domain': [("user_id", "!=", False)],
+            'enroll_unique_field_id': self.env['ir.model.fields']._get('crm.lead', 'email_from').id,
             'model_id': self.env['ir.model']._get_id('crm.lead'),
-            'unique_field_id': self.env['ir.model.fields']._get('crm.lead', 'email_from').id
         })
 
         create_xmls = {
@@ -155,34 +160,34 @@ class MarketingCampaign(models.Model):
         }
         self._create_records_with_xml_ids(create_xmls)
 
-        self.env['marketing.activity'].create([{
+        parent_id = self.env['marketing.activity'].create([{
             'trigger_type': 'begin',
-            'activity_type': 'email',
+            'activity_type': 'mail',
             'interval_type': 'hours',
             'mass_mailing_id': prerequisites['mailing.mailing'][0].id,
             'interval_number': 1,
             'name': _('Send Email'),
             'campaign_id': campaign.id,
-            'child_ids': [(0, 0, {
-                'trigger_type': 'mail_reply',
-                'activity_type': 'action',
-                'interval_type': 'hours',
-                'mass_mailing_id': None,
-                'interval_number': 3,
-                'name': _('If replied, assign 3 stars'),
-                'parent_id': None,
-                'campaign_id': campaign.id,  # use the campaign_id here too,
-                'server_action_id': self.env.ref('marketing_automation_crm.ir_actions_server_crm_priority_three').id,
-            }), (0, 0, {
-                'trigger_type': 'mail_not_open',
-                'activity_type': 'action',
-                'interval_type': 'hours',
-                'mass_mailing_id': None,
-                'interval_number': 6,
-                'name': _('If not opened, priority = 0'),
-                'parent_id': None,
-                'campaign_id': campaign.id,  # use the campaign_id here too,
-                'server_action_id': self.env.ref('marketing_automation_crm.ir_actions_server_crm_priority_zero').id,
-            })]
+        }])
+        self.env['marketing.activity'].create([{
+            'trigger_type': 'mail_reply',
+            'activity_type': 'action',
+            'interval_type': 'hours',
+            'interval_number': 3,
+            'name': _('If replied, assign 3 stars'),
+            'parent_id': parent_id.id,
+            'triggering_activity_id': parent_id.id,
+            'campaign_id': campaign.id,  # use the campaign_id here too,
+            'server_action_id': self.env.ref('marketing_automation_crm.ir_actions_server_crm_priority_three').id,
+        }, {
+            'trigger_type': 'mail_not_open',
+            'activity_type': 'action',
+            'interval_type': 'hours',
+            'interval_number': 6,
+            'name': _('If not opened, priority = 0'),
+            'parent_id': parent_id.id,
+            'triggering_activity_id': parent_id.id,
+            'campaign_id': campaign.id,  # use the campaign_id here too,
+            'server_action_id': self.env.ref('marketing_automation_crm.ir_actions_server_crm_priority_zero').id,
         }])
         return campaign

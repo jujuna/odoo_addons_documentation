@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class StockPicking(models.Model):
@@ -95,7 +96,7 @@ class StockPicking(models.Model):
 
     @api.depends('move_ids',
                  'move_ids.product_id',
-                 'move_ids.product_uom',
+                 'move_ids.uom_id',
                  'move_ids.l10n_ke_oscu_flow_type_code',
                  'l10n_ke_state')
     def _compute_l10n_ke_validation_msg(self):
@@ -110,7 +111,7 @@ class StockPicking(models.Model):
 
             pick_msg = {
                 **pick.move_ids.product_id._l10n_ke_get_validation_messages(),
-                **(pick.move_ids.product_uom | pick.move_ids.product_id.uom_id)._l10n_ke_get_validation_messages(),
+                **(pick.move_ids.uom_id | pick.move_ids.product_id.uom_id)._l10n_ke_get_validation_messages(),
             }
             if pick.l10n_ke_state == 'waiting_invoice':
                 pick_msg['waiting_invoice'] = {
@@ -123,3 +124,10 @@ class StockPicking(models.Model):
                     'blocking': True,
                 }
             pick.l10n_ke_validation_msg = pick_msg
+
+    def action_return(self):
+        for picking in self:
+            if picking.company_id.account_fiscal_country_id.code == 'KE':
+                if any(not move_id.to_refund and move_id.product_id.is_storable for move_id in picking.move_ids):
+                    raise UserError(_("You need to keep 'To Refund' checked as the KRA wants invoicing on delivery. "))
+        return super().action_return()

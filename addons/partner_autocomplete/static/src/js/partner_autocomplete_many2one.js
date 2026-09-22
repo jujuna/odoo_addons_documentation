@@ -2,8 +2,11 @@ import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { computeM2OProps, Many2One } from "@web/views/fields/many2one/many2one";
-import { buildM2OFieldDescription, Many2OneField } from "@web/views/fields/many2one/many2one_field";
-import { Component } from "@odoo/owl";
+import {
+    buildM2OFieldDescription,
+    many2OneFieldProps,
+} from "@web/views/fields/many2one/many2one_field";
+import { Component, useProps } from "@odoo/owl";
 import { Many2XAutocomplete, useOpenMany2XRecord } from "@web/views/fields/relational_utils";
 
 import { usePartnerAutocomplete } from "@partner_autocomplete/js/partner_autocomplete_core";
@@ -25,7 +28,7 @@ export class PartnerMany2One extends Many2One {
 export class PartnerAutoCompleteMany2one extends Component {
     static template = "partner_autocomplete.PartnerAutoCompleteMany2one";
     static components = { Many2One: PartnerMany2One };
-    static props = { ...Many2OneField.props };
+    props = useProps({ ...many2OneFieldProps });
 
     setup() {
         super.setup();
@@ -73,7 +76,7 @@ export class PartnerAutoCompleteMany2one extends Component {
                     	if (shouldSearchWorldWide){
 							queryCountryId = 0;
 						}
-                        const suggestions = await this.partnerAutocomplete.autocomplete(request, queryCountryId);
+                        const suggestions = await this.partnerAutocomplete.autocomplete("name", request, queryCountryId);
                         return suggestions.map((suggestion) => ({
                             cssClass: "partner_autocomplete_dropdown_many2one",
                             data: suggestion,
@@ -106,11 +109,6 @@ export class PartnerAutoCompleteMany2one extends Component {
 
         if (data.logo) {
             context.default_image_1920 = data.logo;
-        }
-
-        const unspsc_codes = data.company.unspsc_codes;
-        if(unspsc_codes){
-            context.default_category_id = await this.orm.call("res.partner", "iap_partner_autocomplete_get_tag_ids", [[], unspsc_codes]);
         }
 
         return this.openRecord({ context });

@@ -3,7 +3,6 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 
 export default class SystrayAction extends Component {
-    static props = {};
     static template = "ai.SystrayAction";
 
     setup() {
@@ -19,7 +18,7 @@ export default class SystrayAction extends Component {
             return;
         }
         this.aiChatLauncher.launchAIChat({
-            callerComponentName: "systray_ai_button",
+            interfaceKey: "systray_ai_button",
         });
     }
 }

@@ -1,12 +1,9 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 
 export class DisplayText extends Component {
     static template = "l10n_it_pos.DisplayText";
-    static props = {
-        operator: { type: Number, optional: true },
-        message: { type: String },
-    };
-    static defaultProps = {
-        operator: 1,
-    };
+    props = useProps({
+        operator: t.number().optional(1),
+        message: t.string(),
+    });
 }

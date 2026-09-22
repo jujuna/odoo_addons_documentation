@@ -1,17 +1,17 @@
+import { _t } from "@web/core/l10n/translation";
 import { formatFloatTime } from "@web/views/fields/formatters";
 import { formatFloat } from "@web/core/utils/numbers";
 
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
+
+export const employeeOvertimeIndicationProps = {
+    allocated_hours: t.number().optional(),
+    uom: t.string().optional("hours"),
+    worked_hours: t.number().optional(),
+};
 
 export class EmployeeOvertimeIndication extends Component {
-    static props = {
-        allocated_hours: { type: Number, optional: true },
-        uom: { type: String, optional: true },
-        worked_hours: { type: Number, optional: true },
-    };
-    static defaultProps = {
-        uom: "hours",
-    };
+    props = useProps(employeeOvertimeIndicationProps);
     static template = "timesheet_grid.EmployeeOvertimeIndication";
 
     get shouldShowHours() {
@@ -22,7 +22,9 @@ export class EmployeeOvertimeIndication extends Component {
         if (!this.shouldShowHours) {
             return "";
         }
-        return this.props.worked_hours < this.props.allocated_hours ? "text-danger" : "text-success";
+        return this.props.worked_hours < this.props.allocated_hours
+            ? "text-danger"
+            : "text-success";
     }
 
     get overtime() {
@@ -45,5 +47,24 @@ export class EmployeeOvertimeIndication extends Component {
             overtimeIndication += formatFloatTime(this.overtime);
         }
         return overtimeIndication;
+    }
+
+    get title() {
+        if (this.props.uom === "days") {
+            return _t(
+                "Difference between the number of days recorded (%(worked_hours)s) and the number of days the employee was supposed to work according to their contract (%(allocated_hours)s)",
+                {
+                    allocated_hours: this.props.allocated_hours,
+                    worked_hours: this.props.worked_hours,
+                }
+            );
+        }
+        return _t(
+            "Difference between the number of hours recorded (%(worked_hours)s) and the number of hours the employee was supposed to work according to their contract (%(allocated_hours)s)",
+            {
+                allocated_hours: this.props.allocated_hours,
+                worked_hours: this.props.worked_hours,
+            }
+        );
     }
 }

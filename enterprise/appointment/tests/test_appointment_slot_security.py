@@ -8,10 +8,11 @@ from odoo.tools import mute_logger
 
 
 @tagged('security')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestAppointmentSlotSecurity(AppointmentSecurityCommon):
 
     @users('apt_manager')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_appointment_slot_access_apt_manager(self):
         """  Test security access to appointment.slot for the group_appointment_manager.
         Can read / write / create / unlink any appointment slot.
@@ -28,7 +29,7 @@ class TestAppointmentSlotSecurity(AppointmentSecurityCommon):
                 appointment_slot.unlink()
 
     @users('apt_user')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_appointment_slot_access_apt_user(self):
         """  Test security access to appointment.slot for the group_appointment_user.
         Can read the appointment slot if the related appointment type is published.
@@ -89,7 +90,7 @@ class TestAppointmentSlotSecurity(AppointmentSecurityCommon):
         apt_manager_slots.unlink()
 
     @users('internal_user')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_appointment_slot_access_internal_user(self):
         """  Test security access to appointment.slot for the base.group_user.
         Can read an appointment slot if the related appointment type:
@@ -124,7 +125,7 @@ class TestAppointmentSlotSecurity(AppointmentSecurityCommon):
                     appointment_slot.unlink()
 
     @users('public_user')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_appointment_slot_access_public_user(self):
         """  Test security access to appointment.slot for the base.group_public.
         Can't access anything outside of specific invitations (as those are sudo'ed in the controllers).

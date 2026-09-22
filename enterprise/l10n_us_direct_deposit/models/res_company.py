@@ -48,7 +48,7 @@ class ResCompany(models.Model):
 
     def _log_external_wise_request(self, message, func):
         """ Log when the ICP's value is in the future. """
-        log_end_date = self.env['ir.config_parameter'].sudo().get_param(ICP_LOG_NAME, '')
+        log_end_date = self.env['ir.config_parameter'].sudo().get_str(ICP_LOG_NAME, '')
         try:
             log_end_date = datetime.strptime(log_end_date, DEFAULT_SERVER_DATETIME_FORMAT)
             need_log = fields.Datetime.now() < log_end_date

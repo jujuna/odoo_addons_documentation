@@ -6,15 +6,15 @@
 # Martin Trigaux, 2022
 # Sergio Zanchetta <primes2h@gmail.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-13 15:01+0000\n"
-"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 00:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
 "sale_amazon/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +22,30 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_amazon
+#: model:ir.module.module,description:base.module_sale_amazon
+msgid ""
+"\n"
+"Import your Amazon orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and marketplaces.\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(SKU in Amazon).\n"
+"* Deliveries confirmed in Odoo are synchronized in Amazon.\n"
+"* Support for both Fulfilment by Amazon (FBA) and Fulfilment by Merchant "
+"(FBM):\n"
+"    * FBA: A stock location and stock moves allow to monitor your stock in "
+"Amazon Fulfilment\n"
+"      Centers.\n"
+"    * FBM: Delivery notifications are sent to Amazon for each confirmed "
+"picking (partial delivery\n"
+"      friendly).\n"
+msgstr ""
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
@@ -56,20 +79,20 @@ msgstr ""
 "out=\"ctx.get('amazon_order_ref') or ''\">RIF</t> ha riscontrato un errore e "
 "non è stata completata.</p>\n"
 "            <p>A meno che l'ordine non sia stato annullato in Seller "
-"Central, non verrà effettuato nessun altro tentativo di sincronizzazione.</"
-"p>\n"
+"Central, non verrà effettuato nessun altro tentativo di sincronizzazione.</p>"
+"\n"
 "            Per programmare un nuovo tentativo, procedere come segue:\n"
 "                <p><ol>\n"
 "                    <li>Entrare negli strumenti per sviluppatori.</li>\n"
 "                    <li>Aprire il modulo dell'account Amazon nel quale è "
 "stato effettuato l'ordine.</li>\n"
-"                    <li>Navigare nella scheda di aggiornamento degli ordini."
-"</li>\n"
+"                    <li>Navigare nella scheda di aggiornamento degli "
+"ordini.</li>\n"
 "                    <li>Impostare una data per <em>Sincronizzazione ultimi "
-"ordini</em> che sia precedente all'ultimo aggiornamento di stato dell'ordine."
-"</li>\n"
-"                    <li>Salvare le modifiche e fare clic sul pulsante "
-"<em>SINCRONIZZA ORDINI</em>.</li>\n"
+"ordini</em> che sia precedente all'ultimo aggiornamento di stato "
+"dell'ordine.</li>\n"
+"                    <li>Salvare le modifiche e fare clic sul pulsante <em>"
+"SINCRONIZZA ORDINI</em>.</li>\n"
 "                </ol>\n"
 "            \n"
 "            <p>Se il problema persiste, contattare il <a href=\"https://"
@@ -394,6 +417,11 @@ msgid "Amazon Accounts"
 msgstr "Account Amazon"
 
 #. module: sale_amazon
+#: model:ir.module.module,shortdesc:base.module_sale_amazon
+msgid "Amazon Connector"
+msgstr ""
+
+#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__amazon_feed_ref
 #: model:ir.model.fields,field_description:sale_amazon.field_stock_picking__amazon_feed_ref
 msgid "Amazon Feed Reference"
@@ -488,30 +516,8 @@ msgid ""
 "(location)s): street, country and country code."
 msgstr ""
 "Amazon richiede alcune informazioni per l'ubicazione di spedizione. "
-"Assicurati che le seguenti informazioni siano presenti in \"%"
-"(location_name)s\" (%(location)s): indirizzo, Paese e codice Paese."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"Since the current carrier doesn't automatically provide a tracking "
-"reference, you need to set one manually."
-msgstr ""
-"Amazon richiede che un codice di tracciamento sia fornito con ogni consegna. "
-"Poiché il trasportatore attuale non fornisce automaticamente un codice di "
-"tracciamento, è necessario impostarlo manualmente."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"You need to assign a carrier to this delivery."
-msgstr ""
-"Amazon richiede che un codice di tracciamento sia fornito con ogni consegna. "
-"È necessario assegnare un vettore a questa consegna."
+"Assicurati che le seguenti informazioni siano presenti in \"%(location_name)"
+"s\" (%(location)s): indirizzo, Paese e codice Paese."
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -690,11 +696,6 @@ msgid "Back to my account"
 msgstr "Ritorna all'account"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
-msgid "Cancel"
-msgstr "Annulla"
-
-#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__company_id
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__company_id
 msgid "Company"
@@ -784,11 +785,6 @@ msgstr "Credenziali"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Default Products"
 msgstr "Prodotti predefiniti"
-
-#. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
-msgid "Discard"
-msgstr "Abbandona"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
@@ -957,6 +953,11 @@ msgstr ""
 "ancora possibile fatturare o consegnare."
 
 #. module: sale_amazon
+#: model:ir.module.module,summary:base.module_sale_amazon
+msgid "Import Amazon orders and sync deliveries"
+msgstr ""
+
+#. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
 msgid "In Processing by Amazon"
 msgstr "In elaborazione da Amazon"
@@ -1008,8 +1009,8 @@ msgid ""
 "Link your Amazon account with Odoo to start synchronizing your "
 "Amazon                               orders."
 msgstr ""
-"Collega il tuo account Amazon con Odoo per iniziare a "
-"sincronizzare                              gli ordini."
+"Collega il tuo account Amazon con Odoo per iniziare a sincronizzare"
+"                              gli ordini."
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_order_view_form
@@ -1031,6 +1032,12 @@ msgstr "Marketplace"
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__active_marketplace_ids
 msgid "Marketplaces"
 msgstr "Marketplace"
+
+#. module: sale_amazon
+#. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Missing product name"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__name
@@ -1371,11 +1378,11 @@ msgstr "Unità di stoccaggio (SKU)."
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_channel
 msgid ""
-"The channel will be updated with the incomming orders or during the next "
-"stock synchronization."
+"The channel will be updated with the incomming orders or, if left empty, "
+"during the next stock synchronization."
 msgstr ""
-"Il canale verrà aggiornato con gli ordini in entrata o durante la prossima "
-"sincronizzazione delle scorte."
+"Il canale verrà aggiornato con gli ordini in arrivo o, se lasciato vuoto, "
+"durante la successiva sincronizzazione delle scorte."
 
 #. module: sale_amazon
 #. odoo-python
@@ -1562,8 +1569,7 @@ msgstr "Nome dell'account definito dall'utente."
 #. module: sale_amazon
 #: model:ir.model.constraint,message:sale_amazon.constraint_amazon_marketplace_unique_api_ref
 msgid "There can only exist one marketplace for a given API Identifier."
-msgstr ""
-"Per un identificatore API specificato può esistere un solo marketplace."
+msgstr "Per un identificatore API specificato può esistere un solo marketplace."
 
 #. module: sale_amazon
 #: model:ir.model.constraint,message:sale_amazon.constraint_sale_order_unique_amazon_order_ref
@@ -1699,128 +1705,3 @@ msgstr "es. Mercato americano"
 #: code:addons/sale_amazon/models/amazon_account.py:0
 msgid "id"
 msgstr "ID"
-
-#~ msgid "AWS Access Key"
-#~ msgstr "Chiave di accesso AWS"
-
-#~ msgid "AWS Secret Key"
-#~ msgstr "Chiave segreta AWS"
-
-#~ msgid "AWS Session Token"
-#~ msgstr "Token di sessione AWS"
-
-#~ msgid ""
-#~ "After validation of the credentials, the marketplaces\n"
-#~ "                                                to which this account has "
-#~ "access will be\n"
-#~ "                                                synchronized and "
-#~ "automatically made available."
-#~ msgstr ""
-#~ "Dopo la convalida delle credenziali, i marketplace\n"
-#~ "a cui questo account ha accesso saranno\n"
-#~ "sincronizzati e resi automaticamente disponibili."
-
-#~ msgid "Amazon Email"
-#~ msgstr "E-mail Amazon"
-
-#~ msgid "Error code: %s; description: %s"
-#~ msgstr "Codice errore: %s; descrizione: %s"
-
-#~ msgid ""
-#~ "If this account gained access to new "
-#~ "marketplaces,                                         synchronize and add "
-#~ "them to the current sync marketplaces"
-#~ msgstr ""
-#~ "Se questo account ha ottenuto l'accesso a nuovi marketplace, "
-#~ "sincronizzalo e aggiungilo agli attuali marketplace di sincronizzazione"
-
-#~ msgid "Inactive"
-#~ msgstr "Non attivo"
-
-#~ msgid "Is Follow Up Displayed"
-#~ msgstr "Follow Up è visualizzato"
-
-#~ msgid "Link with Amazon"
-#~ msgstr "Collega con Amazon"
-
-#~ msgid "Order Follow-up"
-#~ msgstr "Follow-up all'ordine"
-
-#~ msgid "SKU"
-#~ msgstr "SKU"
-
-#~ msgid "SKU must be unique for a given account and marketplace."
-#~ msgstr "SKU deve essere univoco per account e marketplace fornito."
-
-#~ msgid ""
-#~ "Select the marketplace on which your seller account\n"
-#~ "                                                was originally created."
-#~ msgstr ""
-#~ "Selezioni il marketplace sul quale il tuo account di venditore\n"
-#~ "è stato originariamente creato."
-
-#~ msgid "Sign-up Marketplace"
-#~ msgstr "Iscrizione marketplace"
-
-#~ msgid "Stock Location"
-#~ msgstr "Ubicazione di giacenza"
-
-#~ msgid "Sync Marketplaces"
-#~ msgstr "Sincronizza marketplace"
-
-#~ msgid ""
-#~ "The communication with the API failed.\n"
-#~ "Error code: %s; description: %s"
-#~ msgstr ""
-#~ "Comunicazione con API non riuscita.\n"
-#~ "Codice errore: %s; descrizione: %s"
-
-#~ msgid "The moment at which the AWS credentials become invalid."
-#~ msgstr "Momento nel quale le credenziali AWS perdono la loro validità."
-
-#~ msgid ""
-#~ "The original sign-up marketplace of this account. Used for authentication "
-#~ "only."
-#~ msgstr ""
-#~ "Marketplace di iscrizione originale di questo account. Utilizzato solo "
-#~ "per autenticazione."
-
-#~ msgid "The short-lived key used to identify the assumed ARN role on AWS."
-#~ msgstr ""
-#~ "Chiave di breve durata usata per identificare il ruolo ARN assunto su AWS."
-
-#~ msgid ""
-#~ "The short-lived key used to verify the access to the assumed ARN role on "
-#~ "AWS."
-#~ msgstr ""
-#~ "Chiave di breve durata usata per verificare l'accesso al ruolo ARN "
-#~ "assunto in AWS."
-
-#~ msgid ""
-#~ "The short-lived token used to query the SP-API with the assumed ARN role "
-#~ "on AWS."
-#~ msgstr ""
-#~ "Token di breve durata usato per interrogare SP-API con il ruolo ARN "
-#~ "assunto in AWS"
-
-#~ msgid "Unlink account"
-#~ msgstr "Scollega account"
-
-#~ msgid "Update Available Marketplaces"
-#~ msgstr "Aggiornamento dei marketplace disponibili"
-
-#~ msgid "Your Amazon account is linked with Odoo."
-#~ msgstr "L'account Amazon è collegato con Odoo."
-
-#~ msgid ""
-#~ "[%s] %s\n"
-#~ "Condition: %s - %s"
-#~ msgstr ""
-#~ "[%s] %s\n"
-#~ "Condizione: %s - %s"
-
-#~ msgid "[%s] Delivery Charges for %s"
-#~ msgstr "[%s] Costi di consegna per %s"
-
-#~ msgid "[%s] Gift Wrapping Charges for %s"
-#~ msgstr "[%s] Costi confezione regalo per %s"

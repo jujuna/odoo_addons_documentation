@@ -7,10 +7,6 @@
         <field name="inherit_id" ref="l10n_ar.res_config_settings_view_form"/>
         <field name="arch" type="xml">
 
-            <div id="argentina_localization_section" position="attributes">
-                <attribute name="invisible">0</attribute>
-            </div>
-
             <xpath expr="//block[@id='argentina_localization']" position="inside">
                 <setting string="ARCA Web Services" company_dependent="1">
                     <field name="l10n_ar_afip_ws_environment" class="o_light_label"  widget="radio"/>
@@ -23,24 +19,24 @@
                             <label for="l10n_ar_afip_ws_crt_id" string="Certificate" class="o_light_label col-lg-3"/>
                             <field name="l10n_ar_afip_ws_crt_id" help="Select the Certificate that you downloaded from ARCA"/>
                             <span invisible="l10n_ar_afip_ws_crt_id"> or</span>
-                            <button name="l10n_ar_action_create_certificate_request" icon="oi-arrow-right" type="object" class="oe_link oe_inline" string="Generate Request" invisible="l10n_ar_afip_ws_crt_id" help="Click here to create a Resquest Certificate file. This file need to be uploaded to your ARCA Portal in order to ask ARCA for a certificate"/>
+                            <button name="l10n_ar_action_create_certificate_request" icon="east" type="object" class="oe_link oe_inline" string="Generate Request" invisible="l10n_ar_afip_ws_crt_id" help="Click here to create a Resquest Certificate file. This file need to be uploaded to your ARCA Portal in order to ask ARCA for a certificate"/>
                         </div>
                         <div class="mt16">
-                            <button name="l10n_ar_connection_test" icon="oi-arrow-right" type="object" class="oe_link oe_inline" string="Test Connections"/>
+                            <button name="l10n_ar_connection_test" icon="east" type="object" class="oe_link oe_inline" string="Test Connections"/>
                         </div>
                         <div class="mt16" invisible="not l10n_ar_afip_ws_crt_id">
-                            <button name="l10n_ar_action_create_certificate_request" icon="oi-arrow-right" type="object" class="oe_link oe_inline" string="Generate Renewal Request"/>
+                            <button name="l10n_ar_action_create_certificate_request" icon="east" type="object" class="oe_link oe_inline" string="Generate Renewal Request"/>
                         </div>
                         <div class="mt16" id="get_afip_certificate">
                             <a href="https://www.afip.gob.ar/ws/WSAA/WSAA.ObtenerCertificado.pdf" target="_blank">
                                 How to get certificate for production?
                             </a>
                         </div>
-                        <div class="mt16">
-                            <field name="l10n_ar_show_withholding_legend"/>
-                            <label for="l10n_ar_show_withholding_legend" string="Add Withholding Legend to Invoice PDF" class="o_light_label col-lg-10"/>
-                        </div>
                     </div>
+                </setting>
+                <setting string="Add Legend to Invoice PDF" company_dependent="1" help="If this option is selected, the selected legend string will be added below the Document Type letter on the Invoice PDF.">
+                    <label for="l10n_ar_invoice_pdf_legend" string="Legend" class="o_light_label col-lg-3"/>
+                    <field name="l10n_ar_invoice_pdf_legend"/>
                 </setting>
                 <setting string="Verify Vendor Bills validity in ARCA" company_dependent="1" help="Allow or Require to do vendor bill verify in ARCA for documents with CAE, CAI or CAEA numbers" invisible="country_code != 'AR'">
                     <field name="l10n_ar_afip_verification_type" widget="radio"/>
@@ -52,7 +48,7 @@
                     <div class="o_setting_left_pane"/>
                     <div class="o_setting_right_pane">
                         <label for="l10n_ar_payment_foreign_currency"/>
-                        <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." groups="base.group_multi_company"/>
+                        <span class="oi oi-lg" data-icon="business" title="Values set here are company-specific." groups="base.group_multi_company"/>
                         <div class="text-muted">
                             Please select the default option that will be used to inform ARCA whether the payment is made in a foreign currency, as required by RG 5616/2024:<ul>
                             <li>Yes → Always report foreign currency payments to ARCA</li>

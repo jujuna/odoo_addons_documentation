@@ -22,7 +22,7 @@ class QualityCheckSpreadsheet(models.Model):
         "specified, the first sheet is selected by default.",
     )
 
-    def get_formview_action(self, access_uid=None):
+    def get_record_default_action(self, access_uid=None):
         return self.action_open_spreadsheet()
 
     def action_open_spreadsheet(self):

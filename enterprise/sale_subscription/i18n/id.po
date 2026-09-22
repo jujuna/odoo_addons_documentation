@@ -10,21 +10,22 @@
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Abe Manyo (abem)" <abem@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-06 10:37+0000\n"
-"Last-Translator: \"Abe Manyo (abem)\" <abem@odoo.com>\n"
-"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 02:52+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-master/"
 "sale_subscription/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_subscription
 #. odoo-python
@@ -39,6 +40,18 @@ msgstr ""
 "- Anda sedang mencoba untuk memfaktur pesanan rutin. Silakan verifikasi "
 "kuantitas terkirim produk berdasarkan kebijakan faktur, tanggal faktur "
 "berikutnya dan tanggal akhir kontrak."
+
+#. module: sale_subscription
+#: model:ir.module.module,description:base.module_sale_subscription
+msgid ""
+"\n"
+"This module allows you to manage subscriptions.\n"
+"\n"
+"Features:\n"
+"    - Create & edit subscriptions\n"
+"    - Modify subscriptions with sales orders\n"
+"    - Generate invoice automatically at fixed intervals\n"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__nbr
@@ -125,18 +138,6 @@ msgstr ""
 "prorata dari %(start)s sampai %(end)s"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "(Change Plan)"
-msgstr "(Ubah Rencana)"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid ""
-")\n"
-"                        <br/>"
-msgstr ""
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "- Until"
 msgstr ""
@@ -179,89 +180,9 @@ msgid "6 Months"
 msgstr "6 Bulan"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "<b>Payment Method</b>"
-msgstr "<b>Metode Pembayara</b>"
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_advance_payment_inv_sale_subscription
 msgid "<b>Subscriptions</b><br/>"
 msgstr ""
-
-#. module: sale_subscription
-#: model:mail.template,body_html:sale_subscription.mail_template_subscription_alert
-msgid ""
-"<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-"family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-"                <table style=\"width:600px;margin:5px auto;\">\n"
-"                    <tbody>\n"
-"                        <tr><td t-if=\"not "
-"object.company_id.uses_default_logo\">\n"
-"                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-"company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
-"                        </td><td style=\"text-align:right;vertical-"
-"align:middle;\">\n"
-"                                Subscription Renewal\n"
-"                        </td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"                <table style=\"width:600px;margin:0px "
-"auto;background:white;border:1px solid #e1e1e1;\">\n"
-"                    <tbody>\n"
-"                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-"                            <p>Dear <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,</p>\n"
-"                            <p>Your subscription <strong t-out=\"object.name "
-"or ''\">Office Cleaning Service\"</strong> needs your attention.</p>\n"
-"                            <p>We invite you to renew it by clicking on the "
-"following link.</p>\n"
-"                            <p>Kind regards.</p>\n"
-"                        </td></tr>\n"
-"                        <tr data-o-mail-quote-container=\"1\"><td "
-"style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</"
-"td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        "
-msgstr ""
-"<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-"family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-"                <table style=\"width:600px;margin:5px auto;\">\n"
-"                    <tbody>\n"
-"                        <tr><td t-if=\"not "
-"object.company_id.uses_default_logo\">\n"
-"                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-"company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
-"                        </td><td style=\"text-align:right;vertical-"
-"align:middle;\">\n"
-"                                Pembaruan Langganan\n"
-"                        </td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"                <table style=\"width:600px;margin:0px "
-"auto;background:white;border:1px solid #e1e1e1;\">\n"
-"                    <tbody>\n"
-"                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-"                            <p>Kepada <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,</p>\n"
-"                            <p>Langganan Anda <strong t-out=\"object.name or "
-"''\">Layanan Office Cleaning\"</strong> membutuhkan perhatian Anda.</p>\n"
-"                            <p>Kami mengundang Anda untuk memperbaruinya "
-"dengan mengeklik link berikut.</p>\n"
-"                            <p>Salam hormat.</p>\n"
-"                        </td></tr>\n"
-"                        <tr data-o-mail-quote-container=\"1\"><td "
-"style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</"
-"td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        "
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.mail_template_subscription_rating
@@ -470,53 +391,48 @@ msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "<i class=\"fa fa-download me-1\"/> Download"
-msgstr "<i class=\"fa fa-download me-1\"/> Unduh"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> In Progress"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Sedang Berlangsung"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> Paused"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Dipause"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> Renewed"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Diperbarui"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-remove\"/> Closed"
-msgstr "<i class=\"fa fa-fw fa-remove\"/> Ditutup"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-remove\"/> Closing"
-msgstr "<i class=\"fa fa-fw fa-remove\"/> Closing"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-repeat\"/> To Renew"
-msgstr "<i class=\"fa fa-fw fa-repeat\"/> Untuk Diperbarui"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "<i class=\"fa fa-plus\"/> Create address"
-msgstr "<i class=\"fa fa-plus\"/> Buat alamat"
+msgid "<i class=\"oi me-1\" data-icon=\"download\"/> Download"
+msgstr "<i class=\"oi me-1\" data-icon=\"download\"/> Unduh"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
-msgid "<i class=\"oi oi-arrow-right me-1\"/>Back to your subscription"
-msgstr "<i class=\"oi oi-arrow-right me-1\"/>Kembali ke langganan Anda"
+msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Back to your subscription"
+msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>Kembali ke langganan Anda"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
-msgid "<option value=\"\">Choose a reason...</option>"
-msgstr "<option value=\"\">Pilih alasan...</option>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> To Renew"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> In Progress"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Sedang Berlangsung"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> Paused"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Dipause"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> Renewed"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Diperbarui"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"close\"/> Closed"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"close\"/> Ditutup"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"close\"/> Closing"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"close\"/> Closing"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
+msgid "<i class=\"oi\" data-icon=\"add\"/> Create address"
+msgstr "<i class=\"oi\" data-icon=\"add\"/> Buat alamat"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.payment_method_form
@@ -529,22 +445,27 @@ msgstr ""
 "terhubung</small>"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
-msgid ""
-"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"fa fa-fw fa-"
-"repeat\"/> To Renew</span>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<small class=\"text-muted\">Plan</small>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"fa fa-fw fa-"
-"repeat\"/> Untuk Diperbarui</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"fa fa-fw fa-"
-"remove\"/> Closed</span>"
+"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"oi oi-fw\" data-"
+"icon=\"redo\"/> To Renew</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"fa fa-fw fa-"
-"remove\"/> Ditutup</span>"
+"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"oi oi-fw\" data-"
+"icon=\"redo\"/> Untuk Diperbarui</span>"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
+msgid ""
+"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"oi oi-fw\" data-"
+"icon=\"close\"/> Closed</span>"
+msgstr ""
+"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"oi oi-fw\" data-"
+"icon=\"close\"/> Ditutup</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
@@ -557,38 +478,38 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid ""
-"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"fa fa-fw fa-"
-"check\"/> Upsell</span>"
+"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Upsell</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"fa fa-fw fa-"
-"check\"/> Upsell</span>"
+"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Upsell</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"fa fa-fw fa-"
-"check\"/> Renewed</span>"
+"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Renewed</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"fa fa-fw fa-"
-"check\"/> Diperbarui</span>"
+"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Diperbarui</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> In Progress</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> In Progress</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Sedang Berlangsung</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Sedang Berlangsung</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Paused</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Paused</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Dipause</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Dipause</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -623,23 +544,9 @@ msgid "<span class=\"text-muted\">Next Billing</span>"
 msgstr "<span class=\"text-muted\">Billing Berikutnya</span>"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.recurring_details
-msgid "<span class=\"text-start\">Non Recurring</span>:"
-msgstr "<span class=\"text-start\">Tidak Berulang</span>:"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.recurring_details
-msgid "<span class=\"text-start\">Recurring</span>:"
-msgstr "<span class=\"text-start\">Berulang</span>:"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
-msgid ""
-"<span invisible=\"not plan_id or subscription_state == '7_upsell'\">until</"
-"span>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<span class=\"text-muted\">→</span>"
 msgstr ""
-"<span invisible=\"not plan_id or subscription_state == '7_upsell'\">sampai</"
-"span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -665,6 +572,26 @@ msgstr ""
 "        </span>"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<span>·</span>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Invoices</strong>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Period</strong>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Plan</strong>"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "<strong>Recurring Plan</strong>"
 msgstr "<strong>Paket Rutin</strong>"
@@ -679,570 +606,192 @@ msgstr ""
 "ditetapkan. Mohon selesaikan:"
 
 #. module: sale_subscription
+#: model:mail.template,body_html:sale_subscription.mail_template_subscription_alert
+msgid ""
+"<t>\n"
+"<p>Dear <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,</p>\n"
+"<p>Your subscription <strong t-out=\"object.name or ''\">Office Cleaning "
+"Service\"</strong> needs your attention.</p>\n"
+"<p>We invite you to renew it by clicking on the following link.</p>\n"
+"<p>Kind regards.</p>\n"
+"<p t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">--<br "
+"data-o-mail-quote=\"1\"/>Mitchell Admin</p>\n"
+"        </t>"
+msgstr ""
+
+#. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.email_payment_close
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Your Subscription</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Office Cleaning Service</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hello <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Our final attempt to process a payment for your "
-"subscription using your payment method\n"
-"                        <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</"
-"t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">100</t> <t t-out=\"ctx.get('currency') or ''\">$</t> failed.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Your bank or credit institution gave the "
-"following details about the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Our final attempt to process a payment for your "
-"subscription failed because we have no payment method recorded for you.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    As your payment should have been made <strong><t t-"
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Our final attempt to process a payment for your subscription using your "
+"payment method\n"
+"    <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</t>\n"
+"    for <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+"out=\"ctx.get('currency') or ''\">$</t> failed.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Your bank or credit institution gave the following details about the "
+"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Our final attempt to process a payment for your subscription failed "
+"because we have no payment method recorded for you.\n"
+"</t>\n"
+"<br/><br/>\n"
+"As your payment should have been made <strong><t t-"
 "out=\"ctx.get('auto_close_limit') or ''\">5</t> days ago</strong>, your "
 "subscription has been terminated.\n"
-"                    Should you wish to resolve this issue, do not hesitate "
-"to contact us.<br/><br/>\n"
-"                    Thank you for choosing <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Should you wish to resolve this issue, do not hesitate to contact us.<br/"
+"><br/>\n"
+"Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</div>\n"
+"</t>\n"
 "        "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Langganan Anda</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Cleaning Service Kantor</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Halo <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Upaya terakhir kami untuk memproses pembayaran untuk "
-"langganan Anda menggunakan metode pembayaran\n"
-"                        <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</"
-"t>\n"
-"                        untuk <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">100</t> <t t-out=\"ctx.get('currency') or ''\">$</t> gagal.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Bank atau lembaga kredit Anda memberikan rincian "
-"berikut mengenai masalahnya: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Upaya terakhir kami untuk memproses pembayaran untuk "
-"langganan Anda gagal karena tidak ada metode pembayaran yang terekam untuk "
-"Anda.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Karena pembayaran Anda seharusnya sudah dilakukan "
-"<strong><t t-out=\"ctx.get('auto_close_limit') or ''\">5</t> hari lalu</"
-"strong>, langganan Anda telah dihentikan.\n"
-"                    Apabila Anda ingin mengatasi masalah ini, jangan ragu "
-"untuk menghubungi kami.<br/><br/>\n"
-"                    Terima kasih sudah memilih <t t-out=\"company.name or "
-"''\">PerusahaanAnda</t>!\n"
-"                    <div t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">PerusahaanAnda</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@perusahaanAnda.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.contoh.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Halo <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Upaya terakhir kami untuk memproses pembayaran langganan Anda "
+"menggunakan metode pembayaran\n"
+"    <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</t>\n"
+"    sebesar <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+"out=\"ctx.get('currency') or ''\">$</t> gagal.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Bank atau lembaga kredit Anda memberikan detail berikut terkait "
+"masalahnya: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Upaya terakhir kami untuk memproses pembayaran langganan Anda gagal "
+"karena kami tidak memiliki catatan terkait metode pembayaran Anda.\n"
+"</t>\n"
+"<br/><br/>\n"
+"Karena pembayaran seharusnya dilakukan <strong><t t-"
+"out=\"ctx.get('auto_close_limit') or ''\">5</t> hari lalu</strong>, "
+"langganan Anda telah diakhiri.\n"
+"Jika Anda ingin menyelesaikan masalah ini, silakan hubungi kami.<br/><br/>\n"
+"Terima kasih telah memilih <t t-out=\"company.name or ''\">PerusahaanAnda</"
+"t>!\n"
+"<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</div>\n"
+"</t>\n"
 "        "
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.email_payment_reminder
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Your Subscription</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Office Cleaning Service</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hello <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        We were unable to process a payment for your "
-"subscription using your payment method\n"
-"                        <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">10</t> <t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Your bank or credit institution gave the "
-"following details about the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Your subscription <t t-out=\"ctx.get('code') or "
-"''\">CODE</t> is due for renewal but we haven’t received your payment yet. "
-"To keep your subscription active, please make your payment as soon as "
-"possible.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Your subscription <t t-out=\"ctx.get('code') or "
-"''\">CODE</t> is still valid but will be <strong>suspended</strong>\n"
-"                    on <t t-out=\"format_date(ctx.get('date_close')) or "
-"''\">05/05/2021</t><br/>\n"
-"                    <div style=\"margin: 16px 0px; text-align: center;\">\n"
-"                        <a t-attf-href=\"{{ ctx.get('payment_link', "
-"object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; padding: "
-"10px 30px; text-decoration: none; background-color: "
-"{{company.email_secondary_color or '#875A7B'}}; color: "
-"{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
-"                            Pay Now\n"
-"                        </a>\n"
-"                    </div>\n"
-"                    <br/>\n"
-"                    If you have any questions, do not hesitate to contact us."
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    We were unable to process a payment for your subscription using your "
+"payment method\n"
+"    <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
+"    for <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+"out=\"ctx.get('currency_name') or ''\">$</t>.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Your bank or credit institution gave the following details about the "
+"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> is "
+"due for renewal but we haven’t received your payment yet. To keep your "
+"subscription active, please make your payment as soon as possible.\n"
+"</t>\n"
 "<br/><br/>\n"
-"                    Thank you for choosing <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div>\n"
-"                    <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </t>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> will "
+"be <strong>suspended</strong>\n"
+"<t t-out=\"(ctx.get('date_close') and ('on ' + "
+"format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>\n"
+"if payment is not received.<br/>\n"
+"<div style=\"margin: 16px 0px; text-align: center;\">\n"
+"    <a t-attf-href=\"{{ ctx.get('payment_link', object.get_portal_url()) }}"
+"\" t-attf-style=\"display: inline-block; padding: 10px 30px; text-"
+"decoration: none; background-color: {{company.email_secondary_color or "
+"'#875A7B'}}; color: {{company.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
+"        Pay Now\n"
+"    </a>\n"
+"</div>\n"
+"<br/>\n"
+"If you have any questions, do not hesitate to contact us.<br/><br/>\n"
+"Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div>\n"
+"<t t-if=\"user.signature\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</t>\n"
+"</div>\n"
+"</t>\n"
 "        "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Langganan Anda</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Layanan Office Cleaning</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Halo <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Kami tidak dapat memproses pembayaran untuk "
-"langganan Anda menggunakan metode pembayaran Anda\n"
-"                        <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
-"                        untuk <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">10</t> <t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Bank atau lembaga kredit memberikan detail "
-"berikut untuk masalah Anda: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Your subscription <t t-out=\"ctx.get('code') or "
-"''\">CODE</t> is due for renewal but we haven’t received your payment yet. "
-"To keep your subscription active, please make your payment as soon as "
-"possible.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Langganan Anda <t t-out=\"ctx.get('code') or ''\">CODE</"
-"t> masih valid tapi akan <strong>ditangguhkan</strong>\n"
-"                    pada <t t-out=\"format_date(ctx.get('date_close')) or "
-"''\">05/05/2021</t><br/>\n"
-"                    <div style=\"margin: 16px 0px; text-align: center;\">\n"
-"                        <a t-attf-href=\"{{ ctx.get('payment_link', "
-"object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; padding: "
-"10px 30px; text-decoration: none; background-color: "
-"{{company.email_secondary_color or '#875A7B'}}; color: "
-"{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
-"                            Bayar Sekarang\n"
-"                        </a>\n"
-"                    </div>\n"
-"                    <br/>\n"
-"                    Bila Anda memiliki pertanyaan apa pun, jangan ragu untuk "
-"menghubungi kami.<br/><br/>\n"
-"                    Terima kasih sudah memilih <t t-out=\"company.name or "
-"''\">PerusahaanAnda</t>!\n"
-"                    <div>\n"
-"                    <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </t>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">PerusahaanAnda</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@perusahaanAnda.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.contoh.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Halo <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Kami tidak dapat memproses pembayaran langganan Anda menggunakan metode "
+"pembayaran Anda\n"
+"    <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
+"    sejumlah <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+"out=\"ctx.get('currency_name') or ''\">$</t>.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Bank atau lembaga kredit Anda memberikan detail berikut terkait "
+"masalahnya: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Langganan Anda <t t-out=\"object.client_order_ref or ''\">KODE</t> sudah "
+"harus diperpanjang, tetapi kami belum menerima pembayarannya. Agar langganan "
+"tetap aktif, mohon untuk melakukan pembayaran sesegera mungkin.\n"
+"</t>\n"
+"<br/><br/>\n"
+"Langganan Anda <t t-out=\"object.client_order_ref or ''\">KODE</t> akan "
+"<strong>ditangguhkan</strong>\n"
+"<t t-out=\"(ctx.get('date_close') and ('on ' + "
+"format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>\n"
+"jika kami tidak menerima pembayaran.<br/>\n"
+"<div style=\"margin: 16px 0px; text-align: center;\">\n"
+"    <a t-attf-href=\"{{ ctx.get('payment_link', object.get_portal_url()) }}"
+"\" t-attf-style=\"display: inline-block; padding: 10px 30px; text-"
+"decoration: none; background-color: {{company.email_secondary_color or "
+"'#875A7B'}}; color: {{company.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
+"        Bayar Sekarang\n"
+"    </a>\n"
+"</div>\n"
+"<br/>\n"
+"Jika ada yang ingin ditanyakan, silakan hubungi kami.<br/><br/>\n"
+"Terima kasih sudah memilih <t t-out=\"company.name or ''\">PerusahaanAnda</"
+"t>!\n"
+"<div>\n"
+"<t t-if=\"user.signature\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</t>\n"
+"</div>\n"
+"</t>\n"
 "        "
 
 #. module: sale_subscription
@@ -1298,11 +847,6 @@ msgid "Accept One-Time"
 msgstr "Terima Satu-Waktu"
 
 #. module: sale_subscription
-#: model:ir.model,name:sale_subscription.model_account_move_send
-msgid "Account Move Send"
-msgstr "Kirim Account Move"
-
-#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_needaction
 msgid "Action Needed"
 msgstr "Tindakan Diperlukan"
@@ -1321,7 +865,7 @@ msgstr "Perubahan Pelanggan Aktif"
 #: model:ir.actions.act_window,name:sale_subscription.mail_activity_plan_action_subscription
 #: model:ir.ui.menu,name:sale_subscription.mail_activity_plan_menu_config_subscription
 msgid "Activity Plans"
-msgstr "Rencana-Rencana Kegiatan"
+msgstr "Rencana Aktivitas"
 
 #. module: sale_subscription
 #: model:ir.actions.act_window,name:sale_subscription.mail_activity_type_action_config_subscription
@@ -1463,6 +1007,11 @@ msgstr "Pada tanggal"
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_attachment_count
 msgid "Attachment Count"
 msgstr "Hitungan Lampiran"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
+msgid "Attributes"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__authorized
@@ -1633,13 +1182,6 @@ msgid "Campaign"
 msgstr "Kampanye"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_change_customer_view_form
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
-msgid "Cancel"
-msgstr "Batal"
-
-#. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log_report__state__cancel
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_cancel
 msgid "Cancelled"
@@ -1656,6 +1198,15 @@ msgstr ""
 "Membatalkan langganan yang difaktur tidak adil untuk pelanggan. Setelah "
 "faktur telah dibuat dan mungkin sudah dibayar, prosesnya selesai. "
 "Membatalkan langganan mereka pasti akan menghasilkan kekacauan!"
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
+msgid ""
+"Cannot close %(subscriptions_name)s: subscription order with recurring plan."
+msgstr ""
+"Tidak dapat menutup %(subscriptions_name)s pesanan langganan dengan paket "
+"rutin."
 
 #. module: sale_subscription
 #: model:product.template,name:sale_subscription.product_car_leasing_product_template
@@ -1708,6 +1259,11 @@ msgid "Choose a product name.<br/><i>(e.g. eLearning Access)</i>"
 msgstr "Pilih nama produk.<br/><i>(contoh Akses eLearning)</i>"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
+msgid "Choose a reason..."
+msgstr ""
+
+#. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Choose the invoice duration for your subscription"
@@ -1744,6 +1300,7 @@ msgid "Closable"
 msgstr "Dapat diclose"
 
 #. module: sale_subscription
+#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_close_reason_wizard_action
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
@@ -1751,7 +1308,11 @@ msgid "Close"
 msgstr "Tutup"
 
 #. module: sale_subscription
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_close_reason_wizard_action
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_date
+msgid "Close Date"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__close_reason_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__close_reason_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_reason_id
@@ -1772,6 +1333,12 @@ msgstr "Tutup Alasan"
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "Close Subscription"
 msgstr "Tutup Langganan"
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Close the recurring plan dropdown."
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__user_closable_options
@@ -1799,6 +1366,36 @@ msgstr "Closing"
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "Closing text: %s"
 msgstr "Teks penutupan: %s"
+
+#. module: sale_subscription
+#: model:ir.model.fields,help:sale_subscription.field_res_config_settings__no_token_reminder_days
+msgid ""
+"Comma-separated list of day offsets relative to the next invoice date (e.g. "
+"0,1,2,7,14,-2,-7,-14) on which a payment reminder is sent for subscriptions "
+"with no saved payment token."
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
+msgid ""
+"Comma-separated list of day offsets relative to the next invoice date (e.g. "
+"0,1,2,7,14,-2,-7,-14) on which a reminder is sent for subscriptions with no "
+"saved payment token."
+msgstr ""
+
+#. module: sale_subscription
+#: model:ir.model.fields,help:sale_subscription.field_res_config_settings__payment_failed_reminder_days
+msgid ""
+"Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
+"reminder email is sent when an automatic payment with a saved token fails."
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
+msgid ""
+"Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
+"reminder is sent when an automatic payment fails."
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__commercial_partner_id
@@ -2013,6 +1610,11 @@ msgid "Customer State"
 msgstr "Status Pelanggan"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_tag_ids
+msgid "Customer Tags"
+msgstr "Tag Pelanggan"
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_zip
 msgid "Customer ZIP"
 msgstr "ZIP Pelanggan"
@@ -2040,11 +1642,6 @@ msgid "Date the MRR change was first billed."
 msgstr "Tanggal perubahan MRR pertama kali ditagih."
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Date:"
-msgstr "Tanggal:"
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Days"
 msgstr "Hari"
@@ -2066,14 +1663,60 @@ msgid "Define if the subscription product can also be bought as a one-time."
 msgstr "Definisikan bila produk langganan dapat juga dibeli satu-kali saja."
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s months"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s weeks"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s years"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every month"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every week"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every year"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "Delivery Address"
 msgstr "Alamat Tujuan"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__delivery_period_display
+msgid "Delivery Period Display"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Details"
 msgstr "Perincian"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
+msgid "Discard"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
@@ -2106,6 +1749,7 @@ msgstr "Tampilkan Terlambat"
 #: model:ir.model.fields,field_description:sale_subscription.field_payment_transaction__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__display_name
+#: model:ir.model.fields,field_description:sale_subscription.field_product_product__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__display_name
@@ -2156,6 +1800,11 @@ msgid "Draft"
 msgstr "Draft"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Due"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template__duration_unit
 msgid "Duration Unit"
 msgstr "Durasi Unit"
@@ -2203,11 +1852,6 @@ msgid "End Date"
 msgstr "Tanggal Berakhir"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "End Date:"
-msgstr "Tanggal Akhir:"
-
-#. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_end_of_contract
 msgid "End of contract"
 msgstr "Akhir kontrak"
@@ -2220,11 +1864,8 @@ msgstr "Akhir periode"
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
-msgid ""
-"Error during renewal of contract %(order_ids)s %(order_refs)s %"
-"(payment_state)s"
+msgid "Error during renewal of contract %(order_ids)s %(order_refs)s"
 msgstr ""
-"Error selama pembaruan kontrak %(order_ids)s %(order_refs)s %(payment_state)s"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2252,9 +1893,9 @@ msgid "Expansion"
 msgstr "Ekspansi"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Expiration Date:"
-msgstr "Tanggal Kadaluwarsa:"
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__purchase_price
+msgid "Expected Cost"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -2291,12 +1932,6 @@ msgid "First contract date"
 msgstr "Tanggal kontrak pertama"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_product_product__subscription_rule_ids_fixed
-#: model:ir.model.fields,field_description:sale_subscription.field_product_template__subscription_rule_ids_fixed
-msgid "Fixed Subscription Pricings"
-msgstr "Harga Langganan Tetap"
-
-#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_follower_ids
 msgid "Followers"
 msgstr "Follower"
@@ -2308,6 +1943,12 @@ msgstr "Follower (Mitra)"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+msgid "For"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "From"
 msgstr "Dari"
 
@@ -2325,6 +1966,11 @@ msgstr "Kegiatan - Kegiatan Mendatang"
 #: model:ir.model,name:sale_subscription.model_payment_link_wizard
 msgid "Generate Sales Payment Link"
 msgstr "Buat Link Pembayaran Penjualan"
+
+#. module: sale_subscription
+#: model:ir.module.module,summary:base.module_sale_subscription
+msgid "Generate recurring invoices and manage renewals"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -2382,14 +2028,13 @@ msgstr "Di sini Anda daapt menemukan langganan yang terlambat diperbarui."
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "History"
 msgstr "Riwayat"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__history_count
 msgid "History Count"
-msgstr "Jumlah Sejarah"
+msgstr "Jumlah Riwayat"
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_4
@@ -2407,6 +2052,7 @@ msgstr "Saya tidak menggunakannya"
 #: model:ir.model.fields,field_description:sale_subscription.field_payment_transaction__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__id
+#: model:ir.model.fields,field_description:sale_subscription.field_product_product__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__id
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__id
@@ -2456,7 +2102,6 @@ msgstr ""
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_product_product__recurring_invoice
 #: model:ir.model.fields,help:sale_subscription.field_product_template__recurring_invoice
-#: model:ir.model.fields,help:sale_subscription.field_sale_order_line__recurring_invoice
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_template_line__recurring_invoice
 msgid ""
 "If set, confirming a sale order with this product will create a subscription"
@@ -2466,10 +2111,10 @@ msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_line__pricelist_id
-msgid "If you change the pricelist, only newly added lines will be affected."
+msgid ""
+"If you change the pricelist, the prices of all order lines will be updated "
+"accordingly."
 msgstr ""
-"Bila Anda mengganti daftar harga, hanya baris yang baru ditambahkan akan "
-"terpengaruh."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -2668,7 +2313,7 @@ msgstr "Terakhir kali saat kita mengirim pengingat pembayaran"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "Late Activities"
-msgstr "Aktifitas terakhir"
+msgstr "Aktivitas terakhir"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_kanban
@@ -2700,12 +2345,6 @@ msgstr "Ayo tambahkan harga untuk pengulangan terpilih"
 #. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
-msgid "Let's choose the customer for your subscription"
-msgstr "Ayo pilih pelanggan untuk langganan Anda"
-
-#. module: sale_subscription
-#. odoo-javascript
-#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Let's go to the catalog to create our first subscription product"
 msgstr "Mari pergi ke katalog untuk membuat produk langganan pertama kami"
 
@@ -2715,6 +2354,8 @@ msgid "Log Currency"
 msgstr "Mata Uang Log"
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_monthly
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_order_log_growth_tree
@@ -2773,7 +2414,7 @@ msgid "MRR:"
 msgstr "MRR:"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_subscription
+#: model:portal.entry,description:sale_subscription.portal_subscription_entry
 msgid "Manage your subscriptions"
 msgstr "Kelola langganan Anda"
 
@@ -2805,6 +2446,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin
 msgid "Margin"
 msgstr "Margin"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin_percent
+msgid "Margin (%)"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__medium_id
@@ -2846,6 +2492,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Monthly"
 msgstr "Bulanan"
+
+#. module: sale_subscription
+#: model:sale.order.template,name:sale_subscription.monthly_template
+msgid "Monthly Cleaning"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_monthly
@@ -2991,6 +2642,13 @@ msgid "No valid Payment Method"
 msgstr "Tidak ada Metode Pembayaran valid"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__no_token_reminder_days
+msgid "No-token payment reminder days"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 msgid "Non Recurring"
 msgstr "Tidak Berulang"
@@ -3081,11 +2739,6 @@ msgid "Optional Plans"
 msgstr "Rencana Opsional"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Options"
-msgstr "Opsi"
-
-#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__order_reference
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -3103,6 +2756,11 @@ msgid "Order Invoice Status"
 msgstr "Status Faktur Order"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__line_name
+msgid "Order Line Name"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__name
 msgid "Order Reference"
 msgstr "Referensi Order"
@@ -3113,9 +2771,9 @@ msgid "Order Status"
 msgstr "Status Order"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "Orders"
-msgstr "Order"
+#: model:ir.model,name:sale_subscription.model_sale_order_template
+msgid "Order Templates"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__origin_order_id
@@ -3237,16 +2895,9 @@ msgid "Payment Transaction"
 msgstr "Transaksi Tagihan"
 
 #. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid "Payment not recorded"
-msgstr "Pembayaran tidak dicatat"
-
-#. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid "Payment recorded: %s"
-msgstr "Pembayaran dicatat: %s"
+#: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__payment_failed_reminder_days
+msgid "Payment failure reminder days"
+msgstr ""
 
 #. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.email_payment_reminder
@@ -3275,15 +2926,19 @@ msgstr "Transaksi pending"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__plan_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__plan_id
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_list_multi_edit
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 msgid "Plan"
 msgstr "Rencana"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Plan:"
-msgstr "Rencana:"
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/product/product.xml:0
+msgid "Plan not available"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -3342,7 +2997,7 @@ msgid "Portal: retention step"
 msgstr "Portal: langkah retensi"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
 msgid "Price"
 msgstr "Harga"
@@ -3387,19 +3042,11 @@ msgid "Product Category"
 msgstr "Kategori Produk"
 
 #. module: sale_subscription
+#: model:ir.model,name:sale_subscription.model_product_product
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__product_id
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
 msgid "Product Variant"
-msgstr "Varian Produk"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Product Variants"
-msgstr ""
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
-msgid "Product Varient"
 msgstr "Varian Produk"
 
 #. module: sale_subscription
@@ -3408,6 +3055,11 @@ msgstr "Varian Produk"
 #: model:ir.ui.menu,name:sale_subscription.product_menu_catalog
 msgid "Products"
 msgstr "Produk"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Prorated"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__allow_prorated_price
@@ -3448,8 +3100,6 @@ msgid "Quantity"
 msgstr "Kuantitas"
 
 #. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order__subscription_state__1_draft
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log__subscription_state__1_draft
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log_report__state__draft
@@ -3464,26 +3114,25 @@ msgid "Quotation Sent"
 msgstr "Penawaran Terkirim"
 
 #. module: sale_subscription
-#: model:ir.model,name:sale_subscription.model_sale_order_template
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 msgid "Quotation Template"
-msgstr "Kutipan Template"
+msgstr "Template Penawaran"
 
 #. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_sale_order_template_line
 msgid "Quotation Template Line"
-msgstr "Baris Templat Quotation"
+msgstr "Baris Template Penawaran"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_digest
 msgid "Quotation Template:"
-msgstr "Templat Quotation:"
+msgstr "Template Penawaran:"
 
 #. module: sale_subscription
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_template_action
 #: model:ir.ui.menu,name:sale_subscription.menu_template_of_subscription
 msgid "Quotation Templates"
-msgstr "Kutipan template"
+msgstr "Template Penawaran"
 
 #. module: sale_subscription
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_action_quotes
@@ -3501,7 +3150,7 @@ msgstr "Menilai Rata-Rata Teks"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__rating_last_feedback
 msgid "Rating Last Feedback"
-msgstr "Nilai Feedback Terakhir"
+msgstr "Nilai Masukan Terakhir"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__rating_last_image
@@ -3540,8 +3189,9 @@ msgid "Reason"
 msgstr "Alasan"
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__is_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_view_search_inherit
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_order_product_search_inherit
@@ -3555,9 +3205,9 @@ msgid "Recurring Amount"
 msgstr "Jumlah Berulang"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_details
-msgid "Recurring Details"
-msgstr "Detail Pengulangan"
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
+msgid "Recurring Invoice"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__plan_id
@@ -3573,23 +3223,12 @@ msgid "Recurring Plan"
 msgstr "Rencana Berulang"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "Recurring Plan:"
-msgstr "Rencana Berulang:"
-
-#. module: sale_subscription
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_plan_action
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_plans
 msgid "Recurring Plans"
-msgstr "Rencana-Rencana Berulang"
+msgstr "Rencana Berulang"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
-msgid "Recurring Prices"
-msgstr "Harga-Harga Berulang"
-
-#. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__subscription_item_ids
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__subscription_rule_ids
 msgid "Recurring Pricing"
 msgstr "Harga Berulang"
@@ -3601,6 +3240,21 @@ msgstr "Pendapatan Berulang"
 
 #. module: sale_subscription
 #. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"Recurring order with this product will be invoiced at the beginning of the "
+"period."
+msgstr "Pesanan rutin dengan produk ini akan difaktur di awal periode."
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"Recurring order with this product will be invoiced at the end of the period."
+msgstr "Pesanan rutin dengan produk ini akan difaktur di akhir periode."
+
+#. module: sale_subscription
+#. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.constraint,message:sale_subscription.constraint_sale_subscription_plan_check_for_valid_billing_period_value
 msgid ""
@@ -3609,16 +3263,6 @@ msgid ""
 msgstr ""
 "Periode berulang harus merupakan angka positif. Mohon pastikan input adalah "
 "nilai numerik positif yang valid."
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Recurring prices"
-msgstr "Harga berulang"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Reference:"
-msgstr "Rujukan"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__cancel
@@ -3696,15 +3340,6 @@ msgstr "Buka ulang langganan Anda"
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_report
 msgid "Reporting"
 msgstr "Laporan"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
-msgid ""
-"Request a online payment from the customer to confirm the order. For a "
-"subscription, a payment will be required also before each renewal"
-msgstr ""
-"Minta pembayaran online dari pelanggan untuk mengonfirmasi pesanan. Untuk "
-"langganan, pembayaran akan diperlukan juga sebelum pembaruan"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -3804,7 +3439,7 @@ msgstr "Analisis Laporan Sales"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "Sales History"
-msgstr "Sejarah Sales"
+msgstr "Riwayat Sales"
 
 #. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_sale_order_log_report
@@ -3848,6 +3483,12 @@ msgid "Save"
 msgstr "Simpan"
 
 #. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Save your subscription."
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
 msgid "Search Sales Order"
 msgstr "Cari Order Penjualan"
@@ -3862,6 +3503,18 @@ msgstr "Cari Templat"
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select a recurring product"
 msgstr "Pilih produk berulang"
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Select this product."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Select this recurring plan."
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_view_form
@@ -3882,12 +3535,6 @@ msgstr "Kirim Email (pembayaran otomatis)"
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__subscription_action__manual_send_mail
 msgid "Send Mail (manual payment)"
 msgstr "Kirim Email (pembayaran manual)"
-
-#. module: sale_subscription
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_act_window_sms_composer_multi
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_act_window_sms_composer_single
-msgid "Send an SMS Text Message"
-msgstr "Kirim Pesan Teks SMS"
 
 #. module: sale_subscription
 #: model:mail.template,description:sale_subscription.email_payment_close
@@ -3930,6 +3577,11 @@ msgid "Settings"
 msgstr "Pengaturan"
 
 #. module: sale_subscription
+#: model:ir.model,name:sale_subscription.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__starred
 msgid "Show Subscription on dashboard"
 msgstr "Tunjukkan Langganan pada dashboard"
@@ -3954,14 +3606,23 @@ msgstr "Tanggal Mulai"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_digest
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Start Date:"
 msgstr "Tanggal Mulai:"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Started"
+msgstr ""
 
 #. module: sale_subscription
 #: model:mail.message.subtype,name:sale_subscription.subtype_state_change
 msgid "State Change"
 msgstr "Perubahan Status"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
+msgid "State before"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -4087,17 +3748,11 @@ msgid "Subscription Logs"
 msgstr "Log Langganan"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "Subscription Manager:"
-msgstr "Manajer Langganan:"
-
-#. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_sale_subscription_plan
 msgid "Subscription Plan"
 msgstr "Rencana Langganan"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Subscription Pricelist Rules"
 msgstr "Peraturan Daftar Harga Larga"
@@ -4111,7 +3766,6 @@ msgstr "Paket Harga Langganan"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__recurring_invoice
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__recurring_invoice
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template_line__recurring_invoice
 msgid "Subscription Product"
 msgstr "Produk Langganan"
@@ -4123,7 +3777,6 @@ msgstr "Quotation Langganan"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__subscription_state
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__subscription_state
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 msgid "Subscription State"
@@ -4174,19 +3827,9 @@ msgid "Subscription will be paused from %(date_from)s to %(date_to)s."
 msgstr "Langganan akan di-pause dari %(date_from)s sampai %(date_to)s."
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "Subscription:"
-msgstr "Langganan:"
-
-#. module: sale_subscription
 #: model:mail.template,name:sale_subscription.mail_template_subscription_alert
 msgid "Subscription: Default Email Alert"
 msgstr "Langganan: Peringatan Default Email"
-
-#. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_default_alert
-msgid "Subscription: Default SMS Alert"
-msgstr "Langganan: Peringatan Default SMS"
 
 #. module: sale_subscription
 #: model:mail.template,name:sale_subscription.email_payment_close
@@ -4199,36 +3842,28 @@ msgid "Subscription: Payment Reminder"
 msgstr "Langganan: Pengingat Pembayaran"
 
 #. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_payment_failure
-msgid "Subscription: Payment failure"
-msgstr "Langganan: Pembayaran gagal"
-
-#. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_payment_reminder
-msgid "Subscription: Payment reminder"
-msgstr "Langganan: Pengingat pembayaran"
-
-#. module: sale_subscription
 #: model:mail.template,name:sale_subscription.mail_template_subscription_rating
 msgid "Subscription: Rating Request"
 msgstr "Langganan: Permintaan Rating"
 
 #. module: sale_subscription
 #. odoo-python
-#: code:addons/sale_subscription/models/res_partner.py:0
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_action
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_action_filtered
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__subscription_count
 #: model:ir.model.fields,field_description:sale_subscription.field_res_users__subscription_count
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__active_subs_count
+#: model:ir.module.module,shortdesc:base.module_sale_subscription
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_action
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_analysis
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_root
+#: model:portal.entry,name:sale_subscription.portal_subscription_entry
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_menu_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_view_search_inherit
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_search_view_inherit_sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.res_partner_view_inherit_sale_subscription
@@ -4413,6 +4048,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid ""
+"The payment method you selected can only pay amounts starting from %s. "
+"Please create or select another one."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/controllers/portal.py:0
+msgid ""
 "The payment method you selected can only pay amounts up to %s. Please create "
 "or select another one."
 msgstr ""
@@ -4450,6 +4093,16 @@ msgstr "Pembaruan %s telah dibatalkan."
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_line__subscription_start_date
 msgid "The start date indicate when the subscription periods begin."
 msgstr "Indikasikan tanggal mulai saat periode langganan dimulai."
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
+msgid ""
+"The start date of an upsell cannot be greater or equal to the next invoice "
+"date of the subscription %s.\n"
+"You should first invoice the original subscription, use an earlier start "
+"date for the upsell or create a renewal quotation."
+msgstr ""
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_renew
@@ -4515,8 +4168,6 @@ msgid ""
 "the\n"
 "                following active subscriptions:"
 msgstr ""
-"Metode pembayaran ini tidak dapat dihapus, karena saat ini sudah dilink ke\n"
-"                langganan berikut yang aktif:"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -4613,6 +4264,11 @@ msgid "Type of event"
 msgstr "Tipe acara"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__utm_reference
+msgid "UTM Reference"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "Unassigned"
 msgstr "Tak diserah-tugaskan"
@@ -4644,6 +4300,11 @@ msgid "Unpaid subscription"
 msgstr "Langganan tidak dibayar"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_delivered_amount
+msgid "Untaxed Amount Delivered"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_amount_invoiced
 msgid "Untaxed Amount Invoiced"
 msgstr "Jumlah Faktur Sebelum Pajak"
@@ -4665,6 +4326,7 @@ msgstr "Total Sebelum Pajak:"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "Until"
 msgstr "Hingga"
 
@@ -4729,9 +4391,9 @@ msgid "User Pause Start"
 msgstr "User Pause Mulai"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
-msgid "Variant Values"
-msgstr "Nilai-nilai varian"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "Valid until"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_close_reason__visible_in_portal
@@ -4806,19 +4468,14 @@ msgid "We don't want you to leave us like this."
 msgstr "Kami tidak ingin Anda pergi seperti ini."
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order__website_message_ids
-msgid "Website Messages"
-msgstr "Pesan situs"
-
-#. module: sale_subscription
-#: model:ir.model.fields,help:sale_subscription.field_sale_order__website_message_ids
-msgid "Website communication history"
-msgstr "Sejarah komunikasi situs"
-
-#. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_subscription_plan__billing_period_unit__week
 msgid "Weeks"
 msgstr "Minggu"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
+msgid "When"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order__starred
@@ -4829,6 +4486,11 @@ msgstr "Apakah langganan ini akan ditampilkan pada dashboard atau tidak"
 #: model:sale.subscription.plan,name:sale_subscription.subscription_plan_year
 msgid "Yearly"
 msgstr "Tahunan"
+
+#. module: sale_subscription
+#: model:sale.order.template,name:sale_subscription.yearly_template
+msgid "Yearly Cleaning"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_yearly
@@ -4863,6 +4525,14 @@ msgid ""
 msgstr ""
 "Anda akan secara permanent menutup langganan yang valid sampai\n"
 "                    &amp;nbsp;"
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"You can not change the recurring property of this product because it has "
+"been sold already (%s)"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -5031,17 +4701,6 @@ msgstr "Anda tidak dapat upsell langganan menggunakan mata uang yang berbeda."
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid ""
-"You cannot upsell a subscription whose next invoice date is in the past.\n"
-"Please, invoice directly the %s contract."
-msgstr ""
-"Anda tidak dapat upsell langganan yang tanggal faktur berikutnya di masa "
-"lalu.\n"
-"Mohon berikan faktur langsung ke kontrak %s."
-
-#. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid ""
 "You cannot validate a renewal quotation starting before the next invoice "
 "date of the parent contract. Please update the start date after the %s."
 msgstr ""
@@ -5064,7 +4723,8 @@ msgstr ""
 "                baik itu produk storable, produk consumable atau layanan."
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 msgid "Your Subscription"
 msgstr "Langganan Anda"
 
@@ -5144,11 +4804,6 @@ msgstr "pesan"
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "next_invoice_date"
 msgstr "next_invoice_date"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "on"
-msgstr "pada"
 
 #. module: sale_subscription
 #. odoo-python
@@ -5237,18 +4892,6 @@ msgid "until"
 msgstr "sampai"
 
 #. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_payment_failure
-msgid ""
-"{{ object.company_id.name }}: Our final attempt to process a payment for "
-"your subscription failed. As your payment should have been made on "
-"{{ object.next_invoice_date }}, your subscription has been terminated."
-msgstr ""
-"{{ object.company_id.name }}: Percobaan terakhir kami untuk memproses "
-"pembayaran untuk langganan Anda gagal. Karena pembayaran Anda seharusnya "
-"dilakukan pada {{ object.next_invoice_date }}, langganan Anda telah "
-"diberhentikan."
-
-#. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.mail_template_subscription_alert
 msgid ""
 "{{ object.company_id.name }}: Please check the subscription {{ object.name }}"
@@ -5260,299 +4903,5 @@ msgstr ""
 msgid "{{ object.company_id.name }}: Service Rating Request"
 msgstr "{{ object.company_id.name }}: Permintaan Rating Layanan"
 
-#. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_payment_reminder
-msgid ""
-"{{ object.company_id.name }}: We were unable to process a payment for your "
-"subscription. Your subscription {{ object.name }} is still valid but will be "
-"suspended on {{ object.next_invoice_date }} unless the payment succeeds in "
-"the meantime."
-msgstr ""
-"{{ object.company_id.name }}: Kami tidak dapat memproses pembayaran untuk "
-"langganan Anda. Langganan Anda {{ object.name }} masih valid tapi akan "
-"ditangguhkan pada {{ object.next_invoice_date }} kecuali pembayaran berhasil "
-"sebelum tanggal tersebut."
-
-#. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_default_alert
-msgid ""
-"{{ object.company_id.name }}: Your subscription {{ object.name }} needs your "
-"attention. If you have some concerns about it, please contact "
-"{{ object.user_id.name }}, your contact person."
-msgstr ""
-"{{ object.company_id.name }}: Langganan Anda {{ object.name }} membutuhkan "
-"perhatian Anda. Bila Anda memiliki kekhawatiran mengenai hal tersebut, "
-"silakan hubungi {{ object.user_id.name }}, contact person Anda."
-
-#~ msgid "Applied On"
-#~ msgstr "Diterapkan Pada"
-
-#~ msgid "<i class=\"fa fa-download\"/> Download"
-#~ msgstr "<i class=\"fa fa-download\"/> Unduh"
-
-#~ msgid "<i class=\"fa fa-print\"/> Print"
-#~ msgstr "<i class=\"fa fa-print\"/> Cetak"
-
-#~ msgid "<span>Disc.%</span>"
-#~ msgstr "<span>Disc.%</span>"
-
-#~ msgid "<strong class=\"mr16\">Subtotal</strong>"
-#~ msgstr "<strong class=\"mr16\">Subtotal</strong>"
-
-#~ msgid "<strong>Subtotal</strong>"
-#~ msgstr "<strong>Subtotal</strong>"
-
-#~ msgid ""
-#~ "A code server action can be executed from the website, using a dedicated "
-#~ "controller. The address is <base>/website/action/<website_path>. Set this "
-#~ "field as True to allow users to run this action. If it is set to False "
-#~ "the action cannot be run through the website."
-#~ msgstr ""
-#~ "Tindakan code server dapat dilakukan dari website, menggunakan kontroller "
-#~ "yang terdedikasi. Alamat websitenya adalah <base>/website/action/"
-#~ "<website_path>. Tetapkan field ini sebagai True untuk mengizinkan user "
-#~ "melakukan tindakan ini. Jika ditetapkan sebagai False tindakan tersebut "
-#~ "tidak dapat dilakukan melalui website."
-
-#~ msgid "Action"
-#~ msgstr "Tindakan"
-
-#~ msgid "Action Description"
-#~ msgstr "Deskripsi Tindakan"
-
-#~ msgid "Action Name"
-#~ msgstr "Nama Tindakan"
-
-#~ msgid "Action To Do"
-#~ msgstr "Tindakan yang Akan DIlakukan"
-
-#~ msgid "Action Type"
-#~ msgstr "Jenis Tindakan"
-
-#~ msgid "Activity"
-#~ msgstr "Aktivitas"
-
-#~ msgid "Add Followers"
-#~ msgstr "Tambah Pengikut"
-
-#~ msgid "Amount:"
-#~ msgstr "Jumlah:"
-
-#~ msgid "Analytic Account"
-#~ msgstr "Akun Analitik"
-
-#~ msgid "Assign To"
-#~ msgstr "Menetapkan ke"
-
-#~ msgid "Automated Action"
-#~ msgstr "Tindakan Otomatis"
-
-#~ msgid "Available on the Website"
-#~ msgstr "Tersedia di Website"
-
-#~ msgid "Bad"
-#~ msgstr "Bad"
-
-#~ msgid "Color"
-#~ msgstr "Warna"
-
-#~ msgid "Date"
-#~ msgstr "Tanggal"
-
-#~ msgid "Date of Next Invoice"
-#~ msgstr "Tanggal faktur berikutnya"
-
-#~ msgid "Destination"
-#~ msgstr "Tujuan"
-
-#~ msgid "Duration"
-#~ msgstr "Durasi"
-
-#~ msgid "Email Template"
-#~ msgstr "Template Email"
-
-#~ msgid "External ID"
-#~ msgstr "ID Eksternal"
-
-#~ msgid "Fixed"
-#~ msgstr "Tetap"
-
-#~ msgid "Forever"
-#~ msgstr "Selamanya"
-
-#~ msgid "Good"
-#~ msgstr "Baik"
-
-#~ msgid "Group By"
-#~ msgstr "Dikelompokkan berdasarkan"
-
-#~ msgid "Groups"
-#~ msgstr "Kelompok"
-
-#~ msgid "ID of the action if defined in a XML file"
-#~ msgstr "ID tindakan jika didefinisikan dalam file XML"
-
-#~ msgid "If you wish to reopen it, the"
-#~ msgstr "Bila Anda ingin membuka ulang,"
-
-#~ msgid ""
-#~ "If you wish to reopen it, you can pay your invoice for the current "
-#~ "invoicing period."
-#~ msgstr ""
-#~ "Bila Anda ingin membuka ulang, Anda dapat membayar faktur Anda untuk "
-#~ "periode faktur saat ini."
-
-#~ msgid "Log a note..."
-#~ msgstr "Log catatan..."
-
-#~ msgid "Model"
-#~ msgstr "Model"
-
-#~ msgid "Model Name"
-#~ msgstr "Nama Model"
-
-#~ msgid "Modification"
-#~ msgstr "Modifikasi"
-
-#~ msgid "Note"
-#~ msgstr "Catatan"
-
-#~ msgid "Operation not supported"
-#~ msgstr "Operation not supported"
-
-#~ msgid "Print"
-#~ msgstr "Cetak"
-
-#~ msgid "Python Code"
-#~ msgstr "Kode Python"
-
-#~ msgid "Quotation Template Option"
-#~ msgstr "Opsi Templat Quotation"
-
-#~ msgid "Recurrence"
-#~ msgstr "Pengulangan"
-
-#~ msgid "Responsible"
-#~ msgstr "Penanggung Jawab"
-
-#~ msgid "Sad face"
-#~ msgstr "Muka sedih"
-
-#~ msgid "Sales"
-#~ msgstr "Penjualan"
-
-#~ msgid ""
-#~ "Setting a value makes this action available in the sidebar for the given "
-#~ "model."
-#~ msgstr ""
-#~ "Menetapkan sebuah nilai membuat tindakan ini menjadi tersedia pada bagan "
-#~ "sisi untuk model tersebut."
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Tampilkan semua dokumen dengan aksi berikut sebelum hari ini"
-
-#~ msgid "Stage"
-#~ msgstr "Tahapan"
-
-#~ msgid "Summary"
-#~ msgstr "Ringkasan"
-
-#~ msgid "Taxes"
-#~ msgstr "Pajak"
-
-#~ msgid "Terms and Conditions"
-#~ msgstr "Syarat dan Ketentuan"
-
-#~ msgid "The full URL to access the server action through the website."
-#~ msgstr "URL lengkap untuk mengakses server yang bertindak melalui website."
-
-#~ msgid "Total Recurring"
-#~ msgstr "Total Berulang"
-
-#~ msgid "Trigger"
-#~ msgstr "Pemicu"
-
-#~ msgid ""
-#~ "Type of server action. The following values are available:\n"
-#~ "- 'Execute Python Code': a block of python code that will be executed\n"
-#~ "- 'Create a new Record': create a new record with new values\n"
-#~ "- 'Update a Record': update the values of a record\n"
-#~ "- 'Execute several actions': define an action that triggers several other "
-#~ "server actions\n"
-#~ "- 'Send Email': post a message, a note or send an email (Discuss)\n"
-#~ "- 'Add Followers': add followers to a record (Discuss)\n"
-#~ "- 'Create Next Activity': create an activity (Discuss)\n"
-#~ "- 'Send SMS Text Message': send SMS, log them on documents (SMS)"
-#~ msgstr ""
-#~ "Tipe tindakan server. Value berikut tersedia:\n"
-#~ "- 'Execute Kode Python': satu blok kode python akan dilaksanakan\n"
-#~ "- 'Buat Record baru': buat record baru dengan value baru\n"
-#~ "- 'Update Record': update value dari record\n"
-#~ "- 'Execute beberapa tindakan': definisikan tindakan yang akan memicu "
-#~ "beberapa tindakan server\n"
-#~ "- 'Kirim Email': post pesan, catatan atau kirim email (Diskusi)\n"
-#~ "- 'Tambahkan Follower': menambahkan follower ke record (Diskusi)\n"
-#~ "- 'Buat Aktivitas Berikutnya': buat aktivitas (Diskusi)\n"
-#~ "- 'Buat Pesan Teks SMS': kirim SMS, catat mereka di dokumen (SMS)"
-
-#~ msgid "Unit of Measure"
-#~ msgstr "Satuan"
-
-#~ msgid ""
-#~ "Unpaid subscription after the due date majored by this number of days "
-#~ "will be automatically closed by the subscriptions expiration scheduled "
-#~ "action. \n"
-#~ "If the chosen payment method has failed to renew the subscription after "
-#~ "this time, the subscription is automatically closed."
-#~ msgstr ""
-#~ "Langganan yang tidak dibayar setelah tanggal jatuh tempo yang ditentukan "
-#~ "ditambah sekian hari ini akan secara otomatis ditutup oleh tindakan "
-#~ "penutupan langganan terjadwal.\n"
-#~ "Bila metode pembayaran yang terpilih gagal untuk memperbarui langganan "
-#~ "setelah waktu ini, langganan akan secara otomatis ditutup."
-
-#~ msgid "Usage"
-#~ msgstr "Penggunaan"
-
-#~ msgid "Use employee work schedule"
-#~ msgstr "Menggunakan jadwal kerja Pengurus"
-
-#~ msgid "Use the user's working schedule."
-#~ msgstr "Menggunakan jadwal kerja pengguna."
-
-#~ msgid "Website Path"
-#~ msgstr "Website Path"
-
-#~ msgid "Website Url"
-#~ msgstr "Url Website"
-
-#~ msgid ""
-#~ "Write Python code that the action will execute. Some variables are "
-#~ "available for use; help about python expression is given in the help tab."
-#~ msgstr ""
-#~ "Tulis kode Python untuk tindakan yang akan diproses. Beberapa variabel "
-#~ "sudah tersedia untuk digunakan; bantuan untuk ekspresi python dapat "
-#~ "dilihat pada tab bantuan."
-
-#~ msgid "You must be logged in to manage your payment methods."
-#~ msgstr "Anda harus log in untuk mengelola metode pembayaran Anda."
-
-#~ msgid "e.g. Discuss proposal"
-#~ msgstr "mis. Diskusi Proposal"
-
-#~ msgid "greater than"
-#~ msgstr "lebih dari"
-
-#~ msgid "less than"
-#~ msgstr "kurang dari"
-
-#~ msgid "missing payments (from"
-#~ msgstr "kurang pembayaran (dari"
-
-#~ msgid "to this day) will be automatically processed."
-#~ msgstr "sampai hari ini) akan secara otomatis diproses."
-
-#~ msgid ""
-#~ "{{ object.company_id.name }} Invoice (Ref {{ object.name or 'n/a' }})"
-#~ msgstr ""
-#~ "{{ object.company_id.name }} Faktur (Ref {{ object.name or 'n/a' }})"
+#~ msgid "<i class=\"oi oi-fw\" data-icon=\"redo\"/> To Renew"
+#~ msgstr "<i class=\"oi oi-fw\" data-icon=\"redo\"/> Untuk Diperbarui"

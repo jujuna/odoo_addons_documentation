@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { click, queryAll, queryAllTexts, queryFirst } from "@odoo/hoot-dom";
-import { animationFrame, mockDate } from "@odoo/hoot-mock";
+import { click, queryAll, queryAllTexts, queryFirst, waitFor } from "@odoo/hoot-dom";
+import { animationFrame, mockDate, runAllTimers } from "@odoo/hoot-mock";
 import {
     contains,
     defineParams,
@@ -10,7 +10,7 @@ import {
     onRpc,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
-import { Tasks, Project, defineGanttModels } from "./gantt_mock_models";
+import { Tasks, defineGanttModels } from "./gantt_mock_models";
 import {
     SELECTORS,
     focusToday,
@@ -23,7 +23,6 @@ import {
 
 import { browser } from "@web/core/browser/browser";
 import { Domain } from "@web/core/domain";
-import { deserializeDateTime } from "@web/core/l10n/dates";
 import { WebClient } from "@web/webclient/webclient";
 
 describe.current.tags("desktop");
@@ -47,18 +46,15 @@ test("empty ungrouped gantt rendering", async () => {
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe(null);
     expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(columnHeaders).toHaveLength(29);
+    expect(columnHeaders).toHaveLength(32);
     expect(rows).toEqual([{}]);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
-    expect(queryFirst(".o_gantt_cell").offsetHeight).toBe(35, {
-        message: "row height is 35px (25 * 1 pill height + 10px of default empty space)",
+    expect(queryFirst(".o_gantt_cell").offsetHeight).toBe(41, {
+        message: "row height is 41px (25 * 1 pill height + 16px of default empty space)",
     });
 });
 
 test("ungrouped gantt rendering", async () => {
-    const task2 = Tasks._records[1];
-    const startDateLocalString = deserializeDateTime(task2.start).toFormat("f");
-    const stopDateLocalString = deserializeDateTime(task2.stop).toFormat("f");
     Tasks._views.gantt = `<gantt date_start="start" date_stop="stop"/>`;
 
     onRpc("get_gantt_data", ({ model }) => expect.step(model));
@@ -74,7 +70,7 @@ test("ungrouped gantt rendering", async () => {
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe(null);
     expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(columnHeaders).toHaveLength(29);
+    expect(columnHeaders).toHaveLength(32);
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
     expect(rows).toEqual([
         {
@@ -82,9 +78,9 @@ test("ungrouped gantt rendering", async () => {
                 {
                     title: "Task 5",
                     level: 0,
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
+                    colSpan: "Out of bounds (1)  -> 04 (1/2) December 2018",
                 },
-                { title: "Task 1", level: 1, colSpan: "01 December 2018 -> Out of bounds (63) " },
+                { title: "Task 1", level: 1, colSpan: "Out of bounds (1)  -> 31 December 2018" },
                 {
                     title: "Task 2",
                     level: 0,
@@ -100,13 +96,13 @@ test("ungrouped gantt rendering", async () => {
                     level: 2,
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
                 },
-                { title: "Task 3", level: 0, colSpan: "27 December 2018 -> Out of bounds (68) " },
+                { title: "Task 3", level: 0, colSpan: "27 December 2018 -> 03 (1/2) January 2019" },
             ],
         },
     ]);
 
-    expect(queryFirst(".o_gantt_cell").offsetHeight).toBe(85, {
-        message: "row height is 85px (25 * 3 pills + 10px of default empty space)",
+    expect(queryFirst(".o_gantt_cell").offsetHeight).toBe(91, {
+        message: "row height is 91px (25 * 3 pills + 16px of default empty space)",
     });
 
     // test popover and local timezone
@@ -115,14 +111,15 @@ test("ungrouped gantt rendering", async () => {
     expect(task2Pill).toHaveText("Task 2");
 
     await contains(task2Pill).click();
-    expect(`.o_popover`).toHaveCount(1);
-    expect(queryAllTexts`.o_popover .popover-body span`).toEqual([
-        "Task 2",
-        startDateLocalString,
-        stopDateLocalString,
+    await runAllTimers();
+    await waitFor(`.o_popover`);
+    expect(`.o_popover .o_popover_header`).toHaveText("Task 2");
+    expect(queryAllTexts(`.o_popover .o_popover_body div`)).toEqual([
+        "Start: Dec 17, 12:30 PM",
+        "Stop: Dec 22, 7:29 AM",
     ]);
 
-    await contains(`.o_popover .popover-footer i.fa.fa-close`).click();
+    await contains(`.o_popover i.oi[data-icon='close']`).click();
     expect(`.o_popover`).toHaveCount(0);
 });
 
@@ -135,23 +132,19 @@ test("ordered gantt view", async () => {
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe("Gantt View");
     expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(columnHeaders).toHaveLength(29);
+    expect(columnHeaders).toHaveLength(32);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
     expect(rows).toEqual([
         {
-            pills: [
-                {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
-            ],
+            title: "Undefined Stage",
+        },
+        {
             title: "todo",
         },
         {
             title: "in_progress",
             pills: [
-                { level: 0, colSpan: "01 December 2018 -> Out of bounds (63) ", title: "Task 1" },
+                { level: 0, colSpan: "Out of bounds (1)  -> 31 December 2018", title: "Task 1" },
                 {
                     level: 1,
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
@@ -177,7 +170,7 @@ test("ordered gantt view", async () => {
                     colSpan: "20 December 2018 -> 20 (1/2) December 2018",
                     title: "Task 4",
                 },
-                { level: 0, colSpan: "27 December 2018 -> Out of bounds (68) ", title: "Task 3" },
+                { level: 0, colSpan: "27 December 2018 -> 03 (1/2) January 2019", title: "Task 3" },
             ],
         },
     ]);
@@ -193,8 +186,8 @@ test("empty single-level grouped gantt rendering", async () => {
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe("Gantt View");
     expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(columnHeaders).toHaveLength(29);
-    expect(rows).toEqual([{ title: "" }]);
+    expect(columnHeaders).toHaveLength(32);
+    expect(rows).toEqual([{ title: "Undefined Project" }]);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
 });
 
@@ -209,14 +202,17 @@ test("single-level grouped gantt rendering", async () => {
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
     expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
-    expect(columnHeaders).toHaveLength(29);
+    expect(columnHeaders).toHaveLength(32);
     expect(rows).toEqual([
+        {
+            title: "Undefined Project",
+        },
         {
             title: "Project 1",
             pills: [
                 {
                     title: "Task 1",
-                    colSpan: "01 December 2018 -> Out of bounds (63) ",
+                    colSpan: "Out of bounds (1)  -> 31 December 2018",
                     level: 0,
                 },
                 {
@@ -231,7 +227,7 @@ test("single-level grouped gantt rendering", async () => {
                 },
                 {
                     title: "Task 3",
-                    colSpan: "27 December 2018 -> Out of bounds (68) ",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
                     level: 1,
                 },
             ],
@@ -240,15 +236,54 @@ test("single-level grouped gantt rendering", async () => {
             title: "Project 2",
             pills: [
                 {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
-                {
                     title: "Task 7",
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
                     level: 0,
                 },
+            ],
+        },
+    ]);
+});
+
+test("no undefined group when grouped by a required field", async () => {
+    Tasks._fields.project_id.required = true;
+
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop"/>`,
+        groupBy: ["project_id"],
+    });
+
+    expect(getGridContent().rows.map((r) => r.title)).toEqual(["Project 1", "Project 2"]);
+});
+
+test("record in undefined group and another row renders in both", async () => {
+    // mock an override that would include task 1 in the False and res 1 rows
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
+        result.groups.unshift({ resource_ids: false, __record_ids: [1] });
+        result.length += 1;
+        return result;
+    });
+
+    await mountGanttView({
+        resModel: "tasks",
+        arch: '<gantt date_start="start" date_stop="stop" />',
+        groupBy: ["resource_ids"],
+        domain: [["id", "=", 1]],
+    });
+
+    expect(getGridContent().rows).toEqual([
+        {
+            title: "Undefined Resources",
+            pills: [
+                { title: "Task 1", level: 0, colSpan: "Out of bounds (1)  -> 31 December 2018" },
+            ],
+        },
+        {
+            title: "Resource 1",
+            pills: [
+                { title: "Task 1", level: 0, colSpan: "Out of bounds (1)  -> 31 December 2018" },
             ],
         },
     ]);
@@ -293,18 +328,14 @@ test("single-level grouped gantt rendering with group_expand", async () => {
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
     expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
-    expect(columnHeaders).toHaveLength(29);
+    expect(columnHeaders).toHaveLength(32);
     expect(rows).toEqual([
+        { title: "Undefined Project" },
         { title: "Unused Project 1" },
         { title: "Unused Project 2" },
         {
             title: "Project 2",
             pills: [
-                {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
                 {
                     title: "Task 7",
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
@@ -318,7 +349,7 @@ test("single-level grouped gantt rendering with group_expand", async () => {
             pills: [
                 {
                     title: "Task 1",
-                    colSpan: "01 December 2018 -> Out of bounds (63) ",
+                    colSpan: "Out of bounds (1)  -> 31 December 2018",
                     level: 0,
                 },
                 {
@@ -333,7 +364,7 @@ test("single-level grouped gantt rendering with group_expand", async () => {
                 },
                 {
                     title: "Task 3",
-                    colSpan: "27 December 2018 -> Out of bounds (68) ",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
                     level: 1,
                 },
             ],
@@ -353,31 +384,35 @@ test("multi-level grouped gantt rendering", async () => {
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
     expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
-    expect(columnHeaders).toHaveLength(29);
+    expect(columnHeaders).toHaveLength(32);
     expect(rows).toEqual([
+        {
+            title: "Undefined Assign To",
+            isGroup: true,
+        },
+        {
+            title: "Undefined Project",
+            isGroup: true,
+        },
+        {
+            title: "Undefined Stage",
+        },
         {
             title: "User 1",
             isGroup: true,
             pills: [
-                { title: "2", colSpan: "01 December 2018 -> 04 (1/2) December 2018" },
-                { title: "1", colSpan: "04 (1/2) December 2018 -> 19 December 2018" },
+                { title: "1", colSpan: "Out of bounds (8)  -> 19 December 2018" },
                 { title: "2", colSpan: "20 December 2018 -> 20 (1/2) December 2018" },
-                { title: "1", colSpan: "20 (1/2) December 2018 -> Out of bounds (63) " },
+                { title: "1", colSpan: "20 (1/2) December 2018 -> 31 December 2018" },
             ],
         },
         {
             title: "Project 1",
             isGroup: true,
             pills: [
-                { title: "1", colSpan: "01 December 2018 -> 19 December 2018" },
+                { title: "1", colSpan: "Out of bounds (1)  -> 19 December 2018" },
                 { title: "2", colSpan: "20 December 2018 -> 20 (1/2) December 2018" },
-                { title: "1", colSpan: "20 (1/2) December 2018 -> Out of bounds (63) " },
-            ],
-        },
-        {
-            title: "To Do",
-            pills: [
-                { title: "Task 1", colSpan: "01 December 2018 -> Out of bounds (63) ", level: 0 },
+                { title: "1", colSpan: "20 (1/2) December 2018 -> 31 December 2018" },
             ],
         },
         {
@@ -391,24 +426,17 @@ test("multi-level grouped gantt rendering", async () => {
             ],
         },
         {
-            title: "Project 2",
+            title: "To Do",
             pills: [
-                {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    title: "1",
-                },
+                { title: "Task 1", colSpan: "Out of bounds (1)  -> 31 December 2018", level: 0 },
             ],
+        },
+        {
+            title: "Project 2",
             isGroup: true,
         },
         {
             title: "Done",
-            pills: [
-                {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
-            ],
         },
         {
             title: "User 2",
@@ -417,7 +445,7 @@ test("multi-level grouped gantt rendering", async () => {
                 { title: "1", colSpan: "17 (1/2) December 2018 -> 20 (1/2) December 2018" },
                 { title: "2", colSpan: "20 (1/2) December 2018 -> 20 December 2018" },
                 { title: "1", colSpan: "21 December 2018 -> 22 (1/2) December 2018" },
-                { title: "1", colSpan: "27 December 2018 -> Out of bounds (68) " },
+                { title: "1", colSpan: "27 December 2018 -> 03 (1/2) January 2019" },
             ],
         },
         {
@@ -425,7 +453,13 @@ test("multi-level grouped gantt rendering", async () => {
             isGroup: true,
             pills: [
                 { title: "1", colSpan: "17 (1/2) December 2018 -> 22 (1/2) December 2018" },
-                { title: "1", colSpan: "27 December 2018 -> Out of bounds (68) " },
+                { title: "1", colSpan: "27 December 2018 -> 03 (1/2) January 2019" },
+            ],
+        },
+        {
+            title: "Cancelled",
+            pills: [
+                { title: "Task 3", colSpan: "27 December 2018 -> 03 (1/2) January 2019", level: 0 },
             ],
         },
         {
@@ -436,12 +470,6 @@ test("multi-level grouped gantt rendering", async () => {
                     colSpan: "17 (1/2) December 2018 -> 22 (1/2) December 2018",
                     level: 0,
                 },
-            ],
-        },
-        {
-            title: "Cancelled",
-            pills: [
-                { title: "Task 3", colSpan: "27 December 2018 -> Out of bounds (68) ", level: 0 },
             ],
         },
         {
@@ -479,16 +507,11 @@ test("many2many grouped gantt rendering", async () => {
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
     expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
-    expect(columnHeaders).toHaveLength(29);
+    expect(columnHeaders).toHaveLength(32);
     expect(rows).toEqual([
         {
             title: "Undefined Assignees",
             pills: [
-                {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
                 {
                     title: "Task 2",
                     colSpan: "17 (1/2) December 2018 -> 22 (1/2) December 2018",
@@ -504,19 +527,19 @@ test("many2many grouped gantt rendering", async () => {
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
                     level: 1,
                 },
-                { title: "Task 3", colSpan: "27 December 2018 -> Out of bounds (68) ", level: 0 },
+                { title: "Task 3", colSpan: "27 December 2018 -> 03 (1/2) January 2019", level: 0 },
             ],
         },
         {
             title: "User 1",
             pills: [
-                { title: "Task 1", colSpan: "01 December 2018 -> Out of bounds (63) ", level: 0 },
+                { title: "Task 1", colSpan: "Out of bounds (1)  -> 31 December 2018", level: 0 },
             ],
         },
         {
             title: "User 2",
             pills: [
-                { title: "Task 1", colSpan: "01 December 2018 -> Out of bounds (63) ", level: 0 },
+                { title: "Task 1", colSpan: "Out of bounds (1)  -> 31 December 2018", level: 0 },
             ],
         },
     ]);
@@ -537,19 +560,21 @@ test("multi-level grouped with many2many field in gantt view", async () => {
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
     expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
-    expect(columnHeaders).toHaveLength(29);
+    expect(columnHeaders).toHaveLength(32);
     expect(rows).toEqual([
         {
             title: "Undefined Assignees",
             isGroup: true,
             pills: [
-                { title: "1", colSpan: "01 December 2018 -> 04 (1/2) December 2018" },
                 { title: "1", colSpan: "17 (1/2) December 2018 -> 19 December 2018" },
                 { title: "2", colSpan: "20 December 2018 -> 20 (1/2) December 2018" },
                 { title: "2", colSpan: "20 (1/2) December 2018 -> 20 December 2018" },
                 { title: "1", colSpan: "21 December 2018 -> 22 (1/2) December 2018" },
-                { title: "1", colSpan: "27 December 2018 -> Out of bounds (68) " },
+                { title: "1", colSpan: "27 December 2018 -> 03 (1/2) January 2019" },
             ],
+        },
+        {
+            title: "Undefined Project",
         },
         {
             title: "Project 1",
@@ -564,17 +589,12 @@ test("multi-level grouped with many2many field in gantt view", async () => {
                     colSpan: "20 December 2018 -> 20 (1/2) December 2018",
                     level: 1,
                 },
-                { title: "Task 3", colSpan: "27 December 2018 -> Out of bounds (68) ", level: 0 },
+                { title: "Task 3", colSpan: "27 December 2018 -> 03 (1/2) January 2019", level: 0 },
             ],
         },
         {
             title: "Project 2",
             pills: [
-                {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
                 {
                     title: "Task 7",
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
@@ -585,23 +605,23 @@ test("multi-level grouped with many2many field in gantt view", async () => {
         {
             title: "User 1",
             isGroup: true,
-            pills: [{ title: "1", colSpan: "01 December 2018 -> Out of bounds (63) " }],
+            pills: [{ title: "1", colSpan: "Out of bounds (1)  -> 31 December 2018" }],
         },
         {
             title: "Project 1",
             pills: [
-                { title: "Task 1", colSpan: "01 December 2018 -> Out of bounds (63) ", level: 0 },
+                { title: "Task 1", colSpan: "Out of bounds (1)  -> 31 December 2018", level: 0 },
             ],
         },
         {
             title: "User 2",
             isGroup: true,
-            pills: [{ title: "1", colSpan: "01 December 2018 -> Out of bounds (63) " }],
+            pills: [{ title: "1", colSpan: "Out of bounds (1)  -> 31 December 2018" }],
         },
         {
             title: "Project 1",
             pills: [
-                { title: "Task 1", colSpan: "01 December 2018 -> Out of bounds (63) ", level: 0 },
+                { title: "Task 1", colSpan: "Out of bounds (1)  -> 31 December 2018", level: 0 },
             ],
         },
     ]);
@@ -621,6 +641,13 @@ test("full precision gantt rendering", async () => {
     expect(viewTitle).toBe("Gantt View");
     expect(columnHeaders).toHaveLength(9);
     expect(rows).toEqual([
+        {
+            title: "Undefined Assign To",
+            isGroup: true,
+        },
+        {
+            title: "Undefined Project",
+        },
         {
             title: "User 1",
             isGroup: true,
@@ -799,16 +826,16 @@ test("range switching", async () => {
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
     let gridContent = getGridContent();
     expect(gridContent.range).toBe("12/01/2018 -> 02/28/2019");
-    expect(gridContent.columnHeaders).toHaveLength(29);
+    expect(gridContent.columnHeaders).toHaveLength(32);
     expect(gridContent.rows).toEqual([
         {
             pills: [
                 {
                     title: "Task 5",
                     level: 0,
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
+                    colSpan: "Out of bounds (1)  -> 04 (1/2) December 2018",
                 },
-                { title: "Task 1", level: 1, colSpan: "01 December 2018 -> Out of bounds (63) " },
+                { title: "Task 1", level: 1, colSpan: "Out of bounds (1)  -> 31 December 2018" },
                 {
                     title: "Task 2",
                     level: 0,
@@ -824,7 +851,7 @@ test("range switching", async () => {
                     level: 2,
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
                 },
-                { title: "Task 3", level: 0, colSpan: "27 December 2018 -> Out of bounds (68) " },
+                { title: "Task 3", level: 0, colSpan: "27 December 2018 -> 03 (1/2) January 2019" },
             ],
         },
     ]);
@@ -852,12 +879,12 @@ test("range switching", async () => {
                 {
                     title: "Task 4",
                     level: 2,
-                    colSpan: "3am December 20, 2018 -> 7am December 20, 2018",
+                    colSpan: "3am Thursday, December 20, 2018 -> 7am Thursday, December 20, 2018",
                 },
                 {
                     title: "Task 7",
                     level: 2,
-                    colSpan: "1pm December 20, 2018 -> 7pm December 20, 2018",
+                    colSpan: "1pm Thursday, December 20, 2018 -> 7pm Thursday, December 20, 2018",
                 },
             ],
         },
@@ -869,7 +896,7 @@ test("range switching", async () => {
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
     gridContent = getGridContent();
     expect(gridContent.range).toBe("Week");
-    expect(gridContent.columnHeaders).toHaveLength(9);
+    expect(gridContent.columnHeaders).toHaveLength(10);
     expect(gridContent.rows).toEqual([
         {
             pills: [
@@ -877,7 +904,8 @@ test("range switching", async () => {
                 {
                     title: "Task 2",
                     level: 1,
-                    colSpan: "Out of bounds (18)  -> Saturday 22 (1/2) Week 51, Dec 16 - Dec 22",
+                    colSpan:
+                        "Monday 17 (1/2) Week 51, Dec 16 - Dec 22 -> Saturday 22 (1/2) Week 51, Dec 16 - Dec 22",
                 },
                 {
                     title: "Task 4",
@@ -890,11 +918,6 @@ test("range switching", async () => {
                     level: 2,
                     colSpan:
                         "Thursday 20 (1/2) Week 51, Dec 16 - Dec 22 -> Thursday 20 Week 51, Dec 16 - Dec 22",
-                },
-                {
-                    colSpan: "Thursday 27 Week 52, Dec 23 - Dec 29 -> Out of bounds (43) ",
-                    level: 1,
-                    title: "Task 3",
                 },
             ],
         },
@@ -910,6 +933,11 @@ test("range switching", async () => {
     expect(gridContent.rows).toEqual([
         {
             pills: [
+                {
+                    title: "Task 5",
+                    level: 0,
+                    colSpan: "Out of bounds (15)  -> 04 (1/2) December 2018",
+                },
                 {
                     title: "Task 1",
                     level: 1,
@@ -941,7 +969,7 @@ test("range switching", async () => {
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
     gridContent = getGridContent();
     expect(gridContent.range).toBe("Year");
-    expect(gridContent.columnHeaders).toHaveLength(16);
+    expect(gridContent.columnHeaders).toHaveLength(17);
     expect(gridContent.rows).toEqual([
         {
             pills: [
@@ -1029,66 +1057,6 @@ test("Day scale with 24-hours format", async () => {
     expect(columnHeaders.slice(12, 16).map((h) => h.title)).toEqual(["12", "13", "14", "15"]);
 });
 
-test("group tasks by task_properties", async () => {
-    Project._fields.properties_definitions = fields.PropertiesDefinition();
-    Project._records[0].properties_definitions = [
-        {
-            name: "bd6404492c244cff",
-            type: "char",
-        },
-    ];
-    Tasks._fields.task_properties = fields.Properties({
-        definition_record: "project_id",
-        definition_record_field: "properties_definitions",
-    });
-    Tasks._records = [
-        {
-            id: 1,
-            name: "Blop",
-            start: "2018-12-14 08:00:00",
-            stop: "2018-12-24 08:00:00",
-            user_id: 1,
-            project_id: 1,
-            task_properties: {
-                bd6404492c244cff: "test value 1",
-            },
-        },
-        {
-            id: 2,
-            name: "Yop",
-            start: "2018-12-02 08:00:00",
-            stop: "2018-12-12 08:00:00",
-            user_id: 2,
-            project_id: 1,
-            task_properties: {
-                bd6404492c244cff: "test value 1",
-            },
-        },
-    ];
-    await mountGanttView({
-        resModel: "tasks",
-        arch: '<gantt date_start="start" date_stop="stop"/>',
-        groupBy: ["task_properties.bd6404492c244cff"],
-    });
-    const { rows } = getGridContent();
-    expect(rows).toEqual([
-        {
-            pills: [
-                {
-                    title: "Yop",
-                    colSpan: "02 December 2018 -> 12 (1/2) December 2018",
-                    level: 0,
-                },
-                {
-                    title: "Blop",
-                    colSpan: "14 December 2018 -> 24 (1/2) December 2018",
-                    level: 0,
-                },
-            ],
-        },
-    ]);
-});
-
 test("group tasks by date", async () => {
     Tasks._fields.my_date = fields.Date({ string: "My date" });
     Tasks._records = [
@@ -1120,7 +1088,7 @@ test("group tasks by date", async () => {
             pills: [
                 {
                     title: "Yop",
-                    colSpan: "02 December 2018 -> 12 (1/2) December 2018",
+                    colSpan: "Out of bounds (3)  -> 12 (1/2) December 2018",
                     level: 0,
                 },
                 {
@@ -1208,7 +1176,7 @@ test("initialization with default_start_date and default_stop_date", async (asse
     });
     const { range, groupHeaders } = getGridContent();
     expect(range).toBe("01/29/2017 -> 05/26/2019");
-    expect(groupHeaders.map((h) => h.title)).toEqual(["2017", "2018", "2019"]);
+    expect(groupHeaders.map((h) => h.title)).toEqual(["2018", "2019"]);
     expect(`${SELECTORS.columnHeader}.o_gantt_today`).toHaveCount(1);
 });
 
@@ -1254,7 +1222,7 @@ test("range with identical startDate and stopDate", async () => {
 });
 
 test("popover-template with an added footer", async () => {
-    expect.assertions(9);
+    expect.assertions(8);
     onRpc("unlink", ({ model, method, args }) => {
         expect(model).toBe("tasks");
         expect(method).toBe("unlink");
@@ -1264,14 +1232,16 @@ test("popover-template with an added footer", async () => {
         resModel: "tasks",
         arch: `
             <gantt date_start="start" date_stop="stop">
-                <templates>
-                    <t t-name="gantt-popover">
-                        Content
-                        <footer replace="0">
-                            <button name="unlink" type="object" string="Delete" icon="fa-trash" class="btn btn-sm btn-secondary"/>
-                        </footer>
-                    </t>
-                </templates>
+                <popover>
+                    <templates>
+                        <t t-name="popover-body">
+                            Content
+                        </t>
+                        <t t-name="popover-footer" replace="0">
+                            <button name="unlink" type="object" string="Delete" icon="delete" icon_class="oi-filled" class="btn btn-sm btn-secondary"/>
+                        </t>
+                    </templates>
+                </popover>
             </gantt>
         `,
         domain: [["id", "=", 2]],
@@ -1280,18 +1250,17 @@ test("popover-template with an added footer", async () => {
     expect(".o_popover").toHaveCount(0);
 
     await click(SELECTORS.pill);
-    await animationFrame();
-    expect(".o_popover").toHaveCount(1);
-    expect(".o_popover .popover-footer button").toHaveCount(2);
-    expect(queryAllTexts(".o_popover .popover-footer button")).toEqual(["Edit", "Delete"]);
-
-    await click(".o_popover .popover-footer button:last-child");
+    await runAllTimers();
+    await waitFor(".o_popover");
+    expect(".o_popover .o_popover_footer button").toHaveCount(2);
+    expect(queryAllTexts(".o_popover .o_popover_footer button")).toEqual(["Edit", "Delete"]);
+    await click(".o_popover .o_popover_footer button:last-child");
     await animationFrame();
     expect(SELECTORS.pill).toHaveCount(0);
 });
 
 test("popover-template with a replaced footer", async () => {
-    expect.assertions(9);
+    expect.assertions(8);
     onRpc("unlink", ({ model, method, args }) => {
         expect(model).toBe("tasks");
         expect(method).toBe("unlink");
@@ -1301,14 +1270,16 @@ test("popover-template with a replaced footer", async () => {
         resModel: "tasks",
         arch: `
             <gantt date_start="start" date_stop="stop">
-                <templates>
-                    <t t-name="gantt-popover">
-                        Content
-                        <footer>
-                            <button name="unlink" type="object" string="Delete" icon="fa-trash" class="btn btn-sm btn-secondary"/>
-                        </footer>
-                    </t>
-                </templates>
+                <popover>
+                    <templates>
+                        <t t-name="popover-body">
+                            Content
+                        </t>
+                        <t t-name="popover-footer">
+                            <button name="unlink" type="object" string="Delete" icon="delete" icon_class="oi-filled" class="btn btn-sm btn-secondary"/>
+                        </t>
+                    </templates>
+                </popover>
             </gantt>
         `,
         domain: [["id", "=", 2]],
@@ -1318,17 +1289,18 @@ test("popover-template with a replaced footer", async () => {
 
     await click(SELECTORS.pill);
     await animationFrame();
-    expect(".o_popover").toHaveCount(1);
-    expect(".o_popover .popover-footer button").toHaveCount(1);
-    expect(".o_popover .popover-footer button").toHaveText("Delete");
+    await runAllTimers();
+    await waitFor(".o_popover");
+    expect(".o_popover .o_popover_footer button").toHaveCount(1);
+    expect(".o_popover .o_popover_footer button").toHaveText("Delete");
 
-    await click(".o_popover .popover-footer button");
+    await click(".o_popover .o_popover_footer button");
     await animationFrame();
     expect(SELECTORS.pill).toHaveCount(0);
 });
 
 test("popover-template with a button in the body", async () => {
-    expect.assertions(11);
+    expect.assertions(10);
     onRpc("unlink", ({ model, method, args }) => {
         expect(model).toBe("tasks");
         expect(method).toBe("unlink");
@@ -1338,11 +1310,13 @@ test("popover-template with a button in the body", async () => {
         resModel: "tasks",
         arch: `
             <gantt date_start="start" date_stop="stop">
-                <templates>
-                    <t t-name="gantt-popover">
-                        <button name="unlink" type="object" string="Delete" icon="fa-trash" class="btn btn-sm btn-secondary"/>
-                    </t>
-                </templates>
+                <popover>
+                    <templates>
+                        <t t-name="popover-body">
+                            <button name="unlink" type="object" string="Delete" icon="delete" icon_class="oi-filled" class="btn btn-sm btn-secondary"/>
+                        </t>
+                    </templates>
+                </popover>
             </gantt>
         `,
         domain: [["id", "=", 2]],
@@ -1351,14 +1325,14 @@ test("popover-template with a button in the body", async () => {
     expect(".o_popover").toHaveCount(0);
 
     await click(SELECTORS.pill);
-    await animationFrame();
-    expect(".o_popover").toHaveCount(1);
-    expect(".o_popover .popover-body button").toHaveCount(1);
-    expect(".o_popover .popover-footer button").toHaveCount(1);
-    expect(".o_popover .popover-body button").toHaveText("Delete");
-    expect(".o_popover .popover-footer button").toHaveText("Edit");
+    await runAllTimers();
+    await waitFor(".o_popover");
+    expect(".o_popover .o_popover_body button").toHaveCount(1);
+    expect(".o_popover .o_popover_footer button").toHaveCount(1);
+    expect(".o_popover .o_popover_body button").toHaveText("Delete");
+    expect(".o_popover .o_popover_footer button").toHaveText("Edit");
 
-    await click(".o_popover .popover-body button");
+    await click(".o_popover .o_popover_body button");
     await animationFrame();
     expect(SELECTORS.pill).toHaveCount(0);
 });
@@ -1406,4 +1380,32 @@ test("aggregation with half precision", async () => {
             ],
         },
     ]);
+});
+
+test("today button always navigates to today, even when on yesterday", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop"/>`,
+        context: {
+            default_start_date: "2018-12-20",
+            default_stop_date: "2018-12-22",
+        },
+    });
+
+    // await selectCustomRange({ startDate: "2018-12-19", stopDate: "2018-12-20" });
+    // Navigate to yesterday
+    await click(SELECTORS.previousButton);
+    await ganttControlsChanges();
+    let { range } = getGridContent();
+    expect(range).toBe("12/17/2018 -> 12/19/2018", {
+        message: "today (2018-12-20) is not part of the current range",
+    });
+
+    await focusToday();
+    await ganttControlsChanges();
+
+    ({ range } = getGridContent());
+    expect(range).toBe("12/19/2018 -> 12/20/2018", {
+        message: "today (2018-12-20) is included in the current range",
+    });
 });

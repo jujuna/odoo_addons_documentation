@@ -1,7 +1,6 @@
 from lxml import etree, objectify
 
 from odoo import models, release, _
-from odoo.tools import float_round
 from odoo.addons.l10n_cz_reports.models import l10n_cz_reports_utils as cz_utils
 
 
@@ -36,16 +35,16 @@ class CzechTaxReportCustomHandler(models.AbstractModel):
 
         values = {}
         for line in report_lines:
-            if not line['code']:
+            if not line.code:
                 continue
-            values[line['code']] = {}
-            for col in line['columns']:
-                values[line['code']][col['expression_label']] = float_round(col['no_format'], precision_digits=0) if col['no_format'] is not None else 0
+            values[line.code] = {}
+            for col in line.columns:
+                values[line.code][col.expression_label] = col.no_format if col.no_format is not None else 0
 
         data = {
             'odoo_version': release.version,
-            'veta_d': cz_utils.get_veta_d_vals(report, options),
-            'veta_p': cz_utils.get_veta_p_vals(sender_company),
+            'veta_d': cz_utils.get_veta_d_vals(report, options, sender_company),
+            'veta_p': cz_utils.get_veta_p_vals(report, sender_company, self.env.user.partner_id),
             **values,
         }
         xml_content = self.env['ir.qweb']._render('l10n_cz_reports.cz_tax_report_template', values=data)

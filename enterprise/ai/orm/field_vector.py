@@ -25,7 +25,7 @@ class Vector(fields.Field):
     def _column_type(self):
         return ('vector', pg_vector(self.size))
 
-    def convert_to_cache(self, value, record, validate=True):
+    def convert_to_cache(self, value, records, validate=True):
         if value is None or value is False:
             return None
         return str(value)

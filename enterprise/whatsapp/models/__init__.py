@@ -8,8 +8,13 @@ from . import mail_message
 from . import mail_thread
 from . import models
 from . import res_partner
-from . import res_users_settings
+from . import utm
 from . import whatsapp_account
+from . import whatsapp_base_template
+from . import whatsapp_base_template_button
+from . import whatsapp_blocklist
+from . import whatsapp_interactive
+from . import whatsapp_interactive_button
 from . import whatsapp_message
 from . import whatsapp_template
 from . import whatsapp_template_button

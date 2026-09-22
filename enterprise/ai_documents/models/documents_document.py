@@ -4,6 +4,7 @@ import ast
 import datetime
 import logging
 import lxml.html
+from pathlib import PurePath
 
 from collections.abc import Iterable
 from markupsafe import Markup
@@ -13,13 +14,15 @@ from odoo.exceptions import UserError
 from odoo.fields import Domain
 from odoo.tools import is_html_empty
 
-from odoo.addons.ai_fields.tools import parse_ai_prompt_values, ai_field_insert
+from odoo.addons.ai.utils.ai_fields_tools import parse_ai_prompt_values, ai_field_insert
+from odoo.addons.ai.utils.ai_utils import format_name_to_llm
 
 _logger = logging.getLogger(__name__)
 
 
 class DocumentsDocument(models.Model):
     _inherit = "documents.document"
+    _explanation = "AI extensions for documents, enabling automated document sorting into folders using AI-powered classification based on folder-specific prompts."
 
     # Field used when inserting records in a prompt
     # (will not show "Restricted" if we have no access)
@@ -43,6 +46,7 @@ class DocumentsDocument(models.Model):
         "AI To Sort",
         help="Flag to mark the files as to be sorted with AI",
     )
+    ai_context_message_id = fields.Many2one("mail.message", compute="_compute_ai_context_message_id")
 
     _check_ai_sort_prompt = models.Constraint(
         "CHECK(COALESCE(ai_sort_prompt, '') = '' OR (type = 'folder' AND shortcut_document_id IS NULL))",
@@ -64,6 +68,24 @@ class DocumentsDocument(models.Model):
                 and document.type == "binary"
                 and document.attachment_id
             )
+
+    def _compute_ai_context_message_id(self):
+        """
+        Identify the document's initial creation message. This message is extracted and sent to
+        the LLM as context to help it understand the source of the document.
+        """
+        system_messages = dict(
+            self.env["mail.message"]._read_group(
+                [("model", "=", self._name), ("res_id", "in", self.ids), ("message_type", "=", "notification")],
+                groupby=["res_id"],
+                aggregates=["id:recordset"],
+            )
+        )
+        for document in self:
+            if messages := system_messages.get(document.id):
+                document.ai_context_message_id = min(messages, key=lambda msg: msg.create_date)
+            else:
+                document.ai_context_message_id = False
 
     def _search_ai_sortable(self, operator, value):
         if operator != "in" or not isinstance(value, Iterable) or tuple(value) != (True,):
@@ -288,6 +310,8 @@ class DocumentsDocument(models.Model):
             return
 
         ir_actions_tools = self.env["ir.actions.server"].browse(ai_tool_ids)
+        for tool in ir_actions_tools:
+            tool.ai_tool_name = format_name_to_llm(tool.name)
         ir_actions_tools.use_in_ai = True
 
         action_values = {
@@ -303,11 +327,12 @@ class DocumentsDocument(models.Model):
                 <br/>
             """)
             % _(
-                """Here is a document called %(document_name)s and whose content is %(content)s and tags are %(tags)s. The mimetype of the document is %(mimetype)s.""",
+                """Here is a document called %(document_name)s and whose content is %(content)s and tags are %(tags)s. The mimetype of the document is %(mimetype)s. The messages related to document are: %(messages)s""",
                 document_name=ai_field_insert("name", _("Name")),
                 content=ai_field_insert("attachment_id", _("Document Content")),
                 tags=ai_field_insert("tag_ids.name", _("Tags > Name")),
                 mimetype=ai_field_insert("mimetype", _("Mimetype")),
+                messages=ai_field_insert("ai_context_message_id.body", _("Messages > Body")),
             ),
         }
         if ir_action:
@@ -347,3 +372,24 @@ class DocumentsDocument(models.Model):
                 'owner_user': {'id': folder.owner_id.id, 'name': folder.owner_id.name},
             } for folder in self
         }
+
+    def _ai_action_rename_file(self, name):
+        self.ensure_one()
+        document_sudo = self.sudo()
+        name = name.strip()
+
+        if not document_sudo.ai_sortable:
+            raise UserError(_("This document cannot be auto-sorted."))
+
+        if not name:
+            raise UserError(_("No name was provided"))
+
+        original_name = document_sudo.name
+
+        if original_name == name:
+            return _("File name already follows convention")
+
+        name = str(PurePath(name).with_suffix(PurePath(original_name).suffix))
+        document_sudo.name = name
+
+        return _('Renamed "%(old_name)s" to "%(new_name)s".', old_name=original_name, new_name=name)

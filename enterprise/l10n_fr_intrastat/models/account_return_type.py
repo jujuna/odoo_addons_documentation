@@ -7,7 +7,7 @@ class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
     @api.model
-    def _generate_all_returns(self, country_code, main_company, tax_unit=None):
+    def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
         # EXTENDS account_reports
         if country_code == 'FR':
             intrastat_report_types = (
@@ -23,8 +23,6 @@ class AccountReturnType(models.Model):
                 date = {
                     'date_from': previous_period_start,
                     'date_to': previous_period_end,
-                    'filter': 'custom',
-                    'mode': 'range',
                 }
 
                 options = {
@@ -49,4 +47,4 @@ class AccountReturnType(models.Model):
                 if main_company.currency_id.compare_amounts(balance, 460000) >= 0:
                     report_type._try_create_return_for_period(previous_period_start, main_company, tax_unit)
 
-        return super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit)
+        return super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)

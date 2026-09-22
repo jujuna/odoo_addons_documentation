@@ -1,11 +1,14 @@
 import contextlib
 import functools
+import logging
 import re
 import requests
 import xmlrpc.client
 
 from odoo.tools import LazyTranslate
 
+
+_logger = logging.getLogger(__name__)
 _lt = LazyTranslate(__name__)
 TIMEOUT = 15
 
@@ -39,6 +42,7 @@ class OdooDatabaseXmlrpcApi:
     @functools.cached_property
     def xmlrpc_proxy(self):
         with self._handle_xmlrpc_errors():
+            _logger.info('connect to %s through xmlrpc', self.host)
             uid = xmlrpc.client.ServerProxy(f'{self.host}/xmlrpc/2/common').authenticate(self.database, self.login, self.apikey, {})
 
         proxy = xmlrpc.client.ServerProxy(f'{self.host}/xmlrpc/2/object')
@@ -53,22 +57,35 @@ class OdooDatabaseXmlrpcApi:
             return proxy.execute_kw(*arguments)
 
     def list_internal_users(self):
+        _logger.info('Call xmlrpc list_internal_users on %s', self.host)
         return self.execute_kw('res.users', 'search_read',
             [('share', '=', False)],  # internal users only
             ['name', 'login', 'login_date'],
         )
 
+    def create_api_key(self, name, scope):
+        return self.execute_kw('res.users.apikeys', 'generate',
+                               key=self.apikey,
+                               scope=scope,
+                               name=name,
+                               expiration_date=False)
+
     def get_kpi_summary(self):
+        _logger.info('Call xmlrpc get_kpi_summary on %s', self.host)
         return self.execute_kw('kpi.provider', 'get_kpi_summary')
 
     def get_database_uuid(self):
-        return self.execute_kw('ir.config_parameter', 'get_param', 'database.uuid')
+        _logger.info('Call xmlrpc get_database_uuid on %s', self.host)
+        return self.execute_kw('ir.config_parameter', 'get_str', 'database.uuid')
 
     def invite_users(self, emails):
+        _logger.info('Call xmlrpc invite_users on %s, emails: %s', self.host, emails)
         return self.execute_kw('res.users', 'web_create_users', emails=emails, context={'no_reset_password': True})
 
     def remove_users(self, logins):
+        _logger.info('Call xmlrpc remove_users on %s, logins: %s', self.host, logins)
         user_ids = self.execute_kw('res.users', 'search', [('login', 'in', logins)])
+        _logger.info('Call xmlrpc set user %s as inactive on %s, logins: %s', user_ids, self.host, logins)
         return self.execute_kw('res.users', 'write', user_ids, {'active': False})
 
 
@@ -119,12 +136,14 @@ class OdooDatabaseApi(BaseApi):
     @classmethod
     def fetch_version(cls, database_url):
         try:
+            _logger.info('Call json2 fetch version on %s/json/version', database_url)
             response = requests.get(f'{database_url}/json/version', allow_redirects=False, timeout=TIMEOUT)
             if response.status_code == 200:
                 if version := response.json().get('version'):
                     return _humanize_version(version)
 
             # Fallback to XML RPC call to common.version
+            _logger.info('Call xmlrpc fetch version on %s', database_url)
             version = xmlrpc.client.ServerProxy(f'{database_url}/xmlrpc/2/common').version().get('server_serie')
             return _humanize_version(version)
         except (requests.exceptions.RequestException, xmlrpc.client.Error):
@@ -138,6 +157,7 @@ class OdooDatabaseApi(BaseApi):
                 try:
                     return method(self, *args, **kwargs)
                 except FallbackToXmlrpc:
+                    _logger.info('Call json2 to %s on %s failed: fallback to xmlrpc', method.__name__, self.host)
                     self.use_fallback = True
 
             fallback_method = getattr(self.fallback, method.__name__)
@@ -145,27 +165,41 @@ class OdooDatabaseApi(BaseApi):
         return wrapper
 
     @fallback_to_xmlrpc
+    def create_api_key(self, name, scope):
+        return self.post_json2('res.users.apikeys', 'generate',
+                               key=self.apikey,
+                               scope=scope,
+                               name=name,
+                               expiration_date=False)
+
+    @fallback_to_xmlrpc
     def list_internal_users(self):
+        _logger.info('Call json2 list_internal_users on %s', self.host)
         return self.post_json2('res.users', 'search_read',
                                domain=[('share', '=', False)],  # internal users only
                                fields=['name', 'login', 'login_date'])
 
     @fallback_to_xmlrpc
     def get_kpi_summary(self):
+        _logger.info('Call json2 get_kpi_summary on %s', self.host)
         return self.post_json2('kpi.provider', 'get_kpi_summary')
 
     @fallback_to_xmlrpc
     def get_database_uuid(self):
-        return self.post_json2('ir.config_parameter', 'get_param', key='database.uuid')
+        _logger.info('Call json2 get_database_uuid on %s', self.host)
+        return self.post_json2('ir.config_parameter', 'get_str', key='database.uuid')
 
     @fallback_to_xmlrpc
     def invite_users(self, emails):
+        _logger.info('Call json2 invite_users on %s, emails: %s', self.host, emails)
         return self.post_json2('res.users', 'web_create_users', emails=emails, context={'no_reset_password': True})
 
     @fallback_to_xmlrpc
     def remove_users(self, logins):
+        _logger.info('Call json2 remove_users on %s, logins: %s', self.host, logins)
         user_ids = self.post_json2('res.users', 'search', domain=[('login', 'in', logins)])
-        return self.post_json2('res.users', 'write', ids=user_ids, values={'active': False})
+        _logger.info('Call json2 set user %s as inactive on %s, logins: %s', user_ids, self.host, logins)
+        return self.post_json2('res.users', 'write', ids=user_ids, vals={'active': False})
 
 
 def _humanize_version(version):

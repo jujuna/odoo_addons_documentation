@@ -26,11 +26,24 @@ test("clamp", () => {
 test("range", () => {
     expect(range(0, 10)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     expect(range(0, 35, 5)).toEqual([0, 5, 10, 15, 20, 25, 30]);
+    expect(range(0, 34, 5)).toEqual([0, 5, 10, 15, 20, 25, 30]);
+    expect(range(0, 36, 5)).toEqual([0, 5, 10, 15, 20, 25, 30, 35]);
     expect(range(-10, 6, 2)).toEqual([-10, -8, -6, -4, -2, 0, 2, 4]);
     expect(range(0, -10, -1)).toEqual([0, -1, -2, -3, -4, -5, -6, -7, -8, -9]);
     expect(range(4, -4, -1)).toEqual([4, 3, 2, 1, 0, -1, -2, -3]);
     expect(range(1, 4, -1)).toEqual([]);
     expect(range(1, -4, 1)).toEqual([]);
+    expect(range(3)).toEqual([0, 1, 2]);
+    expect(range(0, 3)).toEqual([0, 1, 2]);
+    expect(range(0, 3, 1)).toEqual([0, 1, 2]);
+    expect(range(3, 0)).toEqual([3, 2, 1]);
+    expect(range(3, 0, -1)).toEqual([3, 2, 1]);
+    expect(range(-3)).toEqual([0, -1, -2]);
+    expect(range(0, -3)).toEqual([0, -1, -2]);
+    expect(range(0, -3, -1)).toEqual([0, -1, -2]);
+    expect(range(2, -2)).toEqual([2, 1, 0, -1]);
+    expect(range(2, -2, -3)).toEqual([2, -1]);
+    expect(range(-2, 2)).toEqual([-2, -1, 0, 1]);
 });
 
 describe("roundPrecision", () => {
@@ -252,6 +265,43 @@ test("floatIsZero", () => {
 });
 
 describe("formatFloat", () => {
+    test("precision", () => {
+        patchWithCleanup(localization, {
+            decimalPoint: ".",
+            grouping: [3, 0],
+            thousandsSep: ",",
+        });
+
+        let options = {};
+        expect(formatFloat(3, options)).toBe("3.00");
+        expect(formatFloat(3.1, options)).toBe("3.10");
+        expect(formatFloat(3.12, options)).toBe("3.12");
+        expect(formatFloat(3.129, options)).toBe("3.13");
+
+        options = { digits: [15, 3] };
+        expect(formatFloat(3, options)).toBe("3.000");
+        expect(formatFloat(3.1, options)).toBe("3.100");
+        expect(formatFloat(3.123, options)).toBe("3.123");
+        expect(formatFloat(3.1239, options)).toBe("3.124");
+
+        options = { minDigits: 3 };
+        expect(formatFloat(0, options)).toBe("0.000");
+        expect(formatFloat(3, options)).toBe("3.000");
+        expect(formatFloat(3.1, options)).toBe("3.100");
+        expect(formatFloat(3.123, options)).toBe("3.123");
+        expect(formatFloat(3.1239, options)).toBe("3.1239");
+        expect(formatFloat(3.1231239, options)).toBe("3.123124");
+        expect(formatFloat(528000000.0, options)).toBe("528,000,000.000");
+        expect(formatFloat(1234567890.1234567890, options)).toBe("1,234,567,890.1235");
+
+        options = { minDigits: 3, digits: [15, 4] };
+        expect(formatFloat(3, options)).toBe("3.000");
+        expect(formatFloat(3.1, options)).toBe("3.100");
+        expect(formatFloat(3.123, options)).toBe("3.123");
+        expect(formatFloat(3.1239, options)).toBe("3.1239");
+        expect(formatFloat(3.1234567, options)).toBe("3.1235");
+    });
+
     test("localized", () => {
         patchWithCleanup(localization, {
             decimalPoint: ".",
@@ -343,7 +393,7 @@ describe("formatFloat", () => {
             expect(formatFloat(value, options)).toBe(resHuman);
         });
 
-        Object.assign(options, { humanReadable: false });
+        Object.assign(options, { humanReadable: false, digits: undefined, minDigits: undefined});
         expect(formatFloat(-0.0000001, options)).toBe("0.00");
     });
 });

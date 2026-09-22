@@ -5,32 +5,19 @@ import { definePosModels } from "@point_of_sale/../tests/unit/data/generate_mode
 definePosModels();
 
 describe("pos_store.js", () => {
-    test("getPartnerCredit", async () => {
+    test("onClickDepositMoney", async () => {
         const store = await setupPosEnv();
-        const order = store.addNewOrder();
-        const product = store.models["product.template"].get(5);
+        const randomPartner = store.models["res.partner"].getFirst();
+        const expectedPaymentMethod = store.config.paymentMethods.find(
+            (method) => method.type !== "pay_later"
+        );
+        const result = await store.onClickDepositMoney(50, randomPartner.id);
+        const currentOrder = store.getOrder();
+        const selectedPaymentLine = currentOrder.getSelectedPaymentline();
 
-        const partner = store.models["res.partner"].get(5);
-        order.setPartner(partner);
-
-        await store.addLineToOrder({ product_tmpl_id: product, qty: 1 }, order);
-        let partnerCreditInfo = store.getPartnerCredit(partner);
-
-        expect(partnerCreditInfo).toMatchObject({
-            creditLimit: 10,
-            totalWithCart: 3.45,
-            overDue: false,
-            useLimit: false,
-        });
-
-        await store.addLineToOrder({ product_tmpl_id: product, qty: 2 }, order);
-        partnerCreditInfo = store.getPartnerCredit(partner);
-
-        expect(partnerCreditInfo).toMatchObject({
-            creditLimit: 10,
-            totalWithCart: 10.35,
-            overDue: true,
-            useLimit: true,
-        });
+        expect(result).toBe(true);
+        expect(currentOrder.payment_ids).toHaveLength(1);
+        expect(selectedPaymentLine.amount).toBe(50);
+        expect(selectedPaymentLine.payment_method_id).toBe(expectedPaymentMethod);
     });
 });

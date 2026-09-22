@@ -39,7 +39,6 @@ class TestPosSelfOrderPreparationDisplay(SelfOrderCommonTest):
         """
         floor = self.env["restaurant.floor"].create({
             "name": 'Main Floor',
-            "background_color": 'rgb(249,250,251)',
             "table_ids": [(0, 0, {
                 "table_number": 1,
             })],
@@ -61,6 +60,7 @@ class TestPosSelfOrderPreparationDisplay(SelfOrderCommonTest):
         self.env['restaurant.table'].create({
             'table_number': 1234,
             'floor_id': self.pos_config.floor_ids[0].id,
+            'floor_plan_layout': {'top': 100, 'left': 150, 'width': 100, 'height': 100, 'color': 'green'},
         })
 
         self.pos_config.with_user(self.pos_user).open_ui()

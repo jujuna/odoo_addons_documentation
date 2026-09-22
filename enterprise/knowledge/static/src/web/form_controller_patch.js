@@ -1,12 +1,10 @@
+import { onMounted, onPatched } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
 import { FormController } from "@web/views/form/form_controller";
 import { patch } from "@web/core/utils/patch";
 import { useService } from "@web/core/utils/hooks";
 import { evaluateBooleanExpr } from "@web/core/py_js/py";
 import { CallbackRecorder } from "@web/search/action_hook";
-import {
-    useEffect,
-    useSubEnv
-} from "@odoo/owl";
 
 
 /**
@@ -52,11 +50,19 @@ const FormControllerPatch = {
             this.knowledgeCommandsService = useService('knowledgeCommandsService');
             useSubEnv({
                 __knowledgeUpdateCommandsRecordInfo__: new CallbackRecorder(),
+                searchKnowledgeArticles: () => this.onClickSearchKnowledgeArticle(),
             });
-            useEffect(
-                () => this._evaluateRecordCandidate(),
-                () => [this.model.root.resId],
-            );
+            let lastResId;
+            const evaluateOnResIdChange = () => {
+                const resId = this.model.root?.resId;
+                if (resId === lastResId) {
+                    return;
+                }
+                lastResId = resId;
+                this._evaluateRecordCandidate();
+            };
+            onMounted(evaluateOnResIdChange);
+            onPatched(evaluateOnResIdChange);
         }
     },
     /**

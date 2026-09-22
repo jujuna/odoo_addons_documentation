@@ -1,4 +1,3 @@
-import base64
 import csv
 import re
 
@@ -287,11 +286,8 @@ class SIE4ImportWizard(models.TransientModel):
 
         The dictionary fields other than the label are to be used as the parameter for its respective label methods.
         """
-        sie4_bytes = base64.b64decode(self.attachment_file)
-        try:
-            sie4_lines = sie4_bytes.decode('UTF-8').split('\n')
-        except UnicodeDecodeError:
-            sie4_lines = sie4_bytes.decode('ISO-8859-1').split('\n')
+        sie4_bytes = self.attachment_file.content
+        sie4_lines = sie4_bytes.decode('cp437').split('\n')
         sie4_data = []
         idx = 0
 
@@ -424,7 +420,10 @@ class SIE4ImportWizard(models.TransientModel):
 
         if not currency.is_zero(total_diff):
             off_balance_account = self.env['account.account'].with_company(self.company_id).search_fetch(
-                domain=[('account_type', '=', 'equity_unaffected')],
+                domain=[
+                    *self.env['account.account']._check_company_domain(self.company_id),
+                    ('account_type', '=', 'equity_unaffected')
+                ],
                 field_names=['id'],
                 limit=1,
             )

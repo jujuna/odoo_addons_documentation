@@ -37,7 +37,7 @@ class EpcScheme:
 
     def encode(self, element_string, filter, company_prefix_length):
         if company_prefix_length and not 6 <= company_prefix_length <= 12:
-            raise Exception(_("An error occured: value of company_prefix_length (%(company_prefix_length)s) must be between 6 and 12 inclusive.", company_prefix_length=company_prefix_length))
+            raise Exception(_("An error occurred: value of company_prefix_length (%(company_prefix_length)s) must be between 6 and 12 inclusive.", company_prefix_length=company_prefix_length))
         ai_dict = EpcData.element_string_to_dict(element_string)
         partition_line = self.partition_table.get(company_prefix_length, None)
         next_values = None
@@ -49,7 +49,7 @@ class EpcScheme:
                     raise Exception(_("An error occurred with field 'partition': no partition value can be found for the given company_prefix_length"))
                 to_process = next((key, value) if key == self.partition_table['ai'] else None for key, value in ai_dict.items())
                 if not to_process:  # The presence of the partition field is always linked to the mandatory presence of an AI to split data from in the element string
-                    return _("An error occured during parsing of element_string: AI code %(ai_code)s is missing for scheme %(scheme_name)s", ai_code=self.partition_table['ai'], scheme_name=self.name)
+                    return _("An error occurred during parsing of element_string: AI code %(ai_code)s is missing for scheme %(scheme_name)s", ai_code=self.partition_table['ai'], scheme_name=self.name)
                 next_values = EpcData.split_ai(to_process, company_prefix_length)
                 field.value = partition_line['value']
             elif next_values and len(next_values):
@@ -62,7 +62,7 @@ class EpcScheme:
             elif field.ai and field.ai in ai_dict:
                 field.value = ai_dict[field.ai]
             elif field.name != 'header':
-                return _("An error occured with field '%(field_name)s': the corresponding AI '%(ai_code)s' was not found in the element_string", field_name=field.name, ai_code=field.ai)
+                return _("An error occurred with field '%(field_name)s': the corresponding AI '%(ai_code)s' was not found in the element_string", field_name=field.name, ai_code=field.ai)
 
             try:
                 field._encode()

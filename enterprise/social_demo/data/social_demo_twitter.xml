@@ -38,7 +38,6 @@
         <field name="published_date" eval="time.strftime('%Y-01-01 00:01:00')"/>
         <field name="state">posted</field>
         <field name="account_ids" eval="[(6, 0, [ref('social_demo.social_account_twitter')])]" />
-        <field name="post_method">scheduled</field>
         <field name="scheduled_date" eval="time.strftime('%Y-01-01 00:01:00')"/>
     </record>
 
@@ -47,7 +46,9 @@
         <field name="twitter_tweet_id">1735225253993853106</field>
         <field name="post_id" ref="social_post_global" />
         <field name="account_id" ref="social_account_twitter" />
-        <field name="engagement">5257</field>
+        <field name="likes_count">5257</field>
+        <field name="comments_count">92</field>
+        <field name="shares_count">469</field>
     </record>
 
     <record id="social_live_post_twitter_2" model="social.live.post">
@@ -55,7 +56,9 @@
         <field name="twitter_tweet_id">1735225253993853106</field>
         <field name="post_id" ref="social_post_twitter" />
         <field name="account_id" ref="social_account_twitter" />
-        <field name="engagement">1567</field>
+        <field name="likes_count">1567</field>
+        <field name="comments_count">21</field>
+        <field name="shares_count">3</field>
     </record>
 
     <record id="social_live_post_twitter_3" model="social.live.post">
@@ -63,7 +66,9 @@
         <field name="twitter_tweet_id">1735225253993853106</field>
         <field name="post_id" ref="social_post_global_2" />
         <field name="account_id" ref="social_account_twitter" />
-        <field name="engagement">8622</field>
+        <field name="likes_count">8622</field>
+        <field name="comments_count">147</field>
+        <field name="shares_count">834</field>
     </record>
 
     <record id="social_live_post_twitter_4" model="social.live.post">
@@ -71,13 +76,16 @@
         <field name="twitter_tweet_id">1735225253993853106</field>
         <field name="post_id" ref="social_post_global_3" />
         <field name="account_id" ref="social_account_twitter" />
-        <field name="engagement">7511</field>
+        <field name="likes_count">7511</field>
+        <field name="comments_count">103</field>
+        <field name="shares_count">725</field>
     </record>
 
     <record id="social_stream_post_twitter_1" model="social.stream.post">
         <field name="stream_id" ref="social_stream_twitter_account" />
         <field name="twitter_tweet_id">1</field>
         <field name="twitter_retweet_count">469</field>
+        <field name="twitter_comments_count">92</field>
         <field name="twitter_likes_count">5538</field>
         <field name="author_name">My Company Account</field>
         <field name="twitter_screen_name">mycompanyaccount</field>
@@ -90,6 +98,7 @@
         <field name="stream_id" ref="social_stream_twitter_account" />
         <field name="twitter_tweet_id">2</field>
         <field name="twitter_retweet_count">3</field>
+        <field name="twitter_comments_count">21</field>
         <field name="twitter_likes_count">1476</field>
         <field name="author_name">My Company Account</field>
         <field name="twitter_screen_name">mycompanyaccount</field>
@@ -102,6 +111,7 @@
         <field name="stream_id" ref="social_stream_twitter_account" />
         <field name="twitter_tweet_id">3</field>
         <field name="twitter_retweet_count">834</field>
+        <field name="twitter_comments_count">147</field>
         <field name="twitter_likes_count">9476</field>
         <field name="author_name">My Company Account</field>
         <field name="twitter_screen_name">mycompanyaccount</field>
@@ -115,6 +125,7 @@ Better run to our website while it lasts 🏃</field>
         <field name="stream_id" ref="social_stream_twitter_account" />
         <field name="twitter_tweet_id">4</field>
         <field name="twitter_retweet_count">725</field>
+        <field name="twitter_comments_count">103</field>
         <field name="twitter_likes_count">8008</field>
         <field name="author_name">My Company Account</field>
         <field name="twitter_screen_name">mycompanyaccount</field>
@@ -125,23 +136,23 @@ https://www.youtube.com/watch?v=kmt-oVAB6hU</field>
         <field name="published_date" eval="time.strftime('%Y-01-10 09:00:00')"/>
     </record>
 
-    <record id="social_stream_post_twitter_image_1" model="social.stream.post.image">
-        <field name="image_url" eval="'/web/image/product.product/%s/image_512' % ref('product.product_product_4')"></field>
+    <record id="social_stream_post_twitter_image_1" model="social.stream.post.attachment">
+        <field name="content_url" eval="'/web/image/product.product/%s/image_512' % ref('product.product_product_4')"></field>
         <field name="stream_post_id" ref="social_stream_post_twitter_3" />
     </record>
 
-    <record id="social_stream_post_twitter_image_2" model="social.stream.post.image">
-        <field name="image_url" eval="'/web/image/product.product/%s/image_512' % ref('product.product_product_4b')"></field>
+    <record id="social_stream_post_twitter_image_2" model="social.stream.post.attachment">
+        <field name="content_url" eval="'/web/image/product.product/%s/image_512' % ref('product.product_product_4b')"></field>
         <field name="stream_post_id" ref="social_stream_post_twitter_3" />
     </record>
 
-    <record id="social_stream_post_twitter_image_3" model="social.stream.post.image">
-        <field name="image_url" eval="'/web/image/product.product/%s/image_512' % ref('product.product_product_4c')"></field>
+    <record id="social_stream_post_twitter_image_3" model="social.stream.post.attachment">
+        <field name="content_url" eval="'/web/image/product.product/%s/image_512' % ref('product.product_product_4c')"></field>
         <field name="stream_post_id" ref="social_stream_post_twitter_3" />
     </record>
 
-    <record id="social_stream_post_twitter_image_4" model="social.stream.post.image">
-        <field name="image_url" eval="'/web/image/product.product/%s/image_512' % ref('social_demo.product_product_4d')"></field>
+    <record id="social_stream_post_twitter_image_4" model="social.stream.post.attachment">
+        <field name="content_url" eval="'/web/image/product.product/%s/image_512' % ref('social_demo.product_product_4d')"></field>
         <field name="stream_post_id" ref="social_stream_post_twitter_3" />
     </record>
 

@@ -1,4 +1,4 @@
-import { register_payment_method } from "@point_of_sale/app/services/pos_store";
+import { registry } from "@web/core/registry";
 import { handleRPCError, offlineErrorHandler } from "@point_of_sale/app/utils/error_handlers";
 import { PaymentInterface } from "@point_of_sale/app/utils/payment/payment_interface";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
@@ -19,18 +19,17 @@ export class PaymentDPOPay extends PaymentInterface {
         this.inactivityTimeout = null;
         this.paymentStopped = false;
         this.pollingInProgress = false;
+        this.toAlphanumeric = (str) => str.replace(/[^a-zA-Z0-9]/g, "");
     }
 
-    sendPaymentRequest(cid) {
-        super.sendPaymentRequest(cid);
+    async sendPaymentRequest(line) {
+        await super.sendPaymentRequest(...arguments);
         return this._processPaymentRequest();
     }
 
-    sendPaymentCancel(order, cid) {
-        super.sendPaymentCancel(order, cid);
-        return this._cancelPaymentRequest({
-            sourceId: order.getSelectedPaymentline().transaction_id,
-        });
+    async sendPaymentCancel(line) {
+        await super.sendPaymentCancel(...arguments);
+        return this._cancelPaymentRequest({ sourceId: line.transaction_id });
     }
 
     async _processPaymentRequest() {
@@ -61,10 +60,12 @@ export class PaymentDPOPay extends PaymentInterface {
             }
         }
 
-        const orderId = order?.pos_reference?.replace(" ", "").replaceAll("-", "").toUpperCase();
-        const referencePrefix = this.pos.config.name.replace(/\s/g, "").slice(0, 4);
-        paymentLine.transaction_id =
-            referencePrefix + "/" + orderId + "/" + crypto.randomUUID().replaceAll("-", "");
+        const configPrefix = this.toAlphanumeric(this.pos.config.name).slice(0, 4);
+        const orderUuidSuffix = this.toAlphanumeric(order.uuid).slice(-5);
+        const randomUuidSuffix = this.toAlphanumeric(crypto.randomUUID()).slice(
+            -(15 - (configPrefix.length + orderUuidSuffix.length))
+        );
+        paymentLine.transaction_id = configPrefix + orderUuidSuffix + randomUuidSuffix;
 
         const currency = paymentLine.pos_order_id.currency;
         const data = {
@@ -102,7 +103,7 @@ export class PaymentDPOPay extends PaymentInterface {
         const dpopayFetchPaymentStatus = async (resolve, reject) => {
             clearTimeout(this.pollingTimeout);
 
-            if (this.pos.router.state.current !== "PaymentScreen") {
+            if (this.pos.router.currentScreen() !== "PaymentScreen") {
                 this._removePaymentHandler();
                 return;
             }
@@ -269,7 +270,6 @@ export class PaymentDPOPay extends PaymentInterface {
             ]);
         } catch (error) {
             const line = this._pendingDPOPaymentLine();
-            this.pos.paymentTerminalInProgress = false;
             if (line) {
                 line.setPaymentStatus("force_done");
             }
@@ -326,4 +326,4 @@ export class PaymentDPOPay extends PaymentInterface {
     }
 }
 
-register_payment_method("dpopay", PaymentDPOPay);
+registry.category("pos_payment_providers").add("dpopay", PaymentDPOPay);

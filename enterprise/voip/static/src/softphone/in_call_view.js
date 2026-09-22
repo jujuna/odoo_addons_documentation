@@ -1,30 +1,44 @@
-import { Component, useState } from "@odoo/owl";
-
-import { Call } from "@voip/core/call_model";
+import { Component, proxy, t, useListener, useProps } from "@odoo/owl";
+import { Session } from "@voip/core/web/session";
 import { ActionButton } from "@voip/softphone/action_button";
+import { ActionList } from "@voip/softphone/action_list";
+import { AddCallView } from "@voip/softphone/add_call_view";
+import { CallBanner } from "@voip/softphone/call_banner";
 import { ContactInfo } from "@voip/softphone/contact_info";
 import { Keypad } from "@voip/softphone/keypad";
 import { TransferConfirmation } from "@voip/softphone/transfer_confirmation";
 import { TransferView } from "@voip/softphone/transfer_view";
-
+import { isCurrentFocusEditable } from "@voip/utils/utils";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 
 export class InCallView extends Component {
-    static components = { ActionButton, ContactInfo, Keypad, TransferConfirmation, TransferView };
-    static props = { call: Call };
+    static components = {
+        ActionButton,
+        AddCallView,
+        ActionList,
+        CallBanner,
+        ContactInfo,
+        Keypad,
+        TransferConfirmation,
+        TransferView,
+    };
     static template = "voip.InCallView";
 
+    props = useProps({
+        backSessions: t.array(),
+        frontSession: t.instanceOf(Session),
+    });
+
     setup() {
-        this.action = useService("action");
         this.voip = useService("voip");
         this.softphone = this.voip.softphone;
-        this.userAgent = useService("voip.user_agent");
-        this.ui = useService("ui");
-        this.state = useState({
+        this.userAgent = this.voip.userAgent;
+        this.state = proxy({
             targetContact: false,
             targetPhoneNumber: "",
         });
+        useListener(window, "keydown", this.onWindowKeydown.bind(this));
     }
 
     /** @returns {string} */
@@ -32,13 +46,35 @@ export class InCallView extends Component {
         return this.softphone.inCallView.activeView;
     }
 
+    /** @returns {(contact: { id: number }) => boolean} */
+    get contactExcludeFilter() {
+        const frontId = this.frontSession?.call?.partner_id?.id;
+        const backIds = this.props.backSessions.map((session) => session.call?.partner_id?.id);
+        const allExcluded = new Set([frontId, ...backIds].filter(Boolean));
+        return (contact) => !allExcluded.has(contact.id);
+    }
+
     /** @returns {boolean} */
-    get hasPendingTransfer() {
-        return (
-            this.userAgent.mainSession &&
-            this.userAgent.transferSession &&
-            this.userAgent.activeSession.call.state === "ongoing"
-        );
+    get canToggleRecording() {
+        return this.frontSession.canToggleRecording;
+    }
+
+    /** @returns {import("@voip/core/web/session").Session[]} */
+    get displayedBackSessions() {
+        if (this.userAgent.hasCallInvitation) {
+            const invitationSessionKey = this.userAgent.callInvitationSession.key;
+            return Object.values(this.userAgent.sessions)
+                .filter((s) => s.key !== invitationSessionKey)
+                .reverse();
+        }
+        if (this.softphone.inCallView.activeView === "default") {
+            return this.props.backSessions;
+        }
+        return [];
+    }
+
+    get frontSession() {
+        return this.props.frontSession;
     }
 
     /** @returns {boolean} */
@@ -47,22 +83,8 @@ export class InCallView extends Component {
     }
 
     /** @returns {boolean} */
-    get isOnHold() {
-        return this.userAgent.activeSession.isOnHold;
-    }
-
-    /** @returns {boolean} */
-    get isMuted() {
-        return this.userAgent.activeSession.isMuted;
-    }
-
-    /** @returns {boolean} */
     get isRecording() {
-        const recorder = this.userAgent.activeSession.recorder;
-        if (!recorder) {
-            return false;
-        }
-        return recorder.state === "recording";
+        return this.frontSession.isRecording;
     }
 
     /** @returns {ReturnType<_t>} */
@@ -72,34 +94,34 @@ export class InCallView extends Component {
 
     /** @returns {ReturnType<_t>|""} */
     get recordingIndicatorTitle() {
-        if (this.voip.recordingPolicy === "always") {
+        if (this.voip.config.recordingPolicy === "always") {
             return _t("Enforced by admin");
         }
         return "";
     }
 
-    onClickContact(ev) {
-        const action = {
-            type: "ir.actions.act_window",
-            res_model: "res.partner",
-            views: [[false, "form"]],
-            target: this.ui.isSmall ? "new" : "current",
-            context: {},
-        };
-        if (this.props.call.partner_id) {
-            action.res_id = this.props.call.partner_id.id;
-        } else {
-            action.context.default_phone = this.props.call.phone_number;
-        }
-        this.action.doAction(action);
+    onClickAddCall() {
+        this.softphone.inCallView.activeView = "addCall";
+    }
+
+    onClickAddCallContacts() {
+        this.softphone.inCallView.addCallView.activeView = "contacts";
+    }
+
+    onClickAddCallKeypad() {
+        this.softphone.inCallView.addCallView.activeView = "keypad";
+    }
+
+    onClickBack() {
+        this.softphone.inCallView.activeView = "default";
     }
 
     onClickHangUp() {
-        this.userAgent.hangup();
+        this.frontSession.hangup();
     }
 
     onClickHold() {
-        this.userAgent.activeSession.isOnHold = !this.isOnHold;
+        this.frontSession.isOnHold = !this.frontSession.isOnHold;
     }
 
     onClickKeypad() {
@@ -107,7 +129,33 @@ export class InCallView extends Component {
     }
 
     onClickMute() {
-        this.userAgent.activeSession.isMuted = !this.userAgent.activeSession.isMuted;
+        this.frontSession.isMuted = !this.frontSession.isMuted;
+    }
+
+    /** @param {KeyboardEvent} ev */
+    onWindowKeydown(ev) {
+        const digitMatch = ev.code.match(/^(?:Digit|Numpad)([0-9])$/);
+        const key = digitMatch?.[1] || (["*", "#"].includes(ev.key) ? ev.key : null);
+        const usesAltGraph = ev.getModifierState("AltGraph");
+        if (
+            ev.metaKey ||
+            ((ev.altKey || ev.ctrlKey) && !usesAltGraph) ||
+            ev.repeat ||
+            this.activeView !== "default" ||
+            !this.frontSession.isOngoing ||
+            !key
+        ) {
+            return;
+        }
+        const isDtmfInput =
+            ev.target.classList?.contains("o-voip-Keypad-input") && this.isKeypadOpen;
+        if (isCurrentFocusEditable() && !isDtmfInput) {
+            return;
+        }
+        ev.preventDefault();
+        this.softphone.inCallView.keypad.isOpen = true;
+        this.frontSession.sendDtmf(key);
+        this.softphone.inCallView.keypad.state.input.value += key;
     }
 
     onClickTransfer() {
@@ -116,7 +164,7 @@ export class InCallView extends Component {
     }
 
     onClickConfirmTransfer() {
-        this.userAgent.performAttendedTransfer();
+        this.userAgent.performAttendedTransfer(this.frontSession.key);
     }
 
     onClickTransferContacts() {
@@ -141,22 +189,7 @@ export class InCallView extends Component {
         this.softphone.inCallView.transferView.activeView = "confirmation";
     }
 
-    toggleRecording() {
-        if (this.voip.recordingPolicy !== "user") {
-            return;
-        }
-        const recorder = this.userAgent.activeSession.recorder;
-        if (!recorder) {
-            this.userAgent.activeSession.record();
-            return;
-        }
-        switch (recorder.state) {
-            case "paused":
-                recorder.resume();
-                break;
-            case "recording":
-                recorder.pause();
-                break;
-        }
+    onClickToggleRecording() {
+        this.frontSession.toggleRecording();
     }
 }

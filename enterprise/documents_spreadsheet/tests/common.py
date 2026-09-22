@@ -1,18 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from contextlib import contextmanager
-from datetime import datetime
-from freezegun import freeze_time
-from unittest.mock import patch
-
-
 from odoo.tests.common import HttpCase, new_test_user
 from odoo.addons.spreadsheet_edition.tests.spreadsheet_test_case import SpreadsheetTestCase
 from odoo.tools import file_open, misc
-
-
-TEST_CONTENT = "{}"
-GIF = b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs="
 
 
 class SpreadsheetTestCommon(SpreadsheetTestCase):
@@ -47,15 +37,9 @@ class SpreadsheetTestCommon(SpreadsheetTestCase):
             return self.env["documents.document"].with_user(user or self.env.user).create(vals)
 
         if values and 'create_date' in values:
-            _create = patch.object(self.env.cr, 'now', lambda: values['create_date'])(_create)
-
+            with self.mock_datetime_and_now(values['create_date']):
+                return _create()
         return _create()
-
-    @contextmanager
-    def _freeze_time(self, time):
-        time_format = "%Y-%m-%d %H:%M" if ':' in time else "%Y-%m-%d"
-        with patch.object(self.env.cr, 'now', lambda: datetime.strptime(time, time_format)), freeze_time(time):
-            yield
 
 
 class SpreadsheetTestTourCommon(SpreadsheetTestCommon, HttpCase):
@@ -63,9 +47,9 @@ class SpreadsheetTestTourCommon(SpreadsheetTestCommon, HttpCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.spreadsheet_user.partner_id.country_id = cls.env.ref("base.us")
-        cls.env['res.users'].browse(2).partner_id.country_id = cls.env.ref("base.be")
+        cls.env.ref('base.user_admin').partner_id.country_id = cls.env.ref("base.be")
         # Avoid interference from the demo data which rename the admin user
-        cls.env['res.users'].browse(2).write({"name": "AdminDude"})
+        cls.env.ref('base.user_admin').write({"name": "AdminDude"})
         data_path = misc.file_path('documents_spreadsheet/tests/test_spreadsheet_data.json')
         with file_open(data_path, 'rb') as f:
             cls.spreadsheet = cls.env["documents.document"].create({

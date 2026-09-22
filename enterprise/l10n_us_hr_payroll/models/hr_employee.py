@@ -1,13 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
-
-STATES = ['NY', 'CA', 'AL', 'CO', 'VT', 'IL', 'AZ', 'DC', 'NC', 'VA', 'OR', 'ID']
+from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
+    l10n_us_ssn = fields.Char('US: Social Security Number', groups="hr.group_hr_user", tracking=True)
     l10n_us_old_w4 = fields.Boolean(readonly=False, related="version_id.l10n_us_old_w4", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_us_w4_step_2 = fields.Boolean(readonly=False, related="version_id.l10n_us_w4_step_2", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_us_w4_step_3 = fields.Float(readonly=False, related="version_id.l10n_us_w4_step_3", inherited=True, groups="hr_payroll.group_hr_payroll_user")
@@ -39,3 +39,12 @@ class HrEmployee(models.Model):
     l10n_us_post_roth_401k_type = fields.Selection(readonly=False, related="version_id.l10n_us_post_roth_401k_type", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_us_employee_state_code = fields.Char(related="version_id.l10n_us_employee_state_code", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_us_worker_compensation_id = fields.Many2one(readonly=False, related="version_id.l10n_us_worker_compensation_id", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_us_nj_rate_table = fields.Selection(readonly=False, related="version_id.l10n_us_nj_rate_table", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+
+    @api.constrains('l10n_us_ssn')
+    def _check_l10n_us_ssn(self):
+        for employee in self:
+            if employee.company_id.country_id.code != "US":
+                continue
+            if employee.l10n_us_ssn and (len(employee.l10n_us_ssn) != 9 or not employee.l10n_us_ssn.isdigit()):
+                raise UserError(self.env._('Social Security number (SSN) should be a nine-digit number.'))

@@ -34,18 +34,25 @@ class RepairOrder(models.Model):
         for repair in self:
             repair.quality_alert_count = mapped_data.get(repair.id, 0)
 
+    @api.depends('quality_check_todo')
+    def _compute_validate_button_style(self):
+        super()._compute_validate_button_style()
+        for repair in self:
+            if repair.validate_button_style == 'primary' and repair.quality_check_todo:
+                repair.validate_button_style = 'secondary'
+
     @api.model_create_multi
     def create(self, vals_list):
         res = super().create(vals_list)
         for repair in res:
-            if repair.state in ('confirmed', 'under_repair'):
+            if repair.state == 'confirmed':
                 repair._create_quality_checks_for_repair(["product", "operation"])
         return res
 
     def write(self, vals):
         res = super().write(vals)
         for repair in self:
-            if repair.state in ('confirmed', 'under_repair'):
+            if repair.state == 'confirmed':
                 if "product_id" in vals:
                     repair.quality_check_ids.filtered(lambda c: c.measure_on == "product").unlink()
                     repair._create_quality_checks_for_repair(["product"])
@@ -113,7 +120,6 @@ class RepairOrder(models.Model):
         action = self.env["ir.actions.actions"]._for_xml_id("quality_control.quality_alert_action_check")
         action['context'] = {
             'default_product_id': self.product_id.id,
-            'default_product_tmpl_id': self.product_id.product_tmpl_id.id,
             'default_repair_id': self.id,
         }
         action['domain'] = [('repair_id', '=', self.id)]
@@ -135,7 +141,8 @@ class RepairOrder(models.Model):
         return res
 
     def action_repair_done(self):
-        if any(check.quality_state == "none" for check in self.quality_check_ids):
+        is_manager = self.env.user.has_group('quality.group_quality_manager')
+        if not is_manager and any(check.quality_state == "none" for check in self.quality_check_ids):
             raise UserError(_("You still need to do the quality checks!"))
         return super().action_repair_done()
 

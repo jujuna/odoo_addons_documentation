@@ -9,12 +9,12 @@
                     <footer>
                         <button name="action_export_xlsx" string="Export XLSX" type="object" class="btn-primary disabled" data-hotkey="q" invisible="employee_ids"/>
                         <button name="action_export_xlsx" string="Export XLSX" type="object" class="btn-primary" data-hotkey="q" invisible="not employee_ids"/>
-                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x" />
+                        <button class="btn-secondary" special="cancel" data-hotkey="x"/>
                     </footer>
                     <group class="mt-2">
                         <field name="date_from"/>
                         <field name="date_to"/>
-                        <field name="struct_id" string="Salary Structure"/>
+                        <field name="struct_id" string="Pay Structure"/>
                         <label class="o_form_label" for="include_paid" string="Payslip Status"/>
                         <div class="o_row" string="Payslip Status">
                             <label for="include_paid" string="Paid"/>
@@ -50,9 +50,6 @@
             <field name="mode">primary</field>
             <field name="arch" type="xml">
                 <field name="activity_ids" position="attributes">
-                    <attribute name="optional">hide</attribute>
-                </field>
-                <field name="activity_date_deadline" position="attributes">
                     <attribute name="optional">hide</attribute>
                 </field>
                 <field name="company_id" position="attributes">

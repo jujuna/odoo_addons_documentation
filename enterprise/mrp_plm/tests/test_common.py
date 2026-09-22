@@ -36,6 +36,7 @@ class TestPlmCommon(common.TransactionCase):
             'time_start': 10,
             'time_stop': 5,
             'time_efficiency': 80,
+            'costs_hour': 120,
         })
 
         cls.workcenter_2 = cls.env['mrp.workcenter'].create({
@@ -43,6 +44,7 @@ class TestPlmCommon(common.TransactionCase):
             'time_start': 10,
             'time_stop': 5,
             'time_efficiency': 80,
+            'costs_hour': 60,
         })
 
         cls.workcenter_3 = cls.env['mrp.workcenter'].create({
@@ -62,7 +64,7 @@ class TestPlmCommon(common.TransactionCase):
         cls.bom_table = cls.Bom.create({
             'product_id': cls.table.id,
             'product_tmpl_id': cls.table.product_tmpl_id.id,
-            'product_uom_id': cls.table.uom_id.id,
+            'uom_id': cls.table.uom_id.id,
             'product_qty': 1.0,
             'type': 'normal',
             'bom_line_ids': [
@@ -85,5 +87,4 @@ class TestPlmCommon(common.TransactionCase):
             'bom_id': bom.id,
             'product_tmpl_id': bom.product_tmpl_id.id,
             'type_id': type_id,
-            'stage_id': stage_id,
-            'type': 'bom'})
+            'stage_id': stage_id})

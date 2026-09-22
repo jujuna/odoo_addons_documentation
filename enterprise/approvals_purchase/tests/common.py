@@ -13,7 +13,7 @@ class TestApprovalsCommon(TransactionCase):
         # Define a approval category for purchase.
         approval_category_form = Form(cls.env['approval.category'])
         approval_category_form.name = 'Product Request'
-        approval_category_form.approval_type = 'purchase'
+        approval_category_form.create_rfq = True
         cls.purchase_category = approval_category_form.save()
         # Create an user we can use as approver for example.
         cls.user_approver = cls.env['res.users'].create({
@@ -70,7 +70,7 @@ class TestApprovalsCommon(TransactionCase):
                     'partner_id': cls.partner_seller_1.id,
                     'min_qty': 1,
                     'price': 8,
-                    'product_uom_id': cls.uom_fortnight.id,
+                    'uom_id': cls.uom_fortnight.id,
                 }),
             ],
         })
@@ -122,7 +122,7 @@ class TestApprovalsCommon(TransactionCase):
                     'price_unit': line['price'],
                     'product_id': product.id,
                     'product_qty': line.get('quantity', 1),
-                    'product_uom_id': line.get('uom', product.uom_id.id),
+                    'uom_id': line.get('uom', product.uom_id.id),
                 })
                 vals['order_line'].append(order_line_vals)
 

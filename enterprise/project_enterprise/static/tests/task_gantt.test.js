@@ -1,11 +1,24 @@
 import { mailModels } from "@mail/../tests/mail_test_helpers";
-import { beforeEach, describe, destroy, expect, test } from "@odoo/hoot";
-import { hover, keyDown, queryAll, queryAllTexts, queryOne } from "@odoo/hoot-dom";
-import { animationFrame, mockDate } from "@odoo/hoot-mock";
+import {
+    animationFrame,
+    beforeEach,
+    describe,
+    expect,
+    hover,
+    keyDown,
+    mockDate,
+    queryAll,
+    queryAllTexts,
+    queryOne,
+    runAllTimers,
+    test,
+    waitFor,
+} from "@odoo/hoot";
 import {
     clickModalButton,
     contains,
     defineModels,
+    destroyApp,
     fields,
     mockService,
     models,
@@ -15,7 +28,6 @@ import {
     clickCell,
     dragPill,
     getGridContent,
-    hoverGridCell,
     mountGanttView,
     SELECTORS,
 } from "@web_gantt/../tests/web_gantt_test_helpers";
@@ -44,6 +56,7 @@ beforeEach(() => {
 
 class Task extends projectModels.ProjectTask {
     stuff_id = fields.Many2one({ string: "Stuff", relation: "stuff" });
+    allocated_hours = fields.Float({ string: "Allocated Hours" });
 
     _records = [
         {
@@ -101,30 +114,35 @@ test("Unschedule button is displayed", async () => {
     await mountGanttView({
         arch: `
             <gantt date_start="planned_date_begin" date_stop="date_deadline">
-                <templates>
-                    <t t-name="gantt-popover">
-                        <footer>
+                <popover>
+                    <templates>
+                        <t t-name="popover-footer">
                             <button name="action_unschedule_task" type="object" string="Unschedule"
                                 class="btn btn-sm btn-secondary"/>
-                        </footer>
-                    </t>
-                </templates>
+                        </t>
+                    </templates>
+                </popover>
             </gantt>
         `,
         resModel: "project.task",
     });
     await contains(".o_gantt_pill").click();
+    await runAllTimers();
+    await waitFor(".o_popover");
     expect(".btn.btn-sm.btn-secondary").toHaveCount(1);
     expect(".btn.btn-sm.btn-secondary").toHaveText("Unschedule");
     await contains(".btn.btn-sm.btn-secondary").click();
     expect.verifySteps(["unschedule task"]);
 });
 
-test("not user_ids grouped: no empty group if no records", async () => {
+test("not user_ids grouped: undefined group is always displayed, even with no records", async () => {
     // delete the record having no stuff_id
     Task._records.splice(0, 1);
     await mountGanttView({ ...ganttViewParams, groupBy: ["stuff_id"] });
-    expect(queryAllTexts(".o_gantt_row_headers .o_gantt_row_title")).toEqual(["Bruce Willis"]);
+    expect(queryAllTexts(".o_gantt_row_headers .o_gantt_row_title")).toEqual([
+        "Undefined Stuff",
+        "Bruce Willis",
+    ]);
 });
 
 test("user_ids grouped: specific empty group added, even if no records", async () => {
@@ -167,7 +185,6 @@ test("[..., user_ids(, ...)] grouped", async () => {
         "👤 Unassigned",
         "Jane Doe",
         "Bruce Willis",
-        "👤 Unassigned",
         "John Doe",
     ]);
 });
@@ -199,10 +216,52 @@ test("progress bar has the correct unit", async () => {
     expect(SELECTORS.progressBar).toHaveCount(1);
     expect(SELECTORS.progressBarBackground).toHaveCount(1);
     expect(queryOne(SELECTORS.progressBarBackground).style.width).toBe("100%");
-    expect(SELECTORS.progressBarForeground).toHaveCount(0);
-    await hoverGridCell("10", "June 2021", "Jane Doe");
-    expect(SELECTORS.progressBarForeground).toHaveCount(1);
-    expect(SELECTORS.progressBarForeground).toHaveText("100h / 100h");
+    expect(SELECTORS.progressBarForeground).toHaveText("0h");
+    expect(SELECTORS.progressBarForeground).toHaveAttribute("data-tooltip", "100h/100h (100%)");
+});
+
+test("task leaf rows should not show a progress bar", async () => {
+    Task._records = [
+        {
+            id: 1,
+            name: "Task A",
+            planned_date_begin: "2021-06-14 08:00:00",
+            date_deadline: "2021-06-16 08:00:00",
+            user_ids: [100],
+            project_id: 1,
+            allocated_hours: 10,
+        },
+        {
+            id: 2,
+            name: "Task B",
+            planned_date_begin: "2021-06-14 08:00:00",
+            date_deadline: "2021-06-18 08:00:00",
+            user_ids: [100],
+            project_id: 1,
+            allocated_hours: 20,
+        },
+    ];
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
+        result.progress_bars.user_ids = {
+            100: { value: 60, max_value: 160 },
+        };
+        result.progress_bars.__default = {
+            false: { value: 60, max_value: 160 },
+        };
+        return result;
+    });
+    await mountGanttView({
+        arch: `<gantt js_class="task_gantt" date_start="planned_date_begin" date_stop="date_deadline"
+            progress_bar="user_ids" total_row="1" display_mode="sparse" default_range="month" scales="month"/>`,
+        resModel: "project.task",
+        type: "gantt",
+        groupBy: ["user_ids"],
+    });
+    // Only the assignee row shows a progress bar; task leaves stay empty
+    expect(SELECTORS.progressBar).toHaveCount(1);
+    // But task leaves still keep their allocated-time label.
+    expect(queryAllTexts(SELECTORS.progressBarForeground)).toEqual(["100h", "10h", "20h"]);
 });
 
 test("open a dialog to schedule task", async () => {
@@ -229,7 +288,7 @@ test("open a dialog to schedule task", async () => {
     expect.verifySteps(["schedule_tasks"]);
 });
 
-test("Lines are displayed in alphabetic order, except for the first one", async () => {
+test("Lines are displayed in group order, with the unassigned one always first", async () => {
     for (const user of [
         { id: 102, name: "Omega" },
         { id: 103, name: "Theta" },
@@ -249,10 +308,10 @@ test("Lines are displayed in alphabetic order, except for the first one", async 
     }
     await mountGanttView(ganttViewParams);
     expect(queryAllTexts(".o_gantt_row_headers .o_gantt_row_title")).toEqual(
-        ["👤 Unassigned", "Jane Doe", "John Doe", "Kappa", "Omega", "Rho", "Theta", "Zeta"],
+        ["👤 Unassigned", "Jane Doe", "John Doe", "Omega", "Theta", "Rho", "Zeta", "Kappa"],
         {
             message:
-                "The lines should be sorted by alphabetical order ('👤 Unassigned' is always first)",
+                "The lines are no longer sorted alphabetically; they follow group order, with '👤 Unassigned' always first",
         }
     );
 });
@@ -505,7 +564,7 @@ test("Display 2 milestones in different project at the same date", async () => {
     expect(".o_popover").toHaveCount(1);
     expect(".o_popover u").toHaveCount(2);
     expect(queryAllTexts(".o_popover u")).toEqual(["My Project", "Other Project"]);
-    expect(".o_popover .popover-body i.fa-square-o").toHaveCount(2);
+    expect(".o_popover .popover-body i[data-icon='square']").toHaveCount(2);
     expect(".o_popover .popover-body strong").toHaveCount(2);
     expect(queryAllTexts(".o_popover .popover-body strong")).toEqual([
         "Milestone 3",
@@ -575,7 +634,9 @@ test("Copy pill in another row", async () => {
         },
         {
             title: "John Doe",
-            pills: [{ title: "Yop", level: 0, colSpan: "02 June 2021 -> 12 (1/2) June 2021" }],
+            pills: [
+                { title: "Yop", level: 0, colSpan: "Out of bounds (3)  -> 12 (1/2) June 2021" },
+            ],
         },
     ]);
 
@@ -631,7 +692,9 @@ test("Smart scheduling", async () => {
         },
         {
             title: "John Doe",
-            pills: [{ title: "Yop", level: 0, colSpan: "02 June 2021 -> 12 (1/2) June 2021" }],
+            pills: [
+                { title: "Yop", level: 0, colSpan: "Out of bounds (3)  -> 12 (1/2) June 2021" },
+            ],
         },
     ]);
 
@@ -652,7 +715,9 @@ test("Smart scheduling", async () => {
         },
         {
             title: "John Doe",
-            pills: [{ title: "Yop", level: 0, colSpan: "02 June 2021 -> 12 (1/2) June 2021" }],
+            pills: [
+                { title: "Yop", level: 0, colSpan: "Out of bounds (3)  -> 12 (1/2) June 2021" },
+            ],
         },
     ]);
     expect.verifySteps(["schedule_tasks"]);
@@ -684,7 +749,7 @@ test("Smart scheduling: display warnings", async () => {
             expect.step("notification added");
             expect(options["type"]).toBe("success");
             expect(options["buttons"].length).toBe(1);
-            expect(options["buttons"][0].icon).toBe("fa-undo");
+            expect(options["buttons"][0].icon).toBe("undo");
             expect(options["buttons"][0].name).toBe("Undo");
             notifications.push({ message, options });
             return () => {
@@ -695,7 +760,7 @@ test("Smart scheduling: display warnings", async () => {
         },
     });
 
-    const ganttView = await mountGanttView(ganttViewParams);
+    await mountGanttView(ganttViewParams);
 
     await clickCell("10", "June 2021", "Jane Doe");
     expect(".o_dialog").toHaveCount(1);
@@ -703,7 +768,7 @@ test("Smart scheduling: display warnings", async () => {
     await contains(".o_dialog .o_auto_plan_button:enabled").click();
     expect.verifySteps(["schedule_tasks", "notification added"]);
     expect(notifications).toHaveLength(1);
-    destroy(ganttView);
+    destroyApp();
     expect(notifications).toHaveLength(0);
 });
 
@@ -739,7 +804,9 @@ test("Schedule a task and verify its display in the gantt view", async () => {
         },
         {
             title: "John Doe",
-            pills: [{ title: "Yop", level: 0, colSpan: "02 June 2021 -> 12 (1/2) June 2021" }],
+            pills: [
+                { title: "Yop", level: 0, colSpan: "Out of bounds (3)  -> 12 (1/2) June 2021" },
+            ],
         },
     ]);
 
@@ -760,7 +827,9 @@ test("Schedule a task and verify its display in the gantt view", async () => {
         },
         {
             title: "John Doe",
-            pills: [{ title: "Yop", level: 0, colSpan: "02 June 2021 -> 12 (1/2) June 2021" }],
+            pills: [
+                { title: "Yop", level: 0, colSpan: "Out of bounds (3)  -> 12 (1/2) June 2021" },
+            ],
         },
     ]);
     expect.verifySteps(["web_gantt_write"]);

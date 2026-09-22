@@ -6,22 +6,37 @@ from freezegun import freeze_time
 from markupsafe import Markup
 
 from odoo import Command, fields
-from odoo.tests import Form, TransactionCase
+from odoo.tests import tagged, Form, TransactionCase
 
 from odoo.addons.mail.tests.common import mail_new_test_user
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestTaskFlow(TransactionCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env.company.resource_calendar_id.tz = "Europe/Brussels"
+        cls.env.company.tz = "Europe/Brussels"
+        cls.env.company.resource_calendar_id = cls.env['resource.calendar'].create({
+            'attendance_ids': [
+                (0, 0,
+                    {
+                        'dayofweek': weekday,
+                        'hour_from': hour,
+                        'hour_to': hour + 4,
+                    })
+                for weekday in ['0', '1', '2', '3', '4']
+                for hour in [8, 13]
+            ],
+            'name': 'Standard 40h/week',
+        })
         cls.project_user = mail_new_test_user(
             cls.env, login='Armande',
             name='Armande Project_user', email='armande.project_user@example.com',
             notification_type='inbox',
             groups='project.group_project_user',
+            tz='Europe/Brussels'
         )
 
         cls.project_test_user = mail_new_test_user(
@@ -29,6 +44,7 @@ class TestTaskFlow(TransactionCase):
             name='Armando Project_user', email='armando.project_user@example.com',
             notification_type='inbox',
             groups='project.group_project_user',
+            tz='Europe/Brussels'
         )
 
         cls.project_test = cls.env['project.project'].create({
@@ -40,6 +56,7 @@ class TestTaskFlow(TransactionCase):
             name='Portal_user', email='portal_project_user@example.com',
             notification_type='email',
             groups='base.group_portal',
+            tz='Europe/Brussels'
         )
 
     def create_tasks(self, nb=40):
@@ -48,6 +65,7 @@ class TestTaskFlow(TransactionCase):
         hour_end = [10, 15]
         users = [self.project_test_user, self.project_user, self.project_user | self.project_test_user]
 
+        # batch creation for tests, speedup using 'tracking_disable' key
         self.env['project.task'].with_context(tracking_disable=True).create([{
             'name': 'Fsm task ' + str(i),
             'user_ids': users[i % 3],
@@ -281,7 +299,7 @@ class TestTaskFlow(TransactionCase):
         end = start + relativedelta(days=nb / 2 + 1)
         users = self.project_user | self.project_test_user
 
-        with self.assertQueryCount(__system__=9):
+        with self.assertQueryCount(__system__=12):
             # Query count should be stable even if the number of tasks or users increase (progress bar query count is O(1))
             progress_bar = self.env['project.task']._gantt_progress_bar(
                 'user_ids', users.ids, start, end
@@ -298,14 +316,11 @@ class TestTaskFlow(TransactionCase):
         def get_hours(task):
             return task.planned_date_begin.hour, task.date_deadline.hour
 
-        self.env.company.resource_calendar_id.tz = 'UTC'
+        self.env.company.tz = 'UTC'
         self.project_user.resource_calendar_id = self.env.company.resource_calendar_id
         self.project_test_user.resource_calendar_id = self.env['resource.calendar'].create({
-            'tz': 'UTC',
             'attendance_ids': [Command.create({
-                'name': day,
                 'dayofweek': day,
-                'day_period': 'afternoon',
                 'hour_from': 12,
                 'hour_to': 19,
             }) for day in '12345'],
@@ -448,30 +463,23 @@ class TestTaskFlow(TransactionCase):
         self.project_test_user.resource_calendar_id = self.env['resource.calendar'].create({
             'name': "Test Calendar : 36 Hours/Week",
             'company_id': self.env.company.id,
-            'tz': 'Europe/Brussels',
             'hours_per_week': 36.0,
             'full_time_required_hours': 36.0,
             'attendance_ids': [
                 Command.create({
-                    'name': "Attendance",
                     'dayofweek': dayofweek,
                     'hour_from': hour_from,
                     'hour_to': hour_to,
-                    'day_period': day_period,
-                }) for dayofweek, hour_from, hour_to, day_period in [
-                    ("0", 8.0, 12.0, "morning"),
-                    ("0", 12.0, 13.0, "lunch"),
-                    ("0", 13.0, 17, "afternoon"),
-                    ("1", 8.0, 12.0, "morning"),
-                    ("1", 12.0, 13.0, "lunch"),
-                    ("1", 13.0, 17, "afternoon"),
-                    ("2", 8.0, 12.0, "morning"),
-                    ("2", 12.0, 13.0, "lunch"),
-                    ("2", 13.0, 17, "afternoon"),
-                    ("3", 14.0, 18, "afternoon"),
-                    ("4", 8.0, 12.0, "morning"),
-                    ("4", 12.0, 13.0, "lunch"),
-                    ("4", 13.0, 17, "afternoon"),
+                }) for dayofweek, hour_from, hour_to in [
+                    ("0", 8.0, 12.0),
+                    ("0", 13.0, 17),
+                    ("1", 8.0, 12.0),
+                    ("1", 13.0, 17),
+                    ("2", 8.0, 12.0),
+                    ("2", 13.0, 17),
+                    ("3", 14.0, 18),
+                    ("4", 8.0, 12.0),
+                    ("4", 13.0, 17),
                 ]
             ],
         })
@@ -610,4 +618,36 @@ class TestTaskFlow(TransactionCase):
             fields.Datetime.to_string(task6.date_deadline),
             '2021-09-24 14:00:00',
             'Should take into account the allocated hours set on the task and the working calendar of users assigned'
+        )
+
+    @freeze_time('2026-01-01')
+    def test_task_overlap_warning_before_and_after_save(self):
+        self.env['project.task'].create({
+            'name': 'Task 1',
+            'user_ids': self.project_user,
+            'project_id': self.project_test.id,
+            'planned_date_begin': datetime(2026, 1, 4),
+            'date_deadline': datetime(2026, 1, 10),
+            'allocated_hours': 4,
+        })
+        with Form(self.env["project.task"].with_context(
+            {'default_planned_date_begin': datetime(2026, 1, 4),
+             'default_date_deadline': datetime(2026, 1, 12)}
+        ), 'project_enterprise.project_task_view_form') as new_task:
+            new_task.name = "New Task"
+            new_task.user_ids = self.project_user
+            self.assertFalse(
+                new_task.planning_overlap,
+                "Overlap warning should not be displayed for private tasks"
+            )
+            new_task.project_id = self.project_test
+
+            self.assertIn(
+                f'{self.project_user.name} has 1 tasks at the same time.', new_task.planning_overlap,
+                "Overlap warning failed for unsaved Form task!"
+            )
+        saved_task = new_task.save()
+        self.assertIn(
+            f'{self.project_user.name} has 1 tasks at the same time.', saved_task.planning_overlap,
+            "Overlap warning failed for saved task!"
         )

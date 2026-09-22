@@ -5,11 +5,12 @@ from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
 
 from datetime import date, datetime, timedelta
-from odoo.tests import common, Form
+from odoo.tests import tagged, common, Form
 from odoo import Command
 from odoo.tools.date_utils import start_of, subtract
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMpsMps(common.TransactionCase):
 
     @classmethod
@@ -37,6 +38,7 @@ class TestMpsMps(common.TransactionCase):
 
         cls.mps_dates_month = cls.env.company._get_date_range()
         cls.manufacture_route = cls.env.ref('mrp.route_warehouse0_manufacture')
+        cls.manufacture_route.product_selectable = True
 
         cls.table = cls.env['product.product'].create({
             'name': 'Table',
@@ -320,6 +322,42 @@ class TestMpsMps(common.TransactionCase):
         self.assertFalse(screw_forecast_1['to_replenish'])
         self.assertFalse(screw_forecast_1['forced_replenish'])
 
+    def test_batch_resplenish(self):
+        """ Ensure it will consider the batch size when resplenishing,
+        with or without a specified bom
+        """
+        self.bom_table_leg.write({
+            'enable_batch_size': True,
+            'batch_size': 20.0,
+
+        })
+        self.env['mrp.product.forecast'].create({
+            'production_schedule_id': self.mps_table_leg.id,
+            'date': date.today(),
+            'forecast_qty': 1
+        })
+        table_leg_mps_state = self.mps_table_leg.get_production_schedule_view_state()[0]
+        forecast_at_first_period = table_leg_mps_state['forecast_ids'][0]
+        self.assertEqual(forecast_at_first_period['forecast_qty'], 1)
+        self.assertEqual(forecast_at_first_period['replenish_qty'], 20)
+        self.assertEqual(forecast_at_first_period['safety_stock_qty'], 19)
+
+        self.mps_table_leg.unlink()
+        mps_table_leg_without_bom = self.env['mrp.production.schedule'].create({
+            'product_id': self.table_leg.id,
+            'warehouse_id': self.warehouse.id,
+        })
+        self.env['mrp.product.forecast'].create({
+            'production_schedule_id': mps_table_leg_without_bom.id,
+            'date': date.today(),
+            'forecast_qty': 1
+        })
+        table_leg_mps_state_without_bom = mps_table_leg_without_bom.get_production_schedule_view_state()[0]
+        forecast_at_first_period = table_leg_mps_state_without_bom['forecast_ids'][0]
+        self.assertEqual(forecast_at_first_period['forecast_qty'], 1)
+        self.assertEqual(forecast_at_first_period['replenish_qty'], 20)
+        self.assertEqual(forecast_at_first_period['safety_stock_qty'], 19)
+
     def test_lead_times(self):
         """ Manufacture, supplier and rules uses delay. The forecasts to
         replenish are impacted by those delay. Ensure that the MPS state and
@@ -503,6 +541,129 @@ class TestMpsMps(common.TransactionCase):
         mps_table, mps_drawer = (self.mps_table | self.mps_drawer).get_production_schedule_view_state(period_scale='year')
         self.assertListEqual([f['forecast_qty'] for f in mps_table['forecast_ids']], [20, 20, 0])
         self.assertListEqual([f['indirect_demand_qty'] for f in mps_drawer['forecast_ids']], [30, 10, 0])
+
+    def test_lead_times_with_multi_lvl_bom(self):
+        """ Using the configuration from setup BOM 1 with:
+           - the table has lead time
+           - the table leg has lead time and a safety stock target
+        ensure that the indirect demand of the component is correctly distributed across multiple
+        period when creating a table for week 3.
+        Material needed for producing the table in week 3:
+          - Table leg:
+            - week 2: 4
+          - Screws:
+            - week 2: 20
+        For the Safety stock of the table leg:
+          - Screws:
+            - week 0: 40
+        """
+        self.env.company.manufacturing_period = 'week'
+        self.table.write({
+            'route_ids': [Command.set([self.ref('mrp.route_warehouse0_manufacture')])]
+        })
+        self.bom_table.produce_delay = 1
+        self.bom_table_leg.produce_delay = 1
+        self.mps_table_leg.write({'forecast_target_qty': 10})
+        self.mps_table.set_forecast_qty(3, 1)
+        mps_table = self.mps_table.get_production_schedule_view_state()[0]
+        mps_table_leg = self.mps_table_leg.get_production_schedule_view_state()[0]
+        mps_screw = self.mps_screw.get_production_schedule_view_state()[0]
+
+        self.assertListEqual([f['indirect_demand_qty'] for f in mps_table['forecast_ids'][:4]], [0, 0, 0, 0])
+        self.assertListEqual([f['indirect_demand_qty'] for f in mps_table_leg['forecast_ids'][:4]], [0, 0, 4, 0])
+        self.assertListEqual([f['indirect_demand_qty'] for f in mps_screw['forecast_ids'][:4]], [40, 0, 20, 0])
+
+        self.assertListEqual([f['starting_inventory_qty'] for f in mps_table['forecast_ids'][:4]], [0, 0, 0, 0])
+        self.assertListEqual([f['starting_inventory_qty'] for f in mps_table_leg['forecast_ids'][:4]], [0, 10, 10, 10])
+        self.assertListEqual([f['starting_inventory_qty'] for f in mps_screw['forecast_ids'][:4]], [0, 0, 0, 0])
+
+        self.assertListEqual([f['replenish_qty'] for f in mps_table['forecast_ids'][:4]], [0, 0, 0, 1])
+        self.assertListEqual([f['replenish_qty'] for f in mps_table_leg['forecast_ids'][:4]], [10, 0, 4, 0])
+        self.assertListEqual([f['replenish_qty'] for f in mps_screw['forecast_ids'][:4]], [40, 0, 20, 0])
+
+    def test_long_lead_times_with_multi_lvl_bom(self):
+        """ Using the configuration from setup BOM 1 with:
+           - the table has a long lead time.
+           - the drawers has a long lead time.
+           - the table leg has a lead time and a safety stock target.
+        ensure that the indirect demand of the component is correctly distributed across multiple
+        period when creating a table for week 6 and a drawer in week 5.
+        Material needed for producing the table in week 6:
+          - Drawers:
+            - week 2: 1
+          - Table leg:
+            - week 2: 2
+            - week 1: 2
+          - Screws:
+            - week 2: 8
+            - week 1: 12
+        For producing the drawer in week 5:
+          - Table leg:
+            - week 3: 2
+          - Screws:
+            - week 3: 12
+        For the Safety stock of the table leg:
+          - Screws:
+            - week 0: 40
+        """
+        self.env.company.manufacturing_period = 'week'
+        self.table.write({
+            'route_ids': [Command.set([self.ref('mrp.route_warehouse0_manufacture')])]
+        })
+        self.bom_table.produce_delay = 22
+        self.bom_drawer.produce_delay = 8
+        self.bom_table_leg.produce_delay = 1
+        self.mps_table_leg.write({'forecast_target_qty': 10})
+        self.mps_table.set_forecast_qty(6, 1)
+        self.mps_drawer.set_forecast_qty(5, 1)
+        mps_table = self.mps_table.get_production_schedule_view_state()[0]
+        mps_drawer = self.mps_drawer.get_production_schedule_view_state()[0]
+        mps_table_leg = self.mps_table_leg.get_production_schedule_view_state()[0]
+        mps_screw = self.mps_screw.get_production_schedule_view_state()[0]
+
+        self.assertListEqual([f['indirect_demand_qty'] for f in mps_table['forecast_ids'][:8]], [0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertListEqual([f['indirect_demand_qty'] for f in mps_drawer['forecast_ids'][:8]], [0, 0, 1, 0, 0, 0, 0, 0])
+        self.assertListEqual([f['indirect_demand_qty'] for f in mps_table_leg['forecast_ids'][:8]], [0, 2, 2, 2, 0, 0, 0, 0])
+        self.assertListEqual([f['indirect_demand_qty'] for f in mps_screw['forecast_ids'][:8]], [40, 12, 8, 12, 0, 0, 0, 0])
+
+        self.assertListEqual([f['starting_inventory_qty'] for f in mps_table['forecast_ids'][:8]], [0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertListEqual([f['starting_inventory_qty'] for f in mps_drawer['forecast_ids'][:8]], [0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertListEqual([f['starting_inventory_qty'] for f in mps_table_leg['forecast_ids'][:8]], [0, 10, 10, 10, 10, 10, 10, 10])
+        self.assertListEqual([f['starting_inventory_qty'] for f in mps_screw['forecast_ids'][:8]], [0, 0, 0, 0, 0, 0, 0, 0])
+
+        self.assertListEqual([f['replenish_qty'] for f in mps_table['forecast_ids'][:8]], [0, 0, 0, 0, 0, 0, 1, 0])
+        self.assertListEqual([f['replenish_qty'] for f in mps_drawer['forecast_ids'][:8]], [0, 0, 1, 0, 0, 1, 0, 0])
+        self.assertListEqual([f['replenish_qty'] for f in mps_table_leg['forecast_ids'][:8]], [10, 2, 2, 2, 0, 0, 0, 0])
+        self.assertListEqual([f['replenish_qty'] for f in mps_screw['forecast_ids'][:8]], [40, 12, 8, 12, 0, 0, 0, 0])
+
+    def test_replenish_indirect_demand_at_month_boundary(self):
+        """ Using the configuration from setup BOM 1 with:
+           - the table has a 1-day produce delay
+           - the drawer has a 0-day produce delay
+           Ensure that the indirect outgoing quantity (actual indirect demand) is correctly
+           distributed to the correct periode
+        """
+        self.env.company.manufacturing_period = 'month'
+        self.bom_table.produce_delay = 1
+        self.bom_drawer.produce_delay = 0
+        self.mps_table.set_forecast_qty(3, 1)
+
+        mps_drawer = self.mps_drawer.get_production_schedule_view_state()[0]
+        mps_table_leg = self.mps_table_leg.get_production_schedule_view_state()[0]
+        self.assertListEqual([f['indirect_demand_qty'] for f in mps_drawer['forecast_ids'][:4]], [0, 0, 1, 0])
+        self.assertListEqual([f['indirect_demand_qty'] for f in mps_table_leg['forecast_ids'][:4]], [0, 0, 4, 0])
+
+        self.mps_table.action_replenish()
+        mps_drawer = self.mps_drawer.get_production_schedule_view_state()[0]
+        mps_table_leg = self.mps_table_leg.get_production_schedule_view_state()[0]
+        self.assertListEqual([f['indirect_outgoing_qty'] for f in mps_drawer['forecast_ids'][:4]], [0, 0, 1, 0])
+        self.assertListEqual([f['indirect_outgoing_qty'] for f in mps_table_leg['forecast_ids'][:4]], [0, 0, 2, 0])
+
+        self.mps_drawer.action_replenish()
+        mps_drawer = self.mps_drawer.get_production_schedule_view_state()[0]
+        mps_table_leg = self.mps_table_leg.get_production_schedule_view_state()[0]
+        self.assertListEqual([f['indirect_outgoing_qty'] for f in mps_drawer['forecast_ids'][:4]], [0, 0, 1, 0])
+        self.assertListEqual([f['indirect_outgoing_qty'] for f in mps_table_leg['forecast_ids'][:4]], [0, 0, 4, 0])
 
     def test_indirect_demand(self):
         """ On a multiple BoM relation, ensure that the replenish quantity on
@@ -808,7 +969,7 @@ class TestMpsMps(common.TransactionCase):
         # Create a BoM with two components ('c1 applied only in m'  and 'c2 applied only in L')
         self.env['mrp.bom'].create({
             'product_tmpl_id': product_template.id,
-            'product_uom_id': product_template.uom_id.id,
+            'uom_id': product_template.uom_id.id,
             'product_qty': 1.0,
             'type': 'normal',
             'bom_line_ids': [
@@ -837,6 +998,7 @@ class TestMpsMps(common.TransactionCase):
         self.assertEqual(len(mps_impacted), 1)
         self.assertEqual(mps_impacted[0], mps_c2.id)
 
+    @freeze_time('2024-01-15')
     def test_replenish_trigger(self):
         """Test that the replenish_trigger of components is 'manual'
         and that 'automated' correctly triggers in the cron.
@@ -866,8 +1028,8 @@ class TestMpsMps(common.TransactionCase):
         self.env['mrp.production.schedule'].action_cron_replenish()
         purchase_order_line = self.env['purchase.order.line'].search([('product_id', '=', self.screw.id)])
         self.assertTrue(purchase_order_line)
-        self.assertEqual(purchase_order_line.date_planned.date(), self.mps_dates_month[0][0])
-        self.assertEqual(purchase_order_line.date_order.date(), self.mps_dates_month[0][0] - timedelta(days=3))
+        self.assertEqual(purchase_order_line.date_planned.date(), date(2024, 1, 15))
+        self.assertEqual(purchase_order_line.date_order.date(), date(2024, 1, 15) - timedelta(days=3))
         self.assertEqual(purchase_order_line.product_qty, 20)
         self.assertEqual(purchase_order_line.price_subtotal, 40)
 
@@ -934,8 +1096,7 @@ class TestMpsMps(common.TransactionCase):
         bom_shelf = self.env['mrp.bom'].create({
             'product_id': shelf.id,
             'product_tmpl_id': shelf.product_tmpl_id.id,
-            'product_uom_id': shelf.uom_id.id,
-            'consumption': 'flexible',
+            'uom_id': shelf.uom_id.id,
             'product_qty': 1.0,
             'type': 'normal',
             'bom_line_ids': [
@@ -946,8 +1107,8 @@ class TestMpsMps(common.TransactionCase):
         bom_plank = self.env['mrp.bom'].create({
             'product_id': plank.id,
             'product_tmpl_id': plank.product_tmpl_id.id,
-            'product_uom_id': plank.uom_id.id,
-            'consumption': 'flexible',
+
+            'uom_id': plank.uom_id.id,
             'product_qty': 1.0,
             'type': 'normal',
             'bom_line_ids': [
@@ -1036,14 +1197,14 @@ class TestMpsMps(common.TransactionCase):
         outgoing_move = self.env['stock.move'].create({
             'product_id': product_a.id,
             'product_uom_qty': 1,
-            'product_uom': self.env.ref('uom.product_uom_dozen').id,
+            'uom_id': self.env.ref('uom.product_uom_dozen').id,
             'location_id': self.warehouse.lot_stock_id.id,
             'location_dest_id': self.env.ref('stock.stock_location_customers').id,
         })
         incoming_move = self.env['stock.move'].create({
             'product_id': product_a.id,
             'product_uom_qty': 1,
-            'product_uom': self.env.ref('uom.product_uom_dozen').id,
+            'uom_id': self.env.ref('uom.product_uom_dozen').id,
             'location_id': self.env.ref('stock.stock_location_customers').id,
             'location_dest_id': self.warehouse.lot_stock_id.id,
         })
@@ -1252,7 +1413,7 @@ class TestMpsMps(common.TransactionCase):
         # Change the POL qty from 20 screws to 2 dozen screws (4 more than necessary), validate the PO
         purchase_order_line = self.env['purchase.order.line'].search([('product_id', '=', self.screw.id)])
         purchase_order_line.write({
-            'product_uom_id': self.env.ref('uom.product_uom_dozen').id,
+            'uom_id': self.env.ref('uom.product_uom_dozen').id,
             'product_qty': 2,
         })
         purchase_order_line.order_id.button_confirm()
@@ -1271,7 +1432,7 @@ class TestMpsMps(common.TransactionCase):
         # Change the POL qty from 3 screws to 1 dozen screws
         purchase_order_line_2 = self.env['purchase.order.line'].search([('product_id', '=', self.screw.id), ('id', '!=', purchase_order_line.id)])
         purchase_order_line_2.write({
-            'product_uom_id': self.env.ref('uom.product_uom_dozen').id,
+            'uom_id': self.env.ref('uom.product_uom_dozen').id,
             'product_qty': 1,
         })
         screw_wizard_2 = Form.from_action(self.env, screw_action)
@@ -1295,7 +1456,7 @@ class TestMpsMps(common.TransactionCase):
         production = self.env['mrp.production'].create({
             'product_id': self.table.id,
             'product_qty': 5,
-            'product_uom_id': self.table.uom_id.id,
+            'uom_id': self.table.uom_id.id,
             'bom_id': self.bom_table.id,
             'location_src_id': self.warehouse.lot_stock_id.id,
             'location_dest_id': self.warehouse.lot_stock_id.id,
@@ -1310,7 +1471,7 @@ class TestMpsMps(common.TransactionCase):
         self.assertEqual(drawer_forecast['indirect_outgoing_qty'], 5)
 
     def test_early_replenishment_calculation(self):
-        """ Test that if an early replenishment occured in a period where the replenishment
+        """ Test that if an early replenishment occurred in a period where the replenishment
         is greater than the demand, the next periods take into account these extra quantities
         when setting replenish_qty.
         """
@@ -1329,7 +1490,7 @@ class TestMpsMps(common.TransactionCase):
         # Change the POL qty from 20 screws to 2 dozen screws (4 more than necessary), validate the PO
         purchase_order_line = self.env['purchase.order.line'].search([('product_id', '=', self.screw.id)])
         purchase_order_line.write({
-            'product_uom_id': self.env.ref('uom.product_uom_dozen').id,
+            'uom_id': self.env.ref('uom.product_uom_dozen').id,
             'product_qty': 2,
         })
         purchase_order_line.order_id.button_confirm()
@@ -1424,14 +1585,22 @@ class TestMpsMps(common.TransactionCase):
             ),
         ])
 
-        # Check that the outgoing quantity is 5 and that the related picking is the transit picking for WH
-        wh_transit_picking = reference.move_ids.filtered(lambda m: m.location_dest_id.usage == 'transit').picking_id
+        # Check that the outgoing quantity is 5 and that the related picking is the ongoing picking
+        mps_table_wh0 = self.mps_table.get_production_schedule_view_state()[0]
+        self.assertEqual(mps_table_wh0['forecast_ids'][0]['outgoing_qty'], 5, 'actual demand qty is incorrect')
+        pick_picking = reference.move_ids.filtered(lambda m: m.location_id == self.warehouse.lot_stock_id).picking_id
+        pick_picking.move_ids.write({
+            'quantity': 5,
+            'picked': True,
+        })
+        pick_picking.button_validate()
+        # Pick has been validated, outgoing quantity should remain to 5
         mps_table_wh0 = self.mps_table.get_production_schedule_view_state()[0]
         self.assertEqual(mps_table_wh0['forecast_ids'][0]['outgoing_qty'], 5, 'actual demand qty is incorrect')
         # Get the domain_moves for outgoing moves for WH
         domain_moves = self.mps_table._get_moves_domain(self.mps_dates_month[0][0], self.mps_dates_month[0][1], 'outgoing')
         mps_picking_wh_out = self.mps_table._get_moves_and_date(domain_moves)[0][0].picking_id
-        self.assertEqual(mps_picking_wh_out, wh_transit_picking, 'It should be the transit picking for WH')
+        self.assertEqual(mps_picking_wh_out.picking_type_id, self.warehouse.pack_type_id, 'It should be the PACK picking')
 
         # Create an MPS record for Table for the second warehouse CC
         mps_record_table_cc = self.env['mrp.production.schedule'].create({
@@ -1511,6 +1680,51 @@ class TestMpsMps(common.TransactionCase):
         self.assertEqual(production.bom_id, bom2, "MO was created with an incorrect BOM")
 
     @freeze_time("2024-02-14")
+    def test_suggestion_for_multiple_mps_with_period(self):
+        today = datetime.now().date()
+        self._create_and_process_delivery_at_date(
+            [(self.table, 7), (self.drawer, 3)], today
+        )
+        self._create_and_process_delivery_at_date(
+            [(self.table, 5), (self.drawer, 2)], today, to_validate=False
+        )
+
+        suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
+            'mrp_mps_ids': [Command.set([self.mps_table.id, self.mps_drawer.id])],
+            'period': 1,
+            'based_on': 'actual_demand',
+        })
+        suggestion_wizard.with_context({'period_scale': 'month'}).apply_forecast_quantity_suggestion()
+
+        mps_table = self.mps_table.get_production_schedule_view_state(period_scale='month')[0]
+        mps_drawer = self.mps_drawer.get_production_schedule_view_state(period_scale='month')[0]
+        self.assertEqual(mps_table['forecast_ids'][0]['forecast_qty'], 12)
+        self.assertEqual(mps_drawer['forecast_ids'][0]['forecast_qty'], 5)
+        for i in range(1, self.env.company.manufacturing_period_to_display_month):
+            self.assertEqual(mps_table['forecast_ids'][i]['forecast_qty'], 0)
+            self.assertEqual(mps_drawer['forecast_ids'][i]['forecast_qty'], 0)
+
+    @freeze_time("2024-02-14")
+    def test_suggestion_for_multiple_mps_with_no_period(self):
+        self.env.company.manufacturing_period_to_display_month = 3
+        today = datetime.now().date()
+        self._create_and_process_delivery_at_date(
+            [(self.table, 9), (self.drawer, 4)], today - relativedelta(days=20)
+        )
+
+        suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
+            'mrp_mps_ids': [Command.set([self.mps_table.id, self.mps_drawer.id])],
+            'based_on': '30_days',
+        })
+        suggestion_wizard.with_context({'period_scale': 'month'}).apply_forecast_quantity_suggestion()
+
+        mps_table = self.mps_table.get_production_schedule_view_state(period_scale='month')[0]
+        mps_drawer = self.mps_drawer.get_production_schedule_view_state(period_scale='month')[0]
+        for i in range(self.env.company.manufacturing_period_to_display_month):
+            self.assertEqual(mps_table['forecast_ids'][i]['forecast_qty'], 9)
+            self.assertEqual(mps_drawer['forecast_ids'][i]['forecast_qty'], 4)
+
+    @freeze_time("2024-02-14")
     def test_suggestion_for_years_with_period(self):
         """
         Make some moves in the past with different dates.
@@ -1549,7 +1763,7 @@ class TestMpsMps(common.TransactionCase):
         # choose to suggest only for first period/year (index=1).
         # when choosing a certain period for suggestion, only last year moves are considered
         table_suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
-            'mrp_mps_id': self.mps_table.id,
+            'mrp_mps_ids': [Command.set([self.mps_table.id])],
             'period': 1
         })
         table_suggestion_wizard.with_context({'period_scale': 'year'}).apply_forecast_quantity_suggestion()
@@ -1617,7 +1831,7 @@ class TestMpsMps(common.TransactionCase):
         # choose to suggest only for first period/month (index=1)
         # when choosing a certain period for suggestion, only last year moves are considered
         table_suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
-            'mrp_mps_id': self.mps_table.id,
+            'mrp_mps_ids': [Command.set([self.mps_table.id])],
             'period': 1
         })
         table_suggestion_wizard.with_context({'period_scale': 'month'}).apply_forecast_quantity_suggestion()
@@ -1684,7 +1898,7 @@ class TestMpsMps(common.TransactionCase):
         # choose the first period/week for suggestion (index=1)
         # when choosing a certain period for suggestion, only last year moves are considered
         table_suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
-            'mrp_mps_id': self.mps_table.id,
+            'mrp_mps_ids': [Command.set([self.mps_table.id])],
             'period': 1
         })
         table_suggestion_wizard.with_context({'period_scale': 'week'}).apply_forecast_quantity_suggestion()
@@ -1750,7 +1964,7 @@ class TestMpsMps(common.TransactionCase):
         # choose the first period/day for suggestion (index=1)
         # when choosing a certain period for suggestion, only last year moves are considered
         table_suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
-            'mrp_mps_id': self.mps_table.id,
+            'mrp_mps_ids': [Command.set([self.mps_table.id])],
             'period': 1
         })
         table_suggestion_wizard.with_context({'period_scale': 'day'}).apply_forecast_quantity_suggestion()
@@ -1787,7 +2001,6 @@ class TestMpsMps(common.TransactionCase):
         """
 
         today = datetime.now().date()
-        self.table.uom_id.rounding = 1.0
 
         date = today - relativedelta(years=1)
         self._create_and_process_delivery_at_date(
@@ -1827,7 +2040,7 @@ class TestMpsMps(common.TransactionCase):
         # we choose suggestion to be based on 'last year', so every period's suggestion
         # is taken from same period but previous year. (i.e. 2026 based on 2025 and so on)
         table_suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
-            'mrp_mps_id': self.mps_table.id,
+            'mrp_mps_ids': [Command.set([self.mps_table.id])],
         })
         table_suggestion_wizard.based_on = 'last_year'
         table_suggestion_wizard.with_context({'period_scale': 'year'}).apply_forecast_quantity_suggestion()
@@ -1863,21 +2076,21 @@ class TestMpsMps(common.TransactionCase):
         mps_table = self.mps_table.get_production_schedule_view_state(period_scale='year')[0]
         for i in range(self.env.company.manufacturing_period_to_display_year):
             table_forecast = mps_table['forecast_ids'][i]
-            self.assertEqual(table_forecast['forecast_qty'], 1200)
+            self.assertEqual(table_forecast['forecast_qty'], 1440)
 
         table_suggestion_wizard.based_on = 'three_months'
         table_suggestion_wizard.with_context({'period_scale': 'year'}).apply_forecast_quantity_suggestion()
         mps_table = self.mps_table.get_production_schedule_view_state(period_scale='year')[0]
         for i in range(self.env.company.manufacturing_period_to_display_year):
             table_forecast = mps_table['forecast_ids'][i]
-            self.assertEqual(table_forecast['forecast_qty'], 760)
+            self.assertEqual(table_forecast['forecast_qty'], 840)
 
         table_suggestion_wizard.based_on = 'one_year'
         table_suggestion_wizard.with_context({'period_scale': 'year'}).apply_forecast_quantity_suggestion()
         mps_table = self.mps_table.get_production_schedule_view_state(period_scale='year')[0]
         for i in range(self.env.company.manufacturing_period_to_display_year):
             table_forecast = mps_table['forecast_ids'][i]
-            self.assertEqual(table_forecast['forecast_qty'], 205)
+            self.assertEqual(table_forecast['forecast_qty'], 225)
 
     @freeze_time("2024-02-14")
     def test_suggestion_for_months_with_no_period(self):
@@ -1889,7 +2102,7 @@ class TestMpsMps(common.TransactionCase):
         """
 
         today = datetime.now().date()
-        self.table.uom_id.rounding = 1.0
+        self.env['decimal.precision'].search([('name', '=', 'Product Unit')]).digits = 0
 
         date = today - relativedelta(years=1)
         self._create_and_process_delivery_at_date(
@@ -1929,7 +2142,7 @@ class TestMpsMps(common.TransactionCase):
         # we choose suggestion to be based on 'last year', so every period's suggestion
         # is taken from same period but previous year. (May 2026 based on May 2025 and so on)
         table_suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
-            'mrp_mps_id': self.mps_table.id,
+            'mrp_mps_ids': [Command.set([self.mps_table.id])],
         })
         table_suggestion_wizard.based_on = 'last_year'
         table_suggestion_wizard.with_context({'period_scale': 'month'}).apply_forecast_quantity_suggestion()
@@ -1971,21 +2184,21 @@ class TestMpsMps(common.TransactionCase):
         mps_table = self.mps_table.get_production_schedule_view_state(period_scale='month')[0]
         for i in range(self.env.company.manufacturing_period_to_display_month):
             table_forecast = mps_table['forecast_ids'][i]
-            self.assertEqual(table_forecast['forecast_qty'], 100)
+            self.assertEqual(table_forecast['forecast_qty'], 120)
 
         table_suggestion_wizard.based_on = 'three_months'
         table_suggestion_wizard.with_context({'period_scale': 'month'}).apply_forecast_quantity_suggestion()
         mps_table = self.mps_table.get_production_schedule_view_state(period_scale='month')[0]
         for i in range(self.env.company.manufacturing_period_to_display_month):
             table_forecast = mps_table['forecast_ids'][i]
-            self.assertEqual(table_forecast['forecast_qty'], 64)
+            self.assertEqual(table_forecast['forecast_qty'], 70)
 
         table_suggestion_wizard.based_on = 'one_year'
         table_suggestion_wizard.with_context({'period_scale': 'month'}).apply_forecast_quantity_suggestion()
         mps_table = self.mps_table.get_production_schedule_view_state(period_scale='month')[0]
         for i in range(self.env.company.manufacturing_period_to_display_month):
             table_forecast = mps_table['forecast_ids'][i]
-            self.assertEqual(table_forecast['forecast_qty'], 18)
+            self.assertEqual(table_forecast['forecast_qty'], 19)
 
     @freeze_time("2024-02-14")
     def test_suggestion_for_weeks_with_no_period(self):
@@ -1998,7 +2211,7 @@ class TestMpsMps(common.TransactionCase):
 
         today = datetime.now().date()
         based_on_year = today.year - 1
-        self.table.uom_id.rounding = 1.0
+        self.env['decimal.precision'].search([('name', '=', 'Product Unit')]).digits = 0
 
         date = start_of(subtract(today, years=today.year - based_on_year), 'week')
         self._create_and_process_delivery_at_date(
@@ -2033,7 +2246,7 @@ class TestMpsMps(common.TransactionCase):
         # we choose suggestion to be based on 'last year', so every period's suggestion
         # is taken from same period but previous year. (week 4, 2026 based on week 4, 2025 and so on)
         table_suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
-            'mrp_mps_id': self.mps_table.id,
+            'mrp_mps_ids': [Command.set([self.mps_table.id])],
         })
         table_suggestion_wizard.based_on = 'last_year'
         table_suggestion_wizard.with_context({'period_scale': 'week'}).apply_forecast_quantity_suggestion()
@@ -2098,7 +2311,7 @@ class TestMpsMps(common.TransactionCase):
         and both should reflect on Actual Demand suggestion.
         """
         today = datetime.now().date()
-        self.table.uom_id.rounding = 1.0
+        self.env['decimal.precision'].search([('name', '=', 'Product Unit')]).digits = 0
 
         date = today - relativedelta(years=1)
         self._create_and_process_delivery_at_date(
@@ -2133,7 +2346,7 @@ class TestMpsMps(common.TransactionCase):
         # we choose suggestion to be based on 'last year', so every period's suggestion
         # is taken from same period but previous year. (May 4, 2026 based on May 4, 2025 and so on)
         table_suggestion_wizard = self.env['mrp.mps.forecast.suggestion'].create({
-            'mrp_mps_id': self.mps_table.id,
+            'mrp_mps_ids': [Command.set([self.mps_table.id])],
         })
         table_suggestion_wizard.based_on = 'last_year'
         table_suggestion_wizard.with_context({'period_scale': 'day'}).apply_forecast_quantity_suggestion()
@@ -2188,3 +2401,83 @@ class TestMpsMps(common.TransactionCase):
         for i in range(self.env.company.manufacturing_period_to_display_day):
             table_forecast = mps_table['forecast_ids'][i]
             self.assertEqual(table_forecast['forecast_qty'], 1)
+
+    def test_indirect_multiple_boms(self):
+        """ This test ensure that having multiples BoMs for a product does not negatively impact the MPS.
+        MPS should select in priority the BoM configured on the schedule, not the BoM returned by `_bom_find`
+        """
+
+        # Create final product & component
+        fns, cmp = self.env['product.product'].create([{
+            'name': n,
+            'is_storable': True,
+        } for n in ('fns', 'cmp')])
+
+        # Create the BoMs
+        # This V1 BoM is not used in mps, but will be the one returned by `_bom_find`
+        self.env['mrp.bom'].create({
+            'code': 'V1',
+            'product_tmpl_id': fns.product_tmpl_id.id,
+            'product_qty': 1,
+            'bom_line_ids': [],
+        })
+        fns_bom_2 = self.env['mrp.bom'].create({
+            'code': 'V2',
+            'product_tmpl_id': fns.product_tmpl_id.id,
+            'product_qty': 1,
+            'bom_line_ids': [
+                Command.create({'product_id': cmp.id, 'product_qty': 1}),
+            ],
+        })
+
+        # Create the MPS records, set the safety stock and the minimum replenish qty
+        mps_fns = self.env['mrp.production.schedule'].create({
+            'product_id': fns.id,
+            'warehouse_id': self.warehouse.id,
+            'bom_id': fns_bom_2.id,
+        })
+        mps_cmp = self.env['mrp.production.schedule'].search([('product_id', '=', cmp.id)])
+        self.assertTrue(bool(mps_cmp))
+
+        mps_fns.set_forecast_qty(0, 10)
+
+        # Ensure that the indirect demand for the component was computed (using fns_bom_2)
+        forecast_fns, forecast_cmp = (mps_fns | mps_cmp).get_production_schedule_view_state()
+        self.assertEqual(forecast_fns['forecast_ids'][0]['forecast_qty'], 10)
+        self.assertEqual(forecast_cmp['forecast_ids'][0]['indirect_demand_qty'], 10)
+
+    def test_mps_replenish_rfq_merging(self):
+        """
+        Test that POs created through subsequent MPS replenishments (for the
+        same day) get correctly merged.
+        """
+        self.env.user.tz = 'Europe/Brussels'
+        buy_route = self.warehouse.route_ids.filtered(lambda r: any(rule.action == 'buy' for rule in r.rule_ids))
+        product = self.env['product.product'].create({'name': 'A super product'})
+        vendor = self.env['res.partner'].create({'name': 'A super vendor'})
+        self.env['product.supplierinfo'].create({
+            'product_id': product.id,
+            'partner_id': vendor.id,
+        })
+        mps = self.env['mrp.production.schedule'].with_context({'period_scale': 'month'}).create({
+            'product_id': product.id,
+            'warehouse_id': self.warehouse.id,
+            'route_id': buy_route.id,
+        })
+
+        mps.set_forecast_qty(date_index=0, quantity=10)
+        mps.action_replenish(based_on_lead_time=True)
+        pos = self.env['purchase.order'].search([('product_id', '=', product.id)])
+        self.assertEqual(pos.order_line.product_qty, 10)
+
+        mps.set_forecast_qty(date_index=0, quantity=30)
+        mps.action_replenish(based_on_lead_time=True)
+        pos = self.env['purchase.order'].search([('product_id', '=', product.id)])
+        self.assertEqual(len(pos), 1)
+        self.assertEqual(pos.order_line.product_qty, 30)
+
+        mps.set_forecast_qty(date_index=0, quantity=70)
+        mps.action_replenish(based_on_lead_time=True)
+        pos = self.env['purchase.order'].search([('product_id', '=', product.id)])
+        self.assertEqual(len(pos), 1)
+        self.assertEqual(pos.order_line.product_qty, 70)

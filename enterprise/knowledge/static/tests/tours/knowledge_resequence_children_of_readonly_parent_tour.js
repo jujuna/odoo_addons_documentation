@@ -25,9 +25,9 @@ unfoldArticleFromSidebar("Readonly Parent"),
 { // check that the children were correctly reordered, and try to make a root from one children
     trigger: '.o_article_active:contains(Readonly Parent)',
     run: function () {
-        const child1 = this.anchor.parentElement.querySelectorAll(".o_article_name")[2]
+        const child1 = this.anchor.parentElement.querySelectorAll(".o_article_name")[2];
         // move 1st child above parent.
-        dragAndDropArticle(child1, this.anchor);
+        dragAndDropArticle(child1, this.anchor.querySelector(".o_article_name"));
     },
 }, { // check that the 1st child move was effective
     trigger: '.o_section:contains(Workspace):has(li:nth-child(1):contains(Child 1)):has(li:nth-child(2):contains(Readonly Parent))',

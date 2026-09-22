@@ -1,4 +1,3 @@
-import base64
 import logging
 from datetime import timedelta
 
@@ -7,6 +6,7 @@ from requests.exceptions import ConnectionError as RequestConnectionError, Timeo
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, RedirectWarning
+from odoo.tools import BinaryBytes, BinaryValue
 from odoo.addons.product_barcodelookup.tools import barcode_lookup_service
 
 _logger = logging.getLogger(__name__)
@@ -98,7 +98,7 @@ class ProductFetchImageWizard(models.TransientModel):
 
         if self._get_products_to_process(1):  # Delegate remaining products to the cron
             self._check_cron_status()
-            self.with_context(automatically_triggered=False)._trigger_fetch_images_cron()
+            self._trigger_fetch_images_cron()
             message = _(
                 "Products are processed in the background. Images will be updated progressively."
             )
@@ -134,7 +134,7 @@ class ProductFetchImageWizard(models.TransientModel):
         # reaching Barcode Lookup default rate limit.
         self._process_products(self._get_products_to_process(100))
         if self._get_products_to_process(1):
-            self.with_context(automatically_triggered=True)._trigger_fetch_images_cron(
+            self._trigger_fetch_images_cron(
                 fields.Datetime.now() + timedelta(minutes=1.0)
             )
 
@@ -195,7 +195,7 @@ class ProductFetchImageWizard(models.TransientModel):
                             "Check your API key in setting and retry."
                         ))
                     elif response_status_code == requests.codes.too_many_requests:
-                        self.with_context(automatically_triggered=True)._trigger_fetch_images_cron(
+                        self._trigger_fetch_images_cron(
                             fields.Datetime.now() + timedelta(days=1.0)
                         )
                         _logger.warning(
@@ -214,7 +214,7 @@ class ProductFetchImageWizard(models.TransientModel):
 
                 # The service has not responded more than 3 times, stop trying for now and wait
                 # for the next cron run.
-                self.with_context(automatically_triggered=True)._trigger_fetch_images_cron(
+                self._trigger_fetch_images_cron(
                     fields.Datetime.now() + timedelta(hours=1.0)
                 )
                 _logger.warning(
@@ -263,21 +263,19 @@ class ProductFetchImageWizard(models.TransientModel):
             response.update({'products': products})
         return response
 
-    def _get_image_from_url(self, url):
+    def _get_image_from_url(self, url: str) -> BinaryValue | None:
         """Retrieve an image from the URL.
 
         If the request failed or the response header
         'Content-Type' does not contain 'image/', return None
 
-        :param string url: url of an image
+        :param url: url of an image
         :return: The retrieved image or None
-        :rtype: bytes
         """
-        image = None
         response = barcode_lookup_service.barcode_lookup_request(url)
         if response.status_code == requests.codes.ok and 'image/' in response.headers.get('Content-Type', ''):  # Ignore non-image results
-            image = base64.b64encode(response.content)
-        return image
+            return BinaryBytes(response.content)
+        return None
 
     def _trigger_fetch_images_cron(self, at=None):
         """Create a trigger for the con `ir_cron_fetch_image`.

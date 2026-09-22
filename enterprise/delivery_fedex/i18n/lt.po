@@ -16,19 +16,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-16 05:26+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Lithuanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-09-18 01:55+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Lithuanian <https://translate.odoo.com/projects/odoo-master/"
 "delivery_fedex/lt/>\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
-"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
-"1 : n % 1 != 0 ? 2: 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 "
+": n % 1 != 0 ? 2: 3);\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -93,6 +93,11 @@ msgstr ""
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_droppoff_type__drop_box
 msgid "DROP_BOX"
+msgstr ""
+
+#. module: delivery_fedex
+#: model:ir.model,name:delivery_fedex.model_delivery_carrier
+msgid "Delivery Method"
 msgstr ""
 
 #. module: delivery_fedex
@@ -305,6 +310,11 @@ msgstr ""
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_service_type
 msgid "Fedex Service Type"
+msgstr ""
+
+#. module: delivery_fedex
+#: model:ir.module.module,shortdesc:base.module_delivery_fedex
+msgid "Fedex Shipping (Legacy)"
 msgstr ""
 
 #. module: delivery_fedex
@@ -578,11 +588,6 @@ msgid ""
 msgstr ""
 
 #. module: delivery_fedex
-#: model:ir.model,name:delivery_fedex.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Siuntimo metodai"
-
-#. module: delivery_fedex
 #: model:ir.model.fields,help:delivery_fedex.field_delivery_carrier__fedex_saturday_delivery
 msgid ""
 "Special service:Saturday Delivery, can be requested on following days.\n"
@@ -638,6 +643,15 @@ msgid ""
 msgstr ""
 
 #. module: delivery_fedex
+#: model:ir.module.module,description:base.module_delivery_fedex
+msgid ""
+"This is the legacy integration with FedEx that is no longer "
+"supported.         Please install the new \"Fedex Shipping\" module and "
+"uninstall this one as soon as possible. This integration will stop working "
+"in 2024."
+msgstr ""
+
+#. module: delivery_fedex
 #. odoo-python
 #: code:addons/delivery_fedex/models/delivery_fedex.py:0
 msgid ""
@@ -654,9 +668,3 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid "to create a FedEx account of the following type:"
 msgstr ""
-
-#~ msgid "FedEx"
-#~ msgstr "FedEx"
-
-#~ msgid "FedEx Shipping Methods"
-#~ msgstr "FedEX Siuntimo metodai"

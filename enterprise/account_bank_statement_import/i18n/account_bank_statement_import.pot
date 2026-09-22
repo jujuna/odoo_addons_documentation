@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-12-30 18:43+0000\n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 17:48+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,19 @@ msgstr ""
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "%d transactions had a zero amount and were ignored."
+msgstr ""
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "%d transactions had already been imported and were ignored."
+msgstr ""
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "1 transaction had a zero amount and was ignored."
 msgstr ""
 
 #. module: account_bank_statement_import
@@ -33,14 +45,27 @@ msgid "A bank account transactions can be imported only once!"
 msgstr ""
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,shortdesc:base.module_account_bank_statement_import
+msgid "Account Bank Statement Import"
+msgstr ""
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "All or part of the following file(s) could not be imported:\n"
 msgstr ""
 
 #. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"All transactions in this file either have a zero amount or have already been"
+" imported. There is nothing to import."
+msgstr ""
+
+#. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_bank_statement_line
-msgid "Bank Statement Line"
+msgid "Bank Transaction"
 msgstr ""
 
 #. module: account_bank_statement_import
@@ -86,6 +111,16 @@ msgid "Display Name"
 msgstr ""
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,description:base.module_account_bank_statement_import
+msgid ""
+"Generic Wizard to Import Bank Statements.\n"
+"\n"
+"(This module does not include any type of import format.)\n"
+"\n"
+"OFX and QIF imports are available in Enterprise version."
+msgstr ""
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "Go to Apps"
@@ -109,14 +144,8 @@ msgid "Import ID"
 msgstr ""
 
 #. module: account_bank_statement_import
-#. odoo-python
-#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
-msgid "Import Template for Bank Statement Lines"
-msgstr ""
-
-#. module: account_bank_statement_import
 #. odoo-javascript
-#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import_model.js:0
+#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import/account_bank_statement_import_model.js:0
 msgid "Import Template for Bank Statements"
 msgstr ""
 
@@ -157,6 +186,12 @@ msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
+#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
+msgid "Template for Bank Statement Lines"
+msgstr ""
+
+#. module: account_bank_statement_import
+#. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid ""
 "The account of this statement (%(account)s) is not the same as the journal "
@@ -185,6 +220,14 @@ msgstr ""
 msgid ""
 "This file doesn't contain any transaction for account %s.\n"
 "If it contains transactions for more than one account, it must be imported on each of them."
+msgstr ""
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"This file only contains transactions with a zero amount. There is nothing to"
+" import."
 msgstr ""
 
 #. module: account_bank_statement_import

@@ -86,6 +86,14 @@
         </field>
     </record>
 
+    <record id="action_hr_referral_link_tracker" model="ir.actions.server">
+        <field name="name">Link Tracker</field>
+        <field name="model_id" ref="link_tracker.model_link_tracker"/>
+        <field name="group_ids" eval="[Command.set([ref('hr_referral.group_hr_recruitment_referral_user')])]"/>
+        <field name="state">code</field>
+        <field name="code">action = env['link.tracker'].action_open_referral_link_tracker()</field>
+    </record>
+
     <record id="action_hr_referral_welcome_screen" model="ir.actions.client">
         <field name="name">Dashboard</field>
         <field name="path">referrals</field>
@@ -103,13 +111,22 @@
         parent="menu_hr_referral_root"
         id="menu_hr_referral_reporting"
         name="Reporting"
-        sequence="30"/>
+        sequence="30"
+        groups="hr_referral.group_hr_recruitment_referral_user"/>
 
     <menuitem 
         parent="menu_hr_referral_reporting"
         id="menu_hr_points_referral"
         action="action_hr_referral_points"
         sequence="10"
-        groups="group_hr_recruitment_referral_user"/>
+        groups="hr_referral.group_hr_recruitment_referral_user"/>
+
+    <menuitem
+        parent="menu_hr_referral_reporting"
+        id="menu_hr_referral_link_tracker"
+        action="action_hr_referral_link_tracker"
+        sequence="20"
+        groups="hr_referral.group_hr_recruitment_referral_user"/>
+
     </data>
 </odoo>

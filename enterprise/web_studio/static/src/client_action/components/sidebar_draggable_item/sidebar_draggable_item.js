@@ -1,12 +1,15 @@
-import { Component } from "@odoo/owl";
+import { Component, t, usePlugin, useProps } from "@odoo/owl";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 export class SidebarDraggableItem extends Component {
     static template = "web_studio.SidebarDraggableItem";
-    static props = {
-        className: { type: String, optional: true },
-        description: { type: String, optional: true },
-        dropData: { optional: true },
-        string: { type: String },
-        structure: { type: String },
-    };
+    props = useProps({
+        className: t.string().optional(),
+        description: t.string().optional(),
+        dropData: t.any().optional(),
+        string: t.string(),
+        structure: t.string(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
 }

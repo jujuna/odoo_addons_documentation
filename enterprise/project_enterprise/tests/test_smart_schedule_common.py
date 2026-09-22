@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 
-from datetime import datetime
+from datetime import datetime, UTC
 from dateutil.relativedelta import relativedelta
 
 from odoo.addons.project.tests.test_project_base import TestProjectCommon
@@ -16,14 +16,14 @@ class TestSmartScheduleCommon(TestProjectCommon):
                 'company_id': cls.user_projectuser.company_id.id,
                 'name': cls.user_projectuser.name,
                 'user_id': cls.user_projectuser.id,
-                'tz': cls.user_projectuser.tz,
+                'tz': UTC,
             },
             {
                 'calendar_id': cls.project_pigs.resource_calendar_id.id,
                 'company_id': cls.user_projectmanager.company_id.id,
                 'name': cls.user_projectmanager.name,
                 'user_id': cls.user_projectmanager.id,
-                'tz': cls.user_projectmanager.tz,
+                'tz': UTC,
             },
         ])
 

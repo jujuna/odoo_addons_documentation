@@ -1,31 +1,33 @@
-import { _t } from "@web/core/l10n/translation";
-import { registry } from "@web/core/registry";
+import { markup, usePlugin, t, useProps } from "@odoo/owl";
+import { DefaultCommandItem, defaultCommandItemProps } from "@web/core/commands/command_palette";
 import { HotkeyCommandItem } from "@web/core/commands/default_providers";
-import { DefaultCommandItem } from "@web/core/commands/command_palette";
-import { markup } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
+import { ORM } from "@web/core/orm_plugin";
+import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
+import { useService } from "@web/core/utils/hooks";
 import { highlightText } from "@web/core/utils/html";
 
 // Articles command
 class KnowledgeCommand extends DefaultCommandItem {
     static template = "knowledge.KnowledgeCommandTemplate";
-    static props = {
-        ...DefaultCommandItem.props,
-        headline: String,
-        icon_string: String,
-        isFavorite: Boolean,
-        subjectText: String,
-        subjectName: [String, Boolean],
-    };
+    props = useProps({
+        ...defaultCommandItemProps,
+        headline: t.string(),
+        icon_string: t.string(),
+        isFavorite: t.boolean(),
+        subjectText: t.string(),
+        subjectName: t.or([t.string(), t.boolean()]),
+    });
 }
 
 // "Not found, create one" command
 class Knowledge404Command extends DefaultCommandItem {
     static template = "knowledge.Knowledge404CommandTemplate";
-    static props = {
-        ...DefaultCommandItem.props,
-        articleName: String,
-    };
+    props = useProps({
+        ...defaultCommandItemProps,
+        articleName: t.string(),
+    });
 }
 
 // Advanced search command
@@ -47,8 +49,11 @@ const fn = (hidden) => {
     // Check if the user has enough rights to create a new article
     const canCreate = () => user.checkAccessRight("knowledge.article", "create");
     let articlesData;
-    return async function provide(env, options) {
-        articlesData = await env.services.orm.call(
+    return async function provide(options) {
+        const action = useService("action");
+        const orm = usePlugin(ORM);
+
+        articlesData = await orm.call(
             "knowledge.article",
             "get_user_sorted_articles",
             [[]],
@@ -65,7 +70,7 @@ const fn = (hidden) => {
                     return [{
                         Component: Knowledge404Command,
                         async action() {
-                            const articleIds = await env.services.orm.call(
+                            const articleIds = await orm.call(
                                 'knowledge.article',
                                 'article_create',
                                 [options.searchValue],
@@ -74,7 +79,7 @@ const fn = (hidden) => {
                                 },
                             );
 
-                            env.services.action.doAction('knowledge.ir_actions_server_knowledge_home_page', {
+                            action.doAction('knowledge.ir_actions_server_knowledge_home_page', {
                                 additionalContext: {
                                     res_id: articleIds[0],
                                 }
@@ -95,7 +100,7 @@ const fn = (hidden) => {
         const result = articlesData.map(article => ({
             Component: KnowledgeCommand,
             action() {
-                env.services.action.doAction('knowledge.ir_actions_server_knowledge_home_page', {
+                action.doAction('knowledge.ir_actions_server_knowledge_home_page', {
                     additionalContext: {
                         res_id: article.id,
                     }
@@ -115,7 +120,7 @@ const fn = (hidden) => {
                     article.root_article_id[1],
                     "fw-bolder text-primary"
                 ),
-                icon_string: article.icon || "📄",
+                icon_string: article.icon || "",
             },
         }));
         if (!hidden && !(await user.hasGroup("base.group_portal"))) {
@@ -124,9 +129,9 @@ const fn = (hidden) => {
                 Component: KnowledgeExtraCommand,
                 async action() {
                     const articleIds = articlesData.map(article => article.id);
-                    const action = await env.services.action.loadAction('knowledge.knowledge_article_action');
-                    delete action.context.search_default_filter_not_is_article_item;
-                    env.services.action.doAction(action, {
+                    const actionDescr = await action.loadAction('knowledge.knowledge_article_action');
+                    delete actionDescr.context.search_default_filter_not_is_article_item;
+                    action.doAction(actionDescr, {
                         additionalContext: {
                             search_default_filter_search_article_ids: 1,
                             search_article_ids: articleIds,

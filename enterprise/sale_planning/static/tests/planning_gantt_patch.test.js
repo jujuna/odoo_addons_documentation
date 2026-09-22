@@ -1,7 +1,7 @@
 import { click } from "@mail/../tests/mail_test_helpers";
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { animationFrame, mockDate, mockTimeZone } from "@odoo/hoot-mock";
-import { queryAll, queryAllTexts } from "@odoo/hoot-dom";
+import { animationFrame, mockDate, mockTimeZone, runAllTimers } from "@odoo/hoot-mock";
+import { queryAll, queryAllTexts, waitFor } from "@odoo/hoot-dom";
 import {
     contains,
     defineModels,
@@ -19,9 +19,10 @@ import {
     getGridContent,
     mountGanttView,
     SELECTORS,
+    selectRange,
 } from "@web_gantt/../tests/web_gantt_test_helpers";
 
-import { Component, onWillStart, useState, xml } from "@odoo/owl";
+import { Component, onWillStart, xml, proxy } from "@odoo/owl";
 import { PlanningGanttRenderer } from "@planning/views/planning_gantt/planning_gantt_renderer";
 import { Domain } from "@web/core/domain";
 import { useService } from "@web/core/utils/hooks";
@@ -38,7 +39,7 @@ class PlanningSlot extends planningModels.PlanningSlot {
             name: "Shift 1",
             role_id: 1,
             sale_line_id: 1,
-            resource_id: false,
+            resource_ids: false,
             start_datetime: "2021-10-12 08:00:00",
             end_datetime: "2021-10-12 12:00:00",
             allocated_percentage: 0.5,
@@ -48,15 +49,15 @@ class PlanningSlot extends planningModels.PlanningSlot {
 
 class PlanningRole extends planningModels.PlanningRole {
     _records = [
-        { id: 1, name: "Developer" },
-        { id: 2, name: "Support Tech" },
+        { id: 1, name: "Developer", color: 1 },
+        { id: 2, name: "Support Tech", color: 2 },
     ];
 }
 
 class Resource extends planningModels.ResourceResource {
     _records = [
-        { id: 1, name: "Chaganlal" },
-        { id: 2, name: "Jarvo" },
+        { id: 1, name: "Chaganlal", role_ids: [1], resource_type: "user" },
+        { id: 2, name: "Jarvo", role_ids: [2], resource_type: "user" },
     ];
 }
 
@@ -90,11 +91,10 @@ test("Process domain for plan dialog", async function () {
     });
 
     class Parent extends Component {
-        static template = xml`<View t-props="state"/>`;
+        static template = xml`<View t-props="this.state"/>`;
         static components = { View };
-        static props = ["*"];
         setup() {
-            this.state = useState({
+            this.state = proxy({
                 arch: `<gantt js_class="planning_gantt" date_start="start_datetime" date_stop="end_datetime" default_scale="week"/>`,
                 resModel: "planning.slot",
                 type: "gantt",
@@ -118,8 +118,7 @@ test("Process domain for plan dialog", async function () {
             new Domain(["&", ...Domain.TRUE.toList({}), ...Domain.TRUE.toList({})]),
             ["|", ["start_datetime", "=", false], ["end_datetime", "=", false]],
         ]),
-        [["sale_line_id.state", "!=", "cancel"]],
-        [["sale_line_id", "!=", false]],
+        Domain.not([["sale_line_id.state", "=", "cancel"]]),
     ]);
     expect(renderer.getPlanDialogDomain()).toEqual(expectedDomain.toList());
 
@@ -127,7 +126,7 @@ test("Process domain for plan dialog", async function () {
         "|",
         ["role_id", "=", false],
         "&",
-        ["resource_id", "!=", false],
+        ["resource_ids", "!=", false],
         ["start_datetime", "=", false],
     ];
     await animationFrame();
@@ -138,13 +137,12 @@ test("Process domain for plan dialog", async function () {
                 "|",
                 ["role_id", "=", false],
                 "&",
-                ["resource_id", "!=", false],
+                ["resource_ids", "!=", false],
                 ...Domain.TRUE.toList({}),
             ]),
             ["|", ["start_datetime", "=", false], ["end_datetime", "=", false]],
         ]),
-        [["sale_line_id.state", "!=", "cancel"]],
-        [["sale_line_id", "!=", false]],
+        Domain.not([["sale_line_id.state", "=", "cancel"]]),
     ]);
     expect(renderer.getPlanDialogDomain()).toEqual(expectedDomain.toList());
 
@@ -156,8 +154,7 @@ test("Process domain for plan dialog", async function () {
             Domain.TRUE,
             ["|", ["start_datetime", "=", false], ["end_datetime", "=", false]],
         ]),
-        [["sale_line_id.state", "!=", "cancel"]],
-        [["sale_line_id", "!=", false]],
+        Domain.not([["sale_line_id.state", "=", "cancel"]]),
     ]);
     expect(renderer.getPlanDialogDomain()).toEqual(expectedDomain.toList());
 });
@@ -179,7 +176,7 @@ test("check default planned dates on the plan dialog", async function () {
         id: 2,
         role_id: 1,
         sale_line_id: 1,
-        resource_id: false,
+        resource_ids: false,
         start_datetime: false,
         end_datetime: false,
     });
@@ -192,6 +189,19 @@ test("check default planned dates on the plan dialog", async function () {
 });
 
 test("Show shift form dialog only when shifts to plan", async function () {
+    onRpc("assign_slot", function ({ model, args }) {
+        expect.step("assign_slot");
+        this.env[model].write(args[0], args[1]);
+        return {
+            slots_assigned_ids: args[0],
+            schedule_type: "full",
+            undo_data: {
+                slots_created_ids: [],
+                undo_vals: {},
+            },
+        };
+    });
+
     // Additionally to 'Shift 1', we create a new unplanned shift 'Shift 2' which has a sale_line_id, no start_datetime and no end_datetime values
     PlanningSlot._records.push({
         id: 2,
@@ -241,6 +251,7 @@ test("Show shift form dialog only when shifts to plan", async function () {
     await clickCell("Wednesday 13", "Week 41, Oct 10 - Oct 16");
     expect(".o_dialog").toHaveCount(1);
     expect(".modal-title").toHaveText("Add Shift");
+    expect.verifySteps(["assign_slot"]);
 });
 
 test("Open a dialog to schedule a plan using Open Shift", async function () {
@@ -252,7 +263,7 @@ test("Open a dialog to schedule a plan using Open Shift", async function () {
         list: `<list><field name="sale_line_id"/></list>`,
         form: `
             <form>
-                <field name="resource_id"/>
+                <field name="resource_ids" widget="many2many_avatar_resource"/>
                 <field name="start_datetime"/>
                 <field name="end_datetime"/>
                 <field name="name"/>
@@ -260,20 +271,16 @@ test("Open a dialog to schedule a plan using Open Shift", async function () {
         `,
     };
 
-    onRpc("gantt_resource_work_interval", () => [
-        { false: [["2021-10-12 08:00:00", "2022-10-12 12:00:00"]] },
-    ]);
-
     await mountGanttView({
         resModel: "planning.slot",
         arch: '<gantt js_class="planning_gantt" date_start="start_datetime" date_stop="end_datetime" default_scale="week"/>',
-        groupBy: ["resource_id"],
+        groupBy: ["resource_ids"],
     });
     await hoverGridCell("Wednesday 13", "Week 41, Oct 10 - Oct 16");
     await clickCell("Wednesday 13", "Week 41, Oct 10 - Oct 16");
     await click(".modal-footer .o_create_button");
 
-    await selectFieldDropdownItem("resource_id", "Jarvo");
+    await selectFieldDropdownItem("resource_ids", "Jarvo");
     await contains(`[name='name'] input`).edit("Shift-2");
     await contains(`[name='start_datetime'] button`).click();
     await contains(`[name='start_datetime'] input`).edit("2021-10-12 09:00:00");
@@ -285,12 +292,64 @@ test("Open a dialog to schedule a plan using Open Shift", async function () {
 
     const shift2Pill = queryAll(SELECTORS.pill)[1];
     await contains(shift2Pill).click();
-    expect(queryAllTexts`.o_popover .popover-body span`).toEqual([
-        "Shift-2",
-        "10/12/2021, 9:00 AM",
-        "10/12/2021, 12:00 PM",
+    await runAllTimers();
+    await waitFor(".o_popover");
+    expect(`.o_popover .o_popover_header`).toHaveText("Shift-2");
+    expect(queryAllTexts`.o_popover .o_popover_body div`).toEqual([
+        "Start: Oct 12, 9:00 AM",
+        "Stop: Oct 12, 12:00 PM",
     ]);
 
     await editPill("Shift-2");
-    expect(".o_field_widget[name=resource_id] input").toHaveValue("Jarvo");
+    expect(".o_field_widget[name=resource_ids] .o_tag_badge_text").toHaveText("Jarvo");
+});
+
+test("auto plan on gantt view: default end_datetime should cover full range including last day", async function () {
+    mockTimeZone(0);
+    mockDate("2026-08-17 10:00:00");
+
+    const ranges = [
+        ["Day", "2026-08-17 23:59:59"],
+        ["Week", "2026-08-22 23:59:59"],
+        ["Month", "2026-08-31 23:59:59"],
+        ["Quarter", "2026-09-30 23:59:59"],
+        ["Year", "2026-12-31 23:59:59"],
+    ];
+
+    PlanningSlot._records.push({
+        id: 2,
+        name: "Slot to plan",
+        sale_line_id: 1,
+        resource_ids: false,
+    });
+
+    let currentExpectedDate = null;
+    onRpc("auto_plan_ids", function (params) {
+        expect(params.kwargs.context.default_end_datetime).toBe(currentExpectedDate);
+        return { open_shift_assigned: [2] };
+    });
+
+    await mountGanttView({
+        resModel: "planning.slot",
+        arch: `
+            <gantt
+                js_class="planning_gantt"
+                date_start="start_datetime"
+                date_stop="end_datetime"
+                default_group_by="sale_line_id"
+            />
+        `,
+    });
+
+    for (const [label, date] of ranges) {
+        currentExpectedDate = date;
+
+        await selectRange(label);
+
+        await click(".o_control_panel_main_buttons button > i[data-icon='arrow_drop_down']");
+        await animationFrame();
+
+        await click(".o_gantt_button_auto_plan");
+        await animationFrame();
+    }
 });

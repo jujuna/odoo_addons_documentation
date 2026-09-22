@@ -34,7 +34,9 @@ class ResCompany(models.Model):
     l10n_ec_regime = fields.Selection( # We do a selection as there is a good chance a new regime will be put in place
         selection=[
             ('regular', "Regular Regime (without additional messages in the RIDE)"),
-            ('rimpe', "RIMPE Regime"),
+            ('rimpe', "RIMPE Regime - Deprecated"),
+            ('rimpe_emprendedor', "RIMPE taxpayer - Entrepreneur"),
+            ('rimpe_negocio_popular', "RIMPE taxpayer - Popular Business"),
         ],
         string="Regime",
         default='regular',
@@ -74,6 +76,19 @@ class ResCompany(models.Model):
         string="Purchase Tax Base Account",
         help="Account that will be set on lines created to represent the tax base amounts for purchase withhold documents.",
     )
+    l10n_ec_extra_header_legend_ride = fields.Char(string="Extra Header Legend - RIDE")
+    l10n_ec_edi_provider_id = fields.Many2one(
+        comodel_name='res.partner',
+        string="Software Provider",
+        domain=[('country_id.code', '=', 'EC')],
+        help="The software provider partner whose RUC is reported on electronic documents and RIDE.",
+    )
+
+    def _l10n_ec_is_provider_vat_valid(self):
+        # The SRI expects a RUC (13 digit) for software provider
+        self.ensure_one()
+        vat = self.l10n_ec_edi_provider_id.vat or ''
+        return len(vat) == 13 and self.env['res.partner'].is_valid_ruc_ec(vat)
 
     def _l10n_ec_is_demo_environment(self):
         return not self.l10n_ec_production_env and not self.sudo().l10n_ec_edi_certificate_id

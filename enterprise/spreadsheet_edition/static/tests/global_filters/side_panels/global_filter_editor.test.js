@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
 import { queryAllTexts } from "@odoo/hoot-dom";
 import { animationFrame, mockDate } from "@odoo/hoot-mock";
-import { helpers, stores } from "@odoo/o-spreadsheet";
+import { helpers, stores, owlPlugins } from "@odoo/o-spreadsheet";
 import {
     addGlobalFilter,
     addGlobalFilterWithoutReload,
@@ -40,7 +40,16 @@ import {
     onRpc,
 } from "@web/../tests/web_test_helpers";
 
-import { Component, onMounted, onWillUnmount, xml } from "@odoo/owl";
+import {
+    Component,
+    onMounted,
+    onWillUnmount,
+    xml,
+    signal,
+    providePlugins,
+    t,
+    useProps,
+} from "@odoo/owl";
 import {
     createSpreadsheetWithChart,
     insertChartInSpreadsheet,
@@ -53,6 +62,8 @@ import { TextFilterEditorSidePanel } from "@spreadsheet_edition/bundle/global_fi
 import { NumericFilterEditorSidePanel } from "@spreadsheet_edition/bundle/global_filters/components/filter_editor/numeric_filter_editor_side_panel";
 import { user } from "@web/core/user";
 import { SelectionFilterEditorSidePanel } from "@spreadsheet_edition/bundle/global_filters/components/filter_editor/selection_filter_editor_side_panel";
+import { editSelectComponent } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
+import { render } from "@web/owl2/utils";
 
 const { useStoreProvider, ModelStore, NotificationStore } = stores;
 
@@ -84,13 +95,14 @@ const SIDE_PANELS = {
 };
 
 class Parent extends Component {
-    static template = xml`<t t-component="comp" id='props.filterId'/>`;
-    static props = {
-        filterId: { type: String, optional: true },
-        type: { type: String, optional: true },
-        model: Object,
-        notificationStore: { type: Object, optional: true },
-    };
+    static template = xml`<div class="o-spreadsheet"><t t-component="this.comp" id='this.props.filterId'/></div>`;
+
+    props = useProps({
+        filterId: t.string().optional(),
+        type: t.string().optional(),
+        model: t.object(),
+        notificationStore: t.object().optional(),
+    });
 
     get type() {
         if (this.props.filterId) {
@@ -105,6 +117,11 @@ class Parent extends Component {
     }
 
     setup() {
+        providePlugins([owlPlugins.PopoverContainerPlugin], {
+            getPopoverContainerRect: () =>
+                getFixture().querySelector(".o-spreadsheet").getBoundingClientRect(),
+        });
+
         const stores = useStoreProvider();
         stores.inject(ModelStore, this.props.model);
         if (this.props.notificationStore) {
@@ -112,7 +129,7 @@ class Parent extends Component {
         }
 
         onMounted(() => {
-            stores.on("store-updated", this, this.render.bind(this, true));
+            stores.on("store-updated", this, () => render(this, true));
         });
         onWillUnmount(() => {
             stores.off("store-updated", this);
@@ -181,8 +198,8 @@ test("Pivot display name is displayed in field matching", async function () {
         label: "This year",
     });
     await openSidePanel(model, env, "42");
-    const name = target.querySelector(".o_spreadsheet_field_matching .fw-medium").innerText;
-    expect(name).toBe("Hello");
+    const name = target.querySelector(".o_spreadsheet_field_matching div").innerText;
+    expect(name).toBe("Hello (Pivot #1)");
 });
 
 test("List display name is displayed in field matching", async function () {
@@ -196,8 +213,33 @@ test("List display name is displayed in field matching", async function () {
     });
 
     await openSidePanel(model, env, "42");
-    const name = target.querySelector(".o_spreadsheet_field_matching .fw-medium").innerText;
-    expect(name).toBe("Hello");
+    const name = target.querySelector(".o_spreadsheet_field_matching div").innerText;
+    expect(name).toBe("Hello (List #1)");
+});
+
+test("Chart display name is displayed in field matching", async function () {
+    const { model, env } = await createSpreadsheetWithChart();
+    const sheetId = model.getters.getActiveSheetId();
+    const [chartId] = model.getters.getChartIds(sheetId);
+    const definition = model.getters.getChartDefinition(chartId);
+    model.dispatch("UPDATE_CHART", {
+        definition: {
+            ...definition,
+            title: { text: "Hello" },
+        },
+        chartId,
+        figureId: model.getters.getFigureIdFromChartId(chartId),
+        sheetId,
+    });
+    await addGlobalFilter(model, {
+        id: "42",
+        type: "date",
+        label: "This year",
+    });
+
+    await openSidePanel(model, env, "42");
+    const name = target.querySelector(".o_spreadsheet_field_matching div").innerText;
+    expect(name).toBe("Hello (Chart #1)");
 });
 
 test("Create a new boolean global filter", async function () {
@@ -269,6 +311,19 @@ test("can select a default value for selection filter", async function () {
     expect(globalFilter.defaultValue).toEqual({ operator: "in", selectionValues: ["new"] });
 });
 
+test("Selection global filter supports operator in default value", async function () {
+    const { model, env } = await createSpreadsheetWithPivot();
+    await openSidePanelForCreation(model, env, "selection");
+    await selectModelForSelection("res.users");
+    await selectFieldForSelection("state");
+    await editSelectComponent(".o_spreadsheet_filter_editor_side_panel .o-select", "not in");
+    await contains(".o-global-filter-selection-value input").click();
+    await contains(".o-autocomplete .dropdown-item").click();
+    await saveGlobalFilter();
+    const [globalFilter] = model.getters.getGlobalFilters();
+    expect(globalFilter.defaultValue).toEqual({ operator: "not in", selectionValues: ["new"] });
+});
+
 test("Selecting another model resets the default value", async function () {
     const { model, env } = await createSpreadsheetWithPivot();
     addGlobalFilterWithoutReload(model, {
@@ -277,13 +332,15 @@ test("Selecting another model resets the default value", async function () {
         label: "Status",
         resModel: "res.users",
         selectionField: "state",
-        defaultValue: { operator: "in", selectionValues: ["new"] },
+        defaultValue: { operator: "not in", selectionValues: ["new"] },
     });
     await openSidePanel(model, env, "42");
-    await openSidePanelForCreation(model, env, "selection");
+    expect(".o_spreadsheet_filter_editor_side_panel .o-select").toHaveText("is not in");
     expect(".o_tag_badge_text").toHaveCount(1);
-    await selectModelForSelection("partner");
+    await selectModelForSelection("res.currency");
+    await selectFieldForSelection("position");
     expect(".o_tag_badge_text").toHaveCount(0);
+    expect(".o_spreadsheet_filter_editor_side_panel .o-select").toHaveText("is in");
 });
 
 test("Selecting another field resets the default value", async function () {
@@ -294,12 +351,14 @@ test("Selecting another field resets the default value", async function () {
         label: "Status",
         resModel: "res.users",
         selectionField: "state",
-        defaultValue: { operator: "in", selectionValues: ["new"] },
+        defaultValue: { operator: "not in", selectionValues: ["new"] },
     });
     await openSidePanel(model, env, "42");
     await openSidePanelForCreation(model, env, "selection");
+    expect(".o_spreadsheet_filter_editor_side_panel .o-select").toHaveText("is not in");
     expect(".o_tag_badge_text").toHaveCount(1);
     await selectFieldForSelection("lang");
+    expect(".o_spreadsheet_filter_editor_side_panel .o-select").toHaveText("is in");
     expect(".o_tag_badge_text").toHaveCount(0);
 });
 
@@ -443,6 +502,19 @@ test("check and uncheck range for text filter", async function () {
     await saveGlobalFilter();
     const [globalFilter] = model.getters.getGlobalFilters();
     expect(globalFilter.rangesOfAllowedValues).toBe(undefined);
+});
+
+test("Removing the default value preserves the selected operator", async () => {
+    const { model, env } = await createSpreadsheetWithPivot();
+    addGlobalFilterWithoutReload(model, {
+        id: "42",
+        type: "text",
+        label: "Text",
+        defaultValue: { operator: "not in", strings: ["abc"] },
+    });
+    await openSidePanel(model, env, "42");
+    await contains(".o-global-filter-text-value .o_delete").click();
+    expect(".o_spreadsheet_filter_editor_side_panel .o-select").toHaveText("is not in");
 });
 
 test("Create a new relational global filter", async function () {
@@ -750,12 +822,32 @@ test("Create a new relational global filter of users will shows the checkbox", a
     expect(globalFilter.label).toBe("Users");
 });
 
+test("Relational global filter saves operator with default value", async function () {
+    const { model, env } = await createSpreadsheetWithPivot();
+    await openSidePanelForCreation(model, env, "relation");
+    await selectModelForRelation("res.users");
+    await editSelectComponent(".o_spreadsheet_filter_editor_side_panel .o-select", "not in");
+    await contains(".o_multi_record_selector input").click();
+    await contains(".dropdown-item").click();
+    await saveGlobalFilter();
+    const [filter] = model.getters.getGlobalFilters();
+    expect(filter.defaultValue).toEqual({
+        operator: "not in",
+        ids: [7],
+    });
+});
+
 test("Create a new date filter", async function () {
     mockDate("2022-07-10 00:00:00");
     const { model, env, pivotId } = await createSpreadsheetWithPivot();
     insertListInSpreadsheet(model, {
         model: "partner",
-        columns: ["foo", "bar", "date", "product_id"],
+        columns: [
+            { name: "foo", string: "Foo" },
+            { name: "bar", string: "Bar" },
+            { name: "date", string: "Date" },
+            { name: "product_id", string: "Product" },
+        ],
     });
     insertChartInSpreadsheet(model);
     await openSidePanelForCreation(model, env, "date");
@@ -795,7 +887,12 @@ test("Create a new date filter with period offsets", async function () {
     const { model, env, pivotId } = await createSpreadsheetWithPivot();
     insertListInSpreadsheet(model, {
         model: "partner",
-        columns: ["foo", "bar", "date", "product_id"],
+        columns: [
+            { name: "foo", string: "Foo" },
+            { name: "bar", string: "Bar" },
+            { name: "date", string: "Date" },
+            { name: "product_id", string: "Product" },
+        ],
     });
     insertChartInSpreadsheet(model);
     await openSidePanelForCreation(model, env, "date");
@@ -810,7 +907,7 @@ test("Create a new date filter with period offsets", async function () {
 
     // pivot
     await selectFieldMatching("date", pivotFieldMatching);
-    await contains(pivotFieldMatching.querySelector("select")).select("-1");
+    await editSelectComponent(pivotFieldMatching.querySelector(".o-select"), "-1");
     await contains(pivotFieldMatching.querySelector("input.o_filter_offset_input")).edit("1");
 
     //list
@@ -818,7 +915,7 @@ test("Create a new date filter with period offsets", async function () {
 
     // chart
     await selectFieldMatching("date", chartFieldMatching);
-    await contains(chartFieldMatching.querySelector("select")).select("-1");
+    await editSelectComponent(chartFieldMatching.querySelector(".o-select"), "-1");
     await contains(chartFieldMatching.querySelector("input.o_filter_offset_input")).edit("2");
 
     await saveGlobalFilter();
@@ -845,12 +942,11 @@ test("Cannot create a new date filter with period offsets without setting the fi
     await editGlobalFilterLabel("My Label");
 
     const pivotFieldMatching = target.querySelectorAll(".o_spreadsheet_field_matching")[0];
-    expect(".o_filter_field_offset select.o-input").toHaveCount(0);
+    expect(".o_filter_field_offset .o-select").toHaveCount(0);
 
     // pivot
     await selectFieldMatching("date", pivotFieldMatching);
-    expect(".o_filter_field_offset select.o-input").toHaveCount(1);
-    expect(".o_filter_field_offset select.o-input").toHaveProperty("disabled", false);
+    expect(".o_filter_field_offset .o-select").toHaveCount(1);
 });
 
 test("Creating a new date filter with large period offsets defaults to 50", async () => {
@@ -864,7 +960,7 @@ test("Creating a new date filter with large period offsets defaults to 50", asyn
 
     const pivotFieldMatching = target.querySelectorAll(".o_spreadsheet_field_matching")[0];
     await selectFieldMatching("date", pivotFieldMatching);
-    await contains(pivotFieldMatching.querySelector("select")).select("-1");
+    await editSelectComponent(pivotFieldMatching.querySelector(".o-select"), "-1");
     await contains(pivotFieldMatching.querySelector("input.o_filter_offset_input")).edit("9999");
     await saveGlobalFilter();
     const pivotDomain = model.getters.getPivotComputedDomain(pivotId);
@@ -875,7 +971,12 @@ test("Create a new relative date filter with an empty default value", async () =
     const { model, pivotId, env } = await createSpreadsheetWithPivot();
     insertListInSpreadsheet(model, {
         model: "partner",
-        columns: ["foo", "bar", "date", "product_id"],
+        columns: [
+            { name: "foo", string: "Foo" },
+            { name: "bar", string: "Bar" },
+            { name: "date", string: "Date" },
+            { name: "product_id", string: "Product" },
+        ],
     });
     insertChartInSpreadsheet(model);
     await openSidePanelForCreation(model, env, "date");
@@ -889,7 +990,7 @@ test("Create a new relative date filter with an empty default value", async () =
     await selectFieldMatching("date", listFieldMatching);
     await selectFieldMatching("date", graphFieldMatching);
 
-    await contains(graphFieldMatching.querySelector("select")).select("-1");
+    await editSelectComponent(graphFieldMatching.querySelector(".o-select"), "-1");
     await contains(graphFieldMatching.querySelector("input.o_filter_offset_input")).edit("2");
 
     await saveGlobalFilter();
@@ -912,7 +1013,12 @@ test("Create a new relative date filter", async function () {
     const { model, pivotId, env } = await createSpreadsheetWithPivot();
     insertListInSpreadsheet(model, {
         model: "partner",
-        columns: ["foo", "bar", "date", "product_id"],
+        columns: [
+            { name: "foo", string: "Foo" },
+            { name: "bar", string: "Bar" },
+            { name: "date", string: "Date" },
+            { name: "product_id", string: "Product" },
+        ],
     });
     insertChartInSpreadsheet(model);
     await openSidePanelForCreation(model, env, "date");
@@ -926,15 +1032,15 @@ test("Create a new relative date filter", async function () {
     const graphFieldMatching = target.querySelectorAll(".o_spreadsheet_field_matching")[2];
 
     await selectFieldMatching("date", pivotFieldMatching);
-    await contains(pivotFieldMatching.querySelector("select")).select("-1");
+    await editSelectComponent(pivotFieldMatching.querySelector(".o-select"), "-1");
     await contains(pivotFieldMatching.querySelector("input.o_filter_offset_input")).edit("7");
 
     await selectFieldMatching("date", listFieldMatching);
-    await contains(listFieldMatching.querySelector("select")).select("1");
+    await editSelectComponent(listFieldMatching.querySelector(".o-select"), "1");
     await contains(listFieldMatching.querySelector("input.o_filter_offset_input")).edit("2");
 
     await selectFieldMatching("date", graphFieldMatching);
-    await contains(graphFieldMatching.querySelector("select")).select("-1");
+    await editSelectComponent(graphFieldMatching.querySelector(".o-select"), "-1");
     await contains(graphFieldMatching.querySelector("input.o_filter_offset_input")).edit("3");
 
     await saveGlobalFilter();
@@ -957,7 +1063,12 @@ test("Create a new relative date filter with a negative offset should save the a
     const { model, pivotId, env } = await createSpreadsheetWithPivot();
     insertListInSpreadsheet(model, {
         model: "partner",
-        columns: ["foo", "bar", "date", "product_id"],
+        columns: [
+            { name: "foo", string: "Foo" },
+            { name: "bar", string: "Bar" },
+            { name: "date", string: "Date" },
+            { name: "product_id", string: "Product" },
+        ],
     });
     insertChartInSpreadsheet(model);
     await openSidePanelForCreation(model, env, "date");
@@ -971,19 +1082,19 @@ test("Create a new relative date filter with a negative offset should save the a
     const graphFieldMatching = target.querySelectorAll(".o_spreadsheet_field_matching")[2];
 
     await selectFieldMatching("date", pivotFieldMatching);
-    await contains(pivotFieldMatching.querySelector("select")).select("-1");
+    await editSelectComponent(pivotFieldMatching.querySelector(".o-select"), "-1");
     await contains(pivotFieldMatching.querySelector("input.o_filter_offset_input")).edit("-7", {
         instantly: true,
     });
 
     await selectFieldMatching("date", listFieldMatching);
-    await contains(listFieldMatching.querySelector("select")).select("1");
+    await editSelectComponent(listFieldMatching.querySelector(".o-select"), "1");
     await contains(listFieldMatching.querySelector("input.o_filter_offset_input")).edit("-2", {
         instantly: true,
     });
 
     await selectFieldMatching("date", graphFieldMatching);
-    await contains(graphFieldMatching.querySelector("select")).select("-1");
+    await editSelectComponent(graphFieldMatching.querySelector(".o-select"), "-1");
     await contains(graphFieldMatching.querySelector("input.o_filter_offset_input")).edit("-2", {
         instantly: true,
     });
@@ -1043,7 +1154,12 @@ test("Filter edit side panel is initialized with the correct values", async func
     const { model, pivotId, env } = await createSpreadsheetWithPivot();
     insertListInSpreadsheet(model, {
         model: "partner",
-        columns: ["foo", "bar", "date", "product_id"],
+        columns: [
+            { name: "foo", string: "Foo" },
+            { name: "bar", string: "Bar" },
+            { name: "date", string: "Date" },
+            { name: "product_id", string: "Product" },
+        ],
     });
     addGlobalFilterWithoutReload(
         model,
@@ -1069,12 +1185,12 @@ test("Filter edit side panel is initialized with the correct values", async func
     const pivotField = ".o_spreadsheet_field_matching:eq(0)";
     const pivotFieldValue = `${pivotField} .o_model_field_selector_value span`;
     expect(pivotFieldValue).toHaveText("Date");
-    expect(`${pivotField} select`).toHaveValue("0");
+    expect(`${pivotField} .o-select`).toHaveText("No offset");
 
     const listField = ".o_spreadsheet_field_matching:eq(1)";
     const listFieldValue = `${listField} .o_model_field_selector_value span`;
     expect(listFieldValue).toHaveText("Date");
-    expect(`${listField} select`).toHaveValue("1");
+    expect(`${listField} .o-select`).toHaveText("Next");
 });
 
 test("Empty field is marked as warning", async function () {
@@ -1117,7 +1233,7 @@ test("Field matching edition is saved even without others modifications", async 
     );
     await openSidePanel(model, env, "42");
     await contains(".collapsor").click();
-    await contains(".o_model_field_selector_controls .fa-times").click();
+    await contains(".o_model_field_selector_controls [data-icon='close']").click();
     await saveGlobalFilter();
     expect(model.getters.getPivotFieldMatching(pivotId, "42")).toEqual({});
 });
@@ -1142,7 +1258,7 @@ test("Can clear a field matching an invalid field", async function () {
     await contains(".collapsor").click(); // uncollapse the field matching
     expect(".o_model_field_selector_warning").toHaveCount(1);
     expect(".o_spreadsheet_field_matching .o_model_field_selector").toHaveText("not_a_field");
-    await contains(".o_model_field_selector .fa.fa-times").click();
+    await contains(".o_model_field_selector [data-icon='close']").click();
     expect(".o_spreadsheet_field_matching .o_model_field_selector").toHaveText("");
 });
 
@@ -1194,6 +1310,28 @@ test("Cannot save filter with empty label", async function () {
     expect.verifySteps(["notifyUser"]);
 });
 
+test("Cannot save filter when the operator is changed without a value", async function () {
+    const { model, env } = await createSpreadsheetWithPivot();
+    addGlobalFilterWithoutReload(model, {
+        id: "42",
+        type: "text",
+        label: "Text Filter",
+    });
+    await openSidePanel(model, env, "42", {
+        notifyUser: (notif) => {
+            expect.step("notifyUser");
+            expect(notif.type).toBe("danger");
+            expect(notif.text).toBe(
+                "You cannot change the operator without a value. If default value is not needed, select the first operator."
+            );
+            expect(notif.sticky).toBe(false);
+        },
+    });
+    await editSelectComponent(".o_spreadsheet_filter_editor_side_panel .o-select", "not in");
+    await saveGlobalFilter();
+    expect.verifySteps(["notifyUser"]);
+});
+
 test("Create a new numeric global filter with empty value", async function () {
     const { model, env } = await createSpreadsheetWithPivot();
     await openSidePanelForCreation(model, env, "numeric");
@@ -1206,6 +1344,22 @@ test("Create a new numeric global filter with empty value", async function () {
     expect(globalFilter.defaultValue).toBe(undefined);
 });
 
+test("Numeric filter saves operator with default value", async () => {
+    const { model, env } = await createSpreadsheetWithPivot();
+    await openSidePanelForCreation(model, env, "numeric");
+
+    await editGlobalFilterLabel("My Label");
+    await editSelectComponent(".o_spreadsheet_filter_editor_side_panel .o-select", ">");
+    await contains(".o-global-filter-numeric-value").edit("10");
+    await saveGlobalFilter();
+
+    const [filter] = model.getters.getGlobalFilters();
+    expect(filter.defaultValue).toEqual({
+        operator: ">",
+        targetValue: 10,
+    });
+});
+
 test("Cannot create a filter if a datasource is in error", async function () {
     const { model, env } = await createSpreadsheetWithList({
         mockRPC: async function (route, { model, method, kwargs }) {
@@ -1215,13 +1369,12 @@ test("Cannot create a filter if a datasource is in error", async function () {
         },
     });
 
-    const comp = await openSidePanelForCreation(model, env, "text");
-    expect(".o-validation-error").toHaveCount(1);
-    expect(".o_global_filter_cancel").toHaveCount(1);
-    expect(".o_global_filter_save").toHaveCount(0);
+    const props = signal.Object({ type: "text" });
+
+    await openSidePanelForCreation(model, env, props().type);
 
     for (const type of Object.keys(SIDE_PANELS)) {
-        comp.props.type = type;
+        props().type = type;
         await animationFrame();
         expect(".o-validation-error").toHaveCount(1);
         expect(".o_global_filter_cancel").toHaveCount(1);

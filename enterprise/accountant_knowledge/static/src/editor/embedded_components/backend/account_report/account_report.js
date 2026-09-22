@@ -1,14 +1,17 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 import { getEmbeddedProps } from "@html_editor/others/embedded_component_utils";
 import { useService } from "@web/core/utils/hooks";
 
 export class AccountReportComponent extends Component {
     static template = "accountant_knowledge.EmbeddedAccountReport";
-    static props = {
-        host: { type: Object },
-        name: { type: String },
-        options: { type: Object },
-    };
+
+    props = useProps({
+        host: t.object(),
+        name: t.string(),
+        options: t.object(),
+    });
+
     setup() {
         this.actionService = useService("action");
     }
@@ -34,8 +37,14 @@ export class AccountReportComponent extends Component {
 export const accountReportEmbedding = {
     name: "accountReport",
     Component: AccountReportComponent,
-    getProps: (host) => ({
-        ...getEmbeddedProps(host),
-        host,
-    }),
+    getProps: (host) => {
+        const props = {
+            ...getEmbeddedProps(host),
+            host
+        };
+        if (props.name) {
+            props.name = _t(props.name);
+        }
+        return props;
+    },
 };

@@ -1,4 +1,5 @@
-import { ImagesCarouselDialog } from "./images_carousel_dialog";
+import { useSubEnv } from "@web/owl2/utils";
+import { MediaCarouselDialog } from "./media_carousel_dialog";
 import { StreamPostCommentList } from "./stream_post_comment_list";
 import { StreamPostCommentsReply } from "./stream_post_comments_reply";
 import { SocialPostFormatterMixin } from "./social_post_formatter_mixin";
@@ -8,21 +9,34 @@ import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { useService } from "@web/core/utils/hooks";
-import { Component, useSubEnv, useState } from "@odoo/owl";
+import { getFormattedRecord } from "@web/views/kanban/kanban_record";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 
 export class StreamPostComments extends SocialPostFormatterMixin(Component) {
-    static props = ["*"];
     static template = "social.StreamPostComments";
     static components = { Dialog };
+
+    props = useProps({
+        accountId: t.any(),
+        comments: t.any(),
+        commentsCount: t.any().optional(),
+        error: t.any().optional(),
+        nextRecordsToken: t.any().optional(),
+        onPostDeleted: t.any().optional(),
+        onPostUpdate: t.any().optional(),
+        originalPost: t.any(),
+        postId: t.any(),
+        title: t.any(),
+    });
 
     setup() {
         super.setup();
         this.orm = useService('orm');
         this.dialog = useService('dialog');
-        this.comments = useState(this.props.comments);
+        this.comments = proxy(this.props.comments);
         this.postId = this.props.postId;
 
-        this.state = useState({
+        this.state = proxy({
             displayModal: true,
             showLoadMoreComments: false,
             isEditMode: false,
@@ -43,12 +57,13 @@ export class StreamPostComments extends SocialPostFormatterMixin(Component) {
     // Handlers
     //----------
 
-    onClickMoreImages(index, images) {
-        this.dialog.add(ImagesCarouselDialog, {
-            title: _t("Post Images"),
+    onClickMoreMedias(index, medias) {
+        this.dialog.add(MediaCarouselDialog, {
+            title: _t("Post Medias"),
             activeIndex: index,
-            images: images
-        })
+            medias: medias,
+            mediaType: this.props.originalPost.data.media_type,
+        });
     }
 
     closeCommentsModal() {
@@ -66,16 +81,18 @@ export class StreamPostComments extends SocialPostFormatterMixin(Component) {
     onDeletePost() {
         this.dialog.add(ConfirmationDialog, {
             title: _t("Delete Post"),
-            body: _t("Do you really want to delete this Post ?"),
+            body: _t("Do you really want to delete this Post? It will also be deleted from %(platform)s.", {
+                platform: this.originalPost.media_type.value
+            }),
             confirm: async () => {
-                await rpc(`/social_${this.props.originalPost.media_type.raw_value}/delete_post`, {
-                    stream_post_id: this.originalPost.id.raw_value,
+                await rpc(`/social_${this.props.originalPost.data.media_type}/delete_post`, {
+                    stream_post_id: this.props.originalPost.resId,
                 });
                 if (this.props.onPostDeleted) {
                     this.props.onPostDeleted();
                 }
             },
-            confirmLabel: _t("Delete"),
+            confirmLabel: _t("Delete Post"),
             cancel: () => {},
         });
     }
@@ -94,8 +111,8 @@ export class StreamPostComments extends SocialPostFormatterMixin(Component) {
         this.state.isEditMode = false;
         this.state.message = textarea.value;
 
-        await rpc(`/social_${this.props.originalPost.media_type.raw_value}/edit_post`, {
-            stream_post_id: this.originalPost.id.raw_value,
+        await rpc(`/social_${this.props.originalPost.data.media_type}/edit_post`, {
+            stream_post_id: this.props.originalPost.resId,
             new_message: textarea.value,
         });
 
@@ -119,7 +136,7 @@ export class StreamPostComments extends SocialPostFormatterMixin(Component) {
     }
 
     get originalPost() {
-        return this.props.originalPost;
+        return getFormattedRecord(this.props.originalPost);
     }
 
     get JSON() {
@@ -148,5 +165,9 @@ export class StreamPostComments extends SocialPostFormatterMixin(Component) {
 
     get commentsDisabled() {
         return false;
+    }
+
+    get authorTitle() {
+        return this.props.originalPost.data.author_name || _t("Unknown");
     }
 }

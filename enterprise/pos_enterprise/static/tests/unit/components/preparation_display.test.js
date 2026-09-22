@@ -30,10 +30,10 @@ test("archiveAllVisibleOrders marks all last stage orders as done", async () => 
     const store = await setupPosPrepDisplayEnv();
     await createPrepDisplayTicket(store);
     const comp = await mountWithCleanup(PrepDisplay, {});
-    const states = store.data.models["pos.prep.state"].getAll();
-    states.forEach((s) => (s.stage_id = store.lastStage));
+    const prepLines = store.data.models["pos.prep.line"].getAll();
+    prepLines.forEach((s) => (s.stage_id = store.lastStage));
     comp.archiveAllVisibleOrders();
-    expect(states.every((s) => s.todo === false)).toBe(true);
+    expect(prepLines.every((s) => s.todo === false)).toBe(true);
 });
 
 test("clears selected filters and sets time to all", async () => {

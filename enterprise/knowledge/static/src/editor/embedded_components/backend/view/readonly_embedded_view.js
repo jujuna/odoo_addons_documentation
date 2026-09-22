@@ -1,21 +1,14 @@
 import { getEmbeddedProps } from "@html_editor/others/embedded_component_utils";
-import { EmbeddedView } from "@knowledge/views/embedded_view";
 import { WithLazyLoading } from "@knowledge/components/with_lazy_loading/with_lazy_loading";
+import { EmbeddedView } from "@knowledge/views/embedded_view";
+import { Component, onError, onWillStart, proxy, t, useListener, useProps } from "@odoo/owl";
 import { makeContext } from "@web/core/context";
-import { _t } from "@web/core/l10n/translation";
 import { useOwnDebugContext } from "@web/core/debug/debug_context";
+import { _t } from "@web/core/l10n/translation";
 import { useBus, useService } from "@web/core/utils/hooks";
+import { useSubEnv } from "@web/owl2/utils";
 import { CallbackRecorder } from "@web/search/action_hook";
 import { getDefaultConfig } from "@web/views/view";
-
-import {
-    Component,
-    onError,
-    onWillStart,
-    useExternalListener,
-    useState,
-    useSubEnv,
-} from "@odoo/owl";
 
 const VIEW_RECORDS_LIMITS = {
     kanban: 20,
@@ -27,20 +20,20 @@ export class ReadonlyEmbeddedViewComponent extends Component {
         EmbeddedView,
         WithLazyLoading
     };
-    static props = {
-        host: { type: Object },
-        viewProps: { type: Object },
-    };
     static template = "knowledge.EmbeddedView";
 
+    props = useProps({
+        host: t.object(),
+        viewProps: t.object(),
+    });
+
     setup() {
-        super.setup();
         this.actionService = useService("action");
         this.notificationService = useService("notification");
         this.uiService = useService("ui");
         this.viewFilters = useService("knowledgeEmbedViewsFilters");
         useOwnDebugContext(); // define a debug context when the developer mode is enable
-        this.state = useState({
+        this.state = proxy({
             error: false,
             isLoaded: false,
         });
@@ -80,12 +73,12 @@ export class ReadonlyEmbeddedViewComponent extends Component {
          * As a reminder, tabindex="-1" must be set in the template for an element to capture
          * focusin and focusout events.
          */
-        useExternalListener(this.props.host, "focusin", () => {
+        useListener(this.props.host, "focusin", () => {
             if (!this.props.host.contains(this.uiService.activeElement)) {
                 this.uiService.activateElement(this.props.host);
             }
         });
-        useExternalListener(this.props.host, "focusout", (event) => {
+        useListener(this.props.host, "focusout", (event) => {
             if (!this.props.host.contains(event.relatedTarget)) {
                 this.uiService.deactivateElement(this.props.host);
             }

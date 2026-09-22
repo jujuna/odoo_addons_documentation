@@ -34,7 +34,7 @@ class TestTaskGanttView(TestProjectCommon):
                 'user_ids': False,
             },
         ])
-        cls.env['project.task'].create([
+        cls.task1, cls.task2 = cls.env['project.task'].create([
             {
                 'name': 'Task 1',
                 'project_id': cls.project_gantt_test_1.id,
@@ -80,6 +80,29 @@ class TestTaskGanttView(TestProjectCommon):
             [('project_id', 'ilike', 'Project Test'), ('project_id', '!=', False)] + domain,
         )
         self.assertTrue(project_test in gantt_projects_data, 'Project Test should be displayed in the Gantt view')
+
+    def test_group_expand_project_ids_dynamic_dates(self):
+        project_test = self.env['project.project'].create({'name': 'Project Test'})
+        domain = [
+            ('project_id', 'ilike', 'Project Test'),
+            ('planned_date_begin', '>=', 'today'),
+            ('date_deadline', '>=', 'today +2d'),
+        ]
+        self.env['project.task'].create([
+            {
+                'name': 'Task',
+                'project_id': project_test.id,
+                'partner_id': self.partner_1.id,
+                'planned_date_begin': Datetime.now(),
+                'date_deadline': Datetime.now() + relativedelta(days=5),
+            }
+        ])
+        Task = self.env['project.task'].with_context({
+            'gantt_start_date': Datetime.now(),
+            'gantt_scale': 'week',
+        })
+        gantt_projects_data = Task._group_expand_project_ids(None, domain)
+        self.assertEqual(gantt_projects_data, project_test)
 
     def test_group_expand_partner_ids(self):
         """
@@ -297,14 +320,131 @@ class TestTaskGanttView(TestProjectCommon):
         })
         task._compute_allocated_hours()
 
-    def test_gantt_view_company_calendar_flexible_hours(self):
-        """Ensure the Gantt view handles correctly company calendars with flexible hours"""
+    def test_print_tasks(self):
+        self.env.user.tz = 'UTC'
+        lang = self.env['res.lang']._lang_get(self.env.user.lang or 'en_US')
+        lang.week_start = '7'
 
-        company_calendar = self.env.company.resource_calendar_id
-        company_calendar.write({'flexible_hours': True})
+        self.task1.write({
+            'planned_date_begin': '2022-03-07 00:00:00',
+            'date_deadline': '2024-03-08 23:59:59',
+        })
+        self.task2.write({
+            'planned_date_begin': '2023-01-02 12:00:00',
+            'date_deadline': '2023-01-08 12:00:00',
+        })
+        action = self.env['project.task'].with_context(discard_logo_check=True).action_print_tasks(
+            date_start='2023-01-01 00:00:00',
+            date_end='2023-01-16 23:59:59',
+            domain=[['planned_date_begin', '<', '2023-01-16 23:59:59'], ['date_deadline', '>', '2023-01-01 00:00:00']],
+            scale="week",
+            cell_time=12,
+        )
 
-        Task = self.env['project.task']
-        group_by = ['user_ids']
-        start_date, stop_date = Datetime.now().strftime('%Y-%m-%d 00:00:00'), (Datetime.now() + relativedelta(days=30)).strftime('%Y-%m-%d 23:59:59')
-        gantt_data = Task.get_gantt_data([], group_by, {'display_name': {}}, unavailability_fields=group_by, progress_bar_fields=group_by, start_date=start_date, stop_date=stop_date, scale='month')
-        self.assertEqual(gantt_data["unavailabilities"]['user_ids'][False], [], 'There should be no unavailability intervals when the company calendar has flexible hours.')
+        weeks = action["data"]["grid"]
+        self.assertEqual(len(weeks), 3)
+        self.assertEqual(weeks[0]['title'], 'Week 1 (Jan 1–7, 2023)')
+        self.assertEqual(weeks[0]['tasks'], [
+            {
+                'title': 'Task 1',
+                'style': 'background-color: #80c3c2;',
+                'cell_start': 1,
+                'cell_end': 7,
+            },
+            {
+                'title': 'Task 2',
+                'style': 'background-color: #80c3c2;left: 8.333333333333334% !important;',
+                'cell_start': 2,
+                'cell_end': 7,
+            },
+        ], "Task 2 starts at 12:00, so the pill should only cover the right half of the first cell")
+
+        self.assertTrue(weeks[0]['days'][0]['formated_day'].startswith('Sun'), "With Sunday as start of week, the first week should start on Sun")
+
+        self.assertEqual(weeks[1]['title'], 'Week 2 (Jan 8–14, 2023)')
+        self.assertEqual(
+            weeks[1]['tasks'],
+            [
+                {
+                    'title': 'Task 1',
+                    'style': 'background-color: #80c3c2;',
+                    'cell_start': 1,
+                    'cell_end': 7,
+                },
+                {
+                    'title': 'Task 2',
+                    'style': 'background-color: #80c3c2;right: 50.0% !important;',
+                    'cell_start': 1,
+                    'cell_end': 1,
+                },
+            ],
+            "Week 2: Task 2 ends at 12:00, so the pill should only cover the left half of the last cell",
+        )
+
+        self.assertEqual(weeks[2]['title'], 'Week 3 (Jan 15–16, 2023)')
+        self.assertEqual(
+            weeks[2]['tasks'],
+            [
+                {
+                    'title': 'Task 1',
+                    'style': 'background-color: #80c3c2;',
+                    'cell_start': 1,
+                    'cell_end': 2,
+                },
+            ],
+            "Week 3: Only Task 1 exists and spans full width",
+        )
+
+        for scale in ["month", "quarter", "year"]:
+            action = self.env['project.task'].with_context(discard_logo_check=True).action_print_tasks(
+                date_start='2023-01-01 00:00:00',
+                date_end='2023-02-16 23:59:59',
+                domain=[['planned_date_begin', '<', '2023-01-16 23:59:59'], ['date_deadline', '>', '2023-01-01 00:00:00']],
+                scale=scale,
+                cell_time=24,
+            )
+            periods = action["data"]["grid"]
+            self.assertEqual(len(periods), 2)
+
+            self.assertEqual(periods[0]['title'], 'January 2023')
+            self.assertEqual(
+                periods[0]['tasks'],
+                [
+                    {
+                        'title': 'Task 1',
+                        'style': 'background-color: #80c3c2;',
+                        'cell_start': 1,
+                        'cell_end': 31,
+                    },
+                    {
+                        'title': 'Task 2',
+                        'style': 'background-color: #80c3c2;',
+                        'cell_start': 2,
+                        'cell_end': 8,
+                    },
+                ],
+            )
+
+    def test_gantt_unavailability_flexible_employee_no_leaves(self):
+        """Flex employee with no leaves should have no Gantt unavailabilities."""
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'company_id': self.env.company.id,
+        })
+        self.env['resource.resource'].create({
+            'name': self.user_gantt_test_1.name,
+            'user_id': self.user_gantt_test_1.id,
+            'calendar_id': flexible_calendar.id,
+            'company_id': self.env.company.id,
+        })
+        start = Datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        stop = start + relativedelta(days=30)
+        result = self.env['project.task']._gantt_unavailability(
+            'user_ids', [self.user_gantt_test_1.id], start, stop, 'month'
+        )
+        self.assertEqual(
+            result[self.user_gantt_test_1.id], [],
+            "Flex employee with no leaves should have no unavailabilities.",
+        )

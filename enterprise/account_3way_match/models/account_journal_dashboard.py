@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import fields, models
+from odoo import models
 from odoo.fields import Domain
 from odoo.tools import SQL
 
@@ -31,7 +31,7 @@ class AccountJournal(models.Model):
             ('journal_id', 'in', self.filtered(lambda j: j.type == 'purchase').ids),
             ('move_type', 'in', self.env['account.move'].get_purchase_types(include_receipts=False)),
             '|',
-            ('invoice_date_due', '<', fields.Date.today()),
+            ('invoice_date_due', '<', 'today'),
             ('release_to_pay', '=', 'yes')
         ]
         domain = Domain.AND([

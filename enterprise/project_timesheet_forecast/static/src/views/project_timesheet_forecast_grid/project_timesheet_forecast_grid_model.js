@@ -13,7 +13,8 @@ patch(TimesheetGridModel.prototype, {
 
         if (
             !searchParams.context.group_expand ||
-            this.navigationInfo.periodEnd <= this.today
+            this.navigationInfo.periodEnd <= this.today ||
+            sectionField?.name === "employee_id"
         ) {
             return additionalGroups;
         }
@@ -24,7 +25,7 @@ patch(TimesheetGridModel.prototype, {
          * (depending on the scale).
          */
 
-        const validPlanningFields = ["project_id", "employee_id"];
+        const validPlanningFields = ["project_id", "task_id"];
         const validRowFields = [];
         if (sectionField && validPlanningFields.includes(sectionField.name)) {
             validRowFields.push(sectionField.name);
@@ -40,9 +41,9 @@ patch(TimesheetGridModel.prototype, {
         }
 
         const domain = new Domain([
-            ["employee_id", "!=", false],
-            ["employee_id.user_id", "in", [false, searchParams.context.uid]],
-            ["state", "=", "published"],
+            ["resource_ids.resource_type", "=", 'user'],
+            ["user_ids", "in", [false, searchParams.context.uid]],
+            ["state", "=", "2_published"],
             ["project_id.allow_timesheets", "=", true],
             ["start_datetime", "<", serializeDate(this.navigationInfo.periodEnd)],
             ["end_datetime", ">", serializeDate(this.navigationInfo.periodStart)],
@@ -52,11 +53,14 @@ patch(TimesheetGridModel.prototype, {
         const searchDomain = new Domain(searchParams.domain);
         let additionalDomain = searchDomain;
         for (const tuple of searchDomain.ast.value) {
-            if (
-                tuple.type === 10
-                && !['project_id', 'employee_id', 'user_id'].includes(tuple.value[0].value)
-            ) {
-                fieldsToRemove.push(tuple.value[0].value);
+            if (tuple.type === 10) {
+                const fName = tuple.value[0].value;
+                if (!['project_id', 'task_id', 'employee_id', 'user_id'].includes(fName)) {
+                    fieldsToRemove.push(tuple.value[0].value);
+                }
+                if (['employee_id', 'user_id'].includes(fName)) {
+                    tuple.value[0].value += 's'
+                }
             }
         }
         if (fieldsToRemove.length) {

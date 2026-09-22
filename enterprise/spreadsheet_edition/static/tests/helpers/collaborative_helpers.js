@@ -8,6 +8,7 @@ import { OdooDataProvider } from "@spreadsheet/data_sources/odoo_data_provider";
 import { expect } from "@odoo/hoot";
 import { OdooPivot } from "@spreadsheet/pivot/odoo_pivot";
 import { waitForDataLoaded } from "@spreadsheet/helpers/model";
+import { getMockEnv } from "@web/../tests/web_test_helpers";
 
 /**
  * @typedef {import("@spreadsheet").OdooSpreadsheetModel} Model
@@ -48,7 +49,8 @@ export function leaveSession(spreadsheetChannel, clientId) {
  * Setup a realtime collaborative test environment, with the given data
  */
 export async function setupCollaborativeEnv(serverData) {
-    const env = await makeSpreadsheetMockEnv({ serverData });
+    await makeSpreadsheetMockEnv({ serverData });
+    const env = getMockEnv();
 
     const network = new MockSpreadsheetCollaborativeChannel();
     const model = new Model();

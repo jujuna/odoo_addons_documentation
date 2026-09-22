@@ -1,9 +1,4 @@
--- Unset Firebase configuration within website
-UPDATE website
-   SET firebase_enable_push_notifications = false,
-       firebase_use_own_account = false,
-       firebase_project_id = NULL,
-       firebase_web_api_key = NULL,
-       firebase_web_app_id = NULL,
-       firebase_push_certificate_key = NULL,
-       firebase_sender_id = NULL;
+-- Delete VAPID public and private keys:
+DELETE FROM ir_config_parameter WHERE key IN (
+    'social_push_notifications.vapid_public_key',
+    'social_push_notifications.vapid_private_key');

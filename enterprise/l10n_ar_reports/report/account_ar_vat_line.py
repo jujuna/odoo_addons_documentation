@@ -2,6 +2,8 @@
 from odoo import api, fields, models, tools
 from odoo.tools import SQL
 
+from odoo.addons.l10n_ar.tools.partner_identifiers import AR_CUIT_AFIP_CODE
+
 
 class AccountArVatLine(models.Model):
     """ Base model for new Argentine VAT reports. The idea is that these lines have all the necessary data and which any
@@ -66,7 +68,7 @@ class AccountArVatLine(models.Model):
 
     def open_journal_entry(self):
         self.ensure_one()
-        return self.move_id.get_formview_action()
+        return self.move_id.get_record_default_action()
 
     def init(self):
         cr = self.env.cr
@@ -79,12 +81,12 @@ class AccountArVatLine(models.Model):
         cr.execute(sql)
 
     @property
-    def _table_query(self):
-        return self._ar_vat_line_build_query()
+    def _table_sql(self):
+        return SQL("(%s)", self._ar_vat_line_build_query())
 
     @api.model
     def _ar_vat_line_build_query(self, table_references=None, search_condition=None,
-                                 column_group_key='', tax_types=('sale', 'purchase')) -> SQL:
+                                 column_group_index='', tax_types=('sale', 'purchase')) -> SQL:
         """Returns the SQL Select query fetching account_move_lines info in order to build the pivot view for the VAT summary.
         This method is also meant to be used outside this model, which is the reason why it gives the opportunity to
         provide a few parameters, for which the defaults are used in this model.
@@ -123,9 +125,9 @@ class AccountArVatLine(models.Model):
                     GROUP BY aml.id, aml.move_id, aml.balance
                 )
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     account_move.id,
-                    (CASE WHEN lit.l10n_ar_afip_code = '80' THEN rp.vat ELSE NULL END) AS cuit,
+                    (CASE WHEN rp.l10n_ar_afip_code = %(cuit_afip_code)s THEN rp.vat ELSE NULL END) AS cuit,
                     art.name AS afip_responsibility_type_name,
                     rp.name AS partner_name,
                     COALESCE(tax.type_tax_use, base.type_tax_use) AS tax_type,
@@ -169,20 +171,19 @@ class AccountArVatLine(models.Model):
                 LEFT JOIN
                     res_partner rp ON rp.id = account_move.commercial_partner_id
                 LEFT JOIN
-                    l10n_latam_identification_type lit ON rp.l10n_latam_identification_type_id = lit.id
-                LEFT JOIN
                     l10n_ar_afip_responsibility_type art ON account_move.l10n_ar_afip_responsibility_type_id = art.id
                 WHERE
                     (account_move_line.tax_line_id IS NOT NULL OR base.vat_code IS NOT NULL)
                         AND (tax.type_tax_use IN %(tax_types)s OR base.type_tax_use IN %(tax_types)s)
                 %(search_condition)s
                 GROUP BY
-                    account_move.id, art.name, rp.id, lit.id, COALESCE(tax.type_tax_use, base.type_tax_use)
+                    account_move.id, art.name, rp.id, COALESCE(tax.type_tax_use, base.type_tax_use)
 
                 ORDER BY
                     account_move.invoice_date, account_move.name
             """,
-            column_group_key=column_group_key,
+            column_group_index=column_group_index,
+            cuit_afip_code=AR_CUIT_AFIP_CODE,
             table_references=table_references,
             tax_types=tax_types,
             search_condition=search_condition,

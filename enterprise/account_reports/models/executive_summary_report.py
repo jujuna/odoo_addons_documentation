@@ -5,12 +5,19 @@ from odoo import fields, models
 from odoo.exceptions import UserError
 
 
-class AccountReport(models.Model):
-    _inherit = 'account.report'
+class ExecutiveSummaryCustomHandler(models.AbstractModel):
+    _name = 'account.executive.summary.report.handler'
+    _inherit = 'account.report.custom.handler'
+    _description = 'Executive Summary Custom Handler'
 
-    def _report_custom_engine_executive_summary_ndays(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
-        if current_groupby or next_groupby:
+    def _report_engine_executive_summary_ndays(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        if current_groupby:
             raise UserError(self.env._("NDays expressions of executive summary report don't support the 'group by' feature."))
 
-        date_diff = fields.Date.from_string(options['date']['date_to']) - fields.Date.from_string(options['date']['date_from'])
-        return {'result': date_diff.days}
+        date_to = fields.Date.from_string(options['date']['date_to'])
+        # in 'single' date mode, uses the company's fiscal-year start date
+        date_from = (
+            fields.Date.from_string(options["date"]["date_from"])
+            or self.env.company.compute_fiscalyear_dates(date_to)["date_from"]
+        )
+        return {next(iter(formulas_dict.values())): {'result': (date_to - date_from).days + 1, 'has_sublines': False}}

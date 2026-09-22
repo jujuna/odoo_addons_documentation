@@ -7,7 +7,6 @@ from psycopg2.errors import LockNotAvailable
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.tools import groupby
 from odoo.tools.float_utils import json_float_round
 
 
@@ -96,7 +95,7 @@ class StockMove(models.Model):
     def _action_done(self, cancel_backorder=False):
         # EXTENDS 'stock'
         res = super()._action_done(cancel_backorder=cancel_backorder)
-        if self.filtered(lambda m: m.l10n_ke_oscu_flow_type_code):
+        if res.filtered(lambda m: m.l10n_ke_oscu_flow_type_code):
             self.env.ref('l10n_ke_edi_oscu_stock.ir_cron_send_stock_moves')._trigger()
         return res
 
@@ -118,7 +117,7 @@ class StockMove(models.Model):
             product = move.product_id  # for ease of use
             taxes = product.taxes_id.filtered(lambda tax: tax.l10n_ke_tax_type_id)
             tax_rate = (taxes[0].amount / 100) if taxes else 0
-            quantity_product_uom = move.product_uom._compute_quantity(move.quantity, move.product_id.uom_id)
+            quantity_product_uom = move.uom_id._compute_quantity(move.quantity, move.product_id.uom_id)
 
             # but get from product for now
             price = abs(move._get_price_unit()) * (move.quantity / quantity_product_uom)
@@ -133,7 +132,7 @@ class StockMove(models.Model):
                 'bcd':       product.barcode or '',                        # Barcode
                 'pkgUnitCd': product.l10n_ke_packaging_unit_id.code,       # Packaging unit code
                 'pkg':       json_float_round(quantity_product_uom / product.l10n_ke_packaging_quantity, 2),  # Packaging quantity
-                'qtyUnitCd': move.product_uom.l10n_ke_quantity_unit_id.code,  # UoM (but as defined by Kenya)
+                'qtyUnitCd': move.uom_id.l10n_ke_quantity_unit_id.code,  # UoM (but as defined by Kenya)
                 'qty':       json_float_round(move.quantity, 2),           # Quantity
                 'prc':       json_float_round(price, 2),                   # Unit price cost
                 'splyAmt':   json_float_round(base_amount, 2),             # Cost of items
@@ -204,10 +203,7 @@ class StockMove(models.Model):
         # Moves with a picking should grouped by picking ID. Moves without should be grouped by flow type code and date.
         # Only send moves for products that were successfully registered.
         moves_to_send = self.filtered(lambda m: m.product_id.l10n_ke_item_code)
-        move_send_batches = {
-            move_batch_key: self.env['stock.move'].union(*moves).with_prefetch(moves_to_send.ids)
-            for move_batch_key, moves in groupby(moves_to_send, lambda m: (m.picking_id, m.l10n_ke_oscu_flow_type_code, m.date))
-        }
+        move_send_batches = moves_to_send.grouped(lambda m: (m.picking_id, m.l10n_ke_oscu_flow_type_code, m.date))
         move_batches_data = defaultdict(dict)
         products_to_send_stock_master = self.env['product.product']
         for move_batch_key, moves in move_send_batches.items():
@@ -278,11 +274,11 @@ class StockMove(models.Model):
                     i += 1
                 attachment = self.env['ir.attachment'].create({
                     'name': filename,
-                    'raw': json.dumps(contents, indent=4),
+                    'raw': json.dumps(contents, indent=4).encode(),
                     'res_model': picking.id and 'stock.picking',
                     'res_id': picking.id,
                 })
-                moves.sudo().l10n_ke_oscu_attachment_file = attachment.datas
+                moves.sudo().l10n_ke_oscu_attachment_file = attachment.raw
 
         return is_error
 
@@ -301,7 +297,7 @@ class StockMove(models.Model):
             ]
 
             # This param is set when l10n_ke_edi_oscu_stock is installed, and ensures that old moves are not sent.
-            if from_date := self.env['ir.config_parameter'].sudo().get_param('l10n_ke.start_stock_date'):
+            if from_date := self.env['ir.config_parameter'].sudo().get_str('l10n_ke.start_stock_date'):
                 moves_need_reporting_domain += [('date', '>=', from_date)]
 
             # We set the env company here because it is needed for the stock master to correctly compute product quantities.
@@ -315,7 +311,7 @@ class StockMove(models.Model):
                     if m.picking_id
                     else (
                         not m.product_id._l10n_ke_get_validation_messages()
-                        and not m.product_uom._l10n_ke_get_validation_messages()
+                        and not m.uom_id._l10n_ke_get_validation_messages()
                     )
                 )
             )
@@ -328,7 +324,7 @@ class StockMove(models.Model):
             raise UserError(_("This stock move has already been sent."))
         if any(p._l10n_ke_get_validation_messages() for p in self.product_id):
             raise UserError(_("Information is missing on the product."))
-        if any(uom._l10n_ke_get_validation_messages() for uom in self.product_uom):
+        if any(uom._l10n_ke_get_validation_messages() for uom in self.uom_id):
             raise UserError(_("Information is missing on the unit of measure."))
 
         is_error = self._l10n_ke_oscu_process_moves()

@@ -10,9 +10,10 @@ from odoo import tools, models, fields, api, _
 from odoo.addons.mail.tools import link_preview
 from odoo.exceptions import UserError
 from odoo.fields import Domain
+from odoo.tools import OrderedSet
 from odoo.tools.mail import validate_url
 
-LINK_TRACKER_UNIQUE_FIELDS = ('url', 'campaign_id', 'medium_id', 'source_id', 'label')
+LINK_TRACKER_UNIQUE_FIELDS = ('url', 'campaign_id', 'medium_id', 'source_id', 'utm_reference', 'label')
 
 _logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ class LinkTracker(models.Model):
     # URL info
     url = fields.Char(string='Target URL', required=True)
     absolute_url = fields.Char("Absolute URL", compute="_compute_absolute_url")
-    short_url = fields.Char(string='Tracked URL', compute='_compute_short_url')
+    short_url = fields.Char(string='Tracked URL', compute='_compute_short_url', search='_search_short_url')
     redirected_url = fields.Char(string='Redirected URL', compute='_compute_redirected_url')
     short_url_host = fields.Char(string='Host of the short URL', compute='_compute_short_url_host')
     title = fields.Char(string='Page Title', store=True)
@@ -50,6 +51,20 @@ class LinkTracker(models.Model):
     campaign_id = fields.Many2one(ondelete='set null')
     medium_id = fields.Many2one(ondelete='set null')
     source_id = fields.Many2one(ondelete='set null')
+
+    def _search_short_url(self, operator, value):
+        """Remove the base url and the `/r/` from the given value, and only search for link trackers
+        that have a code that matches the entered value.
+        """
+        base = self.get_base_url() + '/r/'
+        if isinstance(value, str):
+            link_tracker_code = value.replace(base, '')
+        elif isinstance(value, OrderedSet):
+            link_tracker_code = [v.replace(base, '') if isinstance(v, str) else v for v in value]
+        else:
+            return NotImplemented
+
+        return [('link_code_ids.code', operator, link_tracker_code)]
 
     @api.depends("url")
     def _compute_absolute_url(self):
@@ -104,7 +119,7 @@ class LinkTracker(models.Model):
         `link_tracker.no_external_tracking` is set, we add the UTM values in the URL
         *only* for URLs that redirect to the local website (base URL).
         """
-        no_external_tracking = self.env['ir.config_parameter'].sudo().get_param('link_tracker.no_external_tracking')
+        no_external_tracking = self.env['ir.config_parameter'].sudo().get_bool('link_tracker.no_external_tracking')
 
         for tracker in self:
             base_domain = urls.url_parse(tracker.get_base_url()).netloc
@@ -119,6 +134,8 @@ class LinkTracker(models.Model):
                 attr = tracker[field_name]
                 if field.type == 'many2one':
                     attr = attr.name
+                elif field.type == 'reference' and attr:
+                    attr = f'{attr._name},{attr.id}'
                 if attr:
                     query[key] = attr
 
@@ -151,6 +168,9 @@ class LinkTracker(models.Model):
                 [('campaign_id', '=', tracker.campaign_id.id)],
                 [('medium_id', '=', tracker.medium_id.id)],
                 [('source_id', '=', tracker.source_id.id)],
+                [('utm_reference',
+                  '=',
+                  f'{tracker.utm_reference._name},{tracker.utm_reference.id}' if tracker.utm_reference else False)],
                 [('label', '=', tracker.label) if tracker.label else ('label', 'in', (False, ''))],
             ])
             for tracker in self
@@ -166,11 +186,11 @@ class LinkTracker(models.Model):
                 duplicates += tracker
         if duplicates:
             error_lines = '\n- '.join(
-                str((tracker.url, tracker.campaign_id.name, tracker.medium_id.name, tracker.source_id.name, tracker.label or '""'))
+                str((tracker.url, tracker.campaign_id.name, tracker.medium_id.name, tracker.source_id.name, tracker.utm_reference, tracker.label or '""'))
                 for tracker in duplicates
             )
             raise UserError(
-                _('Combinations of Link Tracker values (URL, campaign, medium, source, and label) must be unique.\n'
+                _('Combinations of Link Tracker values (URL, campaign, medium, source, reference, and label) must be unique.\n'
                   'The following combinations are already used: \n- %(error_lines)s', error_lines=error_lines))
 
     @api.model_create_multi
@@ -214,10 +234,24 @@ class LinkTracker(models.Model):
 
         def _format_key(obj):
             """Generate unique 'key' of trackers, allowing to find duplicates."""
-            return tuple(
-                (field_name, obj[field_name].id if isinstance(obj[field_name], models.BaseModel) else obj[field_name])
-                for field_name in LINK_TRACKER_UNIQUE_FIELDS
-            )
+            key_value_pairs = []
+            for field_name in LINK_TRACKER_UNIQUE_FIELDS:
+                if isinstance(obj[field_name], models.BaseModel):
+                    if field_name == 'utm_reference':
+                        if obj[field_name]:
+                            # to be able to compare with create vals, we re-format to 'model,id'
+                            field_value = f'{obj[field_name]._name},{obj[field_name].id}'
+                        else:
+                            field_value = False
+                    else:
+                        field_value = obj[field_name].id
+                elif obj[field_name]:
+                    field_value = obj[field_name]
+                else:
+                    field_value = False
+                key_value_pairs.append((field_name, field_value))
+
+            return tuple(key_value_pairs)
 
         def _format_key_domain(field_values):
             """Handle "label" being False / '' and be defensive."""
@@ -262,6 +296,16 @@ class LinkTracker(models.Model):
 
     def _convert_links_text(self, body, vals, blacklist=None):
         raise NotImplementedError('Moved on mail.render.mixin')
+
+    def action_download_qrcode(self):
+        self.ensure_one()
+        url = urls.url_quote_plus(self.short_url)
+
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/report/barcode/QR/{url}?width=500&height=500&download=1",
+            "target": "self",
+        }
 
     def action_view_statistics(self):
         action = self.env['ir.actions.act_window']._for_xml_id('link_tracker.link_tracker_click_action_statistics')

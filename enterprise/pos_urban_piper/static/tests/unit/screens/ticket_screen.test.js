@@ -1,11 +1,59 @@
 import { definePosModels } from "@point_of_sale/../tests/unit/data/generate_model_definitions";
-import { test, expect } from "@odoo/hoot";
+import { test, expect, waitFor, animationFrame } from "@odoo/hoot";
 import { mountWithCleanup } from "@web/../tests/web_test_helpers";
 import { TicketScreen } from "@point_of_sale/app/screens/ticket_screen/ticket_screen";
+import { getFilledOrder } from "@point_of_sale/../tests/unit/utils";
 import { getUrbanPiperFilledOrder } from "@pos_urban_piper/../tests/unit/utils";
 import { setupPosEnvForPrepDisplay } from "@pos_enterprise/../tests/unit/utils";
 
 definePosModels();
+
+test("togglePlatformFilter", async () => {
+    const store = await setupPosEnvForPrepDisplay();
+    const comp = await mountWithCleanup(TicketScreen, {});
+
+    const order1 = await getUrbanPiperFilledOrder(store);
+    order1.delivery_status = "food_ready";
+    await waitFor(".info-column");
+    expect(".info-column").toHaveCount(1);
+    const order2 = await getFilledOrder(store);
+    const preset = store.models["pos.preset"].get(1);
+
+    comp.togglePlatformFilter();
+    expect(comp.state.isPlatformFilterActive).toBe(true);
+    comp.togglePlatformFilter();
+
+    await animationFrame();
+    expect(".info-column").toHaveCount(2);
+
+    expect(comp.state.selectedPreset).toBe(null);
+    expect(comp.state.selectedOrderUuid).toBe(order1.uuid);
+
+    comp.onPresetSelected(preset);
+    await animationFrame();
+    expect(".info-column").toHaveCount(1);
+    expect(comp.state.isPlatformFilterActive).toBe(false);
+    expect(comp.state.selectedPreset.id).toBe(preset.id);
+    expect(comp.state.selectedOrderUuid).toBe(order2.uuid);
+});
+
+test("onPresetSelected", async () => {
+    const store = await setupPosEnvForPrepDisplay();
+    const comp = await mountWithCleanup(TicketScreen, {});
+
+    const preset = store.models["pos.preset"].get(1);
+    const order1 = await getUrbanPiperFilledOrder(store); //UrbanPiper Order
+    order1.delivery_status = "food_ready";
+    const order_2 = await getFilledOrder(store); //Normal Order
+
+    expect(comp.state.isPlatformFilterActive).toBe(false);
+    expect(comp.state.selectedPreset).toBe(null);
+
+    comp.onPresetSelected(preset);
+    expect(comp.state.isPlatformFilterActive).toBe(false);
+    expect(comp.state.selectedPreset.id).toBe(preset.id);
+    expect(comp.state.selectedOrderUuid).toBe(order_2.uuid);
+});
 
 test("_getSearchFields", async () => {
     await setupPosEnvForPrepDisplay();
@@ -19,6 +67,7 @@ test("_getSearchFields", async () => {
         "PARTNER",
         "DELIVERYPROVIDER",
         "ORDERSTATUS",
+        "DELIVERYID",
     ]);
 });
 
@@ -65,10 +114,13 @@ test("getDate", async () => {
     expect(comp.getDate(order)).toMatch(/\d{2}\/\d{2}\/\d{4}/);
 });
 
-test("postRefund", async () => {
+test("shouldShowPlatformFilterButton", async () => {
     const store = await setupPosEnvForPrepDisplay();
-    const order = await getUrbanPiperFilledOrder(store);
     const comp = await mountWithCleanup(TicketScreen, {});
-    comp.postRefund(order);
-    expect(order.isDeliveryRefundOrder).toBe(true);
+
+    store.config.module_pos_urban_piper = false;
+    expect(comp.shouldShowPlatformFilterButton()).toBe(false);
+
+    store.config.module_pos_urban_piper = true;
+    expect(comp.shouldShowPlatformFilterButton()).toBe(true);
 });

@@ -1,8 +1,8 @@
-import { KanbanCompiler } from "@web/views/kanban/kanban_compiler";
+import { CardCompiler } from "@web/views/card/card_compiler";
 import { append, createElement } from "@web/core/utils/xml";
 import { evaluateExpr } from "@web/core/py_js/py";
 
-export class PayRunKanbanCompiler extends KanbanCompiler {
+export class PayRunKanbanCompiler extends CardCompiler {
     setup() {
         super.setup();
         this.compilers.push({ selector: "[t-name='menu']", fn: this.compileMenu });
@@ -39,6 +39,7 @@ export class PayRunKanbanCompiler extends KanbanCompiler {
         }
 
         const buttonBox = createElement("PayRunButtonBox");
+
         let slotId = 0;
         for (const child of el.children) {
             const options = evaluateExpr(child.getAttribute("options") || "{}");
@@ -48,8 +49,10 @@ export class PayRunKanbanCompiler extends KanbanCompiler {
                 isSmartButton: JSON.stringify(options?.is_smart_button),
                 isPriority: JSON.stringify(options?.is_priority),
             });
-            child.classList.add("border-0", "flex-grow-1", "oe_stat_button");
-            append(mainSlot, this.compileNode(child, params, false));
+            // compileNode strips the button's classes if we don't clone the node
+            const button = child.cloneNode(true);
+            button.classList.add("border-0", "flex-grow-1", "oe_stat_button");
+            append(mainSlot, this.compileNode(button, params, false));
             append(buttonBox, mainSlot);
         }
         return buttonBox;

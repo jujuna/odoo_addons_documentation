@@ -10,6 +10,7 @@ class ResConfigSettings(models.TransientModel):
 
     l10n_be_codaclean_iap_token = fields.Char(related="company_id.l10n_be_codaclean_iap_token", readonly=False)
     l10n_be_codaclean_is_connected = fields.Boolean(related="company_id.l10n_be_codaclean_is_connected")
+    l10n_be_codaclean_soda_journal = fields.Many2one(related="company_id.l10n_be_codaclean_soda_journal", readonly=False)
 
     def l10n_be_codaclean_refresh_connection_status(self):
         self.ensure_one()

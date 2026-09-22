@@ -9,8 +9,8 @@
                 <setting
                     string="Push Notifications"
                     help="Configure Push Notifications">
-                    <field name="firebase_enable_push_notifications"/>
-                    <div class="content-group" invisible="not firebase_enable_push_notifications">
+                    <field name="enable_push_notifications"/>
+                    <div class="content-group" invisible="not enable_push_notifications">
                         <div class="mt16">
                             <label for="notification_request_title" string="Title" class="o_form_label"/>
                             <field name="notification_request_title" class="w-100"
@@ -30,35 +30,8 @@
                             <label for="notification_request_icon" string="Icon" class="o_form_label pe-2"/>
                             <field name="notification_request_icon" class="oe_inline"/>
                         </div>
-                    </div>
-                </setting>
-                <setting invisible="not firebase_enable_push_notifications" groups="base.group_no_one" help="Use your own Firebase Account for this website's push notifications">
-                    <field name="firebase_use_own_account"/>
-                    <div class="content-group" invisible="not firebase_use_own_account">
                         <div class="mt16">
-                            <label for="firebase_project_id" string="Project ID" class="o_form_label"/>
-                            <field name="firebase_project_id" class="w-100" placeholder='e.g. "my-project-id"'/>
-                        </div>
-                        <div class="mt16">
-                            <label for="firebase_web_app_id" string="App ID" class="o_form_label"/>
-                            <field name="firebase_web_app_id" class="w-100" placeholder='e.g. "1:280765099157:web:7c7b7d7b7d7b7d7b7d7b7d"'/>
-                        </div>
-                        <div class="mt16">
-                            <label for="firebase_web_api_key" string="Web API Key" class="o_form_label"/>
-                            <field name="firebase_web_api_key" class="w-100" placeholder='e.g. "BIzbSyXhhsFHEgphW55CSg5cV7h7c_S-AuTMKc9"'/>
-                        </div>
-                        <div class="mt16">
-                            <label for="firebase_push_certificate_key" string="Push Certificate Key ID" class="o_form_label"/>
-                            <field name="firebase_push_certificate_key" class="w-100"
-                                    placeholder='e.g. "CCSc77KP_LX8dTAogFakOoJ_VqNP15u0-43psDJe__a9B..."'/>
-                        </div>
-                        <div class="mt16">
-                            <label for="firebase_sender_id" string="Sender ID" class="o_form_label"/>
-                            <field name="firebase_sender_id" class="w-100" placeholder='e.g. "280765099157"'/>
-                        </div>
-                        <div class="mt16">
-                            <label for="firebase_admin_key_file" string="Key File" class="o_form_label pe-2"/>
-                            <field name="firebase_admin_key_file"/>
+                            <widget name="push_notification_request_preview_button"/>
                         </div>
                     </div>
                 </setting>

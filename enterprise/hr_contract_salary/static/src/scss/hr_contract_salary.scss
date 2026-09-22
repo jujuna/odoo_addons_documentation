@@ -303,3 +303,19 @@
 .hr_cs_brand_optional {
     color: $o-brand-primary;
 }
+
+.o_slideable {
+    --slide-duration: 300ms;
+    --slide-height: 0px;
+    overflow: hidden;
+    height: var(--slide-height);
+    opacity: 1;
+    transition: all var(--slide-duration) ease;
+}
+
+.o_slideable.closed {
+    height: 0;
+    opacity: 0;
+    padding-block: 0;
+    margin-block: 0;
+}

@@ -6,11 +6,14 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestRealEstateBOEGeneration(TestEsAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.estate = cls.env['l10n_es_reports.real.estate'].create({
             'name': "Estate",
+            'real_estate_location': '1',
             'cadastral_reference': '1',
             'street_type': 'type',
             'street_name': 'street',
@@ -27,6 +30,4 @@ class TestRealEstateBOEGeneration(TestEsAccountReportsCommon):
             invoice.l10n_es_reports_mod347_invoice_type = 'real_estates'
             invoice.l10n_es_real_estate_id = self.estate
             invoice.action_post()
-        report = self.env.ref('l10n_es_reports.mod_347')
-        options = self._generate_options(report, fields.Date.from_string('2020-01-01'), fields.Date.from_string('2020-12-31'))
-        self._check_boe_export(report, options, 347)
+        self._check_boe_export(347)

@@ -3,7 +3,6 @@ import { useSignViewButtons } from "@sign/views/hooks";
 import { Dropdown, DropdownItem } from "@web/core/dropdown/dropdown";
 
 export class SignKanbanController extends KanbanController {
-    static template = "sign.SignKanbanController";
     static components = {
         ...KanbanController.components,
         Dropdown,
@@ -11,8 +10,7 @@ export class SignKanbanController extends KanbanController {
     };
 
     setup() {
-        super.setup(...arguments);
-        const functions = useSignViewButtons();
-        Object.assign(this, functions);
+        super.setup();
+        this.signButtons = useSignViewButtons();
     }
 }

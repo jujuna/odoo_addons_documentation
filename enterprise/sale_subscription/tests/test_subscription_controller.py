@@ -1,14 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import datetime
-import json
 from datetime import date
 from unittest.mock import patch
 
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
-from odoo import Command, http
+from odoo import Command
 from odoo.tests import new_test_user, tagged
 from odoo.tools import mute_logger
 from odoo.tools.misc import get_lang
@@ -23,6 +22,8 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 
 @tagged("post_install", "-at_install", "subscription_controller")
 class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscriptionCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -71,6 +72,8 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
 
     def setUp(self):
         super().setUp()
+        self._disable_post_process_patcher()
+        self._patch_account_payment_post_process()
 
         self.user = new_test_user(self.env, "test_user_1", email="test_user_1@nowhere.com", tz="UTC")
         self.other_user = new_test_user(self.env, "test_user_2", email="test_user_2@nowhere.com", password="P@ssw0rd!", tz="UTC")
@@ -94,7 +97,7 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
         """ method to pause a subscription from protal."""
         data = {
             "access_token": self.subscription.access_token,
-            "csrf_token": http.Request.csrf_token(self),
+            "csrf_token": self.csrf_token(),
             "until": until_date,
         }
         return self.url_open(f"/my/subscriptions/{self.subscription.id}/pause", allow_redirects=False, data=data)
@@ -103,7 +106,7 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
         """ method to resume a subscription from protal."""
         data = {
             "access_token": self.subscription.access_token,
-            "csrf_token": http.Request.csrf_token(self),
+            "csrf_token": self.csrf_token(),
         }
         return self.url_open(f"/my/subscriptions/{self.subscription.id}/resume", allow_redirects=False, data=data)
 
@@ -114,7 +117,7 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
             self.subscription.plan_id.user_closable = True
             self.subscription.action_confirm()
             close_reason_id = self.env.ref('sale_subscription.close_reason_1')
-            data = {'access_token': self.subscription.access_token, 'csrf_token': http.Request.csrf_token(self),
+            data = {'access_token': self.subscription.access_token, 'csrf_token': self.csrf_token(),
                     'close_reason_id': close_reason_id.id, 'closing_text': "I am broke"}
             url = "/my/subscriptions/%s/close" % self.subscription.id
             res = self.url_open(url, allow_redirects=False, data=data)
@@ -186,14 +189,15 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
         legit_user_subscription.invalidate_recordset()
         self.assertEqual(legit_user_subscription.payment_token_id, legit_payment_method, "The token should not be updated")
 
+    @freeze_time('2026-08-30 12:10:15')
     def test_automatic_invoice_token(self):
         self.original_prepare_invoice = self.subscription._prepare_invoice
         with patch('odoo.addons.sale_subscription.models.sale_order.SaleOrder._do_payment', wraps=self._mock_subscription_do_payment):
-            self.env['ir.config_parameter'].sudo().set_param('sale.automatic_invoice', 'False')
+            self.env.company.sale_automatic_invoice = False
             subscription = self._portal_payment_controller_flow()
             subscription.transaction_ids.unlink()
             # set automatic invoice and restart
-            self.env['ir.config_parameter'].sudo().set_param('sale.automatic_invoice', 'True')
+            self.env.company.sale_automatic_invoice = True
             self._portal_payment_controller_flow()
 
     def _portal_payment_controller_flow(self):
@@ -226,13 +230,13 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
         url = self._build_url("/my/orders/%s/transaction" % subscription.id)
         self.make_jsonrpc_request(url, data)
         subscription.transaction_ids.provider_id.support_manual_capture = 'full_only'
-        subscription.transaction_ids._set_authorized()
+        self._update_transaction(subscription.transaction_ids, state='authorized')
         subscription.invoice_ids.filtered(lambda am: am.state == 'draft')._post()
-        subscription.transaction_ids.token_id = self.payment_token.id
+        self._update_transaction(subscription.transaction_ids, token_id=self.payment_token.id)
         self.assertEqual(subscription.next_invoice_date, datetime.date.today())
         self.assertEqual(subscription.state, 'sale')
-        subscription.transaction_ids._create_or_link_to_invoice()
-        subscription.transaction_ids._post_process()  # Create the payment
+        subscription.transaction_ids.with_context(payment_safe_write=True)._create_or_link_to_invoice()
+        self._run_post_processing()  # Create the payment
         self.assertEqual(subscription.invoice_count, 1, "One invoice should be created")
         # subscription has a payment_token_id, the invoice is created by the flow.
         subscription.invoice_ids.invoice_line_ids.account_id.account_type = 'income'
@@ -266,15 +270,16 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
         self.make_jsonrpc_request(url, data)
         last_transaction_id = subscription.transaction_ids - first_transaction_id
         # the transaction is associated to the invoice in tx._post_process()
-        last_transaction_id._set_done()
-        last_transaction_id._post_process()
+        self._update_transaction(last_transaction_id, state="done")
+        self._run_post_processing()
         self.assertEqual(len(subscription.transaction_ids), 2)
         self.assertEqual(last_transaction_id.sale_order_ids, subscription)
         subscription.invoice_ids.filtered(lambda am: am.state == 'draft')._post()
         # subscription has a payment_token_id, the invoice is created by the flow.
         subscription.invoice_ids.invoice_line_ids.account_id.account_type = 'asset_cash'
         subscription.invoice_ids.auto_post = 'at_date'
-        subscription.transaction_ids._set_done()
+        self._update_transaction(subscription.transaction_ids, state='done')
+
         last_invoice_date = subscription.next_invoice_date - subscription.plan_id.billing_period
         if last_invoice_date != datetime.date.today():
             # sometimes, the computed last_invoice_date is different than the start_date at this step.
@@ -343,12 +348,13 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
     def test_portal_partial_payment(self):
         with patch('odoo.addons.sale_subscription.models.sale_order.SaleOrder._do_payment',
                    wraps=self._mock_subscription_do_payment):
-            self.env['ir.config_parameter'].sudo().set_param('sale.automatic_invoice', 'False')
+            self.env.company.sale_automatic_invoice = False
             with freeze_time("2024-01-22"):
                 subscription = self.subscription.create({
                     'partner_id': self.partner.id,
                     'company_id': self.company.id,
                     'sale_order_template_id': self.subscription_tmpl.id,
+                    'require_signature': False,
                 })
                 self.pricing_month.price = 100
                 subscription._onchange_sale_order_template_id()
@@ -378,14 +384,14 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
                     )
                 tx_sudo = self._get_tx(processing_values['reference'])
                 # make sure to have a token on the transaction. it is needed to test the confirmation flow
-                tx_sudo.token_id = self.payment_token.id
+                self._update_transaction(tx_sudo, token_id=self.payment_token.id)
                 self.assertEqual(tx_sudo.sale_order_ids, subscription)
                 # self.assertEqual(tx_sudo.amount, amount)
                 self.assertEqual(tx_sudo.sale_order_ids.transaction_ids, tx_sudo)
 
-                tx_sudo._set_done()
+                self._update_transaction(tx_sudo, state="done")
                 with mute_logger('odoo.addons.sale.models.payment_transaction'):
-                    tx_sudo._post_process()
+                    self._run_post_processing()
                 self.assertEqual(subscription.state, 'sale')  # The prepayment amount was paid
                 self.assertEqual(subscription.next_invoice_date, datetime.date.today())
                 self.assertEqual(subscription.state, 'sale')
@@ -396,6 +402,7 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
                 subscription._create_recurring_invoice()
                 action = subscription.prepare_renewal_order()
                 renewal_so = self.env['sale.order'].browse(action['res_id'])
+                renewal_so.require_signature = False
                 renewal_so.prepayment_percent = 0.5
                 self.amount = renewal_so.amount_total / 2.0
 
@@ -419,12 +426,12 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
 
                 # Make sure to have a token on the transaction, it is needed to test the confirmation flow.
                 tx_sudo = self._get_tx(processing_values['reference'])
-                tx_sudo.token_id = self.payment_token.id
+                self._update_transaction(tx_sudo, token_id=self.payment_token.id)
                 self.assertEqual(tx_sudo.sale_order_ids, renewal_so)
                 self.assertEqual(tx_sudo.sale_order_ids.transaction_ids, tx_sudo)
-                tx_sudo._set_done()
+                self._update_transaction(tx_sudo, state='done')
                 with mute_logger('odoo.addons.sale.models.payment_transaction'):
-                    tx_sudo._post_process()
+                    self._run_post_processing()
 
                 # Assert that no token was saved, renewal was sent and only one invoice was registered.
                 self.assertFalse(renewal_so.payment_token_id, "No token should be saved")
@@ -439,13 +446,14 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
                 [('reference', '=', data['reference'])],
                 limit=1,
             )
-            tx.token_id = tx.tokenize and self.env['payment.token'].create({
+            token_id = tx.tokenize and self.env['payment.token'].create({
                 'partner_id': self.subscription.partner_id.id,
                 'payment_method_id': self.payment_method_id,
                 'provider_id': self.provider.id,
                 'provider_ref': 'test123',
-            })
-            tx._set_done()
+            }).id
+            self._update_transaction(tx, token_id=token_id, state='done')
+            self._run_post_processing()
 
         self.portal_user.email = 'chell@aperture.com'
         self.subscription.partner_id = self.portal_partner
@@ -474,7 +482,6 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
                 'tokenization_requested': True,
             })
             process_notification_data(tx_response)
-            self.make_jsonrpc_request('/payment/status/poll', {})
             self.assertFalse(
                 notification_mail_mock.call_count,
                 "Setting a payment token shouldn't send a payment succeeded email",
@@ -488,7 +495,6 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
                 'token_id': self.subscription.payment_token_id.id,
             })
             process_notification_data(tx_response)
-            self.make_jsonrpc_request('/payment/status/poll', {})
             self.assertEqual(
                 notification_mail_mock.call_count,
                 1,
@@ -499,7 +505,7 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
         product_document = self.env['product.document'].create({
             'name': 'doc.txt',
             'active': True,
-            'datas': 'TXkgYXR0YWNobWVudA==',
+            'raw': b'My attachment',
             'res_model': 'product.product',
             'res_id': self.sub_product_tmpl.product_variant_ids.id,
             'attached_on_sale': 'sale_order',
@@ -534,8 +540,8 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
             })
             # Create transaction and process payment while assigning token to subscription.
             tx_context = self._get_payment_context(self._make_http_get_request(
-                f'/my/subscriptions/{subscription.id}',
-                params={'access_token': subscription.access_token},
+                f"/my/subscriptions/{subscription.id}",
+                params={"access_token": subscription.access_token},
             ))
             tx_route_values = {
                 'provider_id': self.provider.id,
@@ -550,9 +556,9 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
             with mute_logger('odoo.addons.payment.models.payment_transaction'):
                 processing_values = self._get_processing_values(tx_route=tx_context['transaction_route'], **tx_route_values)
             tx_sudo = self._get_tx(processing_values['reference'])
-            tx_sudo._set_done()
+            self._update_transaction(tx_sudo, state='done')
             with mute_logger('odoo.addons.sale.models.payment_transaction'):
-                tx_sudo._post_process()
+                self._run_post_processing()
             # Ensure token was assigned after completing the payment in invoices route.
             self.assertEqual(subscription.payment_token_id.id, test_payment_token.id, "Token must be assigned to subscription after transaction creation.")
             # Create transaction with new token without sending invoice_ids in custom_create_values.
@@ -574,8 +580,8 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
                 'partner_id': self.partner.id
             }
             tx_sudo = self._create_transaction(**kwargs)
-            tx_sudo._post_process()
-            tx_sudo._set_done()
+            self._run_post_processing()
+            self._update_transaction(tx_sudo, state='done')
             # Ensure token was not changed after completing the payment in invoices route.
             self.assertEqual(subscription.payment_token_id.id, test_payment_token.id, "Token must remain unchanged after new payment.")
 
@@ -609,8 +615,8 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
         self.assertEqual(subscription.invoice_count, 1, "Portal don't create new invoices")
         self.assertEqual(inv1.payment_state, 'not_paid', "inv 1 is not paid")
         tx = subscription.transaction_ids - existing_tx
-        tx._set_done()
-        tx._post_process()
+        self._update_transaction(tx, state='done')
+        self._run_post_processing()
         inv2 = subscription.invoice_ids - inv1
         self.env['account.payment.register'] \
                 .with_context(active_model='account.move', active_ids=inv2.ids) \
@@ -619,8 +625,8 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
                 'amount': subscription.amount_total,
         })._create_payments()
         tx = subscription.transaction_ids.invoice_ids.transaction_ids
-        tx._set_done()
-        tx._post_process()
+        self._update_transaction(tx, state="done")
+        self._run_post_processing()
         self.assertTrue(inv2.payment_state in ['paid', 'in_payment'], "invoice 2  is paid")
 
     def test_controller_reopen_subscription(self):
@@ -655,8 +661,8 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
             url = self._build_url("/my/subscriptions/%s/transaction" % subscription.id)
             self.make_jsonrpc_request(url, data)
             new_tx = subscription.transaction_ids - existing_tx
-            new_tx._set_done()
-            new_tx._post_process()
+            self._update_transaction(new_tx, state="done")
+            self._run_post_processing()
             self.assertEqual(subscription.invoice_count, 2, "subscription_anticipate should for a new invoice creation")
             inv2 = subscription.invoice_ids - inv1
             self.env['account.payment.register'] \
@@ -666,8 +672,8 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
                     'amount': subscription.amount_total,
             })._create_payments()
             tx = subscription.transaction_ids.invoice_ids.transaction_ids
-            tx._set_done()
-            tx._post_process()
+            self._update_transaction(tx, state="done")
+            self._run_post_processing()
             self.assertTrue(inv2.payment_state in ['paid', 'in_payment'], "invoice 2  is paid")
             self.assertEqual(subscription.next_invoice_date, datetime.date(2024, 2, 1))
             self.assertEqual(inv2.line_ids.mapped(lambda aml: (aml.deferred_start_date, aml.deferred_end_date)),
@@ -693,7 +699,7 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
             close_reason_id = self.env.ref("sale_subscription.close_reason_1")
             data = {
                 "access_token": self.subscription.access_token,
-                "csrf_token": http.Request.csrf_token(self),
+                "csrf_token": self.csrf_token(),
                 "close_reason_id": close_reason_id.id,
                 "closing_text": "I am not able to continue subs"
             }
@@ -731,7 +737,7 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
             close_reason_id = self.env.ref("sale_subscription.close_reason_1")
             data = {
                 "access_token": self.subscription.access_token,
-                "csrf_token": http.Request.csrf_token(self),
+                "csrf_token": self.csrf_token(),
                 "close_reason_id": close_reason_id.id,
                 "closing_text": "I am not able to continue subs"
             }
@@ -776,34 +782,23 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
             'partner_id': self.partner.id,
             'plan_id': self.plan_month.id,
         })
-        data = {
-            "id": 0,
-            "jsonrpc": "2.0",
-            "method": "call",
-            "params": {
-                'res_model': 'sale.order',
-                'order_id': sale_order.id,
-                'product_ids': [sub_product.id, non_sub_product.id],
-            }
-        }
-        headers = {
-            "Content-Type": "application/json",
-        }
         self.authenticate(self.env.user.login, self.env.user.login)
 
         # Make the request
-        response = self.url_open(
+        response_data = self.make_jsonrpc_request(
             '/product/catalog/order_lines_info',
-            data=json.dumps(data).encode(),
-            headers=headers
+            {
+                'res_model': 'sale.order',
+                'order_id': sale_order.id,
+                'product_ids': [sub_product.id, non_sub_product.id],
+                'child_field': 'order_line',
+            }
         )
 
         # Check the response
-        self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
         response_prices = {
             int(product_id): product_data['price']
-            for product_id, product_data in response_data['result'].items()
+            for product_id, product_data in response_data.items()
         }
         expected_prices = {
             sub_product.id: sub_product.list_price,
@@ -858,7 +853,7 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
         # Update the partner
         self.authenticate(self.portal_user.login, self.portal_user.login)
         data = {
-            "csrf_token": http.Request.csrf_token(self),
+            "csrf_token": self.csrf_token(),
             "access_token": self.subscription.access_token,
             "delivery_address": shipping_partner_1.id,
             "invoicing_address": invoicing_partner.id,
@@ -874,7 +869,7 @@ class TestSubscriptionController(PaymentHttpCommon, PaymentCommon, TestSubscript
         """Test that a portal user sees all subscriptions of their company and not others."""
         company = self.env['res.partner'].create({
             'name': 'Test Company',
-            'is_company': True,
+            'vat': 'BE0477472701',
         })
         self.user.partner_id.parent_id = company.id
         self.other_user.partner_id.parent_id = company.id

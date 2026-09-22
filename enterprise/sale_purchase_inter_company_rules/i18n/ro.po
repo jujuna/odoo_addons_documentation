@@ -2,16 +2,16 @@
 # This file contains the translation of the following modules:
 # * sale_purchase_inter_company_rules
 #
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # Alin Ilie <alin.ilie@logit-solutions.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-12-10 10:30+0000\n"
-"Last-Translator: Alin Ilie <alin.ilie@logit-solutions.com>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 04:03+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "sale_purchase_inter_company_rules/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order__auto_generated
@@ -40,8 +40,9 @@ msgstr "Generat automat din %(origin)s ale companiei %(company)s."
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_res_company
-msgid "Companies"
-msgstr "Companii"
+#, fuzzy
+msgid "Company"
+msgstr "Companie"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_res_config_settings
@@ -59,10 +60,13 @@ msgid "Create Sales Orders"
 msgstr "Creare comenzi de vânzare"
 
 #. module: sale_purchase_inter_company_rules
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_account_move__display_name
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order__display_name
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order_line__display_name
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_company__display_name
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order__display_name
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order_line__display_name
 msgid "Display Name"
 msgstr "Nume afișat"
 
@@ -73,59 +77,83 @@ msgid "Generate Purchase Orders"
 msgstr "Generează comenzi de achiziție"
 
 #. module: sale_purchase_inter_company_rules
-#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.view_company_inter_change_inherit_form
-msgid "Generate Purchases Orders"
-msgstr "Generează comenzi de achiziție"
-
-#. module: sale_purchase_inter_company_rules
-#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.view_company_inter_change_inherit_form
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_company__intercompany_generate_sales_orders
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_config_settings__intercompany_generate_sales_orders
 msgid "Generate Sales Orders"
 msgstr "Generează comenzi de vânzare"
 
 #. module: sale_purchase_inter_company_rules
-#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_company__intercompany_generate_sales_orders
-#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_config_settings__intercompany_generate_sales_orders
-msgid "Generate Sales order"
-msgstr "Generează comandă de vânzare"
-
-#. module: sale_purchase_inter_company_rules
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_account_move__id
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order__id
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order_line__id
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_company__id
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order__id
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order_line__id
 msgid "ID"
 msgstr "ID"
 
 #. module: sale_purchase_inter_company_rules
-#. odoo-python
-#: code:addons/sale_purchase_inter_company_rules/models/purchase_order.py:0
+#: model:ir.model.fields,help:sale_purchase_inter_company_rules.field_res_company__intercompany_generate_sales_orders
+#: model:ir.model.fields,help:sale_purchase_inter_company_rules.field_res_config_settings__intercompany_generate_sales_orders
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.res_config_settings_view_form
 msgid ""
-"Inter company user of company %(name)s doesn't have enough access rights"
+"If another company confirms a Purchase Order with this company, a Sales "
+"Order will be created with the chosen warehouse based on the contact address "
+"for the delivery of goods."
 msgstr ""
-"Utilizatorul inter-companie al companiei %(name)s nu are suficiente drepturi "
-"de acces"
 
 #. module: sale_purchase_inter_company_rules
-#. odoo-python
-#: code:addons/sale_purchase_inter_company_rules/models/sale_order.py:0
-msgid "Inter company user of company %s doesn't have enough access rights"
+#: model:ir.model.fields,help:sale_purchase_inter_company_rules.field_res_company__intercompany_generate_purchase_orders
+#: model:ir.model.fields,help:sale_purchase_inter_company_rules.field_res_config_settings__intercompany_generate_purchase_orders
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.res_config_settings_view_form
+msgid ""
+"If another company confirms a Sales Order with this company, a Purchase "
+"Order will be created with the chosen warehouse based on the contact address "
+"for the receipt of goods."
 msgstr ""
-"Utilizatorul inter-companie al companiei %s nu are suficiente drepturi de "
-"acces"
 
 #. module: sale_purchase_inter_company_rules
-#. odoo-python
-#: code:addons/sale_purchase_inter_company_rules/models/purchase_order.py:0
-msgid "Provide at least one user for inter company relation for %(name)s"
+#: model:ir.module.module,shortdesc:base.module_sale_purchase_inter_company_rules
+msgid "Inter Company Module for Sale/Purchase Orders and Invoices"
 msgstr ""
-"Furnizați cel puțin un utilizator pentru relația între companii pentru %"
-"(name)s"
 
 #. module: sale_purchase_inter_company_rules
-#. odoo-python
-#: code:addons/sale_purchase_inter_company_rules/models/sale_order.py:0
-msgid "Provide one user for intercompany relation for %(name)s "
-msgstr "Furnizați un utilizator pentru relația intercompany pentru %(name)s "
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order_line__auto_purchase_order_line_id
+msgid "Intercompany Purchase Order Line"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.module.module,summary:base.module_sale_purchase_inter_company_rules
+msgid "Intercompany SO/PO/INV rules"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order_line__auto_sale_order_line_id
+msgid "Intercompany Sale Order Line"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.model,name:sale_purchase_inter_company_rules.model_account_move
+#, fuzzy
+msgid "Journal Entry"
+msgstr "Înregistrare jurnal "
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.module.module,description:base.module_sale_purchase_inter_company_rules
+msgid ""
+"Module for synchronization of Documents between several companies. For "
+"example, this allow you to have a Sales Order created automatically when a "
+"Purchase Order is validated with another company of the system as vendor, "
+"and inversely.\n"
+"\n"
+"   Supported documents are SO, PO.\n"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "Note"
+msgstr ""
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_purchase_order
@@ -133,9 +161,24 @@ msgid "Purchase Order"
 msgstr "Comandă de achiziție"
 
 #. module: sale_purchase_inter_company_rules
+#: model:ir.model,name:sale_purchase_inter_company_rules.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_sale_order
 msgid "Sales Order"
 msgstr "Comandă de vânzare"
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.model,name:sale_purchase_inter_company_rules.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "Section"
+msgstr ""
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order__auto_purchase_order_id
@@ -146,6 +189,42 @@ msgstr "Sursă comandă de achiziție"
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order__auto_sale_order_id
 msgid "Source Sales Order"
 msgstr "Sursă comandă de vânzare"
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "Subsection"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "The following value(s) have been added from the linked Purchase Order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "The following value(s) have been added from the linked Sales Order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.updated_vals_interco_so_po
+msgid ""
+"The following value(s) have been updated from the linked Purchase Order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.updated_vals_interco_so_po
+msgid "The following value(s) have been updated from the linked Sales Order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.cancelled_interco_so_po
+msgid "The related purchase order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.cancelled_interco_so_po
+msgid "The related sale order:"
+msgstr ""
 
 #. module: sale_purchase_inter_company_rules
 #. odoo-python
@@ -167,3 +246,34 @@ msgstr ""
 "\n"
 "(Monedă comandă de vânzare: %(so_currency)s, Listă de prețuri: %"
 "(pricelist)s, Partener: %(partner)s (ID: %(id)s))"
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.cancelled_interco_so_po
+msgid "has been cancelled."
+msgstr ""
+
+#~ msgid "Generate Purchases Orders"
+#~ msgstr "Generează comenzi de achiziție"
+
+#~ msgid "Generate Sales order"
+#~ msgstr "Generează comandă de vânzare"
+
+#~ msgid ""
+#~ "Inter company user of company %(name)s doesn't have enough access rights"
+#~ msgstr ""
+#~ "Utilizatorul inter-companie al companiei %(name)s nu are suficiente "
+#~ "drepturi de acces"
+
+#~ msgid "Inter company user of company %s doesn't have enough access rights"
+#~ msgstr ""
+#~ "Utilizatorul inter-companie al companiei %s nu are suficiente drepturi de "
+#~ "acces"
+
+#~ msgid "Provide at least one user for inter company relation for %(name)s"
+#~ msgstr ""
+#~ "Furnizați cel puțin un utilizator pentru relația între companii pentru %"
+#~ "(name)s"
+
+#~ msgid "Provide one user for intercompany relation for %(name)s "
+#~ msgstr ""
+#~ "Furnizați un utilizator pentru relația intercompany pentru %(name)s "

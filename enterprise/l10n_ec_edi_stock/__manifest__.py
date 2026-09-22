@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     "name": "Ecuadorian Delivery Guide",
@@ -12,7 +11,7 @@ guide.
 """,
     "author": "TRESCLOUD",
     "category": "Accounting/Localizations/EDI",
-    "license": "OPL-1",
+    "license": "OEEL-1",
     "depends": [
         "stock_account",
         "l10n_ec_edi",
@@ -28,6 +27,5 @@ guide.
         'data/mail_template_data.xml',
         'data/cron_data.xml',
     ],
-    "installable": True,
     "auto_install": True,
 }

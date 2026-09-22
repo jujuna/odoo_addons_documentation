@@ -11,5 +11,6 @@ IotDevice._records = [
         type: "payment",
         connection: "network",
         connected_status: "disconnected",
+        write_date: "2025-01-01 10:00:00",
     },
 ];

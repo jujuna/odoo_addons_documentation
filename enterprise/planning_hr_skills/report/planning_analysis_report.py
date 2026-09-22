@@ -13,8 +13,8 @@ class PlanningAnalysisReport(models.Model):
 
     def _compute_employee_skill_ids(self):
         for slot in self:
-            slot.employee_skill_ids = slot.employee_id.employee_skill_ids
+            slot.employee_skill_ids = slot.employee_ids.employee_skill_ids
 
     @api.model
     def _search_employee_skill_ids(self, operator, value):
-        return [('employee_id.employee_skill_ids', operator, value)]
+        return [('employee_ids.employee_skill_ids', operator, value)]

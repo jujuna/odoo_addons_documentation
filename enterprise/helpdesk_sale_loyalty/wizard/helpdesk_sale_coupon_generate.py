@@ -29,9 +29,14 @@ class HelpdeskSaleCouponGenerate(models.TransientModel):
         coupon = self.env['loyalty.card'].with_context(action_no_send_mail=True).sudo().create({
             'partner_id': self.ticket_id.partner_id.id,
             'program_id': self.program.id,
-            'points': self.points_granted,
             'expiration_date': self.valid_until,
         })
+        coupon._adjust_points(
+            self.points_granted,
+            self.env._(
+                "Coupon generated from helpdesk ticket %s", self.ticket_id.display_name
+            ),
+        )
         self.ticket_id.coupon_ids |= coupon
         self.ticket_id.message_post_with_source(
             'helpdesk.ticket_conversion_link',
@@ -50,8 +55,8 @@ class HelpdeskSaleCouponGenerate(models.TransientModel):
             'default_res_ids': coupon.ids,
             'default_template_id': default_template.id,
             'default_composition_mode': 'comment',
-            'default_email_layout_xmlid': 'mail.mail_notification_light',
             'force_email': True,
+            'from_helpdesk_ticket': self.ticket_id.id,
         }
         return {
             'name': _('Compose Email'),

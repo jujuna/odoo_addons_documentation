@@ -8,14 +8,14 @@ from odoo.exceptions import AccessError
 class EventEvent(models.Model):
     _inherit = "event.event"
 
-    firebase_enable_push_notifications = fields.Boolean('Enable Web Push Notifications',
-        compute='_compute_firebase_enable_push_notifications')
+    enable_push_notifications = fields.Boolean('Enable Web Push Notifications',
+        compute='_compute_enable_push_notifications')
 
-    def _compute_firebase_enable_push_notifications(self):
-        current_website = self.env['website'].get_current_website()
+    def _compute_enable_push_notifications(self):
+        current_website = self.env.website
         for event in self:
             website = event.website_id or current_website
-            event.firebase_enable_push_notifications = website.firebase_enable_push_notifications
+            event.enable_push_notifications = website.enable_push_notifications
 
     def action_send_push(self):
         self.ensure_one()
@@ -25,13 +25,12 @@ class EventEvent(models.Model):
 
         action = self.env['ir.actions.act_window']._for_xml_id('social.action_social_post')
         action['views'] = [[False, 'form']]
-        current_website = self.env['website'].get_current_website()
+        current_website = self.env.website
         social_account = self.env['social.account'].search([(
             'website_id', '=', (self.website_id or current_website).id
         )])
         action['context'] = dict(self.env.context, **{
             'default_account_ids': [social_account.id] if social_account else False,
-            'default_use_visitor_timezone': False,
             'default_visitor_domain': str([
                 '&',
                 ['has_push_notifications', '=', True],

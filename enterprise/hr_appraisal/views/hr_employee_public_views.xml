@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_open_last_appraisal" class="oe_stat_button"
-                    invisible="not is_user or not last_appraisal_id" icon="fa-sitemap" type="object">
+                    invisible="not is_user or not last_appraisal_id" icon="account_tree" type="object">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value">
                             <field name="last_appraisal_date"/>
@@ -23,15 +23,12 @@
                     string="Request Appraisal"
                     type="object"
                     data-hotkey="g"
-                    class="btn btn-primary"
-                    invisible="not can_request_appraisal or ongoing_appraisal_count"/>
-                <button name="action_send_appraisal_request"
-                    string="Request Appraisal"
-                    type="object"
-                    data-hotkey="g"
                     class="btn btn-secondary"
-                    invisible="not can_request_appraisal or not ongoing_appraisal_count"/>
+                    invisible="not can_request_appraisal"/>
             </xpath>
+            <field name="parent_id" position="after">
+                <field name="next_appraisal_date" invisible="not is_manager"/>
+            </field>
         </field>
     </record>
 

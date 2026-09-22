@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models, fields, tools, _
-from odoo.exceptions import RedirectWarning
+from odoo import api, models, fields, tools, _
+from odoo.exceptions import RedirectWarning, ValidationError
 from odoo.tools import format_list
 
 
@@ -19,6 +19,12 @@ class PosConfig(models.Model):
         copy=False,
         help="Brazil: series number associated with this POS.",
     )
+
+    @api.constrains('l10n_br_invoice_serial')
+    def _check_l10n_br_invoice_serial(self):
+        for pos_config in self:
+            if pos_config.l10n_br_invoice_serial and len(pos_config.l10n_br_invoice_serial) > 3:
+                raise ValidationError(_("Oops! The maximum length for the Brazilian electronic invoices series number is 3 digits."))
 
     def _check_before_creating_new_session(self):
         """Override."""

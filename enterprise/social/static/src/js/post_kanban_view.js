@@ -1,39 +1,46 @@
+import { useListener } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { KanbanRenderer } from "@web/views/kanban/kanban_renderer";
 import { kanbanView } from "@web/views/kanban/kanban_view";
 import { registry } from "@web/core/registry";
-import { useService } from '@web/core/utils/hooks';
-
-import { ImagesCarouselDialog } from './images_carousel_dialog';
-import { useEffect, useRef } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+import { MediaCarouselDialog } from "./media_carousel_dialog";
 
 export class PostKanbanRenderer extends KanbanRenderer {
     setup() {
         super.setup();
 
-        this.dialog = useService('dialog');
-        const rootRef = useRef("root");
-        useEffect((images) => {
-            const onClickMoreImages = this.onClickMoreImages.bind(this);
-            images.forEach((image) => image.addEventListener('click', onClickMoreImages));
-            return () => {
-                images.forEach((image) => image.removeEventListener('click', onClickMoreImages));
-            };
-        }, () => [rootRef.el.querySelectorAll('.o_social_stream_post_image_more')]);
+        this.dialog = useService("dialog");
+        // capture phase: the handler stops the propagation to prevent the card's
+        // global click, which is bound on the record root, i.e. below this one.
+        useListener(
+            this.rootRef,
+            "click",
+            (ev) => {
+                const imageEl = ev.target.closest(".o_social_stream_post_content_more");
+                if (imageEl) {
+                    this.onClickMoreImages(ev, imageEl);
+                }
+            },
+            { capture: true }
+        );
     }
 
     /**
      * Shows a bootstrap carousel starting at the clicked image's index
      *
      * @param {PointerEvent} ev - event of the clicked image
+     * @param {HTMLElement} imageEl - the clicked image
      */
-    onClickMoreImages(ev) {
+    onClickMoreImages(ev, imageEl) {
         ev.stopPropagation();
-        this.dialog.add(ImagesCarouselDialog, {
+        this.dialog.add(MediaCarouselDialog, {
             title: _t("Post Images"),
-            activeIndex: parseInt(ev.currentTarget.dataset.index),
-            images: ev.currentTarget.dataset.imageUrls.split(',')
-        })
+            activeIndex: parseInt(imageEl.dataset.index),
+            medias: imageEl.dataset.imageUrls
+                .split(",")
+                .map((data) => ({ type: "image", url: data })),
+        });
     }
 }
 

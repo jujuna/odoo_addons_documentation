@@ -4,16 +4,27 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-08-28 18:22+0000\n"
+"PO-Revision-Date: 2026-08-28 18:22+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_pe_reports
+#: model:ir.module.module,description:base.module_l10n_pe_reports
+msgid ""
+"\n"
+"Electronic accounting reports\n"
+"    - Sales report\n"
+"    - Purchase report\n"
+"\n"
+"P&L + balance Sheet\n"
+msgstr ""
 
 #. module: l10n_pe_reports
 #: model:ir.model,name:l10n_pe_reports.model_account_report
@@ -117,7 +128,7 @@ msgstr ""
 
 #. module: l10n_pe_reports
 #: model:ir.model,name:l10n_pe_reports.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr ""
 
 #. module: l10n_pe_reports
@@ -179,6 +190,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_l10n_pe_tax_ple_8_1_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_l10n_pe_tax_ple_8_2_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_l10n_pe_tax_ple_report_handler__display_name
+#: model:ir.model.fields,field_description:l10n_pe_reports.field_l10n_pe_tax_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_res_company__display_name
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_res_country__display_name
@@ -195,11 +207,6 @@ msgstr ""
 #. module: l10n_pe_reports
 #: model:account.report.column,name:l10n_pe_reports.tax_report_ple_14_1_base_exp
 msgid "EXP"
-msgstr ""
-
-#. module: l10n_pe_reports
-#: model:ir.model,name:l10n_pe_reports.model_account_general_ledger_report_handler
-msgid "FEC Report Custom Handler"
 msgstr ""
 
 #. module: l10n_pe_reports
@@ -224,6 +231,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_l10n_pe_tax_ple_8_1_report_handler__id
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_l10n_pe_tax_ple_8_2_report_handler__id
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_l10n_pe_tax_ple_report_handler__id
+#: model:ir.model.fields,field_description:l10n_pe_reports.field_l10n_pe_tax_report_handler__id
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_res_config_settings__id
 #: model:ir.model.fields,field_description:l10n_pe_reports.field_res_country__id
@@ -323,6 +331,11 @@ msgid "Name"
 msgstr ""
 
 #. module: l10n_pe_reports
+#: model:account.report.column,name:l10n_pe_reports.column_net
+msgid "Net"
+msgstr ""
+
+#. module: l10n_pe_reports
 #. odoo-python
 #: code:addons/l10n_pe_reports/models/account_general_ledger.py:0
 msgid "Only Peruvian company can generate PLE 5.3 report."
@@ -336,6 +349,11 @@ msgstr ""
 #. module: l10n_pe_reports
 #: model:ir.model.fields.selection,name:l10n_pe_reports.selection__res_company__l10n_pe_chart_of_accounts__99
 msgid "Others"
+msgstr ""
+
+#. module: l10n_pe_reports
+#: model:ir.model,name:l10n_pe_reports.model_l10n_pe_tax_report_handler
+msgid "PE Tax Report Custom Handler"
 msgstr ""
 
 #. module: l10n_pe_reports
@@ -398,13 +416,23 @@ msgid "Peru"
 msgstr ""
 
 #. module: l10n_pe_reports
+#: model:ir.module.module,shortdesc:base.module_l10n_pe_reports
+msgid "Peru - Accounting Reports"
+msgstr ""
+
+#. module: l10n_pe_reports
 #: model:ir.model.fields,help:l10n_pe_reports.field_account_bank_statement_line__l10n_pe_sunat_transaction_type
 #: model:ir.model.fields,help:l10n_pe_reports.field_account_move__l10n_pe_sunat_transaction_type
 msgid ""
 "Please choose the transaction type for the SUNAT reports 5.1, 5.2, and 6.1. "
-"It's important to note that this selection will not impact the account move;"
-" its sole purpose is to correctly flag the transaction in the exported txt "
-"file."
+"It's important to note that this selection will not impact the journal "
+"entry; its sole purpose is to correctly flag the transaction in the exported"
+" txt file."
+msgstr ""
+
+#. module: l10n_pe_reports
+#: model:ir.model,name:l10n_pe_reports.model_account_general_ledger_report_handler
+msgid "Polish JPK KR PD Custom Handler"
 msgstr ""
 
 #. module: l10n_pe_reports
@@ -486,6 +514,21 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_pe_reports/models/account_ple_cash_bank.py:0
 msgid "TXT PLE 1.2 (Bank)"
+msgstr ""
+
+#. module: l10n_pe_reports
+#: model:account.report.column,name:l10n_pe_reports.column_tax
+msgid "Tax"
+msgstr ""
+
+#. module: l10n_pe_reports
+#: model:account.return.type,name:l10n_pe_reports.pe_tax_return_type
+msgid "Tax (PE)"
+msgstr ""
+
+#. module: l10n_pe_reports
+#: model:account.report,name:l10n_pe_reports.l10n_pe_tax_report
+msgid "Tax Report"
 msgstr ""
 
 #. module: l10n_pe_reports

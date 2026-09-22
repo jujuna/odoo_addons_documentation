@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { Justification } from "@l10n_it_pos/app/fiscal_printer/commands/types";
 
 const PaymentType = {
@@ -13,23 +13,12 @@ const PaymentType = {
 
 export class PrintRecTotal extends Component {
     static template = "l10n_it_pos.PrintRecTotal";
-    static props = {
-        operator: { type: Number, optional: true },
-        description: { type: String },
-        payment: { type: String },
-        paymentType: {
-            type: String,
-            validate: (paymentType) => Object.values(PaymentType).includes(paymentType),
-        },
-        index: { type: Number, optional: true, validate: (index) => index >= 0 },
-        justification: {
-            type: Number,
-            validate: (alignment) => Object.values(Justification).includes(alignment),
-            optional: true,
-        },
-    };
-    static defaultProps = {
-        operator: 1,
-        justification: Justification.FIRST_20,
-    };
+    props = useProps({
+        operator: t.number().optional(1),
+        description: t.string(),
+        payment: t.string(),
+        paymentType: t.or([t.selection(Object.values(PaymentType)), t.literal(false)]),
+        index: t.customValidator(t.number(), (index) => index >= 0).optional(),
+        justification: t.selection(Object.values(Justification)).optional(Justification.FIRST_20),
+    });
 }

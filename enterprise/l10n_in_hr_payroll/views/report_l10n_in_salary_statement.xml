@@ -11,54 +11,99 @@
                     <span t-out="report_data['month']">May</span>
                     <span t-out="report_data['year']">2024</span>
                     </h2>
-                    <table class="table table-sm table-borderless">
+                    <div class="border-bottom border-dark my-2"></div>
+                    <table class="table table-sm table-borderless my-2">
                         <tbody>
                             <tr>
-                                <td><strong>Employee Name</strong></td>
-                                <td><span t-field="employee.name">Lakshya</span></td>
-                                <td><strong>Date of Joining</strong></td>
-                                <td><span t-field="employee.version_id.contract_date_start">01/01/2024</span></td>
+                                <td class="pe-0"><strong>Employee Name</strong> :</td>
+                                <td class="ps-0"><span t-field="employee.name">Lakshya</span></td>
+                                <td class="pe-0"><strong>Date of Joining</strong> :</td>
+                                <td class="ps-0"><span t-field="employee.version_id.date_start">01/01/2024</span></td>
                             </tr>
                             <tr>
-                                <td><strong>Designation</strong></td>
-                                <td><span t-field="employee.job_title">Software Developer</span></td>
-                                <td><strong>Salary Effective from</strong></td>
-                                <td><span t-out="report_data['date']">01/05/2024</span></td>
+                                <td class="pe-0"><strong>Designation</strong> :</td>
+                                <td class="ps-0"><span t-field="employee.job_title">Software Developer</span></td>
+                                <td class="pe-0"><strong>Salary Effective from</strong> :</td>
+                                <td class="ps-0"><span t-out="report_data['date']">01/05/2024</span></td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th class="text-center">Salary Components</th>
-                                <th class="text-center">Monthly Amount</th>
-                                <th class="text-center">Yearly Amount</th>
+                    <div class="border-bottom border-dark my-2"></div>
+                    <div class="p-2 fw-bold rounded my-2 o_salary_statement_report_header_bg">
+                        <span t-out="report_data['structure'].name"/>
+                    </div>
+
+                    <table class="table table-sm table-borderless">
+                        <thead style="display: table-row-group;">
+                            <tr class="border-bottom border-dark">
+                                <th class="text-start fw-bold">Salary Components</th>
+                                <th class="text-end fw-bold">Monthly Amount (₹)</th>
+                                <th class="text-end fw-bold">Yearly Amount (₹)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td><h5 class="mb-0 mt-2"><strong>Allowance:</strong></h5></td></tr>
+                            <tr class="border-bottom o_salary_statement_report_grey_border">
+                                <td colspan="3"><h5 class="mb-0 mt-2"><strong>Allowance:</strong></h5></td>
+                            </tr>
                             <t t-foreach="report_data['allow_rules']" t-as="rule">
                                 <t t-set="value" t-value="report_data['allow_rules'][rule]"/>
-                                <tr>
+                                <tr class="border-bottom o_salary_statement_report_grey_border">
                                     <td><t t-out="value['name']">Basic Salary</t></td>
-                                    <td><t t-out="value['total']">10000</t></td>
-                                    <td><t t-out="round(value['total_annual'],2)">120000</t></td>
+                                    <td class="text-end"><t t-out="value['total']"
+                                        t-options="{'widget': 'monetary', 'display_currency': report_data['currency']}">
+                                        10000</t>
+                                    </td>
+                                    <td class="text-end"><t t-out="round(value['total_annual'],2)"
+                                        t-options="{'widget': 'monetary', 'display_currency': report_data['currency']}">
+                                        120000</t>
+                                    </td>
                                 </tr>
                             </t>
-                            <tr><td><h5 class="mb-0 mt-2"><strong>Deduction:</strong></h5></td></tr>
+                            <tr class="border-bottom o_salary_statement_report_grey_border">
+                                <td colspan="3"><h5 class="mb-0 mt-2"><strong>Deduction:</strong></h5></td>
+                            </tr>
                             <t t-foreach="report_data['deduct_rules']" t-as="rule">
                                 <t t-set="value" t-value="report_data['deduct_rules'][rule]"/>
-                                <tr>
+                                <tr class="border-bottom o_salary_statement_report_grey_border">
                                     <td><t t-out="value['name']">PF</t></td>
-                                    <td><t t-out="value['total']">-1000</t></td>
-                                    <td><t t-out="round(value['total_annual'],2)">-12000</t></td>
+                                    <td class="text-end">
+                                        <t t-out="value['total']"
+                                        t-options="{'widget': 'monetary', 'display_currency': report_data['currency']}">
+                                        -1000</t>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-out="round(value['total_annual'],2)"
+                                        t-options="{'widget': 'monetary', 'display_currency': report_data['currency']}">
+                                        -12000</t>
+                                    </td>
                                 </tr>
                             </t>
-                            <tr>
-                                <td><strong>Cost to Company</strong></td>
-                                <td><strong><t t-out="round(report_data['ctc'],2)">10000</t></strong></td>
-                                <td><strong><t t-out="round(report_data['ctc_annual'],2)">120000</t></strong></td>
+                            <tr class="border-bottom o_salary_statement_report_grey_border">
+                                <td>Total Deduction</td>
+                                <td class="text-end">
+                                    <t t-out="report_data['total_deduct_monthly']"
+                                        t-options="{'widget': 'monetary', 'display_currency': report_data['currency']}"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-out="report_data['total_deduct_yearly']"
+                                        t-options="{'widget': 'monetary', 'display_currency': report_data['currency']}"/>
+                                </td>
+                            </tr>
+                            <tr class="border-bottom border-dark">
+                                <td><strong>Net Salary</strong></td>
+                                <td class="text-end">
+                                    <strong><t t-out="report_data['net_salary']"
+                                        t-options="{'widget': 'monetary', 'display_currency': report_data['currency']}">
+                                        10000</t>
+                                    </strong>
+                                </td>
+                                <td class="text-end">
+                                    <strong><t t-out="round(report_data['net_salary_annual'],2)"
+                                        t-options="{'widget': 'monetary', 'display_currency': report_data['currency']}">
+                                        120000</t>
+                                    </strong>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

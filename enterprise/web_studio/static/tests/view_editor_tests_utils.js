@@ -1,11 +1,14 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { getFixture } from "@odoo/hoot";
 import { waitFor } from "@odoo/hoot-dom";
-import { Component, useSubEnv, xml } from "@odoo/owl";
+import { Component, onWillDestroy, usePlugin, xml } from "@odoo/owl";
 
 import {
+    assignTestEnv,
     contains,
-    getMockEnv,
-    makeMockEnv,
+    getTestApp,
+    getService,
+    makeTestApp,
     MockServer,
     mountWithCleanup,
     onRpc,
@@ -21,23 +24,25 @@ import { getDefaultConfig } from "@web/views/view";
 import { EditionFlow } from "@web_studio/client_action/editor/edition_flow";
 import { ViewEditor } from "@web_studio/client_action/view_editor/view_editor";
 import { useStudioServiceAsReactive } from "@web_studio/studio_service";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 const serviceRegistry = registry.category("services");
 
 class ViewEditorHoc extends Component {
     static template = xml`<ViewEditor action="{}" className="''" />`;
     static components = { ViewEditor };
-    static props = ["*"];
     setup() {
         const editionFlow = new EditionFlow(this.env, {
             dialog: useService("dialog"),
             studio: useStudioServiceAsReactive(),
             view: useService("view"),
         });
+        onWillDestroy(() => editionFlow.dispose());
         useSubEnv({
             editionFlow,
         });
-        if (this.env.debug) {
+        const debugMode = usePlugin(DebugModePlugin);
+        if (debugMode.isActive()) {
             useOwnDebugContext();
         }
     }
@@ -45,7 +50,6 @@ class ViewEditorHoc extends Component {
 
 class ViewEditorParent extends Component {
     static components = { ViewEditorHoc, MainComponentsContainer };
-    static props = {};
     static template = xml`
         <MainComponentsContainer />
         <div class="o_studio h-100">
@@ -97,7 +101,7 @@ export function handleDefaultStudioRoutes() {
     onRpc("/web_studio/edit_view", () => {});
     onRpc("/web_studio/edit_view_arch", () => {});
     onRpc("/web_studio/get_actions_for_model", () => []);
-    onRpc("/web_studio/get_default_value", () => ({ default_value: undefined }));
+    onRpc("/web_studio/get_field_infos", () => ({ default_value: undefined, tracking: false }));
     onRpc("/web_studio/get_studio_view_arch", () => ({ studio_view_arch: "" }));
     onRpc("get_approval_spec", ({ args }) => {
         const result = { all_rules: {} };
@@ -115,13 +119,16 @@ export async function mountViewEditor(params) {
     params.viewId = params.viewId || 99999999;
 
     prepareRegistry(params.filterRegistry ?? true);
-    const env = params.env || getMockEnv() || (await makeMockEnv({ config }));
+    assignTestEnv({ config });
+    if (!getTestApp()) {
+        await makeTestApp();
+    }
 
     params = parseViewProps(params);
     actionToEdit.views = [[params.viewId, params.type]];
 
     handleDefaultStudioRoutes();
-    env.services.studio.setParams({
+    getService("studio").setParams({
         viewType: params.type,
         editorTab: "views",
         action: actionToEdit,
@@ -130,9 +137,7 @@ export async function mountViewEditor(params) {
         },
         mode: "editor",
     });
-    return mountWithCleanup(ViewEditorParent, {
-        env,
-    });
+    return mountWithCleanup(ViewEditorParent);
 }
 
 function prepareRegistry(filterRegistry) {
@@ -166,6 +171,10 @@ function prepareRegistry(filterRegistry) {
         "ui",
         "effect",
         "web_studio.get_approval_spec_batched",
+        "command",
+        "offline",
+        "datetime_picker",
+        "bottom_sheet",
     ];
     Object.keys(serviceRegistry.content).forEach((e) => {
         if (!REQUIRED_SERVICES.includes(e)) {
@@ -210,7 +219,7 @@ function makeFakeMessagingService() {
 }
 
 export async function openStudio(params = {}) {
-    await contains(".o_main_navbar .o_web_studio_navbar_item button").click();
+    await contains(".o_main_navbar .o_web_studio_navbar_item").click();
     if (params.noEdit) {
         await contains(".o_menu_sections a").click();
         await waitFor(".o_web_studio_views");

@@ -4,10 +4,11 @@
 from freezegun import freeze_time
 
 from odoo.addons.appointment_account_payment.tests.common import AppointmentAccountPaymentCommon
-from odoo.tests import users
+from odoo.tests import tagged, users
 from odoo.tools import mute_logger
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WebsiteAppointmentSaleTest(AppointmentAccountPaymentCommon):
 
     @mute_logger('odoo.sql_db')

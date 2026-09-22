@@ -24,9 +24,15 @@ class AIAgent(models.Model):
     def _is_user_access_allowed(self):
         return super()._is_user_access_allowed() or self.livechat_channel_rule_ids
 
-    def _build_system_context(self, extra_system_context: str = ""):
-        messages = super()._build_system_context(extra_system_context)
-        discuss_channel = self.env.context.get('discuss_channel', self.env['discuss.channel'])
-        if discuss_channel.channel_type == 'livechat':
-            messages.append(PREPROMPTS['livechat'])
-        return messages
+    def _get_livechat_preprompt(self):
+        return PREPROMPTS['livechat']
+
+    def _get_instructions(self, extra_instructions=None, restrict_to_resources_override=None):
+        if self.env.context.get('discuss_channel', self.env['discuss.channel']).channel_type == 'livechat':
+            livechat_preprompt = self._get_livechat_preprompt()
+            if livechat_preprompt:
+                if extra_instructions:
+                    extra_instructions += f"\n{livechat_preprompt}"
+                else:
+                    extra_instructions = livechat_preprompt
+        return super()._get_instructions(extra_instructions, restrict_to_resources_override)

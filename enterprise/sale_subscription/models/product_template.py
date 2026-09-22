@@ -1,9 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Domain
-from odoo.tools import groupby
 
 
 class ProductTemplate(models.Model):
@@ -34,44 +33,29 @@ class ProductTemplate(models.Model):
         copy=False,
         groups='sales_team.group_sale_salesman',
     )
-    # Just like the other subscription_rule_ids field but only including fixed price rules.
-    # This is needed to use in the Recurring Prices list view in the product form.
-    subscription_rule_ids_fixed = fields.One2many(
-        comodel_name='product.pricelist.item',
-        inverse_name='product_tmpl_id',
-        string="Fixed Subscription Pricings",
-        domain=lambda self: self._domain_subscription_rule_ids_fixed(),
-        bypass_search_access=True,
-        copy=False,
-        groups='sales_team.group_sale_salesman',
-    )
     display_subscription_pricing = fields.Char(
         string='Display Price', compute='_compute_display_subscription_pricing',
     )
 
+    def write(self, vals):
+        if self.env.context.get('import_file') and 'recurring_invoice' in vals:
+            confirmed_lines = self._get_confirmed_order_lines()
+            updated_product = self.filtered(lambda p: p.recurring_invoice != vals['recurring_invoice'])
+            if confirmed_lines and updated_product:
+                problematic_products = confirmed_lines.product_template_id & updated_product
+                raise UserError(_("You can not change the recurring property of this product because it has been sold already (%s)", ", ".join(problematic_products.mapped('display_name'))))
+        res = super().write(vals)
+        return res
+
+    @api.model
     def _domain_subscription_rule_ids(self):
-        return Domain.AND([
-            self._base_domain_item_ids(),
-            [('plan_id', '!=', False)],
-        ])
+        return self._domain_pricelist_rule_ids() & Domain('plan_id', '!=', False)
 
-    def _domain_subscription_rule_ids_fixed(self):
-        """
-        Alternative domain computation for the subscription_rule_ids
-        field that filters out every record except the ones where
-        the price is fixed (not computed)
-        """
-        return Domain.AND([
-            self._domain_subscription_rule_ids(),
-            [('compute_price', '=', 'fixed')],
-        ])
-
-    def _domain_pricelist_rule_ids(self):
-        # Recurring rules shouldn't be shown in standard pricelist rules
-        return Domain.AND([
-            super()._domain_pricelist_rule_ids(),
-            [('plan_id', '=', False)]
-        ])
+    @api.depends('recurring_invoice')
+    def _compute_show_sales_price_page(self):
+        super()._compute_show_sales_price_page()
+        for template in self:
+            template.show_sales_price_page |= template.recurring_invoice
 
     @api.model
     def _get_incompatible_types(self):
@@ -89,7 +73,7 @@ class ProductTemplate(models.Model):
             ('product_template_id', 'in', self.ids),
             ('state', '=', 'sale')])
         if confirmed_lines:
-            self.recurring_invoice = not self.recurring_invoice
+            self.recurring_invoice = self._origin.recurring_invoice
             return {'warning': {
                 'title': _("Warning"),
                 'message': _(
@@ -127,52 +111,6 @@ class ProductTemplate(models.Model):
                     _("A subscription combo product can only contain subscription products.")
                 )
 
-    def copy(self, default=None):
-        copied_tmpls = super().copy(default)
-        for template, template_copy in zip(self, copied_tmpls, strict=True):
-
-            if template.company_id != template_copy.company_id:
-                # Don't duplicate pricings when the copy belongs to another company to
-                # avoid multi-company issues.
-                continue
-
-            # User duplicating the template might not have access to pricings
-            template_sudo = template.sudo()
-
-            # Force the order to be on id, since the others keys will have the same value/order
-            # This guarantees the order of the copied pricings is the same as the original ones
-            # regardless of the 'id desc' in the _order of product.pricelist.item model.
-            template_pricings = template_sudo.subscription_rule_ids.sorted('id')
-
-            # Duplicate template rules
-            variant_specific_pricings = template_pricings.filtered('product_id')
-            (template_pricings - variant_specific_pricings).copy({
-                'product_tmpl_id': template_copy.id,
-            })
-
-            # Duplicate variant-specific rules
-            if variant_specific_pricings:
-                variant_mapping = dict(zip(
-                    template_sudo.product_variant_ids.ids,
-                    template_copy.product_variant_ids.ids,
-                    strict=True,
-                ))
-
-                for product_id, pricings in groupby(
-                    variant_specific_pricings,
-                    lambda pricing: pricing.product_id.id
-                ):
-                    if product_id not in variant_mapping:
-                        # Pricings of inactive variants should not be copied
-                        # (removed combinations, archived products ...)
-                        continue
-                    self.env['product.pricelist.item'].sudo().concat(*pricings).copy({
-                        'product_tmpl_id': template_copy.id,
-                        'product_id': variant_mapping.get(product_id),
-                    })
-
-        return copied_tmpls
-
     @api.model
     def _get_configurator_price(
         self, product_or_template, quantity, date, currency, pricelist, *, plan_id=None, **kwargs
@@ -191,7 +129,9 @@ class ProductTemplate(models.Model):
         :rtype: float
         :return: The specified product's price.
         """
-        if product_or_template.recurring_invoice and not plan_id:
+        # When no plan is selected and the user opted for a one time purchase on the website, skip recurring pricing.
+        # allow_one_time_sale is passed via kwargs from the website add-to-cart request and is only relevant for this one time purchase case.
+        if product_or_template.recurring_invoice and not plan_id and not (kwargs.get('allow_one_time_sale') and product_or_template.allow_one_time_sale):
             if product_or_template.is_product_variant:
                 template, variant = product_or_template.product_tmpl_id, product_or_template
             else:
@@ -238,6 +178,11 @@ class ProductTemplate(models.Model):
             product_or_template, date, currency, pricelist, plan_id=plan_id, **kwargs
         )
 
+        # If the user chooses one time purchase on the website, return data without
+        # the recurring price label since this product is being sold as a one time purchase.
+        if kwargs.get('allow_one_time_sale') and product_or_template.allow_one_time_sale:
+            return data
+
         if product_or_template.recurring_invoice:
             if product_or_template.is_product_variant:
                 template, variant = product_or_template.product_tmpl_id, product_or_template
@@ -250,6 +195,15 @@ class ProductTemplate(models.Model):
             if pricing:
                 data['price_info'] = pricing.plan_id.sudo().billing_period_display_sentence
 
+            pricings = template._get_recurring_pricings(pricelist=pricelist, variant=variant, quantity=quantity)
+            data['subscription_plans'] = [
+                {
+                    'id': p.plan_id.id,
+                    'display_name': p.plan_id.sudo().name,
+                }
+                for p in pricings
+            ]
+
         return data
 
     def _get_recurring_pricing(self, pricelist, variant=None, plan_id=None, quantity=1.0):
@@ -259,6 +213,7 @@ class ProductTemplate(models.Model):
             products=product_or_template,
             date=fields.Datetime.now(),
             plan_id=plan_id,
+            quantity=quantity,
             # If no plan is given, return the first one with a plan, to be used as default pricing
             any_plan=True,
         )
@@ -268,7 +223,7 @@ class ProductTemplate(models.Model):
                 product=product_or_template,
                 # No need for uom conversion since multi-uom is not supported for recurring
                 # products atm.
-                qty_in_product_uom=quantity,
+                quantity=quantity,
             )
         )[:1]
 
@@ -280,6 +235,7 @@ class ProductTemplate(models.Model):
         domain = self.env['product.pricelist']._get_applicable_rules_domain(
             products=variant or self,
             date=fields.Datetime.now(),
+            quantity=quantity,
             plan_id=plan_id,
             # If no plan is given, return the first one with a plan, to be used as default pricing
             any_plan=True,
@@ -289,12 +245,69 @@ class ProductTemplate(models.Model):
                 product=product_or_template,
                 # No need for uom conversion since multi-uom is not supported for recurring
                 # products atm.
-                qty_in_product_uom=quantity,
+                quantity=quantity,
             )
         )[:1]
+
+    def _get_recurring_pricings(self, pricelist, variant=None, quantity=1.0):
+        """Return the first pricing applicable for each of the available subscription plans."""
+        self.ensure_one()
+
+        pricings = self.env['product.pricelist.item']
+        domain = pricelist._get_applicable_rules_domain(
+            products=variant or self,
+            date=fields.Datetime.now(),
+            quantity=quantity,
+            any_plan=True,
+        )
+
+        all_pricings = self.env['product.pricelist.item'].search(
+            domain, order=self.env['product.pricelist.item']._get_recurring_rules_order()
+        )
+        if pricelist:
+            # Add the rules not restricted to a specific pricelist, only for the plans that had no
+            # rule for the current pricelist.
+            domain = self.env['product.pricelist']._get_applicable_rules_domain(
+                products=variant or self,
+                date=fields.Datetime.now(),
+                quantity=quantity,
+                any_plan=True,
+            )
+            all_pricings |= self.env['product.pricelist.item'].search(
+                Domain.AND([domain, [('plan_id', 'not in', all_pricings.plan_id.ids)]]),
+                order=self.env['product.pricelist.item']._get_recurring_rules_order()
+            )
+
+        found_plan_ids = set()
+        for pricing in all_pricings:
+            if (
+                pricing.plan_id.sudo().active
+                and (plan_id := pricing.plan_id.id) not in found_plan_ids
+                # No need for uom conversion since multi-uom is not supported for recurring
+                # products atm.
+                and pricing._is_applicable_for(product=variant or self, quantity=quantity)
+            ):
+                found_plan_ids.add(plan_id)
+                pricings |= pricing
+
+        return pricings
 
     def _has_multiple_uoms(self):
         # multi-uoms doesn't work with subscription (for now)
         if self.recurring_invoice:
             return False
         return super()._has_multiple_uoms()
+
+    def _prepare_invoicing_tooltip(self):
+        if self.recurring_invoice:
+            if self.invoice_policy == 'delivery':
+                return self.env._("Recurring order with this product will be invoiced at the end of the period.")
+            elif self.invoice_policy == 'order':
+                return self.env._("Recurring order with this product will be invoiced at the beginning of the period.")
+        return super()._prepare_invoicing_tooltip()
+
+    def _get_confirmed_order_lines(self):
+        return self.env['sale.order.line'].search([
+            ('product_template_id', 'in', self.ids),
+            ('state', '=', 'sale')
+        ])

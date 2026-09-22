@@ -4,12 +4,12 @@
         <field name="name">Balance Sheet</field>
         <field name="name@tr">BILANÇO</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="country_id" ref="base.tr"/>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_multi_company">selector</field>
-        <field name="allow_account_audit_status_on_lines" eval="True"/>
         <field name="column_ids">
             <record id="account_report_l10n_tr_balance_sheet_column" model="account.report.column">
                 <field name="name">Balance</field>
@@ -43,8 +43,6 @@
                                         <field name="name@tr">KASA</field>
                                         <field name="code">TRBS_100</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">100</field>
                                     </record>
                                     <record id="account_report_line_trbs_101" model="account.report.line">
@@ -52,8 +50,6 @@
                                         <field name="name@tr">ALINAN ÇEKLER</field>
                                         <field name="code">TRBS_101</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">101</field>
                                     </record>
                                     <record id="account_report_line_trbs_102" model="account.report.line">
@@ -61,8 +57,6 @@
                                         <field name="name@tr">BANKALAR</field>
                                         <field name="code">TRBS_102</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">102</field>
                                     </record>
                                     <record id="account_report_line_trbs_103" model="account.report.line">
@@ -70,8 +64,6 @@
                                         <field name="name@tr">VERİLEN ÇEKLER VE ÖDEME EMİRLERİ (-)</field>
                                         <field name="code">TRBS_103</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-103</field>
                                     </record>
                                     <record id="account_report_line_trbs_108" model="account.report.line">
@@ -79,8 +71,6 @@
                                         <field name="name@tr">DIĞER HAZIR DEĞERLER</field>
                                         <field name="code">TRBS_108</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">108</field>
                                     </record>
                                 </field>
@@ -97,8 +87,6 @@
                                         <field name="name@tr">HISSE SENETLERI</field>
                                         <field name="code">TRBS_110</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">110</field>
                                     </record>
                                     <record id="account_report_line_trbs_111" model="account.report.line">
@@ -106,8 +94,6 @@
                                         <field name="name@tr">ÖZEL KESİM TAHVİL, SENET VE BONOLARI</field>
                                         <field name="code">TRBS_111</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">111</field>
                                     </record>
                                     <record id="account_report_line_trbs_112" model="account.report.line">
@@ -115,8 +101,6 @@
                                         <field name="name@tr">KAMU KESİMİ TAHVİL, SENET VE BONOLARI</field>
                                         <field name="code">TRBS_112</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">112</field>
                                     </record>
                                     <record id="account_report_line_trbs_118" model="account.report.line">
@@ -124,8 +108,6 @@
                                         <field name="name@tr">DIĞER MENKUL KIYMETLER</field>
                                         <field name="code">TRBS_118</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">118</field>
                                     </record>
                                     <record id="account_report_line_trbs_119" model="account.report.line">
@@ -133,8 +115,6 @@
                                         <field name="name@tr">MENKUL KIYMETLER DEĞER DÜŞÜKLÜĞÜ KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_119</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 119</field>
                                     </record>
                                 </field>
@@ -151,8 +131,6 @@
                                         <field name="name@tr">ALICILAR</field>
                                         <field name="code">TRBS_120</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">120 + 124</field>
                                     </record>
                                     <record id="account_report_line_trbs_121" model="account.report.line">
@@ -160,8 +138,6 @@
                                         <field name="name@tr">ALACAK SENETLERI</field>
                                         <field name="code">TRBS_121</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">121 + 123</field>
                                     </record>
                                     <record id="account_report_line_trbs_122" model="account.report.line">
@@ -169,8 +145,6 @@
                                         <field name="name@tr">ALACAK SENETLERİ REESKONTU (-)</field>
                                         <field name="code">TRBS_122</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 122</field>
                                     </record>
                                     <record id="account_report_line_trbs_126" model="account.report.line">
@@ -178,8 +152,6 @@
                                         <field name="name@tr">VERILEN DEPOZITO VE TEMINATLAR</field>
                                         <field name="code">TRBS_126</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">126</field>
                                     </record>
                                     <record id="account_report_line_trbs_127" model="account.report.line">
@@ -187,8 +159,6 @@
                                         <field name="name@tr">DIĞER TICARI ALACAKLAR</field>
                                         <field name="code">TRBS_127</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">127</field>
                                     </record>
                                     <record id="account_report_line_trbs_128" model="account.report.line">
@@ -196,8 +166,6 @@
                                         <field name="name@tr">ŞÜPHELI TICARI ALACAKLAR</field>
                                         <field name="code">TRBS_128</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">128</field>
                                     </record>
                                     <record id="account_report_line_trbs_129" model="account.report.line">
@@ -205,8 +173,6 @@
                                         <field name="name@tr">ŞÜPHELİ TİCARİ ALACAKLAR KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_129</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 129</field>
                                     </record>
                                 </field>
@@ -223,8 +189,6 @@
                                         <field name="name@tr">ORTAKLARDAN ALACAKLAR</field>
                                         <field name="code">TRBS_131</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">131</field>
                                     </record>
                                     <record id="account_report_line_trbs_132" model="account.report.line">
@@ -232,8 +196,6 @@
                                         <field name="name@tr">İŞTİRAKLERDEN ALACAKLAR</field>
                                         <field name="code">TRBS_132</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">132</field>
                                     </record>
                                     <record id="account_report_line_trbs_133" model="account.report.line">
@@ -241,8 +203,6 @@
                                         <field name="name@tr">BAĞLI ORTAKLIKLARDAN ALACAKLAR</field>
                                         <field name="code">TRBS_133</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">133</field>
                                     </record>
                                     <record id="account_report_line_trbs_135" model="account.report.line">
@@ -250,8 +210,6 @@
                                         <field name="name@tr">PERSONELDEN ALACAKLAR</field>
                                         <field name="code">TRBS_135</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">135</field>
                                     </record>
                                     <record id="account_report_line_trbs_136" model="account.report.line">
@@ -259,8 +217,6 @@
                                         <field name="name@tr">DİĞER ÇEŞİTLİ ALACAKLAR</field>
                                         <field name="code">TRBS_136</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">136</field>
                                     </record>
                                     <record id="account_report_line_trbs_137" model="account.report.line">
@@ -268,8 +224,6 @@
                                         <field name="name@tr">DİĞER ALACAK SENETLERİ REESKONTU (-)</field>
                                         <field name="code">TRBS_137</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 137</field>
                                     </record>
                                     <record id="account_report_line_trbs_138" model="account.report.line">
@@ -277,8 +231,6 @@
                                         <field name="name@tr">ŞÜPHELI DIĞER ALACAKLAR</field>
                                         <field name="code">TRBS_138</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">138</field>
                                     </record>
                                     <record id="account_report_line_trbs_139" model="account.report.line">
@@ -286,8 +238,6 @@
                                         <field name="name@tr">ŞÜPHELİ DİĞER ALACAKLAR KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_139</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 139</field>
                                     </record>
                                 </field>
@@ -304,8 +254,6 @@
                                         <field name="name@tr">İLK MADDE VE MALZEME</field>
                                         <field name="code">TRBS_150</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">150</field>
                                     </record>
                                     <record id="account_report_line_trbs_151" model="account.report.line">
@@ -313,8 +261,6 @@
                                         <field name="name@tr">YARI MAMULLER - ÜRETİM</field>
                                         <field name="code">TRBS_151</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">151</field>
                                     </record>
                                     <record id="account_report_line_trbs_152" model="account.report.line">
@@ -322,8 +268,6 @@
                                         <field name="name@tr">MAMULLER</field>
                                         <field name="code">TRBS_152</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">152</field>
                                     </record>
                                     <record id="account_report_line_trbs_153" model="account.report.line">
@@ -331,8 +275,6 @@
                                         <field name="name@tr">TİCARİ MALLAR</field>
                                         <field name="code">TRBS_153</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">153</field>
                                     </record>
                                     <record id="account_report_line_trbs_157" model="account.report.line">
@@ -340,8 +282,6 @@
                                         <field name="name@tr">DİĞER STOKLAR</field>
                                         <field name="code">TRBS_157</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">157</field>
                                     </record>
                                     <record id="account_report_line_trbs_158" model="account.report.line">
@@ -349,8 +289,6 @@
                                         <field name="name@tr">STOK DEĞER DÜŞÜKLÜĞÜ KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_158</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 158</field>
                                     </record>
                                     <record id="account_report_line_trbs_159" model="account.report.line">
@@ -358,8 +296,6 @@
                                         <field name="name@tr">VERİLEN SİPARİŞ AVANSLARI</field>
                                         <field name="code">TRBS_159</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">159</field>
                                     </record>
                                 </field>
@@ -376,8 +312,6 @@
                                         <field name="name@tr">YILLARA YAYGIN İNŞ.VE ONARIM MAALIYETLERI</field>
                                         <field name="code">TRBS_170</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">170</field>
                                     </record>
                                     <record id="account_report_line_trbs_179" model="account.report.line">
@@ -385,8 +319,6 @@
                                         <field name="name@tr">TAŞERONLARA VERILEN AVANSLAR</field>
                                         <field name="code">TRBS_179</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">179</field>
                                     </record>
                                 </field>
@@ -403,8 +335,6 @@
                                         <field name="name@tr">GELECEK AYLARA AİT GİDERLER</field>
                                         <field name="code">TRBS_180</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">180</field>
                                     </record>
                                     <record id="account_report_line_trbs_181" model="account.report.line">
@@ -412,8 +342,6 @@
                                         <field name="name@tr">GELIR TAHAKKUKLARI</field>
                                         <field name="code">TRBS_181</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">181</field>
                                     </record>
                                 </field>
@@ -430,8 +358,6 @@
                                         <field name="name@tr">DEVREDEN KDV</field>
                                         <field name="code">TRBS_190</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">190</field>
                                     </record>
                                     <record id="account_report_line_trbs_191" model="account.report.line">
@@ -439,8 +365,6 @@
                                         <field name="name@tr">İNDIRILECEK KDV</field>
                                         <field name="code">TRBS_191</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">191</field>
                                     </record>
                                     <record id="account_report_line_trbs_192" model="account.report.line">
@@ -448,8 +372,6 @@
                                         <field name="name@tr">DIĞER KDV</field>
                                         <field name="code">TRBS_192</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">192</field>
                                     </record>
                                     <record id="account_report_line_trbs_193" model="account.report.line">
@@ -457,8 +379,6 @@
                                         <field name="name@tr">PEŞIN ÖDENEN VERGILER VE FONLAR</field>
                                         <field name="code">TRBS_193</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">193</field>
                                     </record>
                                     <record id="account_report_line_trbs_195" model="account.report.line">
@@ -466,8 +386,6 @@
                                         <field name="name@tr">İŞ AVANSLAR</field>
                                         <field name="code">TRBS_195</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">195</field>
                                     </record>
                                     <record id="account_report_line_trbs_196" model="account.report.line">
@@ -475,8 +393,6 @@
                                         <field name="name@tr">PERSONEL AVANSLARI</field>
                                         <field name="code">TRBS_196</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">196</field>
                                     </record>
                                     <record id="account_report_line_trbs_197" model="account.report.line">
@@ -484,8 +400,6 @@
                                         <field name="name@tr">SAYIM VE TESELLÜM NOKSANLARI</field>
                                         <field name="code">TRBS_197</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">197</field>
                                     </record>
                                     <record id="account_report_line_trbs_198" model="account.report.line">
@@ -493,8 +407,6 @@
                                         <field name="name@tr">DIĞER ÇEŞITLI DÖNEN VARLIKLAR</field>
                                         <field name="code">TRBS_198</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">198</field>
                                     </record>
                                     <record id="account_report_line_trbs_199" model="account.report.line">
@@ -502,8 +414,6 @@
                                         <field name="name@tr">DIĞER ÇEŞITLI DÖNEN VARLIKLAR KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_199</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 199</field>
                                     </record>
                                 </field>
@@ -528,8 +438,6 @@
                                         <field name="name@tr">ALICILAR</field>
                                         <field name="code">TRBS_220</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">220 + 224</field>
                                     </record>
                                     <record id="account_report_line_trbs_221" model="account.report.line">
@@ -537,8 +445,6 @@
                                         <field name="name@tr">ALACAK SENETLERI</field>
                                         <field name="code">TRBS_221</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">221</field>
                                     </record>
                                     <record id="account_report_line_trbs_222" model="account.report.line">
@@ -546,8 +452,6 @@
                                         <field name="name@tr">ALACAK SENETLERİ REESKONTU (-)</field>
                                         <field name="code">TRBS_222</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 222</field>
                                     </record>
                                     <record id="account_report_line_trbs_226" model="account.report.line">
@@ -555,8 +459,6 @@
                                         <field name="name@tr">VERILEN DEPOZITO VE TEMINATLAR</field>
                                         <field name="code">TRBS_226</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">226</field>
                                     </record>
                                     <record id="account_report_line_trbs_229" model="account.report.line">
@@ -564,8 +466,6 @@
                                         <field name="name@tr">ŞÜPHELİ ALACAKLAR KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_229</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 229</field>
                                     </record>
                                 </field>
@@ -582,8 +482,6 @@
                                         <field name="name@tr">ORTAKLARDAN ALACAKLAR</field>
                                         <field name="code">TRBS_231</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">231</field>
                                     </record>
                                     <record id="account_report_line_trbs_232" model="account.report.line">
@@ -591,8 +489,6 @@
                                         <field name="name@tr">İŞTİRAKLERDEN ALACAKLAR</field>
                                         <field name="code">TRBS_232</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">232</field>
                                     </record>
                                     <record id="account_report_line_trbs_233" model="account.report.line">
@@ -600,8 +496,6 @@
                                         <field name="name@tr">BAĞLI ORTAKLIKLARDAN ALACAKLAR</field>
                                         <field name="code">TRBS_233</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">233</field>
                                     </record>
                                     <record id="account_report_line_trbs_235" model="account.report.line">
@@ -609,8 +503,6 @@
                                         <field name="name@tr">PERSONELDEN ALACAKLAR</field>
                                         <field name="code">TRBS_235</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">235</field>
                                     </record>
                                     <record id="account_report_line_trbs_236" model="account.report.line">
@@ -618,8 +510,6 @@
                                         <field name="name@tr">DİĞER ÇEŞİTLİ ALACAKLAR</field>
                                         <field name="code">TRBS_236</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">236</field>
                                     </record>
                                     <record id="account_report_line_trbs_237" model="account.report.line">
@@ -627,8 +517,6 @@
                                         <field name="name@tr">DİĞER ALACAK SENETLERİ REESKONTU (-)</field>
                                         <field name="code">TRBS_237</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 237</field>
                                     </record>
                                     <record id="account_report_line_trbs_239" model="account.report.line">
@@ -636,8 +524,6 @@
                                         <field name="name@tr">ŞÜPHELİ DİĞER ALACAKLAR KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_239</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 239</field>
                                     </record>
                                 </field>
@@ -654,8 +540,6 @@
                                         <field name="name@tr">BAĞLI MENKUL KIYMETLER</field>
                                         <field name="code">TRBS_240</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">240</field>
                                     </record>
                                     <record id="account_report_line_trbs_241" model="account.report.line">
@@ -663,8 +547,6 @@
                                         <field name="name@tr">BAĞLI MENKUL KIYMETLER DEĞER DÜŞÜKLÜĞÜ KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_241</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 241</field>
                                     </record>
                                     <record id="account_report_line_trbs_242" model="account.report.line">
@@ -672,8 +554,6 @@
                                         <field name="name@tr">İŞTİRAKLER</field>
                                         <field name="code">TRBS_242</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">242</field>
                                     </record>
                                     <record id="account_report_line_trbs_243" model="account.report.line">
@@ -681,8 +561,6 @@
                                         <field name="name@tr">İŞTİRAKLERE SERMAYE TAAHHÜTLERİ (-)</field>
                                         <field name="code">TRBS_243</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 243</field>
                                     </record>
                                     <record id="account_report_line_trbs_244" model="account.report.line">
@@ -690,8 +568,6 @@
                                         <field name="name@tr">İŞTİRAKLER SERMAYE PAYLARI DEĞER DÜŞÜKLÜĞÜ KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_244</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 244</field>
                                     </record>
                                     <record id="account_report_line_trbs_245" model="account.report.line">
@@ -699,8 +575,6 @@
                                         <field name="name@tr">BAĞLI ORTAKLIKLAR</field>
                                         <field name="code">TRBS_245</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">245</field>
                                     </record>
                                     <record id="account_report_line_trbs_246" model="account.report.line">
@@ -708,8 +582,6 @@
                                         <field name="name@tr">BAĞLI ORTAKLIKLARA SERMAYE TAAHHÜTLERİ (-)</field>
                                         <field name="code">TRBS_246</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 246</field>
                                     </record>
                                     <record id="account_report_line_trbs_247" model="account.report.line">
@@ -717,8 +589,6 @@
                                         <field name="name@tr">BAĞLI ORTAKLIKLAR SERMAYE PAYLARI DEĞER DÜŞÜKLÜGÜ KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_247</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 247</field>
                                     </record>
                                     <record id="account_report_line_trbs_248" model="account.report.line">
@@ -726,8 +596,6 @@
                                         <field name="name@tr">DİĞER MALİ DURAN VARLIKLAR</field>
                                         <field name="code">TRBS_248</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">248</field>
                                     </record>
                                     <record id="account_report_line_trbs_249" model="account.report.line">
@@ -735,8 +603,6 @@
                                         <field name="name@tr">DİĞER MALİ DURAN VARLIKLAR KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_249</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 249</field>
                                     </record>
                                 </field>
@@ -753,8 +619,6 @@
                                         <field name="name@tr">ARAZI VE ARSALAR</field>
                                         <field name="code">TRBS_250</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">250</field>
                                     </record>
                                     <record id="account_report_line_trbs_251" model="account.report.line">
@@ -762,8 +626,6 @@
                                         <field name="name@tr">YER ALTI VE YER ÜSTÜ DÜZENLERİ</field>
                                         <field name="code">TRBS_251</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">251</field>
                                     </record>
                                     <record id="account_report_line_trbs_252" model="account.report.line">
@@ -771,8 +633,6 @@
                                         <field name="name@tr">BINALAR</field>
                                         <field name="code">TRBS_252</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">252</field>
                                     </record>
                                     <record id="account_report_line_trbs_253" model="account.report.line">
@@ -780,8 +640,6 @@
                                         <field name="name@tr">TESİS, MAKİNE VE CİHAZLAR</field>
                                         <field name="code">TRBS_253</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">253</field>
                                     </record>
                                     <record id="account_report_line_trbs_254" model="account.report.line">
@@ -789,8 +647,6 @@
                                         <field name="name@tr">TAŞITLAR</field>
                                         <field name="code">TRBS_254</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">254</field>
                                     </record>
                                     <record id="account_report_line_trbs_255" model="account.report.line">
@@ -798,8 +654,6 @@
                                         <field name="name@tr">DEMIRBAŞLAR</field>
                                         <field name="code">TRBS_255</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">255</field>
                                     </record>
                                     <record id="account_report_line_trbs_256" model="account.report.line">
@@ -807,8 +661,6 @@
                                         <field name="name@tr">DİĞER MADDİ DURAN VARLIKLAR</field>
                                         <field name="code">TRBS_256</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">256</field>
                                     </record>
                                     <record id="account_report_line_trbs_257" model="account.report.line">
@@ -816,8 +668,6 @@
                                         <field name="name@tr">BİRİKMİŞ AMORTİSMANLAR (-)</field>
                                         <field name="code">TRBS_257</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 257</field>
                                     </record>
                                     <record id="account_report_line_trbs_258" model="account.report.line">
@@ -825,8 +675,6 @@
                                         <field name="name@tr">YAPILMAKTA OLAN YATIRIMLAR</field>
                                         <field name="code">TRBS_258</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">258</field>
                                     </record>
                                     <record id="account_report_line_trbs_259" model="account.report.line">
@@ -834,8 +682,6 @@
                                         <field name="name@tr">VERİLEN AVANSLAR</field>
                                         <field name="code">TRBS_259</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">259</field>
                                     </record>
                                 </field>
@@ -852,8 +698,6 @@
                                         <field name="name@tr">HAKLAR</field>
                                         <field name="code">TRBS_260</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">260</field>
                                     </record>
                                     <record id="account_report_line_trbs_261" model="account.report.line">
@@ -861,8 +705,6 @@
                                         <field name="name@tr">ŞEREFIYE</field>
                                         <field name="code">TRBS_261</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">261</field>
                                     </record>
                                     <record id="account_report_line_trbs_262" model="account.report.line">
@@ -870,8 +712,6 @@
                                         <field name="name@tr">KURULUŞ VE ÖRGÜTLENME GİDERLERİ</field>
                                         <field name="code">TRBS_262</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">262</field>
                                     </record>
                                     <record id="account_report_line_trbs_263" model="account.report.line">
@@ -879,8 +719,6 @@
                                         <field name="name@tr">ARAŞTIRMA VE GELIŞTIRME GIDERLERI</field>
                                         <field name="code">TRBS_263</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">263</field>
                                     </record>
                                     <record id="account_report_line_trbs_264" model="account.report.line">
@@ -888,8 +726,6 @@
                                         <field name="name@tr">ÖZEL MALİYETLER</field>
                                         <field name="code">TRBS_264</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">264</field>
                                     </record>
                                     <record id="account_report_line_trbs_267" model="account.report.line">
@@ -897,8 +733,6 @@
                                         <field name="name@tr">DİĞER MADDİ OLMAYAN DURAN VARLIKLAR</field>
                                         <field name="code">TRBS_267</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">267</field>
                                     </record>
                                     <record id="account_report_line_trbs_268" model="account.report.line">
@@ -906,8 +740,6 @@
                                         <field name="name@tr">BIRIKMIŞ AMORTISMANLAR (-)</field>
                                         <field name="code">TRBS_268</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 268</field>
                                     </record>
                                     <record id="account_report_line_trbs_269" model="account.report.line">
@@ -915,8 +747,6 @@
                                         <field name="name@tr">VERILEN AVANSLAR</field>
                                         <field name="code">TRBS_269</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">269</field>
                                     </record>
                                 </field>
@@ -933,8 +763,6 @@
                                         <field name="name@tr">ARAMA GIDERLERI</field>
                                         <field name="code">TRBS_271</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">271</field>
                                     </record>
                                     <record id="account_report_line_trbs_272" model="account.report.line">
@@ -942,8 +770,6 @@
                                         <field name="name@tr">HAZIRLIK VE GELIŞTIRME GIDERLERI</field>
                                         <field name="code">TRBS_272</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">272</field>
                                     </record>
                                     <record id="account_report_line_trbs_277" model="account.report.line">
@@ -951,8 +777,6 @@
                                         <field name="name@tr">DİĞER ÖZEL TÜKENMEYE TABİ VARLIKLAR</field>
                                         <field name="code">TRBS_277</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">277</field>
                                     </record>
                                     <record id="account_report_line_trbs_278" model="account.report.line">
@@ -960,8 +784,6 @@
                                         <field name="name@tr">BIRIKMIŞ TÜKENME PAYLARI (-)</field>
                                         <field name="code">TRBS_278</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 278</field>
                                     </record>
                                     <record id="account_report_line_trbs_279" model="account.report.line">
@@ -969,8 +791,6 @@
                                         <field name="name@tr">VERILEN AVANSLAR</field>
                                         <field name="code">TRBS_279</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">279</field>
                                     </record>
                                 </field>
@@ -987,8 +807,6 @@
                                         <field name="name@tr">GELECEK YILLARA AİT GİDERLER</field>
                                         <field name="code">TRBS_280</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">280</field>
                                     </record>
                                     <record id="account_report_line_trbs_281" model="account.report.line">
@@ -996,8 +814,6 @@
                                         <field name="name@tr">GELIR TAHAKKUKLARI</field>
                                         <field name="code">TRBS_281</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">281</field>
                                     </record>
                                 </field>
@@ -1014,8 +830,6 @@
                                         <field name="name@tr">GELECEK YILLARDA İNDİRİLECEK KATMA DEĞER VERGİSİ</field>
                                         <field name="code">TRBS_291</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">291</field>
                                     </record>
                                     <record id="account_report_line_trbs_292" model="account.report.line">
@@ -1023,8 +837,6 @@
                                         <field name="name@tr">DIĞER KDV</field>
                                         <field name="code">TRBS_292</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">292</field>
                                     </record>
                                     <record id="account_report_line_trbs_293" model="account.report.line">
@@ -1032,8 +844,6 @@
                                         <field name="name@tr">GELECEK YILLAR İHTİYACI STOKLAR</field>
                                         <field name="code">TRBS_293</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">293</field>
                                     </record>
                                     <record id="account_report_line_trbs_294" model="account.report.line">
@@ -1041,8 +851,6 @@
                                         <field name="name@tr">ELDEN ÇIKARILACAK STOKLAR VE MADDİ DURAN VARLIKLAR</field>
                                         <field name="code">TRBS_294</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">294</field>
                                     </record>
                                     <record id="account_report_line_trbs_295" model="account.report.line">
@@ -1050,8 +858,6 @@
                                         <field name="name@tr">PREPAID TAX AND FUNDS</field>
                                         <field name="code">TRBS_295</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">295</field>
                                     </record>
                                     <record id="account_report_line_trbs_297" model="account.report.line">
@@ -1059,8 +865,6 @@
                                         <field name="name@tr">DİĞER DURAN VARLIKLAR</field>
                                         <field name="code">TRBS_297</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">297</field>
                                     </record>
                                     <record id="account_report_line_trbs_298" model="account.report.line">
@@ -1068,8 +872,6 @@
                                         <field name="name@tr">STOK DEĞER DÜŞÜKLÜĞÜ KARŞILIĞI (-)</field>
                                         <field name="code">TRBS_298</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 298</field>
                                     </record>
                                     <record id="account_report_line_trbs_299" model="account.report.line">
@@ -1077,8 +879,6 @@
                                         <field name="name@tr">BIRIKMIŞ AMORTISMANLAR (-)</field>
                                         <field name="code">TRBS_299</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">- 299</field>
                                     </record>
                                 </field>
@@ -1112,8 +912,6 @@
                                         <field name="name@tr">BANKA KREDILERI</field>
                                         <field name="code">TRBS_300</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-300</field>
                                     </record>
                                     <record id="account_report_line_trbs_303" model="account.report.line">
@@ -1121,8 +919,6 @@
                                         <field name="name@tr">UZUN VADELİ KREDİLERİN ANAPARA TAKSİTLERİ VE FAİZLERİ</field>
                                         <field name="code">TRBS_303</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-303</field>
                                     </record>
                                     <record id="account_report_line_trbs_304" model="account.report.line">
@@ -1130,8 +926,6 @@
                                         <field name="name@tr">TAHVİL ANAPARA BORÇ, TAKSİT VE FAİZLERİ</field>
                                         <field name="code">TRBS_304</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-304</field>
                                     </record>
                                     <record id="account_report_line_trbs_305" model="account.report.line">
@@ -1139,8 +933,6 @@
                                         <field name="name@tr">ÇIKARILMIŞ BONOLAR VE SENETLER</field>
                                         <field name="code">TRBS_305</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-305</field>
                                     </record>
                                     <record id="account_report_line_trbs_306" model="account.report.line">
@@ -1148,8 +940,6 @@
                                         <field name="name@tr">ÇIKARILMIŞ DIĞER MENKUL KIYMETLER</field>
                                         <field name="code">TRBS_306</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-306</field>
                                     </record>
                                     <record id="account_report_line_trbs_308" model="account.report.line">
@@ -1157,8 +947,6 @@
                                         <field name="name@tr">MENKUL KIYMETLER İHRAÇ FARKI (-)</field>
                                         <field name="code">TRBS_308</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">308</field>
                                     </record>
                                     <record id="account_report_line_trbs_309" model="account.report.line">
@@ -1166,8 +954,6 @@
                                         <field name="name@tr">DIĞER MALI BORÇLAR</field>
                                         <field name="code">TRBS_309</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-301 - 302 - 309</field>
                                     </record>
                                 </field>
@@ -1184,8 +970,6 @@
                                         <field name="name@tr">SATICILAR</field>
                                         <field name="code">TRBS_320</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-320</field>
                                     </record>
                                     <record id="account_report_line_trbs_321" model="account.report.line">
@@ -1193,8 +977,6 @@
                                         <field name="name@tr">BORÇ SENETLERI</field>
                                         <field name="code">TRBS_321</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-321</field>
                                     </record>
                                     <record id="account_report_line_trbs_322" model="account.report.line">
@@ -1202,8 +984,6 @@
                                         <field name="name@tr">BORÇ SENETLERİ REESKONTU (-)</field>
                                         <field name="code">TRBS_322</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">322</field>
                                     </record>
                                     <record id="account_report_line_trbs_326" model="account.report.line">
@@ -1211,8 +991,6 @@
                                         <field name="name@tr">VERILEN DEPOZITO VE TEMINATLAR</field>
                                         <field name="code">TRBS_326</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-326</field>
                                     </record>
                                     <record id="account_report_line_trbs_329" model="account.report.line">
@@ -1220,8 +998,6 @@
                                         <field name="name@tr">OTHER TRADE PAYABLES</field>
                                         <field name="code">TRBS_329</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-329</field>
                                     </record>
                                 </field>
@@ -1238,8 +1014,6 @@
                                         <field name="name@tr">ORTAKLARA BORÇLAR</field>
                                         <field name="code">TRBS_331</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-331</field>
                                     </record>
                                     <record id="account_report_line_trbs_332" model="account.report.line">
@@ -1247,8 +1021,6 @@
                                         <field name="name@tr">İŞTİRAKLERE BORÇLAR</field>
                                         <field name="code">TRBS_332</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-332</field>
                                     </record>
                                     <record id="account_report_line_trbs_333" model="account.report.line">
@@ -1256,8 +1028,6 @@
                                         <field name="name@tr">BAĞLI ORTAKLIKLARA BORÇLAR</field>
                                         <field name="code">TRBS_333</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-333</field>
                                     </record>
                                     <record id="account_report_line_trbs_335" model="account.report.line">
@@ -1265,8 +1035,6 @@
                                         <field name="name@tr">PERSONELE BORÇLAR</field>
                                         <field name="code">TRBS_335</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-335</field>
                                     </record>
                                     <record id="account_report_line_trbs_336" model="account.report.line">
@@ -1274,8 +1042,6 @@
                                         <field name="name@tr">DIĞER ÇEŞITLI BORÇLAR</field>
                                         <field name="code">TRBS_336</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-336</field>
                                     </record>
                                     <record id="account_report_line_trbs_337" model="account.report.line">
@@ -1283,8 +1049,6 @@
                                         <field name="name@tr">DİĞER BORÇ SENETLERİ REESKONTU (-)</field>
                                         <field name="code">TRBS_337</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">337</field>
                                     </record>
                                 </field>
@@ -1301,8 +1065,6 @@
                                         <field name="name@tr">ALINAN SİPARİŞ AVANSLARI</field>
                                         <field name="code">TRBS_340</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-340</field>
                                     </record>
                                     <record id="account_report_line_trbs_349" model="account.report.line">
@@ -1310,8 +1072,6 @@
                                         <field name="name@tr">ALINAN DİĞER AVANSLAR</field>
                                         <field name="code">TRBS_349</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-349</field>
                                     </record>
                                 </field>
@@ -1328,8 +1088,6 @@
                                         <field name="name@tr">YILLARA YAYGIN İNŞ. VE ONARIM HAKEDIŞLERI</field>
                                         <field name="code">TRBS_350</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-350</field>
                                     </record>
                                 </field>
@@ -1346,8 +1104,6 @@
                                         <field name="name@tr">ÖDENECEK VERGI VE FONLAR</field>
                                         <field name="code">TRBS_360</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-360</field>
                                     </record>
                                     <record id="account_report_line_trbs_361" model="account.report.line">
@@ -1355,8 +1111,6 @@
                                         <field name="name@tr">ÖDENECEK SOSYAL GÜVENLIK KESINTILERI</field>
                                         <field name="code">TRBS_361</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-361</field>
                                     </record>
                                     <record id="account_report_line_trbs_368" model="account.report.line">
@@ -1364,8 +1118,6 @@
                                         <field name="name@tr">VADESİ GEÇMİŞ ERTELENMİŞ VEYA TAKSİTLENDİRİLMİŞ VERGİ VE DİĞER YÜKÜMLÜLÜKLER</field>
                                         <field name="code">TRBS_368</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-368</field>
                                     </record>
                                     <record id="account_report_line_trbs_369" model="account.report.line">
@@ -1373,8 +1125,6 @@
                                         <field name="name@tr">ÖDENECEK DİĞER YÜKÜMLÜLÜKLER</field>
                                         <field name="code">TRBS_369</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-369</field>
                                     </record>
                                 </field>
@@ -1391,8 +1141,6 @@
                                         <field name="name@tr">DÖNEM KÂRI VERGİ VE DİĞER YASAL YÜKÜMLÜLÜK KARŞILIKLARI</field>
                                         <field name="code">TRBS_370</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-370</field>
                                     </record>
                                     <record id="account_report_line_trbs_371" model="account.report.line">
@@ -1400,8 +1148,6 @@
                                         <field name="name@tr">DÖNEM KÂRININ PEŞİN ÖDENEN VERGİ VE DİĞER YÜKÜMLÜLÜKLERİ (-)</field>
                                         <field name="code">TRBS_371</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-371</field>
                                     </record>
                                     <record id="account_report_line_trbs_372" model="account.report.line">
@@ -1409,8 +1155,6 @@
                                         <field name="name@tr">KIDEM TAZMİNATI KARŞILIĞI</field>
                                         <field name="code">TRBS_372</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-372</field>
                                     </record>
                                     <record id="account_report_line_trbs_373" model="account.report.line">
@@ -1418,8 +1162,6 @@
                                         <field name="name@tr">MALIYET GIDERLERI KARŞILIĞI</field>
                                         <field name="code">TRBS_373</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-373</field>
                                     </record>
                                     <record id="account_report_line_trbs_379" model="account.report.line">
@@ -1427,8 +1169,6 @@
                                         <field name="name@tr">DIĞER BORÇ VE GIDER KARŞILIKLARI</field>
                                         <field name="code">TRBS_379</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-379</field>
                                     </record>
                                 </field>
@@ -1445,8 +1185,6 @@
                                         <field name="name@tr">GELECEK AYLARA AİT GELİRLER</field>
                                         <field name="code">TRBS_380</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-380</field>
                                     </record>
                                     <record id="account_report_line_trbs_381" model="account.report.line">
@@ -1454,8 +1192,6 @@
                                         <field name="name@tr">GIDER TAHAKKUKLARI</field>
                                         <field name="code">TRBS_381</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-381</field>
                                     </record>
                                 </field>
@@ -1472,8 +1208,6 @@
                                         <field name="name@tr">HESAPLANAN KDV</field>
                                         <field name="code">TRBS_391</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-391</field>
                                     </record>
                                     <record id="account_report_line_trbs_392" model="account.report.line">
@@ -1481,8 +1215,6 @@
                                         <field name="name@tr">DIĞER KDV</field>
                                         <field name="code">TRBS_392</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-392</field>
                                     </record>
                                     <record id="account_report_line_trbs_393" model="account.report.line">
@@ -1490,8 +1222,6 @@
                                         <field name="name@tr">MERKEZ VE ŞUBELER CARİ HESABI</field>
                                         <field name="code">TRBS_393</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-393</field>
                                     </record>
                                     <record id="account_report_line_trbs_397" model="account.report.line">
@@ -1499,8 +1229,6 @@
                                         <field name="name@tr">SAYIM VE TESELLÜM FAZLALARI(1)</field>
                                         <field name="code">TRBS_397</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-397</field>
                                     </record>
                                     <record id="account_report_line_trbs_399" model="account.report.line">
@@ -1508,8 +1236,6 @@
                                         <field name="name@tr">DİĞER ÇEŞİTLİ YABANCI KAYNAKLAR</field>
                                         <field name="code">TRBS_399</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-399</field>
                                     </record>
                                 </field>
@@ -1534,8 +1260,6 @@
                                         <field name="name@tr">BANKA KREDILERI</field>
                                         <field name="code">TRBS_400</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-400</field>
                                     </record>
                                     <record id="account_report_line_trbs_405" model="account.report.line">
@@ -1543,8 +1267,6 @@
                                         <field name="name@tr">ÇIKARILMIŞ TAHVILLER</field>
                                         <field name="code">TRBS_405</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-405</field>
                                     </record>
                                     <record id="account_report_line_trbs_407" model="account.report.line">
@@ -1552,8 +1274,6 @@
                                         <field name="name@tr">ÇIKARILMIŞ DIĞER MENKUL KIYMETLER</field>
                                         <field name="code">TRBS_407</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-407</field>
                                     </record>
                                     <record id="account_report_line_trbs_408" model="account.report.line">
@@ -1561,8 +1281,6 @@
                                         <field name="name@tr">MENKUL KIYMETLER İHRAÇ FARKI (-)</field>
                                         <field name="code">TRBS_408</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">408</field>
                                     </record>
                                     <record id="account_report_line_trbs_409" model="account.report.line">
@@ -1570,8 +1288,6 @@
                                         <field name="name@tr">DIĞER MALI BORÇLAR</field>
                                         <field name="code">TRBS_409</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-401 - 402 - 409</field>
                                     </record>
                                 </field>
@@ -1588,8 +1304,6 @@
                                         <field name="name@tr">SATICILAR</field>
                                         <field name="code">TRBS_420</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-420</field>
                                     </record>
                                     <record id="account_report_line_trbs_421" model="account.report.line">
@@ -1597,8 +1311,6 @@
                                         <field name="name@tr">BORÇ SENETLERI</field>
                                         <field name="code">TRBS_421</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-421</field>
                                     </record>
                                     <record id="account_report_line_trbs_422" model="account.report.line">
@@ -1606,8 +1318,6 @@
                                         <field name="name@tr">BORÇ SENETLERİ REESKONTU (-)</field>
                                         <field name="code">TRBS_422</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">422</field>
                                     </record>
                                     <record id="account_report_line_trbs_426" model="account.report.line">
@@ -1615,8 +1325,6 @@
                                         <field name="name@tr">ALINAN DEPOZITO VE TEMINATLAR</field>
                                         <field name="code">TRBS_426</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-426</field>
                                     </record>
                                     <record id="account_report_line_trbs_429" model="account.report.line">
@@ -1624,8 +1332,6 @@
                                         <field name="name@tr">OTHER TRADE PAYABLES</field>
                                         <field name="code">TRBS_429</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-429</field>
                                     </record>
                                 </field>
@@ -1642,8 +1348,6 @@
                                         <field name="name@tr">ORTAKLARA BORÇLAR</field>
                                         <field name="code">TRBS_431</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-431</field>
                                     </record>
                                     <record id="account_report_line_trbs_432" model="account.report.line">
@@ -1651,8 +1355,6 @@
                                         <field name="name@tr">İŞTİRAKLERE BORÇLAR</field>
                                         <field name="code">TRBS_432</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-432</field>
                                     </record>
                                     <record id="account_report_line_trbs_433" model="account.report.line">
@@ -1660,8 +1362,6 @@
                                         <field name="name@tr">BAĞLI ORTAKLIKLARA BORÇLAR</field>
                                         <field name="code">TRBS_433</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-433</field>
                                     </record>
                                     <record id="account_report_line_trbs_436" model="account.report.line">
@@ -1669,8 +1369,6 @@
                                         <field name="name@tr">DİĞER ÇEŞİTLİ BORÇLAR(1)</field>
                                         <field name="code">TRBS_436</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-436</field>
                                     </record>
                                     <record id="account_report_line_trbs_437" model="account.report.line">
@@ -1678,8 +1376,6 @@
                                         <field name="name@tr">DİĞER BORÇ SENETLERİ REESKONTU (-)</field>
                                         <field name="code">TRBS_437</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">437</field>
                                     </record>
                                     <record id="account_report_line_trbs_438" model="account.report.line">
@@ -1687,8 +1383,6 @@
                                         <field name="name@tr">AMUYA OLAN ERTELENMİŞ VEYA TAKSİTLENDİRİLMİŞ BORÇLAR</field>
                                         <field name="code">TRBS_438</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-438</field>
                                     </record>
                                 </field>
@@ -1705,8 +1399,6 @@
                                         <field name="name@tr">ALINAN SİPARİŞ AVANSLARI</field>
                                         <field name="code">TRBS_440</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-440</field>
                                     </record>
                                     <record id="account_report_line_trbs_449" model="account.report.line">
@@ -1714,8 +1406,6 @@
                                         <field name="name@tr">ALINAN DİĞER AVANSLAR</field>
                                         <field name="code">TRBS_449</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-449</field>
                                     </record>
                                 </field>
@@ -1732,8 +1422,6 @@
                                         <field name="name@tr">KIDEM TAZMİNATI KARŞILIĞI</field>
                                         <field name="code">TRBS_472</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-472</field>
                                     </record>
                                     <record id="account_report_line_trbs_479" model="account.report.line">
@@ -1741,8 +1429,6 @@
                                         <field name="name@tr">DIĞER BORÇ VE GIDER KARŞILIKLARI</field>
                                         <field name="code">TRBS_479</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-479</field>
                                     </record>
                                 </field>
@@ -1759,8 +1445,6 @@
                                         <field name="name@tr">GELECEK YILLARA AIT GELIRLER</field>
                                         <field name="code">TRBS_480</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-480</field>
                                     </record>
                                     <record id="account_report_line_trbs_481" model="account.report.line">
@@ -1768,8 +1452,6 @@
                                         <field name="name@tr">GIDER TAHAKKUKLARI</field>
                                         <field name="code">TRBS_481</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-481</field>
                                     </record>
                                 </field>
@@ -1786,8 +1468,6 @@
                                         <field name="name@tr">GELECEK YILLARA ERTELENEN VEYA TERKİN EDİLEN KATMA DEĞER VERGİSİ(1)</field>
                                         <field name="code">TRBS_492</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-492</field>
                                     </record>
                                     <record id="account_report_line_trbs_493" model="account.report.line">
@@ -1795,8 +1475,6 @@
                                         <field name="name@tr">TESİSE KATILMA PAYLARI</field>
                                         <field name="code">TRBS_493</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-493</field>
                                     </record>
                                     <record id="account_report_line_trbs_499" model="account.report.line">
@@ -1804,8 +1482,6 @@
                                         <field name="name@tr">DİĞER ÇEŞİTLİ UZUN VADELİ YABANCI KAYNAKLAR</field>
                                         <field name="code">TRBS_499</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-499</field>
                                     </record>
                                 </field>
@@ -1830,8 +1506,6 @@
                                         <field name="name@tr">SERMAYE</field>
                                         <field name="code">TRBS_500</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-500</field>
                                     </record>
                                     <record id="account_report_line_trbs_501" model="account.report.line">
@@ -1839,8 +1513,6 @@
                                         <field name="name@tr">ÖDENMEMİŞ SERMAYE (-)</field>
                                         <field name="code">TRBS_501</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">501</field>
                                     </record>
                                 </field>
@@ -1857,8 +1529,6 @@
                                         <field name="name@tr">HİSSE SENETLERİ İHRAÇ PRİMLERİ</field>
                                         <field name="code">TRBS_520</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-520</field>
                                     </record>
                                     <record id="account_report_line_trbs_521" model="account.report.line">
@@ -1866,8 +1536,6 @@
                                         <field name="name@tr">HİSSE SENEDİ İPTAL KÂRLARI</field>
                                         <field name="code">TRBS_521</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-521</field>
                                     </record>
                                     <record id="account_report_line_trbs_522" model="account.report.line">
@@ -1875,8 +1543,6 @@
                                         <field name="name@tr">M.D.V. YENİDEN DEĞERLEME ARTIŞLARI</field>
                                         <field name="code">TRBS_522</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-522</field>
                                     </record>
                                     <record id="account_report_line_trbs_523" model="account.report.line">
@@ -1884,8 +1550,6 @@
                                         <field name="name@tr">İŞTIRAKLER YENIDEN DEĞERLEME ARTIŞLARI</field>
                                         <field name="code">TRBS_523</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-523</field>
                                     </record>
                                     <record id="account_report_line_trbs_524" model="account.report.line">
@@ -1893,8 +1557,6 @@
                                         <field name="name@tr">Maliyet Artışları Fonu</field>
                                         <field name="code">TRBS_524</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-524</field>
                                     </record>
                                     <record id="account_report_line_trbs_529" model="account.report.line">
@@ -1902,8 +1564,6 @@
                                         <field name="name@tr">DİĞER SERMAYE YEDEKLERİ</field>
                                         <field name="code">TRBS_529</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-529</field>
                                     </record>
                                 </field>
@@ -1920,8 +1580,6 @@
                                         <field name="name@tr">YASAL YEDEKLER</field>
                                         <field name="code">TRBS_540</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-540</field>
                                     </record>
                                     <record id="account_report_line_trbs_541" model="account.report.line">
@@ -1929,8 +1587,6 @@
                                         <field name="name@tr">STATÜ YEDEKLERİ</field>
                                         <field name="code">TRBS_541</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-541</field>
                                     </record>
                                     <record id="account_report_line_trbs_542" model="account.report.line">
@@ -1938,8 +1594,6 @@
                                         <field name="name@tr">OLAĞANÜSTÜ YEDEKLER</field>
                                         <field name="code">TRBS_542</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-542</field>
                                     </record>
                                     <record id="account_report_line_trbs_548" model="account.report.line">
@@ -1947,8 +1601,6 @@
                                         <field name="name@tr">DİĞER KÂR YEDEKLERİ</field>
                                         <field name="code">TRBS_548</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-548</field>
                                     </record>
                                     <record id="account_report_line_trbs_549" model="account.report.line">
@@ -1956,8 +1608,6 @@
                                         <field name="name@tr">ÖZEL FONLAR</field>
                                         <field name="code">TRBS_549</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-549</field>
                                     </record>
                                 </field>
@@ -1974,8 +1624,6 @@
                                         <field name="name@tr">GEÇMİŞ YILLAR KÂRLARI</field>
                                         <field name="code">TRBS_570</field>
                                         <field name="hide_if_zero" eval="True"/>
-                                        <field name="groupby" eval="False"/>
-                                        <field name="foldable" eval="False"/>
                                         <field name="account_codes_formula" eval="False"/>
                                     </record>
                                     <record id="account_report_line_trbs_570" model="account.report.line">
@@ -2024,7 +1672,6 @@
                                         <field name="code">TRBS_580</field>
                                         <field name="hide_if_zero" eval="True"/>
                                         <field name="groupby" eval="False"/>
-                                        <field name="foldable" eval="False"/>
                                         <field name="account_codes_formula" eval="False"/>
                                     </record>
                                     <record id="account_report_line_trbs_580" model="account.report.line">
@@ -2052,7 +1699,6 @@
                                         <field name="code">TRBS_590</field>
                                         <field name="hide_if_zero" eval="True"/>
                                         <field name="groupby" eval="False"/>
-                                        <field name="foldable" eval="False"/>
                                         <field name="account_codes_formula" eval="False"/>
                                     </record>
                                     <record id="account_report_line_trbs_590" model="account.report.line">
@@ -2081,7 +1727,6 @@
                                         <field name="code">TRBS_591</field>
                                         <field name="hide_if_zero" eval="True"/>
                                         <field name="groupby" eval="False"/>
-                                        <field name="foldable" eval="False"/>
                                         <field name="account_codes_formula" eval="False"/>
                                     </record>
                                     <record id="account_report_line_trbs_591" model="account.report.line">

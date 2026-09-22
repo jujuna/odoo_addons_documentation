@@ -3,32 +3,22 @@
 # * esg_hr_fleet
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:46+0000\n"
-"PO-Revision-Date: 2025-09-18 02:44+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 01:08+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-master/"
 "esg_hr_fleet/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#. module: esg_hr_fleet
-#. odoo-javascript
-#: code:addons/esg_hr_fleet/static/src/views/esg_employee_commuting_report_pivot/esg_employee_commuting_report_pivot_view.xml:0
-msgid "Add Emissions"
-msgstr "Añadir emisiones"
-
-#. module: esg_hr_fleet
-#: model:ir.actions.act_window,name:esg_hr_fleet.employee_commuting_emissions_wizard_action
-msgid "Add Employee Commuting Emissions"
-msgstr "Añadir emisiones del desplazamiento diario de los empleados"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: esg_hr_fleet
 #. odoo-javascript
@@ -50,11 +40,17 @@ msgstr ""
 "oficina."
 
 #. module: esg_hr_fleet
-#: model:ir.model,name:esg_hr_fleet.model_res_company
-msgid "Companies"
-msgstr "Compañías"
+#: model_terms:ir.ui.view,arch_db:esg_hr_fleet.emitted_emission_from_account_form_view
+#: model_terms:ir.ui.view,arch_db:esg_hr_fleet.other_emission_form_view
+msgid ""
+"Commuting emissions reflect home-office distance, weekly attendance,\n"
+"                    and vehicle CO₂ emissions for all employees, using data "
+"from the Employee\n"
+"                    and Fleet apps."
+msgstr ""
 
 #. module: esg_hr_fleet
+#: model:ir.model,name:esg_hr_fleet.model_res_company
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_employee_commuting_report__company_id
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_fleet_vehicle_assignation_log__company_id
 msgid "Company"
@@ -67,19 +63,9 @@ msgstr "Ajustes de configuración"
 
 #. module: esg_hr_fleet
 #. odoo-python
-#: code:addons/esg_hr_fleet/wizard/employee_commuting_emissions_wizard.py:0
+#: code:addons/esg_hr_fleet/models/esg_other_emission.py:0
 msgid "Conflicting Emissions"
 msgstr "Emisiones conflictivas"
-
-#. module: esg_hr_fleet
-#: model:ir.model.fields,field_description:esg_hr_fleet.field_employee_commuting_emissions_wizard__create_uid
-msgid "Created by"
-msgstr "Creado por"
-
-#. module: esg_hr_fleet
-#: model:ir.model.fields,field_description:esg_hr_fleet.field_employee_commuting_emissions_wizard__create_date
-msgid "Created on"
-msgstr "Creado el"
 
 #. module: esg_hr_fleet
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_employee_commuting_report__date_from
@@ -92,12 +78,8 @@ msgid "Date To"
 msgstr "Fecha hasta"
 
 #. module: esg_hr_fleet
-#: model_terms:ir.ui.view,arch_db:esg_hr_fleet.employee_commuting_emissions_wizard_form
-msgid "Discard"
-msgstr "Descartar"
-
-#. module: esg_hr_fleet
-#: model:ir.model.fields,field_description:esg_hr_fleet.field_employee_commuting_emissions_wizard__display_name
+#: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_carbon_emission_report__display_name
+#: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_emission_factor__display_name
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_employee_commuting_report__display_name
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_other_emission__display_name
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_fleet_vehicle_assignation_log__display_name
@@ -105,13 +87,6 @@ msgstr "Descartar"
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr "Nombre para mostrar"
-
-#. module: esg_hr_fleet
-#: model_terms:ir.ui.view,arch_db:esg_hr_fleet.employee_commuting_emissions_wizard_form
-msgid "Do you want to generate an Emitted Emission for Employee Commuting?"
-msgstr ""
-"¿Desea generar una emisión emitida para los desplazamientos diarios de los "
-"empleados?"
 
 #. module: esg_hr_fleet
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_employee_commuting_report__driver_id
@@ -124,9 +99,9 @@ msgid "Drivers history on a vehicle"
 msgstr "Historial de conductores en un vehículo"
 
 #. module: esg_hr_fleet
-#: model_terms:ir.ui.view,arch_db:esg_hr_fleet.res_config_settings_view_form
-msgid "ESG"
-msgstr "ASG"
+#: model:ir.model,name:esg_hr_fleet.model_esg_carbon_emission_report
+msgid "ESG Carbon Emissions Report"
+msgstr ""
 
 #. module: esg_hr_fleet
 #: model:ir.model,name:esg_hr_fleet.model_esg_employee_commuting_report
@@ -134,19 +109,16 @@ msgid "ESG Employee Commuting Report"
 msgstr "Informe ASG del desplazamiento diario de los empleados"
 
 #. module: esg_hr_fleet
-#. odoo-python
-#: code:addons/esg_hr_fleet/wizard/employee_commuting_emissions_wizard.py:0
-msgid "Emission successfully created"
-msgstr "Emisión creada con éxito"
+#: model:ir.module.module,shortdesc:base.module_esg_hr_fleet
+msgid "ESG HR Fleet"
+msgstr ""
 
 #. module: esg_hr_fleet
-#: model:ir.model.fields,field_description:esg_hr_fleet.field_employee_commuting_emissions_wizard__date_start
-msgid "Emissions Period"
-msgstr "Periodo de emisiones"
+#: model:ir.model,name:esg_hr_fleet.model_esg_emission_factor
+msgid "Emission Factor"
+msgstr ""
 
 #. module: esg_hr_fleet
-#. odoo-python
-#: code:addons/esg_hr_fleet/wizard/employee_commuting_emissions_wizard.py:0
 #: model:ir.actions.act_window,name:esg_hr_fleet.action_employee_commuting_report_views
 #: model:ir.ui.menu,name:esg_hr_fleet.menu_esg_employee_commuting
 #: model_terms:ir.ui.view,arch_db:esg_hr_fleet.employee_commuting_report_pivot
@@ -160,18 +132,13 @@ msgstr "Emisiones del desplazamiento diario de los empleados"
 
 #. module: esg_hr_fleet
 #. odoo-python
-#: code:addons/esg_hr_fleet/wizard/employee_commuting_emissions_wizard.py:0
+#: code:addons/esg_hr_fleet/models/esg_other_emission.py:0
 msgid "Employee commuting from %(start_date)s to %(end_date)s"
 msgstr "Desplazamiento de empleados del %(start_date)s al %(end_date)s"
 
 #. module: esg_hr_fleet
-#: model:ir.model,name:esg_hr_fleet.model_employee_commuting_emissions_wizard
-msgid "Generate emitted emissions from employee commuting"
-msgstr ""
-"Genere emisiones emitidas por el desplazamiento diario de los empleados"
-
-#. module: esg_hr_fleet
-#: model:ir.model.fields,field_description:esg_hr_fleet.field_employee_commuting_emissions_wizard__id
+#: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_carbon_emission_report__id
+#: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_emission_factor__id
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_employee_commuting_report__id
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_other_emission__id
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_fleet_vehicle_assignation_log__id
@@ -181,19 +148,11 @@ msgid "ID"
 msgstr "ID"
 
 #. module: esg_hr_fleet
-#: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_other_emission__is_fleet
-msgid "Is Fleet"
-msgstr "Es Flota"
-
-#. module: esg_hr_fleet
-#: model:ir.model.fields,field_description:esg_hr_fleet.field_employee_commuting_emissions_wizard__write_uid
-msgid "Last Updated by"
-msgstr "Última actualización por"
-
-#. module: esg_hr_fleet
-#: model:ir.model.fields,field_description:esg_hr_fleet.field_employee_commuting_emissions_wizard__write_date
-msgid "Last Updated on"
-msgstr "Última actualización el"
+#: model:ir.module.module,summary:base.module_esg_hr_fleet
+msgid ""
+"Measure fleet emissions based on your employees' commuting distance and "
+"vehicle data."
+msgstr ""
 
 #. module: esg_hr_fleet
 #: model_terms:ir.actions.act_window,help:esg_hr_fleet.action_employee_commuting_report_views
@@ -206,9 +165,10 @@ msgid "Other Emission"
 msgstr "Otra emisión"
 
 #. module: esg_hr_fleet
-#: model_terms:ir.ui.view,arch_db:esg_hr_fleet.employee_commuting_emissions_wizard_form
-msgid "Save"
-msgstr "Guardar"
+#: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_carbon_emission_report__quantity
+#: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_other_emission__quantity
+msgid "Quantity"
+msgstr ""
 
 #. module: esg_hr_fleet
 #. odoo-javascript
@@ -217,16 +177,18 @@ msgid "See conflicting emissions"
 msgstr "Ver emisiones conflictivas"
 
 #. module: esg_hr_fleet
-#: model:ir.actions.act_window,name:esg_hr_fleet.action_esg_configuration
-#: model:ir.ui.menu,name:esg_hr_fleet.menu_mrp_config
-msgid "Settings"
-msgstr "Ajustes"
-
-#. module: esg_hr_fleet
 #: model:ir.model.constraint,message:esg_hr_fleet.constraint_res_company_weekly_days_at_office_check
 msgid "The Weekly Days at the Office must be a value between 0 and 7."
 msgstr ""
 "El campo de días a la semana en la oficina debe tener un valor entre 0 y 7."
+
+#. module: esg_hr_fleet
+#. odoo-python
+#: code:addons/esg_hr_fleet/models/esg_emission_factor.py:0
+msgid ""
+"The “%(name)s” Emission Factor is required by the ESG app and cannot be "
+"deleted."
+msgstr ""
 
 #. module: esg_hr_fleet
 #. odoo-javascript
@@ -238,14 +200,19 @@ msgstr ""
 "siguientes fechas:"
 
 #. module: esg_hr_fleet
+#. odoo-python
+#: code:addons/esg_hr_fleet/models/esg_other_emission.py:0
+msgid ""
+"To create a Fleet Emission, you need to specify both start and end dates, "
+"and the company of the emission."
+msgstr ""
+
+#. module: esg_hr_fleet
 #: model_terms:ir.actions.act_window,help:esg_hr_fleet.action_employee_commuting_report_views
 msgid ""
-"Track commuting emissions based on each employee’s distance from home to the "
+"Track commuting emissions based on each employee's distance from home to the "
 "office and the emission factor of their vehicle model."
 msgstr ""
-"Supervise las emisiones por el desplazamiento diario según la distancia que "
-"cada empleado viaja de su casa a la oficina y el factor de emisión del "
-"modelo de su vehículo."
 
 #. module: esg_hr_fleet
 #: model:ir.model.fields,field_description:esg_hr_fleet.field_esg_employee_commuting_report__vehicle_id
@@ -278,5 +245,10 @@ msgstr "km"
 msgid "tCO₂"
 msgstr "tCO₂"
 
-#~ msgid "HR"
-#~ msgstr "RR. HH."
+#~ msgid ""
+#~ "Track commuting emissions based on each employee’s distance from home to "
+#~ "the office and the emission factor of their vehicle model."
+#~ msgstr ""
+#~ "Supervise las emisiones por el desplazamiento diario según la distancia "
+#~ "que cada empleado viaja de su casa a la oficina y el factor de emisión "
+#~ "del modelo de su vehículo."

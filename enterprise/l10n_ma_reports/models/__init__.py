@@ -3,4 +3,6 @@
 from . import res_partner
 from . import account_move
 from . import account_report
+from . import account_return
 from . import account_payment
+from . import template_ma

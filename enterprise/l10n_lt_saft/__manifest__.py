@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Lithuanian Standard Audit File for Tax',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Lithuanian SAF-T is standard file format for exporting various types of accounting transactional data using the XML format.

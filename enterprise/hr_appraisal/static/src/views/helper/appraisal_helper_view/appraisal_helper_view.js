@@ -2,24 +2,33 @@ import { _t } from "@web/core/l10n/translation";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, proxy, t, useProps } from "@odoo/owl";
 
 export class AppraisalActionHelper extends Component {
     static template = "hr_appraisal.AppraisalActionHelper";
-    static props = ["noContentHelp"];
+
+    props = useProps({
+        noContentHelp: t.any(),
+    });
+
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
-        this.state = useState({
-            hasDemoData: false,
+        this.state = proxy({
+            hasDemoData: null,
+            hasAppraisalRight: false,
+            employeeNumber: 0,
         });
+        useService("lazy_session").getValue("is_demo", (v) => (this.state.hasDemoData = !!v));
         onWillStart(async () => {
-            this.hasAppraisalRight = await user.hasGroup("hr_appraisal.group_hr_appraisal_user");
-            this.employeeNumber = await this.orm.searchCount(
-                "hr.employee", [
+            this.state.hasAppraisalRight = await user.hasGroup(
+                "hr_appraisal.group_hr_appraisal_user"
+            );
+            this.state.employeeNumber = await this.orm
+                .cache({ type: "disk" })
+                .searchCount("hr.employee", [
                     ["company_id", "in", user.context.allowed_company_ids],
-                ])
-            this.state.hasDemoData = await this.orm.call("hr.appraisal", "has_demo_data", []);
+                ]);
         });
     }
 
@@ -46,17 +55,6 @@ export class AppraisalActionHelper extends Component {
             views: [[false, "form"]],
             view_mode: "form",
             target: "current",
-        });
-    }
-
-    loadAppraisalCampaignWizard(){
-        this.actionService.doAction({
-            name: _t("Appraisal Campaign"),
-            res_model: "hr.appraisal.campaign.wizard",
-            type: "ir.actions.act_window",
-            views: [[false, "form"]],
-            view_mode: "form",
-            target: "new",
         });
     }
 };

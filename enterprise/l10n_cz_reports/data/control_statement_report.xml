@@ -73,35 +73,36 @@
                         <field name="name@cs">A.1. Zdanitelná plnění uskutečněná v tuzemsku v režimu přenesení daňové povinnosti</field>
                         <field name="groupby">move_id,l10n_cz_supplies_code</field>
                         <field name="code">A1</field>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="control_statement_A1_vat_number" model="account.report.expression">
                                 <field name="label">vat_number</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A1</field>
+                                <field name="formula">_report_engine_control_statement_A1</field>
                                 <field name="subformula">vat_number</field>
                             </record>
                             <record id="control_statement_A1_journal_entry" model="account.report.expression">
                                 <field name="label">journal_entry</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A1</field>
+                                <field name="formula">_report_engine_control_statement_A1</field>
                                 <field name="subformula">journal_entry</field>
                             </record>
                             <record id="control_statement_A1_taxable_supply_date" model="account.report.expression">
                                 <field name="label">taxable_supply_date</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A1</field>
+                                <field name="formula">_report_engine_control_statement_A1</field>
                                 <field name="subformula">taxable_supply_date</field>
                             </record>
                             <record id="control_statement_A1_tax_base_1" model="account.report.expression">
                                 <field name="label">tax_base_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A1</field>
+                                <field name="formula">_report_engine_control_statement_A1</field>
                                 <field name="subformula">tax_base_1</field>
                             </record>
                             <record id="control_statement_A1_supplies_code" model="account.report.expression">
                                 <field name="label">supplies_code</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A1</field>
+                                <field name="formula">_report_engine_control_statement_A1</field>
                                 <field name="subformula">supplies_code</field>
                             </record>
                         </field>
@@ -111,53 +112,54 @@
                         <field name="name@cs">A.2. Přijatá zdanitelná plnění</field>
                         <field name="groupby">move_id</field>
                         <field name="code">A2</field>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="control_statement_A2_country_code" model="account.report.expression">
                                 <field name="label">country_code</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A2</field>
+                                <field name="formula">_report_engine_control_statement_A2</field>
                                 <field name="subformula">country_code</field>
                             </record>
                             <record id="control_statement_A2_vat_number" model="account.report.expression">
                                 <field name="label">vat_number</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A2</field>
+                                <field name="formula">_report_engine_control_statement_A2</field>
                                 <field name="subformula">vat_number</field>
                             </record>
                             <record id="control_statement_A2_journal_entry" model="account.report.expression">
                                 <field name="label">journal_entry</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A2</field>
+                                <field name="formula">_report_engine_control_statement_A2</field>
                                 <field name="subformula">journal_entry</field>
                             </record>
                             <record id="control_statement_A2_taxable_supply_date" model="account.report.expression">
                                 <field name="label">taxable_supply_date</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A2</field>
+                                <field name="formula">_report_engine_control_statement_A2</field>
                                 <field name="subformula">taxable_supply_date</field>
                             </record>
                             <record id="control_statement_A2_tax_base_1" model="account.report.expression">
                                 <field name="label">tax_base_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A2</field>
+                                <field name="formula">_report_engine_control_statement_A2</field>
                                 <field name="subformula">tax_base_1</field>
                             </record>
                             <record id="control_statement_A2_tax_1" model="account.report.expression">
                                 <field name="label">tax_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A2</field>
+                                <field name="formula">_report_engine_control_statement_A2</field>
                                 <field name="subformula">tax_1</field>
                             </record>
                             <record id="control_statement_A2_tax_base_2" model="account.report.expression">
                                 <field name="label">tax_base_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A2</field>
+                                <field name="formula">_report_engine_control_statement_A2</field>
                                 <field name="subformula">tax_base_2</field>
                             </record>
                             <record id="control_statement_A2_tax_2" model="account.report.expression">
                                 <field name="label">tax_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A2</field>
+                                <field name="formula">_report_engine_control_statement_A2</field>
                                 <field name="subformula">tax_2</field>
                             </record>
                         </field>
@@ -167,35 +169,36 @@
                         <field name="name@cs">A.3. Dodávky realizované ve speciálním režimu investičního zlata</field>
                         <field name="groupby">move_id</field>
                         <field name="code">A3</field>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="control_statement_A3_country_code" model="account.report.expression">
                                 <field name="label">country_code</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A3</field>
+                                <field name="formula">_report_engine_control_statement_A3</field>
                                 <field name="subformula">country_code</field>
                             </record>
                             <record id="control_statement_A3_vat_number" model="account.report.expression">
                                 <field name="label">vat_number</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A3</field>
+                                <field name="formula">_report_engine_control_statement_A3</field>
                                 <field name="subformula">vat_number</field>
                             </record>
                             <record id="control_statement_A3_journal_entry" model="account.report.expression">
                                 <field name="label">journal_entry</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A3</field>
+                                <field name="formula">_report_engine_control_statement_A3</field>
                                 <field name="subformula">journal_entry</field>
                             </record>
                             <record id="control_statement_A3_tax_base_1" model="account.report.expression">
                                 <field name="label">tax_base_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A3</field>
+                                <field name="formula">_report_engine_control_statement_A3</field>
                                 <field name="subformula">tax_base_1</field>
                             </record>
                             <record id="control_statement_A3_taxable_supply_date" model="account.report.expression">
                                 <field name="label">taxable_supply_date</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A3</field>
+                                <field name="formula">_report_engine_control_statement_A3</field>
                                 <field name="subformula">taxable_supply_date</field>
                             </record>
                         </field>
@@ -205,53 +208,54 @@
                         <field name="name@cs">A.4. Uskutečněná zdanitelná plnění a přijaté platby nad 10.000,- Kč </field>
                         <field name="groupby">move_id</field>
                         <field name="code">A4</field>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="control_statement_A4_vat_number" model="account.report.expression">
                                 <field name="label">vat_number</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A4</field>
+                                <field name="formula">_report_engine_control_statement_A4</field>
                                 <field name="subformula">vat_number</field>
                             </record>
                             <record id="control_statement_A4_journal_entry" model="account.report.expression">
                                 <field name="label">journal_entry</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A4</field>
+                                <field name="formula">_report_engine_control_statement_A4</field>
                                 <field name="subformula">journal_entry</field>
                             </record>
                             <record id="control_statement_A4_taxable_supply_date" model="account.report.expression">
                                 <field name="label">taxable_supply_date</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A4</field>
+                                <field name="formula">_report_engine_control_statement_A4</field>
                                 <field name="subformula">taxable_supply_date</field>
                             </record>
                             <record id="control_statement_A4_tax_base_1" model="account.report.expression">
                                 <field name="label">tax_base_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A4</field>
+                                <field name="formula">_report_engine_control_statement_A4</field>
                                 <field name="subformula">tax_base_1</field>
                             </record>
                             <record id="control_statement_A4_tax_1" model="account.report.expression">
                                 <field name="label">tax_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A4</field>
+                                <field name="formula">_report_engine_control_statement_A4</field>
                                 <field name="subformula">tax_1</field>
                             </record>
                             <record id="control_statement_A4_tax_base_2" model="account.report.expression">
                                 <field name="label">tax_base_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A4</field>
+                                <field name="formula">_report_engine_control_statement_A4</field>
                                 <field name="subformula">tax_base_2</field>
                             </record>
                             <record id="control_statement_A4_tax_2" model="account.report.expression">
                                 <field name="label">tax_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A4</field>
+                                <field name="formula">_report_engine_control_statement_A4</field>
                                 <field name="subformula">tax_2</field>
                             </record>
                             <record id="control_statement_A4_supplies_code" model="account.report.expression">
                                 <field name="label">supplies_code</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A4</field>
+                                <field name="formula">_report_engine_control_statement_A4</field>
                                 <field name="subformula">supplies_code</field>
                             </record>
                         </field>
@@ -260,30 +264,31 @@
                         <field name="name">A.5. Other realized taxable supplies and received payments up to CZK 10,000</field>
                         <field name="name@cs">A.5. Ostatní uskutečněná zdanitelná plnění a přijaté platby do 10.000,- Kč</field>
                         <field name="code">A5</field>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="control_statement_A5_tax_base_1" model="account.report.expression">
                                 <field name="label">tax_base_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A5</field>
+                                <field name="formula">_report_engine_control_statement_A5</field>
                                 <field name="subformula">tax_base_1</field>
                                 <field name="auditable" eval="False"/>
                             </record>
                             <record id="control_statement_A5_tax_1" model="account.report.expression">
                                 <field name="label">tax_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A5</field>
+                                <field name="formula">_report_engine_control_statement_A5</field>
                                 <field name="subformula">tax_1</field>
                             </record>
                             <record id="control_statement_A5_tax_base_2" model="account.report.expression">
                                 <field name="label">tax_base_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A5</field>
+                                <field name="formula">_report_engine_control_statement_A5</field>
                                 <field name="subformula">tax_base_2</field>
                             </record>
                             <record id="control_statement_A5_tax_2" model="account.report.expression">
                                 <field name="label">tax_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_A5</field>
+                                <field name="formula">_report_engine_control_statement_A5</field>
                                 <field name="subformula">tax_2</field>
                             </record>
                         </field>
@@ -299,53 +304,54 @@
                         <field name="name@cs">B.1. Přijatá zdanitelná plnění v tuzemském režimu přenesení daňové povinnosti</field>
                         <field name="groupby">move_id,l10n_cz_supplies_code</field>
                         <field name="code">B1</field>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="control_statement_B1_vat_number" model="account.report.expression">
                                 <field name="label">vat_number</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B1</field>
+                                <field name="formula">_report_engine_control_statement_B1</field>
                                 <field name="subformula">vat_number</field>
                             </record>
                             <record id="control_statement_B1_journal_entry" model="account.report.expression">
                                 <field name="label">journal_entry</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B1</field>
+                                <field name="formula">_report_engine_control_statement_B1</field>
                                 <field name="subformula">journal_entry</field>
                             </record>
                             <record id="control_statement_B1_taxable_supply_date" model="account.report.expression">
                                 <field name="label">taxable_supply_date</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B1</field>
+                                <field name="formula">_report_engine_control_statement_B1</field>
                                 <field name="subformula">taxable_supply_date</field>
                             </record>
                             <record id="control_statement_B1_tax_base_1" model="account.report.expression">
                                 <field name="label">tax_base_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B1</field>
+                                <field name="formula">_report_engine_control_statement_B1</field>
                                 <field name="subformula">tax_base_1</field>
                             </record>
                             <record id="control_statement_B1_tax_1" model="account.report.expression">
                                 <field name="label">tax_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B1</field>
+                                <field name="formula">_report_engine_control_statement_B1</field>
                                 <field name="subformula">tax_1</field>
                             </record>
                             <record id="control_statement_B1_tax_base_2" model="account.report.expression">
                                 <field name="label">tax_base_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B1</field>
+                                <field name="formula">_report_engine_control_statement_B1</field>
                                 <field name="subformula">tax_base_2</field>
                             </record>
                             <record id="control_statement_B1_tax_2" model="account.report.expression">
                                 <field name="label">tax_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B1</field>
+                                <field name="formula">_report_engine_control_statement_B1</field>
                                 <field name="subformula">tax_2</field>
                             </record>
                             <record id="control_statement_B1_supplies_code" model="account.report.expression">
                                 <field name="label">supplies_code</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B1</field>
+                                <field name="formula">_report_engine_control_statement_B1</field>
                                 <field name="subformula">supplies_code</field>
                             </record>
                         </field>
@@ -355,47 +361,48 @@
                         <field name="name@cs">B.2. Přijatá zdanitelná plnění a poskytnuté platby nad 10.000,- Kč</field>
                         <field name="groupby">move_id</field>
                         <field name="code">B2</field>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="control_statement_B2_vat_number" model="account.report.expression">
                                 <field name="label">vat_number</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B2</field>
+                                <field name="formula">_report_engine_control_statement_B2</field>
                                 <field name="subformula">vat_number</field>
                             </record>
                             <record id="control_statement_B2_journal_entry" model="account.report.expression">
                                 <field name="label">journal_entry</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B2</field>
+                                <field name="formula">_report_engine_control_statement_B2</field>
                                 <field name="subformula">journal_entry</field>
                             </record>
                             <record id="control_statement_B2_taxable_supply_date" model="account.report.expression">
                                 <field name="label">taxable_supply_date</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B2</field>
+                                <field name="formula">_report_engine_control_statement_B2</field>
                                 <field name="subformula">taxable_supply_date</field>
                             </record>
                             <record id="control_statement_B2_tax_base_1" model="account.report.expression">
                                 <field name="label">tax_base_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B2</field>
+                                <field name="formula">_report_engine_control_statement_B2</field>
                                 <field name="subformula">tax_base_1</field>
                             </record>
                             <record id="control_statement_B2_tax_1" model="account.report.expression">
                                 <field name="label">tax_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B2</field>
+                                <field name="formula">_report_engine_control_statement_B2</field>
                                 <field name="subformula">tax_1</field>
                             </record>
                             <record id="control_statement_B2_tax_base_2" model="account.report.expression">
                                 <field name="label">tax_base_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B2</field>
+                                <field name="formula">_report_engine_control_statement_B2</field>
                                 <field name="subformula">tax_base_2</field>
                             </record>
                             <record id="control_statement_B2_tax_2" model="account.report.expression">
                                 <field name="label">tax_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B2</field>
+                                <field name="formula">_report_engine_control_statement_B2</field>
                                 <field name="subformula">tax_2</field>
                             </record>
                         </field>
@@ -404,29 +411,30 @@
                         <field name="name">B.3. Received taxable supplies and provided payments up to CZK 10,000</field>
                         <field name="name@cs">B.3. Přijatá zdanitelná plnění a poskytnuté platby do 10.000,- Kč</field>
                         <field name="code">B3</field>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="control_statement_B3_tax_base_1" model="account.report.expression">
                                 <field name="label">tax_base_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B3</field>
+                                <field name="formula">_report_engine_control_statement_B3</field>
                                 <field name="subformula">tax_base_1</field>
                             </record>
                             <record id="control_statement_B3_tax_1" model="account.report.expression">
                                 <field name="label">tax_1</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B3</field>
+                                <field name="formula">_report_engine_control_statement_B3</field>
                                 <field name="subformula">tax_1</field>
                             </record>
                             <record id="control_statement_B3_tax_base_2" model="account.report.expression">
                                 <field name="label">tax_base_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B3</field>
+                                <field name="formula">_report_engine_control_statement_B3</field>
                                 <field name="subformula">tax_base_2</field>
                             </record>
                             <record id="control_statement_B3_tax_2" model="account.report.expression">
                                 <field name="label">tax_2</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_control_statement_B3</field>
+                                <field name="formula">_report_engine_control_statement_B3</field>
                                 <field name="subformula">tax_2</field>
                             </record>
                         </field>

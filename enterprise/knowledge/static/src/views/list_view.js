@@ -22,7 +22,7 @@ export class KnowledgeArticleController extends ListController {
         menuItems.duplicate = {
             isAvailable: () => this.hasSelectedRecords && user.isAdmin,
             sequence: 15,
-            icon: "fa fa-clone",
+            icon: "content_copy",
             description: _t("Duplicate"),
             callback: async () => {
                 const selectedResIds = await this.model.root.getResIds(true);

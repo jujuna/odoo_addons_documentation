@@ -29,7 +29,7 @@
 
             <div name="button_box" position="inside">
                 <button type="object" name="action_view_wages"
-                        class="oe_stat_button" icon="fa-money" invisible="country_code != 'CH'">
+                        class="oe_stat_button" icon="payments" invisible="country_code != 'CH'">
                     <div class="o_stat_info">
                         <span class="o_stat_text">
                             One-time Payments
@@ -84,27 +84,30 @@
                     string="Residence Municipality"
                     invisible="l10n_ch_canton == 'EX'"/>
                 </group>
-                                <group string="Residency Type" invisible="l10n_ch_canton != 'EX' or not l10n_ch_has_withholding_tax">
-                <field name="l10n_ch_residence_type" widget="radio" options="{'horizontal': True}" invisible="l10n_ch_canton != 'EX'"/>
-                <label for="l10n_ch_weekly_residence_address_street" string="Weekly Residence Address"
-                   invisible="l10n_ch_residence_type != 'Weekly' or l10n_ch_canton != 'EX'"/>
-                <div class="o_address_format"
-                 invisible="l10n_ch_residence_type != 'Weekly' or l10n_ch_canton != 'EX'">
-                <field name="l10n_ch_weekly_residence_address_street"
-                       placeholder="Street..."
-                       class="o_address_street"/>
-                <field name="l10n_ch_weekly_residence_address_city"
-                       placeholder="City"
-                       class="o_address_city"/>
-                <field name="l10n_ch_weekly_residence_address_zip"
-                       placeholder="ZIP"
-                       class="o_address_zip"/>
-                <span class="o_address_country">Switzerland</span>
-                </div>
-                <field name="l10n_ch_weekly_residence_canton"
-                   invisible="l10n_ch_residence_type != 'Weekly' or l10n_ch_canton != 'EX'"/>
-                <field name="l10n_ch_weekly_residence_municipality"
-                   invisible="l10n_ch_residence_type != 'Weekly' or l10n_ch_canton != 'EX'"/>
+                <group string="Residency Type"
+                    invisible="l10n_ch_canton != 'EX' or not l10n_ch_has_withholding_tax or country_code != 'CH'">
+                    <field name="l10n_ch_residence_type" widget="radio"
+                        options="{'horizontal': True}" invisible="l10n_ch_canton != 'EX'" />
+                    <label for="l10n_ch_weekly_residence_address_street"
+                        string="Weekly Residence Address"
+                        invisible="l10n_ch_residence_type != 'Weekly' or l10n_ch_canton != 'EX'" />
+                    <div class="o_address_format"
+                        invisible="l10n_ch_residence_type != 'Weekly' or l10n_ch_canton != 'EX'">
+                        <field name="l10n_ch_weekly_residence_address_street"
+                            placeholder="Street..."
+                            class="o_address_street" />
+                        <field name="l10n_ch_weekly_residence_address_city"
+                            placeholder="City"
+                            class="o_address_city" />
+                        <field name="l10n_ch_weekly_residence_address_zip"
+                            placeholder="ZIP"
+                            class="o_address_zip" />
+                        <span class="o_address_country">Switzerland</span>
+                    </div>
+                    <field name="l10n_ch_weekly_residence_canton"
+                        invisible="l10n_ch_residence_type != 'Weekly' or l10n_ch_canton != 'EX'" />
+                    <field name="l10n_ch_weekly_residence_municipality"
+                        invisible="l10n_ch_residence_type != 'Weekly' or l10n_ch_canton != 'EX'" />
                 </group>
             </group>
             <group name="hr_family_group" position="after">
@@ -183,9 +186,11 @@
                     <group name="contract" groups="hr.group_hr_user" style="padding-top: 20px;">
                         <div colspan="2" class="row">
                             <span class="col-8 text-uppercase fw-bolder small"> Contract Overview </span>
-                            <button name="%(hr.hr_version_wizard_action)d" type="action" string="Load a Template" 
-                                class="btn btn-link col-4 p-0 w-max text-end"/>
-                            <div class="w-100 border-top border-1 border-secondary mt-0 mb-3"></div>
+                            <field name="contract_template_id"
+                                widget="contract_template_button"
+                                class="ms-auto text-end w-auto p-0 mb-0 border-0 lh-1"
+                                nolabel="1"/>
+                            <div class="w-100 border-top border-1 mt-0 mb-3"></div>
                         </div>
     <field name="l10n_ch_location_unit_id" string="Workplace" options="{'no_quick_create': True}"/>
     <field name="registration_number" string="Employee Reference"/>
@@ -197,9 +202,10 @@
             class="o_hr_narrow_field ms-3" invisible="not contract_date_start"/>
             <widget name="button_new_contract"/>
         </div>
-                            <field name="contract_type_id" string="Contract Type" placeholder="Contract Type"/>
-                            <field name="structure_type_id" string="Pay Category" placeholder="Employee will be excluded from Pay Runs"
-                                    domain="['|', ('country_id', '=', False), ('country_id', '=', company_country_id)]"/>
+    <field name="employee_type_id" string="Contract Type" placeholder="Contract Type"/>
+    <field name="structure_type_id" string="Pay Category" placeholder="Employee will be excluded from Pay Runs"
+            domain="['|', ('country_id', '=', False), ('country_id', '=', company_country_id)]"/>
+    <field name="l10n_ch_contractual_annual_wage" invisible="wage_type != 'NoTimeConstraint'"/>
     <separator string="Schedule"/>
     <field name="resource_calendar_id"
         groups="hr.group_hr_manager"
@@ -225,7 +231,7 @@
                     <label for="l10n_ch_has_hourly"/>
                     <div class="o_row mw-50" name="hourly_wage">
                         <field name="l10n_ch_has_hourly"/>
-                        <field name="hourly_wage" class="oe_inline o_hr_narrow_field" readonly="not l10n_ch_has_hourly" nolabel="1"/>
+                        <field name="hourly_wage" class="oe_inline o_hr_narrow_field" readonly="not l10n_ch_has_hourly" nolabel="1" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}"/>
                         <div class="mb-3 text-muted">/ Hour</div>
                     </div>
 
@@ -259,7 +265,7 @@
                     <group string="Monthly Wage Types">
                         <field name="l10n_ch_contract_wage_ids" nolabel="1" colspan="4">
                             <list editable="bottom">
-                                <field name="input_type_id" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="salary_rule_id" options="{'no_create': True, 'no_open': True}"/>
                                 <field name="description"/>
                                 <field name="amount"/>
                                 <field name="uom"/>

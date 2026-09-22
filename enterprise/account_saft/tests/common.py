@@ -6,6 +6,8 @@ from odoo.addons.account_reports.models.account_report import AccountReportFileD
 
 class TestSaftReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

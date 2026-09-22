@@ -2,28 +2,24 @@
 
 import { loadJS } from "@web/core/assets";
 import { PaymentInterface } from "@point_of_sale/app/utils/payment/payment_interface";
-import { register_payment_method } from "@point_of_sale/app/services/pos_store";
+import { registry } from "@web/core/registry";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { TYRO_LIB_URLS } from "@pos_tyro/urls";
 import { FailureDialog } from "@pos_tyro/app/components/failure_dialog";
 import { QuestionDialog } from "@pos_tyro/app/components/question_dialog";
+import { _t } from "@web/core/l10n/translation";
 
 export class PaymentTyro extends PaymentInterface {
     setup() {
         super.setup(...arguments);
         this.dialog = this.env.services.dialog;
-        this.orm = this.env.services.orm;
         this.currentQuestion = null;
         this.loadTyroClient();
     }
 
-    get fastPayments() {
-        return false;
-    }
-
     async loadTyroClient() {
         await loadJS(TYRO_LIB_URLS[this.payment_method_id.tyro_mode]);
-        const posProductInfo = await this.orm.call("pos.payment.method", "get_tyro_product_info", [
+        const posProductInfo = await this.callPaymentMethod("get_tyro_product_info", [
             this.payment_method_id.id,
         ]);
         this.tyroClient = new TYRO.IClient(posProductInfo.apiKey, posProductInfo);
@@ -40,40 +36,45 @@ export class PaymentTyro extends PaymentInterface {
         return this.pos.getOrder()?.getSelectedPaymentline();
     }
 
-    addTip(tip) {
+    async addTip(tip) {
+        if (this.pos.config.self_ordering_mode === "kiosk") {
+            this._showError("Tips/surcharges are not supported in the kiosk.");
+            return;
+        }
         const tipAmount = parseInt(tip, 10) / 100;
         if (!this.pos.config.tip_product_id || !this.pos.config.iface_tipproduct) {
-            this.pos.addTyroSurcharge(tipAmount, this.payment_method_id.tyro_surcharge_product_id);
+            await this.pos.addTyroSurcharge(
+                tipAmount,
+                this.payment_method_id.tyro_surcharge_product_id
+            );
             this._showError(
-                "A tip was added on the Tyro terminal, but tipping is not enabled for this Point of Sale. It will instead be recorded as a surcharge.",
-                "Tyro Warning"
+                _t(
+                    "A tip was added on the Tyro terminal, but tipping is not enabled for this Point of Sale. It will instead be recorded as a surcharge."
+                ),
+                _t("Tyro Warning")
             );
         } else {
             const tipProduct = this.pos.config.tip_product_id;
             const orderLines = this.pos.getOrder().lines;
             const existingTip = orderLines.find((line) => line.product_id.id === tipProduct.id);
-            this.pos.setTip(tipAmount + (existingTip?.price_unit ?? 0));
+            await this.pos.setTip(tipAmount + (existingTip?.price_unit ?? 0));
         }
         this.paymentLine.setAmount(this.paymentLine.amount + tipAmount);
     }
 
-    addSurcharge(surcharge) {
+    async addSurcharge(surcharge) {
         const surchargeAmount = parseFloat(surcharge);
-        this.pos.addTyroSurcharge(
+        await this.pos.addTyroSurcharge(
             surchargeAmount,
             this.payment_method_id.tyro_surcharge_product_id
         );
         this.paymentLine.setAmount(this.paymentLine.amount + surchargeAmount);
     }
 
-    onTransactionComplete(response, resultCallback) {
+    async onTransactionComplete(response, resultCallback) {
         const line = this.paymentLine;
         this.dialog.closeAll();
         this.currentQuestion = null;
-
-        if (response.customerReceipt) {
-            line.setReceiptInfo(response.customerReceipt);
-        }
 
         if (response.result === "APPROVED") {
             line.transaction_id = response.transactionId;
@@ -82,10 +83,10 @@ export class PaymentTyro extends PaymentInterface {
             line.card_type = response.cardType;
             line.card_no = response.elidedPan;
             if (response.tipAmount) {
-                this.addTip(response.tipAmount);
+                await this.addTip(response.tipAmount);
             }
             if (response.surchargeAmount && response.surchargeAmount !== "0.00") {
-                this.addSurcharge(response.surchargeAmount);
+                await this.addSurcharge(response.surchargeAmount);
             }
             resultCallback(true);
         } else {
@@ -93,7 +94,8 @@ export class PaymentTyro extends PaymentInterface {
                 this.dialog.add(FailureDialog, {
                     result: response.result,
                     hasReceipt: !!response.customerReceipt,
-                    printReceipt: () => this.pos.printReceipt({ printBillActionTriggered: true }),
+                    printReceipt: () =>
+                        this.pos.ticketPrinter.printReceipt({ printBillActionTriggered: true }),
                 });
             }
             resultCallback(false);
@@ -106,7 +108,7 @@ export class PaymentTyro extends PaymentInterface {
             response.signatureRequired ||
             this.payment_method_id.tyro_always_print_merchant_receipt
         ) {
-            this.paymentLine.tyroMerchantReceipt = response.merchantReceipt;
+            this.paymentLine.tyro_merchant_receipt = response.merchantReceipt;
             if (response.signatureRequired) {
                 this.printMerchantReceipt();
             }
@@ -114,13 +116,17 @@ export class PaymentTyro extends PaymentInterface {
     }
 
     printMerchantReceipt() {
-        if (this.paymentLine.tyroMerchantReceipt) {
+        if (!this.pos.ticketPrinter.receiptPrinters.length) {
+            console.warn("Attempted to print merchant receipt from kiosk, ignoring.");
+            return;
+        }
+        if (this.paymentLine.tyro_merchant_receipt) {
             this.pos
                 .printReceipt({
                     printBillActionTriggered: true,
                 })
                 .then(() => {
-                    this.paymentLine.tyroMerchantReceipt = null;
+                    this.paymentLine.tyro_merchant_receipt = null;
                 });
         }
     }
@@ -149,7 +155,7 @@ export class PaymentTyro extends PaymentInterface {
         const amountDue = order.remainingDue;
         const line = order.getSelectedPaymentline();
         if (totalAmount < 0 && amountDue > line.amount) {
-            this._showError("You cannot refund more than the original amount.");
+            this._showError(_t("You cannot refund more than the original amount."));
             return false;
         }
         return true;
@@ -179,12 +185,11 @@ export class PaymentTyro extends PaymentInterface {
         this.tyroClient.continueLastTransaction(requestCallbacks);
     }
 
-    async sendPaymentRequest(uuid) {
+    async sendPaymentRequest(line) {
         /**
          * Override
          */
         await super.sendPaymentRequest(...arguments);
-        const line = this.paymentLine;
         try {
             line.setPaymentStatus("waitingCard");
             line.tyro_status = "Initiating...";
@@ -226,7 +231,7 @@ export class PaymentTyro extends PaymentInterface {
         }
     }
 
-    async sendPaymentCancel(order, uuid) {
+    async sendPaymentCancel(line) {
         /**
          * Override
          */
@@ -242,7 +247,7 @@ export class PaymentTyro extends PaymentInterface {
 
     _showError(msg, title) {
         if (!title) {
-            title = "Tyro Error";
+            title = _t("Tyro Error");
         }
         this.dialog.add(AlertDialog, {
             title: title,
@@ -251,4 +256,4 @@ export class PaymentTyro extends PaymentInterface {
     }
 }
 
-register_payment_method("tyro", PaymentTyro);
+registry.category("pos_payment_providers").add("tyro", PaymentTyro);

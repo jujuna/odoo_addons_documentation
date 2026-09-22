@@ -1,23 +1,27 @@
+import { Component, onMounted, proxy, t, useListener, useProps } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
-import { Component, useState, useExternalListener } from "@odoo/owl";
 
 const INPUT_KEYS = new Set(["Delete", "Backspace"].concat("0123456789,".split("")));
 
 export class PinPopup extends Component {
     static template = "mrp_workorder.PinPopup";
     static components = { Dialog };
-    static props = {
-        popupData: Object,
-        onClosePopup: Function,
-        onPinValidate: Function,
-    };
+
+    props = useProps({
+        popupData: t.object(),
+        onClosePopup: t.function(),
+        onPinValidate: t.function(),
+    });
 
     setup() {
-        super.setup();
-        this.state = useState({ buffer: "" });
+        this.state = proxy({ buffer: "" });
         this.employee = this.props.popupData.employee;
 
-        useExternalListener(window, "keyup", this._onKeyUp);
+        this.isMounted = false;
+        onMounted(() => {
+            this.isMounted = true;
+        });
+        useListener(window, "keyup", this._onKeyUp.bind(this));
     }
 
     get inputBuffer() {
@@ -49,6 +53,9 @@ export class PinPopup extends Component {
     }
 
     async _onKeyUp(ev) {
+        if (!this.isMounted) {
+            return;
+        }
         if (INPUT_KEYS.has(ev.key)) {
             this.sendInput(ev.key);
         } else if (ev.key === "Enter") {

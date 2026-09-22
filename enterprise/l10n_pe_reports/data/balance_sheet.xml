@@ -4,7 +4,7 @@
         <field name="name">Balance sheet</field>
         <field name="name@es_419">Balance</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
-        <field name="filter_analytic" eval="False"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
         <field name="filter_date_range" eval="False"/>
@@ -47,8 +47,6 @@
                                 <field name="name">Cash and cash equivalents</field>
                                 <field name="name@es_419">Efectivo y otros medios líquidos equivalentes</field>
                                 <field name="code">PE_BS_A_C_CASH</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_A_C_CASH_balance"
                                             model="account.report.expression">
@@ -63,8 +61,6 @@
                                 <field name="name">Financial Investments</field>
                                 <field name="name@es_419">Inversiones financieras</field>
                                 <field name="code">PE_BS_A_C_FI</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_A_C_FI_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -78,8 +74,6 @@
                                 <field name="name">Trade and other receivables</field>
                                 <field name="name@es_419">Deudores comerciales y otras cuentas a cobrar</field>
                                 <field name="code">PE_BS_A_C_RE</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_A_C_RE_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -92,8 +86,6 @@
                                 <field name="name">Inventories</field>
                                 <field name="name@es_419">Inventarios</field>
                                 <field name="code">PE_BS_A_C_INV</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_A_C_INV_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -120,8 +112,6 @@
                                 <field name="name">Investment properties</field>
                                 <field name="name@es_419">Propiedades de inversión</field>
                                 <field name="code">PE_BS_A_NC_INP</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_A_NC_INP_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -134,8 +124,6 @@
                                 <field name="name">Financial assets</field>
                                 <field name="name@es_419">Activos financieros</field>
                                 <field name="code">PE_BS_A_NC_FIN</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_A_NC_FIN_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -148,8 +136,6 @@
                                 <field name="name">Property, plant and equipment</field>
                                 <field name="name@es_419">Propiedades, planta y equipo</field>
                                 <field name="code">PE_BS_A_NC_PPE</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_A_NC_PPE_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -162,8 +148,6 @@
                                 <field name="name">Intangible assets</field>
                                 <field name="name@es_419">Activos intangibles</field>
                                 <field name="code">PE_BS_A_NC_INT</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_A_NC_INT_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -176,8 +160,6 @@
                                 <field name="name">Biological assets</field>
                                 <field name="name@es_419">Activos biológicos</field>
                                 <field name="code">PE_BS_A_NC_BIO</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="hide_if_zero" eval="1"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_A_NC_BIO_balance" model="account.report.expression">
@@ -209,8 +191,6 @@
                         <field name="name">Taxes and contributions payable</field>
                         <field name="name@es_419">Impuestos y contribuciones a pagar</field>
                         <field name="code">PE_BS_L_TAX</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_bs_L_TAX_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -223,8 +203,6 @@
                         <field name="name">Accounts payable</field>
                         <field name="name@es_419">Cuentas por pagar</field>
                         <field name="code">PE_BS_L_PA</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_bs_L_PA_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -237,8 +215,6 @@
                         <field name="name">Remuneration payable</field>
                         <field name="name@es_419">Remuneración a pagar</field>
                         <field name="code">PE_BS_L_RPA</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_bs_L_RPA_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -251,8 +227,6 @@
                         <field name="name">Financial liabilities</field>
                         <field name="name@es_419">Pasivos financieros</field>
                         <field name="code">PE_BS_L_FI</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_bs_L_FI_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -265,8 +239,6 @@
                         <field name="name">Provisions for liabilities</field>
                         <field name="name@es_419">Provisiones para pasivos</field>
                         <field name="code">PE_BS_L_PROV</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_bs_L_PROV_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -291,8 +263,6 @@
                                 <field name="name">Provisions for non-current liabilities</field>
                                 <field name="name@es_419">Provisiones para pasivos no corrientes</field>
                                 <field name="code">PE_BS_L_NC_PROV</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_L_NC_PROV_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -305,8 +275,6 @@
                                 <field name="name">Deferred tax on liabilities and assets</field>
                                 <field name="name@es_419">Pasivos y activos por impuestos</field>
                                 <field name="code">PE_BS_L_NC_DEF</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_L_NC_DEF_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -366,7 +334,7 @@
                                                 <field name="label">balance</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">PE_PNL_F.balance</field>
-                                                <field name="subformula">cross_report(l10n_pe_reports.account_financial_report_pnl)</field>
+                                                <field name="subformula">cross_report(l10n_pe_reports.account_financial_report_pnl, force_date_scope)</field>
                                                 <field name="date_scope">from_fiscalyear</field>
                                             </record>
                                         </field>
@@ -375,8 +343,6 @@
                                         <field name="name">Allocated Profit and Loss</field>
                                         <field name="name@es_419">Pérdidas y ganancias asignadas</field>
                                         <field name="code">PE_BS_E_U_CY_A</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_bs_E_U_CY_A_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -392,7 +358,6 @@
                                 <field name="name@es_419">Pérdidas y ganancias del año anterior</field>
                                 <field name="code">PE_BS_E_U_PY</field>
                                 <field name="hide_if_zero" eval="1"/>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_E_UE_PY_balance_codes" model="account.report.expression">
                                         <field name="label">balance_codes</field>
@@ -411,8 +376,6 @@
                                 <field name="name">Results registered but not yet realized</field>
                                 <field name="name@es_419">Resultados registrados pero aún no realizados</field>
                                 <field name="code">PE_BS_E_U_RNR</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="hide_if_zero" eval="1"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_E_UE_RNR_balance" model="account.report.expression">
@@ -439,8 +402,6 @@
                             <record id="account_financial_report_bs_E_CA" model="account.report.line">
                                 <field name="name">Capital</field>
                                 <field name="code">PE_BS_E_R_CA</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="hide_if_zero" eval="1"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_E_CA_balance" model="account.report.expression">
@@ -454,8 +415,6 @@
                                 <field name="name">Provisions</field>
                                 <field name="name@es_419">Provisiones</field>
                                 <field name="code">PE_BS_E_R_PROV</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="hide_if_zero" eval="1"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_E_PROV_balance" model="account.report.expression">
@@ -469,8 +428,6 @@
                                 <field name="name">Share Capital</field>
                                 <field name="name@es_419">Capital social</field>
                                 <field name="code">PE_BS_E_R_SCA</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="hide_if_zero" eval="1"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_E_R_SCA_balance" model="account.report.expression">
@@ -484,8 +441,6 @@
                                 <field name="name">Share premium funds</field>
                                 <field name="name@es_419">Fondos de primas de acciones</field>
                                 <field name="code">PE_BS_E_R_SPF</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="hide_if_zero" eval="1"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_E_R_SPF_balance" model="account.report.expression">
@@ -499,8 +454,6 @@
                                 <field name="name">Accumulated Results</field>
                                 <field name="name@es_419">Resultados acumulados</field>
                                 <field name="code">PE_BS_E_R_AC</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="hide_if_zero" eval="1"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_E_R_AC_balance" model="account.report.expression">
@@ -514,8 +467,6 @@
                                 <field name="name">Revaluation funds</field>
                                 <field name="name@es_419">Fondos de revalorización</field>
                                 <field name="code">PE_BS_E_R_REF</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="hide_if_zero" eval="1"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_bs_E_R_REF_balance" model="account.report.expression">

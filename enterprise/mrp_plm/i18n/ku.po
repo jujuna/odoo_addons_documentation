@@ -7,17 +7,35 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 13:35+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Kurdish (Central) <https://translate.odoo.com/projects/"
-"odoo-19/mrp_plm/ckb/>\n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 03:49+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Kurdish (Sorani) <https://translate.odoo.com/projects/odoo-"
+"master/mrp_plm/ckb/>\n"
 "Language: ku\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: mrp_plm
+#: model:ir.module.module,description:base.module_mrp_plm
+msgid ""
+"\n"
+"Product Life Management\n"
+"=======================\n"
+"\n"
+"* Versioning of Bill of Materials and Products\n"
+"* Different approval flows possible depending on the type of change order\n"
+"\n"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid " and "
+msgstr ""
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__document_count
@@ -32,15 +50,49 @@ msgid "# ECOs"
 msgstr ""
 
 #. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__used_in_count
+msgid "# Used In"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_product_product__version_count
+#: model:ir.model.fields,field_description:mrp_plm.field_product_template__version_count
+msgid "# Versions"
+msgstr ""
+
+#. module: mrp_plm
 #. odoo-python
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid "%(approval_name)s %(approver_name)s %(approval_status)s this ECO"
 msgstr ""
 
 #. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+msgid "%(label)s: %(old_version)s → %(new_version)s"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "%s updated to new version."
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+msgid "%s version has been updated by:"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.actions.report,print_report_name:mrp_plm.action_mrp_eco_report
+msgid "'ECO Changes - %s' % object.display_name"
+msgstr ""
+
+#. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_type_dashboard_view_kanban
 msgid ""
-"<i class=\"fa fa-envelope-o\" role=\"img\" aria-label=\"Domain alias\" "
+"<i class=\"oi\" data-icon=\"mail\" role=\"img\" aria-label=\"Domain alias\" "
 "title=\"Domain alias\"/>&amp;nbsp;"
 msgstr ""
 
@@ -60,11 +112,6 @@ msgstr ""
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_plm_production_form_view
 msgid "<span class=\"o_stat_text\">ECO(S)</span>"
-msgstr ""
-
-#. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "<span class=\"o_stat_text\">Revision</span>"
 msgstr ""
 
 #. module: mrp_plm
@@ -99,6 +146,11 @@ msgstr "چالاکیەکان"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_exception_decoration
 msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_plans_ids
+msgid "Activity Plans"
 msgstr ""
 
 #. module: mrp_plm
@@ -203,6 +255,11 @@ msgid "Allow to apply changes from this stage."
 msgstr ""
 
 #. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_update_product_version_view_form
+msgid "Apply"
+msgstr ""
+
+#. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_tree
 msgid "Apply Changes"
@@ -211,11 +268,6 @@ msgstr ""
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Apply Rebase"
-msgstr ""
-
-#. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__type
-msgid "Apply on"
 msgstr ""
 
 #. module: mrp_plm
@@ -279,14 +331,9 @@ msgid "Archived"
 msgstr "ئەرشیف کراوە"
 
 #. module: mrp_plm
-#: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco__effectivity__asap
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "As soon as possible"
 msgstr ""
-
-#. module: mrp_plm
-#: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco__effectivity__date
-msgid "At Date"
-msgstr "لەو بەرواردا"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_attachment_count
@@ -318,8 +365,9 @@ msgid "BOM Overview Report"
 msgstr ""
 
 #. module: mrp_plm
-#: model:mrp.eco.type,name:mrp_plm.ecotype_bom_update
-msgid "BOM Updates"
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "Batch Count: %(count)s"
 msgstr ""
 
 #. module: mrp_plm
@@ -339,11 +387,10 @@ msgstr ""
 
 #. module: mrp_plm
 #. odoo-python
-#: code:addons/mrp_plm/models/mrp_eco.py:0
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
 #: model:ir.actions.act_window,name:mrp_plm.mrp_bom_action_kanban
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__bom_id
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_boms
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "Bill of Materials"
 msgstr ""
 
@@ -372,13 +419,33 @@ msgid "Blocking Stage"
 msgstr ""
 
 #. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__bom_id
+msgid "BoM"
+msgstr ""
+
+#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__byproduct_id
 msgid "BoM By-Product"
 msgstr ""
 
 #. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_byproducts
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_components
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_operations
+msgid "BoM Cost"
+msgstr ""
+
+#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__bom_line_id
 msgid "BoM Line"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "BoM Lines"
 msgstr ""
 
 #. module: mrp_plm
@@ -410,8 +477,18 @@ msgid "BoM:"
 msgstr ""
 
 #. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "By-Product Changes"
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom_line__bom_version
+msgid "Bom Version"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__bom_version_label
+msgid "Bom Version Label"
+msgstr ""
+
+#. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_byproducts
+msgid "By-Products"
 msgstr ""
 
 #. module: mrp_plm
@@ -453,16 +530,6 @@ msgid "Changes made on old bill of materials"
 msgstr ""
 
 #. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "Changes made on the new revision bill of materials"
-msgstr ""
-
-#. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "Changes made on the operation."
-msgstr ""
-
-#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__color
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__color
 msgid "Color"
@@ -492,12 +559,17 @@ msgstr "کۆمپانیا"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "Component Changes"
+msgid "Compare BoMs"
 msgstr ""
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Component Rebase"
+msgstr ""
+
+#. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_components
+msgid "Components"
 msgstr ""
 
 #. module: mrp_plm
@@ -519,8 +591,21 @@ msgid "Conflict Resolved"
 msgstr ""
 
 #. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__operation_change
-msgid "Consumed in Operation"
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "Consumed in Operation: %(old)s -> %(new)s"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__cost
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__cost
+msgid "Cost"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__cost_computed
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__cost_computed
+msgid "Cost Computed"
 msgstr ""
 
 #. module: mrp_plm
@@ -548,6 +633,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__create_uid
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_tag__create_uid
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__create_uid
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__create_uid
 msgid "Created by"
 msgstr "دروستکراوە لەلایەن..."
 
@@ -560,17 +646,20 @@ msgstr "دروستکراوە لەلایەن..."
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__create_date
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_tag__create_date
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__create_date
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__create_date
 msgid "Created on"
 msgstr "دروستکراوە لە"
 
 #. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_bounced_content
-msgid "Custom Bounced Message"
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__currency_id
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__currency_id
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__currency_id
+msgid "Currency"
 msgstr ""
 
 #. module: mrp_plm
-#: model:ir.model.fields,help:mrp_plm.field_mrp_eco__effectivity
-msgid "Date on which the changes should be applied. For reference only."
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_bounced_content
+msgid "Custom Bounced Message"
 msgstr ""
 
 #. module: mrp_plm
@@ -585,12 +674,16 @@ msgstr ""
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_kanban
-#: model_terms:ir.ui.view,arch_db:mrp_plm.view_document_file_kanban_mrp_plm
 msgid "Delete"
 msgstr "سڕینەوە"
 
 #. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__description
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__description
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__description
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_byproducts
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_components
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_operations
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Description"
 msgstr "وەسف"
@@ -616,6 +709,11 @@ msgid "Difference between old operation and new operation revision"
 msgstr ""
 
 #. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_update_product_version_view_form
+msgid "Discard"
+msgstr ""
+
+#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom_byproduct__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom_line__display_name
@@ -627,11 +725,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_tag__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__display_name
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_production__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_routing_workcenter__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_product_document__display_name
-#: model:ir.model.fields,field_description:mrp_plm.field_product_product__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_product_template__display_name
+#: model:ir.model.fields,field_description:mrp_plm.field_report_mrp_plm_eco_changes__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_report_mrp_report_bom_structure__display_name
 msgid "Display Name"
 msgstr ""
@@ -651,6 +750,11 @@ msgstr "بەڵگەنامەکان"
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "Done"
 msgstr "تەواو"
+
+#. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_operations
+msgid "Duration"
+msgstr ""
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__eco_id
@@ -696,6 +800,17 @@ msgid "ECO BoM changes"
 msgstr ""
 
 #. module: mrp_plm
+#: model:ir.actions.report,name:mrp_plm.action_mrp_eco_report
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_page_content
+msgid "ECO Changes Summary"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model,name:mrp_plm.model_report_mrp_plm_eco_changes
+msgid "ECO Changes Summary Report"
+msgstr ""
+
+#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__eco_rebase_id
 msgid "ECO Rebase"
 msgstr ""
@@ -726,6 +841,7 @@ msgstr ""
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_type
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__type_id
 msgid "ECO Type"
 msgstr ""
 
@@ -761,7 +877,6 @@ msgstr ""
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_eco_report
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_calendar
-#: model_terms:ir.ui.view,arch_db:mrp_plm.product_product_view_form_inherit_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.product_template_view_form_inherit_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.report_mrp_bom_inherit_mrp_plm
 msgid "ECOs"
@@ -775,6 +890,7 @@ msgstr ""
 #. module: mrp_plm
 #. odoo-python
 #: code:addons/mrp_plm/models/mrp_eco.py:0
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__eco_id
 msgid "Eco"
 msgstr ""
 
@@ -800,7 +916,6 @@ msgid "Edit Task"
 msgstr ""
 
 #. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__effectivity
 #: model:mrp.eco.stage,name:mrp_plm.ecostage_bom_update_effective
 msgid "Effective"
 msgstr ""
@@ -814,12 +929,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_email
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_type_view_form
 msgid "Email Alias"
-msgstr ""
-
-#. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__email_cc
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "Email cc"
 msgstr ""
 
 #. module: mrp_plm
@@ -854,11 +963,6 @@ msgid "Engineering Changes"
 msgstr ""
 
 #. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "Extra Info"
-msgstr ""
-
-#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__final_stage
 msgid "Final Stage"
 msgstr ""
@@ -879,11 +983,6 @@ msgstr "فۆڵۆوەرەکان"
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "فۆڵۆوەرەکان (هاوبەشەکان)"
-
-#. module: mrp_plm
-#: model:ir.model.fields,help:mrp_plm.field_mrp_eco__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr ""
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__effectivity_date
@@ -928,11 +1027,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__id
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_tag__id
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__id
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__id
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_production__id
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_routing_workcenter__id
 #: model:ir.model.fields,field_description:mrp_plm.field_product_document__id
-#: model:ir.model.fields,field_description:mrp_plm.field_product_product__id
 #: model:ir.model.fields,field_description:mrp_plm.field_product_template__id
+#: model:ir.model.fields,field_description:mrp_plm.field_report_mrp_plm_eco_changes__id
 #: model:ir.model.fields,field_description:mrp_plm.field_report_mrp_report_bom_structure__id
 msgid "ID"
 msgstr "ID"
@@ -980,13 +1080,6 @@ msgstr ""
 msgid ""
 "If the active field is set to False, it will allow you to hide the "
 "engineering change order without removing it."
-msgstr ""
-
-#. module: mrp_plm
-#: model:ir.model.fields,help:mrp_plm.field_mrp_eco__will_update_version
-msgid ""
-"If unchecked, the version of the product/BoM will remain unchanged once the "
-"ECO is applied"
 msgstr ""
 
 #. module: mrp_plm
@@ -1068,6 +1161,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__write_uid
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_tag__write_uid
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__write_uid
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__write_uid
 msgid "Last Updated by"
 msgstr "دوایین نوێکردنەوە لەلایەن..."
 
@@ -1080,6 +1174,7 @@ msgstr "دوایین نوێکردنەوە لەلایەن..."
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__write_date
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_tag__write_date
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__write_date
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__write_date
 msgid "Last Updated on"
 msgstr "دوایین نوێکردنەوە لە..."
 
@@ -1096,6 +1191,11 @@ msgstr ""
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_incoming_local
 msgid "Local-part based incoming detection"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.module.module,summary:base.module_mrp_plm
+msgid "Manage engineering change orders on products, bills of material"
 msgstr ""
 
 #. module: mrp_plm
@@ -1134,6 +1234,11 @@ msgid "Master Data"
 msgstr ""
 
 #. module: mrp_plm
+#: model:ir.model.fields,help:mrp_plm.field_mrp_eco__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_has_error
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__message_has_error
 msgid "Message Delivery error"
@@ -1148,6 +1253,12 @@ msgstr "نامەکان"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__upd_time_mode
 msgid "Mode Change"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "Mode: %(mode)s"
 msgstr ""
 
 #. module: mrp_plm
@@ -1209,6 +1320,11 @@ msgid "New Consumed in Operation"
 msgstr ""
 
 #. module: mrp_plm
+#: model:mrp.eco.type,name:mrp_plm.ecotype_new_product_introduction
+msgid "New Product Introduction"
+msgstr ""
+
+#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__new_uom_id
 msgid "New Product UoM"
 msgstr ""
@@ -1237,6 +1353,16 @@ msgstr "پوختەی چالاکییەکانی داهاتوو"
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_type_id
 msgid "Next Activity Type"
 msgstr "جۆری چالاکیی داهاتوو"
+
+#. module: mrp_plm
+#: model:res.groups.privilege,placeholder:mrp_plm.res_groups_privilege_plm
+msgid "No"
+msgstr ""
+
+#. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
+msgid "No BoM Change"
+msgstr ""
 
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_bom_action_kanban
@@ -1300,28 +1426,18 @@ msgid "Once the changes are applied, the ECOs will be moved to this stage."
 msgstr ""
 
 #. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "Open Component"
-msgstr ""
-
-#. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "Open Operation"
-msgstr ""
-
-#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__operation_name
 msgid "Operation"
 msgstr ""
 
 #. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "Operation Changes"
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__operation_id
+msgid "Operation Id"
 msgstr ""
 
 #. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__operation_id
-msgid "Operation Id"
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_operations
+msgid "Operations"
 msgstr ""
 
 #. module: mrp_plm
@@ -1388,8 +1504,22 @@ msgid "PLM Overview"
 msgstr ""
 
 #. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__used_in_bom_ids
+msgid "Parent BoMs"
+msgstr ""
+
+#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_parent_model_id
 msgid "Parent Model"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__used_in_product_tmpl_ids
+msgid "Parent Products"
 msgstr ""
 
 #. module: mrp_plm
@@ -1436,6 +1566,11 @@ msgid "Previous Eco Component Changes"
 msgstr ""
 
 #. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__old_operation_id
+msgid "Previous Operation"
+msgstr ""
+
+#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__old_uom_id
 msgid "Previous Product UoM"
 msgstr ""
@@ -1451,17 +1586,27 @@ msgid "Priority"
 msgstr "ئەولەویەت"
 
 #. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
-msgid "Produced in Operation"
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "Produced in Operation: %(old)s -> %(new)s"
 msgstr ""
 
 #. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
 #: model:ir.model,name:mrp_plm.model_product_template
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__product_tmpl_id
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__product_id
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__product_tmpl_id
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "Product"
 msgstr "بەرهەم"
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+msgid "Product %(product)s"
+msgstr ""
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_product_document
@@ -1469,15 +1614,24 @@ msgid "Product Document"
 msgstr ""
 
 #. module: mrp_plm
-#. odoo-python
-#: code:addons/mrp_plm/models/mrp_eco.py:0
-msgid "Product Only"
+#: model:ir.module.module,shortdesc:base.module_mrp_plm
+msgid "Product Lifecycle Management (PLM)"
 msgstr ""
 
 #. module: mrp_plm
-#: model:ir.model,name:mrp_plm.model_product_product
-msgid "Product Variant"
-msgstr "جۆری بەرهەم"
+#: model:mrp.eco.type,name:mrp_plm.ecotype_product_revision
+msgid "Product Revision"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom_line__product_version
+msgid "Product Version"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__product_version_label
+msgid "Product Version Label"
+msgstr ""
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
@@ -1496,6 +1650,8 @@ msgstr "بەرهەمەکان"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__upd_product_qty
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_byproducts
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_components
 msgid "Quantity"
 msgstr "بڕ"
 
@@ -1539,6 +1695,7 @@ msgstr ""
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__name
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__description_reference
 msgid "Reference"
 msgstr "سەرچاوە"
 
@@ -1585,14 +1742,19 @@ msgid "Responsible User"
 msgstr "بەکارهێنەری بەرپرسیار"
 
 #. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__name
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval_template__name
-msgid "Role"
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
+msgid "Review"
 msgstr ""
 
 #. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
-msgid "Routing"
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
+msgid "Revision"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__name
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval_template__name
+msgid "Role"
 msgstr ""
 
 #. module: mrp_plm
@@ -1621,6 +1783,11 @@ msgstr ""
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__allow_apply_change
 msgid "Show Apply Change"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__show_eco_type
+msgid "Show Eco Type"
 msgstr ""
 
 #. module: mrp_plm
@@ -1729,6 +1896,30 @@ msgid "Template"
 msgstr ""
 
 #. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+msgid "The %(count)s BoMs using this product"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+msgid "The %(count)s products using this product"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+msgid "The 1 BoM using this product"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/wizard/mrp_eco_update_product_version.py:0
+msgid "The 1 product using this product"
+msgstr ""
+
+#. module: mrp_plm
 #: model:res.groups,comment:mrp_plm.group_plm_manager
 msgid "The PLM manager manages products lifecycle management"
 msgstr ""
@@ -1739,6 +1930,7 @@ msgid "The PLM user uses products lifecycle management"
 msgstr ""
 
 #. module: mrp_plm
+#: model:ir.model.fields,help:mrp_plm.field_mrp_bom_line__product_version
 #: model:ir.model.fields,help:mrp_plm.field_product_product__version
 #: model:ir.model.fields,help:mrp_plm.field_product_template__version
 msgid "The current version of the product."
@@ -1783,9 +1975,16 @@ msgid "Today Activities"
 msgstr "چالاکییەکانی ئەمڕۆ"
 
 #. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__type_id
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__total_cost
+msgid "Total Cost"
+msgstr ""
+
+#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__change_type
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__change_type
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_byproducts
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_components
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_operations
 msgid "Type"
 msgstr "جۆر"
 
@@ -1805,9 +2004,10 @@ msgid "Undo"
 msgstr ""
 
 #. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__uom_change
-msgid "Unit"
-msgstr "یەکە"
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "Unit: %(old)s -> %(new)s"
+msgstr ""
 
 #. module: mrp_plm
 #: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco_bom_change__change_type__update
@@ -1816,8 +2016,52 @@ msgid "Update"
 msgstr "نوێکردنەوە"
 
 #. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__will_update_version
-msgid "Update Version"
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__update_bom_version
+msgid "Update Bom Version"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__update_product_version
+msgid "Update Product Version"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model,name:mrp_plm.model_mrp_eco_update_product_version
+msgid "Update Product Versions"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__update_used_in_bom_versions
+msgid "Update Used In Bom Versions"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__update_used_in_product_versions
+msgid "Update Used In Product Versions"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_update_product_version_view_form
+msgid "Update Versions"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
+msgid "Used In"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__used_in_bom_versions_label
+msgid "Used In Bom Versions Label"
+msgstr ""
+
+#. module: mrp_plm
+#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_update_product_version__used_in_product_versions_label
+msgid "Used In Product Versions Label"
 msgstr ""
 
 #. module: mrp_plm
@@ -1836,16 +2080,18 @@ msgid "Validated"
 msgstr "پەسەند کراوە"
 
 #. module: mrp_plm
-#: model_terms:ir.ui.view,arch_db:mrp_plm.view_document_file_kanban_mrp_plm
-msgid "Variant"
-msgstr ""
-
-#. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__version
 #: model:ir.model.fields,field_description:mrp_plm.field_product_product__version
 #: model:ir.model.fields,field_description:mrp_plm.field_product_template__version
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_bom_view_form_inherit_plm
 msgid "Version"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/product.py:0
+#: model_terms:ir.ui.view,arch_db:mrp_plm.product_template_view_form_inherit_plm
+msgid "Versions"
 msgstr ""
 
 #. module: mrp_plm
@@ -1864,16 +2110,9 @@ msgid "Waiting my Approvals"
 msgstr ""
 
 #. module: mrp_plm
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__website_message_ids
-#: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__website_message_ids
-msgid "Website Messages"
-msgstr "پەیامەکانی ماڵپەڕ"
-
-#. module: mrp_plm
-#: model:ir.model.fields,help:mrp_plm.field_mrp_eco__website_message_ids
-#: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__website_message_ids
-msgid "Website communication history"
-msgstr "مێژووی پەیوەندی ماڵپەڕ"
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_update_product_version_view_form
+msgid "Which versions do you want to increase?"
+msgstr ""
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__workcenter_id
@@ -1888,6 +2127,12 @@ msgstr ""
 #. module: mrp_plm
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_workcenters
 msgid "Work Centers"
+msgstr ""
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "Work center: %(old)s -> %(new)s"
 msgstr ""
 
 #. module: mrp_plm
@@ -1917,6 +2162,12 @@ msgid "You cannot change the stage, as approvals are still required."
 msgstr ""
 
 #. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "You need to select a product before starting the revision."
+msgstr ""
+
+#. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_type_view_form
 msgid "alias"
 msgstr ""
@@ -1937,9 +2188,8 @@ msgid "e.g. mycompany.com"
 msgstr "بۆ نموونە. mycompany.com"
 
 #. module: mrp_plm
-#. odoo-python
-#: code:addons/mrp_plm/models/mrp_eco.py:0
-msgid "product"
+#: model_terms:ir.ui.view,arch_db:mrp_plm.eco_changes_operations
+msgid "min"
 msgstr ""
 
 #. module: mrp_plm
@@ -1952,3 +2202,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_kanban
 msgid "text-danger"
 msgstr ""
+
+msgid "Website Messages"
+msgstr "پەیامەکانی ماڵپەڕ"
+
+msgid "Website communication history"
+msgstr "مێژووی پەیوەندی ماڵپەڕ"

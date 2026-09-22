@@ -10,20 +10,6 @@
                     <field name="is_quarter_month"/>
                     <field name="country_code"/>
                 </xpath>
-
-                <xpath expr="//div[hasclass('w-100') and hasclass('p-2') and hasclass('px-3')]" position="after">
-                    <t t-set="is_italian_non_quarterly"
-                       t-value="record.country_code.raw_value == 'IT' and !record.is_quarter_month.raw_value"/>
-                </xpath>
-
-                <xpath expr="//button[@name='action_submit']" position="replace">
-                    <button class="btn btn-secondary"
-                            type="object"
-                            name="action_submit"
-                            invisible="state != 'reviewed' or is_completed or not is_main_company_active">
-                        <t t-esc="is_italian_non_quarterly ? 'Close' : 'Submit'"/>
-                    </button>
-                </xpath>
             </field>
         </record>
     </data>

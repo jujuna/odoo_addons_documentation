@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-15 12:49+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-09-18 03:25+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-master/"
 "delivery_usps/sl/>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +25,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__usps_intl_non_delivery_option__abandon
@@ -54,6 +54,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_content_type
 msgid "Content Type"
 msgstr "Tip vsebine"
+
+#. module: delivery_usps
+#: model:ir.model,name:delivery_usps.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_delivery_nature
@@ -364,11 +369,6 @@ msgid "Shipment created into USPS <br/> <b>Tracking Number: </b>%s"
 msgstr "Pošiljka ustvarjena v USPS <br/> <b>Številka za sledenje: </b>%s"
 
 #. module: delivery_usps
-#: model:ir.model,name:delivery_usps.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Metode odpreme"
-
-#. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__usps_domestic_regular_container__sm_flat_rate_box
 msgid "Small Flat Rate Box"
 msgstr "Majhna škatla s pavšalno ceno"
@@ -420,6 +420,14 @@ msgstr ""
 #: code:addons/delivery_usps/models/usps_request.py:0
 msgid "The selected USPS service (%s) cannot be used to deliver this package."
 msgstr "Izbrane storitve USPS (%s) ni mogoče uporabiti za dostavo tega paketa."
+
+#. module: delivery_usps
+#: model:ir.module.module,description:base.module_delivery_usps
+msgid ""
+"This is the legacy integration with USPS. Please install the new \"United "
+"States Postal Service (USPS) Shipping\" module and uninstall this one as "
+"soon as possible."
+msgstr ""
 
 #. module: delivery_usps
 #. odoo-python
@@ -510,6 +518,11 @@ msgid "USPS User ID"
 msgstr "USPS ID uporabnika"
 
 #. module: delivery_usps
+#: model:ir.module.module,shortdesc:base.module_delivery_usps
+msgid "United States Postal Service (USPS) Shipping (Legacy)"
+msgstr ""
+
+#. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_size_container
 msgid "Usps Size Container"
 msgstr "USPS Velikost posode"
@@ -524,9 +537,3 @@ msgstr "Poštna številka vašega podjetja ali prejemnika je napačna."
 #: model_terms:ir.ui.view,arch_db:delivery_usps.view_delivery_carrier_form_with_provider_usps
 msgid "inch"
 msgstr "centimeter"
-
-#~ msgid "USPS"
-#~ msgstr "USPS"
-
-#~ msgid "USPS Shipping Methods"
-#~ msgstr "USPS metode odpreme"

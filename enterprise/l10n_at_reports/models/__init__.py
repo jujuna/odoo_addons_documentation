@@ -5,4 +5,6 @@
 #                    Mag. Wolfgang Taferner <wolfgang.taferner@wt-io-it.at>
 
 from . import account_report_l10n_at_balance_custom_handler
+from . import account_return
 from . import account_sales_report
+from . import template_at

@@ -2,10 +2,10 @@
 <templates>
     <div t-name="test_spreadsheet_edition.SpreadsheetTestAction" class="o_spreadsheet_action">
         <SpreadsheetNavbar
-            spreadsheetName="state.spreadsheetName"
+            spreadsheetName="this.state.spreadsheetName"
             isReadonly="true"
-            model="model"
+            model="this.model"
         />
-        <SpreadsheetComponent model="model" />
+        <SpreadsheetComponent model="this.model" />
     </div>
 </templates>

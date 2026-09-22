@@ -12,7 +12,7 @@ class HrPayslipWorkedDays(models.Model):
         for worked_days in lu_worked_days:
             if worked_days.payslip_id.edited or worked_days.payslip_id.state != 'draft':
                 continue
-            if not worked_days.version_id or worked_days.code == 'OUT':
+            if not worked_days.version_id or worked_days.code == '000.00':
                 worked_days.amount = 0
                 continue
             amount_rate = worked_days.work_entry_type_id.amount_rate

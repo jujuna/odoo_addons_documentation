@@ -1,9 +1,17 @@
 import { _t } from "@web/core/l10n/translation";
 import { Domain } from "@web/core/domain";
-import { serializeDate, serializeDateTime } from "@web/core/l10n/dates";
+import {
+    formatLocalWeekRange,
+    serializeDate,
+    serializeDateTime,
+    toLocaleDateString,
+    today,
+} from "@web/core/l10n/dates";
 import { localization } from "@web/core/l10n/localization";
-import { clamp } from "@web/core/utils/numbers";
+import { clamp, range } from "@web/core/utils/numbers";
 import { pick } from "@web/core/utils/objects";
+import { domainFromTree } from "@web/core/tree_editor/domain_from_tree";
+import { makeRelativeRange } from "@web/core/tree_editor/virtual_operators";
 
 export const QUARTERS = {
     1: { description: _t("Q1"), coveredMonths: [1, 2, 3] },
@@ -45,6 +53,13 @@ export const QUARTER_OPTIONS = {
 
 export const DEFAULT_INTERVAL = "month";
 
+// Relative offsets defining the range of month and year period options
+// generated for a date filter (used to be configurable from xml).
+const START_MONTH = -2;
+const END_MONTH = 0;
+const START_YEAR = -2;
+const END_YEAR = 0;
+
 /**
  * Time interval options that users can select in the views.
  */
@@ -68,6 +83,14 @@ export const BACKEND_INTERVAL_OPTIONS = {
 //-------------------------------------------------------------------------
 // Functions
 //-------------------------------------------------------------------------
+
+/**
+ * Joins a period description (Aug) and its year respecting localization.
+ */
+function joinWithYear(description, year) {
+    const isRTL = localization.direction === "rtl";
+    return isRTL ? `${year} ${description}` : `${description} ${year}`;
+}
 
 /**
  * Constructs the string representation of a domain and its description. The
@@ -159,15 +182,13 @@ export function constructDateRange(params) {
     }
     const domain = new Domain(["&", [fieldName, ">=", leftBound], [fieldName, "<=", rightBound]]);
     // compute description
-    const descriptions = [date.toFormat("yyyy")];
-    const method = localization.direction === "rtl" ? "push" : "unshift";
+    const year = date.toFormat("yyyy");
+    let description = year;
     if (granularity === "month") {
-        descriptions[method](date.toFormat("MMMM"));
+        description = joinWithYear(date.toFormat("MMMM"), year);
     } else if (granularity === "quarter") {
-        const quarter = date.quarter;
-        descriptions[method](QUARTERS[quarter].description.toString());
+        description = joinWithYear(QUARTERS[date.quarter].description.toString(), year);
     }
-    const description = descriptions.join(" ");
     return { domain, description };
 }
 
@@ -198,9 +219,9 @@ export function getOptionsWithDescriptions(OPTIONS) {
  */
 export function getPeriodOptions(referenceMoment, optionsParams) {
     return [
-        ...getMonthPeriodOptions(referenceMoment, optionsParams),
-        ...getQuarterPeriodOptions(optionsParams),
-        ...getYearPeriodOptions(referenceMoment, optionsParams),
+        ...getMonthPeriodOptions(referenceMoment),
+        ...getQuarterPeriodOptions(),
+        ...getYearPeriodOptions(referenceMoment),
         ...getCustomPeriodOptions(optionsParams),
     ];
 }
@@ -214,49 +235,41 @@ export function toGeneratorId(unit, offset) {
     return `${unit}${sep}${val}`;
 }
 
-function getMonthPeriodOptions(referenceMoment, optionsParams) {
-    const { startYear, endYear, startMonth, endMonth } = optionsParams;
-    return [...Array(endMonth - startMonth + 1).keys()]
-        .map((i) => {
-            const monthOffset = startMonth + i;
-            const date = referenceMoment.plus({
-                months: monthOffset,
-                years: clamp(0, startYear, endYear),
-            });
+function getMonthPeriodOptions(referenceMoment) {
+    return range(START_MONTH, END_MONTH + 1)
+        .map((months) => {
+            const date = referenceMoment.plus({ months });
             const yearOffset = date.year - referenceMoment.year;
             return {
-                id: toGeneratorId("month", monthOffset),
-                defaultYearId: toGeneratorId("year", clamp(yearOffset, startYear, endYear)),
+                id: toGeneratorId("month", months),
+                defaultYearId: toGeneratorId("year", clamp(yearOffset, START_YEAR, END_YEAR)),
                 description: date.toFormat("MMMM"),
                 granularity: "month",
                 groupNumber: 1,
-                plusParam: { months: monthOffset },
+                plusParam: { months },
             };
         })
         .reverse();
 }
 
-function getQuarterPeriodOptions(optionsParams) {
-    const { startYear, endYear } = optionsParams;
-    const defaultYearId = toGeneratorId("year", clamp(0, startYear, endYear));
+function getQuarterPeriodOptions() {
+    const defaultYearId = toGeneratorId("year", 0);
     return Object.values(QUARTER_OPTIONS).map((quarter) => ({
         ...quarter,
         defaultYearId,
     }));
 }
 
-function getYearPeriodOptions(referenceMoment, optionsParams) {
-    const { startYear, endYear } = optionsParams;
-    return [...Array(endYear - startYear + 1).keys()]
-        .map((i) => {
-            const offset = startYear + i;
-            const date = referenceMoment.plus({ years: offset });
+function getYearPeriodOptions(referenceMoment) {
+    return range(START_YEAR, END_YEAR + 1)
+        .map((years) => {
+            const date = referenceMoment.plus({ years });
             return {
-                id: toGeneratorId("year", offset),
+                id: toGeneratorId("year", years),
                 description: date.toFormat("yyyy"),
                 granularity: "year",
                 groupNumber: 2,
-                plusParam: { years: offset },
+                plusParam: { years },
             };
         })
         .reverse();
@@ -337,4 +350,68 @@ export function sortPeriodOptions(options) {
  */
 export function yearSelected(selectedOptionIds) {
     return selectedOptionIds.some((optionId) => optionId.startsWith("year"));
+}
+
+/**  ----------------------- RELATIVE DATE FILTERS -----------------------
+ * Relative filters are search bar menu filters, created from the xml with
+ * the syntax <filter ... date="invoice_date">, that can be toggled in the
+ * search bar itself, changing their domain dynamically (eg. with filter
+ * "Today", clicking `>` will change the domain to tomorrow)
+ *
+ * Their ids are part of the public arch API: they can be used in the
+ * `default_period` attribute of a date filter or as a `search_default_...`
+ * context value, just like the period option ids (`month`, `year-1`, ...).
+ */
+
+export const RELATIVE_FILTER_OPTIONS = {
+    today: { description: _t("Today"), granularity: "day" },
+    this_week: { description: _t("This Week"), granularity: "week" },
+    this_month: { description: _t("This Month"), granularity: "month" },
+    this_quarter: { description: _t("This Quarter"), granularity: "quarter" },
+    this_year: { description: _t("This Year"), granularity: "year" },
+};
+
+export function getRelativeFilterOptions() {
+    return Object.entries(RELATIVE_FILTER_OPTIONS).map(([id, option]) => ({ id, ...option }));
+}
+
+export function constructRelativeDateDomain(searchItem, option, offset) {
+    const { fieldName, fieldType } = searchItem;
+    return domainFromTree(makeRelativeRange(fieldName, offset, option.granularity, fieldType));
+}
+
+/**
+ * Describes the period a relative filter option points at once shifted by
+ * `offset` periods, in terms of the dates it covers rather than of its distance
+ * from now (eg. "Aug 2 - Aug 8" instead of "2 weeks ago").
+ *
+ * @param {import("luxon").DateTime} referenceMoment
+ * @param {Object} option a relative filter option, @see RELATIVE_FILTER_OPTIONS
+ * @param {number} offset number of periods to shift, negative for the past
+ * @returns {TranslatedString}
+ */
+export function getRelativeDateLabel(referenceMoment, option, offset) {
+    const { granularity } = option;
+    const date = referenceMoment.plus({ [granularity]: offset });
+    const isCurrentYear = (date) => date.year === today().year;
+    switch (granularity) {
+        case "week":
+            return formatLocalWeekRange(date);
+        case "month":
+            return date.toLocaleString(
+                isCurrentYear(date) ? { month: "long" } : { month: "long", year: "numeric" }
+            );
+        case "quarter": {
+            const { description } = QUARTERS[date.quarter];
+            if (isCurrentYear(date)) {
+                return description.toString();
+            }
+            return joinWithYear(description.toString(), date.toFormat("yyyy"));
+        }
+        case "year":
+            return date.toFormat("yyyy");
+        case "day":
+        default:
+            return toLocaleDateString(date);
+    }
 }

@@ -12,6 +12,7 @@ patch(GraphRenderer.prototype, {
         this.notification = useService("notification");
         this.actionService = useService("action");
         this.menu = useService("menu");
+        this.uiService = useService("ui");
         this.canInsertChart = session.can_insert_in_spreadsheet;
     },
 
@@ -20,22 +21,23 @@ patch(GraphRenderer.prototype, {
         const { xml_id } = actionId
             ? await this.actionService.loadAction(actionId, this.env.searchModel.context)
             : {};
+        const context = omit(
+            this.model.searchParams.context,
+            ...Object.keys(user.context),
+            "graph_measure",
+            "graph_order"
+        );
         const actionOptions = {
             preProcessingAsyncAction: "insertChart",
             preProcessingAsyncActionData: {
                 metaData: {
                     ...this.model.metaData,
-                    axisType: this.chart.scales.x?.type,
+                    axisType: this.chart.instance().scales.x?.type,
                 },
                 searchParams: {
                     ...this.model.searchParams,
                     domain: this.env.searchModel.domainString,
-                    context: omit(
-                        this.model.searchParams.context,
-                        ...Object.keys(user.context),
-                        "graph_measure",
-                        "graph_order"
-                    ),
+                    context,
                 },
                 actionXmlId: xml_id,
             },
@@ -44,6 +46,7 @@ patch(GraphRenderer.prototype, {
             type: "GRAPH",
             name: this.model.metaData.title,
             actionOptions,
+            context,
         };
         this.env.services.dialog.add(SpreadsheetSelectorDialog, params);
     },

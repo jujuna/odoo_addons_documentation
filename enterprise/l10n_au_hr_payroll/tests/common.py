@@ -31,9 +31,15 @@ class TestPayrollCommon(TransactionCase):
         cls.env = cls.env(context=dict(cls.env.context, allowed_company_ids=cls.australian_company.ids))
         cls.resource_calendar = cls.australian_company.resource_calendar_id
         cls.resource_calendar.company_id = cls.australian_company
-
+        cls.resource_calendar.attendance_ids.work_entry_type_id = cls.env.ref('hr_work_entry.au_work_entry_type_attendance').id
+        cls.work_location = cls.env['hr.work.location'].create({
+            'name': "Office 1",
+            'location_type': "office",
+            'address_id': cls.env.company.partner_id.id,
+        })
         cls.employee_id = cls.env["hr.employee"].create({
             "name": "Mel",
+            "work_location_id": cls.work_location.id,
             "resource_calendar_id": cls.resource_calendar.id,
             "company_id": cls.australian_company.id,
             "private_street": "1 Test Street",
@@ -406,17 +412,17 @@ class TestPayrollCommon(TransactionCase):
 
         cls.default_input_lines = [
             {
-                'input_type_id': cls.env.ref('l10n_au_hr_payroll.input_bonus_commissions').id,
+                'salary_rule_id': cls.env.ref('l10n_au_hr_payroll.input_bonus_commissions').id,
                 'amount': 200,
             },
             # RTW
             {
-                'input_type_id': cls.env.ref('l10n_au_hr_payroll.input_b2work').id,
+                'salary_rule_id': cls.env.ref('l10n_au_hr_payroll.input_b2work').id,
                 'amount': 300,
             },
             # Work related non expense
             {
-                'input_type_id': cls.env.ref('l10n_au_hr_payroll.input_work_related_non_expense').id,
+                'salary_rule_id': cls.env.ref('l10n_au_hr_payroll.input_work_related_non_expense').id,
                 'amount': 550,
             },
         ]
@@ -424,16 +430,12 @@ class TestPayrollCommon(TransactionCase):
         # Will be useful for easy access to the ID when testing
         cls.work_entry_types = {
             entry_type.code: entry_type
-            for entry_type in cls.env['hr.work.entry.type'].search([])
+            for entry_type in cls.env['hr.work.entry.type'].search([('country_id', '=', cls.env.ref('base.au').id)])
         }
 
-        cls.annual_leave_type = cls.env['hr.leave.type'].create({
-            'name': 'Annual Leave',
-            'company_id': cls.australian_company.id,
-            'l10n_au_leave_type': 'annual',
-            'leave_validation_type': 'no_validation',
-            'work_entry_type_id': cls.env.ref('hr_work_entry.l10n_au_work_entry_type_paid_time_off').id,
-        })
+        cls.annual_work_entry_type = cls.env.ref('hr_work_entry.l10n_au_work_entry_type_annual_leave')
+        cls.annual_work_entry_type.l10n_au_work_entry_type = 'annual'
+        cls.annual_work_entry_type.unit_of_measure = 'day'
 
     def create_employee_and_contract(self, wage, contract_info=False):
         if not contract_info:
@@ -456,7 +458,7 @@ class TestPayrollCommon(TransactionCase):
             "l10n_au_tfn": contract_info.get('tfn', '999999661'),
             "is_non_resident": contract_info.get('non_resident', False),
             "l10n_au_nat_3093_amount": 0,
-            "l10n_au_child_support_garnishee_amount": 0,
+            "l10n_au_child_support_garnishee_amount": contract_info.get('l10n_au_child_support_garnishee_amount', 0),
             "l10n_au_medicare_exemption": contract_info.get('medicare_exemption', 'X'),
             "l10n_au_medicare_surcharge": contract_info.get('medicare_surcharge', 'X'),
             "l10n_au_medicare_reduction": contract_info.get('medicare_reduction', 'X'),
@@ -512,7 +514,6 @@ class TestPayrollCommon(TransactionCase):
         payslip = kwargs.get('payslip', False)
         if not payslip:
             payslip = self.env["hr.payslip"].create({
-                "name": "payslip",
                 "employee_id": employee.id,
                 "version_id": contract.id,
                 "struct_id": self.default_payroll_structure.id,
@@ -525,7 +526,7 @@ class TestPayrollCommon(TransactionCase):
             payslip.action_refresh_from_work_entries()
 
         # 2) Verify the workdays
-        if self.default_payroll_structure.use_worked_day_lines:
+        if not payslip.ignore_worked_day_lines:
             for payslip_workday in payslip.worked_days_line_ids:
                 expected_worked_day = list(
                     filter(lambda ewd: ewd[0] == payslip_workday.work_entry_type_id.id, expected_worked_days)

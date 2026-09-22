@@ -29,7 +29,6 @@ function getLocalesComparison(spreadsheetLocale, userLocale) {
 
 export class LocaleStatus extends Component {
     static template = "spreadsheet_edition.LocaleStatus";
-    static props = {};
 
     get mismatchedLocaleTitle() {
         const spreadsheetLocale = this.env.model.getters.getLocale();

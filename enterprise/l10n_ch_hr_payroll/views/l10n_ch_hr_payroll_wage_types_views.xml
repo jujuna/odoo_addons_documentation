@@ -8,7 +8,7 @@
                 <field name="l10n_ch_code" string="CH Code"/>
                 <field name="code" string="Code" optional="hide"/>
                 <field name="name"/>
-                <field name="category_id"/>
+                <field name="category_ids" widget="many2many_tags"/>
                 <field name="l10n_ch_gross_included" string="Gross"/>
                 <field name="l10n_ch_ac_included" string="AVS/AC"/>
                 <field name="l10n_ch_aanp_included" string="LAA"/>
@@ -34,7 +34,7 @@
         <field name="inherit_id" ref="hr_payroll.hr_salary_rule_form"/>
         <field name="arch" type="xml">
             <field name="code" position="before">
-                <field name="l10n_ch_code" string="Swiss Wage Type Code"/>
+                <field name="l10n_ch_code" string="Swiss Wage Type Code" invisible="country_id != %(base.ch)d"/>
             </field>
         </field>
     </record>
@@ -45,7 +45,7 @@
         <field name="inherit_id" ref="hr_payroll.hr_salary_rule_list"/>
         <field name="arch" type="xml">
             <field name="name" position="before">
-                <field name="l10n_ch_code" string="Swiss Wage Type Code"/>
+                <field name="l10n_ch_code" string="Swiss Wage Type Code" optional="show"/>
             </field>
         </field>
     </record>
@@ -110,7 +110,7 @@
         <field name="res_model">hr.salary.rule</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="l10n_ch_wage_type_search_view"/>
-        <field name="domain" model="hr.salary.rule" eval="[('l10n_ch_code', '!=', False), ('struct_id.code','=','CHMONTHLYELM')]"/>
+        <field name="domain" model="hr.salary.rule" eval="[('l10n_ch_code', '!=', False), ('struct_ids.code', 'in', ['CHMONTHLYELM'])]"/>
         <field name="view_ids" eval="[(5, 0, 0),
             (0, 0, {'view_mode': 'list', 'view_id': ref('l10n_ch_hr_payroll.swissdec_wage_types_tree')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('l10n_ch_hr_payroll.swissdec_wage_types_form')})]"/>

@@ -1,6 +1,5 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import {
-    asyncStep,
     Command,
     defineModels,
     fields,
@@ -8,7 +7,6 @@ import {
     models,
     mountView,
     patchWithCleanup,
-    waitForSteps,
 } from "@web/../tests/web_test_helpers";
 import { Record } from "@web/model/relational_model/record";
 
@@ -75,7 +73,7 @@ class AiModel extends models.Model {
         }
         if (unresolveRequest) {
             throw makeServerError({
-                errorName: "odoo.addons.ai_fields.tools.UnresolvedQuery",
+                errorName: "odoo.addons.ai.utils.ai_fields_tools.UnresolvedQuery",
                 description: "The value could not be resolved",
             });
         }
@@ -93,7 +91,7 @@ class AiModel extends models.Model {
         }
         if (unresolveRequest) {
             throw makeServerError({
-                errorName: "odoo.addons.ai_fields.tools.UnresolvedQuery",
+                errorName: "odoo.addons.ai.utils.ai_fields_tools.UnresolvedQuery",
                 description: "The value could not be resolved",
             });
         }
@@ -112,19 +110,19 @@ beforeEach(() => {
     patchWithCleanup(Record.prototype, {
         async computeAiField(fname) {
             const res = await super.computeAiField(fname);
-            asyncStep(fname + " computed");
+            expect.step(fname + " computed");
             return res;
         },
 
         async save(options) {
             const res = await super.save(options);
-            asyncStep("save");
+            expect.step("save");
             return res;
         },
 
         async computeAiProperty(fullName) {
             const res = await super.computeAiProperty(fullName);
-            asyncStep(fullName + " computed");
+            expect.step(fullName + " computed");
             return res;
         },
     });
@@ -143,12 +141,12 @@ test("AI Fields - Boolean Field", async () => {
     expect(".o_field_ai_boolean input").not.toBeChecked();
     expect(".o_field_ai_boolean .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_boolean .btn[title='Refresh value']");
-    await waitForSteps(["bool computed"]);
+    await expect.waitForSteps(["bool computed"]);
     await animationFrame();
     await animationFrame();
     expect(".o_field_ai_boolean input").toBeChecked();
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_boolean input").toBeChecked();
 });
@@ -166,11 +164,11 @@ test("AI Fields - Char Field", async () => {
     expect(".o_field_ai_char input").toHaveValue("");
     expect(".o_field_ai_char .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_char .btn[title='Refresh value']");
-    await waitForSteps(["char computed"]);
+    await expect.waitForSteps(["char computed"]);
     await animationFrame();
     expect(".o_field_ai_char input").toHaveValue("char prompt");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_char input").toHaveValue("char prompt");
 });
@@ -188,11 +186,11 @@ test("AI Fields - Datetime Field", async () => {
     expect(".o_field_ai_datetime input").toHaveValue("");
     expect(".o_field_ai_datetime .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_datetime .btn[title='Refresh value']");
-    await waitForSteps(["datetime computed"]);
+    await expect.waitForSteps(["datetime computed"]);
     await animationFrame();
     expect(".o_field_ai_datetime button[data-field=datetime]").toHaveValue("03/26/2024 13:00:00");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_datetime button[data-field=datetime]").toHaveValue("03/26/2024 13:00:00");
 });
@@ -210,11 +208,11 @@ test("AI Fields - Float Field", async () => {
     expect(".o_field_ai_float input").toHaveValue("0.00");
     expect(".o_field_ai_float .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_float .btn[title='Refresh value']");
-    await waitForSteps(["float computed"]);
+    await expect.waitForSteps(["float computed"]);
     await animationFrame();
     expect(".o_field_ai_float input").toHaveValue("42.50");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_float input").toHaveValue("42.50");
 });
@@ -232,12 +230,12 @@ test("AI Fields - Html Field", async () => {
     expect(".o_field_ai_html .odoo-editor-editable").toHaveText("");
     expect(".o_field_ai_html .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_html .btn[title='Refresh value']");
-    await waitForSteps(["html computed"]);
+    await expect.waitForSteps(["html computed"]);
     await animationFrame();
     await animationFrame();
     expect(".o_field_ai_html .odoo-editor-editable p").toHaveText("html prompt");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_html .odoo-editor-editable p").toHaveText("html prompt");
 });
@@ -255,11 +253,11 @@ test("AI Fields - Integer Field", async () => {
     expect(".o_field_ai_integer input").toHaveValue("0");
     expect(".o_field_ai_integer .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_integer .btn[title='Refresh value']");
-    await waitForSteps(["integer computed"]);
+    await expect.waitForSteps(["integer computed"]);
     await animationFrame();
     expect(".o_field_ai_integer input").toHaveValue("32");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_integer input").toHaveValue("32");
 });
@@ -277,13 +275,13 @@ test("AI Fields - Many2ManyTags Field", async () => {
     expect(".o_field_ai_many2many_tags .o_tag").toHaveCount(0);
     expect(".o_field_ai_many2many_tags .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_many2many_tags .btn[title='Refresh value']");
-    await waitForSteps(["many2many computed"]);
+    await expect.waitForSteps(["many2many computed"]);
     await animationFrame();
     expect(".o_field_ai_many2many_tags .o_tag").toHaveCount(2);
     expect(".o_field_ai_many2many_tags .o_tag:first").toHaveText("ai_model,1");
     expect(".o_field_ai_many2many_tags .o_tag:last").toHaveText("ai_model,2");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_many2many_tags .o_tag").toHaveCount(2);
     expect(".o_field_ai_many2many_tags .o_tag:first").toHaveText("ai_model,1");
@@ -303,11 +301,11 @@ test("AI Fields - Many2One Field", async () => {
     expect(".o_field_ai_many2one input").toHaveValue("");
     expect(".o_field_ai_many2one .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_many2one .btn[title='Refresh value']");
-    await waitForSteps(["many2one computed"]);
+    await expect.waitForSteps(["many2one computed"]);
     await animationFrame();
     expect(".o_field_ai_many2one input").toHaveValue("ai_model,2");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_many2one input").toHaveValue("ai_model,2");
 });
@@ -325,11 +323,11 @@ test("AI Fields - Monetary Field", async () => {
     expect(".o_field_ai_monetary input").toHaveValue("0.00");
     expect(".o_field_ai_monetary .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_monetary .btn[title='Refresh value']");
-    await waitForSteps(["monetary computed"]);
+    await expect.waitForSteps(["monetary computed"]);
     await animationFrame();
     expect(".o_field_ai_monetary input").toHaveValue("99.99");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_monetary input").toHaveValue("99.99");
 });
@@ -347,11 +345,11 @@ test("AI Fields - Selection Field", async () => {
     expect(".o_field_ai_selection input").toHaveValue("");
     expect(".o_field_ai_selection .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_selection .btn[title='Refresh value']");
-    await waitForSteps(["selection computed"]);
+    await expect.waitForSteps(["selection computed"]);
     await animationFrame();
     expect(".o_field_ai_selection input").toHaveValue("Val 2");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_selection input").toHaveValue("Val 2");
 });
@@ -369,11 +367,11 @@ test("AI Fields - Text Field", async () => {
     expect(".o_field_ai_text textarea").toHaveValue("");
     expect(".o_field_ai_text .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_text .btn[title='Refresh value']");
-    await waitForSteps(["text computed"]);
+    await expect.waitForSteps(["text computed"]);
     await animationFrame();
     expect(".o_field_ai_text textarea").toHaveValue("text prompt");
     await click(".o_form_button_save");
-    await waitForSteps(["save"]);
+    await expect.waitForSteps(["save"]);
     await animationFrame();
     expect(".o_field_ai_text textarea").toHaveValue("text prompt");
 });
@@ -392,7 +390,7 @@ test("AI Fields - Unresolved Request", async () => {
     expect(".o_field_ai_char input").toHaveValue("");
     expect(".o_field_ai_char .btn[title='Refresh value']").toHaveCount(1);
     await click(".o_field_ai_char .btn[title='Refresh value']");
-    await waitForSteps(["char computed"]);
+    await expect.waitForSteps(["char computed"]);
     await animationFrame();
     expect(".o_notification .o_notification_content").toHaveText(
         /The value could not be resolved$/
@@ -413,7 +411,7 @@ test("AI Properties - Resolved Request", async () => {
     expect(".o_field_properties .o_property_field_value").toHaveCount(1);
     expect(".o_field_properties .o_property_field_value input").toHaveValue("");
     await click(".o_field_properties .btn[title='Refresh value']");
-    await waitForSteps(["properties.ai_char computed"]);
+    await expect.waitForSteps(["properties.ai_char computed"]);
     await animationFrame();
     expect(".o_notification .o_notification_content").toHaveCount(0);
     expect(".o_field_properties .o_property_field_value input").toHaveValue("ai_char");
@@ -432,7 +430,7 @@ test("AI Properties - Unresolved Request", async () => {
     expect(".o_field_properties .o_property_field_value").toHaveCount(1);
     expect(".o_field_properties .o_property_field_value input").toHaveValue("");
     await click(".o_field_properties .btn[title='Refresh value']");
-    await waitForSteps(["properties.ai_char computed"]);
+    await expect.waitForSteps(["properties.ai_char computed"]);
     await animationFrame();
     expect(".o_notification .o_notification_content").toHaveText(
         /The value could not be resolved$/

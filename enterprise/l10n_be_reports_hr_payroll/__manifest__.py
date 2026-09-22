@@ -2,7 +2,6 @@
 
 {
     'name': 'Belgium - Accounting Reports & Payroll Bridge',
-    'version': '1.0',
     'description': """
 Bridge module integrating the Belgian accounting reports
 with the Belgian HR Payroll module

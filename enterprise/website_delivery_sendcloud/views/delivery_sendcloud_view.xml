@@ -7,7 +7,6 @@
         <field name="inherit_id" ref="delivery_sendcloud.view_delivery_carrier_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='sendcloud_shipping_rules']" position="after">
-                <field name="sendcloud_can_customize_use_locations" invisible="1"/>
                 <field name="sendcloud_use_locations" readonly="not sendcloud_can_customize_use_locations"/>
                 <label for="sendcloud_locations_radius_value" invisible="not sendcloud_use_locations" string="Locations Radius"/>
                 <div class="o_row" invisible="not sendcloud_use_locations">

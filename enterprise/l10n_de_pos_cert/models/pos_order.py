@@ -61,15 +61,15 @@ class PosOrder(models.Model):
     def _l10n_de_payment_types(self):
         """
         Used to retrieve a list of information for the payment of the order to send in the dsfinvk export json template
-        | is_cash_count   | has_journal  | amount | name |
+        | is_cash   | has_journal  | amount | name |
         | --------------- | ------------ | ------ |------|
         | True            | True         |   xx   |      | can be cash pm (Bar)
         | False           | True         |   xx   |      | can be bank, online transactions, etc. (Unbar)
         | False           | False        |   xx   |      | receivable accounts like customer account (Keine)
-        :return: [{is_cash_count[bool], has_journal[bool], amount[int], name[str], type[str]}]
+        :return: [{is_cash[bool], has_journal[bool], amount[int], name[str], type[str]}]
         """
         self.env.cr.execute("""
-            SELECT pm.is_cash_count,
+            SELECT pm.type = 'cash' AS is_cash,
                 journal.id IS NOT NULL AS has_journal,
                 SUM(p.amount) AS amount,
                 pm.name
@@ -77,24 +77,16 @@ class PosOrder(models.Model):
                 LEFT JOIN pos_payment_method pm ON p.payment_method_id=pm.id
                 LEFT JOIN account_journal journal ON pm.journal_id=journal.id
             WHERE p.pos_order_id = %s
-            GROUP BY pm.is_cash_count, has_journal, pm.name
+            GROUP BY is_cash, has_journal, pm.name
         """, [self.id])
 
         result = self.env.cr.dictfetchall()
-        only_settlements = False
-        if hasattr(self.config_id, "settle_due_product_id"):
-            settlement_products = [self.config_id.settle_due_product_id.id, self.config_id.settle_invoice_product_id.id, self.config_id.deposit_product_id.id]
-            # Check if all lines have only deposit or settle due products
-            only_settlements = all(line.product_id.id in settlement_products for line in self.lines)
-
         payment_data = []
         for payment in result:
             payment_type = 'Bar'  # Default
-            if not payment['is_cash_count']:
+            if not payment['is_cash']:
                 if payment['has_journal']:
                     payment_type = 'Unbar'
-                elif not only_settlements:
-                    payment_type = 'Keine'
                 else:
                     continue  # Skip 'Keine' for settlement orders as already adjusted to make total null in the order.
 

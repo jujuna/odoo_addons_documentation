@@ -13,6 +13,7 @@
                        decoration-danger="state == 'rejected'"
                        decoration-success="state == 'accepted'"
                        decoration-info="state in ('to_send', 'sent')"/>
+                <field name="company_id" optional="hide"/>
             </list>
         </field>
     </record>
@@ -33,10 +34,7 @@
                 <sheet>
                     <group>
                         <field name="name"/>
-                        <field name="date_from" readonly="1"/>
-                        <field name="date_to" readonly="1"/>
-                        <field name="recipient"/>
-                        <field name="state" readonly="1"/>
+                        <field name="date_from" readonly="1" widget="daterange" options="{'end_date_field': 'date_to', 'always_range': True}"/>
                     </group>
                     <field name="document_ids" readonly="1">
                         <list readonly="1" editable="bottom">
@@ -48,7 +46,9 @@
                                    decoration-danger="state == 'rejected'"
                                    decoration-success="state == 'accepted'"
                                    decoration-info="state in ('to_send', 'sent')"/>
-                            <field name="message"/>
+                            <field name="message" widget="text"/>
+                            <field name="deposit_uid" optional="hide" groups="base.group_no_one"/>
+                            <field name="declaration_uid" optional="hide" groups="base.group_no_one"/>
                         </list>
                     </field>
                 </sheet>
@@ -61,10 +61,10 @@
         <field name="model">account.report.async.export</field>
         <field name="arch" type="xml">
             <search>
-                <filter string="Rejected" name="state_rejected" domain="[('state', '=', 'rejected')]"/>
                 <filter string="To send" name="state_to_send" domain="[('state', '=', 'to_send')]"/>
                 <filter string="Sent" name="state_sent" domain="[('state', '=', 'sent')]"/>
                 <filter string="Accepted" name="state_accepted" domain="[('state', '=', 'accepted')]"/>
+                <filter string="Rejected" name="state_rejected" domain="[('state', '=', 'rejected')]"/>
                 <group>
                     <filter string="State" name="state" context="{'group_by':'state'}"/>
                 </group>
@@ -81,7 +81,7 @@
 
     <menuitem id="menu_action_account_report_async_export"
               name="EDI exports"
-              parent="account.account_reports_legal_statements_menu"
+              parent="l10n_fr_account.account_reports_fr_statements_menu"
               action="l10n_fr_reports.action_account_report_async_export"
               sequence="60"/>
 </odoo>

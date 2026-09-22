@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:09+0000\n"
-"PO-Revision-Date: 2025-12-30 19:09+0000\n"
+"POT-Creation-Date: 2026-08-28 18:23+0000\n"
+"PO-Revision-Date: 2026-08-28 18:23+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,24 +16,33 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: l10n_us_direct_deposit
-#: model_terms:ir.ui.view,arch_db:l10n_us_direct_deposit.res_config_settings_view_form
+#: model:ir.module.module,description:base.module_l10n_us_direct_deposit
 msgid ""
-"<i title=\"Connect to Wise\" role=\"img\" aria-label=\"Connect to Wise\" class=\"fa fa-plug fa-fw\"/>\n"
-"                                    Connect to Wise"
+"\n"
+"This module allows you to initiate batch payments directly in Odoo via Wise (https://wise.com).\n"
+"Once a Wise account is created and credentials are added in Settings, vendor payments through batches\n"
+"can be initiated digitally from within Odoo and redirect to be completed within Wise via Direct Debit ACH, Standard ACH, FedWire, or Wise Balance.\n"
 msgstr ""
 
 #. module: l10n_us_direct_deposit
 #: model_terms:ir.ui.view,arch_db:l10n_us_direct_deposit.res_config_settings_view_form
 msgid ""
-"<i title=\"Show logs\" role=\"img\" aria-label=\"Show logs\" class=\"fa fa-file-text-o\"/>\n"
-"                                    Show logs"
+"<i title=\"Connect to Wise\" role=\"img\" aria-label=\"Connect to Wise\" class=\"oi oi-fw\" data-icon=\"power\"/>\n"
+"                                Connect to Wise"
 msgstr ""
 
 #. module: l10n_us_direct_deposit
 #: model_terms:ir.ui.view,arch_db:l10n_us_direct_deposit.res_config_settings_view_form
 msgid ""
-"<i title=\"Start logging for 30 minutes\" role=\"img\" aria-label=\"Start logging for 30 minutes\" class=\"fa fa-file-text-o\"/>\n"
-"                                    Start logging for 30 minutes"
+"<i title=\"Show logs\" role=\"img\" aria-label=\"Show logs\" class=\"oi\" data-icon=\"article\"/>\n"
+"                                Show logs"
+msgstr ""
+
+#. module: l10n_us_direct_deposit
+#: model_terms:ir.ui.view,arch_db:l10n_us_direct_deposit.res_config_settings_view_form
+msgid ""
+"<i title=\"Start logging for 30 minutes\" role=\"img\" aria-label=\"Start logging for 30 minutes\" class=\"oi\" data-icon=\"article\"/>\n"
+"                                Start logging for 30 minutes"
 msgstr ""
 
 #. module: l10n_us_direct_deposit
@@ -63,7 +72,7 @@ msgstr ""
 
 #. module: l10n_us_direct_deposit
 #: model:ir.model,name:l10n_us_direct_deposit.model_res_partner_bank
-msgid "Bank Accounts"
+msgid "Bank Account"
 msgstr ""
 
 #. module: l10n_us_direct_deposit
@@ -73,7 +82,7 @@ msgstr ""
 
 #. module: l10n_us_direct_deposit
 #: model:ir.model,name:l10n_us_direct_deposit.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr ""
 
 #. module: l10n_us_direct_deposit
@@ -202,13 +211,18 @@ msgid "Non-USD payments are not yet supported."
 msgstr ""
 
 #. module: l10n_us_direct_deposit
-#: model:ir.model,name:l10n_us_direct_deposit.model_account_payment_method
-msgid "Payment Methods"
+#: model:ir.module.module,summary:base.module_l10n_us_direct_deposit
+msgid "Pay Vendors via Wise"
 msgstr ""
 
 #. module: l10n_us_direct_deposit
 #: model:ir.model,name:l10n_us_direct_deposit.model_account_payment
-msgid "Payments"
+msgid "Payment"
+msgstr ""
+
+#. module: l10n_us_direct_deposit
+#: model:ir.model,name:l10n_us_direct_deposit.model_account_payment_method
+msgid "Payment Method"
 msgstr ""
 
 #. module: l10n_us_direct_deposit
@@ -273,13 +287,13 @@ msgid "U.S. Direct Deposit"
 msgstr ""
 
 #. module: l10n_us_direct_deposit
-#: model_terms:ir.ui.view,arch_db:l10n_us_direct_deposit.res_config_settings_view_form
-msgid "U.S. Direct Deposit (via Wise)"
+#: model:ir.model.fields.selection,name:l10n_us_direct_deposit.selection__account_batch_payment__wise_payment_status__uninitiated
+msgid "Uninitiated"
 msgstr ""
 
 #. module: l10n_us_direct_deposit
-#: model:ir.model.fields.selection,name:l10n_us_direct_deposit.selection__account_batch_payment__wise_payment_status__uninitiated
-msgid "Uninitiated"
+#: model:ir.module.module,shortdesc:base.module_l10n_us_direct_deposit
+msgid "United States - Direct Deposit"
 msgstr ""
 
 #. module: l10n_us_direct_deposit

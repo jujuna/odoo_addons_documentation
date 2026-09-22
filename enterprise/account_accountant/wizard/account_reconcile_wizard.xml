@@ -31,8 +31,7 @@
                 <!-- Reco models -->
                 <field name="reco_model_id" nolabel="1"
                        domain="[['id', 'in', reco_model_autocomplete_ids]]"
-                       widget="selection_badge"
-                       options="{'horizontal': true}"
+                       widget="badges_many2one"
                        invisible="not reco_model_autocomplete_ids and not reco_model_id"/>
 
                 <group>
@@ -106,13 +105,16 @@
                         </div>
                         <field name="date" required="not allow_partials or edit_mode"/>
                         <field name="to_check"/>
+                        <field name="analytic_distribution"
+                               widget="analytic_distribution"
+                               groups="analytic.group_analytic_accounting"/>
                     </group>
                 </group>
 
                 <footer>
                     <button string="Reconcile" class="btn-primary" name="reconcile" type="object" data-hotkey="q"/>
                     <button string="Reconcile &amp; open" class="btn-primary" name="reconcile_open" type="object" data-hotkey="o"/>
-                    <button string="Discard" special="cancel" data-hotkey="x"/>
+                    <button special="cancel" data-hotkey="x"/>
                 </footer>
             </form>
         </field>

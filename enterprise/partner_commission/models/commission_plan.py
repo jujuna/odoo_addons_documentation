@@ -59,7 +59,12 @@ class CommissionRule(models.Model):
         help="If set, the rule does not apply to the whole category but only on the given product.\n"
         "The product must belong to the selected category.\n"
         "Use several rules if you need to match multiple products within a category.")
-    template_id = fields.Many2one('sale.order.template', 'Sale Order Template', ondelete="cascade")
+    template_id = fields.Many2one(
+        'sale.order.template',
+        'Sale Order Template',
+        ondelete="cascade",
+        domain="[('template_type', '=', 'quotation')]"
+    )
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', ondelete="cascade")
     rate = fields.Float('Rate', required=True, default=0)
     is_capped = fields.Boolean('Capped', required=True, default=False, help='Whether the commission is capped.')

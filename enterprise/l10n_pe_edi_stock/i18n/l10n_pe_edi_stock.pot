@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-09-18 18:21+0000\n"
+"PO-Revision-Date: 2026-09-18 18:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,34 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: l10n_pe_edi_stock
+#: model:ir.module.module,description:base.module_l10n_pe_edi_stock
+msgid ""
+"\n"
+"The delivery guide (Guía de Remisión) is needed as a proof\n"
+"that you are sending goods between A and B.\n"
+"\n"
+"It is only when a delivery order is validated that you can create the delivery\n"
+"guide.\n"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
+msgid "<strong>Authorization Issuing Entity</strong>"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
+msgid "<strong>Authorization Number</strong>"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
 msgid "<strong>Delivery Guide Number</strong>"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
+msgid "<strong>Driver's License Number</strong>"
 msgstr ""
 
 #. module: l10n_pe_edi_stock
@@ -27,7 +53,12 @@ msgstr ""
 
 #. module: l10n_pe_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
-msgid "<strong>Licence</strong>"
+msgid "<strong>License Plate</strong>"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
+msgid "<strong>MTC Registration Number</strong>"
 msgstr ""
 
 #. module: l10n_pe_edi_stock
@@ -223,10 +254,6 @@ msgstr ""
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model,name:l10n_pe_edi_stock.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: l10n_pe_edi_stock
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_l10n_pe_edi_vehicle__company_id
 msgid "Company"
 msgstr ""
@@ -366,6 +393,11 @@ msgid "Default Operator"
 msgstr ""
 
 #. module: l10n_pe_edi_stock
+#: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_delivery_address_id
+msgid "Delivery Address"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_status
 msgid "Delivery Guide Status (PE)"
 msgstr ""
@@ -374,6 +406,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
 msgid "Delivery Guide for transfer %s"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_delivery_partner_id
+msgid "Delivery Partner"
 msgstr ""
 
 #. module: l10n_pe_edi_stock
@@ -416,6 +453,11 @@ msgstr ""
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_error
 msgid "EDI error details"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model:ir.module.module,summary:base.module_l10n_pe_edi_stock
+msgid "Electronic Delivery Note for Peru (OSE method) and UBL 2.1"
 msgstr ""
 
 #. module: l10n_pe_edi_stock
@@ -775,6 +817,16 @@ msgid "PE EDI Vehicle"
 msgstr ""
 
 #. module: l10n_pe_edi_stock
+#: model:ir.model.fields,help:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_delivery_partner_id
+msgid "Partner the delivery guide is issued to."
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model:ir.model.fields,help:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_delivery_address_id
+msgid "Partner whose address is used as the delivery destination."
+msgstr ""
+
+#. module: l10n_pe_edi_stock
 #: model:ir.model.fields,help:l10n_pe_edi_stock.field_res_company__l10n_pe_edi_stock_client_password
 #: model:ir.model.fields,help:l10n_pe_edi_stock.field_res_config_settings__l10n_pe_edi_stock_client_password
 msgid "Password assigned for the SUNAT delivery guide API."
@@ -835,6 +887,11 @@ msgstr ""
 msgid ""
 "Peru: The tariff fraction of the product. This takes the form of the HS Code"
 " of the corresponding description."
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model:ir.module.module,shortdesc:base.module_l10n_pe_edi_stock
+msgid "Peruvian - Electronic Delivery Note"
 msgstr ""
 
 #. module: l10n_pe_edi_stock
@@ -922,6 +979,16 @@ msgstr ""
 #. module: l10n_pe_edi_stock
 #. odoo-python
 #: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
+msgid ""
+"SUNAT rejected the delivery guide because it is missing data now required by"
+" SUNAT (error %(code)s). Please update the \"Peruvian - Electronic Delivery "
+"Note\" (l10n_pe_edi_stock) module to its latest version, then send the "
+"delivery guide again."
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#. odoo-python
+#: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
 msgid "SUNAT returned an error code. Details:"
 msgstr ""
 
@@ -943,6 +1010,12 @@ msgstr ""
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__product_template__l10n_pe_edi_tariff_fraction__1006300000
 msgid "Semi-milled or milled rice, including pearled or glazed"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#. odoo-python
+#: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
+msgid "Sender Electronic Delivery Guide"
 msgstr ""
 
 #. module: l10n_pe_edi_stock
@@ -1005,13 +1078,8 @@ msgstr ""
 #. module: l10n_pe_edi_stock
 #. odoo-python
 #: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
-msgid "The client must have a defined district."
-msgstr ""
-
-#. module: l10n_pe_edi_stock
-#. odoo-python
-#: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
-msgid "The company's ID type must be set to RUC on the company contact page."
+msgid ""
+"The company's identification must be a RUC set on the company contact page."
 msgstr ""
 
 #. module: l10n_pe_edi_stock
@@ -1025,6 +1093,12 @@ msgstr ""
 msgid ""
 "The delivery guide is being processed by SUNAT. Click on 'Retry' to refresh "
 "the state."
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#. odoo-python
+#: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
+msgid "The destination address must have a defined district."
 msgstr ""
 
 #. module: l10n_pe_edi_stock

@@ -2,7 +2,7 @@
 
 import time
 
-from odoo import api, models
+from odoo import api, models, tools
 
 
 class ReportL10n_In_Hr_PayrollReport_Payrolladvice(models.AbstractModel):
@@ -13,8 +13,8 @@ class ReportL10n_In_Hr_PayrollReport_Payrolladvice(models.AbstractModel):
         res = {'from_name': '', 'to_name': ''}
         slip = self.env['hr.payslip'].search([('date_from', '<=', input_date), ('date_to', '>=', input_date)], limit=1)
         if slip:
-            res['from_name'] = slip.date_from.strftime('%d %B %Y')
-            res['to_name'] = slip.date_to.strftime('%d %B %Y')
+            res['from_name'] = tools.format_date(self.env, slip.date_from, date_format='dd-MMMM-Y')
+            res['to_name'] = tools.format_date(self.env, slip.date_to, date_format='dd-MMMM-Y')
         return res
 
     @api.model

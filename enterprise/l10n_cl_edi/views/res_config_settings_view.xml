@@ -12,11 +12,11 @@
                     <div class="content-group">
                         <div class="row mt16">
                             <label string="Taxpayer" for="l10n_cl_sii_taxpayer_type" class="col-lg-3 o_light_label"/>
-                            <field name="l10n_cl_sii_taxpayer_type"/>
+                            <field name="l10n_cl_sii_taxpayer_type" readonly="not is_root_company"/>
                         </div>
                         <div class="row">
                             <label string="SII Office" for="l10n_cl_sii_regional_office" class="col-lg-3 o_light_label"/>
-                            <field name="l10n_cl_sii_regional_office"/>
+                            <field name="l10n_cl_sii_regional_office" readonly="not is_root_company"/>
                         </div>
                     </div>
                 </setting>
@@ -24,34 +24,38 @@
                     <div class="content-group">
                         <div class="row mt16">
                             <label string="Activity Codes" for="l10n_cl_company_activity_ids" class="col-lg-4 o_light_label"/>
-                            <field name="l10n_cl_company_activity_ids" context="{'search_by_code': True}" widget="many2many_tags"/>
+                            <field name="l10n_cl_company_activity_ids" context="{'search_by_code': True}" widget="many2many_tags" readonly="not is_root_company"/>
                         </div>
                         <div class="row">
                             <label for="l10n_cl_activity_description" class="col-lg-4 o_light_label"/>
-                            <field name="l10n_cl_activity_description"/>
+                            <field name="l10n_cl_activity_description" readonly="not is_root_company"/>
                         </div>
                     </div>
                 </setting>
                 <setting string="SII Web Services" company_dependent="1" help="Please choose your DTE service provider. If possible, avoid selecting SII Demo mode in a production database.">
-                    <field name="l10n_cl_dte_service_provider" class="col-lg-8 o_light_label" widget="radio"/>
+                    <field name="l10n_cl_dte_service_provider" class="col-lg-8 o_light_label" widget="radio" readonly="not is_root_company"/>
                 </setting>
                 <setting string="Legal Electronic Invoicing Data" company_dependent="1" help="Hint: &quot;Factura Electrónica/Sistema de Certificación de Mercado/Actualizar datos de la empresa autorizada&quot;.">
                     <div class="content-group">
                         <div class="row mt16">
                             <label string="SII Resolution Nº" for="l10n_cl_dte_resolution_number" class="col-lg-4 o_light_label"/>
-                            <field name="l10n_cl_dte_resolution_number"/>
+                            <field name="l10n_cl_dte_resolution_number" readonly="not is_root_company"/>
                         </div>
                         <div class="row">
                             <label string="SII Resolution Date"  for="l10n_cl_dte_resolution_date" class="col-lg-4 o_light_label"/>
-                            <field name="l10n_cl_dte_resolution_date"/>
+                            <field name="l10n_cl_dte_resolution_date" readonly="not is_root_company"/>
                         </div>
                     </div>
                 </setting>
                 <setting string="Email Box Electronic Invoicing" company_dependent="1" help="This email account should match both emails declared on the SII site in the section: &quot;ACTUALIZACION DE DATOS DEL CONTRIBUYENTE&quot;, &quot;Mail Contacto SII&quot; and &quot;Mail Contacto Empresas&quot;.">
                     <div class="content-group">
                         <div class="row mt16">
+                            <label string="Internal Identifier" for="l10n_cl_internal_identifier" class="col-lg-4 o_light_label"/>
+                            <field name="l10n_cl_internal_identifier"/>
+                        </div>
+                        <div class="row">
                             <br/>
-                            <button name="%(mail.action_email_server_tree)d" icon="oi-arrow-right" type="action"
+                            <button name="%(mail.action_email_server_tree)d" icon="east" type="action"
                                 string="Configure DTE Incoming Email" class="btn-link"/>
                         </div>
                     </div>
@@ -60,7 +64,7 @@
                     <div class="content-group">
                         <div class="row mt16">
                             <label string="Email Alias"  for="l10n_cl_dte_email" class="col-lg-4 o_light_label"/>
-                            <field name="l10n_cl_dte_email"/>
+                            <field name="l10n_cl_dte_email" readonly="not is_root_company"/>
                         </div>
                     </div>
                 </setting>
@@ -72,7 +76,7 @@
                                     <strong>Warning:</strong> there is no shared digital signature for this company. You need to define at least one certificate without a user.
                                     Otherwise, you will need to send electronic invoices to the SII manually, and Odoo won't be able to send automatic receipt acknowledgements for vendor bills.
                                 </div>
-                                <button name="%(certificate.certificate_certificate_action_view_list)d" icon="oi-arrow-right" type="action"
+                                <button name="%(certificate.certificate_certificate_action_view_list)d" icon="east" type="action"
                                         string="Configure Signature Certificates" class="btn-link"/>
                             </div>
                         </div>

@@ -6,17 +6,7 @@ from odoo import api, fields, models
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
 
-    manual_consumption = fields.Boolean(related='move_id.manual_consumption', inverse='_inverse_manual_consumption')
     pick_type_create_components_lots = fields.Boolean(related='picking_type_id.use_create_components_lots')
-
-    @api.depends('pick_type_create_components_lots', 'picking_code')
-    def _compute_hide_lot_name(self):
-        super()._compute_hide_lot_name()
-        for line in self:
-            production = line.production_id or line.move_id.production_id
-            if production and line.tracking in ('lot', 'serial'):
-                line.hide_lot = False
-                line.hide_lot_name = True
 
     @api.depends('move_id', 'production_id')
     def _compute_parent_location_id(self):
@@ -39,10 +29,6 @@ class StockMoveLine(models.Model):
                 lines_not_in_production |= line
         super(StockMoveLine, lines_not_in_production)._compute_parent_location_id()
 
-    def _inverse_manual_consumption(self):
-        for rec in self:
-            rec.move_id.manual_consumption = rec.manual_consumption
-
     @api.model_create_multi
     def create(self, vals_list):
         move_line_ids = super().create(vals_list)
@@ -61,6 +47,28 @@ class StockMoveLine(models.Model):
                 ml.move_id = move[0].id
         return move_line_ids
 
+    def _compute_qty_done(self):
+        # Show quantity only when qty_producing > 0 or when explicitly picked but not for
+        # uncompletd splitted move_lines (i.e. line is not picked but move is picked)
+        raw_lines = self.filtered(lambda l: l.production_id and not l.move_id.production_id)
+        for line in raw_lines:
+            if line.picked or (line.production_id.qty_producing and not line.move_id.picked):
+                line.qty_done = line.quantity
+            else:
+                line.qty_done = 0
+        super(StockMoveLine, self - raw_lines)._compute_qty_done()
+
+    def _inverse_qty_done(self):
+        # Only mark lines as picked when they are directky edited from the form not just
+        # by having qty_done
+        raw_lines = self.filtered(lambda l: l.production_id and not l.move_id.production_id)
+        for line in raw_lines.with_context({'preserve_state': True}):
+            qty_done = line.qty_done
+            line.quantity = qty_done
+            if qty_done and self.env.context.get('mark_picked'):
+                line.picked = True
+        super(StockMoveLine, self - raw_lines)._inverse_qty_done()
+
     def _prepare_stock_move_vals(self):
         move_vals = super()._prepare_stock_move_vals()
         if not self.production_id:
@@ -77,6 +85,3 @@ class StockMoveLine(models.Model):
         else:
             move_vals['raw_material_production_id'] = self.production_id.id
         return move_vals
-
-    def _get_fields_stock_barcode(self):
-        return super()._get_fields_stock_barcode() + ['manual_consumption']

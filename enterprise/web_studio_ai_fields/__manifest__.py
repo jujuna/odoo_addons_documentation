@@ -6,7 +6,7 @@
     'category': 'Hidden',
     'version': '0.1',
     'author': 'Odoo S.A.',
-    'license': 'LGPL-3',
+    'license': 'OEEL-1',
     'depends': ['ai_fields', 'web_studio'],
     'auto_install': True,
     'assets': {
@@ -15,7 +15,6 @@
         ],
         'web_studio.studio_assets_minimal': [
             'web_studio_ai_fields/static/src/**/*.js',
-            'web_studio_ai_fields/static/src/**/*.scss',
         ],
         'web.assets_unit_tests': [
             'web_studio_ai_fields/static/tests/**/*',

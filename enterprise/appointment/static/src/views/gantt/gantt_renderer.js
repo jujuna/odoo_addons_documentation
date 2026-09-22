@@ -1,18 +1,15 @@
-import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { user } from "@web/core/user";
 import { GanttRenderer } from "@web_gantt/gantt_renderer";
 import { patch } from "@web/core/utils/patch";
 const { DateTime } = luxon;
 import { onWillStart } from "@odoo/owl";
-import { AppointmentBookingGanttRendererControls } from "./gantt_renderer_controls";
 import { AppointmentGanttPopover } from "./gantt_popover";
 
 export class AppointmentBookingGanttRenderer extends GanttRenderer {
     static pillTemplate = "appointment.AppointmentBookingGanttRendererPill";
     static components = {
         ...GanttRenderer.components,
-        GanttRendererControls: AppointmentBookingGanttRendererControls,
         Popover: AppointmentGanttPopover,
     }
 
@@ -122,57 +119,49 @@ export class AppointmentBookingGanttRenderer extends GanttRenderer {
         return ret;
     }
 
-    get controlsProps() {
-        const showAddLeaveButton = () =>
-            this.isAppointmentManager && this.model.metaData.groupedBy[0] === "resource_ids";
-        return Object.assign(super.controlsProps, {
-            onClickAddLeave: async () => {
-                this.env.services.action.doAction(
-                    {
-                        name: _t("Add Closing Day(s)"),
-                        type: "ir.actions.act_window",
-                        res_model: "appointment.manage.leaves",
-                        view_mode: "form",
-                        views: [[false, "form"]],
-                        target: "new",
-                        context: {},
-                    },
-                    { onClose: () => this.model.fetchData() }
-                );
-            },
-            /**
-             * Display 'Add Leaves' action button if grouping by appointment resources.
-             */
-            get showAddLeaveButton() {
-                return showAddLeaveButton();
-            },
-        });
+    /**
+     * @override
+     */
+    getPopoverProps(pill) {
+        const popoverProps = super.getPopoverProps(...arguments);
+        popoverProps.record = pill.record;
+        return popoverProps;
     }
 
     /**
      * @override
      */
-    async getPopoverProps(pill) {
-        const popoverProps = await super.getPopoverProps(...arguments);
-        const { record } = pill;
-        Object.assign(popoverProps, {
-            buttons: [
-                {
-                    class: "btn btn-sm btn-primary",
-                    text: _t("Save & Close"),
-                    onClick: this.popover.close.bind(this.popover),
-                },
-                ...popoverProps.buttons,
-                {
-                    class: "btn btn-sm btn-secondary ms-auto",
-                    icon: "fa fa-trash",
-                    iconTitle: _t("Remove"),
-                    onClick: () => this.model.unlinkRecords([record.id]),
-                },
-            ],
-            headerClass: `o_gantt_color_${pill._color}`,
-            title: record.appointment_booker_id?.display_name || this.getDisplayName(pill),
-        });
-        return popoverProps;
+    async undoDragDropAction(resId, dragAction, fallbackData, messages) {
+        const cleanFallbackData = { ...fallbackData };
+        delete cleanFallbackData?.originId;
+        return await super.undoDragDropAction(resId, dragAction, cleanFallbackData, messages);
+    }
+
+    /** TOTAL ROW **/
+
+    /**
+     * @override
+     * Sum on the total_capacity_reserved of bookings instead of using the count
+     */
+    addTo(pill, group) {
+        if (!pill.record.total_capacity_reserved) {
+            return false;
+        }
+        group.pills.push(pill);
+        group.aggregateValue += pill.record.total_capacity_reserved;
+        return true;
+    }
+
+    /**
+     * @override
+     * Only compute total row(s) when considering a single appointment type.
+     * This is to avoid a mix of definitions on total_capacity_reserved:
+     * When manage_capacity is true on the appointment type, it is the total
+     * reserved resource_capacity. When false, it is always 1 to count as
+     * an "occurence", see max_bookings field. This enables the total when
+     * coming from an appointment.type, which is the default use case.
+     */
+    shouldComputeAggregateValues(row) {
+        return this.props.context.default_appointment_type_id;
     }
 }

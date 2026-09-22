@@ -16,11 +16,11 @@
                         <tbody>
                             <tr t-foreach="fields" t-as="field" t-key="field.id">
                                 <td class="o-map-renderer--popup-table-content-name fw-bold text-nowrap align-baseline">
-                                    <t t-esc="field.string"/>
+                                    <t t-out="field.string"/>
                                 </td>
                                 <td class="o-map-renderer--popup-table-space"></td>
                                 <td class="o-map-renderer--popup-table-content-value align-baseline">
-                                    <t t-esc="field.value"/>
+                                    <t t-out="field.value"/>
                                 </td>
                             </tr>
                         </tbody>

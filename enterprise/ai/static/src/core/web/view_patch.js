@@ -1,6 +1,6 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { patch } from "@web/core/utils/patch";
 import { View } from "@web/views/view";
-import { useSubEnv } from "@odoo/owl";
 
 patch(View.prototype, {
     setup(...args) {
@@ -22,8 +22,15 @@ patch(View.prototype, {
                 if (aiProps.measures && aiProps.measures.length > 0) {
                     this.componentProps.modelParams.metaData.activeMeasures = aiProps.measures;
                 }
-                if (aiProps.colGroupBys && aiProps.colGroupBys.length > 0) {
-                    this.componentProps.modelParams.metaData.colGroupBys = aiProps.colGroupBys;
+                if (aiProps.colGroupBys?.length) {
+                    this.componentProps.modelParams.metaData.colGroupBys =
+                        aiProps.colGroupBys.flatMap((groupBy) =>
+                            typeof groupBy === "string"
+                                ? groupBy
+                                : groupBy.intervals.map(
+                                      (interval) => `${groupBy.field_name}:${interval}`
+                                  )
+                        );
                 }
                 if (aiProps.sortedColumn) {
                     // Set up sorted column with empty groupId for total column sorting

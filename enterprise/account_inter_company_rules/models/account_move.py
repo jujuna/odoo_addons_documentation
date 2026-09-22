@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models, _
+from odoo import SUPERUSER_ID, _, fields, models
 
 
 class AccountMove(models.Model):
@@ -21,7 +21,7 @@ class AccountMove(models.Model):
             context = dict(self.env.context, default_company_id=company_sudo.id)
             context.pop('default_journal_id', None)
             context.pop('default_invoice_payment_term_id', None)
-            invoices.with_user(company_sudo.intercompany_user_id.id).with_context(context).with_company(company_sudo.id)._inter_company_create_invoices()
+            invoices.with_user(SUPERUSER_ID).with_context(context).with_company(company_sudo.id)._inter_company_create_invoices()
         return posted
 
     def _inter_company_create_invoices(self):
@@ -42,6 +42,14 @@ class AccountMove(models.Model):
                 invoice_vals['invoice_line_ids'].append((0, 0, line._inter_company_prepare_invoice_line_data()))
 
             inv_new = inv.with_context(default_move_type=invoice_vals['move_type']).new(invoice_vals)
+            if inv_new.fiscal_position_id:
+                impacted_countries = inv_new.invoice_line_ids.tax_ids.country_id
+                if (
+                    impacted_countries
+                    and impacted_countries != inv_new.tax_country_id
+                    and impacted_countries != inv_new.fiscal_position_id.country_id
+                ):
+                    inv_new.fiscal_position_id = False
             for line in inv_new.invoice_line_ids.filtered(lambda l: l.display_type not in ('line_section', 'line_subsection', 'line_note')):
                 # We need to adapt the taxes following the fiscal position, but we must keep the
                 # price unit.

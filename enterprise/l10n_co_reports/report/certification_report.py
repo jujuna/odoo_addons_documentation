@@ -30,15 +30,15 @@ class ReportL10n_Co_ReportsReport_Certification(models.AbstractModel):
                 }
 
                 # Add totals
-                for i, column in enumerate(line['columns']):
+                for i, column in enumerate(line.columns):
                     column_data = options['columns'][i % len(options['columns'])]
-                    partner_doc[column_data['expression_label']] = column.get('name')
+                    partner_doc[column_data['expression_label']] = column.name
                 docs.append(partner_doc)
             else:
                 line_dict = {}
-                for i, column in enumerate(line['columns']):
+                for i, column in enumerate(line.columns):
                     column_data = options['columns'][i % len(options['columns'])]
-                    line_dict[column_data['expression_label']] = column.get('name')
+                    line_dict[column_data['expression_label']] = column.name
                 # As mentioned above, at this stage of the iteration,
                 # the partner_doc dict (and the 'lines' key) will always be set.
                 partner_doc['lines'].append(line_dict)

@@ -1,18 +1,19 @@
 import { useInterval } from "@room/room_booking/useInterval";
 
-import { Component, onWillUpdateProps, useState, xml } from "@odoo/owl";
+import { Component, onWillUpdateProps, xml, proxy, t, useProps } from "@odoo/owl";
 
 export class RoomBookingRemainingTime extends Component {
     static template = xml`
         <div class="o_room_remaining_time rounded py-3 bg-black-25 display-4 text-center text-white"
-             t-out="state.remainingTime.toFormat('hh:mm:ss')"/>
+             t-out="this.state.remainingTime.toFormat('hh:mm:ss')"/>
     `;
-    static props = {
-        endTime: { type: Object },
-    };
+
+    props = useProps({
+        endTime: t.object(),
+    });
 
     setup() {
-        this.state = useState({ remainingTime: this.props.endTime.diffNow() });
+        this.state = proxy({ remainingTime: this.props.endTime.diffNow() });
         // Update the remaining time every second
         useInterval(() => {
             const remainingTime = this.props.endTime.diffNow();

@@ -24,14 +24,12 @@
                         <field name="name">Income</field>
                         <field name="code">BDCT_INC</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="domain_formula">-sum([('account_id.internal_group', '=', 'income')])</field>
                     </record>
                     <record id="bd_corporate_tax_report_e_inc" model="account.report.line">
                         <field name="name">Exempt Income</field>
                         <field name="code">BDCT_E_INC</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">tag(l10n_bd.account_tags_tax_c_exempt)</field>
                     </record>
                 </field>
@@ -50,14 +48,12 @@
                         <field name="name">Less (Expenses)</field>
                         <field name="code">BDCT_L_EXP</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">tag(l10n_bd.account_tags_tax_c_exp)</field>
                     </record>
                     <record id="bd_corporate_tax_report_cor" model="account.report.line">
                         <field name="name">Less (Cost Of Revenue)</field>
                         <field name="code">BDCT_L_COR</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">tag(l10n_bd.account_tags_tax_c_cog)</field>
                     </record>
                 </field>

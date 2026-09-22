@@ -16,7 +16,7 @@
         <field name="arch" type="xml">
             <search string="Subscriptions">
                 <field name="name" string="Order" filter_domain="['|', ('name', 'ilike', self), ('client_order_ref', 'ilike', self)]"/>
-                <field name="partner_id" operator="child_of"/>
+                <field name="partner_id" filter_domain="['|', ('partner_id', 'child_of', self), ('partner_id.child_ids.email', 'ilike', self)]"/>
                 <field name="user_id"/>
                 <field name="team_id"/>
                 <field name="order_line" string="Product" filter_domain="[('order_line.product_id', 'ilike', self)]"/>
@@ -34,8 +34,8 @@
                 <filter name="to_renew" string="To Invoice" domain="[('next_invoice_date', '&lt;=', 'today'), ('subscription_state', 'in', ('3_progress', '4_paused'))]"/>
                 <separator/>
                 <filter name="automatic_payment" string="Automatic Payments" domain="[('subscription_state', 'in', ('3_progress', '4_paused')), ('payment_token_id', '!=', False)]"/>
-                <filter name="manual_payment" string="Manual Payment" domain="[('subscription_state', 'in', ('3_progress', '4_paused')), ('payment_token_id', '=', False), ('require_payment', '=', True)]"/>
-                <filter name="automatic_invoicing" string="Automatic Invoicing" domain="[('subscription_state', 'in', ('3_progress', '4_paused')), ('payment_token_id', '=', False), ('require_payment', '=', False)]"/>
+                <filter name="manual_payment" string="Manual Payment" domain="[('subscription_state', 'in', ('3_progress', '4_paused')), ('payment_token_id', '=', False), ('prepayment_percent', '>', '0')]"/>
+                <filter name="automatic_invoicing" string="Automatic Invoicing" domain="[('subscription_state', 'in', ('3_progress', '4_paused')), ('payment_token_id', '=', False), ('prepayment_percent', '=', '0')]"/>
                 <separator/>
                 <filter name="payment_exception" string="In Error" domain="[('payment_exception','=', True)]" help="Contracts whose payment has failed"/>
                 <separator/>
@@ -106,7 +106,7 @@
         <field name="domain">[('subscription_state', 'in', ['1_draft', '3_progress', '4_paused', '6_churn'])]</field>
         <field name="search_view_id" ref="sale_subscription.sale_subscription_view_search"/>
         <field name="help" type="html">
-            <img src="/sale_subscription/static/src/img/MRRgraph.svg" alt="Onboarding example showing how the app tracks customer subscriptions and visualizes MRR growth." class="w-100 mb-4 rounded-3 bg-secondary-light"/>
+            <img src="/sale_subscription/static/src/img/MRRgraph.svg" alt="Onboarding example showing how the app tracks customer subscriptions and visualizes MRR growth." class="w-100 mb-4 rounded-3 bg-300 bg-opacity-50"/>
             <p>Create a new subscription</p>
             <p>Automate invoices and payments, simplify upsell quotes, reduce churn and get insights (MRR, churn, CLTV, ...)</p>
         </field>
@@ -223,7 +223,7 @@
         <field name="name">sale.order.kanban</field>
         <field name="model">sale.order</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="subscription_state" class="o_kanban_mobile o_kanban_order" sample="1" quick_create="false">
+            <kanban default_group_by="subscription_state" class="o_kanban_mobile o_kanban_order" sample="1" quick_create="false" js_class="sale_file_upload_kanban">
                 <field name="state"/>
                 <field name="subscription_state" options="{'group_by_tooltip': {'description': 'Description'}}"/>
                 <field name="sale_order_template_id" groups="sales_team.group_sale_manager"/>
@@ -254,9 +254,9 @@
                                 <field name="starred" widget="boolean_favorite" nolabel="1" force_save="1" />
                                 <field name="activity_ids" widget="kanban_activity" class="ms-2"/>
                                 <b t-if="record.rating_ids.raw_value.length">
-                                    <span style="font-weight:bold;" class="fa fa-fw mt4 fa-smile-o text-success" t-if="record.rating_last_value.value == 5" title="Latest Rating: Happy" role="img" aria-label="Happy face"/>
-                                    <span style="font-weight:bold;" class="fa fa-fw mt4 fa-meh-o text-warning" t-if="record.rating_last_value.value == 3" title="Latest Rating: Neutral" role="img" aria-label="Neutral face"/>
-                                    <span style="font-weight:bold;" class="fa fa-fw mt4 fa-frown-o text-danger" t-if="record.rating_last_value.value == 1" title="Latest Rating: Unhappy" role="img" aria-label="Unhappy face"/>
+                                    <span style="font-weight:bold;" class="oi oi-fw mt4 text-success" data-icon="sentiment_satisfied" t-if="record.rating_last_value.value == 5" title="Latest Rating: Happy" role="img" aria-label="Happy face"/>
+                                    <span style="font-weight:bold;" class="oi oi-fw mt4 text-warning" data-icon="sentiment_neutral" t-if="record.rating_last_value.value == 3" title="Latest Rating: Neutral" role="img" aria-label="Neutral face"/>
+                                    <span style="font-weight:bold;" class="oi oi-fw mt4 text-danger" data-icon="sentiment_sad" t-if="record.rating_last_value.value == 1" title="Latest Rating: Unhappy" role="img" aria-label="Unhappy face"/>
                                 </b>
                             </div>
                             <div class="ms-auto d-flex align-items-center">
@@ -281,7 +281,7 @@
       <field name="name">sale.subscription.order.list</field>
       <field name="model">sale.order</field>
       <field name="arch" type="xml">
-        <list sample="1" multi_edit="1" default_order="next_invoice_date asc, end_date asc"
+                  <list sample="1" multi_edit="1" default_order="next_invoice_date asc, end_date asc" js_class="sale_file_upload_list"
               decoration-warning="subscription_state == '4_paused'"
               decoration-muted="state == 'cancel'">
             <field name="name" string="Number" readonly="1" decoration-bf="1"/>
@@ -302,7 +302,7 @@
             <field name="activity_ids" widget="list_activity" optional="show" readonly="1"/>
             <field name="company_id" readonly="1" column_invisible="True"/>
             <field name="company_id" groups="base.group_multi_company" readonly="1"/>
-            <field name="tag_ids" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}" readonly="1"/>
+            <field name="tag_ids" optional="hide" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
             <field name="recurring_monthly" string="MRR" optional="hide" readonly="1"/>
             <field name="recurring_total" string="Recurring" optional="show" readonly="1"/>
             <field name="plan_id" optional="show" readonly="1"/>

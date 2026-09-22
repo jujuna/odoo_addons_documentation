@@ -140,4 +140,26 @@
         <field name="rule_parameter_id" ref="rule_parameter_l10_eg_tax_rates"/>
         <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
     </record>
+
+    <!-- NOSI Contribution -->
+    <record id="rule_parameter_l10n_eg_social_insurance_contribution_company_rate" model="hr.rule.parameter">
+        <field name="name">Social Insurance Company Contribution Rate</field>
+        <field name="code">l10n_eg_social_insurance_contribution_company_rate</field>
+        <field name="country_id" ref="base.eg"/>
+    </record>
+    <record id="rule_parameter_l10n_eg_social_insurance_contribution_company_rate_2020" model="hr.rule.parameter.value">
+        <field name="parameter_value">18.75</field>
+        <field name="rule_parameter_id" ref="rule_parameter_l10n_eg_social_insurance_contribution_company_rate"/>
+        <field name="date_from" eval="datetime(2020, 1, 1).date()"/>
+    </record>
+    <record id="rule_parameter_l10n_eg_social_insurance_contribution_employee_rate" model="hr.rule.parameter">
+        <field name="name">Social Insurance Employee Contribution Rate</field>
+        <field name="code">l10n_eg_social_insurance_contribution_employee_rate</field>
+        <field name="country_id" ref="base.eg"/>
+    </record>
+    <record id="rule_parameter_l10n_eg_social_insurance_contribution_employee_rate_2020" model="hr.rule.parameter.value">
+        <field name="parameter_value">-11</field>
+        <field name="rule_parameter_id" ref="rule_parameter_l10n_eg_social_insurance_contribution_employee_rate"/>
+        <field name="date_from" eval="datetime(2020, 1, 1).date()"/>
+    </record>
 </odoo>

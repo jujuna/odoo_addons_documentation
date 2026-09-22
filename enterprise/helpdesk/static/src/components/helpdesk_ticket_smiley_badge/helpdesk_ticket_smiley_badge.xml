@@ -2,9 +2,9 @@
 <templates xml:space="preserve">
 
     <t t-name="helpdesk.SmileyBadge" owl="1">
-        <i t-if="props.record.data[props.name] == 'top'" class="fa fa-fw fa-smile-o fa-lg" t-att-class="badgeClass"/>
-        <i t-elif="props.record.data[props.name] == 'ok'" class="fa fa-fw fa-meh-o fa-lg" t-att-class="badgeClass"/>
-        <i t-else="" class="fa fa-fw fa-frown-o fa-lg" t-att-class="badgeClass"/>
+        <i t-if="this.props.record.data[this.props.name] == 'top'" class="oi oi-fw oi-lg" data-icon="sentiment_satisfied" t-att-class="this.badgeClass"/>
+        <i t-elif="this.props.record.data[this.props.name] == 'ok'" class="oi oi-fw oi-lg" data-icon="sentiment_neutral" t-att-class="this.badgeClass"/>
+        <i t-else="" class="oi oi-fw oi-lg" data-icon="sentiment_sad" t-att-class="this.badgeClass"/>
     </t>
 
 </templates>

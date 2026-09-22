@@ -10,6 +10,7 @@ from odoo.tests import tagged, users
 
 
 @tagged('appointment_slots')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class AppointmentHrTest(AppointmentHrCommon):
 
     @classmethod
@@ -57,7 +58,7 @@ class AppointmentHrTest(AppointmentHrCommon):
         }
 
         # Check that only slots during working hours are available for users without flexible hours.
-        self.assertFalse(self.staff_employee_bxls.resource_calendar_id.flexible_hours)
+        self.assertFalse(self.staff_employee_bxls._is_flexible())
         with freeze_time(self.reference_now):
             slots = apt_type._get_appointment_slots('Europe/Brussels')
         # Based on appointment type start hours of slots but 12 is pause midi.
@@ -65,7 +66,15 @@ class AppointmentHrTest(AppointmentHrCommon):
         self.assertSlots(slots, exp_months, slots_data)
 
         # Check that even slots outside working hours are available for users with flexible hours.
-        self.staff_employee_bxls.resource_calendar_id.write({'flexible_hours': True})
+        flexible_calendar = self.env['resource.calendar'].sudo().create({
+            'name': 'Flexible Calendar',
+            'company_id': self.company_admin.id,
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 16,
+            'hours_per_day': 4,
+        })
+        self.staff_employee_bxls.write({'resource_calendar_id': flexible_calendar.id})
         with freeze_time(self.reference_now):
             slots = apt_type._get_appointment_slots('Europe/Brussels')
         slots_data.update({'slots_start_hours': [8, 9, 10, 11, 12, 13]})
@@ -79,11 +88,9 @@ class AppointmentHrTest(AppointmentHrCommon):
                 'dayofweek': f'{day - 1}',
                 'hour_from': hour,
                 'hour_to': hour + 4,
-                'name': f'Day {day} H {hour} {hour + 4}',
             }) for hour in [0, 20] for day in [1, 2, 3, 4]],
             'company_id': self.company_admin.id,
             'name': '00:00-04:00 and 20:00-00:00 on Mondays through Thursday',
-            'tz': 'UTC',
         })
 
         # Current employee is Europe/Brussels

@@ -6,7 +6,8 @@
         <field name="l10n_mx_edi_fiscal_regime">601</field>
     </record>
 
-    <record id="demo_partner" model="res.partner">
+    <!-- Demo contacts to test EDI and factoring through Sapien -->
+    <record id="demo_partner_sapien_1" model="res.partner">
         <field name="name">XENON INDUSTRIAL ARTICLES</field>
         <field name="street">Campobasso Sur 3201 - 9001</field>
         <field name="city">Hidalgo</field>
@@ -17,7 +18,19 @@
         <field name="l10n_mx_edi_fiscal_regime">624</field>
     </record>
 
-    <record id="demo_partner_2" model="res.partner">
+    <record id="demo_partner_sapien_2" model="res.partner">
+        <field name="name">UNIVERSIDAD ROBOTICA ESPAÑOLA</field>
+        <field name="street">Campobasso Oeste 3201 - 9001</field>
+        <field name="city">Hidalgo del Parral</field>
+        <field name="country_id" ref="base.mx"/>
+        <field name="state_id" ref="base.state_mx_df"/>
+        <field name="zip">86991</field>
+        <field name="vat">URE180429TM6</field>
+        <field name="l10n_mx_edi_fiscal_regime">601</field>
+    </record>
+
+    <!-- Demo contacts to test EDI and factoring through Quadrum -->
+    <record id="demo_partner_quadrum_1" model="res.partner">
         <field name="name">INMOBILIARIA CVA</field>
         <field name="street">Campobasso Oeste 3201 - 9001</field>
         <field name="city">Hidalgo del Parral</field>
@@ -25,6 +38,17 @@
         <field name="state_id" ref="base.state_mx_chih"/>
         <field name="zip">33826</field>
         <field name="vat">ICV060329BY0</field>
+        <field name="l10n_mx_edi_fiscal_regime">601</field>
+    </record>
+
+    <record id="demo_partner_quadrum_2" model="res.partner">
+        <field name="name">ESCUELA KEMPER URGATE</field>
+        <field name="street">Campobasso Oeste 3201 - 9001</field>
+        <field name="city">Hidalgo del Parral</field>
+        <field name="country_id" ref="base.mx"/>
+        <field name="state_id" ref="base.state_mx_df"/>
+        <field name="zip">20928</field>
+        <field name="vat">EKU9003173C9</field>
         <field name="l10n_mx_edi_fiscal_regime">601</field>
     </record>
 
@@ -54,30 +78,32 @@
     <data noupdate="1">
         <record id="demo_key" model="certificate.key">
             <field name="name">MX demo key</field>
-            <field name="content" type="base64" file="l10n_mx_edi/demo/pac_credentials/certificate.key"/>
+            <field name="content" type="bytes" file="l10n_mx_edi/demo/pac_credentials/certificate.key"/>
             <field name="password">12345678a</field>
             <field name="company_id" ref="base.demo_company_mx"/>
         </record>
 
         <record id="demo_certificate" model="certificate.certificate">
             <field name="name">MX demo certificate</field>
-            <field name="content" type="base64" file="l10n_mx_edi/demo/pac_credentials/certificate.cer"/>
+            <field name="content" type="bytes" file="l10n_mx_edi/demo/pac_credentials/certificate.cer"/>
             <field name="private_key_id" ref="demo_key"/>
             <field name="company_id" ref="base.demo_company_mx"/>
+            <field name="scope">cfdi_csd</field>
         </record>
 
         <record id="demo_key_zapa" model="certificate.key">
             <field name="name">MX demo key (ZAPA)</field>
-            <field name="content" type="base64" file="l10n_mx_edi/demo/pac_credentials/certificate_zapa.key"/>
+            <field name="content" type="bytes" file="l10n_mx_edi/demo/pac_credentials/certificate_zapa.key"/>
             <field name="password">12345678a</field>
             <field name="company_id" ref="base.demo_company_2_mx"/>
         </record>
 
         <record id="demo_certificate_zapa" model="certificate.certificate">
             <field name="name">MX demo certificate (ZAPA)</field>
-            <field name="content" type="base64" file="l10n_mx_edi/demo/pac_credentials/certificate_zapa.cer"/>
+            <field name="content" type="bytes" file="l10n_mx_edi/demo/pac_credentials/certificate_zapa.cer"/>
             <field name="private_key_id" ref="demo_key_zapa"/>
             <field name="company_id" ref="base.demo_company_2_mx"/>
+            <field name="scope">cfdi_csd</field>
         </record>
     </data>
 

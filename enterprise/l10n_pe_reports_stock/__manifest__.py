@@ -8,8 +8,7 @@ Electronic stock reports
     - PLE 12.1: Permanent Inventory Record in Physical Units
     - PLE 13.1: Permanent Valued Inventory Record
     """,
-    "version": "1.0",
-    "author": "Vauxoo, Odoo SA",
+    "author": "Vauxoo, Odoo S.A.",
     "category": "Accounting/Localizations/Reporting",
     "website": "https://www.odoo.com/app/accounting",
     "license": "OEEL-1",
@@ -19,11 +18,10 @@ Electronic stock reports
         "sale_stock",
     ],
     "data": [
-        "security/ir.model.access.csv",
         "views/product_views.xml",
         "views/stock_picking_views.xml",
         "views/stock_warehouse_views.xml",
         "wizard/stock_move_ple_report.xml",
+        'security/ir.access.csv',
     ],
-    "installable": True,
 }

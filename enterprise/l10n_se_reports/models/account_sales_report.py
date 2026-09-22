@@ -3,66 +3,31 @@
 
 import csv
 import io
-from collections import defaultdict
 from odoo import _, api, fields, models
 from odoo.tools import date_utils
 
 
 class L10n_SeEcSalesReportHandler(models.AbstractModel):
     _name = 'l10n_se.ec.sales.report.handler'
-    _inherit = ['account.ec.sales.report.handler']
+    _inherit = ['account.ec.sales.with.tags.report.handler']
     _description = 'Swedish EC Sales Report Custom Handler'
 
-    def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
-        """
-        Generate the dynamic lines for the report in a horizontal style
-        (one line partner, one column per operation type).
-        """
-        lines = []
-
-        totals_by_column_group = {
-            column_group_key: {
-                "goods": 0.0,
-                "triangular": 0.0,
-                "services": 0.0,
-            }
-            for column_group_key in options['column_groups']
-        }
-        for partner, results in super()._query_partners(report, options):
-            partner_values = defaultdict(dict)
-            for column_group_key in options['column_groups']:
-                partner_sum = results.get(column_group_key, {})
-                partner_values[column_group_key]['goods'] = partner_sum.get('goods', 0.0)
-                partner_values[column_group_key]['triangular'] = partner_sum.get('triangular', 0.0)
-                partner_values[column_group_key]['services'] = partner_sum.get('services', 0.0)
-                partner_values[column_group_key]['vat_number'] = partner_sum.get('full_vat_number', 'UNKNOWN')
-                if not totals_by_column_group[column_group_key].get('vat_number'):
-                    totals_by_column_group[column_group_key]['vat_number'] = ''
-                totals_by_column_group[column_group_key]['goods'] += partner_sum.get('goods', 0.0)
-                totals_by_column_group[column_group_key]['triangular'] += partner_sum.get('triangular', 0.0)
-                totals_by_column_group[column_group_key]['services'] += partner_sum.get('services', 0.0)
-            lines.append((0, super()._get_report_line_partner(report, options, partner, partner_values)))
-        # Report total line.
-        lines.append((0, super()._get_report_line_total(report, options, totals_by_column_group)))
-        return lines
-
     def _custom_options_initializer(self, report, options, previous_options):
-        """
-        Called in _sales_report_init_core_custom_options to add the invoice lines search domain that is specific to the
-        country.
-        Typically, the taxes account.report.expression ids relative to the country for the triangular, sale of goods
-        or services.
-        :param dict options: Report options
-        :param dict previous_options: Previous report options
-        :return dict[Any]: The modified options dictionary
-        """
-        super()._init_core_custom_options(report, options, previous_options)
-        ec_operation_category = options.get('sales_report_taxes', {'goods': tuple(), 'triangular': tuple(), 'services': tuple()})
-
-        ec_operation_category['goods'] = tuple(self.env.ref('l10n_se.tax_report_line_35_tag')._get_matching_tags().ids)
-        ec_operation_category['triangular'] = tuple(self.env.ref('l10n_se.tax_report_line_38_tag')._get_matching_tags().ids)
-        ec_operation_category['services'] = tuple(self.env.ref('l10n_se.tax_report_line_39_tag')._get_matching_tags().ids)
-        options.update({'sales_report_taxes': ec_operation_category})
+        se_tax_tags = self._get_ec_sales_tax_tags()
+        options.update({
+            'sales_report_operation_types': {
+                'goods': {
+                    'tax_tag_ids': se_tax_tags['goods'],
+                },
+                'services': {
+                    'tax_tag_ids': se_tax_tags['services'],
+                },
+                'triangular': {
+                    'tax_tag_ids': se_tax_tags['triangular'],
+                },
+            },
+        })
+        super()._custom_options_initializer(report, options, previous_options)
 
         # Buttons
         options.setdefault('buttons', []).append({
@@ -73,6 +38,22 @@ class L10n_SeEcSalesReportHandler(models.AbstractModel):
             'file_export_type': _('KVR'),
             'active': report.country_id.code in ('SE', None),
         })
+
+    def _get_ec_sales_tax_tags(self):
+        # Overrides account_reports
+        goods_expression = self.env.ref('l10n_se.tax_report_line_35_tag')
+        services_expression = self.env.ref('l10n_se.tax_report_line_39_tag')
+        triangular_expression = self.env.ref('l10n_se.tax_report_line_38_tag')
+
+        return {
+            'goods': goods_expression._get_matching_tags().ids,
+            'services': services_expression._get_matching_tags().ids,
+            'triangular': triangular_expression._get_matching_tags().ids,
+        }
+
+    def _format_vat_number(self, full_vat_number):
+        # Override super function to not trim country code from vat number
+        return full_vat_number
 
     @api.model
     def _get_se_period(self, options):
@@ -103,14 +84,19 @@ class L10n_SeEcSalesReportHandler(models.AbstractModel):
                 ''
             ],
         ]
-        currency = self.env.company.currency_id
         report = self.env['account.report'].browse(options['report_id'])
 
-        for data_line in report._get_lines(options)[:-1]:  # [:-1] to skip total line
+        for data_line in report._get_lines(options):
+            if report._get_model_info_from_id(data_line.id)[0] != 'res.partner':
+                continue
+
             columns = []
-            for column in data_line['columns']:
-                if not (isinstance(column.get('no_format'), (int, float)) and currency.is_zero(column.get('no_format', 0))):
-                    columns.append(column.get('no_format', ''))
+            for column in data_line.columns:
+                if isinstance(column.no_format, str):
+                    columns.append(column.no_format or '')
+                elif isinstance(column.no_format, (int, float)):
+                    value = round(column.no_format or 0)
+                    columns.append(value if value else '')
                 else:
                     columns.append('')
             lines.append(columns)

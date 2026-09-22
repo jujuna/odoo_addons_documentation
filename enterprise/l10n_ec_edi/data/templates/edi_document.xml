@@ -139,7 +139,8 @@
                 <secuencial t-out="sequential"/>
                 <dirMatriz t-out="company_address"/>
                 <agenteRetencion t-out="company.l10n_ec_withhold_agent_number"/>
-                <contribuyenteRimpe t-if="company.l10n_ec_regime == 'rimpe'" t-out="'CONTRIBUYENTE RÉGIMEN RIMPE'"/>
+                <contribuyenteRimpe t-if="company.l10n_ec_regime == 'rimpe_emprendedor'" t-out="'CONTRIBUYENTE RÉGIMEN RIMPE'"/>
+                <contribuyenteRimpe t-elif="company.l10n_ec_regime == 'rimpe_negocio_popular'" t-out="'CONTRIBUYENTE NEGOCIO POPULAR - RÉGIMEN RIMPE'"/>
             </infoTributaria>
         </template>
 
@@ -156,13 +157,13 @@
             <!-- Invoice-related docs -->
             <tipoIdentificacionComprador t-if="is_cnote or is_dnote or is_invoice" t-out="partner_sri_code"/>
             <razonSocialComprador t-if="is_cnote or is_dnote or is_invoice" t-out="clean_str(partner.name)"/>
-            <identificacionComprador t-if="is_cnote or is_dnote or is_invoice" t-out="partner.vat"/>
+            <identificacionComprador t-if="is_cnote or is_dnote or is_invoice" t-out="partner._get_preferred_legal_entity_identifier_vals().get('value', '')"/>
             <direccionComprador t-if="is_invoice" t-out="clean_str(partner.street or '')"/>
 
             <!-- Purchase liquidation docs -->
             <tipoIdentificacionProveedor t-if="is_liquidation" t-out="partner_sri_code"/>
             <razonSocialProveedor t-if="is_liquidation" t-out="clean_str(partner.name)"/>
-            <identificacionProveedor t-if="is_liquidation" t-out="partner.vat"/>
+            <identificacionProveedor t-if="is_liquidation" t-out="partner._get_preferred_legal_entity_identifier_vals().get('value', '')"/>
             <direccionProveedor t-if="is_liquidation" t-out="clean_str(partner.street or '')"/>
 
             <!-- Credit and debit notes -->
@@ -183,16 +184,13 @@
             <t t-set="tax_totals" t-value="taxes_data['tax_details']"/>
             <totalConImpuestos t-if="tax_totals and (is_cnote or is_invoice or is_liquidation)">
                 <totalImpuesto t-as="tax_data" t-foreach="tax_totals.values()">
-                    <t t-call="l10n_ec_edi.common_tax_lines_template">
-                        <t t-set="tarifa_post_base" t-value="True if is_invoice else False"/>
-                    </t>
+                    <t t-call="l10n_ec_edi.common_tax_lines_template"
+                        tarifa_post_base="is_invoice"/>
                 </totalImpuesto>
             </totalConImpuestos>
             <impuestos t-if="tax_totals and is_dnote">
                 <impuesto t-as="tax_data" t-foreach="tax_totals.values()">
-                    <t t-call="l10n_ec_edi.common_tax_lines_template">
-                        <t t-set="tarifa_pre_base" t-value="True"/>
-                    </t>
+                    <t t-call="l10n_ec_edi.common_tax_lines_template" tarifa_pre_base="True"/>
                 </impuesto>
             </impuestos>
             <importeTotal t-if="is_invoice or is_liquidation" t-out="format_num_2(abs(move.amount_total_signed))"/>
@@ -218,7 +216,7 @@
             <tipoSujetoRetenido t-if="partner_sri_code == '08' and supplier_identification_code" t-out="supplier_identification_code"/><!-- foreign supplier partners -->
             <parteRel t-out="'SI' if move.partner_id.l10n_ec_related_party else 'NO'"/>
             <razonSocialSujetoRetenido t-out="clean_str(partner.name)"/>
-            <identificacionSujetoRetenido t-out="partner.vat"/>
+            <identificacionSujetoRetenido t-out="partner._get_preferred_legal_entity_identifier_vals().get('value', '')"/>
             <periodoFiscal t-out="fiscal_period"/>
         </template>
 
@@ -236,7 +234,7 @@
                     <codigoPrincipal t-if="is_invoice or is_liquidation" t-out="product_code"/>
                     <codigoAuxiliar t-if="is_invoice or is_liquidation" t-out="product.l10n_ec_auxiliary_code"/>
 
-                    <descripcion t-out="clean_str(line.name or line.product_id and line.product_id.name or 'OTRO')"/>
+                    <descripcion t-out="clean_str(line.with_context(display_default_code=False).label or 'OTRO')"/>
                     <cantidad t-out="format_num_6(line.quantity)"/>
                     <precioUnitario t-out="format_num_6(line_edi_values['price_unit'])"/>
                     <descuento t-out="format_num_2(abs(base_line['discount_amount']))"/>
@@ -244,9 +242,7 @@
 
                     <impuestos t-if="line_tax_details">
                         <impuesto t-foreach="line_tax_details" t-as="tax_data">
-                            <t t-call="l10n_ec_edi.common_tax_lines_template">
-                                <t t-set="tarifa_pre_base" t-value="True"/>
-                            </t>
+                            <t t-call="l10n_ec_edi.common_tax_lines_template" tarifa_pre_base="True"/>
                         </impuesto>
                     </impuestos>
                 </detalle>
@@ -257,7 +253,7 @@
             <codigo t-out="tax_data['code']"/>
             <codigoPorcentaje t-out="tax_data['code_percentage']"/>
             <tarifa t-if="tarifa_pre_base" t-out="format_num_6(abs(tax_data['rate']))"/>
-            <baseImponible t-out="format_num_6(currency_round(abs(tax_data['base_amount'] if tax_data['code_percentage'] != '3680' else (tax_data['tax_amount']/tax_data['rate']))))"/>
+            <baseImponible t-out="format_num_6(currency_round(abs(tax_data['base_amount'] if tax_data['code_percentage'] != '3680' else (tax_data['tax_amount']/tax_data['rate'] if tax_data['rate'] else 0))))"/>
             <tarifa t-if="tarifa_post_base" t-out="format_num_6(abs(tax_data['rate']))"/>
             <valor t-out="format_num_2(abs(tax_data['tax_amount']))"/>
         </template>
@@ -277,7 +273,7 @@
         <template id="debit_reasons_template">
             <motivos t-if="invoice_lines">
                 <motivo t-foreach="invoice_lines" t-as="line">
-                    <razon t-out="clean_str(line.product_id and line.product_id.name or line.name)"/>
+                    <razon t-out="clean_str(line.with_context(display_default_code=False).label or 'OTRO')"/>
                     <valor t-out="format_num_6(abs(line.balance))"/>
                 </motivo>
             </motivos>

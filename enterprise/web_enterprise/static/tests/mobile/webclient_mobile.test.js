@@ -10,6 +10,7 @@ import {
     mountWithCleanup,
 } from "@web/../tests/web_test_helpers";
 
+import { range } from "@web/core/utils/numbers";
 import { UserMenu } from "@web/webclient/user_menu/user_menu";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 
@@ -78,9 +79,9 @@ test("scroll position is kept", async () => {
     // is view's root node.
     const firstRecord = Partner._records[0];
     delete firstRecord.id;
-    Partner._records = [...Array(80)].map((_, i) => ({
+    Partner._records = range(1, 81).map((i) => ({
         ...firstRecord,
-        name: `Record ${i + 1}`,
+        name: `Record ${i}`,
     }));
 
     // force the html node to be scrollable element
@@ -111,7 +112,7 @@ test("Share URL item is not present in the user menu when screen is small", asyn
     expect(".o_user_menu").toHaveCount(1);
     queryFirst(".o_user_menu").classList.remove("d-none");
 
-    await click(".o_user_menu button");
+    await click(".o_user_menu");
     await animationFrame();
 
     expect(".o_user_menu .dropdown-item").toHaveCount(0, {

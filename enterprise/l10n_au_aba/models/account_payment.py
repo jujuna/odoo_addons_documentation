@@ -28,7 +28,7 @@ class AccountPayment(models.Model):
                 bank_acc = rec.journal_id.bank_account_id
                 if rec.currency_id.name != 'AUD':
                     raise ValidationError(_('ABA payments must be defined in AUD.'))
-                if bank_acc.acc_type != 'aba' or not bank_acc.aba_bsb:
+                if bank_acc.account_type != 'aba' or not bank_acc._get_clearing_number('AU'):
                     raise RedirectWarning(
                         message=_("Journal '%s' requires a proper ABA account. Please configure the Account first.", rec.journal_id.name),
                         action=rec.journal_id._get_records_action(name=_("Configure Journal"), target="new"),
@@ -36,7 +36,7 @@ class AccountPayment(models.Model):
                     )
                 if not rec.journal_id.aba_user_spec or not rec.journal_id.aba_fic or not rec.journal_id.aba_user_number:
                     raise RedirectWarning(
-                        message=_("ABA fields for account '%(account)s' on journal '%(journal)s' are not set. Please set the fields under ABA section!", account=bank_acc.acc_number, journal=rec.journal_id.name),
+                        message=_("ABA fields for account '%(account)s' on journal '%(journal)s' are not set. Please set the fields under ABA section!", account=bank_acc.account_number, journal=rec.journal_id.name),
                         action=rec.journal_id._get_records_action(name=_("Configure Journal"), target="new"),
                         button_text=_("Configure Journal")
                     )
@@ -45,7 +45,7 @@ class AccountPayment(models.Model):
     def _check_partner_bank_account(self):
         aba_payment_method = self.env.ref('l10n_au_aba.account_payment_method_aba_ct')
 
-        faulty_partners = self.filtered(lambda rec: rec.payment_method_id == aba_payment_method and (rec.partner_bank_id.acc_type != 'aba' or not rec.partner_bank_id.aba_bsb)).partner_id
+        faulty_partners = self.filtered(lambda rec: rec.payment_method_id == aba_payment_method and (rec.partner_bank_id.account_type != 'aba' or not rec.partner_bank_id._get_clearing_number('AU'))).partner_id
         if faulty_partners:
             # Redirects to the contacts as some contacts may not have accounts set
             raise RedirectWarning(

@@ -1,7 +1,8 @@
 import { _t } from "@web/core/l10n/translation";
 import { CharField } from "@web/views/fields/char/char_field";
 import { Many2OneField } from "@web/views/fields/many2one/many2one_field";
-import { Component, onWillUpdateProps, useState } from "@odoo/owl";
+import { Component, proxy, signal, t, useProps } from "@odoo/owl";
+import { useLayoutEffect } from "@web/owl2/utils";
 import { Field } from "@web/views/fields/field";
 import { StockMove } from "./mrp_record_line/stock_move";
 import { MrpWorkorder } from "./mrp_record_line/mrp_workorder";
@@ -13,6 +14,7 @@ import { MrpRegisterProductionDialog } from "./dialog/mrp_register_production_di
 import { MrpLogNoteDialog } from "./dialog/mrp_log_note_dialog";
 import { SelectionField } from "@web/views/fields/selection/selection_field";
 import { MrpMenuDialog } from "./dialog/mrp_menu_dialog";
+import { MrpLogTimeDialog } from "./dialog/mrp_log_time_dialog";
 
 export class MrpDisplayRecord extends Component {
     static components = {
@@ -26,42 +28,47 @@ export class MrpDisplayRecord extends Component {
         MrpWorkorder,
         QualityCheck,
     };
-    static props = {
-        groups: Object,
-        barcodeTarget: { type: Boolean, optional: true },
-        production: { optional: true, type: Object },
-        record: Object,
-        removeFromCache: Function,
-        selectWorkcenter: { optional: true, type: Function },
-        sessionOwner: Object,
-        updateEmployees: Function,
-        workcenters: Array,
-        demoRecord: { type: Boolean, optional: true },
-    };
+    props = useProps({
+        groups: t.object(),
+        barcodeTarget: t.boolean().optional(),
+        production: t.object().optional(),
+        record: t.object(),
+        removeFromCache: t.function(),
+        selectWorkcenter: t.function().optional(),
+        sessionOwner: t.object(),
+        updateEmployees: t.function(),
+        workcenters: t.array(),
+        demoRecord: t.boolean().optional(),
+        updateWorkcenter: t.function(),
+        actionPending: t.boolean().optional(),
+    });
     static template = "mrp_workorder.MrpDisplayRecord";
+
+    noteRef = signal.ref();
 
     setup() {
         this.dialog = useService("dialog");
         this.action = useService("action");
-        this.state = useState({
+        this.state = proxy({
             underValidation: false,
         });
-        this.resModel = this.props.record.resModel;
-        this.model = this.props.record.model;
-        this.record = this.props.record.data;
         this.props.record.component = this;
 
-        this.quantityToProduce =
-            this.record.qty_remaining ||
-            this.record.product_qty ||
-            this.props.production.data.product_qty;
+        this.quantityToProduce = this.resModel === "mrp.workorder" ? this.record.qty_to_produce : this.record.product_qty;
         this.displayUOM = this.props.groups.uom;
+        useLayoutEffect(() => this._retargetNoteLinks());
+    }
 
-        onWillUpdateProps((nextProps) => {
-            this.resModel = nextProps.record.resModel;
-            this.model = nextProps.record.model;
-            this.record = nextProps.record.data;
-        });
+    get resModel() {
+        return this.props.record.resModel;
+    }
+
+    get model() {
+        return this.props.record.model;
+    }
+
+    get record() {
+        return this.props.record.data;
     }
 
     /**
@@ -69,9 +76,6 @@ export class MrpDisplayRecord extends Component {
      * tracking number if it applies.
      */
     async registerProduction() {
-        if (!this.props.production.data.qty_producing) {
-            this.props.production.update({ qty_producing: this.props.production.data.product_qty });
-        }
         if (
             this.props.production.data.product_tracking == "serial" &&
             this.props.production.data.product_qty > 1
@@ -79,10 +83,16 @@ export class MrpDisplayRecord extends Component {
             const action = await this.props.record.model.orm.call(
                 this.props.record.resModel,
                 "action_generate_serial",
-                [this.props.record.resId]
+                [this.props.record.resId],
+                { context: { from_shop_floor: true } }
             );
             if (action && typeof action === "object") {
-                return this.action.doAction(action, { onClose: () => this.env.reload() });
+                return this.action.doAction(action, {
+                    additionalContext: {
+                        default_qty_produced: this.props.record.data.qty_produced,
+                    },
+                    onClose: () => this.env.reload(),
+                });
             }
             return;
         }
@@ -97,16 +107,31 @@ export class MrpDisplayRecord extends Component {
             qtyToProduce: this.record.qty_remaining,
         };
         if (this.props.record.resModel === "mrp.workorder") {
-            params.workorderId = this.props.record.resId;
+            params.workorder = this.props.record;
+            params.qtyToProduce = this.props.record.data.qty_to_produce;
         }
         this.dialog.add(MrpRegisterProductionDialog, params);
     }
 
+    async logTime() {
+        const params = {
+            title: _t("Update Employee Time Spent on Work Order"),
+            employeeId: this.props.sessionOwner.id,
+            workorderId: this.props.record.resId,
+            stopWorking: this.stopWorking.bind(this),
+        };
+        this.dialog.add(MrpLogTimeDialog, params);
+    }
+
     editLogNote(ev) {
-        const title = _t("Log Note");
+        ev.stopPropagation();
+        if (ev.target.closest("a[href]")) {
+            // Let the note's links open instead of opening the note edition dialog.
+            return;
+        }
+        const title = _t("Notes");
         const reload = () => this.env.reload();
         const params = { body: "", record: this.props.production, reload, title };
-        ev.stopPropagation();
         this.dialog.add(MrpLogNoteDialog, params);
     }
 
@@ -115,6 +140,12 @@ export class MrpDisplayRecord extends Component {
     }
 
     get quantityToDisplay() {
+        if (this.props.record.resModel === "mrp.workorder") {
+            if(!this.props.record.data.qty_produced) {
+                return `${this.props.record.data.qty_to_produce} ${this.uom}`;
+            }
+            return `${this.props.record.data.qty_produced} / ${this.props.record.data.qty_to_produce} ${this.uom}`;
+        }
         const fullQty = this.quantityProducing && this.quantityProducing !== this.quantityToProduce;
         const qtyProducing = fullQty ? `${this.quantityProducing} / ` : "";
         return `${qtyProducing}${this.quantityToProduce} ${this.uom}`;
@@ -173,7 +204,7 @@ export class MrpDisplayRecord extends Component {
 
     get moves() {
         const moMoves = this.props.production.data.move_raw_ids.records.filter(
-            (move) => !move.data.scrapped && !move.data.bom_line_id && !move.data.operation_id
+            (move) => !move.data.scrapped && !move.data.bom_line_id && !move.data.workorder_id
         );
         if (this.resModel === "mrp.production") {
             return moMoves;
@@ -181,7 +212,7 @@ export class MrpDisplayRecord extends Component {
         const woMovesNoCheck = this.props.record.data.move_raw_ids.records.filter(
             (move) =>
                 !move.data.scrapped &&
-                move.data.operation_id.id === this.props.record.data.operation_id.id &&
+                move.data.workorder_id.id === this.props.record.data.id &&
                 !move.data.check_id.count
         );
         return [...woMovesNoCheck, ...moMoves];
@@ -197,7 +228,19 @@ export class MrpDisplayRecord extends Component {
     }
 
     get logNote() {
-        return this.props.production.data.log_note;
+        const note = this.props.production.data.note;
+        if (!note) return false;
+        // Check for visible text or presence of an <img> tag
+        const textContent = note.replace(/<[^>]*>/g, '').trim();
+        const hasImage = note.match(/<img\s[^>]*src=["'][^"']+["'][^>]*>/i);
+        return textContent || hasImage ? note : false;
+    }
+
+    _retargetNoteLinks() {
+        this.noteRef()?.querySelectorAll("a[href]").forEach((link) => {
+            link.setAttribute("target", "_blank");
+            link.setAttribute("rel", "noreferrer");
+        });
     }
 
     get showAssignedEmployees() {
@@ -248,7 +291,6 @@ export class MrpDisplayRecord extends Component {
             props.startWorking = this.startWorking.bind(this);
             if (subRecord.data.test_type === "register_production") {
                 props.registerProduction = this.registerProduction.bind(this);
-                props.qtyProducing = `${this.quantityProducing} / ${this.quantityToProduce} ${this.uom}`;
             }
         } else if (subRecord.resModel === "mrp.workorder") {
             props.selectWorkcenter = this.props.selectWorkcenter;
@@ -286,13 +328,14 @@ export class MrpDisplayRecord extends Component {
         return this.props.production.data.product_tracking;
     }
 
-    onClickHeader() {
-        this.env.searchModel.removeMOFilter();
-        return this.startWorking(true);
+    async onClickHeader() {
+        if (!(await this.startWorking())) {
+            await this.stopWorking();
+        }
     }
 
     onClickOpenMenu() {
-        if (this.props.demoRecord) {
+        if (this.props.demoRecord || this.props.actionPending) {
             return;
         }
         const params = {
@@ -306,7 +349,12 @@ export class MrpDisplayRecord extends Component {
             params,
             reload: this.env.reload.bind(this),
             removeFromCache: this.props.removeFromCache,
+            updateWorkcenter: this.props.updateWorkcenter,
             registerProduction: this.registerProduction.bind(this),
+            logTime: this.logTime.bind(this),
+            onNavigateToMO: () => {
+                this.env.setActionPending();
+            },
         });
     }
 
@@ -316,9 +364,6 @@ export class MrpDisplayRecord extends Component {
         let methodName = "button_mark_done";
         const kwargs = {};
         if (resModel === "mrp.workorder") {
-            if (this.record.state === "ready" && this.record.qty_producing === 0) {
-                this.props.record.update({ qty_producing: this.record.qty_production });
-            }
             this.validatingEmployee = this.props.sessionOwner.id;
             if (
                 this.props.record.data.employee_ids.records.some(
@@ -331,7 +376,6 @@ export class MrpDisplayRecord extends Component {
                 ]);
                 await this.props.record.load();
             }
-            await this.props.record.save();
             methodName = "do_finish";
             kwargs.context = { no_start_next: true, mrp_display: true };
             if (this.validatingEmployee) {
@@ -346,6 +390,9 @@ export class MrpDisplayRecord extends Component {
             methodName = "button_mark_done";
             resModel = "mrp.production";
             resId = this.props.production.resId;
+            if (this.record.is_last_unfinished_wo) {
+                kwargs.context.last_qty_produced = this.record.qty_produced;
+            }
         }
         let automaticBackorderCreation;
         try {
@@ -382,7 +429,9 @@ export class MrpDisplayRecord extends Component {
             }
             this.state.underValidation = false;
         }
-        this.env.searchModel.removeMOFilter();
+        if (!this.props.record.context.shouldKeepMoFilter) {
+            this.env.searchModel.removeMOFilter();
+        }
     }
 
     _doAction(action) {
@@ -404,7 +453,7 @@ export class MrpDisplayRecord extends Component {
 
     get uom() {
         if (this.displayUOM) {
-            return this.record.product_uom_id?.display_name;
+            return this.record.uom_id?.display_name;
         }
         return this.quantityToProduce === 1 ? _t("Unit") : _t("Units");
     }
@@ -418,7 +467,7 @@ export class MrpDisplayRecord extends Component {
         );
     }
 
-    async startWorking(shouldStop = false) {
+    async startWorking() {
         const { resModel, resId } = this.props.record;
         if (resModel !== "mrp.workorder") {
             return;
@@ -430,10 +479,20 @@ export class MrpDisplayRecord extends Component {
                 context: { mrp_display: true },
             });
             await this.env.reload(this.props.production);
-        } else if (shouldStop) {
-            await this.model.orm.call(resModel, "stop_employee", [resId, [admin_id]]);
-            await this.env.reload(this.props.production);
+            await this.props.updateEmployees();
+            return true;
         }
+        return false;
+    }
+
+    async stopWorking() {
+        const { resModel, resId } = this.props.record;
+        if (resModel !== "mrp.workorder") {
+            return;
+        }
+        const admin_id = this.props.sessionOwner.id;
+        await this.model.orm.call(resModel, "stop_employee", [resId, [admin_id]]);
+        await this.env.reload(this.props.production);
         return this.props.updateEmployees();
     }
 }

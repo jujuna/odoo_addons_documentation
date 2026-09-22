@@ -16,7 +16,7 @@
             </xpath>
             <xpath expr="//field[@name='location']" position="attributes">
                 <attribute name="invisible">hide_location</attribute>
-                <attribute name="required">has_location == 'required' and approval_type != 'purchase'</attribute>
+                <attribute name="required">has_location == 'required' and not create_rfq</attribute>
             </xpath>
         </field>
     </record>

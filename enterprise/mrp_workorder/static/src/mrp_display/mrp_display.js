@@ -1,3 +1,5 @@
+import { OverlayPlugin } from "@web/core/overlay/overlay_plugin";
+import { useSubEnv } from "@web/owl2/utils";
 import { user } from "@web/core/user";
 import { session } from "@web/session";
 import { Pager } from "@web/core/pager/pager";
@@ -14,7 +16,16 @@ import { PinPopup } from "@mrp_workorder/components/pin_popup";
 import { useConnectedEmployee } from "@mrp_workorder/mrp_display/hooks/employee_hooks";
 import { MrpDisplaySearchBar } from "@mrp_workorder/mrp_display/search_bar";
 import { CheckboxItem } from "@web/core/dropdown/checkbox_item";
-import { Component, onWillRender, onWillStart, useState, useSubEnv } from "@odoo/owl";
+import {
+    Component,
+    onMounted,
+    onWillStart,
+    onWillUnmount,
+    usePlugin,
+    proxy,
+    t,
+    useProps,
+} from "@odoo/owl";
 import { MrpEmployeeDialog } from "./dialog/mrp_employee_dialog";
 
 const defaultWorkcenterButtons = [
@@ -33,43 +44,37 @@ export class MrpDisplay extends Component {
         CheckboxItem,
         Pager,
     };
-    static props = {
-        resModel: String,
-        action: { type: Object, optional: true },
-        models: { type: Object },
-        domain: { type: Array },
-        display: { type: Object, optional: true },
-        context: { type: Object, optional: true },
-        groupBy: { type: Array, element: String },
-        orderBy: { type: Array, element: Object },
-    };
+
+    props = useProps({
+        resModel: t.string(),
+        action: t.object().optional(),
+        models: t.array(),
+        domain: t.array(),
+        display: t.object().optional(),
+        context: t.object().optional(),
+        groupBy: t.array(t.string()),
+        orderBy: t.array(t.object()),
+    });
 
     setup() {
+        this.env.config.disableSearchBarAutofocus = true;
         this.homeMenu = useService("home_menu");
         this.viewService = useService("view");
         this.actionService = useService("action");
         this.dialogService = useService("dialog");
         this.pwaService = useService("pwa");
-        this.overlayService = useService("overlay");
+        this.overlayService = usePlugin(OverlayPlugin);
         this.menu = useService("menu");
         this.ui = useService("ui");
 
-        this.adminId = false;
-        this.barcodeTargetRecordId = false;
-        if (
-            this.props.context.active_model === "stock.picking.type" &&
-            this.props.context.active_id
-        ) {
-            this.pickingTypeId = this.props.context.active_id;
-        }
-        useSubEnv({ localStorageName: `mrp_workorder.db_${session.db}.user_${user.userId}` });
+        this.localStorageName = `mrp_workorder.db_${session.db}.user_${user.userId}`;
 
-        const localStoredWC = JSON.parse(localStorage.getItem(this.env.localStorageName));
+        const localStoredWC = JSON.parse(localStorage.getItem(this.localStorageName));
         const firstLoad = !localStoredWC;
         const workcenters = [...defaultWorkcenterButtons, ...(firstLoad ? [] : localStoredWC)];
-        const activeWorkcenter = this._loadActiveWorkcenter(this.env.localStorageName, workcenters);
+        const activeWorkcenter = this._loadActiveWorkcenter(this.localStorageName, workcenters);
 
-        this.state = useState({
+        this.state = proxy({
             activeResModel: activeWorkcenter ? "mrp.workorder" : this.props.resModel,
             activeWorkcenter,
             workcenters,
@@ -77,13 +82,14 @@ export class MrpDisplay extends Component {
             offset: 0,
             limit: this.props.action?.context?.limit,
             firstLoad: firstLoad,
+            actionPending: false,
         });
         this.recordCacheIds = [];
         this.showCaseId = undefined;
 
         const params = this._makeModelParams();
 
-        this.model = useState(useModel(RelationalModel, params));
+        this.model = useModel(RelationalModel, params);
         useSubEnv({
             model: this.model,
             reload: async (record = false) => {
@@ -106,6 +112,9 @@ export class MrpDisplay extends Component {
                 }
                 await this.useEmployee.getConnectedEmployees();
             },
+            setActionPending: () => {
+                this.state.actionPending = true;
+            },
         });
         this.useEmployee = useConnectedEmployee(
             "mrp_display",
@@ -125,7 +134,9 @@ export class MrpDisplay extends Component {
                 uom: await user.hasGroup("uom.group_uom"),
                 workorders: await user.hasGroup("mrp.group_mrp_routings"),
                 timer: await user.hasGroup("mrp_workorder.group_mrp_wo_tablet_timer"),
+                regularUser: await user.hasGroup("base.group_user_regular"),
             };
+            await this._refreshWorkcenters();
             this.env.searchModel.workorders = this.groups.workorders;
             this.env.searchModel.setWorkcenterFilter(this.state.workcenters);
             await this.useEmployee.getConnectedEmployees(true);
@@ -138,7 +149,7 @@ export class MrpDisplay extends Component {
                 );
             }
             if (
-                JSON.parse(localStorage.getItem(this.env.localStorageName)) === null &&
+                JSON.parse(localStorage.getItem(this.localStorageName)) === null &&
                 this.group_mrp_routings
             ) {
                 this.toggleWorkcenterDialog(false);
@@ -148,13 +159,21 @@ export class MrpDisplay extends Component {
             ]);
         });
 
-        onWillRender(() => {
-            this.defineRelevantRecords();
+        onMounted(() => {
+            document.body.classList.add("o_mrp_workorder_o_mrp_display");
+        });
+        onWillUnmount(() => {
+            document.body.classList.remove("o_mrp_workorder_o_mrp_display");
         });
     }
 
     removeRecordIdFromCache(id) {
         this.recordCacheIds.splice(this.recordCacheIds.indexOf(id), 1);
+    }
+
+    updateWorkcenterById(workcenterId, newState) {
+        const workcenter = this.state.workcenters.find((wc) => wc.id === workcenterId);
+        workcenter.working_state = newState;
     }
 
     invalidateRecordIdsCache() {
@@ -172,9 +191,7 @@ export class MrpDisplay extends Component {
         if (
             barcode.startsWith("OBT") ||
             barcode.startsWith("OCD") ||
-            Object.values(this.overlayService.overlays).find(
-                (o) => o.component.name === "DialogWrapper"
-            )
+            this.overlayService.overlays.items().find((o) => o.component.name === "DialogWrapper")
         ) {
             return;
         }
@@ -192,6 +209,12 @@ export class MrpDisplay extends Component {
         if (employee) {
             return this.useEmployee.setSessionOwner(employee, undefined);
         }
+        const workcenter = this.state.workcenters.find(
+            (wc) => wc.barcode && wc.barcode === barcode
+        );
+        if (workcenter) {
+            return this.selectWorkcenter(workcenter.id);
+        }
         return this._onProductBarcodeScanned(barcode);
     }
 
@@ -207,7 +230,7 @@ export class MrpDisplay extends Component {
             }
             // 2. Check if there is a move with this product (WO/MO)
             for (const move of record.data.move_raw_ids.records) {
-                if (move.data.product_barcode === barcode && move.data.manual_consumption) {
+                if (move.data.product_barcode === barcode && move.data.operation_id) {
                     return move.component.onClick();
                 }
             }
@@ -246,27 +269,23 @@ export class MrpDisplay extends Component {
     }
 
     _onWorkorderBarcodeScanned(workorder) {
+        workorder.component.env.searchModel.removeMOFilter();
         return workorder.component.onClickHeader();
     }
 
-    get barcodeTargetRecord() {
+    /**
+     * Should be a computed function (in owl 3)
+     */
+    getBarcodeTargetRecordId() {
         const currentAdminId = this.useEmployee.employees.admin.id;
         if (!currentAdminId) {
             // No current admin, no target record.
             return false;
         }
-        if (currentAdminId === this.adminId) {
-            // We've already found the target record for the current admin, so we can return it
-            return this.barcodeTargetRecordId;
-        }
         const firstWorking = this.relevantRecords.find((r) =>
             r.data.employee_ids.records.some((e) => e.resId === currentAdminId)
         );
-        this.adminId = currentAdminId;
-        this.barcodeTargetRecordId = firstWorking
-            ? firstWorking.resId
-            : this.relevantRecords[0].resId;
-        return this.barcodeTargetRecordId;
+        return firstWorking ? firstWorking.resId : this.relevantRecords[0]?.resId || false;
     }
 
     get productions() {
@@ -296,7 +315,7 @@ export class MrpDisplay extends Component {
 
     async toggleWorkcenter(workcenters) {
         this.state.firstLoad = false;
-        localStorage.setItem(this.env.localStorageName, JSON.stringify(workcenters));
+        localStorage.setItem(this.localStorageName, JSON.stringify(workcenters));
         this.state.workcenters = [...defaultWorkcenterButtons, ...workcenters];
         this.env.searchModel.setWorkcenterFilter(this.state.workcenters);
     }
@@ -360,11 +379,15 @@ export class MrpDisplay extends Component {
                     finished: 4,
                 };
                 recordsNotInCache.sort((wo1, wo2) => {
+                    const p1 = wo1.data.is_planned;
+                    const p2 = wo2.data.is_planned;
                     const v1 = statesComparativeValues[wo1.data.state];
                     const v2 = statesComparativeValues[wo2.data.state];
                     const d1 = wo1.data.date_start;
                     const d2 = wo2.data.date_start;
-                    return v1 - v2 || d1 - d2;
+                    const s1 = wo1.data.sequence;
+                    const s2 = wo1.data.sequence;
+                    return p2 - p1 || v1 - v2 || d1 - d2 || s1 - s2;
                 });
             }
             const recordIds = recordsNotInCache.map((r) => r.resId);
@@ -400,7 +423,7 @@ export class MrpDisplay extends Component {
             this.showCaseId = showcaseId;
         }
         this.state.activeWorkcenter = Number(workcenterId);
-        localStorage.setItem(this.env.localStorageName + `.activeWC`, Number(workcenterId));
+        localStorage.setItem(this.localStorageName + `.activeWC`, Number(workcenterId));
         this.state.activeResModel = this.state.activeWorkcenter
             ? "mrp.workorder"
             : "mrp.production";
@@ -523,6 +546,7 @@ export class MrpDisplay extends Component {
             {
                 setConnectedEmployees: this.useEmployee.setConnectedEmployees,
                 employees: this.useEmployee.employees,
+                getAllEmployees: this.useEmployee.getAllEmployees,
             },
             { onClose: this.env.reload }
         );
@@ -535,6 +559,33 @@ export class MrpDisplay extends Component {
     }
 
     /**
+     * Refreshes the cached (local storage) workcenters with their current backend values
+     * (e.g. barcode, display_name), and drops any workcenter that no longer exists.
+     */
+    async _refreshWorkcenters() {
+        const realWorkcenterIds = this.state.workcenters
+            .filter((wc) => wc.id > 0)
+            .map((wc) => wc.id);
+        if (!realWorkcenterIds.length) {
+            return;
+        }
+        const freshWorkcenters = await this.orm.searchRead(
+            "mrp.workcenter",
+            [["id", "in", realWorkcenterIds]],
+            ["display_name", "barcode", "working_state"]
+        );
+        const freshById = new Map(freshWorkcenters.map((wc) => [wc.id, wc]));
+        this.state.workcenters = this.state.workcenters.reduce((acc, wc) => {
+            if (wc.id <= 0) {
+                acc.push(wc);
+            } else if (freshById.has(wc.id)) {
+                acc.push(freshById.get(wc.id));
+            }
+            return acc;
+        }, []);
+    }
+
+    /**
      * Resolve the active WC id, giving priority to context, then local storage, finally default or false.
      * If the passed workcenter to activate in context is "Overview" (id:0), also save it to local storage.
      * @returns {Number | false} id of the active Workcenter or false if no workcenters
@@ -542,7 +593,7 @@ export class MrpDisplay extends Component {
     _loadActiveWorkcenter(localStorageName, workcenters) {
         if (this.props.context.workcenter_id != null) {
             if (this.props.context.workcenter_id == 0) {
-                localStorage.setItem(this.env.localStorageName + `.activeWC`, Number(0));
+                localStorage.setItem(this.localStorageName + `.activeWC`, Number(0));
             }
             return this.props.context.workcenter_id;
         } else if (localStorage.getItem(`${localStorageName}.activeWC`) !== null) {
@@ -561,7 +612,7 @@ export class MrpDisplay extends Component {
                 product_id: { id: 0, display_name: "[FURN_8522] Table Top" },
                 product_tracking: "serial",
                 product_qty: 4,
-                product_uom_id: { id: 1, display_name: "Units" },
+                uom_id: { id: 1, display_name: "Units" },
                 qty_producing: 4,
                 state: "progress",
                 move_raw_ids: {
@@ -571,7 +622,7 @@ export class MrpDisplay extends Component {
                             data: {
                                 product_id: { id: 0, display_name: "[FURN_7023] Wood Panel" },
                                 product_uom_qty: 8,
-                                product_uom: { id: 1, display_name: "Units" },
+                                uom_id: { id: 1, display_name: "Units" },
                                 move_line_ids: {
                                     records: [],
                                 },
@@ -625,7 +676,7 @@ export class MrpDisplay extends Component {
                 product_id: { id: 0, display_name: "[D_0045_B] Stool (Dark Blue)" },
                 product_tracking: "serial",
                 product_qty: 1,
-                product_uom_id: { id: 1, display_name: "Units" },
+                uom_id: { id: 1, display_name: "Units" },
                 qty_producing: 1,
                 state: "confirmed",
                 move_raw_ids: { records: [] },

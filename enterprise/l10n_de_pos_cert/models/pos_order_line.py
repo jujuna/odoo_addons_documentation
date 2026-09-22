@@ -17,12 +17,9 @@ class PosOrderLine(models.Model):
             is_adjusted = False
         vat_id = self.tax_ids_after_fiscal_position[0].l10n_de_vat_definition_export_identifier if self.tax_ids_after_fiscal_position else 5  # no tax -> considered as non taxable
 
-        # For settlement or deposit we will have qty 0 so won't get from the price_subtotal/price_subtotal_incl
-        settlement_products = []
-        if hasattr(self.order_id.config_id, "settle_due_product_id"):
-            settlement_products = [self.order_id.config_id.settle_due_product_id.id, self.order_id.config_id.settle_invoice_product_id.id, self.order_id.config_id.deposit_product_id.id]
-        incl_vat = self.price_unit if self.product_id.id in settlement_products else self.price_subtotal_incl
-        excl_vat = self.price_unit if self.product_id.id in settlement_products else self.price_subtotal
+        sign = 1 if self.qty > 0 else -1
+        incl_vat = self.price_subtotal_incl * sign
+        excl_vat = self.price_subtotal * sign
 
         line_vat_details = [self.order_id.session_id._get_vat_details(vat_id, incl_vat, excl_vat)]
         line_data = {
@@ -41,8 +38,8 @@ class PosOrderLine(models.Model):
         }
 
         # ID of redeemed voucher
-        if hasattr(self, "is_reward_line") and self.coupon_id:
-            line_data["voucher_id"] = self.coupon_id.code
+        if hasattr(self, "is_reward_line") and self.card_id:
+            line_data["voucher_id"] = self.card_id.code
 
         # line discounts applied using numpad
         if self.discount:
@@ -68,7 +65,7 @@ class PosOrderLine(models.Model):
 
         # Multipurpose Vouchers
         if hasattr(self, "is_reward_line"):  # loyalty enabled
-            if self.coupon_id and self.coupon_id.program_type in ["gift_card", "ewallet"]:
+            if self.card_id and self.card_id.program_type in ["gift_card", "ewallet"]:
                 return "MehrzweckgutscheinEinloesung"  # redemption
             elif self.product_id.id in self.env['loyalty.program'].search([
                     ("pos_ok", "=", True),
@@ -83,16 +80,6 @@ class PosOrderLine(models.Model):
                 return "Anzahlungseinstellung"  # down payment
             if self.order_id.refunded_order_id and self.refunded_orderline_id.sale_order_origin_id:
                 return "Anzahlungsaufloesung"  # down payment liquidation
-
-        if hasattr(config, "settle_due_product_id"):  # settle due installed
-            # receivable account deposites
-            # work similar to MPGV sale for all kind of incoming money to customer account
-            if self.product_id.id in [config.deposit_product_id.id, config.settle_due_product_id.id]:
-                return "MehrzweckgutscheinKauf"
-
-            # formerly created invoiced receivables are settled through PoS
-            if self.product_id.id == config.settle_invoice_product_id.id:
-                return "Forderungsaufloesung"
 
         # order paid using payment method that has no journal set (receivable account) (partial or full payment)
         if self.order_id.payment_ids.filtered(lambda p: not p.payment_method_id.journal_id):

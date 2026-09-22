@@ -7,15 +7,9 @@ import {
     startServer,
 } from "@mail/../tests/mail_test_helpers";
 
-import { describe, test } from "@odoo/hoot";
+import { describe, expect, test } from "@odoo/hoot";
 
-import {
-    asyncStep,
-    Command,
-    serverState,
-    onRpc,
-    waitForSteps,
-} from "@web/../tests/web_test_helpers";
+import { Command, serverState, onRpc } from "@web/../tests/web_test_helpers";
 
 import { defineWebsiteHelpdeskLivechatModels } from "@website_helpdesk_livechat/../tests/website_helpdesk_livechat_test_helpers";
 
@@ -36,10 +30,9 @@ test("can create a ticket from the thread action after the conversation ends", a
             Command.create({ partner_id: serverState.partnerId }),
             Command.create({ guest_id: guestId }),
         ],
-        livechat_operator_id: serverState.partnerId,
     });
     onRpc("discuss.channel", "execute_command_helpdesk", ({ kwargs }) => {
-        asyncStep(`execute command helpdesk. body: ${kwargs.body}`);
+        expect.step(`execute command helpdesk. body: ${kwargs.body}`);
         return true;
     });
     await start();
@@ -48,5 +41,5 @@ test("can create a ticket from the thread action after the conversation ends", a
     await click(".o-mail-DiscussContent-header button[title='Create Ticket']");
     await insertText(".o-livechat-LivechatCommandDialog-form input", "test_ticket");
     await click(".o-mail-ActionPanel button", { text: "Create Ticket" });
-    await waitForSteps(["execute command helpdesk. body: /ticket test_ticket"]);
+    await expect.waitForSteps(["execute command helpdesk. body: /ticket test_ticket"]);
 });

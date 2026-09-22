@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import fields, Command
+from odoo import Command
 from odoo.tests import tagged
 import logging
 from datetime import date
@@ -9,11 +9,12 @@ from odoo.addons.l10n_in_reports.tests.common import L10nInTestAccountReportsCom
 
 _logger = logging.getLogger(__name__)
 TEST_DATE = date(2023, 5, 20)
-HSN_CHANGE_TEST_DATE = date(2025, 5, 11)
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestReports(L10nInTestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -39,8 +40,8 @@ class TestReports(L10nInTestAccountReportsCommon):
         ChartTemplate = cls.env['account.chart.template']
         cls.partner_foreign.l10n_in_gst_treatment = "overseas"
         cls.comp_sgst_18 = ChartTemplate.ref('sgst_sale_18')
-        cls.comp_export_wp = ChartTemplate.ref('igst_sale_18_sez_exp')
-        cls.comp_export_wop = ChartTemplate.ref('igst_sale_18_sez_lut')
+        cls.comp_export_wp = ChartTemplate.ref('igst_sale_18_exp')
+        cls.comp_export_wop = ChartTemplate.ref('igst_sale_18_exp_lut')
         cls.exempt_tax = ChartTemplate.ref('exempt_sale')
         cls.nil_rated_tax = ChartTemplate.ref('nil_rated_sale')
         cls.non_gst_supplies = ChartTemplate.ref('non_gst_supplies_sale')
@@ -114,10 +115,11 @@ class TestReports(L10nInTestAccountReportsCommon):
         export_invoice_wop = self._init_inv(partner=self.partner_foreign, taxes=self.comp_export_wop, line_vals={'price_unit': 500, 'quantity': 2}, invoice_date=invoice_date)
         reverse_inv_func(inv=export_invoice_wop, line_vals={'quantity': 1})
 
-    def _create_gstr_report(self, company=None):
+    def _create_gstr_report(self, date=None, company=None):
+        date = date or self.test_date
         account_return_type = self.env.ref('l10n_in_reports.in_gstr1_return_type')
         return_company = company or self.default_company
-        start_date, end_date = account_return_type._get_period_boundaries(return_company, self.test_date)
+        start_date, end_date = account_return_type._get_period_boundaries(return_company, date)
         gstr_report = self.env['account.return'].create({
             'name': 'IN Tax Return',
             'type_id': account_return_type.id,
@@ -131,9 +133,9 @@ class TestReports(L10nInTestAccountReportsCommon):
 
     def test_gstr1_b2b_summary(self):
         report = self.env.ref('l10n_in_reports.account_report_gstr1')
-        options = self._generate_options(report, fields.Date.from_string("2019-01-01"), fields.Date.from_string("2019-12-31"))
+        options = self._generate_options(report, "2019-01-01", "2019-12-31")
         b2b_line = report._get_lines(options)[0]
-        columns = {col.get('expression_label'): col.get('no_format') for col in b2b_line.get('columns')}
+        columns = {col.expression_label: col.no_format for col in b2b_line.columns}
         # For B2B Invoice - 4A, AB, 4C, 6B, 6C
         expected = {
             'name': '4. Taxable outward supplies made to Registered persons',
@@ -143,7 +145,7 @@ class TestReports(L10nInTestAccountReportsCommon):
             'tax_igst': 0.0,
             'tax_cess': 0.0
         }
-        self.assertDictEqual(expected, {'name': b2b_line.get('name'), **columns}, "Wrong values for Indian GSTR-1 B2B summary report.")
+        self.assertDictEqual(expected, {'name': b2b_line.name, **columns}, "Wrong values for Indian GSTR-1 B2B summary report.")
 
     def test_gstr1_json(self):
         self._setup_moves(self._create_credit_note)
@@ -171,8 +173,8 @@ class TestReports(L10nInTestAccountReportsCommon):
         self.assertFalse(reversed_move_2.l10n_in_reversed_entry_warning)
 
     def test_gstr1_sez_zero_rated_tax(self):
-        igst_0 = self.env['account.chart.template'].ref('igst_sale_0_sez_exp')
-        igst_lut_0 = self.env['account.chart.template'].ref('igst_sale_0_sez_exp_lut')
+        igst_0 = self.env['account.chart.template'].ref('igst_sale_0_exp')
+        igst_lut_0 = self.env['account.chart.template'].ref('igst_sale_0_exp_lut')
 
         b2b_invoice = self._init_inv(
             partner=self.partner_a.copy({'l10n_in_gst_treatment': 'special_economic_zone'}),
@@ -189,21 +191,7 @@ class TestReports(L10nInTestAccountReportsCommon):
         gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
         self.assertDictEqual(gstr1_json, self._read_mock_json('gstr1_sez_zero_rated_expected_response.json'))
 
-    def test_hsn_schema_change_gstr1_json(self):
-        self._setup_moves(self._create_credit_note, invoice_date=HSN_CHANGE_TEST_DATE)
-        account_return_type = self.env.ref('l10n_in_reports.in_gstr1_return_type')
-        start_date, end_date = account_return_type._get_period_boundaries(self.company_data["company"], HSN_CHANGE_TEST_DATE)
-        gstr1_report = self.env['account.return'].create({
-            'name': 'IN Tax Return',
-            'type_id': account_return_type.id,
-            'company_id': self.company_data["company"].id,
-            'date_from': start_date,
-            'date_to': end_date
-        })
-        gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
-        self.assertDictEqual(gstr1_json, self._read_mock_json('gstr1_new_hsn_schema_response.json'))
-
-    def test_taxes_with_sez_exp_lut_and_rcm(self):
+    def test_taxes_with_exp_lut_and_rcm(self):
         self.invoice_with_sez_lut.invoice_date = self.test_date
         self.invoice_with_sez_lut.action_post()
         self.invoice_with_rcm.invoice_date = self.test_date
@@ -211,3 +199,97 @@ class TestReports(L10nInTestAccountReportsCommon):
         gstr1_report = self._create_gstr_report()
         gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
         self.assertDictEqual(gstr1_json, self._read_mock_json('gstr1_sez_lut_and_rcm_response.json'))
+
+    def test_gstr1_document_summary(self):
+        # Case 1: Sequence number in Invoice name contains no leading zeros.
+        inv_date = date(2026, 5, 10)
+        for name in ["INV/2026/8", "INV/2026/9", "INV/2026/10", "INV/2026/11", "INV/2026/12"]:
+            inv = self._init_inv(partner=self.partner_b, taxes=self.comp_igst_18, line_vals={'price_unit': 500, 'quantity': 2}, invoice_date=inv_date, ref=name, post=False)
+            inv.name = name
+            inv.action_post()
+
+        gstr_report = self._create_gstr_report(date=inv_date)
+        document_summary = gstr_report.l10n_in_doc_summary_line_ids
+        self.assertRecordValues(document_summary, [{'serial_from': 'INV/2026/8', 'serial_to': 'INV/2026/12'}])
+
+        # Case 2: Sequence number in Invoice name contains no leading zeros and a suffix
+        inv_date = date(2026, 4, 10)
+        for name in ["INV/2026/98/MS", "INV/2026/99/MS", "INV/2026/100/MS", "INV/2026/101/MS", "INV/2026/102/MS"]:
+            inv = self._init_inv(partner=self.partner_b, taxes=self.comp_igst_18, line_vals={'price_unit': 500, 'quantity': 2}, invoice_date=inv_date, ref=name, post=False)
+            inv.name = name
+            inv.action_post()
+        gstr_report = self._create_gstr_report(date=inv_date)
+        document_summary = gstr_report.l10n_in_doc_summary_line_ids
+        self.assertRecordValues(document_summary, [{'serial_from': 'INV/2026/98/MS', 'serial_to': 'INV/2026/102/MS'}])
+
+    def test_gstr1_foreign_currency_invoice_value(self):
+        """Test that invoice Value in GSTR1 B2B is exported in company currency (INR), not invoice currency."""
+        foreign_currency = self.other_currency
+        self.env['res.currency.rate'].create({
+            'currency_id': foreign_currency.id,
+            'name': self.test_date,
+            'rate': 0.01,
+            'company_id': self.company_data['company'].id,
+        })
+
+        inv = self.init_invoice(
+            'out_invoice',
+            products=self.product_a,
+            invoice_date=self.test_date,
+            taxes=self.comp_igst_18,
+            company=self.company_data['company'],
+            partner=self.partner_b,
+            currency=foreign_currency,
+            post=False,
+        )
+        inv.write({
+            'l10n_in_gst_treatment': 'special_economic_zone',
+        })
+        inv.action_post()
+
+        gstr1_report = self._create_gstr_report()
+        gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
+        self.assertDictEqual(gstr1_json, self._read_mock_json('gstr1_sez_foreign_currency_test.json'))
+
+    def test_gstr1_with_gst_and_cess(self):
+        """To check if query details is returning proper tax details"""
+        cess = self.env['account.chart.template'].ref('cess_5_plus_1591_sale')
+        gst_28 = self.env['account.chart.template'].ref('sgst_sale_28')
+        invoice = self._create_invoice(
+            partner_id=self.partner_b,
+            invoice_date=TEST_DATE,
+            invoice_line_ids=[
+                self._prepare_invoice_line(price_unit=1000.0, tax_ids=(gst_28 + cess)),
+                self._prepare_invoice_line(price_unit=500.0, tax_ids=gst_28),
+            ],
+        )
+        invoice.action_post()
+        gstr1_report = self._create_gstr_report()
+        gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
+        self.assertDictEqual(gstr1_json, self._read_mock_json('gstr1_with_gst_and_cess.json'))
+
+    def test_gstr1_price_adjustment_credit_note_json(self):
+        invoice = self._init_inv(partner=self.partner_b, taxes=self.comp_igst_18, line_vals={'price_unit': 500, 'quantity': 2})
+        price_adjustment_credit_note = self._create_credit_note(inv=invoice, line_vals={'quantity': 1}, post=False)
+        price_adjustment_credit_note.l10n_in_adjustment_type = 'price_adjustment'
+        price_adjustment_credit_note.action_post()
+        gstr1_report = self._create_gstr_report()
+        gstr1_json = gstr1_report._get_l10n_in_gstr1_json()
+        expected_json = {
+            'hsn_b2b': [
+                {
+                    'hsn_sc': '111111',
+                    'uqc': 'UNT',
+                    'rt': 18,
+                    'qty': 2.0,
+                    'txval': 500.0,
+                    'iamt': 90.0,
+                    'samt': 0.0,
+                    'camt': 0.0,
+                    'csamt': 0.0,
+                    'num': 1
+                }
+            ],
+            'hsn_b2c': []
+        }
+        self.assertDictEqual(gstr1_json['hsn'], expected_json)

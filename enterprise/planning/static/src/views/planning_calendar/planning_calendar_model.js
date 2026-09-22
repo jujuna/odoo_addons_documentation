@@ -1,27 +1,38 @@
+import { Domain } from "@web/core/domain";
 import { user } from "@web/core/user";
 import { CalendarModel } from "@web/views/calendar/calendar_model";
 import { usePlanningModelActions } from "../planning_hooks";
-import { planningAskRecurrenceUpdate} from "./planning_ask_recurrence_update/planning_ask_recurrence_update_hook";
+import { planningAskRecurrenceUpdate } from "./planning_ask_recurrence_update/planning_ask_recurrence_update_hook";
 import { _t } from "@web/core/l10n/translation";
+import { serializeDateTime } from "@web/core/l10n/dates";
+import { unique } from "@web/core/utils/arrays";
 
 export class PlanningCalendarModel extends CalendarModel {
     static services = [...CalendarModel.services, "dialog", "orm"];
 
     setup(params, services) {
+        // always fetch those fields as they'll be used by this model and the popover
+        const extraFields = ["repeat", "allocated_hours", "allocated_percentage", "state"];
+        params.fieldNames = unique(params.fieldNames.concat(extraFields));
+
         super.setup(...arguments);
         this.dialog = services.dialog;
         this.getHighlightIds = usePlanningModelActions({
             getHighlightPlannedIds: () => this.env.searchModel.highlightPlannedIds,
             getContext: () => this.env.searchModel._context,
         }).getHighlightIds;
-        this.meta.scale = this.env.isSmall? "day" : this.meta.scale;
+        this.meta.scale = this.uiService.isSmall ? "day" : this.meta.scale;
         this.isManager = null;
     }
 
-    async load() {
+    async load(params = {}) {
         let groupProm;
         if (this.isManager === null) {
             groupProm = user.hasGroup("planning.group_planning_manager").then(result => this.isManager = result);
+        }
+        params.context = {
+            ...(params.context ? params.context : this.meta.context),
+            hide_planned_dates: true,
         }
         return Promise.all([super.load(...arguments), groupProm]);
     }
@@ -31,28 +42,11 @@ export class PlanningCalendarModel extends CalendarModel {
     }
 
     get showMultiCreateTimeRange() {
-         return false;
-     }
+        return false;
+    }
 
     get defaultFilterLabel() {
         return _t("Open Shifts");
-    }
-
-    /**
-     * @override
-     */
-    addFilterFields(record, filterInfo) {
-        // For 'Resource' filters we need the resource_color for the colorIndex, for 'Role' filters we need the colorIndex
-        if (filterInfo.fieldName == 'resource_id') {
-            return {
-                colorIndex: record.rawRecord.resource_type == 'material' ? record.rawRecord['resource_color'] : '',
-                resourceType: record.rawRecord['resource_type'],
-            };
-        }
-        return {
-            ...super.addFilterFields(record, filterInfo),
-            resourceType: record.rawRecord['resource_type'],
-        };
     }
 
     /**
@@ -84,11 +78,11 @@ export class PlanningCalendarModel extends CalendarModel {
     buildRawRecord(partialRecord, options = {}) {
         if (options.batch_create_calendar) {
             let days_to_hours = 0;
-            if (options.schedule[0]['duration_days'] > 1){
+            if (options.schedule[0]['duration_days'] > 1) {
                 days_to_hours = (options.schedule[0]['duration_days'] - 1) * 24;
             }
-            partialRecord.end = partialRecord.start.plus({hour: options.schedule[0]['end_time'] + days_to_hours});
-            partialRecord.start = partialRecord.start.plus({hour: options.schedule[0]['start_time']});
+            partialRecord.end = partialRecord.start.plus({ hour: options.schedule[0]['end_time'] + days_to_hours });
+            partialRecord.start = partialRecord.start.plus({ hour: options.schedule[0]['start_time'] });
         }
         const result = super.buildRawRecord(partialRecord, options);
         if (partialRecord.recurrenceUpdate) {
@@ -123,7 +117,10 @@ export class PlanningCalendarModel extends CalendarModel {
      * @override
      */
     getAllDayDates(start, end) {
-        return [start.startOf('day'), end.endOf('day')];
+        if (end) {
+            return [start.startOf("day"), end.endOf("day")];
+        }
+        return [start.startOf("day"), start.endOf("day")];
     }
 
     /**
@@ -140,19 +137,24 @@ export class PlanningCalendarModel extends CalendarModel {
             const records = [];
             const [section] = this.filterSections;
             for (const date of dates) {
-                const rawRecord = this.buildRawRecord({ start: date }, {'batch_create_calendar': true, 'schedule': schedule});
+                const rawRecord = this.buildRawRecord({ start: date }, { 'batch_create_calendar': true, 'schedule': schedule });
                 for (const filter of section.filters) {
                     if (filter.active && filter.type === "record") {
+                        let sectionFieldValue = filter.value;
+                        const sectionField = this.meta.fields[section.fieldName];
+                        if (sectionField && sectionFieldValue && ['one2many', 'many2many'].includes(sectionField.type)) {
+                            sectionFieldValue = [sectionFieldValue];
+                        }
                         records.push({
                             ...rawRecord,
                             ...values,
-                            [section.fieldName]: filter.value,
+                            [section.fieldName]: sectionFieldValue,
                         });
                     }
                 }
             }
             if (records.length) {
-                const createdRecords = await this.orm.call(this.meta.resModel, "create_batch_from_calendar", [[], records]);
+                const createdRecords = await this.orm.call(this.meta.resModel, "create_batch_from_calendar", [records]);
                 await this.load();
                 return createdRecords
             }
@@ -186,10 +188,106 @@ export class PlanningCalendarModel extends CalendarModel {
     */
     async loadFilters(data) {
         const loadedFilters = await super.loadFilters(data);
-        if (!Object.keys(this.data.filterSections).length && loadedFilters.sections.resource_id?.filters) {
+        if (!Object.keys(this.data.filterSections).length && loadedFilters.sections.resource_ids?.filters) {
             // This is the first load of the view, we set the 'open shifts' filter to active
-            loadedFilters.sections.resource_id.filters[0].active = true;
+            loadedFilters.sections.resource_ids.filters[0].active = true;
         }
         return loadedFilters;
+    }
+
+    /**
+     * @override
+     */
+    computeEventsToScheduleDomain(data) {
+        const { date_start, date_stop } = this.meta.fieldMapping;
+        let baseDomain = this.getBaseDomain();
+
+        const resourcesDomain = new Domain(baseDomain)
+            .toList()
+            .some(
+                (leaf) =>
+                    Array.isArray(leaf) &&
+                    leaf.length === 3 &&
+                    ["resource_ids", "department_id", "manager_id", "user_ids"].includes(leaf[0])
+            );
+        baseDomain = resourcesDomain
+            ? Domain.or([baseDomain, [["resource_ids", "=", false]]])
+            : baseDomain;
+
+        const domain = Domain.removeDomainLeaves(
+            Domain.and([baseDomain, this.computeFiltersDomain(data)]),
+            [date_start, date_stop]
+        );
+        if (date_start === date_stop) {
+            return Domain.and([domain, [[date_start, "=", false]]]);
+        }
+        return Domain.and([
+            domain,
+            Domain.and([[[date_start, "=", false]], [[date_stop, "=", false]]]),
+        ]);
+    }
+
+    /**
+     * @override
+     */
+    _getScheduleContext() {
+        return {
+            ...super._getScheduleContext(...arguments),
+            add_materials_assigned_to_employees: true,
+            default_end_datetime: serializeDateTime(this.meta.date.endOf(this.scale)),
+            scale: this.scale,
+        };
+    }
+
+    /**
+     * @override
+     */
+    _getScheduleData(date) {
+        const data = super._getScheduleData(date);
+        const resource_ids = (this.data.filterSections.resource_ids?.filters || [])
+            .filter((f) => f.active && f.value)
+            .map((f) => f.value);
+        data.resource_ids = resource_ids.length ? resource_ids : false;
+        return data;
+    }
+
+    /**
+     * @override
+     */
+    _getUnscheduleContext() {
+        return {
+            ...super._getUnscheduleContext(...arguments),
+            from_slot_unscheduling: true,
+        };
+    }
+
+    /**
+     * @override
+     */
+    _getUnscheduleData(eventId) {
+        const data = {
+            ...super._getUnscheduleData(...arguments),
+            resource_ids: false,
+            state: "1_draft",
+        };
+        const records = this.data.records;
+        if (eventId in records) {
+            data.allocated_hours = records[eventId].rawRecord.allocated_hours;
+        }
+        return data;
+    }
+
+    /**
+     * @override
+     */
+    async scheduleEvent(eventId, date) {
+        const result = await this.orm.call(
+            this.meta.resModel,
+            "assign_slot",
+            [[eventId], this._getScheduleData(date)],
+            { context: this._getScheduleContext() }
+        );
+        await this.load();
+        return result;
     }
 }

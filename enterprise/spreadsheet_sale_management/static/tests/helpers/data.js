@@ -42,7 +42,6 @@ export class SaleOrderSpreadsheet extends SpreadsheetMixin {
         },
     ];
 
-    dispatch_spreadsheet_message() {}
 }
 
 export function defineSpreadsheetSaleModels() {
@@ -55,7 +54,7 @@ export function defineSpreadsheetSaleModels() {
                 data: JSON.parse(spreadsheet.spreadsheet_data),
                 name: spreadsheet.name,
                 revisions: [],
-                isReadonly: false,
+                has_write_access: true,
                 order_id: order?.id,
                 order_display_name: order?.display_name,
             };
@@ -110,5 +109,6 @@ export function getSaleOrderSpreadsheetData() {
                 modelName: "sale.order",
             },
         ],
+        version: "19.1.0",
     };
 }

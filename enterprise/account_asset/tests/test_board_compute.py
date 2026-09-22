@@ -7,10 +7,12 @@ from odoo import fields
 @tagged('post_install', '-at_install')
 class TestAccountAssetComputation(TestAccountAssetCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.car = cls.create_asset(value=60000, periodicity="yearly", periods=5, method="linear", salvage_value=0)
+        cls.car = cls.create_asset(value=60000, method_period="12", method_number=5, method="linear", salvage_value=0)
 
     def test_linear_5_years_no_prorata_asset(self):
         self.car.validate()
@@ -55,10 +57,8 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_linear_5_years_constant_periods_asset(self):
-        self.car.write({
-            'prorata_computation_type': 'constant_periods',
-            'prorata_date': '2020-07-01',
-        })
+        self.car.prorata_computation_type = 'constant_periods'
+        self.car.main_variant_id.prorata_date = '2020-07-01'
         self.car.validate()
 
         self.assertEqual(self.car.state, 'open')
@@ -73,10 +73,8 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_linear_5_years_daily_computation_asset(self):
-        self.car.write({
-            'prorata_computation_type': 'daily_computation',
-            'prorata_date': '2020-07-01',
-        })
+        self.car.prorata_computation_type = 'daily_computation'
+        self.car.main_variant_id.prorata_date = '2020-07-01'
         self.car.validate()
 
         self.assertEqual(self.car.state, 'open')
@@ -91,10 +89,11 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_5_years_no_prorata_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method': 'degressive',
             'method_progress_factor': 0.3,
         })
+        self.car.model_id = depr_model
         self.car.validate()
 
         self.assertEqual(self.car.state, 'open')
@@ -108,9 +107,12 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_5_years_no_prorata_with_imported_amount_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method': 'degressive',
             'method_progress_factor': 0.3,
+        })
+        self.car.write({
+            'model_id': depr_model.id,
             'already_depreciated_amount_import': 1000,
         })
         self.car.validate()
@@ -126,9 +128,12 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_5_years_no_prorata_with_salvage_value_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method': 'degressive',
             'method_progress_factor': 0.3,
+        })
+        self.car.write({
+            'model_id': depr_model.id,
             'salvage_value': 1000,
         })
         self.car.validate()
@@ -145,7 +150,7 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_then_linear_5_years_no_prorata_asset(self):
-        asset = self.create_asset(value=60000, periodicity="yearly", periods=5, method="degressive_then_linear", degressive_factor=0.3)
+        asset = self.create_asset(value=60000, method_period="12", method_number=5, method="degressive_then_linear", method_progress_factor=0.3)
         asset.validate()
         self.assertEqual(asset.state, 'open')
         self.assertEqual(asset.book_value, 29400)
@@ -158,7 +163,7 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_then_linear_5_years_no_prorata_negative_asset(self):
-        asset = self.create_asset(value=-60000, periodicity="yearly", periods=5, method="degressive_then_linear", degressive_factor=0.3)
+        asset = self.create_asset(value=-60000, method_period="12", method_number=5, method="degressive_then_linear", method_progress_factor=0.3)
         asset.validate()
         self.assertEqual(asset.state, 'open')
         self.assertEqual(asset.book_value, -29400)
@@ -171,7 +176,7 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_than_linear_5_years_no_prorata_with_imported_amount_asset(self):
-        asset = self.create_asset(value=60000, periodicity="yearly", periods=5, method="degressive_then_linear", degressive_factor=0.3, import_depreciation=1000)
+        asset = self.create_asset(value=60000, method_period="12", method_number=5, method="degressive_then_linear", method_progress_factor=0.3, import_depreciation=1000)
         asset.validate()
         self.assertEqual(asset.state, 'open')
         self.assertEqual(asset.book_value, 29400)
@@ -184,7 +189,7 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_than_linear_5_years_no_prorata_with_imported_amount_negative_asset(self):
-        asset = self.create_asset(value=-60000, periodicity="yearly", periods=5, method="degressive_then_linear", degressive_factor=0.3, import_depreciation=-1000)
+        asset = self.create_asset(value=-60000, method_period="12", method_number=5, method="degressive_then_linear", method_progress_factor=0.3, import_depreciation=-1000)
         asset.validate()
         self.assertEqual(asset.state, 'open')
         self.assertEqual(asset.book_value, -29400)
@@ -197,7 +202,7 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_than_linear_5_years_no_prorata_with_salvage_value_asset(self):
-        asset = self.create_asset(value=60000, periodicity="yearly", periods=5, salvage_value=1000, method="degressive_then_linear", degressive_factor=0.3)
+        asset = self.create_asset(value=60000, method_period="12", method_number=5, salvage_value=1000, method="degressive_then_linear", method_progress_factor=0.3)
         asset.validate()
         self.assertEqual(asset.state, 'open')
         self.assertEqual(asset.value_residual, 28910)
@@ -215,7 +220,7 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         The depreciation amount is computed that way: Compute a degressive amount for each year and split it by month linearly.
         The depreciation value could vary by one currency unit to absorb small differences that are created over time.
         """
-        asset = self.create_asset(value=10000, periodicity="monthly", periods=36, method="degressive_then_linear", degressive_factor=0.4)
+        asset = self.create_asset(value=10000, method_period="1", method_number=36, method="degressive_then_linear", method_progress_factor=0.4)
         asset.validate()
         self.assertEqual(asset.state, 'open')
         self.assertRecordValues(asset.depreciation_move_ids, [
@@ -263,10 +268,10 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         """
         asset = self.create_asset(
             value=10000,
-            periodicity="yearly",
-            periods=5,
+            method_period="12",
+            method_number=5,
             method="degressive_then_linear",
-            degressive_factor=0.3,
+            method_progress_factor=0.3,
             acquisition_date="2021-07-01",
             prorata_computation_type="constant_periods",
         )
@@ -285,10 +290,10 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         """
         asset = self.create_asset(
             value=10000,
-            periodicity="monthly",
-            periods=36,
+            method_period="1",
+            method_number=36,
             method="degressive_then_linear",
-            degressive_factor=0.6,
+            method_progress_factor=0.6,
             acquisition_date="2021-07-01",
             prorata_computation_type="constant_periods",
         )
@@ -328,10 +333,11 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_linear_60_months_no_prorata_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method_number': 60,
             'method_period': '1',
         })
+        self.car.model_id = depr_model.id
         self.car.validate()
         self.assertEqual(self.car.state, 'open')
         self.assertEqual(self.car.book_value, 30000)
@@ -404,9 +410,12 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_linear_60_months_no_prorata_with_imported_amount_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method_number': 60,
             'method_period': '1',
+        })
+        self.car.write({
+            'model_id': depr_model.id,
             'already_depreciated_amount_import': 1500,
         })
         self.car.validate()
@@ -480,10 +489,13 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_linear_60_months_no_prorata_with_salvage_value_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method_number': 60,
             'method_period': '1',
             'method_progress_factor': 0.3,
+        })
+        self.car.write({
+            'model_id': depr_model.id,
             'salvage_value': 2000,
         })
         self.car.validate()
@@ -559,12 +571,15 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_linear_60_months_constant_periods_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method_number': 60,
             'method_period': '1',
             'prorata_computation_type': 'constant_periods',
-            'prorata_date': '2020-07-01',
         })
+        self.car.write({
+            'model_id': depr_model.id,
+        })
+        self.car.main_variant_id.prorata_date = '2020-07-01'
         self.car.validate()
         self.assertEqual(self.car.state, 'open')
         self.assertEqual(self.car.book_value, 36000)
@@ -638,12 +653,15 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_linear_60_months_daily_computation_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method_number': 60,
             'method_period': '1',
             'prorata_computation_type': 'daily_computation',
-            'prorata_date': '2020-07-01',
         })
+        self.car.write({
+            'model_id': depr_model.id,
+        })
+        self.car.main_variant_id.prorata_date = '2020-07-01'
         self.car.validate()
         self.assertEqual(self.car.state, 'open')
         self.assertEqual(self.car.book_value, 36013.14)
@@ -718,12 +736,13 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_60_months_no_prorata_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method_number': 60,
             'method_period': '1',
             'method': 'degressive',
             'method_progress_factor': 0.3,
         })
+        self.car.model_id = depr_model
         self.car.validate()
         self.assertEqual(self.car.state, 'open')
         self.assertEqual(self.car.book_value, 24500)
@@ -798,8 +817,8 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
     def test_degressive_60_months_from_middle_year(self):
         asset = self.create_asset(
             value=100000,
-            periodicity='monthly',
-            periods=60,
+            method_period='1',
+            method_number=60,
             method='degressive',
             method_progress_factor=0.35,
             acquisition_date='2022-07-01',
@@ -882,8 +901,8 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         company.fiscalyear_last_month = '6'
         asset = self.create_asset(
             value=100000,
-            periodicity='monthly',
-            periods=60,
+            method_period='1',
+            method_number=60,
             method='degressive',
             method_progress_factor=0.35,
             acquisition_date='2022-07-01',
@@ -960,11 +979,14 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_60_months_no_prorata_with_imported_amount_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method_number': 60,
             'method_period': '1',
             'method': 'degressive',
             'method_progress_factor': 0.3,
+        })
+        self.car.write({
+            'model_id': depr_model.id,
             'already_depreciated_amount_import': 2000,
         })
         self.car.validate()
@@ -1038,11 +1060,14 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_degressive_60_months_no_prorata_with_salvage_value_asset(self):
-        self.car.write({
+        depr_model = self.car.model_id.copy({
             'method_number': 60,
             'method_period': '1',
             'method': 'degressive',
             'method_progress_factor': 0.3,
+        })
+        self.car.write({
+            'model_id': depr_model.id,
             'salvage_value': 2000,
         })
         self.car.validate()
@@ -1120,8 +1145,8 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
     def test_degressive_5_years_from_beggining_of_year(self):
         asset = self.create_asset(
             value=100000,
-            periodicity='yearly',
-            periods=5,
+            method_period='12',
+            method_number=5,
             method='degressive',
             method_progress_factor=0.35,
             acquisition_date='2022-01-01',
@@ -1141,8 +1166,8 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
     def test_degressive_5_years_from_middle_of_year(self):
         asset = self.create_asset(
             value=100000,
-            periodicity='yearly',
-            periods=5,
+            method_period='12',
+            method_number=5,
             method='degressive',
             method_progress_factor=0.35,
             acquisition_date='2022-07-01',
@@ -1161,9 +1186,9 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         ])
 
     def test_compute_board_in_mass(self):
-        book = self.create_asset(value=35, periodicity="monthly", periods=2, method="linear", salvage_value=0)
-        shelf = self.create_asset(value=250, periodicity="monthly", periods=8, method="linear", salvage_value=0)
-        screw = self.create_asset(value=1, periodicity="monthly", periods=1, method="linear", salvage_value=0)
+        book = self.create_asset(value=35, method_period="1", method_number=2, method="linear", salvage_value=0)
+        shelf = self.create_asset(value=250, method_period="1", method_number=8, method="linear", salvage_value=0)
+        screw = self.create_asset(value=1, method_period="1", method_number=1, method="linear", salvage_value=0)
 
         (book + screw).validate()
         (book + shelf + screw).compute_depreciation_board()
@@ -1194,8 +1219,8 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         """
         old_car_asset = self.create_asset(
             value=60000,
-            periodicity='yearly',
-            periods=5,
+            method_period='12',
+            method_number=5,
             method='linear',
             salvage_value=0,
 
@@ -1205,7 +1230,7 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         self.assertEqual(old_car_asset.state, 'open')
         self.assertEqual(old_car_asset.book_value, 36000)
         self.assertEqual(old_car_asset.acquisition_date, fields.Date.from_string('2020-02-01'))
-        self.assertEqual(old_car_asset.prorata_date, fields.Date.from_string('2020-01-01'))
+        self.assertEqual(old_car_asset.main_variant_id.prorata_date, fields.Date.from_string('2020-01-01'))
         self.assertRecordValues(old_car_asset.depreciation_move_ids, [
             self._get_depreciation_move_values(date='2020-12-31', depreciation_value=12000, remaining_value=48000, depreciated_value=12000, state='posted'),
             self._get_depreciation_move_values(date='2021-12-31', depreciation_value=12000, remaining_value=36000, depreciated_value=24000, state='posted'),
@@ -1221,7 +1246,7 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
         self.assertEqual(new_car_asset.state, 'open')
         self.assertEqual(new_car_asset.book_value, 36000)
         self.assertEqual(new_car_asset.acquisition_date, fields.Date.from_string('2020-02-01'))
-        self.assertEqual(new_car_asset.prorata_date, fields.Date.from_string('2020-01-01'))
+        self.assertEqual(new_car_asset.main_variant_id.prorata_date, fields.Date.from_string('2020-01-01'))
         self.assertRecordValues(new_car_asset.depreciation_move_ids, [
             self._get_depreciation_move_values(date='2020-12-31', depreciation_value=12000, remaining_value=48000, depreciated_value=12000, state='posted'),
             self._get_depreciation_move_values(date='2021-12-31', depreciation_value=12000, remaining_value=36000, depreciated_value=24000, state='posted'),
@@ -1248,7 +1273,7 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
 
         # Change the computation type
         self.car.prorata_computation_type = 'constant_periods'
-        self.car.prorata_date = '2021-01-01'
+        self.car.main_variant_id.prorata_date = '2021-01-01'
         self.car.compute_depreciation_board()
 
         self.assertEqual(self.car.state, 'draft')
@@ -1292,19 +1317,19 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
     def test_assets_one_complete_period(self):
         """Test the depreciation move value in case of having just one complete period (year or month) asset."""
         datas = [
-            ('monthly', '2022-01-31', 'linear'),
-            ('monthly', '2022-01-31', 'degressive'),
-            ('monthly', '2022-01-31', 'degressive_then_linear'),
-            ('yearly', '2022-12-31', 'linear'),
-            ('yearly', '2022-12-31', 'degressive'),
-            ('yearly', '2022-12-31', 'degressive_then_linear'),
+            ('1', '2022-01-31', 'linear'),
+            ('1', '2022-01-31', 'degressive'),
+            ('1', '2022-01-31', 'degressive_then_linear'),
+            ('12', '2022-12-31', 'linear'),
+            ('12', '2022-12-31', 'degressive'),
+            ('12', '2022-12-31', 'degressive_then_linear'),
         ]
         for periodicity, end_depreciation_date, method in datas:
             with self.subTest(period=periodicity, method=method, end_depreciation_date=end_depreciation_date):
                 asset = self.create_asset(
                     value=1000,
-                    periodicity=periodicity,
-                    periods=1,
+                    method_period=periodicity,
+                    method_number=1,
                     method=method,
                     acquisition_date='2022-01-01',
                     prorata_date='2022-01-01',
@@ -1319,3 +1344,33 @@ class TestAccountAssetComputation(TestAccountAssetCommon):
                 ])
                 asset.validate()
                 self.assertEqual(asset.state, 'open')
+
+    def test_degressive_no_skipped_entries_at_fiscal_year_boundary(self):
+        """Test that degressive depreciation does not skip entries after a fiscal year boundary. """
+        # Create a shortened fiscal year: May 1, 2025 → December 31, 2025
+        # The next FY (Jan 1 - Dec 31, 2026) follows the standard company setting.
+        self.env['account.fiscal.year'].create({
+            'name': 'FY 2025 (short)',
+            'date_from': '2025-05-01',
+            'date_to': '2025-12-31',
+            'company_id': self.env.company.id,
+        })
+
+        asset = self.create_asset(
+            value=10000,
+            method_period='1',
+            method_number=60,
+            method='degressive',
+            method_progress_factor=0.35,
+            acquisition_date='2025-12-01',
+            prorata_computation_type='constant_periods',
+        )
+        asset.compute_depreciation_board()
+
+        moves = asset.depreciation_move_ids.sorted(lambda mv: (mv.date, mv.id))
+        self.assertEqual(len(moves), 60)
+        self.assertTrue({'2026-01-31', '2026-02-28', '2026-03-31', '2026-04-30'}.issubset({move.date.strftime('%Y-%m-%d') for move in moves}))
+        for move in moves:
+            self.assertGreater(move.depreciation_value, 0)
+        # Verify degressive behavior: first entry amount > last entry amount
+        self.assertGreater(moves[0].depreciation_value, moves[-1].depreciation_value)

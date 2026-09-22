@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Import CSV Bank Statement',
     'category': 'Accounting/Accounting',
-    'version': '1.0',
     'description': r'''
 Module to import CSV bank statements.
 ======================================
@@ -21,7 +19,6 @@ Whenever possible, you should use a more appropriate file format like OFX.
     'data': [
         'views/bank_rec_widget_views.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

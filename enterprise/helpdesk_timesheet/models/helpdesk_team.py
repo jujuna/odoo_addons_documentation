@@ -62,11 +62,6 @@ class HelpdeskTeam(models.Model):
     def write(self, vals):
         if 'use_helpdesk_timesheet' in vals and not vals['use_helpdesk_timesheet']:
             vals['project_id'] = False
-            # to unlink timer when use_helpdesk_timesheet is false
-            self.env['timer.timer'].search([
-                ('res_model', '=', 'helpdesk.ticket'),
-                ('res_id', 'in', self.with_context(active_test=False).ticket_ids.ids)
-            ]).unlink()
         result = super().write(vals)
         if 'use_helpdesk_timesheet' in vals:
             self.sudo()._check_timesheet_group()

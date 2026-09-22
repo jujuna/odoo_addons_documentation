@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "Online Bank Statement Synchronization",
     'summary': "This module is used for Online bank synchronization.",
@@ -10,7 +9,6 @@ a periodic and automatic synchronization of their bank statements.
     """,
 
     'category': 'Accounting/Accounting',
-    'version': '1.0',
     'depends': ['account_accountant'],
 
     'data': [
@@ -18,9 +16,6 @@ a periodic and automatic synchronization of their bank statements.
         'data/ir_cron.xml',
         'data/mail_subtype_data.xml',
         'data/mail_template.xml',
-
-        'security/ir.model.access.csv',
-        'security/account_online_sync_security.xml',
 
         'views/account_online_sync_views.xml',
         'views/account_bank_statement_view.xml',
@@ -32,6 +27,8 @@ a periodic and automatic synchronization of their bank statements.
         'wizard/account_journal_missing_transactions.xml',
         'wizard/account_journal_duplicate_transactions.xml',
         'wizard/account_bank_statement_line.xml',
+
+        'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
@@ -42,6 +39,7 @@ a periodic and automatic synchronization of their bank statements.
             ('remove', 'account_online_synchronization/static/src/components/**/*.dark.scss'),
             'account_online_synchronization/static/src/hooks/**/*',
             'account_online_synchronization/static/src/js/odoo_fin_connector.js',
+            'account_online_synchronization/static/src/css/bank_journal_status.scss',
         ],
         'web.assets_web_dark': [
             'account_online_synchronization/static/src/components/**/*.dark.scss',

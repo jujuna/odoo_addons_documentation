@@ -1,8 +1,91 @@
 from odoo.fields import Command
-from odoo.tests.common import TransactionCase, new_test_user
+from odoo.tests import Form
+from odoo.tests.common import tagged, TransactionCase, new_test_user
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestVoipHrVoipCall(TransactionCase):
+    def test_disconnected_forwarding_prefers_mobile_phone(self):
+        user = new_test_user(
+            self.env,
+            login="mobile_forwarding_user",
+            phone="+3281234567",
+            country_id=self.env.ref("base.be").id,
+        )
+        self.env["hr.employee"].create({
+            "name": "Mobile Forwarding User",
+            "user_id": user.id,
+            "mobile_phone": "+32499123456",
+        })
+
+        settings = user._prepare_pbx_user_settings()
+
+        self.assertEqual(settings.voip_disconnected_outcall_number, "+32499123456")
+
+    def test_disconnected_forwarding_falls_back_to_phone(self):
+        user = new_test_user(
+            self.env,
+            login="phone_forwarding_user",
+            phone="+3281234567",
+            country_id=self.env.ref("base.be").id,
+        )
+        self.env["hr.employee"].create({
+            "name": "Phone Forwarding User",
+            "user_id": user.id,
+            "mobile_phone": "invalid",
+        })
+
+        settings = user._prepare_pbx_user_settings()
+
+        self.assertEqual(settings.voip_disconnected_outcall_number, "+3281234567")
+
+    def test_action_log_call_with_mismatched_record_hr(self):
+        """When the employee's partner differs from the call's partner, the
+        domain check fails and the wizard falls back to the call's contact."""
+        call_partner = self.env["res.partner"].create({"name": "Call Partner"})
+        other_partner = self.env["res.partner"].create({"name": "Other Partner"})
+        other_employee = self.env["hr.employee"].create({"name": "Other Employee"})
+        other_partner.employee_ids = [Command.set([other_employee.id])]
+        call = self.env["voip.call"].create({
+            "phone_number": "+1234567890",
+            "partner_id": call_partner.id,
+        })
+        with Form.from_action(
+            self.env, call.action_log_call(active_model="hr.employee", active_id=other_employee.id),
+        ) as form:
+            self.assertEqual(form.res_model_selection, "res.partner")
+            self.assertEqual(form.contact_id, call_partner)
+            self.assertEqual(form.res_ids, f"[{call_partner.id}]")
+            self.assertEqual(form.call_id, call)
+            # NB: defaults do not trigger the inverse; res_model is only
+            # synced on create/write, i.e. when the user marks the activity done.
+            form.save()
+            self.assertEqual(form.res_model, "res.partner")
+
+    def test_action_log_call_with_matching_model_hr(self):
+        """When active_model=hr.employee matches a registered option (hr.employee),
+        the wizard should pre-select that record type and record."""
+        partner = self.env["res.partner"].create({"name": "Test Partner"})
+        employee = self.env["hr.employee"].create({
+            "name": "Test Employee",
+        })
+        partner.employee_ids = [Command.set([employee.id])]
+        call = self.env["voip.call"].create({
+            "phone_number": "+1234567890",
+            "partner_id": partner.id,
+        })
+        with Form.from_action(
+            self.env, call.action_log_call(active_model="hr.employee", active_id=employee.id),
+        ) as form:
+            self.assertEqual(form.res_model_selection, "hr.employee")
+            self.assertEqual(form.employee_id, employee)
+            self.assertEqual(form.res_ids, f"[{employee.id}]")
+            self.assertEqual(form.call_id, call)
+            # NB: defaults do not trigger the inverse; res_model is only
+            # synced on create/write, i.e. when the user marks the activity done.
+            form.save()
+            self.assertEqual(form.res_model, "hr.employee")
+
     def test_is_within_same_company_true_same_company_employees(self):
         company = self.env["res.company"].create({"name": "Company"})
         caller_partner = self.env["res.partner"].create({"name": "Caller", "email": "caller@example.com"})
@@ -94,7 +177,7 @@ class TestVoipHrVoipCall(TransactionCase):
         self.assertFalse(call.is_within_same_company)
 
     def test_is_within_same_company_falls_back_to_base_logic(self):
-        company_partner = self.env["res.partner"].create({"name": "Test Company", "is_company": True})
+        company_partner = self.env["res.partner"].create({"name": "Test Company"})
         caller = new_test_user(self.env, login="user")
         caller.partner_id.commercial_partner_id = company_partner
         callee_partner = self.env["res.partner"].create({"name": "Callee", "email": "callee@example.com"})

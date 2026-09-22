@@ -11,12 +11,12 @@ class AccountTax(models.Model):
 
     @api.depends('amount', 'invoice_repartition_line_ids.tag_ids', 'refund_repartition_line_ids.tag_ids', 'company_id.l10n_de_fiskaly_api_secret')
     def _compute_l10n_de_vat_definition_export_identifier(self):
-        self.get_vat_definition_export_id()
+        self._get_vat_definition_export_id()
 
-    def get_vat_definition_export_id(self):
+    def _get_vat_definition_export_id(self):
         """ This method is used to ensure that the export definition ID is set for all taxes that are created or updated. specifically for invidual circumstances where the export ID is not set yet."""
         for tax in self:
-            if not tax.company_id.is_country_germany or not tax.company_id.l10n_de_fiskaly_api_secret:
+            if not tax.company_id.l10n_de_is_germany_and_fiskaly():
                 continue
             if not tax.amount:
                 all_tags = set((tax.invoice_repartition_line_ids + tax.refund_repartition_line_ids).tag_ids.mapped('name'))

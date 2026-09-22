@@ -9,6 +9,8 @@ from odoo.addons.sale_timesheet.tests.common import TestCommonSaleTimesheet
 
 @tagged('post_install', '-at_install')
 class TestTasksTicketsConversionSol(TestCommonSaleTimesheet):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def get_default_groups(cls):
         return super().get_default_groups() + cls.env.ref('helpdesk.group_helpdesk_manager')

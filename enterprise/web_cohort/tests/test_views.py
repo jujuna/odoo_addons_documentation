@@ -1,11 +1,12 @@
 from dateutil.relativedelta import relativedelta
 
 from odoo import Command, fields
-from odoo.tests.common import HttpCase, tagged, freeze_time
+from odoo.tests.common import tagged, freeze_time
 
-from odoo.addons.base.tests.test_views import ViewCase
+from odoo.addons.base.tests.test_ir_ui_view import ViewCase
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestViews(ViewCase):
     def test_get_views_model_fields(self):
         model = self.env.ref('base.model_ir_ui_view')

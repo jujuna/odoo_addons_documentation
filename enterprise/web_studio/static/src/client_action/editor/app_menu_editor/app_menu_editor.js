@@ -1,20 +1,23 @@
-import { Component, useRef, useState } from "@odoo/owl";
+import { render } from "@web/owl2/utils";
+import { Component, useProps, proxy, signal, t } from "@odoo/owl";
 import { rpc, rpcBus } from "@web/core/network/rpc";
 import { useBus, useService, useOwnedDialogs } from "@web/core/utils/hooks";
-import { Dialog } from "@web/core/dialog/dialog";
+import { Dialog, dialogProps } from "@web/core/dialog/dialog";
 import { user } from "@web/core/user";
 import { useNestedSortable } from "@web/core/utils/nested_sortable";
 import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
 import { MenuCreatorDialog } from "@web_studio/client_action/menu_creator/menu_creator";
 import { useDialogConfirmation, useSubEnvAndServices } from "@web_studio/client_action/utils";
 
-const EditMenuDialogProps = { ...Dialog.props };
-EditMenuDialogProps.close = { type: Function };
+const EditMenuDialogProps = { ...dialogProps };
+EditMenuDialogProps.close = t.function();
 delete EditMenuDialogProps.slots;
 class EditMenuDialog extends Component {
     static components = { Dialog };
     static template = "web_studio.AppMenuEditor.EditMenuDialog";
-    static props = EditMenuDialogProps;
+    props = useProps(EditMenuDialogProps);
+
+    rootRef = signal.ref();
 
     setup() {
         // Keep the bus from the WebClient
@@ -28,15 +31,14 @@ class EditMenuDialog extends Component {
         useBus(this.env.bus, "ACTION_MANAGER:UPDATE", () => this.cancel());
 
         // States and data
-        this.state = useState({ tree: {}, flatMenus: {} });
+        this.state = proxy({ tree: {}, flatMenus: {} });
         this.state.tree = this.getTree();
         this.toMove = {};
         this.toDelete = [];
 
         // DragAndDrop to move menus around
-        const root = useRef("root");
         useNestedSortable({
-            ref: root,
+            ref: this.rootRef,
             handle: ".o-draggable-handle",
             nest: true,
             maxLevels: 5,
@@ -173,10 +175,10 @@ class EditMenuDialog extends Component {
 }
 
 export class AppMenuEditor extends Component {
-    static props = {
-        env: { type: Object },
-    };
     static template = "web_studio.AppMenuEditor";
+    props = useProps({
+        env: t.object(),
+    });
 
     setup() {
         this.menus = useService("menu");
@@ -186,7 +188,7 @@ export class AppMenuEditor extends Component {
         // contains an override of dialog and an override of action
         useSubEnvAndServices(this.props.env);
         this.addDialog = useOwnedDialogs();
-        useBus(bus, "MENUS:APP-CHANGED", () => this.render());
+        useBus(bus, "MENUS:APP-CHANGED", () => render(this));
     }
 
     onClick(ev) {

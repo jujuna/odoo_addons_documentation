@@ -3,21 +3,45 @@
 # * l10n_pe_edi_stock
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2026.
+# Fernando Vazquez <fvz@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.5alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-11-18 17:12+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-09-18 18:21+0000\n"
+"PO-Revision-Date: 2026-09-18 05:05+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19-l10n/l10n_pe_edi_stock/es_419/>\n"
+"odoo-master/l10n_pe_edi_stock/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: l10n_pe_edi_stock
+#: model:ir.module.module,description:base.module_l10n_pe_edi_stock
+msgid ""
+"\n"
+"The delivery guide (Guía de Remisión) is needed as a proof\n"
+"that you are sending goods between A and B.\n"
+"\n"
+"It is only when a delivery order is validated that you can create the "
+"delivery\n"
+"guide.\n"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
+msgid "<strong>Authorization Issuing Entity</strong>"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
+msgid "<strong>Authorization Number</strong>"
+msgstr ""
 
 #. module: l10n_pe_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
@@ -26,13 +50,23 @@ msgstr "<strong>Número de guía de remisión</strong>"
 
 #. module: l10n_pe_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
+msgid "<strong>Driver's License Number</strong>"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
 msgid "<strong>Issuing entity of the special authorization:</strong>"
 msgstr "<strong>Entidad emisora de la autorización especial:</strong>"
 
 #. module: l10n_pe_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
-msgid "<strong>Licence</strong>"
-msgstr "<strong>Licencia</strong>"
+msgid "<strong>License Plate</strong>"
+msgstr ""
+
+#. module: l10n_pe_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
+msgid "<strong>MTC Registration Number</strong>"
+msgstr ""
 
 #. module: l10n_pe_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.l10n_pe_edi_guiaremision_report_delivery_document
@@ -154,7 +188,7 @@ msgstr "Entidad Emisora de la Autorización"
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_res_partner__l10n_pe_edi_authorization_number
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_res_users__l10n_pe_edi_authorization_number
 msgid "Authorization Number"
-msgstr "Numero de autorización"
+msgstr "Número de autorización"
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__stock_picking__l10n_pe_edi_related_document_type__65
@@ -242,10 +276,6 @@ msgstr "Minerales de cobalto y sus concentrados"
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model,name:l10n_pe_edi_stock.model_res_company
-msgid "Companies"
-msgstr "Empresas"
-
-#. module: l10n_pe_edi_stock
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_l10n_pe_edi_vehicle__company_id
 msgid "Company"
 msgstr "Empresa"
@@ -272,7 +302,7 @@ msgstr ""
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__stock_picking__l10n_pe_edi_reason_for_transfer__05
 msgid "Consignment"
-msgstr "Envío"
+msgstr "Consignación"
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__stock_picking__l10n_pe_edi_related_document_type__80
@@ -324,7 +354,7 @@ msgstr "Minerales de cobre y sus concentrados"
 #. odoo-python
 #: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
 msgid "Could not decode the response received from SUNAT. Details:"
-msgstr ""
+msgstr "No pudimos decodificar la respuesta que envió la SUNAT. Detalles:"
 
 #. module: l10n_pe_edi_stock
 #. odoo-python
@@ -338,6 +368,8 @@ msgstr "No se pudo descomprimir el archivo ZIP recibido de SUNAT."
 msgid ""
 "Could not identify content in the response retrieved from SUNAT. Details:"
 msgstr ""
+"No pudimos identificar contenido en la respuesta obtenida de la SUNAT. "
+"Detalles:"
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__country_code
@@ -390,6 +422,11 @@ msgid "Default Operator"
 msgstr "Operador predeterminado"
 
 #. module: l10n_pe_edi_stock
+#: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_delivery_address_id
+msgid "Delivery Address"
+msgstr "Dirección de entrega"
+
+#. module: l10n_pe_edi_stock
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_status
 msgid "Delivery Guide Status (PE)"
 msgstr "Estado de la guía de remisión (PE)"
@@ -399,6 +436,11 @@ msgstr "Estado de la guía de remisión (PE)"
 #: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
 msgid "Delivery Guide for transfer %s"
 msgstr "Guía de remisión para el traslado %s"
+
+#. module: l10n_pe_edi_stock
+#: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_delivery_partner_id
+msgid "Delivery Partner"
+msgstr "Contacto de entrega"
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_content
@@ -424,7 +466,7 @@ msgstr "Nombre mostrado"
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_latam_document_number
 msgid "Document Number (UY)"
-msgstr ""
+msgstr "Número de documento (UY)"
 
 #. module: l10n_pe_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.view_picking_edi_form
@@ -441,6 +483,11 @@ msgstr "Licencia de conducir"
 #: model:ir.model.fields,field_description:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_error
 msgid "EDI error details"
 msgstr "Detalles del error EDI"
+
+#. module: l10n_pe_edi_stock
+#: model:ir.module.module,summary:base.module_l10n_pe_edi_stock
+msgid "Electronic Delivery Note for Peru (OSE method) and UBL 2.1"
+msgstr ""
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__stock_picking__l10n_pe_edi_related_document_type__01
@@ -816,6 +863,16 @@ msgid "PE EDI Vehicle"
 msgstr "EDI vehículo PE"
 
 #. module: l10n_pe_edi_stock
+#: model:ir.model.fields,help:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_delivery_partner_id
+msgid "Partner the delivery guide is issued to."
+msgstr "Contacto al que se le emite la guía de remisión."
+
+#. module: l10n_pe_edi_stock
+#: model:ir.model.fields,help:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_delivery_address_id
+msgid "Partner whose address is used as the delivery destination."
+msgstr "Contacto cuya dirección se usa como destino de entrega."
+
+#. module: l10n_pe_edi_stock
 #: model:ir.model.fields,help:l10n_pe_edi_stock.field_res_company__l10n_pe_edi_stock_client_password
 #: model:ir.model.fields,help:l10n_pe_edi_stock.field_res_config_settings__l10n_pe_edi_stock_client_password
 msgid "Password assigned for the SUNAT delivery guide API."
@@ -824,13 +881,14 @@ msgstr "Contraseña asignada para la API de guía de remisión de SUNAT."
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__stock_picking__l10n_pe_edi_related_document_type__69
 msgid "Permiso / Autorización de operación de transporte de mercancías"
-msgstr ""
+msgstr "Permiso / Autorización para la operación de transporte de mercancías"
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__stock_picking__l10n_pe_edi_related_document_type__67
 msgid ""
 "Permiso de Operación Especial para el servicio de transporte de MATPEL - MTC"
 msgstr ""
+"Permiso de operación especial para el servicio de transporte de MATPEL - MTC"
 
 #. module: l10n_pe_edi_stock
 #: model:ir.ui.menu,name:l10n_pe_edi_stock.menu_stock_config_settings_pe
@@ -886,6 +944,11 @@ msgid ""
 "Peru: The tariff fraction of the product. This takes the form of the HS Code "
 "of the corresponding description."
 msgstr "El número de partida arancelaria correspondiente al producto."
+
+#. module: l10n_pe_edi_stock
+#: model:ir.module.module,shortdesc:base.module_l10n_pe_edi_stock
+msgid "Peruvian - Electronic Delivery Note"
+msgstr ""
 
 #. module: l10n_pe_edi_stock
 #. odoo-python
@@ -974,8 +1037,22 @@ msgstr "Token de autenticación temporal API SUNAT"
 #. module: l10n_pe_edi_stock
 #. odoo-python
 #: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
-msgid "SUNAT returned an error code. Details:"
+msgid ""
+"SUNAT rejected the delivery guide because it is missing data now required by "
+"SUNAT (error %(code)s). Please update the \"Peruvian - Electronic Delivery "
+"Note\" (l10n_pe_edi_stock) module to its latest version, then send the "
+"delivery guide again."
 msgstr ""
+"La SUNAT rechazó la guía de remisión porque le faltan datos que ahora exige "
+"la SUNAT (error %(code)s). Actualiza el módulo \"Perú - Guía de remisión "
+"electrónica\" (l10n_pe_edi_stock) a su versión más reciente y luego vuelve a "
+"enviar la guía de remisión."
+
+#. module: l10n_pe_edi_stock
+#. odoo-python
+#: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
+msgid "SUNAT returned an error code. Details:"
+msgstr "SUNAT devolvió un código de error. Detalles:"
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__stock_picking__l10n_pe_edi_reason_for_transfer__01
@@ -996,6 +1073,12 @@ msgstr "Venta con entrega a terceros"
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__product_template__l10n_pe_edi_tariff_fraction__1006300000
 msgid "Semi-milled or milled rice, including pearled or glazed"
 msgstr "Arroz semiblanqueado o blanqueado, incluso pulido o glaseado"
+
+#. module: l10n_pe_edi_stock
+#. odoo-python
+#: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
+msgid "Sender Electronic Delivery Guide"
+msgstr ""
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields.selection,name:l10n_pe_edi_stock.selection__stock_picking__l10n_pe_edi_status__sent
@@ -1024,7 +1107,7 @@ msgstr "Entidad Emisora de Autorización Especial"
 #. module: l10n_pe_edi_stock
 #: model:ir.model,name:l10n_pe_edi_stock.model_stock_picking
 msgid "Stock Picking - Delivery Guide (Uruguay)"
-msgstr ""
+msgstr "Recolección de inventario - Guía de remito (Uruguay)"
 
 #. module: l10n_pe_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_pe_edi_stock.res_config_settings_form_inherit_l10n_pe_edi
@@ -1057,22 +1140,15 @@ msgid ""
 "The ISO country code in two chars. \n"
 "You can use this field for quick search."
 msgstr ""
-"El código de País ISO a dos caracteres. \n"
-"Puedes usar este campo para búsqueda rápida."
+"El código ISO del país en dos caracteres.\n"
+"Puedes utilizar este campo para realizar una búsqueda rápida."
 
 #. module: l10n_pe_edi_stock
 #. odoo-python
 #: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
-msgid "The client must have a defined district."
-msgstr "Favor de incluir el Distrito en el contacto del cliente."
-
-#. module: l10n_pe_edi_stock
-#. odoo-python
-#: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
-msgid "The company's ID type must be set to RUC on the company contact page."
+msgid ""
+"The company's identification must be a RUC set on the company contact page."
 msgstr ""
-"El tipo de identificación de la empresa debe establecerse en RUC en la "
-"página de contacto de la empresa."
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields,help:l10n_pe_edi_stock.field_stock_picking__l10n_pe_edi_departure_start_date
@@ -1088,6 +1164,12 @@ msgid ""
 msgstr ""
 "SUNAT está procesando la guía de remisión. Haz clic en “Reintentar” para "
 "actualizar el estado."
+
+#. module: l10n_pe_edi_stock
+#. odoo-python
+#: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
+msgid "The destination address must have a defined district."
+msgstr "La dirección de destino debe tener un distrito definido."
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields,help:l10n_pe_edi_stock.field_l10n_pe_edi_vehicle__authorization_issuing_entity
@@ -1134,7 +1216,7 @@ msgstr "El tipo del documento relacionado."
 #. odoo-python
 #: code:addons/l10n_pe_edi_stock/models/stock_picking.py:0
 msgid "There was an error communicating with the SUNAT service. Details:"
-msgstr ""
+msgstr "Ocurrió un error al comunicarse con el servicio de la SUNAT. Detalles:"
 
 #. module: l10n_pe_edi_stock
 #: model:ir.model.fields,help:l10n_pe_edi_stock.field_res_partner__l10n_pe_edi_operator_license
@@ -1337,8 +1419,11 @@ msgstr "Minerales de circonio y sus concentrados"
 msgid "vehicles"
 msgstr "vehículos"
 
-#~ msgid "Delivery Guide Number"
-#~ msgstr "Número de guía de remisión"
+#~ msgid ""
+#~ "The company's ID type must be set to RUC on the company contact page."
+#~ msgstr ""
+#~ "El tipo de identificación de la empresa debe establecerse en RUC en la "
+#~ "página de contacto de la empresa."
 
-#~ msgid "Transfer"
-#~ msgstr "Albarán"
+#~ msgid "The client must have a defined district."
+#~ msgstr "Favor de incluir el Distrito en el contacto del cliente."

@@ -1,3 +1,4 @@
+import { render } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
 import { onMounted, onWillUnmount } from "@odoo/owl";
 
@@ -25,7 +26,7 @@ export class StudioNavbar extends EnterpriseNavBar {
             this._updateMenuAppsIcon();
         });
 
-        const onMenuButtonsUpdate = () => this.render();
+        const onMenuButtonsUpdate = () => render(this);
         menuButtonsRegistry.addEventListener("UPDATE", onMenuButtonsUpdate);
         onWillUnmount(() => menuButtonsRegistry.removeEventListener("UPDATE", onMenuButtonsUpdate));
     }
@@ -60,7 +61,7 @@ export class StudioNavbar extends EnterpriseNavBar {
     }
     _updateMenuAppsIcon() {
         super._updateMenuAppsIcon();
-        const menuAppsEl = this.menuAppsRef.el;
+        const menuAppsEl = this.menuApps();
         menuAppsEl.classList.toggle(
             "o_menu_toggle_studio_app_creator_back",
             this.studio.MODES.APP_CREATOR === this.studio.mode

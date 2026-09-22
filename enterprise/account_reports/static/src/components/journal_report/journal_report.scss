@@ -11,18 +11,20 @@
             > td.muted { color: $o-gray-300 }
         }
         &.subtable {
-            > td { border-bottom: none }
+            > td {
+                border-bottom: none;
+                padding: 0 !important;
+            }
             &:hover > * { --table-accent-bg: none }
         }
     }
 
     tr.subtable {
         .table {
-            table-layout: fixed;
             width: 100%;
             min-width: auto;
             max-width: 480px;
-            margin-top: 24px;
+            margin: 0 24px;
             padding: 0;
             border: 1px solid $o-gray-300;
             border-radius: 0.25rem;
@@ -34,6 +36,12 @@
                 .btn_action { opacity: 1 }
             }
             :not(caption) > *:not(.btn_action) > *:not(.btn_action) { padding: 0.5rem 0.3rem }
+            td.name {
+                text-wrap: nowrap;
+                max-width: 250px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
         }
     }
 }

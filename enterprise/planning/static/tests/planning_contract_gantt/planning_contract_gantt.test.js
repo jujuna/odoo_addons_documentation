@@ -28,8 +28,8 @@ beforeEach(async () => {
 
     env["planning.slot"].create({
         name: "Shift-1",
-        state: "published",
-        resource_id: resourceId,
+        state: "2_published",
+        resource_ids: [resourceId],
         start_datetime: "2024-03-27 02:30:00",
         end_datetime: "2024-03-27 11:30:00",
     });
@@ -50,7 +50,7 @@ beforeEach(async () => {
 const ganttViewParams = {
     resModel: "planning.slot",
     type: "gantt",
-    arch: `<gantt js_class="planning_gantt" date_start="start_datetime" date_stop="end_datetime" default_group_by="resource_id"
+    arch: `<gantt js_class="planning_gantt" date_start="start_datetime" date_stop="end_datetime" default_group_by="resource_ids"
                 default_scale="week" display_unavailability="1" total_row="True">
            </gantt>`,
     context: {
@@ -59,41 +59,10 @@ const ganttViewParams = {
     },
 };
 
-onRpc("gantt_resource_work_interval", () => [
-    {
-        [resourceId]: [
-            ["2024-03-25 09:00:00", "2024-03-25 18:00:00"],
-            ["2024-03-25 09:00:00", "2024-03-25 18:00:00"],
-            ["2024-03-26 09:00:00", "2024-03-26 18:00:00"],
-            ["2024-03-26 09:00:00", "2024-03-26 18:00:00"],
-            ["2024-03-27 09:00:00", "2024-03-27 18:00:00"],
-            ["2024-03-27 09:00:00", "2024-03-27 18:00:00"],
-            ["2024-03-28 09:00:00", "2024-03-28 18:00:00"],
-            ["2024-03-28 09:00:00", "2024-03-28 18:00:00"],
-            ["2024-03-29 09:00:00", "2024-03-29 18:00:00"],
-            ["2024-03-29 09:00:00", "2024-03-29 18:00:00"],
-        ],
-        false: [
-            ["2024-03-25 09:00:00", "2024-03-25 18:00:00"],
-            ["2024-03-25 09:00:00", "2024-03-25 18:00:00"],
-            ["2024-03-26 09:00:00", "2024-03-26 18:00:00"],
-            ["2024-03-26 09:00:00", "2024-03-26 18:00:00"],
-            ["2024-03-27 09:00:00", "2024-03-27 18:00:00"],
-            ["2024-03-27 09:00:00", "2024-03-27 18:00:00"],
-            ["2024-03-28 09:00:00", "2024-03-28 18:00:00"],
-            ["2024-03-28 09:00:00", "2024-03-28 18:00:00"],
-            ["2024-03-29 09:00:00", "2024-03-29 18:00:00"],
-            ["2024-03-29 09:00:00", "2024-03-29 18:00:00"],
-        ],
-    },
-    { false: 0, [resourceId]: 0 },
-    { false: 0, [resourceId]: 9 },
-]);
-
 onRpc("get_gantt_data", function getGanttData({ parent, kwargs }) {
     const result = parent();
     result.unavailabilities = {
-        resource_id: {
+        resource_ids: {
             [resourceId]: [
                 { start: "2024-03-23 18:00:00", stop: "2024-03-25 09:00:00" },
                 { start: "2024-03-28 18:00:00", stop: "2024-04-01 09:00:00" },
@@ -104,8 +73,25 @@ onRpc("get_gantt_data", function getGanttData({ parent, kwargs }) {
             ],
         },
     };
-    if (kwargs.groupby.includes("resource_id")) {
-        result.working_periods = this.env["planning.slot"]._gantt_resource_employees_working_periods(result.groups, kwargs.start_date, kwargs.stop_date)
+    if (kwargs.groupby.includes("resource_ids")) {
+        const resourceIds = new Set();
+        for (const group of result.groups) {
+            const resId = group.resource_ids ? group.resource_ids[0] : false;
+            if (resId) {
+                resourceIds.add(resId)
+            }
+        }
+
+        const employeeIds = new Set();
+        for (const resource of this.env["resource.resource"].browse([...resourceIds])) {
+            if (!resource.employee_id) {
+                continue
+            }
+            const employee_id = resource.employee_id[0]
+            employeeIds.add(employee_id)
+        }
+        let working_periods = this.env["hr.employee"]._get_working_periods_by_field(employeeIds, kwargs.start_date, kwargs.stop_date, "resource_id");
+        result.working_periods = working_periods;
     }
     return result;
 });

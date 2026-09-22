@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from datetime import timedelta
 import logging
 import requests
 
 from odoo import api, fields, models
+from odoo.tools.misc import format_date, format_time, _format_time_ago
 
 _logger = logging.getLogger(__name__)
 
@@ -18,12 +19,14 @@ class SocialLivePost(models.Model):
 
     _name = 'social.live.post'
     _description = 'Social Live Post'
+    _order = 'scheduled_date ASC NULLS FIRST, id ASC'
 
     post_id = fields.Many2one('social.post', string="Social Post", required=True, index=True, readonly=True, ondelete="cascade")
-    account_id = fields.Many2one('social.account', string="Social Account", required=True, readonly=True, ondelete="cascade")
+    account_id = fields.Many2one('social.account', string="Social Account", required=True, index=True, readonly=True, ondelete="cascade")
+    account_link = fields.Char("Account Link", related="account_id.user_link")
     message = fields.Char('Message', compute='_compute_message',
         help="Content of the social post message that is post-processed (links are shortened, UTMs, ...)")
-    image_ids = fields.Many2many('ir.attachment', string='Attached Images', compute='_compute_image_ids')
+    image_ids = fields.Many2many('social.post.image', string='Attached Images', compute='_compute_image_ids')
     live_post_link = fields.Char('Post Link', compute='_compute_live_post_link',
         help="Link of the live post on the target media.")
     failure_reason = fields.Text('Failure Reason', readonly=True,
@@ -32,16 +35,29 @@ class SocialLivePost(models.Model):
         ('ready', 'Ready'),
         ('posting', 'Posting'),
         ('posted', 'Posted'),
-        ('failed', 'Failed')],
+        ('failed', 'Failed'),
+        ('cancel', 'Cancelled')],
         string='Status', default='ready', required=True, readonly=True,
         help="""Most social.live.posts directly go from Ready to Posted/Failed since they result of a single call to the third party API.
-        A 'Posting' state is also available for those that are sent through batching (like push notifications).""")
-    engagement = fields.Integer("Engagement", help="Number of people engagements with the post (Likes, comments...)")
+        A 'Posting' state is also available for those that are sent through batching (like push notifications) or scheduled.""")
+    likes_count = fields.Integer("Likes")
+    comments_count = fields.Integer("Comments")
+    shares_count = fields.Integer("Shares")
+    has_likes = fields.Boolean(compute='_compute_has_metrics')
+    has_comments = fields.Boolean(compute='_compute_has_metrics')
+    has_shares = fields.Boolean(compute='_compute_has_metrics')
     company_id = fields.Many2one('res.company', 'Company', related='account_id.company_id')
-    media_type = fields.Selection(string='Media', related='account_id.media_type')
+    media_id = fields.Many2one(string='Media', related='account_id.media_id')
+    media_type = fields.Selection(string='Media Type', related='account_id.media_type')
+    scheduled_date = fields.Datetime('Scheduled Date', compute='_compute_scheduled_date', store=True)
+    formatted_published_date = fields.Char('Formatted Published Date', compute='_compute_formatted_published_date')
+
+    @api.depends('media_type')
+    def _compute_has_metrics(self):
+        self.has_likes = self.has_comments = self.has_shares = False
 
     @api.depends(lambda self:
-        ['post_id.utm_campaign_id', 'account_id.media_type', 'account_id.utm_medium_id', 'post_id.source_id']
+        ['post_id.utm_campaign_id', 'account_id.media_type']
         + [f'post_id.{field}' for field in self.env['social.post']._get_post_message_modifying_fields()]
         + [f'post_id.{field}' for field in self.env['social.post']._message_fields().values()])
     def _compute_message(self):
@@ -82,6 +98,24 @@ class SocialLivePost(models.Model):
         for live_post in self:
             live_post.display_name = f'{live_post.account_id.display_name}: {state_description_values.get(live_post.state)}'
 
+    @api.depends(lambda self: ['post_id.scheduled_date', 'post_id.published_date', *(f'post_id.{f}' for f in self.env['social.post']._scheduled_date_fields().values())])
+    def _compute_scheduled_date(self):
+        dates_fields = self.env['social.post']._scheduled_date_fields()
+        for live_post in self:
+            live_post.scheduled_date = live_post.post_id[dates_fields[live_post.media_type]]
+
+    @api.depends('scheduled_date', 'post_id.published_date')
+    def _compute_formatted_published_date(self):
+        for live_post in self:
+            # date shown in the kanban card
+            date = live_post.scheduled_date or live_post.post_id.published_date
+            if not date:
+                live_post.formatted_published_date = False
+            elif timedelta() < (delta := fields.Datetime.now() - date) < timedelta(hours=12):
+                live_post.formatted_published_date = _format_time_ago(self.env, delta, add_direction=True)
+            else:
+                live_post.formatted_published_date = f"{format_date(self.env, date, date_format='medium')} ({format_time(self.env, date, time_format='short')})"
+
     @api.model_create_multi
     def create(self, vals_list):
         res = super(SocialLivePost, self).create(vals_list)
@@ -96,6 +130,9 @@ class SocialLivePost(models.Model):
 
     def action_retry_post(self):
         self._post()
+
+    def action_cancel(self):
+        self.state = 'cancel'
 
     @api.model
     def refresh_statistics(self):
@@ -128,11 +165,11 @@ class SocialLivePost(models.Model):
     def _get_utm_values(self):
         self.ensure_one()
 
-        post_id = self.post_id
         return {
-            'campaign_id': post_id.utm_campaign_id.id,
-            'medium_id': self.account_id.utm_medium_id.id,
-            'source_id': post_id.source_id.id,
+            'campaign_id': self.post_id.utm_campaign_id.id,
+            'medium_id': self.env['utm.mixin']._utm_ref("utm.utm_medium_social_media").id,
+            'source_id': self.account_id.media_id._get_utm_source().id,
+            'utm_reference': f'{self.post_id._name},{self.post_id.id}',
         }
 
     def _filter_by_media_types(self, media_types):

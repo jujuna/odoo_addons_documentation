@@ -1,46 +1,39 @@
+import { Editor } from "@html_editor/editor";
+import { LocalOverlayContainer } from "@html_editor/local_overlay_container";
+import { closestElement } from "@html_editor/utils/dom_traversal";
 import {
     Component,
+    computed,
     onWillStart,
-    onMounted,
-    onWillDestroy,
     onWillUnmount,
-    reactive,
-    useState,
+    proxy,
+    signal,
+    t,
+    useEffect,
+    usePlugin,
+    useProps,
+    useScope,
 } from "@odoo/owl";
-import { _t } from "@web/core/l10n/translation";
-import { omit } from "@web/core/utils/objects";
-import { useOwnedDialogs, useService } from "@web/core/utils/hooks";
-
-import { Many2ManyTagsField } from "@web/views/fields/many2many_tags/many2many_tags_field";
-import { CharField } from "@web/views/fields/char/char_field";
-import { Record as _Record } from "@web/model/record";
-import { Many2OneField } from "@web/views/fields/many2one/many2one_field";
-import { BooleanField } from "@web/views/fields/boolean/boolean_field";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-
-import { ReportEditorSnackbar } from "@web_studio/client_action/report_editor/report_editor_snackbar";
-import { useEditorMenuItem } from "@web_studio/client_action/editor/edition_flow";
-import { memoizeOnce } from "@web_studio/client_action/utils";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
+import { DomainSelectorDialog } from "@web/core/domain_selector_dialog/domain_selector_dialog";
+import { _t } from "@web/core/l10n/translation";
+import { uniqueId } from "@web/core/utils/functions";
+import { useBus, useOwnedDialogs, useService } from "@web/core/utils/hooks";
+import { Record as _Record } from "@web/model/record";
+import { CharField } from "@web/views/fields/char/char_field";
+import { Many2ManyTagsField } from "@web/views/fields/many2many_tags/many2many_tags_field";
+import { Many2OneField } from "@web/views/fields/many2one/many2one_field";
+import { OptionsContainer, UndoRedo } from "../report_editor_components";
 import { ReportEditorIframe } from "../report_editor_iframe";
-import { Editor } from "@html_editor/editor";
-import { closestElement } from "@html_editor/utils/dom_traversal";
-import { ReportRecordNavigation } from "../report_editor_xml/report_record_navigation";
-import { CheckBox } from "@web/core/checkbox/checkbox";
-import { getReportEditorPlugins } from "./editor_plugins/report_editor_plugin";
+import { ReportEditorSidebarPlugin } from "../report_editor_sidebar";
+import { REPORT_EDITOR_PLUGINS } from "./editor_plugins/report_editor_plugin";
 
 class __Record extends _Record.components._Record {
     setup() {
         super.setup();
-        const willSaveUrgently = () => this.model.bus.trigger("WILL_SAVE_URGENTLY");
-        onMounted(() => {
-            this.env.reportEditorModel.bus.addEventListener("WILL_SAVE_URGENTLY", willSaveUrgently);
-        });
-
-        onWillDestroy(() =>
-            this.env.reportEditorModel.bus.removeEventListener(
-                "WILL_SAVE_URGENTLY",
-                willSaveUrgently
-            )
+        useBus(this.env.reportEditorModel.bus, "WILL_SAVE_URGENTLY", () =>
+            this.model.bus.trigger("WILL_SAVE_URGENTLY")
         );
     }
 }
@@ -49,45 +42,80 @@ class Record extends _Record {
     static components = { ..._Record.components, _Record: __Record };
 }
 
-class UndoRedo extends Component {
-    static template = "web_studio.ReportEditorWysiwyg.UndoRedo";
-    static props = {
-        state: Object,
-        className: { type: String, optional: true },
-    };
-}
-
-class ResetConfirmationPopup extends ConfirmationDialog {
-    static template = "web_studio.ReportEditorWysiwyg.ResetConfirmationPopup";
-    static props = {
-        ...omit(ConfirmationDialog.props, "body"),
-        state: Object,
-    };
-}
-
-export class ReportEditorWysiwyg extends Component {
+export class ReportEditorWysiwygSidebar extends Component {
+    static template = "web_studio.ReportEditorWysiwyg.Sidebar";
     static components = {
-        CharField,
         Record,
-        Many2ManyTagsField,
+        OptionsContainer,
+        CharField,
         Many2OneField,
-        BooleanField,
-        UndoRedo,
-        ReportEditorIframe,
-        ReportRecordNavigation,
-        CheckBox,
+        Many2ManyTagsField,
     };
-    static props = {
-        paperFormatStyle: String,
-    };
-    static template = "web_studio.ReportEditorWysiwyg";
+
+    sidebarPlugin = usePlugin(ReportEditorSidebarPlugin);
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
         this.action = useService("action");
         this.addDialog = useOwnedDialogs();
-        this.notification = useService("notification");
+        this.reportEditorModel = proxy(this.env.reportEditorModel);
+        this.reportRecordHooks = {
+            onRecordChanged: (rec) => (this.reportEditorModel.reportData = rec.data),
+        };
+    }
 
-        this._getReportQweb = memoizeOnce(() => {
+    get reportRecordProps() {
+        const model = this.reportEditorModel;
+        return {
+            fields: model.reportFields,
+            activeFields: model.reportActiveFields,
+            values: model.reportData,
+        };
+    }
+
+    async openReportFormView() {
+        await this.sidebarPlugin._saveFn?.();
+        return this.action.doAction(
+            {
+                type: "ir.actions.act_window",
+                res_model: "ir.actions.report",
+                res_id: this.reportEditorModel.editedReportId,
+                views: [[false, "form"]],
+                target: "current",
+            },
+            { clearBreadcrumbs: true }
+        );
+    }
+
+    openPrintDomainEditor(record) {
+        this.addDialog(DomainSelectorDialog, {
+            resModel: this.reportEditorModel.reportResModel,
+            domain: record.data.domain || "[]",
+            isDebugMode: this.debugMode.isActive(),
+            onConfirm: (domain) => record.update({ domain }),
+        });
+    }
+}
+
+export class ReportEditorWysiwyg extends Component {
+    static components = {
+        ReportEditorIframe,
+        LocalOverlayContainer,
+    };
+    static template = "web_studio.ReportEditorWysiwyg";
+
+    props = useProps({ paperFormatStyle: t.string() });
+    debugMode = usePlugin(DebugModePlugin);
+    sidebarPlugin = usePlugin(ReportEditorSidebarPlugin);
+    scope = useScope();
+
+    setup() {
+        this.overlayRef = signal.ref();
+        this.localOverlayContainerKey = uniqueId("report_editor");
+
+        this._reportQweb = computed(() => {
+            const model = this.reportEditorModel;
+            void model.renderKey;
             const tree = new DOMParser().parseFromString(
                 this.reportEditorModel.reportQweb,
                 "text/html"
@@ -97,28 +125,24 @@ export class ReportEditorWysiwyg extends Component {
             return htmlNode;
         });
 
-        const reportEditorModel = (this.reportEditorModel = useState(this.env.reportEditorModel));
+        this._iframeSource = computed(() => this._reportQweb().outerHTML);
+        this.reportEditorModel = proxy(this.env.reportEditorModel);
+
+        useEffect(() => {
+            this._iframeSource();
+            if (this.editor) {
+                this.editor.destroy();
+                this.editor = null;
+            }
+        });
+
         this.reportRecordHooks = {
             onRecordChanged: (rec) => (this.reportEditorModel.reportData = rec.data),
         };
 
-        useEditorMenuItem({
-            component: ReportEditorSnackbar,
-            props: {
-                state: reportEditorModel,
-                onSave: this.save.bind(this),
-                onDiscard: this.discard.bind(this),
-            },
-        });
-
-        // This little reactive is to be bound to the editor, so we create it here.
-        // This could have been a useState, but the current component doesn't use it.
-        // Instead, it passes it to a child of his,
-        this.undoRedoState = reactive({
+        this.undoRedoState = proxy({
             canUndo: false,
             canRedo: false,
-            undo: () => this.editor?.shared.history.undo(),
-            redo: () => this.editor?.shared.history.redo(),
         });
 
         onWillStart(() => this.reportEditorModel.loadReportQweb());
@@ -130,26 +154,35 @@ export class ReportEditorWysiwyg extends Component {
                 this.editor.destroy(true);
             }
         });
+
+        this.sidebarPlugin.useSave({
+            isDirty: computed(() => this.reportEditorModel.isDirty),
+            save: () => this.save(),
+            discard: () => this.discard(),
+        });
+        this.sidebarPlugin.addComponent(UndoRedo, "start", {
+            canUndo: computed(() => this.undoRedoState.canUndo),
+            canRedo: computed(() => this.undoRedoState.canRedo),
+            undo: () => this.editor?.shared.history.undo(),
+            redo: () => this.editor?.shared.history.redo(),
+        });
+        this.scope = useScope();
     }
 
     instantiateEditor({ editable } = {}) {
-        this.undoRedoState.canUndo = false;
-        this.undoRedoState.canRedo = false;
         const onEditorChange = () => {
-            const canUndo = this.editor.shared.history.canUndo();
-            this.reportEditorModel.isDirty = canUndo;
-            Object.assign(this.undoRedoState, {
-                canUndo: canUndo,
-                canRedo: this.editor.shared.history.canRedo(),
-            });
+            this.undoRedoState.canUndo = this.editor.shared.history.canUndo();
+            this.undoRedoState.canRedo = this.editor.shared.history.canRedo();
+            this.reportEditorModel.isDirty = this.undoRedoState.canUndo;
         };
 
         editable.querySelectorAll("[ws-view-id]").forEach((el) => {
             el.setAttribute("contenteditable", "true");
         });
         const editor = new Editor(
+            this.scope,
             {
-                Plugins: getReportEditorPlugins(),
+                Plugins: REPORT_EDITOR_PLUGINS,
                 onChange: onEditorChange,
                 getRecordInfo: () => {
                     const { anchorNode } = this.editor.shared.selection.getEditableSelection();
@@ -166,10 +199,18 @@ export class ReportEditorWysiwyg extends Component {
                         field: "arch",
                     };
                 },
-                reportResModel: this.reportEditorModel.reportResModel,
+                dynamicResModel: this.reportEditorModel.reportResModel,
                 allowVideo: false,
                 allowImageTransform: false,
                 allowImageResize: false,
+                localOverlayContainers: {
+                    key: this.localOverlayContainerKey,
+                    ref: this.overlayRef,
+                },
+                setEditingReport: (name, shared) => {
+                    this.reportEditorModel.sharedReport.set(shared ? name : null);
+                },
+                cleanEmptyStructuralContainers: false,
             },
             this.env.services
         );
@@ -185,11 +226,21 @@ export class ReportEditorWysiwyg extends Component {
             this.editor.destroy(true);
             this.editor = null;
         }
+        this.scope.run(() => {
+            useEffect(() => {
+                if (!iframeRef()) {
+                    if (this.editor) {
+                        this.editor.destroy(true);
+                        this.editor = null;
+                    }
+                }
+            });
+        });
         this.iframeRef = iframeRef;
-        const doc = iframeRef.el.contentDocument;
+        const doc = iframeRef().contentDocument;
         doc.body.classList.remove("container");
 
-        if (odoo.debug) {
+        if (this.debugMode.isActive()) {
             ["t-esc", "t-out", "t-field"].forEach((tAtt) => {
                 doc.querySelectorAll(`*[${tAtt}]`).forEach((e) => {
                     // Save the previous title to set it back before saving the report
@@ -200,24 +251,13 @@ export class ReportEditorWysiwyg extends Component {
                 });
             });
         }
-        if (!this.reportEditorModel._errorMessage && !this.reportEditorModel.inPreview) {
+        if (!this.reportEditorModel._errorMessage && this.reportEditorModel.mode === "wysiwyg") {
             this.editor = this.instantiateEditor({ editable: doc.querySelector("#wrapwrap") });
         }
-        this.reportEditorModel.setInEdition(false);
     }
 
-    get reportQweb() {
-        const model = this.reportEditorModel;
-        return this._getReportQweb(`${model.renderKey}_${model.reportQweb}`).outerHTML;
-    }
-
-    get reportRecordProps() {
-        const model = this.reportEditorModel;
-        return {
-            fields: model.reportFields,
-            activeFields: model.reportActiveFields,
-            values: model.reportData,
-        };
+    get iframeSource() {
+        return this._iframeSource();
     }
 
     async save({ urgent = false } = {}) {
@@ -229,7 +269,7 @@ export class ReportEditorWysiwyg extends Component {
         const editable = this.editor.getElContent();
 
         // Clean technical title
-        if (odoo.debug) {
+        if (this.debugMode.isActive()) {
             editable.querySelectorAll("*[t-field],*[t-out],*[t-esc]").forEach((e) => {
                 if (e.hasAttribute("data-oe-title")) {
                     e.setAttribute("title", e.getAttribute("data-oe-title"));
@@ -289,54 +329,5 @@ export class ReportEditorWysiwyg extends Component {
             confirm: () => this.reportEditorModel.discardReport(),
             cancel: () => {},
         });
-    }
-
-    async resetReport() {
-        const state = reactive({ includeHeaderFooter: true });
-        this.addDialog(ResetConfirmationPopup, {
-            title: _t("Reset report"),
-            confirmLabel: _t("Reset report"),
-            confirmClass: "btn-danger",
-            cancelLabel: _t("Go back"),
-            state,
-            cancel: () => {},
-            confirm: async () => {
-                await this.reportEditorModel.saveReport();
-                try {
-                    await this.reportEditorModel.resetReport(state.includeHeaderFooter);
-                } finally {
-                    this.reportEditorModel.renderKey++;
-                }
-            },
-        });
-    }
-
-    async openReportFormView() {
-        await this.save();
-        return this.action.doAction(
-            {
-                type: "ir.actions.act_window",
-                res_model: "ir.actions.report",
-                res_id: this.reportEditorModel.editedReportId,
-                views: [[false, "form"]],
-                target: "current",
-            },
-            { clearBreadcrumbs: true }
-        );
-    }
-
-    async editSources() {
-        await this.save();
-        this.reportEditorModel.mode = "xml";
-    }
-
-    async togglePreview(toValue) {
-        if (toValue) {
-            const saved = await this.save();
-            if (!saved) {
-                await this.reportEditorModel.loadReportHtml();
-            }
-        }
-        this.reportEditorModel.inPreview = toValue;
     }
 }

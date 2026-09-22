@@ -15,7 +15,7 @@ class MockAPIBarcodelookup(common.BaseCase):
                         "category": "Test Category > Business & Industrial",
                         "manufacturer": "Odoo S.a",
                         "brand": "Odoo",
-                        "color": "Purple",
+                        "color": "Invisible",
                         "gender": "Test Gender",
                         "material": "cotton",
                         "size": "9.75 × 8.25 in",
@@ -46,7 +46,7 @@ class MockAPIBarcodelookup(common.BaseCase):
             return mock_product_data
 
         try:
-            with patch.object(ProductTemplate, 'barcode_lookup', side_effect=barcode_lookup):
-                yield
+            with patch.object(ProductTemplate, 'barcode_lookup', side_effect=barcode_lookup) as mock_barcode_lookup:
+                yield mock_barcode_lookup
         finally:
             pass

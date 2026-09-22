@@ -2,12 +2,12 @@
 
 {
     'name': "AI Text Draft - Accounting",
-    'version': '1.0',
     'category': 'Hidden',
     'summary': "AI text draft integration with accounting",
     'depends': ['ai', 'account'],
     'data': [
         'wizard/account_move_send_wizard.xml',
+        'data/ai_prompt_button_data.xml',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',

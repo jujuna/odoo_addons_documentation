@@ -9,14 +9,15 @@
 # karolína schusterová <karolina.schusterova@vdp.sk>, 2022
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:23+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Czech <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 01:32+0000\n"
+"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-master/"
 "account_inter_company_rules/cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -24,18 +25,13 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
 "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: account_inter_company_rules
 #. odoo-python
 #: code:addons/account_inter_company_rules/models/account_move.py:0
 msgid "%(company)s Invoice: %(entry)s"
 msgstr "%(company)s Faktura: %(entry)s"
-
-#. module: account_inter_company_rules
-#: model:ir.model,name:account_inter_company_rules.model_account_move_send
-msgid "Account Move Send"
-msgstr "Odesílání účetního záznamu"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_bank_statement_line__auto_generated
@@ -57,8 +53,8 @@ msgstr "Automatizace"
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_res_company
-msgid "Companies"
-msgstr "Společnosti"
+msgid "Company"
+msgstr "Společnost"
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_res_config_settings
@@ -71,8 +67,7 @@ msgid "Create Vendor Bills"
 msgstr "Vytvořte dodavatelské faktury"
 
 #. module: account_inter_company_rules
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_user_id
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_user_id
+#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
 msgid "Create as"
 msgstr "Vytvořit jako"
 
@@ -93,9 +88,8 @@ msgstr "Návrh"
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_generate_bills_refund
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_generate_bills_refund
-#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.view_company_inter_change_inherit_form
 msgid "Generate Bills and Refunds"
-msgstr ""
+msgstr "Generování faktur a refundací"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_move__id
@@ -107,9 +101,23 @@ msgid "ID"
 msgstr "ID"
 
 #. module: account_inter_company_rules
-#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.view_company_inter_change_inherit_form
-msgid "Inter-Company Transactions"
-msgstr "Mezipodnikové transakce"
+#: model:ir.model.fields,help:account_inter_company_rules.field_res_company__intercompany_generate_bills_refund
+#: model:ir.model.fields,help:account_inter_company_rules.field_res_config_settings__intercompany_generate_bills_refund
+#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
+msgid ""
+"If another company confirms an invoice with this company, a bill will be "
+"created in the chosen Purchase journal."
+msgstr ""
+
+#. module: account_inter_company_rules
+#: model:ir.module.module,shortdesc:base.module_account_inter_company_rules
+msgid "Inter Company Module for Sale/Purchase Orders and Invoices"
+msgstr ""
+
+#. module: account_inter_company_rules
+#: model:ir.module.module,summary:base.module_account_inter_company_rules
+msgid "Intercompany SO/PO/INV rules"
+msgstr ""
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_account_move
@@ -122,18 +130,26 @@ msgid "Journal Item"
 msgstr "Účetní položka"
 
 #. module: account_inter_company_rules
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_purchase_journal_id
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_purchase_journal_id
-msgid "Purchase Journal"
+#: model:ir.module.module,description:base.module_account_inter_company_rules
+msgid ""
+"Module for synchronization of Documents between several companies. For "
+"example, this allow you to have a Sales Order created automatically when a "
+"Purchase Order is validated with another company of the system as vendor, "
+"and inversely.\n"
+"\n"
+"   Supported documents are invoices/credit notes.\n"
 msgstr ""
 
 #. module: account_inter_company_rules
-#: model:ir.model.fields,help:account_inter_company_rules.field_res_company__intercompany_user_id
-#: model:ir.model.fields,help:account_inter_company_rules.field_res_config_settings__intercompany_user_id
-msgid ""
-"Responsible user for creation of documents triggered by intercompany rules."
-msgstr ""
-"Odpovědný uživatel pro vytváření dokumentů spouštěných interními předpisy."
+#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_purchase_journal_id
+#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_purchase_journal_id
+msgid "Purchase Journal"
+msgstr "Nákupní deník"
+
+#. module: account_inter_company_rules
+#: model:ir.model,name:account_inter_company_rules.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr "Společné funkce průvodce odesláním faktur"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_bank_statement_line__auto_invoice_id
@@ -148,28 +164,14 @@ msgstr "Potvrzeno"
 
 #. module: account_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
-msgid "as"
+msgid "in Journal"
 msgstr ""
 
-#~ msgid "%s Invoice: %s"
-#~ msgstr "%s Faktura: %s"
+#~ msgid "Inter-Company Transactions"
+#~ msgstr "Mezipodnikové transakce"
 
-#~ msgid "Do not synchronize"
-#~ msgstr "Nesynchronizovat"
-
-#~ msgid "Intercompany Transaction Message"
-#~ msgstr "Mezipodniková transakční zpráva"
-
-#~ msgid "Rule"
-#~ msgstr "Pravidlo"
-
-#~ msgid "Select Company"
-#~ msgstr "Vyberte společnost"
-
-#~ msgid "Select the type to setup inter company rules in selected company."
+#~ msgid ""
+#~ "Responsible user for creation of documents triggered by intercompany "
+#~ "rules."
 #~ msgstr ""
-#~ "Vyberte typ pro nastavení pravidel mezi společnostmi ve vybrané "
-#~ "společnosti."
-
-#~ msgid "Synchronize invoices/bills"
-#~ msgstr "Synchronizace faktur / přijatých faktur"
+#~ "Odpovědný uživatel pro vytváření dokumentů spouštěných interními předpisy."

@@ -17,25 +17,21 @@
                         </div>
                     </div>
                 </setting>
-                <setting groups="account.group_account_manager" help="The invoices before this date will not be taken into account as accounting entries">
+                <setting groups="account.group_account_manager" help="All entries created by Invoicing before that date will be ignored in Accounting.">
                     <field name="invoicing_switch_threshold"/>
                 </setting>
                 <setting help="Define fiscal years of more or less than one year">
                     <field name="group_fiscal_year"/>
                     <div class="mt16">
-                        <button name="%(account_accountant.actions_account_fiscal_year)d" icon="oi-arrow-right"
+                        <button name="%(account_accountant.actions_account_fiscal_year)d" icon="east"
                                 type="action" string="Fiscal Years" class="btn-link"
                                 invisible="not group_fiscal_year"/>
                     </div>
                 </setting>
             </setting>
-            <setting id="dynamic_report" position="attributes">
-                <attribute name="invisible">0</attribute>
-            </setting>
             <block id="bank_cash" position="inside">
-                <!-- Set as invisible because the module changed its name to account_transfer but module_account_auto_transfer was not updated (to fix in master) -->
-                <setting groups="account.group_account_manager" help="Enable Auto Transfers " invisible="1">
-                    <field name="module_account_auto_transfer" widget="upgrade_boolean"/>
+                <setting groups="account.group_account_manager" help="Enable Auto Transfers ">
+                    <field name="module_account_transfer" widget="upgrade_boolean"/>
                 </setting>
             </block>
             <block id="invoicing_settings" position="inside">
@@ -45,11 +41,6 @@
                     <field name="signing_user" invisible="not sign_invoice"/>
                 </setting>
             </block>
-            <xpath expr="//block[@id='account_vendor_bills']" position="inside">
-                <setting string="Predict vendor bill product" help="The system will try to predict the product on vendor bill lines based on the label of the line">
-                    <field name="predict_bill_product"/>
-                </setting>
-            </xpath>
 
             <setting id="post_bank_transactions_and_payments_setting" position="after">
                 <setting string="Deferred expense entries:"
@@ -61,15 +52,19 @@
                             <field name="deferred_expense_journal_id" domain="[('type', '=', 'general'), ('active', '=', True)]"/>
                         </div>
                         <div class="row mt8">
-                            <label for="deferred_expense_account_id" class="col-lg-5 o_light_label" string="Deferred expense"/>
-                            <field name="deferred_expense_account_id" domain="[('account_type', '=', 'asset_current')]"/>
+                            <label for="deferred_expense_account_id" class="col-lg-5 o_light_label" string="Account"/>
+                            <field name="deferred_expense_account_id" domain="[('account_type', 'in', ('asset_current', 'asset_prepayments'))]" decoration-muted="not deferred_expense_account_active"/>
                         </div>
                         <div class="row mt8">
                             <label for="generate_deferred_expense_entries_method" class="col-lg-5 o_light_label" string="Generate Entries"/>
                             <field name="generate_deferred_expense_entries_method"/>
                         </div>
+                        <div class="row mt8" invisible="generate_deferred_expense_entries_method != 'on_validation'">
+                            <label for="deferred_expense_periodicity" class="col-lg-5 o_light_label" string="Periodicity"/>
+                            <field name="deferred_expense_periodicity"/>
+                        </div>
                         <div class="row mt8">
-                            <label for="deferred_expense_amount_computation_method" class="col-lg-5 o_light_label" string="Based on"/>
+                            <label for="deferred_expense_amount_computation_method" class="col-lg-5 o_light_label" string="Computation"/>
                             <field name="deferred_expense_amount_computation_method"/>
                         </div>
                     </div>
@@ -83,21 +78,53 @@
                             <field name="deferred_revenue_journal_id" domain="[('type', '=', 'general'), ('active', '=', True)]"/>
                         </div>
                         <div class="row mt8">
-                            <label for="deferred_revenue_account_id" class="col-lg-5 o_light_label" string="Deferred revenue"/>
-                            <field name="deferred_revenue_account_id" domain="[('account_type', '=', 'liability_current')]"/>
+                            <label for="deferred_revenue_account_id" class="col-lg-5 o_light_label" string="Account"/>
+                            <field name="deferred_revenue_account_id" domain="[('account_type', '=', 'liability_current')]" decoration-muted="not deferred_revenue_account_active"/>
                         </div>
                         <div class="row mt8">
                             <label for="generate_deferred_revenue_entries_method" class="col-lg-5 o_light_label" string="Generate Entries"/>
                             <field name="generate_deferred_revenue_entries_method"/>
                         </div>
+                        <div class="row mt8" invisible="generate_deferred_revenue_entries_method != 'on_validation'">
+                            <label for="deferred_revenue_periodicity" class="col-lg-5 o_light_label" string="Periodicity"/>
+                            <field name="deferred_revenue_periodicity"/>
+                        </div>
                         <div class="row mt8">
-                            <label for="deferred_revenue_amount_computation_method" class="col-lg-5 o_light_label" string="Based on"/>
+                            <label for="deferred_revenue_amount_computation_method" class="col-lg-5 o_light_label" string="Computation"/>
                             <field name="deferred_revenue_amount_computation_method"/>
                         </div>
                     </div>
                 </setting>
             </setting>
 
+            <xpath expr="//block[@id='default_accounts']" position="after">
+                <block title="Inventory Valuation" id="account_inventory_valuation">
+                    <setting id="account_stock_valuation_accounts" string="Inventory Accounting" company_dependent="1">
+                        <div class="content-group">
+                            <div class="row mt8">
+                                <label for="valuation_method" class="col-lg-5 o_light_label"/>
+                                <field name="valuation_method"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="cost_method" class="col-lg-5 o_light_label"/>
+                                <field name="cost_method"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="inventory_period" string="Periodic Valuation" class="col-lg-5 o_light_label"/>
+                                <field name="inventory_period"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="stock_valuation_account_id" class="col-lg-5 o_light_label"/>
+                                <field name="stock_valuation_account_id" decoration-muted="not stock_valuation_account_active"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="stock_journal_id" string="Journal" class="col-lg-5 o_light_label"/>
+                                <field name="stock_journal_id"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
         </field>
     </record>
 </odoo>

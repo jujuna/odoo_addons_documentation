@@ -4,21 +4,14 @@ from datetime import date
 from psycopg2.errors import CheckViolation
 
 from .common import SpreadsheetTestCommon
-from odoo.exceptions import AccessError, ValidationError
-from odoo.tests.common import new_test_user
+from odoo.exceptions import AccessError
+from odoo.tests.common import tagged, new_test_user
 from odoo.tools import mute_logger
-
-EXCEL_FILES = [
-    {
-        "content": '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"/>',
-        "path": "[Content_Types].xml",
-    }
-]
 
 
 class SpreadsheetSharing(SpreadsheetTestCommon):
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_can_read_others(self):
         document = self.create_spreadsheet()
         alice = new_test_user(self.env, login="alice")
@@ -49,7 +42,7 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
         self.assertEqual(access.role, 'view')
         self.assertEqual(access.partner_id, alice.partner_id)
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_collaborative_dispatch_spreadsheet_with_token(self):
         document = self.create_spreadsheet()
 
@@ -74,11 +67,11 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
 
         # dispatch revision without access
         with self.assertRaises(AccessError):
-            document.dispatch_spreadsheet_message(revision)
+            document._dispatch_spreadsheet_message(revision)
 
         # dispatch revision with wrong token
         with self.assertRaises(AccessError):
-            document.dispatch_spreadsheet_message(revision, "a wrong token")
+            document._dispatch_spreadsheet_message(revision, "a wrong token")
 
         # snapshot without token
         snapshot_revision = {
@@ -88,7 +81,7 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
             "data": {"revisionId": "snapshot-revision-id"},
         }
         with self.assertRaises(AccessError):
-            document.dispatch_spreadsheet_message(snapshot_revision)
+            document._dispatch_spreadsheet_message(snapshot_revision)
 
         # snapshot with wrong token
         snapshot_revision = {
@@ -98,7 +91,7 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
             "data": {"revisionId": "snapshot-revision-id"},
         }
         with self.assertRaises(AccessError):
-            document.dispatch_spreadsheet_message(snapshot_revision, "a wrong token")
+            document._dispatch_spreadsheet_message(snapshot_revision, "a wrong token")
 
         # now, the user can access the spreadsheet
         document = document.with_user(raoul)
@@ -109,7 +102,7 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
         revision = self.new_revision_data(document)
 
         # dispatch revision with access
-        accepted = document.dispatch_spreadsheet_message(revision, access_token)
+        accepted = document._dispatch_spreadsheet_message(revision, access_token)
         self.assertEqual(accepted, True)
 
         # snapshot with access
@@ -119,10 +112,10 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
             "nextRevisionId": "snapshot-revision-id",
             "data": {"revisionId": "snapshot-revision-id"},
         }
-        accepted = document.dispatch_spreadsheet_message(snapshot_revision, access_token)
+        accepted = document._dispatch_spreadsheet_message(snapshot_revision, access_token)
         self.assertEqual(accepted, True)
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_collaborative_readonly_dispatch_spreadsheet_with_token(self):
         """Readonly access"""
         document = self.create_spreadsheet()
@@ -141,15 +134,15 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
             revision = self.new_revision_data(document)
             # dispatch revision without token
             with self.assertRaises(AccessError):
-                document.dispatch_spreadsheet_message(revision)
+                document._dispatch_spreadsheet_message(revision)
 
             # dispatch revision with wrong token
             with self.assertRaises(AccessError):
-                document.dispatch_spreadsheet_message(revision, "a wrong token")
+                document._dispatch_spreadsheet_message(revision, "a wrong token")
 
             # raise because of readonly access
             with self.assertRaises(AccessError):
-                document.dispatch_spreadsheet_message(revision, access_token)
+                document._dispatch_spreadsheet_message(revision, access_token)
 
             # snapshot without token
             snapshot_revision = {
@@ -159,7 +152,7 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
                 "data": b"{}",
             }
             with self.assertRaises(AccessError):
-                document.dispatch_spreadsheet_message(snapshot_revision)
+                document._dispatch_spreadsheet_message(snapshot_revision)
 
             # snapshot with token
             snapshot_revision = {
@@ -169,16 +162,14 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
                 "data": b"{}",
             }
             with self.assertRaises(AccessError):
-                document.dispatch_spreadsheet_message(snapshot_revision, access_token)
+                document._dispatch_spreadsheet_message(snapshot_revision, access_token)
 
     @mute_logger('odoo.sql_db')
     def test_spreadsheet_can_not_share_write_access_to_portal(self):
         spreadsheet = self.create_spreadsheet()
-        user_portal = new_test_user(self.env, login='alice', groups='base.group_portal')
         user_internal = new_test_user(self.env, login='eve')
         user_internal_archived = new_test_user(self.env, login='john')
         user_internal_archived.active = False
-        partner = self.env['res.partner'].create({'name': 'Bob'})
 
         self.env['documents.access'].create({
             'document_id': spreadsheet.id,
@@ -191,24 +182,6 @@ class SpreadsheetSharing(SpreadsheetTestCommon):
             'partner_id': user_internal_archived.partner_id.id,
             'role': 'edit',
         })
-
-        with self.assertRaises(ValidationError):
-            self.env['documents.access'].create({
-                'document_id': spreadsheet.id,
-                'partner_id': user_portal.partner_id.id,
-                'role': 'edit',
-            })
-
-        with self.assertRaises(ValidationError):
-            self.env['documents.access'].create({
-                'document_id': spreadsheet.id,
-                'partner_id': partner.id,
-                'role': 'edit',
-            })
-
-        with self.assertRaises(CheckViolation):
-            spreadsheet.access_via_link = 'edit'
-            spreadsheet.flush_recordset()
 
         with self.assertRaises(CheckViolation):
             with mute_logger('odoo.addons.documents.models.documents_document'):  # Creating document(s) as superuser

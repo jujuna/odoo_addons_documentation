@@ -1,66 +1,38 @@
 import { _t } from "@web/core/l10n/translation";
-import { StreamPostKanbanRecord } from '@social/js/stream_post_kanban_record';
-import { StreamPostCommentsTwitter } from './stream_post_comments';
-import { StreamPostTwitterQuote } from './stream_post_twitter_quote';
+import { StreamPostKanbanRecord } from "@social/js/stream_post_kanban_record";
+import { StreamPostCommentsTwitter } from "./stream_post_comments";
+import { StreamPostTwitterQuote } from "./stream_post_twitter_quote";
 
-import { debounce } from "@web/core/utils/timing";
 import { rpc } from "@web/core/network/rpc";
 import { patch } from "@web/core/utils/patch";
-import { useService } from '@web/core/utils/hooks';
-import { markup, useEffect } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+import { markup, useListener } from "@odoo/owl";
 
 patch(StreamPostKanbanRecord.prototype, {
-
     setup() {
         super.setup(...arguments);
-        this.notification = useService('notification');
+        this.notification = useService("notification");
 
-        useEffect((commentEl) => {
-            if (commentEl) {
-                const onTwitterCommentsClick = debounce(this._onTwitterCommentsClick.bind(this), 300, true);
-                commentEl.addEventListener('click', onTwitterCommentsClick);
-                return () => {
-                    commentEl.removeEventListener('click', onTwitterCommentsClick);
-                };
-            }
-        }, () => [this.rootRef.el.querySelector('.o_social_twitter_comments')]);
-        useEffect((likeEl) => {
-            if (likeEl) {
-                const onTwitterTweetLike = this._onTwitterTweetLike.bind(this);
-                likeEl.addEventListener('click', onTwitterTweetLike);
-                return () => {
-                    likeEl.removeEventListener('click', onTwitterTweetLike);
-                };
-            }
-        }, () => [this.rootRef.el.querySelector('.o_social_twitter_likes')]);
-        useEffect((retweetEl) => {
-            if (retweetEl) {
-                const onTwitterRetweet = this._onTwitterRetweet.bind(this);
-                retweetEl.addEventListener('click', onTwitterRetweet);
-                return () => {
-                    retweetEl.removeEventListener('click', onTwitterRetweet);
-                };
-            }
-        }, () => [this.rootRef.el.querySelector('.o_social_twitter_retweet')]);
-        useEffect((quoteEl) => {
-            if (quoteEl) {
-                const onTwitterQuote = this._onTwitterQuote.bind(this);
-                quoteEl.addEventListener('click', onTwitterQuote);
-                return () => {
-                    quoteEl.removeEventListener('click', onTwitterQuote);
-                };
-            }
-        }, () => [this.rootRef.el.querySelector('.o_social_twitter_quote')]);
+        const likesEl = () => this.rootRef()?.querySelector(".o_social_twitter_likes");
+        const retweetEl = () => this.rootRef()?.querySelector(".o_social_twitter_retweet");
+        const quoteEl = () => this.rootRef()?.querySelector(".o_social_twitter_quote");
+        useListener(likesEl, "click", this._onTwitterTweetLike.bind(this));
+        useListener(retweetEl, "click", this._onTwitterRetweet.bind(this));
+        useListener(quoteEl, "click", this._onTwitterQuote.bind(this));
     },
 
-    _onTwitterCommentsClick(ev) {
+    openComments(ev) {
+        if (this.record.media_type.raw_value !== "twitter") {
+            return super.openComments(ev);
+        }
         ev.stopPropagation();
         const postId = this.record.id.raw_value;
 
         const modalInfo = {
             title: _t("Twitter Comments"),
             accountId: this.record.account_id.raw_value,
-            originalPost: this.record,
+            originalPost: this.props.record,
+            onTwitterTweetLike: this._onTwitterTweetLike.bind(this),
             postId: postId,
             streamId: this.record.stream_id.raw_value,
         };
@@ -92,21 +64,18 @@ patch(StreamPostKanbanRecord.prototype, {
 
     async _onTwitterTweetLike() {
         const userLikes = this.record.twitter_user_likes.raw_value;
-        rpc(`/social_twitter/${encodeURIComponent(this.record.stream_id.raw_value)}/like_tweet`, {
-            tweet_id: this.record.twitter_tweet_id.raw_value,
-            like: !userLikes
-        });
-        const promises = this.props.group.model.root.groups.map((group) =>
-            group.list.records
-                .filter(
-                    (record) =>
-                        record.data.twitter_tweet_id === this.props.record.data.twitter_tweet_id
-                )
-                .map((record) =>
-                    this._updateLikesCount("twitter_user_likes", "twitter_likes_count", record)
-                )
+        await rpc(
+            `/social_twitter/${encodeURIComponent(this.record.stream_id.raw_value)}/like_tweet`,
+            {
+                tweet_id: this.record.twitter_tweet_id.raw_value,
+                like: !userLikes,
+            }
         );
-        await Promise.all(promises.flat());
+        for (const record of this.props.record.model.root.records) {
+            if (record.data.twitter_tweet_id === this.props.record.data.twitter_tweet_id) {
+                await record.load();
+            }
+        }
     },
 
     _onTwitterRetweet(ev) {
@@ -117,17 +86,17 @@ patch(StreamPostKanbanRecord.prototype, {
         }).then((result) => {
             result = JSON.parse(result);
             if (result === true) {
-                const retweetCount = this.record.twitter_can_retweet.raw_value ?
-                    this.record.twitter_retweet_count.raw_value + 1 :
-                    this.record.twitter_retweet_count.raw_value - 1;
+                const retweetCount = this.record.twitter_can_retweet.raw_value
+                    ? this.record.twitter_retweet_count.raw_value + 1
+                    : this.record.twitter_retweet_count.raw_value - 1;
                 this.props.record.update({
-                    'twitter_can_retweet': !this.record.twitter_can_retweet.raw_value,
-                    'twitter_retweet_count': retweetCount,
+                    twitter_can_retweet: !this.record.twitter_can_retweet.raw_value,
+                    twitter_retweet_count: retweetCount,
                 });
             } else if (result.error) {
                 this.notification.add(result.error, {
-                    title: _t('Error'),
-                    type: 'danger',
+                    title: _t("Error"),
+                    type: "danger",
                 });
             }
         });
@@ -135,14 +104,14 @@ patch(StreamPostKanbanRecord.prototype, {
 
     _onTwitterQuote() {
         this.dialog.add(StreamPostTwitterQuote, {
-            title: _t('Quote a Tweet'),
+            title: _t("Quote a Tweet"),
             mediaSpecificProps: {
                 accountId: this.record.account_id.raw_value,
                 accountName: this.record.author_name.value,
             },
-            originalPost: this.record,
+            originalPost: this.props.record,
+            onTwitterTweetLike: this._onTwitterTweetLike.bind(this),
             refreshStats: () => this.env.refreshStats(),
         });
     },
-
 });

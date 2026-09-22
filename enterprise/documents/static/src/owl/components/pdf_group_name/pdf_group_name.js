@@ -1,25 +1,18 @@
-import { Component, useRef } from "@odoo/owl";
+import { Component, signal, t, useProps } from "@odoo/owl";
 
 export class PdfGroupName extends Component {
-    static props = {
-        groupId: String,
-        name: String,
-        edit: Boolean,
-        onToggleEdit: {
-            type: Function,
-            optional: true,
-        },
-        onEditName: {
-            type: Function,
-            optional: true,
-        },
-    };
+    props = useProps({
+        groupId: t.string(),
+        name: t.string(),
+        edit: t.boolean(),
+        onToggleEdit: t.function().optional(),
+        onEditName: t.function().optional(),
+    });
+
     static template = "documents.component.PdfGroupName";
 
-    setup() {
-        // used to get the value of the input when renaming.
-        this.nameInputRef = useRef("nameInput");
-    }
+    // used to get the value of the input when renaming.
+    nameInputRef = signal.ref();
 
     //--------------------------------------------------------------------------
     // Handlers
@@ -29,7 +22,7 @@ export class PdfGroupName extends Component {
      * @public
      */
     onBlur() {
-        this.props.onEditName(this.props.groupId, this.nameInputRef.el.value);
+        this.props.onEditName(this.props.groupId, this.nameInputRef().value);
     }
     /**
      * @public
@@ -46,7 +39,7 @@ export class PdfGroupName extends Component {
             return;
         }
         ev.stopPropagation();
-        this.props.onEditName(this.props.groupId, this.nameInputRef.el.value);
+        this.props.onEditName(this.props.groupId, this.nameInputRef().value);
         this.props.onToggleEdit(this.props.groupId, false);
     }
 }

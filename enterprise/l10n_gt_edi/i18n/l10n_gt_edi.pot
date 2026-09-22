@@ -4,16 +4,23 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:07+0000\n"
-"PO-Revision-Date: 2025-12-30 19:07+0000\n"
+"POT-Creation-Date: 2026-09-11 18:12+0000\n"
+"PO-Revision-Date: 2026-09-11 18:12+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_gt_edi
+#: model:ir.module.module,description:base.module_l10n_gt_edi
+msgid ""
+"\n"
+"E-invoice implementation for Guatemala\n"
+msgstr ""
 
 #. module: l10n_gt_edi
 #. odoo-python
@@ -39,16 +46,6 @@ msgid "Account Chart Template"
 msgstr ""
 
 #. module: l10n_gt_edi
-#: model:ir.model,name:l10n_gt_edi.model_account_move_reversal
-msgid "Account Move Reversal"
-msgstr ""
-
-#. module: l10n_gt_edi
-#: model:ir.model,name:l10n_gt_edi.model_account_move_send
-msgid "Account Move Send"
-msgstr ""
-
-#. module: l10n_gt_edi
 #: model:ir.model,name:l10n_gt_edi.model_account_debit_note
 msgid "Add Debit Note wizard"
 msgstr ""
@@ -63,6 +60,16 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_gt_edi/models/account_move.py:0
 msgid "All invoice lines must not have any tax for document type %s"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Annulled Credit Note"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Annulled Invoice"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -91,8 +98,41 @@ msgid "CEMENTO"
 msgstr ""
 
 #. module: l10n_gt_edi
-#: model:l10n_latam.identification.type,name:l10n_gt_edi.it_cui
-msgid "CUI"
+#: model:ir.model.fields.selection,name:l10n_gt_edi.selection__l10n_gt_edi_document__state__invoice_cancel_failed
+msgid "Cancel Failed"
+msgstr ""
+
+#. module: l10n_gt_edi
+#. odoo-python
+#: code:addons/l10n_gt_edi/models/account_move.py:0
+msgid "Cancel Invoice"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_cancel__l10n_gt_edi_cancel_reason
+#: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_document__cancel_reason
+msgid "Cancel Reason"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.invoice_cancel_wizard_view
+msgid "Cancel invoice"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model:ir.model.fields.selection,name:l10n_gt_edi.selection__account_move__l10n_gt_edi_state__invoice_cancelled
+#: model:ir.model.fields.selection,name:l10n_gt_edi.selection__l10n_gt_edi_document__state__invoice_cancelled
+msgid "Cancelled"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Cancelled Credit Note"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Cancelled Invoice"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -123,7 +163,7 @@ msgstr ""
 
 #. module: l10n_gt_edi
 #: model:ir.model,name:l10n_gt_edi.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -142,12 +182,22 @@ msgstr ""
 
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Complemento - Cambiaria"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
 msgid "Complemento - Exportacion"
 msgstr ""
 
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
 msgid "Complemento - Referencias Nota"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Complemento - Retenciones Factura Especial"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -180,12 +230,14 @@ msgid "Create a Customer"
 msgstr ""
 
 #. module: l10n_gt_edi
+#: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_cancel__create_uid
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_document__create_uid
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_phrase__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: l10n_gt_edi
+#: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_cancel__create_date
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_document__create_date
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_phrase__create_date
 msgid "Created on"
@@ -220,11 +272,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_gt_edi/models/account_move.py:0
 msgid "Current Company Contact"
-msgstr ""
-
-#. module: l10n_gt_edi
-#: model:l10n_latam.identification.type,description:l10n_gt_edi.it_cui
-msgid "Código Único de Identificación"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -267,6 +314,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_account_move_reversal__display_name
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_account_move_send__display_name
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_account_tax__display_name
+#: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_cancel__display_name
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_document__display_name
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_phrase__display_name
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_res_company__display_name
@@ -321,6 +369,12 @@ msgid "Error when sending the XML to the SAT"
 msgstr ""
 
 #. module: l10n_gt_edi
+#. odoo-python
+#: code:addons/l10n_gt_edi/models/account_move.py:0
+msgid "Error when sending the cancellation XML to the SAT"
+msgstr ""
+
+#. module: l10n_gt_edi
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_res_company__l10n_gt_edi_establishment_code
 msgid "Establishment Code"
 msgstr ""
@@ -363,6 +417,16 @@ msgstr ""
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
 msgid "Fecha Emision Documento Origen:"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Fecha Vencimiento:"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Fecha de Anulación"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -417,6 +481,11 @@ msgid ""
 msgstr ""
 
 #. module: l10n_gt_edi
+#: model:ir.module.module,shortdesc:base.module_l10n_gt_edi
+msgid "Guatemala - E-Invoicing"
+msgstr ""
+
+#. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.res_config_settings_form_inherit_l10n_gt_edi
 msgid "Guatemala Localization"
 msgstr ""
@@ -438,14 +507,6 @@ msgid "Guatemalan SAT Barcode"
 msgstr ""
 
 #. module: l10n_gt_edi
-#. odoo-python
-#: code:addons/l10n_gt_edi/models/account_move.py:0
-msgid ""
-"Guatemalan customer must have the LATAM identification type of either NIT or"
-" CUI"
-msgstr ""
-
-#. module: l10n_gt_edi
 #: model:ir.model,name:l10n_gt_edi.model_l10n_gt_edi_document
 msgid "Guatemalan documents that needs to transit outside of Odoo"
 msgstr ""
@@ -457,6 +518,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_account_move_reversal__id
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_account_move_send__id
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_account_tax__id
+#: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_cancel__id
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_document__id
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_phrase__id
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_res_company__id
@@ -523,6 +585,11 @@ msgid "Journal Entry"
 msgstr ""
 
 #. module: l10n_gt_edi
+#: model:ir.model,name:l10n_gt_edi.model_account_move_reversal
+msgid "Journal Entry Reversal"
+msgstr ""
+
+#. module: l10n_gt_edi
 #: model:ir.model.fields,help:l10n_gt_edi.field_res_company__l10n_gt_edi_infile_key
 #: model:ir.model.fields,help:l10n_gt_edi.field_res_config_settings__l10n_gt_edi_infile_key
 msgid "Key for Infile Webservice (provided by Infile)"
@@ -558,12 +625,14 @@ msgid "L10N Gt Edi Show Consignatory Partner"
 msgstr ""
 
 #. module: l10n_gt_edi
+#: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_cancel__write_uid
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_document__write_uid
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_phrase__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: l10n_gt_edi
+#: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_cancel__write_date
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_document__write_date
 #: model:ir.model.fields,field_description:l10n_gt_edi.field_l10n_gt_edi_phrase__write_date
 msgid "Last Updated on"
@@ -643,7 +712,17 @@ msgstr ""
 
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Monto Abono:"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
 msgid "Motivo Ajuste:"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Motivo de Cancelación"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -662,13 +741,13 @@ msgid "NDEB - Nota de Débito Electrónica"
 msgstr ""
 
 #. module: l10n_gt_edi
-#: model:l10n_latam.identification.type,name:l10n_gt_edi.it_nit
-msgid "NIT"
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "NIT de la Empresa:"
 msgstr ""
 
 #. module: l10n_gt_edi
-#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
-msgid "NIT de la Empresa:"
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.l10n_gt_edi_nit_cf_template
+msgid "NIT: CF"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -688,6 +767,11 @@ msgstr ""
 
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Numero Abono:"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
 msgid "Numero Autorizacion Documento Origen:"
 msgstr ""
 
@@ -699,11 +783,6 @@ msgstr ""
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
 msgid "Número de Autorización"
-msgstr ""
-
-#. module: l10n_gt_edi
-#: model:l10n_latam.identification.type,description:l10n_gt_edi.it_nit
-msgid "Número de Identificación Tributaria"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -757,7 +836,7 @@ msgstr ""
 #. module: l10n_gt_edi
 #. odoo-python
 #: code:addons/l10n_gt_edi/models/account_move.py:0
-msgid "Please add the VAT on partner %s."
+msgid "Please add the NIT or CUI on partner %s."
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -768,12 +847,27 @@ msgstr ""
 #. module: l10n_gt_edi
 #. odoo-python
 #: code:addons/l10n_gt_edi/models/account_move.py:0
-msgid "Please replace Consumidor Final with a real partner and VAT number."
+msgid "Please replace Consumidor Final with a real partner and NIT or CUI."
 msgstr ""
 
 #. module: l10n_gt_edi
 #: model:ir.model.fields.selection,name:l10n_gt_edi.selection__res_company__l10n_gt_edi_service_provider__production
 msgid "Production"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model:ir.model.fields,help:l10n_gt_edi.field_l10n_gt_edi_cancel__l10n_gt_edi_cancel_reason
+msgid "Reason to cancel this invoice."
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Retencion ISR:"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Retencion IVA:"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -857,7 +951,9 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_gt_edi.field_l10n_gt_edi_document__state
 msgid ""
 "Sent -> Successfully sent to the SAT.\n"
-"Sending Failed -> Sending error or validation error from the SAT."
+"Sending Failed -> Sending error or validation error from the SAT.\n"
+"Cancelled -> Successfully cancelled at the SAT.\n"
+"Cancel Failed -> Cancellation error from the SAT."
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -889,6 +985,17 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_gt_edi/models/account_move.py:0
 msgid "Settings"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model:ir.model,name:l10n_gt_edi.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr ""
+
+#. module: l10n_gt_edi
+#. odoo-python
+#: code:addons/l10n_gt_edi/models/account_move.py:0
+msgid "Successfully cancelled the document with the SAT."
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -940,28 +1047,18 @@ msgstr ""
 
 #. module: l10n_gt_edi
 #. odoo-python
-#: code:addons/l10n_gt_edi/models/res_partner.py:0
-msgid "The provided CUI number contains invalid characters."
-msgstr ""
-
-#. module: l10n_gt_edi
-#. odoo-python
-#: code:addons/l10n_gt_edi/models/res_partner.py:0
-msgid "The provided CUI number does not pass the validation."
-msgstr ""
-
-#. module: l10n_gt_edi
-#. odoo-python
-#: code:addons/l10n_gt_edi/models/res_partner.py:0
-msgid "The provided CUI number is too short."
+#: code:addons/l10n_gt_edi/models/account_move.py:0
+msgid ""
+"The total amount of the invoice exceeds the limit allowed for partner "
+"without identification."
 msgstr ""
 
 #. module: l10n_gt_edi
 #. odoo-python
 #: code:addons/l10n_gt_edi/models/account_move.py:0
 msgid ""
-"The total amount of the invoice exceeds the limit allowed for partner "
-"without VAT."
+"This document has been successfully cancelled in DEMO mode. It is considered"
+" as cancelled and it won't be sent to the SAT."
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -983,6 +1080,11 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_gt_edi.field_res_company__l10n_gt_edi_infile_token
 #: model:ir.model.fields,help:l10n_gt_edi.field_res_config_settings__l10n_gt_edi_infile_token
 msgid "Token for Infile Webservice (provided by Infile)"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model_terms:ir.ui.view,arch_db:l10n_gt_edi.report_invoice_document
+msgid "Total Menos Retenciones:"
 msgstr ""
 
 #. module: l10n_gt_edi
@@ -1052,4 +1154,9 @@ msgstr ""
 #. module: l10n_gt_edi
 #: model_terms:ir.ui.view,arch_db:l10n_gt_edi.res_config_settings_form_inherit_l10n_gt_edi
 msgid "Web Services"
+msgstr ""
+
+#. module: l10n_gt_edi
+#: model:ir.model,name:l10n_gt_edi.model_l10n_gt_edi_cancel
+msgid "Wizard to allow the cancellation of Guatemalan documents"
 msgstr ""

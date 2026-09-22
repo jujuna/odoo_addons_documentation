@@ -44,176 +44,6 @@ class AccountFollowupReport(models.AbstractModel):
         })
         return options
 
-    def _get_followup_report_lines(self, options):
-        """
-        Compute and return the lines of the columns of the follow-ups report.
-        """
-        # Get date format for the lang
-        partner = options.get('partner_id') and self.env['res.partner'].browse(options['partner_id']) or False
-        if not partner:
-            return []
-
-        lang_code = partner.lang
-        lines = []
-        res = {}
-        today = fields.Date.today()
-        line_num = 0
-        for l in partner.unreconciled_aml_ids.sorted().filtered(lambda aml: not aml.currency_id.is_zero(aml.amount_residual_currency)):
-            if l.company_id in self.env.company.search([('id', 'child_of', self.env.context.get('allowed_company_ids', self.env.company.id))]):
-                currency = l.currency_id or l.company_id.currency_id
-                if currency not in res:
-                    res[currency] = []
-                res[currency].append(l)
-        for currency, aml_recs in res.items():
-            total = 0
-            total_issued = 0
-            for aml in aml_recs:
-                amount = aml.amount_residual_currency if aml.currency_id else aml.amount_residual
-                invoice_date = {
-                    'name': format_date(self.env, aml.move_id.invoice_date or aml.date, lang_code=lang_code),
-                    'class': 'date',
-                    'style': 'white-space:nowrap;text-align:left;',
-                    'template': 'account_followup.line_template',
-                }
-                date_due = format_date(self.env, aml.date_maturity, lang_code=lang_code)
-                total += amount or 0
-                is_overdue = today > aml.date_maturity if aml.date_maturity else False
-                is_payment = aml.payment_id
-                if is_overdue or is_payment:
-                    total_issued += amount or 0
-                date_due = {
-                    'name': date_due, 'class': 'date',
-                    'style': 'white-space:nowrap;text-align:left;',
-                    'template': 'account_followup.line_template',
-                }
-                if is_overdue:
-                    date_due['style'] += 'color: red;'
-                if is_payment:
-                    date_due = ''
-                move_line_name = {
-                    'name': self._followup_report_format_aml_name(aml.name, aml.move_id.ref),
-                    'style': 'text-align:left; white-space:normal;',
-                    'template': 'account_followup.line_template',
-                }
-                amount = {
-                    'name': formatLang(self.env, amount, currency_obj=currency),
-                    'style': 'text-align:right; white-space:normal;',
-                    'template': 'account_followup.line_template',
-                }
-                line_num += 1
-                invoice_origin = aml.move_id.invoice_origin or ''
-                if len(invoice_origin) > 43:
-                    invoice_origin = invoice_origin[:40] + '...'
-                invoice_origin = {
-                    'name': invoice_origin,
-                    'style': 'text-align:center; white-space:normal;',
-                    'template': 'account_followup.line_template',
-                }
-                columns = [
-                    invoice_date,
-                    date_due,
-                    invoice_origin,
-                    move_line_name,
-                    amount,
-                ]
-                lines.append({
-                    'id': aml.id,
-                    'account_move': aml.move_id,
-                    'name': aml.move_id.name,
-                    'move_id': aml.move_id.id,
-                    'type': is_payment and 'payment' or 'unreconciled_aml',
-                    'unfoldable': False,
-                    'columns': [isinstance(v, dict) and v or {'name': v, 'template': 'account_followup.line_template'} for v in columns],
-                })
-            total_due = formatLang(self.env, total, currency_obj=currency)
-            line_num += 1
-
-            cols = \
-                [{
-                    'name': v,
-                    'template': 'account_followup.line_template',
-                } for v in [''] * 3] + \
-                [{
-                    'name': v,
-                    'style': 'text-align:right; white-space:normal; font-weight: bold;',
-                    'template': 'account_followup.line_template',
-                } for v in [total >= 0 and _('Total Due') or '', total_due]]
-
-            lines.append({
-                'id': line_num,
-                'name': '',
-                'class': 'total',
-                'style': 'border-top-style: double',
-                'unfoldable': False,
-                'level': 3,
-                'columns': cols,
-            })
-            if total_issued > 0:
-                total_issued = formatLang(self.env, total_issued, currency_obj=currency)
-                line_num += 1
-
-                cols = \
-                    [{
-                        'name': v,
-                        'template': 'account_followup.line_template',
-                    } for v in [''] * 3] + \
-                    [{
-                        'name': v,
-                        'style': 'text-align:right; white-space:normal; font-weight: bold;',
-                        'template': 'account_followup.line_template',
-                    } for v in [_('Total Overdue'), total_issued]]
-
-                lines.append({
-                    'id': line_num,
-                    'name': '',
-                    'class': 'total',
-                    'unfoldable': False,
-                    'level': 3,
-                    'columns': cols,
-                })
-            # Add an empty line after the total to make a space between two currencies
-            line_num += 1
-            lines.append({
-                'id': line_num,
-                'name': '',
-                'class': '',
-                'style': 'border-bottom-style: none',
-                'unfoldable': False,
-                'level': 0,
-                'columns': [{'template': 'account_followup.line_template'} for col in columns],
-            })
-        # Remove the last empty line
-        if lines:
-            lines.pop()
-
-        # Catch negative numbers when present
-        for line in lines:
-            for col in line['columns']:
-                if self.env.company.currency_id.compare_amounts(col.get('no_format', 0.0), 0.0) == -1:
-                    col['class'] = 'number color-red'
-
-        return lines
-
-    @api.model
-    def _followup_report_format_aml_name(self, line_name, move_ref, move_name=None):
-        """ Format the display of an account.move.line record. As its very costly to fetch the account.move.line
-        records, only line_name, move_ref, move_name are passed as parameters to deal with sql-queries more easily.
-
-        :param line_name:   The name of the account.move.line record.
-        :param move_ref:    The reference of the account.move record.
-        :param move_name:   The name of the account.move record.
-        :return:            The formatted name of the account.move.line record.
-        """
-        names = []
-        if move_name is not None and move_name != '/':
-            names.append(move_name)
-        if move_ref and move_ref != '/':
-            names.append(move_ref)
-        if line_name and line_name != move_name and line_name != '/':
-            names.append(line_name)
-        name = '-'.join(names)
-        return name
-
     ####################################################
     # DEFAULT BODY AND EMAIL SUBJECT
     ####################################################
@@ -336,29 +166,13 @@ Best Regards,
         if mail_template:
             rendered_values = mail_template._generate_template_recipients(
                 res_ids=[partner.id],
-                render_fields={'partner_to', 'email_cc', 'email_to'},
+                render_fields={'partner_to', 'email_cc', 'partner_cc', 'email_to'},
                 allow_suggested=True,
                 find_or_create_partners=True
             )[partner.id]
             recipients |= partner.browse(rendered_values.get('partner_ids'))
+            recipients |= partner.browse(rendered_values.get('partner_cc_ids'))
         return recipients
-
-    ####################################################
-    # REPORT DATA
-    ####################################################
-
-    def _get_followup_report_columns_name(self):
-        """
-        Return the name of the columns of the follow-ups report
-        """
-        return [
-            {'name': _('Reference'), 'style': 'text-align:center; white-space:nowrap;'},
-            {'name': _('Date'), 'class': 'date', 'style': 'text-align:center; white-space:nowrap;'},
-            {'name': _('Due Date'), 'class': 'date', 'style': 'text-align:center; white-space:nowrap;'},
-            {'name': _('Origin'), 'style': 'text-align:center; white-space:nowrap;'},
-            {'name': _('Communication'), 'style': 'text-align:center; white-space:nowrap;'},
-            {'name': _('Total Due'), 'class': 'number o_price_total', 'style': 'text-align:center; white-space:nowrap;'},
-        ]
 
     ####################################################
     # EXPORT
@@ -391,15 +205,12 @@ Best Regards,
         Send by email the followup to the customer's followup contacts
         """
         partner = self.env['res.partner'].browse(options.get('partner_id'))
-        followup_line = options.get('followup_line', partner.followup_line_id)
         sent_at_least_once = False
         for to_send_partner in self._get_email_recipients(options):
             email = to_send_partner.email
             if email and email.strip():
                 self = self.with_context(lang=partner.lang or self.env.user.lang)
                 body_html = self.with_context(mail=True).get_followup_report_html(options)
-
-                # Should contain the followup report and invoice attachments if join_invoices is True.
                 attachment_ids = options.get('attachment_ids')
 
                 # If the follow-up was executed manually, the author_id will be set to the ID of the current logged-in user.
@@ -421,25 +232,5 @@ Best Regards,
                 )
                 sent_at_least_once = True
 
-                # add additional followers to the partner's chatter
-                if followup_line and followup_line.additional_follower_ids:
-                    partner.message_subscribe(followup_line.additional_follower_ids.partner_id.ids)
         if not sent_at_least_once:
             raise UserError(_("You are trying to send an Email, but no follow-up contact has any email address set for customer '%s'", partner.name))
-
-    @api.model
-    def _print_followup_letter(self, partner, options=None):
-        """Generate the followup letter for the given partner.
-        The letter is saved as ir.attachment and linked in the chatter.
-
-        Returns a client action downloading this letter and closing the wizard.
-        """
-        attachment = partner._get_followup_report_attachment(options)
-        partner.message_post(body=_('Follow-up letter generated'), attachment_ids=[attachment.id])
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'close_followup_wizard',
-            'params': {
-                'url': '/web/content/%s?download=1' % attachment.id,
-            }
-        }

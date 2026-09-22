@@ -45,6 +45,8 @@
                     <button name="button_finalise" type="object" string="Mark as Finalised" />
                     <button name="%(l10n_au_hr_payroll_account.action_open_transfer_previous_payroll)d"
                             string="Import YTD Balances" type="action" display="always"/>
+                    <button name="action_regenerate_ytd_values" type="object" title="Regenerate YTD Records"
+                            icon="refresh" display="always"/>
                 </header>
                 <field name="employee_id" readonly="1"/>
                 <field name="l10n_au_income_stream_type" />
@@ -53,7 +55,7 @@
                 <field name="struct_id" readonly="1"/>
                 <field name="rule_id" readonly="1"/>
                 <field name="requires_inputs" widget="boolean_toggle" readonly="1" column_invisible="1"/>
-                <button name="action_add_inputs" type="object" icon="fa-list" string="Add inputs" class="oe_inline" invisible="not requires_inputs"/>
+                <button name="action_add_inputs" type="object" icon="format_list_bulleted" string="Add inputs" class="oe_inline" invisible="not requires_inputs"/>
                 <field name="start_value" invisible="requires_inputs" />
                 <field name="ytd_amount"/>
                 <field name="finalised" optional="hide" readonly="1"/>

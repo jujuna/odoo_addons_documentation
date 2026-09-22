@@ -13,7 +13,7 @@
                 <progressbar field="activity_state" colors='{"planned": "success", "overdue": "danger", "today": "warning"}'/>
                 <templates>
                     <div t-name="menu">
-                        <a role="menuitem" type="object" name="get_formview_action" class="dropdown-item">Details</a>
+                        <a role="menuitem" type="object" name="get_record_default_action" class="dropdown-item">Details</a>
                         <a role="menuitem" type="object" name="go_to_document" class="dropdown-item">Template</a>
                         <a role="menuitem" type="object" name="cancel" class="dropdown-item" invisible="state in ('signed', 'canceled')">Cancel</a>
                         <a role="menuitem" type="object" name="action_archive" class="dropdown-item" invisible="state not in ('sent', 'signed', 'canceled')" t-if="record.active.raw_value">Archive</a>
@@ -25,22 +25,22 @@
                         <div class="d-flex lh-1 mb-1">
                             <t t-if="record.favorited_ids.raw_value.indexOf(context.uid) &lt; 0">
                                 <a type="object" name="toggle_favorited" title="Set as favorite" aria-label="Set as favorite"
-                                    class="fa fa-lg fa-star-o favorite_sign_button"/>
+                                    class="oi oi-lg favorite_sign_button" data-icon="star"/>
                             </t>
                             <t t-else="">
                                 <a type="object" name="toggle_favorited" title="Remove from favorites" aria-label="Remove from favorites"
-                                    class="fa fa-lg fa-star favorite_sign_button_enabled favorite_sign_button"/>
+                                    class="oi oi-lg oi-filled favorite_sign_button_enabled favorite_sign_button" data-icon="star"/>
                             </t>
                             <field name="reference" class="ms-4 fw-bold fs-5"/>
                         </div>
-                        <field name="template_tags" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        <field name="template_tags" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                         <div class="o_signers mt-2">
                             <div t-foreach="record.request_item_infos.raw_value || []" t-as="request_item_info" t-key="request_item_info.id"
                                 t-att-class="(request_item_info.state === 'completed') ? 'o_sign_completed text-success d-flex' : (request_item_info.state === 'canceled') ? 'o_sign_canceled text-danger d-flex' : 'o_sign_waiting d-flex'">
-                                    <div t-if="request_item_info.state === 'canceled'" class="mt-1 me-1 fa fa-times" title="Canceled"/>
+                                    <div t-if="request_item_info.state === 'canceled'" class="oi mt-1 me-1" data-icon="close" title="Canceled"/>
                                 <input t-else="" t-att-checked="(request_item_info.state === 'completed') ? 'checked' : undefined" class="mt-1 me-1" type="checkbox" disabled="True"/>
                                 <span>
-                                    <t t-esc="request_item_info.partner_name"/><t t-if="request_item_info.signing_date" class="ms-1" t-esc="' ' + request_item_info.signing_date"/>
+                                    <t t-out="request_item_info.partner_name"/><t t-if="request_item_info.signing_date" class="ms-1" t-out="' ' + request_item_info.signing_date"/>
                                 </span>
                             </div>
                         </div>
@@ -66,15 +66,17 @@
         <field name="arch" type="xml">
             <list multi_edit="1" sample="1" js_class="sign_list" decoration-muted="state == 'canceled'" action="go_to_document" type="object" default_order="create_date desc">
                 <header>
-                    <button type="object" name="send_signature_accesses" class="btn btn-secondary" string="Resend"/>
+                    <button type="object" name="send_signature_accesses" class="btn btn-secondary" string="Send reminder"/>
                     <button type="object" name="get_sign_request_documents" class="btn btn-secondary" string="Download"/>
+                    <button type="object" name="action_send" class="btn btn-secondary" string="Send to"/>
                 </header>
                 <field name="create_date" string="Date" readonly="1"/>
                 <field name="reference" readonly="1" string="Name"/>
-                <field name="create_uid" widget="many2one_avatar_user" readonly="1" string="Sent by"/>
+                <field name="send_channel" readonly="1" string="Channel" optional="hide"/>
+                <field name="create_uid" widget="many2one_avatar_user" optional="show" readonly="1" string="Sent by"/>
                 <field name="template_document_ids" widget="many2many_tags" readonly="1" optional="hide"/>
-                <field name="request_item_ids" string="Signers" widget="many2many_tags" readonly="1" options="{'color_field': 'color'}"/>
-                <field name="template_tags" string="Tags" widget="many2many_tags" optional="hide" options="{'color_field': 'color'}"/>
+                <field name="request_item_ids" string="Signers" widget="many2many_tags" readonly="1" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
+                <field name="template_tags" string="Tags" widget="many2many_tags" optional="hide" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                 <field name="reference_doc" readonly="1" optional="hide"/>
                 <field name="state" string="Status" widget="badge" readonly="1"
                         decoration-danger="state in ['canceled']"
@@ -83,14 +85,16 @@
                         decoration-info="state in ['shared']"
                         decoration-muted="state in ['sent']"
                 />
+                <field name="validity" readonly="state not in ['shared', 'sent']" optional="show"/>
+                <field name="completion_date" string="Completed on" optional="hide"/>
                 <field name="need_my_signature" readonly="1" column_invisible="True"/>
                 <field name="create_uid" readonly="1" column_invisible="True"/>
                 <field name="activity_exception_decoration" widget="activity_exception" readonly="1"/>
-                <button name="send_signature_accesses" string="Resend" type="object" groups="sign.group_sign_user" invisible="state != 'sent' or create_uid != uid" icon="fa-refresh"/>
-                <button name="send_signature_accesses" string="Resend" type="object" groups="sign.group_sign_manager" invisible="state != 'sent' or create_uid == uid" icon="fa-refresh"/>
-                <button name="get_formview_action" string="Details" type="object" groups="sign.group_sign_user" invisible="state != 'canceled'" icon="fa-info"/>
-                <button name="get_sign_request_documents" invisible="state != 'signed'" string="Download" type="object" icon="fa-download"/>
-                <button name="go_to_signable_document" string="Sign" type="object" invisible="not need_my_signature or state != 'sent'" icon="fa-pencil-square-o"/>
+                <button name="send_signature_accesses" string="Reminder" type="object" groups="sign.group_sign_user" invisible="state != 'sent' or create_uid != uid" icon="notifications" context="{'show_reminder_notification': True}"/>
+                <button name="send_signature_accesses" string="Reminder" type="object" groups="sign.group_sign_manager" invisible="state != 'sent' or create_uid == uid" icon="notifications" context="{'show_reminder_notification': True}"/>
+                <button name="get_record_default_action" string="Details" type="object" groups="sign.group_sign_user" invisible="state != 'canceled'" icon="info"/>
+                <button name="get_sign_request_documents" invisible="state != 'signed'" string="Download" type="object" icon="download"/>
+                <button name="go_to_signable_document" string="Sign" type="object" invisible="not need_my_signature or state != 'sent'" icon="edit_square"/>
             </list>
         </field>
     </record>
@@ -102,6 +106,11 @@
             <pivot string="Documents" sample="1">
                 <field name="create_date" type="row" interval="month"/>
                 <field name="state" type="col"/>
+                <field name="color" invisible="1"/>
+                <field name="reminder" invisible="1"/>
+                <field name="nb_closed" invisible="1"/>
+                <field name="nb_wait" invisible="1"/>
+                <field name="nb_total" invisible="1"/>
             </pivot>
         </field>
     </record>
@@ -125,15 +134,15 @@
                 <header>
                     <div class="d-flex justify-content-between align-items-center gap-1">
                         <button string="Preview" type="object" name="go_to_document" class="oe_highlight" invisible="state == 'expired'"/>
-                        <field name="completed_document_ids" widget="sign_request_documents_dropdown"/>
-                        <button string="Cancel" type="object" invisible="state not in ('sent', 'signed')" name="cancel" confirm="This will keep all the already completed signature of this request and disable every sent access, are you sure?"/>
+                        <field name="request_document_ids" widget="sign_request_documents_dropdown"/>
+                        <button string="Cancel" type="object" invisible="state not in ('sent')" name="cancel" confirm="This will keep all the already completed signature of this request and disable every sent access, are you sure?"/>
                     </div>
                     <field name="state" widget="statusbar" statusbar_visible="sent,signed"/>
                 </header>
                 <sheet>
                     <field name="active" invisible="1"/>
                     <field name="template_id" invisible="1" kanban_view_ref="1484"/>
-                    <field name="favorited_ids" widget="many2many_tags" options="{'color_field': 'color'}" invisible="1"/>
+                    <field name="favorited_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" invisible="1"/>
                     <widget name="web_ribbon" title="Signed" invisible="state != 'signed'"/>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                     <field name="integrity" invisible="1"/>
@@ -148,15 +157,16 @@
                         <group>
                             <field name="active" invisible="1"/>
                             <field name="template_id" invisible="1" context="{'kanban_view_ref': 'sign.sign_template_view_kanban_mobile'}"/>
-                            <field name="favorited_ids" widget="many2many_tags" options="{'color_field': 'color'}" invisible="1"/>
-                            <field name="template_tags" widget="many2many_tags" options="{'color_field': 'color'}" placeholder="Add document tags here"/>
+                            <field name="favorited_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" invisible="1"/>
+                            <field name="template_tags" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" placeholder="Add document tags here"/>
                             <field name="validity" readonly="state not in ['shared', 'sent']"/>
                             <label for="reminder_enabled" string="Reminder"/>
                             <div class="col">
-                                <field name="reminder_enabled" class="oe_inline mb-0" nolabel="1" widget="boolean_toggle" options="{'autosave': False}"/> Send a reminder
+                                <field name="reminder_enabled" class="oe_inline mb-0" nolabel="1" widget="boolean_toggle"/> Send a reminder
                                 <span invisible="not reminder_enabled">every<field name="reminder" class="text-center mb-0 o_sign_reminder_field" readonly="state not in ['shared', 'sent']"/> days.</span>
                             </div>
-                            <field name="reference_doc" readonly="state != 'sent'"/>
+                            <field name="reference_doc" readonly="create_uid != uid" groups="!sign.group_sign_manager"/>
+                            <field name="reference_doc" groups="sign.group_sign_manager"/>
                         </group>
                     </group>
                     <notebook>
@@ -200,13 +210,8 @@
                 <filter name="my_docs" string="My Documents" domain="[('create_uid', '=', uid)]"/>
                 <filter name="my_sign_request" string="My Requests" domain="[('request_item_ids.partner_id.user_ids', 'in', uid)]"/>
                 <separator/>
-                <filter name="favorite" string="My Favorites" domain="[('favorited_ids', 'in', uid)]"/>
-                <separator/>
-                <filter name="activities_expiring_soon" string="Expiring Soon" domain="[('activity_ids.date_deadline', '&lt;', 'today +7d')]"/>
-                <separator/>
-                <filter name="waiting_for_me" string="Waiting for me" domain="[('need_my_signature', '=', True)]"/>
-                <filter name="waiting_for_others" string="Waiting for others" domain="[('create_uid', '=', uid), ('state', '=', 'sent'), '|', ('need_my_signature', '=', False), ('nb_wait', '>', 1)]"/>
-                <separator/>
+                <filter name="awaiting_signatures" string="Awaiting Signatures" domain="['&amp;', ('state', '=', 'sent'), '|', ('need_my_signature', '=', True), '&amp;', ('create_uid', '=', uid), '|', ('need_my_signature', '=', False), ('nb_wait', '&gt;', 1)]"/>
+                <filter name="scheduled" string="Scheduled" domain="[('state', '=', 'scheduled')]"/>
                 <filter name="sent" string="Sent" domain="[('state', '=', 'sent')]"/>
                 <filter name="signed" string="Signed" domain="[('state', '=', 'signed')]"/>
                 <filter name="canceled" string="Cancelled" domain="[('state', '=', 'canceled')]"/>
@@ -225,7 +230,9 @@
                 <filter name="archived_documents" string="Archived" domain="[('active', '=', False)]"/>
                 <group>
                     <filter name="group_by_template" string="Template" domain="[]" context="{'group_by': 'template_id'}"/>
-                    <filter name="group_by_state" string="State" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_state" string="Status" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_create_state" string="Created On" domain="[]" context="{'group_by': 'create_date'}"/>
+                    <filter name="group_by_sent_by" string="Sent By" domain="[]" context="{'group_by': 'create_uid'}"/>
                 </group>
             </search>
         </field>
@@ -266,6 +273,16 @@
         </field>
     </record>
 
+    <record id="action_sign_save_as_template" model="ir.actions.server">
+        <field name="name">Save as template</field>
+        <field name="model_id" ref="sign.model_sign_request"/>
+        <field name="binding_model_id" ref="sign.model_sign_request"/>
+        <field name="sequence">1</field>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_save_as_template()</field>
+    </record>
+
     <record id="sign_request_view_activity" model="ir.ui.view">
         <field name="name">sign.request.actvity</field>
         <field name="model">sign.request</field>
@@ -287,18 +304,19 @@
         <field name="model">sign.request.item</field>
         <field name="arch" type="xml">
             <list editable="bottom" create="false" delete="false">
-                <field name="change_authorized" column_invisible="True"/>
                 <field name="partner_id" readonly="not change_authorized or state in ['completed']"/>
-                <field name="signer_email"/>
-                <field name="role_id"/>
+                <field name="signer_email" readonly="state in ['completed', 'canceled']"/>
+                <field name="change_authorized" string="Can Delegate"/>
+                <field name="role_id" options="{'no_open': True}"/>
+                <field name="auth_method" readonly="1"/>
                 <field name="state"/>
                 <field name="is_mail_sent" column_invisible="True"/>
-                <button name="send_signature_accesses" string="Send" type="object" icon="fa-square-o pe-2" invisible="not signer_email or state != 'sent' or is_mail_sent"/>
+                <button name="send_signature_accesses" string="Send" type="object" icon="square2" invisible="not signer_email or state != 'sent' or is_mail_sent"/>
                 <button
                     name="send_signature_accesses"
                     string="Resend"
                     type="object"
-                    icon="fa-check-square-o pe-2"
+                    icon="check_box"
                     invisible="not signer_email or state != 'sent' or not is_mail_sent or parent.state == 'expired'"/>
             </list>
         </field>

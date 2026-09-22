@@ -3,22 +3,35 @@
 # * account_saft_import
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Saara Hakanen <sahak@odoo.com>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-12-30 12:59+0000\n"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 03:12+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "account_saft_import/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_saft_import
+#: model:ir.module.module,description:base.module_account_saft_import
+msgid ""
+"\n"
+"Module for the import of SAF-T files, useful for importing accounting "
+"history.\n"
+"\n"
+"SAF-T files are the standard accounting reports that businesses in some "
+"countries have to submit to the tax authorities.\n"
+"This module allows the import of accounts, journals, partners, taxes and "
+"moves from these files.\n"
+msgstr ""
 
 #. module: account_saft_import
 #: model:ir.model,name:account_saft_import.model_account_saft_import_wizard
@@ -28,7 +41,7 @@ msgstr "Ohjattu tilin SAF-T tuontitoiminto"
 #. module: account_saft_import
 #: model:ir.model.fields,help:account_saft_import.field_account_saft_import_wizard__attachment_id
 msgid "Accounting SAF-T data file to be imported"
-msgstr "Kirjanpidon SAF-T-tiedosto, joka tuodaan"
+msgstr "Tuotava kirjanpidon SAF-T-tiedosto"
 
 #. module: account_saft_import
 #. odoo-python
@@ -37,16 +50,7 @@ msgid "Accounting Settings"
 msgstr "Kirjanpidon asetukset"
 
 #. module: account_saft_import
-#: model_terms:ir.ui.view,arch_db:account_saft_import.account_saft_import_form
-msgid "Cancel"
-msgstr "Peruuta"
-
-#. module: account_saft_import
 #: model:ir.model,name:account_saft_import.model_res_company
-msgid "Companies"
-msgstr "Yritykset"
-
-#. module: account_saft_import
 #: model:ir.model.fields,field_description:account_saft_import.field_account_saft_import_wizard__company_id
 msgid "Company"
 msgstr "Yritys"
@@ -80,18 +84,23 @@ msgstr "Tiedosto"
 #. module: account_saft_import
 #: model:ir.model.fields,field_description:account_saft_import.field_account_saft_import_wizard__attachment_name
 msgid "Filename"
-msgstr "Tiedostonnimi"
+msgstr "Tiedostonimi"
 
 #. module: account_saft_import
 #: model:ir.model.fields,field_description:account_saft_import.field_account_saft_import_wizard__id
 #: model:ir.model.fields,field_description:account_saft_import.field_res_company__id
 msgid "ID"
-msgstr "ID"
+msgstr "Tunnus"
 
 #. module: account_saft_import
 #: model_terms:ir.ui.view,arch_db:account_saft_import.account_saft_import_form
 msgid "Import"
 msgstr "Tuo"
+
+#. module: account_saft_import
+#: model:ir.module.module,summary:base.module_account_saft_import
+msgid "Import Accounting Data from SAF-T files"
+msgstr ""
 
 #. module: account_saft_import
 #. odoo-javascript
@@ -107,7 +116,7 @@ msgstr "Tuo tilien alkusaldot"
 #. module: account_saft_import
 #: model_terms:ir.ui.view,arch_db:account_saft_import.account_saft_import_form
 msgid "Import your accounting data from SAF-T file formats"
-msgstr "Tuo kirjanpitotiedot SAF-T-tiedostoformaateista"
+msgstr "Tuo kirjanpitotietosi SAF-T-tiedostomuodoista"
 
 #. module: account_saft_import
 #: model:ir.model.fields,field_description:account_saft_import.field_account_saft_import_wizard__write_uid
@@ -122,9 +131,10 @@ msgstr "Viimeksi päivitetty"
 #. module: account_saft_import
 #: model:ir.actions.act_window,name:account_saft_import.open_saft_import_wizard
 #: model:ir.actions.server,name:account_saft_import.account_saft_import_action
+#: model:ir.module.module,shortdesc:base.module_account_saft_import
 #: model_terms:ir.ui.view,arch_db:account_saft_import.account_saft_import_form
 msgid "SAF-T Import"
-msgstr "SAF-T Tuonti"
+msgstr "SAF-T-tuonti"
 
 #. module: account_saft_import
 #. odoo-python
@@ -141,4 +151,4 @@ msgstr "Valitse tiedosto"
 #. odoo-python
 #: code:addons/account_saft_import/wizard/import_wizard.py:0
 msgid "You should install a Fiscal Localization first."
-msgstr "Maakohtainen verotus tulee asentaa ensin."
+msgstr "Sinun pitäisi asentaa ensin verojen lokalisaatio."

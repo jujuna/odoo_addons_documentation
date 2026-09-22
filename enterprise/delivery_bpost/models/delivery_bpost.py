@@ -69,7 +69,7 @@ class DeliveryCarrier(models.Model):
                     'warning_message': False}
         if order.currency_id.name != 'EUR':
             quote_currency = self.env['res.currency'].search([('name', '=', 'EUR')], limit=1)
-            price = quote_currency._convert(price, order.currency_id, order.company_id, order.date_order or fields.Date.today())
+            price = quote_currency._convert(price, order.currency_id, order.company_id, order.date_order)
         return {'success': True,
                 'price': price,
                 'error_message': False,
@@ -90,7 +90,7 @@ class DeliveryCarrier(models.Model):
                 carrier_price = shipping['price']
             else:
                 quote_currency = self.env['res.currency'].search([('name', '=', 'EUR')], limit=1)
-                carrier_price = quote_currency._convert(shipping['price'], order_currency, company, order.date_order or fields.Date.today())
+                carrier_price = quote_currency._convert(shipping['price'], order_currency, company, order.date_order)
             carrier_tracking_ref = TRACKING_REF_DELIM.join(shipping['main_label']['tracking_codes'])
             tracking_links = Markup('<br/>').join(
                 self._tracking_link_element(code, picking.partner_id.zip)
@@ -155,14 +155,6 @@ class DeliveryCarrier(models.Model):
         if check_value:
             raise UserError(check_value)
         shipping = bpost.send_shipping(pickings, self, False, is_return_label=True)
-        order = pickings.sale_id
-        company = order.company_id or pickings.company_id or self.env.company
-        order_currency = pickings.sale_id.currency_id or pickings.company_id.currency_id
-        if order_currency.name == "EUR":
-            carrier_price = shipping['price']
-        else:
-            quote_currency = self.env['res.currency'].search([('name', '=', 'EUR')], limit=1)
-            carrier_price = quote_currency._convert(shipping['price'], order_currency, company, order.date_order or fields.Date.today())
         carrier_tracking_ref = shipping['main_label']['tracking_codes']
         # bpost does not seem to handle multipackage
         logmessage = _("Return shipment created into bpost") + Markup("<br/> <b>") + _("Tracking Number:") + Markup("</b>") + carrier_tracking_ref[0]

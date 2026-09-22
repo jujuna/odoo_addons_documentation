@@ -9,12 +9,14 @@ from odoo.addons.account_reports.tests.account_sales_report_common import Accoun
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestEEIntrastatReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountSalesReportCommon.setup_country('ee')
     def setUpClass(cls):
         super().setUpClass()
         cls.company_data['company'].country_id = cls.env.ref('base.ee')
-        cls.company_data['company'].company_registry = '0123456789'
+        cls.company_data['company'].partner_id.additional_identifiers = {'EE_EN': '12345678'}
         italy = cls.env.ref('base.it')
         cls.report = cls.env.ref('account_intrastat.intrastat_report')
         cls.report_handler = cls.env['account.intrastat.goods.report.handler']
@@ -189,7 +191,7 @@ class TestEEIntrastatReport(TestAccountReportsCommon):
                 'Description of goods', 'Remark'
             ],
             [
-                '0123456789', '1204', '2022-05', 'IT', '11',
+                '12345678', '1204', '2022-05', 'IT', '11',
                 'QV', '25309050', '798.0', '', '', '23328.48',
                 '', ''
             ],
@@ -215,7 +217,7 @@ class TestEEIntrastatReport(TestAccountReportsCommon):
                 'Value of goods in euros', 'Description of goods', 'Remark'
             ],
             [
-                '0123456789', '1203', '2022-05', 'IT', 'QV999999999999',
+                '12345678', '1203', '2022-05', 'IT', 'QV999999999999',
                 '11', 'QV', '88023000', '14956.0', '4.0', 'p/st',
                 '936000.0', '', ''
             ],

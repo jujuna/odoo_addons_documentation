@@ -5,15 +5,6 @@ from . import models
 from . import wizard
 
 from collections import defaultdict
-from odoo import api, SUPERUSER_ID, _
-
-def _hr_payroll_account_post_init(env):
-    for company in env['res.company'].search([('chart_template', '!=', False)], order="parent_path"):
-        ChartTemplate = env['account.chart.template'].with_company(company)
-        ChartTemplate._load_data({
-            'account.journal': ChartTemplate._get_payroll_account_journal(company.chart_template),
-            'hr.payroll.structure': ChartTemplate._get_payroll_structure(company.chart_template),
-        })
 
 def _salaries_account_journal_pre_init(env):
     """

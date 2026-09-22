@@ -2,8 +2,6 @@
 
 {
     'name': 'Türkiye - Payroll with Accounting',
-    'version': '1.0',
-    'countries': ['tr'],
     'category': 'Human Resources',
     'description': """
 Accounting Data for Türkiye Payroll Rules
@@ -19,5 +17,5 @@ Accounting Data for Türkiye Payroll Rules
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'auto_install': True,
+    'auto_install': ['l10n_tr_hr_payroll', 'hr_payroll_account'],
 }

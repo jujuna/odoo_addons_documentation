@@ -1,10 +1,10 @@
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
-import { Deferred, Mutex } from "@web/core/utils/concurrency";
+import { Mutex } from "@web/core/utils/concurrency";
 
 import { getPdfThumbnail, getWebpThumbnail } from "./documents_client_thumbnail_service_utils";
 
-const THUMBNAIL_WIDTH = 200;
+const THUMBNAIL_WIDTH = 268;
 const THUMBNAIL_HEIGHT = 140;
 
 /**
@@ -15,7 +15,8 @@ const THUMBNAIL_HEIGHT = 140;
  * - Otherwise, the thumbnail is set.
  */
 export const documentsClientThumbnailService = {
-    start(env) {
+    dependencies: ["ui"],
+    start(_, { ui }) {
         let pdfEnabled = true;
         const mutex = new Mutex();
 
@@ -60,7 +61,7 @@ export const documentsClientThumbnailService = {
 
         return {
             enqueueRecords(records) {
-                if (env.isSmall) {
+                if (ui.isSmall) {
                     return;
                 }
                 for (const record of records) {
@@ -73,12 +74,12 @@ export const documentsClientThumbnailService = {
         };
     },
     async _getLoadedImage(record) {
-        const imagePromise = new Deferred();
+        const imagePromise = Promise.withResolvers();
         const img = new Image();
         img.onerror = (e) => imagePromise.reject(e);
         img.onload = () => imagePromise.resolve(img);
         img.src = `/documents/content/${encodeURIComponent(record.data.access_token)}`;
-        return imagePromise;
+        return imagePromise.promise;
     },
 };
 

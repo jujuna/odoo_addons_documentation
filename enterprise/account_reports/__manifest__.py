@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name' : 'Accounting Reports',
@@ -10,8 +9,8 @@ Accounting Reports
     """,
     'depends': ['account_accountant'],
     'data': [
-        'security/account_reports_security.xml',
-        'security/ir.model.access.csv',
+        'data/ir_cron.xml',
+        'data/horizontal_group_data.xml',
         'data/pdf_export_templates.xml',
         'data/customer_reports_pdf_export_templates.xml',
         'data/balance_sheet.xml',
@@ -24,21 +23,24 @@ Accounting Reports
         'data/trial_balance.xml',
         'data/sales_report.xml',
         'data/partner_ledger.xml',
+        'data/trial_balance_template.xml',
         'data/customer_statement.xml',
         'data/followup_report.xml',
         'data/multicurrency_revaluation_report.xml',
         'data/deferred_reports.xml',
         'data/journal_report.xml',
         'data/generic_tax_report.xml',
+        'data/interco_comparison_report.xml',
         'views/account_report_view.xml',
         'data/account_report_actions.xml',
+        'data/account_return_check_actions.xml',
         'data/report_send_cron.xml',
         'data/annual_statements.xml',
         'data/mail_templates.xml',
-        'data/ir_cron.xml',
         'wizard/return_creation_wizard.xml',
         'views/account_move_views.xml',
         'views/res_company_views.xml',
+        'views/account_return_type_views.xml',
         'views/account_return_views.xml',
         'views/account_return_check_views.xml',
         'views/account_journal_dashboard_view.xml',
@@ -54,18 +56,20 @@ Accounting Reports
         'wizard/return_generic_payment_wizard.xml',
         'views/account_account_views.xml',
         'views/account_tax_views.xml',
-        'views/account_return_type_views.xml',
         'views/account_return_check_template_views.xml',
         'views/account_audit_views.xml',
+        'data/account_return_audit_cycle.xml',
         'data/account_return_data.xml',
         'data/menuitems.xml',
         'data/account_return_check_template.xml',
+        'security/ir.access.csv',
     ],
-    'post_init_hook': '_account_reports_post_init',
     'auto_install': True,
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'kpi_providers': [
+        'models.kpi_provider:get_kpi_summary',
+    ],
     'assets': {
         'account_reports.assets_pdf_export': [
             ('include', 'web._assets_helpers'),
@@ -81,7 +85,17 @@ Accounting Reports
             'account_reports/static/src/scss/account_pdf_export_template.scss',
         ],
 
+        "im_livechat.assets_embed_core": [
+            "account_reports/static/src/core/common/**/*",
+        ],
+        "mail.assets_public": [
+            "account_reports/static/src/core/common/**/*",
+        ],
+        "portal.assets_chatter_helpers": [
+            "account_reports/static/src/core/common/**/*",
+        ],
         'web.assets_backend': [
+            "account_reports/static/src/core/common/**/*",
             'account_reports/static/src/components/**/*',
             'account_reports/static/src/js/**/*',
             'account_reports/static/src/views/**/*',

@@ -9,7 +9,7 @@ from odoo.fields import Domain
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    @api.depends('analytic_line_ids.unit_amount', 'analytic_line_ids.validated', 'planning_slot_ids.allocated_hours', 'task_id', 'project_id')
+    @api.depends('analytic_line_ids.unit_amount', 'analytic_line_ids.validated', 'planning_slot_ids.allocated_hours', 'task_id', 'project_id', 'product_id.planning_enabled')
     def _compute_planning_hours_planned(self):
         PlanningSlot = self.env['planning.slot']
         planning_forecast_sols = self.filtered_domain([
@@ -44,8 +44,8 @@ class SaleOrderLine(models.Model):
                 Domain([
                     ('start_datetime', '!=', False),
                     '|',
-                    ('resource_id', '=', False),
-                    ('resource_type', '!=', 'material'),
+                    ('resource_ids', '=', False),
+                    ('resource_ids.resource_type', '=', 'user'),
                 ]) & planning_domain,
                 ['sale_line_id'],
                 ['allocated_hours:sum'])
@@ -56,7 +56,9 @@ class SaleOrderLine(models.Model):
                 converted_unit_amount = sol.company_id.project_time_mode_id._compute_quantity(mapped_unit_amount.get(sol.id, 0.0), uom_hour)
                 # update the planning hours planned
                 sol.planning_hours_planned = mapped_allocated_hours.get(sol.id, 0.0) + converted_unit_amount
-            self.env.add_to_compute(PlanningSlot._fields['allocated_hours'], PlanningSlot.search([
+            slots_to_recompute = PlanningSlot.search([
                 ('start_datetime', '=', False),
                 ('sale_line_id', 'in', self.ids),
-            ]))
+            ])
+            if slots_to_recompute:
+                self.env.add_to_compute(PlanningSlot._fields['allocated_hours'], slots_to_recompute)

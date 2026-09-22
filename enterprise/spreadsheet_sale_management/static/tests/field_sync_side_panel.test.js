@@ -51,7 +51,7 @@ test("confirm with the same position", async () => {
     const sheetId = model.getters.getActiveSheetId();
     const position = { sheetId, col: 0, row: 0 };
     env.openSidePanel("FieldSyncSidePanel", { position });
-    await contains(".o-selection-input input").focus();
+    await contains(".o-selection-input input").click();
     await contains(".o-selection-ok").click();
     expect(".o-selection-input input").toHaveValue("A1");
     expect(getFieldSync(model, "A1")).not.toBe(undefined);
@@ -63,7 +63,7 @@ test("update cell by a range", async () => {
     const sheetId = model.getters.getActiveSheetId();
     const position = { sheetId, col: 0, row: 0 };
     env.openSidePanel("FieldSyncSidePanel", { position });
-    await contains(".o-selection-input input").focus();
+    await contains(".o-selection-input input").click();
     await animationFrame();
     await contains(".o-selection-input input").edit("A2:A3", { confirm: false });
     await contains(".o-selection-ok").click();

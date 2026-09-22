@@ -15,7 +15,7 @@ class SignItem(models.Model):
     type_id = fields.Many2one('sign.item.type', string="Type", required=True, ondelete='restrict')
 
     required = fields.Boolean(default=True)
-    responsible_id = fields.Many2one("sign.item.role", string="Responsible", ondelete="restrict")
+    responsible_id = fields.Many2one("sign.item.role", string="Responsible", ondelete="restrict", index=True)
 
     option_ids = fields.Many2many("sign.item.option", string="Selection options", relation='sign_item_option_rel')
 
@@ -37,6 +37,7 @@ class SignItem(models.Model):
     def create(self, vals_list):
         res = super().create(vals_list)
         res.template_id.check_access('write')
+        res._update_item_type_authorized_users()
         return res
 
     def write(self, vals):
@@ -44,6 +45,14 @@ class SignItem(models.Model):
         if vals.keys() & {'template_id', 'document_id'}:
             self.template_id.check_access('write')
         return res
+
+    def _update_item_type_authorized_users(self):
+        """ Propagate template authorized users to related custom sign item types. """
+        for template in self.template_id:
+            if template.authorized_ids:
+                item_types = self.filtered(lambda item: item.template_id == template and item.type_id.custom).type_id
+                if item_types:
+                    item_types._add_authorized_users(template.authorized_ids)
 
     def copy_data(self, default=None):
         vals_list = super().copy_data(default=default)
@@ -54,6 +63,23 @@ class SignItem(models.Model):
             radio_set_map[radio_set_id] = new_radio_set.id
         for item in vals_list:
             item['radio_set_id'] = radio_set_map.get(item['radio_set_id'])
+        # Copy the role so editing it on one template doesn't leak to the other.
+        role_map = self.env.context.get('__sign_role_copy_map')
+        if role_map is None:
+            role_map = {}  # standalone item copy, not through a template duplication
+
+        for responsible_id in {item['responsible_id'] for item in vals_list if item.get('responsible_id')}:
+            if responsible_id in role_map:
+                continue
+
+            role = self.env['sign.item.role'].browse(responsible_id)
+            if role.default:
+                continue
+
+            role_map[responsible_id] = role.copy().id
+        for item in vals_list:
+            if item.get('responsible_id') in role_map:
+                item['responsible_id'] = role_map[item['responsible_id']]
         return vals_list
 
     @api.constrains('required', 'constant')

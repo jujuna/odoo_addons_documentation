@@ -70,16 +70,16 @@ class HrVersion(models.Model):
 
     def _get_contract_type_domain(self):
         if self.env.company.country_id.code == "CH":
-            return [('id', 'in', self._get_allowed_contract_type_ids())]
+            return [('id', 'in', self._get_allowed_employee_type_ids())]
         return []
 
     l10n_ch_country_id_code = fields.Char(string="Nationality Country Code", related='country_id.code', groups="hr.group_hr_user")
-    l10n_ch_po_box = fields.Char(string="PO. Box", groups="hr.group_hr_user", tracking=True)
+    l10n_ch_po_box = fields.Char(string="PO. Box", groups="hr.group_hr_user", tracking=1)
     l10n_ch_no_nationality = fields.Selection(selection=[("11", "11 - Unknown"),
-                                                         ("22", "22 - Stateless")], string="Special Nationality Status", groups="hr.group_hr_user", tracking=True)
+                                                         ("22", "22 - Stateless")], string="Special Nationality Status", groups="hr.group_hr_user", tracking=1)
     l10n_ch_tax_scale_type = fields.Selection(string="Tax Scale Type", selection=[('TaxAtSourceCode', 'Tariff Code'),
                                                                                   ('CategoryPredefined', "Predefined Category"),
-                                                                                  ('CategoryOpen', "Open")], default="TaxAtSourceCode", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+                                                                                  ('CategoryOpen', "Open")], default="TaxAtSourceCode", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_pre_defined_tax_scale = fields.Selection(string="Predefined Tax Scale",
                                                      selection=[('NON', "NON - Not Subject to Source Tax, without Church Tax"),
                                                                 ('NOY', "NOY - Not Subject to Source Tax, with Church Tax"),
@@ -88,30 +88,30 @@ class HrVersion(models.Model):
                                                                 ('MEN', "MEN - Monetary Value Services residing abroad, without Church tax"),
                                                                 ('MEY', "MEY - Monetary Value Services residing abroad, with Church tax"),
                                                                 ('SFN', "SFN - Special Agreement with France Tariff")
-                                                                ], groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_open_tax_scale = fields.Char(string="Open Tax Scale", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_tax_specially_approved = fields.Boolean(string="Specially Approved by the ACI", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+                                                                ], groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_open_tax_scale = fields.Char(string="Open Tax Scale", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_tax_specially_approved = fields.Boolean(string="Specially Approved by the ACI", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_tax_code = fields.Char(string="Source Tax Code", compute="_compute_l10n_ch_tax_code", groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_source_tax_canton = fields.Char(string="Source Tax Canton", compute="_compute_l10n_ch_source_tax_canton", groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_source_tax_municipality = fields.Char(string="Source Tax Municipality", compute="_compute_l10n_ch_source_tax_municipality", groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_concubinage = fields.Selection(string="Concubinage", selection=[("NoConcubinage", "No"),
                                                                             ("SoleCustody", "Yes with the sole custody"),
                                                                             ("ShareCustodyAndHigherIncome", "Yes with a shared custody and higher income"),
-                                                                            ("AdultChildAndHigherIncome", "Yes, with an Adult Child and higher income")], default="NoConcubinage", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_first_name = fields.Char(string="Spouse First Name", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_last_name = fields.Char(string="Spouse Last Name", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_birthday = fields.Date(string="Spouse Birthday", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_street = fields.Char(groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_zip = fields.Char(groups="hr.group_hr_user", tracking=True, string="Spouse Residence ZIP-Code")
-    l10n_ch_spouse_city = fields.Char(string="Spouse Residence City", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_country_id = fields.Many2one('res.country', groups="hr.group_hr_user", tracking=True, string="Spouse Residence Country")
-    l10n_ch_spouse_revenues = fields.Boolean(string="Spouse Has Income", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_work_end_date = fields.Date(groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_residence_canton = fields.Selection(string="Spouse Residence Canton", selection=CANTONS_WITH_EX, groups="hr.group_hr_user", tracking=True)
-    l10n_ch_cross_border_commuter = fields.Boolean(string="Cross Border Commuter", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_foreign_tax_id = fields.Char(string="Foreign Tax-ID", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_cross_border_start = fields.Date(string="Cross Border Commuter Start Date", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_agricole_company = fields.Boolean(related="company_id.l10n_ch_agricole_company", tracking=True, groups="hr.group_hr_user")
+                                                                            ("AdultChildAndHigherIncome", "Yes, with an Adult Child and higher income")], default="NoConcubinage", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_first_name = fields.Char(string="Spouse First Name", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_last_name = fields.Char(string="Spouse Last Name", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_birthday = fields.Date(string="Spouse Birthday", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_street = fields.Char(groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_zip = fields.Char(groups="hr.group_hr_user", tracking=1, string="Spouse Residence ZIP-Code")
+    l10n_ch_spouse_city = fields.Char(string="Spouse Residence City", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_country_id = fields.Many2one('res.country', groups="hr.group_hr_user", tracking=1, string="Spouse Residence Country")
+    l10n_ch_spouse_revenues = fields.Boolean(string="Spouse Has Income", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_work_end_date = fields.Date(groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_residence_canton = fields.Selection(string="Spouse Residence Canton", selection=CANTONS_WITH_EX, groups="hr.group_hr_user", tracking=1)
+    l10n_ch_cross_border_commuter = fields.Boolean(string="Cross Border Commuter", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_foreign_tax_id = fields.Char(string="Foreign Tax-ID", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_cross_border_start = fields.Date(string="Cross Border Commuter Start Date", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_agricole_company = fields.Boolean(related="company_id.l10n_ch_agricole_company", tracking=1, groups="hr.group_hr_user")
     l10n_ch_relationship_ceo = fields.Selection(string="Degree of Relationship with the owner",
                                                 selection=[("unknown", "Unknown"),
                                                            ("unrelated", "Unrelated to the owner"),
@@ -119,14 +119,14 @@ class HrVersion(models.Model):
                                                            ("OwnerHusband", "Husband of the owner"),
                                                            ("OwnerBloodRelation", "Blood relative with the owner"),
                                                            ("OwnerSiblings", "Siblings with the owner"),
-                                                           ("OwnerFosterChild", "Foster Child of the owner")], tracking=True, default="unknown", groups="hr.group_hr_user")
-    l10n_ch_other_employment = fields.Boolean(string="Other Employment", tracking=True, groups="hr_payroll.group_hr_payroll_user")
+                                                           ("OwnerFosterChild", "Foster Child of the owner")], tracking=1, default="unknown", groups="hr.group_hr_user")
+    l10n_ch_other_employment = fields.Boolean(string="Other Employment", tracking=1, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_total_activity_type = fields.Selection(string="Other Employment Details", selection=[("unknown", "Unknown"),
                                                                                                  ("percentage", "Total Percentage"),
-                                                                                                 ("gross", "Total Gross Monthly Income")], default="unknown", tracking=True, groups="hr_payroll.group_hr_payroll_user")
-    l10n_ch_other_activity_percentage = fields.Float(string="Total Percentage", tracking=True, groups="hr_payroll.group_hr_payroll_user")
-    l10n_ch_other_activity_gross = fields.Float(string="Total Income", tracking=True, groups="hr_payroll.group_hr_payroll_user")
-    l10n_ch_working_days_in_ch = fields.Float(string="Working Days in Switzerland", default=20, tracking=True, groups="hr.group_hr_user")
+                                                                                                 ("gross", "Total Gross Monthly Income")], default="unknown", tracking=1, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_other_activity_percentage = fields.Float(string="Total Percentage", tracking=1, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_other_activity_gross = fields.Float(string="Total Income", tracking=1, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_working_days_in_ch = fields.Float(string="Working Days in Switzerland", default=20, tracking=1, groups="hr.group_hr_user")
     l10n_ch_residence_type = fields.Selection(string="Kind of residence", selection=[("Daily", "Daily"),
                                                                                      ("Weekly", "Weekly")],
                                               default="Daily", groups="hr.group_hr_user",
@@ -139,20 +139,20 @@ class HrVersion(models.Model):
     Weekly:
     For PIS who do not have a residence but have a weekly place of stay in Switzerland,
     the canton and municipality of the weekly stay (based on the address of the weekly stay) are decisive.
-    """, tracking=True)
-    l10n_ch_weekly_residence_canton = fields.Selection(string="Weekly Residence Canton", selection=CANTONS, compute="_compute_weekly_residence_autocomplete", store=True, readonly=False, tracking=True, groups="hr.group_hr_user")
-    l10n_ch_weekly_residence_municipality = fields.Char(string="Weekly Residence Municipality", compute="_compute_weekly_residence_autocomplete", store=True, readonly=False, tracking=True, groups="hr.group_hr_user")
+    """, tracking=1)
+    l10n_ch_weekly_residence_canton = fields.Selection(string="Weekly Residence Canton", selection=CANTONS, compute="_compute_weekly_residence_autocomplete", store=True, readonly=False, tracking=1, groups="hr.group_hr_user")
+    l10n_ch_weekly_residence_municipality = fields.Char(string="Weekly Residence Municipality", compute="_compute_weekly_residence_autocomplete", store=True, readonly=False, tracking=1, groups="hr.group_hr_user")
 
-    l10n_ch_weekly_residence_address_street = fields.Char(string="Weekly Residence Street", tracking=True, groups="hr.group_hr_user")
-    l10n_ch_weekly_residence_address_city = fields.Char(string="Weekly Residence City", compute="_compute_weekly_residence_autocomplete", store=True, readonly=False, tracking=True, groups="hr.group_hr_user")
-    l10n_ch_weekly_residence_address_zip = fields.Char(string="Weekly Residence ZIP-Code", tracking=True, groups="hr.group_hr_user")
+    l10n_ch_weekly_residence_address_street = fields.Char(string="Weekly Residence Street", tracking=1, groups="hr.group_hr_user")
+    l10n_ch_weekly_residence_address_city = fields.Char(string="Weekly Residence City", compute="_compute_weekly_residence_autocomplete", store=True, readonly=False, tracking=1, groups="hr.group_hr_user")
+    l10n_ch_weekly_residence_address_zip = fields.Char(string="Weekly Residence ZIP-Code", tracking=1, groups="hr.group_hr_user")
 
     l10n_ch_flex_profiling = fields.Char("Flex Profiling", help="""
     This variable can only be provided if a prior agreement has been established between the OFS and the company as part of the Profiling process.
     It involves additional information required to account for the specific characteristics of certain companies (e.g., to define the staff included).
-    """, tracking=True, groups="hr.group_hr_user")
+    """, tracking=1, groups="hr.group_hr_user")
 
-    l10n_ch_canton = fields.Selection(selection=CANTONS_WITH_EX, string="Canton", groups="hr.group_hr_user", compute="_compute_autocomplete_private_address", store=True, readonly=False, tracking=True)
+    l10n_ch_canton = fields.Selection(selection=CANTONS_WITH_EX, string="Canton", groups="hr.group_hr_user", compute="_compute_autocomplete_private_address", store=True, readonly=False, tracking=1)
     l10n_ch_tax_scale = fields.Selection([
         ('A', 'A - Scale for single people'),
         ('B', 'B - Scale for married couples living in a common household with only one spouse is gainfully employed'),
@@ -171,8 +171,8 @@ class HrVersion(models.Model):
         ('S', 'S - Scale for Italian cross-border commuters who fulfill the conditions of the scale B'),
         ('T', 'T - Scale for Italian cross-border commuters who fulfill the conditions of the scale C'),
         ('U', 'U - Scale for Italian cross-border commuters who fulfill the conditions of the scale H'),
-    ], string="Swiss Tax Scale", groups="hr_payroll.group_hr_payroll_user", tracking=True, default='A')
-    l10n_ch_municipality = fields.Char(string="Municipality ID", compute="_compute_autocomplete_private_address", store=True, readonly=False, groups="hr.group_hr_user", tracking=True)
+    ], string="Swiss Tax Scale", groups="hr_payroll.group_hr_payroll_user", tracking=1, default='A')
+    l10n_ch_municipality = fields.Char(string="Municipality ID", compute="_compute_autocomplete_private_address", store=True, readonly=False, groups="hr.group_hr_user", tracking=1)
     private_city = fields.Char(compute="_compute_autocomplete_private_address", store=True, readonly=False)
 
     l10n_ch_religious_denomination = fields.Selection([
@@ -181,15 +181,15 @@ class HrVersion(models.Model):
         ('reformedEvangelical', 'Reformed Evangelical'),
         ('jewishCommunity', 'Jewish Community'),
         ('otherOrNone', 'Other or None'),
-    ], default='otherOrNone', string="Religious Denomination", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_church_tax = fields.Boolean(string="Swiss Church Tax", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    ], default='otherOrNone', string="Religious Denomination", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_church_tax = fields.Boolean(string="Swiss Church Tax", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     marital = fields.Selection(selection='_get_marital_status_selection')
-    l10n_ch_marital_from = fields.Date(string="Marital Status Start Date", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_sv_as_number = fields.Char(string="Spouse SV-AS-Number", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_work_canton = fields.Selection(string="Spouse Work Canton", selection=CANTONS_WITH_EX, groups="hr.group_hr_user", tracking=True)
-    l10n_ch_spouse_work_start_date = fields.Date(string="Spouse Work Start Date", groups="hr.group_hr_user", tracking=True)
+    l10n_ch_marital_from = fields.Date(string="Marital Status Start Date", groups="hr.group_hr_user", tracking=1, compute="_compute_marital_from", store=True, readonly=False)
+    l10n_ch_spouse_sv_as_number = fields.Char(string="Spouse SV-AS-Number", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_work_canton = fields.Selection(string="Spouse Work Canton", selection=CANTONS_WITH_EX, groups="hr.group_hr_user", tracking=1)
+    l10n_ch_spouse_work_start_date = fields.Date(string="Spouse Work Start Date", groups="hr.group_hr_user", tracking=1)
     l10n_ch_has_withholding_tax = fields.Boolean(
-        string="Pay Withholding Taxes", groups="hr.group_hr_user", tracking=True)
+        string="Pay Withholding Taxes", groups="hr.group_hr_user", tracking=1)
 
     l10n_ch_residence_category = fields.Selection([
         ('shortTerm-L', 'Short Term (Cat. L)'),
@@ -203,89 +203,98 @@ class HrVersion(models.Model):
         ('ProvisionallyAdmittedForeigners-F', 'Provisionally Admitted Foreigners (Cat. F)'),
         ('ResidentForeignNationalWithGainfulEmployment-Ci', 'Residence Permit with Gainful Employment (Ci)'),
         ('othersNotSwiss', 'Other (Without Swiss)'),
-    ], string="Residence Category", groups="hr.group_hr_user", tracking=True)
+    ], string="Residence Category", groups="hr.group_hr_user", tracking=1)
 
-    contract_type_id = fields.Many2one('hr.contract.type', domain=lambda self: self._get_contract_type_domain(), default=lambda self: self.env.ref("l10n_ch_hr_payroll.l10n_ch_contract_type_indefiniteSalaryMth").id)
+    employee_type_id = fields.Many2one('hr.employee.type', domain=lambda self: self._get_contract_type_domain(), default=lambda self: self.env.ref("l10n_ch_hr_payroll.l10n_ch_contract_type_indefiniteSalaryMth").id if self.env.company.country_id.code == 'CH' else False)
     l10n_ch_job_type = fields.Selection([
         ('highestCadre', 'Top Management'),
         ('middleCadre', 'Middle Management'),
         ('lowerCadre', 'Lower Management'),
         ('lowestCadre', 'Responsible for carrying out the work'),
         ('noCadre', 'Without management function'),
-    ], default='noCadre', string="Job Type", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    ], default='noCadre', string="Job Type", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     wage_type = fields.Selection(selection_add=[("NoTimeConstraint", "No Time Constraint")],
                                  ondelete={"NoTimeConstraint": 'cascade'}, default="monthly")
-    l10n_ch_laa_group = fields.Many2one("l10n.ch.accident.group", string="LAA Code", groups="hr.group_hr_user", tracking=True, domain='[("insurance_id.company_id", "=", company_id)]')
+    l10n_ch_laa_group = fields.Many2one("l10n.ch.accident.group", string="LAA Code", groups="hr.group_hr_user", tracking=1, domain='[("insurance_id.company_id", "=", company_id)]')
     laa_solution_number = fields.Selection(selection=[
         ('0', '0 - Not insured'),
         ('1', '1 - Occupational and Non-Occupational Insured, with deductions'),
         ('2', '2 - Occupational and Non-Occupational Insured, without deductions'),
-        ('3', '3 - Only Occupational Insured')], default='1', groups="hr.group_hr_user", tracking=True)
+        ('3', '3 - Only Occupational Insured')], default='1', groups="hr.group_hr_user", tracking=1)
     l10n_ch_lpp_withdrawal_reason = fields.Selection(selection=[('withdrawalCompany', "Withdrawal From Company"),
                                                                 ('interruptionOfEmployment', 'Interruption Of Work'),
                                                                 ('retirement', "Retirement"),
-                                                                ('others', 'Others')], default="withdrawalCompany", string="Withdrawal Reason", help="""Specify here the entry in LPP reason.""", groups="hr.group_hr_user", tracking=True)
+                                                                ('others', 'Others')], default="withdrawalCompany", string="Withdrawal Reason", help="""Specify here the entry in LPP reason.""", groups="hr.group_hr_user", tracking=1)
     l10n_ch_lpp_entry_reason = fields.Selection(selection=[('interruptionOfEmployment', 'Resuming Work After an Interruption'),
                                                            ('entryCompany', 'Entry In Company'),
-                                                           ('others', 'Others')], string="Entry Reason", default="entryCompany", help="""Specify here the withdrawal from LPP reason.""", groups="hr.group_hr_user", tracking=True)
+                                                           ('others', 'Others')], string="Entry Reason", default="entryCompany", help="""Specify here the withdrawal from LPP reason.""", groups="hr.group_hr_user", tracking=1)
     l10n_ch_lpp_entry_valid_as_of = fields.Date("Entry Valid As Of", compute="_compute_l10n_ch_lpp_entry_valid_as_of", store=True, readonly=False, help="Please Provide the validity date of the last LPP Entry", groups="hr.group_hr_user")
     l10n_ch_lpp_withdrawal_valid_as_of = fields.Date("Withdrawal Valid As Of", compute="_compute_l10n_ch_lpp_withdrawal_valid_as_of", store=True, readonly=False, help="Please Provide the validity date of the last LPP Withdrawal", groups="hr.group_hr_user")
-    l10n_ch_lpp_solutions = fields.Many2many('l10n.ch.lpp.insurance.line', string="LPP Codes", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_lpp_mutations = fields.One2many('l10n.ch.lpp.mutation', 'version_id', groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    lpp_employee_amount = fields.Float(string="LPP Employee Contributions", groups="hr.group_hr_user", tracking=True)
-    lpp_company_amount = fields.Float(string="LPP Company Contributions", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_14th_month = fields.Boolean(string="14th Month", groups="hr.group_hr_user", tracking=True)
-    irregular_working_time = fields.Boolean(string="Irregular Working Time", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    l10n_ch_lpp_solutions = fields.Many2many('l10n.ch.lpp.insurance.line', string="LPP Codes", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_lpp_mutations = fields.One2many('l10n.ch.lpp.mutation', 'version_id', copy=True, groups="hr_payroll.group_hr_payroll_user")
+    lpp_employee_amount = fields.Float(string="LPP Employee Contributions", groups="hr.group_hr_user", tracking=1)
+    lpp_company_amount = fields.Float(string="LPP Company Contributions", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_14th_month = fields.Boolean(string="14th Month", groups="hr.group_hr_user", tracking=1)
+    irregular_working_time = fields.Boolean(string="Irregular Working Time", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_weekly_hours = fields.Float(string="Weekly Hours", compute="_compute_l10n_ch_weekly_hours", store=True, readonly=False, groups="hr_payroll.group_hr_payroll_user")
-    l10n_ch_weekly_lessons = fields.Float(string="Weekly Lessons", groups="hr.group_hr_user", tracking=True)
+    l10n_ch_weekly_lessons = fields.Float(string="Weekly Lessons", groups="hr.group_hr_user", tracking=1)
 
     l10n_ch_thirteen_month = fields.Boolean(
-        string="Has 13th Month", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+        string="Has 13th Month", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_social_insurance_id = fields.Many2one(
-        'l10n.ch.social.insurance', string="AVS/AC Insurance", groups="hr_payroll.group_hr_payroll_user", tracking=True, domain='[("company_id", "=", company_id)]')
+        'l10n.ch.social.insurance', string="AVS/AC Insurance", groups="hr_payroll.group_hr_payroll_user", tracking=1, domain='[("company_id", "=", company_id)]')
     l10n_ch_lpp_insurance_id = fields.Many2one(
-        'l10n.ch.lpp.insurance', string="LPP Insurance", groups="hr_payroll.group_hr_payroll_user", tracking=True, domain='[("company_id", "=", company_id)]')
+        'l10n.ch.lpp.insurance', string="LPP Insurance", groups="hr_payroll.group_hr_payroll_user", tracking=1, domain='[("company_id", "=", company_id)]')
     l10n_ch_accident_insurance_line_id = fields.Many2one(
-        'l10n.ch.accident.insurance.line', string="LAA Insurance", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+        'l10n.ch.accident.insurance.line', string="LAA Insurance", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_additional_accident_insurance_line_ids = fields.Many2many(
-        'l10n.ch.additional.accident.insurance.line', string="LAAC Insurances", groups="hr_payroll.group_hr_payroll_user", tracking=True, domain='[("insurance_id.company_id", "=", company_id)]')
+        'l10n.ch.additional.accident.insurance.line', string="LAAC Insurances", groups="hr_payroll.group_hr_payroll_user", tracking=1, domain='[("insurance_id.company_id", "=", company_id)]')
     l10n_ch_sickness_insurance_line_ids = fields.Many2many(
-        'l10n.ch.sickness.insurance.line', string="IJM Insurances", groups="hr_payroll.group_hr_payroll_user", tracking=True, domain='[("insurance_id.company_id", "=", company_id)]')
+        'l10n.ch.sickness.insurance.line', string="IJM Insurances", groups="hr_payroll.group_hr_payroll_user", tracking=1, domain='[("insurance_id.company_id", "=", company_id)]')
     l10n_ch_compensation_fund_id = fields.Many2one(
-        'l10n.ch.compensation.fund', string="Family Compensation Fund", groups="hr_payroll.group_hr_payroll_user", tracking=True, domain='[("company_id", "=", company_id)]')
-    l10n_ch_lesson_wage = fields.Float('Lesson Wage', tracking=True, help="Employee's gross wage by lesson.", groups="hr_payroll.group_hr_payroll_user")
-    l10n_ch_contractual_13th_month_rate = fields.Float("Contractual allowances for 13th/14th month", digits='Payroll Rate', default=8.3333, groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_location_unit_id = fields.Many2one("l10n.ch.location.unit", string="Workplace", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+        'l10n.ch.compensation.fund', string="Family Compensation Fund", groups="hr_payroll.group_hr_payroll_user", tracking=1, domain='[("company_id", "=", company_id)]')
+    l10n_ch_lesson_wage = fields.Float('Lesson Wage', tracking=1, help="Employee's gross wage by lesson.", groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_contractual_13th_month_rate = fields.Float("Contractual allowances for 13th/14th month", digits='Payroll Rate', default=8.3333, groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_location_unit_id = fields.Many2one("l10n.ch.location.unit", string="Workplace", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_avs_status = fields.Selection([
         ('youth', 'Youth'),
         ('exempted', 'Exempted'),
         ('retired', 'Retired'),
-    ], string="AVS Special Status", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_yearly_holidays = fields.Integer(string="Yearly Holidays Count", default=20, groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_yearly_paid_public_holidays = fields.Integer(default=10, string="Yearly Paid Public Holidays Count", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_lpp_not_insured = fields.Boolean(string="Not LPP Insured", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_other_employers = fields.Boolean(groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_current_occupation_rate = fields.Float(string="Current Occupation rate", compute='_compute_l10n_ch_current_occupation_rate', inverse="_inverse_l10n_ch_current_occupation_rate", store=True, readonly=False, groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_other_employers_occupation_rate = fields.Float(compute="_compute_l10n_ch_other_employers_occupation_rate", store=True, groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    ], string="AVS Special Status", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_yearly_holidays = fields.Integer(string="Yearly Holidays Count", default=20, groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_yearly_paid_public_holidays = fields.Integer(default=10, string="Yearly Paid Public Holidays Count", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_lpp_not_insured = fields.Boolean(string="Not LPP Insured", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_other_employers = fields.Boolean(groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_current_occupation_rate = fields.Float(string="Current Occupation rate", compute='_compute_l10n_ch_current_occupation_rate', inverse="_inverse_l10n_ch_current_occupation_rate", store=True, readonly=False, groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_other_employers_occupation_rate = fields.Float(compute="_compute_l10n_ch_other_employers_occupation_rate", store=True, groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_total_occupation_rate = fields.Float(string="Total occupation rate", compute="_compute_total_occupation_rate", groups="hr_payroll.group_hr_payroll_user")
-    l10n_ch_is_model = fields.Selection(string="IS Model", selection=[('monthly', 'Monthly'), ('yearly', 'Yearly')], default='monthly', groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_is_predefined_category = fields.Char(string="IS Predefined Category", groups="hr_payroll.group_hr_payroll_user", help="Des barèmes fixes sont appliqués pour l'impôt à la source retenu sur les honoraires des administrateurs (art. 93 LIFD) et certaines participations de collaborateur (art. 97a LIFD). Pour ces impôts, aucun enfant n'est pris en compte et un seul taux en %% est appliqué. À cela s'ajoutent des catégories prédéfinies pour les annonces rectificatives et pour l'annonce des salaires bruts des frontaliers français pour lesquels l'accord spécial entre les cantons BE, BS, BL, JU, NE, SO, VD et VS et la France s'applique.", tracking=True)
-    l10n_ch_monthly_effective_days = fields.Float(string="Monthly Effective Working Days", default=20, groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    l10n_ch_is_model = fields.Selection(string="IS Model", selection=[('monthly', 'Monthly'), ('yearly', 'Yearly')], default='monthly', groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_is_predefined_category = fields.Char(string="IS Predefined Category", groups="hr_payroll.group_hr_payroll_user", help="Des barèmes fixes sont appliqués pour l'impôt à la source retenu sur les honoraires des administrateurs (art. 93 LIFD) et certaines participations de collaborateur (art. 97a LIFD). Pour ces impôts, aucun enfant n'est pris en compte et un seul taux en %% est appliqué. À cela s'ajoutent des catégories prédéfinies pour les annonces rectificatives et pour l'annonce des salaires bruts des frontaliers français pour lesquels l'accord spécial entre les cantons BE, BS, BL, JU, NE, SO, VD et VS et la France s'applique.", tracking=1)
+    l10n_ch_monthly_effective_days = fields.Float(string="Monthly Effective Working Days", default=20, groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_contractual_holidays_rate = fields.Float(string="Holiday Compensation", compute="_compute_l10n_ch_contractual_holidays_rate", store=True, readonly=False, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_contractual_public_holidays_rate = fields.Float(string="Public Holiday Compensation", compute="_compute_l10n_ch_contractual_public_holidays_rate", store=True, readonly=False, groups="hr_payroll.group_hr_payroll_user")
-    l10n_ch_contractual_vacation_pay = fields.Boolean(string="Pay Holiday Compensation each month", default=True, groups="hr_payroll.group_hr_payroll_user", help="""If unselected, vacation pay should be paid manually the moment the employee takes his vacation.""", tracking=True)
-    l10n_ch_contractual_annual_wage = fields.Monetary(string="Contractual Annual Wage", default=0, groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    l10n_ch_contractual_vacation_pay = fields.Boolean(string="Pay Holiday Compensation each month", default=True, groups="hr_payroll.group_hr_payroll_user", help="""If unselected, vacation pay should be paid manually the moment the employee takes his vacation.""", tracking=1)
+    l10n_ch_contractual_annual_wage = fields.Monetary(string="Contractual Annual Wage", default=0, groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_ch_permanent_staff_public_admin = fields.Boolean("Permanent Staff for Public Administrations", groups="hr.group_hr_user", help="""
     A flag that allows for the clear identification of core personnel within public administrations.
     This flag will only be used by public administrations (municipalities, cities, districts, cantons, the Confederation, etc.) and churches.
     It will enable the distinction between core staff and various external mandates (such as exam experts, interpreters, etc.) and other engagements that are not part of the permanent workforce.
-    """, tracking=True)
-    l10n_ch_interim_worker = fields.Boolean(string="Interim Worker", groups="hr.group_hr_user", tracking=True)
-    l10n_ch_contract_wage_ids = fields.One2many("l10n.ch.hr.contract.wage", "version_id", domain=[('date_start', '=', False)], copy=True, groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    """, tracking=1)
+    l10n_ch_interim_worker = fields.Boolean(string="Interim Worker", groups="hr.group_hr_user", tracking=1)
+    l10n_ch_contract_wage_ids = fields.One2many("l10n.ch.hr.contract.wage", "version_id", domain=[('date_start', '=', False)], copy=True, groups="hr_payroll.group_hr_payroll_user", tracking=1)
     one_time_wage_count = fields.Integer(compute="_compute_one_time_wage_count", groups="hr_payroll.group_hr_payroll_user")
-    l10n_ch_has_monthly = fields.Boolean("Has Monthly Wage", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_has_hourly = fields.Boolean("Has Hourly Wage", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_ch_has_lesson = fields.Boolean("Has Lesson Wage", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    l10n_ch_has_monthly = fields.Boolean("Has Monthly Wage", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_has_hourly = fields.Boolean("Has Hourly Wage", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_ch_has_lesson = fields.Boolean("Has Lesson Wage", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+
+    _l10n_ch_lesson_wage_positive = models.Constraint(
+        'CHECK(l10n_ch_lesson_wage >= 0)',
+        'The lesson wage must be a positive value.',
+    )
+    _l10n_ch_check_contractual_annual_wage = models.Constraint(
+        'CHECK(l10n_ch_contractual_annual_wage >= 0)',
+        'The contractual annual wage must be a positive value.',
+    )
 
     @api.constrains('l10n_ch_municipality', 'l10n_ch_weekly_residence_municipality', 'private_country_id')
     def _check_swiss_address(self):
@@ -326,7 +335,7 @@ class HrVersion(models.Model):
         if not self.l10n_ch_has_lesson:
             self.l10n_ch_lesson_wage = 0
 
-    def _get_allowed_contract_type_ids(self):
+    def _get_allowed_employee_type_ids(self):
         return (self.env.ref("l10n_ch_hr_payroll.l10n_ch_contract_type_indefiniteSalaryMth") +
                 self.env.ref("l10n_ch_hr_payroll.l10n_ch_contract_type_indefiniteSalaryMthAWT") +
                 self.env.ref("l10n_ch_hr_payroll.l10n_ch_contract_type_fixedSalaryMth") +
@@ -338,19 +347,19 @@ class HrVersion(models.Model):
                 self.env.ref("l10n_ch_hr_payroll.l10n_ch_contract_type_fixedSalaryNoTimeConstraint") +
                 self.env.ref("l10n_ch_hr_payroll.l10n_ch_contract_type_administrativeBoard")).ids
 
-    def generate_work_entries(self, date_start, date_stop, force=False):
+    def generate_work_entries(self, date_start, date_stop):
         # Completely bypass work entry generation for Swiss Contracts
         swissdec_structure = self.env.ref("l10n_ch_hr_payroll.structure_type_employee_ch", raise_if_not_found=False)
         swiss_contracts = self.filtered(lambda c: c.structure_type_id.id == swissdec_structure.id)
 
-        return super(HrVersion, self - swiss_contracts).generate_work_entries(date_start, date_stop, force)
+        return super(HrVersion, self - swiss_contracts).generate_work_entries(date_start, date_stop)
 
     def write(self, vals):
         res = super().write(vals)
         swissdec_structure = self.env.ref("l10n_ch_hr_payroll.structure_type_employee_ch", raise_if_not_found=False)
-        swiss_employees = self.filtered(lambda c: c.structure_type_id.id == swissdec_structure.id).mapped("employee_id")
+        swiss_employees = self.filtered(lambda c: c.sudo().structure_type_id.id == swissdec_structure.id).mapped("employee_id")
         if swiss_employees:
-            pending_computation_slips = swiss_employees.slip_ids.filtered(lambda p: p.state == 'draft' and p.struct_id.code == "CHMONTHLYELM")
+            pending_computation_slips = swiss_employees.sudo().slip_ids.filtered(lambda p: p.state == 'draft' and p.struct_id.code == "CHMONTHLYELM")
             if pending_computation_slips:
                 pending_computation_slips.action_refresh_from_work_entries()
             else:
@@ -413,14 +422,14 @@ class HrVersion(models.Model):
         for contract in self:
             contract.l10n_ch_contractual_public_holidays_rate = round((contract.l10n_ch_yearly_paid_public_holidays / (260 - contract.l10n_ch_yearly_paid_public_holidays)) * 100, 2)
 
-    @api.depends('structure_type_id', 'contract_type_id')
+    @api.depends('structure_type_id', 'employee_type_id')
     def _compute_wage_type(self):
         swissdec_structure = self.env.ref("l10n_ch_hr_payroll.structure_type_employee_ch")
         swissdec_contracts = self.filtered(lambda c: c.structure_type_id.id == swissdec_structure.id)
         for contract in swissdec_contracts:
-            if contract.contract_type_id.code in ["indefiniteSalaryMth", "indefiniteSalaryMthAWT", "fixedSalaryMth", "apprentice", "internshipContract"]:
+            if contract.employee_type_id.code in ["indefiniteSalaryMth", "indefiniteSalaryMthAWT", "fixedSalaryMth", "apprentice", "internshipContract"]:
                 contract.wage_type = "monthly"
-            elif contract.contract_type_id.code in ["indefiniteSalaryHrs", "fixedSalaryHrs"]:
+            elif contract.employee_type_id.code in ["indefiniteSalaryHrs", "fixedSalaryHrs"]:
                 contract.wage_type = "hourly"
             else:
                 contract.wage_type = "NoTimeConstraint"
@@ -472,7 +481,7 @@ class HrVersion(models.Model):
 
     def action_view_wages(self):
         self.ensure_one()
-        action = self.env.ref('l10n_ch_hr_payroll.action_l10n_ch_hr_contract_wage').read()[0]
+        action = self.env['ir.actions.act_window']._for_xml_id('l10n_ch_hr_payroll.action_l10n_ch_hr_contract_wage')
         action['domain'] = [('version_id', '=', self.id),
                             ('date_start', '!=', False)]
         action['context'] = {
@@ -490,7 +499,7 @@ class HrVersion(models.Model):
 
     @api.depends('private_zip')
     def _compute_autocomplete_private_address(self):
-        ZIP_DATA = self.env['hr.rule.parameter']._get_parameter_from_code("l10n_ch_bfs_municipalities", fields.Date.today(), raise_if_not_found=False)
+        ZIP_DATA = self.env['hr.rule.parameter']._get_parameter_from_code("l10n_ch_bfs_municipalities", fields.Date.context_today(self), raise_if_not_found=False)
         if ZIP_DATA:
             for record in self:
                 if record.private_zip:
@@ -502,7 +511,7 @@ class HrVersion(models.Model):
 
     @api.depends('l10n_ch_weekly_residence_address_zip')
     def _compute_weekly_residence_autocomplete(self):
-        ZIP_DATA = self.env['hr.rule.parameter']._get_parameter_from_code("l10n_ch_bfs_municipalities", fields.Date.today(), raise_if_not_found=False)
+        ZIP_DATA = self.env['hr.rule.parameter']._get_parameter_from_code("l10n_ch_bfs_municipalities", fields.Date.context_today(self), raise_if_not_found=False)
         if ZIP_DATA:
             for record in self:
                 if record.l10n_ch_weekly_residence_address_zip:
@@ -558,18 +567,30 @@ class HrVersion(models.Model):
         whitelist_fields = super()._get_whitelist_fields_from_template()
         if self.env.company.country_id.code == "CH":
             whitelist_fields += [
+                "irregular_working_time",
                 "l10n_ch_accident_insurance_line_id",
                 "l10n_ch_additional_accident_insurance_line_ids",
                 "l10n_ch_avs_status",
                 "l10n_ch_compensation_fund_id",
                 "l10n_ch_contractual_13th_month_rate",
+                "l10n_ch_current_occupation_rate",
                 "l10n_ch_is_model",
                 "l10n_ch_is_predefined_category",
                 "l10n_ch_job_type",
                 "l10n_ch_lesson_wage",
                 "l10n_ch_location_unit_id",
+                "l10n_ch_laa_group",
+                "laa_solution_number",
                 "l10n_ch_lpp_insurance_id",
                 "l10n_ch_lpp_not_insured",
+                "l10n_ch_lpp_entry_valid_as_of",
+                "l10n_ch_lpp_entry_reason",
+                "l10n_ch_lpp_withdrawal_reason",
+                "l10n_ch_lpp_withdrawal_valid_as_of",
+                "l10n_ch_lpp_solutions",
+                "lpp_employee_amount",
+                "lpp_company_amount",
+                "l10n_ch_lpp_mutations",
                 "l10n_ch_monthly_effective_days",
                 "l10n_ch_other_employers",
                 "l10n_ch_other_employers_occupation_rate",
@@ -579,5 +600,19 @@ class HrVersion(models.Model):
                 "l10n_ch_total_occupation_rate",
                 "l10n_ch_yearly_holidays",
                 "l10n_ch_yearly_paid_public_holidays",
+                "l10n_ch_contractual_holidays_rate",
+                "l10n_ch_contractual_public_holidays_rate",
+                "l10n_ch_contractual_vacation_pay",
+                "l10n_ch_has_hourly",
+                "l10n_ch_has_monthly",
+                "l10n_ch_has_lesson",
+                "l10n_ch_weekly_hours",
+                "l10n_ch_weekly_lessons",
             ]
         return whitelist_fields
+
+    @api.depends('employee_id.birthday')
+    def _compute_marital_from(self):
+        for record in self:
+            if not record.l10n_ch_marital_from and record.employee_id.birthday:
+                record.l10n_ch_marital_from = record.employee_id.birthday

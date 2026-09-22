@@ -52,7 +52,7 @@
             <xpath expr="//button[@name='button_request_cancel']" position="after">
                 <button name="action_l10n_in_bill_reset_gstr2b_manual_matching"
                     string="Reset Manual Match"
-                    type="object" icon="fa-undo"
+                    type="object" icon="undo"
                     groups="account.group_account_manager"
                     invisible="country_code != 'IN' or state != 'posted' or move_type not in ('in_invoice', 'in_refund')
                     or l10n_in_gstr2b_reconciliation_status != 'manually_matched'"
@@ -60,6 +60,15 @@
             </xpath>
             <xpath expr="//field[@name='invoice_source_email']" position="after">
                 <field name="l10n_in_gstr2b_reconciliation_status" readonly="1" invisible="not l10n_in_gst_efiling_feature_enabled or move_type not in ('in_invoice', 'in_receipt', 'in_refund') or country_code != 'IN'"/>
+                <field name="l10n_in_gstr_iff_exclude"
+                    groups="account.group_account_manager"
+                    widget="boolean_toggle"
+                    readonly="l10n_in_iff_reported"
+                    invisible="not l10n_in_gstr_iff_exclude
+                        or not l10n_in_gst_efiling_feature_enabled
+                        or move_type not in ('out_invoice', 'out_refund')
+                        or country_code != 'IN'"
+                />
             </xpath>
             <xpath expr="//div[@name='journal_div']" position="after">
                 <field name="l10n_in_irn_number" invisible="country_code != 'IN' or not l10n_in_irn_number" class="text-break"/>
@@ -70,7 +79,7 @@
                     <div class="o_row">
                         E-Invoice IRN is available. Fetching data from the GSTN portal.
                         <button name="l10n_in_update_move_using_irn" type="object" class="oe_link oe_inline">
-                            <i class="oi oi-fw o_button_icon oi-arrow-right"/>
+                            <i class="oi oi-fw o_button_icon" data-icon="east"/>
                             Fetch
                         </button>
                     </div>
@@ -79,6 +88,24 @@
         </field>
     </record>
 
+    <record id="view_account_move_list_inherit_account" model="ir.ui.view">
+        <field name="name">account.move.list.inherit.account</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='review_state']" position="after">
+                <field name="l10n_in_gstr_iff_exclude"
+                    groups="account.group_account_manager"
+                    widget="boolean_toggle"
+                    readonly="l10n_in_iff_reported"
+                    invisible="not l10n_in_gst_efiling_feature_enabled
+                        or move_type not in ('out_invoice', 'out_refund')
+                        or country_code != 'IN'"
+                />
+            </xpath>
+        </field>
+    </record>
     <record id="view_account_invoice_filter" model="ir.ui.view">
         <field name="name">account.invoice.select.inherit</field>
         <field name="model">account.move</field>

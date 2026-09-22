@@ -1,45 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="l10n_ch_hr_payroll.SalaryResultWidgetTemplate">
-        <t t-set="institution_domain" t-value="this.state.institution_domain"/>
-        <t t-if="this.state.parsedData">
-            <t t-if="this.state.parsedData.SalaryResult">
-                <t t-set="parsedData" t-value="this.state.parsedData.SalaryResult[institution_domain]"/>
-            </t>
-            <t t-elif="this.state.parsedData.Dialog">
-                <t t-set="parsedData" t-value="this.state.parsedData.Dialog[institution_domain]"/>
-            </t>
-        </t>
-        <t t-else="">
-            <t t-set="parsedData" t-value="None"/>
-        </t>
         <div class="o_swissdec_json_widget p-3">
-            <t t-if="parsedData">
+            <t t-if="this.parsedData">
                 <!-- Warnings -->
-                <t t-if="parsedData.Warning">
-                    <SwissdecNotification type="'warning'" notifications="parsedData.Warning.Notification"/>
+                <t t-if="this.parsedData.Warning">
+                    <SwissdecNotification type="'warning'" notifications="this.parsedData.Warning.Notification"/>
                 </t>
 
                 <!-- Infos -->
-                <t t-if="parsedData.Info">
-                    <SwissdecNotification type="'info'" notifications="parsedData.Info.Notification"/>
+                <t t-if="this.parsedData.Info">
+                    <SwissdecNotification type="'info'" notifications="this.parsedData.Info.Notification"/>
                 </t>
 
                 <!-- Errors -->
-                <t t-if="parsedData.Error">
-                    <t t-set="error" t-value="parsedData.Error"/>
+                <t t-if="this.parsedData.Error">
+                    <t t-set="error" t-value="this.parsedData.Error"/>
                     <t t-if="error.EndUserInformation">
                         <div class="alert alert-danger" role="alert">
-                            <h4 class="alert-heading"><i class="fa fa-times-circle me-2"></i>Error</h4>
+                            <h4 class="alert-heading"><i class="oi oi-filled me-2" data-icon="cancel"></i>Error</h4>
                             <hr/>
-                            <p class="mb-0 text-muted" t-esc="error.EndUserInformation"/>
+                            <p class="mb-0 text-muted" t-out="error.EndUserInformation"/>
                         </div>
                     </t>
                     <t t-if="error.DetailInformation">
                         <div class="alert alert-danger mt-2" role="alert">
-                            <h4 class="alert-heading"><i class="fa fa-times-circle me-2"></i>Details</h4>
+                            <h4 class="alert-heading"><i class="oi oi-filled me-2" data-icon="cancel"></i>Details</h4>
                             <hr/>
-                            <p class="mb-0 text-muted" t-esc="error.DetailInformation"/>
+                            <p class="mb-0 text-muted" t-out="error.DetailInformation"/>
                         </div>
                     </t>
                     <t t-if="error.FaultInformation">
@@ -48,14 +36,14 @@
 
                         <div class="card mt-2 border-danger">
                             <div class="card-header bg-danger text-white">
-                                <i class="fa fa-bug me-2"></i>Fault Information
+                                <i class="oi me-2" data-icon="bug_report"></i>Fault Information
                             </div>
                             <div class="card-body">
                                 <ul class="list-unstyled mb-2">
-                                    <li><b>InstitutionName:</b> <t t-esc="fault_context.InstitutionName"/></li>
-                                    <li><b>TransmissionDate:</b> <t t-esc="fault_context.TransmissionDate"/></li>
-                                    <li><b>ResponseID:</b> <t t-esc="fault_context.ResponseID"/></li>
-                                    <li><b>RequestID:</b> <t t-esc="fault_context.RequestID"/></li>
+                                    <li><b>InstitutionName:</b> <t t-out="fault_context.InstitutionName"/></li>
+                                    <li><b>TransmissionDate:</b> <t t-out="fault_context.TransmissionDate"/></li>
+                                    <li><b>ResponseID:</b> <t t-out="fault_context.ResponseID"/></li>
+                                    <li><b>RequestID:</b> <t t-out="fault_context.RequestID"/></li>
                                 </ul>
 
                                 <!-- Fault Notifications -->
@@ -75,46 +63,44 @@
                 </t>
 
                 <!-- Processing -->
-                <t t-if="parsedData.Processing">
+                <t t-if="this.parsedData.Processing">
                     <div class="alert alert-info mt-2" role="alert">
-                        <h4 class="alert-heading"><i class="fa fa-spinner fa-spin me-2"></i>Processing</h4>
+                        <h4 class="alert-heading"><i class="oi oi-spin me-2" data-icon="progress_activity"></i>Processing</h4>
                         <hr/>
                         <p class="mb-0">Your request is being processed by the Institution</p>
-                        <p t-if="parsedData.Processing.ExpectedAvailability" class="mb-0">
-                            <b>Expected Delivery Date:</b> <t t-esc="parsedData.Processing.ExpectedAvailability"/>
+                        <p t-if="this.parsedData.Processing.ExpectedAvailability" class="mb-0">
+                            <b>Expected Delivery Date:</b> <t t-out="this.parsedData.Processing.ExpectedAvailability"/>
                         </p>
                     </div>
                 </t>
 
                 <!-- Not Supported -->
-                <t t-if="parsedData.NotSupported">
-                    <div class="alert alert-secondary mt-2" role="alert">
-                        <h4 class="alert-heading"><i class="fa fa-ban me-2"></i>Not Supported</h4>
+                <t t-if="this.parsedData.NotSupported">
+                    <div class="alert alert-light mt-2" role="alert">
+                        <h4 class="alert-heading"><i class="oi me-2" data-icon="block"></i>Not Supported</h4>
                         <hr/>
                         <p class="mb-0">This operation is not supported by the institution.</p>
                     </div>
                 </t>
 
                 <!-- Completion Release Missing -->
-                <t t-if="parsedData.CompletionReleaseIsMissing">
+                <t t-if="this.parsedData.CompletionReleaseIsMissing">
                     <div class="alert alert-warning mt-2" role="alert">
-                        <h4 class="alert-heading"><i class="fa fa-exclamation-triangle me-2"></i>Completion Release Missing</h4>
+                        <h4 class="alert-heading"><i class="oi me-2" data-icon="warning"></i>Completion Release Missing</h4>
                         <hr/>
                         <p class="mb-0">The completion release information is missing and required by the Institution.</p>
                     </div>
                 </t>
 
                 <!-- Success -->
-                <t t-if="parsedData.Success">
-                    <t t-call="l10n_ch_hr_payroll.render_success_type">
-                        <t t-set="data" t-value="parsedData.Success"/>
-                    </t>
+                <t t-if="this.parsedData.Success">
+                    <t t-call="l10n_ch_hr_payroll.render_success_type" data="this.parsedData.Success"/>
                 </t>
 
             </t>
             <t t-else="">
                 <div class="alert alert-light" role="alert">
-                    <i class="fa fa-info-circle me-2"></i>No data available
+                    <i class="oi me-2" data-icon="info"></i>No data available
                 </div>
             </t>
         </div>
@@ -129,34 +115,32 @@
     <div>
         <div class="card mt-2 border-sucess">
             <div class="card-header bg-success text-white">
-                <i class="fa fa-check-circle me-2"></i>Success
+                <i class="oi oi-filled me-2" data-icon="check_circle"></i>Success
             </div>
             <div class="card-body">
-                <t t-call="l10n_ch_hr_payroll.render_success_header">
-                    <t t-set="institution" t-value="institution"/>
-                    <t t-set="adressee" t-value="adressee"/>
-                    <t t-set="institution_domain" t-value="institution_domain"/>
-                </t>
+                <t t-call="l10n_ch_hr_payroll.render_success_header"
+                    institution="institution"
+                    adressee="adressee"
+                    institution_domain="this.institution_domain"/>
                 <t t-if="staff and staff.Person">
-                    <t t-call="l10n_ch_hr_payroll.render_staff">
-                        <t t-set="staff" t-value="staff"/>
-                        <t t-set="institution_domain" t-value="institution_domain"/>
-                    </t>
+                    <t t-call="l10n_ch_hr_payroll.render_staff"
+                        staff="staff"
+                        institution_domain="this.institution_domain"/>
                 </t>
                 <t t-if="data['AHV-AVS-QuittanceWithoutCompletion']">
                     <div class="card-header bg-info text-white">
-                        <i class="fa fa-building me-2"></i>AHV-AVS Quittance
+                        <i class="oi oi-filled me-2" data-icon="business"></i>AHV-AVS Quittance
                     </div>
                     <div class="card-body">
 
                     <ul class="list-unstyled mb-2">
-                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-AHV-AVS-Incomes']"><b>Total-AHV-AVS-Incomes:</b> <t t-esc="data['AHV-AVS-QuittanceWithoutCompletion']['Total-AHV-AVS-Incomes']"/></li>
-                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-AHV-AVS-Open']"><b>Total-AHV-AVS-Incomes:</b> <t t-esc="data['AHV-AVS-QuittanceWithoutCompletion']['Total-AHV-AVS-Open']"/></li>
-                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALV-AC-Incomes']"><b>Total-ALV-AC-Incomes:</b> <t t-esc="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALV-AC-Incomes']"/></li>
-                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALVZ-ACS-Incomes']"><b>Total-ALVZ-ACS-Incomes:</b> <t t-esc="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALVZ-ACS-Incomes']"/></li>
-                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALV-AC-Open']"><b>Total-ALV-AC-Open:</b> <t t-esc="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALV-AC-Open']"/></li>
-                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-FLG-LFA-Incomes']"><b>Total-FLG-LFA-Incomes:</b> <t t-esc="data['AHV-AVS-QuittanceWithoutCompletion']['Total-FLG-LFA-Incomes']"/></li>
-                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-FLG-LFA-FamilyIncome-Supplement']"><b>Total-FLG-LFA-FamilyIncome-Supplement:</b> <t t-esc="data['AHV-AVS-QuittanceWithoutCompletion']['Total-FLG-LFA-FamilyIncome-Supplement']"/></li>
+                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-AHV-AVS-Incomes']"><b>Total-AHV-AVS-Incomes:</b> <t t-out="data['AHV-AVS-QuittanceWithoutCompletion']['Total-AHV-AVS-Incomes']"/></li>
+                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-AHV-AVS-Open']"><b>Total-AHV-AVS-Incomes:</b> <t t-out="data['AHV-AVS-QuittanceWithoutCompletion']['Total-AHV-AVS-Open']"/></li>
+                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALV-AC-Incomes']"><b>Total-ALV-AC-Incomes:</b> <t t-out="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALV-AC-Incomes']"/></li>
+                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALVZ-ACS-Incomes']"><b>Total-ALVZ-ACS-Incomes:</b> <t t-out="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALVZ-ACS-Incomes']"/></li>
+                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALV-AC-Open']"><b>Total-ALV-AC-Open:</b> <t t-out="data['AHV-AVS-QuittanceWithoutCompletion']['Total-ALV-AC-Open']"/></li>
+                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-FLG-LFA-Incomes']"><b>Total-FLG-LFA-Incomes:</b> <t t-out="data['AHV-AVS-QuittanceWithoutCompletion']['Total-FLG-LFA-Incomes']"/></li>
+                        <li t-if="data['AHV-AVS-QuittanceWithoutCompletion']['Total-FLG-LFA-FamilyIncome-Supplement']"><b>Total-FLG-LFA-FamilyIncome-Supplement:</b> <t t-out="data['AHV-AVS-QuittanceWithoutCompletion']['Total-FLG-LFA-FamilyIncome-Supplement']"/></li>
                     </ul>
                     </div>
                 </t>
@@ -164,20 +148,20 @@
                 <t t-if="data['UVG-LAA-QuittanceWithoutCompletion']">
                     <t t-set="uvg_data" t-value="data['UVG-LAA-QuittanceWithoutCompletion']"/>
                     <div class="card-header bg-info text-white">
-                        <i class="fa fa-building me-2"></i>UVG-LAA Quittance
+                        <i class="oi oi-filled me-2" data-icon="business"></i>UVG-LAA Quittance
                     </div>
                     <div class="card-body">
 
                     <ul class="list-unstyled mb-3">
-                        <li><b>Number of Female Persons:</b> <t t-esc="uvg_data.NumberOfFemalePersons"/></li>
-                        <li><b>Number of Male Persons:</b> <t t-esc="uvg_data.NumberOfMalePersons"/></li>
+                        <li><b>Number of Female Persons:</b> <t t-out="uvg_data.NumberOfFemalePersons"/></li>
+                        <li><b>Number of Male Persons:</b> <t t-out="uvg_data.NumberOfMalePersons"/></li>
                     </ul>
                     <t t-if="uvg_data['UVG-LAA-BranchTotals'] and uvg_data['UVG-LAA-BranchTotals']['UVG-LAA-BranchTotal']">
                         <t t-set="branch_totals" t-value="uvg_data['UVG-LAA-BranchTotals']['UVG-LAA-BranchTotal']"/>
-                        <t t-foreach="branch_totals" t-as="branch" t-key="branch_key">
+                        <t t-foreach="branch_totals" t-as="branch" t-key="branch_index">
                             <hr class="my-2"/>
                             <h6 class="fw-bold">
-                                <i class="fa fa-code-fork me-2"></i>Branch Identifier: <t t-esc="branch.BranchIdentifier"/>
+                                <i class="oi me-2" data-icon="fork_right"></i>Branch Identifier: <t t-out="branch.BranchIdentifier"/>
                             </h6>
                             <div class="row">
                                 <div class="col-md-6">
@@ -186,10 +170,10 @@
                                         <div class="card-body p-2">
                                             <ul class="list-unstyled mb-1">
                                                 <li t-if="branch['Female-Totals']">
-                                                    <b>BU-AP-Total:</b> <t t-esc="branch['Female-Totals']['BU-AP-Total']"/>
+                                                    <b>BU-AP-Total:</b> <t t-out="branch['Female-Totals']['BU-AP-Total']"/>
                                                 </li>
                                                 <li t-if="branch['Female-Totals']">
-                                                    <b>NBU-BU-ANP-AP-Total:</b> <t t-esc="branch['Female-Totals']['NBU-BU-ANP-AP-Total']"/>
+                                                    <b>NBU-BU-ANP-AP-Total:</b> <t t-out="branch['Female-Totals']['NBU-BU-ANP-AP-Total']"/>
                                                 </li>
                                             </ul>
                                         </div>
@@ -201,10 +185,10 @@
                                         <div class="card-body p-2">
                                             <ul class="list-unstyled mb-1">
                                                 <li t-if="branch['Male-Totals']">
-                                                    <b>BU-AP-Total:</b> <t t-esc="branch['Male-Totals']['BU-AP-Total']"/>
+                                                    <b>BU-AP-Total:</b> <t t-out="branch['Male-Totals']['BU-AP-Total']"/>
                                                 </li>
                                                 <li t-if="branch['Male-Totals']">
-                                                    <b>NBU-BU-ANP-AP-Total:</b> <t t-esc="branch['Male-Totals']['NBU-BU-ANP-AP-Total']"/>
+                                                    <b>NBU-BU-ANP-AP-Total:</b> <t t-out="branch['Male-Totals']['NBU-BU-ANP-AP-Total']"/>
                                                 </li>
                                             </ul>
                                         </div>
@@ -217,7 +201,7 @@
                     <!-- If UVG-LAA-MasterTotal is present, show it -->
                     <t t-if="uvg_data['UVG-LAA-MasterTotal']">
                         <hr class="my-2"/>
-                        <b>UVG-LAA Master Total:</b> <t t-esc="uvg_data['UVG-LAA-MasterTotal']"/>
+                        <b>UVG-LAA Master Total:</b> <t t-out="uvg_data['UVG-LAA-MasterTotal']"/>
                     </t>
                     </div>
                 </t>
@@ -226,7 +210,7 @@
                     <t t-set="uvgz_data" t-value="data['UVGZ-LAAC-QuittanceWithoutCompletion']"/>
                     <div class="card mt-3 border-info">
                         <div class="card-header bg-info text-white">
-                            <i class="fa fa-building me-2"></i>UVGZ-LAAC Quittance
+                            <i class="oi oi-filled me-2" data-icon="business"></i>UVGZ-LAAC Quittance
                         </div>
                         <div class="card-body">
                             <t t-if="uvgz_data['UVGZ-LAAC-CategoryTotals'] and uvgz_data['UVGZ-LAAC-CategoryTotals']['UVGZ-LAAC-CategoryTotal']">
@@ -238,12 +222,12 @@
                                     <div class="card border-light mb-2">
                                         <div class="card-body p-2">
                                             <ul class="list-unstyled mb-1">
-                                                <li><b>Category Code:</b> <t t-esc="cat.CategoryCode"/></li>
+                                                <li><b>Category Code:</b> <t t-out="cat.CategoryCode"/></li>
                                                 <li t-if="cat['Female-Total']">
-                                                    <b>Female Total:</b> <t t-esc="cat['Female-Total']"/>
+                                                    <b>Female Total:</b> <t t-out="cat['Female-Total']"/>
                                                 </li>
                                                 <li t-if="cat['Male-Total']">
-                                                    <b>Male Total:</b> <t t-esc="cat['Male-Total']"/>
+                                                    <b>Male Total:</b> <t t-out="cat['Male-Total']"/>
                                                 </li>
                                             </ul>
                                         </div>
@@ -253,7 +237,7 @@
 
                             <t t-if="uvgz_data['UVGZ-LAAC-MasterTotal']">
                                 <hr class="my-2"/>
-                                <b>UVGZ-LAAC Master Total:</b> <t t-esc="uvgz_data['UVGZ-LAAC-MasterTotal']"/>
+                                <b>UVGZ-LAAC Master Total:</b> <t t-out="uvgz_data['UVGZ-LAAC-MasterTotal']"/>
                             </t>
                         </div>
                     </div>
@@ -263,7 +247,7 @@
                     <t t-set="ktg_data" t-value="data['KTG-AMC-QuittanceWithoutCompletion']"/>
                     <div class="card mt-3 border-info">
                         <div class="card-header bg-info text-white">
-                            <i class="fa fa-building me-2"></i>KTG-AMC Quittance
+                            <i class="oi oi-filled me-2" data-icon="business"></i>KTG-AMC Quittance
                         </div>
                         <div class="card-body">
                             <t t-if="ktg_data['KTG-AMC-CategoryTotals'] and ktg_data['KTG-AMC-CategoryTotals']['KTG-AMC-CategoryTotal']">
@@ -275,12 +259,12 @@
                                     <div class="card border-light mb-2">
                                         <div class="card-body p-2">
                                             <ul class="list-unstyled mb-1">
-                                                <li><b>Category Code:</b> <t t-esc="cat.CategoryCode"/></li>
+                                                <li><b>Category Code:</b> <t t-out="cat.CategoryCode"/></li>
                                                 <li t-if="cat['Female-Total']">
-                                                    <b>Female Total:</b> <t t-esc="cat['Female-Total']"/>
+                                                    <b>Female Total:</b> <t t-out="cat['Female-Total']"/>
                                                 </li>
                                                 <li t-if="cat['Male-Total']">
-                                                    <b>Male Total:</b> <t t-esc="cat['Male-Total']"/>
+                                                    <b>Male Total:</b> <t t-out="cat['Male-Total']"/>
                                                 </li>
                                             </ul>
                                         </div>
@@ -290,17 +274,17 @@
 
                             <t t-if="ktg_data['KTG-AMC-MasterTotal']">
                                 <hr class="my-2"/>
-                                <b>UVGZ-LAAC Master Total:</b> <t t-esc="ktg_data['KTG-AMC-MasterTotal']"/>
+                                <b>UVGZ-LAAC Master Total:</b> <t t-out="ktg_data['KTG-AMC-MasterTotal']"/>
                             </t>
                         </div>
                     </div>
                 </t>
 
                 <t t-if="data['FAK-CAF-QuittanceWithoutCompletion']">
-                    <t t-set="fak_data" t-value="parsedData.Success['FAK-CAF-QuittanceWithoutCompletion']"/>
+                    <t t-set="fak_data" t-value="this.parsedData.Success['FAK-CAF-QuittanceWithoutCompletion']"/>
                     <div class="card mt-3">
                         <div class="card-header bg-info text-white">
-                            <i class="fa fa-building me-2"></i>FAK-CAF Quittance
+                            <i class="oi oi-filled me-2" data-icon="business"></i>FAK-CAF Quittance
                         </div>
                         <div class="card-body">
                             <t t-if="fak_data['Total-FAK-CAF-PerCanton']">
@@ -309,12 +293,12 @@
                                     <div class="card border-light mb-2">
                                         <div class="card-body p-2">
                                             <ul class="list-unstyled mb-1">
-                                                <li><b>Canton:</b> <t t-esc="canton_data.Canton"/></li>
+                                                <li><b>Canton:</b> <t t-out="canton_data.Canton"/></li>
                                                 <li t-if="canton_data['Total-FAK-CAF-ContributorySalary']">
-                                                    <b>Total Contributory Salary:</b> <t t-esc="canton_data['Total-FAK-CAF-ContributorySalary']"/>
+                                                    <b>Total Contributory Salary:</b> <t t-out="canton_data['Total-FAK-CAF-ContributorySalary']"/>
                                                 </li>
                                                 <li t-if="canton_data['Total-FAK-CAF-FamilyIncomeSupplement']">
-                                                    <b>Total Family Income Supplement:</b> <t t-esc="canton_data['Total-FAK-CAF-FamilyIncomeSupplement']"/>
+                                                    <b>Total Family Income Supplement:</b> <t t-out="canton_data['Total-FAK-CAF-FamilyIncomeSupplement']"/>
                                                 </li>
                                             </ul>
                                         </div>
@@ -329,17 +313,17 @@
                 <t t-if="data['TaxQuittance']">
                     <ul class="list-unstyled mb-2">
                         <hr/>
-                        <li t-if="data['TaxQuittance']['NumberOf-OwnershipRightDetail-Tags']"><b>Number Of Onwership Right Detail Tags:</b> <t t-esc="data['TaxQuittance']['NumberOf-OwnershipRightDetail-Tags']"/></li>
-                        <li t-if="data['TaxQuittance']['NumberOf-TaxAnnuity-Tags']"><b>Number of TaxAnnuity Tags:</b> <t t-esc="data['TaxQuittance']['NumberOf-TaxAnnuity-Tags']"/></li>
-                        <li t-if="data['TaxQuittance']['NumberOf-TaxSalary-Tags']"><b>Number of TaxSalary Tags:</b> <t t-esc="data['TaxQuittance']['NumberOf-TaxSalary-Tags']"/></li>
+                        <li t-if="data['TaxQuittance']['NumberOf-OwnershipRightDetail-Tags']"><b>Number Of Onwership Right Detail Tags:</b> <t t-out="data['TaxQuittance']['NumberOf-OwnershipRightDetail-Tags']"/></li>
+                        <li t-if="data['TaxQuittance']['NumberOf-TaxAnnuity-Tags']"><b>Number of TaxAnnuity Tags:</b> <t t-out="data['TaxQuittance']['NumberOf-TaxAnnuity-Tags']"/></li>
+                        <li t-if="data['TaxQuittance']['NumberOf-TaxSalary-Tags']"><b>Number of TaxSalary Tags:</b> <t t-out="data['TaxQuittance']['NumberOf-TaxSalary-Tags']"/></li>
                     </ul>
                 </t>
 
                 <t t-if="data['TaxAtSourceQuittanceWithoutCompletion']">
                     <t t-set="qst_data" t-value="data['TaxAtSourceQuittanceWithoutCompletion']"/>
-                    <div class="card mt-3 border-secondary">
+                    <div class="card mt-3 border">
                         <div class="card-header bg-info text-white">
-                            <i class="fa me-2"></i>Tax At Source Quittance
+                            <i class="oi me-2"></i>Tax At Source Quittance
                         </div>
                         <div class="card-body">
                             <!-- Display TotalMonth if present -->
@@ -348,10 +332,10 @@
                                 <div class="card border-light mb-2">
                                     <div class="card-body p-2">
                                         <ul class="list-unstyled mb-1">
-                                            <li><b>Current Month:</b> <t t-esc="qst_data.TotalMonth.CurrentMonth[0]"/>-<t t-esc="qst_data.TotalMonth.CurrentMonth[1]"/></li>
-                                            <li t-if="qst_data.TotalMonth.TotalTaxableEarning"><b>Total Taxable Earning:</b> <t t-esc="qst_data.TotalMonth.TotalTaxableEarning"/></li>
-                                            <li t-if="qst_data.TotalMonth.TotalTaxAtSource"><b>Total Tax At Source:</b> <t t-esc="qst_data.TotalMonth.TotalTaxAtSource"/></li>
-                                            <li t-if="qst_data.TotalMonth.TotalCommission"><b>Total Commission:</b> <t t-esc="qst_data.TotalMonth.TotalCommission"/></li>
+                                            <li><b>Current Month:</b> <t t-out="qst_data.TotalMonth.CurrentMonth[0]"/>-<t t-out="qst_data.TotalMonth.CurrentMonth[1]"/></li>
+                                            <li t-if="qst_data.TotalMonth.TotalTaxableEarning"><b>Total Taxable Earning:</b> <t t-out="qst_data.TotalMonth.TotalTaxableEarning"/></li>
+                                            <li t-if="qst_data.TotalMonth.TotalTaxAtSource"><b>Total Tax At Source:</b> <t t-out="qst_data.TotalMonth.TotalTaxAtSource"/></li>
+                                            <li t-if="qst_data.TotalMonth.TotalCommission"><b>Total Commission:</b> <t t-out="qst_data.TotalMonth.TotalCommission"/></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -365,10 +349,10 @@
                                     <div class="card border-light mb-2">
                                         <div class="card-body p-2">
                                             <ul class="list-unstyled mb-1">
-                                                <li><b>Correction Month:</b> <t t-esc="corr.Month[0]"/>-<t t-esc="corr.Month[1]"/></li>
-                                                <li t-if="corr.TotalTaxableEarning"><b>Taxable Earning:</b> <t t-esc="corr.TotalTaxableEarning"/></li>
-                                                <li t-if="corr.TotalTaxAtSource"><b>Tax At Source:</b> <t t-esc="corr.TotalTaxAtSource"/></li>
-                                                <li t-if="corr.TotalCommission"><b>Commission:</b> <t t-esc="corr.TotalCommission"/></li>
+                                                <li><b>Correction Month:</b> <t t-out="corr.Month[0]"/>-<t t-out="corr.Month[1]"/></li>
+                                                <li t-if="corr.TotalTaxableEarning"><b>Taxable Earning:</b> <t t-out="corr.TotalTaxableEarning"/></li>
+                                                <li t-if="corr.TotalTaxAtSource"><b>Tax At Source:</b> <t t-out="corr.TotalTaxAtSource"/></li>
+                                                <li t-if="corr.TotalCommission"><b>Commission:</b> <t t-out="corr.TotalCommission"/></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -379,9 +363,9 @@
                 </t>
                 <t t-if="data['TaxAtSourceDeclarationQuittance']">
                     <t t-set="qst_data" t-value="data['TaxAtSourceDeclarationQuittance']"/>
-                    <div class="card mt-3 border-secondary">
+                    <div class="card mt-3 border">
                         <div class="card-header bg-info text-white">
-                            <i class="fa me-2"></i>Tax At Source Quittance
+                            <i class="oi me-2"></i>Tax At Source Quittance
                         </div>
                         <div class="card-body">
                             <!-- Display TotalMonth if present -->
@@ -390,10 +374,10 @@
                                 <div class="card border-light mb-2">
                                     <div class="card-body p-2">
                                         <ul class="list-unstyled mb-1">
-                                            <li><b>Current Month:</b> <t t-esc="qst_data.TotalMonth.CurrentMonth[0]"/>-<t t-esc="qst_data.TotalMonth.CurrentMonth[1]"/></li>
-                                            <li t-if="qst_data.TotalMonth.TotalTaxableEarning"><b>Total Taxable Earning:</b> <t t-esc="qst_data.TotalMonth.TotalTaxableEarning"/></li>
-                                            <li t-if="qst_data.TotalMonth.TotalTaxAtSource"><b>Total Tax At Source:</b> <t t-esc="qst_data.TotalMonth.TotalTaxAtSource"/></li>
-                                            <li t-if="qst_data.TotalMonth.TotalCommission"><b>Total Commission:</b> <t t-esc="qst_data.TotalMonth.TotalCommission"/></li>
+                                            <li><b>Current Month:</b> <t t-out="qst_data.TotalMonth.CurrentMonth[0]"/>-<t t-out="qst_data.TotalMonth.CurrentMonth[1]"/></li>
+                                            <li t-if="qst_data.TotalMonth.TotalTaxableEarning"><b>Total Taxable Earning:</b> <t t-out="qst_data.TotalMonth.TotalTaxableEarning"/></li>
+                                            <li t-if="qst_data.TotalMonth.TotalTaxAtSource"><b>Total Tax At Source:</b> <t t-out="qst_data.TotalMonth.TotalTaxAtSource"/></li>
+                                            <li t-if="qst_data.TotalMonth.TotalCommission"><b>Total Commission:</b> <t t-out="qst_data.TotalMonth.TotalCommission"/></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -407,10 +391,10 @@
                                     <div class="card border-light mb-2">
                                         <div class="card-body p-2">
                                             <ul class="list-unstyled mb-1">
-                                                <li><b>Correction Month:</b> <t t-esc="corr.Month[0]"/>-<t t-esc="corr.Month[1]"/></li>
-                                                <li t-if="corr.TotalTaxableEarning"><b>Taxable Earning:</b> <t t-esc="corr.TotalTaxableEarning"/></li>
-                                                <li t-if="corr.TotalTaxAtSource"><b>Tax At Source:</b> <t t-esc="corr.TotalTaxAtSource"/></li>
-                                                <li t-if="corr.TotalCommission"><b>Commission:</b> <t t-esc="corr.TotalCommission"/></li>
+                                                <li><b>Correction Month:</b> <t t-out="corr.Month[0]"/>-<t t-out="corr.Month[1]"/></li>
+                                                <li t-if="corr.TotalTaxableEarning"><b>Taxable Earning:</b> <t t-out="corr.TotalTaxableEarning"/></li>
+                                                <li t-if="corr.TotalTaxAtSource"><b>Tax At Source:</b> <t t-out="corr.TotalTaxAtSource"/></li>
+                                                <li t-if="corr.TotalCommission"><b>Commission:</b> <t t-out="corr.TotalCommission"/></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -421,16 +405,16 @@
                 </t>
                 <t t-if="data['TaxCrossborderQuittanceWithoutCompletion']">
                     <t t-set="txb_data" t-value="data['TaxCrossborderQuittanceWithoutCompletion']"/>
-                    <div class="card mt-3 border-secondary">
+                    <div class="card mt-3 border">
                         <div class="card-header bg-info text-white">
-                            <i class="fa me-2"></i>Crossborder Declaration Quittance
+                            <i class="oi me-2"></i>Crossborder Declaration Quittance
                         </div>
                         <div class="card-body">
-                            <h6 class="fw-bold text-dark mb-2">Period: <t t-esc="txb_data.Period.from"/> - <t t-esc="txb_data.Period.until"/> </h6>
+                            <h6 class="fw-bold text-dark mb-2">Period: <t t-out="txb_data.Period.from"/> - <t t-out="txb_data.Period.until"/> </h6>
                             <div class="card border-light mb-2">
                                 <div class="card-body p-2">
                                     <ul class="list-unstyled mb-1">
-                                        <li t-if="txb_data.TaxableEarning"><b>Total Taxable Earning:</b> <t t-esc="txb_data.TaxableEarning"/></li>
+                                        <li t-if="txb_data.TaxableEarning"><b>Total Taxable Earning:</b> <t t-out="txb_data.TaxableEarning"/></li>
                                     </ul>
                                 </div>
                             </div>
@@ -445,31 +429,31 @@
 <t t-name="l10n_ch_hr_payroll.render_success_header">
     <ul class="list-unstyled mb-2">
         <t t-if="institution_domain == 'AHV-AVS'">
-            <li t-if="institution['AK-CC-BranchNumber']"><b>Institution ID:</b> <t t-esc="institution['AK-CC-BranchNumber']"/></li>
-            <li t-if="institution['AK-CC-CustomerNumber']"><b>Customer Number:</b> <t t-esc="institution['AK-CC-CustomerNumber']"/></li>
+            <li t-if="institution['AK-CC-BranchNumber']"><b>Institution ID:</b> <t t-out="institution['AK-CC-BranchNumber']"/></li>
+            <li t-if="institution['AK-CC-CustomerNumber']"><b>Customer Number:</b> <t t-out="institution['AK-CC-CustomerNumber']"/></li>
         </t>
         <t t-if="institution_domain == 'FAK-CAF'">
-            <li t-if="institution['FAK-CAF-BranchNumber']"><b>Institution ID:</b> <t t-esc="institution['FAK-CAF-BranchNumber']"/></li>
-            <li t-if="institution['FAK-CAF-CustomerNumber']"><b>Customer Number:</b> <t t-esc="institution['FAK-CAF-CustomerNumber']"/></li>
+            <li t-if="institution['FAK-CAF-BranchNumber']"><b>Institution ID:</b> <t t-out="institution['FAK-CAF-BranchNumber']"/></li>
+            <li t-if="institution['FAK-CAF-CustomerNumber']"><b>Customer Number:</b> <t t-out="institution['FAK-CAF-CustomerNumber']"/></li>
         </t>
         <t t-if="institution_domain == 'UVG-LAA' or institution_domain == 'UVGZ-LAAC' or institution_domain == 'KTG-AMC' or institution_domain == 'BVG-LPP'">
-            <li t-if="institution['InsuranceCompanyName']"><b>Institution Name:</b> <t t-esc="institution['InsuranceCompanyName']"/></li>
-            <li t-if="institution['InsuranceID']"><b>Institution ID:</b> <t t-esc="institution['InsuranceID']"/></li>
-            <li t-if="institution['CustomerIdentity']"><b>Customer Number:</b> <t t-esc="institution['CustomerIdentity']"/></li>
-            <li t-if="institution['ContractIdentity']"><b>Contract Number:</b> <t t-esc="institution['ContractIdentity']"/></li>
-            <li t-if="institution_domain == 'BVG-LPP' and institution['PayrollUnit']"><b>Payroll Unit:</b> <t t-esc="institution['PayrollUnit']"/></li>
+            <li t-if="institution['InsuranceCompanyName']"><b>Institution Name:</b> <t t-out="institution['InsuranceCompanyName']"/></li>
+            <li t-if="institution['InsuranceID']"><b>Institution ID:</b> <t t-out="institution['InsuranceID']"/></li>
+            <li t-if="institution['CustomerIdentity']"><b>Customer Number:</b> <t t-out="institution['CustomerIdentity']"/></li>
+            <li t-if="institution['ContractIdentity']"><b>Contract Number:</b> <t t-out="institution['ContractIdentity']"/></li>
+            <li t-if="institution_domain == 'BVG-LPP' and institution['PayrollUnit']"><b>Payroll Unit:</b> <t t-out="institution['PayrollUnit']"/></li>
         </t>
         <t t-if="institution_domain == 'TaxAtSource' or institution_domain == 'TaxCrossborder'">
-            <li t-if="institution['CantonID']"><b>Canton :</b> <t t-esc="institution['CantonID']"/></li>
-            <li t-if="institution['CustomerIdentity']"><b>Customer Indentity:</b> <t t-esc="institution['CustomerIdentity']"/></li>
-            <li t-if="institution['PayrollUnit']"><b>Payroll Unit:</b> <t t-esc="institution['PayrollUnit']"/></li>
+            <li t-if="institution['CantonID']"><b>Canton :</b> <t t-out="institution['CantonID']"/></li>
+            <li t-if="institution['CustomerIdentity']"><b>Customer Indentity:</b> <t t-out="institution['CustomerIdentity']"/></li>
+            <li t-if="institution['PayrollUnit']"><b>Payroll Unit:</b> <t t-out="institution['PayrollUnit']"/></li>
         </t>
         <hr/>
-        <li><b>Institution:</b> <t t-esc="adressee.InstitutionName"/></li>
-        <li><b>Transmission Date:</b> <t t-esc="adressee.TransmissionDate"/></li>
-        <li><b>ResponseID:</b> <t t-esc="adressee.ResponseID"/></li>
-        <li><b>RequestID:</b> <t t-esc="adressee.RequestID"/></li>
-        <li t-if="changes_up_to"><b>Changes Considered up to:</b> <t t-esc="changes_up_to"/></li>
+        <li><b>Institution:</b> <t t-out="adressee.InstitutionName"/></li>
+        <li><b>Transmission Date:</b> <t t-out="adressee.TransmissionDate"/></li>
+        <li><b>ResponseID:</b> <t t-out="adressee.ResponseID"/></li>
+        <li><b>RequestID:</b> <t t-out="adressee.RequestID"/></li>
+        <li t-if="this.changes_up_to"><b>Changes Considered up to:</b> <t t-out="this.changes_up_to"/></li>
     </ul>
 </t>
 
@@ -477,7 +461,7 @@
     <div class="card mt-3 border-info">
         <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
             <div>
-                <i class="fa fa-users me-2"></i>Staff Overview
+                <i class="oi oi-filled me-2" data-icon="group"></i>Staff Overview
             </div>
         </div>
         <div class="card-body p-2">
@@ -487,17 +471,17 @@
                     description="person.Lastname + ' ' + person.Firstname + statusText"
                     class="'mb-2'"
                 >
-                    <t t-slot="default">
+                    <t t-call-slot="default">
                         <div class="card border-light mb-2">
                             <div class="card-body">
                                 <ul class="list-unstyled mb-1 text-muted">
-                                    <li t-if="person.DateOfBirth"><b>Date of Birth:</b> <t t-esc="person.DateOfBirth"/></li>
+                                    <li t-if="person.DateOfBirth"><b>Date of Birth:</b> <t t-out="person.DateOfBirth"/></li>
                                     <li t-if="person['Social-InsuranceIdentification']">
-                                        <b>Social Insurance #:</b> <t t-esc="person['Social-InsuranceIdentification']['SV-AS-Number'] or 'Unknown'"/>
+                                        <b>Social Insurance #:</b> <t t-out="person['Social-InsuranceIdentification']['SV-AS-Number'] or 'Unknown'"/>
                                     </li>
-                                    <li t-if="person.EmployeeNumber"><b>Employee #:</b> <t t-esc="person.EmployeeNumber"/></li>
-                                    <li t-if="person.Sex"><b>Sex:</b> <t t-esc="person.Sex"/></li>
-                                    <li t-if="person.Nationality"><b>Nationality:</b> <t t-esc="person.Nationality"/></li>
+                                    <li t-if="person.EmployeeNumber"><b>Employee #:</b> <t t-out="person.EmployeeNumber"/></li>
+                                    <li t-if="person.Sex"><b>Sex:</b> <t t-out="person.Sex"/></li>
+                                    <li t-if="person.Nationality"><b>Nationality:</b> <t t-out="person.Nationality"/></li>
                                 </ul>
 
                                 <t t-if="person.Info">
@@ -513,8 +497,8 @@
                                         <t t-set="contributions" t-value="person.Contributions.Contribution[0]"/>
                                         <div class="mt-1">
                                             <ul class="list-unstyled mb-1">
-                                                <li t-if="contributions.EmployeeContribution"><b>Employee Contributions:</b> <t t-esc="contributions.EmployeeContribution"/></li>
-                                                <li t-if="contributions.EmployerContribution"><b>Employer Contributions:</b> <t t-esc="contributions.EmployerContribution"/></li>
+                                                <li t-if="contributions.EmployeeContribution"><b>Employee Contributions:</b> <t t-out="contributions.EmployeeContribution"/></li>
+                                                <li t-if="contributions.EmployerContribution"><b>Employer Contributions:</b> <t t-out="contributions.EmployerContribution"/></li>
                                             </ul>
                                         </div>
                                     </t>
@@ -526,29 +510,28 @@
                                         <div class="mt-1">
                                             <b>Declaration: </b>
                                             <t t-if="person.DeclarationCategory.Entry">
-                                                <span>Entry : <t t-esc="person.DeclarationCategory.Entry.ValidAsOf"/></span>
+                                                <span>Entry : <t t-out="person.DeclarationCategory.Entry.ValidAsOf"/></span>
                                             </t>
                                             <t t-if="person.DeclarationCategory.Withdrawal">
-                                                <span>Withdrawal: <t t-esc="person.DeclarationCategory.Withdrawal.ValidAsOf"/></span>
+                                                <span>Withdrawal: <t t-out="person.DeclarationCategory.Withdrawal.ValidAsOf"/></span>
                                             </t>
                                         </div>
                                     </t>
-                                    <t t-if="person.ProofOfInsurance">
-                                    </t>
+                                    <t t-if="person.ProofOfInsurance"/>
                                 </t>
 
                                 <t t-if="person.TaxAtSourceSalaries and person.TaxAtSourceSalaries.TaxAtSourceSalary">
                                     <hr class="my-2"/>
                                     <h6 class="fw-bold mt-2">
-                                        <i class="fa fa-balance-scale me-2"></i>Tax At Source Salaries
+                                        <i class="oi me-2" data-icon="balance"></i>Tax At Source Salaries
                                     </h6>
-                                    <t t-foreach="person.TaxAtSourceSalaries.TaxAtSourceSalary" t-as="taxSalary" t-key="ts_index">
+                                    <t t-foreach="person.TaxAtSourceSalaries.TaxAtSourceSalary" t-as="taxSalary" t-key="taxSalary_index">
                                         <div class="card border-light mb-2">
                                             <div class="card-body p-2">
                                                 <ul class="list-unstyled mb-1">
-                                                    <li><b>Canton:</b> <t t-esc="taxSalary.TaxAtSourceCanton"/></li>
-                                                    <li><b>Municipality ID:</b> <t t-esc="taxSalary.TaxAtSourceMunicipalityID"/></li>
-                                                    <li><b>Month:</b> <t t-esc="taxSalary.CurrentMonth[0]"/>-<t t-esc="taxSalary.CurrentMonth[1]"/></li>
+                                                    <li><b>Canton:</b> <t t-out="taxSalary.TaxAtSourceCanton"/></li>
+                                                    <li><b>Municipality ID:</b> <t t-out="taxSalary.TaxAtSourceMunicipalityID"/></li>
+                                                    <li><b>Month:</b> <t t-out="taxSalary.CurrentMonth[0]"/>-<t t-out="taxSalary.CurrentMonth[1]"/></li>
                                                 </ul>
                                                 <t t-if="taxSalary.Correction">
                                                     <!-- Since Correction may be a list, iterate over it -->
@@ -558,7 +541,7 @@
                                                             <h6 class="text-dark fw-bold">Reversal Details</h6>
                                                             <t t-set="reversal" t-value="corr.Reversal"/>
                                                             <div class="mb-2">
-                                                                <b>Reversed Month:</b> <t t-esc="reversal.Month[0]"/>-<t t-esc="reversal.Month[1]"/>
+                                                                <b>Reversed Month:</b> <t t-out="reversal.Month[0]"/>-<t t-out="reversal.Month[1]"/>
                                                             </div>
                                                             <table class="table table-sm table-bordered text-center mb-2">
                                                                 <thead class="table-light">
@@ -573,17 +556,17 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td class="fw-bold">Old</td>
-                                                                        <td><t t-esc="reversal.Old.TaxAtSourceCategory.TaxAtSourceCode or reversal.Old.TaxAtSourceCategory.CategoryPredefined"/></td>
-                                                                        <td><t t-esc="reversal.Old.TaxableEarning"/></td>
-                                                                        <td><t t-esc="reversal.Old.AscertainedTaxableEarning"/></td>
-                                                                        <td><t t-esc="reversal.Old.TaxAtSource"/></td>
+                                                                        <td><t t-out="reversal.Old.TaxAtSourceCategory.TaxAtSourceCode or reversal.Old.TaxAtSourceCategory.CategoryPredefined"/></td>
+                                                                        <td><t t-out="reversal.Old.TaxableEarning"/></td>
+                                                                        <td><t t-out="reversal.Old.AscertainedTaxableEarning"/></td>
+                                                                        <td><t t-out="reversal.Old.TaxAtSource"/></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <td class="fw-bold">New</td>
-                                                                        <td><t t-esc="reversal.New.TaxAtSourceCategory.TaxAtSourceCode or reversal.New.TaxAtSourceCategory.CategoryPredefined"/></td>
-                                                                        <td><t t-esc="reversal.New.TaxableEarning"/></td>
-                                                                        <td><t t-esc="reversal.New.AscertainedTaxableEarning"/></td>
-                                                                        <td><t t-esc="reversal.New.TaxAtSource"/></td>
+                                                                        <td><t t-out="reversal.New.TaxAtSourceCategory.TaxAtSourceCode or reversal.New.TaxAtSourceCategory.CategoryPredefined"/></td>
+                                                                        <td><t t-out="reversal.New.TaxableEarning"/></td>
+                                                                        <td><t t-out="reversal.New.AscertainedTaxableEarning"/></td>
+                                                                        <td><t t-out="reversal.New.TaxAtSource"/></td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
@@ -599,10 +582,10 @@
                                                             <t t-set="await" t-value="corr.AwaitCorrectionFromCompany"/>
                                                             <div class="mb-2">
                                                                 <b>Correct Code: </b>
-                                                                <t t-esc="await.TaxAtSourceCategory.TaxAtSourceCode or await.TaxAtSourceCategory.CategoryPredefined or await.TaxAtSourceCategory.CategoryOpen"/>
+                                                                <t t-out="await.TaxAtSourceCategory.TaxAtSourceCode or await.TaxAtSourceCategory.CategoryPredefined or await.TaxAtSourceCategory.CategoryOpen"/>
                                                             </div>
                                                             <div class="mb-2">
-                                                                <b>Valid As Of:</b> <t t-esc="await.ValidAsOf[0]"/>-<t t-esc="await.ValidAsOf[1]"/>
+                                                                <b>Valid As Of:</b> <t t-out="await.ValidAsOf[0]"/>-<t t-out="await.ValidAsOf[1]"/>
                                                             </div>
 
                                                             <t t-if="await.Comment and await.Comment.Notification">
@@ -625,14 +608,14 @@
 </t>
 
 <t t-name="l10n_ch_hr_payroll.render_qst_code">
-    <t t-if="qst.TaxAtSourceCode">
-        <t t-esc="qst.TaxAtSourceCode"/>
+    <t t-if="this.qst.TaxAtSourceCode">
+        <t t-out="this.qst.TaxAtSourceCode"/>
     </t>
-    <t t-elif="qst.CategoryPredefined">
-        <t t-esc="qst.CategoryPredefined"/>
+    <t t-elif="this.qst.CategoryPredefined">
+        <t t-out="this.qst.CategoryPredefined"/>
     </t>
     <t t-else="">
-        <t t-esc="qst.CategoryOpen"/>
+        <t t-out="this.qst.CategoryOpen"/>
     </t>
 
 </t>

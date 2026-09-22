@@ -571,6 +571,28 @@ invoice_1_submit_fail_response = {
     }
 }
 
+invoice_1_submit_fail_response_302 = {
+      "state": "SP",
+      "protocol": None,
+      "status": {
+        "code": "302",
+        "desc": "Rejeição: Irregularidade fiscal do destinatário",
+        "protocol": None,
+        "authorizationDateTime": None,
+        "accessKey": "11111111111111111111111111111111111111111111",
+        "serial": "222",
+        "number": "333"
+      },
+      "pdf": {
+        "base64": None,
+        "link": None
+      },
+      "xml": {
+        "base64": None,
+        "link": None
+      }
+}
+
 invoice_1_cancel_success_response = {
   "status": {
     "code": "101",
@@ -623,25 +645,5 @@ invoice_1_correct_success_response = {
   "pdf": {
     "base64": "eW9sbwo=",
     "link": "https://homolog.invoicy.com.br///DownloadPDFEvento.aspx?XXX"
-  }
-}
-
-invoice_1_correct_fail_response = {
-  "key": "XXX",
-  "subscriptionId": "XXX",
-  "status": {
-    "code": "493",
-    "desc": "Evento nao atende o Schema XML especifico. org.xml.sax.SAXParseException; lineNumber: 1; columnNumber: 138; cvc-minLength-valid: Value apos;aapos; with length = apos;1apos; is not facet-valid with respect to minLength apos;15apos; for type apos;#AnonType_xCorrecaodetEventoCCeapos;.",
-    "protocol": None,
-    "accessKey": "XXX",
-    "authorizationDateTime": {}
-  },
-  "xml": {
-    "base64": None,
-    "link": None
-  },
-  "pdf": {
-    "base64": None,
-    "link": None
   }
 }

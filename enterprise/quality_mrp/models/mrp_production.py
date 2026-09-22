@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -32,6 +32,13 @@ class MrpProduction(models.Model):
             production.quality_check_fail = fail
             production.quality_check_todo = todo
 
+    @api.depends('quality_check_todo')
+    def _compute_validate_button_style(self):
+        super()._compute_validate_button_style()
+        for production in self:
+            if production.validate_button_style == 'primary' and production.quality_check_todo:
+                production.validate_button_style = 'secondary'
+
     def button_quality_alert(self):
         self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id("quality_control.quality_alert_action_check")
@@ -39,7 +46,6 @@ class MrpProduction(models.Model):
         action['context'] = {
             'default_company_id': self.company_id.id,
             'default_product_id': self.product_id.id,
-            'default_product_tmpl_id': self.product_id.product_tmpl_id.id,
             'default_production_id': self.id,
         }
         return action
@@ -49,18 +55,20 @@ class MrpProduction(models.Model):
         if isinstance(res, dict) and res.get('type') == 'ir.actions.act_window':
             return res
         is_qc_status_ok = self._check_qc_status()
-        if not is_qc_status_ok and self.env.context.get('from_wizard'):
-            return {'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'message': _('You still need to do the quality checks!'),
-                    'next': {'type': 'ir.actions.act_window_close'},
-                    'sticky': False,
-                    'type': 'warning',
+        is_manager = self.env.user.has_group('quality.group_quality_manager')
+        if not is_qc_status_ok and not is_manager:
+            if self.env.context.get('from_wizard'):
+                return {'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'message': _('You still need to do the quality checks!'),
+                        'next': {'type': 'ir.actions.act_window_close'},
+                        'sticky': False,
+                        'type': 'warning',
+                    }
                 }
-            }
-        elif not is_qc_status_ok:
-            raise UserError(_('You still need to do the quality checks!'))
+            else:
+                raise UserError(_('You still need to do the quality checks!'))
         return res
 
     def _check_qc_status(self):
@@ -72,7 +80,6 @@ class MrpProduction(models.Model):
         action['context'] = {
             'default_company_id': self.company_id.id,
             'default_product_id': self.product_id.id,
-            'default_product_tmpl_id': self.product_id.product_tmpl_id.id,
             'default_production_id': self.id,
             }
         action['domain'] = [('id', 'in', self.quality_alert_ids.ids)]
@@ -89,8 +96,8 @@ class MrpProduction(models.Model):
             return checks.action_open_quality_check_wizard()
 
     def action_cancel(self):
-        res = super(MrpProduction, self).action_cancel()
-        self.sudo().mapped('check_ids').filtered(lambda x: x.quality_state == 'none').unlink()
+        res = super().action_cancel()
+        self.sudo().mapped('check_ids').unlink()
         return res
 
     def _action_confirm_mo_backorders(self):
@@ -103,6 +110,7 @@ class MrpProduction(models.Model):
         action['views'] = [(False, 'form')]
         action['context'] = {
             **self.env.context,
+            'default_lot_ids': self.lot_producing_ids.ids,
             'default_product_id': self.product_id.id if len(self.move_finished_ids) == 1 else False,
             'default_production_id': self.id,
         }

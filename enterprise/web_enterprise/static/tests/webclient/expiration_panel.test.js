@@ -1,6 +1,13 @@
-import { expect, test } from "@odoo/hoot";
-import { click, queryFirst, edit } from "@odoo/hoot-dom";
-import { animationFrame, mockDate, runAllTimers } from "@odoo/hoot-mock";
+import {
+    animationFrame,
+    click,
+    edit,
+    expect,
+    mockDate,
+    queryFirst,
+    runAllTimers,
+    test,
+} from "@odoo/hoot";
 import {
     getService,
     mockService,
@@ -10,8 +17,8 @@ import {
     serverState,
 } from "@web/../tests/web_test_helpers";
 
+import { location } from "@web/core/browser/browser";
 import { session } from "@web/session";
-import { browser } from "@web/core/browser/browser";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 
 test("Expiration Panel one app installed", async () => {
@@ -74,7 +81,7 @@ test("Expiration Panel one app installed, buy subscription", async () => {
     await click(".oe_instance_buy");
     await animationFrame();
 
-    expect(browser.location.href).toBe("https://www.odoo.com/odoo-enterprise/upgrade?num_users=7");
+    expect(location.href).toBe("https://www.odoo.com/odoo-enterprise/upgrade?num_users=7");
 });
 
 test("Expiration Panel one app installed, try several times to register subscription", async () => {
@@ -96,8 +103,8 @@ test("Expiration Panel one app installed, try several times to register subscrip
             expect.step({ message, options });
         },
     });
-    onRpc("get_param", ({ args }) => {
-        expect.step("get_param");
+    onRpc("get_str", ({ args }) => {
+        expect.step("get_str");
         if (args[0] === "database.already_linked_subscription_url") {
             return false;
         }
@@ -112,15 +119,15 @@ test("Expiration Panel one app installed, try several times to register subscrip
             return "2019-11-15 12:00:00";
         }
     });
-    onRpc("set_param", ({ args }) => {
-        expect.step("set_param");
+    onRpc("set_str", ({ args }) => {
+        expect.step("set_str");
         expect(args[0]).toBe("database.enterprise_code");
         if (callToGetParamCount === 1) {
             expect(args[1]).toBe("ABCDEF");
         } else {
             expect(args[1]).toBe("ABC");
         }
-        return true;
+        return "old value";
     });
     onRpc("update_notification", ({ args }) => {
         expect.step("update_notification");
@@ -212,19 +219,19 @@ test("Expiration Panel one app installed, try several times to register subscrip
 
     expect.verifySteps([
         // second try to submit
-        "get_param",
-        "set_param",
+        "get_str",
+        "set_str",
         "update_notification",
-        "get_param",
-        "get_param",
-        "get_param",
+        "get_str",
+        "get_str",
+        "get_str",
         // third try
-        "get_param",
-        "set_param",
+        "get_str",
+        "set_str",
         "update_notification",
-        "get_param",
-        "get_param",
-        "get_param",
+        "get_str",
+        "get_str",
+        "get_str",
         {
             message:
                 "Thank you, your registration was successful! Your database is valid until November 15, 2019.",
@@ -250,8 +257,8 @@ test("Expiration Panel one app installed, subscription already linked", async ()
         result: false,
         reason: "By design",
     }));
-    onRpc("get_param", ({ args }) => {
-        expect.step("get_param");
+    onRpc("get_str", ({ args }) => {
+        expect.step("get_str");
         if (args[0] === "database.expiration_date") {
             getExpirationDateCount++;
             if (getExpirationDateCount === 1) {
@@ -270,9 +277,9 @@ test("Expiration Panel one app installed, subscription already linked", async ()
             return "super_company_admin@gmail.com";
         }
     });
-    onRpc("set_param", () => {
-        expect.step("set_param");
-        return true;
+    onRpc("set_str", () => {
+        expect.step("set_str");
+        return "old value";
     });
     onRpc("update_notification", () => {
         expect.step("update_notification");
@@ -307,13 +314,13 @@ test("Expiration Panel one app installed, subscription already linked", async ()
     );
 
     expect.verifySteps([
-        "get_param",
-        "set_param",
+        "get_str",
+        "set_str",
         "update_notification",
-        "get_param",
-        "get_param",
-        "get_param",
-        "get_param",
+        "get_str",
+        "get_str",
+        "get_str",
+        "get_str",
     ]);
 });
 
@@ -334,7 +341,7 @@ test("One app installed, database expired", async () => {
         result: false,
         reason: "By design",
     }));
-    onRpc("get_param", ({ args }) => {
+    onRpc("get_str", ({ args }) => {
         if (args[0] === "database.already_linked_subscription_url") {
             return false;
         }
@@ -345,7 +352,7 @@ test("One app installed, database expired", async () => {
             return "2019-11-09 12:00:00";
         }
     });
-    onRpc("set_param", () => true);
+    onRpc("set_str", () => "old value");
     onRpc("update_notification", () => true);
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
@@ -390,8 +397,8 @@ test("One app installed, renew", async () => {
         storeData: true, // used by subscription service to know whether mail is installed
         warning: "admin",
     });
-    onRpc("get_param", ({ args }) => {
-        expect.step("get_param");
+    onRpc("get_str", ({ args }) => {
+        expect.step("get_str");
         expect(args[0]).toBe("database.enterprise_code");
         return "ABC";
     });
@@ -418,7 +425,7 @@ test("One app installed, renew", async () => {
     await click(".oe_instance_renew");
     await animationFrame();
 
-    expect.verifySteps(["get_param"]);
+    expect.verifySteps(["get_str"]);
 });
 
 test("One app installed, check status and get success", async () => {
@@ -432,8 +439,8 @@ test("One app installed, check status and get success", async () => {
         storeData: true, // used by subscription service to know whether mail is installed
         warning: "admin",
     });
-    onRpc("get_param", ({ args }) => {
-        expect.step("get_param");
+    onRpc("get_str", ({ args }) => {
+        expect.step("get_str");
         expect(args[0]).toBe("database.expiration_date");
         return "2019-10-24 12:00:00";
     });
@@ -453,7 +460,7 @@ test("One app installed, check status and get success", async () => {
         "Your subscription was updated and is valid until October 24, 2019."
     );
 
-    expect.verifySteps(["update_notification", "get_param"]);
+    expect.verifySteps(["update_notification", "get_str"]);
 });
 
 // Why would we want to reload the page when we check the status and it hasn't changed?
@@ -468,8 +475,8 @@ test.skip("One app installed, check status and get page reload", async () => {
         storeData: true, // used by subscription service to know whether mail is installed
         warning: "admin",
     });
-    onRpc("get_param", () => {
-        expect.step("get_param");
+    onRpc("get_str", () => {
+        expect.step("get_str");
         return "2019-10-20 12:00:00";
     });
     onRpc("update_notification", () => {
@@ -483,7 +490,7 @@ test.skip("One app installed, check status and get page reload", async () => {
     await click("a.check_enterprise_status");
     await animationFrame();
 
-    expect.verifySteps(["update_notification", "get_param", "reloadPage"]);
+    expect.verifySteps(["update_notification", "get_str", "reloadPage"]);
 });
 
 test("One app installed, upgrade database", async () => {
@@ -497,8 +504,8 @@ test("One app installed, upgrade database", async () => {
         storeData: true, // used by subscription service to know whether mail is installed
         warning: "admin",
     });
-    onRpc("get_param", ({ args }) => {
-        expect.step("get_param");
+    onRpc("get_str", ({ args }) => {
+        expect.step("get_str");
         expect(args[0]).toBe("database.enterprise_code");
         return "ABC";
     });
@@ -521,8 +528,8 @@ test("One app installed, upgrade database", async () => {
     await click("a.oe_instance_upsell");
     await animationFrame();
 
-    expect.verifySteps(["get_param", "search_count"]);
-    expect(browser.location.href).toBe(
+    expect.verifySteps(["get_str", "search_count"]);
+    expect(location.href).toBe(
         "https://www.odoo.com/odoo-enterprise/upsell?num_users=13&contract=ABC"
     );
 });
@@ -561,8 +568,8 @@ test("One app installed, navigation to renewal page", async () => {
         storeData: true, // used by subscription service to know whether mail is installed
         warning: "admin",
     });
-    onRpc("get_param", ({ args }) => {
-        expect.step("get_param");
+    onRpc("get_str", ({ args }) => {
+        expect.step("get_str");
         expect(args[0]).toBe("database.enterprise_code");
         return "ABC";
     });
@@ -590,9 +597,9 @@ test("One app installed, navigation to renewal page", async () => {
     await click(".oe_instance_renew");
     await animationFrame();
 
-    expect(browser.location.href).toBe("https://www.odoo.com/odoo-enterprise/renew?contract=ABC");
+    expect(location.href).toBe("https://www.odoo.com/odoo-enterprise/renew?contract=ABC");
 
-    expect.verifySteps(["get_param"]);
+    expect.verifySteps(["get_str"]);
 });
 
 test("One app installed, different locale (arabic)", async () => {
@@ -607,7 +614,7 @@ test("One app installed, different locale (arabic)", async () => {
         warning: "admin",
     });
     serverState.lang = "ar-001";
-    onRpc("get_param", () => "2019-11-09 12:00:00");
+    onRpc("get_str", () => "2019-11-09 12:00:00");
     onRpc("update_notification", () => true);
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();

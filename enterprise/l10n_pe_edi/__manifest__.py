@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'EDI for Peru',
-    'version': '0.1',
+    'version': '0.2',
     'summary': 'Electronic Invoicing for Peru (OSE method) and UBL 2.1',
     'category': 'Accounting/Localizations/EDI',
     'author': 'Vauxoo',
@@ -24,13 +24,11 @@ We support sending and cancelling of customer invoices.
         'iap',
         'l10n_pe',
         'product_unspsc',
-        'account_edi',
         'account_edi_ubl_cii',
         'certificate',
     ],
     'auto_install': ['l10n_pe'],
     "data": [
-        'security/ir.model.access.csv',
         'data/iap_service_data.xml',
         'data/ubl_pe_21_templates.xml',
         'data/uom_data.xml',
@@ -46,12 +44,12 @@ We support sending and cancelling of customer invoices.
         'views/report_invoice.xml',
         'views/account_menuitem.xml',
         'views/product_views.xml',
-        'data/account_edi_data.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/l10n_pe_edi_demo.xml',
         'demo/product_product_demo.xml',
     ],
     'post_init_hook': 'post_init_hook',
-    'installable': True,
+    'iap_paid_service': True,
 }

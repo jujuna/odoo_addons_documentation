@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-12-30 18:42+0000\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-08-28 17:51+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,22 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: crm_helpdesk
+#: model:ir.module.module,description:base.module_crm_helpdesk
+msgid ""
+"\n"
+"Convert business inquiries that have ended up in the Helpdesk pipeline by mistake,\n"
+"or generate a ticket from a business inquiry\n"
+msgstr ""
+
+#. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
 msgid "An archived ticket cannot be converted into a lead."
+msgstr ""
+
+#. module: crm_helpdesk
+#: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__team_id
+msgid "Assign to"
 msgstr ""
 
 #. module: crm_helpdesk
@@ -33,19 +46,29 @@ msgid "Convert Ticket to Lead"
 msgstr ""
 
 #. module: crm_helpdesk
+#: model:ir.module.module,summary:base.module_crm_helpdesk
+msgid "Convert Tickets from/to Leads"
+msgstr ""
+
+#. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/models/helpdesk_ticket.py:0
+#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__lead
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_view_form_inherited
 msgid "Convert to Lead"
 msgstr ""
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/models/helpdesk_ticket.py:0
+#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__opportunity
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_view_form_inherited
 msgid "Convert to Opportunity"
+msgstr ""
+
+#. module: crm_helpdesk
+#: model:ir.actions.server,name:crm_helpdesk.action_server_convert_ticket_to_lead_or_opportunity
+msgid "Convert to Opportunity/Lead"
 msgstr ""
 
 #. module: crm_helpdesk
@@ -53,11 +76,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_view_form
 msgid "Convert to Ticket"
-msgstr ""
-
-#. module: crm_helpdesk
-#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__convert
-msgid "Convert to opportunity"
 msgstr ""
 
 #. module: crm_helpdesk
@@ -95,12 +113,6 @@ msgid "Customer"
 msgstr ""
 
 #. module: crm_helpdesk
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-msgid "Discard"
-msgstr ""
-
-#. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__display_name
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket__display_name
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__display_name
@@ -115,6 +127,11 @@ msgstr ""
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__force_assignment
 msgid "Force assignment"
+msgstr ""
+
+#. module: crm_helpdesk
+#: model:ir.module.module,shortdesc:base.module_crm_helpdesk
+msgid "Helpdesk - CRM"
 msgstr ""
 
 #. module: crm_helpdesk
@@ -204,8 +221,13 @@ msgid "Salesperson"
 msgstr ""
 
 #. module: crm_helpdesk
-#: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__team_id
-msgid "Team"
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
+msgid "Select a Customer"
+msgstr ""
+
+#. module: crm_helpdesk
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
+msgid "Select a Helpdesk Team"
 msgstr ""
 
 #. module: crm_helpdesk

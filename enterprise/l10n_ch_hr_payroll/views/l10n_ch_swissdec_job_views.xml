@@ -13,7 +13,7 @@
                 <field name="result_state" invisible="general_state != 'Success'" decoration-info="result_state == 'Processing'" decoration-warning="result_state == 'CompletionReleaseIsMissing'" decoration-success="result_state == 'Success'" decoration-danger="result_state == 'Error'" widget="badge"/>
                 <button string="Completion" class="btn btn-secondary" name="action_open_completion_url" type="object" invisible="success_state != 'CompletionAndResult' "/>
                 <button string="Dialog" class="btn btn-secondary" name="action_open_swissdec_job_result" type="object" invisible="success_state != 'DialogAndResult' "/>
-                <button string="Details" name="action_open_swissdec_job_result" type="object" class="btn-link fa-arrow-right" invisible="general_state == 'waiting' and not (success_state in ['CompletionAndResult', 'DialogAndResult'])"/>
+                <button string="Details" name="action_open_swissdec_job_result" type="object" icon="arrow_forward" class="btn-link" invisible="general_state == 'waiting' and not (success_state in ['CompletionAndResult', 'DialogAndResult'])"/>
             </list>
         </field>
     </record>
@@ -39,7 +39,7 @@
                 <sheet>
                     <div name="button_box" position="inside">
                         <button type="object" name="action_open_proof_of_insurance"
-                                class="oe_stat_button" icon="fa-book" invisible="not proof_of_insurance_count">
+                                class="oe_stat_button" icon="book" invisible="not proof_of_insurance_count">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">
                                     Proof of Insurances

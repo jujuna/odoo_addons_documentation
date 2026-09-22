@@ -1,19 +1,24 @@
-import { Component, onWillStart } from "@odoo/owl";
+import { Component, onWillStart, t, usePlugin, useProps } from "@odoo/owl";
 import { user } from "@web/core/user";
 import { dashboardActionRegistry } from "@spreadsheet_dashboard/bundle/dashboard_action/dashboard_action";
 import { _t } from "@web/core/l10n/translation";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 export class DashboardEdit extends Component {
     static template = "spreadsheet_dashboard_edition.DashboardEdit";
-    static props = {
-        onClick: Function,
-        dashboardId: Number,
-        data: Object,
-    };
+
+    props = useProps({
+        onClick: t.function(),
+        dashboardId: t.number(),
+        data: t.object(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
+
     setup() {
         this.isDashboardAdmin = false;
         onWillStart(async () => {
-            if (this.env.debug) {
+            if (this.debugMode.isActive()) {
                 this.isDashboardAdmin = await user.hasGroup(
                     "spreadsheet_dashboard.group_dashboard_manager"
                 );

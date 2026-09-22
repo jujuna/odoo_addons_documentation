@@ -1,6 +1,7 @@
 import { ModelFieldSelector } from "@web/core/model_field_selector/model_field_selector";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
-import { Component } from "@odoo/owl";
+import { Component, t, usePlugin, useProps } from "@odoo/owl";
 import { FilterFieldOffset } from "../filter_field_offset";
 import { sortModelFieldSelectorFields } from "../../../helpers/misc";
 
@@ -15,13 +16,15 @@ export class FilterEditorFieldMatching extends Component {
         FilterFieldOffset,
     };
 
-    static props = {
+    props = useProps({
         // See AbstractFilterEditorSidePanel fieldMatchings
-        fieldMatchings: Array,
-        selectField: Function,
-        filterModelFieldSelectorField: Function,
-        onOffsetSelected: { type: Function, optional: true },
-    };
+        fieldMatchings: t.array(),
+        selectField: t.function(),
+        filterModelFieldSelectorField: t.function(),
+        onOffsetSelected: t.function().optional(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
 
     sortModelFieldSelectorFields = sortModelFieldSelectorFields;
 

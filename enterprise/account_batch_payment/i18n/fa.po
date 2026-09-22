@@ -17,54 +17,50 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-08 19:30+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Persian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 01:30+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Persian <https://translate.odoo.com/projects/odoo-master/"
 "account_batch_payment/fa/>\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/wizard/create_batch_error.py:0
-msgid "\"In Process\""
+#: model:ir.module.module,description:base.module_account_batch_payment
+msgid ""
+"\n"
+"Batch Payments\n"
+"=======================================\n"
+"Batch payments allow grouping payments.\n"
+"\n"
+"They are used namely, but not only, to group several cheques before "
+"depositing them in a single batch to the bank.\n"
+"The total amount deposited will then appear as a single transaction on your "
+"bank statement.\n"
+"When you reconcile, simply select the corresponding batch payment to "
+"reconcile all the payments in the batch.\n"
 msgstr ""
 
 #. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/wizard/create_batch_error.py:0
-msgid "\"In Process, and Paid\""
+msgid "\"Paid\""
 msgstr ""
 
 #. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
-msgid "$1000.0"
-msgstr "$1000.0"
-
-#. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
-msgid "2023-08-14"
-msgstr "2023-08-14"
-
-#. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
-msgid "2023-08-15"
-msgstr "2023-08-15"
-
-#. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
-msgid "3956012345678"
-msgstr "3956012345678"
+#. odoo-python
+#: code:addons/account_batch_payment/wizard/create_batch_error.py:0
+msgid "\"Paid, and Reconciled\""
+msgstr ""
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
-msgid "<span>Batch Payment</span>"
-msgstr "<span>پرداخت انبوه</span>"
+msgid "<span class=\"o_stat_text\">Batch payment</span>"
+msgstr ""
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_form
@@ -84,11 +80,6 @@ msgstr "<strong>ابتدا هشدارهای زیر را در نظر بگیرید
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_form
 msgid "<strong>The following errors occurred</strong>"
 msgstr "<strong>خطاهای زیر رخ دادند</strong>"
-
-#. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
-msgid "ABC Holder Name"
-msgstr ""
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -116,6 +107,11 @@ msgid "Activity Exception Decoration"
 msgstr "دکوراسیون استثنایی فعالیت"
 
 #. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
+
+#. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__activity_state
 msgid "Activity State"
 msgstr "وضعیت فعالیت"
@@ -138,9 +134,14 @@ msgid "All payments must either have an entry or not at all."
 msgstr ""
 
 #. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_payment.py:0
+msgid "All payments must have the same payment method."
+msgstr ""
+
+#. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
 msgid "Amount"
 msgstr "مقدار"
 
@@ -153,11 +154,6 @@ msgstr "باقی‌مانده‌ی مبلغ"
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount_residual_currency
 msgid "Amount Residual Currency"
 msgstr "واحد پول باقی‌مانده‌ی مبلغ"
-
-#. module: account_batch_payment
-#: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__amount_signed
-msgid "Amount Signed"
-msgstr "مقدار امضاء شده"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__message_attachment_count
@@ -178,6 +174,11 @@ msgstr "بانک"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_search
 msgid "Bank Journal"
 msgstr "دفترروزنامه‌ بانک"
+
+#. module: account_batch_payment
+#: model:ir.model,name:account_batch_payment.model_account_bank_statement_line
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -206,6 +207,7 @@ msgstr "گزارش سپرده‌ی انبوه"
 #: model:ir.model,name:account_batch_payment.model_account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard__batch_payment_id
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__batch_payment_id
+#: model:ir.module.module,shortdesc:base.module_account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_search
 msgid "Batch Payment"
@@ -217,6 +219,11 @@ msgstr "پرداخت دسته ای"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_search_inherit_account_batch_payment
 msgid "Batch Payments"
 msgstr "پرداخت های انبوه"
+
+#. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__batch_payments_count
+msgid "Batch Payments Count"
+msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__batch_type
@@ -247,6 +254,12 @@ msgid "Batch payments error reporting wizard line"
 msgstr "سطر مربوط به نرم‌افزار گزارش‌دهی خطای پرداخت@های انبوه"
 
 #. module: account_batch_payment
+#. odoo-javascript
+#: code:addons/account_batch_payment/static/src/components/bank_reconciliation/button_list/button_list.js:0
+msgid "Batches"
+msgstr ""
+
+#. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
 msgid "Cannot validate an empty batch. Please add some payments to it first."
@@ -258,6 +271,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
 msgid "Check Payments"
+msgstr ""
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid "Check batches"
 msgstr ""
 
 #. module: account_batch_payment
@@ -294,7 +313,6 @@ msgstr "شرکت مربوط به این روزنامه"
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.create_batch_error_wizard
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_tree_inherit_account_batch_payment
 msgid "Create Batch"
 msgstr "دسته‌ای را ایجاد کنید"
 
@@ -368,26 +386,18 @@ msgid "Date"
 msgstr "تاریخ"
 
 #. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
-msgid "Demo Ref"
-msgstr "Demo Ref"
-
-#. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__description
 msgid "Description"
 msgstr "توصیف"
 
 #. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.create_batch_error_wizard
-msgid "Discard"
-msgstr "رها کردن"
-
-#. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_bank_statement_line__display_name
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard__display_name
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__display_name
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__display_name
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_create_batch_error_wizard__display_name
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_journal__display_name
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_move_line__display_name
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__display_name
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment_method__display_name
 #: model:ir.model.fields,field_description:account_batch_payment.field_report_account_batch_payment_print_batch_payment__display_name
@@ -413,6 +423,11 @@ msgstr "راهنمای خطا"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_line_tree
 msgid "Exclude Payments"
 msgstr "حذف پرداخت‌ها"
+
+#. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__export_file_attachment_id
+msgid "Export File Attachment"
+msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__export_file
@@ -445,9 +460,10 @@ msgid "Followers (Partners)"
 msgstr "پیروان (شرکاء)"
 
 #. module: account_batch_payment
-#: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "آیکون فونت عالی به عبارتی fa-tasks"
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_tree_inherit_account_batch_payment
+msgid "Generate File"
+msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__export_file_create_date
@@ -470,11 +486,13 @@ msgid "Help"
 msgstr "راهنما"
 
 #. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_bank_statement_line__id
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard__id
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__id
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__id
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_create_batch_error_wizard__id
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_journal__id
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_move_line__id
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__id
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment_method__id
 #: model:ir.model.fields,field_description:account_batch_payment.field_report_account_batch_payment_print_batch_payment__id
@@ -516,19 +534,8 @@ msgstr "توالی پرداخت‌های انبوه درون مرزی"
 
 #. module: account_batch_payment
 #. odoo-python
-#: code:addons/account_batch_payment/models/account_batch_payment.py:0
-msgid "Invalid Partners"
-msgstr "همکاران نامعتبر"
-
-#. module: account_batch_payment
-#. odoo-python
 #: code:addons/account_batch_payment/wizard/create_batch_error.py:0
 msgid "Invalid Payments"
-msgstr ""
-
-#. module: account_batch_payment
-#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__invalid_sct_partners_ids
-msgid "Invalid Sct Partners"
 msgstr ""
 
 #. module: account_batch_payment
@@ -545,6 +552,11 @@ msgstr "افتتاح حساب بانکی:"
 #: model:ir.model,name:account_batch_payment.model_account_journal
 msgid "Journal"
 msgstr "روزنامه"
+
+#. module: account_batch_payment
+#: model:ir.model,name:account_batch_payment.model_account_move_line
+msgid "Journal Item"
+msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard__write_uid
@@ -566,6 +578,11 @@ msgstr "آخرین بروز رسانی در"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
 msgid "Leave empty to generate automatically..."
 msgstr "برای ایجاد یک دسته به صورت خودکار این قسمت را خالی بگذارید ..."
+
+#. module: account_batch_payment
+#: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
@@ -603,11 +620,6 @@ msgid "Name of the export file generated for this batch"
 msgstr "نام فایل انتقالی ایجاد شده برای این دسته"
 
 #. module: account_batch_payment
-#: model:ir.model.fields,help:account_batch_payment.field_account_payment__amount_signed
-msgid "Negative value of amount field if payment_type is outbound"
-msgstr "خنثی کردن ارزش فیلد مبلغ در صورتی که نوع پرداخت برون مرزی باشد"
-
-#. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__state__draft
 msgid "New"
 msgstr "جدید"
@@ -631,11 +643,6 @@ msgstr "خلاصه فعالیت بعدی"
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__activity_type_id
 msgid "Next Activity Type"
 msgstr "نوع فعالیت بعدی"
-
-#. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_search_inherit_account_batch_payment
-msgid "Not in batch"
-msgstr ""
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_search_inherit_account_batch_payment
@@ -674,6 +681,12 @@ msgid "Only %s payments can be added to a batch. Invalid ones will be ignored."
 msgstr ""
 
 #. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_payment.py:0
+msgid "Only outbound payments can be exported."
+msgstr ""
+
+#. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__batch_type__outbound
 msgid "Outbound"
 msgstr "خروجی"
@@ -690,30 +703,31 @@ msgid "Partner"
 msgstr "همکار"
 
 #. module: account_batch_payment
+#: model:ir.model,name:account_batch_payment.model_account_payment
+msgid "Payment"
+msgstr ""
+
+#. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__payment_ids_domain
 msgid "Payment Ids Domain"
 msgstr ""
 
 #. module: account_batch_payment
-#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__payment_method_id
-msgid "Payment Method"
-msgstr "روش پرداخت"
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_move_line__payment_lines_ids
+msgid "Payment Lines"
+msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model,name:account_batch_payment.model_account_payment_method
-msgid "Payment Methods"
-msgstr "روشهای پرداخت"
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__payment_method_id
+msgid "Payment Method"
+msgstr "روش پرداخت"
 
 #. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_payment.py:0
 msgid "Payment added in batch %s"
 msgstr ""
-
-#. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
-msgid "Payment method"
-msgstr "روش پرداخت"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -723,7 +737,6 @@ msgid "Payment removed from batch %s"
 msgstr ""
 
 #. module: account_batch_payment
-#: model:ir.model,name:account_batch_payment.model_account_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__payment_ids
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__payment_ids
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_create_batch_error_wizard__payment_ids
@@ -795,14 +808,37 @@ msgid "SMS Delivery error"
 msgstr "خطای تحویل پیامک"
 
 #. module: account_batch_payment
+#. odoo-javascript
+#: code:addons/account_batch_payment/static/src/components/bank_reconciliation/button_list/button_list.js:0
+msgid "Search: Batch Payment"
+msgstr ""
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_payment.py:0
+msgid "Selected payments include methods that cannot generate a file."
+msgstr ""
+
+#. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__state__sent
 msgid "Sent"
 msgstr "ارسال"
 
 #. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid "Sent batches"
+msgstr ""
+
+#. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_line_tree
 msgid "Show"
 msgstr "نمایش"
+
+#. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__show_download_xml_button
+msgid "Show Download Xml Button"
+msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard_line__show_remove_button
@@ -813,6 +849,14 @@ msgstr "دکمه‌ی حذف را نشان بده"
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_error_wizard__show_remove_options
 msgid "Show Remove Options"
 msgstr "گزینه‌های حذف را نشان بده"
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid ""
+"Some batches have an export file already generated and all payments marked "
+"as sent. You can't delete them."
+msgstr ""
 
 #. module: account_batch_payment
 #. odoo-python
@@ -890,11 +934,6 @@ msgid ""
 msgstr "پرداخت انبوهی که خطا و هشدار ایجاد می‌کند در راهنما نشان داده شده است."
 
 #. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
-msgid "The country or city of"
-msgstr ""
-
-#. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
 msgid ""
@@ -911,11 +950,12 @@ msgstr "روش پرداخت مورد استفاده‌ی پرداخت‌های �
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
 msgid ""
-"To validate the batch, payments must be in process. But some are already "
-"matched with a bank statement."
+"To validate the batch, payments must be paid. But some are already matched "
+"with a bank statement."
 msgstr ""
 
 #. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount_unsigned
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
 msgid "Total"
 msgstr "جمع کل:"
@@ -965,22 +1005,26 @@ msgid "Warning Wizard"
 msgstr "راهنمای هشدار"
 
 #. module: account_batch_payment
-#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__website_message_ids
-msgid "Website Messages"
-msgstr "پیام های وب سایت"
-
-#. module: account_batch_payment
-#: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__website_message_ids
-msgid "Website communication history"
-msgstr "تاریخچه ارتباط با وبسایت"
-
-#. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__file_generation_enabled
 msgid ""
 "Whether or not this batch payment should display the 'Generate File' button "
 "instead of 'Print' in form view."
 msgstr ""
 "آیا این پرداخت دسته‌ای باید دکمه‌ی «ایجاد فایل» را به جای «چاپ» نشان دهد."
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid ""
+"You can't delete a batch payment when an export file is already generated "
+"and all payments are marked as sent."
+msgstr ""
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_payment.py:0
+msgid "You can't generate a file for payments from more than one journal."
+msgstr ""
 
 #. module: account_batch_payment
 #. odoo-python
@@ -1008,24 +1052,18 @@ msgid "You cannot create batches with overlapping payments."
 msgstr ""
 
 #. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
-msgid "is not set, which could cause the file to be refused by the bank."
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_payment.py:0
+msgid "You must select at least one payment to generate a file."
 msgstr ""
 
 #. module: account_batch_payment
-#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
-msgid "these partners"
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
+msgid "payments"
 msgstr ""
 
-#~ msgid ""
-#~ "<i class=\"fa fa-clock-o\" aria-label=\"Date\" role=\"img\" "
-#~ "title=\"Date\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-clock-o\" aria-label=\"Date\" role=\"img\" "
-#~ "title=\"Date\"/>"
+#~ msgid "Website Messages"
+#~ msgstr "پیام های وب سایت"
 
-#~ msgid "Group By"
-#~ msgstr "گروه‌بندی برمبنای"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "تعداد پیام ها که نیاز به عمل"
+#~ msgid "Website communication history"
+#~ msgstr "تاریخچه ارتباط با وبسایت"

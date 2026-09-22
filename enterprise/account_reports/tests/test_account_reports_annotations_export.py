@@ -17,6 +17,8 @@ except ImportError:
 
 @tagged('post_install', '-at_install')
 class TestAccountReportAnnotationsExport(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         if load_workbook is None:
@@ -74,6 +76,12 @@ class TestAccountReportAnnotationsExport(TestAccountReportsCommon):
         # finally one column for the annotations. Hence the index 3 for the annotation column.
         self.assertEqual(export_content[0][3], "Annotations")
         self.assertEqual(export_content[7][3], "1 - Papa a vu le fifi de lolo")
+
+    def test_annotations_export_pdf(self):
+        options = self._generate_options(self.report, '2024-06-01', '2024-06-30', default_options={'unfold_all': True, 'export_mode': 'print'})
+        report_info = self.report.get_report_information(options)
+        render_annotations = self.report._build_annotations_list_for_pdf_export(report_info['lines'], report_info['annotations'])
+        self.assertEqual(render_annotations, [{'body': markupsafe.Markup('Papa a vu le fifi de lolo'), 'date': '06/20/2024', 'number': '1'}])
 
     def test_annotations_export_same_period_last_year_comparison(self):
         default_comparison = {
@@ -193,3 +201,73 @@ class TestAccountReportAnnotationsExport(TestAccountReportsCommon):
                     if field == 'body':
                         field_data = html2plaintext(markupsafe.escape(field_data))
                     self.assertEqual(field_data, line_annotations[i][field], f"Line {line_id} annotation {i} has a different {field} than expected.")
+
+    def test_annotations_outside_custom_fiscal_years_are_ignored(self):
+        vals_list = [
+            {
+                'name': row[2],
+                'date_from': row[0],
+                'date_to': row[1],
+                'company_id': self.env.company.id,
+            }
+            for row in [('2025-01-01', '2025-04-30', 'FY 2025_1'), ('2025-05-01', '2025-12-31', 'FY 2025_2')]
+        ]
+        self.env['account.fiscal.year'].create(vals_list)
+
+        options = self._generate_options(
+            self.report,
+            "2024-06-01",
+            "2024-06-30",
+            default_options={
+                "date": {"period_type": "year"},
+                "comparison": {"filter": "previous_period", "number_period": 2},
+            },
+        )
+        report_info = self.report.get_report_information(options)
+        self.assertEqual(report_info['annotations'], {})
+
+    def test_annotations_export_deferred_revenue_report(self):
+        """
+        Regression test: exporting the Deferred Revenue Report to XLSX must not crash with
+        UnboundLocalError when annotations exist on a deferred revenue record.
+        """
+        deferred_revenue_report = self.env.ref('account_reports.deferred_revenue_report')
+        revenue_account = self.company_data['default_account_revenue']
+
+        self._create_invoice(
+            move_type='out_invoice',
+            invoice_date='2024-01-01',
+            post=True,
+            invoice_line_ids=[
+                self._prepare_invoice_line(
+                    price_unit=1200.0,
+                    account_id=revenue_account,
+                    deferred_start_date='2024-01-01',
+                    deferred_end_date='2024-04-30',
+                )
+            ],
+        )
+
+        # Generate the report lines to get a valid line_id to annotate
+        options = self._generate_options(deferred_revenue_report, '2024-01-01', '2024-01-31')
+
+        # Add an annotation on the first report line — this triggers the bug on XLSX export
+        date = datetime.datetime.strptime('2024-01-15', '%Y-%m-%d').date()
+        message = self.env['mail.message'].create({
+            'model': revenue_account._name,
+            'res_id': revenue_account.id,
+            'body': 'Annotation on deferred revenue record',
+            'date': date,
+            'author_id': self.env.user.partner_id.id,
+            'message_type': 'comment',
+            'subtype_id': self.env.ref('mail.mt_note').id,
+        })
+        self.env['account.report.annotation'].create({
+            'date': date,
+            'message_id': message.id,
+        })
+
+        # This must not raise UnboundLocalError
+        report_data = deferred_revenue_report.export_to_xlsx(options)
+        self.assertIn('file_content', report_data)
+        self.assertEqual(report_data['file_type'], 'xlsx')

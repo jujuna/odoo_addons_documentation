@@ -6,12 +6,12 @@
         <field name="model">res.company</field>
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
-            <field name="company_registry" position="before">
+            <div name="identifiers" position="after">
                 <field name="l10n_gt_edi_vat_affiliation" invisible="country_code != 'GT'"/>
                 <field name="l10n_gt_edi_legal_name" invisible="country_code != 'GT'"/>
                 <field name="l10n_gt_edi_establishment_code" invisible="country_code != 'GT'"/>
                 <field name="l10n_gt_edi_phrase_ids" widget="many2many_tags" invisible="country_code != 'GT'"/>
-            </field>
+            </div>
         </field>
     </record>
 

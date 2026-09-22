@@ -11,10 +11,12 @@
                 t-att-Mes="month"
                 t-att-Anio="year">
                 <t t-foreach="accounts" t-as="account">
+                    <!-- Attributes ordered according to government  -->
                     <catalogocuentas:Ctas
                         t-att-CodAgrup="account.get('code')"
                         t-att-NumCta="account.get('number')"
                         t-att-Desc="account.get('name')"
+                        t-att-SubCtaDe="account.get('parent_code')"
                         t-att-Nivel="account.get('level')"
                         t-att-Natur="account.get('nature')"/>
                 </t>

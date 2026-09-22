@@ -5,6 +5,8 @@ from odoo.addons.delivery.tests.common import DeliveryCommon
 
 class DeliveryUPSCommon(DeliveryCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

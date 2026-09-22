@@ -1,11 +1,9 @@
-# coding: utf-8
 from odoo import fields, Command
 from odoo.addons.l10n_mx.tests.common import TestMxCommon
 from odoo.exceptions import ValidationError
-from odoo.tools import misc
+from odoo.tools import config
 from odoo.tools.zeep.client import SERIALIZABLE_TYPES
 
-import base64
 import logging
 import pprint
 
@@ -22,7 +20,7 @@ _logger = logging.getLogger(__name__)
 # Allow the whole test suite to work as 'external' tests and really send the documents to the PAC
 # in order to ensure their validity.
 # [!] DON'T COMMIT THE CHANGE OF THIS VALUE
-EXTERNAL_MODE = False
+EXTERNAL_MODE = 'EXTERNAL_MODE' in (config['test_tags'] or {})
 
 # For external trade, we need to use the rate of the day. The first time you send a document, you will get
 # a message from the government with the rate of the day. Put it here to validate your documents.
@@ -36,6 +34,8 @@ TEST_RATE_WITH_USD = 16.9995
 
 class TestMxEdiCommon(TestMxCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -45,6 +45,8 @@ class TestMxEdiCommon(TestMxCommon):
         else:
             cls.frozen_today = fields.Datetime.from_string('2025-06-15')
 
+        if 'enforce_cities' in cls.env['res.country']._fields:
+            cls.env.company.country_id.enforce_cities = False
         # Allow to see the full result of AssertionError.
         cls.maxDiff = None
 
@@ -52,14 +54,15 @@ class TestMxEdiCommon(TestMxCommon):
 
         with freeze_time(cls.frozen_today):
             cls.key = cls.env['certificate.key'].create({
-                'content': base64.encodebytes(misc.file_open('l10n_mx_edi/demo/pac_credentials/certificate.key', 'rb').read()),
+                'content': cls.file_read('l10n_mx_edi/demo/pac_credentials/certificate.key'),
                 'password': '12345678a',
                 'company_id': cls.company_data['company'].id,
             })
             cls.certificate = cls.env['certificate.certificate'].create({
-                'content': base64.encodebytes(misc.file_open('l10n_mx_edi/demo/pac_credentials/certificate.cer', 'rb').read()),
+                'content': cls.file_read('l10n_mx_edi/demo/pac_credentials/certificate.cer'),
                 'private_key_id': cls.key.id,
                 'company_id': cls.company_data['company'].id,
+                'scope': 'cfdi_csd',
             })
         cls.certificate.write({
             'date_start': '2016-01-01',
@@ -76,13 +79,14 @@ class TestMxEdiCommon(TestMxCommon):
         with freeze_time(cls.frozen_today):
             cls.private_key = cls.env['certificate.key'].create({
                 'name': 'Test key',
-                'content': base64.encodebytes(misc.file_open('l10n_mx_edi/demo/pac_credentials/certificate.key', 'rb').read()),
+                'content': cls.file_read('l10n_mx_edi/demo/pac_credentials/certificate.key'),
                 'password': '12345678a',
             })
             cls.certificate = cls.env['certificate.certificate'].create({
                 'name': 'Test certificate',
-                'content': base64.encodebytes(misc.file_open('l10n_mx_edi/demo/pac_credentials/certificate.cer', 'rb').read()),
+                'content': cls.file_read('l10n_mx_edi/demo/pac_credentials/certificate.cer'),
                 'private_key_id': cls.private_key.id,
+                'scope': 'cfdi_csd',
             })
         cls.certificate.write({
             'date_start': '2016-01-01 01:00:00',
@@ -130,7 +134,7 @@ class TestMxEdiCommon(TestMxCommon):
         cls.local_tax_3_5_withholding.l10n_mx_tax_type = 'local'
 
         (cls.product_a + cls.product_b).unlink()
-        cls.product = cls._create_product()
+        cls.product = cls._create_product_mx()
 
         cls.payment_term = cls.env['account.payment.term'].create({
             'name': 'test l10n_mx_edi',
@@ -154,7 +158,7 @@ class TestMxEdiCommon(TestMxCommon):
             'zip': '94523',
             'country_id': cls.env.ref('base.us').id,
             'vat': '123456789',
-            'bank_ids': [Command.create({'acc_number': "BE01234567890123"})],
+            'bank_ids': [Command.create({'account_number': "BE01234567890123"})],
         })
 
         cls.payment_method_efectivo = cls.env.ref('l10n_mx_edi.payment_method_efectivo')
@@ -163,17 +167,25 @@ class TestMxEdiCommon(TestMxCommon):
 
         cls.uuid = 0
 
+        cls.non_mx_company_data = cls.setup_other_company(name="Not an MX Company", currency_id=cls.env.ref('base.EUR').id)
+        cls.generic_product = cls.env['product.product'].create({
+            'name': 'Generic product',
+            'list_price': 100.00,
+        })
+
     @contextmanager
-    def mx_external_setup(self, date_obj):
+    def mx_external_setup(self, date_obj, certificate=None):
         """ This must wrap all MX tests and allow to correctly mock the date and to easily
         check the validity of generated files using the web-services instead of mocking everything.
         To "really" test the files, set 'EXTERNAL_MODE' to True.
         That way, the files will be checked by SolucionFactible.
 
         :param date_obj:    A representation of the time as a datetime object.
+        :param certificate: Optional certificate.certificate record.
         """
+        certificate = certificate or self.certificate
         # Ensure the certificate is always valid.
-        self.certificate.write({
+        certificate.write({
             'date_start': date_obj - relativedelta(years=2),
             'date_end': date_obj + relativedelta(years=2),
         })
@@ -182,24 +194,26 @@ class TestMxEdiCommon(TestMxCommon):
             yield
 
     @contextmanager
-    def mocked_retrieve_partner(self, allowed_partners=None):
-        """ Mock the res.partner._retrieve_partner method to restrict the result
+    def mocked_import_retrieve_customer(self, allowed_partners=None):
+        """ Mock the res.partner._import_retrieve_customer method to restrict the result
         to allowed partners inside the sandbox test environment.
 
         :param allowed_partners:    The allowed partners as a result.
         :return:                    The result of the mocked method.
         """
-        super_method = self.env.registry['res.partner']._retrieve_partner
+        super_method = self.env.registry['res.partner']._import_retrieve_customer
 
-        def retrieve_partner(*args, **kwargs):
-            partner = super_method(*args, **kwargs)
+        def import_retrieve_customer(self, search_plan, company, customer_values_list):
+            super_method(self, search_plan, company, customer_values_list)
+            for customer_values in customer_values_list:
+                if (
+                    'customer' in customer_values
+                    and not allowed_partners
+                    or customer_values['customer'] not in allowed_partners
+                ):
+                    del customer_values['customer']
 
-            if not allowed_partners or (partner not in allowed_partners):
-                return self.env['res.partner']
-
-            return partner
-
-        with patch.object(self.env.registry['res.partner'], '_retrieve_partner', retrieve_partner):
+        with patch.object(self.env.registry['res.partner'], '_import_retrieve_customer', import_retrieve_customer):
             yield
 
     @contextmanager
@@ -317,7 +331,7 @@ class TestMxEdiCommon(TestMxCommon):
         yield
 
     @classmethod
-    def _create_product(cls, **kwargs):
+    def _create_product_mx(cls, **kwargs):
         return super()._create_product(
             **{
                 'weight': 2,
@@ -332,24 +346,17 @@ class TestMxEdiCommon(TestMxCommon):
             }
         )
 
-    def _create_invoice(self, **kwargs):
-        today = fields.Date.today()
-        invoice = self.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': self.partner_mx.id,
-            'date': today,
-            'invoice_date': today,
-            'invoice_date_due': today + relativedelta(days=40),  # PPD by default
-            'l10n_mx_edi_payment_method_id': self.payment_method_efectivo.id,
-            'currency_id': self.comp_curr.id,
-            'invoice_line_ids': [Command.create({'product_id': self.product.id})],
-            **kwargs,
-        })
-        invoice.action_post()
-        return invoice
+    def _create_invoice_mx(self, **invoice_args):
+        invoice_args.setdefault('partner_id', self.partner_mx)
+        invoice_args.setdefault('invoice_date_due', fields.Date.today() + relativedelta(days=40))  # PPD by default
+        invoice_args.setdefault('l10n_mx_edi_payment_method_id', self.payment_method_efectivo)
+        invoice_args.setdefault('currency_id', self.comp_curr)
+        invoice_args.setdefault('invoice_line_ids', [self._prepare_invoice_line(product_id=self.product)])
+        invoice_args.setdefault('post', True)
+        return self._create_invoice(**invoice_args)
 
-    def _create_invoice_with_amount(self, invoice_date, currency, amount):
-        return self._create_invoice(
+    def _create_invoice_mx_with_amount(self, invoice_date, currency, amount):
+        return self._create_invoice_mx(
             invoice_date=invoice_date,
             date=invoice_date,
             currency_id=currency.id,
@@ -362,41 +369,29 @@ class TestMxEdiCommon(TestMxCommon):
             ],
         )
 
-    def _create_payment(self, invoices, **kwargs):
-        return self.env['account.payment.register']\
-            .with_context(
-                active_model='account.move',
-                active_ids=invoices.ids,
-            )\
-            .create({
-                'group_payment': True,
-                **kwargs,
-            })\
-            ._create_payments()
+    def _create_invoices_global_invoice(self, invoices):
+        self.env['l10n_mx_edi.global_invoice.create'] \
+            .with_context(invoices.l10n_mx_edi_action_create_global_invoice()['context']) \
+            .create({}) \
+            .action_create_global_invoice()
 
-    def _assert_document_cfdi(self, document, filename):
-        file_path = f'{self.test_module}/tests/test_files/{filename}.xml'
-        with misc.file_open(file_path, 'rb') as file:
-            expected_cfdi = file.read()
-        self.assertXmlTreeEqual(
-            self.get_xml_tree_from_string(document.attachment_id.raw),
-            self.get_xml_tree_from_string(expected_cfdi),
-        )
+    def _assert_document_cfdi(self, document, filename, subfolder=''):
+        self.assert_xml(document.attachment_id.raw, filename, subfolder=subfolder)
 
     def _assert_invoice_cfdi(self, invoice, filename):
-        document = invoice.l10n_mx_edi_invoice_document_ids.filtered(lambda x: x.state == 'invoice_sent')[:1]
+        document = invoice.l10n_mx_edi_invoice_document_ids.sorted().filtered(lambda x: x.state == 'invoice_sent')[:1]
         self.assertTrue(document)
-        self._assert_document_cfdi(document, filename)
+        self._assert_document_cfdi(document, filename, subfolder='invoice')
 
     def _assert_invoice_payment_cfdi(self, payment, filename):
-        document = payment.l10n_mx_edi_payment_document_ids.filtered(lambda x: x.state == 'payment_sent')[:1]
+        document = payment.l10n_mx_edi_payment_document_ids.sorted().filtered(lambda x: x.state == 'payment_sent')[:1]
         self.assertTrue(document)
-        self._assert_document_cfdi(document, filename)
+        self._assert_document_cfdi(document, filename, subfolder='payment')
 
     def _assert_global_invoice_cfdi_from_invoices(self, invoices, filename):
-        document = invoices.l10n_mx_edi_invoice_document_ids.filtered(lambda x: x.state == 'ginvoice_sent')[:1]
+        document = invoices.l10n_mx_edi_invoice_document_ids.sorted().filtered(lambda x: x.state == 'ginvoice_sent')[:1]
         self.assertTrue(document)
-        self._assert_document_cfdi(document, filename)
+        self._assert_document_cfdi(document, filename, subfolder='global_invoice')
 
     def _upload_document_on_journal(self, journal, content, filename):
         attachment = self.env['ir.attachment'].create({
@@ -409,6 +404,8 @@ class TestMxEdiCommon(TestMxCommon):
 
 class TestMxEdiCommonExternal(TestMxEdiCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -417,13 +414,14 @@ class TestMxEdiCommonExternal(TestMxEdiCommon):
             with freeze_time(cls.frozen_today):
                 cls.private_key = cls.env['certificate.key'].create({
                     'name': 'Test key',
-                    'content': base64.encodebytes(misc.file_open('l10n_mx_edi/demo/pac_credentials/certificate.key', 'rb').read()),
+                    'content': cls.file_read('l10n_mx_edi/demo/pac_credentials/certificate.key'),
                     'password': '12345678a',
                 })
                 cls.certificate = cls.env['certificate.certificate'].create({
                     'name': 'Test certificate',
-                    'content': base64.encodebytes(misc.file_open('l10n_mx_edi/demo/pac_credentials/certificate.cer', 'rb').read()),
+                    'content': cls.file_read('l10n_mx_edi/demo/pac_credentials/certificate.cer'),
                     'private_key_id': cls.private_key.id,
+                    'scope': 'cfdi_csd',
                 })
         except ValidationError:
             raise SkipTest("CFDI certificate is invalid.")

@@ -14,7 +14,6 @@ from odoo.addons.website_sale.controllers.combo_configurator import (
 class WebsiteSaleRentingComboConfiguratorController(
     WebsiteSaleComboConfiguratorController, SaleRentingComboConfiguratorController
 ):
-
     @route()
     def website_sale_combo_configurator_get_data(self, *args, **kwargs):
         _convert_rental_dates(kwargs)

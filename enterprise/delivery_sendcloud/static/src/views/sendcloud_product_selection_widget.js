@@ -1,8 +1,9 @@
+import { Component, proxy, useProps } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
-import { formatFloat } from "@web/views/fields/formatters";
 import { registry } from "@web/core/registry";
-import { Component, useState } from "@odoo/owl";
+import { formatFloat } from "@web/views/fields/formatters";
+import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
 export class SendcloudProductSelectionWidget extends Component {
     static template = "delivery_sendcloud.SendcloudProductWidget";
@@ -10,9 +11,9 @@ export class SendcloudProductSelectionWidget extends Component {
         Dropdown,
         DropdownItem,
     };
-    static props = {
-        "*": true,
-    };
+
+    props = useProps(standardWidgetProps);
+
     setup() {
         const { data } = this.props.record;
         this.isReturn = this.props.name == "return_products";
@@ -21,7 +22,7 @@ export class SendcloudProductSelectionWidget extends Component {
             this.products.unshift({name : "None", code : false});
         }
         this.activeCodeKey = this.isReturn ? "return" : "shipping";
-        this.state = useState({
+        this.state = proxy({
             'code': this.activeCode,
         });
     }
@@ -151,4 +152,3 @@ export const sendcloudProductSelectionWidget = {
 };
 
 registry.category("fields").add("sendcloud_product_selection", sendcloudProductSelectionWidget);
-

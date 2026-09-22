@@ -32,6 +32,23 @@ class ResConfigSettings(models.TransientModel):
         for config in self:
             config.l10n_in_gstr_gst_token_valid = config.company_id._is_l10n_in_gstr_token_valid()
 
+    def set_values(self):
+        super().set_values()
+        if self.country_code == 'IN' and self.l10n_in_gst_registration_type:
+            if (
+                self.l10n_in_gst_registration_type == 'regular' and
+                self.l10n_in_fetch_vendor_edi_feature and
+                self.l10n_in_gstr_activate_einvoice_fetch == 'automatic'
+            ):
+                cron = self.env.ref('l10n_in_reports.ir_cron_auto_fetch_einvoice_details', raise_if_not_found=False).sudo()
+                if not cron or cron.active:
+                    return
+                # set the cron to active if the feature is set to automatic and the cron is currently inactive
+                cron.active = True
+            elif self.l10n_in_gst_registration_type == 'composition':
+                self.account_return_periodicity = 'trimester'
+                self.account_return_reminder_day = 12
+
     def l10n_in_gstr_logout_gst(self):
         self.ensure_one()
         company = self.company_id
@@ -74,3 +91,14 @@ class ResConfigSettings(models.TransientModel):
                 'next': {'type': 'ir.actions.act_window_close'},
             }
         }
+
+    def _l10n_in_gsp_provider_changed(self):
+        """
+            This change should effect all Indian companies so we search for them and
+            Invalidate existing tokens if GSP provider changed
+        """
+        self.env['res.company'].sudo().search([('account_fiscal_country_id.code', '=', 'IN')]).write({
+            'l10n_in_gstr_gst_token': False,
+            'l10n_in_gstr_gst_token_validity': False,
+        })
+        super()._l10n_in_gsp_provider_changed()

@@ -6,18 +6,16 @@
         <field name="model">hr.referral.friend</field>
         <field name="arch" type="xml">
             <form>
+                <div class="alert alert-warning p-2" role="alert"
+                    invisible="(id and number_of_friends &lt;= 8) or (not id and number_of_friends &lt;= 7)">
+                    You can only display 8 friends on your dashboard.
+                </div>
                 <sheet>
                     <group>
-                        <group name="name_details">
-                            <field name="name"/>
-                            <field name="position" widget="radio"/>
-                        </group>
-                        <group name="image_header">
-                            <field name="image_head" widget='image' class="oe_avatar referral-rounded-circle" nolabel="1"/>
-                        </group>
-                        <group name="image">
-                            <field name="image" widget='image' nolabel="0"/>
-                        </group>
+                        <field name="name" placeholder="e.g. Hero, Adventurer, Spacewoman, Dog, Batman"/>
+                        <field name="position" widget="radio"/>
+                        <field name="image" widget='image'/>
+                        <field name="image_head" string="Avatar Image" widget='image' class="float-start oe_avatar referral-rounded-circle"/>
                     </group>
                 </sheet>
             </form>
@@ -47,6 +45,6 @@
         </field>
     </record>
 
-    <menuitem parent="menu_hr_referral_configuration" id="menu_hr_referral_friend_configuration" action="action_hr_referral_friend_configuration" sequence="5" groups="hr_referral.group_hr_referral_manager"/>
+    <menuitem parent="menu_hr_referral_dashboard_configuration" id="menu_hr_referral_friend_configuration" action="action_hr_referral_friend_configuration" sequence="2" groups="hr_referral.group_hr_referral_manager"/>
 
 </odoo>

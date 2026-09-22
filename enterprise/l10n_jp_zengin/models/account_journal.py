@@ -4,8 +4,12 @@ import re
 from datetime import datetime
 
 from odoo import _, fields, models
-from odoo.tools import plaintext2html
 from odoo.exceptions import UserError
+from odoo.tools import plaintext2html
+
+# Every Zengin record is padded to a fixed width of 200 characters, whatever the
+# statement type.
+ZENGIN_RECORD_LENGTH = 200
 
 
 class AccountJournal(models.Model):
@@ -29,7 +33,14 @@ class AccountJournal(models.Model):
 
     def _check_zengin(self, zengin_string):
         # Match the first 59 characters of the Zengin file, as defined by the zengin specifications
-        return re.match(r'10[13]0\d{6}\d{6}\d{6}\d{4}[ \uFF5F-\uFF9F]{15}\d{3}[ \uFF5F-\uFF9F]{15}', zengin_string) is not None
+        allowed_chars = r'[ 0-9A-Z\uFF5F-\uFF9F\\,./()-]'
+        pattern = (
+            r'10[13]0\d{6}\d{6}\d{6}\d{4}'
+            + allowed_chars + r'{15}'
+            + r'\d{3}'
+            + allowed_chars + r'{15}'
+        )
+        return re.match(pattern, zengin_string) is not None
 
     def _parse_bank_statement_file(self, raw_file):
         record_data = False
@@ -58,18 +69,16 @@ class AccountJournal(models.Model):
             return datetime.strptime(dt, '%Y%m%d').strftime('%Y-%m-%d')
 
         def parse_header(env, line):
+            if len(line) != ZENGIN_RECORD_LENGTH:
+                raise UserError(env._('Incorrect header length: %(length)s', length=len(line)))
             result = {
                 'date': parsedate(line[10:16]),
             }
             if line[1:3] == '01':
-                if len(line) != 199:
-                    raise UserError(env._('Incorrect header length: %(length)s', length=len(line)))
                 statement_type = 'transfer'
                 acc_number = line[60:67]
                 result['name'] = env._("Zengin Transfer - %(date)s", date=parsedate(line[10:16]))
             else:
-                if len(line) != 200:
-                    raise UserError(env._('Incorrect header length: %(length)s', length=len(line)))
                 statement_type = 'deposit_withdrawal'
                 acc_number = line[66:73]
                 result['name'] = env._("Zengin Deposit/Withdrawal - %(date)s", date=parsedate(line[10:16]))
@@ -131,9 +140,9 @@ class AccountJournal(models.Model):
             return note
 
         def parse_transaction_line(env, statement_type, line, deposit_type=None):
+            if len(line) != ZENGIN_RECORD_LENGTH:
+                raise UserError(env._('Incorrect transaction length: %(length)s', length=len(line)))
             if statement_type == 'transfer':
-                if len(line) != 199:
-                    raise UserError(env._('Incorrect transaction length: %(length)s', length=len(line)))
                 exceed_amount = line[19: 29] == '0000000000'
                 transaction = {
                     'date': parsedate(line[7:13]),
@@ -144,8 +153,6 @@ class AccountJournal(models.Model):
                     'narration': plaintext2html('\n'.join(get_transfer_note(self.env, line, exceed_amount))),
                 }
             else:
-                if len(line) != 200:
-                    raise UserError(env._('Incorrect transaction length: %(length)s', length=len(line)))
                 payment_type = 'deposit' if line[21:22] == '1' else 'withdrawal'
                 sign = -1 if payment_type == 'withdrawal' else 1
                 transaction = {
@@ -159,7 +166,17 @@ class AccountJournal(models.Model):
                     transaction['partner_name'] = sender_name
             return transaction
 
-        recordlist = record_data.split('\r\n')
+        # Records are normally separated by \r\n (or a bare \n), so split on those
+        # first: line splitting is self-correcting if a single record is malformed.
+        # Some banks instead export the file as one continuous string with no
+        # separators; only then do we fall back to the fixed record width.
+        if '\n' in record_data:
+            recordlist = record_data.replace('\r\n', '\n').split('\n')
+        else:
+            recordlist = [
+                record_data[i:i + ZENGIN_RECORD_LENGTH]
+                for i in range(0, len(record_data), ZENGIN_RECORD_LENGTH)
+            ]
         statement = {"transactions": []}
         statement_type = False
         acc_number = False

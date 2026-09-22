@@ -4,6 +4,7 @@ from odoo import api, fields, models
 from odoo.fields import Domain
 from odoo.models import MAGIC_COLUMNS
 from odoo.tools import split_every
+from odoo.exceptions import UserError
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -69,6 +70,20 @@ class Data_MergeGroup(models.Model):
             self.active = False
         self._elect_master_record()
 
+    def undiscard_records(self, records=None):
+        domain = Domain('group_id', '=', self.id)
+
+        if records is not None:
+            domain &= Domain('id', 'in', records)
+
+        records_to_restore = self.env['data_merge.record'].with_context(active_test=False).search(domain)
+        records_to_restore.write({'is_discarded': False})
+
+        all_group_records = self.with_context(active_test=False).record_ids
+        if any(record.active for record in all_group_records):
+            self.active = True
+        self._elect_master_record()
+
     ###################
     ### Master Record
     ###################
@@ -80,15 +95,11 @@ class Data_MergeGroup(models.Model):
         If it exists, this method is responsible to return the master record, otherwise, a generic method is used.
         """
         for group in self:
-            if hasattr(self.env[group.res_model_name], '_elect_method'):
-                elect_master = self.env[group.res_model_name]._elect_method
-            else:
-                elect_master = group._elect_method
-
             records = group.record_ids._original_records()
             if not records:
                 return
 
+            elect_master = group._get_elect_master_method()
             master = elect_master(records)
             if master:
                 master_record = group.record_ids.filtered(lambda r: r.res_id == master.id)
@@ -105,15 +116,28 @@ class Data_MergeGroup(models.Model):
         records_sorted = records.sorted('create_date')
         return records_sorted[0] if records_sorted else None
 
+    def _get_elect_master_method(self):
+        """Return the method used to elect the master record.
+        If the target model defines a custom `_elect_method`, it is returned.
+        Otherwise, the default generic method is used.
+        """
+        self.ensure_one()
+        model = self.env[self.res_model_name]
+        if hasattr(model, "_elect_method"):
+            return model._elect_method
+
+        return self._elect_method
+
     ###########
     ### Merge
     ###########
     @api.model
     def merge_multiple_records(self, group_records):
-        group_ids = self.browse([int(group_id) for group_id in group_records.keys()])
+        group_records = {int(k): v for k, v in group_records.items()}
+        group_ids = self.browse(group_records.keys())
 
         for group in group_ids:
-            group.merge_records(group_records[str(group.id)])
+            group.merge_records(group_records[group.id])
 
     def merge_records(self, records=None):
         """
@@ -154,6 +178,11 @@ class Data_MergeGroup(models.Model):
         # Create a dict with chatter data, in case the merged records are deleted during the merge procedure
         chatter_data = {rec.res_id:dict(res_id=rec.res_id, merged_record=str(rec.name), changes=rec._record_snapshot()) for rec in to_merge}
         res = merge(master_record._original_records(), to_merge._original_records())
+        if res.get('error'):
+            if self.model_id.merge_mode == 'automatic':
+                _logger.warning('Error occurred while merging records for group %s: %s', self.id, res['error'])
+                return
+            raise UserError(res['error'])
         if res.get('log_chatter'):
             self._log_merge(master_record, to_merge, chatter_data)
 
@@ -282,3 +311,176 @@ class Data_MergeGroup(models.Model):
 
         records_to_delete.unlink()
         groups_to_delete.unlink()
+
+    ##########
+    ### Merge Preview
+    ##########
+    def _get_deduplication_rule_mapping(self, master_rec, source_rec):
+        """ Return the values of the fields used in deduplication rules for the master and source records.
+        :param master_rec: `data_merge.record` destination record
+        :param source_rec: `data_merge.record` source record
+        :return: Dict of field labels with their corresponding values for master and source records,
+                and whether they match or not.
+        """
+        self.ensure_one()
+        rule_lines = self.model_id.rule_ids
+        rule_field_names = rule_lines.mapped('field_id.name')
+
+        # _render_values returns {field_description: formatted_value} if value exists for the field.
+        master_vals = master_rec._render_values(rule_field_names)
+        source_vals = source_rec._render_values(rule_field_names)
+
+        rule_fields = {}
+        for field_label in rule_lines.mapped('field_id.field_description'):
+            master_value = master_vals.get(field_label)
+            source_value = source_vals.get(field_label)
+
+            rule_fields[field_label] = {
+                "master_value": master_value,
+                "source_value": source_value,
+                "is_match": str(master_value).lower() == str(source_value).lower()
+            }
+
+        return rule_fields
+
+    def _get_field_preview(self, master_rec, master, source_rec, source):
+        """Prepare a field-by-field diff for all fields whose values differ between master and source.
+        If the model provides a `_get_merge_result_values` method, use it to know which values
+        will update the master. Otherwise, keep the value of the master and ignore the source.
+
+        :param master_rec: `data_merge.record` destination record
+        :param master: original destination record
+        :param source_rec: `data_merge.record` source record
+        :param source: original source record
+        :return: list of dictionaries describing field merge
+        """
+        self.ensure_one()
+        model = self.env[self.res_model_name]
+        # Divergent fields contain field names whose values differ across group records
+        divergent = self.divergent_fields.split(',') if self.divergent_fields else []
+        master_div = master_rec._render_values(divergent)
+        source_div = source_rec._render_values(divergent)
+
+        # If the model has a `_get_merge_result_values` method, use it to determine which values update the master.
+        values_update_in_master = model._get_merge_result_values(master, source) if hasattr(model, "_get_merge_result_values") else {}
+
+        field_preview = []
+        for field_label in (master_div.keys() | source_div.keys()):
+            master_val = master_div.get(field_label)
+            source_val = source_div.get(field_label)
+            # Skip rows where both values are same.
+            if master_val == source_val:
+                continue
+
+            # Check if the source value will replace the master value after merge
+            # Example: if master_val is empty and source_val is "John", master_val will be updated to "John" and highlighted in the preview
+            will_update = field_label in values_update_in_master and values_update_in_master[field_label] != master_val
+
+            field_preview.append({
+                "field_label": field_label,
+                "master_value": master_val,
+                "source_value": source_val,
+                "will_update_master": will_update,
+            })
+        return field_preview
+
+    def _get_relation_preview(self, master_rec, source_rec):
+        """Compute relational impact preview when merging source rec into master.
+        This method compares how many records are linked to the master and
+        source records across different models and fields. These relations
+        will be merged into the master after the merge.
+
+        :param master_rec: target `data_merge.record`.
+        :param source_rec: source `data_merge.record` to merge.
+        :return: List of dict describing the models and fields linked to the master and source records, and their count.
+        """
+        self.ensure_one()
+        # Get all linked records of master and source
+        # Returns {record.id: [(count, model_label, model, field_name), ...]}
+        record_ref = (master_rec + source_rec)._get_references()
+        master_map, source_map = {}, {}  # {(model, model_label, field_name): count}
+
+        for count, model_label, model, field_name in record_ref.get(master_rec.id):
+            master_map[model, model_label, field_name] = count
+
+        for count, model_label, model, field_name in record_ref.get(source_rec.id):
+            source_map[model, model_label, field_name] = count
+
+        merged_relations = []
+        for key in (master_map.keys() | source_map.keys()):
+            model, model_label, field_name = key
+
+            merged_relations.append({
+                "model": model,
+                "model_label": model_label,
+                "field_name": field_name,
+                "master_count": master_map.get(key, 0),
+                "source_count": source_map.get(key, 0),
+            })
+        return merged_relations
+
+    @api.model
+    def _get_image_url(self, record, image_field):
+        return f"/web/image/{record._name}/{record.id}/{image_field}"
+
+    @api.model
+    def _get_record_name(self, record):
+        """Return the display name of records excepts for res.partner where we return name and
+        company_name separately to ease
+        """
+        # For contacts, display contact name first, then company/group.
+        if self.res_model_name != 'res.partner':
+            return record.display_name, False
+        company_name = record.parent_id.commercial_partner_id.display_name
+        return record.name, company_name
+
+    def get_merge_preview(self, record_id):
+        """Return merge preview information for the selected source record.
+
+        :param record_id: ID of the source `data_merge.record`
+        :return: dict containing merge preview data
+        """
+        self.ensure_one()
+        active_records = self.record_ids.filtered(lambda r: not r.is_discarded)
+        if not active_records:
+            return {}
+        source_rec, master_rec = None, None
+        for record in active_records:
+            if record.id == record_id:
+                source_rec = record
+            if record.is_master:
+                master_rec = record
+            if master_rec and source_rec:
+                break
+        if not source_rec:
+            return {}
+
+        # Compute the master record if it is not already selected.
+        if not master_rec:
+            elect_master = self._get_elect_master_method()
+            master = elect_master(active_records._original_records())
+            if not master:
+                return {}
+            master_rec = active_records.filtered(lambda r: r.res_id == master.id)
+        else:
+            master = master_rec._original_records()
+        source = source_rec._original_records()
+
+        model = self.env[self.res_model_name]
+        image_field = model._fields.get('avatar_128') and 'avatar_128' or model._fields.get('image_128') and 'image_128'
+
+        master_name, master_company_name = self._get_record_name(master)
+        source_name, source_company_name = self._get_record_name(source)
+        return {
+            "master_id": master.id,
+            "source_id": source.id,
+            "master_name": master_name,
+            "source_name": source_name,
+            "master_company_name": master_company_name,
+            "source_company_name": source_company_name,
+            "master_image_url": image_field and self._get_image_url(master, image_field),
+            "source_image_url": image_field and self._get_image_url(source, image_field),
+            "deduplication_rule_mapping": self._get_deduplication_rule_mapping(master_rec, source_rec),
+            "master_exclusive": self._get_field_preview(master_rec, master, source_rec, source),
+            "merged_relations": self._get_relation_preview(master_rec, source_rec),
+        }

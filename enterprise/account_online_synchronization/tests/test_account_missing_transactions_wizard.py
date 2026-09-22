@@ -8,6 +8,7 @@ from odoo.addons.account_online_synchronization.tests.common import AccountOnlin
 @tagged('post_install', '-at_install')
 class TestAccountMissingTransactionsWizard(AccountOnlineSynchronizationCommon):
     """ Tests the account journal missing transactions wizard. """
+    _test_user_groups = None  # FIXME list needed groups
 
     @patch('odoo.addons.account_online_synchronization.models.account_online.AccountOnlineLink._fetch_odoo_fin')
     def test_fetch_missing_transaction(self, patched_fetch_odoofin):
@@ -83,22 +84,22 @@ class TestAccountMissingTransactionsWizard(AccountOnlineSynchronizationCommon):
         self.assertEqual(transaction.transaction_details, expected_transaction_details)
 
     @patch('odoo.addons.account_online_synchronization.models.account_online.AccountOnlineLink._fetch_odoo_fin')
-    def test_fetch_missing_transaction_with_end_to_end_uuid(self, patched_fetch_odoofin):
-        """Tests that the wizard works when the end-to-end uuid is sent from OdooFin."""
+    def test_fetch_missing_transaction_with_transaction_uuid(self, patched_fetch_odoofin):
+        """Tests that the wizard works when the transaction uuid is sent from OdooFin."""
         self.account_online_link.state = 'connected'
         patched_fetch_odoofin.side_effect = [
             {
                 'transactions': [self._create_one_online_transaction(
                     transaction_identifier='ABCD01',
                     date='2023-07-06',
-                    end_to_end_uuid='123',
+                    transaction_uuid='123',
                 )],
             },
             {
                 'transactions': [self._create_one_online_transaction(
                     transaction_identifier='ABCD02_pending',
                     date='2023-07-25',
-                    end_to_end_uuid='123',
+                    transaction_uuid='123',
                 )],
             },
         ]
@@ -113,22 +114,22 @@ class TestAccountMissingTransactionsWizard(AccountOnlineSynchronizationCommon):
         self.assertEqual(2, len(transient_transactions))
 
     @patch('odoo.addons.account_online_synchronization.models.account_online.AccountOnlineLink._fetch_odoo_fin')
-    def test_fetch_pending_transaction_with_end_to_end_uuid(self, patched_fetch_odoofin):
-        """Tests that the pending transactions works when the end-to-end uuid is sent from OdooFin."""
+    def test_fetch_pending_transaction_with_transaction_uuid(self, patched_fetch_odoofin):
+        """Tests that the pending transactions works when the transaction uuid is sent from OdooFin."""
         self.account_online_link.state = 'connected'
         patched_fetch_odoofin.side_effect = [
             {
                 'transactions': [self._create_one_online_transaction(
                     transaction_identifier='ABCD01',
                     date='2023-07-06',
-                    end_to_end_uuid='123',
+                    transaction_uuid='123',
                 )],
             },
             {
                 'transactions': [self._create_one_online_transaction(
                     transaction_identifier='ABCD02_pending',
                     date='2023-07-25',
-                    end_to_end_uuid='123',
+                    transaction_uuid='123',
                 )],
             },
         ]

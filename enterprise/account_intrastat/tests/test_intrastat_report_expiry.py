@@ -10,6 +10,8 @@ from freezegun import freeze_time
 @tagged('post_install', '-at_install')
 class IntrastatExpiryReportTest(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -53,50 +55,30 @@ class IntrastatExpiryReportTest(TestAccountReportsCommon):
         cls.product_b.update({'weight': 101})
 
     @classmethod
-    def _create_invoices(cls, code_type=None):
-        moves = cls.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': cls.partner_a.id,
-            'invoice_date': '2022-01-01',
-            'intrastat_country_id': cls.env.ref('base.de').id,
-            'invoice_line_ids': [
-                Command.create({
-                    'name': 'line_1',
-                    'product_id': cls.product_a.id,
-                    'price_unit': 5.0,
-                    'intrastat_transaction_id': cls.intrastat_codes[f'{code_type}-no_date'].id if code_type else None,
-                    'quantity': 1.0,
-                    'account_id': cls.company_data['default_account_revenue'].id,
-                    'tax_ids': [],
-                    'price_unit': 80.0,
-                }),
-                Command.create({
-                    'name': 'line_2',
-                    'product_id': cls.product_b.id,
-                    'intrastat_transaction_id': cls.intrastat_codes[f'{code_type}-expired'].id if code_type else None,
-                    'quantity': 1.0,
-                    'account_id': cls.company_data['default_account_revenue'].id,
-                    'tax_ids': [],
-                    'price_unit': 100.0,
-                }),
-                Command.create({
-                    'name': 'line_3',
-                    'product_id': cls.product_c.id,
-                    'intrastat_transaction_id': cls.intrastat_codes[f'{code_type}-premature'].id if code_type else None,
-                    'quantity': 1.0,
-                    'account_id': cls.company_data['default_account_revenue'].id,
-                    'tax_ids': [],
-                    'price_unit': 250.0,
-                }),
+    @freeze_time('2022-01-01')
+    def _create_invoice_intrastat_tansaction(cls, code_type=None):
+        return cls._create_invoice(
+            intrastat_country_id=cls.env.ref('base.de').id,
+            invoice_line_ids=[
+                cls._prepare_invoice_line(
+                    name=name,
+                    product_id=product,
+                    price_unit=price,
+                    intrastat_transaction_id=transaction,
+                    account_id=cls.company_data['default_account_revenue'],
+                )
+                for name, product, price, transaction in (
+                    ('line_1', cls.product_a, 80.0, code_type and cls.intrastat_codes[f'{code_type}-no_date']),
+                    ('line_2', cls.product_b, 100.0, code_type and cls.intrastat_codes[f'{code_type}-expired']),
+                    ('line_3', cls.product_c, 250.0, code_type and cls.intrastat_codes[f'{code_type}-premature']),
+                )
             ],
-        })
-        moves.action_post()
-        cls.env.flush_all()  # must flush else SQL request in report is not accurate
-        return moves
+            post=True,
+        )
 
     @freeze_time('2022-01-31')
     def test_intrastat_report_transaction(self):
-        invoice = self._create_invoices('transaction')
+        invoice = self._create_invoice_intrastat_tansaction('transaction')
         report = self.env.ref('account_intrastat.intrastat_report')
         options = self._generate_options(
             report,
@@ -138,7 +120,7 @@ class IntrastatExpiryReportTest(TestAccountReportsCommon):
         self.product_a.intrastat_code_id = self.intrastat_codes['commodity-no_date']
         self.product_b.intrastat_code_id = self.intrastat_codes['commodity-expired']
         self.product_c.intrastat_code_id = self.intrastat_codes['commodity-premature']
-        invoice = self._create_invoices()
+        invoice = self._create_invoice_intrastat_tansaction()
         report = self.env.ref('account_intrastat.intrastat_report')
         options = self._generate_options(
             report,

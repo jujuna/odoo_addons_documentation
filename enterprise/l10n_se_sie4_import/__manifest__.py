@@ -4,7 +4,6 @@
     'name': 'Sweden - SIE 4 Import',
     'countries': ['se'],
     'summary': 'Import Accounting Data from SIE 4 files',
-    'version': '1.0',
     'description': """
         Module for the import of SIE 4 standard files.
         Official website: https://sie.se/
@@ -16,15 +15,14 @@
         'l10n_se',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'wizard/import_wizard_view.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [
             'l10n_se_sie4_import/static/src/xml/**/*',
         ],
     },
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

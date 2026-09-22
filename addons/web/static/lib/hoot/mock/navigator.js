@@ -1,5 +1,6 @@
 /** @odoo-module */
 
+import { t } from "@odoo/owl";
 import { isInstanceOf } from "../../hoot-dom/hoot_dom_utils";
 import {
     createMock,
@@ -10,10 +11,6 @@ import {
     setSyncValue,
 } from "../hoot_utils";
 import { ensureTest } from "../main_runner";
-
-/**
- * @typedef {"android" | "ios" | "linux" | "mac" | "windows"} Platform
- */
 
 //-----------------------------------------------------------------------------
 // Global
@@ -28,6 +25,12 @@ const {
     TypeError,
 } = globalThis;
 const { userAgent: $userAgent } = navigator;
+
+//-----------------------------------------------------------------------------
+// Types
+//-----------------------------------------------------------------------------
+
+export const T_PLATFORM = t.selection(["android", "ios", "linux", "mac", "windows"]);
 
 //-----------------------------------------------------------------------------
 // Internal
@@ -141,7 +144,7 @@ function getUserAgentBrowser() {
 }
 
 /**
- * @param {Platform} platform
+ * @param {typeof T_PLATFORM} platform
  */
 function makeUserAgent(platform) {
     const userAgent = ["Mozilla/5.0"];
@@ -271,24 +274,160 @@ export class MockPermissionStatus extends MockEventTarget {
     }
 }
 
+export class MockServiceWorker extends MockEventTarget {
+    static publicListeners = ["error", "message"];
+
+    /** @type {ServiceWorkerState} */
+    state = "activated";
+
+    /**
+     * @param {string} scriptURL
+     */
+    constructor(scriptURL) {
+        super(...arguments);
+
+        /** @type {string} */
+        this.scriptURL = scriptURL;
+    }
+
+    /**
+     * @param {any} _message
+     */
+    postMessage(_message) {}
+}
+
+export class MockServiceWorkerContainer extends MockEventTarget {
+    static publicListeners = ["controllerchange", "message", "messageerror"];
+
+    /** @type {MockServiceWorker | null} */
+    controller = null;
+
+    /**
+     * @private
+     * @type {PromiseWithResolvers<MockServiceWorkerRegistration>}
+     */
+    _readyDef = Promise.withResolvers();
+    /**
+     * @private
+     */
+    _readyResolved = false;
+    /**
+     * @private
+     * @type {Map<string, MockServiceWorkerRegistration>}
+     */
+    _registrations = new Map();
+
+    get ready() {
+        return this._readyDef.promise;
+    }
+
+    async getRegistration(scope = "/") {
+        return this._registrations.get(scope);
+    }
+
+    async getRegistrations() {
+        return Array.from(this._registrations.values());
+    }
+
+    /**
+     * @param {string} scriptURL
+     * @param {{ scope?: string }} [options]
+     */
+    async register(scriptURL, options = {}) {
+        const scope = options.scope ?? "/";
+
+        const registration = new MockServiceWorkerRegistration(scriptURL, scope);
+        this._registrations.set(scope, registration);
+
+        if (!this.controller) {
+            this.controller = registration.active;
+            this.dispatchEvent(new Event("controllerchange"));
+        }
+
+        if (!this._readyResolved) {
+            this._readyResolved = true;
+            this._readyDef.resolve(registration);
+        }
+
+        return registration;
+    }
+
+    startMessages() {}
+
+    /**
+     * @private
+     */
+    _clear() {
+        this.controller = null;
+        this._readyDef = Promise.withResolvers();
+        this._readyResolved = false;
+        this._registrations.clear();
+    }
+}
+
+export class MockServiceWorkerRegistration {
+    /** @type {MockServiceWorker | null} */
+    installing = null;
+    /** @type {MockServiceWorker | null} */
+    waiting = null;
+
+    /**
+     * @param {string} scriptURL
+     * @param {string} scope
+     */
+    constructor(scriptURL, scope) {
+        /** @type {MockServiceWorker | null} */
+        this.active = new MockServiceWorker(scriptURL);
+        /** @type {string} */
+        this.scope = scope;
+    }
+
+    async unregister() {
+        return true;
+    }
+
+    async update() {}
+}
+
+// Naive lock that doesn't lock anything
+export class MockLockManager {
+    async request(name, ...args) {
+        const callback = args.length > 1 ? args[1] : args[0];
+        callback();
+    }
+
+    async query() {
+        return {
+            held: [],
+            pending: [],
+        };
+    }
+}
+
 export const currentPermissions = getPermissions();
 
 export const mockClipboard = new MockClipboard();
 
 export const mockPermissions = new MockPermissions();
 
+export const mockServiceWorker = new MockServiceWorkerContainer();
+
+export const mockLockManager = new MockLockManager();
+
 export const mockNavigator = createMock(navigator, {
     clipboard: { value: mockClipboard },
+    locks: { value: mockLockManager },
     maxTouchPoints: { get: () => (globalThis.ontouchstart === undefined ? 0 : 1) },
     permissions: { value: mockPermissions },
     sendBeacon: { get: () => mockValues.sendBeacon },
-    serviceWorker: { get: () => undefined },
+    serviceWorker: { value: mockServiceWorker },
     userAgent: { get: () => mockValues.userAgent },
     vibrate: { get: () => mockValues.vibrate },
 });
 
 export function cleanupNavigator() {
     permissionStatuses.clear();
+    mockServiceWorker._clear();
     $assign(currentPermissions, getPermissions());
     $assign(mockValues, getMockValues());
 }
@@ -323,7 +462,7 @@ export function mockSendBeacon(callback) {
 }
 
 /**
- * @param {Platform} platform
+ * @param {typeof T_PLATFORM} platform
  */
 export function mockUserAgent(platform = "linux") {
     ensureTest("mockUserAgent");

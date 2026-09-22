@@ -9,21 +9,51 @@
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Abe Manyo (abem)" <abem@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-06 06:53+0000\n"
-"Last-Translator: \"Abe Manyo (abem)\" <abem@odoo.com>\n"
-"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 01:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-master/"
 "hr_appraisal/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_appraisal
+#: model:ir.module.module,description:base.module_hr_appraisal
+msgid ""
+"\n"
+"Periodical Employees appraisal\n"
+"==============================\n"
+"\n"
+"By using this application you can maintain the motivational process by doing "
+"periodical appraisals of your employees performance. The regular assessment "
+"of human resources can benefit your people as well your organization.\n"
+"\n"
+"An appraisal plan can be assigned to each employee. These plans define the "
+"frequency and the way you manage your periodic personal appraisal.\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Ability to create employee's appraisal(s).\n"
+"* An appraisal can be created by an employee's manager or automatically "
+"based on schedule which is defined in the employee form.\n"
+"* The appraisal is done according to a plan in which various surveys can be "
+"created. Each survey can be answered by a particular level in the employees "
+"hierarchy. The final review and appraisal is done by the manager.\n"
+"* Manager, colleague, collaborator, and employee himself/herself receives "
+"email to perform a periodical appraisal.\n"
+"* Every Appraisal Form filled by employees, colleague, collaborator, can be "
+"viewed in a PDF form.\n"
+"* Meeting Requests are created manually according to employees appraisals.\n"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -35,16 +65,9 @@ msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal_goal.py:0
-#: code:addons/hr_appraisal/models/hr_appraisal_template.py:0
-msgid "%s (copy)"
-msgstr "%s (salin)"
-
-#. module: hr_appraisal
-#. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "%s's Goals"
-msgstr "Tujuan-Tujuan %s"
+msgstr "Target %s"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_campaign_wizard__manager
@@ -67,61 +90,13 @@ msgstr ". Lalu, jadwalkan meeting untuk mendiskusikannya."
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid ". Then, share it with appraisers."
-msgstr ". Lalu, bagikan dengan appraiser."
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__100
-msgid "100%"
-msgstr "100%"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__025
-msgid "25%"
-msgstr "25%"
+msgstr ". Lalu, bagikan dengan penilai."
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_config_settings__module_hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "360 Feedback"
-msgstr "360 Feedback"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__050
-msgid "50%"
-msgstr "50%"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__075
-msgid "75%"
-msgstr "75%"
-
-#. module: hr_appraisal
-#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
-msgid ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        An appraisal of <t t-"
-"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
-"                        <br/><br/>\n"
-"                        Please schedule an appraisal date together.\n"
-"                        <br/><br/>\n"
-"                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; text-"
-"align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\"background-color: {{object.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\">\n"
-"                                    View Appraisal\n"
-"                                </a>\n"
-"                            </p>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
+msgstr "360 Masukan"
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_request_from_employee
@@ -134,10 +109,10 @@ msgid ""
 "                        <br/>\n"
 "                        <t t-out=\"ctx.get('author_name', '')\">Addison "
 "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-"\">addison.olson28@example.com</t>) wishes an appraisal.\n"
+"\">addison.olson28@example.com</t>) has requested an appraisal.\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
 "                            <div style=\"margin: 16px 0px 16px 0px; padding: "
-"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
+"8px 16px 8px 16px; background-color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">Annual "
 "appraisal.</t>\n"
 "                            </div>\n"
@@ -145,7 +120,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            <p style=\"margin: 16px 0px 16px 0px; padding: "
 "8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
 "padding: 8px 16px 8px 16px; text-decoration: none; color: "
@@ -159,6 +134,38 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Kepada <t t-out=\"ctx.get('employee_to_name')"
+"\">karyawan</t>,\n"
+"                        <br/>\n"
+"                        <t t-out=\"ctx.get('author_name', '')\">Addison "
+"Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
+"\">addison.olson28@example.com</t>) meminta appraisal.\n"
+"                        <t t-if=\"ctx.get('user_body')\">\n"
+"                            <div style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; background-color: #8A9A8A\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">Appraisal "
+"tahunan.</t>\n"
+"                            </div>\n"
+"                        </t>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; text-align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\" margin: auto; background-color: "
+"{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
+"padding: 8px 16px 8px 16px; text-decoration: none; color: "
+"{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
+"                                    Lihat Appraisal\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_reminder
@@ -175,7 +182,8 @@ msgid ""
 "\">[deadline]</t>.\n"
 "                        <br/>\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
+"                            <div class=\"my-3 py-2 px-3\" style=\"background-"
+"color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">[Optional "
 "comment]</t>\n"
 "                            </div>\n"
@@ -183,7 +191,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            You can access your appraisal form here:\n"
 "                            <p class=\"text-center my-3 py-2 px-3\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
 "8px 16px; text-decoration: none; color: "
@@ -203,6 +211,76 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Hai <t t-out=\"ctx.get('employee_to_name')"
+"\">[karyawan]</t>,\n"
+"                        <br/>\n"
+"                        Hanya mengingatkan bahwa appraisal Anda berikutnya "
+"dengan <t t-out=\"ctx.get('manager_names')\"> [Appraiser]</t>\n"
+"                        dijadwalkan untuk <t t-out=\"ctx.get('date_close')"
+"\">[tenggat]</t>.\n"
+"                        <br/>\n"
+"                        <t t-if=\"ctx.get('user_body')\">\n"
+"                            <div class=\"my-3 py-2 px-3\" style=\"background-"
+"color: #8A9A8A\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">[Komentar "
+"opsional]</t>\n"
+"                            </div>\n"
+"                        </t>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            Anda dapat mengakses formulir appraisal di "
+"sini:\n"
+"                            <p class=\"text-center my-3 py-2 px-3\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\" margin: auto; background-color: "
+"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
+"8px 16px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
+"\">\n"
+"                                    Lihat Appraisal\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                        Jika ada yang ingin ditanyakan atau Anda ingin "
+"mengubah jadwal, silakan hubungi kami.\n"
+"                        <br/>\n"
+"                        <br/>\n"
+"                        <t t-out=\"ctx.get('author_signature')\"/>\n"
+"                        <br/>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
+
+#. module: hr_appraisal
+#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        The appraisal for <t t-"
+"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
+"                        <br/><br/>\n"
+"                        Please proceed with the appraisal discussion based "
+"on the scheduled date.\n"
+"                        <br/><br/>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\"background-color: {{object.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
+"\">\n"
+"                                    View Appraisal\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -213,6 +291,11 @@ msgid ""
 "                        the company.\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        Deskripsikan sesuatu yang Anda banggakan—pekerjaan "
+"yang memiliki dampak positif pada\n"
+"                        perusahaan.\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -222,6 +305,10 @@ msgid ""
 "obstacles?\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        Apakah Anda menghadapi kesulitan baru atau hambatan "
+"yang tidak diduga?\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -232,6 +319,11 @@ msgid ""
 "                        enjoy the most and which the least?\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        Setiap pekerjaan memiliki poin kuatnya. Menurut "
+"Anda, tugas mana yang Anda \n"
+"                        paling nikmati dan paling tidak nikmati?\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -241,6 +333,10 @@ msgid ""
 "them overcome their weaknesses?\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        Dari sudut pandang manajer, bagaimana Anda dapat "
+"membantu mengatasi kelemahan mereka?\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -251,6 +347,12 @@ msgid ""
 "                        reach your goals and foster better collaboration?\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        Ceritakan bagaimana perusahaan dapat mendukung "
+"kebutuhan dan tujuan Anda untuk membantu Anda \n"
+"                        mencapai target dan membangun kolaborasi yang lebih "
+"baik?\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -261,6 +363,11 @@ msgid ""
 "                        the employee’s goals?\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        Bagaimana Anda melihat karyawan ini ke depannya? "
+"Apakah visi Anda selaras dengan \n"
+"                        target karyawan tersebut?\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -271,6 +378,11 @@ msgid ""
 "                        handling work-related challenges.\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        Sebutkan prestasi apa pun yang menunjukkan "
+"kelebihannya dalam \n"
+"                        menangani tantangan terkait pekerjaan.\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -280,47 +392,48 @@ msgstr "<em>Otonomi</em>"
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Company culture and values</em>"
-msgstr ""
+msgstr "<em>Nilai dan budaya perusahaan</em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Compensation</em>"
-msgstr ""
+msgstr "<em>Kompensasi</em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Do you need a rapid response to address the current situation?</em>"
 msgstr ""
+"<em>Apakah Anda butuh tanggapan cepat untuk menangani situasi saat ini?</em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Internal Communication</em>"
-msgstr ""
+msgstr "<em>Komunikasi Internal</em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Job content</em>"
-msgstr ""
+msgstr "<em>Konten pekerjaan</em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Proactivity</em>"
-msgstr ""
+msgstr "<em>Proaktif</em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Provide a long-term objective (beyond 6 months).</em>"
-msgstr ""
+msgstr "<em>Sediakan tujuan jangka panjang (lebih dari 6 bulan).</em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Provide a short-term objective (within the next 6 months).</em>"
-msgstr ""
+msgstr "<em>Sediakan tujuan jangka pendek (dalam 6 bulan ke depan).</em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Stress Management</em>"
-msgstr ""
+msgstr "<em>Manajemen Stres</em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -335,7 +448,7 @@ msgstr "<em>Manajemen Waktu</em>"
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "<em>Work organization</em>"
-msgstr ""
+msgstr "<em>Organisasi kerja</em>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_public_view_form
@@ -355,15 +468,24 @@ msgstr "<span class=\"o_stat_text\">Appraisals</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
+msgid ""
+"<span class=\"o_stat_text\">Appraisals</span>\n"
+"                        <span class=\"o_stat_value\">New</span>"
+msgstr ""
+"<span class=\"o_stat_text\">Appraisal</span>\n"
+"                        <span class=\"o_stat_value\">Baru</span>"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "<span class=\"o_stat_text\">Goals</span>"
-msgstr "<span class=\"o_stat_text\">Goal</span>"
+msgstr "<span class=\"o_stat_text\">Target</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_hierarchy
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_hierarchy
 msgid "<span id=\"span_tag\" invisible=\"not tag_ids\">Tags:</span>"
-msgstr ""
+msgstr "<span id=\"span_tag\" invisible=\"not tag_ids\">Tag:</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -372,6 +494,9 @@ msgid ""
 "                                            <strong class=\"text-success\" "
 "invisible=\"not employee_feedback_published\">Shared to Appraisers</strong>"
 msgstr ""
+"<span invisible=\"employee_feedback_published\">Dibagi ke Penilai</span>\n"
+"                                            <strong class=\"text-success\" "
+"invisible=\"not employee_feedback_published\">Dibagi ke Penilai</strong>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -380,6 +505,9 @@ msgid ""
 "                                            <strong class=\"text-success\" "
 "invisible=\"not manager_feedback_published\">Shared to Employee</strong>"
 msgstr ""
+"<span invisible=\"manager_feedback_published\">Dibagi ke Karyawan</span>\n"
+"                                            <strong class=\"text-success\" "
+"invisible=\"not manager_feedback_published\">Dibagi ke Karyawan</strong>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -400,7 +528,7 @@ msgid ""
 "                    </span>"
 msgstr ""
 "<span style=\"font-weight: bolder;\">\n"
-"                        Feedback\n"
+"                        Masukan\n"
 "                    </span>"
 
 #. module: hr_appraisal
@@ -450,18 +578,18 @@ msgstr ""
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_hierarchy
 msgid "<span>Deadline:</span>"
-msgstr ""
+msgstr "<span>Deadline:</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_hierarchy
 msgid "<span>Expected Time:</span>"
-msgstr ""
+msgstr "<span>Perkiraan Waktu:</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_hierarchy
 msgid "<span>months</span>"
-msgstr ""
+msgstr "<span>bulan</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -471,6 +599,10 @@ msgid ""
 "                                            <span invisible=\"not "
 "employee_feedback_published\">Private</span>"
 msgstr ""
+"<strong class=\"text-info\" "
+"invisible=\"employee_feedback_published\">Privat</strong>\n"
+"                                            <span invisible=\"not "
+"employee_feedback_published\">Privat</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -480,6 +612,10 @@ msgid ""
 "                                            <span invisible=\"not "
 "manager_feedback_published\">Private</span>"
 msgstr ""
+"<strong class=\"text-info\" invisible=\"manager_feedback_published\">Privat</"
+"strong>\n"
+"                                            <span invisible=\"not "
+"manager_feedback_published\">Privat</span>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
@@ -544,7 +680,7 @@ msgstr "<strong>Kesempatan-kesempatan karir</strong>"
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
 msgid "<strong>Company Feedback</strong>"
-msgstr "<strong>Feedback Perusahaan</strong>"
+msgstr "<strong>Masukan Perusahaan</strong>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
@@ -569,12 +705,12 @@ msgstr "<strong>Apakah Anda mencari jalur karir tertentu ?</strong>"
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
 msgid "<strong>Feedback on management</strong>"
-msgstr "<strong>Feedback untuk manajemen</strong>"
+msgstr "<strong>Masukan untuk manajemen</strong>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
 msgid "<strong>GOALS :</strong>"
-msgstr "<strong>GOALS :</strong>"
+msgstr "<strong>TARGET :</strong>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
@@ -671,7 +807,7 @@ msgstr "<strong>Opportunity</strong>"
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
 msgid "<strong>Overall experience feedback</strong>"
-msgstr "<strong>Feedback pengalaman secara keseluruhan</strong>"
+msgstr "<strong>Masukan pengalaman secara keseluruhan</strong>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
@@ -896,7 +1032,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal_goal.py:0
 msgid "A goal template already exist for this goal."
-msgstr "Templat tujuan sudah tersedia untuk tujuan ini."
+msgstr "Template target sudah tersedia untuk target ini."
 
 #. module: hr_appraisal
 #: model:ir.model.constraint,message:hr_appraisal.constraint_hr_appraisal_goal_tag_name_uniq
@@ -906,12 +1042,12 @@ msgstr "Tag dengan nama yang sama sudah tersedia."
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__accessible_employee_feedback
 msgid "Accessible Employee Feedback"
-msgstr "Feedback Karyawan yang dapat Diakses"
+msgstr "Masukan Karyawan yang dapat Diakses"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__accessible_manager_feedback
 msgid "Accessible Manager Feedback"
-msgstr "Feedback Manajer yang dapat Diakses"
+msgstr "Masukan Manajer yang dapat Diakses"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__message_needaction
@@ -928,6 +1064,7 @@ msgstr "Aktif"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_root
 msgid "Activities"
 msgstr "Aktivitas"
 
@@ -943,6 +1080,13 @@ msgid "Activity Exception Decoration"
 msgstr "Dekorasi Pengecualian Aktivitas"
 
 #. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_plans_ids
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_plans_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_plans
+msgid "Activity Plans"
+msgstr "Rencana Aktivitas"
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_state
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_state
 msgid "Activity State"
@@ -952,7 +1096,23 @@ msgstr "Status Aktivitas"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_type_icon
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "Ikon Jenis Aktifitas"
+msgstr "Ikon Jenis Aktivitas"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_type_action_config_appraisal
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_type
+msgid "Activity Types"
+msgstr "Tipe Aktivitas"
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid ""
+"Activity plans are used to assign a list of activities in just a few clicks\n"
+"                (e.g. \"Mid-Year Review\", \"Annual Appraisal\", ...)"
+msgstr ""
+"Rencana kegiatan digunakan untuk menetapkan daftar aktivitas dalam beberapa "
+"klik saja\n"
+"                (contoh, \"Review Tengah Tahun\", \"Appraisal Tahunan\", ...)"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -963,7 +1123,7 @@ msgstr "Jenis aktivitas"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/hr_employee_selection_list/hr_employee_selection_list_view.xml:0
 msgid "Add Goals to Employees"
-msgstr "Tambahkan Goals ke Karyawan"
+msgstr "Tambahkan Target ke Karyawan"
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.hr_appraisal_config_templates_action
@@ -991,24 +1151,15 @@ msgid "All companies"
 msgstr "Semua perusahaan"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-msgid ""
-"Allow to create appraisals in batches:\n"
-"- By Employee: for specific employees\n"
-"- By Company: all employees of the specified company\n"
-"- By Department: all employees of the specified department\n"
-"- By Employee Tag: all employees of the specific employee group category"
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Already Processed"
 msgstr ""
-"Izinkan untuk membuat appraisal secara batch:\n"
-"- Berdasarkan Karyawan: untuk karyawan tertentu\n"
-"- Berdasarkan Perusahaan: semua karyawan pada perusahaan terpilih\n"
-"- Berdasarkan Departemen: semua karyawan pada departemen terpilih\n"
-"- Berdasarkan Tag Karyawan: semua karyawan pada kategori kelompok terpilih"
 
 #. module: hr_appraisal
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_reminder
 msgid "An appraisal reminder sent manually to the employee by the manager"
-msgstr ""
+msgstr "Pengingat appraisal dikirim manual ke karyawan oleh manager"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -1019,7 +1170,6 @@ msgstr "Appraisal lain dengan orang yang sama sudah berlangsung."
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__appraisal_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__appraisal_id
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_activity
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_tree
@@ -1038,10 +1188,8 @@ msgid "Appraisal Assessment Note"
 msgstr "Catatan Penilaian Appraisal"
 
 #. module: hr_appraisal
-#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 msgid "Appraisal Campaign"
 msgstr "Kampanye Appraisal"
@@ -1084,12 +1232,12 @@ msgstr "Formulir Appraisal untuk Diisi"
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_appraisal_goal
 msgid "Appraisal Goal"
-msgstr "Tujuan Appraisal"
+msgstr "Target Appraisal"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_appraisal_goal_tag
-msgid "Appraisal Goal Tags"
-msgstr "Tag Goal Appraisal"
+msgid "Appraisal Goal Tag"
+msgstr "Tag Target Appraisal"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1103,6 +1251,11 @@ msgid "Appraisal Plan Posted"
 msgstr "Rencana Appraisal Diterbitkan"
 
 #. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Appraisal Plans"
+msgstr "Rencana Appraisal"
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__appraisal_properties_definition
 msgid "Appraisal Properties"
 msgstr "Properti Appraisal"
@@ -1110,13 +1263,20 @@ msgstr "Properti Appraisal"
 #. module: hr_appraisal
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_reminder
 msgid "Appraisal Reminder"
-msgstr ""
+msgstr "Pengingat Appraisal"
 
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Appraisal Request"
 msgstr "Permintaan Appraisal"
+
+#. module: hr_appraisal
+#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
+msgid ""
+"Appraisal Request from {{ hasattr(object, 'name') and object.name or '' }}"
+msgstr ""
+"Permohonan Appraisal dari {{ hasattr(object, 'name') and object.name or '' }}"
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_config_templates_action
@@ -1131,7 +1291,7 @@ msgstr "Templat Appraisal"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__appraisal_template_ids
 #: model:ir.ui.menu,name:hr_appraisal.hr_appraisal_template_menu
 msgid "Appraisal Templates"
-msgstr "Templat-Templat Appraisal"
+msgstr "Template Appraisal"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1173,6 +1333,16 @@ msgid "Appraisal to start"
 msgstr "Appraisal untuk dimulai"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_employee_departure.py:0
+msgid ""
+"Appraisal's managers have been updated due to the end of collaboration with "
+"an employee."
+msgstr ""
+"Manajer Appraisal telah diperbarui karena berakhirnya kerja sama dengan "
+"seorang karyawan."
+
+#. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.ir_cron_scheduler_appraisal_ir_actions_server
 msgid "Appraisal: Run employee appraisal"
 msgstr "Appraisal: Jalankan appraisal karyawan"
@@ -1182,13 +1352,13 @@ msgstr "Appraisal: Jalankan appraisal karyawan"
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_action_multiple_appraisals
 #: model:ir.actions.act_window,name:hr_appraisal.open_view_hr_appraisal_tree
+#: model:ir.module.module,shortdesc:base.module_hr_appraisal
 #: model:ir.ui.menu,name:hr_appraisal.menu_hr_appraisal_root
 #: model:ir.ui.menu,name:hr_appraisal.menu_open_view_hr_appraisal_tree
 #: model:res.groups.privilege,name:hr_appraisal.res_groups_privilege_appraisals
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_graph
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_pivot
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_department_view_kanban
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_departure_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 msgid "Appraisals"
 msgstr "Penilaian"
@@ -1201,7 +1371,7 @@ msgstr "Otomatisasi Appraisal"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "Appraisals Plans"
-msgstr "Rencana-Rencana Appraisal"
+msgstr "Rencana Appraisal"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__appraisals_to_process_count
@@ -1221,7 +1391,7 @@ msgstr ""
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Appraisers"
-msgstr ""
+msgstr "Penilai"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1233,6 +1403,11 @@ msgstr "Diarsipkan"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "Ask to fill a survey to other employees"
 msgstr "Minta untuk mengisi survei ke karyawan-karyawan lain"
+
+#. module: hr_appraisal
+#: model:ir.module.module,summary:base.module_hr_appraisal
+msgid "Assess your employees"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__assessment_note_ids
@@ -1247,7 +1422,7 @@ msgid ""
 "Assign Goals to motivate your Employees and keep track of their objectives "
 "between Appraisals."
 msgstr ""
-"Buat Tujuan untuk memotivasi Karyawan Anda dan tetap lacak objektif di "
+"Buat Target untuk memotivasi Karyawan Anda dan tetap lacak tujuannya di "
 "antara Appraisal."
 
 #. module: hr_appraisal
@@ -1292,26 +1467,6 @@ msgid "Body content is the same as the template"
 msgstr "Konten badan sama dengan templat"
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__company
-msgid "By Company"
-msgstr "Berdasarkan Perusahaa"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__department
-msgid "By Department"
-msgstr "Menurut Departemen"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__employee
-msgid "By Employee"
-msgstr "Berdasarkan Karyawan"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__category
-msgid "By Employee Tag"
-msgstr "Menurut Tag Karyawan"
-
-#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "Bye-bye, record!"
@@ -1339,13 +1494,14 @@ msgid "Can See Manager Publish"
 msgstr "Dapat Melihat Publikasi Manajer"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
-msgid "Cancel"
-msgstr "Batal"
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__children_progression
+msgid "Children Progression"
+msgstr "Progres Anak"
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Close"
 msgstr "Tutup"
@@ -1363,10 +1519,6 @@ msgstr "Warna"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_res_company
-msgid "Companies"
-msgstr "Perusahaan"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__company_id
@@ -1392,6 +1544,7 @@ msgid "Configuration"
 msgstr "Konfigurasi"
 
 #. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_confirm_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Confirm"
 msgstr "Konfirmasi"
@@ -1413,6 +1566,11 @@ msgstr "Konten"
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
 msgid "Continue"
 msgstr "Lanjutkan"
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Create a Appraisal Activity Plan"
+msgstr "Buat Rencana Kegiatan Appraisal"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__duration_first_appraisal
@@ -1440,18 +1598,18 @@ msgstr "Buat Appraisal setelah rekrutmen"
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.action_hr_appraisal_goal
 msgid "Create new goals"
-msgstr "Buat goal baru"
+msgstr "Buat target baru"
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.action_hr_appraisal_goal_template
 #: model_terms:ir.actions.act_window,help:hr_appraisal.action_hr_appraisal_goal_template_library
 msgid "Create new goals Template"
-msgstr ""
+msgstr "Buat Template target baru"
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.hr_appraisal_goal_tag_action
 msgid "Create new tags to use on Employee's goals"
-msgstr "Buat tag-tag baru untuk digunakan pada goal Karyawan"
+msgstr "Buat tag baru untuk digunakan pada target Karyawan"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__create_uid
@@ -1507,7 +1665,7 @@ msgstr "Deadline: %s"
 msgid ""
 "Define the next appraisal date automatically based on Appraisal's History"
 msgstr ""
-"Definisikan tanggal appraisal berikutnya secara otomatis berdasarkan Sejarah "
+"Definisikan tanggal appraisal berikutnya secara otomatis berdasarkan Riwayat "
 "Appraisal"
 
 #. module: hr_appraisal
@@ -1515,16 +1673,6 @@ msgstr ""
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "Delete"
 msgstr "Hapus"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-msgid "Delete Future Appraisals"
-msgstr "Hapus Appraisal Masa Depa"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-msgid "Delete all appraisal after contract end date."
-msgstr "Hapus semua appraisal setelah tanggal akhir kontrak."
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -1535,7 +1683,6 @@ msgstr "Hapus beserta anak-anaknya"
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_department
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__department_id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__department_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__department_ids
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1553,11 +1700,6 @@ msgid "Departments"
 msgstr "Departemen"
 
 #. module: hr_appraisal
-#: model:ir.model,name:hr_appraisal.model_hr_departure_wizard
-msgid "Departure Wizard"
-msgstr "Departure Wizard"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__description
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
@@ -1567,7 +1709,6 @@ msgstr "Deskripsi"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/hr_employee_selection_list/hr_employee_selection_list_view.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 msgid "Discard"
 msgstr "Buang"
 
@@ -1579,8 +1720,8 @@ msgstr "Buang"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__display_name
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__display_name
@@ -1607,8 +1748,13 @@ msgid "Draft"
 msgstr "Draft"
 
 #. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Edit Feedback"
+msgstr "Edit Masukan"
+
+#. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_mail_template
-msgid "Email Templates"
+msgid "Email Template"
 msgstr "Templat Email"
 
 #. module: hr_appraisal
@@ -1637,26 +1783,26 @@ msgid "Employee Autocomplete"
 msgstr "Penyelesaian Otomatis Karyawan"
 
 #. module: hr_appraisal
+#: model:ir.model,name:hr_appraisal.model_hr_employee_departure
+msgid "Employee Departure"
+msgstr "Karyawan Keluar"
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_feedback
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__appraisal_employee_feedback_template
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
 msgid "Employee Feedback"
-msgstr "Feedback Karyawan"
+msgstr "Masukan Karyawan"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_feedback_published
 msgid "Employee Feedback Published"
-msgstr "Feedback Karyawan Dipublikasikan"
+msgstr "Masukan Karyawan Dipublikasikan"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_feedback_template
 msgid "Employee Feedback Template"
-msgstr "Templat Feedback Karyawan"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__category_id
-msgid "Employee Tag"
-msgstr "Tag Karyawan"
+msgstr "Templat Masukan Karyawan"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_user_id
@@ -1666,12 +1812,14 @@ msgstr "User Karyawan"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Employee to review"
-msgstr ""
+msgstr "Karyawan untuk ditinjau"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Employee's Feedback"
-msgstr "Feedback Karyawan"
+msgstr "Masukan Karyawan"
 
 #. module: hr_appraisal
 #: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__manager__employee_manager
@@ -1699,6 +1847,16 @@ msgid "Exceeds expectations"
 msgstr "Melebihi ekspektasi"
 
 #. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Employee's Feedback"
+msgstr "Perluas Masukan Karyawan"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Manager's Feedback"
+msgstr "Perluas Masukan Manajer"
+
+#. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_external
 msgid "External"
 msgstr "Eksternal"
@@ -1712,12 +1870,12 @@ msgstr "Isi appraisal untuk %s"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Fill in the employee's feedback section before"
-msgstr ""
+msgstr "Isi bagian feedback karyawan sebelum"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Fill in the manager's feedback section before"
-msgstr ""
+msgstr "Isi bagian feedback manajer sebelum"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__assessment_note
@@ -1738,12 +1896,6 @@ msgid "Followers (Partners)"
 msgstr "Follower (Mitra)"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Ikon font awesome, misalnya fa-tasks"
-
-#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "Future Activities"
 msgstr "Kegiatan - Kegiatan Mendatang"
@@ -1760,17 +1912,17 @@ msgstr ""
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_goal_tag_action
 msgid "Goal Tags"
-msgstr "Tag Tujuan"
+msgstr "Tag Target"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__template_goal_id
 msgid "Goal Template"
-msgstr "Templat Tujuan"
+msgstr "Template Target"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
 msgid "Goal or Employee"
-msgstr ""
+msgstr "Target atau Karyawan"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1781,37 +1933,37 @@ msgstr ""
 #: model:ir.ui.menu,name:hr_appraisal.menu_hr_appraisal_goal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_graph
 msgid "Goals"
-msgstr "Tujuan"
+msgstr "Target"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__goals_count
 msgid "Goals Count"
-msgstr "Jumlah Goal"
+msgstr "Jumlah Target"
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.action_hr_appraisal_goal_template
 msgid "Goals Template"
-msgstr "Templat Tujuan"
+msgstr "Template Target"
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.action_hr_appraisal_goal_template_library
 msgid "Goals Template Library"
-msgstr "Pustaka Templat Tujuan"
+msgstr "Pustaka Templat Target"
 
 #. module: hr_appraisal
 #: model:mail.template,name:hr_appraisal.mail_template_appraisal_request_from_employee
 msgid "HR: Appraisal Request By Employee"
-msgstr ""
+msgstr "HR: Permintaan Appraisal dari Karyawan"
 
 #. module: hr_appraisal
 #: model:mail.template,name:hr_appraisal.mail_template_appraisal_reminder
 msgid "HR: Appraisal reminder"
-msgstr ""
+msgstr "HR: Pengingat appraisal"
 
 #. module: hr_appraisal
 #: model:mail.template,name:hr_appraisal.mail_template_appraisal_confirm
 msgid "HR: General Appraisal Confirmation"
-msgstr ""
+msgstr "HR: Konfirmasi Appraisal Umum"
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_hardskills
@@ -1837,12 +1989,12 @@ msgstr "Bagaimana karyawan dapat berkembang?"
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "How do I feel about my own role?"
-msgstr ""
+msgstr "Apa perasaan saya mengenai peran saya sendiri?"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "How do I feel about the company?"
-msgstr ""
+msgstr "Bagaimana perasaan saya mengenai perusahaan?"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__id
@@ -1852,8 +2004,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__id
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__id
@@ -1911,6 +2063,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "If you need, ask feedback to a selection of colleagues you work with."
 msgstr ""
+"Bila perlu, minta feedback ke kolega tertentu yang bekerja sama dengan Anda."
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__image_1920
@@ -1980,7 +2133,7 @@ msgstr "Bahasa"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "Last 365 days"
-msgstr ""
+msgstr "365 hari terakhir"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__last_appraisal_id
@@ -2030,7 +2183,7 @@ msgstr "Terlambat"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "Late Activities"
-msgstr "Aktifitas terakhir"
+msgstr "Aktivitas terakhir"
 
 #. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.action_open_appraisal_campaign_wizard
@@ -2062,6 +2215,9 @@ msgid ""
 "Long term (&gt; 6 months) career discussion: Where does the employee\n"
 "                    want to go, and how can you help them reach that goal?"
 msgstr ""
+"Diskusi karier jangka panjang (&gt; 6 bulan): Ke mana arah\n"
+"                    yang diinginkan karyawan, dan bagaimana Anda dapat "
+"membantunya mencapai target tersebut?"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__template_id
@@ -2089,22 +2245,24 @@ msgstr "Penilaian Manajer akan muncul di sini"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__appraisal_manager_feedback_template
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
 msgid "Manager Feedback"
-msgstr "Feedback Manajer"
+msgstr "Masukan Manajer"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__manager_feedback_published
 msgid "Manager Feedback Published"
-msgstr "Feedback Manajer Dipublikasikan"
+msgstr "Masukan Manajer Dipublikasikan"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__manager_feedback_template
 msgid "Manager Feedback Template"
-msgstr "Templat Feedback Manajer"
+msgstr "Templat Masukan Manajer"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Manager's Feedback"
-msgstr "Feedback Manajer"
+msgstr "Masukan Manajer"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__manager_ids
@@ -2114,10 +2272,17 @@ msgstr "Manajer"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/goal_helper_static_actions/goal_helper_static_actions.js:0
+#: model:ir.actions.server,name:hr_appraisal.action_mark_appraisal_as_done
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Mark as Done"
 msgstr "Tandai sebagai Selesai"
+
+#. module: hr_appraisal
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2138,17 +2303,6 @@ msgid "Messages"
 msgstr "Pesan"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-msgid "Mode"
-msgstr "Mode"
-
-#. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/components/cog_menu/multiple_appraisals_cog_menu.xml:0
-msgid "Multiple Appraisals"
-msgstr "Lebih Dari Satu Appraisal"
-
-#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "My Activities"
 msgstr "Aktivitas Saya"
@@ -2157,7 +2311,7 @@ msgstr "Aktivitas Saya"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__my_activity_date_deadline
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr "Deadline Kegiatan Saya"
+msgstr "Tenggat Aktivitas Saya"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -2167,7 +2321,7 @@ msgstr "Appraisal Saya"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
 msgid "My Goals"
-msgstr "Tujuan Saya"
+msgstr "Target Saya"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
@@ -2177,7 +2331,7 @@ msgstr "Kelompok ku"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "My team"
-msgstr ""
+msgstr "Tim saya"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__name
@@ -2215,7 +2369,7 @@ msgstr "Kalender Acara Aktivitas Berikutnya"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_date_deadline
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr "Batas Waktu Aktivitas Berikutnya"
+msgstr "Tenggat Aktivitas Berikutnya"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_summary
@@ -2242,16 +2396,15 @@ msgid "Next Appraisal Date"
 msgstr "Tanggal penilaian berikutnya"
 
 #. module: hr_appraisal
+#: model:res.groups.privilege,placeholder:hr_appraisal.res_groups_privilege_appraisals
+msgid "No"
+msgstr ""
+
+#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "No Appraisals found!"
 msgstr "Tidak ada Appraisal yang ditemukan!"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "No employees have the tag %(category_name)s"
-msgstr "Tidak ada karyawan dengan tag %(category_name)s"
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -2266,20 +2419,14 @@ msgid "No, keep it"
 msgstr "Tidak, tetap simpan"
 
 #. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid "Note"
-msgstr "Catatan"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__number_of_completed_sibling_goals
 msgid "Number Of Completed Sibling Goals"
-msgstr "Jumlah Tujuan Saudara yang Diselesaikan"
+msgstr "Jumlah Target Selevel Selesai"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__number_of_sibling_goals
 msgid "Number Of Sibling Goals"
-msgstr "Jumlah Tujuan Saudara"
+msgstr "Jumlah Target Selevel"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__message_needaction_counter
@@ -2313,7 +2460,7 @@ msgstr "Petugas: Akses semua appraisal"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "On demand"
-msgstr ""
+msgstr "Sesuai permintaan"
 
 #. module: hr_appraisal
 #: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal__state__2_pending
@@ -2349,7 +2496,7 @@ msgstr "Peluang"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
 msgid "Optional comment..."
-msgstr ""
+msgstr "Komentar opsional..."
 
 #. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_request_appraisal__lang
@@ -2360,9 +2507,9 @@ msgid ""
 "e.g. {{ object.partner_id.lang }}."
 msgstr ""
 "Bahasa terjemahan opsional (kode ISO) untuk dipilih saat mengirimkan email. "
-"Bila tidak ditetapkan, bahasa utama partner akan digunakan. Ini biasanya "
-"merupakan expression placeholder yang menyediakan bahasa yang sesuai, "
-"contoh. {{ object.partner_id.lang }}."
+"Bila tidak ditetapkan, bahasa partner utama akan digunakan. Ini biasanya "
+"placeholder expression yang menyediakan bahasa yang sesuai, contoh. "
+"{{ object.partner_id.lang }}."
 
 #. module: hr_appraisal
 #: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__manager__person
@@ -2373,12 +2520,12 @@ msgstr "Lainnya"
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
 msgid "Overall experience feedback"
-msgstr "Feedback pengalaman secara keseluruhan"
+msgstr "Masukan pengalaman secara keseluruhan"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__parent_id
 msgid "Parent Goal Template"
-msgstr "Templat Tujuan Induk"
+msgstr "Template Target Induk"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__parent_path
@@ -2397,16 +2544,6 @@ msgid "Plan appraisals with your colleagues, collect and discuss feedback."
 msgstr ""
 "Rencanakan appraisal dengan rekan kerja Anda, kumpulkan dan diskusikan "
 "feedback."
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid ""
-"Please set a final rating to validate these appraisals:\n"
-"- %s"
-msgstr ""
-"Silakan tetapkan rating final untuk memvalidasi appraisal berikut:\n"
-"- %s"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2437,7 +2574,8 @@ msgid "Programming"
 msgstr "Programming"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression_display
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 msgid "Progress"
 msgstr "Kemajuan"
 
@@ -2445,6 +2583,11 @@ msgstr "Kemajuan"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_kanban
 msgid "Progress:"
 msgstr "Progress:"
+
+#. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+msgid "Progression"
+msgstr "Progres"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__appraisal_properties
@@ -2459,6 +2602,10 @@ msgid ""
 "employee can achieve it. Which benefit he will get from it. Maybe some "
 "process                             or steps to help her/him."
 msgstr ""
+"Cantumkan informasi yang terlihat jelas di                             "
+"target, cara karyawan dapat meraihnya, manfaat yang akan didapat darinya. "
+"Mungkin juga beberapa proses                             atau langkah untuk "
+"membantunya."
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
@@ -2467,10 +2614,9 @@ msgid ""
 "Which benefit he will get from it.                             Maybe some "
 "process or steps to help her/him along the way."
 msgstr ""
-"Sediakan informasi yang terlihat di tujuan, bagaimana karyawan dapat "
-"mencapainya. Manfaat apa yang akan dia dapat dari "
-"itu.                             Mungkin beberapa proses atau langkah-"
-"langkah untuk membantu karyawan tersebut."
+"Cantumkan informasi yang terlihat jelas di target, cara karyawan dapat "
+"meraihnya, manfaat yang akan didapat darinya.                             "
+"Mungkin juga beberapa proses atau langkah untuk membantunya."
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_employee_public
@@ -2501,9 +2647,9 @@ msgstr "Nama pengguna terkait untuk sumber daya untuk mengelola aksesnya."
 
 #. module: hr_appraisal
 #. odoo-javascript
-#: code:addons/hr_appraisal/static/src/fields/appraisal_remaining_days.js:0
+#: code:addons/hr_appraisal/static/src/fields/appraisal_relative_date.js:0
 msgid "Remaining Days"
-msgstr "Hari-Hari Tersisa"
+msgstr "Hari Tersisa"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__render_model
@@ -2522,14 +2668,8 @@ msgstr "Laporan"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_public_view_form
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 msgid "Request Appraisal"
 msgstr "Meminta Appraisal"
-
-#. module: hr_appraisal
-#: model:ir.actions.server,name:hr_appraisal.action_create_multi_appraisals
-msgid "Request Appraisals"
-msgstr "Meminta Appraisal-Appraisal"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_request_appraisal
@@ -2537,6 +2677,13 @@ msgid "Request an Appraisal"
 msgstr "Meminta satu Appraisal"
 
 #. module: hr_appraisal
+#. odoo-javascript
+#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
+msgid "Request an Appraisal with your manager to assess your work."
+msgstr ""
+
+#. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_appraisal_reset
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Reset"
 msgstr "Reset"
@@ -2570,15 +2717,9 @@ msgid "Schedule"
 msgstr "Jadwal"
 
 #. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-msgid "Schedule Appraisals"
-msgstr "Jadwalkan Appraisal"
-
-#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Schedule Meeting"
-msgstr ""
+msgstr "Jadwalkan Meeting"
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.hr_appraisal_action_multiple_appraisals
@@ -2605,12 +2746,17 @@ msgstr "Pilih Karyawan"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Self Assessment will show here"
-msgstr "Penilaian Sendiri akan muncul di sini"
+msgstr "Penilaian Mandiri akan muncul di sini"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
 msgid "Send"
 msgstr "Kirim"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.action_appraisal_send_by_email
+msgid "Send By Email"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -2628,7 +2774,7 @@ msgstr ""
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_request_from_employee
 msgid ""
 "Sent manually to the manager by the employee who wants to do an appraisal"
-msgstr ""
+msgstr "Dikirim manual ke manager oleh karyawan yang ingin melakukan appraisal"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__sequence
@@ -2655,17 +2801,17 @@ msgstr "Tindakan / keputusan / tujuan jangka-pendek (6-months)"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__show_employee_feedback_full
 msgid "Show Employee Feedback Full"
-msgstr "Tunjukkan Karyawan Feedback Lengkap"
+msgstr "Tunjukkan Karyawan Masukan Lengkap"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__show_manager_feedback_full
 msgid "Show Manager Feedback Full"
-msgstr "Tunjukkan Manajer Feedback Lengkap"
+msgstr "Tunjukkan Manajer Masukan Lengkap"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "Show all records which has been created during the last 365 days"
-msgstr ""
+msgstr "Tunjukkan semua record yang telah dibuat selama 365 hari terakhir"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -2676,12 +2822,18 @@ msgstr ""
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__sibling_goals_ratio
 msgid "Sibling Goals Ratio"
-msgstr "Rasio Tujuan Saudara"
+msgstr "Rasio Target Selevel"
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_softskills
 msgid "Soft Skills"
 msgstr "Soft Skill"
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Some appraisals were already in another state and were skipped."
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__state
@@ -2718,17 +2870,17 @@ msgstr "Sangat Melampaui Ekspektasi"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__child_ids
 msgid "Sub Goal Template"
-msgstr "Templat Sub Goal"
+msgstr "Template Subtarget"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_list
 msgid "Sub Goals"
-msgstr ""
+msgstr "Subtarget"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 msgid "Sub-Goals"
-msgstr ""
+msgstr "Subtarget"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__subject
@@ -2777,12 +2929,6 @@ msgstr ""
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid "The \"Manager Feedback Published\" cannot be changed by an employee."
-msgstr "\"Feedback Manager Dipublikasi\" tidak dapat diubah oleh karyawan."
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "The appraisal's status has been set to Done by %s"
 msgstr "Status appraisal akan ditetapkan sebagai Selesai pada %s"
 
@@ -2792,14 +2938,8 @@ msgid ""
 "The average timing for the goals to be completed. It will populate the "
 "estimated end date when assigned"
 msgstr ""
-"Timing rata-rata untuk goal yang harus diselesaikan. Ini akan mengisi "
-"tanggal akhir estimasi saat ditugaskan"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "The company %(company_name)s doesn't have employees"
-msgstr "Perusahaan %(company_name)s tidak memiliki karyawan"
+"Timing rata-rata untuk target yang harus diselesaikan. Ini akan mengisi "
+"estimasi tanggal akhir saat ditugaskan"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_employee__next_appraisal_date
@@ -2809,12 +2949,6 @@ msgid ""
 msgstr ""
 "Tanggal berikutnya penilaian dihitung dengan rencana penilaian tanggal "
 "(pertama penilaian + periodisitas)."
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "The department %(department_name)s doesn't have employees"
-msgstr "Departemen %(department_name)s tidak memiliki karyawan"
 
 #. module: hr_appraisal
 #: model:ir.model.constraint,message:hr_appraisal.constraint_res_company_positif_number_months
@@ -2835,7 +2969,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "The employee feedback cannot be changed by managers."
-msgstr "Feedback karyawan tidak dapat diganti oleh manajer."
+msgstr "Masukan karyawan tidak dapat diganti oleh manajer."
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -2844,7 +2978,7 @@ msgid ""
 "The employee's feedback will be published without their consent. Do you "
 "really want to publish it? This action will be logged in the chatter."
 msgstr ""
-"Feedback karyawan akan dipublikasikan tanpa persetujuan mereka. Apakah Anda "
+"Masukan karyawan akan dipublikasikan tanpa persetujuan mereka. Apakah Anda "
 "yakin ingin mempublikasikannya? Tindakan ini akan dicatat pada chatter."
 
 #. module: hr_appraisal
@@ -2872,7 +3006,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "The manager feedback cannot be changed by an employee."
-msgstr "Feedback manajer tidak dapat diganti oleh karyawan."
+msgstr "Masukan manajer tidak dapat diganti oleh karyawan."
 
 #. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__assessment_note
@@ -2916,7 +3050,23 @@ msgstr "Jenis dari aktivitas pengecualian pada rekaman data."
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__uncomplete_goals_count
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__uncomplete_goals_count
 msgid "Uncomplete Goals Count"
-msgstr "Jumlah Goal yang Tidak Selesai"
+msgstr "Jumlah Target Belum Selesai"
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"field: %(inaccessible_field)s"
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"fields: %(inaccessible_fields)s"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2925,9 +3075,9 @@ msgid "Unpublished"
 msgstr "Belum dipublikasikan"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_search
-msgid "Upcoming Appraisals"
-msgstr "Appraisal Mendatang"
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Update"
+msgstr "Perbarui"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -2974,9 +3124,11 @@ msgstr "Terlihat untuk semua"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__waiting_feedback
 msgid "Waiting Feedback from Employee/Managers"
-msgstr "Menunggu Feedback dari Karyawan/Manajer"
+msgstr "Menunggu Masukan dari Karyawan/Manajer"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__warning
 msgid "Warning"
 msgstr "Peringatan"
@@ -2988,21 +3140,9 @@ msgid "Weaknesses"
 msgstr "Weaknesses"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-msgid "Website Messages"
-msgstr "Pesan situs"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-msgid "Website communication history"
-msgstr "Sejarah komunikasi situs"
-
-#. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "What are my most important achievements since my last appraisal?"
-msgstr ""
+msgstr "Apa saja pencapaian terbaik saya semenjak appraisal terakhir saya?"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -3010,11 +3150,14 @@ msgid ""
 "What are my short- and long-term goals within the company and for my\n"
 "                    career?"
 msgstr ""
+"Apa saja target jangka pendek dan panjang saya dalam perusahaan dan untuk "
+"karir\n"
+"                    saya?"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "What do I need to improve my work?"
-msgstr ""
+msgstr "Apa yang perlu saya lakukan untuk memperbarui kinerja saya?"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -3022,11 +3165,15 @@ msgid ""
 "What has been the most challenging aspect of my work this past year,\n"
 "                  and why?"
 msgstr ""
+"Apa aspek paling menantang dari pekerjaan saya dalam satu tahun terakhir,\n"
+"                  dan mengapa?"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "Which parts of my job do I enjoy the most? Which do I enjoy the least?"
 msgstr ""
+"Bagian mana dari pekerjaan saya yang paling saya nikmati? Bagian mana yang "
+"paling tidak saya nikmati?"
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -3049,7 +3196,7 @@ msgstr ""
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 msgid "You can define this goal to be part of another one"
-msgstr ""
+msgstr "Anda dapat mendefinisikan target ini untuk menjadi bagian dari"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3057,8 +3204,8 @@ msgstr ""
 msgid ""
 "You cannot delete an employee who is a goal's manager, archive it instead."
 msgstr ""
-"Anda tidak dapat menghapus karyawan yang merupakan manajer goal, Anda dapat "
-"mengarsipnya."
+"Anda tidak dapat menghapus karyawan yang merupakan manajer target. Anda "
+"dapat mengarsipnya."
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3067,9 +3214,15 @@ msgid ""
 "You cannot duplicate at the same time a goal and one of its children.\n"
 "Duplicating a goal will also duplicate its children."
 msgstr ""
-"Anda tidak dapat menduplikasi di waktu yang sama goal dan salah satu "
-"anaknya.\n"
-"Menduplikasi goal juga akan menduplikasi anak-anaknya."
+"Anda tidak dapat menduplikasi target dan salah satu anaknya secara "
+"bersamaan.\n"
+"Menduplikasi target juga akan menduplikasi anak-anaknya."
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "You cannot modify a finished appraisal."
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3102,7 +3255,7 @@ msgstr "contoh. Appraisal Tahunan"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 msgid "e.g. Improve English"
-msgstr ""
+msgstr "contoh: Meningkatkan bahasa Inggris"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
@@ -3140,153 +3293,12 @@ msgid "once published"
 msgstr "setelah dipublikasikan"
 
 #. module: hr_appraisal
-#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
-msgid ""
-"{{ hasattr(object, 'name') and object.name or '' }} requests an Appraisal"
-msgstr "{{ hasattr(object, 'name') and object.name or '' }} meminta Appraisal"
-
-#. module: hr_appraisal
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_confirm
 msgid "{{ object.employee_id.name }}: Appraisal Confirmed"
 msgstr "{{ object.employee_id.name }}: Appraisal Dikonfirmasi"
 
-#~ msgid "<em>Do you need rapid answer to the current situation?</em>"
-#~ msgstr ""
-#~ "<em>Apakah Anda membutuhkan jawaban cepat untuk situasi saat ini?</em>"
+#~ msgid "Website Messages"
+#~ msgstr "Pesan situs"
 
-#~ msgid "<em>Give an example of long-term objective (&gt; 6 months)</em>"
-#~ msgstr "<em>Berikan contoh tujuan yang jangka panjang (&gt; 6 bulan)</em>"
-
-#~ msgid "<em>Give an example of short-term objective (&lt; 6 months)</em>"
-#~ msgstr "<em>Berikan contoh tujuan yang jangka pendek (&lt; 6 bulan)</em>"
-
-#~ msgid "<em>Pro-activity</em>"
-#~ msgstr "<em>Pro-activity</em>"
-
-#~ msgid "<em>Stress Resistance</em>"
-#~ msgstr "<em>Daya Tahan Stres</em>"
-
-#~ msgid "Appraisal Requested"
-#~ msgstr "Appraisal Diminta"
-
-#~ msgid "Appraisal Sent"
-#~ msgstr "Appraisal Dikirim"
-
-#~ msgid "Appraisal Statistics"
-#~ msgstr "Statistik Appraisal"
-
-#~ msgid "Cancelled"
-#~ msgstr "Dibatalkan"
-
-#~ msgid "Create Date"
-#~ msgstr "Tanggal dibuat"
-
-#~ msgid "Date"
-#~ msgstr "Tanggal"
-
-#~ msgid "Employee Name"
-#~ msgstr "Nama Karyawan"
-
-#~ msgid "Extended Filters..."
-#~ msgstr "Penyaring Tingkat Lanjut..."
-
-#~ msgid "Final Interview"
-#~ msgstr "Akhir wawancara"
-
-#~ msgid "Final Interview Date"
-#~ msgstr "Tanggal Wawancara Final"
-
-#~ msgid "Goal"
-#~ msgstr "Target"
-
-#~ msgid "Group By"
-#~ msgstr "Dikelompokkan berdasarkan"
-
-#~ msgid "Group by..."
-#~ msgstr "Kelompokkan menurut...."
-
-#~ msgid "HR: Appraisal Confirmation"
-#~ msgstr "HR: Konfirmasi Appraisal"
-
-#~ msgid "HR: Employee Appraisal Request"
-#~ msgstr "HR: Permintaan Appraisal Karyawan"
-
-#~ msgid "HR: Manager appraisal request"
-#~ msgstr "HR: Permintaan appraisal Manajer"
-
-#~ msgid "How do I feel about my own..."
-#~ msgstr "Bagaimana perasaan saya mengenai diri saya sendiri..."
-
-#~ msgid "How do I feel about the company..."
-#~ msgstr "Bagaimana perasaan saya mengenai perusahaan..."
-
-#~ msgid "In progress Evaluations"
-#~ msgstr "Dalam proses evaluasi"
-
-#~ msgid "Interview"
-#~ msgstr "Wawancara"
-
-#~ msgid "Last Appraisal Date"
-#~ msgstr "Tanggal Appraisal Terakhir"
-
-#~ msgid "Manager Users"
-#~ msgstr "User Manajer"
-
-#~ msgid "Meetings"
-#~ msgstr "Pertemuan"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Jumlah pesan yang butuh tindakan"
-
-#~ msgid "Operation not supported"
-#~ msgstr "Operation not supported"
-
-#~ msgid ""
-#~ "Optional translation language (ISO code) to select when sending out an "
-#~ "email. If not set, the english version will be used. This should usually "
-#~ "be a placeholder expression that provides the appropriate language, e.g. "
-#~ "{{ object.partner_id.lang }}."
-#~ msgstr ""
-#~ "Bahasa terjemahan opsional (kode ISO) yang dipilih ketika mengirim email. "
-#~ "Bila tidak diatur, versi Bahasa Inggris akan digunakan. Ini seharusnya "
-#~ "merupakan expression placeholder yang menyediakan bahasa yang sesuai, "
-#~ "misalnya {{ object.partner_id.lang }}."
-
-#~ msgid "People I Manage"
-#~ msgstr "Orang yang Saya Kelola"
-
-#~ msgid ""
-#~ "Sent manually to the employee by the manager who wants to do an appraisal"
-#~ msgstr ""
-#~ "Manajer yang ingin melakukan appraisal akan mengirim secara manual ke "
-#~ "karyawan"
-
-#~ msgid "Sent manually to the manager by the employee who wants an appraisal"
-#~ msgstr ""
-#~ "Karyawan yang menginginkan appraisal akan mengirim secara manual ke "
-#~ "manajer"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Tampilkan semua dokumen dengan aksi berikut sebelum hari ini"
-
-#~ msgid "The date of the last appraisal"
-#~ msgstr "Tanggal appraisal terakhir"
-
-#~ msgid "To Do"
-#~ msgstr "Todo"
-
-#~ msgid "To Start"
-#~ msgstr "Untuk Memulai"
-
-#~ msgid "What are my best achievement(s) since my last appraisal?"
-#~ msgstr "Apakah pencapaian terbaik saya semenjak appraisal terakhir saya?"
-
-#~ msgid "What would I need to improve my work?"
-#~ msgstr "Apa yang harus saya perbarui mengenai pekerjaan saya?"
-
-#~ msgid "Which parts of my job do I most / least enjoy?"
-#~ msgstr ""
-#~ "Bagian apa dari pekerjaan saya yang saya paling / paling tidak sukai?"
-
-#~ msgid "oe_kanban_text_red"
-#~ msgstr "oe_kanban_text_red"
+#~ msgid "Website communication history"
+#~ msgstr "Sejarah komunikasi situs"

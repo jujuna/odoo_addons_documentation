@@ -6,6 +6,8 @@ from odoo.tests import tagged
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestLibroDiarioXLSX(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('es')
     def setUpClass(cls):
@@ -107,11 +109,11 @@ class TestLibroDiarioXLSX(TestAccountReportsCommon):
 
         self.assertListEqual(data, [
             ['Entry', 'Line',       'Date',        'Description',          'Document', 'Account Code',                     'Account Name', 'Debit', 'Credit'],
-            [      1,      1, '01/12/2020',     'revenue line 2', 'MISC/2020/12/0001',       '700000',           'Merchandise sold Spain',   500.0,      0.0],
+            [      1,      1, '01/12/2020',     'revenue line 2', 'MISC/2020/12/0001',       '700000',                 'Merchandise sold',   500.0,      0.0],
             [      1,      2, '01/12/2020',         'tax line 2', 'MISC/2020/12/0001',       '477000', 'Taxation authorities, output VAT',   150.0,      0.0],
             [      1,      3, '01/12/2020', 'counterpart line 2', 'MISC/2020/12/0001',       '600000',            'Merchandise purchased',     0.0,    650.0],
-            [      2,      1, '10/12/2020',    'revenue line 1a', 'MISC/2020/12/0002',       '700000',           'Merchandise sold Spain',   500.0,      0.0],
-            [      2,      2, '10/12/2020',    'revenue line 1b', 'MISC/2020/12/0002',       '700000',           'Merchandise sold Spain',  1000.0,      0.0],
+            [      2,      1, '10/12/2020',    'revenue line 1a', 'MISC/2020/12/0002',       '700000',                 'Merchandise sold',   500.0,      0.0],
+            [      2,      2, '10/12/2020',    'revenue line 1b', 'MISC/2020/12/0002',       '700000',                 'Merchandise sold',  1000.0,      0.0],
             [      2,      3, '10/12/2020',         'tax line 1', 'MISC/2020/12/0002',       '477000', 'Taxation authorities, output VAT',   150.0,      0.0],
             [      2,      4, '10/12/2020', 'counterpart line 1', 'MISC/2020/12/0002',       '600000',            'Merchandise purchased',     0.0,   1650.0],
         ])

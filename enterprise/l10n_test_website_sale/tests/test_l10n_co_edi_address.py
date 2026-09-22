@@ -12,7 +12,7 @@ class TestUi(HttpCase):
             'website_published': True,
         })
         # set current company's fiscal country to Colombia
-        website = self.env['website'].get_current_website()
+        website = self.env.ref('base.default_website')
         website.company_id.account_fiscal_country_id = website.company_id.country_id = self.env.ref('base.co')
 
     def test_checkout_set_id_nit(self):

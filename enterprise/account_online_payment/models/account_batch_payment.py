@@ -1,22 +1,36 @@
 from odoo import api, fields, models, SUPERUSER_ID, _
-from odoo.addons.account.tools.structured_reference import is_valid_structured_reference
+from odoo.exceptions import UserError
 
-STATUSES = [
-    ('uninitiated', 'Uninitiated'),
-    ('unsigned', 'Unsigned'),
-    ('pending', 'Pending'),
-    ('accepted', 'Accepted'),
-    ('canceled', 'Canceled'),
-    ('rejected', 'Rejected'),
-]
+from odoo.addons.account_online_payment.models.account_online_link import STATUSES
 
 
 class AccountBatchPayment(models.Model):
     _inherit = 'account.batch.payment'
 
-    payment_identifier = fields.Char(string='Batch ID', readonly=True)
-    payment_online_status = fields.Selection(selection=STATUSES, string='PIS Status', default='uninitiated', readonly=True)
+    payment_identifier = fields.Char(string='Batch ID', readonly=True, copy=False)
+    payment_online_status = fields.Selection(selection=STATUSES, string='PIS Status', default='uninitiated', readonly=True, copy=False)
     account_online_link_payments_enabled = fields.Boolean(compute='_compute_account_online_link_payments_enabled')
+    account_online_link_payments_requested = fields.Boolean(related='journal_id.account_online_link_id.is_payment_activation_requested')
+    account_online_link_payments_activated = fields.Boolean(related='journal_id.account_online_link_id.is_payment_activated')
+
+    def activate_payments(self):
+        """Redirect user to start the payment activation process"""
+        self.ensure_one()
+        online_link = self.journal_id.account_online_link_id
+
+        if not online_link:
+            raise UserError(_('No online bank connection found for this journal.'))
+
+        if not online_link.is_payment_enabled:
+            raise UserError(_('Payments are not enabled for this bank connection.'))
+
+        if online_link.is_payment_activated:
+            raise UserError(_('Payments are already activated for this bank connection.'))
+
+        if online_link.is_payment_activation_requested:
+            raise UserError(_('Payment activation process is already in progress for this bank connection.'))
+
+        return online_link._activate_payments()
 
     def initiate_payment(self):
         """
@@ -27,7 +41,7 @@ class AccountBatchPayment(models.Model):
         self.ensure_one()
 
         if self.payment_online_status == 'unsigned' and self.state == 'sent':
-            self.check_online_payment_status()
+            self.env['account.online.link'].check_online_payment_status(self.ids, self._name)
             if self.payment_online_status != 'unsigned':
                 return {
                     'type': 'ir.actions.client',
@@ -42,109 +56,37 @@ class AccountBatchPayment(models.Model):
                         },
                     },
                 }
-            return self._sign_payment()
-        return self.with_context(xml_export=False).validate_batch()
 
-    def validate_batch(self):
-        if self.payment_method_code != 'sepa_ct' or not self.account_online_link_payments_enabled or self.env.context.get('xml_export'):
-            return super().validate_batch()
+            return self.journal_id.account_online_link_id._sign_payment(self)
+        return self.with_context(xml_export=False).validate_batch(initiate_payment=True)
+
+    def validate_batch(self, initiate_payment=False):
+        if not initiate_payment or not self.account_online_link_payments_enabled or self.env.context.get('xml_export'):
+            return super().validate_batch(initiate_payment=initiate_payment)
 
         action = self._check_batch_validity()
         if action and action.get('res_model') == 'account.batch.error.wizard':
             return action
 
         account_online_link = self.journal_id.account_online_link_id
-        data = self._prepare_payment_data()
-        while True:
-            response = account_online_link._fetch_odoo_fin('/proxy/v1/initiate_payment', data)
-            # In case of token expiration, we receive a special next_data field that we use to redo the request
-            if not response.get('next_data'):
-                break
-            data['next_data'] = response['next_data']
+        self.journal_id.account_online_account_id._check_payment_limit_exceeded(self.payment_ids)
 
-        if response.get('kyc_flow'):
-            self.with_user(SUPERUSER_ID).message_post(body=_("""
-                This payment requires a KYC flow. As this process can take a few days, please use SEPA XML export in the meantime.
-                You will be notified once the KYC flow is completed and you can proceed with the online payment.
-            """))
-        else:
-            self._send_after_validation()
-            self.write({
-                'payment_identifier': response.get('payment_identifier'),
-                'payment_online_status': response.get('payment_online_status'),
-            })
-
-        return {
-            'type': 'ir.actions.act_url',
-            'url': response.get('redirect_url'),
-            'target': '_blank',
-        }
+        return account_online_link._initiate_payment(self)
 
     def check_online_payment_status(self):
-        statuses = {}
-        for batch in self:
-            account_online_account = batch.journal_id.account_online_account_id
-            data = {
-                "payment_identifier": batch.payment_identifier,
-                "account_id": account_online_account.online_identifier,
-                "payment_type": "bulk",
-            }
-
-            while True:
-                response = batch.journal_id.account_online_link_id._fetch_odoo_fin('/proxy/v1/get_payment_status', data)
-                # In case of token expiration, we receive a special next_data field that we use to redo the request
-                if not response.get('next_data'):
-                    break
-                data['next_data'] = response['next_data']
-
-            batch.payment_online_status = response.get('payment_online_status')
-            statuses[batch.id] = batch.payment_online_status
-        return statuses
+        return self.env['account.online.link'].check_online_payment_status(self.ids, self._name)
 
     def export_batch_payment(self):
         to_be_exported = self.env['account.batch.payment']
 
         for record in self:
-            if record.payment_method_code == 'sepa_ct' and record.account_online_link_payments_enabled and not self.env.context.get('xml_export'):
+            if record.account_online_link_payments_enabled and not self.env.context.get('xml_export'):
                 continue
             to_be_exported += record
 
         super(AccountBatchPayment, to_be_exported).export_batch_payment()
         if any(payment.payment_online_status in {'pending', 'accepted'} for payment in to_be_exported):
             self.with_user(SUPERUSER_ID).message_post(body=_("Please be aware that signed payments may have already been processed and sent to the bank."))
-
-    def _sign_payment(self):
-        self.ensure_one()
-
-        account_online_link = self.journal_id.account_online_link_id
-        data = {
-            **self._prepare_payment_data(),
-            "payment_identifier": self.payment_identifier,
-        }
-
-        while True:
-            response = account_online_link._fetch_odoo_fin('/proxy/v1/sign_payment', data)
-
-            if not response.get('next_data'):
-                break
-            data['next_data'] = response['next_data']
-
-        self.payment_online_status = response['payment_online_status']
-        self.payment_identifier = response['payment_identifier']
-
-        return {
-            'type': 'ir.actions.act_url',
-            'url': response['redirect_url'],
-            'target': '_blank',
-        }
-
-    def _cron_check_payment_status(self):
-        self.env['account.batch.payment'].search([
-            ('state', '!=', 'reconciled'),
-            ('payment_method_code', '=', 'sepa_ct'),
-            ('journal_id.account_online_link_id.is_payment_activated', '=', 'True'),
-            ('payment_online_status', 'in', ('unsigned', 'pending')),
-        ]).check_online_payment_status()
 
     @api.depends('journal_id.account_online_link_id')
     def _compute_account_online_link_payments_enabled(self):
@@ -154,25 +96,28 @@ class AccountBatchPayment(models.Model):
     def _prepare_payment_data(self):
         self.ensure_one()
 
-        payments = []
-        for payment in self.payment_ids:
-            payments.append({
-                "amount": payment.amount,
-                "account_number": payment.partner_bank_id.sanitized_acc_number,
-                "account_type": "IBAN",
-                "creditor_name": payment.partner_id.name,
-                "currency": payment.currency_id.display_name,
-                "date": fields.Date.to_string(payment.date),
-                "reference": payment.memo,
-                "structured_reference": is_valid_structured_reference(payment.memo),
-                "end_to_end_uuid": payment.end_to_end_uuid,
-            })
-
-        return {
+        payment_data = {
             "account_id": self.journal_id.account_online_account_id.online_identifier,
             "batch_booking": self.iso20022_batch_booking,
             "date": fields.Date.to_string(self.date),
+            "payer_account_number": self.journal_id.account_online_account_id.account_number,
+            "payer_account_type": 'iban',
+            "payer_account_holder_name": self.journal_id.bank_account_id.holder_name,
+            "payer_name": self.journal_id.company_id.name,
             "payment_type": "bulk",
-            "payments": payments,
+            "payments": [payment._get_payment_data() for payment in self.payment_ids],
             "reference": self.name,
         }
+
+        if vat := self.journal_id.company_id.vat:
+            payment_data["payer_identification"] = vat
+        if address := self.journal_id.company_id.partner_id.contact_address_inline:
+            payment_data["payer_address"] = address
+
+        return payment_data
+
+    def write(self, vals):
+        result = super().write(vals)
+        if 'payment_online_status' in vals:
+            self.payment_ids._sync_payment_state_from_online_status(vals['payment_online_status'])
+        return result

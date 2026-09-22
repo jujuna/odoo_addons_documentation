@@ -1,7 +1,7 @@
 import { CheckBox } from "@web/core/checkbox/checkbox";
 import { useService, useBus } from "@web/core/utils/hooks";
 import { formatFloat } from "@web/views/fields/formatters";
-import { Component, useRef, onPatched } from "@odoo/owl";
+import { Component, onPatched, signal, t, useProps } from "@odoo/owl";
 
 export const SCALE_WEIGHTS = {
     day: 0,
@@ -15,23 +15,28 @@ export default class MpsLineComponent extends Component {
     static components = {
         CheckBox,
     };
-    static props = ["data", "groups", "suggestForecastedDemand"];
 
+    props = useProps({
+        data: t.any(),
+        groups: t.any(),
+        suggestForecastedDemand: t.any(),
+    });
+
+    forecastRowRef = signal.ref();
+    replenishRowRef = signal.ref();
 
     setup() {
         this.actionService = useService("action");
         this.dialogService = useService("dialog");
         this.orm = useService("orm");
         this.model = this.env.model;
-        this.forecastRow = useRef("forecastRow");
-        this.replenishRow = useRef("replenishRow");
 
         onPatched(() => {
             // after a replenishment, switch to next column if possible
-            const previousEl = this.replenishRow.el.getElementsByClassName('o_mrp_mps_hover')[0];
+            const previousEl = this.replenishRowRef().getElementsByClassName('o_mrp_mps_hover')[0];
             if (previousEl) {
                 previousEl.classList.remove('o_mrp_mps_hover');
-                const el = this.replenishRow.el.getElementsByClassName('o_mrp_mps_forced_replenish')[0];
+                const el = this.replenishRowRef().getElementsByClassName('o_mrp_mps_forced_replenish')[0];
                 if (el) {
                     el.classList.add('o_mrp_mps_hover');
                 }
@@ -107,7 +112,7 @@ export default class MpsLineComponent extends Component {
 
     _onClickSuggestForecastedDemand(ev, id){
         if (this.props.suggestForecastedDemand) {
-            this.props.suggestForecastedDemand(this.model.data, id);
+            this.props.suggestForecastedDemand([id]);
         }
     }
 
@@ -128,13 +133,13 @@ export default class MpsLineComponent extends Component {
      */
     _onChangeForecast(ev, productionScheduleId) {
         const dateIndex = parseInt(ev.target.dataset.date_index);
-        const forecastQty = ev.target.value;
+        const forecastQty = ev.target.value.trim();
         if (forecastQty === "" || isNaN(forecastQty)) {
             ev.target.value = this.model._getOriginValue(productionScheduleId, dateIndex, 'forecast_qty');
         } else {
             this.model._saveForecast(productionScheduleId, dateIndex, forecastQty).then(() => {
                 const inputSelector = 'input[data-date_index="' + (dateIndex + 1) + '"]';
-                const nextInput = this.forecastRow.el.querySelector(inputSelector);
+                const nextInput = this.forecastRowRef().querySelector(inputSelector);
                 if (nextInput) {
                     nextInput.select();
                 }
@@ -152,13 +157,13 @@ export default class MpsLineComponent extends Component {
      */
     _onChangeToReplenish(ev, productionScheduleId) {
         const dateIndex = parseInt(ev.target.dataset.date_index);
-        const replenishQty = ev.target.value;
+        const replenishQty = ev.target.value.trim();
         if (replenishQty === "" || isNaN(replenishQty)) {
             ev.target.value = this.model._getOriginValue(productionScheduleId, dateIndex, 'replenish_qty');
         } else {
             this.model._saveToReplenish(productionScheduleId, dateIndex, replenishQty).then(() => {
                 const inputSelector = 'input[data-date_index="' + (dateIndex + 1) + '"]';
-                const nextInput = this.replenishRow.el.querySelector(inputSelector);
+                const nextInput = this.replenishRowRef().querySelector(inputSelector);
                 if (nextInput) {
                     nextInput.select();
                 }
@@ -193,7 +198,7 @@ export default class MpsLineComponent extends Component {
 
     _onMouseOverReplenish(ev) {
         const className = ev ? 'o_mrp_mps_forced_replenish' : 'o_mrp_mps_to_replenish';
-        const elems = this.replenishRow.el.getElementsByClassName(className);
+        const elems = this.replenishRowRef().getElementsByClassName(className);
         if (elems) {
             for (const el of elems) {
                 el.classList.add('o_mrp_mps_hover');
@@ -202,7 +207,7 @@ export default class MpsLineComponent extends Component {
     }
 
     _onMouseOutReplenish(ev) {
-        const elems = this.replenishRow.el.getElementsByClassName('o_mrp_mps_hover');
+        const elems = this.replenishRowRef().getElementsByClassName('o_mrp_mps_hover');
         while (elems.length > 0) {
             elems[0].classList.remove('o_mrp_mps_hover');
         }

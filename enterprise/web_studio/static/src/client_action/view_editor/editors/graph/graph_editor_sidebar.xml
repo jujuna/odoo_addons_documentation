@@ -6,40 +6,40 @@
                 <Property
                     name="'type'"
                     type="'selection'"
-                    value="modelParams.mode"
+                    value="this.modelParams.mode"
                     childProps="{ choices: this.typeChoices }"
-                    onChange.bind="onViewAttributeChanged"
+                    onChange.bind="this.onViewAttributeChanged"
                 >
                     Type
                 </Property>
 
                 <Property
-                    t-if="modelParams.mode !== 'pie'"
+                    t-if="this.modelParams.mode !== 'pie'"
                     name="'order'"
                     type="'selection'"
-                    value="modelParams.order"
+                    value="this.modelParams.order"
                     childProps="{ choices: this.orderChoices, required: false }"
-                    onChange.bind="onViewAttributeChanged"
+                    onChange.bind="this.onViewAttributeChanged"
                 >
                     Sorting
                 </Property>
 
                 <!-- Disable linking is presented as a positive sentence for easier understanding (hence inverse) -->
                 <Property
-                    t-if="modelParams.mode !== 'line'"
+                    t-if="this.modelParams.mode !== 'line'"
                     name="'disable_linking'"
                     type="'boolean'"
-                    value="!modelParams.disableLinking"
+                    value="!this.modelParams.disableLinking"
                     onChange.bind="(value, name) => this.onViewAttributeChanged(!value, name)"
                 >
                     Access records from graph
                 </Property>
 
                 <Property
-                    t-if="modelParams.mode === 'bar'"
+                    t-if="this.modelParams.mode === 'bar'"
                     name="'stacked'"
                     type="'boolean'"
-                    value="modelParams.stacked"
+                    value="this.modelParams.stacked"
                     onChange.bind="this.onViewAttributeChanged"
                 >
                     Stacked graph
@@ -48,7 +48,7 @@
                 <Property
                     name="'first_groupby'"
                     type="'selection'"
-                    value="modelParams.groupBy[0]"
+                    value="this.modelParams.groupBy[0]"
                     childProps="{ choices: this.firstGroupbyChoices, required: false }"
                     onChange="(value) => this.onGroupByChanged('col', value, this.oldFieldValues.firstDimension)"
                 >
@@ -58,7 +58,7 @@
                 <Property
                     name="'second_groupby'"
                     type="'selection'"
-                    value="modelParams.groupBy[1]"
+                    value="this.modelParams.groupBy[1]"
                     childProps="{ choices: this.secondGroupbyChoices, required: false }"
                     onChange="(value) => this.onGroupByChanged('col', value, this.oldFieldValues.secondDimension)"
                 >
@@ -68,14 +68,14 @@
                 <Property
                     name="'measure'"
                     type="'selection'"
-                    value="modelParams.measure"
+                    value="this.modelParams.measure"
                     childProps="{ choices: this.mesureChoices, required: false }"
                     onChange.bind="(value) => this.onGroupByChanged('measure', value, this.oldFieldValues.measure)"
                 >
                     Measure
                 </Property>
 
-                <SidebarViewToolbox onMore="props.openViewInForm" canEditXml="!viewEditorModel.isEditingSubview" openDefaultValues="props.openDefaultValues" />
+                <SidebarViewToolbox onMore="this.props.openViewInForm" canEditXml="!this.viewEditorModel.isEditingSubview" openDefaultValues="this.props.openDefaultValues" />
             </t>
         </InteractiveEditorSidebar>
     </t>

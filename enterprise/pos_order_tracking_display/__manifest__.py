@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'PoS Order Tracking Customer Display',
-    'version': '1.0.0',
     'category': 'Sales/Point of Sale',
     'sequence': 7,
     'summary': 'Display customer\'s order status',
     'depends': ['pos_enterprise', 'pos_self_order'],
-    'installable': True,
     'auto_install': True,
     'data': [
         'views/index.xml',

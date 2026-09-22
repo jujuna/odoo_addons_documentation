@@ -7,8 +7,10 @@ from odoo.addons.l10n_ke_edi_oscu.tests.common import TestKeEdiCommon
 
 
 class TestKeEdi(TestKeEdiCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def _test_get_items(self):
-        self.env['ir.config_parameter'].set_param('l10n_ke_oscu.last_fetch_items_request_date', '20180101000000')
+        self.env['ir.config_parameter'].set_str('l10n_ke_oscu.last_fetch_items_request_date', '20180101000000')
         with self.assertRaises(UserError):
             self.env.company.action_l10n_ke_get_items()
 
@@ -17,7 +19,7 @@ class TestKeEdi(TestKeEdiCommon):
             self.env.company.action_l10n_ke_get_stock_moves()
 
     def _test_update_codes(self):
-        self.env['ir.config_parameter'].set_param('l10n_ke_oscu.last_code_request_date', '20180101000000')
+        self.env['ir.config_parameter'].set_str('l10n_ke_oscu.last_code_request_date', '20180101000000')
         self.env['l10n_ke_edi_oscu.code']._cron_get_codes_from_device()
 
     def _test_update_customer(self):
@@ -25,12 +27,12 @@ class TestKeEdi(TestKeEdiCommon):
             self.partner_a.action_l10n_ke_oscu_fetch_bhf_customer()
 
     def _test_update_notices(self):
-        self.env['ir.config_parameter'].set_param('l10n_ke_oscu.last_notice_request_date', '20180101000000')
+        self.env['ir.config_parameter'].set_str('l10n_ke_oscu.last_notice_request_date', '20180101000000')
         with self.enter_registry_test_mode():
             self.env.ref('l10n_ke_edi_oscu.ir_cron_fetch_notice').method_direct_trigger()
 
     def _test_update_unspsc_codes(self):
-        self.env['ir.config_parameter'].set_param('l10n_ke_oscu.last_unspsc_code_request_date', '20180101000000')
+        self.env['ir.config_parameter'].set_str('l10n_ke_oscu.last_unspsc_code_request_date', '20180101000000')
         with self.enter_registry_test_mode():
             self.env.ref('l10n_ke_edi_oscu.ir_cron_fetch_unspsc').method_direct_trigger()
 
@@ -131,21 +133,21 @@ class TestKeEdi(TestKeEdiCommon):
         }
         expected_vendor_bill_lines = [
             {
-                'name': 'Fiscal Optimization Consultancy',
+                'label': 'Fiscal Optimization Consultancy',
                 'product_id': self.product_service.id,
                 'product_uom_id': self.env.ref('uom.product_uom_unit').id,
                 'quantity': 1,
                 'tax_ids': [self.standard_rate_purchase_tax.id],
                 'balance': 17499,
             }, {
-                'name': '16%',
+                'label': '16%',
                 'product_id': None,
                 'product_uom_id': None,
                 'quantity': 0,
                 'tax_ids': [],
                 'balance': 2799.84,
             }, {
-                'name': False,
+                'label': False,
                 'product_id': None,
                 'product_uom_id': None,
                 'quantity': 0,
@@ -167,6 +169,8 @@ class TestKeEdi(TestKeEdiCommon):
 
 @tagged('external', 'external_l10n', 'post_install', '-post_install_l10n', '-at_install', '-standard')
 class TestKeEdiLive(TestKeEdi):
+    _test_user_groups = None  # FIXME list needed groups
+
     @TestKeEdiCommon.setup_country('ke')
     @classmethod
     def setUpClass(cls):

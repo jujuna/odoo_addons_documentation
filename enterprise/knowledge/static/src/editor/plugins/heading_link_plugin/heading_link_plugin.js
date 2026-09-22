@@ -1,8 +1,7 @@
 import { Plugin } from "@html_editor/plugin";
-import { browser } from "@web/core/browser/browser";
+import { location, browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { ancestors, closestElement, descendants } from "@html_editor/utils/dom_traversal";
-import { scrollAndHighlightHeading } from "@html_editor/utils/url";
 import { xml } from "@odoo/owl";
 import { renderToElement } from "@web/core/utils/render";
 import { uuid } from "@web/core/utils/strings";
@@ -13,11 +12,12 @@ export class HeadingLinkPlugin extends Plugin {
     static dependencies = ["localOverlay", "history"];
     resources = {
         /** Handlers */
-        start_edition_handlers: this.onStartEdition.bind(this),
-        normalize_handlers: (root) => this.updateHeadingIds(root),
-        clean_for_save_handlers: ({ root }) => this.cleanForSave(root),
-        after_split_element_handlers: ({ secondPart }) => this.onAfterSplitElement(secondPart),
+        on_editor_started_handlers: this.onStartEdition.bind(this),
+        on_element_split_handlers: ({ secondPart }) => this.onAfterSplitElement(secondPart),
 
+        /** Processors */
+        clean_for_save_processors: (root) => this.cleanForSave(root),
+        normalize_processors: (root) => this.updateHeadingIds(root),
         before_insert_processors: this.ensureIdUniqueness.bind(this),
 
         system_classes: ["o-highlight-heading"],
@@ -28,7 +28,9 @@ export class HeadingLinkPlugin extends Plugin {
         this.headingLinkOverlay = this.dependencies.localOverlay.makeLocalOverlay("o-heading-link-overlay");
         this.headingLinkContainer = renderToElement(xml`
             <div class="d-flex">
-                <a href="#" title="${_t("Copy a link to this heading to the clipboard")}" class="o-heading-link fa fa-link"/>
+                <a href="#" title="${_t("Copy a link to this heading to the clipboard")}" class="o-heading-link px-1 rounded bg-100 text-400">
+                    <i class="oi" data-icon="link" aria-hidden="true"/>
+                </a>
             </div>
         `);
         this.headingLink = this.headingLinkContainer.firstElementChild;
@@ -37,12 +39,12 @@ export class HeadingLinkPlugin extends Plugin {
         this.addDomListener(this.headingLink, "click", () => {
             const headingId = this.currentHeading?.getAttribute("data-heading-link-id");
             // Navigate to the heading and add the url to the clipboard.
-            browser.location.hash = headingId;
-            browser.navigator.clipboard.writeText(browser.location.href);
-            // Add a step to the history and make sure the ID is saved.
-            this.dependencies.history.addStep();
+            location.hash = headingId;
+            browser.navigator.clipboard.writeText(location.href);
+            // Commit the history and make sure the ID is saved.
+            this.dependencies.history.commit();
             // Highlight the heading.
-            scrollAndHighlightHeading(this.editable, headingId);
+            this.highlightHeading(headingId);
         });
         this.addDomListener(this.headingLink, "dragstart", ev => ev.preventDefault());
 
@@ -65,7 +67,19 @@ export class HeadingLinkPlugin extends Plugin {
     }
 
     onStartEdition() {
-        scrollAndHighlightHeading(this.editable);
+        if (location.hash) {
+            const headingId = location.hash.replace(/^#/, "");
+            if (headingId) {
+                // Wait until the browser has rendered the editor before
+                // scrolling. The timeout value of 500 is a little arbitrary,
+                // but it should be enough to prevent an irritating case where
+                // a Youtube video is in the document and loads while the
+                // autoscroll is happening, and stops it.
+                setTimeout(() => {
+                    this.highlightHeading(headingId);
+                }, 500);
+            }
+        }
     }
 
     onMousemove(heading) {
@@ -92,6 +106,7 @@ export class HeadingLinkPlugin extends Plugin {
         for (const el of root.querySelectorAll(".o-highlight-heading")) {
             el.classList.remove("o-highlight-heading");
         }
+        return root;
     }
 
     destroy() {
@@ -126,6 +141,18 @@ export class HeadingLinkPlugin extends Plugin {
             if (!headingId) {
                 heading.setAttribute("data-heading-link-id", uuid());
             }
+        }
+        return root;
+    }
+
+    highlightHeading(headingId) {
+        const heading = this.editable.querySelector(`[data-heading-link-id="${headingId}"]`);
+        if (heading) {
+            heading.scrollIntoView({ behavior: "smooth" });
+            heading.classList.add("o-highlight-heading");
+            setTimeout(() => {
+                heading.classList.remove("o-highlight-heading");
+            }, 2000);
         }
     }
 }

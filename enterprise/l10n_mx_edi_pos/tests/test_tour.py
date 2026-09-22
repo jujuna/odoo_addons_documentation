@@ -12,6 +12,8 @@ from odoo.tools import mute_logger
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -58,6 +60,7 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             'taxes_id': False,
         })
         self.main_pos_config.open_ui()
+        self.main_pos_config.current_session_id.set_opening_control(0, "")
         self.pos_order = self.env['pos.order'].create({
             "name": "Order 0001",
             "pos_reference": "Order 12345-123-1234",
@@ -91,12 +94,14 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             'amount_return': 0,
         })
         self.make_payment(self.pos_order, self.main_pos_config.payment_method_ids[0], 9.90)
-        self.config.current_session_id.action_pos_session_closing_control()
+        self.main_pos_config.current_session_id.close_session_from_ui()
         self.start_tour("/odoo", "l10n_mx_edi_pos.tour_refund_discount_order", login=self.env.user.login)
 
     def test_qr_code_receipt_mx(self):
-        """This test make sure that no user is created when a partner is set on the PoS order.
-            It also makes sure that the invoice is correctly created.
+        """
+        This test ensures that no user is created when a partner is set on the PoS order.
+        It also ensures that the invoice has the correct default values when created through
+        self-invoicing with a public user and a partner set on the order.
         """
         self.authenticate(None, None)
         self.new_partner = self.env['res.partner'].create({
@@ -133,79 +138,122 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             'amount_return': 10.0,
         })
         self.main_pos_config.current_session_id.close_session_from_ui()
+        self.url_open(f'/pos/ticket/validate?access_token={self.pos_order.access_token}')
+        self.assertEqual(self.env['res.partner'].sudo().search_count([('name', '=', 'AAA Partner')]), 1)
+        self.assertTrue(self.pos_order.is_singly_invoiced, "The pos order should have an invoice")
+        self.assertEqual(self.pos_order.account_move.l10n_mx_edi_usage, 'G03', 'Invoice has default value for l10n_mx_edi_usage')
+        self.assertEqual(self.new_partner.l10n_mx_edi_fiscal_regime, '601', 'Partner has default value for l10n_mx_edi_fiscal_regime')
+
+    def test_qr_code_receipt_mx_without_order_partner(self):
+        """
+        This test ensures that when no partner is set on the order and partner data is provided for self-invoicing,
+        a new partner is created and the corresponding values are set on the invoice based on the provided data.
+        """
+        self.authenticate(None, None)
+        self.product1 = self.env['product.product'].create({
+            'name': 'Test Product 1',
+            'is_storable': True,
+            'list_price': 10.0,
+            'taxes_id': False,
+        })
+        self.main_pos_config.open_ui()
+        self.pos_order = self.env['pos.order'].create({
+            'company_id': self.env.company.id,
+            'session_id': self.main_pos_config.current_session_id.id,
+            'access_token': '1234567890',
+            'lines': [(0, 0, {
+                'name': "OL/0001",
+                'product_id': self.product1.id,
+                'price_unit': 10,
+                'discount': 0.0,
+                'qty': 1.0,
+                'tax_ids': False,
+                'price_subtotal': 10,
+                'price_subtotal_incl': 10,
+            })],
+            'amount_tax': 10,
+            'amount_total': 10,
+            'amount_paid': 10.0,
+            'amount_return': 10.0,
+        })
+        self.main_pos_config.current_session_id.close_session_from_ui()
         get_invoice_data = {
             'access_token': self.pos_order.access_token,
-            'name': self.new_partner.name,
+            'name': 'AAA Partner',
             'email': "test@test.com",
-            'company_name': self.new_partner.company_name,
             'street': "Test street",
             'city': "Test City",
-            'zipcode': self.new_partner.zip,
-            'country_id': self.new_partner.country_id.id,
-            'state_id': self.new_partner.state_id.id,
+            'zipcode': '12345',
+            'country_id': self.env.company.country_id.id,
+            'state_id': self.env.company.country_id.state_ids[0].id,
             'phone': "123456789",
             'vat': 'GODE561231GR8',
             'invoice_l10n_mx_edi_usage': 'D10',
             'partner_l10n_mx_edi_fiscal_regime': '624',
-            'csrf_token': odoo.http.Request.csrf_token(self)
+            'csrf_token': self.csrf_token()
         }
         self.url_open(f'/pos/ticket/validate?access_token={self.pos_order.access_token}', data=get_invoice_data)
         self.assertEqual(self.env['res.partner'].sudo().search_count([('name', '=', 'AAA Partner')]), 1)
-        self.assertTrue(self.pos_order.is_invoiced, "The pos order should have an invoice")
+        self.assertTrue(self.pos_order.is_singly_invoiced, "The pos order should have an invoice")
         self.assertEqual(self.pos_order.account_move.l10n_mx_edi_usage, 'D10', 'Invoice values not saved')
-        self.assertEqual(self.new_partner.l10n_mx_edi_fiscal_regime, '624', 'Partner values not saved')
+        self.assertEqual(self.pos_order.partner_id.l10n_mx_edi_fiscal_regime, '624', 'Partner values not saved')
 
-    def test_settle_account_mx(self):
-        if self.env['ir.module.module']._get('pos_settle_due').state != 'installed':
-            self.skipTest("pos_settle_due needs to be installed")
+    def test_pos_settle_due_main(self):
+        """
+        As tour are very energy consuming, we will only write one test
+        in which we will test the main flow of settling a due invoice
 
-        self.partner_test_1.country_id = self.env.ref('base.mx').id
-        self.partner_test_1.is_company = True
-
-        # create customer account payment method
+        Testing behavior:
+        - Create an order with customer account and check that the due
+        amount is correct on the partner
+        - Deposit money from the partner list and check that the due
+        amount is updated on the partner
+        - Settle an open invoice from the partner list and check that
+        the due amount is updated on the partner
+        """
         self.customer_account_payment_method = self.env['pos.payment.method'].create({
             'name': 'Customer Account',
-            'split_transactions': True,
+            'type': 'pay_later',
         })
-        # add customer account payment method to pos config
         self.main_pos_config.write({
-            'payment_method_ids': [(4, self.customer_account_payment_method.id, 0)],
+            'payment_method_ids': [
+                (4, self.customer_account_payment_method.id),
+            ]
         })
-
-        self.assertEqual(self.partner_test_1.total_due, 0)
-
-        self.main_pos_config.with_user(self.pos_admin).open_ui()
-        current_session = self.main_pos_config.current_session_id
-
-        order = self.env['pos.order'].create({
-            'company_id': self.company.id,
-            'session_id': current_session.id,
-            'partner_id': self.partner_test_1.id,
-            'lines': [odoo.Command.create({
-                'product_id': self.product.id,
-                'price_unit': 10,
-                'discount': 0,
-                'qty': 1,
-                'price_subtotal': 10,
-                'price_subtotal_incl': 10,
-            })],
-            'amount_paid': 10.0,
-            'amount_total': 10.0,
-            'amount_tax': 0.0,
-            'amount_return': 0.0,
-            'to_invoice': True,
-            'last_order_preparation_change': '{}'
+        moda = self.env['res.partner'].create({
+            'name': 'AAA - Moda',
+            'country_id': self.env.ref('base.mx').id,
         })
+        invoice = self.env['account.move'].create({
+            'partner_id': moda.id,
+            'date': '2025-02-17',
+            'invoice_date': '2025-02-17',
+            'move_type': 'out_invoice',
+            'invoice_line_ids': [
+                (0, 0, {'name': 'test', 'price_unit': 200})
+            ],
+        })
+        invoice.action_post()
+        self.assertEqual(moda.total_due, 200)
 
-        self.make_payment(order, self.customer_account_payment_method, 10.0)
+        self.main_pos_config.open_ui()
+        self.start_pos_tour('test_pos_settle_due_main', login='accountman')
 
-        self.assertEqual(self.partner_test_1.total_due, 10)
-        current_session.action_pos_session_closing_control()
+        # Check partner due amount, should be 80000 deposit minus 10
+        # from partially paid order created in the tour
+        self.assertEqual(moda.total_due, -79990.0)
 
-        self.main_pos_config.with_user(self.user).open_ui()
-        self.start_tour("/pos/ui/%d" % self.main_pos_config.id, 'pos_settle_account_due', login="accountman")
-        self.main_pos_config.current_session_id.action_pos_session_closing_control()
-        self.assertEqual(self.partner_test_1.total_due, 0)
+        pos_invoice = moda.invoice_ids[0]
+        self.assertEqual(pos_invoice.amount_residual, 10)
+        self.env['account.payment.register'].with_context(
+            active_ids=pos_invoice.ids,
+            active_model='account.move'
+        ).create({
+            'payment_date': pos_invoice.date,
+            'amount': 10,
+        })._create_payments()
+
+        self.assertEqual(pos_invoice.amount_residual, 0)
 
     def test_usage_mx_pos_invoice_order(self):
         self.main_pos_config.open_ui()
@@ -226,7 +274,6 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             "lines": [
                 Command.create({
                     "discount": 0,
-                    "pack_lot_ids": [],
                     "price_unit": 10.0,
                     "product_id": self.product_a.id,
                     "price_subtotal": 10.0,
@@ -247,7 +294,6 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                     }),
             ],
             "uuid": "12345-123-1234",
-            "last_order_preparation_change": "{}",
             "user_id": self.env.uid,
             "to_invoice": False,
             "l10n_mx_edi_usage": False,
@@ -266,8 +312,7 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
         still pay for the order, and that the points will go up on the gift card, depending
         on how much the refunded product was worth.
         """
-        if self.env['ir.module.module']._get('pos_loyalty').state != 'installed':
-            self.skipTest("pos_loyalty needs to be installed")
+        self.ensure_installed('pos_loyalty')
 
         self.main_pos_config.with_user(self.pos_user).open_ui()
         LoyaltyProgram = self.env['loyalty.program']
@@ -308,7 +353,6 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             "lines": [
                 Command.create({
                     "discount": 0,
-                    "pack_lot_ids": [],
                     "price_unit": 10.0,
                     "product_id": self.product_a.id,
                     "price_subtotal": 10.0,
@@ -329,7 +373,6 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                     }),
             ],
             "uuid": "12345-123-1234",
-            "last_order_preparation_change": "{}",
             "user_id": self.env.uid,
             "to_invoice": False,
             "l10n_mx_edi_usage": False,
@@ -338,15 +381,6 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
         order = self.env["pos.order"].sync_from_ui([order_data])["pos.order"][0]
         usage = order['l10n_mx_edi_usage']
         self.assertEqual(usage, "D10")
-
-    @mute_logger('odoo.http')
-    def test_invoice_to_general_public(self):
-        self.partner_mx.write({
-            "zip": "",
-            "country_id": ""
-        })
-        self.main_pos_config.with_user(self.pos_user).open_ui()
-        self.start_tour("/pos/ui?config_id=%d" % self.main_pos_config.id, "tour_invoice_to_general_public", login="pos_user")
 
     def test_refund_with_discount(self):
         """
@@ -361,9 +395,20 @@ class TestUi(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
 
         self.start_tour("/pos/ui?config_id=%d" % self.main_pos_config.id, 'test_refund_with_discount', login="pos_user")
 
+    @mute_logger('odoo.http')
+    def test_invoice_to_general_public(self):
+        self.no_address_partner = self.env['res.partner'].create({
+            'name': 'Homeless Customer',
+        })
+        self.main_pos_config.with_user(self.pos_user).open_ui()
+        self.start_tour("/pos/ui?config_id=%d" % self.main_pos_config.id, "tour_invoice_to_general_public", login="pos_user")
+
 
 @tagged('post_install', '-at_install', 'post_install_l10n')
 class TestGenericMX(TestGenericLocalization):
+
+    _pos_partner_pos_form_fields = ['l10n_mx_edi_fiscal_regime', 'l10n_mx_edi_usage']
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @AccountTestInvoicingCommon.setup_country('mx')

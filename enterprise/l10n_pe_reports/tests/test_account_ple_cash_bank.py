@@ -8,6 +8,8 @@ from odoo.tests import tagged
 @tagged('post_install', 'post_install_l10n', '-at_install')
 class TestBankCashReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('pe')
     def setUpClass(cls):

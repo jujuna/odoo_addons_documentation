@@ -8,7 +8,6 @@ import { registry } from "@web/core/registry";
 
 export class AppraisalSkillsListRenderer extends SkillsListRenderer {
     static template = "hr_appraisal_skills.AppraisalSkillsListRenderer";
-    static props = [...AppraisalSkillsListRenderer.props];
 
     get fields() {
         const fields = this.props.list.fields;

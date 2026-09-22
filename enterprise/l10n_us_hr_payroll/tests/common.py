@@ -7,15 +7,30 @@ from odoo.tests import TransactionCase
 
 class CommonTestPayslips(TransactionCase):
     @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        structure_type = cls.env['hr.payroll.structure.type'].create({
+            'name': 'common structure type',
+            'country_id': False,
+        })
+
+        cls.common_structure = cls.env['hr.payroll.structure'].create({
+            'name': 'common structure',
+            'type_id': structure_type.id
+        })
+
+    @classmethod
     def create_payslip_run(cls):
         def create_employee_with_bank_account(employee_name):
             employee_id = cls.env['hr.employee'].create({
-                'name': employee_name
+                'name': employee_name,
+                'structure_type_id': cls.common_structure.type_id.id,
             })
             # Create employee bank account
             bank_account = cls.env["res.partner.bank"].create({
                 "partner_id": employee_id.work_contact_id.id,
-                "acc_number": "GB94BARC10201530093459",
+                "account_number": "GB94BARC10201530093459",
+                "clearing_label_id": cls.env.ref("base.clearing_label_us").id,
                 "clearing_number": "123456780",
                 'allow_out_payment': True,
             })
@@ -46,7 +61,8 @@ class CommonTestPayslips(TransactionCase):
             payslip_date = fields.Date.today() + relativedelta(day=1)
             payslip_run_id = cls.env['hr.payslip.run'].create({
                 'name': 'Payslip Run',
-                'date_start': payslip_date
+                'date_start': payslip_date,
+                'structure_id': cls.common_structure.id,
             })
             for employee_id in employee_ids:
                 # Create the employee's payslip and link it to the payslip_run_id
@@ -54,8 +70,10 @@ class CommonTestPayslips(TransactionCase):
                     'name': employee_id.name + '_payslip',
                     'employee_id': employee_id.id,
                     'payslip_run_id': payslip_run_id.id,
-                    'struct_id': cls.env.ref('hr_payroll.default_structure', False).id,
+                    'struct_id': cls.common_structure.id,
                     "date_from": payslip_date,
+                    # US payslips require a payment date before they can be computed
+                    "paid_date": payslip_date,
                 })
                 payslip_id.compute_sheet()
             return payslip_run_id

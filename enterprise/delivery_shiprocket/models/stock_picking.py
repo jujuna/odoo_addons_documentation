@@ -12,3 +12,14 @@ class StockPicking(models.Model):
         copy=False, readonly=True,
         help="Store shiprocket order(s) in a (+) separated string, used in cancelling the order."
     )
+    shiprocket_courier_name = fields.Char(
+        string="Shiprocket Courier",
+        copy=False, readonly=True,
+        help="The actual courier name assigned by Shiprocket for this shipment."
+    )
+
+    def _get_carrier_name(self):
+        """Override of stock_delivery to return the actual courier name for Shiprocket shipments."""
+        if self.carrier_id.delivery_type == 'shiprocket' and self.shiprocket_courier_name:
+            return self.shiprocket_courier_name
+        return super()._get_carrier_name()

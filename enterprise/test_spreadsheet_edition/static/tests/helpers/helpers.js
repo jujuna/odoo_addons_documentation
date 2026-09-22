@@ -12,7 +12,7 @@ import { VersionHistoryAction } from "@spreadsheet_edition/bundle/version_histor
 import { SpreadsheetTest, getDummyBasicServerData } from "./data";
 import { getPyEnv } from "@spreadsheet/../tests/helpers/data";
 import { session } from "@web/session";
-import { mailDataHelpers } from "@mail/../tests/mock_server/mail_mock_server";
+import { Store } from "@mail/../tests/mock_server/store";
 
 /**
  * @typedef {import("@spreadsheet/../tests/helpers/data").ServerData} ServerData
@@ -23,7 +23,6 @@ import { mailDataHelpers } from "@mail/../tests/mock_server/mail_mock_server";
  * @property {Function} [mockRPC] Mock rpc function
  * @property {boolean} [fromSnapshot]
  * @property {number | string} [threadId]
- * @property {WebClient} [webClient]
  */
 
 /**
@@ -33,7 +32,6 @@ import { mailDataHelpers } from "@mail/../tests/mock_server/mail_mock_server";
 export async function createSpreadsheetTestAction(actionTag, params = {}) {
     /** @type {any} */
     let spreadsheetAction;
-    let { webClient } = params;
     const SpreadsheetActionComponent =
         actionTag === "spreadsheet_test_action" ? SpreadsheetTestAction : VersionHistoryAction;
     patchWithCleanup(SpreadsheetActionComponent.prototype, {
@@ -49,14 +47,12 @@ export async function createSpreadsheetTestAction(actionTag, params = {}) {
         spreadsheetId = createNewDummySpreadsheet(serverData);
     }
 
-    if (!webClient) {
-        await prepareWebClientForSpreadsheet();
-        webClient = await makeSpreadsheetMockEnv({
-            serverData,
-            mockRPC: params.mockRPC,
-        });
-        await mountWithCleanup(WebClient);
-    }
+    await prepareWebClientForSpreadsheet();
+    await makeSpreadsheetMockEnv({
+        serverData,
+        mockRPC: params.mockRPC,
+    });
+    await mountWithCleanup(WebClient);
 
     await getService("action").doAction({
         type: "ir.actions.client",
@@ -111,10 +107,10 @@ export async function setupWithThreads(workbookdata = {}) {
     if ("res.users" in pyEnv) {
         /** @type {import("mock_models").ResUsers} */
         const ResUsers = pyEnv["res.users"];
-        const store = new mailDataHelpers.Store();
+        const store = new Store();
         ResUsers._init_store_data(store);
         patchWithCleanup(session, {
-            storeData: store.get_result(),
+            storeData: store.as_dict(),
         });
     }
     const result = await createSpreadsheetTestAction("spreadsheet_test_action", {

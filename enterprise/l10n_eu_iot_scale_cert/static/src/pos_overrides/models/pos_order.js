@@ -5,4 +5,8 @@ patch(PosOrder.prototype, {
     get showCertificationWarning() {
         return this.config.showCertificationWarning;
     },
+
+    isEmpty() {
+        return super.isEmpty() || this.lines.every((line) => line.uiState.isDeleted);
+    },
 });

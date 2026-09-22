@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { user } from "@web/core/user";
 import { FileInput } from "@web/core/file_input/file_input";
 import { SelectMenu } from "@web/core/select_menu/select_menu";
@@ -8,18 +8,19 @@ import { evaluateExpr } from "@web/core/py_js/py";
 
 export class RainbowEffect extends Component {
     static template = "web_studio.ViewEditorSidebar.RainbowEffect";
-    static props = {
-        effect: { type: true, optional: true },
-        onChange: { type: Function },
-    };
     static components = {
         FileInput,
         SelectMenu,
         Property,
     };
-    setup() {
-        this.user = user;
-    }
+
+    props = useProps({
+        effect: t.any().optional(),
+        onChange: t.function(),
+    });
+
+    user = user;
+
     get choices() {
         return [
             { label: _t("Fast"), value: "fast" },

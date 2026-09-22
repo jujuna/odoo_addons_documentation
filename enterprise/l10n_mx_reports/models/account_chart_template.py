@@ -12,3 +12,12 @@ class AccountChartTemplate(models.AbstractModel):
                 'deferred_revenue_account_id': 'cuenta260_01_01',
             }
         }
+
+    @template('mx', 'account.return.type')
+    def _get_mx_reports_account_return_type(self):
+        return {
+            'l10n_mx_reports.mx_tax_return_type': {
+                'tax_payable_account_id': 'cuenta213_01',
+                'tax_receivable_account_id': 'cuenta113_01',
+            },
+        }

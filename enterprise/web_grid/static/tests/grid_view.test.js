@@ -14,7 +14,6 @@ import {
     defineModels,
     fields,
     getService,
-    makeMockEnv,
     mockService,
     models,
     mountView,
@@ -29,6 +28,8 @@ import {
 import { browser } from "@web/core/browser/browser";
 import { Domain } from "@web/core/domain";
 import { WebClient } from "@web/webclient/webclient";
+import { parseFloatTime } from "@web/views/fields/parsers";
+import { formatFloatTime } from "@web/views/fields/formatters";
 
 class Line extends models.Model {
     _name = "analytic.line";
@@ -139,6 +140,18 @@ class Line extends models.Model {
                 <filter string="Selection" name="groupby_selection" domain="[]" context="{'group_by': 'selection_field'}"/>
             </search>
         `,
+        kanban: `
+            <kanban>
+                <templates>
+                    <t t-name="card">
+                        <field name="project_id"/>
+                        <field name="task_id"/>
+                        <field name="date"/>
+                        <field name="unit_amount"/>
+                    </t>
+                </templates>
+            </kanban>
+        `,
     };
 }
 
@@ -203,10 +216,10 @@ describe("grid_view_desktop", () => {
         expect(".o_grid_navigation_buttons button:eq(0)").toHaveText("Today", {
             message: "The first navigation button should be the Today one.",
         });
-        expect(".o_grid_navigation_buttons button > span.oi-arrow-left").toHaveCount(1, {
+        expect(".o_grid_navigation_buttons button > span[data-icon='west']").toHaveCount(1, {
             message: "The previous button should be there",
         });
-        expect(".o_grid_navigation_buttons button > span.oi-arrow-right").toHaveCount(1, {
+        expect(".o_grid_navigation_buttons button > span[data-icon='east']").toHaveCount(1, {
             message: "The next button should be there",
         });
         expect(".o_view_scale_selector").toHaveCount(1);
@@ -223,10 +236,10 @@ describe("grid_view_desktop", () => {
         expect(".o-dropdown--menu .o_scale_button_month").toHaveCount(1, {
             message: "The month scale should be in the dropdown menu",
         });
-        expect(".o_grid_column_title.fw-bolder").toHaveCount(1, {
+        expect(".o_grid_column_title:has(.o_grid_cell_overlay_today)").toHaveCount(1, {
             message: "The column title containing the date should be the current date",
         });
-        expect(".o_grid_column_title.fw-bolder").toHaveText("Mon,\nJan 30", {
+        expect(".o_grid_column_title:has(.o_grid_cell_overlay_today)").toHaveText("Mon,\nJan 30", {
             message: "The current date should be Monday on 30 January 2023",
         });
         expect(".o_grid_column_title:not(.o_grid_navigation_wrap, .o_grid_row_total)").toHaveCount(
@@ -292,10 +305,10 @@ describe("grid_view_desktop", () => {
         expect(".o_grid_column_title.o_grid_row_total").toHaveCount(1, {
             message: "It should have 1 column for the total",
         });
-        expect(".o_grid_column_title.fw-bolder").toHaveCount(1, {
+        expect(".o_grid_column_title:has(.o_grid_cell_overlay_today)").toHaveCount(1, {
             message: "The column title containing the current date should not be there.",
         });
-        expect(".o_grid_column_title.fw-bolder").toHaveText("Mon,\nJan 30", {
+        expect(".o_grid_column_title:has(.o_grid_cell_overlay_today)").toHaveText("Mon,\nJan 30", {
             message: "The current date should be Monday on 30 January",
         });
     });
@@ -342,16 +355,16 @@ describe("grid_view_desktop", () => {
         );
         expect(".o_grid_row.o_grid_highlightable.o_grid_row_total.bg-danger").toHaveCount(1);
         expect(".o_grid_row.o_grid_highlightable.o_grid_row_total.bg-danger").toHaveText("-3.50");
-        expect(".o_grid_row.o_grid_highlightable > div.bg-info").toHaveCount(3, {
+        expect(".o_grid_row.o_grid_highlightable.bg-info-subtle").toHaveCount(3, {
             message:
-                "The cell in the column of the current should have `bg-info` class as the header",
+                "The cell in the column of the current should have `bg-info-subtle` class as the header",
         });
         expect(".o_grid_row.o_grid_row_title.o_grid_highlightable").toHaveCount(2);
         expect(queryAllTexts(".o_grid_row.o_grid_row_title.o_grid_highlightable")).toEqual([
             "P1\n|\nBS task",
             "Webocalypse Now\n|\nAnother BS task",
         ]);
-        await contains(".o_grid_navigation_buttons button span.oi-arrow-right").click();
+        await contains(".o_grid_navigation_buttons button span[data-icon='east']").click();
         expect(
             ".o_grid_row.o_grid_highlightable:not(.o_grid_row_title,.o_grid_column_total,.o_grid_row_total)"
         ).toHaveCount(0, {
@@ -360,10 +373,10 @@ describe("grid_view_desktop", () => {
         expect(".o_view_nocontent").toHaveCount(1, {
             message: "No content div should be displayed",
         });
-        expect("div.bg-info").toHaveCount(0, {
+        expect(".bg-info-subtle").toHaveCount(0, {
             message: "No column should be the current date since we move in the following week.",
         });
-        await contains(".o_grid_navigation_buttons button span.oi-arrow-right").click();
+        await contains(".o_grid_navigation_buttons button span[data-icon='east']").click();
         expect("div.o_grid_row_title").toHaveCount(0, { message: "should not have any cell" });
     });
 
@@ -397,7 +410,7 @@ describe("grid_view_desktop", () => {
             message:
                 "One cell should be displayed to display the total of the week for the whole section",
         });
-        expect(".o_grid_section.o_grid_row_total").toHaveText("10:00", {
+        expect(".o_grid_section.o_grid_row_total").toHaveText("10h", {
             message: "The total of the section should be equal to 10 hours.",
         });
         expect(".o_grid_row.o_grid_row_title").toHaveCount(2, {
@@ -415,26 +428,26 @@ describe("grid_view_desktop", () => {
             )
         ).toEqual([
             // row 1
-            "0:00",
-            "0:00",
-            "2:30",
-            "0:00",
-            "0:00",
-            "0:00",
-            "0:00",
+            "0h",
+            "0h",
+            "2h 30m",
+            "0h",
+            "0h",
+            "0h",
+            "0h",
             // row 2
-            "0:00",
-            "0:00",
-            "0:00",
-            "7:30",
-            "0:00",
-            "0:00",
-            "0:00",
+            "0h",
+            "0h",
+            "0h",
+            "7h 30m",
+            "0h",
+            "0h",
+            "0h",
         ]);
         expect(".o_grid_row.o_grid_row_total").toHaveCount(2, {
             message: "One cell per row should be displayed to display the total of the week",
         });
-        expect(queryAllTexts(".o_grid_row.o_grid_row_total")).toEqual(["2:30", "7:30"]);
+        expect(queryAllTexts(".o_grid_row.o_grid_row_total")).toEqual(["2h 30m", "7h 30m"]);
         expect(".o_grid_search_btn").toHaveCount(0, {
             message: "No search button should be displayed in the grid cells.",
         });
@@ -442,7 +455,7 @@ describe("grid_view_desktop", () => {
         await contains(".o_grid_cell button.o_grid_search_btn").click();
 
         // Click on next period to have no data
-        await contains(".o_grid_navigation_buttons button span.oi-arrow-left").click();
+        await contains(".o_grid_navigation_buttons button span[data-icon='west']").click();
         expect(".o_grid_section").toHaveCount(0);
         expect(
             ".o_grid_row.o_grid_highlightable:not(.o_grid_row_title,.o_grid_column_total,.o_grid_row_total)"
@@ -507,7 +520,7 @@ describe("grid_view_desktop", () => {
         expect(".o_grid_section").toHaveCount(0);
         expect(".o_grid_row_title").toHaveCount(2);
         expect(queryAllTexts(".o_grid_row_title")).toEqual(["None\n|\nP1", "BS task\n|\nP1"]);
-        await contains(".o_grid_navigation_buttons button span.oi-arrow-right").click();
+        await contains(".o_grid_navigation_buttons button span[data-icon='east']").click();
         expect(".o_grid_section").toHaveCount(0);
         expect(".o_grid_row_title").toHaveCount(2);
         expect(queryAllTexts(".o_grid_row_title")).toEqual([
@@ -551,7 +564,7 @@ describe("grid_view_desktop", () => {
         expect(".o_grid_section").toHaveCount(0);
         expect(".o_grid_row_title").toHaveCount(2);
         expect(queryAllTexts(".o_grid_row_title")).toEqual(["None", "BS task"]);
-        await contains(".o_grid_navigation_buttons button span.oi-arrow-right").click();
+        await contains(".o_grid_navigation_buttons button span[data-icon='east']").click();
         expect(".o_grid_section").toHaveCount(0);
         expect(".o_grid_row_title").toHaveCount(2);
         expect(queryAllTexts(".o_grid_row_title")).toEqual(["BS task", "Another BS task"]);
@@ -667,7 +680,7 @@ describe("grid_view_desktop", () => {
         });
 
         expect(queryAllTexts(".o_grid_row_title")).toEqual(["Rem", "Rer", "Sassy"]);
-        await contains(".o_grid_navigation_buttons button span.oi-arrow-left").click();
+        await contains(".o_grid_navigation_buttons button span[data-icon='west']").click();
         expect(queryAllTexts(".o_grid_row_title")).toEqual(["Sas", "Rem", "Sassy", "Rer", "Sar"]);
     });
 
@@ -687,7 +700,7 @@ describe("grid_view_desktop", () => {
         });
 
         expect(queryAllTexts(".o_grid_row_title")).toEqual(["DEF", "GHI"]);
-        await contains(".o_grid_navigation_buttons button span.oi-arrow-left").click();
+        await contains(".o_grid_navigation_buttons button span[data-icon='west']").click();
         expect(queryAllTexts(".o_grid_row_title")).toEqual(["ABC", "DEF"]);
     });
 
@@ -901,16 +914,14 @@ describe("grid_view_desktop", () => {
         const columnTotal = queryOne(
             `.o_grid_row.o_grid_column_total[data-grid-column="${cellContainer.dataset.gridColumn}"]`
         );
-        const [columnTotalHours, columnTotalMinutes] = (
-            (columnTotal.textContent?.length && columnTotal.textContent.split(":")) || [0, 0]
-        ).map((value) => Number(value));
         const rowTotal = queryOne(
             `.o_grid_row_total[data-grid-row="${cellContainer.dataset.gridRow}"]`
         );
-        const [rowTotalHours, rowTotalMinutes] = (
-            (rowTotal.textContent?.length && rowTotal.textContent.split(":")) || [0, 0]
-        ).map((value) => Number(value));
-        expect(cell).toHaveText("0:00");
+
+        const colummTotalFloat = parseFloatTime(columnTotal.textContent);
+        const rowTotalFloat = parseFloatTime(rowTotal.textContent);
+
+        expect(cell).toHaveText("0h");
         await hover(cell);
         await runAllTimers();
         expect(".o_grid_cell").toHaveCount(1, {
@@ -935,13 +946,9 @@ describe("grid_view_desktop", () => {
         expect(".o_grid_cell input").toHaveCount(1);
         await contains(".o_grid_cell input").edit("2");
         await animationFrame();
-        expect(cell).toHaveText("2:00");
-        expect(columnTotal).toHaveText(
-            `${columnTotalHours + 2}:${String(columnTotalMinutes).padStart(2, "0")}`
-        );
-        expect(rowTotal).toHaveText(
-            `${rowTotalHours + 2}:${String(rowTotalMinutes).padStart(2, "0")}`
-        );
+        expect(cell).toHaveText("2h");
+        expect(columnTotal).toHaveText(formatFloatTime(colummTotalFloat + 2));
+        expect(rowTotal).toHaveText(formatFloatTime(rowTotalFloat + 2));
     });
 
     test("edit grid cell with action context defined", async () => {
@@ -1062,7 +1069,7 @@ describe("grid_view_desktop", () => {
         expect(queryAllTexts(".o_grid_bar_chart_total_pill")).toEqual(["", ""]);
 
         const cell = queryFirst(".o_grid_row .o_grid_cell_readonly");
-        expect(cell).toHaveText("0:00");
+        expect(cell).toHaveText("0h");
         await hover(cell);
         await contains(".o_grid_cell").click();
         await animationFrame();
@@ -1132,7 +1139,7 @@ describe("grid_view_desktop", () => {
         ]);
 
         // move to previous week, and check first column header
-        await contains(".oi-arrow-left").click();
+        await contains("[data-icon='west']").click();
         // check first column header
         expect(queryAllTexts(".o_grid_column_title")).toEqual([
             "Today\nWeek",
@@ -1169,7 +1176,7 @@ describe("grid_view_desktop", () => {
         ar_SY: "الأحد،\n٢٩ كانون الثاني",
         he_IL: "יום א׳,\n29 בינו׳",
         fa_IR: "یکشنبه\n۱۰ بهمن",
-        th_TH: "อา.\n29 ม.ค.",
+        th_TH: /(อา\.|อาทิตย์)\n29 ม\.ค\./, // matches diff. between Chrome < 148 and the other browsers
         tr_TR: "29 Oca Paz",
         pl_PL: "niedz.,\n29 sty",
         // for CJK locales: keep everything on one line
@@ -1193,10 +1200,13 @@ describe("grid_view_desktop", () => {
             };
 
             serverState.lang = locale;
-            await makeMockEnv();
             await mountView(view);
             const text = queryAllTexts(".o_grid_column_title")[1];
-            expect(text).toEqual(expected);
+            if (expected instanceof RegExp) {
+                expect(text).toMatch(expected);
+            } else {
+                expect(text).toEqual(expected);
+            }
         });
     }
 
@@ -1232,7 +1242,6 @@ describe("grid_view_desktop", () => {
             };
 
             serverState.lang = locale;
-            await makeMockEnv();
             await mountView(view);
             const text = queryAllTexts(".o_grid_column_title")[1];
             expect(text).toEqual(expected);
@@ -1303,15 +1312,17 @@ describe("grid_view_desktop", () => {
         ).toHaveCount(1);
         expect(
             ".o_grid_row.o_grid_highlightable:not(.o_grid_row_title,.o_grid_column_total,.o_grid_row_total)"
-        ).toHaveText("2:30", { message: "Check if the cell is correctly formatted as float time" });
+        ).toHaveText("2h 30m", {
+            message: "Check if the cell is correctly formatted as float time",
+        });
         expect(
             ".o_grid_column_total:not(.o_grid_row_title,.o_grid_row_total,.o_grid_bar_chart_container)"
         ).toHaveCount(1);
         expect(
             ".o_grid_column_total:not(.o_grid_row_title,.o_grid_row_total,.o_grid_bar_chart_container) span"
-        ).toHaveText("2:30", { message: "check format time is used" });
+        ).toHaveText("2h 30m", { message: "check format time is used" });
         expect(".o_grid_row.o_grid_highlightable.o_grid_row_total").toHaveCount(1);
-        expect(".o_grid_row.o_grid_highlightable.o_grid_row_total").toHaveText("2:30", {
+        expect(".o_grid_row.o_grid_highlightable.o_grid_row_total").toHaveText("2h 30m", {
             message: "check format time is used",
         });
     });
@@ -1359,7 +1370,7 @@ describe("grid_view_desktop", () => {
         await contains(".o_grid_renderer .o_grid_add_line a").click();
         expect(".modal").toHaveCount(1);
         await contains(".modal .modal-footer button.o_form_button_cancel").click();
-        await contains(".o_grid_navigation_buttons button span.oi-arrow-right").click();
+        await contains(".o_grid_navigation_buttons button span[data-icon='east']").click();
         expect(".o_grid_button_add:visible").toHaveCount(1, {
             message: "'Add a line' control panel button should be visible",
         });
@@ -1533,7 +1544,7 @@ describe("grid_view_desktop", () => {
                 "The `Add a Line` button should be displayed when no content data is displayed to be able to create a record.",
         });
 
-        await contains(".o_grid_navigation_buttons span.oi-arrow-right").click();
+        await contains(".o_grid_navigation_buttons span[data-icon='east']").click();
         expect(".o_view_sample_data").toHaveCount(0, {
             message:
                 "The sample data should no longer be displayed since display_empty is true in the grid view",
@@ -1615,7 +1626,7 @@ describe("grid_view_desktop", () => {
         let currentRows = initialRows;
 
         expect(content.scrollTop).toBe(0, { message: "content should be scrolled to the top" });
-        expect(content.offsetHeight).toBe(710, { message: "content should have its height fixed" });
+        expect(content.offsetHeight).toBe(711, { message: "content should have its height fixed" });
         // ! This next assertion is important: it ensures that the grid rows are
         // ! hard-coded so that the virtual hook can work with it. Adapt this test
         // ! accordingly should the row height change.
@@ -2031,20 +2042,74 @@ describe("grid_view_desktop", () => {
                 </grid>`,
         });
 
-        expect(".o_grid_section.o_grid_row_total").toHaveText("20:00", {
+        expect(".o_grid_section.o_grid_row_total").toHaveText("20h", {
             message: "should show 20h in timesheet",
         });
-        expect(queryAllTexts(".o_grid_row.o_grid_row_total")).toEqual(["17:30", "2:30"]);
+        expect(queryAllTexts(".o_grid_row.o_grid_row_total")).toEqual(["17h 30m", "2h 30m"]);
         expect(".scale_button_selection").toHaveCount(1);
         await contains(".scale_button_selection").click();
         expect(".o-dropdown--menu span.dropdown-item.active").toHaveCount(2);
         await contains(".o-dropdown--menu span.dropdown-item.active:eq(1)").click();
 
-        expect(".o_grid_section.o_grid_row_total").toHaveText("10:00", {
+        expect(".o_grid_section.o_grid_row_total").toHaveText("10h", {
             message: "should show 10 hours as weekend is hidden",
         });
-        expect(queryAllTexts(".o_grid_row.o_grid_row_total")).toEqual(["7:30", "2:30"]);
+        expect(queryAllTexts(".o_grid_row.o_grid_row_total")).toEqual(["7h 30m", "2h 30m"]);
         expect.verifySteps(["grid.isWeekendVisible-false"]);
+    });
+
+    test("grid: weekend button disabled for day/year and enabled for week/month", async () => {
+        mockDate("2017-01-25 00:00:00");
+
+        await mountView({
+            type: "grid",
+            resModel: "analytic.line",
+            arch: `<grid>
+                    <field name="project_id" type="row" section="1"/>
+                    <field name="task_id" type="row"/>
+                    <field name="date" type="col">
+                        <range name="day" string="Day" span="day" step="day" hotkey="e"/>
+                        <range name="week" string="Week" span="week" step="day"/>
+                        <range name="month" string="Month" span="month" step="day"/>
+                        <range name="year" string="Year" span="year" step="month"/>
+                    </field>
+                    <field name="unit_amount" type="measure" widget="float_time"/>
+                </grid>`,
+        });
+
+        // day
+        await contains(".scale_button_selection").click();
+        await contains(".dropdown-item:nth-child(1)").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Day", {
+            message: "Active range should be Day",
+        });
+        await contains(".scale_button_selection").click();
+        expect(".o_show_weekends").toHaveClass("disabled");
+
+        //week
+        await contains(".dropdown-item:nth-child(2)").click();
+        await animationFrame();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Week", {
+            message: "Active range should be Week",
+        });
+        await contains(".scale_button_selection").click();
+        expect(".o_show_weekends").not.toHaveClass("disabled");
+
+        //month
+        await contains(".dropdown-item:nth-child(3)").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Month", {
+            message: "Active range should be Month",
+        });
+        await contains(".scale_button_selection").click();
+        expect(".o_show_weekends").not.toHaveClass("disabled");
+
+        //year
+        await contains(".dropdown-item:nth-child(4)").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Year", {
+            message: "Active range should be Year",
+        });
+        await contains(".scale_button_selection").click();
+        expect(".o_show_weekends").toHaveClass("disabled");
     });
 
     test("grid: use the context in the action when a record will be created", async () => {
@@ -2088,7 +2153,7 @@ describe("grid_view_desktop", () => {
             type: "ir.actions.act_window",
             views: [[false, "grid"]],
         });
-        await contains(".oi-arrow-left").click();
+        await contains("[data-icon='west']").click();
         expect(
             queryAllTexts(".o_grid_column_title:not(.o_grid_navigation_wrap, .o_grid_row_total)")
         ).toEqual([
@@ -2169,6 +2234,26 @@ describe("grid_view_desktop", () => {
         expect(".scale_button_selection").toHaveText("Year");
         expect.verifySteps(["scale_year"]);
     });
+
+    test("Selection field label is displayed instead of its key when clicking on cell magnifier", async () => {
+        Line._views["grid"] = `<grid>
+            <field name="selection_field" type="row"/>
+            <field name="task_id" type="col"/>
+            <field name="unit_amount" type="measure" widget="float_time"/>
+        </grid>`;
+        await mountWithCleanup(WebClient);
+        await getService("action").doAction({
+            res_model: "analytic.line",
+            type: "ir.actions.act_window",
+            views: [[false, "grid"]],
+        });
+
+        await hover(".o_grid_row .o_grid_cell_readonly:eq(3)");
+        await contains(".o_grid_cell button.o_grid_search_btn").click();
+        expect(queryAllTexts(".o_control_panel_breadcrumbs .o_last_breadcrumb_item")).toEqual([
+            "GHI (BS task)",
+        ]);
+    });
 });
 describe.tags("mobile");
 describe("grid_view_mobile", () => {
@@ -2198,12 +2283,18 @@ describe("grid_view_mobile", () => {
         expect(".o_grid_navigation_buttons button:eq(0)").toHaveText("Today", {
             message: "The first navigation button should be the Today one.",
         });
-        expect(".o_grid_navigation_buttons > div > button > span.oi-arrow-left").toHaveCount(1, {
-            message: "The previous button should be there",
-        });
-        expect(".o_grid_navigation_buttons > div > button > span.oi-arrow-right").toHaveCount(1, {
-            message: "The previous button should be there",
-        });
+        expect(".o_grid_navigation_buttons > div > button > span[data-icon='west']").toHaveCount(
+            1,
+            {
+                message: "The previous button should be there",
+            }
+        );
+        expect(".o_grid_navigation_buttons > div > button > span[data-icon='east']").toHaveCount(
+            1,
+            {
+                message: "The previous button should be there",
+            }
+        );
         expect(".o_view_scale_selector").toHaveCount(1);
         expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Day", {
             message: "The default active range should be the first one define in the grid view",
@@ -2218,10 +2309,10 @@ describe("grid_view_mobile", () => {
         expect(".o-dropdown--menu .o_scale_button_month").toHaveCount(1, {
             message: "The month scale should be in the dropdown menu",
         });
-        expect(".o_grid_column_title.fw-bolder").toHaveCount(1, {
+        expect(".o_grid_column_title:has(.o_grid_cell_overlay_today)").toHaveCount(1, {
             message: "The column title containing the date should be the current date",
         });
-        expect(".o_grid_column_title.fw-bolder").toHaveText("Mon,\nJan 30", {
+        expect(".o_grid_column_title:has(.o_grid_cell_overlay_today)").toHaveText("Mon,\nJan 30", {
             message: "The current date should be Monday on 30 January 2023",
         });
         expect(".o_grid_column_title:not(.o_grid_navigation_wrap, .o_grid_row_total)").toHaveCount(
@@ -2322,5 +2413,19 @@ describe("grid_view_mobile", () => {
         await scroll(content, { top: content.scrollHeight });
         await animationFrame();
         expect(`a[href="/odoo/m-task/199"]`).toHaveCount(1);
+    });
+
+    test("clicking magnifier opens kanban on mobile", async () => {
+        await mountWithCleanup(WebClient);
+        await getService("action").doAction({
+            res_model: "analytic.line",
+            type: "ir.actions.act_window",
+            views: [[false, "grid"]],
+        });
+        await contains(queryFirst(".o_grid_row .o_grid_cell_readonly")).click();
+        await contains(".o_grid_search_btn").click();
+        expect(".o_kanban_renderer").toHaveCount(1, {
+            message: "Magnifier click should open the Kanban view in mobile mode.",
+        });
     });
 });

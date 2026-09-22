@@ -1,10 +1,9 @@
-# coding: utf-8
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 import csv
 import io
 
 from odoo import api, models, fields
+from odoo.tools import BinaryBytes
 
 
 class L10n_Us_1099Wizard(models.TransientModel):
@@ -13,12 +12,12 @@ class L10n_Us_1099Wizard(models.TransientModel):
 
     def _default_start_date(self):
         """ Return the first day of last year. """
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         return today.replace(today.year - 1, 1, 1)
 
     def _default_end_date(self):
         """ Return the last day of last year. """
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         return today.replace(today.year - 1, 12, 31)
 
     start_date = fields.Date(
@@ -160,7 +159,7 @@ class L10n_Us_1099Wizard(models.TransientModel):
             curr_total = self.env.ref("base.USD").round(curr_total)
             writer.writerow(self._generate_row(curr_company, curr_vendor, curr_total, boxes_1099))
 
-        self.generated_csv_file = base64.b64encode(output.getvalue().encode())
+        self.generated_csv_file = BinaryBytes(output.getvalue().encode())
 
         us_format = "%m_%d_%Y"
         return {

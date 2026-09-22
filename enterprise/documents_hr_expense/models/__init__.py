@@ -3,3 +3,4 @@
 
 from . import documents_document
 from . import hr_expense
+from . import account_move

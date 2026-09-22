@@ -11,43 +11,32 @@ patch(PosStore.prototype, {
 
         try {
             const order = this.getOrder();
-            if (this.env.services.ui.isBlocked || !order.partner_id) {
+            if (this.env.services.ui.isBlocked) {
                 return;
             } else {
                 this.env.services.ui.block({ message: _t("Updating Avatax taxes...") });
             }
 
             const serialized = order.serializeForORM();
-            const data = await this.data.call("pos.order", "get_order_tax_details", [[serialized]]);
-            const modelToAdd = {};
-            for (const [model, records] of Object.entries(data)) {
-                const modelKey = this.data.opts.databaseTable[model]?.key;
-
-                if (!modelKey) {
-                    modelToAdd[model] = records;
-                    continue;
-                }
-
-                this.models.replaceDataByKey(modelKey, { [model]: records });
-            }
-
-            this.models.connectNewData(modelToAdd);
-        } catch {
+            const context = this.getSyncAllOrdersContext([order]);
+            const data = await this.data.call(
+                "pos.order",
+                "get_order_tax_details",
+                [[serialized]],
+                { context }
+            );
+            const missingRecords = await this.data.missingRecursive(data);
+            this.models.loadConnectedData(missingRecords);
+        } catch (e) {
             this.dialog.add(AlertDialog, {
                 title: _t("Error while loading Avatax taxes"),
-                body: _t(
-                    "Enable to load Avatax taxes, please verify partner information and Avatax API configuration."
-                ),
+                body:
+                    e?.data?.message ||
+                    _t("Unable to load Avatax taxes, please verify Avatax API configuration."),
             });
+            console.error(e);
         } finally {
             this.env.services.ui.unblock();
         }
-    },
-    async selectPartner() {
-        const res = await super.selectPartner(...arguments);
-        if (res) {
-            await this.getAvataxTaxesRpc();
-        }
-        return res;
     },
 });

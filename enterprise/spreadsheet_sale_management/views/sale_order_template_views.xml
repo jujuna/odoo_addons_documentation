@@ -5,8 +5,12 @@
         <field name="model">sale.order.template</field>
         <field name="inherit_id" ref="sale_management.sale_order_template_view_form"/>
         <field name="arch" type="xml">
-            <field name="journal_id" position="after">
-                <field name="spreadsheet_template_id" widget="many2one_spreadsheet"/>
+            <field name="share_template" position="before">
+                <field
+                    name="spreadsheet_template_id"
+                    widget="many2one_spreadsheet"
+                    invisible="template_type == 'section'"
+                />
             </field>
         </field>
     </record>

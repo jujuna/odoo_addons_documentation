@@ -13,24 +13,44 @@ import { getCell, getCellFormula, getCellValue } from "@spreadsheet/../tests/hel
 import { createSpreadsheetWithList } from "@spreadsheet/../tests/helpers/list";
 import { waitForDataLoaded } from "@spreadsheet/helpers/model";
 import { allowTranslations } from "@web/../tests/web_test_helpers";
+import {
+    getNextListValue,
+    getTooltipListFormula,
+} from "@spreadsheet_edition/bundle/list/plugins/list_autofill_plugin";
+import { makeStoreWithModel } from "@spreadsheet/../tests/helpers/stores";
+
 const { toCartesian } = spreadsheet.helpers;
+const { CompiledFormula } = spreadsheet;
+const { AutofillStore } = spreadsheet.stores;
 
 describe.current.tags("headless");
 defineSpreadsheetModels();
+
+async function createSpreadsheetWithListAndAutofill(params = {}) {
+    const { model } = await createSpreadsheetWithList(params);
+    const { store } = makeStoreWithModel(model, AutofillStore);
+    return { model, autofillStore: store };
+}
 
 /**
  * Get the computed value that would be autofilled starting from the given xc.
  * The starting xc should contains a List formula
  */
 function getListAutofillValue(model, xc, { direction, steps }) {
-    const content = getCellFormula(model, xc);
+    const cell = getCell(model, xc);
     const column = ["left", "right"].includes(direction);
     const increment = ["left", "top"].includes(direction) ? -steps : steps;
-    return model.getters.getNextListValue(content, column, increment);
+    return getNextListValue(model.getters, cell.compiledFormula, column, increment);
+}
+
+function getTooltipFormula(model, formulaString, isColumn) {
+    const sheetId = model.getters.getActiveSheetId();
+    const compiledFormula = CompiledFormula.Compile(formulaString, sheetId, model.getters);
+    return getTooltipListFormula(model.getters, compiledFormula, isColumn);
 }
 
 test("Autofill list values", async function () {
-    const { model } = await createSpreadsheetWithList();
+    const { model } = await createSpreadsheetWithListAndAutofill();
     // From value to value
     expect(getListAutofillValue(model, "C3", { direction: "bottom", steps: 1 })).toBe(
         getCellFormula(model, "C4")
@@ -48,7 +68,7 @@ test("Autofill list values", async function () {
         getCellFormula(model, "C5")
     );
     expect(getListAutofillValue(model, "C3", { direction: "bottom", steps: 3 })).toBe(
-        `=ODOO.LIST(1,5,"date")`
+        `=ODOO.LIST.VALUE(1,5,"date")`
     );
     expect(getListAutofillValue(model, "C3", { direction: "right", steps: 4 })).toBe("");
     // From value to header
@@ -62,7 +82,7 @@ test("Autofill list values", async function () {
         getCellFormula(model, "B2")
     );
     expect(getListAutofillValue(model, "B4", { direction: "top", steps: 3 })).toBe(
-        getCellFormula(model, "B1")
+        `=ODOO.LIST.HEADER(1,"bar")`
     );
     // From header to header
     expect(getListAutofillValue(model, "B3", { direction: "right", steps: 1 })).toBe(
@@ -87,7 +107,7 @@ test("Autofill list values", async function () {
         getCellFormula(model, "A3")
     );
     expect(getListAutofillValue(model, "A4", { direction: "bottom", steps: 2 })).toBe(
-        `=ODOO.LIST(1,5,"foo")`
+        `=ODOO.LIST.VALUE(1,5,"foo")`
     );
     expect(getListAutofillValue(model, "A4", { direction: "top", steps: 4 })).toBe("");
     // From header to value
@@ -107,7 +127,7 @@ test("Autofill list values", async function () {
 });
 
 test("Autofill list correctly update the cache", async function () {
-    const { model } = await createSpreadsheetWithList({ linesNumber: 1 });
+    const { model } = await createSpreadsheetWithListAndAutofill({ linesNumber: 1 });
     autofill(model, "A2", "A3");
     expect(getCellValue(model, "A3")).toBe("Loading...");
     await animationFrame(); // Await for the batch collection of missing ids
@@ -116,20 +136,20 @@ test("Autofill list correctly update the cache", async function () {
 });
 
 test("Autofill with references works like any regular function (no custom autofill)", async function () {
-    const { model } = await createSpreadsheetWithList();
-    setCellContent(model, "A1", '=ODOO.LIST(1, A1,"probability")');
+    const { model } = await createSpreadsheetWithListAndAutofill();
+    setCellContent(model, "A1", '=ODOO.LIST.VALUE(1, A1,"probability")');
     selectCell(model, "A1");
 
     model.dispatch("AUTOFILL_SELECT", { col: 0, row: 1 });
     model.dispatch("AUTOFILL");
-    expect(getCellFormula(model, "A2")).toBe('=ODOO.LIST(1, A2,"probability")');
+    expect(getCellFormula(model, "A2")).toBe('=ODOO.LIST.VALUE(1,A2,"probability")');
 });
 
 test("Tooltip of list formulas", async function () {
-    const { model } = await createSpreadsheetWithList();
+    const { model } = await createSpreadsheetWithListAndAutofill();
 
     function getTooltip(xc, isColumn) {
-        return model.getters.getTooltipListFormula(getCellFormula(model, xc), isColumn);
+        return getTooltipFormula(model, getCellFormula(model, xc), isColumn);
     }
 
     expect(getTooltip("A3", false)).toBe("Record #2");
@@ -146,28 +166,24 @@ test("Autofill list formula with missing listId", async function () {
                 colNumber: 1,
                 rowNumber: 2,
                 cells: {
-                    A1: '=ODOO.LIST("1","1","date")',
+                    A1: '=ODOO.LIST.VALUE("1","1","date")',
                     B1: '=ODOO.LIST.HEADER("1","date")',
                 },
             },
         ],
     });
     expect(getListAutofillValue(model, "A1", { direction: "bottom", steps: 1 })).toBe(
-        '=ODOO.LIST("1","1","date")'
+        '=ODOO.LIST.VALUE("1","1","date")'
     );
     expect(getListAutofillValue(model, "B1", { direction: "bottom", steps: 1 })).toBe(
         '=ODOO.LIST.HEADER("1","date")'
     );
-    expect(model.getters.getTooltipListFormula(getCellFormula(model, "A1"), false)).toBe(
-        "Missing list #1"
-    );
-    expect(model.getters.getTooltipListFormula(getCellFormula(model, "B1"), false)).toBe(
-        "Missing list #1"
-    );
+    expect(getTooltipFormula(model, getCellFormula(model, "A1"), false)).toBe("Missing list #1");
+    expect(getTooltipFormula(model, getCellFormula(model, "B1"), false)).toBe("Missing list #1");
 });
 
 test("Autofill list keeps format but neither style nor border", async function () {
-    const { model } = await createSpreadsheetWithList();
+    const { model } = await createSpreadsheetWithListAndAutofill();
     // Change the format, style and borders of C2
     const sheetId = model.getters.getActiveSheetId();
     const { col, row } = toCartesian("C2");
@@ -192,6 +208,27 @@ test("Autofill list keeps format but neither style nor border", async function (
     // Check that the format of C2 has been correctly applied to C3 but not the style nor the border
     const filledCell = getCell(model, "C3");
     expect(filledCell.style).toBe(undefined);
-    expect(model.getters.getCellBorder({ sheetId, col, row: row + 1 })).toEqual({});
+    expect(model.getters.getCellBorder({ sheetId, col, row: row + 1 })).toEqual(null);
     expect(filledCell.format).toBe("m/d/yyyy");
+});
+
+test("Autofill for a list that is not loaded yet", async function () {
+    const { model } = await createSpreadsheetWithListAndAutofill({ skipWaitForDataLoaded: true });
+
+    expect(getCellValue(model, "A2")).toBe("Loading...");
+    expect(getListAutofillValue(model, "A1", { direction: "bottom", steps: 1 })).toBe(
+        '=ODOO.LIST.VALUE(1,1,"foo")' // Can autofill since the resulting formula doesn't depend on the list values
+    );
+    expect(getTooltipFormula(model, getCellFormula(model, "A1"), false)).toBe("Loading...");
+});
+
+test("Autofill list formula does not removes the rest of the formula", async function () {
+    const { model } = await createSpreadsheetWithListAndAutofill();
+    setCellContent(model, "A1", '=CONCAT(ODOO.LIST.VALUE(1,5,"foo"),"test")');
+    autofill(model, "A1", "A2");
+    expect(getCellFormula(model, "A2")).toBe('=CONCAT(ODOO.LIST.VALUE(1,6,"foo"),"test")');
+
+    setCellContent(model, "A1", '=ODOO.LIST.HEADER(1,"foo")+28');
+    autofill(model, "A1", "A2");
+    expect(getCellFormula(model, "A2")).toBe('=ODOO.LIST.VALUE(1,1,"foo")+28');
 });

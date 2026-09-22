@@ -1,15 +1,20 @@
-from odoo import fields
-from odoo.addons.stock_account.tests.test_stockvaluationlayer import TestStockValuationCommon
-from odoo.tests import tagged
-from odoo.tools import SQL
-
 from collections import OrderedDict
 from datetime import datetime
+
 from freezegun import freeze_time
+
+from odoo import fields
+from odoo.tests import tagged
+
+from odoo.addons.stock_account.tests.test_stockvaluationlayer import (
+    TestStockValuationCommon,
+)
 
 
 @tagged("post_install", "post_install_l10n", "-at_install", "l10n_pe_lib")
 class TestPeReportsLibTransaction(TestStockValuationCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def get_default_groups(cls):
@@ -23,15 +28,14 @@ class TestPeReportsLibTransaction(TestStockValuationCommon):
         cls.env.company['country_id'] = cls.env.ref("base.pe")
         cls.env.company['vat'] = "20512528458"
         cls.env.company['l10n_pe_financial_statement_type'] = '01'
-        cls.env.company.partner_id.l10n_latam_identification_type_id = cls.env.ref("l10n_pe.it_RUC")
-        cls.env.company.cost_method = 'fifo'
         cls.product_a = cls.env['product.product'].create({
             'name': 'Product A',
             'default_code': 'A_A&A',
             'l10n_pe_type_of_existence': '1',
             'unspsc_code_id': cls.env['product.unspsc.code'].search([], limit=1).id,
-            'uom_id': cls.env.ref('uom.product_uom_unit').id,
+            'uom_id': cls.env.ref('uom.product_uom_unit').id
         })
+        cls.env.company.cost_method = 'fifo'
         cls.product_a.product_tmpl_id.categ_id = cls.env['product.category'].create({'name': 'Test category A', 'property_cost_method': 'average'})
 
         cls.picking_type_in = cls.env['stock.picking.type'].search([('code', '=', 'incoming'), ('company_id', '=', cls.env.company.id)], limit=1)
@@ -45,15 +49,7 @@ class TestPeReportsLibTransaction(TestStockValuationCommon):
         cls.default_options = cls._generate_options_standalone(cls.report, '2024-01-01', '2024-12-31')
         cls.default_options['date']['period_type'] = 'year'
 
-        cls.report._init_currency_table(cls.default_options)
-        currency_table_query = {
-            'join': cls.report._currency_table_aml_join(cls.default_options),
-            'balance': cls.report._currency_table_apply_rate(SQL("account_move_line.balance")),
-            'debit': cls.report._currency_table_apply_rate(SQL("account_move_line.debit")),
-            'credit': cls.report._currency_table_apply_rate(SQL("account_move_line.credit")),
-            'residual': cls.report._currency_table_apply_rate(SQL("account_move.amount_residual")),
-        }
-        cls.report_args = [cls.default_options, currency_table_query]
+        cls.report_args = [cls.default_options]
 
     # Required to get around an access error
     @classmethod
@@ -82,8 +78,6 @@ class TestPeReportsLibTransaction(TestStockValuationCommon):
             'date': {
                 'date_from': date_from_str,
                 'date_to': date_to_str,
-                'mode': 'range',
-                'filter': 'custom',
             },
             'show_account': True,
             'show_currency': True,
@@ -91,6 +85,7 @@ class TestPeReportsLibTransaction(TestStockValuationCommon):
         })
 
     def test_lib_3_7(self):
+        self.env['product.value'].search([('product_id', '=', self.product_a.id)]).unlink()
         with freeze_time('2023-06-01'):     # Before the report period, should still be reported
             self._make_in_move(self.product_a, 13, unit_cost=100)
             self._make_in_move(self.product_a, 1, unit_cost=150)
@@ -100,7 +95,6 @@ class TestPeReportsLibTransaction(TestStockValuationCommon):
         with freeze_time('2025-06-01'):     # After the report period, should not be reported
             self._make_out_move(self.product_a, 10)
         report_data = self.handler._l10n_pe_get_lib_3_7_data(*self.report_args)
-        self.maxDiff = None
         self.assertEqual([OrderedDict(data) for data in report_data], [OrderedDict({
                 'report_date': '20241231',
                 'catalog_code': '1',

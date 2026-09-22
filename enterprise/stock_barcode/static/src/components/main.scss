@@ -35,7 +35,7 @@
             align-items: center;
             flex: 1 1 60%;
             max-width: 200px;
-            .fa-exclamation-triangle {
+            [data-icon="warning"] {
                 opacity: 0.8;
             }
         }
@@ -68,9 +68,8 @@
 
         .o_barcode_location_group {
             &:last-child {
-                box-shadow: 0 3px 6px adjust-color($o-shadow-color, $lightness: 50);
                 // margin-bottom needed for enable scrolling for the last element.
-                margin-bottom: 60vh;
+                margin-bottom: 20vh;
             }
 
             .o_barcode_location_line {
@@ -80,7 +79,6 @@
 
                 .o_location_name {
                     display: inline-block;
-                    direction: rtl;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     text-wrap: nowrap;
@@ -107,7 +105,8 @@
     // =====================================
     .o_barcode_control {
         width: 100%;
-        box-shadow: 0 -3px 10px $gray-300;
+        border-top: 1px solid $border-color;
+
         > .btn {
             flex: 1 1 0px;
             @media (min-height: 800px) {
@@ -124,7 +123,7 @@
     // Line form
     // =====================================
     .o_barcode_line_form {
-        margin-bottom: 36px;
+        margin-bottom: 4em;
         font-size: 1.2em;
 
         @include media-breakpoint-down(md) {
@@ -173,7 +172,7 @@
                     border-radius: var(--border-radius);
                 }
 
-                [name="qty_done"], [name="inventory_quantity"], [name="product_uom_id"] {
+                [name="qty_done"], [name="inventory_quantity"], [name="uom_id"] {
                     margin-bottom: 0;
 
                     & .o_input {
@@ -181,13 +180,13 @@
                     }
                 }
 
-                :not(td)[name="product_uom_id"] {
+                :not(td)[name="uom_id"] {
                     height: 100%;
                     margin-bottom: 0;
                     font-size: 2rem;
                 }
 
-                [name="product_uom_id"] .o-autocomplete, .o_field_many2one_selection, .o_field_many2one_selection input {
+                [name="uom_id"] .o-autocomplete, .o_field_many2one_selection, .o_field_many2one_selection input {
                     height: 100%;
                 }
 

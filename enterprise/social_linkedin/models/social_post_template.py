@@ -14,9 +14,12 @@ class SocialPostTemplate(models.Model):
         'LinkedIn Message', compute='_compute_message_by_media',
         store=True, readonly=False)
     linkedin_image_ids = fields.Many2many(
-        'ir.attachment', 'template_linkedin_image_ids_rel', string='LinkedIn Images',
+        'social.post.image', 'template_linkedin_image_ids_rel', string='LinkedIn Images',
         help='Will attach images to your posts.',
         compute='_compute_images_by_media', store=True, readonly=False, bypass_search_access=True)
+    linkedin_first_comment = fields.Text(
+        'LinkedIn First Comment', compute='_compute_first_comment_by_media',
+        store=True, readonly=False)
 
     display_linkedin_preview = fields.Boolean('Display LinkedIn Preview', compute='_compute_display_linkedin_preview')
     has_linkedin_account = fields.Boolean('Has LinkedIn Account', compute='_compute_has_linkedin_account')
@@ -43,7 +46,7 @@ class SocialPostTemplate(models.Model):
                 and post.has_linkedin_account
             )
 
-    @api.depends(lambda self: ['linkedin_message', 'linkedin_image_ids', 'display_linkedin_preview'] + self._get_post_message_modifying_fields())
+    @api.depends(lambda self: ['linkedin_message', 'linkedin_image_ids', 'display_linkedin_preview', 'social_post_mentions', 'linkedin_first_comment'] + self._get_post_message_modifying_fields())
     def _compute_linkedin_preview(self):
         for post in self:
             if not post.display_linkedin_preview:
@@ -54,8 +57,8 @@ class SocialPostTemplate(models.Model):
             link_preview = {}
             if post.linkedin_image_ids:
                 image_urls = [
-                    f'/web/image/{image._origin.id or image.id}'
-                    for image in post.linkedin_image_ids.sorted(lambda image: image._origin.id or image.id, reverse=True)
+                    f'/web/image/social.post.image/{image._origin.id or image.id}/raw'
+                    for image in post.linkedin_image_ids.sorted(lambda image: (image.sequence, image._origin.id or image.id))
                 ]
             elif url := self.env["social.post"]._extract_url_from_message(post.linkedin_message):
                 preview = self.env["mail.link.preview"].sudo()._search_or_create_from_url(url)
@@ -72,6 +75,7 @@ class SocialPostTemplate(models.Model):
                     post.linkedin_message,
                     'linkedin',
                     **{field: post[field] for field in post._get_post_message_modifying_fields()}),
+                'linkedin_first_comment': post.linkedin_first_comment,
                 'image_urls': image_urls,
                 'link_preview': link_preview,
             })
@@ -85,3 +89,8 @@ class SocialPostTemplate(models.Model):
     def _images_fields(self):
         """Return the images field per media."""
         return {**super()._images_fields(), 'linkedin': 'linkedin_image_ids'}
+
+    @api.model
+    def _first_comment_fields(self):
+        """Return the "first comment" field per media."""
+        return {**super()._first_comment_fields(), 'linkedin': 'linkedin_first_comment'}

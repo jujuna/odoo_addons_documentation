@@ -65,58 +65,40 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_nl'))]"/>
         <field name="company_id" ref="base.demo_company_nl"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="l10n_nl_hr_payroll/static/img/hr_employe_lotte.jpg"/>
-    </record>
-
-    <record id="nl_res_bank_ing" model="res.bank">
-        <field name="name">ING</field>
-        <field name="bic">INGBNL2AXXX</field>
-        <field name="street">ING Straat</field>
-        <field name="city">Almere</field>
-        <field name="zip">6899QO</field>
-        <field name="state" ref="base.state_nl_fl"/>
-        <field name="country" ref="base.nl"/>
-        <field name="phone">09 99287728</field>
-    </record>
-    <record id="nl_res_bank_ing" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_nl_hr_payroll.nl_res_bank_ing')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="nl_res_bank_rabobank" model="res.bank">
-        <field name="name">Rabobank</field>
-        <field name="bic">RABONL2UXXX</field>
-        <field name="street">Rabobank laan</field>
-        <field name="city">Burgum</field>
-        <field name="zip">2699QO</field>
-        <field name="state" ref="base.state_nl_fr"/>
-        <field name="country" ref="base.nl"/>
-        <field name="phone">09 99023978</field>
-    </record>
-    <record id="nl_res_bank_rabobank" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_nl_hr_payroll.nl_res_bank_rabobank')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="image_1920" type="bytes" file="l10n_nl_hr_payroll/static/img/hr_employe_lotte.jpg"/>
     </record>
 
     <record id="res_partner_bank_account_wouter" model="res.partner.bank">
-        <field name="acc_number">NL02INGB0023456789</field>
+        <field name="account_number">NL02INGB0023456789</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_nl_hr_payroll.nl_res_bank_ing"/>
+        <field name="bank_name">ING</field>
+        <field name="bank_bic">INGBNL2AXXX</field>
+        <field name="street">ING Straat</field>
+        <field name="city">Almere</field>
+        <field name="zip">6899QO</field>
+        <field name="state_id" ref="base.state_nl_fl"/>
+        <field name="country_id" ref="base.nl"/>
         <field name="partner_id" ref="l10n_nl_hr_payroll.res_partner_wouter"/>
         <field name="company_id" ref="base.demo_company_nl"/>
-        <field name="currency_id" ref="base.EUR"/>
     </record>
 
     <record id="res_partner_bank_account_lotte" model="res.partner.bank">
-        <field name="acc_number">NL02RABO0123456789</field>
+        <field name="account_number">NL02RABO0123456789</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_nl_hr_payroll.nl_res_bank_rabobank"/>
+        <field name="bank_name">Rabobank</field>
+        <field name="bank_bic">RABONL2UXXX</field>
+        <field name="street">Rabobank laan</field>
+        <field name="city">Burgum</field>
+        <field name="zip">2699QO</field>
+        <field name="state_id" ref="base.state_nl_fr"/>
+        <field name="country_id" ref="base.nl"/>
         <field name="partner_id" ref="l10n_nl_hr_payroll.res_partner_lotte"/>
         <field name="company_id" ref="base.demo_company_nl"/>
-        <field name="currency_id" ref="base.EUR"/>
     </record>
 
     <record id="hr_employee_wouter" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_nl_hr_payroll.res_partner_wouter')).name"/>
-        <field name="image_1920" type="base64" file="l10n_nl_hr_payroll/static/img/hr_employee_wouter.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_nl_hr_payroll/static/img/hr_employee_wouter.jpg"/>
         <field name="work_phone">09 99437379</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_nl_hr_payroll.res_partner_wouter')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_nl_hr_payroll.res_partner_wouter"/>
@@ -141,7 +123,6 @@
         <field name="emergency_phone">09 99676812</field>
         <field name="certificate">bachelor</field>
         <field name="study_field">Mechanical Engineering</field>
-        <field name="study_school">TU Delft</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_nl_hr_payroll.res_partner_bank_account_wouter'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -153,12 +134,13 @@
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_nl').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <record id="hr_employee_lotte" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_nl_hr_payroll.res_partner_lotte')).name"/>
         <field name="job_title">Software Developer</field>
-        <field name="image_1920" type="base64" file="l10n_nl_hr_payroll/static/img/hr_employe_lotte.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_nl_hr_payroll/static/img/hr_employe_lotte.jpg"/>
         <field name="work_phone">09 99896249</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_nl_hr_payroll.res_partner_lotte')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_nl_hr_payroll.hr_employee_wouter"/>
@@ -184,7 +166,6 @@
         <field name="emergency_phone">09 99326891</field>
         <field name="certificate">master</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Utrecht University</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_nl_hr_payroll.res_partner_bank_account_lotte'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -197,6 +178,7 @@
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-2, month=1, day=1))"/>
         <field name="contract_date_end" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-2))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_nl').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <function name="create_version" model="hr.employee">

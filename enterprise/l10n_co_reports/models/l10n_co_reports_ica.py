@@ -16,7 +16,7 @@ class L10n_CoIcaReportHandler(models.AbstractModel):
 
     def _get_query_results(self, report, options, domain, expanded=False):
         queries = []
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
 
             query = report._get_report_query(column_group_options, 'strict_range', domain=domain)
             bimestre_expression = SQL('FLOOR((EXTRACT(MONTH FROM account_move_line.date) + 1) / 2)')
@@ -36,16 +36,9 @@ class L10n_CoIcaReportHandler(models.AbstractModel):
             queries.append(SQL(
                 """
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     SUM(account_move_line.credit - account_move_line.debit) AS balance,
-                    SUM(CASE
-                        WHEN account_move_line.credit > 0
-                            THEN account_move_line.tax_base_amount
-                        WHEN account_move_line.debit > 0
-                            THEN account_move_line.tax_base_amount * -1
-                        ELSE 0
-                        END
-                    ) AS tax_base_amount,
+                    SUM(account_move_line.tax_base_amount) AS tax_base_amount,
                     %(expanded_columns)s
                     rp.id AS partner_id,
                     rp.name AS partner_name
@@ -56,7 +49,7 @@ class L10n_CoIcaReportHandler(models.AbstractModel):
                 GROUP BY rp.id %(expanded_groupby)s
                 %(expanded_having)s
                 """,
-                column_group_key=column_group_key,
+                column_group_index=column_group_index,
                 expanded_columns=expanded_columns,
                 table_references=query.from_clause,
                 expanded_groupby=SQL(', %s, %s', bimestre_expression, ica_type_expression) if expanded else SQL(),
@@ -75,7 +68,7 @@ class L10n_CoIcaReportHandler(models.AbstractModel):
             domain += [('tax_line_id.l10n_co_edi_type.code', '=', '07')]
         return domain
 
-    def _report_expand_unfoldable_line_ica(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_ica(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         report = self.env['account.report'].browse(options['report_id'])
         domain = self._get_domain(report, options, line_dict_id=line_dict_id)
         query_results = self._get_query_results(report, options, domain, expanded=True)

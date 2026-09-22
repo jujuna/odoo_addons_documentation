@@ -14,6 +14,8 @@ from odoo.tools.misc import NON_BREAKING_SPACE
 
 @tagged('commission_purchase', 'post_install', '-at_install')
 class TestPurchaseOrder(TestCommissionsSetup):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_automatic_confirm(self):
         """Only purchase orders within the frequency date range and
         where the amount_total is greater than the limit configure on the company should be confirmed.
@@ -86,8 +88,12 @@ class TestPurchaseOrder(TestCommissionsSetup):
         self.referrer.commission_plan_id = self.gold_plan
         self.referrer.grade_id = self.gold
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True),
-                    view=self.env.ref('sale_subscription.sale_subscription_primary_form_view'))
+        form = Form(
+            self.env['sale.order']
+                .with_user(self.salesman)
+                .with_context(default_subscription_state='1_draft'),
+            view=self.env.ref('sale_subscription.sale_subscription_primary_form_view')
+        )
         form.partner_id = self.customer
         form.partner_invoice_id = self.customer
         form.partner_shipping_id = self.customer
@@ -126,7 +132,7 @@ class TestPurchaseOrder(TestCommissionsSetup):
         self.referrer.grade_id = self.gold
 
         def make_orders(product, so_sales_rep=None, sub_sales_rep=None):
-            form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+            form = Form(self.env['sale.order'].with_user(self.salesman))
             form.partner_id = self.customer
             form.referrer_id = self.referrer
             if so_sales_rep:
@@ -214,6 +220,26 @@ class TestPurchaseOrder(TestCommissionsSetup):
         commission_user_2 = user('commission_user_2', self.ref('partner_commission.group_commission_user'))
         commission_manager = user('commission_manager', self.ref('partner_commission.group_commission_manager'))
         purchase_user = user('purchase_user', self.ref('purchase.group_purchase_user'))
+        mixed_purchase_commission_user = self.env['res.users'].create({
+            'name': 'mixed_purchase_commission_user',
+            'login': 'mixed_purchase_commission_user',
+            'email': 'mixed_purchase_commission_user@example.com',
+            'company_id': self.company.id,
+            'group_ids': [(6, 0, [
+                self.ref('purchase.group_purchase_user'),
+                self.ref('partner_commission.group_commission_user'),
+            ])],
+        })
+        mixed_purchase_commission_manager = self.env['res.users'].create({
+            'name': 'mixed_purchase_commission_manager',
+            'login': 'mixed_purchase_commission_manager',
+            'email': 'mixed_purchase_commission_manager@example.com',
+            'company_id': self.company.id,
+            'group_ids': [(6, 0, [
+                self.ref('purchase.group_purchase_user'),
+                self.ref('partner_commission.group_commission_manager'),
+            ])],
+        })
 
         po = self.env['purchase.order'].create({
             'partner_id': self.customer.id,
@@ -239,7 +265,7 @@ class TestPurchaseOrder(TestCommissionsSetup):
         self.assertTrue(commission_manager.has_group('partner_commission.group_commission_user'))
 
         # group_purchase_user: can access procurement.
-        assert_access_allowed([purchase_user])
+        assert_access_allowed([purchase_user, mixed_purchase_commission_user, mixed_purchase_commission_manager])
         # other groups cannot.
         assert_access_denied([salesman_own_docs, salesman_all_docs, commission_user_1, commission_manager])
 

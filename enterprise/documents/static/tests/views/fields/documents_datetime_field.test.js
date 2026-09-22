@@ -31,12 +31,12 @@ test("Document datetime in form", async () => {
     expect(
         ".o_field_widget[name=datetime] div[title='A datetime']:contains(02/08/2017)"
     ).toHaveCount(1);
-    await contains(".o_field_widget[name=datetime] .fa-edit").click();
+    await contains(".o_field_widget[name=datetime] [data-icon='edit']").click();
     await contains(".o_date_item_cell:contains(27)").click();
     await contains("button:contains(Apply)").click();
     expect(".o_field_widget[name=datetime]:contains(01/27/2017)").toHaveCount(1);
     expect(".o_field_widget[name=datetime]:contains(/)").toHaveCount(1);
-    await contains(".o_field_widget[name=datetime] .fa-times").click();
+    await contains(".o_field_widget[name=datetime] [data-icon='close']").click();
     expect(".o_field_widget[name=datetime]:contains(/)").toHaveCount(0);
 });
 
@@ -52,11 +52,14 @@ test("Document datetime and datetime bouton in form", async () => {
     });
     expect(".o_field_documents_datetime[name=datetime]").toHaveCount(1);
     expect(".o_field_documents_datetime_btn[name=datetime]").toHaveCount(0);
-    await contains(".o_field_widget[name=datetime] .fa-times").click();
+    await contains(".o_field_widget[name=datetime] [data-icon='close']").click();
     expect(".o_field_documents_datetime[name=datetime]").toHaveCount(0);
     expect(".o_field_documents_datetime_btn[name=datetime]").toHaveCount(1);
     expect(".o_field_documents_datetime_btn[name=datetime] button").toHaveClass("btn-primary");
-    expect(".o_field_documents_datetime_btn[name=datetime] i").toHaveClass("fa-calendar");
+    expect(".o_field_documents_datetime_btn[name=datetime] i").toHaveAttribute(
+        "data-icon",
+        "calendar_today"
+    );
 });
 
 test("Document datetime bouton options in form", async () => {
@@ -66,11 +69,14 @@ test("Document datetime bouton options in form", async () => {
         resId: 1,
         arch: `<form>
                     <field name="datetime" widget="documents_datetime_btn"
-                        options="{ 'btn_classes': 'btn-secondary', 'icon': 'plus' }"/>
+                        options="{ 'btn_classes': 'btn-secondary', 'icon': 'add' }"/>
                </form>`,
     });
-    expect(".o_field_documents_datetime_btn[name=datetime] i").toHaveClass("fa-plus");
-    expect(".o_field_documents_datetime_btn[name=datetime] i").not.toHaveClass("fa-calendar");
+    expect(".o_field_documents_datetime_btn[name=datetime] i").toHaveAttribute("data-icon", "add");
+    expect(".o_field_documents_datetime_btn[name=datetime] i").not.toHaveAttribute(
+        "data-icon",
+        "calendar_today"
+    );
     expect(".o_field_documents_datetime_btn[name=datetime] button").toHaveClass("btn-secondary");
     expect(".o_field_documents_datetime_btn[name=datetime] button").not.toHaveClass("btn-primary");
 });

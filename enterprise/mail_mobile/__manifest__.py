@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -24,7 +23,6 @@ This module modifies the mail addon to provide:
         'data/mail_mobile_data.xml',
         'views/res_config_settings_views.xml',
     ],
-    'installable': True,
     'auto_install': ['web_mobile', 'mail_enterprise'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

@@ -2,6 +2,7 @@
 from odoo import _, fields, models
 from odoo.tools import date_utils, SQL
 from odoo.tools.misc import format_date
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
 
 class L10n_VnTaxReportHandler(models.AbstractModel):
@@ -25,14 +26,14 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
         queries = []
 
         # 1) Build the queries to get the months
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             domain = [('move_id.move_type', '=', options['move_type'])]
             query = report._get_report_query(column_group_options, date_scope="strict_range", domain=domain)
             # The joins are there to filter out months for which we would not have any lines in the report.
             queries.append(SQL(
                 """
                   SELECT (date_trunc('month', account_move_line.date::date) + interval '1 month' - interval '1 day')::date AS taxable_month,
-                         %(column_group_key)s                                                                              AS column_group_key
+                         %(column_group_index)s                                                                              AS column_group_index
                     FROM %(table_references)s
                     JOIN account_account_tag_account_move_line_rel account_tag_rel ON account_tag_rel.account_move_line_id = account_move_line.id
                     JOIN account_account_tag account_tag ON account_tag.id = account_tag_rel.account_account_tag_id
@@ -40,7 +41,7 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
                 GROUP BY taxable_month
                 ORDER BY taxable_month DESC
                 """,
-                column_group_key=column_group_key,
+                column_group_index=column_group_index,
                 table_references=query.from_clause,
                 search_condition=query.where_clause,
             ))
@@ -51,37 +52,37 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
         unfold_all = options['export_mode'] == 'print' or options.get('unfold_all')
         for res in self.env.cr.dictfetchall():
             line_id = report._get_generic_line_id('', '', markup=str(res['taxable_month']))
-            month_lines.append({
-                'id': line_id,
-                'name': format_date(self.env, res['taxable_month'], date_format='MMMM y'),
-                'unfoldable': True,
-                'unfolded': line_id in options['unfolded_lines'] or unfold_all,
-                'columns': [report._build_column_dict(None, _column) for _column in options['columns']],
-                'level': 0,
-                'expand_function': '_report_expand_unfoldable_line_l10n_vn_expand_month',
-            })
+            month_lines.append(AccountReportLineData(
+                id=line_id,
+                name=format_date(self.env, res['taxable_month'], date_format='MMMM y'),
+                unfoldable=True,
+                unfolded=line_id in options['unfolded_lines'] or unfold_all,
+                columns=[report._build_column_data(None, column) for column in options['columns']],
+                level=0,
+                expand_function='_report_expand_unfoldable_line_l10n_vn_expand_month',
+            ))
 
         return month_lines
 
     # Second level, tax group rows
-    def _report_expand_unfoldable_line_l10n_vn_expand_month(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_l10n_vn_expand_month(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         """ Used to expand a month line and load the second level, being the tax groups lines. """
         report = self.env['account.report'].browse(options['report_id'])
         month = report._get_markup(line_dict_id)
-        tax_group_lines_values = self._query_tax_groups(options, report, month, offset)
-        return self._get_report_expand_unfoldable_line_value(report, options, line_dict_id, progress, tax_group_lines_values,
+        tax_group_lines_values = self._query_tax_groups(options, report, month)
+        return self._get_report_expand_unfoldable_line_value(report, options, line_dict_id, tax_group_lines_values,
+                                                             limit_to_load, 1, groupby, '_report_expand_unfoldable_line_l10n_vn_expand_month',
                                                              report_line_method=self._get_report_line_tax_group)
 
-    def _query_tax_groups(self, options, report, month, offset):
+    def _query_tax_groups(self, options, report, month):
         """ Query the values for the tax group line.
         The tax group line will sum up the values for the different columns, while being filtered by the month only.
         """
-        limit = report.load_more_limit + 1 if report.load_more_limit and options['export_mode'] != 'print' else None
         # Month is already set to the last day of the month.
         end_date = fields.Date.from_string(month)
         start_date = date_utils.start_of(end_date, 'month')
         queries = []
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             domain = [
                 ('move_id.move_type', '=', options['move_type']),
                 # Make sure to only fetch records that are in the parent's row month
@@ -89,29 +90,23 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
                 ('date', '<=', end_date),
             ]
             query = report._get_report_query(column_group_options, date_scope="strict_range", domain=domain)
-            tag_rel_alias = query.left_join(query.table, 'id', 'account_account_tag_account_move_line_rel', 'account_move_line_id', 'tag_rel')
-            tag_alias = query.left_join(tag_rel_alias, 'account_account_tag_id', 'account_account_tag', 'id', 'tag')
-            tail_query = report._get_engine_query_tail(offset, limit)
+            tag_t = query.table._sudo()._join('tax_tag_ids')
             queries.append(SQL(
                 """
-                  SELECT %(column_group_key)s AS column_group_key,
+                  SELECT %(column_group_index)s AS column_group_index,
                          %(account_tag_name)s                                                                               AS tag_name,
                          SUM(account_move_line.tax_base_amount)                                                             AS tax_base_amount,
                          SUM(%(balance_select)s * CASE WHEN %(balance_negate)s THEN -1 ELSE 1 END)                          AS balance
                     FROM %(table_references)s
-                    %(currency_table_join)s
                    WHERE %(search_condition)s
                 GROUP BY %(account_tag_name)s
-                %(tail_query)s
                 """,
-                balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-                column_group_key=column_group_key,
-                account_tag_name=self.env['account.account.tag']._field_to_sql(tag_alias, 'name', query),
-                balance_negate=self.env['account.account.tag']._field_to_sql(tag_alias, 'balance_negate', query),
+                balance_select=query.table.consolidation_balance,
+                column_group_index=column_group_index,
+                account_tag_name=tag_t.name,
+                balance_negate=tag_t.balance_negate,
                 table_references=query.from_clause,
-                currency_table_join=report._currency_table_aml_join(column_group_options),
                 search_condition=query.where_clause,
-                tail_query=tail_query,
             ))
 
         self.env.cr.execute(SQL(" UNION ALL ").join(queries))
@@ -127,11 +122,11 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
                 if tax_group not in lines_values:
                     lines_values[tax_group] = {
                         'name': tax_group_values['name'],
-                        values['column_group_key']: {
-                            'column_group_key': values['column_group_key'],
+                        values['column_group_index']: {
+                            'column_group_index': values['column_group_index'],
                         }
                     }
-                self._eval_report_grids_map(options, tax_group, values, column_values=lines_values[tax_group][values['column_group_key']])
+                self._eval_report_grids_map(options, tax_group, values, column_values=lines_values[tax_group][values['column_group_index']])
         return lines_values
 
     def _get_report_line_tax_group(self, report, options, tax_group, line_values, parent_line_id):
@@ -139,33 +134,34 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
         line_columns = self._get_line_column(report, options, line_values)
         line_id = report._get_generic_line_id('', '', markup=tax_group, parent_line_id=parent_line_id)
         unfold_all = options['export_mode'] == 'print' or options.get('unfold_all')
-        return {
-            'id': line_id,
-            'parent_id': parent_line_id,
-            'name': line_values['name'],
-            'unfoldable': True,
-            'unfolded': line_id in options['unfolded_lines'] or unfold_all,
-            'columns': line_columns,
-            'level': 1,
-            'expand_function': '_report_expand_unfoldable_line_l10n_vn_expand_tax_group',
-        }
+        return AccountReportLineData(
+            id=line_id,
+            parent_id=parent_line_id,
+            name=line_values['name'],
+            unfoldable=True,
+            unfolded=line_id in options['unfolded_lines'] or unfold_all,
+            columns=line_columns,
+            level=1,
+            expand_function='_report_expand_unfoldable_line_l10n_vn_expand_tax_group',
+        )
 
-    def _report_expand_unfoldable_line_l10n_vn_expand_tax_group(self, line_dict_id, groupby, options, progess, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_l10n_vn_expand_tax_group(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         """ Used to expand a tax group line and load the third level, being the account moves lines. """
         report = self.env['account.report'].browse(options['report_id'])
         month = report._parse_line_id(line_dict_id)[1][0]
         tax_group = report._get_markup(line_dict_id)
-        lines_values = self._query_moves(options, report, tax_group, month, offset)
-        return self._get_report_expand_unfoldable_line_value(report, options, line_dict_id, progess, lines_values, report_line_method=self._get_report_line_move)
+        lines_values = self._query_moves(options, report, tax_group, month)
+        return self._get_report_expand_unfoldable_line_value(report, options, line_dict_id, lines_values,
+                                                             limit_to_load, 2, groupby, '_report_expand_unfoldable_line_l10n_vn_expand_tax_group',
+                                                             report_line_method=self._get_report_line_move)
 
-    def _query_moves(self, options, report, tax_group, month, offset):
+    def _query_moves(self, options, report, tax_group, month):
         """ Fetches the moves for a given month and returns a dictionary mapping partner ids to line values. """
-        limit = report.load_more_limit + 1 if report.load_more_limit and options['export_mode'] != 'print' else None
         end_date = fields.Date.from_string(month)
         start_date = date_utils.start_of(end_date, 'month')
         tax_groups = [grid for grids in options['tax_groups'][tax_group]['report_grids_map'].values() for grid in grids]
         queries = []
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             domain = [
                 ('move_id.move_type', '=', options['move_type']),
                 # Make sure to only fetch records that are in the parent's row month
@@ -173,13 +169,11 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
                 ('date', '<=', end_date),
             ]
             query = report._get_report_query(column_group_options, date_scope="strict_range", domain=domain)
-            tag_rel_alias = query.left_join(query.table, 'id', 'account_account_tag_account_move_line_rel', 'account_move_line_id', 'tag_rel')
-            tag_alias = query.left_join(tag_rel_alias, 'account_account_tag_id', 'account_account_tag', 'id', 'tag')
-            tail_query = report._get_engine_query_tail(offset, limit)
+            tag_t = query.table._sudo()._join('tax_tag_ids')
             invoice_number_column = SQL('l10n_vn_e_invoice_number' if options['move_type'] == 'out_invoice' else 'payment_reference')
             queries.append(SQL(
                 """
-                  SELECT %(column_group_key)s                                                                               AS column_group_key,
+                  SELECT %(column_group_index)s                                                                               AS column_group_index,
                          partner.name                                                                                       AS partner_name,
                          partner.vat                                                                                        AS vat,
                          %(account_tag_name)s                                                                               AS tag_name,
@@ -191,22 +185,18 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
                          SUM(%(balance_select)s * CASE WHEN %(balance_negate)s THEN -1 ELSE 1 END)                          AS balance
                     FROM %(table_references)s
                     JOIN res_partner partner ON partner.id = account_move_line.partner_id
-                    %(currency_table_join)s
                    WHERE %(search_condition)s
                      AND %(account_tag_name)s = ANY(%(tax_groups)s)
                 GROUP BY partner.id, account_move_line__move_id.id, %(account_tag_name)s
-                %(tail_query)s
                 """,
-                balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-                column_group_key=column_group_key,
-                account_tag_name=self.env['account.account.tag']._field_to_sql(tag_alias, 'name', query),
-                balance_negate=self.env['account.account.tag']._field_to_sql(tag_alias, 'balance_negate', query),
+                balance_select=query.table.consolidation_balance,
+                column_group_index=column_group_index,
+                account_tag_name=tag_t.name,
+                balance_negate=tag_t.balance_negate,
                 invoice_number_column=invoice_number_column,
                 table_references=query.from_clause,
                 search_condition=query.where_clause,
-                currency_table_join=report._currency_table_aml_join(column_group_options),
                 tax_groups=tax_groups,
-                tail_query=tail_query,
             ))
 
         self.env.cr.execute(SQL(" UNION ALL ").join(queries))
@@ -219,8 +209,8 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
             if values['move_id'] not in lines_values:
                 lines_values[values['move_id']] = {
                     'name': values['move_name'],
-                    values['column_group_key']: {
-                        'column_group_key': values['column_group_key'],
+                    values['column_group_index']: {
+                        'column_group_index': values['column_group_index'],
                         'move_id': values['move_id'],
                         'move_name': values['move_name'],
                         'ref': values['move_ref'],
@@ -230,7 +220,7 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
                         'tax_id': values['vat'],
                     }
                 }
-            self._eval_report_grids_map(options, tax_group, values, column_values=lines_values[values['move_id']][values['column_group_key']])
+            self._eval_report_grids_map(options, tax_group, values, column_values=lines_values[values['move_id']][values['column_group_index']])
 
         return self._filter_lines_with_values(options, tax_group, lines_values)
 
@@ -240,37 +230,38 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
         line_columns = self._get_line_column(report, options, line_values)
         line_id = report._get_generic_line_id('account.move', move_id, parent_line_id=parent_line_id)
         unfold_all = options['export_mode'] == 'print' or options.get('unfold_all')
-        return {
-            'id': line_id,
-            'parent_id': parent_line_id,
-            'name': line_values['name'],
-            'unfoldable': True,
-            'unfolded': line_id in options['unfolded_lines'] or unfold_all,
-            'columns': line_columns,
-            'level': 2,
-            'caret_options': 'account.move',
-            'expand_function': '_report_expand_unfoldable_line_l10n_vn_expand_move',
-        }
+        return AccountReportLineData(
+            id=line_id,
+            parent_id=parent_line_id,
+            name=line_values['name'],
+            unfoldable=True,
+            unfolded=line_id in options['unfolded_lines'] or unfold_all,
+            columns=line_columns,
+            level=2,
+            caret_options='account.move',
+            expand_function='_report_expand_unfoldable_line_l10n_vn_expand_move',
+        )
 
-    def _report_expand_unfoldable_line_l10n_vn_expand_move(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_l10n_vn_expand_move(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         """ Used to expand a move line and load the fourth level, being the account tax lines. """
         report = self.env['account.report'].browse(options['report_id'])
         month = report._parse_line_id(line_dict_id)[1][0]
         tax_group = report._parse_line_id(line_dict_id)[2][0]
         move_id = report._get_res_id_from_line_id(line_dict_id, 'account.move')
-        lines_values = self._query_tax_lines(options, report, move_id, tax_group, month, offset)
-        return self._get_report_expand_unfoldable_line_value(report, options, line_dict_id, progress, lines_values, report_line_method=self._get_report_line_tax)
+        lines_values = self._query_tax_lines(options, report, move_id, tax_group, month)
+        return self._get_report_expand_unfoldable_line_value(report, options, line_dict_id, lines_values,
+                                                             limit_to_load, 3, groupby, '_report_expand_unfoldable_line_l10n_vn_expand_move',
+                                                             report_line_method=self._get_report_line_tax)
 
-    def _query_tax_lines(self, options, report, move_id, tax_group, month, offset):
+    def _query_tax_lines(self, options, report, move_id, tax_group, month):
         """ Query the values for the partner line.
         The move line will sum up the values for the different columns, while being filtered for the given month only.
         """
-        limit = report.load_more_limit + 1 if report.load_more_limit and options['export_mode'] != 'print' else None
         end_date = fields.Date.from_string(month)
         start_date = date_utils.start_of(end_date, 'month')
         tax_groups = [grid for grids in options['tax_groups'][tax_group]['report_grids_map'].values() for grid in grids]
         queries = []
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             domain = [
                 ('move_id.move_type', '=', options['move_type']),
                 # Make sure to only fetch records that are in the parent's row month
@@ -279,35 +270,29 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
                 ('move_id', '=', move_id),
             ]
             query = report._get_report_query(column_group_options, date_scope="strict_range", domain=domain)
-            tag_rel_alias = query.left_join(query.table, 'id', 'account_account_tag_account_move_line_rel', 'account_move_line_id', 'tag_rel')
-            tag_alias = query.left_join(tag_rel_alias, 'account_account_tag_id', 'account_account_tag', 'id', 'tag')
-            tail_query = report._get_engine_query_tail(offset, limit)
+            tag_t = query.table._sudo()._join('tax_tag_ids')
             queries.append(SQL(
                 """
-                  SELECT %(column_group_key)s                                                                               AS column_group_key,
+                  SELECT %(column_group_index)s                                                                               AS column_group_index,
                          account_tax.id                                                                                     AS tax_id,
                          REGEXP_REPLACE(%(account_tax_description)s, '(<([^>]+)>)', '', 'g')                                AS tax_description,
                          %(account_tag_name)s                                                                               AS tag_name,
-                         account_move_line.tax_base_amount                                                                  AS untaxed_amount,
+                         ABS(account_move_line.tax_base_amount)                                                             AS untaxed_amount,
                          SUM(%(balance_select)s * CASE WHEN %(balance_negate)s THEN -1 ELSE 1 END)                          AS balance
                     FROM %(table_references)s
                     JOIN account_tax account_tax ON account_tax.id = account_move_line.tax_line_id
-                    %(currency_table_join)s
                    WHERE %(search_condition)s
                      AND %(account_tag_name)s = ANY(%(tax_groups)s)
                 GROUP BY %(account_tag_name)s, account_tax.id, account_move_line.id
-                %(tail_query)s
                 """,
-                balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-                column_group_key=column_group_key,
+                balance_select=query.table.consolidation_balance,
+                column_group_index=column_group_index,
                 account_tax_description=self.env['account.tax']._field_to_sql('account_tax', 'description', query),
-                account_tag_name=self.env['account.account.tag']._field_to_sql(tag_alias, 'name', query),
-                balance_negate=self.env['account.account.tag']._field_to_sql(tag_alias, 'balance_negate', query),
+                account_tag_name=tag_t.name,
+                balance_negate=tag_t.balance_negate,
                 table_references=query.from_clause,
-                currency_table_join=report._currency_table_aml_join(column_group_options),
                 search_condition=query.where_clause,
                 tax_groups=tax_groups,
-                tail_query=tail_query,
             ))
 
         self.env.cr.execute(SQL(" UNION ALL ").join(queries))
@@ -322,13 +307,13 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
             if values['tax_id'] not in lines_values:
                 lines_values[values['tax_id']] = {
                     'name': values['tax_description'],
-                    values['column_group_key']: {
-                        'column_group_key': values['column_group_key'],
+                    values['column_group_index']: {
+                        'column_group_index': values['column_group_index'],
                         # Because we group by tax line, we need to find the untaxed amount from the tax
                         'untaxed_amount': values['untaxed_amount'],
                     }
                 }
-            self._eval_report_grids_map(options, tax_group, values, column_values=lines_values[values['tax_id']][values['column_group_key']])
+            self._eval_report_grids_map(options, tax_group, values, column_values=lines_values[values['tax_id']][values['column_group_index']])
 
         return self._filter_lines_with_values(options, tax_group, lines_values)
 
@@ -336,41 +321,38 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
         """ Format the given values to match the report line format. """
         line_columns = self._get_line_column(report, options, line_values)
         line_id = report._get_generic_line_id('account.tax', tax_id, parent_line_id=parent_line_id)
-        return {
-            'id': line_id,
-            'parent_id': parent_line_id,
-            'name': line_values['name'],
-            'unfoldable': False,
-            'unfolded': False,
-            'columns': line_columns,
-            'level': 3,
-            'caret_options': 'account.tax',
-        }
+        return AccountReportLineData(
+            id=line_id,
+            parent_id=parent_line_id,
+            name=line_values['name'],
+            unfoldable=False,
+            unfolded=False,
+            columns=line_columns,
+            level=3,
+            caret_options='account.tax',
+        )
 
     def _build_grand_total_line(self, report, options):
         """ The grand total line is the sum of all values in the given reporting period. """
         queries = []
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             domain = [('move_id.move_type', '=', options['move_type'])]
             query = report._get_report_query(column_group_options, date_scope="strict_range", domain=domain)
-            tag_rel_alias = query.left_join(query.table, 'id', 'account_account_tag_account_move_line_rel', 'account_move_line_id', 'tag_rel')
-            tag_alias = query.left_join(tag_rel_alias, 'account_account_tag_id', 'account_account_tag', 'id', 'tag')
+            tag_t = query.table._sudo()._join('tax_tag_ids')
             queries.append(SQL(
                 """
-                  SELECT %(column_group_key)s                                                                               AS column_group_key,
+                  SELECT %(column_group_index)s                                                                               AS column_group_index,
                          %(account_tag_name)s                                                                               AS tag_name,
                          SUM(%(balance_select)s * CASE WHEN %(balance_negate)s THEN -1 ELSE 1 END)                          AS balance
                     FROM %(table_references)s
-                    %(currency_table_join)s
                    WHERE %(search_condition)s
-                GROUP BY column_group_key, %(account_tag_name)s
+                GROUP BY column_group_index, %(account_tag_name)s
                 """,
-                balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-                column_group_key=column_group_key,
-                account_tag_name=self.env['account.account.tag']._field_to_sql(tag_alias, 'name', query),
-                balance_negate=self.env['account.account.tag']._field_to_sql(tag_alias, 'balance_negate', query),
+                balance_select=query.table.consolidation_balance,
+                column_group_index=column_group_index,
+                account_tag_name=tag_t.name,
+                balance_negate=tag_t.balance_negate,
                 table_references=query.from_clause,
-                currency_table_join=report._currency_table_aml_join(column_group_options),
                 search_condition=query.where_clause,
             ))
         self.env.cr.execute(SQL(" UNION ALL ").join(queries))
@@ -383,60 +365,58 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
         """
         lines_values = {}
         for values in data_dict:
-            if values['column_group_key'] not in lines_values:
-                lines_values[values['column_group_key']] = lines_values
+            if values['column_group_index'] not in lines_values:
+                lines_values[values['column_group_index']] = lines_values
             # Sum the balances on the right expression label.
             # We use a map of tax grids to do that easily
             for tax_group in options['tax_groups']:
-                self._eval_report_grids_map(options, tax_group, values, column_values=lines_values[values['column_group_key']])
+                self._eval_report_grids_map(options, tax_group, values, column_values=lines_values[values['column_group_index']])
         return lines_values
 
     def _get_report_line_grand_total(self, report, options, data):
         """ Format the given values to match the report line format. """
-        return {
-            'id': report._get_generic_line_id('', '', markup='grand_total'),
-            'name': _('Grand Total'),
-            'unfoldable': False,
-            'unfolded': False,
-            'columns': self._get_line_column(report, options, data),
-            'level': 0,
-        }
+        return AccountReportLineData(
+            id=report._get_generic_line_id('', '', markup='grand_total'),
+            name=_('Grand Total'),
+            unfoldable=False,
+            unfolded=False,
+            columns=self._get_line_column(report, options, data),
+            level=0,
+        )
 
-    def _get_report_expand_unfoldable_line_value(self, report, options, line_dict_id, progress, lines_values, *, report_line_method):
+    def _get_report_expand_unfoldable_line_value(self, report, options, line_dict_id, lines_values, limit_to_load, level, groupby, expand_function_name, *, report_line_method):
         lines = []
-        has_more = False
-        treated_results_count = 0
-        next_progress = progress
 
         for line_key, line_values in lines_values.items():
-            if options['export_mode'] != 'print' and report.load_more_limit and treated_results_count == report.load_more_limit:
-                # We loaded one more than the limit on purpose: this way we know we need a "load more" line
-                has_more = True
+            if limit_to_load and len(lines) >= limit_to_load:
                 break
 
             new_line = report_line_method(report, options, line_key, line_values, parent_line_id=line_dict_id)
             lines.append(new_line)
-            next_progress = {
-                column['column_group_key']: line_col.get('no_format', 0)
-                for column, line_col in zip(options['columns'], new_line['columns'])
-                if column['expression_label'] == 'balance'
-            }
-            treated_results_count += 1
 
-        return {
-            'lines': lines,
-            'offset_increment': treated_results_count,
-            'has_more': has_more,
-            'progress': next_progress,
-        }
+        load_more_count = max(len(lines_values) - limit_to_load, 0) if limit_to_load else 0
+        if load_more_count:
+            lines.append(report._create_load_more_line(
+                self.env['account.report.line'],  # little hack since we don't have a real report line here
+                line_dict_id,
+                options,
+                None,
+                load_more_count,
+                level,
+                groupby,
+                expand_function_name,
+                None,
+            ))
+
+        return lines
 
     def _get_line_column(self, report, options, data):
         line_columns = []
         for column in options['columns']:
-            col_value = data[column['column_group_key']].get(column['expression_label'])
-            line_columns.append(report._build_column_dict(
-                col_value=col_value or '',
-                col_data=column,
+            col_value = data[column['column_group_index']].get(column['expression_label'])
+            line_columns.append(report._build_column_data(
+                col_value or '',
+                column,
                 options=options,
             ))
         return line_columns
@@ -454,8 +434,8 @@ class L10n_VnTaxReportHandler(models.AbstractModel):
         lines_with_values = {}
         report_grids_map = options['tax_groups'][tax_group]['report_grids_map']
         for line, value in lines_values.items():
-            for column_group_key in options['column_groups']:
-                if any(value[column_group_key][grid] != 0 for grid in report_grids_map if grid not in ignored_grids):
+            for column_group_index in range(len(options['column_groups'])):
+                if any(value[column_group_index][grid] != 0 for grid in report_grids_map if grid not in ignored_grids):
                     lines_with_values[line] = value
 
         return lines_with_values
@@ -474,35 +454,51 @@ class L10n_VnSalesTaxReportHandler(models.AbstractModel):
                 'tax_0': {
                     'name': _('VAT on sales of goods and services 0%'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed sales of goods and services taxed 0%"],
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_II_a_amount_untaxed").formula.lstrip('-'),
+                        ],
                         'tax_amount': [],
                     },
                 },
                 'tax_5': {
                     'name': _('VAT on sales of goods and services 5%'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed sales of goods and services taxed 5%"],
-                        'tax_amount': ["VAT on sales of goods and services 5%"],
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_II_b_amount_untaxed").formula.lstrip('-')
+                        ],
+                        'tax_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_II_b_balance").formula.lstrip('-')
+                        ],
                     },
                 },
                 'tax_8': {
                     'name': _('VAT on sales of goods and services 8%'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed sales of goods and services taxed 8%"],
-                        'tax_amount': ["VAT on sales of goods and services 8%"],
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_II_c_amount_untaxed_8").formula.lstrip('-')
+                        ],
+                        'tax_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_II_c_balance_8").formula.lstrip('-')
+                        ],
                     },
                 },
                 'tax_10': {
                     'name': _('VAT on sales of goods and services 10%'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed sales of goods and services taxed 10%"],
-                        'tax_amount': ["VAT on sales of goods and services 10%"],
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_II_c_amount_untaxed_10").formula.lstrip('-')
+                        ],
+                        'tax_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_II_c_balance_10").formula.lstrip('-')
+                        ],
                     }
                 },
                 'tax_exempt': {
                     'name': _('VAT Exemption on sales of goods and services'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed sales of goods and services taxed VAT Exemption"],
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_II_1_amount_untaxed").formula.lstrip('-'),
+                        ],
                         'tax_amount': [],
                     }
                 },
@@ -523,35 +519,58 @@ class L10n_VnPurchaseTaxReportHandler(models.AbstractModel):
                 'tax_0': {
                     'name': _('VAT on purchase of goods and services 0%'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed Purchase of Goods and Services taxed 0%", "tax_purchase_import_0_base"],
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_1_amount_untaxed_0").formula.lstrip('-'),
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_a_amount_untaxed_0").formula.lstrip('-'),
+                        ],
                         'tax_amount': [],
                     },
                 },
                 'tax_5': {
                     'name': _('VAT on purchase of goods and services 5%'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed Purchase of Goods and Services taxed 5%", "tax_purchase_import_5_base"],
-                        'tax_amount': ["VAT on purchase of goods and services 5%", "tax_purchase_import_5"],
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_1_amount_untaxed_5").formula.lstrip('-'),
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_a_amount_untaxed_5").formula.lstrip('-')
+                        ],
+                        'tax_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_1_balance_5").formula.lstrip('-'),
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_a_balance_5").formula.lstrip('-')
+                        ],
                     },
                 },
                 'tax_8': {
                     'name': _('VAT on purchase of goods and services 8%'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed Purchase of Goods and Services taxed 8%", "tax_purchase_import_8_base"],
-                        'tax_amount': ["VAT on purchase of goods and services 8%", "tax_purchase_import_8"],
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_1_amount_untaxed_8").formula.lstrip('-'),
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_a_amount_untaxed_8").formula.lstrip('-')
+                        ],
+                        'tax_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_1_balance_8").formula.lstrip('-'),
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_a_balance_8").formula.lstrip('-')
+                        ],
                     },
                 },
                 'tax_10': {
                     'name': _('VAT on purchase of goods and services 10%'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed Purchase of Goods and Services taxed 10%", "tax_purchase_import_10_base"],
-                        'tax_amount': ["VAT on purchase of goods and services 10%", "tax_purchase_import_10"],
-                    }
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_1_amount_untaxed_10").formula.lstrip('-'),
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_a_amount_untaxed_10").formula.lstrip('-')
+                        ],
+                        'tax_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_1_balance_10").formula.lstrip('-'),
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_a_balance_10").formula.lstrip('-')
+                        ],
+                    },
                 },
                 'tax_exempt': {
                     'name': _('VAT on Purchase of Goods and Services Tax Exempt'),
                     'report_grids_map': {
-                        'untaxed_amount': ["Untaxed Purchase of Goods and Services taxed VAT Exemption"],
+                        'untaxed_amount': [
+                            self.env.ref("l10n_vn.form_01_gtgt_report_C_I_1_amount_untaxed_exempt").formula.lstrip('-')
+                        ],
                         'tax_amount': [],
                     }
                 },

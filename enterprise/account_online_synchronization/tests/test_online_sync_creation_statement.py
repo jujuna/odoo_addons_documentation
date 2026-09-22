@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from unittest.mock import MagicMock, patch
 
-from odoo.addons.base.models.res_bank import sanitize_account_number
+from odoo.addons.base.models.res_partner_bank import sanitize_account_number
 from odoo.addons.account_online_synchronization.tests.common import AccountOnlineSynchronizationCommon
 from odoo.exceptions import RedirectWarning
 from odoo.tests import tagged
@@ -11,6 +11,8 @@ from odoo import fields, Command
 
 @tagged('post_install', '-at_install')
 class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -100,7 +102,7 @@ class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
 
         def create_bank_account(account_number, partner_id):
             return self.env['res.partner.bank'].create({
-                'acc_number': account_number,
+                'account_number': account_number,
                 'partner_id': partner_id,
             })
 
@@ -131,7 +133,7 @@ class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
         }
 
         account_link_journal_wizard = self.env['account.bank.selection'].create({'account_online_link_id': self.account_online_link.id})
-        account_link_journal_wizard.with_context(active_model='account.journal', active_id=bank_journal_with_account_gol.id).sync_now()
+        account_link_journal_wizard.with_context(active_model='account.journal', active_id=bank_journal_with_account_gol.id).sync_now(online_account_1.id)
         self.assertEqual(
             online_account_1.id, bank_journal_with_account_gol.account_online_account_id.id,
             "The wizard should have linked the online account to the journal with the same account."
@@ -140,16 +142,14 @@ class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
 
         # Test with no context present, should create a new journal
         previous_number = self.env['account.journal'].search_count([])
-        account_link_journal_wizard.selected_account = online_account_2
-        account_link_journal_wizard.sync_now()
+        account_link_journal_wizard.sync_now(online_account_2.id)
         actual_number = self.env['account.journal'].search_count([])
         self.assertEqual(actual_number, previous_number+1, "should have created a new journal")
         self.assertEqual(online_account_2.journal_ids.currency_id, self.other_currency)
-        self.assertEqual(online_account_2.journal_ids.bank_account_id.sanitized_acc_number, sanitize_account_number('BE61954856342317'))
+        self.assertEqual(online_account_2.journal_ids.bank_account_id.sanitized_account_number, sanitize_account_number('BE61954856342317'))
 
         # Test assigning to a journal in another currency
-        account_link_journal_wizard.selected_account = online_account_3
-        account_link_journal_wizard.with_context(active_model='account.journal', active_id=bank_journal_with_account_usd.id).sync_now()
+        account_link_journal_wizard.with_context(active_model='account.journal', active_id=bank_journal_with_account_usd.id).sync_now(online_account_3.id)
         self.assertEqual(online_account_3.id, bank_journal_with_account_usd.account_online_account_id.id)
         self.assertEqual(bank_journal_with_account_usd.bank_account_id, bank_account_2, "Bank Account should not have changed")
         self.assertEqual(bank_journal_with_account_usd.currency_id, self.other_currency, "Currency should have changed")

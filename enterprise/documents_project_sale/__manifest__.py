@@ -2,7 +2,6 @@
 
 {
     'name': 'Documents - Project - Sale',
-    'version': '1.0',
     'category': 'Productivity/Documents',
     'summary': 'Products Folder Templates',
     'description': """

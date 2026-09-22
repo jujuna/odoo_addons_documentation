@@ -47,7 +47,7 @@ class AccountReport(models.Model):
         """
         if not self.env.company.l10n_sg_unique_entity_number:
             raise UserError(_('Your company must have a UEN.'))
-        if not self.env.company.vat:
+        if not self.env.company.has_vat:
             raise UserError(_('Your company must have a GSTNo.'))
 
         return {
@@ -56,7 +56,7 @@ class AccountReport(models.Model):
             'GSTNo': self.env.company.vat,
             'PeriodStart': date_from,
             'PeriodEnd': date_to,
-            'IAFCreationDate': fields.Date.to_string(fields.Date.today()),
+            'IAFCreationDate': fields.Date.to_string(fields.Date.context_today(self)),
             'ProductVersion': release.product_name + release.version,
             'IAFVersion': IRAS_VERSION
         }
@@ -172,9 +172,9 @@ class AccountReport(models.Model):
         """
         def get_dict_values_from_report_line(line):
             return {
-                'balance': line['columns'][colname_to_idx['balance']]['no_format'],
-                'debit': line['columns'][colname_to_idx['debit']]['no_format'],
-                'credit': line['columns'][colname_to_idx['credit']]['no_format'],
+                'balance': line.columns[colname_to_idx['balance']].no_format,
+                'debit': line.columns[colname_to_idx['debit']].no_format,
+                'credit': line.columns[colname_to_idx['credit']].no_format,
             }
 
         report = self.env.ref('account_reports.general_ledger_report')
@@ -203,20 +203,20 @@ class AccountReport(models.Model):
         init_balance_by_account = {}
         line_account_ids = []
         for line in report_lines:
-            model, res_id = report._get_model_info_from_id(line['id'])
+            model, res_id = report._get_model_info_from_id(line.id)
             if model == 'account.account':
                 line_account_ids.append(res_id)
 
-        accounts_by_ids = {account.id: account for account in self.env['account.account'].browse()(line_account_ids)}
+        accounts_by_ids = {account.id: account for account in self.env['account.account'].browse(line_account_ids)}
 
         for line in report_lines:
-            model, res_id = report._get_model_info_from_id(line['id'])
+            model, res_id = report._get_model_info_from_id(line.id)
             # Find unaffected earnings account as their values are the initial balance since they cannot be unfolded
             if model == 'account.account':
                 if accounts_by_ids[res_id].account_type == 'equity_unaffected':
                     init_balance_by_account[accounts_by_ids[res_id]] = get_dict_values_from_report_line(line)
             elif isinstance(res_id, str) and 'balance_line' in res_id:
-                account_id = report._get_res_id_from_line_id(line['id'], 'account.account')
+                account_id = report._get_res_id_from_line_id(line.id, 'account.account')
                 init_balance_by_account[accounts_by_ids[account_id]] = get_dict_values_from_report_line(line)
 
         all_accounts = self.env['account.account'].search(self.env['account.account']._check_company_domain(company))

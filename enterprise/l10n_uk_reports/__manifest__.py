@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 # Copyright (C) 2011 Smartmode LTD (<http://www.smartmode.co.uk>).
@@ -20,23 +19,20 @@ MTD-VAT API to HMRC.
     ],
     'data': [
         'views/views.xml',
-        "views/res_users_views.xml",
-        'security/ir.model.access.csv',
-        'security/hmrc_security.xml',
+        'views/res_users_views.xml',
         'wizard/hmrc_send_wizard.xml',
         'data/account_return_data.xml',
-        'data/tax_report.xml',
         'data/config_parameter.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [
-            "l10n_uk_reports/static/src/**/*",
-            ],
+            'l10n_uk_reports/static/src/**/*',
+        ],
         'web.assets_unit_tests': [
             'l10n_uk_reports/static/tests/**/*',
         ],
     },
-    'installable': True,
     'auto_install': ['l10n_uk', 'account_reports'],
     'license': 'OEEL-1',
 }

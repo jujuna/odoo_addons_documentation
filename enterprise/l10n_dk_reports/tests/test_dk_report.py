@@ -2,7 +2,7 @@ import csv
 import io
 
 
-from odoo import Command, fields, tools
+from odoo import Command, tools
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.addons.account_reports.models.account_report import AccountReportFileDownloadException
 from odoo.tests import tagged, freeze_time
@@ -10,6 +10,8 @@ from odoo.tests.common import test_xsd
 
 
 class TestDKReportCommon(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('dk')
     def setUpClass(cls):
@@ -22,13 +24,12 @@ class TestDKReportCommon(TestAccountReportsCommon):
             'street': 'Paradisæblevej, 10',
         })
         cls.env['res.partner.bank'].create({
-            'acc_type': 'iban',
             'partner_id': cls.company_data['company'].partner_id.id,
-            'acc_number': 'DK5000400440116243',
+            'account_number': 'DK5000400440116243',
+            'allow_out_payment': True,
         })
         cls.env['res.partner'].create({
             'name': 'Mr Big CEO',
-            'is_company': False,
             'phone': '+45 32 12 34 77',
             'parent_id': cls.company_data['company'].partner_id.id,
         })
@@ -106,13 +107,15 @@ class TestDKReportCommon(TestAccountReportsCommon):
 
     def _generate_xml(cls):
         report = cls.env.ref('account_reports.general_ledger_report')
-        options = cls._generate_options(report, fields.Date.from_string('2021-01-01'), fields.Date.from_string('2021-12-31'))
+        options = cls._generate_options(report, '2021-01-01', '2021-12-31')
         return cls.env[report.custom_handler_model_name].l10n_dk_export_saft_to_xml(options)['file_content']
 
 
 @freeze_time('2022-01-01')
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestDKReport(TestDKReportCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_validate_dk_saft_report_values(self):
         payable_account = self.env['account.chart.template'].ref("dk_coa_7440")
@@ -185,11 +188,11 @@ class TestDKReport(TestDKReportCommon):
         expected_values = (
             # _20230131 is not the export date, but rather the date at which the norm of this csv export was enforced
             ('KONTONUMMER_20230131', 'KONTONAVN_20230131', 'VAERDI_20230131'),
-            ('6190', 'Trade and other receivables', '6250'),
-            ('6560', 'Revaluation reserve', '3000'),
-            ('7441', 'Suppliers of goods and services (short-term) (copy)', '-10000'),
-            ('7680', 'Sales tax', '-1250'),
-            ('7740', 'VAT on purchases', '2000'),
+            ('619000', 'Trade receivables', '6250'),
+            ('656000', 'Reserve for revaluations', '3000'),
+            ('744001', 'Trade payables (short-term) (copy)', '-10000'),
+            ('768000', 'Output VAT', '-1250'),
+            ('774000', 'Input VAT', '2000'),
         )
         for idx, content in enumerate(reader):
             self.assertSequenceEqual(expected_values[idx], content)
@@ -197,6 +200,8 @@ class TestDKReport(TestDKReportCommon):
 
 @tagged('external_l10n', 'post_install', '-at_install', '-standard', 'external')
 class TestDKReportXML(TestDKReportCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @test_xsd(url='https://erhvervsstyrelsen.dk/sites/default/files/2023-01/Danish_SAF-T_Financial_Schema_v_1_0_0.zip')
     def test_xml_validity(self):

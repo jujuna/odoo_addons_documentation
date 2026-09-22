@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
-from odoo.tools import SQL, Query
+from odoo.tools import SQL
 
 
 class BudgetLine(models.Model):
@@ -18,9 +18,14 @@ class BudgetLine(models.Model):
     budget_analytic_id = fields.Many2one('budget.analytic', 'Budget Analytic', ondelete='cascade', index=True, required=True)
     date_from = fields.Date('Start Date', related='budget_analytic_id.date_from', store=True)
     date_to = fields.Date('End Date', related='budget_analytic_id.date_to', store=True)
-    currency_id = fields.Many2one('res.currency', compute='_compute_currency_id', readonly=True)
+    currency_id = fields.Many2one('res.currency', compute='_compute_currency_id', compute_sql='_compute_sql_currency_id', readonly=True, compute_sudo=False)
     budget_amount = fields.Monetary(
-        string='Budgeted')
+        string='Commitment')
+    liquidation_amount = fields.Monetary(
+        string='Liquidation',
+        compute='_compute_liquidation_amount',
+        store=True,
+        readonly=False)
     achieved_amount = fields.Monetary(
         compute='_compute_all',
         string='Achieved',
@@ -51,13 +56,31 @@ class BudgetLine(models.Model):
         for budget in self:
             budget.currency_id = (budget.company_id or self.env.company).currency_id
 
+    def _compute_sql_currency_id(self, table):
+        return SQL(
+            "COALESCE(%s, %s)",
+            table._sudo().company_id.currency_id,
+            self.env.company.currency_id.id,
+        )
+
     @api.depends('achieved_amount', 'budget_amount')
     def _compute_above_budget(self):
         for line in self:
             line.is_above_budget = line.achieved_amount > line.budget_amount
 
+    def _compute_display_name(self):
+        for line in self:
+            analytic_accounts = [
+                line[fname].display_name
+                for fname in line._get_plan_fnames()
+                if line[fname]
+            ]
+            line.display_name = line.budget_analytic_id.name
+            if analytic_accounts:
+                line.display_name = f"{line.display_name}: {'; '.join(analytic_accounts)}"
+
     def _compute_all(self):
-        grouped = dict(self.env['budget.report'].with_context(budget_report_budget_line_ids=self.ids)._read_group(
+        grouped = dict(self.env['budget.report']._read_group(
             domain=[('budget_line_id', 'in', self.ids)],
             groupby=['budget_line_id'],
             aggregates=['achieved:sum'],
@@ -65,7 +88,7 @@ class BudgetLine(models.Model):
         for line in self:
             achieved = grouped.get(line, 0)
             line.achieved_amount = achieved
-            line.achieved_percentage = line.budget_amount and (line.achieved_amount / line.budget_amount)
+            line.achieved_percentage = line.liquidation_amount and (line.achieved_amount / line.liquidation_amount)
 
     @api.depends('date_from', 'date_to')
     def _compute_theoritical_amount(self):
@@ -82,17 +105,12 @@ class BudgetLine(models.Model):
             line.theoritical_amount = line_timedelta and (elapsed_timedelta.total_seconds() / line_timedelta.total_seconds()) * line.budget_amount
             line.theoritical_percentage = line.budget_amount and (line.theoritical_amount / line.budget_amount)
 
-    def _field_to_sql(self, alias: str, field_expr: str, query: (Query | None) = None) -> SQL:
-        if field_expr == 'currency_id':
-            company_alias = query.left_join(alias, 'company_id', 'res_company', 'id', 'company_id')
-            return SQL(
-                "COALESCE(%(company_alias)s.currency_id, %(env_currency_id)s)",
-                company_alias=SQL.identifier(company_alias),
-                env_currency_id=self.env.company.currency_id.id,
-            )
-        return super()._field_to_sql(alias, field_expr, query)
+    @api.depends('budget_amount')
+    def _compute_liquidation_amount(self):
+        for line in self:
+            line.liquidation_amount = line.budget_amount
 
-    def _read_group_select(self, aggregate_spec, query):
+    def _read_group_select(self, table, aggregate_spec):
         # flag achieved_amount/theoritical_amount as aggregatable
         # and manually sum the values from the records in the group
         if aggregate_spec in (
@@ -102,8 +120,8 @@ class BudgetLine(models.Model):
             'theoritical_amount:sum_currency',
             'theoritical_percentage:avg'
         ):
-            return super()._read_group_select('id:recordset', query)
-        return super()._read_group_select(aggregate_spec, query)
+            aggregate_spec = 'id:recordset'
+        return super()._read_group_select(table, aggregate_spec)
 
     def _read_group_postprocess_aggregate(self, aggregate_spec, raw_values):
         if aggregate_spec in (

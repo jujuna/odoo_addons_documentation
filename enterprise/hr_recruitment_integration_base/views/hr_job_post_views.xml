@@ -72,7 +72,7 @@
                         <group>
                             <field name="apply_method"/>
                             <field name="apply_vector" string="Email" invisible="apply_method != 'email'"/>
-                            <field name="recruiter_id" widget="many2one_avatar"/>
+                            <field name="recruiter_id" widget="many2one_avatar_employee"/>
                         </group>
                     </group>
                     <notebook>
@@ -173,11 +173,7 @@
                     name="filter_campaign_end_date"
                     date="campaign_end_date"
                     string="Expiration date"
-                    default_period="year"
-                    start_year="0"
-                    end_year="2"
-                    start_month="0"
-                    end_month="2"/>
+                    default_period="year"/>
                 <group>
                     <filter name="group_platform"
                         string="Platform"

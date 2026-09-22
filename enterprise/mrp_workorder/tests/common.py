@@ -5,6 +5,8 @@ from odoo.addons.mrp.tests.common import TestMrpCommon
 
 class TestMrpWorkorderCommon(TestMrpCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

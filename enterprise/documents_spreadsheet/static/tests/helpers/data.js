@@ -9,17 +9,10 @@ import { defineActions, fields, models, onRpc, serverState } from "@web/../tests
 import { Domain } from "@web/core/domain";
 
 const ACCESS_TOKEN_MY_SPREADSHEET = "accessTokenMyspreadsheet";
-const {
-    IrEmbeddedActions,
-    MailActivityType,
-    MailAlias,
-    MailAliasDomain,
-    DocumentsTag,
-    DocumentsDocument: Documents,
-} = DocumentsModels;
+const { MailActivityType, DocumentsTag, DocumentsDocument: Documents } = DocumentsModels;
 
 export class DocumentsDocument extends Documents {
-    spreadsheet_data = fields.Binary({ string: "Data" });
+    spreadsheet_data = fields.Text({ string: "Data" });
     display_thumbnail = fields.Binary({ string: "Thumbnail" });
     handler = fields.Selection({
         string: "Handler",
@@ -40,13 +33,10 @@ export class DocumentsDocument extends Documents {
             .map((spreadsheet) => ({
                 display_name: spreadsheet.name,
                 id: spreadsheet.id,
+                display_thumbnail: spreadsheet.display_thumbnail,
             }));
         const sliced = records.slice(offset, limit ? offset + limit : undefined);
         return { records: sliced, total: records.length };
-    }
-
-    dispatch_spreadsheet_message() {
-        return false;
     }
 
     action_open_new_spreadsheet(route, args) {
@@ -116,7 +106,7 @@ export class SpreadsheetTemplate extends models.Model {
     _name = "spreadsheet.template";
 
     name = fields.Char({ string: "Name", type: "char" });
-    spreadsheet_data = fields.Binary({ string: "Spreadsheet Data" });
+    spreadsheet_data = fields.Text({ string: "Spreadsheet Data" });
     thumbnail = fields.Binary({ string: "Thumbnail", type: "binary" });
     display_thumbnail = fields.Binary({ string: "Thumbnail" });
     sequence = fields.Integer({ string: "Sequence", type: "integer" });
@@ -133,7 +123,7 @@ export class SpreadsheetTemplate extends models.Model {
                     ? JSON.parse(record.spreadsheet_data)
                     : record.spreadsheet_data,
             name: record.name,
-            isReadonly: false,
+            has_write_access: true,
         };
     }
 
@@ -160,7 +150,7 @@ onRpc(
             data: JSON.parse(record.spreadsheet_data),
             name: record.name,
             revisions: [],
-            isReadonly: false,
+            has_write_access: true,
             is_favorited: record.is_favorited,
             is_archived: !record.active,
             folder_id: record.folder_id?.[0],
@@ -171,12 +161,9 @@ onRpc(
 export function defineDocumentSpreadsheetModels() {
     const SpreadsheetDocumentModels = {
         MailActivityType,
-        MailAlias,
-        MailAliasDomain,
         DocumentsDocument,
         DocumentsTag,
         SpreadsheetTemplate,
-        IrEmbeddedActions,
     };
     Object.assign(SpreadsheetModels, SpreadsheetDocumentModels);
     defineSpreadsheetModels();

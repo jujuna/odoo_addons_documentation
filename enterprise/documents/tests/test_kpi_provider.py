@@ -20,6 +20,7 @@ class TestKpiProvider(TransactionCase):
         all_documents = self.env['documents.document'].create([{
             'name': 'Test Document',
             'folder_id': folder_inbox.id,
+            'raw': 'test',
         }] * 2)
         self.assertCountEqual(self.env['kpi.provider'].get_documents_kpi_summary(),
                               [{'id': 'documents.inbox', 'name': 'Inbox', 'type': 'integer', 'value': 2}])

@@ -11,4 +11,5 @@ class UomUom(models.Model):
         return [
             'name',
             'factor',
+            'package_type_id',
         ]

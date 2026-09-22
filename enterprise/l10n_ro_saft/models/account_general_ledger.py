@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import stdnum.ro
 from collections import defaultdict
 
-import stdnum.ro
-
-from odoo import api, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.tools import float_repr, SQL, Query
-
-from odoo.addons.account_edi_ubl_cii.models.account_edi_common import UOM_TO_UNECE_CODE
+from odoo.models import Query
+from odoo.tools import float_repr, SQL
+from odoo.tools.business_data import split_vat
 
 
 class AccountGeneralLedgerReportHandler(models.AbstractModel):
@@ -37,18 +35,20 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
     @api.model
     def l10n_ro_export_saft_to_xml_monthly(self, options):
-        options['l10n_ro_saft_required_sections'] = self._set_l10n_ro_saft_required_sections('monthly')
+        options['l10n_ro_saft_type'] = 'monthly'
+        options['l10n_ro_saft_required_sections'] = self._set_l10n_ro_saft_required_sections(options['l10n_ro_saft_type'])
         return self.l10n_ro_export_saft_to_xml(options)
 
     @api.model
     def l10n_ro_export_saft_to_xml_assets(self, options):
-        options['l10n_ro_saft_required_sections'] = self._set_l10n_ro_saft_required_sections('assets')
+        options['l10n_ro_saft_type'] = 'assets'
+        options['l10n_ro_saft_required_sections'] = self._set_l10n_ro_saft_required_sections(options['l10n_ro_saft_type'])
         return self.l10n_ro_export_saft_to_xml(options)
 
     @api.model
     def _set_l10n_ro_saft_required_sections(self, export_type):
         """Define which sections of the XML are required to export based on the
-        type of export, which can either be monthly, assets, or stocks (coming soon). """
+        type of export, which can either be monthly, assets"""
         monthly = (export_type == 'monthly')
         assets = (export_type == 'assets')
 
@@ -104,7 +104,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
     @api.model
     def _l10n_ro_saft_prepare_report_values(self, report, options):
-        values = self._saft_prepare_report_values(report, options)
+        options['saft_allow_empty_address'] = self.env.company.country_code == 'RO'
+        values = super()._saft_prepare_report_values(report, options)
 
         # The saft template needs to know which sections are requested
         values['l10n_ro_saft_required_sections'] = options['l10n_ro_saft_required_sections']
@@ -166,8 +167,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         # or have its CUI number in the company_registry field (if not registered for VAT).
         partner = values['company'].partner_id
         if not partner.vat:
-            if partner.company_registry:
-                if not stdnum.ro.cui.is_valid(partner.company_registry):
+            if partner._get_additional_identifier('RO_EN'):
+                if not stdnum.ro.cui.is_valid(partner._get_additional_identifier('RO_EN')):
                     errors['company_registry_number_invalid'] = get_company_action(_('The CUI number for your company (under `Company Registry` in the Company settings) is incorrect.'))
             else:
                 errors['company_vat_registry_number_missing'] = get_company_action(_('In the Company settings, please set your company VAT number under `Tax ID` if registered for VAT, or your CUI number under `Company Registry`.'))
@@ -180,7 +181,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         # Mandatory values for the D.406 declaration
         values.update({
             'xmlns': 'mfp:anaf:dgti:d406:declaratie:v1',
-            'file_version': '2.4.8',
+            'file_version': '2.0',
         })
 
         # The TaxAccountingBasis should indicate the type of CoA that is installed.
@@ -193,14 +194,14 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         partner = values['company'].partner_id
         if partner.vat:
             values['company_registration_number'] = stdnum.ro.cf.compact(partner.vat)
-        elif partner.company_registry:
-            values['company_registration_number'] = stdnum.ro.cui.compact(partner.company_registry)
+        elif partner._get_additional_identifier('RO_EN'):
+            values['company_registration_number'] = stdnum.ro.cui.compact(partner._get_additional_identifier('RO_EN'))
 
         # The HeaderComment section must indicate the type of declaration:
         # - L for monthly returns
         # - T for quarterly returns
         # - A for annual returns
-        # - C for returns on request
+        # - C for returns on request (see l10n_ro_saft_stock/models/account_general_ledger.py)
         # - NL for non-residents monthly
         # - NT for non-residents quarterly
         if values['company'].country_code == 'RO':
@@ -208,7 +209,6 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 'month': 'L',
                 'quarter': 'T',
                 'year': 'A',
-                'fiscalyear': 'A',
             }.get(options['date']['period_type'], 'C')
         else:
             declaration_type = {
@@ -242,7 +242,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 partner_type in ('supplier', 'customer')
                 and partner.vat
                 and partner.vat[:2].isalpha()
-                and partner.country_code != partner._split_vat(partner.vat)[0]
+                and partner.country_code != split_vat(partner.vat)[0]
             ):
                 faulty_partners['partner_vat_doesnt_match_country'] |= partner
             # Romanian company partners should have their VAT number or CUI number set in the Tax ID or company_registry field.
@@ -253,14 +253,16 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 elif not partner.vat[:2].isalpha():
                     vat_country, vat_number = 'ro', partner.vat
                 else:
-                    vat_country, vat_number = partner._split_vat(partner.vat)
+                    vat_country, vat_number = split_vat(partner.vat)
                 if partner.country_code == 'RO' or not partner.country_code:
-                    cui = partner.company_registry or vat_number
+                    cui = partner._get_additional_identifier('RO_EN') or vat_number
                     if not stdnum.ro.cui.is_valid(cui):
                         faulty_partners['partner_registry_incorrect'] |= partner
                 elif not partner.vat or not partner._check_vat_number(vat_country, vat_number):
                     faulty_partners['partner_vat_incorrect'] |= partner
-                elif partner.perform_vies_validation and not partner.vies_valid:
+                elif (self.env.company.vat_check_vies
+                      and partner.perform_vies_validation
+                      and not partner.vies_valid):
                     faulty_partners['partner_vies_failed'] |= partner
 
         descriptions = {
@@ -284,58 +286,57 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         }
 
     @api.model
+    def _l10n_ro_saft_get_registration_number(self, partner):
+        """ Compute the RegistrationNumber field for a partner, consisting of a two-digit type followed by the partner's ID:
+        00 + CUI number (without the 'RO' prefix), for economic operators registered in Romania;
+        01 + country code + VAT code, for economic operators from EU Member States other than Romania;
+        02 + country code + VAT code, for economic operators from non-EU states EU;
+        03 + CNP, for Romanian citizens and individuals resident in Romania, or 03 + NIF for non-resident individuals;
+        04 + partner ID, for customers from Romania not subject to VAT and whose CNP is unknown (e.g. e-commerce);
+        05 + country code + partner ID, for customers from EU Member States other than Romania not subject to VAT;
+        06 + country code + partner ID, for customers from non-EU states not subject to VAT;
+        08 + 13 zeros (080000000000000), for unidentified customers in PoS transactions. This code is restricted ONLY to such transactions;
+        09 + NIF for non-resident legal entities registered in Romania;
+        (types 10 and 11 are restricted to banks)
+        This function requires the country_code to be correctly set on the partner.
+
+        :param partner: the res.partner for which to generate the registration number
+
+        :return: the RegistrationNumber (a string)
+        """
+        if not partner:
+            return '0'
+        if partner.is_company:
+            vat_country, vat_number = split_vat(partner.vat)
+            if not vat_country:
+                vat_country = 'RO'
+            if partner.country_code == 'RO' or not partner.country_code:
+                # For Romanian companies, the company_registry field should contain the CUI number, which is a 8-digit number without the 'RO' prefix
+                # Alternatively, we can get the CUI from the VAT number by removing the 'RO' prefix.
+                cui = partner._get_additional_identifier('RO_EN') or vat_number
+                return '00' + stdnum.ro.cui.compact(cui)
+            elif partner.country_id and 'EU' in partner.country_id.country_group_codes:
+                return '01' + vat_country + vat_number
+            else:
+                return '02' + vat_country + vat_number
+        else:
+            if partner._get_additional_identifier('RO_EN') and stdnum.ro.cnp.is_valid(partner._get_additional_identifier('RO_EN')):
+                # For individuals having a valid CNP or NIF, that should be used
+                return stdnum.ro.cnp.compact(partner._get_additional_identifier('RO_EN'))
+            elif partner.country_code == 'RO' or not partner.country_code:
+                return '04' + str(partner.id)
+            elif partner.country_id and 'EU' in partner.country_id.country_group_codes:
+                return '05' + partner.country_code + str(partner.id)
+            else:
+                return '06' + partner.country_code + str(partner.id)
+            # Code 08 (unidentified customer in PoS transactions) not implemented because the PoS does
+            # not generate anonymous invoices.
+
+    @api.model
     def _l10n_ro_saft_fill_partner_values(self, values):
         """ Fill in partner-related values in the values dict, performing checks as we go. """
-
-        def get_registration_number(partner):
-            """ Compute the RegistrationNumber field for a partner, consisting of a two-digit type followed by the partner's ID:
-            00 + CUI number (without the 'RO' prefix), for economic operators registered in Romania;
-            01 + country code + VAT code, for economic operators from EU Member States other than Romania;
-            02 + country code + VAT code, for economic operators from non-EU states EU;
-            03 + CNP, for Romanian citizens and individuals resident in Romania, or 03 + NIF for non-resident individuals;
-            04 + partner ID, for customers from Romania not subject to VAT and whose CNP is unknown (e.g. e-commerce);
-            05 + country code + partner ID, for customers from EU Member States other than Romania not subject to VAT;
-            06 + country code + partner ID, for customers from non-EU states not subject to VAT;
-            08 + 13 zeros (080000000000000), for unidentified customers in PoS transactions. This code is restricted ONLY to such transactions;
-            09 + NIF for non-resident legal entities registered in Romania;
-            (types 10 and 11 are restricted to banks)
-            This function requires the country_code to be correctly set on the partner.
-
-            :param partner: the res.partner for which to generate the registration number
-
-            :return: the RegistrationNumber (a string)
-            """
-            if partner.is_company:
-                if not partner.vat:
-                    vat_country, vat_number = 'ro', ''
-                elif not partner.vat[:2].isalpha():
-                    vat_country, vat_number = 'ro', partner.vat
-                else:
-                    vat_country, vat_number = partner._split_vat(partner.vat)
-                if partner.country_code == 'RO' or not partner.country_code:
-                    # For Romanian companies, the company_registry field should contain the CUI number, which is a 8-digit number without the 'RO' prefix
-                    # Alternatively, we can get the CUI from the VAT number by removing the 'RO' prefix.
-                    cui = partner.company_registry or vat_number
-                    return '00' + stdnum.ro.cui.compact(cui)
-                elif partner.country_id and 'EU' in partner.country_id.country_group_codes:
-                    return '01' + vat_country + vat_number
-                else:
-                    return '02' + vat_country + vat_number
-            else:
-                if partner.company_registry and stdnum.ro.cnp.is_valid(partner.company_registry):
-                    # For individuals having a valid CNP or NIF, that should be used
-                    return stdnum.ro.cnp.compact(partner.company_registry)
-                elif partner.country_code == 'RO' or not partner.country_code:
-                    return '04' + (partner.country_code or '') + str(partner.id)
-                elif partner.country_id and 'EU' in partner.country_id.country_group_codes:
-                    return '05' + partner.country_code + str(partner.id)
-                else:
-                    return '06' + partner.country_code + str(partner.id)
-                # Code 08 (unidentified customer in PoS transactions) not implemented because the PoS does
-                # not generate anonymous invoices.
-
         for partner_vals in values['partner_detail_map'].values():
-            partner_vals['registration_number'] = get_registration_number(partner_vals['partner'])
+            partner_vals['registration_number'] = self._l10n_ro_saft_get_registration_number(partner_vals['partner'])
             partner_vals['l10n_ro_saft_contacts'] = partner_vals['contacts'].filtered(
                 # Only provide partners which have a first name, last name and phone number.
                 lambda contact: ' ' in contact.name[1:-1] and contact.phone
@@ -391,6 +392,14 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             tax_fields = tax_fields_by_id[tax_vals['id']]
             tax_vals.update(tax_fields)
 
+    def _get_encountered_product_uom_ids(self, values):
+        return {
+            line_vals['product_uom_id']
+            for move_vals in values['move_vals_list']
+            for line_vals in move_vals['line_vals_list']
+            if line_vals['product_uom_id']
+        }
+
     @api.model
     def _l10n_ro_saft_fill_uom_values(self, options, values):
         """ Fill UoMs and unece_code_by_uom """
@@ -402,18 +411,12 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             })
             return
 
-        encountered_product_uom_ids = sorted({
-            line_vals['product_uom_id']
-            for move_vals in values['move_vals_list']
-            for line_vals in move_vals['line_vals_list']
-            if line_vals['product_uom_id']
-        })
+        encountered_product_uom_ids = sorted(self._get_encountered_product_uom_ids(values))
         uoms = self.env['uom.uom'].browse(encountered_product_uom_ids)
 
         # Provide a dict that links each UOM id to its UNECE code
-        uom_xmlids = uoms.get_external_id()
         unece_code_by_uom = {
-            uom.id: UOM_TO_UNECE_CODE.get(uom_xmlids[uom.id], 'C62') for uom in uoms
+            uom.id: uom._get_unece_code() for uom in uoms
         }
 
         values.update({
@@ -433,12 +436,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 'level': level,
             }
 
-        encountered_product_ids = sorted({
-            line_vals['product_id']
-            for move_vals in values['move_vals_list']
-            for line_vals in move_vals['line_vals_list']
-            if line_vals['product_id']
-        })
+        encountered_product_ids = sorted(self._get_encountered_product_ids(values))
         encountered_products = self.env['product.product'].browse(encountered_product_ids)
         product_refs = encountered_products.mapped('default_code')
         products_no_ref = encountered_products.filtered(lambda product: not product.default_code)
@@ -469,6 +467,20 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
         return errors
 
+    def _get_commodity_code(self, product):
+        if product.type == 'service':
+            return '00000000'
+        else:
+            return product.intrastat_code_id.code if 'intrastat_code_id' in product and product.intrastat_code_id else '0'
+
+    def _get_encountered_product_ids(self, values):
+        return {
+            line_vals['product_id']
+            for move_vals in values['move_vals_list']
+            for line_vals in move_vals['line_vals_list']
+            if line_vals['product_id']
+        }
+
     @api.model
     def _l10n_ro_saft_fill_product_values(self, options, values):
         """ Fill product_vals_list """
@@ -476,12 +488,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             values['product_vals_list'] = []
             return
 
-        encountered_product_ids = sorted({
-            line_vals['product_id']
-            for move_vals in values['move_vals_list']
-            for line_vals in move_vals['line_vals_list']
-            if line_vals['product_id']
-        })
+        encountered_product_ids = sorted(self._get_encountered_product_ids(values))
         encountered_products = self.env['product.product'].browse(encountered_product_ids)
         product_vals_list = [
             {
@@ -491,8 +498,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 'uom_id': product.uom_id.id,
                 'product_category': product.product_tmpl_id.categ_id.name,
                 # The account_intrastat module is not a dependency, so this code should work regardless of whether it is installed.
-                'commodity_code': '00000000' if product.type == 'service' else
-                                  (product.intrastat_code_id.code if 'intrastat_code_id' in product and product.intrastat_code_id else '0'),
+                'commodity_code': self._get_commodity_code(product),
             }
             for product in encountered_products
         ]
@@ -616,46 +622,50 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
     def _l10n_ro_saft_query_assets_values(self, options):
 
-        query = Query(self.env, alias='asset', table=SQL.identifier('account_asset'))
+        query = Query(self.env['account.asset'], alias='asset')
         query.add_join('LEFT JOIN', alias='account', table='account_account', condition=SQL('asset.account_asset_id = account.id'))
         account_code = self.env['account.account']._field_to_sql('account', 'code', query)
 
+        lang = self.env.lang or 'en_US'
         query = SQL(
             '''
             SELECT
                 asset.id AS asset_id,
-                asset.parent_id AS parent_id,
-                asset.name AS asset_name,
+                parent_variant.asset_id AS parent_id,
+                COALESCE(asset.name->>%(lang)s, asset.name->>'en_US') AS asset_name,
                 asset.original_value AS asset_original_value,
-                COALESCE(asset.salvage_value, 0) AS asset_salvage_value,
-                asset.disposal_date AS asset_disposal_date,
+                COALESCE(variant.salvage_value, 0) AS asset_salvage_value,
+                variant.disposal_date AS asset_disposal_date,
                 asset.acquisition_date AS asset_acquisition_date,
                 MIN(move.date) AS asset_date,
                 COALESCE(MIN(original_bill_aml.invoice_date), asset.acquisition_date) AS asset_purchase_date,
-                asset.state AS asset_state,
-                asset.method_period AS asset_method_period,
-                asset.method_number AS asset_method_number,
-                asset.method AS asset_method,
-                asset.method_progress_factor AS asset_method_progress_factor,
+                variant.state AS asset_state,
+                model.method_period AS asset_method_period,
+                model.method_number AS asset_method_number,
+                model.method AS asset_method,
+                model.method_progress_factor AS asset_method_progress_factor,
                 asset.currency_id AS asset_currency_id,
                 asset_category.code AS asset_category_code,
                 %(account_code)s AS account_code,
                 array_remove(array_agg(distinct partner.id), NULL) AS supplier_ids,
-                COALESCE(SUM(move.depreciation_value) FILTER (WHERE move.date < %(date_from)s), 0) + COALESCE(asset.already_depreciated_amount_import, 0) AS depreciated_before,
+                COALESCE(SUM(move.depreciation_value) FILTER (WHERE move.date < %(date_from)s), 0) + COALESCE(variant.already_depreciated_amount_import, 0) AS depreciated_before,
                 COALESCE(SUM(move.depreciation_value) FILTER (WHERE move.date BETWEEN %(date_from)s AND %(date_to)s), 0) AS depreciated_during,
                 COALESCE(SUM(move.depreciation_value) FILTER (WHERE move.date BETWEEN %(date_from)s AND %(date_to)s AND move.asset_number_days IS NULL), 0) AS asset_disposal_value
             FROM %(from_clause)s
-            LEFT JOIN account_move move ON move.asset_id = asset.id  AND move.state = 'posted'
+            JOIN account_asset_variant variant ON asset.main_variant_id = variant.id
+            LEFT JOIN account_asset_variant parent_variant ON parent_variant.id = variant.parent_id
+            JOIN account_depreciation_model model ON model.id = variant.model_id
+            LEFT JOIN account_move move ON move.asset_variant_id = variant.id  AND move.state = 'posted'
             LEFT JOIN asset_move_line_rel rel ON rel.asset_id = asset.id
             LEFT JOIN account_move_line original_bill_aml ON original_bill_aml.id = rel.line_id
             LEFT JOIN res_partner partner ON partner.id = original_bill_aml.partner_id
             LEFT JOIN l10n_ro_saft_account_asset_category asset_category ON asset_category.id = asset.l10n_ro_saft_account_asset_category_id
             WHERE asset.company_id = %(company_id)s
               AND (asset.acquisition_date <= %(date_to)s OR move.date <= %(date_to)s)
-              AND (asset.disposal_date >= %(date_from)s OR asset.disposal_date IS NULL)
-              AND asset.state not in ('model', 'draft', 'cancelled')
-              AND asset.active = 't'
-            GROUP BY asset.id, account.id, asset_category.id, account_code
+              AND (variant.disposal_date >= %(date_from)s OR variant.disposal_date IS NULL)
+              AND variant.state not in ('draft', 'cancelled')
+              AND asset.active IS TRUE
+            GROUP BY asset.id, variant.id, parent_variant.asset_id, model.id, account.id, asset_category.id, account_code
             ORDER BY account_code, asset.acquisition_date, asset.id;
             ''',
             account_code=account_code,
@@ -663,6 +673,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             date_to=options['date']['date_to'],
             from_clause=query.from_clause,
             company_id=self.env.company.id,
+            lang=lang,
         )
         return query
 
@@ -681,8 +692,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             raise UserError(_('The SAF-T Asset Declaration cannot be generated if the currency of the company is not RON'))
 
         query = self._l10n_ro_saft_query_assets_values(options)
-        self.env.cr.execute(query)
-        asset_lines = self.env.cr.dictfetchall()
+        asset_lines = self.env.execute_query_dict(query)
 
         # Assign the gross increases sub assets to their main asset (parent)
         parent_lines = []
@@ -695,7 +705,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
         for asset in parent_lines:
             asset_children_lines = children_lines[asset['asset_id']]
-            asset_val = self.env['account.asset.report.handler']._get_parent_asset_values(options, asset, asset_children_lines)
+            asset_val = self._get_parent_asset_values(options, asset, asset_children_lines)
 
             depreciation_percentage = 0
             if asset['asset_method'] == 'linear':
@@ -720,7 +730,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 'acquisition_costs_end': self._l10n_ro_saft_float_repr(asset_val['assets_date_to']),
                 'investment_support': self._l10n_ro_saft_float_repr(asset_val['assets_date_from'] - asset['asset_original_value'] + asset_val['assets_plus']),
                 'asset_method_period': asset['asset_method_period'],
-                'asset_method_number': asset['asset_method_number'],
+                'asset_method_number': f"{round(asset['asset_method_number'], 2):g}",
                 'asset_addition': self._l10n_ro_saft_float_repr(asset_val['assets_plus']),
                 'transfers': self._l10n_ro_saft_float_repr(asset_val['assets_plus'] - asset_val['assets_minus']),
                 'asset_disposal': self._l10n_ro_saft_float_repr(-asset_val['asset_disposal_value']),
@@ -746,6 +756,76 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             res['asset_partners'][asset['asset_id']] = asset['supplier_ids']
 
         values.update(res)
+
+    @api.model
+    def _get_parent_asset_values(self, options, asset_line, asset_children_lines):
+        """ Compute the values needed for the depreciation schedule for each parent asset """
+
+        # Manage the opening of the asset
+        opening = (asset_line['asset_acquisition_date'] or asset_line['asset_date']) < fields.Date.to_date(options['date']['date_from'])
+
+        # Get the main values of the board for the asset
+        depreciation_opening = asset_line['depreciated_before']
+        depreciation_add = asset_line['depreciated_during']
+        depreciation_minus = 0.0
+
+        asset_disposal_value = (
+            asset_line['asset_disposal_value']
+            if (
+                asset_line['asset_disposal_date']
+                and asset_line['asset_disposal_date'] <= fields.Date.to_date(options['date']['date_to'])
+            )
+            else 0.0
+        )
+
+        asset_opening = asset_line['asset_original_value'] if opening else 0.0
+        asset_add = 0.0 if opening else asset_line['asset_original_value']
+        asset_minus = 0.0
+        asset_salvage_value = asset_line.get('asset_salvage_value', 0.0)
+
+        # Add the main values of the board for all the sub assets (gross increases)
+        for child in asset_children_lines:
+            depreciation_opening += child['depreciated_before']
+            depreciation_add += child['depreciated_during']
+
+            opening = (child['asset_acquisition_date'] or child['asset_date']) < fields.Date.to_date(options['date']['date_from'])
+            asset_opening += child['asset_original_value'] if opening else 0.0
+            asset_add += 0.0 if opening else child['asset_original_value']
+
+        # Compute the closing values
+        asset_closing = asset_opening + asset_add - asset_minus
+        depreciation_closing = depreciation_opening + depreciation_add - depreciation_minus
+        asset_currency = self.env['res.currency'].browse(asset_line['asset_currency_id'])
+
+        # Manage the closing of the asset
+        if (
+            asset_line['asset_state'] == 'close'
+            and asset_line['asset_disposal_date']
+            and asset_line['asset_disposal_date'] <= fields.Date.to_date(options['date']['date_to'])
+            and asset_currency.compare_amounts(depreciation_closing, asset_closing - asset_salvage_value) == 0
+        ):
+            depreciation_add -= asset_disposal_value
+            depreciation_minus += depreciation_closing - asset_disposal_value
+            depreciation_closing = 0.0
+            asset_minus += asset_closing
+            asset_closing = 0.0
+
+        # Manage negative assets (credit notes)
+        if asset_currency.compare_amounts(asset_line['asset_original_value'], 0) < 0:
+            asset_add, asset_minus = -asset_minus, -asset_add
+            depreciation_add, depreciation_minus = -depreciation_minus, -depreciation_add
+
+        return {
+            'asset_disposal_value': asset_disposal_value,
+            'assets_date_from': asset_opening,
+            'assets_plus': asset_add,
+            'assets_minus': asset_minus,
+            'assets_date_to': asset_closing,
+            'depre_date_from': depreciation_opening,
+            'depre_plus': depreciation_add,
+            'depre_minus': depreciation_minus,
+            'depre_date_to': depreciation_closing,
+        }
 
     @api.model
     def _l10n_ro_saft_check_asset_values(self, values):
@@ -784,18 +864,20 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                     move.asset_move_type AS asset_move_type,
                     move.depreciation_value AS depreciation_value,
                     aml.balance AS purchase_increase_amount,
-                    COALESCE(asset.parent_id, asset.id) AS asset_id,
+                    COALESCE(parent_variant.asset_id, asset.id) AS asset_id,
                     asset.original_value AS asset_original_value,
-                    asset.net_gain_on_sale AS asset_net_gain_on_sale
+                    variant.net_gain_on_sale AS asset_net_gain_on_sale
                 FROM account_move move
                 LEFT JOIN account_move_line aml ON move.id = aml.move_id
                 INNER JOIN asset_move_line_rel rel ON aml.id = rel.line_id
                 INNER JOIN account_asset asset ON rel.asset_id = asset.id
+                INNER JOIN account_asset_variant variant ON asset.main_variant_id = variant.id
+                LEFT JOIN account_asset_variant parent_variant ON parent_variant.id = variant.parent_id
                 WHERE move.state = 'posted'
                   AND move.date BETWEEN %(date_from)s AND %(date_to)s
                   AND move.company_id = %(company_id)s
-                  AND asset.state not in ('model', 'draft', 'cancelled')
-                  AND asset.active = 't'
+                  AND variant.state not in ('model', 'draft', 'cancelled')
+                  AND asset.active IS TRUE
                 UNION ALL
                 -- Depreciations, negative revaluation, disposal, and sale transactions
                 -- are retrieved from the asset_id field on account_move
@@ -806,16 +888,18 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                     move.asset_move_type AS asset_move_type,
                     move.depreciation_value AS depreciation_value,
                     0 AS purchase_increase_amount,
-                    COALESCE(asset.parent_id, asset.id) AS asset_id,
+                    COALESCE(parent_variant.asset_id, asset.id) AS asset_id,
                     asset.original_value AS asset_original_value,
-                    asset.net_gain_on_sale AS asset_net_gain_on_sale
+                    variant.net_gain_on_sale AS asset_net_gain_on_sale
                 FROM account_move move
-                INNER JOIN account_asset asset ON move.asset_id = asset.id
+                INNER JOIN account_asset_variant variant ON move.asset_variant_id = variant.id
+                INNER JOIN account_asset asset ON variant.asset_id = asset.id AND asset.main_variant_id = variant.id
+                LEFT JOIN account_asset_variant parent_variant ON parent_variant.id = variant.parent_id
                 WHERE move.state = 'posted'
                   AND move.date BETWEEN %(date_from)s AND %(date_to)s
                   AND move.company_id = %(company_id)s
-                  AND asset.state not in ('model', 'draft', 'cancelled')
-                  AND asset.active = 't'
+                  AND variant.state not in ('model', 'draft', 'cancelled')
+                  AND asset.active IS TRUE
             ) asset_transactions
             ORDER BY asset_id, move_date, asset_move_type, move_name
             ''',
@@ -845,8 +929,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         }
 
         query = self._l10n_ro_saft_query_asset_transactions_values(options)
-        self.env.cr.execute(query)
-        for transaction in self.env.cr.dictfetchall():
+        for transaction in self.env.execute_query_dict(query):
             transaction['asset_transaction_id'] = transaction['move_id']
             transaction['asset_transaction_type'] = asset_transaction_type.get(transaction['asset_move_type'], 130)
             transaction['description'] = transaction['move_name']

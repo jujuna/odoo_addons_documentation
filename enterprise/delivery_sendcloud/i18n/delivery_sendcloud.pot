@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-12-30 18:42+0000\n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-08-28 17:50+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -47,16 +47,23 @@ msgid "%(partner_name)s phone required"
 msgstr ""
 
 #. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
+#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Do not forget to load your "
-"SendCloud shipping products for a valid configuration."
+"<i class=\"oi\" data-icon=\"info\"/> Available shipping products depend on "
+"enabled carriers in your Sendcloud account."
 msgstr ""
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> In test environment, to avoid "
+"<i class=\"oi\" data-icon=\"warning\"/> Do not forget to load your SendCloud"
+" shipping products for a valid configuration."
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
+msgid ""
+"<i class=\"oi\" data-icon=\"warning\"/> In test environment, to avoid "
 "charges, your shippings are automatically <b>cancelled</b> after the label "
 "creation."
 msgstr ""
@@ -64,15 +71,8 @@ msgstr ""
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Only administrators can configure "
+"<i class=\"oi\" data-icon=\"warning\"/> Only administrators can configure "
 "the public and private keys."
-msgstr ""
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
-msgid ""
-"<i class=\"fa fa-info-circle\"/> Available shipping products depend on "
-"enabled carriers in your Sendcloud account."
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -89,11 +89,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_has_custom_functionalities
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_product__can_customize_functionalities
 msgid "Can Customize Functionalities"
-msgstr ""
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
-msgid "Cancel"
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -161,6 +156,11 @@ msgstr ""
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__carrier_id
 msgid "Delivery"
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model:ir.model,name:delivery_sendcloud.model_delivery_carrier
+msgid "Delivery Method"
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -249,6 +249,17 @@ msgid "Integration"
 msgstr ""
 
 #. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid "Invalid SendCloud URL."
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_label_type
+msgid "Label Format"
+msgstr ""
+
+#. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_product__write_uid
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__write_uid
 msgid "Last Updated by"
@@ -309,7 +320,10 @@ msgstr ""
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
-msgid "No address found with contact name %s on your sendcloud account."
+msgid ""
+"No address found matching Warehouse name \"%s\" on your sendcloud account. "
+"Please make sure there is an address with the same name under \"Address Name"
+" (optional)\" in your Sendcloud Address configuration."
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -323,7 +337,15 @@ msgstr ""
 #: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
 msgid ""
 "Note that a unit of the product '%s' is heavier than the maximum weight "
-"allowed by the shipping method."
+"allowed by the delivery method."
+msgstr ""
+
+#. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
+msgid ""
+"Note that this price is for %s packages since the order weight is more than "
+"the maximum packaging weight."
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -349,6 +371,16 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
 msgid "Other Functionalities"
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__application/pdf
+msgid "PDF"
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__image/png
+msgid "PNG"
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -381,13 +413,20 @@ msgid "Select the country to be used by this delivery method"
 msgstr ""
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields,help:delivery_sendcloud.field_delivery_carrier__sendcloud_label_type
+msgid ""
+"Select the label format to be used when sending shipments with Sendcloud."
+msgstr ""
+
+#. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid "SendCloud Configuration"
 msgstr ""
 
 #. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.res_config_settings_view_form_sale
-msgid "SendCloud Shipping Methods"
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid "SendCloud should be used with a context manager."
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -443,12 +482,8 @@ msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_id
+#: model:ir.module.module,shortdesc:base.module_delivery_sendcloud
 msgid "Sendcloud Shipping"
-msgstr ""
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.res_config_settings_view_form_stock
-msgid "Sendcloud Shipping Methods"
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -480,8 +515,8 @@ msgid "Shipping Carrier"
 msgstr ""
 
 #. module: delivery_sendcloud
-#: model:ir.model,name:delivery_sendcloud.model_delivery_carrier
-msgid "Shipping Methods"
+#: model:ir.module.module,description:base.module_delivery_sendcloud
+msgid "Shipping Integration with Sendcloud platform"
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -636,7 +671,7 @@ msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_use_batch_shipping
-msgid "Use Batch Shipping"
+msgid "Use Multicollo"
 msgstr ""
 
 #. module: delivery_sendcloud
@@ -678,6 +713,11 @@ msgid "You must have a shipping product configured!"
 msgstr ""
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__application/zpl
+msgid "ZPL"
+msgstr ""
+
+#. module: delivery_sendcloud
 #. odoo-javascript
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
 msgid "cm"
@@ -688,4 +728,10 @@ msgstr ""
 msgid ""
 "created in Sendcloud. <br/>\n"
 "            <b>Tracking Numbers:</b>"
+msgstr ""
+
+#. module: delivery_sendcloud
+#. odoo-javascript
+#: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
+msgid "g"
 msgstr ""

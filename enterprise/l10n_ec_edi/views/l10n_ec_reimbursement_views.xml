@@ -7,13 +7,9 @@
             <form string="Reimbursement Lines">
                 <sheet>
                     <div class="alert alert-warning text-center" role="alert" invisible="not partner_country_code or not (partner_country_code != 'EC' and tax_amount != 0.00)">
-                      <i class="fa fa-info-circle" />
+                      <i class="oi" data-icon="info" />
                       Tip: When registering reimbursements from foreign partners it is common to include the
                       foreign tax into the tax base (adding both amounts into one) and selecting as tax the VAT 0%
-                    </div>
-                    <div class="alert alert-warning text-center" role="alert" invisible="not (partner_id or partner_vat_type_id) or partner_vat_type_id">
-                      <i class="fa fa-info-circle" />
-                      The selected partner has a different type of identification than RUC and VAT.
                     </div>
                     <group string="Document info">
                         <group>
@@ -26,7 +22,6 @@
                             <field name="document_number" placeholder="001-001-000012345"/>
                             <field name="currency_id" invisible="1"/>
                             <field name="partner_country_id"/>
-                            <field name="partner_vat_type_id"/>
                             <field name="partner_vat_number"/>
                         </group>
                     </group>

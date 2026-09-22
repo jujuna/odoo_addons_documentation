@@ -1,34 +1,32 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { getEmbeddedProps } from "@html_editor/others/embedded_component_utils";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
-import { SignNameAndSignatureDialog } from "@sign/dialogs/dialogs";
+import { SignatureDialog } from "@web/core/signature/signature_dialog";
 
 export class SignatureInputComponent extends Component {
     static template = "accountant_knowledge.EmbeddedSignatureInput";
-    static props = {
-        host: { type: Object },
-        replaceSignatureInputWithImage: Function,
-    };
+
+    props = useProps({
+        host: t.object(),
+        replaceSignatureInputWithImage: t.function(),
+    });
 
     setup() {
         this.dialog = useService("dialog");
     }
 
     openSignatureDialog() {
-        const signature = { name: user.name };
-        const close = this.dialog.add(SignNameAndSignatureDialog, {
-            signature,
-            activeFrame: true,
-            frame: {},
-            hash: "",
-            displaySignatureRatio: 3,
-            onConfirm: () => {
+        this.dialog.add(SignatureDialog, {
+            defaultName: user.name,
+            nameAndSignatureProps: {
+                displaySignatureRatio: 3,
+            },
+            uploadSignature: signature => {
                 this.props.replaceSignatureInputWithImage(
                     this.props.host,
-                    signature.getSignatureImage()
+                    signature.signatureImage
                 );
-                close();
             },
         });
     }

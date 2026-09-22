@@ -3,8 +3,9 @@ import * as Dialog from "@point_of_sale/../tests/generic_helpers/dialog_util";
 import * as Chrome from "@point_of_sale/../tests/pos/tours/utils/chrome_util";
 import * as TicketScreen from "@point_of_sale/../tests/pos/tours/utils/ticket_screen_util";
 import * as ProductScreen from "@point_of_sale/../tests/pos/tours/utils/product_screen_util";
+import * as PartnerList from "@point_of_sale/../tests/pos/tours/utils/partner_list_util";
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
-import * as ReceiptScreen from "@point_of_sale/../tests/pos/tours/utils/receipt_screen_util";
+import * as FeedbackScreen from "@point_of_sale/../tests/pos/tours/utils/feedback_screen_util";
 
 registry.category("web_tour.tours").add("l10n_mx_edi_pos.test_mx_pos_invoice_order_and_refund", {
     steps: () =>
@@ -16,7 +17,12 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.test_mx_pos_invoice_ord
             },
             {
                 content: "Open POS session from backend",
-                trigger: "button[name='open_ui']",
+                trigger: "button:contains('Open Register')",
+                run: "click",
+            },
+            {
+                content: "Select tax inclusion",
+                trigger: "button:contains('Tax Included')",
                 run: "click",
                 expectUnloadPage: true,
             },
@@ -55,6 +61,8 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.test_mx_pos_invoice_ord
             Dialog.confirm(),
             PaymentScreen.clickPaymentMethod("Bank"),
             PaymentScreen.clickValidate(),
+            FeedbackScreen.isShown(),
+            Chrome.waitForOrdersSync(),
             Chrome.clickOrders(),
             TicketScreen.selectFilter("Paid"),
             TicketScreen.selectOrder("0001"),
@@ -67,7 +75,7 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.test_mx_pos_invoice_ord
             },
             PaymentScreen.clickPaymentMethod("Bank"),
             PaymentScreen.clickValidate(),
-            ReceiptScreen.isShown(),
+            FeedbackScreen.isShown(),
             Chrome.endTour(),
         ].flat(),
 });
@@ -81,7 +89,12 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_order_defa
         },
         {
             content: "Open POS session from backend",
-            trigger: "button[name='open_ui']",
+            trigger: "button:contains('Open Register')",
+            run: "click",
+        },
+        {
+            content: "Select tax inclusion",
+            trigger: "button:contains('Tax Included')",
             run: "click",
             expectUnloadPage: true,
         },
@@ -130,33 +143,69 @@ registry.category("web_tour.tours").add("tour_invoice_to_general_public", {
             Chrome.startPoS(),
             Dialog.confirm("Open Register"),
             ProductScreen.addOrderline("Whiteboard Pen"),
-            ProductScreen.clickPartnerButton(),
-            ProductScreen.clickCustomer("Arturo Garcia"),
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Cash"),
             PaymentScreen.remainingIs("0.0"),
-            PaymentScreen.clickInvoiceButton(),
+            PaymentScreen.clickInvoiceButton(false),
             {
-                content: "Set Invoice to public: 'No'",
+                content: "Set Invoice to Public: 'Yes'",
+                trigger: "select[name='l10n_mx_edi_cfdi_to_public']",
+                run: "select 1",
+            },
+            Dialog.confirm(), // "Invoice to Public" shouldn't raise an error
+            PaymentScreen.clickPartnerButton(),
+            // Set a customer with no ZIP code nor country
+            PaymentScreen.clickCustomer("Homeless Customer"),
+            PaymentScreen.clickInvoiceButton(false), // Toggle off
+            PaymentScreen.isInvoiceButtonUnchecked(),
+            PaymentScreen.clickInvoiceButton(false),
+            {
+                content: "Set Invoice to Public: 'No'",
                 trigger: "select[name='l10n_mx_edi_cfdi_to_public']",
                 run: "select 0",
             },
             Dialog.confirm(),
-            PaymentScreen.validateButtonIsHighlighted(true),
-            PaymentScreen.clickValidate(),
-            Dialog.is({ title: "Invalid Operation" }),
+            // "Invoice to public" cannot be set to "No" if the customer does not have a ZIP code and country set
+            Dialog.is({ title: "CFDI to Public" }),
             Dialog.confirm(),
-            PaymentScreen.clickInvoiceButton(),
-            PaymentScreen.clickInvoiceButton(),
             {
-                content: "Set Invoice to public: 'Yes'",
+                content: "Set Invoice to Public: 'Yes'",
                 trigger: "select[name='l10n_mx_edi_cfdi_to_public']",
                 run: "select 1",
             },
             Dialog.confirm(),
-            PaymentScreen.validateButtonIsHighlighted(true),
+            PaymentScreen.clickPartnerButton(),
+            PaymentScreen.clickCustomer("Arturo Garcia"),
+            PaymentScreen.clickInvoiceButton(false), // Toggle off
+            PaymentScreen.isInvoiceButtonUnchecked(),
+            PaymentScreen.clickInvoiceButton(false),
+            {
+                content: "Set Invoice to Public: 'No'",
+                trigger: "select[name='l10n_mx_edi_cfdi_to_public']",
+                run: "select 0",
+            },
+            Dialog.confirm(),
+            PaymentScreen.clickPartnerButton(),
+            PaymentScreen.clickCustomer("Homeless Customer"),
+            // Cannot set a customre with no country or ZIP code when "Invoice to Public" is set to "No"
+            Dialog.is({ title: "CFDI to Public" }),
+            Dialog.confirm(),
+            PartnerList.searchCustomerValue("Arturo Garcia"),
+            {
+                content: "Unselect Customer",
+                trigger: ".unselect-tag",
+                run: "click",
+            },
+            // Cannot remove the selected partner if "Invoice to public" is set to "No"
+            Dialog.is({ title: "CFDI to Public" }),
+            Dialog.confirm(),
+            {
+                content: "Close Partner List",
+                trigger: "footer button:contains('Discard')",
+                run: "click",
+            },
             PaymentScreen.clickValidate(),
-            ReceiptScreen.isShown(),
+            FeedbackScreen.isShown(),
             Chrome.endTour(),
         ].flat(),
 });

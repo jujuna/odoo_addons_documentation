@@ -1,121 +1,82 @@
+import { Component, computed, signal, t, useEffect, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-
-import { useNumpadDecimal } from "@web/views/fields/numpad_decimal_hook";
-import { formatInteger } from "@web/views/fields/formatters";
 import { formatFloat } from "@web/core/utils/numbers";
-import { parseInteger, parseFloat } from "@web/views/fields/parsers";
+import { formatInteger } from "@web/views/fields/formatters";
+import { useNumpadDecimal } from "@web/views/fields/numpad_decimal_hook";
+import { parseFloat, parseInteger } from "@web/views/fields/parsers";
+import { standardGridCellProps, useGridCell } from "@web_grid/hooks/grid_cell_hook";
 import { useInputHook } from "@web_grid/hooks/input_hook";
-
-import { Component, useEffect, useRef, useState } from "@odoo/owl";
-import { useGridCell, useMagnifierGlass } from "@web_grid/hooks/grid_cell_hook";
-
-export const standardGridCellProps = {
-    name: String,
-    classNames: String,
-    fieldInfo: Object,
-    readonly: { type: Boolean, optional: true },
-    editMode: { type: Boolean, optional: true },
-    reactive: {
-        type: Object,
-        shape: {
-            cell: [HTMLElement, { value: null }],
-        },
-    },
-    openRecords: Function,
-    onEdit: Function,
-    getCell: Function,
-    onKeyDown: { type: Function, optional: true },
-};
+import { GridCell as ModelGridCell } from "../views/grid_model";
 
 export class GridCell extends Component {
     static template = "web_grid.Cell";
-    static props = standardGridCellProps;
-    static defaultProps = {
-        readonly: true,
-        editMode: false,
-    };
 
-    setup() {
-        this.rootRef = useRef("root");
-        this.state = useState({
-            edit: this.props.editMode,
-            invalid: false,
-            cell: null,
-        });
-        this.discardChanges = false;
-        this.magnifierGlassHook = useMagnifierGlass();
-        this.inputRef = useInputHook({
-            getValue: () => this.formattedValue,
-            refName: "numpadDecimal",
-            parse: this.parse.bind(this),
-            notifyChange: this.onChange.bind(this),
-            commitChanges: this.saveEdition.bind(this),
-            onKeyDown: (ev) => this.props.onKeyDown(ev, this.state.cell),
-            discard: this.discard.bind(this),
-            setInvalid: () => {
-                this.state.invalid = true;
-            },
-            setDirty: () => {
-                this.state.invalid = false;
-            },
-            isInvalid: () => this.state.invalid,
-        });
-        useNumpadDecimal();
+    props = useProps(standardGridCellProps);
 
-        useGridCell();
-        useEffect(
-            (edit, inputEl, cellEl) => {
-                if (inputEl) {
-                    inputEl.value = this.formattedValue;
-                }
-                if (edit && inputEl) {
-                    inputEl.focus();
-                    if (inputEl.type === "text") {
-                        if (inputEl.selectionStart === null) {
-                            return;
-                        }
-                        if (inputEl.selectionStart === inputEl.selectionEnd) {
-                            inputEl.selectionStart = 0;
-                            inputEl.selectionEnd = inputEl.value.length;
-                        }
-                    }
-                }
-                this.discardChanges = false;
-            },
-            () => [this.state.edit, this.inputRef.el, this.props.reactive.cell]
-        );
-    }
+    rootRef = signal.ref(HTMLDivElement);
+    inputRef = signal.ref(HTMLInputElement);
 
-    get value() {
-        return this.state.cell?.value || 0;
-    }
+    discardChanges = false;
+    inputMode = "numeric";
+    cell = signal(null, { type: t.or([t.instanceOf(ModelGridCell), t.literal(null)]) });
+    invalid = signal(false);
 
-    get section() {
-        return this.row.getSection();
-    }
-
-    get row() {
-        return this.state.cell?.row;
-    }
-
-    get formattedValue() {
+    formattedValue = computed(() => {
         const { type, digits } = this.props.fieldInfo;
         if (type === "integer") {
-            return formatInteger(this.value);
+            return formatInteger(this.value());
         }
-        return formatFloat(this.value, { digits: digits || 2 });
+        return formatFloat(this.value(), { digits: digits || 2 });
+    });
+    isEditable = computed(() => {
+        const cell = this.cell();
+        return !this.props.readonly && cell?.readonly === false && !cell.row.isSection;
+    });
+    value = computed(this.getCellValue.bind(this));
+
+    gridCellHook = useGridCell(this.cell, this.isEditable);
+
+    setup() {
+        useNumpadDecimal(this.inputRef);
+        useEffect(() => {
+            this.props.cell(); // subscribe to cell value
+            this.discardChanges = false;
+            const inputEl = this.inputRef();
+            if (inputEl) {
+                inputEl.value = this.formattedValue();
+            }
+            if (this.props.editMode && inputEl) {
+                inputEl.focus();
+                if (inputEl.type === "text") {
+                    if (inputEl.selectionStart === null) {
+                        return;
+                    }
+                    if (inputEl.selectionStart === inputEl.selectionEnd) {
+                        inputEl.selectionStart = 0;
+                        inputEl.selectionEnd = inputEl.value.length;
+                    }
+                }
+            }
+        });
+        useInputHook({
+            inputRef: this.inputRef,
+            invalid: this.invalid,
+            value: this.formattedValue,
+            discard: this.discard.bind(this),
+            onChange: this.onChange.bind(this),
+            onCommit: this.saveEdition.bind(this),
+            onKeyDown: (ev) => this.props.onKeyDown(ev, this.cell()),
+            parse: this.parse.bind(this),
+        });
     }
 
-    get inputMode() {
-        return "numeric";
+    getCellValue() {
+        return this.cell()?.value || 0;
     }
 
-    isEditable(props = this.props) {
-        return (
-            !props.readonly && this.state.cell?.readonly === false && !this.state.cell.row.isSection
-        );
-    }
-
+    /**
+     * @param {string} value
+     */
     parse(value) {
         if (this.props.fieldInfo.type === "integer") {
             return parseInteger(value);
@@ -130,12 +91,12 @@ export class GridCell extends Component {
     }
 
     update(value) {
-        this.state.cell.update(value);
+        this.cell().update(value);
     }
 
     saveEdition(value) {
-        const changesCommitted = (value || false) !== (this.state.cell.value || false);
-        if ((value || false) !== (this.state.cell?.value || false)) {
+        const changesCommitted = (value || false) !== (this.cell().value || false);
+        if ((value || false) !== (this.cell()?.value || false)) {
             this.update(value);
         }
         this.props.onEdit(false);
@@ -148,7 +109,7 @@ export class GridCell extends Component {
     }
 
     onCellClick(ev) {
-        if (this.isEditable() && !this.state.edit) {
+        if (this.isEditable() && !this.props.editMode) {
             this.discardChanges = false;
             this.props.onEdit(true);
         }

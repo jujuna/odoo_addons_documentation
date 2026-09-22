@@ -1,10 +1,6 @@
 import { Plugin } from "@html_editor/plugin";
 import { registry } from "@web/core/registry";
 import { BuilderAction } from "@html_builder/core/builder_action";
-import { withSequence } from "@html_editor/utils/resource";
-import { before } from "@html_builder/utils/option_sequence";
-import { WEBSITE_BACKGROUND_OPTIONS } from "@website/builder/option_sequence";
-import { AILivechatOption } from "./ai_livechat_option";
 
 async function update_website_snippet_agent({ ormService, newAgentId = null, oldAgentId = null }) {
     const agent_ids = {};
@@ -17,12 +13,11 @@ async function update_website_snippet_agent({ ormService, newAgentId = null, old
     await ormService.call("ai.agent", "update_website_snippet_agent", [], agent_ids);
 }
 
-class AILivechatOptionPlugin extends Plugin {
+export class AILivechatOptionPlugin extends Plugin {
     static id = "aiLivechatOption";
 
     resources = {
-        so_content_addition_selector: [".s_ai_livechat"],
-        builder_options: [withSequence(before(WEBSITE_BACKGROUND_OPTIONS), AILivechatOption)],
+        so_content_addition_selectors: [".s_ai_livechat"],
         builder_actions: {
             SetChatStyleAction,
             SetAIAgentAction,

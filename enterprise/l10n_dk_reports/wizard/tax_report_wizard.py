@@ -38,6 +38,7 @@ class L10nDkTaxReportRSUCalendarWizard(models.TransientModel):
     description = fields.Char(help="A description of the declaration type", default='Moms')
     report_id = fields.Many2one(comodel_name='account.report')
     company_id = fields.Many2one(comodel_name='res.company', readonly=True, required=True)
+    return_id = fields.Many2one(comodel_name='account.return')
 
     def action_call_company_calendar(self):
         """
@@ -54,7 +55,7 @@ class L10nDkTaxReportRSUCalendarWizard(models.TransientModel):
         body = self.env['ir.qweb']._render('l10n_dk_reports.calendarService', {
             'transaction_id': uuid4(),
             'transaction_time': fields.Datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'company_registry': self.company_id.company_registry,
+            'company_registry': self.company_id.partner_id._get_additional_identifier('DK_CVR'),
             'description': self.description,
             'date_from': self.date_from,
             'date_to': self.date_to,
@@ -70,12 +71,18 @@ class L10nDkTaxReportRSUCalendarWizard(models.TransientModel):
                 timeout=10,
             )
             response.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            raise UserError(_("Sorry, something went wrong: %s", e))
-
-        response_tree = etree.fromstring(response.text)
-        # Deal with the error code
-        ReportHandler._error_code_handler(response_tree)
+            response_tree = etree.fromstring(response.text)
+            ReportHandler._error_code_handler(response_tree)
+        except (requests.exceptions.RequestException, UserError) as e:
+            if self.return_id:
+                self.return_id.write({'l10n_dk_validation_state': 'rejected'})
+            self.env.user._bus_send('simple_notification', {
+                'type': 'danger',
+                'title': self.env._('Communication Error'),
+                'message': str(e),
+                'sticky': True,
+            })
+            return {'type': 'ir.actions.act_window_close'}
 
         has_information = response_tree.xpath('.//urn:AngivelseFrekvensListe', namespaces=URN_NAMESPACE)
         if has_information is None:
@@ -103,6 +110,7 @@ class L10nDkTaxReportRSUCalendarWizard(models.TransientModel):
         )
 
         wizard_info = self.env['l10n_dk_reports.tax.report.submit.draft.wizard'].create({
+            'return_id': self.return_id.id,
             'frequency_code': response_info.get('frequency_code'),
             'start_date': response_info.get('start_date'),
             'deadline_date': response_info.get('deadline_date'),
@@ -124,7 +132,7 @@ class L10nDkTaxReportRSUCalendarWizard(models.TransientModel):
         if self.date_from == self.date_to:
             raise UserError(_("Please use a Period starting date different than your Period ending date!"))
 
-        if not self.company_id.company_registry:
+        if not self.company_id.partner_id._get_additional_identifier('DK_CVR'):
             raise RedirectWarning(
                 _("No company registry associated with your company. Please define one."),
                 self.env.ref('base.action_res_company_form').id,
@@ -209,20 +217,28 @@ class L10nDkTaxReportRSUSubmitDraftWizard(models.TransientModel):
     settlement_period_end = fields.Date()
     report_id = fields.Many2one(comodel_name='account.report')
     company_id = fields.Many2one(comodel_name='res.company', readonly=True)
+    return_id = fields.Many2one(comodel_name='account.return')
 
     def action_submit_draft(self):
         self.ensure_one()
 
-        lines = self.report_id._get_lines(self.report_id.get_options())
+        previous_options = {
+            'date': {
+                'date_from': self.settlement_period_start,
+                'date_to': self.settlement_period_end,
+            },
+        } if self.settlement_period_start and self.settlement_period_end else {}
+
+        lines = self.report_id._get_lines(self.report_id.get_options(previous_options))
         ReportHandler = self.env['l10n_dk.tax.report.handler']
 
         def get_line_value_from_xmlid(lines, xmlid):
-            return self.env.company.currency_id.round(self.env['account.report']._get_line_from_xml_id(lines, xmlid)['columns'][0]['no_format'])
+            return self.env.company.currency_id.round(self.env['account.report']._get_line_from_xml_id(lines, xmlid).columns[0].no_format)
 
         body = self.env['ir.qweb']._render('l10n_dk_reports.submitDraftService', {
             'transaction_id': uuid4(),
             'transaction_time': fields.Datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'company_registry': self.company_id.company_registry,
+            'company_registry': self.company_id.partner_id._get_additional_identifier('DK_CVR'),
             'settlement_start': self.settlement_period_start,
             'settlement_end': self.settlement_period_end,
             'vat_declaration': get_line_value_from_xmlid(lines, 'l10n_dk.account_tax_report_line_vat_statement'),
@@ -254,18 +270,25 @@ class L10nDkTaxReportRSUSubmitDraftWizard(models.TransientModel):
                 timeout=10,
             )
             response.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            raise UserError(_("Sorry, something went wrong: %s", e))
-
-        response_tree = etree.fromstring(response.text)
-        # Deal with the error code
-        ReportHandler._error_code_handler(response_tree)
+            response_tree = etree.fromstring(response.text)
+            ReportHandler._error_code_handler(response_tree)
+        except (requests.exceptions.RequestException, UserError) as e:
+            if self.return_id:
+                self.return_id.write({'l10n_dk_validation_state': 'rejected'})
+            self.env.user._bus_send('simple_notification', {
+                'type': 'danger',
+                'title': self.env._("Submission Error"),
+                'message': str(e),
+                'sticky': True,
+            })
+            return {'type': 'ir.actions.act_window_close'}
 
         transaction_identifier = response_tree.xpath('.//urn1:TransaktionIdentifier', namespaces=URN1_NAMESPACE)
         if transaction_identifier is None:
             raise UserError(_("The information entered give an empty result"))
 
         wizard_info = self.env['l10n_dk_reports.tax.report.receipt.wizard'].create({
+            'return_id': self.return_id.id,
             'transaction_identifier': transaction_identifier[-1].text,
             'link': find_xml_value('.//urn1:UrlIndicator', response_tree, namespaces=URN1_NAMESPACE),
             'company_id': self.company_id.id,
@@ -293,6 +316,7 @@ class L10nDkTaxReportRSUReceiptWizard(models.TransientModel):
     deadline_date = fields.Date(readonly=True)
     attachment = fields.Binary(attachment=True)
     company_id = fields.Many2one(comodel_name='res.company', readonly=True)
+    return_id = fields.Many2one(comodel_name='account.return')
 
     def action_receive_receipt(self):
         self.ensure_one()
@@ -302,7 +326,7 @@ class L10nDkTaxReportRSUReceiptWizard(models.TransientModel):
             'transaction_id': uuid4(),
             'transaction_time': fields.Datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'received_transaction_identifier': self.transaction_identifier,
-            'company_registry': self.company_id.company_registry,
+            'company_registry': self.company_id.partner_id._get_additional_identifier('DK_CVR'),
         })
 
         envelope = ReportHandler._create_envelope(body)
@@ -315,17 +339,24 @@ class L10nDkTaxReportRSUReceiptWizard(models.TransientModel):
                 timeout=10,
             )
             response.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            raise UserError(_("Sorry, something went wrong: %s", e))
-
-        response_tree = etree.fromstring(response.text)
-        # Deal with the error code
-        ReportHandler._error_code_handler(response_tree)
+            response_tree = etree.fromstring(response.text)
+            ReportHandler._error_code_handler(response_tree)
+        except (requests.exceptions.RequestException, UserError) as e:
+            if self.return_id:
+                self.return_id.write({'l10n_dk_validation_state': 'rejected'})
+            self.env.user._bus_send('simple_notification', {
+                'type': 'danger',
+                'title': self.env._("Receipt Error"),
+                'message': str(e),
+                'sticky': True,
+            })
+            return {'type': 'ir.actions.act_window_close'}
 
         encoded_pdf = response_tree.xpath('.//urn1:DokumentFilIndholdData', namespaces=URN1_NAMESPACE)
         if encoded_pdf is None:
             raise UserError(_("The receipt has not been received."))
-
+        if self.return_id:
+            self.return_id.write({'l10n_dk_validation_state': 'accepted'})
         self.is_receipt_received = True
         self.attachment = encoded_pdf[-1].text
         self.ocr_card_type_code = find_xml_value('.//urn1:OCRKortTypeKode', response_tree, namespaces=URN1_NAMESPACE)

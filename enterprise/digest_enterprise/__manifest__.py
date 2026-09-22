@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -7,7 +6,6 @@
 Enterprise digest data
     """,
     'category': 'Hidden',
-    'version': '1.0',
     'depends': ['web_enterprise', 'digest'],
     'data': [
         'data/digest_data.xml',

@@ -7,6 +7,7 @@ import logging
 from collections import OrderedDict, defaultdict
 from odoo import api, fields, models, _
 from odoo.fields import Datetime
+from odoo.tools.float_utils import float_is_zero
 
 _logger = logging.getLogger(__name__)
 
@@ -57,16 +58,22 @@ class L10n_BeIndividualAccount(models.Model):
             ('struct_id.country_id', '=', False),
             ('struct_id.country_id.code', '=', "BE"),
         ])
-        employees = payslips.employee_id
-        lines = payslips.line_ids.filtered(lambda l: l.salary_rule_id.appears_on_payslip)
-        payslip_rules = [(rule.code, rule.sequence) for rule in lines.salary_rule_id] + [('ECOVOUCHERS', 10000)]
+        lines = payslips.line_ids.filtered(lambda line: line.appears_on_payslip == 'always' or
+                (line.appears_on_payslip == 'non_zero' and not float_is_zero(line.amount, 2)) or
+                (line.display_in_pdf_extra_info))
+        payslip_rules = [(rule.code, rule.sequence) for rule in lines.salary_rule_id]
         payslip_rules = sorted(payslip_rules, key=lambda x: x[1])
         worked_days = payslips.worked_days_line_ids
-        other_inputs = payslips.input_line_ids
 
-        result = {
-            employee: {
+        result = {}
+        for employee in employees:
+            emp_payslips = payslips.filtered(lambda p: p.employee_id == employee)
+            # Use data from latest payslip to represent self.year
+            version = emp_payslips.mapped('version_id').sorted('date_start', reverse=True)[:1]
+
+            result[employee] = {
                 'year': self.year,
+                'version': version,
                 'rules': OrderedDict(
                     (rule[0], defaultdict(lambda: {
                         'year': {'name': False, 'total': 0},
@@ -80,27 +87,11 @@ class L10n_BeIndividualAccount(models.Model):
                         'quarter': {q: {'name': False, 'number_of_days': 0, 'number_of_hours': 0} for q in range(4)}
                     } for code in worked_days.mapped('code')
                 }
-            } for employee in employees
-        }
-
-        for other_input in other_inputs:
-            if other_input.input_type_id.code != "ECOVOUCHERS":
-                continue
-            other_input = other_input.with_context(lang=other_input.payslip_id.employee_id.lang or self.env.user.lang)
-            slip = other_input.payslip_id
-            rule = result[slip.employee_id]['rules']['ECOVOUCHERS'][other_input.payslip_id.struct_id.name]
-            month = slip.date_from.month - 1
-            line_name = _('Ecovouchers')
-            rule['month'][month]['name'] = line_name
-            rule['month'][month]['total'] += other_input.amount
-            rule['quarter'][(month) // 3]['name'] = line_name
-            rule['quarter'][(month) // 3]['total'] += other_input.amount
-            rule['year']['name'] = line_name
-            rule['year']['total'] += other_input.amount
+            }
 
         for line in lines:
             line = line.with_context(lang=line.slip_id.employee_id.lang or self.env.user.lang)
-            rule = result[line.slip_id.employee_id]['rules'][line.salary_rule_id.code][line.salary_rule_id.struct_id.name]
+            rule = result[line.slip_id.employee_id]['rules'][line.salary_rule_id.code][line.slip_id.struct_id.name]
             month = line.slip_id.date_from.month - 1
             line_name = rule['month'][month]['name']
             if not line_name or (line.slip_id.struct_id.type_id.default_struct_id == line.slip_id.struct_id):

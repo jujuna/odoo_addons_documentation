@@ -44,9 +44,9 @@ class AccountReport(models.Model):
             # ids of asset lines are in the form <account_group>_<asset_id>
             asset_ids = {}
             for line in lines:
-                res_model, model_id = self._get_model_info_from_id(line['id'])
+                res_model, model_id = self._get_model_info_from_id(line.id)
                 if res_model == 'account.asset':
-                    asset_ids[model_id] = line['id']
+                    asset_ids[model_id] = line.id
             assets = self.env['account.asset'].search([('id', 'in', list(asset_ids.keys()))])
             # Check that all assets are in EUR and that the company has EUR as its currency;
             asset_currencies = assets.mapped('currency_id')
@@ -64,8 +64,6 @@ class AccountReport(models.Model):
                 total_tax = 0.00
                 for ml in asset.original_move_line_ids:
                     balance = ml.balance
-                    if asset.account_asset_id.multiple_assets_per_line and len(asset.original_move_line_ids) == 1:
-                        balance /= max(1, int(ml.quantity))
                     for tax in ml.tax_ids:
                         # Take the corresponding tax account.move.line on the account.move if the tax is VAT and debit
                         tax_line = ml.move_id.line_ids.filtered(lambda r: r.tax_line_id == tax and r.tax_repartition_line_id and r.debit)
@@ -85,7 +83,7 @@ class AccountReport(models.Model):
             '235': {'field_type': 'number', 'value': date_to.day},
             '236': {'field_type': 'number', 'value': date_to.month}
         }
-        options.update({'filter_unfolded_lines': True})
+        options.update({'unfold_all': True})
         lines = self._get_lines(options)
         # get additional data not shown in the assets report (tax paid, depreciable value)
         depreciable_values, tax_amounts = _get_assets_data(lines)
@@ -125,17 +123,17 @@ class AccountReport(models.Model):
 
         n_expenditure = 0
         for line in lines:
-            acquisition_date = parse_date(self.env, parse_date(self.env, line['columns'][0].get('name', '')))
-            if self._get_model_info_from_id(line['id'])[0] != 'account.asset' or isinstance(acquisition_date, (str, type(None))):
+            acquisition_date = parse_date(self.env, parse_date(self.env, line.columns[0].name or ''))
+            if self._get_model_info_from_id(line.id)[0] != 'account.asset' or acquisition_date is None or isinstance(acquisition_date, str):
                 # only 2 levels are  possible, level 0 are totals
                 continue
             acquisition_date = acquisition_date.strftime('%d%m%Y')
             # Update expenditures table
             n_expenditure += 1
-            name = line['name']
-            acquisition_cost_no_vat = float(line['columns'][3].get('no_format', 0)) + float(line['columns'][4].get('no_format', 0))
-            vat = float(tax_amounts.get(line['id'], 0.))
-            value_to_be_depreciated = float(depreciable_values.get(line['id'], 0))
+            name = line.name
+            acquisition_cost_no_vat = float(line.columns[3].no_format or 0) + float(line.columns[4].no_format or 0)
+            vat = float(tax_amounts.get(line.id, 0.))
+            value_to_be_depreciated = float(depreciable_values.get(line.id, 0))
             expenditures_line = {
                 '501': {'field_type': 'number', 'value': str(n_expenditure)},
                 '502': {'field_type': 'char', 'value': acquisition_date},
@@ -151,17 +149,17 @@ class AccountReport(models.Model):
             expenditures_table.append(expenditures_line)
 
             # Update Depreciation/amortisation table
-            depreciation_or_amortisation = float(line['columns'][2].get('name', '')[:-2] or 0)  # remove ' %' sign
+            depreciation_or_amortisation = float(*(line.columns[2].name or '').split()[:1]) or 0.0  # remove ' % p.a.' part
             # Book value at the beginning of the reported accounting period (not reported by super's _get_lines)
             # asset_opening (acquisition price at the beginning of the accounting period)
             #  - depreciation_opening (depreciated value at the beginning of the accounting period)
-            book_value_beginning = float(line['columns'][3].get('no_format', 0)) - float(line['columns'][8].get('no_format', 0))
-            acquisitions = float(line['columns'][4].get('no_format', 0))
-            sales = float(line['columns'][5].get('no_format', 0))
+            book_value_beginning = float(line.columns[3].no_format or 0) - float(line.columns[8].no_format or 0)
+            acquisitions = float(line.columns[4].no_format or 0)
+            sales = float(line.columns[5].no_format or 0)
             # Depreciation reported from _get_lines divided in value decrease (+) and value increase (-);
             # depreciation is the net difference
-            depreciation = float(line['columns'][8].get('no_format', 0)) - float(line['columns'][9].get('no_format', 0))
-            book_value_end = float(line['columns'][11].get('no_format', 0))
+            depreciation = float(line.columns[8].no_format or 0) - float(line.columns[9].no_format or 0)
+            book_value_end = float(line.columns[11].no_format or 0)
             depreciations_line = {
                 '617': {'field_type': 'number', 'value': str(n_expenditure)},
                 '602': {'field_type': 'char', 'value': acquisition_date},

@@ -24,7 +24,7 @@ class ProductTemplate(models.Model):
         for product in self:
             product.l10n_mx_edi_can_use_customs_invoicing = (
                 product.invoice_policy == 'delivery'
-                and product.tracking != 'none'
+                and product.tracking in ['lot', 'serial']
                 and product.lot_valuated
                 and product.l10n_mx_edi_use_customs_invoicing
             )

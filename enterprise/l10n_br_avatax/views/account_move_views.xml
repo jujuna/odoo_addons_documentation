@@ -33,7 +33,28 @@
                            column_invisible="parent.country_code != 'BR' or not parent.l10n_br_is_avatax or parent.l10n_br_is_service_transaction"
                            readonly="parent.state in ['cancel', 'posted']"
                     />
+                    <field name="l10n_br_item_number"
+                           column_invisible="parent.country_code != 'BR' or not parent.l10n_br_is_avatax or parent.l10n_br_is_service_transaction"
+                           readonly="parent.state in ['cancel', 'posted']"
+                           optional="hide"
+                    />
+                    <field name="l10n_br_order_number"
+                           column_invisible="parent.country_code != 'BR' or not parent.l10n_br_is_avatax or parent.l10n_br_is_service_transaction"
+                           readonly="parent.state in ['cancel', 'posted']"
+                           optional="hide"
+                    />
                 </xpath>
+                <!-- Display tooltip for incoterm_location and make it readonly if it's an export of goods invoice-->
+                <field name="incoterm_location" position="attributes">
+                    <attribute name="help">Brazil: City or location from which the goods are shipped. Used for exportation NF-e.</attribute>
+                    <attribute name="readonly" separator="or" add="state in ['cancel', 'posted'] and l10n_br_partner_country_code != 'BR' and l10n_br_is_avatax and l10n_latam_document_type_id_code == '55'"/>
+                </field>
+                <field name="incoterm_location" position="after">
+                    <field name="l10n_br_shipping_state_id"
+                           invisible="l10n_br_partner_country_code == 'BR' or not l10n_br_is_avatax or l10n_latam_document_type_id_code != '55'"
+                           readonly="state in ['cancel', 'posted']"
+                    />
+                </field>
             </field>
         </record>
     </data>

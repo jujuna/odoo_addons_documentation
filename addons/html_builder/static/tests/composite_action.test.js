@@ -7,9 +7,8 @@ import { BuilderAction } from "@html_builder/core/builder_action";
 import { describe, expect, test } from "@odoo/hoot";
 import { xml } from "@odoo/owl";
 import { contains } from "@web/../tests/web_test_helpers";
-import { BaseOptionComponent } from "@html_builder/core/utils";
 
-// TODO: test composite with each spec: prepare, load, getValue
+// TODO: test composite with each spec: prepare, load
 // TODO: test reloadComposite
 
 describe.current.tags("desktop");
@@ -39,20 +38,18 @@ test("can call 2 separate actions with composite action", async () => {
         Action1,
         Action2,
     });
-    addBuilderOption(
-        class extends BaseOptionComponent {
-            static selector = ".s_test";
-            static template = xml`
+    addBuilderOption({
+        selector: ".s_test",
+        template: xml`
             <BuilderButton
-                    action="'composite'"
-                    actionParam="[
-                        { action: 'action1', actionParam: { mainParam: 'class1' } },
-                        { action: 'action2', actionParam: { mainParam: 'class2' } },
-                    ]">
+                action="'composite'"
+                actionParam="[
+                    { action: 'action1', actionParam: { mainParam: 'class1' } },
+                    { action: 'action2', actionParam: { mainParam: 'class2' } },
+                ]">
                 Click
-            </BuilderButton>`;
-        }
-    );
+        </BuilderButton>`,
+    });
     await setupHTMLBuilder(`<section class="s_test">Test</section>`);
     await contains(":iframe .s_test").click();
     await contains("[data-action-id='composite']").click();
@@ -81,20 +78,18 @@ test("can call the same action twice with composite action", async () => {
     addBuilderAction({
         Action1,
     });
-    addBuilderOption(
-        class extends BaseOptionComponent {
-            static selector = ".s_test";
-            static template = xml`
+    addBuilderOption({
+        selector: ".s_test",
+        template: xml`
             <BuilderButton
-                    action="'composite'"
-                    actionParam="[
-                        { action: 'action1', actionParam: { mainParam: 'class1' } },
-                        { action: 'action1', actionParam: { mainParam: 'class2' } },
-                    ]">
+                action="'composite'"
+                actionParam="[
+                    { action: 'action1', actionParam: { mainParam: 'class1' } },
+                    { action: 'action1', actionParam: { mainParam: 'class2' } },
+                ]">
                 Click
-            </BuilderButton>`;
-        }
-    );
+        </BuilderButton>`,
+    });
     await setupHTMLBuilder(`<section class="s_test">Test</section>`);
     await contains(":iframe .s_test").click();
     await contains("[data-action-id='composite']").click();
@@ -119,20 +114,18 @@ test("composite action's isApplied returns false if no action defined it", async
     addBuilderAction({
         Action1,
     });
-    addBuilderOption(
-        class extends BaseOptionComponent {
-            static selector = ".s_test";
-            static template = xml`
+    addBuilderOption({
+        selector: ".s_test",
+        template: xml`
             <BuilderButton
-                    action="'composite'"
-                    actionParam="[
-                        { action: 'action1', actionParam: { mainParam: 'class1' } },
-                        { action: 'action1', actionParam: { mainParam: 'class2' } },
-                    ]">
+                action="'composite'"
+                actionParam="[
+                    { action: 'action1', actionParam: { mainParam: 'class1' } },
+                    { action: 'action1', actionParam: { mainParam: 'class2' } },
+                ]">
                 Click
-            </BuilderButton>`;
-        }
-    );
+        </BuilderButton>`,
+    });
     await setupHTMLBuilder(`<section class="s_test">Test</section>`);
     await contains(":iframe .s_test").click();
     expect("[data-action-id='composite']").not.toHaveClass("active");
@@ -144,6 +137,46 @@ test("composite action's isApplied returns false if no action defined it", async
         "action: class1", // apply
         "action: class2", // apply
     ]);
+});
+
+test("composite action should use the first getValue", async () => {
+    class Action1 extends BuilderAction {
+        static id = "action1";
+        setup() {
+            this.data = { name: "first action" };
+        }
+        getValue() {
+            return this.data.name;
+        }
+        apply() {}
+    }
+    class Action2 extends BuilderAction {
+        static id = "action2";
+        setup() {
+            this.data = { name: "second action" };
+        }
+        getValue() {
+            return this.data.name;
+        }
+        apply() {}
+    }
+    addBuilderAction({
+        Action1,
+        Action2,
+    });
+    addBuilderOption({
+        selector: ".s_test",
+        template: xml`
+            <BuilderTextInput action="'composite'"
+                actionParam="[
+                    { action: 'action1' },
+                    { action: 'action2' },
+                ]"/>`,
+    });
+    await setupHTMLBuilder(`<section class="s_test">Test</section>`);
+    await contains(":iframe .s_test").click();
+
+    expect("[data-action-id='composite'] input").toHaveValue("first action");
 });
 
 test("composite action's isApplied returns true if at least one action defined it", async () => {
@@ -164,23 +197,41 @@ test("composite action's isApplied returns true if at least one action defined i
         Action1,
         Action2,
     });
-    addBuilderOption(
-        class extends BaseOptionComponent {
-            static selector = ".s_test";
-            static template = xml`
+    addBuilderOption({
+        selector: ".s_test",
+        template: xml`
             <BuilderButton
-                    action="'composite'"
-                    actionParam="[
-                        { action: 'action1', actionParam: { mainParam: 'class1' } },
-                        { action: 'action2', actionParam: { mainParam: 'class2' } },
-                    ]">
+                action="'composite'"
+                actionParam="[
+                    { action: 'action1', actionParam: { mainParam: 'class1' } },
+                    { action: 'action2', actionParam: { mainParam: 'class2' } },
+                ]">
                 Click
-            </BuilderButton>`;
-        }
-    );
+        </BuilderButton>`,
+    });
     await setupHTMLBuilder(`<section class="s_test">Test</section>`);
     await contains(":iframe .s_test").click();
     expect("[data-action-id='composite']").not.toHaveClass("active");
     await contains("[data-action-id='composite']").click();
     expect("[data-action-id='composite']").toHaveClass("active");
+});
+
+test("applied composite action's with no getPriority implementation is considered the applied option", async () => {
+    addBuilderOption({
+        selector: ".s_test",
+        template: xml`
+            <BuilderSelect>
+                <BuilderSelectItem
+                    action="'composite'"
+                    actionParam="[
+                        { action: 'dataAttributeAction', actionParam: { mainParam: 'test' } },
+                    ]"
+                    actionValue="'something'">
+                    The Test Option
+                </BuilderSelectItem>
+            </BuilderSelect>`,
+    });
+    await setupHTMLBuilder(`<section class="s_test" data-test="something">Test</section>`);
+    await contains(":iframe .s_test").click();
+    expect(".o-hb-select-wrapper button").toHaveText("The Test Option");
 });

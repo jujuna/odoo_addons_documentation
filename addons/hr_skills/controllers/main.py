@@ -1,11 +1,12 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import re
 
 from odoo import _
-
-from odoo.http import request, route, Controller, content_disposition
+from odoo.addons.base.models.ir_qweb import QWebError
+from odoo.exceptions import UserError
+from odoo.http import Controller, request, route
+from odoo.http.stream import content_disposition
 
 
 class HrEmployeeCV(Controller):
@@ -25,16 +26,19 @@ class HrEmployeeCV(Controller):
 
         report = request.env.ref('hr_skills.action_report_employee_cv', False)
 
-        pdf_content, dummy = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
-            report, employees.ids, data={
-            'color_primary': color_primary,
-            'color_secondary': color_secondary,
-            'resume_type_education': resume_type_education,
-            'skill_type_language': skill_type_language,
-            'show_skills': 'show_skills' in post,
-            'show_contact': 'show_contact' in post,
-            'show_others': 'show_others' in post,
-        })
+        try:
+            pdf_content, _dummy = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
+                report, employees.ids, data={
+                'color_primary': color_primary,
+                'color_secondary': color_secondary,
+                'resume_type_education': resume_type_education,
+                'skill_type_language': skill_type_language,
+                'show_skills': 'show_skills' in post,
+                'show_contact': 'show_contact' in post,
+                'show_others': 'show_others' in post,
+            })
+        except QWebError as error:
+            raise UserError(error)
 
         if len(employees) == 1:
             report_name = _('Resume %s', employees.name)
@@ -44,7 +48,7 @@ class HrEmployeeCV(Controller):
         pdfhttpheaders = [
             ('Content-Type', 'application/pdf'),
             ('Content-Length', len(pdf_content)),
-            ('Content-Disposition', content_disposition(report_name + '.pdf'))
+            ('Content-Disposition', content_disposition(report_name + '.pdf')),
         ]
 
         return request.make_response(pdf_content, headers=pdfhttpheaders)

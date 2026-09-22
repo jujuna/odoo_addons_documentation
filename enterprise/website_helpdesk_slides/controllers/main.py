@@ -18,7 +18,7 @@ class WebsiteHelpdeskSlides(WebsiteHelpdesk):
                 'record': slide,
                 'score': slide.total_views + slide.comments_count + slide.likes - slide.dislikes,
                 'url': slide.website_absolute_url if slide.is_preview or slide.channel_id.is_member else slide.channel_id.website_absolute_url,
-                'icon': 'fa-graduation-cap',
+                'icon': 'school',
             } for slide in records]
         # slide.channel
         return [{
@@ -26,12 +26,34 @@ class WebsiteHelpdeskSlides(WebsiteHelpdesk):
             'record': channel,
             'score': channel.total_views + channel.total_votes,
             'url': channel.website_absolute_url,
-            'icon': 'fa-graduation-cap',
+            'icon': 'school',
         } for channel in records]
 
 class WebsiteSlidesHelpdesk(WebsiteSlides):
 
-    @route('/helpdesk/<model("helpdesk.team"):team>/slides', type='http', auth="public", website=True, sitemap=True)
+    def sitemap_helpdesk_slides_channel(env, rule, qs):
+        slug = env['ir.http']._slug
+        teams = env['helpdesk.team'].search([])
+
+        for team in teams:
+            channels = team.website_slide_channel_ids
+            if not channels:
+                loc = '/slides'
+                if not qs or qs.lower() in loc.lower():
+                    yield {'loc': loc}
+                continue
+            if len(channels) == 1:
+                loc = f'/slides/{slug(channels[0])}'
+            else:
+                loc = '/slides'
+            if not qs or qs.lower() in loc.lower():
+                last_write = max(channels.mapped('write_date'))
+                yield {
+                    'loc': loc,
+                    'lastmod': last_write.date() if last_write else None,
+                }
+
+    @route('/helpdesk/<model("helpdesk.team"):team>/slides', type='http', auth="public", website=True, sitemap=sitemap_helpdesk_slides_channel)
     def helpdesk_slides_channel(self, team=None, **post):
         if not team or not team.website_slide_channel_ids:
             return request.redirect('/slides')

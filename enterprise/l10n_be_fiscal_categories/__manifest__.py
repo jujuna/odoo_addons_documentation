@@ -14,10 +14,8 @@ Fiscal Categories Data for Belgium
     'data': [
         'data/account_fiscal_categories.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'website': 'https://www.odoo.com/app/accounting',
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'post_init_hook': '_l10n_be_fiscal_categories_post_init',
 }

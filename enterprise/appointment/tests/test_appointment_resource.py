@@ -58,6 +58,99 @@ class AppointmentResource(AppointmentCommon):
             'name': 'Resource 3',
         }])
 
+    def test_appointment_slot_interval_capacity(self):
+        """ Test that slot_interval_capacity is correctly limiting the slot availability.
+            Use complex slot config to assert robustness of the algorithm used in
+            `_filter_slots_interval_available` (see its docstring for details)"""
+        appointment = self.appointment_manage_capacity
+        appointment.write({
+            'appointment_duration': 2.0,
+            'max_schedule_days': 4,
+            'resource_ids': [(5, 0, 0)] + [
+                (0, 0, {'capacity': 3, 'name': f'Resource {i}'}) for i in range(3)
+            ],
+            'slot_creation_interval': .5,
+            'slot_ids': [(5, 0, 0)] + [(0, 0, {
+                'weekday': str(self.reference_monday.isoweekday()),
+                'start_hour': start,
+                'end_hour': end,
+            }) for start, end in [(6, 9), (6.25, 8.25), (6.5, 8.5)]]  # Overlapping, redundant slots
+        })
+        self.assertEqual(appointment.slot_interval_capacity, 0)
+
+        # --- Data ---
+        # 3 resources, 3 capacity each
+        # 5 subslots, 4 bookable times: 6.00 6.15 6.30(2x) 7.00
+        # Interval has length slot_creation_interval = 30min
+        # --- Test case: resource_time mode ---
+        # resource_3 is also used to assert other resources count in the limit even
+        # if we manually select a single resource (e.g. resource_time mode). See below.
+        # No booking is created on resource_3 to be able to reuse same expected slots
+        resource_1, resource_2, resource_3 = appointment.resource_ids
+        appointment.slot_interval_capacity = 2
+
+        # Test case structure:
+        # [
+        #     existing events structured as [(resource, reserved capacity, start), ...],
+        #     available slots as [(asked_capacity, expected_nb_available_slots), ...],
+        # ]
+        cases = [
+            [  # Default availability
+                [],
+                [(2, 5)]
+            ], [  # No availability over 2 capacity (service_subslot_capacity)
+                [],
+                [(3, 0)]
+            ], [  # One booking 5.00->7.00 has no effect on subslots.
+                [(resource_1, 3, self.reference_monday.replace(hour=5))],
+                [(2, 5)]
+            ], [  # One booking 6.00->8.00 (partially) fills subslot 6.00->6.30.
+                [(resource_1, 1, self.reference_monday.replace(hour=6))],
+                [(1, 5), (2, 4)]
+            ], [  # Full booking at 6.15. It falls in 6->6.30 and 6.15->6.45 subslots.
+                [(resource_1, 2, self.reference_monday.replace(hour=6, minute=15))],
+                [(1, 3)]
+            ], [  # Full booking at 6.40. Filling 6.15 and 6.30 subslots, 2 left: 6.00, 7.00
+                [(resource_1, 2, self.reference_monday.replace(hour=6, minute=40))],
+                [(1, 2)]
+            ], [  # Same, cross resources, at 6.30, 2 left: 6.00, 7.00
+                [
+                    (resource_1, 1, self.reference_monday.replace(hour=6, minute=30)),
+                    (resource_2, 1, self.reference_monday.replace(hour=6, minute=30))
+                ],
+                [(1, 2)]
+            ], [  # Bookings starting at the exact end of a subslot do not count towards that subslot
+                [(resource_2, 1, self.reference_monday.replace(hour=7, minute=30))],
+                [(2, 5)]
+            ], [  # This will still count in last subslot, even if after last bookable slot
+                [(resource_1, 2, self.reference_monday.replace(hour=7, minute=20))],
+                [(1, 4)]
+            ], [  # This will not count in last subslot, as over last subslot.
+                [(resource_1, 2, self.reference_monday.replace(hour=8))],
+                [(1, 5)]]
+            ]
+
+        for event_values, expected_values in cases:
+            with freeze_time(self.reference_now), self.subTest(event_values=event_values):
+                events = self.env['calendar.event'].create([{
+                    'appointment_type_id': appointment.id,
+                    'booking_line_ids': [(0, 0, {
+                        'appointment_resource_id': resource.id,
+                        'capacity_reserved': capacity,
+                        'capacity_used': resource.capacity
+                    })],
+                    'name': 'Booking',
+                    'start': start,
+                    'stop': start + timedelta(hours=appointment.appointment_duration),
+                } for resource, capacity, start in event_values])
+                for asked_capacity, nb_slots in expected_values:
+                    slots = appointment._get_appointment_slots('UTC', asked_capacity=asked_capacity)
+                    self.assertEqual(len(self._filter_appointment_slots(slots)), nb_slots)
+                    # Test Case: resource_time mode, using resource_3
+                    slots = appointment._get_appointment_slots('UTC', asked_capacity=asked_capacity, filter_resources=resource_3)
+                    self.assertEqual(len(self._filter_appointment_slots(slots)), nb_slots)
+                events.unlink()
+
     @users('apt_manager')
     def test_appointment_resource_default_appointment_type(self):
         """Check that the default appointment type is properly deduced from the default appointment resource."""
@@ -210,7 +303,7 @@ class AppointmentResource(AppointmentCommon):
         end = start + timedelta(hours=1)
 
         # Create conflicting events. Remaining capacity should be 1, as resource booking should not count.
-        self.env['calendar.event'].with_context(self._test_context).create([{
+        self.env['calendar.event'].create([{
             'appointment_type_id': user_appointment.id,
             'attendee_ids': [(0, 0, {'partner_id': staff_user.partner_id.id, 'state': 'accepted'})],
             'booking_line_ids': [(0, 0, {'appointment_user_id': staff_user.id, 'capacity_reserved': 1, 'capacity_used': 1})],
@@ -250,7 +343,7 @@ class AppointmentResource(AppointmentCommon):
         self.assertTrue(appointment._get_resources_remaining_capacity(resource_2, start, end)['total_remaining_capacity'] == 2)
 
         # Create bookings for resource
-        booking_1, booking_2 = self.env['calendar.event'].with_context(self._test_context).create([{
+        booking_1, booking_2 = self.env['calendar.event'].create([{
             'appointment_type_id': appointment.id,
             'booking_line_ids': [(0, 0, {'appointment_resource_id': resource_1.id, 'capacity_reserved': 1, 'capacity_used': resource_1.capacity})],
             'name': 'Booking 1',
@@ -281,7 +374,7 @@ class AppointmentResource(AppointmentCommon):
         self.assertTrue(appointment._get_resources_remaining_capacity(resource_1, start, end)[resource_1] == 3)
         self.assertTrue(appointment._get_resources_remaining_capacity(resource_2, start, end)[resource_2] == 2)
 
-        booking = self.env['calendar.event'].with_context(self._test_context).create([{
+        booking = self.env['calendar.event'].create([{
             'appointment_type_id': appointment.id,
             'booking_line_ids': [
                 (0, 0, {'appointment_resource_id': resource_1.id, 'capacity_reserved': 3, 'capacity_used': 3}),
@@ -316,6 +409,7 @@ class AppointmentResource(AppointmentCommon):
             'booking_gantt_create_record': True,
             'default_appointment_type_id': self.appointment_manage_capacity.id,
             'default_resource_ids': [self.resource_1.id],
+            'uid': self.env.uid,
         }
 
         booking_form = Form(self.env['calendar.event'].with_context(gantt_context))
@@ -361,7 +455,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
         self.flush_tracking()
 
         with freeze_time(self.reference_now):
-            with self.assertQueryCount(default=7):
+            with self.assertQueryCount(default=11):
                 appointment._get_appointment_slots('UTC')
 
     def test_appointment_resources_check_organizer_validation_conditions(self):
@@ -600,7 +694,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
         # Create a booking for the first resource for all its capacity
         start = datetime(2022, 2, 14, 15, 0, 0)
         end = start + timedelta(hours=1)
-        self.env['calendar.event'].with_context(self._test_context).create({
+        self.env['calendar.event'].create({
             'appointment_type_id': self.apt_type_resource.id,
             'booking_line_ids': [(0, 0, {'appointment_resource_id': table_c2.id, 'capacity_reserved': 2, 'capacity_used': 2})],
             'name': 'Booking 1',
@@ -665,7 +759,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
 
         with freeze_time(self.reference_now):
             appointment._get_appointment_slots('UTC')  # warm-up
-            with self.assertQueryCount(default=3):
+            with self.assertQueryCount(default=7):
                 slots = appointment._get_appointment_slots('UTC')
             resource_slots = self._filter_appointment_slots(
                 slots,
@@ -678,7 +772,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
             )
             self.assertTrue(len(resource_slots) > 0)
             self.assertEqual(len(resource_slots), len(table1_c2_slots))
-            with self.assertQueryCount(default=3):
+            with self.assertQueryCount(default=4):
                 slots = appointment._get_appointment_slots('UTC', asked_capacity=5)
             resource_slots = self._filter_appointment_slots(
                 slots,
@@ -736,7 +830,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
         self._test_slot_generate_available_resources(self.apt_type_resource, 5, 'UTC', start, end, table_c2 + table_c3, available_resources_c5, reference_date=self.reference_now)
 
         # Create a booking for the first resource
-        self.env['calendar.event'].with_context(self._test_context).create({
+        self.env['calendar.event'].create({
             'appointment_type_id': self.apt_type_resource.id,
             'booking_line_ids': [(0, 0, {'appointment_resource_id': table_c2.id, 'capacity_reserved': 1, 'capacity_used': 1})],
             'name': 'Booking 1',
@@ -835,7 +929,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
 
         start = datetime(2022, 2, 14, 15, 0, 0)
         end = start + timedelta(hours=1)
-        self.env['calendar.event'].with_context(self._test_context).create([{
+        self.env['calendar.event'].create([{
             'appointment_type_id': self.apt_type_resource.id,
             'booking_line_ids': [(0, 0, {'appointment_resource_id': resource_shareable.id, 'capacity_reserved': 4, 'capacity_used': 4})],
             'name': 'Booking 1',
@@ -910,7 +1004,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
         # Create a booking for the first resource for all its capacity
         start = datetime(2022, 2, 14, 15, 0, 0)
         end = start + timedelta(hours=1)
-        self.env['calendar.event'].with_context(self._test_context).create({
+        self.env['calendar.event'].create({
             'appointment_type_id': self.apt_type_resource.id,
             'booking_line_ids': [(0, 0, {'appointment_resource_id': resource_1.id, 'capacity_reserved': 5, 'capacity_used': 5})],
             'name': 'Booking 1',
@@ -960,7 +1054,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
 
         with freeze_time(self.reference_now):
             appointment._get_appointment_slots('UTC')  # warm-up
-            with self.assertQueryCount(default=3):
+            with self.assertQueryCount(default=4):
                 appointment._get_appointment_slots('UTC')
 
     @users('apt_manager')
@@ -1105,7 +1199,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
             self.assertEqual(len(resource_slots), 1)
 
         # Resource is booked on its slot on appointment_type_resource
-        self.env['calendar.event'].with_context(self._test_context).create({
+        self.env['calendar.event'].create({
             'appointment_type_id': self.apt_type_resource.id,
             'booking_line_ids': [(0, 0, {
                 'appointment_resource_id': paddle_court.id,
@@ -1126,7 +1220,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
 
     def test_appointment_resources_dont_skip_mail_user_not_attendee(self):
         # Resource is booked on its slot on appointment_type_resource
-        event = self.env['calendar.event'].with_context(self._test_context).create({
+        event = self.env['calendar.event'].create({
             'appointment_type_id': self.apt_type_resource.id,
             'name': 'Booking 1',
             'start': datetime(2022, 2, 14, 15, 0, 0),
@@ -1153,7 +1247,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
         resource_1.linked_resource_ids = resource_2
         start = datetime(2022, 2, 14, 15, 0, 0)
         end = start + timedelta(hours=1)
-        apt_1, apt_2 = self.env['calendar.event'].with_context(self._test_context).create([{
+        apt_1, apt_2 = self.env['calendar.event'].create([{
             'appointment_type_id': self.apt_type_resource.id,
             'booking_line_ids': [
                 (0, 0, {'appointment_resource_id': resource_1.id, 'capacity_reserved': 4, 'capacity_used': 4}),
@@ -1224,7 +1318,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
 
         start = datetime(2022, 2, 14, 15, 0, 0)
         end = start + timedelta(hours=1)
-        booking = self.env['calendar.event'].with_context(self._test_context).create({
+        booking = self.env['calendar.event'].create({
             'appointment_type_id': self.apt_type_resource.id,
             'booking_line_ids': [
                 (0, 0, {'appointment_resource_id': table.id, 'capacity_reserved': 2, 'capacity_used': 3}),
@@ -1280,7 +1374,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
 
         start = datetime(2022, 2, 14, 15, 0, 0)
         end = start + timedelta(hours=1)
-        booking = self.env['calendar.event'].with_context(self._test_context).create({
+        booking = self.env['calendar.event'].create({
             'appointment_type_id': self.apt_type_resource.id,
             'booking_line_ids': [(0, 0, {'appointment_resource_id': resource_1.id, 'capacity_reserved': 1, 'capacity_used': resource_1.capacity})],
             'name': 'Booking 1',
@@ -1308,7 +1402,6 @@ class AppointmentResourceBookingTest(AppointmentCommon):
         # 22:00-23:00 range in UTC will correspond to 23:00-00:00 in UTC+1.
         # So, this matches the attendance ending at midnight in the resource calendar.
         # The corresponding interval bound ends up as 22.59.999999 in UTC unavailabilities.
-        self.env.ref('appointment.appointment_default_resource_calendar').sudo().tz = "Europe/Brussels"
         self.apt_type_resource.slot_ids.write({
             'start_hour': 22,
             'end_hour': 23,
@@ -1318,6 +1411,7 @@ class AppointmentResourceBookingTest(AppointmentCommon):
             'appointment_type_ids': self.apt_type_resource.ids,
             'name': 'Resource',
             'resource_calendar_id': self.env.ref('appointment.appointment_default_resource_calendar').id,
+            'tz': 'Europe/Brussels',
         })
 
         with freeze_time(self.reference_now):

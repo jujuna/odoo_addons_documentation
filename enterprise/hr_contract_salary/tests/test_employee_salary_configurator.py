@@ -1,10 +1,9 @@
 from freezegun import freeze_time
-from datetime import date, timedelta
+from datetime import date
 
 
+from odoo import Command
 import odoo.tests
-import base64
-from odoo.tools import file_open
 
 
 @odoo.tests.tagged('-at_install', 'post_install', 'salary')
@@ -14,8 +13,7 @@ class TestEmployeeSalaryConfigurator(odoo.tests.HttpCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        with file_open('hr_contract_salary/static/src/demo/employee_contract.pdf', "rb") as f:
-            cls.pdf_content = f.read()
+        cls.pdf_content = cls.file_read('hr_contract_salary/static/src/demo/employee_contract.pdf')
 
         attachment = cls.env['ir.attachment'].create({
             'type': 'binary',
@@ -30,11 +28,43 @@ class TestEmployeeSalaryConfigurator(odoo.tests.HttpCase):
             'template_id': cls.template.id,
         })
 
+        version_model = cls.env['ir.model']._get('hr.version')
+        type_employee_name, type_city, type_country_name, type_street = cls.env['sign.item.type'].create([
+            {
+                'name': 'Employee Name',
+                'placeholder': 'legal_name',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'employee_id.legal_name',
+             },
+            {
+                'name': 'Private City',
+                'placeholder': 'City',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'private_city',
+            },
+            {
+                'name': 'Country',
+                'placeholder': 'Country',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'private_country_id.name',
+            },
+            {
+                'name': 'Street',
+                'placeholder': 'Street',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'private_street',
+            },
+        ])
         cls.env['sign.item'].create([
             {
-                'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'employee_id.name',
+                'type_id': type_employee_name.id,
+                'name': 'Name',
                 'required': True,
+                'constant': True,
                 'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                 'page': 1,
                 'posX': 0.273,
@@ -54,9 +84,10 @@ class TestEmployeeSalaryConfigurator(odoo.tests.HttpCase):
                 'width': 0.150,
                 'height': 0.015,
             }, {
-                'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'private_city',
+                'type_id': type_city.id,
+                'name': 'City',
                 'required': True,
+                'constant': True,
                 'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                 'page': 1,
                 'posX': 0.506,
@@ -65,9 +96,10 @@ class TestEmployeeSalaryConfigurator(odoo.tests.HttpCase):
                 'width': 0.150,
                 'height': 0.015,
             }, {
-                'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'private_country_id.name',
+                'type_id': type_country_name.id,
+                'name': 'Country',
                 'required': True,
+                'constant': True,
                 'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                 'page': 1,
                 'posX': 0.663,
@@ -76,9 +108,10 @@ class TestEmployeeSalaryConfigurator(odoo.tests.HttpCase):
                 'width': 0.150,
                 'height': 0.015,
             }, {
-                'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'private_street',
+                'type_id': type_street.id,
+                'name': 'Street',
                 'required': True,
+                'constant': True,
                 'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                 'page': 1,
                 'posX': 0.349,
@@ -121,14 +154,12 @@ class TestEmployeeSalaryConfigurator(odoo.tests.HttpCase):
                 'height': 0.015,
             }
         ])
-
         cls.company_id = cls.env['res.company'].create({
             'name': 'Rambo Company - TEST',
-            'country_id': cls.env.ref('base.be').id,
+            'country_id': False,
         })
 
-        with file_open('sign/static/demo/signature.png', "rb") as f:
-            img_content = base64.b64encode(f.read())
+        img_content = cls.file_read('sign/static/demo/signature.png')
 
         cls.env.ref('base.user_admin').write({
             'company_ids': [(4, cls.company_id.id)],
@@ -160,41 +191,100 @@ class TestEmployeeSalaryConfigurator(odoo.tests.HttpCase):
             'company_id': cls.company_id.id,
         })
 
+        cls.recruiter_employee = cls.env['hr.employee'].create({
+            'name': 'Adam Employston',
+            'company_id': cls.company_id.id,
+            'user_id': cls.env.ref('base.user_admin').id,
+        })
+
         cls.job = cls.env['hr.job'].create({
             'name': 'Senior Developer BE',
             'company_id': cls.company_id.id,
             'contract_template_id': cls.senior_dev_contract.id,
-            'user_id': cls.env.ref('base.user_admin').id,
+            'recruiter_id': cls.recruiter_employee.id,
         })
-
+        cls.work_location = cls.env['hr.work.location'].create({
+            'name': "Office 1",
+            'location_type': "office",
+            'address_id': cls.env.company.partner_id.id,
+            })
         cls.employee_1 = cls.env['hr.employee'].create({
             'name': 'Ahmed Abdelrazek',
+            'work_location_id': cls.work_location.id,
             'date_version': date(2020, 1, 1),
             'contract_date_start': date(2020, 1, 1),
             'contract_date_end': False,
+            'employee_type_id': cls.env.ref('hr.contract_type_employee').id,
             'company_id': cls.company_id.id,
             'job_id': cls.job.id,
             'sign_template_id': cls.template.id,
             'contract_update_template_id': cls.template.id,
             'hr_responsible_id': cls.env.ref('base.user_admin').id,
             'work_email': 'ahmed.abdelrazek@test_email.com',
-
+            'private_country_id': cls.env.ref('base.be').id,
+            'private_state_id': cls.env.ref('base.state_be_1').id,
+            'wage': 6000,
         })
 
-    def test_employee_salary_configurator_flow(self):
-        employee = self.env['hr.employee'].search([('name', 'ilike', 'Ahmed Abdelrazek')])
-        active_versions = self.env['hr.version'].search([('employee_id', '=', employee.id), ('active', '=', True)])
-        self.assertEqual(len(active_versions), 1)
-        self.assertEqual(active_versions[0].contract_date_start, date(2020, 1, 1))
-        self.assertFalse(active_versions[0].contract_date_end)
-        employee.private_country_id = self.env.ref('base.be').id
-        employee.private_state_id = self.env.ref('base.state_be_1').id
+    def test_employee_salary_configurator_amendment_flow(self):
+        employee = self.employee_1
+
         with freeze_time("2022-01-01 12:00:00"):
-            self.start_tour("/", 'hr_contract_salary_employee_flow_tour', login='admin', timeout=350)
-            self.assertEqual(len(active_versions), 1)
-            self.assertFalse(active_versions[0].contract_date_end)
+            self.start_tour("/odoo", 'hr_contract_salary_employee_flow_tour', login='admin', timeout=350)
+            offers = self.env['hr.contract.salary.offer'].search([('employee_id', '=', employee.id)])
+            self.assertTrue(offers)
+            latest_offer = offers[-1]
+            self.assertTrue(latest_offer.is_contract_amendment)
+
         with freeze_time("2022-01-01 13:00:00"):
-            self.start_tour("/", 'hr_contract_salary_employee_flow_tour_counter_sign', login='admin', timeout=350)
-            active_versions = self.env['hr.version'].search([('employee_id', '=', employee.id), ('active', '=', True)])
-            self.assertEqual(len(active_versions), 2)
-            self.assertEqual(active_versions[0].contract_date_end, active_versions[-1].contract_date_start - timedelta(days=1))
+            self.start_tour("/odoo", 'hr_contract_salary_employee_flow_tour_counter_sign', login='admin', timeout=350)
+            versions = employee.version_ids
+            self.assertEqual(len(versions), 2)
+            previous_version = versions[-2]
+            amendment_version = versions[-1]
+            self.assertEqual(amendment_version.contract_date_start, date(2020, 1, 1))
+            self.assertEqual(amendment_version.date_version, date(2022, 1, 1))
+            self.assertFalse(amendment_version.contract_date_end)
+            self.assertFalse(previous_version.contract_date_end)
+
+    def test_employee_salary_configurator_new_contract_flow(self):
+        employee = self.employee_1
+        employee.version_id.contract_date_end = date(2022, 6, 1)
+
+        with freeze_time("2023-01-01 10:00:00"):
+            self.start_tour("/odoo", 'hr_contract_salary_employee_flow_tour', login='admin', timeout=350)
+            offers = self.env['hr.contract.salary.offer'].search([('employee_id', '=', employee.id)])
+            self.assertTrue(offers)
+            new_contract_offer = offers.sorted('create_date')[-1]
+            self.assertFalse(new_contract_offer.is_contract_amendment)
+
+        with freeze_time("2023-01-01 11:00:00"):
+            self.start_tour("/odoo", 'hr_contract_salary_employee_flow_tour_counter_sign', login='admin', timeout=350)
+            final_contract = self.env['hr.version'].search([('employee_id', '=', employee.id)], order='date_version desc', limit=1)
+            self.assertEqual(final_contract.contract_date_start, date(2023, 1, 1))
+            self.assertEqual(final_contract.date_version, date(2023, 1, 1))
+            self.assertFalse(final_contract.contract_date_end)
+
+    def test_employee_salary_configurator_radio_benefit_preselection(self):
+        benefit_type = self.env['hr.contract.salary.benefit.type'].create({'name': 'Salary'})
+        self.env['hr.contract.salary.benefit'].create({
+            'name': 'Gross Wage',
+            'is_configurable_benefit': True,
+            'benefit_type_id': benefit_type.id,
+            'res_field_id': self.env.ref('hr_payroll.field_hr_version__wage').id,
+            'display_type': 'radio',
+            'structure_type_id': self.senior_dev_contract.structure_type_id.id,
+            'value_ids': [
+                Command.create({'name': 'No', 'value': '0'}),
+                Command.create({'name': 'Yes', 'value': '1'}),
+            ],
+        })
+        offer = self.env['hr.contract.salary.offer'].create({
+            'contract_template_id': self.senior_dev_contract.id,
+            'employee_id': self.employee_1.id,
+        })
+        self.authenticate('admin', 'admin')
+        url = f'/salary_package/simulation/offer/{offer.id}'
+        res = self.url_open(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('name="wage_radio" data-value="1" checked="True"', res.text)

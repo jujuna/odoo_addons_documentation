@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models
+from odoo.tools import SQL
 
 
 class HelpdeskSlaReportAnalysis(models.Model):
@@ -16,20 +16,18 @@ class HelpdeskSlaReportAnalysis(models.Model):
     sale_line_id = fields.Many2one('sale.order.line', string="Sales Order Item", readonly=True)
 
     def _select(self):
-        return super()._select() + """ ,
+        return SQL("""%s,
             NULLIF(sol.remaining_hours, 0) as remaining_hours_so,
             T.sale_line_id as sale_line_id
-        """
+        """, super()._select())
 
     def _group_by(self):
-        return super()._group_by() + """ ,
+        return SQL("""%s,
             sol.remaining_hours,
             T.sale_line_id
-        """
+        """, super()._group_by())
 
     def _from(self):
-        from_str = super()._from()
-        from_str += """
+        return SQL("""%s
             LEFT JOIN sale_order_line sol ON T.sale_line_id = sol.id
-        """
-        return from_str
+        """, super()._from())

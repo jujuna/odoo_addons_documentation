@@ -1,10 +1,11 @@
 import logging
 import requests
+from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 
 from odoo import modules, models, fields, _
 from odoo.exceptions import UserError
-from odoo.addons.base.models.res_bank import sanitize_account_number
+from odoo.addons.base.models.res_partner_bank import sanitize_account_number
 from odoo.addons.l10n_be_codabox.const import get_error_msg, get_iap_endpoint
 
 _logger = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ class AccountJournal(models.Model):
         if not date_from:
             date_from = fields.Date.to_string(fields.Date.today() - relativedelta(years=1))
         params = {
-            "db_uuid": self.env["ir.config_parameter"].sudo().get_param("database.uuid"),
+            "db_uuid": self.env["ir.config_parameter"].sudo().get_str('database.uuid'),
             "fidu_vat": company.l10n_be_codabox_fiduciary_vat,
             "company_vat": company.l10n_be_codabox_company_vat,
             "iap_token": company.sudo().l10n_be_codabox_iap_token,
@@ -65,17 +66,24 @@ class AccountJournal(models.Model):
                     with self.pool.cursor() as new_cr:
                         company = company.with_env(self.env(cr=new_cr))
                         company.l10n_be_codabox_is_connected = False
-                raise UserError(get_error_msg(error))
+                if not self.env.context.get("l10n_be_codabox_from_cron"):  # avoid disabling cron if too many fails
+                    raise UserError(get_error_msg(error))
+                else:
+                    _logger.error("L10nBeCodabox: CRON %s error: %s", file_type, error)
             return result.get("files", [])
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            raise UserError(get_error_msg({"type": "error_connecting_iap"}))
+            if not self.env.context.get("l10n_be_codabox_from_cron"):
+                raise UserError(get_error_msg({"type": "error_connecting_iap"}))
+            else:
+                _logger.error("L10nBeCodabox: CRON %s error: error_connecting_iap", file_type)
+        return []
 
     ############################
     # CODA METHODS
     ############################
 
-    def __get_bank_statements_available_sources(self):
-        rslt = super().__get_bank_statements_available_sources()
+    def _get_bank_statements_available_sources(self):
+        rslt = super()._get_bank_statements_available_sources()
         rslt.append(("l10n_be_codabox", _("CodaBox Synchronization")))
         return rslt
 
@@ -87,7 +95,7 @@ class AccountJournal(models.Model):
         ibans = {}  # {iban: last_date} where last_date is the date of the last bank statement or transaction
         codabox_journals = self.search([
             ("bank_statements_source", "=", "l10n_be_codabox"),
-            ("bank_acc_number", "!=", False),
+            ("bank_account_number", "!=", False),
             ("company_id", "=", company.id),
         ])
         for journal in codabox_journals:
@@ -98,58 +106,90 @@ class AccountJournal(models.Model):
                 last_date = self.env["account.bank.statement.line"].search([
                     ("journal_id", "=", journal.id),
                 ], order="date DESC", limit=1).date
-            iban = journal.bank_acc_number.replace(" ", "").upper()
+            iban = journal.bank_account_number.replace(" ", "").upper()
             last_date = fields.Date.to_string(last_date) or date_one_year_ago
             if iban not in ibans:
                 ibans[iban] = last_date
             else:
                 ibans[iban] = min(ibans[iban], last_date)
-        date_from = min(ibans.values()) if ibans else date_one_year_ago
+        lock_date = max(company.user_fiscalyear_lock_date, company.user_hard_lock_date)
+        date_from = max(min(ibans.values()) if ibans else date_one_year_ago, fields.Date.to_string(lock_date))
         statement_ids_all = []
         skipped_bank_accounts = set()
         session = requests.Session()
         acc_journal_map = {
-            # A same account number could be formatted differently in journal.acc_number and
+            # A same account number could be formatted differently in journal.bank_account_number and
             # coda statement. Therefor we must match sanitized versions of both.
             sanitize_account_number(acc_num): journals for acc_num, journals in
             self._read_group(
                 [("bank_statements_source", "in", ("l10n_be_codabox", "undefined"))],
-                ['bank_acc_number'],
+                ['bank_account_number'],
                 ['id:recordset'],
             )
         }
         codas = self._l10n_be_codabox_fetch_transactions_from_iap(session, company, "codas", date_from, ibans)
+
+        journal_stats = defaultdict(lambda: {
+            "count": 0,
+            "dates": [],
+            "currency": None,
+        })
+        imported_files = 0
         for coda in codas:
             try:
                 coda_raw_b64, coda_pdf_b64 = coda
+                assert isinstance(coda_raw_b64, str)
+                assert isinstance(coda_pdf_b64, str)
                 coda_attachment = self.env["ir.attachment"].create({
                     "name": _("Original CodaBox.coda"),
                     'type': 'binary',
-                    'datas': coda_raw_b64,
+                    'raw': coda_raw_b64,
                 })
-                bank_statement_file_data = self._parse_bank_statement_file(coda_attachment.raw)
+                # We parse first the CODA to get the IBAN, Currency and Extension number so that we can select a matching journal
+                bank_statement_file_data = self.with_context(ignore_statements=True)._parse_bank_statement_file(coda_attachment.raw)
                 statement_ids = []
-                for currency, account_number, stmt_vals in bank_statement_file_data:
-                    journal = next((
-                        journal for
-                        journal in acc_journal_map.get(sanitize_account_number(account_number), []) if
-                        journal.currency_id.name or journal.company_id.currency_id.name == currency
-                    ), False)
+                for currency, account_number, extension_number, __ in bank_statement_file_data:
+                    # Prefer a journal with an explicit currency matching
+                    candidates = acc_journal_map.get(sanitize_account_number(account_number), self.env['account.journal'])
+                    journals = (
+                        candidates.filtered(lambda j: j.currency_id and j.currency_id.name == currency)
+                        or candidates.filtered(lambda j: not j.currency_id)
+                    )
+
+                    if len(journals) > 1 and extension_number:
+                        journal = next((j for j in journals if j.extension_number == extension_number), False)
+                    else:
+                        journal = (
+                            next((j for j in journals if j.currency_id.name == currency), False)
+                            or (journals[0] if journals else None)
+                        )
+
                     if journal:
                         journal.bank_statements_source = "l10n_be_codabox"
                     else:
                         skipped_bank_accounts.add(f"{account_number} ({currency})")
                         continue
+                    # We reparse now to have all info including the statements
+                    currency, account_number, extension_number, stmt_vals = journal._parse_bank_statement_file(coda_attachment.raw)[0]
                     stmt_vals = journal._complete_bank_statement_vals(stmt_vals, journal, account_number, coda_attachment)
-                    statement_ids.extend(journal.with_context(skip_pdf_attachment_generation=True)
-                                         ._create_bank_statements(stmt_vals, raise_no_imported_file=False)[0])
+                    statement_id = journal.with_context(skip_pdf_attachment_generation=True)._create_bank_statements(stmt_vals, raise_no_imported_file=False)[0]
+                    if statement_id:
+                        statement_ids.extend(statement_id)
+
+                        # Logging Part
+                        imported_files += 1
+                        stats = journal_stats[journal]
+                        stats['count'] += 1
+                        stats['currency'] = currency
+                        stats['dates'].append(stmt_vals[0].get('date'))
+
                 if statement_ids:
                     statement_ids_all.extend(statement_ids)
                     pdf = self.env['ir.attachment'].create({
                         'name': _("Original CodaBox Bank Statement.pdf"),
                         'type': 'binary',
                         'mimetype': 'application/pdf',
-                        'datas': coda_pdf_b64,
+                        'raw': coda_pdf_b64,
                         'res_model': 'account.bank.statement',
                         'res_id': statement_ids[0],
                     })
@@ -161,13 +201,18 @@ class AccountJournal(models.Model):
                 _logger.error("L10nBeCodabox: Error while importing CodaBox file: %s", e)
                 # We need to rollback here otherwise the next iteration will still have the error when trying to commit
                 self.env.cr.rollback()
+
+        _logger.info("L10nBeCodabox: Coda import summary - Fetched: %s - Imported: %s - Journals: %s", len(codas), imported_files, len(journal_stats))
+        for journal, stats in journal_stats.items():
+            _logger.info("%s (%s): %s transactions (From: %s - To: %s) with currency %s", journal.code, journal.id, stats['count'], min(stats['dates']), max(stats['dates']), stats["currency"])
+
         if skipped_bank_accounts:
             _logger.info("L10nBeCodabox: No journals were found for the following bank accounts found in CodaBox: %s", ','.join(skipped_bank_accounts))
         return statement_ids_all
 
     def l10n_be_codabox_manually_fetch_coda_transactions(self):
         self.ensure_one()
-        statement_ids = self._l10n_be_codabox_fetch_coda_transactions(self.company_id)
+        statement_ids = self._l10n_be_codabox_fetch_coda_transactions(self.company_id.with_context(read_only=True))
         return self.env["account.bank.statement.line"]._action_open_bank_reconciliation_widget(
             extra_domain=[("statement_id", "in", statement_ids)],
         )
@@ -177,41 +222,47 @@ class AccountJournal(models.Model):
             ('l10n_be_codabox_is_connected', '=', True),
         ])
         if not coda_companies:
-            _logger.info("L10BeCodabox: No company is connected to CodaBox.")
+            _logger.info("L10BeCodabox: CODA No company is connected to CodaBox.")
             return
-        imported_statements = sum(len(self._l10n_be_codabox_fetch_coda_transactions(company)) for company in coda_companies)
-        _logger.info("L10BeCodabox: %s bank statements were imported.", imported_statements)
+        for company in coda_companies:
+            self.with_context(l10n_be_codabox_from_cron=True)._l10n_be_codabox_fetch_coda_transactions(company)
 
     ############################
     # SODA METHODS
     ############################
 
     def _l10n_be_codabox_fetch_soda_transactions(self, company):
-        self = company.l10n_be_codabox_soda_journal
+        soda_journal = company.l10n_be_codabox_soda_journal
         session = requests.Session()
         last_soda_date = self.env["account.move"].search([
-            ("journal_id", "=", self.company_id.l10n_be_codabox_soda_journal.id),
-        ], order="date DESC", limit=1).date
+            ("journal_id", "=", soda_journal.id),
+        ], order="create_date DESC", limit=1).create_date
         if not last_soda_date:
             last_soda_date = fields.Date.today() - relativedelta(years=2)  # API goes back 2 years max
-        sodas = self._l10n_be_codabox_fetch_transactions_from_iap(session, self.company_id, "sodas", fields.Date.to_string(last_soda_date))
+
+        lock_date = max(company.user_fiscalyear_lock_date, company.user_hard_lock_date)
+        date_from = max(last_soda_date, lock_date)
+        sodas = self._l10n_be_codabox_fetch_transactions_from_iap(session, soda_journal.company_id, "sodas", fields.Date.to_string(date_from))
+        _logger.info("L10nBeCodabox: %s SODAs fetched", len(sodas))
         moves = self.env["account.move"]
         for soda in sodas:
             try:
                 soda_raw_b64, soda_pdf_b64 = soda
+                assert isinstance(soda_raw_b64, str)
+                assert isinstance(soda_pdf_b64, str)
                 attachment_soda = self.env["ir.attachment"].create({
                     "name": _("Original CodaBox SODA.xml"),
                     'type': 'binary',
-                    'datas': soda_raw_b64,
+                    'raw': soda_raw_b64,
                     'company_id': self.company_id.id,
                 })
-                move = self.with_context(raise_no_imported_file=False)._l10n_be_parse_soda_file(attachment_soda, skip_wizard=True)
+                move = soda_journal.with_context(raise_no_imported_file=False)._l10n_be_parse_soda_file(attachment_soda, skip_wizard=True)
                 if move:
                     attachment_pdf = self.env["ir.attachment"].create({
                         'name': _("Original CodaBox Payroll Statement.pdf"),
                         'type': 'binary',
                         'mimetype': 'application/pdf',
-                        'datas': soda_pdf_b64,
+                        'raw': soda_pdf_b64,
                         'res_model': move._name,
                         'res_id': move.id,
                     })
@@ -252,8 +303,8 @@ class AccountJournal(models.Model):
             ('l10n_be_codabox_soda_journal', '!=', False),
         ])
         if not codabox_companies:
-            _logger.info("L10BeCodabox: No company is connected to CodaBox.")
+            _logger.info("L10BeCodabox: SODA No company is connected to CodaBox.")
             return
         for company in codabox_companies:
-            imported_moves = self._l10n_be_codabox_fetch_soda_transactions(company)
+            imported_moves = self.with_context(l10n_be_codabox_from_cron=True)._l10n_be_codabox_fetch_soda_transactions(company)
             _logger.info("L10BeCodabox: %s payroll statements were imported.", len(imported_moves))

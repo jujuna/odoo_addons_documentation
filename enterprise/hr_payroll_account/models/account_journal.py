@@ -9,6 +9,8 @@ class AccountJournal(models.Model):
 
     @api.ondelete(at_uninstall=False)
     def _prevent_unlink_payroll_journal(self):
+        if self.env.context.get('force_delete'):
+            return
         payroll_journals = self.env['hr.payroll.structure'].sudo().search([]).journal_id
         if self & payroll_journals:
-            raise UserError(_("You cannot delete the journal linked to a Salary Structure"))
+            raise UserError(_("You cannot delete the journal linked to a Pay Structure"))

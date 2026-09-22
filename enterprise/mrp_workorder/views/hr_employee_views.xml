@@ -9,6 +9,9 @@
                 <xpath expr="//group[@name='identification_group']" position='attributes'>
                     <attribute name="string">Attendance/Point of Sale/Manufacturing</attribute>
                 </xpath>
+                <group name="application_group" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </group>
             </field>
         </record>
         <record model="ir.ui.view" id="view_employee_tree_workorder">
@@ -33,8 +36,6 @@
                     <separator/>
                     <filter name="my_team" string="My Team" domain="[('parent_id.user_id', '=', uid)]"/>
                     <filter name="my_department" string="My Department" domain="[('member_of_department', '=', True)]"/>
-                    <separator/>
-                    <filter name="newly_hired" string="Newly Hired" domain="[('newly_hired', '=', True)]"/>
                     <separator/>
                     <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
                 </search>

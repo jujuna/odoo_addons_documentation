@@ -1,28 +1,48 @@
 import { CLIPBOARD_WHITELISTS } from "@html_editor/core/clipboard_plugin";
-import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { manuallyDispatchProgrammaticEvent as dispatch, press, waitFor } from "@odoo/hoot-dom";
+import { describe, expect, test } from "@odoo/hoot";
+import {
+    manuallyDispatchProgrammaticEvent as dispatch,
+    press,
+    waitFor,
+    waitForNone,
+} from "@odoo/hoot-dom";
 import { animationFrame, tick } from "@odoo/hoot-mock";
-import { dataURItoBlob, onRpc, patchWithCleanup } from "@web/../tests/web_test_helpers";
+import { dataURItoBlob, patchWithCleanup } from "@web/../tests/web_test_helpers";
 import { setupEditor, testEditor } from "./_helpers/editor";
 import { cleanLinkArtifacts, unformat } from "./_helpers/format";
 import { getContent, setSelection } from "./_helpers/selection";
-import { pasteHtml, pasteOdooEditorHtml, pasteText, undo } from "./_helpers/user_actions";
+import {
+    insertText,
+    pasteHtml,
+    pasteOdooEditorHtml,
+    pasteText,
+    undo,
+} from "./_helpers/user_actions";
 import { createBaseContainer } from "@html_editor/utils/base_container";
 import { expectElementCount } from "./_helpers/ui_expectations";
-import {
-    EMBEDDED_COMPONENT_PLUGINS,
-    MAIN_PLUGINS,
-    NO_EMBEDDED_COMPONENTS_FALLBACK_PLUGINS,
-} from "@html_editor/plugin_sets";
-import { MAIN_EMBEDDINGS } from "@html_editor/others/embedded_components/embedding_sets";
 import { nodeSize } from "@html_editor/utils/position";
+import { iconClasses } from "@html_editor/utils/dom_info";
 
 function isInline(node) {
     return ["I", "B", "U", "S", "EM", "STRONG", "IMG", "BR", "A", "FONT"].includes(node);
 }
 
 function toIgnore(node) {
-    return ["TABLE", "THEAD", "TH", "TBODY", "TR", "TD", "IMG", "BR", "LI", ".FA"].includes(node);
+    return [
+        "TABLE",
+        "THEAD",
+        "TH",
+        "TBODY",
+        "TR",
+        "TD",
+        "IMG",
+        "BR",
+        "LI",
+        ".OI",
+        "COL",
+        "COLGROUP",
+        ...iconClasses.map((cls) => `.${cls.toUpperCase()}`),
+    ].includes(node);
 }
 
 describe("Html Paste cleaning - whitelist", () => {
@@ -75,7 +95,7 @@ describe("Html Paste cleaning - whitelist", () => {
                 );
             },
             contentAfter:
-                '<p>123a</p><table class="table table-bordered o_table"><tbody><tr><th>h</th></tr><tr><td>b</td></tr></tbody></table><p>d[]</p>',
+                '<p>123a</p><table class="table table-bordered o_table"><tbody><tr><th class="o_table_header">h</th></tr><tr><td>b</td></tr></tbody></table><p>d[]</p>',
         });
     });
 
@@ -104,6 +124,39 @@ describe("Html Paste cleaning - whitelist", () => {
                         <tr>
                             <td><p>[]<br></p></td>
                         </tr>
+                    </tbody>
+                </table>
+            `),
+        });
+    });
+
+    test("should convert table headers in non-first rows to normal cells on paste", async () => {
+        await testEditor({
+            contentBefore: `
+                <p>[]<br></p>
+            `,
+            stepFunction: async (editor) => {
+                pasteHtml(
+                    editor,
+                    unformat(`
+                        <table>
+                            <thead>
+                                <tr><th>Header 1</th></tr>
+                                <tr><th>Header 2</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Cell</td></tr>
+                            </tbody>
+                        </table>
+                    `)
+                );
+            },
+            contentAfter: unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><th class="o_table_header">Header 1</th></tr>
+                        <tr><td>Header 2</td></tr>
+                        <tr><td>Cell[]</td></tr>
                     </tbody>
                 </table>
             `),
@@ -279,7 +332,7 @@ describe("Simple text", () => {
             });
         });
 
-        test("should paste text and understand \\n newlines within UNBREAKABLE node", async () => {
+        test("should paste text and understand \\n newlines within UNSPLITTABLE node", async () => {
             await testEditor({
                 contentBefore: `<div class="oe_unbreakable">[]<br></div>`,
                 stepFunction: async (editor) => {
@@ -289,7 +342,7 @@ describe("Simple text", () => {
             });
         });
 
-        test("should paste text and understand \\n newlines within UNBREAKABLE node(2)", async () => {
+        test("should paste text and understand \\n newlines within UNSPLITTABLE node(2)", async () => {
             await testEditor({
                 contentBefore: `<div class="oe_unbreakable"><span style="font-size: 9px;">a[]</span></div>`,
                 stepFunction: async (editor) => {
@@ -1652,7 +1705,7 @@ describe("Complex html p", () => {
             });
         });
 
-        test("should paste a text when selection leave a span unbreakable (1)", async () => {
+        test("should paste a text when selection leave a span unsplittable (1)", async () => {
             await testEditor({
                 contentBefore: `<div class="oe_unbreakable">1ab<span class="a">c[d</span>e]f</div>`,
                 stepFunction: async (editor) => {
@@ -1662,7 +1715,7 @@ describe("Complex html p", () => {
             });
         });
 
-        test("should paste a text when selection leave a span unbreakable (2)", async () => {
+        test("should paste a text when selection leave a spanunsplittable (2)", async () => {
             await testEditor({
                 contentBefore: `<div class="oe_unbreakable">2a[b<span class="a">c]d</span>ef</div>`,
                 stepFunction: async (editor) => {
@@ -1716,7 +1769,7 @@ describe("Complex html p", () => {
             });
         });
 
-        test("should paste a text when selection across two element (6) unbreakable", async () => {
+        test("should paste a text when selection across two element (6) unsplittable", async () => {
             await testEditor({
                 contentBefore: `<div class="oe_unbreakable">2a<span class="a">b[c</span><p>d]e</p>f</div>`,
                 stepFunction: async (editor) => {
@@ -1852,7 +1905,7 @@ describe("Complex html 3 p", () => {
             });
         });
 
-        test("should paste a text when selection leave a span unbreakable (1)", async () => {
+        test("should paste a text when selection leave a span unsplittable (1)", async () => {
             await testEditor({
                 contentBefore: '<div class="oe_unbreakable">1ab<span class="a">c[d</span>e]f</div>',
                 stepFunction: async (editor) => {
@@ -1863,7 +1916,7 @@ describe("Complex html 3 p", () => {
             });
         });
 
-        test("should paste a text when selection leave a span unbreakable (2)", async () => {
+        test("should paste a text when selection leave a spanunsplittable (2)", async () => {
             await testEditor({
                 contentBefore: '<div class="oe_unbreakable">2a[b<span class="a">c]d</span>ef</div>',
                 stepFunction: async (editor) => {
@@ -2041,7 +2094,7 @@ describe("Complex html p+i", () => {
             });
         });
 
-        test("should paste a text when selection leave a span unbreakable (1)", async () => {
+        test("should paste a text when selection leave a span unsplittable (1)", async () => {
             await testEditor({
                 contentBefore: '<div class="oe_unbreakable">1ab<span class="a">c[d</span>e]f</div>',
                 stepFunction: async (editor) => {
@@ -2052,7 +2105,7 @@ describe("Complex html p+i", () => {
             });
         });
 
-        test("should paste a text when selection leave a span unbreakable (2)", async () => {
+        test("should paste a text when selection leave a spanunsplittable (2)", async () => {
             await testEditor({
                 contentBefore: '<div class="oe_unbreakable">2a[b<span class="a">c]d</span>ef</div>',
                 stepFunction: async (editor) => {
@@ -2104,7 +2157,7 @@ describe("Complex html p+i", () => {
             });
         });
 
-        test("should paste a text when selection across two element (10) unbreakable", async () => {
+        test("should paste a text when selection across two element (10) unsplittable", async () => {
             await testEditor({
                 contentBefore: `<div class="oe_unbreakable">2a<span class="a">b[c</span><p>d]e</p>f</div>`,
                 stepFunction: async (editor) => {
@@ -2236,7 +2289,7 @@ describe("Complex html 3p+b", () => {
             });
         });
 
-        test("should paste a text when selection leave a span unbreakable (1)", async () => {
+        test("should paste a text when selection leave a span unsplittable (1)", async () => {
             await testEditor({
                 contentBefore: '<div class="oe_unbreakable">1ab<span class="a">c[d</span>e]f</div>',
                 stepFunction: async (editor) => {
@@ -2247,7 +2300,7 @@ describe("Complex html 3p+b", () => {
             });
         });
 
-        test("should paste a text when selection leave a span unbreakable (2)", async () => {
+        test("should paste a text when selection leave a spanunsplittable (2)", async () => {
             await testEditor({
                 contentBefore: '<div class="oe_unbreakable">2a[b<span class="a">c]d</span>ef</div>',
                 stepFunction: async (editor) => {
@@ -3006,8 +3059,7 @@ describe("link", () => {
 
         test("should replace link for new content when pasting in an empty link (collapsed)", async () => {
             await testEditor({
-                contentBefore:
-                    '<p><a href="http://test.test/" oe-zws-empty-inline="">[]\u200B</a></p>',
+                contentBefore: '<p><a href="http://test.test/">[]\u200B</a></p>',
                 stepFunction: async (editor) => {
                     pasteText(editor, "abc");
                 },
@@ -3016,8 +3068,7 @@ describe("link", () => {
         });
         test("should replace link for new content when pasting in an empty link (collapsed)(2)", async () => {
             await testEditor({
-                contentBefore:
-                    '<p>xy<a href="http://test.test/" oe-zws-empty-inline="">\u200B[]</a>z</p>',
+                contentBefore: '<p>xy<a href="http://test.test/">\u200B[]</a>z</p>',
                 stepFunction: async (editor) => {
                     pasteText(editor, "abc");
                 },
@@ -3027,7 +3078,7 @@ describe("link", () => {
 
         test("should replace link for new content (url) when pasting in an empty link (collapsed)", async () => {
             const { el, editor } = await setupEditor(
-                `<p>xy<a href="http://test.test/" oe-zws-empty-inline="">\u200B[]</a>z</p>`
+                `<p>xy<a href="http://test.test/">\u200B[]</a>z</p>`
             );
             pasteText(editor, "http://odoo.com");
             await animationFrame();
@@ -3055,7 +3106,7 @@ describe("link", () => {
 
         test("should replace link for new content (url) when pasting in an empty link (collapsed) (2)", async () => {
             const { el, editor } = await setupEditor(
-                `<p>xy<a href="http://test.test/" oe-zws-empty-inline="">\u200B[]</a>z</p>`
+                `<p>xy<a href="http://test.test/">\u200B[]</a>z</p>`
             );
             pasteText(editor, imgUrl);
             await animationFrame();
@@ -3077,7 +3128,7 @@ describe("link", () => {
                 stepFunction: async (editor) => {
                     pasteText(editor, "abc www.odoo.com xyz");
                 },
-                contentAfter: '<p>abc <a href="http://www.odoo.com">www.odoo.com</a> xyz[]</p>',
+                contentAfter: '<p>abc <a href="https://www.odoo.com">www.odoo.com</a> xyz[]</p>',
             });
         });
 
@@ -3088,8 +3139,8 @@ describe("link", () => {
                     pasteText(editor, "odoo.com\ngoogle.com");
                 },
                 contentAfter:
-                    '<div><a href="http://odoo.com">odoo.com</a></div>' +
-                    '<p><a href="http://google.com">google.com</a>[]</p>',
+                    '<div><a href="https://odoo.com">odoo.com</a></div>' +
+                    '<p><a href="https://google.com">google.com</a>[]</p>',
             });
         });
 
@@ -3099,11 +3150,11 @@ describe("link", () => {
                 stepFunction: async (editor) => {
                     pasteHtml(
                         editor,
-                        '<a href="www.odoo.com">odoo.com</a><br><a href="google.com">google.com</a>'
+                        '<a href="https://www.odoo.com">odoo.com</a><br><a href="https://google.com">google.com</a>'
                     );
                 },
                 contentAfter:
-                    '<p><a href="www.odoo.com">odoo.com</a></p><p><a href="https://google.com">google.com[]</a></p>',
+                    '<p><a href="https://www.odoo.com">odoo.com</a></p><p><a href="https://google.com">google.com[]</a></p>',
             });
         });
         test("should paste html content over an empty link (collapsed) (2)", async () => {
@@ -3112,11 +3163,11 @@ describe("link", () => {
                 stepFunction: async (editor) => {
                     pasteHtml(
                         editor,
-                        '<a href="www.odoo.com">odoo.com</a><br><a href="www.google.com">google.com</a>'
+                        '<a href="https://www.odoo.com">odoo.com</a><br><a href="https://www.google.com">google.com</a>'
                     );
                 },
                 contentAfter:
-                    '<p><a href="www.odoo.com">odoo.com</a></p><p><a href="www.google.com">google.com[]</a></p>',
+                    '<p><a href="https://www.odoo.com">odoo.com</a></p><p><a href="https://www.google.com">google.com[]</a></p>',
             });
         });
 
@@ -3201,6 +3252,7 @@ describe("link", () => {
                 contentAfter: "<pre>http://www.xyz.com[]</pre>",
             });
         });
+
         test("should not merge consecutive pastes of the same URL into a single anchor", async () => {
             await testEditor({
                 contentBefore: "<p>[]</p>",
@@ -3212,20 +3264,30 @@ describe("link", () => {
                     '<p><a href="http://www.xyz.com">http://www.xyz.com</a><a href="http://www.xyz.com">http://www.xyz.com</a>[]</p>',
             });
         });
+
+        test("should paste and transform an URL between backticks", async () => {
+            await testEditor({
+                contentBefore: "<p>ab[]cd</p>",
+                stepFunction: async (editor) => {
+                    pasteText(editor, "`http://www.xyz.com`");
+                },
+                contentAfter: '<p>ab`<a href="http://www.xyz.com">http://www.xyz.com</a>`[]cd</p>',
+            });
+        });
     });
 
     describe("range not collapsed", () => {
-        test("should paste and transform an URL in a p (not collapsed)", async () => {
+        test("should paste and attach link on selected content in a p (not collapsed)", async () => {
             await testEditor({
                 contentBefore: "<p>ab[xxx]cd</p>",
                 stepFunction: async (editor) => {
                     pasteText(editor, "http://www.xyz.com");
                 },
-                contentAfter: '<p>ab<a href="http://www.xyz.com">http://www.xyz.com</a>[]cd</p>',
+                contentAfter: '<p>ab<a href="http://www.xyz.com">xxx</a>[]cd</p>',
             });
         });
 
-        test("should paste and transform an URL in a span (not collapsed)", async () => {
+        test("should paste and attach link on selected content in a span (not collapsed)", async () => {
             await testEditor({
                 contentBefore:
                     '<p>a<span class="a">b[x<a href="http://existing.com">546</a>x]c</span>d</p>',
@@ -3233,7 +3295,7 @@ describe("link", () => {
                     pasteText(editor, "http://www.xyz.com");
                 },
                 contentAfter:
-                    '<p>a<span class="a">b<a href="http://www.xyz.com">http://www.xyz.com</a>[]c</span>d</p>',
+                    '<p>a<span class="a">b<a href="http://www.xyz.com">x546x</a>[]c</span>d</p>',
             });
         });
 
@@ -3286,7 +3348,7 @@ describe("link", () => {
                 stepFunction: async (editor) => {
                     pasteHtml(
                         editor,
-                        '<a href="www.odoo.com">odoo.com</a><br><a href="www.google.com">google.com</a>'
+                        '<a href="https://www.odoo.com">odoo.com</a><br><a href="https://www.google.com">google.com</a>'
                     );
                     undo(editor);
                 },
@@ -3392,7 +3454,7 @@ describe("link", () => {
                 stepFunction: async (editor) => {
                     pasteText(editor, "www.odoo.com");
                 },
-                contentAfter: '<p><a href="http://www.odoo.com">www.odoo.com</a>[]</p>',
+                contentAfter: '<p><a href="https://www.odoo.com">xyz</a>[]</p>',
             });
         });
 
@@ -3402,7 +3464,7 @@ describe("link", () => {
                 stepFunction: async (editor) => {
                     pasteText(editor, "abc www.odoo.com xyz");
                 },
-                contentAfter: '<p>abc <a href="http://www.odoo.com">www.odoo.com</a> xyz[]</p>',
+                contentAfter: '<p>abc <a href="https://www.odoo.com">www.odoo.com</a> xyz[]</p>',
             });
         });
 
@@ -3443,11 +3505,11 @@ describe("link", () => {
                 stepFunction: async (editor) => {
                     pasteHtml(
                         editor,
-                        '<a href="www.odoo.com">odoo.com</a><br><a href="google.com">google.com</a>'
+                        '<a href="https://www.odoo.com">odoo.com</a><br><a href="https://google.com">google.com</a>'
                     );
                 },
                 contentAfter:
-                    '<p><a href="www.odoo.com">odoo.com</a></p><p><a href="https://google.com">google.com[]</a></p>',
+                    '<p><a href="https://www.odoo.com">odoo.com</a></p><p><a href="https://google.com">google.com[]</a></p>',
             });
         });
         test("should paste html content over a link if all of its contents is selected (not collapsed) (2)", async () => {
@@ -3456,11 +3518,47 @@ describe("link", () => {
                 stepFunction: async (editor) => {
                     pasteHtml(
                         editor,
-                        '<a href="www.odoo.com">odoo.com</a><br><a href="www.google.com">google.com</a>'
+                        '<a href="https://www.odoo.com">odoo.com</a><br><a href="https://www.google.com">google.com</a>'
                     );
                 },
                 contentAfter:
-                    '<p><a href="www.odoo.com">odoo.com</a></p><p><a href="www.google.com">google.com[]</a></p>',
+                    '<p><a href="https://www.odoo.com">odoo.com</a></p><p><a href="https://www.google.com">google.com[]</a></p>',
+            });
+        });
+        test("should paste URL as label when link with same label and href is selected", async () => {
+            await testEditor({
+                contentBefore: '<p><a href="https://www.xyz.com">[https://www.xyz.com]</a></p>',
+                stepFunction: async (editor) => {
+                    pasteText(editor, "https://google.com");
+                },
+                contentAfter: '<p><a href="https://google.com">https://google.com</a>[]</p>',
+            });
+        });
+        test("should paste URL as label when link with same label and href is selected (2)", async () => {
+            await testEditor({
+                contentBefore: '<p>[<a href="https://www.xyz.com">https://www.xyz.com</a>]</p>',
+                stepFunction: async (editor) => {
+                    pasteText(editor, "https://google.com");
+                },
+                contentAfter: '<p><a href="https://google.com">https://google.com</a>[]</p>',
+            });
+        });
+        test("should paste URL as label when link with same label and href is selected (3)", async () => {
+            await testEditor({
+                contentBefore: '<p>[<a href="https://www.xyz.com/">https://www.xyz.com</a>]</p>',
+                stepFunction: async (editor) => {
+                    pasteText(editor, "https://google.com");
+                },
+                contentAfter: '<p><a href="https://google.com">https://google.com</a>[]</p>',
+            });
+        });
+        test("should keep label same when label and href don't match strictly", async () => {
+            await testEditor({
+                contentBefore: '<p><a href="https://xyz.com">[xyz.com]</a></p>',
+                stepFunction: async (editor) => {
+                    pasteText(editor, "https://google.com");
+                },
+                contentAfter: '<p><a href="https://google.com">xyz.com</a>[]</p>',
             });
         });
     });
@@ -3515,10 +3613,10 @@ describe("images", () => {
             );
         });
 
-        test("should not revert a history step when pasting an image URL as a link (1)", async () => {
+        test("should not revert a history commit when pasting an image URL as a link (1)", async () => {
             const { el, editor } = await setupEditor("<p>[]</p>");
 
-            // paste text to have a history step recorded
+            // paste text to have a history commit recorded
             pasteText(editor, "*should not disappear*");
             pasteText(editor, imgUrl);
             await animationFrame();
@@ -3529,6 +3627,17 @@ describe("images", () => {
             expect(cleanLinkArtifacts(getContent(el))).toBe(
                 `<p>*should not disappear*<a href="${imgUrl}">${imgUrl}</a>[]</p>`
             );
+        });
+        test("should close powerbox after an undo when image pasting", async () => {
+            const { el, editor } = await setupEditor("<p>a[]b</p>");
+            await insertText(editor, "x");
+            expect(getContent(el)).toBe(`<p>ax[]b</p>`);
+            pasteText(editor, imgUrl);
+            await animationFrame();
+            await expectElementCount(".o-we-powerbox", 1);
+            undo(editor);
+            await waitForNone(".o-we-powerbox");
+            expect(getContent(el)).toBe(`<p>ax[]b</p>`);
         });
     });
 
@@ -3584,10 +3693,10 @@ describe("images", () => {
             );
         });
 
-        test("should not revert a history step when pasting an image URL as a link (2)", async () => {
+        test("should not revert a history commit when pasting an image URL as a link (2)", async () => {
             const { el, editor } = await setupEditor("<p>[]</p>");
 
-            // paste text (to have a history step recorded)
+            // paste text (to have a history commit recorded)
             pasteText(editor, "abxxxcd");
             // select xxx in "<p>ab[xxx]cd</p>""
             const p = editor.editable.querySelector("p");
@@ -3635,242 +3744,6 @@ describe("images", () => {
             undo(editor);
             expect(getContent(el)).toBe("<p>[abc]</p>");
         });
-    });
-});
-
-describe("youtube video", () => {
-    const config = { Plugins: [...MAIN_PLUGINS, ...NO_EMBEDDED_COMPONENTS_FALLBACK_PLUGINS] };
-    describe("range collapsed", () => {
-        beforeEach(() => {
-            onRpc("/html_editor/video_url/data", async (request) => {
-                const { params } = await request.json();
-                return { embed_url: params.video_url };
-            });
-        });
-
-        test("should paste and transform a youtube URL in a p (1)", async () => {
-            const { el, editor } = await setupEditor("<p>ab[]cd</p>", { config });
-            pasteText(editor, videoUrl);
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Force powerbox validation on the default first choice
-            await press("Enter");
-            // Wait for the getYoutubeVideoElement promise to resolve.
-            await tick();
-            expect(getContent(el)).toBe(
-                `<p>ab</p><div data-oe-expression="${videoUrl}" class="media_iframe_video" contenteditable="false"><div class="css_editable_mode_display"></div><div class="media_iframe_video_size" contenteditable="false"></div><iframe frameborder="0" contenteditable="false" allowfullscreen="allowfullscreen" src="${videoUrl}"></iframe></div><p>[]cd</p>`
-            );
-        });
-
-        test("should paste and transform a youtube URL in a span (1)", async () => {
-            const { el, editor } = await setupEditor('<p>a<span class="a">b[]c</span>d</p>', {
-                config,
-            });
-            pasteText(editor, "https://youtu.be/dQw4w9WgXcQ");
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Force powerbox validation on the default first choice
-            await press("Enter");
-            // Wait for the getYoutubeVideoElement promise to resolve.
-            await tick();
-            expect(getContent(el)).toBe(
-                '<p>a<span class="a">b</span></p><div data-oe-expression="https://youtu.be/dQw4w9WgXcQ" class="media_iframe_video" contenteditable="false"><div class="css_editable_mode_display"></div><div class="media_iframe_video_size" contenteditable="false"></div><iframe frameborder="0" contenteditable="false" allowfullscreen="allowfullscreen" src="https://youtu.be/dQw4w9WgXcQ"></iframe></div><p><span class="a">[]c</span>d</p>'
-            );
-        });
-
-        test("should paste and not transform a youtube URL in a existing link", async () => {
-            const { el, editor, plugins } = await setupEditor(
-                '<p>a<a href="http://existing.com">b[]c</a>d</p>',
-                { config }
-            );
-            pasteText(editor, "https://youtu.be/dQw4w9WgXcQ");
-            // Ensure the powerbox is active
-            const powerbox = plugins.get("powerbox");
-            expect(powerbox.overlay.isOpen).not.toBe(true);
-            expect(cleanLinkArtifacts(getContent(el))).toBe(
-                '<p>a<a href="http://existing.com">bhttps://youtu.be/dQw4w9WgXcQ[]c</a>d</p>'
-            );
-        });
-
-        test("should paste a youtube URL as a link in a p (1)", async () => {
-            const url = "https://youtu.be/dQw4w9WgXcQ";
-            const { el, editor } = await setupEditor("<p>[]</p>", { config });
-            pasteText(editor, url);
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Pick the second command (Paste as URL)
-            await press("ArrowDown");
-            await press("Enter");
-            expect(cleanLinkArtifacts(getContent(el))).toBe(`<p><a href="${url}">${url}</a>[]</p>`);
-        });
-
-        test("should not revert a history step when pasting a youtube URL as a link (1)", async () => {
-            const url = "https://youtu.be/dQw4w9WgXcQ";
-            const { el, editor } = await setupEditor("<p>[]</p>", { config });
-            // paste text to have a history step recorded
-            pasteText(editor, "*should not disappear*");
-            pasteText(editor, url);
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Pick the second command (Paste as URL)
-            await press("ArrowDown");
-            await press("Enter");
-            expect(cleanLinkArtifacts(getContent(el))).toBe(
-                `<p>*should not disappear*<a href="${url}">${url}</a>[]</p>`
-            );
-        });
-    });
-
-    describe("range not collapsed", () => {
-        beforeEach(() => {
-            onRpc("/html_editor/video_url/data", async (request) => {
-                const { params } = await request.json();
-                return { embed_url: params.video_url };
-            });
-        });
-
-        test("should paste and transform a youtube URL in a p (2)", async () => {
-            const { el, editor } = await setupEditor("<p>ab[xxx]cd</p>", { config });
-            pasteText(editor, "https://youtu.be/dQw4w9WgXcQ");
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Force powerbox validation on the default first choice
-            await press("Enter");
-            // Wait for the getYoutubeVideoElement promise to resolve.
-            await tick();
-            expect(getContent(el)).toBe(
-                '<p>ab</p><div data-oe-expression="https://youtu.be/dQw4w9WgXcQ" class="media_iframe_video" contenteditable="false"><div class="css_editable_mode_display"></div><div class="media_iframe_video_size" contenteditable="false"></div><iframe frameborder="0" contenteditable="false" allowfullscreen="allowfullscreen" src="https://youtu.be/dQw4w9WgXcQ"></iframe></div><p>[]cd</p>'
-            );
-        });
-
-        test("should paste and transform a youtube URL in a span (2)", async () => {
-            const { el, editor } = await setupEditor(
-                '<p>a<span class="a">b[x<a href="http://existing.com">546</a>x]c</span>d</p>',
-                { config }
-            );
-            pasteText(editor, videoUrl);
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Force powerbox validation on the default first choice
-            await press("Enter");
-            // Wait for the getYoutubeVideoElement promise to resolve.
-            await tick();
-            expect(getContent(el)).toBe(
-                `<p>a<span class="a">b</span></p><div data-oe-expression="${videoUrl}" class="media_iframe_video" contenteditable="false"><div class="css_editable_mode_display"></div><div class="media_iframe_video_size" contenteditable="false"></div><iframe frameborder="0" contenteditable="false" allowfullscreen="allowfullscreen" src="${videoUrl}"></iframe></div><p><span class="a">[]c</span>d</p>`
-            );
-        });
-
-        test("should paste and not transform a youtube URL in a existing link", async () => {
-            const { el, editor, plugins } = await setupEditor(
-                '<p>a<a href="http://existing.com">b[qsdqsd]c</a>d</p>',
-                { config }
-            );
-            pasteText(editor, videoUrl);
-            // Ensure the powerbox is active
-            const powerbox = plugins.get("powerbox");
-            expect(powerbox.overlay.isOpen).not.toBe(true);
-            expect(cleanLinkArtifacts(getContent(el))).toBe(
-                `<p>a<a href="http://existing.com">b${videoUrl}[]c</a>d</p>`
-            );
-        });
-
-        test("should paste a youtube URL as a link in a p (2)", async () => {
-            const { el, editor } = await setupEditor("<p>ab[xxx]cd</p>", { config });
-            pasteText(editor, videoUrl);
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Pick the second command (Paste as URL)
-            await press("ArrowDown");
-            await press("Enter");
-            expect(cleanLinkArtifacts(getContent(el))).toBe(
-                `<p>ab<a href="${videoUrl}">${videoUrl}</a>[]cd</p>`
-            );
-        });
-
-        test("should not revert a history step when pasting a youtube URL as a link (2)", async () => {
-            const { el, editor } = await setupEditor("<p>[]</p>", { config });
-            // paste text (to have a history step recorded)
-            pasteText(editor, "abxxxcd");
-            // select xxx in "<p>ab[xxx]cd</p>"
-            const p = editor.editable.querySelector("p");
-            const selection = {
-                anchorNode: p.childNodes[0],
-                anchorOffset: 2,
-                focusNode: p.childNodes[0],
-                focusOffset: 5,
-            };
-            setSelection(selection);
-            setSelection(selection);
-
-            // paste url
-            pasteText(editor, videoUrl);
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Pick the second command (Paste as URL)
-            await press("ArrowDown");
-            await press("Enter");
-            expect(cleanLinkArtifacts(getContent(el))).toBe(
-                `<p>ab<a href="${videoUrl}">${videoUrl}</a>[]cd</p>`
-            );
-        });
-
-        test("should restore selection after pasting video URL followed by UNDO (1)", async () => {
-            const { el, editor } = await setupEditor("<p>[abc]</p>", { config });
-            pasteText(editor, videoUrl);
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Force powerbox validation on the default first choice
-            await press("Enter");
-            // Undo
-            undo(editor);
-            expect(getContent(el)).toBe("<p>[abc]</p>");
-        });
-
-        test("should restore selection after pasting video URL followed by UNDO (2)", async () => {
-            const { el, editor } = await setupEditor("<p>[abc]</p>", { config });
-            pasteText(editor, videoUrl);
-            await animationFrame();
-            await expectElementCount(".o-we-powerbox", 1);
-            // Pick the second command (Paste as URL)
-            await press("ArrowDown");
-            await press("Enter");
-            // Undo
-            undo(editor);
-            expect(getContent(el)).toBe("<p>[abc]</p>");
-        });
-    });
-});
-
-describe("youtube video with embedded components", () => {
-    beforeEach(() => {
-        onRpc("/html_editor/video_url/data", async (request) => {
-            const { params } = await request.json();
-            return { platform: "youtube", video_id: params.video_url.split("v=")[1] };
-        });
-    });
-    const config = {
-        Plugins: [...MAIN_PLUGINS, ...EMBEDDED_COMPONENT_PLUGINS],
-        resources: { embedded_components: MAIN_EMBEDDINGS },
-    };
-    test("should embed a video on youtube URL paste", async () => {
-        const { editor } = await setupEditor("<p>[]<br></p>", { config });
-        pasteText(editor, videoUrl);
-        await waitFor(".o-we-powerbox");
-        // Pick first command (Embed video)
-        await press("Enter");
-        await waitFor(`[data-embedded="video"] iframe`);
-        expect(`[data-embedded="video"] iframe`).toHaveCount(1);
-    });
-    test("should paste a youtube URL as a link in a p", async () => {
-        const { el, editor } = await setupEditor("<p>[]<br></p>", { config });
-        pasteText(editor, videoUrl);
-        await waitFor(".o-we-powerbox");
-        // Pick the second command (Paste as URL)
-        await press("ArrowDown");
-        await press("Enter");
-        expect(cleanLinkArtifacts(getContent(el))).toBe(
-            `<p><a href="${videoUrl}">${videoUrl}</a>[]</p>`
-        );
     });
 });
 
@@ -4152,27 +4025,27 @@ describe("Paste HTML tables", () => {
                 );
             },
             contentAfter: `<table class="table table-bordered o_table">
-${"            "}
-${"            "}
-            <tbody><tr>
+            <colgroup><col style="width: 187px;">
+            <col style="width: 211px;">
+            <col style="width: 187px;"><col style="width: 211px;"></colgroup><tbody><tr style="height: 15pt;">
                 <td>Italic
                         then also BOLD</td>
                 <td><s>Italic strike</s></td>
             </tr>
-            <tr>
+            <tr style="height: 15pt;">
                 <td>Just bold Just Italic</td>
                 <td>Bold underline</td>
             </tr>
-            <tr>
+            <tr style="height: 15pt;">
                 <td>Color text</td>
                 <td><s>Color strike and underline</s></td>
             </tr>
-            <tr>
+            <tr style="height: 15pt;">
                 <td>Color background</td>
                 <td>Color text on color background</td>
             </tr>
-            <tr>
-                <td>14pt MONO TEXT
+            <tr style="height: 20.25pt;">
+                <td colspan="2">14pt MONO TEXT
                 []</td>
             </tr>
         </tbody></table>`,
@@ -4251,19 +4124,19 @@ ${"            "}
                 );
             },
             contentAfter: `<table class="table table-bordered o_table">
-${"        "}
-${"            "}
-${"            "}
-${"        "}
+        <colgroup>
+            <col style="width: 170px;">
+            <col style="width: 187px;">
+        </colgroup>
         <tbody>
-            <tr>
+            <tr style="height: 21px;">
                 <td>
                     Italic then also
                     BOLD
                 </td>
                 <td>Italic strike</td>
             </tr>
-            <tr>
+            <tr style="height: 21px;">
                 <td>
                     Just
                         Bold Just
@@ -4271,19 +4144,19 @@ ${"        "}
                 </td>
                 <td>Bold underline</td>
             </tr>
-            <tr>
+            <tr style="height: 21px;">
                 <td>Color text</td>
                 <td>Color
                     strike and underline</td>
             </tr>
-            <tr>
+            <tr style="height: 21px;">
                 <td>Color background
                 </td>
                 <td>Color
                     text on color background</td>
             </tr>
-            <tr>
-                <td>14pt MONO TEXT[]</td>
+            <tr style="height: 21px;">
+                <td rowspan="1" colspan="2">14pt MONO TEXT[]</td>
             </tr>
         </tbody>
     </table>`,
@@ -4386,8 +4259,8 @@ ${"        "}
                 );
             },
             contentAfter: `<table class="table table-bordered o_table">
-${"        "}
-${"        "}
+        <colgroup></colgroup>
+        <colgroup></colgroup>
         <tbody><tr>
             <td><i>Italic then also BOLD</i></td>
             <td><i><s>Italic strike</s></i></td>
@@ -4411,14 +4284,13 @@ ${"        "}
             </td>
         </tr>
         <tr>
-            <td>
+            <td colspan="2">
                 14pt MONO TEXT[]
             </td>
         </tr>
     </tbody></table>`,
         });
     });
-
     test("should apply default table classes (table, table-bordered, o_table) on paste", async () => {
         await testEditor({
             contentBefore: `
@@ -4449,7 +4321,6 @@ ${"        "}
             `),
         });
     });
-
     test("should move all rows from thead to tbody", async () => {
         await testEditor({
             contentBefore: "<p>[]<br></p>",
@@ -4482,8 +4353,8 @@ ${"        "}
                         <table class="table table-bordered o_table">
                             <tbody>
                                 <tr>
-                                    <th>1</th>
-                                    <th>2</th>
+                                    <th class="o_table_header">1</th>
+                                    <th class="o_table_header">2</th>
                                 </tr>
                                 <tr>
                                     <td>1</td>
@@ -4520,8 +4391,8 @@ ${"        "}
                         <table class="table table-bordered o_table">
                             <tbody>
                                 <tr>
-                                    <th>1</th>
-                                    <th>2[]</th>
+                                    <th class="o_table_header">1</th>
+                                    <th class="o_table_header">2[]</th>
                                 </tr>
                             </tbody>
                         </table>
@@ -4619,7 +4490,7 @@ describe("onDrop", () => {
         await animationFrame();
 
         expect(getContent(el)).toBe(
-            `<p>ab<img src="${base64Image}" data-file-name="image.png" class="img-fluid">[]c</p>`
+            `<p>ab<img class="img-fluid" data-file-name="image.png" src="${base64Image}">[]c</p>`
         );
     });
     test("should drag and drop an image after another image", async () => {
@@ -4660,7 +4531,7 @@ describe("onDrop", () => {
         await animationFrame();
 
         expect(getContent(el)).toBe(
-            `<p><img class="img-fluid" data-file-name="image.png" src="${base64Image2}"><img src="${base64Image}" data-file-name="image.png" class="img-fluid">[]</p>`
+            `<p><img class="img-fluid" data-file-name="image.png" src="${base64Image2}"><img class="img-fluid" data-file-name="image.png" src="${base64Image}">[]</p>`
         );
     });
     test("should drag and drop third image after first image", async () => {
@@ -4700,7 +4571,7 @@ describe("onDrop", () => {
         await animationFrame();
 
         expect(getContent(el)).toBe(
-            `<p><img class="img-fluid" data-file-name="image.png" src="${base64Image1}"><img src="${base64Image3}" data-file-name="image.png" class="img-fluid">[]<img class="img-fluid" data-file-name="image.png" src="${base64Image2}"></p>`
+            `<p><img class="img-fluid" data-file-name="image.png" src="${base64Image1}"><img class="img-fluid" data-file-name="image.png" src="${base64Image3}">[]<img class="img-fluid" data-file-name="image.png" src="${base64Image2}"></p>`
         );
     });
     test("should drag and drop multiple images after another image", async () => {
@@ -4743,7 +4614,7 @@ describe("onDrop", () => {
         await animationFrame();
 
         expect(getContent(el)).toBe(
-            `<p><img class="img-fluid" data-file-name="image.png" src="${base64Image3}"><img src="${base64Image1}" data-file-name="image.png" class="img-fluid"><img src="${base64Image2}" data-file-name="image.png" class="img-fluid">[]</p>`
+            `<p><img class="img-fluid" data-file-name="image.png" src="${base64Image3}"><img class="img-fluid" data-file-name="image.png" src="${base64Image1}"><img class="img-fluid" data-file-name="image.png" src="${base64Image2}">[]</p>`
         );
     });
     test("should drag and drop banner", async () => {
@@ -4782,9 +4653,9 @@ describe("onDrop", () => {
 
         expect(getContent(el)).toBe(
             `<p><br></p><p>ca
-            </p><div role="status" contenteditable="false" data-oe-role="status" class="o_editor_banner user-select-none o-contenteditable-false lh-1 d-flex align-items-center alert alert-info pb-0 pt-3">
-                <i aria-label="Banner Info" data-oe-aria-label="Banner Info" class="o_editor_banner_icon mb-3 fst-normal">💡</i>
-                <div contenteditable="true" class="o_editor_banner_content o-contenteditable-true w-100 px-3">
+            </p><div class="o_editor_banner user-select-none o-contenteditable-false lh-1 d-flex align-items-center alert alert-info pb-0 pt-3" data-oe-role="status" contenteditable="false" role="status">
+                <i class="o_editor_banner_icon mb-3 fst-normal" data-oe-aria-label="Banner Info" aria-label="Banner Info">💡</i>
+                <div class="o_editor_banner_content o-contenteditable-true w-100 px-3" contenteditable="true">
                     <p>Test</p>
                 </div>
             </div><p>b[]</p>`
@@ -4792,9 +4663,9 @@ describe("onDrop", () => {
     });
     test("should drag and drop icon", async () => {
         const { el } = await setupEditor(
-            `<p>[a</p><p><span class="fa fa-heart"></span>b]</p><p>c</p>`
+            `<p>[a</p><p><span class="oi oi-filled" data-icon="favorite"></span>b]</p><p>c</p>`
         );
-        const iconElement = el.querySelector(".fa");
+        const iconElement = el.querySelector(".oi");
         const targetNodeForDrop = el.lastChild;
 
         patchWithCleanup(document, {
@@ -4818,7 +4689,311 @@ describe("onDrop", () => {
         await animationFrame();
 
         expect(getContent(el)).toBe(
-            '<p><br></p><p>ca</p><p>\ufeff<span class="fa fa-heart" contenteditable="false">\u200b</span>\ufeffb[]</p>'
+            '<p><br></p><p>ca</p><p>\ufeff<span class="oi oi-filled" data-icon="favorite" contenteditable="false">\u200b</span>\ufeffb[]</p>'
+        );
+    });
+});
+
+describe("paste table cells into an existing table", () => {
+    test("should paste table content cell-by-cell when the selection is collapsed in a target cell", async () => {
+        const { editor, el } = await setupEditor(
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><p>a1[]</p></td><td><p>a2</p></td></tr>
+                        <tr><td><p>b1</p></td><td><p>b2</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        pasteHtml(
+            editor,
+            unformat(`
+                <table>
+                    <tbody>
+                        <tr><td><p>x1</p></td><td><p><strong>x2</strong></p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table o_selected_table">
+                    <tbody>
+                        <tr>
+                            <td class="o_selected_td"><p>[x1</p></td>
+                            <td class="o_selected_td"><p><strong>x2]</strong></p></td>
+                        </tr>
+                        <tr>
+                            <td><p>b1</p></td>
+                            <td><p>b2</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+            `)
+        );
+    });
+
+    test("should paste table content cell-by-cell when the selection is a partial (non-collapsed) range inside a cell", async () => {
+        const { editor, el } = await setupEditor(
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><p>[a]1</p></td><td><p>a2</p></td></tr>
+                        <tr><td><p>b1</p></td><td><p>b2</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        pasteHtml(
+            editor,
+            unformat(`
+                <table>
+                    <tbody>
+                        <tr><td><p><strong>x11</strong></p></td><td><ul><li>x12</li></ul></td></tr>
+                        <tr><td><p><a href="#">x21</a></p></td><td><p>x22</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table o_selected_table">
+                    <tbody>
+                        <tr>
+                            <td class="o_selected_td"><p><strong>[x11</strong></p></td>
+                            <td class="o_selected_td"><ul><li>x12</li></ul></td>
+                        </tr>
+                        <tr>
+                            <td class="o_selected_td"><p>\ufeff<a href="#">\ufeffx21\ufeff</a>\ufeff</p></td>
+                            <td class="o_selected_td"><p>x22]</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+            `)
+        );
+    });
+
+    test("should fallback to default paste when the clipboard contains non-table siblings", async () => {
+        const { editor, el } = await setupEditor(
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><p>[]a</p></td><td><p>b</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        pasteHtml(
+            editor,
+            unformat(`
+                <p>before</p>
+                <table>
+                    <tbody>
+                        <tr><td><p>x</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <p>before</p>
+                                <table class="table table-bordered o_table">
+                                    <tbody>
+                                        <tr><td><p>x</p></td></tr>
+                                    </tbody>
+                                </table>[]
+                                <p>a</p>
+                            </td>
+                            <td><p>b</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+            `)
+        );
+    });
+
+    test("should expand the paste range when the clipboard table is larger than the current cell selection", async () => {
+        const { editor, el } = await setupEditor(
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><p>[a1</p></td><td><p>a2]</p></td></tr>
+                        <tr><td><p>b1</p></td><td><p>b2</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        pasteOdooEditorHtml(
+            editor,
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><p>x11</p></td><td><p>x12</p></td></tr>
+                        <tr><td><p>x21</p></td><td><p>x22</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table o_selected_table">
+                    <tbody>
+                        <tr>
+                            <td class="o_selected_td"><p>[x11</p></td>
+                            <td class="o_selected_td"><p>x12</p></td>
+                        </tr>
+                        <tr>
+                            <td class="o_selected_td"><p>x21</p></td>
+                            <td class="o_selected_td"><p>x22]</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+            `)
+        );
+    });
+
+    test("should limit pasting to the clipboard table dimensions when selection is larger", async () => {
+        const { editor, el } = await setupEditor(
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><p>[a1</p></td><td><p>a2</p></td></tr>
+                        <tr><td><p>b1</p></td><td><p>b2]</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        pasteHtml(
+            editor,
+            unformat(`
+                <table>
+                    <tbody>
+                        <tr><td><p>x1</p></td><td><p><em>x2</em></p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table o_selected_table">
+                    <tbody>
+                        <tr>
+                            <td class="o_selected_td"><p>[x1</p></td>
+                            <td class="o_selected_td"><p><em>x2]</em></p></td>
+                        </tr>
+                        <tr>
+                            <td><p>b1</p></td>
+                            <td><p>b2</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+            `)
+        );
+    });
+
+    test("should add rows and columns when the pasted table exceeds the remaining target table dimensions", async () => {
+        const { editor, el } = await setupEditor(
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><p>a1</p></td><td><p>a2</p></td></tr>
+                        <tr><td><p>[]b1</p></td><td><p>b2</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        pasteOdooEditorHtml(
+            editor,
+            unformat(`
+                <table class="table table-bordered o_table">
+                    <tbody>
+                        <tr><td><p>x11</p></td><td><p>x12</p></td><td><p>x13</p></td></tr>
+                        <tr><td><p>x21</p></td><td><p>x22</p></td><td><p>x23</p></td></tr>
+                    </tbody>
+                </table>
+            `)
+        );
+        await animationFrame();
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p data-selection-placeholder=""><br></p>
+                <table class="table table-bordered o_table o_selected_table">
+                    <tbody>
+                        <tr>
+                            <td><p>a1</p></td>
+                            <td><p>a2</p></td>
+                            <td><p><br></p></td>
+                        </tr>
+                        <tr>
+                            <td class="o_selected_td"><p>[x11</p></td>
+                            <td class="o_selected_td"><p>x12</p></td>
+                            <td class="o_selected_td"><p>x13</p></td>
+                        </tr>
+                        <tr>
+                            <td class="o_selected_td"><p>x21</p></td>
+                            <td class="o_selected_td"><p>x22</p></td>
+                            <td class="o_selected_td"><p>x23]</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>
+            `)
+        );
+    });
+
+    test("should use a live range for the drop position from caretPositionFromPoint", async () => {
+        const base64Image =
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII=";
+
+        const { el } = await setupEditor(
+            `<p>a[<img class="img-fluid" data-file-name="image.png" src="${base64Image}">]</p>`
+        );
+        const pElement = el.firstChild;
+        const imgElement = pElement.lastChild;
+
+        patchWithCleanup(document, {
+            caretPositionFromPoint: () => ({ offsetNode: pElement, offset: 2 }),
+        });
+
+        const dragdata = new DataTransfer();
+        await dispatch(imgElement, "dragstart", { dataTransfer: dragdata });
+        await animationFrame();
+        const imageHTML = dragdata.getData("application/vnd.odoo.odoo-editor");
+        expect(imageHTML).toBe(
+            `<p><img class="img-fluid" data-file-name="image.png" src="${base64Image}"></p>`
+        );
+
+        const dropData = new DataTransfer();
+        dropData.setData(
+            "text/html",
+            `<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"><img src="${base64Image}">`
+        );
+        dropData.setData("application/vnd.odoo.odoo-editor", imageHTML);
+        await dispatch(pElement, "drop", { dataTransfer: dropData });
+        await animationFrame();
+
+        expect(getContent(el)).toBe(
+            `<p>a<img class="img-fluid" data-file-name="image.png" src="${base64Image}">[]</p>`
         );
     });
 });

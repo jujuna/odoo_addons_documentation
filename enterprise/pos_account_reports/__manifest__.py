@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "pos_account_reports",
 

@@ -14,14 +14,14 @@ class TestSMSPerformance(BaseMailPerformance, sms_common.SMSCase):
     def setUp(self):
         super(TestSMSPerformance, self).setUp()
 
-        self.test_record = self.env['mail.test.sms'].with_context(self._test_context).create({
+        self.test_record = self.env['mail.test.sms'].create({
             'name': 'Test',
             'customer_id': self.customer.id,
             'phone_nbr': '0456999999',
         })
 
         # prepare recipients to test for more realistic workload
-        Partners = self.env['res.partner'].with_context(self._test_context)
+        Partners = self.env['res.partner']
         self.partners = self.env['res.partner']
         for x in range(0, 10):
             self.partners |= Partners.create({
@@ -37,7 +37,7 @@ class TestSMSPerformance(BaseMailPerformance, sms_common.SMSCase):
     def test_message_sms_record_1_partner(self):
         record = self.test_record.with_user(self.env.user)
         pids = self.customer.ids
-        with self.subTest("QueryCount"), self.mockSMSGateway(), self.assertQueryCount(employee=32):  # tme: 31
+        with self.subTest("QueryCount"), self.mockSMSGateway(), self.assertQueryCount(employee=32):  # tme: 32
             messages = record._message_sms(
                 body='Performance Test',
                 partner_ids=pids,

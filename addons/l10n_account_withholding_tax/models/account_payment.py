@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import Command, api, fields, models
+from odoo import api, fields, models
 
 
 class AccountPayment(models.Model):
@@ -10,13 +10,14 @@ class AccountPayment(models.Model):
     # ------------------
 
     display_withholding = fields.Boolean(compute='_compute_display_withholding')
-    should_withhold_tax = fields.Boolean(
-        string='Withhold Tax Amounts',
-        help="Withhold tax amounts from the payment amount.",
-        compute='_compute_should_withhold_tax',
-        readonly=False,
-        store=True,
+    withhold = fields.Selection(
+        selection=[
+            ('withhold_pay', 'Withhold and Pay'),
+            ('withhold', 'Withhold Only'),
+            ('payment', 'Payment Only'),
+        ],
         copy=False,
+        default='payment',
     )
     withholding_line_ids = fields.One2many(
         string='Withholding Lines',
@@ -27,6 +28,18 @@ class AccountPayment(models.Model):
     # We may need to manually set an account, for this we want it to not be readonly by default.
     outstanding_account_id = fields.Many2one(readonly=False)
     withholding_hide_tax_base_account = fields.Boolean(compute='_compute_withholding_hide_tax_base_account')
+    withholding_amount = fields.Monetary(
+        string="Withholding Amount",
+        compute="_compute_withholding_amount",
+        currency_field='currency_id',
+    )
+    withholding_net_amount = fields.Monetary(
+        string="Net Amount",
+        compute="_compute_withholding_net_amount",
+        currency_field='currency_id',
+        help="The amount that will actually be paid after deducting withholding taxes.",
+    )
+    withholding_hide_name = fields.Boolean(compute='_compute_withholding_hide_name')
 
     # --------------------------------
     # Compute, inverse, search methods
@@ -42,7 +55,7 @@ class AccountPayment(models.Model):
 
             withholding_taxes = self.env['account.tax'].search([
                 *self.env['account.tax']._check_company_domain(company),
-                ('is_withholding_tax_on_payment', '=', True),
+                ('is_withholding_tax', '=', True),
             ])
             for payment in self:
                 # To avoid displaying things for nothing, also ensure to only consider withholding taxes matching the payment type.
@@ -50,12 +63,6 @@ class AccountPayment(models.Model):
                 payment_withholding_taxes = withholding_taxes.filtered_domain(payment_domain)
 
                 payment.display_withholding = bool(payment_withholding_taxes)
-
-    @api.depends('withholding_line_ids')
-    def _compute_should_withhold_tax(self):
-        """ Ensures that we display the line table if any withholding line has been added to the payment. """
-        for payment in self:
-            payment.should_withhold_tax = bool(payment.withholding_line_ids)
 
     @api.depends('company_id')
     def _compute_withholding_hide_tax_base_account(self):
@@ -66,10 +73,25 @@ class AccountPayment(models.Model):
         for payment in self:
             payment.withholding_hide_tax_base_account = bool(payment.company_id.withholding_tax_base_account_id)
 
-    @api.depends('should_withhold_tax')
+    @api.depends('withhold')
     def _compute_outstanding_account_id(self):
-        """ Update the computation to reset the account when should_withhold_tax is unchecked. """
+        """ Update the computation to reset the account when withhold is changed. """
         super()._compute_outstanding_account_id()
+
+    @api.depends('withholding_line_ids.amount')
+    def _compute_withholding_amount(self):
+        for payment in self:
+            payment.withholding_amount = sum(payment.withholding_line_ids.mapped('amount'))
+
+    @api.depends('withholding_amount', 'amount')
+    def _compute_withholding_net_amount(self):
+        for payment in self:
+            payment.withholding_net_amount = payment.amount - payment.withholding_amount
+
+    @api.depends("withholding_line_ids.withholding_sequence_id")
+    def _compute_withholding_hide_name(self):
+        for payment in self:
+            payment.withholding_hide_name = not any(line.withholding_sequence_id for line in payment.withholding_line_ids)
 
     # ----------------------------
     # Onchange, Constraint methods
@@ -96,84 +118,42 @@ class AccountPayment(models.Model):
 
     @api.model
     def _get_trigger_fields_to_synchronize(self):
-        # EXTEND account to add the withholding fields in the list.
-        return super()._get_trigger_fields_to_synchronize() + ('withholding_line_ids', 'should_withhold_tax')
-
-    def _synchronize_to_moves(self, changed_fields):
-        """ Updates the synchronization in order to ensure that the entry takes into account changes in the withholding lines. """
         # EXTEND account
-        if not any(field_name in changed_fields for field_name in self._get_trigger_fields_to_synchronize()):
-            return
+        return super()._get_trigger_fields_to_synchronize() + ('withholding_line_ids', 'withhold')
 
-        withholding_payments = self.filtered(lambda payment: payment.withholding_line_ids and payment.should_withhold_tax)
-        for pay in withholding_payments:
-            liquidity_lines, counterpart_lines, write_off_lines = pay._seek_for_lines()
+    def _prepare_move_withholding_lines(self, default_values):
+        # EXTENDS account
+        withholding_lines = super()._prepare_move_withholding_lines(default_values)
+        if self.withhold != 'payment' and self.withholding_line_ids:
+            withholding_lines += self.withholding_line_ids._prepare_withholding_amls_create_values()
+        return withholding_lines
 
-            # Reset/update the liquidity/counterpart lines.
-            line_vals_list = pay._prepare_move_line_default_vals()
-            liquidity_line_values = line_vals_list[0]
-            counterpart_line_values = line_vals_list[1]
+    def _generate_journal_entry(self, write_off_line_vals=None, force_balance=None, line_ids=None):
+        withhold_payments = self.filtered(lambda p: p.withhold == 'withhold')
+        regular_payments = self - withhold_payments
 
-            # Generate the new withholding lines.
-            liquidity_line_balance = liquidity_line_values['debit'] - liquidity_line_values['credit']
-            liquidity_line_amount_currency = liquidity_line_values['amount_currency']
-            withholding_line_values_list = pay.withholding_line_ids._prepare_withholding_amls_create_values()
-            write_off_line_ids_commands = []
-            for line_values in withholding_line_values_list:
-                write_off_line_ids_commands.append(Command.create(line_values))
-                liquidity_line_balance -= line_values['balance']
-                liquidity_line_amount_currency -= line_values['amount_currency']
-            if liquidity_line_balance > 0.0:
-                liquidity_line_values['debit'] = liquidity_line_balance
-                liquidity_line_values['credit'] = 0.0
-            else:
-                liquidity_line_values['debit'] = 0.0
-                liquidity_line_values['credit'] = -liquidity_line_balance
-            liquidity_line_values['amount_currency'] = liquidity_line_amount_currency
+        if regular_payments:
+            super(AccountPayment, regular_payments)._generate_journal_entry(write_off_line_vals, force_balance, line_ids)
 
-            line_ids_commands = [
-                Command.update(liquidity_lines.id, liquidity_line_values) if liquidity_lines else Command.create(liquidity_line_values),
-                Command.update(counterpart_lines.id, counterpart_line_values) if counterpart_lines else Command.create(counterpart_line_values),
-            ] + [
-                Command.delete(line.id)
-                for line in write_off_lines
-            ] + write_off_line_ids_commands
+        if withhold_payments:
+            move_vals = [
+                pay._generate_move_vals(write_off_line_vals, force_balance, line_ids)
+                for pay in withhold_payments
+            ]
+            moves = self.env['account.move'].create(move_vals)
+            for pay, move in zip(withhold_payments, moves):
+                pay.write({'move_id': move.id, 'state': 'paid'})
 
-            pay.move_id \
-                .with_context(skip_invoice_sync=True) \
-                .write({
-                    'name': '/',  # Set the name to '/' to allow it to be changed
-                    'date': pay.date,
-                    'partner_id': pay.partner_id.id,
-                    'currency_id': pay.currency_id.id,
-                    'partner_bank_id': pay.partner_bank_id.id,
-                    'line_ids': line_ids_commands,
-                    'journal_id': pay.journal_id.id,
-                })
+    def _prepare_move_liquidity_lines(self, default_values):
+        """
+        Skip liquidity lines when processing a withholding-only payment,
+        as no cash or bank movement should be recorded.
+        """
+        self.ensure_one()
+        if self.withhold == 'withhold' and self.withholding_line_ids:
+            return []
+        return super()._prepare_move_liquidity_lines(default_values)
 
-        # All other payments will use the original logic
-        super(AccountPayment, self - withholding_payments)._synchronize_to_moves(changed_fields)
-
-    def _generate_move_vals(self, write_off_line_vals=None, force_balance=None, line_ids=None):
-        """ Ensure that the generated payment entry takes into account the withholding lines. """
-        # EXTEND account
-        move_vals = super()._generate_move_vals(write_off_line_vals=write_off_line_vals, force_balance=force_balance, line_ids=line_ids)
-        if not self.withholding_line_ids or not self.should_withhold_tax:
-            return move_vals
-
-        liquidity_line_values = move_vals['line_ids'][0][2]
-        liquidity_line_balance = liquidity_line_values['debit'] - liquidity_line_values['credit']
-        liquidity_line_amount_currency = liquidity_line_values['amount_currency']
-        withholding_line_values_list = self.withholding_line_ids._prepare_withholding_amls_create_values()
-        for line_values in withholding_line_values_list:
-            move_vals['line_ids'].append(Command.create(line_values))
-            liquidity_line_balance -= line_values['balance']
-            liquidity_line_amount_currency -= line_values['amount_currency']
-        liquidity_line_values['amount_currency'] = liquidity_line_amount_currency
-        if liquidity_line_balance > 0.0:
-            liquidity_line_values['debit'] = liquidity_line_balance
-            liquidity_line_values['credit'] = 0.0
-        else:
-            liquidity_line_values['debit'] = 0.0
-            liquidity_line_values['credit'] = -liquidity_line_balance
-        return move_vals
+    @api.constrains('payment_method_line_id')
+    def _check_payment_method_line_id(self):
+        super(AccountPayment, self.filtered(lambda p: p.withhold != 'withhold'))._check_payment_method_line_id()

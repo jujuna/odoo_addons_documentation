@@ -1,15 +1,18 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': 'Electronic invoicing for Colombia with Carvajal',
-    'version': '0.3',
+    'name': 'Electronic invoicing for Colombia',
+    'version': '0.5',
     'category': 'Accounting/Localizations/EDI',
     'summary': 'Colombian Localization for EDI documents',
-    'author': 'Odoo Sa',
-    'depends': ['account_edi', 'l10n_co', 'product_unspsc', 'base_address_extended'],
+    'author': 'Odoo S.A.',
+    'depends': [
+        'l10n_co',
+        'product_unspsc',
+        'certificate',
+        'account_edi_ubl_cii',
+    ],
     'auto_install': ['l10n_co'],
     'data': [
-        'security/ir.model.access.csv',
-        'data/account_edi_data.xml',
         'data/l10n_co_edi.type_code.csv',
         'data/l10n_co_edi.tax.type.csv',
         'data/l10n_co_edi.payment.option.csv',
@@ -18,7 +21,12 @@
         'data/res.country.state.csv',
         'data/res_country_data.xml',
         'data/uom_data.xml',
+        'data/product_product.xml',
+        'data/mail_template_data.xml',
+        'data/cron.xml',
         'views/res_company_views.xml',
+        'views/res_city_view.xml',
+        'wizards/l10n_co_edi_claim_wizard.xml',
         'views/account_invoice_views.xml',
         'views/account_tax_views.xml',
         'views/account_journal_views.xml',
@@ -28,18 +36,29 @@
         'views/res_partner_views.xml',
         'views/tax_type_views.xml',
         'views/res_config_settings_views.xml',
-        'views/electronic_invoice.xml',
-        'views/electronic_invoice_vendor_document.xml',
         'views/portal_address_templates.xml',
+        'views/l10n_co_edi_operation_mode.xml',
+        'views/report_invoice.xml',
+        'views/report_templates.xml',
+        'views/templates.xml',
         'wizards/account_move_reversal_view.xml',
-        'wizards/account_debit_note_view.xml'
+        'wizards/account_debit_note_view.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_frontend': [
+            'l10n_co_edi/static/src/components/**/*',
             'l10n_co_edi/static/src/interactions/**/*',
         ],
+        'web.assets_backend': [
+            'l10n_co_edi/static/src/scss/**/*',
+        ],
+        'web.report_assets_common': [
+            'l10n_co_edi/static/src/scss/**/*',
+        ],
     },
-    'installable': True,
+    'demo': [
+        'demo/demo.xml',
+    ],
     'license': 'OEEL-1',
-    'post_init_hook': '_l10n_co_edi_post_init',
 }

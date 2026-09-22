@@ -4,7 +4,6 @@ import { stepUtils } from "@web_tour/tour_utils";
 import { markup } from "@odoo/owl";
 
 registry.category("web_tour.tours").add('hr_expense_extract_tour' , {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(), {
         trigger: '.o_app[data-menu-xmlid="hr_expense.menu_hr_expense_root"]',
@@ -12,14 +11,9 @@ registry.category("web_tour.tours").add('hr_expense_extract_tour' , {
         tooltipPosition: 'bottom',
         run: "click",
     }, {
-        trigger: '.o_nocontent_help a.btn-primary',
+        trigger: '.o_nocontent_help a.o_select_sample',
         content: _t("Try the AI with a sample receipt."),
         tooltipPosition: 'bottom',
-        run: "click",
-    }, {
-        trigger: ".o_expense_flex",
-        content: _t("Choose a receipt."),
-        tooltipPosition: 'top',
         run: "click",
     }, {
         trigger: "button[name='action_submit']",
@@ -27,7 +21,10 @@ registry.category("web_tour.tours").add('hr_expense_extract_tour' , {
         tooltipPosition: 'bottom',
         run: "click",
     }, {
-        trigger: '.dropdown-toggle[data-menu-xmlid="hr_expense.menu_hr_expense_all_expenses"]',
+        trigger: '[data-menu-xmlid="hr_expense.menu_hr_expense_reports"]',
+        run: "click",
+    }, {
+        trigger: 'a[data-menu-xmlid="hr_expense.menu_hr_expense_all_expenses"]',
         content: _t("Your manager will have to approve (or refuse) your expense reports."),
         tooltipPosition: 'bottom',
         run: "click",

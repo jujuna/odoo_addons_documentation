@@ -1,8 +1,10 @@
+from odoo import Command
 from odoo.tests import common, tagged
 from odoo.tests.common import new_test_user
 
 
-@tagged("voip")
+@tagged("voip", "call_artifacts")
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestVoipAccessRights(common.TransactionCase):
     def _create_user_in_company(self, company, name, login, groups="base.group_user"):
         return new_test_user(
@@ -143,3 +145,120 @@ class TestVoipAccessRights(common.TransactionCase):
         self.assertFalse(provider_b.with_user(admin_user).has_access("read"))
         self.assertFalse(provider_b.with_user(admin_user).has_access("write"))
         self.assertFalse(provider_b.with_user(admin_user).has_access("unlink"))
+
+    def test_admin_access_follows_allowed_companies(self):
+        company_a = self.env["res.company"].create({"name": "Allowed Company A"})
+        company_b = self.env["res.company"].create({"name": "Allowed Company B"})
+        admin_user = self._create_user_in_company(
+            company_a,
+            "Multi-company Admin",
+            "multi_company_voip_admin",
+            groups="voip.group_voip_admin",
+        )
+        admin_user.company_ids = [Command.link(company_b.id)]
+        call_owner = self._create_user_in_company(company_b, "Company B User", "company_b_user")
+        provider = self.env["voip.provider"].create({
+            "name": "Company B Provider",
+            "company_id": company_b.id,
+        })
+        call = self.env["voip.call"].create({
+            "user_id": call_owner.id,
+            "phone_number": "123456789",
+        })
+
+        self.assertTrue(provider.with_user(admin_user).has_access("read"))
+        self.assertTrue(call.with_user(admin_user).has_access("read"))
+
+    def test_pbx_configuration_models_are_admin_only(self):
+        regular_user = new_test_user(self.env, login="pbx_config_regular")
+        officer = new_test_user(
+            self.env,
+            login="pbx_config_officer",
+            groups="voip.group_voip_officer",
+        )
+        admin = new_test_user(
+            self.env,
+            login="pbx_config_admin",
+            groups="voip.group_voip_admin",
+        )
+        model_names = (
+            "voip.sound",
+            "voip.call.flow",
+            "voip.call.group",
+            "voip.did.number.request",
+            "voip.did.number",
+            "voip.extension",
+            "voip.ivr",
+            "voip.music.on.hold",
+            "voip.music.on.hold.track",
+            "voip.queue",
+            "voip.time.condition",
+            "voip.voicemail",
+        )
+
+        for model_name in model_names:
+            with self.subTest(model=model_name):
+                model = self.env[model_name]
+                for operation in ("create", "read", "write", "unlink"):
+                    self.assertFalse(model.with_user(regular_user).has_access(operation))
+                    self.assertFalse(model.with_user(officer).has_access(operation))
+                    self.assertTrue(model.with_user(admin).has_access(operation))
+
+    def test_regular_user_read_access_to_own_mail_call_artifacts(self):
+        """Verify that regular users can read artifacts of their own calls but not others'"""
+        company_a = self.env["res.company"].create({"name": "Company A"})
+        regular_user = self._create_user_in_company(company_a, "Regular", "regular")
+        other_user = self._create_user_in_company(company_a, "Other", "other")
+
+        own_call = self.env["voip.call"].create({"user_id": regular_user.id, "phone_number": "123"})
+        other_call = self.env["voip.call"].create({"user_id": other_user.id, "phone_number": "456"})
+
+        own_artifact = self.env["mail.call.artifact"].create({
+            "voip_call_id": own_call.id,
+            "start_ms": 0,
+            "end_ms": 1000,
+        })
+        other_artifact = self.env["mail.call.artifact"].create({
+            "voip_call_id": other_call.id,
+            "start_ms": 0,
+            "end_ms": 1000,
+        })
+
+        # Own artifact: read access
+        self.assertTrue(own_artifact.with_user(regular_user).has_access("read"))
+        # No other CRUD access
+        self.assertFalse(own_artifact.with_user(regular_user).has_access("create"))
+        self.assertFalse(own_artifact.with_user(regular_user).has_access("write"))
+        self.assertFalse(own_artifact.with_user(regular_user).has_access("unlink"))
+
+        # Other's artifact: no read access
+        self.assertFalse(other_artifact.with_user(regular_user).has_access("read"))
+
+    def test_officer_read_access_to_company_artifacts(self):
+        """Verify that officers can read artifacts of calls where the call's user is in their company"""
+        company_a = self.env["res.company"].create({"name": "Company A"})
+        company_b = self.env["res.company"].create({"name": "Company B"})
+
+        officer = self._create_user_in_company(company_a, "Officer", "officer", groups="voip.group_voip_officer")
+        user_a = self._create_user_in_company(company_a, "User A", "user_a")
+        user_b = self._create_user_in_company(company_b, "User B", "user_b")
+
+        call_a = self.env["voip.call"].create({"user_id": user_a.id, "phone_number": "123"})
+        call_b = self.env["voip.call"].create({"user_id": user_b.id, "phone_number": "456"})
+
+        artifact_a = self.env["mail.call.artifact"].create({
+            "voip_call_id": call_a.id,
+            "start_ms": 0,
+            "end_ms": 1000,
+        })
+        artifact_b = self.env["mail.call.artifact"].create({
+            "voip_call_id": call_b.id,
+            "start_ms": 0,
+            "end_ms": 1000,
+        })
+
+        # Officer can read artifacts from their own company
+        self.assertTrue(artifact_a.with_user(officer).has_access("read"))
+
+        # Officer CANNOT read artifacts from another company
+        self.assertFalse(artifact_b.with_user(officer).has_access("read"))

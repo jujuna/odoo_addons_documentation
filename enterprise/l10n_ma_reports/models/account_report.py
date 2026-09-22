@@ -1,3 +1,5 @@
+import re
+
 from odoo import api, fields, models, _
 from odoo.tools import date_utils, SQL
 
@@ -112,19 +114,19 @@ class L10n_MaTaxReportHandler(models.AbstractModel):
         if 'account_move_line__move_id' not in report_query._joins:
             report_query.join('account_move_line', 'move_id', 'account_move', 'id', 'move_id')
         if 'account_move_line__partner_id' not in report_query._joins:
-            report_query.left_join('account_move_line', 'partner_id', 'res_partner', 'id', 'partner_id')
+            report_query.add_join('LEFT JOIN', 'account_move_line__partner_id', self.env['res.partner']._table, SQL("account_move_line.partner_id = account_move_line__partner_id.id"))
 
         self.env.cr.execute(SQL(
             """
             SELECT
                 COALESCE(MIN(caba_origin_move.name), MIN(account_move_line__move_id.name)) AS move_name,
-                SUM(CASE WHEN account_move_line.display_type = 'tax' THEN account_move_line.balance ELSE 0 END) AS tax_amount,
+                SUM(account_move_line.balance) AS tax_amount,
                 CASE WHEN account_move_line__partner_id.country_id = %(ma_country_id)s
                     THEN account_move_line__partner_id.vat
                     ELSE account_move_line__partner_id.l10n_ma_customs_vat
                 END AS partner_vat,
                 account_move_line__partner_id.name as partner_name,
-                account_move_line__partner_id.company_registry AS partner_ice,
+                account_move_line__partner_id.additional_identifiers->>'MA_ICE' AS partner_ice,
                 tax.amount AS tax_rate,
                 CASE WHEN MIN(caba_origin_move.id) IS NULL
                     THEN NULL
@@ -157,6 +159,7 @@ class L10n_MaTaxReportHandler(models.AbstractModel):
             WHERE %(search_condition)s
 
             GROUP BY account_move_line__partner_id.id, COALESCE(caba_origin_move.id, account_move_line__move_id.id), tax.id
+            HAVING SUM(account_move_line.balance) != 0
             """,
             table_references=report_query.from_clause,
             search_condition=report_query.where_clause,
@@ -172,7 +175,7 @@ class L10n_MaTaxReportHandler(models.AbstractModel):
 
         prorata_expression = self.env.ref('l10n_ma.l10n_ma_vat_d_prorata_pro')
         prorata_expr_totals = report._compute_expression_totals_for_each_column_group(prorata_expression, options)
-        prorata_value = prorata_expr_totals[next(iter(options['column_groups']))][prorata_expression]['value']
+        prorata_value = prorata_expr_totals[0][prorata_expression]['value']
         template_vals |= self._l10n_ma_prepare_vat_report_bill_values(bill_data_list, prorata_value)
 
         return template_vals
@@ -181,9 +184,24 @@ class L10n_MaTaxReportHandler(models.AbstractModel):
     def l10n_ma_reports_export_vat_to_xml(self, options):
         report = self.env['account.report'].browse(options['report_id'])
         template_values = self._l10n_ma_prepare_vat_report_values(options)
+        render = self.env['ir.qweb']._render
+        template = 'l10n_ma_reports.l10n_ma_tax_report_template'
+
+        if options.get('skip_error_check'):
+            content = render(template, values=template_values)
+            return {
+                'file_name': report.get_default_report_filename(options, 'xml'),
+                'file_content': '\n'.join(re.split(r'\n\s*\n', content)).encode(),
+                'file_type': 'xml',
+            }
+
         return report._generate_file_data_with_error_check(
             options,
-            self.env['ir.qweb']._render,
-            {'values': template_values, 'template': 'l10n_ma_reports.l10n_ma_tax_report_template', 'file_type': 'xml'},
+            render,
+            {
+                'values': template_values,
+                'template': template,
+                'file_type': 'xml'
+            },
             template_values['errors'],
         )

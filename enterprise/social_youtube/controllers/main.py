@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import json
 import requests
 
@@ -10,6 +8,7 @@ from odoo import _, fields, http
 from odoo.addons.social.controllers.main import SocialController
 from odoo.addons.social.controllers.main import SocialValidationException
 from odoo.http import request
+from odoo.tools import BinaryBytes
 from odoo.tools.urls import urljoin as url_join
 
 
@@ -35,8 +34,8 @@ class SocialYoutubeController(SocialController):
                 {'error_message': _('YouTube did not provide a valid authorization code.')})
 
         youtube_media = request.env.ref('social_youtube.social_media_youtube')
-        youtube_oauth_client_id = request.env['ir.config_parameter'].sudo().get_param('social.youtube_oauth_client_id')
-        youtube_oauth_client_secret = request.env['ir.config_parameter'].sudo().get_param('social.youtube_oauth_client_secret')
+        youtube_oauth_client_id = request.env['ir.config_parameter'].sudo().get_str('social.youtube_oauth_client_id')
+        youtube_oauth_client_secret = request.env['ir.config_parameter'].sudo().get_str('social.youtube_oauth_client_secret')
 
         if iap_access_token and iap_refresh_token:
             access_token = iap_access_token
@@ -80,8 +79,7 @@ class SocialYoutubeController(SocialController):
             self._youtube_create_accounts(access_token, refresh_token, expires_in)
         except SocialValidationException as e:
             return request.render('social.social_http_error_view', {'error_message': e.get_message(), 'documentation_data': e.get_documentation_data()})
-
-        return request.redirect('/odoo/action-social.action_social_stream_post')
+        return request.render('social.social_http_authentication_done')
 
     # ========================================================
     # COMMENTS / LIKES
@@ -90,7 +88,8 @@ class SocialYoutubeController(SocialController):
     @http.route('/social_youtube/comment', type='http', auth='user', methods=['POST'])
     def social_youtube_comment(self, stream_post_id=None, comment_id=None, message=None, is_edit=False, **kwargs):
         stream_post = self._get_social_stream_post(stream_post_id, 'youtube')
-        return json.dumps(stream_post._youtube_comment_add(comment_id, message, is_edit=is_edit))
+        return json.dumps(stream_post._youtube_comment_add(
+            stream_post.account_id, stream_post.youtube_video_id, comment_id, message, is_edit=is_edit))
 
     @http.route('/social_youtube/delete_comment', type='jsonrpc', auth='user')
     def social_youtube_delete_comment(self, stream_post_id=None, comment_id=None):
@@ -124,7 +123,7 @@ class SocialYoutubeController(SocialController):
             message = _('There is no channel linked with this YouTube account.')
             documentation_link = 'https://support.google.com/youtube/answer/6388033'
             documentation_link_label = _('Read More about YouTube Channel')
-            documentation_link_icon_class = 'fa fa-youtube'
+            documentation_link_icon_class = 'oi_youtube'
             raise SocialValidationException(message, documentation_link, documentation_link_label, documentation_link_icon_class)
 
         accounts_to_create = []
@@ -144,12 +143,12 @@ class SocialYoutubeController(SocialController):
                 'youtube_token_expiration_date': fields.Datetime.now() + timedelta(seconds=int(expires_in)),
                 'youtube_upload_playlist_id': channel['contentDetails']['relatedPlaylists']['uploads'],
                 'is_media_disconnected': False,
-                'image': base64.b64encode(requests.get(
+                'image': BinaryBytes(requests.get(  # FIXME check response status
                     channel['snippet']['thumbnails']['medium']['url'], timeout=10).content)
             }
 
             if existing_accounts.get(account_id):
-                existing_accounts.get(account_id).write(base_values)
+                existing_accounts.get(account_id).sudo().write(base_values)
             else:
                 base_values.update({
                     'youtube_channel_id': account_id,
@@ -159,7 +158,7 @@ class SocialYoutubeController(SocialController):
                 accounts_to_create.append(base_values)
 
         if accounts_to_create:
-            request.env['social.account'].create(accounts_to_create)
+            self.env['social.account'].sudo().create(accounts_to_create)
 
     def _youtube_get_existing_accounts(self, youtube_channels):
         youtube_accounts_ids = [account['id'] for account in youtube_channels.get('items', [])]

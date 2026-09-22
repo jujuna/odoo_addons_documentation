@@ -2,6 +2,7 @@ import { registry } from "@web/core/registry";
 import * as Dialog from "@point_of_sale/../tests/generic_helpers/dialog_util";
 import * as Chrome from "@point_of_sale/../tests/pos/tours/utils/chrome_util";
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
+import * as ProductScreen from "@point_of_sale/../tests/pos/tours/utils/product_screen_util";
 
 registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_refund_discount_order", {
     steps: () => [
@@ -12,21 +13,12 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_refund_discount_or
         },
         {
             content: "Open POS session from backend",
-            trigger: "button[name='open_ui']",
+            trigger: "button:contains('Open Register')",
             run: "click",
             expectUnloadPage: true,
         },
         Dialog.confirm("Open Register"),
-        {
-            content: "Open Actions menu",
-            trigger: "button.more-btn",
-            run: "click",
-        },
-        {
-            content: "Click Refund",
-            trigger: "button.btn:contains('Refund')",
-            run: "click",
-        },
+        ...ProductScreen.clickRefund(),
         {
             content: "Select an Order",
             trigger: "tr.order-row:contains('Paid')",
@@ -35,11 +27,6 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_refund_discount_or
         {
             content: "Select an Orderline",
             trigger: "li.orderline:contains('Test Product 1')",
-            run: "click",
-        },
-        {
-            content: "Select qty to refund",
-            trigger: "button[value='1']",
             run: "click",
         },
         {

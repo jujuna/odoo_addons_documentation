@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models
+from odoo import fields, models
 
 
 class L10n_PhSlpReportHandler(models.AbstractModel):
@@ -46,7 +46,7 @@ class L10n_PhSlpReportHandler(models.AbstractModel):
     def _get_dat_file_name(self, options):
         company = self.env["res.company"].browse(options["companies"][0]["id"])
         company_vat, _company_branch = self._get_partner_vat_branch(company.partner_id)
-        date_to = self._get_report_date_to(options)
+        date_to = fields.Date.from_string(options['date']['date_to'])
         return_period = date_to.strftime(options['filename_date_format'])
 
         return f"{company_vat}P{return_period}.dat"
@@ -54,7 +54,7 @@ class L10n_PhSlpReportHandler(models.AbstractModel):
     def _slsp_get_header_values(self, categories_summed_amount, options):
         company = self.env["res.company"].browse(options["companies"][0]["id"])
         company_vat, _company_branch = self._get_partner_vat_branch(company.partner_id)
-        date_to = self._get_report_date_to(options)
+        date_to = fields.Date.from_string(options['date']['date_to'])
 
         address_1, address_2 = self._get_partner_address_lines(company)
 
@@ -63,9 +63,9 @@ class L10n_PhSlpReportHandler(models.AbstractModel):
             'P',
             self._format_value(company_vat, 9),
             self._format_value(company.partner_id.name, 50, quote=True),
-            self._format_value(company.partner_id.last_name, 30, quote=True),
-            self._format_value(company.partner_id.first_name, 30, quote=True),
-            self._format_value(company.partner_id.middle_name, 30, quote=True),
+            self._format_value(company.partner_id.l10n_ph_last_name, 30, quote=True),
+            self._format_value(company.partner_id.l10n_ph_first_name, 30, quote=True),
+            self._format_value(company.partner_id.l10n_ph_middle_name, 30, quote=True),
             self._format_value(company.partner_id.name, 50, quote=True),
             self._format_value(address_1, 300, quote=True),
             self._format_value(address_2, 300, quote=True),
@@ -77,27 +77,32 @@ class L10n_PhSlpReportHandler(models.AbstractModel):
             self._format_value(categories_summed_amount.get('tax_amount', 0.0), 14),
             self._format_value(categories_summed_amount.get('tax_amount_creditable', 0.0), 14),
             self._format_value(categories_summed_amount.get('tax_amount_non_creditable', 0.0), 14),
-            self._format_value(company.partner_id.l10n_ph_rdo or '', 3),
+            self._format_value(company.l10n_ph_rdo or '', 3),
             self._format_value(date_to.strftime('%m/%d/%Y'), 10),
         ]
 
     def _slsp_get_line_values(self, line, options):
         company = self.env["res.company"].browse(options["companies"][0]["id"])
         company_vat, _company_branch = self._get_partner_vat_branch(company.partner_id)
-        date_to = self._get_report_date_to(options)
+        date_to = fields.Date.from_string(options['date']['date_to'])
 
         payee = self.env['res.partner'].browse(line['payee_id'])
         payee_vat, _payee_branch = self._get_partner_vat_branch(payee.commercial_partner_id)
         address_1, address_2 = self._get_partner_address_lines(payee)
 
+        if payee.l10n_ph_entity_type == 'individual':
+            registered_name = f"{payee.l10n_ph_last_name}, {payee.l10n_ph_first_name}, {payee.l10n_ph_middle_name}"
+        else:
+            registered_name = payee.name
+
         return [
             'D',
             'P',
             self._format_value(payee_vat, 9),
-            self._format_value(line.get('payee_registered_name', ''), 50, quote=True),
-            self._format_value(line.get('payee_last_name', ''), 30, quote=True),
-            self._format_value(line.get('payee_first_name', ''), 30, quote=True),
-            self._format_value(line.get('payee_middle_name', ''), 30, quote=True),
+            self._format_value(registered_name, 50, quote=True),
+            self._format_value(payee.l10n_ph_last_name, 30, quote=True),
+            self._format_value(payee.l10n_ph_first_name, 30, quote=True),
+            self._format_value(payee.l10n_ph_middle_name, 30, quote=True),
             self._format_value(address_1, 300, quote=True),
             self._format_value(address_2, 300, quote=True),
             self._format_value(line.get('exempt_amount', 0.0), 14),

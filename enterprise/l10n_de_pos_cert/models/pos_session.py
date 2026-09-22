@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import Dict
 
 from odoo import models, fields, _, release
@@ -44,38 +42,31 @@ class PosSession(models.Model):
     l10n_de_fiskaly_cash_point_closing_uuid = fields.Char(string="Fiskaly Cash Point Closing Uuid", readonly=True,
         help="The uuid of the 'cash point closing' created at Fiskaly when closing the session.")
 
-    def _validate_session(self, balancing_account=False, amount_to_balance=0, bank_payment_method_diffs=None):
-        res = super()._validate_session(balancing_account, amount_to_balance, bank_payment_method_diffs)
+    def _validate_session_accounting(self):
+        super()._validate_session_accounting()
 
-        # If the result is a dict, this means that there was a problem and the _validate_session was not completed.
-        # In this case, a wizard should show up which is represented by the returned dictionary.
-        # Return the dictionary to prevent running the remaining code.
-        if isinstance(res, dict):
-            return res
-        orders = self.order_ids.filtered(lambda o: o.state == 'done')
+        orders = self.order_ids.filtered(lambda o: o.state != 'draft')
         # We don't want to block the user that need to validate his session order in order to create his TSS
         if self.config_id.is_company_country_germany and self.config_id.l10n_de_fiskaly_tss_id and orders:
             orders = orders.sorted('write_date')  # there are possible cases where the end date won't be set
             json = self._l10n_de_create_cash_point_closing_json(orders)
             self._l10n_de_send_fiskaly_cash_point_closing(json)
 
-        return res
-
     def _l10n_de_create_cash_point_closing_json(self, orders):
         self.env.cr.execute("""
-            SELECT pm.is_cash_count, sum(p.amount) AS amount
+            SELECT pm.type, sum(p.amount) AS amount
             FROM pos_payment p
                 LEFT JOIN pos_payment_method pm ON p.payment_method_id=pm.id
                 JOIN account_journal journal ON pm.journal_id=journal.id
             WHERE p.session_id=%s AND journal.type IN ('cash', 'bank')
-            GROUP BY pm.is_cash_count
+            GROUP BY pm.type
         """, [self.id])
         total_payment_result = self.env.cr.dictfetchall()
 
         total_cash = 0
         total_bank = 0
         for payment in total_payment_result:
-            if payment['is_cash_count']:
+            if payment['type'] == 'cash':
                 total_cash = payment['amount']
             else:
                 total_bank = payment['amount']
@@ -121,6 +112,7 @@ class PosSession(models.Model):
                         # Add to existing totals
                         existing_statement_entry["incl_vat"] = float_repr(float(existing_statement_entry["incl_vat"]) + float(amt.get("incl_vat", 0)), precision)
                         existing_statement_entry["excl_vat"] = float_repr(float(existing_statement_entry["excl_vat"]) + float(amt.get("excl_vat", 0)), precision)
+                        existing_statement_entry["vat"] = float_repr(float(existing_statement_entry["vat"]) + float(amt.get("vat", 0)), precision)
                     else:
                         # Create new statement entry for this vat
                         summary[case_type].append({
@@ -133,18 +125,17 @@ class PosSession(models.Model):
         # Build final statements directly
         # This refers to transactions that fall entirely outside the scope of VAT law (UStG) → Nicht steuerbar (Not Taxable) so vat id 5.
         statements = [
-            {"type": "Anfangsbestand", "name": "Opening Cash", "amounts_per_vat_id": [self._get_vat_details(5, self.cash_register_balance_start, self.cash_register_balance_start)]},
-            {"type": "DifferenzSollIst", "name": "Cash Discrepancy", "amounts_per_vat_id": [self._get_vat_details(5, self.cash_register_difference, self.cash_register_difference)]},
+            {"type": "Anfangsbestand", "name": "Opening Cash", "amounts_per_vat_id": [self._get_vat_details(5, self.opening_balance, self.opening_balance)]},
+            {"type": "DifferenzSollIst", "name": "Cash Discrepancy", "amounts_per_vat_id": [self._get_vat_details(5, self.closing_difference, self.closing_difference)]},
         ]
-
-        move_statements = [entry for entry in self.get_cash_in_out_list() if entry.get('cashier_name')]  # remove difference line
-        for cash_move in move_statements:
+        for cash_move in self.bank_statement_line_ids.filtered(lambda line: not line.is_reconciled).sorted('create_date'):  # remove cash difference line
             # Need to update here if we update format in _prepareTryCashInOutPayload(), _prepare_account_bank_statement_line_vals()
             # current structure of name is: {session_name}-{move_type}-{statement_type}-{move_reason}
             # so if - is in name or reason direct spiltting won't work
-            move_parts = cash_move['name'].removeprefix(self.name).split('-')
+            move_parts = cash_move.payment_ref.removeprefix(self.name).split('-')
             move_type, statement_type, move_reason = move_parts[1], move_parts[2], "-".join(move_parts[3:])
-            statements.append({"type": statement_type.capitalize(), "name": f"Cash {move_type} - {move_reason}"[:40], "amounts_per_vat_id": [self._get_vat_details(5, cash_move['amount'], cash_move['amount'])]})
+            statement_type = (statement_type[0].upper() + statement_type[1:]) if statement_type else ''
+            statements.append({"type": statement_type, "name": f"Cash {move_type} - {move_reason}"[:40], "amounts_per_vat_id": [self._get_vat_details(5, cash_move.amount, cash_move.amount)]})
         for case_type, vat_summaries in summary.items():
             statements.append({"type": case_type, "amounts_per_vat_id": vat_summaries})
         return statements
@@ -166,52 +157,63 @@ class PosSession(models.Model):
 
         precision = self.currency_id.decimal_places
         transactions = []
-        for i, o in enumerate(orders, start=1):
-            if o.partner_id:
-                buyer = {
-                    "name": f"{o.partner_id.name[:50]}",
-                    "buyer_export_id": f"{o.partner_id.id}",
-                    "type": "Kunde" if company.id != o.partner_id.company_id.id else "Mitarbeiter",
-                    "address": {
-                        "street": o.partner_id.street[:60] or 'N/A',  # minimum 1 character required
-                        "postal_code": o.partner_id.zip[:10] or 'N/A',  # minimum 1 character required
-                        "country_code": COUNTRY_CODE_MAP.get(o.partner_id.country_id.code) or "DEU",
-                    },
-                }
-            else:
-                buyer = {"name": "Customer", "buyer_export_id": "null", "type": "Kunde"}
+        # We need to maintain a sequence of orders per config
+        # if we have total 40 orders 30 in older sessions and 10 in current search_count gives 40, but we need to start from 31
+        # so we need to remove the number of orders of current session to get the length of old orders
+        next_transaction_export_id = self.env['pos.order'].search_count([('config_id', '=', config.id)]) - len(orders)
+        # Orders are displayed with the newest first, but we log them from oldest
+        # to newest to preserve the chronological order of events.
+        for i, order in enumerate(reversed(orders), start=1):
+            buyer = {}
+            if partner := order.partner_id:
+                buyer.update({
+                    'name': f'{(partner.name or partner.complete_name)[:50]}',
+                    'buyer_export_id': f'{partner.id}',
+                    'type': 'Kunde' if company.id != partner.company_id.id else 'Mitarbeiter',
+                    'address': {'country_code': COUNTRY_CODE_MAP.get(partner.country_id.code) or 'DEU'},
+                })
+                if street := partner.street:
+                    buyer['address']['street'] = street[:60]
+                if postal_code := partner.zip:
+                    buyer['address']['postal_code'] = postal_code[:10]
 
-            lines_data, payment_types = o._prepare_lines_and_payments()
+            lines_data, payment_types = order._prepare_lines_and_payments()
             adjusted_order_total = self.currency_id.round(sum(
                 float(amount.get('incl_vat'))
                 for entry in lines_data
                 for amount in entry['business_case'].get('amounts_per_vat_id', [])
             ))
             transaction = {
-                "head": {
-                    "tx_id": f"{o.l10n_de_fiskaly_transaction_uuid}",
-                    "transaction_export_id": str(i),
-                    "closing_client_id": f"{config.l10n_de_fiskaly_client_id}",
-                    "type": "Beleg",
-                    "storno": False,
-                    "number": o.id,
-                    "timestamp_start": o.l10n_de_fiskaly_time_start and int(o.l10n_de_fiskaly_time_start.timestamp()) or 0,
-                    "timestamp_end": o.l10n_de_fiskaly_time_end and int(o.l10n_de_fiskaly_time_end.timestamp()) or 0,
-                    "user": {
-                        "user_export_id": f"{(o.user_id or o.create_uid).id}",
-                        "name": f"{(o.user_id or o.create_uid).name[:50]}",
+                'head': {
+                    'tx_id': f'{order.l10n_de_fiskaly_transaction_uuid}',
+                    'transaction_export_id': str(next_transaction_export_id + i),
+                    'closing_client_id': f'{config.l10n_de_fiskaly_client_id}',
+                    'type': 'AVBelegabbruch' if order.state == 'cancel' else 'Beleg',
+                    'storno': False,
+                    'number': order.id,
+                    'timestamp_start': order.l10n_de_fiskaly_time_start and int(order.l10n_de_fiskaly_time_start.timestamp()) or 0,
+                    'timestamp_end': order.l10n_de_fiskaly_time_end and int(order.l10n_de_fiskaly_time_end.timestamp()) or 0,
+                    'user': {
+                        'user_export_id': f'{(order.user_id or order.create_uid).id}',
+                        'name': f'{(order.user_id or order.create_uid).name[:50]}',
                     },
-                    "buyer": buyer,
                 },
                 "data": {
                     "full_amount_incl_vat": float_repr(adjusted_order_total, precision),
                     "payment_types": payment_types,
-                    "amounts_per_vat_id": o._l10n_de_amounts_per_vat(),
+                    "amounts_per_vat_id": order._l10n_de_amounts_per_vat(),
                     "lines": lines_data,
                 },
                 # `l10n_de_fiskaly_signature_public_key` is set only when the transaction finishes successfully (no 5xx errors or network issues).
-                "security": {"tss_tx_id": f"{o.l10n_de_fiskaly_transaction_uuid}"} if o.l10n_de_fiskaly_signature_public_key else {"error_message": "Error while reaching TSS may be due to network issues or TSS unavailability."},
+                "security": {"tss_tx_id": f"{order.l10n_de_fiskaly_transaction_uuid}"} if order.l10n_de_fiskaly_signature_public_key else {"error_message": "Error while reaching TSS may be due to network issues or TSS unavailability."},
             }
+            if buyer:
+                transaction['head']['buyer'] = buyer
+            if order.refunded_order_id:
+                transaction['head']['references'] = [{
+                    'type': 'InterneTransaktion',
+                    'tx_id': order.refunded_order_id.l10n_de_fiskaly_transaction_uuid
+                }]
             transactions.append(transaction)
 
         return {

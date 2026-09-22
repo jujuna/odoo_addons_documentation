@@ -13,14 +13,11 @@ export class SpreadsheetTest extends models.Model {
     get_spreadsheet_history(resId, fromSnapshot) {
         return mockFetchSpreadsheetHistory("spreadsheet.test").call(this, resId, fromSnapshot);
     }
-
-    dispatch_spreadsheet_message() {
-        return false;
-    }
 }
 
 export class SpreadsheetCellThread extends models.Model {
     _name = "spreadsheet.cell.thread";
+    _inherit = ["mail.thread"];
 
     dummy_id = fields.Many2one({ string: "Dummy", relation: "spreadsheet.test" });
 }

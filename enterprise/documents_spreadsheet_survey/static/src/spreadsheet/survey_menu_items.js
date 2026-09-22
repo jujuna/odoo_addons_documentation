@@ -17,6 +17,7 @@ cellMenuRegistry.add("survey_see_record", {
     execute: surveySeeRecord,
     isVisible: canSeeSurveyRecord,
     icon: "o-spreadsheet-Icon.SEE_RECORDS",
+    isEnabledOnLockedSheet: true,
 });
 
 function canSeeSurveyRecord(env) {

@@ -3,21 +3,29 @@
 # * appointment_hr_recruitment
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-09-18 02:43+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-04 18:05+0000\n"
+"PO-Revision-Date: 2026-09-18 01:54+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "appointment_hr_recruitment/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: appointment_hr_recruitment
+#: model:ir.module.module,description:base.module_appointment_hr_recruitment
+msgid ""
+"\n"
+"Keeps track of all appointments related to applicants.\n"
+msgstr ""
 
 #. module: appointment_hr_recruitment
 #: model:mail.template,body_html:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
@@ -55,21 +63,32 @@ msgstr ""
 "        Je souhaiterais organiser un entretien téléphonique avec vous, d’une "
 "durée d’environ 30 minutes.\n"
 "        Nous passerons en revue votre CV ainsi que vos motivations à "
-"rejoindre l'équipe <t t-out=\"object.company_id.name or ''\">YourCompany</"
-"t>.\n"
+"rejoindre l'équipe <t t-out=\"object.company_id.name or ''\">YourCompany</t>"
+".\n"
 "        Vous pouvez réserver un créneau dans notre agenda en cliquant sur le "
 "bouton ci-dessous..<br/>\n"
 "    </div>\n"
 "    <br/>\n"
 "    <a t-att-href=\"object._get_interview_invite_url()\" t-attf-"
 "style=\"background-color: {{user.company_id.email_secondary_color or "
-"'#875A7B'}}; text-decoration: none; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px 8px "
+"'#875A7B'}}; text-decoration: none; color: {"
+"{user.company_id.email_primary_color or '#FFFFFF'}}; padding: 8px 16px 8px "
 "16px; border-radius: 5px;\">Planifier mon entretien</a><br/>\n"
 "    <br/>\n"
 "    Cordialement,\n"
 "</div>\n"
 "        "
+
+#. module: appointment_hr_recruitment
+#: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
+msgid ""
+"<i class=\"oi\" data-icon=\"info\"/>\n"
+"                    It may have expired because your application process has "
+"already been completed or closed."
+msgstr ""
+"<i class=\"oi\" data-icon=\"info\"/>\n"
+"Ce lien a peut-être expiré, car votre processus de candidature est déjà "
+"terminé ou clôturé."
 
 #. module: appointment_hr_recruitment
 #: model:ir.model,name:appointment_hr_recruitment.model_hr_applicant
@@ -82,11 +101,6 @@ msgid "Apply for a Job"
 msgstr "Postuler"
 
 #. module: appointment_hr_recruitment
-#: model:ir.model,name:appointment_hr_recruitment.model_appointment_invite
-msgid "Appointment Invite"
-msgstr "Invitation au rendez-vous"
-
-#. module: appointment_hr_recruitment
 #: model:mail.template,subject:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
 msgid ""
 "Can we plan an interview together for your {{ (object.job_id.name + ' ') if "
@@ -96,16 +110,25 @@ msgstr ""
 "') if object.job_id else '' }}candidature ?"
 
 #. module: appointment_hr_recruitment
-#: model:ir.model.fields,field_description:appointment_hr_recruitment.field_appointment_invite__display_name
 #: model:ir.model.fields,field_description:appointment_hr_recruitment.field_hr_applicant__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
 
 #. module: appointment_hr_recruitment
-#: model:ir.model.fields,field_description:appointment_hr_recruitment.field_appointment_invite__id
 #: model:ir.model.fields,field_description:appointment_hr_recruitment.field_hr_applicant__id
 msgid "ID"
 msgstr "ID"
+
+#. module: appointment_hr_recruitment
+#: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
+msgid ""
+"If you believe this is a mistake or have questions, feel free to reply to "
+"the\n"
+"                    original email or contact the recruitment team directly."
+msgstr ""
+"Si vous pensez qu’il s’agit d’une erreur ou si vous avez des questions, "
+"n’hésitez pas à répondre à l’e-mail d’origine ou à contacter directement "
+"l’équipe de recrutement."
 
 #. module: appointment_hr_recruitment
 #: model:ir.model.fields,field_description:appointment_hr_recruitment.field_hr_applicant__interview_invite_code
@@ -113,9 +136,24 @@ msgid "Interview Invite Code"
 msgstr "Code d’invitation à l’entretien"
 
 #. module: appointment_hr_recruitment
+#: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
+msgid "Interview Link Unavailable"
+msgstr "Lien d’entretien non disponible"
+
+#. module: appointment_hr_recruitment
 #: model:appointment.type,name:appointment_hr_recruitment.appointment_type_interviews
 msgid "Interviews availabilities"
 msgstr "Disponibilités des entretiens"
+
+#. module: appointment_hr_recruitment
+#: model:ir.module.module,summary:base.module_appointment_hr_recruitment
+msgid "Keep track of recruitment appointments"
+msgstr ""
+
+#. module: appointment_hr_recruitment
+#: model:ir.module.module,shortdesc:base.module_appointment_hr_recruitment
+msgid "Recruitment tracking on appointments"
+msgstr ""
 
 #. module: appointment_hr_recruitment
 #: model:mail.template,name:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
@@ -129,3 +167,8 @@ msgid ""
 msgstr ""
 "Envoyez cet e-mail lorsque vous souhaitez planifier un entretien avec un "
 "candidat"
+
+#. module: appointment_hr_recruitment
+#: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
+msgid "This interview is no longer active"
+msgstr "Cet entretien n’est plus actif"

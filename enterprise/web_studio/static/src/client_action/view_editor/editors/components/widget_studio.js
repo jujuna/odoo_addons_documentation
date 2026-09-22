@@ -3,9 +3,10 @@ import { studioIsVisible, useStudioRef } from "@web_studio/client_action/view_ed
 
 export class WidgetStudio extends Widget {
     static template = "web_studio.Widget";
+
     setup() {
         super.setup();
-        useStudioRef("rootRef", this.onClick);
+        this.rootRef = useStudioRef(this.onClick.bind(this));
     }
     get classNames() {
         const classNames = super.classNames;

@@ -3,3 +3,4 @@
 from . import test_payment_advice_batch
 from . import test_salary_rules
 from . import test_hr_esic_report
+from . import test_enet_csv_report

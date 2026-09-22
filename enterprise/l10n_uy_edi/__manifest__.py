@@ -3,7 +3,6 @@
     "countries": ["uy"],
     "category": "Accounting/Localizations/EDI",
     "license": "OEEL-1",
-    "version": "1.0",
     "description": """
 This module integrate Odoo so you can issue electronic documents (CFE) to DGI. Example: e-Ticket, e-Invoice and related Debit and Credit Notes.
 
@@ -36,16 +35,16 @@ Known issues / Roadmap
         "views/l10n_uy_edi_document_views.xml",
         "views/res_config_settings_view.xml",
         "views/res_company_views.xml",
+        "views/res_partner_views.xml",
+        "views/product_views.xml",
         "views/report_invoice.xml",
         "views/cfe_template.xml",
         "data/ir_cron.xml",
         "data/res_currency_data.xml",
-        "security/ir.model.access.csv",
-        "security/security.xml",
+        'security/ir.access.csv',
     ],
     "demo": [
         "demo/l10n_uy_edi_addenda_demo.xml",
         "demo/res_currency_rate_demo.xml",
     ],
-    "installable": True,
 }

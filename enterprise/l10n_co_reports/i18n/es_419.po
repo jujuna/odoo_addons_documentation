@@ -3,21 +3,35 @@
 # * l10n_co_reports
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.1alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:05+0000\n"
-"PO-Revision-Date: 2025-11-18 17:10+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 18:18+0000\n"
+"PO-Revision-Date: 2026-09-18 05:01+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19-l10n/l10n_co_reports/es_419/>\n"
+"odoo-master/l10n_co_reports/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: l10n_co_reports
+#: model:ir.module.module,description:base.module_l10n_co_reports
+msgid ""
+"\n"
+"Accounting reports for Colombia\n"
+"================================\n"
+msgstr ""
+
+#. module: l10n_co_reports
+#: model:ir.ui.menu,name:l10n_co_reports.exogenous_category_menu
+msgid " Colombian Exogenous Report Category"
+msgstr " Categoría de reporte exógeno colombiano"
 
 #. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
@@ -60,6 +74,32 @@ msgid "ACCOUNT"
 msgstr "CUENTA"
 
 #. module: l10n_co_reports
+#: model:ir.model,name:l10n_co_reports.model_account_account
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__account_ids
+msgid "Account"
+msgstr "Cuenta"
+
+#. module: l10n_co_reports
+#: model:ir.model,name:l10n_co_reports.model_account_chart_template
+msgid "Account Chart Template"
+msgstr "Plantilla del plan de cuentas"
+
+#. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__allowed_account_ids
+msgid "Allowed Account"
+msgstr "Cuenta permitida"
+
+#. module: l10n_co_reports
+#: model:ir.model.constraint,message:l10n_co_reports.constraint_l10n_co_exogenous_category_name_uniq
+msgid "An exogenous category with the same name and report already exists."
+msgstr "Ya existe una categoría exógena con el mismo nombre y reporte."
+
+#. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_category__report_type
+msgid "Applicable Report"
+msgstr "Reporte aplicable"
+
+#. module: l10n_co_reports
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_retention_report_wizard__article
 msgid "Artículo"
 msgstr "Artículo"
@@ -68,6 +108,12 @@ msgstr "Artículo"
 #: model:account.report.line,name:l10n_co_reports.l10n_co_inv_blc_assets_expenses
 msgid "Assets + Expenses"
 msgstr "Activo + Gastos"
+
+#. module: l10n_co_reports
+#: model:ir.model.fields.selection,name:l10n_co_reports.selection__l10n_co_exogenous_config__value_to_report__balance
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_config_search
+msgid "Balance"
+msgstr "Saldo"
 
 #. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
@@ -93,6 +139,12 @@ msgstr "CERTIFICADO DE RETENCIÓN POR TERCEROS"
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_libro_diario
 msgid "CREDIT"
 msgstr "HABER"
+
+#. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__exogenous_category_id
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_config_search
+msgid "Category"
+msgstr "Categoría"
 
 #. module: l10n_co_reports
 #: model:ir.actions.client,name:l10n_co_reports.action_account_report_fuente
@@ -128,9 +180,30 @@ msgid "Ciudad Tercero:"
 msgstr "Ciudad tercero:"
 
 #. module: l10n_co_reports
+#: model:ir.module.module,shortdesc:base.module_l10n_co_reports
+msgid "Colombian - Accounting Reports"
+msgstr ""
+
+#. module: l10n_co_reports
 #: model:ir.model,name:l10n_co_reports.model_report_l10n_co_reports_report_certification
 msgid "Colombian Certification Report"
 msgstr "Reporte de certificación colombiano"
+
+#. module: l10n_co_reports
+#: model:ir.model,name:l10n_co_reports.model_l10n_co_exogenous_category
+msgid "Colombian Exogenous Category"
+msgstr "Categoría exógena colombiana"
+
+#. module: l10n_co_reports
+#: model:ir.model,name:l10n_co_reports.model_l10n_co_exogenous_config
+#: model:ir.ui.menu,name:l10n_co_reports.exogenous_config_menu
+msgid "Colombian Exogenous Report Mapping"
+msgstr "Asignación de reporte exógeno colombiano"
+
+#. module: l10n_co_reports
+#: model:ir.model,name:l10n_co_reports.model_l10n_co_reports_exogenous_report_wizard
+msgid "Colombian Exogenous Report Wizard"
+msgstr "Asistente de reporte exógeno colombiano"
 
 #. module: l10n_co_reports
 #: model:ir.model,name:l10n_co_reports.model_report_l10n_co_reports_report_libro_diario
@@ -153,10 +226,16 @@ msgid "Columbian Report Custom Handler"
 msgstr "Controlador de reporte personalizado colombiano"
 
 #. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__concept
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_config_search
+msgid "Concept"
+msgstr "Concepto"
+
+#. module: l10n_co_reports
 #: model:account.report.column,name:l10n_co_reports.l10n_co_reports_ica_type
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
 msgid "Concepto"
-msgstr ""
+msgstr "Concepto"
 
 #. module: l10n_co_reports
 #: model:account.report.column,name:l10n_co_reports.l10n_co_reports_fuente_communication
@@ -165,19 +244,33 @@ msgid "Concepto de retención"
 msgstr "Concepto de retención"
 
 #. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_category__create_uid
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__create_uid
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_exogenous_report_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_retention_report_wizard__create_uid
 msgid "Created by"
 msgstr "Creado por"
 
 #. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_category__create_date
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__create_date
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_exogenous_report_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_retention_report_wizard__create_date
 msgid "Created on"
 msgstr "Creado el"
 
 #. module: l10n_co_reports
+#: model:ir.model.fields.selection,name:l10n_co_reports.selection__l10n_co_exogenous_config__value_to_report__credit
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_config_search
+msgid "Credit"
+msgstr "Haber"
+
+#. module: l10n_co_reports
 #: model:ir.model,name:l10n_co_reports.model_l10n_co_account_trial_balance_per_partner_report_handler
 msgid "Custom handler for Colombian 'Trial balance per partner'"
 msgstr ""
+"Gestor personalizado para el \"Balance de comprobación por contacto\" "
+"colombiano"
 
 #. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_libro_diario
@@ -197,20 +290,10 @@ msgid "Daily Journal Report"
 msgstr "Libro Diario"
 
 #. module: l10n_co_reports
-#: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
-msgid ""
-"Dicha Retención fue consignada oportunamente a nombre de la Dirección de "
-"Impuestos y Aduanas Nacionales en la Ciudad de"
-msgstr ""
-"Dicha retención fue consignada oportunamente a nombre de la Dirección de "
-"Impuestos y Aduanas Nacionales en la ciudad de"
-
-#. module: l10n_co_reports
-#: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
-msgid ""
-"Dicha Retención fue consignada oportunamente a nombre de la Secretaría de "
-"Hacienda en la Ciudad de"
-msgstr ""
+#: model:ir.model.fields.selection,name:l10n_co_reports.selection__l10n_co_exogenous_config__value_to_report__debit
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_config_search
+msgid "Debit"
+msgstr "Debe"
 
 #. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
@@ -218,12 +301,18 @@ msgid "Dirección:"
 msgstr "Dirección:"
 
 #. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_account_account__display_name
+#: model:ir.model.fields,field_description:l10n_co_reports.field_account_chart_template__display_name
+#: model:ir.model.fields,field_description:l10n_co_reports.field_account_general_ledger_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_account_trial_balance_per_partner_report_handler__display_name
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_category__display_name
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__display_name
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_fuente_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_ica_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_iva_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_libro_diario_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_report_handler__display_name
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_exogenous_report_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_retention_report_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_co_reports.field_report_l10n_co_reports_report_certification__display_name
 #: model:ir.model.fields,field_description:l10n_co_reports.field_report_l10n_co_reports_report_libro_diario__display_name
@@ -243,6 +332,27 @@ msgid ""
 msgstr ""
 "El presente certificado se expide en concordancia con las disposiciones "
 "legales contenidas en el artículo 381 del Estatuto Tributario."
+
+#. module: l10n_co_reports
+#. odoo-python
+#: code:addons/l10n_co_reports/models/account_general_ledger.py:0
+msgid "Exogenous Report CSV"
+msgstr "CSV de reporte exógeno"
+
+#. module: l10n_co_reports
+#: model:ir.actions.act_window,name:l10n_co_reports.action_exogenous_category
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_category_form
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_category_list
+msgid "Exogenous Report Category"
+msgstr "Categoría de reporte exógeno"
+
+#. module: l10n_co_reports
+#: model:ir.actions.act_window,name:l10n_co_reports.action_exogenous_config
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_account_form_exogenous_config_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_config_form
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_config_list
+msgid "Exogenous Report Mapping"
+msgstr "Asignación de reporte exógeno"
 
 #. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_libro_diario
@@ -280,17 +390,28 @@ msgid "Fuente Report Custom Handler"
 msgstr "Controlador personalizado del reporte fuente"
 
 #. module: l10n_co_reports
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.exogenous_report_wizard_form
+msgid "Generate CSV"
+msgstr "Generar CSV"
+
+#. module: l10n_co_reports
 #: model:ir.model,name:l10n_co_reports.model_l10n_co_ica_report_handler
 msgid "ICA Report Custom Handler"
 msgstr "Controlador personalizado del reporte ICA"
 
 #. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_account_account__id
+#: model:ir.model.fields,field_description:l10n_co_reports.field_account_chart_template__id
+#: model:ir.model.fields,field_description:l10n_co_reports.field_account_general_ledger_report_handler__id
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_account_trial_balance_per_partner_report_handler__id
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_category__id
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__id
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_fuente_report_handler__id
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_ica_report_handler__id
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_iva_report_handler__id
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_libro_diario_report_handler__id
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_report_handler__id
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_exogenous_report_wizard__id
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_retention_report_wizard__id
 #: model:ir.model.fields,field_description:l10n_co_reports.field_report_l10n_co_reports_report_certification__id
 #: model:ir.model.fields,field_description:l10n_co_reports.field_report_l10n_co_reports_report_libro_diario__id
@@ -308,16 +429,27 @@ msgid "Imprimir"
 msgstr "Imprimir"
 
 #. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_account_account__l10n_co_exogenous_config_ids
+msgid "L10N Co Exogenous Config"
+msgstr "Configuración exógena de Colombia"
+
+#. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_libro_diario
 msgid "LABEL"
 msgstr "CONCEPTO"
 
 #. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_category__write_uid
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__write_uid
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_exogenous_report_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_retention_report_wizard__write_uid
 msgid "Last Updated by"
 msgstr "Última actualización por"
 
 #. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_category__write_date
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__write_date
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_exogenous_report_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_retention_report_wizard__write_date
 msgid "Last Updated on"
 msgstr "Última actualización en"
@@ -325,7 +457,7 @@ msgstr "Última actualización en"
 #. module: l10n_co_reports
 #: model:ir.model,name:l10n_co_reports.model_l10n_co_libro_diario_report_handler
 msgid "Libro Diario Report Custom Handler"
-msgstr ""
+msgstr "Gestor personalizado de reportes de libro diario"
 
 #. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_libro_diario
@@ -348,6 +480,16 @@ msgid "Monto del pago sujeto a retención"
 msgstr "Monto del pago sujeto a retención"
 
 #. module: l10n_co_reports
+#. odoo-python
+#: code:addons/l10n_co_reports/models/account_general_ledger.py:0
+msgid ""
+"Multiple companies have been selected. Please select one company and/or its "
+"branches to export the report."
+msgstr ""
+"Seleccionaste varias empresas. Selecciona una empresa o sus sucursales para "
+"exportar el reporte."
+
+#. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_libro_diario
 msgid "NIT:"
@@ -357,6 +499,22 @@ msgstr "NIT:"
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
 msgid "NO REQUIRE FIRMA AUTOGRAFA."
 msgstr "NO REQUIERE FIRMA AUTÓGRAFA."
+
+#. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_category__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: l10n_co_reports
+#. odoo-python
+#: code:addons/l10n_co_reports/models/account_general_ledger.py:0
+msgid ""
+"No journal items match the criteria for this report. Please verify your "
+"Chart of Accounts configuration, report filters, and journal entries."
+msgstr ""
+"Ningún asiento contable coincide con los criterios de este reporte. Verifica "
+"la configuración de tu plan de cuentas, los filtros del reporte y los "
+"asientos contables."
 
 #. module: l10n_co_reports
 #. odoo-python
@@ -387,9 +545,31 @@ msgid "Partners information"
 msgstr "Información del contacto"
 
 #. module: l10n_co_reports
+#: model:ir.model,name:l10n_co_reports.model_account_general_ledger_report_handler
+msgid "Polish JPK KR PD Custom Handler"
+msgstr "Gestor personalizado"
+
+#. module: l10n_co_reports
 #: model:ir.actions.client,name:l10n_co_reports.action_l10n_co_pl_report
 msgid "Profit and Loss"
 msgstr "Estado de resultados"
+
+#. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__report_type
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_reports_exogenous_report_wizard__exogenous_wizard_report_type
+msgid "Report"
+msgstr "Reporte"
+
+#. module: l10n_co_reports
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_category_search
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_config_search
+msgid "Report Type"
+msgstr "Tipo de reporte"
+
+#. module: l10n_co_reports
+#: model_terms:ir.ui.view,arch_db:l10n_co_reports.view_exogenous_config_search
+msgid "Report Types"
+msgstr "Tipos de reporte"
 
 #. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
@@ -400,6 +580,12 @@ msgstr "Retenido consignado"
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
 msgid "Retenido y consignado"
 msgstr "Retenido y consignado"
+
+#. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_category__sequence
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__category_sequence
+msgid "Sequence"
+msgstr "Secuencia"
 
 #. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_certification
@@ -416,9 +602,54 @@ msgstr ""
 "de realizar su declaración."
 
 #. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__show_concept
+msgid "Show Concept"
+msgstr "Mostrar concepto"
+
+#. module: l10n_co_reports
 #: model_terms:ir.ui.view,arch_db:l10n_co_reports.report_libro_diario
 msgid "TO"
 msgstr "A"
+
+#. module: l10n_co_reports
+#: model:res.currency,currency_unit_label:l10n_co_reports.uvt
+msgid "Tax Value Unit"
+msgstr "Unidad del valor fiscal"
+
+#. module: l10n_co_reports
+#. odoo-python
+#: code:addons/l10n_co_reports/models/l10n_co_exogenous_config.py:0
+msgid "The concept for report type, \"%s\", must be specified."
+msgstr "Debes especificar el concepto para el tipo de reporte \"%s\"."
+
+#. module: l10n_co_reports
+#. odoo-python
+#: code:addons/l10n_co_reports/models/l10n_co_exogenous_config.py:0
+msgid ""
+"The exogenous category, \"%(category_name)s\", is not applicable to report %"
+"(report_type)s."
+msgstr ""
+"La categoría exógena \"%(category_name)s\" no aplica al reporte %"
+"(report_type)s."
+
+#. module: l10n_co_reports
+#. odoo-python
+#: code:addons/l10n_co_reports/models/l10n_co_exogenous_config.py:0
+msgid ""
+"The following accounts are not allowed for the report type - %s.\n"
+"Please review the following:\n"
+"- Report 1008 uses asset accounts.\n"
+"- Report 1009 uses liability accounts."
+msgstr ""
+"Las siguientes cuentas no están permitidas para el tipo de reporte: %s.\n"
+"Revisa lo siguiente:\n"
+"- El reporte 1008 usa cuentas de activos.\n"
+"- El reporte 1009 usa cuentas de pasivos."
+
+#. module: l10n_co_reports
+#: model:ir.model.fields,field_description:l10n_co_reports.field_l10n_co_exogenous_config__value_to_report
+msgid "Value to Report"
+msgstr "Valor a reportar"
 
 #. module: l10n_co_reports
 #. odoo-python

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, tools, _
+from odoo import models, _
 
 
 class HelpdeskTicket(models.Model):
     _inherit = 'helpdesk.ticket'
 
-    def _find_matching_partner(self, email_only=False, force_create=False, force_update=True):
+    def _find_matching_partner(self, force_create=False):
         """ Try to find a matching partner with available information on the
         ticket, using notably customer's name, email, phone, ...
 
@@ -17,24 +17,17 @@ class HelpdeskTicket(models.Model):
         """
         self.ensure_one()
         partner = self.partner_id
-
-        if not partner and self.email_cc:
-            partner = self.env['res.partner'].search([('email_normalized', '=', tools.email_normalize(self.email_cc))], limit=1)
-        elif self.partner_phone:
-            partner = self.env['res.partner'].search([('phone', '=', self.partner_phone)], limit=1)
+        if not partner and self.partner_email:
+            partner = self._partner_find_from_emails_single([self.partner_email], no_create=not force_create)
+        if not partner and self.partner_phone:
+            partner = self.env['res.partner'].search([('phone_mobile_search', '=', self.partner_phone)], limit=1)
 
         if not partner and force_create:
             partner = self.env['res.partner'].create({
                 'name': self.partner_name or self.name,
-                'email': self.partner_name or self.email_cc,
+                'email': self.partner_email,
                 'phone': self.partner_phone,
             })
-
-        if partner and force_update:
-            if not partner.email and self.partner_email:
-                partner.email = self.partner_email
-            if not partner.phone and self.partner_phone:
-                partner.phone = self.partner_phone
 
         return partner
 
@@ -48,5 +41,6 @@ class HelpdeskTicket(models.Model):
             'target': 'new',
             'context': {
                 'dialog_size': 'medium',
+                'default_team_id': self.env['crm.team']._get_default_team_id(user_id=self.user_id.id, domain=None),
             },
         }

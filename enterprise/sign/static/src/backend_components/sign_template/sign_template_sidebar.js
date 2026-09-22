@@ -1,10 +1,10 @@
-import { Component, useState } from "@odoo/owl";
+import { render } from "@web/owl2/utils";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { SignTemplateSidebarRoleItems } from "./sign_template_sidebar_role_items";
 import { useService } from "@web/core/utils/hooks";
 import { useSignViewButtons } from "@sign/views/hooks";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
-import { _t } from "@web/core/l10n/translation";
 import { getDataURLFromFile } from "@web/core/utils/urls";
 
 export class SignTemplateSidebar extends Component {
@@ -15,37 +15,43 @@ export class SignTemplateSidebar extends Component {
         DropdownItem,
     };
     static props = {
-        signItemTypes: { type: Array },
-        isSignRequest: { type: Boolean },
-        signTemplateId: { type: Number },
-        updateRoleName: { type: Function },
-        signers: { type: Array },
-        hasSignRequests: { type: Boolean },
-        updateDocumentName: { type: Function },
-        updateSigners: { type: Function },
-        pushNewSigner: { type: Function },
-        updateCollapse: { type: Function },
-        deleteRole: { type: Function },
-        documents: { type: Array },
-        selectedDocumentId: { type: Number },
-        updateSelectedDocument: { type: Function },
-        updateDocuments: { type: Function },
-        deleteDocument: { type: Function },
-        moveDocumentUp: { type: Function },
-        moveDocumentDown: { type: Function },
-        onEditTemplate: { type: Function },
-        onUpdateDocument: { type: Function },
-        saveManually: { type: Function },
+        canAddDocument: t.boolean().optional(),
+        deleteDocument: t.function(),
+        deleteRole: t.function(),
+        documents: t.array(),
+        fetchSignItemTypes: t.function(),
+        hasSignRequests: t.boolean(),
+        iframe: t.object().optional(),
+        isSignRequest: t.boolean(),
+        moveDocumentDown: t.function(),
+        moveDocumentUp: t.function(),
+        moveSignerDown: t.function(),
+        moveSignerUp: t.function(),
+        onEditTemplate: t.function(),
+        onUpdateDocument: t.function(),
+        pushNewSigner: t.function(),
+        saveManually: t.function(),
+        selectedDocumentId: t.number(),
+        signItemTypes: t.array(),
+        signTemplateId: t.number(),
+        signers: t.array(),
+        updateCollapse: t.function(),
+        updateDocumentName: t.function(),
+        updateDocuments: t.function(),
+        updateRoleName: t.function(),
+        updateSelectedDocument: t.function(),
+        updateSigners: t.function(),
     };
+
+    props = useProps(this.constructor.props);
 
     setup() {
         this.action = useService("action");
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             editableDocumentId: false,
         });
-        const functions = useSignViewButtons(this.props.signTemplateId);
-        Object.assign(this, functions);
+        this.signButtons = useSignViewButtons();
     }
 
     focusOnNewAddedSigner(roleId) {
@@ -77,32 +83,20 @@ export class SignTemplateSidebar extends Component {
     }
 
     deleteSigner(signerId, roleId) {
-        const updatedSigners = [...this.props.signers].filter(signer => signer.id != signerId);
+        const updatedSigners = [...this.props.signers].filter((signer) => signer.id != signerId);
 
         /* After deleting the signer, if no signer is focused, focus the last one in the array. */
-        if (!updatedSigners.some(signer => !signer.isCollapsed) && updatedSigners.length > 0)
+        if (!updatedSigners.some((signer) => !signer.isCollapsed) && updatedSigners.length > 0) {
             updatedSigners[updatedSigners.length - 1].isCollapsed = false;
+        }
 
         this.props.updateSigners(updatedSigners);
         this.props.deleteRole(roleId);
     }
 
-    // TODO: remove in master
-    updateSignerNames(signers) {
-        let signer_idx = 1;
-        const str = _t("Signer")
-        for (const signer of signers) {
-            if (signer.name.includes(str)) {
-                signer.name = _t("Signer %s", signer_idx);
-                this.props.updateRoleName(signer.roleId, signer.name);
-            }
-            signer_idx++;
-        }
-    }
-
     getSidebarRoleItemsProps(id) {
         //  TODO MASTER: we should put the role name here. it would prevent one rpc per role...
-        const signer = this.props.signers.find(signer => signer.id === id);
+        const signer = this.props.signers.find((signer) => signer.id === id);
         return {
             id: id,
             name: signer.name,
@@ -114,13 +108,24 @@ export class SignTemplateSidebar extends Component {
             updateRoleName: this.props.updateRoleName,
             isCollapsed: signer.isCollapsed,
             isInputFocused: signer.isInputFocused,
+            iframe: this.props.iframe,
             /* Update callbacks binding for parent props: */
+            fetchSignItemTypes: () => this.props.fetchSignItemTypes(),
             updateCollapse: (id, value) => this.props.updateCollapse(id, value),
             onDelete: () => this.deleteSigner(id, signer.roleId),
+            onMoveUp: () => this.onMoveSignerUp(id),
+            onMoveDown: () => this.onMoveSignerDown(id),
+            hasMultipleSigners: this.props.signers.length > 1,
             onFieldNameInputKeyUp: (ev) => this.onFieldNameInputKeyUp(ev),
             itemsCount: signer.itemsCount,
             hasSignRequests: this.props.hasSignRequests,
             assignTo: signer.assignTo,
+            updateAssignTo: (assignTo) => {
+                signer.assignTo = assignTo;
+            },
+            updateAuthMethod: (authMethod) => {
+                signer.auth_method = authMethod;
+            },
         };
     }
 
@@ -145,7 +150,7 @@ export class SignTemplateSidebar extends Component {
         }
     }
 
-    setEditableDocumentId (documentId) {
+    setEditableDocumentId(documentId) {
         this.state.editableDocumentId = documentId;
         this.props.updateSelectedDocument(documentId);
     }
@@ -156,14 +161,13 @@ export class SignTemplateSidebar extends Component {
 
         // Polling function to check if the input is no longer `d-none`
         const waitForVisibility = () => {
-            if (input && !input.classList.contains('d-none')) {
+            if (input && !input.classList.contains("d-none")) {
                 // Input is visible, so we can focus
                 input.focus();
                 input.select();
             } else {
                 // Input is still hidden, keep checking in the next frame
                 requestAnimationFrame(waitForVisibility);
-
             }
         };
 
@@ -172,33 +176,43 @@ export class SignTemplateSidebar extends Component {
 
     async onRemoveDocument(documentId) {
         await this.props.deleteDocument(documentId);
-        this.render();
+        render(this);
     }
 
     async onMoveDocumentUp(documentId) {
         await this.props.moveDocumentUp(documentId);
-        this.render();
+        render(this);
     }
 
     async onMoveDocumentDown(documentId) {
         await this.props.moveDocumentDown(documentId);
-        this.render();
+        render(this);
+    }
+
+    async onMoveSignerUp(signerId) {
+        await this.props.moveSignerUp(signerId);
+        render(this);
+    }
+
+    async onMoveSignerDown(signerId) {
+        await this.props.moveSignerDown(signerId);
+        render(this);
     }
 
     async onUpdateDocument(documentId, ev) {
         /* Check if pdf got uploaded, save manually, and call update document function from props. */
         const file = ev.target.files && ev.target.files.length && ev.target.files[0];
-        if (!file)
+        if (!file) {
             return;
+        }
         if (this.props.saveManually) {
             await this.props.saveManually();
         }
         const url = await getDataURLFromFile(file);
         const fileData = {
             name: file.name,
-            datas: url.split(",")[1],
+            raw: url.split(",")[1],
         };
         await this.props.onUpdateDocument(documentId, fileData);
     }
-
 }

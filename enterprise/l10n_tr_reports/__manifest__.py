@@ -2,7 +2,6 @@
 
 {
     'name': 'Türkiye - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Accounting reports for Türkiye
@@ -17,15 +16,16 @@ Accounting reports for Türkiye
         'data/account_report_tr_balance_sheet_data.xml',
         'data/account_report_tr_pnl_data.xml',
         'data/account_return_data.xml',
+        'data/mail_template_data.xml',
         'views/account_journal_views.xml',
         'views/product_view.xml',
+        'views/customer_statement_reconciliation_letter.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'l10n_tr_reports/static/src/components/**/*',
         ],
     },
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

@@ -23,32 +23,39 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:23+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Lithuanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:14+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Lithuanian <https://translate.odoo.com/projects/odoo-master/"
 "account_budget/lt/>\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
-"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
-"1 : n % 1 != 0 ? 2: 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 "
+": n % 1 != 0 ? 2: 3);\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_budget
+#: model:ir.module.module,description:base.module_account_budget
+msgid ""
+"\n"
+"Use budgets to compare actual with expected revenues and costs\n"
+"--------------------------------------------------------------\n"
+msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_kanban
 msgid ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
-"title=\"Period\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Period\" title=\"Period\"/>"
 msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+"<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
 msgstr ""
 
 #. module: account_budget
@@ -87,6 +94,11 @@ msgid "Activity Exception Decoration"
 msgstr "Veiklos išimties žymėjimas"
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_state
 msgid "Activity State"
 msgstr "Veiklos būsena"
@@ -121,6 +133,16 @@ msgid "Analytic Budget"
 msgstr ""
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_analytic_line
+msgid "Analytic Line"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model,name:account_budget.model_analytic_plan_fields_mixin
+msgid "Analytic Plan Fields"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__analytical_plan_ids
 msgid "Analytic Plans"
 msgstr "Analitiniai planai"
@@ -142,7 +164,6 @@ msgstr "Abu"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_analytic
-#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_report__line_type__budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -160,6 +181,8 @@ msgid "Budget %s"
 msgstr ""
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_account_bank_statement_line__budget_analytic_ids
+#: model:ir.model.fields,field_description:account_budget.field_account_move__budget_analytic_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_analytic_id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_analytic_id
 msgid "Budget Analytic"
@@ -169,6 +192,7 @@ msgstr ""
 #: model:ir.model,name:account_budget.model_budget_line
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__budget_line_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_line_id
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budget Line"
 msgstr "Biudžeto eilutė"
 
@@ -185,6 +209,11 @@ msgstr "Biudžeto eilutė"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_tree
 msgid "Budget Lines"
 msgstr "Biudžeto eilutės"
+
+#. module: account_budget
+#: model:ir.module.module,shortdesc:base.module_account_budget
+msgid "Budget Management"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__name
@@ -227,17 +256,18 @@ msgid "Budget end date may not be before the starting date."
 msgstr ""
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budgeted"
 msgstr ""
 
 #. module: account_budget
 #. odoo-python
+#: code:addons/account_budget/models/account_move.py:0
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 #: model:ir.actions.act_window,name:account_budget.act_budget_analytic_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_account_analytic_account_form_inherit_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:account_budget.view_move_form_inherit_budget
 msgid "Budgets"
 msgstr "Biudžetai"
 
@@ -245,11 +275,6 @@ msgstr "Biudžetai"
 #: model:ir.actions.act_window,name:account_budget.act_budget_lines_view
 msgid "Budgets Analysis"
 msgstr "Biudžeto analizė"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "Cancel"
-msgstr "Atšaukti"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -265,6 +290,13 @@ msgstr "Atšaukta"
 #: model_terms:ir.actions.act_window,help:account_budget.act_budget_analytic_view
 msgid "Click to create a new budget."
 msgstr "Norėdami sukurti naują biudžetą, paspauskite."
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
+#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
+msgid "Commitment"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__company_id
@@ -295,6 +327,7 @@ msgstr "Valiuta"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__date
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
 msgid "Date"
 msgstr "Data"
@@ -312,6 +345,9 @@ msgstr "Aprašymas"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_move__display_name
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__display_name
@@ -364,16 +400,6 @@ msgid "Followers (Partners)"
 msgstr "Sekėjai (partneriai)"
 
 #. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesome piktograma, pvz., fa-tasks"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "From"
-msgstr "Iš"
-
-#. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Future Activities"
 msgstr "Būsimos veiklos"
@@ -396,6 +422,9 @@ msgstr "Turi žinutę"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__id
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:account_budget.field_account_move__id
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__id
@@ -440,6 +469,11 @@ msgid "Is Follower"
 msgstr "Yra sekėjas"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__write_uid
@@ -457,6 +491,17 @@ msgstr "Paskutinį kartą atnaujinta"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Late Activities"
 msgstr "Vėluojančios veiklos"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__liquidation_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__liquidation
+msgid "Liquidation"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_has_error
@@ -720,16 +765,6 @@ msgid "User"
 msgstr "Vartotojas"
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__website_message_ids
-msgid "Website Messages"
-msgstr "Interneto svetainės žinutės"
-
-#. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__website_message_ids
-msgid "Website communication history"
-msgstr "Svetainės komunikacijos istorija"
-
-#. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_split_wizard__period__year
 msgid "Year"
 msgstr "Metai"
@@ -757,146 +792,8 @@ msgstr ""
 msgid "id"
 msgstr ""
 
-#~ msgid ""
-#~ "\"End Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr ""
-#~ "Biudžeto eilutės \"pabaigos data\" turėtų būti įtraukta į biudžeto "
-#~ "laikotarpį"
+msgid "Website Messages"
+msgstr "Interneto svetainės žinutės"
 
-#~ msgid ""
-#~ "\"Start Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr ""
-#~ "Biudžeto eilutės \"pradžios data\" turėtų būti įtraukta į biudžeto "
-#~ "laikotarpį"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Period\" "
-#~ "title=\"Period\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Period\" "
-#~ "title=\"Period\"/>"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
-#~ "title=\"Arrow\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
-#~ "title=\"Arrow\"/>"
-
-#~ msgid "<span class=\"o_stat_text\">Budget</span>"
-#~ msgstr "<span class=\"o_stat_text\">Biudžetas</span>"
-
-#~ msgid "Accounts"
-#~ msgstr "Sąskaitos"
-
-#~ msgid "Achievement"
-#~ msgstr "Pasiekimas"
-
-#~ msgid "Amount really earned/spent."
-#~ msgstr "Iš tikrųjų gauta/išleista suma."
-
-#~ msgid "Amount you are supposed to have earned/spent at this date."
-#~ msgstr "Suma, kurią turėjote būti gavęs/išleidęs šiuo metu."
-
-#~ msgid ""
-#~ "Amount you plan to earn/spend. Record a positive amount if it is a "
-#~ "revenue and a negative amount if it is a cost."
-#~ msgstr ""
-#~ "Suma, kurią planuojate gauti/išleisti. Įrašykite teigiamą sumą, jei tai "
-#~ "yra pajamos ir neigiamą, jei tai išlaidos."
-
-#~ msgid "Analytic Plan"
-#~ msgstr "Analitikos Planas"
-
-#~ msgid "Approve"
-#~ msgstr "Patvirtinti"
-
-#~ msgid "Budget Items"
-#~ msgstr "Biudžeto dedamosios"
-
-#~ msgid "Budgetary Position"
-#~ msgstr "Biudžeto pozicija"
-
-#~ msgid "Budgetary Positions"
-#~ msgstr "Biudžetinės pozicijos"
-
-#~ msgid "Cancelled"
-#~ msgstr "Atšauktas"
-
-#~ msgid ""
-#~ "Comparison between practical and theoretical amount. This measure tells "
-#~ "you if you are below or over budget."
-#~ msgstr ""
-#~ "Palyginimas tarp praktinės ir teorinės sumos. Šis matavimas pasako, ar "
-#~ "esate aukščiau, ar žemiau biudžeto."
-
-#~ msgid "Confirm"
-#~ msgstr "Patvirtinti"
-
-#~ msgid "Confirmed"
-#~ msgstr "Patvirtinti"
-
-#~ msgid "Entries..."
-#~ msgstr "Įrašai..."
-
-#~ msgid "Group By"
-#~ msgstr "Grupuoti pagal"
-
-#~ msgid "Name"
-#~ msgstr "Pavadinimas"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Žinučių, kurioms reikia jūsų veiksmo, skaičius"
-
-#~ msgid "Paid Date"
-#~ msgstr "Apmokėjimo data"
-
-#~ msgid "Planned Amount"
-#~ msgstr "Suplanuota suma"
-
-#~ msgid "Planned amount"
-#~ msgstr "Suplanuota suma"
-
-#~ msgid "Practical Amount"
-#~ msgstr "Praktinė suma"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr ""
-#~ "Rodyti visus įrašus, kurių sekančio veiksmo data yra ankstesnė nei "
-#~ "šiandiena"
-
-#~ msgid "The budget must have at least one account."
-#~ msgstr "Biudžetas turi turėti bent vieną sąskaitą."
-
-#~ msgid "Theoretical Amount"
-#~ msgstr "Teorinė suma"
-
-#~ msgid "Theoretical amount"
-#~ msgstr "Teoretinė suma"
-
-#~ msgid "To"
-#~ msgstr " Į"
-
-#~ msgid "To Approve"
-#~ msgstr "Reikia patvirtinti"
-
-#~ msgid "To Approve Budgets"
-#~ msgstr "Patvirtinti biudžetus"
-
-#~ msgid "Total Planned Amount"
-#~ msgstr "Iš viso suplanuota suma"
-
-#~ msgid "Validated"
-#~ msgstr "Patvirtinta"
-
-#~ msgid ""
-#~ "You have to enter at least a budgetary position or analytic account on a "
-#~ "budget line."
-#~ msgstr ""
-#~ "Biudžeto eilutėje turite įvesti bent vieną biudžeto poziciją ar analitinę "
-#~ "sąskaitą."
-
-#~ msgid "e.g. Budget 2023: Optimistic"
-#~ msgstr "pvz. Biudžetas 2023: Optimistinis"
+msgid "Website communication history"
+msgstr "Svetainės komunikacijos istorija"

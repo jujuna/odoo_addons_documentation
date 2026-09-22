@@ -14,8 +14,7 @@ class ResConfigSettings(models.TransientModel):
 
     use_sign_terms = fields.Boolean(
         string='Sign Default Terms & Conditions',
-        config_parameter='sign.use_sign_terms',
-        default=False)
+        config_parameter='sign.use_sign_terms')
 
     group_manage_template_access = fields.Boolean(string="Manage template access", implied_group='sign.manage_template_access')
 
@@ -23,6 +22,15 @@ class ResConfigSettings(models.TransientModel):
     module_sign_emsigner = fields.Boolean(string="Sign with Aadhaar eSign")
 
     signing_certificate_id = fields.Many2one("certificate.certificate", string="Signing certificate", related="company_id.signing_certificate_id", readonly=False)
+    has_external_signature_service = fields.Boolean(compute='_compute_has_external_signature_service')
+
+    def _compute_has_external_signature_service(self):
+        """ Whether any installed module offers a way of signing with the signer's own certificate. """
+        role = self.env['sign.item.role']
+        self.has_external_signature_service = any(
+            role.new({'auth_method': auth_method})._get_external_signature_provider()
+            for auth_method in role._fields['auth_method'].get_values(self.env)
+        )
 
     @api.depends('sign_terms_type')
     def _compute_sign_terms_preview(self):

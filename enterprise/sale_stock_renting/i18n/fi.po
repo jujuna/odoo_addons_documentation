@@ -8,17 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2026-01-13 21:59+0000\n"
-"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 23:04+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "sale_stock_renting/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -41,23 +41,22 @@ msgstr "%(product)s (%(qty)s kohdetta)"
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.rental_order_wizard_view_form
 msgid ""
-"<i class=\"fa fa-warning\"/>\n"
+"<i class=\"oi\" data-icon=\"warning\"/>\n"
 "                        <span>\n"
-"                            Some products don't have the requested qty "
-"available for pickup\n"
+"                            Some products don't have the requested quantity "
+"available for pickup.\n"
 "                        </span>"
 msgstr ""
-"<i class=\"fa fa-warning\"/>\n"
-"                        <span>\n"
-"                            Joillakin tuotteilla ei ole pyydettyä määrää "
-"noudettavaksi\n"
-"                        </span>"
+
+#. module: sale_stock_renting
+#: model:ir.model,name:sale_stock_renting.model_res_groups
+msgid "Access Groups"
+msgstr ""
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "Activate to use stock deliveries and receipts for rental orders"
+msgid "Activate to use stock deliveries and receipts for rental orders."
 msgstr ""
-"Aktivoi käyttääksesi varastotoimituksia ja kuitteja vuokratilauksia varten"
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.stock_lot_kanban_allocation
@@ -70,22 +69,9 @@ msgid "Add a line"
 msgstr "Lisää rivi"
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,help:sale_stock_renting.field_res_company__padding_time
-msgid ""
-"Amount of time (in hours) during which a product is considered unavailable "
-"prior to renting (preparation time)."
+#: model:ir.module.module,summary:base.module_sale_stock_renting
+msgid "Allows use of stock application to manage rentals inventory"
 msgstr ""
-"Aika (tunteina), jonka aikana tuotteen ei katsota olevan käytettävissä ennen "
-"vuokrausta (valmisteluaika)."
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,help:sale_stock_renting.field_res_config_settings__padding_time
-msgid ""
-"Amount of time (in hours) during which a product is considered "
-"unavailableprior to renting (preparation time)."
-msgstr ""
-"Aika (tunteina), jonka aikana tuote ei ole käytettävissä ennen vuokrausta "
-"(valmisteluaika)."
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.sale_order_line_form_lot_allocation
@@ -117,18 +103,13 @@ msgstr "Vuokrattavissa"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_res_company
-msgid "Companies"
-msgstr "Yritykset"
+msgid "Company"
+msgstr ""
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_res_config_settings
 msgid "Config Settings"
 msgstr "Asetukset"
-
-#. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "Default Padding Time"
-msgstr "Oletusarvoinen turvamarginaaliaika"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_account_move__display_name
@@ -139,23 +120,17 @@ msgstr "Oletusarvoinen turvamarginaaliaika"
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:sale_stock_renting.field_res_groups__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_rental_report__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_lot__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_picking__display_name
-#: model:ir.model.fields,field_description:sale_stock_renting.field_stock_return_picking__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse_orderpoint__display_name
 msgid "Display Name"
 msgstr "Näyttönimi"
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,help:sale_stock_renting.field_rental_order_wizard_line__tracking
-#: model:ir.model.fields,help:sale_stock_renting.field_sale_order_line__tracking
-msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr "Varmista varastoitavan tuotteen jäljitettävyys varastossasi."
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard__has_lines_missing_stock
@@ -176,17 +151,22 @@ msgstr "On rivejä, joissa on seurattavia tuotteita"
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__id
+#: model:ir.model.fields,field_description:sale_stock_renting.field_res_groups__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_rental_report__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_lot__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_move__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_picking__id
-#: model:ir.model.fields,field_description:sale_stock_renting.field_stock_return_picking__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse_orderpoint__id
 msgid "ID"
 msgstr "ID"
+
+#. module: sale_stock_renting
+#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
+msgid "Inventory"
+msgstr ""
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__is_product_storable
@@ -220,11 +200,6 @@ msgid "Minimum Inventory Rule"
 msgstr "Minimivarastosääntö"
 
 #. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "Minimum amount of time between two rentals"
-msgstr "Vähimmäisaika kahden vuokrauksen välillä"
-
-#. module: sale_stock_renting
 #. odoo-python
 #: code:addons/sale_stock_renting/models/sale_order_line.py:0
 msgid ""
@@ -245,12 +220,8 @@ msgstr ""
 "%(reserved_qty)s varattu, mutta vain %(stock_qty)s varastossa."
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__padding_time
-msgid "Padding"
-msgstr "Sisämarginaali"
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__padding_time
+#: model:ir.model.fields,field_description:sale_stock_renting.field_product_product__preparation_time
+#: model:ir.model.fields,field_description:sale_stock_renting.field_product_template__preparation_time
 msgid "Padding Time"
 msgstr "Varoaika"
 
@@ -291,7 +262,7 @@ msgstr "Tuote"
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_product_product
 msgid "Product Variant"
-msgstr "Tuotevariaatio"
+msgstr "Tuotevariantti"
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -309,6 +280,11 @@ msgstr "Vuokrausanalyysiraportti"
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__rental_loc_id
 msgid "Rental Location"
 msgstr "Vuokrauspaikka"
+
+#. module: sale_stock_renting
+#: model:ir.module.module,shortdesc:base.module_sale_stock_renting
+msgid "Rental Stock Management"
+msgstr ""
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
@@ -332,12 +308,6 @@ msgid "RentalOrderLine transient representation"
 msgstr "Vuokraustilausrivi siirtyvä esitys"
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_product_product__preparation_time
-#: model:ir.model.fields,field_description:sale_stock_renting.field_product_template__preparation_time
-msgid "Reserve product"
-msgstr "Varaa tuote"
-
-#. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__reserved_lot_ids
 msgid "Reserved Lots"
 msgstr "Varatut erät"
@@ -347,11 +317,6 @@ msgstr "Varatut erät"
 #: code:addons/sale_stock_renting/static/src/widgets/qty_at_date_widget.xml:0
 msgid "Reserved lots unavailable"
 msgstr "Varatut erät eivät ole käytettävissä"
-
-#. module: sale_stock_renting
-#: model:ir.model,name:sale_stock_renting.model_stock_return_picking
-msgid "Return Picking"
-msgstr "Palauta keräily"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__returnable_lot_ids
@@ -393,6 +358,14 @@ msgid "Stock Move"
 msgstr "Varastosiirto"
 
 #. module: sale_stock_renting
+#: model:ir.model.fields,help:sale_stock_renting.field_rental_order_wizard_line__tracking
+#: model:ir.model.fields,help:sale_stock_renting.field_sale_order_line__tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
+
+#. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_product_product__preparation_time
 #: model:ir.model.fields,help:sale_stock_renting.field_product_template__preparation_time
 msgid "Temporarily make this product unavailable before pickup."
@@ -411,19 +384,16 @@ msgstr ""
 #. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_res_company__rental_loc_id
 msgid ""
-"This technical location serves as stock for products currently in rentalThis "
-"location is internal because products in rentalare still considered as "
+"This technical location serves as stock for products currently in rental. "
+"This location is internal because products in rental are still considered as "
 "company assets."
 msgstr ""
-"Tämä tekninen sijaintipaikka toimii tällä hetkellä vuokrattavien tuotteiden "
-"varastona. Tämä sijaintipaikka on sisäinen, koska vuokrattavia tuotteita "
-"pidetään edelleen yrityksen omaisuutena."
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__tracking
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__tracking
-msgid "Tracking"
-msgstr "Seuranta"
+msgid "Tracking Method"
+msgstr ""
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -468,17 +438,13 @@ msgid "You cannot change the product of lines linked to stock moves."
 msgstr "Et voi muuttaa varastosiirtoihin liittyvien rivien tuotetta."
 
 #. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "hours"
-msgstr "tunti(a)"
-
-#. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.product_template_inherit_view_form_stock_rental
-msgid "hours before its picking time"
-msgstr "tuntia ennen keräilyaikaa"
-
-#. module: sale_stock_renting
 #. odoo-javascript
 #: code:addons/sale_stock_renting/static/src/widgets/qty_at_date_widget.xml:0
 msgid "to"
 msgstr "->"
+
+#~ msgid "Ensure the traceability of a storable product in your warehouse."
+#~ msgstr "Varmista varastoitavan tuotteen jäljitettävyys varastossasi."
+
+#~ msgid "Tracking"
+#~ msgstr "Seuranta"

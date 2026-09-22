@@ -1,15 +1,18 @@
 import {
     Component,
-    onMounted,
     onWillUnmount,
-    onWillUpdateProps,
-    useExternalListener,
-    useRef,
-    useState,
+    useProps,
+    proxy,
+    signal,
+    t,
+    useEffect,
+    useListener,
+    usePlugin,
 } from "@odoo/owl";
 import { components, helpers } from "@odoo/o-spreadsheet";
 import { ModelFieldSelector } from "@web/core/model_field_selector/model_field_selector";
 import { browser } from "@web/core/browser/browser";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 const { Section, SelectionInput } = components;
 const { positionToZone, deepEquals } = helpers;
@@ -17,51 +20,46 @@ const { positionToZone, deepEquals } = helpers;
 export class FieldSyncSidePanel extends Component {
     static template = "spreadsheet_sale_management.FieldSyncSidePanel";
     static components = { ModelFieldSelector, Section, SelectionInput };
-    static props = {
-        onCloseSidePanel: Function,
-        position: Object,
-        isNewlyCreate: { type: Boolean, optional: true },
-    };
-    static defaultProps = {
-        isNewlyCreate: false,
-    };
+    props = useProps({
+        onCloseSidePanel: t.function(),
+        position: t.object(),
+        isNewlyCreate: t.boolean().optional(false),
+    });
 
-    inputRef = useRef("positionInput");
+    positionInputRef = signal.ref();
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             newPosition: undefined,
             updateSuccessful: false,
         });
         this.showSaved(this.props.isNewlyCreate);
-        useExternalListener(
+        useListener(
             window,
             "click",
             (ev) => {
                 if (
-                    ev.target !== this.inputRef.el &&
-                    this.inputRef.el.value !== (this.fieldSync.indexInList + 1).toString()
+                    ev.target !== this.positionInputRef() &&
+                    this.positionInputRef().value !== (this.fieldSync.indexInList + 1).toString()
                 ) {
                     this.updateRecordPosition();
                 }
             },
             { capture: true }
         );
-        onWillUpdateProps(() => {
-            if (document.activeElement !== this.inputRef.el && this.inputRef.el) {
-                this.inputRef.el.value = (this.fieldSync.indexInList + 1).toString();
-            }
-        });
-        onMounted(() => {
-            if (this.inputRef.el) {
-                this.inputRef.el.value = (this.fieldSync.indexInList + 1).toString();
+        useEffect(() => {
+            this.props.position;
+            if (this.positionInputRef()) {
+                this.positionInputRef().value = (this.fieldSync.indexInList + 1).toString();
             }
         });
         onWillUnmount(() => {
             browser.clearTimeout(this.timeoutId);
             if (
                 this.fieldSync &&
-                this.inputRef.el.value !== (this.fieldSync.indexInList + 1).toString()
+                this.positionInputRef().value !== (this.fieldSync.indexInList + 1).toString()
             ) {
                 this.updateRecordPosition();
             }
@@ -98,7 +96,7 @@ export class FieldSyncSidePanel extends Component {
     }
 
     updateRecordPosition() {
-        this.updateFieldSync({ indexInList: parseInt(this.inputRef.el.value) - 1 });
+        this.updateFieldSync({ indexInList: parseInt(this.positionInputRef().value) - 1 });
     }
 
     updateField(fieldName) {

@@ -50,30 +50,57 @@ class AccountEdiXmlPint_My(models.AbstractModel):
         if process_type == 'billing':
             return 'urn:peppol:pint:billing-1@my-1'
 
-    def _add_invoice_header_nodes(self, document_node, vals):
+    def _ubl_add_tax_totals_nodes(self, vals):
         # EXTENDS account.edi.xml.ubl_bis3
-        super()._add_invoice_header_nodes(document_node, vals)
-        document_node['cbc:ProfileID'] = {'_text': 'urn:peppol:bis:billing'}
+        super()._ubl_add_tax_totals_nodes(vals)
+        nodes = vals['document_node']['cac:TaxTotal']
 
-    def _get_party_node(self, vals):
-        party_node = super()._get_party_node(vals)
-        commercial_partner = vals['partner'].commercial_partner_id
+        if not nodes:
+            tax_total_node = self._ubl_get_tax_total_node(vals, {
+                'currency': vals['currency_id'],
+                'amount': 0.0,
+                'subtotals': {},
+            })
+            nodes.append(tax_total_node)
 
-        # See https://docs.peppol.eu/poac/my/pint-my/bis/#_seller_tax_identifier
-        party_node['cac:PartyTaxScheme'][0]['cbc:CompanyID']['_text'] = commercial_partner.sst_registration_number or 'NA'
+    def _ubl_add_party_tax_scheme_nodes(self, vals):
+        # EXTENDS account.edi.ubl_bis3
+        super()._ubl_add_party_tax_scheme_nodes(vals)
+        partner = vals['party_vals']['partner']
+        commercial_partner = partner.commercial_partner_id
 
-        if vals['role'] == 'supplier':
-            party_node['cac:PartyTaxScheme'].append(
-                {
-                    **party_node['cac:PartyTaxScheme'][0],
-                    'cbc:CompanyID': {'_text': commercial_partner.vat or 'NA'},
-                    'cac:TaxScheme': {
-                        'cbc:ID': {'_text': 'GST'}
-                    }
-                }
-            )
+        if commercial_partner.country_code == 'MY':
+            vals['party_node']['cac:PartyTaxScheme'] = [{
+                'cbc:CompanyID': {'_text': commercial_partner.sst_registration_number or 'NA'},
+                'cac:TaxScheme': {
+                    'cbc:ID': {'_text': 'NOT_EU_VAT'},
+                },
+            }]
 
-        return party_node
+    def _ubl_add_accounting_supplier_party_tax_scheme_nodes(self, vals):
+        # EXTENDS account.edi.ubl_bis3
+        super()._ubl_add_accounting_supplier_party_tax_scheme_nodes(vals)
+        nodes = vals['party_node']['cac:PartyTaxScheme']
+        partner = vals['party_vals']['partner']
+        commercial_partner = partner.commercial_partner_id
+
+        if commercial_partner.country_code == 'MY':
+            nodes.append({
+                'cbc:CompanyID': {'_text': commercial_partner.vat or 'NA'},
+                'cac:TaxScheme': {
+                    'cbc:ID': {'_text': 'GST'},
+                },
+            })
+
+    def _ubl_add_customization_id_node(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_customization_id_node(vals)
+        vals['document_node']['cbc:CustomizationID']['_text'] = 'urn:peppol:pint:billing-1@my-1'
+
+    def _ubl_add_profile_id_node(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_profile_id_node(vals)
+        vals['document_node']['cbc:ProfileID']['_text'] = 'urn:peppol:bis:billing'
 
     # -------------------------------------------------------------------------
     # EXPORT: Constraints
@@ -100,3 +127,18 @@ class AccountEdiXmlPint_My(models.AbstractModel):
         constraints.pop('cen_en16931_tax_line', '')
 
         return constraints
+
+    # -------------------------------------------------------------------------
+    # IMPORT
+    # -------------------------------------------------------------------------
+
+    def _import_ubl_invoice_add_customer_values(self, collected_values):
+        # EXTENDS account.edi.xml.ubl_bis3; Prioritize PartyLegalEntity when inferring the supplier tax identifier.
+        super()._import_ubl_invoice_add_customer_values(collected_values)
+        odoo_document_type = collected_values['odoo_document_type']
+        party_tag = "AccountingCustomerParty" if odoo_document_type == 'sale' else "AccountingSupplierParty"
+        tree = collected_values['tree']
+        party_legal_entity_node = tree.find(f"./{{*}}{party_tag}/{{*}}Party/{{*}}PartyLegalEntity")
+        if party_legal_entity_node is None:
+            return
+        collected_values['customer_values']['vat'] = party_legal_entity_node.findtext("./{*}CompanyID")

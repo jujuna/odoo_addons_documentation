@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import json
 
 from odoo import SUPERUSER_ID, api, models
@@ -14,7 +13,7 @@ class AccountMoveSend(models.AbstractModel):
         return (move.move_type == 'out_invoice'
                 and ('debit_origin_id' not in self.env['account.move']._fields or not move.debit_origin_id)
                 and move.state == 'posted'
-                and move.company_id.country_id.code == 'TW'
+                and move.company_id.account_fiscal_country_id.code == 'TW'
                 and not move.l10n_tw_edi_state
                 and move.company_id._is_ecpay_enabled())
 
@@ -22,7 +21,7 @@ class AccountMoveSend(models.AbstractModel):
     def _is_tw_edi_issue_allowance_applicable(self, move):
         return (move.move_type == 'out_refund'
                 and move.state == 'posted'
-                and move.company_id.country_id.code == 'TW'
+                and move.company_id.account_fiscal_country_id.code == 'TW'
                 and move.reversed_entry_id
                 and move.reversed_entry_id.l10n_tw_edi_ecpay_invoice_id
                 and not move.l10n_tw_edi_refund_invoice_number
@@ -64,7 +63,7 @@ class AccountMoveSend(models.AbstractModel):
                 file_name = f'{invoice.name.replace("/", "_")}_ecpay_issue_allowance.json'
             invoice_data['ecpay_attachments'] = {
                 'name': file_name,
-                'raw': json.dumps(json_content),
+                'raw': json.dumps(json_content).encode(),
                 'mimetype': 'application/json',
                 'res_model': invoice._name,
                 'res_id': invoice.id,
@@ -88,7 +87,7 @@ class AccountMoveSend(models.AbstractModel):
                     json_content = json.loads(invoice_data['ecpay_attachments']['raw'])
                 # If the invoice was downloaded but not sent, the json file could already be there.
                 elif invoice.l10n_tw_edi_file:
-                    json_content = json.loads(base64.b64decode(invoice.l10n_tw_edi_file))
+                    json_content = json.loads(invoice.l10n_tw_edi_file.content)
                 # If we don't have the file data and the file, we will regenerate it.
                 else:
                     self._l10n_tw_edi_generate_ecpay_json(invoice, invoice_data)

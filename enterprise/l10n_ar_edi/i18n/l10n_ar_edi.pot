@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 19:03+0000\n"
-"PO-Revision-Date: 2026-01-30 19:03+0000\n"
+"POT-Creation-Date: 2026-08-28 18:15+0000\n"
+"PO-Revision-Date: 2026-08-28 18:15+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -22,6 +22,79 @@ msgid ""
 "\n"
 "\n"
 "The ARCA electronic billing webservice is not available. Wait a few minutes for it to reset and try to validate the action again."
+msgstr ""
+
+#. module: l10n_ar_edi
+#: model:ir.module.module,description:base.module_l10n_ar_edi
+msgid ""
+"\n"
+"Functional\n"
+"----------\n"
+"\n"
+"Be able to create journals in Odoo to create electronic customer invoices and report then to ARCA (via webservices).\n"
+"The options available are:\n"
+"\n"
+"    * Electronic Invoice - Web Service\n"
+"    * Export Voucher - Web Service\n"
+"    * Electronic Fiscal Bond - Web Service\n"
+"\n"
+"In the electronic journals if you validate an invoice this one will be validated in both Odoo and ARCA. This validation is\n"
+"made at the instant and we recieve and \"approved/approved with observation/rejected\" state from ARCA. If the invoice has\n"
+"been rejected by ARCA will not be post in the system and a pop up message will be shown with both the error detail (reject reasons)\n"
+"we recieve and a HINT about what the problem could be.\n"
+"\n"
+"For auditing and troubleshooting purposes we also add a menu \"Consulit Invoice in ARCA\" that let us to consult invoices previously\n"
+"sent to ARCA and last number used as support for any possible issues on the sequences synchronization between Odoo and ARCA.\n"
+"\n"
+"    NOTE: From the Journal's form view we are able to force a sync between the odoo sequences to each of the document types in\n"
+"    with the last numbers registered in ARCA.\n"
+"\n"
+"From vendor bills, we have added a functionality that can be configured in the accounting settings to be able to verify\n"
+"vendor bills in ARCA to check if the vendor bills are real (more information please review the setting description).\n"
+"\n"
+"Configuration:\n"
+"\n"
+"1. Go to the Accounting Settings > Argentinean Localization section\n"
+"\n"
+"    1.1. Configure the ARCA Web Services mode:\n"
+"\n"
+"    * Testing environment in order to use demo certificates that will be use to test the instance and to make NOT\n"
+"      real invoices to ARCA. is just for testing. For demo instaces is already pre-defined you will not need to configure\n"
+"      it (commonly named in ARCA as Homologation environment).\n"
+"    * Production environment in order to generate real certificates and legal invoices to ARCA,\n"
+"\n"
+"    1.2. Configure your ARCA Certificate: If you are in a demo instance this one will be have been set by default. If you\n"
+"         are in production instance just need to go to upload your ARCA Certificate\n"
+"\n"
+"    1.3. Optionally you can define if you like to be eable to verify vendor bills in ARCA.\n"
+"\n"
+"2. Create Sales journals that will represent each one of your ARCA POS (Available in ARCA Portal) you want to use in Odoo.\n"
+"\n"
+"    2.1. Use Documents field is set by default please dont change\n"
+"    2.2. Set ARCA POS System for one of the electronic ones.\n"
+"\n"
+"        * Electronic Invoice - Web Service'\n"
+"        * Electronic Fiscal Bond - Web Service'\n"
+"        * Export Voucher - Web Service'\n"
+"\n"
+"    2.3. Set the ARCA POS Number and ARCA POS Address taking into account what you have configured in your ARCA Portal.\n"
+"\n"
+"    NOTE: You can use the \"Check Available ARCA POS\" button in Journal's form to corroborate the to use to create the journals.\n"
+"\n"
+"For more information about Argentinean Electronic invoicing please go to http://www.afip.gob.ar/fe/ayuda.asp\n"
+"\n"
+"Technical\n"
+"---------\n"
+"\n"
+"The web services that are implemented are the ones that are the most common:\n"
+"\n"
+"* wsfev1 - \"Factura Electrónica\" (Electronic Invoice)\n"
+"* wsbfev1 - \"Bono Fiscal Electrónico\" (Electronic Fiscal Bond)\n"
+"* wsfexv1 - \"Factura de Exportación Electrónica\" (Electronic Exportation Invoice - same as Export Voucher)\n"
+"* wscdc - \"Constatación de Comprobantes\" (Invoices Verification)\n"
+"\n"
+"For Development information go to http://www.afip.gob.ar/fe/documentos/WSBFEv1%20-%20Manual%20para%20el%20desarrollador.pdf\n"
+"\n"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -57,7 +130,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ar_edi.view_move_form
 msgid ""
 ") \n"
-"                        <i class=\"fa fa-info-circle\" title=\"This value depends on the receivable account's currency, To change it to Yes change the account to one that use currency that differs to the company currency\" role=\"img\"/>"
+"                        <i class=\"oi\" data-icon=\"info\" title=\"This value depends on the receivable account's currency, To change it to Yes change the account to one that use currency that differs to the company currency\" role=\"img\"/>"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -83,26 +156,6 @@ msgstr ""
 msgid ""
 "* Specific Invoice Number: consult all the invoice information in ARCA for the given number\n"
 "* Get Last Invoice: it connects to ARCA to get the last invoice number and show it in the number field"
-msgstr ""
-
-#. module: l10n_ar_edi
-#. odoo-python
-#: code:addons/l10n_ar_edi/models/afip_errors.py:0
-msgid "17"
-msgstr ""
-
-#. module: l10n_ar_edi
-#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.custom_header_inherit
-msgid ""
-"<br/>\n"
-"                <span class=\"d-block small mt-1 lh-1\">Operation Subject to Withholding</span>"
-msgstr ""
-
-#. module: l10n_ar_edi
-#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.res_config_settings_view_form
-msgid ""
-"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
-"specific.\" groups=\"base.group_multi_company\"/>"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -264,11 +317,6 @@ msgid "Accepted in ARCA with Observations"
 msgstr ""
 
 #. module: l10n_ar_edi
-#: model:ir.model,name:l10n_ar_edi.model_account_move_reversal
-msgid "Account Move Reversal"
-msgstr ""
-
-#. module: l10n_ar_edi
 #: model:ir.model.fields.selection,name:l10n_ar_edi.selection__res_company__l10n_ar_payment_foreign_currency__account
 msgid "Account's Currency Dependant"
 msgstr ""
@@ -282,7 +330,7 @@ msgstr ""
 
 #. module: l10n_ar_edi
 #: model_terms:ir.ui.view,arch_db:l10n_ar_edi.res_config_settings_view_form
-msgid "Add Withholding Legend to Invoice PDF"
+msgid "Add Legend to Invoice PDF"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -314,6 +362,15 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ar_edi
+#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.view_move_form_ar
+msgid ""
+"Argentina: Set this field if the Credit/Debit Note is not linked to an "
+"original invoice. This range marks the beginning and end of the period for "
+"which the adjustment is made. This only applies to Electronic Invoice - Web "
+"Service(FE)."
+msgstr ""
+
+#. module: l10n_ar_edi
 #: model:ir.model.fields,help:l10n_ar_edi.field_account_bank_statement_line__l10n_ar_afip_auth_code_due
 #: model:ir.model.fields,help:l10n_ar_edi.field_account_move__l10n_ar_afip_auth_code_due
 msgid "Argentina: The Due Date of the Invoice given by ARCA."
@@ -340,6 +397,11 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ar_edi
+#: model:ir.module.module,shortdesc:base.module_l10n_ar_edi
+msgid "Argentinean Electronic Invoicing"
+msgstr ""
+
+#. module: l10n_ar_edi
 #. odoo-python
 #: code:addons/l10n_ar_edi/models/afip_errors.py:0
 msgid ""
@@ -348,6 +410,23 @@ msgid ""
 "The only exception is the exchange rate adjustments that need to be done in ARS but taking into account that the orginal invoice must already be accepted (or rejected by the customer).\n"
 "\n"
 "We recommend you to verify if the customer has already accepted/rejected the original invoice"
+msgstr ""
+
+#. module: l10n_ar_edi
+#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.view_move_form_ar
+msgid "Associated Period"
+msgstr ""
+
+#. module: l10n_ar_edi
+#: model:ir.model.fields,field_description:l10n_ar_edi.field_account_bank_statement_line__l10n_ar_afip_asoc_period_end
+#: model:ir.model.fields,field_description:l10n_ar_edi.field_account_move__l10n_ar_afip_asoc_period_end
+msgid "Associated Period End"
+msgstr ""
+
+#. module: l10n_ar_edi
+#: model:ir.model.fields,field_description:l10n_ar_edi.field_account_bank_statement_line__l10n_ar_afip_asoc_period_start
+#: model:ir.model.fields,field_description:l10n_ar_edi.field_account_move__l10n_ar_afip_asoc_period_start
+msgid "Associated Period Start"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -399,11 +478,6 @@ msgid "CAI"
 msgstr ""
 
 #. module: l10n_ar_edi
-#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.l10n_ar_afip_ws_consult_form
-msgid "Cancel"
-msgstr ""
-
-#. module: l10n_ar_edi
 #: model:ir.model,name:l10n_ar_edi.model_certificate_certificate
 #: model_terms:ir.ui.view,arch_db:l10n_ar_edi.res_config_settings_view_form
 msgid "Certificate"
@@ -434,10 +508,6 @@ msgstr ""
 
 #. module: l10n_ar_edi
 #: model:ir.model,name:l10n_ar_edi.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: l10n_ar_edi
 #: model:ir.model.fields,field_description:l10n_ar_edi.field_l10n_ar_afipws_connection__company_id
 msgid "Company"
 msgstr ""
@@ -643,6 +713,14 @@ msgstr ""
 #. module: l10n_ar_edi
 #. odoo-python
 #: code:addons/l10n_ar_edi/models/account_move.py:0
+msgid ""
+"For Argentinean contacts with AFIP Responsibility Type \"Consumidor Final\","
+" the identification type must be DNI or CUIL/CUIT."
+msgstr ""
+
+#. module: l10n_ar_edi
+#. odoo-python
+#: code:addons/l10n_ar_edi/models/account_move.py:0
 msgid "For WS \"%(ws)s\" country code is mandatory country: %(country)s"
 msgstr ""
 
@@ -788,11 +866,10 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ar_edi
-#: model:ir.model.fields,help:l10n_ar_edi.field_res_company__l10n_ar_show_withholding_legend
-#: model:ir.model.fields,help:l10n_ar_edi.field_res_config_settings__l10n_ar_show_withholding_legend
+#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.res_config_settings_view_form
 msgid ""
-"If this option is selected, the legend 'Operation Subject to Withholding' "
-"will be added below the Document Type letter on the Invoice PDF."
+"If this option is selected, the selected legend string will be added below "
+"the Document Type letter on the Invoice PDF."
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -871,17 +948,20 @@ msgid "Journal Entry"
 msgstr ""
 
 #. module: l10n_ar_edi
+#: model:ir.model,name:l10n_ar_edi.model_account_move_reversal
+msgid "Journal Entry Reversal"
+msgstr ""
+
+#. module: l10n_ar_edi
 #: model:ir.model.fields,field_description:l10n_ar_edi.field_account_bank_statement_line__l10n_ar_afip_verification_type
 #: model:ir.model.fields,field_description:l10n_ar_edi.field_account_move__l10n_ar_afip_verification_type
 msgid "L10N Ar Afip Verification Type"
 msgstr ""
 
 #. module: l10n_ar_edi
-#. odoo-python
-#: code:addons/l10n_ar_edi/models/res_currency.py:0
-msgid ""
-"Last Business Day: %(date)s\n"
-"Rate: %(rate)s"
+#: model:ir.model.fields,field_description:l10n_ar_edi.field_res_company__l10n_ar_invoice_pdf_legend
+#: model:ir.model.fields,field_description:l10n_ar_edi.field_res_config_settings__l10n_ar_invoice_pdf_legend
+msgid "L10N Ar Invoice Pdf Legend"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -894,6 +974,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ar_edi.field_l10n_ar_afip_ws_consult__write_date
 #: model:ir.model.fields,field_description:l10n_ar_edi.field_l10n_ar_afipws_connection__write_date
 msgid "Last Updated on"
+msgstr ""
+
+#. module: l10n_ar_edi
+#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.res_config_settings_view_form
+msgid "Legend"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -976,9 +1061,19 @@ msgid "Observed"
 msgstr ""
 
 #. module: l10n_ar_edi
+#: model:ir.model.fields.selection,name:l10n_ar_edi.selection__res_company__l10n_ar_invoice_pdf_legend__operation_subject_to_withholding
+msgid "Operation Subject to Withholding"
+msgstr ""
+
+#. module: l10n_ar_edi
 #: model:ir.model.fields,field_description:l10n_ar_edi.field_account_bank_statement_line__l10n_ar_payment_foreign_currency
 #: model:ir.model.fields,field_description:l10n_ar_edi.field_account_move__l10n_ar_payment_foreign_currency
 msgid "Payment in Foreign Currency"
+msgstr ""
+
+#. module: l10n_ar_edi
+#: model:ir.model.fields.selection,name:l10n_ar_edi.selection__res_company__l10n_ar_invoice_pdf_legend__payment_on_informed_cbu
+msgid "Payment on Informed CBU"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -1046,6 +1141,14 @@ msgstr ""
 #: code:addons/l10n_ar_edi/wizards/l10n_ar_afip_ws_consult.py:0
 msgid ""
 "Please set first the Journal and the Document Type before select this option"
+msgstr ""
+
+#. module: l10n_ar_edi
+#. odoo-python
+#: code:addons/l10n_ar_edi/models/res_company.py:0
+msgid ""
+"Please set the ARCA Certificate and Private Key in order to fetch currency "
+"rates from ARCA"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -1125,14 +1228,21 @@ msgid "Select the Key used to sign your ARCA documents"
 msgstr ""
 
 #. module: l10n_ar_edi
-#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.res_config_settings_view_form_demo
-msgid "Set another demo certificate"
+#: model:ir.model.fields,help:l10n_ar_edi.field_res_company__l10n_ar_invoice_pdf_legend
+#: model:ir.model.fields,help:l10n_ar_edi.field_res_config_settings__l10n_ar_invoice_pdf_legend
+msgid ""
+"Selected legend value will be added below the Document Type letter on the "
+"Invoice PDF."
 msgstr ""
 
 #. module: l10n_ar_edi
-#: model:ir.model.fields,field_description:l10n_ar_edi.field_res_company__l10n_ar_show_withholding_legend
-#: model:ir.model.fields,field_description:l10n_ar_edi.field_res_config_settings__l10n_ar_show_withholding_legend
-msgid "Show Withholding Legend"
+#: model:ir.model.fields,field_description:l10n_ar_edi.field_res_company__currency_provider
+msgid "Service Provider"
+msgstr ""
+
+#. module: l10n_ar_edi
+#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.res_config_settings_view_form_demo
+msgid "Set another demo certificate"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -1231,8 +1341,16 @@ msgstr ""
 
 #. module: l10n_ar_edi
 #. odoo-python
+#: code:addons/l10n_ar_edi/models/res_company.py:0
+msgid ""
+"The following currencies do not have ARCA Code: %s. Please add the required "
+"codes or archive these currencies, then click Update again."
+msgstr ""
+
+#. module: l10n_ar_edi
+#. odoo-python
 #: code:addons/l10n_ar_edi/models/afip_errors.py:0
-msgid "The invoice date cannot be after the last invoice validated in ARCA."
+msgid "The invoice date cannot be before the last invoice validated in ARCA."
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -1297,6 +1415,15 @@ msgstr ""
 
 #. module: l10n_ar_edi
 #. odoo-python
+#: code:addons/l10n_ar_edi/models/account_move.py:0
+msgid ""
+"The start and end dates of the Associated Period must be set to issue "
+"credit/debit notes without an original invoice. Go to tab 'Other Info' > "
+"'Invoice' to set the associated period dates."
+msgstr ""
+
+#. module: l10n_ar_edi
+#. odoo-python
 #: code:addons/l10n_ar_edi/models/l10n_ar_afipws_connection.py:0
 msgid ""
 "The testing certificate is been used for another person, you can wait 10 minutes and try again or you can change the testing certificate. If this message persist you can:\n"
@@ -1336,13 +1463,6 @@ msgstr ""
 msgid ""
 "This QR code is mandatory by the ARCA in the electronic invoices when this "
 "ones are printed."
-msgstr ""
-
-#. module: l10n_ar_edi
-#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.view_currency_form
-msgid ""
-"This button let you view the last rate in ARCA for this currency. You can "
-"use this info to create manually your own rates in Odoo"
 msgstr ""
 
 #. module: l10n_ar_edi
@@ -1475,6 +1595,11 @@ msgid "Unique ID"
 msgstr ""
 
 #. module: l10n_ar_edi
+#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.res_config_settings_view_form
+msgid "Values set here are company-specific."
+msgstr ""
+
+#. module: l10n_ar_edi
 #. odoo-python
 #: code:addons/l10n_ar_edi/models/l10n_ar_afipws_connection.py:0
 msgid "Verification of Invoices (WSCDC)"
@@ -1588,6 +1713,11 @@ msgid "You may not have completed the Bank Account field on the invoice"
 msgstr ""
 
 #. module: l10n_ar_edi
+#: model:ir.model.fields.selection,name:l10n_ar_edi.selection__res_company__currency_provider__arca
+msgid "[AR] ARCA"
+msgstr ""
+
+#. module: l10n_ar_edi
 #. odoo-python
 #: code:addons/l10n_ar_edi/models/product_template.py:0
 msgid ""
@@ -1611,11 +1741,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_ar_edi/models/account_journal.py:0
 msgid "wsfex"
-msgstr ""
-
-#. module: l10n_ar_edi
-#: model_terms:ir.ui.view,arch_db:l10n_ar_edi.view_currency_form
-msgid "⇒ Show latest ARCA Rate"
 msgstr ""
 
 #. module: l10n_ar_edi

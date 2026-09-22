@@ -7,7 +7,8 @@
  */
 export const SIDEBAR_SAFE_FIELDS = [
     "badge",
-    "selection_badge",
+    "badges_selection",
+    "badges_many2one",
     "handle",
     "percentpie",
     "radio",
@@ -17,7 +18,7 @@ export const SIDEBAR_SAFE_FIELDS = [
     "priority",
     "date",
     "datetime",
-    "remaining_days",
+    "relative_date",
     "email",
     "phone",
     "url",
@@ -45,6 +46,7 @@ export const SIDEBAR_SAFE_FIELDS = [
     "CopyClipboardURL",
     "char_emojis",
     "many2many_tags",
+    "many2many_tags_color_dot",
     "many2one",
     "many2many",
     "one2many",
@@ -53,3 +55,13 @@ export const SIDEBAR_SAFE_FIELDS = [
     "daterange",
     "google_address_autocomplete",
 ];
+
+/**
+ * Lists of blacklisted widget types organised per view type.
+ * Certain widgets such as the form status bar widget are designed to be used on single records.
+ * While, it is technically possible to use these widgets on record set views such as the list view, this leads to massive performance issues even for basic selection fields.
+ */
+export const SIDEBAR_VIEW_DEPENDENT_BLACKLIST = {
+    form: ["badge", "statusbar"],
+    list: ["badge", "statusbar"],
+};

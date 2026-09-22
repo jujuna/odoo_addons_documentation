@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 # pylint: disable=C0326
-from base64 import b64decode
 from datetime import datetime
 from freezegun import freeze_time
-from unittest.mock import patch
 
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.tests import tagged
@@ -13,6 +10,8 @@ from odoo import Command, fields
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class LuxembourgElectronicReportTest(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestAccountReportsCommon.setup_country('lu')
@@ -60,8 +59,8 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
     def _filter_zero_lines(self, lines):
         filtered_lines = []
         for line in lines:
-            bal_col = line['columns'][0]
-            if not bal_col.get('is_zero'):
+            bal_col = line.columns[0]
+            if not bal_col.is_zero:
                 filtered_lines.append(line)
         return filtered_lines
 
@@ -69,7 +68,7 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
         report = self.env.ref(report_xmlid)
         options = report.get_options({
             'date': {
-                'filter': 'previous_month',
+                'default_opening_date': 'previous_month',
             }
         })
 
@@ -90,7 +89,7 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
         new_context['report_generation_options'] = options
         wizard.with_context(new_context).get_xml()
         # Remove the <?xml version='1.0' encoding='UTF-8'?> from the string
-        return options, b64decode(wizard.report_data.decode('utf-8'))[38:]
+        return options, wizard.report_data.decode('utf-8')[38:]
 
     def _get_oss_ioss_sme_values(self):
         oss_value = hasattr(self.env['res.config.settings'], "l10n_eu_oss_eu_country") and '1' or '0'
@@ -102,7 +101,7 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
 
     def test_balance_sheet(self):
         report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_bs')
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(report, '2019-01-01', '2019-12-31')
 
         self.assertLinesValues(
             self._filter_zero_lines(report._get_lines(options)),
@@ -130,7 +129,7 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
 
     def test_profit_and_loss(self):
         report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_pl')
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(report, '2019-01-01', '2019-12-31')
 
         self.assertLinesValues(
             self._filter_zero_lines(report._get_lines(options)),
@@ -145,6 +144,36 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
             ],
             options,
         )
+
+    @freeze_time('2019-12-31')
+    def test_generate_xml_agent_rcs_number(self):
+        """Test that Agent/RCSNbr is correctly populated in all three cases:
+        - Agent set with RCS number  → agent's RCS number
+        - Agent set without RCS number (natural person) → 'NE'
+        - No agent set → company's company registry (LU_EN)
+        """
+        company = self.company_data['company']
+        ns = {'ecdf': 'http://www.ctie.etat.lu/2011/ecdf'}
+
+        def get_agent_rcs():
+            _, xml_bytes = self._get_xml_declaration('l10n_lu.tax_report')
+            return self.get_xml_tree_from_string(xml_bytes).findtext('.//ecdf:Agent/ecdf:RCSNbr', namespaces=ns)
+
+        agent = self.env['res.partner'].create({
+            'name': 'Accounting Firm',
+            'l10n_lu_agent_matr_number': '12345678901',
+            'l10n_lu_agent_ecdf_prefix': 'AG001A',
+        })
+
+        company.partner_id.additional_identifiers = {'LU_EN': 'B123456'}
+        company.account_representative_id = agent
+        self.assertEqual(get_agent_rcs(), 'NE')
+
+        agent.l10n_lu_agent_rcs_number = 'B654321'
+        self.assertEqual(get_agent_rcs(), 'B654321')
+
+        company.account_representative_id = False
+        self.assertEqual(get_agent_rcs(), 'B123456')
 
     @freeze_time('2019-12-31')
     def test_generate_xml(self):
@@ -358,14 +387,21 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
                                     <NumericField id="255">271,82</NumericField>
                                     <NumericField id="361">31,42</NumericField>
                                     <NumericField id="362">25,42</NumericField>
+                                    <NumericField id="129">0,00</NumericField>
                                     <NumericField id="394">0,00</NumericField>
                                     <NumericField id="128">0,00</NumericField>
+                                    <NumericField id="137">0,00</NumericField>
                                     <NumericField id="153">0,00</NumericField>
                                     <NumericField id="136">0,00</NumericField>
+                                    <NumericField id="145">0,00</NumericField>
                                     <NumericField id="149">0,00</NumericField>
                                     <NumericField id="144">0,00</NumericField>
+                                    <NumericField id="163">0,00</NumericField>
                                     <NumericField id="396">0,00</NumericField>
                                     <NumericField id="162">0,00</NumericField>
+                                    <NumericField id="175">0,00</NumericField>
+                                    <NumericField id="164">0,00</NumericField>
+                                    <NumericField id="165">0,00</NumericField>
                                     <Choice id="998">1</Choice>
                                     <NumericField id="414">31,42</NumericField>
                                     <NumericField id="415">25,42</NumericField>
@@ -410,7 +446,6 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
             'name': 'test account',
             'account_type': 'expense',
             'code': '603135',
-            'reconcile': False,
             'tag_ids': [Command.set(self.env.ref('l10n_lu.account_tag_appendix_289').ids)],
         })
 
@@ -443,9 +478,9 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
         options = report.get_options(previous_options)
         report_lines = report._get_lines(options)
         # Line "14. Gas" should be equal to 0
-        self.assertEqual(report_lines[18]['columns'][1]['no_format'], 0.0) # Percent
-        self.assertTrue(report_lines[18]['columns'][2]['is_zero']) # Vat excluded
-        self.assertTrue(report_lines[18]['columns'][3]['is_zero']) # Vat invoiced
+        self.assertEqual(report_lines[18].columns[1].no_format, 0.0)  # Percent
+        self.assertTrue(report_lines[18].columns[2].is_zero)  # Vat excluded
+        self.assertTrue(report_lines[18].columns[3].is_zero)  # Vat invoiced
 
         # Set the lock date to generate the default value
         lock_date_wizard = self.env['account.change.lock.date'].create({
@@ -455,9 +490,9 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
 
         # Check the values after setting the general lock date.
         report_lines = report._get_lines(options)
-        self.assertEqual(report_lines[18]['columns'][1]['no_format'], 100.0)
-        self.assertEqual(report_lines[18]['columns'][2]['no_format'], -100.0)
-        self.assertEqual(report_lines[18]['columns'][3]['no_format'], -17.0)
+        self.assertEqual(report_lines[18].columns[1].no_format, 100.0)
+        self.assertEqual(report_lines[18].columns[2].no_format, -100.0)
+        self.assertEqual(report_lines[18].columns[3].no_format, -17.0)
 
     @freeze_time('2022-12-31')
     def test_annual_report_section_1_default_values(self):
@@ -467,7 +502,6 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
             'name': 'Betazoid',
             'account_type': 'income',
             'code': '702001',
-            'reconcile': False,
             'tag_ids': [Command.set(self.env.ref('l10n_lu.account_tag_001').ids)],
         })
 
@@ -499,8 +533,8 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
         options = report.get_options(previous_options)
         report_lines = report._get_lines(options)
         # Line 001 should be equal to 0, but the amount to be allocated should be 7150
-        self.assertTrue(report_lines[3]['columns'][0]['is_zero'])
-        self.assertEqual(report_lines[2]['columns'][0]['no_format'], 7150)
+        self.assertTrue(report_lines[3].columns[0].is_zero)
+        self.assertEqual(report_lines[2].columns[0].no_format, 7150)
 
         # Set the lock date to generate the default value
         lock_date_wizard = self.env['account.change.lock.date'].create({
@@ -511,8 +545,8 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
         # Check the values after setting the general lock date.
         report_lines = report._get_lines(options)
         # Line 001 should be equal to 7150, but the amount to be allocated should be 0
-        self.assertTrue(report_lines[2]['columns'][0]['is_zero'])
-        self.assertEqual(report_lines[3]['columns'][0]['no_format'], 7150)
+        self.assertTrue(report_lines[2].columns[0].is_zero)
+        self.assertEqual(report_lines[3].columns[0].no_format, 7150)
 
         # Remove the tax lock date
         lock_date_wizard = self.env['account.change.lock.date'].create({
@@ -535,20 +569,16 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
 
         # The lines values should not change
         report_lines = report._get_lines(options)
-        self.assertEqual(report_lines[2]['columns'][0]['no_format'], 7150)
-        self.assertEqual(report_lines[3]['columns'][0]['no_format'], 7150)
+        self.assertEqual(report_lines[2].columns[0].no_format, 7150)
+        self.assertEqual(report_lines[3].columns[0].no_format, 7150)
 
     @freeze_time('2019-12-31')
     def test_generate_bs_pnl_xml(self):
+        # Restrict to main company to avoid the reset of the consolidation filter when calling _get_options in the business flow
+        self.env.user.company_ids = self.company_data['company']
         report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_bs')
-        options = report.get_options({})
-        # Add custom range date to test that it is correctly reported in the XML
-        options['date'].update({
-            'date_from': '2019-01-01',
-            'date_to': '2019-12-31',
-            'mode': 'range',
-            'filter': 'custom',
-        })
+        options = self._generate_options(report, '2019-01-01', '2019-12-31')
+
         # Add the filename in the options, which is initially done by the get_report_filename() method
         now_datetime = datetime.now()
         file_ref_data = {
@@ -657,12 +687,47 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
         new_context = self.env.context.copy()
         new_context['report_generation_options'] = options
         wizard.with_context(new_context).get_xml()
-        declaration_to_compare = b64decode(wizard.report_data.decode("utf-8"))[38:]
+        declaration_to_compare = wizard.report_data.decode("utf-8")[38:]
 
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(declaration_to_compare),
             self.get_xml_tree_from_string(expected_xml)
         )
+
+    @freeze_time('2019-12-31')
+    def test_xml_export_with_annotations(self):
+        """Test that annotations on the P&L report are exported as references when the checkbox is checked."""
+        pl_report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_pl')
+        options = pl_report.get_options({})
+        options['date'].update({
+            'date_from': '2019-01-01',
+            'date_to': '2019-12-31',
+            'mode': 'range',
+            'filter': 'custom',
+        })
+
+        account = self.company_data['default_account_revenue']
+        message = self.env['mail.message'].create({
+            'model': account._name,
+            'res_id': account.id,
+            'body': 'NoteRef',
+            'date': '2019-06-01',
+            'author_id': self.env.user.partner_id.id,
+            'message_type': 'comment',
+            'subtype_id': self.env.ref('mail.mt_note').id,
+        })
+        self.env['account.report.annotation'].create({
+            'date': '2019-06-01',
+            'message_id': message.id,
+        })
+
+        wizard = self.env['l10n_lu.generate.accounts.report'].create({
+            'import_notes_as_references': True,
+        })
+        wizard.with_context(report_generation_options=options).get_xml()
+        xml_content = wizard.report_data.decode('utf-8')
+        self.assertIn('id="1701"', xml_content)
+        self.assertIn('NoteRef', xml_content)
 
     @freeze_time('2025-12-31')
     def test_generate_xml_post_2025(self):
@@ -773,6 +838,158 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
             ioss,
             sme,
         )
+
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(declaration_to_compare),
+            self.get_xml_tree_from_string(expected_xml)
+        )
+
+    @freeze_time('2026-01-15')
+    def test_generate_balance_sheet_xml_current_year_earnings(self):
+        # Restrict to main company to avoid the reset of the consolidation filter when calling _get_options in the business flow
+        self.env.user.company_ids = self.company_data['company']
+        company_id = self.company_data['company'].id
+        tax_17 = self.env['account.tax'].search([('name', '=', '17% S'), ('company_id', '=', company_id)], limit=1)
+        account_142 = self.env['account.account'].search([('code', '=', '142000'), ('company_ids', '=', company_id)], limit=1)
+        account_999 = self.env['account.account'].search([('code', '=', '999999'), ('company_ids', '=', company_id)], limit=1)
+        if not account_999:
+            account_999 = self.env['account.account'].create({
+                'name': 'Account 999999',
+                'account_type': 'equity',
+                'code': '999999',
+            })
+        # Remove any potential noise.
+        self.env['account.move'].search([('company_id', '=', company_id), ('state', '=', 'posted')]).button_draft()
+
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'journal_id': self.company_data['default_journal_sale'].id,
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2025-12-12',
+            'invoice_line_ids': [Command.create({
+                'product_id': self.product_a.id,
+                'quantity': 1.0,
+                'price_unit': 1_000_000.0,
+                'tax_ids': tax_17.ids,
+            })]
+        })
+        misc_entry = self.env['account.move'].create({
+            'move_type': 'entry',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'date': '2025-12-31',
+            'line_ids': [
+                Command.create({
+                    'name': '142',
+                    'account_id': account_142.id,
+                    'debit': 1_000_000.0,
+                    'credit': 0.0,
+                }),
+                Command.create({
+                    'name': '999',
+                    'account_id': account_999.id,
+                    'debit': 0.0,
+                    'credit': 1_000_000.0,
+                }),
+            ],
+        })
+        (invoice + misc_entry).action_post()
+
+        report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_bs')
+        options = self._generate_options(report, '2025-01-01', '2025-12-31')
+        wizard = self.env['l10n_lu.generate.accounts.report'].create({})
+        new_context = self.env.context.copy()
+        new_context['report_generation_options'] = options
+        wizard.with_context(new_context).get_xml()
+        declaration_to_compare = wizard.report_data.decode("utf-8")[38:]
+
+        expected_xml = """
+        <eCDFDeclarations xmlns="http://www.ctie.etat.lu/2011/ecdf">
+            <FileReference>___ignore___</FileReference>
+            <eCDFFileVersion>2.0</eCDFFileVersion>
+            <Interface>MODL5</Interface>
+            <Agent>
+                <MatrNbr>12345678900</MatrNbr>
+                <RCSNbr>NE</RCSNbr>
+                <VATNbr>12345613</VATNbr>
+            </Agent>
+            <Declarations>
+                <Declarer>
+                    <MatrNbr>12345678900</MatrNbr>
+                    <RCSNbr>NE</RCSNbr>
+                    <VATNbr>12345613</VATNbr>
+                    <DeclarationGroup>
+                        <Declaration type="CA_COMPP" model="1" language="EN">
+                            <Year>2025</Year>
+                            <Period>1</Period>
+                            <FormData>
+                                <TextField id="01">01/01/2025</TextField>
+                                <TextField id="02">31/12/2025</TextField>
+                                <TextField id="03">EUR</TextField>
+                                <NumericField id="701">1000000,00</NumericField>
+                                <NumericField id="667">1000000,00</NumericField>
+                                <NumericField id="669">1000000,00</NumericField>
+                            </FormData>
+                        </Declaration>
+                        <Declaration type="CA_BILAN" model="1" language="EN">
+                            <Year>2025</Year>
+                            <Period>1</Period>
+                            <FormData>
+                                <TextField id="01">01/01/2025</TextField>
+                                <TextField id="02">31/12/2025</TextField>
+                                <TextField id="03">EUR</TextField>
+                                <NumericField id="151">1000000,00</NumericField>
+                                <NumericField id="163">1000000,00</NumericField>
+                                <NumericField id="165">1170000,00</NumericField>
+                                <NumericField id="167">1170000,00</NumericField>
+                                <NumericField id="183">-170000,00</NumericField>
+                                <NumericField id="185">-170000,00</NumericField>
+                                <NumericField id="201">1000000,00</NumericField>
+                                <NumericField id="202">0,00</NumericField>
+                                <NumericField id="301">1000000,00</NumericField>
+                                <NumericField id="321">1000000,00</NumericField>
+                                <NumericField id="405">1000000,00</NumericField>
+                                <NumericField id="406">0,00</NumericField>
+                            </FormData>
+                        </Declaration>
+                        <Declaration type="CA_PLANCOMPTA" model="1" language="EN">
+                            <Year>2025</Year>
+                            <Period>1</Period>
+                            <FormData>
+                                <TextField id="01">01/01/2025</TextField>
+                                <TextField id="02">31/12/2025</TextField>
+                                <TextField id="03">EUR</TextField>
+                                <NumericField id="0565">1170000,00</NumericField>
+                                <NumericField id="0567">1170000,00</NumericField>
+                                <NumericField id="0569">1170000,00</NumericField>
+                                <NumericField id="0658">170000,00</NumericField>
+                                <NumericField id="0660">170000,00</NumericField>
+                                <NumericField id="0688">170000,00</NumericField>
+                                <NumericField id="0690">170000,00</NumericField>
+                                <NumericField id="0692">170000,00</NumericField>
+                                <NumericField id="1852">1000000,00</NumericField>
+                                <NumericField id="2780">1000000,00</NumericField>
+                                <NumericField id="1862">1000000,00</NumericField>
+                                <NumericField id="1111">1170000,00</NumericField>
+                                <NumericField id="1112">170000,00</NumericField>
+                                <NumericField id="2257">0,00</NumericField>
+                                <NumericField id="2258">1000000,00</NumericField>
+                                <NumericField id="2956">0,00</NumericField>
+                                <NumericField id="2957">1170000,00</NumericField>
+                                <NumericField id="2958">1170000,00</NumericField>
+                                <NumericField id="0161">1000000,00</NumericField>
+                                <NumericField id="0158">0,00</NumericField>
+                                <NumericField id="2939">1,00</NumericField>
+                                <Choice id="2940">1</Choice>
+                                <Choice id="2941">1</Choice>
+                                <Choice id="2942">1</Choice>
+                            </FormData>
+                        </Declaration>
+                        <MappingTable mapping="standard"></MappingTable>
+                    </DeclarationGroup>
+                </Declarer>
+            </Declarations>
+        </eCDFDeclarations>
+        """
 
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(declaration_to_compare),

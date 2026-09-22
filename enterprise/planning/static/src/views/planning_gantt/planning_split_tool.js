@@ -1,13 +1,11 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class PlanningSplitTool extends Component {
-    static props = {
-        reactive: {
-            type: Object,
-            shape: {
-                position: { type: String, optional: true },
-            },
-        },
-    };
     static template = "planning.PlanningSplitTool";
+
+    props = useProps({
+        reactive: t.object({
+            position: t.string().optional(),
+        }),
+    });
 }

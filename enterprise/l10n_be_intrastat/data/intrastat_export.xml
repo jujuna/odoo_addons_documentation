@@ -39,7 +39,7 @@
         <template id="intrastat_report_export_xml">
             <DeclarationReport xmlns="http://www.onegate.eu/2010-01-01">
                 <Administration>
-                    <From declarerType="KBO" t-out="company.company_registry"/>
+                    <From declarerType="KBO" t-out="company.partner_id._get_additional_identifier('BE_EN')"/>
                     <To>NBB</To>
                     <Domain>SXX</Domain>
                 </Administration>
@@ -50,10 +50,9 @@
                     t-if="incl_arrivals"
                 >
                     <Data close="true" t-att-form="_get_reception_form(extended)">
-                        <t t-call="l10n_be_intrastat.intrastat_report_export_xml_items">
-                            <t t-set="reception" t-value="true"/>
-                            <t t-set="items" t-value="in_vals"/>
-                        </t>
+                        <t t-call="l10n_be_intrastat.intrastat_report_export_xml_items"
+                            reception="true"
+                            items="in_vals"/>
                     </Data>
                 </Report>
                 <Report
@@ -63,10 +62,9 @@
                     t-if="incl_dispatches"
                 >
                     <Data close="true" t-att-form="_get_expedition_form(extended)">
-                        <t t-call="l10n_be_intrastat.intrastat_report_export_xml_items">
-                            <t t-set="expedition" t-value="true"/>
-                            <t t-set="items" t-value="out_vals"/>
-                        </t>
+                        <t t-call="l10n_be_intrastat.intrastat_report_export_xml_items"
+                            expedition="true"
+                            items="out_vals"/>
                     </Data>
                 </Report>
             </DeclarationReport>
@@ -75,7 +73,7 @@
         <template id="intrastat_services_report_export_xml">
             <DeclarationReport xmlns="http://www.onegate.eu/2010-01-01">
                 <Administration>
-                    <From declarerType="KBO" t-out="company.company_registry"/>
+                    <From declarerType="KBO" t-out="company.partner_id._get_additional_identifier('BE_EN')"/>
                     <To>NBB</To>
                     <Domain>BBP</Domain>
                 </Administration>

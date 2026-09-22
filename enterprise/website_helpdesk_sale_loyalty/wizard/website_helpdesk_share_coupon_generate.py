@@ -10,8 +10,13 @@ class HelpdeskSaleCouponGenerate(models.TransientModel):
         coupon = self.env['loyalty.card'].sudo().create({
             'partner_id': self.ticket_id.partner_id.id,
             'program_id': self.program.id,
-            'points': self.points_granted,
             'expiration_date': self.valid_until,
         })
+        coupon._adjust_points(
+            self.points_granted,
+            self.env._(
+                "Coupon generated from helpdesk ticket %s", self.ticket_id.display_name
+            ),
+        )
         self.ticket_id.coupon_ids |= coupon
         return self.env['coupon.share'].create_share_action(coupon=coupon)

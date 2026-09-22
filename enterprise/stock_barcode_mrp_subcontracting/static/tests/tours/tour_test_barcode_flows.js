@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 import * as helper from "@stock_barcode/../tests/tours/tour_helper_stock_barcode";
 import { stepUtils } from "@stock_barcode/../tests/tours/tour_step_utils";
-import { _t } from "@web/core/l10n/translation";
 
 // ----------------------------------------------------------------------------
 // Tours
@@ -76,14 +75,12 @@ registry.category("web_tour.tours").add("test_receipt_tracked_subcontracted_prod
 
         {
             trigger: ".o_field_widget[name=qty_producing] input",
-            tooltipPosition: "right",
             run: "edit 1 && click body",
         },
 
         {
             trigger: ".modal-footer .btn[name=subcontracting_record_component]",
-            content: _t("Continue"),
-            tooltipPosition: "bottom",
+            content: "Continue",
             run: "click",
         },
         {
@@ -91,8 +88,7 @@ registry.category("web_tour.tours").add("test_receipt_tracked_subcontracted_prod
         },
         {
             trigger: ".modal-footer .btn-primary[name=subcontracting_record_component]",
-            content: _t("Record production"),
-            tooltipPosition: "bottom",
+            content: "Record production",
             run: "click",
         },
         ...stepUtils.validateBarcodeOperation(),
@@ -108,7 +104,6 @@ registry.category("web_tour.tours").add("test_receipt_flexible_subcontracted_pro
 
         {
             trigger: ".modal .o_field_widget[name=qty_producing] input",
-            tooltipPosition: "right",
             run: "edit 1 && click .modal-body",
         },
         {
@@ -122,8 +117,7 @@ registry.category("web_tour.tours").add("test_receipt_flexible_subcontracted_pro
         },
         {
             trigger: ".modal .modal-footer .btn-primary[name=subcontracting_record_component]",
-            content: _t("Record production"),
-            tooltipPosition: "bottom",
+            content: "Record production",
             run: "click",
         },
         {
@@ -164,7 +158,6 @@ registry.category("web_tour.tours").add("test_partial_subcontract_receipt_and_ba
         {
             content: "Await qty_done update",
             trigger: 'div.o_barcode_line:contains("Chocolate Eclairs") .qty-done:contains("5")',
-            run: () => {},
         },
         {
             content: "Validate reception",
@@ -174,17 +167,15 @@ registry.category("web_tour.tours").add("test_partial_subcontract_receipt_and_ba
         {
             content: "Await backorder window popup",
             trigger: "div.o_barcode_backorder_dialog",
-            run: () => {},
         },
         {
             content: "Validate the incomplete transfer",
-            trigger: 'div.o_barcode_backorder_dialog button:contains("Validate")',
+            trigger: 'div.o_barcode_backorder_dialog button:contains("Create Backorder")',
             run: "click",
         },
         {
             content: "Await backorder notification",
             trigger: 'div.o_notification_body:contains("Following backorder was created")',
-            run: () => {},
         },
     ],
 });

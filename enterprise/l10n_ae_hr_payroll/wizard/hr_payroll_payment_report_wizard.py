@@ -1,16 +1,33 @@
-from odoo import fields, models, _
-from odoo.exceptions import UserError
-import base64
 import csv
 import io
-import pytz
+import xlsxwriter
+
+from datetime import UTC
+
+from odoo import _, fields, models
+from odoo.exceptions import UserError
+from odoo.tools import BinaryBytes
 
 
 class HrPayrollPaymentReportWizard(models.TransientModel):
     _inherit = 'hr.payroll.payment.report.wizard'
 
-    export_format = fields.Selection(selection_add=[('l10n_ae_wps', 'UAE WPS')], default='l10n_ae_wps', ondelete={'l10n_ae_wps': 'set csv'})
-    l10n_ae_employer_narrative = fields.Char(string="Employer Reference for WPS (Optional)")
+    def _get_export_format_selection(self):
+        selection = super()._get_export_format_selection()
+        if 'AE' in self.env.companies.country_id.mapped('code'):
+            selection.extend([
+                ('l10n_ae_wps', 'UAE WPS (.sif)'),
+                ('l10n_ae_wps_xlsx', 'UAE WPS (.xlsx)'),
+            ])
+        return selection
+
+    def _get_default_export_format(self):
+        default = super()._get_default_export_format()
+        if 'AE' in self.env.companies.country_id.mapped('code'):
+            default = 'l10n_ae_wps'
+        return default
+
+    l10n_ae_employer_narrative = fields.Char(string="Employer Reference")
 
     def _l10n_ae_get_company_wps(self, raise_if_multi=False):
         """
@@ -28,13 +45,13 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
 
     def _perform_checks(self):
         super()._perform_checks()
-        if self.export_format == 'l10n_ae_wps':
+        if self.export_format in ('l10n_ae_wps', 'l10n_ae_wps_xlsx'):
             payslips = self.payslip_ids.filtered(lambda p: p.state == "validated" and p.net_wage > 0)
             employees = payslips.employee_id
-            invalid_banks_employee_ids = employees.filtered(lambda e: not e.primary_bank_account_id.bank_id.l10n_ae_routing_code)
+            invalid_banks_employee_ids = employees.filtered(lambda e: not e.primary_bank_account_id._get_clearing_number('AE'))
             if invalid_banks_employee_ids:
                 raise UserError(_(
-                    "Missing UAE routing code for the bank account for the following employees:\n%s",
+                    "Missing Routing ID for the bank account for the following employees:\n%s",
                     invalid_banks_employee_ids.mapped('name')))
             missing_id_employee_ids = employees.filtered(lambda e: not e.identification_id)
             if missing_id_employee_ids:
@@ -45,11 +62,25 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
             company = self._l10n_ae_get_company_wps(raise_if_multi=True)
             company_bank_account = company.l10n_ae_bank_account_id
             if not company_bank_account:
-                raise UserError(_("Please set the salaries bank account in the settings"))
-            if not company_bank_account.bank_id.l10n_ae_routing_code:
+                raise UserError(self.env._("Kindly configure the salaries bank account by navigating to Payroll Configuration → Settings → UAE Payroll WPS Settings"))
+            if not company_bank_account._get_clearing_number('AE'):
                 raise UserError(_("Missing UAE routing code for the salaries bank account"))
             if not company.l10n_ae_employer_code:
-                raise UserError(_("Please set the Employer Unique ID in the settings"))
+                raise UserError(self.env._("Kindly configure the Employer Unique Id by navigating to Payroll Configuration → Settings → UAE Payroll WPS Settings"))
+
+    def _l10n_ae_wps_render_xlsx(self, create_time):
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        worksheet = workbook.add_worksheet('WPS')
+
+        records = self.payslip_ids._l10n_ae_get_wps_data()
+        footer = self._l10n_ae_get_wps_footer(create_time)
+
+        for row_idx, row in enumerate(records + footer):
+            worksheet.write_row(row_idx, 0, row)
+
+        workbook.close()
+        return BinaryBytes(output.getvalue())
 
     def _l10n_ae_wps_render_csv(self, create_time):
         csv_data = io.StringIO()
@@ -63,17 +94,20 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         csv_data.seek(0)
         generated_file = csv_data.read()
         csv_data.close()
-        return base64.encodebytes(generated_file.encode())
+        return generated_file.encode()
 
     # TODO: adjust for multiple bank accounts
     def generate_payment_report(self):
         super().generate_payment_report()
-        if self.export_format == 'l10n_ae_wps':
+        if self.export_format in ('l10n_ae_wps', 'l10n_ae_wps_xlsx'):
             now = fields.Datetime.now()
-            user_tz = pytz.timezone(self.env.context.get('tz') or self.env.user.tz or 'UTC')
-            create_time = pytz.utc.localize(now, is_dst=None).astimezone(user_tz)
-            wps_report = self._l10n_ae_wps_render_csv(create_time)
-            self._write_file(wps_report, '.sif', self._get_l10n_ae_wps_file_name(create_time))
+            user_tz = self.env.tz
+            create_time = now.replace(tzinfo=UTC).astimezone(user_tz)
+            filename = self._get_l10n_ae_wps_file_name(create_time)
+            file, ext = (self._l10n_ae_wps_render_csv(create_time), '.sif') \
+                if self.export_format == 'l10n_ae_wps' \
+                else (self._l10n_ae_wps_render_xlsx(create_time), '.xlsx')
+            self._write_file(file, ext, filename)
 
     def _get_l10n_ae_wps_file_name(self, create_time):
         self.ensure_one()
@@ -87,12 +121,12 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         return [[
             "SCR",
             (company.l10n_ae_employer_code or '').zfill(13),
-            company.l10n_ae_bank_account_id.bank_id.l10n_ae_routing_code or '',
+            (company.l10n_ae_bank_account_id._get_clearing_number('AE') or '').zfill(9),
             create_time.strftime("%Y-%m-%d") if create_time else '',
             create_time.strftime("%H%M") if create_time else '',
             self.payslip_run_id.date_start and self.payslip_run_id.date_start.strftime("%m%Y") or '',
             len(self.payslip_ids),
             self.env['hr.payslip']._l10n_ae_get_wps_formatted_amount(sum(self.payslip_ids.mapped('net_wage'))),
             "AED",
-            self.l10n_ae_employer_narrative or '',
+            self.l10n_ae_employer_narrative or '/',
         ]]

@@ -11,14 +11,15 @@
 # Jasmina Macur <jasmina@hbs.si>, 2022
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-16 13:48+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 01:49+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-master/"
 "helpdesk_timesheet/sl/>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +27,15 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: helpdesk_timesheet
+#: model:ir.module.module,description:base.module_helpdesk_timesheet
+msgid ""
+"\n"
+"- Allow to set project for Helpdesk team\n"
+"- Track timesheet for a task from a ticket\n"
+msgstr ""
 
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_project_project__ticket_count
@@ -48,12 +57,6 @@ msgstr "Analitični konto"
 #: model:ir.model,name:helpdesk_timesheet.model_account_analytic_line
 msgid "Analytic Line"
 msgstr "Analitična postavka"
-
-#. module: helpdesk_timesheet
-#. odoo-python
-#: code:addons/helpdesk_timesheet/models/helpdesk_ticket.py:0
-msgid "Confirm Time Spent"
-msgstr "Potrdite porabljen čas"
 
 #. module: helpdesk_timesheet
 #: model:ir.model,name:helpdesk_timesheet.model_helpdesk_ticket_convert_wizard
@@ -96,11 +99,6 @@ msgid "Display Name"
 msgstr "Prikazani naziv"
 
 #. module: helpdesk_timesheet
-#: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__display_timesheet_timer
-msgid "Display Timesheet Time"
-msgstr "Prikaz časa na delovnem listu"
-
-#. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_sla_report_analysis__employee_id
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket_report_analysis__employee_id
 msgid "Employee"
@@ -118,6 +116,11 @@ msgstr "Skupina za pomoč uporabnikom"
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_timesheets_analysis_report__helpdesk_ticket_id
 msgid "Helpdesk Ticket"
 msgstr "Zahtevek za pomoč uporabnikom"
+
+#. module: helpdesk_timesheet
+#: model:ir.module.module,shortdesc:base.module_helpdesk_timesheet
+msgid "Helpdesk Timesheet"
+msgstr ""
 
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_sla_report_analysis__total_hours_spent
@@ -183,6 +186,21 @@ msgid "Project"
 msgstr "Projekt"
 
 #. module: helpdesk_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
+msgid "Project &amp; Task"
+msgstr ""
+
+#. module: helpdesk_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
+msgid "Project &amp; Task/Ticket"
+msgstr ""
+
+#. module: helpdesk_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
+msgid "Project &amp; Ticket"
+msgstr ""
+
+#. module: helpdesk_timesheet
 #: model:ir.model.fields,help:helpdesk_timesheet.field_helpdesk_team__project_id
 #: model:ir.model.fields,help:helpdesk_timesheet.field_helpdesk_ticket__project_id
 msgid ""
@@ -191,6 +209,11 @@ msgid ""
 msgstr ""
 "Projekt, s katerim bodo povezani delovni listi zahtevkov te ekipe za pomoč "
 "uporabnikom."
+
+#. module: helpdesk_timesheet
+#: model:ir.module.module,summary:base.module_helpdesk_timesheet
+msgid "Project, Tasks, Timesheet"
+msgstr ""
 
 #. module: helpdesk_timesheet
 #: model_terms:ir.actions.act_window,help:helpdesk_timesheet.act_hr_timesheet_line_helpdesk
@@ -208,32 +231,22 @@ msgid "SLA Status Analysis"
 msgstr "SLA Status Analiza"
 
 #. module: helpdesk_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_timesheet
-msgid "Start"
-msgstr "Prični"
-
-#. module: helpdesk_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_timesheet
-msgid "Stop"
-msgstr "Ustavi"
-
-#. module: helpdesk_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
-msgid "Task/Ticket"
-msgstr "Naloga/Zahtevek"
-
-#. module: helpdesk_timesheet
 #: model:project.project,label_tasks:helpdesk_timesheet.helpdesk_team3_projet
 msgid "Tasks"
 msgstr "Opravila"
 
 #. module: helpdesk_timesheet
+#. odoo-python
+#: code:addons/helpdesk_timesheet/models/helpdesk_ticket.py:0
+msgid "There are no timesheets to print for this ticket"
+msgstr ""
+
+#. module: helpdesk_timesheet
 #. odoo-javascript
-#: code:addons/helpdesk_timesheet/static/src/components/grid_timesheet_timer_header/grid_timesheet_timer_header.js:0
+#: code:addons/helpdesk_timesheet/static/src/components/aw_timesheet/frequency_viewer/frequency_viewer.js:0
+#: code:addons/helpdesk_timesheet/static/src/components/timesheet_inline_form/timesheet_inline_form.xml:0
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_account_analytic_line__helpdesk_ticket_id
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.hr_timesheet_line_search_inherit_helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.report_timesheet_ticket
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.view_calendar_account_analytic_line
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.view_calendar_account_analytic_line_multi_create
 msgid "Ticket"
@@ -245,6 +258,12 @@ msgid "Ticket Analysis"
 msgstr "Analiza zahtevka"
 
 #. module: helpdesk_timesheet
+#. odoo-javascript
+#: code:addons/helpdesk_timesheet/static/src/components/timesheet_timer_inline_form/timesheet_timer_inline_form.xml:0
+msgid "Ticket Name"
+msgstr ""
+
+#. module: helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.report_timesheet_ticket
 msgid "Ticket:"
 msgstr "Zahtevek:"
@@ -254,6 +273,7 @@ msgstr "Zahtevek:"
 #: code:addons/helpdesk_timesheet/models/project_project.py:0
 #: model:ir.actions.act_window,name:helpdesk_timesheet.project_project_action_view_helpdesk_tickets
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_project_project__ticket_ids
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.edit_project_helpdesk_form_inherit
 msgid "Tickets"
 msgstr "Zahtevki"
 
@@ -287,11 +307,6 @@ msgid "Timesheet Activities"
 msgstr "Aktivnosti časovnice"
 
 #. module: helpdesk_timesheet
-#: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__timesheet_unit_amount
-msgid "Timesheet Unit Amount"
-msgstr ""
-
-#. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__use_helpdesk_timesheet
 msgid "Timesheet activated on Team"
 msgstr "Časovni list aktiviran v ekipi"
@@ -299,6 +314,7 @@ msgstr "Časovni list aktiviran v ekipi"
 #. module: helpdesk_timesheet
 #: model:ir.actions.act_window,name:helpdesk_timesheet.act_hr_timesheet_line_helpdesk
 #: model:ir.actions.report,name:helpdesk_timesheet.timesheet_report_ticket
+#: model:ir.actions.server,name:helpdesk_timesheet.action_server_print_ticket_timesheets
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__timesheet_ids
 #: model:res.groups,name:helpdesk_timesheet.group_use_helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_timesheet
@@ -310,6 +326,11 @@ msgstr "Časovnice"
 #: model:ir.model,name:helpdesk_timesheet.model_timesheets_analysis_report
 msgid "Timesheets Analysis Report"
 msgstr "Poročilo o analizi delovnega časa"
+
+#. module: helpdesk_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.report_timesheet_ticket
+msgid "Timesheets for the"
+msgstr ""
 
 #. module: helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_tree_inherit_helpdesk_timesheet
@@ -339,14 +360,15 @@ msgstr "Opozorilo"
 #. module: helpdesk_timesheet
 #. odoo-python
 #: code:addons/helpdesk_timesheet/models/account_analytic_line.py:0
+msgid "Working on Helpdesk Ticket"
+msgstr ""
+
+#. module: helpdesk_timesheet
+#. odoo-python
+#: code:addons/helpdesk_timesheet/models/account_analytic_line.py:0
 msgid ""
 "You cannot link a timesheet entry to a task and a ticket at the same time."
 msgstr "Vnosa v časovni list ni mogoče hkrati povezati z nalogo in zahtevkom."
-
-#. module: helpdesk_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.report_timesheet_ticket
-msgid "for the"
-msgstr "za"
 
 #. module: helpdesk_timesheet
 #. odoo-python
@@ -354,44 +376,8 @@ msgstr "za"
 msgid "id"
 msgstr "identifikacija"
 
-#~ msgid "Created by"
-#~ msgstr "Ustvaril"
+#~ msgid "Task/Ticket"
+#~ msgstr "Naloga/Zahtevek"
 
-#~ msgid "Created on"
-#~ msgstr "Ustvarjeno"
-
-#~ msgid "Delete"
-#~ msgstr "Izbriši"
-
-#~ msgid "Describe your activity..."
-#~ msgstr "Opišite svojo aktivnost ... "
-
-#~ msgid "Description"
-#~ msgstr "Opis"
-
-#~ msgid "Discard"
-#~ msgstr "Opusti"
-
-#~ msgid "Duration"
-#~ msgstr "Trajanje"
-
-#~ msgid "Hours Spent"
-#~ msgstr "Porabljene ure"
-
-#~ msgid "Last Updated by"
-#~ msgstr "Zadnji posodobil"
-
-#~ msgid "Last Updated on"
-#~ msgstr "Zadnjič posodobljeno"
-
-#~ msgid "Pause"
-#~ msgstr "Premor"
-
-#~ msgid "Resume"
-#~ msgstr "Nadaljevanje"
-
-#~ msgid "Save"
-#~ msgstr "Shrani"
-
-#~ msgid "Time"
-#~ msgstr "Čas"
+#~ msgid "for the"
+#~ msgstr "za"

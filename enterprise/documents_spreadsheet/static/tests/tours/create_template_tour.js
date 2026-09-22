@@ -5,7 +5,6 @@ const SHEET_NAME = "Res Partner Test Spreadsheet";
 const TEMPLATE_NAME = `${SHEET_NAME} - Template`;
 
 registry.category("web_tour.tours").add("documents_spreadsheet_create_template_tour", {
-    url: "/odoo",
     steps: () => [
         ...stepUtils.goToAppSteps("documents.menu_root", "Open Document app"),
         {
@@ -120,7 +119,7 @@ registry.category("web_tour.tours").add("documents_spreadsheet_create_template_t
             run: "click",
         },
         {
-            trigger: `tr.o_data_row:first-child td[data-tooltip="${TEMPLATE_NAME}"]`,
+            trigger: `tr.o_data_row:first-child .o_data_cell:text(${TEMPLATE_NAME})`,
             content: "Wait search to complete",
         },
         {

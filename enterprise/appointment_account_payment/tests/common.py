@@ -11,12 +11,14 @@ class AppointmentAccountPaymentCommon(AppointmentCommon, HttpCase):
     def setUpClass(cls):
         super().setUpClass()
 
+        booking_product = cls.env["appointment.type"]._get_default_booking_product('Default Booking Product')
+
         paid_apt_common_values = {
             'appointment_tz': 'UTC',
             'has_payment_step': True,
             'min_schedule_hours': 1.0,
             'max_schedule_days': 2,
-            'product_id': cls.env.ref('appointment_account_payment.default_booking_product').id,
+            'product_id': booking_product.id,
             'slot_ids': [(0, 0, {
                 'weekday': str(cls.reference_monday.isoweekday()),
                 'start_hour': 14,

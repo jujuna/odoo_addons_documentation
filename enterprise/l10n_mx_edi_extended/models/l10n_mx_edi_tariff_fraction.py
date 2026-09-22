@@ -4,7 +4,7 @@ from odoo import fields, models, api
 class L10n_Mx_EdiTariffFraction(models.Model):
     _name = 'l10n_mx_edi.tariff.fraction'
     _description = "Mexican EDI Tariff Fraction"
-    _rec_names_search = ['name', 'code']
+    _rec_names_search = ('name', 'code')
 
     code = fields.Char(
         help="Code defined in the SAT to this record.")

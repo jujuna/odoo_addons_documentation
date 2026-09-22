@@ -143,7 +143,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_mx'))]"/>
         <field name="company_id" ref="base.demo_company_mx"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="l10n_mx_hr_payroll/static/img/hr_employee_cecilia.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_mx_hr_payroll/static/img/hr_employee_cecilia.jpg"/>
     </record>
 
     <record id="user_xochilt" model="res.users">
@@ -185,92 +185,71 @@
         <field name="company_id" ref="base.demo_company_mx"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
     </record>
-
-    <record id="mx_res_bank_banorte" model="res.bank">
-        <field name="name">Banorte</field>
-        <field name="bic">MENOMXMTXXX</field>
-        <field name="street">Banorte Street</field>
-        <field name="city">Cancun</field>
-        <field name="zip">77340</field>
-        <field name="state" ref="base.state_mx_q_roo"/>
-        <field name="country" ref="base.mx"/>
-        <field name="phone">99 9911 9239</field>
-    </record>
-    <record id="mx_res_bank_banorte" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_mx_hr_payroll.mx_res_bank_banorte')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="mx_res_bank_azteca" model="res.bank">
-        <field name="name">Banco Azteca</field>
-        <field name="bic">AZTKMXMMXXX</field>
-        <field name="street">Banco Azteca Rd</field>
-        <field name="city">Morelia</field>
-        <field name="zip">58291</field>
-        <field name="state" ref="base.state_mx_mich"/>
-        <field name="country" ref="base.mx"/>
-        <field name="phone">99 9911 2897</field>
-    </record>
-    <record id="mx_res_bank_azteca" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_mx_hr_payroll.mx_res_bank_azteca')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
+    
     <record id="res_partner_bank_account_cesar" model="res.partner.bank">
-        <field name="acc_number">9914439751</field>
+        <field name="account_number">9914439751</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_mx_hr_payroll.mx_res_bank_banorte"/>
+        <field name="bank_name">SANTANDER</field>
+        <field name="clearing_number">014</field>
+        <field name="country_id" ref="base.mx"/>
         <field name="partner_id" ref="l10n_mx_hr_payroll.res_partner_cesar"/>
         <field name="company_id" ref="base.demo_company_mx"/>
-        <field name="currency_id" ref="base.MXN"/>
     </record>
 
     <record id="res_partner_bank_account_cecilia" model="res.partner.bank">
-        <field name="acc_number">014279991443975181</field>
+        <field name="account_number">014279991443975181</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_mx_hr_payroll.mx_res_bank_azteca"/>
+        <field name="bank_name">SANTANDER</field>
+        <field name="clearing_number">014</field>
+        <field name="country_id" ref="base.mx"/>
         <field name="partner_id" ref="l10n_mx_hr_payroll.res_partner_cecilia"/>
         <field name="company_id" ref="base.demo_company_mx"/>
-        <field name="currency_id" ref="base.MXN"/>
     </record>
 
+
     <record id="res_partner_bank_account_xochilt" model="res.partner.bank">
-        <field name="acc_number">014279991443975181</field>
+        <field name="account_number">014279991443975181</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_mx_hr_payroll.mx_res_bank_banorte"/>
+        <field name="bank_name">SANTANDER</field>
+        <field name="clearing_number">014</field>
+        <field name="country_id" ref="base.mx"/>
         <field name="partner_id" ref="l10n_mx_hr_payroll.res_partner_xochilt"/>
         <field name="company_id" ref="base.demo_company_mx"/>
-        <field name="currency_id" ref="base.MXN"/>
     </record>
 
     <record id="res_partner_bank_account_karla" model="res.partner.bank">
-        <field name="acc_number">014279991443975181</field>
+        <field name="account_number">014279991443975181</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_mx_hr_payroll.mx_res_bank_azteca"/>
+        <field name="bank_name">SANTANDER</field>
+        <field name="clearing_number">014</field>
+        <field name="country_id" ref="base.mx"/>
         <field name="partner_id" ref="l10n_mx_hr_payroll.res_partner_karla"/>
         <field name="company_id" ref="base.demo_company_mx"/>
-        <field name="currency_id" ref="base.MXN"/>
     </record>
 
     <record id="res_partner_bank_account_maria" model="res.partner.bank">
-        <field name="acc_number">802900850946113040</field>
+        <field name="account_number">014279991443975181</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_mx_hr_payroll.mx_res_bank_banorte"/>
+        <field name="bank_name">SANTANDER</field>
+        <field name="clearing_number">014</field>
+        <field name="country_id" ref="base.mx"/>
         <field name="partner_id" ref="l10n_mx_hr_payroll.res_partner_maria"/>
         <field name="company_id" ref="base.demo_company_mx"/>
-        <field name="currency_id" ref="base.MXN"/>
     </record>
 
     <record id="res_partner_bank_account_felix" model="res.partner.bank">
-        <field name="acc_number">072580012345678901</field>
+        <field name="account_number">014279991443975182</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_mx_hr_payroll.mx_res_bank_banorte"/>
+        <field name="bank_name">SANTANDER</field>
+        <field name="clearing_number">014</field>
+        <field name="country_id" ref="base.mx"/>
         <field name="partner_id" ref="l10n_mx_hr_payroll.res_partner_felix"/>
         <field name="company_id" ref="base.demo_company_mx"/>
-        <field name="currency_id" ref="base.MXN"/>
     </record>
 
     <record id="base.hr_employee_cesar" model="hr.employee" forcecreate="1">
         <field name="name" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_cesar')).name"/>
-        <field name="image_1920" type="base64" file="l10n_mx_hr_payroll/static/img/hr_employee_cesar.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_mx_hr_payroll/static/img/hr_employee_cesar.jpg"/>
         <field name="work_phone">99 9900 0001</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_cesar')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_mx_hr_payroll.res_partner_cesar"/>
@@ -295,29 +274,26 @@
         <field name="emergency_phone">99 9123 0924</field>
         <field name="certificate">bachelor</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Universidad Nacional Autónoma de México</field>
         <field name="marital">single</field>
-        <field name="ssnid">20008509461</field>
+        <field name="l10n_mx_ssn">20008509461</field>
         <field name="registration_number">001</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_cesar'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
-        <field name="contract_type_id" ref="hr.contract_type_permanent"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="wage">50000</field>
-        <field name="wage_type">monthly</field>
         <field name="schedule_pay">monthly</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
-        <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-5, month=1, day=1))"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-5, month=1, day=1))"/>
+        <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-5, month=1, day=1))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_mx').id)], limit=1)"/>
-        <field name="work_entry_source">calendar</field>
-        <field name="l10n_mx_holiday_bonus_rate">25</field>
+        <field name="l10n_mx_holiday_bonus_rate">0.25</field>
     </record>
 
     <record id="base.hr_employee_cecilia" model="hr.employee" forcecreate="1">
         <field name="name" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_cecilia')).name"/>
-        <field name="image_1920" type="base64" file="l10n_mx_hr_payroll/static/img/hr_employee_cecilia.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_mx_hr_payroll/static/img/hr_employee_cecilia.jpg"/>
         <field name="work_phone">99 9900 0002</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_cecilia')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="address_id" ref="l10n_mx_hr_payroll.res_partner_mx_work_address"/>
@@ -343,35 +319,32 @@
         <field name="emergency_phone">99 9798 2173</field>
         <field name="certificate">master</field>
         <field name="study_field">Business Administration</field>
-        <field name="study_school">Instituto Tecnológico Autónomo de México</field>
         <field name="marital">single</field>
-        <field name="ssnid">20804909461</field>
+        <field name="l10n_mx_ssn">20804909461</field>
         <field name="registration_number">002</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_cecilia'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
-        <field name="contract_type_id" ref="hr.contract_type_temporary"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="wage">25000</field>
+        <field name="schedule_pay">bi-weekly</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-1))"/>
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-1))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_mx').id)], limit=1)"/>
-        <field name="work_entry_source">calendar</field>
-        <field name="l10n_mx_holiday_bonus_rate">25</field>
-        <field name="schedule_pay">bi-weekly</field>
         <field name="l10n_mx_payment_period_vouchers">in_period</field>
         <field name="l10n_mx_meal_voucher_amount">3000</field>
         <field name="l10n_mx_transport_amount">2000</field>
         <field name="l10n_mx_gasoline_amount">1000</field>
         <field name="l10n_mx_savings_fund">4000</field>
-        <field name="l10n_mx_holiday_bonus_rate">25</field>
+        <field name="l10n_mx_holiday_bonus_rate">0.25</field>
     </record>
 
     <record id="base.hr_employee_xochilt" model="hr.employee" forcecreate="1">
         <field name="name" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_xochilt')).name"/>
         <field name="job_title">Software Developer</field>
-        <field name="image_1920" type="base64" file="l10n_mx_hr_payroll/static/img/hr_employee_xochilt.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_mx_hr_payroll/static/img/hr_employee_xochilt.jpg"/>
         <field name="work_phone">99 9900 0003</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_xochilt')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="address_id" ref="l10n_mx_hr_payroll.res_partner_mx_work_address"/>
@@ -397,29 +370,26 @@
         <field name="emergency_phone">55 6789 1234</field>
         <field name="certificate">bachelor</field>
         <field name="study_field">Industrial Design</field>
-        <field name="study_school">Universidad Nacional Autónoma de México</field>
         <field name="marital">single</field>
-        <field name="ssnid">20997609461</field>
+        <field name="l10n_mx_ssn">20997609461</field>
         <field name="registration_number">003</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_xochilt'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
-        <field name="contract_type_id" ref="hr.contract_type_permanent"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="wage">75000</field>
-        <field name="wage_type">monthly</field>
+        <field name="schedule_pay">bi-weekly</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-7, month=1, day=1))"/>
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-7, month=1, day=1))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_mx').id)], limit=1)"/>
-        <field name="work_entry_source">calendar</field>
-        <field name="schedule_pay">bi-weekly</field>
-        <field name="l10n_mx_holiday_bonus_rate">25</field>
+        <field name="l10n_mx_holiday_bonus_rate">0.25</field>
     </record>
 
     <record id="base.hr_employee_karla" model="hr.employee" forcecreate="1">
         <field name="name" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_karla')).name"/>
-        <field name="image_1920" type="base64" file="l10n_mx_hr_payroll/static/img/hr_employee_karla.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_mx_hr_payroll/static/img/hr_employee_karla.jpg"/>
         <field name="work_phone">99 9900 0004</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_karla')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="address_id" ref="l10n_mx_hr_payroll.res_partner_mx_work_address"/>
@@ -445,29 +415,26 @@
         <field name="emergency_phone">99 4567 9876</field>
         <field name="certificate">doctor</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Universidad de Guadalajara</field>
         <field name="marital">single</field>
-        <field name="ssnid">20926709461</field>
+        <field name="l10n_mx_ssn">20926709461</field>
         <field name="registration_number">004</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_karla'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
-        <field name="contract_type_id" ref="hr.contract_type_permanent"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="wage">30000</field>
-        <field name="wage_type">monthly</field>
+        <field name="schedule_pay">bi-weekly</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_mx').id)], limit=1)"/>
-        <field name="work_entry_source">calendar</field>
-        <field name="schedule_pay">bi-weekly</field>
-        <field name="l10n_mx_holiday_bonus_rate">25</field>
+        <field name="l10n_mx_holiday_bonus_rate">0.25</field>
     </record>
 
     <record id="base.hr_employee_maria" model="hr.employee" forcecreate="1">
         <field name="name" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_maria')).name"/>
-        <field name="image_1920" type="base64" file="l10n_mx_hr_payroll/static/img/hr_employee_maria.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_mx_hr_payroll/static/img/hr_employee_maria.jpg"/>
         <field name="work_phone">99 9900 0005</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_maria')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="address_id" ref="l10n_mx_hr_payroll.res_partner_mx_work_address"/>
@@ -493,29 +460,26 @@
         <field name="emergency_phone">99 9900 1005</field>
         <field name="certificate">graduate</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Universidad Nacional Autónoma de México</field>
         <field name="marital">single</field>
-        <field name="ssnid">12218029094</field>
+        <field name="l10n_mx_ssn">12218029094</field>
         <field name="registration_number">005</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_maria'))]"/>
         <field name="job_id" ref="hr.job_trainee"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
-        <field name="contract_type_id" ref="hr.contract_type_permanent"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="wage">8364</field>
-        <field name="wage_type">monthly</field>
+        <field name="schedule_pay">monthly</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="contract_date_start" eval="datetime(2021, 6, 28).date()"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_mx').id)], limit=1)"/>
-        <field name="work_entry_source">calendar</field>
-        <field name="schedule_pay">monthly</field>
-        <field name="l10n_mx_holiday_bonus_rate">25</field>
+        <field name="l10n_mx_holiday_bonus_rate">0.25</field>
     </record>
 
     <record id="base.hr_employee_felix" model="hr.employee" forcecreate="1">
         <field name="name" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_felix')).name"/>
-        <field name="image_1920" type="base64" file="l10n_mx_hr_payroll/static/img/hr_employee_felix.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_mx_hr_payroll/static/img/hr_employee_felix.jpg"/>
         <field name="work_phone">99 9900 0006</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_mx_hr_payroll.res_partner_felix')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="address_id" ref="l10n_mx_hr_payroll.res_partner_mx_work_address"/>
@@ -541,24 +505,21 @@
         <field name="emergency_phone">22 2574 4938</field>
         <field name="certificate">graduate</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Universidad de Guadalajara</field>
         <field name="marital">married</field>
-        <field name="ssnid">45908012345</field>
+        <field name="l10n_mx_ssn">45908012345</field>
         <field name="registration_number">006</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_mx_hr_payroll.res_partner_bank_account_felix'))]"/>
         <field name="job_id" ref="hr.job_trainee"/>
         <field name="department_id" ref="l10n_mx_hr_payroll.mx_hr_department_rd"/>
         <field name="structure_type_id" ref="l10n_mx_hr_payroll.l10n_mx_employee"/>
-        <field name="contract_type_id" ref="hr.contract_type_permanent"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
         <field name="wage">10170</field>
-        <field name="wage_type">monthly</field>
+        <field name="schedule_pay">monthly</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="contract_date_start" eval="datetime(2022, 7, 4).date()"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_mx').id)], limit=1)"/>
-        <field name="work_entry_source">calendar</field>
-        <field name="schedule_pay">monthly</field>
-        <field name="l10n_mx_holiday_bonus_rate">25</field>
+        <field name="l10n_mx_holiday_bonus_rate">0.25</field>
     </record>
 
     <record id="hr_infonavit_discount" model="l10n.mx.hr.infonavit">
@@ -582,7 +543,7 @@
         <field name="monthly_insurance">50</field>
         <field name="extra_fixed_monthly_contribution">100</field>
         <field name="infonavit_type">percentage</field>
-        <field name="percentage">20</field>
+        <field name="percentage">0.20</field>
     </record>
 
     <record id="hr_fonacot_1000" model="l10n.mx.hr.fonacot">

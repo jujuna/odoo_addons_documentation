@@ -2,13 +2,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from datetime import datetime, timedelta
 
-from odoo.tests import users
+from odoo.tests import common, tagged, users
 from odoo.tools import html2plaintext
 from odoo.addons.appointment_crm.tests.common import TestAppointmentCrmCommon
 from odoo.addons.base.tests.common import HttpCaseWithUserPortal
-from odoo.tests import common
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class AppointmentCRMTest(TestAppointmentCrmCommon):
 
     @users('user_employee')
@@ -18,8 +18,10 @@ class AppointmentCRMTest(TestAppointmentCrmCommon):
         """
         # add current user to staff users so they can read the appointment during create
         self.appointment_type_create.sudo().staff_user_ids += self.env.user
+        future_date = datetime.now() + timedelta(days=1)
         event = self._create_meetings_from_appointment_type(
-            self.appointment_type_create, self.user_sales_leads, self.contact_1
+            self.appointment_type_create, self.user_sales_leads, self.contact_1,
+            start=future_date, stop=future_date + timedelta(hours=1)
         )
 
         self.assertEqual(event.res_model_id, self.env['ir.model']._get('crm.lead'),
@@ -37,7 +39,7 @@ class AppointmentCRMTest(TestAppointmentCrmCommon):
         self.assertNotIn(self.env.user.partner_id, lead.message_partner_ids)
 
         next_activity = lead.activity_ids[0]
-        self.assertEqual(next_activity.date_deadline, event.start_date)
+        self.assertEqual(next_activity.date_deadline, event.start.date())
         self.assertEqual(next_activity.calendar_event_id, event)
 
     @users('user_employee')
@@ -45,6 +47,7 @@ class AppointmentCRMTest(TestAppointmentCrmCommon):
         """ Test the creation of a lead based on the creation of an event
         with appointment type configured to create lead
         """
+        self.env = self.env(context={**self.env.context, 'lang': 'en_US'})
         # add current user to staff users so they can read the appointment during create
         (self.appointment_type_create + self.appointment_type_nocreate).sudo().staff_user_ids += self.env.user
         events = self.env['calendar.event'].create([
@@ -63,18 +66,28 @@ class AppointmentCRMTest(TestAppointmentCrmCommon):
                 self.user_sales_leads,
                 self.contact_1,
                 start=datetime.now() + timedelta(hours=1),
-                start_date=datetime.now() + timedelta(hours=1),
                 stop=datetime.now() + timedelta(hours=2),
         )]).sudo()
+        self.cr.flush()  # send trackings
         self.assertTrue(events[0].opportunity_id)
         self.assertFalse(events[1].opportunity_id)
         self.assertTrue(events[2].opportunity_id)
+        # source opportunity tracked in meeting
+        self.assertMessageFields(
+            events[0].message_ids[1], {'tracking_values': [('opportunity_id', 'many2one', self.env['crm.lead'], events[0].opportunity_id)]},
+        )
+        self.assertMessageFields(  # no tracking here, no opportunity
+            events[1].message_ids[1], {'tracking_values': []},
+        )
+        self.assertMessageFields(
+            events[2].message_ids[1], {'tracking_values': [('opportunity_id', 'many2one', self.env['crm.lead'], events[2].opportunity_id)]},
+        )
         event1 = events[0]
         next_activity1 = event1.opportunity_id.activity_ids[0]
-        self.assertEqual(next_activity1.date_deadline, event1.start_date)
+        self.assertEqual(next_activity1.date_deadline, event1.start.date())
         event2 = events[2]
         next_activity2 = event2.opportunity_id.activity_ids[0]
-        self.assertEqual(next_activity2.date_deadline, event2.start_date)
+        self.assertEqual(next_activity2.date_deadline, event2.start.date())
 
     @users('user_employee')
     def test_create_opportunity_multi_company(self):

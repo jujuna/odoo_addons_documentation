@@ -1,17 +1,5 @@
 from odoo import models, _
-from odoo.exceptions import UserError, ValidationError
-from odoo.addons.base_iban.models.res_partner_bank import validate_iban
-
-
-def _is_iban_valid(iban):
-    if iban is None:
-        return False
-    try:
-        validate_iban(iban)
-        return True
-    except ValidationError:
-        pass
-    return False
+from odoo.exceptions import UserError
 
 
 class HrPayrollPaymentReportWizard(models.TransientModel):
@@ -23,8 +11,15 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         payslips = self.payslip_ids.filtered(lambda p: p.state == "done" and p.net_wage > 0)
         employees = payslips.employee_id
 
-        invalid_iban_employee_ids = employees.filtered(lambda e: any((ba.acc_type == 'iban' and not _is_iban_valid(ba.acc_number)) for ba in e.bank_account_ids))
+        invalid_iban_employee_ids = employees.filtered(lambda e: any((ba.account_type == 'iban' and not self.env['res.partner.bank']._is_iban_valid(ba.account_number)) for ba in e.bank_account_ids))
         if invalid_iban_employee_ids:
             raise UserError(_(
                 'Invalid IBAN for the following employees:\n%s',
                 '\n'.join(invalid_iban_employee_ids.mapped('name'))))
+
+        invalid_iban_attachment_ids = payslips.salary_attachment_ids.filtered(lambda att: att.beneficiary_bank_account_id
+                                                                            and not self.env['res.partner.bank']._is_iban_valid(att.beneficiary_bank_account_id.account_number))
+        if invalid_iban_attachment_ids:
+            raise UserError(self.env._(
+                'Invalid IBAN for the following Beneficiaries:\n%s',
+                '\n'.join(invalid_iban_attachment_ids.mapped('beneficiary_bank_account_id'))))

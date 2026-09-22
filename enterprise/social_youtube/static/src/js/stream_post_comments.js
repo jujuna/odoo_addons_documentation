@@ -4,14 +4,18 @@ import { StreamPostCommentsReplyYoutube } from './stream_post_comments_reply';
 
 import { rpc } from "@web/core/network/rpc";
 
-import { onWillStart } from "@odoo/owl";
+import { onWillStart, t, useProps } from "@odoo/owl";
 
 export class StreamPostCommentsYoutube extends StreamPostComments {
+    youtubeProps = useProps({
+        commentsDisabled: t.any(),
+        nextPageToken: t.any(),
+    });
 
     setup() {
         super.setup();
 
-        this.nextPageToken = this.props.nextPageToken;
+        this.nextPageToken = this.youtubeProps.nextPageToken;
         this.commentsCount = this.props.commentsCount;
         this.state.showLoadMoreComments = !!this.nextPageToken;
 
@@ -48,6 +52,6 @@ export class StreamPostCommentsYoutube extends StreamPostComments {
     }
 
     get commentsDisabled() {
-        return this.props.commentsDisabled;
+        return this.youtubeProps.commentsDisabled;
     }
 }

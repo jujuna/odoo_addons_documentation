@@ -18,10 +18,9 @@ class CalendarEvent(models.Model):
         """
         events_w_google_url = self.filtered(lambda event: event.videocall_source == 'google_meet')
         for event in events_w_google_url:
-            if event.user_id.is_google_calendar_synced():
-                if not event.access_token:
-                    event.access_token = uuid.uuid4().hex
-                event.videocall_redirection = f"{event.get_base_url()}/calendar/videocall/{event.access_token}"
+            if event.user_id and event.user_id.is_google_calendar_synced():
+                access_token = event._calendar_event_ensure_token()
+                event.videocall_redirection = f"{event.get_base_url()}/calendar/videocall/{access_token}"
             else:
                 event.videocall_redirection = False
         super(CalendarEvent, self - events_w_google_url)._compute_videocall_redirection()

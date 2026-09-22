@@ -4,6 +4,9 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models
 from odoo.tools.misc import clean_context
+from odoo.tools.translate import LazyTranslate
+
+_lt = LazyTranslate(__name__)
 
 
 class DocumentsRequest_Wizard(models.TransientModel):
@@ -51,13 +54,15 @@ class DocumentsRequest_Wizard(models.TransientModel):
         self.ensure_one()
         document = self.env['documents.document'].create({
             'name': self.name,
+            'type': 'request',
             'folder_id': self.folder_id.id,
             'tag_ids': [(6, 0, self.tag_ids.ids if self.tag_ids else [])],
             'partner_id': self.partner_id.id if self.partner_id else False,
             'requestee_partner_id': self.requestee_id.id,
-            'res_model': self.res_model,
-            'res_id': self.res_id,
-        })
+        } | (
+            # Avoid to force res_model, res_id as it can be inherited from the folder where it is uploaded
+            {'res_model': self.res_model or False, 'res_id': self.res_id} if self.res_model or self.res_id else {}
+        ))
 
         activity_vals = {
             'user_id': self.requestee_id.user_ids[0].id if self.requestee_id.user_ids else self.env.user.id,
@@ -88,6 +93,11 @@ class DocumentsRequest_Wizard(models.TransientModel):
             })
         request_template = self.env.ref('documents.mail_template_document_request', raise_if_not_found=False)
         if request_template:
-            document.with_context(clean_context(self.env.context)).message_mail_with_source(request_template)
-
+            document.with_context({
+                **clean_context(self.env.context),
+                'email_notification_force_header': True,
+                'email_notification_force_footer': True,
+                'email_notification_subtitles': [_lt("Document Request:"), self.name or ''],
+                'email_notification_subtitles_highlight_index': 1,
+            }).message_mail_with_source(request_template, email_layout_xmlid='mail.mail_notification_layout')
         return document

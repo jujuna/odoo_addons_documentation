@@ -2,7 +2,6 @@ import BarcodeModel from "@stock_barcode/models/barcode_model";
 
 import { patch } from "@web/core/utils/patch";
 import { rpc } from "@web/core/network/rpc";
-import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 
 patch(BarcodeModel.prototype, {
@@ -12,68 +11,30 @@ patch(BarcodeModel.prototype, {
      *
      * @override
      */
-    async noProductToast(barcodeData) {
-        // Applicable for the group ["base.group_system"]
-        // Applicable for models ["stock.picking", "stock.quant"]
-        // Applicable for the picking operation ["receipts"]
-        const canManageBarcodelookup = await this.groups.group_user_admin;
-        if (
-            canManageBarcodelookup &&
-            this.isValidForBarcodeLookup &&
-            ["ean8", "ean13", "upca"].some((encoding) =>
-                this.parser.check_encoding(barcodeData.barcode, encoding)
-            )
-        ) {
-            this.trigger("playSound", "error");
-            if (!barcodeData.error) {
-                if (this.groups.group_tracking_lot) {
-                    barcodeData.error = _t(
-                        "This product doesn't exist. Either scan a package available at the picking location or create a new product."
-                    );
-                } else {
-                    barcodeData.error = _t("This product doesn't exist.");
-                }
-            }
-            return this.notification(barcodeData.error, {
-                type: "danger",
-                buttons: [
-                    {
-                        name: _t("Create New Product"),
-                        primary: true,
-                        onClick: () => {
-                            const notifications = registry
-                                .category("main_components")
-                                .get("NotificationContainer").props.notifications;
-                            for (const id in notifications) {
-                                const notification = notifications[id];
-                                if (notification.onClose) {
-                                    notification.onClose();
-                                }
-                                delete notifications[id];
-                            }
-                            return this.openProductForm(barcodeData);
-                        },
-                    },
-                ],
-            });
-        }
-        return super.noProductToast(barcodeData);
+    async _noProductToast(barcodeData) {
+        const barcodeDataToPass = {
+            barcode: barcodeData.barcode,
+            content: barcodeData.error,
+            callback: async () => {
+                barcodeData && (await this.createNewProductLine(barcodeData));
+            },
+        };
+        this.barcodeService.bus.trigger("create_product", { barcodeData: barcodeDataToPass });
     },
 
-    async openProductForm(barcodeData = false) {
+    // method for the "Create Product" button in settings
+    async openProductForm() {
         return await this.action.doAction(
             "stock_barcode_barcodelookup.stock_barcodelookup_product_product_action",
             {
                 additionalContext: {
-                    default_barcode: barcodeData?.barcode,
                     default_is_storable: true,
                     dialog_size: "medium",
                     skip_barcode_check: true,
                 },
                 props: {
-                    onSave: async (record) => {
+                    onSave: async (_record) => {
                         this.notification(_t("Product created successfully"), { type: "success" });
-                        barcodeData ? await this.createNewProductLine(barcodeData) : false;
                         return this.action.doAction({ type: "ir.actions.act_window_close" });
                     },
                 },

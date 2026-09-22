@@ -22,17 +22,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 17:55+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Catalan <https://translate.odoo.com/projects/odoo-19/quality/"
-"ca/>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-17 22:59+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Catalan <https://translate.odoo.com/projects/odoo-master/"
+"quality/ca/>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: quality
+#: model:ir.module.module,description:base.module_quality
+msgid ""
+"\n"
+"Quality Base\n"
+"===============\n"
+"* Define quality points that will generate quality checks on pickings,\n"
+"  manufacturing orders or work orders (quality_mrp)\n"
+"* Quality alerts can be created independently or related to quality checks\n"
+"* Possibility to add a measure to the quality check with a min/max "
+"tolerance\n"
+"* Define your stages for the quality alerts\n"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -83,6 +97,12 @@ msgstr "Activitats"
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Activitat d'excepció de decoració"
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_alert__activity_plans_ids
+#: model:ir.model.fields,field_description:quality.field_quality_check__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_state
@@ -173,6 +193,21 @@ msgstr "Model amb pseudònim"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "All Categories"
+msgstr ""
+
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "All Products"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_point__apply_to
+msgid "Apply to"
+msgstr ""
+
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "Archived"
 msgstr "Arxivat"
 
@@ -183,6 +218,27 @@ msgstr "Arxivat"
 #: model:ir.model.fields,field_description:quality.field_quality_point__message_attachment_count
 msgid "Attachment Count"
 msgstr "Nombre d'adjunts"
+
+#. module: quality
+#: model:ir.module.module,summary:base.module_quality
+msgid "Basic Feature for Quality"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_check__batch_id
+msgid "Batch Transfer"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields,help:quality.field_quality_check__batch_id
+msgid "Batch associated to this transfer"
+msgstr ""
+
+#. module: quality
+#: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__categories
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "Categories"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__reason
@@ -330,11 +386,6 @@ msgid "Email Alias"
 msgstr "Àlies de correu electrònic"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__email_cc
-msgid "Email cc"
-msgstr "cc de correu electrònic"
-
-#. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_domain
 msgid "Email domain e.g. 'example.com' in 'odoo@example.com'"
 msgstr "Domini de correu electrònic p.ex. 'example.com' a 'odoo@example.com'"
@@ -374,12 +425,6 @@ msgstr "Seguidors"
 #: model:ir.model.fields,field_description:quality.field_quality_point__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Seguidors (Partners)"
-
-#. module: quality
-#: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
-#: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Icona Font Awesome p.e. fa-tasks"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
@@ -526,10 +571,6 @@ msgstr "Detecció d'entrada basada en la part local"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__lot_ids
-msgid "Lot"
-msgstr "Lot"
-
-#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__lot_ids
 msgid "Lot/Serial"
 msgstr "Lot/núm. de sèrie"
@@ -538,6 +579,12 @@ msgstr "Lot/núm. de sèrie"
 #: model:ir.model.fields.selection,name:quality.selection__quality_alert__priority__1
 msgid "Low"
 msgstr "Baixa"
+
+#. module: quality
+#: model:ir.model.fields,help:quality.field_quality_alert__activity_type_icon
+#: model:ir.model.fields,help:quality.field_quality_check__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_has_error
@@ -610,6 +657,11 @@ msgstr "Resum de la següent activitat"
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_type_id
 msgid "Next Activity Type"
 msgstr "Tipus de la següent activitat"
+
+#. module: quality
+#: model:res.groups.privilege,placeholder:quality.res_groups_privilege_quality
+msgid "No"
+msgstr ""
 
 #. module: quality
 #. odoo-python
@@ -769,7 +821,7 @@ msgid "Priority"
 msgstr "Prioritat"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__product_tmpl_id
+#: model:ir.model.fields,field_description:quality.field_quality_alert__product_id
 #: model:ir.model.fields,field_description:quality.field_quality_check__product_id
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
 msgid "Product"
@@ -781,12 +833,8 @@ msgid "Product Categories"
 msgstr "Categories de producte"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__product_id
-msgid "Product Variant"
-msgstr "Variant de producte"
-
-#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_point__product_ids
+#: model:ir.model.fields.selection,name:quality.selection__quality_point__apply_to__products
 msgid "Products"
 msgstr "Productes"
 
@@ -810,6 +858,11 @@ msgstr "Etapa d'alerta de qualitat"
 #: model:ir.model,name:quality.model_quality_alert_team
 msgid "Quality Alert Team"
 msgstr "Equip d'alerta de qualitat"
+
+#. module: quality
+#: model:ir.module.module,shortdesc:base.module_quality
+msgid "Quality Base"
+msgstr ""
 
 #. module: quality
 #: model:ir.model,name:quality.model_quality_check
@@ -978,6 +1031,13 @@ msgid "Teams"
 msgstr "Equips"
 
 #. module: quality
+#: model:ir.model.fields,help:quality.field_quality_alert__product_tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
+
+#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__test_type
 #: model:ir.model.fields,field_description:quality.field_quality_point__test_type
 #: model:ir.model.fields,field_description:quality.field_quality_point_test_type__technical_name
@@ -1038,6 +1098,11 @@ msgid "Today Activities"
 msgstr "Activitats d'avui"
 
 #. module: quality
+#: model:ir.model.fields,field_description:quality.field_quality_alert__product_tracking
+msgid "Tracking Method"
+msgstr ""
+
+#. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_tree
 msgid "Type"
@@ -1070,22 +1135,6 @@ msgid "Very High"
 msgstr "Molt alta"
 
 #. module: quality
-#: model:ir.model.fields,field_description:quality.field_quality_alert__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_alert_team__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_check__website_message_ids
-#: model:ir.model.fields,field_description:quality.field_quality_point__website_message_ids
-msgid "Website Messages"
-msgstr "Missatges del lloc web"
-
-#. module: quality
-#: model:ir.model.fields,help:quality.field_quality_alert__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_alert_team__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_check__website_message_ids
-#: model:ir.model.fields,help:quality.field_quality_point__website_message_ids
-msgid "Website communication history"
-msgstr "Historial de comunicacions del lloc web"
-
-#. module: quality
 #: model:quality.reason,name:quality.reason_wo
 msgid "Work Operation"
 msgstr "Operació de treball"
@@ -1100,43 +1149,24 @@ msgstr "Fallida del centre de treball"
 msgid "active"
 msgstr "actiu"
 
-#~ msgid "Alias domain"
-#~ msgstr "Pseudònim del domini"
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "e.g. Check Dimensions"
+msgstr ""
 
-#~ msgid "Close"
-#~ msgstr "Tancar"
+#. module: quality
+#: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
+msgid "e.g. Quarantine, Second Inspection"
+msgstr ""
 
-#~ msgid "Group By"
-#~ msgstr "Agrupar per"
+#~ msgid "Lot"
+#~ msgstr "Lot"
 
-#~ msgid ""
-#~ "No quality team found for this company.\n"
-#~ "Please go to configuration and create one first."
-#~ msgstr ""
-#~ "No s'ha trobat cap equip de qualitat per a aquesta empresa.\n"
-#~ "Si us plau, vagi a configuració i creu un primer."
+#~ msgid "Product Variant"
+#~ msgstr "Variant de producte"
 
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Nombre de missatges que requereixen una acció"
+#~ msgid "Website Messages"
+#~ msgstr "Missatges del lloc web"
 
-#~ msgid "Owner"
-#~ msgstr "Propietari"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr ""
-#~ "Mostra tots els registres en que la data de següent acció és abans d'avui"
-
-#~ msgid ""
-#~ "The owner of records created upon receiving emails on this alias. If this "
-#~ "field is not set the system will attempt to find the right owner based on "
-#~ "the sender (From) address, or will use the Administrator account if no "
-#~ "system user is found for that address."
-#~ msgstr ""
-#~ "El propietari dels registres creats al rebre correus electrònics amb "
-#~ "aquest pseudònim. Si aquest camp no esta definit, el sistema intentarà de "
-#~ "trobar el propietari correcte basat amb l'adreça de l'emissor (De), o "
-#~ "utilitzarà la compta d'administrador si no es troba un usuari per aquesta "
-#~ "adreça."
-
-#~ msgid "Viewer"
-#~ msgstr "Visor"
+#~ msgid "Website communication history"
+#~ msgstr "Historial de comunicacions del lloc web"

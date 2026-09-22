@@ -15,7 +15,6 @@ const cogMenuRegistry = registry.category("cogMenu");
 export class DocumentImportCogMenu extends Component {
     static template = "sign.import.documents.DocumentImportCogMenu";
     static components = { DropdownItem };
-    static props = {};
 
     setup() {
         this.action = useService("action");
@@ -38,16 +37,16 @@ cogMenuRegistry.add(
     {
         Component: DocumentImportCogMenu,
         groupNumber: 15,
-        isDisplayed: async ({ config, isSmall, searchModel }) => {
-            const hasGroupDocumentsUser = await user.hasGroup("documents.group_documents_user");
+        isDisplayed: async ({ config, searchModel }) => {
+            const ui = useService("ui");
             const isSignModel = ["sign.request", "sign.template"].includes(searchModel.resModel);
             const isActionWindow = config.actionType === "ir.actions.act_window";
             return (
-                !isSmall &&
+                !ui.isSmall &&
                 isSignModel &&
-                hasGroupDocumentsUser &&
                 isActionWindow &&
-                config.viewType !== "form"
+                config.viewType !== "form" &&
+                user.hasGroup("documents.group_documents_user")
             );
         },
     },

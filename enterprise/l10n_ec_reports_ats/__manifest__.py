@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Ecuador - ATS Report',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'author': 'TRESCLOUD',
     'description': """
@@ -16,7 +14,6 @@
     'data': [
         'data/ats_report.xml',
     ],
-    'installable': True,
     'auto_install': True,
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
 }

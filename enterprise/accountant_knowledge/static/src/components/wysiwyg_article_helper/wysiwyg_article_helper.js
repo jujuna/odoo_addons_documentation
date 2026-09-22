@@ -8,11 +8,14 @@ patch(WysiwygArticleHelper.prototype, {
         if (!this.props.record.data.inherited_audit_report_id?.records.length) {
             return await super.onLoadTemplateBtnClick();
         }
-        const templates = await this.orm.call(
-            "knowledge.article",
-            "get_suggested_templates",
-            [[this.props.record.data.parent_id.id]]
-        );
+        const templates =
+            (!this.props.record.data.parent_id)
+                ? []
+                : await this.orm.call(
+                    "knowledge.article",
+                    "get_suggested_templates",
+                    [[this.props.record.data.parent_id.id]]
+                );
         this.dialogService.add(ArticleAnnexePickerDialog, {
             articles: [],
             templates: templates,

@@ -22,9 +22,9 @@ class TestAppointmentEventNotifications(AppointmentCommon):
         """ Check that appointment create a mail for each attendee in the invitation
             and the cancellation process. If it's not an appointment the current user is not notified
             for the invitation. No mail is sent for basic event for the cancellation because it's only
-            sent for appointment when the event is archive (c.f. CalendarEvent._track_template() in appointment module)
+            sent for appointment when the event is archive (c.f. CalendarEvent._track_template_parameters() in appointment module)
         """
-        self.env['ir.config_parameter'].sudo().set_param('mail.mail_force_send_limit', None)
+        self.env['ir.config_parameter'].sudo().set_int('mail.mail_force_send_limit', 100)
         all_recipients = self.staff_user_bxls.partner_id + self.user_portal.partner_id
         for appointment_type_id, invite_recipients, nb_invitation, cancel_recipients, nb_cancellation in [
             (self.apt_type_bxls_2days.id, all_recipients, 2, all_recipients, 2),

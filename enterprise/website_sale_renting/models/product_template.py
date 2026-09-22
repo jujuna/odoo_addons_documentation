@@ -1,309 +1,185 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime
-from math import ceil, floor
+from datetime import timedelta
+from zoneinfo import ZoneInfo
 
-from dateutil.relativedelta import relativedelta
-from pytz import UTC, timezone
-
-from odoo import _, api, fields, models
+from odoo import models
 from odoo.exceptions import UserError
 from odoo.http import request
-from odoo.tools import format_amount
+from odoo.tools import float_compare
 
-from odoo.addons.sale_renting.models.product_pricing import PERIOD_RATIO
+from odoo.addons.sale_renting.const import SECONDS_IN_PERIODICITY
 
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = "product.template"
 
-    def _get_additionnal_combination_info(self, product_or_template, quantity, uom, date, website):
-        """Override to add the information about renting for rental products
+    def _get_default_end_delta(self):
+        """Override to extend the default rental duration, so that it already
+        satisfies the product's minimum quantity for a single unit.
+        """
+        delta = super()._get_default_end_delta()
+        if self.rent_periodicity and self.minimum_quantity > 1:
+            delta += (self.minimum_quantity - 1) * timedelta(
+                seconds=SECONDS_IN_PERIODICITY[self.rent_periodicity]
+            )
+        return delta
 
-        If the product is rent_ok, this override adds the following information about the rental:
-            - is_rental: Whether combination is rental,
+    def _get_additional_combination_info(
+        self, product_or_template, quantity, uom, website, pricelist, fiscal_position, **kwargs
+    ):
+        """Override to add the information about renting for rental products.
+
+        If the product is rentable, this override adds the following information about the rental:
+            - is_rental: Whether a combination is rental,
             - rental_duration: The duration of the first defined product pricing on this product
             - rental_unit: The unit of the first defined product pricing on this product
             - default_start_date: If no pickup nor rental date in context, the start_date of the
                                    first renting sale order line in the cart;
             - default_end_date: If no pickup nor rental date in context, the end_date of the
                                    first renting sale order line in the cart;
-            - current_rental_duration: If no pickup nor rental date in context, see rental_duration,
-                                       otherwise, the duration between pickup and rental date in the
-                                       current_rental_unit unit.
-            - current_rental_unit: If no pickup nor rental date in context, see rental_unit,
-                                   otherwise the unit of the best pricing for the renting between
-                                   pickup and rental date.
-            - current_rental_price: If no pickup nor rental date in context, see price,
-                                    otherwise the price of the best pricing for the renting between
-                                    pickup and rental date.
+            - base_unit_price: 0; Disabled.
+            - base_unit_name: False; Disabled.
         """
-        res = super()._get_additionnal_combination_info(product_or_template, quantity, uom, date, website)
-
-        if not product_or_template.rent_ok:
-            return res
-
-        res['list_price'] = res['price']  # No pricelist discount for rental prices
-        currency = website.currency_id.with_context(self.env.context)
-        pricelist = request.pricelist.with_context(self.env.context)
-        ProductPricing = self.env['product.pricing']
-
-        pricing = ProductPricing._get_first_suitable_pricing(product_or_template, pricelist)
-        if not pricing:
-            return res
-
-        # Compute best pricing rule or set default
-        order_sudo = request and request.cart or self.env['sale.order'].sudo()
-        start_date = order_sudo.rental_start_date or self.env.context.get('start_date')
-        end_date = order_sudo.rental_return_date or self.env.context.get('end_date')
-        if start_date and end_date:
-            current_pricing = product_or_template._get_best_pricing_rule(
-                start_date=start_date,
-                end_date=end_date,
-                pricelist=pricelist,
-                currency=currency,
-            )
-            current_unit = current_pricing.recurrence_id.unit
-            current_duration = ProductPricing._compute_duration_vals(
-                start_date, end_date
-            )[current_unit]
-            # Ensure minimum duration is 24 (hours) to ensure the return date is start date + 1
-            # Needed when the start date / end date are taken from the cart
-            if current_pricing.recurrence_id.overnight:
-                current_duration = max(current_duration, 24)
-        else:
-            current_unit = pricing.recurrence_id.unit
-            current_duration = pricing.recurrence_id.duration
-            current_pricing = pricing
-
-        # Compute current price & set default times
-        pickup_time = current_pricing.recurrence_id.pickup_time
-        return_time = current_pricing.recurrence_id.return_time
-        start_date, end_date = self._get_default_renting_dates(
-            start_date, end_date, current_duration, current_unit, pickup_time, return_time
-        )
-
-        # Here we don't add the current_attributes_price_extra nor the
-        # no_variant_attributes_price_extra to the context since those prices are not added
-        # in the context of rental.
-        current_price = pricelist._get_product_price(
-            product=product_or_template,
-            quantity=quantity,
-            currency=currency,
-            start_date=start_date,
-            end_date=end_date,
-        )
-
-        ratio = ceil(current_duration) / pricing.recurrence_id.duration if pricing.recurrence_id.duration else 1
-        if current_unit != pricing.recurrence_id.unit:
-            ratio *= PERIOD_RATIO[current_unit] / PERIOD_RATIO[pricing.recurrence_id.unit]
-
-        # apply taxes
-        product_taxes = res['product_taxes']
-        if product_taxes:
-            current_price = self.env['product.template']._apply_taxes_to_price(
-                current_price, currency, product_taxes, res['taxes'], product_or_template,
+        if not self.rent_periodicity:
+            return super()._get_additional_combination_info(
+                product_or_template, quantity, uom, website, pricelist, fiscal_position, **kwargs
             )
 
-        suitable_pricings = ProductPricing._get_suitable_pricings(product_or_template, pricelist)
+        order_sudo = (request and request.cart) or self.env["sale.order"].sudo()
 
-        # If there are multiple pricings with the same recurrence, we only keep the cheapest ones
-        best_pricings = {}
-        for p in suitable_pricings:
-            if p.recurrence_id not in best_pricings:
-                best_pricings[p.recurrence_id] = p
-            elif best_pricings[p.recurrence_id].price > p.price:
-                best_pricings[p.recurrence_id] = p
-
-        suitable_pricings = best_pricings.values()
-        def _pricing_price(pricing):
-            if product_taxes:
-                price = self.env['product.template']._apply_taxes_to_price(
-                    pricing.price, currency, product_taxes, res['taxes'], product_or_template
-                )
-            else:
-                price = pricing.price
-            if pricing.currency_id == currency:
-                return price
-            return pricing.currency_id._convert(
-                from_amount=price,
-                to_currency=currency,
-                company=self.env.company,
-                date=date,
-            )
-        pricing_table = [
-            (p.name, format_amount(self.env, _pricing_price(p), currency))
-            for p in suitable_pricings
-        ]
-        recurrence = pricing.recurrence_id
-        current_duration, current_rental_unit = (
-            current_pricing.recurrence_id._get_converted_duration_and_label(current_duration)
+        # Compute the default renting period of the product page (cart > context > defaults).
+        tzinfo = ZoneInfo(website.tz)
+        start_date, end_date = order_sudo._get_default_rental_dates(
+            product_or_template,
+            start_date=kwargs.get("start_date"),
+            end_date=kwargs.get("end_date"),
+            tzinfo=tzinfo,
         )
+
+        if start_date and end_date and start_date >= end_date:
+            raise UserError(
+                self.env._("Please choose a return date that is after the pickup date.")
+            )
+
+        res = super(
+            ProductTemplate, self.with_context(start_date=start_date, end_date=end_date)
+        )._get_additional_combination_info(
+            product_or_template, quantity, uom, website, pricelist, fiscal_position, **kwargs
+        )
+        duration = self._get_number_of_periods(start_date, end_date)
+
+        # The quantity stepper always starts at 1 for rental products: the minimum quantity
+        # constraint is enforced through the rental duration instead.
+        minimum_rental_qty = res.pop("minimum_qty", 1)
+        res.pop("minimum_qty_reached_message", None)
 
         return {
             **res,
-            'is_rental': True,
-            'rental_duration': recurrence.duration,
-            'rental_duration_unit': recurrence.unit,
-            'rental_unit': recurrence._get_unit_label(recurrence.duration),
-            'overnight_period': recurrence.overnight,
-            'default_start_date': start_date,
-            'default_end_date': end_date,
-            'current_rental_duration': ceil(current_duration),
-            'current_rental_unit': current_rental_unit,
-            'current_rental_price': current_price,
-            'current_rental_price_per_unit': current_price / (ratio or 1),
-            'base_unit_price': 0,
-            'base_unit_name': False,
-            'pricing_table': pricing_table,
-            'prevent_zero_price_sale': website.prevent_zero_price_sale and currency.is_zero(
-                current_price,
-            ),
+            "is_rental": bool(product_or_template.rent_periodicity),
+            "minimum_rental_qty": minimum_rental_qty,
+            "rental_duration": duration,
+            "rental_unit": self._get_rent_periodicity_label(duration),
+            "default_start_date": start_date,
+            "default_end_date": end_date,
+            #  Disable base unit prices logic for rental products
+            "base_unit_price": 0,
+            "base_unit_name": False,
         }
 
-    @api.model
-    def _get_default_renting_dates(self, start_date, end_date, duration, unit, pickup_time, return_time):
-        """ Get default renting dates to help user
+    def _get_price_before_discount(
+        self, pricelist_item, pricelist_price, product_or_template, quantity, uom, currency
+    ):
+        """Override of `website_sale` to work with rental products.
 
-        :param datetime start_date: a start_date which is directly returned if defined
-        :param datetime end_date: a end_date which is directly returned if defined
-        :param int duration: the duration expressed in int, in the unit given
-        :param string unit: The duration unit, which can be 'hour', 'day', 'week' or 'month'
-        :param float pickup_time: The pickup time in hours (0-23.99)
-        :param float return_time: The return time in hours (0-23.99)
+        Rental prices are computed by aggregating every pricelist rule applicable across the
+        rental period (see ``ProductPricelist._compute_rental_price_rule``), so no single rule
+        can represent the whole price. Because of that,  ``pricelist_item._show_discount_on_shop()``
+        always returns ``False`` for an empty recordset, the generic ``_get_price_before_discount``
+        can never detect a discount for rental products, hence this override.
         """
-        if start_date and end_date and start_date >= end_date:
-            raise UserError(_("Please choose a return date that is after the pickup date."))
-
-        if start_date or end_date:
-            return start_date, end_date
-
-        default_start_dt = self._get_default_start_date(pickup_time)
-        if unit == 'hour':
-            default_end_dt = self._get_default_end_date(
-                default_start_dt,
-                duration,
-                unit,
-                return_time,
+        if not self.rent_periodicity:
+            return super()._get_price_before_discount(
+                pricelist_item, pricelist_price, product_or_template, quantity, uom, currency
             )
-        else:
-            # If unit in day, week, month, take into account the entire day.
-            # 21st + 1 day --> from 21st 00:00:00 to 22nd 23:59:59
-            default_start_dt = datetime.combine(default_start_dt.date(), datetime.min.time())
-            # remove a second to avoid adding a day (from date point of view)
-            default_end_dt = self._get_default_end_date(
-                default_start_dt + relativedelta(seconds=-1),
-                duration,
-                unit,
-                return_time,
-            )
-            # Consider the timezone if frontend request
-            # Return the UTC value according to the client
-            # because the frontend will convert values according to its timezone
-            # (and without conversion, we risk changing day).
-            if request and request.is_frontend and request.cookies.get('tz'):
-                client_tz = timezone(request.cookies['tz'])
-                default_start_dt = client_tz.localize(default_start_dt).astimezone(UTC)
-                default_end_dt = client_tz.localize(default_end_dt).astimezone(UTC)
-        return default_start_dt, default_end_dt
-
-    @api.model
-    def _get_default_start_date(self, pickup_time):
-        """ Get the default pickup date and make it extensible """
-        first_date = self._get_first_potential_date(
-            fields.Datetime.now() + relativedelta(days=1, hours=1, minute=0, second=0, microsecond=0)
+        return self.env["product.pricelist"]._get_product_price(
+            product_or_template, quantity=quantity, uom=uom, currency=currency
         )
-        if pickup_time:
-            website_tz = timezone(request.website.tz)
-            # convert first_date in website TZ before replacing the hours
-            pickup_hour = floor(pickup_time)
-            first_date_website_tz = website_tz.localize(first_date).replace(
-                hour=pickup_hour,
-                minute=round((pickup_time - pickup_hour) * 60),
-            )
-            # send it back in UTC (naive)
-            first_date = first_date_website_tz.astimezone(UTC).replace(tzinfo=None)
-        return first_date
-
-    @api.model
-    def _get_default_end_date(self, start_date, duration, unit, return_time):
-        """ Get the default return date based on pickup date and duration
-
-        :param datetime start_date: the default start_date
-        :param int duration: the duration expressed in int, in the unit given
-        :param string unit: The duration unit, which can be 'hour', 'day', 'week' or 'month'
-        """
-        return_date = self._get_first_potential_date(max(
-            start_date + relativedelta(**{f'{unit}s': duration}),
-            start_date + self.env.company._get_minimal_rental_duration(),
-        ))
-        if return_time:
-            website_tz = timezone(request.website.tz)
-            # convert return_date in website TZ before replacing the hours
-            return_hour = floor(return_time)
-            return_date_website_tz = return_date.astimezone(website_tz).replace(
-                hour=return_hour,
-                minute=round((return_time - return_hour) * 60),
-            )
-            # send it back in UTC (naive)
-            return_date = return_date_website_tz.astimezone(UTC).replace(tzinfo=None)
-        return return_date
-
-    @api.model
-    def _get_first_potential_date(self, date):
-        """ Get the first potential date which respects company unavailability days settings
-        """
-        days_forbidden = self.env.company._get_renting_forbidden_days()
-        weekday = date.isoweekday()
-        for i in range(7):
-            if ((weekday + i) % 7 or 7) not in days_forbidden:
-                break
-        return date + relativedelta(days=i)
 
     def _search_render_results_prices(self, mapping, combination_info):
-        if not combination_info.get('is_rental'):
+        if not combination_info.get("is_rental"):
             return super()._search_render_results_prices(mapping, combination_info)
 
-        duration = combination_info['rental_duration']
-        unit = combination_info['rental_unit']
-        if combination_info['overnight_period']:
-            duration = combination_info['current_rental_duration']
-            unit = combination_info['current_rental_unit']
+        duration = combination_info["rental_duration"]
+        unit = combination_info["rental_unit"]
 
-        return self.env['ir.ui.view']._render_template(
-            'website_sale_renting.rental_search_result_price',
+        website = self.env.website
+        return website._render_template(
+            "website_sale_renting.rental_search_result_price",
             values={
-                'currency': mapping['detail']['display_currency'],
-                'price': combination_info['price'],
-                'duration': duration,
-                'unit': unit,
-            }
-        ), None
+                "currency": mapping["search_item_metadata"]["display_currency"],
+                "price": combination_info["price"],
+                "duration": duration,
+                "unit": unit,
+            },
+        )
 
-    def _get_sales_prices(self, website):
-        prices = super()._get_sales_prices(website)
-        pricelist = request.pricelist
-
+    def _get_sales_prices(self, pricelist_sudo, fiscal_position_sudo, website):
+        prices = super()._get_sales_prices(pricelist_sudo, fiscal_position_sudo, website)
+        start_date = self.env.context.get("start_date")
+        end_date = self.env.context.get("end_date")
         for template in self:
-            if not template.rent_ok:
+            if not template.rent_periodicity:
                 continue
-            pricing = self.env['product.pricing']._get_first_suitable_pricing(template, pricelist)
-            if pricing:
-                recurrence = pricing.recurrence_id
-                duration, unit = recurrence._get_converted_duration_and_label(recurrence.duration)
-                prices[template.id]['rental_duration'] = duration
-                prices[template.id]['rental_unit'] = unit
-            else:
-                prices[template.id]['rental_duration'] = 0
-                prices[template.id]['rental_unit'] = False
+
+            duration = 1
+            if start_date and end_date:
+                duration = template._get_number_of_periods(start_date, end_date)
+
+            prices[template.id]["rental_duration"] = duration
+            prices[template.id]["rental_unit"] = template._get_rent_periodicity_label(duration)
 
         return prices
 
     def _search_get_detail(self, website, order, options):
         search_details = super()._search_get_detail(website, order, options)
-        if options.get('rent_only') or (options.get('from_date') and options.get('to_date')):
-            search_details['base_domain'].append([('rent_ok', '=', True)])
+        if options.get("rent_only") or (options.get("from_date") and options.get("to_date")):
+            search_details["base_domain"].append([("rent_periodicity", "!=", False)])
         return search_details
 
-    def _website_show_quick_add(self):
-        return super()._website_show_quick_add() and self.product_variant_id._can_be_added_to_current_cart()
+    # TODO provide a way to return error message instead, cause 'product doesn't exist' isn't really
+    # understandable.
+    def _is_purchasable(self, product=None) -> bool:
+        # Override of `website_sale` to handle rental products
+        if not super()._is_purchasable(product):
+            return False
+
+        if (
+            not self.rent_periodicity
+            or not (cart := request.cart)
+            or not (cart.rental_start_date and cart.rental_return_date)
+        ):
+            # Not a rental product, no cart, or no rentals in the current cart
+            return True
+
+        rental_lines = cart.order_line.filtered("is_rental")
+        if rental_lines and (
+            rental_lines.product_id == product or rental_lines.product_template_id == self
+        ):
+            # Only rental product in cart is the current product so we allow any period change
+            return True
+
+        if self.rent_periodicity == "hours":
+            return True
+
+        # Only allow if the order pickup & return times match the product pickup & return times.
+        pickup_time, return_time = self.pickup_time, self.return_time
+        loc_pickup_date, loc_return_date = (
+            cart._to_order_tz(cart.rental_start_date),
+            cart._to_order_tz(cart.rental_return_date),
+        )
+
+        return not (
+            float_compare(loc_pickup_date.hour + loc_pickup_date.minute / 60, pickup_time, 2)
+            or float_compare(loc_return_date.hour + loc_return_date.minute / 60, return_time, 2)
+        )

@@ -57,12 +57,15 @@ patch(Document.prototype, {
     },
 
     getDataFromHTML() {
-        super.getDataFromHTML();
-        const { el: parentEl } = this.props.parent;
+        if (!super.getDataFromHTML()) {
+            return false;
+        }
+        const parentEl = this.props.parent();
         this.showThankYouDialog = Boolean(
             parentEl.querySelector("#o_sign_show_emsigner_thank_you_dialog")
         );
         this.errorMessage = parentEl.querySelector("#o_emsigner_show_error_message")?.value;
+        return true;
     },
 
     getIframeProps(sign_document_id) {

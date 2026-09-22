@@ -17,6 +17,7 @@ SKIP_MSG = u"Test skipped due to FedEx server unavailability"
 
 
 @tagged('-standard', 'external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDeliveryFedex(TransactionCase):
 
     def setUp(self):
@@ -233,7 +234,7 @@ class TestDeliveryFedex(TransactionCase):
 
         order1_vals = {
                     'product_id': self.iPadMini.id,
-                    'product_uom': self.uom_unit.id,
+                    'uom_id': self.uom_unit.id,
                     'product_uom_qty': 1.0,
                     'location_id': self.stock_location.id,
                     'location_dest_id': self.customer_location.id}
@@ -257,7 +258,6 @@ class TestDeliveryFedex(TransactionCase):
         self.assertEqual(delivery_order.state, 'done', 'Shipment state should be done.')
 
 
-@tagged('standard', '-external')
 class TestMockDeliveryFedex(TestDeliveryFedex):
 
     @contextmanager

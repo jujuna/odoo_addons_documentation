@@ -1,6 +1,5 @@
 {
     "name": """Chile - E-Invoicing Delivery Guide""",
-    'version': '1.0',
     'category': 'Accounting/Localizations/EDI',
     'sequence': 12,
     'author':  'Blanco Martín & Asociados',
@@ -16,7 +15,7 @@ It is only when a delivery order is validated that you can create the delivery
 guide.  Then it will follow the same flow as for the invoices, sending it to
 the SII.
     """,
-    'website': 'http://blancomartin.cl',
+    'website': 'https://www.bmya.cl',
     'depends': [
         'sale_stock',
         'l10n_cl_edi',
@@ -31,9 +30,8 @@ the SII.
         'views/stock_picking_views.xml',
         'views/report_delivery_guide.xml',
         'views/menuitems.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
-    'installable': True,
     'auto_install': True,
     'license': 'OEEL-1',
 }

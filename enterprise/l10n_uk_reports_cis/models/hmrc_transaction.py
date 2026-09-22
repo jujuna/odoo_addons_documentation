@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 from odoo import api, fields, models
 from odoo.tools.misc import format_date
-from odoo.tools import float_repr, DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import BinaryBytes, float_repr, DEFAULT_SERVER_DATETIME_FORMAT
 
 from odoo.addons.l10n_uk_hmrc.models.hmrc_transaction import _send_request
 
@@ -19,7 +19,7 @@ class HmrcTransaction(models.Model):
         },
     )
     document_file = fields.Binary(string="Document")
-    document_filename = fields.Char()
+    return_id = fields.Many2one('account.return', help="The return this transaction is related to.")
 
     def _generate_cis_mr_xml_data(self, credentials, document_data):
         self.ensure_one()
@@ -30,7 +30,7 @@ class HmrcTransaction(models.Model):
             'document': {
                 'subcontractors': [],
                 'contractor': {
-                    'type': self.company_id.partner_id.company_type,
+                    'type': 'company' if self.company_id.partner_id.is_company else 'person',
                     'unique_taxpayer_reference': self.company_id.l10n_uk_hmrc_unique_taxpayer_reference,
                     'account_office_reference': self.company_id.l10n_uk_hmrc_account_office_reference,
                 },
@@ -41,7 +41,7 @@ class HmrcTransaction(models.Model):
                 'inactivity_indicator': document_data['inactivity_indicator'],
             },
             'transaction': {
-                'mode': self.env['ir.config_parameter'].sudo().get_param("l10n_uk_hmrc.api_mode", 'production'),
+                'mode': self.env['ir.config_parameter'].sudo().get_str("l10n_uk_hmrc.api_mode") or 'production',
                 'class': self._get_transaction_class(),
             },
         }
@@ -52,7 +52,7 @@ class HmrcTransaction(models.Model):
                 partner.with_prefetch(document_data['subcontractor_ids'])
                 xml_data['document']['subcontractors'].append({
                     'id': partner.id,
-                    'type': partner.company_type,
+                    'type': 'company' if partner.is_company else 'person',
                     'trading_name': partner.name,
                     'forename': partner.l10n_uk_reports_cis_forename,
                     'second_forename': partner.l10n_uk_reports_cis_second_forename,
@@ -77,8 +77,10 @@ class HmrcTransaction(models.Model):
         # We render it twice. The second time without credentials to store it in an attachment
         xml_data['credentials'] = {}
         monthly_return_document_safe = self._generate_xml_document(xml_data)
-        self.document_filename = f'hmrc_transaction_document_cis_{self.period_end}.xml'
-        self.document_file = etree.tostring(etree.fromstring(monthly_return_document_safe), pretty_print=True, xml_declaration=True, encoding='UTF-8')
+        self.document_file = BinaryBytes(
+            etree.tostring(etree.fromstring(monthly_return_document_safe), pretty_print=True, xml_declaration=True, encoding='UTF-8'),
+            filename=f'hmrc_transaction_document_cis_{self.period_end}.xml',
+        )
 
         response, header = _send_request(self, monthly_return_document)
 
@@ -92,7 +94,7 @@ class HmrcTransaction(models.Model):
             'state': 'polling',
         }
         self.write(response_write_vals)
-        self.env.ref('l10n_uk_hmrc.ir_cron_l10n_uk_hmrc_process_transactions')._trigger()
+        self._send_poll_request()
 
     def _handle_success(self):
         super()._handle_success()
@@ -103,6 +105,14 @@ class HmrcTransaction(models.Model):
                 force_send=True,
                 email_values={'attachments': [(self.response_filename, self.response_file)]},
             )
+        if self.transaction_type == 'cis_monthly_return' and self.return_id:
+            self.return_id._proceed_with_submission()
+            self.return_id.l10n_uk_cis_status = 'accepted'
+
+    def _handle_acknowledgement(self, header):
+        super()._handle_acknowledgement(header)
+        if self.transaction_type == 'cis_monthly_return' and self.return_id:
+            self.return_id.l10n_uk_cis_status = 'pending'
 
     def _handle_request_error(self, error_data, transaction_type):
         super()._handle_request_error(error_data, transaction_type)
@@ -113,6 +123,8 @@ class HmrcTransaction(models.Model):
                 force_send=True,
                 email_values={'attachments': [(self.response_filename, self.response_file)]},
             )
+        if self.transaction_type == 'cis_monthly_return' and self.return_id:
+            self.return_id.l10n_uk_cis_status = 'error'
 
     @api.model
     def _cron_notify_cis_return(self):
@@ -164,3 +176,8 @@ class HmrcTransaction(models.Model):
             return super()._get_request_body_xml_path()
 
         return 'l10n_uk_reports_cis/templates/hmrc_transaction_body_cis.xml'
+
+    def _get_message_destination_record(self):
+        if self.transaction_type == 'cis_monthly_return':
+            return self.return_id or self.company_id
+        return super()._get_message_destination_record()

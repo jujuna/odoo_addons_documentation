@@ -36,11 +36,11 @@ class YearlySalaryDetail(models.TransientModel):
 
     def _get_year_selection(self):
         current_year = datetime.now().year
-        return [(str(i), i) for i in range(1990, current_year + 1)]
+        return [(str(i), i) for i in range(current_year, 1988, -1)]
 
     year = fields.Selection(
         selection='_get_year_selection', string='Year', required=True,
-        default=lambda x: str(datetime.now().year - 1))
+        default=lambda x: str(datetime.now().year))
     related_employee_ids = fields.Many2many('hr.employee', compute="_compute_related_employee_ids")
     employee_ids = fields.Many2many('hr.employee', 'payroll_emp_rel', 'payroll_id', 'employee_id', string='Employees',
         required=True, compute="_compute_employee_ids", readonly=False, store=True)
@@ -51,9 +51,10 @@ class YearlySalaryDetail(models.TransientModel):
     def _compute_employee_ids(self):
         payslip = self.env['hr.payslip']
         employee = self.env['hr.employee']
+        today = fields.Date.context_today(self)
         for wizard in self:
-            date_from = fields.Date.today() + relativedelta(day=1, month=1, year=int(wizard.year))
-            date_to = fields.Date.today() + relativedelta(day=31, month=12, year=int(wizard.year))
+            date_from = today + relativedelta(day=1, month=1, year=int(wizard.year))
+            date_to = today + relativedelta(day=31, month=12, year=int(wizard.year))
             payslip_domain = [('date_from', '>=', date_from), ('date_to', '<=', date_to), ('state', '=', 'paid')]
             payslip_ids = payslip.search(payslip_domain)
             employee_domain = Domain.AND([wizard._get_domain(), [('slip_ids', 'in', payslip_ids.ids)]])

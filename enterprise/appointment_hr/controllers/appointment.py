@@ -14,15 +14,15 @@ class AppointmentHr(AppointmentController):
     # ------------------------------------------------------------
 
     @route()
-    def appointment_type_page(self, appointment_type_id, state=False, **kwargs):
+    def appointment_type_page(self, appointment_type_slug, state=False, **kwargs):
 
         if not kwargs.get('filter_staff_user_ids'):
-            appointment_type = request.env['appointment.type'].sudo().browse(int(appointment_type_id))
+            appointment_type = request.env['appointment.type'].sudo().browse(request.env['ir.http']._unslug(appointment_type_slug)[1])
             kwargs['filter_staff_user_ids'] = self._get_filtered_staff_user_ids(
                 appointment_type,
                 kwargs.get('filter_employee_ids'),
                 kwargs.get('employee_id'))
-        return super().appointment_type_page(appointment_type_id, state, **kwargs)
+        return super().appointment_type_page(appointment_type_slug, state, **kwargs)
 
     def _get_filtered_staff_user_ids(self, appointment_type, filter_employee_ids=None, employee_id=None):
         """ This method returns the ids of suggested users, ensuring retrocompatibility with previous routes.

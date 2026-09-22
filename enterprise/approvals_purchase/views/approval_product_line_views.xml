@@ -9,10 +9,10 @@
                 <attribute name="decoration-danger">has_no_seller</attribute>
             </xpath>
             <xpath expr="//field[@name='product_id']" position="attributes">
-                <attribute name="required">parent.approval_type != 'purchase' and parent.has_product == 'required'</attribute>
+                <attribute name="required">not parent.create_rfq and parent.has_product == 'required'</attribute>
             </xpath>
             <xpath expr="//field[@name='product_uom_id']" position="after">
-                <field name="seller_id" column_invisible="parent.approval_type != 'purchase'"
+                <field name="seller_id" column_invisible="not parent.create_rfq"
                     domain="[('product_tmpl_id', '=', product_template_id)]"
                     options="{'no_quick_create': True}"
                     context="{

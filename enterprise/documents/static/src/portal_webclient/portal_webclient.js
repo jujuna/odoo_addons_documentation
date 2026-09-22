@@ -4,7 +4,6 @@ import { MainComponentsContainer } from "@web/core/main_components_container";
 import { Component, onMounted } from "@odoo/owl";
 
 export class PortalWebclientWebClient extends Component {
-    static props = {};
     static components = { ActionContainer, MainComponentsContainer };
     static template = "documents.PortalWebclientWebClient";
 

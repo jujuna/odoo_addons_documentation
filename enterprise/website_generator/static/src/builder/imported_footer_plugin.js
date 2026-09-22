@@ -9,11 +9,14 @@ class ImportedFooterPlugin extends Plugin {
         footer_templates_providers: async () => {
             const website_id = this.services.website.currentWebsite.id;
             const view = `website_generator.template_ws_custom_footer_${website_id}`;
-            if (
-                (await this.services.orm.searchCount("ir.ui.view", [["key", "=", view]], {
-                    context: { active_test: false },
-                })) === 0
-            ) {
+            if (!this.importedFooterViewsProm) {
+                this.importedFooterViewsProm = this.services.orm.search(
+                    "ir.ui.view",
+                    [["key", "=", view]],
+                    { limit: 1, context: { active_test: false } }
+                );
+            }
+            if (!(await this.importedFooterViewsProm).length) {
                 return [];
             }
 

@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import Command
+from odoo.exceptions import ValidationError
 from odoo.tests import HttpCase, tagged
 
 
@@ -273,7 +274,7 @@ class TestBarcodeClientAction(HttpCase):
                 'location_dest_id': customer_loc.id,
                 'product_id': product.id,
                 'product_uom_qty': 1,
-                'product_uom': product.uom_id.id,
+                'uom_id': product.uom_id.id,
             })],
             'state': 'draft',
         })
@@ -281,6 +282,11 @@ class TestBarcodeClientAction(HttpCase):
 
         action = self.env['stock.picking'].with_context(active_id=warehouse.out_type_id.id).filter_on_barcode(lot.name)
         self.assertEqual(action['action']['context']['search_default_lot_id'], lot.id)
+        # filter on the product with the GS1 nomenclature active to check the search is well done on the product barcode and not the GS1 one
+        self.env.company.nomenclature_id = self.env.ref('barcodes_gs1_nomenclature.default_gs1_nomenclature')
+        product.barcode = '15099590225866'
+        action = self.env['stock.picking'].with_context(active_id=warehouse.out_type_id.id).filter_on_barcode('15099590225866')
+        self.assertEqual(action['action']['context']['search_default_product_id'], product.id)
 
     def test_filter_on_packaging_barcode(self):
         self.env.user.write({'group_ids': [Command.link(self.env.ref('uom.group_uom').id)]})
@@ -313,7 +319,7 @@ class TestBarcodeClientAction(HttpCase):
                 'location_dest_id': warehouse.out_type_id.default_location_dest_id.id,
                 'product_id': magic_beer.id,
                 'product_uom_qty': 2,
-                'product_uom': pack_24.id,
+                'uom_id': pack_24.id,
             })],
         })
 
@@ -339,3 +345,21 @@ class TestBarcodeClientAction(HttpCase):
 
         product.write({'barcode': False})
         self.assertFalse(product.barcode)
+
+    def test_lot_duplication_with_gs1_nomenclature(self):
+        """
+        Test that two lots cannot have the same name, even when the name follows the pattern of a GS1 rule
+        """
+        product = self.env['product.product'].create({
+            'name': 'Product',
+            'is_storable': True,
+            'tracking': 'serial',
+        })
+        self.env.company.nomenclature_id = self.env.ref('barcodes_gs1_nomenclature.default_gs1_nomenclature')
+        lot = {
+            'name': '101',  # Matches the 'Batch or lot number' rule (barcode_rule_gs1_10)
+            'product_id': product.id
+        }
+        self.env['stock.lot'].create(lot)
+        with self.assertRaises(ValidationError, msg="Shouldn't be possible to create two lots with the same name"):
+            self.env['stock.lot'].create(lot)

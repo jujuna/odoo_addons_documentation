@@ -4,6 +4,7 @@
         <field name="name">Profit and Loss</field>
         <field name="name@cs">Zisk a ztráta</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
@@ -21,8 +22,6 @@
                 <field name="name">I. Revenues from products, goods and services</field>
                 <field name="name@cs">I. Tržby za výrobky, zboží a služby</field>
                 <field name="code">l10n_cz_reports_pl_line_1</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_1_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -35,8 +34,6 @@
                 <field name="name">A. Costs of sale (values adjustments including) </field>
                 <field name="name@cs">A. Náklady na prodej (včetně úprav hodnot)</field>
                 <field name="code">l10n_cz_reports_pl_line_2</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_2_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -62,8 +59,6 @@
                 <field name="name">B. Distribution costs (values adjustments including)</field>
                 <field name="name@cs">B. Distribuční náklady (včetně úprav hodnot)</field>
                 <field name="code">l10n_cz_reports_pl_line_4</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_4_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -76,8 +71,6 @@
                 <field name="name">C. Administrative costs (values adjustments including)</field>
                 <field name="name@cs">C. Administrativní náklady (včetně úprav hodnot)</field>
                 <field name="code">l10n_cz_reports_pl_line_5</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_5_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -90,8 +83,6 @@
                 <field name="name">II. Other operating revenues </field>
                 <field name="name@cs">II. Ostatní provozní výnosy</field>
                 <field name="code">l10n_cz_reports_pl_line_6</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_6_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -104,8 +95,6 @@
                 <field name="name">D. Other operating costs</field>
                 <field name="name@cs">D. Ostatní provozní náklady</field>
                 <field name="code">l10n_cz_reports_pl_line_7</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_7_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -143,8 +132,6 @@
                         <field name="name">III.1. Revenues from shares - controlled or controlling entity</field>
                         <field name="name@cs">III.1. Výnosy z akcií - ovládaná nebo ovládající osoba</field>
                         <field name="code">l10n_cz_reports_pl_line_10</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_10_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -157,8 +144,6 @@
                         <field name="name">III.2. Other revenues from shares</field>
                         <field name="name@cs">III.2. Ostatní výnosy z akcií</field>
                         <field name="code">l10n_cz_reports_pl_line_11</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_11_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -173,8 +158,6 @@
                 <field name="name">E. Costs of sold shares</field>
                 <field name="name@cs">E. Náklady na prodané akcie</field>
                 <field name="code">l10n_cz_reports_pl_line_12</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_12_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -199,8 +182,6 @@
                         <field name="name">IV.1. Revenues from other long-term financial assets - controlled or controlling entity</field>
                         <field name="name@cs">IV.1. Výnosy z ostatního dlouhodobého finančního majetku - ovládaný nebo ovládající subjekt</field>
                         <field name="code">l10n_cz_reports_pl_line_14</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_14_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -213,8 +194,6 @@
                         <field name="name">IV.2. Other revenues from other long-term financial assets</field>
                         <field name="name@cs">IV.2. Ostatní výnosy z ostatního dlouhodobého finančního majetku</field>
                         <field name="code">l10n_cz_reports_pl_line_15</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_15_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -229,8 +208,6 @@
                 <field name="name">F. Costs associated with other long-term financial assets</field>
                 <field name="name@cs">F. Náklady spojené s ostatním dlouhodobým finančním majetkem</field>
                 <field name="code">l10n_cz_reports_pl_line_16</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_16_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -255,8 +232,6 @@
                         <field name="name">V.1. Interest revenues and similar revenues - controlled or controlling entity</field>
                         <field name="name@cs">V.1. Výnosy z úroků a podobné výnosy - kontrolované nebo kontrolující entita</field>
                         <field name="code">l10n_cz_reports_pl_line_18</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_18_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -269,8 +244,6 @@
                         <field name="name">V.2. Other interest revenues and similar revenues</field>
                         <field name="name@cs">V.2. Ostatní úrokové výnosy a podobné výnosy</field>
                         <field name="code">l10n_cz_reports_pl_line_19</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_19_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -285,8 +258,6 @@
                 <field name="name">G. Values adjustments and reserves in financial activity</field>
                 <field name="name@cs">G. Opravné položky a rezervy ve finanční činnosti</field>
                 <field name="code">l10n_cz_reports_pl_line_20</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_20_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -311,8 +282,6 @@
                         <field name="name">H.1. Interest expenses and similar costs controlled or controlling entity</field>
                         <field name="name@cs">H.1. Úrokové náklady a podobné náklady ovládaná nebo ovládající osoba</field>
                         <field name="code">l10n_cz_reports_pl_line_22</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_22_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -325,8 +294,6 @@
                         <field name="name">H.2. Other interest expenses and similar costs</field>
                         <field name="name@cs">H.2. Ostatní úrokové náklady a podobné náklady</field>
                         <field name="code">l10n_cz_reports_pl_line_23</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_23_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -341,8 +308,6 @@
                 <field name="name">VI. Other financial revenues</field>
                 <field name="name@cs">VI. Ostatní finanční výnosy</field>
                 <field name="code">l10n_cz_reports_pl_line_24</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_24_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -355,8 +320,6 @@
                 <field name="name">I. Other financial costs</field>
                 <field name="name@cs">I. Ostatní finanční náklady</field>
                 <field name="code">l10n_cz_reports_pl_line_25</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_25_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -407,8 +370,6 @@
                         <field name="name">J.1. Income tax-due</field>
                         <field name="name@cs">J.1. Splatná daň z příjmu</field>
                         <field name="code">l10n_cz_reports_pl_line_29</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_29_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -421,8 +382,6 @@
                         <field name="name">J.2. Income tax deferred</field>
                         <field name="name@cs">J.2. Odložená daň z příjmu</field>
                         <field name="code">l10n_cz_reports_pl_line_30</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_cz_reports_pl_line_30_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -450,8 +409,6 @@
                 <field name="name">K. Transfer of share from profit / loss to partners (+/-)</field>
                 <field name="name@cs">K. Převod podílu ze zisku/ztráty společníkům (+/-)</field>
                 <field name="code">l10n_cz_reports_pl_line_32</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="expression_ids">
                     <record id="l10n_cz_reports_pl_line_32_balance" model="account.report.expression">
                         <field name="label">balance</field>

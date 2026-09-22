@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
 {
     'name': 'Timer',
-    'version': '1.0',
     'sequence': 24,
     'summary': 'Record time',
     'category': 'Services/Timesheets',
@@ -16,10 +14,8 @@ It adds a timer to a view for time recording purpose
     """,
     'depends': ['web', 'mail'],
     'data': [
-        'security/timer_security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         ],
-    'installable': True,
     'assets': {
         'web.assets_backend': [
             'timer/static/src/**/*',

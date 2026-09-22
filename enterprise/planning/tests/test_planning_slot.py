@@ -1,12 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details
-from datetime import datetime
-from pytz import UTC, timezone
+from datetime import datetime, UTC
+from zoneinfo import ZoneInfo
 
 from .common import TestPlanningContractCommon
-from odoo.tests import new_test_user
+from odoo.tests import tagged, new_test_user
 from odoo.tools.intervals import Intervals
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestPlanningContract(TestPlanningContractCommon):
     @classmethod
     def setUpClass(cls):
@@ -32,20 +33,37 @@ class TestPlanningContract(TestPlanningContractCommon):
             'wage': 5000.0,
         })
 
+        # Shared flexible calendars, reused across the flexible-schedule tests below instead of
+        # each one creating its own.
+        cls.fully_flexible_calendar, cls.flexible_calendar_30_6 = cls.env['resource.calendar'].create([
+            {
+                'name': 'Fully Flexible Calendar',
+                'calendar_type': 'undefined',
+                'attendance_ids': [],
+            },
+            {
+                'name': 'Flexible Calendar 30h/week',
+                'calendar_type': 'undefined',
+                'attendance_ids': [],
+                'hours_per_week': 30,
+                'hours_per_day': 6,
+            },
+        ])
+
     def test_employee_contract_validity_per_period(self):
         start = datetime(2015, 11, 8, 00, 00, 00, tzinfo=UTC)
         end = datetime(2015, 11, 21, 23, 59, 59, tzinfo=UTC)
         calendars_validity_within_period = self.resource_bert._get_calendars_validity_within_period(start, end, default_company=self.employee_bert.company_id)
-        tz = timezone(self.employee_bert.tz)
+        tz = ZoneInfo(self.employee_bert.tz)
 
         self.assertEqual(len(calendars_validity_within_period[self.resource_bert.id]), 2, "There should exist 2 calendars within the period")
         interval_calendar_40h = Intervals([(
             start,
-            tz.localize(datetime.combine(self.contract_cdd.date_end, datetime.max.time())),
+            datetime.combine(self.contract_cdd.date_end, datetime.max.time(), tzinfo=tz),
             self.env['resource.calendar.attendance']
         )])
         interval_calendar_35h = Intervals([(
-            tz.localize(datetime.combine(self.contract_cdi.date_start, datetime.min.time())),
+            datetime.combine(self.contract_cdi.date_start, datetime.min.time(), tzinfo=tz),
             end,
             self.env['resource.calendar.attendance']
         )])
@@ -68,9 +86,27 @@ class TestPlanningContract(TestPlanningContractCommon):
 
     def test_employee_work_planning_hours_info(self):
         planning_hours_info = self.env['planning.slot']._gantt_progress_bar(
-            'resource_id', self.resource_bert.ids, datetime(2015, 11, 8), datetime(2015, 11, 21, 23, 59, 59)
+            'resource_ids', self.resource_bert.ids, datetime(2015, 11, 8), datetime(2015, 11, 21, 23, 59, 59)
         )
         self.assertEqual(75, planning_hours_info[self.resource_bert.id]['max_value'], "Work hours for the employee Jules should be 40h+35h = 75h")
+
+    def test_gantt_progress_bar_work_intervals_timezone(self):
+        self.resource_bert.tz = 'Europe/Brussels'
+        self.resource_bert.calendar_id = self.calendar_40h
+
+        self.env['planning.slot'].create({
+            'start_datetime': datetime(2015, 12, 16, 8, 0, 0),
+            'end_datetime': datetime(2015, 12, 16, 17, 0, 0),
+            'resource_ids': self.resource_bert.ids,
+        })
+        domain = [['start_datetime', '<', datetime(2015, 12, 18, 0, 0, 0)], ['end_datetime', '>', datetime(2015, 12, 15, 0, 0, 0)]]
+        planning_hours_info = self.env['planning.slot']._get_gantt_planning_data(domain, datetime(2015, 12, 16), datetime(2015, 12, 17))
+
+        res_intervals = [
+            (datetime(2015, 12, 16, 7, 0, 0).replace(tzinfo=UTC), datetime(2015, 12, 16, 11, 0, 0).replace(tzinfo=UTC)),
+            (datetime(2015, 12, 16, 12, 0, 0).replace(tzinfo=UTC), datetime(2015, 12, 16, 16, 0, 0).replace(tzinfo=UTC))
+        ]
+        self.assertEqual(planning_hours_info['work_intervals'][self.resource_bert.id], res_intervals, "work_intervals should be in UTC")
 
     def test_creation_recurrencing_planning_without_employee_contract_access(self):
         """
@@ -82,7 +118,7 @@ class TestPlanningContract(TestPlanningContractCommon):
             'name': 'Test planning',
             'start_datetime': datetime(2015, 11, 8, 00, 00, 00),
             'end_datetime': datetime(2015, 11, 21, 23, 59, 59),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'x_times',
             'repeat_number': 2,
@@ -115,12 +151,13 @@ class TestPlanningContract(TestPlanningContractCommon):
         """
 
         # 1) Set a fully flexible contract for an employee
+        fully_flexible_calendar = self.fully_flexible_calendar
         self.employee_joseph.version_id.write({
             'contract_date_end': datetime.strptime('2015-12-16', '%Y-%m-%d'),
             'contract_date_start': datetime.strptime('2015-11-16', '%Y-%m-%d'),
             'date_version': datetime.strptime('2015-11-16', '%Y-%m-%d'),
             'name': 'Fully flex contract for Joseph',
-            'resource_calendar_id': False,
+            'resource_calendar_id': fully_flexible_calendar.id,
             'wage': 5000.0,
         })
 
@@ -128,7 +165,7 @@ class TestPlanningContract(TestPlanningContractCommon):
         slot_outside = self.env['planning.slot'].create({
             'start_datetime': datetime(2015, 12, 17, 8, 0, 0),
             'end_datetime': datetime(2015, 12, 17, 12, 0, 0),
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
         })
         self.assertEqual(slot_outside.allocated_hours, 0, "The allocated hours should be 0 for a slot outside the contract period of a fully flexible employee")
 
@@ -136,17 +173,18 @@ class TestPlanningContract(TestPlanningContractCommon):
         slot_inside = self.env['planning.slot'].create({
             'start_datetime': datetime(2015, 12, 16, 1, 0, 0),
             'end_datetime': datetime(2015, 12, 16, 12, 0, 0),
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
         })
         self.assertEqual(slot_inside.allocated_hours, 11, "The allocated hours should equal the whole length of the slot inside the contract period of a fully flexible employee")
 
         # 2) Set a flexible contract for another employee
+        flexible_calendar = self.flexible_calendar_30_6
         self.employee_janice.version_id.write({
             'date_version': datetime.strptime('2015-11-16', '%Y-%m-%d'),
             'contract_date_start': datetime.strptime('2015-11-16', '%Y-%m-%d'),
             'contract_date_end': datetime.strptime('2015-12-16', '%Y-%m-%d'),
             'name': 'Flex contract for Janice',
-            'resource_calendar_id': self.calendar_30h_flex.id,
+            'resource_calendar_id': flexible_calendar.id,
             'wage': 5000.0,
         })
 
@@ -154,7 +192,7 @@ class TestPlanningContract(TestPlanningContractCommon):
         slot_outside = self.env['planning.slot'].create({
             'start_datetime': datetime(2015, 12, 17, 8, 0, 0),
             'end_datetime': datetime(2015, 12, 17, 12, 0, 0),
-            'resource_id': self.resource_janice.id,
+            'resource_ids': self.resource_janice.ids,
         })
         self.assertEqual(slot_outside.allocated_hours, 0, "The allocated hours should be 0 for a slot outside the contract period of a flexible employee")
 
@@ -162,24 +200,25 @@ class TestPlanningContract(TestPlanningContractCommon):
         slot_inside = self.env['planning.slot'].create({
             'start_datetime': datetime(2015, 12, 16, 8, 0, 0),
             'end_datetime': datetime(2015, 12, 16, 14, 0, 0),
-            'resource_id': self.resource_janice.id,
+            'resource_ids': self.resource_janice.ids,
         })
         self.assertEqual(slot_inside.allocated_hours, 6, "The allocated hours should be 6 for a slot inside the contract period of a flexible employee")
 
         # 3) Set a flexible contract with no end date for another employee
+        flexible_calendar_no_end = self.flexible_calendar_30_6
         self.employee_janice.create_version({
             'date_version': datetime.strptime('2016-01-16', '%Y-%m-%d'),
             'contract_date_start': datetime.strptime('2016-01-16', '%Y-%m-%d'),
             'contract_date_end': False,
             'name': 'Flex contract for Janice with no end date',
-            'resource_calendar_id': self.calendar_30h_flex.id,
+            'resource_calendar_id': flexible_calendar_no_end.id,
             'wage': 5000.0,
         })
 
         slot_inside = self.env['planning.slot'].create({
             'start_datetime': datetime(2016, 1, 16, 8, 0, 0),
             'end_datetime': datetime(2016, 1, 16, 14, 0, 0),
-            'resource_id': self.resource_janice.id,
+            'resource_ids': self.resource_janice.ids,
         })
         self.assertEqual(slot_inside.allocated_hours, 6, "The allocated hours should be 6 for a slot inside the contract period of a flexible employee with no end date")
 
@@ -190,12 +229,13 @@ class TestPlanningContract(TestPlanningContractCommon):
         """
 
         # 1) Set a fully flexible contract for an employee
+        fully_flexible_calendar = self.fully_flexible_calendar
         self.employee_joseph.version_id.write({
             'date_version': datetime.strptime('2015-11-16', '%Y-%m-%d'),
             'contract_date_start': datetime.strptime('2015-11-16', '%Y-%m-%d'),
             'contract_date_end': datetime.strptime('2015-12-16', '%Y-%m-%d'),    # contract will end at 2015-12-16 23:59:59
             'name': 'Fully flex contract for Joseph',
-            'resource_calendar_id': False,
+            'resource_calendar_id': fully_flexible_calendar.id,
             'wage': 5000.0,
         })
 
@@ -203,17 +243,18 @@ class TestPlanningContract(TestPlanningContractCommon):
         slot_outside = self.env['planning.slot'].create({
             'start_datetime': datetime(2015, 12, 16, 8, 0, 0),
             'end_datetime': datetime(2015, 12, 17, 12, 0, 0),
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
         })
         self.assertEqual(slot_outside.allocated_hours, 16.0, "The allocated hours should be 16h (8AM to 12PM) of the 16th of December for the fully flexible employee")
 
         # 2) Set a flexible contract for another employee
+        flexible_calendar = self.flexible_calendar_30_6
         self.employee_janice.version_id.write({
             'date_version': datetime.strptime('2015-11-16', '%Y-%m-%d'),
             'contract_date_start': datetime.strptime('2015-11-16', '%Y-%m-%d'),
             'contract_date_end': datetime.strptime('2015-12-16', '%Y-%m-%d'),
             'name': 'Flex contract for Janice',
-            'resource_calendar_id': self.calendar_30h_flex.id,
+            'resource_calendar_id': flexible_calendar.id,
             'wage': 5000.0,
         })
 
@@ -221,7 +262,7 @@ class TestPlanningContract(TestPlanningContractCommon):
         slot_outside = self.env['planning.slot'].create({
             'start_datetime': datetime(2015, 12, 16, 8, 0, 0),
             'end_datetime': datetime(2015, 12, 17, 8, 0, 0),
-            'resource_id': self.resource_janice.id,
+            'resource_ids': self.resource_janice.ids,
         })
         self.assertEqual(slot_outside.allocated_hours, 6.0, "The allocated hours should be 6h (the max per day) for the flexible employee")
 
@@ -231,3 +272,24 @@ class TestPlanningContract(TestPlanningContractCommon):
             'end_datetime': datetime(2015, 12, 17, 8, 0, 0),
         })
         self.assertEqual(slot.allocated_hours, 8, "The allocated hours should be computed without any issue")
+
+    def test_plan_service_request_action_filters(self):
+        role = self.env['planning.role'].create({
+            'name': 'Test Role',
+            'resource_ids': self.resource_joseph.ids,
+        })
+
+        slot = self.env['planning.slot'].create({
+            'name': 'Test Service Request',
+            'role_id': role.id,
+            'start_datetime': False,
+            'end_datetime': False,
+        })
+        action = slot.action_plan_shift()
+        self.assertEqual(action['context']['search_default_role_id'], role.id, "The role should be set as the default filter.")
+        self.assertEqual(action['context']['filter_resource_ids'], role.resource_ids.ids, "The role's resources should be used as the resource filter")
+
+        slot.write({'role_id': False})
+        action = slot.action_plan_shift()
+        self.assertEqual(action['context']['search_default_role_id'], False)
+        self.assertEqual(action['context']['filter_resource_ids'], [])

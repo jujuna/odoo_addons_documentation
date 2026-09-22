@@ -1,5 +1,6 @@
-import { useService } from "@web/core/utils/hooks";
+import { usePlugin } from "@odoo/owl";
+import { AccountDuplicateTransactionsPlugin } from "./account_duplicate_transaction_plugin";
 
-export function useCheckDuplicateService() {
-    return useService("account_online_synchronization.duplicate_check_service");
+export function useCheckDuplicatePlugin() {
+    return usePlugin(AccountDuplicateTransactionsPlugin);
 }

@@ -22,7 +22,7 @@ class MarketingCampaignTest(TestMACommon):
     def test_campaign_archive(self):
         """ Ensures that campaigns are stopped when archived. """
         campaign = self.env['marketing.campaign'].create({
-            'domain': [('id', 'in', self.test_records[0].ids)],
+            'enroll_domain': [('id', 'in', self.test_records[0].ids)],
             'model_id': self.env['ir.model']._get_id('marketing.test.sms'),
             'name': 'Test Campaign',
         })
@@ -34,9 +34,61 @@ class MarketingCampaignTest(TestMACommon):
         self.assertEqual(campaign.state, 'stopped')
 
     @users('user_marketing_automation')
+    def test_campaign_compute_allowed_trigger_type_ui(self):
+        campaign = self.campaign.with_env(self.env)
+        begin_sms_activity = self._create_activity(campaign, activity_type='sms', trigger_type='begin')
+        begin_mail_activity = self._create_activity_mail(campaign, act_values={'trigger_type': 'begin'})
+        split_sms_triggered = self._create_activity(campaign, activity_type='split', triggering_activity_id=begin_sms_activity.id, trigger_type='activity', parent_id=begin_sms_activity.id)
+        sms_triggered = self._create_activity_mail(campaign, act_values={'triggering_activity_id': begin_sms_activity.id, 'trigger_type': 'activity', 'parent_id': begin_sms_activity.id})
+        split_mail_triggered = self._create_activity(campaign, activity_type='split', trigger_type='activity', triggering_activity_id=begin_mail_activity.id, parent_id=begin_mail_activity.id)
+        mail_triggered = self._create_activity_log_note(campaign, "Hello", act_values={'triggering_activity_id': begin_mail_activity.id, 'trigger_type': 'activity', 'parent_id': begin_mail_activity.id})
+
+        for activity, allowed_trigger_type_ui in [
+            (split_sms_triggered, ['bounce', 'click']),
+            (sms_triggered, ['bounce', 'click', 'not_click']),
+            (split_mail_triggered, ['bounce', 'click', 'open', 'reply']),
+            (mail_triggered, ['bounce', 'click', 'not_click', 'not_open', 'not_reply', 'open', 'reply'])
+        ]:
+            with self.subTest(activity_type=activity.activity_type, activity_category=activity.triggering_activity_id.activity_type):
+                self.assertListEqual(sorted(activity.allowed_trigger_type_ui), sorted(allowed_trigger_type_ui))
+
+    @users('user_marketing_automation')
+    @mute_logger('odoo.addons.base.ir.ir_model', 'odoo.models')
+    def test_campaign_compute_participants(self):
+        """Check that the participant count compute method works."""
+        empty_campaign = self.env['marketing.campaign'].create({
+            'name': 'My First Campaign',
+            'model_id': self.env['ir.model']._get('marketing.test.sms').id,
+        })
+        self.assertEqual(empty_campaign.total_participant_count, 0)
+
+        other_campaign = self.env['marketing.campaign'].create({
+            'name': 'Campaign 2',
+            'model_id': self.env['ir.model']._get('marketing.test.sms').id,
+        })
+        test_records = self._create_marketauto_records('marketing.test.sms', count=6)
+        empty_participants = empty_campaign._create_participants(test_records[:2].ids)
+        empty_participants += empty_campaign._create_participants(test_records[2:4].ids, additional_values={'is_test': True})
+        empty_participants += empty_campaign._create_participants(test_records[4].ids, additional_values={'state': 'completed'})
+        empty_participants += empty_campaign._create_participants(test_records[5].ids, additional_values={'state': 'completed', 'is_test': True})
+        other_participants = other_campaign._create_participants(test_records[0].ids, additional_values={'is_test': True})
+        other_participants += other_campaign._create_participants(test_records[1:3].ids, additional_values={'state': 'completed'})
+        other_participants += other_campaign._create_participants(test_records[3].ids, additional_values={'state': 'completed', 'is_test': True})
+
+        self.assertEqual(empty_campaign.running_participant_count, 2)
+        self.assertEqual(empty_campaign.completed_participant_count, 1)
+        self.assertEqual(empty_campaign.total_participant_count, 3)
+        self.assertEqual(empty_campaign.test_participant_count, 3)
+
+        self.assertEqual(other_campaign.running_participant_count, 0)
+        self.assertEqual(other_campaign.completed_participant_count, 2)
+        self.assertEqual(other_campaign.total_participant_count, 2)
+        self.assertEqual(other_campaign.test_participant_count, 2)
+
+    @users('user_marketing_automation')
     @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.mail.models.mail_mail')
     def test_campaign_domain_with_translated_terms(self):
-        """ Test that a campaign with a domain containing translated terms in
+        """ Test that a campaign with an enroll_domain containing translated terms in
         the language of the responsible does correctly sync participant and
         execute activities. """
         # init test variables to ease code reading
@@ -48,10 +100,10 @@ class MarketingCampaignTest(TestMACommon):
 
         self.env.user.sudo().write({'lang': 'en_US'})
         campaign = self.env['marketing.campaign'].create({
-            'domain': [('name', '!=', 'Test_00'), ('text_trans', '=', 'Test FR')],
+            'enroll_domain': [('name', '!=', 'Test_00'), ('text_trans', '=', 'Test FR')],
             'marketing_activity_ids': [
                 (0, 0, {
-                    'activity_type': 'email',
+                    'activity_type': 'mail',
                     'name': 'Test',
                 }),
             ],
@@ -59,16 +111,16 @@ class MarketingCampaignTest(TestMACommon):
             'name': 'Test Campaign',
         })
 
-        # launch campaign, with responsible language != language terms in campaign domain
+        # launch campaign, with responsible language != language terms in campaign enroll_domain
         self._launch_campaign(campaign, date_reference=self.date_reference)
 
         self.assertEqual(campaign.running_participant_count, 0)
         self.assertFalse(campaign.participant_ids)
 
-        # with responsible language == language terms in campaign domain
+        # with responsible language == language terms in campaign enroll_domain
         self.env.user.sudo().write({'lang': 'fr_FR'})
         with self.mock_datetime_and_now(self.date_reference):
-            campaign.sync_participants()
+            campaign._synchronize_participants()
 
         self.assertEqual(campaign.running_participant_count, len(test_records_init))
         self.assertEqual(campaign.participant_ids.mapped('res_id'), test_records_init.ids)
@@ -84,7 +136,7 @@ class MarketingCampaignTest(TestMACommon):
             - Copy child of activity and keep coherence in parent_id
         """
         campaign = self.env['marketing.campaign'].create({
-            'domain': [('id', 'in', self.test_records.ids)],
+            'enroll_domain': [('id', 'in', self.test_records.ids)],
             'model_id': self.env['ir.model']._get_id('marketing.test.sms'),
             'name': 'My First Campaign',
         })
@@ -137,110 +189,3 @@ class MarketingCampaignTest(TestMACommon):
         # check relationships
         self.assertEqual(activity2.parent_id, activity)
         self.assertEqual(activity2_dup.parent_id, activity_dup)
-
-    @users('user_marketing_automation')
-    @mute_logger('odoo.addons.base.ir.ir_model', 'odoo.models')
-    def test_campaign_participants_compute(self):
-        """Check that the participant count compute method works."""
-        empty_campaign = self.env['marketing.campaign'].create({
-            'name': 'My First Campaign',
-            'model_id': self.env['ir.model']._get('marketing.test.sms').id,
-        })
-        self.assertEqual(empty_campaign.total_participant_count, 0)
-
-        campaign1 = self.env['marketing.campaign'].create({
-            'name': 'Campaign 1',
-            'model_id': self.env['ir.model']._get('marketing.test.sms').id,
-        })
-        campaign2 = self.env['marketing.campaign'].create({
-            'name': 'Campaign 2',
-            'model_id': self.env['ir.model']._get('marketing.test.sms').id,
-        })
-        self.env['marketing.participant'].create([
-            {'campaign_id': campaign1.id, 'state': 'running', 'is_test': True},
-            {'campaign_id': campaign1.id, 'state': 'running', 'is_test': True},
-            {'campaign_id': campaign1.id, 'state': 'running', 'is_test': False},
-            {'campaign_id': campaign1.id, 'state': 'running', 'is_test': False},
-            {'campaign_id': campaign1.id, 'state': 'completed', 'is_test': True},
-            {'campaign_id': campaign1.id, 'state': 'completed', 'is_test': False},
-            {'campaign_id': campaign2.id, 'state': 'running', 'is_test': True},
-            {'campaign_id': campaign2.id, 'state': 'completed', 'is_test': True},
-            {'campaign_id': campaign2.id, 'state': 'completed', 'is_test': False},
-            {'campaign_id': campaign2.id, 'state': 'completed', 'is_test': False},
-        ])
-        self.assertEqual(campaign1.running_participant_count, 2)
-        self.assertEqual(campaign1.completed_participant_count, 1)
-        self.assertEqual(campaign1.total_participant_count, 3)
-        self.assertEqual(campaign1.test_participant_count, 3)
-
-        self.assertEqual(campaign2.running_participant_count, 0)
-        self.assertEqual(campaign2.completed_participant_count, 2)
-        self.assertEqual(campaign2.total_participant_count, 2)
-        self.assertEqual(campaign2.test_participant_count, 2)
-
-    @users('user_marketing_automation')
-    @mute_logger('odoo.addons.base.ir.ir_model', 'odoo.models')
-    def test_campaign_unique_field(self):
-        # initial data: 0-1-2 have unique partners, 3-4 are void, 4 will receive same partner as 0 to test uniqueness
-        test_records = self.test_records[:5]
-        self.assertEqual(len(test_records), 5)
-        test_records[-1].write({'name': test_records[0].name})
-
-        name_field = self.env['ir.model.fields'].sudo().search([
-            ('model_id', '=', self.env['ir.model']._get_id('marketing.test.sms')),
-            ('name', '=', 'name')
-        ])
-
-        campaign = self.env['marketing.campaign'].create({
-            'domain': [('id', 'in', test_records.ids)],
-            'model_id': self.env['ir.model']._get_id('marketing.test.sms'),
-            'name': 'My First Campaign',
-            'unique_field_id': name_field.id,
-        })
-        mailing = self._create_mailing('marketing.test.sms')
-        _activity = self._create_activity(campaign, mailing=mailing)
-
-        self._launch_campaign(campaign)
-        self.assertEqual(campaign.running_participant_count, 4)
-        self.assertEqual(campaign.participant_ids.mapped('res_id'), test_records[:4].ids)
-
-        test_records[-1].write({'name': 'Unique Again'})
-        campaign.sync_participants()
-
-        self.assertEqual(campaign.running_participant_count, 5)
-        self.assertEqual(campaign.participant_ids.mapped('res_id'), test_records.ids)
-
-    @users('user_marketing_automation')
-    @mute_logger('odoo.addons.base.ir.ir_model', 'odoo.models')
-    def test_campaign_unique_field_many2one(self):
-        # initial data: 0-1-2 have unique partners, 3-4 are void, 4 will receive same partner as 0 to test uniqueness
-        test_records = self.test_records[:5]
-        self.assertEqual(len(test_records), 5)
-        self.assertEqual(len(test_records.mapped('customer_id')), 3)
-        test_records[-1].write({'customer_id': test_records[0].customer_id.id})
-        self.assertEqual(test_records[3].customer_id, self.env['res.partner'])
-
-        partner_field = self.env['ir.model.fields'].sudo().search([
-            ('model_id', '=', self.env['ir.model']._get_id('marketing.test.sms')),
-            ('name', '=', 'customer_id')
-        ])
-
-        campaign = self.env['marketing.campaign'].create({
-            'domain': [('id', 'in', test_records.ids)],
-            'model_id': self.env['ir.model']._get_id('marketing.test.sms'),
-            'name': 'My First Campaign',
-            'unique_field_id': partner_field.id,
-        })
-        mailing = self._create_mailing('marketing.test.sms')
-        _activity = self._create_activity(campaign, mailing=mailing)
-
-        self._launch_campaign(campaign)
-        self.assertEqual(campaign.running_participant_count, 3)
-        self.assertEqual(campaign.participant_ids.mapped('res_id'), test_records[0:3].ids)
-
-        # new partner -> will be added to set of participants as not duplicated anymore
-        test_records[-1].write({'customer_id': self.env['res.partner'].create({'name': 'JustHere'})})
-        campaign.sync_participants()
-
-        self.assertEqual(campaign.running_participant_count, 4)
-        self.assertEqual(campaign.participant_ids.mapped('res_id'), (test_records[0:3] | test_records[-1]).ids)

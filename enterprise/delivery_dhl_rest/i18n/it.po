@@ -3,22 +3,22 @@
 # * delivery_dhl_rest
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-10-08 02:40+0000\n"
-"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 00:31+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
 "delivery_dhl_rest/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_dhl_rest
 #: model:ir.model.fields.selection,name:delivery_dhl_rest.selection__delivery_carrier__dhl_product_code__0
@@ -133,7 +133,7 @@ msgstr "America"
 #. module: delivery_dhl_rest
 #: model:ir.model.fields.selection,name:delivery_dhl_rest.selection__delivery_carrier__dhl_region_code__ap
 msgid "Asia Pacific"
-msgstr "Asia Pacifica"
+msgstr "Asia Pacifico"
 
 #. module: delivery_dhl_rest
 #: model:ir.model.fields.selection,name:delivery_dhl_rest.selection__delivery_carrier__dhl_product_code__b
@@ -224,6 +224,11 @@ msgid "DHL Documents"
 msgstr "Documenti DHL"
 
 #. module: delivery_dhl_rest
+#: model:ir.module.module,shortdesc:base.module_delivery_dhl_rest
+msgid "DHL Express Shipping"
+msgstr ""
+
+#. module: delivery_dhl_rest
 #: model:ir.model.fields,field_description:delivery_dhl_rest.field_delivery_carrier__dhl_product_code
 msgid "DHL Product"
 msgstr "Prodotto DHL"
@@ -234,13 +239,18 @@ msgstr "Prodotto DHL"
 msgid ""
 "DHL account number is missing, please modify your delivery method settings."
 msgstr ""
-"Il numero conto DHL è mancante, si prega di modificare le impostazioni del "
-"metodo di consegna."
+"Il numero conto DHL è mancante, modifica le impostazioni del metodo di "
+"consegna."
 
 #. module: delivery_dhl_rest
 #: model:ir.model.fields,field_description:delivery_dhl_rest.field_delivery_carrier__dhl_default_package_type_id
 msgid "DHLxw Package Type"
 msgstr "Tipo collo DHLxw"
+
+#. module: delivery_dhl_rest
+#: model:ir.model,name:delivery_dhl_rest.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "Metodo di consegna"
 
 #. module: delivery_dhl_rest
 #: model:ir.model.fields,field_description:delivery_dhl_rest.field_delivery_carrier__dhl_duty_payment
@@ -462,6 +472,15 @@ msgid "S - Same Day"
 msgstr "S - Stesso giorno"
 
 #. module: delivery_dhl_rest
+#: model:ir.module.module,description:base.module_delivery_dhl_rest
+msgid ""
+"Send your shippings through DHL and track them online. This version of the "
+"DHL connector iscompatible with the DHL REST API available at https://"
+"developer.dhl.com/. It is no longercompatible with the older DHL SOAP APIs "
+"(which have their own credentials)."
+msgstr ""
+
+#. module: delivery_dhl_rest
 #: model:ir.model.fields.selection,name:delivery_dhl_rest.selection__delivery_carrier__dhl_duty_payment__s
 msgid "Sender"
 msgstr "Mittente"
@@ -483,11 +502,6 @@ msgstr ""
 "L'assicurazione sulla spedizione non è disponibile tra il luogo di origine e "
 "quello di destinazione. Ti consigliamo di provare con un altro prodotto DHL "
 "o di selezionare un metodo di consegna senza assicurazione."
-
-#. module: delivery_dhl_rest
-#: model:ir.model,name:delivery_dhl_rest.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Metodi di spedizione"
 
 #. module: delivery_dhl_rest
 #. odoo-python
@@ -551,12 +565,6 @@ msgstr ""
 #. module: delivery_dhl_rest
 #. odoo-python
 #: code:addons/delivery_dhl_rest/models/delivery_dhl.py:0
-msgid "The planned date for the shipment must be in the future."
-msgstr "La data pianificata per la spedizione deve essere nel futuro."
-
-#. module: delivery_dhl_rest
-#. odoo-python
-#: code:addons/delivery_dhl_rest/models/delivery_dhl.py:0
 msgid ""
 "There is no price available for this shipping, you should rather try with "
 "the DHL product %s"
@@ -615,3 +623,15 @@ msgstr "Z - Oneri destinazione"
 #: model:ir.model.fields.selection,name:delivery_dhl_rest.selection__delivery_carrier__dhl_label_image_format__zpl2
 msgid "ZPL2"
 msgstr "ZPL2"
+
+#~ msgid ""
+#~ " Extra Info: The scheduled time for the shipment was either not set or "
+#~ "was in the past, so DHL has been sent a planned shipping time of one hour "
+#~ "from now"
+#~ msgstr ""
+#~ " Informazioni aggiuntive: l'orario previsto per la spedizione non era "
+#~ "stato impostato o era già trascorso, pertanto a DHL è stato comunicato un "
+#~ "orario di spedizione previsto tra un'ora di pianificazione"
+
+#~ msgid "The planned date for the shipment must be in the future."
+#~ msgstr "La data pianificata per la spedizione deve essere nel futuro."

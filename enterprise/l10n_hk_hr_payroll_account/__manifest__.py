@@ -2,8 +2,6 @@
 
 {
     'name': 'Hong Kong - Payroll with Accounting',
-    'version': '1.0',
-    'countries': ['hk'],
     'category': 'Human Resources/Payroll',
     'description': """
 Accounting Data for Hong Kong Payroll Rules
@@ -19,5 +17,5 @@ Accounting Data for Hong Kong Payroll Rules
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'auto_install': True,
+    'auto_install': ['l10n_hk_hr_payroll', 'hr_payroll_account'],
 }

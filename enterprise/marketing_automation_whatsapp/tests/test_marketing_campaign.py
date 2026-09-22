@@ -21,9 +21,9 @@ class WaMaCase(WhatsAppCommon, MockIncomingWhatsApp, MarketingAutomationCase, Ma
         })
 
         cls.campaign = cls.env["marketing.campaign"].create({
-            "domain": [("id", "in", cls.whatsapp_test_customer.ids)],
+            'enroll_domain': [("id", "in", cls.whatsapp_test_customer.ids)],
             'model_id': cls.env["ir.model"]._get_id("res.partner"),
-            "name": "Test Campaign",
+            'name': "Test Campaign",
         })
         cls.test_wa_template = cls._create_wa_template(
             "res.partner",
@@ -46,11 +46,11 @@ class TestMarketingAutomation(WaMaCase):
 
     def test_detect_responses(self):
         """ Test reply mechanism on whatsapp """
-        self.campaign.sync_participants()
+        self.campaign._synchronize_participants()
 
         # send message
         with self.mockWhatsappGateway():
-            self.campaign.execute_activities()
+            self.campaign._execute_activities()
 
         traces = self.env['marketing.trace'].search([
             ('activity_id', 'in', self.activity.ids),
@@ -66,12 +66,45 @@ class TestMarketingAutomation(WaMaCase):
 @tagged("link_tracker")
 class TestLinkTracker(WaMaCase):
 
+    def test_static_button(self):
+        """ Static URL buttons in MA support. Different test compared to
+        'test_tracked_button' because WA templates support only 2 buttons
+        at a time. """
+        self.test_wa_template.write({
+            'button_ids': [
+                (5, 0),
+                (0, 0, {
+                    'sequence': 0,
+                    'button_type': 'url',
+                    'name': 'url_static',
+                    'url_type': 'static',
+                    'website_url': self.wa_static_btn_url,
+                }),
+            ],
+        })
+
+        # send message
+        self.campaign._synchronize_participants()
+        with self.mockWhatsappGateway():
+            self.campaign._execute_activities()
+
+        trace = self.env['marketing.trace'].search([
+            ('activity_id', 'in', self.activity.ids),
+            ('res_id', '=', self.whatsapp_test_customer.id),
+        ])
+        self.assertEqual(len(trace), 1)
+
+        # find embedded links
+        sent_wa_msg = self._wa_msg_sent_vals[0]
+        # only body, static do not send component
+        self.assertEqual(len(sent_wa_msg['components']), 1)
+
     def test_tracked_button(self):
-        self.campaign.sync_participants()
+        self.campaign._synchronize_participants()
 
         # send message
         with self.mockWhatsappGateway():
-            self.campaign.execute_activities()
+            self.campaign._execute_activities()
 
         trace = self.env['marketing.trace'].search([
             ('activity_id', 'in', self.activity.ids),
@@ -93,10 +126,8 @@ class TestLinkTracker(WaMaCase):
         body_link_tracker = self.env['link.tracker'].search([("url", "=", self.wa_tracked_body_url)])
         self.assertEqual(len(body_link_tracker), 1)
 
-        # FIXME: why are buttons using local part url only, not body url ?
-        self.assertEqual(link_btn_1, f'r/{btn_link_tracker.code}/w/{trace.whatsapp_message_id.id}')
+        self.assertEqual(link_btn_1, f'{self.link_base_url}/r/{btn_link_tracker.code}/w/{trace.whatsapp_message_id.id}')
         self.assertEqual(link_body, f'{self.link_base_url}/r/{body_link_tracker.code}/w/{trace.whatsapp_message_id.id}')
-        # FIXME: why are dynamic buttons not having their trailing / ?
         self.assertEqual(link_btn_2, '???')
 
     def test_wa_template_button_component_tracking(self):

@@ -19,10 +19,10 @@ class L10nChCompensationFund(models.Model):
         input_values = []
 
         # Load Input Types
-        child_allowance_input = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_input_WT_3000')
-        education_allowance_input = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_input_WT_3010')
-        child_allowance_input_fcf = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3004_input_fcf')
-        education_allowance_input_fcf = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3014_input_fcf')
+        child_allowance_input = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3000')
+        education_allowance_input = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3010')
+        child_allowance_input_fcf = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3004_fcf')
+        education_allowance_input_fcf = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3014_fcf')
 
         if not self.caf_scale_ids:
             return []
@@ -98,7 +98,7 @@ class L10nChCompensationFund(models.Model):
 
                     input_values.append({
                         'amount': amount,
-                        'input_type_id': allowance_input.id
+                        'salary_rule_id': allowance_input.id
                     })
 
         return input_values

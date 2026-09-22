@@ -1,50 +1,15 @@
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
+from unittest.mock import patch
 
 from odoo import Command, fields
 from odoo.addons.documents.tests.test_documents_common import TransactionCaseDocuments
 from odoo.addons.mail.tests.common import MockEmail
-from odoo.tests import Form, freeze_time, users
+from odoo.tests import tagged, Form, freeze_time, users
+from odoo.tools import mute_logger
 
 
-class TestDocumentsSharing(TransactionCaseDocuments, MockEmail):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.manager_doc, cls.user_doc = cls.env['documents.document'].create([{
-            'name': 'Manager document',
-            'folder_id': cls.folder_a.id,
-            'owner_id': cls.document_manager.id,
-            'access_ids': False,
-        }, {
-            'name': 'User document',
-            'folder_id': cls.folder_a.id,
-            'owner_id': cls.doc_user.id,
-            'access_ids': False,
-        }])
-        cls.manager_doc_shortcut, cls.user_doc_shortcut = cls.env['documents.document'].create([{
-            'name': 'Manager document (shortcut)',
-            'shortcut_document_id': cls.manager_doc.id,
-        }, {
-            'name': 'User document (shortcut)',
-            'shortcut_document_id': cls.user_doc.id,
-        }])
-        cls.partner_without_user = cls.env['res.partner'].create({
-            'name': 'Dave',
-            'email': 'dave@odoo.com',
-        })
-        cls.portal_user.email = 'portal_user_doc_sharing@example.com'
-        cls.portal_partner = cls.portal_user.partner_id
-        cls.internal_user.email = 'internal_doc_sharing@example.com'
-
-    def set_documents_env_user_to_current(self):
-        """Helper to ensure the env of the test documents are self.env.user (to work with @users decorator)."""
-        self.manager_doc = self.manager_doc.with_user(self.env.user)
-        self.user_doc = self.user_doc.with_user(self.env.user)
-        self.manager_doc_shortcut = self.manager_doc_shortcut.with_user(self.env.user)
-        self.user_doc_shortcut = self.user_doc_shortcut.with_user(self.env.user)
-        self.folder_a = self.folder_a.with_user(self.env.user)
-        self.folder_b = self.folder_b.with_user(self.env.user)
+class TestDocumentsSharingCommon(TransactionCaseDocuments):
 
     @staticmethod
     def form_get_access_edit(form, partner):
@@ -76,6 +41,49 @@ class TestDocumentsSharing(TransactionCaseDocuments, MockEmail):
                 'views': [[False, 'form']],
             })
         return self.env['documents.sharing'].browse([action['res_id']])
+
+
+class TestDocumentsSharing(TestDocumentsSharingCommon, MockEmail):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.manager_doc, cls.user_doc = cls.env['documents.document'].create([{
+            'name': 'Manager document',
+            'folder_id': cls.folder_a.id,
+            'owner_id': cls.document_manager.id,
+            'access_ids': False,
+            'raw': b'test',
+        }, {
+            'name': 'User document',
+            'folder_id': cls.folder_a.id,
+            'owner_id': cls.doc_user.id,
+            'access_ids': False,
+            'raw': b'test',
+        }])
+        cls.manager_doc_shortcut, cls.user_doc_shortcut = cls.env['documents.document'].create([{
+            'name': 'Manager document (shortcut)',
+            'shortcut_document_id': cls.manager_doc.id,
+        }, {
+            'name': 'User document (shortcut)',
+            'shortcut_document_id': cls.user_doc.id,
+        }])
+        cls.partner_without_user = cls.env['res.partner'].create({
+            'name': 'Dave',
+            'email': 'dave@odoo.com',
+        })
+        cls.portal_user.email = 'portal_user_doc_sharing@example.com'
+        cls.portal_partner = cls.portal_user.partner_id
+        cls.internal_user.email = 'internal_doc_sharing@example.com'
+        cls.doc_user.email = 'doc_user@example.com'
+
+    def set_documents_env_user_to_current(self):
+        """Helper to ensure the env of the test documents are self.env.user (to work with @users decorator)."""
+        self.manager_doc = self.manager_doc.with_user(self.env.user)
+        self.user_doc = self.user_doc.with_user(self.env.user)
+        self.manager_doc_shortcut = self.manager_doc_shortcut.with_user(self.env.user)
+        self.user_doc_shortcut = self.user_doc_shortcut.with_user(self.env.user)
+        self.folder_a = self.folder_a.with_user(self.env.user)
+        self.folder_b = self.folder_b.with_user(self.env.user)
 
     @freeze_time('2025-02-26 15:02:00')
     def test_filtered_relevant_access(self):
@@ -227,8 +235,73 @@ class TestDocumentsSharing(TransactionCaseDocuments, MockEmail):
         self.partner_without_user.email = False
         action = self.create_documents_sharing(self.user_doc).action_invite_members()
         self.assertEqual(action['params']['type'], 'warning')
-        self.assertEqual(action['params']['title'], 'No partners')
+        self.assertEqual(action['params']['title'], 'No partners/groups')
         self.assertFalse(action.get('next'), 'The wizard remains open.')
+
+    @mute_logger('odoo.addons.base.models.ir_rule')
+    @users("documents@example.com")
+    def test_invite_reset_expiration_date(self):
+        """Re-inviting a member reset its expiration date."""
+        self.set_documents_env_user_to_current()
+        doc = self.user_doc
+
+        expired = fields.Datetime.now() - timedelta(days=1)
+        doc.action_update_access_rights(partners={self.portal_partner: ('view', expired),
+                                                 self.internal_user.partner_id: ('edit', False)})
+        self._assert_raises_check_access_rule(doc.with_user(self.portal_user), 'read')
+
+        doc_sharing = self.create_documents_sharing(doc)
+        with Form(doc_sharing) as form:
+            form.invite_partner_ids = self.portal_partner
+            form.invite_role = 'view'
+            form.invite_notify = False
+        self.assertEqual(doc_sharing.share_access_ids.partner_id, self.internal_user.partner_id,
+                         "Expired member is hidden from People with access.")
+        self.assertEqual(doc_sharing.action_invite_members()['params']['type'], 'success')
+
+        doc_sharing = self.create_documents_sharing(doc)
+        self.assertIn(self.portal_partner, doc_sharing.share_access_ids.partner_id,
+                      "Re-invited member reappears under People with access.")
+        self.assertFalse(
+            doc_sharing.share_access_ids.filtered(lambda ds: ds.partner_id == self.portal_partner).expiration_date,
+            "Expiration date has been reset.")
+        self.assertEqual(doc.with_user(self.portal_user).user_permission, 'view',
+                         "Re-invited member has access to the document again.")
+
+    @mute_logger('odoo.addons.base.models.ir_rule')
+    @users("documents@example.com")
+    def test_invite_reset_expiration_date_group(self):
+        """Re-inviting a group reset its expiration date."""
+        self.set_documents_env_user_to_current()
+        doc = self.user_doc
+        group = self.env['res.group.functional'].sudo().create({
+            'name': 'Portal Functional Group',
+            'user_ids': [Command.link(self.portal_user.id)],
+        })
+
+        expired = fields.Datetime.now() - timedelta(days=1)
+        doc.action_update_access_rights(groups={group: ('view', expired)},
+                                       partners={self.internal_user.partner_id: ('edit', False)})
+        self._assert_raises_check_access_rule(doc.with_user(self.portal_user), 'read')
+
+        doc_sharing = self.create_documents_sharing(doc)
+        with Form(doc_sharing) as form:
+            form.invite_type = 'groups'
+            form.invite_group_ids = group
+            form.invite_role = 'view'
+            form.invite_notify = False
+        self.assertFalse(doc_sharing.share_access_ids.group_id,
+                         "Expired group is hidden from People with access.")
+        self.assertEqual(doc_sharing.action_invite_members()['params']['type'], 'success')
+
+        doc_sharing = self.create_documents_sharing(doc)
+        self.assertEqual(doc_sharing.share_access_ids.group_id, group,
+                         "Re-invited group reappears under People with access.")
+        self.assertFalse(
+            doc_sharing.share_access_ids.filtered(lambda ds: ds.group_id == group).expiration_date,
+            "Expiration date has been reset.")
+        self.assertEqual(doc.with_user(self.portal_user).user_permission, 'view',
+                         "Members of the re-invited group have access to the document again.")
 
     @users("documents@example.com")
     def test_invite_warning_partners_without_access(self):
@@ -236,7 +309,10 @@ class TestDocumentsSharing(TransactionCaseDocuments, MockEmail):
         self.set_documents_env_user_to_current()
         (self.user_doc | self.manager_doc).sudo().access_internal = 'edit'
         for documents in (self.user_doc, self.user_doc.copy() | self.manager_doc):
-            with self.subTest(documents=documents.mapped('name')):
+            with (
+                self.subTest(documents=documents.mapped('name')),
+                patch.object(self.env.registry["res.users"], '_get_signup_invitation_scope', lambda _: 'b2b')
+            ):
                 action = self.env['documents.sharing'].action_open(documents.ids)
                 doc_sharing = self.assert_open_wizard(action, documents)
                 with Form(doc_sharing) as form:
@@ -246,7 +322,7 @@ class TestDocumentsSharing(TransactionCaseDocuments, MockEmail):
                 self.assertTrue(action)
                 self.assertTrue({'type': 'ir.actions.client', 'tag': 'display_notification'}.items() <= action.items())
                 self.assertTrue(
-                    {'type': 'success', 'title': 'Successfully Shared'}.items() <= action.get('params', {}).items())
+                    {'type': 'success', 'title': 'Successfully shared'}.items() <= action.get('params', {}).items())
                 self.assert_open_wizard(action.get('params', {}).get('next'), documents)
 
                 with Form(self.create_documents_sharing(documents)) as form:
@@ -264,6 +340,19 @@ class TestDocumentsSharing(TransactionCaseDocuments, MockEmail):
                           self.form_get_access_edit(form, self.partner_without_user) as access_part_without_user_form):
                         self.assertFalse(access_internal_form.has_warning_no_access)
                         self.assertFalse(access_part_without_user_form.has_warning_no_access)
+
+        with (
+            self.subTest("Signup enabled"),
+            patch.object(self.env.registry["res.users"], '_get_signup_invitation_scope', lambda _: 'b2c')
+        ):
+            # don't show the warning if the signup is available
+            self.user_doc.access_via_link = 'none'
+            action = self.env['documents.sharing'].action_open(self.user_doc.ids)
+            doc_sharing = self.assert_open_wizard(action, self.user_doc)
+            with Form(doc_sharing) as form:
+                self.assertFalse(form.has_warning_partners_without_access)
+                form.invite_partner_ids = self.partner_without_user
+            self.assertFalse(form.has_warning_partners_without_access)
 
     def test_open_wizard_with_shortcuts(self):
         """Test that open sharing wizard on shortcuts open the wizard on the target of the shortcut."""
@@ -404,6 +493,17 @@ class TestDocumentsSharing(TransactionCaseDocuments, MockEmail):
         self.assertFalse(portal_access_user_doc.expiration_date)
         self.assertEqual(portal_access_user_doc.role, 'view')
 
+    @users("documents@example.com")
+    def test_update_access_rights_as_editor(self):
+        """Test modifying access_internal when "only" an editor."""
+        self.set_documents_env_user_to_current()
+        self.manager_doc.sudo().action_update_access_rights(
+            access_internal='none', access_via_link='none', partners={self.env.user.partner_id: ('edit', None)})
+        doc_sharing = self.create_documents_sharing(self.manager_doc)
+        with Form(doc_sharing) as form:
+            form.access_internal = 'write_edit'
+            self.assertFalse(form.is_readonly)
+
     @users("dtdm")
     def test_update_access_rights_of_owners(self):
         """Test modifying member access of partner that owns some of the selected documents."""
@@ -464,18 +564,23 @@ class TestDocumentsSharing(TransactionCaseDocuments, MockEmail):
 
     @users("documents@example.com")
     def test_update_access_rights_warning_link_with_more_rights(self):
-        """Test the warning about sharing documents with more rights when having the link than the internal users."""
+        """Test the warning about gaining indirectly "edit" permission through access_via_link being "edit"."""
         self.set_documents_env_user_to_current()
         for documents in (self.user_doc, self.user_doc.copy() | self.user_doc.copy()):
+            documents.action_update_access_rights(partners={self.portal_partner: ('view', False)})
             with self.subTest(documents=documents):
                 documents.access_internal = 'edit'
                 documents.access_via_link = 'edit'
-                doc_sharing = self.create_documents_sharing(documents)
-                with Form(doc_sharing) as form:
-                    self.assertFalse(form.has_warning_link_with_more_rights)
-                    form.access_internal = 'write_view'
-                    self.assertTrue(form.has_warning_link_with_more_rights)
-                action = doc_sharing.action_update_rights()
+
+                action = self.env['documents.sharing'].action_open(documents.ids)
                 doc_sharing = self.assert_open_wizard(action, documents)
-                self.assertEqual(set(documents.mapped('access_internal')), {'view'})
-                self.assertTrue(doc_sharing.has_warning_link_with_more_rights)
+
+                with Form(doc_sharing) as form:
+                    # portal user gains indirectly "edit" access as access_via_link = "edit"
+                    self.assertTrue(form.has_warning_link_with_more_rights)
+                    with self.form_get_access_edit(form, self.portal_partner) as access_edit_form:
+                        access_edit_form.is_deleted = True
+                    self.assertFalse(form.has_warning_link_with_more_rights)
+                    # internal users gain indirectly "edit" access as access_via_link = "edit"
+                    form.access_internal = 'view'
+                    self.assertTrue(form.has_warning_link_with_more_rights)

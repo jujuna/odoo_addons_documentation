@@ -16,23 +16,21 @@ class SocialPost(models.Model):
             post.use_leads = self.env.user.has_group('crm.group_use_lead')
 
     def _compute_leads_opportunities_count(self):
-        mapped_data = {}
-        if self.source_id.ids:
-            lead_data = self.env['crm.lead']._read_group(
-                [('source_id', 'in', self.source_id.ids)],
-                ['source_id'], ['__count'])
-            mapped_data = {source.id: count for source, count in lead_data}
+        lead_data = {}
+        if self:
+            lead_data = dict(
+                self.env['crm.lead']._read_group(
+                    [('utm_reference', 'in', [f'{post._name},{post.id}' for post in self])],
+                    ['utm_reference'], ['__count'])
+                )
+
         for post in self:
-            post.leads_opportunities_count = mapped_data.get(post.source_id.id, 0)
+            post.leads_opportunities_count = lead_data.get(f'{post._name},{post.id}', 0)
 
     def action_redirect_to_leads_opportunities(self):
         view = 'crm.crm_lead_all_leads' if self.use_leads else 'crm.crm_lead_opportunities'
         action = self.env["ir.actions.actions"]._for_xml_id(view)
         action['view_mode'] = 'list,kanban,graph,pivot,form,calendar'
-        action['domain'] = self._get_crm_utm_domain()
+        action['domain'] = [('utm_reference', 'in', [f'{post._name},{post.id}' for post in self])]
         action['context'] = {'active_test': False, 'create': False}
         return action
-
-    def _get_crm_utm_domain(self):
-        """ We want all records that match the UTMs """
-        return [('source_id', '=', self.source_id.id)]

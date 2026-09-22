@@ -5,8 +5,11 @@ from . import test_spreadsheet_collaborative
 from . import test_spreadsheet_documents_sharing
 from . import test_spreadsheet_import_xlsx
 from . import test_spreadsheet_import_csv
+from . import test_spreadsheet_portal_sharing
+from . import test_spreadsheet_public_sharing
 from . import test_spreadsheet_share
 from . import test_spreadsheet_template
+from . import test_spreadsheet_trash
 from . import test_spreadsheet
 from . import test_share_controllers
 from . import test_session_info

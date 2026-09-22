@@ -8,6 +8,14 @@ from odoo.addons.account.models.chart_template import template
 class AccountChartTemplate(models.AbstractModel):
     _inherit = 'account.chart.template'
 
+    @template('ec', 'res.company')
+    def _get_ec_edi_res_company(self):
+        return {
+            self.env.company.id: {
+                'l10n_ec_edi_provider_id': self.env.company.partner_id.id,
+            },
+        }
+
     @template('ec', 'account.journal')
     def _get_ec_edi_account_journal(self):
         return {

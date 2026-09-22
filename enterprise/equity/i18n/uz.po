@@ -14,15 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-10-08 18:43+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-17 22:51+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/equity/"
+"uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__securities
@@ -93,9 +95,8 @@ msgstr "(Musbat bo‘lmagan opsiyonlarning muddati tugamaydi)"
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
-#, fuzzy
 msgid "(Optional)"
-msgstr "(Ixtiyoriy)"
+msgstr ""
 
 #. module: equity
 #. odoo-python
@@ -109,12 +110,6 @@ msgstr "(muddati tugagan)"
 #, fuzzy
 msgid "(object._get_ubo_report_filename())"
 msgstr "(object._get_ubo_report_filename())"
-
-#. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-#, fuzzy
-msgid "/ Security"
-msgstr "/ Qimmatli qog‘oz"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -131,108 +126,70 @@ msgid "<br/> Nationality:"
 msgstr "<br/> Fuqaroligi:"
 
 #. module: equity
-#: model:mail.template,body_html:equity.equity_shareholder_email_template
-#, fuzzy
-msgid ""
-"<div>\n"
-"                    <p> Hello <t t-out=\"ctx.get('holder_name')\"/>,<br/>\n"
-"                        You will find your latest transaction and valuations "
-"in the following link: <br/>\n"
-"                        <a t-attf-href=\"/my/equity?"
-"access_token={{ctx.get('equity_access_token')}}\" class=\"btn btn-"
-"primary\">Show Equity</a> <br/> <br/>\n"
-"                        Best,\n"
-"                        <t t-if=\"user_id.signature\">\n"
-"                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
-"<div> <p> Hurmatli <t t-out=\"ctx.get('holder_name')\"/>,<br/> Sizning "
-"so‘nggi operatsiyalaringiz va baholashlaringizni quyidagi havola orqali "
-"ko‘rishingiz mumkin: <br/> <a t-attf-href=\"/my/equity?"
-"access_token={{ctx.get('equity_access_token')}}\" class=\"btn btn-"
-"primary\">Aksiyalarni ko‘rsatish</a> <br/> <br/> Hurmat bilan, <t t-"
-"if=\"user_id.signature\"> <br/>--<br/> <t t-out=\"user_id.signature or "
-"''\">Mitchell Admin</t> </t> </p> </div>"
-
-#. module: equity
 #: model:mail.template,body_html:equity.equity_ubo_form_email_template
-#, fuzzy
 msgid ""
 "<div>\n"
-"                    <p> Hello <t t-out=\"object.name\"/>,<br/>\n"
+"                    <p> Hello,<br/>\n"
 "                        Following our legal obligations to identify clients, "
 "we need to report natural persons who directly or indirectly\n"
 "                        hold or control at least 25% in the capital or "
 "voting rights of <b><t t-out=\"user_id.company_id.name\"/></b>. <br/> <br/>\n"
-"                        Please fill in the UBO request:<br/>\n"
-"                        <a t-attf-href=\"/my/ubo?"
-"{{object._get_equity_url_params()}}\" class=\"btn btn-primary\">Fill UBO</a> "
-"<br/> <br/>\n"
+"                        Please fill in the UBO request through the link "
+"above.<br/> <br/>\n"
 "                        Thank you,\n"
 "                        <t t-if=\"user_id.signature\">\n"
 "                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
-"<div> <p> Hurmatli <t t-out=\"object.name\"/>,<br/> Mijozlarni aniqlash "
-"bo‘yicha qonuniy majburiyatlarimizga ko‘ra, biz <b><t t-"
-"out=\"user_id.company_id.name\"/></b> kompaniyasining kapitalida yoki ovoz "
-"berish huquqlarining kamida 25 foiziga bevosita yoki bilvosita egalik "
-"qiluvchi yoki nazorat qiluvchi jismoniy shaxslar haqida ma'lumot berishimiz "
-"kerak. <br/> <br/> Iltimos, UBO so‘rovnomasini to‘ldiring:<br/> <a t-attf-"
-"href=\"/my/ubo?{{object._get_equity_url_params()}}\" class=\"btn btn-"
-"primary\">UBOni to‘ldirish</a> <br/> <br/> Rahmat, <t t-"
-"if=\"user_id.signature\"> <br/>--<br/> <t t-out=\"user_id.signature or "
-"''\">Mitchell Admin</t> </t> </p> </div>"
+
+#. module: equity
+#: model:mail.template,body_html:equity.equity_shareholder_email_template
+msgid ""
+"<div>\n"
+"                    <p> Hello,<br/>\n"
+"                        You will find your latest transaction and valuations "
+"in the link above. <br/> <br/>\n"
+"                        Best,\n"
+"                        <t t-if=\"user_id.signature\">\n"
+"                            <br/>--<br/>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
+msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-envelope ms-2 mt-1\" aria-label=\"Email Address\" "
-"title=\"Email Address\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"mail\" aria-label=\"Email "
+"Address\" title=\"Email Address\"/>"
 msgstr ""
-"<i class=\"fa fa-envelope ms-2 mt-1\" aria-label=\"Elektron pochta manzili\" "
-"title=\"Elektron pochta manzili\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-phone ms-2 mt-1\" aria-label=\"Phone Number\" title=\"Phone "
-"Number\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"phone\" aria-label=\"Phone "
+"Number\" title=\"Phone Number\"/>"
 msgstr ""
-"<i class=\"fa fa-phone ms-2 mt-1\" aria-label=\"Telefon raqami\" "
-"title=\"Telefon raqami\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_kanban
-#, fuzzy
 msgid ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"To\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'exercise'\"/>"
 msgstr ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
-"invisible=\"transaction_type!= 'exercise'\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_kanban
-#, fuzzy
 msgid ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"To\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'transfer'\"/>"
 msgstr ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
-"invisible=\"transaction_type!= 'transfer'\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_view_partner_form
@@ -253,8 +210,8 @@ msgid ""
 "<span> Shareholder<span invisible=\"equity_shareholders_count == 1\">s</"
 "span></span>"
 msgstr ""
-"<span> Aksiyador<span invisible=\"equity_shareholders_count == 1\">lar</"
-"span></span>"
+"<span> Aksiyador<span invisible=\"equity_shareholders_count == 1\">lar</span>"
+"</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -341,6 +298,12 @@ msgstr ""
 "davlatlarning tartibga solinadigan bozorida muomalada bo‘lgan kompaniya; yoki"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid "A partner cannot have transactions in different currencies."
+msgstr ""
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 #, fuzzy
 msgid ""
@@ -412,6 +375,11 @@ msgid "Auditor"
 msgstr "Auditor"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__author_id
+msgid "Author"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 #: model:ir.model.fields,help:equity.field_equity_ubo__auth_rep_role
@@ -450,8 +418,8 @@ msgstr ""
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
-#: model:ir.model.fields,field_description:equity.field_res_partner__ubo_birth_date
-#: model:ir.model.fields,field_description:equity.field_res_users__ubo_birth_date
+#: model:ir.model.fields,field_description:equity.field_res_partner__birth_date
+#: model:ir.model.fields,field_description:equity.field_res_users__birth_date
 #, fuzzy
 msgid "Birth Date"
 msgstr "Tug‘ilgan sana"
@@ -470,6 +438,11 @@ msgid "Board Member"
 msgstr "Kengash a'zosi"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__body_has_template_value
+msgid "Body content is the same as the template"
+msgstr ""
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 #, fuzzy
 msgid "Buyer"
@@ -480,6 +453,16 @@ msgstr "Xaridor"
 #, fuzzy
 msgid "CEO"
 msgstr "Bosh direktor"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_transaction__can_change_currency
+msgid "Can Change Currency"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__can_edit_body
+msgid "Can Edit Body"
+msgstr ""
 
 #. module: equity
 #. odoo-python
@@ -545,6 +528,7 @@ msgid "Clear"
 msgstr "Tozalash"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_cap_table__company_id
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__partner_id
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__partner_id
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__partner_id
@@ -574,6 +558,18 @@ msgid "Company - Cat 3. Executive officer"
 msgstr "Kompaniya - 3-toifa. Ijrochi rahbar"
 
 #. module: equity
+#: model:ir.model.fields,help:equity.field_equity_transaction__company_id
+#: model:ir.model.fields,help:equity.field_equity_ubo__company_id
+#: model:ir.model.fields,help:equity.field_equity_valuation__company_id
+msgid "Company to which this record is visible"
+msgstr ""
+
+#. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+msgid "Compose Email"
+msgstr ""
+
+#. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_configuration
 #, fuzzy
 msgid "Configuration"
@@ -587,6 +583,11 @@ msgstr "Sozlamalar"
 #, fuzzy
 msgid "Contact"
 msgstr "Kontakt"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__body
+msgid "Contents"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -653,6 +654,7 @@ msgid "Create a Customer"
 msgstr "Mijoz yaratish"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__create_uid
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__create_uid
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__create_uid
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__create_uid
@@ -662,6 +664,7 @@ msgid "Created by"
 msgstr "Yaratuvchi"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__create_date
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__create_date
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__create_date
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__create_date
@@ -738,6 +741,7 @@ msgstr "Bekor qilish"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__display_name
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__display_name
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__display_name
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__display_name
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__display_name
@@ -780,11 +784,12 @@ msgstr "Haqiqiy egani tahrirlash"
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 #: model:ir.actions.server,name:equity.action_equity_dashboard_res_partner
+#: model:ir.module.module,shortdesc:base.module_equity
 #: model:ir.ui.menu,name:equity.menu_equity
+#: model:portal.entry,name:equity.equity_portal_entry
 #: model:res.groups.privilege,name:equity.res_groups_privilege_equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_breadcrumbs_equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
-#: model_terms:ir.ui.view,arch_db:equity.portal_my_home_equity
 #, fuzzy
 msgid "Equity"
 msgstr "Aksiya"
@@ -797,12 +802,38 @@ msgid "Equity Access Token"
 msgstr "Aksiyalarga kirish tokeni"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button
+msgid "Equity Button"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button_text
+msgid "Equity Button Text"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button_url
+msgid "Equity Button Url"
+msgstr ""
+
+#. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__equity_currency_id
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_currency_id
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_currency_id
 #, fuzzy
 msgid "Equity Currency"
 msgstr "Aksiya valyutasi"
+
+#. module: equity
+#: model:ir.model,name:equity.model_equity_mail_compose_message
+msgid "Equity Email composition wizard"
+msgstr ""
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
+msgid "Equity Invitation"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_kanban_dashboard_graph
@@ -921,6 +952,12 @@ msgstr ""
 "shaxslar; ota-ona;"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
+msgid "Fill UBO"
+msgstr ""
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 #, fuzzy
 msgid "First and Last Name:"
@@ -951,10 +988,10 @@ msgid ""
 "                <b>hold or control at least 25% in the capital or voting "
 "rights</b> of"
 msgstr ""
-"Mijozlarni aniqlash bo‘yicha qonuniy majburiyatlarimizga ko‘ra, "
-"<b>kompaniyaning kamida 25% kapital yoki ovoz berish huquqlariga bevosita "
-"yoki bilvosita egalik qiluvchi yoki nazorat qiluvchi</b> jismoniy shaxslar "
-"haqida ma'lumot bering"
+"Mijozlarni aniqlash bo‘yicha qonuniy majburiyatlarimizga ko‘ra, <b>"
+"kompaniyaning kamida 25% kapital yoki ovoz berish huquqlariga bevosita yoki "
+"bilvosita egalik qiluvchi yoki nazorat qiluvchi</b> jismoniy shaxslar haqida "
+"ma'lumot bering"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_formation_date
@@ -962,6 +999,11 @@ msgstr ""
 #, fuzzy
 msgid "Formation Date"
 msgstr "Tashkil etilgan sana"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__email_from
+msgid "From"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -1055,16 +1097,14 @@ msgstr "Aksiyalar"
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.xml:0
-#, fuzzy
 msgid ""
 "I hereby declare on honor that the information provided is truthful and "
 "accurate."
 msgstr ""
-"Men taqdim etilgan ma'lumotlar to‘g‘ri va aniq ekanligini vijdonan "
-"tasdiqlayman."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__id
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__id
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__id
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__id
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__id
@@ -1167,11 +1207,9 @@ msgid "Invalid token"
 msgstr "Noto‘g‘ri token"
 
 #. module: equity
-#. odoo-python
-#: code:addons/equity/models/res_partner.py:0
-#, fuzzy
-msgid "Invite %s"
-msgstr "%sni taklif qilish"
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__is_mail_template_editor
+msgid "Is Editor"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_is_follower
@@ -1195,6 +1233,12 @@ msgid "Job Position:"
 msgstr "Lavozim:"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__lang
+msgid "Language"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__write_uid
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__write_uid
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__write_uid
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__write_uid
@@ -1204,6 +1248,7 @@ msgid "Last Updated by"
 msgstr "Oxirgi yangilagan shaxs"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__write_date
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__write_date
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__write_date
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__write_date
@@ -1230,6 +1275,16 @@ msgstr "Davlat qonunlari bilan boshqariladigan yuridik shaxslar;"
 #, fuzzy
 msgid "Liquidator"
 msgstr "Tugatuvchi"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__template_id
+msgid "Mail Template"
+msgstr ""
+
+#. module: equity
+#: model:ir.module.module,summary:base.module_equity
+msgid "Manage securities, transactions, and cap tables."
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -1272,6 +1327,11 @@ msgstr "Xabarlar"
 #, fuzzy
 msgid "Missing Documents"
 msgstr "Yetishmayotgan hujjatlar"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__model
+msgid "Model"
+msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_equity
@@ -1393,23 +1453,23 @@ msgid "New Valuation"
 msgstr "Yangi baholash"
 
 #. module: equity
+#: model:res.groups.privilege,placeholder:equity.res_groups_privilege_equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 #, fuzzy
 msgid "No"
 msgstr "Yo‘q"
 
 #. module: equity
-#. odoo-python
-#: code:addons/equity/models/equity_transaction.py:0
-#, fuzzy
-msgid "No %s was set!"
-msgstr "%s belgilanmagan!"
-
-#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 #, fuzzy
 msgid "No UBOs recorded for this company."
 msgstr "Ushbu kompaniya uchun haqiqiy benefitsiar egalar qayd etilmagan."
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid "No holders were set!"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -1504,8 +1564,8 @@ msgid ""
 "Only %(subscriber_options)s %(security_class_name)s options available for "
 "exercise"
 msgstr ""
-"Amalga oshirish uchun faqat %(subscriber_options)s ta %"
-"(security_class_name)s opsiyasi mavjud"
+"Amalga oshirish uchun faqat %(subscriber_options)s ta %(security_class_name)"
+"s opsiyasi mavjud"
 
 #. module: equity
 #. odoo-python
@@ -1530,6 +1590,15 @@ msgstr "Opsiyani amalga oshirish"
 #, fuzzy
 msgid "Option Pool"
 msgstr "Opsiyalar jamg‘armasi"
+
+#. module: equity
+#: model:ir.model.fields,help:equity.field_equity_mail_compose_message__lang
+msgid ""
+"Optional translation language (ISO code) to select when sending out an "
+"email. If not set, the main partner's language will be used. This should "
+"usually be a placeholder expression that provides the appropriate language, "
+"e.g. {{ object.partner_id.lang }}."
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_security_class__class_type__options
@@ -1574,6 +1643,11 @@ msgstr "PEP - Siyosiy jihatdan ta'sirli shaxs"
 #, fuzzy
 msgid "Partner"
 msgstr "Hamkor"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids_all_have_email
+msgid "Partner Ids All Have Email"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -1642,6 +1716,11 @@ msgid "Recipient of the securities of the transaction."
 msgstr ""
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids
+msgid "Recipients"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_end_dialog.xml:0
 #, fuzzy
@@ -1656,16 +1735,26 @@ msgid "Remove holder exit date."
 msgstr "Egalik chiqish sanasini olib tashlash"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__render_model
+msgid "Rendering Model"
+msgstr ""
+
+#. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_reporting
 #, fuzzy
 msgid "Reporting"
 msgstr "Hisobot"
 
 #. module: equity
-#: model:ir.actions.act_window,name:equity.action_equity_request_ubo_form
+#: model:ir.actions.server,name:equity.action_equity_request_ubo_form
 #, fuzzy
 msgid "Request UBO Form"
 msgstr "UBO shaklini so‘rash"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__res_ids
+msgid "Res"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__auth_rep_role
@@ -1724,7 +1813,7 @@ msgid "Security Price"
 msgstr "Qimmatli qog‘oz narxi"
 
 #. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.portal_my_home_equity
+#: model:portal.entry,description:equity.equity_portal_entry
 #, fuzzy
 msgid "See your shares and transactions"
 msgstr "Aksiyalar va tranzaksiyalarni ko‘rish"
@@ -1759,21 +1848,11 @@ msgstr ""
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/cap_table/cap_table.xml:0
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 #, fuzzy
 msgid "Send"
 msgstr "Yuborish"
-
-#. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-#, fuzzy
-msgid "Send to Seller"
-msgstr "Sotuvchiga yuborish"
-
-#. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-#, fuzzy
-msgid "Send to Subscriber"
-msgstr "Obunachiga yuborish"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__sequence
@@ -1824,6 +1903,11 @@ msgstr "Imzo:"
 #, fuzzy
 msgid "Strike Price"
 msgstr "Ish bajarish narxi"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__subject
+msgid "Subject"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -1979,7 +2063,6 @@ msgstr "Umumiy qiymat"
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_valuation__event__transaction
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_form
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_search
 #, fuzzy
 msgid "Transaction"
@@ -2003,7 +2086,6 @@ msgstr "Bitim turi"
 #: model:ir.actions.act_window,name:equity.action_equity_transaction
 #: model:ir.ui.menu,name:equity.menu_equity_ownership_transactions
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_list
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 #, fuzzy
 msgid "Transactions"
 msgstr "Bitimlar"
@@ -2038,6 +2120,8 @@ msgid "UBO"
 msgstr "UBO"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
 #: model:mail.activity.type,name:equity.equity_ubo_form_mail_activity
 #, fuzzy
 msgid "UBO Form Request"
@@ -2136,6 +2220,7 @@ msgstr "UBO shaklini yuklash"
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__valuation
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__valuation
 #: model:ir.ui.menu,name:equity.menu_equity_reporting_valuation
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_form
 #, fuzzy
 msgid "Valuation"
 msgstr "Baholash"
@@ -2143,6 +2228,7 @@ msgstr "Baholash"
 #. module: equity
 #: model:ir.actions.act_window,name:equity.action_equity_valuation
 #: model:ir.ui.menu,name:equity.menu_equity_ownership_valuations
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 #, fuzzy
 msgid "Valuations"
 msgstr "Baholashlar"
@@ -2154,10 +2240,23 @@ msgid "Vesting period, exercise deadline, etc."
 msgstr "Huquqqa ega bo‘lish muddati, bajarish muddati va boshqalar"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
+msgid "View Equity"
+msgstr ""
+
+#. module: equity
 #: model:res.groups,name:equity.group_equity_viewer
 #, fuzzy
 msgid "Viewer"
 msgstr "Ko‘ruvchi"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_transaction__company_id
+#: model:ir.model.fields,field_description:equity.field_equity_ubo__company_id
+#: model:ir.model.fields,field_description:equity.field_equity_valuation__company_id
+msgid "Visible to"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__votes
@@ -2185,27 +2284,10 @@ msgid "Voting Rights"
 msgstr "Ovoz berish huquqi"
 
 #. module: equity
-#: model:ir.model.fields,field_description:equity.field_equity_transaction__website_message_ids
-#: model:ir.model.fields,field_description:equity.field_equity_ubo__website_message_ids
-#: model:ir.model.fields,field_description:equity.field_equity_valuation__website_message_ids
-#, fuzzy
-msgid "Website Messages"
-msgstr "Veb-sayt xabarlari"
-
-#. module: equity
-#: model:ir.model.fields,help:equity.field_equity_transaction__website_message_ids
-#: model:ir.model.fields,help:equity.field_equity_ubo__website_message_ids
-#: model:ir.model.fields,help:equity.field_equity_valuation__website_message_ids
-#, fuzzy
-msgid "Website communication history"
-msgstr "Veb-sayt muloqot tarixi"
-
-#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_end_dialog.xml:0
-#, fuzzy
 msgid "When did the shareholder lose its 25% stake in control or in votes?"
-msgstr "Aksiyador nazoratdagi yoki ovozdagi 25% ulushini qachon yo‘qotdi?"
+msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -2227,6 +2309,11 @@ msgid "Who should complete and sign the declaration?"
 msgstr "Deklaratsiyani kim to‘ldirishi va imzolashi kerak?"
 
 #. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+msgid "Write your message here..."
+msgstr ""
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 #, fuzzy
 msgid "Yes"
@@ -2242,6 +2329,17 @@ msgid ""
 msgstr ""
 "Siz 25% dan kam aksiyaga yoki ovoz berish huquqiga ega bo‘lgan har qanday "
 "aksiyadorni olib tashlashingiz mumkin."
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+#, fuzzy
+msgid ""
+"You cannot change the equity currency because this partner already has "
+"existing transactions."
+msgstr ""
+"Bog‘langan tranzaksiyalar mavjudligi sababli xavfsizlik sinfi turini "
+"o‘zgartirib bo‘lmaydi"
 
 #. module: equity
 #. odoo-javascript
@@ -2365,6 +2463,11 @@ msgid "e.g. Seed, Series A, ..."
 msgstr "masalan, Boshlang‘ich, A seriyasi, ..."
 
 #. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+msgid "e.g. Welcome to MyCompany!"
+msgstr ""
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 #, fuzzy
 msgid "in"
@@ -2398,6 +2501,11 @@ msgid "or"
 msgstr "yoki"
 
 #. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
+msgid "per security"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 #, fuzzy
@@ -2410,20 +2518,6 @@ msgstr "iltimos, foizlarni 0 va 100 orasida saqlang"
 #, fuzzy
 msgid "remaining"
 msgstr "qolgan"
-
-#. module: equity
-#. odoo-python
-#: code:addons/equity/models/equity_transaction.py:0
-#, fuzzy
-msgid "seller"
-msgstr "sotuvchi"
-
-#. module: equity
-#. odoo-python
-#: code:addons/equity/models/equity_transaction.py:0
-#, fuzzy
-msgid "subscriber"
-msgstr "obunachi"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
@@ -2444,3 +2538,11 @@ msgstr "yil"
 #, fuzzy
 msgid "years"
 msgstr "yil"
+
+#, fuzzy
+msgid "Website Messages"
+msgstr "Veb-sayt xabarlari"
+
+#, fuzzy
+msgid "Website communication history"
+msgstr "Veb-sayt muloqot tarixi"

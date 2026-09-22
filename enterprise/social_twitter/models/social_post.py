@@ -8,16 +8,23 @@ class SocialPost(models.Model):
     _inherit = 'social.post'
 
     twitter_image_ids = fields.Many2many(relation="twitter_image_ids_rel")
+    twitter_scheduled_date = fields.Datetime(
+        string='X Scheduled for',
+        compute='_compute_scheduled_date_by_media',
+        store=True, readonly=False, copy=False)
 
     @api.depends('live_post_ids.twitter_tweet_id')
     def _compute_stream_posts_count(self):
         super()._compute_stream_posts_count()
 
     @api.depends('state')
-    def _compute_twitter_post_limit_message(self):
-        self.twitter_post_limit_message = False
+    def _compute_is_twitter_post_limit_exceed(self):
         self.is_twitter_post_limit_exceed = False
-        super(SocialPost, self - self.filtered(lambda post: post.state in ['posting', 'posted']))._compute_twitter_post_limit_message()
+        super(SocialPost, self - self.filtered(lambda post: post.state in ['posting', 'posted']))._compute_is_twitter_post_limit_exceed()
+
+    @api.model
+    def _scheduled_date_fields(self):
+        return {**super()._scheduled_date_fields(), 'twitter': 'twitter_scheduled_date'}
 
     def _get_stream_post_domain(self):
         domain = super()._get_stream_post_domain()

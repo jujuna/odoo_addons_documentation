@@ -1,3 +1,6 @@
+import { htmlToTextContentInline } from "@mail/utils/common/format";
+
+import { isAndroid } from "@web/core/browser/feature_detection";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
@@ -25,9 +28,14 @@ export class OutOfFocusService {
         /** @type {import("models").Store} */
         this.store = services["mail.store"];
         this.closeFuncs = [];
+        this.contributingMessageLocalIds = new Set();
+        env.bus.addEventListener("window_focus", () => this.onWindowFocus());
     }
-
     async notify(message, thread) {
+        if (this.contributingMessageLocalIds.has(message.localId)) {
+            return;
+        }
+        this.contributingMessageLocalIds.add(message.localId);
         const modelsHandleByPush = ["mail.thread", "discuss.channel"];
         if (
             modelsHandleByPush.includes(message.thread?.model) &&
@@ -42,21 +50,22 @@ export class OutOfFocusService {
             notificationTitle = _t("New message");
         } else {
             icon = author.avatarUrl;
-            if (message.thread?.channel_type === "channel") {
+            if (message.thread?.channel?.channel_type === "channel") {
                 notificationTitle = _t("%(author name)s from %(channel name)s", {
                     "author name": message.authorName,
-                    "channel name": message.thread.displayName,
+                    "channel name": message.channel_id.displayName,
                 });
             } else {
                 notificationTitle = message.authorName;
             }
         }
-        const notificationContent = message.previewText
-            .toString()
-            .substring(0, PREVIEW_MSG_MAX_SIZE);
+        const notificationContent = htmlToTextContentInline(message.previewText).substring(
+            0,
+            PREVIEW_MSG_MAX_SIZE
+        );
         await this.sendNotification({
             message: notificationContent,
-            sound: message.thread?.model === "discuss.channel",
+            sound: Boolean(message.channel_id),
             title: notificationTitle,
             type: "info",
             icon,
@@ -145,6 +154,11 @@ export class OutOfFocusService {
     }
 
     async _playSound() {
+        // On Android with push notifications granted, suppress in-browser sound —
+        // push notifications handle alerts there and respect the device's silent mode.
+        if (isAndroid() && browser.Notification?.permission === "granted") {
+            return;
+        }
         if (
             this.canPlayAudio &&
             this.store.settings.messageSound &&
@@ -160,6 +174,12 @@ export class OutOfFocusService {
 
     get canSendNativeNotification() {
         return Boolean(window.Notification && window.Notification.permission === "granted");
+    }
+    clearUnreadMessage() {
+        this.contributingMessageLocalIds.clear();
+    }
+    onWindowFocus() {
+        this.clearUnreadMessage();
     }
 }
 

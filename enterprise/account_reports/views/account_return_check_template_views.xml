@@ -7,7 +7,7 @@
                 <list>
                     <field name="name"/>
                     <field name="return_type"/>
-                    <field name="cycle"/>
+                    <field name="cycle_id"/>
                     <field name="type" optional="hide"/>
                 </list>
             </field>
@@ -22,9 +22,9 @@
                         <group>
                             <group>
                                 <field name="name"/>
-                                <field name="cycle"/>
+                                <field name="cycle_id" options="{'no_open': 1, 'no_create': 1}"/>
                                 <field name="return_type" options="{'no_open': 1, 'no_create_edit': 1}"/>
-                                <field name="type" widget="selection_badge"/>
+                                <field name="type" widget="badges_selection"/>
                             </group>
                             <group>
                                 <field name="action_id" groups="base.group_no_one"/>
@@ -56,12 +56,12 @@
                 <search>
                     <field name="name"/>
                     <field name="return_type"/>
-                    <field name="cycle"/>
+                    <field name="cycle_id"/>
                     <filter name="filter_manual" string="Manual" domain="[('type', '=', 'check'), ('model', '=', False)]"/>
                     <filter name="filter_automated" string="Automated" domain="[('type', '=', 'check'), ('model', '!=', False)]"/>
                     <filter name="filter_file_upload" string="Document Upload" domain="[('type', '=', 'file')]"/>
 
-                    <filter name="groupby_cycle" string="Cycle" context="{'group_by': 'cycle'}"/>
+                    <filter name="groupby_cycle" string="Cycle" context="{'group_by': 'cycle_id'}"/>
                     <filter name="groupby_type" string="Type" context="{'group_by': 'type'}"/>
                     <filter name="groupby_return_type" string="Return/Audit" context="{'group_by': 'return_type'}"/>
                 </search>

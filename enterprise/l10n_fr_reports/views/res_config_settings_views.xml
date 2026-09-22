@@ -20,6 +20,19 @@
               </div>
           </setting>
         </xpath>
+
+        <xpath expr="//setting[@id='account_return_periodicity']//button[@name='open_tax_return_type_list']/.." position="before">
+          <div class="row">
+              <label string="VAT ROF" for="l10n_fr_rof_type" class="col-lg-3 o_light_label"/>
+              <field name="l10n_fr_rof_type"/>
+          </div>
+        </xpath>
+        <xpath expr="//div[@id='account_return_periodicity_field']" position="after">
+          <div class="row" invisible="country_code != 'FR'">
+              <label string="Regime" for="l10n_fr_fiscal_regime" class="col-lg-3 o_light_label"/>
+              <field name="l10n_fr_fiscal_regime"/>
+          </div>
+        </xpath>
       </field>
     </record>
   </data>

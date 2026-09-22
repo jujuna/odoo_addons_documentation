@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.fields import Command
+from odoo.fields import Command, Date
 from odoo.tests import tagged
 
 from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSubscriptionCommon
@@ -8,6 +8,8 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 
 @tagged('post_install', '-at_install')
 class TestSubscriptionReport(TestSubscriptionCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -79,7 +81,7 @@ class TestSubscriptionReport(TestSubscriptionCommon):
         default_pricelist_company_2 = self.env['product.pricelist'].search([
             ('company_id', '=', self.company_data_2['company'].id)
         ])
-        for rule in sub_a.pricelist_id.subscription_item_ids:
+        for rule in sub_a.pricelist_id.item_ids.filtered('plan_id'):
             rule.copy({'pricelist_id': default_pricelist_company_2.id})
         sub_b = self.subscription.create({
             'name': 'Company2 - Currency1 - Bis',
@@ -111,6 +113,7 @@ class TestSubscriptionReport(TestSubscriptionCommon):
             'rate_ids': [(0, 0, {
                 'rate': 2,
                 'company_id': self.company_data_2['company'].id,
+                'name': Date.subtract(Date.today(), days=1),
             })]
         })
         sub_c.action_confirm()
@@ -138,3 +141,28 @@ class TestSubscriptionReport(TestSubscriptionCommon):
                          msg='Report C should have 2 time more recurring monthly compared to A when converted in the same currency')
         self.assertAlmostEqual(report_a.recurring_yearly, report_c.recurring_yearly * 2, delta=0.1,
                          msg='Report C should have 2 time more recurring yearly compared to A when converted in the same currency')
+
+    def test_report_productless(self):
+        """
+        Test that a subscription with no product lines is correctly reported in the subscription report.
+        """
+        subscription = self.env['sale.order'].create([{
+            'name': 'Subscription',
+            'is_subscription': True,
+            'plan_id': self.plan_month.id,
+            'partner_id': self.user_portal.partner_id.id,
+            'order_line': [
+                Command.create({
+                    'name': "Productless Line",
+                    'price_unit': 100,
+                    'product_uom_qty': 1,
+                }),
+            ],
+        }])
+
+        subscription.action_confirm()
+
+        report = self.env['sale.subscription.report'].search([('name', '=', 'Subscription')])
+        self.assertEqual(len(report), 1)
+        self.assertEqual(report.recurring_monthly, 100)
+        self.assertEqual(report.recurring_yearly, 1200)

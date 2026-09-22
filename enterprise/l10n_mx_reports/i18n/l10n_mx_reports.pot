@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-08-28 18:21+0000\n"
+"PO-Revision-Date: 2026-08-28 18:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -19,6 +19,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_mx_reports/models/trial_balance.py:0
 msgid "\t- %(name)s"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.module.module,description:base.module_l10n_mx_reports
+msgid ""
+"\n"
+"Electronic accounting reports\n"
+"    - COA\n"
+"    - Trial Balance\n"
+"    - Month 13 Trial Balance\n"
+"    - XML Polizas Export\n"
+"\n"
+"DIOT Report\n"
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -57,6 +70,16 @@ msgid " 87 - Global Operations"
 msgstr ""
 
 #. module: l10n_mx_reports
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.xml_polizas_wizard_form
+msgid "AB123451234512"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.xml_polizas_wizard_form
+msgid "ABC6987654/99"
+msgstr ""
+
+#. module: l10n_mx_reports
 #: model:ir.model,name:l10n_mx_reports.model_account_account
 msgid "Account"
 msgstr ""
@@ -78,9 +101,49 @@ msgid "Adjective for relationship between a person and a country."
 msgstr ""
 
 #. module: l10n_mx_reports
+#: model:ir.model.fields,help:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__order_number
+msgid ""
+"Attribute to express the order number assigned to the tax audit to which the Journal Entry application refers.\n"
+"Required for request types 'AF' and 'FC'"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,help:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__process_number
+msgid ""
+"Attribute to express the process number assigned to the request for refund or compensation to which the request for the Journal Entry refers.\n"
+"Required for request types 'DE' and 'CO'"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields.selection,name:l10n_mx_reports.selection__l10n_mx_reports_xml_polizas_wizard__export_type__fc
+msgid "Audit certification"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:account.report.column,name:l10n_mx_reports.l10n_mx_bs_nif_b6_balance
+msgid "Balance"
+msgstr ""
+
+#. module: l10n_mx_reports
 #. odoo-python
 #: code:addons/l10n_mx_reports/models/trial_balance.py:0
 msgid "COA SAT (XML)"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.l10n_mx_reports_sat_export_wizard
+msgid "Cancel"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/wizard/xml_polizas_wizard.py:0
+msgid "Company Settings"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields.selection,name:l10n_mx_reports.selection__l10n_mx_reports_xml_polizas_wizard__export_type__co
+msgid "Compensation"
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -96,6 +159,18 @@ msgstr ""
 #. module: l10n_mx_reports
 #: model:ir.model,website_form_label:l10n_mx_reports.model_res_partner
 msgid "Create a Customer"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_sat_export_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_sat_export_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__create_date
+msgid "Created on"
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -135,11 +210,57 @@ msgstr ""
 #. module: l10n_mx_reports
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_account_account__display_name
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_account_chart_template__display_name
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_account_general_ledger_report_handler__display_name
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_account_move__display_name
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_account_trial_balance_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_report_handler__display_name
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_sat_export_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_res_country__display_name
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_res_partner__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.l10n_mx_reports_sat_export_wizard
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.xml_polizas_wizard_form
+msgid "Export"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/models/trial_balance.py:0
+msgid "Export SAT"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.actions.act_window,name:l10n_mx_reports.xml_polizas_action
+msgid "Export XML Polizas Wizard"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__export_type
+msgid "Export type"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__report_filename
+msgid "Filename"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__filter_all_entries
+msgid "Filter All Entries"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__filter_partial_journals
+msgid "Filter Partial Journals"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__filter_partial_month
+msgid "Filter Partial Month"
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -151,17 +272,25 @@ msgstr ""
 #. module: l10n_mx_reports
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_account_account__id
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_account_chart_template__id
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_account_general_ledger_report_handler__id
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_account_move__id
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_account_trial_balance_report_handler__id
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_report_handler__id
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_sat_export_wizard__id
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__id
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_res_country__id
 #: model:ir.model.fields,field_description:l10n_mx_reports.field_res_partner__id
 msgid "ID"
 msgstr ""
 
 #. module: l10n_mx_reports
-#. odoo-python
-#: code:addons/l10n_mx_reports/models/trial_balance.py:0
-msgid "Invalid SAT code: %s"
+#: model:ir.model,name:l10n_mx_reports.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_account_account__l10n_mx_is_sat_exportable
+msgid "L10N Mx Is Sat Exportable"
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -176,8 +305,25 @@ msgid "L10N Mx Type Of Third"
 msgstr ""
 
 #. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_sat_export_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_sat_export_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: l10n_mx_reports
 #: model:ir.model,name:l10n_mx_reports.model_l10n_mx_report_handler
 msgid "Mexican Account Report Custom Handler"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.view_account_move_closing_mx
+msgid "Mexico"
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -197,9 +343,31 @@ msgid ""
 msgstr ""
 
 #. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__mimetype
+msgid "Mimetype"
+msgstr ""
+
+#. module: l10n_mx_reports
 #. odoo-python
 #: code:addons/l10n_mx_reports/models/trial_balance.py:0
 msgid "Missing Debit or Credit balance account tag in database."
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/models/trial_balance.py:0
+msgid "Month 13"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_account_bank_statement_line__l10n_mx_closing_move
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_account_move__l10n_mx_closing_move
+msgid "Month 13 Closing"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.constraint,message:l10n_mx_reports.constraint_account_move_l10n_mx_closing_move_on_dec_31
+msgid "Month 13 closing entries should be done on December 31st."
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -210,8 +378,43 @@ msgstr ""
 
 #. module: l10n_mx_reports
 #. odoo-python
+#: code:addons/l10n_mx_reports/wizard/xml_polizas_wizard.py:0
+msgid "No records could be exported with current selection."
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields.selection,name:l10n_mx_reports.selection__l10n_mx_reports_sat_export_wizard__submit_type__n
+msgid "Normal"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.module.module,shortdesc:base.module_l10n_mx_reports
+msgid "Odoo Mexican Localization Reports"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
 #: code:addons/l10n_mx_reports/models/trial_balance.py:0
 msgid "Only Mexican company can generate SAT report."
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__order_number
+msgid "Order Number"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/wizard/xml_polizas_wizard.py:0
+msgid "Order number (%(number)s) is invalid, must be like: %(example)s"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/wizard/xml_polizas_wizard.py:0
+msgid ""
+"Order number is required for Export Type \"%(export_type_af)s\" or "
+"\"%(export_type_fc)s\""
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -222,8 +425,53 @@ msgstr ""
 
 #. module: l10n_mx_reports
 #. odoo-python
+#: code:addons/l10n_mx_reports/wizard/xml_polizas_wizard.py:0
+msgid "Please define the VAT on your company."
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model,name:l10n_mx_reports.model_account_general_ledger_report_handler
+msgid "Polish JPK KR PD Custom Handler"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__process_number
+msgid "Process Number"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/wizard/xml_polizas_wizard.py:0
+msgid "Process number (%(number)s) is invalid, must be like: %(example)s"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/wizard/xml_polizas_wizard.py:0
+msgid ""
+"Process number is required for Export Type \"%(export_type_co)s\" or "
+"\"%(export_type_de)s\""
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__report_data
+msgid "Report file"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields.selection,name:l10n_mx_reports.selection__l10n_mx_reports_xml_polizas_wizard__export_type__de
+msgid "Return of goods"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
 #: code:addons/l10n_mx_reports/models/trial_balance.py:0
 msgid "SAT (XML)"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model,name:l10n_mx_reports.model_l10n_mx_reports_sat_export_wizard
+msgid "SAT Export Wizard"
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -256,8 +504,58 @@ msgid ""
 msgstr ""
 
 #. module: l10n_mx_reports
+#: model:ir.model.fields,field_description:l10n_mx_reports.field_l10n_mx_reports_sat_export_wizard__submit_type
+msgid "Submit Type"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields.selection,name:l10n_mx_reports.selection__l10n_mx_reports_sat_export_wizard__submit_type__c
+msgid "Supplementary"
+msgstr ""
+
+#. module: l10n_mx_reports
 #: model:account.return.type,name:l10n_mx_reports.mx_tax_return_type
 msgid "Tax"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields.selection,name:l10n_mx_reports.selection__l10n_mx_reports_xml_polizas_wizard__export_type__af
+msgid "Tax audit"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/wizard/xml_polizas_wizard.py:0
+msgid "The company's VAT is invalid for Mexico."
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,help:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__filter_partial_journals
+msgid "The filter does not include all journals"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,help:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__filter_partial_month
+msgid "The filter does not only include full months"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,help:l10n_mx_reports.field_l10n_mx_reports_xml_polizas_wizard__filter_all_entries
+msgid "The filter includes unposted entries"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.xml_polizas_wizard_form
+msgid ""
+"The filter is selecting <strong>an incomplete period</strong>. The resulting"
+" XML files may be incomplete."
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.xml_polizas_wizard_form
+msgid ""
+"The filter is selecting <strong>only some of the journals</strong>. The "
+"resulting XML files may be incomplete."
 msgstr ""
 
 #. module: l10n_mx_reports
@@ -277,6 +575,13 @@ msgid ""
 msgstr ""
 
 #. module: l10n_mx_reports
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.xml_polizas_wizard_form
+msgid ""
+"The resulting XML will contain also <strong>unposted entries</strong>. The "
+"resulting XML files may be incorrect."
+msgstr ""
+
+#. module: l10n_mx_reports
 #: model:ir.model,name:l10n_mx_reports.model_account_trial_balance_report_handler
 msgid "Trial Balance Custom Handler"
 msgstr ""
@@ -292,6 +597,42 @@ msgstr ""
 msgid ""
 "Warning: this account doesn't follow Odoo's account guidelines.\n"
 "                    Check"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model.fields,help:l10n_mx_reports.field_account_bank_statement_line__l10n_mx_closing_move
+#: model:ir.model.fields,help:l10n_mx_reports.field_account_move__l10n_mx_closing_move
+msgid ""
+"Whether this is a closing entry for the fiscal year that should appear in "
+"the Month 13 Trial Balance"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model:ir.model,name:l10n_mx_reports.model_l10n_mx_reports_xml_polizas_wizard
+msgid "Wizard for the XML Polizas export of Journal Entries"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/models/account_general_ledger.py:0
+msgid "XML"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/models/account_general_ledger.py:0
+msgid "XML (Polizas)"
+msgstr ""
+
+#. module: l10n_mx_reports
+#: model_terms:ir.ui.view,arch_db:l10n_mx_reports.xml_polizas_wizard_form
+msgid "XML Polizas Export"
+msgstr ""
+
+#. module: l10n_mx_reports
+#. odoo-python
+#: code:addons/l10n_mx_reports/models/account_general_ledger.py:0
+msgid "XML Polizas Export Options"
 msgstr ""
 
 #. module: l10n_mx_reports

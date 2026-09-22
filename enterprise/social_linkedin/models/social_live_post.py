@@ -2,12 +2,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import contextlib
+import json
 import logging
 import requests
 from urllib.parse import urlparse
 import re
 
-from odoo import models, fields, tools, _
+from odoo import _, fields, models, tools
 from odoo.addons.mail.tools import link_preview
 from odoo.exceptions import UserError
 
@@ -25,6 +26,12 @@ class SocialLivePost(models.Model):
 
         for post in linkedin_live_posts:
             post.live_post_link = 'https://www.linkedin.com/feed/update/%s' % post.linkedin_post_id
+
+    def _compute_has_metrics(self):
+        super()._compute_has_metrics()
+        linkedin_live_posts = self._filter_by_media_types(['linkedin'])
+        linkedin_live_posts.has_likes = True
+        linkedin_live_posts.has_comments = True
 
     def _refresh_statistics(self):
         super()._refresh_statistics()
@@ -59,7 +66,10 @@ class SocialLivePost(models.Model):
 
                     like_count = sum(like.get('count', 0) for like in stats.get('reactionSummaries', {}).values())
                     comment_count = stats.get('commentSummary', {}).get('count', 0)
-                    linkedin_post_ids[urn].update({'engagement': like_count + comment_count})
+                    linkedin_post_ids[urn].update({
+                        'likes_count': like_count,
+                        'comments_count': comment_count,
+                    })
 
     def _post(self):
         linkedin_live_posts = self._filter_by_media_types(['linkedin'])
@@ -83,7 +93,7 @@ class SocialLivePost(models.Model):
                 try:
                     images_urn = [
                         live_post.account_id._linkedin_upload_image(
-                            image_id.with_context(bin_size=False).raw)
+                            image_id.raw.content)
                         for image_id in live_post.image_ids
                     ]
                 except UserError as e:
@@ -106,7 +116,7 @@ class SocialLivePost(models.Model):
                 tracker_code = urlparse(url_in_message).path.split('/r/')[-1]
                 link_tracker = self.env['link.tracker'].search([
                     ('link_code_ids.code', '=', tracker_code),
-                    ('source_id', '=', live_post.post_id.source_id.id),
+                    ('utm_reference', '=', f'{live_post.post_id._name},{live_post.post_id.id}'),
                 ], limit=1)
                 original_url = link_tracker.url or url_in_message
                 data['content'] = {
@@ -120,7 +130,7 @@ class SocialLivePost(models.Model):
                 if image_url := preview.get('og_image'):
                     with contextlib.suppress(Exception):
                         if (image_response := requests.get(image_url, timeout=3)).ok:
-                            image_urn = self.account_id._linkedin_upload_image(image_response.content)
+                            image_urn = live_post.account_id._linkedin_upload_image(image_response.content)
                             data['content']['article']['thumbnail'] = image_urn
 
             response = live_post.account_id._linkedin_request('posts', json=data)
@@ -132,6 +142,17 @@ class SocialLivePost(models.Model):
                     'failure_reason': False,
                     'linkedin_post_id': post_id,
                 }
+                if live_post.post_id.linkedin_first_comment:
+                    comment = self.env['mail.render.mixin'].sudo()._shorten_links_text(
+                        live_post.post_id.linkedin_first_comment,
+                        live_post._get_utm_values()
+                    )
+                    with contextlib.suppress(Exception):
+                        self.env['social.stream.post']._linkedin_comment_add(
+                            live_post.account_id,
+                            post_id,
+                            comment,
+                        )
             else:
                 try:
                     response_json = response.json()
@@ -144,7 +165,7 @@ class SocialLivePost(models.Model):
 
                 if response_json.get('serviceErrorCode') == 65600:
                     # Invalid access token
-                    self.account_id._action_disconnect_accounts(response)
+                    live_post.account_id._action_disconnect_accounts(response)
 
             live_post.write(values)
 
@@ -153,6 +174,12 @@ class SocialLivePost(models.Model):
         Replaces the special characters `(){}<>[]_` with escaped versions of themselves, i.e. `\\(\\)\\{\\}\\<\\>\\[\\]`.
         https://learn.microsoft.com/en-us/linkedin/marketing/integrations/community-management/shares/little-text-format?view=li-lms-2023-03#text
         """
-        pattern = r"[\(\)\<\>\{\}\[\]\_\|\*\~\#\@]"
+        pattern = r"[\(\)\<\>\{\}\[\]\_\|\*\~\#]"
         output_string = re.sub(pattern, lambda match: r"\{}".format(match.group(0)), input_string)
+        for mention, values in json.loads(self.post_id.social_post_mentions or '{}').get('linkedin', {}).items():
+            def format_to_linkedin_mention(match):
+                member = values.get('member', '')
+                full_name = values.get('full_name') or mention
+                return f"@[{full_name}]({member})"
+            output_string = re.sub(fr"@{re.escape(mention)}", format_to_linkedin_mention, output_string)
         return output_string

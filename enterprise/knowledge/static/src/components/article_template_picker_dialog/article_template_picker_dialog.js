@@ -1,8 +1,7 @@
 import { _t } from "@web/core/l10n/translation";
-import { Component, onMounted, useEffect, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, signal, t, useEffect, useProps } from "@odoo/owl";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { Dialog } from "@web/core/dialog/dialog";
-import { groupBy } from "@web/core/utils/arrays";
 import { Record } from "@web/model/record";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
@@ -25,57 +24,60 @@ export class ArticleTemplatePickerDialog extends Component {
         NoContentHelper: ArticleTemplatePickerNoContentHelper,
         WithSubEnv
     };
-    static props = {
-        articles: { type: Object },
-        templates: { type: Object },
-        templateRenderingContext: { type: Object, optional: true },
-        onLoadArticle: { type: Function },
-        onLoadTemplate: { type: Function },
-        onDeleteArticle: { type: Function },
-        onDeleteTemplate: { type: Function },
-        close: { type: Function },
-    };
-    /**
-     * @override
-     */
+
+    props = useProps({
+        articles: t.array(t.object()),
+        templates: t.array(t.object()),
+        templateRenderingContext: t.object().optional(),
+        onLoadArticle: t.function(),
+        onLoadTemplate: t.function(),
+        onDeleteArticle: t.function(),
+        onDeleteTemplate: t.function(),
+        close: t.function(),
+    });
+
+    scrollViewRef = signal.ref();
+
+    articlesListedInTemplateGallery = signal([]);
+    templatesGroupedByCategory = signal([]);
+    resId = signal(undefined);
+    isRenderingTemplate = signal(false);
+
     setup() {
-        super.setup();
         this.size = "fs";
         this.user = user;
         this.orm = useService("orm");
         this.dialogService = useService("dialog");
-        this.scrollView = useRef("scroll-view");
 
         const articlesListedInTemplateGallery = this.props.articles;
         const templates = this.props.templates;
 
         const templatesGroupedByCategory = Object.values(
-            groupBy(templates, template => template["template_category_id"][0])
+            Object.groupBy(templates, (template) => template["template_category_id"][0])
         ).sort((a, b) => {
             return a[0]["template_category_sequence"] - b[0]["template_category_sequence"];
         }).map(group => group.sort((a, b) => {
             return a["template_sequence"] - b["template_sequence"];
         }));
 
-        this.state = useState({
-            articlesListedInTemplateGallery,
-            templatesGroupedByCategory,
-        });
+        this.articlesListedInTemplateGallery.set(articlesListedInTemplateGallery);
+        this.templatesGroupedByCategory.set(templatesGroupedByCategory);
         this.selectFirstEntryFromSidebar();
 
         onMounted(() => {
-            const { el } = this.scrollView;
+            const el = this.scrollViewRef();
             if (el) {
                 el.scrollTop = 0;
             }
         });
 
         useEffect(() => {
-            const { el } = this.scrollView;
+            this.resId();
+            const el = this.scrollViewRef();
             if (el) {
                 el.style.visibility = "visible";
             }
-        }, () => [this.state.resId]);
+        });
     }
 
     /**
@@ -83,15 +85,15 @@ export class ArticleTemplatePickerDialog extends Component {
      * @param {function} onLoadRecord
      */
     loadRecord(resId, onLoadRecord) {
-        const { el } = this.scrollView;
+        const el = this.scrollViewRef();
         if (el) {
             el.scrollTop = 0;
         }
-        if (resId !== this.state.resId) {
+        if (resId !== this.resId()) {
             if (el) {
                 el.style.visibility = "hidden";
             }
-            this.state.resId = resId;
+            this.resId.set(resId);
             onLoadRecord?.();
         }
     }
@@ -100,11 +102,11 @@ export class ArticleTemplatePickerDialog extends Component {
      * Selects the first entry from the templates gallery sidebar.
      */
     selectFirstEntryFromSidebar() {
-        if (this.state.articlesListedInTemplateGallery.length > 0) {
-            const articleId = this.state.articlesListedInTemplateGallery[0].id;
+        if (this.articlesListedInTemplateGallery().length > 0) {
+            const articleId = this.articlesListedInTemplateGallery()[0].id;
             this.onSelectArticle(articleId);
-        } else if (this.state.templatesGroupedByCategory.length > 0) {
-            const templateId = this.state.templatesGroupedByCategory[0][0].id;
+        } else if (this.templatesGroupedByCategory().length > 0) {
+            const templateId = this.templatesGroupedByCategory()[0][0].id;
             this.onSelectTemplate(templateId);
         }
     }
@@ -127,10 +129,10 @@ export class ArticleTemplatePickerDialog extends Component {
             confirmLabel: _t("Remove Template"),
             confirm: async () => {
                 await this.props.onDeleteArticle(articleId);
-                this.state.articlesListedInTemplateGallery = this.state.articlesListedInTemplateGallery.filter(article => {
+                this.articlesListedInTemplateGallery.set(this.articlesListedInTemplateGallery().filter(article => {
                     return article.id !== articleId;
-                });
-                if (this.state.resId === articleId) {
+                }));
+                if (this.resId() === articleId) {
                     this.selectFirstEntryFromSidebar();
                 }
             },
@@ -149,7 +151,7 @@ export class ArticleTemplatePickerDialog extends Component {
             confirm: async () => {
                 await this.props.onDeleteTemplate(templateId);
                 const groups = [];
-                for (const group of this.state.templatesGroupedByCategory) {
+                for (const group of this.templatesGroupedByCategory()) {
                     const templates = group.filter(template => {
                         return template.id !== templateId;
                     });
@@ -157,8 +159,8 @@ export class ArticleTemplatePickerDialog extends Component {
                         groups.push(templates);
                     }
                 }
-                this.state.templatesGroupedByCategory = groups;
-                if (this.state.resId === templateId) {
+                this.templatesGroupedByCategory.set(groups);
+                if (this.resId() === templateId) {
                     this.selectFirstEntryFromSidebar();
                 }
             },
@@ -171,7 +173,7 @@ export class ArticleTemplatePickerDialog extends Component {
      */
     onSelectArticle(articleId) {
         this.loadRecord(articleId, () => {
-            this.state.isRenderingTemplate = false;
+            this.isRenderingTemplate.set(false);
         });
     }
 
@@ -180,17 +182,17 @@ export class ArticleTemplatePickerDialog extends Component {
      */
     onSelectTemplate(templateId) {
         this.loadRecord(templateId, () => {
-            this.state.isRenderingTemplate = true;
+            this.isRenderingTemplate.set(true);
         });
     }
 
     async onLoadArticle() {
-        await this.props.onLoadArticle(this.state.resId);
+        await this.props.onLoadArticle(this.resId());
         this.props.close();
     }
 
     async onLoadTemplate() {
-        await this.props.onLoadTemplate(this.state.resId);
+        await this.props.onLoadTemplate(this.resId());
         this.props.close();
     }
 

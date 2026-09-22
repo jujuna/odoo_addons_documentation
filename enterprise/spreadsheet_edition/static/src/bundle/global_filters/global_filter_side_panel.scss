@@ -1,12 +1,11 @@
 .o-spreadsheet-topbar {
-    background: white;
-
-    .o_topbar_filter_icon, .o_topbar_share_icon {
-        cursor: pointer;
-        background: white;
-
-        &:hover {
-            background-color: #ebebeb;
+    .o-topbar-topright .o-hoverable-button {
+        padding: 3px 5px;
+        border: 1px solid transparent;
+        &.o_topbar_share_icon {
+            .o-icon {
+                --os-icon-font-size: .8em;
+            }
         }
     }
 }
@@ -44,6 +43,10 @@
     .pivot_filter_section {
         display: flex;
         flex-direction: row;
+
+        .o_input {
+            border-color: var(--os-border-color) !important;
+        }
 
         .o_spreadsheet_model_technical_name {
             font-size: 0.9rem;

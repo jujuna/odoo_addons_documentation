@@ -8,18 +8,22 @@ class AppointmentResource(models.Model):
 
     # this should be one2one
     pos_table_ids = fields.One2many('restaurant.table', 'appointment_resource_id', string='POS Table')
-    is_used = fields.Json("Is Used", compute='_compute_is_used', help="Indicates if the resource is currently used in a calendar event for the given date range.")
+    is_used = fields.Json("Is Used", compute='_compute_is_used', help="Indicates if the resource is currently used in a calendar event for the given date range.", readonly=False)
 
     @api.model
-    def _load_pos_data_domain(self, data, config):
-        if not config.module_pos_restaurant:
+    def _load_pos_data_domain(self, data):
+        if not data['pos.config'].module_pos_restaurant:
             return False
 
-        return [('pos_table_ids', 'in', [table['id'] for table in data['restaurant.table']])]
+        return [('pos_table_ids', 'in', data['restaurant.table'].ids)]
+
+    @api.model
+    def _load_pos_data_dependencies(self):
+        return ['restaurant.table']
 
     @api.model
     def _load_pos_data_fields(self, config):
-        return ['pos_table_ids']
+        return ['pos_table_ids', 'capacity']
 
     def _compute_is_used(self):
         start_date_str = self.env.context.get('start_date')
@@ -54,8 +58,20 @@ class AppointmentResource(models.Model):
             event_start = resource_events[0].start.strftime("%Y-%m-%d %H:%M:%S") if resource_events else ''
             event_stop = resource_events[0].stop.strftime("%Y-%m-%d %H:%M:%S") if resource_events else ''
             capacity = resource_events[0].waiting_list_capacity if resource_events else ''
+            total_capacity = sum(resource_events[0].resource_ids.mapped('capacity')) if resource_events else ''
             resource.is_used = {
                 'event_start': event_start,
                 'event_stop': event_stop,
-                'capacity': capacity
+                'capacity': capacity,
+                'event_id': resource_events[0].id,
+                'total_capacity': total_capacity
             } if resource_events else {}
+
+    @api.depends('capacity')
+    def _compute_display_name(self):
+        if not self.env.context.get('from_pos_booking'):
+            return super()._compute_display_name()
+        for resource in self:
+            resource_name_capacity = f"{resource.name} 🪑{resource.capacity}"
+            display_name = resource_name_capacity if resource.capacity > 1 else resource.name
+            resource.display_name = display_name

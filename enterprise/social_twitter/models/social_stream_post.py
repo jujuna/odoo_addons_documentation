@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import ast
-import base64
 import logging
 import requests
 
 from odoo import _, api, models, fields
 from odoo.exceptions import UserError
 from odoo.http import request
+from odoo.tools.image import image_data_uri
 from odoo.tools.urls import urljoin as url_join
 
 _logger = logging.getLogger(__name__)
@@ -34,6 +32,7 @@ class SocialStreamPost(models.Model):
     twitter_quoted_tweet_author_name = fields.Char('Quoted post author Name')
     twitter_quoted_tweet_author_link = fields.Char('Quoted post author Link')
     twitter_quoted_tweet_profile_image_url = fields.Char('Quoted post profile image URL')
+    twitter_can_reply = fields.Boolean("X Can Reply", default=True)
 
     _tweet_uniq = models.Constraint(
         'UNIQUE (twitter_tweet_id, stream_id)',
@@ -97,11 +96,11 @@ class SocialStreamPost(models.Model):
     # COMMENTS / LIKES
     # ========================================================
 
-    def _twitter_comment_add(self, stream, comment_id, message, attachment):
+    @api.model
+    def _twitter_comment_add(self, account_id, tweet_id, comment_id, message, attachment=None):
         """Create a reply to a tweet."""
-        self.ensure_one()
-        tweet_id = comment_id or self.twitter_tweet_id
-        tweet = self._twitter_post_tweet(stream, message, attachment, reply={'in_reply_to_tweet_id': tweet_id})
+        tweet_id = comment_id or tweet_id
+        tweet = self._twitter_post_tweet(account_id, message, attachment, reply={'in_reply_to_tweet_id': tweet_id})
         tweet['in_reply_to_tweet_id'] = tweet_id
         return tweet
 
@@ -125,7 +124,7 @@ class SocialStreamPost(models.Model):
             'since_id': self.twitter_tweet_id,
             'max_results': 100,
             'tweet.fields': 'conversation_id,created_at,public_metrics,referenced_tweets',
-            'expansions': 'author_id,attachments.media_keys',
+            'expansions': 'author_id,attachments.media_keys,referenced_tweets.id,referenced_tweets.id.author_id',
             'user.fields': 'id,name,username,profile_image_url',
             'media.fields': 'type,url,preview_image_url',
         }
@@ -146,7 +145,7 @@ class SocialStreamPost(models.Model):
                 raise UserError(_("See older replies on x.com"))
             raise UserError(_("Failed to fetch the posts in the same thread: '%(text)s' using the account %(account)s.", text=result.text, account=self.stream_id.account_id.name))
 
-        users = {
+        users_per_ids = {
             user['id']: {
                 **user,
                 'profile_image_url': user.get('profile_image_url'),
@@ -159,20 +158,27 @@ class SocialStreamPost(models.Model):
             for media in result.json().get('includes', {}).get('media', [])
         }
 
+        tweets_per_ids = {
+            tweet['id']: tweet
+            for tweet in result.json().get('includes', {}).get('tweets', ())
+        }
+
         return {
             'comments': [
-                self.env['social.media']._format_tweet({
-                    **tweet,
-                    'author': users.get(tweet.get('author_id'), {}),
-                    'medias': [
-                        medias.get(media)
-                        for media in tweet.get('attachments', {}).get('media_keys', [])
-                    ],
-                })
+                self.stream_id.account_id._format_tweet(
+                    {
+                        **tweet,
+                        'author': users_per_ids.get(tweet.get('author_id'), {}),
+                        'medias': [
+                            medias.get(media)
+                            for media in tweet.get('attachments', {}).get('media_keys', [])
+                        ],
+                    },
+                    tweets_per_ids,
+                )
                 for tweet in result.json().get('data', [])
             ],
-            'is_reply_limited': ast.literal_eval(self.env['ir.config_parameter'].sudo().get_param(
-                'social_twitter.enable_reply_limit', 'False'))
+            'is_reply_limited': self.env['ir.config_parameter'].sudo().get_bool('social_twitter.enable_reply_limit', True)
         }
 
     def _twitter_tweet_delete(self, tweet_id):
@@ -216,11 +222,17 @@ class SocialStreamPost(models.Model):
         if not result.ok:
             raise UserError(_('Can not like / unlike the tweet\n%s.', result.text))
 
-        posts = request.env['social.stream.post'].search([('twitter_tweet_id', '=', tweet_id)])
-        if posts:
-            posts.twitter_user_likes = like
-
         return True
+
+    def _twitter_update_likes(self, like):
+        """Like the Tweet in SUDO for social users."""
+        for post in self:
+            if post.twitter_user_likes == like:
+                continue
+            post.sudo().write({
+                'twitter_likes_count': max(0, post.twitter_likes_count + (1 if like else -1)),
+                'twitter_user_likes': like,
+            })
 
     def _twitter_do_retweet(self):
         """ Creates a new retweet for the given stream post on Twitter. """
@@ -282,7 +294,7 @@ class SocialStreamPost(models.Model):
         self.ensure_one()
         if not message and not attachment:
             return self._twitter_do_retweet()
-        self._twitter_post_tweet(self.stream_id, message, attachment, quote_tweet_id=self.twitter_tweet_id)
+        self._twitter_post_tweet(self.account_id, message, attachment, quote_tweet_id=self.twitter_tweet_id)
         return True
 
     # ========================================================
@@ -298,7 +310,8 @@ class SocialStreamPost(models.Model):
             ).post_id
         return super()._fetch_matching_post()
 
-    def _twitter_post_tweet(self, stream, message, attachment, **additionnal_params):
+    @api.model
+    def _twitter_post_tweet(self, account_id, message, attachment, **additionnal_params):
         data = {
             'text': message,
             **additionnal_params,
@@ -307,7 +320,7 @@ class SocialStreamPost(models.Model):
         images_attachments_ids = None
         if attachment:
             bytes_data = attachment.read()
-            images_attachments_ids = stream.account_id._format_images_twitter([{
+            images_attachments_ids = account_id._format_images_twitter([{
                 'bytes': bytes_data,
                 'file_size': len(bytes_data),
                 'mimetype': attachment.content_type,
@@ -315,8 +328,8 @@ class SocialStreamPost(models.Model):
             if images_attachments_ids:
                 data['media'] = {'media_ids': images_attachments_ids}
 
-        post_endpoint_url = url_join(request.env['social.media']._TWITTER_ENDPOINT, '/2/tweets')
-        headers = stream.account_id._get_twitter_oauth_header(post_endpoint_url)
+        post_endpoint_url = url_join(self.env['social.media']._TWITTER_ENDPOINT, '/2/tweets')
+        headers = account_id._get_twitter_oauth_header(post_endpoint_url)
         result = requests.post(
             post_endpoint_url,
             json=data,
@@ -325,29 +338,28 @@ class SocialStreamPost(models.Model):
         )
 
         if not result.ok:
-            stream.account_id.write({'is_media_disconnected': True})
+            account_id.write({'is_media_disconnected': True})
             error = result.json().get('detail') or result.text
-            raise UserError(_('Failed to post comment: %(error)s with the account %(account)s.', error=error, account=stream.account_id.name))
+            raise UserError(_('Failed to post comment: %(error)s with the account %(account)s.', error=error, account=account_id.name))
 
         tweet = result.json()['data']
 
         # we can not use fields expansion when creating a tweet,
         # so we fill manually the missing values to not recall the API
         tweet.update({
-            'author_id': self.account_id.twitter_user_id,
+            'author_id': account_id.twitter_user_id,
             'author': {
-                'id': self.account_id.twitter_user_id,
-                'name': self.account_id.name,
-                'username': self.account_id.social_account_handle,
-                'profile_image_url': '/web/image/social.account/%s/image' % stream.account_id.id,
+                'id': account_id.twitter_user_id,
+                'name': account_id.name,
+                'username': account_id.social_account_handle,
+                'profile_image_url': '/web/image/social.account/%s/image' % account_id.id,
             },
             **additionnal_params,
         })
         if images_attachments_ids:
             # the image didn't create an attachment, and it will require an extra
-            # API call to get the URL, so we just base 64 encode the image data
-            b64_image = base64.b64encode(bytes_data).decode()
-            link = "data:%s;base64,%s" % (attachment.content_type, b64_image)
+            # API call to get the URL, so we just return a base64 URI data
+            link = image_data_uri(bytes_data)
             tweet['medias'] = [{'url': link, 'type': 'photo'}]
 
-        return request.env['social.media']._format_tweet(tweet)
+        return account_id._format_tweet(tweet)

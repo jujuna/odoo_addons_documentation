@@ -4,7 +4,10 @@
     <template id="price_dynamic_filter_template_product_product_subscription"
               inherit_id="website_sale.price_dynamic_filter_template_product_product">
         <xpath expr="//del" position="after">
-            <span t-if="record.recurring_invoice and data.get('is_subscription', False) and data.get('is_plan_possible', False)" class="fw-bold">
+            <span
+                t-if="product.recurring_invoice and data.get('is_subscription', False) and data.get('is_plan_possible', False)"
+                class="fw-bold"
+            >
                 <span t-out="data.get('temporal_unit_display')"/>
             </span>
         </xpath>
@@ -72,7 +75,6 @@
                                                 class="form-check-input me-2 flex-shrink-0" required="1"
                                             />
                                             <div>
-                                                <span t-if="product.type == 'consu'">Deliver Every </span>
                                                 <span t-out="pricing['table_name']"/>
                                             </div>
                                         </label>
@@ -80,6 +82,9 @@
                                 </td>
                                 <td class="col-auto text-start">
                                     <span class="fw-bold" t-out="pricing['table_price']"/>
+                                    <del t-if="pricing.get('original_plan_price')">
+                                        <span t-out="pricing['original_plan_price']"/>
+                                    </del>
                                 </td>
                                 <td class="col-auto" t-if="product.type == 'service' or pricing.get('discounted_price')">
                                     <div class="d-flex align-items-center gap-1">
@@ -103,7 +108,6 @@
                     </bdi>
                 </del>
             </h5>
-            <t t-if="is_view_active('website_sale.tax_indication')" t-call="website_sale.tax_indication"/>
         </t>
     </template>
 
@@ -120,6 +124,9 @@
                 />
                 <span>Buy Once</span>
                 <span class="fw-bold ms-3 one_time_price" t-out="combination_info.get('list_price')" t-options="{'widget': 'monetary', 'display_currency': combination_info.get('currency')}"/>
+                <del t-if="combination_info.get('original_list_price')">
+                    <span t-out="combination_info.get('original_list_price')" t-options="{'widget': 'monetary', 'display_currency': combination_info.get('currency')}"/>
+                </del>
             </label>
         </div>
         <div
@@ -131,7 +138,7 @@
                 <div t-if="combination_info['subscription_pricing_select']" class="table-responsive border rounded-2 plan_select">
                     <table class="table align-middle mb-0">
                         <tbody>
-                            <t t-foreach="combination_info['pricings']" t-as="pricing" t-key="pricing['plan_id']">
+                            <t t-foreach="combination_info['pricings']" t-as="pricing">
                                 <tr>
                                     <td class="col-auto">
                                         <div class="d-flex align-items-center">
@@ -140,7 +147,6 @@
                                                 t-att-disabled="not pricing['can_be_added']" required="1"
                                             />
                                             <label t-att-for="'plan_' + str(pricing['plan_id'])" class="form-check-label mb-0">
-                                                <span t-if="product.type == 'consu'">Deliver Every </span>
                                                 <span t-out="pricing['table_name']"/>
                                             </label>
                                         </div>
@@ -148,6 +154,9 @@
                                     <td class="col-auto text-start">
                                         <div class="d-flex align-items-center gap-1">
                                             <span t-out="pricing['table_price']"/>
+                                            <del t-if="pricing.get('original_plan_price')">
+                                                <span t-out="pricing['original_plan_price']"/>
+                                            </del>
                                             <span t-if="pricing.get('discounted_price')" class="badge text-bg-success ms-1">
                                                 -<t t-out="pricing['discounted_price']"/>%
                                             </span>
@@ -196,20 +205,20 @@
     </template>
 
     <template id="product_template_message" inherit_id="website_sale.product">
-        <xpath expr="//form[@t-if='is_add_to_cart_possible']" position="after">
-            <p t-elif="product.recurring_invoice and product.subscription_rule_ids" class="alert alert-warning">
+        <article t-if="is_add_to_cart_possible" position="after">
+            <p t-elif="product.recurring_invoice and product.pricelist_rule_ids.plan_id" class="alert alert-warning">
                 This subscription is not compatible with the one already in your cart.
                 Please order them separately or empty your cart.
             </p>
-        </xpath>
+        </article>
     </template>
 
     <template id="product_template_message_add_to_cart" inherit_id="website_sale.cta_wrapper">
-        <a id="add_to_cart" position="attributes">
+        <button name="add_to_cart" data-action="add_to_cart" position="attributes">
             <attribute name="t-att-data-subscription-plan-id">
                 combination_info['subscription_default_pricing_plan_id'] if combination_info.get('is_subscription') and combination_info['pricings'] else ''
             </attribute>
-        </a>
+        </button>
     </template>
 
 </odoo>

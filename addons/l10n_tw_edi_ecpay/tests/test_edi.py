@@ -18,6 +18,8 @@ CALL_API_METHOD = 'odoo.addons.l10n_tw_edi_ecpay.models.account_move.call_ecpay_
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class L10nTWITestEdi(TestAccountMoveSendCommon, HttpCase):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountMoveSendCommon.setup_country('tw')
     def setUpClass(cls):
@@ -35,20 +37,18 @@ class L10nTWITestEdi(TestAccountMoveSendCommon, HttpCase):
             'city': '中正區',
             'state_id': cls.env.ref('base.state_tw_tpc').id,
             'country_id': cls.env.ref('base.tw').id,
-            'company_type': 'person',
         })
         cls.partner_b.write({
             'phone': '+886 123 456 789',
+            'vat': '24153791',
             'street': 'street七美',
             'city': '信義區',
             'state_id': cls.env.ref('base.state_tw_klc').id,
             'country_id': cls.env.ref('base.tw').id,
-            'vat': '24153791',
-            'company_type': 'company',
         })
         # We can reuse this invoice for the flow tests.
         cls.basic_invoice = cls.init_invoice(
-            'out_invoice', partner=cls.partner_a, products=cls.product_a,
+            'out_invoice', partner=cls.partner_a, products=cls.product_a, taxes=cls.tax_sale_a,
         )
         cls.basic_invoice.action_post()
         cls.basic_invoice_b2b = cls.init_invoice(
@@ -212,38 +212,21 @@ class L10nTWITestEdi(TestAccountMoveSendCommon, HttpCase):
         """
         This tests the data validation when trying to send to the ECpay platform.
         """
-        # the partner is b2b but has no tax id
+        # the partner is considered b2b if it has a valid tax id else b2c
         test_partner = self.env['res.partner'].create({
             'name': 'Test Partner',
             'phone': '+886 123 456 789',
             'street': 'street七美',
             'city': '中正區',
             'state_id': self.env.ref('base.state_tw_tpc').id,
-            'company_type': 'company',
+            'vat': '00501503',
+            'country_id': self.env.ref('base.tw').id,
         })
-        invoice_a = self.init_invoice(
-            'out_invoice', partner=test_partner, products=self.product_a,
-        )
-        invoice_a.action_post()
-        send_and_print = self.create_send_and_print(invoice_a)
-        with self.assertRaises(UserError):
-            send_and_print.action_send_and_print()
-
-        # the partner is b2b and has an invalid tax id
-        test_partner.vat = '1234567A'
-        invoice_b = self.init_invoice(
-            'out_invoice', partner=test_partner, products=self.product_a,
-        )
-        invoice_b.action_post()
-        send_and_print = self.create_send_and_print(invoice_b)
-        with self.assertRaises(UserError):
-            send_and_print.action_send_and_print()
 
         # the partner's phone number is invalid
-        test_partner.vat = '12345678'
         test_partner.phone = '123+456+789'
         invoice_c = self.init_invoice(
-            'out_invoice', partner=test_partner, products=self.product_a,
+            'out_invoice', partner=test_partner, products=self.product_a, taxes=self.tax_sale_a,
         )
         invoice_c.action_post()
         send_and_print = self.create_send_and_print(invoice_c)
@@ -252,7 +235,7 @@ class L10nTWITestEdi(TestAccountMoveSendCommon, HttpCase):
         # the invoice type is invalid
         test_partner.phone = '+886 123 456 789'
         invoice_d = self.init_invoice(
-            'out_invoice', partner=test_partner, products=self.product_a,
+            'out_invoice', partner=test_partner, products=self.product_a, taxes=self.tax_sale_a,
         )
         invoice_d.l10n_tw_edi_invoice_type = '08'
         invoice_d.action_post()
@@ -263,7 +246,7 @@ class L10nTWITestEdi(TestAccountMoveSendCommon, HttpCase):
     def test_08_invoice_with_downpayment(self):
         """Ensure downpayment with -ve quantity is normalized for ECPay JSON."""
         invoice = self.init_invoice(
-            'out_invoice', partner=self.partner_a, products=self.product_a,
+            'out_invoice', partner=self.partner_a, products=self.product_a, taxes=self.tax_sale_a,
         )
         invoice.write({
             "invoice_line_ids": [
@@ -287,7 +270,8 @@ class L10nTWITestEdi(TestAccountMoveSendCommon, HttpCase):
                     'ItemWord': 'Units',
                     'ItemPrice': 1000.0,
                     'ItemTaxType': '1',
-                    'ItemAmount': 1000.0
+                    'ItemAmount': 1000.0,
+                    'ItemRemark': "商品單位: Units"
                 },
                 {
                     'ItemSeq': 2,
@@ -296,10 +280,74 @@ class L10nTWITestEdi(TestAccountMoveSendCommon, HttpCase):
                     'ItemWord': False,
                     'ItemPrice': -10.0,
                     'ItemTaxType': '1',
-                    'ItemAmount': -10.0
+                    'ItemAmount': -10.0,
+                    'ItemRemark': ""
                 },
             ],
         )
+
+    def test_08b_downpayment_tax_amount_matches_invoice(self):
+        """
+        This test ensures the json and the amount on the invoice matches, as well as checking the
+        output of the numbers are what will appear on the ECPay page
+        Two cases:
+        case 1 to check for invoice and ECPay tax mismatch
+        case 2 to check for whether the values generated by the code
+        is what ECPays expects
+        """
+        self.ensure_installed('sale')
+        self.env.user.group_ids = [Command.link(self.env.ref('sales_team.group_sale_salesman').id)]
+        cases = [
+            {
+                "down_payment_amounts": [330.0, 230.0],
+                "remaining_amount": 1000,
+                "expected_tax": 50.0 - 17.0 - 12.0,
+            },
+            {
+                "down_payment_amounts": [330.0],
+                "remaining_amount": 1000,
+                "expected_tax": 50.0 - 17.0,
+            },
+        ]
+        for case in cases:
+            down_payment_amounts = case["down_payment_amounts"]
+            remaining_amount = case["remaining_amount"]
+            expected_tax = case["expected_tax"]
+            with self.subTest(down_payment_amounts=down_payment_amounts, remaining_amount=remaining_amount):
+                sale_order = self.env['sale.order'].create({  # noqa: OLS03001
+                    'partner_id': self.partner_b.id,
+                    'order_line': [self._prepare_order_line(product_id=self.product_a.id, price_unit=remaining_amount, tax_ids=self.tax_sale_a)],
+                })
+                sale_order.action_confirm()
+                for net_amount in down_payment_amounts:
+                    gross_amount = net_amount * (1 + self.tax_sale_a.amount / 100)
+                    wizard = self.env['sale.advance.payment.inv'].with_context(  # noqa: OLS03001
+                        active_model='sale.order', active_ids=sale_order.ids,
+                    ).create({'advance_payment_method': 'fixed', 'fixed_amount': gross_amount})
+                    down_payment_invoice = self.env['account.move'].browse(wizard.create_invoices()['res_id'])
+                    down_payment_invoice.action_post()
+                invoice = sale_order._create_invoices(final=True)
+                invoice.action_post()
+                json_data = invoice._l10n_tw_edi_generate_invoice_json()
+                self.assertEqual(json_data["TaxAmount"], expected_tax)
+                self.assertEqual(json_data["TaxAmount"], invoice.amount_tax)
+                self.assertEqual(
+                    sum(item["ItemTax"] for item in json_data["Items"]),
+                    json_data["TaxAmount"],
+                )
+
+    def test_08c_b2b_tax_amount_matches_invoice_with_two_taxes(self):
+        """Two lines with distinct taxes round per tax on the invoice, payload must be the same"""
+        invoice = self._create_invoice(
+            partner_id=self.partner_b.id,
+            invoice_line_ids=[
+                self._prepare_invoice_line(name="line a", price_unit=12.0, tax_ids=self.tax_sale_a),
+                self._prepare_invoice_line(name="line b", price_unit=12.0, tax_ids=self.tax_sale_b),
+            ],
+            post=True,
+        )
+        json_data = invoice._l10n_tw_edi_generate_invoice_json()
+        self.assertEqual(json_data["TaxAmount"], invoice.amount_tax)
 
     def test_09_refund_invoice_with_payment(self):
         """
@@ -416,7 +464,7 @@ class L10nTWITestEdi(TestAccountMoveSendCommon, HttpCase):
         passes validation regardless of the gap. (not covered here)
         """
         seven_days_ago = datetime.now() - timedelta(days=7)
-        invoice = self.init_invoice("out_invoice", partner=self.partner_b, products=self.product_a)
+        invoice = self.init_invoice("out_invoice", partner=self.partner_b, products=self.product_a, taxes=self.tax_sale_a)
         invoice.write({
             "invoice_date": seven_days_ago.date(),
             "l10n_tw_edi_invoice_create_date": seven_days_ago,
@@ -452,7 +500,7 @@ class L10nTWITestEdi(TestAccountMoveSendCommon, HttpCase):
 
         Ensure the convert_utc_time_to_tw_time function works to convert the 'InvoiceDate' in the allowance JSON to TW date
         """
-        invoice = self.init_invoice("out_invoice", partner=self.partner_a, products=self.product_a)
+        invoice = self.init_invoice("out_invoice", partner=self.partner_a, products=self.product_a, taxes=self.tax_sale_a)
         invoice.write({
             "l10n_tw_edi_invoice_create_date": datetime(2026, 1, 5, 18, 0, 0),
             "l10n_tw_edi_ecpay_invoice_id": "AB11100099"  # simulate it was already sent

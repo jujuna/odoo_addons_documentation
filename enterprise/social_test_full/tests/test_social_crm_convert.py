@@ -4,9 +4,10 @@
 from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.addons.social.tests import common
 from odoo.addons.social.tests.tools import mock_void_external_calls
-from odoo.tests import Form, users
+from odoo.tests import tagged, Form, users
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSocialCrmConvert(common.SocialCase):
     @classmethod
     def setUpClass(cls):
@@ -61,9 +62,14 @@ class TestSocialCrmConvert(common.SocialCase):
 
         Since we found a perfect match on a single partner, the action will be set to 'exist' and
         the partner_id will be initialized with this partner. """
-
-        self.social_stream_post.write({'facebook_post_id': 'abc123'})
-        john_doe = self.env['res.partner'].sudo().create({'name': 'John Doe'})
+        author_name = 'John Doe Social Test'
+        self.social_stream_post.write({
+            'facebook_post_id': 'abc123',
+            'author_name': author_name,
+        })
+        john_doe = self.env['res.partner'].sudo().create({
+            'name': author_name,
+        })
         # <form string="Convert Post to Lead">
         #     ...
         #             <field name="conversion_source" invisible="1"/>
@@ -74,8 +80,8 @@ class TestSocialCrmConvert(common.SocialCase):
         #     ...
         # </form>
         convert_wizard_form = Form(self.env['social.post.to.lead'].with_context(
-            default_social_account_id=self.social_account,
-            default_social_stream_post_id=self.social_stream_post,
+            default_social_account_id=self.social_account.id,
+            default_social_stream_post_id=self.social_stream_post.id,
             default_conversion_source='stream_post',
             default_post_content='Hello',
         ))
@@ -84,15 +90,16 @@ class TestSocialCrmConvert(common.SocialCase):
         self.assertEqual(convert_wizard.post_datetime, self.social_stream_post.published_date)
         self.assertEqual(convert_wizard.post_link, self.social_stream_post.post_link)
         self.assertEqual(convert_wizard.partner_id, john_doe)
-        self.assertEqual(convert_wizard.author_name, 'John Doe')
+        self.assertEqual(convert_wizard.author_name, author_name)
         self.assertEqual(convert_wizard.action, 'exist')
 
         convert_wizard.action_convert_to_lead()
         created_lead = self.env['crm.lead'].sudo().search([('partner_id', '=', john_doe.id)])
         self.assertEqual(len(created_lead), 1)
         self.assertEqual(created_lead.campaign_id, self.utm_campaign_id)
-        self.assertEqual(created_lead.medium_id, self.social_account.utm_medium_id)
-        self.assertEqual(created_lead.source_id, self.social_post.source_id)
+        self.assertEqual(created_lead.medium_id, self.env.ref("utm.utm_medium_social_media"))
+        self.assertEqual(created_lead.source_id, self.env.ref('utm.utm_source_facebook'))
+        self.assertEqual(created_lead.utm_reference, self.social_post)
 
     @users('user_social_crm')
     @mock_void_external_calls()
@@ -117,5 +124,5 @@ class TestSocialCrmConvert(common.SocialCase):
         created_lead = self.env['crm.lead'].sudo().search([('partner_id', '=', convert_wizard.partner_id.id)])
         self.assertEqual(len(created_lead), 1)
         self.assertFalse(created_lead.campaign_id)
-        self.assertEqual(created_lead.medium_id, self.social_account.utm_medium_id)
-        self.assertEqual(created_lead.source_id, self.env.ref('social_crm.utm_source_social_post'))
+        self.assertEqual(created_lead.medium_id, self.env.ref("utm.utm_medium_social_media"))
+        self.assertEqual(created_lead.source_id, self.env.ref('utm.utm_source_facebook'))

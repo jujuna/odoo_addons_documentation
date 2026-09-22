@@ -1,45 +1,58 @@
 import { registry } from "@web/core/registry";
-import { formatFloatTime } from "@web/views/fields/formatters";
+import { formatDateTime } from "@web/views/fields/formatters";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { getFormattedValue } from "@web/views/utils";
 import { useService } from "@web/core/utils/hooks";
 
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
+import { formatList } from "@web/core/l10n/utils";
+import { _t } from "@web/core/l10n/translation";
 
 export class ConflictingSlotIdsField extends Component {
     static template = "planning.ConflictingSlotIdsField";
-    static props = {
-        ...standardFieldProps,
-    };
+
+    props = useProps(standardFieldProps);
 
     setup() {
         this.actionService = useService("action");
     }
 
     get conflictingSlots() {
-        return this.props.record.data[this.props.name].records.map((r) => ({
-            ...r,
-            data: Object.fromEntries(
-                Object.keys(r.data).map((fieldName) => {
-                    let formattedValue = "";
-                    if (fieldName === "allocated_hours") {
-                        formattedValue = formatFloatTime(r.data.allocated_hours, {
-                            noLeadingZeroHour: true,
-                        }).replace(/(:00|:)/g, "h");
-                    } else {
-                        formattedValue = getFormattedValue(r, fieldName);
-                    }
-                    if (fieldName === "allocated_percentage") {
-                        formattedValue += "%";
-                    }
-                    return [fieldName, formattedValue];
-                })
-            ),
-        }));
+        return this.props.record.data[this.props.name].records;
     }
 
-    getConflictSlotMessage(slot) {
-        return slot.data.role_id;
+    get conflictString() {
+        let slots = this.conflictingSlots;
+        if (slots.length > 1) {
+            slots = [slots[0]];
+            slots.push({ data: { display_name: _t("other ones.") }})
+        }
+        return formatList(slots.map((slot) => {
+            let displayName = slot.data.display_name;
+            const startDatetime = slot.data.start_datetime;
+            const endDatetime = slot.data.end_datetime;
+            if (displayName && startDatetime && endDatetime) {
+                let showDate = true;
+                const showTime = true;
+                const showSeconds = false;
+                if (startDatetime.hasSame(endDatetime, "day")) {
+                    showDate = false;
+                }
+                return _t("%(display_name)s (%(start_datetime)s - %(end_datetime)s)", {
+                    display_name: displayName,
+                    start_datetime: formatDateTime(startDatetime, {
+                        showTime,
+                        showDate,
+                        showSeconds
+                    }),
+                    end_datetime: formatDateTime(endDatetime, {
+                        showTime,
+                        showDate,
+                        showSeconds
+                    }),
+                })
+            }
+            return displayName;
+        }));
     }
 
     async showConflictedSlots() {
@@ -58,13 +71,12 @@ export class ConflictingSlotIdsField extends Component {
 export const conflictingSlotIdsField = {
     component: ConflictingSlotIdsField,
     supportedTypes: ["many2many"],
+    additionalClasses: ["d-inline-flex align-items-center"],
     relatedFields: () => {
         return [
+            { name: "display_name", type: "char" },
             { name: "start_datetime", type: "datetime" },
             { name: "end_datetime", type: "datetime" },
-            { name: "allocated_hours", type: "float_time" },
-            { name: "allocated_percentage", type: "float" },
-            { name: "role_id", type: "many2one", relation: "planning.role" },
         ];
     },
 };

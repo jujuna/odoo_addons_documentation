@@ -34,6 +34,17 @@ class TestQualityCheck(TestQualityCommon):
             }
         ])
 
+        cls.quality_user = cls.env['res.users'].create({
+            'name': 'Quality Worker',
+            'login': 'quality_worker',
+            'email': 'q_worker@test.com',
+            'group_ids': [
+                Command.link(cls.env.ref('stock.group_stock_user').id),
+                Command.link(cls.env.ref('quality.group_quality_user').id),
+                Command.link(cls.env.ref('stock.group_production_lot').id),
+            ]
+        })
+
     def test_00_picking_quality_check(self):
 
         """Test quality check on incoming shipment."""
@@ -57,7 +68,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id})
@@ -106,7 +117,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id})
@@ -147,7 +158,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id})
@@ -172,7 +183,7 @@ class TestQualityCheck(TestQualityCommon):
 
         product = self.env['product.product'].create({
             'name': 'Product',
-            'tracking': 'none',
+            'is_storable': True,
         })
 
         # Create Quality Point for incoming shipment on lots with 'Measure' as test type
@@ -218,7 +229,7 @@ class TestQualityCheck(TestQualityCommon):
         move = self.env['stock.move'].create({
             'product_id': product_tracked_by_lot.id,
             'product_uom_qty': 11,
-            'product_uom': product_tracked_by_lot.uom_id.id,
+            'uom_id': product_tracked_by_lot.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id})
@@ -251,7 +262,9 @@ class TestQualityCheck(TestQualityCommon):
         # Check that tests are failing and succeeding properly
         check_line1.measure = 3.
         check_line2.measure = 4.5
-        check_line1.do_measure()
+        with Form.from_action(self.env, check_line1.do_measure()) as wizard_form:
+            wizard_form.qty_failed = 2.0
+            wizard_form.save().confirm_measure()
         check_line2.do_measure()
         self.assertTrue(check_line1.quality_state == 'fail', "Quality Check of type 'measure' not failing on move line")
         self.assertTrue(check_line2.quality_state == 'pass', "Quality Check of type 'measure' not passing on move line")
@@ -261,7 +274,7 @@ class TestQualityCheck(TestQualityCommon):
             'product_id': product.id,
             'product_uom_qty': 1,
             'quantity': 1,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id
@@ -273,7 +286,7 @@ class TestQualityCheck(TestQualityCommon):
             'product_id': product.id,
             'product_uom_qty': 1,
             'quantity': 0,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id
@@ -303,7 +316,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id
@@ -339,7 +352,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id
@@ -348,7 +361,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': self.product_2.id,
             'product_uom_qty': 2,
-            'product_uom': self.product_2.uom_id.id,
+            'uom_id': self.product_2.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id
@@ -369,6 +382,7 @@ class TestQualityCheck(TestQualityCommon):
         """
         # Create Quality Point for incoming shipment with only a product_category set.
         self.quality_point_test = self.env['quality.point'].create({
+            'apply_to': 'categories',
             'product_category_ids': [(4, self.product_category_base.id)],
             'picking_type_ids': [(4, self.picking_type_id)],
             'test_type_id': self.env.ref('quality_control.test_type_passfail').id
@@ -386,7 +400,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id
@@ -395,7 +409,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': self.product_2.id,
             'product_uom_qty': 2,
-            'product_uom': self.product_2.uom_id.id,
+            'uom_id': self.product_2.uom_id.id,
             'picking_id': self.picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id
@@ -408,141 +422,6 @@ class TestQualityCheck(TestQualityCommon):
         self.assertEqual(len(self.picking_in.check_ids), 1)
         self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product.id)), 1)
         self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product_2.id)), 0)
-
-    def test_07_picking_quality_check_creation_with_product_and_categories(self):
-
-        """ Test Quality Check creation on incoming shipment from a Quality Point
-        with both products and product_categories set
-        """
-        # Create Quality Point for incoming shipment with only a product_category set.
-        self.quality_point_test = self.env['quality.point'].create({
-            'product_ids': [(4, self.product_2.id), (4, self.product_4.id)],
-            'product_category_ids': [(4, self.product_category_base.id)],
-            'picking_type_ids': [(4, self.picking_type_id)],
-            'test_type_id': self.env.ref('quality_control.test_type_passfail').id
-        })
-        # Check that Quality Point has been created.
-        self.assertTrue(self.quality_point_test, "Quality Point not created.")
-        # Create incoming shipment.
-        self.picking_in = self.env['stock.picking'].create({
-            'picking_type_id': self.picking_type_id,
-            'partner_id': self.partner_id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Create move with wrong product but having right category (child of Quality Point set category.
-        self.env['stock.move'].create({
-            'product_id': self.product.id,
-            'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
-            'picking_id': self.picking_in.id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Create move with right product but having wrong category (parent of Quality Point set category).
-        self.env['stock.move'].create({
-            'product_id': self.product_2.id,
-            'product_uom_qty': 2,
-            'product_uom': self.product_2.uom_id.id,
-            'picking_id': self.picking_in.id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Create move with wrong product and having wrong category (parent of Quality Point set category).
-        self.env['stock.move'].create({
-            'product_id': self.product_3.id,
-            'product_uom_qty': 2,
-            'product_uom': self.product_3.uom_id.id,
-            'picking_id': self.picking_in.id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Create move with right product having right category
-        self.env['stock.move'].create({
-            'product_id': self.product_4.id,
-            'product_uom_qty': 2,
-            'product_uom': self.product_4.uom_id.id,
-            'picking_id': self.picking_in.id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Check that incoming shipment has been created.
-        self.assertTrue(self.picking_in, "Incoming shipment not created.")
-        # Confirm incoming shipment.
-        self.picking_in.action_confirm()
-        # Check that Quality Check for incoming shipment have been created only for the right product / category.
-        self.assertEqual(len(self.picking_in.check_ids), 3)
-        self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product.id)), 1)
-        self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product_2.id)), 1)
-        self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product_3.id)), 0)
-        self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product_4.id)), 1)
-
-    def test_08_on_product_creation_with_product_and_categories(self):
-
-        """ Test Quality Check creation on incoming shipment from a Quality Point
-        with both products and product_categories set
-        """
-        # Create Quality Point for incoming shipment with only a product_category set.
-        self.quality_point_test = self.env['quality.point'].create({
-            'product_ids': [(4, self.product_2.id), (4, self.product_4.id)],
-            'product_category_ids': [(4, self.product_category_base.id)],
-            'picking_type_ids': [(4, self.picking_type_id)],
-            'measure_on': 'move_line',
-            'test_type_id': self.env.ref('quality_control.test_type_passfail').id
-        })
-        # Create incoming shipment.
-        self.picking_in = self.env['stock.picking'].create({
-            'picking_type_id': self.picking_type_id,
-            'partner_id': self.partner_id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Create move with wrong product but having right category (child of Quality Point set category.
-        self.env['stock.move'].create({
-            'product_id': self.product.id,
-            'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
-            'picking_id': self.picking_in.id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Create move with right product but having wrong category (parent of Quality Point set category).
-        self.env['stock.move'].create({
-            'product_id': self.product_2.id,
-            'product_uom_qty': 2,
-            'product_uom': self.product_2.uom_id.id,
-            'picking_id': self.picking_in.id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Create move with wrong product and having wrong category (parent of Quality Point set category).
-        self.env['stock.move'].create({
-            'product_id': self.product_3.id,
-            'product_uom_qty': 2,
-            'product_uom': self.product_3.uom_id.id,
-            'picking_id': self.picking_in.id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Create move with right product having right category
-        self.env['stock.move'].create({
-            'product_id': self.product_4.id,
-            'product_uom_qty': 2,
-            'product_uom': self.product_4.uom_id.id,
-            'picking_id': self.picking_in.id,
-            'location_id': self.location_id,
-            'location_dest_id': self.location_dest_id
-        })
-        # Confirm incoming shipment.
-        self.picking_in.action_confirm()
-        self.picking_in.move_ids.picked = True
-
-        # Check that Quality Check for incoming shipment have been created for all the good move lines
-        self.assertEqual(len(self.picking_in.check_ids), 3)
-        self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product.id)), 1)
-        self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product_2.id)), 1)
-        self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product_3.id)), 0)
-        self.assertEqual(len(self.picking_in.check_ids.filtered(lambda c: c.product_id.id == self.product_4.id)), 1)
 
     def test_09_quality_check_on_operations(self):
 
@@ -563,7 +442,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create([{
             'product_id': product.id,
             'product_uom_qty': 1,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
             'picking_id': receipt.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id,
@@ -582,15 +461,14 @@ class TestQualityCheck(TestQualityCommon):
         self.assertEqual(receipt.check_ids.picking_id, receipt)
 
         with self.assertRaises(UserError):
-            receipt._action_done()
+            receipt.with_user(self.quality_user)._action_done()
 
         receipt.check_ids.do_pass()
         receipt._action_done()
 
     def test_check_no_serial(self):
         """
-        The tracked product without set lot should not open a quality check unless
-        the picking type does not need lot.
+        The tracked product without set lot should raise a user error stating that a lot should be set.
         """
         self.product.write({
             'tracking': 'serial',
@@ -613,7 +491,7 @@ class TestQualityCheck(TestQualityCommon):
                 'move_ids': [Command.create({
                     'product_id': self.product.id,
                     'product_uom_qty': 5,
-                    'product_uom': self.product.uom_id.id,
+                    'uom_id': self.product.uom_id.id,
                     'location_id': self.location_id,
                     'location_dest_id': self.location_dest_id,
                 })],
@@ -626,10 +504,12 @@ class TestQualityCheck(TestQualityCommon):
         move = receipt.move_ids
         self.assertFalse(move.move_line_ids.lot_id)
         self.assertEqual(move.move_line_ids.mapped('lot_name'), [False] * 5)
-        # check that there is no check to do
-        self.assertEqual(receipt.check_quality(), True)
+        # check that a user error is raised if we try to check the quality without setting a lot
+        with self.assertRaises(UserError, msg="A UserError should be raised as lot/sn is needed."):
+            receipt.check_quality()
 
         move.move_line_ids[0].lot_name = "test_sn1"
+        move.move_line_ids[0].picked = True
         qc_wizard = Form.from_action(self.env, receipt.check_quality())
         # no quality check created yet
         quality_check = qc_wizard.save()
@@ -645,6 +525,20 @@ class TestQualityCheck(TestQualityCommon):
         quality_check = qc_wizard.save()
         # there is only one check created for the picking
         self.assertTrue(quality_check.is_last_check)
+
+    def test_qty_to_test_without_product(self):
+        """Test that QC qty_to_test still calcuates without a product set"""
+        quality_point = self.env['quality.point'].create({
+            'measure_on': 'move_line',
+            'picking_type_ids': [(4, self.picking_type_id)],
+            'testing_percentage_within_lot': 50.00,
+        })
+        quality_check = self.env['quality.check'].create({
+            'point_id': quality_point.id,
+        })
+        quality_check = Form(quality_check).save()
+        # qty_to_test based on ml quantity, which we cannot make without a product (due to auto-gen move) => defaults to 0
+        self.assertEqual(quality_check.qty_to_test, 0.0)
 
     def test_checks_removal_on_SM_cancellation(self):
         """
@@ -670,6 +564,8 @@ class TestQualityCheck(TestQualityCommon):
             'picking_type_ids': [(4, warehouse.store_type_id.id)],
         } for product in (p01, p02)])
 
+        # stock reference to simulate a common source document (e.g. PO)
+        reference = self.env['stock.reference'].create({'name': 'reference'})
         receipt = self.env['stock.picking'].create({
             'picking_type_id': self.picking_type_id,
             'partner_id': self.partner_id,
@@ -679,10 +575,11 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create([{
             'product_id': product.id,
             'product_uom_qty': 1,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
             'picking_id': receipt.id,
             'location_id': self.location_id,
             'location_dest_id': warehouse.wh_input_stock_loc_id.id,
+            'reference_ids': [Command.link(reference.id)],
         } for product in (p01, p02)])
         receipt.action_confirm()
         receipt.move_ids.quantity = 1
@@ -702,10 +599,11 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': p01.id,
             'product_uom_qty': 1,
-            'product_uom': p01.uom_id.id,
+            'uom_id': p01.uom_id.id,
             'picking_id': receipt.id,
             'location_id': self.location_id,
             'location_dest_id': warehouse.wh_input_stock_loc_id.id,
+            'reference_ids': [Command.link(reference.id)],
         })
         receipt.action_confirm()
         receipt.move_ids.quantity = 1
@@ -736,7 +634,7 @@ class TestQualityCheck(TestQualityCommon):
         move = self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 1,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': receipt.id,
             'location_id': receipt.location_id.id,
             'location_dest_id': receipt.location_dest_id.id,
@@ -783,7 +681,7 @@ class TestQualityCheck(TestQualityCommon):
         move = self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': picking.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id,
@@ -826,7 +724,7 @@ class TestQualityCheck(TestQualityCommon):
         move = self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 2,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': picking.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id,
@@ -994,13 +892,13 @@ class TestQualityCheck(TestQualityCommon):
         move.quantity = 0
         move.move_line_ids = [Command.create({
             'product_id': product_lot.id,
-            'product_uom_id': product_lot.uom_id.id,
+            'uom_id': product_lot.uom_id.id,
             'quantity': 2,
             'picking_id': receipt.id,
             'lot_name': 'lot1',
         }), Command.create({
             'product_id': product_lot.id,
-            'product_uom_id': product_lot.uom_id.id,
+            'uom_id': product_lot.uom_id.id,
             'quantity': 2,
             'picking_id': receipt.id,
             'lot_name': 'lot2',
@@ -1041,6 +939,27 @@ class TestQualityCheck(TestQualityCommon):
         self.assertEqual(receipt.state, 'done')
         self.assertEqual(receipt.move_ids.mapped('state'), ['done', 'done'])
 
+    def test_preselect_failure_location(self):
+        """Test that the first failure location is auto-preselected when multiple
+        failure locations exist and the quality check is marked as failed."""
+        failure_loc_1 = self.failure_location
+        failure_loc_2 = failure_loc_1.copy()
+        self.env['quality.point'].create({
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+            'product_ids': [Command.link(self.product_2.id)],
+            'failure_location_ids': [Command.set([failure_loc_1.id, failure_loc_2.id])],
+        })
+
+        self.receipt.action_confirm()
+        wizard = Form.from_action(self.env, self.receipt.check_quality()).save()
+        wizard = Form.from_action(self.env, wizard.do_fail()).save()
+
+        self.assertEqual(wizard.failure_location_id.id, failure_loc_1.id, "Wizard should auto-preselect the first available failure location.")
+        wizard.confirm_fail()
+        self.assertRecordValues(self.receipt.check_ids, [
+            {'quality_state': 'fail', 'product_id': self.product_2.id, 'failure_location_id': failure_loc_1.id},
+        ])
+
     def test_qp_with_product_ctg(self):
         """
         Test that the quality check is created based on the product category of product and quality point.
@@ -1058,12 +977,14 @@ class TestQualityCheck(TestQualityCommon):
         })
         self.env['quality.point'].create({
             'title': 'QP1',
+            'apply_to': 'categories',
             'product_category_ids': [(4, product_cat_2.id), (4, self.product_category_base.id)],
             'picking_type_ids': [(4, self.picking_type_id)],
             'measure_on': 'move_line',
         })
         self.env['quality.point'].create({
             'title': 'QP2',
+            'apply_to': 'categories',
             'product_category_ids': [(4, self.product_category_base.id)],
             'picking_type_ids': [(4, self.picking_type_id)],
             'measure_on': 'move_line',
@@ -1111,21 +1032,21 @@ class TestQualityCheck(TestQualityCommon):
         move_tracked_product_a = self.env['stock.move'].create({
             'product_id': self.product_2.id,
             'product_uom_qty': 1,
-            'product_uom': self.product_2.uom_id.id,
+            'uom_id': self.product_2.uom_id.id,
             'picking_id': picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id})
         move_untracked = self.env['stock.move'].create({
             'product_id': self.product_3.id,
             'product_uom_qty': 1,
-            'product_uom': self.product_3.uom_id.id,
+            'uom_id': self.product_3.uom_id.id,
             'picking_id': picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id})
         move_tracked_product_b = self.env['stock.move'].create({
             'product_id': self.product_4.id,
             'product_uom_qty': 2,
-            'product_uom': self.product_4.uom_id.id,
+            'uom_id': self.product_4.uom_id.id,
             'picking_id': picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id,
@@ -1144,34 +1065,33 @@ class TestQualityCheck(TestQualityCommon):
         # Register a quantity of 2 units for your product_b and none for product_a
         move_tracked_product_a.quantity = 0
         move_tracked_product_b.quantity = 2
+        move_tracked_product_b.picked = True
         move_tracked_product_b._generate_serial_numbers("1", next_serial_count=2)
         tracked_check_ids_to_do = picking_in.check_ids.filtered(lambda qc: qc.product_id == self.product_4)
         self.env.invalidate_all()
         # Check that clicking on the Quality Check button shows you the QC's related to product_b
-        qc_wizard = Form.from_action(self.env, picking_in.check_quality()).save()
+        qc_wizard = Form.from_action(self.env, picking_in.with_user(self.quality_user).check_quality()).save()
         self.assertEqual(qc_wizard.check_ids, tracked_check_ids_to_do)
         # process one of the 2 QC's and keep the second one for validation
         tracked_check_ids_to_do[0].do_pass()
         self.assertEqual(tracked_check_ids_to_do[0].quality_state, 'pass')
         tracked_check_ids_to_do = tracked_check_ids_to_do.filtered(lambda qc: qc.quality_state == 'none')
-        qc_wizard = Form.from_action(self.env, picking_in.check_quality()).save()
+        qc_wizard = Form.from_action(self.env, picking_in.with_user(self.quality_user).check_quality()).save()
         self.assertEqual(qc_wizard.check_ids, tracked_check_ids_to_do)
 
-        # Set a quantity on the product_a but check only product_b
-        # Clicking on the Quality check button one should see both QC's
-        # -> At validation only the QC's for picked move should be seen
-        move_tracked_product_b.picked = True
+        # Checks related to picked products appear regardless of checking while Validating the picking
+        # or just doing the Quality Checks without validating the picking.
         move_tracked_product_a.quantity = 1
         move_tracked_product_a._generate_serial_numbers("1", next_serial_count=1)
         self.assertFalse(move_tracked_product_a.picked)
-        qc_wizard = Form.from_action(self.env, picking_in.check_quality()).save()
-        self.assertEqual(qc_wizard.check_ids, picking_in.check_ids.filtered(lambda qc: qc.quality_state == 'none'))
+        qc_wizard = Form.from_action(self.env, picking_in.with_user(self.quality_user).check_quality()).save()
+        self.assertEqual(qc_wizard.check_ids.lot_name, move_tracked_product_b.move_line_ids[1].lot_name)
 
-        # Validate incoming shipment.
-        wizard = Form.from_action(self.env, picking_in.button_validate()).save()
-        qc_wizard = Form.from_action(self.env, wizard.process()).save()
+        # Validate incoming shipment, the same QCs should appear
+        qc_wizard = Form.from_action(self.env, picking_in.with_user(self.quality_user).button_validate()).save()
         self.assertEqual(qc_wizard.check_ids, tracked_check_ids_to_do)
         qc_wizard.do_pass()
+        Form.from_action(self.env, picking_in.with_user(self.quality_user).button_validate()).save().process()
         backorder = picking_in.backorder_ids
         self.assertEqual(picking_in.state, 'done')
         self.assertEqual(len(backorder.check_ids), 1)
@@ -1198,7 +1118,7 @@ class TestQualityCheck(TestQualityCommon):
         self.env['stock.move'].create({
             'product_id': self.product_3.id,
             'product_uom_qty': 2,
-            'product_uom': self.product_3.uom_id.id,
+            'uom_id': self.product_3.uom_id.id,
             'picking_id': picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id,
@@ -1214,14 +1134,17 @@ class TestQualityCheck(TestQualityCommon):
         wizard.do_fail()
         self.assertEqual(picking_in.check_ids.quality_state, 'fail')
 
-        scrap = self.env['stock.scrap'].create({
+        scrap = self.env['stock.move'].create({
+            'is_scrap': True,
             'picking_id': picking_in.id,
             'product_id': self.product_3.id,
-            'product_uom_id': self.product_3.uom_id.id,
-            'scrap_qty': 5.0,
+            'location_id': self.location_id,
+            'location_dest_id': self.scrap_location_id,
+            'quantity': 5.0,
         })
-        scrap.do_scrap()
-        self.assertEqual(len(picking_in.move_ids), 2)
+        scrap._action_scrap()
+        all_moves = self.env['stock.move'].search([('picking_id', '=', picking_in.id)])
+        self.assertEqual(len(all_moves), 2)
         self.assertEqual(len(picking_in.check_ids), 1)
 
     def test_qc_by_product_with_partial_reception(self):
@@ -1243,7 +1166,7 @@ class TestQualityCheck(TestQualityCommon):
         move = self.env['stock.move'].create({
             'product_id': self.product_2.id,
             'product_uom_qty': 10,
-            'product_uom': self.product_2.uom_id.id,
+            'uom_id': self.product_2.uom_id.id,
             'picking_id': picking_in.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id})
@@ -1252,13 +1175,15 @@ class TestQualityCheck(TestQualityCommon):
         self.assertTrue(picking_in.quality_check_todo)
         move.quantity = 5
         move.picked = True
-        # validate the incoming picking and create a backorder
-        action_quality_check = Form.from_action(self.env, picking_in.button_validate()).save().process()
+        # validate the incoming picking
+        action_quality_check = Form.from_action(self.env, picking_in.with_user(self.quality_user).button_validate()).save()
         # Confirm the quality check wizard
-        Form.from_action(self.env, action_quality_check).save().do_pass()
+        action_quality_check.do_pass()
         # Check that the first quality check is still linked to the first picking
         self.assertEqual(len(picking_in.check_ids), 1)
         self.assertEqual(picking_in.check_ids.quality_state, 'pass')
+        # create a backorder
+        Form.from_action(self.env, picking_in.with_user(self.quality_user).button_validate()).save().process()
         # Make sure that the backorder is correctly created and that it has a quality check
         backorder = picking_in.backorder_ids
         self.assertEqual(len(backorder.check_ids), 1)
@@ -1296,7 +1221,7 @@ class TestQualityCheck(TestQualityCommon):
             'move_ids': [Command.create({
                 'product_id': self.product.id,
                 'product_uom_qty': 2,
-                'product_uom': self.product.uom_id.id,
+                'uom_id': self.product.uom_id.id,
                 'location_id': self.location_id,
                 'location_dest_id': self.location_dest_id,
             })],
@@ -1348,7 +1273,7 @@ class TestQualityCheck(TestQualityCommon):
             'move_ids': [Command.create({
                 'product_id': self.product.id,
                 'product_uom_qty': 2,
-                'product_uom': self.product.uom_id.id,
+                'uom_id': self.product.uom_id.id,
                 'location_id': self.location_dest_id,
                 'location_dest_id': self.ref('stock.stock_location_customers'),
             })],
@@ -1435,7 +1360,7 @@ class TestQualityCheck(TestQualityCommon):
             'move_ids': [Command.create({
                 'product_id': self.product.id,
                 'product_uom_qty': 2,
-                'product_uom': self.product.uom_id.id,
+                'uom_id': self.product.uom_id.id,
                 'location_id': out_picking_type.default_location_src_id.id,
                 'location_dest_id': customer_location.id,
             })],
@@ -1475,7 +1400,7 @@ class TestQualityCheck(TestQualityCommon):
             'move_ids': [Command.create({
                 'product_id': product.id,
                 'product_uom_qty': 1,
-                'product_uom': product.uom_id.id,
+                'uom_id': product.uom_id.id,
             })]
         } for product in [self.product, self.product_2]])
         receipts[0].action_confirm()
@@ -1487,8 +1412,9 @@ class TestQualityCheck(TestQualityCommon):
         })
         self.assertEqual(ml.lot_name, '1457')
 
-        action_quality_check = Form.from_action(self.env, receipts.button_validate()).save()
-        validate_res = action_quality_check.do_pass()
+        action_quality_check = Form.from_action(self.env, receipts.with_user(self.quality_user).button_validate()).save()
+        action_quality_check.do_pass()
+        validate_res = receipts.with_user(self.quality_user).button_validate()
 
         self.assertEqual(validate_res.get('type'), 'ir.actions.client')
         self.assertEqual(validate_res.get('tag', False), 'do_multi_print')
@@ -1511,6 +1437,36 @@ class TestQualityCheck(TestQualityCommon):
         quality_point.active = False
         self.product.invalidate_recordset(fnames=['quality_control_point_qty'])
         self.assertEqual(self.product.quality_control_point_qty, 0)
+
+    def test_quality_check_uom_updates_with_sml(self):
+        """Ensure that the Quality Check UoM reflects the Stock Move Line UoM and can be searched."""
+        uom_unit = self.env.ref('uom.product_uom_unit')
+        uom_dozen = self.env.ref('uom.product_uom_dozen')
+
+        self.env['quality.point'].create({
+            'picking_type_ids': [Command.link(self.env.ref('stock.picking_type_in').id)],
+            'product_ids': [Command.link(self.product.id)],
+            'measure_on': 'move_line',
+            'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+        })
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_in').id,
+            'location_id': self.env.ref('stock.stock_location_suppliers').id,
+            'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+            'move_ids': [Command.create({
+                'product_id': self.product.id,
+                'product_uom_qty': 1,
+                'uom_id': uom_unit.id,
+            })],
+        })
+        picking.action_confirm()
+        self.assertTrue(picking.quality_check_todo, "Picking should have a QC to do")
+        self.assertEqual(picking.check_ids.uom_id, uom_unit, "QC UoM should match the sml's initial UoM")
+        # Change the move line UoM
+        picking.move_line_ids.uom_id = uom_dozen
+        self.assertEqual(picking.move_ids.uom_id, uom_unit, "Move's uom_id remains the same")
+        self.assertEqual(picking.check_ids.uom_id, uom_dozen, "QC UoM should update to the SML UoM")
+        self.assertEqual(picking.check_ids.qty_line, 1)
 
     def test_quality_point_stat_button_from_product_view(self):
         """
@@ -1552,3 +1508,253 @@ class TestQualityCheck(TestQualityCommon):
             {'quality_state': 'fail', 'product_id': self.product.id, 'qty_failed': 1.0},
             {'quality_state': 'fail', 'product_id': self.product.id, 'qty_failed': 1.0},
         ])
+
+    def test_no_error_for_tracked_product_quality_check(self):
+        """Test that Quality Checks does not raise a UserError in 2 cases:
+        - A tracked product's lot/serial is not set but its quality point is not by quantity (measure_on != 'move_line')
+        - A quality point (measure_on='move_line') is configured for a non-tracked product with a tracked product whose
+        lot is not set in the same picking
+        """
+        self.product.write({
+            'tracking': 'serial',
+            'is_storable': True,
+        })
+        self.env['quality.point'].create([{
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+            'measure_on': 'product',
+            'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+        }, {
+            'product_ids': [Command.link(self.product_2.id)],
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+            'measure_on': 'move_line',
+            'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+        }])
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.picking_type_id,
+            'location_id': self.location_id,
+            'location_dest_id': self.location_dest_id,
+            'move_ids': [Command.create({
+                    'product_id': p.id,
+                    'product_uom_qty': 2,
+                    'uom_id': p.uom_id.id,
+                    'location_id': self.location_id,
+                    'location_dest_id': self.location_dest_id,
+                }) for p in [self.product, self.product_2]],
+        })
+        picking.action_confirm()
+
+        qc_wizard = Form.from_action(self.env, picking.check_quality())
+        quality_check = qc_wizard.save()
+        self.assertEqual(len(quality_check.check_ids), 3)
+
+    def test_partial_quantity_failure_split(self):
+        """Test quantity failure splits move quantities correctly.
+        CASE-1: With total qty = 5 and failed qty = 3:
+        - Passed move: product_uom_qty = 2, move_line quantity = 2
+        - Failed move: product_uom_qty = 3, move_line quantity = 3
+        CASE-2: Failed qty > total qty (failed = 6):
+        - Passed move: product_uom_qty = 0, move_line quantity = 0
+        - Failed move: product_uom_qty = 5, move_line quantity = 6
+        """
+        self.env['quality.point'].create({
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+            'measure_on': 'move_line',
+            'failure_location_ids': [Command.link(self.failure_location.id)],
+        })
+        self.product.is_storable = True
+        receipt1, receipt2 = self.env['stock.picking'].create([
+            {
+                'picking_type_id': self.picking_type_id,
+                'location_id': self.location_id,
+                'location_dest_id': self.location_dest_id,
+                'move_ids': [Command.create({
+                    'product_id': self.product.id,
+                    'product_uom_qty': 5,
+                    'location_id': self.location_id,
+                    'location_dest_id': self.location_dest_id,
+                })],
+            }
+            for _ in range(2)
+        ])
+        for picking, failed_qty in [(receipt1, 3), (receipt2, 6)]:
+            picking.action_confirm()
+            wizard_action = picking.check_ids.action_open_quality_check_wizard()
+            wizard = self.env[wizard_action['res_model']].with_context(wizard_action['context']).create({})
+            fail_action = wizard.do_fail()
+            fail_wizard = self.env[fail_action['res_model']].with_context(fail_action['context']).browse(fail_action['res_id'])
+            fail_wizard.qty_failed = failed_qty
+            fail_wizard.confirm_fail()
+        self.assertRecordValues(receipt1.move_ids, [
+            {'product_id': self.product.id, 'product_uom_qty': 2, 'quantity': 2},
+            {'product_id': self.product.id, 'product_uom_qty': 3, 'quantity': 3},
+        ])
+        [(quality_rate,)] = self.env['quality.check']._read_group(
+            [('picking_id', '=', receipt1.id)],
+            aggregates=['quality_rate:avg'],
+        )
+        self.assertEqual(quality_rate, 50.0)
+        self.assertRecordValues(receipt2.move_ids, [
+            {'product_id': self.product.id, 'product_uom_qty': 0, 'quantity': 0},
+            {'product_id': self.product.id, 'product_uom_qty': 5, 'quantity': 6},
+        ])
+
+    def test_qc_fail_with_failure_location(self):
+        """Ensure that when a quality check is failed directly from the quality check form
+        (not through the wizard), the selected failure location is correctly saved
+        on the quality check record.
+        """
+        quality_point = self.env['quality.point'].create({
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+            'measure_on': 'product',
+            'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+            'failure_location_ids': [Command.link(self.failure_location.id)],
+        })
+        qc = self.env['quality.check'].create({
+            'product_id': self.product.id,
+            'point_id': quality_point.id,
+            'picking_id': self.receipt.id,
+        })
+        with Form.from_action(self.env, qc.do_fail()) as wizard:
+            wizard.failure_location_id = self.failure_location
+            wizard.save().confirm_fail()
+        self.assertRecordValues(self.receipt.check_ids, [{
+            'quality_state': 'fail',
+            'product_id': self.product.id,
+            'failure_location_id': self.failure_location.id,
+        }])
+
+    def test_quality_point_quantity_fail_pass_flow(self):
+        """
+        Test failed quantities move to the failure location and passed quantities
+        move to the original destination.
+        Case 1: Fail 1 unit (goes to failure location), then pass 1 unit (goes to original destination)
+        Case 2: Pass 1 unit (goes to original destination), then fail 2 units (goes to failure location)
+        """
+        self.env['quality.point'].create({
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+            'measure_on': 'move_line',
+            'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+            'failure_location_ids': [Command.link(self.failure_location.id)],
+        })
+        receipt = self.env['stock.picking'].create({
+            'picking_type_id': self.picking_type_id,
+            'location_id': self.location_id,
+            'location_dest_id': self.location_dest_id,
+            'move_ids': [Command.create({
+                'product_id': self.product.id,
+                'product_uom_qty': 2,
+                'location_id': self.location_id,
+                'location_dest_id': self.location_dest_id,
+            })],
+        })
+        receipt2 = receipt.copy()
+        (receipt | receipt2).action_confirm()
+        receipt2.move_ids.quantity = 1
+        receipt2.check_ids.do_pass()
+        receipt2.move_ids.quantity = 3
+        receipt.move_ids.quantity = 1
+
+        for incoming_picking in (receipt, receipt2):
+            action = incoming_picking.check_ids.filtered(lambda c: c.quality_state == 'none').action_open_quality_check_wizard()
+            fail_wizard = self.env[action['res_model']].with_context(action['context']).create({})
+            fail_action = fail_wizard.do_fail()
+            self.env[fail_action['res_model']].with_context(fail_action['context']).browse(fail_action['res_id']).confirm_fail()
+
+        receipt.move_ids.quantity = 2
+        receipt.check_ids.filtered(lambda c: c.quality_state == 'none').do_pass()
+
+        self.assertRecordValues(receipt.move_ids.move_line_ids, [
+            {'quantity': 1, 'location_dest_id': self.failure_location.id},
+            {'quantity': 1, 'location_dest_id': self.location_dest_id},
+        ])
+        self.assertRecordValues(receipt2.move_ids.move_line_ids, [
+            {'quantity': 1, 'location_dest_id': self.location_dest_id},
+            {'quantity': 2, 'location_dest_id': self.failure_location.id},
+        ])
+
+    def test_on_demand_quality_check_partial_failure_split(self):
+        """
+        Test that a manually created (on-demand) quality check with
+        Control per Quantity can be split correctly on partial failure
+        """
+        stock_location = self.env.ref('stock.stock_location_stock')
+        customer_location = self.env.ref('stock.stock_location_customers')
+        delivery = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.warehouse0').out_type_id.id,
+            'location_id': stock_location.id,
+            'location_dest_id': customer_location.id,
+            'move_ids': [Command.create({
+                'product_id': self.product.id,
+                'product_uom_qty': 10,
+                'location_id': stock_location.id,
+                'location_dest_id': customer_location.id,
+            })],
+        })
+        delivery.action_confirm()
+        # Manually create an on-demand quality check (no control point).
+        manual_check = self.env['quality.check'].create({
+            'picking_id': delivery.id,
+            'product_id': self.product.id,
+            'measure_on': 'move_line',
+        })
+        self.assertFalse(manual_check.move_line_id, "move_line_id should not be set on a manual check")
+        wizard_action = delivery.check_ids.action_open_quality_check_wizard()
+        wizard = self.env[wizard_action['res_model']].with_context(wizard_action['context']).create({})
+        fail_action = wizard.do_fail()
+        fail_wizard = self.env[fail_action['res_model']].with_context(fail_action['context']).browse(fail_action['res_id'])
+        # Set partial failure: 3 units failed, 7 units passed
+        fail_wizard.qty_failed = 3
+        fail_wizard.failure_location_id = self.failure_location.id
+        fail_wizard.confirm_fail()
+        # After the split there should be 2 checks: 1 failed (3 units), 1 passed (7 units)
+        self.assertEqual(len(delivery.check_ids), 2)
+        self.assertRecordValues(delivery.check_ids.sorted('quality_state'), [
+            {'quality_state': 'fail', 'product_id': self.product.id, 'failure_location_id': self.failure_location.id},
+            {'quality_state': 'pass', 'product_id': self.product.id, 'failure_location_id': False},
+        ])
+
+    def test_admin_can_bypass_quality_checks(self):
+        self.env['quality.point'].create({
+            'name': 'Test Bypass Admin QC',
+            'picking_type_ids': [Command.link(self.receipt.picking_type_id.id)],
+            'product_ids': [Command.link(self.product.id)],
+            'company_id': self.env.company.id,
+        })
+
+        self.receipt.action_confirm()
+        self.receipt.action_assign()
+
+        self.assertTrue(self.receipt.quality_check_todo, "A quality check should be pending.")
+
+        for move in self.receipt.move_ids:
+            move.quantity = move.product_uom_qty
+
+        self.receipt.button_validate()
+
+        self.assertEqual(self.receipt.state, 'done', "The administrator should be able to validate the transfer despite the pending QC.")
+
+        pending_checks = self.receipt.check_ids.filtered(lambda qc: qc.quality_state == 'none')
+        self.assertTrue(pending_checks, "The quality check must have survived the validation and still be 'none'.")
+
+    def test_stock_user_cannot_bypass_quality_checks(self):
+        self.env['quality.point'].create({
+            'name': 'Test No Bypass QC',
+            'picking_type_ids': [Command.link(self.receipt.picking_type_id.id)],
+            'product_ids': [Command.link(self.product.id)],
+            'company_id': self.env.company.id,
+        })
+
+        self.receipt.action_confirm()
+        self.receipt.action_assign()
+
+        self.assertTrue(self.receipt.quality_check_todo)
+
+        for move in self.receipt.move_ids:
+            move.quantity = move.product_uom_qty
+
+        res = self.receipt.with_user(self.quality_user).button_validate()
+
+        self.assertTrue(isinstance(res, dict), "Odoo should return the Quality Check wizard action")
+        self.assertEqual(res.get('res_model'), 'quality.check.wizard')
+
+        self.assertNotEqual(self.receipt.state, 'done', "The picking must not be validated")

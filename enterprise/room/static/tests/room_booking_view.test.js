@@ -2,7 +2,7 @@ import { expect, test } from "@odoo/hoot";
 import { press } from "@odoo/hoot-dom";
 import { advanceTime, freezeTime, mockDate, runAllTimers } from "@odoo/hoot-mock";
 import { defineRoomModels, mountRoomBookingView } from "@room/../tests/room_test_helpers";
-import { asyncStep, contains, onRpc, waitForSteps } from "@web/../tests/web_test_helpers";
+import { contains, onRpc } from "@web/../tests/web_test_helpers";
 
 import {
     INACTIVITY_TIMEOUT,
@@ -29,22 +29,22 @@ function assertRoomStatus(remainingTime, nbBookings) {
         // Ignore second digits as it will be affected by mocked time being advanced
         expect(".o_room_remaining_time").toHaveText(new RegExp(`^${time.slice(0, -2)}\\d\\d$`));
         expect(".o_room_booking_main > div").toHaveStyle(
-            "background-image: linear-gradient(#FF0000DD, #FF0000DD)",
+            "background-image: linear-gradient(rgba(255, 0, 0, 0.867), rgba(255, 0, 0, 0.867))",
             { inline: true }
         );
-        expect("i.fa-calendar-times-o.fa-3x").toHaveCount(1);
+        expect("i[data-icon='event_busy'].oi-3x").toHaveCount(1);
     } else {
         expect(".o_room_remaining_time").toHaveCount(0);
         expect(".o_room_booking_main > div").toHaveStyle(
-            "background-image: linear-gradient(#00FF00DD, #00FF00DD)",
+            "background-image: linear-gradient(rgba(0, 255, 0, 0.867), rgba(0, 255, 0, 0.867))",
             { inline: true }
         );
-        expect("i.fa-check-circle.fa-3x").toHaveCount(1);
+        expect("i[data-icon='check_circle'].oi-3x").toHaveCount(1);
     }
     expect(".o_room_sidebar .list-group-item").toHaveCount(nbBookings);
 }
 
-const QUICK_BOOK_SEL = ".btn-dark i.fa-rocket";
+const QUICK_BOOK_SEL = ".btn-dark i[data-icon='rocket_launch']";
 
 defineRoomModels();
 
@@ -92,7 +92,7 @@ test("Room Booking View - Quick Booking", async () => {
     });
     onRpc("/room/room_test/booking/10/delete", async () => {
         await notifyView("booking/delete", [{ id: 10 }]);
-        asyncStep("delete_booking");
+        expect.step("delete_booking");
         return true;
     });
     mockDate("2023-06-17 09:59:00", 0);
@@ -109,10 +109,10 @@ test("Room Booking View - Quick Booking", async () => {
         stop_datetime: "2023-06-17 10:59:00",
     };
     await contains(`${buttonsSelector}:last-child`).click();
-    await contains(".o_room_sidebar .list-group-item:first-child .fa-trash").click();
+    await contains(".o_room_sidebar .list-group-item:first-of-type [data-icon='delete'].oi-filled").click();
     await contains(".modal-footer button:contains('Delete')").click();
     await runAllTimers();
-    await waitForSteps(["delete_booking"]);
+    await expect.waitForSteps(["delete_booking"]);
 
     mockDate("2023-06-17 10:25:00", 0);
     await contains(QUICK_BOOK_SEL).click();
@@ -124,9 +124,9 @@ test("Room Booking View - Quick Booking", async () => {
         stop_datetime: "2023-06-17 10:55:00",
     };
     await contains(`${buttonsSelector}:last-child`).click();
-    await contains(".o_room_sidebar .list-group-item:first-child .fa-trash").click();
+    await contains(".o_room_sidebar .list-group-item:first-of-type [data-icon='delete'].oi-filled").click();
     await contains(".modal-footer button:contains('Delete')").click();
-    await waitForSteps(["delete_booking"]);
+    await expect.waitForSteps(["delete_booking"]);
 
     mockDate("2023-06-17 10:43:00", 0);
     await contains(QUICK_BOOK_SEL).click();
@@ -138,9 +138,9 @@ test("Room Booking View - Quick Booking", async () => {
         stop_datetime: "2023-06-17 10:58:00",
     };
     await contains(buttonsSelector).click();
-    await contains(".o_room_sidebar .list-group-item:first-child .fa-trash").click();
+    await contains(".o_room_sidebar .list-group-item:first-of-type [data-icon='delete'].oi-filled").click();
     await contains(".modal-footer button:contains('Delete')").click();
-    await waitForSteps(["delete_booking"]);
+    await expect.waitForSteps(["delete_booking"]);
 
     mockDate("2023-06-17 10:59:00", 0);
     await contains(QUICK_BOOK_SEL).click();
@@ -224,16 +224,16 @@ test("Room Booking View - Inactivity reset", async () => {
     // Writing the title should reset the timeout
     await press("s");
     await advanceTime(INACTIVITY_TIMEOUT - 1);
-    expect(".fa-check-circle.fa-3x").toHaveCount(0);
+    expect("[data-icon='check_circle'].oi-3x").toHaveCount(0);
 
     // Clicking anywhere should reset the timeout
     await contains(".o_room_booking_main").click();
     await advanceTime(INACTIVITY_TIMEOUT - 1);
-    expect(".fa-check-circle.fa-3x").toHaveCount(0);
+    expect("[data-icon='check_circle'].oi-3x").toHaveCount(0);
 
     // Make sure timeout still occurs
     await advanceTime(1);
-    expect(".fa-check-circle.fa-3x").toHaveCount(1);
+    expect("[data-icon='check_circle'].oi-3x").toHaveCount(1);
 });
 
 test("Room Booking View - Consecutive Bookings", async () => {

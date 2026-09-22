@@ -3,21 +3,22 @@
 # * product_barcodelookup
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-09-16 15:33+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
+"POT-Creation-Date: 2026-08-28 17:56+0000\n"
+"PO-Revision-Date: 2026-09-18 02:33+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/product_barcodelookup/zh_Hans/>\n"
+"projects/odoo-master/product_barcodelookup/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: product_barcodelookup
 #. odoo-python
@@ -25,8 +26,12 @@ msgstr ""
 msgid ""
 "%(matching_images_count)s matching images have been found for %"
 "(product_count)s products."
+msgstr "已找到%(matching_images_count)s个与%(product_count)s个产品相匹配的图像。"
+
+#. module: product_barcodelookup
+#: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
+msgid "<i class=\"oi\" data-icon=\"east\"/> Create API Key"
 msgstr ""
-"已找到%(matching_images_count)s个与%(product_count)s个产品相匹配的图像。"
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
@@ -62,8 +67,8 @@ msgstr "后台处理产品的任务已在运行。请稍后再试。"
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
-msgid "API Key:"
-msgstr "API 密钥："
+msgid "API Key"
+msgstr ""
 
 #. module: product_barcodelookup
 #: model:ir.model.fields,field_description:product_barcodelookup.field_res_config_settings__barcodelookup_api_key
@@ -71,29 +76,14 @@ msgid "API key"
 msgstr "API 密钥"
 
 #. module: product_barcodelookup
-#: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
-msgid "Barcode Database"
-msgstr "条码数据库"
-
-#. module: product_barcodelookup
 #: model:ir.model.fields,help:product_barcodelookup.field_res_config_settings__barcodelookup_api_key
 msgid "Barcode Lookup API Key for create product from barcode."
 msgstr "条码查询 API 密钥，用于从条码创建产品。"
 
 #. module: product_barcodelookup
-#: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
-msgid "Cancel"
-msgstr "取消"
-
-#. module: product_barcodelookup
 #: model:ir.model,name:product_barcodelookup.model_res_config_settings
 msgid "Config Settings"
 msgstr "配置设置"
-
-#. module: product_barcodelookup
-#: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
-msgid "Create products by scanning using"
-msgstr "通过扫描建立产品时，使用："
 
 #. module: product_barcodelookup
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_fetch_image_wizard__create_uid
@@ -106,7 +96,6 @@ msgid "Created on"
 msgstr "创建日期"
 
 #. module: product_barcodelookup
-#: model:ir.model.fields,field_description:product_barcodelookup.field_ir_cron_trigger__display_name
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_fetch_image_wizard__display_name
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_product__display_name
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_template__display_name
@@ -135,10 +124,9 @@ msgstr "从条码查询获取图片"
 #. odoo-python
 #: code:addons/product_barcodelookup/wizard/product_fetch_image_wizard.py:0
 msgid "Go to Settings"
-msgstr ""
+msgstr "前往“设置”"
 
 #. module: product_barcodelookup
-#: model:ir.model.fields,field_description:product_barcodelookup.field_ir_cron_trigger__id
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_fetch_image_wizard__id
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_product__id
 #: model:ir.model.fields,field_description:product_barcodelookup.field_product_template__id
@@ -185,6 +173,11 @@ msgstr "之外"
 #: model:ir.model,name:product_barcodelookup.model_product_template
 msgid "Product"
 msgstr "产品"
+
+#. module: product_barcodelookup
+#: model:ir.module.module,shortdesc:base.module_product_barcodelookup
+msgid "Product Barcode Lookup"
+msgstr ""
 
 #. module: product_barcodelookup
 #: model:ir.actions.server,name:product_barcodelookup.ir_cron_fetch_image_ir_actions_server
@@ -248,9 +241,11 @@ msgstr ""
 "原操作，或重新安装模块 “product_barcodelookup”。"
 
 #. module: product_barcodelookup
-#: model:ir.model,name:product_barcodelookup.model_ir_cron_trigger
-msgid "Triggered actions"
-msgstr "触发行动"
+#: model:ir.module.module,description:base.module_product_barcodelookup
+msgid ""
+"This module allows you to create products from barcode using Barcode Lookup "
+"API Key"
+msgstr ""
 
 #. module: product_barcodelookup
 #: model:ir.model.fields,help:product_barcodelookup.field_product_product__is_image_fetch_pending
@@ -261,21 +256,6 @@ msgstr "是否必须为该产品获取图像。由定时任务处理。"
 #: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_8
 msgid "age group"
 msgstr "年龄组"
-
-#. module: product_barcodelookup
-#: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
-msgid "barcodelookup.com"
-msgstr "barcodelookup.com"
-
-#. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_6
-msgid "brand"
-msgstr "品牌"
-
-#. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_1
-msgid "color"
-msgstr "颜色"
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.res_config_settings_view_form
@@ -293,24 +273,9 @@ msgid "manufacturer"
 msgstr "制造商"
 
 #. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_3
-msgid "material"
-msgstr "材料"
-
-#. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_4
-msgid "pattern"
-msgstr "图案"
-
-#. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
 msgid "selected products,"
 msgstr "选择的产品"
-
-#. module: product_barcodelookup
-#: model:product.attribute,name:product_barcodelookup.product_attribute_lookup_7
-msgid "size"
-msgstr "尺寸"
 
 #. module: product_barcodelookup
 #: model_terms:ir.ui.view,arch_db:product_barcodelookup.product_fetch_image_wizard_view_form
@@ -329,5 +294,17 @@ msgstr ""
 "                            处理，因为它们要么已有图像，\n"
 "                            要么缺少条形码"
 
-#~ msgid "This action is already scheduled. Please try again later."
-#~ msgstr "这个动作已经安排好了。请稍后再试。"
+msgid "brand"
+msgstr "品牌"
+
+msgid "color"
+msgstr "颜色"
+
+msgid "material"
+msgstr "材料"
+
+msgid "pattern"
+msgstr "图案"
+
+msgid "size"
+msgstr "尺寸"

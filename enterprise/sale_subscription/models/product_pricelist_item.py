@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from odoo.fields import Domain
 
 
 class ProductPricelistItem(models.Model):
@@ -17,9 +18,9 @@ class ProductPricelistItem(models.Model):
 
     @api.depends('plan_id')
     def _compute_company_id(self):
-        rules_with_pricelist = self.filtered('pricelist_id')
-        super(ProductPricelistItem, rules_with_pricelist)._compute_company_id()
-        for item in (self - rules_with_pricelist):
+        rules_with_pricelist_or_template_id = self.filtered(lambda rule: rule.pricelist_id or rule.product_tmpl_id)
+        super(ProductPricelistItem, rules_with_pricelist_or_template_id)._compute_company_id()
+        for item in (self - rules_with_pricelist_or_template_id):
             # must have a plan if there is no pricelist
             if not item.plan_id:
                 continue
@@ -36,7 +37,7 @@ class ProductPricelistItem(models.Model):
     def _compute_price_label(self):
         super()._compute_price_label()
         for item in self:
-            if item.plan_id and item.compute_price in ('fixed', 'percentage'):
+            if item.plan_id and (item.compute_price == 'fixed' or item.is_plain_discount):
                 item.price = item.env._(
                     "%(price_details)s %(recurrence)s",
                     price_details=item.price,
@@ -45,15 +46,15 @@ class ProductPricelistItem(models.Model):
 
     # === BUSINESS METHODS === #
 
-    def _is_applicable_for(self, product, qty_in_product_uom):
+    def _is_applicable_for(self, product, quantity, *, uom=None, **_kwargs):
         # Subscription rules should not apply to non-recurring products
         if self.plan_id and not product.recurring_invoice:
             return False
         if not self.plan_id and product.recurring_invoice and not product.allow_one_time_sale:
             return False
-        return super()._is_applicable_for(product, qty_in_product_uom)
+        return super()._is_applicable_for(product, quantity, uom=uom, **_kwargs)
 
-    def _compute_base_price(self, product, quantity, uom, date, currency, *, plan_id=None, **kwargs):
+    def _compute_base_price(self, product, quantity, uom, *, plan_id=None, **kwargs):
         """Override of `product` to consider pricelist items without pricelists as 'sales price' for recurring products.
 
         :param product: recordset of product (product.product/product.template)
@@ -67,20 +68,24 @@ class ProductPricelistItem(models.Model):
         :rtype: float
         """
         rule_base = self.base or 'list_price'
-        if rule_base == 'list_price' and product.recurring_invoice and plan_id:
+        if (
+            rule_base == 'list_price'
+            and product.recurring_invoice
+            and plan_id
+            # don't look for a shared rule if the current record already is one, to make sure to
+            # avoid infinite recursion.
+            and (not self or self.pricelist_id)
+        ):
             domain = self.env['product.pricelist']._get_applicable_rules_domain(
-                products=product,
-                date=fields.Datetime.now(),
-                plan_id=plan_id,
+                products=product, quantity=quantity, uom=uom, plan_id=plan_id, **kwargs
             )
+            # Exclude self: a no-pricelist plan rule must not use itself as its own
+            # base price, otherwise _compute_price would recurse infinitely.
+            domain &= Domain('id', 'not in', self.ids)
             no_pl_rule = self.env['product.pricelist.item'].search(domain, order='plan_id', limit=1)
             if no_pl_rule:
-                return no_pl_rule._compute_price(
-                    product, quantity, uom, date, currency, plan_id=plan_id, **kwargs,
-                )
-        return super()._compute_base_price(
-            product, quantity, uom, date, currency, plan_id=plan_id, **kwargs
-        )
+                return no_pl_rule._compute_price(product, quantity, uom, plan_id=plan_id, **kwargs)
+        return super()._compute_base_price(product, quantity, uom, plan_id=plan_id, **kwargs)
 
     # === TOOLING === #
 

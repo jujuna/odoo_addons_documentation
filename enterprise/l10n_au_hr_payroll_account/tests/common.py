@@ -11,6 +11,8 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 @tagged("post_install_l10n", "post_install", "-at_install", "aba_file")
 class L10nPayrollAccountCommon(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('au')
     def setUpClass(cls):
@@ -24,16 +26,13 @@ class L10nPayrollAccountCommon(AccountTestInvoicingCommon):
         )
         cls.env = cls.env(context=dict(cls.env.context, allowed_company_ids=cls.company.ids))
         cls.resource_calendar = cls.company.resource_calendar_id
-        cls.bank_cba = cls.env["res.bank"].create({
-            "name": "Commonwealth Bank of Australia",
-            "bic": "CTBAAU2S",
-            "country": cls.env.ref("base.au").id,
-        })
         cls.company_bank_account = cls.env['res.partner.bank'].create({
-            "bank_id": cls.bank_cba.id,
-            "acc_number": '12344321',
-            "acc_type": 'aba',
-            "aba_bsb": '123-456',
+            "bank_name": "Commonwealth Bank of Australia",
+            "bank_bic": "CTBAAU2S",
+            "country_id": cls.env.ref("base.au").id,
+            "account_number": '12344321',
+            "clearing_label_id": cls.env.ref('base.clearing_label_au').id,
+            "clearing_number": '123-456',
             "company_id": cls.company.id,
             "partner_id": cls.company.partner_id.id,
         })
@@ -58,23 +57,26 @@ class L10nPayrollAccountCommon(AccountTestInvoicingCommon):
             'company_id': cls.env.company.id,
         }])
         cls.bank_accounts_emp_1 = cls.env['res.partner.bank'].create([{
-            'acc_number': "123-666",
+            'account_number': "123-666",
             'partner_id': cls.employee_contact_1.id,
             'company_id': cls.env.company.id,
             'allow_out_payment': True,
-            'aba_bsb': '123456'},
-            {'acc_number': "123-777",
+            'clearing_label_id': cls.env.ref('base.clearing_label_au').id,
+            'clearing_number': '123456'},
+            {'account_number': "123-777",
             'partner_id': cls.employee_contact_1.id,
             'company_id': cls.env.company.id,
             'allow_out_payment': True,
-            'aba_bsb': '123456'}
+             'clearing_label_id': cls.env.ref('base.clearing_label_au').id,
+             'clearing_number': '123456'}
         ])
         cls.bank_accounts_emp_2 = cls.env['res.partner.bank'].create({
-            'acc_number': "123-888",
+            'account_number': "123-888",
             'partner_id': cls.employee_contact_2.id,
             'company_id': cls.env.company.id,
             'allow_out_payment': True,
-            'aba_bsb': '654321'
+            'clearing_label_id': cls.env.ref('base.clearing_label_au').id,
+            'clearing_number': '654321'
         })
         cls.employee_1 = cls.env["hr.employee"].create({
             "name": "Mel Gibson",
@@ -164,7 +166,20 @@ class L10nPayrollAccountCommon(AccountTestInvoicingCommon):
             "parameter_value": {"claimable": 150},
         })
 
-    def _register_payment(self, payslip_run):
+    @classmethod
+    def _create_company(cls, **create_values):
+        company = super()._create_company(**create_values)
+        cls.env['ir.sequence'].create({
+            'name': 'STP Sequence',
+            'code': 'stp.transaction',
+            'prefix': 'PAYEVENT0004',
+            'padding': 10,
+            'number_next': 1,
+            'company_id': company.id,
+        })
+        return company
+
+    def _register_payment_hr_payroll(self, payslip_run):
         action = payslip_run.action_register_payment()
 
         payment_register = (
@@ -211,12 +226,13 @@ class L10nPayrollAccountCommon(AccountTestInvoicingCommon):
                 "date_end": end_date or "2024-01-31",
                 "name": "January Batch",
                 "company_id": self.company.id,
-            }
+                "structure_id": self.default_payroll_structure.id,
+            },
         )
 
-        payslip_run.generate_payslips(employee_ids=employee_ids.ids)
+        payslip_run._generate_payslips()
         payslip_run.slip_ids.write({"input_line_ids": [(0, 0, {
-            "input_type_id": self.env.ref(input_id).id,
+            "salary_rule_id": self.env.ref(input_id).id,
             "amount": amount,
             }) for input_id, amount in input_xml_ids.items()
         ]})

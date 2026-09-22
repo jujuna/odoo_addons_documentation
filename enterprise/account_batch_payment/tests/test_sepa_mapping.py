@@ -1,7 +1,8 @@
 from odoo.addons.account_batch_payment.models.sepa_mapping import sanitize_communication
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import tagged, TransactionCase
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSepaMapping(TransactionCase):
     def test_sepa_mapping(self):
         self.assertEqual(sanitize_communication("Hello/world", 5), "Hello")

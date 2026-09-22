@@ -1,15 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'AI Livechat',
-    'version': '1.0',
     'category': 'AI',
-    'summary': """
-        Augment Livechat with AI Agents.
-    """,
-    'depends': ['ai_app', 'im_livechat'],
+    'summary': "Augment Livechat with AI Agents.",
+    'depends': ['ai', 'im_livechat'],
     'data': [
         'data/ai_agent_data.xml',
-        'views/im_livechat_channel_rule_views.xml'
+        'views/im_livechat_channel_rule_views.xml',
+        'views/discuss_channel_views.xml',
     ],
     'demo': [
         'data/im_livechat_channel_rule_demo.xml',
@@ -33,7 +31,6 @@
         ],
     },
     'author': 'Odoo S.A.',
-    'installable': True,
     'auto_install': True,
     'license': 'OEEL-1',
 }

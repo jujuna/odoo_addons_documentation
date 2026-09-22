@@ -8,7 +8,7 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     l10n_in_reseller_partner_id = fields.Many2one('res.partner',
-        string='Reseller', domain="[('vat', '!=', False), '|', ('company_id', '=', False), ('company_id', '=', company_id)]", readonly=False)
+        string='Reseller', domain="[('has_vat', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)]", readonly=False)
 
     @api.depends('partner_invoice_id')
     def _compute_fiscal_position_id(self):
@@ -58,7 +58,8 @@ class SaleOrder(models.Model):
         if not orders_without_fiscal:
             return
 
-        foreign_state = self.env['res.country.state'].search([('country_id.code', '!=', 'IN')], limit=1)
+        foreign_country = self.env['res.country'].new({'name': 'Not India', 'code': '!!'})
+        foreign_state = self.env['res.country.state'].new({'country_id': foreign_country})
         sez_state = self.env.ref('l10n_in.state_in_oc', raise_if_not_found=False)
         for state, orders in orders_without_fiscal.grouped(_get_fiscal_state).items():
             virtual_partner = self.env['res.partner'].new({

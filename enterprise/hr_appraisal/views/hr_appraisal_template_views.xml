@@ -15,7 +15,7 @@
                     <group>
                         <group>
                             <field name="company_id" groups="base.group_multi_company" placeholder="Visible to all" options="{'no_create': True}"/>
-                            <field name="department_ids" widget="many2many_tags" placeholder="Visible to all" options="{'no_create': True, 'color_field': 'color'}"/>
+                            <field name="department_ids" widget="many2many_tags" placeholder="Visible to all" options="{'no_create': True, 'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                         </group>
                     </group>
                     <div class="o_appraisal_both_feedback d-flex flex-column flex-md-row flex-wrap align-items-stretch">
@@ -52,7 +52,7 @@
             <list string="Appraisal Template">
                 <field name="sequence" widget="handle"/>
                 <field name="description"/>
-                <field name="department_ids" widget="many2many_tags" optional="show" options="{'color_field': 'color'}"/>
+                <field name="department_ids" widget="many2many_tags" optional="show" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                 <field name="company_id" groups="base.group_multi_company"/>
             </list>
         </field>

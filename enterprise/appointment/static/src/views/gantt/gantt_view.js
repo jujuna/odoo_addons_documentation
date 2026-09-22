@@ -9,6 +9,7 @@ export const AppointmentBookingGanttView = {
     Controller: AppointmentBookingGanttController,
     Model: AppointmentBookingGanttModel,
     Renderer: AppointmentBookingGanttRenderer,
+    buttonTemplate: 'appointment.Gantt.Buttons',
 };
 
 registry.category("views").add("appointment_booking_gantt", AppointmentBookingGanttView);

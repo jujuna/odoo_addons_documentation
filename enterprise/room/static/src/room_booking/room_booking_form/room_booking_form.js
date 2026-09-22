@@ -1,23 +1,25 @@
 import { scrollTo } from "@web/core/utils/scrolling";
 
-import { Component, onWillUpdateProps, useEffect, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, onPatched, onWillUpdateProps, proxy, signal, t, useProps } from "@odoo/owl";
 
 export class RoomBookingForm extends Component {
     static template = "room.RoomBookingForm";
-    static props = {
-        createBooking: Function,
-        bookings: Object,
-        bookingToEdit: { type: Object, optional: true },
-        cancel: Function,
-        editBooking: Function,
-        bookingName: { type: String, optional: true },
-    };
+
+    props = useProps({
+        createBooking: t.function(),
+        bookings: t.array(),
+        bookingToEdit: t.object().optional(),
+        cancel: t.function(),
+        editBooking: t.function(),
+        bookingName: t.string().optional(),
+    });
+
+    rootRef = signal.ref();
 
     setup() {
-        this.root = useRef("root");
         // If editing the current booking, show the current date as start otherwise the start
         // time slot would be hidden and we would not be able to change the start date
-        this.state = useState({
+        this.state = proxy({
             selectedDay: this.props.bookingToEdit
                 ? luxon.DateTime.max(
                       this.props.bookingToEdit.interval.start.startOf("day"),
@@ -55,21 +57,25 @@ export class RoomBookingForm extends Component {
         /**
          * Show the selected start or the "8am" slot at the top of the scheduler when changing day
          */
-        useEffect(
-            () => {
-                const slot = this.root.el.querySelector(
-                    `#slot${
-                        this.state.bookingStart?.startOf("day").equals(this.state.selectedDay)
-                            ? this.state.bookingStart.toFormat("HHmm")
-                            : "0800"
-                    }`,
-                );
-                if (slot) {
-                    scrollTo(slot, { isAnchor: true });
-                }
-            },
-            () => [this.state.selectedDay],
-        );
+        let scrolledDay;
+        const scrollToSelectedSlot = () => {
+            if (scrolledDay && this.state.selectedDay.equals(scrolledDay)) {
+                return;
+            }
+            scrolledDay = this.state.selectedDay;
+            const slot = this.rootRef().querySelector(
+                `#slot${
+                    this.state.bookingStart?.startOf("day").equals(this.state.selectedDay)
+                        ? this.state.bookingStart.toFormat("HHmm")
+                        : "0800"
+                }`
+            );
+            if (slot) {
+                scrollTo(slot, { isAnchor: true });
+            }
+        };
+        onMounted(scrollToSelectedSlot);
+        onPatched(scrollToSelectedSlot);
     }
 
     //----------------------------------------------------------------------
@@ -229,7 +235,7 @@ export class RoomBookingForm extends Component {
         // Add midnight slot if the last time slot can be used as end of the booking
         if (this.state.bookingStart && canBeEndDate) {
             const midnight = this.state.selectedDay.plus({ day: 1 });
-            const isEnd = this.state.bookingEnd?.equals(midnight);
+            const isEnd = this.state.bookingEnd && this.state.bookingEnd >= midnight;
             slots.push({
                 start: midnight,
                 canBeEndDate,

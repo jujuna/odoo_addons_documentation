@@ -36,7 +36,7 @@
             <xpath expr="//header//button[@name='action_cancel']" position="after">
                 <button name="action_send_delivery_guide" type="object"
                     string="Generate Delivery Guide"
-                    invisible="state != 'done' or country_code != 'PE' or picking_type_code != 'outgoing' or l10n_pe_edi_status"/>
+                    invisible="state != 'done' or country_code != 'PE' or picking_type_code not in ('outgoing', 'internal') or l10n_pe_edi_status"/>
             </xpath>
             <xpath expr="//notebook" position="inside">
                  <page string="PE EDI" name="pe_edi" invisible="not l10n_pe_edi_transport_type" readonly="l10n_pe_edi_status == 'sent'">

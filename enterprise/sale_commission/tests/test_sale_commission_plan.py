@@ -7,6 +7,8 @@ from odoo.addons.sale_commission.tests.test_sale_commission_common import TestSa
 @tagged('post_install', '-at_install')
 class TestSaleCommissionPlan(TestSaleCommissionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time("2024-01-15")
     def test_targets_preserved_when_extending_date_range(self):
         """ Test that existing targets are preserved when extending the plan's date range. """
@@ -58,3 +60,17 @@ class TestSaleCommissionPlan(TestSaleCommissionCommon):
         self.assertEqual(len(plan.target_ids), 2, "Should only have 2 targets after shortening to H1 2024.")
         self.assertEqual(plan.target_ids.sorted('date_from')[0].name, '2024 Q1', "First target should be Q1 2024.")
         self.assertEqual(plan.target_ids.sorted('date_from')[1].name, '2024 Q2', "Second target should be Q2 2024.")
+
+    def test_unrelated_targets_removed_when_updating_periodicity(self):
+        """ Test that the targets of a commission plan are properly removed if they don't belong to the new periodicity set. """
+        plan = self.env['sale.commission.plan'].create({
+            'name': 'Test Plan',
+            'date_from': '2026-01-01',
+            'date_to': '2026-12-31',
+            'periodicity': 'year',
+        })
+        self.assertEqual(len(plan.target_ids), 1)
+        plan.periodicity = 'quarter'
+        self.assertEqual(len(plan.target_ids), 4)
+        plan.periodicity = 'month'
+        self.assertEqual(len(plan.target_ids), 12)

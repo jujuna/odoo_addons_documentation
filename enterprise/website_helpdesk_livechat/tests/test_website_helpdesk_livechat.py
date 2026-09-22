@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-import json
+from markupsafe import Markup
 
 from odoo import Command
+from odoo.addons.bus.tests.common import BusCase, BusResult
 from odoo.tests.common import HttpCase
 from odoo.addons.helpdesk.tests.common import HelpdeskCommon
 from odoo.exceptions import ValidationError
@@ -12,7 +11,7 @@ from odoo.tests import tagged
 
 
 @tagged("post_install", "-at_install")
-class TestWebsiteHelpdeskLivechat(HttpCase, HelpdeskCommon):
+class TestWebsiteHelpdeskLivechat(HttpCase, HelpdeskCommon, BusCase):
     def setUp(self):
         super().setUp()
         self.maxDiff = None
@@ -33,6 +32,8 @@ class TestWebsiteHelpdeskLivechat(HttpCase, HelpdeskCommon):
         self.test_team.use_website_helpdesk_livechat = True
 
     def test_helpdesk_commands(self):
+        teams = self.env['helpdesk.team'].search([('use_website_helpdesk_livechat', '=', True), ('id', '!=', self.test_team.id)])
+        teams.use_website_helpdesk_livechat = False
         data = self.make_jsonrpc_request(
             "/im_livechat/get_session", {"channel_id": self.livechat_channel.id}
         )
@@ -60,14 +61,52 @@ class TestWebsiteHelpdeskLivechat(HttpCase, HelpdeskCommon):
         # Post message with the created attachments
         discuss_channel.message_post(attachment_ids=attachments.ids, message_type="comment")
 
+        # Create ticket with /ticket command and empty title to get the help message
+        expected_transient_message = (
+            "<span class='o_mail_notification'>"
+            "Create a new helpdesk ticket with: <pre>/ticket <i>ticket title</i></pre>"
+            "</span>"
+        )
+
+        def notifications(body):
+            self.env.cr.execute("SELECT currval('mail_message_id_seq')")
+            message_id = self.env.cr.fetchone()[0]
+            return [
+                BusResult(
+                    self.helpdesk_manager,
+                    "mail.record/insert",
+                    {
+                        "mail.message": [
+                            {
+                                "author_id": self.env.ref("base.partner_root").id,
+                                "body": ["markup", body],
+                                "id": message_id,
+                                "is_transient": True,
+                                "subtype_id": self.env.ref("mail.mt_note").id,
+                                "thread": {"id": discuss_channel.id, "model": "discuss.channel"},
+                            },
+                        ],
+                        "mail.thread": [
+                            {
+                                "id": discuss_channel.id,
+                                "messages": [["ADD", [message_id]]],
+                                "model": "discuss.channel",
+                                "transientMessages": [["ADD", [message_id]]],
+                            },
+                        ],
+                    },
+                ),
+            ]
+
+        with self.assertBus(lambda: notifications(expected_transient_message)):
+            discuss_channel.execute_command_helpdesk(body="/ticket")
+
         # Create the ticket with the /ticket command
         ticket_name = 'Test website helpdesk livechat'
         discuss_channel.execute_command_helpdesk(body=f"/ticket {ticket_name}")
         self.assertTrue(discuss_channel.sudo().ticket_ids)
 
-        self.env.cr.precommit.run()  # trigger the creation of bus.bus records
-        bus = self.env['bus.bus'].search([('channel', 'like', f'"res.partner",{self.helpdesk_manager.partner_id.id}')], order='id desc', limit=1)
-        message = json.loads(bus.message)
+        message = discuss_channel.message_ids[0]
         ticket = self.env['helpdesk.ticket'].search([('team_id', '=', self.test_team.id)])
         self.assertIn('<div data-embedded="file"', ticket.description,
             'The name "Text attachment" should be added to the ticket description.')
@@ -75,34 +114,44 @@ class TestWebsiteHelpdeskLivechat(HttpCase, HelpdeskCommon):
             "The image attachment should be added to the ticket description.")
         self.assertEqual(ticket.message_attachment_count, 1,
             'Only one text-type attachment should be attached to the ticket.')
-        expected_message = f"<span class='o_mail_notification'>Created a new ticket: <a href=# data-oe-model='helpdesk.ticket' data-oe-id='{ticket.id}'>{ticket_name} (#{ticket.ticket_ref})</a></span>"
-
+        expected_message = Markup(
+            '<div class="o_mail_notification" data-oe-type="create-ticket">created a new ticket: '
+            '<a href="#" data-oe-model="helpdesk.ticket" data-oe-id="%(ticket_id)s">'
+            '%(ticket_name)s (#%(ticket_ref)s)</a></div>'
+        ) % {
+            "ticket_id": ticket.id,
+            "ticket_name": ticket_name,
+            "ticket_ref": ticket.ticket_ref,
+        }
         self.assertTrue(ticket, f"Ticket {ticket_name} should have been created.")
-        self.assertEqual(message['payload']['body'], expected_message, 'A message should be posted with a link to the created ticket.')
+        self.assertEqual(message.body, expected_message, "A message should be posted with a link to the created ticket.")
         self.assertIn(ticket_name, ticket.name, f"The created ticket should be named '{ticket_name}'.")
         self.assertIn(test_message, f"{self.helpdesk_manager.name}: {str(ticket.description)}", 'The chat history should be in the ticket description.')
 
         # Search the tickets with the /search_tickets command
-        discuss_channel.execute_command_helpdesk_search(body=f"/search_tickets {ticket_name}")
-
-        self.env.cr.precommit.run()  # trigger the creation of bus.bus records
-        bus = self.env['bus.bus'].search([('channel', 'like', f'"res.partner",{self.helpdesk_manager.partner_id.id}')], order='id desc', limit=1)
-        message = json.loads(bus.message)
         expected_message = f"<span class='o_mail_notification'>Tickets search results for <b>Test website helpdesk livechat</b>: <br/><a href=# data-oe-model='helpdesk.ticket' data-oe-id='{ticket.id}'>{ticket_name} (#{ticket.ticket_ref})</a></span>"
-
-        self.assertEqual(message['payload']['body'], expected_message, 'A message should be posted saying the previously created ticket matches the command.')
+        with self.assertBus(lambda: notifications(expected_message)):
+            discuss_channel.execute_command_helpdesk_search(body=f"/search_tickets {ticket_name}")
 
         # Create 5 additional tickets with similar name as the previous ticket
         for i in range(5):
             discuss_channel.execute_command_helpdesk(body=f"/ticket {ticket_name}{i}")
 
-        discuss_channel.execute_command_helpdesk_search(body=f"/search_tickets {ticket_name}")
-        self.env.cr.precommit.run()  # trigger the creation of bus.bus records
-        bus = self.env['bus.bus'].search([('channel', 'like', f'"res.partner",{self.helpdesk_manager.partner_id.id}')], order='id desc', limit=1)
-        message = json.loads(bus.message)
-
-        load_more_expected_message = f'<b><a href="#" data-oe-type="load" data-oe-lst="{ticket_name}" data-oe-load-counter="1">Load More</a></b>'
-        self.assertIn(load_more_expected_message, message['payload']['body'], "Load More link should be present when more than 5 tickets are found by the search_tickets command")
+        extra_tickets = self.env["helpdesk.ticket"].search(
+            [("name", "in", [f"{ticket_name}{i}" for i in range(5)])], order="id desc"
+        )
+        ticket_links = "<br/>".join(
+            f"<a href=# data-oe-model='helpdesk.ticket' data-oe-id='{extra_ticket.id}'>"
+            f"{extra_ticket.name} (#{extra_ticket.ticket_ref})</a>"
+            for extra_ticket in extra_tickets
+        )
+        load_more_link = f'<div class="o_load_more"><b><a href="#" data-oe-type="load" data-oe-lst="{ticket_name}" data-oe-load-counter="1">Load More</a></b></div>'
+        expected_message = (
+            "<span class='o_mail_notification'>Tickets search results for "
+            f"<b>{ticket_name}</b>: <br/>{ticket_links}<br/>{load_more_link}</span>"
+        )
+        with self.assertBus(lambda: notifications(expected_message)):
+            discuss_channel.execute_command_helpdesk_search(body=f"/search_tickets {ticket_name}")
 
     def test_chatbot_script_steps_with_create_ticket(self):
         with self.assertRaises(ValidationError):
@@ -119,7 +168,7 @@ class TestWebsiteHelpdeskLivechat(HttpCase, HelpdeskCommon):
             ]
         })
 
-    def test_get_livechat_session_fields_to_store(self):
+    def test_store_livechat_extra_fields(self):
         parent_partner, other_partner = self.env["res.partner"].create(
             [
                 {"name": "Parent Partner"},
@@ -152,7 +201,6 @@ class TestWebsiteHelpdeskLivechat(HttpCase, HelpdeskCommon):
                 ],
                 "channel_type": "livechat",
                 "livechat_channel_id": self.livechat_channel.id,
-                "livechat_operator_id": self.helpdesk_manager.partner_id.id,
                 "name": "Test Channel",
             }
         )

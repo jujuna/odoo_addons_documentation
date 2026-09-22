@@ -16,5 +16,3 @@ class TestPayrollAccountCommon(TestPayrollCommon):
             'company_id': self.company_in.id,
         })
         self.env.ref('l10n_in_hr_payroll.hr_payroll_structure_in_employee_salary').journal_id = self.account_journal
-        self.contract_rahul.structure_type_id = self.env.ref('l10n_in_hr_payroll.hr_payroll_salary_structure_type_ind_emp_pay')
-        self.contract_jethalal.structure_type_id = self.env.ref('l10n_in_hr_payroll.hr_payroll_salary_structure_type_ind_emp_pay')

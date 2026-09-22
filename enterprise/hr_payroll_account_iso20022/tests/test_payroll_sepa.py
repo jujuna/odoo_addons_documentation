@@ -1,17 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-
 from lxml import etree
-from datetime import date, datetime, timedelta
 
-from odoo import Command, fields
-from odoo.addons.hr_payroll_account.tests.test_hr_payroll_account import TestHrPayrollAccountCommon
+from odoo import Command
+from odoo.addons.hr_payroll.tests.common import TestPayslipBase
 from odoo.tests.common import test_xsd
-from odoo.tests import tagged, Form
+from odoo.tests import tagged
 
 
-class TestPayrollSEPACreditTransferCommon(TestHrPayrollAccountCommon):
+class TestPayrollSEPACreditTransferCommon(TestPayslipBase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -21,197 +18,59 @@ class TestPayrollSEPACreditTransferCommon(TestHrPayrollAccountCommon):
             'country_id': cls.env.ref('base.us').id,
         })
 
-        cls.bank = cls.env['res.bank'].create({
-            'name': 'BNP',
-            'bic': 'GEBABEBB',
+        cls.work_contact = cls.env['res.partner'].create({
+            'name': 'Richard Parker',
+            'email': 'richard@example.com',
+            'country_id': cls.env.ref('base.us').id,
         })
+        cls.richard_emp.work_contact_id = cls.work_contact
 
         cls.res_partner_bank = cls.env['res.partner.bank'].create({
-            'acc_number': 'BE32707171912447',
+            'account_number': 'BE32707171912447',
             'partner_id': cls.work_contact.id,
-            'acc_type': 'bank',
-            'bank_id': cls.bank.id,
+            'bank_name': 'BNP',
+            'bank_bic': 'GEBABEBB',
         })
 
         cls.bank_partner = cls.env['res.partner.bank'].create({
-            'acc_number': 'BE84567968814145',
-            'acc_type': 'iban',
+            'account_number': 'BE84567968814145',
             'partner_id': cls.company_us.partner_id.id,
+            'bank_name': 'BNP',
+            'bank_bic': 'GEBABEBB',
         })
 
-        cls.hr_employee_john.bank_account_ids = [Command.link(cls.res_partner_bank.id)]
+        cls.richard_emp.bank_account_ids = [Command.link(cls.res_partner_bank.id)]
 
         cls.bank_journal = cls.env['account.journal'].create({
             'name': 'Bank',
             'code': 'BNK',
             'type': 'bank',
-            'bank_id': cls.bank.id,
             'bank_account_id': cls.bank_partner.id,
         })
-        cls.bank_journal.sepa_pain_version = 'pain.001.001.09'
+        cls.sepa_payment_method_line = cls.bank_journal.outbound_payment_method_line_ids.filtered(
+            lambda line: line.code == 'sepa_ct',
+        )[:1]
+        cls.sepa_payment_method_line.sepa_pain_version = 'pain.001.001.09'
 
-        # ============================= MIURA =============================
-        cls.miura_be_company = cls.env['res.company'].create({
-            'name': 'Miura BE company',
-            'country_id': cls.env.ref('base.be').id,
-            'currency_id': cls.env.ref('base.EUR').id,
-            'batch_payroll_move_lines': False,
-        })
-        miura_transfer_account = cls.env['account.account'].create({
-            'name': 'Miura Company Transfer Account',
-            'code': '994987',
-            'reconcile': True,
-            'account_type': 'liability_payable',
-            'company_ids': (cls.miura_be_company.id,),
-        })
-        cls.miura_be_company.transfer_account_id = miura_transfer_account.id
-        cls.bnp_bank = cls.env['res.bank'].create({
-            'name': 'Miura BNP',
-            'bic': 'GEBABEBB',
-        })
-        cls.miura_work_contact = cls.env['res.partner'].create({'name': 'Miura work contact'})
-        cls.miura_partner_bank = cls.env['res.partner.bank'].create({
-            'acc_number': 'BE91073397502076',
-            'partner_id': cls.miura_work_contact.id,
-            'acc_type': 'bank',
-            'bank_id': cls.bnp_bank.id,
-            'allow_out_payment': True,
+        cls.payroll_structure = cls.env['hr.payroll.structure'].create({
+            'name': 'Monthly Salary - Test',
+            'type_id': cls.structure_type.id,
         })
 
-        cls.salary_work_contact = cls.env['res.partner'].create({'name': 'Salary work contact'})
-        cls.salary_partner_bank = cls.env['res.partner.bank'].create({
-            'acc_number': 'BE34438537755990',
-            'partner_id': cls.salary_work_contact.id,
-            'acc_type': 'bank',
-            'bank_id': cls.bnp_bank.id,
-            'allow_out_payment': True,
+        cls.payslip_run = cls.env['hr.payslip.run'].create({
+            'name': 'November Payroll',
+            'date_start': '2025-11-01',
+            'date_end': '2025-11-30',
+            'structure_id': cls.payroll_structure.id,
         })
 
-        cls.miura_work_address = cls.env['res.partner'].create({'name': 'Miura work address'})
-        cls.hr_employee_miura = cls.env['hr.employee'].create({
-           'work_contact_id': cls.miura_work_contact.id,
-            'address_id': cls.miura_work_address.id,
-            'birthday': '1966-07-11',
-            'children': 0.0,
-            'sex': 'male',
-            'marital': 'single',
-            'name': 'Kentaro',
-            'bank_account_ids': [cls.miura_partner_bank.id],
-            'company_id': cls.miura_be_company.id,
+        cls.hr_payslip_richard = cls.env['hr.payslip'].create({
+            'name': 'Payslip - Richard',
+            'employee_id': cls.richard_emp.id,
+            'struct_id': cls.payroll_structure.id,
+            'date_from': '2025-11-01',
+            'date_to': '2025-11-30',
         })
-
-        salary_payable = cls.env['account.account'].create({
-            'name': 'Salary Payable',
-            'code': '2300',
-            'reconcile': True,
-            'account_type': 'liability_payable',
-            'company_ids': (cls.miura_be_company.id,),
-        })
-
-        salary_account = cls.env['account.account'].create({
-            'name': "Salary Expense",
-            'code': "092039",
-            'account_type': "expense",
-            'company_ids': (cls.miura_be_company.id,),
-        })
-
-        cls.miura_salaries_journal = cls.env['account.journal'].create({
-            'name': 'Sepa Test Salaries',
-            'type': 'credit',
-            'code': 'SEPA-SLR-TEST',
-            'default_account_id': salary_account.id,
-            'sepa_pain_version': 'pain.001.001.09',
-            'currency_id': cls.env.ref('base.EUR').id,
-            'company_id': cls.miura_be_company.id,
-            'bank_account_id': cls.salary_partner_bank.id,
-        })
-
-        cls.hr_structure_mangaka = cls.env['hr.payroll.structure'].create({
-            'name': 'Salary Structure for Mangaka',
-            'rule_ids': [
-                (0, 0, {
-                    'name': 'Basic Salary',
-                    'amount_select': 'percentage',
-                    'amount_percentage': 100,
-                    'amount_percentage_base': 'version.wage',
-                    'code': 'BASIC',
-                    'category_id': cls.env.ref('hr_payroll.BASIC').id,
-                    'sequence': 1,
-                }), (0, 0, {
-                    'name': 'Provident Fund',
-                    'amount_select': 'percentage',
-                    'sequence': 120,
-                    'amount_percentage': -12.5,
-                    'amount_percentage_base': 'version.wage',
-                    'code': 'PF',
-                    'category_id': cls.env.ref('hr_payroll.DED').id,
-                }), (0, 0, {
-                    'name': 'Meal Voucher',
-                    'amount_select': 'fix',
-                    'amount_fix': 10,
-                   'quantity': "'WORK100' in worked_days and worked_days['WORK100'].number_of_days",
-                    'code': 'MA',
-                    'category_id': cls.env.ref('hr_payroll.ALW').id,
-                    'sequence': 16,
-                }), (0, 0, {
-                    'name': 'Conveyance Allowance',
-                    'amount_select': 'fix',
-                    'amount_fix': 800,
-                    'code': 'CA',
-                    'category_id': cls.env.ref('hr_payroll.ALW').id,
-                    'sequence': 10,
-                }), (0, 0, {
-                    'name': 'House Rent Allowance',
-                    'amount_select': 'percentage',
-                    'amount_percentage': 40,
-                    'amount_percentage_base': 'version.wage',
-                    'code': 'HRA',
-                    'category_id': cls.env.ref('hr_payroll.ALW').id,
-                    'sequence': 5,
-                }), (0, 0, {
-                    'name': 'Net Salary',
-                    'amount_select': 'code',
-                    'amount_python_compute': 'result = categories["BASIC"] + categories["ALW"] + categories["DED"]',
-                    'code': 'NET',
-                    'category_id': cls.env.ref('hr_payroll.NET').id,
-                    'sequence': 200,
-                    'account_credit': salary_payable.id,
-                    'employee_move_line': True,
-                })
-
-            ],
-            'type_id': cls.env['hr.payroll.structure.type'].create({'name': 'Employee', 'country_id': False}).id,
-            'journal_id': cls.miura_salaries_journal.id,
-        })
-
-        hr_structure_type = cls.env['hr.payroll.structure.type'].create({
-            'name': 'Salary Structure Type',
-            'struct_ids': [(4, cls.hr_structure_mangaka.id)],
-            'default_struct_id': cls.hr_structure_mangaka.id,
-        })
-
-        cls.env['hr.version'].browse(cls.hr_employee_miura.version_id.id).write({
-            'name': 'Miura contract',
-            'contract_date_end': fields.Date.to_string(datetime.now() + timedelta(days=365)),
-            'contract_date_start': date(2010, 1, 1),
-            'wage': 5000.0,
-            'employee_id': cls.hr_employee_miura.id,
-            'structure_type_id': hr_structure_type.id,
-        })
-
-        cls.hr_payslip_miura = cls.env['hr.payslip'].create({
-            'employee_id': cls.hr_employee_miura.id,
-            'struct_id': cls.hr_structure_mangaka.id,
-            'journal_id': cls.miura_salaries_journal.id,
-            'name': 'Test Payslip Miura',
-        })
-
-        sepa_payment_method_line = cls.env['account.payment.method.line'].create({
-            'payment_method_id': cls.env.ref('account_iso20022.account_payment_method_sepa_ct').id,
-            'journal_id': cls.miura_salaries_journal.id,
-        })
-
-        cls.miura_salaries_journal.outbound_payment_method_line_ids |= sepa_payment_method_line
 
 
 @tagged('post_install', '-at_install')
@@ -220,35 +79,36 @@ class TestPayrollSEPACreditTransfer(TestPayrollSEPACreditTransferCommon):
         """ Checking the process of payslip when you create a SEPA payment. """
 
         # I verify if the payslip has not already a payslip run.
-        self.assertFalse(self.hr_payslip_john.payslip_run_id, 'There is already a payslip run!')
+        self.assertFalse(self.hr_payslip_richard.payslip_run_id, 'There is already a payslip run!')
 
         # I validate the payslip.
-        self.hr_payslip_john.action_payslip_done()
+        self.hr_payslip_richard.action_payslip_done()
 
         # I verify the payslip is in validated state.
-        self.assertEqual(self.hr_payslip_john.state, 'validated', 'State not changed!')
+        self.assertEqual(self.hr_payslip_richard.state, 'validated', 'State not changed!')
 
         # I make the SEPA payment.
         file = self.env['hr.payroll.payment.report.wizard'].create({
-            'payslip_ids': self.hr_payslip_john.ids,
-            'payslip_run_id': self.hr_payslip_john.payslip_run_id.id,
+            'payslip_ids': self.hr_payslip_richard.ids,
             'export_format': 'sepa',
             'journal_id': self.bank_journal.id,
+            'payment_method_line_id': self.sepa_payment_method_line.id,
         })._create_sepa_binary()
 
         # I verify if a file is created.
         self.assertTrue(file, 'SEPA payment has not been created!')
 
         # I verify the payslip is in validated state.
-        self.assertEqual(self.hr_payslip_john.state, 'validated', 'State should not change!')
+        self.assertEqual(self.hr_payslip_richard.state, 'validated')
 
     def test_01_hr_payroll_account_iso20022(self):
         """ Checking the process of payslip run when you create a SEPA payment. """
         # I verify the payslip run is in draft state.
-        self.assertEqual(self.payslip_run.state, '01_ready', 'State not changed!')
+        self.assertEqual(self.payslip_run.state, '00_draft', 'State not changed!')
 
         # I create a payslip employee.
-        self.payslip_run.generate_payslips(employee_ids=[self.hr_employee_john.id])
+        self.payslip_run._generate_payslips()
+        self.assertEqual(self.payslip_run.state, '01_ready', 'Pay Run has draft payslips')
 
         # I verify if the payslip run has payslip(s).
         self.assertTrue(len(self.payslip_run.slip_ids) > 0, 'Payslip(s) not added!')
@@ -265,19 +125,21 @@ class TestPayrollSEPACreditTransfer(TestPayrollSEPACreditTransferCommon):
             'payslip_run_id': self.payslip_run.id,
             'export_format': 'sepa',
             'journal_id': self.bank_journal.id,
+            'payment_method_line_id': self.sepa_payment_method_line.id,
         })._create_sepa_binary()
 
         # I verify if a file is created for the payslip run.
         self.assertTrue(file, 'SEPA payment has not been created!')
 
         # I verify the payslip is in paid state.
-        self.assertEqual(self.payslip_run.state, '02_close', 'State should not change!')
+        self.assertEqual(self.payslip_run.state, '02_close')
 
     def test_02_hr_payroll_account_iso20022_ch(self):
-        self.assertEqual(self.payslip_run.state, '01_ready')
+        self.assertEqual(self.payslip_run.state, '00_draft')
 
         # I create a payslip employee.
-        self.payslip_run.generate_payslips(employee_ids=[self.hr_employee_john.id])
+        self.payslip_run._generate_payslips()
+        self.assertEqual(self.payslip_run.state, '01_ready', 'Pay Run has draft payslips')
 
         self.assertTrue(len(self.payslip_run.slip_ids) > 0)
 
@@ -290,35 +152,52 @@ class TestPayrollSEPACreditTransfer(TestPayrollSEPACreditTransferCommon):
             'payslip_run_id': self.payslip_run.id,
             'export_format': 'iso20022_ch',
             'journal_id': self.bank_journal.id,
+            'payment_method_line_id': self.sepa_payment_method_line.id,
         })._create_sepa_binary()
 
         self.assertTrue(file)
         self.assertEqual(self.payslip_run.state, '02_close')
 
-    def test_sepa_payslip_partner_bank_id(self):
-        """ Check that the "partner_bank_id" is set after account_register_payment wizard has
-            been initialized and that the action_create_payments (action launched when the
-            user clicks on "Create Payments" button of the account_register_payment wizard)
-            doesn't raise any error.
+    def test_sepa_export_multi_bank_account_instr_id_uniqueness(self):
+        """ Test that a payslip split across multiple bank accounts generates unique SEPA InstrId (slip.id-bank_account.id) """
 
-            This test is not following any real spec, its only purpose is to check that the payslip
-            sepa payment flow works (so feel free to modify it if you feel like something's wrong)
-        """
-        self.hr_payslip_miura.compute_sheet()
-        self.hr_payslip_miura.action_payslip_done()
-        self.hr_payslip_miura.move_id.action_post()
-
-        sepa_payment_method_line = self.env['account.payment.method.line'].create({
-            'payment_method_id': self.env.ref('account_iso20022.account_payment_method_sepa_ct').id,
-            'journal_id': self.miura_salaries_journal.id,
+        other_partner_bank = self.env['res.partner.bank'].create({
+            'account_number': 'BE32707171912490',
+            'partner_id': self.work_contact.id,
+            'bank_name': 'BNP',
+            'bank_bic': 'OTHERBANK',
         })
 
-        action_register_payment = self.hr_payslip_miura.action_register_payment()
-        register_payment_form = Form.from_action(self.env, action_register_payment)
-        register_payment_form.payment_method_line_id = sepa_payment_method_line
-        saved_form = register_payment_form.save()
-        self.assertEqual(saved_form.partner_bank_id.id, self.miura_partner_bank.id)
-        saved_form.action_create_payments()
+        self.richard_emp.bank_account_ids = [Command.link(other_partner_bank.id)]
+        self.richard_emp.write({
+            'bank_account_ids': [Command.link(other_partner_bank.id)],
+            'salary_distribution': {
+                str(self.res_partner_bank.id): {'sequence': 1, 'amount': 50.0, 'amount_is_percentage': True},
+                str(other_partner_bank.id): {'sequence': 2, 'amount': 50.0, 'amount_is_percentage': True},
+            }
+        })
+
+        self.payslip_run._generate_payslips()
+        self.payslip_run.action_validate()
+        file = self.env['hr.payroll.payment.report.wizard'].create({
+            'payslip_ids': self.payslip_run.slip_ids.ids,
+            'payslip_run_id': self.payslip_run.id,
+            'export_format': 'sepa',
+            'journal_id': self.bank_journal.id,
+            'payment_method_line_id': self.sepa_payment_method_line.id,
+        })._create_sepa_binary()
+
+        self.assertTrue(file)
+        xml_content = file.decode('utf-8')
+
+        payslip = self.payslip_run.slip_ids
+        self.assertEqual(len(payslip), 1)
+
+        expected_id_1 = f'<InstrId>{payslip.id}-{self.res_partner_bank.id}</InstrId>'
+        expected_id_2 = f'<InstrId>{payslip.id}-{other_partner_bank.id}</InstrId>'
+
+        self.assertIn(expected_id_1, xml_content, f'Missing unique InstrId: {expected_id_1}')
+        self.assertIn(expected_id_2, xml_content, f'Missing unique InstrId: {expected_id_2}')
 
 
 @tagged('external_l10n', 'post_install', '-at_install', '-standard')
@@ -328,26 +207,28 @@ class TestPayrollSEPACreditTransferXmlValidity(TestPayrollSEPACreditTransferComm
     def test_00_hr_payroll_account_iso20022(self):
         """ Checking the process of payslip when you create a SEPA payment. """
 
-        self.hr_payslip_john.action_payslip_done()
+        self.hr_payslip_richard.action_payslip_done()
         file = self.env['hr.payroll.payment.report.wizard'].create({
-            'payslip_ids': self.hr_payslip_john.ids,
-            'payslip_run_id': self.hr_payslip_john.payslip_run_id.id,
+            'payslip_ids': self.hr_payslip_richard.ids,
+            'payslip_run_id': self.hr_payslip_richard.payslip_run_id.id,
             'export_format': 'sepa',
             'journal_id': self.bank_journal.id,
+            'payment_method_line_id': self.sepa_payment_method_line.id,
         })._create_sepa_binary()
-        return etree.fromstring(base64.b64decode(file))
+        return etree.fromstring(file)
 
     @test_xsd(path='account_sepa/schemas/pain.001.001.03.xsd')
     def test_01_hr_payroll_account_iso20022(self):
         """ Checking the process of payslip run when you create a SEPA payment. """
 
-        self.payslip_run.generate_payslips(employee_ids=[self.hr_employee_john.id])
+        self.payslip_run._generate_payslips()
         self.payslip_run.action_validate()
         file = self.env['hr.payroll.payment.report.wizard'].create({
             'payslip_ids': self.payslip_run.slip_ids.ids,
             'payslip_run_id': self.payslip_run.id,
             'export_format': 'sepa',
             'journal_id': self.bank_journal.id,
+            'payment_method_line_id': self.sepa_payment_method_line.id,
         })._create_sepa_binary()
 
-        return etree.fromstring(base64.b64decode(file))
+        return etree.fromstring(file)

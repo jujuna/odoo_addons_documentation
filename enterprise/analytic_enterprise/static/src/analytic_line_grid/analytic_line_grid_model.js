@@ -31,6 +31,10 @@ export class AnalyticLineGridModel extends GridModel {
     static NavigationInfo = AnalyticLineGridNavigationInfo;
 
     async loadData(metaData) {
+        if (!metaData.sectionField && metaData.rowFields.length > 0) {
+            metaData.sectionField = metaData.rowFields.shift();
+        }
+
         if (this.navigationInfo.range.span === "year") {
             await this.navigationInfo.fetchPeriod();
         }

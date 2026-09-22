@@ -17,7 +17,8 @@ class TestPayrollDepartureNotice(TestPayrollCommon):
             'name': 'PFI Employee',
             'date_version': date(2025, 1, 1),
             'contract_date_start': date(2025, 1, 1),
-            'contract_type_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_pfi').id,
+            'employee_type_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_pfi').id,
+            'l10n_be_dimona_category': 'ivt',
         })
 
     def test_departure_notice_only_PFI(self):
@@ -25,16 +26,17 @@ class TestPayrollDepartureNotice(TestPayrollCommon):
         When the employee only has one PFI contract, there is no notice period. The start and end date of the notice
         period should then be the departure date.
         """
-        wizard = self.env['hr.payslip.employee.depature.notice'].with_context(allowed_company_ids=self.belgian_company.ids, active_id=self.pfi_employee.id).create({
-            'departure_date': date(2025, 2, 1),
-            'leaving_type_id': self.env.ref('hr.departure_fired').id,
-            'departure_description': 'PFI fired'
+        departure = self.env['hr.employee.departure'].with_context(allowed_company_ids=self.belgian_company.ids, active_id=self.pfi_employee.id).create({
+            'dismissal_date': date(2025, 2, 1),
+            'departure_reason_id': self.env.ref('hr.departure_fired').id,
+            'departure_description': 'PFI fired',
         })
-        self.assertEqual(wizard.oldest_contract_id, self.env['hr.version'])
-        self.assertEqual(wizard.first_contract, False)
-        self.assertEqual(wizard.start_notice_period, date(2025, 2, 1))
-        self.assertEqual(wizard.end_notice_period, date(2025, 2, 1))
-        self.assertEqual(wizard.notice_duration_week_after_2014, 0)
+        self.assertEqual(departure.l10n_be_first_contract_id, self.env['hr.version'])
+        self.assertFalse(departure.l10n_be_first_contract_date)
+        self.assertEqual(departure.l10n_be_notice_period_start, date(2025, 2, 1),
+            "If no notice period, the notice period start should be the dismissal date.")
+        self.assertEqual(departure.departure_date, date(2025, 2, 1))
+        self.assertEqual(departure.l10n_be_notice_duration_week_after_2014, 0)
 
     def test_departure_notice_first_PFI(self):
         """
@@ -45,12 +47,13 @@ class TestPayrollDepartureNotice(TestPayrollCommon):
         second_version_cdi = self.pfi_employee.create_version({
             'date_version': date(2025, 2, 1),
             'contract_date_start': date(2025, 2, 1),
-            'contract_type_id': self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_cdi').id,
+            'employee_type_id': self.env.ref('hr.contract_type_employee').id,
+            'l10n_be_dimona_category': 'oth',
         })
-        wizard = self.env['hr.payslip.employee.depature.notice'].with_context(allowed_company_ids=self.belgian_company.ids, active_id=self.pfi_employee.id).create({
-            'departure_date': date(2025, 3, 1),
-            'leaving_type_id': self.env.ref('hr.departure_fired').id,
-            'departure_description': 'CDI fired'
+        wizard = self.env['hr.employee.departure'].with_context(allowed_company_ids=self.belgian_company.ids, active_id=self.pfi_employee.id).create({
+            'dismissal_date': date(2025, 3, 1),
+            'departure_reason_id': self.env.ref('hr.departure_fired').id,
+            'departure_description': 'CDI fired',
         })
-        self.assertEqual(wizard.oldest_contract_id, second_version_cdi)
-        self.assertEqual(wizard.first_contract, date(2025, 2, 1))
+        self.assertEqual(wizard.l10n_be_first_contract_id, second_version_cdi)
+        self.assertEqual(wizard.l10n_be_first_contract_date, date(2025, 2, 1))

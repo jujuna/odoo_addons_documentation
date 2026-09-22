@@ -14,15 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:49+0000\n"
-"PO-Revision-Date: 2025-10-08 18:51+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-18 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 02:41+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"sale_commission/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_commission
 #. odoo-python
@@ -40,10 +42,9 @@ msgstr "%(user)s - %(plan)s"
 
 #. module: sale_commission
 #. odoo-python
-#: code:addons/sale_commission/model/commission_plan.py:0
-#, fuzzy
-msgid "%s (copy)"
-msgstr "%s (nusxa)"
+#: code:addons/sale_commission/model/commission_plan_achievement.py:0
+msgid "%s"
+msgstr ""
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
@@ -61,7 +62,6 @@ msgstr "Erishilgan"
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__target_rate
-#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__achieved_rate
 #, fuzzy
 msgid "Achieved Rate"
 msgstr "Erishish darajasi"
@@ -85,26 +85,36 @@ msgid "Achievement"
 msgstr "Natija"
 
 #. module: sale_commission
-#: model:ir.model.fields,field_description:sale_commission.field_res_config_settings__group_commission_forecast
-#, fuzzy
-msgid "Achievement Forecast"
-msgstr "Natija bashorati"
-
-#. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
 #, fuzzy
 msgid "Achievement Report"
 msgstr "Natijalar hisoboti"
 
 #. module: sale_commission
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Achievement ÷ target = target completion"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.actions.act_window,name:sale_commission.sale_achievement_action_report
-#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__type__achieve
 #: model:ir.ui.menu,name:sale_commission.sale_commission_achievement_report_menu
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_list
 #, fuzzy
 msgid "Achievements"
 msgstr "Natijalar"
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Achievements Rules"
+msgstr ""
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_issue_user_wizard_form
+msgid ""
+"Achievements whose users are present in different plans. Period overlap and\n"
+"                        gaps are detected."
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__message_needaction
@@ -127,21 +137,24 @@ msgstr "Faol rejalar"
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_wizard
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
-#, fuzzy
-msgid "Add Multiple Salespersons"
-msgstr "Bir nechta sotuvchilarni qo‘shish"
+msgid "Add Multiple Salespeople"
+msgstr ""
 
 #. module: sale_commission
-#: model:ir.actions.act_window,name:sale_commission.sale_subscription_change_customer_wizard_action
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__add_plan_id
+msgid "Add Plan"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.actions.act_window,name:sale_commission.sale_commission_change_customer_wizard_action
 #, fuzzy
 msgid "Add Salespersons"
 msgstr "Sotuvchilarni qo‘shish"
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
-#, fuzzy
-msgid "Add a new Sales Person"
-msgstr "Yangi sotuvchi qo‘shish"
+msgid "Add a new Salesperson"
+msgstr ""
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
@@ -160,6 +173,14 @@ msgstr "Yangi komissiya darajasini qo‘shish"
 #, fuzzy
 msgid "Add to"
 msgstr "Qo‘shish:"
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_achievement.py:0
+msgid ""
+"Added values (user and plan) must be coherent: set or unset. Same for "
+"Reduced values"
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
@@ -205,30 +226,15 @@ msgstr ""
 "sozlash imkonini beradi"
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_forecast
-#, fuzzy
-msgid ""
-"Allows you to manually set a salesperson's forecast\n"
-"                for a specific period and commission plan."
-msgstr ""
-"Muayyan davr va komissiya rejasi uchun sotuvchining bashoratini qo‘lda "
-"belgilash imkonini beradi"
-
-#. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_my_forecast
-#, fuzzy
-msgid ""
-"Allows you to manually set your sales' forecast\n"
-"                for a specific period and commission plan."
-msgstr ""
-"Muayyan davr va komissiya rejasi uchun sotuvlar bashoratini qo‘lda belgilash "
-"imkonini beradi"
-
-#. module: sale_commission
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan_achievement__type__amount_invoiced
 #, fuzzy
 msgid "Amount Invoiced"
 msgstr "Hisob-faktura qilingan summa"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan_achievement__type__amount_paid
+msgid "Amount Paid in Full"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan_achievement__type__amount_sold
@@ -244,7 +250,9 @@ msgstr "Tasdiqlash"
 
 #. module: sale_commission
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__state__approved
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_search
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 #, fuzzy
 msgid "Approved"
 msgstr "Tasdiqlangan"
@@ -262,13 +270,11 @@ msgid "Attachment Count"
 msgstr "Ilova soni"
 
 #. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
-#, fuzzy
-msgid "Based on"
-msgstr "Asosida"
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__blocked
+msgid "Blocked"
+msgstr ""
 
 #. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_wizard
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 #, fuzzy
 msgid "Cancel"
@@ -285,6 +291,11 @@ msgstr "Bekor qilingan"
 #, fuzzy
 msgid "Category"
 msgstr "Toifa"
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_issue_user_wizard_form
+msgid "Close"
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
@@ -425,26 +436,34 @@ msgid "Completed"
 msgstr "Bajarildi"
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_plan
-#, fuzzy
-msgid ""
-"Compute commissions of your sales people based on their achievements and "
-"targets"
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__date_from
+msgid "Conflict From"
 msgstr ""
-"Savdo xodimlaringizning yutuqlari va maqsadlari asosida komissiyalarini "
-"hisoblash"
 
 #. module: sale_commission
-#: model:ir.model,name:sale_commission.model_res_config_settings
-#, fuzzy
-msgid "Config Settings"
-msgstr "Sozlamalar"
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__date_to
+msgid "Conflict To"
+msgstr ""
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_plan
-#, fuzzy
-msgid "Create a new commission plan"
-msgstr "Yangi komissiya rejasini tuzish"
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__issue_type
+msgid "Conflict Type"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__conflicting_plan_id
+msgid "Conflicting Plan"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.actions.act_window,name:sale_commission.duplicated_user_wizard_action
+msgid "Conflicting lines"
+msgstr ""
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_issue_user_wizard_form
+msgid "Congratulations, no conflicting line has been found!"
+msgstr ""
 
 #. module: sale_commission
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_achievement
@@ -453,21 +472,16 @@ msgid "Create an adjustment"
 msgstr "Tuzatma kiritish"
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_forecast
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_my_forecast
-#, fuzzy
-msgid "Create an forecast"
-msgstr "Prognoz tuzish"
-
-#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__create_uid
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__create_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__create_uid
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__create_uid
 #, fuzzy
 msgid "Created by"
 msgstr "Tuzuvchi"
@@ -476,11 +490,13 @@ msgstr "Tuzuvchi"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__create_date
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__create_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__create_date
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__create_date
 #, fuzzy
 msgid "Created on"
 msgstr "Tuzilgan sana"
@@ -551,18 +567,24 @@ msgid "Details"
 msgstr "Tafsilotlar"
 
 #. module: sale_commission
+#: model:ir.actions.server,name:sale_commission.model_sale_commission_plan_duplicates
+msgid "Detect users conflicts"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_crm_team__display_name
-#: model:ir.model.fields,field_description:sale_commission.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_res_users__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__display_name
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__display_name
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__display_name
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__display_name
 #, fuzzy
 msgid "Display Name"
@@ -570,7 +592,9 @@ msgstr "Ko‘rsatiladigan nom"
 
 #. module: sale_commission
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__state__done
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_search
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 #, fuzzy
 msgid "Done"
 msgstr "Bajarildi"
@@ -583,16 +607,25 @@ msgid "Draft"
 msgstr "Qoralama"
 
 #. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__target_type__dynamic
+msgid "Dynamic"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__dynamic_plan_ids
+msgid "Dynamic Plan"
+msgstr ""
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Dynamic Target"
+msgstr ""
+
+#. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 #, fuzzy
 msgid "Effective Period"
 msgstr "Amal qilish davri"
-
-#. module: sale_commission
-#: model:res.groups,name:sale_commission.group_commission_forecast
-#, fuzzy
-msgid "Enable Commission Forecast"
-msgstr "Komissiya prognozini yoqish"
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_list
@@ -601,7 +634,6 @@ msgid "End Date"
 msgstr "Tugash sanasi"
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_my_report
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_report
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_report_sale
 #, fuzzy
@@ -611,6 +643,12 @@ msgid ""
 msgstr ""
 "Komissiya rejasiga biriktirilganingizga va komissiya oladigan savdolarni "
 "amalga oshirganingizga ishonch hosil qiling"
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_report__forecast
+msgid ""
+"Entered manually by the salesperson. No impact on commission calculation."
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
@@ -639,13 +677,15 @@ msgid "Followers (Partners)"
 msgstr "Kuzatuvchilar (hamkorlar)"
 
 #. module: sale_commission
-#: model:ir.actions.act_window,name:sale_commission.sale_commission_action_forecast
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_user__other_plans
+msgid ""
+"For reference only. Useful to quickly control the consistency between "
+"salespeople."
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__amount
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__forecast
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_graph
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_list
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_pivot
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 #, fuzzy
 msgid "Forecast"
 msgstr "Prognoz"
@@ -660,11 +700,9 @@ msgid "From"
 msgstr "Boshlanish sanasi"
 
 #. module: sale_commission
-#. odoo-python
-#: code:addons/sale_commission/model/commission_plan_user.py:0
-#, fuzzy
-msgid "From must be before To"
-msgstr "Boshlanish sanasi tugash sanasidan oldin bo‘lishi kerak"
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_problematic_user_wizard__issue_type__gap
+msgid "Gap"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__has_message
@@ -674,21 +712,27 @@ msgstr "Xabar mavjud"
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_crm_team__id
-#: model:ir.model.fields,field_description:sale_commission.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_commission.field_res_users__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__id
 #, fuzzy
 msgid "ID"
 msgstr "ID"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__id_str
+msgid "Id Str"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,help:sale_commission.field_sale_commission_plan__message_needaction
@@ -704,20 +748,43 @@ msgid "If checked, some messages have a delivery error."
 msgstr "Belgilansa, ba'zi xabarlarda yetkazib berish xatosi bor"
 
 #. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__in_payment
+msgid "In Payment"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Invoices,"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__invoicing_legacy
+msgid "Invoicing App Legacy"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__message_is_follower
 #, fuzzy
 msgid "Is Follower"
 msgstr "Kuzatuvchimi"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__issue_user_ids
+msgid "Issue User"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__write_uid
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__write_uid
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__write_uid
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__write_uid
 #, fuzzy
 msgid "Last Updated by"
 msgstr "Oxirgi yangilovchi"
@@ -726,11 +793,13 @@ msgstr "Oxirgi yangilovchi"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__write_date
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__write_date
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__write_date
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__write_date
 #, fuzzy
 msgid "Last Updated on"
 msgstr "Oxirgi yangilangan sana"
@@ -740,6 +809,33 @@ msgstr "Oxirgi yangilangan sana"
 #, fuzzy
 msgid "Last Year"
 msgstr "O‘tgan yil"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__type__achieve
+msgid "Linear"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__move_id
+msgid "Linked Invoice"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__order_id
+msgid "Linked Order"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_achievement__readonly
+msgid ""
+"Lock records to prevent their modification (typically after running "
+"payroll). Only users with a high-enough access right can unlock records."
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__readonly
+msgid "Locked"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_target_forecast__team_id
@@ -752,6 +848,11 @@ msgstr ""
 "kitob va obunalarda savdo guruhini belgilash uchun ishlatiladi"
 
 #. module: sale_commission
+#: model:ir.module.module,summary:base.module_sale_commission
+msgid "Manage your salespersons' commissions"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model,name:sale_commission.model_sale_commission_achievement
 #, fuzzy
 msgid "Manual Commission Achievement"
@@ -762,6 +863,12 @@ msgstr "Qo‘lda kiritilgan komissiya yutug‘i"
 #, fuzzy
 msgid "Mark as done"
 msgstr "Bajarilgan deb belgilash"
+
+#. module: sale_commission
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Measure × rate = achievement"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__message_has_error
@@ -788,18 +895,10 @@ msgid "My Achievements"
 msgstr "Mening yutuqlarim"
 
 #. module: sale_commission
-#: model:ir.actions.act_window,name:sale_commission.sale_commission_action_my_report
-#: model:ir.ui.menu,name:sale_commission.sale_commission_my_menu
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 #, fuzzy
 msgid "My Commissions"
 msgstr "Mening komissiyalarim"
-
-#. module: sale_commission
-#: model:ir.actions.act_window,name:sale_commission.sale_commission_action_my_forecast
-#, fuzzy
-msgid "My Forecast"
-msgstr "Mening bashoratim"
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__name
@@ -807,6 +906,11 @@ msgstr "Mening bashoratim"
 #, fuzzy
 msgid "Name"
 msgstr "Nom"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__not_paid
+msgid "Not Paid"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__note
@@ -882,12 +986,37 @@ msgid "Other plans"
 msgstr "Boshqa rejalar"
 
 #. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_problematic_user_wizard__issue_type__overlap
+msgid "Overlap"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model,name:sale_commission.model_sale_commission_problematic_user_wizard
+msgid "Overlap/Gap period per plan and user"
+msgstr ""
+
+#. module: sale_commission
 #. odoo-python
 #: code:addons/sale_commission/model/commission_plan_target.py:0
 msgid ""
 "Overlapping periods detected for plan '%(plan)s':\n"
 "- %(c_name)s [%(c_from)s → %(c_to)s]\n"
 "- %(n_name)s [%(n_from)s → %(n_to)s]"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__paid
+msgid "Paid"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__paid_ratio
+msgid "Paid Ratio"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__partial
+msgid "Partially Paid"
 msgstr ""
 
 #. module: sale_commission
@@ -905,6 +1034,11 @@ msgid "Payment Date"
 msgstr "To‘lov sanasi"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__payment_state
+msgid "Payment State"
+msgstr ""
+
+#. module: sale_commission
 #. odoo-python
 #: code:addons/sale_commission/controllers/main.py:0
 #, fuzzy
@@ -917,7 +1051,6 @@ msgstr "Samaradorlik"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__target_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__target_id
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_list
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_list
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 #, fuzzy
@@ -938,15 +1071,27 @@ msgid "Periods"
 msgstr "Davrlar"
 
 #. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_achievement_report__document_user_id
+msgid "Person assigned to the source document"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__plan_id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_issue_wizard__plan_ids
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__plan_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__plan_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__plan_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__plan_id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__plan_id
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_view_search
 #, fuzzy
 msgid "Plan"
 msgstr "Reja"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__plan_user_id
+msgid "Plan User"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_achievement__product_id
@@ -991,10 +1136,20 @@ msgid "Reduce From"
 msgstr "Quyidagidan kamaytirish"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement__reduce_plan_id
+msgid "Reduce Plan"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__related_res_id
 #, fuzzy
 msgid "Related"
 msgstr "Aloqador"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__related_res_name
+msgid "Related Document"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__related_res_model
@@ -1016,10 +1171,33 @@ msgid "Reset to draft"
 msgstr "Qoralamaga qaytarish"
 
 #. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_achievement_report__payment_state__reversed
+msgid "Reversed"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__message_has_sms_error
 #, fuzzy
 msgid "SMS Delivery error"
 msgstr "SMS yetkazib berishda xatolik"
+
+#. module: sale_commission
+#: model:ir.module.module,shortdesc:base.module_sale_commission
+msgid "Sale Commission"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_user__user_ids
+msgid ""
+"Sale Order and invoices of these users will be added to the achievements of "
+"the salesperson"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Sale Orders, ..."
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__team_id
@@ -1040,12 +1218,6 @@ msgid "Sales Commission Report"
 msgstr "Savdo komissiyasi hisoboti"
 
 #. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
-#, fuzzy
-msgid "Sales People"
-msgstr "Sotuvchilar"
-
-#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__user_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__user_id
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_search
@@ -1058,16 +1230,20 @@ msgstr "Sotuvchi"
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__team_id
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__user_type__team
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 #, fuzzy
 msgid "Sales Team"
 msgstr "Sotuvchilar jamoasi"
 
 #. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Salespeople"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__user_id
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__sale_user_id
 #: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__user_type__person
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 #, fuzzy
 msgid "Salesperson"
@@ -1092,16 +1268,45 @@ msgid "Start Date"
 msgstr "Boshlanish sanasi"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__state
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__state
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__state
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__state
 #, fuzzy
 msgid "State"
 msgstr "Holat"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__target_type__static
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Static"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan__target_type
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_target__target_type
+msgid ""
+"Static: Set a target for a given period.\n"
+"\n"
+"    Dynamic: The target of a salesperson is the sum of the targets of their "
+"subordinates on the following plans."
+msgstr ""
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
+msgid "Structure"
+msgstr ""
 
 #. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_wizard
 #, fuzzy
 msgid "Submit"
 msgstr "Yuborish"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__user_ids
+msgid "Sum of achievements"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,help:sale_commission.field_sale_commission_plan_target__payment_amount
@@ -1116,6 +1321,11 @@ msgid "Sum of target amount per plan paid on the same date"
 msgstr ""
 "Bir xil sanada to‘langan tarif rejasi bo‘yicha maqsadli summalarning "
 "yig‘indisi"
+
+#. module: sale_commission
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_issue_user_wizard_form
+msgid "TODO"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__target_ids
@@ -1152,17 +1362,70 @@ msgid "Target Frequency"
 msgstr "Maqsad chastotasi"
 
 #. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__target_type
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target__target_type
+msgid "Target Type"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_report__achieved_rate
+msgid "Target completion"
+msgstr ""
+
+#. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_commission__target_rate
 #, fuzzy
 msgid "Target completion (%)"
 msgstr "Maqsadni bajarish (%)"
 
 #. module: sale_commission
-#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__type__target
+#. odoo-javascript
+#: code:addons/sale_commission/static/src/js/commission_plan_list_renderer/commission_plan_empty_screen.xml:0
+msgid "Target completion on the commission graph = commission"
+msgstr ""
+
+#. module: sale_commission
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_view_form
 #, fuzzy
 msgid "Targets"
 msgstr "Maqsadlar"
+
+#. module: sale_commission
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__user_id
+msgid "Team Member"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_plan_user.py:0
+msgid ""
+"The 'From' date value (%(df)s) of the Sales People must correspond to the "
+"target periods.\n"
+"e.g. %(adf)s"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_plan_user.py:0
+msgid ""
+"The 'To' date value (%(dt)s) of the Sales People must correspond to the "
+"target periods.\n"
+"e.g. %(adt)s"
+msgstr ""
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_plan_user.py:0
+msgid "The assignment start date must be before the end date"
+msgstr ""
+
+#. module: sale_commission
+#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan__dynamic_plan_ids
+msgid ""
+"The dynamic target of a salesperson is the sum of the targets of their "
+"subordinates on the following plans. Leave empty to specify a static target "
+"in the Targets tab below."
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
@@ -1170,6 +1433,13 @@ msgstr "Maqsadlar"
 #, fuzzy
 msgid "The plan should have at least one target with an achievement rate of 0%"
 msgstr "Rejada kamida bitta maqsadning bajarilish darajasi 0% bo‘lishi kerak"
+
+#. module: sale_commission
+#. odoo-python
+#: code:addons/sale_commission/model/commission_plan_user.py:0
+msgid ""
+"The sales person's assignment must be within the commission plan period."
+msgstr ""
 
 #. module: sale_commission
 #. odoo-python
@@ -1194,23 +1464,15 @@ msgid "The team is required in team plan."
 msgstr "Jamoa rejasida jamoa talab etiladi"
 
 #. module: sale_commission
-#: model:ir.model.constraint,message:sale_commission.constraint_sale_commission_plan_user_user_uniq
-#, fuzzy
-msgid "The user is already present in the plan"
-msgstr "Foydalanuvchi allaqachon rejaga kiritilgan"
-
-#. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
-#, fuzzy
-msgid "This Month"
-msgstr "Shu oy"
-
-#. module: sale_commission
-#: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_target_forecast_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_report_view_search
 #, fuzzy
 msgid "This Year"
 msgstr "Shu yil"
+
+#. module: sale_commission
+#: model:ir.model.fields.selection,name:sale_commission.selection__sale_commission_plan__type__target
+msgid "Tiered"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__date_to
@@ -1255,7 +1517,6 @@ msgid "Type"
 msgstr "Tur"
 
 #. module: sale_commission
-#: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_my_report
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_report
 #: model_terms:ir.actions.act_window,help:sale_commission.sale_commission_action_report_sale
 #, fuzzy
@@ -1270,9 +1531,11 @@ msgstr "Kelgusi"
 
 #. module: sale_commission
 #: model:ir.model,name:sale_commission.model_res_users
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_achievement_report__document_user_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__user_ids
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_target_forecast__user_id
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user_wizard__user_ids
+#: model_terms:ir.ui.view,arch_db:sale_commission.sale_achievement_report_view_search
 #: model_terms:ir.ui.view,arch_db:sale_commission.sale_commission_plan_user_view_search
 #, fuzzy
 msgid "User"
@@ -1286,6 +1549,7 @@ msgstr "Foydalanuvchining savdo jamoasi"
 
 #. module: sale_commission
 #: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__user_type
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan_user__user_type
 #, fuzzy
 msgid "User Type"
 msgstr "Foydalanuvchi turi"
@@ -1300,21 +1564,20 @@ msgstr "Foydalanuvchi muddati rejadan keyin tugashi mumkin emas"
 #. module: sale_commission
 #. odoo-python
 #: code:addons/sale_commission/model/commission_plan_user.py:0
-#, fuzzy
-msgid "User period cannot start before the plan."
-msgstr "Foydalanuvchi muddati rejadan oldin boshlanishi mumkin emas"
+msgid "User period cannot start after the plan."
+msgstr ""
 
 #. module: sale_commission
-#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_plan__website_message_ids
-#, fuzzy
-msgid "Website Messages"
-msgstr "Veb-sayt xabarlari"
+#: model:ir.model.fields,field_description:sale_commission.field_sale_commission_problematic_user_wizard__wizard_id
+msgid "Wizard"
+msgstr ""
 
 #. module: sale_commission
-#: model:ir.model.fields,help:sale_commission.field_sale_commission_plan__website_message_ids
-#, fuzzy
-msgid "Website communication history"
-msgstr "Veb-sayt muloqot tarixi"
+#: model:ir.model,name:sale_commission.model_sale_commission_plan_issue_wizard
+msgid ""
+"Wizard for detecting user appearing in multiple sale.commission.plan.user "
+"user_ids record"
+msgstr ""
 
 #. module: sale_commission
 #: model:ir.model,name:sale_commission.model_sale_commission_plan_user_wizard
@@ -1352,3 +1615,23 @@ msgstr "masalan, 2025-yilgi komissiyalar rejasi"
 #, fuzzy
 msgid "per"
 msgstr "uchun"
+
+#, fuzzy
+#~ msgid "Website Messages"
+#~ msgstr "Veb-sayt xabarlari"
+
+#, fuzzy
+#~ msgid "Website communication history"
+#~ msgstr "Veb-sayt muloqot tarixi"
+
+#, fuzzy
+#~ msgid "Add Multiple Salespersons"
+#~ msgstr "Bir nechta sotuvchilarni qo‘shish"
+
+#, fuzzy
+#~ msgid "From must be before To"
+#~ msgstr "Boshlanish sanasi tugash sanasidan oldin bo‘lishi kerak"
+
+#, fuzzy
+#~ msgid "The user is already present in the plan"
+#~ msgstr "Foydalanuvchi allaqachon rejaga kiritilgan"

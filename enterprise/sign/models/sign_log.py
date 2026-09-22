@@ -34,7 +34,7 @@ class SignLog(models.Model):
     longitude = fields.Float(digits=(10, 7), groups="sign.group_sign_manager")
     ip = fields.Char("IP address of the visitor", required=True, groups="sign.group_sign_manager")
     log_hash = fields.Char(string="Inalterability Hash", readonly=True, copy=False)
-    token = fields.Char(string="User token")
+    token = fields.Char(string="User token", groups="base.group_system")
 
     # Accessed for ?
     action = fields.Selection(
@@ -53,6 +53,7 @@ class SignLog(models.Model):
 
     request_state = fields.Selection([
         ("shared", "Shared"),
+        ("scheduled", "Scheduled"),
         ("sent", "Before Signature"),
         ("signed", "After Signature"),
         ("refused", "Refused Signature"),
@@ -113,12 +114,13 @@ class SignLog(models.Model):
         previous_hash = ""
         sign_request = not prev_activity and self.env['sign.request'].browse(vals['sign_request_id'])
         if sign_request and sign_request.template_id.document_ids:
-            body = sign_request.template_id.document_ids[0].with_context(bin_size=False).attachment_id.datas
+            attachment = sign_request.template_id.document_ids[0].attachment_id
+            # It used to be `str(attachment_id.datas)`, keeping the same behaviour
+            body = "b'" + attachment.raw.to_base64() + "'"
         else:
             previous_hash = prev_activity.log_hash
             body = self._compute_string_to_hash(vals)
-        hash = sha256((previous_hash + str(body)).encode('utf-8')).hexdigest()
-        return hash
+        return sha256((previous_hash + body).encode('utf-8')).hexdigest()
 
     def _compute_string_to_hash(self, vals):
         values = {}
@@ -135,7 +137,7 @@ class SignLog(models.Model):
         """
         Check the integrity of a sign request by comparing the logs hash to the computed values.
         """
-        logs = self.filtered(lambda item: item.action in ['sign', 'create'])
+        logs = self.filtered(lambda item: item.action in ['sign', 'create']).sudo()
         for log in logs:
             vals = {key: value[0] if isinstance(value, tuple) else value for key, value in log.read()[0].items()}
             hash = self._get_or_check_hash(vals)

@@ -6,6 +6,8 @@ from odoo.tests import tagged
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestL10nEsAccountReportTrialBalance(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('es')
     def setUpClass(cls):
@@ -68,7 +70,7 @@ class TestL10nEsAccountReportTrialBalance(TestAccountReportsCommon):
             [
                 (self.rec_account.display_name,                        -500.0,          0.0,     1000.0,       -1000.0,        -1500.0),
                 (self.expense_account.display_name,                       0.0,       1000.0,        0.0,        1000.0,         1000.0),
-                ('Undistributed Profits/Losses - company_1_data',       500.0,          0.0,        0.0,           0.0,          500.0),
+                ('Result Brought Forward - company_1_data',             500.0,          0.0,        0.0,           0.0,          500.0),
                 ('Total',                                                 0.0,       1000.0,     1000.0,           0.0,            0.0),
             ],
             options,

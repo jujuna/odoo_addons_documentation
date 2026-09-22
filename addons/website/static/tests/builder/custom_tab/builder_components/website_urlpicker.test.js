@@ -1,24 +1,16 @@
-import { after, before, expect, test } from "@odoo/hoot";
+import { addBuilderOption } from "@html_builder/../tests/helpers";
+import { beforeEach, expect, test } from "@odoo/hoot";
+import { advanceTime } from "@odoo/hoot-dom";
 import { xml } from "@odoo/owl";
 import { contains, onRpc } from "@web/../tests/web_test_helpers";
+import { patch } from "@web/core/utils/patch";
 import {
-    addOption,
     defineWebsiteModels,
     setupWebsiteBuilder,
 } from "@website/../tests/builder/website_helpers";
 
 defineWebsiteModels();
 
-let originalWindowOpen;
-function mockWindowOpen() {
-    originalWindowOpen = window.open;
-    window.open = (...args) => {
-        expect.step(`callWindowOpen ${args[0]}`);
-    };
-}
-function unmockWindowOpen() {
-    window.open = originalWindowOpen;
-}
 function mockGetSuggestedLinks(callback = undefined) {
     onRpc("/website/get_suggested_links", () => {
         callback?.();
@@ -58,17 +50,18 @@ function mockGetSuggestedLinks(callback = undefined) {
     });
 }
 
-before(() => {
-    mockWindowOpen();
-});
-after(() => {
-    unmockWindowOpen();
+beforeEach(() => {
+    patch(window, {
+        open(url) {
+            expect.step(`callWindowOpen ${url}`);
+        },
+    });
 });
 
 test("link button opens in new window if url not empty", async () => {
-    addOption({
+    addBuilderOption({
         selector: ".test-options-target",
-        template: xml`<WebsiteUrlPicker dataAttributeAction="'url'"/>`,
+        template: xml`<BuilderUrlPicker dataAttributeAction="'url'"/>`,
     });
     await setupWebsiteBuilder(`<div class="test-options-target">b</div>`);
     await contains(":iframe .test-options-target").click();
@@ -87,30 +80,30 @@ test("opens dropdown when typing /", async () => {
     mockGetSuggestedLinks(() => {
         expect.step("button_immediate_install");
     });
-    addOption({
+    addBuilderOption({
         selector: ".test-options-target",
-        template: xml`<WebsiteUrlPicker dataAttributeAction="'url'"/>`,
+        template: xml`<BuilderUrlPicker dataAttributeAction="'url'"/>`,
     });
     await setupWebsiteBuilder(`<div class="test-options-target">b</div>`);
     await contains(":iframe .test-options-target").click();
 
-    await contains(".we-bg-options-container input").edit("/");
-    await contains(".we-bg-options-container input").click();
+    await contains(".we-bg-options-container input").edit("/", { confirm: false });
+    await advanceTime(250);
     expect.verifySteps(["button_immediate_install"]);
     expect(document.querySelector(".o_website_ui_autocomplete")).toBeVisible();
 });
 
 test("selects and commits value from dropdown", async () => {
     mockGetSuggestedLinks();
-    addOption({
+    addBuilderOption({
         selector: ".test-options-target",
-        template: xml`<WebsiteUrlPicker dataAttributeAction="'url'"/>`,
+        template: xml`<BuilderUrlPicker dataAttributeAction="'url'"/>`,
     });
     await setupWebsiteBuilder(`<div class="test-options-target">b</div>`);
     await contains(":iframe .test-options-target").click();
 
-    await contains(".we-bg-options-container input").edit("/");
-    await contains(".we-bg-options-container input").click();
+    await contains(".we-bg-options-container input").edit("/", { confirm: false });
+    await advanceTime(250);
     await contains(document.querySelector(".o_website_ui_autocomplete > li:first-child a")).click();
     expect(document.querySelector(".o_website_ui_autocomplete")).toBe(null);
     expect(".we-bg-options-container input").toHaveValue("/page1");
@@ -119,9 +112,9 @@ test("selects and commits value from dropdown", async () => {
 
 test("collects anchors in current page and suggests them", async () => {
     mockGetSuggestedLinks();
-    addOption({
+    addBuilderOption({
         selector: ".test-options-target",
-        template: xml`<WebsiteUrlPicker dataAttributeAction="'url'"/>`,
+        template: xml`<BuilderUrlPicker dataAttributeAction="'url'"/>`,
     });
     await setupWebsiteBuilder(`
         <div class="test-options-target">b</div>
@@ -129,8 +122,8 @@ test("collects anchors in current page and suggests them", async () => {
         <div id="anchor2" data-anchor="true">anchor2</div>
     `);
     await contains(":iframe .test-options-target").click();
-    await contains(".we-bg-options-container input").edit("#");
-    await contains(".we-bg-options-container input").click();
+    await contains(".we-bg-options-container input").edit("#", { confirm: false });
+    await advanceTime(250);
 
     // Check autocomplete suggests both anchors
     const els = document.querySelectorAll(".o_website_ui_autocomplete > li a");

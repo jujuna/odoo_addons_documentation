@@ -18,7 +18,6 @@ registry.category("web_tour.tours").add("test_create_new_spreadsheet_from_qualit
         },
         {
             trigger: ".o_spreadsheet_container",
-            run: () => {},
         },
     ],
 });

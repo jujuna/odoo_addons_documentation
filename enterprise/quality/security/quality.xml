@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- This group is meant to manage quality stages -->
     <record model="res.groups.privilege" id="res_groups_privilege_quality">
@@ -28,31 +27,4 @@
         <field name="implied_ids" eval="[(4, ref('quality.group_quality_user'))]"/>
     </record>
 
-    <data noupdate="1">
-
-   	<record model="ir.rule" id="quality_alert_comp_rule">
-        <field name="name">Quality alert company rule</field>
-        <field name="model_id" ref="model_quality_alert"/>
-        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-    </record>
-
-   	<record model="ir.rule" id="quality_check_comp_rule">
-        <field name="name">Quality check company rule</field>
-        <field name="model_id" ref="model_quality_check"/>
-        <field name="domain_force">['|', ('company_id', 'in', company_ids), ('point_id.company_id', 'in', company_ids)]</field>
-    </record>
-
-   	<record model="ir.rule" id="control_point_comp_rule">
-        <field name="name">Control point company rule</field>
-        <field name="model_id" ref="model_quality_point"/>
-        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-    </record>
-
-    <record model="ir.rule" id="quality_team_comp_rule">
-        <field name="name">Quality Team multi-company</field>
-        <field name="model_id" ref="model_quality_alert_team"/>
-        <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
-    </record>
-    </data>
-
-</odoo>
+    </odoo>

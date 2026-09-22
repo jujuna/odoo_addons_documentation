@@ -1,3 +1,4 @@
+import calendar
 import contextlib
 import datetime
 import json
@@ -5,14 +6,14 @@ import logging
 import math
 import re
 import requests
+import unicodedata
 
 from io import BytesIO
 from lxml import html
-from openpyxl import load_workbook
 from requests.exceptions import HTTPError, RequestException
 
 from odoo import Command, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools import format_date
 from odoo.tools.float_utils import float_compare
 
@@ -78,6 +79,17 @@ class EsgDatabase(models.Model):
         action_view_emission_factor['domain'] = [('database_id', '=', self.id)]
         return action_view_emission_factor
 
+    def action_unload_data(self):
+        self.ensure_one()
+        if not self.last_update:
+            raise UserError(self.env._('You cannot remove a database that was not loaded.'))
+        factors_to_remove = self.env['esg.emission.factor'].search([('database_id', '=', self.id)])
+        source_ids_to_remove = factors_to_remove.source_id.ids
+        factors_to_remove.unlink()
+        self.env['esg.emission.source'].browse(source_ids_to_remove).unlink()
+        self.last_update = False
+        self.latest_version = False
+
     def _external_api_call(self, request_url):
         ademe_api_url = 'https://data.ademe.fr/data-fair/api/v1/datasets/base-carboner'
         if not request_url.startswith(ademe_api_url):
@@ -116,6 +128,131 @@ class EsgDatabase(models.Model):
     # ADEME IMPORT
     # =============
     def _get_ademe_emission_factor_values(self, lines):
+        MONTHS_FR = {
+            'janv': 1, 'janvier': 1,
+            'févr': 2, 'fevr': 2, 'février': 2, 'fevrier': 2,
+            'mars': 3,
+            'avr': 4, 'avril': 4,
+            'mai': 5,
+            'juin': 6,
+            'juil': 7, 'juillet': 7,
+            'août': 8, 'aout': 8,
+            'sept': 9, 'septembre': 9,
+            'oct': 10, 'octobre': 10,
+            'nov': 11, 'novembre': 11,
+            'déc': 12, 'dec': 12, 'décembre': 12, 'decembre': 12
+        }
+
+        REGION_TO_NAME = {
+            'alsace':                     'Alsace',
+            'aquitaine':                  'Aquitaine',
+            'auvergne':                   'Auvergne',
+            'basse normandie':            'Basse-Normandie',
+            'bourgogne':                  'Bourgogne',
+            'bretagne':                   'Bretagne',
+            'centre':                     'Centre',
+            'centre val de loire':        'Centre',                       # variant -> Centre
+            'champagne ardenne':          'Champagne-Ardenne',
+            'corse':                      'Corse',
+            'corsica':                    'Corse',                        # EN spelling
+            'franche comte':              'Franche-Comté',
+            'haute normandie':            'Haute-Normandie',
+            'ile de france':              'Île-de-France',                # covers Ile- and Île-
+            'languedoc roussillon':       'Languedoc-Roussillon',
+            'limousin':                   'Limousin',
+            'lorraine':                   'Lorraine',
+            'midi pyrenees':              'Midi-Pyrénées',                # covers Pyrenées/Pyrénées
+            'nord pas de calais':         'Nord-Pas-de-Calais',           # covers -De-/-de-
+            'pays de la loire':           'Pays de la Loire',             # covers hyphenated form
+            'picardie':                   'Picardie',
+            'poitou charente':            'Poitou-Charentes',             # singular -> plural
+            'poitou charentes':           'Poitou-Charentes',
+            'provence alpes cote d azur': 'Provence-Alpes-Côte d\'Azur',
+            'rhone alpes':                'Rhône-Alpes',
+            # overseas regions
+            'guadeloupe':                 'Guadeloupe',
+            'martinique':                 'Martinique',
+            'guyane':                     'Guyane',
+            'french guyana':              'Guyane',
+            'reunion':                    'La Réunion',
+            'reunion island':             'La Réunion',
+            'la reunion':                 'La Réunion',
+            'mayotte':                    'Mayotte',
+        }
+
+        COUNTRY_NAME_MAP = {
+            "Chinese Taipei": "Taiwan",
+            "Congo": "Congo (Republic)",
+            "Dem. Rep. of Congo": "Congo (DRC)",
+            "DPR of Korea (north)": "North Korea",
+            "FYR of Macedonia": "North Macedonia",
+            "Irland": "Ireland",
+            "Italia": "Italy",
+            "Netherland": "Netherlands",
+            "Republic of Moldova": "Moldova",
+            "Slovak Republic": "Slovakia",
+            "Syrian Arab Republic": "Syria",
+            "Turkey": "Türkiye",
+            "United Rep. of Tanzania": "Tanzania",
+        }
+
+        def norm(s):
+            """Lowercase, strip accents, flatten hyphens/apostrophes/spaces."""
+            s = s.strip().lower()
+            s = ''.join(c for c in unicodedata.normalize('NFD', s)
+                        if unicodedata.category(c) != 'Mn')
+            for ch in "-'’/":
+                s = s.replace(ch, ' ')
+            return ' '.join(s.split())
+
+        def map_to_region(value):
+            """Return the canonical old region NAME, or None if unmappable."""
+            return REGION_TO_NAME.get(norm(value.split(',', 1)[0]))
+
+        def map_to_country(value):
+            return COUNTRY_NAME_MAP.get(value, value)
+
+        def parse_ademe_date(date_str):
+            date_str = date_str.strip().lower()
+
+            # Deals with years given in 2 digits (eg: "18" -> 2018)
+            def get_year(y_str):
+                y = int(y_str)
+                return y + 2000 if y < 100 else y
+
+            # 1. Fixed format with slash : "31/12/2023"
+            match = re.match(r'^(\d{1,2})/(\d{1,2})/(\d{4})$', date_str)
+            if match:
+                d, m, y = map(int, match.groups())
+                return datetime.datetime(y, m, d)
+
+            # 2. Textual fixed format : "31-mars-21" or "29-déc-23"
+            match = re.match(r'^(\d{1,2})-([a-zûéè]+)-(\d{2,4})$', date_str)
+            if match:
+                d_str, m_str, y_str = match.groups()
+                m = MONTHS_FR.get(m_str)
+                if m:
+                    y = get_year(y_str)
+                    return datetime.datetime(y, m, int(d_str))
+
+            # 3. Format month-year : "déc-18" or "janv-25" → last day of the month
+            match = re.match(r'^([a-zûéè]+)-(\d{2,4})$', date_str)
+            if match:
+                m_str, y_str = match.groups()
+                m = MONTHS_FR.get(m_str)
+                if m:
+                    y = get_year(y_str)
+                    last_day = calendar.monthrange(y, m)[1]
+                    return datetime.datetime(y, m, last_day)
+
+            # 4. Format complete year : "Année 2008" or "2026" → 31 December
+            match = re.match(r'^(?:année\s+)?(\d{4})$', date_str)
+            if match:
+                y = int(match.group(1))
+                return datetime.datetime(y, 12, 31)
+
+            return False
+
         existing_factors = dict(self.env['esg.emission.factor']._read_group(
             domain=[('database_id', '=', self.id)],
             groupby=['code'],
@@ -129,20 +266,26 @@ class EsgDatabase(models.Model):
             'SF6': self.env.ref('esg.esg_gas_sf6'),
         }
         hardcoded_units_conversion = {
-            'kg': [
-                'kg of active substance', 'kg (live weight)', 'kg net weight', 'kg of spreaded nitrogen',
-                'kg of suppressed DCO', 'kg of treated leather', 'Kg', 'kg of spreaded nitrgen',
-                'kgH2', 'kg NTK', 'kg BioGNC'
-            ],
-            'L': ['liter', 'Liter'],
-            'Ton': ['ton', 'ton of K2O', 'ton of N', 'ton of P2O5', 'ton of clinker', 'ton of waste', 'tonne'],
-            'Units': ['unit', 'meal'],
-            'm': ['m of road'],
-            'm²': ['m²  net floor area', 'm² of ceiling', 'm² of floor', 'm² of wall', 'm2 SHON'],
-            'm³': ['m3', 'm3 (n)'],
-            'ml': ['mL'],
-            'Hours': ['hour', 'heure'],
-            'kWh': ['kWh (LHV)', 'kWh (PCI)', 'kWh HHV', 'kWh ICV', 'kWh IVC', 'kWh LHV', 'kWh SCV']
+            'kg of active substance': 'kg', 'kg (live weight)': 'kg', 'kg net weight': 'kg',
+            'kg of spreaded nitrogen': 'kg', 'kg of suppressed DCO': 'kg', 'kg of treated leather': 'kg',
+            'Kg': 'kg', 'kg of spreaded nitrgen': 'kg', 'kgH2': 'kg', 'kg NTK': 'kg', 'kg BioGNC': 'kg',
+            'liter': 'L', 'Liter': 'L',
+            'ton': 't', 'ton of K2O': 't', 'ton of N': 't', 'ton of P2O5': 't',
+            'ton of clinker': 't', 'ton of waste': 't', 'tonne': 't',
+            'unit': 'Units', 'meal': 'Units', 'device': 'Units', 'plant': 'Units',
+            'm of road': 'm',
+            'm²  net floor area': 'm²', 'm² of ceiling': 'm²', 'm² of floor': 'm²',
+            'm² of wall': 'm²', 'm2 SHON': 'm²',
+            'm3': 'm³', 'm3 (n)': 'm³',
+            'mL': 'ml',
+            'hour': 'Hours', 'heure': 'Hours',
+            'kWh (LHV)': 'KWH', 'kWh (PCI)': 'KWH', 'kWh HHV': 'KWH', 'kWh ICV': 'KWH', 'kWhPCI': 'KWH',
+            'kWh IVC': 'KWH', 'kWh LHV': 'KWH', 'kWh SCV': 'KWH', 'KWh ICV': 'KWH', 'KWH': 'KWH', 'kWh': 'KWH',
+            'GJ ICV': 'GJ', 'MJ ICV': 'MJ', 'GJ PCI': 'GJ', 'GJ SCV': 'GJ', 'GJ IVC': 'GJ',
+            'toe ICV': 'toe', 'toe SCV': 'toe', 'tep PCI': 'toe', 'tep IVC': 'toe', 'TOe ICV': 'toe',
+        }
+        unknown_units = {
+            '100 A4 sheets', 't.km', 'ton.km', 'm3.km', 'passager.km', 'passenger.km', 'ha.year', 'person.month', 'kgH2/100km',
         }
         hardcoded_source_scopes = {
             'Achats de biens': 'indirect_others',
@@ -186,6 +329,13 @@ class EsgDatabase(models.Model):
         _logger.info("ESG: Processing raw lines")
         line_values = []
         posts_gas_lines = []
+        # Used for the country/states mapping
+        country_names_to_fetch = set()
+        state_names_to_fetch = set()
+        needs_france = False
+        needs_europe = False
+        skipped_line_codes = []
+
         for raw_line in lines:
             if not raw_line:
                 continue
@@ -200,24 +350,37 @@ class EsgDatabase(models.Model):
                 line_values[-1]['gas_line_ids'] = posts_gas_lines
                 continue
 
-            dates = {}
-            for raw_date in ['Date_de_création', 'Période_de_validité']:
-                if raw_date not in line:
-                    dates[raw_date] = False
-                    continue
-                try:
-                    dates[raw_date] = datetime.datetime.strptime(line[raw_date], '%Y-%m-%d')
-                except ValueError:
-                    dates[raw_date] = False
+            from_date = datetime.datetime.strptime(line.get('Date_de_création', ''), '%Y-%m-%d')
+            to_date = parse_ademe_date(line.get('Période_de_validité', ''))
+            if from_date and to_date and to_date < from_date:
+                from_date = to_date
+                to_date = False
 
             posts_gas_lines = []
             gas_lines = _get_gas_lines(line, gasses, total_emissions)
 
             normalized_unit = line.get('Unité_anglais', line.get('Unité_français', '')).replace('kgCO2e/', '')
-            for base_unit, alternate_names in hardcoded_units_conversion.items():
-                if normalized_unit in alternate_names:
-                    normalized_unit = base_unit
-                    break
+            normalized_unit = hardcoded_units_conversion.get(normalized_unit, normalized_unit)
+            if normalized_unit in unknown_units:
+                skipped_line_codes.append(line["Identifiant_de_l'élément"])
+                continue
+
+            loc = line.get("Localisation_géographique")
+            sub_loc = line.get("Sous-localisation_géographique_anglais")
+
+            if loc in ["France continentale", "Outre-mer"]:
+                needs_france = True
+                if sub_loc:
+                    if cleaned_state := map_to_region(sub_loc):
+                        state_names_to_fetch.add(cleaned_state)
+                    else:
+                        skipped_line_codes.append(line["Identifiant_de_l'élément"])
+                        continue
+            elif loc == "Autre pays du monde":
+                if sub_loc:
+                    country_names_to_fetch.add(map_to_country(sub_loc))
+            elif loc == "Europe":
+                needs_europe = True
 
             factor_values = {
                 'name': f'{line.get("Nom_base_anglais", "")} {line.get("Nom_attribut_anglais", "")} {line.get("Nom_frontière_anglais", "")}'
@@ -228,14 +391,17 @@ class EsgDatabase(models.Model):
                 'uom_id': normalized_unit,
                 'esg_uncertainty_value': line.get('Incertitude', 0) / 100,
                 'compute_method': 'physically',
-                'valid_from': dates['Date_de_création'],
-                'valid_to': dates['Période_de_validité'],
+                'valid_from': from_date,
+                'valid_to': to_date,
                 'source_id': line['Code_de_la_catégorie'],
                 'gas_line_ids': gas_lines,
+                'loc': loc,
+                'sub_loc': sub_loc,
             }
             if not gas_lines:
                 factor_values['esg_emissions_value'] = total_emissions
             line_values.append(factor_values)
+        _logger.info("ESG: Records skipped due to unknown location: %s", skipped_line_codes)
 
         _logger.info("ESG: Checking existing units, emission sources and esg activity type")
         # Prepare to process all units at once to avoid multiplying queries and loops
@@ -268,14 +434,24 @@ class EsgDatabase(models.Model):
         )
 
         _logger.info("ESG: Processing link to related records")
+        eur_currencies_pattern = re.compile(r'^keuro( \(\d{4}\) HT)?$')
+        eur_currencies = {'euro spent'}
         # slow loop, should be optimized
         for source_tree, unit, line in zip(source_tree_list, units, line_values):
             # units
             existing_unit = existing_units.get(unit, False)
-            if not existing_unit:
+            if not existing_unit and not bool(eur_currencies_pattern.match(unit)) and not unit in eur_currencies:
                 existing_unit = self.env['uom.uom'].create({'name': unit})
                 existing_units[unit] = existing_unit
-            line['uom_id'] = existing_unit.id
+            if bool(eur_currencies_pattern.match(unit)) or unit in eur_currencies:
+                currency_eur = self.env.ref('base.EUR')
+                line['currency_id'] = currency_eur.id
+                line['uom_id'] = False
+                line['compute_method'] = 'monetary'
+                if unit != 'euro spent':
+                    line['esg_emissions_value'] = line['esg_emissions_value'] / 1000
+            else:
+                line['uom_id'] = existing_unit.id
             # sources
             previous_existing_source = self.env['esg.emission.source']
             for source_name in source_tree:
@@ -302,9 +478,57 @@ class EsgDatabase(models.Model):
                     gas_line['activity_type_id'] = activity.id
                 line['gas_line_ids'] = [Command.create(gas) for gas in line['gas_line_ids']]
 
+        # Countries and states fetching
+        _logger.info("ESG: Fetching countries and states")
+        if needs_france:
+            country_names_to_fetch.add("France")
+        country_name_to_id = {}
+        if country_names_to_fetch:
+            countries = self.env['res.country'].search([('name', 'in', list(country_names_to_fetch))])
+            country_name_to_id = {c.name.lower(): c.id for c in countries}
+
+        state_name_to_id = {}
+        if state_names_to_fetch:
+            state_domain = [('name', 'in', list(state_names_to_fetch))]
+            states = self.env['res.country.state'].search(state_domain)
+            state_name_to_id = {s.name.lower(): s.id for s in states}
+
+        europe_country_ids = []
+        if needs_europe:
+            europe_group = self.env.ref('base.europe_prefix', raise_if_not_found=False)
+            if europe_group:
+                europe_country_ids = europe_group.country_ids.ids
+
+        # Final iteration on the resulting factors
         new_factor_values = []
         write_factor_values = {}
         for line_value in line_values:
+            # Apply the mapping on fetched res.country and res.country.state records
+            loc = line_value.pop("loc")
+            sub_loc = line_value.pop("sub_loc")
+            c_ids = []
+            s_ids = []
+
+            if loc in ["France continentale", "Outre-mer"]:
+                if "france" in country_name_to_id:
+                    c_ids.append(country_name_to_id["france"])
+                if sub_loc:
+                    cleaned_state = map_to_region(sub_loc)
+                    if cleaned_state and cleaned_state.lower() in state_name_to_id:
+                        s_ids.append(state_name_to_id[cleaned_state.lower()])
+            elif loc == "Autre pays du monde":
+                if sub_loc:
+                    country = map_to_country(sub_loc)
+                    if country and country.lower() in country_name_to_id:
+                        c_ids.append(country_name_to_id[country.lower()])
+            elif loc == "Europe":
+                c_ids.extend(europe_country_ids)
+
+            line_value.update({
+                'country_ids': [Command.set(list(set(c_ids)))],
+                'state_ids': [Command.set(list(set(s_ids)))],
+            })
+
             # Separate data into existing one and new one
             line_code = line_value['code']
             if line_code in existing_factors:
@@ -418,6 +642,7 @@ class EsgDatabase(models.Model):
         ipcc_ef_data_list = []
         parent_source_names = set()
         try:
+            from openpyxl import load_workbook  # noqa: PLC0415
             filename = self._get_ipcc_xls_file()
             workbook = load_workbook(filename=filename)
             sheet = workbook.active
@@ -457,7 +682,7 @@ class EsgDatabase(models.Model):
                         ipcc_data[key] = value
                 if not is_header:
                     ipcc_ef_data_list.append(ipcc_data)
-        except (ValueError, HTTPError, RequestException) as exception:
+        except (ValueError, HTTPError, RequestException, ModuleNotFoundError) as exception:
             response_error['params']['message'] = self.env._(
                 "Server returned an unexpected error: %(error)s",
                 error=str(exception),

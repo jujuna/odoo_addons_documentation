@@ -11,6 +11,8 @@ from odoo import Command
 @tagged("-at_install", "post_install", "post_install_l10n")
 class TestUyEdiStock(TestUyEdi):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -75,7 +77,7 @@ class TestUyEdiStock(TestUyEdi):
         return [Command.create({
             'product_id': self.product_delivery.id,
             'product_uom_qty': 1.0,
-            'product_uom': self.product_delivery.uom_id.id,
+            'uom_id': self.product_delivery.uom_id.id,
             'location_id': self.stock_location.id,
             'location_dest_id': self.customer_location.id
         })]

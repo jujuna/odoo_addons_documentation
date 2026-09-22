@@ -12,7 +12,7 @@ export class CarrierTypeSelection extends SelectionField {
     }
 
     onChange(value) {
-        this.props.record.update({ [this.props.name]: value }, { save: this.props.autosave });
+        this.props.record.update({ [this.props.name]: value });
     }
 }
 

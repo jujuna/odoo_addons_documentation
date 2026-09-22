@@ -3,27 +3,42 @@
 # * crm_helpdesk
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-09-16 15:32+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 01:48+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "crm_helpdesk/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: crm_helpdesk
+#: model:ir.module.module,description:base.module_crm_helpdesk
+msgid ""
+"\n"
+"Convert business inquiries that have ended up in the Helpdesk pipeline by "
+"mistake,\n"
+"or generate a ticket from a business inquiry\n"
+msgstr ""
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
 msgid "An archived ticket cannot be converted into a lead."
 msgstr "Arkistoitua tukipyyntöä ei voi muuntaa liidiksi."
+
+#. module: crm_helpdesk
+#: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__team_id
+msgid "Assign to"
+msgstr "Anna tehtäväksi"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__convert_to
@@ -34,23 +49,33 @@ msgstr "Muuntotoiminto"
 #: model:ir.model,name:crm_helpdesk.model_helpdesk_ticket_to_lead
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
 msgid "Convert Ticket to Lead"
-msgstr "Muunna tiketti liidiksi"
+msgstr "Muunna tukipyyntö liidiksi"
+
+#. module: crm_helpdesk
+#: model:ir.module.module,summary:base.module_crm_helpdesk
+msgid "Convert Tickets from/to Leads"
+msgstr ""
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/models/helpdesk_ticket.py:0
+#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__lead
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_view_form_inherited
 msgid "Convert to Lead"
 msgstr "Muunna liidiksi"
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/models/helpdesk_ticket.py:0
+#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__opportunity
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_view_form_inherited
 msgid "Convert to Opportunity"
 msgstr "Muunna myyntimahdollisuudeksi"
+
+#. module: crm_helpdesk
+#: model:ir.actions.server,name:crm_helpdesk.action_server_convert_ticket_to_lead_or_opportunity
+msgid "Convert to Opportunity/Lead"
+msgstr "Muunna myyntimahdollisuudeksi/liidiksi"
 
 #. module: crm_helpdesk
 #: model:ir.actions.act_window,name:crm_helpdesk.crm_lead_convert2ticket_action
@@ -58,11 +83,6 @@ msgstr "Muunna myyntimahdollisuudeksi"
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_view_form
 msgid "Convert to Ticket"
 msgstr "Muunna tukipyynnöksi"
-
-#. module: crm_helpdesk
-#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__convert
-msgid "Convert to opportunity"
-msgstr "Muunna myyntimahdollisuudeksi"
 
 #. module: crm_helpdesk
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
@@ -99,12 +119,6 @@ msgid "Customer"
 msgstr "Asiakas"
 
 #. module: crm_helpdesk
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-msgid "Discard"
-msgstr "Hylkää"
-
-#. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__display_name
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket__display_name
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__display_name
@@ -114,12 +128,17 @@ msgstr "Näyttönimi"
 #. module: crm_helpdesk
 #: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__action__nothing
 msgid "Do not link to a customer"
-msgstr "Älä liitä asiakkaaseen"
+msgstr "Älä linkitä asiakkaaseen"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__force_assignment
 msgid "Force assignment"
-msgstr "Pakota vastuutus"
+msgstr "Pakota tehtävänanto"
+
+#. module: crm_helpdesk
+#: model:ir.module.module,shortdesc:base.module_crm_helpdesk
+msgid "Helpdesk - CRM"
+msgstr ""
 
 #. module: crm_helpdesk
 #: model:ir.model,name:crm_helpdesk.model_helpdesk_ticket
@@ -139,8 +158,8 @@ msgid ""
 "If checked, forces salesman to be updated on updated opportunities even if "
 "already set."
 msgstr ""
-"Jos valittu, tämä pakottaa myyjän päivittämään päivitetyt "
-"myyntimahdollisuudet, vaikka ne olisi jo asetettu."
+"Jos ruksittu, pakottaa myyjän päivittämisen päivitetyissä "
+"myyntimahdollisuuksissa, vaikka olisi jo asetettu."
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__write_uid
@@ -174,7 +193,7 @@ msgstr "Muunna liidi tukipyynnöksi"
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/crm_lead_convert2ticket.py:0
 msgid "Lead converted into ticket %s"
-msgstr "Liidi muunnettiin tukipyynnöksi %s"
+msgstr "Liidi muunnettu tukipyynnöksi %s"
 
 #. module: crm_helpdesk
 #. odoo-python
@@ -185,13 +204,13 @@ msgstr "Liidi luotu"
 #. module: crm_helpdesk
 #: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__action__exist
 msgid "Link to an existing customer"
-msgstr "Yhdistetään olemassa olevaan asiakkaaseen"
+msgstr "Linkitä olemassa olevaan asiakkaaseen"
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
 msgid "Opportunity created"
-msgstr "Myyntimahdollisuus on luotu"
+msgstr "Myyntimahdollisuus luotu"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__action
@@ -210,9 +229,14 @@ msgid "Salesperson"
 msgstr "Myyjä"
 
 #. module: crm_helpdesk
-#: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__team_id
-msgid "Team"
-msgstr "Tiimi"
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
+msgid "Select a Customer"
+msgstr "Valitse asiakas"
+
+#. module: crm_helpdesk
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
+msgid "Select a Helpdesk Team"
+msgstr "Valitse asiakaspalvelutiimi"
 
 #. module: crm_helpdesk
 #. odoo-python
@@ -229,7 +253,7 @@ msgstr "Tämä myyntimahdollisuus on luotu tukipyynnöstä: %s"
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__ticket_id
 msgid "Ticket"
-msgstr "Lippu"
+msgstr "Tukipyyntö"
 
 #. module: crm_helpdesk
 #. odoo-python
@@ -242,3 +266,6 @@ msgstr "Tukipyyntö muunnettu"
 #: code:addons/crm_helpdesk/wizard/crm_lead_convert2ticket.py:0
 msgid "Ticket Created"
 msgstr "Tukipyyntö luotu"
+
+msgid "Convert to opportunity"
+msgstr "Muunna myyntimahdollisuudeksi"

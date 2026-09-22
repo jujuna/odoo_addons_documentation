@@ -1,17 +1,25 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
-import { onMounted, onWillStart, useState, Component, useSubEnv, onWillUnmount } from "@odoo/owl";
+import {
+    onMounted,
+    onWillStart,
+    Component,
+    onWillUnmount,
+    proxy,
+    useListener,
+    usePlugin,
+    useProps,
+} from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { useSetupAction } from "@web/search/action_hook";
 import { downloadFile } from "@web/core/network/download";
 import { user } from "@web/core/user";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
-import { browser } from "@web/core/browser/browser";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { UNTITLED_SPREADSHEET_NAME, DEFAULT_LINES_NUMBER } from "@spreadsheet/helpers/constants";
 import * as spreadsheet from "@odoo/o-spreadsheet";
 import { initCallbackRegistry } from "@spreadsheet/o_spreadsheet/init_callbacks";
 import { RecordFileStore } from "../image/record_file_store";
 import { useSpreadsheetCurrencies, useSpreadsheetLocales, useSpreadsheetThumbnail } from "../hooks";
-import { useSpreadsheetPrint } from "@spreadsheet/hooks";
 import { InputDialog } from "./input_dialog/input_dialog";
 import { OdooDataProvider } from "@spreadsheet/data_sources/odoo_data_provider";
 import { CommentsStore } from "../comments/comments_store";
@@ -19,11 +27,13 @@ import { waitForDataLoaded } from "@spreadsheet/helpers/model";
 import { createDefaultCurrency } from "@spreadsheet/currency/helpers";
 import { SpreadsheetNavbar } from "@spreadsheet_edition/bundle/components/spreadsheet_navbar/spreadsheet_navbar";
 import { SpreadsheetComponent } from "@spreadsheet/actions/spreadsheet_component";
-
-const uuidGenerator = new spreadsheet.helpers.UuidGenerator();
+import { router } from "@web/core/browser/router";
+import { cookie } from "@web/core/browser/cookie";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 const { Model } = spreadsheet;
 const { useStoreProvider, ModelStore, SidePanelStore } = spreadsheet.stores;
+const { UuidGenerator } = spreadsheet.helpers;
 
 /**
  * @typedef SpreadsheetData
@@ -32,18 +42,21 @@ const { useStoreProvider, ModelStore, SidePanelStore } = spreadsheet.stores;
  * @property {string} data
  * @property {Object[]} revisions
  * @property {boolean} snapshot_requested
- * @property {Boolean} isReadonly
+ * @property {Boolean} has_write_access
  * @property {string} [writable_rec_name_field]
  */
 
 export class AbstractSpreadsheetAction extends Component {
     static template = "";
-    static props = { ...standardActionServiceProps };
     static components = {
         SpreadsheetComponent,
         SpreadsheetNavbar,
     };
     static target = "fullscreen";
+
+    props = useProps(standardActionServiceProps);
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
         if (!this.props.action.params) {
@@ -75,10 +88,10 @@ export class AbstractSpreadsheetAction extends Component {
         this.spreadsheetService = useService("spreadsheet_collaborative");
         this.stores = useStoreProvider();
         this.threadId = this.params?.thread_id;
-        this.dataFetched = false;
         this.originalMetaViewportContent = document.querySelector(
             'head meta[name="viewport"]'
         ).content;
+        this.commandService = useService("command");
 
         useSetupAction({
             beforeLeave: this._leaveSpreadsheet.bind(this),
@@ -92,34 +105,46 @@ export class AbstractSpreadsheetAction extends Component {
             }),
         });
 
-        const print = useSpreadsheetPrint(() => this.model);
         useSubEnv({
             download: this.download.bind(this),
             downloadAsJson: this.downloadAsJson.bind(this),
             showHistory: this.showHistory.bind(this),
             insertThreadInSheet: this.insertThreadInSheet.bind(this),
-            print,
             getLinesNumber: this._getLinesNumber.bind(this),
             getUserLocale: () => this.data && this.data.user_locale,
+            openPalette: this.commandService.openMainPalette,
         });
-        this.state = useState({
+        this.state = proxy({
             spreadsheetName: UNTITLED_SPREADSHEET_NAME,
         });
 
         onWillStart(async () => {
             if (this.props.state?.model && this.props.state?.data) {
-                this.dataFetched = true;
                 this._initializeWith(this.props.state.data);
                 this.model = this.props.state.model;
                 this.model.joinSession();
                 this.stores.inject(ModelStore, this.model);
             } else {
-                await this.fetchData();
-                this.createModel();
-                this.stores.inject(ModelStore, this.model);
+                try {
+                    const data = await this.fetchData();
+                    this._initializeWith(data);
+                    this.createModel();
+                    this.syncSheetFromRouter();
+                    this.stores.inject(ModelStore, this.model);
+                } catch {
+                    this.notifications.add(
+                        "The spreadsheet you’re trying to access doesn’t exist, has been deleted, or you don’t have the necessary permissions to view it.",
+                        {
+                            type: "info",
+                            sticky: true,
+                        }
+                    );
+                    await this.actionService.doAction("menu");
+                }
             }
         });
         onMounted(() => {
+            document.body.classList.add("o_spreadsheet_edition_o_spreadsheet_action");
             document
                 .querySelector('head meta[name="viewport"]')
                 .setAttribute(
@@ -130,11 +155,13 @@ export class AbstractSpreadsheetAction extends Component {
             const commentsStore = this.stores.get(CommentsStore);
             this.props.updateActionState({
                 resId: this.resId,
-                access_token: this.accessToken,
+                access_token: this.accessToken || this.data?.access_token,
                 share_id: this.shareId,
+                sid: this.model.getters.getActiveSheetId(),
             });
             this.env.config.setDisplayName(this.state.spreadsheetName);
             this.model.on("unexpected-revision-id", this, this.onUnexpectedRevisionId.bind(this));
+            this.model.on("command-dispatched", this, this.syncRouterFromSheet);
             if (this.threadId) {
                 // necessary atm - we need at least one frame to have the right viewport height/width
                 setTimeout(() => commentsStore.openCommentThread(this.threadId), 0);
@@ -143,20 +170,27 @@ export class AbstractSpreadsheetAction extends Component {
             }
         });
         onWillUnmount(() => {
+            document.body.classList.remove("o_spreadsheet_edition_o_spreadsheet_action");
             // the meximum scale does not work, need to find another approach
             document
                 .querySelector('head meta[name="viewport"]')
                 .setAttribute("content", this.originalMetaViewportContent);
             this.model.off("unexpected-revision-id", this);
+            this.model.off("command-dispatched", this);
         });
+        useListener(window, "afterprint", this.logExport.bind(this));
     }
 
     get navbarProps() {
         return {
-            isReadonly: this.isReadonly,
+            isReadonly: !this.hasWriteAccess,
             onSpreadsheetNameChanged: this._onSpreadSheetNameChanged.bind(this),
             spreadsheetName: this.state.spreadsheetName,
         };
+    }
+
+    get spreadsheetMode() {
+        return !this.hasWriteAccess ? "readonly" : "normal";
     }
 
     async fetchData() {
@@ -165,20 +199,7 @@ export class AbstractSpreadsheetAction extends Component {
         if (!this.props.state) {
             await this._setupPreProcessingCallbacks();
         }
-        const data = await this._fetchData();
-        if (!data) {
-            this.actionService.doAction("menu");
-            this.notifications.add(
-                "The spreadsheet you’re trying to access doesn’t exist, has been deleted, or you don’t have the necessary permissions to view it.",
-                {
-                    type: "info",
-                    sticky: true,
-                }
-            );
-            return;
-        }
-        this.dataFetched = true;
-        this._initializeWith(data);
+        return this._fetchServerData();
     }
 
     createModel() {
@@ -187,7 +208,7 @@ export class AbstractSpreadsheetAction extends Component {
             this.getModelConfig(),
             this.stateUpdateMessages
         );
-        if (this.env.debug) {
+        if (this.debugMode.isActive()) {
             // eslint-disable-next-line no-import-assign
             spreadsheet.__DEBUG__ = spreadsheet.__DEBUG__ || {};
             spreadsheet.__DEBUG__.model = this.model;
@@ -195,9 +216,6 @@ export class AbstractSpreadsheetAction extends Component {
     }
 
     getModelConfig() {
-        if (!this.dataFetched) {
-            return {};
-        }
         const transportService = this.spreadsheetService.makeCollaborativeChannel(
             this.resModel,
             this.resId,
@@ -209,7 +227,12 @@ export class AbstractSpreadsheetAction extends Component {
             this.model.dispatch("EVALUATE_CELLS");
         });
         return {
-            custom: { env: this.env, orm: this.orm, odooDataProvider },
+            custom: {
+                env: this.env,
+                orm: this.orm,
+                odooDataProvider,
+                isFrozenSpreadsheet: this.env.isFrozenSpreadsheet?.(),
+            },
             external: {
                 fileStore: this.fileStore,
                 loadCurrencies: this.loadCurrencies,
@@ -219,13 +242,14 @@ export class AbstractSpreadsheetAction extends Component {
             defaultCurrency: createDefaultCurrency(this.data.default_currency),
             transportService,
             client: {
-                id: uuidGenerator.smallUuid(),
+                id: UuidGenerator.smallUuid(),
                 name: user.name,
                 userId: user.userId,
             },
-            mode: this.isReadonly ? "readonly" : "normal",
+            mode: this.spreadsheetMode,
             snapshotRequested: this.snapshotRequested,
             customColors: this.data.company_colors,
+            colorScheme: cookie.get("color_scheme"),
         };
     }
 
@@ -272,7 +296,7 @@ export class AbstractSpreadsheetAction extends Component {
         this.spreadsheetData = data.data;
         this.stateUpdateMessages = data.revisions;
         this.snapshotRequested = data.snapshot_requested;
-        this.isReadonly = data.isReadonly;
+        this.hasWriteAccess = data.has_write_access;
         this.data = data;
     }
 
@@ -296,13 +320,17 @@ export class AbstractSpreadsheetAction extends Component {
         this._openSpreadsheet(id);
     }
 
+    logExport() {
+        this.model.dispatch("LOG_DATASOURCE_EXPORT", { action: "print" });
+    }
+
     /**
      * @private
      */
     async _leaveSpreadsheet() {
         await this.model.leaveSession();
         this.model.off("update", this);
-        if (!this.isReadonly) {
+        if (this.hasWriteAccess) {
             return this.onSpreadsheetLeft();
         }
     }
@@ -339,14 +367,8 @@ export class AbstractSpreadsheetAction extends Component {
     /**
      * @returns {Promise<SpreadsheetData>}
      */
-    async _fetchData() {
-        const response = await browser.fetch(`/spreadsheet/data/${this.resModel}/${this.resId}`, {
-            method: "GET",
-        });
-        if ([403, 404].includes(response.status)) {
-            return;
-        }
-        return response.json();
+    async _fetchServerData() {
+        return this.http.get(`/spreadsheet/data/${this.resModel}/${this.resId}`);
     }
 
     /**
@@ -386,18 +408,52 @@ export class AbstractSpreadsheetAction extends Component {
     }
 
     /**
+     * Sync initial sheet with router (resolve and activate)
+     */
+    syncSheetFromRouter() {
+        if (!this.model) {
+            return;
+        }
+        const urlSheetId = router.current.sid;
+        const sheetIds = this.model.getters.getSheetIds();
+        const activeSheetId = this.model.getters.getActiveSheetId();
+        const targetSheetId = sheetIds.includes(urlSheetId) ? urlSheetId : sheetIds[0];
+        if (activeSheetId !== targetSheetId) {
+            this.model.dispatch("ACTIVATE_SHEET", {
+                sheetIdFrom: activeSheetId,
+                sheetIdTo: targetSheetId,
+            });
+        }
+    }
+
+    /**
+     * Sync router with the currently activated sheet when activate sheet command dispatch
+     */
+    syncRouterFromSheet(cmd) {
+        if (cmd.type === "ACTIVATE_SHEET" || cmd.type === "DELETE_SHEET") {
+            router.replaceState({
+                ...router.current,
+                sid: this.model.getters.getActiveSheetId(),
+            });
+        }
+    }
+
+    /**
      * Downloads the spreadsheet in xlsx format
      */
     async download() {
         this.ui.block();
         try {
             await waitForDataLoaded(this.model);
+            const exportXlsx = await this.model.exportXLSX();
+            const sources = this.model.getters.getLoadedDataSources();
             await this.actionService.doAction({
                 type: "ir.actions.client",
                 tag: "action_download_spreadsheet",
                 params: {
                     name: this.state.spreadsheetName,
-                    xlsxData: this.model.exportXLSX(),
+                    xlsxData: exportXlsx,
+                    sources,
                 },
             });
         } finally {

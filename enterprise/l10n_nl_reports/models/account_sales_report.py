@@ -1,107 +1,48 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import re
 from lxml import etree
 
-from collections import defaultdict
-
-from odoo import api, fields, models, _
+from odoo import fields, models, _
 from odoo.exceptions import RedirectWarning
+from odoo.tools import cleanup_xml_node
+from odoo.tools.business_data import split_vat
 
 
 class L10n_Nl_ReportsEcSalesReportHandler(models.AbstractModel):
     _name = 'l10n_nl_reports.ec.sales.report.handler'
-    _inherit = ['account.ec.sales.report.handler']
+    _inherit = ['account.ec.sales.with.tags.report.handler']
     _description = 'Dutch EC Sales Report Custom Handler'
 
-    def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
-        lines = []
-
-        totals_by_column_group = {
-            key: {
-                column['expression_label']: 0.0 if column['figure_type'] == 'monetary' else ''
-                for column in options['columns']
-            } for key in options['column_groups']
-        }
-
-        for partner, results in self._query_partners(report, options):
-            partner_values = defaultdict(dict)
-
-            for column_group_key in options['column_groups']:
-                partner_sum = results.get(column_group_key, {})
-                country_code = partner_sum.get('country_code', 'UNKNOWN')
-
-                # For Greece, the ISO 3166 code (GR) and European Union code (EL) is not the same.
-                # Since this is a european report, we need the European Union code.
-                if country_code == 'GR':
-                    country_code = 'EL'
-
-                line_total = partner_sum.get('goods', 0.0) + partner_sum.get('services', 0.0) + partner_sum.get('triangular', 0.0)
-
-                partner_values[column_group_key].update({
-                    'country_code': country_code,
-                    'partner_name': '',
-                    'vat': self._format_vat(partner_sum.get('full_vat_number'), country_code),
-                    'amount_product': partner_sum.get('goods', 0.0),
-                    'amount_service': partner_sum.get('services', 0.0),
-                    'amount_triangular': partner_sum.get('triangular', 0.0),
-                    'total': line_total,
-                })
-
-                totals_by_column_group[column_group_key]['amount_product'] += partner_sum.get('goods', 0.0)
-                totals_by_column_group[column_group_key]['amount_service'] += partner_sum.get('services', 0.0)
-                totals_by_column_group[column_group_key]['amount_triangular'] += partner_sum.get('triangular', 0.0)
-                totals_by_column_group[column_group_key]['total'] += line_total
-
-            lines.append((0, self._get_report_line_partner(report, options, partner, partner_values)))
-
-        lines.append((0, self._get_report_line_total(report, options, totals_by_column_group)))
-        return lines
-
-    def _caret_options_initializer(self):
-        """
-        Add custom caret option for the report to link to the partner and allow cleaner overrides.
-        """
-        return {
-            'nl_icp_partner': [
-                {'name': _("View Partner"), 'action': 'caret_option_open_record_form'},
-            ],
-        }
-
     def _custom_options_initializer(self, report, options, previous_options):
+        nl_tax_tags = self._get_ec_sales_tax_tags()
+        options.update({
+            'sales_report_operation_types': {
+                'goods': {
+                    'tax_tag_ids': nl_tax_tags['goods'],
+                },
+                'services': {
+                    'tax_tag_ids': nl_tax_tags['services'],
+                },
+                'triangular': {
+                    'tax_tag_ids': nl_tax_tags['triangular'],
+                },
+            },
+        })
         super()._custom_options_initializer(report, options, previous_options)
-        options['buttons'].append({'name': "XBRL", 'sequence': 40, 'action': 'open_xbrl_wizard', 'file_export_type': 'XBRL'})
+        options['buttons'].append({'name': "XBRL", 'sequence': 40, 'action': 'open_xbrl_wizard', 'file_export_type': _('XBRL')})
+        options.get('sales_report_taxes', {}).update(self._get_ec_sales_tax_tags())
 
-        goods_tag = self.env.ref('l10n_nl.tax_report_rub_3bg_tag', raise_if_not_found=False)
-        services_tag = self.env.ref('l10n_nl.tax_report_rub_3bs_tag', raise_if_not_found=False)
-        triangular_tag = self.env.ref('l10n_nl.tax_report_rub_3bt_tag', raise_if_not_found=False)
-        if goods_tag and services_tag and triangular_tag:
-            options.get('sales_report_taxes', {}).update({
-                'goods': goods_tag._get_matching_tags().ids,
-                'services': services_tag._get_matching_tags().ids,
-                'triangular': triangular_tag._get_matching_tags().ids,
-                'use_taxes_instead_of_tags': False,
-            })
-        else:
-            goods_tax = self.env['account.chart.template'].ref('btw_X0_producten', raise_if_not_found=False)
-            services_tax = self.env['account.chart.template'].ref('btw_X0_diensten', raise_if_not_found=False)
-            triangular_tax = self.env['account.chart.template'].ref('btw_X0_ABC_levering', raise_if_not_found=False)
-            options.get('sales_report_taxes', {}).update({
-                'goods': [goods_tax.id] if goods_tax else [],
-                'services': [services_tax.id] if services_tax else [],
-                'triangular': [triangular_tax.id] if triangular_tax else [],
-                'use_taxes_instead_of_tags': True,
-            })
-
-    @api.model
-    def _format_vat(self, vat, country_code):
-        """ VAT numbers must be reported without country code, and grouped by 4
-        characters, with a space between each pair of groups.
-        """
-        if vat:
-            if vat[:2].lower() == country_code.lower():
-                vat = vat[2:]
-            return vat
-        return None
+    def _get_ec_sales_tax_tags(self):
+        # Overrides account_reports
+        goods_expression = self.env.ref('l10n_nl.tax_report_rub_3bg_tag')
+        services_expression = self.env.ref('l10n_nl.tax_report_rub_3bs_tag')
+        triangular_expression = self.env.ref('l10n_nl.tax_report_rub_3bt_tag')
+        return {
+            'goods': goods_expression._get_matching_tags().ids,
+            'services': services_expression._get_matching_tags().ids,
+            'triangular': triangular_expression._get_matching_tags().ids,
+        }
 
     def open_xbrl_wizard(self, options):
         res = self.env['l10n_nl_reports.tax.report.handler'].open_xbrl_wizard(options)
@@ -109,8 +50,6 @@ class L10n_Nl_ReportsEcSalesReportHandler(models.AbstractModel):
             'name': _('EC Sales (ICP) SBR'),
             'res_model': 'l10n_nl_reports.sbr.icp.wizard',
         })
-        for ec_tax_filter in res['context']['options']['ec_tax_filter_selection']:
-            ec_tax_filter['selected'] = True
         return res
 
     def export_icp_report_to_xbrl(self, options):
@@ -124,6 +63,9 @@ class L10n_Nl_ReportsEcSalesReportHandler(models.AbstractModel):
         if date_to.year == 2024:
             # We still need to support the NT18 taxonomy for 2024 until that declaration period is over.
             template_xmlid = 'l10n_nl_reports.icp_report_sbr_nt18'
+        elif date_to.year == 2025:
+            # We still need to support the NT19 taxonomy for 2025 until that declaration period is over.
+            template_xmlid = 'l10n_nl_reports.icp_report_sbr_nt19'
 
         report_template = self.env.ref(template_xmlid, raise_if_not_found=False)
         if not report_template:
@@ -142,7 +84,7 @@ class L10n_Nl_ReportsEcSalesReportHandler(models.AbstractModel):
 
         xbrl = self.env['ir.qweb']._render(report_template.id, data)
         xbrl_element = etree.fromstring(xbrl)
-        xbrl_file = etree.tostring(xbrl_element, xml_declaration=True, encoding='utf-8')
+        xbrl_file = etree.tostring(cleanup_xml_node(xbrl_element, remove_blank_nodes=False), xml_declaration=True, encoding='utf-8')
         return {
             'file_name': report.get_default_report_filename(options, 'xbrl'),
             'file_content': xbrl_file,
@@ -150,34 +92,85 @@ class L10n_Nl_ReportsEcSalesReportHandler(models.AbstractModel):
         }
 
     def _generate_codes_values(self, report, lines, options):
+
+        def get_country_and_vat(line, colname_to_idx):
+            country = line.columns[colname_to_idx['country_code']].name
+            vat = line.columns[colname_to_idx['vat_number']].name
+
+            country = (country or '').strip().upper()
+            vat = (vat or '').strip().upper()
+            vat = re.sub(r'[^A-Z0-9]', '', vat)
+
+            return country, vat
+
+        def update_icp_context(contexts_map, country, vat):
+            key = (country, vat)
+            if key in contexts_map:
+                return contexts_map[key]['contextRef']
+
+            ctx_id = f"ICP_{country}_{vat or 'NOVAT'}"
+
+            contexts_map[key] = {
+                'contextRef': ctx_id,
+                'country': country,
+                'VATIdentificationNumberNational': vat,
+            }
+            return ctx_id
+
         codes_values = options.get('codes_values', {})
+        vat_identification_division = codes_values.get('VATIdentificationNumberNLFiscalEntityDivision')
+        if vat_identification_division is None:
+            sender_vat = report._get_sender_company_for_export(options).vat
+            vat_identification_division = split_vat(sender_vat, default_country_code='NL')[1]
+
         codes_values.update({
             'IntraCommunitySupplies': [],
             'IntraCommunityServices': [],
             'IntraCommunityABCSupplies': [],
-            'VATIdentificationNumberNLFiscalEntityDivision': self.env.company.vat[2:] if self.env.company.vat.startswith('NL') else self.env.company.vat,
+            'VATIdentificationNumberNLFiscalEntityDivision': vat_identification_division,
         })
+
+        icp_contexts_map = {}
 
         colname_to_idx = {col['expression_label']: idx for idx, col in enumerate(options.get('columns', []))}
         company_currency = self.env.company.currency_id
+
         for line in lines:
-            if report._get_markup(line['id']) != 'total':
-                if company_currency.compare_amounts(line['columns'][colname_to_idx['amount_product']].get('no_format', 0), 0):
-                    codes_values['IntraCommunitySupplies'].append({
-                        'CountryCodeISO': line['columns'][colname_to_idx['country_code']].get('name'),
-                        'SuppliesAmount': str(int(line['columns'][colname_to_idx['amount_product']].get('no_format'))),
-                        'VATIdentificationNumberNational': line['columns'][colname_to_idx['vat']].get('name'),
-                    })
-                if company_currency.compare_amounts(line['columns'][colname_to_idx['amount_service']].get('no_format', 0), 0):
-                    codes_values['IntraCommunityServices'].append({
-                        'CountryCodeISO': line['columns'][colname_to_idx['country_code']].get('name'),
-                        'ServicesAmount': str(int(line['columns'][colname_to_idx['amount_service']].get('no_format'))),
-                        'VATIdentificationNumberNational': line['columns'][colname_to_idx['vat']].get('name', 0),
-                    })
-                if company_currency.compare_amounts(line['columns'][colname_to_idx['amount_triangular']].get('no_format', 0), 0):
-                    codes_values['IntraCommunityABCSupplies'].append({
-                        'CountryCodeISO': line['columns'][colname_to_idx['country_code']].get('name'),
-                        'SuppliesAmount': str(int(line['columns'][colname_to_idx['amount_triangular']].get('no_format'))),
-                        'VATIdentificationNumberNational': line['columns'][colname_to_idx['vat']].get('name'),
-                    })
+            if not line.columns[colname_to_idx['vat_number']].no_format or 0:
+                continue
+
+            country, vat = get_country_and_vat(line, colname_to_idx)
+
+            amount_product = line.columns[colname_to_idx['goods']].no_format or 0
+            if company_currency.compare_amounts(amount_product, 0):
+                ctx_id = update_icp_context(icp_contexts_map, country, vat)
+                codes_values['IntraCommunitySupplies'].append({
+                    'CountryCodeISO': country,
+                    'SuppliesAmount': str(int(amount_product)),
+                    'VATIdentificationNumberNational': vat,
+                    'contextRef': ctx_id,
+                })
+
+            amount_service = line.columns[colname_to_idx['services']].no_format or 0
+            if company_currency.compare_amounts(amount_service, 0):
+                ctx_id = update_icp_context(icp_contexts_map, country, vat)
+                codes_values['IntraCommunityServices'].append({
+                    'CountryCodeISO': country,
+                    'ServicesAmount': str(int(amount_service)),
+                    'VATIdentificationNumberNational': vat,
+                    'contextRef': ctx_id,
+                })
+
+            amount_triangular = line.columns[colname_to_idx['triangular']].no_format or 0
+            if company_currency.compare_amounts(amount_triangular, 0):
+                ctx_id = update_icp_context(icp_contexts_map, country, vat)
+                codes_values['IntraCommunityABCSupplies'].append({
+                    'CountryCodeISO': country,
+                    'SuppliesAmount': str(int(amount_triangular)),
+                    'VATIdentificationNumberNational': vat,
+                    'contextRef': ctx_id,
+                })
+
+        codes_values['contexts'] = list(icp_contexts_map.values())
+
         return codes_values

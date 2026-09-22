@@ -1,4 +1,3 @@
-import base64
 import math
 
 from odoo import fields, models, _
@@ -8,7 +7,20 @@ from odoo.exceptions import ValidationError, UserError
 class HrPayrollPaymentReportWizard(models.TransientModel):
     _inherit = 'hr.payroll.payment.report.wizard'
 
-    export_format = fields.Selection(selection_add=[('nacha', 'NACHA')], default='nacha', ondelete={'nacha': 'set csv'})
+    def _get_export_format_selection(self):
+        selection = super()._get_export_format_selection()
+        if 'US' in self.env.companies.country_id.mapped('code'):
+            selection.extend([
+                ('nacha', 'NACHA'),
+            ])
+        return selection
+
+    def _get_default_export_format(self):
+        default = super()._get_default_export_format()
+        if 'US' in self.env.companies.country_id.mapped('code'):
+            default = 'nacha'
+        return default
+
     journal_id = fields.Many2one(
         string='Bank Journal', comodel_name='account.journal', required=True,
         default=lambda self: self.env['account.journal'].search([('type', '=', 'bank')], limit=1))
@@ -57,7 +69,7 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         return int(aba_routing[:-1][-8:])
 
     def _calculate_aba_hash_for_payments(self, payments):
-        hashes = sum(self._calculate_aba_hash(payment.partner_bank_id.clearing_number) for payment in payments)
+        hashes = sum(self._calculate_aba_hash(payment.partner_bank_id._get_clearing_number('US')) for payment in payments)
         return str(hashes)[-10:]  # take the rightmost 10 characters
 
     def _generate_nacha_batch_control_record(self, payments, offset_payment, batch_nr):
@@ -83,9 +95,9 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         return "".join((
             "6",  # Record Type Code
             ("37" if is_offset else "32") if bank.l10n_us_bank_account_type == 'savings' else ("27" if is_offset else "22"),  # Transaction Code
-            f"{bank.clearing_number[:-1]:8.8}",  # RDFI Routing Transit Number
-            f"{bank.clearing_number[-1]:1.1}",  # Check Digit
-            f"{bank.acc_number:17.17}",  # DFI Account Number
+            f"{bank._get_clearing_number('US')[:-1]:8.8}",  # RDFI Routing Transit Number
+            f"{bank._get_clearing_number('US')[-1]:1.1}",  # Check Digit
+            f"{bank.account_number:17.17}",  # DFI Account Number
             f"{self._get_total_cents(payment):010d}",  # Amount
             f"{payment.partner_id.vat or '':15.15}",  # Individual Identification Number (optional)
             f"{'OFFSET' if is_offset else payment.partner_id.name:22.22}",  # Individual Name
@@ -96,7 +108,7 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         ))
 
     def _generate_nacha_batch_header_record(self, date, batch_nr):
-        description = f"BATCH {batch_nr}"
+        description = f"PAYROLL {batch_nr}"
         name = self.payslip_run_id.name if self.payslip_run_id else self.payslip_ids[0].name
         return "".join((
             "5",  # Record Type Code
@@ -118,11 +130,11 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
 
     def _validate_bank_for_nacha(self, payment):
         bank = payment.partner_bank_id
-        if not bank.clearing_number:
+        if not bank._get_clearing_number('US'):
             raise ValidationError(
                 self.env._(
                     "Please set the %(clearing_number_label)s on the %(account)s bank account for %(partner)s.",
-                    clearing_number_label=_("ABA Routing Number") if bank.show_aba_routing else _("Clearing Number"),
+                    clearing_number_label=bank.clearing_label_id.name,
                     account=bank.display_name,
                     partner=payment.partner_id.display_name,
                 )
@@ -133,11 +145,13 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         # Only payslips with state == "validated" and net_wage > 0 will be used to generate the report
         for payslip in self.payslip_ids.filtered(lambda p: p.state == "validated" and p.net_wage > 0):
             employee = payslip.employee_id
-            allocations = payslip.compute_salary_allocations()
-            for ba in payslip.employee_id.bank_account_ids:
-                amount = allocations[str(ba.id)]
+            allocations = payslip._compute_salary_allocations()
+            for ba in payslip.employee_id.bank_account_ids | payslip.salary_attachment_ids.beneficiary_bank_account_id:
+                amount = allocations.get(str(ba.id), None)
+                if amount is None:
+                    continue
                 payment = self.env["account.payment"].new({
-                    "partner_id": employee.work_contact_id.id,
+                    "partner_id": ba.partner_id.id or employee.work_contact_id.id,
                     "partner_bank_id": ba.id,
                     "amount": amount,
                     "date": self.effective_date,
@@ -215,7 +229,7 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         entries.extend([batch_contrl_record, file_control_record])
         entries.extend(self._generate_padding(number_of_batches, len(payslip_payments | offset_payments)))
 
-        return base64.encodebytes(("\r\n".join([header] + entries)).encode())
+        return ("\r\n".join([header] + entries)).encode()
 
     def _validate_journal_for_nacha(self):
         journal = self.journal_id

@@ -1,16 +1,14 @@
+import { onWillStart } from "@odoo/owl";
 import { FileViewer as WebFileViewer } from "@web/core/file_viewer/file_viewer";
-import { patch } from "@web/core/utils/patch";
-import { useService } from "@web/core/utils/hooks";
 import { user } from "@web/core/user";
-import { useComponent, onWillStart } from "@odoo/owl";
-
+import { useService } from "@web/core/utils/hooks";
+import { patch } from "@web/core/utils/patch";
 
 patch(WebFileViewer.prototype, {
     setup() {
         super.setup();
         this.orm = useService("orm");
-        const component = useComponent();
-        this.action = component.env.services?.action;
+        this.action = useService("action");
 
         onWillStart(async () => {
             const fileThread = this.state.file?.thread;
@@ -23,18 +21,18 @@ patch(WebFileViewer.prototype, {
         const file = this.state.file;
 
         // Need res_id or res_model to reference to the sign request
-        let { model: res_model, id: res_id } = file.thread;
+        const { model: res_model, id: res_id } = file.thread;
         const attachment_id = file.id;
 
         // If the res_model is sign.request as it's not allowed in reference field selection in the backend,
-        if (res_model === 'sign.request' || !res_id || !res_model) {
+        if (res_model === "sign.request" || !res_id || !res_model) {
             return;
         }
 
         const [template_id, template_name] = await this.orm.call(
             "sign.template",
             "create_sign_template_from_ir_attachment_data",
-            [attachment_id, res_id, res_model],
+            [attachment_id, res_id, res_model]
         );
 
         this.action.doAction({

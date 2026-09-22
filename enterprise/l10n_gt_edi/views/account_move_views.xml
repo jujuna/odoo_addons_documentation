@@ -53,8 +53,8 @@
                       invisible="not l10n_gt_edi_document_ids">
                     <field name="l10n_gt_edi_document_ids">
                         <list create="false" delete="false" edit="false" no_open="1"
-                              decoration-danger="state == 'invoice_sending_failed'"
-                              decoration-success="state == 'invoice_sent'">
+                              decoration-danger="state in ('invoice_sending_failed', 'invoice_cancel_failed')"
+                              decoration-success="state in ('invoice_sent', 'invoice_cancelled')">
                             <field name="message" column_invisible="1"/> <!-- needed for the account_document_state widget -->
                             <field name="datetime"/>
                             <field name="state" widget="account_document_state"/>
@@ -65,11 +65,11 @@
                             <button name="action_download_file"
                                     type="object"
                                     string="Download Certificate"
-                                    invisible="not (attachment_id and state == 'invoice_sent')"/>
+                                    invisible="not (attachment_id and state in ('invoice_sent', 'invoice_cancelled'))"/>
                             <button name="action_download_file"
                                     type="object"
                                     string="Download Failed XML"
-                                    invisible="not (attachment_id and state == 'invoice_sending_failed')"/>
+                                    invisible="not (attachment_id and state in ('invoice_sending_failed', 'invoice_cancel_failed'))"/>
                         </list>
                     </field>
                 </page>

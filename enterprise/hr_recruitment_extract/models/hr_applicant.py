@@ -3,8 +3,7 @@
 import re
 import string
 
-from odoo import api, models, _
-from odoo.addons.iap.tools import iap_tools
+from odoo import api, models, tools, _
 
 OCR_VERSION = 102
 
@@ -58,6 +57,13 @@ class HrApplicant(models.Model):
             name_ocr = self._get_ocr_selected_value(ocr_results, 'name', "")
             email_from_ocr = self._get_ocr_selected_value(ocr_results, 'email', "")
             phone_ocr = self._get_ocr_selected_value(ocr_results, 'phone', "")
+
+            if (
+                (email_from_ocr and self.email_from and tools.email_normalize(email_from_ocr) != tools.email_normalize(self.email_from))
+                or (self.partner_id and (self.partner_id.parent_id or self.partner_id.user_ids))
+            ):
+                email_from_ocr = name_ocr = phone_ocr = ''
+
             self.partner_name = name_ocr or self.partner_name
             self.email_from = email_from_ocr or self.email_from
             self.partner_phone = phone_ocr or self.partner_phone
@@ -94,11 +100,13 @@ class HrApplicant(models.Model):
         if self.env.company.recruitment_extract_show_ocr_option_selection == 'auto_send':
             self.filtered('extract_can_show_send_button')._send_batch_for_digitization()
 
-    def _contact_iap_extract(self, pathinfo, params):
-        params['version'] = OCR_VERSION
-        params['account_token'] = self._get_iap_account().sudo().account_token
-        endpoint = self.env['ir.config_parameter'].sudo().get_param('iap_extract_endpoint', 'https://extract.api.odoo.com')
-        return iap_tools.iap_jsonrpc(endpoint + '/api/extract/applicant/2/' + pathinfo, params=params)
+    @api.model
+    def _get_ocr_api_version(self):
+        return OCR_VERSION
+
+    @api.model
+    def _get_api_route(self):
+        return 'api/extract/applicant/2'
 
     def _get_ocr_module_name(self):
         return 'hr_recruitment_extract'

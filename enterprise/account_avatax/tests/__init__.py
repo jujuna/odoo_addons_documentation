@@ -1,4 +1,6 @@
 from . import test_avatax
+from . import test_avatax_iap
+from . import test_avatax_parameters
 
 # Tests for the certification badges
 # https://developer.avalara.com/certification/avatax/

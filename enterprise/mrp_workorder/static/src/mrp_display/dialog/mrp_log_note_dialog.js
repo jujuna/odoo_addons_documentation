@@ -1,16 +1,20 @@
-import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { TextField } from "@web/views/fields/text/text_field";
+import { useProps, t } from "@odoo/owl";
+import {
+    ConfirmationDialog,
+    confirmationDialogProps,
+} from "@web/core/confirmation_dialog/confirmation_dialog";
+import { HtmlField } from "@html_editor/fields/html_field";
 
 export class MrpLogNoteDialog extends ConfirmationDialog {
     static template = "mrp_workorder.MrpLogNoteDialog";
-    static props = {
-        ...ConfirmationDialog.props,
-        record: Object,
-        reload: { type: Function, optional: true },
-    };
+    props = useProps({
+        ...confirmationDialogProps,
+        record: t.object(),
+        reload: t.function().optional(),
+    });
     static components = {
         ...ConfirmationDialog.components,
-        TextField,
+        HtmlField,
     };
 
     async _cancel() {

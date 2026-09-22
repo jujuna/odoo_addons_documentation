@@ -9,23 +9,62 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:43+0000\n"
-"PO-Revision-Date: 2026-01-13 22:02+0000\n"
+"POT-Creation-Date: 2026-09-04 18:02+0000\n"
+"PO-Revision-Date: 2026-09-18 01:08+0000\n"
 "Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/databases/zh_Hans/>\n"
+"projects/odoo-master/databases/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: databases
+#: model:ir.module.module,description:base.module_databases
+msgid ""
+"\n"
+"Connect and manage all your client databases\n"
+"============================================\n"
+"\n"
+"The Databases app lets you connect and manage all your client databases from "
+"a\n"
+"single Odoo workspace. Whether you are an accounting firm or an Odoo "
+"partner,\n"
+"you can easily track who manages each database, follow up on timesheets, "
+"tasks\n"
+"and more.\n"
+msgstr ""
+
+#. module: databases
+#. odoo-python
+#: code:addons/databases/wizard/databases_synchronization_wizard.py:0
+msgid "%(nb_failed_dbs)s databases could not be synchronized.\n"
+msgstr ""
 
 #. module: databases
 #. odoo-python
 #: code:addons/databases/wizard/databases_synchronization_wizard.py:0
 msgid "%(nb_new_dbs)s new databases, %(nb_updated_dbs)s updated."
 msgstr "%(nb_new_dbs)s 个新数据库，已更新 %(nb_updated_dbs)s 个。"
+
+#. module: databases
+#. odoo-python
+#: code:addons/databases/wizard/databases_synchronization_wizard.py:0
+msgid "- … and %(nb_dbs)d more!\n"
+msgstr "- …以及%(nb_dbs)d 更多！\n"
+
+#. module: databases
+#: model_terms:ir.ui.view,arch_db:databases.view_users_form_databases_inherit
+msgid ""
+"<span class=\"o_form_label\">\n"
+"                                Manage access:\n"
+"                            </span>\n"
+"                            <span class=\"text-muted\">\n"
+"                                useful to cut all access at once\n"
+"                            </span>"
+msgstr ""
 
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.edit_project
@@ -61,7 +100,7 @@ msgstr "Odoo.com 的 API 登入凭证"
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.edit_project
 msgid "Add a user"
-msgstr ""
+msgstr "添加用户"
 
 #. module: databases
 #: model:res.groups,name:databases.group_databases_manager
@@ -71,12 +110,12 @@ msgstr "管理员"
 #. module: databases
 #: model:res.groups,comment:databases.group_databases_manager
 msgid "Administrator can manage the client databases"
-msgstr "系统管理员可管理及修改客户端资料库"
+msgstr "系统管理员可以管理及修改客户端数据库"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_nb_users
 msgid "Amount of Users"
-msgstr ""
+msgstr "用户数量"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_nb_documents
@@ -87,6 +126,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/databases/wizard/databases_manage_users_wizard.py:0
 msgid "An error occurred: %s"
+msgstr "发生错误：%s"
+
+#. module: databases
+#: model_terms:ir.ui.view,arch_db:databases.res_config_settings_view_form
+msgid ""
+"Automatically connect to SaaS databases using Odoo.com as an OAuth provider."
 msgstr ""
 
 #. module: databases
@@ -145,34 +190,34 @@ msgstr "数据库"
 #. odoo-python
 #: code:addons/databases/api.py:0
 msgid "Database \"%s\" not found"
-msgstr ""
+msgstr "未找到数据库“%s ”"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_api_key
 #: model:ir.model.fields,field_description:databases.field_project_template_create_wizard__database_api_key
 msgid "Database API Key"
-msgstr ""
+msgstr "数据库 API 密钥"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_api_login
 #: model:ir.model.fields,field_description:databases.field_project_template_create_wizard__database_api_login
 msgid "Database API Login"
-msgstr ""
+msgstr "数据库 API 登录"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_api_key_to_use
 msgid "Database Api Key To Use"
-msgstr ""
+msgstr "要使用的数据库 API 密钥"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_can_access
 msgid "Database Can Access"
-msgstr ""
+msgstr "数据库可访问"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_kpi_base_definition_id
 msgid "Database Kpi Base Definition"
-msgstr ""
+msgstr "数据库 KPI 基础定义"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_name
@@ -183,12 +228,12 @@ msgstr "数据库名称"
 #. module: databases
 #: model:ir.model,name:databases.model_databases_synchronization_wizard
 msgid "Database Synchronization Wizard"
-msgstr ""
+msgstr "数据库同步向导"
 
 #. module: databases
 #: model:project.project,name:databases.database_default_template
 msgid "Database Template"
-msgstr ""
+msgstr "数据库模板"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_url
@@ -198,23 +243,24 @@ msgstr "数据库URL"
 
 #. module: databases
 #: model:ir.model,name:databases.model_databases_user
+#: model:ir.model.fields,field_description:databases.field_res_users__database_user_ids
 msgid "Database User"
-msgstr ""
+msgstr "数据库用户"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_user_ids
 msgid "Database Users"
-msgstr ""
+msgstr "数据库用户"
 
 #. module: databases
 #: model:ir.model,name:databases.model_databases_manage_users_wizard
 msgid "Database Users Invitation Wizard"
-msgstr ""
+msgstr "数据库用户邀请向导"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_version
 msgid "Database Version"
-msgstr ""
+msgstr "数据库版本"
 
 #. module: databases
 #. odoo-python
@@ -222,31 +268,28 @@ msgstr ""
 msgid ""
 "Database synchronization is running in the background. You will be notified "
 "upon completion."
-msgstr ""
+msgstr "数据库同步正在后台运行。完成后将通知您。"
 
 #. module: databases
 #: model:ir.actions.act_window,name:databases.action_view_databases_all
+#: model:ir.module.module,shortdesc:base.module_databases
 #: model:ir.ui.menu,name:databases.menu_databases
 #: model:ir.ui.menu,name:databases.menu_main_databases
 #: model:res.groups.privilege,name:databases.res_groups_privilege_databases
 #: model_terms:ir.ui.view,arch_db:databases.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:databases.view_users_form_databases_inherit
 msgid "Databases"
 msgstr "数据库"
 
 #. module: databases
 #: model:ir.actions.server,name:databases.ir_cron_synchronize_databases_with_odoocom_ir_actions_server
 msgid "Databases: pull databases from Odoo.com and synchronize"
-msgstr ""
+msgstr "数据库：从 Odoo.com 提取数据库并进行同步"
 
 #. module: databases
 #: model:ir.actions.server,name:databases.ir_cron_synchronize_databases_ir_actions_server
 msgid "Databases: synchronize"
-msgstr ""
-
-#. module: databases
-#: model_terms:ir.ui.view,arch_db:databases.databases_manage_users_wizard_view_form
-msgid "Discard"
-msgstr "丢弃"
+msgstr "数据库：同步"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_databases_manage_users_wizard__display_name
@@ -255,6 +298,7 @@ msgstr "丢弃"
 #: model:ir.model.fields,field_description:databases.field_project_project__display_name
 #: model:ir.model.fields,field_description:databases.field_project_template_create_wizard__display_name
 #: model:ir.model.fields,field_description:databases.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:databases.field_res_users__display_name
 msgid "Display Name"
 msgstr "显示名称"
 
@@ -292,6 +336,12 @@ msgstr ""
 
 #. module: databases
 #. odoo-python
+#: code:addons/databases/wizard/databases_synchronization_wizard.py:0
+msgid "Error while creating an API key on %(nb_dbs)d databases:\n"
+msgstr ""
+
+#. module: databases
+#. odoo-python
 #: code:addons/databases/wizard/databases_manage_users_wizard.py:0
 msgid "Error while creating users on %(dbname)s: %(message)s\n"
 msgstr ""
@@ -299,13 +349,8 @@ msgstr ""
 #. module: databases
 #. odoo-python
 #: code:addons/databases/wizard/databases_synchronization_wizard.py:0
-msgid "Error while getting KPIs from %(dbname)s: %(message)s\n"
-msgstr ""
-
-#. module: databases
-#. odoo-python
-#: code:addons/databases/wizard/databases_synchronization_wizard.py:0
-msgid "Error while getting users from %(dbname)s: %(message)s\n"
+msgid ""
+"Error while fetching information from %(host_names)s on %(ip)s: %(message)s\n"
 msgstr ""
 
 #. module: databases
@@ -373,6 +418,7 @@ msgstr "托管"
 #: model:ir.model.fields,field_description:databases.field_project_project__id
 #: model:ir.model.fields,field_description:databases.field_project_template_create_wizard__id
 #: model:ir.model.fields,field_description:databases.field_res_config_settings__id
+#: model:ir.model.fields,field_description:databases.field_res_users__id
 msgid "ID"
 msgstr "ID"
 
@@ -440,12 +486,17 @@ msgstr "最新认证"
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_databases_user__local_user_id
 msgid "Local User"
-msgstr ""
+msgstr "本地用户"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_databases_user__login
 msgid "Login"
 msgstr "登录"
+
+#. module: databases
+#: model:ir.module.module,summary:base.module_databases
+msgid "Manage a fleet of Odoo databases"
+msgstr ""
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_kpi_properties
@@ -456,6 +507,11 @@ msgstr "指标"
 #: model:ir.model.fields,field_description:databases.field_databases_manage_users_wizard__mode
 msgid "Mode"
 msgstr "模式"
+
+#. module: databases
+#: model:ir.model.fields,field_description:databases.field_res_config_settings__module_databases_auth
+msgid "Module Databases Auth"
+msgstr ""
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_databases_user__name
@@ -478,6 +534,11 @@ msgid "New databases will be based on the selected project template."
 msgstr ""
 
 #. module: databases
+#: model:res.groups.privilege,placeholder:databases.res_groups_privilege_databases
+msgid "No"
+msgstr ""
+
+#. module: databases
 #: model_terms:ir.actions.act_window,help:databases.action_view_tasks_all
 msgid "No tasks found. Let's create one!"
 msgstr "找不到任务。 让我们创建一个！"
@@ -496,11 +557,6 @@ msgstr "Odoo 在线"
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_res_config_settings__databases_apikey
 msgid "Odoo.com API Key"
-msgstr ""
-
-#. module: databases
-#: model:ir.model.fields,field_description:databases.field_res_config_settings__databases_apiuser
-msgid "Odoo.com API User"
 msgstr ""
 
 #. module: databases
@@ -594,6 +650,7 @@ msgstr "移除"
 
 #. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.edit_project
+#: model_terms:ir.ui.view,arch_db:databases.view_users_form_databases_inherit
 msgid "Remove User"
 msgstr ""
 
@@ -614,18 +671,33 @@ msgid "Responsible"
 msgstr "负责人"
 
 #. module: databases
+#: model_terms:ir.ui.view,arch_db:databases.view_users_form_databases_inherit
+msgid "Revoke all access"
+msgstr ""
+
+#. module: databases
+#: model_terms:ir.ui.view,arch_db:databases.res_config_settings_view_form
+msgid "SaaS SSO Auto-login"
+msgstr "SaaS 单点登录（SSO）自动登录"
+
+#. module: databases
+#: model:ir.model.fields,field_description:databases.field_res_config_settings__databases_saas_single_sign_on
+msgid "Saas SSO"
+msgstr "SaaS SSO"
+
+#. module: databases
 #. odoo-python
 #: code:addons/databases/wizard/databases_manage_users_wizard.py:0
 msgid ""
 "Select the users you want to invite to the %(nb_databases)s selected "
 "databases."
-msgstr ""
+msgstr "选择想要邀请哪些用户，加入已选择的 %(nb_databases)s 个数据库。"
 
 #. module: databases
 #. odoo-python
 #: code:addons/databases/wizard/databases_manage_users_wizard.py:0
 msgid "Select the users you want to invite to the database %(database_name)s."
-msgstr ""
+msgstr "选择想要邀请哪些用户，加入数据库“%(database_name)s”。"
 
 #. module: databases
 #. odoo-python
@@ -633,14 +705,14 @@ msgstr ""
 msgid ""
 "Select the users you want to remove from the %(nb_databases)s selected "
 "databases."
-msgstr ""
+msgstr "选择要从已选定的 %(nb_databases)s 个数据库中移除哪些用户。"
 
 #. module: databases
 #. odoo-python
 #: code:addons/databases/wizard/databases_manage_users_wizard.py:0
 msgid ""
 "Select the users you want to remove from the database %(database_name)s."
-msgstr ""
+msgstr "选择要从数据库“%(database_name)s”删除的用户。"
 
 #. module: databases
 #: model:ir.actions.act_window,name:databases.action_databases_configuration
@@ -657,19 +729,19 @@ msgstr "状态"
 #: model:ir.model.fields,field_description:databases.field_databases_manage_users_wizard__summary_message
 #: model:ir.model.fields,field_description:databases.field_databases_synchronization_wizard__summary_message
 msgid "Summary Message"
-msgstr ""
+msgstr "摘要信息"
 
 #. module: databases
 #: model:ir.model.fields,field_description:databases.field_project_project__database_nb_synchro_errors
 msgid "Synchronization Errors Count"
-msgstr ""
+msgstr "同步错误计数"
 
 #. module: databases
 #. odoo-python
 #: code:addons/databases/models/project_project.py:0
 #: code:addons/databases/wizard/databases_synchronization_wizard.py:0
 msgid "Synchronization of %d databases"
-msgstr ""
+msgstr "同步 %d 个数据库"
 
 #. module: databases
 #: model:ir.actions.server,name:databases.action_synchronize_database
@@ -681,7 +753,7 @@ msgstr "同步"
 #. module: databases
 #: model:ir.actions.server,name:databases.action_synchronize_all_databases
 msgid "Synchronize all the Databases"
-msgstr ""
+msgstr "同步所有数据库"
 
 #. module: databases
 #: model_terms:ir.actions.act_window,help:databases.action_view_databases_all
@@ -689,6 +761,8 @@ msgid ""
 "Synchronize to automatically fetch Odoo Online databases, or set an API Key "
 "to connect to On Premise or Odoo.sh ones."
 msgstr ""
+"进行同步，以自动读取Odoo云端版数据库；或设置API密钥，以连接至离线安装版或"
+"Odoo.sh数据库。"
 
 #. module: databases
 #: model:ir.actions.act_window,name:databases.action_view_tasks_all
@@ -701,48 +775,57 @@ msgstr "任务"
 #. odoo-javascript
 #: code:addons/databases/static/src/views/databases_project_list/databases_project_list_renderer.js:0
 msgid "Tax return %(return_name)s"
-msgstr ""
-
-#. module: databases
-#. odoo-python
-#: code:addons/databases/wizard/databases_synchronization_wizard.py:0
-msgid ""
-"The database %(url)s is registered as a saas database in odoo.com. As it "
-"seems to be configured we have left it as is.\n"
-msgstr ""
+msgstr "报税表 %(return_name)s"
 
 #. module: databases
 #. odoo-python
 #: code:addons/databases/wizard/databases_manage_users_wizard.py:0
 msgid "These users were successfully invited to %(nb_databases)s databases."
-msgstr ""
+msgstr "已成功邀请以下用户加入 %(nb_databases)s 个数据库。"
 
 #. module: databases
 #. odoo-python
 #: code:addons/databases/wizard/databases_manage_users_wizard.py:0
 msgid "These users were successfully removed from %(nb_databases)s databases."
-msgstr "这些用户已成功从 %(nb_databases)s 数据库中删除。"
+msgstr "已成功从 %(nb_databases)s 个数据库移除以下用户。"
+
+#. module: databases
+#. odoo-python
+#: code:addons/databases/models/res_users.py:0
+msgid "This user has no access to remove."
+msgstr "此用户无权限删除。"
 
 #. module: databases
 #: model:ir.model.constraint,message:databases.constraint_project_project_database_url_required
 msgid "Uh-oh! It seems we are missing a url for a database!"
-msgstr ""
+msgstr "哎呀！似乎缺少了数据库 URL！"
 
 #. module: databases
+#: model:project.tags,name:databases.project_tag_db_unreachable
+msgid "Unreachable"
+msgstr "无法访问"
+
+#. module: databases
+#: model:ir.model,name:databases.model_res_users
 #: model:ir.model.fields,field_description:databases.field_databases_manage_users_wizard__user_ids
 #: model:res.groups,name:databases.group_databases_user
 msgid "User"
 msgstr "用户"
 
 #. module: databases
+#: model:ir.model.fields,field_description:databases.field_project_project__user_is_database_user
+msgid "User Is Database User"
+msgstr "用户是数据库用户"
+
+#. module: databases
 #: model_terms:ir.ui.view,arch_db:databases.edit_project
 msgid "User Management"
-msgstr ""
+msgstr "用户管理"
 
 #. module: databases
 #: model:res.groups,comment:databases.group_databases_user
 msgid "User can access the client databases"
-msgstr ""
+msgstr "用户可以访问客户端数据库"
 
 #. module: databases
 #. odoo-python
@@ -765,4 +848,15 @@ msgstr "版本"
 msgid ""
 "Whether the user should be notified once the cron has finished synchronizing "
 "the databases"
+msgstr ""
+
+#. module: databases
+#: model_terms:ir.ui.view,arch_db:databases.view_users_form_databases_inherit
+msgid ""
+"You can't revoke your own access. You wouldn't want to lock yourself out!"
+msgstr ""
+
+#. module: databases
+#: model_terms:ir.ui.view,arch_db:databases.view_users_form_databases_inherit
+msgid "remote user"
 msgstr ""

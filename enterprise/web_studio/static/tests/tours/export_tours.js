@@ -1,13 +1,12 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("can_export_new_module", {
-    url: "/odoo",
     steps: () => [
         {
             trigger: ".o_home_menu_background .o_home_menu",
         },
         {
-            trigger: ".o_web_studio_navbar_item > .o_nav_entry",
+            trigger: ".o_web_studio_navbar_item",
             run: "click",
         },
         {
@@ -53,7 +52,11 @@ registry.category("web_tour.tours").add("can_export_new_module", {
             run: "click",
         },
         {
-            trigger: ".o_web_studio_navbar_item > .o_nav_entry",
+            content: "Wait until the home page is fully loaded",
+            trigger: ".o_home_menu",
+        },
+        {
+            trigger: ".o_web_studio_navbar_item",
             run: "click",
         },
         {

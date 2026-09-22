@@ -1,6 +1,11 @@
+import logging
 from odoo import api, fields, models
+from odoo.addons.databases.models.project_project import get_database_api_keys
 
 from ..api import ApiError, OdooDatabaseApi
+
+
+_logger = logging.getLogger(__name__)
 
 
 class DatabasesInviteUsersWizard(models.TransientModel):
@@ -119,8 +124,10 @@ class DatabasesInviteUsersWizard(models.TransientModel):
             if (user.login, db.id) not in existing_users
         ])
 
+        database_api_keys = get_database_api_keys(new_users.project_id)
         for db, db_users in new_users.grouped('project_id').items():
-            args = [db.database_url, db.database_name, db.database_api_login, db.sudo().database_api_key_to_use]
+            database_api_key = database_api_keys.get(db.id, '')
+            args = [db.database_url, db.database_name, db.database_api_login, database_api_key]
             if not all(args):
                 self.error_message += self.env._(
                     "Error while connecting to %(url)s: We are missing the database name, the api login or the api key\n",
@@ -133,6 +140,7 @@ class DatabasesInviteUsersWizard(models.TransientModel):
             try:
                 db_api.invite_users(db_users.mapped('login'))
             except ApiError as e:
+                _logger.warning('ApiError: Error while creating user on %s: %s', db.database_name, e.args[0])
                 self.error_message += self.env._(
                     "Error while creating users on %(dbname)s: %(message)s\n",
                     dbname=db.database_name,
@@ -150,8 +158,10 @@ class DatabasesInviteUsersWizard(models.TransientModel):
             ('project_id', 'in', self.database_ids.ids),
         ])
 
+        database_api_keys = get_database_api_keys(users_to_delete.project_id)
         for db, db_users in users_to_delete.grouped('project_id').items():
-            args = [db.database_url, db.database_name, db.database_api_login, db.sudo().database_api_key_to_use]
+            database_api_key = database_api_keys.get(db.id, '')
+            args = [db.database_url, db.database_name, db.database_api_login, database_api_key]
             if not all(args):
                 self.error_message += self.env._(
                     "Error while connecting to %(url)s: We are missing the database name, the api login or the api key\n",
@@ -164,6 +174,7 @@ class DatabasesInviteUsersWizard(models.TransientModel):
             try:
                 db_api.remove_users(db_users.mapped('login'))
             except ApiError as e:
+                _logger.warning('ApiError: Error while removing users from %s: %s', db.database_name, e.args[0])
                 self.error_message += self.env._(
                     "Error while removing users from %(dbname)s: %(message)s\n",
                     dbname=db.database_name,

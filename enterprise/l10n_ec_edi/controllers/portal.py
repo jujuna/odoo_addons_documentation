@@ -11,19 +11,17 @@ from odoo.addons.portal.controllers.portal import pager as portal_pager
 class PortalWithholding(PortalAccount):
 
     def _is_ecuador_company(self):
-        return request.env.company.country_code == 'EC'
+        return request.env.company.account_fiscal_country_id.code == "EC"
 
-    def _prepare_home_portal_values(self, counters):
-        values = super()._prepare_home_portal_values(counters)
-        AccountInvoice = request.env['account.move']
-        if self._is_ecuador_company() and 'withholding_count' in counters:
-            values['withholding_count'] = AccountInvoice.search_count([
-                    ('state', 'not in', ('cancel', 'draft')),
-                    ('move_type', '=', 'entry'),
-                    ('l10n_ec_withhold_type', '=', 'in_withhold')
-                ],
-            ) if AccountInvoice.has_access('read') else 0
-        return values
+    def _prepare_portal_counter_values(self, counter):
+        if self._is_ecuador_company() and counter == 'withholding_count':
+            domain = [
+                ('state', 'not in', ('cancel', 'draft')),
+                ('move_type', '=', 'entry'),
+                ('l10n_ec_withhold_type', '=', 'in_withhold'),
+            ]
+            return 'account.move', domain, 'read'
+        return super()._prepare_portal_counter_values(counter)
 
     # ------------------------------------------------------------
     # My Withholdings

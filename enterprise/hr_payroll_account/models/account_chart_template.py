@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 
@@ -15,7 +14,8 @@ class AccountChartTemplate(models.AbstractModel):
 
     def _post_load_data(self, template_code, company, template_data):
         super()._post_load_data(template_code, company, template_data)
-        self._load_payroll_accounts(template_code, company)
+        if self.env.context.get('chart_template_load'):
+            self._load_payroll_accounts(template_code, company)
 
     def _load_payroll_accounts(self, template_code, companies):
         config_method = getattr(self, f'_configure_payroll_account_{template_code}', None)
@@ -23,11 +23,13 @@ class AccountChartTemplate(models.AbstractModel):
             config_method(companies)
 
     @api.model
-    def _configure_payroll_account(self, companies, country_code, account_codes=None, rules_mapping=None, default_account=None):
+    def _configure_payroll_account(self, companies, country_code, account_codes=None, account_refs=None, rules_mapping=None, default_account=None):
         # companies: Recordset of the companies to configure
-        # country_code: list containing all the needed accounts code
-        # rule_mapping: dictionary of the debit/credit accounts and tax tags for each related rule
-        # default_account: Defaut account to specify on the created journals
+        # country_code: country code to find payroll structures and tax tags
+        # account_codes: list of account codes to look up by prefix (alternative to account_refs)
+        # account_refs: list of XML IDs to look up (alternative to account_codes)
+        # rules_mapping: dictionary of the debit/credit accounts and tax tags for each related rule
+        # default_account: default account to specify on the created journals
         structures = self.env['hr.payroll.structure'].search([('country_id.code', '=', country_code)])
         AccountAccount = self.env['account.account']
         rule_tag_mapper = self._get_tag_mapper(self.env['res.country'].search([('code', '=', country_code)]).id)
@@ -40,13 +42,20 @@ class AccountChartTemplate(models.AbstractModel):
             if company.country_id.code in ['BE', 'CH']:
                 company.batch_payroll_move_lines = True
             accounts = {}
-            for code in account_codes:
-                account = AccountAccount.with_company(company).search([
-                    *AccountAccount._check_company_domain(company),
-                    ('code', '=like', '%s%%' % code)], limit=1)
-                if not account:
-                    _logger.warning("Payroll configuration: Missing account %s", code)
-                accounts[code] = account
+            if account_codes:
+                for code in account_codes:
+                    account = AccountAccount.with_company(company).search([
+                        *AccountAccount._check_company_domain(company),
+                        ('code', '=like', '%s%%' % code)], limit=1)
+                    if not account:
+                        _logger.warning("Payroll configuration: Missing account %s", code)
+                    accounts[code] = account
+            elif account_refs:
+                for xml_id in account_refs:
+                    account = self.ref(xml_id, raise_if_not_found=False) or AccountAccount
+                    if not account:
+                        _logger.warning("Payroll configuration: Missing account %s", xml_id)
+                    accounts[xml_id] = account
 
             journal = self.ref('hr_payroll_account_journal')
             if not journal.default_account_id and default_account:
@@ -80,45 +89,8 @@ class AccountChartTemplate(models.AbstractModel):
     @template(model='hr.payroll.structure')
     def _get_payroll_structure(self, template_code):
         return {
-            'hr_payroll.structure_002': {
+            structure.id: {
                 'journal_id': 'hr_payroll_account_journal',
-            },
-            'hr_payroll.structure_worker_001': {
-                'journal_id': 'hr_payroll_account_journal',
-            },
-            'hr_payroll.default_structure': {
-                'journal_id': 'hr_payroll_account_journal',
-            },
+            }
+            for structure in self.env['hr.payroll.structure'].sudo().with_context(active_test=False).search([])
         }
-
-    def _get_demo_data(self, company=False):
-        demo_data = super()._get_demo_data(company)
-        if not self.env['account.account'].search_count(
-            [
-                *self.env['account.account']._check_company_domain(company),
-                ('code', '=', "123456"),
-            ],
-            limit=1,
-        ):
-            account_data = demo_data.setdefault('account.account', {})
-            account_data['hr_payslip_account'] = {
-                'name': _("Account Payslip Houserental"),
-                'code': "123456",
-                'account_type': 'liability_payable',
-                'reconcile': True,
-            }
-        if self.env.ref('hr_payroll.hr_salary_rule_houserentallowance1', raise_if_not_found=False) and self.ref('hr_payslip_account', raise_if_not_found=False):
-            demo_data['hr.salary.rule'] = {
-                'hr_payroll.hr_salary_rule_houserentallowance1': {
-                    'account_debit': 'hr_payslip_account',
-                    'account_credit': 'hr_payslip_account',
-                }
-            }
-        if self.env.ref('hr_payroll.structure_003', raise_if_not_found=False) and self.ref('hr_payroll_account_journal', raise_if_not_found=False):
-            demo_data['hr.payroll.structure'] = {
-                'hr_payroll.structure_003': {
-                    'journal_id': 'hr_payroll_account_journal',
-                }
-            }
-
-        return demo_data

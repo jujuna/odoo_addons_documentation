@@ -2,10 +2,11 @@
 
 from collections import defaultdict
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import api, fields, models, _
 from odoo.fields import Domain
 from odoo.exceptions import ValidationError
-from odoo.tools.sql import column_exists, create_column
 
 
 class AccountAnalyticLine(models.Model):
@@ -14,16 +15,11 @@ class AccountAnalyticLine(models.Model):
     helpdesk_ticket_id = fields.Many2one(
         'helpdesk.ticket', 'Ticket', index='btree_not_null',
         compute='_compute_helpdesk_ticket_id', store=True, readonly=False,
+        init_storage=lambda model: None,
         domain="[('company_id', '=', company_id), ('project_id', '=?', project_id)]")
     project_id = fields.Many2one(inverse="_inverse_project_id")
     has_helpdesk_team = fields.Boolean(related='project_id.has_helpdesk_team', export_string_translation=False)
     display_task = fields.Boolean(compute="_compute_display_task", export_string_translation=False)
-
-    def _auto_init(self):
-        # At install implementation of `_compute_helpdesk_ticket_id` -> default value of NULL for all rows
-        if not column_exists(self.env.cr, 'account_analytic_line', 'helpdesk_ticket_id'):
-            create_column(self.env.cr, 'account_analytic_line', 'helpdesk_ticket_id', 'int4')
-        return super()._auto_init()
 
     @api.depends('has_helpdesk_team', 'project_id', 'task_id', 'helpdesk_ticket_id')
     def _compute_display_task(self):
@@ -40,6 +36,7 @@ class AccountAnalyticLine(models.Model):
         super(AccountAnalyticLine, self - timesheets_with_ticket)._compute_project_id()
 
     def _inverse_project_id(self):
+        super()._inverse_project_id()
         self.filtered(
             lambda line:
                 (
@@ -90,6 +87,29 @@ class AccountAnalyticLine(models.Model):
         super()._onchange_project_id()
         if not self.project_id or self.helpdesk_ticket_id.project_id != self.project_id:
             self.helpdesk_ticket_id = False
+        if not (
+            self.env.context.get('timesheet_timer_search')
+            and not self.helpdesk_ticket_id
+            and self.has_helpdesk_team
+            and (employee := self.env.user.employee_id)
+        ):
+            return
+
+        # Prefill the ticket of the most recent timesheet the user logged on this project in the
+        # past month; if that timesheet has no ticket, prefill none.
+        recent_ticket = self._get_recently_used_records('helpdesk_ticket_id', limit=1, domain=[
+            ('employee_id', '=', employee.id),
+            ('project_id', '=', self.project_id.id),
+            ('date', '>=', fields.Date.context_today(self) - relativedelta(months=1)),
+            '|',
+                ('helpdesk_ticket_id', '=', False),
+                ('helpdesk_ticket_id', 'any', [
+                    ('active', '=', True),
+                    ('project_id', '=', self.project_id.id),
+                ]),
+        ])
+        if recent_ticket:
+            self.helpdesk_ticket_id = recent_ticket[0][0]
 
     def write(self, vals):
         if vals.get("helpdesk_ticket_id"):
@@ -126,20 +146,6 @@ class AccountAnalyticLine(models.Model):
                     vals.update(vals_update)
         return super().create(vals_list)
 
-    def _update_existing_timers(self, vals):
-        # if the ticket changed to set a ticket or remove ticket and no task is set instead
-        if 'helpdesk_ticket_id' in vals and (self.helpdesk_ticket_id or not self.task_id):
-            # Check if there are some running timers linked to the timesheets to also update them.
-            timers = self.env['timer.timer'].search([('res_model', '=', self._name), ('res_id', 'in', self.ids)])
-            if timers:
-                helpdesk_ticket_id = vals['helpdesk_ticket_id']
-                timers.write({
-                    'parent_res_model': 'helpdesk.ticket' if helpdesk_ticket_id else None,
-                    'parent_res_id': helpdesk_ticket_id
-                })
-            return
-        super()._update_existing_timers(vals)
-
     def _get_timesheet_field_and_model_name(self):
         if self.env.context.get('default_helpdesk_ticket_id', False):
             return 'helpdesk_ticket_id', 'helpdesk.ticket'
@@ -161,35 +167,29 @@ class AccountAnalyticLine(models.Model):
                     '|',
                         ('project_id.message_partner_ids', 'child_of', [self.env.user.partner_id.commercial_partner_id.id]),
                         ('helpdesk_ticket_id.message_partner_ids', 'child_of', [self.env.user.partner_id.commercial_partner_id.id]),
-                ('project_id.privacy_visibility', '=', 'portal')
+                ('project_id.privacy_visibility', 'in', ['portal', 'invited_users'])
         ]
 
     @api.model
-    def _add_time_to_timesheet_fields(self):
-        return super()._add_time_to_timesheet_fields() + ['helpdesk_ticket_id']
-
-    def _get_new_timesheet_timer_vals(self):
+    def _get_aw_timesheet_fields_specification(self):
         return {
-            **super()._get_new_timesheet_timer_vals(),
-            'helpdesk_ticket_id': self.helpdesk_ticket_id.id,
+            **super()._get_aw_timesheet_fields_specification(),
+            'has_helpdesk_team': {},
+            'helpdesk_ticket_id': {
+                'fields': {'display_name': {}},
+            },
         }
 
-    def _get_last_timesheet_domain(self):
-        return Domain.AND([
-            super()._get_last_timesheet_domain(),
-            [('helpdesk_ticket_id', '=', self.helpdesk_ticket_id.id)],
-        ])
-
-    def _get_timesheet_timer_data(self):
-        timesheet_timer_data = super()._get_timesheet_timer_data()
-        if 'other_company' not in timesheet_timer_data:
-            timesheet_timer_data['helpdesk_ticket_id'] = self.helpdesk_ticket_id.id
-            timesheet_timer_data['has_helpdesk_team'] = self.has_helpdesk_team
-        return timesheet_timer_data
-
-    def _get_timer_vals(self):
-        vals = super()._get_timer_vals()
-        if self.helpdesk_ticket_id:
-            vals['parent_res_model'] = 'helpdesk.ticket'
-            vals['parent_res_id'] = self.helpdesk_ticket_id.id
-        return vals
+    @api.model
+    def _get_assistant_odoo_models(self):
+        return {
+            **super()._get_assistant_odoo_models(),
+            'helpdesk.ticket': {
+                'label': self.env._('Working on Helpdesk Ticket'),
+                'target': {
+                    'type': 'field',
+                    'target_model': 'project.project',
+                    'field': 'project_id',
+                },
+            },
+        }

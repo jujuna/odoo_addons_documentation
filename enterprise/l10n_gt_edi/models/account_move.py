@@ -1,5 +1,6 @@
 import logging
 
+from datetime import datetime, time
 from lxml import etree
 from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
@@ -7,9 +8,12 @@ from zoneinfo import ZoneInfo
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.tools import cleanup_xml_node, html2plaintext
-from odoo.tools.sql import column_exists, create_column, table_exists
+from odoo.tools.partner_identifiers import is_identifier_void
+from odoo.tools.sql import table_exists
 
 from .utils import _l10n_gt_edi_send_to_sat
+
+GT_TZ = ZoneInfo("America/Guatemala")
 
 DTE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 _logger = logging.getLogger(__name__)
@@ -53,16 +57,19 @@ class AccountMove(models.Model):
         compute='_compute_l10n_gt_edi_doc_type',
         store=True,
         readonly=False,
+        init_storage=lambda model: None,
     )
     l10n_gt_edi_available_doc_types = fields.Char(compute="_compute_l10n_gt_edi_available_doc_types")
     l10n_gt_edi_state = fields.Selection(
         selection=[
             ('invoice_sent', 'Sent'),
+            ('invoice_cancelled', 'Cancelled'),
         ],
         string="GT Status",
         compute='_compute_from_l10n_gt_edi_document_ids',
         store=True,
         tracking=True,
+        init_storage=lambda model: None,
     )
     l10n_gt_edi_phrase_ids = fields.Many2many(
         comodel_name='l10n_gt_edi.phrase',
@@ -78,27 +85,20 @@ class AccountMove(models.Model):
         compute='_compute_l10n_gt_edi_consignatory_partner',
         store=True,
         readonly=False,
+        init_storage=lambda model: None,
     )
     l10n_gt_edi_attachment_id = fields.Many2one(
         comodel_name='ir.attachment',
         compute='_compute_from_l10n_gt_edi_document_ids',
         store=True,
         readonly=True,
+        init_storage=lambda model: None,
     )
 
     def _auto_init(self):
         """
         Create all compute-stored fields here to avoid MemoryError when initializing on large databases.
         """
-        for column_name, column_type in (
-            ("l10n_gt_edi_doc_type", "varchar"),
-            ("l10n_gt_edi_state", "varchar"),
-            ("l10n_gt_edi_consignatory_partner", "int4"),
-            ("l10n_gt_edi_attachment_id", "int4"),
-        ):
-            if not column_exists(self.env.cr, 'account_move', column_name):
-                create_column(self.env.cr, 'account_move', column_name, column_type)
-
         if not table_exists(self.env.cr, 'account_move_l10n_gt_edi_phrase_rel'):
             self.env.cr.execute(
                 """
@@ -126,7 +126,7 @@ class AccountMove(models.Model):
         # EXTENDS 'account'
         super()._compute_show_reset_to_draft_button()
         for move in self:
-            if move.l10n_gt_edi_state == 'invoice_sent':
+            if move.l10n_gt_edi_state in ('invoice_sent', 'invoice_cancelled'):
                 move.show_reset_to_draft_button = False
 
     @api.depends('l10n_gt_edi_document_ids')
@@ -136,8 +136,9 @@ class AccountMove(models.Model):
 
         for move in self:
             for document in move.l10n_gt_edi_document_ids.sorted():
-                if document.state == 'invoice_sent':
+                if not move.l10n_gt_edi_state and document.state in ('invoice_cancelled', 'invoice_sent'):
                     move.l10n_gt_edi_state = document.state
+                if document.state == 'invoice_sent':
                     move.l10n_gt_edi_attachment_id = document.attachment_id
                     break
 
@@ -156,15 +157,19 @@ class AccountMove(models.Model):
                 elif move.move_type in ('out_invoice', 'out_receipt', 'in_invoice', 'in_receipt'):
                     available_types.extend(('FACT', 'FCAM', 'FPEQ', 'FCAP'))
 
-                if not move.debit_origin_id and move.move_type in ('in_invoice', 'in_receipt'):
-                    available_types.extend(('NABN', 'FESP'))
+                if not move.debit_origin_id:
+                    if move.move_type in ('in_invoice', 'in_receipt'):
+                        available_types.append('FESP')
+                    elif move.move_type == 'in_refund':
+                        available_types.append('NABN')
 
-            final_available_types = [
-                doc_type
-                for doc_type in available_types
-                if doc_type in VALID_DOC_TYPES_BY_AFFILIATION.get(move.company_id.l10n_gt_edi_vat_affiliation, {})
-            ]
-            move.l10n_gt_edi_available_doc_types = ','.join(final_available_types)
+            if move.is_sale_document(include_receipts=True):
+                available_types = (
+                    doc_type
+                    for doc_type in available_types
+                    if doc_type in VALID_DOC_TYPES_BY_AFFILIATION.get(move.company_id.l10n_gt_edi_vat_affiliation, {})
+                )
+            move.l10n_gt_edi_available_doc_types = ','.join(available_types)
 
     @api.depends('l10n_gt_edi_available_doc_types')
     def _compute_l10n_gt_edi_doc_type(self):
@@ -180,7 +185,7 @@ class AccountMove(models.Model):
     def _compute_l10n_gt_edi_phrase_ids(self):
         for move in self:
             if move.country_code == 'GT' and move.commercial_partner_id and move.l10n_gt_edi_doc_type not in ('FESP', 'NABN'):
-                if move.state == 'draft':
+                if move.state == 'draft' or (move.state == 'posted' and not move.l10n_gt_edi_state):
                     move.l10n_gt_edi_phrase_ids = (
                         move.l10n_gt_edi_phrase_ids +
                         move.company_id.l10n_gt_edi_phrase_ids +
@@ -208,6 +213,27 @@ class AccountMove(models.Model):
                 or move.company_id.partner_id
             )
 
+    @api.depends('l10n_gt_edi_state')
+    def _compute_need_cancel_request(self):
+        # EXTENDS 'account' to add dependency
+        super()._compute_need_cancel_request()
+
+    def _need_cancel_request(self):
+        # EXTENDS 'account'
+        return super()._need_cancel_request() or self.l10n_gt_edi_state == 'invoice_sent'
+
+    def button_request_cancel(self):
+        # EXTENDS 'account'
+        if self.l10n_gt_edi_state == 'invoice_sent':
+            return {
+                'target': 'new',
+                'name': _("Cancel Invoice"),
+                'type': 'ir.actions.act_window',
+                'views': [(False, 'form')],
+                'res_model': 'l10n_gt_edi.cancel',
+            }
+        return super().button_request_cancel()
+
     ################################################################################
     # Guatemalan Document Shorthands & Helpers
     ################################################################################
@@ -231,7 +257,7 @@ class AccountMove(models.Model):
             'name': self._l10n_gt_edi_get_sat_xml_name(),
             'res_model': self._name,
             'res_id': self.id,
-            'raw': values['certificate'],
+            'raw': values['certificate'].encode(),
             'type': 'binary',
             'mimetype': 'application/xml',
         }])
@@ -252,7 +278,46 @@ class AccountMove(models.Model):
                 'name': f"SAT_failed_{self._l10n_gt_edi_get_name()}.xml",
                 'res_model': document._name,
                 'res_id': document.id,
-                'raw': values['xml'],
+                'raw': values['xml'].encode(),
+                'type': 'binary',
+                'mimetype': 'application/xml',
+            }])
+
+    def _l10n_gt_edi_create_document_cancelled(self, cancel_reason, result):
+        self.ensure_one()
+        document = self.env['l10n_gt_edi.document'].create({
+            'invoice_id': self.id,
+            'state': 'invoice_cancelled',
+            'cancel_reason': cancel_reason,
+            'uuid': result['uuid'],
+            'series': result['series'],
+            'serial_number': result['serial_number'],
+            'certification_date': result['certification_date'],
+        })
+        document.attachment_id = self.env['ir.attachment'].create([{
+            'name': self._l10n_gt_edi_get_sat_cancel_xml_name(),
+            'res_model': document._name,
+            'res_id': document.id,
+            'raw': result['certificate'].encode(),
+            'type': 'binary',
+            'mimetype': 'application/xml',
+        }])
+        return document
+
+    def _l10n_gt_edi_create_document_cancel_failed(self, values):
+        self.ensure_one()
+        message_title = _("Error when sending the cancellation XML to the SAT")
+        document = self.env['l10n_gt_edi.document'].create({
+            'invoice_id': self.id,
+            'state': 'invoice_cancel_failed',
+            'message': message_title + ":\n" + '\n'.join(values['errors']),
+        })
+        if values.get('xml'):
+            document.attachment_id = self.env['ir.attachment'].create([{
+                'name': f"SAT_cancel_failed_{self._l10n_gt_edi_get_name()}.xml",
+                'res_model': document._name,
+                'res_id': document.id,
+                'raw': values['xml'].encode(),
                 'type': 'binary',
                 'mimetype': 'application/xml',
             }])
@@ -269,21 +334,29 @@ class AccountMove(models.Model):
         self.ensure_one()
         return f"SAT_certificate_{self._l10n_gt_edi_get_name()}.xml"
 
+    def _l10n_gt_edi_get_sat_cancel_xml_name(self):
+        self.ensure_one()
+        return f"SAT_cancel_{self._l10n_gt_edi_get_name()}.xml"
+
+    def _l10n_gt_edi_get_root_company(self):
+        self.ensure_one()
+        return self.company_id.parent_ids.filtered('partner_id.vat')[-1:] or self.company_id.root_id
+
     def _get_name_invoice_report(self):
         # EXTENDS account
         self.ensure_one()
-        if self.l10n_gt_edi_state == 'invoice_sent':
+        if self.l10n_gt_edi_state in ('invoice_sent', 'invoice_cancelled'):
             return 'l10n_gt_edi.report_invoice_document'
         return super()._get_name_invoice_report()
 
     def _l10n_gt_edi_get_extra_invoice_report_values(self):
         self.ensure_one()
-        if self.l10n_gt_edi_state != 'invoice_sent':
+        if self.l10n_gt_edi_state not in ('invoice_sent', 'invoice_cancelled'):
             return {}
 
         current_company = self.company_id
-        sudo_root_company = current_company.sudo().parent_ids.filtered('partner_id.vat')[-1:] or current_company.sudo().root_id
-        document = self.l10n_gt_edi_document_ids.sorted()[0]
+        sudo_root_company = self.sudo()._l10n_gt_edi_get_root_company()
+        document = self.l10n_gt_edi_document_ids.sorted().filtered(lambda doc: doc.state == 'invoice_sent')[:1]
         sat_url_params = urlencode({
             'tipo': 'autorizacion',
             'numero': document.uuid,
@@ -309,13 +382,22 @@ class AccountMove(models.Model):
             'company_name': current_company.l10n_gt_edi_legal_name,
             'company_vat': sudo_root_company.vat,
             'phrases': self.l10n_gt_edi_phrase_ids.mapped('pdf_message'),
-            'have_exportacion': self.l10n_gt_edi_doc_type == 'FACT' and self.commercial_partner_id.country_code != 'GT',
-            'have_referencias': self.l10n_gt_edi_doc_type in ('NCRE', 'NDEB'),
         }
+        self._l10n_gt_edi_add_base_values(report_values)
         if report_values['have_exportacion']:
             self._l10n_gt_edi_add_export_values(report_values)
         if report_values['have_referencias']:
             self._l10n_gt_edi_add_reference_values(report_values)
+        if report_values['have_cambiaria']:
+            self._l10n_gt_edi_add_payment_values(report_values)
+        if report_values['is_especial_fectura']:
+            self._l10n_gt_edi_add_withholding_values(report_values)
+        if self.l10n_gt_edi_state == 'invoice_cancelled':
+            cancel_doc = self.l10n_gt_edi_document_ids.sorted().filtered(lambda doc: doc.state == 'invoice_cancelled')[:1]
+            report_values.update({
+                'cancel_reason': cancel_doc.cancel_reason,
+                'cancel_date': cancel_doc.datetime.astimezone(GT_TZ).strftime("%Y-%m-%d %H:%M:%S"),
+            })
 
         return report_values
 
@@ -343,9 +425,8 @@ class AccountMove(models.Model):
         self.ensure_one()
         alerts = {}
         current_company = self.company_id
-        sudo_root_company = current_company.sudo().parent_ids.filtered('partner_id.vat')[-1:] or current_company.sudo().root_id
+        sudo_root_company = self.sudo()._l10n_gt_edi_get_root_company()
         partner_is_cf = self.commercial_partner_id == self.env.ref('l10n_gt_edi.final_consumer', raise_if_not_found=False)
-        partner_identification = self.commercial_partner_id.l10n_latam_identification_type_id
         error_action_partner = {
             'action_text': _("View Partner"),
             'action': self.commercial_partner_id._get_records_action(name=_("Partner")),
@@ -383,24 +464,18 @@ class AccountMove(models.Model):
                 'action': self.l10n_gt_edi_consignatory_partner._get_records_action(name=_("Consignatory Company")),
             }
 
-        if all((
-            not partner_is_cf,                                # Real partner
-            self.commercial_partner_id.country_code == 'GT',  # From Guatemala
-            self.commercial_partner_id.vat,                   # With VAT
-            partner_identification.country_id.code != 'GT',   # That has non-GT LATAM id type (not NIT or CUI)
-        )):
-            alerts['l10n_gt_edi_invalid_id_type'] = {
-                'message': _("Guatemalan customer must have the LATAM identification type of either NIT or CUI"),
-                **error_action_partner,
-            }
-
-        # When IDReceptor="CF" is used (on CF or partners without VAT), the total amount of the invoice must be below 2500 GTQ
-        if not self.commercial_partner_id.vat and self.amount_total >= 2500:
+        # When IDReceptor="CF" is used (on CF or partners without identification), the total amount
+        # of the invoice must be below 2500 GTQ
+        partner_identifier = self.commercial_partner_id._get_preferred_legal_entity_identifier_vals() if self.commercial_partner_id else {}
+        if (
+            is_identifier_void(partner_identifier.get('value'))
+            and abs(self.amount_total_signed) >= 2500
+        ):
             if partner_is_cf:
-                additional_message = _("Please replace Consumidor Final with a real partner and VAT number.")
+                additional_message = _("Please replace Consumidor Final with a real partner and NIT or CUI.")
             else:
-                additional_message = _("Please add the VAT on partner %s.", self.commercial_partner_id.name)
-            message_title = _("The total amount of the invoice exceeds the limit allowed for partner without VAT.")
+                additional_message = _("Please add the NIT or CUI on partner %s.", self.commercial_partner_id.name)
+            message_title = _("The total amount of the invoice exceeds the limit allowed for partner without identification.")
             alerts['l10n_gt_edi_missing_vat'] = {
                 'message': f"{message_title} {additional_message}",
                 **error_action_partner,
@@ -496,8 +571,8 @@ class AccountMove(models.Model):
 
         if all((
             self.commercial_partner_id.country_code != 'GT',  # Export invoices (uses Exportacion complemento)
-            'consu' in self.invoice_line_ids.product_id.mapped('type')  # Have product lines of type goods
-            or all(                                                     # Or have product combo lines where every item inside it is goods product
+            'service' not in self.invoice_line_ids.product_id.mapped('type')  # Have product lines of type goods or combo
+            and all(                                                     # And if any product combo lines, their product should be goods
                 combo_child_product.type == 'consu'
                 for combo_product in self.invoice_line_ids.product_id.filtered(lambda p: p.type == 'combo')
                 for combo_child_product in combo_product.combo_ids.combo_item_ids.product_id
@@ -601,7 +676,7 @@ class AccountMove(models.Model):
                 'numero_linea': item_no,
                 'bien_o_servicio': "B" if is_goods_product else "S",
                 'cantidad': quantity,
-                'descripcion': line.name.replace('\n', ' '),
+                'descripcion': (line.label or '').replace('\n', ' '),
                 'precio_unitario': f'{gross_price_unit:.10f}',
                 'precio': f'{gross_price_total_before_discount:.10f}',
                 'descuento': f'{discount_amount:.10f}',
@@ -646,18 +721,19 @@ class AccountMove(models.Model):
 
         # Emisor & Receptor identification fields
         current_company = self.company_id
-        sudo_root_company = current_company.sudo().parent_ids.filtered('partner_id.vat')[-1:] or current_company.sudo().root_id
-        partner_uses_cui = self.commercial_partner_id.l10n_latam_identification_type_id == self.env.ref('l10n_gt_edi.it_cui', raise_if_not_found=False)
+        sudo_root_company = self.sudo()._l10n_gt_edi_get_root_company()
+        partner_identifier = self.commercial_partner_id._get_preferred_legal_entity_identifier_vals() if self.commercial_partner_id else {}
         partner_is_final_consumer = self.commercial_partner_id == self.env.ref('l10n_gt_edi.final_consumer', raise_if_not_found=False)
         partner_is_guatemalan = self.commercial_partner_id.country_code == 'GT'
 
         receptor_tipo_especial = None
-        receptor_id = (self.commercial_partner_id.vat or '').replace('-', '')
-        if partner_is_guatemalan and partner_uses_cui:
+        # the receptor is identified by its NIT (`vat`), or by its CUI when it has no NIT
+        receptor_id = (partner_identifier.get('value') or '').replace('-', '')
+        if partner_is_guatemalan and partner_identifier.get('key') == 'GT_CUI':
             receptor_tipo_especial = "CUI"
         if not partner_is_guatemalan:
             receptor_tipo_especial = "EXT"
-        if partner_is_final_consumer or not receptor_id:
+        if partner_is_final_consumer or is_identifier_void(partner_identifier.get('value')):
             receptor_id = "CF"
             receptor_tipo_especial = None
 
@@ -717,7 +793,7 @@ class AccountMove(models.Model):
         gt_values.update({
             'exportacion_nombre_consignatario_o_destinatario': self.l10n_gt_edi_consignatory_partner.name[:70],
             'exportacion_direccion_consignatario_o_destinatario':
-                self.l10n_gt_edi_consignatory_partner._display_address(without_company=True).replace('\n', ' - ')[:70],
+                self.l10n_gt_edi_consignatory_partner._display_address(without_name=True, separator=' - ')[:70],
             'exportacion_codigo_consignatario_o_destinatario': self.l10n_gt_edi_consignatory_partner.l10n_gt_edi_consignatory_code,
             'exportacion_otra_referencia': self.l10n_gt_edi_consignatory_partner.ref or "N/A",
             'exportacion_incoterm': 'consu' in self.invoice_line_ids.product_id.mapped('type') and self.invoice_incoterm_id.code,
@@ -729,7 +805,7 @@ class AccountMove(models.Model):
         original_document = reference_move.l10n_gt_edi_document_ids.sorted()[0]  # guaranteed to be an `invoice_sent` document
         gt_values.update({
             'referencias_motivo_ajuste': self.ref,
-            'referencias_fecha_emision_documento_origen': original_document.datetime.astimezone(ZoneInfo("America/Guatemala")).strftime("%Y-%m-%d"),
+            'referencias_fecha_emision_documento_origen': reference_move.invoice_date.strftime("%Y-%m-%d"),
             'referencias_numero_autorizacion_documento_origen': original_document.uuid,
             'referencias_numero_documento_origen': original_document.serial_number,
             'referencias_serie_documento_origen': original_document.series,
@@ -792,10 +868,10 @@ class AccountMove(models.Model):
 
         xml_data = self.env['ir.qweb']._render('l10n_gt_edi.SAT', gt_values)
         xml_data = etree.tostring(cleanup_xml_node(xml_data, remove_blank_nodes=False), pretty_print=True, encoding='unicode')
-        sudo_root_company = self.company_id.sudo().parent_ids.filtered('partner_id.vat')[-1:] or self.company_id.sudo().root_id
+        sudo_root_company = self.sudo()._l10n_gt_edi_get_root_company()
 
         # Send the XML to Infile
-        db_uuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        db_uuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
         result = _l10n_gt_edi_send_to_sat(
             company=sudo_root_company,
             xml_data=xml_data,
@@ -817,6 +893,50 @@ class AccountMove(models.Model):
 
         if self._can_commit():
             self._cr.commit()
+
+    def _l10n_gt_edi_try_cancel(self, cancel_reason):
+        self.ensure_one()
+
+        sent_document = self.l10n_gt_edi_document_ids.sorted().filtered(lambda doc: doc.state == 'invoice_sent')[:1]
+        sudo_root_company = self.sudo()._l10n_gt_edi_get_root_company()
+        now_gt = fields.Datetime.now().astimezone(GT_TZ)
+
+        cancel_values = {
+            'uuid': sent_document.uuid,
+            'issuer_vat': (sudo_root_company.vat or '').replace('-', ''),
+            'recipient_id': (self.commercial_partner_id.vat or '').replace('-', '') or 'CF',
+            'issue_datetime': datetime.combine(self.invoice_date, time(tzinfo=GT_TZ)).isoformat(),
+            'cancel_datetime': now_gt.isoformat(),
+            'cancel_reason': cancel_reason,
+        }
+
+        xml_data = self.env['ir.qweb']._render('l10n_gt_edi.dte_anulacion', cancel_values)
+        xml_data = etree.tostring(cleanup_xml_node(xml_data, remove_blank_nodes=False), pretty_print=True, encoding='unicode')
+
+        db_uuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
+        result = _l10n_gt_edi_send_to_sat(
+            company=sudo_root_company,
+            xml_data=xml_data,
+            identification_key=f"{db_uuid}_{self._l10n_gt_edi_get_name()}_CANCEL",
+        )
+
+        self.l10n_gt_edi_document_ids.sudo().filtered(lambda d: d.state == 'invoice_cancel_failed').unlink()
+
+        if 'errors' in result:
+            self.sudo()._l10n_gt_edi_create_document_cancel_failed({**result, 'xml': xml_data})
+            if self._can_commit():
+                self.env.cr.commit()  # to store the failed document
+            raise UserError('\n'.join(result['errors']))
+
+        cancel_document_sudo = self.sudo()._l10n_gt_edi_create_document_cancelled(cancel_reason, result)
+        self.message_post(
+            body=_("Successfully cancelled the document with the SAT."),
+            attachment_ids=cancel_document_sudo.attachment_id.ids,
+        )
+        if sudo_root_company.l10n_gt_edi_service_provider == 'demo':
+            self.message_post(body=_("This document has been successfully cancelled in DEMO mode. "
+                                     "It is considered as cancelled and it won't be sent to the SAT."))
+        self.button_cancel()
 
     def l10n_gt_edi_send_bill_to_sat(self):
         self.ensure_one()

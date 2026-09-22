@@ -8,13 +8,13 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet/div[@name='button_box']" position="inside">
                 <field name='vehicle_id' invisible="1"/>
-                <button class="oe_stat_button" string="Vehicle" name="action_open_vehicle" type="object" icon="fa-car" invisible="not vehicle_id"/>
+                <button class="oe_stat_button" string="Vehicle" name="action_open_vehicle" type="object" icon="directions_car" invisible="not vehicle_id"/>
             </xpath>
             <xpath expr="//sheet/notebook/page[@name='related_items']//field[@name='account_id']" position="after">
                 <field name='vehicle_id' optional='hidden'/>
             </xpath>
-            <xpath expr="//field[@name='already_depreciated_amount_import']" position="after">
-                <field name='vehicle_id'/>
+            <xpath expr="//field[@name='asset_group_id']" position="after">
+                <field name='vehicle_id' invisible="not is_vehicle and not vehicle_id"/>
             </xpath>
         </field>
     </record>

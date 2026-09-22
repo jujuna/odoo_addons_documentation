@@ -9,6 +9,8 @@ from odoo.tests import freeze_time, tagged
 @tagged('-at_install', 'post_install')
 class TestSaleReport(TestSubscriptionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def setUp(self):
         super().setUp()
         self.recurring_product_tmp, self.no_recurring_product_tmpl = self.env['product.template'].create([

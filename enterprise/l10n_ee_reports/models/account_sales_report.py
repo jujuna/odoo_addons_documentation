@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from collections import defaultdict
 from lxml import etree, objectify
 
 from odoo import _, fields, models
@@ -10,34 +9,26 @@ from odoo.tools import float_round
 
 class L10n_EeEcSalesReportHandler(models.AbstractModel):
     _name = 'l10n_ee.ec.sales.report.handler'
-    _inherit = ['account.ec.sales.report.handler']
+    _inherit = ['account.ec.sales.with.tags.report.handler']
     _description = 'Estonian EC Sales Report Custom Handler'
 
-    def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
-        lines = []
-
-        for partner, results in super()._query_partners(report, options):
-            partner_values = defaultdict(dict)
-            for column_group_key in options['column_groups']:
-                partner_sum = results.get(column_group_key, {})
-                partner_values[column_group_key]['country_code'] = partner_sum.get('country_code', 'UNKNOWN')
-                partner_values[column_group_key]['vat_number'] = partner_sum.get('vat_number', 'UNKNOWN')
-                partner_values[column_group_key]['goods'] = partner_sum.get('goods', 0.0)
-                partner_values[column_group_key]['triangular'] = partner_sum.get('triangular', 0.0)
-                partner_values[column_group_key]['services'] = partner_sum.get('services', 0.0)
-            lines.append((0, super()._get_report_line_partner(report, options, partner, partner_values)))
-
-        return lines
-
     def _custom_options_initializer(self, report, options, previous_options):
-        super()._init_core_custom_options(report, options, previous_options)
+        ee_tax_tags = self._get_ec_sales_tax_tags()
+        options.update({
+            'sales_report_operation_types': {
+                'goods': {
+                    'tax_tag_ids': ee_tax_tags['goods'],
+                },
+                'services': {
+                    'tax_tag_ids': ee_tax_tags['services'],
+                },
+                'triangular': {
+                    'tax_tag_ids': ee_tax_tags['triangular'],
+                },
+            },
+        })
 
-        ec_operation_category = options.get('sales_report_taxes', {'goods': tuple(), 'triangular': tuple(), 'services': tuple()})
-
-        ec_operation_category['goods'] = tuple(self.env.ref('l10n_ee.tax_report_line_ec_goods_tag')._get_matching_tags().ids)
-        ec_operation_category['triangular'] = tuple(self.env.ref('l10n_ee.tax_report_line_ec_triangular_tag')._get_matching_tags().ids)
-        ec_operation_category['services'] = tuple(self.env.ref('l10n_ee.tax_report_line_ec_services_tag')._get_matching_tags().ids)
-        options.update({'sales_report_taxes': ec_operation_category})
+        super()._custom_options_initializer(report, options, previous_options)
 
         options.setdefault('buttons', []).append({
             'name': _('XML'),
@@ -47,13 +38,25 @@ class L10n_EeEcSalesReportHandler(models.AbstractModel):
             'file_export_type': _('XML'),
         })
 
+    def _get_ec_sales_tax_tags(self):
+        # Overrides account_reports
+        goods_expression = self.env.ref('l10n_ee.tax_report_line_ec_goods_tag')
+        services_expression = self.env.ref('l10n_ee.tax_report_line_ec_services_tag')
+        triangular_expression = self.env.ref('l10n_ee.tax_report_line_ec_triangular_tag')
+
+        return {
+            'goods': goods_expression._get_matching_tags().ids,
+            'services': services_expression._get_matching_tags().ids,
+            'triangular': triangular_expression._get_matching_tags().ids,
+        }
+
     def export_to_xml_sales_report(self, options):
         report = self.env['account.report'].browse(options['report_id'])
         date_to = fields.Date.from_string(options['date'].get('date_to'))
         if options['date']['period_type'] != 'month':
             raise UserError(_('Choose a month to export the IC Supply Report'))
         company = self.env.company
-        if not company.company_registry:
+        if not company.partner_id._get_additional_identifier('EE_EN'):
             action = self.env.ref('base.action_res_company_form')
             raise RedirectWarning(_('No company registry number associated with your company. Please define one.'), action.id, _("Company Settings"))
 
@@ -62,22 +65,25 @@ class L10n_EeEcSalesReportHandler(models.AbstractModel):
         rows = []
         undefined_vat_partners = []
         for line in lines:
-            vat_number = line['columns'][colexpr_to_idx['vat_number']].get('name', '')
+            if report._get_model_info_from_id(line.id)[0] != 'res.partner':
+                continue
+
+            vat_number = line.columns[colexpr_to_idx['vat_number']].name
             if not vat_number:
-                undefined_vat_partners.append(line['name'])
+                undefined_vat_partners.append(line.name)
             rows.append({
-                'country_code': line['columns'][colexpr_to_idx['country_code']].get('name', ''),
+                'country_code': line.columns[colexpr_to_idx['country_code']].name,
                 'vat_number': vat_number,
-                'goods': int(float_round(line['columns'][colexpr_to_idx['goods']]['no_format'], precision_digits=0)),
-                'triangular': int(float_round(line['columns'][colexpr_to_idx['triangular']]['no_format'], precision_digits=0)),
-                'services': int(float_round(line['columns'][colexpr_to_idx['services']]['no_format'], precision_digits=0)),
+                'goods': int(float_round(line.columns[colexpr_to_idx['goods']].no_format, precision_digits=0)),
+                'triangular': int(float_round(line.columns[colexpr_to_idx['triangular']].no_format, precision_digits=0)),
+                'services': int(float_round(line.columns[colexpr_to_idx['services']].no_format, precision_digits=0)),
             })
 
         if undefined_vat_partners:
             raise UserError(_('No VAT number defined for the following partners: %s', ', '.join(undefined_vat_partners)))
 
         xml_data = {
-            'tax_payer_reg_code': company.company_registry,
+            'tax_payer_reg_code': company.partner_id._get_additional_identifier('EE_EN'),
             'year': date_to.year,
             'month': date_to.month,
             'rows': rows,

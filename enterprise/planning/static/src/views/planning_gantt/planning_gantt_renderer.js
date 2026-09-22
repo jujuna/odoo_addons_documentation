@@ -4,18 +4,16 @@ import { GanttRenderer } from "@web_gantt/gantt_renderer";
 import { getColumnStart, getUnionOfIntersections } from "@web_gantt/gantt_helpers";
 import { PlanningEmployeeAvatar } from "./planning_employee_avatar";
 import { PlanningMaterialRole } from "./planning_material_role";
-import { PlanningGanttRowProgressBar } from "./planning_gantt_row_progress_bar";
-import { useEffect, onWillStart, reactive, markup, useState } from "@odoo/owl";
+import { markup, onMounted, onPatched, proxy } from "@odoo/owl";
 import { serializeDateTime } from "@web/core/l10n/dates";
 import { planningAskRecurrenceUpdate } from "../planning_calendar/planning_ask_recurrence_update/planning_ask_recurrence_update_hook";
 import { PlanningGanttRendererControls } from "./planning_gantt_renderer_controls";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
-import { usePlanningRecurringDeleteAction } from "../planning_hooks";
-import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { AddressRecurrencyConfirmationDialog } from "@planning/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog";
+import { usePlanningPopoverActions } from "../planning_hooks";
 import { localization } from "@web/core/l10n/localization";
 import { PlanningSplitTool } from "./planning_split_tool";
+import { PlanningGanttPopover } from "./planning_gantt_popover";
 
 const { Duration, DateTime } = luxon;
 
@@ -24,33 +22,65 @@ export class PlanningGanttRenderer extends GanttRenderer {
     static rowHeaderTemplate = "planning.PlanningGanttRenderer.RowHeader";
     static pillTemplate = "planning.PlanningGanttRenderer.Pill";
     static groupPillTemplate = "planning.PlanningGanttRenderer.GroupPill";
+    static progressBarLabelTemplate = "planning.PlanningGanttRenderer.ProgressBarLabel";
     static components = {
         ...GanttRenderer.components,
         Avatar: PlanningEmployeeAvatar,
         GanttRendererControls: PlanningGanttRendererControls,
-        GanttRowProgressBar: PlanningGanttRowProgressBar,
+        Popover: PlanningGanttPopover,
         Material: PlanningMaterialRole,
         PlanningSplitTool,
     };
     setup() {
-        this.duplicateToolHelperReactive = reactive({ shouldDisplay: false });
-        this.splitToolHelperReactive = reactive({});
-        super.setup();
-        useEffect(() => {
-            this.gridRef.el.classList.add("o_planning_gantt");
-        });
-
-        this.state = useState({
-            recurrenceUpdate: "this",
-        });
-        this.planningRecurrenceDeletion = usePlanningRecurringDeleteAction();
+        this.duplicateToolHelperReactive = proxy({ shouldDisplay: false });
+        this.splitToolHelperReactive = proxy({});
         this.isPlanningManager = false;
+        super.setup();
+        onMounted(() => this.gridRef().classList.add("o_planning_gantt"));
+        onPatched(() => this.gridRef().classList.add("o_planning_gantt"));
+
+        this.popoverActions = usePlanningPopoverActions();
         this.notificationService = useService("notification");
-        onWillStart(this.onWillStart);
     }
 
     async onWillStart() {
-        this.isPlanningManager = await user.hasGroup('planning.group_planning_manager');
+        this.isPlanningManager = await user.hasGroup("planning.group_planning_manager");
+        super.onWillStart();
+    }
+
+    /**
+     * @override
+     */
+    ganttCellAttClass(row, column) {
+        return {
+            ...super.ganttCellAttClass(...arguments),
+            o_resource_has_no_working_periods: !this._resourceHasWorkingPeriods(column, row),
+        };
+    }
+
+    /**
+     * @param {number} column - Column index
+     * @param {Row} row - Row Object
+     */
+    _resourceHasWorkingPeriods(column, row) {
+        const { workingPeriods } = this.model.data;
+        if (!workingPeriods) {
+            return true;
+        }
+        const resourceId = Object.assign({}, ...JSON.parse(row.id)).resource_ids?.[0];
+        const periods = workingPeriods[resourceId];
+        if (periods?.length) {
+            const { interval } = this.model.metaData.scale;
+            const left = column.start.startOf(interval);
+            const right = column.stop.startOf(interval);
+            return periods.some(
+                ({ start, end }) =>
+                    start.startOf(interval) <= left &&
+                    (!end ||
+                        end.startOf(interval) >= right)
+            );
+        }
+        return periods === undefined;
     }
 
     /**
@@ -72,11 +102,11 @@ export class PlanningGanttRenderer extends GanttRenderer {
     }
 
     onPillClicked(ev, pill) {
-        if (this.env.isSmall || !this.isPlanningManager || this.model.useSampleModel) {
+        if (this.uiService.isSmall || !this.isPlanningManager || this.model.useSampleModel) {
             super.onPillClicked(...arguments);
             return;
         }
-        const splitToolEl = this.cellContainerRef.el.querySelector(".o_gantt_pill_split_tool");
+        const splitToolEl = this.cellContainerRef().querySelector(".o_gantt_pill_split_tool");
         if (splitToolEl) {
             const { clientX, clientY } = ev;
             const { x, y, width, height } = splitToolEl.getBoundingClientRect();
@@ -94,7 +124,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
     computeDerivedParamsFromHover() {
         super.computeDerivedParamsFromHover(...arguments);
         delete this.splitToolHelperReactive.position;
-        if (this.env.isSmall || !this.isPlanningManager || this.model.useSampleModel) {
+        if (this.uiService.isSmall || !this.isPlanningManager || this.model.useSampleModel) {
             return;
         }
         if (this.isDragging || this.connectorDragState.dragging) {
@@ -147,18 +177,8 @@ export class PlanningGanttRenderer extends GanttRenderer {
         const pill = super.enrichPill(...arguments);
         const { record } = pill;
 
-        if (record.employee_id && !this.model.metaData.groupedBy.includes("resource_id")) {
-            const { id: resId, display_name: displayName } = record.employee_id;
-            pill.hasAvatar = true;
-            pill.avatarProps = {
-                resModel: "hr.employee.public",
-                resId,
-                displayName,
-            };
-        } else {
-            pill.hasAvatar = false;
-            pill.avatarProps = {};
-        }
+        pill.hasAvatar = false;
+        pill.avatarProps = {};
 
         const model = this.props.model;
         if (model.highlightIds && !model.highlightIds.includes(record.id)) {
@@ -169,9 +189,8 @@ export class PlanningGanttRenderer extends GanttRenderer {
         if (percentage === 0) {
             return pill;
         }
-        const resource = record.resource_id;
-        const resourceId = resource && resource.id;
-        if (this.isOpenShift(record) || this.isFlexibleHours(resourceId)) {
+        const resources = record.resource_ids || [];
+        if (this.isOpenShift(record) || resources.every((r) => this.isFlexibleHours(r.id))) {
             for (let col = this.getFirstGridCol(pill); col < this.getLastGridCol(pill); col++) {
                 const subColumn = this.getSubColumnFromColNumber(col);
                 if (!subColumn) {
@@ -252,49 +271,29 @@ export class PlanningGanttRenderer extends GanttRenderer {
     /**
      * @override
      */
-    async getPopoverProps(pill) {
-        const popoverProps = await super.getPopoverProps(...arguments);
+    progressBarIsVisible(row) {
+        return (
+            super.progressBarIsVisible(row) &&
+            !row.progressBar.is_fully_flexible_hours &&
+            !row.progressBar.all_group_by_resources_fully_flexible
+        );
+    }
+
+    /**
+     * @override
+     */
+    getPopoverProps(pill) {
+        const popoverProps = super.getPopoverProps(...arguments);
         const { record } = pill;
         if (this.isPlanningManager) {
-            const recurrenceProps = { resId: record.id, resModel: this.model.metaData.resModel };
-            popoverProps.buttons.push({
-                text: _t("Delete"),
-                class: "btn btn-sm btn-secondary btn-delete",
-                onClick: async () => {
-                    const canProceed = await new Promise((resolve) => {
-                        if (record.repeat) {
-                            this.dialogService.add(AddressRecurrencyConfirmationDialog, {
-                                cancel: () => resolve(false),
-                                close: () => resolve(false),
-                                confirm: async () => {
-                                    await this.planningRecurrenceDeletion._actionAddressRecurrency(
-                                        recurrenceProps,
-                                        this.state.recurrenceUpdate
-                                    );
-                                    return resolve(true);
-                                },
-                                onChangeRecurrenceUpdate:
-                                    this.planningRecurrenceDeletion._setRecurrenceUpdate.bind(this),
-                                selected: this.state.recurrenceUpdate,
-                            });
-                        } else {
-                            this.dialogService.add(ConfirmationDialog, {
-                                body: _t("Are you sure you want to delete this shift?"),
-                                confirmLabel: _t("Delete"),
-                                cancel: () => resolve(false),
-                                close: () => resolve(false),
-                                confirm: () => resolve(true),
-                            });
-                        }
-                    });
-                    if (canProceed) {
-                        await this.model.orm.unlink(recurrenceProps.resModel, [
-                            recurrenceProps.resId,
-                        ]);
-                        await this.model.fetchData();
-                    }
-                },
-            });
+            const args = {
+                orm: this.model.orm,
+                resModel: this.model.metaData.resModel,
+                record,
+                reload: () => this.model.fetchData(),
+            };
+            popoverProps.onUnschedule = this.popoverActions.makeOnUnschedule(args);
+            popoverProps.onDelete = this.popoverActions.makeOnDelete(args);
         }
         return popoverProps;
     }
@@ -304,19 +303,30 @@ export class PlanningGanttRenderer extends GanttRenderer {
      * @returns {any[]}
      */
     getRecordIntervals(record) {
-        const resourceId = record.resource_id && record.resource_id.id;
+        if (!(Object.keys(this.model.data.workIntervals || {}).length && record.resource_ids?.length)) {
+            return [];
+        }
+        const resourceIntervalsList = [];
+        for (const resourceId of record.resource_ids) {
+            const resourceIntervals = this.model.data.workIntervals?.[resourceId];
+            if (resourceIntervals) {
+                resourceIntervalsList.push(resourceIntervals);
+            }
+        }
+        if (!resourceIntervalsList.length) {
+            return [];
+        }
+        let resourcesIntervals = resourceIntervalsList[0];
+        for (let i = 1; i < resourceIntervalsList.length; i++) {
+            const newIntervals = [];
+            for (const interval of resourceIntervalsList[i]) {
+                newIntervals.push(...getUnionOfIntersections(interval, resourcesIntervals));
+            }
+            resourcesIntervals = newIntervals;
+        }
         const startTime = record.start_datetime;
         const endTime = record.end_datetime;
-        if (!Object.keys(this.model.data.progressBars.resource_id || {}).length) {
-            return [];
-        }
-        const resourceIntervals =
-            this.model.data.progressBars?.resource_id?.[resourceId]?.work_intervals;
-        if (!resourceIntervals) {
-            return [];
-        }
-        const recordIntervals = getUnionOfIntersections([startTime, endTime], resourceIntervals);
-        return recordIntervals;
+        return getUnionOfIntersections([startTime, endTime], resourcesIntervals);
     }
 
     /**
@@ -324,7 +334,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
      * @returns {boolean}
      */
     isFlexibleHours(resource_id) {
-        return !!this.model.data.progressBars?.resource_id?.[resource_id]?.is_flexible_hours;
+        return !!this.model.data.isFlexibleHours?.[resource_id];
     }
 
     /**
@@ -332,7 +342,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
      * @returns {boolean}
      */
     isOpenShift(record) {
-        return !record.resource_id;
+        return !record.resource_ids?.length;
     }
 
     /**
@@ -351,14 +361,14 @@ export class PlanningGanttRenderer extends GanttRenderer {
         }
 
         // These checks only make sense if the gantt view is grouped by the resource
-        if (row.groupedBy && row.groupedBy[0] !== 'resource_id') {
+        if (row.groupedBy && row.groupedBy[0] !== 'resource_ids') {
             return wouldAggregate;
         }
 
         // A row not having work intervals could mean that a resource doesn't have a contract or the row is the "Total" row
-        const workIntervals = this.model.data.progressBars?.resource_id?.[row.resId]?.work_intervals;
+        const workIntervals = this.model.data.workIntervals?.[row.resId];
         if (!workIntervals) {
-            if (row.groupedByField === "resource_id") {  // If there is no contract, don't show aggregate info
+            if (row.groupedByField === "resource_ids") {  // If there is no contract, don't show aggregate info
                 return false;
             } else if (!row.groupedByField) {  // If it's not grouped by anything, its the total row, follow default behaviour
                 return wouldAggregate;
@@ -378,7 +388,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
         }
 
         // We do not show aggregate info on days with time-off
-        const unavailabilities = Object.entries(row.unavailabilities).map(([key, {start, stop}]) => ([start, stop]));
+        const unavailabilities = Object.entries(row.unavailabilities).map(([key, { start, stop }]) => ([start, stop]));
         const dayOff = []
         for (const interval of groupWorkOverlap) {
             const dayOffInterval = getUnionOfIntersections(interval, unavailabilities);
@@ -402,7 +412,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
     getPillFromGroup(group, maxAggregateValue, consolidate) {
         const newPill = super.getPillFromGroup(...arguments);
         if (group.pills.length) {
-            newPill.resourceId = group.pills[0].record.resource_id;
+            newPill.resourceId = group.pills[0].record.resource_ids;
         }
         const { start, stop } = this.getColumnFromColNumber(newPill.grid.column[0]);
         newPill.date_start = start;
@@ -410,17 +420,17 @@ export class PlanningGanttRenderer extends GanttRenderer {
         return newPill;
     }
 
-    _computeWorkHours(pill) {
+    _computeWorkHours(pill, row) {
         let workHours = 0;
-        if (!this.row.progressBar?.employee_id || ["day", "year"].includes(this.model.metaData.scale.id)) {
+        if (!row.progressBar?.employee_id || ["day", "year"].includes(this.model.metaData.scale.id)) {
             return workHours;
         }
-        const resource_id = this.row.resId;
+        const resource_id = row.resId;
         // If flexible hour contract, colour the gantt view group based on whether the aggregate value > the "average work hours" per day.
         if (this.isFlexibleHours(resource_id)) {
-            workHours = this.model.data.progressBars.resource_id[resource_id]?.avg_hours;
+            workHours = this.model.data.avgWorkHours[resource_id];
         } else {
-            workHours = this.model.data.progressBars.resource_id[resource_id]?.work_intervals.reduce(
+            workHours = this.model.data.workIntervals[resource_id].reduce(
                 (sum, [ intervalStart, intervalEnd ]) => {
                     // Check whether the work interval is of the same date as the grouping pill
                     if (intervalStart >= pill.date_start && intervalEnd <= pill.date_end) {
@@ -433,18 +443,18 @@ export class PlanningGanttRenderer extends GanttRenderer {
         return workHours;
     }
 
-    _computeDisplayName(pill, workHours) {
-        const progressBar = this.row.progressBar;
+    _computeDisplayName(pill, workHours, row) {
+        const progressBar = row.progressBar;
         if (!progressBar?.employee_id || ["day", "month", "year"].includes(this.model.metaData.scale.id) || workHours === 0) {
             return pill.displayName;
         }
         return `${pill.displayName} (${Math.round(pill.aggregateValue / workHours * 100)}%)`;
     }
 
-    _computeResourceOvertimeColors(pill, workHours) {
-        const progressBar = this.row.progressBar;
-        const isFullyFlexibleHours = this.isFlexibleHours(this.row.resId) && workHours === 24;
-        if (!progressBar?.employee_id || ["day", "year"].includes(this.model.metaData.scale.id) || isFullyFlexibleHours){
+    _computeResourceOvertimeColors(pill, workHours, row) {
+        const progressBar = row.progressBar;
+        const isFullyFlexibleHours = this.isFlexibleHours(row.resId) && workHours === 24;
+        if (!progressBar?.employee_id || ["day", "year"].includes(this.model.metaData.scale.id) || isFullyFlexibleHours) {
             return "bg-primary border-primary";
         }
         return workHours == pill.aggregateValue ? 'bg-success border-success' : workHours > pill.aggregateValue ? 'bg-warning border-warning' : 'bg-danger border-danger';
@@ -471,8 +481,8 @@ export class PlanningGanttRenderer extends GanttRenderer {
     /**
      * @override
      */
-    isHoverable(row) {
-        if (!row.fromServer) {
+    isHoverable(row = null) {
+        if (row && !row.fromServer) {
             return !row.isGroup;
         }
         return super.isHoverable(...arguments);
@@ -481,7 +491,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
     processRow() {
         const result = super.processRow(...arguments);
         const { fromServer, groupedByField, id, name, progressBar, resId } = result.rows[0];
-        const isGroupedByResource = groupedByField === "resource_id";
+        const isGroupedByResource = groupedByField === "resource_ids";
         const employeeId = progressBar && progressBar.employee_id;
         const isResourceMaterial = progressBar && progressBar.is_material_resource;
         const resourceColor = progressBar && progressBar.resource_color || 0;
@@ -489,8 +499,15 @@ export class PlanningGanttRenderer extends GanttRenderer {
         const showEmployeeAvatar = isGroupedByResource && fromServer && Boolean(employeeId) || Boolean(resId && isResourceMaterial);
         if (showEmployeeAvatar) {
             const { fields } = this.model.metaData;
-            const resModel = fields.resource_id.relation;
-            this.rowsWithAvatar[id] = { resModel, resId: resId, displayName: name, isResourceMaterial, showPopover, resourceColor };
+            const resModel = fields.resource_ids.relation;
+            this.rowsWithAvatar[id] = {
+                resModel,
+                resId: resId,
+                displayName: name,
+                isResourceMaterial,
+                showPopover,
+                resourceColor,
+            };
         } else if (isResourceMaterial) {
             this.rowsWithMaterial[id] = { displayName: name };
         }
@@ -526,20 +543,24 @@ export class PlanningGanttRenderer extends GanttRenderer {
 
     /**
      * Split a shift (pill) into two shifts.
-     * For shifts with flexible hours or open slots, the split is done without taking into account availabbilities.
-     * For shifts with regular working hours, the split is done taking into account the resource's availabilities.
-     * As an exception, if the shift spans on weekends (where the resource had no availabilities unavailable)
-     * for a regular working schedule, we split the shift but set a 8-17 schedule for the shift in weekends.
+     * If the view scale is 'day', split exactly where requested, else:
+     *     For shifts with flexible hours or open slots, the split is done without taking into account availabilities.
+     *     For shifts with regular working hours, the split is done taking into account the resource's availabilities.
+     *     As an exception, if the shift spans on weekends (where the resource had no availabilities unavailable)
+     *     for a regular working schedule, we split the shift but set a 8-17 schedule for the shift in weekends.
      *
      * @param {Pill} pill
      * @param {number} startColumnId - column where to split the pill
      */
     async onPillSplitToolClicked(pill, startColumnId) {
-        const resourceId = pill.record.resource_id.id || false;
+        let resourceId = false;
+        if (pill.record.resource_ids && pill.record.resource_ids.length) {
+            resourceId = pill.record.resource_ids[0];
+        }
         const splitRightPill = this.getColumnStartStop(startColumnId, startColumnId);
         const splitLeftPill = this.getColumnStartStop(startColumnId - 1, startColumnId - 1);
         let copiedShiftId;
-        if (!resourceId || this.isFlexibleHours(resourceId)) {
+        if (!resourceId || this.isFlexibleHours(resourceId) || this.currentScaleId === "day") {
             const start = splitRightPill.start;
             const stop = splitLeftPill.stop;
             copiedShiftId = await this.model.splitPill(start, stop, pill.record);
@@ -568,7 +589,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
         // Close the last split notification if any and show a new split notification with an Undo button
         this.closeNotificationFn?.();
         this.closeNotificationFn = this.notificationService.add(
-            markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${_t(
+            markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${_t(
                 "Shift divided into two"
             )}</span>`,
             {
@@ -576,7 +597,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
                 className: "planning_notification",
                 buttons: [{
                     name: 'Undo',
-                    icon: 'fa-undo',
+                    icon: 'undo',
                     onClick: async () => {
                         // Undo the shift split based on the schedule that was before the split
                         const result = await this.model.orm.call(
@@ -586,13 +607,13 @@ export class PlanningGanttRenderer extends GanttRenderer {
                                 [pill.record.id, copiedShiftId],
                                 serializeDateTime(pill.record.start_datetime),
                                 serializeDateTime(pill.record.end_datetime),
-                                !pill.record.resource_id ? false : pill.record.resource_id.id,
+                                pill.record.resource_ids,
                             ],
                         );
                         this.closeNotificationFn?.();
                         if (!result) {
                             this.closeNotificationFn = this.notificationService.add(
-                                markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${_t(
+                                markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${_t(
                                     "Shifts could not be merged back"
                                 )}</span>`,
                                 { type: 'danger' },
@@ -600,7 +621,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
                         } else {
                             this.model.fetchData();
                             this.closeNotificationFn = this.notificationService.add(
-                                markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${_t(
+                                markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${_t(
                                     "Shifts merged back"
                                 )}</span>`,
                                 { type: 'success' },
@@ -677,12 +698,13 @@ export class PlanningGanttRenderer extends GanttRenderer {
 
     onInteractionChange() {
         super.onInteractionChange();
-        this.duplicateToolHelperReactive.shouldDisplay = this.interaction.mode === "drag";
+        this.duplicateToolHelperReactive.shouldDisplay =
+            this.interaction.mode === "reschedule" && this.cellForDrag.el;
     }
 
-    async dragPillDrop({pill}) {
+    async dragPillDrop({ pill }) {
         const { record } = this.pills[pill.dataset.pillId];
-        if (record.repeat && this.interaction.dragAction !== "copy") {
+        if (record.repeat && this.interaction.mode !== "copy") {
             const recurrenceUpdate = await planningAskRecurrenceUpdate(this.dialogService);
             if (recurrenceUpdate) {
                 record.recurrence_update = recurrenceUpdate;
@@ -693,7 +715,7 @@ export class PlanningGanttRenderer extends GanttRenderer {
         }
     }
 
-    async resizePillDrop({pill}) {
+    async resizePillDrop({ pill }) {
         const { record } = this.pills[pill.dataset.pillId];
         if (record.repeat) {
             const recurrenceUpdate = await planningAskRecurrenceUpdate(this.dialogService);
@@ -706,4 +728,103 @@ export class PlanningGanttRenderer extends GanttRenderer {
         }
     }
 
+    displayFailedPlanningNotification(message) {
+        return this.notificationService.add(message, { type: "danger" });
+    }
+
+    async scheduleEvent(params) {
+        const { resId } = params;
+        const schedule = this.model.getSchedule(params);
+        const result = await this.model._assignSlot(resId, schedule);
+        this.notifyAssignSlotResult([resId], result);
+    }
+
+    getSelectCreateDialogProps(params) {
+        const props = super.getSelectCreateDialogProps(params);
+        props.context.planning_slots_to_schedule = true;
+        props.onSelected = async (resIds) => {
+            if (!resIds.length) {
+                return;
+            }
+            const result = await this.model._assignSlot(resIds, props.context);
+            this.notifyAssignSlotResult(resIds, result);
+        };
+        props.onCreateEdit = () => {
+            this.props.create(props.context);
+        };
+        return props;
+    }
+
+    notifyAssignSlotResult(ids, result) {
+        if (!result.slots_assigned_ids.length) {
+            this.displayFailedPlanningNotification(
+                _t("Resources unavailable for the selected period.")
+            );
+            return;
+        }
+        const notifLabel =
+            ids.length > 1
+                ? _t("Shifts scheduled")
+                : result.schedule_type === "full"
+                ? _t("Shift scheduled")
+                : _t("Shift partially scheduled");
+        this.closeNotificationFn?.();
+        this.closeNotificationFn = this.notificationService.add(
+            markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${notifLabel}</span>`,
+            {
+                type: "success",
+                className: "planning_notification",
+                buttons: [
+                    {
+                        name: _t("Undo"),
+                        icon: "undo",
+                        onClick: async () => {
+                            this.closeNotificationFn?.();
+                            try {
+                                await this.model.orm.call(
+                                    this.model.metaData.resModel,
+                                    "undo_assign_slot",
+                                    [
+                                        ids,
+                                        result.undo_data.slots_created_ids,
+                                        result.undo_data.undo_vals,
+                                    ]
+                                );
+                                this.model.fetchData();
+                                this.closeNotificationFn = this.notificationService.add(
+                                    markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${
+                                        ids.length > 1
+                                            ? _t("Shifts unscheduled")
+                                            : _t("Shift unscheduled")
+                                    }</span>`,
+                                    {
+                                        type: "success",
+                                        className: "planning_notification",
+                                    }
+                                );
+                            } catch {
+                                this.closeNotificationFn = this.notificationService.add(
+                                    markup`<i class="fa fa-fw fa-times"></i><span class="ms-1">${_t(
+                                        "Could not undo scheduling"
+                                    )}</span>`,
+                                    {
+                                        type: "danger",
+                                        className: "planning_notification",
+                                    }
+                                );
+                            }
+                        },
+                    },
+                ],
+            }
+        );
+    }
+
+    openPlanDialogCallback(result) {
+        if (!result) {
+            this.displayFailedPlanningNotification(
+                _t("This resource is not available for this shift during the selected period.")
+            );
+        }
+    }
 }

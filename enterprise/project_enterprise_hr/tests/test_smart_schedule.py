@@ -1,9 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 
-from datetime import date, datetime
+from datetime import date, datetime, UTC
+
 from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
-import pytz
+
 from odoo.tests import tagged, freeze_time
 from odoo.tools import float_compare
 from odoo.addons.project_enterprise.tests.test_smart_schedule_common import TestSmartScheduleCommon
@@ -13,17 +14,6 @@ from .auto_shift_dates_hr_common import AutoShiftDatesHRCommon
 @tagged('-at_install', 'post_install')
 @freeze_time('2023-01-01')
 class TestSmartSchedule(TestSmartScheduleCommon):
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.flexible_calendar = cls.env['resource.calendar'].create({
-            'name': 'Flex Calendar 8h',
-            'tz': 'UTC',
-            'full_time_required_hours': 40.0,
-            'hours_per_day': 8.0,
-            'flexible_hours': True,
-        })
 
     def test_multi_users_tasks(self):
         """
@@ -48,10 +38,12 @@ class TestSmartSchedule(TestSmartScheduleCommon):
 
         self.env["hr.employee"].create([{
             "name": self.user_projectuser.name,
-            "user_id": self.user_projectuser.id
+            "user_id": self.user_projectuser.id,
+            "tz": "Europe/Brussels",
         }, {
             "name": self.user_projectmanager.name,
-            "user_id": self.user_projectmanager.id
+            "user_id": self.user_projectmanager.id,
+            "tz": "Europe/Brussels",
         }])
 
         self.env['resource.calendar.leaves'].create([{
@@ -59,13 +51,13 @@ class TestSmartSchedule(TestSmartScheduleCommon):
             'date_from': datetime(2023, 1, 3, 0),
             'date_to': datetime(2023, 1, 6, 23),
             'resource_id': self.user_projectuser.employee_id.resource_id.id,
-            'time_type': 'leave',
+            'count_as': 'absence',
         }, {
             'name': 'scheduled leave',
             'date_from': datetime(2023, 1, 5, 0),
             'date_to': datetime(2023, 1, 10, 23),
             'resource_id': self.user_projectmanager.employee_id.resource_id.id,
-            'time_type': 'leave',
+            'count_as': 'absence',
         }])
 
         result = (
@@ -109,12 +101,20 @@ class TestSmartSchedule(TestSmartScheduleCommon):
         both users (flex and regular)                                                                     |----------------------------> [task_project_pigs_no_allocated_hours_user]------
         """
         self.env.user.sudo().tz = 'UTC'
-        self.user_projectuser.company_id.resource_calendar_id.tz = 'UTC'
 
         self.task_project_pigs_with_allocated_hours_user.allocated_hours = 36
         self.user_projectuser.action_create_employee()
         self.user_projectmanager.action_create_employee()
-        self.user_projectuser.employee_id.write({"resource_calendar_id": self.flexible_calendar.id})
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 40,
+            'hours_per_day': 8,
+        })
+        self.user_projectuser.employee_id.write({
+            "resource_calendar_id": flexible_calendar.id,
+        })
         (self.user_projectuser.employee_id.resource_id | self.user_projectmanager.employee_id.resource_id).write({'tz': 'UTC'})
 
         self.task_project_goats_with_allocated_hours_user.write({
@@ -194,11 +194,20 @@ class TestSmartSchedule(TestSmartScheduleCommon):
                 - day 30: ~ 3.42
         """
         self.env.user.sudo().tz = 'UTC'
-        self.user_projectuser.company_id.resource_calendar_id.tz = 'UTC'
 
         self.user_projectuser.action_create_employee()
         self.user_projectmanager.action_create_employee()
-        self.user_projectuser.employee_id.write({"resource_calendar_id": self.flexible_calendar.id, "tz": "UTC"})
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 40,
+            'hours_per_day': 8,
+        })
+        self.user_projectuser.employee_id.write({
+            "resource_calendar_id": flexible_calendar.id,
+            "tz": "UTC"
+        })
         (self.user_projectuser.employee_id.resource_id | self.user_projectmanager.employee_id.resource_id).write({'tz': 'UTC'})
 
         self.task_project_goats_with_allocated_hours_user.write({
@@ -215,7 +224,7 @@ class TestSmartSchedule(TestSmartScheduleCommon):
             "allocated_hours": 6,
         })
 
-        min_start, max_end = pytz.utc.localize(datetime(2023, 7, 28)), pytz.utc.localize(datetime(2023, 7, 30, 16))
+        min_start, max_end = datetime(2023, 7, 28).replace(tzinfo=UTC), datetime(2023, 7, 30, 16).replace(tzinfo=UTC)
         _dummy, flex_users_hours_per_day, flex_user_work_hours_per_week = self.task_project_pigs_no_allocated_hours_user._web_gantt_get_valid_intervals(min_start, max_end, self.user_projectuser | self.user_projectmanager)
 
         self.assertEqual(float_compare(flex_users_hours_per_day[self.user_projectuser.id][date(2023, 7, 28)], 3.57, precision_digits=2), 0, "8 - 4.42")
@@ -274,12 +283,16 @@ class TestSmartSchedule(TestSmartScheduleCommon):
         both users (flex and regular)                                                                     |----------------------------> [task_project_pigs_no_allocated_hours_user]------
         """
         self.env.user.sudo().tz = 'UTC'
-        self.user_projectuser.company_id.resource_calendar_id.tz = 'UTC'
 
         self.task_project_pigs_with_allocated_hours_user.allocated_hours = 36
         self.user_projectuser.action_create_employee()
         self.user_projectmanager.action_create_employee()
-        self.user_projectuser.employee_id.write({"resource_calendar_id": False})
+        fully_flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Fully Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+        })
+        self.user_projectuser.employee_id.write({"resource_calendar_id": fully_flexible_calendar.id})
         (self.user_projectuser.employee_id.resource_id | self.user_projectmanager.employee_id.resource_id).write({'tz': 'UTC'})
 
         self.task_project_goats_with_allocated_hours_user.write({
@@ -322,6 +335,7 @@ class TestSmartSchedule(TestSmartScheduleCommon):
         self.assertEqual(self.task_project_pigs_no_allocated_hours_no_user.date_deadline, datetime(2023, 1, 4, 0))
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class ProjectEnterpriseHrTestSmartScheduleWithVersion(AutoShiftDatesHRCommon):
 
     @classmethod

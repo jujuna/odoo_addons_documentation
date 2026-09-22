@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-import base64
-
 from odoo import Command
 from odoo.addons.stock_account.tests.test_anglo_saxon_valuation_reconciliation_common import ValuationReconciliationTestCommon
 
-from odoo.tools import misc
+from odoo.tools import BinaryBytes
 
 
 class TestL10nClEdiStockCommon(ValuationReconciliationTestCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @ValuationReconciliationTestCommon.setup_country('cl')
@@ -39,24 +38,21 @@ class TestL10nClEdiStockCommon(ValuationReconciliationTestCommon):
         cls.stock_location = cls.warehouse.lot_stock_id.id
         cls.chilean_partner_a = cls.env['res.partner'].create({
             'name': 'Chilean Partner A',
-            'is_company': 1,
             'city': 'Pudahuel',
             'country_id': cls.env.ref('base.cl').id,
             'street': 'Puerto Test 102',
             'phone': '+562 0000 0000',
             'company_id': cls.env.company.id,
             'l10n_cl_dte_email': 'chilean.partner.a@example.com',
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_cl.it_RUT').id,
             'l10n_cl_sii_taxpayer_type': '1',
             'l10n_cl_activity_description': 'activity_test',
             'vat': '76086428-5',
             'l10n_cl_delivery_guide_price': 'sale_order',
         })
 
-        content = misc.file_open('certificate/tests/data/cert.pfx', mode='rb').read()
         cls.certificate = cls.env['certificate.certificate'].create({
             'name': 'CL Test certificate',
-            'content': base64.b64encode(content),
+            'content': cls.file_read('certificate/tests/data/cert.pfx'),
             'pkcs12_password': 'example',
             'subject_serial_number': '23841194-7',
             'company_id': cls.company_data['company'].id,
@@ -113,12 +109,11 @@ class TestL10nClEdiStockCommon(ValuationReconciliationTestCommon):
         l10n_latam_document_type_52 = cls.env.ref('l10n_cl.dc_gd_dte')
         l10n_latam_document_type_52.write({'active': True})
 
-        caf_file_template = misc.file_open('l10n_cl_edi_stock/tests/template/caf_file_template.xml').read()
-
-        caf52_file = caf_file_template.replace('<TD></TD>', '<TD>52</TD>')
+        caf_file_template = cls.file_read('l10n_cl_edi_stock/tests/template/caf_file_template.xml')
+        caf52_file = BinaryBytes(caf_file_template.content.replace(b'<TD></TD>', b'<TD>52</TD>'))
         cls.caf52_file = cls.env['l10n_cl.dte.caf'].with_company(cls.env.company.id).sudo().create({
             'filename': 'FoliosSII7620122435221201910221946.xml',
-            'caf_file': base64.b64encode(caf52_file.encode('utf-8')),
+            'caf_file': caf52_file,
             'l10n_latam_document_type_id': l10n_latam_document_type_52.id,
             'status': 'in_use',
         })

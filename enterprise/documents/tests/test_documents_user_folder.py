@@ -1,12 +1,12 @@
 from odoo import Command
 from odoo.exceptions import UserError
 from odoo.fields import Domain
-from odoo.tests import users
+from odoo.tests import tagged, users
 
-from odoo.addons.documents.controllers.documents import ShareRoute
 from odoo.addons.documents.tests.test_documents_common import TransactionCaseDocuments
 
 
+@tagged('at_install', '-post_install')  # at_install to avoid constraints archiving non-test folders
 class TestDocumentsUserFolder(TransactionCaseDocuments):
 
     def assertDocumentsEqual(self, actual, expected):
@@ -32,8 +32,8 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
             cls.company_folder,
             cls.company_restr_folder,
         ) = cls.env['documents.document'].sudo().create([
-            {'name': 'Company Document', 'owner_id': False, 'access_internal': 'view'},
-            {'name': 'Company Document Restricted', 'owner_id': False},
+            {'name': 'Company Document', 'owner_id': False, 'access_internal': 'view', 'raw': 'test'},
+            {'name': 'Company Document Restricted', 'owner_id': False, 'raw': 'test'},
             {
                 'name': "Internal User's Drive Document",
                 'owner_id': cls.internal_user.id,
@@ -70,6 +70,7 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
             'name': f'{label} Shared doc',
             'folder_id': folder.id,
             'access_internal': 'view',
+            'raw': 'test',
         } for (label, folder) in (
             ('Company', cls.sub_company_admin),
             ('Drive', cls.sub_drive_admin),
@@ -96,7 +97,7 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
         )
         # Log access to folder_a
         for user in cls.doc_user, cls.document_sys_admin, cls.portal_user, cls.internal_user:
-            ShareRoute._upsert_last_access_date(cls.env(user=user), cls.folder_a)
+            cls.env['documents.document'].with_user(user)._upsert_last_access_date(cls.folder_a)
 
         cls.company_restr_doc.action_update_access_rights(partners={cls.doc_user.partner_id: ('view', False)})
         cls.env['documents.document'].search([('id', 'not in', cls.test_documents.ids)]).action_archive()
@@ -126,7 +127,7 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
         ]
         for vals, expected in cases:
             with self.subTest(vals=vals):
-                doc = self.env['documents.document'].with_context(context).create(vals)
+                doc = self.env['documents.document'].with_context(context).create(vals | {'raw': 'test'})
                 for key, value in expected.items():
                     self.assertEqual(doc[key], value)
 
@@ -138,13 +139,16 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
         ).create([
             {
                 'name': 'defaults',
+                'raw': 'test',
             },
             {
                 'name': 'Company document',
                 'user_folder_id': 'COMPANY',
+                'raw': 'test',
             }, {
                 'name': 'My Drive Document',
                 'user_folder_id': 'MY',
+                'raw': 'test',
             }, {
                 'name': 'Folder A/B',
                 'type': 'folder',
@@ -153,6 +157,7 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
                 'name': 'Document A/B2',
                 'folder_id': self.folder_a.id,
                 'user_folder_id': str(self.folder_a.id),
+                'raw': 'test',
             }
         ])
         self.assertEqual(defaults.folder_id.id, self.folder_a_a.id)
@@ -171,6 +176,7 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
                     self.env['documents.document'].create({
                         'name': 'Should fail',
                         'user_folder_id': user_folder_id,
+                        'raw': 'test',
                     })
         for idx, values in enumerate((
             {'user_folder_id': str(self.folder_a_a.id), 'folder_id': self.folder_a.id},  # different folder_id
@@ -179,14 +185,14 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
         )):
             with self.subTest(idx=idx):
                 with self.subTest(kind='create'), self.assertRaises(UserError):
-                    self.env['documents.document'].create(values)
+                    self.env['documents.document'].create(values | {'raw': 'test'})
                 with self.subTest(kind='write'), self.assertRaises(UserError):
                     my.write(values)
 
     @users('internal_user')
-    def test_search_child_of(self):
+    def test_search_user_root(self):
         my_subfolder, company_subfolder, sub_sub_company_admin = self.env["documents.document"].sudo().create([
-            {'name': 'My Subfolder', 'folder_id': self.internal_drive.id},
+            {'name': 'My Subfolder', 'folder_id': self.internal_drive.id, 'type': 'folder'},
             {'name': 'Company Subfolder', 'type': 'folder', 'folder_id': self.company_folder.id},
             {
                 'name': 'Sub Company Admin Folder',
@@ -195,37 +201,71 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
                 'folder_id': self.sub_company_admin.id,
             },
         ])
+        # Archived in My Drive
+        self.env["documents.document"].sudo().create(
+            {'name': 'My Subfolder', 'folder_id': self.internal_drive.id, 'type': 'folder', 'active': False}
+        )
         sub_company_admin_folder_doc = self.env['documents.document'].create({
             'name': 'Sub Company Admin Folder Doc',
             'access_internal': 'view',
             'folder_id': sub_sub_company_admin.id,
+            'type': 'binary',
+            'raw': b'test',
         })
+        company_admin = self.env['documents.document'].sudo().create({
+            'name': 'Company Admin Subfolder',
+            'type': 'folder',
+            'folder_id': self.company_folder.id,
+            'access_internal': 'none',
+            'owner_id': False,
+            'children_ids': [
+                Command.create({
+                    'name': 'Shared doc',
+                    'access_internal': 'view',
+                    'owner_id': False,
+                    'raw': 'test',
+                }),
+            ],
+        })
+        company_subfolder_doc = company_admin.children_ids
+        expected_my = self.internal_drive | my_subfolder
+        expected_company = self.company_folder | company_subfolder | self.company_doc
+        expected_shared = (self.folder_a | self.folder_a_a | self.folder_b | self.shared_doc_company_sub | self.shared_doc_drive
+             | self.shared_doc_company | sub_sub_company_admin | sub_company_admin_folder_doc | company_subfolder_doc)
         cases = [
-            ('SHARED',
-             self.folder_a | self.folder_a_a | self.folder_b | self.shared_doc_company_sub | self.shared_doc_drive
-             | self.shared_doc_company | sub_sub_company_admin | sub_company_admin_folder_doc),
-            ('MY', self.internal_drive | my_subfolder),
-            ('COMPANY', self.company_folder | company_subfolder | self.company_doc),
-            (str(self.internal_drive.id), my_subfolder),
+            ({'CRACK'}, self.env["documents.document"]),
+            ({'SHARED'}, expected_shared),
+            ({'MY'}, expected_my),
+            ({'COMPANY'}, expected_company),
+            ({'MY', 'COMPANY'}, expected_my | expected_company),
+            ({'MY', 'SHARED'}, expected_my | expected_shared),
+            ({'COMPANY', 'SHARED'}, expected_company | expected_shared),
+            ({'MY', 'COMPANY', 'SHARED'}, expected_my | expected_company | expected_shared),
+            ({'MY', 'COMPANY', 'SHARED', 'CRACK'}, expected_my | expected_company | expected_shared),
         ]
         accessible_documents = self.env["documents.document"].search([])
-        for user_folder_id, expected in cases:
-            with self.subTest(user_folder_id=user_folder_id):
-                domain = [('user_folder_id', 'child_of', user_folder_id)]
+        for user_root, expected in cases:
+            with self.subTest(user_root=user_root):
+                domain = Domain('user_root', 'in', user_root)
                 actual = self.env['documents.document'].search(domain)
                 self.assertDocumentsEqual(actual, expected)
                 filtered = accessible_documents.filtered_domain(domain)
                 self.assertDocumentsEqual(filtered, expected)
+                with self.subTest(active=False):
+                    self.assertFalse(
+                        self.env["documents.document"].search(domain & Domain("active", "=", False))
+                    )
 
     @users('internal_user')
     def test_search_folder_id_child_of(self):
-        my_subfolder, company_subfolder = self.env['documents.document'].create([
-            {'name': 'My Subfolder', 'folder_id': self.internal_drive.id},
+        my_subfolder, company_subfolder, archived = self.env['documents.document'].create([
+            {'name': 'My Subfolder', 'folder_id': self.internal_drive.id, 'raw': 'test'},
             {'name': 'Company Subfolder', 'type': 'folder', 'folder_id': self.company_folder.id},
+            {'name': 'Company SubFolder Archived', 'type': 'folder', 'folder_id': self.company_folder.id, 'active': False},
         ])
         cases = [
             (self.internal_drive, self.internal_drive | my_subfolder),  # not shared_doc_drive
-            (self.company_folder, self.company_folder | company_subfolder)  # not shared_doc_company_sub
+            (self.company_folder, self.company_folder | company_subfolder)  # not shared_doc_company_sub nor archived
         ]
         accessible_documents = self.env["documents.document"].search([])
         for folder, expected in cases:
@@ -235,6 +275,15 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
                 self.assertDocumentsEqual(actual, expected)
                 filtered = accessible_documents.filtered_domain(domain)
                 self.assertDocumentsEqual(filtered, expected)
+
+        # Search in the Trash should find archived children
+        self.assertDocumentsEqual(
+            self.env["documents.document"].search(
+                Domain("active", "=", False)
+                & Domain("folder_id", "child_of", self.company_folder.id)
+            ),
+            archived,
+        )
 
     def test_compute_and_search_user_folder_id_equal(self):
         """Test user_folder_id's compute and search with "equal" operator.
@@ -344,17 +393,17 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
                 {},
                 {
                     "Company": None,
-                    "Company Admin Subfolder": self.company_folder.id,
+                    "Company Admin Subfolder": self.sub_company_admin.user_folder_id,
                     "Company Folder": "COMPANY",
                     "Company Restricted Folder": "COMPANY",
-                    "Drive Admin Subfolder": self.internal_drive.id,
+                    "Drive Admin Subfolder": self.sub_drive_admin.user_folder_id,
                     "Internal User's Drive Document": "SHARED",
                     "My Drive": None,
                     "Recent": None,
                     "Shared with me": None,
                     "Trash": None,
                     "folder A": "SHARED",
-                    "folder A - A": self.folder_a.id,
+                    "folder A - A": self.folder_a_a.user_folder_id,
                     "folder B": "SHARED",
                 },
             ),
@@ -362,7 +411,7 @@ class TestDocumentsUserFolder(TransactionCaseDocuments):
                 {"documents_unique_folder_id": self.folder_a.id},
                 {
                     "folder A": False,
-                    "folder A - A": self.folder_a.id,
+                    "folder A - A": self.folder_a_a.user_folder_id,
                 },
             ),
         ]

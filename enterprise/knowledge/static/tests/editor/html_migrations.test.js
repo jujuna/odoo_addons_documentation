@@ -17,7 +17,6 @@ import {
     mountWithCleanup,
     onRpc,
 } from "@web/../tests/web_test_helpers";
-import { Deferred } from "@web/core/utils/concurrency";
 import { SearchModel } from "@web/search/search_model";
 import { WebClient } from "@web/webclient/webclient";
 
@@ -173,7 +172,7 @@ describe("test migration of embedded views and view links filters", () => {
     });
 
     test("Ensure that embedded views filters and favorites have their `user_id` field converted to `user_ids`", async function () {
-        const searchModelPromise = new Deferred();
+        const searchModelPromise = Promise.withResolvers();
         before(() => {
             mockKnowledgeCommentsService();
             patchWithCleanup(WithLazyLoading.prototype, {
@@ -203,7 +202,7 @@ describe("test migration of embedded views and view links filters", () => {
             props: { resId: 1 },
             viewType: "form",
         });
-        const searchModel = await searchModelPromise;
+        const searchModel = await searchModelPromise.promise;
         expect(searchModel.query).toEqual([{ searchItemId: 1 }]);
         const myFavorite = searchModel.searchItems[1];
         expect(myFavorite.description).toEqual("myFavorite");
@@ -221,8 +220,8 @@ describe("test migration of embedded views and view links filters", () => {
     });
 
     test("Ensure that embedded views links filters have their `user_id` field converted to `user_ids`", async function () {
-        const viewLinkPromise = new Deferred();
-        const searchModelPromise = new Deferred();
+        const viewLinkPromise = Promise.withResolvers();
+        const searchModelPromise = Promise.withResolvers();
         let saveSearchModel = false;
         before(() => {
             mockKnowledgeCommentsService();
@@ -260,7 +259,7 @@ describe("test migration of embedded views and view links filters", () => {
             props: { resId: 2 },
             viewType: "form",
         });
-        const viewLink = await viewLinkPromise;
+        const viewLink = await viewLinkPromise.promise;
         expect(
             htmlFieldComponent.editor
                 .getElContent()
@@ -268,7 +267,7 @@ describe("test migration of embedded views and view links filters", () => {
         ).toHaveCount(1);
         saveSearchModel = true;
         viewLink.openViewLink();
-        const searchModel = await searchModelPromise;
+        const searchModel = await searchModelPromise.promise;
         expect(searchModel.query).toEqual([{ searchItemId: 1 }]);
         const myFavorite = searchModel.searchItems[1];
         expect(myFavorite.description).toEqual("myFavorite");

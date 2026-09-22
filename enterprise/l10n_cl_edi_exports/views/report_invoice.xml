@@ -16,8 +16,8 @@
                         </thead>
                         <tbody>
                             <tr class="exports_body">
-                                <td t-out="o.l10n_cl_port_origin_id.name" class="text-start"/>
-                                <td t-out="o.l10n_cl_port_destination_id.name" class="text-start"/>
+                                <td t-out="o.l10n_cl_port_origin_id.name or ''" class="text-start"/>
+                                <td t-out="o.l10n_cl_port_destination_id.name or ''" class="text-start"/>
                                 <td t-out="o.l10n_cl_customs_quantity_of_packages" class="text-center"/>
                                 <td>
                                     <span t-if="o.l10n_cl_customs_service_indicator" class="text-start"
@@ -55,7 +55,7 @@
 
                                 <td>
                                     <t t-if="inv_rate">
-                                        <span t-esc="'%s %.2f CLP' % (o.currency_id.l10n_cl_short_name, inv_rate)" class="text-start"/>
+                                        <span t-out="'%s %.2f CLP' % (o.currency_id.l10n_cl_short_name, inv_rate)" class="text-start"/>
                                     </t>
                                 </td>
                                 <td>

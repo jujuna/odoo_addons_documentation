@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import copy
 
 from datetime import datetime
-from freezegun import freeze_time
-from unittest.mock import patch
 
 from odoo import exceptions
 from odoo.addons.mass_mailing.tests.common import MassMailCommon
@@ -12,6 +9,7 @@ from odoo.tests import Form, tagged, users
 
 
 @tagged('mailing_list')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMailingContactAccess(MassMailCommon):
 
     @users('user_marketing')
@@ -43,57 +41,7 @@ class TestMailingContactAccess(MassMailCommon):
 
 
 @tagged('mailing_list')
-class TestMailingContactToList(MassMailCommon):
-
-    @users('user_marketing')
-    def test_mailing_contact_to_list(self):
-        contacts = self.env['mailing.contact'].create([{
-            'name': 'Contact %02d',
-            'email': 'contact_%02d@test.example.com',
-        } for x in range(30)])
-
-        self.assertEqual(len(contacts), 30)
-        self.assertEqual(contacts.list_ids, self.env['mailing.list'])
-
-        mailing = self.env['mailing.list'].create({
-            'name': 'Contacts Agregator',
-        })
-
-        # create wizard with context values
-        wizard_form = Form(self.env['mailing.contact.to.list'].with_context(default_contact_ids=contacts.ids))
-        self.assertEqual(wizard_form.contact_ids.ids, contacts.ids)
-
-        # set mailing list and add contacts
-        wizard_form.mailing_list_id = mailing
-        wizard = wizard_form.save()
-        frozen_time = datetime(2025, 1, 1, 0, 0)
-        with self.mock_datetime_and_now(frozen_time):
-            action = wizard.action_add_contacts()
-            self.assertEqual(contacts.list_ids, mailing)
-            create_dates = contacts.subscription_ids.mapped('create_date')
-            self.assertTrue(all(date == frozen_time for date in create_dates), "All create dates should be equal to frozen datetime")
-        self.assertEqual(action["type"], "ir.actions.client")
-        self.assertTrue(action.get("params", {}).get("next"), "Should return a notification with a next action")
-        subaction = action["params"]["next"]
-        self.assertEqual(subaction["type"], "ir.actions.act_window_close")
-
-        # set mailing list, add contacts and redirect to mailing view
-        mailing2 = self.env['mailing.list'].create({
-            'name': 'Contacts Sublimator',
-        })
-
-        wizard_form.mailing_list_id = mailing2
-        wizard = wizard_form.save()
-        action = wizard.action_add_contacts_and_send_mailing()
-        self.assertEqual(contacts.list_ids, mailing + mailing2)
-        self.assertEqual(action["type"], "ir.actions.client")
-        self.assertTrue(action.get("params", {}).get("next"), "Should return a notification with a next action")
-        subaction = action["params"]["next"]
-        self.assertEqual(subaction["type"], "ir.actions.act_window")
-        self.assertEqual(subaction["context"]["default_contact_list_ids"], [mailing2.id])
-
-
-@tagged('mailing_list')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMailingListMerge(MassMailCommon):
 
     @classmethod
@@ -101,7 +49,7 @@ class TestMailingListMerge(MassMailCommon):
         super(TestMailingListMerge, cls).setUpClass()
         cls._create_mailing_list()
 
-        cls.mailing_list_3 = cls.env['mailing.list'].with_context(cls._test_context).create({
+        cls.mailing_list_3 = cls.env['mailing.list'].create({
             'name': 'ListC',
             'contact_ids': [
                 (0, 0, {'name': 'Norberto', 'email': 'norbert@example.com'}),
@@ -141,8 +89,7 @@ class TestMailingListMerge(MassMailCommon):
             new = new.with_context(default_list_ids=[list_id])
             self.assertFalse(any(contact.opt_out for contact in new))
 
-        with freeze_time('2022-01-01 12:00'), \
-             patch.object(self.env.cr, 'now', lambda: datetime(2022, 1, 1, 12, 0, 0)):
+        with self.mock_datetime_and_now(datetime(2022, 1, 1, 12, 0, 0)):
             contact_form = Form(self.env['mailing.contact'])
             contact_form.name = 'Contact_test'
             with contact_form.subscription_ids.new() as subscription:
@@ -180,55 +127,9 @@ class TestMailingListMerge(MassMailCommon):
         contact_2 = contact_1.with_context(default_list_ids=self.mailing_list_3.ids).copy()
         self.assertEqual(contact_1.list_ids, contact_2.list_ids, 'Should copy the existing mailing list(s)')
 
-    @users('user_marketing')
-    def test_mailing_list_merge(self):
-        # TEST CASE: Merge A,B into the existing mailing list C
-        # The mailing list C contains the same email address than 'Norbert' in list B
-        # This test ensure that the mailing lists are correctly merged and no
-        # duplicates are appearing in C
-        merge_form = Form(self.env['mailing.list.merge'].with_context(
-            active_ids=[self.mailing_list_1.id, self.mailing_list_2.id],
-            active_model='mailing.list'
-        ))
-        merge_form.new_list_name = False
-        merge_form.merge_options = 'existing'
-        # Need to set `merge_options` before `dest_lid_id` so `dest_list_id` is visible
-        # `'invisible': [('merge_options', '=', 'new')]`
-        merge_form.dest_list_id = self.mailing_list_3
-        merge_form.archive_src_lists = False
-        result_list = merge_form.save().action_mailing_lists_merge()
-
-        # Assert the number of contacts is correct
-        self.assertEqual(
-            len(result_list.contact_ids.ids), 5,
-            'The number of contacts on the mailing list C is not equal to 5')
-
-        # Assert there's no duplicated email address
-        self.assertEqual(
-            len(list(set(result_list.contact_ids.mapped('email')))), 5,
-            'Duplicates have been merged into the destination mailing list. Check %s' % (result_list.contact_ids.mapped('email')))
-
-    @users('user_marketing')
-    def test_mailing_list_merge_cornercase(self):
-        """ Check wrong use of merge wizard """
-        with self.assertRaises(exceptions.UserError):
-            merge_form = Form(self.env['mailing.list.merge'].with_context(
-                active_ids=[self.mailing_list_1.id, self.mailing_list_2.id],
-            ))
-
-        merge_form = Form(self.env['mailing.list.merge'].with_context(
-            active_ids=[self.mailing_list_1.id],
-            active_model='mailing.list',
-            default_src_list_ids=[self.mailing_list_1.id, self.mailing_list_2.id],
-            default_dest_list_id=self.mailing_list_3.id,
-            default_merge_options='existing',
-        ))
-        merge = merge_form.save()
-        self.assertEqual(merge.src_list_ids, self.mailing_list_1 + self.mailing_list_2)
-        self.assertEqual(merge.dest_list_id, self.mailing_list_3)
-
 
 @tagged('mailing_list')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMailingContactImport(MassMailCommon):
     """Test the transient <mailing.contact.import>."""
 
@@ -255,7 +156,6 @@ class TestMailingContactImport(MassMailCommon):
         ])
 
         self.env['mailing.mailing'].create({
-            'name': 'Test',
             'subject': 'Test',
             'contact_list_ids': (first_list | second_list).ids,
         })
@@ -327,6 +227,7 @@ class TestMailingContactImport(MassMailCommon):
 
 
 @tagged('mailing_list')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSubscriptionManagement(MassMailCommon):
 
     @users('user_marketing')

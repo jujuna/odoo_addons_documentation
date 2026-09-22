@@ -14,7 +14,6 @@ export function mockKnowledgeCommentsService() {
         createThreadAndPost() {},
         createVirtualThread() {},
         deleteThread() {},
-        fetchMessages() {},
         getCommentsState: () => ({
             articleId: undefined,
             activeThreadId: undefined,

@@ -4,7 +4,7 @@
 import ast
 from dateutil.relativedelta import relativedelta
 
-from odoo import api, fields, models
+from odoo import api, fields, models, modules
 from odoo.tools import split_every, SQL
 
 # When cleaning_mode = automatic, _clean_records calls action_validate.
@@ -64,6 +64,17 @@ class Data_CleaningModel(models.Model):
         if any(rule.field_id.model_id != self.res_model_id for rule in self.rule_ids):
             self.rule_ids = [(5, 0, 0)]
 
+    @api.onchange('cleaning_mode')
+    def _onchange_cleaning_mode(self):
+        if self.cleaning_mode == 'automatic':
+            return {
+                'warning': {
+                    'title': "Automatic Mode",
+                    'message': "When enabling automatic mode your rules will run periodically without manual validation. "
+                               "Please note that these changes are permanent and cannot be reversed."
+                }
+            }
+
     def _compute_records_to_clean(self):
         count_data = self.env['data_cleaning.record']._read_group(
             [('cleaning_model_id', 'in', self.ids)],
@@ -80,13 +91,6 @@ class Data_CleaningModel(models.Model):
     def _clean_records_format_phone(self, **kwargs):
         self.ensure_one()
 
-        self.env.cr.execute("""
-            SELECT res_id, data_cleaning_rule_id
-            FROM data_cleaning_record
-            JOIN data_cleaning_record_data_cleaning_rule_rel
-            ON data_cleaning_record_data_cleaning_rule_rel.data_cleaning_record_id = data_cleaning_record.id""")
-        existing_rows = self.env.cr.fetchall()
-
         field = kwargs['field_name']
         records = self.env[self.res_model_name].search([(field, 'not in', [False, ''])])
         records = records.with_context(prefetch_fields=False)
@@ -98,7 +102,7 @@ class Data_CleaningModel(models.Model):
         for record in records:
             record_country = self.env['data_cleaning.record']._get_country_id(record)
             formatted = self.env[self.res_model_name]._phone_format(number=record[field], country=record_country, force_format='INTERNATIONAL')
-            if (record.id, rule_ids[0]) not in existing_rows and formatted and record[field] != formatted:
+            if formatted and record[field] != formatted:
                 result.append({
                     'res_id': record['id'],
                     'rule_ids': rule_ids,
@@ -110,9 +114,10 @@ class Data_CleaningModel(models.Model):
 
     def _clean_records(self, batch_commits=False):
         self.env.flush_all()
+        is_test = modules.module.current_test
 
         records_to_clean = []
-        cleaning_record_table = SQL.identifier(self.env['data_cleaning.record']._table)
+        cleaning_record_model = self.env['data_cleaning.record']
         for cleaning_model in self:
             records_to_create = []
             active_model = self.env[cleaning_model.res_model_name]
@@ -122,13 +127,27 @@ class Data_CleaningModel(models.Model):
             active_cond = SQL("AND %s", SQL.identifier(active_name)) if active_name else SQL()
 
             field_actions = cleaning_model.rule_ids._action_to_sql()
+            # set of (res_id, field_id) for records matching at least one rule, used to create new cleaning records and remove obsolete ones.
+            records_matching_rules = set()
+            record_values_by_key = {}
             for field_name, field_action in field_actions.items():
                 action = field_action['action']
                 operator = field_action['operator']
+                field_id = field_action['field_id']
+                rule_ids = field_action['rule_ids']
                 if operator is False:  # special case for ACTIONS_SQL
                     cleaner = getattr(cleaning_model, '_clean_records_%s' % action)
                     values = cleaner(**field_action)
-                    records_to_create += values
+                    for value in values:
+                        res_id = value['res_id']
+                        key = (res_id, field_id)
+                        records_matching_rules.add(key)
+                        record_values_by_key[key] = {
+                            'res_id': res_id,
+                            'rule_ids': rule_ids,
+                            'cleaning_model_id': cleaning_model.id,
+                            'field_id': field_id,
+                        }
                 else:
                     query = SQL(
                         """
@@ -138,39 +157,67 @@ class Data_CleaningModel(models.Model):
                             %(table)s
                         WHERE
                             %(field)s %(operator)s %(cleaned_field_expr)s
-                            AND NOT EXISTS(
-                                SELECT 1
-                                FROM %(cleaning_record_table)s
-                                WHERE
-                                    res_id = %(table)s.id
-                                    AND cleaning_model_id = %(cleaning_model_id)s)
                             %(active_cond)s
                         ORDER BY id
                         """,
                         table=table,
                         field=(field := active_model._field_to_sql(active_model._table, field_name)),
-                        operator=SQL(operator),
+                        operator=operator,
                         # can be complex sql expression & multiple actions get
                         # combined through string formatting, so doesn't seem
                         # to be a smarter solution than whitelisting the entire thing
-                        cleaned_field_expr=SQL(action, field) if field_action['composable'] else SQL(action),
-                        cleaning_record_table=cleaning_record_table,
-                        cleaning_model_id=cleaning_model.id,
-                        active_cond=active_cond
+                        cleaned_field_expr=action(field),
+                        active_cond=active_cond,
                     )
                     self.env.cr.execute(query)
-                    for r in self.env.cr.fetchall():
-                        records_to_create.append({
-                            'res_id': r[0],
+                    for (res_id,) in self.env.cr.fetchall():
+                        key = (res_id, field_id)
+                        records_matching_rules.add(key)
+                        record_values_by_key[key] = {
+                            'res_id': res_id,
                             'rule_ids': field_action['rule_ids'],
                             'cleaning_model_id': cleaning_model.id,
-                            'field_id': field_action['field_id'],
-                        })
+                            'field_id': field_id,
+                        }
+
+            # Get existing cleaning records for this model so we can remove the ones that no longer match the rules.
+            self.env.cr.execute("""
+                SELECT id, res_id, field_id
+                  FROM data_cleaning_record
+                 WHERE cleaning_model_id = %s
+            """, (cleaning_model.id,))
+
+            # create a dict with key (res_id, field_id) to find the existing cleaning record,
+            # so we can avoid creating duplicates and remove obsolete ones.
+            existing_records_map = {
+                (res_id, field_id): rec_id
+                for rec_id, res_id, field_id in self.env.cr.fetchall()
+            }
+            existing_keys = set(existing_records_map.keys())
+
+            # Determine which records need to be created and which ones need to be deleted
+            # to update the cleaning records according to the rules.
+            to_create_keys = records_matching_rules - existing_keys
+            to_delete_keys = existing_keys - records_matching_rules
+
+            if to_delete_keys:
+                ids_to_delete = [existing_records_map[key] for key in to_delete_keys]
+                cleaning_record_model.browse(ids_to_delete).unlink()
+
+            records_to_create = [record_values_by_key[key] for key in sorted(to_create_keys)]
 
             if cleaning_model.cleaning_mode == 'automatic':
+                existing_records = self.env['data_cleaning.record'].search([
+                    ('cleaning_model_id', '=', cleaning_model.id)
+                ])
+                for idx in range(0, len(existing_records), DR_CREATE_STEP_AUTO):
+                    existing_batch = existing_records[idx:idx + DR_CREATE_STEP_AUTO]
+                    existing_batch.action_validate()
+                    if batch_commits and not is_test:
+                        self.env.cr.commit()
                 for records_to_create_batch in split_every(DR_CREATE_STEP_AUTO, records_to_create):
                     self.env['data_cleaning.record'].create(records_to_create_batch).action_validate()
-                    if batch_commits:
+                    if batch_commits and not is_test:
                         # Commit after each batch iteration to avoid complete rollback on timeout as
                         # this can create lots of new records.
                         self.env.cr.commit()
@@ -178,7 +225,7 @@ class Data_CleaningModel(models.Model):
                 records_to_clean = records_to_clean + records_to_create
         for records_to_clean_batch in split_every(DR_CREATE_STEP_MANUAL, records_to_clean):
             self.env['data_cleaning.record'].create(records_to_clean_batch)
-            if batch_commits:
+            if batch_commits and not is_test:
                 self.env.cr.commit()
 
     @api.model
@@ -249,3 +296,21 @@ class Data_CleaningModel(models.Model):
 
         if self.cleaning_mode == 'manual':
             return self.open_records()
+
+    def refresh_clean_records(self):
+        """
+        Refresh cleaned records and reopen the Data Cleaning view.
+        Preserves the selected search panel filter by passing
+        `cleaning_model_id` into the action context.
+        """
+        self.search([])._clean_records(batch_commits=True)
+        cleaning_model_id = self.env.context.get('cleaning_model_id')
+        action = self.env["ir.actions.actions"]._for_xml_id("data_cleaning.action_data_cleaning_record")
+        context = action.get('context', {})
+        if isinstance(context, str):
+            context = ast.literal_eval(context)
+        if cleaning_model_id:
+            context['searchpanel_default_cleaning_model_id'] = cleaning_model_id
+        action['context'] = context
+        action['target'] = 'main'
+        return action

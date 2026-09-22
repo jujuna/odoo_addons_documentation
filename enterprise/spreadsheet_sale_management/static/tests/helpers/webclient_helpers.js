@@ -1,5 +1,4 @@
 import { onMounted } from "@odoo/owl";
-import { Deferred } from "@odoo/hoot-mock";
 import { SpreadsheetFieldSyncAction } from "@spreadsheet_sale_management/bundle/field_sync/action/field_sync_action";
 import { getService, patchWithCleanup, mountWithCleanup } from "@web/../tests/web_test_helpers";
 import { WebClient } from "@web/webclient/webclient";
@@ -14,7 +13,7 @@ import {
  * @param {number} [params.spreadsheetId]
  */
 export async function mountSaleOrderSpreadsheetAction(params = {}) {
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     let spreadsheetAction = {};
     patchWithCleanup(SpreadsheetFieldSyncAction.prototype, {
         setup() {
@@ -33,7 +32,7 @@ export async function mountSaleOrderSpreadsheetAction(params = {}) {
             spreadsheet_id: params.spreadsheetId ?? 1,
         },
     });
-    await def;
+    await def.promise;
     const model = getSpreadsheetActionModel(spreadsheetAction);
     const env = getSpreadsheetActionEnv(spreadsheetAction);
     return { model, env, webClient };

@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add('account_reports_search', {
-    url: '/odoo/action-account_reports.action_account_report_general_ledger',
     steps: () => [
         {
             content: "click search",
@@ -30,7 +29,7 @@ registry.category("web_tour.tours").add('account_reports_search', {
         },
         {
             content: 'test if the receivable line is present',
-            trigger: '.line_name:contains("121000 Account Receivable")',
+            trigger: '.line_name:contains("121000 Accounts Receivable")',
             run: 'click',
         },
         {

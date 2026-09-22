@@ -1,3 +1,3 @@
--- disable l10n_l10n_be_hr_payroll_dimona
+-- disable DIMONA/DmfA
 UPDATE res_company
    SET onss_expeditor_number = 'dummy';

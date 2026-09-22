@@ -1,14 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from base64 import b64encode
-
 from odoo.tests import tagged
-from odoo.tools import file_open
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
 @tagged('-at_install', 'post_install_l10n', 'post_install')
 class AccountTestSAFTImport(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('dk')
     def setUpClass(cls):
@@ -16,8 +15,7 @@ class AccountTestSAFTImport(AccountTestInvoicingCommon):
 
         cls.company.write({'name': 'SAF-T test company'})
 
-        with file_open('l10n_dk_saft_import/tests/data/saft_example_dk.xml') as f:
-            cls.saft_filedata = b64encode(f.read().encode())
+        cls.saft_filedata = cls.file_read('l10n_dk_saft_import/tests/data/saft_example_dk.xml')
 
         # Accounts codes that should be present after import of the SAF-T example file
         cls.reference_accounts = {

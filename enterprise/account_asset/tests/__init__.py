@@ -3,6 +3,8 @@
 
 from . import common
 from . import test_account_asset
+from . import test_asset_ledger
 from . import test_asset_template
 from . import test_board_compute
+from . import test_depreciation_model
 from . import test_reevaluation_asset

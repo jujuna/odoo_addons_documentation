@@ -1,33 +1,35 @@
-import { _t } from "@web/core/l10n/translation";
 import { Dialog } from '@web/core/dialog/dialog';
 import { FormViewDialog } from '@web/views/view_dialogs/form_view_dialog';
-import { useChildRef, useService } from '@web/core/utils/hooks';
-import { Component } from "@odoo/owl";
+import { useOwnedDialogs, useService } from '@web/core/utils/hooks';
+import { Component, signal, t, useProps } from "@odoo/owl";
+import { ConfirmationDialog } from '@web/core/confirmation_dialog/confirmation_dialog';
+import { _t } from '@web/core/l10n/translation';
 
 export class AddSocialStreamDialog extends Component {
     static components = { Dialog };
     static template = "social.AddSocialStreamDialog";
-    static props = {
-        title: String,
-        socialAccounts: Array,
-        isSocialManager: Boolean,
-        onSaved: Function,
-        close: Function,
-        socialMedia: Object,
-        companies: Array,
-    };
+
+    props = useProps({
+        socialAccounts: t.array(),
+        isSocialManager: t.boolean(),
+        onSaved: t.function(),
+        close: t.function(),
+        socialMedia: t.array(),
+        companies: t.array(),
+    });
 
     setup() {
         super.setup();
         this.dialog = useService('dialog');
-        this.modalRef = useChildRef();
+        this.modalRef = signal.ref();
         this.orm = useService('orm');
+        this.action = useService("action");
+        this.addDialog = useOwnedDialogs();
     }
 
     _onClickSocialAccount(event) {
         const target = event.currentTarget;
         this.dialog.add(FormViewDialog, {
-            title: _t('Add a Stream'),
             resModel: 'social.stream',
             context: {
                 default_media_id: parseInt(target.dataset.mediaId),
@@ -39,16 +41,31 @@ export class AddSocialStreamDialog extends Component {
         this.props.close();
     }
 
-    _onClickSocialMedia(event) {
-        const mediaId = parseInt(event.currentTarget.dataset.mediaId);
-        const selectCompany = this.modalRef.el.querySelector('select[name="company_id"]');
+    async _onClickSocialMedia(mediaId, context) {
+        const selectCompany = this.modalRef().querySelector('select[name="company_id"]');
         const companyId = selectCompany ? parseInt(selectCompany.value) || 0 : undefined;
-
-        this.orm.call('social.media', 'action_add_account', [mediaId], {
-            company_id: companyId
-        }).then((action) => {
-            document.location = action.url;
+        const action = await this.orm.call("social.media", "action_add_account", [mediaId], {
+            company_id: companyId,
+            context,
         });
+        this.action.doAction(action);
     }
 
+    get medias() {
+        return this.props.socialMedia;
+    }
+
+    /**
+     * Remove the given social account.
+     */
+    async _onDeleteAccount(accountId) {
+        this.addDialog(ConfirmationDialog, {
+            body: _t("Are you sure you want to delete this account?"),
+            confirm: async () => {
+                await this.orm.call("social.account", "unlink", [accountId]);
+                window.location.reload();
+            },
+            cancel: () => {},
+        });
+    }
 }

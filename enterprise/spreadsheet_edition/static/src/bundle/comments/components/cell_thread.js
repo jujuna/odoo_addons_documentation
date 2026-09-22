@@ -1,4 +1,5 @@
-import { Component, useState, onWillUpdateProps, useChildSubEnv, onWillStart } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
+import { asyncComputed, Component, onWillStart, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { Thread } from "@mail/core/common/thread";
 import { Composer } from "@mail/core/common/composer";
@@ -8,37 +9,29 @@ export class CellThread extends Component {
     static template = "spreadsheet_edition.CellThread";
     static components = { Thread, Composer, SpreadsheetCommentComposer };
 
-    static props = {
-        threadId: Number,
-        edit: Boolean,
-    };
     static threadModel = "spreadsheet.cell.thread";
 
+    props = useProps({
+        threadId: t.number(),
+        edit: t.boolean(),
+    });
+
     setup() {
-        useChildSubEnv({
+        useSubEnv({
             inChatWindow: true,
             chatter: {},
         });
         /** @type {import("models").Store} */
         this.mailStore = useService("mail.store");
-        this.state = useState({
-            /** @type {import("models").Thread} */
-            thread: undefined,
+        this.thread = asyncComputed(async () => {
+            const thread = this.mailStore["mail.thread"].insert({
+                model: CellThread.threadModel,
+                id: this.props.threadId,
+            });
+            thread.fetchNewMessages();
+            return thread;
         });
-        onWillStart(() => this.loadThread(this.props.threadId));
 
-        onWillUpdateProps(async (nextProps) => {
-            if (this.props.threadId !== nextProps.threadId) {
-                await this.loadThread(nextProps.threadId);
-            }
-        });
-    }
-
-    async loadThread(threadId) {
-        this.state.thread = this.mailStore.Thread.insert({
-            model: CellThread.threadModel,
-            id: threadId,
-        });
-        await this.state.thread.fetchNewMessages();
+        onWillStart(() => this.thread.currentPromise());
     }
 }

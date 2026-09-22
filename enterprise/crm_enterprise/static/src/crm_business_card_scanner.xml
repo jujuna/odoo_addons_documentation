@@ -3,14 +3,14 @@
     <t t-name="crm_enterprise.CrmBusinessCardScanner">
         <FileUploader
             multiUpload="true"
-            onUploaded.bind="onFileUploaded"
-            onUploadComplete.bind="onUploadComplete">
+            onUploaded.bind="this.onFileUploaded"
+            onUploadComplete.bind="this.onUploadComplete">
             <t t-set-slot="toggler">
-                <i class="fa fa-camera me-1"/>
-                <span t-if="isMobileOS">Scan Business Cards</span>
+                <i class="oi me-1" data-icon="photo_camera"/>
+                <span t-if="this.isMobileOS">Scan Business Cards</span>
                 <span t-else="">Import Business Cards</span>
             </t>
-            <t t-slot="default"/>
+            <t t-call-slot="default"/>
         </FileUploader>
     </t>
 </templates>

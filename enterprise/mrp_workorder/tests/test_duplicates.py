@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo import Command
 from odoo.tests import Form, common
 
 
 class TestDuplicateProducts(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
-        super(TestDuplicateProducts, cls).setUpClass()
+        super().setUpClass()
 
         grp_workorder = cls.env.ref('mrp.group_mrp_routings')
         cls.env.user.write({'group_ids': [(4, grp_workorder.id)]})
@@ -93,22 +93,17 @@ class TestDuplicateProducts(common.TransactionCase):
     def test_duplicate_with_points(self):
         """ Bom with the same non tracked product in 2 bom lines and a quality point
         on this component"""
-        self.painting.tracking = 'none'
-        self.blank_boat.tracking = 'none'
-        self.env['quality.point'].create({
-            'product_ids': [(4, self.painted_boat.id)],
-            'picking_type_ids': [(4, self.env['stock.picking.type'].search([('code', '=', 'mrp_operation')], limit=1).id)],
+        self.painting.tracking = False
+        self.blank_boat.tracking = False
+        picking_type_id = self.env['stock.picking.type'].search([('code', '=', 'mrp_operation')], limit=1).id
+        test_type_id = self.env.ref('mrp_workorder.test_type_register_consumed_materials').id
+        self.env['quality.point'].create([{
+            'product_ids': [Command.link(self.painted_boat.id)],
+            'picking_type_ids': [Command.link(picking_type_id)],
             'operation_id': self.operation_1.id,
-            'test_type_id': self.env.ref('mrp_workorder.test_type_register_consumed_materials').id,
-            'component_id': self.painting.id,
-        })
-        self.env['quality.point'].create({
-            'product_ids': [(4, self.painted_boat.id)],
-            'picking_type_ids': [(4, self.env['stock.picking.type'].search([('code', '=', 'mrp_operation')], limit=1).id)],
-            'operation_id': self.operation_1.id,
-            'test_type_id': self.env.ref('mrp_workorder.test_type_register_consumed_materials').id,
-            'component_id': self.blank_boat.id,
-        })
+            'test_type_id': test_type_id,
+            'bom_line_id': bom_line.id,
+        } for bom_line in self.bom_boat.bom_line_ids])
         self.bom_boat.bom_line_ids.write({'operation_id': self.operation_1.id})
 
         mrp_order_form = Form(self.env['mrp.production'])
@@ -164,11 +159,11 @@ class TestDuplicateProducts(common.TransactionCase):
 
         production.action_confirm()
         production.button_plan()
+        production.lot_producing_ids = self.pb1
 
         wo = production.workorder_ids[0]
         wo.button_start()
         # Components
-        wo.finished_lot_ids = self.pb1
         wo.move_raw_ids[0].move_line_ids[0].lot_id = self.bb1
         wo.move_raw_ids[0].move_line_ids[0].quantity = 1
         # First layer

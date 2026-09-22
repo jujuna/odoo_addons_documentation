@@ -1,9 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': "SEPA Direct Debit",
-
     'summary': "Collect payments from your customers through SEPA direct debit.",
-
     'description': """
 This module enables the generation of SEPA Direct Debit (SDD)-compliant XML files (consistent
 with pain.008.001.02 specification) to send to your bank in order to
@@ -27,30 +25,18 @@ To register a payment for open invoices, you can use the dedicated
 Payment' wizard. An error message will appear if no valid mandate is
 available for generating a payment on the selected invoice.
     """,
-
     'category': 'Accounting/Accounting',
-
-    'depends': ['base_iban', 'account_batch_payment', 'account'],
-
+    'depends': ['account_direct_debit'],
     'data': [
-        'security/account_sepa_direct_debit_security.xml',
-        'security/ir.model.access.csv',
-        'report/empty_mandate_report.xml',
-        'data/account_data.xml',
         'data/sdd_payment_method.xml',
-        'data/sdd_mandate_state_cron.xml',
         'data/mail_template.xml',
+        'report/mandate_report.xml',
         'views/sdd_mandate_views.xml',
         'views/account_payment_view.xml',
         'views/account_journal_dashboard_view.xml',
-        'views/report_invoice.xml',
         'views/res_config_settings_views.xml',
-        'views/res_partner_view.xml',
         'views/account_batch_payment_views.xml',
-        'views/account_move_view.xml',
         'views/account_journal_views.xml',
-        'wizard/account_payment_register_view.xml',
-        'wizard/sdd_mandate_send_views.xml',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

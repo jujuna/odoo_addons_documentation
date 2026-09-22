@@ -1,7 +1,7 @@
 import KnowledgeHierarchy from "@knowledge/components/hierarchy/hierarchy";
 
 import { registry } from "@web/core/registry";
-import { Component, xml } from "@odoo/owl";
+import { Component, useProps, xml } from "@odoo/owl";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
@@ -129,12 +129,14 @@ before(() => {
     // Create a component to test the breadcrumb and the hierarchy without the top bar component:
     class KnowledgeNavigation extends Component {
         static template = xml`
-            <KnowledgeHierarchy record="props.record"/>
+            <KnowledgeHierarchy record="this.props.record"/>
         `;
         static components = {
-            KnowledgeHierarchy
+            KnowledgeHierarchy,
         };
-        static props = {...standardWidgetProps};
+
+        props = useProps(standardWidgetProps);
+
         setup() {
             openArticle = (resId) => this.env.openArticle(resId);
         }
@@ -171,9 +173,11 @@ const assertHierarchyArticles = async (articleIds) => {
     MockServer.env["article"].browse(articleIds).forEach((article, idx) => {
         if (idx === articleIds.length - 1) {
             // current article
-            expect(`.o_hierarchy_item:last-of-type:contains(${article.icon || "📄"})`).toHaveCount(
-                1
-            );
+            if (article.icon) {
+                expect(`.o_hierarchy_item:last-of-type:contains(${article.icon})`).toHaveCount(1);
+            } else {
+                expect(".o_hierarchy_item:last-of-type [data-icon='description']").toHaveCount(1);
+            }
             if (article.is_locked || !article.user_can_write) {
                 expect(`.o_hierarchy_item:last-of-type:contains(${article.name})`).toHaveCount(1);
             } else {

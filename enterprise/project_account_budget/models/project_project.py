@@ -12,6 +12,9 @@ class ProjectProject(models.Model):
 
     total_budget_amount = fields.Monetary('Total planned amount', compute='_compute_budget', default=0, export_string_translation=False)
     total_budget_progress = fields.Float("Budget Spent", compute="_compute_budget", export_string_translation=False)
+    total_budget_achieved_amount = fields.Monetary(compute='_compute_budget', default=0, export_string_translation=False)
+    total_budget_achieved_progress = fields.Float(compute="_compute_budget", export_string_translation=False)
+    budget_count = fields.Integer(compute='_compute_budget', export_string_translation=False)
 
     def _get_budget_analytic_account_domain(self):
         return Domain.OR([
@@ -20,27 +23,38 @@ class ProjectProject(models.Model):
 
     def _compute_budget(self):
         budget_items = self.env['budget.line'].sudo()._read_group(
-            self._get_budget_analytic_account_domain(),
+            Domain.AND([
+                self._get_budget_analytic_account_domain(),
+                [('budget_analytic_id.state', 'in', ['confirmed', 'done'])],
+            ]),
             groupby=['account_id', 'budget_analytic_id'],
             aggregates=['budget_amount:sum', 'achieved_amount:sum'],
         )
         budget_items_by_account_analytic = defaultdict(lambda: {
             'budget_amount': 0,
+            'achieved_amount': 0,
             'budget_amount_for_progress': 0,
             'achieved_amount_for_progress': 0,
+            'budget_count': 0,
         })
         for analytic_account, budget_analytic_id, budget_amount_sum, achieved_amount_sum in budget_items:
             type_factor = -1 if budget_analytic_id.budget_type == 'expense' else 1
             budget_items_by_account_analytic[analytic_account.id]["budget_amount"] += budget_amount_sum
+            budget_items_by_account_analytic[analytic_account.id]["achieved_amount"] += achieved_amount_sum
             budget_items_by_account_analytic[analytic_account.id]["budget_amount_for_progress"] += budget_amount_sum * type_factor
             budget_items_by_account_analytic[analytic_account.id]["achieved_amount_for_progress"] += achieved_amount_sum * type_factor
+            budget_items_by_account_analytic[analytic_account.id]["budget_count"] += 1
 
         for project in self:
             total_budget_amount = budget_items_by_account_analytic[project.account_id.id]['budget_amount']
+            total_achieved_amount = budget_items_by_account_analytic[project.account_id.id]['achieved_amount']
             total_budget_amount_fp = budget_items_by_account_analytic[project.account_id.id]['budget_amount_for_progress']
             total_achieved_amount_fp = budget_items_by_account_analytic[project.account_id.id]['achieved_amount_for_progress']
             project.total_budget_progress = total_budget_amount_fp and (total_achieved_amount_fp - total_budget_amount_fp) / abs(total_budget_amount_fp)
             project.total_budget_amount = total_budget_amount
+            project.total_budget_achieved_amount = total_achieved_amount
+            project.total_budget_achieved_progress = total_budget_amount_fp and (total_achieved_amount / total_budget_amount)
+            project.budget_count = budget_items_by_account_analytic[project.account_id.id]['budget_count']
 
     def action_view_budget_lines(self, domain=None):
         self.ensure_one()
@@ -57,22 +71,16 @@ class ProjectProject(models.Model):
             'view_mode': 'form',
         }
 
+    def action_budget_spent(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id('account_budget.budget_report_action')
+        action['display_name'] = self.env._("%(name)s's Budget Spent", name=self.name)
+        action['domain'] = [('budget_analytic_id.state', 'in', ['confirmed', 'done']), ('account_id', 'in', self.account_id.ids)]
+        return action
+
     # ----------------------------
     #  Project Updates
     # ----------------------------
-
-    def get_panel_data(self):
-        panel_data = super().get_panel_data()
-        panel_data['account_id'] = self.account_id.id
-        panel_data['budget_items'] = self._get_budget_items()
-        panel_data['show_budget_items'] = bool(self.account_id)
-        return panel_data
-
-    def get_budget_items(self):
-        self.ensure_one()
-        if self.account_id and self.env.user.has_group('project.group_project_user'):
-            return self._get_budget_items(True)
-        return {}
 
     def _get_budget_items(self, with_action=True):
         self.ensure_one()
@@ -117,11 +125,10 @@ class ProjectProject(models.Model):
             budget_data['allocated'] += allocated
             budget_data['spent'] += spent
             budget_data['budget_type'] = budget_analytic.budget_type
-            total_allocated += allocated
-            total_spent += spent
+            total_allocated += -allocated if budget_analytic.budget_type == 'expense' else allocated
+            total_spent += -spent if budget_analytic.budget_type == 'expense' else spent
             total_allocated_for_progress += allocated * -1 if budget_analytic.budget_type == 'expense' else allocated
             total_spent_for_progress += spent * -1 if budget_analytic.budget_type == 'expense' else spent
-
             if can_see_budget_items:
                 budget_item = {
                     'id': budget_analytic.id,
@@ -165,3 +172,25 @@ class ProjectProject(models.Model):
             budget_items['form_view_id'] = self.env.ref('project_account_budget.view_budget_analytic_form_dialog').id
             budget_items['company_id'] = self.company_id.id or self.env.company.id
         return budget_items
+
+    def action_open_project_budgets(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id('account_budget.act_budget_analytic_view')
+        form_view_id = self.env.ref('project_account_budget.view_budget_analytic_form').id
+        list_view_id = self.env.ref('project_account_budget.view_budget_analytic_tree').id
+        action.update({
+            'domain': [('budget_line_ids.account_id', '=', self.account_id.id)],
+            'views': [
+                (list_view_id if view_type == 'list' else form_view_id if view_type == 'form' else view_id, view_type)
+                for view_id, view_type in action['views']
+            ],
+            'context': {
+                'project_update': True,
+                'active_id': self.id,
+            },
+            'help': self.env._("""
+                <p class="o_view_nocontent_smiling_face">No budgets found. Create your first one!</p>
+                <p>Use budgets to compare actual results with expected revenues and costs.</p>
+            """),
+        })
+        return action

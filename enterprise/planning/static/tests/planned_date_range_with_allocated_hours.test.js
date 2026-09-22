@@ -40,6 +40,6 @@ test("planned_date_range_with_allocated_hours widget in list view", async () => 
         "Nov 9, 12:00 AM\n10:00 PM"
     );
     expect(".o_field_planned_date_range_with_allocated_hours:last").toHaveText(
-        "Nov 9, 12:00 AM\n10:00 PM\n(10:00)"
+        "Nov 9, 12:00 AM\n10:00 PM\n(10h)"
     );
 });

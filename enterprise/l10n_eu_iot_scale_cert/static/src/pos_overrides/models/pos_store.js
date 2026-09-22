@@ -2,20 +2,16 @@ import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/services/pos_store";
 import { makeAwaitable } from "@point_of_sale/app/utils/make_awaitable_dialog";
-import { CertifiedScaleScreen } from "../components/scale_screen/certified_scale_screen";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { CertifiedScaleScreen } from "@l10n_eu_iot_scale_cert/app/components/certified_scale_screen/certified_scale_screen";
 
 patch(PosStore.prototype, {
     async processServerData() {
         await super.processServerData(...arguments);
 
         this.isScaleIconVisible =
-            this.config.iface_electronic_scale &&
             this.config._is_eu_country &&
             this.models["product.product"].some((product) => product.to_weight);
-
-        // TODO: The POS is only certified in 18.0, so we will disable the certification messages. Once a new version is certified, this line should be removed.
-        this.isScaleIconVisible = false;
 
         this.config.isCertified = this.isCertified;
         this.config.showCertificationWarning = this.isScaleIconVisible && !this.isCertified;
@@ -42,18 +38,23 @@ patch(PosStore.prototype, {
         return this.certificationErrors.length === 0;
     },
 
-    async weighProduct() {
-        if (this.isCertified && this.scale.product.unitOfMeasureId !== this.config._kg_uom_id) {
-            this.dialog.add(AlertDialog, {
-                title: _t("Unable to weigh product"),
-                body: _t("The unit of measure must be set to kg to weigh in a certified POS."),
-            });
-            this.scale.reset();
-            return 0;
+    async handleWeighableProduct(values, order, configure) {
+        if (values.product_tmpl_id.to_weight && this.scale && configure && this.isScaleIconVisible) {
+            const productUomId = values.product_id.product_tmpl_id?.uom_id?.id;
+            if (productUomId !== this.config._kg_uom_id) {
+                this.dialog.add(AlertDialog, {
+                    title: _t("Unable to weigh product"),
+                    body: _t("The unit of measure must be set to kg to weigh in a certified POS."),
+                });
+                return false;
+            }
         }
-        const result = await makeAwaitable(this.env.services.dialog, CertifiedScaleScreen);
+        return super.handleWeighableProduct(...arguments);
+    },
+
+    async weighProduct() {
         // Returning 0 instead of null stops the POS still adding
         // an orderline in case of error (not desired behaviour when certified)
-        return result ?? 0;
+        return makeAwaitable(this.env.services.dialog, CertifiedScaleScreen);
     },
 });

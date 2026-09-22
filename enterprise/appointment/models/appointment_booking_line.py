@@ -13,7 +13,7 @@ class AppointmentBookingLine(models.Model):
 
     active = fields.Boolean(related="calendar_event_id.active")
     appointment_resource_id = fields.Many2one('appointment.resource', string="Appointment Resource",
-        ondelete="cascade")
+        index='btree_not_null', ondelete="cascade")
     appointment_user_id = fields.Many2one('res.users', string="Appointment User", related="calendar_event_id.user_id",
         readonly=False)
     appointment_type_id = fields.Many2one('appointment.type', related="calendar_event_id.appointment_type_id",
@@ -34,16 +34,20 @@ class AppointmentBookingLine(models.Model):
     @api.constrains('appointment_resource_id', 'appointment_type_id', 'appointment_user_id')
     def _check_user_or_resource_set(self):
         for line in self:
-            if ((line.appointment_type_id.schedule_based_on == 'users' and not line.appointment_user_id) or
-                (line.appointment_type_id.schedule_based_on == 'resources' and not line.appointment_resource_id)):
-                raise ValidationError(_('Booking line must have a user or resource set.'))
+            appointment_type = line.appointment_type_id
+            # resource appointments can have an empty line to hold unassigned capacity
+            if (appointment_type.schedule_based_on == 'users' and not line.appointment_user_id):
+                raise ValidationError(_('Booking line must have a user set.'))
 
     @api.constrains('appointment_resource_id', 'appointment_type_id', 'appointment_user_id')
     def _check_user_or_resource_match_appointment_type(self):
         """Check appointment user/resource linked to the lines is indeed usable through the appointment type."""
         for appointment_type, lines in self.grouped('appointment_type_id').items():
             if appointment_type.schedule_based_on == 'users':
-                non_compatible_users_and_resource = lines.appointment_user_id - appointment_type.staff_user_ids
+                non_compatible_users_and_resource = self.env['res.users']
+                for user in lines.appointment_user_id:
+                    if not appointment_type.with_user(user).has_access('read'):
+                        non_compatible_users_and_resource += user
             else:
                 non_compatible_users_and_resource = lines.appointment_resource_id - appointment_type.resource_ids
 

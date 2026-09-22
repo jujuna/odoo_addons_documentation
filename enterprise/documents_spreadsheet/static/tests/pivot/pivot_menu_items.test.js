@@ -15,9 +15,11 @@ import { animationFrame } from "@odoo/hoot-mock";
 import { helpers, registries } from "@odoo/o-spreadsheet";
 import {
     addGlobalFilter,
+    createSheet,
     selectCell,
     setCellContent,
     setGlobalFilterValue,
+    updatePivot,
 } from "@spreadsheet/../tests/helpers/commands";
 import { getBasicPivotArch } from "@spreadsheet/../tests/helpers/data";
 import {
@@ -32,9 +34,10 @@ import {
     insertPivotInSpreadsheet,
 } from "@spreadsheet/../tests/helpers/pivot";
 import { doMenuAction } from "@spreadsheet/../tests/helpers/ui";
-import { contains, MockServer } from "@web/../tests/web_test_helpers";
+import { assignTestEnv, contains, getService, MockServer } from "@web/../tests/web_test_helpers";
 import { user } from "@web/core/user";
 import { mockActionService } from "../helpers/spreadsheet_test_utils";
+import { waitForDataLoaded } from "@spreadsheet/helpers/model";
 const { cellMenuRegistry, topbarMenuRegistry } = registries;
 const { toCartesian, toZone } = helpers;
 
@@ -49,15 +52,34 @@ const reinsertStaticPivotPath = ["data", "reinsert_static_pivot", "reinsert_stat
 
 beforeEach(() => {
     target = getFixture();
+    assignTestEnv({ isSmall: false });
 });
 
 test("Reinsert a dynamic pivot", async function () {
     const { model, env } = await createSpreadsheetWithPivot();
     selectCell(model, "D8");
     await doMenuAction(topbarMenuRegistry, reinsertDynamicPivotPath, env);
+    await animationFrame();
     expect(getCorrespondingCellFormula(model, "E10")).toBe(`=PIVOT(1)`, {
         message: "It should be part of a pivot formula",
     });
+});
+
+test("Can reinsert a dynamic pivot with a style", async function () {
+    const { model, env, pivotId } = await createSpreadsheetWithPivot({ pivotType: "dynamic" });
+    updatePivot(model, pivotId, {
+        style: { tableStyleId: "PivotTableStyleLight1" },
+    });
+    await waitForDataLoaded(model);
+
+    const sheetId = model.getters.getActiveSheetId();
+    const position = { col: 0, row: 0, sheetId };
+    model.getters.getCellTableStyle(position); // compute the lazy-loaded table style
+    model.dispatch("DELETE_CONTENT", { sheetId, target: [toZone("A1:E14")] });
+    selectCell(model, "A1");
+    await doMenuAction(topbarMenuRegistry, reinsertDynamicPivotPath, env);
+    expect(() => model.getters.getCellTableStyle(position)).not.toThrow();
+    expect(getCorrespondingCellFormula(model, "A1")).toBe(`=PIVOT(1)`);
 });
 
 test("Reinsert a static pivot", async function () {
@@ -120,13 +142,14 @@ test("Reinsert pivot menu item should be hidden if the pivot is invalid", async 
 test("Reinsert a pivot in a too small sheet", async function () {
     const { model, env } = await createSpreadsheetWithPivot();
     const sheetId = model.getters.getActiveSheetId();
-    model.dispatch("CREATE_SHEET", { cols: 1, rows: 1, sheetId: "111" });
+    createSheet(model, { cols: 1, rows: 1, sheetId: "111" });
     model.dispatch("ACTIVATE_SHEET", {
         sheetIdFrom: sheetId,
         sheetIdTo: "111",
     });
     selectCell(model, "A1");
     await doMenuAction(topbarMenuRegistry, reinsertDynamicPivotPath, env);
+    await animationFrame();
     expect(model.getters.getNumberCols("111")).toBe(6);
     expect(model.getters.getNumberRows("111")).toBe(5);
     expect(getCorrespondingCellFormula(model, "B3")).toBe(`=PIVOT(1)`, {
@@ -272,6 +295,7 @@ test("undo pivot reinsert", async function () {
     const { model, env } = await createSpreadsheetWithPivot();
     selectCell(model, "D8");
     await doMenuAction(topbarMenuRegistry, reinsertDynamicPivotPath, env);
+    await animationFrame();
     expect(getCorrespondingCellFormula(model, "E10")).toBe(`=PIVOT(1)`, {
         message: "It should contain a pivot formula",
     });
@@ -346,46 +370,30 @@ test("Verify presence of pivots in top menu bar in a spreadsheet with a pivot", 
     });
 
     const root = topbarMenuRegistry.getMenuItems().find((item) => item.id === "data");
-    const childrenNames = root.children(env).map((name) => name.name(env).toString()); // toString to force translation
-    expect(childrenNames.find((name) => name === "(#1) Partners by Foo")).not.toBe(undefined);
-    expect(childrenNames.find((name) => name === "(#2) Partner Pivot")).not.toBe(undefined);
+    const children = root.children(env);
+    const childrenNames = children.map((name) => name.name(env).toString());
+    const pivotSubmenu = children.find((child) => child.id === "pivot_data_sources");
+    expect(pivotSubmenu).not.toBe(undefined);
+    const pivotChildrenNames = pivotSubmenu.children(env).map((name) => name.name(env).toString());
+    expect(pivotChildrenNames.find((name) => name === "(#1) Partners by Foo")).not.toBe(undefined);
+    expect(pivotChildrenNames.find((name) => name === "(#2) Partner Pivot")).not.toBe(undefined);
     // bottom children
     expect(childrenNames.find((name) => name === "Refresh all data")).not.toBe(undefined);
     expect(childrenNames.find((name) => name === "Re-insert dynamic pivot")).not.toBe(undefined);
     expect(childrenNames.find((name) => name === "Re-insert static pivot")).not.toBe(undefined);
-    expect(childrenNames.find((name) => name === "Re-insert list")).not.toBe(undefined);
 });
 
 test("Pivot focus changes on top bar menu click", async function () {
     const { model, env } = await createSpreadsheetFromPivotView();
     await insertPivotInSpreadsheet(model, "PIVOT#2", { arch: getBasicPivotArch() });
 
-    await doMenuAction(topbarMenuRegistry, ["data", "item_pivot_1"], env);
+    await doMenuAction(topbarMenuRegistry, ["data", "pivot_data_sources", "item_pivot_1"], env);
     await animationFrame();
     expect(".os-pivot-title").toHaveValue("Partners by Foo");
 
-    await doMenuAction(topbarMenuRegistry, ["data", "item_pivot_2"], env);
+    await doMenuAction(topbarMenuRegistry, ["data", "pivot_data_sources", "item_pivot_2"], env);
     await animationFrame();
     expect(".os-pivot-title").toHaveValue("Partner Pivot");
-});
-
-test("A warning is displayed in the menu item if the pivot is unused", async function () {
-    const { model } = await createSpreadsheetFromPivotView();
-    model.dispatch("CREATE_SHEET", { sheetId: "sh2", name: "Sheet2" });
-    await insertPivotInSpreadsheet(model, "PIVOT#2", { sheetId: "sh2" });
-    await contains("div[data-id='data']").click();
-
-    const menuItemPivot1 = target.querySelector("div[data-name='item_pivot_1']");
-    const menuItemPivot2 = target.querySelector("div[data-name='item_pivot_2']");
-
-    expect(menuItemPivot1.querySelectorAll(".o-unused-pivot-icon")).toHaveLength(0);
-    expect(menuItemPivot2.querySelectorAll(".o-unused-pivot-icon")).toHaveLength(0);
-
-    model.dispatch("DELETE_SHEET", { sheetId: "sh2" });
-    await animationFrame();
-
-    expect(menuItemPivot1.querySelectorAll(".o-unused-pivot-icon")).toHaveLength(0);
-    expect(menuItemPivot2.querySelectorAll(".o-unused-pivot-icon")).toHaveLength(1);
 });
 
 test("Can rebuild the Odoo domain of records based on the according merged pivot cell", async function () {
@@ -448,7 +456,7 @@ test("See records is not visible if the formula is in error", async function () 
 test("'See records' loads a specific action if set in the pivot definition", async function () {
     const actionXmlId = "spreadsheet.partner_action";
     const { webClient, model } = await createSpreadsheetFromPivotView({ actionXmlId });
-    const actionService = webClient.env.services.action;
+    const actionService = getService("action");
     const env = {
         ...webClient.env,
         model,
@@ -504,6 +512,7 @@ test("Pivot cells are highlighted when hovering their menu item", async function
     const sheetId = model.getters.getActiveSheetId();
     await contains(".o-sidePanelClose").click();
     await contains(".o-topbar-top div[data-id='data']").click();
+    await contains("div[data-name='pivot_data_sources']").click();
 
     await hover("div[data-name='item_pivot_1']");
     const pivotId = model.getters.getPivotIds()[0];
@@ -514,6 +523,6 @@ test("Pivot cells are highlighted when hovering their menu item", async function
 
     expect(getHighlightsFromStore(env)).toEqual([{ color: "#017E84", range, noFill: true }]);
 
-    await leave("div[data-name='item_pivot_1");
+    await leave("div[data-name='item_pivot_1']");
     expect(getHighlightsFromStore(env)).toEqual([]);
 });

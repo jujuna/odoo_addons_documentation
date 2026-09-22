@@ -9,7 +9,7 @@
                 <field name="fiscal_category_id" string="Fiscal Category"
                 invisible="internal_group not in ('asset', 'expense', 'income')"/>
             </xpath>
-            <xpath expr="//page[@name='Description']" position="after">
+            <xpath expr="//page[@name='accounting']" position="after">
                 <page name="fiscal_rates" string="Fiscal Rates" invisible="not fiscal_category_id">
                     <field name="rate_ids" nolabel="1">
                         <list order="date_from desc" editable="bottom">

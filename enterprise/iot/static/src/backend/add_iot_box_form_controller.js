@@ -5,15 +5,14 @@ import { useService } from "@web/core/utils/hooks";
 import { onMounted, onWillUnmount } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 
-
 export class AddIoTBoxFormController extends FormController {
     setup() {
         super.setup();
         this.notification = useService("notification");
         this.orm = useService("orm");
         this.iotBoxesBeforeConnection = [];
-        this.newIoTBoxes = [];              // List of new IoT boxes found
-        this.iotCheckTimer = null;          // Timer to manage polling
+        this.newIoTBoxes = []; // List of new IoT boxes found
+        this.iotCheckTimer = null; // Timer to manage polling
 
         onMounted(async () => {
             await this.initializeIoTConnection();
@@ -29,7 +28,11 @@ export class AddIoTBoxFormController extends FormController {
      * @returns {Promise<void>}
      */
     async initializeIoTConnection() {
-        this.iotBoxesBeforeConnection = await this.orm.call("iot.box", "search_read", [[], ["identifier"]]);
+        const iotBoxRecords = await this.orm.call("iot.box", "search_read", [
+            [["identifier", "!=", false]],
+            ["identifier"],
+        ]);
+        this.iotBoxesBeforeConnection = iotBoxRecords.map((box) => box.identifier);
 
         // Set a timer to check for new IoT Boxes every 5 seconds
         this.iotCheckTimer = setInterval(async () => {
@@ -48,12 +51,10 @@ export class AddIoTBoxFormController extends FormController {
      * @returns {Promise<boolean>} True if a new IoT Box has been found, false otherwise.
      */
     async lookForNewIoTBox() {
-        const iotBoxesAfterConnection = await this.orm.call("iot.box", "search_read", [[], ["identifier"]]);
-        this.newIoTBoxes = iotBoxesAfterConnection.filter(
-            (afterBox) => !this.iotBoxesBeforeConnection.some(
-                beforeBox => beforeBox.identifier === afterBox.identifier
-            )
-        );
+        this.newIoTBoxes = await this.orm.call("iot.box", "search_read", [
+            [["identifier", "not in", this.iotBoxesBeforeConnection]],
+            ["identifier"],
+        ]);
 
         return this.newIoTBoxes.length > 0;
     }
@@ -81,4 +82,4 @@ export class AddIoTBoxFormController extends FormController {
 
 export const addIoTBox = { ...formView, Controller: AddIoTBoxFormController };
 
-registry.category("views").add('add_iot_box_wizard', addIoTBox);
+registry.category("views").add("add_iot_box_wizard", addIoTBox);

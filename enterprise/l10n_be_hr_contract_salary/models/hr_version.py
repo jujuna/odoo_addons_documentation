@@ -1,43 +1,31 @@
-import ast
-
 from markupsafe import Markup
 
 from odoo import api, fields, models, _
 from odoo.fields import Domain
-from odoo.tools.float_utils import float_compare, float_round
+from odoo.tools.float_utils import float_round
 
 
 class HrVersion(models.Model):
     _inherit = 'hr.version'
 
-    image_1920_filename = fields.Char(tracking=True)
-    id_card_filename = fields.Char(groups="hr.group_hr_user", tracking=True)
+    image_1920_filename = fields.Char(tracking=1)
+    id_card_filename = fields.Char(groups="hr.group_hr_user", tracking=1)
     id_card = fields.Binary(related='employee_id.id_card', groups="hr.group_hr_manager", readonly=False)
-    driving_license_filename = fields.Char(groups="hr.group_hr_user", tracking=True)
+    driving_license_filename = fields.Char(groups="hr.group_hr_user", tracking=1)
     driving_license = fields.Binary(related='employee_id.driving_license', groups="hr.group_hr_manager", readonly=False)
-    mobile_invoice_filename = fields.Char(groups="hr.group_hr_user", tracking=True)
+    mobile_invoice_filename = fields.Char(groups="hr.group_hr_user", tracking=1)
     mobile_invoice = fields.Binary(related='employee_id.mobile_invoice', groups="hr.group_hr_manager", readonly=False)
-    sim_card_filename = fields.Char(groups="hr.group_hr_user", tracking=True)
+    sim_card_filename = fields.Char(groups="hr.group_hr_user", tracking=1)
     sim_card = fields.Binary(related='employee_id.sim_card', groups="hr.group_hr_manager", readonly=False)
-    internet_invoice_filename = fields.Char(groups="hr.group_hr_user", tracking=True)
+    internet_invoice_filename = fields.Char(groups="hr.group_hr_user", tracking=1)
     internet_invoice = fields.Binary(related="employee_id.internet_invoice", groups="hr.group_hr_manager", readonly=False)
     double_holiday_wage = fields.Monetary(compute='_compute_double_holiday_wage', groups="hr_payroll.group_hr_payroll_user")
-    contract_type_id = fields.Many2one('hr.contract.type', "Contract Type",
-                                       default=lambda self: self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_cdi',
-                                                                         raise_if_not_found=False) if self.env.company.country_id.code == "BE" else self.env['hr.contract.type'])
+    employee_type_id = fields.Many2one('hr.employee.type', "Employee Type",
+                                       index='btree_not_null',
+                                       default=lambda self: self.env.ref('hr.contract_type_employee',
+                                                                         raise_if_not_found=False) if self.env.company.country_id.code == "BE" else self.env['hr.employee.type'])
     l10n_be_bicyle_cost = fields.Float(compute='_compute_l10n_be_bicyle_cost', groups="hr_payroll.group_hr_payroll_user")
-
-    l10n_be_mobility_budget_amount = fields.Monetary(
-        string="Mobility Budget Amount",
-        store=True,
-        compute="_compute_l10n_be_mobility_budget_amount"
-    )
-
-    l10n_be_wage_with_mobility_budget = fields.Monetary(
-        tracking=True, string="Wage with Mobility Budget",
-        compute="_compute_l10n_be_wage_with_mobility_budget",
-        store=True
-    )
+    l10n_be_13th_month_in_warrant = fields.Boolean("13th Month paid in warrant", groups="hr_payroll.group_hr_payroll_user")
 
     @api.depends('has_bicycle')
     def _compute_l10n_be_bicyle_cost(self):
@@ -47,56 +35,134 @@ class HrVersion(models.Model):
             else:
                 version.l10n_be_bicyle_cost = self._get_private_bicycle_cost(version.employee_id.km_home_work)
 
-    @api.depends('l10n_be_mobility_budget', 'wage_with_holidays')
-    def _compute_l10n_be_mobility_budget_amount(self):
-        mobility_budget_max = self.env['hr.rule.parameter']._get_parameter_from_code("mobility_budget_max", fields.Date.today(), raise_if_not_found=False) or 16875
-        mobility_budget_min = self.env['hr.rule.parameter']._get_parameter_from_code("mobility_budget_min", fields.Date.today(), raise_if_not_found=False) or 3164
+    def _get_meal_voucher_info_depends_fields(self):
+        return super()._get_meal_voucher_info_depends_fields() + ['holidays']
 
-        minimum_wage = self.env['hr.rule.parameter']._get_parameter_from_code('cp200_min_gross_wage', fields.Date.today(), raise_if_not_found=False) or 0
-        for version in self:
-            minimum_wage = float_round(minimum_wage * version.work_time_rate, precision_digits=2)
-            if version.l10n_be_mobility_budget:
-                base = self.env.context.get(
-                    'salary_simulation_full_time_wage_on_holidays',
-                    version.wage_with_holidays
-                )
-                raw_mb = min(mobility_budget_max, base * 13.0 / 5.0)
-
-                # find the right budget to not get under the minimum wage
-                current_yearly_cost = self.env.context.get(
-                    'salary_simulation_full_time_yearly_cost',
-                    version._get_yearly_cost_from_wage_with_holidays() if version._is_salary_sacrifice() else version.final_yearly_costs
-                )
-                version_mobility_budget_min = mobility_budget_min
-                version_mobility_budget_max = raw_mb
-                while float_compare(version_mobility_budget_min, version_mobility_budget_max, precision_digits=2) == -1:
-                    version_mobility_budget = (version_mobility_budget_max + version_mobility_budget_min) / 2
-                    wage_with_mobility_budget = version._get_gross_from_employer_costs(current_yearly_cost - version_mobility_budget)
-                    if wage_with_mobility_budget < minimum_wage and minimum_wage:
-                        version_mobility_budget_max = version_mobility_budget
-                    else:
-                        version_mobility_budget_min = version_mobility_budget
-
-                raw_mb = version_mobility_budget_min
-                version.l10n_be_mobility_budget_amount = raw_mb
-            else:
-                version.l10n_be_mobility_budget_amount = 0.0
-
-    @api.depends('l10n_be_mobility_budget', 'l10n_be_mobility_budget_amount', 'wage_with_holidays')
-    def _compute_l10n_be_wage_with_mobility_budget(self):
-        for version in self:
-            if version._is_salary_sacrifice():
-                yearly_cost = version._get_yearly_cost_from_wage_with_holidays()
-                version.l10n_be_wage_with_mobility_budget = version._get_gross_from_employer_costs(yearly_cost - version.l10n_be_mobility_budget_amount)
-            else:
-                version.l10n_be_wage_with_mobility_budget = version._get_gross_from_employer_costs(version.final_yearly_costs - version.l10n_be_mobility_budget_amount)
+    def _get_monthly_nb_meal_voucher(self, holidays=None):
+        self.ensure_one()
+        holidays = holidays if holidays is not None else self.holidays  # 0 needs to be a valid value
+        return (220.0 - holidays) / 12
 
     @api.model
-    def _get_wage_to_apply(self):
+    def _get_sacrifice_fields(self):
+        return super()._get_sacrifice_fields() + ['l10n_be_mobility_budget', 'l10n_be_mobility_budget_amount']
+
+    def _get_mobility_budget_amount(self, inverse=True):
+        """ Get the mobility budget based on the target yearly cost using fixed-point iteration.
+
+        We find wage W and mobility budget MB such that:
+        - yearly_cost = (W * salary_factor + benefits + MB + fixed) / ratio
+        - MB = min(max_budget, W * 13 / 5)
+        - W >= minimum_wage
+
+        Where ratio accounts for holidays (sacrifice ratio).
+        This ensures the mobility budget is correctly based on the final wage that achieves the target yearly cost.
+        """
+        if not inverse:
+            return super()._get_mobility_budget_amount(inverse=inverse)
+
         self.ensure_one()
-        if self.l10n_be_mobility_budget:
-            return self.l10n_be_wage_with_mobility_budget
-        return super()._get_wage_to_apply()
+        today = fields.Date.context_today(self)
+
+        mobility_budget_max = self.env['hr.rule.parameter']._get_parameter_from_code(
+            "mobility_budget_max", today, raise_if_not_found=False) or 16875
+
+        mobility_budget_min = self.env['hr.rule.parameter']._get_parameter_from_code(
+            "mobility_budget_min", today, raise_if_not_found=False) or 3164
+
+        minimum_wage = self.env['hr.rule.parameter']._get_parameter_from_code(
+            'cp200_min_gross_wage', today, raise_if_not_found=False) or 2238
+
+        minimum_wage = float_round(minimum_wage * self.work_time_rate, precision_digits=2)
+
+        current_yearly_cost = self.env.context.get(
+            'salary_simulation_full_time_yearly_cost',
+            self.final_yearly_costs
+        )
+        # do fixed-point iteration to find consistent wage and mobility budget
+
+        # we start with initial guess: wage without mobility budget
+        wage = self._get_simulated_wage_from_yearly_costs(current_yearly_cost, mobility_budget=0)
+
+        if not self.l10n_be_mobility_budget:
+            return wage, 0.0
+
+        mobility_budget = 0.0
+        max_iterations = 20
+        tolerance = 0.01  # convergence tolerance in euros
+
+        for iteration in range(max_iterations):
+            raw_mobility_budget = min(mobility_budget_max, self._get_mobility_budget_cost(wage))
+
+            new_wage = self._get_simulated_wage_from_yearly_costs(current_yearly_cost, mobility_budget=raw_mobility_budget)
+
+            if new_wage < minimum_wage and minimum_wage:
+                mb_low = 0.0
+                mb_high = raw_mobility_budget
+
+                while mb_high - mb_low > tolerance:
+                    mb_mid = (mb_low + mb_high) / 2.0
+                    test_wage = self._get_simulated_wage_from_yearly_costs(current_yearly_cost, mobility_budget=mb_mid)
+
+                    if test_wage < minimum_wage:
+                        mb_high = mb_mid
+                    else:
+                        mb_low = mb_mid
+
+                mobility_budget = mb_low
+                break
+
+            if abs(new_wage - wage) < tolerance and abs(raw_mobility_budget - mobility_budget) < tolerance:
+                mobility_budget = raw_mobility_budget
+                break
+
+            wage = new_wage
+            mobility_budget = raw_mobility_budget
+
+        # We have to ensure that we respect the minimum mobility budget, and if this is higher than
+        # the optimal one, we have to recompute the corresponding wage
+        final_mobility_budget = max(float_round(mobility_budget, precision_digits=2), mobility_budget_min)
+        final_wage = self._get_simulated_wage_from_yearly_costs(current_yearly_cost, mobility_budget=final_mobility_budget)
+
+        return final_wage, final_mobility_budget
+
+    def _get_mobility_budget_cost_ratio(self):
+        """ 12 months
+            + 13e month (except if paid in warrants)
+            - simple holiday allowance (20 days/4 weeks ≃ 0.92 month) """
+        self.ensure_one()
+        ratio = super()._get_mobility_budget_cost_ratio()
+        return ratio - 1 if self.l10n_be_13th_month_in_warrant else ratio
+
+    def _inverse_final_yearly_costs(self):
+        is_simulation = self.env.context.get('salary_simulation')
+        belgian_versions = self.filtered(lambda v: v.company_id.country_id.code == 'BE')
+        non_belgium_versions = self - belgian_versions
+        if non_belgium_versions:
+            super(HrVersion, non_belgium_versions)._inverse_final_yearly_costs()
+        if belgian_versions:
+            if not is_simulation:
+                super(HrVersion, belgian_versions)._inverse_final_yearly_costs()
+            else:
+                for version in belgian_versions:
+                    if version.l10n_be_mobility_budget:
+                        wage, mobility_budget = version._get_mobility_budget_amount()
+                        version.wage = wage
+                        version.l10n_be_mobility_budget_amount = mobility_budget
+                    else:
+                        version.wage = version._get_wage_from_yearly_costs(version.final_yearly_costs)
+                        version.l10n_be_mobility_budget_amount = 0
+
+    def _get_simulated_wage_from_yearly_costs(self, yearly_cost, ratio=None, fixed=None, mobility_budget=0):
+        self.ensure_one()
+        ratio = ratio or self._get_yearly_cost_sacrifice_ratio()
+        fixed = fixed or self._get_yearly_cost_sacrifice_fixed()
+        if self.l10n_be_mobility_budget and self.l10n_be_mobility_budget_amount:
+            fixed = fixed - self.l10n_be_mobility_budget_amount
+        salary_costs_factor = self._get_salary_costs_factor()
+        if salary_costs_factor:
+            return (yearly_cost - fixed - self._get_benefits_costs() - mobility_budget) * ratio / salary_costs_factor
+        return 0
 
     @api.model
     def _get_private_bicycle_cost(self, distance):
@@ -104,22 +170,14 @@ class HrVersion(models.Model):
         amount_max = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code('cp200_cycle_reimbursement_max', raise_if_not_found=False) or 8
         return 4 * min(amount_max, amount_per_km * distance * 2)
 
-    @api.depends(
-        'wage_with_holidays', 'wage_on_signature',
-        'employee_id.l10n_be_scale_seniority', 'job_id.l10n_be_scale_category',
-        'work_time_rate', 'l10n_be_time_credit', 'resource_calendar_id.work_time_rate')
-    def _compute_l10n_be_is_below_scale(self):
-        super()._compute_l10n_be_is_below_scale()
-
-    @api.depends('wage_with_holidays')
+    @api.depends('wage')
     def _compute_double_holiday_wage(self):
         for version in self:
-            version.double_holiday_wage = version._get_wage_to_apply() * 0.92
+            version.double_holiday_wage = version.wage * 0.92
 
     @api.model
     def _benefit_white_list(self):
         return super()._benefit_white_list() + [
-            'private_car_reimbursed_amount',
             'yearly_commission_cost',
             'meal_voucher_average_monthly_amount',
             'l10n_be_bicyle_cost',
@@ -132,7 +190,7 @@ class HrVersion(models.Model):
         if not has_car or not selected_car:
             return {
                 'transport_mode_car': False,
-                'new_car': False,
+                'has_new_car': False,
                 'new_car_model_id': False,
                 'car_id': False,
             }
@@ -141,13 +199,13 @@ class HrVersion(models.Model):
         if new_car:
             return {
                 'transport_mode_car': True,
-                'new_car': True,
+                'has_new_car': True,
                 'new_car_model_id': int(car_id),
                 'car_id': False,
             }
         return {
             'transport_mode_car': True,
-            'new_car': False,
+            'has_new_car': False,
             'new_car_model_id': False,
             'car_id': int(car_id),
         }
@@ -177,12 +235,18 @@ class HrVersion(models.Model):
             'bike_id': int(bike_id),
         }
 
-    def _get_benefit_values_wishlist_car_total_depreciated_cost(self, version_vals, benefits):
-        if benefits.get('fold_wishlist_car_total_depreciated_cost', False):
-            model_id = benefits['select_wishlist_car_total_depreciated_cost'].split('-')[1]
+    def _get_benefit_values_temporary_car_total_depreciated_cost(self, version_vals, benefits):
+        if benefits.get('fold_temporary_car_total_depreciated_cost', False):
+            car_options = benefits.get('select_temporary_car_total_depreciated_cost', '')
+            car_id = car_options.split('-')[1] if '-' in car_options else None
+            new_car_model = benefits.get('select_company_car_total_depreciated_cost', '')
+            new_car_model_id = new_car_model.split('-')[1] if new_car_model and new_car_model.startswith('new-') else False
+
             return {
-                'new_car': True,
-                'new_car_model_id': int(model_id)
+                'has_new_car': True,
+                'car_id': int(car_id) if car_id else False,
+                'new_car_model_id': int(new_car_model_id) if new_car_model_id else False,
+                'transport_mode_car': True,
             }
         else:
             return {}
@@ -194,7 +258,7 @@ class HrVersion(models.Model):
         return {'l10n_be_ambulatory_insured_spouse': benefits['fold_l10n_be_ambulatory_insured_spouse']}
 
     def _get_description_company_car_total_depreciated_cost(self, new_value=None):
-        benefit = self.env.ref('l10n_be_hr_contract_salary.l10n_be_transport_company_car')
+        benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_transport_company_car')
         description = benefit.description or ""
         if not new_value:
             if self.car_id:
@@ -216,24 +280,35 @@ class HrVersion(models.Model):
         is_new = bool(car_option == "new")
 
         car_elements = self._get_company_car_description_values(vehicle, is_new)
-        description += Markup('<ul>%s</ul>') % Markup().join([Markup('<li>%s: %s</li>') % (key, value) for key, value in car_elements.items() if value])
+        description += Markup('<div class="d-flex row">%s</div>') % Markup().join([
+        Markup('<div class="col"><span class="vehicle_elements_label">%s</span><b class="vehicle_description_value">%s</b></div>') % (key, value)
+        for key, value in car_elements.items() if value])
+        if car_option == "old" and vehicle.description:
+            description += Markup('<div class="car_description_value">%s</div>') % vehicle.description
         return description
 
-    def _get_description_wishlist_car_total_depreciated_cost(self, new_value=None):
-        benefit = self.env.ref('l10n_be_hr_contract_salary.l10n_be_transport_new_car')
+    def _get_description_temporary_car_total_depreciated_cost(self, new_value=None):
+        benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_transport_temporary_car')
         description = benefit.description or ""
         if not new_value:
             return description
-        else:
-            vehicle_id = new_value.split('-')[1]
-            vehicle = self.env['fleet.vehicle.model'].with_company(self.company_id).sudo().browse(int(vehicle_id))
-            car_elements = self._get_company_car_description_values(vehicle, True)
-            description += Markup('<ul>%s</ul>') % Markup().join([Markup('<li>%s: %s</li>') % (key, value) for key, value in car_elements.items() if value])
+        vehicle_id = new_value.split('-')[1]
+        try:
+            vehicle_id = int(vehicle_id)
+        except ValueError:
+            return description
 
+        vehicle = self.env['fleet.vehicle'].with_company(self.company_id).sudo().browse(vehicle_id)
+        car_elements = self._get_company_car_description_values(vehicle, False)
+        description += Markup('<div class="d-flex row">%s</div>') % Markup().join([
+        Markup('<div class="col"><span class="vehicle_elements_label">%s</span><b class="vehicle_description_value">%s</b></div>') % (key, value)
+        for key, value in car_elements.items() if value])
+        if vehicle.description:
+            description += Markup('<div class="car_description_value">%s</div>') % vehicle.description
         return description
 
     def _get_description_company_bike_depreciated_cost(self, new_value):
-        benefit = self.env.ref('l10n_be_hr_contract_salary.l10n_be_transport_company_bike')
+        benefit = self.env.ref('l10n_be_hr_payroll.l10n_be_transport_company_bike')
         description = benefit.description or ""
         if not new_value:
             if self.bike_id:
@@ -247,15 +322,15 @@ class HrVersion(models.Model):
             bike = self.env['fleet.vehicle'].with_company(self.company_id).sudo().browse(int(bike_id))
 
         bike_elements = {
-            'Monthly Cost': _("%s € (Rent)", bike.total_depreciated_cost if bike_option == "old" else bike.default_total_depreciated_cost),
             'Electric Assistance': _("Yes") if bike.electric_assistance else _("No"),
-            'Color': bike.color,
+            'Color': bike.color if bike_option == "old" else False,
             'Bike Frame Type': bike.frame_type if bike_option == "old" else False,
             'Frame Size (cm)': bike.frame_size if bike_option == "old" else False,
         }
 
-        description += Markup('<ul>%s</ul>') % Markup().join(Markup('<li>%s: %s</li>') % (key, value) for key, value in bike_elements.items() if value)
-
+        description += Markup('<div class="d-flex row">%s</div>') % Markup().join([
+        Markup('<div class="col"><span class="vehicle_elements_label">%s</span><b class="vehicle_description_value">%s</b></div>') % (key, value)
+        for key, value in bike_elements.items() if value])
         return description
 
     def _get_company_car_description_values(self, vehicle_id, is_new):
@@ -266,32 +341,26 @@ class HrVersion(models.Model):
                 unit=vehicle_id.co2_emission_unit) if vehicle_id.default_co2 else False
             fuel_type = vehicle_id.default_fuel_type
             transmission = vehicle_id.transmission
-            door_number = odometer = immatriculation = trailer_hook = False
-            bik_display = "%s €" % round(vehicle_id.default_atn, 2)
-            monthly_cost_display = _("%(co2_fee)s € (CO2 Fee) + %(rent)s € (Rent)", co2_fee=round(vehicle_id.co2_fee, 2), rent=round(vehicle_id.default_total_depreciated_cost - vehicle_id.co2_fee, 2))
+            odometer = False
+            door_number = vehicle_id.doors
+            trailer_hook = False
         else:
             co2 = _("%(co2)s %(unit)s", co2=vehicle_id.co2,
                 unit=vehicle_id.co2_emission_unit) if vehicle_id.co2 else False
             fuel_type = vehicle_id.fuel_type
             door_number = vehicle_id.doors
             odometer = vehicle_id.odometer
-            immatriculation = vehicle_id.acquisition_date
             transmission = vehicle_id.transmission
-            trailer_hook = "Yes" if vehicle_id.trailer_hook else "No"
-            bik_display = "%s €" % round(vehicle_id.atn, 2)
-            monthly_cost_display = _("%(co2_fee)s € (CO2 Fee) + %(rent)s € (Rent)", co2_fee=round(vehicle_id.co2_fee, 2), rent=round(vehicle_id.total_depreciated_cost - vehicle_id.co2_fee, 2))
+            trailer_hook = "Yes" if vehicle_id.trailer_hook else False
 
         car_elements = {
             'CO2 Emission': co2,
-            'Monthly Cost': monthly_cost_display,
             'Fuel Type': fuel_type,
             'Range': vehicle_range,
-            'BIK': bik_display,
             'Transmission': transmission,
             'Doors Number': door_number,
             'Trailer Hook': trailer_hook,
             'Odometer': odometer,
-            'Immatriculation Date': immatriculation
         }
         return car_elements
 
@@ -301,7 +370,6 @@ class HrVersion(models.Model):
 
     def _get_benefit_values_ip_value(self, version_vals, benefits):
         return {
-            'ip': benefits['ip_value'] and ast.literal_eval(benefits['ip_value']),
             'ip_wage_rate': version_vals.get('ip_wage_rate')
         }
 

@@ -1,7 +1,7 @@
 from copy import deepcopy
 from datetime import date
 
-from odoo import Command, _, api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import OrderedSet
 
@@ -10,7 +10,7 @@ from odoo.addons.hr_expense_stripe.utils import STRIPE_3D_SECURE_LOCALES, make_r
 
 class HrExpenseStripeCardholderWizard(models.TransientModel):
     _name = 'hr.expense.stripe.cardholder.wizard'
-    _inherit = 'mail.thread'  # So we can steal tracking data
+    _inherit = 'mail.thread'
     _description = 'Wizard to configure the cardholder'
 
     # DEV warning, due to the fact that we're using the tracking values to make the diff between stripe values and the new tracked ones,
@@ -45,6 +45,7 @@ class HrExpenseStripeCardholderWizard(models.TransientModel):
         domain='[("country_id", "=", billing_country_id)]',
         tracking=True,
     )  # US required
+    company_country_code = fields.Char(related='company_country_id.code', string="Company Country Code", readonly=True)
     billing_zip = fields.Char(string="Zip", tracking=True)
 
     @api.model
@@ -89,8 +90,10 @@ class HrExpenseStripeCardholderWizard(models.TransientModel):
             if billing_adress['line2']:
                 tracked_create_vals['billing_street2'] = billing_adress['line2']
             if billing_adress['state']:
-                state = self.env['res.country.state'].search([('name', 'ilike', billing_adress['state'])], limit=1)
-                tracked_create_vals['billing_state_id'] = state.id
+                state = self.env['res.country.state'].search([('code', '=', billing_adress['state'])], limit=1)
+                if not state:  # We previously stored the name of the state, so Stripe might still have the name instead of the code
+                    state = self.env['res.country.state'].search([('name', 'ilike', billing_adress['state'])], limit=1)
+                tracked_create_vals['billing_state_id'] = state.id or False
             create_vals['stripe_values'] = deepcopy(tracked_create_vals)
 
         else:
@@ -104,67 +107,41 @@ class HrExpenseStripeCardholderWizard(models.TransientModel):
             tracked_create_vals['birthday'] = employee_sudo.birthday and employee_sudo.birthday.isoformat()  # VERY IMPORTANT, the ORM will convert it but not the JSON
 
             work_address = employee_sudo.address_id
-            tracked_create_vals['billing_country_id'] = work_address.country_id.id
+            tracked_create_vals['billing_country_id'] = work_address.country_id and work_address.country_id.id
             tracked_create_vals['billing_city'] = work_address.city
 
             tracked_create_vals['billing_street'] = work_address.street
             tracked_create_vals['billing_street2'] = work_address.street2
             tracked_create_vals['billing_zip'] = work_address.zip
-            tracked_create_vals['billing_state_id'] = work_address.state_id.id
+            tracked_create_vals['billing_state_id'] = work_address.state_id and work_address.state_id.id
 
             # As it doesn't exist on Stripe
             tracked_create_vals['stripe_values'] = {field_name: False for field_name in tracked_create_vals}
 
-        wizard = self.with_context(tracking_disable=True).create([{**create_vals, **tracked_create_vals}])
-        return wizard.with_context(tracking_disable=False)
+        return self.create([{**create_vals, **tracked_create_vals}])
 
-    def _mail_track(self, tracked_fields, initial_values):
+    def _track_prepare(self, field_names):
         # EXTEND mail to force custom initial_values
-        self.ensure_one()
-        initial_values = {}
-        for field_name, value in self.stripe_values.items():
-            match field_name:
-                case 'billing_country_id':  # relational model field stored as an integer in the json
-                    initial_values[field_name] = self.env['res.country'].browse(value)
-                case 'billing_state_id':
-                    initial_values[field_name] = self.env['res.country.state'].browse(value)
-                case 'birthday':  # Stored as an iso-format string in the json
-                    initial_values[field_name] = value and date.fromisoformat(value)
-                case _:
-                    initial_values[field_name] = value
-
-        return super()._mail_track(tracked_fields, initial_values)
-
-    def _get_tracking_values_commands(self):
-        """
-        Re-Generate the commands required for the tracking value to be set as we want it, unrelated if the field was actually modified
-        by the wizard, we want to track the data on Stripe
-        """
-        self.ensure_one()
-        command_list = [Command.clear()]
-        original_values = self.stripe_values
-
-        field_infos = self.fields_get(self._fields, attributes=('string', 'type', 'selection', 'currency_field'))
-        for field_name, value in original_values.items():
-            match field_name:
-                case 'billing_country_id':  # relational model field
-                    new_value = self[field_name] and self[field_name].id
-                case 'birthday':  # Stored as an isoformat string in the json
-                    new_value = self[field_name]
-                    value = value and date.fromisoformat(value)
-                case _:
-                    new_value = self[field_name]
-
-            if new_value != value:
-                command_list.append(Command.create(
-                    self.env['mail.tracking.value']._create_tracking_values(
-                        initial_value=value,
-                        new_value=new_value,
-                        col_name=field_name,
-                        col_info=field_infos[field_name],
-                        record=self,
-                )))
-        return command_list
+        initial_values = super()._track_prepare(field_names)
+        if initial_values is None:
+            return
+        for wizard in self:
+            record_initial_values = initial_values.get(wizard.id)
+            if not record_initial_values:
+                continue
+            for field_name, value in (wizard.stripe_values or {}).items():
+                if field_name not in record_initial_values:
+                    continue
+                match field_name:
+                    case 'billing_country_id':  # relational model field stored as an integer in the json
+                        record_initial_values[field_name] = self.env['res.country'].browse(value)
+                    case 'billing_state_id':
+                        record_initial_values[field_name] = self.env['res.country.state'].browse(value)
+                    case 'birthday':  # Stored as an iso-format string in the json
+                        record_initial_values[field_name] = value and date.fromisoformat(value)
+                    case _:
+                        record_initial_values[field_name] = value
+        return initial_values
 
     def action_save_cardholder(self):
         self.ensure_one()
@@ -216,7 +193,9 @@ class HrExpenseStripeCardholderWizard(models.TransientModel):
         if self.billing_street2:
             payload['billing']['address']['line2'] = self.billing_street2
         if self.billing_state_id:
-            payload['billing']['address']['state'] = self.billing_state_id.name
+            # Stripe uses the ISO 3166-2 for the state for the US. However, Odoo doesn't use the ISO 3611-2 for all the countries
+            # But the ISO 3166-2 is used for the US states in Odoo and Stripe doesn't check it for the others (EU/UK) so we can safely use it.
+            payload['billing']['address']['state'] = self.billing_state_id.code
 
         employee_stripe_id = employee_sudo.private_stripe_id
         if employee_stripe_id:
@@ -264,14 +243,12 @@ class HrExpenseStripeCardholderWizard(models.TransientModel):
             # Get the cardholder cards that belong to the same company
             cardholder_user_su = wizard.sudo().employee_id.user_id
             cards_su = cardholder_user_su.stripe_card_ids.filtered(lambda card: card.company_id == wizard.company_id)
-            message = max(wizard.message_ids, key=lambda msg: msg.date, default=None)  # Only the last message
+            message = max(wizard.sudo().message_ids, key=lambda msg: msg.date, default=None)  # Only the last message
             if message:
-                tracking_values = [Command.create(values) for values in message.tracking_value_ids.copy_data()]
                 for card_su in cards_su:
                     create_vals += message.copy_data({
                         **common_vals,
                         'res_id': card_su.id,
-                        'tracking_value_ids': tracking_values.copy(),
                     })
                 messages_to_unlink += message
 

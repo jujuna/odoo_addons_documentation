@@ -47,11 +47,8 @@ class TestWhitelistFromTemplate(TransactionCase):
         self.assertEqual(contract.l10n_us_health_benefits_medical, 0.0)
         self.assertFalse(contract.l10n_us_worker_compensation_id)
 
-        wizard = self.env['hr.version.wizard']\
-            .with_company(self.company_us)\
-            .with_context(active_model='hr.employee', active_id=self.employee_us.id)\
-            .create({'contract_template_id': template.id})
-        wizard.action_load_template()
+        self.employee_us.contract_template_id = template
+        self.employee_us._onchange_contract_template_id()
 
         for field in Version._get_whitelist_fields_from_template():
             self.assertEqual(contract[field], template[field])

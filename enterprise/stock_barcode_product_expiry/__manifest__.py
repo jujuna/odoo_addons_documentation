@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': "Barcode Expiry",
     'category': 'Supply Chain/Inventory',
-    'version': '1.0',
     'depends': ['stock_barcode', 'product_expiry'],
     'auto_install': True,
     'author': 'Odoo S.A.',

@@ -5,6 +5,8 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 class AccountAutoTransferTestCase(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -30,7 +32,6 @@ class AccountAutoTransferTestCase(AccountTestInvoicingCommon):
                 'name': 'MASTER %s' % self.master_account_index,
                 'code': 'MA00%s' % self.master_account_index,
                 'account_type': 'asset_receivable',
-                'reconcile': True
             })
 
         slave_ids = self.env['account.account']
@@ -40,7 +41,6 @@ class AccountAutoTransferTestCase(AccountTestInvoicingCommon):
                 'name': 'SLAVE %s' % self.slave_account_index,
                 'code': 'SL000%s' % self.slave_account_index,
                 'account_type': 'asset_receivable',
-                'reconcile': True
             })
         return master_ids, slave_ids
 

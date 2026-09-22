@@ -18,7 +18,7 @@ class PosConfig(models.Model):
             read_records[0]["_is_eu_country"] = is_eu_country
             read_records[0]["_kg_uom_id"] = kg_uom_id
             read_records[0]["_unit_uom_id"] = unit_uom_id
-            if is_eu_country and config.iface_electronic_scale:
+            if is_eu_country and config.iot_scale_id:
                 read_records[0]["_scale_checksum"] = calculate_scale_checksum()[0]
                 read_records[0]["_scale_checksum_expected"] = EXPECTED_CHECKSUM
                 read_records[0]["_lne_certification_details"] = config._get_certification_details()
@@ -41,5 +41,5 @@ class PosConfig(models.Model):
             "odoo_version": release.major_version,
             "certificate_number": "LNE-40724",
             "pos_app_version": self.env["ir.module.module"]._get("point_of_sale").installed_version,
-            "iot_image": self.iface_scale_id.iot_id.version,
+            "iot_image": self.iot_scale_id.iot_id.version,
         }

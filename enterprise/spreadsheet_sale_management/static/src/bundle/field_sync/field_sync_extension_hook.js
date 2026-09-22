@@ -1,4 +1,4 @@
-import { registries, coreTypes, stores } from "@odoo/o-spreadsheet";
+import { registries, coreTypes, evaluationCommandTypes, stores } from "@odoo/o-spreadsheet";
 import { onMounted } from "@odoo/owl";
 
 import { _t } from "@web/core/l10n/translation";
@@ -23,6 +23,12 @@ const {
 } = registries;
 
 coreTypes.add("ADD_FIELD_SYNC").add("DELETE_FIELD_SYNCS");
+
+// `evaluationCommandTypes` is a snapshot of `coreTypes` taken when o-spreadsheet
+// is loaded, so every core type added here has to be registered again for
+// evaluation plugins to receive it.
+// TODO: remove once `isEvaluationCommand` also checks `coreTypes` at call time.
+evaluationCommandTypes.add("ADD_FIELD_SYNC").add("DELETE_FIELD_SYNCS");
 
 /**
  * Adds the spreadsheet field sync plugins and menus
@@ -76,7 +82,7 @@ export function addSpreadsheetFieldSyncExtensionWithCleanUp(cleanUpHook = () => 
             env.openSidePanel("FieldSyncSidePanel", { isNewlyCreate });
         },
         sequence: 2000,
-        isVisible: (env) => !env.isSmall,
+        isVisible: (env) => !env.services.ui.isSmall,
     };
     addToRegistryWithCleanup(cleanUpHook, cellMenuRegistry, "add_field_sync", addMenuAction);
     topbarMenuRegistry.replaceChild("add_field_sync", ["insert"], addMenuAction);

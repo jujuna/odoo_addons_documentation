@@ -7,7 +7,7 @@
             <form string="Structure Type">
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" icon="fa-calculator" type="action" name="%(action_view_hr_payroll_structure_from_type)d">
+                        <button class="oe_stat_button" icon="calculate" type="action" name="%(action_view_hr_payroll_structure_from_type)d">
                             <field string="Structures" name="struct_type_count" widget="statinfo"/>
                         </button>
                     </div>
@@ -58,6 +58,8 @@
         <field name="arch" type="xml">
             <search string="Search Structure Type">
                 <field name="name" string="Contract Type"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+
            </search>
         </field>
     </record>

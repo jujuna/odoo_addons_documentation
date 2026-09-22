@@ -16,7 +16,6 @@ import {
     mountWithCleanup,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
-import { Deferred } from "@web/core/utils/concurrency";
 import { WebClient } from "@web/webclient/webclient";
 
 import { onMounted } from "@odoo/owl";
@@ -89,7 +88,7 @@ export async function spawnListViewForSpreadsheet(params = {}) {
  * @returns {Promise<{ model: Model, webClient: object, env: object }>}
  */
 export async function createSpreadsheetFromListView(params = {}) {
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     let spreadsheetAction = {};
     patchWithCleanup(SpreadsheetAction.prototype, {
         setup() {
@@ -116,7 +115,7 @@ export async function createSpreadsheetFromListView(params = {}) {
     const value = params.linesNumber ? params.linesNumber.toString() : "10";
     await contains(".o-sp-dialog-meta-threshold-input").edit(value);
     await contains(".modal-content > .modal-footer > .btn-primary").click();
-    await def;
+    await def.promise;
     const model = getSpreadsheetActionModel(spreadsheetAction);
     await waitForDataLoaded(model);
     await animationFrame();

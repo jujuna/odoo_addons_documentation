@@ -3,5 +3,5 @@ import { patch } from "@web/core/utils/patch";
 import { TimesheetCalendarMyTimesheetsController } from "./timesheet_calendar_my_timesheets_controller";
 
 patch(timesheetCalendarMyTimesheetsView, {
-    Controller: TimesheetCalendarMyTimesheetsController
+    Controller: TimesheetCalendarMyTimesheetsController,
 });

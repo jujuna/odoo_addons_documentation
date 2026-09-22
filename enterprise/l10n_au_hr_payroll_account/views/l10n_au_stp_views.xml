@@ -15,12 +15,11 @@
         <field name="arch" type="xml">
             <form string="Single Touch Payroll">
                 <field name="state" invisible="1"/>
-                <field name="xml_filename" invisible="1"/>
                 <header>
                     <field name="state" widget="statusbar"/>
                     <button name="l10n_au_hr_payroll_account.l10n_au_action_submit_stp" string="Submit to ATO" type="action"
                         class="btn-primary" invisible="state in ['sent']"/>
-                    <button name="action_replace_file" string="Replace File" type="object"
+                    <button name="action_replace_file" string="Amend" type="object"
                         class="btn-primary" invisible="state != 'sent' or is_replaced or payevent_type == 'update'"/>
                 </header>
                 <sheet>
@@ -131,7 +130,7 @@
                 <field name="name"/>
                 <field name="payevent_type" />
                 <field name="activity_ids" widget="list_activity"/>
-                <field name="activity_date_deadline" string="Deadline" widget="remaining_days" />
+                <field name="activity_date_deadline" string="Deadline" widget="relative_date" />
                 <field name="payslip_batch_id" optional="hide"/>
                 <field name="state" widget="badge"
                 decoration-success="state == 'sent'"

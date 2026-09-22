@@ -1,19 +1,19 @@
 <odoo>
     <record id="afip_ri_pkey" model="certificate.key">
         <field name="name">ARCA key</field>
-        <field name="content" type="base64" file="l10n_ar_edi/demo/private_key.pem"/>
+        <field name="content" type="bytes" file="l10n_ar_edi/demo/private_key.pem"/>
         <field name="company_id" ref="base.company_ri"/>
     </record>
 
     <record id="afip_mono_pkey" model="certificate.key">
         <field name="name">ARCA key</field>
-        <field name="content" type="base64" file="l10n_ar_edi/demo/private_key.pem"/>
+        <field name="content" type="bytes" file="l10n_ar_edi/demo/private_key.pem"/>
         <field name="company_id" ref="base.company_mono"/>
     </record>
 
     <record id="afip_exento_pkey" model="certificate.key">
         <field name="name">ARCA key</field>
-        <field name="content" type="base64" file="l10n_ar_edi/demo/private_key.pem"/>
+        <field name="content" type="bytes" file="l10n_ar_edi/demo/private_key.pem"/>
         <field name="company_id" ref="base.company_exento"/>
     </record>
 
@@ -35,7 +35,7 @@
     <data noupdate="1">
 
         <record id="bank_account_mono" model="res.partner.bank">
-            <field name="acc_number">2097538411100037551563</field>
+            <field name="account_number">2097538411100037551563</field>
             <field name="partner_id" ref="base.partner_mono"/>
             <field name="company_id" ref="base.company_mono"/>
         </record>

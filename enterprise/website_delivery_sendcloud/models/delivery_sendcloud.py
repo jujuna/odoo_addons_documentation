@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
@@ -59,7 +58,7 @@ class DeliveryCarrier(models.Model):
 
     @api.model
     def _get_distance_uom_id_from_ir_config_parameter(self):
-        distance_in_miles_param = self.env['ir.config_parameter'].sudo().get_param('product.volume_in_cubic_feet')
+        distance_in_miles_param = self.env['ir.config_parameter'].sudo().get_str('product.volume_in_cubic_feet') or '0'
         if distance_in_miles_param == '1':
             return self.env.ref('uom.product_uom_mile')
         return self.env.ref('uom.product_uom_km')
@@ -83,25 +82,25 @@ class DeliveryCarrier(models.Model):
                 min_distance = uom_meter._compute_quantity(100, delivery.sendcloud_locations_radius_unit)
                 raise ValidationError(_("The minimum radius allowed is %(distance)d%(unit)s", distance=min_distance, unit=delivery.sendcloud_locations_radius_unit.name))
 
-    def _sendcloud_get_close_locations(self, partner_address):
+    def _sendcloud_get_close_locations(self, partner_address, **kwargs):
         superself = self.sudo()
         distance = int(self.sendcloud_locations_radius_unit._compute_quantity(self.sendcloud_locations_radius_value, self.env.ref('uom.product_uom_meter')))
-        slr = SendcloudLocationsRequest(superself.sendcloud_public_key, superself.sendcloud_secret_key, self.log_xml)
+        with SendcloudLocationsRequest(superself.sendcloud_public_key, superself.sendcloud_secret_key, self.log_xml) as slr:
 
-        locations = slr.get_close_locations(partner_address, distance, self.sendcloud_shipping_id.carrier)
-        close_locations = []
+            locations = slr.get_close_locations(partner_address, distance, self.sendcloud_shipping_id.carrier)
+            close_locations = []
 
-        for location in locations:
-            close_locations.append(dict(
-                id=location['id'],
-                name=location['name'].title(),
-                opening_hours=location['formatted_opening_times'],
-                street=f"{location['street'].title()} {location['house_number']}",
-                city=location['city'].title(),
-                zip_code=location['postal_code'],
-                country_code=location['country'],
-                latitude=location['latitude'],
-                longitude=location['longitude'],
-            ))
+            for location in locations:
+                close_locations.append(dict(
+                    id=location['id'],
+                    name=location['name'].title(),
+                    opening_hours=location['formatted_opening_times'],
+                    street=f"{location['street'].title()} {location['house_number']}",
+                    city=location['city'].title(),
+                    zip_code=location['postal_code'],
+                    country_code=location['country'],
+                    latitude=location['latitude'],
+                    longitude=location['longitude'],
+                ))
 
-        return close_locations
+            return close_locations

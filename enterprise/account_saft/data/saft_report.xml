@@ -40,16 +40,15 @@
     To be called with 'company' set as a res.company record.
     -->
     <template id="company_header">
-        <RegistrationNumber t-if="company.company_registry" t-out="company.company_registry"/>
-        <t t-call="account_saft.addresses_contacts">
-            <t t-set="partner_id" t-value="company.partner_id.id"/>
-        </t>
+        <t t-set="company_identifier" t-value="company.partner_id._get_preferred_legal_entity_identifier_vals().get('value', '')"/>
+        <RegistrationNumber t-if="company_identifier" t-out="company_identifier"/>
+        <t t-call="account_saft.addresses_contacts" partner_id="company.partner_id.id"/>
         <BankAccount t-foreach="company.bank_ids" t-as="partner_bank">
-            <t t-if="partner_bank.acc_type == 'iban'">
-                <IBANNumber t-out="partner_bank.acc_number"/>
+            <t t-if="partner_bank.account_type == 'iban'">
+                <IBANNumber t-out="partner_bank.account_number"/>
             </t>
             <t t-else="">
-                <BankAccountNumber t-out="partner_bank.acc_number"/>
+                <BankAccountNumber t-out="partner_bank.account_number"/>
                 <BankAccountName t-if="partner_bank.bank_name" t-out="partner_bank.bank_name[:70]"/>
                 <SortCode t-if="partner_bank.bank_bic" t-out="partner_bank.bank_bic[:18]"/>
             </t>
@@ -133,7 +132,7 @@
                         <AccountDescription t-out="account.name[:256]"/>
                         <StandardAccountID t-out="account.code"/>
                         <t t-if="account_vals['saft_account_type']">
-                            <AccountType t-esc="account_vals['saft_account_type']"/>
+                            <AccountType t-out="account_vals['saft_account_type']"/>
                         </t>
                         <t t-if="account_vals['opening_balance'] &lt; 0.0">
                             <OpeningCreditBalance t-out="format_float(-account_vals['opening_balance'])"/>
@@ -151,9 +150,7 @@
                 </GeneralLedgerAccounts>
                 <Customers t-if="customer_vals_list">
                     <Customer t-foreach="customer_vals_list" t-as="partner_vals">
-                        <t t-call="account_saft.addresses_contacts">
-                            <t t-set="partner_id" t-value="partner_vals['partner'].id"/>
-                        </t>
+                        <t t-call="account_saft.addresses_contacts" partner_id="partner_vals['partner'].id"/>
                         <CustomerID t-out="partner_vals['partner'].id"/>
                         <t t-if="partner_vals['opening_balance'] &lt; 0.0">
                             <OpeningCreditBalance t-out="format_float(-partner_vals['opening_balance'])"/>
@@ -171,9 +168,7 @@
                 </Customers>
                 <Suppliers t-if="supplier_vals_list">
                     <Supplier t-foreach="supplier_vals_list" t-as="partner_vals">
-                        <t t-call="account_saft.addresses_contacts">
-                            <t t-set="partner_id" t-value="partner_vals['partner'].id"/>
-                        </t>
+                        <t t-call="account_saft.addresses_contacts" partner_id="partner_vals['partner'].id"/>
                         <SupplierID t-out="partner_vals['partner'].id"/>
                         <t t-if="partner_vals['opening_balance'] &lt; 0.0">
                             <OpeningCreditBalance t-out="format_float(-partner_vals['opening_balance'])"/>
@@ -232,8 +227,8 @@
                         <GLPostingDate t-out="move_vals['date']"/>
                         <t t-if="move_vals['partner_id']">
                             <t t-set="partner_vals" t-value="partner_detail_map[move_vals['partner_id']]"/>
-                            <CustomerID t-if="partner_vals['type'] == 'customer'" t-out="move_vals['partner_id']"/>
-                            <SupplierID t-if="partner_vals['type'] == 'supplier'" t-out="move_vals['partner_id']"/>
+                            <CustomerID t-if="'customer' in partner_vals['types']" t-out="move_vals['partner_id']"/>
+                            <SupplierID t-if="'supplier' in partner_vals['types']" t-out="move_vals['partner_id']"/>
                         </t>
                         <Line t-foreach="move_vals['line_vals_list']" t-as="line_vals">
                             <RecordID t-out="line_vals['id']"/>
@@ -242,8 +237,8 @@
                             <SourceDocumentID t-out="move_vals['id']"/>
                             <t t-if="line_vals['partner_id']">
                                 <t t-set="partner_vals" t-value="partner_detail_map[line_vals['partner_id']]"/>
-                                <CustomerID t-if="partner_vals['type'] == 'customer'" t-out="line_vals['partner_id']"/>
-                                <SupplierID t-if="partner_vals['type'] == 'supplier'" t-out="line_vals['partner_id']"/>
+                                <CustomerID t-if="line_vals['account_type'] == 'asset_receivable' or (line_vals['account_type'] != 'liability_payable' and partner_vals['type'] == 'customer')" t-out="line_vals['partner_id']"/>
+                                <SupplierID t-if="line_vals['account_type'] == 'liability_payable' or (line_vals['account_type'] != 'asset_receivable' and partner_vals['type'] == 'supplier')" t-out="line_vals['partner_id']"/>
                             </t>
                             <Description t-out="(line_vals['name'] or move_vals['name'])[:256]"/>
                             <t t-call="account_saft.line_debit_credit_amount"/>

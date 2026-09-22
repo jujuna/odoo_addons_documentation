@@ -6,18 +6,21 @@ export const embeddedActionsServerData = getDocumentsTestServerModelsData([
         id: 2,
         name: "Request 1",
         available_embedded_actions_ids: [1],
+        type: "request",
     },
     {
         folder_id: 1,
         id: 3,
         name: "Request 2",
         available_embedded_actions_ids: [2, 3],
+        type: "request",
     },
     {
         folder_id: 1,
         id: 4,
         name: "Request 3",
         available_embedded_actions_ids: [3],
+        type: "request",
     },
 ]);
 embeddedActionsServerData["ir.embedded.actions"] = [

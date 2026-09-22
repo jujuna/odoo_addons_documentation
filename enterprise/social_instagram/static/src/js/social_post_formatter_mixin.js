@@ -1,4 +1,4 @@
-import { markup } from "@odoo/owl";
+import { htmlEscape, markup } from "@odoo/owl";
 
 import {
     SocialPostFormatterMixinBase,
@@ -20,15 +20,14 @@ patch(SocialPostFormatterMixinBase, {
             value = htmlReplace(
                 value,
                 SocialPostFormatterRegex.REGEX_HASHTAG,
-                (_, before, hashtag) => {
+                (_, hashtag) => {
                     /**
                      * markup: value is a Markup object (either escaped inside htmlReplace or
-                     * flagged safe), `before` and `hashtag` are directly coming from this value,
-                     * and the regex doesn't do anything crazy to unescape them.
+                     * flagged safe), `hashtag` is directly coming from this value,
+                     * and the regex doesn't do anything crazy to unescape it.
                      */
-                    before = markup(before);
                     hashtag = markup(hashtag);
-                    return markup`${before}<a href='https://www.instagram.com/explore/tags/${hashtag}' target='_blank'>#${hashtag}</a>`;
+                    return markup`<a href='https://www.instagram.com/explore/tags/${hashtag}' target='_blank'>#${hashtag}</a>`;
                 }
             );
             value = htmlReplace(value, SocialPostFormatterRegex.REGEX_AT, (_, name) => {
@@ -39,6 +38,17 @@ patch(SocialPostFormatterMixinBase, {
                  */
                 name = markup(name);
                 return markup`<a href='https://www.instagram.com/${name}' target='_blank'>@${name}</a>`;
+            });
+        } else if (this._getMediaType() === "instagram_preview") {
+            const mentions =
+                JSON.parse(this.props.record.data.social_post_mentions || "{}")["instagram"] || {};
+            value = value.replaceAll(SocialPostFormatterRegex.REGEX_AT, (mention, name) => {
+                if (!mentions[name]) {
+                    return mention;
+                }
+                return markup`<a href='https://www.instagram.com/${htmlEscape(
+                    name
+                )}' target='_blank'>${mention}</a>`;
             });
         }
         return value;

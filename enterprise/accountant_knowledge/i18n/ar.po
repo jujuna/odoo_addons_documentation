@@ -2,15 +2,15 @@
 # This file contains the translation of the following modules:
 # * accountant_knowledge
 #
-# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-17 11:43+0000\n"
-"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 01:45+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
 "accountant_knowledge/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,13 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: accountant_knowledge
+#. odoo-python
+#: code:addons/accountant_knowledge/models/audit_report.py:0
+msgid "%(title)s (copy)"
+msgstr "%(title)s (نسخة)"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_attestation
@@ -47,14 +53,28 @@ msgid "<em>To be completed...</em>"
 msgstr "<em>قيد التنفيذ...</em>"
 
 #. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
 #: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_kanban
-msgid "<i class=\"fa fa-fw fa-building me-2\" title=\"Company\"/>"
-msgstr "<i class=\"fa fa-fw fa-building me-2\" title=\"Company\"/>"
+msgid "<i class=\"oi me-2\" data-icon=\"east\" title=\"arrow\"/>"
+msgstr ""
 
 #. module: accountant_knowledge
 #: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_kanban
-msgid "<i class=\"fa fa-fw fa-calendar me-2\" title=\"Calendar\"/>"
-msgstr "<i class=\"fa fa-fw fa-calendar me-2\" title=\"Calendar\"/>"
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"business\" "
+"title=\"Company\"/>"
+msgstr ""
+"<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"business\" "
+"title=\"Company\"/>"
+
+#. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_kanban
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"calendar_today\" "
+"title=\"Calendar\"/>"
+msgstr ""
+"<i class=\"oi oi-fw oi-filled me-2\" data-icon=\"calendar_today\" "
+"title=\"Calendar\"/>"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_supporting_documents
@@ -242,12 +262,12 @@ msgstr ""
 "يتم عرض السلف المستلمة من مؤسسات عامة أو خاصة لتمويل أنشطة الشركة، والتي "
 "يكون سدادها مشروطًا، تحت بند حقوق الملكية في الميزانية العمومية كـ ”حقوق "
 "ملكية أخرى“. ويتم تسجيل نفقات الفوائد المقابلة كالتزامات تحت بند ”القروض "
-"والديون المالية الأخرى“."
+"والديون المالية الأخرى“"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_asset_information
 msgid "Aged Payable"
-msgstr "حسابات دائنة مستحقة متأخرة"
+msgstr "حسابات دائنة مستحقة متأخرة "
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_asset_information
@@ -270,9 +290,23 @@ msgid "Annexes"
 msgstr "الملحقات"
 
 #. module: accountant_knowledge
+#: model:ir.model,name:accountant_knowledge.model_audit_report
 #: model:ir.ui.menu,name:accountant_knowledge.menu_action_accountant_audit_report
+#: model:knowledge.article,template_name:accountant_knowledge.accountant_knowledge_article_template_audit_report
 msgid "Annual Report"
 msgstr "التقرير السنوي"
+
+#. module: accountant_knowledge
+#: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__knowledge_template_article_id
+#: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__is_audit_report_template
+msgid "Annual Report Template"
+msgstr "قالب التقرير السنوي"
+
+#. module: accountant_knowledge
+#: model:ir.actions.act_window,name:accountant_knowledge.action_audit_report
+#: model:ir.module.module,shortdesc:base.module_accountant_knowledge
+msgid "Annual Reports"
+msgstr "التقارير السنوية"
 
 #. module: accountant_knowledge
 #: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__knowledge_article_id
@@ -296,8 +330,8 @@ msgid ""
 "financial statements of {{ company name }} for the period from {{ start of "
 "period }} to {{ end of period }}, which include the following key figures:"
 msgstr ""
-"بصفتنا محاسبين قانونيين، قمنا بتجميع البيانات المالية المؤقتة لشركة "
-"{{ company name }} للفترة من {{ start of period }} إلى {{ end of period }}، "
+"بصفتنا محاسبين قانونيين، قمنا بتجميع البيانات المالية المؤقتة لشركة {{ "
+"company name }} للفترة من {{ start of period }} إلى {{ end of period }}، "
 "والتي تتضمن الأرقام الرئيسية التالية:"
 
 #. module: accountant_knowledge
@@ -327,27 +361,9 @@ msgid "Attestation"
 msgstr "التصديق"
 
 #. module: accountant_knowledge
-#: model:ir.model,name:accountant_knowledge.model_audit_report
 #: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__audit_report_id
-#: model:knowledge.article,template_name:accountant_knowledge.accountant_knowledge_article_template_audit_report
 msgid "Audit Report"
 msgstr "تقرير المراجعة"
-
-#. module: accountant_knowledge
-#: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__knowledge_template_article_id
-#: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__is_audit_report_template
-msgid "Audit Report Template"
-msgstr "قالب تقرير المراجعة"
-
-#. module: accountant_knowledge
-#: model:ir.actions.act_window,name:accountant_knowledge.action_audit_report
-msgid "Audit Reports"
-msgstr "تقارير التدقيق"
-
-#. module: accountant_knowledge
-#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
-msgid "Audit Template"
-msgstr "قالب المراجعة"
 
 #. module: accountant_knowledge
 #: model:knowledge.article,template_name:accountant_knowledge.accountant_knowledge_article_template_balance_sheet
@@ -470,10 +486,15 @@ msgid "Costs related to under-activity are excluded from the inventory value."
 msgstr "يتم استبعاد التكاليف المتعلقة بنقص الأنشطة من قيمة المخزون."
 
 #. module: accountant_knowledge
+#: model:ir.module.module,summary:base.module_accountant_knowledge
+msgid "Create Annual Reports with Knowledge"
+msgstr ""
+
+#. module: accountant_knowledge
 #: model:ir.actions.act_window,name:accountant_knowledge.action_audit_report_quick_create
 #: model_terms:ir.actions.act_window,help:accountant_knowledge.action_audit_report
-msgid "Create an Audit Report"
-msgstr "إنشاء تقرير تدقيق"
+msgid "Create an Annual Report"
+msgstr "إنشاء تقرير سنوي"
 
 #. module: accountant_knowledge
 #: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__create_uid
@@ -489,7 +510,7 @@ msgstr "أُنشئ في"
 #. odoo-javascript
 #: code:addons/accountant_knowledge/static/src/editor/embedded_components/backend/account_report/account_report.xml:0
 msgid "Customize"
-msgstr "خصِّص"
+msgstr "تخصيص"
 
 #. module: accountant_knowledge
 #: model_terms:ir.actions.act_window,help:accountant_knowledge.action_audit_report
@@ -525,7 +546,7 @@ msgstr "فترة الإهلاك"
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_liabilities_information
 msgid "Depreciation Schedule"
-msgstr "جدول الإهلاك"
+msgstr "جدول الإهلاك "
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_asset_information
@@ -585,8 +606,8 @@ msgid ""
 "Detail the factors affecting future tax liabilities and the impact of tax "
 "valuation adjustments."
 msgstr ""
-"قم بتوضيح العوامل التي تؤثر على الالتزامات الضريبية المستقبلية وتأثير "
-"تعديلات التقييم الضريبي."
+"قم بتوضيح العوامل التي تؤثر على الالتزامات الضريبية المستقبلية وتأثير تعديلات "
+"التقييم الضريبي."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_asset_information
@@ -604,13 +625,11 @@ msgstr ""
 #. module: accountant_knowledge
 #. odoo-javascript
 #: code:addons/accountant_knowledge/static/src/components/export_audit_report_to_pdf_dialog/export_audit_report_to_pdf_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
 msgid "Discard"
 msgstr "إهمال"
 
 #. module: accountant_knowledge
 #: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__display_name
-#: model:ir.model.fields,field_description:accountant_knowledge.field_ir_actions_report__display_name
 #: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
@@ -643,6 +662,19 @@ msgid "Draft"
 msgstr "مسودة"
 
 #. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_kanban
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_list
+msgid "Duplicate"
+msgstr "إنشاء نسخة مطابقة "
+
+#. module: accountant_knowledge
+#. odoo-python
+#: code:addons/accountant_knowledge/models/audit_report.py:0
+msgid "Duplicate Annual Report"
+msgstr "نسخة مكررة من التقرير السنوي"
+
+#. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_attestation
 msgid ""
 "During the course of our engagement, we identified the following matters "
@@ -668,14 +700,14 @@ msgid ""
 "During this period, the company benefited from the following tax credits, "
 "which have contributed to optimizing its tax position:"
 msgstr ""
-"خلال هذه الفترة، استفادت الشركة من الائتمانات الضريبية التالية، التي ساهمت "
-"في تحسين وضعها الضريبي:"
+"خلال هذه الفترة، استفادت الشركة من الائتمانات الضريبية التالية، التي ساهمت في "
+"تحسين وضعها الضريبي:"
 
 #. module: accountant_knowledge
 #. odoo-python
 #: code:addons/accountant_knowledge/models/audit_report.py:0
-msgid "Edit Audit Report"
-msgstr "تحرير تقرير المراجعة"
+msgid "Edit Annual Report"
+msgstr "تحرير التقرير السنوي"
 
 #. module: accountant_knowledge
 #: model_terms:ir.actions.act_window,help:accountant_knowledge.action_audit_report
@@ -804,6 +836,11 @@ msgid "Fiscal Year N<br>"
 msgstr "السنة المالية N<br>"
 
 #. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_front_cover
+msgid "Fiscal period from"
+msgstr ""
+
+#. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_intangible_and_tangible_assets
 msgid "Fixtures and fittings: 10 years"
 msgstr "التجهيزات والتركيبات: 10 سنوات"
@@ -826,8 +863,8 @@ msgid ""
 "For each member, indicate the retirement commitments and similar benefits "
 "granted to them."
 msgstr ""
-"بالنسبة لكل عضو، يرجى الإشارة إلى التزامات التقاعد والمزايا المماثلة "
-"الممنوحة له."
+"بالنسبة لكل عضو، يرجى الإشارة إلى التزامات التقاعد والمزايا المماثلة الممنوحة "
+"له."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_transactions_with_management
@@ -837,8 +874,8 @@ msgid ""
 "amount of commitments made on their behalf."
 msgstr ""
 "بالنسبة لكل عضو، قم بتحديد السلف والقروض الممنوحة له، بما في ذلك الشروط "
-"المتفق عليها والسداد الذي تم خلال الفترة، بالإضافة إلى مبلغ الالتزامات التي "
-"تم التعهد بها نيابة عنه."
+"المتفق عليها والسداد الذي تم خلال الفترة، بالإضافة إلى مبلغ الالتزامات التي تم "
+"التعهد بها نيابة عنه."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_taxation
@@ -846,8 +883,8 @@ msgid ""
 "For tax-consolidated entities, explain the tax allocation method, tax "
 "differences, loss carryforwards, and related accounting specifics."
 msgstr ""
-"بالنسبة للكيانات المدمجة ضريبياً، اشرح طريقة توزيع الضرائب، والاختلافات "
-"الضريبية، والخسائر المرحّلة، والتفاصيل المحاسبية ذات الصلة."
+"بالنسبة للكيانات المدمجة ضريبياً، اشرح طريقة توزيع الضرائب، والاختلافات الضريبية"
+"، والخسائر المرحّلة، والتفاصيل المحاسبية ذات الصلة."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_asset_information
@@ -855,8 +892,8 @@ msgid ""
 "From the Equity app, print the Capitalization Table and insert it <strong "
 "class=\"o-upload-link\">here</strong>"
 msgstr ""
-"من تطبيق الأسهم، اطبع جدول الرسملة وأدخله <strong class=\"o-upload-"
-"link\">هنا</strong>"
+"من تطبيق الأسهم، اطبع جدول الرسملة وأدخله <strong class=\"o-upload-link\">"
+"هنا</strong>"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_intangible_and_tangible_assets
@@ -885,7 +922,7 @@ msgid ""
 "applicable accounting standards"
 msgstr ""
 "نظراً للطبيعة المبتكرة لأنشطة الشركة، فإن جزءاً كبيراً من نفقاتها يتعلق بتكاليف "
-"التطوير كما هو محدد في المعايير المحاسبية المعمول بها."
+"التطوير كما هو محدد في المعايير المحاسبية المعمول بها"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_account_principles_and_methods
@@ -894,7 +931,6 @@ msgstr "الاستمرارية؛"
 
 #. module: accountant_knowledge
 #: model:ir.model.fields,field_description:accountant_knowledge.field_audit_report__id
-#: model:ir.model.fields,field_description:accountant_knowledge.field_ir_actions_report__id
 #: model:ir.model.fields,field_description:accountant_knowledge.field_knowledge_article__id
 msgid "ID"
 msgstr "المُعرف"
@@ -1012,9 +1048,8 @@ msgid ""
 "Include acquisitions, disposals, cancellations, and the reason for holding "
 "these shares (e.g. employee plans, market operations)."
 msgstr ""
-"اذكر عدد وقيمة الأسهم التي تمتلكها الشركة خلال السنة. قم بتضمين عمليات "
-"الشراء والبيع والإلغاء وأسباب امتلاك هذه الأسهم (مثل خطط الموظفين وعمليات "
-"السوق)."
+"اذكر عدد وقيمة الأسهم التي تمتلكها الشركة خلال السنة. قم بتضمين عمليات الشراء "
+"والبيع والإلغاء وأسباب امتلاك هذه الأسهم (مثل خطط الموظفين وعمليات السوق)."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_asset_information
@@ -1022,8 +1057,8 @@ msgid ""
 "Indicate the total book value of inventories as well as the book value by "
 "relevant categories."
 msgstr ""
-"اذكر القيمة الدفترية الإجمالية للمخزونات وكذلك القيمة الدفترية حسب الفئات "
-"ذات الصلة."
+"اذكر القيمة الدفترية الإجمالية للمخزونات وكذلك القيمة الدفترية حسب الفئات ذات "
+"الصلة."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_income_statement
@@ -1056,8 +1091,8 @@ msgid ""
 "discounts obtained."
 msgstr ""
 "تُقيَّم الأصول غير الملموسة بتكلفة شرائها أو إنتاجها، بما في ذلك جميع النفقات "
-"اللازمة لإعداد هذه الأصول للاستخدام المقصود منها. ويُخصم من هذا التقييم أي "
-"خصومات تجارية أو حسومات أو خصومات تسوية تم الحصول عليها."
+"اللازمة لإعداد هذه الأصول للاستخدام المقصود منها. ويُخصم من هذا التقييم أي خصومات "
+"تجارية أو حسومات أو خصومات تسوية تم الحصول عليها."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_intangible_and_tangible_assets
@@ -1137,7 +1172,7 @@ msgstr ""
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_asset_information
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_financial_resources
 msgid "Loans"
-msgstr "القروض"
+msgstr "القروض "
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_asset_information
@@ -1278,8 +1313,8 @@ msgid ""
 "review."
 msgstr ""
 "تم أداء عملنا وفقاً للمعايير المهنية المطبقة على عمليات التجميع، كما صدرت عن "
-"الهيئة المهنية للمحاسبين القانونيين. ولكن لا يعتبر هذا العمل تدقيقاً أو "
-"مراجعة محدودة."
+"الهيئة المهنية للمحاسبين القانونيين. ولكن لا يعتبر هذا العمل تدقيقاً أو مراجعة "
+"محدودة."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_entity_information
@@ -1300,6 +1335,14 @@ msgstr "براءات الاختراع: سيتم تحديدها لاحقًا..."
 #: model:knowledge.article,template_name:accountant_knowledge.accountant_knowledge_article_template_performance_and_operations
 msgid "Performance & Operations"
 msgstr "الأداء والعمليات"
+
+#. module: accountant_knowledge
+#. odoo-python
+#: code:addons/accountant_knowledge/controller/main.py:0
+msgid ""
+"Please make sure a document layout has been set for the company linked to "
+"the audit report you intend to export."
+msgstr ""
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_income_statement
@@ -1419,8 +1462,8 @@ msgid ""
 "Receivables and payables denominated in foreign currencies are converted "
 "into euros using the exchange rate at the invoice date."
 msgstr ""
-"يتم تحويل المبالغ المستحقة القبض والمبالغ المستحقة الدفع بالعملات الأجنبية "
-"إلى اليورو باستخدام سعر الصرف الساري في تاريخ الفاتورة."
+"يتم تحويل المبالغ المستحقة القبض والمبالغ المستحقة الدفع بالعملات الأجنبية إلى "
+"اليورو باستخدام سعر الصرف الساري في تاريخ الفاتورة."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_attestation
@@ -1456,11 +1499,6 @@ msgstr "التجديدات: 10 سنوات"
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_financial_resources
 msgid "Repayable Advances"
 msgstr "السلف القابلة للسداد"
-
-#. module: accountant_knowledge
-#: model:ir.model,name:accountant_knowledge.model_ir_actions_report
-msgid "Report Action"
-msgstr "إجراء التقرير"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_attestation
@@ -1633,6 +1671,11 @@ msgid "Supporting Documents"
 msgstr "المستندات الداعمة"
 
 #. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_table_of_content
+msgid "Table of content"
+msgstr ""
+
+#. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_intangible_and_tangible_assets
 msgid ""
 "Tangible assets are also valued at their production cost where applicable."
@@ -1671,6 +1714,11 @@ msgid "Technical installations, equipment, and tools<br>"
 msgstr "التركيبات التقنية والمعدات والأدوات<br>"
 
 #. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
+msgid "Template"
+msgstr "قالب"
+
+#. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_account_principles_and_methods
 msgid ""
 "The annual financial statements have been prepared in accordance with "
@@ -1705,8 +1753,7 @@ msgid ""
 "The exemption for valuation of securities in case of abnormal and temporary "
 "decline is applied."
 msgstr ""
-"يتم تطبيق الإعفاء من تقييم الأوراق المالية في حالة الانخفاض غير الطبيعي "
-"والمؤقت."
+"يتم تطبيق الإعفاء من تقييم الأوراق المالية في حالة الانخفاض غير الطبيعي والمؤقت."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_preamble
@@ -1785,9 +1832,8 @@ msgid ""
 "equity as investment grants."
 msgstr ""
 "يتم إثبات الجزء من الإعانات الذي يمول النفقات الرأسمالية في الدخل التشغيلي "
-"خلال نفس الفترة التي يتم فيها إثبات استهلاك الأصول ذات الصلة. ويتم تسجيل "
-"الجزء المكتسب الذي لم يتم إثباته بعد في الدخل تحت بند حقوق الملكية كمنح "
-"استثمارية."
+"خلال نفس الفترة التي يتم فيها إثبات استهلاك الأصول ذات الصلة. ويتم تسجيل الجزء "
+"المكتسب الذي لم يتم إثباته بعد في الدخل تحت بند حقوق الملكية كمنح استثمارية."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_account_principles_and_methods
@@ -1795,8 +1841,8 @@ msgid ""
 "The primary method used to value the items recorded in the accounts is the "
 "historical cost method."
 msgstr ""
-"الطريقة الأساسية المستخدمة لتقييم البنود المسجلة في الحسابات هي طريقة "
-"التكلفة التاريخية."
+"الطريقة الأساسية المستخدمة لتقييم البنود المسجلة في الحسابات هي طريقة التكلفة "
+"التاريخية."
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_intangible_and_tangible_assets
@@ -1804,8 +1850,8 @@ msgid ""
 "The purchase price (including customs duties and non-recoverable taxes, less "
 "any trade discounts, rebates, or settlement discounts);"
 msgstr ""
-"سعر الشراء (بما في ذلك الرسوم الجمركية والضرائب غير القابلة للاسترداد، "
-"مطروحًا منها أي خصومات تجارية أو حسومات أو خصومات تسوية)؛"
+"سعر الشراء (بما في ذلك الرسوم الجمركية والضرائب غير القابلة للاسترداد، مطروحًا "
+"منها أي خصومات تجارية أو حسومات أو خصومات تسوية)؛"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_preamble
@@ -1814,6 +1860,14 @@ msgid ""
 "balance sheet }}."
 msgstr ""
 "يبلغ إجمالي الميزانية العمومية قبل توزيع النتيجة {{ total balance sheet }}."
+
+#. module: accountant_knowledge
+#. odoo-python
+#: code:addons/accountant_knowledge/models/knowledge_article.py:0
+msgid ""
+"This article does not have an associated audit report, so the PDF cannot be "
+"generated."
+msgstr ""
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_entity_information
@@ -1893,8 +1947,8 @@ msgid ""
 "We are making the following comment regarding a matter that may affect the "
 "overall consistency and reliability of the financial statements:"
 msgstr ""
-"نقدم التعليق التالي بشأن مسألة قد تؤثر على الاتساق والموثوقية العامة "
-"للبيانات المالية:"
+"نقدم التعليق التالي بشأن مسألة قد تؤثر على الاتساق والموثوقية العامة للبيانات "
+"المالية:"
 
 #. module: accountant_knowledge
 #: model_terms:knowledge.article,template_body:accountant_knowledge.accountant_knowledge_article_template_inventory_overview
@@ -1919,8 +1973,8 @@ msgid ""
 "value."
 msgstr ""
 "حيثما ينطبق ذلك، يتم إهلاك المبالغ المستحقة القبض من خلال مخصصات لمراعاة "
-"الصعوبات المحتملة في التحصيل. ويتم تحديد مخصصات الانخفاض في القيمة هذه من "
-"خلال مقارنة قيمة الشراء بالقيمة المحتملة القابلة للتحصيل."
+"الصعوبات المحتملة في التحصيل. ويتم تحديد مخصصات الانخفاض في القيمة هذه من خلال "
+"مقارنة قيمة الشراء بالقيمة المحتملة القابلة للتحصيل."
 
 #. module: accountant_knowledge
 #: model:knowledge.article,template_name:accountant_knowledge.accountant_knowledge_article_template_workforce
@@ -1937,3 +1991,8 @@ msgstr "القوى العاملة المستخدمة خلال الفترة"
 #: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_view_form
 msgid "e.g. Annual Financial Overview"
 msgstr "مثال، نظرة عامة على الوضع المالي السنوي"
+
+#. module: accountant_knowledge
+#: model_terms:ir.ui.view,arch_db:accountant_knowledge.audit_report_front_cover
+msgid "to"
+msgstr ""

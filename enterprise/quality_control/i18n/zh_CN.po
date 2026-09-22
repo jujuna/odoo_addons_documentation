@@ -8,23 +8,37 @@
 # Jeffery CHEN <jeffery9@gmail.com>, 2022
 # Emily Jia <eji@odoo.com>, 2023
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-09 18:43+0000\n"
-"PO-Revision-Date: 2025-11-20 08:14+0000\n"
-"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 01:23+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/quality_control/zh_Hans/>\n"
+"projects/odoo-master/quality_control/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: quality_control
+#: model:ir.module.module,description:base.module_quality_control
+msgid ""
+"\n"
+"Quality Control\n"
+"===============\n"
+"* Define quality points that will generate quality checks on pickings,\n"
+"  manufacturing orders or work orders (quality_mrp)\n"
+"* Quality alerts can be created independently or related to quality checks\n"
+"* Possibility to add a measure to the quality check with a min/max "
+"tolerance\n"
+"* Define your stages for the quality alerts\n"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -49,27 +63,13 @@ msgid "15.3 cm"
 msgstr "15.3 厘米"
 
 #. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
-msgid "2023-08-15"
-msgstr "2023 年 8 月 15 日"
-
-#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_dashboard_view_kanban
 msgid ""
-"<i class=\"fa fa-envelope-o\" role=\"img\" aria-label=\"Domain alias\" "
+"<i class=\"oi\" data-icon=\"mail\" role=\"img\" aria-label=\"Domain alias\" "
 "title=\"Domain alias\"/>&amp;nbsp;"
 msgstr ""
-"<i class=\"fa fa-envelope-o\" role=\"img\" aria-label=\"域别名\" title=\"域别"
-"名\"/>&amp;nbsp;"
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid ""
-"<span class=\"fa fa-2x\" data-icon=\"∑\" style=\"padding-left: 10px;\" "
-"role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
-msgstr ""
-"<span class=\"fa fa-2x\" data-icon=\"∑\" style=\"padding-left: 10px;\" "
-"role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
+"<i class=\"oi\" data-icon=\"mail\" role=\"img\" aria-label=\"域别名\" "
+"title=\"域别名\"/>&amp;nbsp;"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
@@ -119,6 +119,18 @@ msgstr "<span class=\"o_stat_text\">质量检查</span>"
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 msgid "<span class=\"o_stat_text\">Quality Checks</span>"
 msgstr "<span class=\"o_stat_text\">质量检查</span>"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.res_partner_view_form_inherit_quality_control
+msgid "<span class=\"o_stat_text\">Quality Rate</span>"
+msgstr ""
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
+msgid ""
+"<span class=\"oi o_button_icon\" data-icon=\"troubleshoot\" style=\"padding-"
+"left: 10px;\" role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -247,9 +259,19 @@ msgid "Back"
 msgstr "回退"
 
 #. module: quality_control
+#: model:ir.model,name:quality_control.model_stock_picking_batch
+msgid "Batch Transfer"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__check_ids
 msgid "Check"
 msgstr "检查"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.stock_move_line_view_list_from_batch
+msgid "Check Quality"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__check_state
@@ -301,6 +323,11 @@ msgid "Confirm Measure"
 msgstr "确认测量"
 
 #. module: quality_control
+#: model:ir.model,name:quality_control.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_point__measure_frequency_type
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
 msgid "Control Frequency"
@@ -336,6 +363,11 @@ msgid "Control per:"
 msgstr "每次控制："
 
 #. module: quality_control
+#: model:ir.module.module,summary:base.module_quality_control
+msgid "Control the quality of your products"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
 msgid "Correct Measure"
 msgstr "正确测量"
@@ -349,6 +381,11 @@ msgstr "纠正动作"
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_form
 msgid "Create Alert"
 msgstr "创建警报"
+
+#. module: quality_control
+#: model:ir.model,website_form_label:quality_control.model_res_partner
+msgid "Create a Customer"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_alert_action_check
@@ -396,12 +433,6 @@ msgid "Days"
 msgstr "天"
 
 #. module: quality_control
-#: model:ir.model.fields,help:quality_control.field_quality_check__uom_id
-#: model:ir.model.fields,help:quality_control.field_quality_check_wizard__uom_id
-msgid "Default unit of measure used for all stock operations."
-msgstr "所有库存作业的默认单位。"
-
-#. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_check_action_main
 #: model_terms:ir.actions.act_window,help:quality_control.quality_check_action_team
 msgid ""
@@ -447,14 +478,11 @@ msgid "Determines if only a fraction of the lot should be tested"
 msgstr "确定是否只需对部分批次的产品进行测试"
 
 #. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
-msgid "Discard"
-msgstr "丢弃"
-
-#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_ir_http__display_name
 #: model:ir.model.fields,field_description:quality_control.field_product_product__display_name
 #: model:ir.model.fields,field_description:quality_control.field_product_template__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_alert__display_name
+#: model:ir.model.fields,field_description:quality_control.field_quality_alert_team__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__display_name
@@ -462,10 +490,12 @@ msgstr "丢弃"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__display_name
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet__display_name
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet_internal__display_name
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_lot__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_move__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__display_name
 msgid "Display Name"
 msgstr "显示名称"
 
@@ -481,15 +511,14 @@ msgid "Edit"
 msgstr "编辑"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Effective Date Last Year"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_form
 msgid "Email Alias"
 msgstr "电子邮箱别名"
-
-#. module: quality_control
-#: model:ir.model.fields,help:quality_control.field_quality_check__product_tracking
-#: model:ir.model.fields,help:quality_control.field_quality_check_wizard__product_tracking
-msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr "确保可追溯到仓库中的产品。"
 
 #. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_success__fail
@@ -541,6 +570,11 @@ msgid "Future Activities"
 msgstr "未来活动"
 
 #. module: quality_control
+#: model:ir.model,name:quality_control.model_ir_http
+msgid "HTTP Routing"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__hide_picking_id
 msgid "Hide Picking"
 msgstr ""
@@ -553,12 +587,14 @@ msgstr ""
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__hide_repair_id
 msgid "Hide Repair"
-msgstr ""
+msgstr "隐藏维修"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_ir_http__id
 #: model:ir.model.fields,field_description:quality_control.field_product_product__id
 #: model:ir.model.fields,field_description:quality_control.field_product_template__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_alert__id
+#: model:ir.model.fields,field_description:quality_control.field_quality_alert_team__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__id
@@ -566,10 +602,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__id
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet__id
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet_internal__id
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_lot__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_move__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__id
+#: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__id
 msgid "ID"
 msgstr "ID"
 
@@ -643,6 +681,12 @@ msgid "Late Activities"
 msgstr "最近活动"
 
 #. module: quality_control
+#: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__move_line
+#: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_on__move_line
+msgid "Lot"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_line_id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__lot_line_id
 msgid "Lot Line"
@@ -662,7 +706,6 @@ msgstr "批号/序列号"
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_stock_lot
-#: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_ids
 msgid "Lot/Serial"
 msgstr "批次/序列号"
 
@@ -734,12 +777,6 @@ msgid "Nb Checks"
 msgstr "检查"
 
 #. module: quality_control
-#. odoo-python
-#: code:addons/quality_control/models/quality.py:0
-msgid "New"
-msgstr "新建"
-
-#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Next"
 msgstr "下一页"
@@ -803,6 +840,11 @@ msgid "Notes"
 msgstr "备注"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
+msgid "OK"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_frequency_type__on_demand
 msgid "On-demand"
 msgstr "按需要"
@@ -824,14 +866,10 @@ msgstr "作业"
 #: model:ir.model.fields,help:quality_control.field_quality_point__measure_on
 msgid ""
 "Operation = One quality check is requested at the operation level.\n"
-"                  Product = A quality check is requested per product.\n"
-"                 Quantity = A quality check is requested for each new "
-"product quantity registered, with partial quantity checks also possible."
+"                Product = A quality check is requested per product.\n"
+"                Lot = A quality check is requested for each new product "
+"quantity registered, with partial quantity checks also possible."
 msgstr ""
-"操作 = 在操作层面要求进行一次质量检查。\n"
-"                  产品 = 每个产品要求进行一次质量检查。\n"
-"                  数量 = 对每个新注册的产品数量要求进行质量检查，也可以进行部"
-"分数量检查。"
 
 #. module: quality_control
 #: model:ir.ui.menu,name:quality_control.menu_quality_dashboard
@@ -845,6 +883,7 @@ msgstr "部分测试"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_form
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 msgid "Partner"
 msgstr "合作伙伴"
 
@@ -928,11 +967,6 @@ msgid "Product Variant"
 msgstr "产品变体"
 
 #. module: quality_control
-#: model:ir.ui.menu,name:quality_control.quality_control_menu_product_variant
-msgid "Product Variants"
-msgstr "产品变体"
-
-#. module: quality_control
 #: model:ir.ui.menu,name:quality_control.quality_control_menu_product
 #: model:ir.ui.menu,name:quality_control.quality_product_menu_product_template
 msgid "Products"
@@ -949,6 +983,7 @@ msgid "Qty Failed"
 msgstr "失败数量"
 
 #. module: quality_control
+#: model:ir.module.module,shortdesc:base.module_quality_control
 #: model:ir.ui.menu,name:quality_control.menu_quality_root
 msgid "Quality"
 msgstr "质量"
@@ -959,6 +994,7 @@ msgstr "质量"
 #: model:ir.actions.server,name:quality_control.stock_picking_action_quality_alert
 #: model:ir.model,name:quality_control.model_quality_alert
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_calendar
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_form
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_search_inherit_quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 msgid "Quality Alert"
@@ -985,6 +1021,11 @@ msgstr "质量警报数量"
 #: model:ir.ui.menu,name:quality_control.menu_quality_config_alert_stage
 msgid "Quality Alert Stages"
 msgstr "质量警报阶段"
+
+#. module: quality_control
+#: model:ir.model,name:quality_control.model_quality_alert_team
+msgid "Quality Alert Team"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_alert_stage_action
@@ -1026,6 +1067,12 @@ msgid "Quality Check Analysis"
 msgstr "质量检查分析"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__quality_check_count
+#: model:ir.model.fields,field_description:quality_control.field_res_users__quality_check_count
+msgid "Quality Check Count"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__quality_check_fail
 msgid "Quality Check Fail"
 msgstr "未通过"
@@ -1054,6 +1101,11 @@ msgid "Quality Check Qty"
 msgstr "质量检查数量"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__quality_check_todo
+msgid "Quality Check Todo"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
 msgid "Quality Check:"
 msgstr "质量检查："
@@ -1065,6 +1117,7 @@ msgstr "质量检查："
 #: model:ir.actions.act_window,name:quality_control.quality_check_action_team
 #: model:ir.ui.menu,name:quality_control.menu_quality_checks
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_batch_form
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_search_inherit_quality
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_production_lot_form_quality_control
@@ -1115,6 +1168,13 @@ msgstr "质量合格数量"
 #: model_terms:ir.ui.view,arch_db:quality_control.product_template_form_view_quality_control
 msgid "Quality Points"
 msgstr "质量点"
+
+#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_check__quality_rate
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__quality_rate
+#: model:ir.model.fields,field_description:quality_control.field_res_users__quality_rate
+msgid "Quality Rate"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.actions.act_window,name:quality_control.quality_spreadsheet_template_action_config
@@ -1171,10 +1231,14 @@ msgstr ""
 "              对你的不同产品，在每项操作中都要进行质量检查。"
 
 #. module: quality_control
+#. odoo-python
+#: code:addons/quality_control/models/quality_spreadsheet_template.py:0
+msgid "Quality templates"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__qty_line
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__qty_line
-#: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__move_line
-#: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_on__move_line
 msgid "Quantity"
 msgstr "数量"
 
@@ -1247,7 +1311,7 @@ msgstr "负责人"
 #. odoo-javascript
 #: code:addons/quality_control/static/src/spreadsheet_bundle/quality_check_spreadsheet_action/quality_check_spreadsheet_action.xml:0
 msgid "Save in"
-msgstr "保存在"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__show_lot_text
@@ -1283,6 +1347,12 @@ msgstr "电子表格数据"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
 msgstr "电子表格文件名称"
+
+#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__spreadsheet_image_ids
+msgid "Spreadsheet Image"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_revision_ids
@@ -1342,6 +1412,16 @@ msgid "Success cell"
 msgstr "成功储存格"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_point__supplier_count
+msgid "Supplier Count"
+msgstr ""
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
+msgid "Suppliers"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_tag_view_search
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_tag_view_tree
 msgid "Tags"
@@ -1367,6 +1447,14 @@ msgstr "团队："
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_tree
 msgid "Teams"
 msgstr "团队"
+
+#. module: quality_control
+#: model:ir.model.fields,help:quality_control.field_quality_check__product_tracking
+#: model:ir.model.fields,help:quality_control.field_quality_check_wizard__product_tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__test_type
@@ -1403,6 +1491,11 @@ msgstr ""
 "如 Sheet2!C4）。如果未指定，则默认选择第一个工作表。"
 
 #. module: quality_control
+#: model:ir.model.fields,help:quality_control.field_quality_check__quality_rate
+msgid "The percentage of quality checks that passed."
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_point__measure_frequency_value
 msgid "The probability of each quality check being generated"
 msgstr "生成每项质量检查的概率"
@@ -1420,6 +1513,11 @@ msgid "Title"
 msgstr "标题"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_form
+msgid "Title..."
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 msgid "Today Activities"
 msgstr "今日活动"
@@ -1432,8 +1530,8 @@ msgstr "偏差"
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__product_tracking
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__product_tracking
-msgid "Tracking"
-msgstr "追溯"
+msgid "Tracking Method"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_stock_picking
@@ -1475,6 +1573,7 @@ msgid "Untitled spreadsheet"
 msgstr ""
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_batch_form
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Validate"
 msgstr "验证"
@@ -1544,6 +1643,14 @@ msgstr "您须在验证前提供图片"
 #. module: quality_control
 #. odoo-python
 #: code:addons/quality_control/models/stock_picking.py:0
+msgid ""
+"You need to supply a Lot/Serial Number for product:\n"
+"%(products)s"
+msgstr ""
+
+#. module: quality_control
+#. odoo-python
+#: code:addons/quality_control/models/stock_picking.py:0
 msgid "You still need to do the quality checks!"
 msgstr "请先进行质量检查！"
 
@@ -1562,39 +1669,8 @@ msgstr "例如：QA大师"
 msgid "e.g. mycompany.com"
 msgstr "e.g. mycompany.com"
 
-#~ msgid "% of Operations"
-#~ msgstr "% 的操作"
+#~ msgid "Ensure the traceability of a storable product in your warehouse."
+#~ msgstr "确保可追溯到仓库中的产品。"
 
-#~ msgid "% of Transfers"
-#~ msgstr "% 的调拨"
-
-#~ msgid ""
-#~ "<span attrs=\"{'invisible': [('measure_frequency_type', '=', 'all')]}"
-#~ "\">Every </span>"
-#~ msgstr ""
-#~ "<span attrs=\"{'invisible': [('measure_frequency_type', '=', 'all')]}\">每"
-#~ "</span>"
-
-#~ msgid "Cancel"
-#~ msgstr "取消"
-
-#~ msgid "Group By"
-#~ msgstr "分组方式"
-
-#~ msgid "In #{kanban_getcolorname(record.color.raw_value)}"
-#~ msgstr "在 #{kanban_getcolorname(record.color.raw_value)}"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "Partial Transfer Test"
-#~ msgstr "部分调拨测试"
-
-#~ msgid "Product Unit of Measure"
-#~ msgstr "产品计量单位"
-
-#~ msgid "Quality Control Points"
-#~ msgstr "质量控制点"
-
-#~ msgid "You measured %.2f %s and it should be between %.2f and %.2f %s."
-#~ msgstr "您的测量值为 %.2f %s，且该值应在 %.2f 和 %.2f %s 之间。"
+#~ msgid "Tracking"
+#~ msgstr "追溯"

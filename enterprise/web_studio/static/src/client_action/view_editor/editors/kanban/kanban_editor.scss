@@ -1,6 +1,7 @@
 .o_web_studio_kanban_view_editor:not(.o_web_studio_kanban_view_editor_legacy) {
         $-web-studio-kanban-edition-gap: 6px;
-
+        --ws-hook-nearest-border: 1px dashed #{rgba($o-brand-primary, 0.5)};
+        --ws-hook-separator-display: none;
         .o_kanban_record {
             transition: padding .3s;
 
@@ -16,11 +17,11 @@
             }
 
             // it make no sense to add elements if this class is applied
-            aside.o_kanban_aside_full .o_web_studio_hook {
+            aside.o_card_aside_full .o_web_studio_hook {
                 display: none !important;
             }
 
-            main > div.o-web-studio-editor--element-clickable {
+            .o_record_main > div.o-web-studio-editor--element-clickable {
                 margin: 0;
                 max-width: 100%;
             }
@@ -69,36 +70,6 @@
             .o-web-studio-editor--element-clickable {
                 &:has(.o-web-studio-editor--element-clickable) {
                     padding: $-web-studio-kanban-edition-gap*0.5;
-                }
-            }
-
-            .o_web_studio_hook {
-                margin: 1px;
-                border: 0px dashed transparent;
-                transition: all .2s;
-
-                &.o_web_studio_hook_visible {
-                    padding: 6px;
-                    background: rgba($o-brand-secondary, 0.1);
-                    z-index: 100;
-
-                    &[data-structures="aside"], &[data-type="t"] {
-                        width: 50px !important;
-                    }
-
-                    &[data-type="ribbon"] {
-                        width: 100% !important;
-                    }
-                }
-                &.o_web_studio_nearest_hook {
-                    cursor: pointer;
-                    background-color: rgba($o-brand-primary, 0.02);
-                    border: 1px dashed rgba($o-brand-primary, 0.5);
-                    padding: 18px !important;
-
-                    &[data-type="ribbon"] div {
-                        opacity: 1 !important;
-                    }
                 }
             }
         }

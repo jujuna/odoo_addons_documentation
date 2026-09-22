@@ -1,8 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo.tests import tagged
+
 from odoo.addons.helpdesk.tests.common import HelpdeskCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHelpdeskSaleTimesheetSLA(HelpdeskCommon):
     @classmethod
     def setUpClass(cls):
@@ -28,13 +31,13 @@ class TestHelpdeskSaleTimesheetSLA(HelpdeskCommon):
                 'name': 'SLA with partner',
                 'team_id': cls.test_team.id,
                 'stage_id': cls.stage_new.id,
-                'partner_ids': [cls.partner.id],
+                'criteria_domain': "[('partner_id', '=', %d)]" % cls.partner.id,
             }, {
                 'name': 'SLA with both',
                 'team_id': cls.test_team.id,
                 'stage_id': cls.stage_new.id,
                 'product_ids': [cls.product_template.id],
-                'partner_ids': [cls.partner.id],
+                'criteria_domain': "[('partner_id', '=', %d)]" % cls.partner.id,
             }
         ])
 

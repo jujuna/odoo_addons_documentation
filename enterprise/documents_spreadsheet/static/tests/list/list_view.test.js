@@ -20,6 +20,8 @@ import * as spreadsheet from "@odoo/o-spreadsheet";
 import { onMounted } from "@odoo/owl";
 import {
     addGlobalFilter,
+    createSheet,
+    deleteSheet,
     selectCell,
     setCellContent,
 } from "@spreadsheet/../tests/helpers/commands";
@@ -33,7 +35,10 @@ import { insertListInSpreadsheet } from "@spreadsheet/../tests/helpers/list";
 import { getZoneOfInsertedDataSource } from "@spreadsheet/../tests/helpers/pivot";
 import { doMenuAction, getActionMenu } from "@spreadsheet/../tests/helpers/ui";
 import { waitForDataLoaded } from "@spreadsheet/helpers/model";
-import { getSpreadsheetActionModel } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
+import {
+    getSpreadsheetActionModel,
+    editSelectComponent,
+} from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
 import { InsertListSpreadsheetMenu } from "@spreadsheet_edition/assets/list_view/insert_list_spreadsheet_menu_owl";
 import { SpreadsheetSelectorDialog } from "@spreadsheet_edition/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog";
 import { insertList } from "@spreadsheet_edition/bundle/list/list_init_callback";
@@ -41,6 +46,7 @@ import * as dsHelpers from "@web/../tests/core/tree_editor/condition_tree_editor
 import {
     contains,
     fields,
+    getService,
     mountView,
     onRpc,
     pagerNext,
@@ -52,7 +58,6 @@ import {
 } from "@web/../tests/web_test_helpers";
 import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
-import { Deferred } from "@web/core/utils/concurrency";
 import { mockActionService } from "../helpers/spreadsheet_test_utils";
 
 defineDocumentSpreadsheetModels();
@@ -60,7 +65,7 @@ defineDocumentSpreadsheetTestAction();
 describe.current.tags("desktop");
 
 const { topbarMenuRegistry, cellMenuRegistry } = spreadsheet.registries;
-const { toZone } = spreadsheet.helpers;
+const { toZone, sanitizeSheetName } = spreadsheet.helpers;
 
 test("insert list formulas", async () => {
     const { model } = await createSpreadsheetFromListView({
@@ -76,16 +81,19 @@ test("insert list formulas", async () => {
             },
         },
     });
-    expect(model.getters.getListDefinition("1").columns).toEqual(["foo", "bar"]);
+    expect(model.getters.getListDefinition("1").columns).toMatchObject([
+        { name: "foo" },
+        { name: "bar" },
+    ]);
     expect(getCellFormula(model, "A1")).toBe('=ODOO.LIST.HEADER(1,"foo","Foo")');
     expect(getCellFormula(model, "B1")).toBe('=ODOO.LIST.HEADER(1,"bar","Bar")');
-    expect(getCellFormula(model, "A2")).toBe('=ODOO.LIST(1,1,"foo")');
-    expect(getCellFormula(model, "A3")).toBe('=ODOO.LIST(1,2,"foo")');
-    expect(getCellFormula(model, "A4")).toBe('=ODOO.LIST(1,3,"foo")');
+    expect(getCellFormula(model, "A2")).toBe('=ODOO.LIST.VALUE(1,1,"foo")');
+    expect(getCellFormula(model, "A3")).toBe('=ODOO.LIST.VALUE(1,2,"foo")');
+    expect(getCellFormula(model, "A4")).toBe('=ODOO.LIST.VALUE(1,3,"foo")');
     expect(getCellFormula(model, "A5")).toBe("");
-    expect(getCellFormula(model, "B2")).toBe('=ODOO.LIST(1,1,"bar")');
-    expect(getCellFormula(model, "B3")).toBe('=ODOO.LIST(1,2,"bar")');
-    expect(getCellFormula(model, "B4")).toBe('=ODOO.LIST(1,3,"bar")');
+    expect(getCellFormula(model, "B2")).toBe('=ODOO.LIST.VALUE(1,1,"bar")');
+    expect(getCellFormula(model, "B3")).toBe('=ODOO.LIST.VALUE(1,2,"bar")');
+    expect(getCellFormula(model, "B4")).toBe('=ODOO.LIST.VALUE(1,3,"bar")');
     expect(getCellFormula(model, "B5")).toBe("");
 });
 
@@ -102,7 +110,7 @@ test("List export with a invisible field", async () => {
             },
         },
     });
-    expect(model.getters.getListDefinition("1").columns).toEqual(["bar"]);
+    expect(model.getters.getListDefinition("1").columns).toEqual([{ name: "bar", string: "Bar" }]);
 });
 
 test("List export with a widget handle", async () => {
@@ -118,7 +126,9 @@ test("List export with a widget handle", async () => {
             },
         },
     });
-    expect(model.getters.getListDefinition("1").columns).toEqual(["bar"]);
+    expect(model.getters.getListDefinition("1").columns).toMatchObject([
+        { name: "bar", string: "Bar" },
+    ]);
 });
 
 test("Lists are inserted with a table in the webclient", async () => {
@@ -128,7 +138,7 @@ test("Lists are inserted with a table in the webclient", async () => {
     expect(table.range.zone).toEqual(toZone("A1:D11"));
 });
 
-test("property fields are not exported", async () => {
+test("property fields are exported", async () => {
     const data = getBasicData();
     const propertyDefinition = {
         type: "char",
@@ -175,7 +185,11 @@ test("property fields are not exported", async () => {
             },
         },
     });
-    expect(model.getters.getListDefinition("1").columns).toEqual(["product_id", "bar"]);
+    expect(model.getters.getListDefinition("1").columns).toMatchObject([
+        { name: "product_id", string: "Product" },
+        { name: "bar", string: "Bar" },
+        { name: "partner_properties.property_char", string: "Property char" },
+    ]);
     expect.verifySteps(["display_property"]);
 });
 
@@ -192,7 +206,9 @@ test("json fields are not exported", async () => {
             },
         },
     });
-    expect(model.getters.getListDefinition("1").columns).toEqual(["bar"]);
+    expect(model.getters.getListDefinition("1").columns).toMatchObject([
+        { name: "bar", string: "Bar" },
+    ]);
 });
 
 test("list side panel is open at insertion", async function () {
@@ -210,15 +226,12 @@ test("An error is displayed in the side panel if the list has invalid model", as
     });
     await contains(".o-sidePanelClose").click();
     const listId = model.getters.getListIds()[0];
-    const listDefinition = model.getters.getListModelDefinition(listId);
+    const listDefinition = model.getters.getListDefinition(listId);
     model.dispatch("UPDATE_ODOO_LIST", {
         listId,
         list: {
             ...listDefinition,
-            metaData: {
-                ...listDefinition.metaData,
-                resModel: "unknown",
-            },
+            model: "unknown",
         },
     });
     env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
@@ -230,49 +243,31 @@ test("An error is displayed in the side panel if the list has invalid model", as
 test("Open list properties", async function () {
     const { env } = await createSpreadsheetFromListView();
 
-    await doMenuAction(topbarMenuRegistry, ["data", "item_list_1"], env);
+    await doMenuAction(topbarMenuRegistry, ["data", "list_data_sources", "item_list_1"], env);
     await animationFrame();
     const target = getFixture();
     const title = target.querySelector(".o-sidePanelTitle").innerText;
     expect(title).toBe("List #1");
 
     const sections = target.querySelectorAll(".o-section");
-    expect(sections.length).toBe(6, { message: "it should have 6 sections" });
-    const [listName, listModel, columns, domain] = sections;
+    expect(sections.length).toBe(7, { message: "it should have 7 sections" });
+    const [listName, listModel, columns, sort, domain, ,] = sections;
 
     expect(listName.children[0]).toHaveText("List Name");
-    expect(listName.children[1].querySelector("input").value).toBe("Partners");
+    expect(listName.querySelector("input").value).toBe("Partners");
 
     expect(listModel.children[0]).toHaveText("Model");
     expect(listModel.children[1]).toHaveText("Partner (partner)");
 
-    expect(columns.children[0]).toHaveText("Columns");
+    expect(columns.querySelector(".o-section-title > div").firstChild.textContent.trim()).toBe(
+        "Columns"
+    );
+    expect(sort.querySelector(".o-section-title > div").firstChild.textContent.trim()).toBe(
+        "Sorting"
+    );
 
     expect(domain.children[0]).toHaveText("Domain");
     expect(domain.children[1]).toHaveText("Match all records\nInclude archived");
-});
-
-test("A warning is displayed in the menu item if the list is unused", async function () {
-    const { model } = await createSpreadsheetFromListView();
-    model.dispatch("CREATE_SHEET", { sheetId: "sh2", name: "Sheet2" });
-    insertListInSpreadsheet(model, {
-        sheetId: "sh2",
-        model: "product",
-        columns: ["name", "active"],
-    });
-    const target = getFixture();
-    await contains("div[data-id='data']").click();
-
-    const menuItemList1 = target.querySelector("div[data-name='item_list_1']");
-    const menuItemList2 = target.querySelector("div[data-name='item_list_2']");
-    expect(menuItemList1.querySelector(".o-unused-list-icon")).toEqual(null);
-    expect(menuItemList2.querySelector(".o-unused-list-icon")).toEqual(null);
-
-    model.dispatch("DELETE_SHEET", { sheetId: "sh2" });
-    await animationFrame();
-
-    expect(menuItemList1.querySelector(".o-unused-list-icon")).toEqual(null);
-    expect(menuItemList2.querySelector(".o-unused-list-icon")).toHaveCount(1);
 });
 
 test("A warning is displayed in the side panel if the list is unused", async function () {
@@ -284,10 +279,10 @@ test("A warning is displayed in the side panel if the list is unused", async fun
 
     expect(".o-validation-warning").toHaveCount(0);
 
-    model.dispatch("CREATE_SHEET", { sheetId: "sh2", name: "Sheet2" });
+    createSheet(model, { sheetId: "sh2", name: "Sheet2" });
     const activeSheetId = model.getters.getActiveSheetId();
     model.dispatch("ACTIVATE_SHEET", { sheetIdFrom: activeSheetId, sheetIdTo: "sh2" });
-    model.dispatch("DELETE_SHEET", { sheetId: activeSheetId });
+    deleteSheet(model, activeSheetId);
     await animationFrame();
 
     expect(".o-validation-warning").toHaveCount(1);
@@ -327,17 +322,15 @@ test("Undo a list insertion closes the side panel", async function () {
 test("Add list in an existing spreadsheet", async () => {
     const { model, env } = await createSpreadsheetFromListView();
     const list = model.getters.getListDefinition("1");
-    const fields = model.getters.getListDataSource("1").getFields();
     const callback = insertList.bind({ isEmptySpreadsheet: false })({
         list: {
             ...list,
-            columns: list.columns.map((col) => ({ name: col })),
+            columns: list.columns,
         },
         threshold: 10,
-        fields: fields,
         name: "my list",
     });
-    model.dispatch("CREATE_SHEET", { sheetId: "42", position: 1 });
+    createSheet(model, { sheetId: "42", position: 1 });
     const activeSheetId = model.getters.getActiveSheetId();
     expect(model.getters.getSheetIds()).toEqual([activeSheetId, "42"]);
     await callback(model, env.__spreadsheet_stores__);
@@ -347,26 +340,54 @@ test("Add list in an existing spreadsheet", async () => {
     expect(".o-listing-details-side-panel").toHaveCount(1);
 });
 
-test("Verify absence of list properties on non-list cell", async function () {
+test("Verify absence of list properties and sorting list on non-list cell", async function () {
     const { model, env } = await createSpreadsheetFromListView();
     selectCell(model, "Z26");
-    const root = cellMenuRegistry.getAll().find((item) => item.id === "listing_properties");
-    expect(root.isVisible(env)).toBe(false);
+    const propertiesItem = cellMenuRegistry
+        .getAll()
+        .find((item) => item.id === "listing_properties");
+    const sortingItem = cellMenuRegistry.getAll().find((item) => item.id === "sorting_list");
+    expect(propertiesItem.isVisible(env)).toBe(false);
+    expect(sortingItem.isVisible(env)).toBe(false);
 });
 
-test("Verify absence of list properties on formula with invalid list Id", async function () {
+test("Verify absence of list properties and sorting list on formula with invalid list Id", async function () {
     const { model, env } = await createSpreadsheetFromListView();
     setCellContent(model, "A1", `=ODOO.LIST.HEADER("fakeId", "foo")`);
-    const root = cellMenuRegistry.getAll().find((item) => item.id === "listing_properties");
-    expect(root.isVisible(env)).toBe(false);
-    setCellContent(model, "A1", `=ODOO.LIST("fakeId", "2", "bar")`);
-    expect(root.isVisible(env)).toBe(false);
+    const propertiesItem = cellMenuRegistry
+        .getAll()
+        .find((item) => item.id === "listing_properties");
+    const sortingItem = cellMenuRegistry.getAll().find((item) => item.id === "sorting_list");
+    expect(propertiesItem.isVisible(env)).toBe(false);
+    expect(sortingItem.isVisible(env)).toBe(false);
+    setCellContent(model, "A1", `=ODOO.LIST.VALUE("fakeId", "2", "bar")`);
+    expect(propertiesItem.isVisible(env)).toBe(false);
+    expect(sortingItem.isVisible(env)).toBe(false);
+});
+
+test("Verify absence of sorting list on static list", async function () {
+    const { model, env } = await createSpreadsheetFromListView();
+    const sortingItem = cellMenuRegistry.getAll().find((item) => item.id === "sorting_list");
+    selectCell(model, "A1");
+    expect(sortingItem.isVisible(env)).toBe(false);
+});
+
+test("Verify presence of sorting list on dynamic list", async function () {
+    const { model, env } = await createSpreadsheetFromListView();
+    const sortingItem = cellMenuRegistry.getAll().find((item) => item.id === "sorting_list");
+    setCellContent(model, "G1", `=ODOO.LIST(1)`);
+    selectCell(model, "G1");
+    expect(sortingItem.isVisible(env)).toBe(true);
 });
 
 test("Re-insert a list correctly ask for lines number", async function () {
     const { model, env } = await createSpreadsheetFromListView();
     selectCell(model, "Z26");
-    await doMenuAction(topbarMenuRegistry, ["data", "reinsert_list", "reinsert_list_1"], env);
+    await doMenuAction(
+        topbarMenuRegistry,
+        ["data", "reinsert_static_list", "reinsert_static_list_1"],
+        env
+    );
     await animationFrame();
     expect(".modal-body input").toHaveCount(1);
     expect(".modal-body input").toHaveProperty("type", "number");
@@ -374,7 +395,11 @@ test("Re-insert a list correctly ask for lines number", async function () {
     await contains(".o_dialog .btn-secondary").click(); // cancel
     expect(getCellFormula(model, "Z26")).toBe("", { message: "the list is not re-inserted" });
 
-    await doMenuAction(topbarMenuRegistry, ["data", "reinsert_list", "reinsert_list_1"], env);
+    await doMenuAction(
+        topbarMenuRegistry,
+        ["data", "reinsert_static_list", "reinsert_static_list_1"],
+        env
+    );
     await animationFrame();
     await contains(".o_dialog .btn-primary").click(); // confirm
     expect(getCellFormula(model, "Z26")).toBe('=ODOO.LIST.HEADER(1,"foo","Foo")', {
@@ -382,11 +407,49 @@ test("Re-insert a list correctly ask for lines number", async function () {
     });
 });
 
+test("Re-insert a static list keeps stored header definitions", async function () {
+    const { model, env } = await createSpreadsheetFromListView();
+    const listId = model.getters.getListIds()[0];
+    const list = model.getters.getListDefinition(listId);
+
+    model.dispatch("UPDATE_ODOO_LIST", {
+        listId,
+        list: {
+            ...list,
+            columns: [
+                { name: "foo" },
+                { name: "bar", string: "Fixed Bar" },
+                { name: "date", string: "Custom Date" },
+            ],
+        },
+    });
+
+    selectCell(model, "Z26");
+
+    await doMenuAction(
+        topbarMenuRegistry,
+        ["data", "reinsert_static_list", "reinsert_static_list_1"],
+        env
+    );
+    await animationFrame();
+
+    await contains(".modal-body input").edit("10");
+    await contains(".modal-content > .modal-footer > .btn-primary").click();
+
+    expect(getCellFormula(model, "Z26")).toBe('=ODOO.LIST.HEADER(1,"foo")');
+    expect(getCellFormula(model, "AA26")).toBe('=ODOO.LIST.HEADER(1,"bar","Fixed Bar")');
+    expect(getCellFormula(model, "AB26")).toBe('=ODOO.LIST.HEADER(1,"date","Custom Date")');
+});
+
 test("Validates input and shows error message when input is invalid", async function () {
     const { model, env } = await createSpreadsheetFromListView();
     selectCell(model, "Z1");
 
-    await doMenuAction(topbarMenuRegistry, ["data", "reinsert_list", "reinsert_list_1"], env);
+    await doMenuAction(
+        topbarMenuRegistry,
+        ["data", "reinsert_static_list", "reinsert_static_list_1"],
+        env
+    );
     await animationFrame();
 
     await contains(".modal-body input").edit("");
@@ -395,20 +458,43 @@ test("Validates input and shows error message when input is invalid", async func
     expect(".modal-body span.text-danger:only").toHaveText("Please enter a valid number.");
 });
 
-test("Re-insert a list with a selected number of records", async function () {
+test("Re-insert a static list with a selected number of records", async function () {
     const { model, env } = await createSpreadsheetFromListView();
     selectCell(model, "Z1");
 
-    await doMenuAction(topbarMenuRegistry, ["data", "reinsert_list", "reinsert_list_1"], env);
+    await doMenuAction(
+        topbarMenuRegistry,
+        ["data", "reinsert_static_list", "reinsert_static_list_1"],
+        env
+    );
     await animationFrame();
 
     await contains(".modal-body input").edit("2000");
     await contains(".modal-content > .modal-footer > .btn-primary").click();
 
     expect(model.getters.getNumberRows(model.getters.getActiveSheetId())).toBe(2001);
+    expect(getCellFormula(model, "Z2001")).toBe('=ODOO.LIST.VALUE(1,2000,"foo")');
 });
 
-test("Re-insert a list also applies a table", async function () {
+test("Re-insert a dynamic list with a selected number of records", async function () {
+    const { model, env } = await createSpreadsheetFromListView();
+    selectCell(model, "Z1");
+
+    await doMenuAction(
+        topbarMenuRegistry,
+        ["data", "reinsert_dynamic_list", "reinsert_dynamic_list_1"],
+        env
+    );
+    await animationFrame();
+
+    await contains(".modal-body input").edit("2000");
+    await contains(".modal-content > .modal-footer > .btn-primary").click();
+
+    expect(model.getters.getNumberRows(model.getters.getActiveSheetId())).toBe(2001);
+    expect(getCellFormula(model, "Z1")).toBe("=ODOO.LIST(1,2000)");
+});
+
+test("Re-insert a static list also applies a table", async function () {
     const { model, env } = await createSpreadsheetFromListView();
     const sheetId = model.getters.getActiveSheetId();
     let table = model.getters.getTable({ sheetId, col: 0, row: 49 });
@@ -416,7 +502,11 @@ test("Re-insert a list also applies a table", async function () {
 
     selectCell(model, "A50");
 
-    await doMenuAction(topbarMenuRegistry, ["data", "reinsert_list", "reinsert_list_1"], env);
+    await doMenuAction(
+        topbarMenuRegistry,
+        ["data", "reinsert_static_list", "reinsert_static_list_1"],
+        env
+    );
     await animationFrame();
 
     await contains(".modal-body input").edit("10");
@@ -424,6 +514,28 @@ test("Re-insert a list also applies a table", async function () {
 
     table = model.getters.getTable({ sheetId, col: 0, row: 49 });
     expect(table.range.zone).toEqual(toZone("A50:D60"));
+});
+
+test("Re-insert a dynamic list also applies a table", async function () {
+    const { model, env } = await createSpreadsheetFromListView();
+    const sheetId = model.getters.getActiveSheetId();
+    let table = model.getters.getTable({ sheetId, col: 0, row: 49 });
+    expect(table).toBe(undefined);
+
+    selectCell(model, "A50");
+
+    await doMenuAction(
+        topbarMenuRegistry,
+        ["data", "reinsert_dynamic_list", "reinsert_dynamic_list_1"],
+        env
+    );
+    await animationFrame();
+
+    await contains(".modal-body input").edit("10");
+    await contains(".modal-content > .modal-footer > .btn-primary").click();
+
+    table = model.getters.getTable({ sheetId, col: 0, row: 49 });
+    expect(table.range.zone).toEqual(toZone("A50:D54"));
 });
 
 test("user related context is not saved in the spreadsheet", async function () {
@@ -487,7 +599,7 @@ test("user related context is not saved in the spreadsheet", async function () {
 });
 
 test("Selected records from current page are inserted correctly", async function () {
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     let spreadsheetAction = {};
     patchWithCleanup(SpreadsheetAction.prototype, {
         setup() {
@@ -523,7 +635,7 @@ test("Selected records from current page are inserted correctly", async function
     await contains(insertMenuItem).click();
     await contains(".modal-content > .modal-footer > .btn-primary").click();
 
-    await def;
+    await def.promise;
     const model = getSpreadsheetActionModel(spreadsheetAction);
     await waitForDataLoaded(model);
     expect(getCellValue(model, "A2")).toBe(17, {
@@ -533,7 +645,7 @@ test("Selected records from current page are inserted correctly", async function
 });
 
 test("Selected all records from current page are inserted correctly", async function () {
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     let spreadsheetAction = {};
     patchWithCleanup(SpreadsheetAction.prototype, {
         setup() {
@@ -569,7 +681,7 @@ test("Selected all records from current page are inserted correctly", async func
     await contains(insertMenuItem).click();
     await contains(".modal-content > .modal-footer > .btn-primary").click();
 
-    await def;
+    await def.promise;
     const model = getSpreadsheetActionModel(spreadsheetAction);
     await waitForDataLoaded(model);
     expect(getCellValue(model, "A2")).toBe(12, {
@@ -604,7 +716,7 @@ test("Insert in spreadsheet is avaiblable on a list grouped by m2m field", async
     const target = getFixture();
     await contains(target.querySelectorAll(".o_list_record_selector input")[0]).click();
     await toggleActionMenu();
-    await contains(".o-dropdown--menu .o_menu_item:has(.oi-view-list)").click();
+    await contains(".o-dropdown--menu .o_menu_item:has([data-icon='view_list'])").click();
     await contains(".modal button.btn-primary").click();
     await animationFrame();
 
@@ -661,8 +773,8 @@ test("See record of list is only displayed on list formula with only one list fo
         services: model.config.custom.env.services,
     };
     setCellContent(model, "A1", "test");
-    setCellContent(model, "A2", `=ODOO.LIST("1","1","foo")`);
-    setCellContent(model, "A3", `=ODOO.LIST("1","1","foo")+LIST("1","1","foo")`);
+    setCellContent(model, "A2", `=ODOO.LIST.VALUE("1","1","foo")`);
+    setCellContent(model, "A3", `=ODOO.LIST.VALUE("1","1","foo")+LIST("1","1","foo")`);
     const root = cellMenuRegistry.getAll().find((item) => item.id === "list_see_record");
 
     selectCell(model, "A1");
@@ -690,7 +802,7 @@ test("See records is not visible if the formula is in error", async function () 
     setCellContent(
         model,
         "B2",
-        getCellFormula(model, "B2").replace(`ODOO.LIST(1`, `ODOO.LIST("5)`)
+        getCellFormula(model, "B2").replace(`ODOO.LIST.VALUE(1`, `ODOO.LIST.VALUE("5)`)
     ); //Invalid id
     expect(getEvaluatedCell(model, "B2").message).not.toBe(undefined);
     expect(root.isVisible(env)).toBe(false);
@@ -709,7 +821,7 @@ test("See record.isVisible() don't throw on spread values", async function () {
 
 test("Cannot see record of list formula without value", async function () {
     const { env, model } = await createSpreadsheetFromListView();
-    expect(getCellFormula(model, "A6")).toBe(`=ODOO.LIST(1,5,"foo")`);
+    expect(getCellFormula(model, "A6")).toBe(`=ODOO.LIST.VALUE(1,5,"foo")`);
     expect(getCellValue(model, "A6")).toBe("", { message: "A6 is empty" });
     selectCell(model, "A6");
     const action = await getActionMenu(cellMenuRegistry, ["list_see_record"], env);
@@ -719,7 +831,7 @@ test("Cannot see record of list formula without value", async function () {
 test("'See records' loads a specific action if set in the list definition", async function () {
     const actionXmlId = "spreadsheet.partner_action";
     const { webClient, model } = await createSpreadsheetFromListView({ actionXmlId });
-    const actionService = webClient.env.services.action;
+    const actionService = getService("action");
     const env = {
         ...webClient.env,
         model,
@@ -775,7 +887,7 @@ test("Update the list title from the side panel", async function () {
     const [listId] = model.getters.getListIds();
     env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
     await animationFrame();
-    const target = await contains(".os-input");
+    const target = await contains(".o-sidePanel .os-input");
     await target.click();
     await target.edit("new name");
     expect(model.getters.getListName(listId)).toBe("new name");
@@ -848,20 +960,19 @@ test("Update the list sorting from the side panel", async function () {
     const [listId] = model.getters.getListIds();
     env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
     await animationFrame();
-    await contains(".add-dimension").click();
+    await contains(".add-dimension:eq(1)").click();
     for (let i = 0; i < 5; i++) {
         await contains(".o-popover input").press("ArrowDown");
     }
     await contains(".o-autocomplete-value-focus").click();
     expect(model.getters.getListDefinition(listId).orderBy).toEqual([{ name: "date", asc: true }]);
-    await contains(".add-dimension").click();
+    await contains(".add-dimension:eq(1)").click();
     for (let i = 0; i < 7; i++) {
         await contains(".o-popover input").press("ArrowDown");
     }
     await contains(".o-autocomplete-value-focus").click();
-    const fixture = getFixture();
-    fixture.querySelector(".o-select-order").value = false;
-    fixture.querySelector(".o-select-order").dispatchEvent(new Event("change"));
+    await editSelectComponent(".o-select-order:eq(0)", "false");
+    expect(".o-select-order:eq(0)").toHaveText("Descending");
     expect(model.getters.getListDefinition(listId).orderBy).toEqual([
         { name: "date", asc: false },
         { name: "foo", asc: true },
@@ -883,7 +994,7 @@ test("List sorting selector should display only sortable fields", async function
     const fixture = getFixture();
     env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
     await animationFrame();
-    await contains(".add-dimension").click();
+    await contains(".add-dimension:eq(1)").click();
     const options = [...fixture.querySelectorAll(".o-popover .o-autocomplete-dropdown > div")];
     const availableFields = options.map((el) => el.innerText);
     expect(availableFields).toEqual([
@@ -914,11 +1025,11 @@ test("List sorting selector should not display already used fields", async funct
     const fixture = getFixture();
     env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
     await animationFrame();
-    await contains(".add-dimension").click();
+    await contains(".add-dimension:eq(1)").click();
     await contains(".o-popover input").press("ArrowDown");
     await contains(".o-popover input").press("ArrowDown");
     await contains(".o-autocomplete-value-focus").click();
-    await contains(".add-dimension").click();
+    await contains(".add-dimension:eq(1)").click();
     let options = [...fixture.querySelectorAll(".o-popover .o-autocomplete-dropdown > div")];
     let availableFields = options.map((el) => el.innerText);
     expect(availableFields).toEqual([
@@ -942,7 +1053,7 @@ test("List sorting selector should not display already used fields", async funct
     await contains(".o-popover input").press("ArrowDown");
     await contains(".o-popover input").press("ArrowDown");
     await contains(".o-autocomplete-value-focus").click();
-    await contains(".add-dimension").click();
+    await contains(".add-dimension:eq(1)").click();
     options = [...fixture.querySelectorAll(".o-popover .o-autocomplete-dropdown > div")];
     availableFields = options.map((el) => el.innerText);
     expect(availableFields).toEqual([
@@ -973,11 +1084,11 @@ test("List sorting selector should display used fields again when corresponding 
     const fixture = getFixture();
     env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
     await animationFrame();
-    await contains(".add-dimension").click();
+    await contains(".add-dimension:eq(1)").click();
     await contains(".o-popover input").press("ArrowDown");
     await contains(".o-popover input").press("ArrowDown");
     await contains(".o-autocomplete-value-focus").click();
-    await contains(".add-dimension").click();
+    await contains(".add-dimension:eq(1)").click();
     let options = [...fixture.querySelectorAll(".o-popover .o-autocomplete-dropdown > div")];
     let availableFields = options.map((el) => el.innerText);
     expect(availableFields).toEqual([
@@ -999,7 +1110,7 @@ test("List sorting selector should display used fields again when corresponding 
         "Users",
     ]);
     await contains(".o-delete-rule").click();
-    await contains(".add-dimension").click();
+    await contains(".add-dimension:eq(1)").click();
     options = [...fixture.querySelectorAll(".o-popover .o-autocomplete-dropdown > div")];
     availableFields = options.map((el) => el.innerText);
     expect(availableFields).toEqual([
@@ -1078,16 +1189,19 @@ test("Sorting from the list is displayed in the properties panel", async functio
     expect(".o_sorting_rule_column:eq(0)").toHaveText("Bar");
     expect(".o_sorting_rule_column:eq(1)").toHaveText("Foo");
     /** Bar should be descending */
-    expect(".o-select-order:eq(0)").toHaveValue("false");
+    expect(".o-select-order:eq(0)").toHaveText("Descending");
     /** Foo should be ascending */
-    expect(".o-select-order:eq(1)").toHaveValue("true");
+    expect(".o-select-order:eq(1)").toHaveText("Ascending");
 });
 
 test("Opening the sidepanel of a list while the panel of another list is open updates the side panel", async function () {
     const { model, env } = await createSpreadsheetFromListView({});
     insertListInSpreadsheet(model, {
         model: "product",
-        columns: ["name", "active"],
+        columns: [
+            { name: "name", string: "Name" },
+            { name: "active", string: "Active" },
+        ],
     });
 
     const listIds = model.getters.getListIds();
@@ -1104,7 +1218,7 @@ test("Opening the sidepanel of a list while the panel of another list is open up
     expect(modelName).toHaveText("Product (product)");
 });
 
-test("Duplicate a list from the side panel", async function () {
+test("Duplicate a list from the side panel curates the list name", async function () {
     const serverData = getBasicServerData();
     Partner._fields.foo.sortable = true;
     const { model, env } = await createSpreadsheetFromListView({
@@ -1112,15 +1226,28 @@ test("Duplicate a list from the side panel", async function () {
         orderBy: [{ name: "foo", asc: true }],
     });
     const [listId] = model.getters.getListIds();
+    const definition = model.getters.getListDefinition(listId);
+    const listName = "Do not keep Unsupported characters: '-:-*-?-\\-[-]-/";
+    model.dispatch("UPDATE_ODOO_LIST", {
+        listId,
+        list: { ...definition, name: listName },
+    });
     env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
     await animationFrame();
 
     expect(model.getters.getListIds().length).toBe(1);
     expect(".o-sidePanelTitle").toHaveText("List #1");
     await contains(".os-cog-wheel-menu-icon").click();
-    await contains(".o-popover .fa-clone").click();
+    await contains(".o-popover [data-icon='content_copy']").click();
     expect(model.getters.getListIds().length).toBe(2);
     expect(".o-sidePanelTitle").toHaveText("List #2");
+    const sheetIds = model.getters.getSheetIds();
+    expect(sheetIds.length).toEqual(2);
+    const sheetId = model.getters.getActiveSheetId();
+    expect(sheetId).toBe(sheetIds[1]);
+    expect(model.getters.getSheetName(sheetId)).toBe(
+        sanitizeSheetName(listName + " (copy) (List #2)")
+    );
 });
 
 test("List export from an action with an xml ID", async function () {
@@ -1149,6 +1276,7 @@ test("List cells are highlighted when hovering the list menu item", async functi
     await contains(".o-sidePanelClose").click();
     const sheetId = model.getters.getActiveSheetId();
     await contains(".o-topbar-top div[data-id='data']").click();
+    await contains("div[data-name='list_data_sources']").click();
 
     await hover("div[data-name='item_list_1']");
     const range = model.getters.getRangeFromZone(
@@ -1219,7 +1347,7 @@ test("Middle-click on 'See record' opens the record in a new tab", async functio
 
 test("readonly list side panel", async function () {
     const { model, env } = await createSpreadsheetFromListView();
-    await doMenuAction(topbarMenuRegistry, ["data", "item_list_1"], env);
+    await doMenuAction(topbarMenuRegistry, ["data", "list_data_sources", "item_list_1"], env);
     await animationFrame();
     expect(".o-sidePanelBody > div.pe-none.opacity-50").toHaveCount(0);
     model.updateMode("readonly");
@@ -1245,4 +1373,31 @@ test("display list related filters panel", async function () {
     );
     await addGlobalFilter(model, { id: "43", type: "relation", label: "Filter 2" });
     expect(".o_side_panel_collapsible_title:contains(Matching 1 / 2 filters)").toHaveCount(1);
+});
+
+test("can sort a list from right click menu", async function () {
+    const { model, env } = await createSpreadsheetFromListView();
+    const [listId] = model.getters.getListIds();
+    selectCell(model, "B1");
+    const root = cellMenuRegistry.getAll().find((item) => item.id === "sorting_list");
+    const sortAsc = root.children.find((item) => item.id === "list_sorting_asc");
+    const sortDesc = root.children.find((item) => item.id === "list_sorting_desc");
+    const noSorting = root.children.find((item) => item.id === "no_list_sorting");
+    expect(model.getters.getListDefinition(listId).orderBy).toEqual([]);
+    expect(noSorting.isActive(env)).toBe(true);
+
+    sortAsc.execute(env);
+    await waitForDataLoaded(model);
+    expect(model.getters.getListDefinition(listId).orderBy).toEqual([{ name: "bar", asc: true }]);
+    expect(sortAsc.isActive(env)).toBe(true);
+
+    sortDesc.execute(env);
+    await waitForDataLoaded(model);
+    expect(model.getters.getListDefinition(listId).orderBy).toEqual([{ name: "bar", asc: false }]);
+    expect(sortDesc.isActive(env)).toBe(true);
+
+    noSorting.execute(env);
+    await waitForDataLoaded(model);
+    expect(model.getters.getListDefinition(listId).orderBy).toEqual([]);
+    expect(noSorting.isActive(env)).toBe(true);
 });

@@ -8,5 +8,5 @@ class PosSession(models.Model):
     def _load_pos_data_models(self, config):
         data = super()._load_pos_data_models(config)
         if self.env.company.country_id.code == 'EC':
-            data += ['l10n_latam.identification.type', 'account.move']
+            data += ['account.move']
         return data

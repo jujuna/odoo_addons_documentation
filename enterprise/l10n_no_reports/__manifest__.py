@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -17,12 +16,10 @@ Accounting reports for Norway
         'data/balance_sheet.xml',
         'data/tax_report.xml',
         'data/tax_report_export.xml',
-        'data/res_company_views.xml',
         'wizard/vat_report_export.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
     'auto_install': ['l10n_no', 'account_reports'],
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

@@ -104,4 +104,5 @@ cellMenuRegistry.add("use_global_filter", {
         return SET_FILTER_MATCHING_CONDITION(position, env.model.getters);
     },
     icon: "o-spreadsheet-Icon.SEARCH",
+    isEnabledOnLockedSheet: true,
 });

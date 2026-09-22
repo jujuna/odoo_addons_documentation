@@ -2,5 +2,7 @@
 
 from . import account_journal
 from . import account_move
-from . import soda_account_mapping
+from . import res_company
 from . import res_config_settings
+from . import soda_account_mapping
+from . import soda_analytic_mapping

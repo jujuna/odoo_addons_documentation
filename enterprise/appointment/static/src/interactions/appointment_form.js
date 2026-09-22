@@ -20,20 +20,12 @@ export class AppointmentForm extends Interaction {
                 "d-none": this.showAddGuest,
             }),
         },
-        "button.o_appointment_input_guest_cancel": {
-            "t-att-class": () => ({
-                "d-none": !this.showAddGuest,
-            }),
-        },
-        "div.o_appointment_add_guests button.o_appointment_input_guest_cancel": {
-            "t-on-click": this.onHideGuest,
-        },
         ".o_appointment_form_confirm_btn": {
             "t-on-click": this.onConfirmAppointment,
         },
-        ".o_appointment_validation_error": {
+        ".o_appointment_add_guests_textarea": {
             "t-att-class": () => ({
-                "d-none": this.errorMessage === "",
+                "is-invalid": this.errorMessage != "",
             }),
         },
         ".o_appointment_error_text": {
@@ -113,16 +105,6 @@ export class AppointmentForm extends Interaction {
             appointmentFormEl.submit();
             addLoadingEffect(event.target);
         }
-    }
-
-    /**
-     * This function will hide the guest email textarea if allow_guests option is enabled.
-     */
-    onHideGuest() {
-        this.errorMessage = "";
-        this.showAddGuest = false;
-        const textAreaEl = this.el.querySelector("#o_appointment_input_guest_emails");
-        textAreaEl.value = "";
     }
 
     validateCheckboxes() {

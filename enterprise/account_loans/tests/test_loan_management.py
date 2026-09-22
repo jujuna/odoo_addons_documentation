@@ -11,6 +11,8 @@ from odoo.addons.account_loans import _account_loans_add_date_column
 
 @tagged('post_install', '-at_install')
 class TestLoanManagement(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -32,6 +34,11 @@ class TestLoanManagement(AccountTestInvoicingCommon):
             ('account_type', '=', 'expense'),
             ('id', '!=', cls.company.account_journal_early_pay_discount_loss_account_id.id),
         ], limit=1)
+        cls.analytic_account = cls.env['account.analytic.account'].create({
+            'name': 'Test Analytic Account',
+            'company_id': cls.company.id,
+            'plan_id': cls.env['account.analytic.plan'].create({'name': 'Test Analytic Plan'}).id,
+        })
 
     def create_loan(self, name, date, duration, amount_borrowed, interest, validate=False, skip_until_date=False):
         loan = self.env['account.loan'].create({
@@ -98,22 +105,22 @@ class TestLoanManagement(AccountTestInvoicingCommon):
 
         # Verify that the payment_moves are correct
         self.assertRecordValues(payment_moves[0] | payment_moves[11] | payment_moves[15] | payment_moves[-1], [{
-            'date': fields.Date.to_date('2024-01-31'),
+            'date': fields.Date.to_date('2024-01-01'),
             'ref': "Odoomobile Loan 🚗 - Principal & Interest 01/2024",
             'amount_total': 1_100,  # 1_000 principal + 100 interest
             'generating_loan_line_id': loan.line_ids[0].id,
         }, {
-            'date': fields.Date.to_date('2024-12-31'),
+            'date': fields.Date.to_date('2024-12-01'),
             'ref': "Odoomobile Loan 🚗 - Principal & Interest 12/2024",
             'amount_total': 1_100,  # 1_000 principal + 100 interest
             'generating_loan_line_id': loan.line_ids[11].id,
         }, {
-            'date': fields.Date.to_date('2025-04-30'),
+            'date': fields.Date.to_date('2025-04-01'),
             'ref': "Odoomobile Loan 🚗 - Principal & Interest 04/2025",
             'amount_total': 1_100,  # 1_000 principal + 100 interest
             'generating_loan_line_id': loan.line_ids[15].id,
         }, {
-            'date': fields.Date.to_date('2025-12-31'),
+            'date': fields.Date.to_date('2025-12-01'),
             'ref': "Odoomobile Loan 🚗 - Principal & Interest 12/2025",
             'amount_total': 1_100,  # 1_000 principal + 100 interest
             'generating_loan_line_id': loan.line_ids[-1].id,
@@ -138,17 +145,17 @@ class TestLoanManagement(AccountTestInvoicingCommon):
 
         # Verify that the reclassification moves are correct
         self.assertRecordValues(reclassification_moves[0] | reclassification_moves[11] | reclassification_moves[15], [{
-            'date': fields.Date.to_date('2024-01-31'),
+            'date': fields.Date.to_date('2024-01-01'),
             'ref': "Odoomobile Loan 🚗 - Reclassification LT - ST 02/2024 to 01/2025",  # offset of 1 month
             'amount_total': 12_000,  # sum of the principals of the next 12 months
             'generating_loan_line_id': loan.line_ids[0].id,
         }, {
-            'date': fields.Date.to_date('2024-12-31'),
+            'date': fields.Date.to_date('2024-12-01'),
             'ref': "Odoomobile Loan 🚗 - Reclassification LT - ST 01/2025 to 12/2025",  # offset of 1 month
             'amount_total': 12_000,  # sum of the principals between 01/25 and 12/25
             'generating_loan_line_id': loan.line_ids[11].id,
         }, {
-            'date': fields.Date.to_date('2025-04-30'),
+            'date': fields.Date.to_date('2025-04-01'),
             'ref': "Odoomobile Loan 🚗 - Reclassification LT - ST 05/2025 to 12/2025",  # offset of 1 month
             'amount_total': 8_000,  # sum of the principals between 05/25 and 12/25
             'generating_loan_line_id': loan.line_ids[15].id,
@@ -265,39 +272,39 @@ class TestLoanManagement(AccountTestInvoicingCommon):
         # Verify that the loan is running
         loan.action_confirm()
         self.assertEqual(loan.state, 'running')
-        self.assertEqual(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')), 15)
+        self.assertEqual(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')), 17)
         self.assertEqual(len(loan.line_ids.generated_move_ids), 34)
 
         # Verify that the loan is cancelled
         loan.action_cancel()
         self.assertEqual(loan.state, 'cancelled')
         self.assertFalse(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')))
-        self.assertEqual(len(loan.line_ids.generated_move_ids), 15)
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 17)
 
         # Verify that we can reset to draft the loan
         loan.action_set_to_draft()
         self.assertEqual(loan.state, 'draft')
-        self.assertEqual(len(loan.line_ids.generated_move_ids), 15)
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 17)
 
         # Run it again
         loan.action_confirm()
         self.assertEqual(loan.state, 'running')
-        self.assertEqual(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')), 15)
-        self.assertEqual(len(loan.line_ids.generated_move_ids), 49)
+        self.assertEqual(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')), 17)
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 51)
 
         # Close the loan, only draft entries should be removed
         action = loan.action_close()
         wizard = self.env[action['res_model']].browse(action['res_id'])
         wizard.action_save()
         self.assertEqual(loan.state, 'closed')
-        self.assertEqual(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')), 15)
-        self.assertEqual(len(loan.line_ids.generated_move_ids), 33)
+        self.assertEqual(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')), 17)
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 35)
 
         # Reset to draft, the entries should be removed
         loan.action_set_to_draft()
         self.assertEqual(loan.state, 'draft')
         self.assertFalse(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')))
-        self.assertEqual(len(loan.line_ids.generated_move_ids), 30)
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 34)
 
     @freeze_time('2024-01-01')
     def test_loan_import_amortization_schedule(self):
@@ -338,7 +345,7 @@ class TestLoanManagement(AccountTestInvoicingCommon):
             'state': 'running',
             'name': attachment.name,
             'amount_borrowed': 19_900.25,  # Sum of principals
-            'outstanding_balance': 15_981.65,  # = 19_900.25 - principal of first 12 lines
+            'outstanding_balance': 15_627.82,  # = 19_900.25 - principal of first 12 lines
         }])
 
         self.assertEqual(len(loan.line_ids), 48)  # 4 years
@@ -383,7 +390,7 @@ class TestLoanManagement(AccountTestInvoicingCommon):
             'state': 'running',
             'name': attachment.name,
             'amount_borrowed': 19_900.25,  # Sum of principals
-            'outstanding_balance': 15_981.65,  # = 19_900.25 - principal of first 12 lines
+            'outstanding_balance': 15_627.82,  # = 19_900.25 - principal of first 12 lines
         }])
 
         self.assertEqual(len(loan.line_ids), 48)  # 4 years
@@ -441,3 +448,180 @@ class TestLoanManagement(AccountTestInvoicingCommon):
 
         self.assertTrue(loan.line_ids.generated_move_ids)
         self.assertEqual(loan.state, 'closed')
+
+    def test_loan_analytic_distribution_propagation(self):
+        """Test that the analytic distribution on a loan propagates to all generated moves."""
+        test_distribution = {str(self.analytic_account.id): 100.0}
+        loan = self.create_loan('Analytic Test Loan', '2024-01-01', 12, 12_000, 1_200, validate=False)
+        loan.write({'analytic_distribution': test_distribution})
+
+        self.assertEqual(loan.analytic_distribution, test_distribution)
+
+        loan.action_confirm()
+        payment_moves = loan.line_ids.generated_move_ids.filtered(lambda m: m.is_loan_payment_move)
+        self.assertTrue(payment_moves, "Payment moves were not generated")
+
+        for move in payment_moves:
+            for line in move.line_ids:
+                self.assertEqual(
+                    line.analytic_distribution,
+                    test_distribution,
+                    f"Analytic distribution failed to propagate to payment move line: {line.name}"
+                )
+
+        reclass_moves = loan.line_ids.generated_move_ids - payment_moves
+        self.assertTrue(reclass_moves, "Reclassification moves were not generated")
+
+        for move in reclass_moves:
+            for line in move.line_ids:
+                self.assertEqual(
+                    line.analytic_distribution,
+                    test_distribution,
+                    f"Analytic distribution failed to propagate to reclassification move line: {line.name}"
+                )
+
+    def test_loan_analytic_distribution_empty(self):
+        """Test that confirming a loan without analytics does not crash or inject false data."""
+        loan = self.create_loan('Empty Analytic Loan', '2024-01-01', 12, 12_000, 1_200, validate=True)
+        self.assertFalse(loan.analytic_distribution)
+
+        all_move_lines = loan.line_ids.generated_move_ids.mapped('line_ids')
+        for line in all_move_lines:
+            self.assertFalse(
+                line.analytic_distribution,
+                f"Analytic distribution should be empty on move line: {line.name}"
+            )
+
+    @freeze_time('2026-07-01')
+    def test_loan_analytic_profitability_evolution(self):
+        """
+        Test the evolution of analytic profitability (interest loss) over time.
+        Verifies that as loan payment moves are posted, only the interest expense
+        trickles down into the analytic ledger as a loss, ensuring accurate
+        month-by-month P&L reporting
+        """
+        test_distribution = {str(self.analytic_account.id): 100.0}
+
+        loan = self.create_loan('Analytic Evolution Loan', '2025-02-01', 12, 12_000, 1_200, validate=False)
+        loan.write({'analytic_distribution': test_distribution})
+        loan.action_confirm()
+
+        for line in loan.line_ids:
+            move = line.generated_move_ids.filtered(lambda m: m.is_loan_payment_move)
+            self.assertEqual(move.state, 'posted', f"Move for {line.date} did not auto-post.")
+
+        read_group_result = self.env['account.analytic.line'].formatted_read_group(
+            domain=[
+                (self.analytic_account.plan_id._column_name(), '=', self.analytic_account.id),
+                ('general_account_id.internal_group', 'in', ['income', 'expense']),
+            ],
+            groupby=[self.analytic_account.plan_id._column_name(), 'date:month'],
+            aggregates=['amount:sum'],
+        )
+
+        for rg_cell, expected in zip(read_group_result, [
+            ('2025-02-01', -100.0),
+            ('2025-03-01', -100.0),
+            ('2025-04-01', -100.0),
+            ('2025-05-01', -100.0),
+            ('2025-06-01', -100.0),
+            ('2025-07-01', -100.0),
+            ('2025-08-01', -100.0),
+            ('2025-09-01', -100.0),
+            ('2025-10-01', -100.0),
+            ('2025-11-01', -100.0),
+            ('2025-12-01', -100.0),
+            ('2026-01-01', -100.0),
+        ]):
+            self.assertEqual((rg_cell['date:month'][0], rg_cell['amount:sum']), expected)
+
+    def test_normal_accounting_date_calculation(self):
+        """ Test that a payment in the following month snaps to the 1st """
+        loan = self.env['account.loan'].create({
+            'name': 'Test Normal Date',
+            'date': '2026-06-15',
+            'amount_borrowed': 10000,
+            'journal_id': self.loan_journal.id,
+            'expense_account_id': self.expense_account.id,
+            'short_term_account_id': self.short_term_account.id,
+            'long_term_account_id': self.long_term_account.id,
+        })
+
+        wizard = self.env['account.loan.compute.wizard'].with_context(active_id=loan.id).create({
+            'loan_id': loan.id,
+            'loan_amount': loan.amount_borrowed,
+            'start_date': loan.date,
+            'first_payment_date': fields.Date.to_date('2026-07-30'),  # NEXT month
+            'payment_end_of_month': 'at_anniversary',
+            'loan_term': 1,
+            'interest_rate': 5.0,
+        })
+        wizard.action_save()
+
+        first_line = loan.line_ids[0]
+        self.assertEqual(first_line.date, fields.Date.to_date('2026-07-30'))
+
+    def test_edge_case_same_month_accounting_date(self):
+        """ Test that a payment in the same month does not predate the loan start date """
+        loan = self.env['account.loan'].create({
+            'name': 'Test Same Month',
+            'date': '2026-06-15',
+            'amount_borrowed': 10000,
+            'journal_id': self.loan_journal.id,
+            'expense_account_id': self.expense_account.id,
+            'short_term_account_id': self.short_term_account.id,
+            'long_term_account_id': self.long_term_account.id,
+        })
+
+        wizard = self.env['account.loan.compute.wizard'].with_context(active_id=loan.id).create({
+            'loan_id': loan.id,
+            'loan_amount': loan.amount_borrowed,
+            'start_date': loan.date,
+            'first_payment_date': fields.Date.to_date('2026-06-30'),  # SAME month
+            'payment_end_of_month': 'at_anniversary',
+            'loan_term': 1,
+            'interest_rate': 5.0,
+        })
+        wizard.action_save()
+
+        first_line = loan.line_ids[0]
+        self.assertEqual(first_line.date, fields.Date.to_date('2026-06-30'))
+
+    def test_journal_entry_move_dates(self):
+        """ Test that action_confirm applies the correct dates to generated moves """
+        loan = self.env['account.loan'].create({
+            'name': 'Test Move Dates',
+            'date': '2026-06-15',
+            'amount_borrowed': 10000,
+            'duration': 2,
+            'interest': 500,
+            'journal_id': self.loan_journal.id,
+            'expense_account_id': self.expense_account.id,
+            'short_term_account_id': self.short_term_account.id,
+            'long_term_account_id': self.long_term_account.id,
+        })
+
+        wizard = self.env['account.loan.compute.wizard'].with_context(active_id=loan.id).create({
+            'loan_id': loan.id,
+            'loan_amount': loan.amount_borrowed,
+            'start_date': loan.date,
+            'first_payment_date': fields.Date.to_date('2026-07-17'),
+            'payment_end_of_month': 'at_anniversary',
+            'loan_term': 2,
+            'interest_rate': 5.0,
+        })
+        wizard.action_save()
+        loan.amount_borrowed = sum(loan.line_ids.mapped('principal'))
+        loan.action_confirm()
+
+        first_line = loan.line_ids.sorted('date')[0]
+        moves = first_line.generated_move_ids
+
+        payment_move = moves.filtered(lambda m: m.is_loan_payment_move)
+        reclass_move = moves.filtered(lambda m: not m.is_loan_payment_move and not m.reversed_entry_id)
+        reversal_move = moves.filtered(lambda m: m.reversed_entry_id)
+
+        self.assertEqual(payment_move.date, fields.Date.to_date('2026-07-01'))
+        self.assertEqual(reclass_move.date, fields.Date.to_date('2026-07-01'))
+        # Reversal must be exactly one month later
+        self.assertEqual(reversal_move.date, fields.Date.to_date('2026-08-01'))

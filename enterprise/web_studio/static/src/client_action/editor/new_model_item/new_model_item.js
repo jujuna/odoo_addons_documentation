@@ -1,4 +1,5 @@
-import { Component, useState } from "@odoo/owl";
+import { render } from "@web/owl2/utils";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { user } from "@web/core/user";
@@ -10,14 +11,16 @@ import { useDialogConfirmation } from "../../utils";
 class SimpleNewModelDialog extends Component {
     static template = "web_studio.SimpleNewModelDialog";
     static components = { Dialog };
-    static props = { close: { type: Function } };
+    props = useProps({
+        close: t.function(),
+    });
 
     setup() {
         this.addDialog = useOwnedDialogs();
         this.menus = useService("menu");
         this.action = useService("action");
         this.studio = useService("studio");
-        this.state = useState({ modelName: "", showValidation: false });
+        this.state = proxy({ modelName: "", showValidation: false });
         const { confirm, cancel } = useDialogConfirmation({
             confirm: async (data) => {
                 const { menu_id, action_id } = await rpc("/web_studio/create_new_menu", {
@@ -60,7 +63,6 @@ class SimpleNewModelDialog extends Component {
 }
 
 export class NewModelItem extends Component {
-    static props = {};
     static template = "web_studio.NewModelItem";
 
     setup() {
@@ -69,7 +71,7 @@ export class NewModelItem extends Component {
         this.studio = useService("studio");
         this.action = useService("action");
 
-        useBus(this.env.bus, "MENUS:APP-CHANGED", () => this.render());
+        useBus(this.env.bus, "MENUS:APP-CHANGED", () => render(this));
     }
 
     onClick(ev) {

@@ -39,7 +39,10 @@ class ProjectTask(models.Model):
             [
                 ('project_id', '!=', False),
                 ('task_id', 'in', list(all_task_ids)),
-                ('validated', 'in', [True, self.env['ir.config_parameter'].sudo().get_param('sale.invoiced_timesheet', DEFAULT_INVOICED_TIMESHEET) == 'approved'])
+                ('validated', 'in', [True, (self.env['ir.config_parameter'].sudo().get_str('sale.invoiced_timesheet') or DEFAULT_INVOICED_TIMESHEET) == 'approved']),
+                '|',
+                    ('so_line', '=', False),
+                    ('so_line.state', '=', 'sale'),
             ],
             ['task_id'],
             ['unit_amount:sum'],
@@ -66,7 +69,7 @@ class ProjectTask(models.Model):
         result = super().read(fields=fields, load=load)
         if fields and 'timesheet_ids' in fields and (self.env.user._is_portal() or 'project_sharing_id' in self.env.context):
             # We need to check if configuration
-            param_invoiced_timesheet = self.env['ir.config_parameter'].sudo().get_param('sale.invoiced_timesheet', DEFAULT_INVOICED_TIMESHEET)
+            param_invoiced_timesheet = self.env['ir.config_parameter'].sudo().get_str('sale.invoiced_timesheet') or DEFAULT_INVOICED_TIMESHEET
             if param_invoiced_timesheet == 'approved':
                 timesheets_read_group = self.env['account.analytic.line']._read_group(
                     [('task_id', 'in', self.ids), ('validated', '=', True)],
@@ -82,16 +85,16 @@ class ProjectTask(models.Model):
         if not self.env['sale.order.line'].has_access('read'):
             return {}
         uom_hour = self.env.ref('uom.product_uom_hour')
-        planned_hours_per_sol = self.env['project.task']._read_group([
+        allocated_hours_per_sol = self.env['project.task']._read_group([
             ('sale_line_id', 'in', res_ids),
-        ], ['sale_line_id'], ['planned_hours:sum'])
-        planned_hours_per_sol_mapped = {
-            sale_line.id: planned_hours_sum
-            for sale_line, planned_hours_sum in planned_hours_per_sol
+        ], ['sale_line_id'], ['allocated_hours:sum'])
+        allocated_hours_per_sol_mapped = {
+            sale_line.id: allocated_hours_sum
+            for sale_line, allocated_hours_sum in allocated_hours_per_sol
         }
         return {
             sol.id: {
-                'value': planned_hours_per_sol_mapped.get(sol.id, 0.0),
+                'value': allocated_hours_per_sol_mapped.get(sol.id, 0.0),
                 'max_value': sol.product_uom_id._compute_quantity(sol.product_uom_qty, uom_hour),
             }
             for sol in self.env['sale.order.line'].search([('id', 'in', res_ids)])
@@ -107,7 +110,7 @@ class ProjectTask(models.Model):
 
     def _get_portal_total_hours_dict(self):
         total_hours_dict = super()._get_portal_total_hours_dict()
-        if not (total_hours_dict and self.env['ir.config_parameter'].sudo().get_param('sale.invoiced_timesheet', DEFAULT_INVOICED_TIMESHEET) == 'approved'):
+        if not (total_hours_dict and (self.env['ir.config_parameter'].sudo().get_str('sale.invoiced_timesheet') or DEFAULT_INVOICED_TIMESHEET) == 'approved'):
             return total_hours_dict
         timesheetable_tasks = self.filtered('allow_timesheets')
         total_hours_dict['effective_hours'] = self.env['account.analytic.line']._read_group(

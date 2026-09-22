@@ -21,6 +21,7 @@ class StockBarcodeController(http.Controller):
             action (open an existing / new picking) or warning.
         """
         barcode_type = None
+        request.update_context(allowed_company_ids=self._get_allowed_company_ids())
         nomenclature = request.env.company.nomenclature_id
         try:
             parsed_results = nomenclature.parse_barcode(barcode)
@@ -29,17 +30,25 @@ class StockBarcodeController(http.Controller):
         if parsed_results and nomenclature.is_gs1_nomenclature:
             # search with the last feasible rule
             for result in parsed_results[::-1]:
-                if result['type'] in ['product', 'package', 'location', 'dest_location']:
+                if result['type'] in ['product', 'package', 'location', 'location_dest']:
                     barcode_type = result['type']
                     break
 
         # Alias support
         elif parsed_results:
             for res in parsed_results if isinstance(parsed_results, list) else [parsed_results]:
+                if res['type'] in ['price', 'weight']:
+                    barcode = res['base_code']
+                    barcode_type = 'product'
+                    break
                 barcode = res.get('code', barcode)
                 break
 
         if not barcode_type:
+            if request.env.user.has_group('stock.group_stock_picking_batch'):
+                ret_open_batch_picking = self.try_open_batch_picking(barcode)
+                if ret_open_batch_picking:
+                    return ret_open_batch_picking
             ret_open_picking = self._try_open_picking(barcode)
             if ret_open_picking:
                 return ret_open_picking
@@ -49,7 +58,7 @@ class StockBarcodeController(http.Controller):
                 return ret_open_picking_type
 
         if request.env.user.has_group('stock.group_stock_multi_locations') and \
-           (not barcode_type or barcode_type in ['location', 'dest_location']):
+           (not barcode_type or barcode_type in ['location', 'location_dest']):
             ret_new_internal_picking = self._try_new_internal_picking(barcode)
             if ret_new_internal_picking:
                 return ret_new_internal_picking
@@ -70,6 +79,11 @@ class StockBarcodeController(http.Controller):
             ret_open_package = self._try_open_package(barcode)
             if ret_open_package:
                 return ret_open_package
+
+        if not barcode_type:
+            ret_open_partner_pickings = self._try_open_partner_pickings(barcode)
+            if ret_open_partner_pickings:
+                return ret_open_partner_pickings
 
         if request.env.user.has_group('stock.group_stock_multi_locations'):
             return {'warning': _('No picking or location or product corresponding to barcode %(barcode)s', barcode=barcode)}
@@ -99,14 +113,14 @@ class StockBarcodeController(http.Controller):
         data = target_record._get_stock_barcode_data()
         data['records'].update(self._get_barcode_nomenclature())
         data['precision'] = request.env['decimal.precision'].precision_get('Product Unit')
-        mute_sound = request.env['ir.config_parameter'].sudo().get_param('stock_barcode.mute_sound_notifications')
+        mute_sound = request.env['ir.config_parameter'].sudo().get_bool('stock_barcode.mute_sound_notifications')
         data['config'] = data.get('config', {})
-        data['config']['play_sound'] = bool(not mute_sound or mute_sound == "False")
-        data['config']['barcode_separator_regex'] = request.env['ir.config_parameter'].sudo().get_param('stock_barcode.barcode_separator_regex', '.^')
-        data['config']['barcode_rfid_batch_time'] = int(request.env['ir.config_parameter'].sudo().get_param('stock_barcode.barcode_rfid_batch_time', 1000))
-        delay_between_scan = request.env['ir.config_parameter'].sudo().get_param('stock_barcode.delay_between_scan')
-        if delay_between_scan and delay_between_scan.isnumeric():
-            data['config']['delay_between_scan'] = int(delay_between_scan)
+        data['config']['play_sound'] = not mute_sound
+        data['config']['barcode_separator_regex'] = request.env['ir.config_parameter'].sudo().get_str('stock_barcode.barcode_separator_regex') or '.^'
+        data['config']['barcode_rfid_batch_time'] = request.env['ir.config_parameter'].sudo().get_int('stock_barcode.barcode_rfid_batch_time') or 1000
+        delay_between_scan = request.env['ir.config_parameter'].sudo().get_int('stock_barcode.delay_between_scan')
+        if delay_between_scan:
+            data['config']['delay_between_scan'] = delay_between_scan
         return {
             'data': data,
             'groups': self._get_groups_data(),
@@ -127,8 +141,7 @@ class StockBarcodeController(http.Controller):
             ("inventory_date", "<=", fields.Date.context_today(user)),
             ("inventory_quantity_set", "=", False),
         ])
-        mute_sound = request.env['ir.config_parameter'].sudo().get_param('stock_barcode.mute_sound_notifications')
-        play_sound = bool(not mute_sound or mute_sound == "False")
+        play_sound = not request.env['ir.config_parameter'].sudo().get_bool('stock_barcode.mute_sound_notifications')
         return {
             'groups': groups,
             'play_sound': play_sound,
@@ -262,23 +275,46 @@ class StockBarcodeController(http.Controller):
 
         return request.make_response(merged_pdf, headers=pdfhttpheaders)
 
+    def try_open_batch_picking(self, barcode):
+        batch_picking = request.env['stock.picking.batch'].search([
+            ('name', '=', barcode),
+        ], limit=1)
+        if batch_picking:
+            action = batch_picking.action_client_action()
+            action['context'] = {'active_id': batch_picking.id}
+            action = {'action': action}
+            return action
+        return False
+
     def _try_open_lot(self, barcode):
-        """ If barcode represent a lot, open a form view to show all
-        the details of this lot.
+        """ If barcode represents a lot, open either a form view if only one
+        matching lot exists, or a kanban view for all matching lots.
         """
         result = request.env['stock.lot'].search_read([
             ('name', '=', barcode),
-        ], ['id', 'display_name'], limit=1)
+        ], ['id', 'display_name'])
         if result:
-            return {
+            form_view_id = request.env.ref('stock.view_production_lot_form').id
+            action = {
                 'action': {
-                    'name': 'Open lot',
+                    'name': _('Open lot'),
                     'res_model': 'stock.lot',
-                    'views': [(request.env.ref('stock.view_production_lot_form').id, 'form')],
                     'type': 'ir.actions.act_window',
-                    'res_id': result[0]['id'],
                 }
             }
+            if len(result) == 1:
+                action['action'].update({
+                    'views': [(form_view_id, 'form')],
+                    'res_id': result[0]['id'],
+                })
+            else:
+                kanban_view_id = request.env.ref('stock_barcode.stock_lot_view_kanban').id
+                lot_ids = [res['id'] for res in result]
+                action['action'].update({
+                    'views': [(kanban_view_id, 'kanban'), (form_view_id, 'form')],
+                    'domain': [('id', 'in', lot_ids)],
+                })
+            return action
         return False
 
     def _try_open_product_location(self, barcode):
@@ -296,21 +332,10 @@ class StockBarcodeController(http.Controller):
                  ['product_id'], limit=1):
             product_id, product_display_name = result[0]['product_id']
         if result:
-            tree_view_id = request.env.ref('stock.view_stock_quant_tree').id
-            kanban_view_id = request.env.ref('stock_barcode.stock_quant_barcode_kanban_2').id
-            return {
-                'action': {
-                    'name': product_display_name,
-                    'res_model': 'stock.quant',
-                    'views': [(tree_view_id, 'list'), (kanban_view_id, 'kanban')],
-                    'type': 'ir.actions.act_window',
-                    'domain': [('product_id', '=', product_id)],
-                    'context': {
-                        'search_default_internal_loc': True,
-                    },
-                    'mobile_view_mode': 'kanban',
-                }
-            }
+            action = self.env["ir.actions.act_window"]._for_xml_id('stock_barcode.stock_quant_action_locate')
+            action['display_name'] = product_display_name
+            action['domain'] = [('product_id', '=', product_id)]
+            return {'action': action}
 
     def _try_open_picking_type(self, barcode):
         """ If barcode represent a picking type, open a new
@@ -336,6 +361,28 @@ class StockBarcodeController(http.Controller):
             action = corresponding_picking.action_open_picking_client_action()
             return {'action': action}
         return False
+
+    def _try_open_partner_pickings(self, barcode):
+        """If barcode is a contact, open the picking kanban with their pending transfers across all types."""
+        partner = request.env['res.partner'].search([('barcode', '=', barcode)], limit=1)
+        if not partner:
+            return False
+        commercial = partner.commercial_partner_id
+        pending_domain = [
+            ('partner_id', 'child_of', commercial.id),
+            ('state', 'not in', ('done', 'cancel', 'draft')),
+        ]
+        if not request.env['stock.picking'].search_count(pending_domain):
+            return {'warning': _("No pending transfer for %(partner)s", partner=commercial.display_name)}
+        action = request.env['ir.actions.actions']._for_xml_id('stock_barcode.stock_picking_action_kanban')
+        # Strip the action's per-user and per-picking-type defaults.
+        action['display_name'] = commercial.display_name
+        action['context'] = {
+            'contact_display': 'partner_address',
+            'search_default_partner_id': commercial.id,
+        }
+        action['domain'] = pending_domain
+        return {'action': action}
 
     def _try_open_package(self, barcode):
         """ If barcode represents a package, open it.
@@ -400,7 +447,7 @@ class StockBarcodeController(http.Controller):
 
     def _get_picking_type_domain(self, barcode_type, allowed_company_ids):
         return [
-            ('active', '=', 'True'),
+            ('active', '=', True),
             ('barcode', '!=', ''),
             ('company_id', 'in', allowed_company_ids)
         ]
@@ -415,7 +462,8 @@ class StockBarcodeController(http.Controller):
             # get picking types barcodes
             picking_type_ids = request.env['stock.picking.type'].search(domain)
             for picking_type_batch in split_every(112, picking_type_ids.ids):
-                picking_types_pdf, _content_type = request.env['ir.actions.report']._render_qweb_pdf('stock.action_report_picking_type_label', picking_type_batch)
+                data = request.env['stock.picking.type.label.layout']._prepare_report_data_for_picking_types(picking_type_batch, '4x7')
+                picking_types_pdf, _content_type = request.env['ir.actions.report']._render_qweb_pdf('product.action_report_product_label_pdf', data=data)
                 if picking_types_pdf:
                     barcode_pdfs.append(picking_types_pdf)
 
@@ -423,7 +471,8 @@ class StockBarcodeController(http.Controller):
         if barcode_type == 'locations' and request.env.user.has_group('stock.group_stock_multi_locations'):
             locations_ids = request.env['stock.location'].search(domain)
             for location_ids_batch in split_every(112, locations_ids.ids):
-                locations_pdf, _content_type = request.env['ir.actions.report']._render_qweb_pdf('stock.action_report_location_barcode', location_ids_batch)
+                data = request.env['stock.location.label.layout']._prepare_report_data_for_locations(location_ids_batch, '4x7')
+                locations_pdf, _content_type = request.env['ir.actions.report']._render_qweb_pdf('product.action_report_product_label_pdf', data=data)
                 if locations_pdf:
                     barcode_pdfs.append(locations_pdf)
         return barcode_pdfs
@@ -436,6 +485,7 @@ class StockBarcodeController(http.Controller):
             'group_production_lot': request.env.user.has_group('stock.group_production_lot'),
             'group_uom': request.env.user.has_group('uom.group_uom'),
             'group_stock_sign_delivery': request.env.user.has_group('stock.group_stock_sign_delivery'),
+            'group_user_regular': request.env.user.has_group('base.group_user_regular'),
         }
 
     def _get_barcode_nomenclature(self):

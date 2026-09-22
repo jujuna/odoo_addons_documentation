@@ -1,5 +1,4 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 from odoo import models, fields, api, tools
 from odoo.exceptions import ValidationError
 from odoo.tools.i18n import format_list
@@ -19,8 +18,9 @@ class SignRequest(models.Model):
 
     @api.constrains('send_channel')
     def _check_send_channel(self):
-        whatsapp_sign_configured = self.env['sign.request.item']._check_whatsapp_template_exists()
         for sign_request in self:
+            company = sign_request.communication_company_id
+            whatsapp_sign_configured = company and company._check_if_whatsapp_sign_is_enabled()
             if sign_request.send_channel == 'whatsapp' and not whatsapp_sign_configured:
                 raise ValidationError(
                     self.env._("All Whatsapp templates must be configured before creating the sign request.")
@@ -30,13 +30,11 @@ class SignRequest(models.Model):
     def _compute_signers_name(self):
         for sign_request in self:
             names = sign_request.request_item_ids.mapped('display_name')
-            if self.env['sign.request.item']._check_whatsapp_template_exists():
-                template_id = self.env['ir.config_parameter'].sudo().get_param(
-                    'whatsapp_sign.whatsapp_completion_template_id'
-                )
-                template = self.env['whatsapp.template'].browse(int(template_id))
+            company = sign_request.communication_company_id
+            if company and company._check_if_whatsapp_sign_is_enabled():
+                wa_template = company.request_completion_wa_template_id
                 sign_request.signers_name = format_list(
-                    self.env, names, lang_code=template.lang_code
+                    self.env, names, lang_code=wa_template.lang_code
                 )
             else:
                 sign_request.signers_name = ', '.join(names)
@@ -64,7 +62,6 @@ class SignRequest(models.Model):
         """ Sends a completion message for a signed document.
         This method handles sending a completion message to the signers after a document has been fully signed.
         It primarily attempts to use a WhatsApp channel if configured.
-        If the channel is 'whatsapp' and the required WhatsApp template is not found, it falls back to sending an email by calling the parent method.
 
         :param signers: The list of `res.partner` records to whom the completion message should be sent
         :param bool request_edited: A boolean indicating if the signing request was edited
@@ -77,23 +74,19 @@ class SignRequest(models.Model):
         """
         self.ensure_one()
 
+        company = self.communication_company_id
         is_whatsapp = self.send_channel == 'whatsapp'
-        misconfiguration = is_whatsapp and not self.env['sign.request.item']._check_whatsapp_template_exists()
+        misconfiguration = is_whatsapp and not (company and company._check_if_whatsapp_sign_is_enabled())
         if misconfiguration:
             self.send_channel = 'email'
-        if misconfiguration or not is_whatsapp:
-            return super()._send_completed_documents_message(signers, request_edited, partner,
-                                                             access_token, with_message_cc, force_send)
-        elif not sign_request_item:
-            return
-
-        template_id = self.env['ir.config_parameter'].sudo().get_param('whatsapp_sign.whatsapp_completion_template_id')
-        whatsapp_template = self.env['whatsapp.template'].browse(int(template_id))
-        whatsapp_composer = self.env['whatsapp.composer'].with_context({'active_id': sign_request_item.id}).create({
-            'wa_template_id': whatsapp_template.id,
-            'res_model': 'sign.request.item'
-        })
-        whatsapp_composer.sudo()._send_whatsapp_template(force_send_by_cron=not force_send)
+        if is_whatsapp and not misconfiguration and sign_request_item:
+            wa_template = company.request_completion_wa_template_id
+            whatsapp_composer = self.env['whatsapp.composer'].with_context({'active_id': sign_request_item.id}).create({
+                'wa_template_id': wa_template.id,
+                'res_model': 'sign.request.item'
+            })
+            whatsapp_composer.sudo()._send_whatsapp_template(force_send_by_cron=not force_send)
+        return super()._send_completed_documents_message(signers, request_edited, partner, access_token, with_message_cc, force_send)
 
     def _send_refused_message(self, refuser, refusal_reason, partner, access_token=None, force_send=False, sign_request_item=None):
         """ Sends a refusal message for a document signing request.
@@ -109,21 +102,19 @@ class SignRequest(models.Model):
         """
         self.ensure_one()
 
+        company = self.communication_company_id
         is_whatsapp = self.send_channel == 'whatsapp'
-        misconfiguration = is_whatsapp and not self.env['sign.request.item']._check_whatsapp_template_exists()
+        misconfiguration = is_whatsapp and not (company and company._check_if_whatsapp_sign_is_enabled())
         if misconfiguration:
             self.send_channel = 'email'
-        if misconfiguration or not is_whatsapp:
+        if misconfiguration or not is_whatsapp or not sign_request_item:
             return super()._send_refused_message(refuser, refusal_reason, partner, access_token, force_send)
-        elif not sign_request_item:
-            return
 
-        template_id = self.env['ir.config_parameter'].sudo().get_param('whatsapp_sign.whatsapp_refusal_template_id')
-        whatsapp_template = self.env['whatsapp.template'].browse(int(template_id))
         self.refusal_reason = refusal_reason
 
+        wa_template = company.request_refusal_wa_template_id
         whatsapp_composer = self.env['whatsapp.composer'].with_context({'active_id': sign_request_item.id}).create({
-            'wa_template_id': whatsapp_template.id,
+            'wa_template_id': wa_template.id,
             'res_model': 'sign.request.item'
         })
         whatsapp_composer.sudo()._send_whatsapp_template(force_send_by_cron=not force_send)

@@ -82,8 +82,8 @@ test("available periods without scale attribute", async () => {
     await contains(".o_web_studio_sidebar .o_web_studio_property_mode .dropdown-toggle").click();
     expect(queryAllTexts(".o-dropdown--menu .dropdown-item")).toEqual([
         "Day",
-        "Month",
         "Week",
+        "Month",
         "Year",
     ]);
 });

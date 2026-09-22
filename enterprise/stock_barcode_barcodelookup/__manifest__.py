@@ -17,6 +17,9 @@
         'web.assets_tests': [
             'stock_barcode_barcodelookup/static/tests/tours/**/*',
         ],
+        'web.assets_unit_tests': [
+            'stock_barcode_barcodelookup/static/tests/**/*.test.js',
+        ],
     },
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

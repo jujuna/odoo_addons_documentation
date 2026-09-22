@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
+import contextlib
 import logging
 
 from dateutil.relativedelta import relativedelta
+from requests import RequestException
 
 from odoo import api, fields, models
-from odoo.exceptions import AccessError, UserError
+from odoo.exceptions import UserError
 from odoo.tools import _, LazyTranslate
+
+from odoo.addons.iap.tools import iap_tools
 
 _lt = LazyTranslate(__name__)
 _logger = logging.getLogger(__name__)
@@ -97,16 +100,30 @@ class ExtractMixin(models.AbstractModel):
             record._try_to_check_ocr_status()
 
     @api.model
-    def _contact_iap_extract(self, pathinfo, params):
-        """ Contact the IAP extract service and return the response. This method is meant to be overridden """
-        return {}
+    def _get_ocr_api_version(self):
+        """ Return the version of the OCR API to use. This method is meant to be overridden. """
+        raise NotImplementedError()
+
+    @api.model
+    def _get_api_route(self):
+        """ Return the API route to use. This method is meant to be overridden. """
+        raise NotImplementedError()
+
+    @api.model
+    def _contact_iap_extract(self, action, params):
+        """ Contact the IAP extract service and return the response."""
+        params['version'] = self._get_ocr_api_version()
+        params['account_token'] = self._get_iap_account().sudo().account_token
+        endpoint = self.env['ir.config_parameter'].sudo().get_str('iap_extract_endpoint') or 'https://extract.api.odoo.com'
+        route = self._get_api_route()
+        return iap_tools.iap_jsonrpc(f"{endpoint}/{route}/{action}", params=params)
 
     @api.model
     def _cron_validate(self):
         records_to_validate = self.with_context(skip_is_manually_modified=True).search(self._get_validation_domain())
 
         for record in records_to_validate:
-            try:
+            with contextlib.suppress(RequestException):
                 record._contact_iap_extract(
                     'validate',
                     params={
@@ -116,8 +133,6 @@ class ExtractMixin(models.AbstractModel):
                         }
                     }
                 )
-            except AccessError:
-                pass
 
         records_to_validate.extract_state = 'done'
         return records_to_validate
@@ -260,8 +275,8 @@ class ExtractMixin(models.AbstractModel):
 
             user_infos = self._get_user_infos()
             params = {
-                'dbuuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
-                'documents': [x.datas.decode('utf-8') for x in attachment],
+                'dbuuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
+                'documents': [x.raw.to_base64() for x in attachment],
                 'user_infos': user_infos,
                 'webhook_url': self._get_webhook_url(),
             }
@@ -271,8 +286,7 @@ class ExtractMixin(models.AbstractModel):
                 if result['status'] == 'success':
                     self.extract_state = 'waiting_extraction'
                     self.extract_document_uuid = result['document_token']
-                    if self.env['ir.config_parameter'].sudo().get_param("iap_extract.already_notified", True):
-                        self.env['ir.config_parameter'].sudo().set_param("iap_extract.already_notified", False)
+                    self.env['ir.config_parameter'].sudo().set_bool("iap_extract.already_notified", False)
                     self.env['iap.account']._send_success_notification(
                         message=self._get_iap_bus_notification_success(),
                     )
@@ -291,7 +305,10 @@ class ExtractMixin(models.AbstractModel):
                         'An error occurred during OCR parsing of %s %d. Status: %s',
                         self._name, self.id, self.extract_status,
                     )
-            except AccessError:
+            except iap_tools.IAPServerError:
+                self.extract_state = 'error_status'
+                self.extract_status = 'error_internal'
+            except RequestException:
                 self.extract_state = 'error_status'
                 self.extract_status = 'error_no_connection'
             if self.extract_state == 'error_status':
@@ -311,7 +328,7 @@ class ExtractMixin(models.AbstractModel):
         )
 
         #If we don't find the config parameter, we consider it True, because we don't want to notify if no credits has been bought earlier.
-        already_notified = self.env['ir.config_parameter'].sudo().get_param("iap_extract.already_notified", True)
+        already_notified = self.env['ir.config_parameter'].sudo().get_bool("iap_extract.already_notified", True)
         if already_notified:
             return
         try:
@@ -328,7 +345,7 @@ class ExtractMixin(models.AbstractModel):
                     'email_to': res[0]['email']
                 }
                 mail_template.send_mail(iap_account.id, force_send=True, email_values=email_values)
-                self.env['ir.config_parameter'].sudo().set_param("iap_extract.already_notified", True)
+                self.env['ir.config_parameter'].sudo().set_bool("iap_extract.already_notified", True)
 
     def _validate_ocr(self):
         documents_to_validate = self.filtered(lambda doc: doc.extract_state == 'waiting_validation')
@@ -350,7 +367,7 @@ class ExtractMixin(models.AbstractModel):
             self._on_ocr_results(ocr_results)
             self.with_company(self.company_id)._fill_document_with_results(ocr_results)
             # Set OdooBot as the author of the tracking message
-            self._track_set_author(self.env.ref('base.partner_root'))
+            self._track_set_log_author(self.env.ref('base.partner_root'))
             if 'full_text_annotation' in ocr_results:
                 self.message_main_attachment_id.index_content = ocr_results['full_text_annotation']
 

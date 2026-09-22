@@ -1,6 +1,5 @@
 {
     'name': 'ESG HR Fleet',
-    'version': '1.0',
     'summary': "Measure fleet emissions based on your employees' commuting distance and vehicle data.",
     'depends': [
         'esg',
@@ -8,20 +7,16 @@
     ],
     'data': [
         'data/esg_hr_fleet_data.xml',
-        'security/esg_hr_fleet_security.xml',
-        'security/ir.model.access.csv',
+        'report/esg_carbon_emission_report_views.xml',
         'report/esg_employee_commuting_report_views.xml',
         'views/esg_menus.xml',
+        'views/esg_other_emission_views.xml',
         'views/res_config_settings_views.xml',
-        'wizard/employee_commuting_emissions_wizard.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [
-            'esg_hr_fleet/static/src/**/*',
-            ('remove', 'esg_hr_fleet/static/src/views/esg_employee_commuting_report_pivot/**'),
-        ],
-        'web.assets_backend_lazy': [
-            'esg_hr_fleet/static/src/views/esg_employee_commuting_report_pivot/**',
+            'esg_hr_fleet/static/src/fields/**/*',
         ],
     },
     'auto_install': True,

@@ -2,15 +2,15 @@
 
 from odoo.http import request
 
-from odoo.addons.l10n_br.controllers.portal import L10nBRPortalAccount
+from odoo.addons.account.controllers.portal import PortalAccount
 
 
-class L10nBREdiPortalAccount(L10nBRPortalAccount):
+class L10nBREdiPortalAccount(PortalAccount):
 
     def _complete_address_values(self, address_values, *args, **kwargs):
         """ Override. Complete the address for EDI in the B2C case (CPF identification). """
         super()._complete_address_values(address_values, *args, **kwargs)
-        if address_values.get('l10n_latam_identification_type_id') == request.env.ref('l10n_br.cpf').id:
+        if 'BR_CN' in (address_values.get('additional_identifiers') or {}):
             fiscal_position = request.env['account.fiscal.position'].sudo().search([
                 ('company_id', '=', request.env.company.id), ('l10n_br_is_avatax', '=', True)
             ], limit=1)

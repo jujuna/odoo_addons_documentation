@@ -17,4 +17,17 @@ patch(PrepDisplay.prototype, {
         }
         return result;
     },
+    getFilteredOrdersKey(prepLine) {
+        const result = super.getFilteredOrdersKey(...arguments);
+        const courseId = prepLine.pos_order_line_id?.course_id;
+        return result + (courseId ? "-" + courseId.id : "");
+    },
+    getOrderlineInfo(prepLine) {
+        const result = super.getOrderlineInfo(...arguments);
+        const courseId = prepLine.pos_order_line_id?.course_id;
+        return {
+            ...result,
+            course_id: courseId,
+        };
+    },
 });

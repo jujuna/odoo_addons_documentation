@@ -22,5 +22,6 @@ class MrpWorkorder(models.Model):
         self._create_or_update_analytic_entry()
 
     def action_cancel(self):
-        self.employee_analytic_account_line_ids.unlink()
-        return super().action_cancel()
+        res = super().action_cancel()
+        self.sudo().employee_analytic_account_line_ids.unlink()
+        return res

@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Hr Recruitment Extract',
-    'version': '1.0',
     'category': 'Human Resources/Recruitment',
     'summary': 'Extract data from CV scans to fill applicant forms automatically',
     'depends': ['hr_recruitment', 'iap_extract', 'iap_mail', 'mail_enterprise'],

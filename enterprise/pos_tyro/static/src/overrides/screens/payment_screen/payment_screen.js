@@ -24,9 +24,7 @@ patch(PaymentScreen.prototype, {
         );
         if (
             validLinesToRefund.length < 2 ||
-            !validLinesToRefund.some(
-                (line) => line.payment_method_id.use_payment_terminal === "tyro"
-            )
+            !validLinesToRefund.some((line) => line.payment_method_id.payment_provider === "tyro")
         ) {
             // This 'refund by payment line' functionality is only needed to meet Tyro's
             // certification criteria regarding split payments/refunds. So for now, we

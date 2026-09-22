@@ -2,9 +2,9 @@
 <odoo>
     <t t-name="hr_appraisal.AppraisalGoal.buttons" t-inherit="web.ListView.Buttons" t-inherit-mode="primary">
         <xpath expr="." position="inside">
-            <t t-if="hasSelectedRecords">
-                <button type="button" class="btn btn-primary" t-on-click="onSelect">
-                    <span t-if="defaultEmployeeIds?.length">
+            <t t-if="this.hasSelectedRecords">
+                <button type="button" class="btn btn-primary" t-on-click="this.onSelect">
+                    <span t-if="this.defaultEmployeeIds?.length">
                         Select
                     </span>
                     <span t-else="">
@@ -12,7 +12,7 @@
                     </span>
                 </button>
             </t>
-            <button type="button" class="btn btn-secondary" t-on-click.stop="onClose">Close</button>
+            <button type="button" class="btn btn-secondary" t-on-click.stop="this.onClose">Close</button>
         </xpath>
     </t>
 </odoo>

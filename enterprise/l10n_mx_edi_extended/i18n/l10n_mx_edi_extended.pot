@@ -4,21 +4,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-08-28 18:21+0000\n"
+"PO-Revision-Date: 2026-08-28 18:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
-
-#. module: l10n_mx_edi_extended
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
-msgid "<br/>Customs:"
-msgstr ""
 
 #. module: l10n_mx_edi_extended
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
@@ -35,7 +30,12 @@ msgstr ""
 
 #. module: l10n_mx_edi_extended
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
-msgid "<span>XEXX010101000</span>"
+msgid "<span>Customs Numbers</span>"
+msgstr ""
+
+#. module: l10n_mx_edi_extended
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.l10n_mx_fiscal_regime_receptor
+msgid "<span>NumRegIdTrib:</span>"
 msgstr ""
 
 #. module: l10n_mx_edi_extended
@@ -127,7 +127,7 @@ msgstr ""
 
 #. module: l10n_mx_edi_extended
 #: model:ir.model,name:l10n_mx_edi_extended.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr ""
 
 #. module: l10n_mx_edi_extended
@@ -177,16 +177,6 @@ msgid ""
 msgstr ""
 
 #. module: l10n_mx_edi_extended
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
-msgid "Customs Qty"
-msgstr ""
-
-#. module: l10n_mx_edi_extended
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
-msgid "Customs Unit"
-msgstr ""
-
-#. module: l10n_mx_edi_extended
 #: model:ir.model.fields,field_description:l10n_mx_edi_extended.field_uom_uom__l10n_mx_edi_code_aduana
 msgid "Customs code"
 msgstr ""
@@ -200,6 +190,12 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_mx_edi_extended.selection__account_move__l10n_mx_edi_external_trade_type__02
 #: model:ir.model.fields.selection,name:l10n_mx_edi_extended.selection__res_partner__l10n_mx_edi_external_trade_type__02
 msgid "Definitive"
+msgstr ""
+
+#. module: l10n_mx_edi_extended
+#: model:ir.model.fields.selection,name:l10n_mx_edi_extended.selection__account_move__l10n_mx_edi_external_trade_type__04
+#: model:ir.model.fields.selection,name:l10n_mx_edi_extended.selection__res_partner__l10n_mx_edi_external_trade_type__04
+msgid "Definitive without alienation"
 msgstr ""
 
 #. module: l10n_mx_edi_extended
@@ -219,8 +215,24 @@ msgid "Display Name"
 msgstr ""
 
 #. module: l10n_mx_edi_extended
+#: model:ir.model.fields.selection,name:l10n_mx_edi_extended.selection__account_move__l10n_mx_edi_external_trade_type__01
+#: model:ir.model.fields.selection,name:l10n_mx_edi_extended.selection__res_partner__l10n_mx_edi_external_trade_type__01
+msgid "Does not apply"
+msgstr ""
+
+#. module: l10n_mx_edi_extended
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
+msgid "Dollar Value"
+msgstr ""
+
+#. module: l10n_mx_edi_extended
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.mx_partner_address_form
 msgid "Door #"
+msgstr ""
+
+#. module: l10n_mx_edi_extended
+#: model:ir.module.module,shortdesc:base.module_l10n_mx_edi_extended
+msgid "EDI for Mexico (Advanced Features)"
 msgstr ""
 
 #. module: l10n_mx_edi_extended
@@ -255,16 +267,15 @@ msgid "ID"
 msgstr ""
 
 #. module: l10n_mx_edi_extended
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
+msgid "Identification No."
+msgstr ""
+
+#. module: l10n_mx_edi_extended
 #: model:ir.model.fields,help:l10n_mx_edi_extended.field_l10n_mx_edi_tariff_fraction__active
 msgid ""
 "If the tariff fraction has expired it could be disabled to do not allow "
 "select the record."
-msgstr ""
-
-#. module: l10n_mx_edi_extended
-#: model:ir.model.fields,help:l10n_mx_edi_extended.field_account_bank_statement_line__l10n_mx_edi_external_trade_type
-#: model:ir.model.fields,help:l10n_mx_edi_extended.field_account_move__l10n_mx_edi_external_trade_type
-msgid "If this field is 02, the CFDI will include the complement."
 msgstr ""
 
 #. module: l10n_mx_edi_extended
@@ -375,13 +386,16 @@ msgid "Mexican documents that needs to transit outside of Odoo"
 msgstr ""
 
 #. module: l10n_mx_edi_extended
+#: model:ir.model.fields,help:l10n_mx_edi_extended.field_account_bank_statement_line__l10n_mx_edi_external_trade_type
+#: model:ir.model.fields,help:l10n_mx_edi_extended.field_account_move__l10n_mx_edi_external_trade_type
 #: model:ir.model.fields,help:l10n_mx_edi_extended.field_res_partner__l10n_mx_edi_external_trade_type
 #: model:ir.model.fields,help:l10n_mx_edi_extended.field_res_users__l10n_mx_edi_external_trade_type
 msgid ""
-"Mexico: Indicates whether the partner is foreign and if an External Trade "
-"complement is required.01 - Not Set: No Complement.02 - Definitive: Adds the"
-" External Trade complement to CFDI.03 - Temporal: Used when exporting goods "
-"for a temporary period."
+"Mexico: Indicates whether the partner is foreign and if an External Trade complement is required.\n"
+"01 - Does not apply: No Complement.\n"
+"02 - Definitive: Adds the External Trade complement to CFDI.\n"
+"03 - Temporal: Used when exporting goods for a temporary period.\n"
+"04 - Definitive without alienation: Adds the External Trade complement to CFDI if the invoice total is 0."
 msgstr ""
 
 #. module: l10n_mx_edi_extended
@@ -403,8 +417,6 @@ msgstr ""
 #. module: l10n_mx_edi_extended
 #: model:ir.model.fields,field_description:l10n_mx_edi_extended.field_account_bank_statement_line__l10n_mx_edi_external_trade
 #: model:ir.model.fields,field_description:l10n_mx_edi_extended.field_account_move__l10n_mx_edi_external_trade
-#: model:ir.model.fields,field_description:l10n_mx_edi_extended.field_res_partner__l10n_mx_edi_external_trade
-#: model:ir.model.fields,field_description:l10n_mx_edi_extended.field_res_users__l10n_mx_edi_external_trade
 msgid "Need external trade?"
 msgstr ""
 
@@ -463,6 +475,11 @@ msgstr ""
 #. module: l10n_mx_edi_extended
 #: model:ir.model.fields,field_description:l10n_mx_edi_extended.field_account_move_line__l10n_mx_edi_qty_umt
 msgid "Qty UMT"
+msgstr ""
+
+#. module: l10n_mx_edi_extended
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
+msgid "Quantity"
 msgstr ""
 
 #. module: l10n_mx_edi_extended
@@ -530,6 +547,16 @@ msgid "UMT Aduana"
 msgstr ""
 
 #. module: l10n_mx_edi_extended
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
+msgid "Unit"
+msgstr ""
+
+#. module: l10n_mx_edi_extended
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.report_invoice_document
+msgid "Unit Value"
+msgstr ""
+
+#. module: l10n_mx_edi_extended
 #: model:ir.model.fields,field_description:l10n_mx_edi_extended.field_account_move_line__l10n_mx_edi_price_unit_umt
 msgid "Unit Value UMT"
 msgstr ""
@@ -581,12 +608,4 @@ msgstr ""
 #. module: l10n_mx_edi_extended
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_extended.mx_partner_address_form
 msgid "ZIP"
-msgstr ""
-
-#. module: l10n_mx_edi_extended
-#: model:ir.model.fields,help:l10n_mx_edi_extended.field_res_partner__l10n_mx_edi_external_trade
-#: model:ir.model.fields,help:l10n_mx_edi_extended.field_res_users__l10n_mx_edi_external_trade
-msgid ""
-"check this box to add by default the external trade complement in invoices "
-"for this customer."
 msgstr ""

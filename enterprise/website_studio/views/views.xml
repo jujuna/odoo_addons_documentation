@@ -45,12 +45,12 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='model_id']" position="after">
-                <field name="model" invisible="1"/>
+                <field name="model" invisible="1"/>  <!-- Used by _inverse_compute_model_id from ir.ui.view -->
             </xpath>
 
             <xpath expr="//field[@name='record_domain']" position="after">
-                <field name="use_menu" widget="boolean_toggle" options='{"autosave": False}' invisible="id" />
-                <field name="auto_single_page" widget="boolean_toggle" options='{"autosave": False}' invisible="id" />
+                <field name="use_menu" widget="boolean_toggle" invisible="id" />
+                <field name="auto_single_page" widget="boolean_toggle" invisible="id" />
             </xpath>
         </field>
     </record>

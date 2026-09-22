@@ -1,25 +1,27 @@
+import { KnowledgeCommentsPopover } from "@knowledge/comments/comments_popover/comments_popover";
+import { KnowledgeCommentCreatorComposer } from "@knowledge/comments/composer";
+import { KnowledgeThread } from "@knowledge/comments/knowledge_thread";
+import { Composer } from "@mail/core/common/composer";
+import {
+    computed,
+    Component,
+    onWillDestroy,
+    onWillStart,
+    proxy,
+    signal,
+    t,
+    useEffect,
+    useOnChange,
+    useProps,
+} from "@odoo/owl";
+import { isBrowserChrome } from "@web/core/browser/feature_detection";
+import { usePopover } from "@web/core/popover/popover_hook";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
-import { usePopover } from "@web/core/popover/popover_hook";
-import { Composer } from "@mail/core/common/composer";
-import { KnowledgeThread } from "../../mail/thread/knowledge_thread";
 import { scrollTo } from "@web/core/utils/scrolling";
-import { isBrowserChrome } from "@web/core/browser/feature_detection";
-import { KnowledgeCommentsPopover } from "../comments_popover/comments_popover";
-import { KnowledgeCommentCreatorComposer } from "../../mail/composer/composer";
-import { CommentAnchorText } from "./comment_anchor_text";
 import { imageUrl } from "@web/core/utils/urls";
-import {
-    Component,
-    onWillStart,
-    useSubEnv,
-    useRef,
-    useEffect,
-    useState,
-    onWillDestroy,
-} from "@odoo/owl";
-import { effect } from "@web/core/utils/reactive";
-import { batched } from "@web/core/utils/timing";
+import { useSubEnv } from "@web/owl2/utils";
+import { CommentAnchorText } from "./comment_anchor_text";
 
 const DEFAULT_ANCHOR_TEXT_SIZE = 50;
 export const MIN_THREAD_WIDTH = 300;
@@ -31,40 +33,58 @@ export class KnowledgeCommentsThread extends Component {
         KnowledgeThread,
         KnowledgeCommentCreatorComposer,
     };
-    static props = {
-        threadId: { type: String },
-        horizontalDimensions: { type: Object, optional: true },
-        top: { type: Number, optional: true },
-        readonly: { type: Boolean, optional: true },
-    };
     static template = "knowledge.KnowledgeCommentsThread";
+
+    props = useProps({
+        threadId: t.string(),
+        horizontalDimensions: t.object().optional(),
+        top: t.number().optional(),
+    });
+
+    threadHeights = useProps.static(
+        "threadHeights",
+        t.record(t.object({ height: t.number() })).optional({})
+    );
+
+    targetRef = signal.ref();
+    threadScrollableRef = signal.ref();
 
     setup() {
         this.commentsService = useService("knowledge.comments");
-        this.threadScrollableRef = useRef("threadScrollableRef");
-        this.targetRef = useRef("targetRef");
-        this.composerRef = useRef("composerRef");
-        this.commentsState = useState(this.commentsService.getCommentsState());
+        this.commentsState = proxy(this.commentsService.getCommentsState());
         let previousThreadId;
         this.alive = true;
-        effect(
-            batched((state) => {
-                if (!this.alive) {
-                    return;
+        // Cache the last non undefined value for threadRecord. The commentsState
+        // resets its threadRecords collection eg when the current article
+        // changes (onWillUpdateProps), however at that point, instances of
+        // this class are not destroyed yet, and many reactive constructions
+        // (eg message_actions) are still subscribed to changes on the current
+        // threadRecord. With this cache system, even if the commentsState is
+        // reset, subscribers are not affected as the computed signal returns
+        // the cached value.
+        let threadRecord;
+        this.threadRecord = computed(() => {
+            const updatedThreadRecord = this.commentsState.threadRecords[this.props.threadId];
+            if (updatedThreadRecord !== undefined) {
+                threadRecord = updatedThreadRecord;
+            }
+            return threadRecord;
+        });
+        useEffect(() => {
+            if (!this.alive) {
+                return;
+            }
+            if (previousThreadId !== this.commentsState.activeThreadId) {
+                if (previousThreadId === this.props.threadId && this.editorThread) {
+                    this.editorThread.onActivate(new CustomEvent("knowledge.deactivateThread"));
                 }
-                if (previousThreadId !== state.activeThreadId) {
-                    if (previousThreadId === this.props.threadId && this.editorThread) {
-                        this.editorThread.onActivate(new CustomEvent("knowledge.deactivateThread"));
-                    }
-                    previousThreadId = state.activeThreadId;
-                }
-            }),
-            [this.commentsState]
-        );
+                previousThreadId = this.commentsState.activeThreadId;
+            }
+        });
         onWillDestroy(() => {
             this.alive = false;
         });
-        this.state = useState({
+        this.state = proxy({
             hasFullAnchorText: false,
         });
         useSubEnv({
@@ -83,9 +103,9 @@ export class KnowledgeCommentsThread extends Component {
             onClose: () => {
                 this.onClosePopover();
             },
-            env: this.env,
             position: "left-start",
-            popoverClass: "o_knowledge_comments_popover",
+            popoverClass: "o_knowledge_comments_popover d-flex flex-column rounded-3 shadow-sm",
+            withScope: true,
         });
         const onActivate = (ev) => {
             switch (ev.type) {
@@ -107,136 +127,111 @@ export class KnowledgeCommentsThread extends Component {
                     break;
             }
         };
-        useEffect(
-            () => {
-                const editorThread = this.editorThread;
-                if (editorThread) {
-                    editorThread.onActivateMap.set("main", onActivate);
-                    editorThread.onFocusMap.set("main", onFocus);
+        useOnChange(
+            () => [this.editorThread],
+            (editorThread) => {
+                if (!editorThread) {
+                    return;
                 }
+                editorThread.onActivateMap.set("main", onActivate);
+                editorThread.onFocusMap.set("main", onFocus);
                 return () => {
-                    if (editorThread) {
-                        editorThread.onActivateMap.delete(onActivate);
-                        editorThread.onFocusMap.delete(onFocus);
-                    }
+                    editorThread.onActivateMap.delete("main");
+                    editorThread.onFocusMap.delete("main");
                 };
-            },
-            () => [this.editorThread]
-        );
-        let wasActive;
-        useEffect(
-            () => {
-                if (this.isActive && !wasActive && !this.smallUI) {
-                    const scrollable = this.threadScrollableRef.el;
-                    const composer = this.composerRef.el;
-                    if (scrollable && composer) {
-                        const composerRect = composer.getBoundingClientRect();
-                        scrollable.scrollBy({
-                            top: composerRect.height,
-                        });
-                    }
-                }
-                if (this.isActive !== wasActive) {
-                    wasActive = this.isActive;
-                }
-            },
-            () => [this.isActive, this.smallUI]
+            }
         );
         if (this.commentsState.displayMode === "handler") {
             const setTargetHeight = (target) => {
                 const targetRect = target.getBoundingClientRect();
-                if (!(this.props.threadId in this.env.threadHeights)) {
-                    this.env.threadHeights[this.props.threadId] = {
+                if (!(this.props.threadId in this.threadHeights)) {
+                    this.threadHeights[this.props.threadId] = {
                         height: undefined,
                     };
                 }
-                this.env.threadHeights[this.props.threadId].height = targetRect.height;
+                this.threadHeights[this.props.threadId].height = targetRect.height;
             };
-            useEffect(
-                () => {
-                    if (this.targetRef.el) {
-                        const observer = new ResizeObserver((entries) => {
-                            for (const entry of entries) {
-                                if (entry.target) {
-                                    setTargetHeight(entry.target);
-                                }
+            useEffect(() => {
+                const target = this.targetRef();
+                if (target) {
+                    const observer = new ResizeObserver((entries) => {
+                        for (const entry of entries) {
+                            if (entry.target) {
+                                setTargetHeight(entry.target);
                             }
-                        });
-                        observer.observe(this.targetRef.el);
-                        setTargetHeight(this.targetRef.el);
-                        return () => observer.disconnect();
-                    }
-                },
-                () => [this.targetRef.el]
-            );
-            useEffect(
-                () => {
-                    if (
-                        this.editorThread &&
-                        (this.editorThread.threadId === "undefined" ||
-                            this.commentsState.shouldOpenActiveThread) &&
-                        this.targetRef.el &&
-                        this.isActive
-                    ) {
-                        this.commentsState.shouldOpenActiveThread = false;
-                        if (this.smallUI) {
-                            this.openPopover();
                         }
+                    });
+                    observer.observe(target);
+                    setTargetHeight(target);
+                    return () => observer.disconnect();
+                }
+            });
+            useEffect(() => {
+                if (
+                    this.editorThread &&
+                    (this.editorThread.threadId === "undefined" ||
+                        this.commentsState.shouldOpenActiveThread) &&
+                    this.targetRef() &&
+                    this.isActive
+                ) {
+                    this.commentsState.shouldOpenActiveThread = false;
+                    if (this.smallUI) {
+                        this.openPopover();
                     }
-                },
-                () => [this.targetRef.el, this.isActive, this.smallUI, this.editorThread]
-            );
-            useEffect(
-                () => {
-                    if (!this.smallUI && this.popover.isOpen) {
-                        this.popover.close();
-                    }
-                },
-                () => [this.smallUI]
-            );
+                }
+            });
+            useEffect(() => {
+                if (!this.smallUI && this.popover.isOpen) {
+                    this.popover.close();
+                }
+            });
         }
         if (this.props.threadId === "undefined") {
             onWillStart(() => {
                 this.commentsService.loadThreads([this.props.threadId]);
             });
         } else {
-            useEffect(
+            // commentsState.threadRecords is reset onWillUpdateProps when
+            // the articleId changes, loadRecords should not be called
+            // during this transient state (this component is destined to be
+            // destroyed).
+            const articleId = this.commentsState.articleId;
+            useOnChange(
+                () => [this.commentsState.displayMode],
                 () => {
-                    if (!(this.props.threadId in this.commentsState.threadRecords)) {
+                    if (
+                        articleId === this.commentsState.articleId &&
+                        !(this.props.threadId in this.commentsState.threadRecords)
+                    ) {
                         this.commentsService.loadRecords(this.env.model.root.resId, {
                             threadId: this.props.threadId,
                         });
                     }
-                },
-                () => [this.commentsState.articleId, this.commentsState.displayMode]
+                }
             );
-            useEffect(
-                () => {
-                    if (
-                        this.props.threadId in this.commentsState.threadRecords &&
-                        !(this.props.threadId in this.commentsState.threads)
-                    ) {
-                        this.commentsService.loadThreads([this.props.threadId]);
-                        this.thread.knowledgePreLoading = true;
-                        this.thread.fetchNewMessages().then(() => {
-                            if (this.editorThread?.isProtected()) {
-                                return;
-                            }
-                            let isEmpty = true;
-                            for (const message of this.thread.messages) {
-                                if (message.message_type === "comment" && !message.isEmpty) {
-                                    isEmpty = false;
-                                    break;
-                                }
-                            }
-                            if (isEmpty) {
-                                this.commentsService.deleteThread(this.props.threadId);
-                            }
-                        });
-                        this.thread.knowledgePreLoading = false;
+            useOnChange(
+                () => [this.threadRecord()],
+                (threadRecord) => {
+                    if (!threadRecord || this.props.threadId in this.commentsState.threads) {
+                        return;
                     }
-                },
-                () => [this.threadRecord]
+                    this.commentsService.loadThreads([this.props.threadId]);
+                    this.thread.fetchNewMessages().then(() => {
+                        if (this.editorThread?.isProtected()) {
+                            return;
+                        }
+                        let isEmpty = true;
+                        for (const message of this.thread.messages) {
+                            if (message.message_type === "comment" && !message.isEmpty) {
+                                isEmpty = false;
+                                break;
+                            }
+                        }
+                        if (isEmpty) {
+                            this.commentsService.deleteThread(this.props.threadId);
+                        }
+                    });
+                }
             );
         }
         onWillDestroy(() => {
@@ -310,7 +305,7 @@ export class KnowledgeCommentsThread extends Component {
     get fullAnchorText() {
         let text;
         if (!this.editorThread) {
-            text = this.threadRecord?.article_anchor_text || "";
+            text = this.threadRecord()?.article_anchor_text || "";
         } else {
             text = this.editorThread.anchorText;
         }
@@ -336,10 +331,6 @@ export class KnowledgeCommentsThread extends Component {
         return this.commentsState.threads[this.props.threadId];
     }
 
-    get threadRecord() {
-        return this.commentsState.threadRecords[this.props.threadId];
-    }
-
     get smallUI() {
         return (
             this.commentsState.displayMode === "handler" &&
@@ -361,7 +352,7 @@ export class KnowledgeCommentsThread extends Component {
         if (this.props.threadId === "undefined") {
             return false;
         }
-        return this.threadRecord.is_resolved;
+        return this.threadRecord().is_resolved;
     }
 
     onClick(ev) {
@@ -401,8 +392,8 @@ export class KnowledgeCommentsThread extends Component {
             const popoverProps = {
                 threadId: this.props.threadId,
             };
-            if (this.targetRef.el) {
-                this.popover.open(this.targetRef.el, popoverProps);
+            if (this.targetRef()) {
+                this.popover.open(this.targetRef(), popoverProps);
             }
         }
     }

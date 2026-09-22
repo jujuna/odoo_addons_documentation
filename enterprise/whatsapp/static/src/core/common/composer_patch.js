@@ -8,18 +8,15 @@ patch(Composer.prototype, {
     setup() {
         super.setup();
         this.composerDisableCheckTimeout = null;
-        useEffect(
-            () => {
-                clearTimeout(this.composerDisableCheckTimeout);
-                this.checkComposerDisabled();
-            },
-            () => [this.thread?.whatsapp_channel_valid_until]
-        );
+        useEffect(() => {
+            clearTimeout(this.composerDisableCheckTimeout);
+            this.checkComposerDisabled();
+        });
         onWillDestroy(() => clearTimeout(this.composerDisableCheckTimeout));
     },
     get allowUpload() {
         if (
-            this.thread?.channel_type === "whatsapp" &&
+            this.thread?.channel?.channel_type === "whatsapp" &&
             this.props.composer.attachments.length > 0
         ) {
             return false;
@@ -28,7 +25,7 @@ patch(Composer.prototype, {
     },
     get areAllActionsDisabled() {
         if (
-            this.thread?.channel_type === "whatsapp" &&
+            this.thread?.channel?.channel_type === "whatsapp" &&
             !this.state.active &&
             !this.isRevivingWhatsapp
         ) {
@@ -40,36 +37,39 @@ patch(Composer.prototype, {
         return false;
     },
     get isMultiUpload() {
-        if (this.thread?.channel_type === "whatsapp") {
+        if (this.thread?.channel?.channel_type === "whatsapp") {
             return false;
         }
         return super.isMultiUpload;
     },
     get placeholder() {
-        if (this.thread?.channel_type === "whatsapp") {
-            if (!this.state.active && this.props.composer.threadExpired) {
+        if (this.thread?.channel?.channel_type === "whatsapp") {
+            if (!this.state.active && this.props.composer.whatsappThreadDisabled) {
                 return _t("Conversation closed.");
             }
             return _t("Answer as %(whatsapp_account_name)s", {
-                whatsapp_account_name: this.thread.wa_account_id.name,
+                whatsapp_account_name: this.thread.channel.wa_account_id.name,
             });
         }
         return super.placeholder;
     },
 
     checkComposerDisabled() {
-        if (this.thread && this.thread.channel_type === "whatsapp") {
-            const datetime = this.thread.whatsappChannelValidUntilDatetime;
-            if (!datetime) {
-                return;
-            }
-            const delta = datetime.ts - Date.now();
-            if (delta <= 0) {
+        if (this.thread && this.thread.channel?.channel_type === "whatsapp") {
+            const datetime = this.thread.channel.whatsapp_channel_valid_until;
+            const isBlocked = this.thread.channel.whatsapp_channel_blocked;
+
+            const now = Date.now();
+            const ts = datetime?.ts;
+            const shouldDisable = !ts || ts <= now || isBlocked;
+
+            if (shouldDisable) {
                 this.state.active = false;
-                this.props.composer.threadExpired = true;
+                this.props.composer.whatsappThreadDisabled = true;
             } else {
+                const delta = ts - now;
                 this.state.active = true;
-                this.props.composer.threadExpired = false;
+                this.props.composer.whatsappThreadDisabled = false;
                 this.composerDisableCheckTimeout = setTimeout(() => {
                     this.checkComposerDisabled();
                 }, delta);
@@ -80,8 +80,30 @@ patch(Composer.prototype, {
     /** @override */
     get isSendButtonDisabled() {
         const whatsappInactive =
-            this.thread && this.thread.channel_type === "whatsapp" && !this.state.active;
+            this.thread && this.thread.channel?.channel_type === "whatsapp" && !this.state.active;
         return super.isSendButtonDisabled || whatsappInactive;
+    },
+
+    onClickSendInteractive() {
+        this.action.doAction(
+            {
+                type: "ir.actions.act_window",
+                name: _t("Send Interactive Message"),
+                res_model: "whatsapp.interactive.composer",
+                view_mode: "form",
+                views: [[false, "form"]],
+                target: "new",
+                context: {
+                    active_model: this.thread.model,
+                    default_discuss_channel_id: this.thread.id,
+                },
+            },
+            {
+                onClose: () => {
+                    this.thread.fetchMessages();
+                },
+            }
+        );
     },
 
     onclickWhatsAppChat() {
@@ -118,16 +140,16 @@ patch(Composer.prototype, {
     },
 
     processFileUploading(ev, superCb) {
-        if (
-            this.thread?.channel_type === "whatsapp" &&
-            this.props.composer.attachments.length > 0
-        ) {
-            ev.preventDefault();
-            this.env.services.notification.add(
-                _t("Only one attachment is allowed for each message"),
-                { type: "warning" }
-            );
-            return;
+        if (this.thread?.channel?.channel_type === "whatsapp") {
+            const files = ev.dataTransfer?.files || ev.clipboardData?.files || [];
+            if (this.props.composer.attachments.length > 0 || files.length > 1) {
+                ev.preventDefault();
+                this.env.services.notification.add(
+                    _t("Only one attachment is allowed for each message"),
+                    { type: "warning" }
+                );
+                return;
+            }
         }
         superCb(ev);
     },

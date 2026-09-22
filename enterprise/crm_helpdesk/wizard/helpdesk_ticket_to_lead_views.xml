@@ -22,9 +22,9 @@
                     </group>
                 </sheet>
                 <footer>
-                    <button name="action_convert_to_lead" string="Convert to Lead" type="object" class="btn-primary" data-hotkey="q" groups="crm.group_use_lead" context="{'show_create_ticket': True}"/>
-                    <button name="action_convert_to_lead" string="Convert to Opportunity" type="object" class="btn-primary" data-hotkey="q" groups="!crm.group_use_lead"/>
-                    <button string="Discard" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                    <button name="action_convert_to_lead" string="Convert to Lead" type="object" class="btn-primary" data-hotkey="q" invisible="convert_to == 'opportunity'" context="{'show_create_ticket': True}"/>
+                    <button name="action_convert_to_lead" string="Convert to Opportunity" type="object" class="btn-primary" data-hotkey="q" invisible="convert_to == 'lead'"/>
+                    <button class="btn-secondary" special="cancel" data-hotkey="x"/>
                 </footer>
             </form>
         </field>

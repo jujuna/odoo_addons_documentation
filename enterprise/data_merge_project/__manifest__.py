@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Project Merge action',
-    'version': '1.0',
     'category': 'Productivity/Data Cleaning',
     'summary': 'Add Merge action in contextual menu of project task and tag models.',
     'description': """Add Merge action in contextual menu of project task and tag models.""",

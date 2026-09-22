@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 from datetime import datetime, timedelta
 
+from odoo.addons.base.tests.files import PNG_B64, PNG_RAW
 from odoo.addons.appointment.tests.common import AppointmentSecurityCommon
 from odoo.exceptions import AccessError
 from odoo.tests import tagged, users
@@ -10,10 +9,11 @@ from odoo.tools import mute_logger, file_open
 
 
 @tagged('security')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestAppointmentTypeSecurity(AppointmentSecurityCommon):
 
     @users('apt_manager')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_appointment_type_access_apt_manager(self):
         """  Test security access to appointment.type for the group_appointment_manager.
         Can read / write / create / unlink any appointment type.
@@ -31,19 +31,22 @@ class TestAppointmentTypeSecurity(AppointmentSecurityCommon):
         })
 
     @users('apt_user')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_appointment_type_access_apt_user(self):
         """  Test security access to appointment.type for the group_appointment_user.
         Can create an appointment type.
         Can read every published appointment type.
         Can read an appointment type that:
             - is created by the user.
+            - the user is set as responsible
             - has the user in its staff OR doesn't have any staff
             - is resource-based.
         Can write an appointment type that:
             - is created by the user.
+            - the user is set as responsible
         Can unlink an appointment type that:
             - is created by the user.
+            - the user is set as responsible
         """
         self._prepare_types_with_user()
         # Can't read appointment type for which he is not part of staff users
@@ -70,12 +73,20 @@ class TestAppointmentTypeSecurity(AppointmentSecurityCommon):
             with self.subTest(appointment_type=appointment_type), self.assertRaises(AccessError):
                 appointment_type.unlink()
 
-        # Can only write or unlink appointment types created by himself
+        # Can read/write/unlink if added as responsible
+        for appointment_type in self.all_apt_types:
+            with self.subTest(appointment_type=appointment_type):
+                appointment_type.with_user(self.apt_manager).write({'is_published': False, 'responsible_id': self.env.user.id})
+                appointment_type.read(['name'])
+                appointment_type.write({'name': 'test'})
+                appointment_type.unlink()
+
+        # Can write or unlink appointment types created by himself
         created_apt.write({'name': 'test'})
         created_apt.unlink()
 
     @users('internal_user')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_appointment_type_access_internal_user(self):
         """  Test security access to appointment.type for the base.group_user.
         Can read an appointment type that:
@@ -110,7 +121,7 @@ class TestAppointmentTypeSecurity(AppointmentSecurityCommon):
                     appointment_type.unlink()
 
     @users('public_user')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_appointment_type_access_public_user(self):
         """  Test security access to appointment.type for the base.group_public.
         Can't read / write / create / unlink any appointment type.
@@ -154,7 +165,7 @@ class TestAppointmentTypeSecurity(AppointmentSecurityCommon):
         self.assertIn("Test confirmation message", test_event._get_customer_description())
 
     @users('public_user')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_appointment_type_image_access_public_user(self):
         """  Test that base.group_public users can access every appointment type image
         even though they don't have read access on the appointment.type model.
@@ -162,8 +173,8 @@ class TestAppointmentTypeSecurity(AppointmentSecurityCommon):
         self._prepare_types_with_user()
 
         placeholder_image = file_open(self.env['appointment.type']._get_placeholder_filename('image_1920'), 'rb').read()
-        test_image_b64 = b'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYGAAAAAEAAH2FzhVAAAAAElFTkSuQmCC'
-        test_image = base64.b64decode(test_image_b64)
+        test_image_b64 = PNG_B64
+        test_image = PNG_RAW
 
         (self.apt_type_apt_manager + self.apt_type_resource).with_user(self.apt_manager).write({'image_1920': test_image_b64})
         cases = [

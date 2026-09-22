@@ -21,8 +21,7 @@ class AccountReturnSubmissionWizard(models.TransientModel):
             'return_id': account_return.id if account_return else None,
         })._get_records_action(target='new')
 
-        record_action['name'] = _("Submission Instructions")
-
+        record_action['name'] = _("Submit")
         record_action.setdefault('context', {})
         record_action['context'] |= {
             'dialog_size': 'large',

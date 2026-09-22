@@ -1,22 +1,24 @@
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
 import { formatDate, parseDate } from "@web/core/l10n/dates";
-import { Component, useState, onWillStart } from "@odoo/owl";
+import { Component, onWillStart, proxy, usePlugin, useProps } from "@odoo/owl";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { _t } from "@web/core/l10n/translation";
+import { ORM } from "@web/core/orm_plugin";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
+
 const { DateTime } = luxon;
 
 
 export class AccountReturnDashboardList extends Component {
     static template = "account_reports.account_return_dashboard_list";
-    static props = {
-        ...standardWidgetProps,
-    };
+    props = useProps(standardWidgetProps);
+
+    orm = usePlugin(ORM);
+    action = usePlugin(ActionPlugin);
+
+    state = proxy({ accountReturns: [] });
 
     setup() {
-        this.orm = useService("orm");
-        this.action = useService("action");
-        this.accountReturns = useState([]);
         onWillStart(this.fetchNextReturns);
     }
 
@@ -24,27 +26,12 @@ export class AccountReturnDashboardList extends Component {
         const deadlineDate = parseDate(accountReturn.date_deadline);
         const now = DateTime.now().startOf('day');
         const daysDiff = deadlineDate.diff(now, 'days').days;
-
-        let deadlineDisplay;
         let deadlineClass = '';
 
-        if (daysDiff < -1) {
-            deadlineDisplay = formatDate(deadlineDate);
+        if (daysDiff < 0) {  // Overdue
             deadlineClass = 'text-danger';
-        } else if (daysDiff === -1) {
-            deadlineDisplay = _t("Yesterday");
-            deadlineClass = 'text-danger';
-        } else if (daysDiff === 0) {
-            deadlineDisplay = _t("Today");
+        } else if (daysDiff <= 7) {
             deadlineClass = 'text-warning';
-        } else if (daysDiff === 1) {
-            deadlineDisplay = _t("Tomorrow");
-            deadlineClass = 'text-warning';
-        } else if (daysDiff <= 5) {
-            deadlineDisplay = _t("In %s days", Math.round(daysDiff));
-            deadlineClass = 'text-warning';
-        } else {
-            deadlineDisplay = _t("In %s days", Math.round(daysDiff));
         }
 
         return {
@@ -53,19 +40,30 @@ export class AccountReturnDashboardList extends Component {
             type_id: accountReturn.type_id,
             matchedReturnsCount: accountReturn.matched_returns_count,
             deadline: formatDate(deadlineDate),
-            deadlineDisplay,
             deadlineClass,
         };
     }
-
     async fetchNextReturns() {
-        const returns = await this.orm.call(
-            'account.return',
-            'get_next_return_for_dashboard',
-            [this.props.record.resId], //allow_multiple_by_types
-        );
+        const applyReturns = (returns) => {
+            this.state.accountReturns = returns.map(this.formatReturn);
+        };
 
-        this.accountReturns = returns.map(this.formatReturn);
+        const returns = await this.orm
+            .cache({
+                type: "disk",
+                update: "always",
+                callback: (freshReturns, hasChanged) => {
+                    if (hasChanged) {
+                        applyReturns(freshReturns);
+                    }
+                },
+            })
+            .call(
+                'account.return',
+                'get_next_return_for_dashboard',
+                [this.props.record.resId], //allow_multiple_by_types
+            );
+        applyReturns(returns);
     }
 
     /**
@@ -96,6 +94,7 @@ export class AccountReturnDashboardList extends Component {
                     'search_default_todo_returns': 1,
                     // Apply name filter using return type
                     'search_default_type_id': returnTypeId,
+                    'max_number_opened_groups': 100000,
                 },
                 domain: [['return_type_category', '=', 'account_return']],
             };

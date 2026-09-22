@@ -7,8 +7,8 @@ Generates Intrastat PDF report for declaration based on invoices.
     'depends': ['account_intrastat', 'l10n_hr_reports'],
     'data': [
         'data/account_return_data.xml',
-        'security/ir.model.access.csv',
         'wizard/intrastat_goods_submission_wizard.xml',
+        'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

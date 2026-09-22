@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 
-from odoo.tools.misc import street_split
+from odoo.tools.business_data import street_split
 
 from odoo import api, models, _
 

@@ -3,15 +3,15 @@
 # * account_fiscal_categories_fleet
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Marta (wacm)" <wacm@odoo.com>, 2025.
+# "Marta (wacm)" <wacm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-30 11:42+0000\n"
-"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
-"Language-Team: Polish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 01:32+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
 "account_fiscal_categories_fleet/pl/>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -19,12 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#. module: account_fiscal_categories_fleet
-#: model:ir.model,name:account_fiscal_categories_fleet.model_account_fiscal_category
-msgid "Account Fiscal Category"
-msgstr "Kategoria konta podatkowego"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: account_fiscal_categories_fleet
 #. odoo-python
@@ -48,12 +43,6 @@ msgid "Created on"
 msgstr "Data utworzenia"
 
 #. module: account_fiscal_categories_fleet
-#: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_fleet_disallowed_expenses_rate__rate
-msgid "Deductibility (%)"
-msgstr "Możliwość odliczenia (%)"
-
-#. module: account_fiscal_categories_fleet
-#: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_fleet_vehicle__rate_ids
 #: model_terms:ir.ui.view,arch_db:account_fiscal_categories_fleet.fleet_vehicle_view_form
 msgid "Deductibility Rates"
 msgstr "Stawki odliczeń"
@@ -66,12 +55,21 @@ msgstr "Niestandardowa obsługa raportu odroczonych wydatków"
 #. module: account_fiscal_categories_fleet
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_account_deferred_report_handler__display_name
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_account_fiscal_categories_fleet_report_handler__display_name
-#: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_account_fiscal_category__display_name
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_account_move_line__display_name
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_fleet_disallowed_expenses_rate__display_name
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_fleet_vehicle__display_name
 msgid "Display Name"
 msgstr "Nazwa wyświetlana"
+
+#. module: account_fiscal_categories_fleet
+#: model:ir.module.module,shortdesc:base.module_account_fiscal_categories_fleet
+msgid "Fiscal Categories on Fleets"
+msgstr ""
+
+#. module: account_fiscal_categories_fleet
+#: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_fleet_vehicle__rate_ids
+msgid "Fiscal Deductibility"
+msgstr "Odliczenie podatkowe"
 
 #. module: account_fiscal_categories_fleet
 #: model:ir.model,name:account_fiscal_categories_fleet.model_account_fiscal_categories_fleet_report_handler
@@ -81,7 +79,6 @@ msgstr "Niestandardowy procesor raportów podatkowych floty"
 #. module: account_fiscal_categories_fleet
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_account_deferred_report_handler__id
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_account_fiscal_categories_fleet_report_handler__id
-#: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_account_fiscal_category__id
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_account_move_line__id
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_fleet_disallowed_expenses_rate__id
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_fleet_vehicle__id
@@ -112,20 +109,19 @@ msgid "Last Updated on"
 msgstr "Data ostatniej aktualizacji"
 
 #. module: account_fiscal_categories_fleet
-#: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_account_fiscal_category__car_category
-msgid "Requires a Vehicle"
-msgstr "Wymaga pojazdu"
+#: model:ir.module.module,summary:base.module_account_fiscal_categories_fleet
+msgid "Manage fiscal categories with fleets"
+msgstr ""
+
+#. module: account_fiscal_categories_fleet
+#: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_fleet_disallowed_expenses_rate__rate
+msgid "Non-deductible (%)"
+msgstr "Niepodlegające odliczeniu (%)"
 
 #. module: account_fiscal_categories_fleet
 #: model:ir.model.fields,field_description:account_fiscal_categories_fleet.field_fleet_disallowed_expenses_rate__date_from
 msgid "Start Date"
 msgstr "Data początkowa"
-
-#. module: account_fiscal_categories_fleet
-#: model:ir.model.fields,help:account_fiscal_categories_fleet.field_account_fiscal_category__car_category
-msgid "The vehicle becomes mandatory while booking any account move."
-msgstr ""
-"Pojazd staje się obowiązkowy przy rezerwacji jakiegokolwiek ruchu konta."
 
 #. module: account_fiscal_categories_fleet
 #: model:ir.model,name:account_fiscal_categories_fleet.model_fleet_vehicle
@@ -155,3 +151,6 @@ msgstr "potrzebuje kategorii podatkowej."
 #: code:addons/account_fiscal_categories_fleet/static/src/components/fiscal_report/warnings.xml:0
 msgid "these accounts"
 msgstr "te konta"
+
+msgid "Deductibility (%)"
+msgstr "Możliwość odliczenia (%)"

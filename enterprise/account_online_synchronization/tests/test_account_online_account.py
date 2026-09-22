@@ -6,13 +6,16 @@ from freezegun import freeze_time
 from unittest.mock import patch
 
 from odoo import Command, fields, tools
-from odoo.addons.account_online_synchronization.tests.common import AccountOnlineSynchronizationCommon
+from odoo.exceptions import UserError
 from odoo.tests import tagged
+from odoo.addons.account_online_synchronization.tests.common import AccountOnlineSynchronizationCommon
 
 _logger = logging.getLogger(__name__)
 
 @tagged('post_install', '-at_install')
 class TestAccountOnlineAccount(AccountOnlineSynchronizationCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -394,6 +397,102 @@ class TestAccountOnlineAccount(AccountOnlineSynchronizationCommon):
         self.assertEqual(
             self.bank_journal.default_account_id.currency_id.id,
             self.company_data['currency'].id,
+        )
+
+    @patch("odoo.addons.account_online_synchronization.models.account_online.AccountOnlineLink._update_connection_status", return_value={})
+    def test_assign_journal(self, patched_update_connection_status):
+        def _get_online_account_with_new_link():
+            online_link = self.env['account.online.link'].create({
+                'name': 'Test link',
+                'client_id': 'client_id_1',
+                'refresh_token': 'refresh_token',
+                'access_token': 'access_token',
+                'state': 'connected',
+            })
+            return self.env['account.online.account'].sudo().create({
+                'name': 'Test bank account',
+                'account_number': '1234567890',
+                'account_online_link_id': online_link.id,
+            })
+
+        # a journal with this account number exists and is not connected, it should be assigned
+        unlinked_journal = self.env['account.journal'].create({
+            'name': 'Unlinked journal',
+            'type': 'bank',
+            'code': 'TEST',
+            'bank_account_number': '1234567890',
+        })
+        online_account = _get_online_account_with_new_link()
+        online_account._assign_journal()
+        self.assertEqual(online_account.journal_ids, unlinked_journal)
+
+        # a journal with this account number exists and is synchronized and status = 'connected', it should raise an error
+        with self.assertRaises(UserError, msg="There's already a synchronized journal linked to this IBAN"):
+            online_account_2 = _get_online_account_with_new_link()
+            online_account_2._assign_journal()
+
+        # a journal with this account number exists and is synchronized and status != 'connected', it should use this journal
+        unlinked_journal.account_online_link_id.state = 'error'
+        online_account_3 = _get_online_account_with_new_link()
+        online_account_3._assign_journal()
+        self.assertNotEqual(online_account.journal_ids, unlinked_journal)
+        self.assertEqual(online_account_3.journal_ids, unlinked_journal)
+
+        # no journal with this bank number exists, a new one is created and assigned
+        unlinked_journal.bank_account_id.allow_out_payment = False
+        unlinked_journal.write({'bank_account_number': '0987654321'})
+        online_account_4 = _get_online_account_with_new_link()
+        old_journal_count = self.env['account.journal'].search_count([('type', '=', 'bank')])
+        online_account_4._assign_journal()
+        self.assertTrue(online_account_4.journal_ids)
+        self.assertNotEqual(online_account_4.journal_ids, unlinked_journal)
+        self.assertEqual(self.env['account.journal'].search_count([('type', '=', 'bank')]), old_journal_count + 1)
+
+        # 2 journals with this account number exist and are synchronized but not connected, it should take the most recently synchronized
+        new_unlinked_journal = self.env['account.journal'].create({
+            'name': 'New Unlinked journal',
+            'type': 'bank',
+            'code': 'TEST2',
+            'bank_account_number': '1234567890',
+            'account_online_account_id': _get_online_account_with_new_link().id,
+        })
+        (new_unlinked_journal.account_online_link_id + online_account_4.account_online_link_id).state = 'error'
+        new_unlinked_journal.account_online_account_id.last_sync = fields.Datetime.now()
+        online_account_4.last_sync = fields.Datetime.now() - timedelta(days=1)
+        online_account_5 = _get_online_account_with_new_link()
+        online_account_5._assign_journal()
+        self.assertEqual(online_account_5.journal_ids, new_unlinked_journal)
+
+    @patch("odoo.addons.account_online_synchronization.models.account_online.AccountOnlineLink._update_connection_status", return_value={})
+    def test_assign_journal_without_account_number(self, patched_update_connection_status):
+        """ When the provider returns no `account_number` (e.g. Canadian
+        banks, which do not use IBANs), the dedup search must not match other
+        connected journals that happen to have an empty `bank_account_number`.
+        """
+        self.account_online_link.state = 'connected'
+        self.assertFalse(self.euro_bank_journal.bank_account_number)
+
+        new_online_link = self.env['account.online.link'].create({
+            'name': 'New link',
+            'client_id': 'client_id_2',
+            'refresh_token': 'refresh_token',
+            'access_token': 'access_token',
+            'state': 'connected',
+        })
+        new_online_account = self.env['account.online.account'].sudo().create({
+            'name': 'Canadian bank account',
+            'account_online_link_id': new_online_link.id,
+        })
+
+        old_journal_count = self.env['account.journal'].search_count([('type', '=', 'bank')])
+        new_online_account._assign_journal()
+
+        # A fresh journal is created instead of falsely reusing/blocking on the existing one
+        self.assertTrue(new_online_account.journal_ids)
+        self.assertNotEqual(new_online_account.journal_ids, self.euro_bank_journal)
+        self.assertEqual(
+            self.env['account.journal'].search_count([('type', '=', 'bank')]),
+            old_journal_count + 1,
         )
 
     @patch("odoo.addons.account_online_synchronization.models.account_online.AccountOnlineLink._update_connection_status", return_value={})

@@ -1,5 +1,3 @@
-import base64
-
 from odoo import Command
 from odoo.addons.l10n_br_edi_pos.tests.test_l10n_br_edi_pos import CommonPosBrEdiTest, TestL10nBREDIPOSCommon
 from odoo.exceptions import UserError
@@ -9,6 +7,8 @@ from odoo.tools import mute_logger
 
 @tagged("post_install_l10n", "post_install", "-at_install")
 class TestNfceDownload(CommonPosBrEdiTest, HttpCase, TestL10nBREDIPOSCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -47,7 +47,7 @@ class TestNfceDownload(CommonPosBrEdiTest, HttpCase, TestL10nBREDIPOSCommon):
                 'res_model': 'pos.order',
                 'res_id': order.id,
                 'res_field': 'l10n_br_edi_xml_attachment_file',
-                'datas': base64.b64encode(xml_content).decode(),
+                'raw': xml_content,
                 'mimetype': 'application/xml',
             })
         return order

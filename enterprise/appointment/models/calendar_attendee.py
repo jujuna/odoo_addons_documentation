@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, tools
+from odoo import fields, models, tools
 
 
 class CalendarAttendee(models.Model):
@@ -26,19 +26,24 @@ class CalendarAttendee(models.Model):
         appointment_attendees = self.filtered(lambda attendee: attendee.event_id.appointment_type_id)
         super(CalendarAttendee, self - appointment_attendees)._send_invitation_emails()
 
+        now = fields.Datetime.now()
+        appointment_invited_attendees = appointment_attendees.filtered(
+            lambda attendee: attendee.event_id.appointment_status in ['booked', 'request'] and attendee.event_id.start > now
+        )
         attendees_per_appointment_type = tools.groupby(
-            appointment_attendees,
+            appointment_invited_attendees,
             lambda attendee: attendee.event_id.appointment_type_id)
         for appointment_type, attendees in attendees_per_appointment_type:
             if appointment_type.booked_mail_template_id:
                 # groupby returns a list -> convert back to a recordset
-                calendar_attendees = self.env['calendar.attendee'].concat(*attendees)
+                calendar_attendees = self.env['calendar.attendee'].concat(attendees)
                 super(CalendarAttendee, calendar_attendees)._notify_attendees(
                     appointment_type.booked_mail_template_id,
                     force_send=True,
-                    notify_author=True,
+                    notify_author=self.env.context.get('mail_notify_author', True),
                 )
 
-    def _should_notify_attendee(self, notify_author=False):
-        """ Notify all attendees for meeting linked to appointment type """
-        return self.event_id.appointment_type_id or super()._should_notify_attendee(notify_author=notify_author)
+    def get_base_url(self):
+        if self.event_id:
+            return self.event_id.get_base_url()
+        return super().get_base_url()

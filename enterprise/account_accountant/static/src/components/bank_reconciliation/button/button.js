@@ -1,20 +1,18 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class BankRecButton extends Component {
     static template = "account_accountant.BankRecButton";
-    static props = {
-        label: { type: String, optional: true },
-        action: { type: Function, optional: true },
-        count: { type: [Number, { value: null }], optional: true },
-        primary: { type: Boolean, optional: true },
-        toReview: { type: Boolean, optional: true },
-        classes: { type: String, optional: true },
-    };
-    static defaultProps = {
-        primary: false,
-        classes: "",
-    };
+    props = useProps({
+        label: t.string().optional(),
+        action: t.function().optional(),
+        count: t.or([t.number(), t.literal(null)]).optional(),
+        primary: t.boolean().optional(false),
+        toReview: t.boolean().optional(),
+        classes: t.string().optional(""),
+        isLarge: t.boolean().optional(),
+        suggestion: t.number().optional(),
+    });
 
     setup() {
         this.ui = useService("ui");

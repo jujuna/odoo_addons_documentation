@@ -1,18 +1,21 @@
-import { Component, onWillUnmount, useState, useSubEnv, useRef, onMounted } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
+import { Component, proxy, useProps, t } from "@odoo/owl";
 import { useSelfOrder } from "@pos_self_order/app/services/self_order_service";
 import { useService } from "@web/core/utils/hooks";
 import { AttributeSelection } from "@pos_self_order/app/components/attribute_selection/attribute_selection";
-import { useScrollShadow } from "../../utils/scroll_shadow_hook";
+import { ProductInterface } from "@pos_self_order/app/components/product_interface/product_interface";
 import {
     getProductVariantByAttributes,
     getAttributeValues,
     getAttributeValuesExtraPrice,
 } from "@pos_self_order/app/services/card_utils";
+import { shouldShowMissingDetails } from "../../utils";
+import { ProductTemplate } from "@point_of_sale/app/models/product_template";
 
 export class ProductPage extends Component {
     static template = "pos_self_order.ProductPage";
-    static components = { AttributeSelection };
-    static props = ["productTemplate"];
+    static components = { AttributeSelection, ProductInterface };
+    props = useProps({ productTemplate: t.instanceOf(ProductTemplate) });
 
     setup() {
         this.selfOrder = useSelfOrder();
@@ -27,39 +30,9 @@ export class ProductPage extends Component {
         useSubEnv({ selectedValues: {} });
 
         this.selfOrder.lastEditedProductId = this.props.productTemplate.id;
-        this.state = useState({
+        this.state = proxy({
             qty: editedLine ? editedLine.qty : 1,
             selectedValues: this.env.selectedValues,
-            topShadowOpacity: 0,
-            bottomShadowOpacity: 0,
-            showStickyTitle: false,
-        });
-        this.productNameRef = useRef("productName");
-        this.scrollContainerRef = useRef("scrollContainer");
-        this.scrollShadow = useScrollShadow(this.scrollContainerRef);
-
-        onMounted(() => {
-            const productNameEl = this.productNameRef.el;
-            if (productNameEl) {
-                this.observer = new IntersectionObserver(
-                    ([entry]) => {
-                        this.state.showStickyTitle = !entry.isIntersecting;
-                    },
-                    {
-                        root: null,
-                        threshold: 0,
-                    }
-                );
-                this.observer.observe(productNameEl);
-            }
-        });
-
-        onWillUnmount(() => {
-            this.selfOrder.editedLine = null;
-
-            if (this.observer) {
-                this.observer.unobserve(this.productNameRef.el);
-            }
         });
     }
 
@@ -68,13 +41,7 @@ export class ProductPage extends Component {
     }
 
     shouldShowMissingDetails() {
-        const el = this.scrollContainerRef?.el;
-        if (!el) {
-            return false;
-        }
-        return (
-            el.scrollHeight > el.clientHeight && this.productTemplate.attribute_line_ids.length > 1
-        );
+        return shouldShowMissingDetails(this.productTemplate, this.state.selectedValues);
     }
 
     changeQuantity(increase) {
@@ -138,15 +105,23 @@ export class ProductPage extends Component {
             getAttributeValues(attributeIds, this.selfOrder.models)
         );
 
+        const order = this.selfOrder.currentOrder;
+        const pricelist = order.pricelist_id;
         const price = this.props.productTemplate.getPrice(
-            this.selfOrder.currentOrder.pricelist_id,
+            pricelist,
             1,
             priceExtra,
             false,
             productVariant
         );
-        const taxDetails = this.props.productTemplate.getTaxDetails({
-            overridedValues: { price_unit: price, quantity: this.state.qty },
+        const product = productVariant || this.props.productTemplate;
+        const fiscalPosition = order.fiscal_position_id;
+        const taxDetails = product.getTaxDetails({
+            overridedValues: {
+                price,
+                fiscalPosition,
+                quantity: this.state.qty,
+            },
         });
         return this.selfOrder.isTaxesIncludedInPrice()
             ? taxDetails.total_included
@@ -173,10 +148,25 @@ export class ProductPage extends Component {
             this.state.selectedValues[this.productTemplate.id]?.getAllCustomValues()
         );
 
+        const historyState = history.state || {};
+        if (this.productTemplate.pos_optional_product_ids.length && !historyState.redirectPage) {
+            return this.router.navigate("optional_product", { id: this.productTemplate.id });
+        }
+
+        // We came from the optional product page to configure this product: account for it
+        // in the snapshot it left behind, so its badge matches what is now in the cart.
+        const qtys = historyState.state?.optionalProductQtys;
+        if (qtys) {
+            qtys[this.productTemplate.id] = (qtys[this.productTemplate.id] || 0) + this.state.qty;
+        }
         this.goBack();
     }
 
     goBack() {
+        if (history.state?.redirectPage) {
+            const { redirectPage, params, state } = history.state;
+            return this.router.navigate(redirectPage, params, state);
+        }
         this.router.navigate("product_list");
     }
 
@@ -189,15 +179,4 @@ export class ProductPage extends Component {
             .getElementById(missingAttribute?.attribute_id?.id)
             ?.scrollIntoView({ behavior: "smooth" });
     }
-
-    /*
-    // TODO
-    get editableProductLine() {
-        const order = this.selfOrder.currentOrder;
-        return !(
-            this.selfOrder.editedLine &&
-            this.selfOrder.editedLine.uuid &&
-            order.lastChangesSent[this.selfOrder.editedLine.uuid]
-        );
-    }*/
 }

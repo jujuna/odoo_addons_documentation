@@ -126,5 +126,5 @@ test("Verify stages nocontent helper is visible when all task stages are deleted
         message: "should have 1 column",
     });
     expect(".o_column_quick_create").toHaveCount(1);
-    expect(".o_kanban_stages_nocontent").toHaveCount(1);
+    expect(".o_kanban_group_nocontent").toHaveCount(1);
 });

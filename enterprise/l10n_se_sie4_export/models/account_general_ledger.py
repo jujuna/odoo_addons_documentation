@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models, release
 from odoo.exceptions import UserError
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, SQL
 
 DATEFORMAT_SIE4 = '%Y%m%d'
 DATEFORMAT_MAIN = DEFAULT_SERVER_DATE_FORMAT
@@ -33,12 +33,17 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
         result_strf = DATEFORMAT_SIE4 if use_sie4_format else DATEFORMAT_MAIN
         datetime_from = datetime.strptime(options['date']['date_from'], DATEFORMAT_MAIN)
         datetime_to = datetime.strptime(options['date']['date_to'], DATEFORMAT_MAIN)
+        previous_fiscal_year = self.env['account.fiscal.year'].search([
+            ('date_to', '<=', options['date']['date_from'])
+        ], order='date_to desc', limit=1)
+        prev_date_from = previous_fiscal_year.date_from if previous_fiscal_year else (datetime_from - relativedelta(years=1))
+        prev_date_to = previous_fiscal_year.date_to if previous_fiscal_year else (datetime_from - relativedelta(days=1))
         return {
-            'prev_date_from': (datetime_from - relativedelta(years=1)).strftime(result_strf),
-            'prev_date_to': (datetime_to - relativedelta(years=1)).strftime(result_strf),
+            'prev_date_from': prev_date_from.strftime(result_strf),
+            'prev_date_to': prev_date_to.strftime(result_strf),
             'curr_date_from': datetime_from.strftime(result_strf),
             'curr_date_to': datetime_to.strftime(result_strf),
-            'next_date_from': (datetime_from + relativedelta(years=1)).strftime(result_strf),
+            'next_date_from': (datetime_to + relativedelta(days=1)).strftime(result_strf),
             'next_date_to': (datetime_to + relativedelta(years=1)).strftime(result_strf),
         }
 
@@ -63,8 +68,6 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
             'date': {
                 'date_from': date_from,
                 'date_to': date_to,
-                'mode': 'range',
-                'filter': 'custom',
             },
             'export_mode': 'file',
         })
@@ -88,7 +91,9 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
     def _export_l10n_se_sie4_chart_of_account(self, options):
         sie4_coa_lines = []
         company_id = options['companies'][0]['id']
-        accounts = self.env['account.account'].with_company(company_id).search([])
+        accounts = self.env['account.account'].with_company(company_id).search([
+            *self.env['account.account']._check_company_domain(company_id),
+        ])
 
         for account in accounts:
             sie4_coa_lines.extend((
@@ -102,9 +107,9 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
     def _l10n_se_sie4_get_initial_balances_values(self, report, options, filtered_accounts):
         def get_dict_values_from_report_line(line):
             return {
-                'balance': line['columns'][colname_to_idx['balance']]['no_format'],
-                'debit': line['columns'][colname_to_idx['debit']]['no_format'],
-                'credit': line['columns'][colname_to_idx['credit']]['no_format'],
+                'balance': line.columns[colname_to_idx['balance']].no_format,
+                'debit': line.columns[colname_to_idx['debit']].no_format,
+                'credit': line.columns[colname_to_idx['credit']].no_format,
             }
         options = {
             **options,
@@ -115,10 +120,10 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
         initial_balances = {}
         account_by_ids = {account.id: account for account in filtered_accounts}
         for line in lines:
-            _model, res_id = report._get_model_info_from_id(line['id'])
+            _model, res_id = report._get_model_info_from_id(line.id)
 
             if isinstance(res_id, str) and 'balance_line' in res_id:
-                account_id = report._get_res_id_from_line_id(line['id'], 'account.account')
+                account_id = report._get_res_id_from_line_id(line.id, 'account.account')
                 account = account_by_ids.get(account_id, False)
                 if account:
                     initial_balances[account] = get_dict_values_from_report_line(line)
@@ -142,7 +147,10 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
         dates = self._get_l10n_se_sie4_dates(options)
         company_id = options['companies'][0]['id']
         bs_accounts = self.env['account.account'].with_company(company_id).search_fetch(
-            domain=[('include_initial_balance', '=', True)],
+            domain=[
+                *self.env['account.account']._check_company_domain(company_id),
+                ('include_initial_balance', '=', True),
+            ],
             field_names=['id'],
         )
         seen_bs_account_codes = set()
@@ -150,9 +158,6 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
 
         prev_year_options = self._get_l10n_se_sie4_options(report, dates['prev_date_from'], dates['prev_date_to'])
         next_year_options = self._get_l10n_se_sie4_options(report, dates['next_date_from'], dates['next_date_to'])
-        report._init_currency_table(prev_year_options)
-        report._init_currency_table(options)
-        report._init_currency_table(next_year_options)
         prev_ib_values = self.with_company(company_id)._l10n_se_sie4_get_initial_balances_values(report, prev_year_options, bs_accounts)
         curr_ib_values = self.with_company(company_id)._l10n_se_sie4_get_initial_balances_values(report, options, bs_accounts)
         next_ib_values = self.with_company(company_id)._l10n_se_sie4_get_initial_balances_values(report, next_year_options, bs_accounts)
@@ -187,8 +192,10 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
         company_id = options['companies'][0]['id']
 
         common_domain = [
+            *self.env['account.move.line']._check_company_domain(company_id),
             ('account_id.include_initial_balance', '=', False),
             ('display_type', 'not in', ('line_section', 'line_subsection', 'line_note')),
+            ('move_id.state', '!=', 'cancel'),
         ]
         prev_year_domain = common_domain + [('date', '>=', dates['prev_date_from']), ('date', '<=', dates['prev_date_to'])]
         curr_year_domain = common_domain + [('date', '>=', dates['curr_date_from']), ('date', '<=', dates['curr_date_to'])]
@@ -210,30 +217,58 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
     @api.model
     def _export_l10n_se_sie4_verification(self, options):
         sie4_verification_lines = []
-        dates = self._get_l10n_se_sie4_dates(options)
-        company_id = options['companies'][0]['id']
-        unsupported_display_type = {'line_note', 'line_section', 'line_subsection'}
-        moves = self.env['account.move'].with_company(company_id).search([
-            ('state', '=', 'posted'),
-            ('date', '>=', dates['curr_date_from']),
-            ('date', '<=', dates['curr_date_to']),
-        ])
-
-        for verification_idx, move in enumerate(moves.sorted(reverse=True), start=1):
-            transactions = []
-            for line in move.line_ids:
-                if line.display_type not in unsupported_display_type:
-                    transactions.append(f'    #TRANS {line.account_id.code} {{}} {line.balance}')
-
-            sie4_verification_lines.extend((
-                f'#VER A {verification_idx} {move.date.strftime(DATEFORMAT_SIE4)} "{move.name}"',
-                '{', *transactions, '}',
-            ))
-
+        report = self.env['account.report'].browse(options.get('report_id'))
+        company_ids = report.get_report_company_ids(options)
+        query = report._get_report_query(options, 'strict_range', [])
+        account_alias = 'account_move_line__account_id'
+        condition = SQL(
+            "%s = %s",
+            SQL.identifier('account_move_line', 'account_id'),
+            SQL.identifier(account_alias, 'id')
+        )
+        query.add_join('JOIN', account_alias, 'account_account', condition)
+        account_env = self.env['account.account'].with_context(allowed_company_ids=company_ids)
+        account_code = account_env._field_to_sql(account_alias, 'code', query)
+        sql_query = SQL(
+            """
+            SELECT
+                m.id AS move_id,
+                m.name AS move_name,
+                m.date AS move_date,
+                %(account_code)s AS account_code,
+                account_move_line.balance AS balance
+            FROM %(table)s
+            JOIN account_move m ON m.id = account_move_line.move_id
+            WHERE %(where_clause)s
+            ORDER BY m.date ASC, m.name ASC, m.id ASC, account_move_line.id ASC
+            """,
+            account_code=account_code,
+            table=query.from_clause,
+            where_clause=query.where_clause,
+        )
+        self.env.flush_all()
+        self.env.cr.execute(sql_query)
+        last_move_id = None
+        verification_idx = 0
+        for row in self.env.cr.dictfetchall():
+            current_move_id = row['move_id']
+            if current_move_id != last_move_id:
+                if last_move_id is not None:
+                    sie4_verification_lines.append('}')
+                verification_idx += 1
+                move_date_str = row['move_date'].strftime(DATEFORMAT_SIE4)
+                sie4_verification_lines.extend((
+                    f'#VER A {verification_idx} {move_date_str} "{row["move_name"]}"',
+                    '{'
+                ))
+                last_move_id = current_move_id
+            sie4_verification_lines.append(f'    #TRANS {row["account_code"]} {{}} {row["balance"]}')
+        if last_move_id is not None:
+            sie4_verification_lines.append('}')
         return sie4_verification_lines
 
     def export_l10n_se_sie4_file(self, options):
-        if options['date']['period_type'] != 'fiscalyear':
+        if options['date']['period_type'] != 'year':
             raise UserError(_("You must set the period type to be in fiscal year in order to export SIE 4 file."))
         if len(options['companies']) > 1:
             selected_companies = self.env['res.company'].search_fetch(

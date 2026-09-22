@@ -1,7 +1,19 @@
-import { sortBy } from "@web/core/utils/arrays";
+import {
+    onMounted,
+    onPatched,
+    signal,
+    types as t,
+    useListener,
+    usePlugin,
+    useProps,
+} from "@odoo/owl";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 import { registry } from "@web/core/registry";
-import { SIDEBAR_SAFE_FIELDS } from "@web_studio/client_action/view_editor/editors/sidebar_safe_fields";
-import { useComponent, useEffect, useRef } from "@odoo/owl";
+import { sortBy } from "@web/core/utils/arrays";
+import {
+    SIDEBAR_SAFE_FIELDS,
+    SIDEBAR_VIEW_DEPENDENT_BLACKLIST,
+} from "@web_studio/client_action/view_editor/editors/sidebar_safe_fields";
 
 export const hookPositionTolerance = 50;
 
@@ -48,7 +60,7 @@ export function isToXpathEquivalentFromXpath(position, toXpath, fromXpath) {
 }
 
 export function getHooks(el) {
-    return [...el.querySelectorAll(".o_web_studio_hook")];
+    return [...el.querySelectorAll(".o_web_studio_hook:not(.d-none),.o_web_studio_hook_special")];
 }
 
 export function randomName(baseName) {
@@ -68,33 +80,23 @@ export function cleanClickedElements(mainEl) {
     }
 }
 
-export function useStudioRef(refName = "studioRef", onClick) {
-    // create two hooks and call them here?
-    const comp = useComponent();
-    const ref = useRef(refName);
-    useEffect(
-        (el) => {
-            if (el) {
-                el.setAttribute("data-studio-xpath", comp.props.studioXpath);
-            }
-        },
-        () => [ref.el]
-    );
+export function useStudioRef(onClick, ref = signal.ref()) {
+    // studioXpath is not always given: the compilers only put an xpath on the
+    // nodes they consider interesting (e.g. "a[type]" buttons don't get one).
+    const props = useProps({ studioXpath: t.string().optional() });
+    const setStudioXpath = () => {
+        const el = ref();
+        if (el && props.studioXpath) {
+            el.setAttribute("data-studio-xpath", props.studioXpath);
+        }
+    };
+    onMounted(setStudioXpath);
+    onPatched(setStudioXpath);
 
     if (onClick) {
-        const handler = onClick.bind(comp);
-        useEffect(
-            (el) => {
-                if (el) {
-                    el.addEventListener("click", handler, { capture: true });
-                    return () => {
-                        el.removeEventListener("click", handler);
-                    };
-                }
-            },
-            () => [ref.el]
-        );
+        useListener(ref, "click", onClick, { capture: true });
     }
+    return ref;
 }
 
 export function makeModelErrorResilient(ModelClass, activeActions = { create: true }) {
@@ -110,7 +112,7 @@ export function makeModelErrorResilient(ModelClass, activeActions = { create: tr
         setup() {
             super.setup(...arguments);
             const orm = this.orm;
-            const debug = this.env.debug;
+            const debugMode = usePlugin(DebugModePlugin);
             this.orm = Object.assign(Object.create(orm), {
                 async call(model, method) {
                     if (method === "onchange") {
@@ -118,7 +120,7 @@ export function makeModelErrorResilient(ModelClass, activeActions = { create: tr
                             try {
                                 return await orm.call.call(orm, ...arguments);
                             } catch {
-                                logError(debug);
+                                logError(debugMode.toString());
                             }
                         }
                         return { value: {} };
@@ -134,7 +136,8 @@ export function getWowlFieldWidgets(
     fieldType,
     currentKey = "",
     blacklistedKeys = [],
-    debug = false
+    debug = false,
+    viewType = ""
 ) {
     const wowlFieldRegistry = registry.category("fields");
     const widgets = [];
@@ -151,6 +154,10 @@ export function getWowlFieldWidgets(
             }
             // Widget is not whitelisted
             if (!debug && !SIDEBAR_SAFE_FIELDS.includes(widgetKey)) {
+                continue;
+            }
+            // Widget is blacklisted for this viewType
+            if (!debug && SIDEBAR_VIEW_DEPENDENT_BLACKLIST[viewType]?.includes(widgetKey)) {
                 continue;
             }
         }

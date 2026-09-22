@@ -47,7 +47,7 @@ class L10nBgReportsTaxReportHandler(models.AbstractModel):
                 'document_date': query_res_line['document_date'],
                 'partner_vat': query_res_line['partner_vat'],
                 'partner_name': query_res_line['partner_name'],
-                'product_type': query_res_line['label'][0][:30].replace('\n', ' '),
+                'product_type': query_res_line['label'][:30].replace('\n', ' '),
                 'exemption_reason': query_res_line['exemption_reason'],
                 'total_base': 0,
                 'total_tax': 0,
@@ -75,6 +75,7 @@ class L10nBgReportsTaxReportHandler(models.AbstractModel):
             ('name', 'in', tax_tags_names),
             ('country_id.code', '=', 'BG'),
         ]).grouped('id')
+        product_name = self.env['product.template']._field_to_sql('product_template', 'name')
 
         query = SQL("""
             SELECT
@@ -85,19 +86,24 @@ class L10nBgReportsTaxReportHandler(models.AbstractModel):
                 company_id.l10n_bg_branch_code as branch_code,
                 partner.vat AS partner_vat,
                 partner.name AS partner_name,
-                array_agg(account_move_line.name) AS label,
+                CONCAT_WS(
+                    '\n',
+                    (array_agg(%(product_name)s))[1],
+                    (array_agg(account_move_line.name))[1]
+                ) AS label,
                 array_agg(tag.id ORDER BY tag.id) AS tax_tag,
                 account_move.l10n_bg_exemption_reason AS exemption_reason,
                 array_agg(CASE WHEN account_move_line.tax_line_id IS NOT NULL THEN TRUE ELSE FALSE END) AS is_tax_line,
                 array_agg(ABS(account_move_line.amount_currency)) AS amount_currency
             FROM
                 %(table_references)s
-                %(currency_table_join)s
                 JOIN account_move ON account_move.id = account_move_line.move_id
                 LEFT JOIN res_partner partner ON partner.id = account_move_line.partner_id
                 LEFT JOIN res_company company_id ON company_id.id = account_move.company_id
                 LEFT JOIN account_account_tag_account_move_line_rel aa_tag_aml_rel ON aa_tag_aml_rel.account_move_line_id = account_move_line.id
                 LEFT JOIN account_account_tag tag ON aa_tag_aml_rel.account_account_tag_id = tag.id
+                LEFT JOIN product_product product ON product.id = account_move_line.product_id
+                LEFT JOIN product_template product_template ON product_template.id = product.product_tmpl_id
             WHERE
                 %(search_conditions)s
                 AND account_move.move_type IN %(move_types)s
@@ -106,10 +112,10 @@ class L10nBgReportsTaxReportHandler(models.AbstractModel):
             ORDER BY serial_number
         """,
             table_references=query_params.from_clause,
-            currency_table_join=report._currency_table_aml_join(options),
             search_conditions=query_params.where_clause,
             move_types=('in_invoice', 'in_refund', 'in_receipt') if ledger_type == 'purchase' else ('out_invoice', 'out_refund', 'out_receipt'),
             tag_ids=list(tax_tags.keys()),
+            product_name=product_name,
         )
 
         self.env.cr.execute(query)

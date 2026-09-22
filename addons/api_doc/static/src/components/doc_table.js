@@ -1,4 +1,5 @@
-import { Component, useState, useExternalListener, useRef, onWillRender } from "@odoo/owl";
+import { Component, computed, proxy, signal, t, useListener, useProps } from "@odoo/owl";
+import { localeCompare } from "@web/core/l10n/utils";
 
 export const TABLE_TYPES = {
     Id: "id",
@@ -10,88 +11,96 @@ export class DocTable extends Component {
     static components = { DocTable };
     static template = "web.DocTable";
 
-    static props = {
-        data: true,
-    };
+    props = useProps({
+        data: t.any(),
+    });
+
+    items = computed(() => this.computeItems());
+    subTableRef = signal.ref();
+    tooltipRef = signal.ref();
 
     setup() {
-        this.subTableRef = useRef("subTableRef");
-        this.tooltipRef = useRef("tooltipRef");
-        this.hideTooltipTimeout = null;
-        this.state = useState({
+        this.state = proxy({
             sortBy: 0,
             sortOrder: "desc",
             subTable: undefined,
             tooltipContent: "",
             tooltipStyle: "",
-            lastTooltipLeft: 0,
-            lastTooltipTop: 0,
         });
+        this.isHovering = false;
+        this.hideTimeout = null;
+        this.requestAnim = null;
 
-        onWillRender(() => {
-            this.items = this.computeItems();
-        });
-
-        useExternalListener(window, "click", (event) => {
-            if (
-                this.subTableRef.el &&
-                this.subTableRef.el !== event.target &&
-                !this.subTableRef.el.contains(event.target)
-            ) {
+        useListener(window, "click", (event) => {
+            const subTableEl = this.subTableRef();
+            if (subTableEl && subTableEl !== event.target && !subTableEl.contains(event.target)) {
                 this.state.subTable = null;
             }
         });
 
-        useExternalListener(window, "scroll", () => (this.state.subTable = null));
+        useListener(window, "scroll", () => (this.state.subTable = null));
     }
 
     showDynamicTooltip(event, content) {
-        if (this.hideTooltipTimeout) {
-            clearTimeout(this.hideTooltipTimeout);
-            this.hideTooltipTimeout = null;
+        if (this.requestAnim) {
+            cancelAnimationFrame(this.requestAnim);
         }
-        this.state.tooltipContent = content;
+        if (this.hideTimeout) {
+            clearTimeout(this.hideTimeout);
+        }
+
+        this.activeHoverTarget = event.target;
+        this.isHovering = true;
+
         const triggerRect = event.target.getBoundingClientRect();
-        this.state.tooltipStyle = `
-            opacity: 0;
-            pointer-events: none;
-        `;
-        requestAnimationFrame(() => {
-            if (!this.tooltipRef.el) {
+
+        this.requestAnim = requestAnimationFrame(() => {
+            if (!this.tooltipRef() || !this.isHovering) {
                 return;
             }
-            const tooltipRect = this.tooltipRef.el.getBoundingClientRect();
-            const top = triggerRect.top - tooltipRect.height - 10;
-            const left = triggerRect.left - tooltipRect.width / 2;
+            const top = triggerRect.top;
+            const left = triggerRect.left + 20;
+
+            this.state.tooltipContent = content;
             this.state.tooltipStyle = `
                 top: ${top}px;
                 left: ${left}px;
-                position: fixed;
                 opacity: 1;
                 pointer-events: auto;
             `;
-            this.state.lastTooltipTop = top;
-            this.state.lastTooltipLeft = left;
         });
     }
 
-    hideDynamicTooltip() {
-        if (this.hideTooltipTimeout) {
-            clearTimeout(this.hideTooltipTimeout);
-            this.hideTooltipTimeout = null;
+    scheduleHide(event) {
+        if (this.hideTimeout) {
+            clearTimeout(this.hideTimeout);
         }
-        const top = this.state.lastTooltipTop;
-        const left = this.state.lastTooltipLeft;
-        this.state.tooltipStyle = `
-            top: ${top}px;
-            left: ${left}px;
-            position: fixed;
-            opacity: 0;
-            pointer-events: none;
-        `;
-        this.hideTooltipTimeout = setTimeout(() => {
-            this.state.tooltipContent = "";
-        }, 200);
+        const currentTarget = event.target;
+        this.isHovering = false;
+
+        this.hideTimeout = setTimeout(() => {
+            if (!this.isHovering) {
+                const tooltipEl = this.tooltipRef();
+                this.state.tooltipStyle = `
+                    top: ${tooltipEl ? tooltipEl.style.top : 0};
+                    left: ${tooltipEl ? tooltipEl.style.left : 0};
+                    opacity: 0;
+                    pointer-events: none;
+                `;
+                setTimeout(() => {
+                    if (currentTarget === this.activeHoverTarget) {
+                        this.state.tooltipContent = "";
+                    }
+                }, 200);
+            }
+        }, 100);
+    }
+
+    keepAlive() {
+        if (this.hideTimeout) {
+            clearTimeout(this.hideTimeout);
+        }
+        this.isHovering = true;
     }
 
     computeItems() {
@@ -101,9 +110,9 @@ export class DocTable extends Component {
                 const a = this.getValue(itemA[this.state.sortBy]);
                 const b = this.getValue(itemB[this.state.sortBy]);
                 if (this.state.sortOrder === "asc") {
-                    return b.localeCompare(a);
+                    return localeCompare(b, a);
                 } else {
-                    return a.localeCompare(b);
+                    return localeCompare(a, b);
                 }
             });
             return items;
@@ -156,11 +165,11 @@ export class DocTable extends Component {
 
     getSortIcon(rowIndex) {
         if (this.state.sortBy !== rowIndex) {
-            return "fa fa-sort";
+            return "swap_vert";
         } else if (this.state.sortOrder === "asc") {
-            return "fa fa-sort-asc";
+            return "arrow_upward";
         } else {
-            return "fa fa-sort-desc";
+            return "arrow_downward";
         }
     }
 

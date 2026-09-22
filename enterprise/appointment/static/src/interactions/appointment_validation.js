@@ -1,3 +1,4 @@
+import { usePlugin } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { rpc } from "@web/core/network/rpc";
 import { findInvalidEmailFromText } from "../js/utils.js";
@@ -7,6 +8,7 @@ import { user } from "@web/core/user";
 
 import { Interaction } from "@web/public/interaction";
 import { registry } from "@web/core/registry";
+import { BootstrapInstance } from "@web/core/utils/bootstrap_plugin";
 
 export class AppointmentValidation extends Interaction {
     static selector = ".o_appointment_validation_details";
@@ -32,9 +34,9 @@ export class AppointmentValidation extends Interaction {
                 "d-none": !this.showGuestAddition,
             }),
         },
-        ".o_appointment_validation_error": {
+        ".o_appointment_add_guests_textarea": {
             "t-att-class": () => ({
-                "d-none": this.errorMessage.length === 0,
+                "is-invalid": this.errorMessage.length != 0,
             }),
         },
         ".o_appointment_error_text": {
@@ -48,6 +50,7 @@ export class AppointmentValidation extends Interaction {
     };
 
     setup() {
+        this.bootstrap = usePlugin(BootstrapInstance);
         this.errorMessage = "";
         this.showGuestAddition = false;
     }
@@ -84,7 +87,7 @@ export class AppointmentValidation extends Interaction {
 
     onCopyVideocallLink(ev) {
         const copyButtonEl = ev.target;
-        const tooltip = Tooltip.getOrCreateInstance(copyButtonEl, {
+        const tooltip = this.bootstrap.getOrCreateInstance(Tooltip, copyButtonEl, {
             title: _t("Link Copied!"),
             trigger: "manual",
             placement: "right",

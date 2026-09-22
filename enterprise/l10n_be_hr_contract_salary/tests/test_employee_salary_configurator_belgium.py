@@ -1,4 +1,4 @@
-from datetime import date
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from freezegun import freeze_time
 
@@ -7,44 +7,24 @@ from odoo.tests import tagged
 from odoo.addons.hr_contract_salary.tests.test_employee_salary_configurator import (
     TestEmployeeSalaryConfigurator,
 )
+from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
 
 
 @tagged('-at_install', 'post_install', 'post_install_l10n', 'salary')
-class TestEmployeeSalaryConfiguratorBelgium(TestEmployeeSalaryConfigurator):
+class TestEmployeeSalaryConfiguratorBelgium(TestEmployeeSalaryConfigurator, TestBelgiumCommon):
     @classmethod
     @freeze_time('2022-01-01 09:00:00')
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.res_partner = cls.env['res.partner'].create(dict(
-            name="Ahmed Abdelrazek",
-            vat="BE0477472701",
-            country_id=cls.env.ref('base.be').id,
-        ))
+        cls.company_id.write({'country_id': cls.env.ref('base.be').id})
+        cls.senior_dev_contract.structure_type_id = cls.env.ref('hr.structure_type_employee_cp200').id
+        cls.employee_1.structure_type_id = cls.env.ref('hr.structure_type_employee_cp200').id
+        cls.employee = cls.employee_1
 
-        cls.bank_account = cls.env['res.partner.bank'].create({
-            'acc_number': 'BE10 3631 0709 4104',
-            'partner_id': cls.res_partner.id,
-        })
-
-        cls.employee_1.unlink()
-
-        cls.employee_1 = cls.env['hr.employee'].create({
-            'name': 'Ahmed Abdelrazek',
-            'date_version': date(2020, 1, 1),
-            'contract_date_start': date(2020, 1, 1),
-            'contract_date_end': False,
-            'company_id': cls.company_id.id,
-            'job_id': cls.job.id,
-            'sign_template_id': cls.template.id,
-            'contract_update_template_id': cls.template.id,
-            'hr_responsible_id': cls.env.ref('base.user_admin').id,
-            'work_email': 'ahmed.abdelrazek@test_email.com',
-            'bank_account_ids': cls.bank_account,
-        })
+        cls.company_id.current_payroll_config_id.l10n_be_employer_category_id = cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010')
 
     def test_employee_salary_configurator_flow(self):
-        employee = self.env['hr.employee'].search([('name', 'ilike', 'Ahmed Abdelrazek')])
         with freeze_time("2022-01-01 12:00:00"):
-            self.start_tour("/", 'hr_contract_salary_employee_flow_tour', login='admin', timeout=350)
-            self.assertEqual(employee.bank_account_ids.acc_holder_name, "Mohamed Dallash", "Account Holder name should have the same value as the one on the salary configurator")
+            self.start_tour("/odoo", 'hr_contract_salary_employee_flow_tour_belgium', login='admin', timeout=350)
+            self.assertEqual(self.employee.bank_account_ids.holder_name, "Mohamed Dallash", "Account Holder name should have the same value as the one on the salary configurator")

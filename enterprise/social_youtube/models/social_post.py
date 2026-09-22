@@ -18,6 +18,9 @@ class SocialPost(models.Model):
         compute='_compute_youtube_access_token')
     youtube_title = fields.Char('YouTube Video Title')
     youtube_description = fields.Text('YouTube Video Description')
+    youtube_first_comment = fields.Text(
+        'YouTube First Comment', compute='_compute_first_comment_by_media',
+        store=True, readonly=False)
     youtube_preview = fields.Html('YouTube Preview', compute='_compute_youtube_preview')
     youtube_accounts_count = fields.Integer('Selected YouTube Accounts',
         compute='_compute_youtube_accounts_count')
@@ -28,6 +31,10 @@ class SocialPost(models.Model):
         help='Once posted, set the video as Public/Private/Unlisted')
     youtube_video_url = fields.Char('YouTube Video Url', compute="_compute_youtube_video_url")
     youtube_thumbnail_url = fields.Char('YouTube Thumbnail Url', compute="_compute_youtube_thumbnail_url")
+    youtube_scheduled_date = fields.Datetime(
+        string='YouTube Scheduled for',
+        compute='_compute_scheduled_date_by_media',
+        store=True, readonly=False, copy=False)
 
     @api.constrains('message', 'image_ids')
     def _check_has_message_or_image(self):
@@ -44,15 +51,24 @@ class SocialPost(models.Model):
 
     @api.depends('account_ids.media_type', 'account_ids.youtube_access_token')
     def _compute_youtube_access_token(self):
+        """Token used by the web client to upload the video.
+
+        No group on this field (`social.post.youtube_access_token`),
+        it's a very short-lived token (a few hours), and we set the value only
+        if we have write access on the post.
+        """
         for post in self:
+            if not post.has_access("write"):
+                post.youtube_access_token = False
+                continue
+
             youtube_account = post.account_ids.filtered(lambda account: account.media_type == 'youtube')
             if len(youtube_account) == 1:
-                youtube_account._refresh_youtube_token()
-                post.youtube_access_token = youtube_account.youtube_access_token
+                post.youtube_access_token = youtube_account._get_youtube_access_token()
             else:
                 post.youtube_access_token = False
 
-    @api.depends('youtube_title', 'youtube_description', 'youtube_video_id', 'scheduled_date', 'youtube_accounts_count')
+    @api.depends('youtube_title', 'youtube_description', 'youtube_video_id', 'youtube_scheduled_date', 'youtube_accounts_count', 'youtube_first_comment')
     def _compute_youtube_preview(self):
         for post in self:
             if not (post.youtube_accounts_count == 1 and post.youtube_title):
@@ -62,7 +78,8 @@ class SocialPost(models.Model):
                 'youtube_title': post.youtube_title or _('Video'),
                 'youtube_description': post.youtube_description,
                 'youtube_video_id': post.youtube_video_id,
-                'published_date': post.scheduled_date if post.scheduled_date else fields.Datetime.now(),
+                'youtube_first_comment': post.youtube_first_comment,
+                'published_date': post.youtube_scheduled_date if post.youtube_scheduled_date else fields.Datetime.now(),
                 'post_link': "https://www.youtube.com/watch?v=%s" % post.youtube_video_id if post.youtube_video_id else '',
             })
 
@@ -83,6 +100,10 @@ class SocialPost(models.Model):
         for post in self:
             post.youtube_video_url = "https://www.youtube.com/watch?v=%s" % post.youtube_video_id
 
+    @api.model
+    def _scheduled_date_fields(self):
+        return {**super()._scheduled_date_fields(), 'youtube': 'youtube_scheduled_date'}
+
     def _check_post_access(self):
         super()._check_post_access()
 
@@ -102,18 +123,6 @@ class SocialPost(models.Model):
                 elif len(social_post.youtube_description) > 5000:
                     raise ValidationError(_("Description cannot exceed 5000 characters."))
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        """The names of the UTM sources are generated based on the content of _rec_name.
-
-        But for Youtube, the message field is not required, so we should use the title
-        of the video instead.
-        """
-        for values in vals_list:
-            if not values.get('message') and not values.get('name') and values.get('youtube_title'):
-                values['name'] = self.env['utm.source']._generate_name(self, values.get('youtube_title'))
-        return super().create(vals_list)
-
     def _get_stream_post_domain(self):
         domain = super()._get_stream_post_domain()
         youtube_video_ids = [youtube_video_id for youtube_video_id in self.mapped('youtube_video_id') if youtube_video_id]
@@ -132,3 +141,8 @@ class SocialPost(models.Model):
     @api.model
     def _get_post_message_modifying_fields(self):
         return super()._get_post_message_modifying_fields() + ['youtube_video_id']
+
+    @api.model
+    def _first_comment_fields(self):
+        """Return the "first comment" field per media."""
+        return {**super()._first_comment_fields(), 'youtube': 'youtube_first_comment'}

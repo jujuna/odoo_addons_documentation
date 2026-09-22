@@ -9,6 +9,8 @@ from odoo.addons.sale.tests.common import TestSaleCommon
 
 class TestSaleCommissionCommon(TestSaleCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -78,7 +80,7 @@ class TestSaleCommissionCommon(TestSaleCommon):
         }])
 
         cls.commission_plan_manager = cls.env['sale.commission.plan'].create([{
-            'name': "Manager",
+            'name': "Test Plan Manager",
             'company_id': cls.env.company.id,
             'date_from': datetime.date(year=2024, month=1, day=1),
             'date_to': datetime.date(year=2024, month=12, day=31),
@@ -92,3 +94,32 @@ class TestSaleCommissionCommon(TestSaleCommon):
             'user_id': cls.commission_manager.id,
             'plan_id': cls.commission_plan_manager.id,
         }])
+
+        cls.commission_other = cls.env['sale.commission.plan'].create({
+            'name': "Other plan",
+            'date_from': datetime.date(year=2024, month=1, day=1),
+            'date_to': datetime.date(year=2024, month=12, day=31),
+            'periodicity': 'month',
+            'type': 'achieve',
+            'user_type': 'person',
+            'target_type': 'static',
+
+        })
+        cls.commission_other.achievement_ids = cls.env['sale.commission.plan.achievement'].create([{
+            'type': 'amount_invoiced',
+            'rate': 1,
+            'plan_id': cls.commission_other.id,
+        }])
+        cls.commission_other.target_ids.amount = 100
+        cls.commission_other.user_ids = cls.env['sale.commission.plan.user'].create([{
+            'user_id': cls.commission_user_2.id,
+            'plan_id': cls.commission_other.id,
+        }])
+
+        cls.dynamic_plan = cls.commission_plan_manager.copy({
+            'periodicity': 'month',
+            'type': 'achieve',
+            'user_type': 'person',
+            'target_type': 'dynamic',
+            'dynamic_plan_ids': [Command.link(cls.commission_other.id)]
+        })

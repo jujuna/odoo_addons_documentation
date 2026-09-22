@@ -15,13 +15,14 @@ class MrpWorkorder(models.Model):
         self._create_or_update_analytic_entry()
         return res
 
-    def _set_duration(self):
-        res = super()._set_duration()
+    def _set_duration(self, employee_id=None, employee_duration=None):
+        res = super()._set_duration(employee_id, employee_duration)
         self._create_or_update_analytic_entry()
         return res
 
     def action_cancel(self):
-        (self.mo_analytic_account_line_ids | self.wc_analytic_account_line_ids).unlink()
+        sudo_self = self.sudo()
+        (sudo_self.mo_analytic_account_line_ids | sudo_self.wc_analytic_account_line_ids).unlink()
         return super().action_cancel()
 
     def _prepare_analytic_line_values(self, account_field_values, amount, unit_amount):
@@ -39,7 +40,7 @@ class MrpWorkorder(models.Model):
         }
 
     def _create_or_update_analytic_entry(self):
-        for wo in self:
+        for wo in self.sudo():
             if not wo.id:
                 continue
             hours = wo.duration / 60.0
@@ -48,11 +49,25 @@ class MrpWorkorder(models.Model):
 
     def _create_or_update_analytic_entry_for_record(self, value, hours):
         self.ensure_one()
-        if self.workcenter_id.analytic_distribution or self.wc_analytic_account_line_ids or self.mo_analytic_account_line_ids:
+        if self.workcenter_id.analytic_distribution or self.wc_analytic_account_line_ids:
             wc_analytic_line_vals = self.env['account.analytic.account']._perform_analytic_distribution(self.workcenter_id.analytic_distribution, value, hours, self.wc_analytic_account_line_ids, self)
             if wc_analytic_line_vals:
-                self.wc_analytic_account_line_ids += self.env['account.analytic.line'].sudo().create(wc_analytic_line_vals)
+                self.sudo().wc_analytic_account_line_ids += self.env['account.analytic.line'].sudo().create(wc_analytic_line_vals)
+
+    def _clear_journal_entries(self):
+        account_moves = self.sudo().time_ids.account_move_line_id.move_id
+        account_moves.button_draft()
+        account_moves.unlink()
+
+    def _action_reset_to_progress(self):
+        self._clear_journal_entries()
+        super()._action_reset_to_progress()
+
+    def _action_reset_to_draft(self):
+        self._clear_journal_entries()
+        super()._action_reset_to_draft()
 
     def unlink(self):
-        (self.mo_analytic_account_line_ids | self.wc_analytic_account_line_ids).unlink()
+        sudo_self = self.sudo()
+        (sudo_self.mo_analytic_account_line_ids | sudo_self.wc_analytic_account_line_ids).unlink()
         return super().unlink()

@@ -1,4 +1,5 @@
 import json
+import logging
 
 from markupsafe import Markup
 from odoo import api, fields, models
@@ -7,24 +8,35 @@ from odoo.exceptions import UserError
 from odoo.tools import LazyTranslate, _
 
 _lt = LazyTranslate(__name__)
+_logger = logging.getLogger(__name__)
 ENDPOINT = "https://l10n-fr-aspone.api.odoo.com"
+TEST_ENDPOINT = "https://l10n-fr-aspone.test.odoo.com"
 
 # Allows to translate the errors returned by IAP
 ERROR_CODE_TO_MSG = {
-    'invalid_xml': _lt("The structure of the xml document is invalid."),
-    'missing_deposit': _lt("No deposit_uid was provided."),
-    'missing_declaration': _lt("No declaration_uid was provided."),
-    'unknown_deposit': _lt("This deposit is unknown from Odoo."),
-    'unknown_declaration': _lt("This declaration is unknown from Odoo."),
-    'error_subscription': _lt("An error has occurred when trying to verify your subscription."),
+    'api_error': _lt("An unexpected error occured"),
+    'aspone_credentials_not_configured': _lt("Aspone credentials are not configured."),
+    'aspone_sso_account_tittle_error': _lt("Subscriber title must be 'MS' or 'MR'."),
+    'aspone_sso_missing_field': _lt("One or more fields are missing."),
     'dbuuid_not_exist': _lt("Your database uuid does not exist"),
+    'error_subscription': _lt("An error has occurred when trying to verify your subscription."),
+    'insee_code_not_found': _lt("The INSEE code could not be found for the given commune / country."),
+    'invalid_model_for_insee_lookup': _lt("The model provided for the INSEE lookup is not valid."),  # We can probably remove this one as it shouldn't happen functionally.
+    'invalid_xml_root': _lt("The root of your XML file is invalid."),
+    'invalid_xml_syntax': _lt("The syntax of your XML file is invalid."),
+    'missing_debtor_identifier': _lt("The debtor's identifier is missing."),
+    'missing_test_attribute': _lt("The test attribute is missing in your XML file."),
+    'missing_writer_siret': _lt("Your SIRET number is missing."),
+    'network_error': _lt("A network error occurred while connecting to ASPOne."),
+    'no_interchanges_found': _lt("No interchange was found for this deposit."),
+    'not_active_db': _lt("Your database is not yet activated."),
     'not_enterprise': _lt("You do not have an Odoo enterprise subscription."),
     'not_prod_env': _lt("Your database is not used for a production environment."),
-    'not_active_db': _lt("Your database is not yet activated."),
-    'add_document': _lt("An error occurred while trying to send the document: "),
-    'get_interchange': _lt("An error occurred while getting the interchange details: "),
-    'get_declaration': _lt("An error occurred while getting the declaration details: "),
-    'get_attachment': _lt("An error occurred while getting the attachments: "),
+    'unauthorized_access': _lt("Access denied."),
+    'unknown_declaration': _lt("This declaration is unknown from Odoo."),
+    'unknown_deposit': _lt("This deposit is unknown from Odoo."),
+    'unknown_procedure': _lt("Wrong procedure value provided."),
+    'xml_validation_error': _lt("There was an unexpected error during the validation of the XML file."),
 }
 
 
@@ -57,32 +69,30 @@ class AccountReportAsyncDocument(models.Model):
             full_logs = json.loads(report.step_1_logs or '[]') + json.loads(report.step_2_logs or '[]')
             msg = report._get_message(full_logs)
             if report.state == 'to_send':
-                report.message = ""
+                report.message = Markup("")
             elif report.state == 'accepted':
-                report.message = Markup("<b> ") + _("The report has been fully processed by the recipient") + Markup(" </b>") + msg
+                report.message = Markup("<b>%s</b>") % _("The report has been fully processed by the recipient") + msg
             elif report.state == 'rejected':
-                report.message = Markup("<b> ") + _("The report has been rejected") + Markup(" </b>") + msg
+                report.message = Markup("<b>%s</b>") % _("The report has been rejected") + msg
             else:
-                report.message = _(
-                    "<b> Warning, the report has not been fully processed by the recipient yet </b>") + msg
+                report.message = Markup("<b>%s</b>") % _("Warning, the report has not been fully processed by the recipient yet") + msg
 
     @api.model
     def _get_message(self, logs):
-        """ Recursively build the message from the logs. See '_collect_errors_in_history'. """
+        """Recursively build the message from the logs."""
         if not logs:
-            return ""
-        msg = "<ul>"
+            return ''
+        errstyle = Markup(" class='text-danger'")
+        msg = [Markup("<ul>")]
         for log in logs:
-            if log['is_error']:
-                msg += "<li style='color: red;'>"
-            else:
-                msg += "<li>"
-            msg += log['name'] + ": " + log['label'] + "</li>"
-            # handle details
-            if log.get('details'):
-                msg += self._get_message(log['details'])
-        msg += "</ul>"
-        return msg
+            msg.append(Markup("<li{style}>{name}: {label}{details}</li>").format(
+                style=errstyle if log['is_error'] else '',
+                name=log['name'],
+                label=log['label'],
+                details=self._get_message(details) if (details := log.get('details')) else '',
+            ))
+        msg.append(Markup("</ul>"))
+        return Markup().join(msg)
 
     def _process_reports_async_documents(self):
         """
@@ -103,30 +113,45 @@ class AccountReportAsyncDocument(models.Model):
         received a final state and was not in error).
         """
         for export in self:
-            # Avoid calling the first step again if its state is already final
-            first_step_state_final = False
-            if export.step_1_logs:
-                first_step_state_final = any(status['is_final'] for status in json.loads(export.step_1_logs))
+            try:
+                # Avoid calling the first step again if its state is already final
+                first_step_state_final = False
+                if export.step_1_logs:
+                    first_step_state_final = any(status['is_final'] for status in json.loads(export.step_1_logs))
 
-            # First step
-            if not first_step_state_final:
-                response = export._get_interchanges_by_deposit_id()
-                step_1_logs = export._process_interchanges_response(response)
-                export.step_1_logs = json.dumps(step_1_logs)
-                if any(status['is_error'] for status in step_1_logs):
-                    export.state = 'rejected'
-                first_step_state_final = any(status['is_final'] for status in step_1_logs)
+                # First step
+                if not first_step_state_final:
+                    response = export._get_interchanges_by_deposit_id()
+                    step_1_logs = export._process_interchanges_response(response)
+                    export.step_1_logs = json.dumps(step_1_logs)
+                    if any(status['is_error'] for status in step_1_logs):
+                        export.state = 'rejected'
+                        export.account_report_async_export_id.return_id._message_log(body=self.env._(
+                            "The document %(document_name)s was rejected by ASPOne.",
+                            documentname=export.name,
+                        ))
+                    first_step_state_final = any(status['is_final'] for status in step_1_logs)
 
-            # Second step
-            if first_step_state_final and export.state != 'rejected' and export.declaration_uid:
-                response = export._get_declaration_details()
-                step_2_logs = export._process_declaration_response(response)
+                # Second step
+                if first_step_state_final and export.state != 'rejected' and export.declaration_uid:
+                    response = export._get_declaration_details()
+                    step_2_logs = export._process_declaration_response(response)
 
-                export.step_2_logs = json.dumps(step_2_logs)
-                if any(status['is_error'] for status in step_2_logs):
-                    export.state = 'rejected'
-                elif any(status['is_final'] for status in step_2_logs):
-                    export.state = 'accepted'
+                    export.step_2_logs = json.dumps(step_2_logs)
+                    if any(status['is_error'] for status in step_2_logs):
+                        export.state = 'rejected'
+                        export.account_report_async_export_id.return_id._message_log(body=self.env._(
+                            "The document %(document_name)s was rejected by ASPOne.",
+                            documentname=export.name,
+                        ))
+                    elif any(status['is_final'] for status in step_2_logs):
+                        export.state = 'accepted'
+                        export.account_report_async_export_id.return_id._message_log(body=self.env._(
+                            "The document %(document_name)s was accepted by ASPOne.",
+                            documentname=export.name,
+                        ))
+            except Exception as e:  # noqa: BLE001
+                _logger.warning("Error while processing interchanges response: %s", e)
 
             if export.state == 'rejected':
                 report_closing_entry = export.env['account.move'].search([
@@ -166,83 +191,73 @@ class AccountReportAsyncDocument(models.Model):
         log = {
             'name': history['name'],
             'label': history['label'],
-            'is_error': history['isError'],
-            'is_final': history['isFinal'],
+            'is_error': history['type'] == 'ERROR',
+            'is_final': history['final'],
             'details': [],
         }
 
-        if history['stateDetailsHistory']:
-            for sub_history in history['stateDetailsHistory']['stateDetail']:
-                label = sub_history['label']
-                if sub_history['detailledLabel']:
-                    label += ": " + sub_history['detailledLabel']
-                sub_log = {
-                    'name': sub_history['name'],
-                    'label': label,
-                    'is_error': sub_history['isError'],
-                    'is_final': sub_history['isFinal'],
-                }
-                log['details'].append(sub_log)
+        for detail in (history.get('details') or []):
+            label = detail.get('label')
+            if label_detail := detail.get('detail'):
+                label += f": {label_detail}"
+            sub_log = {
+                'name': detail.get('name') or _("DETAIL"),
+                'label': label,
+                'is_error': detail['type'] == 'ERROR',
+                'is_final': detail.get('final'),
+            }
+            log['details'].append(sub_log)
 
         logs.append(log)
 
     @api.model
     def _get_fr_webservice_answer(self, url, params):
         """ Post the request and catch known Exceptions, return the content of the response as a dict. """
-        response = iap_tools.iap_jsonrpc(url, params=params)
+        response = iap_tools.iap_jsonrpc(url, params=params, raise_user_error=True)
 
-        # Error from IAP
-        if response.get('error'):
-            err = response['error']
-            if isinstance(response['error'], str):
-                msg = ERROR_CODE_TO_MSG[err]
-                msg_rest = ''
+        if not response.get('success'):
+            if response.get('error') == 'validation_error':
+                error_code = response.get('message')
+                msg = ERROR_CODE_TO_MSG.get(error_code) or self.env._("A validation error occurred: %(error_code)s.", error_code=error_code)
             else:
-                msg = ERROR_CODE_TO_MSG[err[0]]
-                msg_rest = err[1]
-            msg = self.env._(msg) + msg_rest  # pylint: disable=gettext-variable
+                msg = self.env._("An internal error occurred.")
+            msg += self.env._(" Please try again.\nIf the error still persists please contact the support.")
             raise UserError(msg)
 
-        # Error from ASPOne
-        if response['responseType'] != 'SUCCESS':
-            raise UserError(_(
-                "Unexpected response from proxy: '%(response_type)s %(message)s'.\nPlease contact the support.",
-                response_type=response['responseType'],
-                message=response['response']['errorResponse']['message']),
-            )
-
         return response
+
+    @api.model
+    def _is_aspone_test_mode(self):
+        is_neutralized = self.env['ir.config_parameter'].sudo().get_bool('database.is_neutralized')
+        aspone_mode = self.env['ir.config_parameter'].sudo().get_str('l10n_fr_reports.aspone_mode', 'prod')
+        return aspone_mode.lower() == 'test' or is_neutralized
 
     # ------------------------------------------------------------
     # Processing the ASPOne responses
     # ------------------------------------------------------------
 
     def _process_interchanges_response(self, response):
-        if not response['response']['successfullResponse']['interchanges']:
+        if not response['data']['interchange'].get('interchange_id'):
             raise Exception(_("Unexpected result: the response should contain an interchange."))
-        if len(response['response']['successfullResponse']['interchanges']['interchange']) != 1:
-            raise Exception(_("Unexpected result: the response should contain at most one interchange."))
-        interchange = response['response']['successfullResponse']['interchanges']['interchange'][0]
+        interchange = response['data']['interchange']
 
         logs = []
         # The events are logged in reversed order (last event in 1st position)
-        for history in reversed(interchange['statesHistory']['stateHistory']):
+        for history in reversed(interchange['states']):
             self._collect_errors_in_history(history, logs)
         # Get the declaration_uid, NB: it will only be available when no errors were returned at this step
-        if interchange['declarationIds'] \
-                and interchange['declarationIds']['declarationId'] \
-                and not self.declaration_uid:
-            if len(interchange['declarationIds']['declarationId']) > 1:
+        if interchange['declaration_ids'] and not self.declaration_uid:
+            if len(interchange['declaration_ids']) > 1:
                 # Can occur if we send a document to more than one recipient (e.g. DGFiP + OGA)
                 raise Exception(_("Unexpected result: the interchange should contain at most one declarationId."))
-            self.declaration_uid = interchange['declarationIds']['declarationId'][0]
+            self.declaration_uid = interchange['declaration_ids'][0]
         return logs
 
     def _process_declaration_response(self, response):
         logs = []
-        for history in reversed(response['response']['successfullResponse']['declarationTva']['statesHistory']['stateHistory']):
+        for history in reversed(response['data']['states']):
             self._collect_errors_in_history(history, logs)
-            if history['isError']:
+            if history['type'] == 'ERROR':
                 self.state = 'rejected'
             if history['name'] == 'ACCEPTED_BY_DESTINATION':
                 self.state = 'accepted'
@@ -268,18 +283,25 @@ class AccountReportAsyncDocument(models.Model):
     # Calls to ASPOne (via IAP)
     # ------------------------------------------------------------
 
+    def _get_aspone_endpoint(self):
+        aspone_mode = self.env['ir.config_parameter'].sudo().get_str('l10n_fr_reports.aspone_mode', 'prod')
+        aspone_endpoint = self.env['ir.config_parameter'].sudo().get_str('l10n_fr_reports.aspone_endpoint')
+        return aspone_endpoint or TEST_ENDPOINT if aspone_mode.lower() == 'test' else ENDPOINT
+
     def _get_interchanges_by_deposit_id(self):
         """ First step: get the interchanges linked to a deposit_uid (possibly several interchanges per deposit). """
-        db_uuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        db_uuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
+        endpoint = self._get_aspone_endpoint()
         return self._get_fr_webservice_answer(
-            url=ENDPOINT + "/api/l10n_fr_aspone/1/get_interchanges_by_deposit_id",
+            url=endpoint + "/api/l10n_fr_aspone/2/get_interchanges_by_deposit_id",
             params={'db_uuid': db_uuid, 'deposit_uid': self.deposit_uid},
         )
 
     def _get_declaration_details(self):
         """ Second step: get info of a single declaration/interchange. """
-        db_uuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        db_uuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
+        endpoint = self._get_aspone_endpoint()
         return self._get_fr_webservice_answer(
-            url=ENDPOINT + "/api/l10n_fr_aspone/1/get_declaration_details",
+            url=endpoint + "/api/l10n_fr_aspone/2/get_declaration_details",
             params={'db_uuid': db_uuid, 'declaration_uid': self.declaration_uid},
         )

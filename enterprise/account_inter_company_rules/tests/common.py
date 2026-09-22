@@ -6,13 +6,14 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 class TestInterCompanyRulesCommon(AccountTestInvoicingCommon):
     """This test needs sale_purchase_inter_company_rules to run."""
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
         super(TestInterCompanyRulesCommon, cls).setUpClass()
 
         cls.company_a = cls.company_data['company']
-        cls.company_b = cls.setup_other_company()['company']
+        cls.company_b = cls.setup_other_company(name='Test company 2')['company']
 
         # Create a new product named product_consultant
         cls.product_consultant = cls.env['product.product'].create({

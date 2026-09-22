@@ -6,10 +6,11 @@ from markupsafe import Markup
 
 from odoo.addons.project.tests.test_project_base import TestProjectCommon
 from odoo.fields import Command
-from odoo.tests import Form, freeze_time
+from odoo.tests import tagged, Form, freeze_time
 
 # Time is freezed on a monday
 @freeze_time('2100-01-04')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestPlanningOverlap(TestProjectCommon):
     @classmethod
     def setUpClass(cls):

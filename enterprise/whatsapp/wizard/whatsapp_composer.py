@@ -5,7 +5,7 @@ import logging
 
 from ast import literal_eval
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models, tools, _
 from odoo.exceptions import ValidationError, RedirectWarning, UserError
 from odoo.addons.whatsapp.tools import phone_validation as wa_phone_validation
 
@@ -31,7 +31,7 @@ class WhatsappComposer(models.TransientModel):
     def default_get(self, fields):
         result = super().default_get(fields)
         context = self.env.context
-        if context.get('active_model'):
+        if ('wa_template_id' in fields or 'res_model' in fields) and context.get('active_model'):
             result['res_model'] = context['active_model']
             wa_template_id = self.env['whatsapp.template']._find_default_for_model(result['res_model'])
             if wa_template_id and not result.get('wa_template_id'):
@@ -53,7 +53,8 @@ class WhatsappComposer(models.TransientModel):
 
     # content
     phone = fields.Char(string="Phone", compute="_compute_number", readonly=False, store=True)
-    invalid_phone_number_count = fields.Integer(compute="_compute_invalid_phone_number_count")
+    blocklisted_phone_number_count = fields.Integer(compute="_compute_phone_validation_counts")
+    invalid_phone_number_count = fields.Integer(compute="_compute_phone_validation_counts")
     wa_template_id = fields.Many2one(comodel_name="whatsapp.template", string="Template")
     preview_whatsapp = fields.Html(compute="_compute_preview_whatsapp", string="Message Preview")
 
@@ -62,19 +63,19 @@ class WhatsappComposer(models.TransientModel):
     number_of_free_text_button = fields.Integer(string="Number of free text Buttons", compute='_compute_number_of_free_text_button')
     is_header_free_text = fields.Boolean(compute='_compute_is_header_free_text')
     is_button_dynamic = fields.Boolean(compute='_compute_is_button_dynamic')
-    header_text_1 = fields.Char(string="Header Free Text", compute='_compute_free_text', readonly=False, store=True)
-    free_text_1 = fields.Char(string="Free Text 1", compute='_compute_free_text', readonly=False, store=True)
-    free_text_2 = fields.Char(string="Free Text 2", compute='_compute_free_text', readonly=False, store=True)
-    free_text_3 = fields.Char(string="Free Text 3", compute='_compute_free_text', readonly=False, store=True)
-    free_text_4 = fields.Char(string="Free Text 4", compute='_compute_free_text', readonly=False, store=True)
-    free_text_5 = fields.Char(string="Free Text 5", compute='_compute_free_text', readonly=False, store=True)
-    free_text_6 = fields.Char(string="Free Text 6", compute='_compute_free_text', readonly=False, store=True)
-    free_text_7 = fields.Char(string="Free Text 7", compute='_compute_free_text', readonly=False, store=True)
-    free_text_8 = fields.Char(string="Free Text 8", compute='_compute_free_text', readonly=False, store=True)
-    free_text_9 = fields.Char(string="Free Text 9", compute='_compute_free_text', readonly=False, store=True)
-    free_text_10 = fields.Char(string="Free Text 10", compute='_compute_free_text', readonly=False, store=True)
-    button_dynamic_url_1 = fields.Char(string="Button Url 1", compute='_compute_button_dynamic_url', readonly=False, store=True)
-    button_dynamic_url_2 = fields.Char(string="Button Url 2", compute='_compute_button_dynamic_url', readonly=False, store=True)
+    header_text_1 = fields.Char(string="Header Free Text")
+    free_text_1 = fields.Char(string="Free Text 1")
+    free_text_2 = fields.Char(string="Free Text 2")
+    free_text_3 = fields.Char(string="Free Text 3")
+    free_text_4 = fields.Char(string="Free Text 4")
+    free_text_5 = fields.Char(string="Free Text 5")
+    free_text_6 = fields.Char(string="Free Text 6")
+    free_text_7 = fields.Char(string="Free Text 7")
+    free_text_8 = fields.Char(string="Free Text 8")
+    free_text_9 = fields.Char(string="Free Text 9")
+    free_text_10 = fields.Char(string="Free Text 10")
+    button_dynamic_url_1 = fields.Char(string="Button Url 1")
+    button_dynamic_url_2 = fields.Char(string="Button Url 2")
 
     # ------------------------------------------------------------
     # COMPUTES
@@ -89,8 +90,15 @@ class WhatsappComposer(models.TransientModel):
         for composer in self:
             records = self.env[composer.res_model].browse(literal_eval(composer.res_ids))
             numbers = []
+            use_default_recipient = composer.wa_template_id.use_default_recipient
+            recipients_phone_info = (
+                records._phone_get_recipients_info() if use_default_recipient else {}
+            )
             for record in records[:12]:
-                if composer.wa_template_id.phone_field:
+                if use_default_recipient:
+                    if num := recipients_phone_info[record.id]['number']:
+                        numbers.append(num)
+                elif composer.wa_template_id.phone_field:
                     try:
                         numbers.append(record._find_value_from_field_path(composer.wa_template_id.phone_field))
                     except UserError as err:
@@ -113,20 +121,43 @@ class WhatsappComposer(models.TransientModel):
             composer.phone = phone
 
     @api.depends('phone', 'batch_mode')
-    def _compute_invalid_phone_number_count(self):
+    def _compute_phone_validation_counts(self):
         for composer in self:
             records = self._get_active_records()
+            blocklisted_phone_number_count = 0
+            invalid_phone_number_count = 0
+            blocklisted_numbers = self.env['whatsapp.blocklist'].sudo().search([
+                ('wa_account_id', '=', composer.wa_template_id.wa_account_id.id),
+            ]).mapped('number')
             if composer.batch_mode:
-                invalid_phone_number_count = 0
+                use_default_recipient = composer.wa_template_id.use_default_recipient
+                recipients_phone_info = (
+                    records._phone_get_recipients_info() if use_default_recipient else {}
+                )
                 for rec in records:
-                    mobile_number = rec._whatsapp_phone_format(fpath=composer.wa_template_id.phone_field)
+                    mobile_number = False
+                    if use_default_recipient:
+                        # Already formatted (E164)
+                        mobile_number = recipients_phone_info[rec.id]['sanitized']
+                    elif composer.wa_template_id.phone_field:
+                        mobile_number = rec._whatsapp_phone_format(fpath=composer.wa_template_id.phone_field)
                     if not mobile_number:
                         invalid_phone_number_count += 1
+                    else:
+                        formatted_number = wa_phone_validation.wa_phone_format_for_blacklist(mobile_number)
+                        if formatted_number in blocklisted_numbers:
+                            blocklisted_phone_number_count += 1
             elif composer.phone:
                 sanitize_number = records._whatsapp_phone_format(number=composer.phone)
-                invalid_phone_number_count = 1 if not sanitize_number else 0
+                if not sanitize_number:
+                    invalid_phone_number_count = 1
+                else:
+                    formatted_number = wa_phone_validation.wa_phone_format_for_blacklist(sanitize_number)
+                    if formatted_number in blocklisted_numbers:
+                        blocklisted_phone_number_count += 1
             else:
                 invalid_phone_number_count = 1
+            composer.blocklisted_phone_number_count = blocklisted_phone_number_count
             composer.invalid_phone_number_count = invalid_phone_number_count
 
     @api.depends(lambda self: self._get_free_text_fields())
@@ -175,31 +206,6 @@ class WhatsappComposer(models.TransientModel):
             else:
                 rec.is_button_dynamic = False
 
-    @api.depends('wa_template_id')
-    def _compute_button_dynamic_url(self):
-        for rec in self:
-            freetext_btn_vars = rec.wa_template_id.variable_ids.filtered(lambda line: line.line_type == 'button' and line.field_type == 'free_text')
-            freetext_btn_vars = freetext_btn_vars.sorted(key=lambda var: var.button_id.sequence)
-            if len(freetext_btn_vars) > 0:
-                rec.button_dynamic_url_1 = freetext_btn_vars[0].demo_value
-            if len(freetext_btn_vars) > 1:
-                rec.button_dynamic_url_2 = freetext_btn_vars[1].demo_value
-
-    @api.depends('wa_template_id')
-    def _compute_free_text(self):
-        for rec in self:
-            if rec.wa_template_id.header_type == 'text':
-                header_param = rec.wa_template_id.variable_ids.filtered(lambda line: line.line_type == 'header' and line.field_type == 'free_text')
-                if rec.wa_template_id.variable_ids and header_param:
-                    rec.header_text_1 = header_param[0].demo_value
-            if rec.wa_template_id.variable_ids:
-                free_text_count = 1
-                filtered_variables = rec.wa_template_id.variable_ids.filtered(lambda line: line.line_type == 'body' and line.field_type == 'free_text')
-                sorted_variables = filtered_variables.sorted(key=lambda var: var._extract_variable_index())
-                for param in sorted_variables:
-                    rec[f"free_text_{free_text_count}"] = param.demo_value
-                    free_text_count += 1
-
     def _extract_digits(self, string):
         if not string:
             return string
@@ -220,7 +226,7 @@ class WhatsappComposer(models.TransientModel):
             raise ValidationError(_("Please select a WhatsApp Template to send."))
         return self._send_whatsapp_template()
 
-    def _create_whatsapp_messages(self, force_create=False):
+    def _create_whatsapp_messages_values(self, skip_raise_number=False):
         records = self._get_active_records()
 
         if self.wa_template_id and self.wa_template_id.variable_ids:
@@ -230,62 +236,102 @@ class WhatsappComposer(models.TransientModel):
                     _("User phone number required in template but no value set on user profile.")
                 )
         free_text_json = self._get_text_free_json()
+        raise_exception = not (self.batch_mode or skip_raise_number)
+        # batch compute of phone information
+        use_default_recipient = self.wa_template_id.use_default_recipient
+        recipients_phone_info = (
+            records._phone_get_recipients_info() if use_default_recipient else {}
+        )
+        # (not entirely) batch compute of log recipients
+        recipients = records._mail_get_partners()
+        for record in records:
+            if not recipients.get(record.id):
+                recipients[record.id] = record._whatsapp_get_responsible().partner_id
         message_vals_all = []
-        raise_exception = not (self.batch_mode or force_create)
-        for rec in records:
-            mobile_number = None
-            if self.batch_mode:
-                formatted_number_wa = rec._whatsapp_phone_format(
-                    fpath=self.wa_template_id.phone_field,
-                    raise_on_format_error=raise_exception,
-                )
-                mobile_number = rec.mapped(self.wa_template_id.phone_field)[0]
-            elif not mobile_number:
-                mobile_number = self.phone
-                formatted_number_wa = rec._whatsapp_phone_format(
-                    number=mobile_number, raise_on_format_error=raise_exception,
-                )
 
-            message_vals = {}
+        # setup a batch size to generate messages, independently from caller
+        batch_size = self.env['ir.config_parameter'].sudo().get_int('mail.batch_size') or 50  # be sure to not have 0, as otherwise no iteration is done
+        for batch_records in tools.split_every(batch_size, records.ids, piece_maker=records.browse):
+            mobile_numbers, formatted_numbers_wa = [], []
+            for rec in batch_records:
+                mobile_number = None
+                formatted_number_wa = None
+                if self.batch_mode:
+                    if use_default_recipient:
+                        recipient_info = recipients_phone_info[rec.id]
+                        # Format sanitized (E164) to WhatsApp format (e.g. 9163...)
+                        formatted_number_wa = (
+                            rec._whatsapp_phone_format(
+                                number=recipient_info['sanitized'],
+                                raise_on_format_error=raise_exception,
+                            ) if recipient_info['sanitized'] else False
+                        )
+                        mobile_number = recipient_info['number']
+                    elif self.wa_template_id.phone_field:
+                        formatted_number_wa = rec._whatsapp_phone_format(
+                            fpath=self.wa_template_id.phone_field,
+                            raise_on_format_error=raise_exception,
+                        )
+                        mobile_number = rec.mapped(self.wa_template_id.phone_field)[0]
+                elif not mobile_number:
+                    mobile_number = self.phone
+                    formatted_number_wa = rec._whatsapp_phone_format(
+                        number=mobile_number, raise_on_format_error=raise_exception,
+                    )
+                mobile_numbers.append(mobile_number)
+                formatted_numbers_wa.append(formatted_number_wa)
 
-            if not formatted_number_wa:
-                message_vals.update({
-                    'failure_type': 'phone_invalid',
-                    'state': 'error',
-                })
-
-            body = self._get_html_preview_whatsapp(rec=rec)
-            post_values = {
-                'attachment_ids': [self.attachment_id.id] if self.attachment_id else [],
-                'body': body,
-                'message_type': 'whatsapp_message',
-                'partner_ids': rec._mail_get_partners()[rec.id].ids or rec._whatsapp_get_responsible().partner_id.ids,
-            }
+            # create linked mail.message records
+            bodies = {rec.id: self._get_html_preview_whatsapp(rec=rec) for rec in batch_records}
+            # unsupported batch on channel model due to their implementation
             if self.res_model == 'discuss.channel':
-                message = rec.message_post(body=body, message_type="comment", subtype_xmlid='mail.mt_comment')
+                messages = self.env['mail.message']
+                for rec in batch_records:
+                    messages += rec.message_post(body=bodies[rec.id], message_type="comment", subtype_xmlid='mail.mt_comment')
             elif hasattr(records, '_message_log'):
-                message = rec._message_log(**post_values)
-            else:
-                message = self.env['mail.message'].create(
-                    dict(post_values, res_id=rec.id, model=self.res_model,
-                         subtype_id=self.env['ir.model.data']._xmlid_to_res_id("mail.mt_note"))
+                messages = batch_records._message_log_batch(
+                    bodies=bodies,
+                    attachment_ids={rec.id: [self.attachment_id.id] if self.attachment_id else False for rec in batch_records},
+                    message_type='whatsapp_message',
+                    partner_ids={rec.id: recipients[rec.id].ids for rec in batch_records},
                 )
-            message_vals_all.append(message_vals | {
-                'mail_message_id': message.id,
-                'mobile_number': mobile_number,
-                'mobile_number_formatted': formatted_number_wa,
-                'free_text_json': free_text_json,
-                'wa_template_id': self.wa_template_id.id,
-                'wa_account_id': self.wa_template_id.wa_account_id.id,
-            })
-        if message_vals_all:
-            messages = self.env['whatsapp.message'].create(message_vals_all)
-            return messages
-        return self.env["whatsapp.message"]
+            else:
+                messages = self.env['mail.message'].create([
+                    {
+                        'body': bodies[rec.id],
+                        'attachment_ids': self.attachment_id.ids,
+                        'message_type': 'whatsapp_message',
+                        'partner_ids': recipients[rec.id],
+                        'res_id': rec.id,
+                        'model': self.res_model,
+                        'subtype_id': self.env['ir.model.data']._xmlid_to_res_id("mail.mt_note"),
+                    } for rec in records
+                ])
+
+            for record, mobile_number, formatted_number_wa, message in zip(
+                batch_records, mobile_numbers, formatted_numbers_wa, messages,
+                strict=True,
+            ):
+                message_vals = {}
+                if not formatted_number_wa:
+                    message_vals.update({
+                        'failure_type': 'phone_invalid',
+                        'state': 'error',
+                    })
+                message_vals_all.append(message_vals | {
+                    'mail_message_id': message.id,
+                    'mobile_number': mobile_number,
+                    'mobile_number_formatted': formatted_number_wa,
+                    'free_text_json': free_text_json,
+                    'wa_template_id': self.wa_template_id.id,
+                    'wa_account_id': self.wa_template_id.wa_account_id.id,
+                })
+        return message_vals_all
 
     def _send_whatsapp_template(self, force_send_by_cron=False):
-        messages = self._create_whatsapp_messages(force_create=force_send_by_cron)
-        if messages:
+        messages_values = self._create_whatsapp_messages_values(skip_raise_number=force_send_by_cron)
+        if messages_values:
+            messages = self.env['whatsapp.message'].create(messages_values)
             messages._send(force_send_by_cron=force_send_by_cron)
             return messages
         return self.env["whatsapp.message"]
@@ -312,13 +358,18 @@ class WhatsappComposer(models.TransientModel):
         self.ensure_one()
         template_variables_value = self.wa_template_id.variable_ids._get_variables_value(rec)
         text_vars = self.wa_template_id.variable_ids.filtered(lambda var: var.field_type == 'free_text')
-        body_text_vars = text_vars.filtered(lambda var: var.line_type == 'body').sorted(key=lambda var: var._extract_variable_index())
+        body_text_vars = text_vars.filtered(lambda var: var.line_type == 'body')
+        if self.wa_template_id.variable_type == 'named':
+            body_text_vars = body_text_vars.sorted(key=lambda var: self.wa_template_id.body.find(var.name))
+        else:
+            body_text_vars = body_text_vars.sorted(key=lambda var: var._extract_variable_value())
         for var_index, body_text_var in zip(range(1, self.number_of_free_text + 1), body_text_vars):
             free_text_x = self[f'free_text_{var_index}']
             if free_text_x:
                 template_variables_value[f'body-{body_text_var.name}'] = free_text_x
-        if self.header_text_1 and text_vars.filtered(lambda var: var.line_type == 'header'):
-            template_variables_value['header-{{1}}'] = self.header_text_1
+        header_text_var = text_vars.filtered(lambda var: var.line_type == 'header')
+        if self.header_text_1 and header_text_var:
+            template_variables_value[f'header-{header_text_var.name}'] = self.header_text_1
         return self.wa_template_id._get_formatted_body(variable_values=template_variables_value)
 
     # ------------------------------------------------------------

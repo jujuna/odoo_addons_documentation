@@ -18,7 +18,7 @@ class ApprovalRequest(models.Model):
 
     name = fields.Char(string="Approval Subject", tracking=True)
     active = fields.Boolean(default=True, tracking=True)
-    category_id = fields.Many2one('approval.category', string="Category", required=True)
+    category_id = fields.Many2one('approval.category', string="Category", required=True, index=True)
     category_image = fields.Binary(related='category_id.image')
     approver_ids = fields.One2many('approval.approver', 'request_id', string="Approvers", check_company=True,
         compute='_compute_approver_ids', store=True, readonly=False)
@@ -52,7 +52,6 @@ class ApprovalRequest(models.Model):
     user_status = fields.Selection([
         ('new', 'New'),
         ('pending', 'Submitted'),
-        ('waiting', 'Waiting'),
         ('approved', 'Approved'),
         ('refused', 'Refused'),
         ('cancel', 'Canceled')], compute="_compute_user_status")
@@ -74,8 +73,6 @@ class ApprovalRequest(models.Model):
     has_product = fields.Selection(related="category_id.has_product")
     requirer_document = fields.Selection(related="category_id.requirer_document")
     approval_minimum = fields.Integer(related="category_id.approval_minimum")
-    approval_type = fields.Selection(related="category_id.approval_type")
-    approver_sequence = fields.Boolean(related="category_id.approver_sequence")
     automated_sequence = fields.Boolean(related="category_id.automated_sequence")
 
     @api.depends('approver_ids')
@@ -103,10 +100,6 @@ class ApprovalRequest(models.Model):
         for request in self:
             if request.date_start and request.date_end and request.date_start > request.date_end:
                 raise ValidationError(_("Start date should precede the end date."))
-
-    def copy_data(self, default=None):
-        vals_list = super().copy_data(default=default)
-        return [dict(vals, name=self.env._("%s (copy)", request.name)) for request, vals in zip(self, vals_list)]
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -148,7 +141,7 @@ class ApprovalRequest(models.Model):
     def action_confirm(self):
         # make sure that the manager is present in the list if he is required
         self.ensure_one()
-        if self.category_id.manager_approval == 'required':
+        if self.category_id.manager_approval:
             employee = self.env['hr.employee'].search([('user_id', '=', self.request_owner_id.id), ('company_id', '=', self.company_id.id)], limit=1)
             if not employee.parent_id:
                 raise UserError(_('This request needs to be approved by your manager. There is no manager linked to your employee profile.'))
@@ -161,15 +154,8 @@ class ApprovalRequest(models.Model):
         if self.requirer_document == 'required' and not self.attachment_number:
             raise UserError(_("You have to attach at least one document."))
 
-        approvers = self.approver_ids
-        if self.approver_sequence:
-            approvers = approvers.filtered(lambda a: a.status in ['new', 'pending', 'waiting'])
-
-            approvers[1:].sudo().write({'status': 'waiting'})
-            approvers = approvers[0] if approvers and approvers[0].status != 'pending' else self.env['approval.approver']
-        else:
-            approvers = approvers.filtered(lambda a: a.status == 'new')
-
+        # Every approver is requested at the same time, there is no order between them.
+        approvers = self.approver_ids.filtered(lambda a: a.status == 'new')
         approvers._create_activity()
         approvers.sudo().write({'status': 'pending'})
         self.sudo().write({'date_confirmed': fields.Datetime.now()})
@@ -183,22 +169,6 @@ class ApprovalRequest(models.Model):
         ]
         activities = self.env['mail.activity'].search(domain)
         return activities
-
-    def _update_next_approvers(self, new_status, approver, only_next_approver, cancel_activities=False):
-        approvers_updated = self.env['approval.approver']
-        for approval in self.filtered('approver_sequence'):
-            current_approver = approval.approver_ids & approver
-            approvers_to_update = approval.approver_ids.filtered(lambda a: a.status not in ['approved', 'refused'] and (a.sequence > current_approver.sequence or (a.sequence == current_approver.sequence and a.id > current_approver.id)))
-
-            if only_next_approver and approvers_to_update:
-                approvers_to_update = approvers_to_update[0]
-            approvers_updated |= approvers_to_update
-
-        approvers_updated.sudo().status = new_status
-        if new_status == 'pending':
-            approvers_updated._create_activity()
-        if cancel_activities:
-            approvers_updated.request_id._cancel_activities()
 
     def _cancel_activities(self):
         approval_activity = self.env.ref('approvals.mail_activity_data_approval')
@@ -215,15 +185,11 @@ class ApprovalRequest(models.Model):
             approval_request.message_post(body=_('The request has been approved by an Approval Officer'))
 
     def action_approve(self, approver=None):
-        if any(approval.approver_sequence and approval.user_status == 'waiting' for approval in self):
-            raise ValidationError(_('You cannot approve before the previous approver.'))
-
         if not isinstance(approver, models.BaseModel):
             approver = self.mapped('approver_ids').filtered(
                 lambda approver: approver.user_id == self.env.user
             )
         approver.write({'status': 'approved'})
-        self.sudo()._update_next_approvers('pending', approver, only_next_approver=True)
         self.sudo()._get_user_approval_activities(user=self.env.user).action_feedback()
 
     def action_refuse(self, approver=None):
@@ -232,7 +198,6 @@ class ApprovalRequest(models.Model):
                 lambda approver: approver.user_id == self.env.user
             )
         approver.write({'status': 'refused'})
-        self.sudo()._update_next_approvers('refused', approver, only_next_approver=False, cancel_activities=True)
         self.sudo()._get_user_approval_activities(user=self.env.user).action_feedback()
 
     def action_withdraw(self, approver=None):
@@ -240,7 +205,6 @@ class ApprovalRequest(models.Model):
             approver = self.mapped('approver_ids').filtered(
                 lambda approver: approver.user_id == self.env.user
             )
-        self.sudo()._update_next_approvers('waiting', approver, only_next_approver=False, cancel_activities=True)
         approver.write({'status': 'pending'})
 
     def action_draft(self):
@@ -248,7 +212,7 @@ class ApprovalRequest(models.Model):
 
     def action_cancel(self):
         self.sudo()._get_user_approval_activities(user=self.env.user).unlink()
-        self.mapped('approver_ids').write({'status': 'cancel'})
+        self.sudo().mapped('approver_ids').write({'status': 'cancel'})
 
     @api.depends_context('uid')
     @api.depends('approver_ids.status')
@@ -279,7 +243,10 @@ class ApprovalRequest(models.Model):
             request.request_status = status
 
             # Send approval accepted/refused message
-            if status != old_status and status in ('approved', 'refused') and request.request_owner_id.partner_id:
+            if (request.id
+                and status != old_status
+                and status in ('approved', 'refused')
+                and request.request_owner_id.partner_id):
                 if status == 'approved':
                     body = _("The request created on %(create_date)s by %(request_owner)s has been approved.",
                             create_date=request.create_date.date(),
@@ -315,13 +282,10 @@ class ApprovalRequest(models.Model):
                 employee = self.env['hr.employee'].search([('user_id', '=', request.request_owner_id.id), ('company_id', '=', self.company_id.id)], limit=1)
                 if employee.parent_id.user_id:
                     manager_user_id = employee.parent_id.user_id.id
-                    manager_required = request.category_id.manager_approval == 'required'
-                    # We set the manager sequence to be lower than all others (9) so they are the first to approve.
                     approver_id_vals.append(Command.create({
                         'user_id': manager_user_id,
                         'status': 'new',
-                        'required': manager_required,
-                        'sequence': 9,
+                        'required': True,
                     }))
                     if manager_user_id in users_to_category_approver.keys():
                         users_to_category_approver.pop(manager_user_id)
@@ -331,7 +295,6 @@ class ApprovalRequest(models.Model):
                     'user_id': user_id,
                     'status': 'new',
                     'required': users_to_category_approver[user_id].required,
-                    'sequence': users_to_category_approver[user_id].sequence,
                 }))
 
             request.update({'approver_ids': approver_id_vals})
@@ -359,19 +322,10 @@ class ApprovalRequest(models.Model):
             for approval in self:
                 approval.message_subscribe(partner_ids=approval.request_owner_id.partner_id.ids)
 
-        if 'approver_ids' in vals:
-            to_resequence = self.filtered_domain([('approver_sequence', '=', True), ('request_status', '=', 'pending')])
-            for approval in to_resequence:
-                if not approval.approver_ids.filtered(lambda a: a.status == 'pending'):
-                    approver = approval.approver_ids.filtered(lambda a: a.status == 'waiting')
-                    if approver:
-                        approver[0].status = 'pending'
-                        approver[0]._create_activity()
-
         return res
 
-    def _track_subtype(self, init_values):
+    def _track_log_get_default_subtype(self, track_init_values):
         self.ensure_one()
-        if 'request_status' in init_values:
+        if 'request_status' in track_init_values:
             return self.env.ref('approvals.mt_approval_request_status')
-        return super()._track_subtype(init_values)
+        return super()._track_log_get_default_subtype(track_init_values)

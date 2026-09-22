@@ -1,20 +1,25 @@
+import { useProps, proxy } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
-import { NewViewDialog } from "@web_studio/client_action/editor/new_view_dialogs/new_view_dialog";
+import {
+    NewViewDialog,
+    newViewDialogProps,
+} from "@web_studio/client_action/editor/new_view_dialogs/new_view_dialog";
 import { useService } from "@web/core/utils/hooks";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
+const mapNewViewDialogProps = { ...newViewDialogProps };
+delete mapNewViewDialogProps.viewType;
+
 export class MapNewViewDialog extends NewViewDialog {
     static template = "web_studio.MapNewViewDialog";
-    static props = {
-        ...NewViewDialog.props,
-    };
+    props = useProps(mapNewViewDialogProps);
 
     setup() {
         super.setup();
         this.dialog = useService("dialog");
-        this.fieldsChoice = {
+        this.fieldsChoice = proxy({
             res_partner: null,
-        };
+        });
     }
 
     get viewType() {
@@ -28,7 +33,9 @@ export class MapNewViewDialog extends NewViewDialog {
         if (!this.partnerFields.length) {
             this.dialog.add(AlertDialog, {
                 title: _t("Contact Field Required"),
-                body: _t("Map views are based on the address of a linked Contact. You need to have a Many2one field linked to the res.partner model in order to create a map view."),
+                body: _t(
+                    "Map views are based on the address of a linked Contact. You need to have a Many2one field linked to the res.partner model in order to create a map view."
+                ),
                 contentClass: "o_web_studio_preserve_space",
             });
             this.props.close();
@@ -37,5 +44,3 @@ export class MapNewViewDialog extends NewViewDialog {
         }
     }
 }
-
-delete MapNewViewDialog.props.viewType;

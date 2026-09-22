@@ -1,14 +1,10 @@
-import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import {
-    makeMockEnv,
-    models,
-    defineModels,
-    patchWithCleanup,
-} from "@web/../tests/web_test_helpers";
+import { beforeEach, describe, expect, mockFetch, test } from "@odoo/hoot";
+import { defineModels, makeTestApp, models } from "@web/../tests/web_test_helpers";
 import { uuid } from "@web/core/utils/strings";
-import { browser } from "@web/core/browser/browser";
 
 import { IotHttpService } from "@iot/network_utils/iot_http_service";
+
+describe.current.tags("headless");
 
 class IotChannel extends models.Model {
     get_iot_channel() {
@@ -33,14 +29,13 @@ let websocketMessages;
 let notification;
 let longpolling;
 let websocket;
-let webRtc;
 let orm;
 let onSuccess;
 let onFailure;
-let calledCallback = "pending";
+let calledCallback;
 
 beforeEach(async () => {
-    await makeMockEnv();
+    await makeTestApp();
     websocketMessages = [];
     notification = {
         added: [],
@@ -50,53 +45,33 @@ beforeEach(async () => {
     };
 
     orm = new DummyOrm({ ip: "127.0.0.1", identifier: "box-123" });
-    patchWithCleanup(browser, {
-        fetch: async (_url) => {
-            return true;
-        },
-    });
+
+    mockFetch(() => true);
+
+    // reset callback tracker
+    calledCallback = "pending";
 
     // if we should receive a failed response from the IoT Box
-    let webRtcShouldFail = false;
     let longpollingShouldFail = false;
     let websocketShouldFail = false;
 
     // if calling the action should fail
-    let webRtcShouldThrow = false;
     let longpollingShouldThrow = false;
     let websocketShouldThrow = false;
 
-    webRtc = {
-        sendMessage: async (identifier, payload, actionId, _messageType) => {
-            if (webRtcShouldThrow) {
-                throw new Error("webrtc sendMessage failed");
-            }
-            return actionId || uuid();
-        },
-        onMessage: async (identifier, deviceIdentifier, actionId, onSuccess, onFailure) => {
-            if (webRtcShouldThrow) {
-                throw new Error("webrtc onMessage failed");
-            }
-            if (webRtcShouldFail) {
-                onFailure({ status: "disconnected" }, deviceIdentifier);
-                return;
-            }
-            onSuccess({ status: "success", device_identifier: deviceIdentifier }, deviceIdentifier);
-        },
-        setThrow: (v) => {
-            webRtcShouldThrow = v;
-        },
-        setFail: (v) => {
-            webRtcShouldFail = v;
-        },
-    };
+    // longpolling should respond like a standard http request, or be delayed like longpolling
+    let longpollingDirectResponse = true;
 
     longpolling = {
+        directResponse: false,
         sendMessage: async (ip, payload, actionId, _hasFallback) => {
             if (longpollingShouldThrow) {
                 throw new Error("longpolling sendMessage failed");
             }
-            return actionId || uuid();
+            return {
+                status: longpollingShouldFail ? "error" : "success",
+                result: !longpollingDirectResponse ? "pending" : {},
+            };
         },
         onMessage: (ip, deviceIdentifier, onSuccess, onFailure, actionId) => {
             if (longpollingShouldThrow) {
@@ -113,6 +88,9 @@ beforeEach(async () => {
         },
         setFail: (v) => {
             longpollingShouldFail = v;
+        },
+        shouldRespondDirectly: (v) => {
+            longpollingDirectResponse = v;
         },
     };
 
@@ -156,26 +134,34 @@ beforeEach(async () => {
         calledCallback = "onFailure";
     };
 
-    iotHttpService = new IotHttpService({ iot_longpolling: longpolling, websocket, webRtc, notification, orm } );
+    iotHttpService = new IotHttpService({
+        iot_longpolling: longpolling,
+        websocket,
+        notification,
+        orm,
+    });
 });
 
 describe("action", () => {
-    test("uses WebRTC first and succeeds", async () => {
-        await iotHttpService.action(1, "device-1", { foo: "bar" }, onSuccess, onFailure);
-        expect(calledCallback).toBe("onSuccess");
-        expect(iotHttpService.connectionStatus).toBe("webrtc");
+    describe("longpolling", () => {
+        test("uses /action response and succeeds", async () => {
+            longpolling.shouldRespondDirectly(true);
+            await iotHttpService.action(1, "device-2", { a: "b" }, onSuccess, onFailure);
+
+            expect(calledCallback).toBe("onSuccess");
+            expect(iotHttpService.connectionStatus).toBe("longpolling");
+        });
+
+        test("waits for /event and succeeds", async () => {
+            longpolling.shouldRespondDirectly(false);
+            await iotHttpService.action(1, "device-2", { a: "b" }, onSuccess, onFailure);
+
+            expect(calledCallback).toBe("onSuccess");
+            expect(iotHttpService.connectionStatus).toBe("longpolling");
+        });
     });
 
-    test("fallback to longpolling when WebRTC fails", async () => {
-        webRtc.setThrow(true);
-        await iotHttpService.action(1, "device-2", { a: "b" }, onSuccess, onFailure);
-
-        expect(calledCallback).toBe("onSuccess");
-        expect(iotHttpService.connectionStatus).toBe("longpolling");
-    });
-
-    test("fallback to websocket when both WebRTC and longpolling fail", async () => {
-        webRtc.setThrow(true);
+    test("fallback to websocket when longpolling fails", async () => {
         longpolling.setThrow(true);
 
         await iotHttpService.action(1, "device-3", { x: "y" }, onSuccess, onFailure);
@@ -184,7 +170,6 @@ describe("action", () => {
     });
 
     test("all methods fail and onFailure is invoked with disconnected status", async () => {
-        webRtc.setThrow(true);
         longpolling.setThrow(true);
         websocket.setThrow(true);
 
@@ -193,30 +178,12 @@ describe("action", () => {
         expect(iotHttpService.connectionStatus).toBe("offline");
     });
 
-    test("invalid iotBoxId (array unwraps Many2one)", async () => {
-        await iotHttpService.action([1], "device-array", { foo: "bar" }, onSuccess);
+    test("invalid iotBoxId (get id from Many2one)", async () => {
+        await iotHttpService.action({ id: 1 }, "device-array", { foo: "bar" }, onSuccess);
         expect(calledCallback).toBe("onSuccess");
-    });
-
-    test("recent longpolling failure short-circuits longpolling path", async () => {
-        // simulate that longpolling just failed
-        iotHttpService.longpollingFailedTimestamp = Date.now();
-        webRtc.setThrow(true);
-        // longpolling should be skipped due to recent failure, so websocket is used
-        await iotHttpService.action(1, "device-5", { test: "val" }, onSuccess);
-        expect(calledCallback).toBe("onSuccess");
-        expect(iotHttpService.connectionStatus).toBe("websocket");
-    });
-
-    test("webrtc onMessage calls back onFailure", async () => {
-        webRtc.setFail(true); // make WebRTC onMessage report failure
-        await iotHttpService.action(1, "device-webrtc-fail", { foo: "bar" }, onSuccess, onFailure);
-        expect(calledCallback).toBe("onFailure");
-        expect(iotHttpService.connectionStatus).toBe("webrtc"); // received failure callback from webrtc
     });
 
     test("longpolling onMessage calls back onFailure", async () => {
-        webRtc.setThrow(true);
         longpolling.setFail(true); // make longpolling onMessage report failure
         await iotHttpService.action(
             1,
@@ -230,7 +197,6 @@ describe("action", () => {
     });
 
     test("websocket onMessage calls back onFailure", async () => {
-        webRtc.setThrow(true);
         longpolling.setThrow(true);
         websocket.setFail(true); // make websocket onMessage report failure
         await iotHttpService.action(
@@ -263,7 +229,6 @@ describe("action", () => {
         expect(iotHttpService.cachedIotBoxes[2]?.identifier).toBe("box-456");
 
         // ensure that the second record (and only this one) is removed after failure
-        webRtc.setThrow(true);
         longpolling.setThrow(true);
         websocket.setThrow(true);
         await iotHttpService.action(2, "device-2", { a: "attempt-2-fails" }, onSuccess, onFailure);

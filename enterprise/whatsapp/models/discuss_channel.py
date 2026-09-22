@@ -28,15 +28,14 @@ class DiscussChannel(models.Model):
     whasapp number """
     _inherit = 'discuss.channel'
 
-    channel_type = fields.Selection(
-        selection_add=[('whatsapp', 'WhatsApp Conversation')],
-        ondelete={'whatsapp': 'cascade'})
+    channel_type = fields.Selection(selection_add=[("whatsapp", "WhatsApp")], ondelete={"whatsapp": "cascade"})
     whatsapp_number = fields.Char(string="Phone Number")
     whatsapp_channel_valid_until = fields.Datetime(string="WhatsApp Channel Valid Until Datetime", compute="_compute_whatsapp_channel_valid_until")
     last_wa_mail_message_id = fields.Many2one(comodel_name="mail.message", string="Last WA Partner Mail Message", index='btree_not_null')
     whatsapp_partner_id = fields.Many2one(comodel_name='res.partner', string="WhatsApp Partner", index='btree_not_null')
     wa_account_id = fields.Many2one(comodel_name='whatsapp.account', string="WhatsApp Business Account")
     whatsapp_channel_active = fields.Boolean('Is Whatsapp Channel Active', compute="_compute_whatsapp_channel_active")
+    whatsapp_channel_blocked = fields.Boolean(string='Is WhatsApp Channel Blocked', compute="_compute_whatsapp_channel_blocked")
 
     _group_public_id_check = models.Constraint(
         "CHECK (channel_type = 'channel' OR channel_type = 'whatsapp' OR group_public_id IS NULL)",
@@ -47,21 +46,26 @@ class DiscussChannel(models.Model):
     def _compute_display_name(self):
         whatsapp_channels = self.filtered('whatsapp_partner_id')
         for channel in whatsapp_channels:
-            number = channel.whatsapp_number
             partner = channel.whatsapp_partner_id
+            number = channel.whatsapp_number or partner.phone
             partner_name = partner.name if partner.name != partner.phone else False
-            channel.display_name = f'{partner_name} ({number})' if partner_name else number
+            channel.display_name = f'{partner_name} ({number})' if partner_name and number else (partner_name or number)
         super(DiscussChannel, self - whatsapp_channels)._compute_display_name()
 
-    @api.constrains('channel_type', 'whatsapp_number')
+    @api.constrains(lambda self: self.env['discuss.channel']._check_whatsapp_number_contains_fields())
     def _check_whatsapp_number(self):
         # constraint to check the whatsapp number for channel with type 'whatsapp'
         missing_number = self.filtered(lambda channel: channel.channel_type == 'whatsapp' and not channel.whatsapp_number)
         if missing_number:
             raise ValidationError(
                 _("A phone number is required for WhatsApp channels %(channel_names)s",
-                  channel_names=', '.join(missing_number)
+                  channel_names=', '.join(missing_number.mapped('display_name'))
                 ))
+
+    @api.model
+    def _check_whatsapp_number_contains_fields(self):
+        """To be overriden in identifiers module, to avoid overwriting constrains fields."""
+        return ['channel_type', 'whatsapp_number']
 
     # INHERITED CONSTRAINTS
 
@@ -84,6 +88,24 @@ class DiscussChannel(models.Model):
             channel.whatsapp_channel_active = channel.whatsapp_channel_valid_until and \
                 channel.whatsapp_channel_valid_until > fields.Datetime.now()
 
+    def _compute_whatsapp_channel_blocked(self):
+        wa_channels = self.filtered(lambda channel: channel.channel_type == 'whatsapp')
+        (self - wa_channels).whatsapp_channel_blocked = False
+        if not wa_channels:
+            return
+
+        formatted_numbers = {
+            c.id: wa_phone_validation.wa_phone_format_for_blacklist(c.whatsapp_number)
+            for c in wa_channels
+        }
+        blocklist_records = self.env['whatsapp.blocklist'].sudo().search([
+            ('wa_account_id', 'in', wa_channels.mapped('wa_account_id').ids),
+            ('number', 'in', list(formatted_numbers.values())),
+        ])
+        blocked_set = {(rec.wa_account_id.id, rec.number) for rec in blocklist_records}
+        for channel in wa_channels:
+            channel.whatsapp_channel_blocked = (channel.wa_account_id.id, formatted_numbers[channel.id]) in blocked_set
+
     # INHERITED COMPUTES
 
     def _compute_group_public_id(self):
@@ -97,25 +119,31 @@ class DiscussChannel(models.Model):
 
     def _get_notify_valid_parameters(self):
         if self.channel_type == 'whatsapp':
-            return super()._get_notify_valid_parameters() | {'whatsapp_inbound_msg_uid'}
+            return super()._get_notify_valid_parameters() | {'whatsapp_inbound_msg_uid', 'wa_interactive_id'}
         return super()._get_notify_valid_parameters()
 
-    def _notify_thread(self, message, msg_vals=False, **kwargs):
+    def _notify_thread(self, message, **kwargs):
         parent_msg_id = kwargs.pop('parent_msg_id') if 'parent_msg_id' in kwargs else False
         # WhatsApp msg must exist before notify to ensure it's included in notifications.
-        if kwargs.get('whatsapp_inbound_msg_uid') and self.channel_type == 'whatsapp':
-            self.env['whatsapp.message'].create({
-                'mail_message_id': message.id,
-                'message_type': 'inbound',
-                'mobile_number': f'+{self.whatsapp_number}',
-                'msg_uid': kwargs['whatsapp_inbound_msg_uid'],
-                'parent_id': parent_msg_id,
-                'state': 'received',
-                'wa_account_id': self.wa_account_id.id,
-            })
-            if parent_msg_id:
-                self.env['whatsapp.message'].browse(parent_msg_id).state = 'replied'
-        return super()._notify_thread(message, msg_vals=msg_vals, **kwargs)
+        if (wa_msg_uid := kwargs.get('whatsapp_inbound_msg_uid')) and self.channel_type == 'whatsapp':
+            self.env['whatsapp.message'].create(
+                self._get_inbound_whatsapp_message_values_from_mail_message(message, wa_msg_uid, parent_msg_id)
+            )
+        return super()._notify_thread(message, **kwargs)
+
+    def _get_inbound_whatsapp_message_values_from_mail_message(self, mail_message, whatsapp_message_uid, parent_msg_id=False):
+        self.ensure_one()
+        message_values = {
+            'mail_message_id': mail_message.id,
+            'message_type': 'inbound',
+            'msg_uid': whatsapp_message_uid,
+            'parent_id': parent_msg_id,
+            'state': 'received',
+            'wa_account_id': self.wa_account_id.id,
+        }
+        if self.whatsapp_number:
+            message_values['mobile_number'] = f'+{self.whatsapp_number}'
+        return message_values
 
     def message_post(self, *args, body='', attachment_ids=None, message_type='notification', parent_id=False, **kwargs):
         valid_parent_id = False
@@ -138,7 +166,7 @@ class DiscussChannel(models.Model):
             return message
 
         messages = None
-        if not kwargs.get('whatsapp_inbound_msg_uid') and attachment_ids and body:
+        if not kwargs.get('whatsapp_inbound_msg_uid') and attachment_ids and body and not tools.is_html_empty(body):
             audio_types = self.env['whatsapp.message']._SUPPORTED_ATTACHMENT_TYPE['audio']
             attachment_records = self.env['ir.attachment'].browse(attachment_ids)
             audio_attachments = attachment_records.filtered(lambda x: x.mimetype in audio_types)
@@ -161,18 +189,16 @@ class DiscussChannel(models.Model):
             )
 
         whatsapp_message_vals = []
+        wa_interactive_id = kwargs.get('wa_interactive_id')
         for new_msg in messages:
             if not new_msg.wa_message_ids:
-                whatsapp_message_vals.append({
-                    'body': new_msg.body,
-                    'mail_message_id': new_msg.id,
-                    'message_type': 'outbound',
-                    'mobile_number': f'+{self.whatsapp_number}',
-                    'wa_account_id': self.wa_account_id.id,
-                })
+                vals = self._get_outbound_whatsapp_message_values_from_mail_message(new_msg)
+                if wa_interactive_id:
+                    vals['wa_interactive_id'] = wa_interactive_id
+                whatsapp_message_vals.append(vals)
         if messages.author_id == self.whatsapp_partner_id:
             self.last_wa_mail_message_id = new_msg
-            Store(bus_channel=self).add(self, "whatsapp_channel_valid_until").bus_send()
+            Store(bus_channel=self).add(self, ["whatsapp_channel_valid_until"])
         if whatsapp_message_vals:
             self.env['whatsapp.message'].create(whatsapp_message_vals)._send_message()
 
@@ -182,18 +208,54 @@ class DiscussChannel(models.Model):
         # only return the non-audio message if there are two, as we don't expect to post two messages
         return messages[0]
 
+    def _get_outbound_whatsapp_message_values_from_mail_message(self, mail_message):
+        self.ensure_one()
+        vals = {
+            'body': mail_message.body,
+            'mail_message_id': mail_message.id,
+            'message_type': 'outbound',
+            'wa_account_id': self.wa_account_id.id,
+        }
+        if number := (self.whatsapp_number and f'+{self.whatsapp_number}') or self.whatsapp_partner_id.phone_sanitized:
+            vals['mobile_number'] = number
+        return vals
+
     # ------------------------------------------------------------
     # CONTROLLERS
     # ------------------------------------------------------------
 
-    def _get_whatsapp_channel(self, whatsapp_number, wa_account_id, sender_name=False, create_if_not_found=False, related_message=False):
-        """ Creates a whatsapp channel.
+    def _get_whatsapp_channel_domain(self, identifiers):
+        """ Search domain for the channel matching the given identifiers (extended per identifier type). """
+        if number := identifiers.get('number'):
+            return fields.Domain('whatsapp_number', '=', self._get_whatsapp_channel_format_number(number))
+        return fields.Domain.FALSE
 
-        :param str whatsapp_number: whatsapp phone number of the customer. It should
-          be formatted according to whatsapp standards, aka {country_code}{national_number}.
+    def _get_whatsapp_channel_create_values(self, identifiers, wa_account_id=None, sender_name=False):
+        default_name = (
+            sender_name or
+            (identifiers.get('number') and self.env['res.partner']._format_wa_phone(identifiers['number'])) or
+            identifiers.get('wa_id') or
+            identifiers.get('bsuid')
+        )
+        wa_partner = self.env['res.partner']._find_or_create_from_whatsapp_identifiers(identifiers, default_name, wa_account_id)
+        number = identifiers.get('number')
+        wa_number = self._get_whatsapp_channel_format_number(number) if number else False
+        recipient_name = wa_partner.name if wa_partner.name != wa_partner.phone else False
+        if wa_number:
+            name = f'{recipient_name} ({wa_number})' if recipient_name else wa_number
+        else:
+            name = recipient_name or default_name
+        create_vals = {
+            'name': name,
+            'channel_type': 'whatsapp',
+            'wa_account_id': wa_account_id.id,
+            'whatsapp_partner_id': wa_partner.id,
+        }
+        if wa_number:
+            create_vals['whatsapp_number'] = wa_number
+        return create_vals
 
-        :returns: whatsapp discussion discuss.channel
-        """
+    def _get_whatsapp_channel_format_number(self, whatsapp_number):
         # be somewhat defensive with number, as it is used in various flows afterwards
         # notably in 'message_post' for the number, and called by '_process_messages'
         base_number = whatsapp_number if whatsapp_number.startswith('+') else f'+{whatsapp_number}'
@@ -204,11 +266,30 @@ class DiscussChannel(models.Model):
             force_format="WHATSAPP",
             raise_exception=False,
         ) or wa_number
+        return wa_formatted
 
+    def _get_whatsapp_channel(self, whatsapp_number, wa_account_id, sender_name=False, create_if_not_found=False, related_message=False):
+        """ Find or create a whatsapp channel from a phone number.
+
+        Backward-compatible wrapper; prefer `_get_whatsapp_channel_from_identifiers`.
+
+        :param str whatsapp_number: whatsapp phone number of the customer. It should
+          be formatted according to whatsapp standards, aka {country_code}{national_number}.
+
+        :returns: whatsapp discussion discuss.channel
+        """
+        return self._get_whatsapp_channel_from_identifiers(
+            wa_account_id, {'number': whatsapp_number}, sender_name=sender_name,
+            create_if_not_found=create_if_not_found, related_message=related_message,
+        )
+
+    def _get_whatsapp_channel_from_identifiers(self, wa_account_id, identifiers, sender_name=False, create_if_not_found=False, related_message=False):
+        channel_domain = self._get_whatsapp_channel_domain(identifiers)
+        if not channel_domain:
+            return self.env['discuss.channel']
         related_record = False
         responsible_partners = self.env['res.partner']
-        channel_domain = [
-            ('whatsapp_number', '=', wa_formatted),
+        channel_domain = channel_domain + [
             ('wa_account_id', '=', wa_account_id.id)
         ]
         if related_message:
@@ -225,15 +306,8 @@ class DiscussChannel(models.Model):
 
         partners_to_notify = responsible_partners
         if not channel and create_if_not_found:
-            recipient_partner = self.env['res.partner']._find_or_create_from_number(wa_formatted, sender_name)
-            recipient_name = recipient_partner.name if recipient_partner.name != recipient_partner.phone else False
-            channel = self.sudo().with_context(tools.clean_context(self.env.context)).create({
-                'name': f"{recipient_name} ({wa_formatted})" if recipient_name else wa_formatted,
-                'channel_type': 'whatsapp',
-                'whatsapp_number': wa_formatted,
-                'whatsapp_partner_id': recipient_partner.id,
-                'wa_account_id': wa_account_id.id,
-            })
+            create_vals = self._get_whatsapp_channel_create_values(identifiers, wa_account_id=wa_account_id, sender_name=sender_name)
+            channel = self.sudo().with_context(tools.clean_context(self.env.context)).create(create_vals)
             partners_to_notify |= channel.whatsapp_partner_id
             if related_message:
                 # Add message in channel about the related document
@@ -264,41 +338,27 @@ class DiscussChannel(models.Model):
             if partners_to_notify == channel.whatsapp_partner_id and wa_account_id.notify_user_ids.partner_id:
                 partners_to_notify |= wa_account_id.notify_user_ids.partner_id
             channel.channel_member_ids = [Command.clear()] + [Command.create({'partner_id': partner.id}) for partner in partners_to_notify]
-            channel._broadcast(partners_to_notify.ids)
+            channel._broadcast(partners_to_notify.user_ids)
         return channel
 
     # ------------------------------------------------------------
     # OVERRIDE
     # ------------------------------------------------------------
 
-    def _action_unfollow(self, partner=None, guest=None, post_leave_message=True):
-        if partner and self.channel_type == "whatsapp" \
-                and next(
-                    (member.partner_id for member in self.channel_member_ids if not member.partner_id.partner_share),
-                    self.env["res.partner"]
-                ) == partner:
-            msg = _("You can't leave this channel. As you are the owner of this WhatsApp channel, you can only delete it.")
-            partner._bus_send_transient_message(self, msg)
-            return
-        super()._action_unfollow(partner, guest, post_leave_message)
+    def _phone_get_number_fields(self):
+        return ['whatsapp_number']
 
-    def _to_store_defaults(self, target):
-        return super()._to_store_defaults(target) + [
-            Store.Attr("whatsapp_channel_valid_until", predicate=is_whatsapp_channel),
-            Store.One("whatsapp_partner_id", [], predicate=is_whatsapp_channel),
-            # sudo: discuss.channel - reading wa_account_id is allowed for multi-company users
-            Store.One("wa_account_id", ["name"], predicate=is_whatsapp_channel, sudo=True),
-        ]
+    def _store_channel_fields(self, res: Store.FieldList):
+        super()._store_channel_fields(res)
+        res.one("group_public_id", ["full_name"], predicate=is_whatsapp_channel)
+        res.attr("whatsapp_channel_blocked", predicate=is_whatsapp_channel)
+        res.attr("whatsapp_channel_valid_until", predicate=is_whatsapp_channel)
+        res.one("whatsapp_partner_id", [], predicate=is_whatsapp_channel)
+        # sudo: discuss.channel - reading wa_account_id is allowed for multi-company users
+        res.one("wa_account_id", ["name"], predicate=is_whatsapp_channel, sudo=True)
 
     def _types_allowing_seen_infos(self):
         return super()._types_allowing_seen_infos() + ["whatsapp"]
 
-    # ------------------------------------------------------------
-    # COMMANDS
-    # ------------------------------------------------------------
-
-    def execute_command_leave(self, **kwargs):
-        if self.channel_type == 'whatsapp':
-            self.action_unfollow()
-        else:
-            super().execute_command_leave(**kwargs)
+    def _types_allowing_unfollow(self):
+        return super()._types_allowing_unfollow() + ["whatsapp"]

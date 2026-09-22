@@ -2,11 +2,12 @@ import io
 
 from odoo import api, models
 from odoo.tools import float_compare
+from odoo.tools.image import binary_to_image
 
 from base64 import b64decode
 from markupsafe import Markup
 from PIL import Image
-from typing import Literal, Optional
+from typing import Literal
 
 
 class EventRegistrationBadgePrinterReport(models.AbstractModel):
@@ -16,8 +17,8 @@ class EventRegistrationBadgePrinterReport(models.AbstractModel):
     @api.model
     def load_image(
         self,
-        image_field: str,
-        size: Optional[tuple[int, int]] = None,
+        image_field: str | bytes,
+        size: tuple[int, int] | None = None,
         crop_mode: Literal["contain", "cover"] = "contain",
         flip=False
     ):
@@ -34,9 +35,9 @@ class EventRegistrationBadgePrinterReport(models.AbstractModel):
         if not image_field:
             return None
 
-        image_data = b64decode(image_field)
-        image_buffer = io.BytesIO(image_data)
-        image = Image.open(image_buffer)
+        if isinstance(image_field, str):
+            image_field = b64decode(image_field)
+        image = binary_to_image(image_field)
 
         if flip:
             image = image.rotate(180)

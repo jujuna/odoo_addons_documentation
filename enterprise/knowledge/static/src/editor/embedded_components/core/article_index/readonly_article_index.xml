@@ -5,14 +5,12 @@
             <div class="o_embedded_articles_index_label px-2 py-1 fw-bold">Index</div>
         </div>
         <div class="o_embedded_articles_index_content">
-            <div t-if="(props.articles || []).length === 0" class="fst-italic p-1">
+            <div t-if="(this.props.articles || []).length === 0" class="fst-italic p-1">
                 No article to display
             </div>
             <ul class="m-0 p-0">
-                <t t-foreach="props.articles" t-as="article" t-key="article_index">
-                    <t t-call="knowledge.ReadonlyArticleIndexNestedList">
-                        <t t-set="article" t-value="article"/>
-                    </t>
+                <t t-foreach="this.props.articles" t-as="article" t-key="article_index">
+                    <t t-call="knowledge.ReadonlyArticleIndexNestedList" article="article"/>
                 </t>
             </ul>
         </div>
@@ -27,9 +25,7 @@
             </a>
             <ul class="m-0">
                 <t t-foreach="article.childIds" t-as="child_article" t-key="child_article_index">
-                    <t t-call="knowledge.ReadonlyArticleIndexNestedList">
-                        <t t-set="article" t-value="child_article"/>
-                    </t>
+                    <t t-call="knowledge.ReadonlyArticleIndexNestedList" article="child_article"/>
                 </t>
             </ul>
         </li>

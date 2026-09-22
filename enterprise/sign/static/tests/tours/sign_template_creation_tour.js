@@ -1,21 +1,14 @@
 import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
-import { _t } from "@web/core/l10n/translation";
 import tourUtils from "@sign/js/tours/tour_utils";
 
 export function createSelectionRectangle(viewerContainer, page, startPos = 0.25, endPos = 0.75) {
     const pageRect = page.getBoundingClientRect();
 
-    const startX = pageRect.width * startPos;
-    const startY = pageRect.height * startPos;
-    const endX = pageRect.width * endPos;
-    const endY = pageRect.height * endPos;
-    const mousemoveEvent = new MouseEvent("mousemove", {
-        bubbles: true,
-        clientX: startX,
-        clientY: startY,
-    });
-    viewerContainer.dispatchEvent(mousemoveEvent);
+    const startX = pageRect.left + pageRect.width * startPos;
+    const startY = pageRect.top + pageRect.height * startPos;
+    const endX = pageRect.left + pageRect.width * endPos;
+    const endY = pageRect.top + pageRect.height * endPos;
 
     const mousedownEvent = new MouseEvent("mousedown", {
         bubbles: true,
@@ -41,7 +34,6 @@ export function createSelectionRectangle(viewerContainer, page, startPos = 0.25,
 }
 
 registry.category("web_tour.tours").add("sign_template_creation_tour", {
-    url: "/odoo?debug=1",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
@@ -52,7 +44,6 @@ registry.category("web_tour.tours").add("sign_template_creation_tour", {
         {
             content: "Click on Template Menu",
             trigger: 'a[data-menu-xmlid="sign.sign_template_menu"]',
-            tooltipPosition: "bottom",
             run: "click",
         },
         {
@@ -89,7 +80,7 @@ registry.category("web_tour.tours").add("sign_template_creation_tour", {
         },
         {
             content: "Enter Template Edit Mode",
-            trigger: ".fa-pencil.me-2:not(:visible)",
+            trigger: "[data-icon='edit'].me-2:not(:visible)",
             run: "click",
         },
         {
@@ -99,20 +90,23 @@ registry.category("web_tour.tours").add("sign_template_creation_tour", {
         },
         {
             content: "Drop Signature Item",
-            trigger: ".o_sign_field_type_button:contains(" + _t("Signature") + ")",
-            run({ queryFirst }) {
+            trigger: ".o_sign_field_type_button:contains(Signature)",
+            async run({ queryFirst }) {
                 const to = queryFirst(`:iframe .page[data-page-number="1"]`);
-                tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.5, 0.25);
+                await tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.5, 0.25);
             },
         },
         {
+            trigger: ":iframe .page:has(.o_sign_item_display:count(1))",
+        },
+        {
             content: "Click on Add Signer",
-            trigger: ".btn.btn-link.fs-5.m-0",
+            trigger: "button[title='Add signer']",
             run: "click",
         },
         {
             content: "Open Sign Item Dropdown",
-            trigger: ".o_sign_sidebar_signer_selected .o_sign_sidebar_icon.o-dropdown",
+            trigger: ".o_sign_sidebar_signer:contains(signer 2) .o_sign_sidebar_icon.o-dropdown",
             run: "click",
         },
         {
@@ -122,50 +116,58 @@ registry.category("web_tour.tours").add("sign_template_creation_tour", {
         },
         {
             content: "Edit Name",
-            trigger: "#name_0",
-            run: "click && edit Test Signer && click body",
+            trigger: ".modal input#name_0",
+            run: "edit Test Signer",
         },
         {
             content: "Click on Save",
-            trigger: ".btn.btn-primary.o_form_button_save",
+            trigger: ".modal .btn.btn-primary.o_form_button_save",
             run: "click",
         },
         {
             content: "Drop Signature Item",
-            trigger: ".o_sign_field_type_button:contains(" + _t("Signature") + ")",
-            run({ queryFirst }) {
+            trigger: ".o_sign_field_type_button:contains(Signature)",
+            async run({ queryFirst }) {
                 const to = queryFirst(`:iframe .page[data-page-number="1"]`);
-                tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.25, 0.15);
+                await tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.25, 0.15);
             },
+        },
+        {
+            trigger: ":iframe .page:has(.o_sign_item_display:count(2))",
         },
         {
             content: "Drop Name Sign Item",
-            trigger: ".o_sign_field_type_button:contains(" + _t("Name") + ")",
-            run({ queryFirst }) {
+            trigger: ".o_sign_field_type_button:contains(Name)",
+            async run({ queryFirst }) {
                 const to = queryFirst(`:iframe .page[data-page-number="1"]`);
-                tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.25, 0.25);
+                await tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.25, 0.25);
             },
         },
         {
+            trigger: ":iframe .page:has(.o_sign_item_display:count(3))",
+        },
+        {
             content: "Drop Text Sign Item",
-            trigger: ".o_sign_field_type_button:contains(" + _t("Text") + ")",
-            run({ queryFirst }) {
+            trigger: ".o_sign_field_type_button:contains(Text)",
+            async run({ queryFirst }) {
                 const to = queryFirst(`:iframe .page[data-page-number="1"]`);
-                tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.15, 0.25);
+                await tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.15, 0.25);
             },
+        },
+        {
+            trigger: ":iframe .page:has(.o_sign_item_display:count(4))",
         },
         {
             content: "Test multi-select by creating a selection rectangle",
             trigger: ":iframe .page[data-page-number='1']",
-            run({ queryFirst }) {
+            run({ anchor, queryFirst }) {
                 const viewerContainer = queryFirst(`:iframe #viewerContainer`);
-                const page = queryFirst(`:iframe .page[data-page-number="1"]`);
-                createSelectionRectangle(viewerContainer, page, 0.25, 0.75);
+                createSelectionRectangle(viewerContainer, anchor, 0.02, 0.4);
             },
         },
         {
             content: "Verify items are selected",
-            trigger: ":iframe .o_sign_sign_item.multi_selected",
+            trigger: ":iframe .page:has(.o_sign_sign_item.multi_selected:count(3))",
         },
         {
             content: "Test copy functionality with Ctrl+C",
@@ -183,9 +185,8 @@ registry.category("web_tour.tours").add("sign_template_creation_tour", {
         {
             content: "Click elsewhere to prepare for paste",
             trigger: ":iframe .page[data-page-number='1']",
-            run({ queryFirst, click }) {
-                const page = queryFirst(`:iframe .page[data-page-number="1"]`);
-                const pageRect = page.getBoundingClientRect();
+            run({ anchor, click }) {
+                const pageRect = anchor.getBoundingClientRect();
                 click({
                     x: pageRect.left + pageRect.width * 0.8,
                     y: pageRect.top + pageRect.height * 0.8,
@@ -206,17 +207,19 @@ registry.category("web_tour.tours").add("sign_template_creation_tour", {
             },
         },
         {
+            trigger: ":iframe .page:has(.o_sign_item_display:count(7))",
+        },
+        {
             content: "Test multi-select by creating a selection rectangle",
             trigger: ":iframe .page[data-page-number='1']",
-            run({ queryFirst }) {
+            async run({ anchor, queryFirst }) {
                 const viewerContainer = queryFirst(`:iframe #viewerContainer`);
-                const page = queryFirst(`:iframe .page[data-page-number="1"]`);
-                createSelectionRectangle(viewerContainer, page, 0.25, 0.75);
+                createSelectionRectangle(viewerContainer, anchor, 0.3, 0.6);
             },
         },
         {
             content: "Verify items are selected",
-            trigger: ":iframe .o_sign_sign_item.multi_selected",
+            trigger: ":iframe .page:has(.o_sign_sign_item.multi_selected:count(4))",
         },
         // Testing if search works by searching for letter 'a'.
         {
@@ -240,7 +243,7 @@ registry.category("web_tour.tours").add("sign_template_creation_tour", {
         },
         {
             content: "Click document name edit button",
-            trigger: ".o_sign_sidebar_document_name .fa-pencil:not(:visible)",
+            trigger: ".o_sign_sidebar_document_name [data-icon='edit']:not(:visible)",
             run: "click",
         },
         {

@@ -1,17 +1,18 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
 
 export class HolderEndDialog extends Component {
     static template = "equity.HolderEndDialog";
     static components = { Dialog };
-    static props = {
-        ubo: { type: Object },
-        close: { type: Function },
-    };
+
+    props = useProps({
+        ubo: t.object(),
+        close: t.function(),
+    });
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             ubo: this.props.ubo,
             endDate: this.props.ubo["end_date"],
         });

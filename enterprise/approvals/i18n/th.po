@@ -4,27 +4,37 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-08 20:04+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/approvals/"
-"th/>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 03:19+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
+"approvals/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "%s (copy)"
-msgstr "%s (สำเนา)"
+#: model:ir.module.module,description:base.module_approvals
+msgid ""
+"\n"
+"This module manages approvals workflow\n"
+"======================================\n"
+"\n"
+"This module manages approval requests like business trips,\n"
+"out of office, overtime, borrow items, general approvals,\n"
+"procurements, contract approval, etc.\n"
+"\n"
+"According to the approval type configuration, a request\n"
+"creates next activities for the related approvers.\n"
+msgstr ""
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
@@ -32,39 +42,19 @@ msgid "'Approval - %s' % object.name"
 msgstr "'การอนุมัติ - %s' % object.name"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/07/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/08/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "1200"
-msgstr "1200"
-
-#. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-check text-success me-1\"/>Approve"
+msgid "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuse"
 msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-times text-danger me-1\"/>Refuse"
+msgid "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Approve"
 msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "<span class=\"col-2 fw-bold\">Description:</span>"
 msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
-msgstr "<span class=\"fa fa-warning\" title=\"การอนุมัติขั้นต่ำไม่ถูกต้อง\"/>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -75,6 +65,14 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
 msgid "<span class=\"mx-1\">-</span>"
 msgstr "<span class=\"mx-1\">-</span>"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
+">"
+msgstr ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"การอนุมัติขั้นต่ำไม่ถูกต้อง\"/>"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
@@ -101,6 +99,11 @@ msgstr "กิจกรรม"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "การตกแต่งข้อยกเว้นกิจกรรม"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
@@ -133,14 +136,6 @@ msgstr "ผู้ดูแลระบบ"
 #: model:ir.ui.menu,name:approvals.approvals_approval_menu_all
 msgid "All Approvals"
 msgstr "การอนุมัติทั้งหมด"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,help:approvals.field_approval_request__approval_type
-msgid ""
-"Allows you to define which documents you would like to create once the "
-"request has been approved"
-msgstr "ให้คุณกำหนดว่าเอกสารใดที่คุณต้องการสร้างเมื่อคำขอได้รับการอนุมัติ"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__amount
@@ -218,12 +213,7 @@ msgid "Approval Subject"
 msgstr "หัวข้อการอนุมัติ"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approval_type
-msgid "Approval Type"
-msgstr "ประเภทการอนุมัติ"
-
-#. module: approvals
+#: model:ir.module.module,shortdesc:base.module_approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_root
 #: model:res.groups.privilege,name:approvals.res_groups_privilege_approvals
 msgid "Approvals"
@@ -264,13 +254,6 @@ msgid "Approver"
 msgstr "ผู้อนุมัติ"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_category.py:0
-msgid ""
-"Approver Sequence can only be activated with at least 1 minimum approver."
-msgstr "ลำดับผู้อนุมัติสามารถเปิดใช้งานได้โดยมีผู้อนุมัติขั้นต่ำอย่างน้อย 1 คนเท่านั้น"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__user_ids
 msgid "Approver Users"
 msgstr "ผู้ใช้ผู้อนุมัติ"
@@ -287,12 +270,6 @@ msgstr "ผู้อนุมัติ"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Approvers"
 msgstr "ผู้อนุมัติ"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approver_sequence
-msgid "Approvers Sequence?"
-msgstr "ลำดับผู้อนุมัติ?"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -344,8 +321,8 @@ msgstr "แนบ"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
-msgid "Automated Sequence?"
-msgstr "ลำดับอัตโนมัติ?"
+msgid "Automated Sequence"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -412,11 +389,6 @@ msgid "Category Approver"
 msgstr "ผู้อนุมัติหมวดหมู่"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
-msgid "Code"
-msgstr "โค้ด"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category_approver__company_id
@@ -427,13 +399,9 @@ msgstr "บริษัท"
 
 #. module: approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_config
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 msgid "Configuration"
 msgstr "การกำหนดค่า"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
-msgid "Confirm Date"
-msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__partner_id
@@ -452,9 +420,9 @@ msgid "Contract Approval"
 msgstr "การอนุมัติสัญญา"
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid "Create a new product variant"
-msgstr "สร้างตัวเลือกสินค้าใหม่"
+#: model:ir.module.module,summary:base.module_approvals
+msgid "Create and validate approvals requests"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid
@@ -579,11 +547,6 @@ msgid "Existing User"
 msgstr "ผู้ใช้ที่มีอยู่"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "Fields"
-msgstr "ฟิลด์"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
 msgid "Followers"
 msgstr "ผู้ติดตาม"
@@ -594,19 +557,9 @@ msgid "Followers (Partners)"
 msgstr "ผู้ติดตาม (พาร์ทเนอร์)"
 
 #. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "ไอคอนแบบฟอนต์ที่ยอดเยี่ยมเช่น fa-tasks"
-
-#. module: approvals
 #: model:ir.actions.server,name:approvals.model_approval_request_approve_admin
 msgid "Force Approval"
 msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "From:"
-msgstr "จาก:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
@@ -687,18 +640,10 @@ msgstr "มีการอ้างอิง"
 msgid ""
 "How the employee's manager interacts with this type of approval.\n"
 "\n"
-"        Empty: do nothing\n"
-"        Is Approver: the employee's manager will be in the approver list\n"
-"        Is Required Approver: the employee's manager will be required to "
-"approve the request.\n"
+"        if checked the employee's manager is a required approver of the "
+"request, along with the selected users\n"
 "    "
 msgstr ""
-"วิธีที่ผู้จัดการของพนักงานโต้ตอบกับการอนุมัติประเภทนี้\n"
-"\n"
-"       ว่างเปล่า: ไม่ทำอะไรเลย\n"
-"        เป็นผู้อนุมัติ: ผู้จัดการของพนักงานจะอยู่ในรายชื่อผู้อนุมัติ\n"
-"       เป็นผู้อนุมัติที่จำเป็น: ผู้จัดการของพนักงานจะต้องอนุมัติคำร้องขอ\n"
-"    "
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__id
@@ -737,20 +682,9 @@ msgstr "ถ้าเลือก ข้อความบางข้อคว�
 #: model:ir.model.fields,help:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,help:approvals.field_approval_request__automated_sequence
 msgid ""
-"If checked, the Approval Requests will have an automated generated name "
-"based on the given code."
-msgstr "หากเลือก คำขออนุมัติจะมีชื่อที่สร้างขึ้นโดยอัตโนมัติตามโค้ดที่ระบุ"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
-msgid ""
-"If checked, the approvers have to approve in sequence (one after the other). "
-"If Employee's Manager is selected as approver, they will be the first in "
-"line."
+"If enabled, the approval request subject will be generated automatically "
+"using the given prefix code."
 msgstr ""
-"หากทำเครื่องหมาย ผู้อนุมัติจะต้องอนุมัติตามลำดับ (ทีละรายการ) "
-"หากผู้จัดการของพนักงานถูกเลือกเป็นผู้อนุมัติ พวกเขาจะเป็นคนแรกที่อยู่ในรายการ"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -769,19 +703,9 @@ msgid "Invalid Minimum Warning"
 msgstr "คำเตือนขั้นต่ำไม่ถูกต้อง"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__approver
-msgid "Is Approver"
-msgstr "เป็นผู้อนุมัติ"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_is_follower
 msgid "Is Follower"
 msgstr "เป็นผู้ติดตาม"
-
-#. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__required
-msgid "Is Required Approver"
-msgstr "จำเป็นต้องมีผู้อนุมัติ"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_job_referral_award
@@ -854,6 +778,11 @@ msgid "Marc Demo"
 msgstr "Marc Demo"
 
 #. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
 msgid "Message Delivery error"
 msgstr "เกิดข้อผิดพลาดในการส่งข้อความ"
@@ -868,6 +797,12 @@ msgstr "ข้อความ"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__approval_minimum
 msgid "Minimum Approval"
 msgstr "การอนุมัติขั้นต่ำ"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Minimum Approval must be at least 1."
+msgstr ""
 
 #. module: approvals
 #. odoo-python
@@ -946,6 +881,11 @@ msgstr "สรุปกิจกรรมถัดไป"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_type_id
 msgid "Next Activity Type"
 msgstr "ประเภทกิจกรรมถัดไป"
+
+#. module: approvals
+#: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
+msgid "No"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
@@ -1062,9 +1002,9 @@ msgid "Period:"
 msgstr "ช่วง:"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "Print"
-msgstr "พิมพ์"
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
+msgid "Prefix Code"
+msgstr ""
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_procurement
@@ -1086,12 +1026,6 @@ msgstr "รายละเอียดสินค้า"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__product_line_ids
 msgid "Product Line"
 msgstr "รายการสินค้า"
-
-#. module: approvals
-#: model:ir.actions.act_window,name:approvals.product_product_action
-#: model:ir.ui.menu,name:approvals.approvals_menu_product_variant
-msgid "Product Variants"
-msgstr "ตัวเลือกย่อยสินค้า"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.product_template_action
@@ -1215,9 +1149,7 @@ msgid "SMS Delivery error"
 msgstr "ข้อผิดพลาดในการส่ง SMS"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_approver__sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_category_approver__sequence
 msgid "Sequence"
 msgstr "ลำดับ"
 
@@ -1275,6 +1207,12 @@ msgstr "ส่ง"
 #: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__pending
 msgid "Submitted"
 msgstr "ส่งแล้ว"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Submitted Date"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1421,22 +1359,6 @@ msgid "Users"
 msgstr "ผู้ใช้"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__waiting
-#: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__waiting
-msgid "Waiting"
-msgstr "รอ"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_request__website_message_ids
-msgid "Website Messages"
-msgstr "ข้อความเว็บไซต์"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__website_message_ids
-msgid "Website communication history"
-msgstr "ประวัติการสื่อสารเว็บไซต์"
-
-#. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "Withdraw"
 msgstr "ถอน"
@@ -1452,12 +1374,6 @@ msgstr ""
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You can't delete an approved request. Archive it instead."
 msgstr ""
-
-#. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "You cannot approve before the previous approver."
-msgstr "คุณไม่สามารถอนุมัติก่อนผู้อนุมัติคนก่อนหน้าได้"
 
 #. module: approvals
 #. odoo-python
@@ -1500,15 +1416,6 @@ msgid "You must cancel and then back to draft the approval first."
 msgstr ""
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid ""
-"You must define a product for everything you sell or purchase,\n"
-"            whether it's a storable product, a consumable or a service."
-msgstr ""
-"คุณต้องกำหนดสินค้าสำหรับทุกสิ่งที่คุณขายหรือซื้อ\n"
-"           ไม่ว่าจะเป็นสินค้าที่เก็บไว้ได้ วัสดุสิ้นเปลือง หรือบริการ"
-
-#. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Your minimum approval exceeds the total of default approvers."
@@ -1536,7 +1443,12 @@ msgstr "เมนู"
 msgid "new request"
 msgstr "คำร้องขอใหม่"
 
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "to:"
-msgstr "ถึง:"
+#~ msgid ""
+#~ "Approver Sequence can only be activated with at least 1 minimum approver."
+#~ msgstr "ลำดับผู้อนุมัติสามารถเปิดใช้งานได้โดยมีผู้อนุมัติขั้นต่ำอย่างน้อย 1 คนเท่านั้น"
+
+#~ msgid "Waiting"
+#~ msgstr "รอ"
+
+#~ msgid "You cannot approve before the previous approver."
+#~ msgstr "คุณไม่สามารถอนุมัติก่อนผู้อนุมัติคนก่อนหน้าได้"

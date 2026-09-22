@@ -1,4 +1,3 @@
-import base64
 from dateutil.relativedelta import relativedelta
 import json
 import uuid
@@ -29,7 +28,7 @@ class ResPartner(models.Model):
     equity_formation_date = fields.Date(string="Formation Date")
 
     # Ultimate Beneficial Owner
-    ubo_birth_date = fields.Date(string="Birth Date")
+    birth_date = fields.Date()
     ubo_birth_place = fields.Char(string="Birth Place")
     ubo_national_identifier = fields.Char(string="UBO ID Number")
     ubo_pep = fields.Boolean(string="PEP", help="Politically Exposed Person")
@@ -57,8 +56,9 @@ class ResPartner(models.Model):
             partner.equity_shareholders_count = partners_holders.get(partner, 0)
 
     def _compute_equity_last_valuation(self):
+        today = fields.Date.context_today(self)
         for partner in self:
-            last_valuation_id = self.env['equity.valuation'].search([('partner_id', '=', partner.id), ('date', '<=', fields.Date.today())], order='date DESC', limit=1)
+            last_valuation_id = self.env['equity.valuation'].search([('partner_id', '=', partner.id), ('date', '<=', today)], order='date DESC', limit=1)
             partner.equity_last_valuation = format_decimalized_amount(0 if not last_valuation_id else last_valuation_id.valuation, partner.equity_currency_id)
 
     def _compute_equity_kanban_dashboard_graph(self):
@@ -160,12 +160,12 @@ class ResPartner(models.Model):
         pdf_content, _ = sudo_self.env['ir.actions.report']._render_qweb_pdf(
             'equity.equity_ubo_report',
             res_ids=[self.id],
-            data={'rep_name': rep_name, 'rep_position': rep_position, 'rep_sig_date': fields.Date.today()},
+            data={'rep_name': rep_name, 'rep_position': rep_position, 'rep_sig_date': fields.Date.context_today(self)},
         )
         attachment = sudo_self.env['ir.attachment'].create({
             'name': 'UBO_report.pdf',
             'type': 'binary',
-            'datas': base64.b64encode(pdf_content),
+            'raw': pdf_content,
             'res_model': 'res.partner',
             'res_id': self.id,
             'mimetype': 'application/pdf',
@@ -177,7 +177,7 @@ class ResPartner(models.Model):
         ubo_activities = self.sudo().activity_search(['equity.equity_ubo_form_mail_activity'])
         return bool(ubo_activities)
 
-    def _message_mail_after_hook(self, mails):
+    def _message_post_after_hook(self, message):
         if self.env.context.get('create_ubo_to_do_activity'):
             ubo_activity_xml_id = 'equity.equity_ubo_form_mail_activity'
             date_deadline = fields.Date.context_today(self) + relativedelta(days=7)
@@ -191,34 +191,40 @@ class ResPartner(models.Model):
                 date_deadline=date_deadline,
                 user_id=self.env.user.id,
             )
-        return super()._message_mail_after_hook(mails)
+        return super()._message_post_after_hook(message)
 
     def _get_ubo_report_filename(self):
         self.ensure_one()
         return "%s_ubo.pdf" % self.display_name.replace(' ', '_')
 
     def action_partner_equity_send(self, linked_transaction=None):
-        self.ensure_one()
         linked_transaction = linked_transaction or self.env['equity.transaction'].search([
             ('date', '<=', fields.Date.context_today(self)),
             '|', ('subscriber_id', '=', self.id), ('seller_id', '=', self.id),
         ], order='date DESC', limit=1)
-        return {
-            'type': 'ir.actions.act_window',
-            'name': self.env._("Invite %s", self.name),
-            'res_model': 'mail.compose.message',
-            'view_mode': 'form',
-            'views': [(False, 'form')],
-            'view_id': self.env.ref('equity.equity_email_compose_message_wizard_form').id,
-            'target': 'new',
-            'context': {
-                'default_model': 'equity.transaction',
-                'default_res_ids': linked_transaction.ids,
-                'default_partner_ids': self.ids,
-                'default_template_id': self.env.ref('equity.equity_shareholder_email_template').id,
-                'default_composition_mode': 'comment',
-                'hide_recipients': True,
-                'holder_name': self.name,
-                'equity_access_token': self.sudo()._equity_ensure_token(),
-            },
-        }
+        return self.env['equity.mail.compose.message'].create({
+            'partner_ids': self.ids,
+            'template_id': self.env.ref('equity.equity_shareholder_email_template').id,
+            'model': 'equity.transaction',
+            'res_ids': linked_transaction.ids,
+            'equity_button_text': self.env._("View Equity"),
+            'equity_button_url': '/my/equity',
+        })._get_records_action(
+            name=self.env._("Equity Invitation"),
+            target='new',
+        )
+
+    def action_partner_ubo_send(self):
+        return self.env['equity.mail.compose.message'].create({
+            'partner_ids': self.ids,
+            'template_id': self.env.ref('equity.equity_ubo_form_email_template').id,
+            'model': 'res.partner',
+            'res_ids': self.ids,
+            'equity_button_text': self.env._("Fill UBO"),
+            'equity_button_url': '/my/ubo',
+        }).with_context(
+            create_ubo_to_do_activity=True,
+        )._get_records_action(
+            name=self.env._("UBO Form Request"),
+            target='new',
+        )

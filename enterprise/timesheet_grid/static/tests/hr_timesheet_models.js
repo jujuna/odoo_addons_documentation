@@ -1,4 +1,4 @@
-import { fields, models, onRpc } from "@web/../tests/web_test_helpers";
+import { fields, getKwArgs, models, onRpc } from "@web/../tests/web_test_helpers";
 
 import { projectModels } from "@project/../tests/project_models";
 import {
@@ -18,6 +18,12 @@ export class ProjectProject extends projectModels.ProjectProject {
 
 export class ProjectTask extends projectModels.ProjectTask {
     allow_timesheets = fields.Boolean();
+
+    get_additional_groups(domain, specification, limit) {
+        const kwargs = getKwArgs(arguments, "domain", "specification", "limit");
+        ({ domain, specification, limit } = kwargs);
+        return this.web_search_read(domain, specification, { limit });
+    }
 
     _records = [
         { id: 1, name: "BS task", project_id: 1 },
@@ -40,13 +46,20 @@ export class HREmployeePublic extends models.Model {
 }
 
 export class HRTimesheet extends hrTimesheetModels.HRTimesheet {
-    timer_start = fields.Datetime();
-    timer_pause = fields.Datetime();
-    is_timer_running = fields.Boolean({ compute: "_compute_is_timer_running" });
+    user_id = fields.Many2one({ relation: "res.users" });
     company_id = fields.Many2one({ relation: "res.company" });
     employee_id = fields.Many2one({ relation: "hr.employee.public" });
-    date = fields.Date({ default: "2017-01-31" });
-    display_timer = fields.Boolean();
+    date = fields.Date({ default: "2019-03-11" });
+    task_id = fields.Many2one({
+        relation: "project.task",
+        onChange(record) {
+            const task =
+                record.task_id && this.env["project.task"].find((t) => t.id === record.task_id);
+            if (task?.project_id) {
+                record.project_id = task.project_id;
+            }
+        },
+    });
     selection_field = fields.Selection({
         selection: [
             ["abc", "ABC"],
@@ -54,34 +67,6 @@ export class HRTimesheet extends hrTimesheetModels.HRTimesheet {
             ["ghi", "GHI"],
         ],
     });
-
-    _compute_is_timer_running() {
-        for (const record of this) {
-            record.is_timer_running = record.timer_start && !record.timer_pause;
-        }
-    }
-
-    action_start_new_timesheet_timer(vals = {}) {
-        if (!vals.project_id) {
-            vals.project_id = this.env["project.project"].search([], null, 1)[0];
-        }
-        const timesheetId = this.create(vals);
-
-        // Creating a timer to run usally done "timer.mixin"
-        const timer = this.env["timer.timer"].create({
-            timer_start: false,
-            timer_pause: false,
-            is_timer_running: false,
-            res_model: this._name,
-            res_id: timesheetId,
-            user_id: this.env.user.id,
-        });
-        const Timer = this.env["timer.timer"];
-        Timer.action_timer_start(timer);
-        const timerData = Timer.read(timer, ["timer_start"])[0];
-        this.write(timesheetId, { timer_start: timerData.timer_start }); // should be computed instead
-        return this.read(timesheetId, this._get_timesheet_timer_field_names())[0];
-    }
 
     grid_unavailability(dateStart, dateEnd) {
         const { res_ids: employeeIds } = arguments[2];
@@ -92,65 +77,84 @@ export class HRTimesheet extends hrTimesheetModels.HRTimesheet {
         return unavailabilityDates;
     }
 
-    action_add_time_to_timer() {
-        return false;
-    }
-
-    action_timer_start() {
-        this.action_start_new_timesheet_timer();
-        return false;
-    }
-
-    action_timer_unlink(timesheetId) {
-        const timerId = this.env["timer.timer"].search([
-            ["res_model", "=", this._name],
-            ["res_id", "=", timesheetId],
-        ])[0];
-        if (timerId) {
-            this.env["timer.timer"].unlink(timerId);
-        }
-        const timesheetData = this.read(timesheetId)[0];
-        if (!timesheetData.unit_amount) {
-            this.unlink(timesheetId);
-        }
-    }
-
-    action_timer_stop(timesheetId) {
-        const timerId = this.env["timer.timer"].search([
-            ["res_model", "=", this._name],
-            ["res_id", "=", timesheetId],
-        ])[0];
-        if (timerId) {
-            let duration = this.env["timer.timer"].action_timer_stop(timerId);
-            if (duration < 0.25) {
-                duration = 0.25;
-            }
-            this.write(timesheetId, { unit_amount: duration, timer_start: false });
-            this.env["timer.timer"].unlink(timerId);
-            return duration;
-        }
-        return 0;
-    }
-
-    get_running_timer() {
-        const result = { step_timer: 30 };
-        const timesheetId = this.env["timer.timer"].search_read(
-            [
-                ["res_model", "=", this._name],
-                ["user_id", "=", this.env.user.id],
+    get_assistant_data() {
+        return {
+            rounding_values: {
+                minimum: 15,
+                rounding: 15,
+            },
+            odoo_models_data: [
+                {
+                    model: "project.task",
+                    label: "Working on Task in Project App",
+                    url_regex: `${window.location.origin}/odoo/(?:[^/?#]+/)*(?:to\\-do|tasks|project_sharing|my\\-tasks|all\\-tasks|project\\.task)/(\\d+)(?:\\?|$)`,
+                },
+                {
+                    model: "project.project",
+                    label: "Working on Project in Project App",
+                    url_regex: `${window.location.origin}/odoo/(?:[^/?#]+/)*(?:project\\-configuration|project|project\\.project)/(\\d+)(?:\\?|$)`,
+                },
             ],
-            ["res_id"]
-        )[0];
-        if (timesheetId) {
-            Object.assign(result, {
-                ...this.read(timesheetId, this._get_timesheet_timer_field_names()),
-            });
-        }
-        return result;
+        };
     }
 
-    _get_timesheet_timer_field_names() {
-        return ["date", "name", "project_id", "task_id", "unit_amount", "timer_start"];
+    get_assistant_events(date) {
+        return [];
+    }
+
+    get_aw_app_from_urls(urls) {
+        return {};
+    }
+
+    resolve_gmail_partners(emails) {
+        return {};
+    }
+
+    resolve_assistant_models_targets(ids_per_model) {
+        return {};
+    }
+
+    _get_aw_timesheet_fields_specification() {
+        return {
+            id: {},
+            name: {},
+            date: {},
+            user_id: {
+                fields: {
+                    display_name: {},
+                },
+            },
+            project_id: {
+                fields: {
+                    display_name: {},
+                },
+            },
+            task_id: {
+                fields: {
+                    display_name: {},
+                },
+            },
+            unit_amount: {},
+            company_id: {
+                fields: {
+                    display_name: {},
+                },
+            },
+        };
+    }
+
+    get_aw_timesheet_data(date) {
+        const specification = this._get_aw_timesheet_fields_specification();
+        const domain = [
+            ["date", "=", date],
+            ["user_id", "=", this.env.user.id],
+        ];
+        const timesheets = this.web_search_read(domain, specification);
+        return {
+            working_hours: 7.6,
+            specification: specification,
+            timesheets: timesheets,
+        };
     }
 
     _records = [
@@ -161,7 +165,6 @@ export class HRTimesheet extends hrTimesheetModels.HRTimesheet {
             employee_id: 2,
             date: "2017-01-24",
             unit_amount: 2.5,
-            display_timer: true,
         },
         {
             name: "bop",
@@ -223,35 +226,6 @@ export class HRTimesheet extends hrTimesheetModels.HRTimesheet {
                 </group>
             </form>
         `,
-        list: `
-            <list js_class="timesheet_timer_list" sample="1">
-                <field name="timer_start" column_invisible="1"/>
-                <field name="name" />
-                <field name="date" />
-                <field name="project_id" />
-                <field name="task_id" />
-                <field name="selection_field" />
-                <field name="unit_amount" />
-                <field name="is_timer_running" />
-            </list>
-        `,
-        kanban: `
-            <kanban js_class="timesheet_timer_kanban">
-                <templates>
-                    <field name="name"/>
-                    <field name="timer_start"/>
-                    <field name="unit_amount"/>
-                    <t t-name="card">
-                        <div>
-                            <field name="employee_id"/>
-                            <field name="project_id"/>
-                            <field name="task_id"/>
-                            <field name="date"/>
-                            <field name="display_timer"/>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>`,
         grid: `
             <grid js_class="timesheet_grid" barchart_total="1" create_inline="1">
                 <field name="employee_id" type="row" widget="timesheet_many2one_avatar_employee"/>
@@ -291,10 +265,100 @@ export class HRTimesheet extends hrTimesheetModels.HRTimesheet {
     };
 }
 
+export class AwRule extends models.Model {
+    _name = "aw.rule";
+
+    name = fields.Char();
+    regex = fields.Char();
+    type = fields.Selection({
+        selection: [
+            ["call", "Call"],
+            ["messaging", "Messaging"],
+            ["meeting", "Meeting"],
+            ["document", "Document"],
+            ["spreadsheet", "Spreadsheet"],
+            ["presentation", "Presentation"],
+            ["development", "Development"],
+            ["odoo", "Odoo"],
+            ["planning", "Planning"],
+            ["other", "Other"],
+        ],
+        required: true,
+    });
+    applies_to = fields.Selection({
+        selection: [
+            ["everyone", "Everyone"],
+            ["departments", "Departments"],
+            ["private", "Private"],
+        ],
+        default: "everyone",
+    });
+    threshold = fields.Float({ default: 1 });
+    template = fields.Char();
+    description = fields.Char();
+    sequence = fields.Integer({ default: 10 });
+    project_id = fields.Many2one({ relation: "project.project" });
+    task_id = fields.Many2one({ relation: "project.task" });
+    always_active = fields.Boolean();
+    side_activity = fields.Boolean();
+
+    get_applicable_rules(fields) {
+        return this.search_read([], fields);
+    }
+
+    _records = [
+        {
+            id: 1,
+            name: "Dev Activity",
+            type: "development",
+            regex: "https://test.com/(.)",
+            template: "Activity $1",
+            project_id: 1,
+            threshold: 5,
+            side_activity: false,
+        },
+        {
+            id: 2,
+            name: "Meeting Activity",
+            type: "meeting",
+            regex: "Activity B",
+            template: "Activity B",
+            project_id: 2,
+            side_activity: true,
+            sequence: 2,
+        },
+        {
+            id: 3,
+            name: "Github",
+            sequence: 10,
+            regex: String.raw`\[(FIX|REF|ADD|REM|REV|MOV|REL|IMP|MERGE|CLA|I18N|PERF|CLN|LINT)]\s?(?:\[(?<task_id>\d+)]\s?)(.*?) (?:by .*?) · Pull Request #\d+ · (.*)\|https:\/\/github\.com`,
+            type: "code",
+            template: "Working on $4",
+            description: "[$1] $3",
+            project_id: false,
+            task_id: false,
+            always_active: false,
+        },
+        {
+            id: 4,
+            name: "Github",
+            sequence: 10,
+            regex: String.raw`(?:\[(?<task_id>\d+)]\s?)?(?:\[(FIX|REF|ADD|REM|REV|MOV|REL|IMP|MERGE|CLA|I18N|PERF|CLN|LINT)]\s?)?(.*?) (?:by .*?) · Pull Request #\d+ · (.*)\|https:\/\/github\.com`,
+            type: "code",
+            template: "Working on $4",
+            description: "[$2] $3",
+            project_id: false,
+            task_id: false,
+            always_active: false,
+        },
+    ];
+}
+
 projectModels.ProjectProject = ProjectProject;
 projectModels.ProjectTask = ProjectTask;
 hrTimesheetModels.HRTimesheet = HRTimesheet;
 hrTimesheetModels.HREmployeePublic = HREmployeePublic;
+hrTimesheetModels.AwRule = AwRule;
 hrTimesheetModels.TimerTimer = timerModels.TimerTimer;
 
 export function defineTimesheetModels() {
@@ -312,14 +376,6 @@ export function defineTimesheetModels() {
                 };
             }
             return result;
-        } else if (method === "get_timesheet_ranking_data") {
-            return {
-                leaderboard: [],
-                employee_id: false,
-                billing_rate_target: false,
-                total_time_target: false,
-                show_leaderboard: true,
-            };
         } else if (method === "get_daily_working_hours") {
             return {
                 1: {

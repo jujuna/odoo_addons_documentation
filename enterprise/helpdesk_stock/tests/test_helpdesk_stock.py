@@ -43,26 +43,22 @@ class TestHelpdeskStock(common.HelpdeskCommon):
             'sale_order_id': so.id,
         })
 
-        stock_picking_form = Form(self.env['stock.return.picking'].with_context({
+        stock_picking_form = Form(self.env['stock.return.picking.helpdesk'].with_context({
             'active_model': 'helpdesk.ticket',
             'default_ticket_id': ticket.id
         }))
         stock_picking_form.picking_id = so.picking_ids[0]
-        with stock_picking_form.product_return_moves.edit(0) as line:
-            line.quantity = 1
-        return_picking = stock_picking_form.save()
+        retuen_wizard = stock_picking_form.save()
+        return_action = retuen_wizard.action_return_picking()
+        return_picking = self.env['stock.picking'].browse(return_action['res_id'])
+        return_picking.move_ids[0].product_uom_qty = 1
+        return_picking.action_confirm()
+        return_picking.action_assign()
 
-        self.assertEqual(len(return_picking.product_return_moves), 1,
+        self.assertEqual(len(return_picking.move_ids), 1,
             "A picking line should be present")
-        self.assertEqual(return_picking.product_return_moves[0].product_id, product,
+        self.assertEqual(return_picking.move_ids[0].product_id, product,
             "The product of the picking line does not match the product of the sale order")
-
-        return_picking.action_create_returns()
-
-        return_picking = self.env['stock.picking'].search([
-            ('partner_id', '=', self.partner.id),
-            ('picking_type_code', '=', 'incoming'),
-        ])
 
         self.assertEqual(len(return_picking), 1, "No return created")
         self.assertEqual(return_picking.state, 'assigned', "Wrong status of the refund")
@@ -71,7 +67,6 @@ class TestHelpdeskStock(common.HelpdeskCommon):
         self.assertEqual(return_picking.id, ticket.picking_ids[0].id,
             "The correct return should be referenced in the ticket")
 
-        return_picking.move_ids[0].quantity = 1
         return_picking.button_validate()
         # Trigger _compute_state
         return_picking.state
@@ -124,7 +119,7 @@ class TestHelpdeskStock(common.HelpdeskCommon):
         })
         try:
             # create a return picking on ticket
-            Form(self.env['stock.return.picking'].with_context({
+            Form(self.env['stock.return.picking.helpdesk'].with_context({
                 'active_model': 'helpdesk.ticket',
                 'default_ticket_id': ticket.id
             }))
@@ -144,7 +139,6 @@ class TestHelpdeskStock(common.HelpdeskCommon):
         })
         commercial_partner = self.env['res.partner'].create({
             'name': 'Commercial Customer',
-            'is_company': True,
         })
         # Create a child partner
         partner = self.env['res.partner'].create({
@@ -180,41 +174,13 @@ class TestHelpdeskStock(common.HelpdeskCommon):
         self.assertTrue(ticket.has_partner_picking,
                         "The ticket should have a related delivery order for the commercial partner")
 
-    def test_helpdesk_ticket_product_from_parent_company(self):
-        company_product, employee_1_product, employee_2_product = self.env['product.product'].create([
-            {'name': 'Company Product'},
-            {'name': 'Employee 1 Product'},
-            {'name': 'Employee 2 Product'},
-        ])
-        partners = self.env['res.partner'].create([
-            {'name': 'Company', 'company_type': 'company'},
-            {'name': 'Employee 1', 'company_type': 'person'},
-            {'name': 'Employee 1', 'company_type': 'person'},
-        ])
-        company, employee_1, employee_2 = partners
-        (employee_1 | employee_2).commercial_partner_id = company
-
-        sale_orders = self.env['sale.order'].create([
-            {'partner_id': company.id, 'order_line': [Command.create({'product_id': company_product.id})]},
-            {'partner_id': employee_1.id, 'order_line': [Command.create({'product_id': employee_1_product.id})]},
-            {'partner_id': employee_2.id, 'order_line': [Command.create({'product_id': employee_2_product.id})]},
-        ])
-        sale_orders.action_confirm()
-
-        products = (company_product | employee_1_product | employee_2_product)
-        ticket = self.env['helpdesk.ticket'].create({'name': 'Ticket'})
-
-        for partner in partners:
-            ticket.partner_id = partner
-            self.assertEqual(ticket.suitable_product_ids, products, 'Products from all children of the parent company should be visible')
-
     def test_ensure_has_partner_picking(self):
         """
         It is possible to return some products from a ticket. To do so, the user
         clicks on the Return button. That button will only be displayed in a
         condition strongly based on the field `has_partner_picking` (tldr: the
-        client must have an outgoing done picking). This test ensures the field
-        value is correct in several cases.
+        client must have an outgoing done picking OR a confirmed sale order line).
+        This test ensures the field value is correct in several cases.
         """
         product, service = self.env['product.product'].create([
             {'name': 'Amazing Product', 'type': 'consu'},
@@ -256,11 +222,14 @@ class TestHelpdeskStock(common.HelpdeskCommon):
             'partner_id': partner.id,
         } for partner in partners])
 
-        done_so_ticket = tickets.filtered(lambda t: t.partner_id == done_so.partner_id)
-        other_tickets = tickets - done_so_ticket
+        ticket_by_partner = {t.partner_id.id: t for t in tickets}
 
-        self.assertTrue(done_so_ticket.has_partner_picking)
-        self.assertEqual(other_tickets.mapped('has_partner_picking'), [False] * 5)
+        self.assertFalse(ticket_by_partner[partners[0].id].has_partner_picking, "Partner with 'No SO' should not have return picking.")
+        self.assertTrue(ticket_by_partner[partners[1].id].has_partner_picking, "Partner with 'SO with service' should have return picking.")
+        self.assertFalse(ticket_by_partner[partners[2].id].has_partner_picking, "Partner with 'Draft SO' should not have return picking.")
+        self.assertTrue(ticket_by_partner[partners[3].id].has_partner_picking, "Partner with 'Confirmed SO' should have return picking.")
+        self.assertFalse(ticket_by_partner[partners[4].id].has_partner_picking, "Partner with 'Cancelled SO' should not have return picking.")
+        self.assertTrue(ticket_by_partner[partners[5].id].has_partner_picking, "Partner with 'Done SO' should have return picking.")
 
     def test_set_picking_to_false_in_wizard(self):
         """ This test ensure that when the picking field of the wizard is set to False, no traceback is triggered during
@@ -294,7 +263,7 @@ class TestHelpdeskStock(common.HelpdeskCommon):
             'sale_order_id': so.id
         })
 
-        wizard_form = Form(self.env['stock.return.picking'].with_context({
+        wizard_form = Form(self.env['stock.return.picking.helpdesk'].with_context({
             'active_model': 'helpdesk.ticket',
             'default_ticket_id': ticket.id
         }))
@@ -318,27 +287,26 @@ class TestHelpdeskStock(common.HelpdeskCommon):
             'team_id': self.test_team.id,
         })
 
-        wizard = self.env['stock.return.picking'].create({
-            'ticket_id': ticket.id,
-            'partner_id': partner.id
-        })
+        wizard_form = Form(self.env['stock.return.picking.helpdesk'].with_context({
+            'active_model': 'helpdesk.ticket',
+            'default_ticket_id': ticket.id,
+            'default_partner_id': partner.id,
+        }))
 
-        line = self.env['stock.return.picking.line'].create({
+        return_wizard = wizard_form.save()
+        return_action = return_wizard.action_return_picking()
+        res_picking = self.env['stock.picking'].browse(return_action['res_id'])
+        self.env['stock.move'].create({
             'product_id': product.id,
-            'move_quantity': 5,
-            'quantity': 5,
+            'product_uom_qty': 5,
             'uom_id': product.uom_id.id,
-            'wizard_id': wizard.id,
+            'picking_id': res_picking.id,
         })
-
-        res = wizard.action_create_returns()
-        self.assertTrue(res)
-        self.assertEqual(line.ids, wizard.product_return_moves.ids, 'the line ids should match the wizard product return moves')
-
-        res_picking = self.env['stock.picking'].search([('id', '=', res.get('res_id'))])
+        res_picking.action_confirm()
+        res_picking.action_assign()
         self.assertEqual(res_picking.product_id.id, product.id, 'the product id should match the product selected in the wizard')
         self.assertEqual(res_picking.picking_type_code, 'incoming', 'the picking type code should be incoming in the return')
-        self.assertEqual(res_picking.return_id.id, wizard.picking_id.id, 'the return id should match the wizard picking id')
+        self.assertEqual(res_picking.return_id.id, return_wizard.picking_id.id, 'the return id should match the wizard picking id')
 
     def test_return_picking_default_multistep_delivery(self):
         """
@@ -384,7 +352,7 @@ class TestHelpdeskStock(common.HelpdeskCommon):
                     'team_id': self.test_team.id,
                     'sale_order_id': so.id,
                 })
-                return_wizard_form = Form(self.env['stock.return.picking'].with_context({
+                return_wizard_form = Form(self.env['stock.return.picking.helpdesk'].with_context({
                     'active_model': 'helpdesk.ticket',
                     'default_ticket_id': ticket.id,
                 }))

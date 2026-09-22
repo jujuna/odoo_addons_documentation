@@ -1,8 +1,8 @@
+import { Component, onMounted, onPatched, useProps, proxy, signal, t, xml } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
 import { formView } from "@web/views/form/form_view";
-import { studioIsVisible } from "@web_studio/client_action/view_editor/editors/utils";
 import { StudioHook } from "@web_studio/client_action/view_editor/editors/components/studio_hook_component";
-
-import { Component, useEffect, useRef, useState } from "@odoo/owl";
+import { studioIsVisible } from "@web_studio/client_action/view_editor/editors/utils";
 
 const components = formView.Renderer.components;
 
@@ -15,19 +15,25 @@ const components = formView.Renderer.components;
 // An utility function that extends the common API parts of groups
 function extendGroup(GroupClass) {
     class Group extends GroupClass {
-        static props = [...GroupClass.props, "studioXpath?", "studioIsVisible?"];
+        // The props schema is inherited from GroupClass; the extra optional
+        // props (studioXpath, studioIsVisible) are allowed by the loose owl3
+        // validation.
         static components = { ...GroupClass.components, StudioHook };
+        studioProps = useProps({
+            studioXpath: t.string().optional(),
+            studioIsVisible: t.boolean().optional(true),
+        });
+        rootRef = signal.ref();
         setup() {
             super.setup();
-            this.viewEditorModel = useState(this.env.viewEditorModel);
-            this.rootRef = useRef("rootRef");
+            this.viewEditorModel = proxy(this.env.viewEditorModel);
         }
         get allClasses() {
             let classes = super.allClasses;
-            if (!studioIsVisible(this.props)) {
+            if (!studioIsVisible(this.studioProps)) {
                 classes = `${classes || ""} o_web_studio_show_invisible`;
             }
-            if (this.props.studioXpath) {
+            if (this.studioProps.studioXpath) {
                 classes = `${classes || ""} o-web-studio-editor--element-clickable`;
             }
             return classes;
@@ -47,10 +53,10 @@ function extendGroup(GroupClass) {
         }
 
         onGroupClicked(ev) {
-            if (ev.target.closest(".o-web-studio-editor--element-clickable") !== this.rootRef.el) {
+            if (ev.target.closest(".o-web-studio-editor--element-clickable") !== this.rootRef()) {
                 return;
             }
-            this.env.config.onNodeClicked(this.props.studioXpath);
+            this.env.config.onNodeClicked(this.studioProps.studioXpath);
         }
     }
     return Group;
@@ -60,55 +66,53 @@ function extendGroup(GroupClass) {
 // Those are the only ones (for now), to be draggable internally
 // It should shadow the Field and its Label below
 class InnerGroupItemComponent extends Component {
-    static template = "web_studio.Form.InnerGroup.ItemComponent";
-    static props = {
-        cell: { type: Object },
-        slots: { type: Object },
-    };
+    static template = xml`<t t-call="web_studio.Form.InnerGroup.ItemComponent" cell="this.cell"/>`;
+
+    props = useProps({
+        cell: t.object(),
+        slots: t.object(),
+    });
+
+    labelRef = signal.ref();
+    fieldRef = signal.ref();
+
     setup() {
-        const labelRef = useRef("labelRef");
-        const fieldRef = useRef("fieldRef");
-
-        this.labelRef = labelRef;
-
-        useEffect(
-            (studioIsVisible, labelEl, fieldEl) => {
-                // Only label act as the business unit for studio
-                if (labelEl) {
-                    const clickable = labelEl.querySelector(
-                        ".o-web-studio-editor--element-clickable"
-                    );
-                    if (clickable) {
-                        clickable.classList.remove("o-web-studio-editor--element-clickable");
-                    }
-                    labelEl.classList.add("o-web-studio-editor--element-clickable");
-                    const invisible = labelEl.querySelector(".o_web_studio_show_invisible");
-                    if (invisible) {
-                        invisible.classList.remove("o_web_studio_show_invisible");
-                    }
-                    labelEl.classList.toggle("o_web_studio_show_invisible", !studioIsVisible);
-                    labelEl.classList.add("o-draggable");
+        this.uiService = useService("ui");
+        const applyStudioClasses = () => {
+            const studioIsVisible = this.cell.studioIsVisible;
+            const labelEl = this.labelRef();
+            const fieldEl = this.fieldRef();
+            if (labelEl) {
+                const clickable = labelEl.querySelector(".o-web-studio-editor--element-clickable");
+                if (clickable) {
+                    clickable.classList.remove("o-web-studio-editor--element-clickable");
                 }
-
-                if (fieldEl) {
-                    const clickable = fieldEl.querySelector(
-                        ".o-web-studio-editor--element-clickable"
-                    );
-                    if (clickable) {
-                        clickable.classList.remove("o-web-studio-editor--element-clickable");
-                    }
-                    const invisible = fieldEl.querySelector(".o_web_studio_show_invisible");
-                    if (invisible) {
-                        invisible.classList.remove("o_web_studio_show_invisible");
-                    }
-                    fieldEl.classList.add("o-web-studio-element-ghost");
+                labelEl.classList.add("o-web-studio-editor--element-clickable");
+                const invisible = labelEl.querySelector(".o_web_studio_show_invisible");
+                if (invisible) {
+                    invisible.classList.remove("o_web_studio_show_invisible");
                 }
-            },
-            () => [this.cell.studioIsVisible, labelRef.el, fieldRef.el]
-        );
+                labelEl.classList.toggle("o_web_studio_show_invisible", !studioIsVisible);
+                labelEl.classList.add("o-draggable");
+            }
+
+            if (fieldEl) {
+                const clickable = fieldEl.querySelector(".o-web-studio-editor--element-clickable");
+                if (clickable) {
+                    clickable.classList.remove("o-web-studio-editor--element-clickable");
+                }
+                const invisible = fieldEl.querySelector(".o_web_studio_show_invisible");
+                if (invisible) {
+                    invisible.classList.remove("o_web_studio_show_invisible");
+                }
+                fieldEl.classList.add("o-web-studio-element-ghost");
+            }
+        };
+        onMounted(applyStudioClasses);
+        onPatched(applyStudioClasses);
 
         this.onMouseFieldIO = (ev) => {
-            labelRef.el.classList.toggle("o-web-studio-ghost-hovered", ev.type === "mouseover");
+            this.labelRef().classList.toggle("o-web-studio-ghost-hovered", ev.type === "mouseover");
         };
     }
     get cell() {
@@ -143,7 +147,7 @@ export class InnerGroup extends _InnerGroup {
 
         if (!hasRows) {
             hooks.set("inside", {
-                xpath: this.props.studioXpath,
+                xpath: this.studioProps.studioXpath,
                 position: "inside",
                 subTemplate: "formGrid",
                 colSpan: this.props.maxCols,

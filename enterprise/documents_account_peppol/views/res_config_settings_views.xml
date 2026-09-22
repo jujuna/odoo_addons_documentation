@@ -16,6 +16,7 @@
                         <field
                             name="documents_account_peppol_folder_id"
                             required="peppol_reception_mode == 'documents' and peppol_participation_role == 'sending_and_receiving'"
+                            options="{'no_create': True, 'no_create_edit': True}"
                             />
                     </div>
                     <div class="row">
@@ -32,9 +33,6 @@
             </xpath>
             <xpath expr="//div[@name='peppol_journal_config']" position="attributes">
                 <attribute name="invisible">peppol_reception_mode != 'journal'</attribute>
-            </xpath>
-            <xpath expr="//field[@name='account_peppol_purchase_journal_id']" position="attributes">
-                <attribute name="required" add="peppol_reception_mode == 'journal'" separator=" and " />
             </xpath>
         </field>
     </record>

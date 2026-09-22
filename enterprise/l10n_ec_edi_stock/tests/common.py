@@ -7,6 +7,8 @@ from odoo.addons.l10n_ec_edi.tests.test_edi_xml import TestEcEdiXmls
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestECDeliveryGuideCommon(TestEcEdiXmls):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         '''
@@ -30,8 +32,7 @@ class TestECDeliveryGuideCommon(TestEcEdiXmls):
 
         cls.delivery_guide_carrier = cls.env['res.partner'].create({
             'name': 'Delivery guide Carrier EC',
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_ec.ec_dni').id,
-            'vat': '0750032310'
+            'additional_identifiers': {'EC_DNI': '0750032310'},
         })
 
     def _get_stock_picking_move_line_vals(self):

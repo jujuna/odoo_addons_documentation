@@ -1,10 +1,10 @@
 import { click, contains, start, startServer } from "@mail/../tests/mail_test_helpers";
 import { serverState } from "@web/../tests/web_test_helpers";
 import { describe, test } from "@odoo/hoot";
-import { defineVoipCRMModels } from "@voip_crm/../tests/voip_crm_test_helpers";
+import { setupVoipCRMTests } from "@voip_crm/../tests/voip_crm_test_helpers";
 
 describe.current.tags("desktop");
-defineVoipCRMModels();
+setupVoipCRMTests();
 
 test("Clicking on the “open record” button opens the corresponding record.", async () => {
     const pyEnv = await startServer();
@@ -23,8 +23,10 @@ test("Clicking on the “open record” button opens the corresponding record.",
     await start();
     await click(".o_menu_systray button[title='Show Softphone']");
     await click("button span:contains('Activities')");
-    await click(".o-voip-TabEntry", { text: "Vincent's Birthday" });
+    await click(".o-voip-TabEntry details");
+    await click(".o-voip-ActionButton[title='Go to']");
+    await click(".o-dropdown-item span:contains('Activity details')");
     await contains(".o_form_view", { count: 0 });
-    await click("button .oi-arrow-right");
+    await click(".o-dropdown-item [data-icon='east']");
     await contains(".o_form_view");
 });

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Invoicing',
@@ -20,8 +19,6 @@ It gives the Administrator user access to important invoicing features such as b
         'data/digest_data.xml',
         'data/account_accountant_tour.xml',
         'data/ir_config_parameters.xml',
-
-        'security/ir.model.access.csv',
         'security/account_accountant_security.xml',
 
         'views/account_account_views.xml',
@@ -36,15 +33,16 @@ It gives the Administrator user access to important invoicing features such as b
         'views/product_views.xml',
         'views/bank_rec_widget_views.xml',
         'views/report_invoice.xml',
+        'views/account_journal_views.xml',
 
         'wizard/account_change_lock_date.xml',
         'wizard/account_auto_reconcile_wizard.xml',
         'wizard/account_reconcile_wizard.xml',
+        'wizard/bank_rec_auto_reconcile_wizard.xml',
+        'wizard/account_select_account_line.xml',
+        'wizard/account_split_journal_item_wizard.xml',
+        'security/ir.access.csv',
     ],
-    'demo': [
-        'demo/demo_data.xml',
-    ],
-    'installable': True,
     'auto_install': True,
     'post_init_hook': '_account_accountant_post_init',
     'uninstall_hook': "uninstall_hook",

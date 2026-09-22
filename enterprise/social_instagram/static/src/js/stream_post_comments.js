@@ -2,9 +2,12 @@ import { rpc } from "@web/core/network/rpc";
 import { StreamPostComments } from '@social/js/stream_post_comments';
 import { StreamPostCommentListInstagram } from './stream_post_comment_list';
 import { StreamPostCommentsReplyInstagram } from './stream_post_comments_reply';
-import { onWillStart } from "@odoo/owl";
+import { onWillStart, t, useProps } from "@odoo/owl";
 
 export class StreamPostCommentsInstagram extends StreamPostComments {
+    instagramProps = useProps({
+        commentsDisabled: t.any(),
+    });
 
     setup() {
         super.setup();
@@ -47,6 +50,6 @@ export class StreamPostCommentsInstagram extends StreamPostComments {
     }
 
     get commentsDisabled() {
-        return this.props.commentsDisabled;
+        return this.instagramProps.commentsDisabled;
     }
 }

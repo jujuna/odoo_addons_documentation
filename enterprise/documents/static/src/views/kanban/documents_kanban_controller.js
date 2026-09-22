@@ -1,9 +1,8 @@
-import { preSuperSetup, useDocumentView } from "@documents/views/hooks";
 import { DocumentsControllerMixin } from "@documents/views/documents_controller_mixin";
 import { DocumentsSelectionBox } from "@documents/views/selection_box/documents_selection_box";
-import { onWillRender, useEffect, useRef, useState } from "@odoo/owl";
-import { KanbanController } from "@web/views/kanban/kanban_controller";
+import { onMounted, onPatched, signal } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
+import { KanbanController } from "@web/views/kanban/kanban_controller";
 
 export class DocumentsKanbanController extends DocumentsControllerMixin(KanbanController) {
     static template = "documents.DocumentsKanbanView";
@@ -12,55 +11,24 @@ export class DocumentsKanbanController extends DocumentsControllerMixin(KanbanCo
         Dropdown,
         SelectionBox: DocumentsSelectionBox,
     };
+
+    uploadFileInputRef = signal.ref();
+
     setup() {
-        preSuperSetup();
-        super.setup(...arguments);
-        this.uploadFileInputRef = useRef("uploadFileInput");
-        const properties = useDocumentView(this.documentsViewHelpers());
-        Object.assign(this, properties);
+        super.setup();
 
-        this.documentStates = useState({
-            previewStore: {},
+        onMounted(() => {
+            this.openTrashIfNecessary();
+            this.openInitialPreview();
         });
-        this.rightPanelState = useState(this.documentService.rightPanelReactive);
-
-        useEffect(
-            () => {
-                this.documentService.getSelectionActions = () => ({
-                    getTopbarActions: () => this.getTopBarActionMenuItems(),
-                    getMenuProps: () => this.actionMenuProps,
-                });
-            },
-            () => []
-        );
-
-        onWillRender(() => this.openInitialPreview());
+        onPatched(() => {
+            this.openTrashIfNecessary();
+            this.openInitialPreview();
+        });
     }
 
-    get hasSelectedRecords() {
-        return this.targetRecords.length;
-    }
-
-    get targetRecords() {
-        return this.model.targetRecords;
-    }
-
-    /**
-     * Override this to add view options.
-     */
-    documentsViewHelpers() {
-        return {
-            getSelectedDocumentsElements: () =>
-                this.root?.el?.querySelectorAll(".o_kanban_record.o_record_selected") || [],
-            setPreviewStore: (previewStore) => {
-                this.documentStates.previewStore = previewStore;
-            },
-            isRecordPreviewable: this.isRecordPreviewable.bind(this),
-        };
-    }
-
-    isRecordPreviewable(record) {
-        return record.isViewable();
+    getSelectedDocumentsElements() {
+        return this.rootRef()?.querySelectorAll(".o_kanban_record.o_record_selected") || [];
     }
 
     /**

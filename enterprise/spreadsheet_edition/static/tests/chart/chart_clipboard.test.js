@@ -1,47 +1,35 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { Model, helpers } from "@odoo/o-spreadsheet";
+import { helpers, stores } from "@odoo/o-spreadsheet";
 import {
     createSpreadsheetWithChart,
     insertChartInSpreadsheet,
 } from "@spreadsheet/../tests/helpers/chart";
 import { addGlobalFilter, createBasicChart } from "@spreadsheet/../tests/helpers/commands";
 import { defineSpreadsheetModels } from "@spreadsheet/../tests/helpers/data";
-import { makeSpreadsheetMockEnv } from "@spreadsheet/../tests/helpers/model";
+import { createSpreadsheetWithPivot } from "@spreadsheet/../tests/helpers/pivot";
+import { makeStoreWithModel } from "@spreadsheet/../tests/helpers/stores";
 
 describe.current.tags("headless");
 defineSpreadsheetModels();
 
 const { toZone } = helpers;
+const { ClipboardStore } = stores;
+
 const chartId = "uuid1";
 
-const serverData = {
-    menus: {
-        root: {
-            id: "root",
-            children: [1],
-            name: "root",
-            appID: "root",
-        },
-        1: {
-            id: 1,
-            children: [],
-            name: "test menu 1",
-            xmlid: "spreadsheet_edition.test.menu",
-            appID: 1,
-            actionID: "menuAction",
-        },
-    },
-};
-
 test("link is kept when copying chart", async () => {
-    const env = await makeSpreadsheetMockEnv({ serverData });
-    const model = new Model({}, { custom: { env } });
+    const { model, pivotId } = await createSpreadsheetWithPivot();
+    makeStoreWithModel(model, ClipboardStore);
     createBasicChart(model, chartId);
-    model.dispatch("LINK_ODOO_MENU_TO_CHART", {
+    model.dispatch("UPDATE_ODOO_LINK_TO_CHART", {
         chartId,
-        odooMenuId: 1,
+        odooLink: { dataSourceCoreId: pivotId, type: "dataSource", dataSourceType: "pivot" },
     });
-    expect(model.getters.getChartOdooMenu(chartId).id).toBe(1);
+    expect(model.getters.getChartOdooLink(chartId)).toEqual({
+        dataSourceCoreId: pivotId,
+        type: "dataSource",
+        dataSourceType: "pivot",
+    });
     const figureId = model.getters.getFigureIdFromChartId(chartId);
     model.dispatch("UPDATE_CHART", {
         sheetId: model.getters.getActiveSheetId(),
@@ -52,7 +40,11 @@ test("link is kept when copying chart", async () => {
             type: "line",
         },
     });
-    expect(model.getters.getChartOdooMenu(chartId).id).toBe(1);
+    expect(model.getters.getChartOdooLink(chartId)).toEqual({
+        dataSourceCoreId: pivotId,
+        type: "dataSource",
+        dataSourceType: "pivot",
+    });
     const sheetId = model.getters.getActiveSheetId();
     model.dispatch("SELECT_FIGURE", { figureId });
     model.dispatch("COPY");
@@ -60,13 +52,18 @@ test("link is kept when copying chart", async () => {
     const chartIds = model.getters.getChartIds(sheetId);
     expect(chartIds.length).toBe(2);
     for (const _chartId of chartIds) {
-        expect(model.getters.getChartOdooMenu(_chartId).id).toBe(1);
+        expect(model.getters.getChartOdooLink(_chartId)).toEqual({
+            dataSourceCoreId: pivotId,
+            type: "dataSource",
+            dataSourceType: "pivot",
+        });
     }
 });
 
 test("copy/paste Odoo chart field matching", async () => {
-    const { model } = await createSpreadsheetWithChart({ type: "odoo_pie" });
-    insertChartInSpreadsheet(model, "odoo_bar");
+    const { model } = await createSpreadsheetWithChart({ type: "pie" });
+    makeStoreWithModel(model, ClipboardStore);
+    insertChartInSpreadsheet(model, "bar");
     const sheetId = model.getters.getActiveSheetId();
     const [chartId1, chartId2] = model.getters.getChartIds(sheetId);
     const fieldMatching = {
@@ -102,8 +99,9 @@ test("copy/paste Odoo chart field matching", async () => {
 });
 
 test("cut/paste Odoo chart field matching", async () => {
-    const { model } = await createSpreadsheetWithChart({ type: "odoo_pie" });
-    insertChartInSpreadsheet(model, "odoo_bar");
+    const { model } = await createSpreadsheetWithChart({ type: "pie" });
+    makeStoreWithModel(model, ClipboardStore);
+    insertChartInSpreadsheet(model, "bar");
     const sheetId = model.getters.getActiveSheetId();
     const [chartId1, chartId2] = model.getters.getChartIds(sheetId);
     const fieldMatching = {

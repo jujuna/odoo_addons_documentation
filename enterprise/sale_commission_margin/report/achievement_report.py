@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-
 from odoo import models
+from odoo.tools import SQL
 
 
 class SaleCommissionAchievementReport(models.Model):
@@ -11,4 +11,4 @@ class SaleCommissionAchievementReport(models.Model):
         return super()._get_sale_rates() + ['margin']
 
     def _get_sale_rates_product(self):
-        return super()._get_sale_rates_product() + "+ (rules.margin_rate * COALESCE(sol.margin, 0)) / fo.currency_rate"
+        return SQL("%s + (rules.margin_rate * COALESCE(sol.margin, 0)) / fo.currency_rate", super()._get_sale_rates_product())

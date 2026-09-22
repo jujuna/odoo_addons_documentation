@@ -19,21 +19,24 @@ class L10n_AuTerminationPayment(models.TransientModel):
     )
     contract_end_date = fields.Date(
         "Contract End Date",
-        default=fields.Date.today
+        default=fields.Date.context_today
     )
-    cessation_type_code = fields.Selection(CESSATION_TYPE_CODE, required=True)
+    cessation_type_code = fields.Selection(
+        CESSATION_TYPE_CODE, required=True, help="The employment's cessation reason. This information is required by the ATO.")
     unused_annual_leaves = fields.Float(
         string="Annual Leaves",
         compute="_compute_unused_leaves",
+        help="Amount of unused annual leaves (in days)."
     )
     unused_long_service_leaves = fields.Float(
         string="Long Service Leaves",
         compute="_compute_unused_leaves",
+        help="Amount of unused long service leaves (in days)."
     )
     termination_type = fields.Selection([
         ("normal", "Non-Genuine Redundancy"),
         ("genuine", "Genuine Redundancy"),
-    ], required=True, default="normal", string="Termination Type")
+    ], required=True, default="normal", string="Termination Type", help="Whether the redundancy is genuine or not. This will affect withholding calculations on the employee's final pay, both for unused leaves and ETPs.")
 
     @api.model
     def default_get(self, fields):
@@ -55,12 +58,12 @@ class L10n_AuTerminationPayment(models.TransientModel):
         for record in self:
             leaves = self.env["hr.leave.allocation"].search([
                 ("state", "=", "validate"),
-                ("holiday_status_id.l10n_au_leave_type", "in", ['annual', 'long_service']),
+                ("work_entry_type_id.l10n_au_work_entry_type", "in", ['annual', 'long_service']),
                 ("employee_id", "=", self.employee_id.id),
                 ("date_from", "<=", record.version_id.date_end or record.contract_end_date),
             ])
 
-            annual_leaves = leaves.filtered(lambda l: l.holiday_status_id.l10n_au_leave_type == 'annual')
+            annual_leaves = leaves.filtered(lambda l: l.work_entry_type_id.l10n_au_work_entry_type == 'annual')
             long_service_leaves = leaves - annual_leaves
 
             record.unused_annual_leaves = sum(annual_leaves.mapped("number_of_days")) - sum(annual_leaves.mapped("leaves_taken"))
@@ -77,7 +80,7 @@ class L10n_AuTerminationPayment(models.TransientModel):
         })
         # Implement New payslip create
         payslip = self.env["hr.payslip"].create({
-            "name": f"Termination Salary Slip - {self.employee_id.name}",
+            "title": "Termination Salary Slip",
             "employee_id": self.employee_id.id,
             "version_id": self.version_id.id,
             "date_from": self._get_termination_payslip_period_start(),

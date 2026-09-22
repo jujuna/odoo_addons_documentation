@@ -5,6 +5,8 @@ from freezegun import freeze_time
 import ast
 
 from odoo import Command, fields, tools
+from odoo.addons.base.tests.files import GIF_RAW
+from odoo.addons.documents.tests.test_documents_common import get_document_creation_message
 from odoo.addons.mail.tests.common import MailCommon
 from odoo.addons.test_mail.data.test_mail_data import MAIL_EML_ATTACHMENT, MAIL_NO_BODY, MAIL_TEMPLATE, MAIL_TEMPLATE_EXTRA_HTML
 from odoo.exceptions import AccessError, ValidationError
@@ -46,7 +48,7 @@ class TestMailGateway(MailCommon):
         cls.email_filenames = ['attachment', 'original_msg.eml']
         cls.document = cls.env['documents.document'].with_context(mail_create_nolog=True).create({
             'access_internal': 'edit',
-            'datas': b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=",
+            'raw': GIF_RAW,
             'name': 'file.gif',
             'mimetype': 'image/gif',
             'folder_id': cls.env['documents.document'].create({'name': 'folderA', 'type': 'folder'}).id,
@@ -59,7 +61,11 @@ class TestMailGateway(MailCommon):
         cls.test_activity_type2 = cls.env['mail.activity.type'].create({'name': 'Test Activity Type2'})
 
     def send_test_mail_with_attachment(self, email_from, msg_id=None, references=None):
-        with self.mock_mail_gateway():
+        with (
+            self.mock_mail_gateway(),
+            self.mock_mail_app(),
+            RecordCapturer(self.env['documents.document'], []) as documents,
+        ):
             self.format_and_process(
                 MAIL_EML_ATTACHMENT,
                 email_from,
@@ -69,9 +75,16 @@ class TestMailGateway(MailCommon):
                 references=references or '<f3b9f8f8-28fa-2543-cab2-7aa68f679ebb@odoo.com>',
                 msg_id=msg_id or '<cb7eaf62-58dc-2017-148c-305d0c78892f@odoo.com>',
             )
-        documents = self.env['documents.document'].search([('name', 'in', self.email_filenames)])
-        self.assertEqual(len(documents), len(self.email_filenames))
-        return documents
+
+        self.assertEqual(len(documents.records), len(self.email_filenames))
+        messages = self._new_msgs.filtered(
+            lambda m: m.res_id in documents.records.ids and m.model == 'documents.document'
+        )
+        for document in documents.records:
+            creation_message = messages.filtered(lambda m: m.res_id == document.id).sorted("id")
+            self.assertGreater(len(creation_message), 0)
+            self.assertMessageFields(creation_message[0], {'body_content': get_document_creation_message('OdooBot', document.name, 'Email')})
+        return documents.records
 
     def send_test_mail_with_attachment_on_different_company(self, email_from, msg_id=None, references=None):
         with self.mock_mail_gateway():
@@ -98,6 +111,7 @@ class TestMailGateway(MailCommon):
                 'name': 'file',
                 'type': 'binary',
                 'alias_name': 'test',
+                'raw': 'test',
             })
 
     def test_reply_with_attachment(self):
@@ -119,7 +133,7 @@ class TestMailGateway(MailCommon):
         self.assertEqual(self.env['ir.attachment'].search_count(
             [('res_id', '=', self.document.id), ('res_model', '=', self.document._name)]), 3)
         doc_messages = self.env['mail.message'].search(
-            [('res_id', '=', self.document.id), ('model', '=', self.document._name)])
+            [('res_id', '=', self.document.id), ('model', '=', self.document._name), ('subject', '!=', False)])
         self.assertEqual(len(doc_messages), 2)
         self.assertListEqual(
             doc_messages.mapped('subject'),
@@ -135,6 +149,10 @@ class TestMailGateway(MailCommon):
             self.assertEqual(document.attachment_id.res_id, document.id)
             self.assertEqual(document.folder_id, self.folder)
             self.assertEqual(document.tag_ids, self.tag)
+            self.assertEqual(document.type, 'binary')
+            self.assertEqual(len(document.message_ids), 2)
+            email_msg = document.message_ids.filtered(lambda m: m.message_type == "email")
+            self.assertMessageFields(email_msg, {"body_content": "Chaussée de Namur, 40"})
         self.assertEqual(
             self.env['documents.document'].with_context(active_test=False).search_count([]),
             documents_count + 3,
@@ -152,6 +170,8 @@ class TestMailGateway(MailCommon):
             self.assertEqual(document.attachment_id.res_id, document.id)
             self.assertEqual(document.folder_id, self.folder)
             self.assertEqual(document.tag_ids, self.tag)
+            self.assertEqual(document.type, 'binary')
+            self.assertEqual(len(document.message_ids), 2)
         self.assertEqual(
             self.env['documents.document'].with_context(active_test=False).search_count([]),
             documents_count + 3,
@@ -236,6 +256,8 @@ class TestMailGateway(MailCommon):
             self.assertEqual(activity_ids.note, '<p>TODO note defaults</p>')
             self.assertEqual(activity_ids.user_id, self.user_employee)
             self.assertEqual(activity_ids.date_deadline, fields.Date.today() + relativedelta(months=1))
+            self.assertEqual(document.type, "binary")
+            self.assertEqual(len(document.message_ids), 2)
 
     @mute_logger('odoo.addons.mail.models.mail_thread')
     def test_create_activity_disabled(self):
@@ -257,6 +279,8 @@ class TestMailGateway(MailCommon):
             self.assertEqual(document.attachment_id.res_id, document.id)
             self.assertEqual(document.folder_id, self.folder)
             self.assertEqual(document.tag_ids, self.other_tag)
+            self.assertEqual(document.type, 'binary')
+            self.assertEqual(len(document.message_ids), 2)
 
     @mute_logger('odoo.addons.mail.models.mail_thread')
     def test_custom_tags_command_1(self):
@@ -328,7 +352,7 @@ class TestMailGateway(MailCommon):
             )
         self.assertTrue(document.active)
         self.assertEqual(document.name, 'Test Sys Param 1')
-        self.env['ir.config_parameter'].set_param('documents.disable_mail_to_document', '1')
+        self.env['ir.config_parameter'].set_int('documents.disable_mail_to_document', 1)
         with self.mock_mail_gateway():
             document = self.format_and_process(
                 MAIL_TEMPLATE,

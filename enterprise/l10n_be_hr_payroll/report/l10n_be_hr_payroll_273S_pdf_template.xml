@@ -5,6 +5,8 @@
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
                     <t t-call="web.external_layout">
+                        <t t-set="declaration" t-value="declaration_273S['declaration']"/>
+                        <t t-set="beneficiaries" t-value="declaration_273S['beneficiaries']"/>
                         <div style="font-size:12px">
                             <div class="page container-fuid">
                                 <div class="row text-center">
@@ -40,18 +42,18 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-12 border p-2">
-                                        <div class="mb-2">N° d’entreprise ou, à défaut, n° national : <t t-esc="company_info['identification']"/></div>
-                                        <div class="mb-2">Nom, prénoms, dénomination sociale ou officielle : <t t-esc="company_info['name']"/></div>
-                                        <div class="mb-2">Domicile, siège social ou siège du principal établissement administratif (adresse complète) : <t t-esc="company_info['address']"/></div>
+                                        <div class="mb-2">N° d’entreprise ou, à défaut, n° national : <t t-out="company_info['identification']"/></div>
+                                        <div class="mb-2">Nom, prénoms, dénomination sociale ou officielle : <t t-out="company_info['name']"/></div>
+                                        <div class="mb-2">Domicile, siège social ou siège du principal établissement administratif (adresse complète) : <t t-out="company_info['address']"/></div>
                                         <div class="row">
-                                            <div class="col-6">N° téléphone : <t t-esc="company_info['phone']"/></div>
-                                            <div class="col-6">Adresse e-mail : <t t-esc="company_info['email']"/></div>
+                                            <div class="col-6">N° téléphone : <t t-out="company_info['phone']"/></div>
+                                            <div class="col-6">Adresse e-mail : <t t-out="company_info['email']"/></div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="mt-4 row">
                                     <div class="col-12 border p-2">
-                                        <div class="mb-2 fw-bold">DATE D’ATTRIBUTION OU DE MISE EN PAIEMENT DES REVENUS : <t t-esc="period.strftime('%d/%m/%Y')"/></div>
+                                        <div class="mb-2 fw-bold">DATE D’ATTRIBUTION OU DE MISE EN PAIEMENT DES REVENUS : <t t-out="period.strftime('%d/%m/%Y')"/></div>
                                         <div>Le précompte mobilier est supporté par le débiteur des revenus à la décharge du bénéficiaire :<div class="ms-2 border p-1 d-inline-block"></div></div>
                                     </div>
                                 </div>
@@ -77,25 +79,25 @@
                                             <tbody class="text-end">
                                                 <tr>
                                                     <th scope="row" class="text-start">1</th>
-                                                    <td><t t-esc="to_monetary(declaration['gross_amount'])"/></td>
-                                                    <td><t t-esc="to_monetary(declaration['deductable_costs']['fixed'] + declaration['deductable_costs']['actual'])"/></td>
-                                                    <td><t t-esc="to_monetary(declaration['taxable_amount'])"/></td>
-                                                    <td><t t-esc="'%.2f %s' % (declaration['rate'], '%')"/></td>
-                                                    <td><t t-esc="to_monetary(declaration['tax_amount'])"/></td>
-                                                    <td><t t-esc="to_monetary(0)"/></td>
+                                                    <td><t t-out="to_monetary(declaration['gross_amount'])"/></td>
+                                                    <td><t t-out="to_monetary(declaration['deductable_costs']['fixed'] + declaration['deductable_costs']['actual'])"/></td>
+                                                    <td><t t-out="to_monetary(declaration['taxable_amount'])"/></td>
+                                                    <td><t t-out="'%.2f %s' % (declaration['rate'], '%')"/></td>
+                                                    <td><t t-out="to_monetary(declaration['tax_amount'])"/></td>
+                                                    <td><t t-out="to_monetary(0)"/></td>
                                                 </tr>
                                                 <tr class="align-text-bottom">
                                                     <td class="border-0 fw-bold">Totaux :</td>
-                                                    <td><t t-esc="to_monetary(declaration['gross_amount'])"/></td>
+                                                    <td><t t-out="to_monetary(declaration['gross_amount'])"/></td>
                                                     <td class="border-0"></td>
-                                                    <td><t t-esc="to_monetary(declaration['taxable_amount'])"/></td>
+                                                    <td><t t-out="to_monetary(declaration['taxable_amount'])"/></td>
                                                     <td class="border-0"></td>
-                                                    <td><t t-esc="to_monetary(declaration['tax_amount'])"/></td>
-                                                    <td><t t-esc="to_monetary(0)"/></td>
+                                                    <td><t t-out="to_monetary(declaration['tax_amount'])"/></td>
+                                                    <td><t t-out="to_monetary(0)"/></td>
                                                 </tr>
                                                 <tr class="align-text-bottom">
                                                     <td colspan="5" class="border-0 fw-bold">Montant à payer :</td>
-                                                    <td colspan="2"><t t-esc="to_monetary(declaration['tax_amount'])"/></td>
+                                                    <td colspan="2"><t t-out="to_monetary(declaration['tax_amount'])"/></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -132,31 +134,31 @@
                                             <tbody class="text-end">
                                                 <t t-foreach="beneficiaries" t-as="beneficiary">
                                                     <tr>
-                                                        <th scope="row" class="text-start"><t t-esc="beneficiary_index + 1"/></th>
+                                                        <th scope="row" class="text-start"><t t-out="beneficiary_index + 1"/></th>
                                                         <td class="text-start">
-                                                            <div>a) <t t-esc="beneficiary['identification']['name']"/></div>
-                                                            <div>b) <t t-esc="beneficiary['identification']['street']"/></div>
-                                                            <div>c) <t t-esc="beneficiary['identification']['country']"/> <t t-esc="beneficiary['identification']['zip']"/> <t t-esc="beneficiary['identification']['city']"/></div>
+                                                            <div>a) <t t-out="beneficiary['identification']['name']"/></div>
+                                                            <div>b) <t t-out="beneficiary['identification']['street']"/></div>
+                                                            <div>c) <t t-out="beneficiary['identification']['country']"/> <t t-out="beneficiary['identification']['zip']"/> <t t-out="beneficiary['identification']['city']"/></div>
                                                             <div>d) </div>
                                                         </td>
-                                                        <td><t t-esc="to_monetary(beneficiary['gross_amount'])"/></td>
+                                                        <td><t t-out="to_monetary(beneficiary['gross_amount'])"/></td>
                                                         <td>
-                                                            <div>a) <t t-esc="to_monetary(beneficiary['deductable_costs']['fixed'])"/></div>
-                                                            <div>b) <t t-esc="to_monetary(beneficiary['deductable_costs']['actual'])"/></div>
+                                                            <div>a) <t t-out="to_monetary(beneficiary['deductable_costs']['fixed'])"/></div>
+                                                            <div>b) <t t-out="to_monetary(beneficiary['deductable_costs']['actual'])"/></div>
                                                         </td>
-                                                        <td><t t-esc="to_monetary(beneficiary['tax_amount'])"/></td>
-                                                        <td><t t-esc="to_monetary(0)"/></td>
+                                                        <td><t t-out="to_monetary(beneficiary['tax_amount'])"/></td>
+                                                        <td><t t-out="to_monetary(0)"/></td>
                                                     </tr>
                                                 </t>
                                                 <tr class="align-text-bottom">
                                                     <td colspan="2" class="border-start-0 border-bottom-0 fw-bold">Totaux :</td>
-                                                    <td><t t-esc="to_monetary(declaration['gross_amount'])"/></td>
+                                                    <td><t t-out="to_monetary(declaration['gross_amount'])"/></td>
                                                     <td>
-                                                        <div>a) <t t-esc="to_monetary(declaration['deductable_costs']['fixed'])"/></div>
-                                                        <div>b) <t t-esc="to_monetary(declaration['deductable_costs']['actual'])"/></div>
+                                                        <div>a) <t t-out="to_monetary(declaration['deductable_costs']['fixed'])"/></div>
+                                                        <div>b) <t t-out="to_monetary(declaration['deductable_costs']['actual'])"/></div>
                                                     </td>
-                                                    <td><t t-esc="to_monetary(0)"/></td>
-                                                    <td><t t-esc="to_monetary(declaration['tax_amount'])"/></td>
+                                                    <td><t t-out="to_monetary(0)"/></td>
+                                                    <td><t t-out="to_monetary(declaration['tax_amount'])"/></td>
                                                 </tr>
                                             </tbody>
                                         </table>

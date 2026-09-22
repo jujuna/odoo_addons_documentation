@@ -3,7 +3,7 @@
     <record id="whatsapp_template_pos_attach" model="ir.attachment">
         <field name="name">receipt.png</field>
         <field name="type">binary</field>
-        <field name="datas" type="base64" file="whatsapp_pos/static/src/img/pos.png"/>
+        <field name="raw" type="bytes" file="whatsapp_pos/static/src/img/pos.png"/>
         <field name="res_model">whatsapp.template</field>
     </record>
 
@@ -12,10 +12,9 @@
         <field name="template_name">pos_receipt</field>
         <field name="lang_code">en</field>
         <field name="template_type">utility</field>
-        <field name="header_attachment_ids" eval="[(4, ref('whatsapp_pos.whatsapp_template_pos_attach'), 0)]"/>
+        <field name="header_attachment_id" ref="whatsapp_pos.whatsapp_template_pos_attach"/>
         <field name="header_type">image</field>
         <field name="footer_text">Write 'stop' to stop receiving messages</field>
-        <field name="phone_field">partner_id.phone</field>
         <field name="model_id" ref="point_of_sale.model_pos_order"/>
         <field name="body">Dear {{1}},
 
@@ -55,7 +54,6 @@ Thank you for shopping with us.
         <field name="lang_code">en</field>
         <field name="template_type">marketing</field>
         <field name="footer_text">Write 'stop' to stop receiving messages</field>
-        <field name="phone_field">mobile</field>
         <field name="model_id" ref="point_of_sale.model_pos_order"/>
         <field name="body">Dear customer,
 

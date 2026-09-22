@@ -9,6 +9,8 @@ from odoo.addons.sale_project.tests.common import TestSaleProjectCommon
 @tagged("-at_install", "post_install")
 class testSoProjectCreation(TestSaleProjectCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

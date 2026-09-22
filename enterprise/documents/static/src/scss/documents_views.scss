@@ -1,26 +1,4 @@
-////// ========== Search Panel ==============
-////// ======================================
-.o_search_panel > .o_search_panel_section {
-    .o_drag_over_selector {
-        &.o_search_panel_filter_value, > header {
-            background-color: $component-active-bg;
-            font-weight: $font-weight-bold;
-            color: $black;
-
-            .o_search_panel_label_title {
-                padding-left: map-get($spacers, 2);
-            }
-
-            /* Firefox firing dragleave when dragging over text
-            https://bugzilla.mozilla.org/show_bug.cgi?id=1478562 */
-            .o_search_panel_label {
-                pointer-events: none;
-            }
-        }
-
-    }
-}
-
+.o_documents_activity_view .o_control_panel_actions,
 .o_documents_kanban_view .o_control_panel_actions,
 .o_documents_list_view .o_control_panel_actions {
     justify-content: center !important;
@@ -108,29 +86,14 @@
     background: $red-100;
 }
 
-%o_documents_watermark {
-    transform: translate(-50%, -25%) rotate(-27deg);
-}
-
-.o_documents_watermark_file_viewer {
-    @extend %o_documents_watermark;
-    scale: 1.5;
-}
-.o_documents_watermark_thumbnail {
-    @extend %o_documents_watermark;
-    scale: 0.5;
-}
-
 .o_documents_thumbnail_iframe {
-    width: 600px;
-    height: 570px;
-    -ms-zoom: 0.34;
-    -moz-transform: scale(0.34);
-    -moz-transform-origin: 0 0;
-    -o-transform: scale(0.34);
-    -o-transform-origin: 0 0;
+    width: calc(100% / 0.34);
+    height: calc(100% / 0.34);
+    transform: scale(0.34);
+    transform-origin: 0 0;
     -webkit-transform: scale(0.34);
     -webkit-transform-origin: 0 0;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 .o_record_temporary {
@@ -256,6 +219,12 @@
 ////// =========== Sharing Dialog ==============
 ////// ===========================================
 
+.o_documents_share_form_view {
+    & .o_field_radio .o_horizontal {
+        gap: 16px;
+    }
+}
+
 .o_documents_sharing_kanban {
     max-height: 155px;
     overflow-x: hidden;
@@ -265,10 +234,13 @@
 
     .o_kanban_renderer {
         --Kanban-gap: 0 !important;
-        --KanbanRecord-padding-h: 0 !important;
-        --KanbanRecord-padding-v: 0 !important;
+        --Kanban-padding: 0;
 
         .o_kanban_record {
+            --Card-padding-h: 0;
+            --Card-padding-v: 0;
+
+            font-size: inherit;
             border: 0 !important;
 
             @media (pointer: fine) {
@@ -296,8 +268,6 @@
 
 .o_documents_sharing_documents_compact .o_kanban_renderer {
     --Kanban-gap: 0 !important;
-    --KanbanRecord-padding-v: 0 !important;
-    --KanbanRecord-padding-h: 0 !important;
 
     .o_kanban_record {
         border: 0 !important;
@@ -327,7 +297,6 @@
 ////// ======================================
 
 .o_document_chatter_container {
-    border-left: 1px solid var(--border-color);
     .o-mail-Chatter-topbar {
         padding-top: 0.25rem;
         @include media-breakpoint-up(lg) {
@@ -338,7 +307,22 @@
 
     }
     &.o-mail-ChatterContainer.o-aside {
+        --DocumentsAside-marginTop: 0px;
+
         width: calc(#{$o-mail-Chatter-minWidth} + 20px + var(--Chatter-asideExtraWidth));
+        margin-top: var(--DocumentsAside-marginTop);
+        margin-inline-start: map-get($spacers, 3);
+        max-height: calc(100% - #{map-get($spacers, 3)} - var(--DocumentsAside-marginTop));
+
+        .o-mail-Chatter {
+            --Chatter-default-padding-x: #{map-get($spacers, 4)};
+            --ChatterAsideForm-padding-left: #{map-get($spacers, 3)};
+        }
+
+        // Sticky: must stay opaque, and match the box.
+        .o-mail-Chatter-top {
+            background-color: $o-view-background-color;
+        }
     }
 }
 
@@ -349,15 +333,6 @@
     .embedded-editor-height-4 .note-editable {
         min-height: 6em;
     }
-}
-
-// AddDocumentsAttachmentPlugin powerbox icon
-.o_add_documents_icon {
-    background-image: url('/documents/static/description/icon.svg');
-    background-size: 70%;
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: grayscale(1);
 }
 
 //// ========= Operation Wizard ===========
@@ -377,7 +352,11 @@
         }
     }
     div.o_field_documents_user_folder_id_char {
+        --SearchPanelHeader-margin-top: #{map-get($spacers, 2)};
+        --SearchPanel-width: 100%;
+
         display: inherit;
+        width: initial;
     }
     div.o_documents_operation_destination_children_ids {
         @media (min-width: 768px) {
@@ -407,5 +386,17 @@
           --table-striped-bg: inherit !important;
         }
         color: $text-muted !important;
+    }
+}
+
+.o_document_record_popover {
+    .popover-arrow {
+        display: none;
+    }
+    // hide scrollbar
+    scrollbar-width: none !important;  // Firefox
+    -ms-overflow-style: none !important;  // IE and Edge
+    &::-webkit-scrollbar {  // Chromium, Safari, Opera
+        display: none !important;
     }
 }

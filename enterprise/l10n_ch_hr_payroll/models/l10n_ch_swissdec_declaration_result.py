@@ -1,15 +1,17 @@
-from odoo import api, fields, models, _, Command
-from ..api.swissdec_declarations import SwissdecDeclaration
-from werkzeug.urls import url_parse, url_unparse, url_encode, url_decode
-from pytz import utc
 import base64
-from decimal import Decimal
 import datetime
-from odoo.tools.pdf import PdfFileReader, PdfFileWriter
-from io import BytesIO
-from markupsafe import Markup
-from dateutil.relativedelta import relativedelta
 import uuid
+from decimal import Decimal
+from io import BytesIO
+
+from dateutil.relativedelta import relativedelta
+from markupsafe import Markup
+from werkzeug.urls import url_parse, url_unparse, url_encode, url_decode
+
+from odoo import api, fields, models, _, Command
+from odoo.tools.pdf import PdfFileReader, PdfFileWriter
+from ..api.swissdec_declarations import SwissdecDeclaration
+from odoo.tools import BinaryBytes
 
 XSD_SKIP_VALUE = "XSDSKIP"
 
@@ -224,14 +226,14 @@ class L10nCHSwissdecJobResult(models.Model):
 
             attachment = self.env['ir.attachment'].create({
                 'name': _("get_result_response_%s.xml", institution.domain),
-                'datas': base64.encodebytes(message.encode()),
+                'raw': BinaryBytes(message.encode()),
                 'res_id': institution.id,
                 'res_model': institution._name,
             })
 
             message_attachment = self.env['ir.attachment'].create({
                 'name': _("get_resultµ_request_%s.xml", institution.domain),
-                'datas': base64.encodebytes(request_archive.encode()),
+                'raw': BinaryBytes(request_archive.encode()),
                 'res_id': institution.id,
                 'res_model': institution._name,
             })
@@ -434,7 +436,7 @@ class L10nCHSwissdecJobResult(models.Model):
                 if v_type:
                     # Normalize datetime if needed
                     if v_type == "DateTime" and v_val and hasattr(v_val, 'tzinfo') and v_val.tzinfo:
-                        v_val = v_val.astimezone(utc).replace(tzinfo=None)
+                        v_val = v_val.astimezone(datetime.UTC).replace(tzinfo=None)
                     if isinstance(v_val, Decimal):
                         v_val = float(v_val)
                     vals.update({
@@ -521,6 +523,7 @@ class L10nCHSwissdecJobResult(models.Model):
         response_dict = self.result_response_json
         staff = response_dict.get("SalaryResult", {}).get(self.domain, {}).get('Success', {}).get('Staff', {}).get('Person', [])
         message_log = []
+        today = fields.Date.context_today(self)
 
         def _find_employee(firstname, lastname, sv_as_number):
             domain = [
@@ -621,7 +624,7 @@ class L10nCHSwissdecJobResult(models.Model):
                         if reversal.get('Month'):
                             valid_as_of = _parse_month_to_date(reversal['Month'])
                         else:
-                            valid_as_of = fields.Date.today()
+                            valid_as_of = today
 
                         new_data = reversal.get('New', {})
 
@@ -636,7 +639,7 @@ class L10nCHSwissdecJobResult(models.Model):
                             'reason': _("Source Tax Reversal"),
                             'correction_method': 'manual',
                             'valid_as_of': valid_as_of,
-                            'correction_date': fields.Date.today(),
+                            'correction_date': today,
                             'payslips_to_correct': [(6, 0, payslips.ids)],
                         })
                         message_log.append(_("Source Tax Correction (%(link)s) imported for %(employees)s", link=correction._get_html_link(), employees=employee._get_html_link()))
@@ -650,7 +653,7 @@ class L10nCHSwissdecJobResult(models.Model):
                             valid_as_of_str = await_corr['ValidAsOf']
                             valid_as_of = _parse_month_to_date(valid_as_of_str)
                         else:
-                            valid_as_of = fields.Date.today()
+                            valid_as_of = today
                         payslips = _find_payslips_to_correct(employee, valid_as_of)
                         if not payslips:
                             continue
@@ -659,7 +662,7 @@ class L10nCHSwissdecJobResult(models.Model):
                             'reason': "Awaiting Correction From Company",
                             'correction_method': 'auto',
                             'valid_as_of': valid_as_of,
-                            'correction_date': fields.Date.today(),
+                            'correction_date': today,
                             'payslips_to_correct': [(6, 0, payslips.ids)],
                         })
                         message_log.append(Markup(_("Source Tax Correction (%(link)s) imported for %(employees)s", link=correction._get_html_link(), employees=employee._get_html_link())))
@@ -685,7 +688,7 @@ class L10nCHSwissdecJobResult(models.Model):
 
             for i, person in enumerate(persons_with_poi):
                 pdf_writer = PdfFileWriter()
-                pdf_writer.addPage(pdf_reader.pages[i])
+                pdf_writer.add_page(pdf_reader.pages[i])
                 single_page_pdf_stream = BytesIO()
                 pdf_writer.write(single_page_pdf_stream)
                 single_page_pdf_data = single_page_pdf_stream.getvalue()
@@ -699,7 +702,7 @@ class L10nCHSwissdecJobResult(models.Model):
                     attachment_name = f"{lastname}_{firstname}_proof_of_finsurance_{self.transmission_date.year}_{self.transmission_date.month}.pdf"
                     attachments_no_match += self.env['ir.attachment'].create({
                         'name': attachment_name,
-                        'datas': base64.encodebytes(single_page_pdf_data),
+                        'raw': BinaryBytes(single_page_pdf_data),
                         'res_id': self.id,
                         'res_model': self._name,
                     })
@@ -711,7 +714,7 @@ class L10nCHSwissdecJobResult(models.Model):
                         'pdf_filename': _("Proof_of_insurance_%(year)s_%(name)s", year=self.transmission_date.year, name=employee.name),
                         'pdf_to_generate': False,
                         'state': 'pdf_generated',
-                        'pdf_file': base64.encodebytes(single_page_pdf_data)
+                        'pdf_file': BinaryBytes(single_page_pdf_data)
                     })
 
             self.env['hr.payroll.employee.declaration'].create(employee_declaration_vals)
@@ -738,11 +741,12 @@ class L10nCHSwissdecJobResult(models.Model):
     def generate_is_statement(self):
         self.ensure_one()
         result = self.env.company._l10n_ch_swissdec_request('generate_verified_tax_statement', raw_xml=self.last_raw_response)
-        binary_pdf = result['verified_tax_statement']
+        pdf_b64 = result['verified_tax_statement']
+        assert isinstance(pdf_b64, str)
 
         attachment = self.env['ir.attachment'].create({
             'name': f"Verified_st_statement_{self.declaration_id.swissdec_declaration_id}.pdf",
-            'datas': binary_pdf,
+            'raw': pdf_b64,
             'res_id': self.id,
             'res_model': self._name,
         })

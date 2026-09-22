@@ -2,7 +2,7 @@
 
 from odoo import Command
 from odoo.exceptions import UserError, AccessError
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import tagged, TransactionCase
 from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.tools import mute_logger
 
@@ -104,6 +104,7 @@ class TestDocumentsDocumentFolder(TransactionCase):
             self.user_portal.partner_id: ('view', None),
         })
         new_folder = self.env['documents.document'].create({
+            'type': 'folder',
             'name': 'New Child Folder',
             'folder_id': self.folder.id,
         })
@@ -147,7 +148,7 @@ class TestDocumentsDocumentFolder(TransactionCase):
 
         attachment = document_copy.attachment_id.ensure_one()
         self.assertNotEqual(attachment.id, self.document.attachment_id.id)
-        self.assertEqual(document_copy.raw, self.document.raw)
+        self.assertEqual(document_copy.raw.content, self.document.raw.content)
 
         # Check that owner is used for all children documents too
         folder_copy_2 = self.folder.copy({'owner_id': self.user_portal.id})
@@ -160,7 +161,7 @@ class TestDocumentsDocumentFolder(TransactionCase):
         original_folder = self.env['documents.document'].create({
             'type': 'folder',
             'name': 'A Folder',
-            'children_ids': [Command.create({'name': "A Request"})]
+            'children_ids': [Command.create({'name': 'A Request', 'type': 'request'})]
         })
         original_child = original_folder.children_ids[0]
         self.assertFalse(original_folder.available_embedded_actions_ids)

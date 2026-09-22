@@ -14,16 +14,21 @@
         }
     }
 
-    &.o_home_menu_background_custom .o_home_menu {
-        background: {
-            size: cover;
-            repeat: no-repeat;
-            position: center;
-        }
-    }
-
     .o_menu_systray {
         @include print-variable(o-navbar-badge-bg, $o-navbar-badge-bg);
+    }
+}
+
+.o_touch_device .o_home_menu {
+    scrollbar-width: none;
+    .o_home_menu_search_input {
+        border: $o-home-menu-input-border;
+        @include media-breakpoint-up(md) {
+            max-width: $o-home-menu-container-size !important;
+        }
+    }
+    .container {
+        min-height: 100vh;
     }
 }
 
@@ -47,6 +52,9 @@
     }
 
     .o_app {
+        --AppSwitcherIcon-box-shadow: rgba(0,0,0, .075) 0px 0px 0px 1px, rgba(42, 51, 70, 0.03) 0px 1px 1px -0.5px, rgba(42, 51, 70, 0.04) 0px 2px 2px -1px, rgba(42, 51, 70, 0.04) 0px 3px 3px -1.5px, rgba(42, 51, 70, 0.03) 0px 5px 5px -2.5px, rgba(42, 51, 70, 0.03) 0px 10px 10px -5px, rgba(42, 51, 70, 0.03) 0px 24px 24px -8px;
+        --AppSwitcherIcon-transition: box-shadow ease-in 0.1s, transform ease-in 0.1s;
+
         .o_app_icon {
             width: $o-home-menu-app-icon-max-width;
             aspect-ratio: 1;
@@ -54,32 +62,27 @@
             background-color: var(--AppSwitcherIcon-background, #{$o-home-menu-app-icon-background-color});
             object-fit: cover;
             transform-origin: center bottom;
-            transition: box-shadow ease-in 0.1s, transform ease-in 0.1s;
-            box-shadow: var(--AppSwitcherIcon-inset-shadow, inset 0 0 0 1px rgba(0,0,0, .2)), 
-                0 1px 1px rgba(#000, .02),
-                0 2px 2px rgba(#000, .02),
-                0 4px 4px rgba(#000, .02),
-                0 8px 8px rgba(#000, .02),
-                0 16px 16px rgba(#000, .02);
+            transform: var(--AppSwitcherIcon-transform);
+            transition: var(--AppSwitcherIcon-transition);
+            box-shadow: var(--AppSwitcherIcon-box-shadow--hover, var(--AppSwitcherIcon-box-shadow));
+            border-radius: .5rem !important;
 
-            .fa {
+            .oi {
                 font-size: $o-home-menu-app-icon-max-width * 0.5;
             }
         }
         
-        &:hover .o_app_icon {
-            box-shadow: var(--AppSwitcherIcon-inset-shadow, inset 0 0 0 1px rgba(0,0,0, .2)), 
-                0 2px 2px rgba(#000, .03),
-                0 4px 4px rgba(#000, .03),
-                0 8px 8px rgba(#000, .03),
-                0 12px 12px rgba(#000, .03),
-                0 24px 24px rgba(#000, .03);
-            transform: translateY(-2px);
+        &:hover {
+            --AppSwitcherIcon-box-shadow--hover: var(--black-15) 0px 0px 0px 1px, rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px;
         }
 
-        &:active .o_app_icon {
-            transform: translateY(-2px) scale(.98);
-            transition: none;
+        &:active {
+            --AppSwitcherIcon-transform: translateY(-2px) scale(.98);
+            --AppSwitcherIcon-transition: none;
+        }
+
+        &:focus-visible {
+            outline: 0;
         }
 
         .o_caption {
@@ -88,7 +91,7 @@
         }
 
         &.o_focused {
-            background: $component-active-bg;
+            background: rgba($o-component-active-bg, .75);
             outline: 1px solid $o-action;
             border-radius: $border-radius;
         }
@@ -97,8 +100,10 @@
     .o_dragged_app {
         transition: transform 0.5s;
         transform: rotate(6deg);
+
         .o_app_icon {
-            box-shadow: 0 8px 15px -10px black;
+            --AppSwitcherIcon-box-shadow: var(--black-15) 0px 0px 0px 1px, rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px, 0 8px 15px -10px rgba(9, 30, 66, 0.5);
+
             transform: translateY(-1px);
         }
     }

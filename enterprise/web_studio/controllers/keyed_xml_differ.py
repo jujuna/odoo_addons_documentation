@@ -1,7 +1,7 @@
 import re
 from bisect import bisect_left
 from copy import deepcopy
-from itertools import chain
+from itertools import chain, takewhile
 from collections.abc import Iterable
 from collections import deque
 from dataclasses import dataclass, field
@@ -423,9 +423,10 @@ class KeyedXmlDiffer:
     """
 
     @classmethod
-    def assign_node_ids_for_diff(cls, tree):
+    def assign_node_ids_for_diff(cls, tree, diff_attribute=None):
+        diff_attribute = diff_attribute or DIFF_ATTRIBUTE
         for index, desc in enumerate(tree.iter(etree.Element)):
-            desc.set(DIFF_ATTRIBUTE, str(index))
+            desc.set(diff_attribute, str(index))
 
     def __init__(
         self,
@@ -652,7 +653,8 @@ class KeyedXmlDiffer:
         Except that here we don't care about tails or texts or attributes, as only the relative
         position of nodes is crucial for us.
         """
-        expr, position, new_target = [xpath_node.get(attr) for attr in ["expr", "position", "new_target"]]
+        expr, position, new_target, mode = [xpath_node.get(attr) for attr in ["expr", "position", "new_target", "mode"]]
+        mode = mode or "outer"
         if not new_target:
             target_node = self.map_id_to_node_old[expr]
         else:
@@ -660,11 +662,25 @@ class KeyedXmlDiffer:
 
         xpath_node.set("expr", self._get_xpath(target_node))
 
-        if position == "move":
+        if position in ("move", "attributes"):
             self._redo_xpath_node(xpath_node, target_node)
             return target_node
 
-        last_target = target_node
+        sentinel = etree.Element("sentinel")
+        if position == "before":
+            target_node.addprevious(sentinel)
+        elif position == "after":
+            target_node.addnext(sentinel)
+        elif position == "inside":
+            target_node.append(sentinel)
+        elif position == "replace" and mode == "inner":
+            if len(target_node) == 0:
+                target_node.append(sentinel)
+            else:
+                target_node[0].addprevious(sentinel)
+        elif position == "replace" and mode == "outer":
+            target_node.addprevious(sentinel)
+
         for content in xpath_node:
             if new_id := content.get("o-diff-new-id"):
                 content = self.new_nodes_map[new_id]
@@ -672,18 +688,20 @@ class KeyedXmlDiffer:
                 content = self._apply_xpath_operation(content)
             else:
                 content = deepcopy(content)
-
-            if position == "before":
-                target_node.addprevious(content)
-            elif position in ("after", "replace"):
-                last_target.addnext(content)
-                last_target = content
-            elif position == "inside":
-                target_node.append(content)
+            sentinel.addprevious(content)
 
         self._redo_xpath_node(xpath_node, target_node)
         if position == "replace":
-            target_node.getparent().remove(target_node)
+            if mode == "outer":
+                target_node.getparent().remove(target_node)
+                sentinel.getparent().remove(sentinel)
+            elif mode == "inner":
+                for c in reversed(target_node):
+                    c.getparent().remove(c)
+                    if c == sentinel:
+                        break
+        else:
+            sentinel.getparent().remove(sentinel)
 
     def _handle_new_node(self, new_node):
         """When a node was not present in the old tree (it doesn't have an DIFF-ID)
@@ -826,6 +844,8 @@ class KeyedXmlDiffer:
         attribs = {}
         for attr in ("expr", "position"):
             attribs[attr] = xpath_node.attrib.pop(attr)
+        if replacemode := xpath_node.get("mode"):
+            attribs["mode"] = replacemode
         for attr in xpath_node.attrib:
             xpath_node.attrib.pop(attr)
 
@@ -839,44 +859,14 @@ class KeyedXmlDiffer:
 
     def _handle_node_full_replace(self, node_id, change):
         """When texts in an old node are incompatible with texts in a new node
-        we replace the whole node by its new tag, attributes and contents.
-        We don't want to loose references of its children though.
-        So, we build a temporary node in which we push and move everything
-        to replace the old node with that new one in a second operation
+        we replace the whole node's content (see odoo/odoo@ce29310b935ba51ae1584e682eea1ee829d5e7d9)
         """
-        main_node = self.map_id_to_node_old[node_id]
-        new_node = change["new_node"]
-        attribs = dict(new_node.attrib)
         main_xpaths_list = []
         sub_xpath_list = []
-        if len(new_node) == 0:
-            replace_with = Element(main_node.tag, attribs)
-            replace_with.text = new_node.text
-            replace_xpath = Element("xpath", expr=node_id, position="replace", replace_all="1")
-            replace_xpath.append(deepcopy(replace_with))
-            main_xpaths_list.append(replace_xpath)
-            return main_xpaths_list, sub_xpath_list
-
-        # Append a temporary node inside the main one to store elements.
-        # <oldnode>[*children]<tempnode /></oldnode>
-        xpath_temp = Element("xpath", expr=node_id, position="inside")
-        new_id = self.new_id
-        self.new_id += 1
-        new_node = Element(main_node.tag, attribs)
-        new_node.set("o-diff-new-id", str(new_id))
-        self.new_nodes_map[str(new_id)] = new_node
-
-        xpath_temp.append(deepcopy(new_node))
-        main_xpaths_list.append(xpath_temp)
-        inside_temp_xpath = Element("xpath", expr=str(new_id), position="inside", new_target="1")
-        main_xpaths_list.append(inside_temp_xpath)
-
-        self.fill_xpath_node(change['new_leaves'], inside_temp_xpath, sub_xpath_list)
-
-        # Replace the original node with the temporary one
-        replace_with_temp = Element("xpath", expr=node_id, position="replace", replace_all="1")
-        replace_with_temp.append(Element("xpath", expr=str(new_id), position="move", new_target="1"))
-        main_xpaths_list.append(replace_with_temp)
+        replace_xpath = Element("xpath", expr=node_id, position="replace", mode="inner")
+        main_xpaths_list.append(replace_xpath)
+        self.fill_xpath_node(change['new_leaves'], replace_xpath, sub_xpath_list)
+        main_xpaths_list.extend(self._build_xpaths_attributes(change.get("attributes"), node_id))
         return main_xpaths_list, sub_xpath_list
 
     def _parse_old_leaves(self, leaves):
@@ -921,6 +911,10 @@ class KeyedXmlDiffer:
             left_old = old_leaves[0]
             if isinstance(old_leaves[-1], TextLeaf):
                 right_old = old_leaves[-1]
+                if position == "after":
+                    texts_reversed = [l.element for l in takewhile(lambda l: isinstance(l, TextLeaf), reversed(old_leaves))]
+                    right_old = TextLeaf(_texts_concat(reversed(texts_reversed)))
+
         if new_leaves:
             left_new = new_leaves[0]
             right_new = new_leaves[-1]

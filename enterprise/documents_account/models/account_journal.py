@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from odoo import api, models, _
 from odoo.fields import Domain
+from odoo.tools import SQL
 
 
 class AccountJournal(models.Model):
@@ -103,7 +104,7 @@ class AccountJournal(models.Model):
         existing_settings = {(s.company_id, s.journal_id.type): s.folder_id for s in existing_settings}
 
         existing_folders = Documents.search(
-            Domain('id', 'not in', FolderSetting._search([]).select('folder_id')) &
+            Domain('id', 'not in', FolderSetting._search([]).select(SQL('folder_id'))) &
             Domain.OR([
                 [('company_id', '=', company.id), ('folder_id', '=', company.account_folder_id.id),
                  ('name', '=', type_labels[journal_type]), ('type', '=', 'folder')]

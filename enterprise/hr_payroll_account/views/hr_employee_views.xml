@@ -12,6 +12,12 @@
             <group name="application_group" position="inside">
                     <field name="analytic_distribution" widget="analytic_distribution" groups="analytic.group_analytic_accounting"/>
             </group>
+            <field name="review_state" position="attributes">
+                <attribute name="groups">hr.group_hr_user,account.group_account_user</attribute>
+            </field>
+            <field name="date_to_review" position="attributes">
+                <attribute name="groups">hr.group_hr_user,account.group_account_user</attribute>
+            </field>
         </field>
     </record>
 </odoo>

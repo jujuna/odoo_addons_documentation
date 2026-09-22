@@ -1,7 +1,7 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { click, runAllTimers } from "@odoo/hoot-dom";
 import {
-    makeDialogMockEnv,
+    assignDialogTestEnv,
     mockService,
     mountWithCleanup,
     patchWithCleanup,
@@ -13,8 +13,8 @@ import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { SMSSignerDialog } from "@sign/dialogs/dialogs";
 import { fakeSignInfoService } from "./dialog_utils";
 
-const mountSMSSignerDialog = async (postValidation = () => {}) => {
-    await makeDialogMockEnv();
+async function mountSMSSignerDialog(postValidation = () => {}) {
+    assignDialogTestEnv();
     await mountWithCleanup(SMSSignerDialog, {
         props: {
             signerPhone: fakePhoneNumber,
@@ -22,7 +22,7 @@ const mountSMSSignerDialog = async (postValidation = () => {}) => {
             close: () => {},
         },
     });
-};
+}
 
 const fakePhoneNumber = "123456789";
 const documentId = 23;

@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { queryAll, queryAllTexts, queryFirst } from "@odoo/hoot-dom";
-import { animationFrame, mockDate } from "@odoo/hoot-mock";
+import { queryAll, queryAllTexts, queryFirst, waitFor } from "@odoo/hoot-dom";
+import { animationFrame, mockDate, runAllTimers } from "@odoo/hoot-mock";
 import { contains, getService, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
 import { Domain } from "@web/core/domain";
-import { deserializeDateTime } from "@web/core/l10n/dates";
 import { WebClient } from "@web/webclient/webclient";
 import { Tasks, defineGanttModels } from "./gantt_mock_models";
 import { CLASSES, SELECTORS, getGridContent, mountGanttView } from "./web_gantt_test_helpers";
@@ -23,17 +22,14 @@ test("empty ungrouped gantt rendering", async () => {
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe(null);
     expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(columnHeaders).toHaveLength(8);
-    expect(columnHeaders.at(0).title).toBe("01");
-    expect(columnHeaders.at(-1).title).toBe("08");
+    expect(columnHeaders).toHaveLength(10);
+    expect(columnHeaders.at(0).title).toBe("15");
+    expect(columnHeaders.at(-1).title).toBe("24");
     expect(rows).toEqual([{}]);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
 });
 
 test("ungrouped gantt rendering", async () => {
-    const task5 = Tasks._records[4];
-    const startDateLocalString = deserializeDateTime(task5.start).toFormat("f");
-    const stopDateLocalString = deserializeDateTime(task5.stop).toFormat("f");
     Tasks._views.gantt = `<gantt date_start="start" date_stop="stop"/>`;
 
     onRpc("get_gantt_data", ({ model }) => expect.step(model));
@@ -49,33 +45,36 @@ test("ungrouped gantt rendering", async () => {
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe(null);
     expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(columnHeaders).toHaveLength(8);
-    expect(columnHeaders.at(0).title).toBe("01");
-    expect(columnHeaders.at(-1).title).toBe("08");
+    expect(columnHeaders).toHaveLength(10);
+    expect(columnHeaders.at(0).title).toBe("15");
+    expect(columnHeaders.at(-1).title).toBe("24");
     expect(SELECTORS.expandCollapseButtons).not.toHaveCount();
     expect(rows).toEqual([
         {
             pills: [
-                { title: "Task 5", level: 0, colSpan: "01 Dec 2018 -> 04 (1/2) Dec 2018" },
-                { title: "Task 1", level: 1, colSpan: "01 Dec 2018 -> Out of bounds (63) " },
+                { title: "Task 1", level: 1, colSpan: "Out of bounds (1)  -> Out of bounds (63) " },
+                { title: "Task 2", level: 0, colSpan: "17 (1/2) Dec 2018 -> 22 (1/2) Dec 2018" },
+                { title: "Task 4", level: 2, colSpan: "20 Dec 2018 -> 20 (1/2) Dec 2018" },
+                { title: "Task 7", level: 2, colSpan: "20 (1/2) Dec 2018 -> 20 Dec 2018" },
             ],
         },
     ]);
 
     // test popover and local timezone
     expect(`.o_popover`).toHaveCount(0);
-    const task5Pill = queryAll(SELECTORS.pill)[0];
-    expect(task5Pill).toHaveText("Task 5");
+    const task1Pill = queryAll(SELECTORS.pill)[0];
+    expect(task1Pill).toHaveText("Task 1");
 
-    await contains(task5Pill).click();
-    expect(`.o_popover`).toHaveCount(1);
-    expect(queryAllTexts`.o_popover .popover-body span`).toEqual([
-        "Task 5",
-        startDateLocalString,
-        stopDateLocalString,
+    await contains(task1Pill).click();
+    await runAllTimers();
+    await waitFor(`.o_popover`);
+    expect(`.o_popover .o_popover_header`).toHaveText("Task 1");
+    expect(queryAllTexts(`.o_popover .o_popover_body div`)).toEqual([
+        "Start: Nov 30, 7:30 PM",
+        "Stop: Dec 31, 7:29 PM",
     ]);
 
-    await contains(`.o_popover .popover-footer i.fa.fa-close`).click();
+    await contains(`.o_popover i.oi[data-icon='close']`).click();
     expect(`.o_popover`).toHaveCount(0);
 });
 
@@ -85,7 +84,7 @@ test("ordered gantt view", async () => {
         arch: `<gantt date_start="start" date_stop="stop" progress="progress"/>`,
         groupBy: ["stage_id"],
     });
-    await contains(".o_content").scroll({ left: 850 });
+    await contains(".o_gantt_scroll_container").scroll({ left: 850 });
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe("Gantt View");
     expect(range).toBe("12/01/2018 -> 02/28/2019");
@@ -94,6 +93,9 @@ test("ordered gantt view", async () => {
     expect(columnHeaders.at(-1).title).toBe("25");
     expect(SELECTORS.noContentHelper).toHaveCount(0);
     expect(rows).toEqual([
+        {
+            title: "Undefined Stage",
+        },
         {
             title: "todo",
         },
@@ -141,10 +143,10 @@ test("empty single-level grouped gantt rendering", async () => {
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe("Gantt View");
     expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(columnHeaders).toHaveLength(8);
-    expect(columnHeaders.at(0).title).toBe("01");
-    expect(columnHeaders.at(-1).title).toBe("08");
-    expect(rows).toEqual([{ title: "" }]);
+    expect(columnHeaders).toHaveLength(10);
+    expect(columnHeaders.at(0).title).toBe("16");
+    expect(columnHeaders.at(-1).title).toBe("25");
+    expect(rows).toEqual([{ title: "Undefined Project" }]);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
 });
 
@@ -154,7 +156,7 @@ test("single-level grouped gantt rendering", async () => {
         arch: `<gantt string="Tasks" date_start="start" date_stop="stop"/>`,
         groupBy: ["project_id"],
     });
-    await contains(".o_content").scroll({ left: 850 });
+    await contains(".o_gantt_scroll_container").scroll({ left: 850 });
     expect(SELECTORS.expandCollapseButtons).not.toHaveCount();
 
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
@@ -164,6 +166,9 @@ test("single-level grouped gantt rendering", async () => {
     expect(columnHeaders.at(0).title).toBe("16");
     expect(columnHeaders.at(-1).title).toBe("25");
     expect(rows).toEqual([
+        {
+            title: "Undefined Project",
+        },
         {
             title: "Project 1",
             pills: [
@@ -247,8 +252,6 @@ test("Progressbar: check the progressbar percentage visibility.", async () => {
 
     expect(SELECTORS.progressBar).toHaveCount(2);
     const [progressBar1, progressBar2] = queryAll(SELECTORS.progressBar);
-    expect(progressBar1).toHaveClass("o_gantt_group_success");
-    expect(progressBar2).toHaveClass("o_gantt_group_success");
     const [rowHeader1, rowHeader2] = [progressBar1.parentElement, progressBar2.parentElement];
     expect(rowHeader1.matches(SELECTORS.rowHeader)).toBe(true);
     expect(rowHeader2.matches(SELECTORS.rowHeader)).toBe(true);
@@ -258,8 +261,7 @@ test("Progressbar: check the progressbar percentage visibility.", async () => {
         "50%",
         "12.5%",
     ]);
-    expect(SELECTORS.progressBarForeground).toHaveCount(2);
-    expect(queryAllTexts(SELECTORS.progressBarForeground)).toEqual(["50h / 100h", "25h / 200h"]);
+    expect(queryAllTexts(SELECTORS.progressBarForeground)).toEqual(["50h", "175h"]);
 
     // Check the style of one of the progress bars
     expect(rowHeader1.children).toHaveLength(2);
@@ -267,9 +269,9 @@ test("Progressbar: check the progressbar percentage visibility.", async () => {
     expect(rowTitle1.matches(SELECTORS.rowTitle)).toBe(true);
     expect(rowTitle1.nextElementSibling).toBe(progressBar1);
 
-    expect(rowHeader1).toHaveStyle({ gridTemplateRows: "25px 25px" });
-    expect(rowTitle1).toHaveStyle({ height: "25px" });
-    expect(progressBar1).toHaveStyle({ height: "25px" });
+    expect(rowHeader1).toHaveStyle({ gridTemplateRows: "27px 5px" });
+    expect(rowTitle1).toHaveStyle({ height: "27px" });
+    expect(progressBar1).toHaveStyle({ height: "5px" });
 });
 
 test("Progressbar: grouped row", async () => {
@@ -295,8 +297,6 @@ test("Progressbar: grouped row", async () => {
 
     expect(SELECTORS.progressBar).toHaveCount(4);
     const [progressBar1, progressBar2] = queryAll(SELECTORS.progressBar);
-    expect(progressBar1).toHaveClass("o_gantt_group_success");
-    expect(progressBar2).toHaveClass("o_gantt_group_success");
     const [rowHeader1, rowHeader2] = [progressBar1.parentElement, progressBar2.parentElement];
     expect(rowHeader1.matches(SELECTORS.rowHeader)).toBe(true);
     expect(rowHeader2.matches(SELECTORS.rowHeader)).toBe(true);
@@ -308,13 +308,7 @@ test("Progressbar: grouped row", async () => {
         "12.5%",
         "12.5%",
     ]);
-    expect(SELECTORS.progressBarForeground).toHaveCount(4);
-    expect(queryAllTexts(SELECTORS.progressBarForeground)).toEqual([
-        "50h / 100h",
-        "50h / 100h",
-        "25h / 200h",
-        "25h / 200h",
-    ]);
+    expect(queryAllTexts(SELECTORS.progressBarForeground)).toEqual(["50h", "50h", "175h", "175h"]);
 
     // Check the style of one of the progress bars
     expect(rowHeader1.children).toHaveLength(2);
@@ -322,9 +316,9 @@ test("Progressbar: grouped row", async () => {
     expect(rowTitle1.matches(SELECTORS.rowTitle)).toBe(true);
     expect(rowTitle1.nextElementSibling).toBe(progressBar1);
 
-    expect(rowHeader1).toHaveStyle({ gridTemplateRows: "23px 25px" });
-    expect(rowTitle1).toHaveStyle({ height: "23px" });
-    expect(progressBar1).toHaveStyle({ height: "25px" });
+    expect(rowHeader1).toHaveStyle({ gridTemplateRows: "18px 5px" });
+    expect(rowTitle1).toHaveStyle({ height: "18px" });
+    expect(progressBar1).toHaveStyle({ height: "5px" });
 });
 
 test("horizontal scroll applies to the content [SMALL SCREEN]", async () => {
@@ -336,21 +330,22 @@ test("horizontal scroll applies to the content [SMALL SCREEN]", async () => {
         views: [[false, "gantt"]],
     });
     await animationFrame();
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
 
     const o_view_controller = queryFirst(".o_view_controller");
-    const o_content = queryFirst(".o_content");
+    const scrollContainer = queryFirst(".o_gantt_scroll_container");
     const firstColumnHeader = queryFirst(SELECTORS.columnHeader);
     const initialXHeaderCell = firstColumnHeader.getBoundingClientRect().x;
 
     expect(o_view_controller).toHaveClass("o_action_delegate_scroll");
     expect(o_view_controller).toHaveStyle({ overflow: "hidden" });
-    expect(o_content).toHaveStyle({ overflow: "auto" });
-    expect(o_content).toHaveProperty("scrollLeft", 0);
+    expect(scrollContainer).toHaveStyle({ overflow: "auto" });
+    expect(scrollContainer).toHaveProperty("scrollLeft", 0);
 
     // Horizontal scroll
     const newScrollLeft = 50;
-    await contains(".o_content").scroll({ left: newScrollLeft });
+    await contains(".o_gantt_scroll_container").scroll({ left: newScrollLeft });
 
-    expect(o_content).toHaveProperty("scrollLeft", newScrollLeft);
+    expect(scrollContainer).toHaveProperty("scrollLeft", newScrollLeft);
     expect(firstColumnHeader.getBoundingClientRect().x).toBe(initialXHeaderCell - 50);
 });

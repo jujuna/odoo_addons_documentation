@@ -25,14 +25,12 @@ class AccountJournal(models.Model):
         return rslt
 
     def _check_ofx(self, raw_file):
-        if (raw_file or b'').startswith(b"OFXHEADER"):
-            #v1 OFX
+        header = raw_file.content[:1024]
+        if header.startswith(b"OFXHEADER"):
+            # v1 OFX
             return True
-        try:
-            #v2 OFX
-            return b"<ofx>" in (raw_file or b'').lower()
-        except ElementTree.ParseError:
-            return False
+        # v2 OFX
+        return b"<ofx>" in header.lower()
 
     def _fill_transaction_vals_line_ofx(self, transaction, length_transactions, partner_bank):
         return {
@@ -41,9 +39,10 @@ class AccountJournal(models.Model):
             'ref': transaction.id,
             'amount': float(transaction.amount),
             'unique_import_id': transaction.id,
-            'account_number': partner_bank.acc_number,
+            'account_number': partner_bank.account_number,
             'partner_id': partner_bank.partner_id.id,
             'sequence': length_transactions + 1,
+            'transaction_details': transaction.__dict__,
         }
 
     def _parse_bank_statement_file(self, raw_file):

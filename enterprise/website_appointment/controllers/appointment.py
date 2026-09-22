@@ -13,7 +13,20 @@ class WebsiteAppointment(AppointmentController):
     # APPOINTMENT INDEX PAGE
     # ------------------------------------------------------------
 
-    @http.route()
+    def appointment_type_index_sitemap(env, rule, qs):
+        Appointment = env['appointment.type']
+        domain = [('is_published', '=', True)]
+        appointments = Appointment.search(domain, limit=2)
+
+        if len(appointments) == 1:
+            loc = f'/appointment/{appointments[0].id}'
+        else:
+            loc = '/appointment'
+
+        if not qs or qs.lower() in loc.lower():
+            yield {'loc': loc}
+
+    @http.route(sitemap=appointment_type_index_sitemap)
     def appointment_type_index(self, page=1, **kwargs):
         """
         Display the appointments to choose (the display depends of a custom option called 'Card Design')
@@ -40,26 +53,15 @@ class WebsiteAppointment(AppointmentController):
         )
         if len(available_appointment_types) == 1 and not kwargs.get('search'):
             # If there is only one appointment type available in the selection, skip the appointment type selection view
-            return request.redirect('/appointment/%s?%s' % (available_appointment_types.id, keep_query('*')))
+            return request.redirect('%s?%s' % (available_appointment_types.website_url, keep_query('*')))
 
-        cards_layout = request.website.viewref('website_appointment.opt_appointments_list_cards').active
-
-        if cards_layout:
-            return request.render(
-                'website_appointment.appointments_cards_layout',
-                self._prepare_appointments_cards_data(
-                    page, available_appointment_types,
-                    **kwargs
-                )
+        return request.render(
+            'website_appointment.appointments_selection_layout',
+            self._prepare_appointments_data(
+                page, available_appointment_types,
+                **kwargs
             )
-        else:
-            return request.render(
-                'appointment.appointments_list_layout',
-                self._prepare_appointments_list_data(
-                    available_appointment_types,
-                    **kwargs
-                )
-            )
+        )
 
     # ----------------------------------------------------------------
     # APPOINTMENT SUBMISSION : RECAPTCHA CHECK
@@ -67,84 +69,21 @@ class WebsiteAppointment(AppointmentController):
     @http.route()
     def appointment_form_submit(self, *args, **kwargs):
         request.env['ir.http']._verify_request_recaptcha_token('appointment_form_submission')
+        # Ensure the visitor is recorded for the test_appointment_forced_staff_user_tour
+        request.env['ir.http']._get_visitor_from_request(force_create=True)
         return super().appointment_form_submit(*args, **kwargs)
-
-    # ----------------------------------------------------------------
-    # APPOINTMENT TYPE PAGE VIEW : WITH NEW OPERATOR SELECTION VIEW
-    # ----------------------------------------------------------------
-
-    def _get_appointment_type_resource_selection_view(self, appointment_type, page_values):
-        """
-        Renders the appointment_select_operator template. This displays a card view of available staff users to
-        select from for appointment_type, containing their picture, job description and website_description.
-
-        :param appointment_type: the appointment_type that we want to access.
-        :param page_values: dict of precomputed values in the appointment_page route.
-        """
-        return request.render("website_appointment.appointment_select_operator", {
-            'appointment_type': appointment_type,
-            'available_appointments': page_values['available_appointments'],
-            'main_object': appointment_type,
-            'users_possible': page_values['users_possible'],
-            'resources_possible': page_values['resources_possible'],
-        })
-
-    def _get_appointment_type_page_view(self, appointment_type, page_values, state=False, **kwargs):
-        """
-        Override: when website_appointment is installed, instead of the default appointment type page, renders the
-        operator selection template, if the condition below is met.
-        """
-        # If the user skips the resource selection to see all availabilities, make sure we do not show the selection.
-        # As the operator view is mainly user cards, we only show it if avatars are 'on'. Also, it makes no sense in
-        # random appointment types since it is a selection screen. Moreover, the selection should not have already
-        # been made before in order to avoid loops. Finally, in order to choose, one needs at least 2 possible users/resources.
-        skip_resource_selection = kwargs.get('skip_resource_selection') or \
-            not appointment_type.active or \
-            appointment_type.is_auto_assign or \
-            appointment_type.is_date_first
-        operator_selection = not skip_resource_selection and \
-            appointment_type.schedule_based_on == 'users' and \
-            not page_values['user_selected'] and \
-            len(page_values['users_possible']) > 1
-        resource_selection = not skip_resource_selection and \
-            appointment_type.schedule_based_on == 'resources' and \
-            not page_values['resource_selected'] and \
-            len(page_values['resources_possible']) > 1
-        if operator_selection or resource_selection:
-            return self._get_appointment_type_resource_selection_view(appointment_type, page_values)
-        return super()._get_appointment_type_page_view(appointment_type, page_values, state, **kwargs)
-
-    def _prepare_appointment_type_page_values(self, appointment_type, staff_user_id=False, resource_selected_id=False, skip_resource_selection=False, **kwargs):
-        """
-        Override: Take into account the operator selection flow. When skipping the selection,
-        no {user,resource}_selected or user_default should be set. The display is also properly managed according to this new flow.
-
-        :param skip_resource_selection: If true, skip the selection, and instead see all availabilities. No user should be selected.
-        """
-        values = super()._prepare_appointment_type_page_values(appointment_type, staff_user_id, resource_selected_id, **kwargs)
-        values['skip_resource_selection'] = skip_resource_selection
-        if skip_resource_selection:
-            values['user_selected'] = values['user_default'] = request.env['res.users']
-            values['resource_selected'] = values['resource_default'] = request.env['appointment.resource']
-        else:
-            resource_or_user_selected = values['user_selected'] if appointment_type.schedule_based_on == 'users' else values['resource_selected']
-            values['hide_select_dropdown'] = values['hide_select_dropdown'] or (
-                resource_or_user_selected
-                and not (appointment_type.is_date_first and not appointment_type.is_auto_assign))
-        return values
 
     # Tools / Data preparation
     # ------------------------------------------------------------
 
-    def _prepare_appointments_cards_data(self, page, appointment_types, **kwargs):
+    def _prepare_appointments_data(self, page, appointment_types, **kwargs):
         """
-            Compute specific data for the cards layout like the search bar and the pager.
+            Compute specific data for the appointment selection layout like the search bar and the pager.
         """
         APPOINTMENTS_PER_PAGE = 12
-        website = request.website
         appointment_count = len(appointment_types)
 
-        pager = website.pager(
+        pager = self.env.website.pager(
             url='/appointment',
             url_args=kwargs,
             total=appointment_count,
@@ -162,13 +101,19 @@ class WebsiteAppointment(AppointmentController):
             'filter_staff_user_ids': kwargs.get('filter_staff_user_ids'),
             'invite_token': kwargs.get('invite_token'),
             'search_count': appointment_count,
+            'structured_data': appointment_types._render_jsonld(),
         }
+
+    def _prepare_appointment_type_page_values(self, appointment_type, staff_user_id=False, resource_selected_id=False, **kwargs):
+        values = super()._prepare_appointment_type_page_values(appointment_type, staff_user_id, resource_selected_id, **kwargs)
+        values['structured_data'] = appointment_type._render_jsonld(is_detail_page=True)
+        return values
 
     def _get_allowed_companies(self, organizer):
         """ Check if the current website can be used to determine the company
         and fallback on the companies of the organizer if not """
         companies = super()._get_allowed_companies(organizer)
-        website_company = request.website.company_id if request.website else request.env['res.company']
+        website_company = self.env.website.company_id
         return website_company if website_company in companies else companies
 
     def _get_customer_partner(self):
@@ -177,7 +122,7 @@ class WebsiteAppointment(AppointmentController):
         avoid partner duplication if the user is not logged. """
         partner = super()._get_customer_partner()
         if not partner:
-            visitor = request.env['website.visitor']._get_visitor_from_request()
+            visitor = request.env['ir.http']._get_visitor_from_request()
             if visitor.partner_id:
                 partner = visitor.partner_id
             elif visitor and request.env.user._is_public():
@@ -195,12 +140,12 @@ class WebsiteAppointment(AppointmentController):
         """
         country = AppointmentController._get_customer_country()
         if not country:
-            visitor = request.env['website.visitor']._get_visitor_from_request()
+            visitor = request.env['ir.http']._get_visitor_from_request()
             country = visitor.country_id
         return country
 
     @classmethod
     def _appointments_base_domain(cls, filter_appointment_type_ids, search=False, invite_token=False, additional_domain=None, filter_countries=False):
         domain = super()._appointments_base_domain(filter_appointment_type_ids, search, invite_token, additional_domain, filter_countries)
-        domain &= request.website.website_domain()
+        domain &= request.env.website.website_domain()
         return domain

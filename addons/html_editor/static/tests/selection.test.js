@@ -1,7 +1,7 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { isInViewPort, press, queryFirst, queryOne } from "@odoo/hoot-dom";
 import { animationFrame, tick } from "@odoo/hoot-mock";
-import { Component, xml } from "@odoo/owl";
+import { Component, signal, xml } from "@odoo/owl";
 import {
     defineModels,
     fields,
@@ -11,13 +11,13 @@ import {
 } from "@web/../tests/web_test_helpers";
 import { useAutofocus } from "@web/core/utils/hooks";
 import { Plugin } from "../src/plugin";
-import { MAIN_PLUGINS } from "../src/plugin_sets";
 import { setupEditor } from "./_helpers/editor";
 import { getContent, setSelection } from "./_helpers/selection";
 import { insertText, tripleClick } from "./_helpers/user_actions";
+import { unformat } from "./_helpers/format";
 import { withSequence } from "@html_editor/utils/resource";
-import { callbacksForCursorUpdate } from "@html_editor/utils/selection";
 import { SelectionPlugin } from "@html_editor/core/selection_plugin";
+import { callbacksForCursorUpdate } from "@html_editor/utils/selection";
 
 test("getEditableSelection should work, even if getSelection returns null", async () => {
     const { editor } = await setupEditor("<p>a[b]</p>");
@@ -40,12 +40,12 @@ test("plugins should be notified when ranges are removed", async () => {
     class TestPlugin extends Plugin {
         static id = "test";
         resources = {
-            selectionchange_handlers: () => count++,
+            on_selectionchange_handlers: () => count++,
         };
     }
 
     const { el } = await setupEditor("<p>a[b]</p>", {
-        config: { Plugins: [...MAIN_PLUGINS, TestPlugin] },
+        config: { includePlugins: [TestPlugin] },
     });
     const countBefore = count;
     document.getSelection().removeAllRanges();
@@ -178,6 +178,66 @@ test("setEditableSelection should not crash if getSelection returns null", async
     expect(selection.endOffset).toBe(2);
 });
 
+test("getSelectionData should use the range of the document selection to set offsets (specifically for safari)", async () => {
+    const { editor } = await setupEditor("[]");
+    let selection = editor.shared.selection.getEditableSelection();
+    expect(selection.startOffset).toBe(0);
+    expect(selection.endOffset).toBe(0);
+
+    // Simulate the broken behavior of Safari where getSelection returns a selection
+    // with offsets outside of the actual node length, and the range is correct.
+    patchWithCleanup(document, {
+        getSelection: () => ({
+            ...selection,
+            anchorOffset: 1,
+            focusOffset: 1,
+            rangeCount: 1,
+            getRangeAt: () => ({
+                commonAncestorContainer: selection.anchorNode,
+                startContainer: selection.anchorNode,
+                endContainer: selection.focusNode,
+                startOffset: 0,
+                endOffset: 0,
+            }),
+        }),
+    });
+
+    selection = editor.shared.selection.getEditableSelection();
+    expect(selection.anchorOffset).toBe(0);
+});
+
+test("active selection shouldn't change when document selection is inconsistent with its range", async () => {
+    const { editor } = await setupEditor("<p>[]</p>abc");
+    let selection = editor.shared.selection.getEditableSelection();
+    const originalAnchorNode = selection.anchorNode;
+    expect(selection.startOffset).toBe(0);
+    expect(selection.endOffset).toBe(0);
+
+    // Simulate a very broken DOM selection with inconsistent anchor/focus nodes
+    // comparing its range.
+    patchWithCleanup(document, {
+        getSelection: () => ({
+            ...selection,
+            anchorNode: selection.anchorNode.parentNode,
+            focusNode: selection.focusNode.parentNode,
+            anchorOffset: 0,
+            focusOffset: 0,
+            rangeCount: 1,
+            getRangeAt: () => ({
+                commonAncestorContainer: selection.anchorNode,
+                startContainer: selection.anchorNode,
+                endContainer: selection.focusNode,
+                startOffset: 0,
+                endOffset: 0,
+            }),
+        }),
+    });
+
+    selection = editor.shared.selection.getEditableSelection();
+    expect(selection.anchorNode).toBe(originalAnchorNode);
+    expect(selection.anchorOffset).toBe(0);
+});
+
 test("modifySelection should not crash if getSelection returns null", async () => {
     const { editor } = await setupEditor("<p>a[b]</p>");
     let selection = editor.shared.selection.getEditableSelection();
@@ -226,13 +286,54 @@ test("press 'ctrl+a' in 'contenteditable' should only select his content", async
     );
 });
 
+test("press 'ctrl+a' with 'contenteditable=false' at start should anchors selection in editable", async () => {
+    const { el } = await setupEditor(
+        unformat(`
+                <div contenteditable="false">
+                    <div>abc</div>
+                    <div contenteditable="true">def</div>
+                </div>
+                <div class="o-paragraph">ghi[]</div>
+            `)
+    );
+    await press(["ctrl", "a"]);
+    expect(getContent(el)).toBe(
+        unformat(`
+                <p data-selection-placeholder="">[<br></p>
+                <div contenteditable="false">
+                    <div>abc</div>
+                    <div contenteditable="true">def</div>
+                </div>
+                <div class="o-paragraph">ghi]</div>
+            `)
+    );
+});
+
+test.tags("focus required");
+test("should focus the nearest editable ancestor when selection is inside a non-editable", async () => {
+    const { editor } = await setupEditor(
+        `<div contenteditable="false"><p contenteditable="true">[test]</p></div>`
+    );
+    const p = queryOne('p[contenteditable="true"]');
+    expect(p).toBeFocused();
+
+    // Moved focus outside of the editable
+    p.blur();
+    expect(document.body).toBeFocused();
+
+    editor.shared.selection.focusEditable();
+    // Focus should be on the closest editable element of the selection
+    expect(p).toBeFocused();
+});
+
 test("restore a selection when you are not in the editable shouldn't move the focus", async () => {
     class TestInput extends Component {
-        static template = xml`<input t-ref="input" t-att-value="'eee'" class="test"/>`;
-        static props = ["*"];
+        static template = xml`<input t-ref="this.inputRef" t-att-value="'eee'" class="test"/>`;
+
+        inputRef = signal.ref();
 
         setup() {
-            useAutofocus({ refName: "input", mobile: true });
+            useAutofocus({ ref: this.inputRef, mobile: true });
         }
     }
 
@@ -268,7 +369,7 @@ test("restore a selection when you are not in the editable shouldn't move the fo
     }
 
     const { editor } = await setupEditor("<p>te[]st</p>", {
-        config: { Plugins: [...MAIN_PLUGINS, TestPlugin] },
+        config: { includePlugins: [TestPlugin] },
     });
     await insertText(editor, "/test");
     await press("enter");
@@ -716,6 +817,9 @@ describe("getTargetedNodes", () => {
                 const { el: editable, editor } = await setupEditor(
                     "<table><tbody><tr><td>abcd[e</td><td>f]g</td></tr></tbody></table>"
                 );
+                // Table selection happens on selectionchange
+                // event which is fired in the next tick.
+                await tick();
                 // The special table selection implies the two table cells are
                 // fully marked as selected.
                 const td1 = editable.querySelector("td"); // The selection crossed `</td>` -> include it.
@@ -730,6 +834,9 @@ describe("getTargetedNodes", () => {
                 const { el: editable, editor } = await setupEditor(
                     "<table><tbody><tr><td>abcd<br>[<br>e</td><td>f]g</td></tr></tbody></table>"
                 );
+                // Table selection happens on selectionchange
+                // event which is fired in the next tick.
+                await tick();
                 // The special table selection implies the two table cells are
                 // fully marked as selected.
                 const td1 = editable.querySelector("td"); // The selection crossed `</td>` -> include it.
@@ -1221,7 +1328,7 @@ describe("crash fixes", () => {
         class TestPlugin extends Plugin {
             static id = "test";
             resources = {
-                selectionchange_handlers: withSequence(-1, (selectionData) => {
+                on_selectionchange_handlers: withSequence(-1, (selectionData) => {
                     const { anchorNode } = selectionData.editableSelection;
                     anchorNode.parentElement.remove();
                 }),
@@ -1229,7 +1336,7 @@ describe("crash fixes", () => {
         }
 
         const { el } = await setupEditor("<p>x<span>a[]</span></p>", {
-            config: { Plugins: [...MAIN_PLUGINS, TestPlugin] },
+            config: { includePlugins: [TestPlugin] },
         });
         expect(getContent(el)).toBe("<p>x[]</p>");
     });
@@ -1319,4 +1426,22 @@ describe("Preserve selection", () => {
         c1.restore();
         expect(isSameCursor(c1, c2)).toBe(true);
     });
+});
+
+describe("Focus changes", () => {
+    test("Should not lose selection on focus change from the command palette", async () => {
+        const { el } = await setupEditor("<p>ab[]cd</p>");
+        await press(["ctrl", "k"]);
+        await animationFrame();
+        await press(["Escape"]);
+        await animationFrame();
+        expect(getContent(el)).toBe("<p>ab[]cd</p>");
+    });
+});
+
+test.tags("desktop");
+test("Triple click shouldn't escape contenteditable context", async () => {
+    const { el } = await setupEditor(`<p>a<span contenteditable="true">c</span>b</p>`);
+    await tripleClick(el.querySelector("span"));
+    expect(getContent(el)).toBe(`<p>a<span contenteditable="true">[c]</span>b</p>`);
 });

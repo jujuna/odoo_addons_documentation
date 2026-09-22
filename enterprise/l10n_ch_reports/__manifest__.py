@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -15,7 +14,6 @@ Accounting reports for Switzerland
         'data/account_financial_html_report_data.xml',
         'data/account_return_data.xml',
     ],
-    'installable': True,
     'auto_install': ['l10n_ch', 'account_reports'],
     'website': 'https://www.odoo.com/app/accounting',
     'author': 'Odoo S.A.',

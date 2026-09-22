@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Mexican Localization for the Point of Sale',
@@ -11,9 +10,13 @@
         'point_of_sale',
     ],
     'data': [
+        'security/ir.access.csv',
+
         'views/res_config_settings_views.xml',
         'views/pos_payment_method_views.xml',
+        'views/res_partner_views.xml',
         'views/pos_order_views.xml',
+        'views/pos_ticket_view.xml',
 
         'wizard/l10n_mx_edi_global_invoice_create.xml',
     ],
@@ -28,7 +31,6 @@
             'l10n_mx_edi_pos/static/tests/tours/refund_order_tour.js',
         ],
     },
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

@@ -9,16 +9,17 @@ from odoo.addons.hr_expense.tests.common import TestExpenseCommon
 @tagged('-at_install', 'post_install')
 class TestExpenseMargin(TestExpenseCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_expense_reinvoice_purchase_price(self):
         # re-invoiceable products
         product_with_cost = self.product_a
-        product_with_cost.write({'standard_price': 1000, 'expense_policy': 'sales_price'})
+        product_with_cost.write({'standard_price': 1000, 'reinvoice_policy': 'sales_price'})
         product_with_no_cost = self.product_c
-        product_with_no_cost.write({'expense_policy': 'sales_price'})
+        product_with_no_cost.write({'reinvoice_policy': 'sales_price'})
 
         # create SO line and confirm SO (with only one line)
         sale_order = self.env['sale.order'].with_context(
-            mail_notrack=True,
             mail_create_nolog=True,
         ).sudo().create({
             'partner_id': self.partner_a.id,
@@ -74,13 +75,12 @@ class TestExpenseMargin(TestExpenseCommon):
 
         expense.action_submit()
         expense._do_approve()  # Skip duplicate wizard
-        self.post_expenses_with_wizard(expense)
+        self.post_expenses(expense)
 
-        self.assertRecordValues(sale_order.order_line, [
-            {'purchase_price': 1000.00, 'is_expense': False},
-            # Expense lines:
-            {'purchase_price':   86.96, 'is_expense': True},
-            {'purchase_price':  100.00, 'is_expense': True},
-            {'purchase_price':  869.57, 'is_expense': True},
-            {'purchase_price': 1000.00, 'is_expense': True},
-        ])
+        self.assertAlmostEqual(sale_order.order_line[0].purchase_price, 1000.0)
+        self.assertFalse(sale_order.order_line[0].is_expense)
+
+        # Expense Lines
+        for line, expected_purchase_price in zip(sale_order.order_line[1:], [86.96, 100.0, 869.5666667, 1000.0]):
+            self.assertAlmostEqual(line.purchase_price, expected_purchase_price)
+            self.assertTrue(line.is_expense)

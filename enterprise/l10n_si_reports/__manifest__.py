@@ -1,8 +1,6 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Slovenia - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """ Base module for Slovenian reports """,
     'depends': [
@@ -10,13 +8,14 @@
         'account_reports',
     ],
     'data': [
-        'data/account_return_data.xml',
+        'data/ec_sales_lists.xml',
         'data/balance_sheet.xml',
         'data/profit_loss.xml',
-        'data/ec_sales_lists.xml',
+        'data/account_return_data.xml',
+        'wizard/ec_sales_list_submission_wizard.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': True,
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

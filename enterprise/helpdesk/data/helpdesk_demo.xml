@@ -34,7 +34,6 @@
     <record id="helpdesk_team2" model="helpdesk.team">
         <field name="name">IT Support (Auto Assignment by Tags)</field>
         <field name="stage_ids" eval="[(6, 0, [ref('helpdesk.stage_new'), ref('helpdesk.stage_in_progress'), ref('helpdesk.stage_solved'), ref('helpdesk.stage_cancelled')])]"/>
-        <field name="use_rating" eval="True"/>
         <field name="color">8</field>
         <field name="sequence">13</field>
         <field name="auto_assignment" eval="True"/>
@@ -59,7 +58,6 @@
         <field name="name">VIP Support</field>
         <field name="stage_ids" eval="[(6, 0, [ref('helpdesk.stage_new'), ref('helpdesk.stage_in_progress'), ref('helpdesk.stage_solved'), ref('helpdesk.stage_cancelled')])]"/>
         <field name="use_sla" eval="True"/>
-        <field name="use_rating" eval="True"/>
         <field name="color">10</field>
         <field name="auto_assignment" eval="True"/>
         <field name="assign_method">randomly</field>
@@ -71,7 +69,10 @@
         </field>
     </record>
     <record id="helpdesk.helpdesk_team1" model="helpdesk.team">
-        <field name="use_rating" eval="True"/>
+        <field name="member_ids" eval="[Command.link(ref('base.user_demo'))]"/>
+        <field name="allow_portal_ticket_closing" eval="True"/>
+        <field name="auto_close_ticket" eval="True"/>
+        <field name="auto_assignment" eval="True"/>
         <field name="description" type="html">
             <p>We provide 24/7 support, Monday through Friday. Ticket responses are usually provided within 2 working days.<br/>
             Support is mainly provided in English. We can also assist in Spanish, French, and Dutch.</p>
@@ -96,10 +97,9 @@
     <record id="helpdesk_sla_3" model="helpdesk.sla">
         <field name="name">8 hours to finish</field>
         <field name="team_id" ref="helpdesk_team3"/>
-        <field name="priority">3</field>
         <field name="stage_id" ref="stage_solved"/>
         <field name="time">8</field>
-        <field name="partner_ids" eval="[Command.link(ref('base.res_partner_10')), Command.link(ref('base.res_partner_2'))]"/>
+        <field name="criteria_domain" eval="[('partner_id', 'in', [ref('base.res_partner_10'), ref('base.res_partner_2')]), ('priority', '=' , '3')]"/>
     </record>
 
     <!-- Tickets -->
@@ -120,7 +120,7 @@
     <record id="helpdesk_ticket_3" model="helpdesk.ticket">
         <field name="name">Warranty</field>
         <field name="team_id" ref="helpdesk.helpdesk_team1"/>
-        <field name="user_id" ref="base.user_admin"/>
+        <field name="user_id" ref="base.user_demo"/>
         <field name="priority">2</field>
         <field name="partner_id" ref="base.res_partner_main1" />
         <field name="stage_id" ref="helpdesk.stage_new"/>
@@ -172,7 +172,7 @@ Thank you!</p>
     <record id="helpdesk_ticket_6" model="helpdesk.ticket">
         <field name="name">Lost key</field>
         <field name="team_id" ref="helpdesk.helpdesk_team1"/>
-        <field name="user_id" ref="base.user_admin"/>
+        <field name="user_id" ref="base.user_demo"/>
         <field name="partner_id" ref="base.res_partner_3"/>
         <field name="stage_id" ref="helpdesk.stage_in_progress"/>
         <field name="kanban_state">done</field>
@@ -490,8 +490,8 @@ Thanks in advance,<br/><br/>Joe King</p>
         <field name="tag_ids" eval="[Command.link(ref('helpdesk.tag_service'))]"/>
         <field name="partner_id" ref="base.res_partner_4"/>
         <field name="description" type="html">
-<p>Internet is very slow today. 
-Can you please increase the speed from your side? 
+<p>Internet is very slow today.
+Can you please increase the speed from your side?
 Maybe add some extra GBs so it works faster?</p>
         </field>
     </record>
@@ -555,8 +555,8 @@ Maybe add some extra GBs so it works faster?</p>
         <field name="activity_type_id" ref="mail.mail_activity_data_todo"/>
         <field name="date_deadline" eval="DateTime.today()"/>
         <field name="summary">Provide warranty details</field>
-        <field name="create_uid" ref="base.user_admin"/>
-        <field name="user_id" ref="base.user_admin"/>
+        <field name="create_uid" ref="base.user_demo"/>
+        <field name="user_id" ref="base.user_demo"/>
     </record>
     <record id="helpdesk_activity_2" model="mail.activity">
         <field name="res_id" ref="helpdesk.helpdesk_ticket_12"/>
@@ -582,4 +582,143 @@ Maybe add some extra GBs so it works faster?</p>
         <field name="auto_delete" eval="False"/>
     </record>
 
+    <!-- Sent assignment email -->
+    <function model="helpdesk.ticket" name="message_post_with_source"
+            eval="([ref('helpdesk.helpdesk_ticket_3')], obj().env.ref('helpdesk.new_ticket_request_email_template'))"/>
+
+    <record id="helpdesk_ticket_3_message_1" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_3"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.partner_demo"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=2))"/>
+        <field name="body" type="html"><div>Thank you for your inquiry. Our products typically come with a one-year limited warranty. For more details, could you specify which product you're interested in?</div></field>
+    </record>
+    <record id="helpdesk_ticket_3_message_2" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_3"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.res_partner_main1"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=2.5))"/>
+        <field name="body" type="html"><div>I'm interested in purchasing a desk. Does the warranty cover assembly-related issues?</div></field>
+    </record>
+    <record id="helpdesk_ticket_3_message_3" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_3"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.partner_demo"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=4))"/>
+        <field name="body" type="html"><div>Yes, our warranty covers any defects related to assembly or materials. Please let us know if you need assistance with your purchase.</div></field>
+    </record>
+    <record id="helpdesk_ticket_3_message_4" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_3"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.res_partner_main1"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=6))"/>
+        <field name="body" type="html"><div>That's great to hear. Could you also provide information on extended warranty options?</div></field>
+    </record>
+    <record id="helpdesk_ticket_3_message_5" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_3"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.partner_demo"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=7))"/>
+        <field name="body" type="html"><div>We offer extended warranty options for up to three years. Feel free to contact us for more details and pricing.</div></field>
+    </record>
+    <record id="helpdesk_ticket_3_message_6" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_3"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.res_partner_main1"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=8))"/>
+        <field name="body" type="html"><div>Thank you for the information. I'll consider the extended warranty option for my desk purchase.</div></field>
+    </record>
+    <record id="helpdesk_ticket_6_message_1" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_6"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.partner_demo"/>
+        <field name="date" eval="(DateTime.now() + relativedelta(hours=1))"/>
+        <field name="body" type="html"><div>We apologize for the inconvenience. Could you please provide the locker model or any identification marks on it?</div></field>
+    </record>
+    <record id="helpdesk_ticket_6_message_2" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_6"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.res_partner_3"/>
+        <field name="date" eval="(DateTime.now() + relativedelta(hours=2))"/>
+        <field name="body" type="html"><div>It's a NX Pro, no serial number visible.</div></field>
+    </record>
+    <record id="helpdesk_ticket_6_message_3" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_6"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.partner_demo"/>
+        <field name="date" eval="(DateTime.now() + relativedelta(hours=3))"/>
+        <field name="body" type="html"><div>We recommend contacting a locksmith who specializes in opening locked furniture.</div></field>
+    </record>
+    <record id="helpdesk_ticket_6_message_4" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_6"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.res_partner_3"/>
+        <field name="date" eval="(DateTime.now() + relativedelta(hours=5))"/>
+        <field name="body" type="html"><div>Can you provide a replacement key for this locker model?</div></field>
+    </record>
+    <record id="helpdesk_ticket_6_message_5" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_6"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.partner_demo"/>
+        <field name="date" eval="(DateTime.now() + relativedelta(hours=6))"/>
+        <field name="body" type="html"><div>Unfortunately, we don't have replacement keys for this model.</div></field>
+    </record>
+    <record id="helpdesk_ticket_15_message_1" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_15"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.partner_admin"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=1.5))"/>
+        <field name="body" type="html"><div>Thank you for informing us. We will send a technician to fix the balance issue with the desk legs. Can you provide your address and preferred timing for the visit?</div></field>
+    </record>
+    <record id="helpdesk_ticket_15_message_2" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_15"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.res_partner_address_15"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=4))"/>
+        <field name="body" type="html"><div>My address is 123 Main Street, Anytown, USA. Anytime between 9 AM to 5 PM works for me.</div></field>
+    </record>
+    <record id="helpdesk_ticket_15_message_3" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_15"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.partner_admin"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=5))"/>
+        <field name="body" type="html"><div>Understood. We will schedule a technician to visit your office to fix the desk legs. Thank you for your patience.</div></field>
+    </record>
+    <record id="helpdesk_ticket_15_message_4" model="mail.message">
+        <field name="model">helpdesk.ticket</field>
+        <field name="res_id" ref="helpdesk.helpdesk_ticket_15"/>
+        <field name="subtype_id" ref="mail.mt_comment"/>
+        <field name="message_type">comment</field>
+        <field name="author_id" ref="base.res_partner_address_15"/>
+        <field name="date" eval="(DateTime.today() + relativedelta(hours=5.5))"/>
+        <field name="body" type="html"><div>Thank you for your prompt response. Looking forward to the visit.</div></field>
+    </record>
 </odoo>

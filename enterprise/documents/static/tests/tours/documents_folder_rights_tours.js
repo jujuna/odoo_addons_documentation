@@ -2,7 +2,6 @@ import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
 
 registry.category("web_tour.tours").add("test_document_folder_rights_for_multi_company", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
@@ -22,7 +21,7 @@ registry.category("web_tour.tours").add("test_document_folder_rights_for_multi_c
             run: "click",
         },
         {
-            trigger: ".o_switch_company_menu > .dropdown-toggle",
+            trigger: ".o_switch_company_menu",
             run: "click",
         },
         {

@@ -6,6 +6,7 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, UserError
 
 import re
+import uuid
 
 
 class HrEmployee(models.Model):
@@ -52,12 +53,23 @@ class HrEmployee(models.Model):
     l10n_ch_tax_scale = fields.Selection(readonly=False, related="version_id.l10n_ch_tax_scale", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_religious_denomination = fields.Selection(readonly=False, related="version_id.l10n_ch_religious_denomination", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_church_tax = fields.Boolean(readonly=False, related="version_id.l10n_ch_church_tax", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_job_type = fields.Selection(readonly=False, related="version_id.l10n_ch_job_type", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     irregular_working_time = fields.Boolean(readonly=False, related="version_id.irregular_working_time", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_weekly_hours = fields.Float(readonly=False, related="version_id.l10n_ch_weekly_hours", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_thirteen_month = fields.Boolean(readonly=False, related="version_id.l10n_ch_thirteen_month", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_social_insurance_id = fields.Many2one(readonly=False, related="version_id.l10n_ch_social_insurance_id", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_lpp_insurance_id = fields.Many2one(readonly=False, related="version_id.l10n_ch_lpp_insurance_id", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_accident_insurance_line_id = fields.Many2one(readonly=False, related="version_id.l10n_ch_accident_insurance_line_id", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_additional_accident_insurance_line_ids = fields.Many2many(readonly=False, related="version_id.l10n_ch_additional_accident_insurance_line_ids", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_sickness_insurance_line_ids = fields.Many2many(readonly=False, related="version_id.l10n_ch_sickness_insurance_line_ids", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_compensation_fund_id = fields.Many2one(readonly=False, related="version_id.l10n_ch_compensation_fund_id", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_lesson_wage = fields.Float(readonly=False, related="version_id.l10n_ch_lesson_wage", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_contractual_13th_month_rate = fields.Float(readonly=False, related="version_id.l10n_ch_contractual_13th_month_rate", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_location_unit_id = fields.Many2one(readonly=False, related="version_id.l10n_ch_location_unit_id", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_avs_status = fields.Selection(readonly=False, related="version_id.l10n_ch_avs_status", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_yearly_holidays = fields.Integer(readonly=False, related="version_id.l10n_ch_yearly_holidays", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_yearly_paid_public_holidays = fields.Integer(readonly=False, related="version_id.l10n_ch_yearly_paid_public_holidays", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    l10n_ch_lpp_not_insured = fields.Boolean(readonly=False, related="version_id.l10n_ch_lpp_not_insured", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_current_occupation_rate = fields.Float(readonly=False, related="version_id.l10n_ch_current_occupation_rate", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_other_employers_occupation_rate = fields.Float(readonly=True, related="version_id.l10n_ch_other_employers_occupation_rate", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_total_occupation_rate = fields.Float(readonly=True, related="version_id.l10n_ch_total_occupation_rate", inherited=True, groups="hr_payroll.group_hr_payroll_user")
@@ -70,6 +82,7 @@ class HrEmployee(models.Model):
     l10n_ch_has_monthly = fields.Boolean(readonly=False, related="version_id.l10n_ch_has_monthly", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_has_hourly = fields.Boolean(readonly=False, related="version_id.l10n_ch_has_hourly", inherited=True, groups="hr_payroll.group_hr_payroll_user")
     l10n_ch_has_lesson = fields.Boolean(readonly=False, related="version_id.l10n_ch_has_lesson", inherited=True, groups="hr_payroll.group_hr_payroll_user")
+    registration_number = fields.Char(default=lambda self: str(uuid.uuid4().hex))
 
     @api.constrains('birthday')
     def _check_birthday(self):
@@ -99,6 +112,8 @@ class HrEmployee(models.Model):
         # Recompute open payslips automatically on each update since almost all fields cause a change in computation
         pending_computation_slips = self.sudo().slip_ids.filtered(lambda p: p.state == 'draft' and p.struct_id.code == "CHMONTHLYELM")
         if pending_computation_slips:
+            earliest_payslip_date = min(pending_computation_slips.mapped('date_from'))
+            self.with_context(l10n_ch_reference_date=earliest_payslip_date)._create_or_update_snapshot()
             pending_computation_slips.action_refresh_from_work_entries()
         else:
             self._create_or_update_snapshot()
@@ -134,6 +149,19 @@ class HrEmployee(models.Model):
                 if not employee.l10n_ch_legal_first_name:
                     employee.l10n_ch_legal_first_name = first_name
 
+    def _get_splitting_legal_name_countries(self):
+        return super()._get_splitting_legal_name_countries() + ['CH']
+
+    @api.depends('l10n_ch_legal_first_name', 'l10n_ch_legal_last_name')
+    def _compute_legal_name(self):
+        ch_employees = self.filtered(lambda e: e.company_id.country_code == 'CH')
+        for employee in ch_employees:
+            if employee.l10n_ch_legal_first_name and employee.l10n_ch_legal_last_name:
+                employee.legal_name = f'{employee.l10n_ch_legal_first_name} {employee.l10n_ch_legal_last_name}'
+            else:
+                employee.legal_name = employee.name
+        super(HrEmployee, self - ch_employees)._compute_legal_name()
+
     @api.model
     def _create_or_update_snapshot(self):
 
@@ -168,6 +196,7 @@ class HrEmployee(models.Model):
             ('year', '>', year),
             ('employee_id', 'in', self.ids)
         ])
+        unlock_pay_period = self.env.context.get('unlock_pay_period')
 
         # Mutation insensitive informations, these have to be updated even if the payroll month is closed
         monthly_persons_to_update = existing_snapshots.monthly_value_ids.filtered(lambda s: not s.payroll_month_closed or (s.month >= month and s.year >= year)).sorted(lambda s: (s.year, s.month))
@@ -175,7 +204,7 @@ class HrEmployee(models.Model):
         monthly_persons_to_update._recompute_recordset(['person'])
 
         # Mutation sensitive informations, these should not be recomputed once payroll month is closed
-        monthly_values_to_update = existing_snapshots.monthly_value_ids.filtered(lambda s: not s.payroll_month_closed).sorted(lambda s: (s.year, s.month))
+        monthly_values_to_update = existing_snapshots.monthly_value_ids.filtered(lambda s: not s.payroll_month_closed or (s.month >= month and s.year >= year and unlock_pay_period)).sorted(lambda s: (s.year, s.month))
 
         if self.env.context.get('update_salaries'):
             self.env.add_to_compute(self.env['l10n.ch.employee.monthly.values']._fields['bvg_lpp_annual_basis'], monthly_values_to_update)
@@ -192,11 +221,7 @@ class HrEmployee(models.Model):
         self.env.add_to_compute(self.env['l10n.ch.employee.monthly.values']._fields['monthly_statistics'], monthly_values_to_update)
         monthly_values_to_update._recompute_recordset(['monthly_statistics'])
 
-        if self.env.context.get('lock_pay_period'):
-            existing_snapshots._toggle_pay_period_lock(lock=True)
-
-        if self.env.context.get('unlock_pay_period'):
-            existing_snapshots._toggle_pay_period_lock(lock=False)
+        existing_snapshots._toggle_pay_period_lock()
 
     def action_absence_swiss_employee(self):
         return {

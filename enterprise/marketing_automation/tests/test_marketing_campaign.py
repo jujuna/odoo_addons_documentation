@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 from odoo.addons.marketing_automation.tests.common import MarketingAutomationCommon
-from odoo.exceptions import UserError
-from odoo.tests import tagged, users
+from odoo.exceptions import UserError, ValidationError
+from odoo.fields import Datetime
+from odoo.tests import Form, tagged, users
 
 
 @tagged("marketing_automation", "utm")
@@ -12,6 +10,7 @@ class TestMarketingCampaign(MarketingAutomationCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.date_reference = Datetime.from_string('2026-02-26 09:00:00')
         cls.activity = cls._create_activity_mail(
             cls.campaign,
             user=cls.user_marketing_automation,
@@ -20,6 +19,18 @@ class TestMarketingCampaign(MarketingAutomationCommon):
                 'interval_number': 0, 'interval_type': 'hours',
             },
         )
+        cls._create_mailing_list()
+
+    @users('user_marketing_automation')
+    def test_action_retry_failed_blocked_for_marketing_automation(self):
+        """ Ensure retrying a mailing linked to a marketing campaign is blocked. """
+        mailing = self.activity.mass_mailing_id
+
+        self.assertTrue(mailing.use_in_marketing_automation)
+
+        # Verify that calling action_retry_failed raises a UserError
+        with self.assertRaises(UserError, msg="Retrying a marketing automation mailing should be blocked."):
+            mailing.action_retry_failed()
 
     @users('user_marketing_automation')
     def test_create_records_with_xml_ids(self):
@@ -72,9 +83,9 @@ class TestMarketingCampaign(MarketingAutomationCommon):
 
         duplicated_campaign = original_campaign.copy()
         for campaign in original_campaign + duplicated_campaign:
-            campaign.sync_participants()
+            campaign._synchronize_participants()
             with self.mock_mail_gateway(mail_unlink_sent=False):
-                campaign.execute_activities()
+                campaign._execute_activities()
             for activity in campaign.marketing_activity_ids:
                 with self.subTest(msg=f'campaign.name="{campaign.name}"', activity=activity):
                     self.assertMarketAutoTraces(
@@ -85,40 +96,75 @@ class TestMarketingCampaign(MarketingAutomationCommon):
                         }], activity)
 
     @users('user_marketing_automation')
-    def test_utm_source(self):
-        """ Test source name modification and uniqueness check """
-        # Setup
-        campaign = self.campaign.with_user(self.env.user)
-        utm_source_name = 'utm_source_without_mailing'
-        campaign.marketing_activity_ids.mass_mailing_id.name = utm_source_name
-        self.assertEqual(
-            campaign.marketing_activity_ids.mass_mailing_id.name,
-            utm_source_name,
-        )
+    def test_model_update(self):
+        """Test that updating the target model resets all model-dependent fields."""
+        partner_model = self.env['ir.model']._get('res.partner')
+        partner_field_name = self.env['ir.model.fields']._get('res.partner', 'name')
+        partner_field_write_date = self.env['ir.model.fields']._get('res.partner', 'write_date')
+        user_model = self.env['ir.model']._get('res.users')
+        user_field_name = self.env['ir.model.fields']._get('res.users', 'name')
 
-        # Try to remove template from campaign's activity
-        with self.assertRaises(UserError):
-            campaign.marketing_activity_ids.mass_mailing_id.unlink()
+        partner_filter, user_filter = self.env["mailing.filter"].create([
+            {
+                "name": "Test Filter (Partner)",
+                "mailing_model_id": partner_model.id,
+                "mailing_domain": repr([("active", "=", True)]),
+            }, {
+            "name": "Test Filter (User)",
+            "mailing_model_id": user_model.id,
+            "mailing_domain": repr(['&', ("active", "=", True), ("partner_id.active", "=", True)]),
+            }
+        ])
 
-        campaign.marketing_activity_ids.mass_mailing_id = False
-        self.assertTrue(
-            self.env['utm.source'].search([('name', '=', utm_source_name)]),
-            "Test prerequisite: UTM source should still exists, even though it's not related to any campaigns"
-        )
+        campaign_form = Form(self.env["marketing.campaign"], view="marketing_automation.marketing_campaign_view_form_trigger")
+        campaign_form.title = 'My Test Campaign'
+        self.assertEqual(campaign_form.model_id, partner_model)
 
-        # Create new campaign with an activity
-        new_campaign = self.env['marketing.campaign'].create({
-            'domain': [('name', 'like', 'MATest')],
-            'model_id': self.env['ir.model']._get_id('mailing.contact'),
-            'name': 'New Test Campaign',
-        })
-        self._create_activity_mail(
-            new_campaign,
-            user=self.user_marketing_automation,
-            act_values={
-                'trigger_type': 'begin',
-                'interval_number': 0, 'interval_type': 'hours',
-            },
-        )
-        # Reassign the original UTM source name to the new campaign (attempting to trigger unique name constraint)
-        new_campaign.marketing_activity_ids.mass_mailing_id.name = utm_source_name
+        campaign_form.mailing_filter_ids.add(partner_filter)
+        campaign_form.enroll_unique_field_id = partner_field_name
+        self.assertEqual(campaign_form.enroll_domain, repr([("active", "=", True)]))
+        self.assertTrue(campaign_form.enroll_recipients_count > 0, 'Should have at least default admin partner in recipients')
+        self.assertEqual(campaign_form.model_id, partner_model)
+
+        # invalid enroll_unique_field_id
+        campaign_form.enroll_unique_field_id = partner_field_write_date
+        with self.assertRaises(ValidationError):
+            campaign_form.save()
+        campaign_form.enroll_unique_field_id = user_field_name
+        with self.assertRaises(ValidationError):
+            campaign_form.save()
+        campaign_form.enroll_unique_field_id = partner_field_name
+
+        # update model
+        campaign_form.model_id = user_model
+        self.assertFalse(campaign_form.enroll_unique_field_id, 'Changing model should reset unicity field')
+        self.assertEqual(campaign_form.enroll_domain, repr([]), 'Changing model should reset domain')
+        self.assertFalse(campaign_form.mailing_filter_ids, 'Changing model should reset mailing filters')
+        campaign_form.enroll_unique_field_id = user_field_name
+        campaign_form.mailing_filter_ids.add(user_filter)
+        self.assertEqual(campaign_form.enroll_domain, repr(['&', ("active", "=", True), ("partner_id.active", "=", True)]))
+        self.assertTrue(campaign_form.enroll_recipients_count > 0, 'Should have at least default admin user in recipients')
+        campaign_form.save()
+
+        # reset model
+        campaign_form.model_id = self.env["ir.model"]
+        self.assertEqual(campaign_form.enroll_domain, repr([]))
+        self.assertFalse(campaign_form.enroll_unique_field_id)
+        self.assertEqual(campaign_form.enroll_recipients_count, 0)
+        self.assertFalse(campaign_form.mailing_filter_ids)
+
+
+@tagged('marketing_automation')
+class TestMarketingCampaignIntegrity(MarketingAutomationCommon):
+
+    @users('user_marketing_automation')
+    def test_writing_error_coordinates(self):
+        campaign = self.campaign.with_env(self.env)
+        campaign.action_sort_steps()
+        # surface incorrect key
+        with self.assertRaises(ValidationError):
+            campaign.write({'view_coordinates': {'bad_key': 'I am the bad guy'}})
+        # deep incorrect key
+        with self.assertRaises(ValidationError):
+            campaign.write({'view_coordinates': {'trigger': {'x': {'duh': 'the bad guy'}, 'y': 0}}})
+        campaign.write({'view_coordinates': {'trigger': {'x': 1, 'y': 2}}})

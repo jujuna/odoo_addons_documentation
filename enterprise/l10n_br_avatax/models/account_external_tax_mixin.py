@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
+from collections import defaultdict
 from datetime import datetime
 from json import dumps
 from pprint import pformat
@@ -8,7 +9,7 @@ from odoo import models, fields, _, api
 from odoo.addons.iap.tools.iap_tools import iap_jsonrpc
 from odoo.addons.l10n_br_avatax.models.product_template import USE_TYPE_SELECTION
 from odoo.exceptions import ValidationError
-from odoo.tools import partition
+from odoo.tools import partition, frozendict
 from odoo.tools.float_utils import float_round, json_float_round
 
 logger = logging.getLogger(__name__)
@@ -18,6 +19,72 @@ DEFAULT_IAP_ENDPOINT = 'https://l10n-br-avatax.api.odoo.com'
 DEFAULT_IAP_TEST_ENDPOINT = 'https://l10n-br-avatax.test.odoo.com'
 ICP_LOG_NAME = 'l10n_br_avatax.log.end.date'
 AVATAX_PRECISION_DIGITS = 2  # defined by API
+
+COUNTRY_TO_AVATAX_CODE = {
+    "MM": "930", "BA": "981", "KP": "1872", "KR": "1902", "HR": "1953", "US": "2496",
+    "FK": "2550", "GD": "2976", "IM": "3595", "NL": "5738", "PF": "5991", "SS": "7600",
+    "AF": "132", "AL": "175", "DE": "230", "BF": "310", "AD": "370", "AO": "400", "AQ": "420",
+    "AG": "434", "SA": "531", "DZ": "590", "AR": "639", "AM": "647", "AW": "655", "AU": "698",
+    "AT": "728", "BS": "779", "BH": "809", "BD": "817", "BB": "833", "BY": "850", "BE": "876",
+    "BZ": "884", "BM": "906", "BO": "973", "BQ": "3599", "BW": "1015", "BV": "1023", "BR": "1058",
+    "BN": "1082", "BG": "1112", "BI": "1155", "CV": "1279", "KY": "1376", "KH": "1414", "CM": "1457",
+    "CA": "1490", "GG": "3212", "JE": "3930", "KZ": "1538", "QA": "1546", "CL": "1589", "CN": "1600",
+    "CY": "1635", "CO": "1694", "KM": "1732", "CG": "8885", "CK": "1830", "CR": "1961", "KW": "1988",
+    "CU": "1996", "BJ": "2291", "DK": "2321", "DM": "2356", "EC": "2399", "EG": "2402", "ER": "2437",
+    "AE": "2445", "ES": "2453", "SI": "2461", "SK": "2470", "EE": "2518", "ET": "2534", "PH": "2674",
+    "FI": "2712", "FR": "2755", "GA": "2810", "GM": "2852", "GH": "2895", "GE": "2917", "GI": "2933",
+    "GR": "3018", "GL": "3050", "GP": "3093", "GU": "3131", "GT": "3174", "GF": "3255", "GN": "3298",
+    "GQ": "3310", "GY": "3379", "HT": "3417", "HM": "3433", "HN": "3450", "HK": "3514", "HU": "3557",
+    "YE": "3573", "IN": "3611", "ID": "3654", "IQ": "3697", "IE": "3751", "IS": "3794", "IL": "3832",
+    "IT": "3867", "JM": "3913", "JP": "3999", "JO": "4030", "KI": "4111", "LA": "4200", "LS": "4260",
+    "LV": "4278", "LB": "4316", "LR": "4340", "LY": "4383", "LI": "4405", "LT": "4421", "LU": "4456",
+    "MK": "4499", "MG": "4502", "MY": "4553", "MW": "4588", "MV": "4618", "ML": "4642", "MT": "4677",
+    "MA": "4740", "MH": "4766", "MQ": "4774", "MU": "4855", "MR": "4880", "MX": "4936", "MD": "4944",
+    "MC": "4952", "MN": "4979", "ME": "4985", "FM": "4995", "MS": "5010", "MZ": "5053", "NA": "5070",
+    "NR": "5088", "CX": "5118", "NP": "5177", "NI": "5215", "NE": "5258", "NG": "5282", "NU": "5312",
+    "NF": "5355", "NO": "5380", "NC": "5428", "PG": "5452", "NZ": "5487", "VU": "5517", "OM": "5568",
+    "PW": "5754", "PK": "5762", "PS": "5780", "PA": "5800", "PY": "5860", "PE": "5894", "PN": "5932",
+    "PL": "6033", "PT": "6076", "PR": "6114", "KE": "6238", "KG": "6254", "UA": "8311", "CF": "6408",
+    "DO": "6475", "ZW": "6653", "RO": "6700", "RW": "6750", "RU": "6769", "EH": "6858", "SV": "6874",
+    "WS": "6904", "AS": "6912", "SM": "6971", "VC": "7056", "SH": "7102", "LC": "7153", "SN": "7285",
+    "SC": "7315", "SL": "7358", "RS": "7370", "SG": "7412", "SY": "7447", "SO": "7480", "LK": "7501",
+    "SZ": "7544", "ZA": "7560", "SD": "7595", "SE": "7641", "CH": "7676", "SR": "7706", "TH": "7765",
+    "TZ": "7803", "TD": "7889", "CZ": "7919", "TG": "8001", "TO": "8109", "TT": "8150", "TN": "8206",
+    "TC": "8230", "TM": "8249", "TR": "8273", "TV": "8281", "UG": "8338", "UY": "8451", "UZ": "8478",
+    "VA": "8486", "VE": "8508", "VN": "8583", "VG": "8630", "VI": "8664", "FJ": "8702", "WF": "8753",
+    "ZM": "8907",
+}
+
+COUNTRY_TO_ALPHA_3_CODE = {
+    "BD": "BGD", "BE": "BEL", "BF": "BFA", "BG": "BGR", "BA": "BIH", "BB": "BRB", "WF": "WLF", "BL": "BLM", "BM": "BMU",
+    "BN": "BRN", "BO": "BOL", "BH": "BHR", "BI": "BDI", "BJ": "BEN", "BT": "BTN", "JM": "JAM", "BV": "BVT", "BW": "BWA",
+    "WS": "WSM", "BQ": "BES", "BR": "BRA", "BS": "BHS", "JE": "JEY", "BY": "BLR", "BZ": "BLZ", "RU": "RUS", "RW": "RWA",
+    "RS": "SRB", "TL": "TLS", "RE": "REU", "TM": "TKM", "TJ": "TJK", "RO": "ROU", "TK": "TKL", "GW": "GNB", "GU": "GUM",
+    "GT": "GTM", "GS": "SGS", "GR": "GRC", "GQ": "GNQ", "GP": "GLP", "JP": "JPN", "GY": "GUY", "GG": "GGY", "GF": "GUF",
+    "GE": "GEO", "GD": "GRD", "GB": "GBR", "GA": "GAB", "SV": "SLV", "GN": "GIN", "GM": "GMB", "GL": "GRL", "GI": "GIB",
+    "GH": "GHA", "OM": "OMN", "TN": "TUN", "JO": "JOR", "HR": "HRV", "HT": "HTI", "HU": "HUN", "HK": "HKG", "HN": "HND",
+    "HM": "HMD", "VE": "VEN", "PR": "PRI", "PS": "PSE", "PW": "PLW", "PT": "PRT", "SJ": "SJM", "PY": "PRY", "IQ": "IRQ",
+    "PA": "PAN", "PF": "PYF", "PG": "PNG", "PE": "PER", "PK": "PAK", "PH": "PHL", "PN": "PCN", "PL": "POL", "PM": "SPM",
+    "ZM": "ZMB", "EH": "ESH", "EE": "EST", "EG": "EGY", "ZA": "ZAF", "EC": "ECU", "IT": "ITA", "VN": "VNM", "SB": "SLB",
+    "ET": "ETH", "SO": "SOM", "ZW": "ZWE", "SA": "SAU", "ES": "ESP", "ER": "ERI", "ME": "MNE", "MD": "MDA", "MG": "MDG",
+    "MF": "MAF", "MA": "MAR", "MC": "MCO", "UZ": "UZB", "MM": "MMR", "ML": "MLI", "MO": "MAC", "MN": "MNG", "MH": "MHL",
+    "MK": "MKD", "MU": "MUS", "MT": "MLT", "MW": "MWI", "MV": "MDV", "MQ": "MTQ", "MP": "MNP", "MS": "MSR", "MR": "MRT",
+    "IM": "IMN", "UG": "UGA", "TZ": "TZA", "MY": "MYS", "MX": "MEX", "IL": "ISR", "FR": "FRA", "IO": "IOT", "SH": "SHN",
+    "FI": "FIN", "FJ": "FJI", "FK": "FLK", "FM": "FSM", "FO": "FRO", "NI": "NIC", "NL": "NLD", "NO": "NOR", "NA": "NAM",
+    "VU": "VUT", "NC": "NCL", "NE": "NER", "NF": "NFK", "NG": "NGA", "NZ": "NZL", "NP": "NPL", "NR": "NRU", "NU": "NIU",
+    "CK": "COK", "XK": "XKX", "CI": "CIV", "CH": "CHE", "CO": "COL", "CN": "CHN", "CM": "CMR", "CL": "CHL", "CC": "CCK",
+    "CA": "CAN", "CG": "COG", "CF": "CAF", "CD": "COD", "CZ": "CZE", "CY": "CYP", "CX": "CXR", "CR": "CRI", "CW": "CUW",
+    "CV": "CPV", "CU": "CUB", "SZ": "SWZ", "SY": "SYR", "SX": "SXM", "KG": "KGZ", "KE": "KEN", "SS": "SSD", "SR": "SUR",
+    "KI": "KIR", "KH": "KHM", "KN": "KNA", "KM": "COM", "ST": "STP", "SK": "SVK", "KR": "KOR", "SI": "SVN", "KP": "PRK",
+    "KW": "KWT", "SN": "SEN", "SM": "SMR", "SL": "SLE", "SC": "SYC", "KZ": "KAZ", "KY": "CYM", "SG": "SGP", "SE": "SWE",
+    "SD": "SDN", "DO": "DOM", "DM": "DMA", "DJ": "DJI", "DK": "DNK", "VG": "VGB", "DE": "DEU", "YE": "YEM", "DZ": "DZA",
+    "US": "USA", "UY": "URY", "YT": "MYT", "UM": "UMI", "LB": "LBN", "LC": "LCA", "LA": "LAO", "TV": "TUV", "TW": "TWN",
+    "TT": "TTO", "TR": "TUR", "LK": "LKA", "LI": "LIE", "LV": "LVA", "TO": "TON", "LT": "LTU", "LU": "LUX", "LR": "LBR",
+    "LS": "LSO", "TH": "THA", "TF": "ATF", "TG": "TGO", "TD": "TCD", "TC": "TCA", "LY": "LBY", "VA": "VAT", "VC": "VCT",
+    "AE": "ARE", "AD": "AND", "AG": "ATG", "AF": "AFG", "AI": "AIA", "VI": "VIR", "IS": "ISL", "IR": "IRN", "AM": "ARM",
+    "AL": "ALB", "AO": "AGO", "AQ": "ATA", "AS": "ASM", "AR": "ARG", "AU": "AUS", "AT": "AUT", "AW": "ABW", "IN": "IND",
+    "AX": "ALA", "AZ": "AZE", "IE": "IRL", "ID": "IDN", "UA": "UKR", "QA": "QAT", "MZ": "MOZ"
+}
 
 
 class AccountExternalTaxMixin(models.AbstractModel):
@@ -65,6 +132,9 @@ class AccountExternalTaxMixin(models.AbstractModel):
     )
     # Technical field that holds errors meant for the actionable_errors widget.
     l10n_br_avatax_warnings = fields.Json(compute="_compute_l10n_br_avatax_warnings")
+    l10n_br_edi_avatax_data = fields.Json(
+        help="Brazil: technical field that remembers the last tax summary returned by Avatax.", copy=False
+    )
 
     def _compute_l10n_br_is_service_transaction(self):
         """Should be overridden. Used to determine if we should treat this record as a service (NFS-e) record."""
@@ -146,9 +216,9 @@ class AccountExternalTaxMixin(models.AbstractModel):
                     "level": "danger",
                 }
 
-            if line['lineAmount'] < 0:
+            if line['lineAmount'] < line['lineTaxedDiscount']:
                 errors["negative_line"] = {
-                    "message": _("Avatax Brazil doesn't support negative lines."),
+                    "message": _("The document amount must be positive."),
                     "level": "danger",
                 }
 
@@ -164,7 +234,7 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
         if not is_service:
             if service_lines:
-                service_products = self.env["product.product"].union(*[line["tempProduct"] for line in service_lines])
+                service_products = self.env["product.product"].union(line["tempProduct"] for line in service_lines)
                 errors["disallowed_service_products"] = {
                     "message": _(
                         "%(transaction)s is a goods transaction but has service products:\n%(products)s.",
@@ -177,7 +247,7 @@ class AccountExternalTaxMixin(models.AbstractModel):
                 }
         else:
             if consumable_lines:
-                consumable_products = self.env["product.product"].union(*[line["tempProduct"] for line in consumable_lines])
+                consumable_products = self.env["product.product"].union(line["tempProduct"] for line in consumable_lines)
                 errors["disallowed_goods_products"] = {
                     "message": _(
                         "%(transaction)s is a service transaction but has non-service products:\n%(products)s",
@@ -216,7 +286,7 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
     def _l10n_br_avatax_check_partner(self):
         res = {}
-        if self.l10n_br_is_service_transaction:
+        if self.l10n_br_is_service_transaction and self.partner_shipping_id.country_id.code == 'BR':
             partner = self.partner_shipping_id
             city = partner.city_id
             if not city or city.country_id.code != "BR":
@@ -328,8 +398,98 @@ class AccountExternalTaxMixin(models.AbstractModel):
         else:
             return {'icmsTaxPayer': partner.l10n_br_taxpayer == 'icms'}
 
+    @api.model
+    def _l10n_br_deep_update_dict(self, d, u):
+        """Like {}.update but handles nested dicts recursively. Based on https://stackoverflow.com/a/3233356."""
+        for k, v in u.items():
+            if isinstance(v, dict):
+                d[k] = self._l10n_br_deep_update_dict(d.get(k, {}), v)
+            else:
+                d[k] = v
+        return d
+
+    @api.model
+    def _l10n_br_deep_clean_dict(self, d):
+        """Recursively removes keys with a falsy value in dicts. Based on https://stackoverflow.com/a/48152075."""
+        cleaned_dict = {}
+        for k, v in d.items():
+            # Avalara will assign the wrong CFOP if some falsy fields are missing.
+            if isinstance(v, dict) and k != 'taxesSettings':
+                v = self._l10n_br_deep_clean_dict(v)
+            if v:
+                cleaned_dict[k] = v
+        return cleaned_dict or None
+
+    @api.model
+    def _l10n_br_get_location_dict(self, partner, is_export=False):
+        # 'partner' may be empty, e.g. when the invoice has no transporter.
+        federal_tax_id = partner._get_preferred_legal_entity_identifier_vals().get('value', '') if partner else ''
+        return {
+            "name": partner.name or partner.display_name,
+            "businessName": partner.name or partner.display_name,
+            "type": self._l10n_br_get_partner_type(partner),
+            "federalTaxId": "9999999999" if is_export else federal_tax_id,
+            "cityTaxId": partner.l10n_br_im_code,
+            "stateTaxId": partner.l10n_br_ie_code,
+            "suframa": partner.l10n_br_isuf_code,
+            "address": {
+                "neighborhood": "EXTERIOR" if is_export else partner.street2,
+                "street": partner.street_name,
+                "zipcode": "99999999" if is_export else partner.zip,
+                "cityName": "EXTERIOR" if is_export else partner.city,
+                'cityCode': '9999999' if is_export else '',
+                "state": "EX" if is_export else partner.state_id.code,
+                'country': COUNTRY_TO_ALPHA_3_CODE.get(partner.country_code, 'BRA'),
+                "countryCode": COUNTRY_TO_AVATAX_CODE.get(partner.country_code),
+                "number": partner.street_number,
+                "complement": partner.street_number2,
+                "phone": partner.phone,
+                "email": partner.email,
+            },
+            "activitySector": {
+              "code": partner.l10n_br_activity_sector,
+            },
+            "taxRegime": partner.l10n_br_tax_regime,
+        }
+
+    @api.model
+    def _l10n_br_get_locations(self, params):
+        customer = params['partner']
+        company_partner = params['company_partner']
+        partner_shipping = params['partner_shipping']
+
+        is_service = params['is_service']
+        is_export = params['is_export_goods']
+
+        # For customer
+        entity_location = self._l10n_br_get_location_dict(customer, is_export)
+        entity_location['taxesSettings'] = self._l10n_br_get_taxes_settings(is_service, customer)
+
+        # For company
+        establishment_location = self._l10n_br_get_location_dict(company_partner)
+        establishment_location['taxesSettings'] = self._l10n_br_get_taxes_settings(is_service, company_partner)
+        if company_partner.l10n_br_tax_regime == 'simplified':
+            establishment_location['taxesSettings']['pCredSN'] = params['company'].l10n_br_icms_rate
+        if cnae := params['cnae']:
+            establishment_location['activitySector']['ActivitySector_CNAE'] = {'code': cnae.sanitized_code}
+
+        # For when services was provided at a different delivery address
+        partner_shipping_location = {}
+        if partner_shipping != customer:
+            partner_shipping_content = self._l10n_br_get_location_dict(partner_shipping)
+
+            key = 'rendered' if is_service else 'delivery'
+            partner_shipping_location[key] = partner_shipping_content
+
+        return {
+            "entity": entity_location,
+            "establishment": establishment_location,
+            **partner_shipping_location,
+        }
+
     def _get_l10n_br_avatax_service_params(self):
         params = self._get_external_tax_service_params()
+
         params.update({
             'operation_type': self.l10n_br_goods_operation_type_id,
             'invoice_refs': {},
@@ -347,6 +507,11 @@ class AccountExternalTaxMixin(models.AbstractModel):
             # To be filled by models
             'partner_shipping': None,
             'origin_record': None,
+
+            # For NF-e export
+            'is_export_goods': None,
+            'shipping_state_id': None,
+            'incoterm_location': None,
         })
         return params
 
@@ -360,14 +525,19 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
         base_line = line_data['base_line']
         product = base_line['product_id']
+        op_type = line_data['operation_type']
+        dispatched_discount_amount = abs(sum(
+            disc_line['tax_details']['raw_total_excluded_currency']
+            for disc_line in base_line.get('discount_base_lines', [])
+        ))
         line = {
             'lineCode': base_line['id'],
-            'useType': record_use_type or product.l10n_br_use_type,
-            'operationType': line_data['operation_type'].technical_name,
+            'useType': op_type.l10n_br_use_type or record_use_type or product.l10n_br_use_type,
+            'operationType': op_type.technical_name,
             'otherCostAmount': 0,
             'freightAmount': 0,
             'insuranceAmount': 0,
-            'lineTaxedDiscount': base_line['quantity'] * base_line['price_unit'] * (base_line['discount'] / 100.0),
+            'lineTaxedDiscount': base_line['quantity'] * base_line['price_unit'] * (base_line['discount'] / 100.0) + dispatched_discount_amount,
             'lineAmount': base_line['quantity'] * base_line['price_unit'],
             'lineUnitPrice': base_line['price_unit'],
             'numberOfItems': base_line['quantity'],
@@ -402,8 +572,8 @@ class AccountExternalTaxMixin(models.AbstractModel):
                 descriptor['cnae'] = product.l10n_br_ncm_code_id.l10n_br_cnae_code_id.sanitized_code
         else:
             descriptor['cest'] = product.l10n_br_cest_code or ''
-            descriptor['source'] = product.l10n_br_source_origin or ''
-            descriptor['productType'] = product.l10n_br_sped_type or ''
+            descriptor['source'] = op_type.l10n_br_source_origin or product.l10n_br_source_origin or ''
+            descriptor['productType'] = op_type.l10n_br_sped_type or product.l10n_br_sped_type or ''
             descriptor['hsCode'] = (product.l10n_br_ncm_code_id.code or '').replace('.', '')
             if product.l10n_br_ncm_code_id.ex:
                 descriptor['ex'] = product.l10n_br_ncm_code_id.ex
@@ -411,6 +581,22 @@ class AccountExternalTaxMixin(models.AbstractModel):
             uom = base_line['product_uom_id']
             descriptor['unitTaxable'] = uom.name[:6] if uom else ''  # the maximum length allowed by the API is 6
             descriptor['unit'] = uom.name[:6] if uom else ''
+            descriptor.update({
+                'manufacturerEquivalent': op_type.l10n_br_issuer_manufacturer_industry_equivalent,
+                'appropriateIPIcreditWhenInGoing': op_type.l10n_br_issuer_appropriate_ipi_credit,
+                'notSubjectToIcmsSt': op_type.l10n_br_issuer_not_subject_to_icmsst,
+                'isIcmsStSubstitute': op_type.l10n_br_issuer_is_icmsst_substitute,
+                'appropriateICMScreditWhenInGoing': op_type.l10n_br_issuer_appropriate_icms_credit,
+                'appropriatePISCOFINScreditWhenInGoing': op_type.l10n_br_issuer_appropriate_piscofins_credit,
+            })
+            line['goods'] = {'entityOwnProduction': op_type.l10n_br_recipient_manufacturer_industry_equivalent}
+            if is_substitute := op_type.l10n_br_recipient_is_icmsst_substitute:
+                line['goods']['entityIcmsStSubstitute'] = is_substitute
+
+            if order_number := line_data.get('order_number'):
+                line['orderNumber'] = order_number
+            if order_item_number := line_data.get('order_item_number'):
+                line['orderItemNumber'] = order_item_number
 
         return line
 
@@ -460,8 +646,6 @@ class AccountExternalTaxMixin(models.AbstractModel):
     @api.model
     def _prepare_l10n_br_avatax_document_service_call(self, params):
         """ Returns the full payload containing one record to be used in a /transactions API call. """
-        partner = params['partner']
-        company_partner = params['company_partner']
 
         is_service = params['is_service']
         lines = self._prepare_l10n_br_avatax_document_lines_service_call(
@@ -475,101 +659,40 @@ class AccountExternalTaxMixin(models.AbstractModel):
         self._l10n_br_remove_temp_values_lines(lines)
         self._l10n_br_repr_amounts(lines)
 
-        partner_shipping_id = params['partner_shipping']
-        partner_shipping_location = {}
-        if partner_shipping_id != partner:
-            partner_shipping_content = {
-                'name': partner_shipping_id.display_name,
-                'businessName': partner_shipping_id.display_name,
-                'type': self._l10n_br_get_partner_type(partner_shipping_id),
-                'federalTaxId': partner_shipping_id.vat,
-                'cityTaxId': partner_shipping_id.l10n_br_im_code,
-                'suframa': partner_shipping_id.l10n_br_isuf_code or '',
-                'address': {
-                    'number': partner_shipping_id.street_number,
-                    'complement': partner_shipping_id.street_number2,
-                    'street': partner_shipping_id.street,
-                    'neighborhood': partner_shipping_id.street2,
-                    'zipcode': partner_shipping_id.zip,
-                    'cityName': partner_shipping_id.city,
-                    'state': partner_shipping_id.state_id.code,
-                    'phone': partner_shipping_id.phone,
-                    'email': partner_shipping_id.email
-                }
-            }
-            key = 'rendered' if is_service else 'delivery'
-            partner_shipping_location[key] = partner_shipping_content
-
-        taxes_settings_customer = self._l10n_br_get_taxes_settings(is_service, partner)
-        taxes_settings_company = self._l10n_br_get_taxes_settings(is_service, company_partner)
-        if company_partner.l10n_br_tax_regime == 'simplified':
-            taxes_settings_company['pCredSN'] = params['company'].l10n_br_icms_rate
-
         payments = {}
         if installments := params['installments']:
             payments = {'payment': installments}
 
-        activity_sector = {}
-        if params['cnae']:
-            activity_sector = {'ActivitySector_CNAE': {'code': params['cnae'].sanitized_code}}
+        goods = {}
+        if params['is_export_goods']:
+            goods = {
+                'idDest': 3,
+            }
+            if params['shipping_state_id'] and params['incoterm_location']:
+                goods['exportInfo'] = {
+                    'shippingState': params['shipping_state_id'].code,
+                    'place': params['incoterm_location'][:60],
+                }
 
-        return {
+        return self._l10n_br_deep_clean_dict({
             'header': {
                 'transactionDate': (params['document_date'] or fields.Date.today()).isoformat(),
                 'amountCalcType': 'gross',
                 'documentCode': '%s_%s' % (params['model_name'], params['id']),
                 'messageType': 'services' if is_service else 'goods',
-                'companyLocation': '',
+                'companyLocation': params['company_partner'].vat,
                 'operationType': params['operation_type'].technical_name,
                 **params['invoice_refs'],
-                'locations': {
-                    'entity': {  # the customer
-                        'name': partner.name,
-                        'type': self._l10n_br_get_partner_type(partner),
-                        'activitySector': {
-                            'code': partner.l10n_br_activity_sector,
-                        },
-                        'taxesSettings': {
-                            **taxes_settings_customer,
-                        },
-                        'taxRegime': partner.l10n_br_tax_regime,
-                        'address': {
-                            'zipcode': partner.zip,
-                            'cityName': partner.city_id.name,
-                        },
-                        'federalTaxId': partner.vat,
-                        'suframa': partner.l10n_br_isuf_code or '',
-                    },
-                    'establishment': {  # the seller
-                        'name': company_partner.name,
-                        'type': 'business',
-                        'activitySector': {
-                            'code': company_partner.l10n_br_activity_sector,
-                            **activity_sector,
-                        },
-                        'taxesSettings': {
-                            **taxes_settings_company,
-                        },
-                        'taxRegime': company_partner.l10n_br_tax_regime,
-                        'address': {
-                            'zipcode': company_partner.zip,
-                            'cityName': company_partner.city_id.name,
-                        },
-                        'federalTaxId': company_partner.vat,
-                        'suframa': company_partner.l10n_br_isuf_code or '',
-                    },
-                    **partner_shipping_location,
-                },
+                'locations': self._l10n_br_get_locations(params),
+                'goods': goods,
                 **payments,
             },
             'lines': lines,
-        }
+        })
 
     @api.model
     def _extract_tax_values_from_l10n_br_avatax_detail(self, service_params, line_detail, tax_detail):
         tax_amount = tax_detail['tax']
-        if service_params['is_return']:
-            tax_amount = -tax_amount
 
         if tax_detail['taxImpact']['impactOnNetAmount'] == 'Subtracted':
             tax_amount *= -1
@@ -578,6 +701,9 @@ class AccountExternalTaxMixin(models.AbstractModel):
         # The service API already accounts for the discount in the net figure.
         if not service_params['is_service']:
             base_amount_currency -= line_detail['lineTaxedDiscount']
+
+        if tax_detail['taxImpact']['impactOnNetAmount'] == 'Informative' or tax_detail["taxImpact"]["accounting"] == "none":
+            return None
 
         return (
             {'name': 'Avalara Brazil', 'company_id': service_params['company'].id},
@@ -595,13 +721,69 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
     def _l10n_br_call_avatax_taxes(self, company, document_data):
         # To allow saving this response in l10n_br_edi.
-        return self.env['account.external.tax.mixin']._l10n_br_iap_calculate_tax(document_data, company)
+        api_response = self.env['account.external.tax.mixin']._l10n_br_iap_calculate_tax(document_data, company)
+
+        # Store the retrieved Avatax data
+        self.l10n_br_edi_avatax_data = {
+            "header": api_response.get("header"),
+            "lines": api_response.get("lines"),
+            "summary": api_response.get("summary"),
+        }
+
+        return api_response
+
+    def _get_external_tax_service_params(self):
+        """Override to filter out negative lines. Negative lines will be dispatched
+        into valid positive ones.
+        """
+        params = super()._get_external_tax_service_params()
+        if not self.l10n_br_is_avatax:
+            return params
+
+        AccountTax = self.env['account.tax']
+        # Extract base_lines from line_data
+        line_data = params['line_data']
+        base_lines = []
+        for index, data in enumerate(line_data):
+            base_line = data['base_line']
+            base_line['_index'] = index
+            if base_line['tax_details']['raw_total_excluded_currency'] < 0 and not base_line['special_type']:
+                # Set key to identify discount lines later at '_dispatch_global_discount_lines'
+                base_line['special_type'] = 'global_discount'
+
+            clean_base_line = AccountTax._prepare_base_line_for_taxes_computation(
+                base_line,
+                tax_ids=[],
+                special_type=base_line['special_type'],
+                _original_record=base_line['record'],
+                _original_data=data,
+                _original_base_line=base_line,
+                _index=index,
+            )
+            clean_base_line['record'] = clean_base_line['_original_record']
+            base_lines.append(clean_base_line)
+
+        AccountTax._add_tax_details_in_base_lines(base_lines, self.company_id)
+        AccountTax._round_base_lines_tax_details(base_lines, self.company_id)
+        aggregated_base_lines = self.env['account.tax']._dispatch_global_discount_lines(base_lines, self.company_id)
+
+        return {
+            **params,
+            'line_data': [
+                {
+                    **base_line['_original_data'],
+                    'base_line': base_line,
+                }
+                for base_line in aggregated_base_lines
+            ],
+        }
 
     def _get_external_taxes(self):
         # EXTENDS 'account.external.tax.mixin'
         res = super()._get_external_taxes()
 
         br_records = self.filtered(lambda record: record.l10n_br_is_avatax)
+
         errors = []
         for record in br_records:
             if blocking := record._l10n_br_avatax_blocking_errors():
@@ -630,10 +812,11 @@ class AccountExternalTaxMixin(models.AbstractModel):
                     continue
 
                 for base_line, line_results in zip(base_lines, api_response['lines']):
+                    # Reset manual field since it is possible that some discount lines were removed or added
                     tax_values_list = []
                     for tax_detail in line_results['taxDetails']:
-                        if tax_detail['taxImpact']['impactOnNetAmount'] != 'Informative' and tax_detail['taxImpact']['accounting'] != 'none':
-                            tax_values_list.append(self._extract_tax_values_from_l10n_br_avatax_detail(service_params, line_results, tax_detail))
+                        if extracted_tax_info := record._extract_tax_values_from_l10n_br_avatax_detail(service_params, line_results, tax_detail):
+                            tax_values_list.append(extracted_tax_info)
                     base_line_with_tax_values.append((base_line, tax_values_list))
 
             if errors:
@@ -643,17 +826,153 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
         return res
 
+    def _process_external_taxes(self, company, base_line_with_tax_values, tax_key_field, search_archived_taxes=False):
+        """EXTENDS account_external_tax. Extract original 'discount_base_lines' from each base line and obtain the theorical.
+        tax and base amount obtained from rpc call for each discount line.
+        """
+        if tax_key_field != 'l10n_br_avatax_code':
+            return super()._process_external_taxes(company, base_line_with_tax_values, tax_key_field, search_archived_taxes)
+
+        AccountTax = self.env['account.tax']
+        to_group_together = defaultdict(lambda: {'to_aggregate': []})
+        new_base_line_with_tax_values = []
+        for base_line, tax_values_list in base_line_with_tax_values:
+            # No discount line to distribute.
+            discount_base_lines = base_line.get('discount_base_lines')
+            if not discount_base_lines:
+                new_base_line_with_tax_values.append((base_line, tax_values_list))
+                continue
+
+            # Split the amounts to distinguish what is from the clean base_line and what has to be allocated to each discount_base_line.
+            # We can't use original_base_line as this might have the info of a previous calculation.
+            target_factors_discount_base_lines = [
+                {
+                    'factor': discount_base_line['tax_details']['raw_total_excluded_currency'],
+                    'base_line_index': discount_base_line['_index'],
+                    'discount_base_line': discount_base_line,
+                    'tax_values_list': [
+                        (
+                            tax_group_values,
+                            tax_values,
+                            {key: 0.0 for key, _amount in amount_values.items()},
+                        )
+                        for tax_group_values, tax_values, amount_values in tax_values_list
+                    ],
+                }
+                for discount_base_line in discount_base_lines
+            ]
+            target_factor_base_line = {
+                'factor': base_line['tax_details']['raw_total_excluded_currency'],
+                'base_line_index': base_line['_index'],
+                'tax_values_list': [
+                    (
+                        tax_group_values,
+                        tax_values,
+                        {key: 0.0 for key, _amount in amount_values.items()},
+                    )
+                    for tax_group_values, tax_values, amount_values in tax_values_list
+                ],
+            }
+            target_factors = [target_factor_base_line] + target_factors_discount_base_lines
+            for tax_values_index, (_tax_group_values, _tax_values, amount_values) in enumerate(tax_values_list):
+                for key, amount in amount_values.items():
+                    # First we get the amounts to distribute for the positive part and the total negative
+                    amounts_to_distribute = AccountTax._distribute_delta_amount_smoothly(
+                        precision_digits=AVATAX_PRECISION_DIGITS,
+                        delta_amount=amount,
+                        target_factors=target_factors,
+                        allow_negative_factors=True,
+                    )
+
+                    for _line_index, (target_factor, amount_to_distribute) in enumerate(zip(target_factors, amounts_to_distribute)):
+                        target_factor['tax_values_list'][tax_values_index][2][key] += amount_to_distribute
+
+            # Add the fully recovered original_base_line.
+            new_base_line_with_tax_values.append((base_line, target_factor_base_line['tax_values_list']))
+            for target_factor in target_factors_discount_base_lines:
+                to_group_together[target_factor['base_line_index']]['base_line'] = target_factor['discount_base_line']['record']
+                to_group_together[target_factor['base_line_index']]['to_aggregate'].append(target_factor['tax_values_list'])
+
+        # Recover the original discount lines.
+        for data in to_group_together.values():
+            # Each line can have different taxes, meaning each discount can have amounts from an specific tax in some lines
+            # but not in others.
+            tax_values_amount_map = defaultdict(lambda: {'base_amount_currency': 0.0, 'tax_amount_currency': 0.0})
+            original_base_line = data['base_line']
+            to_aggregate_tax_values_list = data['to_aggregate']
+
+            # Aggregate amounts for each tax combination
+            for to_aggregate_tax_values in to_aggregate_tax_values_list:
+                for tax_group_values, tax_values, amount_vals in to_aggregate_tax_values:
+                    tax_group_key, tax_values_key = frozendict(tax_group_values), frozendict(tax_values)
+                    tax_amounts = tax_values_amount_map[tax_group_key, tax_values_key]
+                    tax_amounts['tax_amount_currency'] += amount_vals['tax_amount_currency']
+                    tax_amounts['base_amount_currency'] += amount_vals['base_amount_currency']
+
+            # Build tax values
+            new_tax_values_list = [
+                (dict(tax_key[0]), dict(tax_key[1]), aggregated_amounts)
+                for tax_key, aggregated_amounts in tax_values_amount_map.items()
+            ]
+
+            new_base_line_with_tax_values.append((original_base_line, new_tax_values_list))
+
+        # Sort
+        base_line_with_tax_values = sorted(new_base_line_with_tax_values, key=lambda x: x[0]['_index'])
+
+        return super()._process_external_taxes(company, base_line_with_tax_values, tax_key_field, search_archived_taxes)
+
+    @api.model
+    def _l10n_br_get_line_tax_details_str(self, groupby_dict):
+        """ Returns a dict of formatted string of tax details of all taxes per line
+            :param groupby_dict:    a dict that has a record as the key and lines as the value
+                                    (ex. {account.move: account.move.line} or {sale.order: sale.order.line})
+        """
+
+        line_tax_details_str_dict = {}
+
+        for record, lines in groupby_dict.items():
+            tax_calculation_response = record.l10n_br_edi_avatax_data or {}
+            if not tax_calculation_response:
+                continue
+            line_id_to_line_data = {line["lineCode"]: line for line in tax_calculation_response.get("lines", [])}
+            service_param = record._get_l10n_br_avatax_service_params()
+
+            for line in lines:
+                avalara_line = line_id_to_line_data.get(line.id, {})
+                tax_detail_to_str = ''
+                # Build the formatted string since each line can have multiple taxes
+                for detail in avalara_line.get('taxDetails', {}):
+                    if avatax_detail := record._extract_tax_values_from_l10n_br_avatax_detail(service_param, avalara_line, detail):
+                        # Find the specific tax referenced in the taxDetail to access its name
+                        extracted_tax_info = avatax_detail[1]
+                        existing_tax = record._search_existing_external_tax(
+                            record.company_id,
+                            'l10n_br_avatax_code',
+                            extracted_tax_info["l10n_br_avatax_code"],
+                            extracted_tax_info["price_include_override"]
+                        )
+                        cst_str = ""
+                        if cst := detail.get("cst"):
+                            cst_str = f"CST {cst} - "
+
+                        # Tax detail format: '<tax name> - <tax percentage>% - R$ <tax amount> - CST <code> - BC R$ <base amount>'
+                        tax_detail_to_str += f"{existing_tax.display_name} - {detail["rate"]}% - R$ {detail["tax"]} - {cst_str}BC R$ {detail["subtotalTaxable"]} \n"
+                line_tax_details_str_dict[line.id] = tax_detail_to_str
+
+        return line_tax_details_str_dict
+
     # IAP related methods
     def _l10n_br_iap_request(self, route, company, json=None):
         avatax_api_id, avatax_api_key = company.sudo().l10n_br_avatax_api_identifier, company.sudo().l10n_br_avatax_api_key
 
         default_endpoint = DEFAULT_IAP_ENDPOINT if company.l10n_br_avalara_environment == 'production' else DEFAULT_IAP_TEST_ENDPOINT
-        iap_endpoint = self.env['ir.config_parameter'].sudo().get_param('l10n_br_avatax_iap.endpoint', default_endpoint)
+        iap_endpoint = self.env['ir.config_parameter'].sudo().get_str('l10n_br_avatax_iap.endpoint') or default_endpoint
         environment = company.l10n_br_avalara_environment
         url = f'{iap_endpoint}/api/l10n_br_avatax/1/{route}'
 
         params = {
-            'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+            'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             'account_token': self.env['iap.account'].get(IAP_SERVICE_NAME).sudo().account_token,
             'avatax': {
                 'is_production': environment and environment == 'production',
@@ -666,7 +985,7 @@ class AccountExternalTaxMixin(models.AbstractModel):
             params['api_secret'] = avatax_api_key
 
         start = str(datetime.utcnow())
-        response = iap_jsonrpc(url, params=params, timeout=60)  # longer timeout because create_account can take some time
+        response = iap_jsonrpc(url, params=params, timeout=60, raise_user_error=True)  # longer timeout because create_account can take some time
         end = str(datetime.utcnow())
 
         # Avatax support requested that requests and responses be provided in JSON, so they can easily load them in their

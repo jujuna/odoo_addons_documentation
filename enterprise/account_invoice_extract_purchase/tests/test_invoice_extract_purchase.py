@@ -5,10 +5,13 @@ from odoo import Command
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.iap_extract.tests.test_extract_mixin import TestExtractMixin
 from odoo.tests import Form, tagged
+from odoo.tools import mute_logger
 
 
 @tagged('post_install', '-at_install')
 class TestInvoiceExtractPurchase(AccountTestInvoicingCommon, TestExtractMixin):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -150,7 +153,7 @@ class TestInvoiceExtractPurchase(AccountTestInvoicingCommon, TestExtractMixin):
 
         self.assertTrue(invoice.id not in self.purchase_order.invoice_ids.ids)
 
-    def test_action_reload_ai_data(self):
+    def test_action_reload_imported_data(self):
         invoice = self.env['account.move'].create({
             'move_type': 'in_invoice',
             'extract_state': 'waiting_validation',
@@ -170,7 +173,7 @@ class TestInvoiceExtractPurchase(AccountTestInvoicingCommon, TestExtractMixin):
 
         extract_response = self.get_result_success_response()
         with self._mock_iap_extract(extract_response=extract_response):
-            invoice.action_reload_ai_data()
+            invoice.action_reload_imported_data()
 
         # Check that the fields have been overwritten with the content of the PO matched by the OCR
         self.assertTrue(invoice.id in self.purchase_order.invoice_ids.ids)
@@ -203,7 +206,8 @@ class TestInvoiceExtractPurchase(AccountTestInvoicingCommon, TestExtractMixin):
 
         # Step 2: Create a bill from PO1
         bill_form = Form(self.env['account.move'].with_context(default_move_type='in_invoice'))
-        bill_form.purchase_vendor_bill_id = self.env['purchase.bill.union'].browse(-po1.id)
+        with mute_logger('odoo.tests.form.onchange'):  # Mute "x PO lines added to the bill" notification
+            bill_form.purchase_vendor_bill_id = self.env['purchase.bill.union'].browse(-po1.id)
         bill = bill_form.save()
 
         self.assertEqual(bill.invoice_origin, po1.name)

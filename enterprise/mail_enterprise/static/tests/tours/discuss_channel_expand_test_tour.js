@@ -9,10 +9,13 @@ import { registry } from "@web/core/registry";
 registry
     .category("web_tour.tours")
     .add("mail_enterprise/static/tests/tours/discuss_channel_expand_test_tour.js", {
-        url: "/odoo",
         steps: () => [
             {
-                trigger: ".o-mail-DiscussSystray-class .fa-comments",
+                trigger: ".o-mail-DiscussSystray-class [data-icon='forum']",
+                run: "click",
+            },
+            {
+                trigger: ".o-mail-MessagingMenu-tab:has(:text('Channels'))",
                 run: "click",
             },
             {

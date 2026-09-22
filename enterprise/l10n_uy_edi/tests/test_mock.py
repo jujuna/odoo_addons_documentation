@@ -1,3 +1,6 @@
+from unittest.mock import patch
+
+from odoo import Command
 from odoo.tests.common import tagged
 
 from odoo.exceptions import UserError
@@ -7,6 +10,8 @@ from . import common
 
 @tagged("-at_install", "post_install", "post_install_l10n", "mock")
 class TestMock(common.TestUyEdi):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -35,9 +40,13 @@ class TestMock(common.TestUyEdi):
         self.company_uy.l10n_uy_edi_ucfe_password = "password_wrong"
         invoice = self._create_move()
         invoice.action_post()
-        error_msg = "Fault Error - Las credenciales no son v.*lidas"
-        with self.assertRaisesRegex(UserError, error_msg):
+        error_msg = ".*Fault Error - Las credenciales no son v.*lidas"
+        # We don't want to use assertRaisesRegex because we don't want to rollback (simulate the commit)
+        try:
             self._mock_send_and_print(invoice, "mock_30_invoice_bad_credentials")
+            self.fail("Should raise a UserError before")
+        except UserError as e:
+            self.assertRegex(str(e), error_msg)
 
         self.assertEqual(invoice.name, "* %s" % invoice.id, "Name should remain * ID because is was not process")
         self.assertEqual(invoice.l10n_uy_edi_cfe_state, "error")
@@ -122,8 +131,7 @@ class TestMock(common.TestUyEdi):
         """ capture error return by DGI because the data we send in the XML is not valid """
         partner_local_with_error = self.env["res.partner"].create({
             "name": "IEB Internacional",
-            "l10n_latam_identification_type_id": self.env.ref("l10n_uy.it_dni").id,
-            "vat": "218435730016",
+            "additional_identifiers": {"UY_DNI": "218435730016"},
             "street": "Bach 0",
             "city": "Aeroparque",
             "state_id": self.env.ref("base.state_uy_02").id,
@@ -133,8 +141,12 @@ class TestMock(common.TestUyEdi):
         invoice = self._create_move(partner_id=partner_local_with_error.id)
         invoice.action_post()
         error_msg = ".*por lo que se espera país AR, BR, CL ó PY, pero se recibió UY.*"
-        with self.assertRaisesRegex(UserError, error_msg):
+        # We don't want to use assertRaisesRegex because we don't want to rollback (simulate the commit)
+        try:
             self._mock_send_and_print(invoice, "mock_110_invoice_error")
+            self.fail("Should raise a UserError before")
+        except UserError as e:
+            self.assertRegex(str(e), error_msg)
 
         self.assertFalse(invoice.invoice_pdf_report_file, "Since we have an error the pdf file must not exist.")
         self.assertEqual(invoice.l10n_uy_edi_cfe_state, "error")
@@ -162,6 +174,28 @@ class TestMock(common.TestUyEdi):
         self.assertFalse(invoice.l10n_uy_edi_cfe_state)
         self.assertFalse(invoice.l10n_uy_edi_error)
 
+    def test_125_non_billable_with_taxes_validation_fail(self):
+        """ Test to ensure a non-billable product with taxes is captured before sending to Uruware. """
+        non_billable = self.env["product.product"].create({
+            "name": "Non-Billable Product",
+            "list_price": 50.0,
+            "type": "service",
+            "company_id": self.company_uy.id,
+            "taxes_id": False,
+            "l10n_uy_edi_is_non_billable": True,
+        })
+        invoice = self._create_move(
+            invoice_line_ids=[
+                Command.create({"product_id": self.service_vat_22.id, "price_unit": 100.0, "tax_ids": self.tax_22.ids}),
+                Command.create({"product_id": non_billable.id, "price_unit": 50.0, "tax_ids": self.tax_22.ids}),
+            ])
+        invoice.action_post()
+        with self.assertRaisesRegex(UserError, "A non-billable product cannot have taxes"):
+            self._mock_send_and_print(invoice, expected_xml_file="NO_RESPONSE")
+
+        self.assertFalse(invoice.l10n_uy_edi_cfe_state)
+        self.assertFalse(invoice.l10n_uy_edi_error)
+
     def test_130_cron_vendor_bills_ok(self):
         """ Simulate the run of 'UY: Create vendor bills (sync from Uruware)' cron. On this case exists a notification
         available, so also exists a move that will be created. The goal of this tests is not to check if the received
@@ -179,3 +213,22 @@ class TestMock(common.TestUyEdi):
         self._mock_cron_l10n_uy_edi_get_vendor_bills('test_140_cron_vendor_bills_notf_unavailable')
         new_move_created = self.env['account.move'].search([])
         self.assertEqual(new_move_created, self.env['account.move'])
+
+    def test_150_populate_partner_from_vat(self):
+        partner = self.env["res.partner"].create({
+            "name": "placeholder",
+            "vat": "219000090011",
+            "country_id": self.env.ref("base.uy").id,
+        })
+        with patch(f"{self.utils_path}._ucfe_inbox", return_value=self._mocked_response("mock_640_partner_info")):
+            partner.button_l10n_uy_populate_from_vat()
+
+        self.assertEqual(partner.name, "DGI RUC PRUEBA CEDE Y DIRECCION GENERAL IMPOSITIVA")
+        self.assertEqual(partner.ref, "VERIFICACION ACTUALIZACION 051")
+        self.assertEqual(partner.street, "12 METROS 6855 BIS 101")
+        self.assertEqual(partner.street2, "Apto 5")
+        self.assertEqual(partner.city, "CASUPA")
+        self.assertEqual(partner.zip, "11000")
+        self.assertEqual(partner.phone, "25062223")
+        self.assertEqual(partner.email, "PLANPROD@DGI.GUB.UY")
+        self.assertEqual(partner.state_id, self.env.ref("base.state_uy_08"))

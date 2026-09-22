@@ -7,6 +7,7 @@ from odoo.addons.web_studio.wizard.studio_export_wizard import _find_circular_de
 from odoo.addons.http_routing.tests.common import MockRequest
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestExport(HttpCase):
     def setUp(self):
         super().setUp()
@@ -189,7 +190,7 @@ class TestExportTours(HttpCase):
         exported_models = {f[0] for f in files}
         self.assertEqual(exported_models, {
             'ir.actions.act_window', 'ir.default',
-            'ir.model', 'ir.model.fields', 'ir.model.access',
+            'ir.model', 'ir.model.fields', 'ir.access',
             'ir.ui.view', 'ir.ui.menu',
         })
         self.assertEqual(len(data.filtered(lambda r: r.model == 'ir.model')), 1)
@@ -200,6 +201,7 @@ class TestExportTours(HttpCase):
         self.assertTrue('My App Records' in created_menus)
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestCircularDependencies(BaseCase):
     def test_circular_dependencies(self):
         self.assertEqual(_find_circular_dependencies({}), [])

@@ -1,19 +1,16 @@
 import re
-import csv
 
 from odoo import api, fields, models
-from odoo.tools import file_open
 
-with file_open('l10n_mx/data/template/account.group-mx.csv') as group_template_csv:
-    reader = csv.reader(group_template_csv, delimiter=',', quotechar='"')
-    SAT_GROUPS_CODES = {row[2] for row in reader}
-ACCOUNT_ID_PATTERN = re.compile(r'\d{3}\.\d{2}\.\d*')
+ACCOUNT_ID_PATTERN = re.compile(r'\d{3}\.\d{2}(\.\d+)*')
+EXPORTABLE_SAT_CODE_PATTERN = re.compile(r'^\d{3}(\.\d{2}(\.\d+)*)?$')
 
 
 class AccountAccount(models.Model):
     _inherit = 'account.account'
 
     l10n_mx_is_sat_invalid = fields.Boolean(compute="_compute_l10n_mx_is_sat_invalid")
+    l10n_mx_is_sat_exportable = fields.Boolean(compute="_compute_l10n_mx_is_sat_exportable")
 
     @api.depends('code')
     def _compute_l10n_mx_is_sat_invalid(self):
@@ -24,7 +21,13 @@ class AccountAccount(models.Model):
         incorrect_accounts = self.filtered(
             lambda a: current_company.country_code == "MX" and
                 a.code and current_company in a.company_ids
-                and (a.code.rpartition('.')[0] not in SAT_GROUPS_CODES or not ACCOUNT_ID_PATTERN.fullmatch(a.code))
+                and a.active
+                and not ACCOUNT_ID_PATTERN.fullmatch(a.code)
         )
         (self - incorrect_accounts).l10n_mx_is_sat_invalid = False
         incorrect_accounts.l10n_mx_is_sat_invalid = True
+
+    @api.depends('code')
+    def _compute_l10n_mx_is_sat_exportable(self):
+        for account in self:
+            account.l10n_mx_is_sat_exportable = bool(EXPORTABLE_SAT_CODE_PATTERN.fullmatch(account.code))

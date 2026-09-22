@@ -4,7 +4,7 @@ from odoo import models, fields, api, _
 class L10nGtEdiPhrase(models.Model):
     _name = "l10n_gt_edi.phrase"
     _description = "Guatemalan Phrases Object"
-    _rec_names_search = ["phrase_type", 'scenario_code', "scenario_description"]
+    _rec_names_search = ("phrase_type", 'scenario_code', "scenario_description")
 
     phrase_type = fields.Integer(required=True)
     phrase_description = fields.Char(required=True)

@@ -8,7 +8,7 @@ from odoo import api, fields, models
 
 class HelpdeskTag(models.Model):
     _name = 'helpdesk.tag'
-    _description = 'Helpdesk Tags'
+    _description = 'Helpdesk Tag'
     _order = 'name'
 
     def _get_default_color(self):

@@ -33,6 +33,7 @@ class RequestAppraisal(models.TransientModel):
 
     @api.model
     def _get_template_and_recipients(self, appraisal):
+        appraisal = appraisal.sudo()
         employee = appraisal.employee_id
         managers = appraisal.manager_ids
         if self.env.user.employee_id in managers:

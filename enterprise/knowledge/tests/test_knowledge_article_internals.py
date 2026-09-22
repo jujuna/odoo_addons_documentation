@@ -11,6 +11,7 @@ from odoo.tools import mute_logger
 
 
 @tagged('knowledge_internals')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleFields(KnowledgeCommonWData):
     """ Test fields and their management. """
 
@@ -69,7 +70,6 @@ class TestKnowledgeArticleFields(KnowledgeCommonWData):
         body_values = [False, '', '<p><br /></p>', '<p>MyBody</p>']
 
         for index, body in enumerate(body_values):
-            self.patch(self.env.cr, 'now', lambda: _reference_dt)
             with freeze_time(_reference_dt):
                 article = self.env['knowledge.article'].create({
                     'body': body,
@@ -79,8 +79,6 @@ class TestKnowledgeArticleFields(KnowledgeCommonWData):
             self.assertEqual(article.last_edition_uid, self.env.user)
             self.assertEqual(article.last_edition_date, _reference_dt)
             self.assertFalse(article.html_field_history)
-
-            self.patch(self.env.cr, 'now', lambda: _reference_dt + timedelta(days=1))
 
             # fields that does not change content
             with freeze_time(_reference_dt + timedelta(days=1)):
@@ -110,6 +108,7 @@ class TestKnowledgeArticleFields(KnowledgeCommonWData):
 
 
 @tagged('knowledge_internals')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleInternals(KnowledgeCommonWData):
     """ Testing model/ORM overrides """
 
@@ -117,7 +116,10 @@ class TestKnowledgeArticleInternals(KnowledgeCommonWData):
         """ Test our custom display_name / name_search / name_create. """
 
         KnowledgeArticle = self.env['knowledge.article']
-        icon_placeholder = KnowledgeArticle._get_no_icon_placeholder()
+        # '📄' used to be a placeholder prefixed to the display_name of icon-less
+        # articles. It is now an ordinary emoji: it must only match articles that
+        # actually store it as their icon.
+        former_placeholder = '📄'
 
         KnowledgeArticle.search([]).unlink()  # remove other articles to ease testing
         [article_no_icon, article_icon] = KnowledgeArticle.create([{
@@ -129,7 +131,7 @@ class TestKnowledgeArticleInternals(KnowledgeCommonWData):
 
         self.assertEqual(
             article_no_icon.display_name,
-            '%s Article Without Icon' % icon_placeholder
+            'Article Without Icon'
         )
 
         self.assertEqual(
@@ -141,11 +143,11 @@ class TestKnowledgeArticleInternals(KnowledgeCommonWData):
         for search_input, expected_articles in zip(
             ['Article With',
              '🚀 Article With',
-             '%s Article With' % icon_placeholder,
+             '%s Article With' % former_placeholder,
              '⭐ Test'],
             [article_icon + article_no_icon,
              article_icon,
-             article_no_icon,
+             KnowledgeArticle,
              KnowledgeArticle]
         ):
             self.assertEqual(
@@ -157,13 +159,13 @@ class TestKnowledgeArticleInternals(KnowledgeCommonWData):
         # test the '=' operator
         for search_input, expected_articles in zip(
             ['Article Without Icon',
-             '%s Article Without Icon' % icon_placeholder,
+             '%s Article Without Icon' % former_placeholder,
              'Article With Icon',
              '🚀 Article With Icon',
              '🚀 Article With',
              '⭐ Test'],
             [article_no_icon,
-             article_no_icon,
+             KnowledgeArticle,
              article_icon,
              article_icon,
              KnowledgeArticle,
@@ -179,11 +181,11 @@ class TestKnowledgeArticleInternals(KnowledgeCommonWData):
         for create_input, (expected_name, expected_icon) in zip(
             ['a',
              'Article Without Icon',
-             '%s Article With Icon' % icon_placeholder,
+             '%s Article With Icon' % former_placeholder,
              '🚀 Article With Icon'],
             [('a', False),
              ('Article Without Icon', False),
-             ('Article With Icon', icon_placeholder),
+             ('Article With Icon', former_placeholder),
              ('Article With Icon', '🚀')]
         ):
             # result of name_create is a display_name
@@ -193,6 +195,7 @@ class TestKnowledgeArticleInternals(KnowledgeCommonWData):
 
 
 @tagged('knowledge_internals')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleUtilities(KnowledgeCommonWData):
     """ Test data oriented utilities and tools for articles. """
 
@@ -262,6 +265,7 @@ class TestKnowledgeArticleUtilities(KnowledgeCommonWData):
 
 
 @tagged('knowledge_internals', 'knowledge_management')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeCommonWDataInitialValue(KnowledgeCommonWData):
     """ Test initial values or our test data once so that other tests do not have
     to do it. """
@@ -293,7 +297,7 @@ class TestKnowledgeCommonWDataInitialValue(KnowledgeCommonWData):
         self.assertEqual(self.workspace_children[0].sequence, 0)
         self.assertEqual(self.workspace_children[1].sequence, 1)
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_initial_values_as_employee(self):
         """ Ensure all tests have the same basis (user specific computed as

@@ -73,18 +73,18 @@
                     <strong>
                         <span t-att-style="'color: %s;' % o.company_id.secondary_color">Date:</span>
                     </strong>
-                    <span t-esc="o._get_effective_date()" t-options='{"widget": "date"}'/>
+                    <span t-out="o._get_effective_date()" t-options='{"widget": "date"}'/>
                     <br/>
                     <strong>Customer:</strong>
                     <span t-out="o.partner_id.commercial_partner_id.name or o.partner_id.name"/>
                     <br/>
 
-                    <t t-if="o.partner_id.vat and o.partner_id.l10n_latam_identification_type_id">
+                    <t t-set="cl_doc_vals" t-value="o.partner_id._get_preferred_legal_entity_identifier_vals()"/>
+                    <t t-if="cl_doc_vals">
                         <strong>
-                            <t t-out="o.partner_id.l10n_latam_identification_type_id.name or o.company_id.country_id.vat_label"
-                               id="inv_tax_id_label"/>:
+                            <t t-out="cl_doc_vals.get('label') or o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>:
                         </strong>
-                        <span t-out="o.partner_id.vat"/>
+                        <span t-out="cl_doc_vals['value']"/>
                         <br/>
                     </t>
                     <strong>GIRO:</strong>
@@ -111,22 +111,27 @@
         </template>
 
         <template id="barcode_stamp_footer">
-            <div name="stamp">
-                <t t-if="o.l10n_cl_sii_barcode" t-set="barcode_stamp"
-                   t-value="o._pdf417_barcode(o.l10n_cl_sii_barcode)"/>
-                <t t-if="barcode_stamp">
-                    <img class="img-fluid" t-attf-src="data:image/*;base64,{{barcode_stamp}}"/>
-                    <p t-att-style="'color: %s;' % o.company_id.primary_color" class="text-center small">
-                        Electronic Stamp SII
-                        <br/>
-                        Resolution Nº:
-                        <span t-field="o.company_id.l10n_cl_dte_resolution_number"/>
-                        from Date:
-                        <span t-field="o.company_id.l10n_cl_dte_resolution_date" t-options='{"widget": "date"}'/>
-                        <br/>
-                        Verify the document on www.sii.cl
-                    </p>
-                </t>
+            <t t-if="o.l10n_cl_sii_barcode" t-set="barcode_stamp"
+               t-value="o._pdf417_barcode(o.l10n_cl_sii_barcode)"/>
+            <div class="row">
+                <div name="stamp" class="col-5">
+                    <t t-if="barcode_stamp">
+                        <img class="img-fluid" t-attf-src="data:image/*;base64,{{barcode_stamp}}"/>
+                        <p t-att-style="'color: %s;' % o.company_id.primary_color" class="text-center small">
+                            Electronic Stamp SII
+                            <br/>
+                            Resolution Nº:
+                            <span t-field="o.company_id.l10n_cl_dte_resolution_number"/>
+                            from Date:
+                            <span t-field="o.company_id.l10n_cl_dte_resolution_date" t-options='{"widget": "date"}'/>
+                            <br/>
+                            Verify the document on www.sii.cl
+                        </p>
+                    </t>
+                </div>
+            </div>
+            <div class="row" t-if="print_with_cedible and o.partner_id.country_code == 'CL'">
+                <t t-call="l10n_cl_edi.cedible_block"/>
             </div>
         </template>
 
@@ -189,7 +194,7 @@
                                                 <span t-field="line.quantity"/>
                                             </td>
                                             <td groups="uom.group_uom">
-                                                <span t-field="line.product_uom"/>
+                                                <span t-field="line.uom_id"/>
                                             </td>
 
                                             <td class="text-end" t-if="has_unit_price">
@@ -269,20 +274,22 @@
                                     </div>
                                 </div>
                             </div>
+                            <t t-call="l10n_cl_edi_stock.barcode_stamp_footer"/>
                             <div class="row">
-                                <div class="col-5">
-                                    <t t-call="l10n_cl_edi_stock.barcode_stamp_footer"/>
-                                </div>
-                                <div class="col-7 text-justify">
+                                <div class="col-12 text-justify">
                                     <br/>
                                     <p t-field="o.note"/>
                                 </div>
                             </div>
-
                         </div>
                     </t>
                 </t>
             </t>
+        </template>
+
+        <template id="delivery_guide_yield_document">
+            <t t-set="print_with_cedible" t-value="True"/>
+            <t t-call="l10n_cl_edi_stock.delivery_guide_document"/>
         </template>
 
         <record id="action_delivery_guide_report_pdf" model="ir.actions.report">
@@ -290,10 +297,17 @@
             <field name="model">stock.picking</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">l10n_cl_edi_stock.delivery_guide_document</field>
-            <field name="report_file">l10n_cl_edi_stock.delivery_guide_document</field>
             <field name="print_report_name">'GDE Guide SII - %s' % (object.name)</field>
             <field name="binding_model_id" ref="model_stock_picking"/>
             <field name="binding_type">report</field>
+        </record>
+
+        <record id="action_delivery_guide_yield_report_pdf" model="ir.actions.report">
+            <field name="name">Delivery Guide Yield Copy SII DTE 52 (CL)</field>
+            <field name="model">stock.picking</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">l10n_cl_edi_stock.delivery_guide_yield_document</field>
+            <field name="print_report_name">'GDE Guide SII Yield Copy - %s' % (object.name)</field>
         </record>
 
     </data>

@@ -27,9 +27,10 @@ Key Features
 """,
     "data": [
         'security/hr_appraisal_security.xml',
-        'security/ir.model.access.csv',
         'wizard/request_appraisal_views.xml',
         'data/hr_appraisal_templates.xml',
+        'views/mail_activity_plan_views.xml',
+        'views/mail_activity_views.xml',
         'views/hr_appraisal_views.xml',
         'views/hr_appraisal_goal_template_views.xml',
         'views/hr_appraisal_goal_views.xml',
@@ -41,13 +42,16 @@ Key Features
         'views/hr_appraisal_template_views.xml',
         'data/hr_appraisal_data.xml',
         'data/mail_template_data.xml',
-        'wizard/hr_departure_wizard_views.xml',
         'wizard/hr_appraisal_campaign_wizard.xml',
+        'views/hr_job_views.xml',
+        'security/ir.access.csv',
     ],
     "demo": [
         "data/hr_appraisal_demo.xml",
     ],
-    'installable': True,
+    'other_files': [
+        'data/scenarios/hr_appraisal_scenario.xml',
+    ],
     'application': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
@@ -55,6 +59,11 @@ Key Features
     'assets': {
         'web.assets_backend': [
             'hr_appraisal/static/src/**/*',
+            ('remove', 'hr_appraisal/static/src/views/gantt/**/*'),
+        ],
+        # we need to lazy load gantt views to be able to use web_gantt's classes
+        'web.assets_backend_lazy': [
+            'hr_appraisal/static/src/views/gantt/**/*',
         ],
         'web.assets_tests': [
             'hr_appraisal/static/tests/tours/*.js',

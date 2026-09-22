@@ -1,19 +1,19 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
-import { describe, expect, test, queryOne } from "@odoo/hoot";
+import { beforeEach, describe, expect, queryOne, test, queryAllTexts } from "@odoo/hoot";
+import { waitFor } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import {
     contains,
+    defineActions,
     defineModels,
     fields,
     getService,
     models,
     mountWithCleanup,
     onRpc,
-    defineActions,
 } from "@web/../tests/web_test_helpers";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 import { editView, handleDefaultStudioRoutes, openStudio } from "../view_editor_tests_utils";
-import { waitFor } from "@odoo/hoot-dom";
 
 describe.current.tags("desktop");
 
@@ -64,7 +64,7 @@ class Task extends models.Model {
 
     _views = {
         "map,1": `
-            <map res_partner='partner_id' routing='true' hide_name='true' hide_address='true' studio_map_field_ids="[1,2]">
+            <map res_partner='partner_id' routing='ordered' hide_name='true' hide_address='true' studio_map_field_ids="[1,2]">
                 <field name='name' string='Name'/>
                 <field name='description' string='Description'/>
             </map>`,
@@ -75,6 +75,18 @@ class Task extends models.Model {
 defineModels([Partner, Task]);
 
 handleDefaultStudioRoutes();
+
+beforeEach(() => {
+    onRpc("res.company", "web_read", () => [
+        {
+            partner_id: {
+                contact_address_complete: false,
+                partner_latitude: 10.0,
+                partner_longitude: 10.5,
+            },
+        },
+    ]);
+});
 
 test("marker popup fields in editor sidebar", async () => {
     expect.assertions(12);
@@ -90,7 +102,7 @@ test("marker popup fields in editor sidebar", async () => {
             target: { field_ids: [1], operation_type: "remove" },
         });
         const arch = `
-            <map res_partner='partner_id' routing='true' hide_name='true' hide_address='true' studio_map_field_ids="[2]">
+            <map res_partner='partner_id' routing='ordered' hide_name='true' hide_address='true' studio_map_field_ids="[2]">
                 <field name='description' string='Description'/>
             </map>`;
 
@@ -112,32 +124,22 @@ test("marker popup fields in editor sidebar", async () => {
     await contains(".o_web_studio_navbar_item").click();
     expect(".o_web_studio_sidebar .o_map_popup_fields").toHaveCount(1);
     expect(".o_web_studio_sidebar .o_map_popup_fields .badge").toHaveCount(2);
-    expect("div.leaflet-marker-icon").toHaveCount(1);
+    expect("div.leaflet-marker-icon").toHaveCount(2);
 
     await contains("div.leaflet-marker-icon").click();
 
-    expect(
-        ".o-map-renderer--popup-table tbody tr:first .o-map-renderer--popup-table-content-name"
-    ).toHaveText("Name");
-    expect(
-        ".o-map-renderer--popup-table tbody tr:first .o-map-renderer--popup-table-content-value"
-    ).toHaveText("first record");
-    expect(
-        ".o-map-renderer--popup-table tbody tr:last .o-map-renderer--popup-table-content-name"
-    ).toHaveText("Description");
-    expect(
-        ".o-map-renderer--popup-table tbody tr:last .o-map-renderer--popup-table-content-value"
-    ).toHaveText("first description");
+    expect(".o_map_card_grid > div:nth-child(1)").toHaveText("Name");
+    expect(".o_map_card_grid > div:nth-child(2)").toHaveText("first record");
+    expect(".o_map_card_grid > div:nth-child(3)").toHaveText("Description");
+    expect(".o_map_card_grid > div:nth-child(4)").toHaveText("first description");
 
     await contains(".o_web_studio_sidebar .o_map_popup_fields .badge .o_delete").click();
     expect.verifySteps(["edit_view"]);
     expect(".o_web_studio_sidebar .o_map_popup_fields .badge").toHaveCount(1);
 
     await contains("div.leaflet-marker-icon").click();
-    expect(".o-map-renderer--popup-table tbody tr").toHaveCount(1);
-    expect(
-        ".o-map-renderer--popup-table tbody tr .o-map-renderer--popup-table-content-value"
-    ).toHaveText("first description");
+    expect(".o_map_card_grid > *").toHaveCount(2);
+    expect(".o_map_card_grid > div:nth-child(2)").toHaveText("first description");
 });
 
 test("map additional fields domain", async () => {
@@ -175,7 +177,7 @@ test("map additional fields domain", async () => {
     expect.verifySteps(["name_search"]);
 });
 
-test("many2many, one2many and binary fields cannot be selected in SortBy dropdown for map editor", async () => {
+test("map routing options", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
@@ -193,6 +195,27 @@ test("many2many, one2many and binary fields cannot be selected in SortBy dropdow
 
     await contains(".o_web_studio_navbar_item").click();
     await contains("input.o_select_menu_toggler:eq(1)").click();
+    expect(queryAllTexts(".o_select_menu_item")).toEqual(["Disabled", "Ordered", "Optimized"]);
+});
+
+test("many2many, one2many and binary fields cannot be selected in SortBy dropdown for map editor", async () => {
+    await mountWithCleanup(WebClientEnterprise);
+    await animationFrame();
+
+    await getService("action").doAction({
+        name: "Task",
+        res_model: "task",
+        type: "ir.actions.act_window",
+        view_mode: "map",
+        views: [
+            [1, "map"],
+            [false, "search"],
+        ],
+        group_ids: [],
+    });
+
+    await contains(".o_web_studio_navbar_item").click();
+    await contains("input.o_select_menu_toggler:eq(2)").click();
     // There are 3 hidden fields that are not defined above in the class (id, create_date, write_date)
     expect(".o_select_menu_item").toHaveCount(8);
 });
@@ -223,4 +246,40 @@ test("map leaflet is rendered", async () => {
     mapRect = mapContainer.getBoundingClientRect();
     expect(mapRect.width).toBeGreaterThan(0);
     expect(mapRect.height).toBeGreaterThan(0);
+});
+
+test("can create toggle in editor sidebar", async () => {
+    await mountWithCleanup(WebClientEnterprise);
+    await animationFrame();
+
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        expect.step("edit_view");
+        expect(params.operations[0].new_attrs).toEqual({ create: false });
+        const arch = `
+            <map res_partner='partner_id' routing='ordered' hide_name='true' hide_address='true' studio_map_field_ids="[1,2]" create='false'>
+                <field name='name' string='Name'/>
+                <field name='description' string='Description'/>
+            </map>`;
+        return editView(params, "map", arch);
+    });
+
+    await getService("action").doAction({
+        name: "Task",
+        res_model: "task",
+        type: "ir.actions.act_window",
+        view_mode: "map",
+        views: [
+            [1, "map"],
+            [false, "search"],
+        ],
+        group_ids: [],
+    });
+
+    await contains(".o_web_studio_navbar_item").click();
+    expect(".o_web_studio_sidebar input#create").toBeChecked();
+
+    await contains(".o_web_studio_sidebar input#create").click();
+    expect.verifySteps(["edit_view"]);
+    expect(".o_web_studio_sidebar input#create").not.toBeChecked();
 });

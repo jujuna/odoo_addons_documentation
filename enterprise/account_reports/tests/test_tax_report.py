@@ -4,11 +4,14 @@ from freezegun import freeze_time
 
 from .common import TestAccountReportsCommon
 from odoo import fields, Command
+from odoo.exceptions import RedirectWarning
 from odoo.tests import Form, tagged
 
 
 @tagged('post_install', '-at_install')
 class TestTaxReport(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -63,7 +66,6 @@ class TestTaxReport(TestAccountReportsCommon):
             'code': 'cash.basis.transfer.account',
             'name': 'cash_basis_transfer_account',
             'account_type': 'income',
-            'reconcile': True,
         })
 
         # ==== Sale taxes: group of two taxes having type_tax_use = 'sale' ====
@@ -240,6 +242,8 @@ class TestTaxReport(TestAccountReportsCommon):
             'report_id': cls.domestic_tax_report.id,
             'deadline_periodicity': 'trimester',
             'deadline_start_date': '2020-01-01',
+            'tax_payable_account_id': cls.company_data['default_tax_account_payable'].id,
+            'tax_receivable_account_id': cls.company_data['default_tax_account_receivable'].id,
         })
 
         cls.foreign_tax_return_type = cls.env['account.return.type'].create({
@@ -247,6 +251,8 @@ class TestTaxReport(TestAccountReportsCommon):
             'report_id': cls.foreign_tax_report.id,
             'deadline_periodicity': 'trimester',
             'deadline_start_date': '2020-01-01',
+            'tax_payable_account_id': cls.company_data['default_tax_account_payable'].id,
+            'tax_receivable_account_id': cls.company_data['default_tax_account_receivable'].id,
         })
 
         # Create some domestic invoices (not all in the same closing period)
@@ -271,8 +277,6 @@ class TestTaxReport(TestAccountReportsCommon):
         vals = {
             'name': 'Test tax group',
             'company_id': company.id,
-            'tax_receivable_account_id': cls.company_data['default_tax_account_receivable'].sudo().copy({'company_ids': company.ids}).id,
-            'tax_payable_account_id': cls.company_data['default_tax_account_payable'].sudo().copy({'company_ids': company.ids}).id,
         }
         if country:
             vals['country_id'] = country.id
@@ -351,7 +355,7 @@ class TestTaxReport(TestAccountReportsCommon):
             'tax_unit_id': tax_unit.id if tax_unit else False,
         })
         with self.allow_pdf_render():
-            tax_return.action_validate(bypass_failing_tests=True)
+            tax_return.action_submit()
 
         self.assertEqual(len(closing_vals_by_company), len(tax_return.closing_move_ids))
         for closing_move in tax_return.closing_move_ids:
@@ -404,11 +408,127 @@ class TestTaxReport(TestAccountReportsCommon):
                     {'debit': 63.0,      'credit': 0.0,      'account_id': self.tax_account_1.id},
                     # 0.5 * 0.6 * (400 - 60) = 102
                     {'debit': 0.0,       'credit': 102.0,    'account_id': self.tax_account_1.id},
-                    {'debit': 0.0,       'credit': 63.0,     'account_id': self.tax_group_1.tax_payable_account_id.id},
-                    {'debit': 102.0,     'credit': 0.0,      'account_id': self.tax_group_2.tax_receivable_account_id.id},
+                    # Both tax groups settle on the return's single pair, so -63 + 102 nets here
+                    {'debit': 39.0,      'credit': 0.0,      'account_id': self.company_data['default_tax_account_receivable'].id},
                 ],
             }
         )
+
+    def test_tax_closing_advance_payment_account(self):
+        """ The closing entry zeroes out the advance tax payment account and nets its balance
+        into the payable/receivable amount, instead of leaving it aside.
+        The account is configured on the return type, so every tax group of the return keys its
+        subtotal on it; it must still be balanced exactly once.
+        """
+        advance_account = self.env['account.account'].create({
+            'name': "Tax Advance Account",
+            'code': '260000',
+            'account_type': 'asset_current',
+        })
+        self.domestic_tax_return_type.with_company(self.env.company).advance_tax_payment_account_id = advance_account
+
+        # A prepayment of 40 sitting on the advance account before the end of the closing period
+        self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2021-02-15',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'line_ids': [
+                Command.create({'debit': 40.0, 'credit': 0.0, 'account_id': advance_account.id}),
+                Command.create({'debit': 0.0, 'credit': 40.0, 'account_id': self.company_data['default_account_revenue'].id}),
+            ],
+        }).action_post()
+
+        self._assert_tax_closing(
+            self.env.company,
+            '2021-01-01',
+            '2021-03-31',
+            self.domestic_tax_return_type,
+            {
+                self.env.company: [
+                    {'debit': 63.0,      'credit': 0.0,      'account_id': self.tax_account_1.id},
+                    {'debit': 0.0,       'credit': 102.0,    'account_id': self.tax_account_1.id},
+                    # Balanced once
+                    {'debit': 0.0,       'credit': 40.0,     'account_id': advance_account.id},
+                    # -63 + 102 netted on the return's single pair, plus the 40 of advance payment
+                    {'debit': 79.0,      'credit': 0.0,      'account_id': self.company_data['default_tax_account_receivable'].id},
+                ],
+            }
+        )
+
+    def test_tax_closing_accounts_branch(self):
+        """ The closing accounts belong to the company tree: a branch reads and writes the root's."""
+        return_type = self.domestic_tax_return_type
+        payable = self.company_data['default_tax_account_payable']
+        receivable = self.company_data['default_tax_account_receivable']
+        branch = self.env['res.company'].create({
+            'name': "Test branch",
+            'parent_id': self.env.company.id,
+        })
+
+        for field_name, expected in (
+            ('tax_payable_account_id', payable),
+            ('tax_receivable_account_id', receivable),
+        ):
+            with self.subTest(field_name=field_name):
+                self.assertFalse(
+                    return_type.with_company(branch)[f'company_{field_name}'],
+                    "The branch holds no value of its own",
+                )
+                self.assertEqual(
+                    return_type.with_company(branch)[field_name],
+                    expected,
+                    "The branch reads the account the root settles on",
+                )
+                self.assertEqual(return_type.with_company(branch)[field_name], expected)
+
+    def test_tax_closing_accounts_branch_edit(self):
+        """ Editing from a branch settles on the root, and leaves the other accounts alone."""
+        return_type = self.domestic_tax_return_type
+        receivable = self.company_data['default_tax_account_receivable']
+        branch = self.env['res.company'].create({
+            'name': "Test branch",
+            'parent_id': self.env.company.id,
+        })
+        other_payable = self.env['account.account'].create({
+            'name': "Other Tax Payable",
+            'code': '251200',
+            'account_type': 'liability_payable',
+            'non_trade': True,
+        })
+
+        return_type.with_company(branch).tax_payable_account_id = other_payable
+
+        self.assertEqual(
+            return_type.with_company(self.env.company).tax_payable_account_id,
+            other_payable,
+            "The edit made from the branch settles on the root",
+        )
+        self.assertFalse(
+            return_type.with_company(branch).company_tax_payable_account_id,
+            "The branch must not gain a value of its own",
+        )
+        self.assertEqual(
+            return_type.with_company(branch).tax_receivable_account_id,
+            receivable,
+            "Editing one account must leave the others untouched",
+        )
+
+    def test_tax_closing_accounts_missing(self):
+        """ With no accounts on the return type, the user is redirected to it to fix the configuration."""
+        self.domestic_tax_return_type.with_company(self.env.company).write({
+            'tax_payable_account_id': False,
+            'tax_receivable_account_id': False,
+        })
+
+        tax_return = self.env['account.return'].create({
+            'name': "Return",
+            'date_from': '2021-01-01',
+            'date_to': '2021-03-31',
+            'type_id': self.domestic_tax_return_type.id,
+            'company_id': self.env.company.id,
+        })
+        with self.assertRaises(RedirectWarning), self.allow_pdf_render():
+            tax_return.action_submit()
 
     def test_tax_report_foreign_monocompany(self):
         """ Test tax report's content with a foreign VAT fiscal position.
@@ -458,8 +578,8 @@ class TestTaxReport(TestAccountReportsCommon):
                     {'debit': 72.0,      'credit': 0.0,      'account_id': self.tax_account_1.id},
                     # 0.6 * 0.49 * (1000 - 600) = 117.6
                     {'debit': 0.0,       'credit': 117.6,    'account_id': self.tax_account_1.id},
-                    {'debit': 0.0,       'credit': 72.0,     'account_id': self.tax_group_3.tax_payable_account_id.id},
-                    {'debit': 117.6,     'credit': 0.0,      'account_id': self.tax_group_4.tax_receivable_account_id.id},
+                    # Both tax groups settle on the return's single pair, so -72 + 117.6 nets here
+                    {'debit': 45.6,      'credit': 0.0,      'account_id': self.company_data['default_tax_account_receivable'].id},
                 ],
             }
         )
@@ -881,58 +1001,15 @@ class TestTaxReport(TestAccountReportsCommon):
             """
             invoices.mapped('line_ids').filtered(lambda x: x.account_type in ('asset_receivable', 'liability_payable')).reconcile()
 
-        # 100 (base, invoice) - 100 (base, refund) + 20 (tax, invoice) - 5 (25% tax, refund) = 15
+        # CABA reconciled with a refund should not impact the report since no payment has been made.
         self._run_caba_generic_test(
             #   Name                      Balance
             [   0,                        1],
             [
-                ('Sale',                     15),
-                ('Purchase',                 15),
+                ('Sale',                     0),
+                ('Purchase',                 0),
             ],
             on_all_invoices_created=reconcile_opposite_types
-        )
-
-    @freeze_time('2023-10-05 02:00:00')
-    def test_tax_report_grid_cash_basis_misc_pmt(self):
-        """ Cash basis moves create for taxes based on payments are handled differently
-        by the report; we want to ensure their sign is managed properly. This
-        test runs the case where the invoice is paid with a misc operation instead
-        of a payment.
-        """
-        def reconcile_with_misc_pmt(invoice):
-            """ Create a misc operation equivalent to a full payment and reconciles
-            the invoice with it.
-            """
-            # Pay the invoice with a misc operation simulating a payment, so that the cash basis entries are created
-            invoice_reconcilable_line = invoice.line_ids.filtered(lambda x: x.account_type in ('liability_payable', 'asset_receivable'))
-            account = (invoice.line_ids - invoice_reconcilable_line).account_id - self.cash_basis_transfer_account
-            pmt_move = self.env['account.move'].create({
-                'move_type': 'entry',
-                'date': invoice.date,
-                'line_ids': [Command.create({
-                                'account_id': invoice_reconcilable_line.account_id.id,
-                                'debit': invoice_reconcilable_line.credit,
-                                'credit': invoice_reconcilable_line.debit,
-                            }),
-                            Command.create({
-                                'account_id': account.id,
-                                'credit': invoice_reconcilable_line.credit,
-                                'debit': invoice_reconcilable_line.debit,
-                            })],
-            })
-            pmt_move.action_post()
-            payment_reconcilable_line = pmt_move.line_ids.filtered(lambda x: x.account_type in ('liability_payable', 'asset_receivable'))
-            (invoice_reconcilable_line + payment_reconcilable_line).reconcile()
-
-        # 100 (base, invoice) - 100 (base, refund) + 20 (tax, invoice) - 5 (25% tax, refund) = 15
-        self._run_caba_generic_test(
-            #   Name                      Balance
-            [   0,                            1],
-            [
-                ('Sale',                     15),
-                ('Purchase',                 15),
-            ],
-            on_invoice_created=reconcile_with_misc_pmt
         )
 
     @freeze_time('2023-10-05 02:00:00')
@@ -1587,10 +1664,19 @@ class TestTaxReport(TestAccountReportsCommon):
             })
             tax_group = self.env['account.tax.group'].search([('company_id', '=', company.id), ('name', '=', 'Test tax group')], limit=1)
 
+            # The closing settles on the return type's pair, held company-dependently, so every
+            # company of the unit needs its own slot filled.
+            closing_payable = self.company_data['default_tax_account_payable'].sudo().copy({'company_ids': company.ids})
+            closing_receivable = self.company_data['default_tax_account_receivable'].sudo().copy({'company_ids': company.ids})
+            self.domestic_tax_return_type.with_company(company).write({
+                'tax_payable_account_id': closing_payable.id,
+                'tax_receivable_account_id': closing_receivable.id,
+            })
+
             tax_accounts_map[company] = {
                 'tax': tax_account,
-                'payable': tax_group.tax_payable_account_id,
-                'receivable': tax_group.tax_receivable_account_id,
+                'payable': closing_payable,
+                'receivable': closing_receivable,
             }
 
             test_tax = self._add_basic_tax_for_report(tax_unit_report, 42, 'sale', tax_group, [(100, tax_account, True)], company=company)
@@ -1735,7 +1821,13 @@ class TestTaxReport(TestAccountReportsCommon):
                 (unit_companies - current_company).partner_id.with_company(current_company).property_account_position_id,
                 created_fp
             )
-            self.assertFalse(created_fp.map_tax(self.env['account.tax'].search([('company_id', '=', current_company.id)])))
+            # Tax unit FP drops taxes bound to a fiscal position; taxes
+            # without fiscal_position_ids are preserved by design.
+            company_taxes = self.env['account.tax'].search([('company_id', '=', current_company.id)])
+            bound_taxes = company_taxes.filtered('fiscal_position_ids')
+            all_taxes = company_taxes - bound_taxes
+            self.assertFalse(created_fp.map_tax(bound_taxes))
+            self.assertEqual(created_fp.map_tax(all_taxes), all_taxes)
             self.assertFalse(current_company.partner_id.with_company(current_company).property_account_position_id)
         tax_unit._compute_fiscal_position_completion()
         self.assertTrue(tax_unit.fpos_synced)
@@ -1809,6 +1901,11 @@ class TestTaxReport(TestAccountReportsCommon):
         })
         company_2_tax_group = self._instantiate_basic_test_tax_group(company=company_2, country=self.fiscal_country)
         company_2_tax = self._add_basic_tax_for_report(self.domestic_tax_report, 11, 'sale', company_2_tax_group, [(100, company_2_tax_account, True)], company=company_2)
+        # The closing settles on the return type's pair, held company-dependently
+        self.domestic_tax_return_type.with_company(company_2).write({
+            'tax_payable_account_id': self.company_data['default_tax_account_payable'].sudo().copy({'company_ids': company_2.ids}).id,
+            'tax_receivable_account_id': self.company_data['default_tax_account_receivable'].sudo().copy({'company_ids': company_2.ids}).id,
+        })
         self.init_invoice('out_invoice', partner=self.partner_a, invoice_date='2021-02-02', post=True, amounts=[1000], taxes=company_2_tax, company=company_2)
 
         # Both companies belong to a tax unit in test country
@@ -1874,14 +1971,14 @@ class TestTaxReport(TestAccountReportsCommon):
                     {'debit':  63.0,      'credit':   0.0,     'account_id': self.tax_account_1.id},
                     # 0.5 * 0.6 * (400 - 60) = 102
                     {'debit':   0.0,      'credit': 102.0,     'account_id': self.tax_account_1.id},
-                    {'debit':   0.0,      'credit':  63.0,     'account_id': self.tax_group_1.tax_payable_account_id.id},
-                    {'debit': 102.0,      'credit':   0.0,     'account_id': self.tax_group_2.tax_receivable_account_id.id},
+                    # Both tax groups settle on the return's single pair, so -63 + 102 nets here
+                    {'debit':  39.0,      'credit':   0.0,     'account_id': self.company_data['default_tax_account_receivable'].id},
                 ],
 
                 company_2: [
                     # 0.11 * 1 * 1000 = 110
                     {'debit': 110.0,      'credit':   0.0,     'account_id': company_2_tax_account.id},
-                    {'debit':   0.0,      'credit': 110.0,     'account_id': company_2_tax_group.tax_payable_account_id.id},
+                    {'debit':   0.0,      'credit': 110.0,     'account_id': self.domestic_tax_return_type.with_company(company_2).tax_payable_account_id.id},
                 ],
         }, tax_unit=tax_unit)
 
@@ -2385,8 +2482,8 @@ class TestTaxReport(TestAccountReportsCommon):
                     {'debit': 84.0,      'credit': 0.0,      'account_id': self.tax_account_1.id},
                     # 0.6 * 0.49 * (1000 - 600) = 117.6
                     {'debit': 0.0,       'credit': 117.6,    'account_id': self.tax_account_1.id},
-                    {'debit': 0.0,       'credit': 84.0,     'account_id': self.tax_group_3.tax_payable_account_id.id},
-                    {'debit': 117.6,     'credit': 0.0,      'account_id': self.tax_group_4.tax_receivable_account_id.id},
+                    # Both tax groups settle on the return's single pair, so -84 + 117.6 nets here
+                    {'debit': 33.6,      'credit': 0.0,      'account_id': self.company_data['default_tax_account_receivable'].id},
                 ],
             }
         )
@@ -2500,3 +2597,250 @@ class TestTaxReport(TestAccountReportsCommon):
             ],
             options
         )
+
+    def test_caba_negative_lines_with_multiple_accounts(self):
+        """ One invoice with 2 lines on 2 income acccounts, one with a negative total, both with a caba tax."""
+        self.company_data['company'].tax_exigibility = True
+        account_1 = self.company_data['default_account_revenue']
+        account_2 = self.company_data["default_account_assets"]
+        caba_tax_10 = self.env['account.tax'].create({
+            'name': "tax_10",
+            'amount_type': 'percent',
+            'type_tax_use': 'sale',
+            'amount': 10.0,
+            'tax_exigibility': 'on_payment',
+            'cash_basis_transition_account_id': self.cash_basis_transfer_account.id,
+        })
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2019-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'line1',
+                    'account_id': account_1.id,
+                    'price_unit': -1000.0,
+                    'tax_ids': [Command.set(caba_tax_10.ids)],
+                }),
+                Command.create({
+                    'name': 'line2',
+                    'account_id': account_2.id,
+                    'price_unit': 2000.0,
+                    'tax_ids': [Command.set(caba_tax_10.ids)],
+                }),
+            ]
+        })
+        invoice.action_post()
+
+        payment = self.env['account.payment'].create({
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_a.id,
+            'amount': 1100,
+            'date': invoice.date,
+            'journal_id': self.company_data['default_journal_bank'].id,
+        })
+        payment.action_post()
+
+        # Reconcile the move with a payment
+        (payment.move_id + invoice).line_ids.filtered(lambda x: x.account_id == self.company_data['default_account_receivable']).reconcile()
+
+        report = self.env.ref('account.generic_tax_report_account_tax')
+        options = self._generate_options(report, invoice.date, invoice.date)
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                                                          Base      Tax
+            [   0,                                                                             1,        2],
+            [
+                ('Sales',                                                                     "",    100.0),
+                (account_2.display_name,                                                      "",    200.0),
+                (f'{caba_tax_10.name} ({caba_tax_10.amount}%)',                           2000.0,    200.0),
+                (f'Total {account_2.display_name}',                                           "",    200.0),
+                (account_1.display_name,                                                      "",   -100.0),
+                (f'{caba_tax_10.name} ({caba_tax_10.amount}%)',                          -1000.0,   -100.0),
+                (f'Total {account_1.display_name}',                                           "",   -100.0),
+                ('Total Sales',                                                               "",    100.0),
+            ],
+            options
+        )
+
+        report = self.env.ref("account.generic_tax_report_tax_account")
+        options['report_id'] = report.id
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                                                           Base      Tax
+            [   0,                                                                              1,        2],
+            [
+                ('Sales',                                                                      "",    100.0),
+                (f'{caba_tax_10.name} ({caba_tax_10.amount}%)',                                "",    100.0),
+                (account_2.display_name,                                                   2000.0,    200.0),
+                (account_1.display_name,                                                  -1000.0,   -100.0),
+                (f'Total {caba_tax_10.name} ({caba_tax_10.amount}%)',                          "",    100.0),
+                ('Total Sales',                                                                "",    100.0),
+            ],
+            options
+        )
+
+    def test_caba_not_duplicated_in_tax_report_when_in_tax_group(self):
+        """
+            Test that the CABA tax amount is not duplicated in the general tax report
+            when it is part of a tax group.
+        """
+
+        self.env.company.tax_exigibility = True
+
+        regular_tax = self.env['account.tax'].create({
+            'name': 'Regular',
+            'amount': 10,
+            'amount_type': 'percent',
+            'type_tax_use': 'sale',
+        })
+
+        caba_tax = self.env['account.tax'].create({
+            'name': 'Cash Basis',
+            'amount': 10,
+            'amount_type': 'percent',
+            'type_tax_use': 'sale',
+            'tax_exigibility': 'on_payment',
+            'cash_basis_transition_account_id': self.cash_basis_transfer_account.id,
+        })
+
+        tax_group = self.env['account.tax'].create({
+            'name': "tax_group",
+            'amount_type': 'group',
+            'children_tax_ids': [Command.set((regular_tax + caba_tax).ids)],
+        })
+
+        invoice = self.init_invoice(
+            'out_invoice',
+            invoice_date='2026-01-01',
+            post=True,
+            amounts=[100],
+            taxes=tax_group,
+            company=self.company_data['company'],
+        )
+
+        report = self.env.ref("account.generic_tax_report")
+        options = self._generate_options(report, invoice.date, invoice.date)
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                                                           Base      Tax
+            [0,                                                                        1,        2],
+            [
+                ('Sales',                                                                      "",       10.0),
+                (f'{regular_tax.name} ({regular_tax.amount}%)',                                100.0,    10.0),
+                ('Total Sales',                                                                "",       10.0),
+            ],
+            options
+        )
+
+        self._register_full_payment_for_invoice(invoice)
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                                                           Base      Tax
+            [0,                                                                        1,        2],
+            [
+                ('Sales',                                                                      "",       20.0),
+                (f'{regular_tax.name} ({regular_tax.amount}%)',                                100.0,    10.0),
+                (f'{caba_tax.name} ({caba_tax.amount}%)',                                      100.0,    10.0),
+                ('Total Sales',                                                                "",       20.0),
+            ],
+            options
+        )
+
+    def test_previous_return_period_date_scope(self):
+        self.init_invoice('in_invoice', invoice_date='2024-09-30', post=True, amounts=[60])
+        self.init_invoice('in_invoice', invoice_date='2024-12-31', post=True, amounts=[42])
+        self.init_invoice('in_invoice', invoice_date='2025-01-01', post=True, amounts=[100])
+
+        report = self.env['account.report'].create({
+            'name': 'Test report',
+            'column_ids': [Command.create({'name': 'Balance', 'sequence': 1, 'expression_label': 'balance'})],
+            'line_ids': [
+                Command.create({
+                    'name': "test",
+                    'expression_ids': [
+                        Command.create({
+                            'label': 'balance',
+                            'engine': 'domain',
+                            'formula': [('account_id.account_type', '=', 'expense')],
+                            'subformula': 'sum',
+                            'date_scope': 'previous_return_period',
+                        })
+                    ],
+                }),
+            ],
+        })
+
+        self.env['account.return.type'].create({
+            'name': "TestReturn",
+            'report_id': report.id,
+            'deadline_periodicity': 'trimester',
+            'deadline_start_date': '2020-01-01',
+        })
+
+        options = self._generate_options(report, '2025-01-01', '2025-03-31')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                             42.0),
+            ],
+            options,
+        )
+
+        options = self._generate_options(report, '2025-01-01', '2025-01-31')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                             42.0),
+            ],
+            options,
+        )
+
+        options = self._generate_options(report, '2025-02-01', '2025-02-28')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                             42.0),
+            ],
+            options,
+        )
+
+        options = self._generate_options(report, '2025-03-01', '2025-03-31')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                             42.0),
+            ],
+            options,
+        )
+
+        options = self._generate_options(report, '2025-04-01', '2025-04-01')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                            100.0),
+            ],
+            options,
+        )
+
+    def test_executive_summary_without_date_range(self):
+        report = self.env.ref('account_reports.executive_summary')
+        report.filter_date_range = False
+        options = report.get_options({'filter_date': {'range_mode': False}})
+        self.assertIsNone(options['date']['date_from'])
+        self.assertTrue(report.get_report_information(options))

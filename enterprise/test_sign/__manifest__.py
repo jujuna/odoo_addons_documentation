@@ -2,7 +2,6 @@
 
 {
     'name': 'Test Sign',
-    'version': '1.0',
     'category': 'Sales/Sign',
     'summary': "Sign Test case",
     'description': """
@@ -16,7 +15,6 @@ Let your customers follow the signature process easily.
         'mrp',
         'hr_expense',
     ],
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

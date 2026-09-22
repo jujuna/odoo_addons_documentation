@@ -15,17 +15,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-05 18:40+0000\n"
-"Last-Translator: \"Thi Huong Nguyen (thng)\" <thng@odoo.com>\n"
-"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 04:07+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-master/"
 "sale_subscription/vi/>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_subscription
 #. odoo-python
@@ -40,6 +40,18 @@ msgstr ""
 "- Bạn đang cố gắng lập hóa đơn cho các đơn hàng định kỳ. Vui lòng xác minh "
 "số lượng sản phẩm đã giao dựa trên chính sách lập hóa đơn, ngày lập hóa đơn "
 "tiếp theo và ngày kết thúc hợp đồng."
+
+#. module: sale_subscription
+#: model:ir.module.module,description:base.module_sale_subscription
+msgid ""
+"\n"
+"This module allows you to manage subscriptions.\n"
+"\n"
+"Features:\n"
+"    - Create & edit subscriptions\n"
+"    - Modify subscriptions with sales orders\n"
+"    - Generate invoice automatically at fixed intervals\n"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__nbr
@@ -126,18 +138,6 @@ msgstr ""
 "lệ từ %(start)s đến %(end)s"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "(Change Plan)"
-msgstr "(Đổi gói cước)"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid ""
-")\n"
-"                        <br/>"
-msgstr ""
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "- Until"
 msgstr ""
@@ -180,89 +180,9 @@ msgid "6 Months"
 msgstr "6 tháng"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "<b>Payment Method</b>"
-msgstr "<b>Phương thức thanh toán</b>"
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_advance_payment_inv_sale_subscription
 msgid "<b>Subscriptions</b><br/>"
 msgstr ""
-
-#. module: sale_subscription
-#: model:mail.template,body_html:sale_subscription.mail_template_subscription_alert
-msgid ""
-"<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-"family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-"                <table style=\"width:600px;margin:5px auto;\">\n"
-"                    <tbody>\n"
-"                        <tr><td t-if=\"not "
-"object.company_id.uses_default_logo\">\n"
-"                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-"company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
-"                        </td><td style=\"text-align:right;vertical-"
-"align:middle;\">\n"
-"                                Subscription Renewal\n"
-"                        </td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"                <table style=\"width:600px;margin:0px "
-"auto;background:white;border:1px solid #e1e1e1;\">\n"
-"                    <tbody>\n"
-"                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-"                            <p>Dear <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,</p>\n"
-"                            <p>Your subscription <strong t-out=\"object.name "
-"or ''\">Office Cleaning Service\"</strong> needs your attention.</p>\n"
-"                            <p>We invite you to renew it by clicking on the "
-"following link.</p>\n"
-"                            <p>Kind regards.</p>\n"
-"                        </td></tr>\n"
-"                        <tr data-o-mail-quote-container=\"1\"><td "
-"style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</"
-"td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        "
-msgstr ""
-"<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-"family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-"                <table style=\"width:600px;margin:5px auto;\">\n"
-"                    <tbody>\n"
-"                        <tr><td t-if=\"not "
-"object.company_id.uses_default_logo\">\n"
-"                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-"company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
-"                        </td><td style=\"text-align:right;vertical-"
-"align:middle;\">\n"
-"                                Gia hạn gói đăng ký\n"
-"                        </td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"                <table style=\"width:600px;margin:0px "
-"auto;background:white;border:1px solid #e1e1e1;\">\n"
-"                    <tbody>\n"
-"                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-"                            <p>Xin chào <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,</p>\n"
-"                            <p>Vui lòng xem lại gói đăng ký <strong t-"
-"out=\"object.name or ''\">Dịch vụ vệ sinh văn phòng\"</strong>.</p>\n"
-"                            <p>Chúng tôi trân trọng kính mời bạn gia hạn "
-"bằng cách nhấp vào liên kết sau.</p>\n"
-"                            <p>Trân trọng.</p>\n"
-"                        </td></tr>\n"
-"                        <tr data-o-mail-quote-container=\"1\"><td "
-"style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</"
-"td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        "
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.mail_template_subscription_rating
@@ -472,53 +392,48 @@ msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "<i class=\"fa fa-download me-1\"/> Download"
-msgstr "<i class=\"fa fa-download me-1\"/> Tải xuống"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> In Progress"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Đang xử lý"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> Paused"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Đã tạm ngừng"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> Renewed"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Đã gia hạn"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-remove\"/> Closed"
-msgstr "<i class=\"fa fa-fw fa-remove\"/> Đã đóng"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-remove\"/> Closing"
-msgstr "<i class=\"fa fa-fw fa-remove\"/> Đang đóng"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-repeat\"/> To Renew"
-msgstr "<i class=\"fa fa-fw fa-repeat\"/> Cần gia hạn"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "<i class=\"fa fa-plus\"/> Create address"
-msgstr ""
+msgid "<i class=\"oi me-1\" data-icon=\"download\"/> Download"
+msgstr "<i class=\"oi me-1\" data-icon=\"download\"/> Tải xuống"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
-msgid "<i class=\"oi oi-arrow-right me-1\"/>Back to your subscription"
-msgstr "<i class=\"oi oi-arrow-right me-1\"/>Quay lại đăng ký của bạn"
+msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Back to your subscription"
+msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>Quay lại đăng ký của bạn"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
-msgid "<option value=\"\">Choose a reason...</option>"
-msgstr "<option value=\"\">Chọn một lý do...</option>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> To Renew"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> In Progress"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Đang xử lý"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> Paused"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Đã tạm ngừng"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> Renewed"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Đã gia hạn"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"close\"/> Closed"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"close\"/> Đã đóng"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"close\"/> Closing"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"close\"/> Đang đóng"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
+msgid "<i class=\"oi\" data-icon=\"add\"/> Create address"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.payment_method_form
@@ -530,22 +445,27 @@ msgstr ""
 "<small class=\"text-600\">Tự động thanh toán cho gói đăng ký liên kết</small>"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
-msgid ""
-"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"fa fa-fw fa-"
-"repeat\"/> To Renew</span>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<small class=\"text-muted\">Plan</small>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"fa fa-fw fa-"
-"repeat\"/> Cần gia hạn</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"fa fa-fw fa-"
-"remove\"/> Closed</span>"
+"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"oi oi-fw\" data-"
+"icon=\"redo\"/> To Renew</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"fa fa-fw fa-"
-"remove\"/> Đã đóng</span>"
+"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"oi oi-fw\" data-"
+"icon=\"redo\"/> Cần gia hạn</span>"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
+msgid ""
+"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"oi oi-fw\" data-"
+"icon=\"close\"/> Closed</span>"
+msgstr ""
+"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"oi oi-fw\" data-"
+"icon=\"close\"/> Đã đóng</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
@@ -558,38 +478,38 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid ""
-"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"fa fa-fw fa-"
-"check\"/> Upsell</span>"
+"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Upsell</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"fa fa-fw fa-"
-"check\"/> Đơn bán thêm</span>"
+"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Đơn bán thêm</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"fa fa-fw fa-"
-"check\"/> Renewed</span>"
+"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Renewed</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"fa fa-fw fa-"
-"check\"/> Đã gia hạn</span>"
+"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Đã gia hạn</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> In Progress</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> In Progress</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Đang tiến hành</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Đang tiến hành</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Paused</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Paused</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Đã tạm ngừng</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Đã tạm ngừng</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -623,23 +543,9 @@ msgid "<span class=\"text-muted\">Next Billing</span>"
 msgstr "<span class=\"text-muted\">Ngày lập hoá đơn tiếp theo</span>"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.recurring_details
-msgid "<span class=\"text-start\">Non Recurring</span>:"
-msgstr "<span class=\"text-start\">Không định kỳ</span>:"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.recurring_details
-msgid "<span class=\"text-start\">Recurring</span>:"
-msgstr "<span class=\"text-start\">Định kỳ</span>:"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
-msgid ""
-"<span invisible=\"not plan_id or subscription_state == '7_upsell'\">until</"
-"span>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<span class=\"text-muted\">→</span>"
 msgstr ""
-"<span invisible=\"not plan_id or subscription_state == '7_upsell'\">cho đến</"
-"span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -666,6 +572,26 @@ msgstr ""
 "</span>"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<span>·</span>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Invoices</strong>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Period</strong>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Plan</strong>"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "<strong>Recurring Plan</strong>"
 msgstr "<strong>Gói cước định kỳ</strong>"
@@ -680,571 +606,156 @@ msgstr ""
 "được thiết lập đầy đủ. Vui lòng hoàn thành:"
 
 #. module: sale_subscription
+#: model:mail.template,body_html:sale_subscription.mail_template_subscription_alert
+msgid ""
+"<t>\n"
+"<p>Dear <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,</p>\n"
+"<p>Your subscription <strong t-out=\"object.name or ''\">Office Cleaning "
+"Service\"</strong> needs your attention.</p>\n"
+"<p>We invite you to renew it by clicking on the following link.</p>\n"
+"<p>Kind regards.</p>\n"
+"<p t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">--<br "
+"data-o-mail-quote=\"1\"/>Mitchell Admin</p>\n"
+"        </t>"
+msgstr ""
+"<t>\n"
+"<p>Kính gửi <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,</"
+"p>\n"
+"<p>Đăng ký của quý khách <strong t-out=\"object.name or ''\">Dịch vụ Vệ sinh "
+"Văn phòng\"</strong> cần được quý khách lưu ý.</p>\n"
+"<p>Chúng tôi kính mời quý khách gia hạn bằng cách nhấp vào liên kết sau.</"
+"p>\n"
+"<p>Trân trọng,</p>\n"
+"<p t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">--<br "
+"data-o-mail-quote=\"1\"/>Mitchell Admin</p>\n"
+"        </t>"
+
+#. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.email_payment_close
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Your Subscription</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Office Cleaning Service</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hello <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Our final attempt to process a payment for your "
-"subscription using your payment method\n"
-"                        <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</"
-"t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">100</t> <t t-out=\"ctx.get('currency') or ''\">$</t> failed.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Your bank or credit institution gave the "
-"following details about the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Our final attempt to process a payment for your "
-"subscription failed because we have no payment method recorded for you.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    As your payment should have been made <strong><t t-"
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Our final attempt to process a payment for your subscription using your "
+"payment method\n"
+"    <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</t>\n"
+"    for <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+"out=\"ctx.get('currency') or ''\">$</t> failed.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Your bank or credit institution gave the following details about the "
+"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Our final attempt to process a payment for your subscription failed "
+"because we have no payment method recorded for you.\n"
+"</t>\n"
+"<br/><br/>\n"
+"As your payment should have been made <strong><t t-"
 "out=\"ctx.get('auto_close_limit') or ''\">5</t> days ago</strong>, your "
 "subscription has been terminated.\n"
-"                    Should you wish to resolve this issue, do not hesitate "
-"to contact us.<br/><br/>\n"
-"                    Thank you for choosing <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Should you wish to resolve this issue, do not hesitate to contact us.<br/"
+"><br/>\n"
+"Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</div>\n"
+"</t>\n"
 "        "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Gói đăng ký của bạn</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Dịch vụ vệ sinh văn phòng</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Xin chào <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Chúng tôi đã nỗ lực xử lý thanh toán cho gói đăng ký "
-"của bạn bằng phương thức thanh toán bạn đã chọn\n"
-"                        <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</"
-"t>\n"
-"                        với số tiền <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">100</t> <t t-out=\"ctx.get('currency') or ''\">$</t> nhưng không thành "
-"công.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Ngân hàng hoặc tổ chức tín dụng của bạn cung cấp "
-"thông tin sự cố như sau: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Chúng tôi đã nỗ lực xử lý thanh toán cho gói đăng ký "
-"của bạn, nhưng không thành công vì không có dữ liệu nào về phương thức thanh "
-"toán của bạn.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Vì lẽ ra bạn cần thanh toán từ <strong><t t-"
-"out=\"ctx.get('auto_close_limit') or ''\">5</t> ngày trước</strong>, nên "
-"chúng tôi rất tiếc gói đăng ký của bạn đã bị hủy.\n"
-"                    Nếu bạn muốn giải quyết vấn đề này, vui lòng liên hệ với "
-"chúng tôi.<br/><br/>\n"
-"                    Cảm ơn bạn đã lựa chọn <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Được hỗ trợ bởi <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Chào <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Lần thử cuối cùng của chúng tôi để xử lý thanh toán cho gói đăng ký của "
+"bạn bằng phương thức thanh toán của bạn\n"
+"   <t t-out=\"ctx.get('payment_token') or ''\"> TOKEN</t>\n"
+"    cho <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+"out=\"ctx.get('currency') or ''\">$</t> đã thất bại.\n"
+"   <t t-if=\"ctx.get('error')\"> \n"
+"        Ngân hàng hoặc tổ chức tín dụng của bạn đã cung cấp các chi tiết sau "
+"về vấn đề này: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"   </t>\n"
+"</t> \n"
+"<t t-else=\"\">\n"
+"    Lần thử cuối cùng của chúng tôi để xử lý thanh toán cho gói đăng ký của "
+"bạn đã thất bại vì chúng tôi không có phương thức thanh toán nào được ghi "
+"nhận cho bạn.\n"
+"</t>\n"
+"<br/><br/> \n"
+"Vì thanh toán của bạn lẽ ra đã được thực hiện <strong><t t-"
+"out=\"ctx.get('auto_close_limit') or ''\">5</t> ngày trước</strong>, gói "
+"đăng ký của bạn đã bị hủy.\n"
+"Nếu bạn muốn giải quyết vấn đề này, vui lòng liên hệ với chúng tôi.<br/><br/"
+">\n"
+"Cảm ơn bạn đã lựa chọn <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\"> --<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</div>\n"
+"</t>\n"
 "        "
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.email_payment_reminder
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Your Subscription</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Office Cleaning Service</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hello <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        We were unable to process a payment for your "
-"subscription using your payment method\n"
-"                        <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">10</t> <t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Your bank or credit institution gave the "
-"following details about the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Your subscription <t t-out=\"ctx.get('code') or "
-"''\">CODE</t> is due for renewal but we haven’t received your payment yet. "
-"To keep your subscription active, please make your payment as soon as "
-"possible.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Your subscription <t t-out=\"ctx.get('code') or "
-"''\">CODE</t> is still valid but will be <strong>suspended</strong>\n"
-"                    on <t t-out=\"format_date(ctx.get('date_close')) or "
-"''\">05/05/2021</t><br/>\n"
-"                    <div style=\"margin: 16px 0px; text-align: center;\">\n"
-"                        <a t-attf-href=\"{{ ctx.get('payment_link', "
-"object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; padding: "
-"10px 30px; text-decoration: none; background-color: "
-"{{company.email_secondary_color or '#875A7B'}}; color: "
-"{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
-"                            Pay Now\n"
-"                        </a>\n"
-"                    </div>\n"
-"                    <br/>\n"
-"                    If you have any questions, do not hesitate to contact us."
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    We were unable to process a payment for your subscription using your "
+"payment method\n"
+"    <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
+"    for <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+"out=\"ctx.get('currency_name') or ''\">$</t>.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Your bank or credit institution gave the following details about the "
+"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> is "
+"due for renewal but we haven’t received your payment yet. To keep your "
+"subscription active, please make your payment as soon as possible.\n"
+"</t>\n"
 "<br/><br/>\n"
-"                    Thank you for choosing <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div>\n"
-"                    <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </t>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> will "
+"be <strong>suspended</strong>\n"
+"<t t-out=\"(ctx.get('date_close') and ('on ' + "
+"format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>\n"
+"if payment is not received.<br/>\n"
+"<div style=\"margin: 16px 0px; text-align: center;\">\n"
+"    <a t-attf-href=\"{{ ctx.get('payment_link', object.get_portal_url()) }}"
+"\" t-attf-style=\"display: inline-block; padding: 10px 30px; text-"
+"decoration: none; background-color: {{company.email_secondary_color or "
+"'#875A7B'}}; color: {{company.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
+"        Pay Now\n"
+"    </a>\n"
+"</div>\n"
+"<br/>\n"
+"If you have any questions, do not hesitate to contact us.<br/><br/>\n"
+"Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div>\n"
+"<t t-if=\"user.signature\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</t>\n"
+"</div>\n"
+"</t>\n"
 "        "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
-"object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Gói đăng ký của bạn</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Dịch vụ vệ sinh văn phòng</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Xin chào <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Chúng tôi không thể xử lý thanh toán cho gói đăng ký "
-"của bạn thông qua phương thức thanh toán bạn đã chọn là\n"
-"                        <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
-"                        với số tiền <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">10</t> <t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Ngân hàng hoặc tổ chức tín dụng của bạn cung cấp "
-"thông tin sự cố như sau: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Gói đăng ký <t t-out=\"ctx.get('code') or ''\">MÃ</"
-"t> sắp đến ngày gia hạn nhưng chúng tôi vẫn chưa nhận được khoản thanh toán "
-"của bạn. Để duy trì gói đăng ký, vui lòng thanh toán càng sớm càng tốt.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Gói đăng ký <t t-out=\"ctx.get('code') or ''\">MÃ</t> "
-"vẫn còn hiệu lực nhưng sẽ bị <strong>tạm ngừng</strong>\n"
-"                    vào ngày <t t-out=\"format_date(ctx.get('date_close')) "
-"or ''\">05/05/2021</t><br/>\n"
-"                    <div style=\"margin: 16px 0px; text-align: center;\">\n"
-"                        <a t-attf-href=\"{{ ctx.get('payment_link', "
-"object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; padding: "
-"10px 30px; text-decoration: none; background-color: "
-"{{company.email_secondary_color or '#875A7B'}}; color: "
-"{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
-"                            Thanh toán ngay\n"
-"                        </a>\n"
-"                    </div>\n"
-"                    <br/>\n"
-"                    Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với "
-"chúng tôi.<br/><br/>\n"
-"                    Cảm ơn bạn đã lựa chọn <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div>\n"
-"                    <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </t>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Được hỗ trợ bởi <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
-"        "
 
 #. module: sale_subscription
 #. odoo-python
@@ -1296,11 +807,6 @@ msgstr "Biến động ARR (bình thường hoá)"
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__allow_one_time_sale
 msgid "Accept One-Time"
 msgstr ""
-
-#. module: sale_subscription
-#: model:ir.model,name:sale_subscription.model_account_move_send
-msgid "Account Move Send"
-msgstr "Account Move Send"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_needaction
@@ -1458,6 +964,11 @@ msgstr "Vào ngày"
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_attachment_count
 msgid "Attachment Count"
 msgstr "Số lượng tệp đính kèm"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
+msgid "Attributes"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__authorized
@@ -1630,13 +1141,6 @@ msgid "Campaign"
 msgstr "Chiến dịch"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_change_customer_view_form
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
-msgid "Cancel"
-msgstr "Hủy"
-
-#. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log_report__state__cancel
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_cancel
 msgid "Cancelled"
@@ -1654,6 +1158,13 @@ msgstr ""
 "hàng. Một khi hóa đơn đã được tạo — và thậm chí có thể đã được thanh toán — "
 "thì mọi thứ đã hoàn tất. Việc hủy đăng ký chắc chắn sẽ gây ra không ít rắc "
 "rối!"
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
+msgid ""
+"Cannot close %(subscriptions_name)s: subscription order with recurring plan."
+msgstr ""
 
 #. module: sale_subscription
 #: model:product.template,name:sale_subscription.product_car_leasing_product_template
@@ -1706,6 +1217,11 @@ msgid "Choose a product name.<br/><i>(e.g. eLearning Access)</i>"
 msgstr "Chọn tên sản phẩm.<br/><i>(ví dụ: truy cập khóa học online)</i>"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
+msgid "Choose a reason..."
+msgstr ""
+
+#. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Choose the invoice duration for your subscription"
@@ -1742,6 +1258,7 @@ msgid "Closable"
 msgstr "Có thể đóng"
 
 #. module: sale_subscription
+#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_close_reason_wizard_action
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
@@ -1749,7 +1266,11 @@ msgid "Close"
 msgstr "Đóng"
 
 #. module: sale_subscription
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_close_reason_wizard_action
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_date
+msgid "Close Date"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__close_reason_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__close_reason_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_reason_id
@@ -1770,6 +1291,12 @@ msgstr "Các lý do đóng"
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "Close Subscription"
 msgstr "Đóng đăng ký"
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Close the recurring plan dropdown."
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__user_closable_options
@@ -1797,6 +1324,36 @@ msgstr "Đóng"
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "Closing text: %s"
 msgstr "Văn bản đóng: %s"
+
+#. module: sale_subscription
+#: model:ir.model.fields,help:sale_subscription.field_res_config_settings__no_token_reminder_days
+msgid ""
+"Comma-separated list of day offsets relative to the next invoice date (e.g. "
+"0,1,2,7,14,-2,-7,-14) on which a payment reminder is sent for subscriptions "
+"with no saved payment token."
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
+msgid ""
+"Comma-separated list of day offsets relative to the next invoice date (e.g. "
+"0,1,2,7,14,-2,-7,-14) on which a reminder is sent for subscriptions with no "
+"saved payment token."
+msgstr ""
+
+#. module: sale_subscription
+#: model:ir.model.fields,help:sale_subscription.field_res_config_settings__payment_failed_reminder_days
+msgid ""
+"Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
+"reminder email is sent when an automatic payment with a saved token fails."
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
+msgid ""
+"Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
+"reminder is sent when an automatic payment fails."
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__commercial_partner_id
@@ -2011,6 +1568,11 @@ msgid "Customer State"
 msgstr "Tỉnh thành của khách hàng"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_tag_ids
+msgid "Customer Tags"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_zip
 msgid "Customer ZIP"
 msgstr "Mã bưu chính của khách hàng"
@@ -2038,11 +1600,6 @@ msgid "Date the MRR change was first billed."
 msgstr ""
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Date:"
-msgstr "Ngày:"
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Days"
 msgstr "Ngày"
@@ -2062,14 +1619,60 @@ msgid "Define if the subscription product can also be bought as a one-time."
 msgstr ""
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s months"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s weeks"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s years"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every month"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every week"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every year"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "Delivery Address"
 msgstr "Địa chỉ giao hàng"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__delivery_period_display
+msgid "Delivery Period Display"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Details"
 msgstr "Chi tiết"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
+msgid "Discard"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
@@ -2102,6 +1705,7 @@ msgstr "Hiển thị Chậm trễ"
 #: model:ir.model.fields,field_description:sale_subscription.field_payment_transaction__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__display_name
+#: model:ir.model.fields,field_description:sale_subscription.field_product_product__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__display_name
@@ -2150,6 +1754,11 @@ msgid "Draft"
 msgstr "Nháp"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Due"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template__duration_unit
 msgid "Duration Unit"
 msgstr "Đơn vị khoảng thời gian"
@@ -2196,11 +1805,6 @@ msgid "End Date"
 msgstr "Ngày kết thúc"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "End Date:"
-msgstr "Ngày kết thúc:"
-
-#. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_end_of_contract
 msgid "End of contract"
 msgstr "Kết thúc hợp đồng"
@@ -2213,11 +1817,8 @@ msgstr "Cuối kỳ"
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
-msgid ""
-"Error during renewal of contract %(order_ids)s %(order_refs)s %"
-"(payment_state)s"
+msgid "Error during renewal of contract %(order_ids)s %(order_refs)s"
 msgstr ""
-"Lỗi khi gia hạn hợp đồng %(order_ids)s %(order_refs)s %(payment_state)s"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2245,9 +1846,9 @@ msgid "Expansion"
 msgstr "Expansion"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Expiration Date:"
-msgstr "Ngày hết hạn:"
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__purchase_price
+msgid "Expected Cost"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -2284,12 +1885,6 @@ msgid "First contract date"
 msgstr "Ngày hợp đồng đầu tiên"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_product_product__subscription_rule_ids_fixed
-#: model:ir.model.fields,field_description:sale_subscription.field_product_template__subscription_rule_ids_fixed
-msgid "Fixed Subscription Pricings"
-msgstr ""
-
-#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_follower_ids
 msgid "Followers"
 msgstr "Người theo dõi"
@@ -2301,6 +1896,12 @@ msgstr "Người theo dõi (Đối tác)"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+msgid "For"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "From"
 msgstr "Từ"
 
@@ -2318,6 +1919,11 @@ msgstr "Hoạt động trong tương lai"
 #: model:ir.model,name:sale_subscription.model_payment_link_wizard
 msgid "Generate Sales Payment Link"
 msgstr "Tạo liên kết thanh toán bán hàng"
+
+#. module: sale_subscription
+#: model:ir.module.module,summary:base.module_sale_subscription
+msgid "Generate recurring invoices and manage renewals"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -2375,7 +1981,6 @@ msgstr "Bạn sẽ tìm thấy các đăng ký đã quá hạn cần gia hạn t
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "History"
 msgstr "Lịch sử"
 
@@ -2400,6 +2005,7 @@ msgstr "Tôi không dùng nó"
 #: model:ir.model.fields,field_description:sale_subscription.field_payment_transaction__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__id
+#: model:ir.model.fields,field_description:sale_subscription.field_product_product__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__id
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__id
@@ -2448,7 +2054,6 @@ msgstr ""
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_product_product__recurring_invoice
 #: model:ir.model.fields,help:sale_subscription.field_product_template__recurring_invoice
-#: model:ir.model.fields,help:sale_subscription.field_sale_order_line__recurring_invoice
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_template_line__recurring_invoice
 msgid ""
 "If set, confirming a sale order with this product will create a subscription"
@@ -2457,9 +2062,10 @@ msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_line__pricelist_id
-msgid "If you change the pricelist, only newly added lines will be affected."
+msgid ""
+"If you change the pricelist, the prices of all order lines will be updated "
+"accordingly."
 msgstr ""
-"Nếu bạn thay đổi bảng giá, chỉ những dòng mới được thêm vào mới bị ảnh hưởng."
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -2690,12 +2296,6 @@ msgstr "Hãy thêm giá cho chu kỳ lặp đã chọn"
 #. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
-msgid "Let's choose the customer for your subscription"
-msgstr "Hãy chọn khách hàng cho đăng ký của bạn"
-
-#. module: sale_subscription
-#. odoo-javascript
-#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Let's go to the catalog to create our first subscription product"
 msgstr "Hãy vào danh mục để tạo sản phẩm đăng ký đầu tiên"
 
@@ -2705,6 +2305,8 @@ msgid "Log Currency"
 msgstr "Tiền tệ nhật ký"
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_monthly
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_order_log_growth_tree
@@ -2763,7 +2365,7 @@ msgid "MRR:"
 msgstr "MRR:"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_subscription
+#: model:portal.entry,description:sale_subscription.portal_subscription_entry
 msgid "Manage your subscriptions"
 msgstr "Quản lý gói đăng ký của bạn"
 
@@ -2794,7 +2396,12 @@ msgstr ""
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin
 msgid "Margin"
-msgstr "Lợi nhuận"
+msgstr "Biên lợi nhuận"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin_percent
+msgid "Margin (%)"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__medium_id
@@ -2836,6 +2443,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Monthly"
 msgstr "Hàng tháng"
+
+#. module: sale_subscription
+#: model:sale.order.template,name:sale_subscription.monthly_template
+msgid "Monthly Cleaning"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_monthly
@@ -2981,6 +2593,13 @@ msgid "No valid Payment Method"
 msgstr "Không có phương thức thanh toán hợp lệ"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__no_token_reminder_days
+msgid "No-token payment reminder days"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 msgid "Non Recurring"
 msgstr "Không định kỳ"
@@ -2999,7 +2618,7 @@ msgstr "Không"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
 msgid "Not Invoiced"
-msgstr "Chưa lập hoá đơn"
+msgstr "Chưa xuất hoá đơn"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sales_order_filter_subscription
@@ -3069,11 +2688,6 @@ msgid "Optional Plans"
 msgstr "Gói cước tùy chọn"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Options"
-msgstr "Tùy chọn"
-
-#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__order_reference
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -3091,6 +2705,11 @@ msgid "Order Invoice Status"
 msgstr "Trạng thái hóa đơn của đơn hàng"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__line_name
+msgid "Order Line Name"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__name
 msgid "Order Reference"
 msgstr "Mã đơn hàng"
@@ -3101,9 +2720,9 @@ msgid "Order Status"
 msgstr "Trạng thái đơn hàng"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "Orders"
-msgstr "Đơn hàng"
+#: model:ir.model,name:sale_subscription.model_sale_order_template
+msgid "Order Templates"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__origin_order_id
@@ -3225,16 +2844,9 @@ msgid "Payment Transaction"
 msgstr "Giao dịch thanh toán"
 
 #. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid "Payment not recorded"
-msgstr "Thanh toán chưa được ghi nhận"
-
-#. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid "Payment recorded: %s"
-msgstr "Thanh toán đã được ghi nhận: %s"
+#: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__payment_failed_reminder_days
+msgid "Payment failure reminder days"
+msgstr ""
 
 #. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.email_payment_reminder
@@ -3263,15 +2875,19 @@ msgstr "Giao dịch đang treo"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__plan_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__plan_id
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_list_multi_edit
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 msgid "Plan"
 msgstr "Gói cước"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Plan:"
-msgstr "Gói cước:"
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/product/product.xml:0
+msgid "Plan not available"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -3333,7 +2949,7 @@ msgid "Portal: retention step"
 msgstr "Cổng thông tin: bước lưu giữ"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
 msgid "Price"
 msgstr "Giá"
@@ -3378,19 +2994,11 @@ msgid "Product Category"
 msgstr "Danh mục sản phẩm"
 
 #. module: sale_subscription
+#: model:ir.model,name:sale_subscription.model_product_product
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__product_id
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
 msgid "Product Variant"
-msgstr "Biến thể sản phẩm"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Product Variants"
-msgstr ""
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
-msgid "Product Varient"
 msgstr "Biến thể sản phẩm"
 
 #. module: sale_subscription
@@ -3399,6 +3007,11 @@ msgstr "Biến thể sản phẩm"
 #: model:ir.ui.menu,name:sale_subscription.product_menu_catalog
 msgid "Products"
 msgstr "Sản phẩm"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Prorated"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__allow_prorated_price
@@ -3439,8 +3052,6 @@ msgid "Quantity"
 msgstr "Số lượng"
 
 #. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order__subscription_state__1_draft
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log__subscription_state__1_draft
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log_report__state__draft
@@ -3455,7 +3066,6 @@ msgid "Quotation Sent"
 msgstr "Báo giá đã gửi"
 
 #. module: sale_subscription
-#: model:ir.model,name:sale_subscription.model_sale_order_template
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 msgid "Quotation Template"
 msgstr "Mẫu báo giá"
@@ -3531,8 +3141,9 @@ msgid "Reason"
 msgstr "Lý do"
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__is_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_view_search_inherit
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_order_product_search_inherit
@@ -3546,9 +3157,9 @@ msgid "Recurring Amount"
 msgstr ""
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_details
-msgid "Recurring Details"
-msgstr "Thông tin định kỳ"
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
+msgid "Recurring Invoice"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__plan_id
@@ -3564,23 +3175,12 @@ msgid "Recurring Plan"
 msgstr "Gói cước định kỳ"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "Recurring Plan:"
-msgstr "Gói cước định kỳ:"
-
-#. module: sale_subscription
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_plan_action
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_plans
 msgid "Recurring Plans"
 msgstr "Kế hoạch định kỳ"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
-msgid "Recurring Prices"
-msgstr "Giá định kỳ"
-
-#. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__subscription_item_ids
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__subscription_rule_ids
 msgid "Recurring Pricing"
 msgstr "Chiến lược giá định kỳ"
@@ -3592,6 +3192,21 @@ msgstr "Doanh thu định kỳ"
 
 #. module: sale_subscription
 #. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"Recurring order with this product will be invoiced at the beginning of the "
+"period."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"Recurring order with this product will be invoiced at the end of the period."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.constraint,message:sale_subscription.constraint_sale_subscription_plan_check_for_valid_billing_period_value
 msgid ""
@@ -3600,16 +3215,6 @@ msgid ""
 msgstr ""
 "Giai đoạn định kỳ phải là số dương. Hãy đảm bảo dữ liệu đầu vào là giá trị "
 "số dương hợp lệ."
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Recurring prices"
-msgstr ""
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Reference:"
-msgstr "Tham chiếu:"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__cancel
@@ -3687,15 +3292,6 @@ msgstr "Mở lại gói đăng ký của bạn"
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_report
 msgid "Reporting"
 msgstr "Báo cáo"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
-msgid ""
-"Request a online payment from the customer to confirm the order. For a "
-"subscription, a payment will be required also before each renewal"
-msgstr ""
-"Yêu cầu khách hàng thanh toán online để xác nhận đơn hàng. Đối với gói đăng "
-"ký, thanh toán cũng sẽ được yêu cầu trước mỗi lần gia hạn"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -3831,12 +3427,18 @@ msgstr "Bộ phận sales"
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "Salesperson"
-msgstr "Nhân viên sales"
+msgstr "Chuyên viên sales"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "Save"
 msgstr "Lưu"
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Save your subscription."
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
@@ -3853,6 +3455,18 @@ msgstr "Tìm kiếm mẫu"
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select a recurring product"
 msgstr "Chọn một sản phẩm định kỳ"
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Select this product."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Select this recurring plan."
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_view_form
@@ -3873,12 +3487,6 @@ msgstr "Gửi email (thanh toán tự động)"
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__subscription_action__manual_send_mail
 msgid "Send Mail (manual payment)"
 msgstr "Gửi email (thanh toán thủ công)"
-
-#. module: sale_subscription
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_act_window_sms_composer_multi
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_act_window_sms_composer_single
-msgid "Send an SMS Text Message"
-msgstr "Gửi tin nhắn văn bản SMS"
 
 #. module: sale_subscription
 #: model:mail.template,description:sale_subscription.email_payment_close
@@ -3920,6 +3528,11 @@ msgid "Settings"
 msgstr "Cài đặt"
 
 #. module: sale_subscription
+#: model:ir.model,name:sale_subscription.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__starred
 msgid "Show Subscription on dashboard"
 msgstr "Hiển thị Đăng ký trên bảng điều khiển"
@@ -3943,14 +3556,23 @@ msgstr "Ngày bắt đầu"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_digest
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Start Date:"
 msgstr "Ngày bắt đầu:"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Started"
+msgstr ""
 
 #. module: sale_subscription
 #: model:mail.message.subtype,name:sale_subscription.subtype_state_change
 msgid "State Change"
 msgstr "Đổi trạng thái"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
+msgid "State before"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -4075,17 +3697,11 @@ msgid "Subscription Logs"
 msgstr "Nhật ký đăng ký"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "Subscription Manager:"
-msgstr "Quản lý đăng ký:"
-
-#. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_sale_subscription_plan
 msgid "Subscription Plan"
 msgstr "Gói cước đăng ký"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Subscription Pricelist Rules"
 msgstr ""
@@ -4099,7 +3715,6 @@ msgstr ""
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__recurring_invoice
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__recurring_invoice
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template_line__recurring_invoice
 msgid "Subscription Product"
 msgstr "Sản phẩm đăng ký"
@@ -4111,7 +3726,6 @@ msgstr "Báo giá đăng ký"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__subscription_state
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__subscription_state
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 msgid "Subscription State"
@@ -4162,19 +3776,9 @@ msgid "Subscription will be paused from %(date_from)s to %(date_to)s."
 msgstr ""
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "Subscription:"
-msgstr "Gói đăng ký:"
-
-#. module: sale_subscription
 #: model:mail.template,name:sale_subscription.mail_template_subscription_alert
 msgid "Subscription: Default Email Alert"
 msgstr "Đăng ký: Cảnh báo email mặc định"
-
-#. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_default_alert
-msgid "Subscription: Default SMS Alert"
-msgstr "Đăng ký: Cảnh báo SMS mặc định"
 
 #. module: sale_subscription
 #: model:mail.template,name:sale_subscription.email_payment_close
@@ -4187,36 +3791,28 @@ msgid "Subscription: Payment Reminder"
 msgstr "Đăng ký: Nhắc nhở thanh toán"
 
 #. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_payment_failure
-msgid "Subscription: Payment failure"
-msgstr "Đăng ký: Thanh toán không thành công"
-
-#. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_payment_reminder
-msgid "Subscription: Payment reminder"
-msgstr "Đăng ký: Nhắc nhở thanh toán"
-
-#. module: sale_subscription
 #: model:mail.template,name:sale_subscription.mail_template_subscription_rating
 msgid "Subscription: Rating Request"
 msgstr "Đăng ký: Mời đánh giá"
 
 #. module: sale_subscription
 #. odoo-python
-#: code:addons/sale_subscription/models/res_partner.py:0
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_action
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_action_filtered
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__subscription_count
 #: model:ir.model.fields,field_description:sale_subscription.field_res_users__subscription_count
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__active_subs_count
+#: model:ir.module.module,shortdesc:base.module_sale_subscription
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_action
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_analysis
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_root
+#: model:portal.entry,name:sale_subscription.portal_subscription_entry
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_menu_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_view_search_inherit
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_search_view_inherit_sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.res_partner_view_inherit_sale_subscription
@@ -4400,6 +3996,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid ""
+"The payment method you selected can only pay amounts starting from %s. "
+"Please create or select another one."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/controllers/portal.py:0
+msgid ""
 "The payment method you selected can only pay amounts up to %s. Please create "
 "or select another one."
 msgstr ""
@@ -4437,6 +4041,16 @@ msgstr "Việc gia hạn %s đã bị hủy."
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_line__subscription_start_date
 msgid "The start date indicate when the subscription periods begin."
 msgstr "Ngày bắt đầu cho biết thời điểm bắt đầu chu kỳ đăng ký."
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
+msgid ""
+"The start date of an upsell cannot be greater or equal to the next invoice "
+"date of the subscription %s.\n"
+"You should first invoice the original subscription, use an earlier start "
+"date for the upsell or create a renewal quotation."
+msgstr ""
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_renew
@@ -4500,8 +4114,6 @@ msgid ""
 "the\n"
 "                following active subscriptions:"
 msgstr ""
-"Không thể xóa phương thức thanh toán này, vì nó hiện được liên kết với\n"
-"                 các gói đăng ký đang hoạt động sau:"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -4541,7 +4153,7 @@ msgstr ""
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "To Invoice"
-msgstr "Cần lập hoá đơn"
+msgstr "Cần xuất hoá đơn"
 
 #. module: sale_subscription
 #. odoo-python
@@ -4600,6 +4212,11 @@ msgid "Type of event"
 msgstr "Loại sự kiện"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__utm_reference
+msgid "UTM Reference"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "Unassigned"
 msgstr "Chưa phân công"
@@ -4631,6 +4248,11 @@ msgid "Unpaid subscription"
 msgstr "Đăng ký chưa thanh toán"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_delivered_amount
+msgid "Untaxed Amount Delivered"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_amount_invoiced
 msgid "Untaxed Amount Invoiced"
 msgstr "Số tiền trước thuế đã xuất hóa đơn"
@@ -4652,6 +4274,7 @@ msgstr "Tổng trước thuế"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "Until"
 msgstr "Cho đến"
 
@@ -4715,9 +4338,9 @@ msgid "User Pause Start"
 msgstr ""
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
-msgid "Variant Values"
-msgstr "Giá trị biến thể"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "Valid until"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_close_reason__visible_in_portal
@@ -4792,19 +4415,14 @@ msgid "We don't want you to leave us like this."
 msgstr "Chúng tôi không lỡ để bạn rời đi như thế này."
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order__website_message_ids
-msgid "Website Messages"
-msgstr "Thông báo trên trang web"
-
-#. module: sale_subscription
-#: model:ir.model.fields,help:sale_subscription.field_sale_order__website_message_ids
-msgid "Website communication history"
-msgstr "Lịch sử trao đổi qua trang web"
-
-#. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_subscription_plan__billing_period_unit__week
 msgid "Weeks"
 msgstr "Tuần"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
+msgid "When"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order__starred
@@ -4815,6 +4433,11 @@ msgstr "Liệu đăng ký này có được hiển thị trên bảng điều kh
 #: model:sale.subscription.plan,name:sale_subscription.subscription_plan_year
 msgid "Yearly"
 msgstr "Hàng năm"
+
+#. module: sale_subscription
+#: model:sale.order.template,name:sale_subscription.yearly_template
+msgid "Yearly Cleaning"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_yearly
@@ -4853,6 +4476,14 @@ msgid ""
 msgstr ""
 "Bạn sắp đóng vĩnh viễn gói đăng ký vẫn đang có hiệu lực cho đến\n"
 "&amp;nbsp;"
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"You can not change the recurring property of this product because it has "
+"been sold already (%s)"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -5015,16 +4646,6 @@ msgstr "Bạn không thể bán thêm đăng ký bằng đơn vị tiền tệ k
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid ""
-"You cannot upsell a subscription whose next invoice date is in the past.\n"
-"Please, invoice directly the %s contract."
-msgstr ""
-"Bạn không thể bán thêm đăng ký có ngày lập hoá đơn tiếp theo trong quá khứ.\n"
-"Vui lòng trực tiếp lập hóa đơn cho hợp đồng %s."
-
-#. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid ""
 "You cannot validate a renewal quotation starting before the next invoice "
 "date of the parent contract. Please update the start date after the %s."
 msgstr ""
@@ -5047,7 +4668,8 @@ msgstr ""
 "vụ."
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 msgid "Your Subscription"
 msgstr "Gói đăng ký của bạn"
 
@@ -5127,11 +4749,6 @@ msgstr "thông báo"
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "next_invoice_date"
 msgstr "next_invoice_date"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "on"
-msgstr "vào"
 
 #. module: sale_subscription
 #. odoo-python
@@ -5220,18 +4837,6 @@ msgid "until"
 msgstr "cho đến"
 
 #. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_payment_failure
-msgid ""
-"{{ object.company_id.name }}: Our final attempt to process a payment for "
-"your subscription failed. As your payment should have been made on "
-"{{ object.next_invoice_date }}, your subscription has been terminated."
-msgstr ""
-"{{ object.company_id.name }}: Chúng tôi đã nỗ lực xử lý thanh toán cho gói "
-"đăng ký của bạn qua phương thức thanh toán bạn đã chọn nhưng không thành "
-"công. Vì bạn cần thanh toán vào {{ object.next_invoice_date }}, nên chúng "
-"tôi rất tiếc rằng gói đăng ký của bạn đã bị hủy."
-
-#. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.mail_template_subscription_alert
 msgid ""
 "{{ object.company_id.name }}: Please check the subscription {{ object.name }}"
@@ -5243,726 +4848,5 @@ msgstr ""
 msgid "{{ object.company_id.name }}: Service Rating Request"
 msgstr "{{ object.company_id.name }}: Yêu cầu đánh giá dich vụ"
 
-#. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_payment_reminder
-msgid ""
-"{{ object.company_id.name }}: We were unable to process a payment for your "
-"subscription. Your subscription {{ object.name }} is still valid but will be "
-"suspended on {{ object.next_invoice_date }} unless the payment succeeds in "
-"the meantime."
-msgstr ""
-"{{ object.company_id.name }}: Chúng tôi không thể xử lý thanh toán cho gói "
-"đăng ký của bạn. Gói đăng ký {{ object.name }} vẫn còn hiệu lực nhưng sẽ bị "
-"tạm dừng vào {{ object.next_invoice_date }} nếu thanh toán không được thực "
-"hiện vào thời hạn trên."
-
-#. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_default_alert
-msgid ""
-"{{ object.company_id.name }}: Your subscription {{ object.name }} needs your "
-"attention. If you have some concerns about it, please contact "
-"{{ object.user_id.name }}, your contact person."
-msgstr ""
-"{{ object.company_id.name }}: Đăng ký của bạn {{ object.name }} cần bạn xem "
-"xét. Nếu bạn có bất cứ thắc mắc nào, vui lòng liên hệ người phụ trách "
-"{{ object.user_id.name }}."
-
-#~ msgid "Applied On"
-#~ msgstr "Được áp dụng cho"
-
-#~ msgid "(Wrong address?)"
-#~ msgstr "(Sai địa chỉ?)"
-
-#~ msgid "3 Months"
-#~ msgstr "3 tháng"
-
-#~ msgid "<i class=\"fa fa-comment\"/> Send message"
-#~ msgstr "<i class=\"fa fa-comment\"/> Gửi tin nhắn"
-
-#~ msgid "<i class=\"fa fa-download\"/> Download"
-#~ msgstr "<i class=\"fa fa-download\"/> Tải xuống"
-
-#~ msgid "<i class=\"fa fa-print\"/> Print"
-#~ msgstr "<i class=\"fa fa-print\"/> In"
-
-#~ msgid "<small class=\"text-muted\">Subscription -</small>"
-#~ msgstr "<small class=\"text-muted\">Thuê bao -</small>"
-
-#~ msgid "<span>Disc.%</span>"
-#~ msgstr "<span>G.Giá.%</span>"
-
-#~ msgid "<strong class=\"mr16\">Subtotal</strong>"
-#~ msgstr "<strong class=\"mr16\">Thành tiền</strong>"
-
-#~ msgid "<strong class=\"text-muted\">Subscription Manager:</strong>"
-#~ msgstr "<strong class=\"text-muted\">Quản lý đăng ký:</strong>"
-
-#~ msgid "<strong> and </strong>"
-#~ msgstr "<strong> và </strong>"
-
-#~ msgid "<strong>Next Billing Amount:</strong>"
-#~ msgstr "<strong>Số tiền thanh toán tiếp theo:</strong>"
-
-#~ msgid "<strong>Subtotal</strong>"
-#~ msgstr "<strong>Thành tiền</strong>"
-
-#~ msgid "<strong>to</strong>"
-#~ msgstr "<strong>tới</strong>"
-
-#~ msgid ""
-#~ "A code server action can be executed from the website, using a dedicated "
-#~ "controller. The address is <base>/website/action/<website_path>. Set this "
-#~ "field as True to allow users to run this action. If it is set to False "
-#~ "the action cannot be run through the website."
-#~ msgstr ""
-#~ "Một hành động máy chủ mã có thể được thực hiện từ trang web, sử dụng một "
-#~ "bộ điều khiển chuyên dụng. Địa chỉ là <base>/ website / action /"
-#~ "<website_path>. Đặt trường này là \"Đúng\" để cho phép người dùng chạy "
-#~ "tác vụ này. Nếu nó được đặt thành \"Sai\" thì hành động không thể chạy "
-#~ "qua trang web."
-
-#~ msgid "Action"
-#~ msgstr "Thực hiện"
-
-#~ msgid "Action Description"
-#~ msgstr "Mô tả hành động"
-
-#~ msgid "Action Name"
-#~ msgstr "Tên hành động"
-
-#~ msgid "Action To Do"
-#~ msgstr "Cần thực hiện"
-
-#~ msgid "Action Type"
-#~ msgstr "Kiểu Hành động"
-
-#~ msgid "Activity"
-#~ msgstr "Hoạt động"
-
-#~ msgid "Activity User Type"
-#~ msgstr "Kiểu tài khoản hoạt động"
-
-#~ msgid "Add Followers"
-#~ msgstr "Thêm Người theo dõi"
-
-#~ msgid "Amount:"
-#~ msgstr "Tổng:"
-
-#~ msgid "Analytic Account"
-#~ msgstr "Tài khoản phân tích"
-
-#~ msgid "Apply on"
-#~ msgstr "Áp dụng cho"
-
-#~ msgid "Archived Product"
-#~ msgstr "Lưu trữ sản phẩm"
-
-#~ msgid "Archived Products"
-#~ msgstr "Lưu trữ các sản phẩm"
-
-#~ msgid "Assign To"
-#~ msgstr "Phân công cho"
-
-#~ msgid "Automated Action"
-#~ msgstr "Thực hiện tự động"
-
-#~ msgid "Available on the Website"
-#~ msgstr "Khả dụng ở Website"
-
-#~ msgid "Bad"
-#~ msgstr "Tệ"
-
-#~ msgid "Bad Health"
-#~ msgstr "Sức khỏe xấu"
-
-#~ msgid "Before Update Domain"
-#~ msgstr "Trước khi cập nhật miền"
-
-#~ msgid "Binding Model"
-#~ msgstr "Binding Model"
-
-#~ msgid "Binding Type"
-#~ msgstr "Binding Type"
-
-#~ msgid "Binding View Types"
-#~ msgstr "Loại giao diện Binding"
-
-#~ msgid "Change plan"
-#~ msgstr "Đổi gói cước"
-
-#~ msgid "Child Actions"
-#~ msgstr "Hành động con"
-
-#~ msgid ""
-#~ "Child server actions that will be executed. Note that the last return "
-#~ "returned action value will be used as global return value."
-#~ msgstr ""
-#~ "Child server actions that will be executed. Note that the last return "
-#~ "returned action value will be used as global return value."
-
-#~ msgid "Click here to add some products or services to your quotation."
-#~ msgstr "Bấm để thêm một số sản phẩm hoặc dịch vào báo giá của bạn."
-
-#~ msgid "Color"
-#~ msgstr "Màu sắc"
-
-#~ msgid "Create a new subscription alert"
-#~ msgstr "Tạo thông báo đăng ký mới"
-
-#~ msgid "Create next activity"
-#~ msgstr "Tạo hoạt động tiếp theo"
-
-#~ msgid ""
-#~ "Create subscriptions to manage recurring invoicing and payments. "
-#~ "Subscriptions can\n"
-#~ "                be time-bounded or not. In case of a limited period, they "
-#~ "are flagged as to be renewed\n"
-#~ "                one month from the end date."
-#~ msgstr ""
-#~ "Tạo đăng ký để quản lý thanh toán và lập hóa đơn định kỳ. Đăng ký có thể\n"
-#~ "                có thời hạn hoặc không. Trong trường hợp giới hạn thời "
-#~ "gian, chúng được gắn cờ là cần gia hạn \n"
-#~ "                một tháng sau ngày kết thúc."
-
-#~ msgid "Current Plan:"
-#~ msgstr "Gói hiện tại:"
-
-#~ msgid "Date"
-#~ msgstr "Ngày"
-
-#~ msgid "Date of Next Invoice"
-#~ msgstr "Ngày lập hóa đơn tiếp theo"
-
-#~ msgid "Define a new subscription"
-#~ msgstr "Xác định đăng ký mới"
-
-#~ msgid "Delay After Trigger"
-#~ msgstr "Trì hoãn sau ngày kích hoạt"
-
-#~ msgid "Delay after trigger date"
-#~ msgstr "Trì hoãn sau ngày kích hoạt"
-
-#~ msgid "Delay type"
-#~ msgstr "Dạng trì hoãn"
-
-#~ msgid "Destination"
-#~ msgstr "Đích"
-
-#~ msgid "Due Date In"
-#~ msgstr "Ngày đáo hạn"
-
-#~ msgid "Due type"
-#~ msgstr "Loại thời hạn"
-
-#~ msgid "Duration"
-#~ msgstr "Thời lượng"
-
-#~ msgid "Email Template"
-#~ msgstr "Mẫu email"
-
-#~ msgid "External ID"
-#~ msgstr "External ID"
-
-#~ msgid "Fields that trigger the onchange."
-#~ msgstr "Các trường kích hoạt sự thay đổi."
-
-#~ msgid "Fixed"
-#~ msgstr "Cố định"
-
-#~ msgid "Forever"
-#~ msgstr "Mãi mãi"
-
-#~ msgid "Good"
-#~ msgstr "Tốt"
-
-#~ msgid "Good Health"
-#~ msgstr "Sức khỏe tốt"
-
-#~ msgid "Group By"
-#~ msgstr "Nhóm theo"
-
-#~ msgid "Groups"
-#~ msgstr "Nhóm"
-
-#~ msgid "Health"
-#~ msgstr "Sức khỏe"
-
-#~ msgid "Helps you handle subscriptions and recurring invoicing."
-#~ msgstr "Giúp bạn kiểm soát hợp đồng và lập hóa đơn định kì."
-
-#~ msgid "ID of the action if defined in a XML file"
-#~ msgstr "ID của hành động nếu được xác định trong tệp XML"
-
-#~ msgid ""
-#~ "If checked, the user will be able to close his account from the frontend"
-#~ msgstr ""
-#~ "Nếu được chọn, người dùng sẽ có thể đóng tài khoản của họ từ giao diện"
-
-#~ msgid ""
-#~ "If present, this condition must be satisfied before executing the action "
-#~ "rule."
-#~ msgstr ""
-#~ "Nếu có, điều kiện này phải được thỏa mãn trước khi thực hiện quy tắc hành "
-#~ "động."
-
-#~ msgid ""
-#~ "If present, this condition must be satisfied before the update of the "
-#~ "record."
-#~ msgstr "Nếu có, điều kiện này phải được thỏa mãn trước khi cập nhật hồ sơ."
-
-#~ msgid ""
-#~ "If set, subscriptions with this template will invoice in this journal; "
-#~ "otherwise the sales journal with the lowest sequence is used."
-#~ msgstr ""
-#~ "Nếu chọn, hợp đồng có mẫu này sẽ lập hóa đơn theo nhật kí này; nó được "
-#~ "dùng cho các nhật kí bán hàng có thứ tự thấp hơn."
-
-#~ msgid "If you wish to reopen it, the"
-#~ msgstr "Nếu bạn muốn mở lại,"
-
-#~ msgid ""
-#~ "If you wish to reopen it, you can pay your invoice for the current "
-#~ "invoicing period."
-#~ msgstr ""
-#~ "Nếu bạn muốn mở lại, bạn có thể thanh toán hóa đơn cho chu kỳ lập hóa đơn "
-#~ "hiện tại."
-
-#~ msgid "Initial"
-#~ msgstr "Ký nháy"
-
-#~ msgid "Invoice Email"
-#~ msgstr "Email hóa đơn"
-
-#~ msgid "Last Run"
-#~ msgstr "Chạy gần nhất"
-
-#~ msgid "Latest Rating: Dissatisfied"
-#~ msgstr "Đánh giá mới nhất: Không hài lòng"
-
-#~ msgid "Latest Rating: Okay"
-#~ msgstr "Đánh giá mới nhất: OK"
-
-#~ msgid "Latest Rating: Satisfied"
-#~ msgstr "Đánh giá mới nhất: Hài lòng"
-
-#~ msgid "Least Delay Msg"
-#~ msgstr "Ít chậm trễ nhất Msg"
-
-#~ msgid "Link Field"
-#~ msgstr "Trường liên kết"
-
-#~ msgid "Log a note..."
-#~ msgstr "Ghi chú ..."
-
-#~ msgid "MRR Between"
-#~ msgstr "MRR giữa"
-
-#~ msgid "MRR Change Amount"
-#~ msgstr "Số tiền MRR thay đổi"
-
-#~ msgid "MRR Change More"
-#~ msgstr "MRR Thay đổi nhiều hơn"
-
-#~ msgid "MRR Change Period"
-#~ msgstr "Khoảng thời gian thay đổi MRR"
-
-#~ msgid "MRR Change Unit"
-#~ msgstr "Đơn vị MRR thay đổi"
-
-#~ msgid "MRR Range Max"
-#~ msgstr "Phạm vi MRR tối đa"
-
-#~ msgid "MRR Range Min"
-#~ msgstr "Phạm vi MRR tối thiểu"
-
-#~ msgid "Manage Payment Method"
-#~ msgstr "Quản lý phương thức thanh toán"
-
-#~ msgid "Manage Payment Methods"
-#~ msgstr "Manage Payment Methods"
-
-#~ msgid "Model"
-#~ msgstr "Model"
-
-#~ msgid "Model Name"
-#~ msgstr "Tên đối tượng"
-
-#~ msgid ""
-#~ "Model for record creation / update. Set this field only to specify a "
-#~ "different model than the base model."
-#~ msgstr ""
-#~ "Model for record creation / update. Set this field only to specify a "
-#~ "different model than the base model."
-
-#~ msgid "Model on which the server action runs."
-#~ msgstr "Đối tượng chạy trên máy chủ."
-
-#~ msgid "Modification"
-#~ msgstr "Điều chỉnh"
-
-#~ msgid "Neutral"
-#~ msgstr "Trung tính"
-
-#~ msgid "Note"
-#~ msgstr "Ghi chú"
-
-#~ msgid ""
-#~ "Odoo automatically sets subscriptions to be renewed in a pending\n"
-#~ "            state. After the negotiation, the salesman should close or "
-#~ "renew\n"
-#~ "            pending subscriptions."
-#~ msgstr ""
-#~ "Hệ thống tự động cài các đăng ký qua  chờ gia hạn trong trạng thái chờ\n"
-#~ "            xử lý. Sau khi thương lượng, nhân viên bán hàng nên đóng hoặc "
-#~ "gia hạn\n"
-#~ "            các đăng ký đang đợi."
-
-#~ msgid "On Change Fields Trigger"
-#~ msgstr "Bật trình kích hoạt trường thay đổi"
-
-#~ msgid "Operation not supported"
-#~ msgstr "Hoạt động không được hỗ trợ"
-
-#~ msgid ""
-#~ "Optional help text for the users with a description of the target view, "
-#~ "such as its usage and purpose."
-#~ msgstr ""
-#~ "Văn bản trợ giúp tùy chọn cho người dùng có mô tả về chế độ xem mục tiêu, "
-#~ "chẳng hạn như mục đích sử dụng và mục đích của nó."
-
-#~ msgid "Over"
-#~ msgstr "Hơn"
-
-#~ msgid "Pay With"
-#~ msgstr "Trả qua"
-
-#~ msgid "Payment method:"
-#~ msgstr "Phương thức thanh toán:"
-
-#~ msgid "Period over which the KPI is calculated"
-#~ msgstr "Khoảng thời gian mà KPI được tính"
-
-#~ msgid "Plan Details"
-#~ msgstr "Chi tiết gói"
-
-#~ msgid "Plans"
-#~ msgstr "Kế hoạch"
-
-#~ msgid "Pricing rule of temporal products"
-#~ msgstr "Quy tắc định giá của các sản phẩm theo thời gian"
-
-#~ msgid "Print"
-#~ msgstr "In"
-
-#~ msgid ""
-#~ "Provide the field used to link the newly created record on the record "
-#~ "used by the server action."
-#~ msgstr ""
-#~ "Cung cấp trường được sử dụng để liên kết bản ghi mới được tạo trên bản "
-#~ "ghi được sử dụng bởi hành động máy chủ."
-
-#~ msgid "Python Code"
-#~ msgstr "Mã Python"
-
-#~ msgid "Quotation Template Option"
-#~ msgstr "Tùy chọn mẫu báo giá"
-
-#~ msgid "Rating Operator"
-#~ msgstr "Xếp hạng vận hành"
-
-#~ msgid "Rating Percentage"
-#~ msgstr "Tỷ lệ phần trăm"
-
-#~ msgid ""
-#~ "Rating Satisfaction is the ratio of positive rating to total number of "
-#~ "rating."
-#~ msgstr ""
-#~ "Tỷ lệ phần trăm đánh giá Mức độ hài lòng là tỷ lệ giữa đánh giá tích cực "
-#~ "trên tổng số xếp hạng."
-
-#~ msgid "Recurrence"
-#~ msgstr "Định kỳ"
-
-#~ msgid "Renewal Allowed"
-#~ msgstr "Được phép gia hạn"
-
-#~ msgid "Responsible"
-#~ msgstr "Phụ trách"
-
-#~ msgid "SMS Template"
-#~ msgstr "Mẫu SMS"
-
-#~ msgid "Sad face"
-#~ msgstr "Mặt buồn"
-
-#~ msgid "Sales"
-#~ msgstr "Bán hàng"
-
-#~ msgid "Sales Team Leader"
-#~ msgstr "Trưởng nhóm bán hàng"
-
-#~ msgid ""
-#~ "Send a renewal quotation to the customer.\n"
-#~ "            When it is confirmed, the subscription is running again."
-#~ msgstr ""
-#~ "Gửi báo giá gia hạn cho khách hàng.\n"
-#~ "            Khi nó được xác nhận, đăng ký sẽ chạy lại."
-
-#~ msgid "Send an SMS Text Message to the customer"
-#~ msgstr "Gửi tin nhắn văn bản SMS cho khách hàng"
-
-#~ msgid "Send an email to the customer"
-#~ msgstr "Gửi email cho khách hàng"
-
-#~ msgid "Server Actions"
-#~ msgstr "Hành động Phía máy chủ"
-
-#~ msgid "Set Payment Method"
-#~ msgstr "Cài phương thức thanh toán"
-
-#~ msgid ""
-#~ "Setting a value makes this action available in the sidebar for the given "
-#~ "model."
-#~ msgstr ""
-#~ "Đặt giá trị làm cho hành động này có sẵn trong thanh bên cho mô hình đã "
-#~ "cho."
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Hiển thị tất cả dữ liệu có ngày xử lý tiếp theo trước ngày hôm nay"
-
-#~ msgid "Show the health status"
-#~ msgstr "Hiển thị tình trạng sức khỏe"
-
-#~ msgid "Specific Products"
-#~ msgstr "Sản phẩm cụ thể"
-
-#~ msgid "Specific Users"
-#~ msgstr "Người dùng cụ thể"
-
-#~ msgid "Stage"
-#~ msgstr "Giai đoạn"
-
-#~ msgid "Stage goes from"
-#~ msgstr "Giai đoạn đi từ"
-
-#~ msgid "Subscription Revenue End Date"
-#~ msgstr "Ngày kết thúc doanh thu Đăng ký"
-
-#~ msgid "Subscription Revenue Start Date"
-#~ msgstr "Ngày bắt đầu doanh thu Đăng ký"
-
-#~ msgid "Subscription Salesperson"
-#~ msgstr "Nhân viên kinh doanh Đăng ký"
-
-#~ msgid "Subscription reached its end date"
-#~ msgstr "Đăng ký đến ngày kết thúc"
-
-#~ msgid "Subscription stage category when the change occurred"
-#~ msgstr "Danh mục giai đoạn đăng ký khi xuất hiện thay đổi"
-
-#~ msgid "Summary"
-#~ msgstr "Tổng kết"
-
-#~ msgid "Target Model"
-#~ msgstr "Model mục tiêu"
-
-#~ msgid "Target Model Name"
-#~ msgstr "Target Model Name"
-
-#~ msgid "Taxes"
-#~ msgstr "Thuế"
-
-#~ msgid "Temporal Type"
-#~ msgstr "Loại thời gian"
-
-#~ msgid "Terms and Conditions"
-#~ msgstr "Điều khoản và Điều kiện"
-
-#~ msgid "The full URL to access the server action through the website."
-#~ msgstr "URL đầy đủ để truy cập hành động máy chủ thông qua trang web."
-
-#~ msgid ""
-#~ "The scheduled action for alerts has been deleted. Update the "
-#~ "Subscriptions module to re-create it."
-#~ msgstr ""
-#~ "Hành động đã lên lịch cho cảnh báo đã bị xóa. Cập nhật module Đăng ký để "
-#~ "tạo lại nó."
-
-#~ msgid "Timed Condition"
-#~ msgstr "Điều kiện thời gian"
-
-#~ msgid "Total Recurring"
-#~ msgstr "Tổng định kỳ"
-
-#~ msgid "Trigger"
-#~ msgstr "Bộ khởi động"
-
-#~ msgid "Trigger Date"
-#~ msgstr "Ngày kích hoạt"
-
-#~ msgid "Trigger Fields"
-#~ msgstr "Trường kích hoạt"
-
-#~ msgid "Trigger Now"
-#~ msgstr "Kích hoạt ngay"
-
-#~ msgid "Trigger On"
-#~ msgstr "Trigger On"
-
-#~ msgid ""
-#~ "Trigger alerts for salespersons or customers: churn, invoice not paid, "
-#~ "upsell, etc."
-#~ msgstr ""
-#~ "Thông báo kích hoạt cho nhân viên bán hàng hoặc khách hàng: ngừng hoạt "
-#~ "động, hóa đơn chưa thanh toán, bán thêm, v.v."
-
-#~ msgid ""
-#~ "Type of server action. The following values are available:\n"
-#~ "- 'Execute Python Code': a block of python code that will be executed\n"
-#~ "- 'Create a new Record': create a new record with new values\n"
-#~ "- 'Update a Record': update the values of a record\n"
-#~ "- 'Execute several actions': define an action that triggers several other "
-#~ "server actions\n"
-#~ "- 'Send Email': post a message, a note or send an email (Discuss)\n"
-#~ "- 'Add Followers': add followers to a record (Discuss)\n"
-#~ "- 'Create Next Activity': create an activity (Discuss)\n"
-#~ "- 'Send SMS Text Message': send SMS, log them on documents (SMS)"
-#~ msgstr ""
-#~ "Loại hành động của máy chủ. Các giá trị sau đây có sẵn:\n"
-#~ "- 'Execute Python Code': một khối mã python sẽ được thực thi\n"
-#~ "- 'Tạo bản ghi mới': tạo bản ghi mới với các giá trị mới\n"
-#~ "- 'Cập nhật bản ghi': cập nhật giá trị của bản ghi\n"
-#~ "- 'Thực hiện một số hành động': xác định một hành động kích hoạt một số "
-#~ "hành động máy chủ khác\n"
-#~ "- 'Gửi Email': gửi tin nhắn, ghi chú hoặc gửi email (Thảo luận)\n"
-#~ "- 'Thêm người theo dõi': thêm người theo dõi vào bản ghi (Thảo luận)\n"
-#~ "- 'Create Next Activity': tạo hoạt động (Thảo luận)\n"
-#~ "- 'Send SMS Text Message': gửi tin nhắn SMS, ghi vào tài liệu (SMS)"
-
-#~ msgid "Unit of Measure"
-#~ msgstr "Đơn vị tính"
-
-#~ msgid ""
-#~ "Unpaid subscription after the due date majored by this number of days "
-#~ "will be automatically closed by the subscriptions expiration scheduled "
-#~ "action. \n"
-#~ "If the chosen payment method has failed to renew the subscription after "
-#~ "this time, the subscription is automatically closed."
-#~ msgstr ""
-#~ "Gói đăng ký chưa thanh toán sau ngày đến hạn tính theo số ngày này sẽ tự "
-#~ "động bị đóng dựa trên tác vụ hết hạn đăng ký đã lên lịch.\n"
-#~ "Nếu không thể sử dụng phương thức thanh toán đã chọn để gia hạn đăng ký "
-#~ "sau thời gian này, gói đăng ký sẽ tự động bị đóng."
-
-#~ msgid "Usage"
-#~ msgstr "Cách dùng"
-
-#~ msgid ""
-#~ "Use 'Specific User' to always assign the same user on the next activity. "
-#~ "Use 'Generic User From Record' to specify the field name of the user to "
-#~ "choose on the record."
-#~ msgstr ""
-#~ "Dùng thông tin 'Người dùng cụ thể' để luôn chỉ định cùng một người dùng "
-#~ "cho hoạt động tiếp theo. Sử dụng 'Người dùng chung từ dữ liệu' để chỉ "
-#~ "định tên trường của người dùng sẽ chọn trên dữ liệu."
-
-#~ msgid "Use Calendar"
-#~ msgstr "Dùng lịch"
-
-#~ msgid "Use employee work schedule"
-#~ msgstr "Sử dụng lịch làm việc của nhân viên"
-
-#~ msgid ""
-#~ "Use subscriptions to follow tasks, issues, timesheets or invoicing based "
-#~ "on\n"
-#~ "                work done, expenses and/or sales orders. Odoo will "
-#~ "automatically manage\n"
-#~ "                the alerts for the renewal of the subscriptions to the "
-#~ "right salesperson."
-#~ msgstr ""
-#~ "Sử dụng đăng ký để theo dõi các nhiệm vụ, vấn đề, thời gian biểu hoặc hóa "
-#~ "đơn đươc lập dựa trên\n"
-#~ "                công việc hoàn thành, chi phí và/hoặc đơn hàng. Hệ thống "
-#~ "sẽ tự động quản lý\n"
-#~ "                cảnh báo để gia hạn đăng ký này tới đúng người."
-
-#~ msgid "Use the user's working schedule."
-#~ msgstr "Sử dụng lịch làm việc của người dùng."
-
-#~ msgid "User field name"
-#~ msgstr "Tên trường"
-
-#~ msgid "Valid Until:"
-#~ msgstr "Có hiệu lực đến:"
-
-#~ msgid "Value Mapping"
-#~ msgstr "Ánh xạ giá trị"
-
-#~ msgid "Website Path"
-#~ msgstr "Đường dẫn website"
-
-#~ msgid "Website Url"
-#~ msgstr "Đường dẫn Website"
-
-#~ msgid ""
-#~ "When calculating a day-based timed condition, it is possible to use a "
-#~ "calendar to compute the date based on working days."
-#~ msgstr ""
-#~ "Khi tính toán điều kiện theo thời gian dựa trên ngày, có thể sử dụng lịch "
-#~ "để tính toán ngày dựa trên ngày làm việc."
-
-#~ msgid ""
-#~ "When dealing with multiple actions, the execution order is based on the "
-#~ "sequence. Low number means high priority."
-#~ msgstr ""
-#~ "Khi xử lý nhiều hành động, thứ tự thực hiện dựa trên chuỗi. Số thấp có "
-#~ "nghĩa là ưu tiên cao."
-
-#~ msgid "When unchecked, the rule is hidden and will not be executed."
-#~ msgstr "Khi không được chọn, quy tắc sẽ bị ẩn và sẽ không được thực thi."
-
-#~ msgid ""
-#~ "Write Python code that the action will execute. Some variables are "
-#~ "available for use; help about python expression is given in the help tab."
-#~ msgstr ""
-#~ "Write Python code that the action will execute. Some variables are "
-#~ "available for use; help about python expression is given in the help tab."
-
-#~ msgid "You must be logged in to manage your payment methods."
-#~ msgstr "Bạn phải đăng nhập để quản lý phương thức thanh toán."
-
-#~ msgid ""
-#~ "You will find here the subscriptions to be renewed (end date is close or "
-#~ "passed)"
-#~ msgstr ""
-#~ "Bạn sẽ tìm thấy ở đây các thuê bao được gia hạn (ngày kết thúc là đóng "
-#~ "hoặc thông qua)"
-
-#~ msgid "Your Details"
-#~ msgstr "Thông tin của bạn"
-
-#~ msgid "Your Plan"
-#~ msgstr "Gói của bạn"
-
-#~ msgid "e.g. Closed Subscription"
-#~ msgstr "ví dụ: Đăng ký đã đóng"
-
-#~ msgid "e.g. Discuss proposal"
-#~ msgstr "vd: Thảo luận về đề xuất"
-
-#~ msgid "greater than"
-#~ msgstr "lớn hơn"
-
-#~ msgid "less than"
-#~ msgstr "nhỏ hơn"
-
-#~ msgid "missing payments (from"
-#~ msgstr "thanh toán đang thiếu (từ"
-
-#~ msgid "to this day) will be automatically processed."
-#~ msgstr "cho ngày này) sẽ được tự động thực hiện."
-
-#~ msgid ""
-#~ "{{ object.company_id.name }} Invoice (Ref {{ object.name or 'n/a' }})"
-#~ msgstr ""
-#~ "{{ object.company_id.name }} Hóa đơn (Mã {{ object.name or 'n/a' }})"
+#~ msgid "<i class=\"oi oi-fw\" data-icon=\"redo\"/> To Renew"
+#~ msgstr "<i class=\"oi oi-fw\" data-icon=\"redo\"/> Cần gia hạn"

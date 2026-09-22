@@ -9,14 +9,14 @@
                         <span>Inventory Reason</span>
                     </div>
                     <div>
-                        <input type="text" class="o_input" t-att-value="inventoryReason.value" t-on-change="onInventoryReasonChange" />
+                        <input type="text" class="o_input" t-att-value="this.inventoryReason.value" t-on-change="this.onInventoryReasonChange" />
                     </div>
                 </div>
             </div>
             <t t-set-slot="footer">
-                <button class="o_confirm btn btn-primary" t-on-click="onConfirm">Apply Now</button>
-                <button class="o_confirm btn btn-primary" t-on-click="onWaitReview">Wait a Review</button>
-                <button class="o_cancel btn btn-secondary" t-on-click="props.close">Cancel</button>
+                <button class="o_confirm btn btn-primary" t-on-click="this.onConfirm">Apply Now</button>
+                <button class="o_confirm btn btn-primary" t-on-click="this.onWaitReview">Wait a Review</button>
+                <button class="o_cancel btn btn-secondary" t-on-click="this.props.close">Discard</button>
             </t>
         </Dialog>
     </t>

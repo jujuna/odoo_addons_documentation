@@ -5,10 +5,10 @@
         <field name="model">account.payment</field>
         <field name="inherit_id" ref="account.view_account_payment_search"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='state_sent']" position="before">
+            <xpath expr="//filter[@name='outstanding']" position="before">
                 <filter string="ABA Payments To Send" domain="[
                     ('payment_method_id.code', '=', 'aba_ct'),
-                    ('state', '=', 'in_process'),
+                    ('state', '=', 'paid'),
                     ('is_sent', '=', False),
                     ('is_matched', '=', False),
                 ]" name="aba_to_send"/>

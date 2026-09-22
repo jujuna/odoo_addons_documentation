@@ -7,17 +7,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-11-16 18:02+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Mongolian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-17 23:41+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Mongolian <https://translate.odoo.com/projects/odoo-master/"
 "delivery_envia/mn/>\n"
 "Language: mn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_envia
+#: model:ir.module.module,description:base.module_delivery_envia
+msgid ""
+"\n"
+"Send your shippings through Envia and track them online\n"
+"=======================================================\n"
+"\n"
+"Envia is a provider of integrated shipping and tracking solutions for "
+"growing e-commerce businesses.\n"
+"Seamlessly integrating with a large range of couriers and platforms,\n"
+"you can streamline every step of your fulfilment process,\n"
+"reduce handling time and improve customer experience.\n"
+msgstr ""
 
 #. module: delivery_envia
 #. odoo-python
@@ -33,7 +47,7 @@ msgstr ""
 #. module: delivery_envia
 #: model_terms:ir.ui.view,arch_db:delivery_envia.view_shipping_method_envia
 msgid ""
-"<i class=\"fa fa-info-circle\"/> Available shipping services depend on "
+"<i class=\"oi\" data-icon=\"info\"/> Available shipping services depend on "
 "enabled carriers in your Envia account."
 msgstr ""
 
@@ -62,11 +76,6 @@ msgstr ""
 #: model:ir.model.fields.selection,name:delivery_envia.selection__stock_package_type__envia_mail_type__box
 msgid "Box"
 msgstr "Хайрцаг"
-
-#. module: delivery_envia
-#: model_terms:ir.ui.view,arch_db:delivery_envia.view_shipping_method_envia
-msgid "Cancel"
-msgstr "Цуцлах"
 
 #. module: delivery_envia
 #: model:ir.model.fields,field_description:delivery_envia.field_stock_package_type__package_carrier_type
@@ -171,6 +180,11 @@ msgid "Delivery"
 msgstr "Хүргэлт"
 
 #. module: delivery_envia
+#: model:ir.model,name:delivery_envia.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
+
+#. module: delivery_envia
 #: model:ir.model.fields,field_description:delivery_envia.field_delivery_carrier__envia_residential_delivery
 msgid "Delivery Residential Zone"
 msgstr ""
@@ -184,6 +198,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:delivery_envia.field_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_envia.field_envia_shipping_wizard__display_name
 #: model:ir.model.fields,field_description:delivery_envia.field_stock_package_type__display_name
+#: model:ir.model.fields,field_description:delivery_envia.field_stock_picking__display_name
 msgid "Display Name"
 msgstr "Дэлгэрэнгүй нэр"
 
@@ -300,6 +315,11 @@ msgid "Envia Setup"
 msgstr ""
 
 #. module: delivery_envia
+#: model:ir.module.module,shortdesc:base.module_delivery_envia
+msgid "Envia Shipping"
+msgstr ""
+
+#. module: delivery_envia
 #. odoo-python
 #: code:addons/delivery_envia/models/delivery_carrier.py:0
 msgid "Envia order(s) not found to cancel shipment!"
@@ -340,12 +360,6 @@ msgstr ""
 #. module: delivery_envia
 #: model:ir.model.fields,field_description:delivery_envia.field_delivery_carrier__envia_service_name
 msgid "Envia.com Service Name"
-msgstr ""
-
-#. module: delivery_envia
-#: model_terms:ir.ui.view,arch_db:delivery_envia.res_config_settings_view_form_sale_envia
-#: model_terms:ir.ui.view,arch_db:delivery_envia.res_config_settings_view_form_stock_envia
-msgid "Envia.com Shipping Methods"
 msgstr ""
 
 #. module: delivery_envia
@@ -391,6 +405,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:delivery_envia.field_delivery_carrier__id
 #: model:ir.model.fields,field_description:delivery_envia.field_envia_shipping_wizard__id
 #: model:ir.model.fields,field_description:delivery_envia.field_stock_package_type__id
+#: model:ir.model.fields,field_description:delivery_envia.field_stock_picking__id
 msgid "ID"
 msgstr "ID"
 
@@ -677,13 +692,16 @@ msgid "Shipment created into Envia"
 msgstr ""
 
 #. module: delivery_envia
-#: model:ir.model,name:delivery_envia.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Хүргэх аргууд"
-
-#. module: delivery_envia
 #: model_terms:ir.ui.view,arch_db:delivery_envia.view_shipping_method_envia
 msgid "Shipping Product"
+msgstr ""
+
+#. module: delivery_envia
+#. odoo-python
+#: code:addons/delivery_envia/models/envia_request.py:0
+msgid ""
+"Shipping from Brazil requires an authorized NF-e on the label, set the "
+"Related Invoice on %(picking_name)s or link its packages on the invoice."
 msgstr ""
 
 #. module: delivery_envia
@@ -743,9 +761,22 @@ msgid "Tracking Numbers:"
 msgstr ""
 
 #. module: delivery_envia
+#: model:ir.model,name:delivery_envia.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: delivery_envia
 #. odoo-python
 #: code:addons/delivery_envia/models/delivery_carrier.py:0
 msgid "Unable to cancel order: %(order_number)s"
+msgstr ""
+
+#. module: delivery_envia
+#. odoo-python
+#: code:addons/delivery_envia/models/stock_picking.py:0
+msgid ""
+"Validated transfer without NF-e linked. Envia.com label not generated. "
+"Create/link NF-e and click 'Send to Shipper' to generate the label."
 msgstr ""
 
 #. module: delivery_envia

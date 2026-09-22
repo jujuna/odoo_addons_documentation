@@ -4,12 +4,13 @@ import { setCellContent } from "@spreadsheet/../tests/helpers/commands";
 import { SpreadsheetModels } from "@spreadsheet/../tests/helpers/data";
 import { createModelWithDataSource } from "@spreadsheet/../tests/helpers/model";
 import { fields, models } from "@web/../tests/web_test_helpers";
+import { patchSpreadsheetExternalShareFunctionCheck } from "@documents_spreadsheet/bundle/actions/external_share_function";
 
 export const MOCK_SURVEY_DATA = {
     survey_table: [
-        ["Timestamp", "2024-05-01 12:00:00", "2024-05-02 12:00:00"],
-        ["How are you ?", "Just fine !", "Good"],
-        ["What's your age ?", 25, 35],
+        [{value: "Timestamp"}, {value: "2024-05-01 12:00:00"}, {value: "2024-05-02 12:00:00"}],
+        [{value: "How are you ?"}, {value: "Just fine !"}, {value: "Good"}],
+        [{value: "What's your age ?"}, {value: 25}, {value: 35}],
     ],
     user_input_ids: [5, 6],
     survey_name: "Test Survey",
@@ -30,6 +31,7 @@ export function defineDocumentSpreadsheetSurveyModels() {
     const DocumentSpreadsheetSurveyModels = { SurveySurvey };
     Object.assign(SpreadsheetModels, DocumentSpreadsheetSurveyModels);
     defineDocumentSpreadsheetModels();
+    patchSpreadsheetExternalShareFunctionCheck(); // Patch function registry
 }
 
 export async function createModelWithSurvey() {

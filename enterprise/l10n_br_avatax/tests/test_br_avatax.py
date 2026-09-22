@@ -6,12 +6,13 @@ from unittest import SkipTest, mock
 from unittest.mock import patch
 
 from odoo import modules
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Command
 from odoo.tests.common import TransactionCase, freeze_time, tagged
 from odoo.tools import file_open
 
 from .mocked_invoice_response import generate_response
+from .mocked_credit_note_response import generate_response as credit_note_generate_response
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.l10n_br_avatax.models.account_external_tax_mixin import (
     AccountExternalTaxMixin,
@@ -82,7 +83,7 @@ class TestBRMockedRequests(TransactionCase):
                     record = self.env[record_model].browse(int(record_id))
                     lines = [
                         line['base_line']['record']
-                        for line in record._get_line_data_for_external_taxes()
+                        for line in record._get_external_tax_service_params()['line_data']
                     ]
 
                     test_case.assertEqual(
@@ -112,6 +113,8 @@ class TestBRMockedRequests(TransactionCase):
 
 @tagged('post_install_l10n', '-at_install', 'post_install')
 class TestAvalaraBrCommon(AccountTestInvoicingCommon, TestBRMockedRequests):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('br')
     def setUpClass(cls):
@@ -156,7 +159,10 @@ class TestAvalaraBrCommon(AccountTestInvoicingCommon, TestBRMockedRequests):
             'country_id': cls.env.ref('base.br').id,
             'zip': '80010-010',
         })
-        company.partner_id.l10n_br_tax_regime = 'individual'
+        company.partner_id.write({
+            'l10n_br_tax_regime': 'individual',
+            'vat': '49233848000150',
+        })
 
         cls.partner = cls.env['res.partner'].create({
             'name': 'Avatax Brazil Test Partner',
@@ -168,6 +174,21 @@ class TestAvalaraBrCommon(AccountTestInvoicingCommon, TestBRMockedRequests):
             'zip': '93022-718',
             'property_account_position_id': cls.fp_avatax.id,
             'l10n_br_tax_regime': 'individual',
+            'additional_identifiers': {'BR_CN': '92355690448'},
+        })
+
+        cls.foreign_partner = cls.env['res.partner'].create({
+            'name': 'Foreign Partner',
+            'street': '77 Santa Barbara Rd',
+            'city': 'Pleasant Hill',
+            'state_id': cls.env.ref('base.state_us_5').id,
+            'country_id': cls.env.ref('base.us').id,
+            'zip': '94523',
+            'property_account_position_id': cls.fp_avatax.id,
+            'l10n_br_tax_regime': 'notApplicable',
+            'l10n_br_taxpayer': 'non',
+            'l10n_br_subject_cofins': 'N',
+            'l10n_br_subject_pis': 'N',
         })
 
         cls.partner_shipping_id = cls.env['res.partner'].create({
@@ -247,58 +268,60 @@ class TestAvalaraBrCommon(AccountTestInvoicingCommon, TestBRMockedRequests):
             yield mocked
 
     @classmethod
+    @freeze_time('2021-01-01')
     def _create_invoice_01_and_expected_response(cls, move_type='out_invoice'):
-        products = (
-            cls.product_user,
-            cls.product_accounting,
-            cls.product_expenses,
-            cls.product_invoicing,
-        )
-        invoice = cls.env['account.move'].create({
-            'move_type': move_type,
-            'partner_id': cls.partner.id,
-            'fiscal_position_id': cls.fp_avatax.id,
-            'invoice_date': '2021-01-01',
-            'invoice_line_ids': [
-                (0, 0, {
-                    'product_id': product.id,
-                    'tax_ids': None,
-                    'price_unit': product.list_price,
-                }) for product in products
+        invoice = cls._create_invoice(
+            move_type=move_type,
+            partner_id=cls.partner,
+            fiscal_position_id=cls.fp_avatax,
+            invoice_line_ids=[
+                cls._prepare_invoice_line(product_id=cls.product_user, discount=10),
+                cls._prepare_invoice_line(product_id=cls.product_accounting),
+                cls._prepare_invoice_line(product_id=cls.product_expenses),
+                cls._prepare_invoice_line(product_id=cls.product_invoicing),
             ],
-        })
-        invoice.invoice_line_ids[0].discount = 10
-
+        )
         return invoice, generate_response(invoice.invoice_line_ids)
 
     @classmethod
-    def _create_invoice_02(cls, operation_types=False):
-        products = (
-            cls.product_user,
-            cls.product_accounting,
-            cls.product_expenses,
-            cls.product_invoicing,
-        )
-
+    @freeze_time('2021-01-01')
+    def _create_invoice_02(cls, operation_types=None):
         operation_types = operation_types or (
             cls.env.ref('l10n_br_avatax.operation_type_1'),
             cls.env.ref('l10n_br_avatax.operation_type_2'),
             cls.env.ref('l10n_br_avatax.operation_type_3'),
             cls.env.ref('l10n_br_avatax.operation_type_60'),
         )
+        return cls._create_invoice(
+            partner_id=cls.partner,
+            fiscal_position_id=cls.fp_avatax,
+            invoice_line_ids=[
+                cls._prepare_invoice_line(product_id=cls.product_user, l10n_br_goods_operation_type_id=operation_types[0]),
+                cls._prepare_invoice_line(product_id=cls.product_accounting, l10n_br_goods_operation_type_id=operation_types[1]),
+                cls._prepare_invoice_line(product_id=cls.product_expenses, l10n_br_goods_operation_type_id=operation_types[2]),
+                cls._prepare_invoice_line(product_id=cls.product_invoicing, l10n_br_goods_operation_type_id=operation_types[3]),
+            ],
+        )
+
+    @classmethod
+    def _create_invoice_03(cls):
+        # Create Export of Goods Invoice
+        cls.product.barcode = False
         invoice = cls.env['account.move'].create({
             'move_type': 'out_invoice',
-            'partner_id': cls.partner.id,
+            'partner_id': cls.foreign_partner.id,
             'fiscal_position_id': cls.fp_avatax.id,
-            'invoice_date': '2021-01-01',
+            'invoice_date': '2025-10-20',
+            'invoice_date_due': '2025-10-21',
             'invoice_line_ids': [
                 Command.create({
-                    'product_id': product.id,
+                    'product_id': cls.product.id,
                     'tax_ids': None,
-                    'price_unit': product.list_price,
-                    'l10n_br_goods_operation_type_id': operation_type and operation_type.id,
-                }) for product, operation_type in zip(products, operation_types)
+                    'price_unit': cls.product.list_price,
+                })
             ],
+            'incoterm_location': 'testincotermlocationtestincotermlocationtestincotermlocationtestincoterm',
+            'l10n_br_shipping_state_id': cls.env.ref('base.state_br_ac').id
         })
 
         return invoice
@@ -309,7 +332,7 @@ class TestAvalaraBrCommon(AccountTestInvoicingCommon, TestBRMockedRequests):
         # Create a delivery address for partner
         partner_shipping_id = cls.partner_shipping_id
         invoice.partner_id.write({
-            'child_ids': (4, partner_shipping_id.id),
+            'child_ids': [Command.link(partner_shipping_id.id)],
             'l10n_br_tax_regime': 'realProfit',
             'city_id': cls.env.ref("l10n_br.city_br_002"),
         })
@@ -324,6 +347,8 @@ class TestAvalaraBrCommon(AccountTestInvoicingCommon, TestBRMockedRequests):
 
 
 class TestAvalaraBrInvoiceCommon(TestAvalaraBrCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def assertInvoice(self, invoice, test_exact_response):
         self.assertEqual(
             len(invoice.invoice_line_ids.tax_ids),
@@ -380,6 +405,8 @@ class TestAvalaraBrInvoiceCommon(TestAvalaraBrCommon):
 
 @tagged('post_install_l10n', '-at_install', 'post_install')
 class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_01_invoice_br(self):
         invoice, response = self._create_invoice_01_and_expected_response()
         with self._capture_request_br(return_value=response):
@@ -389,8 +416,12 @@ class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
         invoice, _ = self._create_invoice_01_and_expected_response()
         invoice.currency_id = self.env.ref('base.USD')
 
-        with self.assertRaisesRegex(UserError, r'.* Brazilian Real is required to calculate taxes with Avatax.'):
+        # We don't want to use assertRaisesRegex because we don't want to rollback (simulate the commit)
+        try:
             self.assertInvoice(invoice, test_exact_response=None)
+            self.fail("Should raise a UserError before")
+        except UserError as e:
+            self.assertRegex(str(e), r'.* Brazilian Real is required to calculate taxes with Avatax.')
 
     def test_03_transport_cost(self):
         invoice, _ = self._create_invoice_01_and_expected_response()
@@ -433,18 +464,6 @@ class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
             self.assertEqual(freight, line['freightAmount'])
             self.assertEqual(insurance, line['insuranceAmount'])
             self.assertEqual(other, line['otherCostAmount'])
-
-    def test_04_negative_line(self):
-        invoice, _ = self._create_invoice_01_and_expected_response()
-        self.env['account.move.line'].create({
-            'product_id': self.product_user_discount.id,
-            'move_id': invoice.id,
-            'price_unit': -1_000.00,
-        })
-
-        with self._capture_request_br(), \
-             self.assertRaisesRegex(UserError, "Avatax Brazil doesn't support negative lines."):
-            invoice.action_post()
 
     def test_05_credit_note(self):
         """Tax calculation without setting operation types on the lines. This should use the default
@@ -594,7 +613,7 @@ class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
         }])
 
     def test_12_service_invoice_with_installments(self):
-        """Test that service invoices with installments clear tax_ids when using Avalara. It's necessary because Avalara
+        """Test that service invoices with installments clear tax info when using Avalara. It's necessary because Avalara
         expects installments to be sent without taxes for service invoices."""
         invoice, response = self._create_invoice_01_and_expected_response()
         rio_city = self.env.ref("l10n_br.city_br_002")
@@ -618,24 +637,14 @@ class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
         self.assertGreater(invoice.amount_tax, 0, "There should be a tax amount on this invoice.")
 
         with self._capture_request_br(return_value=response) as captured:
-            invoice._get_external_taxes()
+            invoice.button_external_tax_calculation()
 
-        expected_untaxed_terms = invoice.invoice_payment_term_id._compute_terms(
-            invoice.date,
-            invoice.currency_id,
-            invoice.company_id,
-            tax_amount=0,
-            tax_amount_currency=0,
-            sign=1,
-            untaxed_amount=invoice.amount_untaxed,
-            untaxed_amount_currency=invoice.amount_untaxed,
-        )
+        payload = captured.call_args.args[2]
 
-        self.assertEqual(
-            [installment['grossValue'] for installment in captured.call_args[0][2]['header']['payment']['installment']],
-            [term['company_amount'] for term in expected_untaxed_terms['line_ids']],
-            "Installments should be sent without taxes."
-        )
+        with self._capture_request_br(return_value=response) as captured:
+            invoice.button_external_tax_calculation()
+
+        self.assertEqual(payload, captured.call_args.args[2], "The payload of the second call should be the same")
 
     def test_11_service_invoice_with_discount(self):
         invoice, response = self._create_invoice_01_and_expected_response()
@@ -652,7 +661,15 @@ class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
             "The discount shouldn't have been subtracted, it's already accounted for in lineNetFigure."
         )
 
-    def test_13_service_invoice_with_rendered_address(self):
+    def test_13_export_goods_invoice(self):
+        """ Test that export for goods invoices are sent to Avalara with the required information"""
+        invoice = self._create_invoice_03()
+        with self._with_mocked_l10n_br_iap_request([
+            ("calculate_tax", "nfe_export_goods_tax_request", "nfe_export_goods_tax_response"),
+        ]):
+            invoice.action_post()
+
+    def test_14_service_invoice_with_rendered_address(self):
         rio_city = self.env.ref("l10n_br.city_br_002")
         ncm_code_id = self.env.ref('l10n_br_avatax.service_1_07')
         # Make a service invoice
@@ -680,9 +697,469 @@ class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
         delivery = payload['header']['locations'].get('delivery')
         self.assertTrue(delivery, "Delivery address should be sent in request when partner_shipping_id is not the same as partner_id")
 
+    @freeze_time(TEST_DATETIME)
+    def test_mock_calculate_tax_with_negative_lines(self):
+        invoice = self._create_invoice(
+            partner_id=self.partner,
+            fiscal_position_id=self.fp_avatax,
+            invoice_line_ids=[
+                self._prepare_invoice_line(product_id=self.product_user, price_unit=100.0),
+                self._prepare_invoice_line(product_id=self.product_user, price_unit=50.0),
+                self._prepare_invoice_line(product_id=self.product_user, price_unit=10.0),
+                self._prepare_invoice_line(product_id=self.product_user_discount, price_unit=-60.0),
+            ],
+            post=False,
+        )
+        with self._with_mocked_l10n_br_iap_request(
+            [('calculate_tax', 'tax_request_negative_lines', 'tax_response_negative_lines')]
+        ):
+            invoice.action_post()
+
+        self.assertRecordValues(invoice.invoice_line_ids, [
+            {'price_unit': 100.0, 'price_subtotal': 88.0, 'price_total': 100.0},
+            {'price_unit': 50.0, 'price_subtotal': 44.0, 'price_total': 50.0},
+            {'price_unit': 10.0, 'price_subtotal': 8.8, 'price_total': 10.0},
+            {'price_unit': -60.0, 'price_subtotal': -52.8, 'price_total': -60.0},
+        ])
+
+    def test_redistribute_amounts_after_api_call(self):
+        """Test that _process_external_taxes correctly distributes tax values back to all invoice lines."""
+        invoice = self._create_invoice(
+            partner_id=self.partner,
+            fiscal_position_id=self.fp_avatax,
+            invoice_line_ids=[
+                self._prepare_invoice_line(product_id=self.product_user, price_unit=100.0),
+                self._prepare_invoice_line(product_id=self.product_user, price_unit=50.0),
+                self._prepare_invoice_line(product_id=self.product_user_discount, price_unit=-30.0),
+            ],
+        )
+
+        service_params = invoice._get_l10n_br_avatax_service_params()
+        line_data_list = service_params['line_data']
+        self.assertEqual(len(line_data_list), 2)  # No discount line
+
+        base_lines = [line_data['base_line'] for line_data in line_data_list]
+
+        tax_group_values = {'name': 'Avatax Brazil', 'company_id': invoice.company_id.id}
+        icms = {'name': 'icms', 'l10n_br_avatax_code': 'icms'}
+        pis = {'name': 'pis', 'l10n_br_avatax_code': 'pis'}
+        base_line_with_tax_values = [
+            (base_lines[0], [
+                (tax_group_values, icms, {'base_amount_currency': 80.0, 'tax_amount_currency': 8.0}),
+                (tax_group_values, pis, {'base_amount_currency': 80.0, 'tax_amount_currency': 1.6}),
+            ]),
+            (base_lines[1], [
+                # Amounts should be correctly distributed even if the taxes have a different order
+                (tax_group_values, pis, {'base_amount_currency': 40.0, 'tax_amount_currency': 0.8}),
+                (tax_group_values, icms, {'base_amount_currency': 40.0, 'tax_amount_currency': 4.0}),
+            ]),
+        ]
+
+        result = invoice._process_external_taxes(
+            invoice.company_id,
+            base_line_with_tax_values,
+            'l10n_br_avatax_code',
+        )
+
+        self.assertEqual(len(result), 3)  # Discount line should be brought back
+
+        icms_id = str(self.env['account.tax'].search([('l10n_br_avatax_code', '=', 'icms')], limit=1).id)
+        pis_id = str(self.env['account.tax'].search([('l10n_br_avatax_code', '=', 'pis')], limit=1).id)
+
+        discount_record = invoice.invoice_line_ids.filtered(lambda l: l.price_unit < 0)
+        discount_amounts = result[discount_record]['manual_tax_amounts']
+        self.assertAlmostEqual(discount_amounts[icms_id]['tax_amount_currency'], -20 / 80 * 8 - 10 / 40 * 4)
+        self.assertAlmostEqual(discount_amounts[pis_id]['tax_amount_currency'], -20 / 80 * 1.6 - 10 / 40 * 0.8)
+
+        # Totals should stay the same: ICMS = 12.0, PIS = 2.4
+        total_icms = sum(result[r]['manual_tax_amounts'][icms_id]['tax_amount_currency'] for r in result)
+        total_pis = sum(result[r]['manual_tax_amounts'][pis_id]['tax_amount_currency'] for r in result)
+        self.assertAlmostEqual(total_icms, 12.0)
+        self.assertAlmostEqual(total_pis, 2.4)
+
+    def test_global_discount_redistribution(self):
+        """Check if invoice with discount line is redistributed correctly after Avatax call."""
+        invoice = self._create_invoice(
+            partner_id=self.partner,
+            fiscal_position_id=self.fp_avatax,
+            invoice_line_ids=[
+                self._prepare_invoice_line(product_id=self.product_user, price_unit=100.0),
+                self._prepare_invoice_line(product_id=self.product_user, price_unit=50.0),
+                self._prepare_invoice_line(product_id=self.product_user_discount, price_unit=-30.0),
+            ],
+        )
+
+        # Discount is absorbed by other lines: -20 to line 1, -10 to line 2
+        # Mock Avatax response with 12% ICMS (tax included) for these lines
+        response = {
+            'lines': [
+                {
+                    'lineCode': invoice.invoice_line_ids[0].id,
+                    'lineNetFigure': 80.0,
+                    'lineTaxedDiscount': 0,
+                    'taxDetails': [{
+                        'taxType': 'icms',
+                        'tax': 9.6,
+                        'rate': 12,
+                        'subtotalTaxable': 80.0,
+                        'taxImpact': {'impactOnNetAmount': 'Included', 'accounting': 'liability'},
+                    }],
+                },
+                {
+                    'lineCode': invoice.invoice_line_ids[1].id,
+                    'lineNetFigure': 40.0,
+                    'lineTaxedDiscount': 0,
+                    'taxDetails': [{
+                        'taxType': 'icms',
+                        'tax': 4.8,
+                        'rate': 12,
+                        'subtotalTaxable': 40.0,
+                        'taxImpact': {'impactOnNetAmount': 'Included', 'accounting': 'liability'},
+                    }],
+                },
+            ],
+        }
+
+        # Do it twice to check if it's idempotent
+        request_args = []
+        for _ in range(2):
+            with self._capture_request_br(return_value=response) as mock:
+                invoice.button_external_tax_calculation()
+                request_args.append(mock.call_args.args[2])
+
+            # Tax totals: 9.6 + 4.8 = 14.4, redistributed to 3 lines
+            self.assertRecordValues(invoice, [{
+                'amount_untaxed': 120.0,
+                'amount_tax': 14.4,
+                'amount_total': 134.4,
+            }])
+
+            self.assertRecordValues(invoice.invoice_line_ids, [
+                {'price_subtotal': 100, 'price_total': 112.0},  # line 100: 100/80 of (base=80, tax=9.6)
+                {'price_subtotal': 50, 'price_total': 56.0},  # line 50: 50/40 of (base=40, tax=4.8)
+                {'price_subtotal': -30, 'price_total': -33.6},    # discount: -20/80 and -20/40 of both amounts
+            ])
+
+        self.assertEqual(request_args[0], request_args[1], "Request to Avalara should be the same on both calls")
+
+    def test_tax_recalculation_after_removing_discount(self):
+        """Test that tax calculation works after removing the discount line."""
+        invoice = self._create_invoice(
+            partner_id=self.partner,
+            fiscal_position_id=self.fp_avatax,
+            invoice_line_ids=[
+                self._prepare_invoice_line(product_id=self.product_user, price_unit=100.0),
+                self._prepare_invoice_line(product_id=self.product_user, price_unit=50.0),
+                self._prepare_invoice_line(product_id=self.product_user_discount, price_unit=-30.0),
+            ],
+        )
+
+        # Response for 2 distributed lines
+        response_with_discount = {
+            'lines': [
+                {
+                    'lineCode': invoice.invoice_line_ids[0].id,
+                    'lineNetFigure': 80.0,
+                    'lineTaxedDiscount': 0,
+                    'taxDetails': [{
+                        'taxType': 'icms',
+                        'tax': 9.6,
+                        'rate': 12,
+                        'subtotalTaxable': 80.0,
+                        'taxImpact': {'impactOnNetAmount': 'Included', 'accounting': 'liability'},
+                    }],
+                },
+                {
+                    'lineCode': invoice.invoice_line_ids[1].id,
+                    'lineNetFigure': 40.0,
+                    'lineTaxedDiscount': 0,
+                    'taxDetails': [{
+                        'taxType': 'icms',
+                        'tax': 4.8,
+                        'rate': 12,
+                        'subtotalTaxable': 40.0,
+                        'taxImpact': {'impactOnNetAmount': 'Included', 'accounting': 'liability'},
+                    }],
+                },
+            ],
+        }
+
+        with self._capture_request_br(return_value=response_with_discount):
+            invoice.button_external_tax_calculation()
+
+        self.assertEqual(invoice.amount_tax, 14.4)
+
+        # Remove the discount line
+        invoice.invoice_line_ids.filtered(lambda l: l.price_unit < 0).unlink()
+
+        # Response for 2 lines without discount
+        response_without_discount = {
+            'lines': [
+                {
+                    'lineCode': invoice.invoice_line_ids[0].id,
+                    'lineNetFigure': 100.0,
+                    'lineTaxedDiscount': 0,
+                    'taxDetails': [{
+                        'taxType': 'icms',
+                        'tax': 12.0,
+                        'rate': 12,
+                        'subtotalTaxable': 100.0,
+                        'taxImpact': {'impactOnNetAmount': 'Included', 'accounting': 'liability'},
+                    }],
+                },
+                {
+                    'lineCode': invoice.invoice_line_ids[1].id,
+                    'lineNetFigure': 50.0,
+                    'lineTaxedDiscount': 0,
+                    'taxDetails': [{
+                        'taxType': 'icms',
+                        'tax': 6.0,
+                        'rate': 12,
+                        'subtotalTaxable': 50.0,
+                        'taxImpact': {'impactOnNetAmount': 'Included', 'accounting': 'liability'},
+                    }],
+                },
+            ],
+        }
+
+        with self._capture_request_br(return_value=response_without_discount):
+            invoice.button_external_tax_calculation()
+
+        self.assertRecordValues(invoice, [{
+            'amount_untaxed': 150.0,
+            'amount_tax': 18.0,
+            'amount_total': 168.0,
+        }])
+
+        self.assertRecordValues(invoice.invoice_line_ids, [
+            {'price_subtotal': 100.0, 'price_total': 112.0},
+            {'price_subtotal': 50.0, 'price_total': 56.0},
+        ])
+
+    def test_fail_distribute_negative_amount_lines(self):
+        invoice = self._create_invoice(
+            partner_id=self.partner,
+            fiscal_position_id=self.fp_avatax,
+            invoice_line_ids=[
+                self._prepare_invoice_line(
+                    product_id=self.product_user,
+                    price_unit=50.0,
+                ),
+                self._prepare_invoice_line(
+                    product_id=self.product_user_discount,
+                    price_unit=-100.0
+                ),
+            ],
+        )
+
+        with self.assertRaisesRegex(ValidationError, "The document amount must be positive."):
+            invoice._get_external_taxes()
+
+    def test_15_credit_note_with_included_tax(self):
+        product = self.env['product.product'].create({
+            'name': 'Test Product',
+            'default_code': 'PROD2',
+            'list_price': 800.00,
+            'standard_price': 800.00,
+            'l10n_br_ncm_code_id': self.env.ref('l10n_br_avatax.02062990').id,
+            'l10n_br_source_origin': '0',
+            'l10n_br_sped_type': 'FOR PRODUCT',
+            'l10n_br_use_type': 'production',
+            'supplier_taxes_id': None,
+        })
+
+        credit_note = self.env['account.move'].create({
+            'move_type': 'out_refund',
+            'partner_id': self.partner.id,
+            'fiscal_position_id': self.fp_avatax.id,
+            'invoice_date': '2021-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': product.id,
+                    'tax_ids': None,
+                    'price_unit': product.list_price,
+                }),
+            ],
+        })
+
+        response = credit_note_generate_response(credit_note.invoice_line_ids)
+        with self._capture_request_br(return_value=response):
+            credit_note.action_post()
+
+        expected_amounts = {
+            'amount_total': 800.0,
+            'amount_untaxed': 704.0,
+            'amount_tax': 96.0,
+        }
+        self.assertRecordValues(credit_note, [expected_amounts])
+        self.assertEqual(credit_note.tax_totals['total_amount_currency'], expected_amounts['amount_total'])
+        self.assertEqual(credit_note.tax_totals['base_amount_currency'], expected_amounts['amount_untaxed'])
+
+    def test_16_nfe_with_order_number_and_item_number(self):
+        """ Test that when an order number and item number are provided, they are correctly sent to Avatax. """
+        invoice = self._create_invoice(
+            partner_id=self.partner,
+            fiscal_position_id=self.fp_avatax,
+            invoice_line_ids=[
+                self._prepare_invoice_line(
+                    product_id=self.product_user,
+                    price_unit=100.0,
+                    l10n_br_item_number='1234',
+                    l10n_br_order_number='5678',
+                ),
+            ],
+        )
+
+        payload = invoice._prepare_l10n_br_avatax_document_service_call(invoice._get_l10n_br_avatax_service_params())
+        actual_line = payload['lines'][0]
+
+        self.assertEqual(actual_line['lineAmount'], 100.0)
+        self.assertEqual(actual_line['orderNumber'], '5678')
+        self.assertEqual(actual_line['orderItemNumber'], '1234')
+
+    def test_17_nfe_with_order_number_and_item_number_none(self):
+        """ Test that when an order number and item number are None, they should not be sent to Avatax. """
+        invoice = self._create_invoice(
+            partner_id=self.partner,
+            fiscal_position_id=self.fp_avatax,
+            invoice_line_ids=[
+                self._prepare_invoice_line(
+                    product_id=self.product_user,
+                    price_unit=100.0,
+                ),
+            ],
+        )
+
+        payload = invoice._prepare_l10n_br_avatax_document_service_call(invoice._get_l10n_br_avatax_service_params())
+        actual_line = payload['lines'][0]
+
+        self.assertTrue('orderNumber' not in actual_line)
+        self.assertTrue('orderItemNumber' not in actual_line)
+
+    def test_18_stale_manual_total_excluded_currency(self):
+        """Test that manual_total_excluded_currency is updated on recomputation even if it already has a value."""
+        invoice, response = self._create_invoice_01_and_expected_response()
+
+        # First call to populate extra_tax_data with correct values.
+        with self._capture_request_br(return_value=response):
+            invoice.button_external_tax_calculation()
+
+        # Corrupt the manual_total_excluded_currency in extra_tax_data.
+        for line in invoice.invoice_line_ids:
+            extra_tax_data = line.extra_tax_data
+            extra_tax_data['manual_total_excluded_currency'] = 123
+            line.write({'extra_tax_data': extra_tax_data})
+
+        # Second call, should correct the stale manual_total_excluded_currency.
+        with self._capture_request_br(return_value=response):
+            invoice.button_external_tax_calculation()
+
+        # Verify that manual_total_excluded_currency was updated from the fresh Avatax response.
+        pre_tax_base = invoice.invoice_line_ids[0].extra_tax_data.get('manual_total_excluded_currency')
+        self.assertNotEqual(pre_tax_base, 123)
+
+    def _get_missing_fields_warnings(self, invoice):
+        params = invoice._get_l10n_br_avatax_service_params()
+        lines = invoice._prepare_l10n_br_avatax_document_lines_service_call(
+            params['line_data'], params['use_type'], params['cnae'],
+            params['is_service'], params['partner_shipping'], params['company'],
+        )
+        return invoice._l10n_br_avatax_check_missing_fields_product(lines)
+
+    def test_19_operation_type_product_options_win_over_product(self):
+        """Product-option fields resolve from the operation type before the product."""
+        invoice, _ = self._create_invoice_01_and_expected_response()
+        invoice.l10n_br_goods_operation_type_id.write({
+            'l10n_br_source_origin': '2',
+            'l10n_br_sped_type': 'FEEDSTOCK',
+            'l10n_br_use_type': 'resale',
+        })
+
+        payload = invoice._prepare_l10n_br_avatax_document_service_call(invoice._get_l10n_br_avatax_service_params())
+        for line in payload['lines']:
+            self.assertEqual(line['useType'], 'resale')
+            self.assertEqual(line['itemDescriptor']['source'], '2')
+            self.assertEqual(line['itemDescriptor']['productType'], 'FEEDSTOCK')
+
+    def test_20_operation_type_product_options_fallback_to_product(self):
+        """When the operation type leaves the product-option fields empty, the product values are used."""
+        invoice, _ = self._create_invoice_01_and_expected_response()
+
+        payload = invoice._prepare_l10n_br_avatax_document_service_call(invoice._get_l10n_br_avatax_service_params())
+        for line in payload['lines']:
+            self.assertEqual(line['useType'], 'use or consumption')
+            self.assertEqual(line['itemDescriptor']['source'], '0')
+            self.assertEqual(line['itemDescriptor']['productType'], 'FOR PRODUCT')
+
+    def test_21_line_operation_type_beats_header(self):
+        """A line-level operation type override wins over the header operation type."""
+        line_op_type = self.env.ref('l10n_br_avatax.operation_type_2')
+        line_op_type.write({
+            'l10n_br_source_origin': '5',
+            'l10n_br_sped_type': 'PACKAGING',
+            'l10n_br_use_type': 'production',
+        })
+        invoice = self._create_invoice_02(operation_types=(line_op_type, False, False, False))
+        invoice.l10n_br_goods_operation_type_id.write({
+            'l10n_br_source_origin': '2',
+            'l10n_br_sped_type': 'FEEDSTOCK',
+            'l10n_br_use_type': 'resale',
+        })
+
+        lines = invoice._prepare_l10n_br_avatax_document_service_call(invoice._get_l10n_br_avatax_service_params())['lines']
+        self.assertEqual(lines[0]['useType'], 'production')
+        self.assertEqual(lines[0]['itemDescriptor']['source'], '5')
+        self.assertEqual(lines[0]['itemDescriptor']['productType'], 'PACKAGING')
+        for line in lines[1:]:
+            self.assertEqual(line['useType'], 'resale')
+            self.assertEqual(line['itemDescriptor']['source'], '2')
+            self.assertEqual(line['itemDescriptor']['productType'], 'FEEDSTOCK')
+
+    def test_22_use_type_priority(self):
+        """useType priority: operation type > document-level use type > product."""
+        invoice, _ = self._create_invoice_01_and_expected_response()
+
+        # Document-level use type wins over the product value.
+        invoice.l10n_br_use_type = 'fixed assets'
+        payload = invoice._prepare_l10n_br_avatax_document_service_call(invoice._get_l10n_br_avatax_service_params())
+        for line in payload['lines']:
+            self.assertEqual(line['useType'], 'fixed assets')
+
+        # Operation type use type wins over the document-level value.
+        invoice.l10n_br_goods_operation_type_id.l10n_br_use_type = 'resale'
+        payload = invoice._prepare_l10n_br_avatax_document_service_call(invoice._get_l10n_br_avatax_service_params())
+        for line in payload['lines']:
+            self.assertEqual(line['useType'], 'resale')
+
+    def test_23_missing_fields_warning_resolved_by_operation_type(self):
+        """The missing product-option warning clears when the operation type resolves the value."""
+        invoice, _ = self._create_invoice_01_and_expected_response()
+        invoice.invoice_line_ids.product_id.l10n_br_source_origin = False
+
+        warnings = self._get_missing_fields_warnings(invoice)
+        self.assertIn('invoice_products_missing_fields_warning', warnings)
+        self.assertIn('Source of Origin', warnings['invoice_products_missing_fields_warning']['message'])
+
+        invoice.l10n_br_goods_operation_type_id.l10n_br_source_origin = '2'
+        self.assertNotIn('invoice_products_missing_fields_warning', self._get_missing_fields_warnings(invoice))
+
+    def test_24_missing_ncm_warns_regardless_of_operation_type(self):
+        """A missing NCM code always warns; the operation type cannot resolve it."""
+        invoice, _ = self._create_invoice_01_and_expected_response()
+        invoice.invoice_line_ids.product_id.l10n_br_ncm_code_id = False
+        invoice.l10n_br_goods_operation_type_id.write({
+            'l10n_br_source_origin': '2',
+            'l10n_br_sped_type': 'FEEDSTOCK',
+            'l10n_br_use_type': 'resale',
+        })
+
+        self.assertIn('products_missing_fields_danger', self._get_missing_fields_warnings(invoice))
+
 
 @tagged('post_install_l10n', '-at_install', 'post_install')
 class TestAvalaraBrSettings(TestAvalaraBrInvoiceCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('br')
     def setUpClass(cls):
@@ -749,9 +1226,22 @@ class TestAvalaraBrSettings(TestAvalaraBrInvoiceCommon):
         self.assertEqual(self.settings.company_id.vat, '00623904000173', 'CNPJ should be compacted in internal storage')
         self.assertEqual(arguments['cnpj'], '00.623.904/0001-73', 'CNPJ must be formatted for account creation')
 
+    def test_06_extract_tax_values_multiple_moves(self):
+        """Ensure that the tax values are extracted correctly when multiple moves are passed to the function.
+        """
+        invoice_1, response = self._create_invoice_01_and_expected_response()
+        invoice_2, _dummy = self._create_invoice_01_and_expected_response()
+        invoices = invoice_1 | invoice_2
+
+        with self._capture_request_br(return_value=response):
+            invoices.action_post()
+        self.assertTrue(all(invoice.state == 'posted' for invoice in invoices))
+
 
 @tagged('external_l10n', 'external', '-at_install', 'post_install', '-standard')
 class TestAvalaraBrInvoiceIntegration(TestAvalaraBrInvoiceCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_01_invoice_integration_br(self):
         with self._skip_no_credentials():
             invoice, _ = self._create_invoice_01_and_expected_response()

@@ -3,13 +3,14 @@ import { useService } from "@web/core/utils/hooks";
 import { WithSearch } from "@web/search/with_search/with_search";
 import { MainComponent } from '@mrp_mps/components/main';
 import { MrpMpsSearchModel } from '@mrp_mps/search/mrp_mps_search_model';
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
-import { Component, onWillStart } from "@odoo/owl";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
+import { Component, onWillStart, useProps } from "@odoo/owl";
 
 export class MainComponentAction extends Component {
     static template = "mrp_mps.mrp_mps_action";
     static components = { WithSearch, MainComponent };
-    static props = {...standardActionServiceProps};
+
+    props = useProps(standardActionServiceProps);
 
     setup() {
         this.viewService = useService("view");
@@ -26,6 +27,7 @@ export class MainComponentAction extends Component {
             this.withSearchProps = {
                 resModel: this.resModel,
                 SearchModel: MrpMpsSearchModel,
+                globalState: this.props.globalState,
                 context: this.props.action.context,
                 domain: this.props.action.domain,
                 orderBy: [{name: "id", asc: true}],

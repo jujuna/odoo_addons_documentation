@@ -5,7 +5,7 @@ class L10n_Ro_SaftAccountAssetCategory(models.Model):
     _name = 'l10n_ro_saft.account.asset.category'
     _description = "Asset categories for Romania's saft"
     _order = "code"
-    _rec_names_search = ['code', 'description']
+    _rec_names_search = ('code', 'description')
 
     _code_unique = models.Constraint(
         'unique (code)',

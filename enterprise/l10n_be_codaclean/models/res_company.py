@@ -1,7 +1,8 @@
 import re
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.addons.l10n_be_codaclean.tools.iap_api import contact
+from odoo.exceptions import UserError
 
 
 class ResCompany(models.Model):
@@ -17,6 +18,7 @@ class ResCompany(models.Model):
         compute="_compute_l10n_be_codaclean_is_connected",
         store=True,
     )
+    l10n_be_codaclean_soda_journal = fields.Many2one("account.journal", string="Journal in which codaclean CODB's will be imported", domain="[('type', '=', 'general')]")
 
     @api.depends("l10n_be_codaclean_iap_token")
     def _compute_l10n_be_codaclean_is_connected(self):
@@ -66,10 +68,10 @@ class ResCompany(models.Model):
         return result
 
     def _l10n_be_codaclean_get_formatted_vat(self):
-        if self.vat and self.vat != "/":
+        if self.has_vat:
             vat = self.vat
         else:
-            vat = self.company_registry
+            vat = self.partner_id._get_additional_identifier('BE_EN')
         digits = re.sub(r"[^0-9]", "", vat or "")
         return re.sub(r"(\d{4})(\d{3})(\d{3})", r"\1.\2.\3", digits)
 
@@ -103,3 +105,10 @@ class ResCompany(models.Model):
             self.l10n_be_codaclean_iap_token = False
 
         return result
+
+    def _l10n_be_codaclean_verify_prerequisites(self):
+        self.check_access('write')
+        self.ensure_one()
+        pattern = r"^\d{4}\.\d{3}\.\d{3}$"
+        if not re.fullmatch(pattern, self._l10n_be_codaclean_get_formatted_vat()):
+            raise UserError(_("The company VAT/ID number is not valid."))

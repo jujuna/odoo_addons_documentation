@@ -3,21 +3,22 @@
 # * l10n_cl_edi_stock
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.5alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:02+0000\n"
-"PO-Revision-Date: 2025-11-18 17:10+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-09-18 18:16+0000\n"
+"PO-Revision-Date: 2026-09-18 05:01+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19-l10n/l10n_cl_edi_stock/es_419/>\n"
+"odoo-master/l10n_cl_edi_stock/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: l10n_cl_edi_stock
 #: model:ir.model.fields,help:l10n_cl_edi_stock.field_stock_picking__l10n_cl_dte_partner_status
@@ -35,6 +36,24 @@ msgstr ""
 "            - Enviado: El DTE ha sido enviado al cliente."
 
 #. module: l10n_cl_edi_stock
+#: model:ir.module.module,description:base.module_l10n_cl_edi_stock
+msgid ""
+"\n"
+"The delivery guide (guia de despacho) is needed as a proof\n"
+"that you are sending goods between A and B.\n"
+"\n"
+"It is configurable on the partner if prices are needed on the\n"
+"delivery guide and if they need to come from the sale order\n"
+"or the product itself.\n"
+"\n"
+"It is only when a delivery order is validated that you can create the "
+"delivery\n"
+"guide.  Then it will follow the same flow as for the invoices, sending it "
+"to\n"
+"the SII.\n"
+msgstr ""
+
+#. module: l10n_cl_edi_stock
 #. odoo-python
 #: code:addons/l10n_cl_edi_stock/models/stock_picking.py:0
 msgid "%s is accepted by SII. It cannot be cancelled."
@@ -44,6 +63,11 @@ msgstr "%s is aceptado por el SII. No puede ser anulado."
 #: model:ir.actions.report,print_report_name:l10n_cl_edi_stock.action_delivery_guide_report_pdf
 msgid "'GDE Guide SII - %s' % (object.name)"
 msgstr "'GDE Guía de Despacho SII - %s' % (object.name)"
+
+#. module: l10n_cl_edi_stock
+#: model:ir.actions.report,print_report_name:l10n_cl_edi_stock.action_delivery_guide_yield_report_pdf
+msgid "'GDE Guide SII Yield Copy - %s' % (object.name)"
+msgstr "'Copia de la Guía de Despacho Electrónica (CL) - %s' % (object.name)"
 
 #. module: l10n_cl_edi_stock
 #: model:ir.model.fields.selection,name:l10n_cl_edi_stock.selection__stock_picking__l10n_cl_delivery_guide_reason__1
@@ -97,6 +121,9 @@ msgid ""
 "                                                <span style=\"line-height: "
 "180%;\">RUT:</span>"
 msgstr ""
+"<br/>\n"
+"                                                <span style=\"line-height: "
+"180%;\">RUT:</span>"
 
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.custom_header
@@ -104,13 +131,17 @@ msgid ""
 "<br/>\n"
 "                                                <span>Nº:</span>"
 msgstr ""
+"<br/>\n"
+"                                                <span>Nº:</span>"
 
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.barcode_stamp_footer
 msgid ""
 "<br/>\n"
-"                        Verify the document on www.sii.cl"
-msgstr "Verifique documento en www.sii.cl"
+"                            Verify the document on www.sii.cl"
+msgstr ""
+"<br/>\n"
+"                            Verifica el documento en www.sii.cl"
 
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.stock_informations
@@ -167,6 +198,29 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Apreciable\n"
+"                        <t t-"
+"if=\"object.partner_id.commercial_partner_id\">\n"
+"                            <t t-out=\"object.partner_id.name or "
+"''\">Brandon Freeman</t> (<t t-"
+"out=\"object.partner_id.commercial_partner_id.name or ''\">Brandon Freeman</"
+"t>),\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or "
+"''\">Brandon Freeman</t>,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        Esta es tu guía de despacho <strong t-"
+"out=\"object.l10n_latam_document_number or ''\">GDE 000008</strong>\n"
+"                        <br/><br/>\n"
+"                        No dudes en contactarnos si tienes alguna pregunta.\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.delivery_guide_document
@@ -191,7 +245,7 @@ msgstr "<strong>Descuento</strong>"
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.stock_informations
 msgid "<strong>GIRO:</strong>"
-msgstr ""
+msgstr "<strong>GIRO:</strong>"
 
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.delivery_guide_document
@@ -206,12 +260,12 @@ msgstr "<strong>Cantidad</strong>"
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.delivery_guide_document
 msgid "<strong>Subtotal Exento</strong>"
-msgstr ""
+msgstr "<strong>Subtotal exento</strong>"
 
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.delivery_guide_document
 msgid "<strong>Subtotal Neto</strong>"
-msgstr ""
+msgstr "<strong>Subtotal neto</strong>"
 
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.delivery_guide_document
@@ -226,7 +280,7 @@ msgstr "<strong>Precio Unitario</strong>"
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.delivery_guide_document
 msgid "<strong>Unit</strong>"
-msgstr "<strong>Un Med</strong>"
+msgstr "<strong>Unidad</strong>"
 
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.delivery_guide_document
@@ -267,7 +321,7 @@ msgstr ""
 #. module: l10n_cl_edi_stock
 #: model:ir.actions.act_window,name:l10n_cl_edi_stock.action_stock_l10n_cl_dte_caf
 msgid "CAFs"
-msgstr ""
+msgstr "CAFs"
 
 #. module: l10n_cl_edi_stock
 #: model:ir.ui.menu,name:l10n_cl_edi_stock.menu_stock_l10n_cl_dte_caf
@@ -278,6 +332,11 @@ msgstr "CAFs"
 #: model:ir.model.fields.selection,name:l10n_cl_edi_stock.selection__stock_picking__l10n_cl_dte_status__cancelled
 msgid "Cancelled"
 msgstr "Anulado"
+
+#. module: l10n_cl_edi_stock
+#: model:ir.module.module,shortdesc:base.module_l10n_cl_edi_stock
+msgid "Chile - E-Invoicing Delivery Guide"
+msgstr ""
 
 #. module: l10n_cl_edi_stock
 #: model:ir.model.fields,help:l10n_cl_edi_stock.field_res_partner__l10n_cl_delivery_guide_price
@@ -308,7 +367,7 @@ msgstr "Contacto"
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.view_picking_edi_form
 msgid "Create Delivery Guide"
-msgstr "Crear Guía de Despacho"
+msgstr "Crear guía de despacho"
 
 #. module: l10n_cl_edi_stock
 #: model:ir.model,website_form_label:l10n_cl_edi_stock.model_res_partner
@@ -357,7 +416,7 @@ msgstr "Se ha creado el DTE."
 #. odoo-python
 #: code:addons/l10n_cl_edi_stock/models/stock_picking.py:0
 msgid "DTE has been sent to SII with response: %s."
-msgstr "El DTE ha sido enviado al SII con la suguiente respuesta: %s."
+msgstr "El DTE ha sido enviado al SII con la siguiente respuesta: %s."
 
 #. module: l10n_cl_edi_stock
 #. odoo-python
@@ -387,6 +446,11 @@ msgid "Delivery Guide SII DTE 52 (CL)"
 msgstr "Guía Despacho SII DTE 52 (CL)"
 
 #. module: l10n_cl_edi_stock
+#: model:ir.actions.report,name:l10n_cl_edi_stock.action_delivery_guide_yield_report_pdf
+msgid "Delivery Guide Yield Copy SII DTE 52 (CL)"
+msgstr "Copia de la Guía de Despacho Electrónica SII DTE 52 (CL)"
+
+#. module: l10n_cl_edi_stock
 #. odoo-python
 #: code:addons/l10n_cl_edi_stock/models/stock_picking.py:0
 msgid "Delivery Guide for foreign partner is not implemented yet"
@@ -409,7 +473,7 @@ msgstr "No mostrar el precio"
 #. module: l10n_cl_edi_stock
 #: model:ir.model.fields,field_description:l10n_cl_edi_stock.field_stock_picking__l10n_latam_document_number
 msgid "Document Number (UY)"
-msgstr ""
+msgstr "Número de documento (UY)"
 
 #. module: l10n_cl_edi_stock
 #. odoo-python
@@ -420,7 +484,7 @@ msgstr "Firma del Documento"
 #. module: l10n_cl_edi_stock
 #: model:ir.model.fields,field_description:l10n_cl_edi_stock.field_stock_picking__l10n_latam_document_type_id
 msgid "Document Type (UY)"
-msgstr ""
+msgstr "Tipo de documento (UY)"
 
 #. module: l10n_cl_edi_stock
 #. odoo-python
@@ -428,15 +492,18 @@ msgstr ""
 msgid ""
 "Document type with code 52 active not found. You can update the module to "
 "solve this problem. "
-msgstr "No encentramos el tipo de documento 52.  Tiene que updatar el modulo"
+msgstr "No encontramos el tipo de documento 52. Debes actualizar el módulo. "
 
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.barcode_stamp_footer
 msgid ""
 "Electronic Stamp SII\n"
-"                        <br/>\n"
-"                        Resolution Nº:"
+"                            <br/>\n"
+"                            Resolution Nº:"
 msgstr ""
+"Timbre electrónico SII\n"
+"                        <br/>\n"
+"                        Resolución Nº:"
 
 #. module: l10n_cl_edi_stock
 #. odoo-python
@@ -466,7 +533,7 @@ msgstr "ID"
 #. module: l10n_cl_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.dte_subtemplate
 msgid "INT1"
-msgstr ""
+msgstr "INT1"
 
 #. module: l10n_cl_edi_stock
 #. odoo-python
@@ -510,6 +577,13 @@ msgstr "Logo"
 #: model:ir.model.fields.selection,name:l10n_cl_edi_stock.selection__stock_picking__l10n_cl_dte_status__manual
 msgid "Manual"
 msgstr "Manual"
+
+#. module: l10n_cl_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.view_picking_edi_form
+msgid ""
+"No delivery guide has been numbered for this CAF yet. Please set the first "
+"number in the Delivery Guide Number field."
+msgstr ""
 
 #. module: l10n_cl_edi_stock
 #. odoo-python
@@ -565,6 +639,11 @@ msgid "Print Delivery Guide"
 msgstr "Imprimir Guía de Despacho"
 
 #. module: l10n_cl_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.view_picking_edi_form
+msgid "Print Yield Copy"
+msgstr "Imprimir copia"
+
+#. module: l10n_cl_edi_stock
 #: model:ir.model.fields,field_description:l10n_cl_edi_stock.field_stock_picking__l10n_cl_delivery_guide_reason
 msgid "Reason of the Transfer"
 msgstr "Razón de la transferencia"
@@ -611,15 +690,6 @@ msgid "Sent"
 msgstr "Enviado"
 
 #. module: l10n_cl_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_stock.view_picking_edi_form
-msgid ""
-"Sequence not found for delivery guide. Please, set the first number into "
-"Delivery Guide Number field"
-msgstr ""
-"No se encontró una secuencia para la guía de despacho. Por favor, establezca "
-"el primer número dentro del campo número para la guía de despacho"
-
-#. module: l10n_cl_edi_stock
 #: model:ir.model.fields,help:l10n_cl_edi_stock.field_stock_picking__l10n_cl_dte_status
 msgid ""
 "Status of sending the DTE to the SII:\n"
@@ -648,18 +718,28 @@ msgstr ""
 #. module: l10n_cl_edi_stock
 #: model:ir.model,name:l10n_cl_edi_stock.model_stock_move
 msgid "Stock Move Ewaybill"
-msgstr ""
+msgstr "Guía de despacho electrónica de movimiento de existencias"
 
 #. module: l10n_cl_edi_stock
 #: model:ir.model,name:l10n_cl_edi_stock.model_stock_picking
 msgid "Stock Picking - Delivery Guide (Uruguay)"
-msgstr ""
+msgstr "Recolección de inventario - Guía de remito (Uruguay)"
 
 #. module: l10n_cl_edi_stock
 #. odoo-python
 #: code:addons/l10n_cl_edi_stock/models/stock_picking.py:0
 msgid "System Locked"
 msgstr "Sistema Bloqueado"
+
+#. module: l10n_cl_edi_stock
+#. odoo-python
+#: code:addons/l10n_cl_edi_stock/models/stock_picking.py:0
+msgid ""
+"The maximum amount of Activities Names is 4. Please go to your company and "
+"select only 4 or less options."
+msgstr ""
+"El número máximo de nombres de actividades es 4. Ve a tu empresa y "
+"selecciona solo 4 opciones o menos."
 
 #. module: l10n_cl_edi_stock
 #: model:ir.model.fields,help:l10n_cl_edi_stock.field_stock_picking__l10n_latam_document_number
@@ -744,9 +824,10 @@ msgid ""
 "and printed in the invoice barcode should be present in the printed invoice "
 "report to be valid"
 msgstr ""
-"Este XML contiene la porción del DTE que debería ser codificada en PDF417 e "
-"impresa. Este código de barras debe estar presente en el reporte de guía  de "
-"despacho para que la misma sea válida"
+"Este XML contiene la porción del XML del DTE que debe codificarse en PDF417 "
+"e imprimirse en el código de barras de la factura; este código de barras "
+"debe estar presente en el reporte de la guía de despacho para que la misma "
+"sea válida"
 
 #. module: l10n_cl_edi_stock
 #. odoo-python
@@ -821,14 +902,10 @@ msgstr "⇒ Establecer a Borrador"
 msgid "⇒ Verify on SII"
 msgstr "⇒ Verificar en SII"
 
-#~ msgid "Delivery Guide Number"
-#~ msgstr "Número de guía de entrega"
-
-#~ msgid "Document Type"
-#~ msgstr "Tipo de Documento"
-
-#~ msgid "Stock Move"
-#~ msgstr "Movimiento de existencias"
-
-#~ msgid "Transfer"
-#~ msgstr "Albarán"
+#~ msgid ""
+#~ "Sequence not found for delivery guide. Please, set the first number into "
+#~ "Delivery Guide Number field"
+#~ msgstr ""
+#~ "No se encontró una secuencia para la guía de despacho. Por favor, "
+#~ "establezca el primer número dentro del campo número para la guía de "
+#~ "despacho"

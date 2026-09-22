@@ -3,23 +3,24 @@
 # * knowledge
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-12-06 10:14+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/knowledge/"
-"fr/>\n"
+"POT-Creation-Date: 2026-09-18 17:46+0000\n"
+"PO-Revision-Date: 2026-09-18 03:42+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"knowledge/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: knowledge
 #. odoo-javascript
@@ -95,8 +96,8 @@ msgstr "%(article_name)s (copie)"
 #. module: knowledge
 #. odoo-python
 #: code:addons/knowledge/models/knowledge_article.py:0
-msgid "%s has been sent to Trash"
-msgstr "%s a été envoyé à la corbeille"
+msgid "%s has been moved to Trash"
+msgstr "%s a été déplacé vers la corbeille"
 
 #. module: knowledge
 #. odoo-javascript
@@ -757,37 +758,37 @@ msgstr ""
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
 msgid ""
-"<i class=\"fa fa-w fa-info-circle\"/> All external users you selected won't "
-"be added to the members."
+"<i class=\"oi oi-fw\" data-icon=\"info\"/> All external users you selected "
+"won't be added to the members."
 msgstr ""
-"<i class=\"fa fa-w fa-info-circle\"/> Tous les utilisateurs externes que "
-"vous avez sélectionnés ne seront pas ajoutés aux membres."
+"<i class=\"oi oi-fw\" data-icon=\"info\"/> Tous les utilisateurs externes "
+"que vous avez sélectionnés ne seront pas ajoutés aux membres."
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_kanban_items
 msgid ""
-"<i invisible=\"not is_user_favorite\" class=\"fa fa-star\" title=\"Remove "
-"from favorites\"/>\n"
+"<i invisible=\"not is_user_favorite\" class=\"oi oi-filled\" data-"
+"icon=\"star\" title=\"Remove from favorites\"/>\n"
 "                                    <i invisible=\"is_user_favorite\" "
-"class=\"fa fa-star-o\" title=\"Add to favorites\"/>"
+"class=\"oi\" data-icon=\"star\" title=\"Add to favorites\"/>"
 msgstr ""
-"<i invisible=\"not is_user_favorite\" class=\"fa fa-star\" title=\"Supprimer "
-"des favoris\"/>\n"
+"<i invisible=\"not is_user_favorite\" class=\"oi oi-filled\" data-"
+"icon=\"star\" title=\"Supprimer des favoris\"/>\n"
 "                                    <i invisible=\"is_user_favorite\" "
-"class=\"fa fa-star-o\" title=\"Ajouter aux favoris\"/>"
+"class=\"oi\" data-icon=\"star\" title=\"Ajouter aux favoris\"/>"
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_kanban
 msgid ""
-"<i invisible=\"not is_user_favorite\" class=\"fa fa-star\" title=\"Remove "
-"from favorites\"/>\n"
-"                                <i invisible=\"is_user_favorite\" class=\"fa "
-"fa-star-o\" title=\"Add to favorites\"/>"
+"<i invisible=\"not is_user_favorite\" class=\"oi oi-filled\" data-"
+"icon=\"star\" title=\"Remove from favorites\"/>\n"
+"                                <i invisible=\"is_user_favorite\" "
+"class=\"oi\" data-icon=\"star\" title=\"Add to favorites\"/>"
 msgstr ""
-"<i invisible=\"not is_user_favorite\" class=\"fa fa-star\" title=\"Retirer "
-"des favoris\"/>\n"
-"                                <i invisible=\"is_user_favorite\" class=\"fa "
-"fa-star-o\" title=\"Ajouter aux favoris\"/>"
+"<i invisible=\"not is_user_favorite\" class=\"oi oi-filled\" data-"
+"icon=\"star\" title=\"Retirer des favoris\"/>\n"
+"                                <i invisible=\"is_user_favorite\" "
+"class=\"oi\" data-icon=\"star\" title=\"Ajouter aux favoris\"/>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_account_management
@@ -2217,7 +2218,12 @@ msgstr "Activités"
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "Activité exception décoration"
+msgstr "Indicateur d’exception d’activité"
+
+#. module: knowledge
+#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__activity_plans_ids
+msgid "Activity Plans"
+msgstr "Plans d'activité"
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__activity_state
@@ -2319,11 +2325,11 @@ msgstr ""
 #. module: knowledge
 #: model_terms:ir.actions.act_window,help:knowledge.knowledge_article_favorite_action
 msgid ""
-"Add articles in your list of favorites by clicking on the <i class=\"fa fa-"
-"star-o\"></i> next to the article name."
+"Add articles in your list of favorites by clicking on the <i class=\"oi\" "
+"data-icon=\"star\"></i> next to the article name."
 msgstr ""
 "Ajoutez des articles dans votre liste de favoris en cliquant sur <i "
-"class=\"fa fa-star-o\"></i> à côté du nom de l'article."
+"class=\"oi\" data-icon=\"star\"></i> à côté du nom de l'article."
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
@@ -2332,14 +2338,8 @@ msgstr "Ajouter des personnes ou des adresses e-mail"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
-msgid "Add people..."
-msgstr "Ajouter des personnes..."
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Add to Favorites"
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+msgid "Add to Favorite"
 msgstr "Ajouter aux favoris"
 
 #. module: knowledge
@@ -2379,63 +2379,48 @@ msgstr "Publicité en ligne ou à la télévision"
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
 "After-Sales Service <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Services après-vente <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_1
 msgid ""
 "After-Sales Service <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
 "span>"
 msgstr ""
-"Services après-vente <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-"
-"o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
 "After-Sales Service <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Services après-vente <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
 "After-Sales Service​ <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Services après-vente <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
 "After-Sales Service​ <span class=\"o_stars o_five_stars\" id=\"checkId-5\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Services après-vente <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-5\"><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-"i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa "
-"fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
@@ -2461,19 +2446,13 @@ msgstr "Âge : 42"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
-msgid "All Discussions"
-msgstr "Toutes les discussions"
+msgid "All"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_product_catalog
 msgid "All Models 📖"
 msgstr "Tous les modèles 📖"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/form_status_indicator/form_status_indicator.xml:0
-msgid "All changes saved"
-msgstr "Tous les changements sont enregistrés"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
@@ -2619,6 +2598,12 @@ msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/views/item_calendar/item_calendar_view.js:0
+msgid "Are you sure you want to move this article to the trash?"
+msgstr "Êtes-vous sûr de vouloir déplacer cet article vers la corbeille ?"
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.js:0
 msgid ""
 "Are you sure you want to remove this template from the list?\n"
@@ -2662,12 +2647,6 @@ msgid ""
 msgstr ""
 "Êtes-vous sûr de vouloir restreindre l'accès à cet article ? Cela signifie "
 "qu'il n'héritera plus des droits d'accès de ses parents."
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/views/item_calendar/item_calendar_view.js:0
-msgid "Are you sure you want to send this article to the trash?"
-msgstr "Êtes-vous sûr de vouloir supprimer cet article ?"
 
 #. module: knowledge
 #. odoo-javascript
@@ -2853,6 +2832,12 @@ msgid "BOOK NOW"
 msgstr "RESERVER MAINTENANT"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
+msgid "Back to My Account"
+msgstr ""
+
+#. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
 msgid "Background:"
 msgstr "Contexte :"
@@ -2905,62 +2890,44 @@ msgstr "Brand Assets"
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
 "Brand Attraction <span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Attraction de la marque <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-3\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
 "Brand Attraction <span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
 "span>"
 msgstr ""
-"Attraction de la marque <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-3\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-"
-"o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
 "Brand Attraction <span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Attraction de la marque <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-3\"><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
 "Brand Attraction <span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Attraction de la marque <span class=\"o_stars o_five_stars\" "
-"id=\"checkId-3\"><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-"i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa "
-"fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_brand_assets
 msgid "Brand Name Rules"
 msgstr "Règles relatives au nom de marque"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
-msgid "Browse Templates"
-msgstr "Parcourir les modèles"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_release_note
@@ -2970,20 +2937,14 @@ msgstr "Corrections de bugs 🔨"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
-msgid "Build an Item Calendar"
-msgstr "Créer un élément Calendrier"
+msgid "Build an"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
-msgid "Build an Item Kanban"
-msgstr "Créer un élément Kanban"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
-msgid "Build an Item List"
-msgstr "Créer un élément Liste"
+msgid "Build an Item database"
+msgstr ""
 
 #. module: knowledge
 #: model:knowledge.article,template_description:knowledge.knowledge_article_template_marketing_customer_personas
@@ -3003,6 +2964,12 @@ msgstr "Mais aussi..."
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_account_management
 msgid "Buying Process"
 msgstr "Processus d'achat"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "Calendar"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -3076,7 +3043,6 @@ msgstr "L'utilisateur peut-il voir l'article ?"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/knowledge_cover/knowledge_cover.xml:0
-#: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.xml:0
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -3137,6 +3103,12 @@ msgid ""
 msgstr ""
 "Centralisez les réunions d'équipe en un seul article, tout en vous assurant "
 "que les minutes sont traitées efficacement."
+
+#. module: knowledge
+#: model:ir.module.module,description:base.module_knowledge
+#: model:ir.module.module,summary:base.module_knowledge
+msgid "Centralize, manage, share and grow your knowledge library"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_account_management
@@ -3213,13 +3185,13 @@ msgstr "Fermer"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/topbar/topbar.js:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.js:0
 msgid "Close chatter panel"
 msgstr "Fermer le panneau de discussion"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/topbar/topbar.js:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.js:0
 msgid "Close comments panel"
 msgstr "Fermer le panneau des commentaires"
 
@@ -3228,6 +3200,12 @@ msgstr "Fermer le panneau des commentaires"
 #: code:addons/knowledge/static/src/editor/plugins/comments_plugin/comments_plugin.js:0
 msgid "Comment"
 msgstr "Commenter"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/side_panel/side_panel.js:0
+msgid "Comments"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
@@ -3343,6 +3321,12 @@ msgstr "Copier le lien"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/knowledge_readonly_heading_link/knowledge_readonly_heading_link.xml:0
+msgid "Copy a link to this heading in the clipboard"
+msgstr "Copier le lien de ce titre dans le presse-papiers"
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/core/clipboard/embedded_clipboard.xml:0
 msgid "Copy to Clipboard"
 msgstr "Copier dans le presse-papiers"
@@ -3405,6 +3389,7 @@ msgstr "Créer ''"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 msgid "Create a Copy"
 msgstr "Créer une copie"
 
@@ -3621,18 +3606,17 @@ msgstr ""
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.xml:0
 #: code:addons/knowledge/static/src/components/item_calendar_props_dialog/item_calendar_props_dialog.xml:0
 #: code:addons/knowledge/static/src/components/knowledge_cover/knowledge_cover_dialog.xml:0
-#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.js:0
+#: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.xml:0
 #: code:addons/knowledge/static/src/components/prompt_embedded_view_name_dialog/prompt_embedded_view_name_dialog.xml:0
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/embedded_view_link/embedded_view_link_edit_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
 msgid "Discard"
 msgstr "Ignorer"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/form_status_indicator/form_status_indicator.xml:0
-msgid "Discard all changes"
-msgstr "Ignorer tous les changements"
+#: code:addons/knowledge/static/src/components/side_panel/side_panel.js:0
+msgid "Discussions"
+msgstr ""
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_ir_attachment__display_name
@@ -3839,8 +3823,6 @@ msgid "Favorite Articles"
 msgstr "Articles favoris"
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar_section.xml:0
 #: model:ir.actions.act_window,name:knowledge.knowledge_article_favorite_action
 #: model:ir.ui.menu,name:knowledge.knowledge_article_favorite_menu
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_favorite_view_tree
@@ -3848,7 +3830,13 @@ msgid "Favorites"
 msgstr "Favoris"
 
 #. module: knowledge
-#: model_terms:ir.ui.view,arch_db:knowledge.portal_my_home_knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
+msgid "Filter discussions"
+msgstr ""
+
+#. module: knowledge
+#: model:portal.entry,description:knowledge.portal_knowledge_entry
 msgid "Find all articles shared with you"
 msgstr "Trouvez tous les articles partagés avec vous"
 
@@ -3880,11 +3868,6 @@ msgstr "Abonnés"
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article_thread__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Abonnés (Partenaires)"
-
-#. module: knowledge
-#: model:ir.model.fields,help:knowledge.field_knowledge_article__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Icône Font Awesome par ex. fa-tasks"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_brand_assets
@@ -3933,6 +3916,12 @@ msgstr "Genre : F"
 #: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
 msgid "General Access"
 msgstr "Accès général"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "Get started with"
+msgstr ""
 
 #. module: knowledge
 #: model:knowledge.article,template_name:knowledge.knowledge_article_template_hr_faq
@@ -4034,24 +4023,6 @@ msgstr "Masqué"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Hide Chatter"
-msgstr "Masquer le chatter"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Hide Comments"
-msgstr "Masquer les commentaires"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Hide Properties"
-msgstr "Masquer les propriétés"
-
-#. module: knowledge
-#. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/article_index/article_index.xml:0
 msgid "Hide sub-articles"
 msgstr "Masquer les sous-articles"
@@ -4073,8 +4044,6 @@ msgid "History metadata"
 msgstr "Métadonnées historiques"
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
 #: model:ir.ui.menu,name:knowledge.knowledge_menu_home
 msgid "Home"
 msgstr "Accueil"
@@ -4246,6 +4215,16 @@ msgid ""
 msgstr ""
 "Si activé, cet article enfant sera automatiquement créé lorsque son modèle "
 "parent sera utilisé"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "If this was a mistake, you can recover it from the"
+msgstr "S’il s’agit d’une erreur, vous pouvez le récupérer depuis"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "If this was a mistake, you can recover them from the"
+msgstr "S’il s’agit d’une erreur, vous pouvez les récupérer depuis"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_post_mortem
@@ -4443,18 +4422,6 @@ msgid "Invitation to access an article"
 msgstr "Invitation à accéder à un article"
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
-#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
-msgid "Invite"
-msgstr "Inviter"
-
-#. module: knowledge
-#: model:ir.actions.act_window,name:knowledge.knowledge_invite_action_from_article
-msgid "Invite people"
-msgstr "Inviter des gens"
-
-#. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article_favorite__is_article_active
 msgid "Is Article Active"
 msgstr "Est un article actif"
@@ -4561,6 +4528,12 @@ msgid "Item Stage"
 msgstr "Étape élément"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "Item database"
+msgstr ""
+
+#. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_calendar_items
 msgid "Items"
 msgstr "Articles"
@@ -4588,6 +4561,12 @@ msgstr "Julius"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "Kanban"
+msgstr ""
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.js:0
 msgid "Kanban of %s"
 msgstr "Kanban de %s"
@@ -4606,13 +4585,6 @@ msgstr ""
 "collègues."
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
-msgid "Keep writing, or choose an option below to jump right in!"
-msgstr ""
-"Continuez à écrire ou choisissez une option ci-dessous pour vous lancer !"
-
-#. module: knowledge
 #: model:knowledge.article,template_description:knowledge.knowledge_article_template_company_newsletter
 msgid ""
 "Keep your colleagues informed about the company's latest developments and "
@@ -4625,9 +4597,10 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/external_embedded_view_favorite_menu/insert_embedded_view.xml:0
 #: code:addons/knowledge/static/src/editor/embedded_components/plugins/article_index_plugin/article_index_plugin.js:0
+#: model:ir.module.module,shortdesc:base.module_knowledge
 #: model:ir.ui.menu,name:knowledge.knowledge_menu_root
 #: model:ir.ui.menu,name:knowledge.knowledge_menu_technical
-#: model_terms:ir.ui.view,arch_db:knowledge.portal_my_home_knowledge
+#: model:portal.entry,name:knowledge.portal_knowledge_entry
 msgid "Knowledge"
 msgstr "Connaissances"
 
@@ -4669,12 +4642,6 @@ msgid "Last Edited on"
 msgstr "Dernière modification le"
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Last Edited ·"
-msgstr "Dernière modification ·"
-
-#. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__last_edition_user_avatar
 msgid "Last Editor's Avatar"
 msgstr "Avatar du dernier éditeur"
@@ -4702,6 +4669,13 @@ msgstr "Mis à jour par"
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_invite__write_date
 msgid "Last Updated on"
 msgstr "Mis à jour le"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+msgid "Last edited by"
+msgstr ""
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
@@ -4750,6 +4724,12 @@ msgstr "Lien copié dans votre presse-papiers."
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
+msgid "List"
+msgstr ""
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.js:0
 msgid "List of %s"
 msgstr "Liste de %s"
@@ -4774,7 +4754,6 @@ msgstr "Charger le modèle"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/article_index/article_index.xml:0
 msgid "Load a Template"
 msgstr "Charger un modèle"
@@ -4832,7 +4811,7 @@ msgstr "Gérez le planning de votre équipe pour le sprint à venir."
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/message/message_actions.js:0
+#: code:addons/knowledge/static/src/mail/core/common/message_actions.js:0
 msgid "Mark the discussion as resolved"
 msgstr "Marquer la discussion comme résolue"
 
@@ -4846,6 +4825,11 @@ msgstr "Marketing"
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_campaign_brief
 msgid "Marketing Campaign Brief"
 msgstr "Brief de marketing"
+
+#. module: knowledge
+#: model:ir.model.fields,help:knowledge.field_knowledge_article__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -4884,6 +4868,7 @@ msgstr "Membre"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
 #: code:addons/knowledge/static/src/components/topbar/topbar.xml:0
 #: model:ir.actions.act_window,name:knowledge.knowledge_article_member_action
 #: model:ir.ui.menu,name:knowledge.knowledge_article_member_menu
@@ -4910,6 +4895,11 @@ msgid "Menu Article"
 msgstr "Article de menu"
 
 #. module: knowledge
+#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__root_article_emoji
+msgid "Menu Article Emoji"
+msgstr ""
+
+#. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_invite__message
 msgid "Message"
 msgstr "Message"
@@ -4922,13 +4912,13 @@ msgstr "Erreur d'envoi du message"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/message/message_model_patch.js:0
+#: code:addons/knowledge/static/src/mail/core/common/message_model_patch.js:0
 msgid "Message Link Copied!"
 msgstr "Lien du message copié !"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/message/message_model_patch.js:0
+#: code:addons/knowledge/static/src/mail/core/common/message_model_patch.js:0
 msgid "Message Link Copy Failed (Permission denied?)!"
 msgstr "Échec de la copie du lien du message (Permission refusée ?)!"
 
@@ -4949,6 +4939,12 @@ msgstr "Configuration de calendrier manquante."
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
 msgid "More actions"
 msgstr "Plus d'actions"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+msgid "More options"
+msgstr "Plus d’options"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_company_newsletter
@@ -4982,6 +4978,7 @@ msgstr "Déplacer l'article"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 msgid "Move To"
 msgstr "Déplacer vers"
 
@@ -5017,7 +5014,9 @@ msgstr "Déplacer vers Partagé"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
 #: code:addons/knowledge/static/src/components/permission_panel/permission_panel.js:0
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_tree
 msgid "Move to Trash"
 msgstr "Déplacer vers la corbeille"
 
@@ -5026,6 +5025,17 @@ msgstr "Déplacer vers la corbeille"
 #: code:addons/knowledge/static/src/components/sidebar/sidebar.js:0
 msgid "Move to Workspace"
 msgstr "Déplacer vers l'espace de travail"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/views/item_calendar/item_calendar_view.js:0
+msgid "Move to trash"
+msgstr "Déplacer vers la corbeille"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
+msgid "My Activities"
+msgstr "Mes activités"
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__my_activity_date_deadline
@@ -5085,7 +5095,7 @@ msgstr "Nouveau"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
+#: code:addons/knowledge/static/src/components/knowledge_wysiwyg/knowledge_wysiwyg.js:0
 msgid "New Article"
 msgstr "Nouvel article"
 
@@ -5099,6 +5109,12 @@ msgstr "Nouvelles fonctionnalités 🎉"
 #: code:addons/knowledge/models/knowledge_article_thread.py:0
 msgid "New Mention in %s"
 msgstr "Nouvelle mention dans %s"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
+msgid "New article"
+msgstr ""
 
 #. module: knowledge
 #. odoo-javascript
@@ -5169,6 +5185,12 @@ msgstr "Pas encore de favoris !"
 #: model_terms:ir.actions.act_window,help:knowledge.knowledge_article_member_action
 msgid "No Members yet!"
 msgstr "Pas encore de membres !"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/toc_panel/toc_panel.xml:0
+msgid "No Title found"
+msgstr "Aucun titre trouvé"
 
 #. module: knowledge
 #: model:ir.model.fields.selection,name:knowledge.selection__knowledge_article_member__permission__none
@@ -5334,16 +5356,11 @@ msgstr "Oups, il n'y a rien ici. Effectuez une autre recherche."
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
 #: code:addons/knowledge/static/src/components/embedded_view_actions_menu/embedded_view_actions_menu.xml:0
 #: code:addons/knowledge/static/src/views/item_calendar/item_calendar_views.xml:0
 msgid "Open"
 msgstr "Ouvert"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
-msgid "Open Discussions"
-msgstr "Discussions ouvertes"
 
 #. module: knowledge
 #. odoo-javascript
@@ -5353,21 +5370,21 @@ msgstr "Ouvrir l'historique des versions"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/topbar/topbar.js:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.js:0
 msgid "Open chatter panel"
 msgstr "Ouvrir le panneau de discussion"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/topbar/topbar.js:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.js:0
 msgid "Open comments panel"
 msgstr "Ouvrir le panneau des commentaires"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
-msgid "Open the Trash"
-msgstr "Ouvrir la corbeille"
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+msgid "Open in new tab"
+msgstr "Ouvrir dans un nouvel onglet"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_meeting_example_branding
@@ -5422,6 +5439,11 @@ msgstr "Points de douleur (<em>cochez les points pertinents</em>)"
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__parent_id
 msgid "Parent Article"
 msgstr "Article parent"
+
+#. module: knowledge
+#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__parent_emoji
+msgid "Parent Emoji"
+msgstr ""
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__parent_path
@@ -5513,7 +5535,7 @@ msgstr "Mise à jour des podcasts 📻"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/composer/composer_patch.js:0
+#: code:addons/knowledge/static/src/mail/core/common/composer_patch.js:0
 msgid "Post"
 msgstr "Comptabiliser"
 
@@ -5549,57 +5571,50 @@ msgstr "Aperçu"
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi oi-"
+"filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Prix <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi oi-"
+"filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Prix <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_1
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi oi-"
+"filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
+"span>"
 msgstr ""
-"Prix <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi oi-"
+"filled\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Prix <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
-"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>​"
+"Price <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i></span>​"
 msgstr ""
-"Prix <span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>​"
 
 #. module: knowledge
 #. odoo-javascript
@@ -5610,7 +5625,6 @@ msgstr "Primaire"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.js:0
-#: code:addons/knowledge/static/src/components/sidebar/sidebar_section.xml:0
 #: model:ir.model.fields.selection,name:knowledge.selection__knowledge_article__category__private
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
 msgid "Private"
@@ -5627,6 +5641,8 @@ msgid "Productivity"
 msgstr "Productivité"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/side_panel/side_panel.js:0
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__article_properties
 msgid "Properties"
 msgstr "Propriétés"
@@ -5694,7 +5710,7 @@ msgstr "Évaluations"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/mail/message/message_actions.js:0
+#: code:addons/knowledge/static/src/mail/core/common/message_actions.js:0
 msgid "Re-open the discussion"
 msgstr "Réouvrir la discussion"
 
@@ -5746,13 +5762,7 @@ msgstr "Supprimer la couverture"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Remove From Favorites"
-msgstr "Retirer des favoris"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-#: code:addons/knowledge/static/src/mail/emoji_picker/emoji_picker_patch.xml:0
+#: code:addons/knowledge/static/src/mail/core/web/emoji_picker_patch.xml:0
 msgid "Remove Icon"
 msgstr "Supprimer l'icône"
 
@@ -5782,6 +5792,12 @@ msgstr "Supprimer la couverture"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
+msgid "Remove from Favorite"
+msgstr "Retirer des favoris"
+
+#. module: knowledge
+#. odoo-javascript
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.xml:0
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
 msgid "Remove from Templates"
@@ -5797,6 +5813,7 @@ msgstr "Supprimer des favoris"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/prompt_embedded_view_name_dialog/prompt_embedded_view_name_dialog.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 msgid "Rename"
 msgstr "Renommer"
 
@@ -5827,8 +5844,8 @@ msgstr "Repositionner la couverture"
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/comments/comments_panel/comments_panel.xml:0
-msgid "Resolved Discussions"
-msgstr "Discussions résolues"
+msgid "Resolved"
+msgstr ""
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__activity_user_id
@@ -5924,12 +5941,6 @@ msgstr "Enregistrer la position"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/form_status_indicator/form_status_indicator.xml:0
-msgid "Save manually"
-msgstr "Enregistrer manuellement"
-
-#. module: knowledge
-#. odoo-javascript
 #: code:addons/knowledge/static/src/components/knowledge_cover/knowledge_cover.xml:0
 msgid "Save position"
 msgstr "Enregistrer la position"
@@ -6022,16 +6033,9 @@ msgstr "Envoyer en tant que message"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_tree
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 msgid "Send to Trash"
 msgstr "Envoyer à la corbeille"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/views/item_calendar/item_calendar_view.js:0
-msgid "Send to trash"
-msgstr "Déplacer vers la corbeille"
 
 #. module: knowledge
 #: model:ir.model.fields,field_description:knowledge.field_knowledge_article__sequence
@@ -6042,20 +6046,29 @@ msgstr "Séquence"
 
 #. module: knowledge
 #. odoo-javascript
+#: code:addons/knowledge/static/src/components/permission_panel/permission_panel.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 #: code:addons/knowledge/static/src/components/topbar/topbar.xml:0
+#: model:ir.actions.act_window,name:knowledge.knowledge_invite_action_from_article
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_invite_view_form
 msgid "Share"
 msgstr "Partager"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/permission_panel_dialog/permission_panel_dialog.xml:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.js:0
+msgid "Share Settings for %(title)s"
+msgstr "Partager les paramètres pour %(title)s"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/permission_panel_dialog/permission_panel_dialog.js:0
 msgid "Share settings"
 msgstr "Paramètres de partage"
 
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.js:0
-#: code:addons/knowledge/static/src/components/sidebar/sidebar_section.xml:0
 #: model:ir.model.fields.selection,name:knowledge.selection__knowledge_article__category__shared
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
 msgid "Shared"
@@ -6075,18 +6088,6 @@ msgstr "Liste to-do partagée"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Show Chatter"
-msgstr "Afficher le chatter"
-
-#. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-msgid "Show Comments"
-msgstr "Afficher les commentaires"
-
-#. module: knowledge
-#. odoo-javascript
 #: code:addons/knowledge/static/src/comments/comment/comment.xml:0
 msgid "Show Less"
 msgstr "Afficher moins"
@@ -6099,10 +6100,15 @@ msgstr "Voir plus"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
-#: code:addons/knowledge/static/src/components/topbar/topbar.xml:0
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.xml:0
 msgid "Show Properties"
 msgstr "Afficher les propriétés"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/side_panel/side_panel_toolbar.xml:0
+msgid "Show Table of Contents"
+msgstr "Afficher la table des matières"
 
 #. module: knowledge
 #. odoo-javascript
@@ -6143,61 +6149,51 @@ msgstr "Taille :"
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
-"Social <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i class=\"fa "
-"fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
+"Social <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i class=\"oi "
+"oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Social <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i class=\"fa "
-"fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
 "Social Status <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Statut social <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
 "Social Status <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
 "span>"
 msgstr ""
-"Statut social <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
 "Social Status <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Statut social <span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_1
 msgid ""
 "Social Status ​<span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Statut social ​<span class=\"o_stars o_five_stars\" id=\"checkId-4\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model:knowledge.article,template_name:knowledge.knowledge_article_template_software_specification
@@ -6208,8 +6204,8 @@ msgstr "Spécification du logiciel"
 #. module: knowledge
 #. odoo-python
 #: code:addons/knowledge/models/knowledge_article.py:0
-msgid "Some articles have been sent to Trash"
-msgstr "Certains articles ont été envoyés dans la corbeille"
+msgid "Some articles have been moved to Trash"
+msgstr "Certains articles ont été déplacés vers la corbeille"
 
 #. module: knowledge
 #. odoo-javascript
@@ -6231,50 +6227,40 @@ msgstr "Feedback de la source"
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_3
 msgid ""
 "Speed of Service <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i></span>"
 msgstr ""
-"Rapidité du service <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_4
 msgid ""
 "Speed of Service <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi oi-filled\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></"
 "span>"
 msgstr ""
-"Rapidité du service <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-"
-"star\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_1
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_persona_2
 msgid ""
 "Speed of Service <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"class=\"oi oi-filled\" data-icon=\"star\"></i><i class=\"oi oi-filled\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Rapidité du service <span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star\"></i><i class=\"fa fa-star\"></i><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_customer_personas
 msgid ""
 "Speed of Service ​<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
+"class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></"
+"i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"Rapidité du service ​<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
-"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></"
-"span>"
 
 #. module: knowledge
 #: model:knowledge.article,template_name:knowledge.knowledge_article_template_sprint_calendar
@@ -6326,12 +6312,6 @@ msgid "Start typing"
 msgstr "Commencez à écrire"
 
 #. module: knowledge
-#. odoo-javascript
-#: code:addons/knowledge/static/src/components/knowledge_html_field/knowledge_html_field.js:0
-msgid "Start with a title..."
-msgstr "Commencez par un titre..."
-
-#. module: knowledge
 #: model_terms:digest.tip,tip_description:knowledge.digest_tip_knowledge_2
 msgid ""
 "Start working together on any Knowledge Article by sharing your article with "
@@ -6349,9 +6329,9 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "Statut basé sur les activités\n"
-"En retard : la date d'échéance est déjà dépassée\n"
+"En retard : l'échéance est déjà dépassée\n"
 "Aujourd'hui : la date d'activité est aujourd'hui\n"
-"Planifiée : activités futures"
+"Planifié : activités futures."
 
 #. module: knowledge
 #. odoo-javascript
@@ -6360,10 +6340,21 @@ msgid "Stop Date"
 msgstr "Date d'arrêt"
 
 #. module: knowledge
+#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__summary
+msgid "Summary"
+msgstr "Résumé"
+
+#. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/editor/embedded_components/backend/article_index/article_index.xml:0
 msgid "Switch Mode"
 msgstr "Basculer le mode"
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/side_panel/side_panel.js:0
+msgid "Table of Contents"
+msgstr "Table des matières"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_sales_playbook
@@ -6437,6 +6428,9 @@ msgid "Template used to generate the article"
 msgstr "Modèle utilisé pour générer l’article"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
+#: code:addons/knowledge/static/src/components/wysiwyg_article_helper/wysiwyg_article_helper.xml:0
 #: model:ir.ui.menu,name:knowledge.knowledge_article_template_menu
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
 msgid "Templates"
@@ -6496,6 +6490,12 @@ msgid "The Future Entrepreneurship Fair"
 msgstr "Salon du futur de l'entrepreneuriat"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/toc_panel/toc_panel.xml:0
+msgid "The Table of Contents will appear here."
+msgstr "La table des matières apparaîtra ici."
+
+#. module: knowledge
 #. odoo-python
 #: code:addons/knowledge/models/knowledge_article.py:0
 msgid "The article '%s' needs at least one member with 'Write' access."
@@ -6519,6 +6519,16 @@ msgid ""
 msgstr ""
 "L'emplacement de destination de %(article_name)s est ambigu. Veuillez "
 "préciser la catégorie."
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "The following article has been moved to Trash:"
+msgstr "L’article suivant a été déplacé vers la corbeille :"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "The following articles have been moved to Trash:"
+msgstr "Les articles suivants ont été déplacés vers la corbeille :"
 
 #. module: knowledge
 #. odoo-python
@@ -6737,7 +6747,10 @@ msgid "Toggle aside menu"
 msgstr "Toggle Menu latéral"
 
 #. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/sidebar/sidebar.xml:0
 #: model:ir.actions.act_window,name:knowledge.knowledge_article_action_trashed
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_tree_items
 msgid "Trash"
 msgstr "Corbeille"
@@ -6773,18 +6786,15 @@ msgstr "Saisissez du texte dans cette section"
 
 #. module: knowledge
 #. odoo-javascript
-#: code:addons/knowledge/static/src/components/form_status_indicator/form_status_indicator.xml:0
-msgid "Unable to save. Correct the issue or discard all changes"
-msgstr ""
-"Impossible de sauvegarder. Résoudre le problème ou annuler toutes les "
-"modifications."
-
-#. module: knowledge
-#. odoo-javascript
 #: code:addons/knowledge/static/src/components/options_dropdown/options_dropdown.xml:0
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_form
 msgid "Unarchive"
 msgstr "Désarchiver"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "Unless restored,"
+msgstr "À moins d’être restauré,"
 
 #. module: knowledge
 #. odoo-javascript
@@ -6800,9 +6810,12 @@ msgstr "Déverrouiller"
 #: code:addons/knowledge/static/src/components/article_template_picker_dialog/article_template_picker_dialog.xml:0
 #: code:addons/knowledge/static/src/components/hierarchy/hierarchy.xml:0
 #: code:addons/knowledge/static/src/components/permission_panel/permission_panel.js:0
+#: code:addons/knowledge/static/src/components/sidebar/rename_popover.xml:0
 #: code:addons/knowledge/static/src/components/sidebar/sidebar.js:0
+#: code:addons/knowledge/static/src/components/sidebar/sidebar_row.js:0
 #: code:addons/knowledge/static/src/components/sidebar/sidebar_row.xml:0
 #: code:addons/knowledge/static/src/editor/html_migrations/migration-1.0.js:0
+#: code:addons/knowledge/static/src/editor/plugins/article_plugin/article_plugin.js:0
 #: code:addons/knowledge/static/src/webclient/commands/knowledge_providers.js:0
 #: code:addons/knowledge/static/src/xml/knowledge_command_palette.xml:0
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_hierarchy
@@ -6839,6 +6852,12 @@ msgid "Use the /clipboard command on a Knowledge Article and get going."
 msgstr ""
 "Utilisez la commande /presse-papiers sur un article de Connaissances et "
 "lancez-vous."
+
+#. module: knowledge
+#. odoo-javascript
+#: code:addons/knowledge/static/src/components/toc_panel/toc_panel.xml:0
+msgid "Use the /heading command to insert your first title."
+msgstr "Utilisez la commande /heading pour insérer votre premier titre."
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_brand_assets
@@ -6914,18 +6933,6 @@ msgid "We already cannot wait for the next one🏃"
 msgstr "Vivement la prochaine édition🏃"
 
 #. module: knowledge
-#: model:ir.model.fields,field_description:knowledge.field_knowledge_article__website_message_ids
-#: model:ir.model.fields,field_description:knowledge.field_knowledge_article_thread__website_message_ids
-msgid "Website Messages"
-msgstr "Messages du site web"
-
-#. module: knowledge
-#: model:ir.model.fields,help:knowledge.field_knowledge_article__website_message_ids
-#: model:ir.model.fields,help:knowledge.field_knowledge_article_thread__website_message_ids
-msgid "Website communication history"
-msgstr "Historique de communication du site web"
-
-#. module: knowledge
 #. odoo-python
 #: code:addons/knowledge/models/res_users.py:0
 msgid "Welcome %s"
@@ -6972,19 +6979,18 @@ msgstr ""
 #. module: knowledge
 #: model:ir.model.fields,help:knowledge.field_knowledge_article__to_delete
 msgid ""
-"When sent to trash, articles are flagged to be deleted\n"
+"When moved to trash, articles are flagged to be deleted\n"
 "                days after last edit. knowledge_article_trash_limit_days "
 "config\n"
 "                parameter can be used to modify the number of days. \n"
 "                (default is 30)"
 msgstr ""
-"Lorsqu'ils sont envoyés à la corbeille, les articles sont marqués pour être "
-"supprimés\n"
-" quelques jours après la dernière modification. Le paramètre de "
-"configuration\n"
-" knowledge_article_trash_limit_days peut être utilisé pour modifier le "
-"nombre de jours.\n"
-"(la valeur par défaut est 30)"
+"Lorsqu’ils sont déplacés vers la corbeille, les articles sont marqués pour "
+"être supprimés\n"
+"jours après la dernière modification. Le paramètre "
+"knowledge_article_trash_limit_days\n"
+"peut être utilisé pour modifier le nombre de jours.\n"
+"(par défaut : 30)"
 
 #. module: knowledge
 #: model:ir.model.fields,help:knowledge.field_knowledge_article__full_width
@@ -7080,7 +7086,6 @@ msgstr ""
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/components/move_article_dialog/move_article_dialog.js:0
-#: code:addons/knowledge/static/src/components/sidebar/sidebar_section.xml:0
 #: model:ir.model.fields.selection,name:knowledge.selection__knowledge_article__category__workspace
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_search
 msgid "Workspace"
@@ -7338,19 +7343,25 @@ msgstr ""
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
-msgid "and the following child article(s) have"
-msgstr "et les articles enfants suivants ont"
+msgid "and the following child"
+msgstr "et l’article enfant suivant"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "article"
+msgstr "article"
 
 #. module: knowledge
 #. odoo-javascript
 #: code:addons/knowledge/static/src/webclient/commands/knowledge_providers.js:0
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
 msgid "articles"
 msgstr "articles"
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
-msgid "been sent to Trash.<br/>"
-msgstr "envoyé à la corbeille.<br/>"
+msgid "at any time before then."
+msgstr "à tout moment avant cette date."
 
 #. module: knowledge
 #. odoo-javascript
@@ -7368,6 +7379,16 @@ msgstr "contactez la personne chargée du parc automobile"
 #: code:addons/knowledge/static/src/components/knowledge_cover/knowledge_cover.xml:0
 msgid "cover"
 msgstr "couverture"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "day"
+msgstr "jour"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "days"
+msgstr "jours"
 
 #. module: knowledge
 #. odoo-javascript
@@ -7394,13 +7415,13 @@ msgstr "par ex. À faire"
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
-msgid "has"
-msgstr "a"
+msgid "has been moved to Trash."
+msgstr "a été déplacé vers la corbeille."
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
-msgid "have"
-msgstr "ont"
+msgid "have been moved to Trash:"
+msgstr "ont été déplacés vers la corbeille :"
 
 #. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_mail_invite
@@ -7446,6 +7467,16 @@ msgid "the article"
 msgstr "l'article"
 
 #. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "these articles will be permanently deleted in"
+msgstr "ces articles seront définitivement supprimés dans"
+
+#. module: knowledge
+#: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_trash_notification
+msgid "this article will be permanently deleted in"
+msgstr "cet article sera définitivement supprimé dans"
+
+#. module: knowledge
 #: model_terms:ir.ui.view,arch_db:knowledge.knowledge_article_view_form
 msgid "to unleash the power of Knowledge !"
 msgstr "pour libérer le pouvoir de Connaissances !"
@@ -7458,35 +7489,29 @@ msgstr "écrire"
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_software_specification
 msgid ""
-"​<span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"​<span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"​<span class=\"o_stars o_five_stars\" id=\"checkId-1\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_software_specification
 msgid ""
-"​<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"​<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"​<span class=\"o_stars o_five_stars\" id=\"checkId-2\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_software_specification
 msgid ""
-"​<span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
+"​<span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i class=\"oi\" data-"
+"icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i class=\"oi\" "
+"data-icon=\"star\"></i><i class=\"oi\" data-icon=\"star\"></i><i "
+"class=\"oi\" data-icon=\"star\"></i></span>"
 msgstr ""
-"​<span class=\"o_stars o_five_stars\" id=\"checkId-3\"><i class=\"fa fa-star-"
-"o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
-"class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i></span>"
 
 #. module: knowledge
 #: model_terms:knowledge.article,template_body:knowledge.knowledge_article_template_marketing_campaign_brief

@@ -1,10 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import tagged, TransactionCase
 
 from freezegun import freeze_time
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class HelpdeskSLA(TransactionCase):
 
     @classmethod
@@ -32,7 +33,7 @@ class HelpdeskSLA(TransactionCase):
             'team_id': cls.test_team.id,
             'time': 32,
             'stage_id': cls.stage_progress.id,
-            'priority': '1',
+            "criteria_domain": "[('priority', '=', '1')]",
         })
 
     def create_ticket(self, team, *arg, **kwargs):
@@ -58,7 +59,7 @@ class HelpdeskSLA(TransactionCase):
             dest_ticket = self.create_ticket(team=self.test_team, sla_ids=self.sla)
             dest_ticket.message_subscribe([follower_1.id, follower_2.id])
 
-        nearest_deadline = min(source_ticket.sla_status_ids.deadline, dest_ticket.sla_status_ids.deadline)
+        nearest_deadline = min(deadline for deadline in (source_ticket.sla_status_ids | dest_ticket.sla_status_ids).mapped('deadline') if deadline)
         self.env['helpdesk.ticket']._merge_method(dest_ticket, source_ticket)
 
         self.assertEqual(len(dest_ticket.message_follower_ids), 2, 'Follower 2 should be added')

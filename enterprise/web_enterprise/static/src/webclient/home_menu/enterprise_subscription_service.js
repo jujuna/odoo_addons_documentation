@@ -1,6 +1,6 @@
 import { registry } from "@web/core/registry";
 import { session } from "@web/session";
-import { browser } from "@web/core/browser/browser";
+import { location } from "@web/core/browser/browser";
 import { deserializeDateTime, serializeDate, formatDate } from "@web/core/l10n/dates";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
@@ -10,7 +10,7 @@ import { rpc } from "@web/core/network/rpc";
 import { SysAdminPanel } from "./sysadmin_panel";
 
 const { DateTime } = luxon;
-import { Component, reactive, xml, markup } from "@odoo/owl";
+import { Component, xml, markup, proxy } from "@odoo/owl";
 
 function daysUntil(datetime) {
     const duration = datetime.diff(DateTime.utc(), "days");
@@ -71,15 +71,15 @@ export class SubscriptionManager {
             ],
         ];
         const nbUsers = await this.orm.call("res.users", "search_count", args);
-        browser.location = `https://www.odoo.com/odoo-enterprise/upgrade?num_users=${nbUsers}`;
+        location.href = `https://www.odoo.com/odoo-enterprise/upgrade?num_users=${nbUsers}`;
     }
     /**
      * Save the registration code then triggers a ping to submit it.
      */
     async submitCode(enterpriseCode) {
         const [oldDate] = await Promise.all([
-            this.orm.call("ir.config_parameter", "get_param", ["database.expiration_date"]),
-            this.orm.call("ir.config_parameter", "set_param", [
+            this.orm.call("ir.config_parameter", "get_str", ["database.expiration_date"]),
+            this.orm.call("ir.config_parameter", "set_str", [
                 "database.enterprise_code",
                 enterpriseCode,
             ]),
@@ -88,11 +88,11 @@ export class SubscriptionManager {
         await this.orm.call("publisher_warranty.contract", "update_notification", [[]]);
 
         const [linkedSubscriptionUrl, linkedEmail, expirationDate] = await Promise.all([
-            this.orm.call("ir.config_parameter", "get_param", [
+            this.orm.call("ir.config_parameter", "get_str", [
                 "database.already_linked_subscription_url",
             ]),
-            this.orm.call("ir.config_parameter", "get_param", ["database.already_linked_email"]),
-            this.orm.call("ir.config_parameter", "get_param", ["database.expiration_date"]),
+            this.orm.call("ir.config_parameter", "get_str", ["database.already_linked_email"]),
+            this.orm.call("ir.config_parameter", "get_str", ["database.expiration_date"]),
         ]);
 
         if (linkedSubscriptionUrl) {
@@ -120,7 +120,7 @@ export class SubscriptionManager {
     async checkStatus() {
         await this.orm.call("publisher_warranty.contract", "update_notification", [[]]);
 
-        const expirationDateStr = await this.orm.call("ir.config_parameter", "get_param", [
+        const expirationDateStr = await this.orm.call("ir.config_parameter", "get_str", [
             "database.expiration_date",
         ]);
         this.lastRequestStatus = "update";
@@ -128,7 +128,7 @@ export class SubscriptionManager {
     }
 
     async sendUnlinkEmail() {
-        const sendUnlinkInstructionsUrl = await this.orm.call("ir.config_parameter", "get_param", [
+        const sendUnlinkInstructionsUrl = await this.orm.call("ir.config_parameter", "get_str", [
             "database.already_linked_send_mail_url",
         ]);
         this.mailDeliveryStatus = "ongoing";
@@ -142,19 +142,19 @@ export class SubscriptionManager {
     }
 
     async renew() {
-        const enterpriseCode = await this.orm.call("ir.config_parameter", "get_param", [
+        const enterpriseCode = await this.orm.call("ir.config_parameter", "get_str", [
             "database.enterprise_code",
         ]);
 
         const url = "https://www.odoo.com/odoo-enterprise/renew";
         const contractQueryString = enterpriseCode ? `?contract=${enterpriseCode}` : "";
-        browser.location = `${url}${contractQueryString}`;
+        location.href = `${url}${contractQueryString}`;
     }
 
     async upsell() {
         const limitDate = serializeDate(DateTime.utc().minus({ days: 15 }));
         const [enterpriseCode, nbUsers] = await Promise.all([
-            this.orm.call("ir.config_parameter", "get_param", ["database.enterprise_code"]),
+            this.orm.call("ir.config_parameter", "get_str", ["database.enterprise_code"]),
             this.orm.call("res.users", "search_count", [
                 [
                     ["share", "=", false],
@@ -164,19 +164,18 @@ export class SubscriptionManager {
         ]);
         const url = "https://www.odoo.com/odoo-enterprise/upsell";
         const contractQueryString = enterpriseCode ? `&contract=${enterpriseCode}` : "";
-        browser.location = `${url}?num_users=${nbUsers}${contractQueryString}`;
+        location.href = `${url}?num_users=${nbUsers}${contractQueryString}`;
     }
 }
 
 class ExpiredSubscriptionBlockUI extends Component {
-    static props = {};
     // TODO the "o_blockUI" div in there seems useless (it has 0 height and thus displays and does nothing)
     static template = xml`
-        <t t-if="subscription.daysLeft &lt;= 0">
+        <t t-if="this.subscription.daysLeft &lt;= 0">
             <div class="o_blockUI"/>
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1100" class="d-flex align-items-center justify-content-center">
-                <ExpirationPanel t-if="!subscription.sysadmin.replace"/>
-                <SysAdminPanel t-if="subscription.sysadmin.message and subscription.warningType === 'admin'"/>
+                <ExpirationPanel t-if="!this.subscription.sysadmin.replace"/>
+                <SysAdminPanel t-if="this.subscription.sysadmin.message and this.subscription.warningType === 'admin'"/>
             </div>
         </t>`;
     static components = { ExpirationPanel, SysAdminPanel };
@@ -192,7 +191,7 @@ export const enterpriseSubscriptionService = {
         registry
             .category("main_components")
             .add("expired_subscription_block_ui", { Component: ExpiredSubscriptionBlockUI });
-        return reactive(new SubscriptionManager(env, { orm, notification }));
+        return proxy(new SubscriptionManager(env, { orm, notification }));
     },
 };
 

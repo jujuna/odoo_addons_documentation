@@ -1,46 +1,28 @@
 import { mailModels } from "@mail/../tests/mail_test_helpers";
-import { mailDataHelpers } from "@mail/../tests/mock_server/mail_mock_server";
 
-import { fields, makeKwArgs } from "@web/../tests/web_test_helpers";
+import { fields } from "@web/../tests/web_test_helpers";
 import { serializeDateTime } from "@web/core/l10n/dates";
 
 const { DateTime } = luxon;
 
+const isWhatsAppChannel = (channel) => channel.channel_type === "whatsapp";
+
 export class DiscussChannel extends mailModels.DiscussChannel {
+    whatsapp_channel_blocked = fields.Boolean({ default: false });
     whatsapp_channel_valid_until = fields.Datetime({
         default: () => serializeDateTime(DateTime.local().plus({ days: 1 })),
     });
     wa_account_id = fields.Generic({ default: () => 1 });
 
-    /**
-     * @override
-     * @type {typeof mailModels.DiscussChannel["prototype"]["_to_store"]}
-     */
-    _to_store(store, fields) {
-        /** @type {import("mock_models").ResPartner} */
-        const ResPartner = this.env["res.partner"];
-
-        super._to_store(...arguments);
-        if (fields && Array.isArray(fields) && fields.length) {
-            return;
-        }
-        const channels = this._filter([
-            ["id", "in", this.map((channel) => channel.id)],
-            ["channel_type", "=", "whatsapp"],
-        ]);
-        for (const channel of channels) {
-            store._add_record_fields(this.browse(channel.id), {
-                whatsapp_channel_valid_until: channel.whatsapp_channel_valid_until || false,
-                whatsapp_partner_id: mailDataHelpers.Store.one(
-                    ResPartner.browse(channel.whatsapp_partner_id),
-                    makeKwArgs({ only_id: true })
-                ),
-                wa_account_id: mailDataHelpers.Store.one(
-                    this.env["whatsapp.account"].browse(channel.wa_account_id),
-                    makeKwArgs({ fields: ["name"] })
-                ),
-            });
-        }
+    /** @override */
+    _store_channel_fields(res) {
+        super._store_channel_fields(res);
+        res.one("group_public_id", ["full_name"], { predicate: isWhatsAppChannel });
+        res.attr("whatsapp_channel_blocked", undefined, { predicate: isWhatsAppChannel });
+        res.attr("whatsapp_channel_valid_until", undefined, { predicate: isWhatsAppChannel });
+        res.one("whatsapp_partner_id", [], { predicate: isWhatsAppChannel });
+        // sudo: discuss.channel - reading wa_account_id is allowed for multi-company users
+        res.one("wa_account_id", ["name"], { predicate: isWhatsAppChannel, sudo: true });
     }
 
     /**

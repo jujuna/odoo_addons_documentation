@@ -3,16 +3,18 @@
     <t t-name="knowledge.MacrosEmbeddedClipboard" t-inherit="knowledge.EmbeddedClipboard" t-inherit-mode="primary">
         <xpath expr='//EmbeddedComponentToolbarButton[@name="&apos;copyToClipboard&apos;"]' position="before">
             <EmbeddedComponentToolbarButton
-                hidden="!targetRecordInfo?.canPostMessages"
-                icon="'fa-envelope'"
+                hidden="!this.targetRecordInfo?.canPostMessages"
+                icon="'mail'"
+                iconClass="'oi-filled'"
                 label.translate="Send as Message"
-                onClick.bind="onClickSendAsMessage"
+                onClick.bind="this.onClickSendAsMessage"
             />
             <EmbeddedComponentToolbarButton
-                hidden="!targetRecordInfo?.withHtmlField"
-                icon="'fa-pencil-square'"
-                label="htmlFieldTargetMessage"
-                onClick.bind="onClickUseAsDescription"
+                hidden="!this.targetRecordInfo?.withHtmlField"
+                icon="'edit_square'"
+                iconClass="'oi-filled'"
+                label="this.htmlFieldTargetMessage"
+                onClick.bind="this.onClickUseAsDescription"
             />
         </xpath>
     </t>

@@ -6,6 +6,8 @@ from odoo.addons.point_of_sale.tests.common import TestPoSCommon
 
 class TestMxEdiPosCommon(TestMxEdiCommon, TestPoSCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -22,8 +24,10 @@ class TestMxEdiPosCommon(TestMxEdiCommon, TestPoSCommon):
     def with_pos_session(self):
         session = self.open_new_session(0.0)
         yield session
-        session.post_closing_cash_details(0.0)
-        session.close_session_from_ui()
+        cash_pm = self.config._get_cash_payment_method()
+        session.close_session_from_ui({
+            cash_pm.id: 0,
+        })
 
     @contextmanager
     def create_and_invoice_order(self):
@@ -48,12 +52,18 @@ class TestMxEdiPosCommon(TestMxEdiCommon, TestPoSCommon):
         results = self.env['pos.order'].sync_from_ui([order_data])
         return self.env['pos.order'].browse([order['id'] for order in results['pos.order']])
 
+    def _create_orders_global_invoice(self, orders):
+        self.env['l10n_mx_edi.global_invoice.create'] \
+            .with_context(orders.l10n_mx_edi_action_create_global_invoice()['context']) \
+            .create({}) \
+            .action_create_global_invoice()
+
     def _assert_order_cfdi(self, order, filename):
-        document = order.l10n_mx_edi_document_ids.filtered(lambda x: x.state == 'invoice_sent')[:1]
+        document = order.l10n_mx_edi_document_ids.sorted().filtered(lambda x: x.state == 'invoice_sent')[:1]
         self.assertTrue(document)
-        self._assert_document_cfdi(document, filename)
+        self._assert_document_cfdi(document, filename, subfolder='global_invoice_refund')
 
     def _assert_global_invoice_cfdi_from_orders(self, orders, filename):
-        document = orders.l10n_mx_edi_document_ids.filtered(lambda x: x.state == 'ginvoice_sent')[:1]
+        document = orders.l10n_mx_edi_document_ids.sorted().filtered(lambda x: x.state == 'ginvoice_sent')[:1]
         self.assertTrue(document)
-        self._assert_document_cfdi(document, filename)
+        self._assert_document_cfdi(document, filename, subfolder='global_invoice')

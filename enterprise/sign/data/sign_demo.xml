@@ -10,7 +10,7 @@
 
     <record id="attachment_sign_1" model="ir.attachment">
         <field name="name">Employment Contract.pdf</field>
-        <field name="datas" type="base64" file="sign/static/demo/employment.pdf"/>
+        <field name="raw" type="bytes" file="sign/static/demo/employment.pdf"/>
         <field name="mimetype">application/pdf;base64</field>
     </record>
     <record id="template_sign_1" model="sign.template">
@@ -102,7 +102,7 @@
 
     <record id="attachment_sign_2" model="ir.attachment">
         <field name="name">Non-Disclosure Agreement.pdf</field>
-        <field name="datas" type="base64" file="sign/static/demo/nda.pdf"/>
+        <field name="raw" type="bytes" file="sign/static/demo/nda.pdf"/>
         <field name="mimetype">application/pdf</field>
     </record>
     <record id="template_sign_2" model="sign.template">
@@ -119,7 +119,7 @@
     <record model="sign.item" id="sign_item_10">
         <field name="document_id" ref="document_sign_2"/>
         <field name="type_id" ref="sign_item_type_name"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_2"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.125</field>
         <field name="posY" type="float">0.175</field>
@@ -130,7 +130,7 @@
     <record model="sign.item" id="sign_item_11">
         <field name="document_id" ref="document_sign_2"/>
         <field name="type_id" ref="sign_item_type_text"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_2"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.355</field>
         <field name="posY" type="float">0.175</field>
@@ -141,7 +141,7 @@
     <record model="sign.item" id="sign_item_12">
         <field name="document_id" ref="document_sign_2"/>
         <field name="type_id" ref="sign_item_type_initial"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_2"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.915</field>
         <field name="posY" type="float">0.970</field>
@@ -152,7 +152,7 @@
     <record model="sign.item" id="sign_item_13">
         <field name="document_id" ref="document_sign_2"/>
         <field name="type_id" ref="sign_item_type_initial"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_2"/>
         <field name="page" type="int">2</field>
         <field name="posX" type="float">0.915</field>
         <field name="posY" type="float">0.970</field>
@@ -163,7 +163,7 @@
     <record model="sign.item" id="sign_item_14">
         <field name="document_id" ref="document_sign_2"/>
         <field name="type_id" ref="sign_item_type_initial"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_2"/>
         <field name="page" type="int">3</field>
         <field name="posX" type="float">0.915</field>
         <field name="posY" type="float">0.970</field>
@@ -174,7 +174,7 @@
     <record model="sign.item" id="sign_item_15">
         <field name="document_id" ref="document_sign_2"/>
         <field name="type_id" ref="sign_item_type_initial"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_2"/>
         <field name="page" type="int">4</field>
         <field name="posX" type="float">0.915</field>
         <field name="posY" type="float">0.970</field>
@@ -185,7 +185,7 @@
     <record model="sign.item" id="sign_item_16">
         <field name="document_id" ref="document_sign_2"/>
         <field name="type_id" ref="sign_item_type_signature"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_2"/>
         <field name="page" type="int">5</field>
         <field name="posX" type="float">0.215</field>
         <field name="posY" type="float">0.365</field>
@@ -196,7 +196,7 @@
     <record model="sign.item" id="sign_item_18">
         <field name="document_id" ref="document_sign_2"/>
         <field name="type_id" ref="sign_item_type_name"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_2"/>
         <field name="page" type="int">5</field>
         <field name="posX" type="float">0.215</field>
         <field name="posY" type="float">0.445</field>
@@ -207,7 +207,7 @@
 
     <record id="attachment_sign_3" model="ir.attachment">
         <field name="name">Odoo_Individual_Contributor_License_Agreement.pdf</field>
-        <field name="datas" type="base64" file="sign/static/demo/cla.pdf"/>
+        <field name="raw" type="bytes" file="sign/static/demo/cla.pdf"/>
         <field name="mimetype">application/pdf;base64</field>
     </record>
     <record id="template_sign_3" model="sign.template">
@@ -221,7 +221,7 @@
     <record model="sign.item" id="sign_item_20">
         <field name="document_id" ref="document_sign_3"/>
         <field name="type_id" ref="sign_item_type_initial"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_3"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.915</field>
         <field name="posY" type="float">0.970</field>
@@ -232,7 +232,7 @@
     <record model="sign.item" id="sign_item_21">
         <field name="document_id" ref="document_sign_3"/>
         <field name="type_id" ref="sign_item_type_name"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_3"/>
         <field name="page" type="int">2</field>
         <field name="posX" type="float">0.290</field>
         <field name="posY" type="float">0.600</field>
@@ -243,7 +243,7 @@
     <record model="sign.item" id="sign_item_22">
         <field name="document_id" ref="document_sign_3"/>
         <field name="type_id" ref="sign_item_type_email"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_3"/>
         <field name="page" type="int">2</field>
         <field name="posX" type="float">0.290</field>
         <field name="posY" type="float">0.631</field>
@@ -254,7 +254,7 @@
     <record model="sign.item" id="sign_item_23">
         <field name="document_id" ref="document_sign_3"/>
         <field name="type_id" ref="sign_item_type_text"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_3"/>
         <field name="page" type="int">2</field>
         <field name="posX" type="float">0.290</field>
         <field name="posY" type="float">0.662</field>
@@ -265,7 +265,7 @@
     <record model="sign.item" id="sign_item_24">
         <field name="document_id" ref="document_sign_3"/>
         <field name="type_id" ref="sign_item_type_date"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_3"/>
         <field name="page" type="int">2</field>
         <field name="posX" type="float">0.290</field>
         <field name="posY" type="float">0.693</field>
@@ -276,7 +276,7 @@
     <record model="sign.item" id="sign_item_25">
         <field name="document_id" ref="document_sign_3"/>
         <field name="type_id" ref="sign_item_type_signature"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_3"/>
         <field name="page" type="int">2</field>
         <field name="posX" type="float">0.290</field>
         <field name="posY" type="float">0.725</field>
@@ -287,7 +287,7 @@
 
     <record id="attachment_sign_4" model="ir.attachment">
         <field name="name">Real_Estate_Listing_Agreement.pdf</field>
-        <field name="datas" type="base64" file="sign/static/demo/rela.pdf"/>
+        <field name="raw" type="bytes" file="sign/static/demo/rela.pdf"/>
         <field name="mimetype">application/pdf</field>
     </record>
     <record id="template_sign_4" model="sign.template">
@@ -304,7 +304,7 @@
     <record model="sign.item" id="sign_item_27">
         <field name="document_id" ref="document_sign_4"/>
         <field name="type_id" ref="sign_item_type_name"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_4"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.155</field>
         <field name="posY" type="float">0.206</field>
@@ -315,7 +315,7 @@
     <record model="sign.item" id="sign_item_29">
         <field name="document_id" ref="document_sign_4"/>
         <field name="type_id" ref="sign_item_type_initial"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_4"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.915</field>
         <field name="posY" type="float">0.970</field>
@@ -326,7 +326,7 @@
     <record model="sign.item" id="sign_item_31">
         <field name="document_id" ref="document_sign_4"/>
         <field name="type_id" ref="sign_item_type_name"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_4"/>
         <field name="page" type="int">2</field>
         <field name="posX" type="float">0.535</field>
         <field name="posY" type="float">0.801</field>
@@ -337,7 +337,7 @@
     <record model="sign.item" id="sign_item_33">
         <field name="document_id" ref="document_sign_4"/>
         <field name="type_id" ref="sign_item_type_signature"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_4"/>
         <field name="page" type="int">2</field>
         <field name="posX" type="float">0.565</field>
         <field name="posY" type="float">0.820</field>
@@ -348,7 +348,7 @@
 
     <record id="attachment_sign_5" model="ir.attachment">
         <field name="name">YC_Form_SaaS_Agreement.pdf</field>
-        <field name="datas" type="base64" file="sign/static/demo/saas.pdf"/>
+        <field name="raw" type="bytes" file="sign/static/demo/saas.pdf"/>
         <field name="mimetype">application/pdf</field>
     </record>
     <record id="template_sign_5" model="sign.template">
@@ -363,7 +363,7 @@
     <record model="sign.item" id="sign_item_34">
         <field name="document_id" ref="document_sign_5"/>
         <field name="type_id" ref="sign_item_type_company"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_5"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.210</field>
         <field name="posY" type="float">0.125</field>
@@ -374,7 +374,7 @@
     <record model="sign.item" id="sign_item_35">
         <field name="document_id" ref="document_sign_5"/>
         <field name="type_id" ref="sign_item_type_name"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_5"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.610</field>
         <field name="posY" type="float">0.125</field>
@@ -385,7 +385,7 @@
     <record model="sign.item" id="sign_item_36">
         <field name="document_id" ref="document_sign_5"/>
         <field name="type_id" ref="sign_item_type_email"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_5"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.180</field>
         <field name="posY" type="float">0.150</field>
@@ -396,7 +396,7 @@
     <record model="sign.item" id="sign_item_37">
         <field name="document_id" ref="document_sign_5"/>
         <field name="type_id" ref="sign_item_type_phone"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_5"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.600</field>
         <field name="posY" type="float">0.150</field>
@@ -407,7 +407,7 @@
     <record model="sign.item" id="sign_item_43">
         <field name="document_id" ref="document_sign_5"/>
         <field name="type_id" ref="sign_item_type_company"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_5"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.570</field>
         <field name="posY" type="float">0.655</field>
@@ -418,7 +418,7 @@
     <record model="sign.item" id="sign_item_45">
         <field name="document_id" ref="document_sign_5"/>
         <field name="type_id" ref="sign_item_type_signature"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_5"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.570</field>
         <field name="posY" type="float">0.675</field>
@@ -429,7 +429,7 @@
     <record model="sign.item" id="sign_item_46">
         <field name="document_id" ref="document_sign_5"/>
         <field name="type_id" ref="sign_item_type_initial"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_5"/>
         <field name="page" type="int">2</field>
         <field name="posX" type="float">0.915</field>
         <field name="posY" type="float">0.970</field>
@@ -440,7 +440,7 @@
     <record model="sign.item" id="sign_item_47">
         <field name="document_id" ref="document_sign_5"/>
         <field name="type_id" ref="sign_item_type_initial"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_5"/>
         <field name="page" type="int">3</field>
         <field name="posX" type="float">0.915</field>
         <field name="posY" type="float">0.970</field>
@@ -451,7 +451,7 @@
     <record model="sign.item" id="sign_item_48">
         <field name="document_id" ref="document_sign_5"/>
         <field name="type_id" ref="sign_item_type_initial"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_5"/>
         <field name="page" type="int">4</field>
         <field name="posX" type="float">0.915</field>
         <field name="posY" type="float">0.970</field>
@@ -467,7 +467,7 @@
 
     <record id="attachment_sign_6" model="ir.attachment">
         <field name="name">Rental_Agreement.pdf</field>
-        <field name="datas" type="base64" file="sign/static/demo/rental.pdf"/>
+        <field name="raw" type="bytes" file="sign/static/demo/rental.pdf"/>
         <field name="mimetype">application/pdf</field>
     </record>
     <record id="template_sign_6" model="sign.template">
@@ -478,20 +478,20 @@
         <field name="attachment_id" ref="attachment_sign_6"/>
         <field name="template_id" ref="template_sign_6"/>
     </record>
-    <record model="sign.item" id="sign_item_1">
+    <record model="sign.item" id="sign_item_6_1">
         <field name="document_id" ref="document_sign_6"/>
         <field name="type_id" ref="sign_item_type_name"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_6"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.050</field>
         <field name="posY" type="float">0.580</field>
         <field name="width" type="float">0.200</field>
         <field name="height" type="float">0.015</field>
     </record>
-    <record model="sign.item" id="sign_item_2">
+    <record model="sign.item" id="sign_item_6_2">
         <field name="document_id" ref="document_sign_6"/>
         <field name="type_id" ref="sign_item_type_signature"/>
-        <field name="responsible_id" ref="sign_item_role_default"/>
+        <field name="responsible_id" ref="sign_item_role_demo_6"/>
         <field name="page" type="int">1</field>
         <field name="posX" type="float">0.050</field>
         <field name="posY" type="float">0.600</field>
@@ -500,14 +500,14 @@
     </record>
 
     <record id="base.user_admin" model="res.users">
-        <field name="sign_signature" type="base64" file="sign/static/demo/signature.png"/>
+        <field name="sign_signature" type="bytes" file="sign/static/demo/signature.png"/>
     </record>
     <record model="sign.request" id="sign_request_01">
         <field name="template_id" ref="template_sign_4"/>
         <field name="reference">Your Real Estate Listing Agreement</field>
         <field name="subject">Your Real Estate Listing Agreement</field>
         <field name="request_item_ids" eval="[(5, 0, 0), (0,0,{
-            'role_id': ref('sign_item_role_default'),
+            'role_id': ref('sign_item_role_demo_4'),
             'partner_id': ref('base.partner_demo_portal'),
         })]"/>
     </record>
@@ -518,7 +518,7 @@
         <field name="subject">Your SAAS order</field>
         <field name="state">signed</field>
         <field name="request_item_ids" eval="[(5, 0, 0), (0,0,{
-            'role_id': ref('sign_item_role_default'),
+            'role_id': ref('sign_item_role_demo_5'),
             'partner_id': ref('base.partner_demo_portal'),
             'state': 'completed',
             'signer_email': 'portal@example.com',

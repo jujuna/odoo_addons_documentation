@@ -28,7 +28,7 @@ class TestHrContract(TestPayrollCommon):
             'contract_date_end':  date(2020, 4, 30),
             'resource_calendar_id': self.env.company.resource_calendar_id.id,
             'wage': 5000.0,
-            'contract_type_id': self.env.ref('l10n_in_hr_payroll.l10n_in_contract_type_probation').id,
+            'employee_type_id': self.env.ref('l10n_in_hr_payroll.l10n_in_contract_type_probation').id,
             'hr_responsible_id': user_admin_id,
         })
         with freeze_time("2020-05-07"):
@@ -49,7 +49,7 @@ class TestHrContract(TestPayrollCommon):
             'name': 'Test Version',
             'wage': 50000.0,
             'resource_calendar_id': self.env.company.resource_calendar_id.id,
-            'contract_type_id': self.env.ref('l10n_in_hr_payroll.l10n_in_contract_type_probation').id,
+            'employee_type_id': self.env.ref('l10n_in_hr_payroll.l10n_in_contract_type_probation').id,
             'hr_responsible_id': self.env.ref('base.user_admin').id,
         })
 
@@ -86,27 +86,26 @@ class TestHrContract(TestPayrollCommon):
     def test_in_hr_version_percentage_computation(self):
         """ Test the computation of percentage fields in hr.version model """
 
-        # TODO: fix this
-        if self.env.ref('base.module_hr_contract_salary').state == 'installed':
-            self.skipTest("Skip Test: Inconsistency with `hr_contract_salary` module")
-
-        version = self.rahul_emp.create_version({
-            'date_version': date(2025, 3, 1),
-            'contract_date_start': date(2025, 3, 1),
-            'contract_date_end':  date(2025, 6, 30),
-            'name': 'Test Version',
+        version = self.Employee.create({
+            'name': 'Percentage Employee',
+            'country_id': self.in_country.id,
+            'department_id': self.rd_dept.id,
+            'company_id': self.company_in.id,
+            'date_version': date(2023, 1, 1),
+            'contract_date_start': date(2023, 1, 1),
+            'contract_date_end': date(2023, 1, 31),
             'wage': 50000.0,
             'l10n_in_basic_salary_amount': 20000,
-            'l10n_in_hra': 10000,
-            'l10n_in_standard_allowance': 1100,
-            'l10n_in_performance_bonus': 1000,
-            'l10n_in_leave_travel_allowance': 1000,
+            'l10n_in_hra': 8000,
+            'l10n_in_standard_allowance': 1000,
+            'l10n_in_performance_bonus': 6000,
+            'l10n_in_leave_travel_allowance': 6000,
+            'l10n_in_gratuity': 962,
+        }).version_id
+        version.write({
+            'name': 'Test Version',
             'l10n_in_pf_employer_type': 'calculate',
             'l10n_in_pf_employee_type': 'calculate',
-            'l10n_in_gratuity': 962,
-            'resource_calendar_id': self.env.company.resource_calendar_id.id,
-            'contract_type_id': self.env.ref('l10n_in_hr_payroll.l10n_in_contract_type_probation').id,
-            'hr_responsible_id': self.env.ref('base.user_admin').id,
         })
 
         with Form(version) as version_form:
@@ -137,18 +136,32 @@ class TestHrContract(TestPayrollCommon):
         if 'hr_contract_salary' not in self.env["ir.module.module"]._installed():
             self.skipTest('hr_contract_salary is not installed')
 
-        default_percentage = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_in_basic_percent', raise_if_not_found=False)
         offer = self.env['hr.contract.salary.offer'].create([{
-            'monthly_wage': 0.0,
+            'salary_amount': 0.0,
+            'budget_type': 'yearly_employer',
         }])
 
-        offer.final_yearly_costs = 500000.0
-        version = offer._get_version()
+        offer.salary_amount = 500000.0
+        # Add the ctx key manually, as the test is running in a savepoint, can't use the ctx manager
+        version = offer.with_context(
+            hr_version_ctx_savepoint=True,  # can't import `HR_VERSION_CTX_KEY`, as this module doesn't depend on `hr_contract_salary`...
+            salary_simulation=True,
+            tracking_disable=True,
+        )._get_version()
         version.company_id.country_code = 'IN'
 
-        self.assertAlmostEqual(version.l10n_in_basic_percentage, default_percentage,
-        msg="Default basic percentage should be 60%")
-        self.assertEqual(version.l10n_in_basic_salary_amount, 25000.0)
+        self.assertAlmostEqual(version.l10n_in_basic_percentage, 0.5, places=2,
+        msg="Default basic percentage should be 50%")
+        self.assertAlmostEqual(version.l10n_in_basic_salary_amount, 20833.34, places=2)
+        version.l10n_in_pf_enabled = False
+        self.assertEqual(version.l10n_in_pf_employee_amount, 0.0,
+            msg="Opting out should reset employee PF amount")
+        self.assertEqual(version.l10n_in_pf_employer_amount, 0.0,
+            msg="Opting out should reset employer PF amount")
+        self.assertEqual(version.l10n_in_pf_employee_percentage, 0.0,
+            msg="Opting out should reset employee PF percentage")
+        self.assertEqual(version.l10n_in_pf_employer_percentage, 0.0,
+            msg="Opting out should reset employer PF percentage")
 
     def test_l10n_in_hourly_wage_monthly_conversion(self):
         """Hourly contracts should derive their monthly wage from the proper calendar."""
@@ -191,7 +204,7 @@ class TestHrContract(TestPayrollCommon):
             'contract_date_end': date(2026, 7, 31),
             'hourly_wage': 80.0,
             'l10n_in_basic_percentage': 0.2,
-            'resource_calendar_id': False,
+            'resource_calendar_id': company_calendar.id,
         })
         company_hourly_version.write({'wage_type': 'hourly'})
 

@@ -112,7 +112,7 @@ class L10nChIndividualAccount(models.Model):
             employee: {
                 'year': self.year,
                 'company': employee.company_id or self.company_id,
-                'contract_type': employee.version_id.contract_type_id.name or '',
+                'contract_type': employee.version_id.employee_type_id.name or '',
                 'job_title': employee.version_id.job_id.name or '',
                 'entry_date': employee.version_id.date_start or '',
                 'withdrawal_date': employee.version_id.date_end or '',

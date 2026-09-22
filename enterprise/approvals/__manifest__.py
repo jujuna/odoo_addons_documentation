@@ -19,7 +19,6 @@ creates next activities for the related approvers.
     'depends': ['mail', 'hr', 'product'],
     'data': [
         'security/approval_security.xml',
-        'security/ir.model.access.csv',
 
         'data/approval_category_data.xml',
         'data/mail_activity_type_data.xml',
@@ -32,22 +31,28 @@ creates next activities for the related approvers.
         'views/approval_request_template.xml',
         'report/approval_request_report.xml',
         'views/approval_request_views.xml',
+        'security/ir.access.csv',
     ],
     'demo':[
         'data/approval_demo.xml',
     ],
     'application': True,
-    'installable': True,
     'assets': {
         'web.assets_backend': [
-            'approvals/static/src/common/**',
+            'approvals/static/src/core/common/**',
             'approvals/static/src/web/**',
             'approvals/static/src/views/**',
             'approvals/static/src/scss/**',
         ],
+        "im_livechat.assets_embed_core": [
+            "approvals/static/src/core/common/**/*",
+        ],
         'mail.assets_public': [
-            'approvals/static/src/common/**',
+            'approvals/static/src/core/common/**',
          ],
+        "portal.assets_chatter_helpers": [
+            "approvals/static/src/core/common/**/*",
+        ],
         'web.assets_tests': [
             'approvals/static/tests/tours/**/*',
         ],

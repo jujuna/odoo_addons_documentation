@@ -10,6 +10,12 @@ class QRCodePaymentWizard(models.TransientModel):
     _description = "Generic Payment Wizard with QR Code"
 
     qr_code = fields.Html(compute='_compute_qr_code')
+    show_warning_missing_vat_number = fields.Boolean(compute='_compute_show_warning_missing_vat_number')
+
+    @api.depends('company_id.vat')
+    def _compute_show_warning_missing_vat_number(self):
+        for wizard in self:
+            wizard.show_warning_missing_vat_number = not bool(wizard.company_id.vat)
 
     @api.depends('partner_bank_id', 'communication', 'amount_to_pay')
     def _compute_qr_code(self):
@@ -41,3 +47,14 @@ class QRCodePaymentWizard(models.TransientModel):
             if src_list := tree.xpath('//img/@src'):
                 b64_qr = src_list[0]
         return b64_qr
+
+    def action_open_company_configuration_wizard(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self.env._('Set your company data'),
+            'res_model': 'res.company',
+            'res_id': self.company_id.id,
+            'views': [(self.env.ref('account.res_company_form_view_onboarding').id, "form")],
+            'target': 'new',
+        }

@@ -41,7 +41,7 @@
         <field name="user_id" ref="base.user_admin"/>
         <field name="client_order_ref">test_subscription_portal_0</field>
         <field name="plan_id" ref="sale_subscription.subscription_plan_month"/>
-        <field name="require_payment" eval='False'/>
+        <field name="prepayment_percent" eval='0'/>
     </record>
 
     <function model="sale.order" name="_onchange_sale_order_template_id" eval="[ref('test_subscription_portal_0')]"/>
@@ -54,7 +54,7 @@
         <field name="note">Full flow 2</field>
         <field name="client_order_ref">test_subscription_portal_1</field>
         <field name="plan_id" ref="sale_subscription.subscription_plan_month"/>
-        <field name="require_payment" eval='False'/>
+        <field name="prepayment_percent" eval='0'/>
     </record>
 
     <function
@@ -69,7 +69,7 @@
         <field name="team_id" ref="sales_team.team_sales_department"/>
         <field name="client_order_ref">test_subscription_portal_2</field>
         <field name="plan_id" ref="sale_subscription.subscription_plan_month"/>
-        <field name="require_payment" eval='False'/>
+        <field name="prepayment_percent" eval='0'/>
     </record>
 
     <function
@@ -83,7 +83,7 @@
         <field name="user_id" ref="base.user_demo"/>
         <field name="client_order_ref">test_subscription_portal_3</field>
         <field name="plan_id" ref="sale_subscription.subscription_plan_year"/>
-        <field name="require_payment" eval='False'/>
+        <field name="prepayment_percent" eval='0'/>
     </record>
 
     <function
@@ -99,7 +99,7 @@
         <field name="state">draft</field>
         <field name="client_order_ref">test_subscription_portal_4</field>
         <field name="plan_id" ref="sale_subscription.subscription_plan_6_month"/>
-        <field name="require_payment" eval='False'/>
+        <field name="prepayment_percent" eval='0'/>
     </record>
 
     <record id="rec_line_1" model="sale.order.line">

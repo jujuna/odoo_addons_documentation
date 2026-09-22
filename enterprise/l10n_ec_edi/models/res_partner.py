@@ -2,8 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
-from odoo.addons.l10n_ec.models.res_partner import PartnerIdTypeEc
-from odoo.addons.l10n_ec.models.res_partner import verify_final_consumer
+from odoo.addons.l10n_ec.models.res_partner import EC_PARTNER_ID_CODES, verify_final_consumer
 
 
 class ResPartner(models.Model):
@@ -29,21 +28,19 @@ class ResPartner(models.Model):
         """
         Returns ID code for edi documents, based on table 6 of SRI's electronic documents specification.
         """
-        partner_id_type = self._l10n_ec_get_identification_type()
-        if verify_final_consumer(self.vat):  # checks that all 13 digits are 9
-            return PartnerIdTypeEc.FINAL_CONSUMER
-        elif partner_id_type == 'foreign':
-            return PartnerIdTypeEc.FOREIGN
+        id_type, value = self._l10n_ec_get_identification_type()
+        if verify_final_consumer(value):  # checks that all 13 digits are 9
+            return EC_PARTNER_ID_CODES['final_consumer']
+        elif id_type == 'foreign':
+            return EC_PARTNER_ID_CODES['foreign']
         else:
             # Otherwise the EDI code corresponds to the one for out moves
-            return PartnerIdTypeEc.get_ats_code_for_partner(self, 'out_')
+            return self._l10n_ec_get_ats_code('out_')
 
     def _get_l10n_ec_edi_supplier_identification_type_code(self):
         # For the withhold xml in Ecuador, the provider type is identified as a company or a natural person
         # when the third digit of its identification is 6 or 9
-        if not self.vat:
+        identification = self._get_preferred_legal_entity_identifier_vals().get('value', '')
+        if not identification or len(identification) < 3:
             return None
-        supplier_code = '01'
-        if self.vat[2] in ['6', '9']:
-            supplier_code = '02'
-        return supplier_code
+        return '02' if identification[2] in ['6', '9'] else '01'

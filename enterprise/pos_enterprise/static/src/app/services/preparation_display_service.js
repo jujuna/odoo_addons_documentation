@@ -1,29 +1,38 @@
+import { proxy, usePlugin } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import { PosDataPlugin } from "@point_of_sale/app/plugins/pos_data_plugin";
+import { PosTicketPrinterPlugin } from "@point_of_sale/app/plugins/pos_ticket_printer_plugin";
 import { getOnNotified } from "@point_of_sale/utils";
 import { useService } from "@web/core/utils/hooks";
 import { redirect } from "@web/core/utils/urls";
 import { session } from "@web/session";
 import { user } from "@web/core/user";
 import { WithLazyGetterTrap } from "@point_of_sale/lazy_getter";
-import { useState } from "@odoo/owl";
 import { debounce } from "@web/core/utils/timing";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
+import { EpsonPrinter } from "@point_of_sale/app/utils/printer/epson_printer";
 
 const { DateTime } = luxon;
 
 export class PrepDisplay extends WithLazyGetterTrap {
-    static DEPENDENCIES = ["orm", "bus_service", "notification", "pos_data"];
+    static DEPENDENCIES = ["orm", "bus_service", "notification", "dialog"];
 
     constructor() {
         super(...arguments);
         this.ready = this.setup(...arguments).then(() => this);
     }
-    async setup({ env, deps: { pos_data, bus_service, notification, orm } }) {
+    async setup({ env, deps: { bus_service, notification, orm, dialog } }) {
+        this.data = usePlugin(PosDataPlugin);
+        this.ticketPrinter = usePlugin(PosTicketPrinterPlugin);
+        this.ticketPrinter.init(env);
+
         this.id = odoo.preparation_display.id;
         this.env = env;
         this.orm = orm;
-        this.data = pos_data;
         this.bus = bus_service;
         this.notification = notification;
+        this.dialog = dialog;
         this.sound = this.env.services["mail.sound_effects"];
 
         this.selectedStageId = this.data.models["pos.prep.stage"].getFirst().id;
@@ -49,10 +58,10 @@ export class PrepDisplay extends WithLazyGetterTrap {
         this.onNotified("LOAD_ORDERS", async (data) => {
             await this.getPreparationDisplayOrder(data.orderId);
 
-            const orderToDisplay = this.data.models["pos.prep.state"].filter(
-                (state) => state.prep_line_id.prep_order_id.pos_order_id.id === data.orderId
+            const orderToDisplay = this.data.models["pos.prep.line"].filter(
+                (line) => line.stage_id && line.prep_order_id.pos_order_id.id === data.orderId
             );
-            const minDuration = Math.min(...orderToDisplay.map((state) => state.timeToShow));
+            const minDuration = Math.min(...orderToDisplay.map((line) => line.timeToShow));
 
             if (data.sound) {
                 if (minDuration) {
@@ -66,57 +75,147 @@ export class PrepDisplay extends WithLazyGetterTrap {
             if (data.notification) {
                 this.notification.add(data.notification);
             }
-            this.computeOrderCounts();
-        });
-        this.onNotified("CHANGE_STATE_STAGE", (data) => {
-            for (const stage of data["pdis_state_stages"]) {
-                const state = this.data.models["pos.prep.state"].get(stage.id);
-                if (!state) {
-                    continue;
+
+            // Auto-print if the latest preparation order starts in the configured stage.
+            if (this.prepDisplay.auto_print_stage_id && data.orderId) {
+                const [prepOrder] = this.data.models["pos.prep.order"].filter(
+                    (order) => order.pos_order_id.id === data.orderId
+                );
+                const prepLines = prepOrder.prep_line_ids;
+                // Use the last line since the first one can be a combo parent which don't have a stage as they are displayed with the child lines.
+                if (prepLines.at(-1).stage_id?.id === this.prepDisplay.auto_print_stage_id.id) {
+                    await this.printPreparationTicket({ prepOrder, prepLines });
                 }
-                this.filterHistory(state);
-                state.stage_id = this.data.models["pos.prep.stage"].get(stage.stage_id);
-                state.todo = true;
-                state.write_date = stage.last_stage_change;
-            }
-            for (const [orderId, completion_time] of Object.entries(
-                data["prep_order_completion_time"]
-            )) {
-                const order = this.data.models["pos.prep.order"].get(orderId);
-                if (!order) {
-                    continue;
-                }
-                order.completion_time = completion_time;
             }
             this.computeOrderCounts();
         });
         this.onNotified("CHANGE_STATE_STATUS", (lineStatus) => {
             for (const status of lineStatus) {
-                const state = this.data.models["pos.prep.state"].get(status.id);
-                if (!state) {
+                const line = this.data.models["pos.prep.line"].get(status.id);
+                if (!line) {
                     continue;
                 }
-                state.todo = status.todo;
-                if (state.stage_id.id === this.lastStage.id && state.todo === false) {
-                    this.filterHistory(state);
+                line.todo = status.todo;
+                if (line.stage_id.id === line.raw.last_stage_id && line.todo === false) {
+                    this.filterHistory(line);
                 }
             }
             this.computeOrderCounts();
         });
-        this.onNotified("NOTIFICATION", async (data) => {
-            if (data.sound) {
-                this.ringTheBell();
-            }
-            if (data.notification) {
-                this.notification.add(data.notification);
-            }
-            this.computeOrderCounts();
-        });
+        this.onNotified("POS_ORDER_DELETED", (data) =>
+            this.removeOrdersByPosOrderIds(data.pos_order_ids)
+        );
         this.bus.addEventListener("BUS:RECONNECT", () => {
             this.ringTheBell();
             this.getPreparationDisplayOrder(null);
         });
+        this.prepPrinters = this.prepDisplay?.printer_ids || [];
+        this.stageChangedOrderIds = [];
+        if (this.prepPrinters.length) {
+            this.prepPrinters.forEach((printer) => {
+                printer._instance = new EpsonPrinter({ printer });
+            });
+            this.onNotified("STATE_BARCODE_UPDATE", (data) => {
+                const [stateId, associatedBarcodes] = Object.entries(data)[0];
+                const prepLine = this.data.models["pos.prep.line"].get(stateId);
+                if (prepLine) {
+                    prepLine.update({
+                        associated_barcodes: associatedBarcodes,
+                    });
+                }
+            });
+        }
     }
+    get prepDisplay() {
+        return this.data.models["pos.prep.display"].get(this.id);
+    }
+    async changeStateStageAnimation(selectedTicket, prepLines) {
+        if (prepLines.length === selectedTicket.prepLines.length) {
+            this.stageChangedOrderIds.push(selectedTicket.prepOrder.id);
+            setTimeout(async () => {
+                this.lastStageChange = await this.changeStateStage(prepLines, 1);
+                this.clearChangeTimeout(selectedTicket.prepOrder.id);
+            }, 250);
+        } else {
+            this.lastStageChange = await this.changeStateStage(prepLines, 1);
+        }
+    }
+
+    clearChangeTimeout(prepOrderId) {
+        this.stageChangedOrderIds = this.stageChangedOrderIds.filter(
+            (orderId) => orderId !== prepOrderId
+        );
+    }
+
+    async printPreparationTicket(selectedTicket) {
+        let ticketPrinted = false;
+        for (const printer of this.prepPrinters) {
+            const printerCategoryIds = new Set(
+                printer.product_categories_ids.map((category) => category.id)
+            );
+            const printerLines = selectedTicket.prepLines.filter((line) =>
+                line.categories.some((category) => printerCategoryIds.has(category.id))
+            );
+            // Nothing to print for this printer.
+            if (!printerLines.length) {
+                continue;
+            }
+            await this.printReceipt(printer, printerLines);
+            ticketPrinted = true;
+        }
+
+        // No ticket was printed. Fallback to force-print the complete ticket..
+        if (!ticketPrinted) {
+            await this.printReceipt(this.prepPrinters[0], selectedTicket.prepLines);
+        }
+    }
+
+    async printReceipt(printer, prepLines) {
+        const prepBarcode = this.prepDisplay.use_barcode
+            ? Math.floor(10000 + Math.random() * 90000).toString()
+            : "";
+
+        const printerLines = [];
+        for (const line of prepLines) {
+            // Combo parent lines aren't included in prepLines, so include them explicitly and keep each parent before its child lines.
+            const parent = line.combo_parent_id;
+            if (parent && !printerLines.some((l) => l.id === parent.id)) {
+                printerLines.push(parent);
+            }
+            printerLines.push(line);
+        }
+
+        await this.ticketPrinter.printOrderChanges({
+            order: prepLines[0].prep_order_id.pos_order_id,
+            opts: {
+                prepBarcode,
+                prepOrderLines: printerLines,
+                template: "pos_enterprise.pos_order_change_receipt",
+                forcePrint: true, // No category filtering needed here; print the provided lines.
+            },
+            printers: [printer],
+        });
+
+        if (prepBarcode) {
+            await this.assignBarcode(prepBarcode, prepLines);
+        }
+    }
+
+    async assignBarcode(prepBarcode, prepLines) {
+        // Keep a mapping between the generated barcode and the preparation lines
+        // included in the printed ticket so that only those lines are updated when scanned.
+        for (const line of prepLines) {
+            const associatedBarcodes = [...(line.associated_barcodes || []), prepBarcode];
+            line.update({ associated_barcodes: associatedBarcodes });
+            // Synchronize to all devices
+            await this.data.call("pos.prep.line", "update_associated_barcodes", [
+                [line.id],
+                associatedBarcodes,
+                this.id,
+            ]);
+        }
+    }
+
     get lastStage() {
         return this.data.models["pos.prep.stage"].getAll()[
             this.data.models["pos.prep.stage"].getAll().length - 1
@@ -125,13 +224,26 @@ export class PrepDisplay extends WithLazyGetterTrap {
     get categories() {
         return this.data.models["pos.category"].getAll();
     }
-    filterHistory(state) {
-        const previousStage = this.orderNextStage(state.stage_id.id, -1);
+    get activeLines() {
+        return this.data.models["pos.prep.line"].getAll().filter((line) => line.stage_id);
+    }
+    removeOrdersByPosOrderIds(posOrderIds = []) {
+        // prep lines cascade from prep orders via the cascade delete models config.
+        if (!posOrderIds.length) {
+            return;
+        }
+        const prepOrders = this.data.models["pos.prep.order"].filter(({ pos_order_id }) =>
+            posOrderIds.includes(pos_order_id.id)
+        );
+        prepOrders.forEach((order) => this.data.localDeleteCascade(order));
+    }
+    filterHistory(line) {
+        const previousStage = this.orderNextStage(line.stage_id.id, -1);
         if (!previousStage) {
             return;
         }
         previousStage.recallHistory = previousStage.recallHistory.map(
-            (elem) => (elem = elem.filter((historyState) => historyState.id !== state.id))
+            (elem) => (elem = elem.filter((historyLine) => historyLine.id !== line.id))
         );
     }
     selectStage(stageId) {
@@ -207,7 +319,7 @@ export class PrepDisplay extends WithLazyGetterTrap {
             : this.selectedPresetIds.add(presetId);
         this.saveFilterToLocalStorage();
     }
-    checkStateVisibility(state) {
+    checkStateVisibility(line) {
         const selectedCategoryIds = this.selectedCategoryIds;
         const selectedProductIds = this.selectedProductIds;
         const selectedPresetIds = this.selectedPresetIds;
@@ -221,7 +333,7 @@ export class PrepDisplay extends WithLazyGetterTrap {
         let timeCheck = true;
 
         if (selectedTimeIds.size) {
-            const orderDate = state.prep_line_id.prep_order_id.pos_order_id.preset_time;
+            const orderDate = line.prep_order_id.pos_order_id.preset_time;
             if (!orderDate) {
                 timeCheck = selectedTimeIds.has("today");
             } else {
@@ -235,20 +347,20 @@ export class PrepDisplay extends WithLazyGetterTrap {
 
         const categoryMatch =
             selectedCategoryIds.size === 0 ||
-            state.categories.some((category) => selectedCategoryIds.has(category.id));
+            line.categories.some((category) => selectedCategoryIds.has(category.id));
         const productMatch =
-            selectedProductIds.size === 0 || selectedProductIds.has(state.product.id);
-        const presetId = state.prep_line_id.prep_order_id.pos_order_id.preset_id;
+            selectedProductIds.size === 0 || selectedProductIds.has(line.product.id);
+        const presetId = line.prep_order_id.pos_order_id.preset_id;
         const presetMatch =
             selectedPresetIds.size === 0 || Boolean(presetId && selectedPresetIds.has(presetId.id));
-        const notDoneOrLastStage = state.todo || state.stage_id.id !== this.lastStage.id;
+        const notDoneOrLastStage = line.todo || line.stage_id.id !== line.raw.last_stage_id;
 
         return (
             notDoneOrLastStage &&
             categoryMatch &&
             productMatch &&
             presetMatch &&
-            (timeCheck || (state.timeToShow === 0 && selectedTimeIds.has("now")))
+            (timeCheck || (line.timeToShow === 0 && selectedTimeIds.has("now")))
         );
     }
     orderNextStage(stageId, direction = 1) {
@@ -268,12 +380,12 @@ export class PrepDisplay extends WithLazyGetterTrap {
         const nextDays = now.plus({ days: 2 });
         const countedOrders = new Set();
 
-        this.data.models["pos.prep.state"].getAll().forEach((state) => {
-            const prepOrder = state.prep_line_id.prep_order_id;
+        this.activeLines.forEach((line) => {
+            const prepOrder = line.prep_order_id;
             if (
-                (!this.selectedStageId || state.stage_id.id === this.selectedStageId) &&
+                (!this.selectedStageId || line.stage_id.id === this.selectedStageId) &&
                 !countedOrders.has(prepOrder.id) &&
-                !state.isStageDone(this.lastStage.id)
+                !line.isStageDone()
             ) {
                 countedOrders.add(prepOrder.id);
                 const orderDate = prepOrder.pos_order_id.preset_time;
@@ -286,7 +398,7 @@ export class PrepDisplay extends WithLazyGetterTrap {
                 if (orderDate && orderDate >= nextDays) {
                     orderDays.next_days++;
                 }
-                if (!orderDate || state.timeToShow === 0) {
+                if (!orderDate || line.timeToShow === 0) {
                     orderDays.now++;
                 }
             }
@@ -295,20 +407,20 @@ export class PrepDisplay extends WithLazyGetterTrap {
         this.orderDays = orderDays;
     }
     computeOrderCountPresets() {
-        const allStates = this.data.models["pos.prep.state"].getAll();
+        const allLines = this.activeLines;
         const orderPresets = {};
         this.data.models["pos.preset"].getAll().forEach((preset) => {
             orderPresets[preset.id] = 0;
         });
         const countedOrders = new Set();
-        allStates.forEach((state) => {
-            const prepOrder = state.prep_line_id.prep_order_id;
+        allLines.forEach((line) => {
+            const prepOrder = line.prep_order_id;
             const presetId = prepOrder.pos_order_id.preset_id;
             if (
-                (!this.selectedStageId || state.stage_id.id === this.selectedStageId) &&
+                (!this.selectedStageId || line.stage_id.id === this.selectedStageId) &&
                 presetId &&
                 !countedOrders.has(prepOrder.id) &&
-                !state.isStageDone(this.lastStage.id)
+                !line.isStageDone()
             ) {
                 countedOrders.add(prepOrder.id);
                 orderPresets[presetId.id] += 1;
@@ -323,24 +435,31 @@ export class PrepDisplay extends WithLazyGetterTrap {
             this.computeOrderCountPresets();
         }
     }
+    getFilteredOrdersKey(line) {
+        return line.prep_order_id.id + "-" + line.stage_id.id;
+    }
+    getOrderlineInfo(line) {
+        return {
+            prepOrder: line.prep_order_id,
+            stage: line.stage_id,
+            prepLines: [],
+        };
+    }
     get filteredOrders() {
         const ordersToDisplay = new Map();
-        this.data.models["pos.prep.state"].getAll().forEach((state) => {
+        this.activeLines.forEach((line) => {
             if (
-                this.checkStateVisibility(state) &&
-                (!this.selectedStageId || state.stage_id.id === this.selectedStageId)
+                this.checkStateVisibility(line) &&
+                (!this.selectedStageId || line.stage_id.id === this.selectedStageId)
             ) {
-                const key = state.prep_line_id.prep_order_id.id + "-" + state.stage_id.id;
+                const key = this.getFilteredOrdersKey(line);
                 if (!ordersToDisplay.has(key)) {
-                    ordersToDisplay.set(key, {
-                        prepOrder: state.prep_line_id.prep_order_id,
-                        stage: state.stage_id,
-                        states: [],
-                    });
+                    ordersToDisplay.set(key, this.getOrderlineInfo(line));
                 }
-                ordersToDisplay.get(key).states.push(state);
+                ordersToDisplay.get(key).prepLines.push(line);
             }
         });
+
         return Array.from(ordersToDisplay.values()).sort((a, b) => {
             const stageA = a.stage;
             const stageB = b.stage;
@@ -349,10 +468,10 @@ export class PrepDisplay extends WithLazyGetterTrap {
             if (stageDiff) {
                 return stageDiff;
             }
-            // within the stage, keep the default order unless the state is done then show most recent first.
+            // within the stage, keep the default order unless the preparation line is done then show most recent first.
             let difference;
-            const aWriteDate = Math.max(...a.states.map((sate) => sate.write_date.ts));
-            const bWriteDate = Math.max(...b.states.map((sate) => sate.write_date.ts));
+            const aWriteDate = Math.max(...a.prepLines.map((line) => line.last_stage_change.ts));
+            const bWriteDate = Math.max(...b.prepLines.map((line) => line.last_stage_change.ts));
             if (stageA.id === this.lastStage.id) {
                 difference = bWriteDate - aWriteDate;
             } else {
@@ -364,51 +483,82 @@ export class PrepDisplay extends WithLazyGetterTrap {
             return difference;
         });
     }
-    async syncStateStatus(states) {
-        const stateStatus = {};
-        const stateIds = [];
+    async syncStateStatus(lines) {
+        const lineStatus = {};
+        const lineIds = [];
 
-        for (const state of states) {
-            stateIds.push(state.id);
-            stateStatus[state.id] = state.todo;
+        for (const line of lines) {
+            lineIds.push(line.id);
+            lineStatus[line.id] = line.todo;
         }
-        await this.orm.call(
-            "pos.prep.state",
-            "change_state_status",
-            [stateIds, stateStatus, this.id],
-            {}
-        );
+        await this.orm.call("pos.prep.line", "change_state_status", [lineIds, lineStatus], {});
     }
-    async doneOrders(states) {
-        states.forEach((state) => (state.todo = false));
-        this.syncStateStatus(states);
+    async doneOrders(lines) {
+        lines.forEach((line) => (line.todo = false));
+        this.syncStateStatus(lines);
     }
-    async changeStateStage(states, direction = 1) {
-        const currentStage = states[0].stage_id;
-        const nextStage = this.orderNextStage(currentStage.id, direction);
+    async changeStateStage(lines, direction = 1) {
+        const currentStage = lines[0].stage_id;
+        const lineIds = lines.map((line) => line.id);
 
-        const stateIds = [];
-        const statesStages = {};
-
-        states.forEach((sate) => {
-            stateIds.push(sate.id);
-            statesStages[sate.id] = sate.isCancelled ? this.lastStage.id : nextStage.id;
+        await this.orm.call("pos.prep.line", "change_prep_line_stage", [lineIds, this.id], {
+            direction,
         });
-        await this.orm.call(
-            "pos.prep.state",
-            "change_state_stage",
-            [stateIds, statesStages, this.id],
-            {}
-        );
         if (direction === 1) {
-            currentStage.recallHistory.push(states);
+            currentStage.recallHistory.push(lines);
         }
+        if (this.prepPrinters.length && this.prepDisplay.auto_print_stage_id && direction > 0) {
+            // Automatically print KOT for all moved orders.
+            const nextStage = this.orderNextStage(currentStage.id, direction);
+            if (nextStage.id === this.prepDisplay.auto_print_stage_id?.id) {
+                const prepOrders = new Map();
+                // Group moved preparation lines by preparation order.
+                for (const line of lines) {
+                    const order = line.prep_order_id;
+                    if (!prepOrders.has(order.id)) {
+                        prepOrders.set(order.id, {
+                            prepOrder: order,
+                            prepLines: [],
+                        });
+                    }
+                    prepOrders.get(order.id).prepLines.push(line);
+                }
+
+                for (const { prepOrder, prepLines } of prepOrders.values()) {
+                    await this.printPreparationTicket({ prepOrder, prepLines });
+                }
+            }
+        }
+    }
+    clearAllOrders() {
+        const message =
+            this.filteredOrders[0].stage.id === this.lastStage.id
+                ? _t(
+                      "All orders are in the last stage. This action will mark all orders as Done. Would you like to continue?"
+                  )
+                : _t(
+                      "Clearing all orders will move all the orders of the current stage to the next one. Would you like to continue?"
+                  );
+        this.dialog.add(ConfirmationDialog, {
+            title: _t("Warning"),
+            body: message,
+            confirmLabel: _t("Continue"),
+            cancelLabel: _t("Discard"),
+            confirm: async () => await this.moveAllOrdersToNextStage(),
+            cancel: () => {},
+        });
+    }
+    async moveAllOrdersToNextStage() {
+        const lines = this.filteredOrders.flatMap((order) => order.prepLines);
+        this.filteredOrders[0].stage.id === this.lastStage.id
+            ? await this.doneOrders(lines)
+            : await this.changeStateStage(lines);
     }
     async resetOrders() {
-        this.data.models["pos.prep.state"].deleteMany(this.data.models["pos.prep.state"].getAll());
+        this.data.models["pos.prep.line"].deleteMany(this.data.models["pos.prep.line"].getAll());
         const stages = this.data.models["pos.prep.stage"].getAll();
         stages.map((stage) => (stage.recallHistory = []));
-        await this.data.callRelated("pos.prep.display", "reset", [[this.id]]);
+        await this.data.call("pos.prep.display", "reset", [[this.id]]);
     }
     async loadPosHasProducts() {
         return await this.orm.call("pos.prep.display", "pos_has_valid_product", [], {});
@@ -421,15 +571,21 @@ export class PrepDisplay extends WithLazyGetterTrap {
             window.location.reload();
         }
     }
-    async getPreparationDisplayOrder(orderId) {
+    async getPreparationDisplayOrder() {
         const orders = await this.orm.call(
             "pos.prep.display",
-            "get_preparation_display_order",
-            [this.id, orderId],
+            "get_preparation_display_orders",
+            [this.id],
             {}
         );
+
+        const serverLineIds = new Set((orders["pos.prep.line"] || []).map((r) => r.id));
+
+        this.data.models["pos.prep.line"]
+            .filter((line) => !serverLineIds.has(line.id))
+            .forEach((line) => line.delete());
         const missingRecords = await this.data.missingRecursive(orders);
-        this.data.models.loadConnectedData(missingRecords);
+        this.data.models.loadConnectedData(missingRecords, [], { delaySetup: true });
         this.computeOrderCounts();
     }
     exit() {
@@ -453,5 +609,5 @@ registry.category("services").add("preparation_display", preparationDisplayServi
  * @returns {PrepDisplay}
  */
 export function usePrepDisplay() {
-    return useState(useService("preparation_display"));
+    return proxy(useService("preparation_display"));
 }

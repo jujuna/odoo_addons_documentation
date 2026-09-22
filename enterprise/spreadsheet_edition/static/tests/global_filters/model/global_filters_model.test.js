@@ -6,6 +6,7 @@ import { registries } from "@odoo/o-spreadsheet";
 import { getCellValue, getCell, getEvaluatedGrid } from "@spreadsheet/../tests/helpers/getters";
 import {
     addGlobalFilter,
+    createSheet,
     selectCell,
     setCellContent,
 } from "@spreadsheet/../tests/helpers/commands";
@@ -53,9 +54,12 @@ test("Can set a value from a pivot header context menu", async function () {
     expect(getCellValue(model, "B3")).toBe("");
     expect(getCellValue(model, "B4")).toBe(121);
     selectCell(model, "A3");
-    expect(getCell(model, "B3").content).toBe('=PIVOT.VALUE(1,"probability:avg","product_id",37)', {
-        message: "the formula field matches the filter",
-    });
+    expect(getCell(model, "B3").compiledFormula.toFormulaString(model.getters)).toBe(
+        '=PIVOT.VALUE(1,"probability:avg","product_id",37)',
+        {
+            message: "the formula field matches the filter",
+        }
+    );
     const root = cellMenuRegistry.getMenuItems().find((item) => item.id === "use_global_filter");
     expect(root.isVisible(env)).toBe(true);
     await root.execute(env);
@@ -67,7 +71,7 @@ test("Can set a value from a pivot header context menu", async function () {
     expect(getCellValue(model, "B3")).toBe(10);
     expect(getCellValue(model, "B4")).toBe(121);
 
-    model.dispatch("CREATE_SHEET", { sheetId: "42" });
+    createSheet(model, { sheetId: "42" });
     setCellContent(model, "A1", `=PIVOT("1")`, "42");
     selectCell(model, "A3", "42");
     expect(root.isVisible(env)).toBe(true);
@@ -124,7 +128,9 @@ test("Can open context menu without argument", async function () {
                 </pivot>`,
         pivotType: "static",
     });
-    expect(getCell(model, "B5").content).toBe('=PIVOT.VALUE(1,"probability:avg")');
+    expect(getCell(model, "B5").compiledFormula.toFormulaString(model.getters)).toBe(
+        '=PIVOT.VALUE(1,"probability:avg")'
+    );
     await addGlobalFilter(
         model,
         {
@@ -138,7 +144,7 @@ test("Can open context menu without argument", async function () {
     const root = cellMenuRegistry.getMenuItems().find((item) => item.id === "use_global_filter");
     expect(root.isVisible(env)).toBe(false);
 
-    model.dispatch("CREATE_SHEET", { sheetId: "42" });
+    createSheet(model, { sheetId: 42 });
     setCellContent(model, "A1", `=PIVOT("1")`, "42");
     selectCell(model, "B5", "42");
     expect(root.isVisible(env)).toBe(false);
@@ -161,7 +167,7 @@ test("Can open context menu when there is a filter with no field defined", async
     const root = cellMenuRegistry.getMenuItems().find((item) => item.id === "use_global_filter");
     expect(root.isVisible(env)).toBe(false);
 
-    model.dispatch("CREATE_SHEET", { sheetId: "42" });
+    createSheet(model, { sheetId: 42 });
     setCellContent(model, "A1", `=PIVOT("1")`, "42");
     selectCell(model, "B3", "42");
     expect(root.isVisible(env)).toBe(false);
@@ -178,7 +184,7 @@ test("Set as filter is not visible if there is no pivot formula", async function
 test("Set as filter is not visible on empty cells of PIVOT", async function () {
     const { env, model } = await createSpreadsheetWithPivot();
     const root = cellMenuRegistry.getMenuItems().find((item) => item.id === "use_global_filter");
-    model.dispatch("CREATE_SHEET", { sheetId: "42" });
+    createSheet(model, { sheetId: 42 });
     setCellContent(model, "A1", `=PIVOT("1")`, "42");
     selectCell(model, "A1", "42");
     expect(root.isVisible(env)).toBe(false);
@@ -218,11 +224,17 @@ test("menu to set filter value is only visible on the PIVOT.HEADER formulas", as
     const root = cellMenuRegistry.getMenuItems().find((item) => item.id === "use_global_filter");
 
     selectCell(model, "A3");
-    expect(getCell(model, "A3").content.includes("PIVOT.HEADER(")).not.toBe(undefined);
+    expect(
+        getCell(model, "A3")
+            .compiledFormula.toFormulaString(model.getters)
+            .includes("PIVOT.HEADER(")
+    ).not.toBe(undefined);
     expect(root.isVisible(env)).toBe(true);
 
     selectCell(model, "B3");
-    expect(getCell(model, "B3").content.includes("PIVOT.VALUE(")).not.toBe(undefined);
+    expect(
+        getCell(model, "B3").compiledFormula.toFormulaString(model.getters).includes("PIVOT.VALUE(")
+    ).not.toBe(undefined);
     expect(root.isVisible(env)).toBe(false);
 });
 
@@ -236,7 +248,7 @@ test("menu to set filter value is only visible on the the header of a PIVOT.TABL
     });
     await addGlobalFilter(model, testGlobalFilter, testFieldMatching);
     const sheetIdFrom = model.getters.getActiveSheetId();
-    model.dispatch("CREATE_SHEET", { sheetId: "42", position: 1 });
+    createSheet(model, { sheetId: "42", position: 1 });
     model.dispatch("ACTIVATE_SHEET", { sheetIdFrom, sheetIdTo: "42" });
     setCellContent(model, "A1", '=PIVOT("1")');
     const root = cellMenuRegistry.getMenuItems().find((item) => item.id === "use_global_filter");

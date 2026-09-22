@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-# pylint: disable=C0326
 from odoo.addons.l10n_mx_edi.tests.common import TestMxEdiCommon
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
-from odoo import fields, Command
+from odoo import Command, fields
 from odoo.tests.common import test_xsd
-from odoo.tests import tagged
+from odoo.tests import HttpCase, tagged
 from odoo.exceptions import RedirectWarning
 
 from freezegun import freeze_time
@@ -13,6 +11,8 @@ from freezegun import freeze_time
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestL10nMXTrialBalanceReportCommon(TestMxEdiCommon, TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -26,53 +26,79 @@ class TestL10nMXTrialBalanceReportCommon(TestMxEdiCommon, TestAccountReportsComm
         cls.account_tag_credit = cls.env.ref('l10n_mx.tag_credit_balance_account')
 
         # Entries in 2020 to test initial balance
-        cls.move_2020_01 = cls.env['account.move'].create({
-            'move_type': 'entry',
-            'date': fields.Date.to_date('2020-01-01'),
-            'journal_id': cls.company_data['default_journal_misc'].id,
-            'line_ids': [
-                Command.create({'debit': 1000.0, 'credit': 0.0, 'account_id': cls.company_data['default_account_payable'].id}),
-                Command.create({'debit': 0.0, 'credit': 1000.0, 'account_id': cls.company_data['default_account_revenue'].id}),
-            ]
-        })
+        cls.move_2020_01 = cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_misc'],
+            date='2020-01-01',
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_payable'],
+                    debit=1000.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=0.0,
+                    credit=1000.0,
+                ),
+            ],
+        )
 
-        cls.move_2020_02 = cls.env['account.move'].create({
-            'move_type': 'entry',
-            'date': fields.Date.to_date('2020-02-01'),
-            'journal_id': cls.company_data['default_journal_misc'].id,
-            'line_ids': [
-                Command.create(
-                    {'debit': 500.0, 'credit': 0.0, 'account_id': cls.company_data['default_account_expense'].id}),
-                Command.create(
-                    {'debit': 0.0, 'credit': 500.0, 'account_id': cls.company_data['default_account_revenue'].id}),
-            ]
-        })
+        cls.move_2020_02 = cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_misc'],
+            date='2020-02-01',
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_expense'],
+                    debit=500.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=0.0,
+                    credit=500.0,
+                ),
+            ],
+        )
         (cls.move_2020_01 + cls.move_2020_02).action_post()
 
         # Entries in 2021 to test report for a specific financial year
-        cls.move_2021_01 = cls.env['account.move'].create({
-            'move_type': 'entry',
-            'date': fields.Date.to_date('2021-06-01'),
-            'journal_id': cls.company_data['default_journal_misc'].id,
-            'line_ids': [
-                Command.create(
-                    {'debit': 250.0, 'credit': 0.0, 'account_id': cls.company_data['default_account_expense'].id}),
-                Command.create(
-                    {'debit': 0.0, 'credit': 250.0, 'account_id': cls.company_data['default_account_revenue'].id}),
-            ]
-        })
+        cls.move_2021_01 = cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_misc'],
+            date='2021-06-01',
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_expense'],
+                    debit=250.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=0.0,
+                    credit=250.0,
+                ),
+            ],
+        )
 
-        cls.move_2021_02 = cls.env['account.move'].create({
-            'move_type': 'entry',
-            'date': fields.Date.to_date('2021-08-01'),
-            'journal_id': cls.company_data['default_journal_misc'].id,
-            'line_ids': [
-                Command.create(
-                    {'debit': 75.0, 'credit': 0.0, 'account_id': cls.company_data['default_account_payable'].id}),
-                Command.create(
-                    {'debit': 0.0, 'credit': 75.0, 'account_id': cls.company_data['default_account_revenue'].id}),
-            ]
-        })
+        cls.move_2021_02 = cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_misc'],
+            date='2021-08-01',
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_payable'],
+                    debit=75.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=0.0,
+                    credit=75.0,
+                ),
+            ],
+        )
         (cls.move_2021_01 + cls.move_2021_02).action_post()
 
         # Special cases: codes with extra levels from the default COA and dotted account names
@@ -81,7 +107,7 @@ class TestL10nMXTrialBalanceReportCommon(TestMxEdiCommon, TestAccountReportsComm
                 "name": "Extra deep code",
                 "account_type": "liability_current",
                 "code": "205.06.01.001",
-                "reconcile": True,
+                "parent_id": cls.env["account.chart.template"].ref("account_subgroup_otros_acreedores_diversos_a_corto_plazo").id,
             }
         )
 
@@ -90,7 +116,7 @@ class TestL10nMXTrialBalanceReportCommon(TestMxEdiCommon, TestAccountReportsComm
                 "name": "Dotted name C.V.",
                 "account_type": "liability_current",
                 "code": "205.06.03",
-                "reconcile": True,
+                "parent_id": cls.env["account.chart.template"].ref("account_subgroup_otros_acreedores_diversos_a_corto_plazo").id,
             }
         )
 
@@ -144,18 +170,21 @@ class TestL10nMXTrialBalanceReportCommon(TestMxEdiCommon, TestAccountReportsComm
         (cls.extra_deep_code_move + cls.dotted_name_move).action_post()
 
         cls.report = cls.env.ref('account_reports.trial_balance_report')
-        cls.company_data['company'].totals_below_sections = False
+        cls.company_data['company'].totals_below_sections = True
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_generate_coa_xml(self):
         """ This test will generate a COA report and verify that every
             account with an entry in the selected period has been there.
 
             CodAgrup corresponds to Account Group code
-            NumCta corresponds to Account Group code
-            Desc corresponds to Account Group Name
+            NumCta corresponds to Account code
+            Desc corresponds to Account Name
+            SubCtaDe corresponds to account parent code
             Nivel corresponds to Hierarchy Level
             Natur corresponds to type of account (Debit or Credit)
 
@@ -169,126 +198,24 @@ class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
 
         expected_coa_xml = b"""<?xml version='1.0' encoding='utf-8'?>
         <catalogocuentas:Catalogo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:catalogocuentas="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas" xsi:schemaLocation="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas/CatalogoCuentas_1_3.xsd" Version="1.3" RFC="EKU9003173C9" Mes="01" Anio="2021" Sello="___ignore___" Certificado="___ignore___" noCertificado="___ignore___">
-            <catalogocuentas:Ctas CodAgrup="101" NumCta="101" Desc="Cash" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="101.01" NumCta="101.01" Desc="Cash in hand" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="102" NumCta="102" Desc="Bank" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="102.01" NumCta="102.01" Desc="National banks" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="102.02" NumCta="102.02" Desc="Foreign banks" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="105" NumCta="105" Desc="Clients" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="105.01" NumCta="105.01" Desc="National customers" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="107" NumCta="107" Desc="Sundry debtors" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="107.05" NumCta="107.05" Desc="Other sundry debtors" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="108" NumCta="108" Desc="Allowance for doubtful accounts" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="108.01" NumCta="108.01" Desc="Allowance for doubtful accounts national" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="108.02" NumCta="108.02" Desc="Allowance for doubtful accounts foreign" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="110" NumCta="110" Desc="Employment subsidy to be applied" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="110.01" NumCta="110.01" Desc="Employment subsidy to be applied" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="113" NumCta="113" Desc="Tax credit" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="113.01" NumCta="113.01" Desc="VAT receivable" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="113.02" NumCta="113.02" Desc="Income tax to recover" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="113.08" NumCta="113.08" Desc="Other taxes in favour" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115" NumCta="115" Desc="Inventory" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.01" NumCta="115.01" Desc="Inventory" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.02" NumCta="115.02" Desc="Raw materials and materials" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.03" NumCta="115.03" Desc="Production in progress" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.04" NumCta="115.04" Desc="Finished products" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.05" NumCta="115.05" Desc="Goods in transit" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.06" NumCta="115.06" Desc="Goods held by third parties" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="118" NumCta="118" Desc="Creditable taxes paid" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="118.01" NumCta="118.01" Desc="Creditable VAT paid" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="118.02" NumCta="118.02" Desc="Creditable import VAT paid" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="118.03" NumCta="118.03" Desc="Creditable IEPS paid" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="119" NumCta="119" Desc="Taxes payable" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="119.01" NumCta="119.01" Desc="VAT due" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="119.02" NumCta="119.02" Desc="Import VAT due" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="119.03" NumCta="119.03" Desc="IEPS pending payment" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="120" NumCta="120" Desc="Advances to suppliers" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="120.01" NumCta="120.01" Desc="Advance to national suppliers" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="120.02" NumCta="120.02" Desc="Advance payment to foreign suppliers" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="173" NumCta="173" Desc="Deferred expenditure" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="173.01" NumCta="173.01" Desc="Deferred expenditure" Nivel="2" Natur="D"/>
             <catalogocuentas:Ctas CodAgrup="201" NumCta="201" Desc="Suppliers" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="201.01" NumCta="201.01" Desc="National suppliers" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="201.01" NumCta="201.01" Desc="National suppliers" SubCtaDe="201" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="201.01" NumCta="201.01.01" Desc="National suppliers" SubCtaDe="201.01" Nivel="3" Natur="A"/>
             <catalogocuentas:Ctas CodAgrup="205" NumCta="205" Desc="Short-term sundry creditors" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06" Desc="Other short-term sundry creditors" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="206" NumCta="206" Desc="Customer advance" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="206.01" NumCta="206.01" Desc="Domestic customer advance" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="206.02" NumCta="206.02" Desc="Advance payment from foreign customer" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="206.05" NumCta="206.05" Desc="Other customer advances" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="208" NumCta="208" Desc="Taxes carried forward collected" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="208.01" NumCta="208.01" Desc="VAT carried forward collected" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="208.02" NumCta="208.02" Desc="IEPS carried forward collected" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="209" NumCta="209" Desc="Uncollected taxes carried forward" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="209.01" NumCta="209.01" Desc="VAT carried forward not collected" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="209.02" NumCta="209.02" Desc="IEPS carried forward not collected" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210" NumCta="210" Desc="Provision for wages and salaries payable" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210.01" NumCta="210.01" Desc="Provision for wages and salaries payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210.02" NumCta="210.02" Desc="Provision for holidays payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210.03" NumCta="210.03" Desc="Provision for Christmas bonus payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210.04" NumCta="210.04" Desc="Savings fund provision payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="211" NumCta="211" Desc="Provision for social security contributions payable" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="211.01" NumCta="211.01" Desc="Employer's IMSS provision payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="211.02" NumCta="211.02" Desc="Provision for SAR payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="211.03" NumCta="211.03" Desc="Infonavit provision payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213" NumCta="213" Desc="Taxes and duties payable" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213.01" NumCta="213.01" Desc="VAT payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213.02" NumCta="213.02" Desc="IEPS payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213.03" NumCta="213.03" Desc="Income tax payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213.07" NumCta="213.07" Desc="Other taxes payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216" NumCta="216" Desc="Taxes withheld" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.01" NumCta="216.01" Desc="Taxes withheld from income tax on wages and salaries" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.03" NumCta="216.03" Desc="Withholding of income tax for leasing" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.04" NumCta="216.04" Desc="Taxes withheld from income tax for professional services" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.10" NumCta="216.10" Desc="VAT withholding taxes" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.11" NumCta="216.11" Desc="IMSS withholdings from workers" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="260" NumCta="260" Desc="Deferred liabilities" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="260.01" NumCta="260.01" Desc="Deferred liabilities" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="302" NumCta="302" Desc="Heritage" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="302.01" NumCta="302.01" Desc="Heritage" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="304" NumCta="304" Desc="Result of previous years" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="304.01" NumCta="304.01" Desc="Profit from previous years" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="305" NumCta="305" Desc="Result for the year" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="305.01" NumCta="305.01" Desc="Profit for the year" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06" Desc="Other short-term sundry creditors" SubCtaDe="205" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06.01.001" Desc="Extra deep code" SubCtaDe="205.06" Nivel="3" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06.03" Desc="Dotted name C.V." SubCtaDe="205.06" Nivel="3" Natur="A"/>
             <catalogocuentas:Ctas CodAgrup="401" NumCta="401" Desc="Income" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="401.01" NumCta="401.01" Desc="Sales and/or services taxed at the general rate" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="402" NumCta="402" Desc="Refunds, discounts or rebates on income" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="402.04" NumCta="402.04" Desc="Refunds, discounts or rebates of other income" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="402" NumCta="402" Desc="Refunds, discounts or rebates on income" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="402.01" NumCta="402.01" Desc="Refunds, discounts or rebates on sales and/or services at the general rate" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="403" NumCta="403" Desc="Other income" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="403.01" NumCta="403.01" Desc="Other Income" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="501" NumCta="501" Desc="Cost of sale and/or service" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="501.01" NumCta="501.01" Desc="Cost of sales" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="503" NumCta="503" Desc="Returns, discounts or rebates on purchases" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="503.01" NumCta="503.01" Desc="Returns, discounts or rebates on purchases" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="505" NumCta="505" Desc="Cost of fixed assets" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="505.01" NumCta="505.01" Desc="Cost of fixed asset sales" Nivel="2" Natur="D"/>
+            <catalogocuentas:Ctas CodAgrup="401.01" NumCta="401.01" Desc="Sales and/or services taxed at the general rate" SubCtaDe="401" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="401.01" NumCta="401.01.01" Desc="Sales and/or services taxed at the general rate" SubCtaDe="401.01" Nivel="3" Natur="A"/>
             <catalogocuentas:Ctas CodAgrup="601" NumCta="601" Desc="Overheads" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.01" NumCta="601.01" Desc="Wages and salaries" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.06" NumCta="601.06" Desc="Holidays" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.07" NumCta="601.07" Desc="Holiday bonus" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.12" NumCta="601.12" Desc="Aguinaldo" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.15" NumCta="601.15" Desc="Pantry" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.16" NumCta="601.16" Desc="Transport" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.19" NumCta="601.19" Desc="Savings fund" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.26" NumCta="601.26" Desc="IMSS contributions" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.27" NumCta="601.27" Desc="Infonavit contributions" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.28" NumCta="601.28" Desc="SAR contributions" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.58" NumCta="601.58" Desc="Other taxes and duties" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.74" NumCta="601.74" Desc="Commissions on sales" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.84" NumCta="601.84" Desc="Other overheads" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="701" NumCta="701" Desc="Financial expenses" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="701.01" NumCta="701.01" Desc="Foreign exchange loss" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="702" NumCta="702" Desc="Financial products" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="702.01" NumCta="702.01" Desc="Exchange profit" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="811" NumCta="811" Desc="Tax gain or loss on sale and/or derecognition of fixed assets" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="811.01" NumCta="811.01" Desc="Tax gain or loss on sale and/or derecognition of fixed assets" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="899" NumCta="899" Desc="Other off-balance sheet items" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="899.01" NumCta="899.01" Desc="Other off-balance sheet items" Nivel="2" Natur="D"/>
+            <catalogocuentas:Ctas CodAgrup="601.84" NumCta="601.84" Desc="Other overheads" SubCtaDe="601" Nivel="2" Natur="D"/>
+            <catalogocuentas:Ctas CodAgrup="601.84" NumCta="601.84.01" Desc="Other overheads" SubCtaDe="601.84" Nivel="3" Natur="D"/>
         </catalogocuentas:Catalogo>
         """
 
         options = self._generate_options(self.report, '2021-01-01', '2021-12-31')
+        self.assertTrue(any(button.get('action_param') == 'action_l10n_mx_generate_coa_sat_xml' for button in options['buttons']))
         options['l10n_mx_sat_ignore_errors'] = True
         with freeze_time(self.frozen_today):
             coa_report = self.env[self.report.custom_handler_model_name].action_l10n_mx_generate_coa_sat_xml(options)['file_content']
@@ -304,125 +231,19 @@ class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
         """
         expected_coa_xml = b"""<?xml version='1.0' encoding='utf-8'?>
         <catalogocuentas:Catalogo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:catalogocuentas="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas" xsi:schemaLocation="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas/CatalogoCuentas_1_3.xsd" Version="1.3" RFC="EKU9003173C9" Mes="01" Anio="2021" Sello="___ignore___" Certificado="___ignore___" noCertificado="___ignore___">
-                    <catalogocuentas:Ctas CodAgrup="101" NumCta="101" Desc="Cash" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="101.01" NumCta="101.01" Desc="Cash in hand" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="102" NumCta="102" Desc="Bank" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="102.01" NumCta="102.01" Desc="National banks" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="102.02" NumCta="102.02" Desc="Foreign banks" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="105" NumCta="105" Desc="Clients" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="105.01" NumCta="105.01" Desc="National customers" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="107" NumCta="107" Desc="Sundry debtors" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="107.05" NumCta="107.05" Desc="Other sundry debtors" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="108" NumCta="108" Desc="Allowance for doubtful accounts" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="108.01" NumCta="108.01" Desc="Allowance for doubtful accounts national" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="108.02" NumCta="108.02" Desc="Allowance for doubtful accounts foreign" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="110" NumCta="110" Desc="Employment subsidy to be applied" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="110.01" NumCta="110.01" Desc="Employment subsidy to be applied" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="113" NumCta="113" Desc="Tax credit" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="113.01" NumCta="113.01" Desc="VAT receivable" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="113.02" NumCta="113.02" Desc="Income tax to recover" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="113.08" NumCta="113.08" Desc="Other taxes in favour" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115" NumCta="115" Desc="Inventory" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.01" NumCta="115.01" Desc="Inventory" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.02" NumCta="115.02" Desc="Raw materials and materials" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.03" NumCta="115.03" Desc="Production in progress" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.04" NumCta="115.04" Desc="Finished products" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.05" NumCta="115.05" Desc="Goods in transit" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="115.06" NumCta="115.06" Desc="Goods held by third parties" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="118" NumCta="118" Desc="Creditable taxes paid" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="118.01" NumCta="118.01" Desc="Creditable VAT paid" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="118.02" NumCta="118.02" Desc="Creditable import VAT paid" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="118.03" NumCta="118.03" Desc="Creditable IEPS paid" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="119" NumCta="119" Desc="Taxes payable" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="119.01" NumCta="119.01" Desc="VAT due" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="119.02" NumCta="119.02" Desc="Import VAT due" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="119.03" NumCta="119.03" Desc="IEPS pending payment" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="120" NumCta="120" Desc="Advances to suppliers" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="120.01" NumCta="120.01" Desc="Advance to national suppliers" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="120.02" NumCta="120.02" Desc="Advance payment to foreign suppliers" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="173" NumCta="173" Desc="Deferred expenditure" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="173.01" NumCta="173.01" Desc="Deferred expenditure" Nivel="2" Natur="D"/>
             <catalogocuentas:Ctas CodAgrup="201" NumCta="201" Desc="Suppliers" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="201.01" NumCta="201.01" Desc="National suppliers" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="201.01" NumCta="201.01" Desc="National suppliers" SubCtaDe="201" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="201.01" NumCta="201.01.01" Desc="National suppliers" SubCtaDe="201.01" Nivel="3" Natur="A"/>
             <catalogocuentas:Ctas CodAgrup="205" NumCta="205" Desc="Short-term sundry creditors" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06" Desc="Other short-term sundry creditors" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="206" NumCta="206" Desc="Customer advance" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="206.01" NumCta="206.01" Desc="Domestic customer advance" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="206.02" NumCta="206.02" Desc="Advance payment from foreign customer" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="206.05" NumCta="206.05" Desc="Other customer advances" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="208" NumCta="208" Desc="Taxes carried forward collected" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="208.01" NumCta="208.01" Desc="VAT carried forward collected" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="208.02" NumCta="208.02" Desc="IEPS carried forward collected" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="209" NumCta="209" Desc="Uncollected taxes carried forward" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="209.01" NumCta="209.01" Desc="VAT carried forward not collected" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="209.02" NumCta="209.02" Desc="IEPS carried forward not collected" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210" NumCta="210" Desc="Provision for wages and salaries payable" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210.01" NumCta="210.01" Desc="Provision for wages and salaries payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210.02" NumCta="210.02" Desc="Provision for holidays payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210.03" NumCta="210.03" Desc="Provision for Christmas bonus payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="210.04" NumCta="210.04" Desc="Savings fund provision payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="211" NumCta="211" Desc="Provision for social security contributions payable" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="211.01" NumCta="211.01" Desc="Employer's IMSS provision payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="211.02" NumCta="211.02" Desc="Provision for SAR payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="211.03" NumCta="211.03" Desc="Infonavit provision payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213" NumCta="213" Desc="Taxes and duties payable" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213.01" NumCta="213.01" Desc="VAT payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213.02" NumCta="213.02" Desc="IEPS payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213.03" NumCta="213.03" Desc="Income tax payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="213.07" NumCta="213.07" Desc="Other taxes payable" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216" NumCta="216" Desc="Taxes withheld" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.01" NumCta="216.01" Desc="Taxes withheld from income tax on wages and salaries" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.03" NumCta="216.03" Desc="Withholding of income tax for leasing" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.04" NumCta="216.04" Desc="Taxes withheld from income tax for professional services" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.10" NumCta="216.10" Desc="VAT withholding taxes" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="216.11" NumCta="216.11" Desc="IMSS withholdings from workers" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="260" NumCta="260" Desc="Deferred liabilities" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="260.01" NumCta="260.01" Desc="Deferred liabilities" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="302" NumCta="302" Desc="Heritage" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="302.01" NumCta="302.01" Desc="Heritage" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="304" NumCta="304" Desc="Result of previous years" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="304.01" NumCta="304.01" Desc="Profit from previous years" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="305" NumCta="305" Desc="Result for the year" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="305.01" NumCta="305.01" Desc="Profit for the year" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06" Desc="Other short-term sundry creditors" SubCtaDe="205" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06.01.001" Desc="Extra deep code" SubCtaDe="205.06" Nivel="3" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="205.06" NumCta="205.06.03" Desc="Dotted name C.V." SubCtaDe="205.06" Nivel="3" Natur="A"/>
             <catalogocuentas:Ctas CodAgrup="401" NumCta="401" Desc="Income" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="401.01" NumCta="401.01" Desc="Sales and/or services taxed at the general rate" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="402" NumCta="402" Desc="Refunds, discounts or rebates on income" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="402.04" NumCta="402.04" Desc="Refunds, discounts or rebates of other income" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="402" NumCta="402" Desc="Refunds, discounts or rebates on income" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="402.01" NumCta="402.01" Desc="Refunds, discounts or rebates on sales and/or services at the general rate" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="403" NumCta="403" Desc="Other income" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="403.01" NumCta="403.01" Desc="Other Income" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="501" NumCta="501" Desc="Cost of sale and/or service" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="501.01" NumCta="501.01" Desc="Cost of sales" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="503" NumCta="503" Desc="Returns, discounts or rebates on purchases" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="503.01" NumCta="503.01" Desc="Returns, discounts or rebates on purchases" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="505" NumCta="505" Desc="Cost of fixed assets" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="505.01" NumCta="505.01" Desc="Cost of fixed asset sales" Nivel="2" Natur="D"/>
+            <catalogocuentas:Ctas CodAgrup="401.01" NumCta="401.01" Desc="Sales and/or services taxed at the general rate" SubCtaDe="401" Nivel="2" Natur="A"/>
+            <catalogocuentas:Ctas CodAgrup="401.01" NumCta="401.01.01" Desc="Sales and/or services taxed at the general rate" SubCtaDe="401.01" Nivel="3" Natur="A"/>
             <catalogocuentas:Ctas CodAgrup="601" NumCta="601" Desc="Overheads" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.01" NumCta="601.01" Desc="Wages and salaries" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.06" NumCta="601.06" Desc="Holidays" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.07" NumCta="601.07" Desc="Holiday bonus" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.12" NumCta="601.12" Desc="Aguinaldo" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.15" NumCta="601.15" Desc="Pantry" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.16" NumCta="601.16" Desc="Transport" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.19" NumCta="601.19" Desc="Savings fund" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.26" NumCta="601.26" Desc="IMSS contributions" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.27" NumCta="601.27" Desc="Infonavit contributions" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.28" NumCta="601.28" Desc="SAR contributions" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.58" NumCta="601.58" Desc="Other taxes and duties" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.74" NumCta="601.74" Desc="Commissions on sales" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="601.84" NumCta="601.84" Desc="Other overheads" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="701" NumCta="701" Desc="Financial expenses" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="701.01" NumCta="701.01" Desc="Foreign exchange loss" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="702" NumCta="702" Desc="Financial products" Nivel="1" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="702.01" NumCta="702.01" Desc="Exchange profit" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="702.02" NumCta="702.02" Desc="Domestic foreign exchange gain related party" Nivel="2" Natur="A"/>
-            <catalogocuentas:Ctas CodAgrup="702" NumCta="702" Desc="Financial products" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="702.02" NumCta="702.02" Desc="Domestic foreign exchange gain related party" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="811" NumCta="811" Desc="Tax gain or loss on sale and/or derecognition of fixed assets" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="811.01" NumCta="811.01" Desc="Tax gain or loss on sale and/or derecognition of fixed assets" Nivel="2" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="899" NumCta="899" Desc="Other off-balance sheet items" Nivel="1" Natur="D"/>
-            <catalogocuentas:Ctas CodAgrup="899.01" NumCta="899.01" Desc="Other off-balance sheet items" Nivel="2" Natur="D"/>
+            <catalogocuentas:Ctas CodAgrup="601.84" NumCta="601.84" Desc="Other overheads" SubCtaDe="601" Nivel="2" Natur="D"/>
+            <catalogocuentas:Ctas CodAgrup="601.84" NumCta="601.84.01" Desc="Other overheads" SubCtaDe="601.84" Nivel="3" Natur="D"/>
         </catalogocuentas:Catalogo>
         """
 
@@ -447,39 +268,97 @@ class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
         every account present in the trial balance (except unaffected
         earnings account) is present in the xml.
 
+        NumCta corresponds to Account Group code
         SaldoIni corresponds to Initial Balance
-        SaldoFin corresponds to End Balance
         Debe corresponds to Debit in the current period
         Haber corresponds to Credit in the current period
-        NumCta corresponds to Account Group code
+        SaldoFin corresponds to End Balance
         """
         expected_sat_xml = b"""<?xml version='1.0' encoding='utf-8'?>
         <BCE:Balanza xmlns:BCE="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion/BalanzaComprobacion_1_3.xsd" Version="1.3" RFC="EKU9003173C9" Mes="01" Anio="2021" TipoEnvio="N" Sello="___ignore___" Certificado="___ignore___" noCertificado="___ignore___">
-            <BCE:Ctas Debe="75.00" NumCta="201" Haber="0.00" SaldoFin="-1075.00" SaldoIni="-1000.00"/>
-            <BCE:Ctas Debe="75.00" NumCta="201.01" Haber="0.00" SaldoFin="-1075.00" SaldoIni="-1000.00"/>
-            <BCE:Ctas Debe="450.00" NumCta="205" Haber="450.00" SaldoFin="0.00" SaldoIni="0.00"/>
-            <BCE:Ctas Debe="450.00" NumCta="205.06" Haber="450.00" SaldoFin="0.00" SaldoIni="0.00"/>
-            <BCE:Ctas Debe="0.00" NumCta="401" Haber="325.00" SaldoFin="325.00" SaldoIni="0.00"/>
-            <BCE:Ctas Debe="0.00" NumCta="401.01" Haber="325.00" SaldoFin="325.00" SaldoIni="0.00"/>
-            <BCE:Ctas Debe="250.00" NumCta="601" Haber="0.00" SaldoFin="250.00" SaldoIni="0.00"/>
-            <BCE:Ctas Debe="250.00" NumCta="601.84" Haber="0.00" SaldoFin="250.00" SaldoIni="0.00"/>
+            <BCE:Ctas NumCta="201" SaldoIni="-1000.00" Debe="75.00" Haber="0.00" SaldoFin="-1075.00"/>
+            <BCE:Ctas NumCta="201.01" SaldoIni="-1000.00" Debe="75.00" Haber="0.00" SaldoFin="-1075.00"/>
+            <BCE:Ctas NumCta="201.01.01" SaldoIni="-1000.00" Debe="75.00" Haber="0.00" SaldoFin="-1075.00"/>
+            <BCE:Ctas NumCta="205" SaldoIni="0.00" Debe="450.00" Haber="450.00" SaldoFin="0.00"/>
+            <BCE:Ctas NumCta="205.06" SaldoIni="0.00" Debe="450.00" Haber="450.00" SaldoFin="0.00"/>
+            <BCE:Ctas NumCta="205.06.01.001" SaldoIni="0.00" Debe="50.00" Haber="400.00" SaldoFin="350.00"/>
+            <BCE:Ctas NumCta="205.06.03" SaldoIni="0.00" Debe="400.00" Haber="50.00" SaldoFin="-350.00"/>
+            <BCE:Ctas NumCta="401" SaldoIni="0.00" Debe="0.00" Haber="325.00" SaldoFin="325.00"/>
+            <BCE:Ctas NumCta="401.01" SaldoIni="0.00" Debe="0.00" Haber="325.00" SaldoFin="325.00"/>
+            <BCE:Ctas NumCta="401.01.01" SaldoIni="0.00" Debe="0.00" Haber="325.00" SaldoFin="325.00"/>
+            <BCE:Ctas NumCta="601" SaldoIni="0.00" Debe="250.00" Haber="0.00" SaldoFin="250.00"/>
+            <BCE:Ctas NumCta="601.84" SaldoIni="0.00" Debe="250.00" Haber="0.00" SaldoFin="250.00"/>
+            <BCE:Ctas NumCta="601.84.01" SaldoIni="0.00" Debe="250.00" Haber="0.00" SaldoFin="250.00"/>
         </BCE:Balanza>
         """
 
-        # Adding a more specific group to ensure that the SAT is still generated correctly
-        self.env['account.group'].create({
-            "code_prefix_start": "201.01.01",
-            "code_prefix_end": "201.01.01",
-            "name": "Specific group",
-        })
-
         options = self._generate_options(self.report, '2021-01-01', '2021-12-31')
+        self.assertTrue(any(button.get('action_param') == 'action_l10n_mx_generate_sat_xml' for button in options['buttons']))
         options['l10n_mx_sat_ignore_errors'] = True
         with freeze_time(self.frozen_today):
             sat_report = self.env[self.report.custom_handler_model_name].action_l10n_mx_generate_sat_xml(options)['file_content']
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(sat_report),
             self.get_xml_tree_from_string(expected_sat_xml),
+        )
+
+    def test_generate_sat_xml_supplementary(self):
+        """This test will generate a SAT report with TipoEnvio='C' (Complementary/Supplementary) and verify that:
+        - TipoEnvio is 'C'
+        - FechaModBal attribute IS present in the XML
+        - Filename ends with 'BC'
+        """
+        move_2021_03 = self.env["account.move"].create({
+            "move_type": "entry",
+            "date": fields.Date.to_date("2021-12-18"),
+            "journal_id": self.company_data["default_journal_misc"].id,
+            'line_ids': [
+                Command.create(
+                    {'debit': 250.0, 'credit': 0.0, 'account_id': self.company_data['default_account_expense'].id}),
+                Command.create(
+                    {'debit': 0.0, 'credit': 250.0, 'account_id': self.company_data['default_account_revenue'].id}),
+            ]
+        })
+        move_2021_03.action_post()
+        fecha_mod_bal = fields.Date.to_date(fields.Date.today())
+        expected_sat_xml = (
+            """<?xml version='1.0' encoding='utf-8'?>
+        <BCE:Balanza xmlns:BCE="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion http://www.sat.gob.mx/esquemas/ContabilidadE/1_3/BalanzaComprobacion/BalanzaComprobacion_1_3.xsd" Version="1.3" RFC="EKU9003173C9" Mes="01" Anio="2021" TipoEnvio="C" FechaModBal="%s" Sello="___ignore___" Certificado="___ignore___" noCertificado="___ignore___">
+            <BCE:Ctas NumCta="201" SaldoIni="-1000.00" Debe="75.00" Haber="0.00" SaldoFin="-1075.00"/>
+            <BCE:Ctas NumCta="201.01" SaldoIni="-1000.00" Debe="75.00" Haber="0.00" SaldoFin="-1075.00"/>
+            <BCE:Ctas NumCta="201.01.01" SaldoIni="-1000.00" Debe="75.00" Haber="0.00" SaldoFin="-1075.00"/>
+            <BCE:Ctas NumCta="205" SaldoIni="0.00" Debe="450.00" Haber="450.00" SaldoFin="0.00"/>
+            <BCE:Ctas NumCta="205.06" SaldoIni="0.00" Debe="450.00" Haber="450.00" SaldoFin="0.00"/>
+            <BCE:Ctas NumCta="205.06.01.001" SaldoIni="0.00" Debe="50.00" Haber="400.00" SaldoFin="350.00"/>
+            <BCE:Ctas NumCta="205.06.03" SaldoIni="0.00" Debe="400.00" Haber="50.00" SaldoFin="-350.00"/>
+            <BCE:Ctas NumCta="401" SaldoIni="0.00" Debe="0.00" Haber="575.00" SaldoFin="575.00"/>
+            <BCE:Ctas NumCta="401.01" SaldoIni="0.00" Debe="0.00" Haber="575.00" SaldoFin="575.00"/>
+            <BCE:Ctas NumCta="401.01.01" SaldoIni="0.00" Debe="0.00" Haber="575.00" SaldoFin="575.00"/>
+            <BCE:Ctas NumCta="601" SaldoIni="0.00" Debe="500.00" Haber="0.00" SaldoFin="500.00"/>
+            <BCE:Ctas NumCta="601.84" SaldoIni="0.00" Debe="500.00" Haber="0.00" SaldoFin="500.00"/>
+            <BCE:Ctas NumCta="601.84.01" SaldoIni="0.00" Debe="500.00" Haber="0.00" SaldoFin="500.00"/>
+        </BCE:Balanza>
+        """
+            % fecha_mod_bal
+        ).encode()
+
+        options = self._generate_options(self.report, "2021-01-01", "2021-12-31")
+        options["l10n_mx_sat_ignore_errors"] = True
+        options["submit_type"] = "C"
+
+        sat_result = self.env[
+            self.report.custom_handler_model_name
+        ].action_l10n_mx_generate_sat_xml(options)
+        sat_report = sat_result["file_content"]
+        file_name = sat_result["file_name"]
+
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(sat_report),
+            self.get_xml_tree_from_string(expected_sat_xml),
+        )
+        self.assertTrue(
+            file_name.endswith("BC.xml"),
+            f"Expected filename to end with 'BC.xml', got {file_name}",
         )
 
     def test_generate_coa_xml_without_tag(self):
@@ -505,7 +384,7 @@ class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
                 ('205.06.03 Dotted name C.V.',                                   0.0,     400.0,    50.0,     350.0),
                 ('401.01.01 Sales and/or services taxed at the general rate',    0.0,       0.0,   325.0,    -325.0),
                 ('601.84.01 Other overheads',                                    0.0,     250.0,     0.0,     250.0),
-                ('Undistributed Profits/Losses - ESCUELA KEMPER URGATE',    -1000.00,      0.00,    0.00,  -1000.00),
+                ('Result Brought Forward - ESCUELA KEMPER URGATE',          -1000.00,      0.00,    0.00,  -1000.00),
                 ('Total',                                                        0.0,     775.0,   775.0,       0.0),
             ],
             options,
@@ -513,12 +392,12 @@ class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
 
         # Testing the report with hierarchy
         options['hierarchy'] = True
+        self.env.company.totals_below_sections = False
         self.assertLinesValues(
             self.report._get_lines(options),
             #   Name                                                 Initial Balance     Debit    Credit     End Balance
             [0,                                                                  1,         2,        3,         4],
             [
-                ('2 Passive',                                                 1000.0,     525.0,   450.0,    1075.0),
                 ('201 Suppliers',                                             1000.0,      75.0,     0.0,    1075.0),
                 ('201.01 National suppliers',                                 1000.0,      75.0,     0.0,    1075.0),
                 ('201.01.01 National suppliers',                              1000.0,      75.0,     0.0,    1075.0),
@@ -526,15 +405,13 @@ class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
                 ('205.06 Other short-term sundry creditors',                     0.0,     450.0,   450.0,       0.0),
                 ('205.06.01.001 Extra deep code',                                0.0,      50.0,   400.0,    -350.0),
                 ('205.06.03 Dotted name C.V.',                                   0.0,     400.0,    50.0,     350.0),
-                ('4 Income',                                                     0.0,       0.0,   325.0,    -325.0),
                 ('401 Income',                                                   0.0,       0.0,   325.0,    -325.0),
                 ('401.01 Sales and/or services taxed at the general rate',       0.0,       0.0,   325.0,    -325.0),
                 ('401.01.01 Sales and/or services taxed at the general rate',    0.0,       0.0,   325.0,    -325.0),
-                ('6 Expenditure',                                                0.0,     250.0,     0.0,     250.0),
                 ('601 Overheads',                                                0.0,     250.0,     0.0,     250.0),
                 ('601.84 Other overheads',                                       0.0,     250.0,     0.0,     250.0),
                 ('601.84.01 Other overheads',                                    0.0,     250.0,     0.0,     250.0),
-                ('Undistributed Profits/Losses - ESCUELA KEMPER URGATE',    -1000.00,      0.00,    0.00,  -1000.00),
+                ('Result Brought Forward - ESCUELA KEMPER URGATE',          -1000.00,      0.00,    0.00,  -1000.00),
                 ('Total',                                                        0.0,     775.0,   775.0,       0.0),
             ],
             options,
@@ -560,8 +437,284 @@ class TestL10nMXTrialBalanceReport(TestL10nMXTrialBalanceReportCommon):
         self.assertEqual(20, len(self.get_xml_tree_from_string(coa_report).attrib.get("noCertificado")))
 
 
+@tagged('post_install_l10n', 'post_install', '-at_install')
+class TestL10nMXTrialBalanceMonth13(TestAccountReportsCommon, HttpCase):
+    """ Testing the MX Trial Balance when there are Month 13 closing entries. """
+    _test_user_groups = None  # FIXME list needed groups
+
+    @classmethod
+    @TestAccountReportsCommon.setup_country('mx')
+    def setUpClass(cls):
+        super().setUpClass()
+
+        # Invoice dated 2021-12-01,
+        cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_sale'],
+            date='2021-12-01',
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_receivable'],
+                    debit=1000.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=0.0,
+                    credit=1000.0,
+                ),
+            ],
+            post=True,
+        )
+
+        account_current_year_earnings = cls.env['account.account'].search([
+            ('code', '=', '305.01.01'),
+            ('company_ids', '=', cls.company_data['company'].id),
+        ])
+
+        # Month 13 closing entry dated 2021-12-31
+        cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_sale'],
+            date='2021-12-31',
+            l10n_mx_closing_move=True,
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=800.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=account_current_year_earnings,
+                    debit=0.0,
+                    credit=800.0,
+                ),
+            ],
+            post=True,
+        )
+
+        # Invoice dated 2022-12-06
+        cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_sale'],
+            date='2022-12-06',
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_receivable'],
+                    debit=200.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=0.0,
+                    credit=200.0,
+                ),
+            ],
+            post=True,
+        )
+
+        # Invoice dated 2022-12-31
+        cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_sale'],
+            date='2022-12-31',
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_receivable'],
+                    debit=100.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=0.0,
+                    credit=100.0,
+                ),
+            ],
+            post=True,
+        )
+
+        # Month 13 closing entry dated 2022-12-31
+        cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_sale'],
+            date='2022-12-31',
+            l10n_mx_closing_move=True,
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=250.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=account_current_year_earnings,
+                    debit=0.0,
+                    credit=250.0,
+                ),
+            ],
+            post=True,
+        )
+
+        # Invoice dated 2023-01-01
+        cls._create_invoice(
+            move_type='entry',
+            journal_id=cls.company_data['default_journal_sale'],
+            date='2023-01-01',
+            line_ids=[
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_receivable'],
+                    debit=20.0,
+                    credit=0.0,
+                ),
+                cls._prepare_entry_line(
+                    account_id=cls.company_data['default_account_revenue'],
+                    debit=0.0,
+                    credit=20.0,
+                ),
+            ],
+            post=True,
+        )
+
+        cls.report = cls.env.ref('account_reports.trial_balance_report')
+
+    def test_non_month_13(self):
+        """ Test the Trial Balance report in the case where the 'Month 13' filter is not set.
+            We generate the TB for two periods: from 2022-12-01 to 2022-12-31, and from 2022-12-01 to 2023-01-01.
+
+            For 2022-12-01 to 2022-12-31:
+            - the closing entry for 2021 should appear in the initial balance
+            - the closing entry for 2022 should not appear
+
+            For 2022-12-01 to 2023-01-01:
+            - the closing entry for 2021 should appear in the initial balance
+            - the closing entry for 2022 should appear in the current period"""
+
+        # Generate the Trial Balance for Dec 2022.
+        options = self._generate_options(self.report, '2022-12-01', '2022-12-31', {'hierarchy': False, 'unfold_all': True})
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                                    Initial Balance     Debit    Credit    End Balance
+            [0,                                                                     1,        2,        3,         4],
+            [
+                ('105.01.01 Domestic customers',                                 1000.0,    300.0,     0.0,     1300.0),
+                ('401.01.01 Sales and/or services taxed at the general rate',       0.0,      0.0,   300.0,     -300.0),
+                ('Result Brought Forward - company_1_data',                     -1000.0,      0.0,     0.0,    -1000.0),
+                ('Total',                                                           0.0,    300.0,   300.0,        0.0),
+
+            ],
+            options,
+        )
+
+        # Generate the Trial Balance between 2022-12-01 and 2023-01-01.
+        options = self._generate_options(self.report, '2022-12-01', '2023-01-01', {'hierarchy': False, 'unfold_all': True})
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                                    Initial Balance     Debit    Credit    End Balance
+            [0,                                                                     1,        2,        3,         4],
+            [
+                ('105.01.01 Domestic customers',                                 1000.0,    320.0,      0.0,    1320.0),
+                ('305.01.01 Uncut results',                                         0.0,      0.0,    250.0,    -250.0),
+                ('401.01.01 Sales and/or services taxed at the general rate',       0.0,    250.0,    320.0,     -70.0),
+                ('Result Brought Forward - company_1_data',                     -1000.0,      0.0,    0.0,     -1000.0),
+                ('Total',                                                           0.0,    570.0,    570.0,       0.0),
+            ],
+            options,
+        )
+
+    def test_month_13(self):
+        """ Test the Trial Balance report in the case where the 'Month 13' filter is set.
+            We generate the TB for period 2022-12-01 to 2022-12-31.
+            We expect:
+            - the invoices in Dec 2022 and the closing entry for 2021 appear in the initial balance
+            - the closing entry for 2022 appears in the current period.
+        """
+
+        # Generate the Trial Balance for Dec 2022 with the 'Month 13' filter active.
+        options = self._generate_options(self.report, '2022-12-01', '2022-12-31', {'hierarchy': False, 'unfold_all': True, 'l10n_mx_month_13': True})
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                                  [ Initial Balance ] [    Month 13   ] [ End Balance ]
+            #   Name                                                           Balance     Debit   Credit      Balance
+            [0,                                                                    1,         2,        3,         4],
+            [
+                ('105.01.01 Domestic customers',                                1300.0,       0.0,      0.0,    1300.0),
+                ('305.01.01 Uncut results',                                        0.0,       0.0,    250.0,    -250.0),
+                ('401.01.01 Sales and/or services taxed at the general rate',   -300.0,     250.0,      0.0,     -50.0),
+                ('Result Brought Forward - company_1_data',                    -1000.0,       0.0,      0.0,   -1000.0),
+                ('Total',                                                          0.0,     250.0,    250.0,       0.0),
+            ],
+            options,
+        )
+
+    def test_comparison(self):
+        """ Test comparisons when there are Month 13 closing entries.
+
+            - With the Month 13 filter active, comparisons are disabled (so we don't test them)
+            - With the Month 13 filter inactive, the closing entry should appear as part of the month of December,
+              unless December is the last period in the comparison - in that case the closing entry shouldn't appear.
+        """
+
+        # Generate the Trial Balance for Dec 2022, comparing with Nov 2022, and without the 'Month 13' filter.
+        options = self._generate_options(self.report, '2022-12-01', '2022-12-31', {
+            'hierarchy': False,
+            'unfold_all': True,
+            'comparison': {
+                'filter': 'previous_period',
+                'number_period': 1,
+                'period_order': 'ascending',
+            },
+        })
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                                                  [Initial]     [   Nov 2022   ]    [   Dec 2022   ]       [ End ]
+            #    Name                                                           Balance       Debit    Credit     Debit    Credit       Balance
+            [0,                                                                   1,             2,      3,          4,        5,          6],
+            [
+                ('105.01.01 Domestic customers',                               1000.0,          0.0,     0.0,      300.0,       0.0,    1300.0),
+                # Values manually added to the equity unaffected account
+                ('401.01.01 Sales and/or services taxed at the general rate',     0.0,          0.0,     0.0,        0.0,     300.0,    -300.0),
+                ('Result Brought Forward - company_1_data',                   -1000.0,          0.0,     0.0,        0.0,       0.0,   -1000.0),
+                ('Total',                                                         0.0,          0.0,     0.0,      300.0,     300.0,       0.0),
+            ],
+            options,
+        )
+
+        # Generate the Trial Balance for Jan 2023, comparing with Dec 2022, and without the 'Month 13' filter.
+        options = self._generate_options(self.report, '2023-01-01', '2023-01-31', {
+            'hierarchy': False,
+            'unfold_all': True,
+            'comparison': {
+                'filter': 'previous_period',
+                'number_period': 1,
+                'period_order': 'ascending',
+            },
+        })
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                                                  [Initial]  [   Dec 2022   ]   [Initial]   [ End ]  [   Jan 2023   ]     [ End ]
+            #    Name                                                           Balance    Debit    Credit    Balance    Balance   Debit   Credit     Balance
+            [0,                                                                    1,         2,        3,        4,        5,       6,       7,          8],
+            [
+                ('105.01.01 Domestic customers',                               1000.0,     300.0,      0.0,   1300.0,    1300.0,    20.0,      0.0,    1320.0),
+                ('305.01.01 Uncut results',                                       0.0,       0.0,    250.0,   -250.0,       0.0,     0.0,      0.0,       0.0),
+                ('401.01.01 Sales and/or services taxed at the general rate',     0.0,     250.0,    300.0,    -50.0,       0.0,     0.0,     20.0,     -20.0),
+                ('Result Brought Forward - company_1_data',                   -1000.0,       0.0,      0.0,  -1000.0,   -1300.0,     0.0,      0.0,   -1300.0),
+                ('Total',                                                         0.0,     550.0,    550.0,      0.0,       0.0,    20.0,     20.0,       0.0),
+            ],
+            options,
+        )
+
+    def test_tour_trial_balance_month13_date_filter(self):
+        """ This test is created to ensure the date filter for Month 13 keeps working in case the date filter system
+            is refactored, as this module uses a hack to add the Month 13 options with the behavior we want.
+        """
+        with freeze_time('2022-06-01'):
+            self.start_tour("/odoo/action-account_reports.action_account_report_coa", 'trial_balance_month_13_date_filter', login=self.env.user.login)
+
+
 @tagged('external_l10n', 'post_install', '-at_install', '-standard', 'external')
 class TestL10nMXTrialBalanceReportXmlValidity(TestL10nMXTrialBalanceReportCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @test_xsd(url='https://www.sat.gob.mx/esquemas/ContabilidadE/1_3/CatalogoCuentas/CatalogoCuentas_1_3.xsd')
     def test_coa_xml_validity(self):
         options = self._generate_options(self.report, '2021-01-01', '2021-12-31')

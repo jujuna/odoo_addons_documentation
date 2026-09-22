@@ -4,11 +4,11 @@ from odoo import models
 class AccountReturn(models.Model):
     _inherit = 'account.return'
 
-    def action_submit(self):
+    def _prepare_submission(self):
         # Extends account_reports
         if self.type_external_id == 'l10n_fi_intrastat.fi_intrastat_goods_return_type':
             return self.env['l10n_fi_intrastat.intrastat.goods.submission.wizard']._open_submission_wizard(self)
-        return super().action_submit()
+        return super()._prepare_submission()
 
     def _generate_locking_attachments(self, options):
         # Extends account_reports

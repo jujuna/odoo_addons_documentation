@@ -8,17 +8,15 @@ GANTT_VALID_ATTRIBUTES = set([
     '__validate__',                     # ir.ui.view implementation detail
     'date_start',
     'date_stop',
+    'buffer_start',
+    'buffer_stop',
     'default_scale', # should be dropped
     'default_range',
     'class',
     'js_class',
     'form_view_id',
-    'kanban_view_id',
     'multi_create_view',
     'progress',
-    'consolidation',
-    'consolidation_max',
-    'consolidation_exclude',
     'string',
     'create',
     'on_create',
@@ -44,12 +42,18 @@ GANTT_VALID_ATTRIBUTES = set([
     'decoration-warning',
     'decoration-danger',
     'sample',
+    'schedule',
     'progress_bar',
     'dependency_field',
     'dependency_inverted_field',
     'pill_label',
     'groups_limit'
 ])
+
+POPOVER_VALID_ATTRIBUTES = {
+    '__validate__',  # ir.ui.view implementation detail
+    'card_id',
+}
 
 
 class IrUiView(models.Model):
@@ -61,16 +65,16 @@ class IrUiView(models.Model):
         if not node_info['validate']:
             return
 
-        templates_count = 0
+        popover_count = 0
         for child in node.iterchildren(tag=etree.Element):
-            if child.tag == 'templates':
-                if not templates_count:
-                    templates_count += 1
+            if child.tag == 'popover':
+                if not popover_count:
+                    popover_count += 1
                 else:
-                    msg = _('Gantt view can contain only one templates tag')
+                    msg = _('Gantt view can contain only one popover tag')
                     self._raise_view_error(msg, child)
             elif child.tag != 'field':
-                msg = _('Gantt child can only be field or template, got %s', child.tag)
+                msg = _('Gantt child can only be field or popover, got %s', child.tag)
                 self._raise_view_error(msg, child)
 
         default_scale = node.get('default_scale')
@@ -107,6 +111,32 @@ class IrUiView(models.Model):
             )
             self._raise_view_error(msg, node)
 
+    def _validate_tag_popover(self, node, name_manager, node_info):
+        if not node_info['validate']:
+            return
+
+        templates_count = 0
+        for child in node.iterchildren(tag=etree.Element):
+            if child.tag == 'templates':
+                if not templates_count:
+                    templates_count += 1
+                else:
+                    msg = _('Gantt popover can contain only one templates tag')
+                    self._raise_view_error(msg, child)
+            elif child.tag != 'field':
+                msg = _('Gantt popover child can only be field or template, got %s', child.tag)
+                self._raise_view_error(msg, child)
+
+        attrs = set(node.attrib)
+        remaining = attrs - POPOVER_VALID_ATTRIBUTES
+        if remaining:
+            msg = _(
+                "Invalid attributes (%(invalid_attributes)s) in gantt popover. Attributes must be in (%(valid_attributes)s)",
+                invalid_attributes=remaining,
+                valid_attributes=POPOVER_VALID_ATTRIBUTES,
+            )
+            self._raise_view_error(msg, node)
+
     def _get_view_fields(self, view_type, models):
         if view_type == 'gantt':
             models[self._name] = list(self._fields.keys())
@@ -114,7 +144,7 @@ class IrUiView(models.Model):
         return super()._get_view_fields(view_type, models)
 
     def _get_view_info(self):
-        return {'gantt': {'icon': 'fa fa-tasks'}} | super()._get_view_info()
+        return {'gantt': {'icon': 'view_timeline'}} | super()._get_view_info()
 
     def _is_qweb_based_view(self, view_type):
         return view_type == 'gantt' or super()._is_qweb_based_view(view_type)

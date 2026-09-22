@@ -9,11 +9,14 @@ import {
 import { describe, expect, test } from "@odoo/hoot";
 import { patchWithCleanup } from "@web/../tests/web_test_helpers";
 import { methods } from "@web_mobile/js/services/core";
+import { mockUserAgent } from "@odoo/hoot-mock";
 
-describe.current.tags("desktop");
+describe.current.tags("mobile");
 defineMailModels();
 
 test("'backbutton' event should close messaging menu", async () => {
+    mockUserAgent("android");
+    patchUiSize({ size: SIZES.SM });
     // simulate the feature is available on the current device
     // component must and will be destroyed before the overrideBackButton is unpatched
     patchWithCleanup(methods, {
@@ -30,6 +33,8 @@ test("'backbutton' event should close messaging menu", async () => {
 });
 
 test("[technical] messaging menu should properly override the back button", async () => {
+    mockUserAgent("android");
+    patchUiSize({ size: SIZES.SM });
     // simulate the feature is available on the current device
     // component must and will be destroyed before the overrideBackButton is unpatched
     let overrideBackButton = false;
@@ -38,7 +43,6 @@ test("[technical] messaging menu should properly override the back button", asyn
             overrideBackButton = enabled;
         },
     });
-    patchUiSize({ size: SIZES.SM });
     await start();
 
     await click(".o_menu_systray i[aria-label='Messages']");

@@ -14,14 +14,10 @@ from odoo.addons.portal.controllers.portal import pager as portal_pager
 
 class AppointmentPortal(portal.CustomerPortal):
 
-    def _prepare_home_portal_values(self, counters):
-        values = super()._prepare_home_portal_values(counters)
-
-        if 'appointment_count' in counters:
-            domain = self._get_portal_default_domain()
-            values['appointment_count'] = request.env['calendar.event'].search_count(domain)
-
-        return values
+    def _prepare_portal_counter_values(self, counter):
+        if counter == 'appointment_count':
+            return 'calendar.event', self._get_portal_default_domain(), 'read'
+        return super()._prepare_portal_counter_values(counter)
 
     def _get_portal_default_domain(self):
         my_user = request.env.user
@@ -109,7 +105,7 @@ class AppointmentPortal(portal.CustomerPortal):
         # If not False, this will contain a list of tuples (record of groupby, recordset of events):
         # [(res.users(2), calendar.event(1, 2)), (...), ...]
         if groupby_field:
-            grouped_appointments = [(g, Event.concat(*events)) for g, events in groupbyelem(appointments, itemgetter(groupby_field))]
+            grouped_appointments = [(g, Event.concat(events)) for g, events in groupbyelem(appointments, itemgetter(groupby_field))]
 
         values.update({
             'appointments': appointments,

@@ -6,13 +6,13 @@
         <field name="inherit_id" ref="event.view_event_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='track_count']/.." position='replace'>
-                <field name="track_gantt_initial_date" invisible="1"/>
-                <field name="track_gantt_scale" invisible="1"/>
+                <field name="track_gantt_initial_date" invisible="1"/> <!-- Needed for stat button context -->
+                <field name="track_gantt_scale" invisible="1"/> <!-- Needed for stat button context -->
                 <button
                     name="%(website_event_track.action_event_track_from_event)d"
                     type="action"
                     class="oe_stat_button"
-                    icon="fa-microphone"
+                    icon="mic"
                     context="{'initialDate': track_gantt_initial_date, 'default_scale': track_gantt_scale}">
                     <field name="track_count" string="Tracks" widget="statinfo"/>
                 </button>

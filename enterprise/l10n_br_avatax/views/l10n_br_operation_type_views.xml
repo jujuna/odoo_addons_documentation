@@ -9,8 +9,34 @@
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="technical_name"/>
                             <field name="active"/>
                         </group>
+                        <notebook>
+                            <page string="Issuer Options">
+                                <group>
+                                        <field name="l10n_br_issuer_manufacturer_industry_equivalent"/>
+                                        <field name="l10n_br_issuer_appropriate_ipi_credit"/>
+                                        <field name="l10n_br_issuer_not_subject_to_icmsst"/>
+                                        <field name="l10n_br_issuer_is_icmsst_substitute"/>
+                                        <field name="l10n_br_issuer_appropriate_icms_credit"/>
+                                        <field name="l10n_br_issuer_appropriate_piscofins_credit"/>
+                                </group>
+                            </page>
+                            <page string="Recipient Options">
+                                <group>
+                                    <field name="l10n_br_recipient_manufacturer_industry_equivalent"/>
+                                    <field name="l10n_br_recipient_is_icmsst_substitute"/>
+                                </group>
+                            </page>
+                            <page string="Product Options">
+                                <group>
+                                    <field name="l10n_br_source_origin"/>
+                                    <field name="l10n_br_sped_type"/>
+                                    <field name="l10n_br_use_type"/>
+                                </group>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
@@ -20,7 +46,7 @@
             <field name="name">l10n_br.operation.type.list</field>
             <field name="model">l10n_br.operation.type</field>
             <field name="arch" type="xml">
-                <list editable="bottom">
+                <list>
                     <field name="name"/>
                     <field name="technical_name"/>
                     <field name="active" widget="boolean_toggle"/>

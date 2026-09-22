@@ -4,9 +4,10 @@
 from datetime import timedelta
 
 from odoo.addons.appointment.tests.common import AppointmentCommon
-from odoo.tests import users
+from odoo.tests import tagged, users
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class ResPartnerTest(AppointmentCommon):
 
     @users('staff_user_bxls')

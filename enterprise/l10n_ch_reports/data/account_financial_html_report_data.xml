@@ -6,6 +6,7 @@
         <field name="name@it">Conto economico</field>
         <field name="name@de">Erfolgsrechnung</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="country_id" ref="base.ch"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_multi_company">selector</field>
@@ -38,8 +39,6 @@
                         <field name="name@it">Fatturato</field>
                         <field name="name@de">Nettoerlöse aus Lieferungen und Leistungen</field>
                         <field name="code">CH_30</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_30_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -54,8 +53,6 @@
                         <field name="name@it">Variazione delle rimanenze</field>
                         <field name="name@de">Bestandesänderungen an unfertigen und fertigen Erzeugnissen sowie an nicht fakturierten Dienstleistungen</field>
                         <field name="code">CH_39</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_39_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -87,8 +84,6 @@
                         <field name="name@it">Costo delle merci e dei materiali</field>
                         <field name="name@de">Material- und Warenaufwand</field>
                         <field name="code">CH_4</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_4_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -103,8 +98,6 @@
                         <field name="name@it">Costi del personale</field>
                         <field name="name@de">Personalaufwand</field>
                         <field name="code">CH_5</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_5_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -119,8 +112,6 @@
                         <field name="name@it">Altri costi d’esercizio</field>
                         <field name="name@de">Übriger betrieblicher Aufwand</field>
                         <field name="code">CH_60</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_60_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -152,8 +143,6 @@
                         <field name="name@it">Ammortamenti e svalutazioni di articoli su immobili e attrezzature</field>
                         <field name="name@de">Abschreibungen und Wertberichtigungen auf Positionen des Anlagevermögens</field>
                         <field name="code">CH_68</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_68_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -185,8 +174,6 @@
                         <field name="name@it">Risultato finanziario</field>
                         <field name="name@de">Finanzertrag / -aufwand</field>
                         <field name="code">CH_69</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_69_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -218,8 +205,6 @@
                         <field name="name@it">Risultato delle attività operative accessorie</field>
                         <field name="name@de">Betrieblicher Nebenerfolg</field>
                         <field name="code">CH_7</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_7_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -234,8 +219,6 @@
                         <field name="name@it">Ricavi non operativi</field>
                         <field name="name@de">Betriebsfremder Ertrag / Aufwand</field>
                         <field name="code">CH_80</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_80_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -250,8 +233,6 @@
                         <field name="name@it">Risultato straordinario</field>
                         <field name="name@de">Ausserordentlicher, einmaliger oder periodenfremder Ertrag / Aufwand</field>
                         <field name="code">CH_85</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_ch_85_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -268,8 +249,6 @@
                 <field name="name@it">Imposte dirette</field>
                 <field name="name@de">Direkte Steuern</field>
                 <field name="code">CH_89</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_line_ch_89_balance" model="account.report.expression">
@@ -307,6 +286,7 @@
         <field name="name@it">Stato patrimoniale</field>
         <field name="name@de">Bilanz</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="country_id" ref="base.ch"/>
@@ -343,8 +323,6 @@
                                 <field name="name@it">Tesoreria</field>
                                 <field name="name@de">Flüssige Mittel</field>
                                 <field name="code">CH_100</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">100 + 101 + 102 + 103 + 104 + 105</field>
                             </record>
                             <record id="account_financial_report_line_ch_106" model="account.report.line">
@@ -353,8 +331,6 @@
                                 <field name="name@it">Attività correnti quotate</field>
                                 <field name="name@de">Kurzfristig gehaltene Aktiven mit Börsenkurs</field>
                                 <field name="code">CH_106</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">106 + 107 + 108 + 109</field>
                             </record>
                             <record id="account_financial_report_line_ch_110" model="account.report.line">
@@ -363,8 +339,6 @@
                                 <field name="name@it">Crediti per forniture e servizi</field>
                                 <field name="name@de">Forderungen aus Lieferungen und Leistungen</field>
                                 <field name="code">CH_110</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">110 + 111 + 112 + 113</field>
                             </record>
                             <record id="account_financial_report_line_ch_114" model="account.report.line">
@@ -373,8 +347,6 @@
                                 <field name="name@it">Altri crediti a breve termine</field>
                                 <field name="name@de">Übrige kurzfristige Forderungen</field>
                                 <field name="code">CH_114</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">114 + 115 + 116 + 117 + 118 + 119</field>
                             </record>
                             <record id="account_financial_report_line_ch_120" model="account.report.line">
@@ -383,8 +355,6 @@
                                 <field name="name@it">Rimanenze e servizi non fatturati</field>
                                 <field name="name@de">Vorräte und nicht fakturierte Dienstleistungen</field>
                                 <field name="code">CH_120</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">12</field>
                             </record>
                             <record id="account_financial_report_line_ch_130" model="account.report.line">
@@ -393,8 +363,6 @@
                                 <field name="name@it">Ratei e risconti (transitori)</field>
                                 <field name="name@de">Aktive Rechnungsabgrenzungen</field>
                                 <field name="code">CH_130</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">13</field>
                             </record>
                         </field>
@@ -413,8 +381,6 @@
                                 <field name="name@it">Immobilizzazioni finanziarie</field>
                                 <field name="name@de">Finanzanlagen</field>
                                 <field name="code">CH_140</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">14\(148,149)</field>
                             </record>
                             <record id="account_financial_report_line_ch_148" model="account.report.line">
@@ -423,8 +389,6 @@
                                 <field name="name@it">Partecipazioni</field>
                                 <field name="name@de">Beteiligungen</field>
                                 <field name="code">CH_148</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">148 + 149</field>
                             </record>
                             <record id="account_financial_report_line_ch_150" model="account.report.line">
@@ -433,8 +397,6 @@
                                 <field name="name@it">Immobilizzazioni materiali mobiliari</field>
                                 <field name="name@de">Mobile Sachanlagen</field>
                                 <field name="code">CH_150</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">15</field>
                             </record>
                             <record id="account_financial_report_line_ch_160" model="account.report.line">
@@ -443,8 +405,6 @@
                                 <field name="name@it">Immobili, impianti e macchinari</field>
                                 <field name="name@de">Immobile Sachanlagen</field>
                                 <field name="code">CH_160</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">16</field>
                             </record>
                             <record id="account_financial_report_line_ch_170" model="account.report.line">
@@ -453,8 +413,6 @@
                                 <field name="name@it">Immobilizzazioni immateriali</field>
                                 <field name="name@de">Immaterielle Werte</field>
                                 <field name="code">CH_170</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">17</field>
                             </record>
                             <record id="account_financial_report_line_ch_180" model="account.report.line">
@@ -463,8 +421,6 @@
                                 <field name="name@it">Capitale non versato: capitale sociale - capitale della fondazione</field>
                                 <field name="name@de">Nicht einbezahltes Grund-, Gesellschafter- oder Stiftungs kapital</field>
                                 <field name="code">CH_180</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">18 + 19</field>
                             </record>
                         </field>
@@ -495,8 +451,6 @@
                                 <field name="name@it">Debiti a breve termine derivanti da acquisti e prestazioni di servizi</field>
                                 <field name="name@de">Verbindlichkeiten aus Lieferungen und Leistungen</field>
                                 <field name="code">CH_200</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-20</field>
                             </record>
                             <record id="account_financial_report_line_ch_210" model="account.report.line">
@@ -505,8 +459,6 @@
                                 <field name="name@it">Indebitamento a breve termine fruttifero di interessi</field>
                                 <field name="name@de">Kurzfristige verzinsliche Verbindlichkeiten</field>
                                 <field name="code">CH_210</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-21</field>
                             </record>
                             <record id="account_financial_report_line_ch_220" model="account.report.line">
@@ -515,8 +467,6 @@
                                 <field name="name@it">Altre passività correnti</field>
                                 <field name="name@de">Übrige kurzfristige Verbindlichkeiten</field>
                                 <field name="code">CH_220</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-22</field>
                             </record>
                             <record id="account_financial_report_line_ch_230" model="account.report.line">
@@ -525,8 +475,6 @@
                                 <field name="name@it">Ratei e risconti passivi e fondi a breve termine</field>
                                 <field name="name@de">Passive Rechnungsabgrenzungen und kurzfristige Rückstellungen</field>
                                 <field name="code">CH_230</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-23</field>
                             </record>
                         </field>
@@ -545,8 +493,6 @@
                                 <field name="name@it">Indebitamento a lungo termine fruttifero di interessi</field>
                                 <field name="name@de">Langfristige verzinsliche Verbindlichkeiten</field>
                                 <field name="code">CH_240</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-24</field>
                             </record>
                             <record id="account_financial_report_line_ch_250" model="account.report.line">
@@ -555,8 +501,6 @@
                                 <field name="name@it">Altri debiti a lungo termine</field>
                                 <field name="name@de">Übrige langfristige Verbindlichkeiten</field>
                                 <field name="code">CH_250</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-25</field>
                             </record>
                             <record id="account_financial_report_line_ch_260" model="account.report.line">
@@ -565,8 +509,6 @@
                                 <field name="name@it">Accantonamenti a lungo termine e disposizioni di legge</field>
                                 <field name="name@de">Rückstellungen sowie vom Gesetz vorgesehene ähnliche Positionen</field>
                                 <field name="code">CH_260</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-26 - 27</field>
                             </record>
                         </field>
@@ -577,7 +519,7 @@
                         <field name="name@it">PATRIMONIO NETTO</field>
                         <field name="name@de">EIGENKAPITAL</field>
                         <field name="code">CH_28</field>
-                        <field name="aggregation_formula">CH_280.balance + CH_290.balance + CH_299.balance</field>
+                        <field name="aggregation_formula">CH_280.balance + CH_290_A.balance + CH_RE.balance + CH_290_C.balance</field>
                         <field name="children_ids">
                             <record id="account_financial_report_line_ch_280" model="account.report.line">
                                 <field name="name">Share, corporate or foundation capital</field>
@@ -585,33 +527,50 @@
                                 <field name="name@it">Capitale sociale o di fondazione</field>
                                 <field name="name@de">Grund-, Gesellschafter- oder Stiftungskapital</field>
                                 <field name="code">CH_280</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-28</field>
                             </record>
-                            <record id="account_financial_report_line_ch_290" model="account.report.line">
-                                <field name="name">Legal capital reserves</field>
-                                <field name="name@fr">Réserves / bénéfices et pertes reportés</field>
-                                <field name="name@it">Riserve / Utili e perdite a riportate</field>
-                                <field name="name@de">Reserven und Jahresgewinn oder Jahresverlust</field>
-                                <field name="code">CH_290</field>
-                                <field name="aggregation_formula">CH_290_A.balance + CH_290_B.balance</field>
+                            <record id="account_financial_report_line_ch_290_a" model="account.report.line">
+                                <field name="name">Legal reserves</field>
+                                <field name="name@fr">Réserves légales</field>
+                                <field name="name@it">Riserve legali</field>
+                                <field name="name@de">Gesetzliche Reserven</field>
+                                <field name="code">CH_290_A</field>
+                                <field name="expression_ids">
+                                    <record id="account_financial_report_line_ch_290_a_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="engine">domain</field>
+                                        <field name="date_scope">from_beginning</field>
+                                        <field name="formula">[('account_id.code', '&gt;=', '290'), ('account_id.code', '&lt;', '2970')]</field>
+                                        <field name="subformula">-sum</field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="account_financial_report_line_ch_retained_earnings" model="account.report.line">
+                                <field name="name">Retained earnings</field>
+                                <field name="name@fr">Résultat reporté</field>
+                                <field name="name@it">Utili non distribuiti</field>
+                                <field name="name@de">Gewinnrücklagen</field>
+                                <field name="code">CH_RE</field>
+                                <field name="aggregation_formula">CH_297.balance + CH_290_B.balance</field>
                                 <field name="children_ids">
-                                    <record id="account_financial_report_line_ch_290_a" model="account.report.line">
-                                        <field name="name">Legal reserves</field>
-                                        <field name="name@fr">Réserves légales</field>
-                                        <field name="name@it">Riserve legali</field>
-                                        <field name="name@de">Gesetzliche Reserven</field>
-                                        <field name="code">CH_290_A</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
+                                    <record id="account_financial_report_line_ch_297" model="account.report.line">
+                                        <field name="name">Profit / Loss brought forward</field>
+                                        <field name="name@fr">Report à nouveau</field>
+                                        <field name="name@it">Utile / Perdita portato(a) a nuovo</field>
+                                        <field name="name@de">Gewinnvortrag / Verlustvortrag</field>
+                                        <field name="code">CH_297</field>
+                                        <field name="action_id" ref="account_financial_report_l10n_ch_pl_action"/>
                                         <field name="expression_ids">
-                                            <record id="account_financial_report_line_ch_290_a_balance" model="account.report.expression">
+                                            <record id="account_financial_report_line_ch_297_domain" model="account.report.expression">
+                                                <field name="label">domain</field>
+                                                <field name="engine">account_codes</field>
+                                                <field name="date_scope">strict_range</field>
+                                                <field name="formula">-297</field>
+                                            </record>
+                                            <record id="account_financial_report_line_ch_297_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
-                                                <field name="engine">domain</field>
-                                                <field name="date_scope">from_beginning</field>
-                                                <field name="formula">[('account_id.code', '&gt;=', '290'), ('account_id.code', '&lt;', '2970')]</field>
-                                                <field name="subformula">-sum</field>
+                                                <field name="engine">aggregation</field>
+                                                <field name="formula">CH_297.domain + CH_299_B.balance</field>
                                             </record>
                                         </field>
                                     </record>
@@ -634,7 +593,7 @@
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">CH_R.balance</field>
                                                 <field name="date_scope">to_beginning_of_fiscalyear</field>
-                                                <field name="subformula">cross_report(l10n_ch_reports.account_financial_report_l10n_ch_cdr)</field>
+                                                <field name="subformula">cross_report(l10n_ch_reports.account_financial_report_l10n_ch_cdr, force_date_scope)</field>
                                             </record>
                                             <record id="account_financial_report_line_ch_290_b_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -642,6 +601,22 @@
                                                 <field name="formula">CH_290_B.domain + CH_290_B.cross_report</field>
                                             </record>
                                         </field>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="account_financial_report_line_ch_290_c" model="account.report.line">
+                                <field name="name">Treasury shares</field>
+                                <field name="name@fr">Actions propres</field>
+                                <field name="name@it">Azioni proprie</field>
+                                <field name="name@de">Eigene Aktien</field>
+                                <field name="code">CH_290_C</field>
+                                <field name="expression_ids">
+                                    <record id="account_financial_report_line_ch_290_c_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="engine">account_codes</field>
+                                        <field name="date_scope">from_beginning</field>
+                                        <field name="formula">-298</field>
+                                        <field name="subformula" eval="False"/>
                                     </record>
                                 </field>
                             </record>
@@ -658,7 +633,7 @@
                                         <field name="engine">aggregation</field>
                                         <field name="formula">CH_R.balance</field>
                                         <field name="date_scope">from_fiscalyear</field>
-                                        <field name="subformula">cross_report(l10n_ch_reports.account_financial_report_l10n_ch_cdr)</field>
+                                        <field name="subformula">cross_report(l10n_ch_reports.account_financial_report_l10n_ch_cdr, force_date_scope)</field>
                                     </record>
                                 </field>
                                 <field name="children_ids">
@@ -668,8 +643,10 @@
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_ch_299_a_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
-                                                <field name="engine">account_codes</field>
-                                                <field name="formula">-2979</field>
+                                                <field name="engine">domain</field>
+                                                <field name="formula">['|', ('account_id.code', '=like', '9999%'), ('account_id.account_type','=','equity_unaffected')]</field>
+                                                <field name="subformula">sum</field>
+                                                <field name="date_scope">from_fiscalyear</field>
                                             </record>
                                         </field>
                                     </record>

@@ -1,4 +1,4 @@
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, computed, proxy, t, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { ViewStructures } from "@web_studio/client_action/view_editor/editors/components/view_structures";
 import { InteractiveEditorSidebar } from "@web_studio/client_action/view_editor/interactive_editor/interactive_editor_sidebar";
@@ -36,10 +36,6 @@ class KanbanFieldProperties extends FieldProperties {
 
 export class KanbanEditorSidebar extends Component {
     static template = "web_studio.ViewEditor.KanbanEditorSidebar";
-    static props = {
-        openViewInForm: { type: Function, optional: true },
-        openDefaultValues: { type: Function, optional: true },
-    };
     static components = {
         InteractiveEditorSidebar,
         ExistingFields,
@@ -48,6 +44,11 @@ export class KanbanEditorSidebar extends Component {
         ViewStructures,
         SidebarViewToolbox,
     };
+
+    props = useProps({
+        openViewInForm: t.function().optional(),
+        openDefaultValues: t.function().optional(),
+    });
     static get viewStructures() {
         return {
             aside: {
@@ -81,7 +82,7 @@ export class KanbanEditorSidebar extends Component {
     }
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             foldField: {
                 id: 0,
                 fold_name: "",
@@ -89,7 +90,7 @@ export class KanbanEditorSidebar extends Component {
             groupByField: {},
             fieldsForFold: [],
         });
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
         this.editArchAttributes = useEditNodeAttributes({ isRoot: true });
         this.propertiesComponents = {
             a: {
@@ -142,6 +143,23 @@ export class KanbanEditorSidebar extends Component {
             required: false,
         };
     }
+
+    get canCustomSumField() {
+        return this.archInfo.progressAttributes;
+    }
+
+    get sumFieldValue() {
+        return this.archInfo.progressAttributes?.sumField?.name ?? "";
+    }
+
+    sumFieldProps = computed(() => ({
+        choices: fieldsToChoices(
+            this.viewEditorModel.fields,
+            this.viewEditorModel.MEASURABLE_TYPES,
+            (field) => field.aggregator
+        ),
+        required: false,
+    }));
 
     get defaultGroupBy() {
         return {
@@ -228,6 +246,29 @@ export class KanbanEditorSidebar extends Component {
             fold_name: value,
         });
         this.state.foldField.fold_name = value;
+    }
+
+    async editSumField(value) {
+        this.viewEditorModel.doOperation({
+            type: "attributes",
+            position: "attributes",
+            new_attrs: {
+                sum_field: value,
+            },
+            target: {
+                tag: "progressbar",
+                xpath_info: [
+                    {
+                        tag: "kanban",
+                        indice: 1,
+                    },
+                    {
+                        tag: "progressbar",
+                        indice: 1,
+                    },
+                ],
+            },
+        });
     }
 
     async editGroupExpand(value) {

@@ -1,12 +1,11 @@
 import { makeSpreadsheetMockEnv } from "@spreadsheet/../tests/helpers/model";
-import { serverState } from "@web/../tests/web_test_helpers";
+import { getService, serverState } from "@web/../tests/web_test_helpers";
 import { getDocumentBasicData } from "./data";
 
 export const makeDocumentsSpreadsheetMockEnv = async (params = {}) => {
     params.serverData = ensureDocumentsRequiredRecords(params.serverData);
-    const env = await makeSpreadsheetMockEnv(params);
-    env.services["document.document"].store.odoobot = { userId: serverState.odoobotId };
-    return env;
+    await makeSpreadsheetMockEnv(params);
+    getService("document.document").store.odoobot = { userId: serverState.odoobotId };
 };
 
 export const ensureDocumentsRequiredRecords = (serverData) => {

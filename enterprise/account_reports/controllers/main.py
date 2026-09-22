@@ -1,19 +1,24 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import werkzeug
-from werkzeug.exceptions import InternalServerError
-
-from odoo.addons.account_reports.models.account_report import AccountReportFileDownloadException
-from odoo.addons.account.controllers.download_docs import _get_headers
-from odoo import http
-from odoo.http import content_disposition, request
-from odoo.tools.misc import html_escape
-
 import json
 
+from types import GeneratorType
 
-class AccountReportController(http.Controller):
+from werkzeug.exceptions import InternalServerError
 
-    @http.route('/account_reports', type='http', auth='user', methods=['POST'], csrf=False)
+from odoo.http import Controller, request, route
+from odoo.http.dispatcher import serialize_exception
+from odoo.http.stream import content_disposition
+from odoo.tools.misc import html_escape
+
+from odoo.addons.account.controllers.download_docs import _get_headers
+from odoo.addons.account_reports.models.account_report import (
+    AccountReportFileDownloadException,
+)
+
+
+class AccountReportController(Controller):
+
+    @route('/account_reports', type='http', auth='user', methods=['POST'], csrf=False)
     def get_report(self, options, file_generator, **kwargs):
         uid = request.env.uid
         options = json.loads(options)
@@ -37,7 +42,7 @@ class AccountReportController(http.Controller):
             else:
                 response = request.make_response(file_content, headers=response_headers)
 
-            if file_type in ('zip', 'xaf'):
+            if file_type in ('zip', 'xaf') or isinstance(file_content, GeneratorType):
                 # Adding direct_passthrough to the response and giving it a file
                 # as content means that we will stream the content of the file to the user
                 # Which will prevent having the whole file in memory
@@ -53,7 +58,7 @@ class AccountReportController(http.Controller):
             }
             raise InternalServerError(response=self._generate_response(data)) from e
         except Exception as e:  # noqa: BLE001
-            data = http.serialize_exception(e)
+            data = serialize_exception(e)
             raise InternalServerError(response=self._generate_response(data)) from e
 
     def _generate_response(self, data):
@@ -70,18 +75,19 @@ class AccountReportController(http.Controller):
             ('Content-Disposition', content_disposition(file_name)),
         ]
 
-        if file_type in ('xml', 'txt', 'csv', 'kvr', 'csv'):
+        if file_type in ('xml', 'txt', 'csv', 'kvr', 'csv') and not isinstance(file_content, GeneratorType):
             headers.append(('Content-Length', len(file_content)))
 
         return headers
 
-    @http.route('/account_reports/download_attachments/<models("ir.attachment"):attachments>', type='http', auth='user')
+    @route('/account_reports/download_attachments/<models("ir.attachment"):attachments>', type='http', auth='user')
     def download_report_attachments(self, attachments):
         attachments.check_access('read')
         assert all(attachment.res_id and attachment.res_model == 'res.partner' for attachment in attachments)
         if len(attachments) == 1:
-            headers = _get_headers(attachments.name, attachments.mimetype, attachments.raw)
-            return request.make_response(attachments.raw, headers)
+            content = attachments.raw.content
+            headers = _get_headers(attachments.name, attachments.mimetype, content)
+            return request.make_response(content, headers)
         else:
             content = attachments._build_zip_from_attachments()
             headers = _get_headers('attachments.zip', 'zip', content)

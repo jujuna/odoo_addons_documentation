@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Approvals - Purchase',
-    'version': '1.0',
     'category': 'Human Resources/Approvals',
     'description': """
 This module adds to the approvals workflow the possibility to generate
@@ -19,7 +17,6 @@ RFQ from an approval purchase request.
     'demo': [
         'data/approval_demo.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

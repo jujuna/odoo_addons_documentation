@@ -34,13 +34,14 @@ class L10n_BeScheduleChangeAllocation(models.Model):
 
     def apply_directly(self):
         for record in self:
-            number_of_days = self.env['l10n_be.hr.payroll.schedule.change.wizard']\
+            number_of_days, number_of_hours = self.env['l10n_be.hr.payroll.schedule.change.wizard']\
                 .with_company(record.version_id.company_id)._compute_new_allocation(
                     record.leave_allocation_id, record.current_resource_calendar_id,
                     record.new_resource_calendar_id, record.effective_date,
             )
             record.leave_allocation_id.write({
                 'number_of_days': number_of_days,
+                'number_of_hours': number_of_hours,
             })
             record.leave_allocation_id._message_log(body=Markup(_('New working schedule on %(contract_name)s.<br/>'
             'New total: %(days)s')) % {'contract_name': record.version_id.name, 'days': number_of_days})

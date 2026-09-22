@@ -7,22 +7,48 @@
 # Wichanon Jamwutthipreecha, 2022
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~15.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 05:26+0000\n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 01:01+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
 "delivery_easypost/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__4x4
+msgid "4x4"
+msgstr "4x4"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__4x6
+msgid "4x6"
+msgstr "4x6"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__6x4
+msgid "6x4"
+msgstr "6x4"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__7x3
+msgid "7x3"
+msgstr "7x3"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__8_5x11
+msgid "8.5x11"
+msgstr ""
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -42,8 +68,8 @@ msgid ""
 "same page.</b>\n"
 "                <br/>"
 msgstr ""
-"<b>เมื่อสร้างบัญชีของคุณแล้ว "
-"ให้ไปที่แดชบอร์ดแล้วคลิกที่ลูกศรถัดจากชื่อผู้ใช้ของคุณเพื่อกำหนดค่าบัญชีผู้ให้บริการของคุณ </b>\n"
+"<b>เมื่อสร้างบัญชีของคุณแล้ว ให้ไปที่แดชบอร์ดแล้วคลิกที่ลูกศรถัดจากชื่อผู้ใช้ของคุณเพื่อกำหนดค่าบัญชีผู้ให้บ"
+"ริการของคุณ </b>\n"
 "                <b>คุณสามารถเพิ่มบัญชีผู้ให้บริการใหม่ได้ทางด้านขวาของหน้าเดียวกัน</b>\n"
 "                <br/>"
 
@@ -68,11 +94,6 @@ msgstr "จำเป็นต้องมีรหัสการผลิตเ
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "API keys"
 msgstr "API คีย์"
-
-#. module: delivery_easypost
-#: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_easypost_carrier_type
-msgid "Cancel"
-msgstr "ยกเลิก"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_stock_package_type__package_carrier_type
@@ -131,6 +152,11 @@ msgid "Delivery Carrier"
 msgstr "ผู้ให้บริการจัดส่ง"
 
 #. module: delivery_easypost
+#: model:ir.model,name:delivery_easypost.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
+
+#. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__display_name
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__display_name
@@ -184,6 +210,11 @@ msgid "Easypost Label File Type"
 msgstr "ประเภทไฟล์ฉลาก Easypost"
 
 #. module: delivery_easypost
+#: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_label_size
+msgid "Easypost Label Size"
+msgstr ""
+
+#. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_stock_picking__ep_order_ref
 msgid "Easypost Order Reference"
 msgstr "อ้างอิงคำสั่ง Easypost"
@@ -194,10 +225,9 @@ msgid "Easypost Service"
 msgstr "บริการ Easypost"
 
 #. module: delivery_easypost
-#: model_terms:ir.ui.view,arch_db:delivery_easypost.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_easypost.res_config_settings_view_form_stock
-msgid "Easypost Shipping Methods"
-msgstr "วิธีการการจัดส่ง Easypost"
+#: model:ir.module.module,shortdesc:base.module_delivery_easypost
+msgid "Easypost Shipping"
+msgstr ""
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -261,13 +291,18 @@ msgid ""
 "It seems Easypost do not provide shipments for this order.                We "
 "advise you to try with another package type or service level."
 msgstr ""
-"ดูเหมือนว่า Easypost จะไม่จัดส่งสินค้าสำหรับคำสั่งซื้อนี้ "
-"เราขอแนะนำให้คุณลองใช้แพ็คเกจหรือระดับบริการอื่น"
+"ดูเหมือนว่า Easypost จะไม่จัดส่งสินค้าสำหรับคำสั่งซื้อนี้ เราขอแนะนำให้คุณลองใช้แพ็คเกจหรือระดับบริ"
+"การอื่น"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Label Format"
 msgstr "รูปแบบฉลาก"
+
+#. module: delivery_easypost
+#: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
+msgid "Label Size"
+msgstr ""
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__write_uid
@@ -346,6 +381,11 @@ msgid "Select a carrier"
 msgstr "เลือกผู้ให้บริการ"
 
 #. module: delivery_easypost
+#: model:ir.module.module,description:base.module_delivery_easypost
+msgid "Send your parcels through Easypost and track them online"
+msgstr ""
+
+#. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__name
 msgid "Service Level Name"
 msgstr "ชื่อระดับบริการ"
@@ -355,11 +395,6 @@ msgstr "ชื่อระดับบริการ"
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "Shipment created into Easypost<br/><b>Tracking Numbers:</b> %s<br/>"
 msgstr "การจัดส่งที่สร้างโดย Easypost<br/><b>หมายเลขติดตาม:</b> %s<br/>"
-
-#. module: delivery_easypost
-#: model:ir.model,name:delivery_easypost.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "วิธีการการจัดส่ง"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -380,41 +415,33 @@ msgstr "ทดสอบ API คีย์"
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Default Package Type)"
 msgstr ""
-"%s ผู้ให้บริการหายไป (ช่องหายไป) :\n"
-" ประเภทแพ็คเกจเริ่มต้น)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Delivery Carrier Type)"
 msgstr ""
-"%s ผู้ให้บริการหายไป (ช่องหายไป) :\n"
-" ประเภทผู้ให้บริการจัดส่ง)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Production API Key)"
 msgstr ""
-"%sผู้ให้บริการหายไป (ช่องหายไป) :\n"
-" Production API Key)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Test API Key)"
 msgstr ""
-"%s ผู้ให้บริการหายไป (ช่องหายไป) :\n"
-" Test API Key)"
 
 #. module: delivery_easypost
 #. odoo-python
@@ -480,8 +507,8 @@ msgid ""
 "You have no carrier linked to your Easypost Account.                Please "
 "connect to Easypost, link your account to carriers and then retry."
 msgstr ""
-"คุณไม่มีผู้ให้บริการที่เชื่อมโยงกับบัญชี Easypost ของคุณ โปรดเชื่อมต่อกับ Easypost "
-"เพื่อเชื่อมโยงบัญชีของคุณกับผู้ให้บริการแล้วลองอีกครั้ง"
+"คุณไม่มีผู้ให้บริการที่เชื่อมโยงกับบัญชี Easypost ของคุณ โปรดเชื่อมต่อกับ Easypost เพื่อเชื่อมโยงบัญชี"
+"ของคุณกับผู้ให้บริการแล้วลองอีกครั้ง"
 
 #. module: delivery_easypost
 #: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_file_type__zpl
@@ -492,10 +519,3 @@ msgstr "ZPL"
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "to create a new account:"
 msgstr "สร้างบัญชีใหม่"
-
-#~ msgid ""
-#~ "<span attrs=\"{'invisible': [('package_carrier_type', '!=', 'easypost')]}"
-#~ "\">Inches</span>"
-#~ msgstr ""
-#~ "<span attrs=\"{'invisible': [('package_carrier_type', '!=', 'easypost')]}"
-#~ "\">นิ้ว</span>"

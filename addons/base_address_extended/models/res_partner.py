@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models, tools
+from odoo import api, fields, models
+from odoo.tools.business_data import street_split
 
 
 class ResPartner(models.Model):
@@ -34,7 +34,7 @@ class ResPartner(models.Model):
         """Splits street value into sub-fields.
         Recomputes the fields of STREET_FIELDS when `street` of a partner is updated"""
         for partner in self:
-            partner.update(tools.street_split(partner.street))
+            partner.update(street_split(partner.street))
 
     def _get_street_split(self):
         self.ensure_one()
@@ -48,8 +48,10 @@ class ResPartner(models.Model):
     def _onchange_city_id(self):
         if self.city_id:
             self.city = self.city_id.name
-            self.zip = self.city_id.zipcode
-            self.state_id = self.city_id.state_id
+            if self.city_id.state_id:
+                self.state_id = self.city_id.state_id
+            if not (self.parent_id and self.city_id == self.parent_id.city_id and self.zip == self.parent_id.zip) and self.city_id.zipcode:
+                self.zip = self.city_id.zipcode
         elif self._origin:
             self.city = False
             self.zip = False
@@ -60,3 +62,17 @@ class ResPartner(models.Model):
         super()._onchange_country_id()
         if self.country_id and self.country_id != self.city_id.country_id:
             self.city_id = False
+
+    @api.model
+    def _get_res_city_by_name(self, name, country_id):
+        ResCity = self.env['res.city']
+        if not name or not country_id:
+            return ResCity
+
+        if self.env.user._is_public():
+            ResCity = ResCity.sudo()
+
+        return ResCity.search([
+            ('name', '=ilike', name),
+            ('country_id', '=', country_id),
+        ], limit=1)

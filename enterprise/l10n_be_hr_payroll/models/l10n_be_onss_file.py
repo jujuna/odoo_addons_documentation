@@ -1,7 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-
 from datetime import date
 
 from odoo import api, fields, models
@@ -40,6 +38,7 @@ DECLARATION_TYPES = [
     ("ECOR", "Ecaro Technical Identification Keys"),
     ("ECRQ", "Ecaro Data Consultation Request"),
     ("FINO", "Financial Note"),
+    ("FLEX", "Flexi@Work declaration"),
     ("FISI", "Financial Statement for Accredited Social Secretariats"),
     ("IDFL", "Identification Change"),
     ("LIRE", "Payment Allocation List (Social Secretariats)"),
@@ -108,6 +107,9 @@ class L10nBeOnssFile(models.Model):
     form_creation_hour = fields.Char(
         compute='_compute_form_creation_date',
         store=True)
+    reference = fields.Char(
+        compute="_compute_form_creation_date",
+        store=True)
 
     file_content = fields.Text(compute='_compute_file_content', store=True)
 
@@ -175,31 +177,39 @@ class L10nBeOnssFile(models.Model):
     @api.depends('file')
     def _compute_file_content(self):
         for onss_file in self:
-            file_content_b64 = onss_file.with_context(bin_size=False).file
-            if not file_content_b64:
+            file_content = onss_file.file
+            if not file_content:
                 onss_file.file_content = False
                 continue
             try:
-                onss_file.file_content = base64.b64decode(file_content_b64)
+                onss_file.file_content = file_content.decode()
             except UnicodeDecodeError:
-                onss_file.file_content = file_content_b64
+                onss_file.file_content = file_content.to_base64()
 
     @api.depends('file', 'declaration_type')
     def _compute_form_creation_date(self):
         for onss_file in self:
-            file_content_b64 = onss_file.with_context(bin_size=False).file
-            if not file_content_b64:
+            file_content = onss_file.file
+            if not file_content:
                 onss_file.form_creation_date = False
                 onss_file.form_creation_hour = False
+                onss_file.reference = False
                 continue
             try:
-                data_dict = xml_str_to_dict(base64.b64decode(file_content_b64))
+                data_dict = xml_str_to_dict(file_content.content)
             except Exception:  # noqa: BLE001
                 continue
             form = {}
-            for key in ['DmfAOriginal', 'NOTIFICATION', 'ACRF']:
+            for key in ['DmfAOriginal', 'NOTIFICATION', 'ACRF', 'DmfAConsultationRequest', 'DmfAUpdate', 'DmfAUpdateNotification', 'DmfAPID', 'FLXWAGE']:
                 if key in data_dict:
                     form = data_dict[key]['Form']
                     break
             onss_file.form_creation_date = form.get('FormCreationDate', False)
             onss_file.form_creation_hour = form.get('FormCreationHour', False)
+            onss_file.reference = False
+            references = form.get('Reference', [])
+            if isinstance(references, dict):
+                references = [references]
+            for reference in references:
+                if reference['ReferenceType'] == '1':
+                    onss_file.reference = reference['ReferenceNbr']

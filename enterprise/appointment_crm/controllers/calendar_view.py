@@ -2,14 +2,20 @@
 
 from odoo.addons.appointment.controllers.calendar_view import AppointmentCalendarView
 from odoo.fields import Domain
-from odoo.http import request
 
 
 class AppointmentCrmCalendarView(AppointmentCalendarView):
 
     @classmethod
-    def _get_staff_user_appointment_invite_domain(cls, appointment_type, user):
-        domain = super()._get_staff_user_appointment_invite_domain(appointment_type, user)
-        if 'default_opportunity_id' in request.env.context:
-            domain = Domain.AND([domain, [('opportunity_id', '=', request.env.context['default_opportunity_id'])]])
+    def _get_appointment_invite_domain(cls, appointment_type, user, opportunity_id=None, **kwargs):
+        domain = super()._get_appointment_invite_domain(appointment_type, user, **kwargs)
+        if opportunity_id:
+            domain = Domain.AND([domain, [('opportunity_id', '=', opportunity_id)]])
         return domain
+
+    @classmethod
+    def _get_appointment_invite_values(cls, appointment_type, opportunity_id=None, **kwargs):
+        invitation_values = super()._get_appointment_invite_values(appointment_type, **kwargs)
+        if opportunity_id:
+            invitation_values['opportunity_id'] = opportunity_id
+        return invitation_values

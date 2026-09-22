@@ -1,4 +1,4 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, signal, t, usePlugin, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { computeXpath } from "@web_studio/client_action/view_editor/editors/xml_utils";
 import { visitXML } from "@web/core/utils/xml";
@@ -7,6 +7,7 @@ import { StudioHook } from "@web_studio/client_action/view_editor/editors/compon
 import { InteractiveEditorSidebar } from "@web_studio/client_action/view_editor/interactive_editor/interactive_editor_sidebar";
 import { ExistingFields } from "@web_studio/client_action/view_editor/editors/components/view_fields";
 import { Property } from "@web_studio/client_action/view_editor/property/property";
+import { ModifiersProperties } from "@web_studio/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties";
 import { SidebarViewToolbox } from "@web_studio/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox";
 import { _t } from "@web/core/l10n/translation";
 import { memoize } from "@web/core/utils/functions";
@@ -18,6 +19,7 @@ import {
     FilterConfiguration,
 } from "@web_studio/client_action/view_editor/interactive_editor/field_configuration/field_configuration";
 import { randomName } from "@web_studio/client_action/view_editor/editors/utils";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 function getGroupByFieldNameFromString(str) {
     const matches = str.match(/(,\s*)?(["'])group_by\2\1(\s*:\s*)?\2(?<fieldName>.*)\2/);
@@ -70,8 +72,10 @@ class SearchEditorArchParser {
         if (nodeName === "field") {
             this.changeCategory("field", true);
             const item = this.parseNode(node);
-            item.studioXpath = studioXpath;
-            this.fields.push(item);
+            if (!studioXpath.includes("searchpanel")) {
+                item.studioXpath = studioXpath;
+                this.fields.push(item);
+            }
             return false;
         }
         if (nodeName === "filter") {
@@ -150,12 +154,19 @@ class SearchEditorArchParser {
 }
 
 class SearchEditorController extends Component {
-    static props = { ...standardViewProps, archInfo: { type: Object } };
     static template = "web_studio.SearchEditorController";
     static components = { StudioHook };
 
+    props = useProps({
+        ...standardViewProps,
+        archInfo: t.object(),
+    });
+
+    rootRef = signal.ref();
+    debugMode = usePlugin(DebugModePlugin);
+
     setup() {
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
     }
 
     get filtersGroups() {
@@ -208,14 +219,14 @@ class SearchEditorController extends Component {
         }
         if (type === "groupBy") {
             let label = item.label || item.name;
-            if (this.env.debug) {
+            if (this.debugMode.isActive()) {
                 label = `${label} (${item.groupBy})`;
             }
             return label;
         }
         if (type === "field") {
             let label = item.label || this.props.fields[item.name].string;
-            if (this.env.debug) {
+            if (this.debugMode.isActive()) {
                 label = `${label} (${item.name})`;
             }
             return label;
@@ -231,7 +242,6 @@ class SearchEditorController extends Component {
 
 class SearchComponents extends Component {
     static components = { SidebarDraggableItem };
-    static props = {};
     static template = "web_studio.SearchEditor.Sidebar.Components";
 
     get structures() {
@@ -249,32 +259,44 @@ class SearchComponents extends Component {
 }
 
 class SimpleElementEditor extends Component {
-    static props = { node: { type: Object } };
-    static components = { Property, SidebarPropertiesToolbox };
+    static components = { Property, SidebarPropertiesToolbox, ModifiersProperties };
     static template = "web_studio.SearchEditor.SimpleElementEditor";
 
-    setup() {
-        this.addDialog = useOwnedDialogs();
-    }
+    props = useProps({
+        node: t.object(),
+    });
 
-    get viewEditorModel() {
-        return this.env.viewEditorModel;
+    setup() {
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
+
+        this.addDialog = useOwnedDialogs();
+        const searchArchParser = new SearchEditorArchParser();
+        this._getParsedNode = memoize(() =>
+            // The node.humanName does not indicate whether a filter node is actually a group by.
+            // Parsing the node provides us this information.
+            searchArchParser.parseNode(this.viewEditorModel.activeNode.arch)
+        );
     }
 
     get node() {
         return this.props.node;
     }
 
+    get type() {
+        const { activeNodeXpath, arch } = this.viewEditorModel;
+        return this._getParsedNode(`${activeNodeXpath}_${arch}`).type;
+    }
+
     get label() {
-        if (this.node.type === "field" && !this.node.label) {
-            return this.env.viewEditorModel.fields[this.node.name].string;
+        if (this.type === "field" && !this.node.label) {
+            return this.node.field.string;
         }
-        return this.node.label;
+        return this.node.attrs.string;
     }
 
     get domain() {
-        if (this.node.type === "filter") {
-            return this.node.domain;
+        if (this.type === "filter") {
+            return this.node.attrs.domain;
         }
         return null;
     }
@@ -312,10 +334,6 @@ class SimpleElementEditor extends Component {
 
 class SearchEditorSidebar extends Component {
     static template = "web_studio.ViewEditor.SearchEditorSidebar";
-    static props = {
-        openViewInForm: { type: Function, optional: true },
-        openDefaultValues: { type: Function, optional: true },
-    };
     static components = {
         InteractiveEditorSidebar,
         ExistingFields,
@@ -325,17 +343,17 @@ class SearchEditorSidebar extends Component {
         SimpleElementEditor,
     };
 
+    props = useProps({
+        openViewInForm: t.function().optional(),
+        openDefaultValues: t.function().optional(),
+    });
+
     setup() {
-        this.viewEditorModel = useState(this.env.viewEditorModel);
-        const searchArchParser = new SearchEditorArchParser();
-        this._getCurrentNode = memoize(() =>
-            searchArchParser.parseNode(this.viewEditorModel.activeNode.arch)
-        );
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
     }
 
     get currentNode() {
-        const { activeNodeXpath, arch } = this.viewEditorModel;
-        return this._getCurrentNode(`${activeNodeXpath}_${arch}`);
+        return this.viewEditorModel.activeNode;
     }
 }
 
@@ -370,7 +388,7 @@ async function addSearchViewStructure(structure, { droppedData, targetInfo, addD
             if (!["groupBy", "filter"].includes(targetInfo.type)) {
                 return;
             } else {
-                const fieldName = JSON.parse(droppedData).fieldName;
+                const fieldName = droppedData.fieldName;
                 const fieldGet = this.env.viewEditorModel.fields[fieldName];
                 const willBeGroupBy = targetInfo.type === "groupBy";
 
@@ -464,12 +482,12 @@ searchEditor.prepareForDrag = function ({ element, viewEditorModel, ref }) {
             const fieldName = JSON.parse(element.dataset.drop).fieldName;
             const field = viewEditorModel.fields[fieldName];
             if (!fieldCanBeFilter(field)) {
-                ref.el
+                ref()
                     .querySelector(`.o-web-studio-search--filters`)
                     .classList.add(disabledDropClass);
             }
             if (!fieldCanBeGroupable(field)) {
-                ref.el
+                ref()
                     .querySelector(`.o-web-studio-search--groupbys`)
                     .classList.add(disabledDropClass);
             }
@@ -478,7 +496,7 @@ searchEditor.prepareForDrag = function ({ element, viewEditorModel, ref }) {
         }
         case "separator":
         case "filter": {
-            const els = ref.el.querySelectorAll(
+            const els = ref().querySelectorAll(
                 ".o-web-studio-search--fields,.o-web-studio-search--groupbys"
             );
             els.forEach((el) => el.classList.add("o-web-studio-search--drop-disable"));
@@ -487,7 +505,7 @@ searchEditor.prepareForDrag = function ({ element, viewEditorModel, ref }) {
     }
 
     return () => {
-        ref.el
+        ref()
             .querySelectorAll(".o-web-studio-search--drop-disable")
             .forEach((el) => el.classList.remove("o-web-studio-search--drop-disable"));
     };

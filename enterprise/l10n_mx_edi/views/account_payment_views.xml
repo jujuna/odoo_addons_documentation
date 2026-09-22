@@ -6,16 +6,10 @@
         <field name="inherit_id" ref="account.view_account_payment_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='button_request_cancel']" position="after">
-                <field name="l10n_mx_edi_force_pue_payment_needed" invisible="1"/>
                 <field name="l10n_mx_edi_is_cfdi_needed" invisible="1"/>
                 <field name="l10n_mx_edi_update_sat_needed" invisible="1"/>
                 <field name="l10n_mx_edi_payment_document_ids" invisible="1"/>
 
-                <button string="Force CFDI"
-                        name="l10n_mx_edi_cfdi_payment_force_try_send"
-                        type="object"
-                        groups="account.group_account_invoice"
-                        invisible="not l10n_mx_edi_force_pue_payment_needed"/>
                 <button string="Update SAT"
                         name="l10n_mx_edi_cfdi_try_sat"
                         type="object"
@@ -70,10 +64,6 @@
                                     type="object"
                                     string="Print"
                                     invisible="not print_button_needed"/>
-                            <button name="action_force_payment_cfdi"
-                                    type="object"
-                                    string="Force CFDI"
-                                    invisible="state != 'payment_sent_pue'"/>
                             <button name="action_retry"
                                     type="object"
                                     string="Retry"
@@ -82,6 +72,10 @@
                                     type="object"
                                     string="Cancel"
                                     invisible="not cancel_button_needed"/>
+                            <button name="action_download_cancellation_ack_report"
+                                    type="object"
+                                    string="Print"
+                                    invisible="not print_cancellation_ack_button_needed"/>
                         </list>
                     </field>
                 </group>

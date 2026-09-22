@@ -15,11 +15,14 @@ class SocialAccount(models.Model):
     youtube_channel_id = fields.Char('YouTube Channel ID', readonly=True,
         help="YouTube Channel ID provided by the YouTube API, this should never be set manually.")
     youtube_access_token = fields.Char('Google Access Token', readonly=True,
-        help="Access token provided by the YouTube API, this should never be set manually.")
+        help="Access token provided by the YouTube API, this should never be set manually.",
+        groups=fields.NO_ACCESS)
     youtube_refresh_token = fields.Char('Google Refresh Token', readonly=True,
-        help="Refresh token provided by the YouTube API, this should never be set manually.")
+        help="Refresh token provided by the YouTube API, this should never be set manually.",
+        groups=fields.NO_ACCESS)
     youtube_token_expiration_date = fields.Datetime('Token expiration date', readonly=True,
-        help="Expiration date of the Access Token provided by the YouTube API, this should never be set manually.")
+        help="Expiration date of the Access Token provided by the YouTube API, this should never be set manually.",
+        groups=fields.NO_ACCESS)
     youtube_upload_playlist_id = fields.Char('YouTube Upload Playlist ID', readonly=True,
          help="'Uploads' Playlist ID provided by the YouTube API, this should never be set manually.")
 
@@ -29,13 +32,21 @@ class SocialAccount(models.Model):
         super(SocialAccount, (self - youtube_accounts))._compute_stats_link()
 
         for account in youtube_accounts:
-            account.stats_link = "https://studio.youtube.com/channel/%s/analytics/tab-overview" % account.youtube_channel_id
+            account.stats_link = f"https://studio.youtube.com/channel/{account.youtube_channel_id}/analytics/tab-overview"
+            account.user_link = f"https://www.youtube.com/channel/{account.youtube_channel_id}"
 
     @api.model_create_multi
     def create(self, vals_list):
         res = super().create(vals_list)
         res.filtered(lambda account: account.media_type == 'youtube')._create_default_stream_youtube()
         return res
+
+    def _get_youtube_access_token(self):
+        """Return the access token to use for API calls."""
+        self.ensure_one()
+        self.check_access("read")
+        self._refresh_youtube_token()
+        return self.sudo().youtube_access_token
 
     def action_youtube_revoke(self):
         """Open the "social account revoke youtube" wizard in order to revoke the access token of this account."""
@@ -80,11 +91,14 @@ class SocialAccount(models.Model):
         - Using our IAP proxy (for databases with valid enterprise subscriptions)
           That will receive the new access_token from our IAP proxy. """
 
-        youtube_oauth_client_id = self.env['ir.config_parameter'].sudo().get_param('social.youtube_oauth_client_id')
-        youtube_oauth_client_secret = self.env['ir.config_parameter'].sudo().get_param('social.youtube_oauth_client_secret')
+        youtube_oauth_client_id = self.env['ir.config_parameter'].sudo().get_str('social.youtube_oauth_client_id')
+        youtube_oauth_client_secret = self.env['ir.config_parameter'].sudo().get_str('social.youtube_oauth_client_secret')
 
-        for account in self:
-            if not account.youtube_token_expiration_date or account.youtube_token_expiration_date > fields.Datetime.now():
+        for account_su in self.sudo():
+            if (
+                not account_su.youtube_token_expiration_date
+                or account_su.youtube_token_expiration_date > fields.Datetime.now()
+            ):
                 continue
 
             if youtube_oauth_client_id and youtube_oauth_client_secret:
@@ -93,29 +107,27 @@ class SocialAccount(models.Model):
                         'client_id': youtube_oauth_client_id,
                         'client_secret': youtube_oauth_client_secret,
                         'grant_type': 'refresh_token',
-                        'refresh_token': account.youtube_refresh_token
+                        'refresh_token': account_su.youtube_refresh_token
                     },
                     timeout=5
                 ).json()
             else:
-                social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_param(
-                    'social.social_iap_endpoint',
-                    self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
-                )
+                social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_str(
+                    'social.social_iap_endpoint') or self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
 
                 token_refresh_response = requests.get(
                     url_join(social_iap_endpoint, 'api/social/youtube/1/refresh_token'),
                     params={
-                        'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
-                        'refresh_token': account.youtube_refresh_token
+                        'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
+                        'refresh_token': account_su.youtube_refresh_token
                     },
                     timeout=5
                 ).json()
 
             if token_refresh_response.get('error'):
-                account._action_disconnect_accounts(token_refresh_response)
+                account_su._action_disconnect_accounts(token_refresh_response)
             else:
-                account.sudo().write({
+                account_su.write({
                     'youtube_access_token': token_refresh_response['access_token'],
                     'youtube_token_expiration_date': fields.Datetime.now() + timedelta(
                         seconds=token_refresh_response.get('expires_in', 0)),

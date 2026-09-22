@@ -38,7 +38,7 @@ export class EsgCarbonEmissionReport extends models.ServerModel {
 
     _views = {
         list: `
-            <list editable="bottom" js_class="esg_carbon_emission_list">
+            <list>
                 <field name="date"/>
                 <field name="name"/>
                 <field name="esg_emission_factor_id"/>

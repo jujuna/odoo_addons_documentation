@@ -23,6 +23,7 @@ import {
 } from "@web/../tests/web_test_helpers";
 import { loadBundle } from "@web/core/assets";
 import { registry } from "@web/core/registry";
+import { useService } from "@web/core/utils/hooks";
 import { WebClient } from "@web/webclient/webclient";
 
 const { Grid } = spreadsheet.components;
@@ -40,8 +41,8 @@ async function openView(viewType, options = {}) {
         {
             Component: InsertViewSpreadsheet,
             groupNumber: 4,
-            isDisplayed: ({ isSmall, config }) =>
-                !isSmall && config.actionType === "ir.actions.act_window",
+            isDisplayed: ({ config }) =>
+                !useService("ui").isSmall && config.actionType === "ir.actions.act_window",
         },
         { sequence: 1 }
     );
@@ -78,12 +79,12 @@ async function insertInSpreadsheetAndClickLink(target) {
     await animationFrame();
 }
 
-function getCurrentViewType(webClient) {
-    return webClient.env.services.action.currentController.view.type;
+function getCurrentViewType() {
+    return getService("action").currentController.view.type;
 }
 
-function getCurrentAction(webClient) {
-    return webClient.env.services.action.currentController.action;
+function getCurrentAction() {
+    return getService("action").currentController.action;
 }
 
 let target;
@@ -137,14 +138,14 @@ beforeEach(() => {
 });
 
 test("simple list view", async function () {
-    const webClient = await openView("list");
+    await openView("list");
     await insertInSpreadsheetAndClickLink(target);
-    expect(getCurrentViewType(webClient)).toBe("list");
+    expect(getCurrentViewType()).toBe("list");
 });
 
 test("list view with custom domain and groupby", async function () {
     serverData.actions["1"].domain = [["id", "!=", 0]];
-    const webClient = await openView("list", {
+    await openView("list", {
         additionalContext: { search_default_filter_2: 1 },
     });
 
@@ -156,8 +157,8 @@ test("list view with custom domain and groupby", async function () {
     await toggleMenuItem("name");
 
     await insertInSpreadsheetAndClickLink(target);
-    expect(getCurrentViewType(webClient)).toBe("list");
-    const action = getCurrentAction(webClient);
+    expect(getCurrentViewType()).toBe("list");
+    const action = getCurrentAction();
     expect(action.domain).toEqual(
         ["&", ["id", "!=", 0], "|", ["name", "=", false], ["name", "=", "Raoul"]],
         { message: "The domain should be the same" }
@@ -204,48 +205,48 @@ test("insert action in new spreadsheet", async function () {
 });
 
 test("kanban view", async function () {
-    const webClient = await openView("kanban");
+    await openView("kanban");
     await insertInSpreadsheetAndClickLink(target);
-    expect(getCurrentViewType(webClient)).toBe("kanban");
+    expect(getCurrentViewType()).toBe("kanban");
 });
 
 test("simple graph view", async function () {
-    const webClient = await openView("graph");
+    await openView("graph");
     await insertInSpreadsheetAndClickLink(target);
-    expect(getCurrentViewType(webClient)).toBe("graph");
+    expect(getCurrentViewType()).toBe("graph");
 });
 
 test("graph view with custom chart type and order", async function () {
-    const webClient = await openView("graph");
-    await contains(".fa-pie-chart").click();
+    await openView("graph");
+    await contains("[data-icon='pie_chart']").click();
     // count measure
-    await toggleMenu("Measures");
+    await contains(`.o_report_measures`).click();
     await toggleMenuItem("Count");
     await insertInSpreadsheetAndClickLink(target);
-    const action = getCurrentAction(webClient);
+    const action = getCurrentAction();
     expect(action.context.graph_mode).toBe("pie", {
         message: "It should be a pie chart",
     });
     expect(action.context.graph_measure).toBe("__count", {
         message: "It should have the custom measures",
     });
-    expect(".fa-pie-chart.active").toHaveCount(1);
+    expect("[data-icon='pie_chart'].active").toHaveCount(1);
 });
 
 test("calendar view", async function () {
-    const webClient = await openView("calendar");
+    await openView("calendar");
     await insertInSpreadsheetAndClickLink(target);
-    expect(getCurrentViewType(webClient)).toBe("calendar");
+    expect(getCurrentViewType()).toBe("calendar");
 });
 
 test("simple pivot view", async function () {
-    const webClient = await openView("pivot");
+    await openView("pivot");
     await insertInSpreadsheetAndClickLink(target);
-    expect(getCurrentViewType(webClient)).toBe("pivot");
+    expect(getCurrentViewType()).toBe("pivot");
 });
 
 test("pivot view with custom group by and measure", async function () {
-    const webClient = await openView("pivot");
+    await openView("pivot");
 
     // group by name
     await toggleSearchBarMenu();
@@ -256,7 +257,7 @@ test("pivot view with custom group by and measure", async function () {
     await toggleMenuItem("Count");
 
     await insertInSpreadsheetAndClickLink(target);
-    const action = getCurrentAction(webClient);
+    const action = getCurrentAction();
 
     expect(action.context.pivot_row_groupby).toEqual(["name"], {
         message: "It should be grouped by name",
@@ -272,14 +273,14 @@ test("pivot view with custom group by and measure", async function () {
 // TODO: we don't depend of web_enterprise (or base_setup) so map views are not available.
 // we should probably move this to test_spreadsheet_edition & add a dependency there
 test.skip("map view", async function () {
-    const webClient = await openView("map");
+    await openView("map");
     await insertInSpreadsheetAndClickLink(target);
-    expect(getCurrentViewType(webClient)).toBe("map");
+    expect(getCurrentViewType()).toBe("map");
 });
 
 test("action with domain being the empty string", async function () {
     serverData.actions["1"].domain = "";
-    const webClient = await openView("list");
+    await openView("list");
     await insertInSpreadsheetAndClickLink(target);
-    expect(getCurrentViewType(webClient)).toBe("list");
+    expect(getCurrentViewType()).toBe("list");
 });

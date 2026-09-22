@@ -7,12 +7,18 @@ import { DocumentsActivityRenderer } from "./documents_activity_renderer";
 import { DocumentsControlPanel } from "../search/documents_control_panel";
 import { DocumentsSearchModel } from "../search/documents_search_model";
 
+class DocumentsActivitySearchModel extends DocumentsSearchModel {
+    _isFetchSectionsRequired() {
+        return this.getSelectedFolderId() == null;
+    }
+}
+
 export const DocumentsActivityView = {
     ...activityView,
     ControlPanel: DocumentsControlPanel,
     Controller: DocumentsActivityController,
     Model: DocumentsActivityModel,
     Renderer: DocumentsActivityRenderer,
-    SearchModel: DocumentsSearchModel,
+    SearchModel: DocumentsActivitySearchModel,
 };
 registry.category("views").add("documents_activity", DocumentsActivityView);

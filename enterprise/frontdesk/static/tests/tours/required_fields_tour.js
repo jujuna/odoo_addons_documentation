@@ -3,11 +3,6 @@ import { registry } from "@web/core/registry";
 registry.category("web_tour.tours").add("required_fields_tour", {
     steps: () => [
         {
-            content: "Click on Check in",
-            trigger: ".btn:contains('Check in')",
-            run: "click",
-        },
-        {
             content: "Filling the details",
             trigger: "input#company",
             run: "edit Office",
@@ -28,11 +23,6 @@ registry.category("web_tour.tours").add("required_fields_tour", {
             run: "edit test@example.com",
         },
         {
-            content: "Click on the check in button",
-            trigger: ".btn-primary:contains('Check In')",
-            run: "click",
-        },
-        {
             content: "Click on Browse All Hosts button",
             trigger: ".btn:contains('Browse All Hosts')",
             run: "click",
@@ -44,7 +34,7 @@ registry.category("web_tour.tours").add("required_fields_tour", {
         },
         {
             content: "Select the host from the card list",
-            trigger: '.card:contains("Test Host Employee")',
+            trigger: 'h6:contains("Test Host Employee")',
             run: "click",
         },
         {

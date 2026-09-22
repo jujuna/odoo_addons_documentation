@@ -3,15 +3,15 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 
 export class IoTRestartOdoo extends Component {
     static template = `iot.HeaderButton`;
-    static props = {
+    props = useProps({
         ...standardWidgetProps,
-        btn_name: { type: String },
-        btn_class: { type: String },
-    };
+        btn_name: t.string(),
+        btn_class: t.string(),
+    });
 
     setup() {
         super.setup();
@@ -34,25 +34,25 @@ export class IoTRestartOdoo extends Component {
             this.props.record._config.resId,
             identifier,
             { action: "restart_odoo" },
-            () => this.notification.add(_t("%s is currently restarting", name), {
-                type: "info",
-            }),
+            () =>
+                this.notification.add(_t("%s is currently restarting", name), {
+                    type: "info",
+                }),
             () => {
                 this.notification.add(
-                    _t("Failed to send the restart command to the IoT Box ('%s')", name), { type: "danger" }
-                )
-            },
+                    _t("Failed to send the restart command to the IoT Box ('%s')", name),
+                    { type: "danger" }
+                );
+            }
         );
     }
 }
 
 export const ioTRestartOdoo = {
     component: IoTRestartOdoo,
-    extractProps: ({ attrs }) => {
-        return {
-            btn_name: attrs.btn_name,
-            btn_class: attrs.btn_class,
-        };
-    },
+    extractProps: ({ attrs }) => ({
+        btn_name: attrs.btn_name,
+        btn_class: attrs.btn_class,
+    }),
 };
 registry.category("view_widgets").add("iot_restart_odoo", ioTRestartOdoo);

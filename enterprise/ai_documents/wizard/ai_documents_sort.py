@@ -2,6 +2,7 @@
 
 from odoo import _, Command, api, fields, models
 from odoo.tools import is_html_empty
+from markupsafe import Markup
 
 
 class AiDocumentsSort(models.TransientModel):
@@ -31,24 +32,69 @@ class AiDocumentsSort(models.TransientModel):
             tool_actions = self._get_folder_actions(folder)
 
         if "ai_tool_ids" in fields:
-            move_in_folder = self.env.ref(
-                "ai_documents.ir_actions_server_move_in_folder",
-                raise_if_not_found=False,
-            )
-            if move_in_folder:
-                tool_actions |= move_in_folder
+            tools = ["ai_documents.ir_actions_server_move_in_folder", "ai_documents.ir_actions_server_rename_file"]
+            for tool_name in tools:
+                if tool := self.env.ref(tool_name, raise_if_not_found=False):
+                    tool_actions |= tool
+
             values["ai_tool_ids"] = [Command.set(tool_actions.ids)]
 
         finance_folder = self.env.ref("documents.document_finance_folder", raise_if_not_found=False)
         if "ai_sort_prompt" not in fields or not finance_folder:
             return values
-
-        values["ai_sort_prompt"] = _(
-            "If the document is an invoice, send it to %s",
-            self.env["documents.document"]._ai_folder_insert(finance_folder.id),
-        )
+        ai_sort_prompts = [
+            _("Before starting, analyze the content, metadata, and messages."),
+            _("Rename the file using: [ORIGIN]-[SENDER]-[DOC_TYPE]-[DATE]."),
+            "",
+            _(
+                "If the document is an invoice, send it to %s",
+                self.env["documents.document"]._ai_folder_insert(finance_folder.id),
+            ),
+        ]
+        values["ai_sort_prompt"] = Markup("<br/>").join(ai_sort_prompts)
 
         return values
+
+    @api.model
+    def _activate_demo_prompt(self, folder_id):
+        """Activate the demo prompt on the given folder."""
+        prompt_lines, ai_tool_ids = self._get_demo_prompt_data()
+        if not prompt_lines:
+            return
+
+        self.create({
+            "folder_id": folder_id,
+            "ai_sort_prompt": Markup("<div>%s</div>") % Markup("<br/>").join(prompt_lines),
+            "ai_tool_ids": ai_tool_ids.ids,
+        }).action_setup_folder()
+
+    @api.model
+    def _get_demo_prompt_data(self):
+        """Return demo prompt lines and tool IDs.
+
+        :return: tuple(list of prompt line strings, list of ir.actions.server)
+        """
+        finance_folder = self.env.ref("documents.document_finance_folder", raise_if_not_found=False)
+        prompt = [
+            _("Before starting, analyze the content, metadata, and messages."),
+            _("Rename the file using: [ORIGIN]-[SENDER]-[DOC_TYPE]-[DATE]."),
+            "",
+        ]
+        if finance_folder:
+            prompt.append(
+                _(
+                    "If the document is an invoice, send it to %s",
+                    self.env["documents.document"]._ai_folder_insert(finance_folder.id),
+                )
+            )
+
+        ai_tool_ids = self.env["ir.actions.server"]
+        tools = ["ai_documents.ir_actions_server_move_in_folder", "ai_documents.ir_actions_server_rename_file"]
+        for tool_name in tools:
+            if tool := self.env.ref(tool_name, raise_if_not_found=False):
+                ai_tool_ids |= tool
+
+        return prompt, ai_tool_ids
 
     folder_id = fields.Many2one(
         "documents.document",

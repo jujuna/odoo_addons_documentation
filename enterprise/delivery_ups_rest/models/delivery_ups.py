@@ -58,6 +58,11 @@ class DeliveryCarrier(models.Model):
         for carrier in self.filtered(lambda c: c.delivery_type == 'ups_rest'):
             carrier.can_generate_return = True
 
+    def _compute_supports_cash_on_delivery(self):
+        ups_rest_carriers = self.filtered(lambda carrier: carrier.delivery_type == 'ups_rest')
+        super(DeliveryCarrier, self - ups_rest_carriers)._compute_supports_cash_on_delivery()
+        ups_rest_carriers.supports_cash_on_delivery = True
+
     def _compute_supports_shipping_insurance(self):
         super()._compute_supports_shipping_insurance()
         for carrier in self:
@@ -105,7 +110,7 @@ class DeliveryCarrier(models.Model):
         else:
             quote_currency = self.env['res.currency'].search([('name', '=', result['currency_code'])], limit=1)
             price = quote_currency._convert(
-                float(result['price']), order.currency_id, order.company_id, order.date_order or fields.Date.today())
+                float(result['price']), order.currency_id, order.company_id, order.date_order)
 
         if self.ups_bill_my_account and order.partner_ups_carrier_account:
             # Don't show delivery amount, if ups bill my account option is true
@@ -129,9 +134,10 @@ class DeliveryCarrier(models.Model):
 
         shipment_info = {
             'require_invoice': picking._should_generate_commercial_invoice(),
-            'invoice_date': fields.Date.today().strftime('%Y%m%d'),
+            'invoice_date': fields.Date.context_today(self).strftime('%Y%m%d'),
             'description': picking.origin or picking.name,
             'total_qty': sum(sml.quantity for sml in picking.move_line_ids),
+            'freight_charge': sum(sol.price_total for sol in picking.sale_id.order_line.filtered(lambda l: l.is_delivery)),
             'ilt_monetary_value': '%d' % sum(sml.sale_price for sml in picking.move_line_ids),
             'itl_currency_code': currency_code,
             'phone': picking.partner_id.phone or picking.sale_id.partner_id.phone,
@@ -186,7 +192,7 @@ class DeliveryCarrier(models.Model):
             else:
                 quote_currency = self.env['res.currency'].search([('name', '=', result['currency_code'])], limit=1)
                 price = quote_currency._convert(
-                    float(result['price']), currency_order, company, order.date_order or fields.Date.today())
+                    float(result['price']), currency_order, company, order.date_order)
 
             package_labels = result.get('label_binary_data', [])
 
@@ -243,7 +249,7 @@ class DeliveryCarrier(models.Model):
         else:
             quote_currency = self.env['res.currency'].search([('name', '=', result['currency_code'])], limit=1)
             price = quote_currency._convert(
-                float(result['price']), currency_order, company, order.date_order or fields.Date.today())
+                float(result['price']), currency_order, company, order.date_order)
 
         package_labels = []
         for track_number, label_binary_data in result.get('label_binary_data'):
@@ -259,6 +265,8 @@ class DeliveryCarrier(models.Model):
             attachments = [('%s-%s-%s.%s' % (self.get_return_label_prefix(), pl[0], index, self.ups_label_file_type), pl[1]) for index, pl in enumerate(package_labels)]
         else:
             attachments = [('%s-%s-%s.%s' % (self.get_return_label_prefix(), package_labels[0][0], 1, 'pdf'), pdf.merge_pdf([pl[1] for pl in package_labels]))]
+        if result.get('invoice_binary_data'):
+            attachments.append(('UPSCommercialInvoice_return.pdf', result['invoice_binary_data']))
         picking.message_post(body=logmessage, attachments=attachments)
         shipping_data = {
             'exact_price': price,

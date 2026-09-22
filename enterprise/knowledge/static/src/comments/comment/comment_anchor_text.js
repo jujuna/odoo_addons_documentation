@@ -1,15 +1,13 @@
-import { Component, onWillUpdateProps } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class CommentAnchorText extends Component {
     static template = "knowledge.CommentAnchorText";
-    static props = {
-        anchorText: { String },
-    };
 
-    setup() {
-        this.anchorTextArray = this.props.anchorText.split("<br>");
-        onWillUpdateProps((newProps) => {
-            this.anchorTextArray = newProps.anchorText.split("<br>");
-        });
+    props = useProps({
+        anchorText: t.string(),
+    });
+
+    get anchorTextArray() {
+        return (this.props.anchorText || "").split("<br>");
     }
 }

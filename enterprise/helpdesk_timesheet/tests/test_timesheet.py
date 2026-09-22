@@ -3,7 +3,6 @@
 import logging
 
 from datetime import date, timedelta
-from freezegun import freeze_time
 from unittest.mock import patch
 
 from odoo.tests import tagged, Form
@@ -59,44 +58,6 @@ class TestTimesheet(TestHelpdeskTimesheetCommon):
         helpdesk_ticket.write({'partner_id': partner2.id})
 
         self.assertEqual(timesheet_entry.partner_id, partner2, "The timesheet entry's partner should still be equal to the ticket's partner/customer, after the change")
-
-    def test_helpdesk_timesheet_wizard_timezones(self):
-        user = self.user_employee
-        ticket = self.helpdesk_ticket.with_user(user)
-        timezones = [
-            'Pacific/Niue',        # UTC-11,
-            'Europe/Brussels',     # UTC+1
-            'Pacific/Kiritimati',  # UTC+14
-        ]
-        test_cases = {
-            '2024-01-24 08:30': (-1, +0, +0),
-            '2024-01-24 10:30': (-1, +0, +1),
-            '2024-01-24 16:30': (+0, +0, +1),
-        }
-
-        for utc_time, day_diffs in test_cases.items():
-            with freeze_time(utc_time):
-                for tz, diff in zip(timezones, day_diffs):
-                    # reset all timezones on the environments
-                    user.tz = tz
-                    self.env.flush_all()
-                    self.env.transaction.reset()
-                    local_date = date.today() + timedelta(diff)
-
-                    self.assertTrue(ticket.display_timesheet_timer, "The timer should be available in that ticket")
-                    ticket.action_timer_start()
-                    action = ticket.action_timer_stop()
-                    wizard = self.env['hr.timesheet.stop.timer.confirmation.wizard'] \
-                        .with_context(action['context']) \
-                        .with_user(user) \
-                        .new({})
-                    timesheet = wizard.timesheet_id
-                    wizard.action_save_timesheet()
-                    self.assertEqual(
-                        timesheet.date,
-                        local_date,
-                        f"{utc_time} UTC should be {local_date} in {tz} time",
-                    )
 
     def test_log_timesheet_with_ticket_analytic_account(self):
         """ Test whether the analytic account of the project is set on the ticket.
@@ -324,90 +285,6 @@ class TestTimesheet(TestHelpdeskTimesheetCommon):
         timesheet = self.env['account.analytic.line'].create([vals])
         self.assertEqual(timesheet.company_id, new_company, 'The expected company of the timesheet is the company from the project of its ticket')
 
-    def test_launch_the_timer_for_a_ticket(self):
-        """ Test if starting and stopping the timer on a timesheet entry linked to a helpdesk ticket creates a new entry
-            with the ticket_id set
-        """
-        yesterday = date.today() - timedelta(days=1)
-
-        timesheet = self.env['account.analytic.line'].with_user(self.user_employee).create({
-            'name': 'Yesterday Timesheet',
-            'project_id': self.project.id,
-            'date': yesterday,
-            'employee_id': self.empl_employee.id,
-            'helpdesk_ticket_id': self.helpdesk_ticket.id,
-        })
-
-        timesheet.with_user(self.user_employee).action_timer_start()
-        timesheet.with_user(self.user_employee).action_timer_stop()
-
-        timesheet_count = self.env['account.analytic.line'].search_count([
-            ('date', '=', date.today()),
-            ('helpdesk_ticket_id', '=', self.helpdesk_ticket.id)
-        ], limit=1)
-        self.assertEqual(timesheet_count, 1, "The new timesheet entry's ticket_id should be set correctly.")
-
-    def test_create_separate_timesheet_entries_depending_on_ticket_id(self):
-        ticket_copy = self.helpdesk_ticket.sudo().copy()
-        timesheet_1, timesheet_2, timesheet_3 = self.env['account.analytic.line'].with_user(self.user_employee).create([{
-            'name': '/',
-            'project_id': self.project.id,
-            'date': date.today(),
-            'helpdesk_ticket_id': self.helpdesk_ticket.id,
-        }, {
-            'name': '/',
-            'project_id': self.project.id,
-            'date': date.today(),
-            'helpdesk_ticket_id': ticket_copy.id,
-        }, {
-            'name': '/',
-            'project_id': self.project.id,
-            'date': date.today(),
-            'helpdesk_ticket_id': ticket_copy.id,
-        }])
-
-        timesheet_1.sudo()._add_timesheet_time(15, True)
-        timesheet_2.sudo()._add_timesheet_time(15, True)
-        timesheet_3.sudo()._add_timesheet_time(15, True)
-
-        # timesheets 2 and 3 should be merged since they belong to the same ticket, timesheet 1 must be kept separate
-        self.assertTrue(timesheet_1.exists(), 'Timesheet 1 should not have been merged')
-        self.assertFalse(timesheet_2.exists(), 'Timesheet 2 should have been merged into 3')
-        self.assertTrue(timesheet_3.exists(), 'Timesheet 2 should have been merged into 3')
-        self.assertAlmostEqual(timesheet_1.unit_amount, 0.25, 2)
-        self.assertAlmostEqual(timesheet_3.unit_amount, 0.5, 2)
-
-    def test_change_helpdesk_team_on_ticket_with_timer_running(self):
-        """ Test that changing the helpdesk team of a ticket with a running timer does not stop the timer """
-        timesheet = self.env['account.analytic.line'].with_user(self.user_employee).create({
-            'name': '/',
-            'project_id': self.project.id,
-            'date': date.today(),
-            'helpdesk_ticket_id': self.helpdesk_ticket.id,
-        })
-
-        timesheet.action_timer_start()
-
-        helpdesk_team_with_timesheet, helpdesk_team_without_timesheet = self.env['helpdesk.team'].create([{
-            'name': 'Helpdesk with timesheet',
-            'use_helpdesk_timesheet': True,
-            'project_id': self.project.id,
-        }, {
-            'name': 'Helpdesk without timesheet',
-            'use_helpdesk_timesheet': False,
-        }])
-        self.helpdesk_ticket.team_id = helpdesk_team_with_timesheet
-        self.assertTrue(timesheet.is_timer_running, 'The timer should still be running after changing the helpdesk team')
-        self.assertEqual(timesheet.user_timer_id.parent_res_model, 'helpdesk.ticket', 'The timer should still be linked to the ticket')
-        self.assertEqual(timesheet.user_timer_id.parent_res_id, self.helpdesk_ticket.id, 'The timer should still be linked to the ticket')
-
-        ticket = self.helpdesk_ticket.with_user(self.user_employee)
-        self.assertTrue(ticket.is_timer_running)
-
-        ticket.team_id = helpdesk_team_without_timesheet
-        self.assertFalse(ticket.is_timer_running, 'The timer should have been stopped after changing the helpdesk team since the timesheet feature is disabled on that team')
-        self.assertFalse(timesheet.exists(), 'The timesheet should have been deleted after the timer was stopped since the unit_amount is 0')
-
     def test_total_hours_spent(self):
         """ Test the total_hours_spent field is correctly computed """
         # create 5 tickets with a timesheet each of 10 minutes
@@ -445,3 +322,33 @@ class TestTimesheet(TestHelpdeskTimesheetCommon):
         })
         self.env.company.timesheet_encode_uom_id = self.env.ref('uom.product_uom_day')
         self.assertEqual(helpdesk_ticket.team_id.total_timesheet_time, 1, "Total timesheet time should be 1 day")
+
+    def test_timer_onchange_project_prefills_recent_ticket(self):
+        """Selecting a helpdesk project in the timer prefills the most recent ticket the user logged time on."""
+        Timesheet = self.env['account.analytic.line'].with_user(self.user_employee)
+        timesheet = self.env['account.analytic.line'].create({
+            'name': '/',
+            'date': date.today() - timedelta(days=60),
+            'helpdesk_ticket_id': self.helpdesk_ticket.id,
+            'employee_id': self.empl_employee.id,
+            'unit_amount': 1.0,
+        })
+
+        line = Timesheet.with_context(timesheet_timer_search=True).new({'project_id': self.project.id})
+        line._onchange_project_id()
+        self.assertFalse(line.helpdesk_ticket_id, "The timer should not prefill a ticket that is no longer relevant")
+
+        timesheet.date = date.today()
+        line = Timesheet.with_context(timesheet_timer_search=True).new({'project_id': self.project.id})
+        line._onchange_project_id()
+        self.assertEqual(line.helpdesk_ticket_id, self.helpdesk_ticket,
+                         "The timer should prefill the ticket the user recently logged time on")
+
+        line = Timesheet.new({'project_id': self.project.id})
+        line._onchange_project_id()
+        self.assertFalse(line.helpdesk_ticket_id, "Selecting a project only prefills a ticket in the timer")
+
+        timesheet.helpdesk_ticket_id = False
+        line = Timesheet.with_context(timesheet_timer_search=True).new({'project_id': self.project.id})
+        line._onchange_project_id()
+        self.assertFalse(line.helpdesk_ticket_id, "The timer should prefill no ticket when the last timesheet has none")

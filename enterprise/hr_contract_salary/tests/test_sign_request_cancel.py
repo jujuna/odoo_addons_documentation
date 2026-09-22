@@ -1,8 +1,9 @@
 from odoo import Command
 from odoo.tools import file_open
-from odoo.tests.common import TransactionCase, new_test_user
+from odoo.tests.common import tagged, TransactionCase, new_test_user
 
 
+@tagged('at_install', '-post_install', 'salary')  # LEGACY at_install
 class TestSignRequestCancel(TransactionCase):
 
     def setUp(cls):
@@ -79,3 +80,46 @@ class TestSignRequestCancel(TransactionCase):
             sign_request.cancel()
             self.assertEqual(sign_request.state, 'canceled', "User should be able to cancel his Sign Request.")
         self.assertEqual(self.salary_offer.state, 'cancelled', "The offer should be cancelled when the sign request is cancelled.")
+
+    def test_activity_close_on_sign_request_cancel(self):
+        user = new_test_user(
+            self.env,
+            login='user_activity',
+            groups='sign.group_sign_user'
+        )
+        template = self.env['sign.template'].create({
+            'name': 'Template Activity Test',
+        })
+        self.env['sign.document'].create({
+            'template_id': template.id,
+            'attachment_id': self.attachment.id,
+            'sign_item_ids': self.sign_item,
+        })
+        sign_request = self.env['sign.request'].create({
+            'template_id': template.id,
+            'reference': 'Test Activity Removal',
+            'request_item_ids': [Command.create({
+                'partner_id': user.partner_id.id,
+                'role_id': self.env.ref('hr_sign.sign_item_role_default').id,
+            })],
+        })
+        sign_request._schedule_activity(user)
+        activities = self.env['mail.activity'].search([
+            ('res_model', '=', 'sign.request'),
+            ('res_id', '=', sign_request.id),
+            ('activity_type_id', '=', self.env.ref('sign.mail_activity_data_signature_request').id),
+        ])
+        self.assertTrue(activities, "Activity should exist before cancellation.")
+
+        sign_request.write({
+            'state': 'canceled'
+        })
+        activities_after = self.env['mail.activity'].search([
+            ('res_model', '=', 'sign.request'),
+            ('res_id', '=', sign_request.id),
+            ('activity_type_id', '=', self.env.ref('sign.mail_activity_data_signature_request').id),
+        ])
+        self.assertFalse(
+            activities_after,
+            "Activity should be closed when sign request is cancelled."
+        )

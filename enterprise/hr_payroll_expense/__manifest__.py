@@ -3,7 +3,6 @@
 
 {
     'name': 'Expenses in Payslips',
-    'version': '1.0',
     'category': 'Human Resources/Payroll',
     'sequence': 95,
     'summary': 'Submit, validate and reinvoice employee expenses',
@@ -17,12 +16,16 @@ This application allows you to reimburse expenses in payslips.
     'data': [
         'views/hr_expense_views.xml',
         'views/hr_payslip_views.xml',
-        'data/hr_payroll_expense_data.xml',
+        'views/product_product_views.xml',
         'wizard/account_payment_register_views.xml',
     ],
     'demo': ['data/hr_payroll_expense_demo.xml'],
     'auto_install': True,
-    'installable': True,
+    'assets': {
+        'web.assets_backend': [
+            'hr_payroll_expense/static/src/**/*',
+        ],
+    },
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

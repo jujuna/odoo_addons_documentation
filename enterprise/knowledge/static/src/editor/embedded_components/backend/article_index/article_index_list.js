@@ -1,20 +1,22 @@
-import { Component, useRef } from "@odoo/owl";
+import { Component, signal, t, useProps } from "@odoo/owl";
 import { useNestedSortable } from "@web/core/utils/nested_sortable";
 import { useService } from "@web/core/utils/hooks";
 
 export class ArticleIndexList extends Component {
     static template = "knowledge.ArticleIndexList";
-    static props = {
-        articles: { type: Object },
-        isNested: { type: Boolean, optional: true },
-    };
+
+    props = useProps({
+        articles: t.object(),
+        isNested: t.boolean().optional(),
+    });
+
+    rootRef = signal.ref();
 
     setup() {
         this.orm = useService("orm");
-        this.root = useRef("root");
 
         useNestedSortable({
-            ref: this.root,
+            ref: this.rootRef,
             elements: "li",
             nest: this.props.isNested,
             onDrop: async ({ element, next, parent }) => {

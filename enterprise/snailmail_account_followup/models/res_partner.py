@@ -22,10 +22,10 @@ class ResPartner(models.Model):
         if options.get('snailmail', followup_line.send_letter):
             self.send_followup_snailmail(options)
 
-    def _has_missing_followup_info(self):
-        res = super()._has_missing_followup_info()
+    def _has_missing_followup_info(self, followup_line):
+        res = super()._has_missing_followup_info(followup_line)
         followup_contacts = self._get_all_followup_contacts() or self
-        if self.followup_line_id.send_letter \
+        if followup_line.send_letter \
             and not any(self.env['snailmail.letter']._is_valid_address(to_send_partner)
                         for to_send_partner in followup_contacts):
             return True

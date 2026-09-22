@@ -28,7 +28,7 @@ test("Document boolean icon field in kanban", async () => {
                         <h1><field name="name"/></h1>
                         <div t-attf-class="test-{{record.id.raw_value}}">
                             <field name="is_favorited" widget="documents_boolean_icon"
-                                options="{'icon': 'fa-fw fa-times', 'btn_false_class': 'btn-danger', 'btn_true_class': 'btn-success'}"/>
+                                options="{'icon': 'close', 'icon_class': 'oi-fw', 'btn_false_class': 'btn-danger', 'btn_true_class': 'btn-success'}"/>
                         </div>
                     </t>
                 </templates>
@@ -36,8 +36,8 @@ test("Document boolean icon field in kanban", async () => {
     });
     for (const doc of documents) {
         const base = `test-${doc.id}`;
-        expect(`.${base} i.fa-fw`).toHaveCount(1);
-        expect(`.${base} i.fa-times`).toHaveCount(1);
+        expect(`.${base} i.oi-fw`).toHaveCount(1);
+        expect(`.${base} i[data-icon="close"]`).toHaveCount(1);
         if (doc.is_favorited) {
             expect(`.${base} button`).toHaveClass("btn btn-success");
             await contains(`.${base} button`).click();

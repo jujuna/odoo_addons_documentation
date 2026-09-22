@@ -1,5 +1,5 @@
-import { FileViewer } from "@documents/attachments/document_file_viewer";
-import { Component, useEffect, useRef, useState } from "@odoo/owl";
+import { FileViewer } from "@documents/core/web/document_file_viewer";
+import { Component, signal, t, useListener, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class DocumentsFileViewer extends Component {
@@ -7,62 +7,34 @@ export class DocumentsFileViewer extends Component {
     static components = {
         FileViewer,
     };
-    static props = [
-        "parentRoot", // Parent's root element, used to know the zone to use.
-        "previewStore",
-    ];
+
+    props = useProps({
+        previewStore: t.object(),
+    });
+
+    rootRef = signal.ref();
 
     setup() {
         this.documentService = useService("document.document");
-        this.root = useRef("root");
-        this.rightPanelState = useState(this.documentService.rightPanelReactive);
-        this.state = useState({ topOffset: 0 });
 
         const onKeydown = this.onIframeKeydown.bind(this);
-        useEffect(
-            (iframe) => {
-                if (!iframe) {
-                    return;
-                }
-                // We need to wait until the iframe is loaded to be able to bind our keydown handler.
-                const onLoad = () => {
-                    // In case of youtube links contentDocument might be null.
-                    if (!iframe.contentDocument) {
-                        return;
-                    }
-                    iframe.contentDocument.addEventListener("keydown", onKeydown);
-                };
-                iframe.addEventListener("load", onLoad);
-                return () => {
-                    iframe.removeEventListener("load", onLoad);
-                };
-            },
-            () => [this.root.el && this.root.el.querySelector("iframe")]
-        );
-        useEffect(
-            (el) => {
-                if (!el) {
-                    return;
-                }
-                this.state.topOffset = el.scrollTop;
-                const scrollHandler = () => {
-                    this.state.topOffset = el.scrollTop;
-                };
-                el.addEventListener("scroll", scrollHandler);
-                return () => {
-                    el.removeEventListener("scroll", scrollHandler);
-                };
-            },
-            () => [this.parentRoot.el]
-        );
-    }
 
-    get parentRoot() {
-        return this.props.parentRoot;
+        // We need to wait until the iframe is loaded to be able to bind our keydown handler.
+        useListener(
+            () => this.rootRef()?.querySelector("iframe"),
+            "load",
+            function onLoad(ev) {
+                const iframe = ev.currentTarget;
+                // In case of youtube links contentDocument might be null.
+                if (iframe.contentDocument) {
+                    iframe.contentDocument.addEventListener("keydown", onKeydown);
+                }
+            }
+        );
     }
 
     get isRightPanelVisible() {
-        return this.rightPanelState.visible && !this.env.isSmall;
+        return this.documentService.state.rightPanelVisible && this.documentService.canShowRightPanel;
     }
 
     onGlobalKeydown(ev) {

@@ -1,26 +1,40 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 from collections import defaultdict
-from contextlib import contextmanager, ExitStack
+from contextlib import ExitStack, contextmanager
 from datetime import datetime, timedelta
 from unittest import skip
 from unittest.mock import patch
 
-from odoo import Command, http
+from odoo import Command, fields
 from odoo.exceptions import AccessError, UserError, ValidationError
-from odoo.tests.common import new_test_user
+from odoo.http.requestlib import DEFAULT_MAX_CONTENT_LENGTH
 from odoo.tests import users
-from odoo.tools import mute_logger
+from odoo.tests.common import new_test_user, RecordCapturer
+from odoo.tools import html2plaintext, mute_logger
 
-from .test_documents_common import TransactionCaseDocuments, GIF, TEXT, WEBP
+from .test_documents_common import TransactionCaseDocuments, get_document_creation_message
+from odoo.addons.base.tests.files import GIF_RAW, WEBP_RAW
+from odoo.addons.mail.tests.common import MailCommon
 
-DATA = "data:application/zip;base64,R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs="
-file_a = {'name': 'doc.zip', 'datas': 'data:application/zip;base64,R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs='}
+TEXT_RAW = b'TEST'
 
 
-class TestCaseDocuments(TransactionCaseDocuments):
+class TestCaseDocuments(TransactionCaseDocuments, MailCommon):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.document_company_root = cls.env['documents.document'].create({
+            'type': 'binary',
+            'raw': GIF_RAW,
+            'name': 'company_root.gif',
+            'mimetype': 'image/gif',
+            'folder_id': False,
+            'owner_id': False,
+            'access_ids': [Command.create({'partner_id': cls.document_manager.partner_id.id, 'role': 'edit'}),
+                           Command.create({'partner_id': cls.internal_user.partner_id.id, 'role': 'edit'})],
+        })
 
     @skip("TODO: move to controller")
     @users('documents@example.com')
@@ -49,7 +63,8 @@ class TestCaseDocuments(TransactionCaseDocuments):
             with self.subTest(field_name=field_name):
                 self.assertEqual(shortcut[field_name], self.document_gif[field_name])
         attachment = self.env['ir.attachment'].create({
-            **file_a,
+            'name': 'attached',
+            'raw': b'aaaaa',
             'res_model': False,
             'res_id': False,
         })
@@ -95,22 +110,24 @@ class TestCaseDocuments(TransactionCaseDocuments):
         Tests a documents.document create method when created from an already existing ir.attachment.
         """
         attachment = self.env['ir.attachment'].create({
-            'datas': GIF,
+            'raw': GIF_RAW,
             'name': 'attachmentGif.gif',
             'res_model': 'documents.document',
             'res_id': 0,
         })
-        document_a = self.env['documents.document'].create({
-            'folder_id': self.folder_b.id,
-            'name': 'new name',
-            'attachment_id': attachment.id,
-        })
+        with self.mock_mail_app():
+            document_a = self.env['documents.document'].create({
+                'folder_id': self.folder_b.id,
+                'name': 'new name',
+                'attachment_id': attachment.id,
+            })
         self.assertEqual(document_a.attachment_id.id, attachment.id,
                          'the attachment should be the attachment given in the create values')
         self.assertEqual(document_a.name, 'new name',
                          'the name given should be used')
         self.assertFalse(document_a.res_model)
         self.assertFalse(document_a.res_id)
+        self.assertTrue(self._new_msgs)
 
     def test_documents_create_res_model(self):
         """Test the model set on a document and its attachment."""
@@ -121,34 +138,36 @@ class TestCaseDocuments(TransactionCaseDocuments):
 
         attachment = self.env['ir.attachment'].create({'name': 'test', 'res_model': 'documents.document'})
         partner = self.env['res.partner'].create({'name': 'partner'})
-        doc = self.env['documents.document'].create({'attachment_id': attachment.id, 'res_model': 'res.partner', 'res_id': partner.id})
+        with self.mock_mail_app():
+            doc = self.env['documents.document'].create({'attachment_id': attachment.id, 'res_model': 'res.partner', 'res_id': partner.id})
         self.assertEqual(attachment.res_model, 'res.partner')
         self.assertEqual(attachment.res_id, partner.id)
         self.assertEqual(doc.res_model, 'res.partner')
         self.assertEqual(doc.res_id, partner.id)
+        self.assertTrue(self._new_msgs)
+        self.assertMessageFields(self._new_msgs, {'body_content': get_document_creation_message('OdooBot', 'test', 'Contact')})
 
         user = self.portal_user
         attachment = self.env['ir.attachment'].create({'name': 'test', 'res_model': 'res.users', 'res_id': user.id})
         doc = self.env['documents.document'].create({'attachment_id': attachment.id})
-        self.assertEqual(attachment.res_model, 'res.users')
         self.assertEqual(attachment.res_id, user.id)
         self.assertEqual(doc.res_model, 'res.users')
         self.assertEqual(doc.res_id, user.id)
 
         doc.attachment_id = False
         doc.name = 'test'
-        doc.datas = 'ZGF0YQ=='
+        doc.raw = b'data'
         self.assertEqual(doc.attachment_id.res_model, 'res.users')
         self.assertEqual(doc.attachment_id.res_id, user.id)
         self.assertEqual(doc.attachment_id.name, 'test')
 
         doc.write({'attachment_id': False, 'res_model': False, 'res_id': False})
-        doc.datas = 'ZGF0YQ=='
+        doc.raw = b'data'
         self.assertEqual(doc.attachment_id.res_model, 'documents.document')
         self.assertEqual(doc.attachment_id.res_id, doc.id)
         self.assertEqual(doc.attachment_id.name, 'test')
 
-        doc = self.env['documents.document'].create({'datas': 'ZGF0YQ=='})
+        doc = self.env['documents.document'].create({'raw': b'data'})
         self.assertFalse(doc.res_model)
         self.assertFalse(doc.res_id)
         self.assertEqual(doc.attachment_id.res_model, 'documents.document')
@@ -162,7 +181,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
         """
         document_a = self.env['documents.document'].create({
             'name': 'Test mimetype gif',
-            'datas': GIF,
+            'raw': GIF_RAW,
             'folder_id': self.folder_b.id,
         })
         self.assertFalse(document_a.res_model)
@@ -171,14 +190,16 @@ class TestCaseDocuments(TransactionCaseDocuments):
                          'the res_model should be set as document by default')
         self.assertEqual(document_a.attachment_id.res_id, document_a.id,
                          'the res_id should be set as the document id by default to allow access right inheritance')
-        self.assertEqual(document_a.attachment_id.datas, GIF, 'the document should have a GIF data')
+        self.assertEqual(document_a.attachment_id.raw.content, GIF_RAW, 'the document should have a GIF data')
         document_no_attachment = self.env['documents.document'].create({
             'name': 'Test mimetype gif',
             'folder_id': self.folder_b.id,
+            'type': 'request',
         })
         self.assertFalse(document_no_attachment.attachment_id, 'the new document shouldnt have any attachment_id')
-        document_no_attachment.write({'datas': TEXT})
-        self.assertEqual(document_no_attachment.attachment_id.datas, TEXT, 'the document should have an attachment')
+        document_no_attachment.write({'raw': TEXT_RAW})
+        self.assertEqual(document_no_attachment.attachment_id.raw.content, TEXT_RAW, 'the document should have an attachment')
+        self.assertEqual(document_no_attachment.type, 'binary')
 
     def test_documents_create_performance(self):
         folders = self.env['documents.document'].create([
@@ -191,19 +212,23 @@ class TestCaseDocuments(TransactionCaseDocuments):
             self.env['documents.document'].create([{
                 'folder_id': folder.id,
                 'type': 'binary',
+                'raw': 'test',
             } for folder in folders])
 
     def test_default_res_id_model(self):
         """
         Test default res_id and res_model from context are used for linking attachment to document.
         """
-        document = self.env['documents.document'].create({'folder_id': self.folder_b.id})
+        document = self.env['documents.document'].create({
+            'type': 'request',
+            'folder_id': self.folder_b.id,
+        })
         attachment = self.env['ir.attachment'].with_context(
             default_res_id=document.id,
             default_res_model=document._name,
         ).create({
             'name': 'attachmentGif.gif',
-            'datas': GIF,
+            'raw': GIF_RAW,
         })
         self.assertEqual(attachment.res_id, document.id, "It should be linked to the default res_id")
         self.assertEqual(attachment.res_model, document._name, "It should be linked to the default res_model")
@@ -216,7 +241,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
         """
         document = self.env["documents.document"].create(
             {
-                "datas": GIF,
+                "raw": GIF_RAW,
                 "folder_id": self.folder_b.id,
                 "res_model": "res.users",
                 "res_id": self.doc_user.id,
@@ -240,14 +265,14 @@ class TestCaseDocuments(TransactionCaseDocuments):
         self.assertEqual(len(document.previous_attachment_ids.ids), 0, "The history should be empty")
         original_attachment = document.attachment_id
         check_attachment_res_fields(original_attachment, "res.users", self.doc_user.id)
-        document.write({'datas': TEXT})
+        document.write({'raw': TEXT_RAW})
         new_attachment = document.previous_attachment_ids
         check_attachment_res_fields(original_attachment, "res.users", self.doc_user.id)
         check_attachment_res_fields(new_attachment, "documents.document", document.id)
         self.assertEqual(len(document.previous_attachment_ids), 1)
         self.assertNotEqual(document.previous_attachment_ids, original_attachment)
-        self.assertEqual(document.previous_attachment_ids[0].datas, GIF, "The history should have the right content")
-        self.assertEqual(document.attachment_id.datas, TEXT, "The document should have the right content")
+        self.assertEqual(document.previous_attachment_ids[0].raw.content, GIF_RAW, "The history should have the right content")
+        self.assertEqual(document.attachment_id.raw.content, TEXT_RAW, "The document should have the right content")
         old_attachment = document.attachment_id
         document.write({'attachment_id': new_attachment.id})
         check_attachment_res_fields(new_attachment, "res.users", self.doc_user.id)
@@ -265,34 +290,63 @@ class TestCaseDocuments(TransactionCaseDocuments):
             new_attachment not in document.previous_attachment_ids,
             "the history should not contain the new attachment",
         )
-        document.write({'datas': DATA})
+        document.write({'raw': GIF_RAW})
         self.assertEqual(document.attachment_id, new_attachment)
 
     def test_write_mimetype(self):
         """
         Tests the consistency of documents' mimetypes
         """
-        document = self.env['documents.document'].with_user(self.doc_user.id).create({'datas': GIF, 'folder_id': self.folder_b.id})
-        document.with_user(self.doc_user.id).write({'datas': TEXT, 'mimetype': 'text/plain'})
+        document = self.env['documents.document'].with_user(self.doc_user.id).create({'raw': GIF_RAW, 'folder_id': self.folder_b.id})
+        document.with_user(self.doc_user.id).write({'raw': TEXT_RAW, 'mimetype': 'text/plain'})
         self.assertEqual(document.mimetype, 'text/plain', "the new mimetype should be the one given on write")
-        document.with_user(self.doc_user.id).write({'datas': TEXT, 'mimetype': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})
+        document.with_user(self.doc_user.id).write({'raw': TEXT_RAW, 'mimetype': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})
         self.assertEqual(document.mimetype, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', "should preserve office mime type")
 
-    def test_cascade_delete(self):
+    def test_archive_on_attachment_deletion(self):
         """
-        Makes sure that documents are unlinked when their attachment is unlinked.
+        Makes sure that documents are archived when their attachment is unlinked.
         """
-        document = self.env['documents.document'].create({'datas': GIF, 'folder_id': self.folder_b.id})
-        self.assertTrue(document.exists(), 'the document should exist')
+        document = self.env['documents.document'].create({'raw': GIF_RAW, 'folder_id': self.folder_b.id})
+        self.assertTrue(document.exists() and document.active, 'the document should exist and not be archived')
         document.attachment_id.unlink()
-        self.assertFalse(document.exists(), 'the document should not exist')
+        self.assertTrue(document.exists() and not document.active, 'the document should exist and be archived')
+
+    def test_archive_request_on_unlink_related_activity(self):
+        """
+        Makes sure that document requests are archived when their related activity are deleted.
+        """
+        record = self.env['res.partner'].create({'name': 'test record'})
+        upload_activity_type_xml_id = 'mail.mail_activity_data_upload_document'
+        self.env.ref(upload_activity_type_xml_id).folder_id = self.folder_a
+        with RecordCapturer(self.env['documents.document']) as capture:
+            record.activity_schedule(upload_activity_type_xml_id)
+        document = capture.records.filtered(lambda d: d.request_activity_id == record.activity_ids)
+        activity = document.request_activity_id
+        self.assertTrue(activity)
+        self.assertEqual(len(document), 1, "Scheduling an upload activity creates a related document request")
+        record.unlink()
+        self.assertFalse(activity.with_context(active_test=False).exists(),
+                         "Activity is deleted as its related record is deleted")
+        self.assertTrue(document.exists() and not document.active,
+                        "The document request is archived as its related activity is deleted")
 
     def test_is_favorited(self):
-        user = new_test_user(self.env, "test user", groups='documents.group_documents_user')
-        document = self.env['documents.document'].create({'datas': GIF, 'folder_id': self.folder_b.id})
-        document.favorited_ids = user
-        self.assertFalse(document.is_favorited)
-        self.assertTrue(document.with_user(user).is_favorited)
+        """ Test the is_favorited field (compute and inverse method). """
+        # Test the compute method
+        self.document_gif.favorited_ids = self.doc_user
+        self.assertFalse(self.document_gif.is_favorited)
+        self.assertTrue(self.document_gif.with_user(self.doc_user).is_favorited)
+        # Test the inverse method
+        documents = self.document_gif | self.document_txt
+        documents.with_user(self.doc_user).is_favorited = True
+        documents.invalidate_recordset()
+        self.assertEqual(documents.with_user(self.doc_user).mapped('is_favorited'), [True, True])
+        self.assertEqual(documents.mapped('is_favorited'), [False, False])
+        documents.with_user(self.doc_user).is_favorited = False
+        documents.invalidate_recordset()
+        self.assertEqual(documents.with_user(self.doc_user).mapped('is_favorited'), [False, False])
+        self.assertEqual(documents.mapped('is_favorited'), [False, False])
 
     def test_neuter_mimetype(self):
         """
@@ -302,15 +356,15 @@ class TestCaseDocuments(TransactionCaseDocuments):
         The test stays duplicated here to ensure the de-duplicated logic still catches our use cases.
         """
         self.folder_b.action_update_access_rights(partners={self.doc_user.partner_id: ('edit', False)})
-        document = self.env['documents.document'].create({'datas': GIF, 'folder_id': self.folder_b.id})
+        document = self.env['documents.document'].create({'raw': GIF_RAW, 'folder_id': self.folder_b.id})
 
-        document.with_user(self.doc_user.id).write({'datas': TEXT, 'mimetype': 'text/xml'})
+        document.with_user(self.doc_user.id).write({'raw': TEXT_RAW, 'mimetype': 'text/xml'})
         self.assertEqual(document.mimetype, 'text/plain', "XML mimetype should be forced to text")
-        document.with_user(self.doc_user.id).write({'datas': TEXT, 'mimetype': 'image/svg+xml'})
+        document.with_user(self.doc_user.id).write({'raw': TEXT_RAW, 'mimetype': 'image/svg+xml'})
         self.assertEqual(document.mimetype, 'text/plain', "SVG mimetype should be forced to text")
-        document.with_user(self.doc_user.id).write({'datas': TEXT, 'mimetype': 'text/html'})
+        document.with_user(self.doc_user.id).write({'raw': TEXT_RAW, 'mimetype': 'text/html'})
         self.assertEqual(document.mimetype, 'text/plain', "HTML mimetype should be forced to text")
-        document.with_user(self.doc_user.id).write({'datas': TEXT, 'mimetype': 'application/xhtml+xml'})
+        document.with_user(self.doc_user.id).write({'raw': TEXT_RAW, 'mimetype': 'application/xhtml+xml'})
         self.assertEqual(document.mimetype, 'text/plain', "XHTML mimetype should be forced to text")
 
     def test_create_from_message_invalid_tags(self):
@@ -330,7 +384,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
         sanitized_extension = 'txt'
         for extension in ('.txt', ' .txt', '..txt', '.txt ', ' .txt ', '  .txt   '):
             document = self.env['documents.document'].create({
-                'datas': base64.b64encode(b"Test"),
+                'raw': b"Test",
                 'name': f'name{extension}',
                 'mimetype': 'text/plain',
                 'folder_id': self.folder_b.id,
@@ -391,7 +445,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
             - ensure the existing flow for res_model `False` does not break.
         """
         documents = self.env['documents.document'].create([{
-                'datas': GIF,
+                'raw': GIF_RAW,
                 'folder_id': self.folder_b.id,
                 'res_model': res_model,
                 'res_id': res_id,
@@ -424,7 +478,11 @@ class TestCaseDocuments(TransactionCaseDocuments):
             {'name': f'Test Folder {idx + 1}', 'type': 'folder'} for idx in range(3)
         ])
         folder_3.folder_id = folder_1
-        request = self.env['documents.document'].create({'name': 'Test Request', 'folder_id': folder_3.id})
+        request = self.env['documents.document'].create({
+            'name': 'Test Request',
+            'folder_id': folder_3.id,
+            'type': 'request',
+        })
 
         # Can't move into archived folders
         folder_2.action_archive()
@@ -448,6 +506,17 @@ class TestCaseDocuments(TransactionCaseDocuments):
         (folder_1 | folder_3).write({'folder_id': folder_2.id, 'active': True})
 
         self.assertFalse(request.active, "folder_3's content should still be in the trash")
+
+    def test_log_message_on_doc_move_to_my_drive(self):
+        """Moving a document to My Drive logs a message on the source folder."""
+        source_folder_id = self.document_txt.folder_id.id
+        with RecordCapturer(self.env['mail.message'], []) as capture:
+            self.document_txt.with_user(self.document_manager).write({'user_folder_id': 'MY'})
+            message = capture.records
+
+        self.assertEqual(len(message), 1)
+        self.assertEqual(message.res_id, source_folder_id)
+        self.assertIn("file.txt has been moved outside this folder.", html2plaintext(message.body))
 
     def test_unarchive_document_with_archived_parent(self):
         """Unarchive a document whose parent folder is archived should send an error."""
@@ -516,7 +585,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
                 self.document_txt.attachment_id.id,
                 "There must be a new attachment"
             )
-            self.assertEqual(copy.raw, self.document_txt.raw)
+            self.assertEqual(copy.raw.content, self.document_txt.raw.content)
 
             self.env.flush_all()  # trigger recomputes
 
@@ -530,7 +599,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
             self.document_txt.attachment_id.id,
             "There must be a new attachment"
         )
-        self.assertEqual(copy.raw, self.document_txt.raw)
+        self.assertEqual(copy.raw.content, self.document_txt.raw.content)
 
         # check that we can copy in a folder inside the company folder
         self.assertFalse(self.folder_a.folder_id)
@@ -630,14 +699,15 @@ class TestCaseDocuments(TransactionCaseDocuments):
     def test_embedding_actions(self):
         """Check that embedded actions name is translated."""
         self.env['res.lang']._activate_lang('fr_FR')
-        doc = self.env['documents.document'].create({'name': 'A request', 'folder_id': self.folder_a.id})
+        doc = self.env['documents.document'].create(
+            {'name': 'A request', 'folder_id': self.folder_a.id, 'type': 'request'})
         self.assertFalse(doc.available_embedded_actions_ids)
         self.server_action.with_context(lang='fr_FR').name = "Blablabla"
         self.env['documents.document'].action_folder_embed_action(self.folder_a.id, self.server_action.id)
         doc.invalidate_recordset(['available_embedded_actions_ids'])
         embedded_action = doc.available_embedded_actions_ids
-        self.assertEqual(embedded_action.name, self.server_action.name)
-        self.assertEqual(embedded_action.with_context(lang='fr_FR').name, "Blablabla")
+        self.assertEqual(embedded_action.display_name, self.server_action.display_name)
+        self.assertEqual(embedded_action.with_context(lang='fr_FR').display_name, "Blablabla")
 
     def test_embedding_actions_permission(self):
         """Test that embedding actions enforces permissions but allows sudo bypass."""
@@ -670,6 +740,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
         doc = self.env['documents.document'].create({
             'name': 'A request',
             'folder_id': self.folder_a.id,
+            'raw': 'test',
         })
         parent_base = self.server_action
         parent_base.group_ids = [Command.create({'name': 'Test Gr', 'user_ids': [Command.link(self.env.user.id)]})]
@@ -721,10 +792,10 @@ class TestCaseDocuments(TransactionCaseDocuments):
                 pdf_document = self.env['documents.document'].create({
                     'name': 'Test PDF doc',
                     'mimetype': mimetype,
-                    'datas': "JVBERi0gRmFrZSBQREYgY29udGVudA==",
+                    'raw': b'%PDF- Fake PDF content',
                     'folder_id': self.folder_b.id,
                 })
-                self.assertEqual(pdf_document.thumbnail, False)
+                self.assertFalse(pdf_document.thumbnail)
                 self.assertEqual(pdf_document.thumbnail_status, 'client_generated')
 
         word_document = self.env['documents.document'].create({
@@ -732,35 +803,35 @@ class TestCaseDocuments(TransactionCaseDocuments):
             'mimetype': 'application/msword',
             'folder_id': self.folder_b.id,
         })
-        self.assertEqual(word_document.thumbnail, False)
+        self.assertFalse(word_document.thumbnail)
         self.assertEqual(word_document.thumbnail_status, False)
 
         webp_document = self.env['documents.document'].create({
             'name': 'Test WEBP doc',
             'mimetype': 'image/webp',
-            'datas': WEBP,
+            'raw': WEBP_RAW,
             'folder_id': self.folder_b.id,
         })
-        self.assertEqual(webp_document.thumbnail, False)
+        self.assertFalse(webp_document.thumbnail)
         self.assertEqual(webp_document.thumbnail_status, 'client_generated')
 
         image_documents = self.env['documents.document'].create([{
             'name': 'Test image doc',
             'mimetype': mimetype,
-            'datas': GIF,
+            'raw': GIF_RAW,
             'folder_id': self.folder_b.id,
         } for mimetype in [
             'image/bmp', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/tiff', 'image/x-icon'
         ]])
         for image_document in image_documents:
             with self.subTest(mimetype=image_document.mimetype):
-                self.assertEqual(image_document.thumbnail, GIF)
+                self.assertTrue(image_document.thumbnail)
                 self.assertEqual(image_document.thumbnail_status, 'present')
 
         text_documents = self.env['documents.document'].create([{
             'name': 'Test Special Case Text doc',
             'mimetype': mimetype,
-            'datas': TEXT,
+            'raw': TEXT_RAW,
             'folder_id': self.folder_b.id,
         } for mimetype in [
             'text/html', 'text/csv', 'text/plain', 'text/javascript', 'text/css', 'text/markdown', 'text/xml',
@@ -768,7 +839,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
         ]])
         for text_document in text_documents:
             with self.subTest(mimetype=text_document.mimetype):
-                self.assertEqual(text_document.thumbnail, False)
+                self.assertFalse(text_document.thumbnail)
                 self.assertEqual(text_document.thumbnail_status, False)
 
     def test_document_max_upload_limit(self):
@@ -777,11 +848,11 @@ class TestCaseDocuments(TransactionCaseDocuments):
         key_doc = 'document.max_fileupload_size'
         key_web = 'web.max_file_upload_size'
 
-        ICP.set_param(key_doc, 20)
-        ICP.set_param(key_web, 10)
+        ICP.set_int(key_doc, 20)
+        ICP.set_int(key_web, 10)
         self.assertEqual(Doc.get_document_max_upload_limit(), 20)
 
-        ICP.set_param(key_doc, 0)
+        ICP.set_int(key_doc, 0)
         self.assertEqual(Doc.get_document_max_upload_limit(), None)
 
         ICP.search([('key', '=', key_doc)]).unlink()
@@ -790,15 +861,15 @@ class TestCaseDocuments(TransactionCaseDocuments):
         ICP.search([('key', '=', key_web)]).unlink()
         self.assertEqual(
             Doc.get_document_max_upload_limit(),
-            http.DEFAULT_MAX_CONTENT_LENGTH
+            DEFAULT_MAX_CONTENT_LENGTH,
         )
 
     def test_document_order_by_is_folder(self):
         # check that the order is "folder first", and then most recent first
-        doc_1 = self.env['documents.document'].create([{'name': 'D1'}])
+        doc_1 = self.env['documents.document'].create([{'name': 'D1', 'raw': 'test'}])
         doc_2 = self.env['documents.document'].create([{'name': 'D2', 'type': 'folder'}])
         doc_3 = self.env['documents.document'].create([{'name': 'D3', 'type': 'url'}])
-        doc_4 = self.env['documents.document'].create([{'name': 'D4'}])
+        doc_4 = self.env['documents.document'].create([{'name': 'D4', 'raw': 'test'}])
         docs = doc_1 | doc_2 | doc_3 | doc_4
         result = self.env['documents.document'].search([('id', 'in', docs.ids)], order='is_folder, create_date DESC, id DESC')
 
@@ -808,7 +879,10 @@ class TestCaseDocuments(TransactionCaseDocuments):
         self.assertEqual(result[3], doc_1)
 
     def test_document_order_by_last_access_date(self):
-        documents = self.env['documents.document'].create([{'name': 'D1'}, {'name': 'D2'}])
+        documents = self.env['documents.document'].create([
+            {'name': 'D1', 'raw': 'test'},
+            {'name': 'D2', 'raw': 'test'},
+        ])
         self.env['documents.access'].create([{
             'document_id': documents[0].id,
             'last_access_date': datetime.now() + timedelta(days=1),
@@ -829,7 +903,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
 
     def test_document_group_by_last_access_date(self):
         Doc = self.env['documents.document']
-        documents = Doc.create([{'name': f'D{i}'} for i in range(6)])
+        documents = Doc.create([{'name': f'D{i}', 'raw': 'test'} for i in range(6)])
         self.env['documents.access'].create([{
             'document_id': documents[0].id,
             'last_access_date': datetime.now() - timedelta(hours=1),
@@ -896,6 +970,7 @@ class TestCaseDocuments(TransactionCaseDocuments):
                     'name': 'Test Document',
                     'folder_id': folder.id,
                     'url': url,
+                    'type': 'url',
                 })
 
     def test_document_shortcut_to_my_drive(self):
@@ -909,12 +984,44 @@ class TestCaseDocuments(TransactionCaseDocuments):
             {'type': 'folder', 'name': 'folder', 'access_internal': 'view'}
         ])
         attachment = self.env['ir.attachment'].create({
-            'datas': GIF,
+            'raw': GIF_RAW,
             'name': 'TestAttachment.gif',
             'res_model': 'documents.document',
             'res_id': folder.id,
         })
         self.assertNotEqual(attachment.name, folder.name, 'the folder name should not change')
+
+    def test_document_toggle_favorited(self):
+        """ Test toggle favorite """
+        all_docs = self.document_gif | self.document_txt
+        all_docs_user = all_docs.with_user(self.doc_user)
+        all_docs_manager = all_docs.with_user(self.document_manager)
+        self.assertEqual(all_docs_manager.mapped('is_favorited'), [False, False])
+        self.assertEqual(all_docs_user.mapped('is_favorited'), [False, False])
+
+        self.document_gif.with_user(self.document_manager).toggle_favorited()
+        all_docs.invalidate_recordset(['is_favorited'])
+        self.assertEqual(all_docs_manager.mapped('is_favorited'), [True, False])
+        self.assertEqual(all_docs_user.mapped('is_favorited'), [False, False])
+
+        self.document_gif.with_user(self.doc_user).toggle_favorited()
+        all_docs.invalidate_recordset(['is_favorited'])
+        self.assertEqual(all_docs_user.mapped('is_favorited'), [True, False])
+
+        # Different values: set True for all
+        all_docs_user.toggle_favorited()
+        all_docs.invalidate_recordset(['is_favorited'])
+        self.assertEqual(all_docs_user.mapped('is_favorited'), [True, True])
+
+        # Same values -> toggle all (True -> False)
+        all_docs_user.toggle_favorited()
+        all_docs.invalidate_recordset(['is_favorited'])
+        self.assertEqual(all_docs_user.mapped('is_favorited'), [False, False])
+
+        # Same values -> toggle all (False -> True)
+        all_docs_user.toggle_favorited()
+        all_docs.invalidate_recordset(['is_favorited'])
+        self.assertEqual(all_docs_user.mapped('is_favorited'), [True, True])
 
     def test_document_toggle_lock(self):
         """ Test unlocking of the documents when the user_permission is set to edit. """
@@ -937,7 +1044,61 @@ class TestCaseDocuments(TransactionCaseDocuments):
             'name': 'Test',
             'res_id': partner.id,
             'res_model': 'res.partner',
+            'type': 'request',
         })
         self.assertEqual(doc.res_name, "Test Partner")
         partner.unlink()
+        self.assertTrue(doc.exists())
         self.assertFalse(doc.res_name)
+
+    @users('dtdm')
+    def test_is_protected_admin(self):
+        """Test that root folder are not protected for admin."""
+        company_root_folder = self.company_root_folder.with_env(self.env)
+        company_sub_folder = self.company_sub_folder.with_env(self.env)
+        document_company_root = self.document_company_root.with_env(self.env)
+        self.assertFalse(company_root_folder.is_protected)
+        self.assertFalse(company_sub_folder.is_protected)
+        self.assertFalse(document_company_root.is_protected)
+        not_protected_documents = self.env['documents.document'].search([('is_protected', '!=', True)])
+        self.assertTrue(all(folder in not_protected_documents
+                            for folder in company_root_folder | company_sub_folder | document_company_root))
+
+    @users('internal_user')
+    def test_is_protected_internal_user(self):
+        """Test that root folder are protected for internal user."""
+        company_root_folder = self.company_root_folder.with_env(self.env)
+        company_sub_folder = self.company_sub_folder.with_env(self.env)
+        document_company_root = self.document_company_root.with_env(self.env)
+        self.assertTrue(company_root_folder.is_protected,
+                        "Folders at the root of Company can only be edited by Documents Managers.")
+        self.assertFalse(company_sub_folder.is_protected)
+        self.assertFalse(document_company_root.is_protected)
+        self.assertIn(company_root_folder,
+                      self.env['documents.document'].search([('is_protected', '=', True)]))
+        self.assertNotIn(company_sub_folder, self.env['documents.document'].search([('is_protected', '=', True)]))
+        self.assertIn(document_company_root, self.env['documents.document'].search([('is_protected', '!=', True)]),
+                      "Non folders are never protected")
+
+    @users('documents@example.com')
+    def test_create_document_write_other_document_access_ids(self):
+        """Test that we cannot write access ids of document by creating another document."""
+        inaccessible_document = self.env['documents.document'].with_user(self.internal_user).sudo().create(
+            {'type': 'binary', 'raw': b'test'}).with_env(self.env)
+        self.assertEqual(inaccessible_document.user_permission, 'none')
+        expiration_date = fields.Datetime.add(fields.Datetime.today(), days=10)
+        document = self.env['documents.document'].create({
+            'type': 'binary', 'raw': b'test', 'name': 'test.txt',
+            'folder_id': self.folder_b.id,
+            'access_ids': [Command.create({
+                'document_id': inaccessible_document.id, 'partner_id': self.doc_user.partner_id.id,
+                'role': 'edit', 'expiration_date': expiration_date})],
+        })
+        access_ids = document.sudo().access_ids.filtered(lambda a: a.expiration_date == expiration_date)
+        self.assertEqual(len(access_ids), 1)
+        self.assertEqual(access_ids.document_id, document,
+                         'The access id created has been redirected to the created document.')
+        self.assertEqual(inaccessible_document.user_permission, 'none',
+                         'The inaccessible document permissions have not been altered.')
+        inaccessible_document.sudo().action_update_access_rights(partners={self.doc_user.partner_id: ('view', False)})
+        self.assertEqual(inaccessible_document.user_permission, 'view')

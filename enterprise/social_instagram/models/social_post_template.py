@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import uuid
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.tools.image import base64_to_image
+from odoo.tools.image import binary_to_image
 
 
 class SocialPostTemplate(models.Model):
@@ -18,9 +17,13 @@ class SocialPostTemplate(models.Model):
         'Instagram Message', compute='_compute_message_by_media',
         store=True, readonly=False)
     instagram_image_ids = fields.Many2many(
-        'ir.attachment', 'template_instagram_image_ids_rel', string='Instagram Images',
+        'social.post.image', 'template_instagram_image_ids_rel', string='Instagram Images',
         help='Will attach images to your posts.',
         compute='_compute_images_by_media', store=True, readonly=False, bypass_search_access=True)
+    instagram_first_comment = fields.Text(
+        'Instagram First Comment', compute='_compute_first_comment_by_media',
+        store=True, readonly=False)
+    instagram_post_as_story = fields.Boolean("Instagram Post Story")
 
     instagram_access_token = fields.Char('Access Token', default=lambda self: self._get_default_access_token(), copy=False,
         help="Used to allow access to Instagram to retrieve the post image")
@@ -36,6 +39,12 @@ class SocialPostTemplate(models.Model):
                 and not post.instagram_image_ids):
                 raise UserError(_("Please specify either a Instagram Message or upload some Instagram Images."))
 
+    @api.constrains('instagram_post_as_story', 'instagram_image_ids')
+    def _check_instagram_post_as_story(self):
+        for post in self:
+            if post.instagram_post_as_story and len(post.instagram_image_ids) != 1:
+                raise UserError(_("Oops! Instagram stories can only contain a single picture."))
+
     @api.depends('account_ids.media_id.media_type')
     def _compute_has_instagram_account(self):
         for post in self:
@@ -46,7 +55,7 @@ class SocialPostTemplate(models.Model):
         for post in self:
             post.display_instagram_preview = (post.instagram_message or post.instagram_image_ids) and post.has_instagram_account
 
-    @api.depends(lambda self: ['instagram_message', 'instagram_image_ids', 'display_instagram_preview'] + self._get_post_message_modifying_fields())
+    @api.depends(lambda self: ['instagram_message', 'instagram_image_ids', 'display_instagram_preview', 'social_post_mentions', 'instagram_first_comment', 'instagram_post_as_story'] + self._get_post_message_modifying_fields())
     def _compute_instagram_preview(self):
         """ We want to display various error messages if the image is not appropriate.
         See #_get_instagram_image_error() for more information. """
@@ -61,13 +70,15 @@ class SocialPostTemplate(models.Model):
                 'faulty_images': faulty_images,
                 'error_code': error_code,
                 'image_urls': [
-                    f'/web/image/{image._origin.id or image.id}'
-                    for image in post.instagram_image_ids.sorted(lambda image: image._origin.id or image.id, reverse=True)
+                    f'/web/image/social.post.image/{image._origin.id or image.id}/raw'
+                    for image in post.instagram_image_ids.sorted(lambda image: (image.sequence, image._origin.id or image.id))
                 ],
                 'message': post._prepare_post_content(
                     post.instagram_message,
                     'instagram',
                     **{field: post[field] for field in post._get_post_message_modifying_fields()}),
+                'instagram_first_comment': post.instagram_first_comment,
+                'instagram_post_as_story': post.instagram_post_as_story,
             })
 
     def _get_instagram_image_error(self):
@@ -91,14 +102,13 @@ class SocialPostTemplate(models.Model):
 
         self.ensure_one()
         error_code = False
-        faulty_images = self.env['ir.attachment']
+        faulty_images = self.env['social.post.image']
         jpeg_images = self.instagram_image_ids.filtered(lambda image: image.mimetype == 'image/jpeg')
         non_jpeg_images = self.instagram_image_ids - jpeg_images
-
         if not self.instagram_image_ids:
             error_code = 'missing'
         else:
-            if len(jpeg_images) > 10:
+            if (len(jpeg_images) > 10 and not self.instagram_post_as_story) or (len(jpeg_images) > 1 and self.instagram_post_as_story):
                 error_code = 'max_limit'
             if non_jpeg_images:
                 error_code = 'wrong_extension'
@@ -106,14 +116,14 @@ class SocialPostTemplate(models.Model):
             if jpeg_images and not non_jpeg_images:
                 for jpeg_image in jpeg_images:
                     try:
-                        image = base64_to_image(jpeg_image.with_context(bin_size=False).datas)
+                        image = binary_to_image(jpeg_image.raw)
                     except UserError:
                         # image could not be loaded
                         error_code = 'corrupted'
                         return jpeg_image.name, error_code
 
                     image_ratio = image.width / image.height if image.height else 0
-                    if image_ratio < 0.8 or image_ratio > 1.91:
+                    if not self.instagram_post_as_story and (image_ratio < 0.8 or image_ratio > 1.91):
                         error_code = 'incorrect_ratio'
                         faulty_images += jpeg_image
 
@@ -128,3 +138,16 @@ class SocialPostTemplate(models.Model):
     def _images_fields(self):
         """Return the images field per media."""
         return {**super()._images_fields(), 'instagram': 'instagram_image_ids'}
+
+    @api.model
+    def _first_comment_fields(self):
+        """Return the "first comment" field per media."""
+        return {**super()._first_comment_fields(), 'instagram': 'instagram_first_comment'}
+
+    def _prepare_social_post_values(self):
+        """Return the values to generate a social post from the social post template."""
+        self.ensure_one()
+        return {
+            **super()._prepare_social_post_values(),
+            'instagram_post_as_story': self.instagram_post_as_story,
+        }

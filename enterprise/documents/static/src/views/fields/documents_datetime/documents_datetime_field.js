@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { formatDateTime } from "@web/core/l10n/dates";
 import { localization } from "@web/core/l10n/localization";
 import { registry } from "@web/core/registry";
@@ -7,10 +7,11 @@ import { DocumentsDatetimeBtnField } from "../documents_datetime_btn/documents_d
 
 export class DocumentsDatetimeField extends Component {
     static template = "documents.DocumentsDatetimeField";
-    static props = {
+
+    props = useProps({
         ...standardFieldProps,
-        label: { type: String, optional: true },
-    };
+        label: t.string().optional(),
+    });
     static components = {
         DocumentsDatetimeBtnField,
     };

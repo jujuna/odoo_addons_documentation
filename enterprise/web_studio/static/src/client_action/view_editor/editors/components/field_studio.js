@@ -1,9 +1,10 @@
+import { proxy } from "@odoo/owl";
 import { Field } from "@web/views/fields/field";
 import { FieldContentOverlay } from "./field_content_overlay";
 
 import { useStudioRef, studioIsVisible } from "@web_studio/client_action/view_editor/editors/utils";
 
-import { useState } from "@odoo/owl";
+import { registry } from "@web/core/registry";
 
 /*
  * Field:
@@ -13,16 +14,27 @@ import { useState } from "@odoo/owl";
 export class FieldStudio extends Field {
     static components = { ...Field.components, FieldContentOverlay };
     static template = "web_studio.Field";
+
     setup() {
         super.setup();
-        this.state = useState({
+        this.state = proxy({
             displayOverlay: false,
         });
-        useStudioRef("rootRef", this.onClick);
+        this.rootRef = useStudioRef(this.onClick.bind(this));
+        if (this.props.type) {
+            // widget
+            const editorFieldComponent = registry
+                .category("editor_fields")
+                .get(this.props.type, null);
+            if (editorFieldComponent) {
+                this.field = { ...this.field };
+                this.field.component = editorFieldComponent;
+            }
+        }
     }
     get fieldComponentProps() {
         const fieldComponentProps = super.fieldComponentProps;
-        if (this.type === "kanban.many2one_avatar_user") {
+        if (this.type === "card.many2one_avatar_user") {
             // This field must be visible, even when dealing without a record
             fieldComponentProps.readonly = false;
         }
@@ -49,8 +61,11 @@ export class FieldStudio extends Field {
         if (hasLabel) {
             return false;
         }
-        if (this.type === "kanban.many2one_avatar_user") {
+        if (this.type === "card.many2one_avatar_user") {
             return false; // The widget has its own visibility when empty
+        }
+        if (this.type === "statusbar") {
+            return false;
         }
         return "isEmpty" in this.field ? this.field.isEmpty(record, name) : !record.data[name];
     }
@@ -83,13 +98,24 @@ export class FieldStudio extends Field {
         });
     }
 
+    onClickDefault() {
+        this.env.config.onNodeClicked(this.props.studioXpath);
+        this.state.displayOverlay = !this.state.displayOverlay;
+    }
+
     onClick(ev) {
+        if (
+            this.field.component?.onFieldClicked?.(ev, {
+                onClickDefault: this.onClickDefault.bind(this),
+            })
+        ) {
+            return;
+        }
         if (ev.target.classList.contains("o_web_studio_editX2Many")) {
             return;
         }
         ev.stopPropagation();
         ev.preventDefault();
-        this.env.config.onNodeClicked(this.props.studioXpath);
-        this.state.displayOverlay = !this.state.displayOverlay;
+        this.onClickDefault();
     }
 }

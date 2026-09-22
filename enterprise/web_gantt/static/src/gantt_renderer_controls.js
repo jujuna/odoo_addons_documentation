@@ -1,7 +1,9 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { formatDate } from "@web/core/l10n/dates";
+import { _t } from "@web/core/l10n/translation";
+import { useService } from "@web/core/utils/hooks";
 import { pick } from "@web/core/utils/objects";
 import { debounce } from "@web/core/utils/timing";
 import { diffColumn } from "./gantt_helpers";
@@ -18,20 +20,34 @@ export class GanttRendererControls extends Component {
         DropdownItem,
         GanttScaleSelector,
     };
-    static props = [
-        "model",
-        "displayExpandCollapseButtons",
-        "focusToday",
-        "getCurrentFocusDate",
-        "slots?",
-    ];
     static toolbarContentTemplate = "web_gantt.GanttRendererControls.ToolbarContent";
     static rangeMenuTemplate = "web_gantt.GanttRendererControls.RangeMenu";
+
+    props = useProps({
+        model: t.any(),
+        displayExpandCollapseButtons: t.any(),
+        focusToday: t.any(),
+        getCurrentFocusDate: t.any(),
+        showConnectors: t.any(),
+        toggleShowConnectors: t.any(),
+        hasSidePanel: t.any().optional(),
+        sidePanelExpanded: t.any().optional(),
+        toggleSidePanel: t.any().optional(),
+        toScheduleString: t.any().optional(),
+        slots: t.any().optional(),
+    });
 
     setup() {
         this.model = this.props.model;
         this.updateMetaData = debounce(() => this.model.fetchData(this.makeParams()), 500);
-        this.state = useState(pick(this.model.metaData, ...KEYS));
+        this.state = proxy(pick(this.model.metaData, ...KEYS));
+        this.uiService = useService("ui");
+    }
+
+    get displayModeTitle() {
+        return this.model.displayParams.displayMode === "dense"
+            ? _t("Activate sparse mode")
+            : _t("Activate dense mode");
     }
 
     getGanttScaleSelectorProps() {
@@ -106,7 +122,7 @@ export class GanttRendererControls extends Component {
     selectRangeId(rangeId) {
         Object.assign(
             this.state,
-            this.model.getRangeFromDate(rangeId, DateTime.now().startOf("day"))
+            this.model.getRangeFromDate(rangeId, this.props.getCurrentFocusDate())
         );
         delete this.state.keepCurrentFocusDate;
         this.updateMetaData();
@@ -122,7 +138,9 @@ export class GanttRendererControls extends Component {
 
     get displayRescheduleMethods() {
         return (
-            this.model.metaData.dependencyEnabled && !this.model.useSampleModel && !this.env.isSmall
+            this.model.metaData.dependencyEnabled &&
+            !this.model.useSampleModel &&
+            !this.uiService.isSmall
         );
     }
 

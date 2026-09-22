@@ -13,7 +13,7 @@ class AccountMove(models.Model):
     def write(self, vals):
         res = super().write(vals)
         if 'matched_payment_ids' in vals:
-            for move in self.filtered_domain([('payment_state', 'in', ['paid', 'in_payment'])]):
+            for move in self.filtered_domain([('payment_state', 'in', ['paid', 'in_payment']), ('move_type', '=', 'out_invoice')]):
                 move._reopen_paid_churned_subscription()
         return res
 
@@ -33,7 +33,7 @@ class AccountMove(models.Model):
                         so.message_post(body=body)
                 continue
 
-            log_order_ids = []
+            effective_date = min(move.invoice_line_ids.filtered('deferred_start_date').mapped('deferred_start_date'), default=False) or move.invoice_date
             for aml in move.invoice_line_ids:
                 if not aml.subscription_id or aml.is_downpayment:
                     continue
@@ -42,16 +42,15 @@ class AccountMove(models.Model):
                 sale_order = aml.sale_line_ids.order_id
                 upsell_so = sale_order.filtered(lambda so: so.subscription_state == '7_upsell')
                 subscription = aml.subscription_id - upsell_so.subscription_id
-                all_subscription_ids.add(subscription.id)
-                log_order_ids.append(aml.subscription_id.id)
                 if upsell_so:
                     log_date_values["upsell"][upsell_so] = {
-                        'effective_date': aml.deferred_start_date or move.date,
+                        'effective_date': effective_date,
                         'event_date':  upsell_so.date_order.date(),
                     }
                 if subscription:
+                    all_subscription_ids.add(subscription.id)
                     log_date_values["subscription"][subscription] = {
-                        'effective_date': aml.deferred_start_date or move.date,
+                        'effective_date': effective_date,
                         'event_date': subscription.date_order.date(),
                     }
 
@@ -63,7 +62,7 @@ class AccountMove(models.Model):
                 # Churn sub are reopened in the _post_process of payment transaction.
                 # Renewed sub should not be incremented as the renewal is the running contract.
                 # Invoices for renewed contract can be posted when the delivered products arrived after the renewal date.
-                last_invoice_end_date = subscription.invoice_ids.invoice_line_ids.filtered(lambda aml: aml.subscription_id == subscription)._get_max_invoiced_date()
+                last_invoice_end_date = subscription.invoice_ids.invoice_line_ids.filtered(lambda aml: aml.subscription_id == subscription and aml.sale_line_ids and all(sale_line.order_id.subscription_state != '7_upsell' for sale_line in aml.sale_line_ids))._get_max_invoiced_date()
                 subscription.next_invoice_date = last_invoice_end_date + relativedelta(days=1) if last_invoice_end_date else subscription.start_date
                 if subscription.order_line._is_all_postpaid():
                     # If all recurring lines are postpaid, we don't rely on deferred_end_date
@@ -110,9 +109,11 @@ class AccountMove(models.Model):
 
     def _reopen_paid_churned_subscription(self):
         # Re-open churned subscriptions after payment.
+        today = fields.Date.context_today(self)
         sub_order = self.line_ids.subscription_id
+        close_reasons_ids = self.env['sale.order.close.reason']._get_reason_to_reopen()
         for order in sub_order:
-            cutoff_date = fields.Date.today() - relativedelta(days=order.plan_id.auto_close_limit)
+            cutoff_date = today - relativedelta(days=order.plan_id.auto_close_limit)
             # Prevent reopening churned subscriptions if cutoff_date is after next_invoice_date
-            if order.subscription_state == '6_churn' and order.next_invoice_date >= cutoff_date:
+            if order.subscription_state == '6_churn' and order.next_invoice_date >= cutoff_date and order.close_reason_id.id in close_reasons_ids:
                 order.set_open()

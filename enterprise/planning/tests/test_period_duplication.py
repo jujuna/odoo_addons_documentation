@@ -3,9 +3,12 @@
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from odoo.tests import tagged
+
 from odoo.addons.planning.tests.common import TestCommonPlanning
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestPeriodDuplication(TestCommonPlanning):
 
     @classmethod
@@ -13,18 +16,24 @@ class TestPeriodDuplication(TestCommonPlanning):
         super(TestPeriodDuplication, cls).setUpClass()
         cls.setUpEmployees()
         cls.setUpCalendars()
+
+        cls.fully_flexible_calendar = cls.env['resource.calendar'].create({
+            'name': 'Fully Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+        })
         cls.env['planning.slot'].create({
-            'resource_id': cls.resource_bert.id,
+            'resource_ids': cls.resource_bert.ids,
             'start_datetime': datetime(2019, 6, 3, 8, 0),  # it was a slot on Sunday...
             'end_datetime': datetime(2019, 6, 3, 17, 0),
         })
         cls.env['planning.slot'].create({
-            'resource_id': cls.resource_bert.id,
+            'resource_ids': cls.resource_bert.ids,
             'start_datetime': datetime(2019, 6, 4, 8, 0),
             'end_datetime': datetime(2019, 6, 5, 17, 0),
         })
         cls.env['planning.slot'].create({
-            'resource_id': cls.resource_bert.id,
+            'resource_ids': cls.resource_bert.ids,
             'start_datetime': datetime(2019, 6, 3, 8, 0),
             'end_datetime': datetime(2019, 6, 3, 17, 0),
             'repeat': True,
@@ -33,7 +42,7 @@ class TestPeriodDuplication(TestCommonPlanning):
             'repeat_interval': 1,
         })
         cls.env['planning.slot'].create({
-            'resource_id': cls.resource_joseph.id,
+            'resource_ids': cls.resource_joseph.ids,
             'start_datetime': datetime(2020, 10, 19, 6, 0),
             'end_datetime': datetime(2020, 10, 19, 15, 0),
         })
@@ -57,7 +66,7 @@ class TestPeriodDuplication(TestCommonPlanning):
         self.assertEqual(len(slots), 5, 'duplicate has only duplicated slots that fit entirely in the period')
 
         duplicated_slots = self.env['planning.slot'].search([
-            ('employee_id', '=', employee.id),
+            ('employee_ids', 'in', employee.id),
             ('start_datetime', '>', datetime(2019, 6, 9, 0, 0)),
             ('end_datetime', '<', datetime(2019, 6, 15, 23, 59)),
         ])
@@ -80,7 +89,7 @@ class TestPeriodDuplication(TestCommonPlanning):
         self.env['planning.slot'].action_copy_previous_week('2020-10-26 00:00:00', [['start_datetime', '<=', '2020-10-25 23:59:59'], ['end_datetime', '>=', '2020-10-18 00:00:00']])
 
         duplicated_slots = self.env['planning.slot'].search([
-            ('employee_id', '=', employee.id),
+            ('resource_ids', 'in', employee.resource_id.id),
             ('start_datetime', '>', datetime(2020, 10, 26, 0, 0)),
             ('end_datetime', '<', datetime(2020, 10, 30, 23, 59)),
         ])
@@ -100,11 +109,20 @@ class TestPeriodDuplication(TestCommonPlanning):
         """
         # set a employee with a flexible calendar
         employee = self.resource_bert
-        employee.calendar_id = self.flex_50h_calendar
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 50,
+            'hours_per_day': 10.0,
+        })
+        employee.write({
+            'calendar_id': flexible_calendar.id,
+        })
 
         # set a shift on Sunday for 7 hours
         self.env['planning.slot'].create({
-            'resource_id': employee.id,
+            'resource_ids': employee.ids,
             'start_datetime': datetime(2020, 10, 18, 11, 0),
             'end_datetime': datetime(2020, 10, 18, 18, 0),
         })
@@ -112,7 +130,7 @@ class TestPeriodDuplication(TestCommonPlanning):
         # copy the slot to the next Sunday
         self.env['planning.slot'].action_copy_previous_week('2020-10-19 00:00:00', [['start_datetime', '<=', '2020-10-18 23:59:59'], ['end_datetime', '>=', '2020-10-12 00:00:00']])
         duplicated_slots = self.env['planning.slot'].search([
-            ('resource_id', '=', employee.id),
+            ('resource_ids', 'in', employee.ids),
             ('start_datetime', '>', datetime(2020, 10, 19, 0, 0)),
             ('end_datetime', '<', datetime(2022, 10, 25, 23, 59)),
         ])
@@ -123,38 +141,38 @@ class TestPeriodDuplication(TestCommonPlanning):
         """ Test copy_previous_week for fully flexible resources.
             Test Case:
             =========
-            1) set an employee with a fully flexible calendar.
+            1) set a resource with a fully flexible calendar.
             2) create 3 slots on 3 different days with each different allocated hours (Monday 5h, Tuesday 6h, Friday 11h)
             3) apply copy_previous_week and verify that the shift is copied to the next week with the same allocated hours
         """
-        # set an employee as a fully flexible resource
-        employee = self.resource_bert
-        employee.calendar_id = False
+        # set a resource as a fully flexible resource
+        resource = self.resource_bert
+        resource.calendar_id = self.fully_flexible_calendar
 
         # set 3 slots on 3 different days with different allocated hours
         self.env['planning.slot'].create([
             {
-                'resource_id': employee.id,
+                'resource_ids': resource.ids,
                 'start_datetime': datetime(2020, 10, 12, 8, 0),
                 'end_datetime': datetime(2020, 10, 12, 13, 0),
-                'state': 'published',
+                'state': '2_published',
             }, {
-                'resource_id': employee.id,
+                'resource_ids': resource.ids,
                 'start_datetime': datetime(2020, 10, 13, 8, 0),
                 'end_datetime': datetime(2020, 10, 13, 14, 0),
-                'state': 'published',
+                'state': '2_published',
             }, {
-                'resource_id': employee.id,
+                'resource_ids': resource.ids,
                 'start_datetime': datetime(2020, 10, 16, 8, 0),
                 'end_datetime': datetime(2020, 10, 16, 19, 0),
-                'state': 'published',
+                'state': '2_published',
             }
         ])
 
         # copy the slot to the next week
         self.env['planning.slot'].action_copy_previous_week('2020-10-19 00:00:00', [['start_datetime', '<=', '2020-10-18 23:59:59'], ['end_datetime', '>=', '2020-10-12 00:00:00']])
         duplicated_slots = self.env['planning.slot'].search([
-            ('resource_id', '=', employee.id),
+            ('resource_ids', 'in', resource.ids),
             ('start_datetime', '>', datetime(2020, 10, 19, 0, 0)),
             ('end_datetime', '<', datetime(2022, 10, 25, 23, 59)),
         ])
@@ -177,31 +195,30 @@ class TestPeriodDuplication(TestCommonPlanning):
         """
         rescource_calendar_with_overlapping = self.env['resource.calendar'].create({
             'name': 'Classic 40h/week with overlapping',
-            'tz': 'UTC',
             'hours_per_day': 8.0,
             'attendance_ids': [
-                (0, 0, {'name': 'Monday Morning', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Monday Afternoon', 'dayofweek': '0', 'hour_from': 12, 'hour_to': 16, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Tuesday Morning', 'dayofweek': '1', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Tuesday Afternoon', 'dayofweek': '1', 'hour_from': 12, 'hour_to': 16, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Wednesday Morning', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Wednesday Afternoon', 'dayofweek': '2', 'hour_from': 12, 'hour_to': 16, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Thursday Afternoon', 'dayofweek': '3', 'hour_from': 12, 'hour_to': 16, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Friday Morning', 'dayofweek': '4', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Friday Afternoon', 'dayofweek': '4', 'hour_from': 12, 'hour_to': 16, 'day_period': 'afternoon'})
+                (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '0', 'hour_from': 12, 'hour_to': 16}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 12, 'hour_to': 16}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 12, 'hour_to': 16}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 12, 'hour_to': 16}),
+                (0, 0, {'dayofweek': '4', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '4', 'hour_from': 12, 'hour_to': 16})
             ]
         })
         self.env.user.company_id.resource_calendar_id = rescource_calendar_with_overlapping
         slot = self.env['planning.slot'].create({
             'start_datetime': datetime(2020, 10, 12, 8, 0),
             'end_datetime': datetime(2020, 10, 13, 16, 0),
-            'state': 'published',
+            'state': '2_published',
         })
         # copy the slot to the next week
         self.env['planning.slot'].action_copy_previous_week('2020-10-19 00:00:00', [['start_datetime', '<=', '2020-10-18 23:59:59'], ['end_datetime', '>=', '2020-10-12 00:00:00']])
         duplicated_slots = self.env['planning.slot'].search([
-            ('resource_id', '=', False),
+            ('resource_ids', '=', False),
             ('start_datetime', '>', datetime(2020, 10, 19, 0, 0)),
             ('end_datetime', '<', datetime(2022, 10, 25, 23, 59)),
         ])
@@ -210,30 +227,34 @@ class TestPeriodDuplication(TestCommonPlanning):
 
     def test_duplication_on_non_working_days_for_fully_flexible_hours(self):
         """ When applying copy_previous week, it should copy the shifts of flexible resources when they fall on a non-working day.
-            (E.g. a shift from Saturday toSunday for a fully flexible employee should be copied to the next week with same allocated hours)
+            (E.g. a shift from Saturday toSunday for a fully flexible resource should be copied to the next week with same allocated hours)
 
             Test Case:
             =========
-            1) set an employee with a fully flexible calendar.
+            1) set an resource with a fully flexible calendar.
             2) create a shift from Saturday to Sunday
             3) apply copy_previous_week and verify that the shift is copied to the next week with the same allocated hours
         """
-        # set an employee as a fully flexible resource
-        employee = self.resource_bert
-        employee.calendar_id = False
+        # set an resource as a fully flexible resource
+        resource = self.resource_bert
+        resource.calendar_id = self.env['resource.calendar'].create({
+            'name': 'Fully Flexible',
+            'company_id': resource.company_id.id,
+            'calendar_type': 'undefined',
+        })
 
         # set a shift on Saturday Evening 9PM to Sunday morning 8AM (11 hours)
         self.env['planning.slot'].create({
-            'resource_id': employee.id,
+            'resource_ids': resource.ids,
             'start_datetime': datetime(2020, 10, 17, 21, 0),
             'end_datetime': datetime(2020, 10, 18, 8, 0),
-            'state': 'published',
+            'state': '2_published',
         })
 
         # copy the slot to the next week
         self.env['planning.slot'].action_copy_previous_week('2020-10-19 00:00:00', [['start_datetime', '<=', '2020-10-18 23:59:59'], ['end_datetime', '>=', '2020-10-12 00:00:00']])
         duplicated_slots = self.env['planning.slot'].search([
-            ('resource_id', '=', employee.id),
+            ('resource_ids', 'in', resource.ids),
             ('start_datetime', '>', datetime(2020, 10, 19, 0, 0)),
             ('end_datetime', '<', datetime(2022, 10, 25, 23, 59)),
         ])
@@ -252,10 +273,11 @@ class TestPeriodDuplication(TestCommonPlanning):
         """
 
         employee = self.employee_bert
+        resource = employee.resource_id
 
         # set a shift on Sunday for 8 hours
         self.env['planning.slot'].create({
-            'employee_id': employee.id,
+            'resource_ids': resource.ids,
             'start_datetime': datetime(2020, 10, 18, 8, 0),
             'end_datetime': datetime(2020, 10, 18, 16, 0),
         })
@@ -264,7 +286,7 @@ class TestPeriodDuplication(TestCommonPlanning):
         self.env['planning.slot'].action_copy_previous_week('2020-10-19 00:00:00', [['start_datetime', '<=', '2020-10-18 23:59:59'], ['end_datetime', '>=', '2020-10-12 00:00:00']])
 
         duplicated_slots = self.env['planning.slot'].search([
-            ('employee_id', '=', employee.id),
+            ('resource_ids', 'in', resource.id),
             ('start_datetime', '>', datetime(2020, 10, 19, 0, 0)),
             ('end_datetime', '<', datetime(2022, 10, 25, 23, 59)),
         ])
@@ -277,10 +299,10 @@ class TestPeriodDuplication(TestCommonPlanning):
             str(dt), [
                 ['start_datetime', '<=', dt],
                 ['end_datetime', '>=', dt - relativedelta(weeks=1)],
-                ['resource_id', '=', self.resource_joseph.id],
+                ['resource_ids', 'in', self.resource_joseph.id],
             ]
         )
-        self.assertEqual(PlanningSlot.browse(copied + to_copy).resource_id, self.resource_joseph,
+        self.assertEqual(PlanningSlot.browse(copied + to_copy).resource_ids, self.resource_joseph,
                          "Filter should be taken into account when copying previous week")
 
     def test_duplication_should_only_copy_once_except_if_undone(self):
@@ -289,7 +311,7 @@ class TestPeriodDuplication(TestCommonPlanning):
         domain = [
             ['start_datetime', '<=', dt + relativedelta(weeks=1)],
             ['end_datetime', '>=', dt],
-            ['resource_id', '=', self.resource_joseph.id],
+            ['resource_ids', 'in', self.resource_joseph.id],
         ]
 
         def copy_slot():
@@ -297,7 +319,7 @@ class TestPeriodDuplication(TestCommonPlanning):
                 str(dt), [
                     ['start_datetime', '<=', dt],
                     ['end_datetime', '>=', dt - relativedelta(weeks=1)],
-                    ['resource_id', '=', self.resource_joseph.id],
+                    ['resource_ids', 'in', self.resource_joseph.id],
                 ]
             )
 
@@ -315,7 +337,7 @@ class TestPeriodDuplication(TestCommonPlanning):
         PlanningSlot = self.env['planning.slot']
         dt = datetime(2023, 7, 24, 0, 0)
         PlanningSlot.create({
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
             'start_datetime': dt + relativedelta(hour=19),
             'end_datetime': dt + relativedelta(hour=20),
         })
@@ -323,20 +345,21 @@ class TestPeriodDuplication(TestCommonPlanning):
             str(dt + relativedelta(weeks=1)), [
                 ['start_datetime', '<=', dt + relativedelta(weeks=1)],
                 ['end_datetime', '>=', dt],
-                ['resource_id', '=', self.resource_joseph.id],
+                ['resource_ids', 'in', self.resource_joseph.id],
             ]
         )
-        self.assertFalse(PlanningSlot.browse(copied).resource_id, "The slot should be copied as open, as it's outside the schedule")
+        self.assertFalse(PlanningSlot.browse(copied).resource_ids, "The slot should be copied as open, as it's outside the schedule")
 
     def test_duplication_should_create_assigned_shift_when_flexible_resource(self):
         PlanningSlot = self.env['planning.slot']
         dt = datetime(2023, 7, 24, 0, 0)
+        flexible_calendar = self.fully_flexible_calendar
         flexible_resource = self.env['resource.resource'].create({
             'name': 'Flexible Resource',
-            'calendar_id': False,
+            'calendar_id': flexible_calendar.id,
         })
         PlanningSlot.create({
-            'resource_id': flexible_resource.id,
+            'resource_ids': flexible_resource.ids,
             'start_datetime': dt + relativedelta(hour=19),
             'end_datetime': dt + relativedelta(hour=20),
         })
@@ -344,16 +367,16 @@ class TestPeriodDuplication(TestCommonPlanning):
             str(dt + relativedelta(weeks=1)), [
                 ['start_datetime', '<=', dt + relativedelta(weeks=1)],
                 ['end_datetime', '>=', dt],
-                ['resource_id', '=', flexible_resource.id],
+                ['resource_ids', 'in', flexible_resource.id],
             ]
         )
-        self.assertEqual(PlanningSlot.browse(copied).resource_id, flexible_resource, "The slot should be copied as assigned, as its resource is flexible")
+        self.assertEqual(PlanningSlot.browse(copied).resource_ids, flexible_resource, "The slot should be copied as assigned, as its resource is flexible")
 
     def test_duplication_should_create_open_shift_when_conflicting_destination(self):
         PlanningSlot = self.env['planning.slot']
         dt = datetime(2023, 7, 24, 0, 0)
         PlanningSlot.create([{
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
             'start_datetime': dt + relativedelta(hours=9, weeks=i),
             'end_datetime': dt + relativedelta(hours=15, weeks=i),
         } for i in range(2)])
@@ -361,16 +384,16 @@ class TestPeriodDuplication(TestCommonPlanning):
             str(dt + relativedelta(weeks=1)), [
                 ['start_datetime', '<=', dt + relativedelta(weeks=1)],
                 ['end_datetime', '>=', dt],
-                ['resource_id', '=', self.resource_joseph.id],
+                ['resource_ids', 'in', self.resource_joseph.id],
             ]
         )
-        self.assertFalse(PlanningSlot.browse(copied).resource_id, "The slot should be copied as open, as another shift already exists at this time")
+        self.assertFalse(PlanningSlot.browse(copied).resource_ids, "The slot should be copied as open, as another shift already exists at this time")
 
     def test_duplication_should_create_open_shift_when_conflicting_origin(self):
         PlanningSlot = self.env['planning.slot']
         dt = datetime(2023, 7, 24, 0, 0)
         PlanningSlot.create([{
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
             'start_datetime': dt + relativedelta(hours=9),
             'end_datetime': dt + relativedelta(hours=15),
         } for _dummy in range(2)])
@@ -378,13 +401,13 @@ class TestPeriodDuplication(TestCommonPlanning):
             str(dt + relativedelta(weeks=1)), [
                 ['start_datetime', '<=', dt + relativedelta(weeks=1)],
                 ['end_datetime', '>=', dt],
-                ['resource_id', '=', self.resource_joseph.id],
+                ['resource_ids', 'in', self.resource_joseph.id],
             ]
         )
-        resource_ids = [s.resource_id.id for s in PlanningSlot.browse(copied)]
-        self.assertEqual(len(resource_ids), 2, "Both shifts should be copied")
-        self.assertIn(self.resource_joseph.id, resource_ids, "One of the shifts should be assigned")
-        self.assertIn(False, resource_ids, "One of the shifts should open")
+        resources_list = [slot.resource_ids for slot in PlanningSlot.browse(copied)]
+        self.assertEqual(len(resources_list), 2, "Both shifts should be copied")
+        self.assertIn(self.resource_joseph, resources_list, "One of the shifts should be assigned")
+        self.assertIn(self.env['resource.resource'], resources_list, "One of the shifts should open")
 
     def test_duplication_forecasted_slot_when_unavailabilities(self):
         """ When copying a forecasted slot (> 24 hours) through the copy previous week action, we need to ensure that
@@ -403,7 +426,7 @@ class TestPeriodDuplication(TestCommonPlanning):
         dt = datetime(2023, 8, 14, 0, 0)
         # create a slot from Monday to Friday (forecasted slot) and assign it to the resource
         PlanningSlot.create({
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'start_datetime': dt + relativedelta(hours=8),
             'end_datetime': dt + relativedelta(days=4, hours=17),
         })
@@ -426,7 +449,7 @@ class TestPeriodDuplication(TestCommonPlanning):
             str(dt_next_week), [
                 ['start_datetime', '<=', dt_next_week],
                 ['end_datetime', '>=', dt],
-                ['resource_id', '=', self.resource_bert.id],
+                ['resource_ids', 'in', self.resource_bert.id],
             ]
         )
         copied_slots = PlanningSlot.browse(copied_slots_ids).sorted('start_datetime')
@@ -455,11 +478,23 @@ class TestPeriodDuplication(TestCommonPlanning):
         )
 
         self.assertEqual(
-            (copied_slots[0] + copied_slots[2] + copied_slots[4]).resource_id ,
+            (copied_slots[0] + copied_slots[2] + copied_slots[4]).resource_ids,
             self.resource_bert,
             "The copied slots on Monday, Wednesday and Friday should be assigned to the resource, as the resource works on those days.",
         )
         self.assertFalse(
-            (copied_slots[1] + copied_slots[2] + copied_slots[4] + copied_slots[5]).resource_id,
+            (copied_slots[1] + copied_slots[2] + copied_slots[4] + copied_slots[5]).resource_ids,
             "The copied slots on Tuesday and Thursday should be open shifts, as the resource has leaves planned on those days.",
         )
+
+    def test_rollback_copy_after_unlinking_slot(self):
+        PlanningSlot = self.env['planning.slot']
+        copied, to_copy = PlanningSlot.action_copy_previous_week('2019-06-09 00:00:00',
+                                                            [['start_datetime', '<=', '2020-04-04 21:59:59'],
+                                                             ['end_datetime', '>=', '2020-03-28 23:00:00']])
+
+        PlanningSlot.browse(copied[0]).unlink()
+        PlanningSlot.browse(copied).action_rollback_copy_previous_week(to_copy)
+
+        self.assertFalse(PlanningSlot.browse(copied[1]).exists())
+        self.assertFalse(PlanningSlot.browse(to_copy[0]).was_copied)

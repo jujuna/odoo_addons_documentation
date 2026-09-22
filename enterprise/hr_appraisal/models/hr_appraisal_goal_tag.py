@@ -8,7 +8,7 @@ from odoo import api, fields, models
 
 class HrAppraisalGoalTag(models.Model):
     _name = 'hr.appraisal.goal.tag'
-    _description = 'Appraisal Goal Tags'
+    _description = 'Appraisal Goal Tag'
     _order = 'name'
 
     def _get_default_color(self):

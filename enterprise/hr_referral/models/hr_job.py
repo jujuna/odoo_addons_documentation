@@ -6,7 +6,7 @@ from odoo import fields, models, _
 class HrJob(models.Model):
     _inherit = "hr.job"
 
-    job_open_date = fields.Date('Job Start Recruitment Date', default=fields.Date.today(),
+    job_open_date = fields.Date('Job Start Recruitment Date', default=fields.Date.context_today,
         groups="hr.group_hr_user,hr_recruitment.group_hr_recruitment_user")  # never use ?
     utm_campaign_id = fields.Many2one('utm.campaign', 'Campaign', ondelete='restrict')
     max_points = fields.Integer(compute='_compute_max_points')
@@ -16,27 +16,36 @@ class HrJob(models.Model):
     linkedin_clicks = fields.Integer(compute='_compute_clicks')
 
     def _compute_clicks(self):
-        if self.env.user.utm_source_id:
-            grouped_data = self.env['link.tracker']._read_group([
-                ('source_id', '=', self.env.user.utm_source_id.id),
-                ('campaign_id', 'in', self.mapped('utm_campaign_id').ids),
-                ('medium_id', '!=', False),
-                ], ['campaign_id', 'medium_id'], ['count:sum'])
-        else:
-            grouped_data = {}
-        medium_direct = self.env.ref('utm.utm_medium_direct', raise_if_not_found=False)
-        medium_facebook = self.env.ref('utm.utm_medium_facebook', raise_if_not_found=False)
-        medium_twitter = self.env.ref('utm.utm_medium_twitter', raise_if_not_found=False)
-        medium_linkedin = self.env.ref('utm.utm_medium_linkedin', raise_if_not_found=False)
-        mapped_data = {job.utm_campaign_id.id: {} for job in self}
-        for campaign, medium, count in grouped_data:
-            mapped_data[campaign.id][medium.id] = count
+        grouped_data = self.env['link.tracker']._read_group([
+            ('utm_reference', '=', f'{self.env.user._name},{self.env.user.id}'),
+            ('campaign_id', 'in', self.mapped('utm_campaign_id').ids),
+            ('medium_id', '!=', False),
+            ('source_id', '!=', False),
+            ], ['campaign_id', 'medium_id', 'source_id'], ['count:sum'])
+        medium_direct = self.env['utm.mixin']._utm_ref('utm.utm_medium_direct')
+        medium_social_media = self.env['utm.mixin']._utm_ref('utm.utm_medium_social_media')
+        source_referral_link = self.env['utm.mixin']._utm_ref('utm.utm_source_referral')
+        source_facebook = self.env.ref(
+            'hr_referral.utm_source_referral_link_facebook',
+            raise_if_not_found=False,
+        )
+        source_twitter = self.env.ref(
+            'hr_referral.utm_source_referral_link_twitter',
+            raise_if_not_found=False,
+        )
+        source_linkedin = self.env.ref(
+            'hr_referral.utm_source_referral_link_linkedin',
+            raise_if_not_found=False,
+        )
+        mapped_data = {job.utm_campaign_id: {} for job in self}
+        for campaign, medium, source, count in grouped_data:
+            mapped_data[campaign][medium, source] = count
         for job in self:
-            data = mapped_data[job.utm_campaign_id.id]
-            job.direct_clicks = data.get(medium_direct.id, 0) if medium_direct else 0
-            job.facebook_clicks = data.get(medium_facebook.id, 0) if medium_facebook else 0
-            job.twitter_clicks = data.get(medium_twitter.id, 0) if medium_twitter else 0
-            job.linkedin_clicks = data.get(medium_linkedin.id, 0) if medium_linkedin else 0
+            data = mapped_data[job.utm_campaign_id]
+            job.direct_clicks = data.get((medium_direct, source_referral_link), 0)
+            job.facebook_clicks = data.get((medium_social_media, source_facebook), 0)
+            job.twitter_clicks = data.get((medium_social_media, source_twitter), 0)
+            job.linkedin_clicks = data.get((medium_social_media, source_linkedin), 0)
 
     def _compute_max_points(self):
         for job in self:
@@ -60,22 +69,28 @@ class HrJob(models.Model):
 
         # checks and defaults
         self.ensure_one()
-        chanel_to_medium = {
+        channel_to_medium = {
             'direct': 'utm.utm_medium_direct',
-            'facebook': 'utm.utm_medium_facebook',
-            'twitter': 'utm.utm_medium_twitter',
-            'linkedin': 'utm.utm_medium_linkedin',
+            'facebook': 'utm.utm_medium_social_media',
+            'twitter': 'utm.utm_medium_social_media',
+            'linkedin': 'utm.utm_medium_social_media',
         }
-        if channel not in chanel_to_medium:
+        channel_to_source = {
+            'direct': 'utm.utm_source_referral',
+            'facebook': 'hr_referral.utm_source_referral_link_facebook',
+            'twitter': 'hr_referral.utm_source_referral_link_twitter',
+            'linkedin': 'hr_referral.utm_source_referral_link_linkedin',
+        }
+        if channel not in channel_to_source:
             return {}
-        medium = self.env.ref(chanel_to_medium[channel], raise_if_not_found=False)
-        if not medium:
+        source = self.env.ref(channel_to_source[channel], raise_if_not_found=False)
+        medium = self.env['utm.mixin']._utm_ref(channel_to_medium[channel])
+        if not source:
             return {}
         if users is None:
             users = self.env.user
         elif not users:
             return {}
-        users._ensure_utm_source()
         if not self.utm_campaign_id:
             self.utm_campaign_id = self.env['utm.campaign'].create([{'name': self.name}])
 
@@ -83,14 +98,14 @@ class HrJob(models.Model):
         trackers = self.env['link.tracker'].search([
             ('url', '=', self.full_url),
             ('campaign_id', '=', self.utm_campaign_id.id),
-            ('medium_id', '=', medium.id),
-            ('source_id', 'in', users.utm_source_id.ids),
+            ('source_id', '=', source.id),
+            ('utm_reference', 'in', [f'res.users,{user_id}' for user_id in users.ids]),
         ])
-        trackers_by_source_id = {tracker.source_id: tracker for tracker in trackers}
+        trackers_by_user = {tracker.utm_reference: tracker for tracker in trackers}
         trackers_to_create = []
         user_without_tracker = []
         for user in users:
-            tracker = trackers_by_source_id.get(user.utm_source_id)
+            tracker = trackers_by_user.get(user)
             if tracker:
                 referral_links_by_user[user] = tracker.short_url
             else:
@@ -100,7 +115,8 @@ class HrJob(models.Model):
                     'title': _('Referral %(user)s: %(job_url)s', user=user, job_url=self.full_url),
                     'campaign_id': self.utm_campaign_id.id,
                     'medium_id': medium.id,
-                    'source_id': user.utm_source_id.id,
+                    'source_id': source.id,
+                    'utm_reference': f'res.users,{user.id}',
                 })
         LinkTrackers = self.env['link.tracker']
         if not LinkTrackers.has_access('create') and\
@@ -112,10 +128,6 @@ class HrJob(models.Model):
             referral_links_by_user[user] = tracker.short_url
 
         return referral_links_by_user
-
-    def set_recruit(self):  # never use ??
-        self.write({'job_open_date': fields.Date.today()})
-        return super().set_recruit()
 
     def get_referral_link(self, channel):
         self.ensure_one()
@@ -135,7 +147,7 @@ class HrJob(models.Model):
     def action_referral_campaign(self):
         self.ensure_one()
         return {
-            'name': _("Referral Campaign for %(job)s", job=self.name),
+            'name': _("Promotion Campaign for %(job)s", job=self.name),
             'type': 'ir.actions.act_window',
             'res_model': 'hr.referral.campaign.wizard',
             'view_mode': 'form',

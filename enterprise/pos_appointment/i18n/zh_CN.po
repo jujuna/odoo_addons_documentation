@@ -3,48 +3,77 @@
 # * pos_appointment
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-09 18:43+0000\n"
-"PO-Revision-Date: 2025-11-08 19:57+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 02:22+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/pos_appointment/zh_Hans/>\n"
+"projects/odoo-master/pos_appointment/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.xml:0
+msgid "11am - 5pm"
+msgstr "11am - 5pm"
+
+#. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.xml:0
+msgid "12am - 11am"
+msgstr "12am - 11am"
+
+#. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.xml:0
+msgid "5pm - 12am"
+msgstr "5pm - 12am"
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "<span> hours</span>"
-msgstr "<span> 小时</span>"
+msgid "<i class=\"oi oi-filled\" data-icon=\"group\" title=\"People\"/>"
+msgstr ""
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "<span>people</span>"
-msgstr "<span>人员</span>"
+msgid "<i class=\"oi oi-filled\" data-icon=\"person\" title=\"Customer\"/>"
+msgstr ""
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_gantt_booking_resource
-msgid "<strong>Duration: </strong>"
-msgstr "<strong>时长：</strong>"
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
+msgid "<i class=\"oi oi-filled\" data-icon=\"phone\" title=\"Phone\"/>"
+msgstr ""
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_gantt_booking_resource
-msgid "<strong>Phone: </strong>"
-msgstr "<strong>手机： </strong>"
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
+msgid "<span class=\"people-label ms-2\">people</span>"
+msgstr "<span class=\"people-label ms-2\">人员</span>"
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_gantt_booking_resource
-msgid "<strong>Start Date: </strong>"
-msgstr "<strong>开始日期：</strong>"
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+msgid "Afternoon"
+msgstr "下午"
+
+#. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.xml:0
+msgid "Afternoon:"
+msgstr "下午"
+
+#. module: pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+msgid "Amount of guests"
+msgstr ""
 
 #. module: pos_appointment
 #: model:ir.model.fields,field_description:pos_appointment.field_calendar_event__appointment_status
@@ -64,9 +93,14 @@ msgid "Appointment type"
 msgstr "预约类型"
 
 #. module: pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
+msgid "Arrival"
+msgstr "到达"
+
+#. module: pos_appointment
 #. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/gantt_overrides/gantt_renderer.js:0
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_record.js:0
+#: code:addons/pos_appointment/static/src/app/form_extend/form_view_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
 msgid "Booked"
 msgstr "已预订"
 
@@ -77,18 +111,12 @@ msgid "Booking"
 msgstr "预订"
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_gantt_booking_resource
-msgid "Booking Details"
-msgstr "预订详情"
-
-#. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "Booking Name"
-msgstr "预订名称"
-
-#. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
+#. odoo-javascript
+#. odoo-python
+#: code:addons/pos_appointment/models/calendar_event.py:0
+#: code:addons/pos_appointment/static/src/override/web/control_panel.xml:0
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_graph_pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
 msgid "Bookings"
 msgstr "预订"
 
@@ -98,17 +126,16 @@ msgid "Calendar Event"
 msgstr "日程"
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "Cancel"
-msgstr "取消"
-
-#. module: pos_appointment
 #. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/gantt_overrides/gantt_renderer.js:0
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_record.js:0
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
+#: code:addons/pos_appointment/static/src/app/form_extend/form_view_dialog.xml:0
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_kanban
 msgid "Check In"
+msgstr "签到"
+
+#. module: pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+#, fuzzy
+msgid "Checked-In"
 msgstr "签到"
 
 #. module: pos_appointment
@@ -117,22 +144,20 @@ msgid "Config Settings"
 msgstr "配置设定"
 
 #. module: pos_appointment
-#. odoo-python
-#: code:addons/pos_appointment/models/calendar_event.py:0
-msgid "Create Booking"
-msgstr "创建预约"
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/services/pos_store.js:0
+msgid "Create"
+msgstr ""
 
 #. module: pos_appointment
 #: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "Date"
-msgstr "日期"
+msgid "Customer"
+msgstr "客户"
 
 #. module: pos_appointment
-#. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/gantt_overrides/gantt_renderer.js:0
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_record.js:0
-msgid "Delete"
-msgstr "删除"
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+msgid "Date"
+msgstr "日期"
 
 #. module: pos_appointment
 #: model:ir.model.fields,field_description:pos_appointment.field_appointment_type__display_name
@@ -145,44 +170,38 @@ msgid "Display Name"
 msgstr "显示名称"
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "Duration"
-msgstr "时长"
-
-#. module: pos_appointment
 #. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_record.xml:0
-msgid "Duration:"
-msgstr "时长："
-
-#. module: pos_appointment
-#. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/gantt_overrides/gantt_renderer.js:0
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_record.xml:0
+#: code:addons/pos_appointment/static/src/app/services/pos_store.js:0
 msgid "Edit"
 msgstr "编辑"
 
 #. module: pos_appointment
-#. odoo-python
-#: code:addons/pos_appointment/models/calendar_event.py:0
-msgid "Edit Booking"
-msgstr "编辑预约"
-
-#. module: pos_appointment
-#. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_controller.xml:0
-msgid "Evening: 5:00 PM - 12:00 AM"
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
+msgid "End Time"
 msgstr ""
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_gantt_booking_resource
-msgid "Event Details"
-msgstr "活动详情"
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+msgid "Evening"
+msgstr "晚上"
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "Extra Comments..."
-msgstr "额外评论"
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.xml:0
+msgid "Evening:"
+msgstr ""
+
+#. module: pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
+#, fuzzy
+msgid "Guests"
+msgstr "客人"
+
+#. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.js:0
+msgid "Hour is %s"
+msgstr ""
 
 #. module: pos_appointment
 #: model:ir.model.fields,field_description:pos_appointment.field_appointment_type__id
@@ -195,27 +214,32 @@ msgid "ID"
 msgstr "ID"
 
 #. module: pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+#, fuzzy
+msgid "Morning"
+msgstr "上午"
+
+#. module: pos_appointment
 #. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_controller.xml:0
-msgid "Lunch: 11:00 AM - 5:00 PM"
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.xml:0
+msgid "Morning:"
 msgstr ""
 
 #. module: pos_appointment
-#. odoo-python
-#: code:addons/pos_appointment/models/calendar_event.py:0
-msgid "Manage Bookings"
-msgstr "管理预订"
-
-#. module: pos_appointment
-#. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_controller.xml:0
-msgid "Morning: 12:00 AM - 11:00 AM"
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+msgid "My Bookings"
 msgstr ""
 
 #. module: pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
+#, fuzzy
+msgid "Name"
+msgstr "名称"
+
+#. module: pos_appointment
 #. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/gantt_overrides/gantt_renderer.js:0
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_record.js:0
+#: code:addons/pos_appointment/static/src/app/form_extend/form_view_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
 msgid "No Show"
 msgstr "缺席"
 
@@ -225,15 +249,29 @@ msgid "No show"
 msgstr "缺席"
 
 #. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/popover_extend/popover.xml:0
+msgid "Notes"
+msgstr ""
+
+#. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/popover_extend/popover.xml:0
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
+#, fuzzy
+msgid "Phone"
+msgstr "电话"
+
+#. module: pos_appointment
 #: model:ir.model.fields,field_description:pos_appointment.field_calendar_event__phone_number
 msgid "Phone number"
 msgstr "电话号码"
 
 #. module: pos_appointment
-#. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_record.xml:0
-msgid "Phone:"
-msgstr "电话:"
+#: model:ir.module.module,shortdesc:base.module_pos_appointment
+msgid "Point of Sale Appointment"
+msgstr ""
 
 #. module: pos_appointment
 #: model:ir.model,name:pos_appointment.model_pos_config
@@ -246,52 +284,71 @@ msgid "Point of Sale Session"
 msgstr "POS会话"
 
 #. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/popover_extend/popover.xml:0
+msgid "Q&A answer"
+msgstr ""
+
+#. module: pos_appointment
 #: model:ir.model.fields,field_description:pos_appointment.field_calendar_event__answers
 msgid "Q&A answers"
 msgstr "问答答案"
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "Reservation for"
-msgstr "预订人："
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+#, fuzzy
+msgid "Responsible"
+msgstr "负责人"
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "Resources"
-msgstr "资源"
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+#, fuzzy
+msgid "Search Meetings"
+msgstr "搜索会议"
 
 #. module: pos_appointment
 #. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_controller.xml:0
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.xml:0
 msgid "Select Date"
 msgstr "选择日期"
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "Select Resources"
-msgstr "选择资源"
-
-#. module: pos_appointment
 #. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_controller.xml:0
-msgid "Select hour"
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.xml:0
+msgid "Select Hour"
 msgstr ""
 
 #. module: pos_appointment
 #. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_record.xml:0
-msgid "Start Date:"
-msgstr "开始日期："
+#: code:addons/pos_appointment/static/src/app/components/pos_appointment_search_filter/pos_appointment_search_filter.js:0
+msgid "Start is %s"
+msgstr ""
+
+#. module: pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
+#, fuzzy
+msgid "Status"
+msgstr "状态"
+
+#. module: pos_appointment
+#: model:ir.module.module,summary:base.module_pos_appointment
+msgid "This module lets you manage online reservations for PoS"
+msgstr ""
+
+#. module: pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_list
+msgid "Total Guest"
+msgstr ""
 
 #. module: pos_appointment
 #. odoo-javascript
 #: code:addons/pos_appointment/static/src/app/gantt_overrides/gantt_renderer.xml:0
+#: model_terms:ir.ui.view,arch_db:pos_appointment.view_calendar_event_search
 msgid "Unassigned"
 msgstr "未分派"
 
 #. module: pos_appointment
-#. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/gantt_overrides/gantt_renderer.js:0
 #: model:ir.model,name:pos_appointment.model_ir_ui_view
 msgid "View"
 msgstr "视图"
@@ -302,23 +359,61 @@ msgid "Waiting"
 msgstr "正在等待"
 
 #. module: pos_appointment
+#. odoo-javascript
+#: code:addons/pos_appointment/static/src/app/popover_extend/popover.xml:0
 #: model:ir.model.fields,field_description:pos_appointment.field_calendar_event__waiting_list_capacity
 msgid "Waiting List Capacity"
 msgstr "候补名单容量"
 
 #. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_form_gantt_booking
-msgid "e.g. \"John Doe\""
-msgstr "例如：John Doe"
-
-#. module: pos_appointment
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_gantt_booking_resource
-msgid "for:"
-msgstr "为："
-
-#. module: pos_appointment
 #. odoo-javascript
-#: code:addons/pos_appointment/static/src/app/kanban_extend/kanban_record.xml:0
-#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_gantt_booking_resource
-msgid "hours"
-msgstr "小时"
+#: code:addons/pos_appointment/static/src/app/popover_extend/popover.xml:0
+msgid "guests"
+msgstr ""
+
+#. module: pos_appointment
+#: model_terms:ir.ui.view,arch_db:pos_appointment.calendar_event_view_kanban
+#, fuzzy
+msgid "p"
+msgstr "p"
+
+#~ msgid "Booking Name"
+#~ msgstr "预订名称"
+
+#~ msgid "Cancel"
+#~ msgstr "取消"
+
+#~ msgid "Create Booking"
+#~ msgstr "创建预约"
+
+#~ msgid "Delete"
+#~ msgstr "删除"
+
+#~ msgid "Duration"
+#~ msgstr "时长"
+
+#~ msgid "Edit Booking"
+#~ msgstr "编辑预约"
+
+#~ msgid "Extra Comments..."
+#~ msgstr "额外评论"
+
+#~ msgid "Reservation for"
+#~ msgstr "预订人："
+
+#, fuzzy
+#~ msgid "Tables"
+#~ msgstr "桌台"
+
+#~ msgid "e.g. \"John Doe\""
+#~ msgstr "例如：John Doe"
+
+#, fuzzy
+#~ msgid "for"
+#~ msgstr "由于"
+
+#~ msgid "for:"
+#~ msgstr "为："
+
+#~ msgid "hours"
+#~ msgstr "小时"

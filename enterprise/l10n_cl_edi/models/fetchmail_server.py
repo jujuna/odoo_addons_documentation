@@ -157,6 +157,18 @@ class FetchmailServer(models.Model):
                 return document_number
         return False
 
+    def _check_document_type(self, xml_tree):
+        document_type_code = xml_tree.findtext('.//ns0:TipoDTE', namespaces=XML_NAMESPACES)
+        document_type = self.env['l10n_latam.document.type'].search(
+            [('code', '=', document_type_code), ('country_id.code', '=', 'CL')], limit=1)
+        if not document_type:
+            _logger.info('DTE has been discarded! Document type %s not found', document_type_code)
+            return False
+        if document_type and document_type.internal_type not in ['invoice', 'debit_note', 'credit_note']:
+            _logger.info('DTE has been discarded! The document type %s is not a vendor bill', document_type_code)
+            return False
+        return True
+
     def _process_incoming_email(self, msg_txt):
         parsed_values = self.env['mail.thread']._message_parse_extract_payload(msg_txt, {})
         body, attachments = parsed_values['body'], parsed_values['attachments']
@@ -201,23 +213,30 @@ class FetchmailServer(models.Model):
         attachment = self.env['ir.attachment'].create({'name': file_data['name'], 'raw': file_data['raw']})
 
         # This will separate each DTE into a new attachment, and create a move for each DTE and call the decoder.
-        Move = self.env['account.move'].with_context(
-            default_invoice_source_email=from_address,
-            default_move_type='in_invoice',
-            default_company_id=company_id,
-            default_journal_id=self.env['account.journal'].search(
-                [
-                    *self.env['account.journal']._check_company_domain(company_id),
-                    ('type', '=', 'purchase'),
-                    ('l10n_latam_use_documents', '=', True),
-                ],
-                limit=1,
-            ),
+        move_context = {
+            'default_invoice_source_email': from_address,
+            'default_move_type': 'in_invoice',
+            'default_company_id': company_id,
+        }
+        default_latam_journal = self.env['account.journal'].search(
+            [
+                *self.env['account.journal']._check_company_domain(company_id),
+                ('type', '=', 'purchase'),
+                ('l10n_latam_use_documents', '=', True),
+            ],
+            limit=1,
         )
+        if default_latam_journal:
+            move_context['default_journal_id'] = default_latam_journal.id
+        Move = self.env['account.move'].with_context(**move_context)
 
         files_data = Move._to_files_data(attachment)
         files_data.extend(Move._unwrap_attachments(files_data))
-        files_data = [file_data for file_data in files_data if not self._check_dte_already_processed(file_data['xml_tree'])]
+        files_data = [
+            file_data for file_data in files_data
+            if not self._check_dte_already_processed(file_data['xml_tree'])
+            and self._check_document_type(file_data['xml_tree'])
+        ]
 
         records = Move.create([{}] * len(files_data))
         for record, file_data in zip(records, files_data):
@@ -263,9 +282,12 @@ class FetchmailServer(models.Model):
         for dte in xml_tree.xpath('//ns0:%s' % dte_tag, namespaces=XML_NAMESPACES):
             document_number = dte.findtext('.//ns0:Folio', namespaces=XML_NAMESPACES)
             partner_vat = (
-                dte.findtext('.//ns0:RUTRecep', namespaces=XML_NAMESPACES).upper() or
-                dte.findtext('.//ns0:RutReceptor', namespaces=XML_NAMESPACES).upper()
+                dte.findtext('.//ns0:RUTRecep', namespaces=XML_NAMESPACES, default='').upper() or
+                dte.findtext('.//ns0:RutReceptor', namespaces=XML_NAMESPACES, default='').upper()
             )
+            if not partner_vat:
+                _logger.warning('No partner vat in incoming customer claim has been found')
+                continue
             if not (partners := self.env["res.partner"].search([
                 ("vat", "=", partner_vat),
                 *self.env['res.partner']._check_company_domain(company_id),
@@ -316,7 +338,17 @@ class FetchmailServer(models.Model):
             xml_tag_by_type.get(origin_type), namespaces=XML_NAMESPACES)
         if not receiver_rut:
             return None
-        return self.env['res.company'].sudo().search([('vat', '=', receiver_rut[0].text)], limit=1)
+        # ordered by hierarchy, so a RUT held by a branch as well still matches the legal entity
+        company = self.env['res.company'].sudo().search(
+            [('vat', '=', receiver_rut[0].text)], limit=1, order='parent_path')
+        if not company:
+            return company
+        identifier = (xml_tree.findtext('.//ns0:CdgIntRecep', namespaces=XML_NAMESPACES) or '').strip()
+        if not identifier:
+            return company
+        branch = company._l10n_cl_get_rut_companies().filtered(
+            lambda branch: branch.l10n_cl_internal_identifier == identifier)
+        return branch[:1] or company
 
     def _is_dte_enabled_company(self, company):
         return False if not company.l10n_cl_dte_service_provider else True

@@ -1,39 +1,52 @@
-import { Component, useState, onWillUnmount } from "@odoo/owl";
+import { Component, computed, onWillUnmount, proxy, useProps, signal, t } from "@odoo/owl";
 import { usePrepDisplay } from "@pos_enterprise/app/services/preparation_display_service";
 import { Orderline } from "@pos_enterprise/app/components/orderline/orderline";
 import { computeFontColor, useDelayedValueChange } from "@pos_enterprise/app/utils/utils";
-import { TagsList } from "@web/core/tags_list/tags_list";
+import { BadgeTag } from "@web/core/tags_list/badge_tag";
 import { logPosMessage } from "@point_of_sale/app/utils/pretty_console_log";
+import { PosPrepOrder } from "@pos_enterprise/app/models/pos_preparation_order";
+import { PosPrepStage } from "@pos_enterprise/app/models/pos_preparation_stage";
+import { PosPrepLine } from "@pos_enterprise/app/models/pos_prep_line";
+import { _t } from "@web/core/l10n/translation";
+const { DateTime } = luxon;
 
 export class Order extends Component {
-    static components = { Orderline, TagsList };
+    static components = { Orderline, BadgeTag };
     static template = "pos_enterprise.Order";
-    static props = {
-        order: Object,
-    };
+    props = useProps({
+        order: t.object({
+            prepOrder: t.instanceOf(PosPrepOrder),
+            stage: t.instanceOf(PosPrepStage),
+            prepLines: t.array(t.instanceOf(PosPrepLine)),
+        }),
+    });
+
+    orderlinesContainerRef = signal.ref();
+
+    // Drives the card animation while the order is moving to another stage.
+    isStageChanging = computed(() =>
+        this.prepDisplay.stageChangedOrderIds?.includes(this.order?.id)
+    );
 
     setup() {
         this.prepDisplay = usePrepDisplay();
-        this.state = useState({
+        this.state = proxy({
             duration: 0,
-            productHighlighted: [],
-            changeStageTimeout: null,
         });
         this.actionInProgress = false;
         this._updateDuration();
         this.interval = setInterval(() => {
-            this._updateDuration();
+            if (this.order && this.order.pos_order_id) {
+                this._updateDuration();
+            } else {
+                clearInterval(this.interval);
+            }
         }, 1000);
         onWillUnmount(() => {
             clearInterval(this.interval);
         });
 
         this.internalNoteState = useDelayedValueChange(() => this.order.pos_order_id.internal_note);
-    }
-
-    clearChangeTimeout() {
-        clearTimeout(this.state.changeStageTimeout);
-        this.state.changeStageTimeout = null;
     }
 
     _updateDuration() {
@@ -43,11 +56,23 @@ export class Order extends Component {
         return this.props.order.prepOrder;
     }
     get presetTime() {
-        return this.order.pos_order_id.preset_time.toFormat("HH:mm");
+        return this.order.pos_order_id.formatDateOrTime("preset_time", "time");
     }
 
     get presetDate() {
-        return this.order.pos_order_id.preset_time.toFormat("dd/MM");
+        const preset_time = this.order.pos_order_id.preset_time;
+        if (!preset_time) {
+            return "";
+        }
+        const today = DateTime.now();
+
+        if (preset_time.hasSame(today, "day")) {
+            return _t("Today");
+        }
+        if (preset_time.hasSame(today.plus({ days: 1 }), "day")) {
+            return _t("Tomorrow");
+        }
+        return this.order.pos_order_id.formatDateOrTime("preset_time", "date");
     }
 
     get fontColor() {
@@ -55,27 +80,28 @@ export class Order extends Component {
     }
 
     getChildPreparationLineStates(orderline_id) {
-        return this.props.order.states.filter(
-            (pl) => pl.prep_line_id.combo_parent_id?.id === orderline_id.id
+        return this.props.order.prepLines.filter(
+            (pl) => pl.combo_parent_id?.id === orderline_id.id
         );
     }
 
     get orderlines() {
         const orderlines = [];
-        for (const sate of this.props.order.states) {
-            if (orderlines.includes(sate)) {
+        for (const line of this.props.order.prepLines) {
+            if (orderlines.includes(line)) {
                 continue;
             }
-            const parent_preparation_line = sate.prep_line_id.combo_parent_id;
+            const parent_preparation_line = line.combo_parent_id;
             if (parent_preparation_line) {
                 const children = this.getChildPreparationLineStates(parent_preparation_line);
                 const allChildrenAreFalse = children.every((child) => child.todo === false);
-                orderlines.push(
-                    { prep_line_id: parent_preparation_line, todo: !allChildrenAreFalse },
-                    ...children
-                );
+                parent_preparation_line.todo = !allChildrenAreFalse;
+                orderlines.push(parent_preparation_line, ...children);
             } else {
-                orderlines.push(sate);
+                if (orderlines.includes(line)) {
+                    continue;
+                }
+                orderlines.push(line);
             }
         }
         return orderlines;
@@ -92,32 +118,40 @@ export class Order extends Component {
         return timeDiff;
     }
 
-    changeOrderlineStatus(state) {
-        const lastStage = this.prepDisplay.lastStage.id;
+    changeOrderlineStatus(prepLine) {
+        const lastStage = prepLine.raw.last_stage_id;
         if (this.props.order.stage.id === lastStage) {
             return;
         }
-        const newState = !state.todo;
-        state.todo = newState;
-        if (state.prep_line_id.combo_line_ids.length > 0) {
-            this.getChildPreparationLineStates(state.prep_line_id).forEach((state_line) => {
+        const newState = !prepLine.todo;
+        prepLine.todo = newState;
+        if (prepLine.combo_line_ids.length > 0) {
+            this.getChildPreparationLineStates(prepLine).forEach((state_line) => {
                 state_line.todo = newState;
             });
         }
 
-        if (this.props.order.states.some((state) => state.todo)) {
-            this.prepDisplay.syncStateStatus(this.props.order.states);
+        if (this.props.order.prepLines.some((pl) => pl.todo)) {
+            this.prepDisplay.syncStateStatus(this.props.order.prepLines);
         } else {
-            this.changeStateStageAnimation(this.props.order.states);
+            this.prepDisplay.changeStateStageAnimation(
+                this.props.order,
+                this.props.order.prepLines
+            );
         }
     }
 
+    get order_name() {
+        return (
+            this.order.pos_order_id.floating_order_name || this.order.pos_order_id.tracking_number
+        );
+    }
     _getOrderDuration() {
-        return Math.max(...this.props.order.states.map((state) => state.computeDuration()));
+        return Math.max(...this.props.order.prepLines.map((pl) => pl.computeDuration()));
     }
 
     async doneOrder() {
-        this.prepDisplay.doneOrders(this.props.order.states);
+        this.prepDisplay.doneOrders(this.props.order.prepLines);
     }
 
     get cardColor() {
@@ -130,13 +164,14 @@ export class Order extends Component {
         }
         try {
             this.actionInProgress = true;
-            if (this.props.order.stage === this.prepDisplay.lastStage) {
+            if (this.props.order.prepLines.every((pl) => pl.stage_id.id === pl.raw.last_stage_id)) {
                 return;
             } else {
-                const strickedLine = this.props.order.states.filter((l) => !l.todo);
+                const strickedLine = this.props.order.prepLines.filter((l) => !l.todo);
 
-                await this.changeStateStageAnimation(
-                    strickedLine.length ? strickedLine : this.props.order.states
+                await this.prepDisplay.changeStateStageAnimation(
+                    this.props.order,
+                    strickedLine.length ? strickedLine : this.props.order.prepLines
                 );
             }
         } catch (error) {
@@ -146,16 +181,6 @@ export class Order extends Component {
         }
     }
     get pdisNotes() {
-        return JSON.parse(this.order.pos_order_id.internal_note || "[]");
-    }
-    async changeStateStageAnimation(states) {
-        if (states.length === this.props.order.states.length) {
-            this.state.changeStageTimeout = setTimeout(async () => {
-                this.lastStageChange = await this.prepDisplay.changeStateStage(states);
-                this.clearChangeTimeout();
-            }, 250);
-        } else {
-            this.lastStageChange = await this.prepDisplay.changeStateStage(states);
-        }
+        return JSON.parse(this.order.pos_order_id.internal_note || null);
     }
 }

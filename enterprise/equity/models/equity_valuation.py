@@ -9,6 +9,14 @@ class EquityValuation(models.Model):
     _name = 'equity.valuation'
     _inherit = ['mail.thread']
     _description = "Valuation"
+    _check_company_auto = True
+
+    company_id = fields.Many2one(
+        'res.company',
+        related='partner_id.company_id',
+        string="Visible to",
+        help="Company to which this record is visible",
+    )
 
     event = fields.Selection(selection=[('audit', "Audit"), ('transaction', "Transaction")], default='transaction', required=True)
     date = fields.Date(default=fields.Date.context_today, required=True)
@@ -88,7 +96,7 @@ class EquityValuation(models.Model):
 
     @api.model
     def get_valuation_chart_data(self, data_function, freq='month', limit=12):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         date_format = 'MMM d, y' if freq == 'day' else 'yyyy' if freq == 'year' else 'MMM yyyy'
 
         def past_dates(freq, limit):

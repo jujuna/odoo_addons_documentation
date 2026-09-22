@@ -7,6 +7,8 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TaxReportTest(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -319,5 +321,23 @@ class TaxReportTest(AccountTestInvoicingCommon):
 
         tags_after = self._get_tax_tags(self.test_country_1, tag_name='Buny')
         self.assertEqual(len(tags_after), 1, "Changing the formula should have renamed the tag")
+        self.assertEqual(tags_after.mapped('name'), ['Buny'])
+        self.assertEqual(tags_after, tags_to_rename, "Changing the formula should have renamed the tags")
+
+    def test_change_formula_negative_tag(self):
+        tags_before = self._get_tax_tags(self.test_country_1, tag_name='Buny')
+        self.assertFalse(tags_before, "The tags shouldn't exist yet")
+
+        tags_to_rename = self._get_tax_tags(self.test_country_1, tag_name='55')
+
+        self.tax_report_line_1_55.expression_ids.write({
+            'engine': 'tax_tags',  # Same value as before
+            'formula': '-Buny',
+        })
+
+        tags_after = self._get_tax_tags(self.test_country_1, tag_name='Buny')
+        neg_tags = self._get_tax_tags(self.test_country_1, tag_name='-Buny')
+        self.assertFalse(neg_tags, "No negative tag should have been created")
+        self.assertEqual(len(tags_after), 1, "Changing the formula should have renamed the tag, ignoring the '-' sign in the formula.")
         self.assertEqual(tags_after.mapped('name'), ['Buny'])
         self.assertEqual(tags_after, tags_to_rename, "Changing the formula should have renamed the tags")

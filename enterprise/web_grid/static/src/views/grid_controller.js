@@ -1,22 +1,23 @@
-import { _t } from "@web/core/l10n/translation";
+import { Component, onWillUnmount, proxy, signal, t, useProps } from "@odoo/owl";
+import { browser } from "@web/core/browser/browser";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
-import { serializeDate, deserializeDate } from "@web/core/l10n/dates";
+import { deserializeDate, serializeDate } from "@web/core/l10n/dates";
+import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
-import { Layout } from "@web/search/layout";
 import { useModelWithSampleData } from "@web/model/model";
-import { standardViewProps } from "@web/views/standard_view_props";
-import { useViewButtons } from "@web/views/view_button/view_button_hook";
-import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
-import { ViewButton } from "@web/views/view_button/view_button";
 import { useSetupAction } from "@web/search/action_hook";
 import { CogMenu } from "@web/search/cog_menu/cog_menu";
+import { Layout } from "@web/search/layout";
 import { SearchBar } from "@web/search/search_bar/search_bar";
 import { useSearchBarToggler } from "@web/search/search_bar/search_bar_toggler";
-import { browser } from "@web/core/browser/browser";
 import { ActionHelper } from "@web/views/action_helper";
-
-import { Component, useState, onWillUnmount, useRef } from "@odoo/owl";
+import { standardViewProps } from "@web/views/standard_view_props";
+import { ViewButton } from "@web/views/view_button/view_button";
+import { useViewButtons } from "@web/views/view_button/view_button_hook";
+import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
+import { GridModel } from "./grid_model";
+import { GridRenderer } from "./grid_renderer";
 
 const { DateTime } = luxon;
 
@@ -30,24 +31,26 @@ export class GridController extends Component {
         SearchBar,
         ActionHelper,
     };
-
-    static props = {
-        ...standardViewProps,
-        archInfo: Object,
-        buttonTemplate: String,
-        Model: Function,
-        Renderer: Function,
-    };
-
     static template = "web_grid.GridView";
 
+    props = useProps({
+        ...standardViewProps,
+        archInfo: t.object(),
+        buttonTemplate: t.string(),
+        Model: t.constructor(GridModel),
+        Renderer: t.constructor(GridRenderer),
+    });
+
+    rootRef = signal.ref(HTMLDivElement);
+
     setup() {
+        this.uiService = useService("ui");
         const state = this.props.state || {};
         let activeRangeName = this.props.archInfo.activeRangeName;
         let defaultAnchor;
         if (state.activeRangeName) {
             activeRangeName = state.activeRangeName;
-        } else if (this.isMobile && "day" in this.props.archInfo.ranges) {
+        } else if (this.uiService.isSmall && "day" in this.props.archInfo.ranges) {
             activeRangeName = "day";
         }
         if (state.anchor) {
@@ -68,25 +71,25 @@ export class GridController extends Component {
             ranges: this.props.archInfo.ranges,
             defaultAnchor,
         });
-        const rootRef = useRef("root");
         useSetupAction({
-            rootRef: rootRef,
+            rootRef: this.rootRef,
             getLocalState: () => {
                 const { anchor, range } = this.model.navigationInfo;
                 return {
                     anchor,
                     activeRangeName: range?.name,
                 };
-            }
-        })
-        const isWeekendVisible = browser.localStorage.getItem("grid.isWeekendVisible");
-        this.state = useState({
-            activeRangeName: this.model.navigationInfo.range?.name,
-            isWeekendVisible: isWeekendVisible !== null && isWeekendVisible !== undefined
-                ? JSON.parse(isWeekendVisible)
-                : true,
+            },
         });
-        useViewButtons(rootRef, {
+        const isWeekendVisible = browser.localStorage.getItem("grid.isWeekendVisible");
+        this.state = proxy({
+            activeRangeName: this.model.navigationInfo.range?.name,
+            isWeekendVisible:
+                isWeekendVisible !== null && isWeekendVisible !== undefined
+                    ? JSON.parse(isWeekendVisible)
+                    : true,
+        });
+        useViewButtons(this.rootRef, {
             beforeExecuteAction: this.beforeExecuteActionButton.bind(this),
             afterExecuteAction: this.afterExecuteActionButton.bind(this),
             reload: this.reload.bind(this),
@@ -95,15 +98,8 @@ export class GridController extends Component {
         this.searchBarToggler = useSearchBarToggler();
     }
 
-    get isMobile() {
-        return this.env.isSmall;
-    }
-
     get isEditable() {
-        return (
-            this.props.archInfo.activeActions.edit &&
-            this.props.archInfo.editable
-        );
+        return this.props.archInfo.activeActions.edit && this.props.archInfo.editable;
     }
 
     get displayNoContent() {

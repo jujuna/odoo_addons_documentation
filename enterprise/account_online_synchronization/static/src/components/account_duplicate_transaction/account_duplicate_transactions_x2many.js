@@ -2,25 +2,28 @@ import { onMounted } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { ListRenderer } from "@web/views/list/list_renderer";
 import { X2ManyField, x2ManyField } from "@web/views/fields/x2many/x2many_field";
-import { useCheckDuplicateService } from "./account_duplicate_transaction_hook";
+import { useCheckDuplicatePlugin } from "./account_duplicate_transaction_hook";
 
 export class AccountDuplicateTransactionsListRenderer extends ListRenderer {
     static template = "account_online_synchronization.AccountDuplicateTransactionsListRenderer";
-    static recordRowTemplate = "account_online_synchronization.AccountDuplicateTransactionsRecordRow";
+    static recordRowTemplate =
+        "account_online_synchronization.AccountDuplicateTransactionsRecordRow";
 
     setup() {
         super.setup();
-        this.duplicateCheckService = useCheckDuplicateService();
+        this.duplicateCheckPlugin = useCheckDuplicatePlugin();
 
         onMounted(() => {
-            this.deleteButton = document.querySelector('button[name="delete_selected_transactions"]');
+            this.deleteButton = document.querySelector(
+                'button[name="delete_selected_transactions"]'
+            );
             this.deleteButton.disabled = true;
         });
     }
 
     toggleRecordSelection(selected, record) {
-        this.duplicateCheckService.updateLIne(selected, record.data.id);
-        this.deleteButton.disabled = this.duplicateCheckService.selectedLines.size === 0;
+        this.duplicateCheckPlugin.updateLine(selected, record.data.id);
+        this.deleteButton.disabled = this.duplicateCheckPlugin.selectedLines.size === 0;
     }
 
     get hasSelectors() {

@@ -1,6 +1,6 @@
 import { HolderEditDialog } from "@equity/components/ubo_form/holder_edit_dialog";
 import { HolderEndDialog } from "@equity/components/ubo_form/holder_end_dialog";
-import { Component, markup, useState } from "@odoo/owl";
+import { Component, markup, proxy, t, useProps } from "@odoo/owl";
 import { deserializeDate, formatDate } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
@@ -11,20 +11,21 @@ import { formatPercentage } from "@web/views/fields/formatters";
 
 export class UboForm extends Component {
     static template = "equity.UboForm";
-    static props = {
-        accessToken: { type: String },
-        ubos: { type: Array },
-        equityUboSettings: { type: Object },
-        allCountries: { type: Array },
-        defaultCountryId: { type: Number },
-    };
+
+    props = useProps({
+        accessToken: t.string(),
+        allCountries: t.array(),
+        defaultCountryId: t.or([t.number(), t.literal(false)]),
+        equityUboSettings: t.object(),
+        ubos: t.array(),
+    });
 
     setup() {
         super.setup();
         this.dialogService = useService("dialog");
         this.notification = useService("notification");
 
-        this.ubos = useState(this.props.ubos);
+        this.ubos = proxy(this.props.ubos);
         this.allCountries = Object.fromEntries(this.props.allCountries.map(({ id, name }) => [id, name]));
     }
 
@@ -48,7 +49,7 @@ export class UboForm extends Component {
             holder_id: {
                 name: "",
                 country_id: this.props.defaultCountryId,
-                ubo_birth_date: false,
+                birth_date: false,
                 ubo_national_identifier: "",
                 ubo_pep: false,
             },
@@ -129,7 +130,7 @@ export class UboForm extends Component {
             return 0;
         }).map((ubo) => {
             return [
-                this.styleTitleAndContent(ubo["holder_id"]["name"], this.displayDate(ubo["holder_id"]["ubo_birth_date"])),
+                this.styleTitleAndContent(ubo["holder_id"]["name"], this.displayDate(ubo["holder_id"]["birth_date"])),
                 this.displayDate(ubo["start_date"]),
                 this.displayDate(ubo["end_date"]),
                 this.styleTitleAndContent(

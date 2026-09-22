@@ -1,13 +1,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
-import base64
 
-from .common import SpreadsheetTestCommon, TEST_CONTENT, GIF
+from .common import SpreadsheetTestCommon
+from odoo.addons.base.tests.files import GIF_RAW
 from odoo.exceptions import AccessError
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 from odoo.tests.common import new_test_user
-from odoo.tools import mute_logger
+from odoo.tools import BinaryBytes, mute_logger
+
+TEST_CONTENT = "{}"
+GIF_VALUE = BinaryBytes(GIF_RAW)
 
 
 class SpreadsheetDocuments(SpreadsheetTestCommon):
@@ -29,7 +32,7 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         self.assertEqual(document.handler, "spreadsheet")
         self.assertEqual(document.mimetype, "application/o-spreadsheet")
         self.assertEqual(document.name, "Untitled spreadsheet")
-        self.assertEqual(document.datas, document._empty_spreadsheet_data_base64())
+        self.assertEqual(document.raw.content, document._empty_spreadsheet_data_bin())
         self.assertEqual(action_open["type"], "ir.actions.client")
         self.assertEqual(action_open["tag"], "action_open_spreadsheet")
 
@@ -66,6 +69,7 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
             "timeFormat": "hh:mm:ss",
             "formulaArgSeparator": ";",
             "weekStart": 1,
+            "digitGrouping": "[3,0]",
         }
         self.assertEqual(json.loads(document.spreadsheet_data)["settings"]["locale"], expected_locale)
 
@@ -81,7 +85,7 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         folder = self.env['documents.document'].create({'name': 'Folder', 'type': 'folder'})
         frozen_folder, document = self.env['documents.document'].create([
             {'name': 'Frozen Folder', 'type': 'folder', 'handler': 'frozen_folder', 'folder_id': folder.id},
-            {'name': 'Document', 'folder_id': folder.id},
+            {'name': 'Document', 'folder_id': folder.id, 'raw': 'test'},
         ])
         frozen_spreadsheet = self.env['documents.document'].create({'name': 'Spreadsheet', 'handler': 'frozen_spreadsheet'})
         partner = self.env['res.partner'].create({'name': 'Partner'})
@@ -196,9 +200,9 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
     def test_spreadsheet_to_display_with_domain(self):
         self.archive_existing_spreadsheet()
 
-        with self._freeze_time("2020-02-03"):
+        with self.mock_datetime_and_now("2020-02-03"):
             spreadsheet1 = self.create_spreadsheet(name="My Spreadsheet")
-        with self._freeze_time("2020-02-02"):
+        with self.mock_datetime_and_now("2020-02-02"):
             spreadsheet2 = self.create_spreadsheet(name="Untitled Spreadsheet")
         spreadsheets = self.env["documents.document"]._get_spreadsheets_to_display([("name", "ilike", "My")])
         spreadsheet_ids = [s["id"] for s in spreadsheets]
@@ -213,17 +217,17 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
     def test_spreadsheet_to_display_with_offset_limit(self):
         self.archive_existing_spreadsheet()
         user = new_test_user(self.env, login="Jean", groups="base.group_user")
-        with self._freeze_time("2020-02-02"):
+        with self.mock_datetime_and_now("2020-02-02"):
             spreadsheet1 = self.create_spreadsheet(user=user, name="My Spreadsheet 1")
-        with self._freeze_time("2020-02-03"):
+        with self.mock_datetime_and_now("2020-02-03"):
             spreadsheet2 = self.create_spreadsheet(user=user, name="My Spreadsheet 2")
-        with self._freeze_time("2020-02-04"):
+        with self.mock_datetime_and_now("2020-02-04"):
             spreadsheet3 = self.create_spreadsheet(name="My Spreadsheet 3")
-        with self._freeze_time("2020-02-05"):
+        with self.mock_datetime_and_now("2020-02-05"):
             spreadsheet4 = self.create_spreadsheet(user=user, name="SP 4")
-        with self._freeze_time("2020-02-06"):
+        with self.mock_datetime_and_now("2020-02-06"):
             spreadsheet5 = self.create_spreadsheet(name="SP 5")
-        with self._freeze_time("2020-02-07"):
+        with self.mock_datetime_and_now("2020-02-07"):
             spreadsheet6 = self.create_spreadsheet(name="SP 6")
 
         #########
@@ -318,9 +322,9 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
 
     def test_spreadsheet_to_display_create_order(self):
         self.archive_existing_spreadsheet()
-        with self._freeze_time("2020-02-02 18:00"):
+        with self.mock_datetime_and_now("2020-02-02 18:00"):
             spreadsheet1 = self.create_spreadsheet()
-        with self._freeze_time("2020-02-15 18:00"):
+        with self.mock_datetime_and_now("2020-02-15 18:00"):
             spreadsheet2 = self.create_spreadsheet()
         spreadsheets = self.env["documents.document"]._get_spreadsheets_to_display([])
         spreadsheet_ids = [s["id"] for s in spreadsheets]
@@ -328,9 +332,9 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
 
     def test_spreadsheet_to_display_write_order(self):
         self.archive_existing_spreadsheet()
-        with self._freeze_time("2020-02-02 18:00"):
+        with self.mock_datetime_and_now("2020-02-02 18:00"):
             spreadsheet1 = self.create_spreadsheet()
-        with self._freeze_time("2020-02-15 18:00"):
+        with self.mock_datetime_and_now("2020-02-15 18:00"):
             spreadsheet2 = self.create_spreadsheet()
         spreadsheet1.spreadsheet_data = r"{}"
         spreadsheets = self.env["documents.document"]._get_spreadsheets_to_display([])
@@ -339,9 +343,9 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
 
     def test_spreadsheet_to_display_join_session(self):
         self.archive_existing_spreadsheet()
-        with self._freeze_time("2020-02-02 18:00"):
+        with self.mock_datetime_and_now("2020-02-02 18:00"):
             spreadsheet1 = self.create_spreadsheet()
-        with self._freeze_time("2020-02-15 18:00"):
+        with self.mock_datetime_and_now("2020-02-15 18:00"):
             spreadsheet2 = self.create_spreadsheet()
         spreadsheet1._get_serialized_spreadsheet_data_body()
         spreadsheets = self.env["documents.document"]._get_spreadsheets_to_display([])
@@ -353,9 +357,9 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         user = new_test_user(
             self.env, login="Jean", groups="documents.group_documents_user"
         )
-        with self._freeze_time("2020-02-02 18:00"):
+        with self.mock_datetime_and_now("2020-02-02 18:00"):
             spreadsheet1 = self.create_spreadsheet(user=user)
-        with self._freeze_time("2020-02-15 18:00"):
+        with self.mock_datetime_and_now("2020-02-15 18:00"):
             spreadsheet2 = self.create_spreadsheet()
         spreadsheets = (
             self.env["documents.document"].with_user(user)._get_spreadsheets_to_display([])
@@ -383,20 +387,14 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         manager_doc = self.create_spreadsheet(user=user)
         visible_doc = self.create_spreadsheet(user=user)
         # archive existing record rules which might allow access (disjunction between record rules)
-        record_rules = self.env["ir.rule"].search(
-            [
-                ("model_id", "=", model.id),
-            ]
-        )
-        record_rules.active = False
-        self.env["ir.rule"].create(
-            {
-                "name": "test record rule",
-                "model_id": model.id,
-                "groups": [(4, group.id)],
-                "domain_force": f"[('id', '=', {visible_doc.id})]",  # always rejects
-            }
-        )
+        self.env["ir.access"].search([("model_id", "=", model.id)]).active = False
+        self.env["ir.access"].create({
+            "name": "test record rule",
+            "model_id": model.id,
+            "group_id": group.id,
+            "operation": "crud",
+            "domain": f"[('id', '=', {visible_doc.id})]",  # always rejects
+        })
 
         spreadsheets = (
             self.env["documents.document"].with_user(user)._get_spreadsheets_to_display([])
@@ -424,7 +422,7 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
             "default_spreadshee_name": "Spreadsheet test",
             "default_template_name": "Spreadsheet test - Template",
             "default_spreadsheet_data": TEST_CONTENT,
-            "default_thumbnail": GIF,
+            "default_thumbnail": GIF_VALUE,
         }
         wizard = Form(
             self.env["save.spreadsheet.template"].with_context(context)
@@ -436,7 +434,7 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         self.assertTrue(template, "It should have created a template")
         self.assertEqual(template.name, "Spreadsheet test - Template")
         self.assertEqual(template.spreadsheet_data, TEST_CONTENT)
-        self.assertEqual(template.thumbnail, GIF)
+        self.assertEqual(template.thumbnail.content, GIF_VALUE.content)
 
     def test_save_template_purges_comments(self):
         base_data = {
@@ -450,7 +448,7 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
             "default_spreadshee_name": "Spreadsheet test",
             "default_template_name": "Spreadsheet test - Template",
             "default_spreadsheet_data": json.dumps(base_data),
-            "default_thumbnail": GIF,
+            "default_thumbnail": GIF_VALUE,
         }
         wizard = Form(
             self.env["save.spreadsheet.template"].with_context(context)
@@ -587,7 +585,7 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         })
         vals = {
             "name": "test.txt",
-            "datas": b'aGVsbG8hCg==\n',
+            "raw": b'hello!\n',
             "folder_id": self.folder.id,
             "mimetype": "text/plain",
         }
@@ -635,48 +633,38 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
     def test_read_spreadsheet_data(self):
         document = self.env["documents.document"].create({
             "name": "test.txt",
-            "datas": base64.encodebytes(b'{ "sheets": [] }'),
+            "raw": b'{ "sheets": [] }',
             "handler": "spreadsheet",
             "mimetype": "application/o-spreadsheet",
             "folder_id": self.folder.id,
         })
         self.assertEqual(document.spreadsheet_data, '{ "sheets": [] }')
 
-    def test_read_spreadsheet_data_bin_size_ctx(self):
-        document = self.env["documents.document"].with_context(bin_size=True).create({
-            "name": "test.txt",
-            "datas": base64.encodebytes(b"{}"),
-            "handler": "spreadsheet",
-            "mimetype": "application/o-spreadsheet",
-            "folder_id": self.folder.id,
-        })
-        self.assertEqual(document.spreadsheet_data, "{}")
-
     def test_read_non_spreadsheet_data(self):
         document = self.env["documents.document"].create({
             "name": "test.txt",
-            "datas": TEST_CONTENT,
+            "raw": b"{}",
             "mimetype": "text/plain",
             "folder_id": self.folder.id,
         })
-        self.assertEqual(document.spreadsheet_data, False)
+        self.assertFalse(document.spreadsheet_data)
 
     def test_write_spreadsheet_data(self):
         document = self.env["documents.document"].create({
             "name": "test.txt",
-            "datas": base64.encodebytes(b"{}"),
+            "raw": b"{}",
             "handler": "spreadsheet",
             "mimetype": "application/o-spreadsheet",
             "folder_id": self.folder.id,
         })
         data = b'{ "sheets": [] }'
-        document.spreadsheet_data = data
-        self.assertEqual(document.datas, base64.b64encode(data))
+        document.spreadsheet_binary_data = BinaryBytes(data)
+        self.assertEqual(document.raw.content, data)
 
     def test_copy_spreadsheet_revisions(self):
         spreadsheet = self.create_spreadsheet()
         user = new_test_user(self.env, login="Jean", groups="base.group_user")
-        spreadsheet.dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
+        spreadsheet._dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
 
         #########
         # ADMIN #
@@ -702,7 +690,7 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
 
     def test_copy_spreadsheet_snapshot(self):
         spreadsheet = self.create_spreadsheet()
-        spreadsheet.dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
+        spreadsheet._dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
         self.snapshot(
             spreadsheet,
             spreadsheet.current_revision_uuid, "snapshot-revision-id", {"sheets": [], "revisionId": "snapshot-revision-id"},
@@ -710,8 +698,8 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         with mute_logger('odoo.addons.documents.models.documents_document'):
             copy = spreadsheet.copy()
         self.assertEqual(
-            copy.spreadsheet_snapshot,
-            spreadsheet.spreadsheet_snapshot,
+            copy.spreadsheet_snapshot.content,
+            spreadsheet.spreadsheet_snapshot.content,
             "Copy should have the same snapshot data",
         )
 
@@ -727,186 +715,10 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
             copy = spreadsheet.copy({'name': 'sheet'})
         self.assertEqual(copy.name, 'sheet')
 
-    def test_copy_image_in_snapshot(self):
-        spreadsheet = self.create_spreadsheet()
-        image = self.env["ir.attachment"].create({
-            "name": "image.png",
-            "datas": b"test",
-            "res_model": "documents.document",
-            "res_id": spreadsheet.id,
-        })
-        spreadsheet_data = {
-            "revisionId": "NEW_REVISION",
-            "sheets": [{
-                "figures": [
-                    {
-                        "id": "14",
-                        "x": 0,
-                        "y": 0,
-                        "width": 10,
-                        "height": 10,
-                        "tag": "image",
-                        "data": {
-                            "path": f"/web/image/{image.id}",
-                            "size": {"width": 10, "height": 10},
-                            "mimetype": "image/png"
-                        }
-                    },
-                    {
-                        "id": "14",
-                        "x": 0,
-                        "y": 0,
-                        "width": 10,
-                        "height": 10,
-                        "tag": "image",
-                        "data": {
-                            "path": f"/web/image/{image.id}?access_token={image.generate_access_token()[0]}",
-                            "size": {"width": 10, "height": 10},
-                            "mimetype": "image/png"
-                        }
-                    }
-                ],
-            }],
-        }
-        spreadsheet.spreadsheet_data = json.dumps(spreadsheet_data)
-        self.snapshot(spreadsheet, "START_REVISION", "NEW_REVISION", spreadsheet_data)
-        with mute_logger('odoo.addons.documents.models.documents_document'):
-            copy = spreadsheet.copy({
-                "spreadsheet_data": spreadsheet.spreadsheet_data,
-                "spreadsheet_snapshot": spreadsheet.spreadsheet_snapshot,
-            })
-        copied_data = json.loads(copy.spreadsheet_data)
-        copied_snapshot = json.loads(copy._get_spreadsheet_serialized_snapshot())
-        for data_copy in (copied_data, copied_snapshot):
-            [figure, figure_with_token] = data_copy["sheets"][0]["figures"]
-            image_definition = figure["data"]
-            path = image_definition["path"]
-            attachment_copy_id = int(path.split("/")[3])
-            attachment_copy = self.env["ir.attachment"].browse(attachment_copy_id)
-            self.assertNotEqual(attachment_copy_id, image.id)
-            self.assertEqual(attachment_copy.res_id, copy.id)
-            self.assertEqual(attachment_copy.res_model, "documents.document")
-            self.assertEqual(image_definition["path"], f"/web/image/{attachment_copy_id}")
-
-            image_definition = figure_with_token["data"]
-            path = image_definition["path"]
-            attachment_copy_id = int(path.split("/")[3].split("?")[0])
-            attachment_copy = self.env["ir.attachment"].browse(attachment_copy_id)
-            self.assertEqual(
-                image_definition["path"],
-                f"/web/image/{attachment_copy_id}?access_token={attachment_copy.access_token}"
-            )
-
-    def test_copy_image_in_revision(self):
-        spreadsheet = self.create_spreadsheet()
-        image = self.env["ir.attachment"].create({
-            "name": "image.png",
-            "datas": b"test",
-            "res_model": "documents.document",
-            "res_id": spreadsheet.id,
-        })
-        commands = [{
-            "type": "CREATE_IMAGE",
-            "figureId": "image-id",
-            "col": 0,
-            "row": 0,
-            "offset": {"x": 0, "y": 0},
-            "size": {"width": 1, "height": 1},
-            "definition": {
-                "path": "/web/image/%s" % image.id,
-            }
-        }, {
-            "type": "CREATE_IMAGE",
-            "figureId": "image-id2",
-            "col": 0,
-            "row": 0,
-            "offset": {"x": 0, "y": 0},
-            "size": {"width": 1, "height": 1},
-            "definition": {
-                "path": "/web/image/%s?access_token=%s" % (image.id, image.generate_access_token()[0]),
-            }
-        }]
-
-        spreadsheet.dispatch_spreadsheet_message(self.new_revision_data(spreadsheet, commands=commands))
-        with mute_logger('odoo.addons.documents.models.documents_document'):  # Creating document(s) as superuser
-            copy = spreadsheet.copy()
-        revision = copy.spreadsheet_revision_ids
-        [command, command_with_token] = json.loads(revision.commands)["commands"]
-        path = command["definition"]["path"]
-        attachment_copy_id = int(path.split("/")[3])
-        attachment_copy = self.env["ir.attachment"].browse(attachment_copy_id)
-        self.assertNotEqual(attachment_copy_id, image.id)
-        self.assertEqual(attachment_copy.res_id, copy.id)
-        self.assertEqual(attachment_copy.res_model, "documents.document")
-        self.assertEqual(command["definition"]["path"], f"/web/image/{attachment_copy_id}")
-
-        path = command_with_token["definition"]["path"]
-        attachment_copy_id = int(path.split("/")[3].split("?")[0])
-        attachment_copy = self.env["ir.attachment"].browse(attachment_copy_id)
-        self.assertEqual(
-            command_with_token["definition"]["path"],
-            f"/web/image/{attachment_copy_id}?access_token={attachment_copy.access_token}"
-        )
-
-    def test_create_spreadsheet_with_image_linked_to_other_record(self):
-        image = self.env["ir.attachment"].create({
-            "name": "image.png",
-            "datas": b"test",
-            "res_model": self.env.user._name,
-            "res_id": self.env.user.id,
-        })
-        spreadsheet_data = {
-            "sheets": [{
-                "figures": [
-                    {
-                        "id": "14",
-                        "x": 0,
-                        "y": 0,
-                        "width": 10,
-                        "height": 10,
-                        "tag": "image",
-                        "data": {
-                            "path": f"/web/image/{image.id}",
-                            "size": {"width": 10, "height": 10},
-                            "mimetype": "image/png"
-                        }
-                    }
-                ],
-            }],
-        }
-        spreadsheet = self.create_spreadsheet({
-            "spreadsheet_data": json.dumps(spreadsheet_data)
-        })
-        with mute_logger('odoo.addons.documents.models.documents_document'):  # Creating document(s) as superuser
-            copy = spreadsheet.copy({
-            "spreadsheet_data": spreadsheet.spreadsheet_data,
-            "spreadsheet_snapshot": spreadsheet.spreadsheet_snapshot,
-        })
-        image_definition = json.loads(copy.spreadsheet_data)["sheets"][0]["figures"][0]["data"]
-        path = image_definition["path"]
-        attachment_copy_id = int(path.split("/")[3])
-        attachment_copy = self.env["ir.attachment"].browse(attachment_copy_id)
-        self.assertNotEqual(attachment_copy_id, image.id)
-        self.assertEqual(attachment_copy.res_id, copy.id)
-        self.assertEqual(attachment_copy.res_model, "documents.document")
-        self.assertEqual(image_definition["path"], f"/web/image/{attachment_copy_id}")
-
-    def test_delete_spreadsheet_delete_image(self):
-        spreadsheet = self.create_spreadsheet()
-        image = self.env["ir.attachment"].create({
-            "name": "image.png",
-            "datas": b"test",
-            "res_model": "documents.document",
-            "res_id": spreadsheet.id,
-        })
-        self.assertTrue(image)
-        spreadsheet.unlink()
-        self.assertFalse(image.exists())
-
     def test_spreadsheet_thumbnail_checksum(self):
         spreadsheet = self.create_spreadsheet()
         self.assertFalse(spreadsheet.spreadsheet_thumbnail_checksum)
-        spreadsheet.display_thumbnail = GIF
+        spreadsheet.display_thumbnail = GIF_VALUE
         thumbnail_attachment = self.env["ir.attachment"].search([
             ("res_model", "=", "documents.document"),
             ("res_field", "=", "thumbnail"),
@@ -919,8 +731,8 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
 
     def test_spreadsheet_thumbnail_checksum_other_document(self):
         document = self.env["documents.document"].create({
-            "datas": GIF,
-            "thumbnail": GIF,
+            "raw": GIF_VALUE,
+            "thumbnail": GIF_VALUE,
             "folder_id": self.folder.id,
         })
         self.assertFalse(document.spreadsheet_thumbnail_checksum)
@@ -933,8 +745,8 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
 
         # a regular document
         self.env["documents.document"].create({
-            "datas": GIF,
-            "thumbnail": GIF,
+            "raw": GIF_VALUE,
+            "thumbnail": GIF_VALUE,
             "folder_id": self.folder.id,
         })
 

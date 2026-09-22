@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     "name": "Ecuadorian Accounting EDI",
@@ -14,9 +13,10 @@ Includes automations to easily predict the withholding tax to be applied to each
 """,
     "author": "TRESCLOUD",
     "category": "Accounting/Localizations/EDI",
-    "license": "OPL-1",
+    "license": "OEEL-1",
     "depends": [
         "account_edi",
+        "account_payment",
         "certificate",
         "l10n_ec",
     ],
@@ -27,9 +27,7 @@ Includes automations to easily predict the withholding tax to be applied to each
         "data/l10n_ec.taxpayer.type.csv",
         "data/account.edi.format.csv",
         "data/res.country.csv",
-
-        "security/ir.model.access.csv",
-        "security/security.xml",
+        'data/portal_entry_data.xml',
 
         "views/account_journal_view.xml",
         "views/account_move_views.xml",
@@ -48,6 +46,7 @@ Includes automations to easily predict the withholding tax to be applied to each
         'wizard/l10n_ec_wizard_account_withhold_view.xml',
 
         "data/mail_template_data.xml",
+        'security/ir.access.csv',
     ],
     'demo': [
         "demo/demo_company.xml",
@@ -58,7 +57,6 @@ Includes automations to easily predict the withholding tax to be applied to each
             'l10n_ec_edi/static/src/components/**/*',
         ],
     },
-    "installable": True,
     "auto_install": ["l10n_ec"],
     'post_init_hook': '_post_install_hook_configure_ecuadorian_data',
 }

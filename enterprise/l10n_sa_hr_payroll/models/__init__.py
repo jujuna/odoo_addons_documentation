@@ -7,6 +7,11 @@ from . import hr_employee
 from . import hr_salary_attachment
 from . import hr_payroll_structure_type
 from . import hr_payslip_run
-from . import res_bank
 from . import res_company
 from . import res_config_settings
+from . import res_partner_bank
+from . import l10n_sa_disciplinary_action
+from . import hr_leave
+from . import hr_department
+from . import l10n_sa_nationalization_percentage
+from . import hr_work_entry_type

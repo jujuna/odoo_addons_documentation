@@ -2,7 +2,6 @@
 
 {
     'name': 'Expense cards: Demo',
-    'version': '1.0',
     'category': 'Human Resources/Expenses',
     'sequence': 75,
     'summary': 'Create and manage company expense cards via Stripe: Demo',
@@ -17,11 +16,13 @@
         'wizard/hr_expense_stripe_topup_wizard.xml',
         'wizard/hr_expense_stripe_test_purchase_wizard.xml',
         'wizard/hr_expense_stripe_test_shipping_wizard.xml',
-
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
-    'assets': {},
+    'assets': {
+        'web.assets_backend': [
+            'hr_expense_stripe_demo/static/src/components/*',
+        ],
+    },
     'post_init_hook': '_post_init_hook_setup_issuing_demo',
-    'installable': True,
-    'license': 'LGPL-3',
+    'license': 'OEEL-1',
 }

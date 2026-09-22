@@ -2,7 +2,14 @@ import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
 import { queryAll } from "@odoo/hoot-dom";
 import { mockDate } from "@odoo/hoot-mock";
-import { defineModels, fields, models } from "@web/../tests/web_test_helpers";
+import {
+    defineModels,
+    fields,
+    models,
+    onRpc,
+    toggleMenuItem,
+    toggleSearchBarMenu,
+} from "@web/../tests/web_test_helpers";
 import { mountGanttView } from "@web_gantt/../tests/web_gantt_test_helpers";
 
 describe.current.tags("desktop");
@@ -85,25 +92,9 @@ beforeEach(() => {
 });
 
 test("hr gantt view not grouped", async () => {
+    // hrGanttView can only be (and is always) grouped by `employee_id`
     await mountGanttView({ resModel: "task", arch });
-    expect(".o-mail-Avatar").toHaveCount(0);
-});
-
-test("hr gantt view grouped by employee only", async () => {
-    await mountGanttView({ resModel: "task", arch, groupBy: ["employee_id"] });
-    expect(".o_gantt_row_title .o-mail-Avatar").toHaveCount(3);
-});
-
-test("hr gantt view grouped by employee > foo", async () => {
-    await mountGanttView({ resModel: "task", arch, groupBy: ["employee_id", "foo"] });
-    expect(".o_gantt_row_header.o_gantt_group .o_gantt_row_title .o-mail-Avatar").toHaveCount(3);
-});
-
-test("hr gantt view grouped by foo > employee", async () => {
-    await mountGanttView({ resModel: "task", arch, groupBy: ["foo", "employee_id"] });
-    expect(".o_gantt_row_header:not(.o_gantt_group) .o_gantt_row_title .o-mail-Avatar").toHaveCount(
-        4
-    );
+    expect(".o-mail-Avatar").toHaveCount(3);
 });
 
 test("hr gantt view pill rounding", async () => {
@@ -128,4 +119,69 @@ test("hr gantt view pill rounding", async () => {
     expect(task4.right).toBeWithin(col20.x, col21.x, { message: "Task 4 should end the 20th" });
     expect(task5.left).toBe(col21.left, { message: "Task 5 should display before noon" });
     expect(task6.right).toBe(col22.right, { message: "Task 6 should display after noon" });
+});
+
+/*
+ * The `user_domain` passed in context to `get_gantt_data` should only
+ * reflect what the user explicitly typed/applied via the search bar.
+ * `domain` should contain all the filters/domains, including `user_domain`
+ */
+test("user_domain contains domain from search bar, domain contains all filters", async () => {
+    onRpc("get_gantt_data", (args) => {
+        expect.step({
+            domain: args.kwargs.domain,
+            user_domain: args.kwargs.context.user_domain,
+        });
+    });
+
+    await mountGanttView({
+        resModel: "task",
+        arch: `<gantt js_class="hr_gantt" date_start="start" default_group_by='employee_id' date_stop="stop"/>`,
+        // domain implicitly applied. it should not appear in user_domain
+        domain: [["employee_id.name", "=", "Princess Cadence"]],
+        // available filters that can be clicked by user
+        searchViewArch: `
+            <search>
+                <filter name="filter_pony" string="Is Pony" domain="[['kind', '=', 'pony']]"/>
+            </search>
+        `,
+    });
+
+    expect.verifySteps(
+        [
+            {
+                domain: [
+                    "&",
+                        ["employee_id.name", "=", "Princess Cadence"],
+                    "&",
+                        ["start", "<", "2019-02-28 23:00:00"],
+                        ["stop", ">", "2018-11-30 23:00:00"],
+                ],
+                user_domain: [],
+            },
+        ],
+        { message: "`domain` should contain all gantt filters, but no filters are defined in the search bar so `user_domain` should be empty" }
+    );
+
+    // make as if the user clicked on the "Pony" filter
+    await toggleSearchBarMenu();
+    await toggleMenuItem("Is Pony");
+
+    expect.verifySteps(
+        [
+            {
+                domain: [
+                    "&",
+                        "&",
+                            ["employee_id.name", "=", "Princess Cadence"],
+                            ["kind", "=", "pony"],
+                    "&",
+                        ["start", "<", "2019-02-28 23:00:00"],
+                        ["stop", ">", "2018-11-30 23:00:00"],
+                ],
+                user_domain: [["kind", "=", "pony"]],
+            },
+        ],
+        { message: "`domain` should contain all gantt filters (including `user_domain`), `user_domain` should contain the filters defined in the search bar only" }
+    );
 });

@@ -15,7 +15,17 @@ registry.category("web_tour.tours").add("PosBarcodelookupFlow", {
                 trigger: 'div[name="barcode"] input',
                 run: "edit 710535977349",
             },
-            Dialog.confirm("Save"),
+            {
+                content: "Click to open the Point of Sale categories dropdown.",
+                trigger: 'div[name="pos_categ_ids"] input',
+                run: "click",
+            },
+            {
+                content: "Select the 'Misc' category from the list.",
+                trigger: 'a.ui-menu-item-wrapper:contains("Misc")',
+                run: "click",
+            },
+            Dialog.confirm("Add & Close", ".btn-secondary"),
             // new product will be available in pos by default so let's order.
             ProductScreen.addOrderline("Odoo Scale up", "1"),
             ProductScreen.clickPayButton(),

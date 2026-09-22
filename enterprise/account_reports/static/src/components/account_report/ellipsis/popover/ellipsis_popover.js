@@ -1,10 +1,10 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class AccountReportEllipsisPopover extends Component {
     static template = "account_reports.AccountReportEllipsisPopover";
-    static props = {
-        close: Function,
-        name: String,
-        copyEllipsisText: Function,
-    };
+    props = useProps({
+        close: t.function(),
+        name: t.string(),
+        copyEllipsisText: t.function(),
+    });
 }

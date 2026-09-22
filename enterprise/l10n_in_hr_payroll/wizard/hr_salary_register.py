@@ -16,10 +16,10 @@ class SalaryRegisterWizard(models.TransientModel):
         return super().default_get(fields)
 
     def _get_default_date_from(self):
-        return fields.Date.today() + relativedelta(day=1, month=1)
+        return fields.Date.context_today(self) + relativedelta(day=1, month=1)
 
     def _get_default_date_to(self):
-        return fields.Date.today() + relativedelta(day=31)
+        return fields.Date.context_today(self) + relativedelta(day=31)
 
     def _get_employee_ids_domain(self):
         employees = self.env['hr.payslip'].search([('state', 'in', ['validated', 'paid'])]).employee_id.filtered(lambda e: e.company_id.country_id.code == "IN").ids
@@ -45,7 +45,7 @@ class SalaryRegisterWizard(models.TransientModel):
     date_from = fields.Date(string='Start Date', required=True, default=_get_default_date_from)
     date_to = fields.Date(string='End Date', required=True, default=_get_default_date_to)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
-    struct_id = fields.Many2one('hr.payroll.structure', string='Salary Structure', domain=_get_struct_id_domain)
+    struct_id = fields.Many2one('hr.payroll.structure', string='Pay Structure', domain=_get_struct_id_domain)
     include_paid = fields.Boolean(string="Paid", default=True, compute="_compute_include_paid", readonly=False, store=True)
     include_done = fields.Boolean(string="Done", readonly=False, compute="_compute_include_done", store=True)
 

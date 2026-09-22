@@ -1,11 +1,14 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { click, press, waitFor, delay } from "@odoo/hoot-dom";
-import { animationFrame, Deferred } from "@odoo/hoot-mock";
+import { click, press, waitFor } from "@odoo/hoot-dom";
+import { animationFrame } from "@odoo/hoot-mock";
 import { Component, xml } from "@odoo/owl";
 import {
     contains,
     defineActions,
     defineMenus,
+    defineModels,
+    fields,
+    models,
     getService,
     mountWithCleanup,
     onRpc,
@@ -13,7 +16,7 @@ import {
     serverState,
     stepAllNetworkCalls,
 } from "@web/../tests/web_test_helpers";
-import { browser } from "@web/core/browser/browser";
+import { location, browser } from "@web/core/browser/browser";
 import { user } from "@web/core/user";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 import { StudioClientAction } from "@web_studio/client_action/studio_client_action";
@@ -22,6 +25,7 @@ import { FormEditorRenderer } from "@web_studio/client_action/view_editor/editor
 import { ListEditorRenderer } from "@web_studio/client_action/view_editor/editors/list/list_editor_renderer";
 import { ViewEditor } from "@web_studio/client_action/view_editor/view_editor";
 import { defineStudioEnvironment } from "./studio_tests_context";
+import { redirect } from "@web/core/utils/urls";
 
 describe.current.tags("desktop");
 
@@ -33,7 +37,7 @@ test("Studio not available for non system users", async () => {
     patchWithCleanup(user, { isSystem: false });
     await mountWithCleanup(WebClientEnterprise);
     expect(".o_main_navbar").toHaveCount(1);
-    expect(".o_main_navbar .o_web_studio_navbar_item button").toHaveCount(0);
+    expect(".o_main_navbar .o_web_studio_navbar_item").toHaveCount(0);
 });
 
 test("Studio icon matches the clickbot selector", async () => {
@@ -58,7 +62,7 @@ test("open Studio with act_window and viewType", async () => {
     await animationFrame();
     expect(".o_form_view").toHaveCount(1);
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_web_studio_editor_manager .o_web_studio_form_view_editor");
 
     expect('.o_field_widget[name="name"]').toHaveText("Yop");
@@ -76,7 +80,7 @@ test("reload the studio view", async () => {
     await waitFor(".o_form_view");
     expect(".o_field_char input").toHaveValue("Yop");
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_web_studio_editor_manager");
 
     await getService("studio").reload();
@@ -93,7 +97,7 @@ test("switch view and close Studio", async () => {
     await click(".o_app[data-menu-xmlid=app_1]");
     await waitFor(".o_kanban_record:contains(Yop)");
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_web_studio_editor_manager");
 
     await click(".o_web_studio_menu .o_menu_sections button");
@@ -123,14 +127,14 @@ test("navigation in Studio with act_window", async () => {
     expect.verifySteps([
         "/web/webclient/translations",
         "/web/webclient/load_menus",
-        "/mail/data",
+        "/mail/store",
         "/web/action/load",
         "get_views",
         "web_search_read",
         "has_group",
     ]);
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await waitFor(".o_web_studio_editor_manager .o_web_studio_kanban_view_editor");
 
     expect.verifySteps([
@@ -184,7 +188,7 @@ test("keep action context when leaving Studio", async () => {
     await click(".o_nav_entry[data-menu-xmlid=menu_12]");
     await waitFor(".o_list_view");
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await waitFor(".o_web_studio_editor_manager .o_web_studio_list_view_editor");
 
     await click(".o_web_studio_leave");
@@ -217,7 +221,7 @@ test("user context is unpolluted when entering studio in error", async () => {
     await waitFor(".o_kanban_view");
     expect.verifySteps([`get_views, context studio: "undefined", option studio: "undefined"`]);
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     expect(".o_web_studio_kanban_view_editor").toHaveCount(0);
     expect(".o_kanban_view").toHaveCount(1);
     expect.verifyErrors(["Boom"]);
@@ -260,7 +264,7 @@ test("user context is not polluted when getting views", async () => {
         `web_search_read, context studio: "undefined"`,
     ]);
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await waitFor(".o_web_studio_kanban_view_editor");
     expect.verifySteps([
         `get_views, context studio: "undefined", option studio: "true"`,
@@ -298,7 +302,7 @@ test("error bubbles up if first rendering", async () => {
     await waitFor(".o_kanban_view");
     await contains(".o_menu_sections a[data-menu-xmlid=menu_12]").click();
     await waitFor(".o_list_view");
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await animationFrame();
 
     expect.verifyErrors(["Boom"]);
@@ -338,7 +342,7 @@ test("error when new app's view is invalid", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await contains(".o_web_studio_new_app").click();
     await contains(".o_web_studio_app_creator_next").click();
     await contains(".o_web_studio_app_creator_name input").edit("testApp");
@@ -362,7 +366,7 @@ test("open same record when leaving form", async () => {
 
     expect(".o_form_view .o_field_widget[name=name] input").toHaveValue("Applejack");
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await waitFor(".o_web_studio_editor_manager .o_web_studio_form_view_editor");
 
     expect(".o_form_view .o_field_widget[data-studio-xpath='/form[1]/field[1]'] span").toHaveText(
@@ -388,7 +392,7 @@ test("open Studio with non editable view", async () => {
     await click(".o_switch_view.o_grid");
     await waitFor(".o_grid_view");
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_web_studio_action_editor");
 });
 
@@ -399,7 +403,7 @@ test("open list view with sample data gives empty list view in studio", async ()
     await click(".o_app[data-menu-xmlid=app_3]");
     await waitFor(".o_list_view");
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await waitFor(".o_web_studio_editor_manager");
 
     expect(".o_list_table .o_data_row").toHaveCount(0);
@@ -415,7 +419,7 @@ test("kanban in studio should always ignore sample data", async () => {
     await click(".o_switch_view.o_kanban");
     await waitFor(".o_kanban_view");
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await waitFor(".o_web_studio_editor_manager");
 
     expect(
@@ -446,7 +450,7 @@ test("entering a kanban keeps the user's domain", async () => {
 
     expect.verifySteps([`web_search_read: [["name","ilike","Apple"]]`]);
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_web_studio_editor_manager");
 
     expect.verifySteps([`web_search_read: [["name","ilike","Apple"]]`]);
@@ -470,7 +474,7 @@ test("open Studio with editable form view and check context propagation", async 
     await contains(".o_list_button_add").click();
     await waitFor(".o_form_view");
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_web_studio_editor_manager");
 
     await click(".o_web_studio_form_view_editor .o_field_one2many");
@@ -485,7 +489,7 @@ test("open Studio with editable form view and check context propagation", async 
 });
 
 test("concurrency: execute a non editable action and try to enter studio", async () => {
-    const def = new Deferred();
+    const def = Promise.withResolvers();
 
     const webClient = await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
@@ -499,7 +503,7 @@ test("concurrency: execute a non editable action and try to enter studio", async
     });
 
     await click(".o_app[data-menu-xmlid=app_4]");
-    await def;
+    await def.promise;
     expect(".o_list_view").toHaveCount(1);
     expect(".o_web_studio_navbar_item.o_disabled").toHaveCount(1);
 });
@@ -508,7 +512,7 @@ test("command palette inside studio", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_studio_home_menu");
 
     await press("Space");
@@ -526,7 +530,7 @@ test("command palette inside studio with error", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_studio_home_menu");
 
     await press(["S", "e", "t", "t"]);
@@ -537,13 +541,12 @@ test("command palette inside studio with error", async () => {
 });
 
 test("leaving studio with a pending rendering in Studio", async () => {
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     let makeItWait = false;
 
     let dummyclass = "first-pass";
     class Dummy extends Component {
-        static template = xml`<div class="dummy" t-att-class="classes" />`;
-        static props = {};
+        static template = xml`<div class="dummy" t-att-class="this.classes" />`;
         get classes() {
             return dummyclass;
         }
@@ -571,7 +574,7 @@ test("leaving studio with a pending rendering in Studio", async () => {
 
     onRpc("/web/action/load", async () => {
         if (makeItWait) {
-            await def;
+            await def.promise;
         }
     });
 
@@ -590,7 +593,7 @@ test("leaving studio with a pending rendering in Studio", async () => {
     await click(".o_data_cell");
     await animationFrame();
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_web_studio_editor_manager");
 
     expect(".dummy.first-pass").toHaveCount(1);
@@ -604,7 +607,7 @@ test("leaving studio with a pending rendering in Studio", async () => {
     expect(".dummy.second-pass").toHaveCount(1);
 
     def.resolve();
-    await def;
+    await def.promise;
     await animationFrame();
     expect(".o_web_studio_editor_manager").toHaveCount(0);
     expect(".dummy").toHaveCount(0);
@@ -633,7 +636,7 @@ test("auto-save feature works in studio (not editing a view)", async () => {
     await click(".o_app[data-menu-xmlid=app_1]");
     await waitFor(".o_kanban_view");
 
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_web_studio_editor_manager");
 
     await click(".o_menu_sections button:contains(Automations)");
@@ -663,8 +666,8 @@ test("load with active_id active_ids", async () => {
         });
     });
 
-    browser.location.href = "/odoo/action-1/studio";
-    browser.location.search = "?mode=editor&_view_type=form&_tab=views&active_id=1";
+    location.href = "/odoo/action-1/studio";
+    location.search = "?mode=editor&_view_type=form&_tab=views&active_id=1";
 
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
@@ -672,8 +675,123 @@ test("load with active_id active_ids", async () => {
     expect.verifySteps(["onchange"]);
 });
 
+test("entering studio with active_id", async () => {
+    class Task extends models.Model {
+        project_id = fields.Many2one({ relation: "project" });
+        _records = [
+            {
+                id: 1,
+                display_name: "task1",
+                project_id: 1,
+            },
+            {
+                id: 2,
+                display_name: "task2",
+                project_id: 2,
+            },
+        ];
+        _views = {
+            list: `<list>
+                <field name="display_name" />
+                <button name="1" type="action" string="somebutton" column_invisible="context.get('active_id') != 1" />
+            </list>`,
+        };
+    }
+    class Project extends models.Model {
+        task_ids = fields.One2many({ relation: "task" });
+        _records = [
+            {
+                id: 1,
+                display_name: "paul bismuth",
+            },
+            {
+                id: 2,
+                display_name: "la santé",
+            },
+        ];
+
+        _views = {
+            list: `<list><field name="display_name" /></list>`,
+        };
+    }
+    defineModels([Project, Task]);
+    defineActions([
+        {
+            xml_id: "action_active_id_project",
+            id: 1,
+            type: "ir.actions.act_window",
+            res_model: "project",
+            name: "Projects",
+            target: "main",
+            views: [
+                [false, "list"],
+                [false, "form"],
+            ],
+        },
+        {
+            xml_id: "action_active_id_task",
+            id: 2,
+            type: "ir.actions.act_window",
+            res_model: "task",
+            name: "Tasks",
+            target: "current",
+            views: [
+                [false, "list"],
+                [false, "form"],
+            ],
+            domain: `[["project_id", "=", active_id]]`,
+        },
+    ]);
+    await mountWithCleanup(WebClientEnterprise);
+    await waitFor(".o_home_menu");
+    await animationFrame(); // wait for url to be pushed
+    expect(location.href).toBe("https://www.hoot.test/odoo");
+
+    await getService("action").doAction("action_active_id_project");
+    await waitFor(".o_list_view .o_last_breadcrumb_item:contains(Projects)");
+    expect(".o_list_view button:contains(somebutton)").toHaveCount(0);
+    await animationFrame();
+    expect(location.href).toBe("https://www.hoot.test/odoo/action-1");
+
+    await getService("action").doAction("action_active_id_task", {
+        additionalContext: { active_id: 1 },
+    });
+    await waitFor(".o_list_view .o_last_breadcrumb_item:contains(Tasks)");
+    expect(".o_list_view button:contains(somebutton)").toHaveCount(1);
+    await animationFrame();
+    expect(".o_breadcrumb").toHaveText("Projects\nTasks");
+    expect(location.href).toBe("https://www.hoot.test/odoo/action-1/1/action-2");
+
+    await click(".o_web_studio_navbar_item");
+    await waitFor(".o_web_studio_editor_manager");
+    expect(".o_list_view button:contains(somebutton)").toHaveCount(1);
+
+    await animationFrame();
+    expect(location.href).toBe(
+        "https://www.hoot.test/odoo/action-1/1/action-2/studio?mode=editor&_tab=views&_view_type=list"
+    );
+
+    redirect("/odoo/action-1/1/action-2");
+    browser.dispatchEvent(new PopStateEvent("popstate", { state: {} }));
+    await waitFor(".o_list_view:not(.o_studio .o_list_view)");
+    expect(".o_list_view button:contains(somebutton)").toHaveCount(1);
+
+    await animationFrame();
+    expect(location.href).toBe("https://www.hoot.test/odoo/action-1/1/action-2");
+
+    redirect("/odoo/action-1/1/action-2/studio?mode=editor&_tab=views&_view_type=list");
+    browser.dispatchEvent(new PopStateEvent("popstate", { state: {} }));
+    await waitFor(".o_studio .o_list_view");
+    expect(".o_list_view button:contains(somebutton)").toHaveCount(1);
+
+    await animationFrame();
+    expect(location.href).toBe(
+        "https://www.hoot.test/odoo/action-1/1/action-2/studio?mode=editor&_tab=views&_view_type=list"
+    );
+});
+
 test("can edit ir.actions.act_window without id", async () => {
-    onRpc("get_formview_action", ({ args }) => ({
+    onRpc("get_record_default_action", ({ args }) => ({
         type: "ir.actions.act_window",
         res_model: "pony",
         target: "current",
@@ -690,12 +808,12 @@ test("can edit ir.actions.act_window without id", async () => {
     await click(".o_form_view .o_field_many2one_selection .o_external_button");
     await animationFrame();
     expect(".breadcrumb-item a:contains(Yop)").toHaveCount(1);
-    await click(".o_web_studio_navbar_item button");
+    await click(".o_web_studio_navbar_item");
     await waitFor(".o_web_studio_editor_manager");
 
     expect(".o_field_widget[name='name']").toHaveText("Rainbow Dash");
-    expect(browser.location.pathname).toBe("/odoo/action-1/1/m-pony/1/studio");
-    expect(browser.location.search).toBe("?mode=editor&_tab=views&_view_type=form");
+    expect(location.pathname).toBe("/odoo/action-1/1/m-pony/1/studio");
+    expect(location.search).toBe("?mode=editor&_tab=views&_view_type=form");
 
     await click(".o_menu_sections button:contains(Views)");
     await animationFrame();
@@ -707,13 +825,11 @@ test("can edit ir.actions.act_window without id", async () => {
     await click(".o_web_studio_leave");
     await waitFor(".o_action_manager:first:not(:has(.o_studio))");
     await waitFor(".o_form_view");
-    // The router pushes its state just after a setTimeout
-    await delay(0);
 
     expect(".o_form_view .o_field_widget[name='name'] input").toHaveValue("Rainbow Dash");
-    expect(".o_breadcrumb").toHaveText("partner Action\nYop\nRainbow Dash");
-    expect(browser.location.pathname).toBe("/odoo/action-1/1/m-pony/1");
-    expect(browser.location.search).toBe(""); // no view type in search means the default view type of the action is taken
+    expect(".o_breadcrumb").toHaveText("Yop\nRainbow Dash");
+    expect(location.pathname).toBe("/odoo/action-1/1/m-pony/1");
+    expect(location.search).toBe(""); // no view type in search means the default view type of the action is taken
 });
 
 test("enter and leave with multirecord view (invalid to load)", async () => {
@@ -727,7 +843,7 @@ test("enter and leave with multirecord view (invalid to load)", async () => {
         display_name: "some dynamic action",
     });
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     expect(".o_web_studio_view_renderer .o_pivot_view").toHaveCount(1);
 
     await contains(".o_web_studio_leave").click();
@@ -749,7 +865,7 @@ test("enter and leave on home menu with multirecord view (invalid to load)", asy
         display_name: "some dynamic action",
     });
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     expect(".o_web_studio_view_renderer .o_pivot_view").toHaveCount(1);
 
     await contains(".o_studio_navbar .o_menu_toggle").click();
@@ -782,7 +898,7 @@ test("enter and leave on home menu with multirecord view (invalid to load) and a
         display_name: "some dynamic action",
     });
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     expect(".o_web_studio_view_renderer .o_pivot_view").toHaveCount(1);
 
     await contains(".o_studio_navbar .o_menu_toggle").click();

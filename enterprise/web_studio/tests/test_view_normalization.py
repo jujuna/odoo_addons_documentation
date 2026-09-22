@@ -1,12 +1,15 @@
 import random
 import textwrap
-from odoo.http import _request_stack
+
+from odoo.http import request_var
 from odoo.tests.common import TransactionCase, tagged
 from odoo.tools import DotDict
+
 from odoo.addons.web_studio.controllers.main import WebStudioController
 
 
 @tagged('web_studio_normalization')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestViewNormalization(TransactionCase):
 
     maxDiff = None
@@ -14,8 +17,11 @@ class TestViewNormalization(TransactionCase):
     def setUp(self):
         super(TestViewNormalization, self).setUp()
         random.seed('https://youtu.be/tFjNH9l6-sQ')
+        self.addCleanup(random.seed)
         self.session = DotDict({'debug': ''})
-        _request_stack.push(self)
+
+        request_reset = request_var.set(self)
+        self.addCleanup(request_var.reset, request_reset)
         self.base_view = self.env.ref('base.view_partner_form')
         self.gantt_view = self.env['ir.ui.view'].create({
             'arch_base':
@@ -33,14 +39,12 @@ class TestViewNormalization(TransactionCase):
                 <sheet>
                     <field name="image_1920" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;image_128&quot;, &quot;size&quot;: [90, 90]}"/>
                     <div class="oe_title">
-                        <field name="is_company" invisible="1"/>
                         <field name="type" invisible="1"/>
-                        <field name="company_type" widget="radio" class="oe_edit_only" on_change="on_change_company_type(company_type)" options="{'horizontal': true}"/>
                         <h1>
                             <field name="name" default_focus="1" placeholder="Name" required="type == 'contact'"/>
                         </h1>
                         <div class="o_row">
-                            <field name="parent_id" placeholder="Company" domain="[('is_company', '=', True)]" context="{'default_is_company': True}" invisible="is_company and not parent_id" on_change="onchange_parent_id(parent_id)"/>
+                            <field name="parent_id" placeholder="Company" domain="[('parent_id', '=', False)]" invisible="not parent_id" on_change="onchange_parent_id(parent_id)"/>
                         </div>
                     </div>
 
@@ -63,7 +67,7 @@ class TestViewNormalization(TransactionCase):
                             <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
                         </group>
                         <group>
-                            <field name="function" placeholder="e.g. Sales Director" invisible="is_company"/>
+                            <field name="function" placeholder="e.g. Sales Director"/>
                             <field name="phone" widget="phone"/>
                             <field name="user_ids" invisible="1"/>
                             <field name="email" widget="email" required="user_ids"/>
@@ -702,7 +706,7 @@ class TestViewNormalization(TransactionCase):
               <xpath expr="//templates//div" position="inside">
                 <div class="o_dropdown_kanban dropdown">
                             <a role="button" class="dropdown-toggle o-no-caret btn" data-bs-toggle="dropdown" href="#">
-                                <span class="fa fa-bars fa-lg" title="menu"/>
+                                <span class="oi oi-lg" data-icon="menu" title="menu"/>
                             </a>
                             <div class="dropdown-menu" role="menu">
                                 <t t-if="widget.editable"><a type="open" class="dropdown-item">Edit</a></t>
@@ -723,7 +727,7 @@ class TestViewNormalization(TransactionCase):
               <xpath expr="/form/sheet/notebook/page/field[@name='child_ids']/kanban//field[@name='name']" position="after">
                 <div class="o_dropdown_kanban dropdown" name="studio_div_302a40">
                   <a role="button" class="dropdown-toggle o-no-caret btn" data-bs-toggle="dropdown" href="#">
-                    <span class="fa fa-bars fa-lg" title="menu"/>
+                    <span class="oi oi-lg" data-icon="menu" title="menu"/>
                   </a>
                   <div class="dropdown-menu" role="menu" name="studio_div_4e2ccd">
                     <t t-if="widget.editable">
@@ -1380,7 +1384,7 @@ class TestViewNormalization(TransactionCase):
                         </page>
                         <page>
                           <group><group name="display_name">
-                              <field name="company_name"/>
+                              <field name="name"/>
                           </group></group>
                         </page>
                     </notebook>
@@ -1510,8 +1514,3 @@ class TestViewNormalization(TransactionCase):
           </xpath>
         </data>
         """)
-
-    def tearDown(self):
-        super(TestViewNormalization, self).tearDown()
-        random.seed()
-        _request_stack.pop()

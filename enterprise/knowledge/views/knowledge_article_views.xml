@@ -35,87 +35,87 @@
                 <field name="is_article_visible_by_everyone" invisible="1"/>
                 <field name="is_article_visible" invisible="1"/>
                 <field name="origin_template_id" invisible="1"/>
-                    <!-- Article header -->
-                    <widget name="knowledge_topbar"/>
-                    <!-- Invisible Article Warning Banner-->
-                    <div class="alert alert-info text-center mb-0" role="alert" groups="base.group_user"
-                         invisible="not id or category != 'workspace' or is_article_visible">
-                        <field name="user_has_access_parent_path" invisible="1"/>
-                        This article is only displayed to its members.
-                        <a invisible="not user_has_access_parent_path" role="button" type="object" name="action_join" class="text-decoration-underline oe_link alert-link">
-                            Join
-                        </a>
-                    </div>
-                    <!-- Archived Article Warning Banner-->
-                    <div class="alert alert-warning text-center mb-0" role="alert"
-                         invisible="active or to_delete">
-                        This article is archived.
-                        <a role="button" class="text-decoration-underline oe_link alert-link" type="object" name="action_unarchive"
-                        invisible="not user_can_write" >Unarchive</a>
-                    </div>
-                    <!-- Trashed Article Warning Banner-->
-                    <div class="alert alert-warning text-center mb-0" role="alert" invisible="not to_delete">
-                        This Article is in Trash and will be deleted on the <field class="mb-0" name="deletion_date"/>.
-                        <a role="button" type="object" name="action_unarchive"
-                                class="text-decoration-underline oe_link alert-link"
-                                invisible="not user_can_write" >
-                            Restore
-                        </a>
-                    </div>
-                    <div class="flex-grow-1 position-relative">
-                        <div class="o_scroll_view o_knowledge_main_view">
-                            <div class="row p-0 m-0" style="height: 100%">
-                                <div class="col-12 col-lg position-relative p-0">
-                                    <div class="o_scroll_view_lg">
-                                        <!-- Article body -->
-                                        <div class="o_knowledge_body d-flex flex-column"
-                                             invisible="not id">
-                                             <!-- Full Width handling -->
-                                             <span class="o_knowledge_article_view_form_dynamic_width d-none"
-                                                   invisible="full_width"/>
-                                            <!-- Article Cover -->
-                                            <span class="pt-md-5" invisible="cover_image_id"/>
-                                            <field name="cover_image_url" invisible="1" />
-                                            <field name="cover_image_position" invisible="1" />
-                                            <widget name="knowledge_cover" invisible="not cover_image_id"/>
-                                            <!-- Article Icon -->
-                                            <field name="icon" widget="knowledge_icon" invisible="not icon" readonly="is_locked or not user_can_write or not active" class="o_knowledge_icon o_large"/>
+                <div class="d-flex flex-grow-1">
+                    <div class="o_knowledge_article_card d-flex flex-column flex-grow-1 min-w-0 bg-view">
+                        <!-- Article header -->
+                        <widget name="knowledge_topbar"/>
+                        <!-- Invisible Article Warning Banner-->
+                        <div class="alert alert-info text-center mb-0 mx-2" role="alert" groups="base.group_user"
+                            invisible="not id or category != 'workspace' or is_article_visible">
+                            <field name="user_has_access_parent_path" invisible="1"/>
+                            This article is only displayed to its members.
+                            <a invisible="not user_has_access_parent_path" role="button" type="object" name="action_join" class="text-decoration-underline oe_link alert-link">
+                                Join
+                            </a>
+                        </div>
+                        <!-- Archived Article Warning Banner-->
+                        <div class="alert alert-warning text-center mb-0 mx-2" role="alert"
+                            invisible="active or to_delete">
+                            This article is archived.
+                            <a role="button" class="text-decoration-underline oe_link alert-link" type="object" name="action_unarchive"
+                            invisible="not user_can_write" >Unarchive</a>
+                        </div>
+                        <!-- Trashed Article Warning Banner-->
+                        <div class="alert alert-warning text-center mb-0 mx-2" role="alert" invisible="not to_delete">
+                            This Article is in Trash and will be deleted on the <field class="mb-0" name="deletion_date"/>.
+                            <a role="button" type="object" name="action_unarchive"
+                                    class="text-decoration-underline oe_link alert-link"
+                                    invisible="not user_can_write" >
+                                Restore
+                            </a>
+                        </div>
+                        <div class="flex-grow-1 position-relative">
+                            <div class="o_scroll_view o_knowledge_main_view">
+                                <div class="row p-0 m-0" style="height: 100%">
+                                    <div class="col-12 col-lg position-relative p-0">
+                                        <div class="o_scroll_view_lg">
                                             <!-- Article body -->
-                                            <div class="o_knowledge_editor mt-3">
-                                                <field name="body" widget="knowledge_html" class="o_field_html" no_label="1" groups="base.group_user"
-                                                    options="{'collaborative': true, 'resizable': False, 'embedded_components': true, 'baseContainers': ['P', 'DIV']}"
-                                                    readonly="is_locked or not user_can_write or not active"/>
-                                                <!-- Portal users get some commands disabled, notably /image and /file, as they don't have access to ir.attachment -->
-                                                <field name="body" widget="knowledge_html" class="o_field_html" no_label="1" groups="base.group_portal"
-                                                    options="{'collaborative': true, 'resizable': False, 'embedded_components': true, 'allowAttachmentCreation': false, 'baseContainers': ['P', 'DIV']}"
-                                                    readonly="is_locked or not user_can_write or not active"/>
+                                            <div class="o_knowledge_body d-flex flex-column h-100"
+                                                invisible="not id">
+                                                <!-- Full Width handling -->
+                                                <span class="o_knowledge_article_view_form_dynamic_width d-none"
+                                                    invisible="full_width"/>
+                                                <!-- Article Cover -->
+                                                <span class="pt-md-5" invisible="cover_image_id"/>
+                                                <field name="cover_image_url" invisible="1" />
+                                                <field name="cover_image_position" invisible="1" />
+                                                <widget name="knowledge_cover" invisible="not cover_image_id"/>
+                                                <!-- Article Icon -->
+                                                <field name="icon" widget="knowledge_icon" invisible="not icon" readonly="is_locked or not user_can_write or not active" class="o_knowledge_icon o_large"/>
+                                                <!-- Article body -->
+                                                <div class="o_knowledge_editor mt-3 h-100">
+                                                    <field name="body" widget="knowledge_html" class="o_field_html h-100" no_label="1" groups="base.group_user"
+                                                        options="{'collaborative': true, 'resizable': False, 'embedded_components': true, 'baseContainers': ['P', 'DIV'], 'allowWhiteboard': true}"
+                                                        readonly="is_locked or not user_can_write or not active"/>
+                                                    <!-- Portal users get some commands disabled, notably /file, as they don't have access to ir.attachment.
+                                                    Though they can upload images using /media command -->
+                                                    <field name="body" widget="knowledge_html" class="o_field_html h-100" no_label="1" groups="base.group_portal"
+                                                        options="{'collaborative': true, 'resizable': False, 'embedded_components': true, 'allowFile': false, 'baseContainers': ['P', 'DIV'], 'allowWhiteboard': true}"
+                                                        readonly="is_locked or not user_can_write or not active"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- No Content Helper -->
+                                        <div class="o_view_nocontent" invisible="id">
+                                            <div class="o_nocontent_help">
+                                                <p class="o_view_nocontent_smiling_face">
+                                                    No article yet.
+                                                </p>
+                                                <p>
+                                                    <a role="button" class="o_nocontent_create_btn">
+                                                        Create an article
+                                                    </a>
+                                                    to unleash the power of Knowledge !
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- No Content Helper -->
-                                    <div class="o_view_nocontent" invisible="id">
-                                        <div class="o_nocontent_help">
-                                            <p class="o_view_nocontent_smiling_face">
-                                                 No article yet.
-                                            </p>
-                                            <p>
-                                                <a role="button" class="o_nocontent_create_btn">
-                                                    Create an article
-                                                </a>
-                                                to unleash the power of Knowledge !
-                                            </p>
-                                        </div>
-                                    </div>
                                 </div>
-                                <!-- Properties -->
-                                <widget name="knowledge_properties_panel"/>
-                                <!-- Chatter -->
-                                <widget name="knowledge_chatter_panel" groups="base.group_user"/>
-                                <!-- Comments Panel -->
-                                <widget name="knowledge_comments_panel"/>
                             </div>
                         </div>
                     </div>
+                    <widget name="knowledge_side_panel"/>
+                </div>
                 <field name="icon" invisible="1" readonly="is_locked or not user_can_write"/>
             </form>
         </field>
@@ -140,10 +140,10 @@
                                 <field name="icon"/>
                             </div>
                             <button name="action_toggle_favorite" type="object"
-                                icon="fa-star mt-1 me-1" class="o_knowledge_toggle_favorite position-absolute top-0 end-0 p-0 h-100"
+                                icon="star" icon_class="oi-filled mt-1 me-1" class="o_knowledge_toggle_favorite position-absolute top-0 end-0 p-0 h-100"
                                 title="Remove from favorites" invisible="not is_user_favorite"/>
                             <button name="action_toggle_favorite" type="object"
-                                icon="fa-star-o mt-1 me-1" class="o_knowledge_toggle_favorite position-absolute top-0 end-0 p-0 h-100"
+                                icon="star" icon_class="mt-1 me-1" class="o_knowledge_toggle_favorite position-absolute top-0 end-0 p-0 h-100"
                                 title="Add to favorites" invisible="is_user_favorite"/>
                         </div>
                         <div class="o_hierarchy_node_body d-flex flex-column text-center h-auto px-2">
@@ -155,12 +155,7 @@
                             </div>
                             <div class="d-flex align-items-center" t-if="isRoot">
                                 <div class="flex-grow-1 text-truncate">
-                                    <i t-att-title="record.category.value" class="fa me-1"
-                                        t-att-class="{
-                                            'fa-building': record.category.raw_value === 'workspace',
-                                            'fa-users': record.category.raw_value === 'shared',
-                                            'fa-user': record.category.raw_value === 'private'
-                                        }"/>
+                                    <i t-att-title="record.category.value" class="oi oi-filled me-1" t-att-data-icon="{'workspace': 'business', 'shared': 'group', 'private': 'person'}[record.category.raw_value]"/>
                                     <field name="category"/>
                                 </div>
                             </div>
@@ -179,15 +174,15 @@
             <list default_order="is_user_favorite desc, favorite_count desc"
                   js_class="knowledge_article_view_tree">
                 <header>
-                    <button string="Send to Trash" icon="fa-trash" type="object" name="action_send_to_trash" class="btn"/>
+                    <button string="Move to Trash" icon="delete" icon_class="oi-filled" type="object" name="action_send_to_trash" class="btn"/>
                 </header>
                 <field name="display_name" string="Name"/>
                 <field name="is_user_favorite" column_invisible="True"/>
                 <button name="action_toggle_favorite" string=" " type="object"
-                        icon="fa-star pe-2" class="o_knowledge_toggle_favorite"
+                        icon="star" icon_class="oi-filled pe-2" class="o_knowledge_toggle_favorite"
                         invisible="not is_user_favorite"/>
                 <button name="action_toggle_favorite" string=" " type="object"
-                        icon="fa-star-o pe-2" class="o_knowledge_toggle_favorite"
+                        icon="star" icon_class="pe-2" class="o_knowledge_toggle_favorite"
                         invisible="is_user_favorite"/>
                 <field name="parent_id"/>
                 <field name="create_uid" string="Created by" widget="many2one_avatar_user" optional="show"/>
@@ -209,15 +204,15 @@
             <list create="0" default_order="write_date desc"
                   js_class="knowledge_article_view_tree">
                 <header>
-                    <button string="Restore" icon="oi-unarchive" type="object" name="action_unarchive" class="btn"/>
+                    <button string="Restore" icon="unarchive" type="object" name="action_unarchive" class="btn"/>
                 </header>
                 <field name="display_name" string="Name"/>
                 <field name="is_user_favorite" column_invisible="True"/>
                 <button name="action_toggle_favorite" string=" " type="object"
-                        icon="fa-star pe-2" class="o_knowledge_toggle_favorite"
+                        icon="star" icon_class="oi-filled pe-2" class="o_knowledge_toggle_favorite"
                         invisible="not is_user_favorite"/>
                 <button name="action_toggle_favorite" string=" " type="object"
-                        icon="fa-star-o pe-2" class="o_knowledge_toggle_favorite"
+                        icon="star" icon_class="pe-2" class="o_knowledge_toggle_favorite"
                         invisible="is_user_favorite"/>
                 <field name="category" optional="hide"/>
                 <field name="favorite_count" column_invisible="True"/>
@@ -249,18 +244,18 @@
         <field name="model">knowledge.article</field>
         <field name="priority">32</field>
         <field name="arch" type="xml">
-            <list create="1" js_class="knowledge_article_view_tree_embedded" default_order="sequence asc, write_date desc, id desc">
+            <list js_class="knowledge_article_view_tree_embedded" default_order="sequence asc, write_date desc, id desc">
                 <header>
-                    <button string="Trash" icon="fa-trash" type="object" name="action_send_to_trash" class="btn"/>
+                    <button string="Trash" icon="delete" icon_class="oi-filled" type="object" name="action_send_to_trash" class="btn"/>
                 </header>
                 <field name="sequence" widget="handle"/>
                 <field name="display_name" string="Name"/>
                 <field name="is_user_favorite" column_invisible="True"/>
                 <button name="action_toggle_favorite" string=" " type="object"
-                        icon="fa-star pe-2" class="o_knowledge_toggle_favorite"
+                        icon="star" icon_class="oi-filled pe-2" class="o_knowledge_toggle_favorite"
                         invisible="not is_user_favorite"/>
                 <button name="action_toggle_favorite" string=" " type="object"
-                        icon="fa-star-o pe-2" class="o_knowledge_toggle_favorite"
+                        icon="star" icon_class="pe-2" class="o_knowledge_toggle_favorite"
                         invisible="is_user_favorite"/>
                 <field name="create_uid" string="Created by" widget="many2one_avatar_user" optional="show"/>
                 <field name="create_date" string="Created on" optional="show"/>
@@ -292,9 +287,9 @@
                                     intermediate action that will do a sudo call on the `knowledge.article` model. -->
                             <a type="object" name="action_toggle_favorite" class="o_knowledge_toggle_favorite mb-auto mt-1 me-1">
                                 <i invisible="not is_user_favorite"
-                                   class="fa fa-star" title="Remove from favorites"/>
+                                   class="oi oi-filled" data-icon="star" title="Remove from favorites"/>
                                 <i invisible="is_user_favorite"
-                                   class="fa fa-star-o" title="Add to favorites"/>
+                                   class="oi" data-icon="star" title="Add to favorites"/>
                             </a>
                         </div>
                         <field name="parent_id" class="text-muted text-truncate"/>
@@ -323,28 +318,28 @@
                 <field name="parent_id"/>
                 <templates>
                     <t t-name="card" class="flex-row">
-                        <aside t-if="record.cover_image_url.raw_value.length > 0" class="o_kanban_aside_full me-2">
+                        <aside t-if="record.cover_image_url.raw_value.length > 0" class="o_card_aside_full me-2">
                             <div t-attf-style="background-image: url(#{record.cover_image_url.raw_value}); background-size: cover; background-position: center;" role="img"/>
                         </aside>
                         <main>
                             <div class="d-flex">
                                 <div class="d-flex">
                                     <field name="icon" widget="knowledge_icon" class="me-2" readonly="is_locked or not user_has_write_access" invisible="not icon"/>
-                                    <field name="name" invisible="is_template"/>
+                                    <field name="name" invisible="is_template" class="fw-bold fs-5"/>
                                     <field name="template_name" invisible="not is_template" class="fw-bolder fs-5"/>
                                     <div invisible="(is_template and template_name) or (not is_template and name)">Untitled</div>
                                 </div>
                                 <a type="object" name="action_toggle_favorite" class="o_knowledge_toggle_favorite ms-auto mb-auto pe-1">
                                     <i invisible="not is_user_favorite"
-                                       class="fa fa-star" title="Remove from favorites"/>
+                                       class="oi oi-filled" data-icon="star" title="Remove from favorites"/>
                                     <i invisible="is_user_favorite"
-                                       class="fa fa-star-o" title="Add to favorites"/>
+                                       class="oi" data-icon="star" title="Add to favorites"/>
                                 </a>
                             </div>
                             <field name="article_properties" widget="properties"/>
-                            <footer>
-                                <field name="activity_ids" widget="kanban_activity" class="ms-auto"/>
-                                <field name="create_uid" widget="many2one_avatar_user"/>
+                            <footer class="pt-1">
+                                <field name="activity_ids" widget="kanban_activity"/>
+                                <field name="create_uid" widget="many2one_avatar_user" class="ms-auto"/>
                             </footer>
                         </main>
                     </t>
@@ -417,6 +412,10 @@
                     domain="[('active', '=', False)]"/>
                 <filter name="filter_trashed" string="Trashed"
                     domain="[('active', '=', False), ('to_delete', '=', True)]"/>
+                <separator invisible="1"/>
+                <filter invisible="1" string="My Activities" name="filter_activities_my"
+                        domain="[('activity_user_id', '=', uid)]"/>
+                <separator invisible="1"/>
                 <filter invisible="1" string="Late Activities" name="activities_overdue"
                     domain="[('my_activity_date_deadline', '&lt;', 'today')]"
                     help="Show all records whose next activity date is past"/>

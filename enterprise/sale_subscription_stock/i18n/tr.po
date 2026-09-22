@@ -10,17 +10,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-11-21 14:41+0000\n"
-"Last-Translator: Odoo Turkish Import <dyki+tr@odoo.com>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:57+0000\n"
+"PO-Revision-Date: 2026-09-18 00:53+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
 "sale_subscription_stock/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_subscription_stock
 #. odoo-python
@@ -34,6 +34,11 @@ msgstr ""
 "oluşturulmasını engelledi. Teslimatınızın işlendiğinden emin olmak için "
 "lütfen \"Abonelik: Teslimat oluştur\" eylemini kullanarak manuel olarak "
 "tetikleyin."
+
+#. module: sale_subscription_stock
+#: model:ir.module.module,summary:base.module_sale_subscription_stock
+msgid "Allow to create recurring order on storable product"
+msgstr ""
 
 #. module: sale_subscription_stock
 #. odoo-python
@@ -57,7 +62,6 @@ msgstr "Deterjan (SUB)"
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_sale_order_line__display_name
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_forecasted_product_product__display_name
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_picking__display_name
-#: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_return_picking_line__display_name
 msgid "Display Name"
 msgstr "İsim Göster"
 
@@ -67,11 +71,15 @@ msgid "Display Recurring Stock Delivery Warning"
 msgstr "Yinelenen Stok Teslim Uyarısını Görüntüleme"
 
 #. module: sale_subscription_stock
+#: model:ir.actions.server,name:sale_subscription_stock.action_compute_price_bom_product
+msgid "Generate delivery"
+msgstr ""
+
+#. module: sale_subscription_stock
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_sale_order__id
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_sale_order_line__id
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_forecasted_product_product__id
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_picking__id
-#: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_return_picking_line__id
 msgid "ID"
 msgstr "ID"
 
@@ -82,22 +90,24 @@ msgid "New picking has been confirmed"
 msgstr "Yeni toplama onaylandı"
 
 #. module: sale_subscription_stock
-#: model_terms:ir.ui.view,arch_db:sale_subscription_stock.product_template_form_view
-msgid ""
-"Recurring order with this product will be invoiced at the beginning of the "
-"period."
+#: model:ir.module.module,shortdesc:base.module_sale_subscription_stock
+msgid "Sale Subscriptions Stock"
 msgstr ""
 
 #. module: sale_subscription_stock
-#: model_terms:ir.ui.view,arch_db:sale_subscription_stock.product_template_form_view
+#: model:ir.module.module,description:base.module_sale_subscription_stock
 msgid ""
-"Recurring order with this product will be invoiced at the end of the period."
-msgstr ""
-"Bu ürün ile tekrar eden siparişler dönem sonunda faturalandırılacaktır."
-
-#. module: sale_subscription_stock
-#: model:ir.model,name:sale_subscription_stock.model_stock_return_picking_line
-msgid "Return Picking Line"
+"Sale Subscriptions Stock\n"
+"\n"
+"Sale Subscription Stock is a bridge module between sale_subscription and\n"
+"sale_stock. The purpose of this module is to allow the user to create\n"
+"subscription sale order with storable product which will result in\n"
+"recurring delivery order and invoicing of those products.\n"
+"Features:\n"
+"- Allow the creation of recurring storable product\n"
+"- Automaticaly create delivery order for the recurring storable product\n"
+"- Invoice delivered recurring product at the end of invoicing period\n"
+"- Report planned delivery for active subscriptions\n"
 msgstr ""
 
 #. module: sale_subscription_stock
@@ -114,11 +124,6 @@ msgstr "Satış Sipariş Satırı"
 #: model:ir.model,name:sale_subscription_stock.model_stock_forecasted_product_product
 msgid "Stock Replenishment Report"
 msgstr "Stok İkmal Raporu"
-
-#. module: sale_subscription_stock
-#: model:ir.actions.server,name:sale_subscription_stock.action_compute_price_bom_product
-msgid "Subscription: Generate delivery"
-msgstr "Abonelik: Teslimat oluşturun"
 
 #. module: sale_subscription_stock
 #. odoo-javascript
@@ -141,3 +146,6 @@ msgstr ""
 #: model:ir.model,name:sale_subscription_stock.model_stock_picking
 msgid "Transfer"
 msgstr "Aktarım"
+
+msgid "Subscription: Generate delivery"
+msgstr "Abonelik: Teslimat oluşturun"

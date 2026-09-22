@@ -1,6 +1,5 @@
 import { patch } from "@web/core/utils/patch";
 import { ProductTemplate } from "@point_of_sale/app/models/product_template";
-import { isFiscalPrinterConfigured } from "./helpers/utils";
 
 patch(ProductTemplate.prototype, {
     // EXTENDS 'point_of_sale'
@@ -14,8 +13,7 @@ patch(ProductTemplate.prototype, {
             pricelist,
             fiscalPosition
         );
-        const config = this.models["pos.config"].getFirst();
-        extraValues.l10n_it_epson_printer = isFiscalPrinterConfigured(config);
+        extraValues.l10n_it_epson_printer = this.config.useFiscalPrinter;
         return extraValues;
     },
 });

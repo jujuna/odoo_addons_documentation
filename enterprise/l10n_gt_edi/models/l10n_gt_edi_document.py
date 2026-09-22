@@ -11,11 +11,15 @@ class L10nGtEdiDocument(models.Model):
         selection=[
             ('invoice_sent', 'Sent'),
             ('invoice_sending_failed', 'Sending Failed'),
+            ('invoice_cancelled', 'Cancelled'),
+            ('invoice_cancel_failed', 'Cancel Failed'),
         ],
         string='GT Status',
         required=True,
         help="Sent -> Successfully sent to the SAT.\n"
-             "Sending Failed -> Sending error or validation error from the SAT.",
+             "Sending Failed -> Sending error or validation error from the SAT.\n"
+             "Cancelled -> Successfully cancelled at the SAT.\n"
+             "Cancel Failed -> Cancellation error from the SAT.",
     )
     datetime = fields.Datetime(default=fields.Datetime.now, required=True)
     attachment_id = fields.Many2one(comodel_name='ir.attachment', readonly=True)
@@ -24,6 +28,7 @@ class L10nGtEdiDocument(models.Model):
     series = fields.Char()
     serial_number = fields.Char()
     certification_date = fields.Char()
+    cancel_reason = fields.Char()
 
     def action_download_file(self):
         """ Download the XML file linked to the document.

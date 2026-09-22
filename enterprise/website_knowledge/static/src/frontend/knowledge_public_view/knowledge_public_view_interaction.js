@@ -1,15 +1,29 @@
-import { reactive, xml } from "@odoo/owl";
+import { Component, xml, proxy, useProps, t } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { Interaction } from "@web/public/interaction";
 import { Article } from "@website_knowledge/frontend/knowledge_public_view/knowledge_public_article";
 import { KnowledgePublicSidebar } from "@website_knowledge/frontend/sidebar/knowledge_public_sidebar";
+import { KnowledgeReadOnlyHeadingLink } from "@knowledge/components/knowledge_readonly_heading_link/knowledge_readonly_heading_link";
 import { patch } from "@web/core/utils/patch";
 import { router } from "@web/core/browser/router";
-import { browser } from "@web/core/browser/browser";
+import { location } from "@web/core/browser/browser";
 import { stateToUrl, urlToState } from "@knowledge/portal_webclient/router_utils";
 
 const SIDEBAR_ENABLE_BUTTON_SELECTOR = ".o_knowledge_sidebar_enabler_button";
-const contentTemplate = xml`<t t-out="content"/>`;
+const contentTemplate = xml`<t t-out="this.content"/>`;
+
+class HeadingLinkLocalOverlay extends Component {
+    static template = xml`<div class="o-public-local-overlay position-relative h-0 w-0">
+        <KnowledgeReadOnlyHeadingLink readonlyElementRef="this.props.readonlyElementRef"/>
+    </div>`;
+    static components = {
+        KnowledgeReadOnlyHeadingLink,
+    };
+
+    props = useProps({
+        readonlyElementRef: t.function([], t.ref()),
+    });
+}
 
 export class KnowledgePublicViewInteraction extends Interaction {
     static selector = ".o_knowledge_public_view";
@@ -41,11 +55,20 @@ export class KnowledgePublicViewInteraction extends Interaction {
             "t-att-href": () =>
                 `/web/login?redirect=/knowledge/article/${this.subEnv.record.resId}`,
         },
+        ".o_knowledge_article": {
+            "t-component": (target) => [
+                HeadingLinkLocalOverlay,
+                {
+                    readonlyElementRef: () => target.querySelector(".o_readonly"),
+                },
+            ],
+        },
     };
 
     setup() {
         this.interactionService = this.services["public.interactions"];
-        this.state = reactive({
+        this.uiService = this.services.ui;
+        this.state = proxy({
             showSidebar: false,
         });
         const handleButtonVisibility = () => {
@@ -61,7 +84,7 @@ export class KnowledgePublicViewInteraction extends Interaction {
                 container.replaceChildren();
                 // Interactions are restarted during the renderAt process.
                 this.renderAt(contentTemplate, { content: this.subEnv.record.content }, container);
-                if (this.env.isSmall) {
+                if (this.uiService.isSmall) {
                     this.subEnv.toggleSidebar(false);
                 } else {
                     handleButtonVisibility();
@@ -77,12 +100,12 @@ export class KnowledgePublicViewInteraction extends Interaction {
             stateToUrl,
             urlToState,
         });
-        router.replaceState(router.urlToState(new URL(browser.location)));
+        router.replaceState(router.urlToState(new URL(location)));
     }
 
     async willStart() {
         if (this.el.querySelector(".o_knowledge_sidebar_container")) {
-            this.subEnv.toggleSidebar(!this.env.isSmall);
+            this.subEnv.toggleSidebar(!this.uiService.isSmall);
         }
     }
 

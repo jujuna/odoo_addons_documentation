@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': "MRP Barcode",
     'category': 'Supply Chain/Inventory',
     'summary': 'Process Manufacturing Orders from the barcode application',
-    'version': '1.0',
     'depends': ['stock_barcode', 'mrp'],
     'auto_install': True,
     'author': 'Odoo S.A.',

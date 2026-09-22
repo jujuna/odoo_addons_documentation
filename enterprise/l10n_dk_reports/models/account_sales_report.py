@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import csv
 import io
-from collections import defaultdict
 
 from odoo import _, models
 from odoo.exceptions import RedirectWarning
@@ -9,58 +8,28 @@ from odoo.exceptions import RedirectWarning
 
 class L10n_DkEcSalesReportHandler(models.AbstractModel):
     _name = 'l10n_dk.ec.sales.report.handler'
-    _inherit = ['account.ec.sales.report.handler']
+    _inherit = ['account.ec.sales.with.tags.report.handler']
     _description = 'Denmark EC Sales Report Custom Handler'
 
-    def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
-        """
-        Generate the dynamic lines for the report in a horizontal style
-        (one line partner, one column per operation type).
-        """
-
-        lines = []
-
-        totals_by_column_group = {
-            column_group_key: {
-                "goods": 0.0,
-                "services": 0.0,
-                "triangular": 0.0,
-                "balance": 0.0,
-            }
-            for column_group_key in options['column_groups']
-        }
-
-        for partner, results in super()._query_partners(report, options):
-            partner_values = defaultdict(dict)
-
-            for column_group_key in options['column_groups']:
-                partner_sum = results.get(column_group_key, {})
-                partner_values[column_group_key]['vat_number'] = partner_sum.get('vat_number', '')
-                partner_values[column_group_key]['country_code'] = partner_sum.get('country_code', 'UNKNOWN')
-                partner_values[column_group_key]['goods'] = partner_sum.get('goods', 0.0)
-                partner_values[column_group_key]['services'] = partner_sum.get('services', 0.0)
-                partner_values[column_group_key]['triangular'] = partner_sum.get('triangular', 0.0)
-                line_balance = partner_sum.get('goods', 0.0) + partner_sum.get('services', 0.0) + partner_sum.get('triangular', 0.0)
-                partner_values[column_group_key]['balance'] = line_balance
-
-                totals_by_column_group[column_group_key]['goods'] += partner_sum.get('goods', 0.0)
-                totals_by_column_group[column_group_key]['services'] += partner_sum.get('services', 0.0)
-                totals_by_column_group[column_group_key]['triangular'] += partner_sum.get('triangular', 0.0)
-                totals_by_column_group[column_group_key]['balance'] += line_balance
-
-            lines.append((0, super()._get_report_line_partner(report, options, partner, partner_values)))
-
-        lines.append((0, super()._get_report_line_total(report, options, totals_by_column_group)))
-        return lines
-
     def _custom_options_initializer(self, report, options, previous_options):
-        """
-        Add custom options for the invoice lines domain specific to Denmark
 
-        Typically, the taxes account.report.expression ids relative to the country for the triangular, sale of goods
-        or services.
-        """
+        dk_tax_tags = self._get_ec_sales_tax_tags()
+        options.update({
+            'sales_report_operation_types': {
+                'goods': {
+                    'tax_tag_ids': dk_tax_tags['goods'],
+                },
+                'services': {
+                    'tax_tag_ids': dk_tax_tags['services'],
+                },
+                'triangular': {
+                    'tax_tag_ids': dk_tax_tags['triangular'],
+                },
+            },
+        })
+
         super()._custom_options_initializer(report, options, previous_options)
+
         options.setdefault('buttons', []).append({
             'name': _('CSV'),
             'sequence': 30,
@@ -69,28 +38,32 @@ class L10n_DkEcSalesReportHandler(models.AbstractModel):
             'file_export_type': _('CSV'),
         })
 
-        report_goods_eu_tag = self.env.ref('l10n_dk.account_tax_report_line_section_b_product_eu_tag')
-        report_services_eu_tag = self.env.ref('l10n_dk.account_tax_report_line_section_b_services_tag')
-        report_triangular_eu_tag = self.env.ref('l10n_dk.account_tax_report_line_section_b_triangular_tag')
+    def _get_ec_sales_tax_tags(self):
+        # Overrides account_reports
+        goods_expression = self.env.ref('l10n_dk.account_tax_report_line_section_b_product_eu_tag')
+        services_expression = self.env.ref('l10n_dk.account_tax_report_line_section_b_services_tag')
+        triangular_expression = self.env.ref('l10n_dk.account_tax_report_line_section_b_triangular_tag')
 
-        ec_operation_category = options.get('sales_report_taxes', {})
-        ec_operation_category['goods'] = report_goods_eu_tag._get_matching_tags().ids
-        ec_operation_category['services'] = report_services_eu_tag._get_matching_tags().ids
-        ec_operation_category['triangular'] = report_triangular_eu_tag._get_matching_tags().ids
+        return {
+            'goods': goods_expression._get_matching_tags().ids,
+            'services': services_expression._get_matching_tags().ids,
+            'triangular': triangular_expression._get_matching_tags().ids,
+        }
 
-        # Unset this as 'use_taxes_instead_of_tags' should never be used outside of the generic ec sales report
-        ec_operation_category['use_taxes_instead_of_tags'] = False
-
-        options.update({
-            'sales_report_taxes': ec_operation_category,
-            'rounding_unit': 'units',  # So that the report is rounded by default
-        })
+    def _report_engine_ec_sales_report(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        results = super()._report_engine_ec_sales_report(options, date_scope, formulas_dict, current_groupby, warnings)
+        if current_groupby:
+            for key, res in results[next(iter(formulas_dict.values()))]:
+                # Denmark government impose that country code for greece is EL
+                if res['country_code'] == 'GR':
+                    res['country_code'] = 'EL'
+        return results
 
     def export_sales_report_to_csv(self, options):
         colname_to_idx = {col['expression_label']: idx for idx, col in enumerate(options.get('columns', []))}
         report = self.env['account.report'].browse(options['report_id'])
 
-        cvr_number = self.env.company.company_registry
+        cvr_number = self.env.company.partner_id._get_additional_identifier('DK_CVR')
         if not cvr_number:
             raise RedirectWarning(
                 _("No CVR number associated with your company."),
@@ -104,21 +77,22 @@ class L10n_DkEcSalesReportHandler(models.AbstractModel):
             [0, cvr_number, 'LISTE', '', '', '', '', '', ''],
         ]
 
-        # We don't need formatting since we just need raw data
-        options['no_format'] = True
         lines = report._get_lines(options)
 
         date_formatted = options['date'].get('date_to')
         index = 0
-        for line in lines[:-1]:
-            customer_vat = line['columns'][colname_to_idx['vat_number']].get('name', '')
+        for line in lines:
+            if report._get_model_info_from_id(line.id)[0] != 'res.partner':
+                continue
+
+            customer_vat = line.columns[colname_to_idx['vat_number']].name
 
             if not customer_vat:
                 redirect_action = {
                     'view_mode': 'form',
                     'res_model': 'res.partner',
                     'type': 'ir.actions.act_window',
-                    'res_id': int(report._get_model_info_from_id(line['id'])[1]),
+                    'res_id': int(report._get_model_info_from_id(line.id)[1]),
                     'views': [(False, 'form')]
                 }
                 raise RedirectWarning(
@@ -127,11 +101,7 @@ class L10n_DkEcSalesReportHandler(models.AbstractModel):
                     _("Change the VAT number")
                 )
 
-            country_code = line['columns'][colname_to_idx['country_code']].get('name', '')
-
-            # Denmark government impose that country code for greece is EL
-            if country_code == 'GR':
-                country_code = 'EL'
+            country_code = line.columns[colname_to_idx['country_code']].name or ''
 
             # line entry, should always start with 'id 2' format:
             # 2, id, end date of the report, our company cvr number, the partner country code, partner VAT, amounts for goods, triangular, services
@@ -143,9 +113,9 @@ class L10n_DkEcSalesReportHandler(models.AbstractModel):
                     cvr_number,
                     country_code,
                     customer_vat,
-                    round(line['columns'][colname_to_idx['goods']].get('no_format', 0)),
-                    round(line['columns'][colname_to_idx['triangular']].get('no_format', 0)),
-                    round(line['columns'][colname_to_idx['services']].get('no_format', 0)),
+                    round(line.columns[colname_to_idx['goods']].no_format or 0),
+                    round(line.columns[colname_to_idx['triangular']].no_format or 0),
+                    round(line.columns[colname_to_idx['services']].no_format or 0),
                 ]
             )
             index += 1
@@ -156,7 +126,7 @@ class L10n_DkEcSalesReportHandler(models.AbstractModel):
             [
                 10,
                 index,
-                round(lines[-1]['columns'][colname_to_idx['balance']]['no_format']) if lines else 0,
+                round(lines[-1].columns[colname_to_idx['balance']].no_format) if lines else 0,
                 '',
                 '',
                 '',

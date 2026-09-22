@@ -15,7 +15,7 @@
         'data/saft_report.xml',
         'data/l10n_at_saft.account.csv',
         'views/res_config_settings_views.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

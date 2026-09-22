@@ -2,9 +2,12 @@
 
 from datetime import date, timedelta
 
+from freezegun import freeze_time
+
 from odoo.tests import HttpCase, tagged
 
 from odoo.addons.hr_timesheet.tests.test_timesheet import TestCommonTimesheet
+from odoo.addons.hr.tests.test_utils import get_admin_employee
 
 
 @tagged('-at_install', 'post_install')
@@ -18,11 +21,19 @@ class TestRecordTime(TestCommonTimesheet, HttpCase):
             'name': 'Test Project'
         })
 
-    def test_record_time(self):
-        self.start_tour('/odoo', 'timesheet_record_time', login='admin', timeout=100)
+        cls.admin_employee = get_admin_employee(cls.env)
 
     def test_timesheet_overtime(self):
-        self.empl_employee.resource_calendar_id.flexible_hours = True
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 40,
+            'hours_per_day': 8
+        })
+        self.empl_employee.write({
+            'resource_calendar_id': flexible_calendar.id,
+        })
         # Get this week's Monday (or next Monday if today is Sunday)
         relevant_monday = date.today() + timedelta(
             days=-date.today().weekday() + (7 if date.today().weekday() == 6 else 0)
@@ -60,27 +71,25 @@ class TestRecordTime(TestCommonTimesheet, HttpCase):
             'company_id': company.id,
         })
 
-        # Create flexible calendar
-        calendar = self.env['resource.calendar'].create({
-            'name': 'Calendar 8h',
-            'tz': 'UTC',
-            'full_time_required_hours': 8.0,
-            'hours_per_day': 8.0,
-            'flexible_hours': True,
-        })
-
         # Create employee linked to user
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 8,
+            'hours_per_day': 8,
+            'company_id': company.id,
+        })
         employee = self.env['hr.employee'].create({
             'name': 'Test Employee',
             'user_id': test_user.id,
             'company_id': company.id,
-            'resource_calendar_id': calendar.id,
+            'resource_calendar_id': flexible_calendar.id,
         })
 
         # Ensure company calendar is NOT flexible (to avoid global override)
         company.resource_calendar_id = self.env['resource.calendar'].create({
             'name': 'Company Calendar (Rigid)',
-            'flexible_hours': False,
         })
 
         # Call grid_unavailability() with the employee
@@ -103,3 +112,51 @@ class TestRecordTime(TestCommonTimesheet, HttpCase):
         # Company availability
         self.assertTrue(len(unavailable_days[False]))
         self.assertFalse(unavailable_days[employee.id])
+
+    def test_timer_onchange_project_prefills_recent_task(self):
+        """Selecting a project in the timer prefills the most recent eligible task the user logged time on."""
+        Timesheet = self.env['account.analytic.line'].with_user(self.user_employee)
+        timesheet = self.env['account.analytic.line'].create({
+            'name': '/',
+            'date': date.today() - timedelta(days=60),
+            'project_id': self.project_customer.id,
+            'task_id': self.task1.id,
+            'employee_id': self.empl_employee.id,
+            'unit_amount': 1.0,
+        })
+
+        line = Timesheet.with_context(timesheet_timer_search=True).new({'project_id': self.project_customer.id})
+        line._onchange_project_id()
+        self.assertFalse(line.task_id, "The timer should not prefill a task that is no longer relevant")
+
+        timesheet.date = date.today()
+        line = Timesheet.with_context(timesheet_timer_search=True).new({'project_id': self.project_customer.id})
+        line._onchange_project_id()
+        self.assertEqual(line.task_id, self.task1,
+                         "The timer should prefill the task the user recently logged time on")
+
+        line = Timesheet.new({'project_id': self.project_customer.id})
+        line._onchange_project_id()
+        self.assertFalse(line.task_id, "Selecting a project only prefills a task in the timer")
+
+        timesheet.task_id = False
+        line = Timesheet.with_context(timesheet_timer_search=True).new({'project_id': self.project_customer.id})
+        line._onchange_project_id()
+        self.assertFalse(line.task_id, "The timer should prefill no task when the last timesheet has none")
+
+    @freeze_time('2026-07-13 00:30:00')  # 00:30 UTC == 20:30 the previous day in America/Guadeloupe (UTC-4)
+    def test_systray_timer_survives_utc_midnight(self):
+        """A running timer stays visible in the systray after the server's UTC clock
+        passes midnight while it is still the previous day in the user's timezone."""
+        self.user_employee.tz = 'America/Guadeloupe'
+        self.user_employee.password = self.user_employee.login
+        self.authenticate(self.user_employee.login, self.user_employee.login)
+        running = self.env['account.analytic.line'].create({
+            'name': '/',
+            'project_id': self.project_customer.id,
+            'employee_id': self.empl_employee.id,
+            'date': date(2026, 7, 12),
+            'unit_amount': 0.0,
+        })
+        result = self.make_jsonrpc_request('/timesheet_grid/timesheet_systray_user_data', params={})
+        self.assertIn(running.id, [ts['id'] for ts in result['timesheets']['records']])

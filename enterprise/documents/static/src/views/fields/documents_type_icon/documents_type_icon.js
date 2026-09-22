@@ -1,28 +1,26 @@
-import { Component, useRef } from "@odoo/owl";
+import { Component, signal, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class DocumentsTypeIcon extends Component {
     static template = "documents.DocumentsTypeIcon";
-    static props = { ...standardFieldProps };
+    props = useProps(standardFieldProps);
 
-    setup() {
-        this.fileInput = useRef("fileInput");
-    }
+    fileInputRef = signal.ref();
 
     onClickDocumentsRequest() {
-        this.fileInput.el.click();
+        this.fileInputRef().click();
     }
 
     async onReplaceDocument() {
-        if (!this.fileInput.el.files.length) {
+        if (!this.fileInputRef().files.length) {
             return;
         }
         await this.env.model.env.documentsView.bus.trigger("documents-upload-files", {
-            files: this.fileInput.el.files,
+            files: this.fileInputRef().files,
             accessToken: this.props.record.data.access_token,
         });
-        this.fileInput.el.value = "";
+        this.fileInputRef().value = "";
     }
 }
 

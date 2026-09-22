@@ -3,24 +3,34 @@
 # * pos_hr
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025.
-# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025.
+# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025, 2026.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-12-20 09:51+0000\n"
+"POT-Creation-Date: 2026-08-28 17:42+0000\n"
+"PO-Revision-Date: 2026-08-31 20:44+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/pos_hr/es_419/>\n"
+"odoo-s19-4/pos_hr/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: pos_hr
+#: model:ir.module.module,description:base.module_pos_hr
+msgid ""
+"\n"
+"This module allows Employees (and not users) to log in to the Point of Sale "
+"application using a barcode, a PIN number or both.\n"
+"The actual till still requires one user but an unlimited number of employees "
+"can log on to that till and process sales.\n"
+msgstr ""
 
 #. module: pos_hr
 #: model_terms:ir.ui.view,arch_db:pos_hr.single_employee_sales_report
@@ -49,6 +59,16 @@ msgstr "Permisos avanzados"
 #: model_terms:ir.ui.view,arch_db:pos_hr.res_config_settings_view_form
 msgid "All Employees"
 msgstr "Todos los empleados"
+
+#. module: pos_hr
+#: model:ir.model.fields,help:pos_hr.field_pos_config__logged_employee_ids
+msgid "All employees who have logged into the current session"
+msgstr "Todos los empleados que han iniciado sesión en la sesión actual"
+
+#. module: pos_hr
+#: model:ir.model.fields,help:pos_hr.field_pos_session__logged_employee_ids
+msgid "All employees who have logged into this session"
+msgstr "Todos los empleados que han iniciado sesión en esta sesión"
 
 #. module: pos_hr
 #: model:ir.model,name:pos_hr.model_account_bank_statement_line
@@ -96,21 +116,25 @@ msgid "Cashier name"
 msgstr "Nombre del cajero"
 
 #. module: pos_hr
-#. odoo-python
-#: code:addons/pos_hr/models/pos_session.py:0
-msgid "Closed Register"
-msgstr "Caja registradora cerrada"
-
-#. module: pos_hr
 #: model:ir.model,name:pos_hr.model_res_config_settings
 msgid "Config Settings"
 msgstr "Ajustes de configuración"
+
+#. module: pos_hr
+#: model:ir.model,name:pos_hr.model_res_partner
+msgid "Contact"
+msgstr ""
 
 #. module: pos_hr
 #. odoo-javascript
 #: code:addons/pos_hr/static/src/app/components/popups/closing_popup/closing_popup.xml:0
 msgid "Counted"
 msgstr "Contado"
+
+#. module: pos_hr
+#: model:ir.model,website_form_label:pos_hr.model_res_partner
+msgid "Create a Customer"
+msgstr ""
 
 #. module: pos_hr
 #. odoo-javascript
@@ -130,12 +154,14 @@ msgstr "Descartar"
 #: model:ir.model.fields,field_description:pos_hr.field_pos_config__display_name
 #: model:ir.model.fields,field_description:pos_hr.field_pos_daily_sales_reports_wizard__display_name
 #: model:ir.model.fields,field_description:pos_hr.field_pos_order__display_name
+#: model:ir.model.fields,field_description:pos_hr.field_pos_order_receipt__display_name
 #: model:ir.model.fields,field_description:pos_hr.field_pos_payment__display_name
 #: model:ir.model.fields,field_description:pos_hr.field_pos_session__display_name
 #: model:ir.model.fields,field_description:pos_hr.field_product_product__display_name
 #: model:ir.model.fields,field_description:pos_hr.field_report_pos_hr_single_employee_sales_report__display_name
 #: model:ir.model.fields,field_description:pos_hr.field_report_pos_order__display_name
 #: model:ir.model.fields,field_description:pos_hr.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:pos_hr.field_res_partner__display_name
 msgid "Display Name"
 msgstr "Mostrar nombre"
 
@@ -163,6 +189,11 @@ msgstr "Empleado:"
 #: code:addons/pos_hr/models/hr_employee.py:0
 msgid "Employee: %(employee)s - PoS Config(s): %(config_list)s \n"
 msgstr "Empleado: %(employee)s - Configuración del PdV: %(config_list)s \n"
+
+#. module: pos_hr
+#: model_terms:ir.ui.view,arch_db:pos_hr.view_pos_session_form_inherit_pos_hr
+msgid "Employees"
+msgstr "Empleados"
 
 #. module: pos_hr
 #: model:ir.model.fields,help:pos_hr.field_pos_config__advanced_employee_ids
@@ -196,7 +227,7 @@ msgstr "Empleados con acceso mínimo"
 #. odoo-javascript
 #: code:addons/pos_hr/static/src/app/screens/login_screen/login_screen.xml:0
 msgid "Enter your PIN"
-msgstr "Escriba su NIP"
+msgstr "Ingresa tu NIP"
 
 #. module: pos_hr
 #: model:ir.model.fields,field_description:pos_hr.field_account_bank_statement_line__id
@@ -204,12 +235,14 @@ msgstr "Escriba su NIP"
 #: model:ir.model.fields,field_description:pos_hr.field_pos_config__id
 #: model:ir.model.fields,field_description:pos_hr.field_pos_daily_sales_reports_wizard__id
 #: model:ir.model.fields,field_description:pos_hr.field_pos_order__id
+#: model:ir.model.fields,field_description:pos_hr.field_pos_order_receipt__id
 #: model:ir.model.fields,field_description:pos_hr.field_pos_payment__id
 #: model:ir.model.fields,field_description:pos_hr.field_pos_session__id
 #: model:ir.model.fields,field_description:pos_hr.field_product_product__id
 #: model:ir.model.fields,field_description:pos_hr.field_report_pos_hr_single_employee_sales_report__id
 #: model:ir.model.fields,field_description:pos_hr.field_report_pos_order__id
 #: model:ir.model.fields,field_description:pos_hr.field_res_config_settings__id
+#: model:ir.model.fields,field_description:pos_hr.field_res_partner__id
 msgid "ID"
 msgstr "ID"
 
@@ -222,6 +255,11 @@ msgid "If left empty, all employees can log in to PoS"
 msgstr "Si se deja vacío, todos los empleados pueden acceder al PdV"
 
 #. module: pos_hr
+#: model:ir.module.module,summary:base.module_pos_hr
+msgid "Link module between Point of Sale and HR"
+msgstr ""
+
+#. module: pos_hr
 #. odoo-javascript
 #: code:addons/pos_hr/static/src/app/components/navbar/navbar.xml:0
 #: code:addons/pos_hr/static/src/app/components/popups/cashier_selection_popup/cashier_selection_popup.xml:0
@@ -229,10 +267,22 @@ msgid "Lock"
 msgstr "Bloquear"
 
 #. module: pos_hr
+#: model:ir.model.fields,field_description:pos_hr.field_pos_config__logged_employee_ids
+#: model:ir.model.fields,field_description:pos_hr.field_pos_session__logged_employee_ids
+msgid "Logged In Cashiers"
+msgstr "Cajeros con sesión iniciada"
+
+#. module: pos_hr
 #: model_terms:ir.ui.view,arch_db:pos_hr.pos_config_form_view_inherit
 #: model_terms:ir.ui.view,arch_db:pos_hr.res_config_settings_view_form
 msgid "Minimal rights"
 msgstr "Permisos mínimos"
+
+#. module: pos_hr
+#. odoo-javascript
+#: code:addons/pos_hr/static/src/app/components/popups/cashier_selection_popup/cashier_selection_popup.xml:0
+msgid "More..."
+msgstr "Más…"
 
 #. module: pos_hr
 #. odoo-javascript
@@ -281,6 +331,11 @@ msgid "PIN not found"
 msgstr "No se encontró el NIP"
 
 #. module: pos_hr
+#: model:ir.module.module,shortdesc:base.module_pos_hr
+msgid "POS - HR"
+msgstr ""
+
+#. module: pos_hr
 #. odoo-javascript
 #: code:addons/pos_hr/static/src/app/utils/select_cashier_mixin.js:0
 msgid "Password?"
@@ -304,8 +359,13 @@ msgstr "Reporte diario del Punto de venta"
 
 #. module: pos_hr
 #: model:ir.model,name:pos_hr.model_pos_order
-msgid "Point of Sale Orders"
-msgstr "Órdenes del punto de venta"
+msgid "Point of Sale Order"
+msgstr "Orden del punto de venta"
+
+#. module: pos_hr
+#: model:ir.model,name:pos_hr.model_pos_order_receipt
+msgid "Point of Sale Order Receipt Generator"
+msgstr "Generador de recibos de órdenes del punto de venta"
 
 #. module: pos_hr
 #: model:ir.model,name:pos_hr.model_report_pos_order
@@ -314,8 +374,8 @@ msgstr "Reporte de órdenes del punto de venta"
 
 #. module: pos_hr
 #: model:ir.model,name:pos_hr.model_pos_payment
-msgid "Point of Sale Payments"
-msgstr "Pagos en punto de venta"
+msgid "Point of Sale Payment"
+msgstr "Pago en el punto de venta"
 
 #. module: pos_hr
 #: model:ir.model,name:pos_hr.model_pos_session
@@ -394,30 +454,5 @@ msgstr ""
 "No puede eliminar un empleado que puede estar en uso en una sesión activa de "
 "PdV, primero cierre las sesiones: \n"
 
-#~ msgid "If left empty, only Odoo users have extended rights in PoS"
-#~ msgstr ""
-#~ "Si está vacío, solo los usuarios de Odoo tendrán permisos adicionales en "
-#~ "el PdV"
-
-#~ msgid "A collection of single session reports. One for each employee"
-#~ msgstr ""
-#~ "Una colección de reportes de una sola sesión. Uno para cada empleado"
-
-#~ msgid ""
-#~ "Can't generate a report per employee! as selected session has no orders "
-#~ "associated with any employee."
-#~ msgstr ""
-#~ "No es posible generar un reporte por empleado. La sesión seleccionada no "
-#~ "tiene órdenes asociadas con ningún empleado."
-
-#~ msgid "Change Cashier"
-#~ msgstr "Cambiar cajero"
-
-#~ msgid "Employee Sales Details"
-#~ msgstr "Detalles de ventas de empleados"
-
-#~ msgid "Payments in %(paymentMethod)s"
-#~ msgstr "Pagos en %(paymentMethod)s"
-
-#~ msgid "Print"
-#~ msgstr "Imprimir"
+msgid "Closed Register"
+msgstr "Caja registradora cerrada"

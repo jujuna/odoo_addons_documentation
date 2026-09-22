@@ -8,6 +8,14 @@ from freezegun import freeze_time
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestCFDIPosOrderDocuments(TestMxEdiPosCommon):
 
+    _test_user_groups = (
+        'point_of_sale.group_pos_user',
+        'account.group_account_invoice',  # Needed for invoice creation
+        'base.group_system',  # Needed for some configurations
+    )
+
+    _test_user_name = 'Test Pos User'
+
     def test_global_invoice_refund_production_sign_flow_cancel_from_the_sat(self):
         """ Test the case the global invoice refund is signed but the user manually cancel the document from the SAT portal (production environment). """
         self.env.company.l10n_mx_edi_pac_test_env = False
@@ -23,7 +31,7 @@ class TestCFDIPosOrderDocuments(TestMxEdiPosCommon):
                 })
                 order.l10n_mx_edi_cfdi_to_public = True
             with self.with_mocked_pac_sign_success():
-                order._l10n_mx_edi_cfdi_global_invoice_try_send()
+                self._create_orders_global_invoice(order)
             with self.with_mocked_sat_call(lambda _x: 'valid'):
                 order.l10n_mx_edi_cfdi_try_sat()
             gi_sent_doc_values = {
@@ -49,14 +57,20 @@ class TestCFDIPosOrderDocuments(TestMxEdiPosCommon):
                 'state': 'invoice_sent',
                 'sat_state': 'valid',
             }
+            invoice_sent_doc_values = {
+                'pos_order_ids': order.ids,
+                'state': 'invoice_sent',
+                'sat_state': 'valid',
+            }
             self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
+                invoice_sent_doc_values,
                 refund_sent_doc_values,
                 gi_sent_doc_values,
             ])
             self.assertRecordValues(order, [{
                 'l10n_mx_edi_update_sat_needed': True,
                 'l10n_mx_edi_cfdi_sat_state': 'valid',
-                'l10n_mx_edi_cfdi_state': 'global_sent',
+                'l10n_mx_edi_cfdi_state': 'sent',
             }])
 
         # Manual cancellation from the SAT portal.
@@ -73,9 +87,16 @@ class TestCFDIPosOrderDocuments(TestMxEdiPosCommon):
             'state': 'invoice_cancel',
             'sat_state': 'cancelled',
         }
+        invoice_cancel_doc_values = {
+            'pos_order_ids': order.ids,
+            'state': 'invoice_cancel',
+            'sat_state': 'cancelled',
+        }
         self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
+            invoice_cancel_doc_values,
             refund_cancel_doc_values,
             gi_cancel_doc_values,
+            invoice_sent_doc_values,
             refund_sent_doc_values,
             gi_sent_doc_values,
         ])
@@ -83,7 +104,7 @@ class TestCFDIPosOrderDocuments(TestMxEdiPosCommon):
         self.assertRecordValues(order, [{
             'l10n_mx_edi_update_sat_needed': False,
             'l10n_mx_edi_cfdi_sat_state': 'cancelled',
-            'l10n_mx_edi_cfdi_state': 'global_cancel',
+            'l10n_mx_edi_cfdi_state': 'sent',
         }])
 
     def test_global_invoice_production_sign_flow_cancel_from_the_sat(self):
@@ -99,7 +120,7 @@ class TestCFDIPosOrderDocuments(TestMxEdiPosCommon):
                     'payments': [(self.bank_pm1, 1160.0)],
                 })
             with self.with_mocked_pac_sign_success():
-                order._l10n_mx_edi_cfdi_global_invoice_try_send()
+                self._create_orders_global_invoice(order)
             with self.with_mocked_sat_call(lambda _x: 'valid'):
                 order.l10n_mx_edi_cfdi_try_sat()
             sent_doc_values = {

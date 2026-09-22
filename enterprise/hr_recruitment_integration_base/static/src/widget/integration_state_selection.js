@@ -1,21 +1,24 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 
 import { registry } from '@web/core/registry';
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class IntegrationStateSelectionField extends Component {
     static template = "hr_recruitment_integration_base.IntegrationStateSelection";
-    static props = {
+
+    props = useProps({
         ...standardFieldProps,
-        ribbon: { type: Boolean, optional: true },
-    }
+        ribbon: t.boolean().optional(),
+    });
+
     setup() {
         super.setup();
         this.colors = {
             'pending': ["info", "info"],
             'warning': ["warning", "warning"],
             'expired': ["muted", "muted"],
-            'deleted': ["muted", "secondary"],
+            'deleted': ["muted", "300"],
             'failure': ["danger", "danger"],
             'success': ["success", "success"]
         };
@@ -30,7 +33,7 @@ export class IntegrationStateSelectionField extends Component {
     }
 
     get imgClassNames() {
-        return `fa fa-fw o_button_icon fa-circle${this.value == 'deleted' ? "-o" : ""} text-${this.color[0]}`
+        return `oi oi-fw ${this.value == 'deleted' ? "" : "oi-filled"} o_button_icon text-${this.color[0]}`
     }
 
     get ribbonClassNames() {
@@ -54,9 +57,10 @@ export const integrationStateSelectionField = {
     component: IntegrationStateSelectionField,
     supportedOptions: [
         {
+            label: _t("Ribbon"),
             name: "ribbon",
-            type: "boolean"
-        }
+            type: "boolean",
+        },
     ],
     extractProps({ options }) {
         return {'ribbon': Boolean(options.ribbon)};

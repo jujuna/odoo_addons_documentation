@@ -1,9 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.tests.common import TransactionCase
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestQualityCheck(TransactionCase):
 
     def test_change_quality_point(self):
@@ -28,7 +29,7 @@ class TestQualityCheck(TransactionCase):
         qc = self.env['quality.check'].create({
                 'product_id': product_b.id,
                 'point_id': qp_product_b.id,
-                'team_id': 1
+                'team_id': self.env['quality.check'].team_id.search([], limit=1).id,
             })
         qc_form = Form(qc)
         self.assertEqual(qc.test_type_id, qp_product_b.test_type_id)
@@ -43,8 +44,8 @@ class TestQualityCheck(TransactionCase):
         Test that the quality.check model's name and control_date fields are not copied when duplicating a quality.check
         """
         qc_a = self.env['quality.check'].create({
-            'team_id': 1,
-            'test_type_id': 1,
+            'team_id': self.env['quality.check'].team_id.search([], limit=1).id,
+            'test_type_id': self.env['quality.check'].test_type_id.search([], limit=1).id,
         })
         next_name = self.env['ir.sequence'].search([('code', '=', 'quality.check')]).number_next_actual
         qc_a.do_pass()

@@ -1,6 +1,6 @@
 import { animationFrame, expect, test } from "@odoo/hoot";
 import { mountWithCleanup } from "@web/../tests/web_test_helpers";
-import { setupPosEnv } from "@point_of_sale/../tests/unit/utils";
+import { setupPosEnv, expectFormattedPrice } from "@point_of_sale/../tests/unit/utils";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { definePosModels } from "@point_of_sale/../tests/unit/data/generate_model_definitions";
 
@@ -27,7 +27,7 @@ test("getNumpadButtons", async () => {
         .filter((button) => ["quantity", "discount"].includes(button.value))
         .map((button) => button.disabled);
     expect(Math.abs(order.discountLines[0].priceIncl).toString()).toBe(
-        (order.lines[0].priceIncl * 0.1).toPrecision(2)
+        (order.lines[0].priceIncl * 0.1).toPrecision(3)
     );
 
     expect(receivedButtonsDisableStatue).toEqual([true, true]);
@@ -40,4 +40,32 @@ test("getNumpadButtons", async () => {
             (order.lines[0].priceIncl * 0.1).toPrecision(2)
         );
     }, 100);
+});
+
+test("addProductToOrder reapplies the global discount", async () => {
+    const store = await setupPosEnv();
+    const order = store.addNewOrder();
+    const product = store.models["product.template"].get(5);
+    const productScreen = await mountWithCleanup(ProductScreen, {
+        props: { orderUuid: order.uuid },
+    });
+
+    await productScreen.addProductToOrder(product);
+    expectFormattedPrice(productScreen.total, "$ 115.00");
+    expect(order.priceIncl).toBe(115);
+    expect(order.priceExcl).toBe(100);
+    expect(order.amountTaxes).toBe(15);
+
+    await store.applyDiscount(10);
+    expectFormattedPrice(productScreen.total, "$ 103.50");
+    expect(order.priceIncl).toBe(103.5);
+    expect(order.priceExcl).toBe(90);
+    expect(order.amountTaxes).toBe(13.5);
+
+    await productScreen.addProductToOrder(product);
+    await animationFrame();
+    expectFormattedPrice(productScreen.total, "$ 207.00");
+    expect(order.priceIncl).toBe(207);
+    expect(order.priceExcl).toBe(180);
+    expect(order.amountTaxes).toBe(27);
 });

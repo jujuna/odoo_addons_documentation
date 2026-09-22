@@ -98,6 +98,7 @@
             .o_cell_td > .o_line_cell_value_number {
                 display: block;
                 text-align: right;
+                white-space: nowrap;
             }
 
             .o_cell_td > .o_last_comment {
@@ -142,6 +143,11 @@
             }
         }
     }
+
+    .o_account_reports_company_logo {
+        max-height: 4rem;
+        margin-bottom: .75rem;
+    }
 }
 
 /****************
@@ -157,11 +163,6 @@
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 1rem;
-}
-
-.o_company_logo {
-    max-height: 4rem;
-    margin-bottom: 12px;
 }
 
 .o_overflow_value {
@@ -186,3 +187,82 @@ body[dir="rtl"] {
 .o_footer_font_size { font-size: 0.7rem }
 
 .o_annotation { list-style: none }
+
+/****************
+    AUDIT CHECKS
+*****************/
+.o_audit_section {
+    page-break-before: always;
+    margin-top: 20px;
+}
+.o_audit_header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-bottom: 2px solid #000;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+.o_audit_cycle_title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: #212529;
+}
+.o_audit_card {
+    border: 1px solid #e0e0e0;
+    padding: 4px 10px 2px 10px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    page-break-inside: avoid;
+}
+.o_audit_badge_wrap {
+    float: right;
+    width: 100px;
+    text-align: right;
+    margin-top: 1px;
+}
+.o_audit_content {
+    margin-right: 110px;
+}
+.o_audit_name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #212529;
+}
+.o_audit_msg {
+    font-size: 13px;
+    color: #777;
+    margin: 0;
+    line-height: 1.2;
+}
+.o_audit_notes {
+    border-top: 1px solid #eeeeee;
+    padding-top: 4px;
+    margin-top: 4px;
+    font-size: 13px;
+}
+.o_audit_clear {
+    clear: both;
+    height: 0;
+    line-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.o_status_badge {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 2px 5px;
+    margin-left: 8px;
+    border-radius: 800px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.o_status_badge_todo { color: $o-info; border: 1px solid $o-info; }
+.o_status_badge_reviewed { color: $o-success; border: 1px solid $o-success; }
+.o_status_badge_supervised { color: $o-success; border: 1px solid $o-success; }
+.o_status_badge_anomaly { color: $o-danger; border: 1px solid $o-danger; }

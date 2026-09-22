@@ -5,7 +5,7 @@ from odoo import models, fields, api
 class L10n_Ca_Cpa005TransactionCode(models.Model):
     _name = 'l10n_ca_cpa005.transaction.code'
     _description = "Canadian EFT transaction codes as defined in Payments Canada Standard 007"
-    _rec_names_search = ["name", "code"]
+    _rec_names_search = ("name", "code")
 
     name = fields.Char("Name", required=True)
     active = fields.Boolean("Active", default=True)

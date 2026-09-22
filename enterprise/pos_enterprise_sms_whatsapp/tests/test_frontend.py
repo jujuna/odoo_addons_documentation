@@ -9,6 +9,8 @@ import odoo.tests
 
 @odoo.tests.tagged('post_install', '-at_install')
 class TestPDisCommunication(test_frontend.TestFrontendCommon, TestPreparationDisplayHttpCommon, SMSCase, WhatsAppCase):
+    _test_user_groups = None  # FIXME list needed groups
+
     def setUp(self):
         super().setUp()
 
@@ -38,7 +40,6 @@ class TestPDisCommunication(test_frontend.TestFrontendCommon, TestPreparationDis
             'category_ids': [Command.set(self.env['pos.category'].search([]).ids)],
         })
 
-        self.pos_config.printer_ids.unlink()
         self.pos_config.with_user(self.pos_user).open_ui()
         self.pos_config.current_session_id.set_opening_control(0, "")
         self_route = self.pos_config._get_self_order_route()
@@ -53,9 +54,7 @@ class TestPDisCommunication(test_frontend.TestFrontendCommon, TestPreparationDis
         self.assertTrue(sms_messages, "A SMS should be sent to the customer's phone number.")
 
         pdis_order = self.env['pos.prep.order'].search([('pos_order_id', '=', order.id)], limit=1)
-        penultimate_stage = self.pdis.stage_ids[-2]
-        pdis_states = self.env['pos.prep.state'].search([('prep_line_id', 'in', pdis_order.prep_line_ids.ids)])
-        pdis_states.sudo().change_state_stage({str(state.id): penultimate_stage.id for state in pdis_states}, self.pdis.id)
+        pdis_order.prep_line_ids.sudo().change_prep_line_stage(self.pdis.id, direction=1)
 
         sms_order_received_template = self.env.ref('pos_enterprise_sms_whatsapp.sms_template_order_received_confirmation_pos')
         sms_order_ready_template = self.env.ref('pos_enterprise_sms_whatsapp.sms_template_order_ready_pos')
@@ -78,7 +77,6 @@ class TestPDisCommunication(test_frontend.TestFrontendCommon, TestPreparationDis
             'category_ids': [Command.set(self.env['pos.category'].search([]).ids)],
         })
 
-        self.pos_config.printer_ids.unlink()
         self.pos_config.with_user(self.pos_user).open_ui()
         self.pos_config.current_session_id.set_opening_control(0, "")
         self_route = self.pos_config._get_self_order_route()
@@ -92,9 +90,7 @@ class TestPDisCommunication(test_frontend.TestFrontendCommon, TestPreparationDis
         self.assertTrue(whatsapp_messages, "A WhatsApp message should be sent to the customer's phone number.")
 
         pdis_order = self.env['pos.prep.order'].search([('pos_order_id', '=', order.id)], limit=1)
-        penultimate_stage = self.pdis.stage_ids[-2]
-        pdis_states = self.env['pos.prep.state'].search([('prep_line_id', 'in', pdis_order.prep_line_ids.ids)])
-        pdis_states.sudo().change_state_stage({str(state.id): penultimate_stage.id for state in pdis_states}, self.pdis.id)
+        pdis_order.prep_line_ids.sudo().change_prep_line_stage(self.pdis.id, direction=1)
 
         whatsapp_order_received_template = self.env.ref('pos_enterprise_sms_whatsapp.whatsapp_order_received_confirmation_pos')
         whatsapp_order_ready_template = self.env.ref('pos_enterprise_sms_whatsapp.whatsapp_order_ready_confirmation_pos')

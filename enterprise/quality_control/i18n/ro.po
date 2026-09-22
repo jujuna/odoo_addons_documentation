@@ -9,16 +9,16 @@
 # Martin Trigaux, 2022
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# Odoo Translation Bot <c3p@odoo.com>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2025, 2026.
 # Alin Ilie <alin.ilie@logit-solutions.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-09 18:43+0000\n"
-"PO-Revision-Date: 2025-12-10 10:26+0000\n"
-"Last-Translator: Alin Ilie <alin.ilie@logit-solutions.com>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 01:23+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "quality_control/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,21 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: quality_control
+#: model:ir.module.module,description:base.module_quality_control
+msgid ""
+"\n"
+"Quality Control\n"
+"===============\n"
+"* Define quality points that will generate quality checks on pickings,\n"
+"  manufacturing orders or work orders (quality_mrp)\n"
+"* Quality alerts can be created independently or related to quality checks\n"
+"* Possibility to add a measure to the quality check with a min/max "
+"tolerance\n"
+"* Define your stages for the quality alerts\n"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -51,25 +65,11 @@ msgid "15.3 cm"
 msgstr "15.3 cm"
 
 #. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
-msgid "2023-08-15"
-msgstr "2023-08-15"
-
-#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_dashboard_view_kanban
 msgid ""
-"<i class=\"fa fa-envelope-o\" role=\"img\" aria-label=\"Domain alias\" "
+"<i class=\"oi\" data-icon=\"mail\" role=\"img\" aria-label=\"Domain alias\" "
 "title=\"Domain alias\"/>&amp;nbsp;"
 msgstr ""
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid ""
-"<span class=\"fa fa-2x\" data-icon=\"∑\" style=\"padding-left: 10px;\" "
-"role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
-msgstr ""
-"<span class=\"fa fa-2x\" data-icon=\"∑\" style=\"padding-left: 10px;\" "
-"role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
@@ -119,6 +119,18 @@ msgstr "<span class=\"o_stat_text\">Verifică calitatea</span>"
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 msgid "<span class=\"o_stat_text\">Quality Checks</span>"
 msgstr "<span class=\"o_stat_text\">Verificări Calitate</span>"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.res_partner_view_form_inherit_quality_control
+msgid "<span class=\"o_stat_text\">Quality Rate</span>"
+msgstr ""
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
+msgid ""
+"<span class=\"oi o_button_icon\" data-icon=\"troubleshoot\" style=\"padding-"
+"left: 10px;\" role=\"img\" aria-label=\"Statistics\" title=\"Statistics\"/>"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -247,9 +259,19 @@ msgid "Back"
 msgstr "Înapoi"
 
 #. module: quality_control
+#: model:ir.model,name:quality_control.model_stock_picking_batch
+msgid "Batch Transfer"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__check_ids
 msgid "Check"
 msgstr "Verifică"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.stock_move_line_view_list_from_batch
+msgid "Check Quality"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__check_state
@@ -301,6 +323,11 @@ msgid "Confirm Measure"
 msgstr "Cofirmare Măsurare"
 
 #. module: quality_control
+#: model:ir.model,name:quality_control.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_point__measure_frequency_type
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
 msgid "Control Frequency"
@@ -336,6 +363,11 @@ msgid "Control per:"
 msgstr "Control pe:"
 
 #. module: quality_control
+#: model:ir.module.module,summary:base.module_quality_control
+msgid "Control the quality of your products"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
 msgid "Correct Measure"
 msgstr "Măsurare Corectă"
@@ -349,6 +381,11 @@ msgstr "Acțiuni corective"
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_form
 msgid "Create Alert"
 msgstr "Creați alertă"
+
+#. module: quality_control
+#: model:ir.model,website_form_label:quality_control.model_res_partner
+msgid "Create a Customer"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_alert_action_check
@@ -394,12 +431,6 @@ msgstr "Data"
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_frequency_unit__day
 msgid "Days"
 msgstr "Zile"
-
-#. module: quality_control
-#: model:ir.model.fields,help:quality_control.field_quality_check__uom_id
-#: model:ir.model.fields,help:quality_control.field_quality_check_wizard__uom_id
-msgid "Default unit of measure used for all stock operations."
-msgstr "Unitatea de măsură implicită folosită în toate operațiunile stocului."
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_check_action_main
@@ -448,14 +479,11 @@ msgid "Determines if only a fraction of the lot should be tested"
 msgstr "Determină dacă lotul ar trebui testat doar parțial"
 
 #. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
-msgid "Discard"
-msgstr "Renunță"
-
-#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_ir_http__display_name
 #: model:ir.model.fields,field_description:quality_control.field_product_product__display_name
 #: model:ir.model.fields,field_description:quality_control.field_product_template__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_alert__display_name
+#: model:ir.model.fields,field_description:quality_control.field_quality_alert_team__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__display_name
@@ -463,10 +491,12 @@ msgstr "Renunță"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__display_name
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet__display_name
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet_internal__display_name
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_lot__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_move__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__display_name
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__display_name
 msgid "Display Name"
 msgstr "Nume afișat"
 
@@ -482,16 +512,14 @@ msgid "Edit"
 msgstr "Editare"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Effective Date Last Year"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_form
 msgid "Email Alias"
 msgstr "Email Alias"
-
-#. module: quality_control
-#: model:ir.model.fields,help:quality_control.field_quality_check__product_tracking
-#: model:ir.model.fields,help:quality_control.field_quality_check_wizard__product_tracking
-msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr ""
-"Asigurați trasabilitatea unui produs stocabil în depozitul dumneavoastră."
 
 #. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_success__fail
@@ -543,6 +571,11 @@ msgid "Future Activities"
 msgstr "Activități viitoare"
 
 #. module: quality_control
+#: model:ir.model,name:quality_control.model_ir_http
+msgid "HTTP Routing"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__hide_picking_id
 msgid "Hide Picking"
 msgstr "Ascunde selectarea"
@@ -558,9 +591,11 @@ msgid "Hide Repair"
 msgstr "Repararea pieilor"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_ir_http__id
 #: model:ir.model.fields,field_description:quality_control.field_product_product__id
 #: model:ir.model.fields,field_description:quality_control.field_product_template__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_alert__id
+#: model:ir.model.fields,field_description:quality_control.field_quality_alert_team__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__id
@@ -568,10 +603,12 @@ msgstr "Repararea pieilor"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__id
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet__id
 #: model:ir.model.fields,field_description:quality_control.field_report_quality_control_quality_worksheet_internal__id
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_lot__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_move__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_move_line__id
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__id
+#: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__id
 msgid "ID"
 msgstr "ID"
 
@@ -643,6 +680,12 @@ msgid "Late Activities"
 msgstr "Activități întârziate"
 
 #. module: quality_control
+#: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__move_line
+#: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_on__move_line
+msgid "Lot"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_line_id
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__lot_line_id
 msgid "Lot Line"
@@ -662,7 +705,6 @@ msgstr "Lot/SN"
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_stock_lot
-#: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_ids
 msgid "Lot/Serial"
 msgstr "Lot/Serial"
 
@@ -734,12 +776,6 @@ msgid "Nb Checks"
 msgstr "Verificări Nb"
 
 #. module: quality_control
-#. odoo-python
-#: code:addons/quality_control/models/quality.py:0
-msgid "New"
-msgstr "Nou(ă)"
-
-#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Next"
 msgstr "Înainte"
@@ -803,6 +839,11 @@ msgid "Notes"
 msgstr "Note"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
+msgid "OK"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_frequency_type__on_demand
 msgid "On-demand"
 msgstr "La cerere"
@@ -824,14 +865,10 @@ msgstr "Operație"
 #: model:ir.model.fields,help:quality_control.field_quality_point__measure_on
 msgid ""
 "Operation = One quality check is requested at the operation level.\n"
-"                  Product = A quality check is requested per product.\n"
-"                 Quantity = A quality check is requested for each new "
-"product quantity registered, with partial quantity checks also possible."
+"                Product = A quality check is requested per product.\n"
+"                Lot = A quality check is requested for each new product "
+"quantity registered, with partial quantity checks also possible."
 msgstr ""
-"Operație = O verificare de calitate este cerută la nivelul operației.\n"
-"                 Produs = O verificare de calitate este cerută per produs\n"
-"                 Volum = O verificare de calitate este cerută pentru fiecare "
-"cantitate de produs nou înregistrată, cu posibile teste de calitate parțiale."
 
 #. module: quality_control
 #: model:ir.ui.menu,name:quality_control.menu_quality_dashboard
@@ -845,6 +882,7 @@ msgstr "Test parțial"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_form
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 msgid "Partner"
 msgstr "Partener"
 
@@ -928,11 +966,6 @@ msgid "Product Variant"
 msgstr "Variantă produs"
 
 #. module: quality_control
-#: model:ir.ui.menu,name:quality_control.quality_control_menu_product_variant
-msgid "Product Variants"
-msgstr "Variante produs"
-
-#. module: quality_control
 #: model:ir.ui.menu,name:quality_control.quality_control_menu_product
 #: model:ir.ui.menu,name:quality_control.quality_product_menu_product_template
 msgid "Products"
@@ -949,6 +982,7 @@ msgid "Qty Failed"
 msgstr "Cantitate eșuată"
 
 #. module: quality_control
+#: model:ir.module.module,shortdesc:base.module_quality_control
 #: model:ir.ui.menu,name:quality_control.menu_quality_root
 msgid "Quality"
 msgstr "Calitate"
@@ -959,6 +993,7 @@ msgstr "Calitate"
 #: model:ir.actions.server,name:quality_control.stock_picking_action_quality_alert
 #: model:ir.model,name:quality_control.model_quality_alert
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_calendar
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_form
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_search_inherit_quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 msgid "Quality Alert"
@@ -985,6 +1020,11 @@ msgstr "Alertă de Calitate cantitate"
 #: model:ir.ui.menu,name:quality_control.menu_quality_config_alert_stage
 msgid "Quality Alert Stages"
 msgstr "Stadii Alertă Calitate"
+
+#. module: quality_control
+#: model:ir.model,name:quality_control.model_quality_alert_team
+msgid "Quality Alert Team"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_alert_stage_action
@@ -1028,6 +1068,12 @@ msgid "Quality Check Analysis"
 msgstr "Analiză Verificare Calitate"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__quality_check_count
+#: model:ir.model.fields,field_description:quality_control.field_res_users__quality_check_count
+msgid "Quality Check Count"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_stock_picking__quality_check_fail
 msgid "Quality Check Fail"
 msgstr "Verificare Calitate Eșuată"
@@ -1056,6 +1102,11 @@ msgid "Quality Check Qty"
 msgstr "Verificare Calitate Cantitate"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_stock_picking_batch__quality_check_todo
+msgid "Quality Check Todo"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
 msgid "Quality Check:"
 msgstr "Verificare Calitate:"
@@ -1067,6 +1118,7 @@ msgstr "Verificare Calitate:"
 #: model:ir.actions.act_window,name:quality_control.quality_check_action_team
 #: model:ir.ui.menu,name:quality_control.menu_quality_checks
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_batch_form
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_search_inherit_quality
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_production_lot_form_quality_control
@@ -1117,6 +1169,13 @@ msgstr "Volum trecut test de calitate"
 #: model_terms:ir.ui.view,arch_db:quality_control.product_template_form_view_quality_control
 msgid "Quality Points"
 msgstr "Puncte Calitate"
+
+#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_check__quality_rate
+#: model:ir.model.fields,field_description:quality_control.field_res_partner__quality_rate
+#: model:ir.model.fields,field_description:quality_control.field_res_users__quality_rate
+msgid "Quality Rate"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.actions.act_window,name:quality_control.quality_spreadsheet_template_action_config
@@ -1176,10 +1235,14 @@ msgstr ""
 "              la fiecare intervenție, pentru mai multe produse."
 
 #. module: quality_control
+#. odoo-python
+#: code:addons/quality_control/models/quality_spreadsheet_template.py:0
+msgid "Quality templates"
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__qty_line
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__qty_line
-#: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__move_line
-#: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_on__move_line
 msgid "Quantity"
 msgstr "Cantitate"
 
@@ -1252,7 +1315,7 @@ msgstr "Responsabil"
 #. odoo-javascript
 #: code:addons/quality_control/static/src/spreadsheet_bundle/quality_check_spreadsheet_action/quality_check_spreadsheet_action.xml:0
 msgid "Save in"
-msgstr "Salvează în"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__show_lot_text
@@ -1288,6 +1351,12 @@ msgstr "Date Foaie de Calcul"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
 msgstr "Nume fișier foaie de calcul"
+
+#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__spreadsheet_image_ids
+msgid "Spreadsheet Image"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_revision_ids
@@ -1347,6 +1416,16 @@ msgid "Success cell"
 msgstr "Celulă succes"
 
 #. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_point__supplier_count
+msgid "Supplier Count"
+msgstr ""
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
+msgid "Suppliers"
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_tag_view_search
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_tag_view_tree
 msgid "Tags"
@@ -1372,6 +1451,14 @@ msgstr "Echipă:"
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_tree
 msgid "Teams"
 msgstr "Echipe"
+
+#. module: quality_control
+#: model:ir.model.fields,help:quality_control.field_quality_check__product_tracking
+#: model:ir.model.fields,help:quality_control.field_quality_check_wizard__product_tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__test_type
@@ -1410,6 +1497,11 @@ msgstr ""
 "foaie."
 
 #. module: quality_control
+#: model:ir.model.fields,help:quality_control.field_quality_check__quality_rate
+msgid "The percentage of quality checks that passed."
+msgstr ""
+
+#. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_point__measure_frequency_value
 msgid "The probability of each quality check being generated"
 msgstr "Probabilitatea ca fiecare verificare de calitate să fie generată"
@@ -1427,6 +1519,11 @@ msgid "Title"
 msgstr "Titlu"
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_view_form
+msgid "Title..."
+msgstr ""
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 msgid "Today Activities"
 msgstr "Activitățile de astăzi"
@@ -1439,8 +1536,8 @@ msgstr "Toleranță"
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__product_tracking
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__product_tracking
-msgid "Tracking"
-msgstr "Trasabilitate"
+msgid "Tracking Method"
+msgstr ""
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_stock_picking
@@ -1482,6 +1579,7 @@ msgid "Untitled spreadsheet"
 msgstr ""
 
 #. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_batch_form
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Validate"
 msgstr "Validează"
@@ -1551,6 +1649,14 @@ msgstr "Trebuie să adaugați o imagine înainte de a valida"
 #. module: quality_control
 #. odoo-python
 #: code:addons/quality_control/models/stock_picking.py:0
+msgid ""
+"You need to supply a Lot/Serial Number for product:\n"
+"%(products)s"
+msgstr ""
+
+#. module: quality_control
+#. odoo-python
+#: code:addons/quality_control/models/stock_picking.py:0
 msgid "You still need to do the quality checks!"
 msgstr "Încă trebuie să faceți verificările de calitate!"
 
@@ -1569,30 +1675,12 @@ msgstr "ex. Șefii QA"
 msgid "e.g. mycompany.com"
 msgstr "ex. compania-mea.com"
 
-#~ msgid ""
-#~ "<span attrs=\"{'invisible': [('measure_frequency_type', '=', 'all')]}"
-#~ "\">Every </span>"
+#~ msgid "Ensure the traceability of a storable product in your warehouse."
 #~ msgstr ""
-#~ "<span attrs=\"{'invisible': [('measure_frequency_type', '=', 'all')]}"
-#~ "\">Fiecare </span>"
+#~ "Asigurați trasabilitatea unui produs stocabil în depozitul dumneavoastră."
 
-#~ msgid "Cancel"
-#~ msgstr "Anulează"
+#~ msgid "Tracking"
+#~ msgstr "Trasabilitate"
 
-#~ msgid "Group By"
-#~ msgstr "Grupează după"
-
-#~ msgid "In #{kanban_getcolorname(record.color.raw_value)}"
-#~ msgstr "In #{kanban_getcolorname(record.color.raw_value)}"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "Product Unit of Measure"
-#~ msgstr "Unitate de măsură produs"
-
-#~ msgid "Quality Control Points"
-#~ msgstr "Puncte de Control Calitate"
-
-#~ msgid "You measured %.2f %s and it should be between %.2f and %.2f %s."
-#~ msgstr "Ați măsurat %.2f %s și ar trebuie să fie între %.2f și %.2f %s."
+#~ msgid "New"
+#~ msgstr "Nou(ă)"

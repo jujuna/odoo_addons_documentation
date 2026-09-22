@@ -30,11 +30,11 @@ async function mountViewAndGetCell() {
 test("hr.timesheet (grid): timesheet_uom should be company related", async () => {
     const cell = await mountViewAndGetCell();
 
-    expect(cell.textContent).toBe("0:00", {
+    expect(cell.textContent).toBe("0h", {
         message: "float_time formatter should be used",
     });
     await contains(cell).hover();
-    expect(cell.textContent).toBe("0:00", {
+    expect(cell.textContent).toBe("0h", {
         message: "float_time formatter should be used",
     });
 });

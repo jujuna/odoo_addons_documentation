@@ -3,7 +3,6 @@
 {
     'name': 'Sweden Registered Cash Register',
     'countries': ['se'],
-    'version': '1.0',
     'category': 'Sales/Point Of Sale',
     'sequence': 6,
     'summary': 'Implements the registered cash system',
@@ -15,6 +14,7 @@
         'views/pos_config.xml',
         'views/res_config_settings_views.xml',
         'views/pos_order.xml',
+        'receipt/pos_order_receipt.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [
@@ -24,7 +24,6 @@
             'l10n_se_pos/static/tests/**/*'
         ],
     },
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

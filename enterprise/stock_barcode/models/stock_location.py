@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-
 from odoo import api, fields, models
+from odoo.tools import BinaryBytes
 
 
 class StockLocation(models.Model):
@@ -27,7 +25,7 @@ class StockLocation(models.Model):
                         location.barcode,
                         **options
                     )
-                    location.barcode_img = base64.b64encode(barcode).decode()
+                    location.barcode_img = BinaryBytes(barcode)
                 except ValueError:
                     location.barcode_img = False
                     pass

@@ -2,18 +2,17 @@
 
 {
     'name': 'Employee Referral',
-    'version': '1.0',
     'category': 'Human Resources/Referrals',
     'sequence': 235,
     'summary': 'Let your employees share job positions and refer their friends',
     'description': """Let your employees share job positions and refer their friends""",
-    'website': ' ',
+    'website': 'https://www.odoo.com/app/referrals',
     'depends': ['hr_recruitment', 'link_tracker', 'website_hr_recruitment', 'hr_recruitment_reports'],
     'data': [
         'data/data.xml',
         'data/referral_templates.xml',
+        'data/utm_data.xml',
         'security/hr_referral_security.xml',
-        'security/ir.model.access.csv',
         'views/hr_applicant_views.xml',
         'wizard/hr_referral_campaign_wizard_views.xml',
         'wizard/hr_referral_alert_mail_wizard_views.xml',
@@ -28,15 +27,14 @@
         'views/hr_referral_alert_views.xml',
         'views/hr_referral_reward_views.xml',
         'views/hr_referral_views.xml',
+        'views/link_tracker_views.xml',
         'views/res_config_settings_views.xml',
         'report/hr_referral_report_views.xml',
         'report/hr_referral_reward_report_views.xml',
+        'security/ir.access.csv',
     ],
     'demo': ['data/hr_referral_demo.xml'],
-    'installable': True,
     'application': True,
-    'pre_init_hook': '_pre_init_referral',
-    'post_init_hook': '_update_stage',
     'uninstall_hook': 'uninstall_hook',
     'assets': {
         'web.assets_backend': [

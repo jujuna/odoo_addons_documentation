@@ -10,6 +10,7 @@ from xml.etree import ElementTree
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.fields import Domain
+from odoo.tools import SQL
 
 
 class DocumentsDocument(models.Model):
@@ -18,6 +19,7 @@ class DocumentsDocument(models.Model):
     # once we parsed the XML to know if a PDF is embedded inside,
     # we store that information so we don't need to parse it again
     has_embedded_pdf = fields.Boolean('Has Embedded PDF', compute='_compute_has_embedded_pdf', store=True)
+    account_setting_ids = fields.One2many('documents.account.folder.setting', 'folder_id')
 
     @api.depends('has_embedded_pdf')
     def _compute_thumbnail(self):
@@ -36,6 +38,53 @@ class DocumentsDocument(models.Model):
         for document in self:
             document.has_embedded_pdf = bool(document._extract_pdf_from_xml())
 
+    @api.depends_context('uid')
+    @api.depends('account_setting_ids')
+    def _compute_is_protected(self):
+        is_manager = self.env.user.has_group('documents.group_documents_manager')
+        user_company_and_false = self.env.user.company_ids.ids + [False]
+        protected = self.filtered(
+            lambda d: d.account_setting_ids and (not is_manager or d.company_id.id not in user_company_and_false))
+        protected.is_protected = True
+        super(DocumentsDocument, self - protected)._compute_is_protected()
+
+    @api.model
+    def _search_is_protected(self, operator, operand):
+        domain = super()._search_is_protected(operator, operand)
+        if domain is NotImplemented:
+            return NotImplemented
+        # Only handle "in" operator and "[True]" operand (see super)
+        domain_sync_folders = Domain(
+            [('id', 'in', self.env['documents.account.folder.setting'].sudo()._search([]).select(SQL('folder_id')))])
+        if self.env.user.has_group('documents.group_documents_manager'):
+            return domain | (
+                    domain_sync_folders & Domain('company_id', 'not in', self.env.user.company_ids.ids + [False]))
+        return domain | domain_sync_folders
+
+    @api.depends('account_setting_ids')
+    def _compute_is_company_allowed(self):
+        """Overridden to display account folders when a child company is selected."""
+        super()._compute_is_company_allowed()
+        for document in self.filtered('account_setting_ids'):
+            document.is_company_allowed |= document.company_id in self.env.companies.parent_ids
+
+    def _search_is_company_allowed(self, operator, operand):
+        domain = super()._search_is_company_allowed(operator, operand)
+        if domain is NotImplemented or operator != 'in':
+            return NotImplemented
+        return domain | (
+                Domain('id', 'in', self.env['documents.account.folder.setting'].sudo()._search([]).select(SQL('folder_id')))
+                & Domain('company_id', 'parent_of', self.env.companies.ids)
+        )
+
+    def _get_child_document_default_company(self):
+        """Returns active company if linked to an account setting and active company is child of the setting company."""
+        company = super()._get_child_document_default_company()  # Always called to check pre-condition
+        if (setting_company_sudo := self.sudo().account_setting_ids.company_id) and self.is_company_allowed and (
+                setting_company_sudo in self.env.company.parent_ids):
+            return self.env.company
+        return company
+
     def _extract_pdf_from_xml(self):
         """Parse the XML file and return the PDF content if one is found.
 
@@ -47,7 +96,7 @@ class DocumentsDocument(models.Model):
         """
         self.ensure_one()
 
-        if not self.mimetype:
+        if not self.mimetype or not self.raw:
             return False
 
         if not (self.mimetype.endswith('/xml')
@@ -55,7 +104,7 @@ class DocumentsDocument(models.Model):
             return False
 
         try:
-            xml_file_content = self.with_context(bin_size=False).raw.decode()
+            xml_file_content = self.raw.content.decode()
         except UnicodeDecodeError:
             return False
 
@@ -82,12 +131,9 @@ class DocumentsDocument(models.Model):
 
         return False
 
-    def account_create_account_move(self, move_type, journal_id=None, partner_id=None, skip_activities=False):
-        if not skip_activities:
-            for record in self:
-                record.activity_ids.action_feedback(feedback="completed")
+    def account_create_account_move(self, move_type, journal_id=None, partner_id=None):
         if any(document.type == 'folder' for document in self):
-            raise UserError(_('You can not create account move on folder.'))
+            raise UserError(_('You can not create a journal entry from a folder.'))
 
         if journal_id is None:
             company_journals = self.env['account.journal'].search([
@@ -132,6 +178,13 @@ class DocumentsDocument(models.Model):
         # loop (because of the "multi" server action). When it is the case, we try
         # to redirect to a list of all created invoices instead of just the last
         # one, using the context.
+        action_name_ref = {
+            'in_invoice': self.env._("Vendor Bills"),
+            'in_refund': self.env._("Vendor Refunds"),
+            'in_receipt': self.env._("Vendor Receipts"),
+            'out_invoice': self.env._("Customer Invoices"),
+            'out_refund': self.env._("Customer Credit Notes"),
+        }
         context = dict(self.env.context, default_move_type=move_type)
         documents_active_ids = context.get('documents_active_ids')
         if context.get('active_model') != 'documents.document' or not documents_active_ids:
@@ -141,7 +194,7 @@ class DocumentsDocument(models.Model):
         action = {
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',
-            'name': _("Invoices"),
+            'name': action_name_ref[move_type],
             'view_id': False,
             'view_mode': 'list',
             'views': [(False, "list"), (False, "form")],
@@ -176,8 +229,12 @@ class DocumentsDocument(models.Model):
 
     @api.model
     def _get_base_server_actions_domain(self):
+        """ Adds a check on company to avoid using/running actions when not in the right company."""
+        domain = super()._get_base_server_actions_domain()
+        if self.env.context.get('documents_gc_actions'):
+            return domain
         return Domain.AND([
-            super()._get_base_server_actions_domain(),
+            domain,
             Domain.OR([
                 [('state', '!=', 'documents_account_record_create')],
                 [('documents_account_journal_id', '=', False)],
@@ -241,4 +298,13 @@ class DocumentsDocument(models.Model):
                     "sequence": 200,
                 }
             },
+        ])
+
+    def _get_gc_clear_bin_domain(self):
+        query_folder_id = self.env['documents.account.folder.setting']._search(
+            [('folder_id', '!=', False)]
+        ).select(SQL('folder_id'))
+        return Domain.AND([
+            super()._get_gc_clear_bin_domain(),
+            [('id', 'not in', SQL("(%s)", query_folder_id))],
         ])

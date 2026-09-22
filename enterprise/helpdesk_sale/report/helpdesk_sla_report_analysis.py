@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models
+from odoo.tools import SQL
 
 
 class HelpdeskSlaReportAnalysis(models.Model):
@@ -10,6 +10,4 @@ class HelpdeskSlaReportAnalysis(models.Model):
     sale_order_id = fields.Many2one('sale.order', string='Ref. Sales Order', readonly=True, groups="sales_team.group_sale_salesman,account.group_account_invoice")
 
     def _select(self):
-        select_str = super()._select()
-        select_str += ", T.sale_order_id as sale_order_id"
-        return select_str
+        return SQL("%s, T.sale_order_id as sale_order_id", super()._select())

@@ -15,6 +15,8 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestDatevCSV(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_chart_template('de_skr03')
     def setUpClass(cls):
@@ -41,6 +43,60 @@ class TestDatevCSV(AccountTestInvoicingCommon):
             ('company_id', '=', cls.company_data['company'].id),
         ], limit=1)
 
+    def _setup_three_currency_test(self, date='2020-12-01'):
+        usd = self.setup_other_currency('USD', rates=[(date, 50)])
+        aed = self.setup_other_currency('AED', rates=[(date, 30)])
+        bank_journal = self.env['account.journal'].create({
+            'name': 'Three Currency Bank',
+            'code': '3CUR',
+            'type': 'bank',
+            'currency_id': aed.id,
+            'company_id': self.company_data['company'].id,
+        })
+
+        return {
+            'usd': usd,
+            'aed': aed,
+            'bank_journal': bank_journal,
+            'bank_account': bank_journal.default_account_id,
+            'ar_account': self.company_data['default_account_receivable'],
+            'ap_account': self.company_data['default_account_payable'],
+        }
+
+    def _create_three_currency_transaction(self, journal_id, amount, invoice_values, date='2020-12-01'):
+        statement = self.env['account.bank.statement'].create({
+            'line_ids': [
+                Command.create({
+                    'journal_id': journal_id,
+                    'date': date,
+                    'amount': amount,
+                    'payment_ref': 'Three currency test',
+                    'partner_id': self.partner_a.id,
+                }),
+            ],
+        })
+        arap_lines = self.env['account.move.line']
+
+        for values in invoice_values:
+            invoice = self._create_invoice_one_line(
+                move_type=values['move_type'],
+                currency_id=values['currency_id'],
+                invoice_date=date,
+                price_unit=values['price_unit'],
+                tax_ids=[],
+                post=True,
+            )
+            arap_lines |= invoice.line_ids.filtered(
+                lambda line: line.account_id.account_type in (
+                    'asset_receivable',
+                    'liability_payable',
+                )
+            )
+
+        statement.line_ids.set_line_bank_statement_line(arap_lines.ids)
+
+        return statement.line_ids.move_id
+
     def test_datev_in_invoice(self):
         report = self.env.ref('account_reports.general_ledger_report')
         options = report.get_options({})
@@ -66,7 +122,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
                     'name': 'Line Number 2',
                     'price_unit': 100,
                     'account_id': self.account_3400.id,
-                    'tax_ids': [(6, 0, self.tax_19.ids)],
+                    'tax_ids': [],
                 }),
                 (0, None, {
                     'name': 'Line Number 3',
@@ -87,8 +143,8 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         self.assertEqual(3, len(data), "csv should have 3 lines")
         self.assertIn(['119,00', 'S', 'EUR', '34000000', str(move.partner_id.id + 700000000),
                        self.tax_19.l10n_de_datev_code, '112', move.name, move.invoice_line_ids[0].name], data)
-        self.assertIn(['119,00', 'S', 'EUR', '34000000', str(move.partner_id.id + 700000000),
-                       self.tax_19.l10n_de_datev_code, '112', move.name, move.invoice_line_ids[1].name], data)
+        self.assertIn(['100,00', 'S', 'EUR', '34000000', str(move.partner_id.id + 700000000),
+                       '', '112', move.name, move.invoice_line_ids[1].name], data)
         self.assertIn(['119,00', 'S', 'EUR', '49800000', str(move.partner_id.id + 700000000),
                        self.tax_19.l10n_de_datev_code, '112', move.name, move.invoice_line_ids[2].name], data)
 
@@ -589,7 +645,10 @@ class TestDatevCSV(AccountTestInvoicingCommon):
             {'name': 'partner6', 'vat': '1234567890'},
             {'name': 'partner7', 'vat': 'NL000099998B57'},
             {'name': 'partner8', 'vat': '/'},
-            {'name': 'partner9', 'vat': '12AAAAA1234AAZA'}
+            {'name': 'partner9', 'vat': '12AAAAA1234AAZA'},
+            {'name': 'partner10', 'vat': 'EL123456783'},
+            {'name': 'partner11', 'vat': 'EL123456783', 'country_id': self.ref('base.gr')},
+            {'name': 'partner12', 'vat': 'BE0897223670', 'country_id': self.ref('base.ch')},
         ]
         partners = self.env['res.partner'].create(partners_list)
 
@@ -614,19 +673,23 @@ class TestDatevCSV(AccountTestInvoicingCommon):
             reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
             # first 2 rows are just headers and needn't be validated
             # first 2 columns are 'account' and 'name' and they are irrelevant to this test
-            data = [row[2:10] for row in itertools.islice(reader, 2, None)]
+            # column 19 'land' required for non DE
+            data = [row[2:10] + [row[19]] for row in itertools.islice(reader, 2, None)]
             self.assertEqual(
                 data,
                 [
-                    ["", "partner1", "", "", "1", "", "BE", "0897223670"],
-                    ["", "partner2", "", "", "1", "", "", ""],
-                    ["", "partner3", "", "", "1", "", "US", "12345671"],
-                    ["", "partner4", "", "", "1", "", "", ""],
-                    ["", "partner5", "", "", "1", "", "", "NA"],
-                    ["", "partner6", "", "", "1", "", "", "1234567890"],
-                    ["", "partner7", "", "", "1", "", "NL", "000099998B57"],
-                    ["", "partner8", "", "", "1", "", "", "/"],
-                    ["", "partner9", "", "", "1", "", "", "12AAAAA1234AAZA"],
+                    ["", "", "", "", "2", "", "BE", "0897223670", "BE"],
+                    ["", "partner2", "", "", "1", "", "", "", ""],
+                    ["", "", "", "", "2", "", "", "", "US"],
+                    ["", "partner4", "", "", "1", "", "", "", ""],
+                    ["", "partner5", "", "", "1", "", "", "", ""],
+                    ["", "", "", "", "2", "", "", "", ""],
+                    ["", "", "", "", "2", "", "NL", "000099998B57", "NL"],
+                    ["", "partner8", "", "", "1", "", "", "", ""],
+                    ["", "", "", "", "2", "", "", "", ""],
+                    ["", "", "", "", "2", "", "EL", "123456783", "GR"],
+                    ["", "", "", "", "2", "", "EL", "123456783", "GR"],
+                    ["", "", "", "", "2", "", "BE", "0897223670", "CH"],
                 ],
             )
 
@@ -689,12 +752,12 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, moves))
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
-        self.assertIn(['18,14', 'S', 'EUR', '21300000', debit_account_code, self.tax_19.l10n_de_datev_code, '312', pay.name, pay.move_id.line_ids[2].name], data)
-        self.assertIn(['2,13', 'S', 'EUR', '21300000', debit_account_code, self.tax_7.l10n_de_datev_code, '312', pay.name, pay.move_id.line_ids[2].name], data)
+        epd_loss_account_code = str(self.env.company.account_journal_early_pay_discount_loss_account_id.code).ljust(8, '0')
+        self.assertIn(['18,14', 'S', 'EUR', epd_loss_account_code, debit_account_code, self.tax_19.l10n_de_datev_code, '312', pay.name, pay.move_id.line_ids[2].name], data)
+        self.assertIn(['2,13', 'S', 'EUR', epd_loss_account_code, debit_account_code, self.tax_7.l10n_de_datev_code, '312', pay.name, pay.move_id.line_ids[2].name], data)
 
     def test_datev_out_bank_payment_epd_rounding(self):
         report = self.env.ref('account_reports.general_ledger_report')
-        self.company_data['default_account_tax_purchase'].reconcile = True
         options = report.get_options({})
         options['date'].update({
             'date_from': '2020-01-01',
@@ -765,8 +828,9 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, payment_move))
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
-        self.assertIn(['3,83', 'H', 'EUR', '26700000', '12010000', self.tax_19.l10n_de_datev_code, '212', payment_move.name, "Early Payment Discount"], data)
-        self.assertIn(['1,84', 'H', 'EUR', '26700000', '12010000', self.tax_19.l10n_de_datev_code, '212', payment_move.name, "Early Payment Discount"], data)
+        epd_gain_account_code = str(self.env.company.account_journal_early_pay_discount_gain_account_id.code).ljust(8, '0')
+        self.assertIn(['3,83', 'H', 'EUR', epd_gain_account_code, '12010000', self.tax_19.l10n_de_datev_code, '212', payment_move.name, "Early Payment Discount"], data)
+        self.assertIn(['1,84', 'H', 'EUR', epd_gain_account_code, '12010000', self.tax_19.l10n_de_datev_code, '212', payment_move.name, "Early Payment Discount"], data)
 
     @freeze_time('2021-01-02 18:00')
     def test_datev_out_invoice_with_attch(self):
@@ -825,6 +889,53 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         """
 
         self.assertXmlTreeEqual(self.get_xml_tree_from_string(xml), self.get_xml_tree_from_string(expected_tree))
+
+    @freeze_time('2021-01-02 18:00')
+    def test_datev_out_invoice_with_orphaned_attachment(self):
+        """
+        `message_main_attachment_id` may point to an attachment not linked to the
+        move (`res_id=0`, `res_model=False`, e.g. an image uploaded by another user).
+        Exporting as a plain accounting user (not manager, not system) must not raise
+        an `AccessError`.
+        """
+        accountant = self.env['res.users'].create({
+            'name': 'Accountant',
+            'login': 'accountant',
+            'group_ids': [Command.set([self.env.ref('account.group_account_user').id])],
+        })
+
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = report.get_options({})
+        options['date'].update({
+            'date_from': '2020-01-01',
+            'date_to': '2020-12-31',
+        })
+
+        move = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': fields.Date.to_date('2020-12-01'),
+            'invoice_line_ids': [
+                Command.create({
+                    'price_unit': 100,
+                    'account_id': self.account_4980.id,
+                    'tax_ids': [Command.set(self.tax_19.ids)],
+                }),
+            ]
+        })
+        move.action_post()
+
+        move.message_main_attachment_id = self.env['ir.attachment'].create({
+            'name': 'orphan.png',
+            'mimetype': 'image/png',
+            'raw': b'Fake Image',
+        })
+        # Access is only re-checked when fields are actually fetched from the DB; the ORM
+        # cache is shared for the whole transaction, so without this the accountant would
+        # transparently reuse the values already cached by the admin's create() above
+        move.message_main_attachment_id.invalidate_recordset()
+
+        self.env[report.custom_handler_model_name].with_user(accountant).l10_de_datev_export_to_zip_and_attach(options)
 
     def test_datev_out_invoice_with_included_tax(self):
         report = self.env.ref('account_reports.general_ledger_report')
@@ -897,9 +1008,9 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, move))
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
-        self.assertIn(['119,00', 'H', 'XYZ', '2,0', '238,00', 'EUR', '34000000', str(move.partner_id.id + 100000000),
+        self.assertIn(['119,00', 'H', 'XYZ', '0,5', '238,00', 'EUR', '34000000', str(move.partner_id.id + 100000000),
                        self.tax_19.l10n_de_datev_code, '112', move.name, move.invoice_line_ids[0].name], data)
-        self.assertIn(['19,95', 'H', 'XYZ', '2,0', '39,90', 'EUR', '34000000', str(move.partner_id.id + 100000000),
+        self.assertIn(['19,95', 'H', 'XYZ', '0,5', '39,90', 'EUR', '34000000', str(move.partner_id.id + 100000000),
                        self.tax_19.l10n_de_datev_code, '112', move.name, move.invoice_line_ids[1].name], data)
 
     def test_datev_entry_in_foreign_currency(self):
@@ -945,7 +1056,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, move))
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
-        self.assertIn(['50,00', 'H', 'XYZ', '2,0', '100,00', 'EUR', '34000000', '49800000',
+        self.assertIn(['50,00', 'H', 'XYZ', '0,5', '100,00', 'EUR', '34000000', '49800000',
                        '', '112', move.name, move.line_ids[1].name], data)
 
     def test_datev_miscellaneous_with_updated_credit_and_debit_in_aml(self):
@@ -1114,7 +1225,7 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, move))
         reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
         data = [[x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
-        self.assertIn(['119,00', 'H', 'XYZ', '2,0', '238,00', 'EUR', '34000000', str(move.partner_id.id + 100000000),
+        self.assertIn(['119,00', 'H', 'XYZ', '0,5', '238,00', 'EUR', '34000000', str(move.partner_id.id + 100000000),
                        self.tax_19.l10n_de_datev_code, '112', move.name, move.invoice_line_ids[0].name], data)
 
     def test_datev_expense_payment_with_tax(self):
@@ -1176,3 +1287,281 @@ class TestDatevCSV(AccountTestInvoicingCommon):
         self.assertEqual([
             ['150,00', 'H', 'EUR', '12030000', '34000000', tax_19_incl.l10n_de_datev_code],
         ], data)
+
+    def test_datev_out_invoice_in_foreign_currency_with_exchange_loss(self):
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = report.get_options(previous_options={'date': {
+            'date_from': '2026-01-01',
+            'date_to': '2026-12-31'
+        }})
+
+        # Create exchange rate entries for the foreign currency
+        foreign_currency = self.env['res.currency'].create({
+            'name': "XYZ",
+            'symbol': 'X',
+            'rate_ids': [
+                Command.create({'name': '2026-01-01', 'rate': 1.0}),
+                Command.create({'name': '2026-01-15', 'rate': 1.1}),
+            ],
+        })
+
+        # Create the invoice on any date before the exchange rate changes (i.e before 15th in this case)
+        move = self.env['account.move'].create([{
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'currency_id': foreign_currency.id,
+            'invoice_date': '2026-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'Line',
+                    'price_unit': 100.00,
+                    'tax_ids': [],
+                }),
+            ]
+        }])
+        move.action_post()
+
+        # Make the payment on any date with the new exchange rate (15th or after)
+        # The payment should create two entries in the report, one for the invoice payment
+        # and another for the currency exchange difference.
+        pay = self.env['account.payment.register'].with_context(active_model='account.move', active_ids=move.ids).create({
+            'payment_date': fields.Date.to_date('2026-01-16'),
+        })._create_payments()
+
+        # Get the exchange move
+        exchange_move = move.line_ids.matched_credit_ids.exchange_move_id
+
+        # Get the payment move
+        payment_move = pay.move_id
+
+        moves = payment_move | exchange_move
+
+        f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, moves))
+        reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
+        data = [[x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
+        self.assertIn(['100,00', 'H', 'XYZ', '1,099989', '90,91', 'EUR', str(move.partner_id.id + 100000000), '12030000',
+                       '', '1601', payment_move.name, payment_move.line_ids[0].name], data)
+        self.assertIn(['0,00', 'H', 'XYZ', '1,0', '9,09', 'EUR', str(move.partner_id.id + 100000000), '21500000',
+                      '', '3101', exchange_move.name, exchange_move.line_ids[0].name], data)
+
+    def test_datev_out_invoice_in_foreign_currency_with_exchange_gain(self):
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = report.get_options(previous_options={'date': {
+            'date_from': '2026-01-01',
+            'date_to': '2026-12-31'
+        }})
+
+        # Create exchange rate entries for the foreign currency
+        foreign_currency = self.env['res.currency'].create({
+            'name': "XYZ",
+            'symbol': 'X',
+            'rate_ids': [
+                Command.create({'name': '2026-01-01', 'rate': 1.0}),
+                Command.create({'name': '2026-01-15', 'rate': 0.5}),
+            ],
+        })
+
+        # Create the invoice on any date before the exchange rate changes (i.e before 15th in this case)
+        move = self.env['account.move'].create([{
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'currency_id': foreign_currency.id,
+            'invoice_date': '2026-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'Line',
+                    'price_unit': 100.00,
+                    'tax_ids': [],
+                }),
+            ]
+        }])
+        move.action_post()
+
+        # Make the payment on any date with the new exchange rate (15th or after)
+        # The payment should create two entries in the report, one for the invoice payment
+        # and another for the currency exchange difference.
+        pay = self.env['account.payment.register'].with_context(active_model='account.move', active_ids=move.ids).create({
+            'payment_date': fields.Date.to_date('2026-01-16'),
+        })._create_payments()
+
+        # Get the exchange move
+        exchange_move = move.line_ids.matched_credit_ids.exchange_move_id
+
+        # Get the payment move
+        payment_move = pay.move_id
+
+        moves = payment_move | exchange_move
+
+        f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, moves))
+        reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
+        data = [[x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[13]] for x in reader][2:]
+        self.assertIn(['100,00', 'H', 'XYZ', '0,5', '200,00', 'EUR', str(move.partner_id.id + 100000000), '12030000',
+                       '', '1601', payment_move.name, payment_move.line_ids[0].name], data)
+        self.assertIn(['0,00', 'S', 'XYZ', '1,0', '100,00', 'EUR', str(move.partner_id.id + 100000000), '26600000',
+                      '', '3101', exchange_move.name, exchange_move.line_ids[0].name], data)
+
+    def test_datev_in_invoice_tax_with_multiple_repartition_lines(self):
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = report.get_options(previous_options={'date': {
+            'date_from': '2026-01-01',
+            'date_to': '2026-01-31',
+        }})
+
+        foreign_currency = self.env['res.currency'].create({
+            'name': "for",
+            'symbol': 'abc',
+            'rounding': 0.01,
+            'rate_ids': [
+                Command.create({'name': '2025-01-01', 'rate': 3}),
+            ],
+        })
+
+        tax_account = self.company_data['default_account_tax_purchase']
+
+        tax = self.env['account.tax'].create({
+            'name': 'multiple repartition line tax',
+            'amount_type': 'percent',
+            'amount': 10.0,
+            'type_tax_use': 'purchase',
+            'repartition_line_ids': [
+                Command.create({'document_type': 'invoice', 'repartition_type': 'base'}),
+                Command.create({'document_type': 'invoice', 'repartition_type': 'tax', 'account_id': tax_account.id, 'factor_percent': 50.0}),
+                Command.create({'document_type': 'invoice', 'repartition_type': 'tax', 'account_id': tax_account.id, 'factor_percent': 50.0}),
+                Command.create({'document_type': 'refund', 'repartition_type': 'base'}),
+                Command.create({'document_type': 'refund', 'repartition_type': 'tax', 'account_id': tax_account.id, 'factor_percent': 50.0}),
+                Command.create({'document_type': 'refund', 'repartition_type': 'tax', 'account_id': tax_account.id, 'factor_percent': 50.0}),
+            ]
+        })
+
+        move = self.env['account.move'].create([{
+            'move_type': 'in_invoice',
+            'partner_id': self.partner_a.id,
+            'date': '2026-01-01',
+            'invoice_date': '2026-01-01',
+            'currency_id': foreign_currency.id,
+            'invoice_line_ids': [Command.create({
+                'price_unit': 100.00,
+                'tax_ids': [tax.id],
+            })]
+        }])
+        move.action_post()
+        f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, move))
+        reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
+        data = [[x[0], x[1], x[2], x[6], x[7], x[8]] for x in reader][2:]
+        self.assertEqual([
+            ['110,00', 'S', 'for', '34000000', str(move.partner_id.id + 700000000), ''],
+        ], data)
+
+    def test_datev_exchange_rate_zero_denominator(self):
+        """Test that an exchange rate defaults to 1,0 when the base currency amount is zero"""
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = report.get_options(previous_options={
+            'date': {'date_from': '2026-01-01', 'date_to': '2026-12-31'}
+        })
+        foreign_currency = self.env['res.currency'].create({
+            'name': "XYZ",
+            'symbol': 'X',
+        })
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2026-01-15',
+            'currency_id': foreign_currency.id,
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'Zero Base Test Line',
+                    'quantity': 1,
+                    'price_unit': 100.00,
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'tax_ids': [],
+                })
+            ]
+        })
+        invoice.action_post()
+        f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, invoice))
+        reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
+        data = [[x[0], x[1], x[2], x[3], x[4], x[5]] for x in reader][2:]
+        self.assertIn(['100,00', 'H', 'XYZ', '1,0', '100,00', 'EUR'], data)
+
+    def test_datev_three_currency_basic(self):
+        """
+        Tests 3-currency export with one foreign AR line.
+
+        Bank [AED] → AR [USD] → Company Currency [EUR]
+        """
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = report.get_options(previous_options={'date': {
+            'date_from': '2020-01-01',
+            'date_to': '2020-12-31',
+        }})
+        setup = self._setup_three_currency_test()
+        move = self._create_three_currency_transaction(
+            setup['bank_journal'].id,
+            amount=3000.0,
+            invoice_values=[{
+                'move_type': 'out_invoice',
+                'currency_id': setup['usd'].id,
+                'price_unit': 5000.0,
+            }],
+        )
+        f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, move))
+        reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
+        data = [
+            [x[0], x[1], x[2], x[4], x[5], x[7]]
+            for x in list(reader)[2:]
+        ]
+
+        self.assertEqual(len(data), 2)
+        self.assertIn(['3000,00', 'S', 'AED', '100,00', 'EUR', '13600000'], data)
+        self.assertIn(['5000,00', 'H', 'USD', '100,00', 'EUR', '13600000'], data)
+
+    def test_datev_three_currency_multiple_lines(self):
+        """
+        Tests multiple lines with mixed 2/3-currency handling.
+
+        One bank transaction:
+            -4,500 AED = -150 EUR
+
+        Reconciled against:
+            2,500 USD = 50 EUR
+            2,500 USD = 50 EUR
+            1,500 AED = 50 EUR
+        """
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = report.get_options(previous_options={'date': {
+            'date_from': '2020-01-01',
+            'date_to': '2020-12-31',
+        }})
+        setup = self._setup_three_currency_test()
+        move = self._create_three_currency_transaction(
+            setup['bank_journal'].id,
+            amount=-4500.0,
+            invoice_values=[
+                {
+                    'move_type': 'in_invoice',
+                    'currency_id': setup['usd'].id,
+                    'price_unit': 2500.0,
+                },
+                {
+                    'move_type': 'in_invoice',
+                    'currency_id': setup['usd'].id,
+                    'price_unit': 2500.0,
+                },
+                {
+                    'move_type': 'in_invoice',
+                    'currency_id': setup['aed'].id,
+                    'price_unit': 1500.0,
+                },
+            ],
+        )
+        f = StringIO(self.env[report.custom_handler_model_name]._l10n_de_datev_get_csv(options, move))
+        reader = csv.reader(f, delimiter=';', quotechar='"', quoting=2)
+        data = [
+            [x[0], x[1], x[2], x[4], x[5], x[7]]
+            for x in list(reader)[2:]
+        ]
+
+        self.assertEqual(len(data), 4)
+        self.assertEqual(data.count(['4500,00', 'H', 'AED', '100,00', 'EUR', '13600000']), 1)
+        self.assertEqual(data.count(['2500,00', 'S', 'USD', '50,00', 'EUR', '13600000']), 2)
+        self.assertEqual(data.count(['1500,00', 'S', 'AED', '50,00', 'EUR', '12060000']), 1)

@@ -1,9 +1,10 @@
+import { Scope, useApp, useScope } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { appTranslateFn } from "@web/core/l10n/translation";
-import { Interaction } from "./interaction";
-import { getTemplate } from "@web/core/templates";
-import { PairSet } from "./utils";
+import { addLoadingEffect, isClickable } from "@web/core/utils/ui";
 import { Colibri } from "./colibri";
+import { Interaction } from "./interaction";
+import lazyloader from "./lazyloader";
+import { BUTTON_HANDLER_SELECTOR, PairSet } from "./utils";
 
 /**
  * Website Core
@@ -18,12 +19,20 @@ import { Colibri } from "./colibri";
  * The Interaction class is designed to be a simple class that provides access
  * to the framework (env and services), and a minimalist declarative framework
  * that allows manipulating dom, attaching event handlers and updating it
- * properly. It does not depend on owl.
+ * properly. ~~It does not depend on owl~~.
+ *                     ^^^
+ * Edit: this commit added the explicit dependency to Owl, because it already depended
+ * on it through @web/core/registry. Furthermore, 'prepareRoot' does NOT work without
+ * an Owl App instance.
  *
  * The Component kind of interaction is used for more complicated interface needs.
  * It provides full access to Owl features, but is rendered browser side.
  *
  */
+const waitForInteractionsSetup = Promise.withResolvers();
+lazyloader.registerPageReadinessDelay(waitForInteractionsSetup.promise);
+
+class InteractionScope extends Scope {}
 
 class InteractionService {
     /**
@@ -32,17 +41,22 @@ class InteractionService {
      * @param {Object} env
      */
     constructor(el, env) {
+        this.scope = useScope();
         this.Interactions = [];
         this.el = el;
         this.isActive = false;
+        this.initialSetupDone = false;
         // relation el <--> Interaction
         this.activeInteractions = new PairSet();
         this.env = env;
         this.interactions = [];
         this.roots = [];
-        this.owlApp = null;
+        this.owlApp = useApp();
         this.proms = [];
         this.registry = null;
+        this.shouldBuffer = false;
+        this.bufferedClicks = new Map();
+        this.bufferTargets = new Map();
     }
 
     /**
@@ -53,24 +67,20 @@ class InteractionService {
      */
     activate(Interactions, target) {
         this.Interactions = Interactions;
-        const startProm = this.env.isReady.then(() => this.startInteractions(target));
+        const startProm = this.scope.ready.then(async () => {
+            const allInteractionsStarted = this.startInteractions(target);
+            this.retriggerBufferedClicks();
+            await allInteractionsStarted;
+            this.shouldBuffer = false;
+        });
         this.proms.push(startProm);
     }
 
+    createInteractionScope() {
+        return new InteractionScope(this.owlApp);
+    }
+
     prepareRoot(el, C, props, position = "beforeend") {
-        if (!this.owlApp) {
-            const { App } = odoo.loader.modules.get("@odoo/owl");
-            const appConfig = {
-                name: "Odoo Website",
-                getTemplate,
-                env: this.env,
-                dev: this.env.debug,
-                translateFn: appTranslateFn,
-                warnIfNoStaticProps: this.env.debug,
-                translatableAttributes: ["data-tooltip"],
-            };
-            this.owlApp = new App(null, appConfig);
-        }
         const root = this.owlApp.createRoot(C, { props, env: this.env });
         const rootEl = document.createElement("owl-root");
         rootEl.setAttribute("contenteditable", "false");
@@ -118,15 +128,28 @@ class InteractionService {
                     ? [el, ...el.querySelectorAll(I.selector)]
                     : el.querySelectorAll(I.selector);
                 if (I.selectorHas) {
-                    targets = [...targets].filter((el) => !!el.querySelector(I.selectorHas));
+                    if (!Array.isArray(I.selectorHas)) {
+                        I.selectorHas = [I.selectorHas];
+                    }
+                    targets = [...targets].filter((el) =>
+                        I.selectorHas.every((sel) => !!el.querySelector(`:scope ${sel}`))
+                    );
                 }
                 if (I.selectorNotHas) {
-                    targets = [...targets].filter((el) => !el.querySelector(I.selectorNotHas));
+                    if (!Array.isArray(I.selectorNotHas)) {
+                        I.selectorNotHas = [I.selectorNotHas];
+                    }
+                    targets = [...targets].filter(
+                        (el) =>
+                            !I.selectorNotHas.every((sel) => !!el.querySelector(`:scope ${sel}`))
+                    );
                 }
             } catch {
-                const selectorHasError = I.selectorHas ? ` or selectorHas: '${I.selectorHas}'` : "";
+                const selectorHasError = I.selectorHas
+                    ? ` or selectorHas: '${I.selectorHas.join("', '")}'`
+                    : "";
                 const selectorNotHasError = I.selectorNotHas
-                    ? ` or selectorNotHas: '${I.selectorNotHas}'`
+                    ? ` or selectorNotHas: '${I.selectorNotHas.join("', '")}'`
                     : "";
                 const error = new Error(
                     `Could not start interaction ${I.name} (invalid selector: '${I.selector}'${selectorHasError}${selectorNotHasError})`
@@ -137,6 +160,11 @@ class InteractionService {
             for (const _el of targets) {
                 this._startInteraction(_el, I, proms);
             }
+        }
+        if (!this.initialSetupDone) {
+            waitForInteractionsSetup.resolve();
+            this.shouldBuffer = true;
+            this.initialSetupDone = true;
         }
         if (el === this.el) {
             this.isActive = true;
@@ -156,6 +184,7 @@ class InteractionService {
                 const interaction = new Colibri(this, I, el);
                 this.interactions.push(interaction);
                 proms.push(interaction.start());
+                this.registerBufferedClicks(interaction);
             } catch (e) {
                 this.proms.push(Promise.reject(e));
             }
@@ -169,19 +198,31 @@ class InteractionService {
         if (!interaction.el) {
             return true;
         }
+        const selectorHasArray = Array.isArray(selectorHas) ? selectorHas : [selectorHas];
+        const selectorNotHasArray = Array.isArray(selectorNotHas)
+            ? selectorNotHas
+            : [selectorNotHas];
         return (
             el === interaction.el ||
             el.contains(interaction.el) ||
-            (selectorHas && !interaction.el.querySelector(selectorHas)) ||
-            (selectorNotHas && !!interaction.el.querySelector(selectorNotHas))
+            (selectorHas &&
+                selectorHasArray.some((sel) => !interaction.el.querySelector(`:scope ${sel}`))) ||
+            (selectorNotHas &&
+                selectorNotHasArray.some((sel) => !!interaction.el.querySelector(`:scope ${sel}`)))
         );
     }
 
     stopInteractions(el = this.el) {
         const interactions = [];
+        const errors = [];
         for (const interaction of this.interactions.slice().reverse()) {
             if (this.shouldStop(el, interaction)) {
-                interaction.destroy();
+                try {
+                    this.unbufferClicks(el, interaction);
+                    interaction.destroy();
+                } catch (error) {
+                    errors.push([interaction.interaction.constructor.name, error]);
+                }
                 this.activeInteractions.delete(interaction.el, interaction.interaction.constructor);
             } else {
                 interactions.push(interaction);
@@ -201,6 +242,9 @@ class InteractionService {
         if (el === this.el) {
             this.isActive = false;
         }
+        for (const [interaction, error] of errors) {
+            throw new Error(`Could not destroy interaction ${interaction}`, error);
+        }
     }
 
     /**
@@ -212,10 +256,113 @@ class InteractionService {
         const proms = this.proms.slice();
         return Promise.all(proms);
     }
+
+    /**************************** BUFFERING CLICKS ****************************/
+    /**
+     * Buffers clicks made before interactions are started to be replayed after.
+     *
+     * @param {Object} interaction - Colibri instance
+     */
+    registerBufferedClicks(interaction) {
+        const btnEls = [];
+        const dynamicContent = interaction.interaction.dynamicContent;
+        for (const sel in dynamicContent) {
+            const hasClickListener = Object.keys(dynamicContent[sel]).some((directive) =>
+                directive.startsWith("t-on-click")
+            );
+            if (hasClickListener) {
+                const nodes = interaction.getNodes(sel);
+                btnEls.push(
+                    ...nodes.filter(
+                        (node) => node.nodeType === 1 && node.matches(BUTTON_HANDLER_SELECTOR)
+                    )
+                );
+            }
+        }
+        for (const btnEl of new Set(btnEls)) {
+            this.setInteractionsPerBufferTarget(btnEl, interaction.startResolvers.promise);
+            if (!this.bufferedClicks.has(btnEl) && !this.bufferTargets.get(btnEl).handler) {
+                const handler = (ev) => {
+                    if (!this.shouldBuffer) {
+                        return;
+                    }
+                    ev.preventDefault();
+                    ev.stopImmediatePropagation();
+                    const restore = addLoadingEffect(btnEl);
+                    this.bufferedClicks.set(btnEl, { event: ev, restore });
+                };
+                btnEl.addEventListener("click", handler, { capture: true, once: true });
+                this.bufferTargets.get(btnEl).handler = handler;
+            }
+        }
+    }
+
+    setInteractionsPerBufferTarget(el, interactionStartPromise) {
+        if (!this.bufferTargets.has(el)) {
+            this.bufferTargets.set(el, {
+                interactionStarts: new Set([interactionStartPromise]),
+                handler: undefined,
+            });
+        } else {
+            this.bufferTargets.get(el).interactionStarts.add(interactionStartPromise);
+        }
+    }
+
+    /**
+     * Dispatches a click event on all buffered clicks targets.
+     */
+    retriggerBufferedClicks() {
+        for (const [btnEl, { interactionStarts }] of this.bufferTargets.entries()) {
+            const startProms = new Set(interactionStarts);
+            for (const interaction of this.interactions) {
+                if (interaction.el.contains(btnEl)) {
+                    startProms.add(interaction.startResolvers.promise);
+                }
+            }
+            Promise.allSettled(startProms).then(() => {
+                if (!this.bufferedClicks.has(btnEl)) {
+                    return;
+                }
+                const { event, restore } = this.bufferedClicks.get(btnEl);
+                restore();
+                if (isClickable(btnEl)) {
+                    event.target.dispatchEvent(new event.constructor(event.type, event));
+                }
+                this.bufferedClicks.delete(btnEl);
+            });
+        }
+    }
+
+    /**
+     * Removes elements from clicks to be retriggered.
+     *
+     * @param {HTMLElement} el - root stopped
+     * @param {Object} interaction - Colibri instance
+     */
+    unbufferClicks(el, interaction) {
+        for (const [btnEl, { interactionStarts, handler }] of this.bufferTargets.entries()) {
+            if (el === btnEl || el.contains(btnEl)) {
+                if (!interactionStarts.has(interaction.startResolvers.promise)) {
+                    continue;
+                }
+                interactionStarts.delete(interaction.startResolvers.promise);
+                interaction.startResolvers.promise.catch(() => {});
+                interaction.startResolvers.reject();
+                if (!interactionStarts.size) {
+                    if (!this.bufferedClicks.get(btnEl)) {
+                        btnEl.removeEventListener("click", handler, { capture: true, once: true });
+                    } else {
+                        this.bufferedClicks.get(btnEl).restore();
+                        this.bufferedClicks.delete(btnEl);
+                    }
+                    this.bufferTargets.delete(btnEl);
+                }
+            }
+        }
+    }
 }
 
 export const publicInteractionService = {
-    dependencies: ["localization"],
     async start(env) {
         // fallback if #wrapwrap is not present in the dom
         const el = document.querySelector("#wrapwrap") || document.querySelector("body");

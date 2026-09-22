@@ -7,14 +7,14 @@ class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
     @api.model
-    def _generate_all_returns(self, country_code, main_company, tax_unit=None):
+    def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
         """
         Generate all periodic returns for Spain (ES).
         This includes Intrastat returns for goods and services,
         which are only created if sales or purchase balance exceeds the legal threshold (400,000€).
         """
 
-        super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit)
+        super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)
 
         if country_code == 'ES':
             # NOTE: This currently includes triangular sales.
@@ -31,8 +31,6 @@ class AccountReturnType(models.Model):
             date = {
                 'date_from': fields.Date.to_string(intrastat_date_from),
                 'date_to': fields.Date.to_string(intrastat_date_to),
-                'filter': 'custom',
-                'mode': 'range',
             }
 
             # Evaluate each Intrastat return type

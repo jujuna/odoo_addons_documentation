@@ -13,7 +13,7 @@
                         </div>
                     </div>
                     <div class="card-body h-100">
-                        <t t-if="team.website_latest_articles" class="card-title">
+                        <t t-if="team.website_latest_articles">
                             <small class="text-muted text-uppercase">
                                 <t t-if="len(team.website_latest_articles) &gt; 4">Favorites</t>
                                 <t t-else="">Quick Links</t>
@@ -49,7 +49,7 @@
     <template id="search_result" name="Knowledge Base: Knowledge Search Result">
         <div class="website_forum d-flex w-100 mb-0 py-4 border-top">
             <p class="mt-1 text-400">
-                <i class="fa fa-fw fa-2x fa-book" title="Knowledge Article"/>
+                <i class="oi oi-fw oi-2x" data-icon="book" title="Knowledge Article"/>
             </p>
             <div class="w-100 ms-3">
                 <h5>
@@ -61,7 +61,7 @@
                     | <t t-out="record.parent_id.sudo().display_name"/>
                     </t>
                     <t t-if="record.is_user_favorite">
-                    | <div class="fa fa-star text-warning"/>
+                    | <i class="oi oi-filled text-warning" data-icon="star"/>
                     </t>
                 </small>
             </div>

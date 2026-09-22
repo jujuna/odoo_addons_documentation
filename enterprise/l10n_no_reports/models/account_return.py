@@ -18,7 +18,7 @@ class AccountReturn(models.Model):
 
         return super()._evaluate_deadline(company, return_type, return_type_external_id, date_from, date_to)
 
-    def action_submit(self):
+    def _prepare_submission(self):
         if self.type_external_id == 'l10n_no_reports.no_tax_return_type':
             return self.env['l10n_no_reports.vat.return.submission.wizard']._open_submission_wizard(self)
-        return super().action_submit()
+        return super()._prepare_submission()

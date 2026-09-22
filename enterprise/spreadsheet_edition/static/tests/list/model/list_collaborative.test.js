@@ -1,6 +1,6 @@
 import { beforeEach, describe, test } from "@odoo/hoot";
 import { animationFrame } from "@odoo/hoot-mock";
-import { setCellContent } from "@spreadsheet/../tests/helpers/commands";
+import { addRows, setCellContent } from "@spreadsheet/../tests/helpers/commands";
 import { defineSpreadsheetModels, getBasicServerData } from "@spreadsheet/../tests/helpers/data";
 import {
     getCellContent,
@@ -19,37 +19,30 @@ defineSpreadsheetModels();
 
 /** @typedef {import("@spreadsheet/o_spreadsheet/o_spreadsheet").Model} Model */
 
-function insertList(model, id, anchor = [0, 0]) {
-    const { definition, columns } = getListPayload();
+function insertList(model, listId, anchor = [0, 0]) {
+    const definition = getListPayload();
+
     return model.dispatch("INSERT_ODOO_LIST", {
         sheetId: model.getters.getActiveSheetId(),
         col: anchor[0],
         row: anchor[1],
-        id,
         definition,
-        columns,
+        listId,
         linesNumber: 5,
+        mode: "static",
     });
 }
 
 function getListPayload() {
     return {
-        definition: {
-            metaData: {
-                resModel: "partner",
-                columns: ["foo", "probability"],
-            },
-            searchParams: {
-                domain: [],
-                context: {},
-                orderBy: [],
-            },
-            limit: 5,
-        },
+        model: "partner",
         columns: [
-            { name: "foo", type: "integer" },
-            { name: "probability", type: "integer" },
+            { name: "foo", string: "Foo" },
+            { name: "probability", string: "Probability" },
         ],
+        domain: [],
+        context: {},
+        orderBy: [],
     };
 }
 
@@ -87,11 +80,11 @@ test("Add two lists concurrently", async () => {
     );
     spExpect([alice, bob, charlie]).toHaveSynchronizedValue(
         (user) => getCellFormula(user, "A1"),
-        `=ODOO.LIST.HEADER(1,"foo")`
+        `=ODOO.LIST.HEADER(1,"foo","Foo")`
     );
     spExpect([alice, bob, charlie]).toHaveSynchronizedValue(
         (user) => getCellFormula(user, "A26"),
-        `=ODOO.LIST.HEADER(2,"foo")`
+        `=ODOO.LIST.HEADER(2,"foo","Foo")`
     );
     await animationFrame();
 
@@ -140,14 +133,14 @@ test("Rename and remove a list concurrently", async () => {
 test("Re-insert and remove a list concurrently", async () => {
     insertList(alice, "1");
     await network.concurrent(() => {
-        const { columns } = getListPayload();
+        const definition = getListPayload();
         alice.dispatch("RE_INSERT_ODOO_LIST", {
-            id: "1",
+            listId: "1",
             col: 0,
             row: 0,
             sheetId: alice.getters.getActiveSheetId(),
             linesNumber: 5,
-            columns,
+            columns: definition.columns,
         });
         bob.dispatch("REMOVE_ODOO_LIST", {
             listId: "1",
@@ -179,7 +172,7 @@ test("remove and update a domain of a list concurrently", async () => {
 test("remove and update a sorting of a list concurrently", async () => {
     insertList(alice, "1");
     await network.concurrent(() => {
-        const listDefinition = alice.getters.getListModelDefinition("1");
+        const listDefinition = alice.getters.getListDefinition("1");
         alice.dispatch("REMOVE_ODOO_LIST", {
             listId: "1",
         });
@@ -188,10 +181,7 @@ test("remove and update a sorting of a list concurrently", async () => {
             listId: "1",
             list: {
                 ...listDefinition,
-                searchParams: {
-                    ...listDefinition.searchParams,
-                    orderBy: orderBy,
-                },
+                orderBy: orderBy,
             },
         });
     });
@@ -251,4 +241,66 @@ test("Duplicate and insert list concurrently", async () => {
         (user) => user.getters.getListIds(),
         expectedListIds
     );
+});
+
+test("Computed column formula in UPDATE_ODOO_LIST is adapted when rows are added concurrently before", async () => {
+    insertList(alice, "1");
+    const sheetId = alice.getters.getActiveSheetId();
+    const listDef = alice.getters.getListDefinition("1");
+
+    await network.concurrent(() => {
+        addRows(bob, "before", 0, 1);
+        alice.dispatch("UPDATE_ODOO_LIST", {
+            listId: "1",
+            list: {
+                ...listDef,
+                columns: [
+                    ...listDef.columns,
+                    {
+                        name: "calc",
+                        string: "Calc",
+                        computedBy: { sheetId, formula: "=A1" },
+                        hidden: false,
+                    },
+                ],
+            },
+        });
+    });
+
+    spExpect([alice, bob, charlie]).toHaveSynchronizedValue((user) => {
+        const def = user.getters.getListDefinition("1");
+        const calcCol = def.columns.find((col) => col.name === "calc");
+        return calcCol?.computedBy?.formula;
+    }, "=A2");
+});
+
+test("Computed column formula in UPDATE_ODOO_LIST is adapted when rows are added concurrently after", async () => {
+    insertList(alice, "1");
+    const sheetId = alice.getters.getActiveSheetId();
+    const listDef = alice.getters.getListDefinition("1");
+
+    await network.concurrent(() => {
+        alice.dispatch("UPDATE_ODOO_LIST", {
+            listId: "1",
+            list: {
+                ...listDef,
+                columns: [
+                    ...listDef.columns,
+                    {
+                        name: "calc",
+                        string: "Calc",
+                        computedBy: { sheetId, formula: "=A1" },
+                        hidden: false,
+                    },
+                ],
+            },
+        });
+        addRows(bob, "before", 0, 1);
+    });
+
+    spExpect([alice, bob, charlie]).toHaveSynchronizedValue((user) => {
+        const def = user.getters.getListDefinition("1");
+        const calcCol = def.columns.find((col) => col.name === "calc");
+        return calcCol?.computedBy?.formula;
+    }, "=A2");
 });

@@ -3,9 +3,10 @@
 
 from odoo.addons.appointment_crm.tests.common import TestAppointmentCrmCommon
 from odoo.addons.website.tests.test_website_visitor import MockVisitor
-from odoo.tests import HttpCase, common
+from odoo.tests import tagged, HttpCase, common
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WebsiteAppointmentCRMTest(TestAppointmentCrmCommon, MockVisitor):
     @classmethod
     def setUpClass(cls):

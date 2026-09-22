@@ -4,6 +4,7 @@
         <field name="name">Profit and Loss</field>
         <field name="name@es_419">Estado de resultados</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="country_id" ref="base.co"/>
         <field name="filter_date_range" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
@@ -28,17 +29,13 @@
                         <field name="code">L10N_CO_PNL_IO</field>
                         <field name="name">Operational</field>
                         <field name="name@es_419">Operacionales</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-41</field>
-                        <field name="groupby">account_id</field>
                     </record>
                     <record id="l10n_co_pl_account_report_income_non_operational" model="account.report.line">
                         <field name="code">L10N_CO_PNL_INO</field>
                         <field name="name">Non-operational</field>
                         <field name="name@es_419">No operacionales</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-42</field>
-                        <field name="groupby">account_id</field>
                     </record>
                 </field>
             </record>
@@ -61,8 +58,6 @@
                         <field name="code">L10N_CO_PNL_E_ADMIN</field>
                         <field name="name">Administrative Operations</field>
                         <field name="name@es_419">Operacionales de administración</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_expenses_admin_balance" model="account.report.expression">
@@ -77,8 +72,6 @@
                         <field name="code">L10N_CO_PNL_E_SALES</field>
                         <field name="name">Sales Operations</field>
                         <field name="name@es_419">Operacionales de ventas</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_expenses_sales_balance" model="account.report.expression">
@@ -93,8 +86,6 @@
                         <field name="code">L10N_CO_PNL_DEPR</field>
                         <field name="name">Depreciation and Amortization</field>
                         <field name="name@es_419">Depreciaciones y amortizaciones</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_depreciation_balance" model="account.report.expression">
@@ -109,8 +100,6 @@
                         <field name="code">L10N_CO_PNL_E_NO</field>
                         <field name="name">Non-operational</field>
                         <field name="name@es_419">No operacionales</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_expenses_non_operational_balance" model="account.report.expression">
@@ -127,7 +116,7 @@
                 <field name="code">L10N_CO_PNL_COST_SALES</field>
                 <field name="name">Cost of Sales</field>
                 <field name="name@es_419">Costos de ventas</field>
-                <field name="foldable" eval="True"/>
+                <field name="foldability">foldable</field>
                 <field name="aggregation_formula" eval="False"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
@@ -143,8 +132,6 @@
                         <field name="code">L10N_CO_PNL_COST_SNS</field>
                         <field name="name">Cost of sales and provision of services</field>
                         <field name="name@es_419">Costo de ventas y de prestación de servicios</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_cost_sales_services_balance" model="account.report.expression">
@@ -159,8 +146,6 @@
                         <field name="code">L10N_CO_PNL_COST_PURCHASE</field>
                         <field name="name">Purchases</field>
                         <field name="name@es_419">Compras</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_purchase_cost_balance" model="account.report.expression">
@@ -177,7 +162,7 @@
                 <field name="code">L10N_CO_PNL_COST_PROD</field>
                 <field name="name">Cost of Production</field>
                 <field name="name@es_419">Costos de producción o de operación</field>
-                <field name="foldable" eval="True"/>
+                <field name="foldability">foldable</field>
                 <field name="aggregation_formula" eval="False"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
@@ -196,8 +181,6 @@
                         <field name="code">L10N_CO_PNL_RAW_MATERIAL</field>
                         <field name="name">Raw Material</field>
                         <field name="name@es_419">Materia prima</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_raw_material_balance" model="account.report.expression">
@@ -212,8 +195,6 @@
                         <field name="code">L10N_CO_PNL_COST_LABOR</field>
                         <field name="name">Direct Labor</field>
                         <field name="name@es_419">Mano de obra directa</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_cost_labor_balance" model="account.report.expression">
@@ -228,8 +209,6 @@
                         <field name="code">L10N_CO_PNL_INDIRECT</field>
                         <field name="name">Indirect Costs</field>
                         <field name="name@es_419">Costos indirectos</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_cost_indirect_balance" model="account.report.expression">
@@ -244,8 +223,6 @@
                         <field name="code">L10N_CO_PNL_COST_CONTRACTS</field>
                         <field name="name">Service Contracts</field>
                         <field name="name@es_419">Contratos de servicios</field>
-                        <field name="foldable" eval="True"/>
-                        <field name="groupby">account_id</field>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_co_pl_account_report_cost_contracts_balance" model="account.report.expression">
@@ -262,8 +239,6 @@
                 <field name="code">L10N_CO_PNL_GAINS_LOSSES</field>
                 <field name="name">Gains and Losses</field>
                 <field name="name@es_419">Ganancias y pérdidas</field>
-                <field name="foldable" eval="True"/>
-                <field name="groupby">account_id</field>
                 <field name="hierarchy_level">0</field>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="expression_ids">
@@ -286,8 +261,6 @@
                 <field name="code">L10N_CO_PNL_TAX</field>
                 <field name="name">Income Tax</field>
                 <field name="name@es_419">Impuesto de renta y complementarios</field>
-                <field name="foldable" eval="True"/>
-                <field name="groupby">account_id</field>
                 <field name="hierarchy_level">0</field>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="expression_ids">

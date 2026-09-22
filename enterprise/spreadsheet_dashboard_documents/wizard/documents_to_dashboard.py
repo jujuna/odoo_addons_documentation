@@ -8,6 +8,7 @@ class SpreadsheetDocumentToDashboard(models.TransientModel):
     _name = 'spreadsheet.document.to.dashboard'
     _description = "Create a dashboard from a spreadsheet document"
 
+    spreadsheet_data = fields.Text()
     name = fields.Char(
         "Dashboard Name",
         required=True,
@@ -42,7 +43,7 @@ class SpreadsheetDocumentToDashboard(models.TransientModel):
                 "name": self.name,
                 "dashboard_group_id": self.dashboard_group_id.id,
                 "group_ids": self.group_ids.ids,
-                "spreadsheet_data": self.document_id._get_spreadsheet_serialized_snapshot(),
+                "spreadsheet_data": self.spreadsheet_data,
             }
         )
         # transfer the comments to the dashboard

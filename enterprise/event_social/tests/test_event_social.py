@@ -37,7 +37,7 @@ class EventSocialCase(EventCase, MockEmail):
         cls.event_date_begin = datetime(2021, 3, 22, 8, 0, 0)
         cls.event_date_end = datetime(2021, 3, 24, 18, 0, 0)
 
-        with cls.mock_datetime_and_now(cls, cls.reference_now):
+        with cls.mock_datetime_and_now(cls.reference_now):
             cls.test_event = cls.env['event.event'].create({
                 'name': 'TestEvent',
                 'date_begin': cls.event_date_begin,
@@ -53,25 +53,26 @@ class EventSocialCase(EventCase, MockEmail):
                 ],
             })
 
+        cls.social_template = cls.env['social.post.template'].sudo().create({
+            'account_ids': [(4, cls.social_account.id)],
+            'message': 'Join the Python side of the force!',
+        })
+
     @users('user_eventmanager')
     def test_social_schedule_after_sub(self):
         """Check that we can not set "after each registration" with social event mail."""
-        social_template = self.env['social.post.template'].create({
-            'account_ids': [(4, self.social_account.id)],
-            'message': 'Join the Python side of the force!',
-        })
         with self.assertRaises(UserError):
             self.env['event.type'].create({
                 'name': 'Super category',
                 'event_type_mail_ids': [(0, 0, {
-                    'template_ref': 'social.post.template,%i' % social_template.id,
+                    'template_ref': 'social.post.template,%i' % self.social_template.id,
                     'interval_type': 'after_sub'
                 })],
             })
 
         with self.assertRaises(UserError):
             self.env['event.mail'].create({
-                'template_ref': 'social.post.template,%i' % social_template.id,
+                'template_ref': 'social.post.template,%i' % self.social_template.id,
                 'interval_type': 'after_sub',
                 'event_id': self.test_event.id,
             })
@@ -79,15 +80,11 @@ class EventSocialCase(EventCase, MockEmail):
     @users('user_eventmanager')
     def test_social_schedule_before_event(self):
         """Check that the social template is automatically set, when changing the category of the event."""
-        social_template = self.env['social.post.template'].create({
-            'account_ids': [(4, self.social_account.id)],
-            'message': 'Join the Python side of the force!',
-        })
         category = self.env['event.type'].create({
             'name': 'Super category',
             'event_type_mail_ids': [(0, 0, {
                 'notification_type': 'social_post',
-                'template_ref': 'social.post.template,%i' % social_template.id,
+                'template_ref': 'social.post.template,%i' % self.social_template.id,
             })],
         })
         event_form = Form(self.env['event.event'])
@@ -97,22 +94,21 @@ class EventSocialCase(EventCase, MockEmail):
         event_form.event_type_id = category
         event = event_form.save()
 
+        event_mail = event.sudo().event_mail_ids
         self.assertEqual(event.name, 'Test event')
-        self.assertEqual(len(event.event_mail_ids), 1)
-        self.assertEqual(event.event_mail_ids.interval_type, 'before_event')
-        self.assertFalse(event.event_mail_ids.mail_done)
-        self.assertEqual(event.event_mail_ids.scheduled_date, datetime(2020, 1, 31, 23, 0, 0))
-        self.assertEqual(event.event_mail_ids.template_ref, social_template)
+        self.assertEqual(len(event_mail), 1)
+        self.assertEqual(event_mail.interval_type, 'before_event')
+        self.assertFalse(event_mail.mail_done)
+        self.assertEqual(event_mail.scheduled_date, datetime(2020, 1, 31, 23, 0, 0))
+        self.assertEqual(event_mail.template_ref, self.social_template)
 
         # send scheduler on event
         with self.mock_datetime_and_now(datetime(2020, 2, 2, 10, 0, 0)):
-            # use sudo as schedulers are meant to be run by crons, hence limiting
-            # ACLs for event users
-            event.event_mail_ids.sudo().execute()
+            event_mail.execute()
 
-        self.assertEqual(event.event_mail_ids.mail_count_done, 1,
+        self.assertEqual(event_mail.mail_count_done, 1,
                          'Should equal number of accounts')
-        self.assertTrue(event.event_mail_ids.mail_done)
+        self.assertTrue(event_mail.mail_done)
 
     @mute_logger('odoo.addons.event.models.event_mail')
     @users('user_eventmanager')

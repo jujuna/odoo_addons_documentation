@@ -58,12 +58,12 @@ class SaleOrderLine(models.Model):
         qty_to_invoice_by_customs = defaultdict(float)
         outgoing_moves, incoming_moves = self._get_outgoing_incoming_moves()
         sml_by_customs = (outgoing_moves | incoming_moves).move_line_ids.filtered(
-            lambda ml: ml.state == 'done' and ml.product_id.tracking != 'none'
+            lambda ml: ml.state == 'done' and ml.product_id.tracking in ['lot', 'serial']
         ).grouped(lambda ml: ml.lot_id.sudo().l10n_mx_edi_customs_number)
 
         for customs, move_lines in sml_by_customs.items():
             delivered_qty = sum(
-                _compute_qty(ml.quantity, ml.product_uom_id, ml.location_usage == 'customer') for ml in move_lines
+                _compute_qty(ml.quantity, ml.uom_id, ml.location_usage == 'customer') for ml in move_lines
             )
             qty_to_invoice_by_customs[customs] = delivered_qty
 

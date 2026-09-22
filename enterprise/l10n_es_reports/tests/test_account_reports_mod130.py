@@ -7,20 +7,22 @@ from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestAccountReportsModelo130(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('es')
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.company_data['company'].country_id = cls.env.ref('base.be').id
+        cls.company_data['company'].country_id = cls.env.ref('base.es').id
         cls.company_data['company'].currency_id = cls.env.ref('base.EUR').id
         cls.company_data['currency'] = cls.env.ref('base.EUR')
 
         cls.partner_a = cls.env['res.partner'].create({
             'name': 'Bidule',
             'company_id': cls.company_data['company'].id,
-            'company_type': 'company',
             'country_id': cls.company_data['company'].country_id.id,
+            'vat': 'ESA39200019',
         })
 
         cls.product = cls.env['product.product'].create({

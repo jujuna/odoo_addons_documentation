@@ -10,6 +10,8 @@ patch(PivotController.prototype, {
         useBus(this.env.bus, "APPLY_AI_ADJUST_MODEL", async ({ detail }) => {
             const { measures } = detail;
             if (this.model instanceof PivotModel) {
+                // Wait for any ongoing model load to avoid overwriting its metadata.
+                await this.model.race.getCurrentProm();
                 const metaData = this.model._buildMetaData();
                 const metaDataMeasures = computeReportMeasures(
                     metaData.fields,
@@ -20,10 +22,12 @@ patch(PivotController.prototype, {
                 const activeMeasures = metaData.activeMeasures || [];
                 const measuresToToggle = new Set([
                     ...validMeasures.filter((m) => !activeMeasures.includes(m)), // measures to activate
-                    ...activeMeasures.filter((m) => !validMeasures.includes(m)), // measures to deactivate
+                    ...(validMeasures.length
+                        ? activeMeasures.filter((m) => !validMeasures.includes(m))
+                        : []), // measures to deactivate
                 ]);
                 for (const measure of measuresToToggle) {
-                    this.model.toggleMeasure(measure);
+                    await this.model.toggleMeasure(measure);
                 }
             }
         });

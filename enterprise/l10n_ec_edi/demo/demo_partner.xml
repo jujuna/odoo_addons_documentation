@@ -9,15 +9,13 @@
         <field name="phone">+593 4 3731742</field>
         <field name="email">info@company.ecexample.com</field>
         <field name="website">www.ecexample.com</field>
-        <field name="vat">0931077481</field>
-        <field name="l10n_latam_identification_type_id" ref="l10n_ec.ec_dni"/>
+        <field name="additional_identifiers" eval="{'EC_DNI': '0931077481'}"/>
         <field name="l10n_ec_taxpayer_type_id" ref="l10n_ec_taxpayer_type_06"/>
     </record>
 
     <record id="l10n_ec.ec_social_security" model="res.partner" >
         <field name="street">Av. 10 de Agosto</field>
         <field name="city">Quito</field>
-        <field name="l10n_latam_identification_type_id" ref="l10n_ec.ec_ruc"/>
         <field name="l10n_ec_taxpayer_type_id" ref="l10n_ec_taxpayer_type_01"/>
     </record>
 </odoo>

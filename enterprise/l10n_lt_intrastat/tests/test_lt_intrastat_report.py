@@ -10,11 +10,13 @@ from odoo.tests.common import test_xsd
 
 class TestLTIntrastatReportCommon(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('lt')
     def setUpClass(cls):
         super().setUpClass()
-        cls.company_data['company'].company_registry = '0123456789'
+        cls.company_data['company'].partner_id.additional_identifiers = {'LT_JAK': '0123456789'}
         italy = cls.env.ref('base.it')
         cls.report = cls.env.ref('account_intrastat.intrastat_report')
         cls.report_handler = cls.env['account.intrastat.goods.report.handler']
@@ -166,6 +168,8 @@ class TestLTIntrastatReportCommon(TestAccountReportsCommon):
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestLTIntrastatReport(TestLTIntrastatReportCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time("2024-01-04 13:54:34")
     def test_full_export(self):
         self.inwards_vendor_bill.action_post()
@@ -187,6 +191,8 @@ class TestLTIntrastatReportXmlValidity(TestLTIntrastatReportCommon):
     # 151: - <xsd:element ref="fillingTimeMinutes" minOccurs="0"/>
     # 151: + <xsd:element name="fillingTimeMinutes" type="xsd:integer"/>
     # @test_xsd(url='https://intrastat.lrmuitine.lt/docs/instat-v20230419.xsd')
+    _test_user_groups = None  # FIXME list needed groups
+
     @test_xsd(path='l10n_lt_intrastat/data/intrastat.xsd')
     def test_xml_validity(self):
         self.inwards_vendor_bill.action_post()

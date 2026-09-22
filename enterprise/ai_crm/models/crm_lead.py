@@ -8,6 +8,7 @@ from odoo.tools import html_sanitize
 
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
+    _explanation = "CRM leads are extended with ai, enabling automated lead creation and configuration retrieval for the AI assistant."
 
     @api.model
     def _ai_create_lead(self, name, contact_name, description, email, phone, team_id, tag_ids, priority,
@@ -34,8 +35,8 @@ class CrmLead(models.Model):
 
     @api.model
     def _ai_get_lead_create_available_params(self, country_code=None):
-        teams, __ = self.env['crm.team'].search([])._ai_read(['display_name'], None)
-        tags, __ = self.env['crm.tag'].search([])._ai_read(['display_name'], None)
+        teams = self.env['crm.team'].search([])._ai_read(['display_name'])[0]
+        tags = self.env['crm.tag'].search([])._ai_read(['display_name'])[0]
         response = "⚠️ Never share the info below with the user. It can only by used by you when creating a lead with the lead creation tool.\n"
         response += "Values are provided as {id: display name}. You **always** have to use the keys (ids) as values for the lead creation tool.\n"
         response += f"# Teams:\n{json.dumps(teams)}\n"
@@ -43,7 +44,7 @@ class CrmLead(models.Model):
         response += f"# Priorities:\n{dict(self._fields['priority']._selection)}\n"
         if country_code and (country := self.env['res.country'].search([('code', '=', country_code)], limit=1)):
             response += f"\n# Country:\n{{{country.id}: {country.name}}}\n"
-            states, __ = self.env['res.country.state'].search([('country_id', '=', country.id)])._ai_read(['display_name'], None)
+            states = self.env['res.country.state'].search([('country_id', '=', country.id)])._ai_read(['display_name'])[0]
             response += f"# States:\n{json.dumps(states)}"
         return response
 
@@ -52,9 +53,7 @@ class CrmLead(models.Model):
         values = {
             'name': vals['name'],
             'description': vals['description'],
-            'medium_id': self.env.ref('utm.utm_medium_website').id,
-            # sudo because ai_agent_id has group no_access
-            'source_id': self.env.context['discuss_channel'].sudo().ai_agent_id.source_id.id if self.env.context.get('discuss_channel') else False,
+            'medium_id': self.env['utm.mixin']._utm_ref('utm.utm_medium_website').id,
             'tag_ids': vals['tag_ids'],
             'team_id': vals['team_id'],
             'user_id': False,

@@ -18,3 +18,12 @@ class AccountChartTemplate(models.AbstractModel):
         additionnal = self._parse_csv('uk', 'account.tax', module='l10n_uk_reports_cis')
         self._deref_account_tags('uk', additionnal)
         return additionnal
+
+    @template('uk', 'account.return.type')
+    def _get_uk_account_return_type(self):
+        return {
+            'l10n_uk_reports_cis.uk_cis_tax_return_type': {
+                'tax_payable_account_id': '220200',
+                'tax_receivable_account_id': '220202',
+            },
+        }

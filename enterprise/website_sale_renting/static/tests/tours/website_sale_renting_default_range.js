@@ -3,7 +3,6 @@ import { registry } from "@web/core/registry";
 registry
     .category("web_tour.tours")
     .add("website_sale_renting_default_duration_from_default_range", {
-        url: "/shop?start_date=2023-12-17+23%3A00%3A00&end_date=2023-12-22+22%3A59%3A59",
         steps: () => [
             {
                 content: "Search computer write text",

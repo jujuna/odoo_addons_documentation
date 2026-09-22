@@ -3,9 +3,13 @@
 
 from odoo import _, models, fields, api
 from odoo.http import request
+from odoo.exceptions import AccessError
 
 import logging
 import requests
+
+from odoo.tools import SQL
+from odoo.tools.misc import hmac
 
 _logger = logging.getLogger(__name__)
 
@@ -48,6 +52,7 @@ class SocialAccount(models.Model):
     media_id = fields.Many2one('social.media', string="Social Media", required=True, readonly=True, index=True,
         help="Related Social Media (Facebook, X, ...).", ondelete='cascade')
     media_type = fields.Selection(related='media_id.media_type')
+    user_link = fields.Char("User Link", compute='_compute_stats_link')
     stats_link = fields.Char("Stats Link", compute='_compute_stats_link',
         help="Link to the external Social Account statistics")
     image = fields.Image("Image", max_width=128, max_height=128, readonly=True)
@@ -70,11 +75,17 @@ class SocialAccount(models.Model):
     has_account_stats = fields.Boolean("Has Account Stats", default=True,
         help="""Defines whether this account has Audience/Engagements/Stories stats.
         Account with stats are displayed on the dashboard.""")
-    utm_medium_id = fields.Many2one('utm.medium', string="UTM Medium", required=True, ondelete='restrict',
-        help="Every time an account is created, a utm.medium is also created and linked to the account")
     company_id = fields.Many2one('res.company', 'Company', default=_get_default_company,
                                  domain=lambda self: [('id', 'in', self.env.companies.ids)],
                                  help="Link an account to a company to restrict its usage or keep empty to let all companies use it.")
+
+    has_livechat = fields.Boolean(related="media_id.has_livechat")
+    is_livechat_webhook_registered = fields.Boolean("Is Livechat Webhook Registered")
+    livechat_channel_id = fields.Many2one("im_livechat.channel", string="Livechat Channel", ondelete="set null", index="btree_not_null")
+    livechat_awaiting_discuss_channel_ids = fields.Many2many("discuss.channel", string="Livechat Awaiting Discuss Channels",
+        compute="_compute_livechat_awaiting_discuss_channel_ids")
+    livechat_awaiting_discuss_channel_count = fields.Integer("Livechat Awaiting Discuss Channels Count",
+        compute="_compute_livechat_awaiting_discuss_channel_ids")
 
     def _compute_statistics(self):
         """ Every social module should override this method if it 'has_account_stats'.
@@ -88,6 +99,21 @@ class SocialAccount(models.Model):
         Ex: https://www.facebook.com/Odoo-Social-557894618055440/insights """
         for account in self:
             account.stats_link = False
+            account.user_link = False
+
+    def _compute_livechat_awaiting_discuss_channel_ids(self):
+        discuss_channels = dict(self.env['discuss.channel']._read_group(
+            domain=[
+                ('livechat_social_account_id', 'in', self.ids),
+                ('livechat_failure', '=', 'no_agent'),
+                ('livechat_end_dt', '=', False),
+            ],
+            groupby=['livechat_social_account_id'],
+            aggregates=["id:recordset"],
+        ))
+        for account in self:
+            account.livechat_awaiting_discuss_channel_ids = discuss_channels.get(account, False)
+            account.livechat_awaiting_discuss_channel_count = len(account.livechat_awaiting_discuss_channel_ids)
 
     @api.depends('media_id')
     def _compute_display_name(self):
@@ -97,45 +123,9 @@ class SocialAccount(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        """Every account has a unique corresponding utm.medium for statistics
-        computation purposes. This way, it will be possible to see every leads
-        or quotations generated through a particular account."""
-
-        if all(vals.get('media_id') and vals.get('name') for vals in vals_list):
-            # as 'media_id' and 'name' are required fields, we will let the 'create' handle the error
-            # if they are not present
-            media_all = self.env['social.media'].search([('id', 'in', [vals.get('media_id') for vals in vals_list])])
-            media_names = {
-                social_media.id: social_media.name
-                for social_media in media_all
-            }
-
-            medium_all = self.env['utm.medium'].create([{
-                "name": "[%(media_name)s] %(account_name)s" % {
-                    "media_name": media_names.get(vals['media_id']),
-                    "account_name": vals['name']
-                }
-            } for vals in vals_list])
-
-            for vals, medium in zip(vals_list, medium_all):
-                vals['utm_medium_id'] = medium.id
-
-        res = super(SocialAccount, self).create(vals_list)
+        res = super().create(vals_list)
         res._compute_statistics()
         return res
-
-    def write(self, vals):
-        """ If name is updated, reflect the change on medium_id (see #create method). """
-        if vals.get('name'):
-            for social_account in self.filtered(lambda social_account: social_account.utm_medium_id):
-                social_account.utm_medium_id.write({
-                    'name': "[%(media_name)s] %(account_name)s" % {
-                        "media_name": social_account.media_id.name,
-                        "account_name": vals['name']
-                    }
-                })
-
-        return super(SocialAccount, self).write(vals)
 
     @api.model
     def refresh_statistics(self):
@@ -148,21 +138,48 @@ class SocialAccount(models.Model):
             all_accounts._compute_statistics()
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             _logger.warning("Failed to refresh social account statistics.", exc_info=True)
-        return [{
-            'id': account.id,
-            'name': account.name,
-            'is_media_disconnected': account.is_media_disconnected,
-            'audience': account.audience,
-            'audience_trend': account.audience_trend,
-            'engagement': account.engagement,
-            'engagement_trend': account.engagement_trend,
-            'stories': account.stories,
-            'stories_trend': account.stories_trend,
-            'has_trends': account.has_trends,
-            'media_id': [account.media_id.id],
-            'media_type': account.media_id.media_type,
-            'stats_link': account.stats_link
-        } for account in all_accounts]
+        return [account._get_social_account_values() for account in all_accounts]
+
+    @api.model
+    def fetch_statistics(self):
+        return [
+            account._get_social_account_values()
+            for account in self.search([('has_account_stats', '=', True)])
+        ]
+
+    def _get_social_account_values(self):
+        """Return the values used by the JS for the given social account."""
+        self.ensure_one()
+        return {
+            'id': self.id,
+            'name': self.name,
+            'is_media_disconnected': self.is_media_disconnected,
+            'audience': self.audience,
+            'audience_trend': self.audience_trend,
+            'engagement': self.engagement,
+            'engagement_trend': self.engagement_trend,
+            'stories': self.stories,
+            'stories_trend': self.stories_trend,
+            'has_trends': self.has_trends,
+            'media_id': [self.media_id.id],
+            'media_type': self.media_id.media_type,
+            'stats_link': self.stats_link,
+            'has_image': bool(self.image),
+        }
+
+    @api.model
+    def search_mention_suggestions(self, search_term, media_type):
+        """This method is created so that each social_module is able to override the method.
+
+        :param search_term: Search term used to search for a specific user.
+        :return: An array of results following this structure: {
+            'name': username,
+            'description': "A description of the profile if it exists",
+            'profile_image_url': "url/to/profile/image",
+            **other_infos: "This will be used by the mention system later on."
+        }
+        """
+        return []
 
     def _compute_trend(self, value, delta_30d):
         return 0.0 if value - delta_30d <= 0 else (delta_30d / (value - delta_30d)) * 100
@@ -197,3 +214,52 @@ class SocialAccount(models.Model):
                         disconnection_info or "Not provided",
                         stack_info=True)
         self.sudo().write({'is_media_disconnected': True})
+
+    def action_register_webhook(self):
+        """Register the webhook (is managed by submodules)."""
+        self.ensure_one()
+        if not self.env.user.has_group("social.group_social_manager"):
+            raise AccessError(_("Only social manager can register webhook."))
+
+    def action_delete_webhook(self):
+        """Unregister from the webhook, API calls are managed by submodules."""
+        self.ensure_one()
+        if not self.env.su and not self.env.user.has_group("social.group_social_manager"):
+            raise AccessError(_("Only social manager can register webhook."))
+        self.livechat_channel_id = False
+
+    def action_view_social_need_action(self):
+        self.ensure_one()
+        return {
+            **self.env['ir.actions.act_window']._for_xml_id('im_livechat.discuss_channel_action_from_livechat_channel'),
+            'domain': [('id', 'in', self.livechat_awaiting_discuss_channel_ids.ids)],
+            'context': self.env.context,
+        }
+
+    def _social_try_lock_message_id(self, message_id):
+        """Take a SQL lock on the given social message id.
+
+        Return False if another transaction holds the lock
+        (inspired from @message_process).
+        """
+        self.ensure_one()
+        self.env.cr.execute(
+            SQL('SELECT pg_try_advisory_xact_lock(hashtext(%s))',
+                repr(('Social Message Lock', message_id, self.id))),
+        )
+        return self.env.cr.fetchone()[0]
+
+    @api.model
+    def _get_attachment_token(self, attachment):
+        """Build the access token, so the social media can download the attachment.
+
+        We cannot use the standard download route with the access token of the attachments
+        because we will need to call `generate_access_token`, and the API will
+        try to fetch before the tokens exists in database, so we use our custom route.
+        """
+        attachment.check_access('read')
+        return hmac(
+            self.env(su=True),
+            "social-download-attachment",
+            attachment.id,
+        )

@@ -4,9 +4,8 @@
     'name': 'Mexico - Payroll',
     'countries': ['mx'],
     'category': 'Human Resources/Payroll',
-    'depends': ['hr_payroll', 'hr_work_entry_holidays', 'hr_payroll_holidays'],
+    'depends': ['hr_payroll', 'hr_holidays'],
     'auto_install': ['hr_payroll'],
-    'version': '1.0',
     'description': """
 Mexican Payroll Rules.
 =========================
@@ -20,24 +19,27 @@ Mexican Payroll Rules.
     * Integrated with Leaves Management
     """,
     'data': [
-        'security/ir.model.access.csv',
         'data/resource_calendar_data.xml',
         'data/hr_salary_rule_category_data.xml',
         'data/hr_payroll_structure_type_data.xml',
+        'data/hr_work_entry_type_data.xml',
         'views/hr_payroll_report.xml',
         'data/hr_payroll_structure_data.xml',
         'data/hr_rule_parameters_data.xml',
-        'data/hr_payslip_input_type_data.xml',
         'data/salary_rules/hr_salary_rule_regular_pay_data.xml',
         'data/salary_rules/hr_salary_rule_christmas_bonus_data.xml',
         'views/report_payslip_templates.xml',
         'views/l10n_mx_hr_infonavit_views.xml',
         'views/hr_contract_template_views.xml',
         'views/hr_employee_views.xml',
+        'views/hr_payslip_views.xml',
+        'views/res_config_settings_views.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'data/l10n_mx_hr_payroll_demo.xml',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'post_init_hook': '_l10n_mx_hr_payroll_post_install',
 }

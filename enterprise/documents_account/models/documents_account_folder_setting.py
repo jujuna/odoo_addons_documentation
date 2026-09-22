@@ -10,13 +10,15 @@ class DocumentsAccountFolderSetting(models.Model):
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company,
                                  ondelete='cascade')
     company_account_folder_id = fields.Many2one(related='company_id.account_folder_id')
-    journal_id = fields.Many2one('account.journal', required=True, ondelete='cascade')
+    journal_id = fields.Many2one('account.journal', required=True, ondelete='cascade',
+                                 domain="['|', ('company_id', '=', company_id), ('id', '=', journal_id)]")
     folder_id = fields.Many2one(
-        'documents.document', string="Folder", required=True, domain=lambda self: [
+        'documents.document', string="Folder", required=True, domain="""[
             ('type', '=', 'folder'), ('shortcut_document_id', '=', False),
-            ('id', 'child_of', self.env.company.account_folder_id.ids),
-            '|', ('company_id', '=', False), ('company_id', '=', self.env.company.id)
-        ],
+            ('id', 'child_of', company_account_folder_id),
+            '|', '|', ('company_id', '=', False), ('company_id', '=', company_id), ('id', '=', folder_id)
+        ]""",
+        index=True,
     )
     tag_ids = fields.Many2many('documents.tag', string="Tags")
 

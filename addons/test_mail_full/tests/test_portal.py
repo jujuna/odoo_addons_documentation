@@ -29,76 +29,6 @@ class TestPortal(TestMailFullCommon, TestSMSRecipients):
 @tagged('-at_install', 'post_install', 'portal', 'mail_controller')
 class TestPortalControllers(TestPortal):
 
-    def test_portal_avatar_with_access_token(self):
-        mail_record = self.env['mail.message'].create({
-            'author_id': self.record_portal.partner_id.id,
-            'model': self.record_portal._name,
-            'res_id': self.record_portal.id,
-        })
-        token = self.record_portal.access_token
-        formatted_record = mail_record.portal_message_format(options={"token": token})[0]
-        self.assertEqual(
-            formatted_record.get("author_avatar_url"),
-            f"/mail/avatar/mail.message/{mail_record.id}/author_avatar/50x50?access_token={token}",
-        )
-        response = self.url_open(
-            f"/mail/avatar/mail.message/{mail_record.id}/author_avatar/50x50?access_token={token}"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers.get('Content-Type'), 'image/svg+xml; charset=utf-8')
-        self.assertRegex(response.headers.get('Content-Disposition', ''), r'mail_message-\d+-author_avatar\.svg')
-
-        placeholder_response = self.url_open(
-            f'/mail/avatar/mail.message/{mail_record.id}/author_avatar/50x50?access_token={token + "a"}'
-        )  # false token
-        self.assertEqual(placeholder_response.status_code, 200)
-        self.assertEqual(placeholder_response.headers.get('Content-Type'), 'image/png')
-        self.assertRegex(placeholder_response.headers.get('Content-Disposition', ''), r'placeholder\.png')
-
-        no_token_response = self.url_open(f'/mail/avatar/mail.message/{mail_record.id}/author_avatar/50x50')
-        self.assertEqual(no_token_response.status_code, 200)
-        self.assertEqual(no_token_response.headers.get('Content-Type'), 'image/png')
-        self.assertRegex(no_token_response.headers.get('Content-Disposition', ''), r'placeholder\.png')
-
-    def test_portal_avatar_with_hash_pid(self):
-        self.authenticate(None, None)
-        post_url = f"{self.record_portal.get_base_url()}/mail/message/post"
-        pid = self.partner_2.id
-        _hash = self.record_portal._sign_token(pid)
-        res = self.url_open(
-            url=post_url,
-            json={
-                'params': {
-                    'thread_model': self.record_portal._name,
-                    'thread_id': self.record_portal.id,
-                    'post_data': {'body': "Test"},
-                    'hash': _hash,
-                    'pid': pid,
-                },
-            },
-        )
-        res.raise_for_status()
-        self.assertNotIn("error", res.json())
-        message = self.record_portal.message_ids[0]
-        formatted_message = message.portal_message_format(options={"hash": _hash, "pid": pid})[0]
-        self.assertEqual(
-            formatted_message.get("author_avatar_url"),
-            f"/mail/avatar/mail.message/{message.id}/author_avatar/50x50?_hash={_hash}&pid={pid}",
-        )
-        response = self.url_open(
-            f"/mail/avatar/mail.message/{message.id}/author_avatar/50x50?_hash={_hash}&pid={pid}"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers.get('Content-Type'), 'image/svg+xml; charset=utf-8')
-        self.assertRegex(response.headers.get('Content-Disposition', ''), r'mail_message-\d+-author_avatar\.svg')
-
-        placeholder_response = self.url_open(
-            f'/mail/avatar/mail.message/{message.id}/author_avatar/50x50?_hash={_hash + "a"}&pid={pid}'
-        )  # false hash
-        self.assertEqual(placeholder_response.status_code, 200)
-        self.assertEqual(placeholder_response.headers.get('Content-Type'), 'image/png')
-        self.assertRegex(placeholder_response.headers.get('Content-Disposition', ''), r'placeholder\.png')
-
     def test_portal_share_comment(self):
         """ Test posting through portal controller allowing to use a hash to
         post wihtout access rights. """
@@ -123,6 +53,47 @@ class TestPortalControllers(TestPortal):
         messages = self.record_portal.message_ids.filtered(lambda msg: msg.author_id == self.partner_2)
 
         self.assertIn('Test', messages[0].body)
+
+    def test_portal_message_fetch(self):
+        """Test that portal message fetch result includes share-only messages."""
+        msg_custom, msg_comment, msg_note = self.env["mail.message"].create(
+            [
+                {
+                    "body": "Test",
+                    "message_type": "comment",
+                    "model": self.record_portal._name,
+                    "res_id": self.record_portal.id,
+                    "subtype_id": subtype.id,
+                }
+                for subtype in (
+                    self.env["mail.message.subtype"].create({"internal": False, "name": "Custom"}),
+                    self.env.ref("mail.mt_comment"),
+                    self.env.ref("mail.mt_note"),
+                )
+            ]
+        )
+        self.authenticate(None, None)
+        chatter_fetch_params = {
+            "access_params": {"token": self.record_portal.access_token},
+            "thread_id": self.record_portal.id,
+            "thread_model": self.record_portal._name,
+        }
+        result = self.make_jsonrpc_request(
+            "/mail/store",
+            {"fetch_params": [["/mail/chatter_fetch", chatter_fetch_params]]},
+        )
+        fetched_ids = [msg["id"] for msg in result["mail.message"]]
+        self.assertIn(
+            msg_custom.id,
+            fetched_ids,
+            "Non-internal non-comment subtype should be included.",
+        )
+        self.assertIn(
+            msg_comment.id,
+            fetched_ids,
+            "Non-internal comment subtype should be included.",
+        )
+        self.assertNotIn(msg_note.id, fetched_ids, "Internal subtype should be excluded.")
 
 
 @tagged('-at_install', 'post_install', 'portal', 'mail_controller')

@@ -1,9 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Avatax Brazil Sale',
-    'version': '1.0',
     'category': 'Accounting/Accounting',
-    'depends': ['l10n_br_avatax', 'sale'],
+    'depends': ['l10n_br_avatax', 'sale_external_tax'],
     'data': [
         'views/sale_order_views.xml',
     ],

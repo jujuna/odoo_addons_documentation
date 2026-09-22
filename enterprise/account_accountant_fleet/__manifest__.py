@@ -4,7 +4,6 @@
     'name': 'Accounting/Fleet bridge',
     'category': 'Accounting/Accounting',
     'summary': 'Manage accounting with fleet features',
-    'version': '1.0',
     'depends': ['account_fleet', 'account_accountant'],
     'author': 'Odoo S.A.',
     'data': [

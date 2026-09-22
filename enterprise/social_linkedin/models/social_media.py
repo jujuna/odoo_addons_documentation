@@ -13,7 +13,8 @@ class SocialMedia(models.Model):
     _inherit = 'social.media'
 
     _LINKEDIN_ENDPOINT = 'https://api.linkedin.com/rest/'
-    _LINKEDIN_SCOPE = 'r_basicprofile r_organization_followers w_member_social w_member_social_feed rw_organization_admin w_organization_social w_organization_social_feed r_organization_social r_organization_social_feed'
+    _LINKEDIN_PAGE_SCOPES = 'r_organization_followers rw_organization_admin w_organization_social w_organization_social_feed r_organization_social r_organization_social_feed'
+    _LINKEDIN_PERSONAL_SCOPES = 'r_basicprofile r_member_profileAnalytics w_member_social r_organization_social_feed'
 
     media_type = fields.Selection(selection_add=[('linkedin', 'LinkedIn')])
 
@@ -23,9 +24,9 @@ class SocialMedia(models.Model):
         if self.media_type != 'linkedin':
             return super()._action_add_account()
 
-        linkedin_use_own_account = self.env['ir.config_parameter'].sudo().get_param('social.linkedin_use_own_account')
-        linkedin_app_id = self.env['ir.config_parameter'].sudo().get_param('social.linkedin_app_id')
-        linkedin_client_secret = self.env['ir.config_parameter'].sudo().get_param('social.linkedin_client_secret')
+        linkedin_use_own_account = self.env['ir.config_parameter'].sudo().get_str('social.linkedin_use_own_account')
+        linkedin_app_id = self.env['ir.config_parameter'].sudo().get_str('social.linkedin_app_id')
+        linkedin_client_secret = self.env['ir.config_parameter'].sudo().get_str('social.linkedin_client_secret')
 
         if linkedin_app_id and linkedin_client_secret and linkedin_use_own_account:
             return self._add_linkedin_accounts_from_configuration(linkedin_app_id)
@@ -33,33 +34,28 @@ class SocialMedia(models.Model):
             return self._add_linkedin_accounts_from_iap()
 
     def _add_linkedin_accounts_from_configuration(self, linkedin_app_id):
+        link_personal = bool(self.env.context.get('linkedin_link_personal'))
+        state = f"{self._get_csrf_token()}-{int(link_personal)}"
         params = {
             'response_type': 'code',
             'client_id': linkedin_app_id,
             'redirect_uri': self._get_linkedin_redirect_uri(),
-            'state': self.csrf_token,
-            'scope': self._LINKEDIN_SCOPE,
+            'state': state,
+            'scope': self._LINKEDIN_PERSONAL_SCOPES if link_personal else self._LINKEDIN_PAGE_SCOPES,
         }
-
-        return {
-            'type': 'ir.actions.act_url',
-            'url': 'https://www.linkedin.com/oauth/v2/authorization?%s' % url_encode(params),
-            'target': 'self'
-        }
+        return 'https://www.linkedin.com/oauth/v2/authorization?%s' % url_encode(params)
 
     def _add_linkedin_accounts_from_iap(self):
-        o_redirect_uri = url_join(self.get_base_url(), 'social_linkedin/callback')
+        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_str(
+            'social.social_iap_endpoint') or self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
 
-        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_param(
-            'social.social_iap_endpoint',
-            self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
-        )
-
+        link_personal = bool(self.env.context.get('linkedin_link_personal'))
+        state = f"{self._get_csrf_token()}-{int(link_personal)}"
         iap_add_accounts_url = requests.get(url_join(social_iap_endpoint, 'api/social/linkedin/1/add_accounts'), params={
-            'state': self.csrf_token,
-            'scope': self._LINKEDIN_SCOPE,
-            'o_redirect_uri': o_redirect_uri,
-            'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+            'state': state,
+            'scope': self._LINKEDIN_PERSONAL_SCOPES if link_personal else self._LINKEDIN_PAGE_SCOPES,
+            'o_redirect_uri': self._get_linkedin_redirect_uri(),
+            'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid')
         }, timeout=5).text
 
         if iap_add_accounts_url == 'unauthorized':
@@ -70,11 +66,7 @@ class SocialMedia(models.Model):
         elif iap_add_accounts_url == 'linkedin_missing_configuration' or iap_add_accounts_url == 'missing_parameters':
             raise UserError(_("The url that this service requested returned an error. Please contact the author of the app."))
 
-        return {
-            'type': 'ir.actions.act_url',
-            'url': iap_add_accounts_url,
-            'target': 'self'
-        }
+        return iap_add_accounts_url
 
     def _get_linkedin_redirect_uri(self):
-        return url_join(self.get_base_url(), 'social_linkedin/callback')
+        return url_join(self.get_base_url(), '/social/linkedin/start_auth_process')

@@ -9,9 +9,11 @@ from odoo import api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    referrer_id = fields.Many2one('res.partner', 'Referrer', domain=[('grade_id', '!=', False)], tracking=True)
+    referrer_id = fields.Many2one(
+        'res.partner', 'Referrer', domain=[('grade_id', '!=', False)], index='btree_not_null', tracking=True,
+        groups="base.group_user")
     commission_plan_frozen = fields.Boolean(
-        'Freeze Plan', tracking=True,
+        'Freeze Plan', tracking=True, groups="base.group_user",
         help="Whether the commission plan is frozen. When checked, the commission plan won't automatically be updated according to the partner level.")
     commission_plan_id = fields.Many2one(
         'commission.plan',
@@ -20,8 +22,9 @@ class SaleOrder(models.Model):
         inverse='_set_commission_plan',
         store=True,
         tracking=True,
+        groups="base.group_user",
         help="Takes precedence over the Referrer's commission plan.")
-    commission = fields.Monetary(string='Referrer Commission', compute='_compute_commission')
+    commission = fields.Monetary(string='Referrer Commission', compute='_compute_commission', groups="base.group_user")
 
     @api.depends('referrer_id', 'commission_plan_id', 'sale_order_template_id', 'pricelist_id', 'order_line.price_subtotal')
     def _compute_commission(self):
@@ -90,5 +93,5 @@ class SaleOrder(models.Model):
             if so.commercial_partner_id.grade_id != so.assigned_grade_id:
                 continue
             if so.commercial_partner_id.commission_plan_id == so.assigned_grade_id.default_commission_plan_id:
-                so.commercial_partner_id.commission_plan_id = False
+                so.commercial_partner_id.sudo().commission_plan_id = False
         return super()._remove_partnership()

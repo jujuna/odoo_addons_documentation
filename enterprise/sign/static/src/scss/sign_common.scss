@@ -1,5 +1,6 @@
-.o_sign_template_header_wrapper .o_input {
-    --o-input-background-color: #{$o-webclient-background-color};
+// For the public sign page, set borders so they render (var not set otherwise).
+.o_web_sign_name_and_signature {
+    --o-border-color: #{o-color('300')};
 }
 
 .o_sign_document_body {
@@ -112,12 +113,17 @@
     display: none;
     opacity: 0;
 
-    @include o-position-absolute($bottom: 0, $left: 0);
+    @include o-position-absolute($bottom: 5px, $left: 0);
     width: 100%;
     padding: 10px;
 
     @include font-size(1.25em);
     text-align: center;
+    pointer-events: none;
+
+    .o_validate_button, .o_next_document_button {
+        pointer-events: auto;
+    }
 }
 
 @media (max-width: 767px) { /* @screen-xs-max */
@@ -212,7 +218,7 @@
         left: 5%;
         height: 80%;
         width: 20%;
-        border: 3px solid #017e84;
+        border: 3px solid $o-enterprise-action-color;
         border-right: none;
         border-radius: 22px;
         border-top-right-radius: 0;
@@ -221,7 +227,7 @@
         :before {
             content: attr(sign_label);
             font-size: 120%;
-            color: #017E84;
+            color: $o-enterprise-action-color;
             font-family: "Inter",Sans;
             left: 110%;
             width: 250px;
@@ -233,7 +239,7 @@
         :after {
             content: attr(hash);
             font-size: 120%;
-            color: #017E84;
+            color: $o-enterprise-action-color;
             font-family: $o-font-family-monospace;
             width: 250px;
             display: inline-block;
@@ -302,7 +308,7 @@
         width: 100%;
         height: 100%;
         position: absolute;
-        background-color: #AAAA;
+        background-color: rgba($o-black, .35);
         z-index: 10;
         left: 0;
         top: 0;
@@ -321,21 +327,17 @@
     }
 }
 
-.o_sign_item_popover_selection{
-    .o_input{
-        border: 1px solid #e7e9ed;
-        border-radius: 0 0.25rem 0.25rem 0;
-        padding-block: 2px;
-        padding-left: 10px;
-        padding-right: 20px !important;
-        width: 100%;
+.o_seprate_dialog_content {
+    .modal-header {
+        border-bottom: 1px solid $border-color;
     }
-    .o_sign_selection{
-        border: 1px solid #e7e9ed;
-        padding-block: 2px;
-        padding-left: 10px;
+    .modal-footer {
+        border-top: 1px solid $border-color;
     }
-    .o_dropdown_button{
-        margin-right: 8px;
+}
+
+.o_sign_resend_icon {
+    &:hover {
+        color: var(--primary) !important;
     }
 }

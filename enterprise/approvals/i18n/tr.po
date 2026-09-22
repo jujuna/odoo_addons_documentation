@@ -26,23 +26,32 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-21 14:20+0000\n"
-"Last-Translator: Odoo Turkish Import <dyki+tr@odoo.com>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 03:19+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
 "approvals/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "%s (copy)"
-msgstr "%s (kopya)"
+#: model:ir.module.module,description:base.module_approvals
+msgid ""
+"\n"
+"This module manages approvals workflow\n"
+"======================================\n"
+"\n"
+"This module manages approval requests like business trips,\n"
+"out of office, overtime, borrow items, general approvals,\n"
+"procurements, contract approval, etc.\n"
+"\n"
+"According to the approval type configuration, a request\n"
+"creates next activities for the related approvers.\n"
+msgstr ""
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
@@ -50,39 +59,19 @@ msgid "'Approval - %s' % object.name"
 msgstr "'Onay - %s' % object.name"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/07/2023 10:00:00"
-msgstr "07/07/2023 10:00:00"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/08/2023 10:00:00"
-msgstr "07/08/2023 10:00:00"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "1200"
-msgstr "1200"
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuse"
+msgstr "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Çöp"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-check text-success me-1\"/>Approve"
-msgstr "<i class=\"fa fa-check text-success me-1\"/>Onaylamak"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-times text-danger me-1\"/>Refuse"
-msgstr "<i class=\"fa fa-times text-danger me-1\"/>Çöp"
+msgid "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Approve"
+msgstr "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Onaylamak"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "<span class=\"col-2 fw-bold\">Description:</span>"
 msgstr "<span class=\"col-2 fw-bold\">Açıklama:</span>"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
-msgstr "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -93,6 +82,15 @@ msgstr "<span class=\"fw-bold\">Kime:</span>"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
 msgid "<span class=\"mx-1\">-</span>"
 msgstr "<span class=\"mx-1\">-</span>"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
+">"
+msgstr ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
+">"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
@@ -119,6 +117,11 @@ msgstr "Aktivite"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Etkinlik İstisna Dekorasyonu"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
@@ -151,16 +154,6 @@ msgstr "Yönetici"
 #: model:ir.ui.menu,name:approvals.approvals_approval_menu_all
 msgid "All Approvals"
 msgstr "Tüm Onaylamalar"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,help:approvals.field_approval_request__approval_type
-msgid ""
-"Allows you to define which documents you would like to create once the "
-"request has been approved"
-msgstr ""
-"Talep onaylandıktan sonra hangi belgeleri oluşturmak istediğinizi "
-"tanımlamanıza olanak tanır"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__amount
@@ -238,12 +231,7 @@ msgid "Approval Subject"
 msgstr "Onay Konusu"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approval_type
-msgid "Approval Type"
-msgstr "Onay Türü"
-
-#. module: approvals
+#: model:ir.module.module,shortdesc:base.module_approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_root
 #: model:res.groups.privilege,name:approvals.res_groups_privilege_approvals
 msgid "Approvals"
@@ -284,13 +272,6 @@ msgid "Approver"
 msgstr "Onaylayan"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_category.py:0
-msgid ""
-"Approver Sequence can only be activated with at least 1 minimum approver."
-msgstr "Onaylayıcı Sırası, en az 1 asgari onaylayıcı ile etkinleştirilebilir."
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__user_ids
 msgid "Approver Users"
 msgstr "Onaylayıcı Kullanıcılar"
@@ -307,12 +288,6 @@ msgstr "Onaylayan(lar)"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Approvers"
 msgstr "Onaylayanlar"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approver_sequence
-msgid "Approvers Sequence?"
-msgstr "Onaylayıcılar Sırası?"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -364,8 +339,8 @@ msgstr "Ekler"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
-msgid "Automated Sequence?"
-msgstr "Otomatik Sıra?"
+msgid "Automated Sequence"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -432,11 +407,6 @@ msgid "Category Approver"
 msgstr "Kategori Onaylayıcı"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
-msgid "Code"
-msgstr "Kod"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category_approver__company_id
@@ -447,13 +417,9 @@ msgstr "Firma"
 
 #. module: approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_config
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 msgid "Configuration"
 msgstr "Ayarlar"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
-msgid "Confirm Date"
-msgstr "Onay Tarihi"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__partner_id
@@ -472,9 +438,9 @@ msgid "Contract Approval"
 msgstr "Sözleşme Onayı"
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid "Create a new product variant"
-msgstr "Yeni bir ürün varyantı oluştur"
+#: model:ir.module.module,summary:base.module_approvals
+msgid "Create and validate approvals requests"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid
@@ -599,11 +565,6 @@ msgid "Existing User"
 msgstr "Mevcut Kullanıcı"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "Fields"
-msgstr "Alanlar"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
 msgid "Followers"
 msgstr "Takipçiler"
@@ -614,19 +575,9 @@ msgid "Followers (Partners)"
 msgstr "Takipçiler (İş ortakları)"
 
 #. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Yazı tipi harika simgesi ör. fa-görevler"
-
-#. module: approvals
 #: model:ir.actions.server,name:approvals.model_approval_request_approve_admin
 msgid "Force Approval"
 msgstr "Kuvvet Onayı"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "From:"
-msgstr "Başlangıç:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
@@ -707,19 +658,10 @@ msgstr "Referansı Var"
 msgid ""
 "How the employee's manager interacts with this type of approval.\n"
 "\n"
-"        Empty: do nothing\n"
-"        Is Approver: the employee's manager will be in the approver list\n"
-"        Is Required Approver: the employee's manager will be required to "
-"approve the request.\n"
+"        if checked the employee's manager is a required approver of the "
+"request, along with the selected users\n"
 "    "
 msgstr ""
-"Çalışanın yöneticisinin bu onay türüyle nasıl etkileşim kuracağı.\n"
-"\n"
-"        Boş: hiçbir şey yapma\n"
-"        Onaylayıcı: çalışanın yöneticisi onaylayıcı listesine eklenir\n"
-"        Gerekli Onaylayıcı: çalışanın yöneticisinin talebi onaylaması "
-"zorunludur.\n"
-"    "
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__id
@@ -758,23 +700,9 @@ msgstr "İşaretliyse, bazı mesajlar gönderi hatası içermektedir."
 #: model:ir.model.fields,help:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,help:approvals.field_approval_request__automated_sequence
 msgid ""
-"If checked, the Approval Requests will have an automated generated name "
-"based on the given code."
+"If enabled, the approval request subject will be generated automatically "
+"using the given prefix code."
 msgstr ""
-"Eğer işaretlenirse, Onay Taleplerine verilen koda dayalı olarak otomatik "
-"oluşturulmuş bir ad verilir."
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
-msgid ""
-"If checked, the approvers have to approve in sequence (one after the other). "
-"If Employee's Manager is selected as approver, they will be the first in "
-"line."
-msgstr ""
-"Eğer işaretlenirse, onaylayıcılar sırayla (biri bitirdikten sonra diğeri) "
-"onay vermelidir. Çalışanın Yöneticisi onaylayıcı olarak seçilmişse, sırada "
-"ilk olarak yer alır."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -793,19 +721,9 @@ msgid "Invalid Minimum Warning"
 msgstr "Geçersiz Asgari Uyarısı"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__approver
-msgid "Is Approver"
-msgstr "Onaylayıcıdır"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_is_follower
 msgid "Is Follower"
 msgstr "Takipçi mi"
-
-#. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__required
-msgid "Is Required Approver"
-msgstr "Gerekli Onaylayıcıdır"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_job_referral_award
@@ -878,6 +796,11 @@ msgid "Marc Demo"
 msgstr "Marc Demo"
 
 #. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
 msgid "Message Delivery error"
 msgstr "Mesaj Teslim hatası"
@@ -892,6 +815,12 @@ msgstr "Mesajlar"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__approval_minimum
 msgid "Minimum Approval"
 msgstr "Minimum Onay"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Minimum Approval must be at least 1."
+msgstr ""
 
 #. module: approvals
 #. odoo-python
@@ -972,6 +901,11 @@ msgstr "Sonraki Aktivite Özeti"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_type_id
 msgid "Next Activity Type"
 msgstr "Sonraki Aktivitie Türü"
+
+#. module: approvals
+#: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
+msgid "No"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
@@ -1088,9 +1022,9 @@ msgid "Period:"
 msgstr "Dönem:"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "Print"
-msgstr "Yazdırın"
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
+msgid "Prefix Code"
+msgstr ""
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_procurement
@@ -1112,12 +1046,6 @@ msgstr "Ürün Açıklaması"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__product_line_ids
 msgid "Product Line"
 msgstr "Ürün Satırı"
-
-#. module: approvals
-#: model:ir.actions.act_window,name:approvals.product_product_action
-#: model:ir.ui.menu,name:approvals.approvals_menu_product_variant
-msgid "Product Variants"
-msgstr "Ürün Varyantları"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.product_template_action
@@ -1241,9 +1169,7 @@ msgid "SMS Delivery error"
 msgstr "SMS İleti hatası"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_approver__sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_category_approver__sequence
 msgid "Sequence"
 msgstr "Sıralama"
 
@@ -1301,6 +1227,12 @@ msgstr "Gönder"
 #: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__pending
 msgid "Submitted"
 msgstr "Gönderildi"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Submitted Date"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1459,22 +1391,6 @@ msgid "Users"
 msgstr "Kullanıcılar"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__waiting
-#: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__waiting
-msgid "Waiting"
-msgstr "Bekleyen"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_request__website_message_ids
-msgid "Website Messages"
-msgstr "Websitesi Mesajları"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__website_message_ids
-msgid "Website communication history"
-msgstr "Websitesi iletişim geçmişi"
-
-#. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "Withdraw"
 msgstr "Geri Çek"
@@ -1490,12 +1406,6 @@ msgstr "Kendi onayınızı onaylamanıza veya reddetmenize izin verilmez."
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You can't delete an approved request. Archive it instead."
 msgstr "Onaylanmış bir talebi silemezsiniz. Bunun yerine arşivleyin."
-
-#. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "You cannot approve before the previous approver."
-msgstr "Önceki onaylayıcıdan önce onay veremezsiniz."
 
 #. module: approvals
 #. odoo-python
@@ -1540,17 +1450,6 @@ msgstr ""
 "dönmelisiniz."
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid ""
-"You must define a product for everything you sell or purchase,\n"
-"            whether it's a storable product, a consumable or a service."
-msgstr ""
-"Sattığınız veya satın aldığınız her şey için bir ürün tanımlamanız "
-"gerekir, \n"
-"           ister depolanabilir bir ürün, ister sarf malzemesi veya hizmet "
-"olsun."
-
-#. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Your minimum approval exceeds the total of default approvers."
@@ -1578,57 +1477,13 @@ msgstr "menü"
 msgid "new request"
 msgstr "yeni talep"
 
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "to:"
-msgstr "kime:"
-
-#~ msgid "<span>From: </span>"
-#~ msgstr "<span> Kimden </span>"
-
-#~ msgid "<span>to: </span>"
-#~ msgstr "<span> Kime </span>"
-
-#~ msgid "Approval Type Approver"
-#~ msgstr "Onay Türü Onaylayıcı"
-
-#~ msgid "Approvals Types"
-#~ msgstr "Onay Türleri"
-
-#~ msgid "Approvals Types Image"
-#~ msgstr "Onay Türleri Resmi"
-
 #~ msgid ""
-#~ "Conversion between Units of Measure can only occur if they belong to the "
-#~ "same category. The conversion will be made based on the ratios."
+#~ "Approver Sequence can only be activated with at least 1 minimum approver."
 #~ msgstr ""
-#~ "Ölçü Birimleri arası dönüştürme yalnızca aynı kategoriye sahiplerse "
-#~ "yapılabilir. Dönüşümler oranlara göre yapılacaktır."
+#~ "Onaylayıcı Sırası, en az 1 asgari onaylayıcı ile etkinleştirilebilir."
 
-#~ msgid "Deadline"
-#~ msgstr "Zaman Sınırı"
+#~ msgid "Waiting"
+#~ msgstr "Bekleyen"
 
-#~ msgid "Delete"
-#~ msgstr "Sil"
-
-#~ msgid "Edit Request"
-#~ msgstr "İsteği Düzenle"
-
-#~ msgid "Log"
-#~ msgstr "Kayıt"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Eylem gerektiren mesaj adedi"
-
-#~ msgid "Request Approval"
-#~ msgstr "Onay İsteği"
-
-#~ msgid "Unit of Measure"
-#~ msgstr "Ölçü Birimi"
-
-#~ msgid ""
-#~ "You cannot assign the same approver multiple times on the same request."
-#~ msgstr "Aynı talepte aynı onaylayıcıyı birden fazla kez atayamazsınız."
-
-#~ msgid "You have to attach at lease one document."
-#~ msgstr "En az bir belge eklemeniz gerekir."
+#~ msgid "You cannot approve before the previous approver."
+#~ msgstr "Önceki onaylayıcıdan önce onay veremezsiniz."

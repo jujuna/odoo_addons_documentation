@@ -3,26 +3,65 @@
 # * l10n_de_reports
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Larissa Manderfeld (lman)" <lman@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~16.1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:05+0000\n"
-"PO-Revision-Date: 2025-11-18 17:10+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-19-l10n/"
+"POT-Creation-Date: 2026-08-28 18:18+0000\n"
+"PO-Revision-Date: 2026-09-18 05:01+0000\n"
+"Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
 "l10n_de_reports/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_return.py:0
+msgid ""
+"\n"
+"\n"
+"Details:\n"
+msgstr ""
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_return.py:0
+msgid ""
+"\n"
+"\n"
+"For complete error code reference, check out https://docs.rs/eric-sdk/latest/"
+"eric_sdk/enum.ErrorCode.html."
+msgstr ""
+
+#. module: l10n_de_reports
+#: model:ir.module.module,description:base.module_l10n_de_reports
+msgid ""
+"\n"
+"Accounting reports for Germany\n"
+"Contains Balance sheet, Profit and Loss, VAT and Partner VAT reports\n"
+"Also adds DATEV export options to general ledger\n"
+msgstr ""
 
 #. module: l10n_de_reports
 #: model:ir.model,name:l10n_de_reports.model_account_chart_template
 msgid "Account Chart Template"
 msgstr "Kontenrahmenvorlage"
+
+#. module: l10n_de_reports
+#: model:ir.model,name:l10n_de_reports.model_account_return
+msgid "Accounting Return"
+msgstr "Buchhaltungsmeldung"
+
+#. module: l10n_de_reports
+#: model:ir.model,name:l10n_de_reports.model_account_return_type
+msgid "Accounting Return Type"
+msgstr "Art der Steuererklärung"
 
 #. module: l10n_de_reports
 #. odoo-python
@@ -32,7 +71,7 @@ msgstr "CSV"
 
 #. module: l10n_de_reports
 #: model:ir.model,name:l10n_de_reports.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr "Unternehmen"
 
 #. module: l10n_de_reports
@@ -43,6 +82,7 @@ msgstr "Konfigurationseinstellungen"
 #. module: l10n_de_reports
 #. odoo-python
 #: code:addons/l10n_de_reports/models/account_generic_tax_report.py:0
+#: code:addons/l10n_de_reports/models/account_return.py:0
 msgid "Configure your company"
 msgstr "Ihr Unternehmen konfigurieren"
 
@@ -102,6 +142,8 @@ msgstr "Datev zip"
 #: model:ir.model.fields,field_description:l10n_de_reports.field_account_chart_template__display_name
 #: model:ir.model.fields,field_description:l10n_de_reports.field_account_general_ledger_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_de_reports.field_account_move__display_name
+#: model:ir.model.fields,field_description:l10n_de_reports.field_account_return__display_name
+#: model:ir.model.fields,field_description:l10n_de_reports.field_account_return_type__display_name
 #: model:ir.model.fields,field_description:l10n_de_reports.field_l10n_de_ec_sales_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_de_reports.field_l10n_de_tax_report_handler__display_name
 #: model:ir.model.fields,field_description:l10n_de_reports.field_res_company__display_name
@@ -111,9 +153,9 @@ msgid "Display Name"
 msgstr "Name anzeigen"
 
 #. module: l10n_de_reports
-#: model:ir.model,name:l10n_de_reports.model_account_general_ledger_report_handler
-msgid "FEC Report Custom Handler"
-msgstr "FEC-Bericht Benutzerdefinierter Handler"
+#: model:account.return.type,name:l10n_de_reports.de_ec_sales_list_return_type
+msgid "EC Sales List"
+msgstr "Zusammenfassende Meldung"
 
 #. module: l10n_de_reports
 #. odoo-python
@@ -132,9 +174,28 @@ msgid "German Tax Report Custom Handler"
 msgstr "Deutscher Steuerbericht Custom Handler"
 
 #. module: l10n_de_reports
+#: model:ir.module.module,shortdesc:base.module_l10n_de_reports
+msgid "Germany - Accounting Reports"
+msgstr ""
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_sales_report.py:0
+msgid "Goods"
+msgstr "Waren"
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_return.py:0
+msgid "Hints:"
+msgstr ""
+
+#. module: l10n_de_reports
 #: model:ir.model.fields,field_description:l10n_de_reports.field_account_chart_template__id
 #: model:ir.model.fields,field_description:l10n_de_reports.field_account_general_ledger_report_handler__id
 #: model:ir.model.fields,field_description:l10n_de_reports.field_account_move__id
+#: model:ir.model.fields,field_description:l10n_de_reports.field_account_return__id
+#: model:ir.model.fields,field_description:l10n_de_reports.field_account_return_type__id
 #: model:ir.model.fields,field_description:l10n_de_reports.field_l10n_de_ec_sales_report_handler__id
 #: model:ir.model.fields,field_description:l10n_de_reports.field_l10n_de_tax_report_handler__id
 #: model:ir.model.fields,field_description:l10n_de_reports.field_res_company__id
@@ -152,11 +213,11 @@ msgid ""
 "partner will be added to a multiple of ten starting by the number 1.The "
 "account code's length can be specified in the company settings."
 msgstr ""
-"Im Datev-Export des Hauptbuchs wird jeder Kunde durch diesen Kennung "
+"Im DATEV-Export des Hauptbuchs wird jeder Kunde anhand dieser Kennung "
 "identifiziert. Wenn diese Kennung nicht festgelegt ist, wird die Datenbank-"
-"ID des Partners zu einem Vielfachen von zehn addiert, beginnend mit der Zahl "
-"7. Die Länge des Kontocodes kann in den Unternehmenseinstellungen festgelegt "
-"werden."
+"ID des Partners verwendet und auf ein Vielfaches von zehn aufgerundet, "
+"beginnend mit der Nummer 1. Die Länge des Kontocodes kann in den "
+"Unternehmenseinstellungen festgelegt werden."
 
 #. module: l10n_de_reports
 #: model:ir.model.fields,help:l10n_de_reports.field_res_partner__l10n_de_datev_identifier
@@ -167,11 +228,11 @@ msgid ""
 "partner will be added to a multiple of ten starting by the number 7.The "
 "account code's length can be specified in the company settings."
 msgstr ""
-"Im Datev-Export des Hauptbuchs wird jeder Lieferant durch diesen Kennung "
+"Im DATEV-Export des Hauptbuchs wird jeder Kunde anhand dieser Kennung "
 "identifiziert. Wenn diese Kennung nicht festgelegt ist, wird die Datenbank-"
-"ID des Partners zu einem Vielfachen von zehn addiert, beginnend mit der Zahl "
-"7. Die Länge des Kontocodes kann in den Unternehmenseinstellungen festgelegt "
-"werden."
+"ID des Partners verwendet und auf ein Vielfaches von zehn aufgerundet, "
+"beginnend mit der Nummer 1. Die Länge des Kontocodes kann in den "
+"Unternehmenseinstellungen festgelegt werden."
 
 #. module: l10n_de_reports
 #: model:ir.model,name:l10n_de_reports.model_account_move
@@ -181,18 +242,58 @@ msgstr "Buchungssatz"
 #. module: l10n_de_reports
 #: model:ir.model.fields,field_description:l10n_de_reports.field_res_company__l10n_de_datev_client_number
 msgid "L10N De Datev Client Number"
-msgstr "L10N De Datev Kundennummer"
+msgstr "DATEV-Mandatennummer"
 
 #. module: l10n_de_reports
 #: model:ir.model.fields,field_description:l10n_de_reports.field_res_company__l10n_de_datev_consultant_number
 msgid "L10N De Datev Consultant Number"
-msgstr "L10N De Datev Beraternummer"
+msgstr "DATEV-Beraternummer"
 
 #. module: l10n_de_reports
 #: model:ir.model.fields,field_description:l10n_de_reports.field_account_bank_statement_line__l10n_de_datev_main_account_id
 #: model:ir.model.fields,field_description:l10n_de_reports.field_account_move__l10n_de_datev_main_account_id
 msgid "L10N De Datev Main Account"
-msgstr "L10N De Datev Hauptkonto"
+msgstr "DATEV-Hauptkonto"
+
+#. module: l10n_de_reports
+#: model:ir.model.fields,field_description:l10n_de_reports.field_account_return__l10n_de_elster_payload_attachment_id
+msgid "L10N De Elster Payload Attachment"
+msgstr ""
+
+#. module: l10n_de_reports
+#: model:ir.model,name:l10n_de_reports.model_account_general_ledger_report_handler
+msgid "Polish JPK KR PD Custom Handler"
+msgstr "Benutzerdefinierter Handler für polnischen Bericht JPK KR PD"
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_generic_tax_report.py:0
+msgid "Quarter not supported."
+msgstr "Quartal nicht unterstützt."
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_sales_report.py:0
+msgid "Services"
+msgstr "Dienstleistungen"
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_return.py:0
+msgid "Submission Failed, Please try again later"
+msgstr ""
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_return.py:0
+msgid "Submission failed with error code: %s"
+msgstr ""
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_return.py:0
+msgid "Successfully submitted to Elster."
+msgstr ""
 
 #. module: l10n_de_reports
 #: model:account.return.type,name:l10n_de_reports.de_tax_return_type
@@ -202,7 +303,26 @@ msgstr "Steuer"
 #. module: l10n_de_reports
 #: model_terms:ir.ui.view,arch_db:l10n_de_reports.res_config_settings_view_form
 msgid "The number of digits for the account code in the DateV export"
-msgstr "Die Anzahl der Ziffern für den Kontocode im Datev-Export"
+msgstr "Die Anzahl der Ziffern für den Kontocode im DATEV-Export"
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_return.py:0
+msgid ""
+"The tax report's XML has been attached. You can review it before submission."
+msgstr ""
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_return.py:0
+msgid "Transfer Ticket: %s"
+msgstr ""
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_sales_report.py:0
+msgid "Triangular"
+msgstr "Dreieckig"
 
 #. module: l10n_de_reports
 #. odoo-python
@@ -229,6 +349,14 @@ msgstr ""
 #: code:addons/l10n_de_reports/models/account_generic_tax_report.py:0
 msgid "Your company's SteuerNummer field should be filled"
 msgstr "Die Steuernummer Ihres Unternehmens sollte ausgefüllt sein."
+
+#. module: l10n_de_reports
+#. odoo-python
+#: code:addons/l10n_de_reports/models/account_return.py:0
+msgid ""
+"Your company's must have a SteuerNummer. Please configure it before "
+"submitting to ELSTER."
+msgstr ""
 
 #. module: l10n_de_reports
 #. odoo-python

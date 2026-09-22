@@ -16,7 +16,7 @@ class L10n_CoIvaReportHandler(models.AbstractModel):
 
     def _get_query_results(self, report, options, domain, expanded=False):
         queries = []
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
 
             query = report._get_report_query(column_group_options, 'strict_range', domain=domain)
             bimestre_expression = SQL('CAST(FLOOR((EXTRACT(MONTH FROM account_move_line.date) + 1) / 2) AS INT)')
@@ -37,17 +37,10 @@ class L10n_CoIvaReportHandler(models.AbstractModel):
             queries.append(SQL(
                 """
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     SUM((account_move_line.credit - account_move_line.debit) / 0.15) AS balance_15_over_19,
                     SUM(account_move_line.credit - account_move_line.debit) AS balance,
-                    SUM(CASE
-                        WHEN account_move_line.credit > 0
-                            THEN account_move_line.tax_base_amount
-                        WHEN account_move_line.debit > 0
-                            THEN account_move_line.tax_base_amount * -1
-                        ELSE 0
-                        END
-                    ) AS tax_base_amount,
+                    SUM(account_move_line.tax_base_amount) AS tax_base_amount,
                     %(bimestre_column)s
                     rp.id AS partner_id,
                     rp.name AS partner_name
@@ -57,7 +50,7 @@ class L10n_CoIvaReportHandler(models.AbstractModel):
                 GROUP BY rp.id %(bimestre_groupby)s
                 %(bimestre_having)s
                 """,
-                column_group_key=column_group_key,
+                column_group_index=column_group_index,
                 bimestre_column=bimestre_column,
                 bimestre_groupby=SQL(', %s', bimestre_expression) if expanded else SQL(),
                 bimestre_having=bimestre_having,
@@ -76,7 +69,7 @@ class L10n_CoIvaReportHandler(models.AbstractModel):
             domain += [('tax_line_id.l10n_co_edi_type.code', '=', '05')]
         return domain
 
-    def _report_expand_unfoldable_line_iva(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_iva(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         report = self.env['account.report'].browse(options['report_id'])
         domain = self._get_domain(report, options, line_dict_id=line_dict_id)
         query_results = self._get_query_results(report, options, domain, expanded=True)

@@ -1,19 +1,22 @@
+import { Component, onWillStart, proxy, signal, useEffect, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { user } from "@web/core/user";
+import { useService } from "@web/core/utils/hooks";
 import { throttleForAnimation } from "@web/core/utils/timing";
-import { useRecordObserver } from "@web/model/relational_model/utils";
-import { Component, onWillStart, useRef, useState } from "@odoo/owl";
+import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
 class KnowledgeCover extends Component {
-    static props = standardWidgetProps;
     static template = "knowledge.KnowledgeCover";
+
+    props = useProps(standardWidgetProps);
+
+    rootRef = signal.ref();
+    imageRef = signal.ref();
 
     setup() {
         super.setup();
-        this.root = useRef("root");
-        this.image = useRef("image");
-        this.state = useState({
+        this.uiService = useService("ui");
+        this.state = proxy({
             repositioning: false,
             grabbing: false,
             // cover_image_position is false if the cover has never been repositioned before
@@ -28,12 +31,12 @@ class KnowledgeCover extends Component {
         // article by loading the related record, the state of this component
         // is shared between the articles and is not recomputed).
         let previousArticleId = this.props.record.resId;
-        useRecordObserver((record) => {
-            if (!previousArticleId || previousArticleId !== record.resId) {
-                previousArticleId = record.resId;
+        useEffect(() => {
+            if (!previousArticleId || previousArticleId !== this.props.record.resId) {
+                previousArticleId = this.props.record.resId;
                 this.state.repositioning = false;
                 this.state.grabbing = false;
-                this.state.verticalPosition = record.data.cover_image_position || 50;
+                this.state.verticalPosition = this.props.record.data.cover_image_position || 50;
             }
         });
     }
@@ -63,7 +66,7 @@ class KnowledgeCover extends Component {
      */
     repositionCover() {
         this.state.repositioning = true;
-        const cover = this.image.el;
+        const cover = this.imageRef();
         let prevPos;
 
         const moveCover = throttleForAnimation(ev => {

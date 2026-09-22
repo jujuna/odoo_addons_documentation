@@ -19,10 +19,11 @@ class TestWhitelistFromTemplate(TransactionCase):
             'name': 'CH Employee',
             'company_id': self.company_ch.id,
             'contract_date_start': "2024-01-01",
-            'structure_type_id': self.env.ref('l10n_ch_hr_payroll.structure_type_employee_ch').id
+            'structure_type_id': self.env.ref('l10n_ch_hr_payroll.structure_type_employee_ch').id,
+            'private_country_id': False,
         })
 
-        LocationUnit = self.env['l10n.ch.location.unit'].with_context(tracking_disable=True)
+        LocationUnit = self.env['l10n.ch.location.unit']
         self.location_unit_1 = LocationUnit.create({
             "company_id": self.company_ch.id,
             "partner_id": self.env['res.partner'].create({
@@ -153,15 +154,13 @@ class TestWhitelistFromTemplate(TransactionCase):
     def test_ch_warnings_action_text_presence(self):
         """Test the presence of action_text values in payslip.issues."""
         payslip = self.env['hr.payslip'].create({
-            'name': 'Warning Slip',
             'employee_id': self.employee_ch.id,
             'date_from': "2024-01-01",
             'date_to': "2024-01-31",
         })
 
         expected_action_texts = [
-            'Employee Reference',
-            'Gender',
+            'Sex',
             'Birthday',
             'Nationality (Country)',
             'Canton',
@@ -177,11 +176,13 @@ class TestWhitelistFromTemplate(TransactionCase):
             'Workplace',
             'Private Country',
         ]
-
+        self.employee_ch.write(
+            {'wage_type': 'monthly', 'l10n_ch_has_monthly': True, 'wage': 5000}
+        )
         self.validate_payslip_issues_presence(payslip, expected_action_texts)
 
         self.employee_ch.write(
-            {'registration_number': '1', "l10n_ch_job_type": "lowerCadre", 'structure_type_id': self.env.ref('l10n_ch_hr_payroll.structure_type_employee_ch').id, 'contract_date_start': date(2022, 1, 1), 'contract_date_end': date(2022, 3, 31), 'wage_type': "hourly", 'l10n_ch_has_hourly': True, "l10n_ch_contractual_13th_month_rate": 8.33, 'wage': 0, 'hourly_wage': 50.0, 'l10n_ch_lesson_wage': 50.0, 'l10n_ch_has_lesson': True, 'l10n_ch_location_unit_id': self.location_unit_1.id, 'l10n_ch_social_insurance_id': self.avs_1.id, 'l10n_ch_laa_group': self.laa_group_A, 'laa_solution_number': '1', 'l10n_ch_lpp_insurance_id': self.lpp_0.id, 'l10n_ch_compensation_fund_id': self.caf_lu_1.id, 'l10n_ch_thirteen_month': True, 'l10n_ch_yearly_holidays': 0, 'certificate': 'higherVocEducation', 'name': "Herz Monica", 'sex': 'female', 'company_id': self.company_ch.id, 'country_id': self.env.ref('base.ch').id, 'l10n_ch_sv_as_number': False, 'birthday': date(1976, 6, 30), 'marital': 'married', 'l10n_ch_marital_from': date(2001, 5, 25), 'private_street': 'Bahnhofstrasse 1', 'private_zip': '6020', 'private_city': 'Emmenbrücke', 'private_country_id': self.env.ref('base.ch').id, 'l10n_ch_municipality': 1024, 'l10n_ch_residence_category': False, 'l10n_ch_canton': 'LU', 'lang': 'en_US'},
+            {'registration_number': '1', "l10n_ch_job_type": "lowerCadre", 'structure_type_id': self.env.ref('l10n_ch_hr_payroll.structure_type_employee_ch').id, 'wage_type': "monthly", 'l10n_ch_has_monthly': True, "l10n_ch_contractual_13th_month_rate": 8.33, 'wage': 5000, 'hourly_wage': 0.0, 'l10n_ch_lesson_wage': 0, 'l10n_ch_has_lesson': False, 'l10n_ch_location_unit_id': self.location_unit_1.id, 'l10n_ch_social_insurance_id': self.avs_1.id, 'l10n_ch_laa_group': self.laa_group_A, 'laa_solution_number': '1', 'l10n_ch_lpp_insurance_id': self.lpp_0.id, 'l10n_ch_compensation_fund_id': self.caf_lu_1.id, 'l10n_ch_thirteen_month': True, 'l10n_ch_yearly_holidays': 0, 'certificate': 'higherVocEducation', 'name': "Herz Monica", 'sex': 'female', 'company_id': self.company_ch.id, 'country_id': self.env.ref('base.ch').id, 'l10n_ch_sv_as_number': False, 'birthday': date(1976, 6, 30), 'marital': 'married', 'l10n_ch_marital_from': date(2001, 5, 25), 'private_street': 'Bahnhofstrasse 1', 'private_zip': '6020', 'private_city': 'Emmenbrücke', 'private_country_id': self.env.ref('base.ch').id, 'l10n_ch_municipality': 1024, 'l10n_ch_residence_category': False, 'l10n_ch_canton': 'LU', 'lang': 'en_US'},
         )
         expected_action_texts_2 = [
             'Job',
@@ -196,11 +197,12 @@ class TestWhitelistFromTemplate(TransactionCase):
         """
 
         payslip_run = self.env['hr.payslip.run'].create({
+            "company_id": self.company_ch.id,
             'date_end': '2025-11-30',
             'date_start': '2025-11-01',
             'name': 'Payslip for Employee',
             'structure_id': self.env.ref('l10n_ch_hr_payroll.hr_payroll_structure_ch_elm').id,
         })
 
-        payslip_run.generate_payslips(employee_ids=[self.employee_ch.id])
-        self.assertEqual(payslip_run.slip_ids.name, 'Salary Slip - CH Employee - November 2025')
+        payslip_run._generate_payslips()
+        self.assertEqual(payslip_run.slip_ids.name, 'Payslip - CH Employee - November 2025')

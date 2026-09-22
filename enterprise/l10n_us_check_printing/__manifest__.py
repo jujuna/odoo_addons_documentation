@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 {
-    'name': 'US Checks Layout',
-    'version': '1.0',
+    'name': 'United States - Checks Layout',
     'category': 'Accounting/Localizations/Check',
     'summary': 'Print US Checks',
     'description': """
@@ -33,7 +31,6 @@ You can choose between:
         'report/print_check_middle.xml',
         'report/print_check_bottom.xml',
     ],
-    'installable': True,
     'auto_install': ['l10n_us_account'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

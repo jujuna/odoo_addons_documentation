@@ -2,24 +2,24 @@
 # This file contains the translation of the following modules:
 # * equity
 #
-# "Thi Huong Nguyen (thng)" <thng@odoo.com>, 2025.
+# "Thi Huong Nguyen (thng)" <thng@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-12-24 08:44+0000\n"
-"Last-Translator: \"Thi Huong Nguyen (thng)\" <thng@odoo.com>\n"
-"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-17 22:51+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-master/"
 "equity/vi/>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__securities
@@ -67,7 +67,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 msgid "(Completed through portal Form)"
-msgstr "(Hoàn thành qua biểu mẫu trên cổng thông tin)"
+msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -78,7 +78,7 @@ msgstr "(ID"
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "(Non-positive options don't expire)"
-msgstr "(Các tùy chọn không tích cực không hết hạn)"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -98,18 +98,11 @@ msgid "(object._get_ubo_report_filename())"
 msgstr "(object._get_ubo_report_filename())"
 
 #. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-msgid "/ Security"
-msgstr ""
-
-#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid ""
 "<br/>\n"
 "                                            Politically Exposed Person:"
 msgstr ""
-"<br/>\n"
-"                                            Người có liên quan đến chính trị:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -117,119 +110,106 @@ msgid "<br/> Nationality:"
 msgstr ""
 
 #. module: equity
-#: model:mail.template,body_html:equity.equity_shareholder_email_template
-msgid ""
-"<div>\n"
-"                    <p> Hello <t t-out=\"ctx.get('holder_name')\"/>,<br/>\n"
-"                        You will find your latest transaction and valuations "
-"in the following link: <br/>\n"
-"                        <a t-attf-href=\"/my/equity?"
-"access_token={{ctx.get('equity_access_token')}}\" class=\"btn btn-"
-"primary\">Show Equity</a> <br/> <br/>\n"
-"                        Best,\n"
-"                        <t t-if=\"user_id.signature\">\n"
-"                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
-"<div>\n"
-"                    <p> Chào <t t-out=\"ctx.get('holder_name')\"/>,<br/>\n"
-"                        Bạn có thể xem các giao dịch và định giá mới nhất "
-"của mình tại liên kết sau: <br/>\n"
-"                        <a t-attf-href=\"/my/equity?"
-"access_token={{ctx.get('equity_access_token')}}\" class=\"btn btn-"
-"primary\">Show Equity</a> <br/> <br/> \n"
-"                        Thân mến,\n"
-"                       <t t-if=\"user_id.signature\">\n"
-"                            <br/> --<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
-"                        </t>\n"
-"                   </p>\n"
-"                </div>\n"
-"            "
-
-#. module: equity
 #: model:mail.template,body_html:equity.equity_ubo_form_email_template
 msgid ""
 "<div>\n"
-"                    <p> Hello <t t-out=\"object.name\"/>,<br/>\n"
+"                    <p> Hello,<br/>\n"
 "                        Following our legal obligations to identify clients, "
 "we need to report natural persons who directly or indirectly\n"
 "                        hold or control at least 25% in the capital or "
 "voting rights of <b><t t-out=\"user_id.company_id.name\"/></b>. <br/> <br/>\n"
-"                        Please fill in the UBO request:<br/>\n"
-"                        <a t-attf-href=\"/my/ubo?"
-"{{object._get_equity_url_params()}}\" class=\"btn btn-primary\">Fill UBO</a> "
-"<br/> <br/>\n"
+"                        Please fill in the UBO request through the link "
+"above.<br/> <br/>\n"
 "                        Thank you,\n"
 "                        <t t-if=\"user_id.signature\">\n"
 "                            <br/>--<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div>\n"
-"                    <p>Xin chào <t t-out=\"object.name\"/>,<br/>\n"
-"                        Theo nghĩa vụ pháp lý trong việc xác định khách "
-"hàng, chúng tôi cần báo cáo các cá nhân trực tiếp hoặc gián tiếp\n"
-"                        sở hữu hoặc kiểm soát ít nhất 25% vốn hoặc quyền "
-"biểu quyết của <b><t t-out=\"user_id.company_id.name\"/></b> . <br/> <br/>\n"
-"                        Vui lòng điền vào yêu cầu UBO:<br/>\n"
-"                        <a t-attf-href=\"/my/ubo?"
-"{{object._get_equity_url_params()}}\" class=\"btn btn-primary\">Điền UBO</a> "
-"<br/> <br/> \n"
-"                        Xin cảm ơn!\n"
+"                    <p> Chào,<br/>\n"
+"                        Theo nghĩa vụ pháp lý của chúng tôi trong việc xác "
+"định khách hàng, chúng tôi cần báo cáo các cá nhân trực tiếp hoặc gián tiếp\n"
+"                        sở hữu hoặc kiểm soát ít nhất 25% in trong vốn hoặc "
+"quyền biểu quyết của <b><t t-out=\"user_id.company_id.name\"/></b> . <br/> "
+"<br/>\n"
+"                        Vui lòng điền vào yêu cầu UBO qua liên kết "
+"trên.<br/> <br/>\n"
+"                        Cảm ơn,\n"
 "                       <t t-if=\"user_id.signature\">\n"
 "                            <br/> --<br/>\n"
-"                            <t t-out=\"user_id.signature or ''\">Mitchell "
-"Admin</t>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
+"                       </t>\n"
+"                    </p> \n"
+"               </div> \n"
+"            "
+
+#. module: equity
+#: model:mail.template,body_html:equity.equity_shareholder_email_template
+msgid ""
+"<div>\n"
+"                    <p> Hello,<br/>\n"
+"                        You will find your latest transaction and valuations "
+"in the link above. <br/> <br/>\n"
+"                        Best,\n"
+"                        <t t-if=\"user_id.signature\">\n"
+"                            <br/>--<br/>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
 "                        </t>\n"
-"                   </p>\n"
+"                    </p>\n"
 "                </div>\n"
+"            "
+msgstr ""
+"<div>\n"
+"                    <p> Chào bạn,<br/>\n"
+"                        Bạn có thể xem các giao dịch và định giá mới nhất "
+"của mình tại liên kết trên. <br/> <br/>\n"
+"                        Thân mến,\n"
+"                       <t t-if=\"user_id.signature\">\n"
+"                            <br/> --<br/>\n"
+"                            <t t-out=\"user_id.signature\"/>\n"
+"                       </t>\n"
+"                    </p> \n"
+"               </div> \n"
 "            "
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
 msgid ""
-"<i class=\"fa fa-envelope ms-2 mt-1\" aria-label=\"Email Address\" "
-"title=\"Email Address\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"mail\" aria-label=\"Email "
+"Address\" title=\"Email Address\"/>"
 msgstr ""
-"<i class=\"fa fa-envelope ms-2 mt-1\" aria-label=\"Địa chỉ email\" "
-"title=\"Địa chỉ email\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"mail\" aria-label=\"Địa chỉ "
+"email\" title=\"Địa chỉ email\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_help
 msgid ""
-"<i class=\"fa fa-phone ms-2 mt-1\" aria-label=\"Phone Number\" title=\"Phone "
-"Number\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"phone\" aria-label=\"Phone "
+"Number\" title=\"Phone Number\"/>"
 msgstr ""
-"<i class=\"fa fa-phone ms-2 mt-1\" aria-label=\"Số điện thoại\" title=\"Số "
-"điện thoại\"/>"
+"<i class=\"oi oi-filled ms-2 mt-1\" data-icon=\"phone\" aria-label=\"Số điện "
+"thoại\" title=\"Số điện thoại\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_kanban
 msgid ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"To\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'exercise'\"/>"
 msgstr ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"Đến\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'thực hiện'\"/>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_kanban
 msgid ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"To\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'transfer'\"/>"
 msgstr ""
-"<i title=\"To\" class=\"fa fa-fw fa-arrow-right mx-1\" "
+"<i title=\"Đến\" class=\"oi oi-fw mx-1\" data-icon=\"arrow_forward\" "
 "invisible=\"transaction_type != 'chuyển nhượng'\"/>"
 
 #. module: equity
@@ -248,8 +228,6 @@ msgid ""
 "<span> Shareholder<span invisible=\"equity_shareholders_count == 1\">s</"
 "span></span>"
 msgstr ""
-"<span>Cổ đông<span invisible=\"equity_shareholders_count == 1\"></span></"
-"span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_dashboard_res_partner
@@ -257,15 +235,13 @@ msgid ""
 "<span> Transaction<span invisible=\"equity_transaction_count == 1\">s</"
 "span></span>"
 msgstr ""
-"<span>Giao dịch<span invisible=\"equity_transaction_count == 1\"></span></"
-"span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "<span>Missing supporting documents! Attach them in the chatter.</span>"
 msgstr ""
-"<span>Thiếu tài liệu hỗ trợ! Vui lòng đính kèm chúng trong phần trò chuyện.</"
-"span>"
+"<span>Thiếu tài liệu hỗ trợ! Vui lòng đính kèm chúng trong cửa sổ trò "
+"chuyện.</span>"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_security_class_form
@@ -290,15 +266,14 @@ msgstr "<strong>HOẶC</strong>"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "<strong>Tax ID Number:</strong>"
-msgstr "<strong>ID thuế:</strong>"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/valuation_chart/valuation_chart.xml:0
 msgid ""
 "= Your shares / Total number of shares (i.e., options not taken into account)"
-msgstr ""
-"= Số cổ phần của bạn / Tổng số cổ phần (tức là không tính các quyền chọn)"
+msgstr "= Số cổ phần của bạn/Tổng số cổ phần (tức là không tính các quyền chọn)"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -325,6 +300,12 @@ msgstr ""
 "Khu vực Kinh tế Châu Âu; hoặc"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid "A partner cannot have transactions in different currencies."
+msgstr ""
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid ""
 "According to laws related to anti money laundering, the notary must identify "
@@ -345,7 +326,7 @@ msgstr "Tác vụ cần thiết"
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.xml:0
 msgid "Add Beneficial Owner"
-msgstr "Thêm Chủ sở hữu thực sự"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -385,11 +366,16 @@ msgid "Auditor"
 msgstr ""
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__author_id
+msgid "Author"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 #: model:ir.model.fields,help:equity.field_equity_ubo__auth_rep_role
 msgid "Authorized Representative Role"
-msgstr "Vai trò của Đại diện được ủy quyền"
+msgstr ""
 
 #. module: equity
 #: model:ir.actions.act_window,name:equity.action_equity_ubo
@@ -422,8 +408,8 @@ msgstr ""
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
-#: model:ir.model.fields,field_description:equity.field_res_partner__ubo_birth_date
-#: model:ir.model.fields,field_description:equity.field_res_users__ubo_birth_date
+#: model:ir.model.fields,field_description:equity.field_res_partner__birth_date
+#: model:ir.model.fields,field_description:equity.field_res_users__birth_date
 msgid "Birth Date"
 msgstr ""
 
@@ -439,6 +425,11 @@ msgid "Board Member"
 msgstr ""
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__body_has_template_value
+msgid "Body content is the same as the template"
+msgstr "Nội dung chính giống với mẫu"
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Buyer"
 msgstr "Bên mua"
@@ -447,6 +438,16 @@ msgstr "Bên mua"
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__ceo
 msgid "CEO"
 msgstr "CEO"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_transaction__can_change_currency
+msgid "Can Change Currency"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__can_edit_body
+msgid "Can Edit Body"
+msgstr ""
 
 #. module: equity
 #. odoo-python
@@ -480,12 +481,12 @@ msgstr ""
 #: model:ir.ui.menu,name:equity.menu_equity_reporting_cap_table_pivot
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_cap_table_pivot
 msgid "Cap Table Pivot"
-msgstr "Bảng phân bổ vốn cổ phần"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__chairman
 msgid "Chairman of the Board"
-msgstr "Chủ tịch Hội đồng Quản trị"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__security_class_id
@@ -501,6 +502,7 @@ msgid "Clear"
 msgstr "Xoá"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_cap_table__company_id
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__partner_id
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__partner_id
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__partner_id
@@ -526,6 +528,18 @@ msgid "Company - Cat 3. Executive officer"
 msgstr "Công ty - Danh mục 3. Giám đốc điều hành"
 
 #. module: equity
+#: model:ir.model.fields,help:equity.field_equity_transaction__company_id
+#: model:ir.model.fields,help:equity.field_equity_ubo__company_id
+#: model:ir.model.fields,help:equity.field_equity_valuation__company_id
+msgid "Company to which this record is visible"
+msgstr ""
+
+#. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+msgid "Compose Email"
+msgstr ""
+
+#. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_configuration
 msgid "Configuration"
 msgstr "Cấu hình"
@@ -539,11 +553,16 @@ msgid "Contact"
 msgstr "Liên hệ"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__body
+msgid "Contents"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.js:0
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__end_date
 msgid "Control End Date"
-msgstr "Ngày kết thúc kiểm soát"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -558,13 +577,13 @@ msgstr ""
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.js:0
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__start_date
 msgid "Control Start Date"
-msgstr "Ngày bắt đầu kiểm soát"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "Control Start Date is mandatory"
-msgstr "Ngày bắt đầu kiểm soát là bắt buộc"
+msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -596,6 +615,7 @@ msgid "Create a Customer"
 msgstr "Tạo một khách hàng"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__create_uid
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__create_uid
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__create_uid
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__create_uid
@@ -604,6 +624,7 @@ msgid "Created by"
 msgstr "Được tạo bởi"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__create_date
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__create_date
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__create_date
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__create_date
@@ -619,7 +640,7 @@ msgstr "Tiền tệ"
 #. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_dashboard
 msgid "Dashboard"
-msgstr "Bảng điều khiển"
+msgstr "Báo cáo tổng quan"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__date
@@ -639,7 +660,7 @@ msgid ""
 "Definitions: \"beneficial owners\", \"control\", \"shareholder holding 25% "
 "or more\", \"decision makers\""
 msgstr ""
-"Định nghĩa: \"chủ sở hữu thực sự\", \"quyền kiểm soát\", \"cổ đông sở hữu "
+"Định nghĩa: \"chủ sở hữu hưởng lợi\", \"quyền kiểm soát\", \"cổ đông sở hữu "
 "25% trở lên\", \"người ra quyết định\""
 
 #. module: equity
@@ -652,7 +673,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Destination class can only be set in exercise transactions."
-msgstr "Lớp đích chỉ có thể được thiết lập trong các giao dịch tập luyện."
+msgstr "Lớp đích chỉ có thể được thiết lập trong các giao dịch thực hiện."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__dilution
@@ -668,6 +689,7 @@ msgstr "Huỷ bỏ"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__display_name
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__display_name
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__display_name
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__display_name
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__display_name
@@ -687,29 +709,30 @@ msgstr ""
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__attachment_expiration_date
 msgid "Document Exp. Date"
-msgstr "Ngày hết hạn của tài liệu"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.xml:0
 msgid "Document Expiration Date"
-msgstr "Ngày hết hạn của tài liệu"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "Edit Beneficial Owner"
-msgstr "Chỉnh sửa Chủ sở hữu thực sự"
+msgstr ""
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/res_partner.py:0
 #: model:ir.actions.server,name:equity.action_equity_dashboard_res_partner
+#: model:ir.module.module,shortdesc:base.module_equity
 #: model:ir.ui.menu,name:equity.menu_equity
+#: model:portal.entry,name:equity.equity_portal_entry
 #: model:res.groups.privilege,name:equity.res_groups_privilege_equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_breadcrumbs_equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_company_equity
-#: model_terms:ir.ui.view,arch_db:equity.portal_my_home_equity
 msgid "Equity"
 msgstr "Vốn chủ sở hữu"
 
@@ -720,6 +743,21 @@ msgid "Equity Access Token"
 msgstr ""
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button
+msgid "Equity Button"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button_text
+msgid "Equity Button Text"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__equity_button_url
+msgid "Equity Button Url"
+msgstr ""
+
+#. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__equity_currency_id
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_currency_id
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_currency_id
@@ -727,10 +765,21 @@ msgid "Equity Currency"
 msgstr ""
 
 #. module: equity
+#: model:ir.model,name:equity.model_equity_mail_compose_message
+msgid "Equity Email composition wizard"
+msgstr ""
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
+msgid "Equity Invitation"
+msgstr ""
+
+#. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_kanban_dashboard_graph
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_kanban_dashboard_graph
 msgid "Equity Kanban Dashboard Graph"
-msgstr "Biểu đồ bảng điều khiển Kanban về vốn chủ sở hữu"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_last_valuation
@@ -741,13 +790,13 @@ msgstr ""
 #. module: equity
 #: model:mail.template,name:equity.equity_shareholder_email_template
 msgid "Equity Shareholder Email"
-msgstr ""
+msgstr "Email cổ đông"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_shareholders_count
 #: model:ir.model.fields,field_description:equity.field_res_users__equity_shareholders_count
 msgid "Equity Shareholders Count"
-msgstr ""
+msgstr "Số lượng cổ đông"
 
 #. module: equity
 #: model:ir.model,name:equity.model_equity_transaction
@@ -765,7 +814,7 @@ msgstr ""
 #. module: equity
 #: model:mail.template,name:equity.equity_ubo_form_email_template
 msgid "Equity UBO Form Email"
-msgstr "Mẫu đơn UBO về vốn chủ sở hữu qua email"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_res_partner__equity_valuation_ids
@@ -787,13 +836,13 @@ msgstr "Sự kiện"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Exemption from the identification of beneficial"
-msgstr "Miễn trừ việc xác định chủ sở hữu thực sự"
+msgstr "Miễn trừ việc xác định chủ sở hữu hưởng lợi"
 
 #. module: equity
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Exercise transactions must have a destination 'Share' class"
-msgstr "Các giao dịch tập thể phải có lớp đích là 'Share'"
+msgstr "Các giao dịch thực hiện phải có lớp đích là 'Chia sẻ'"
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__expiration_date
@@ -827,9 +876,15 @@ msgstr ""
 "                        vợ/chồng; cha mẹ;"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
+msgid "Fill UBO"
+msgstr ""
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "First and Last Name:"
-msgstr "Họ tên:"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__message_follower_ids
@@ -864,6 +919,11 @@ msgid "Formation Date"
 msgstr ""
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__email_from
+msgid "From"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/cap_table/cap_table.js:0
 msgid "Fully Diluted"
@@ -892,7 +952,7 @@ msgstr ""
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__has_auth_rep_role
 msgid "Has Auth Rep Role"
-msgstr "Có vai trò Đại diện Xác thực"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__has_message
@@ -954,10 +1014,10 @@ msgid ""
 "I hereby declare on honor that the information provided is truthful and "
 "accurate."
 msgstr ""
-"Tôi xin cam đoan rằng thông tin được cung cấp là trung thực và chính xác."
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__id
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__id
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__id
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__id
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__id
@@ -1047,9 +1107,8 @@ msgid "Invalid token"
 msgstr "Token không hợp lệ"
 
 #. module: equity
-#. odoo-python
-#: code:addons/equity/models/res_partner.py:0
-msgid "Invite %s"
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__is_mail_template_editor
+msgid "Is Editor"
 msgstr ""
 
 #. module: equity
@@ -1071,6 +1130,12 @@ msgid "Job Position:"
 msgstr "Vị trí công việc:"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__lang
+msgid "Language"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__write_uid
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__write_uid
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__write_uid
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__write_uid
@@ -1079,6 +1144,7 @@ msgid "Last Updated by"
 msgstr "Cập nhật lần cuối bởi"
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__write_date
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__write_date
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__write_date
 #: model:ir.model.fields,field_description:equity.field_equity_ubo__write_date
@@ -1100,6 +1166,16 @@ msgstr "Các pháp nhân được điều chỉnh bởi pháp luật quốc gia 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__auth_rep_role__liquidator
 msgid "Liquidator"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__template_id
+msgid "Mail Template"
+msgstr ""
+
+#. module: equity
+#: model:ir.module.module,summary:base.module_equity
+msgid "Manage securities, transactions, and cap tables."
 msgstr ""
 
 #. module: equity
@@ -1138,6 +1214,11 @@ msgid "Missing Documents"
 msgstr ""
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__model
+msgid "Model"
+msgstr ""
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_equity
 msgid "My Companies"
 msgstr "Công ty của tôi"
@@ -1145,12 +1226,12 @@ msgstr "Công ty của tôi"
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_1
 msgid "NGO - Cat 1. Directors"
-msgstr "NGO - Loại 1. Ban Giám đốc"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_2
 msgid "NGO - Cat 2. Individuals with representation authority"
-msgstr "Tổ chức phi chính phủ (NGO) - Loại 2. Cá nhân có quyền đại diện"
+msgstr "NGO - Loại 2. Cá nhân có quyền đại diện"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_3
@@ -1160,7 +1241,7 @@ msgstr "NGO - Loại 3. Các cá nhân chịu trách nhiệm quản lý hàng ng
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_4
 msgid "NGO - Cat 4. Founders of a foundation"
-msgstr "NGO - Loại 4. Người sáng lập của một quỹ từ thiện"
+msgstr "NGO - Loại 4. Người sáng lập của một quỹ"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_ubo__control_method__ngo_5
@@ -1241,20 +1322,21 @@ msgid "New Valuation"
 msgstr ""
 
 #. module: equity
+#: model:res.groups.privilege,placeholder:equity.res_groups_privilege_equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "No"
 msgstr "Không"
 
 #. module: equity
-#. odoo-python
-#: code:addons/equity/models/equity_transaction.py:0
-msgid "No %s was set!"
-msgstr "Không có %s nào được thiết lập!"
-
-#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "No UBOs recorded for this company."
-msgstr "Không có UBOs nào được ghi nhận cho công ty này."
+msgstr ""
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid "No holders were set!"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -1309,8 +1391,8 @@ msgid ""
 "Only %(seller_options)s %(security_class_name)s options available for "
 "transfer"
 msgstr ""
-"Chỉ có các tùy chọn %(seller_options)s %(security_class_name)s có sẵn cho "
-"việc chuyển đổi"
+"Chỉ có các tùy chọn %(seller_options)s %(security_class_name)s có thể chuyển "
+"nhượng"
 
 #. module: equity
 #. odoo-python
@@ -1318,7 +1400,7 @@ msgstr ""
 msgid ""
 "Only %(seller_shares)s %(security_class_name)s shares available for transfer"
 msgstr ""
-"Chỉ có cổ phiếu của %(seller_shares)s %(security_class_name)s có thể chuyển "
+"Chỉ có cổ phiếu %(seller_shares)s %(security_class_name)s có thể chuyển "
 "nhượng"
 
 #. module: equity
@@ -1328,8 +1410,8 @@ msgid ""
 "Only %(subscriber_options)s %(security_class_name)s options available for "
 "cancellation"
 msgstr ""
-"Chỉ có các tùy chọn %(subscriber_options)s %(security_class_name)s có sẵn "
-"cho việc hủy bỏ"
+"Chỉ có các tùy chọn %(subscriber_options)s %(security_class_name)s có thể "
+"hủy bỏ"
 
 #. module: equity
 #. odoo-python
@@ -1338,7 +1420,7 @@ msgid ""
 "Only %(subscriber_options)s %(security_class_name)s options available for "
 "exercise"
 msgstr ""
-"Chỉ có các tùy chọn %(subscriber_options)s %(security_class_name)s  có thể "
+"Chỉ có các tùy chọn %(subscriber_options)s %(security_class_name)s có thể "
 "được thực hiện"
 
 #. module: equity
@@ -1348,8 +1430,8 @@ msgid ""
 "Only %(subscriber_shares)s %(security_class_name)s shares available for "
 "cancellation"
 msgstr ""
-"Chỉ có cổ phiếu của %(subscriber_shares)s %(security_class_name)s có thể "
-"được hủy bỏ"
+"Chỉ có cổ phiếu %(subscriber_shares)s %(security_class_name)s có thể được "
+"hủy bỏ"
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_transaction__transaction_type__exercise
@@ -1361,6 +1443,19 @@ msgstr ""
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Option Pool"
 msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,help:equity.field_equity_mail_compose_message__lang
+msgid ""
+"Optional translation language (ISO code) to select when sending out an "
+"email. If not set, the main partner's language will be used. This should "
+"usually be a placeholder expression that provides the appropriate language, "
+"e.g. {{ object.partner_id.lang }}."
+msgstr ""
+"Ngôn ngữ dịch thuật tùy chọn (mã ISO) cần chọn khi gửi email. Nếu không được "
+"thiết lập, ngôn ngữ của đối tác chính sẽ được sử dụng. Đây thường là một "
+"biểu thức giữ chỗ cung cấp ngôn ngữ phù hợp, ví dụ: {{ "
+"object.partner_id.lang }}."
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_security_class__class_type__options
@@ -1393,12 +1488,17 @@ msgstr "PEP"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "PEP - Politically Exposed Person"
-msgstr "PEP - Cá nhân có liên quan đến chính trị"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__partner_id
 msgid "Partner"
 msgstr "Đối tác"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids_all_have_email
+msgid "Partner Ids All Have Email"
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -1458,6 +1558,11 @@ msgid "Recipient of the securities of the transaction."
 msgstr "Người nhận các chứng khoán của giao dịch."
 
 #. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__partner_ids
+msgid "Recipients"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_end_dialog.xml:0
 msgid "Remove Shareholder"
@@ -1467,7 +1572,12 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/ubo_form.xml:0
 msgid "Remove holder exit date."
-msgstr "Xóa ngày rời khỏi của người nắm giữ."
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__render_model
+msgid "Rendering Model"
+msgstr ""
 
 #. module: equity
 #: model:ir.ui.menu,name:equity.menu_equity_reporting
@@ -1475,8 +1585,13 @@ msgid "Reporting"
 msgstr "Báo cáo"
 
 #. module: equity
-#: model:ir.actions.act_window,name:equity.action_equity_request_ubo_form
+#: model:ir.actions.server,name:equity.action_equity_request_ubo_form
 msgid "Request UBO Form"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__res_ids
+msgid "Res"
 msgstr ""
 
 #. module: equity
@@ -1506,7 +1621,7 @@ msgstr "Chứng khoán"
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Securities must be positive"
-msgstr "Chứng khoán phải có giá trị dương"
+msgstr ""
 
 #. module: equity
 #: model:ir.model,name:equity.model_equity_security_class
@@ -1528,9 +1643,9 @@ msgid "Security Price"
 msgstr ""
 
 #. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.portal_my_home_equity
+#: model:portal.entry,description:equity.equity_portal_entry
 msgid "See your shares and transactions"
-msgstr "Xem cổ phiếu và giao dịch của bạn"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_transaction__seller_id
@@ -1546,7 +1661,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Seller and Buyer must be different."
-msgstr "Người bán và Người mua phải là hai bên khác nhau."
+msgstr ""
 
 #. module: equity
 #. odoo-python
@@ -1558,18 +1673,10 @@ msgstr ""
 #. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/cap_table/cap_table.xml:0
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Send"
 msgstr "Gửi"
-
-#. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-msgid "Send to Seller"
-msgstr ""
-
-#. module: equity
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-msgid "Send to Subscriber"
-msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_security_class__sequence
@@ -1579,7 +1686,7 @@ msgstr "Trình tự"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "Shareholders who hold more than 25%"
-msgstr "Các cổ đông sở hữu hơn 25%"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_security_class__class_type__shares
@@ -1590,7 +1697,7 @@ msgstr "Lượt chia sẻ"
 #. odoo-python
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "Shares transactions must have a subscriber"
-msgstr "Giao dịch cổ phiếu phải có người đăng ký"
+msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -1611,6 +1718,11 @@ msgstr "Chữ ký:"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Strike Price"
+msgstr ""
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_mail_compose_message__subject
+msgid "Subject"
 msgstr ""
 
 #. module: equity
@@ -1703,7 +1815,7 @@ msgstr "Hiện tại không có giao dịch nào cho tài khoản của bạn."
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
 msgid "There are two classes of beneficial owners:"
-msgstr "Có hai loại chủ sở hữu thực sự:"
+msgstr "Có hai loại chủ sở hữu hưởng lợi:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_my_equity
@@ -1742,7 +1854,6 @@ msgstr "Tổng giá trị"
 #. module: equity
 #: model:ir.model.fields.selection,name:equity.selection__equity_valuation__event__transaction
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_form
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_search
 msgid "Transaction"
 msgstr "Giao dịch"
@@ -1763,7 +1874,6 @@ msgstr "Loại giao dịch"
 #: model:ir.actions.act_window,name:equity.action_equity_transaction
 #: model:ir.ui.menu,name:equity.menu_equity_ownership_transactions
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_list
-#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 msgid "Transactions"
 msgstr "Giao dịch"
 
@@ -1793,6 +1903,8 @@ msgid "UBO"
 msgstr "UBO"
 
 #. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
 #: model:mail.activity.type,name:equity.equity_ubo_form_mail_activity
 msgid "UBO Form Request"
 msgstr ""
@@ -1879,24 +1991,39 @@ msgstr ""
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__valuation
 #: model:ir.model.fields,field_description:equity.field_equity_valuation__valuation
 #: model:ir.ui.menu,name:equity.menu_equity_reporting_valuation
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_form
 msgid "Valuation"
 msgstr "Định giá"
 
 #. module: equity
 #: model:ir.actions.act_window,name:equity.action_equity_valuation
 #: model:ir.ui.menu,name:equity.menu_equity_ownership_valuations
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_valuation_list
 msgid "Valuations"
 msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
 msgid "Vesting period, exercise deadline, etc."
-msgstr "Thời gian chờ, hạn chót thực hiện, v.v."
+msgstr ""
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/res_partner.py:0
+msgid "View Equity"
+msgstr ""
 
 #. module: equity
 #: model:res.groups,name:equity.group_equity_viewer
 msgid "Viewer"
 msgstr "Người xem"
+
+#. module: equity
+#: model:ir.model.fields,field_description:equity.field_equity_transaction__company_id
+#: model:ir.model.fields,field_description:equity.field_equity_ubo__company_id
+#: model:ir.model.fields,field_description:equity.field_equity_valuation__company_id
+msgid "Visible to"
+msgstr ""
 
 #. module: equity
 #: model:ir.model.fields,field_description:equity.field_equity_cap_table__votes
@@ -1921,25 +2048,10 @@ msgid "Voting Rights"
 msgstr ""
 
 #. module: equity
-#: model:ir.model.fields,field_description:equity.field_equity_transaction__website_message_ids
-#: model:ir.model.fields,field_description:equity.field_equity_ubo__website_message_ids
-#: model:ir.model.fields,field_description:equity.field_equity_valuation__website_message_ids
-msgid "Website Messages"
-msgstr "Thông báo trên trang web"
-
-#. module: equity
-#: model:ir.model.fields,help:equity.field_equity_transaction__website_message_ids
-#: model:ir.model.fields,help:equity.field_equity_ubo__website_message_ids
-#: model:ir.model.fields,help:equity.field_equity_valuation__website_message_ids
-msgid "Website communication history"
-msgstr "Lịch sử trao đổi qua trang web"
-
-#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_end_dialog.xml:0
 msgid "When did the shareholder lose its 25% stake in control or in votes?"
 msgstr ""
-"Khi nào cổ đông mất quyền kiểm soát hoặc quyền biểu quyết với tỷ lệ 25%?"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_form
@@ -1959,6 +2071,11 @@ msgid "Who should complete and sign the declaration?"
 msgstr "Ai nên hoàn thành và ký vào tờ khai?"
 
 #. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+msgid "Write your message here..."
+msgstr ""
+
+#. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "Yes"
 msgstr "Có"
@@ -1972,6 +2089,14 @@ msgid ""
 msgstr ""
 "Bạn có thể loại bỏ bất kỳ cổ đông nào sở hữu dưới 25% số cổ phần hoặc quyền "
 "biểu quyết."
+
+#. module: equity
+#. odoo-python
+#: code:addons/equity/models/equity_transaction.py:0
+msgid ""
+"You cannot change the equity currency because this partner already has "
+"existing transactions."
+msgstr ""
 
 #. module: equity
 #. odoo-javascript
@@ -1994,7 +2119,7 @@ msgstr ""
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.portal_ubo_submit
 msgid "Your UBO Declaration Has Been Submitted!"
-msgstr "Tuyên bố về UBO của bạn đã được nộp!"
+msgstr ""
 
 #. module: equity
 #. odoo-python
@@ -2047,7 +2172,7 @@ msgstr ""
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "are the following publicly traded companies."
-msgstr "là các công ty niêm yết trên sàn chứng khoán sau đây."
+msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2069,12 +2194,17 @@ msgstr "ngày"
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
 msgid "declares that the beneficial owners of the company:"
-msgstr "xác nhận rằng các chủ sở hữu thực sự của công ty:"
+msgstr "xác nhận rằng các chủ sở hữu hưởng lợi của công ty:"
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_security_class_form
 msgid "e.g. Seed, Series A, ..."
-msgstr "Ví dụ: Vòng gọi vốn hạt giống, Vòng gọi vốn Series A,..."
+msgstr ""
+
+#. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.equity_mail_compose_message_form
+msgid "e.g. Welcome to MyCompany!"
+msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.equity_ubo_report
@@ -2105,6 +2235,11 @@ msgid "or"
 msgstr "hay"
 
 #. module: equity
+#: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form
+msgid "per security"
+msgstr ""
+
+#. module: equity
 #. odoo-javascript
 #: code:addons/equity/static/src/components/ubo_form/holder_edit_dialog.js:0
 msgid "please keep percentages between 0 and 100"
@@ -2115,18 +2250,6 @@ msgstr "Vui lòng giữ các tỷ lệ phần trăm trong khoảng từ 0 đến
 #: code:addons/equity/models/equity_transaction.py:0
 msgid "remaining"
 msgstr "còn lại"
-
-#. module: equity
-#. odoo-python
-#: code:addons/equity/models/equity_transaction.py:0
-msgid "seller"
-msgstr ""
-
-#. module: equity
-#. odoo-python
-#: code:addons/equity/models/equity_transaction.py:0
-msgid "subscriber"
-msgstr ""
 
 #. module: equity
 #: model_terms:ir.ui.view,arch_db:equity.view_equity_transaction_form

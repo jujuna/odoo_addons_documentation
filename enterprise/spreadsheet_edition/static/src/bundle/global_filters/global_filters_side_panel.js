@@ -1,8 +1,9 @@
-import { FilterValue } from "@spreadsheet/global_filters/components/filter_value/filter_value";
 import { _t } from "@web/core/l10n/translation";
-import { Component, useRef } from "@odoo/owl";
+import { Component, onWillStart, signal, t, useProps } from "@odoo/owl";
 import { hooks, components } from "@odoo/o-spreadsheet";
 import { GlobalFilterSuggestions } from "./global_filter_suggestions/global_filter_suggestions";
+import { useService } from "@web/core/utils/hooks";
+import { GlobalFilterItem } from "./global_filter_item/global_filter_item";
 
 const { Section } = components;
 
@@ -12,16 +13,21 @@ const { Section } = components;
  */
 export class GlobalFiltersSidePanel extends Component {
     static template = "spreadsheet_edition.GlobalFiltersSidePanel";
-    static components = { FilterValue, GlobalFilterSuggestions, Section };
-    static props = {
-        onCloseSidePanel: { type: Function, optional: true },
-    };
+    static components = { GlobalFilterItem, GlobalFilterSuggestions, Section };
+
+    props = useProps({
+        onCloseSidePanel: t.function().optional(),
+    });
 
     dnd = hooks.useDragAndDropListItems();
-    filtersListRef = useRef("filtersList");
+    filtersListRef = signal.ref();
 
     setup() {
         this.getters = this.env.model.getters;
+        this.orm = useService("orm");
+        onWillStart(async () => {
+            this.searchableParentRelations = await this.fetchSearchableParentRelation();
+        });
     }
 
     get isReadonly() {
@@ -133,27 +139,19 @@ export class GlobalFiltersSidePanel extends Component {
             draggedItemId: filter.id,
             initialMousePosition: event.clientY,
             items: filtersItems,
-            scrollableContainerEl: this.filtersListRef.el,
+            scrollableContainerEl: this.filtersListRef(),
             onDragEnd: (filterId, finalIndex) => this.onDragEnd(filterId, finalIndex),
         });
     }
 
     getFiltersElementsRects() {
-        return Array.from(this.filtersListRef.el.children[0].children).map((filterEl) =>
+        return Array.from(this.filtersListRef().children[0].children).map((filterEl) =>
             filterEl.getBoundingClientRect()
         );
     }
 
     getFilterItemStyle(filter) {
         return this.dnd.itemsStyle[filter.id] || "";
-    }
-
-    setGlobalFilterValue(id, value, displayNames) {
-        this.env.model.dispatch("SET_GLOBAL_FILTER_VALUE", {
-            id,
-            value,
-            displayNames,
-        });
     }
 
     onDragEnd(filterId, finalIndex) {
@@ -169,5 +167,14 @@ export class GlobalFiltersSidePanel extends Component {
 
     deleteFilter(filterId) {
         this.env.model.dispatch("REMOVE_GLOBAL_FILTER", { id: filterId });
+    }
+
+    fetchSearchableParentRelation() {
+        const models = this.filters
+            .filter((filter) => filter.type === "relation")
+            .map((filter) => filter.modelName);
+        return this.orm
+            .cache({ type: "disk" })
+            .call("ir.model", "has_searchable_parent_relation", [models]);
     }
 }

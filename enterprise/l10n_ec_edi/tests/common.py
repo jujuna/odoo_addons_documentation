@@ -2,21 +2,23 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from contextlib import contextmanager
-from datetime import datetime
-from lxml import etree
+from datetime import datetime, UTC
 from pprint import pformat
 from unittest import mock
+
+from freezegun import freeze_time
+from lxml import etree
 
 from odoo.addons.account_edi.tests.common import AccountEdiTestCommon
 from odoo.tests import tagged
 from odoo.tools.xml_utils import cleanup_xml_node
 from odoo import Command
-from pytz import timezone
-from freezegun import freeze_time
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestEcEdiCommon(AccountEdiTestCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @AccountEdiTestCommon.setup_country('ec')
@@ -24,7 +26,7 @@ class TestEcEdiCommon(AccountEdiTestCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.frozen_today = datetime(year=2022, month=1, day=25, hour=0, minute=0, second=0, tzinfo=timezone('utc'))
+        cls.frozen_today = datetime(year=2022, month=1, day=25, hour=0, minute=0, second=0, tzinfo=UTC)
 
         # Allow to see the full result of AssertionError.
         cls.maxDiff = None
@@ -60,13 +62,12 @@ class TestEcEdiCommon(AccountEdiTestCommon):
         cls.partner_a.write({
             **partner_vals,
             'vat': "0453661050152",
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_ec.ec_ruc').id,
         })
 
         cls.partner_b.write({
             **partner_vals,
-            'vat': "0453661050",
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_ec.ec_dni').id,
+            'vat': False,
+            'additional_identifiers': {'EC_DNI': "0453661050"},
         })
         cls.product_withhold = cls.env['product.product'].create({
             'name': 'Test Service Product',
@@ -330,6 +331,7 @@ L10N_EC_EDI_XML_OUT_INV = """
         <campoAdicional nombre="Referencia">Fact 001-001-000000001</campoAdicional>
         <campoAdicional nombre="Vendedor">Because I am accountman!</campoAdicional>
         <campoAdicional nombre="E-mail">accountman@test.com</campoAdicional>
+        <campoAdicional nombre="RUC Proveedor">1792366836001</campoAdicional>
     </infoAdicional>
 </factura>""".encode()
 
@@ -388,6 +390,7 @@ L10N_EC_EDI_XML_DEBIT_NOTE = """
         <campoAdicional nombre="Referencia">NotDb 001-001-000000001</campoAdicional>
         <campoAdicional nombre="Vendedor">Because I am accountman!</campoAdicional>
         <campoAdicional nombre="E-mail">accountman@test.com</campoAdicional>
+        <campoAdicional nombre="RUC Proveedor">1792366836001</campoAdicional>
     </infoAdicional>
 </notaDebito>""".encode()
 
@@ -452,6 +455,7 @@ L10N_EC_EDI_XML_CREDIT_NOTE = """
         <campoAdicional nombre="Referencia">NotCr 001-001-000000001</campoAdicional>
         <campoAdicional nombre="Vendedor">Because I am accountman!</campoAdicional>
         <campoAdicional nombre="E-mail">accountman@test.com</campoAdicional>
+        <campoAdicional nombre="RUC Proveedor">1792366836001</campoAdicional>
     </infoAdicional>
 </notaCredito>""".encode()
 
@@ -526,6 +530,7 @@ L10N_EC_EDI_XML_PURCHASE_LIQ = """
     </detalles>
     <infoAdicional>
         <campoAdicional nombre="Referencia">LiqCo 001-001-000000001</campoAdicional>
+        <campoAdicional nombre="RUC Proveedor">1792366836001</campoAdicional>
     </infoAdicional>
 </liquidacionCompra>""".encode()
 
@@ -577,8 +582,8 @@ L10N_EC_EDI_XML_IN_WTH = """
                     <codigo>1</codigo>
                     <codigoRetencion>312</codigoRetencion>
                     <baseImponible>400.00</baseImponible>
-                    <porcentajeRetener>1.75</porcentajeRetener>
-                    <valorRetenido>7.00</valorRetenido>
+                    <porcentajeRetener>2.00</porcentajeRetener>
+                    <valorRetenido>8.00</valorRetenido>
                 </retencion>
             </retenciones>
             <pagos>
@@ -591,6 +596,7 @@ L10N_EC_EDI_XML_IN_WTH = """
     </docsSustento>
     <infoAdicional>
         <campoAdicional nombre="Direccion">Av. Libertador Simón Bolívar 1155</campoAdicional>
+        <campoAdicional nombre="RUC Proveedor">1792366836001</campoAdicional>
     </infoAdicional>
 </comprobanteRetencion>""".encode()
 
@@ -689,6 +695,7 @@ L10N_EC_EDI_XML_PURCHASE_LIQ_WTH = """
     </docsSustento>
     <infoAdicional>
         <campoAdicional nombre="Direccion">Av. Libertador Simón Bolívar 1155</campoAdicional>
+        <campoAdicional nombre="RUC Proveedor">1792366836001</campoAdicional>
     </infoAdicional>
 </comprobanteRetencion>""".encode()
 
@@ -717,8 +724,8 @@ L10N_EC_EDI_XPATH_INVOICE_IN = """
                 <codigo>1</codigo>
                 <codigoRetencion>312</codigoRetencion>
                 <baseImponible>400.00</baseImponible>
-                <porcentajeRetener>1.75</porcentajeRetener>
-                <valorRetenido>7.00</valorRetenido>
+                <porcentajeRetener>2.00</porcentajeRetener>
+                <valorRetenido>8.00</valorRetenido>
                 </retencion>
             </retenciones>
             <pagos>
@@ -750,8 +757,8 @@ L10N_EC_EDI_XPATH_INVOICE_IN = """
                 <codigo>1</codigo>
                 <codigoRetencion>312</codigoRetencion>
                 <baseImponible>500.00</baseImponible>
-                <porcentajeRetener>1.75</porcentajeRetener>
-                <valorRetenido>8.75</valorRetenido>
+                <porcentajeRetener>2.00</porcentajeRetener>
+                <valorRetenido>10.00</valorRetenido>
                 </retencion>
             </retenciones>
             <pagos>
@@ -963,6 +970,7 @@ L10N_EC_EDI_REIMBURSEMENT_LIQUIDATION = """
     </reembolsos>
     <infoAdicional>
         <campoAdicional nombre="Referencia">LiqCo 001-001-000000001</campoAdicional>
+        <campoAdicional nombre="RUC Proveedor">1792366836001</campoAdicional>
     </infoAdicional>
 </liquidacionCompra>
 """

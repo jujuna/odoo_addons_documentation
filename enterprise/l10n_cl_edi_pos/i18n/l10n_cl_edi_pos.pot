@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:05+0000\n"
-"PO-Revision-Date: 2025-12-30 19:05+0000\n"
+"POT-Creation-Date: 2026-09-11 18:11+0000\n"
+"PO-Revision-Date: 2026-09-11 18:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,10 +16,26 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: l10n_cl_edi_pos
-#: model:ir.model.fields,help:l10n_cl_edi_pos.field_pos_config__journal_id
+#: model:ir.module.module,description:base.module_l10n_cl_edi_pos
 msgid ""
-"Accounting journal used to post POS session journal entries and POS invoice "
-"payments."
+"\n"
+"This module brings the technical requirement for the Chilean regulation.\n"
+"Install this if you are using the Point of Sale app in Chile.\n"
+"\n"
+msgstr ""
+
+#. module: l10n_cl_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_pos.pos_order_receipt_footer
+msgid ""
+"<br/>\n"
+"                    <span>Timbre Electrónico SII</span><br/>"
+msgstr ""
+
+#. module: l10n_cl_edi_pos
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_pos.pos_order_receipt_footer
+msgid ""
+"<br/>\n"
+"                    <span>Verifique documento en www.sii.cl</span><br/>"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
@@ -28,20 +44,14 @@ msgid "Card Payment"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt_header/receipt_header.xml:0
-msgid "Cliente:"
+#: model:ir.module.module,shortdesc:base.module_l10n_cl_edi_pos
+#: model:ir.module.module,summary:base.module_l10n_cl_edi_pos
+msgid "Chilean module for Point of Sale"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
 #: model:ir.model,name:l10n_cl_edi_pos.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt_header/receipt_header.xml:0
-msgid "Comuna:"
+msgid "Company"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
@@ -61,17 +71,11 @@ msgid "Deleting this partner is not allowed."
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt_header/receipt_header.xml:0
-msgid "Dirección:"
-msgstr ""
-
-#. module: l10n_cl_edi_pos
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_account_move__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_l10n_latam_document_type__display_name
-#: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_l10n_latam_identification_type__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_config__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_order__display_name
+#: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_order_receipt__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_payment_method__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_session__display_name
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_res_company__display_name
@@ -80,27 +84,21 @@ msgid "Display Name"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt_header/receipt_header.xml:0
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_pos.pos_order_receipt_header
 msgid "Giro:"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_account_move__id
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_l10n_latam_document_type__id
-#: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_l10n_latam_identification_type__id
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_config__id
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_order__id
+#: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_order_receipt__id
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_payment_method__id
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_session__id
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_res_partner__id
 msgid "ID"
-msgstr ""
-
-#. module: l10n_cl_edi_pos
-#: model:ir.model,name:l10n_cl_edi_pos.model_l10n_latam_identification_type
-msgid "Identification Types"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
@@ -114,13 +112,17 @@ msgid "Journal Entry"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
+#: model:ir.model.fields,help:l10n_cl_edi_pos.field_pos_config__journal_id
+msgid "Journal used for customer invoices and refunds credit notes. "
+msgstr ""
+
+#. module: l10n_cl_edi_pos
 #: model:ir.model,name:l10n_cl_edi_pos.model_l10n_latam_document_type
 msgid "Latam Document Type"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt_header/receipt_header.xml:0
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_pos.pos_order_receipt_header
 msgid "Nº:"
 msgstr ""
 
@@ -142,12 +144,17 @@ msgstr ""
 
 #. module: l10n_cl_edi_pos
 #: model:ir.model,name:l10n_cl_edi_pos.model_pos_order
-msgid "Point of Sale Orders"
+msgid "Point of Sale Order"
+msgstr ""
+
+#. module: l10n_cl_edi_pos
+#: model:ir.model,name:l10n_cl_edi_pos.model_pos_order_receipt
+msgid "Point of Sale Order Receipt Generator"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
 #: model:ir.model,name:l10n_cl_edi_pos.model_pos_payment_method
-msgid "Point of Sale Payment Methods"
+msgid "Point of Sale Payment Method"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
@@ -156,8 +163,7 @@ msgid "Point of Sale Session"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt_header/receipt_header.xml:0
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_pos.pos_order_receipt_header
 msgid "RUT:"
 msgstr ""
 
@@ -168,8 +174,7 @@ msgid "Refund not possible"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt.xml:0
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_pos.pos_order_receipt_footer
 msgid "Resolución Nº:"
 msgstr ""
 
@@ -180,15 +185,13 @@ msgid "SII Barcode Image"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt.xml:0
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_pos.pos_order_receipt_footer
 msgid "Suggested Tip:"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt_header/receipt_header.xml:0
-msgid "Teléfono:"
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_pos.view_partner_form_pos_ui_inherit_l10n_cl_edi_pos
+msgid "Taxpayer Type"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
@@ -198,26 +201,8 @@ msgid "The 'Consumidor Final Anónimo' must be present and active."
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt.xml:0
-msgid "Timbre Electrónico SII"
-msgstr ""
-
-#. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt.xml:0
-msgid "Verifique documento en www.sii.cl"
-msgstr ""
-
-#. module: l10n_cl_edi_pos
 #: model:ir.model.fields,field_description:l10n_cl_edi_pos.field_pos_order__voucher_number
 msgid "Voucher Number"
-msgstr ""
-
-#. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt.xml:0
-msgid "Voucher Number:"
 msgstr ""
 
 #. module: l10n_cl_edi_pos
@@ -233,7 +218,6 @@ msgid "You have to set a country in your company setting."
 msgstr ""
 
 #. module: l10n_cl_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_cl_edi_pos/static/src/app/components/receipt/receipt.xml:0
+#: model_terms:ir.ui.view,arch_db:l10n_cl_edi_pos.pos_order_receipt_footer
 msgid "de Fecha:"
 msgstr ""

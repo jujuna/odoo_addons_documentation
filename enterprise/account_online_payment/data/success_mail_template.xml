@@ -7,46 +7,19 @@
             <field name="subject">Payments successfully activated</field>
             <field name="email_to">{{object.renewal_contact_email}}</field>
             <field name="auto_delete" eval="True"/>
+            <field name="email_layout_xmlid">mail.mail_notification_light</field>
             <field name="body_html" type="html">
-                <table border="0" width="100%" cellpadding="0" bgcolor="#ededed" style="padding: 20px; background-color: #ededed" summary="o_mail_notification">
-                    <tbody>
-                        <tr>
-                            <td align="center" style="min-width: 590px;">
-                                <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px;">
-                                <tr>
-                                    <td valign="middle">
-                                        <span style="font-size:20px; color:white; font-weight: bold;">
-                                            You have just unlocked seamless payments in Odoo
-                                        </span>
-                                    </td>
-                                    <td valign="middle" align="right">
-                                        <img src="https://www.odoo.com/openerp_enterprise/static/img/mail/odoo_logo_white.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="Odoo S.A."/>
-                                    </td>
-                                </tr>
-                                </table>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td align="center" style="min-width: 590px;">
-                                <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px;">
-                                <tbody>
-                                    <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
-                                        <p>Hi there,</p>
-                                        <p>We're pleased to inform you that the payments feature in Odoo has been successfully activated. You can now process payments directly through your Odoo database, ensuring faster, more secure, and more efficient transactions.</p>
-                                    </td>
-                                </tbody>
-                                </table>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td align="center">
-                                Powered by <a href="https://www.odoo.com">Odoo</a>.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div style="font-size: 14px;">
+                    <p>Hi there,</p>
+                    <p>We're pleased to inform you that the payments feature in Odoo has been successfully activated. </p>
+                    <p>You can now process payments directly through your Odoo database, ensuring faster, more secure, and more efficient transactions.</p>
+                    <div style="margin:16px auto; text-align:center">
+                        <a t-att-href="object.get_base_url()"
+                           t-attf-style="padding: 8px 16px 8px 16px; border-radius: 3px; background-color: {{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; text-decoration:none; color: {{object.company_id.email_primary_color or '#FFFFFF'}};">
+                            Make Payments
+                        </a>
+                    </div>
+                </div>
             </field>
         </record>
     </data>

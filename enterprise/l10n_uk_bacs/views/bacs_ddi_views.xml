@@ -18,20 +18,18 @@
                     <sheet>
                         <field name="company_id" invisible="1"/>
                         <div class="oe_button_box" name="button_box">
-                            <button type="object" name="action_view_payments_to_collect" icon="fa-usd" class="oe_stat_button">
+                            <button type="object" name="action_view_payments_to_collect" icon="attach_money" class="oe_stat_button">
                                 <field name="payments_len" widget="statinfo" string="Collections" help="Payments generated for this DDI that have not yet been collected."/>
                             </button>
 
-                            <button type="object" name="action_view_paid_invoices" icon="fa-pencil-square-o" class="oe_stat_button">
+                            <button type="object" name="action_view_paid_invoices" icon="edit_square" class="oe_stat_button">
                                 <field name="paid_invoices_len" widget="statinfo" string="Invoices Paid" help="Invoices paid with this DDI."/>
                             </button>
                         </div>
                         <group>
                             <group>
                                 <field name="partner_id" readonly="state != 'draft'"/>
-                                <field name="suitable_journal_ids" invisible="1"/>
                                 <field name="partner_bank_id" domain="[('partner_id', '=', partner_id)]" context="{'default_partner_id':partner_id, 'bacs_ddi': True}" readonly="state != 'draft'"/>
-                                <field name="payment_journal_id" domain="[('id', 'in', suitable_journal_ids)]" readonly="state != 'draft'"/>
                             </group>
                             <group>
                                 <field name="name" readonly="state != 'draft'"/>
@@ -43,17 +41,6 @@
                     <div class="o_attachment_preview"/>
                     <chatter/>
                 </form>
-            </field>
-        </record>
-
-        <record id="view_partner_bank_form_inherit_account_bacs" model="ir.ui.view">
-            <field name="name">res.partner.bank.view.form.inherit.account.bacs.direct.debit</field>
-            <field name="model">res.partner.bank</field>
-            <field name="inherit_id" ref="base.view_partner_bank_form"/>
-            <field name="arch" type="xml">
-                <field name="partner_id" position="attributes">
-                    <attribute name="invisible">context.get('bacs_ddi')</attribute>
-                </field>
             </field>
         </record>
 

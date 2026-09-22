@@ -17,23 +17,51 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2026-01-23 17:55+0000\n"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 02:01+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "documents_account/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents_account
+#: model:ir.module.module,description:base.module_documents_account
+msgid ""
+"\n"
+"Bridge module between the accounting and documents apps. It enables\n"
+"the creation invoices from the Documents module, and adds a\n"
+"button on Accounting's reports allowing to save the report into the\n"
+"Documents app in the desired format(s).\n"
+msgstr ""
 
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/ir_actions_server.py:0
 msgid "\"New Journal Entry\" can only be applied to Document."
 msgstr "\"Uusi päiväkirjamerkintä\" voidaan liittää vain asiakirjaan."
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "%(model_name)s"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "%(model_name)s (%(journal_name)s)"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "%(operation)s tag %(tag)s"
+msgstr ""
 
 #. module: documents_account
 #. odoo-javascript
@@ -60,6 +88,11 @@ msgid "A setting already exists for this journal"
 msgstr "Tätä päiväkirjaa varten on jo olemassa asetus"
 
 #. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_documents_document__account_setting_ids
+msgid "Account Setting"
+msgstr ""
+
+#. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.res_config_settings_view_form
 msgid "Accounting"
 msgstr "Kirjanpito"
@@ -80,6 +113,12 @@ msgstr "Kirjanpitoraportti"
 #: code:addons/documents_account/static/src/js/tour.js:0
 msgid "Action"
 msgstr "Toiminto"
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_add_tag_ids
+#: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_add_tag_ids
+msgid "Add Tags"
+msgstr ""
 
 #. module: documents_account
 #. odoo-javascript
@@ -108,9 +147,21 @@ msgid "Attachment"
 msgstr "Liite"
 
 #. module: documents_account
+#: model:ir.model,name:documents_account.model_account_bank_statement
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_bank_statement
 msgid "Bank Statement"
 msgstr "Pankin tiliote"
+
+#. module: documents_account
+#: model:ir.model,name:documents_account.model_account_document_import_mixin
+msgid "Business document import mixin"
+msgstr "Yritysasiakirjan tuonnin mixin"
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Cannot add and remove tags at the same time: %s"
+msgstr "Tunnisteita ei voi lisätä ja poistaa samanaikaisesti: %s"
 
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.res_config_settings_view_form
@@ -168,10 +219,6 @@ msgstr "Sulje (Esc)"
 
 #. module: documents_account
 #: model:ir.model,name:documents_account.model_res_company
-msgid "Companies"
-msgstr "Yritykset"
-
-#. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__company_id
 msgid "Company"
 msgstr "Yritys"
@@ -193,66 +240,22 @@ msgid "Create"
 msgstr "Luo"
 
 #. module: documents_account
-#. odoo-python
-#: code:addons/documents_account/models/ir_actions_server.py:0
-msgid "Create %(model_name)s"
-msgstr "Luo %(model_name)s"
-
-#. module: documents_account
-#. odoo-python
-#: code:addons/documents_account/models/ir_actions_server.py:0
-msgid "Create %(model_name)s (%(journal_name)s)"
-msgstr "Luo %(model_name)s (%(journal_name)s)"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note_code
-msgid "Create Credit Note"
-msgstr "Luo hyvityslasku"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note
-msgid "Create Customer Credit Note"
-msgstr "Luo asiakkaan hyvityslasku"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice_code
-msgid "Create Customer Invoice"
-msgstr "Luo asiakaslasku"
-
-#. module: documents_account
 #. odoo-javascript
 #: code:addons/documents_account/static/src/js/tour.js:0
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry_code
 msgid "Create Misc Entry"
 msgstr "Luo Satunnainen merkintä"
 
 #. module: documents_account
 #. odoo-javascript
 #: code:addons/documents_account/static/src/js/tour.js:0
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill_code
 msgid "Create Vendor Bill"
 msgstr "Luo toimittajan lasku"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund_code
-msgid "Create Vendor Credit Note"
-msgstr "Luo toimittajan hyvityslasku"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_receipt
-msgid "Create Vendor Receipt"
-msgstr "Luo myyjän kuitti"
 
 #. module: documents_account
 #. odoo-javascript
 #: code:addons/documents_account/static/src/js/tour.js:0
 msgid "Create a new document for the remaining page, it will be handled later."
-msgstr ""
-"Luo uusi asiakirja jäljellä olevalle sivulle, se käsitellään myöhemmin."
+msgstr "Luo uusi asiakirja jäljellä olevalle sivulle, se käsitellään myöhemmin."
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__create_uid
@@ -270,11 +273,31 @@ msgid "Credit Note"
 msgstr "Hyvityslasku"
 
 #. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note
+msgid "Customer Credit Note"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Customer Credit Notes"
+msgstr "Asiakkaan hyvityslaskut"
+
+#. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_out_invoice
 msgid "Customer Invoice"
 msgstr "Myyntilasku"
 
 #. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Customer Invoices"
+msgstr "Asiakaslaskut"
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_account_bank_statement__display_name
+#: model:ir.model.fields,field_description:documents_account.field_account_document_import_mixin__display_name
 #: model:ir.model.fields,field_description:documents_account.field_account_journal__display_name
 #: model:ir.model.fields,field_description:documents_account.field_account_move__display_name
 #: model:ir.model.fields,field_description:documents_account.field_account_report__display_name
@@ -293,6 +316,11 @@ msgstr "Näyttönimi"
 #: model:ir.model,name:documents_account.model_documents_document
 msgid "Document"
 msgstr "Dokumentti"
+
+#. module: documents_account
+#: model:ir.module.module,shortdesc:base.module_documents_account
+msgid "Documents - Accounting"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_account_create_model
@@ -333,6 +361,12 @@ msgstr "Kirjanpidon raporttien vientimuoto"
 #: model:ir.model,name:documents_account.model_account_reports_export_wizard
 msgid "Export wizard for accounting's reports"
 msgstr "Ohjattu kirjanpidon raporttien vienti"
+
+#. module: documents_account
+#. odoo-javascript
+#: code:addons/documents_account/static/src/components/mail_attachments/mail_attachments_selector_patch.js:0
+msgid "Failed to paste links: "
+msgstr "Linkkien liittäminen epäonnistui: "
 
 #. module: documents_account
 #. odoo-javascript
@@ -378,6 +412,8 @@ msgid "Has Embedded PDF"
 msgstr "Sisältää upotetun PDF-tiedoston"
 
 #. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_account_bank_statement__id
+#: model:ir.model.fields,field_description:documents_account.field_account_document_import_mixin__id
 #: model:ir.model.fields,field_description:documents_account.field_account_journal__id
 #: model:ir.model.fields,field_description:documents_account.field_account_move__id
 #: model:ir.model.fields,field_description:documents_account.field_account_report__id
@@ -394,20 +430,33 @@ msgstr "ID"
 
 #. module: documents_account
 #: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement
-#: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement_code
-msgid "Import Bank Statement"
-msgstr "Tuo tiliote"
+msgid "Import Statement"
+msgstr ""
+
+#. module: documents_account
+#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
+msgid "In Journal"
+msgstr ""
 
 #. module: documents_account
 #. odoo-python
-#: code:addons/documents_account/models/documents_document.py:0
-msgid "Invoices"
-msgstr "Laskut"
+#: code:addons/documents_account/models/account_move.py:0
+msgid "Invalid attachment ids: IDs must be integers."
+msgstr ""
+
+#. module: documents_account
+#: model:documents.document,name:documents_account.documents_vendor_bill_inv_007
+msgid "Invoice-INV_2018_0007.pdf"
+msgstr ""
+
+#. module: documents_account
+#: model:ir.module.module,summary:base.module_documents_account
+msgid "Invoices from Documents"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model,name:documents_account.model_account_journal
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__journal_id
-#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
 msgid "Journal"
 msgstr "Päiväkirja"
 
@@ -430,6 +479,11 @@ msgstr "Päiväkirjat"
 #: model:ir.actions.act_window,name:documents_account.action_folder_settings_installer
 msgid "Journals to synchronize"
 msgstr "Synkronoitavat päiväkirjat"
+
+#. module: documents_account
+#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
+msgid "Keep in existing folder"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__write_uid
@@ -475,36 +529,54 @@ msgstr ""
 "i>"
 
 #. module: documents_account
+#. odoo-javascript
+#: code:addons/documents_account/static/src/components/mail_attachments/mail_attachments_selector_patch.js:0
+msgid "Links pasted"
+msgstr "Liitetyt linkit"
+
+#. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry
+msgid "Misc Entry"
+msgstr ""
+
+#. module: documents_account
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_entry
 msgid "Miscellaneous Operations"
-msgstr "Muut toiminnot"
+msgstr "Sekalaiset toiminnot"
 
 #. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note_move
-msgid "Move Document To Taxes"
-msgstr "Siirrä asiakirja veroihin"
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Move to %s"
+msgstr ""
 
 #. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice_move
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill_move
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund_move
-msgid "Move Document to Taxes"
-msgstr "Siirrä asiakirja veroihin"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry_move
-msgid "Move Documents to Annual Closing"
-msgstr "Siirrä asiakirjat tilinpäätökseen"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement_move
-msgid "Move to Annual Closing"
-msgstr "Siirry tilinpäätökseen"
+#: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_folder_id
+#: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_folder_id
+msgid "Move to Folder"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__state__documents_account_record_create
 msgid "New Journal Entry"
 msgstr "Uusi päiväkirjamerkintä"
+
+#. module: documents_account
+#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
+msgid "None"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Only one folder move is allowed per action."
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Only tag/folder updates are allowed as child actions."
+msgstr ""
 
 #. module: documents_account
 #. odoo-javascript
@@ -516,6 +588,12 @@ msgstr "Avaa toimenpidevalikko"
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_in_receipt
 msgid "Purchase Receipt"
 msgstr "Ostokuitti"
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_remove_tag_ids
+#: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_remove_tag_ids
+msgid "Remove Tags"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_account_bank_statement_line__suspense_statement_line_id
@@ -587,30 +665,50 @@ msgid ""
 "actions\n"
 msgstr ""
 "Palvelintoiminnon tyyppi. Saatavilla seuraavat arvot:\n"
-"- 'Päivitä kirjaus': päivitä kirjauksen arvot\n"
-"- 'Luo toiminta': luo toiminnan (Viestintä)\n"
+"- 'Päivitä kirjaus': päivittää kirjauksen arvot\n"
+"- 'Luo toimenpide': luo toimenpiteen (Viestintä)\n"
 "- 'Lähetä sähköposti': lähettää viestin, huomautuksen tai sähköpostin "
 "(Viestintä)\n"
-"- 'Lähetä tekstiviesti': lähetä tekstiviestejä, kirjaa ne asiakirjoihin "
+"- 'Lähetä tekstiviesti': lähettää tekstiviestejä, kirjaa ne asiakirjoihin "
 "(Tekstiviesti)\n"
-"- 'Lisää/poista seuraajia': lisää tai poista seuraajia kirjaukseen "
-"(Viestintä)\n"
-"- 'Luo kirjaus': luo uusi kirjaus uusilla arvoilla\n"
-"- 'Suorita koodi': Python-koodin pätkä, joka suoritetaan\n"
-"- 'Lähetä Webhook-ilmoitus': lähetä POST-pyyntö ulkoiseen järjestelmään, "
-"joka tunnetaan myös nimellä Webhook\n"
-"- 'Suorita useita toimintoja': Määritä toiminto, joka käynnistää useita "
-"muita palvelintoimintoja\n"
+"- 'Lisää/poista seuraajia': lisää tai poistaa tietueen seuraajia (Viestintä)"
+"\n"
+"- 'Luo kirjaus': luo uuden kirjauksen uusilla arvoilla\n"
+"- 'Suorita koodi': pätkä Python-koodia, joka suoritetaan\n"
+"- 'Lähetä Webhook-ilmoitus': lähettää JULKAISU-pyynnön ulkoiseen "
+"järjestelmään, joka tunnetaan myös nimellä Webhook\n"
+"- 'Useita toimintoja': määrittää toiminnon, joka laukaisee useita muita "
+"palvelintoimintoja\n"
 
 #. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_in_invoice
 msgid "Vendor Bill"
 msgstr "Ostolasku"
 
 #. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Vendor Bills"
+msgstr "Toimittajan laskut"
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Vendor Receipts"
+msgstr "Toimittajan kuitit"
+
+#. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_in_refund
-msgid "Vendor Credit Note"
-msgstr "Toimittajahyvitys"
+msgid "Vendor Refund"
+msgstr ""
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Vendor Refunds"
+msgstr "Toimittajan maksupalautukset"
 
 #. module: documents_account
 #. odoo-javascript
@@ -618,8 +716,8 @@ msgstr "Toimittajahyvitys"
 msgid ""
 "Want to become a <b>paperless company</b>? Let's discover Odoo Documents."
 msgstr ""
-"Haluatko tulla <b>paperittomaksi yritykseksi</b>? Tutustutaan Odoo Asiakirja "
-"-sovellukseen."
+"Haluatko tulla <b>paperittomaksi yritykseksi</b>? Tutustutaan Odoo "
+"Asiakirja -sovellukseen."
 
 #. module: documents_account
 #: model_terms:web_tour.tour,rainbow_man_message:documents_account.documents_account_tour
@@ -627,14 +725,14 @@ msgid ""
 "Wow... 6 documents processed in a few seconds, You're good.<br>The tour is "
 "complete. Try uploading your own documents now."
 msgstr ""
-"Vaikuttavaa. Kuusi asiakirjaa käsitelty muutamassa sekunnissa."
-"<br>Esittelykierros on nyt päättynyt. Kokeile omien asiakirjojen lataamista."
+"Vaikuttavaa. Kuusi asiakirjaa käsitelty muutamassa sekunnissa.<br>"
+"Esittelykierros on nyt päättynyt. Kokeile omien asiakirjojen lataamista."
 
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/documents_document.py:0
-msgid "You can not create account move on folder."
-msgstr "Et voi luoda tilikirjausta kansioon."
+msgid "You can not create a journal entry from a folder."
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_res_config_settings__account_folder_id
@@ -642,69 +740,11 @@ msgid "account default folder"
 msgstr "tilin oletuskansio"
 
 #. module: documents_account
+#: model:documents.document,name:documents_account.documents_vendor_bill_extract_ready_mat_document
+msgid "ready_mat.xml"
+msgstr ""
+
+#. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.view_account_move_form_inherit_documents_account
 msgid "to mark this invoice as paid."
 msgstr "merkitä tämän laskun maksetuksi."
-
-#~ msgid ""
-#~ "A set of condition and actions which will be available to all attachments "
-#~ "matching the conditions"
-#~ msgstr ""
-#~ "Joukko ehtoja ja toimia, jotka ovat kaikkien ehtoja vastaavien "
-#~ "liitetiedostojen käytettävissä"
-
-#~ msgid "Accounting "
-#~ msgstr "Kirjanpito "
-
-#~ msgid "Accounting Workspace"
-#~ msgstr "Kirjanpidon työtila"
-
-#~ msgid "Credit note"
-#~ msgstr "Hyvityslasku"
-
-#~ msgid "Customer invoice"
-#~ msgstr "Asiakaslasku"
-
-#~ msgid "Documents Account Settings"
-#~ msgstr "Asiakirjojen tiliasetukset"
-
-#~ msgid "Financial Statement"
-#~ msgstr "Tilinpäätös"
-
-#~ msgid ""
-#~ "Let's process documents in your Inbox.<br/><i>Tip: Use Tags to filter "
-#~ "documents and structure your process.</i>"
-#~ msgstr ""
-#~ "Käsitellään saapuneet asiakirjat.<br/><i>Vinkki: Käytä tunnisteita "
-#~ "asiakirjojen suodattamiseen ja prosessin jäsentämiseen.</i>"
-
-#~ msgid "Let's process this document, coming from our scanner."
-#~ msgstr "Käsittelemme tätä skannerista tulevaa asiakirjaa."
-
-#~ msgid ""
-#~ "Let's tag this mail as legal<br/> <i>Tips: actions can be tailored to "
-#~ "your process, according to the workspace.</i>"
-#~ msgstr ""
-#~ "Merkitään tämä posti lakiasioiden postiksi<br/> <i>Vinkkejä: Toiminnot "
-#~ "voidaan räätälöidä prosessisi mukaan työtilan mukaan.</i>"
-
-#~ msgid ""
-#~ "Send this letter to the legal department, by assigning the right tags."
-#~ msgstr ""
-#~ "Lähetä tämä kirje oikeudelliselle osastolle antamalla oikeat tunnisteet."
-
-#~ msgid "Tax Statement"
-#~ msgstr "Veroilmoitus"
-
-#~ msgid "Vendor bill"
-#~ msgstr "Ostolasku"
-
-#~ msgid "Workspace"
-#~ msgstr "Työtila"
-
-#~ msgid ""
-#~ "Wow... 6 documents processed in a few seconds, You're good.<br/>The tour "
-#~ "is complete. Try uploading your own documents now."
-#~ msgstr ""
-#~ "Vau... 6 asiakirjaa käsitelty muutamassa sekunnissa, olet hyvä.<br/"
-#~ ">Kierros on valmis. Kokeile nyt omien asiakirjojesi lataamista."

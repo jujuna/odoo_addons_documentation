@@ -101,7 +101,10 @@ class FleetVehicle(models.Model):
     l10n_mx_environment_insurance_policy = fields.Char(
         string="Environment Insurance Policy",
         help="Environment Insurance Policy Number - used when transporting hazardous materials")
-    l10n_mx_is_freight_vehicle = fields.Boolean()
+    l10n_mx_is_freight_vehicle = fields.Boolean(
+        string="Is Freight Vehicle",
+        help="If activated, this vehicle can be used as a vehicle for transporting goods and items on Carta Porte complemento"
+    )
 
     @api.constrains('l10n_mx_trailer_ids')
     def _check_trailers(self):

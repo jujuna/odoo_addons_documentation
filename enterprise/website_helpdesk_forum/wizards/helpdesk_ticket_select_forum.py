@@ -75,13 +75,6 @@ class HelpdeskTicketSelectForumWizard(models.TransientModel):
             'forum_post_ids': [(4, forum_post.id, 0)]
         })
 
-        for post in forum_post:
-            post.message_post_with_source(
-                'helpdesk.ticket_creation',
-                render_values={'self': post, 'ticket': self.ticket_id},
-                subtype_xmlid='mail.mt_note',
-            )
-
         return forum_post
 
     def action_create_post(self):

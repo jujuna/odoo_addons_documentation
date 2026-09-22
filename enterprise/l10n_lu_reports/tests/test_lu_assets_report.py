@@ -9,6 +9,8 @@ from odoo.tests import Form, tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class LuxembourgAssetsReportTaxesTest(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('lu')
     def setUpClass(cls):
@@ -33,17 +35,27 @@ class LuxembourgAssetsReportTaxesTest(TestAccountReportsCommon):
         line_taxes = [{'taxes': []}, {'taxes': [cls.tax_3]}, {'taxes': [cls.tax_3, cls.tax_17]}]
         cls.inv1 = cls._post_invoice(line_taxes)
 
+        cls.company_data['default_account_assets'].depreciation_model_id = cls.env['account.depreciation.model'].create({
+            'method': 'linear',
+            'method_number': 5,
+            'method_period': '12',
+            'company_id': cls.env.company.id,
+        })
+        cls.company_data['default_account_assets'].asset_depreciation_account_id = cls.company_data['default_account_assets']
+        cls.company_data['default_account_assets'].asset_expense_account_id = cls.company_data['default_account_expense']
+
     def test_asset_no_invoice(self):
         # Test case with no original_move_line_ids on the asset;
         # then no tax is set, and no tax should be reported for the asset
+
         self.env['account.asset'].create({
             'name': 'test',
             'acquisition_date': datetime.today() - relativedelta(days=400),
-            'account_depreciation_id': self.company_data['default_account_assets'].id,
-            'account_depreciation_expense_id': self.company_data['default_account_expense'].id,
+            'account_asset_id': self.company_data['default_account_assets'].id,
             'journal_id': self.company_data['default_journal_purchase'].id,
             'original_value': 100.00,
         }).validate()
+
         report = self.env.ref('account_asset.assets_report')
         report, options = self._get_report_and_options(report, datetime.today() - relativedelta(days=365), datetime.today())
         data = report.l10n_lu_asset_report_get_xml_2_0_report_values(options)['forms'][0]['tables'][0]
@@ -68,41 +80,6 @@ class LuxembourgAssetsReportTaxesTest(TestAccountReportsCommon):
         self.assertEqual(2000.0 + 60.0 + 170.0, data[0].get('504', {}).get('value'))
         self.assertEqual(60.0 + 170.0, data[0].get('505', {}).get('value'))
 
-    def test_asset_multiple_assets_per_line(self):
-        # Test tax computation on assets created with an account with multiple_assets_per_line set
-        account = self.env['account.account'].create({
-            'name': 'multiple_assets_per_line_test_account',
-            'code': '000001',
-            'account_type': 'asset_non_current',
-            'multiple_assets_per_line': True,
-            'create_asset': "validate",
-        })
-        move_form = Form(self.env['account.move'].with_context(default_move_type='in_invoice'))
-        move_form.invoice_date = datetime.today() - relativedelta(days=500)
-        move_form.partner_id = self.partner_be
-        with move_form.invoice_line_ids.new() as line_form:
-            line_form.product_id = self.product
-            line_form.account_id = account
-            line_form.price_unit = 100.00
-            line_form.quantity = 10.0
-            line_form.tax_ids.clear()
-            line_form.tax_ids.add(self.tax_17)
-        move = move_form.save()
-        move.action_post()
-        report = self.env.ref('account_asset.assets_report')
-        # Assets must be in a state different from draft in order to be reported
-        for asset in move.asset_ids:
-            asset.account_depreciation_id = self.company_data['default_account_assets']
-            asset.account_depreciation_expense_id = self.company_data['default_account_expense']
-            asset.validate()
-        report, options = self._get_report_and_options(report, datetime.today() - relativedelta(days=365), datetime.today())
-        data = report.l10n_lu_asset_report_get_xml_2_0_report_values(options)['forms'][0]['tables'][0]
-
-        self.assertEqual(len(data), 10)
-        for line in data:
-            self.assertEqual((1000.0 + 170.0) / 10, line.get('504', {}).get('value'))
-            self.assertEqual(170.0 / 10, line.get('505', {}).get('value'))
-
     @classmethod
     def _get_report_and_options(cls, report, date_from, date_to):
         report = report.with_context(date_from=date_from, date_to=date_to, lang='en_US')
@@ -111,15 +88,9 @@ class LuxembourgAssetsReportTaxesTest(TestAccountReportsCommon):
 
     @classmethod
     def _get_report_data_linked_assets(cls, invoice_lines):
-        asset_form = Form(cls.env['account.asset'])
-        # `original_move_line_ids` is not visible when it's empty by default
-        # {'invisible' : [('original_move_line_ids', '=', [])]}
-        asset_form._view['modifiers']['original_move_line_ids']['invisible'] = 'False'
-        for line in invoice_lines:
-            asset_form.original_move_line_ids.add(line)
-        asset_form.account_depreciation_id = cls.company_data['default_account_assets']
-        asset_form.account_depreciation_expense_id = cls.company_data['default_account_expense']
-        asset_form.journal_id = cls.company_data['default_journal_purchase']
+        asset_form = Form(cls.env['account.asset'].with_context(
+            default_original_move_line_ids=[line.id for line in invoice_lines],
+        ))
         asset_form = asset_form.save()
         asset_form.validate()
         report = cls.env.ref('account_asset.assets_report')
@@ -138,6 +109,7 @@ class LuxembourgAssetsReportTaxesTest(TestAccountReportsCommon):
                 line_form.price_unit = 100.00
                 line_form.quantity = 10.0
                 line_form.sequence = i
+                line_form.account_id = cls.company_data['default_account_assets']
                 line_form.tax_ids.clear()
                 for tax in move_line['taxes']:
                     line_form.tax_ids.add(tax)

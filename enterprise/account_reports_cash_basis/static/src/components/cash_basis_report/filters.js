@@ -17,7 +17,7 @@ patch(AccountReportFilters.prototype, {
     get selectedExtraOptions() {
         let selectedExtraOptionsName = super.selectedExtraOptions;
         if (this.controller.filters.show_cash_basis) {
-            const cashBasisFilterName = this.controller.cachedFilterOptions.report_cash_basis
+            const cashBasisFilterName = this.controller.cachedFilterOptions().report_cash_basis
                 ? _t("Cash Basis")
                 : _t("Accrual Basis");
 

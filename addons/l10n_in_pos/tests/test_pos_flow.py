@@ -7,6 +7,7 @@ class TestPosFlow(TestInPosBase):
     """
     Test class for GSTR-related POS functionality.
     """
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_invoice_order_after_session_closed(self):
         """Test that an order can be invoiced after its session is closed.
@@ -50,7 +51,6 @@ class TestPosFlow(TestInPosBase):
         # with self.with_pos_session() as session2:
         pos_order_going_to_invoice.partner_id = self.partner_a
         pos_order_going_to_invoice.action_pos_order_invoice()
-        # session2.action_pos_session_closing_control()
 
         # Confirm that reversal move(s) are now set
         reversal_moves = self.env['account.move'].search([('reversed_pos_order_id', '=', pos_order_going_to_invoice.id)])
@@ -62,9 +62,10 @@ class TestPosFlow(TestInPosBase):
             {'product_id': False, 'l10n_in_hsn_code': False, 'product_uom_id': False, 'debit': 15.0, 'credit': 0.0},
             {'product_id': False, 'l10n_in_hsn_code': False, 'product_uom_id': False, 'debit': 15.0, 'credit': 0.0},
             {'product_id': False, 'l10n_in_hsn_code': False, 'product_uom_id': False, 'debit': 0.0, 'credit': 630.0},
-
         ], {
             'amount_untaxed': 0.0,
             'amount_tax': 0.0,
             'amount_total': 630.0,
         })
+        self.assertEqual(pos_order_going_to_invoice.amount_total, 630.0,
+                        "The total amount of the order should match the reversal move total.")

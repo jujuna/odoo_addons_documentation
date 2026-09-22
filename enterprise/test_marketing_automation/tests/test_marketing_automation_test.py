@@ -15,10 +15,10 @@ class TestMarketingCampaign(TestMACommon):
         super().setUpClass()
         cls.date_reference = datetime(2025, 6, 23, 14, 0, 0)
 
-        with cls.mock_datetime_and_now(cls, cls.date_reference):
+        with cls.mock_datetime_and_now(cls.date_reference):
             # create a marketing campaign with a parent activity with one child activity
             cls.test_campaign = cls.env['marketing.campaign'].with_user(cls.user_marketing_automation).create({
-                'domain': [('name', 'like', 'MATest')],
+                'enroll_domain': [('name', 'like', 'MATest')],
                 'model_id': cls.env['ir.model']._get_id('marketing.test.sms'),
                 'name': 'New Test Campaign',
             })
@@ -81,7 +81,13 @@ class TestMarketingCampaign(TestMACommon):
         self.assertLinkShortenedHtml(
             self._new_mails[0].body,
             ('url0', 'https://www.example.com/test/bar?baz=qux', True),
-            {'baz': 'qux', 'utm_campaign': campaign.name, 'utm_medium': 'Email', 'utm_source': activity1.name},
+            {
+                'baz': 'qux',
+                'utm_campaign': campaign.name,
+                'utm_medium': 'Email',
+                'utm_source': 'Mass Mailing',
+                'utm_reference': f'marketing.activity,{activity1.id}',
+            },
         )
         # don't launch first child activity, but check that it exists
         self.assertEqual(len(participant1.trace_ids), 2, 'Should have prepared planned child activity')
@@ -112,7 +118,13 @@ class TestMarketingCampaign(TestMACommon):
         self.assertLinkShortenedHtml(
             self._new_mails[0].body,
             ('url0', 'https://www.example.com/test/bar?baz=qux', True),
-            {'baz': 'qux', 'utm_campaign': campaign.name, 'utm_medium': 'Email', 'utm_source': activity1.name},
+            {
+                'baz': 'qux',
+                'utm_campaign': campaign.name,
+                'utm_medium': 'Email',
+                'utm_source': 'Mass Mailing',
+                'utm_reference': f'marketing.activity,{activity1.id}',
+            },
         )
         # don't launch first child activity, but check that it exists
         self.assertEqual(len(participant2.trace_ids), 2, 'Should have prepared planned child activity')

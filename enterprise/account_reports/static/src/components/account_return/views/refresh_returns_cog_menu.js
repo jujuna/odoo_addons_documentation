@@ -1,6 +1,8 @@
 import { Component } from "@odoo/owl";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
+import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
+import { useEnv } from "@web/owl2/utils";
 
 const cogMenuRegistry = registry.category("cogMenu");
 
@@ -8,10 +10,16 @@ const cogMenuRegistry = registry.category("cogMenu");
 export class RefreshAccountReturns extends Component {
     static template = "account_reports.RefreshAccountReturns";
     static components = { DropdownItem };
-    static props = {};
+
+    env = useEnv();
 
     async refresh_all_account_returns() {
-        await this.env.services.orm.call("account.return", "action_refresh_all_returns");
+        await rpc("/web/dataset/call_kw/account.return/action_refresh_all_returns", {
+            model: "account.return",
+            method: "action_refresh_all_returns",
+            args: [],
+            kwargs: {},
+        });
         await this.env.model.load();
     }
 }

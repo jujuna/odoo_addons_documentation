@@ -4,25 +4,42 @@ import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { accountTaxHelpers } from "@account/helpers/account_tax";
 import { _t } from "@web/core/l10n/translation";
 import { debounce } from "@web/core/utils/timing";
+import { PosOrderAccounting } from "@point_of_sale/app/models/accounting/pos_order_accounting";
 
 patch(PosStore.prototype, {
     async setup() {
         await super.setup(...arguments);
         this.debouncedDiscount = debounce(this.applyDiscount.bind(this));
-        this.models["pos.order.line"].addEventListener("update", (data) => {
-            const line = this.models["pos.order.line"].get(data.id);
-            const order = line.order_id;
+        const updateOrderDiscount = (order) => {
             if (!order || order.state !== "draft") {
                 return;
             }
 
-            const isDiscountLine = line.isDiscountLine;
-            if (!order.globalDiscountPc || isDiscountLine) {
+            if (!order.globalDiscountPc.value) {
                 return;
             }
 
-            const percentage = order.globalDiscountPc;
-            this.debouncedDiscount(percentage, order); // Wait an animation frame before applying the discount
+            const { value, type } = order.globalDiscountPc;
+            this.debouncedDiscount(value, type, order); // Wait an animation frame before applying the discount
+        };
+
+        this.models["pos.order.line"].addEventListener("update", (data) => {
+            const line = this.models["pos.order.line"].get(data.id);
+            const order = line.order_id;
+
+            if (!line.isDiscountLine && !line.isServiceFeeLine()) {
+                updateOrderDiscount(order);
+            }
+        });
+
+        this.models["pos.order"].addEventListener("update", ({ id, fields }) => {
+            const areAccountingFields = fields?.some((field) =>
+                PosOrderAccounting.accountingFields.has(field)
+            );
+
+            if (areAccountingFields) {
+                updateOrderDiscount(this.models["pos.order"].get(id));
+            }
         });
     },
     selectOrderLine(order, line) {
@@ -32,7 +49,7 @@ patch(PosStore.prototype, {
             this.numpadMode = "price";
         }
     },
-    async applyDiscount(percent, order = this.getOrder()) {
+    async applyDiscount(value, type = "percent", order = this.getOrder()) {
         const taxKey = (taxIds) =>
             taxIds
                 .map((tax) => tax.id)
@@ -73,11 +90,14 @@ patch(PosStore.prototype, {
             raw_grouping_key: { product_id: product.id },
         });
 
+        // A fixed discount ignores the base sign, so negate it on refunds to mirror the
+        // negative base (percentages already follow it). Keep `discount_value` as-is below.
+        const discountAmount = type === "fixed" && order.is_refund ? -value : value;
         const globalDiscountBaseLines = accountTaxHelpers.prepare_global_discount_lines(
             baseLines,
             order.company_id,
-            "percent",
-            percent,
+            type,
+            discountAmount,
             {
                 computation_key: "global_discount",
                 grouping_function: groupingFunction,
@@ -86,12 +106,13 @@ patch(PosStore.prototype, {
         let lastDiscountLine = null;
         for (const baseLine of globalDiscountBaseLines) {
             const extra_tax_data = accountTaxHelpers.export_base_line_extra_tax_data(baseLine);
-            extra_tax_data.discount_percentage = percent;
-
+            extra_tax_data.discount_value = value;
+            extra_tax_data.discount_type = type;
             const key = taxKey(baseLine.tax_ids);
             const existingLine = discountLinesMap[key];
 
             if (existingLine) {
+                existingLine.extra_tax_data = extra_tax_data;
                 existingLine.price_unit = baseLine.price_unit;
                 delete discountLinesMap[key];
             } else {
@@ -114,6 +135,8 @@ patch(PosStore.prototype, {
         Object.values(discountLinesMap).forEach((line) => {
             line.delete();
         });
+
+        order.recomputeServiceFees();
 
         if (lastDiscountLine && isGlobalDiscountBtnClicked) {
             order.selectOrderline(lastDiscountLine);

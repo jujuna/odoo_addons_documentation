@@ -29,7 +29,7 @@
                             </div>
                         </main>
                         <footer class="modal-footer">
-                            <button type="button" data-bs-dismiss="modal" class="btn">Cancel</button>
+                            <button type="button" data-bs-dismiss="modal" class="btn">Discard</button>
                             <button type="submit" class="btn btn-primary o_apply_ups_bill_my_account">Apply</button>
                         </footer>
                     </div>
@@ -64,7 +64,7 @@
                     <t t-if="order.partner_ups_carrier_account">
                         <a href="/shop/property_ups_carrier_account/unset">
                             Using Account <strong><t t-out="order.partner_ups_carrier_account"/></strong>
-                            <i class="fa fa-trash-o" role="img" aria-label="Delete" title="Delete"/>
+                            <i class="oi" data-icon="delete" role="img" aria-label="Delete" title="Delete"/>
                         </a>
                         <span>(UPS Billing will remain to the customer)</span>
                     </t>

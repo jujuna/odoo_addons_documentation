@@ -1,9 +1,13 @@
 from odoo.addons.documents_account.tests.common import DocumentsAccountTestCommon
+from odoo.tests import users
 from odoo.tests.common import RecordCapturer, tagged
+from odoo.tools import SQL
 
 
-@tagged('post_install', '-at_install', 'test_document_bridge')
+@tagged('test_document_bridge')
 class TestJournalSyncAutoConfig(DocumentsAccountTestCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -31,7 +35,7 @@ class TestJournalSyncAutoConfig(DocumentsAccountTestCommon):
 
         # Setup journals which will automatically create the synchronization settings
         cls.company_2 = cls.env['res.company'].search([('name', '=', 'company_2')])[0]
-        with cls._freeze_time('2022-08-22 09:16'):
+        with cls.mock_datetime_and_now('2022-08-22 09:16'):
             cls.journals = cls.env['account.journal'].create([
                 {'name': 'Misc company 1', 'type': 'general', 'company_id': cls.env.company.id},
                 {'name': 'Misc company 2', 'type': 'general', 'company_id': cls.company_2.id},
@@ -50,6 +54,7 @@ class TestJournalSyncAutoConfig(DocumentsAccountTestCommon):
         cls.misc_journal = cls.journals[0]
         cls.misc_setting = FolderSettings.search([('journal_id', '=', cls.misc_journal.id)])
         cls.misc_folder = cls.misc_setting.folder_id
+        cls.company_1 = cls.env.company
 
     def test_initial_data(self):
         self.assertEqual(len(self.settings_by_name), 4)
@@ -114,7 +119,7 @@ class TestJournalSyncAutoConfig(DocumentsAccountTestCommon):
         FolderSettings = self.env['documents.account.folder.setting']
         self.misc_setting.folder_id.name = 'renamed'
 
-        with self._freeze_time('2024-08-22 09:16'):
+        with self.mock_datetime_and_now('2024-08-22 09:16'):
             new_misc_journal = self.env['account.journal'].create({'name': 'Misc 2', 'type': 'general'})
         new_misc_setting = FolderSettings.search([('journal_id', '=', new_misc_journal.id)])
         self.assertEqual(new_misc_setting.folder_id, self.misc_setting.folder_id,
@@ -124,7 +129,7 @@ class TestJournalSyncAutoConfig(DocumentsAccountTestCommon):
             'name': 'replaced', 'type': 'folder',
             'folder_id': self.env.company.account_folder_id.id, 'company_id': self.env.company.id})
         new_misc_setting.folder_id = replaced_folder
-        with self._freeze_time('2025-08-22 10:16'):
+        with self.mock_datetime_and_now('2025-08-22 10:16'):
             another_misc_journal = self.env['account.journal'].create({'name': 'Misc 3', 'type': 'general'})
         another_misc_setting = FolderSettings.search([('journal_id', '=', another_misc_journal.id)])
         self.assertEqual(another_misc_setting.folder_id.name, 'replaced')
@@ -145,6 +150,7 @@ class TestJournalSyncAutoConfig(DocumentsAccountTestCommon):
         self.assertEqual(misc_journal_no_pre_config_setting.folder_id.name, 'Miscellaneous')
         self.assertEqual(misc_journal_no_pre_config_setting.folder_id, self.unused_folder_with_misc_name)
 
+    @users('__system__')
     def test_post_init(self):
         """Simulate the creation of the documents synchronization settings in the post init of documents_account."""
         # Remove all settings and related folders/tags as if we were installing documents_account
@@ -160,15 +166,15 @@ class TestJournalSyncAutoConfig(DocumentsAccountTestCommon):
         for lang in (self.env.lang, 'fr_FR'):
             with self.subTest(lang=lang):
                 self.env['account.journal'].with_context(lang=lang).search(
-                    [('id', 'not in', FolderSettings._search([]).select("journal_id"))]
+                    [('id', 'not in', FolderSettings._search([]).select(SQL("journal_id")))]
                 )._documents_configure_sync()
                 settings_by_name = FolderSettings.search(
                     [('journal_id', 'in', self.journals.ids)]).grouped(lambda j: j.journal_id.name)
                 for name, expected_tag_name_fr, expected_folder_name, expected_folder_name_fr, expected_company in (
-                        ('Misc company 1', 'Divers companie 1', 'Miscellaneous', 'Divers', self.env.company),
+                        ('Misc company 1', 'Divers companie 1', 'Miscellaneous', 'Divers', self.company_1),
                         ('Misc company 2', 'Divers companie 2', 'Miscellaneous', 'Divers', self.company_2),
                         ('Bank company 2', 'Banque companie 2', 'Bank', 'Banque', self.company_2),
-                        ('Cash company 1', 'Espèce companie 1', 'Cash', 'Espèces', self.env.company),
+                        ('Cash company 1', 'Espèce companie 1', 'Cash', 'Espèces', self.company_1),
                 ):
                     expected_tag_name = name
                     setting = settings_by_name[name]

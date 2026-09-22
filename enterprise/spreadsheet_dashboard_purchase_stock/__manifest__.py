@@ -8,7 +8,6 @@
     'data': [
         "data/dashboards.xml",
     ],
-    'installable': True,
     'auto_install': ['purchase_stock', 'stock_enterprise'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

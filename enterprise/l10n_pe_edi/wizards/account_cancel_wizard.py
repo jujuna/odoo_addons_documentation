@@ -16,5 +16,5 @@ class L10n_Pe_EdiCancel(models.TransientModel):
         self.ensure_one()
         moves = self.env['account.move'].browse(self.env.context.get('active_ids'))
         moves.l10n_pe_edi_cancel_reason = self.l10n_pe_edi_cancel_reason.strip()
-        moves.button_cancel_posted_moves()
+        moves._l10n_pe_edi_cancel_invoice()
         return True

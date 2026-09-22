@@ -29,42 +29,6 @@ class HrPayslip(models.Model):
         for payslip in self:
             payslip.expenses_count = len(payslip.expense_ids)
 
-    @api.model
-    def _issues_dependencies(self):
-        return super()._issues_dependencies() + [
-            'expense_ids',
-            'struct_id.rule_ids',
-            'struct_id.rule_ids.code',
-            'struct_id.rule_ids.account_debit',
-            'struct_id.rule_ids.account_debit.account_type',
-        ]
-
-    def _get_errors_by_slip(self):
-        # EXTENDS hr_payroll
-        errors_by_slip = super()._get_errors_by_slip()
-        draft_slips = self.filtered(lambda ps: ps.state == 'draft')
-        for struct, slips in draft_slips.filtered('expense_ids').grouped('struct_id').items():
-            expense_rules = struct.rule_ids.filtered(lambda rule: rule.code == 'EXPENSES')
-            if not expense_rules:
-                for slip in slips:
-                    errors_by_slip[slip].append({
-                        'message': _('No rule to handle expenses'),
-                        'action_text': _("Rules"),
-                        'action': struct.rule_ids._get_records_action(),
-                        'level': 'danger',
-                    })
-            elif not expense_rules.filtered(
-                lambda rule: rule.account_debit and rule.account_debit.account_type == 'liability_payable'
-            ):
-                for slip in slips:
-                    errors_by_slip[slip].append({
-                        'message': _('No debit account for EXPENSES rules'),
-                        'action_text': _("Expense rules"),
-                        'action': expense_rules._get_records_action(),
-                        'level': 'danger',
-                    })
-        return errors_by_slip
-
     def action_payslip_cancel(self):
         # Remove the link to the cancelled payslip so it can be linked to another payslip
         # EXTENDS hr_payroll
@@ -104,7 +68,7 @@ class HrPayslip(models.Model):
         return self.env['hr.expense'].search([
             ('employee_id', 'in', self.employee_id.ids),
             ('state', 'in', ('approved', 'posted')),
-            ('payment_mode', '=', 'own_account'),
+            ('payment_mode', '=', 'payslip_account'),
             ('refund_in_payslip', '=', True),
             ('payslip_id', '=', False)])
 
@@ -121,9 +85,8 @@ class HrPayslip(models.Model):
         # group by employee
         expenses_by_employee = expenses_sudo.grouped('employee_id')
         for slip_sudo in self.sudo():
-            payslip_expenses = expenses_by_employee.get(slip_sudo.employee_id, self.env['hr.expense'])
-            if not slip_sudo.struct_id.rule_ids.filtered(lambda rule: rule.code == 'EXPENSES'):
-                continue
+            payslip_expenses = expenses_by_employee.get(slip_sudo.employee_id, self.env['hr.expense']) \
+                .filtered(lambda expense: any(rule in slip_sudo.struct_id.rule_ids for rule in expense.product_id.salary_rule_ids))
             if slip_sudo.expense_ids and clear_existing:
                 slip_sudo.expense_ids = [Command.set(payslip_expenses.ids)]
             elif payslip_expenses:
@@ -136,42 +99,43 @@ class HrPayslip(models.Model):
             If False, will only compute the lines using the expenses already linked to the payslip.
             If True, will take all the expenses that are valid for this payslip (do not link them to the payslip)
         """
-        expense_type = self.env.ref('hr_payroll_expense.expense_other_input', raise_if_not_found=False)
-
         expenses_by_employee_sudo = {}
         if search_new_valid_expenses:
             expenses_by_employee_sudo = self.sudo()._get_employee_expenses_to_refund_in_payslip().grouped('employee_id')
 
-        if not expense_type:
-            _logger.warning("The 'hr_payroll_expense.expense_other_input' payslip input type is missing.")
-            return  # We cannot do anything without the expense type
-
+        all_rule_ids_to_update = set(self.env['product.product'].sudo().search(
+            [('salary_rule_ids.struct_ids', 'in', self.struct_id.ids)]
+        ).salary_rule_ids.ids)
         for payslip in self:
-            # Sudo to bypass access rights, as we just need to read the expense's total amounts
+            # Sudo to bypass access rights, as we just need to read the expenses' total amounts
             expenses_sudo = payslip.sudo().expense_ids
+            remaining_rules_to_update = payslip.struct_id.rule_ids.filtered(lambda rule: rule.id in all_rule_ids_to_update)
             if expenses_by_employee_sudo:
-                employee_expenses_sudo = expenses_by_employee_sudo.get(payslip.employee_id, self.env['hr.expense'])
+                employee_expenses_sudo = expenses_by_employee_sudo.get(payslip.employee_id, self.env['hr.expense']) \
+                .filtered(lambda expense: any(rule in payslip.sudo().struct_id.rule_ids for rule in expense.product_id.salary_rule_ids))
                 if employee_expenses_sudo:
                     del expenses_by_employee_sudo[payslip.employee_id]  # To avoid double assignations
                 expenses_sudo += employee_expenses_sudo
-            total = sum(expenses_sudo.mapped('total_amount'))
-            lines_to_remove = payslip.input_line_ids.filtered(lambda x: x.input_type_id == expense_type)
-            input_lines_vals = [Command.delete(line.id) for line in lines_to_remove]
-            if total:
-                input_lines_vals.append(Command.create({
-                    'amount': total,
-                    'input_type_id': expense_type.id
-                }))
-            payslip.input_line_ids = input_lines_vals
+            correct_rule_per_expense_sudo = expenses_sudo._get_correct_salary_rule_per_expense(payslip.struct_id)
+            expenses_sudo_by_rule = expenses_sudo.grouped(correct_rule_per_expense_sudo.get)
+            for rule, expenses_sudo in expenses_sudo_by_rule.items():
+                remaining_rules_to_update -= rule
+                total = sum(expenses_sudo.mapped('total_amount'))
+                payslip._set_input_value(rule.code, total)
+
+            # Some expenses might have been unlinked from the payslip, so we need to make sure they are reset to 0 on the payslip
+            for remaining_rule in remaining_rules_to_update:
+                payslip._set_input_value(remaining_rule.code, 0.0)
 
     def _update_expenses(self):
-        expense_type = self.env.ref('hr_payroll_expense.expense_other_input', raise_if_not_found=False)
-        if not expense_type:
-            return  # We cannot do anything without the expense type
         for payslip_sudo in self.sudo():
-            if not payslip_sudo.input_line_ids.filtered(lambda line: line.input_type_id == expense_type):
-                # Sudo to bypass access rights, as we just need to unlink the two models
-                payslip_sudo.expense_ids.payslip_id = False
+            for expense in payslip_sudo.expense_ids:
+                # Expenses live as input lines: if no input line targets one of the
+                # expense product's rules anymore (e.g. the user removed it), detach
+                # the expense from the payslip.
+                if not any(rule in payslip_sudo.input_line_ids.salary_rule_id for rule in expense.product_id.salary_rule_ids):
+                    # Sudo to bypass access rights, as we just need to unlink the two models
+                    expense.payslip_id = False
 
     def action_open_expenses(self):
         return_action = {

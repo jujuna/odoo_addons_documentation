@@ -14,15 +14,39 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 18:44+0000\n"
-"PO-Revision-Date: 2025-10-08 18:44+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-04 18:03+0000\n"
+"PO-Revision-Date: 2026-09-18 02:45+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"sale_shopee/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_shopee
+#: model:ir.module.module,description:base.module_sale_shopee
+msgid ""
+"\n"
+"Import your Shopee orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and shops\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(item_id or model_id in\n"
+"  Shopee)\n"
+"* Support for both Fulfillment by Shopee (FBS), Fulfillment by Merchant "
+"(FBM) and Fulfilled by Cross\n"
+"  Border Seller (Hybrid):\n"
+"* FBS: Importing the completed orders\n"
+"* FBM/Hybrid: Delivery information is fetched from Shopee, track and "
+"synchronize the stock level to\n"
+"  Shopee\n"
+msgstr ""
 
 #. module: sale_shopee
 #: model:mail.template,body_html:sale_shopee.order_sync_failure
@@ -53,9 +77,8 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"<p>Shopee buyurtmasining <t t-out=\"ctx.get('shopee_order_ref') yoki "
-"''\">REF</t> havolasi bilan sinxronlashuvi xatolik tufayli tugallanmadi.</"
-"p>\n"
+"<p>Shopee buyurtmasining <t t-out=\"ctx.get('shopee_order_ref') yoki ''\">"
+"REF</t> havolasi bilan sinxronlashuvi xatolik tufayli tugallanmadi.</p>\n"
 "<p>Agar buyurtma Shopee'da bekor qilinmasa, boshqa sinxronlashuv urinishlari "
 "amalga oshirilmaydi.</p>\n"
 "<p>Yangi sinxronlashuv urinishini rejalashtirish uchun quyidagi qadamlarni "
@@ -163,11 +186,11 @@ msgid ""
 "        </body>"
 msgstr ""
 "<style>.shopee_table { width: 100%; max-width: 900px; border-collapse: "
-"collapse; }.shopee_table th,.shopee_table td { border: 1px solid "
-"#888; }.shopee_table th { white-space: nowrap; }.shopee_table thead th "
-"{ padding: 0.5em 0.5em; text-align: center; border-bottom: 1px solid "
-"#888; }.shopee_table tbody th,.shopee_table tbody td { padding: 0.5em 0.5em "
-"1em; vertical-align: top; } </style> <body><div> <p>Shopee yuk tashish "
+"collapse; }.shopee_table th,.shopee_table td { border: 1px solid #888; }"
+".shopee_table th { white-space: nowrap; }.shopee_table thead th { padding: "
+"0.5em 0.5em; text-align: center; border-bottom: 1px solid #888; }"
+".shopee_table tbody th,.shopee_table tbody td { padding: 0.5em 0.5em 1em; "
+"vertical-align: top; } </style> <body><div> <p>Shopee yuk tashish "
 "yorliqlarini sinxronlash jarayonida ba'zi xatoliklar yuz berdi va jarayon "
 "yakunlanmadi.</p> <p>Boshqa sinxronlash urinishlari amalga oshirilmasligi "
 "sababli, tanlab olishlarni qayta qo‘lda sinxronlashdan oldin, iltimos, "
@@ -250,17 +273,17 @@ msgid ""
 "        </body>"
 msgstr ""
 "<style>.shopee_table { width: 100%; max-width: 900px; border-collapse: "
-"collapse; }.shopee_table th,.shopee_table td { border: 1px solid "
-"#888; }.shopee_table th { white-space: nowrap; }.shopee_table thead th "
-"{ padding: 0.5em 0.5em; text-align: center; border-bottom: 1px solid "
-"#888; }.shopee_table tbody th,.shopee_table tbody td { padding: 0.5em 0.5em "
-"1em; vertical-align: top; } </style> <body><div> <p><b><t t-"
-"out=\"ctx.get('shopee_shop') or ''\">REF</t></b> Shopee do‘koni uchun "
-"inventar sinxronizatsiyasi ba'zi xatoliklarga duch keldi va yakunlanmadi.</"
-"p> <p>Quyida Shopee tomonidan yuborilgan xatolar keltirilgan: </p> <table "
+"collapse; }.shopee_table th,.shopee_table td { border: 1px solid #888; }"
+".shopee_table th { white-space: nowrap; }.shopee_table thead th { padding: "
+"0.5em 0.5em; text-align: center; border-bottom: 1px solid #888; }"
+".shopee_table tbody th,.shopee_table tbody td { padding: 0.5em 0.5em 1em; "
+"vertical-align: top; } </style> <body><div> <p><b><t t-out=\"ctx.get"
+"('shopee_shop') or ''\">REF</t></b> Shopee do‘koni uchun inventar "
+"sinxronizatsiyasi ba'zi xatoliklarga duch keldi va yakunlanmadi.</p> <p>"
+"Quyida Shopee tomonidan yuborilgan xatolar keltirilgan: </p> <table "
 "class=\"shopee_table\"> <thead> <tr> <th>Shopee mahsulot identifikatori</th> "
-"<th>Xabar</th> </tr> </thead> <tbody> <tr t-"
-"foreach=\"ctx.get('error_messages')\" t-as=\"error\"> <th><t t-"
+"<th>Xabar</th> </tr> </thead> <tbody> <tr t-foreach=\"ctx.get"
+"('error_messages')\" t-as=\"error\"> <th><t t-"
 "out=\"error['item_identifier']\"/></th> <td> <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/> <t t-else=\"\">Shopee bilan sinxronizatsiya "
 "paytida noma'lum xatolik yuz berdi. Afsuski, mahsulot uchun mavjud miqdor "
@@ -306,16 +329,15 @@ msgstr ""
 "hisoblanadi."
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
+msgid "Account"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 #, fuzzy
 msgid "Account Name"
 msgstr "Hisob nomi"
-
-#. module: sale_shopee
-#: model:ir.ui.menu,name:sale_shopee.accounts_menu
-#, fuzzy
-msgid "Accounts"
-msgstr "Hisoblar"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__active
@@ -402,7 +424,13 @@ msgid "Authorization Remaining Days"
 msgstr "Avtorizatsiyaning qolgan kunlari"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Authorize New Shop"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 #, fuzzy
 msgid "Authorize Shop"
 msgstr "Do‘konni avtorizatsiya qilish"
@@ -413,12 +441,6 @@ msgstr "Do‘konni avtorizatsiya qilish"
 #, fuzzy
 msgid "Bundle Deal"
 msgstr "To‘plam taklifi"
-
-#. module: sale_shopee
-#: model_terms:ir.ui.view,arch_db:sale_shopee.quick_create_account_form
-#, fuzzy
-msgid "Cancel"
-msgstr "Bekor qilish"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__cancelled
@@ -475,6 +497,11 @@ msgid "Create Shopee Accounts"
 msgstr "Shopee hisoblarini yaratish"
 
 #. module: sale_shopee
+#: model:ir.model,name:sale_shopee.model_shopee_shop_create
+msgid "Create Shopee Shop Wizard"
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model,website_form_label:sale_shopee.model_res_partner
 #, fuzzy
 msgid "Create a Customer"
@@ -484,6 +511,7 @@ msgstr "Mijoz yaratish"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_uid
 #, fuzzy
 msgid "Created by"
 msgstr "Yaratuvchi"
@@ -492,6 +520,7 @@ msgstr "Yaratuvchi"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_date
 #, fuzzy
 msgid "Created on"
 msgstr "Yaratilgan sana"
@@ -527,6 +556,7 @@ msgstr "Standart sotuvchi"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__display_name
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__display_name
 #, fuzzy
@@ -646,6 +676,7 @@ msgstr "Shopee orqali bajarish"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__id
 #, fuzzy
@@ -674,6 +705,11 @@ msgstr ""
 #, fuzzy
 msgid "If this field is empty, all companies will be allowed."
 msgstr "Agar bu maydon bo‘sh bo‘lsa, barcha kompaniyalarga ruxsat beriladi."
+
+#. module: sale_shopee
+#: model:ir.module.module,summary:base.module_sale_shopee
+msgid "Import Shopee orders and sync deliveries"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_shop__status__inactive
@@ -724,6 +760,7 @@ msgstr "Oxirgi sinxronlash sanasi"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_uid
 #, fuzzy
 msgid "Last Updated by"
 msgstr "Oxirgi yangilovchi"
@@ -732,6 +769,7 @@ msgstr "Oxirgi yangilovchi"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_date
 #, fuzzy
 msgid "Last Updated on"
 msgstr "Oxirgi yangilangan sana"
@@ -741,6 +779,11 @@ msgstr "Oxirgi yangilangan sana"
 #, fuzzy
 msgid "Lock"
 msgstr "Qulflash"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Manage Accounts"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__name
@@ -757,9 +800,20 @@ msgstr "Shopee'da jo‘natmani qayta tartibga solish kerak"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_list
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_list
 #, fuzzy
 msgid "New"
 msgstr "Yangi"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "New Account"
+msgstr ""
+
+#. module: sale_shopee
+#: model:ir.actions.act_window,name:sale_shopee.shopee_shop_create_wizard_action
+msgid "New Shop"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__not_available
@@ -772,6 +826,12 @@ msgstr "Mavjud emas"
 #, fuzzy
 msgid "Order Count"
 msgstr "Buyurtmalar soni"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Order Discount"
+msgstr ""
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
@@ -822,6 +882,14 @@ msgstr "Mahsulot aksiyasi"
 #, fuzzy
 msgid "Product Variant"
 msgstr "Mahsulot varianti"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid ""
+"Promotion: %(promotion_type)s - id: %(promotion_id)d\n"
+"Original price: %(price)s"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__ready
@@ -903,6 +971,13 @@ msgid "Save And Authorize"
 msgstr "Saqlash va avtorizatsiya qilish"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid ""
+"Select the Shopee account on which to authorize the new shop, or register "
+"another account."
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__confirmed
 #, fuzzy
 msgid "Shipment Arranged"
@@ -932,6 +1007,12 @@ msgstr "Shopee orqali yuborildi"
 #, fuzzy
 msgid "Shipping Label Not Ready"
 msgstr "Yuk xati tayyor emas"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Shipping: %(carrier)s"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__shop_id
@@ -989,15 +1070,9 @@ msgid "Shopee"
 msgstr "Shopee"
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_account.py:0
-#, fuzzy
-msgid "Shopee API Account - %(partner_id)s"
-msgstr "Shopee API hisobi - %(partner_id)s"
-
-#. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_shopee_account
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__account_id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__account_id
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 #, fuzzy
 msgid "Shopee Account"
@@ -1022,6 +1097,11 @@ msgstr "Shopee summa tuzatishi"
 #, fuzzy
 msgid "Shopee Buyer ID"
 msgstr "Shopee xaridor ID raqami"
+
+#. module: sale_shopee
+#: model:ir.module.module,shortdesc:base.module_sale_shopee
+msgid "Shopee Connector"
+msgstr ""
 
 #. module: sale_shopee
 #. odoo-python
@@ -1059,7 +1139,6 @@ msgstr "Shopee mahsulot ID raqami"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 #: model:ir.actions.act_window,name:sale_shopee.sale_shopee_item_action
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__shopee_item_ids
-#: model:ir.ui.menu,name:sale_shopee.items_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_item_view_list
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 #, fuzzy
@@ -1092,6 +1171,11 @@ msgstr "mock_shopee_shop'dagi Shopee buyurtmasi %(order)s"
 #, fuzzy
 msgid "Shopee Order %(shopee_order_ref)s at %(shop_name)s"
 msgstr "%(shop_name)s'dagi Shopee buyurtmasi %(shopee_order_ref)s"
+
+#. module: sale_shopee
+#: model:product.template,name:sale_shopee.default_discount_product_product_template
+msgid "Shopee Order Discount"
+msgstr ""
 
 #. module: sale_shopee
 #. odoo-python
@@ -1263,6 +1347,7 @@ msgstr "Shopee: yuk tashish yorliqlarini sinxronlash"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_account.py:0
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__shop_ids
+#: model:ir.ui.menu,name:sale_shopee.shops_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 #, fuzzy
 msgid "Shops"
@@ -1348,6 +1433,11 @@ msgstr ""
 "Shopee API so‘rovlari uchun foydalaniladigan API manzili. Ishlab chiqarish "
 "va sinov manzillari mavjud. Manzillar orasidan siz mo‘ljallagan bozorga "
 "geografik jihatdan eng yaqinini tanlang."
+
+#. module: sale_shopee
+#: model:ir.model.fields,help:sale_shopee.field_shopee_shop_create__account_id
+msgid "The Shopee account on which the new shop is authorized."
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_sale_order__shopee_shop_id
@@ -1532,23 +1622,6 @@ msgstr ""
 #, fuzzy
 msgid "You are not allowed to access this page."
 msgstr "Sizga ushbu sahifaga kirish ruxsat etilmagan."
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-#, fuzzy
-msgid "[%(sku)s] %(product_name)s"
-msgstr "[%(sku)s] %(product_name)s"
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-#, fuzzy
-msgid ""
-"[%(sku)s] %(product_title)s\n"
-"Promotion: %(promotion_type)s - id: %(promotion_id)d"
-msgstr ""
-"[%(sku)s] %(product_title)s Aksiya: %(promotion_type)s - id: %(promotion_id)d"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form

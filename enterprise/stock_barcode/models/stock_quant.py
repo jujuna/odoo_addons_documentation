@@ -4,15 +4,20 @@ from odoo import models, fields, api
 class StockQuant(models.Model):
     _inherit = 'stock.quant'
 
-    dummy_id = fields.Char(compute='_compute_dummy_id', inverse='_inverse_dummy_id')
+    dummy_id = fields.Char(store=False)
+    has_count_requested = fields.Boolean(
+        string='Has this quant count been requested',
+        default=False,
+        help="Technical field to mark the quant count request to make it non-removable for the barcode user",
+    )
     image_1920 = fields.Image(related="product_id.image_1920")
     product_reference_code = fields.Char(related="product_id.code", string="Product Reference Code")
 
-    def _compute_dummy_id(self):
-        self.dummy_id = ''
-
-    def _inverse_dummy_id(self):
-        pass
+    @api.depends_context('barcode_view')
+    def _compute_display_name(self):
+        if not self.env.context.get('barcode_view'):
+            return super()._compute_display_name()
+        self.display_name = "Inventory Count"
 
     @api.model
     def barcode_write(self, vals):
@@ -53,6 +58,14 @@ class StockQuant(models.Model):
                 quant_ids.append(quant.id)
         return self.browse(quant_ids)._get_stock_barcode_data()
 
+    def action_remove_quant_in_barcode(self):
+        """Used to delete a line from physical inventory in barcode without affecting the inventory
+        count.
+        """
+        self.action_clear_inventory_quantity()
+        self.write({'inventory_date': False})
+        self._compute_inventory_date()
+
     def action_validate(self):
         quants = self.with_context(inventory_mode=True).filtered(lambda q: q.inventory_quantity_set)
         quants._compute_inventory_diff_quantity()
@@ -69,16 +82,18 @@ class StockQuant(models.Model):
 
     def _get_stock_barcode_data(self):
         locations = self.env['stock.location']
-        company_id = self.env.company.id
         package_types = self.env['stock.package.type']
         valid_quants = self
         if not self:  # `self` is an empty recordset when we open the inventory adjustment.
-            warehouse_location = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1).lot_stock_id
+            warehouse = self.env.user._get_default_warehouse_id()
+            if not warehouse:
+                self.env['stock.warehouse']._warehouse_redirect_warning()
+            warehouse_location = warehouse.lot_stock_id
             quant_locations = self.env['stock.location']
             if self.env.user.has_group('stock.group_stock_multi_locations'):
                 quant_locations = self.env['stock.location'].search([
                     ('usage', 'in', ['internal', 'transit']),
-                    ('company_id', '=', company_id),
+                    ('company_id', '=', self.env.company.id),
                 ], order='id')
             else:
                 quant_locations = warehouse_location
@@ -87,7 +102,7 @@ class StockQuant(models.Model):
                     ('user_id', '=?', self.env.user.id),
                     ('user_id', '=', False),
                 ('location_id', 'in', quant_locations.ids),
-                ('inventory_date', '<=', fields.Date.today()),
+                ('inventory_date', '<=', 'today'),
             ])
             locations = warehouse_location.child_internal_location_ids | valid_quants.location_id
             if self.env.user.has_group('stock.group_tracking_lot'):
@@ -108,10 +123,10 @@ class StockQuant(models.Model):
         owners = self.owner_id
         packages = self.package_id
         packages |= packages.parent_package_id
-        uoms = products.uom_id | products.uom_ids
+        uoms = products.uom_id | products.uom_ids | products.extra_uom_ids
         # If UoM setting is active, fetch all UoM's data.
         if self.env.user.has_group('uom.group_uom'):
-            uoms = self.env['uom.uom'].search([])
+            uoms = self.env['uom.uom'].with_context(active_test=False).search([])
 
         data = {
             "records": {
@@ -124,7 +139,7 @@ class StockQuant(models.Model):
                 "uom.uom": uoms.read(uoms._get_fields_stock_barcode(), load=False),
             },
             "nomenclature_id": [self.env.company.nomenclature_id.id],
-            "show_quantity_count": self.env['ir.config_parameter'].sudo().get_param('stock.show_expected_quantity_count', default='False') == 'True',
+            "show_quantity_count": self.env['ir.config_parameter'].sudo().get_bool('stock.show_expected_quantity_count'),
             "user_id": self.env.user.id,
         }
         return data
@@ -137,13 +152,15 @@ class StockQuant(models.Model):
             'inventory_quantity',
             'inventory_quantity_set',
             'quantity',
-            'product_uom_id',
+            'available_quantity',
+            'uom_id',
             'lot_id',
             'package_id',
             'owner_id',
             'inventory_diff_quantity',
             'dummy_id',
             'user_id',
+            'has_count_requested',
         ]
 
     def _get_inventory_fields_write(self):

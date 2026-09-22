@@ -24,7 +24,7 @@ test("switchFoodDeliveryAvailability and availableForFoodDelivery", async () => 
 
     comp.switchFoodDeliveryAvailability();
     // Mocking bus channel call
-    store.notifyFoodDeliveryStatus({ product_ids: [5], status: false });
+    store._notifyFoodDeliveryStatus({ product_ids: [5], status: false });
 
     expect(comp.availableForFoodDelivery).toBe(false);
 });

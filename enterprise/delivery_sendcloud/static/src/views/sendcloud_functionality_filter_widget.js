@@ -1,19 +1,20 @@
+import { Component, onWillStart, onWillUpdateProps, proxy, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, onWillUpdateProps, useState } from "@odoo/owl";
+import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
 export class SendcloudFunctionalitiesField extends Component {
     static template = "delivery_sendcloud.functionalities";
-    static props = {
-        "*": true,
-    };
+
+    props = useProps(standardWidgetProps);
+
     setup() {
         const { data } = this.props.record;
         this.actionService = useService("action");
         this.orm = useService("orm");
         this.resId = data.id;
         this.sendcloudProductId = data.sendcloud_shipping_id.id;
-        this.filterableFunc = useState({});
+        this.filterableFunc = proxy({});
         this.currentFilters = {...data.sendcloud_product_functionalities};
         onWillStart(this._fetchFunctionalities);
         onWillUpdateProps((nextProps) => this._onWillUpdateProps(nextProps));

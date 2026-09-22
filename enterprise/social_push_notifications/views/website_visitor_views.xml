@@ -24,7 +24,7 @@
         <field name="arch" type="xml">
             <xpath expr="//list" position="inside">
                 <field name="has_push_notifications" column_invisible="True"/>
-                <button name="action_send_push_notification" string="Send Push Notification" type="object" icon="fa-bell"
+                <button name="action_send_push_notification" string="Send Push Notification" type="object" icon="notifications" icon_class="oi-filled"
                    invisible="not has_push_notifications"/>
             </xpath>
         </field>
@@ -70,12 +70,4 @@
                 action = records.action_send_push_notification()
         </field>
     </record>
-
-    <menuitem
-        id="social_visitor"
-        name="Visitors"
-        parent="social.menu_social_global"
-        action="website.website_visitors_action"
-        sequence="25"
-        groups="website.group_website_restricted_editor"/>
 </data></odoo>

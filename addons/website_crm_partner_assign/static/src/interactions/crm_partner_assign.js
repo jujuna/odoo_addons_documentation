@@ -12,7 +12,7 @@ export class CRMPartnerAssign extends Interaction {
     dynamicContent = {
         ".interested_partner_assign_confirm": { "t-on-click.prevent.stop": this.locked(this.onInterestedPartnerConfirmClick) },
         ".desinterested_partner_assign_confirm": { "t-on-click.prevent.stop": this.locked(this.onDesinterestedPartnerConfirmClick) },
-        ".opp-stage-button": { "t-on-click.withTarget": this.locked(this.onOppStageButtonClick) },
+        ".opp-stage-button": { "t-on-click": this.locked(this.onOppStageButtonClick) },
         ".edit_contact_confirm": { "t-on-click.prevent.stop": this.locked(this.onEditContactClick) },
         ".new_opp_confirm": { "t-on-click.prevent.stop": this.locked(this.onCreateOppClick) },
         ".edit_opp_confirm": { "t-on-click.prevent.stop": this.locked(this.onEditOppClick) },
@@ -94,7 +94,7 @@ export class CRMPartnerAssign extends Interaction {
         }]);
         if (response.errors) {
             this.el.querySelector("#new-opp-dialog .alert")?.remove();
-            const alertEl = this.el.createElement("div");
+            const alertEl = document.createElement("div");
             alertEl.classList.add("alert", "alert-danger");
             alertEl.textContent = response.errors;
             const parentEl = this.el.querySelector("#new-opp-dialog");
@@ -137,8 +137,12 @@ export class CRMPartnerAssign extends Interaction {
         }
     }
 
-    async onOppStageButtonClick(ev, currentTargetEl) {
-        await this.changeOppStage(parseInt(currentTargetEl.getAttribute("opp")), parseInt(currentTargetEl.getAttribute("data")));
+    async onOppStageButtonClick(ev) {
+        const currentTarget = ev.currentTarget;
+        await this.changeOppStage(
+            parseInt(currentTarget.getAttribute("opp")),
+            parseInt(currentTarget.getAttribute("data"))
+        );
     }
 
     onNextActivityChange() {

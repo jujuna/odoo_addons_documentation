@@ -2,10 +2,10 @@
 <templates xml:space="preserve">
     <t t-name="mrp_workorder.ProductCatalogKanbanRenderer" t-inherit="ProductCatalogKanbanRenderer" t-inherit-mode="extension">
         <xpath expr="//t[@t-if='groupOrRecord.group']//KanbanRecord" position="attributes">
-            <attribute name="pushCatalogKanbanUpdate">props.pushCatalogKanbanUpdate?.bind(this)</attribute>
+            <attribute name="pushCatalogKanbanUpdate">this.productCatalogProps.pushCatalogKanbanUpdate?.bind(this)</attribute>
         </xpath>
         <xpath expr="//t[@t-else='']//KanbanRecord" position="attributes">
-            <attribute name="pushCatalogKanbanUpdate">props.pushCatalogKanbanUpdate?.bind(this)</attribute>
+            <attribute name="pushCatalogKanbanUpdate">this.productCatalogProps.pushCatalogKanbanUpdate?.bind(this)</attribute>
         </xpath>
     </t>
 </templates>

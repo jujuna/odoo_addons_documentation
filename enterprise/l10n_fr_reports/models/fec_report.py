@@ -40,7 +40,7 @@ class L10n_FrFecExportWizard(models.TransientModel):
 
     def create_fec_report_action(self):
         # OVERRIDE
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         if self.date_from > today or self.date_to > today:
             raise UserError(_('You could not set the start date or the end date in the future.'))
         if self.date_from >= self.date_to:

@@ -6,7 +6,6 @@ from ..api.swissdec_declarations import SwissdecDeclaration
 from .hr_version import CANTONS
 
 import json
-import base64
 import re
 
 XSD_SKIP_VALUE = "XSDSKIP"
@@ -87,14 +86,14 @@ class L10nCHSwissdecDeclaration(models.Model):
             if response:
                 attachment_request = self.env['ir.attachment'].create({
                     'name': _("Get_Status_%s_request.xml", self.swissdec_declaration_id),
-                    'datas': base64.encodebytes(message_archive.encode()),
+                    'raw': message_archive.encode(),
                     'res_id': self.id,
                     'res_model': self._name,
                 })
 
                 attachment_response = self.env['ir.attachment'].create({
                     'name': _("Declaration_%s_response.xml", self.swissdec_declaration_id),
-                    'datas': base64.encodebytes(response_archive.encode()),
+                    'raw': response_archive.encode(),
                     'res_id': self.id,
                     'res_model': self._name,
                 })
@@ -102,7 +101,7 @@ class L10nCHSwissdecDeclaration(models.Model):
 
                 # response = serialize_object(response)
                 corresponding_report = self.env[self.res_model].browse(self.res_id)
-                institution_descriptions = swissdec_declaration.get_mapped_institution_descriptions(institutions=corresponding_report._get_institutions())
+                institution_descriptions = swissdec_declaration.get_mapped_institution_descriptions(institutions=corresponding_report._get_institutions(), skip_bvg_payroll_unit=True)
                 job_responses = []
 
                 plausiblity_state = response.get("PlausibilityState", {}).get("Plausible")

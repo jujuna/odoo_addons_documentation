@@ -1,9 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.http import content_disposition, request, route
-from odoo.tools import replace_exceptions, str2bool
-from odoo.addons.documents.controllers.documents import ShareRoute
 from werkzeug.exceptions import BadRequest
+
+from odoo.http import request, route
+from odoo.http.stream import content_disposition
+from odoo.tools import replace_exceptions, str2bool
+
+from odoo.addons.documents.controllers.documents import ShareRoute
 
 
 class AccountShareRoute(ShareRoute):
@@ -15,7 +18,7 @@ class AccountShareRoute(ShareRoute):
         if download:
             return super().documents_content(access_token, download)
 
-        document = self._from_access_token(access_token, skip_log=True)
+        document = self.env['documents.document']._from_access_token(access_token, skip_log=True)
         is_public = request.env.user._is_public()
         if document.sudo(is_public).has_embedded_pdf:
             # TODO: cache the extracted pdf in the browser

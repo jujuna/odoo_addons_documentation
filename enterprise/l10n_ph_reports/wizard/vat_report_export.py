@@ -13,6 +13,7 @@ class L10n_Ph_ReportsDatFileExport(models.TransientModel):
 
     attachment_for = fields.Selection(
         selection=[
+            ('1600VT', '1600VT'),  # MAP - monthly
             ('1601EQ', '1601EQ'),  # QAP - quarterly
             ('1604E', '1604E'),  # QAP - annually
             ('1701Q', '1701Q'),  # SAWT - quarterly
@@ -27,7 +28,7 @@ class L10n_Ph_ReportsDatFileExport(models.TransientModel):
         store=True,
     )
     available_forms = fields.Char(
-        default='1601EQ,1604E,1701Q,1701,1702Q,1702,S,P',  # default to all forms, provide the specific ones at creation.
+        default='1600VT,1601EQ,1604E,1701Q,1701,1702Q,1702,S,P',  # default to all forms, provide the specific ones at creation.
     )
     dat_export_warning = fields.Json(compute='_compute_dat_export_warning')
 
@@ -47,7 +48,7 @@ class L10n_Ph_ReportsDatFileExport(models.TransientModel):
             date_data = report_options['date']
             date_to = fields.Date.to_date(date_data['date_to'])
             period_types_display_map = {
-                'fiscalyear': wizard.env._("the year %(year)s", year=date_data['string']),
+                'year': wizard.env._("the year %(year)s", year=date_data['string']),
                 'quarter': wizard.env._("the Q%(quarter_number)s %(year)s", quarter_number=date_utils.get_quarter_number(date_to), year=date_to.year),
                 'month': format_date(env=wizard.env, value=date_to, date_format='MMMM YYYY'),
                 'custom': wizard.env._("%(date_from)s to %(date_to)s", date_from=date_data['date_from'], date_to=date_data['date_to']),
@@ -57,15 +58,17 @@ class L10n_Ph_ReportsDatFileExport(models.TransientModel):
 
             if wizard.attachment_for in {'1601EQ', '1701Q', '1702Q', 'S', 'P'} and period_type != 'quarter':
                 expected_period = wizard.env._("a quarterly")
-            elif wizard.attachment_for in {'1604E', '1701', '1702'} and period_type != 'fiscalyear':
+            elif wizard.attachment_for in {'1604E', '1701', '1702'} and period_type != 'year':
                 expected_period = wizard.env._("an annual")
+            elif wizard.attachment_for == '1600VT' and period_type != 'month':
+                expected_period = wizard.env._("a monthly")
 
             wizard.dat_export_warning = {
                 'warning_mismatch_export_periodicity': {
                     'message': wizard.env._(
                         "Please note that the %(report_name)s is %(expected_period)s report, but you are exporting it for %(period)s.\n"
                         "You can change the export period using the date filter on the accounting report.",
-                        report_name=dict(wizard._fields['attachment_for'].selection)[wizard.attachment_for],
+                        report_name=dict(wizard._fields['attachment_for']._description_selection(self.env))[wizard.attachment_for],
                         expected_period=expected_period,
                         period=period_types_display_map[period_type],
                     ),
@@ -78,7 +81,11 @@ class L10n_Ph_ReportsDatFileExport(models.TransientModel):
         if not self.attachment_for:
             raise UserError(self.env._("Please select which form you are exporting the attachment for."))
 
-        if self.attachment_for in ['1601EQ', '1604E']:
+        if self.attachment_for == '1600VT':
+            alpha_type = 'MAP'
+            periodicity = 'monthly'
+            filename_date_format = '%m%Y'
+        elif self.attachment_for in ['1601EQ', '1604E']:
             alpha_type = 'QAP'
             periodicity = 'quarterly' if self.attachment_for == '1601EQ' else 'annually'
             filename_date_format = '%m%Y' if periodicity == 'quarterly' else '%m%d%Y'

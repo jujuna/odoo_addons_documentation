@@ -2,25 +2,23 @@ import { OptionsDropdown } from "@knowledge/components/options_dropdown/options_
 import { knowledgeTopbar } from "@knowledge/components/topbar/topbar";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import {
-    asyncStep,
     contains,
     defineModels,
     fields,
     getKwArgs,
-    getMockEnv,
+    isSmall,
     makeMockServer,
     mockService,
     models,
     mountView,
     onRpc,
     patchWithCleanup,
-    waitForSteps,
 } from "@web/../tests/web_test_helpers";
 import { serializeDateTime } from "@web/core/l10n/dates";
 import { user } from "@web/core/user";
 
-import { expect, test } from "@odoo/hoot";
-import { click, runAllTimers, waitFor } from "@odoo/hoot-dom";
+import { expect, test, beforeEach } from "@odoo/hoot";
+import { click, queryFirst, runAllTimers, setInputFiles, waitFor } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 
 class KnowledgeArticle extends models.ServerModel {
@@ -79,6 +77,7 @@ async function mountTopbar(articleId) {
         arch: /* xml */ `
             <form js_class="knowledge_article_view_form">
                 <widget name="knowledge_topbar"/>
+                <widget name="knowledge_side_panel"/>
             </form>
         `,
         resModel: "knowledge.article",
@@ -88,8 +87,8 @@ async function mountTopbar(articleId) {
     await waitFor(".o_knowledge_form_view");
 }
 
-async function openOptionsDropdown() {
-    await click(".o_knowledge_header .dropdown-toggle[title='More actions']");
+async function openOptionsDropdown(rootSelector = ".o_knowledge_header") {
+    await click(`${rootSelector} .dropdown-toggle[title='More actions']`);
     await waitFor(".o_knowledge_options_dropdown");
     await animationFrame();
 }
@@ -97,6 +96,14 @@ async function openOptionsDropdown() {
 async function waitForOptionsDropdownClose() {
     await waitFor(".o-overlay-container:not(:has(.o_knowledge_options_dropdown))");
     await animationFrame();
+}
+
+async function ensureOptionsDropdownOpen() {
+    if (!queryFirst(".o_knowledge_options_dropdown")) {
+        await openOptionsDropdown();
+    } else {
+        await waitFor(".o_knowledge_options_dropdown");
+    }
 }
 
 function assertOptionsDropdown(config) {
@@ -109,7 +116,7 @@ function assertOptionsDropdown(config) {
         canWrite && !isLocked && hasParent ? 1 : 0
     );
     expect(".dropdown-item:contains('Full Width')").toHaveCount(canWrite ? 1 : 0);
-    expect(".dropdown-item:contains('Move To')").toHaveCount(canWrite && isInternalUser ? 1 : 0);
+    expect(".dropdown-item[name='move_to']").toHaveCount(canWrite && isInternalUser ? 1 : 0);
     expect(".dropdown-item:contains('Lock Content')").toHaveCount(canWrite && !isLocked ? 1 : 0);
     expect(".dropdown-item:contains('Create a Copy')").toHaveCount(1);
     expect(".dropdown-item:contains('Convert into Article Item')").toHaveCount(
@@ -119,10 +126,13 @@ function assertOptionsDropdown(config) {
     expect(".dropdown-item:contains('Add to Templates')").toHaveCount(
         canWrite && isInternalUser ? 1 : 0
     );
-    expect(".dropdown-item:contains('Send to Trash')").toHaveCount(
+    expect(".dropdown-item[name='move_to_trash']").toHaveCount(
         canWrite && isInternalUser ? 1 : 0
     );
 }
+beforeEach(() => {
+    onRpc("knowledge.article", "has_access", () => true);
+});
 
 test("Options Dropdown layout for a readonly article", async () => {
     const mockServer = await makeMockServer();
@@ -141,7 +151,7 @@ test("Options Dropdown layout for a portal user", async () => {
     await mountTopbar(articleId);
     await openOptionsDropdown();
     // some options are not shown for portal users
-    expect(".o_knowledge_options_dropdown .dropdown-item").toHaveCount(6);
+    expect(".o_knowledge_options_dropdown .dropdown-item").toHaveCount(5);
     assertOptionsDropdown({ canWrite: true, isInternalUser: false });
     expect(".o_knowledge_options_dropdown div.text-muted:contains('Last Edited')").toHaveCount(1);
 });
@@ -157,7 +167,7 @@ test("Add/Remove Cover", async () => {
         const { params } = await request.json();
         expect(params.orientation).toBe("landscape");
         expect(params.query).toBe("Bloups");
-        asyncStep("add random cover");
+        expect.step("add random cover");
         return { cover_id: mockServer.env["knowledge.cover"].create({}) };
     });
     await mountTopbar(articleId);
@@ -165,7 +175,7 @@ test("Add/Remove Cover", async () => {
     expect(".dropdown-item:contains('Remove Cover')").toHaveCount(0);
     await click(".dropdown-item:contains('Add Cover')");
     await waitForOptionsDropdownClose();
-    await waitForSteps(["add random cover"]);
+    await expect.waitForSteps(["add random cover"]);
     await openOptionsDropdown();
     expect(".dropdown-item:contains('Add Cover')").toHaveCount(0);
     await click(".dropdown-item:contains('Remove Cover')");
@@ -182,6 +192,29 @@ test("Add/Remove Cover", async () => {
     expect(".o_select_media_dialog input.o_we_search").toHaveValue("Bloups");
 });
 
+test("Abort article cover upload", async () => {
+    const mockServer = await makeMockServer();
+    const articleId = mockServer.env["knowledge.article"].create({ name: "Bloups" });
+    onRpc(`/knowledge/article/${articleId}/add_random_cover`, () => ({ error: "key_not_found" }));
+    mockService("upload", {
+        uploadFiles(_files, _options, _onUploaded, setAbortCallback) {
+            expect.step("upload started");
+            setAbortCallback(() => expect.step("upload aborted"));
+            return new Promise(() => {});
+        },
+    });
+
+    await mountTopbar(articleId);
+    await openOptionsDropdown();
+    await click(".dropdown-item:contains('Add Cover')");
+    await waitFor(".o_select_media_dialog");
+    await click(".o_select_media_dialog .o_upload_media_button");
+    await setInputFiles(new File(["test"], "cover.png", { type: "image/png" }));
+    await expect.waitForSteps(["upload started"]);
+    await click(".o_select_media_dialog .modal-footer .btn-secondary:contains('Discard')");
+    await expect.waitForSteps(["upload aborted"]);
+});
+
 test("Add Properties", async () => {
     const mockServer = await makeMockServer();
     const parentId = mockServer.env["knowledge.article"].create({ name: "p" });
@@ -191,24 +224,26 @@ test("Add Properties", async () => {
     // add properties button should be disabled on root articles
     await openOptionsDropdown();
     expect(".dropdown-item:contains('Add Properties')").toHaveClass("o_disabled_option");
-    if (getMockEnv().isSmall) {
+    if (isSmall()) {
         await click(".o_bottom_sheet_backdrop");
     }
     await click(".o_article_name:contains('c')");
     await waitFor(".o_article_active .o_article_name:contains('c')");
     // add properties shouldn't be disabled anymore
     await openOptionsDropdown();
+    await waitFor(".dropdown-item:not(.o_disabled_option):contains('Add Properties')");
     expect(".dropdown-item:contains('Add Properties')").not.toHaveClass("o_disabled_option");
     await click(".dropdown-item:contains('Add Properties')");
     await waitForOptionsDropdownClose();
     // add properties button shouldn't be shown anymore
-    await openOptionsDropdown();
+    await openOptionsDropdown(".o_widget_knowledge_side_panel");
     expect(".dropdown-item:contains('Add Properties')").toHaveCount(0);
-    if (getMockEnv().isSmall) {
+    if (isSmall()) {
         await click(".o_bottom_sheet_backdrop");
     }
     // add properties button should be shown after closing the properties (no property created)
-    await click(".o_knowledge_header .btn-properties");
+    await click(".o_widget_knowledge_side_panel .btn-properties");
+    await animationFrame();
     await openOptionsDropdown();
     expect(".dropdown-item:contains('Add Properties')").not.toHaveClass("o_disabled_option");
 });
@@ -219,16 +254,15 @@ test("Toggle lock", async () => {
     await mountTopbar(articleId);
     await openOptionsDropdown();
     await click(".dropdown-item:contains('Lock Content')");
-    await waitForOptionsDropdownClose();
-    // lock icon should be shown in the topbar
-    expect(".o_knowledge_header i.fa-lock").toHaveCount(1);
-    await openOptionsDropdown();
+    await waitFor(".o_knowledge_header i[data-icon='lock']");
+    await ensureOptionsDropdownOpen();
+    await waitFor(".dropdown-item:contains('Unlock')");
     // The article is now Locked
     assertOptionsDropdown({ isInternalUser: true, canWrite: true, isLocked: true });
     await click(".dropdown-item:contains('Unlock')");
-    await waitForOptionsDropdownClose();
-    expect(".o_knowledge_header i.fa-lock").toHaveCount(0);
-    await openOptionsDropdown();
+    await waitFor(".o_knowledge_header:not(:has(i[data-icon='lock']))");
+    await ensureOptionsDropdownOpen();
+    await waitFor(".dropdown-item:contains('Lock Content')");
     // hidden options should be shown again
     assertOptionsDropdown({ isInternalUser: true, canWrite: true });
 });
@@ -244,7 +278,7 @@ test("Move Article", async () => {
         expect(id).toBe(articles[0]);
         if (searchTerm) {
             expect(searchTerm).toBe("a2");
-            asyncStep("get valid parent");
+            expect.step("get valid parent");
             return mockServer.env["knowledge.article"].browse([articles[1]]);
         }
         return mockServer.env["knowledge.article"].browse(articles.slice(1));
@@ -253,12 +287,12 @@ test("Move Article", async () => {
     onRpc("move_to", ({ args: [id], kwargs: { parent_id: parentId } }) => {
         expect(id).toBe(articles[0]);
         expect(parentId).toBe(articles[1]);
-        asyncStep("move");
+        expect.step("move");
         return true;
     });
     await mountTopbar(articles[0]);
     await openOptionsDropdown();
-    await click(".dropdown-item:contains('Move To')");
+    await click(".dropdown-item[name='move_to']");
     await waitFor(".o_knowledge_select_menu_dropdown");
     expect(".dropdown-item:contains('a1')").toHaveCount(0);
     expect(".dropdown-item:contains('a2')").toHaveCount(1);
@@ -266,13 +300,13 @@ test("Move Article", async () => {
     await contains("input.dropdown-item").click();
     await contains("input.dropdown-item").edit("a2", { confirm: false });
     await runAllTimers();
-    await waitForSteps(["get valid parent"]);
+    await expect.waitForSteps(["get valid parent"]);
     expect(".dropdown-item:contains('a1')").toHaveCount(0);
     expect(".dropdown-item:contains('a2')").toHaveCount(1);
     expect(".dropdown-item:contains('a3')").toHaveCount(0);
     await click(".dropdown-item:contains('a2')");
     await click(waitFor(".modal-footer .btn-primary:interactive"));
-    await waitForSteps(["move"]);
+    await expect.waitForSteps(["move"]);
 });
 
 test("Open Version History", async () => {
@@ -308,7 +342,7 @@ test("Send Article to Trash", async () => {
     mockService("action", {
         doAction({ action }) {
             if (action === "redirect to parent") {
-                asyncStep("redirect");
+                expect.step("redirect");
             }
         },
     });
@@ -323,9 +357,9 @@ test("Send Article to Trash", async () => {
     const articleId = mockServer.env["knowledge.article"].create({});
     await mountTopbar(articleId);
     await openOptionsDropdown();
-    await click(".dropdown-item:contains('Send to Trash')");
+    await click(".dropdown-item[name='move_to_trash']");
     await waitForOptionsDropdownClose();
-    await waitForSteps(["redirect"]);
+    await expect.waitForSteps(["redirect"]);
     // redirect was mocked, test topbar with trashed article
     await openOptionsDropdown();
     // options dropdown should only contain the restore button
@@ -354,7 +388,7 @@ test("Toggle Properties Panel (desktop)", async () => {
             <form js_class="knowledge_article_view_form">
                 <widget name="knowledge_topbar"/>
                 <div class="row h-100 m-3">
-                    <widget name="knowledge_properties_panel"/>
+                    <widget name="knowledge_side_panel"/>
                 </div>
             </form>
         `,
@@ -365,34 +399,32 @@ test("Toggle Properties Panel (desktop)", async () => {
     await waitFor(".o_knowledge_form_view");
     // properties panel and toggle button are not shown for root articles
     expect(".o_knowledge_header .btn-properties").toHaveCount(0);
-    expect(".o_widget_knowledge_properties_panel").not.toBeVisible();
     expect(".o_field_properties").toHaveCount(0);
     // when opening an article with article properties, panel should be open
     await click(".o_article_name:contains('child1')");
     await waitFor(".o_article_active .o_article_name:contains('child1')");
     await animationFrame();
-    expect(".o_widget_knowledge_properties_panel").toBeVisible();
+    expect(".o_knowledge_properties_panel").toBeVisible();
     expect(".o_field_properties").toHaveCount(1);
-    expect(".o_knowledge_header .btn-properties").toHaveClass("active");
+    expect(".o_widget_knowledge_side_panel .btn-properties").toHaveClass("active");
     // close the properties panel
-    await click(".o_knowledge_header .btn-properties");
+    await click(".o_widget_knowledge_side_panel .btn-properties");
     await animationFrame();
-    expect(".o_widget_knowledge_properties_panel").not.toBeVisible();
     expect(".o_field_properties").toHaveCount(0);
     expect(".o_knowledge_header .btn-properties").not.toHaveClass("active");
     // reopen the properties panel
     await click(".o_knowledge_header .btn-properties");
     await animationFrame();
-    expect(".o_widget_knowledge_properties_panel").toBeVisible();
+    expect(".o_knowledge_properties_panel").toBeVisible();
     expect(".o_property_field").toHaveCount(1);
-    expect(".o_knowledge_header .btn-properties").toHaveClass("active");
+    expect(".o_widget_knowledge_side_panel .btn-properties").toHaveClass("active");
     // when opening an article whose parent has properties definitions, panel should remain open
     await click(".o_article_name:contains('child2')");
     await waitFor(".o_article_active .o_article_name:contains('child2')");
     await animationFrame();
-    expect(".o_widget_knowledge_properties_panel").toBeVisible();
+    expect(".o_knowledge_properties_panel").toBeVisible();
     expect(".o_field_properties").toHaveCount(1);
-    expect(".o_knowledge_header .btn-properties").toHaveClass("active");
+    expect(".o_widget_knowledge_side_panel .btn-properties").toHaveClass("active");
     // remove parent's properties definition
     mockServer.env["knowledge.article"].write(parentId, {
         article_properties_definition: [],
@@ -401,7 +433,7 @@ test("Toggle Properties Panel (desktop)", async () => {
     await click(".o_article_name:contains('child1')");
     await waitFor(".o_article_active .o_article_name:contains('child1')");
     await animationFrame();
-    expect(".o_widget_knowledge_properties_panel").not.toBeVisible();
+    expect(".o_knowledge_properties_panel").toHaveCount(0);
     expect(".o_field_properties").toHaveCount(0);
     expect(".o_knowledge_header .btn-properties").toHaveCount(0);
 });
@@ -435,7 +467,7 @@ test("Toggle Properties Panel (Mobile)", async () => {
             <form js_class="knowledge_article_view_form">
                 <widget name="knowledge_topbar"/>
                 <div class="row h-100 m-3">
-                    <widget name="knowledge_properties_panel"/>
+                    <widget name="knowledge_side_panel"/>
                 </div>
             </form>
         `,
@@ -448,28 +480,22 @@ test("Toggle Properties Panel (Mobile)", async () => {
     await click(".o_article_name:contains('child1')");
     await waitFor(".o_article_active .o_article_name:contains('child1')");
     await animationFrame();
-    expect(".o_widget_knowledge_properties_panel").not.toBeVisible();
+    expect(".o_knowledge_properties_panel").toHaveCount(0);
     expect(".o_field_properties").toHaveCount(0);
-    // open the properties panel
-    await openOptionsDropdown();
-    expect(".dropdown-item:contains('Add Properties')").toHaveCount(0);
-    expect(".dropdown-item:contains('Show Properties')").toHaveCount(1);
-    expect(".dropdown-item:contains('Hide Properties')").toHaveCount(0);
-    await click(".dropdown-item:contains('Show Properties')");
+    expect(".btn-properties").not.toHaveClass("active");
+    // manually open the panel
+    await click(".btn-properties");
     await animationFrame();
-    expect(".o_widget_knowledge_properties_panel").toBeVisible();
+    expect(".o_knowledge_properties_panel").toBeVisible();
     expect(".o_field_properties").toHaveCount(1);
-    await openOptionsDropdown();
-    expect(".dropdown-item:contains('Add Properties')").toHaveCount(0);
-    expect(".dropdown-item:contains('Show Properties')").toHaveCount(0);
-    expect(".dropdown-item:contains('Hide Properties')").toHaveCount(1);
+    expect(".btn-properties").toHaveClass("active");
     // panel should remain open when opening an article with properties while the panel is opened
     await click(".o_article_name:contains('child2')");
     await waitFor(".o_article_active .o_article_name:contains('child2')");
     await animationFrame();
-    expect(".o_widget_knowledge_properties_panel").toBeVisible();
+    expect(".o_knowledge_properties_panel").toBeVisible();
     expect(".o_field_properties").toHaveCount(1);
-    expect(".o_knowledge_header .btn-properties").toHaveClass("active");
+    expect(".btn-properties").toHaveClass("active");
     // remove parent's properties definition
     mockServer.env["knowledge.article"].write(parentId, {
         article_properties_definition: [],
@@ -478,6 +504,6 @@ test("Toggle Properties Panel (Mobile)", async () => {
     await click(".o_article_name:contains('child1')");
     await waitFor(".o_article_active .o_article_name:contains('child1')");
     await animationFrame();
-    expect(".o_widget_knowledge_properties_panel").not.toBeVisible();
+    expect(".o_knowledge_properties_panel").toHaveCount(0);
     expect(".o_field_properties").toHaveCount(0);
 });

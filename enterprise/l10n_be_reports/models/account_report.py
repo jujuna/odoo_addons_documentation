@@ -1,34 +1,19 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import calendar
+import io
 import re
-import stdnum
-
+import zipfile
 from markupsafe import Markup
 
 from odoo import models, _
 from odoo.exceptions import RedirectWarning, UserError
+from odoo.tools import BinaryBytes
+from odoo.tools.business_data import split_vat
 
 
 def _raw_phonenumber(phonenumber):
     return re.sub("[^+0-9]", "", phonenumber)[:20]
-
-def _split_vat_number_and_country_code(vat_number):
-    """
-    Even with base_vat, the vat number doesn't necessarily starts
-    with the country code
-    We should make sure the vat is set with the country code
-    to avoid submitting a declaration with a wrong vat number
-    """
-    vat_number = vat_number.replace(' ', '').upper()
-    try:
-        int(vat_number[:2])
-        country_code = None
-    except ValueError:
-        country_code = vat_number[:2]
-        vat_number = vat_number[2:]
-
-    return vat_number, country_code
 
 def _get_xml_export_representative_node(report):
     """ The <Representative> node is common to XML exports made for VAT Listing, VAT Intra,
@@ -40,11 +25,11 @@ def _get_xml_export_representative_node(report):
     """
     representative = report.env.company.account_representative_id
     if representative:
-        vat_no, country_from_vat = _split_vat_number_and_country_code(representative.vat or "")
+        country_from_vat, vat_no = split_vat(representative.vat, default_country_code=representative.country_id.code or 'be')
         country = report.env['res.country'].search([('code', '=', country_from_vat)], limit=1)
         phone = representative.phone or ''
         node_values = {
-            'vat': stdnum.get_cc_module('be', 'vat').compact(vat_no),   # Sanitize VAT number
+            'vat': vat_no,
             'name': representative.name,
             'street': "%s %s" % (representative.street or "", representative.street2 or ""),
             'zip': representative.zip,
@@ -115,7 +100,7 @@ class L10n_BeTaxReportHandler(models.AbstractModel):
 
     def export_tax_report_to_xml(self, options):
         report = self.env['account.report'].browse(options['report_id'])
-        vat_no, country_from_vat = _split_vat_number_and_country_code(report.get_vat_for_export(options))
+        country_from_vat, vat_no = split_vat(report.get_vat_for_export(options))
         sender_company = report._get_sender_company_for_export(options)
         default_address = sender_company.partner_id.address_get()
         address = self.env['res.partner'].browse(default_address.get("default")) or sender_company.partner_id
@@ -162,18 +147,12 @@ class L10n_BeTaxReportHandler(models.AbstractModel):
             'comment': options.get('comment'),
             'prorata_deduction': deduction_text,
             'representative_node': _get_xml_export_representative_node(report),
-            'rectification_ref': options.get('rectification_ref'),
         }
 
         rslt = Markup(f"""<?xml version="1.0"?>
 <ns2:VATConsignment xmlns="http://www.minfin.fgov.be/InputCommon" xmlns:ns2="http://www.minfin.fgov.be/VATConsignment" VATDeclarationsNbr="1">
     %(representative_node)s
     <ns2:VATDeclaration SequenceNumber="1" DeclarantReference="%(send_ref)s">""") % file_data
-
-        if file_data.get('rectification_ref'):
-            rslt += Markup("""
-        <ns2:ReplacedVATDeclaration>%(rectification_ref)s</ns2:ReplacedVATDeclaration>
-            """) % file_data
 
         rslt += Markup(f"""<ns2:Declarant>
             <VATNumber xmlns="http://www.minfin.fgov.be/InputCommon">%(only_vat)s</VATNumber>
@@ -212,42 +191,35 @@ class L10n_BeTaxReportHandler(models.AbstractModel):
 
         # Iterate on the report lines, using this mapping
         for line in lines:
-            model, line_id = report._parse_line_id(line['id'])[-1][1:]
+            model, line_id = report._parse_line_id(line.id)[-1][1:]
             if (
                     model == 'account.report.line'
                     and line_id in lines_grids_map
-                    and not currency_id.is_zero(line['columns'][colname_to_idx['balance']]['no_format'])
+                    and not currency_id.is_zero(line.columns[colname_to_idx['balance']].no_format)
             ):
                 grids_list.append((lines_grids_map[line_id].lstrip('-'),
-                                   line['columns'][colname_to_idx['balance']]['no_format'],
-                                   line['columns'][colname_to_idx['balance']].get('carryover_bounds', False),
-                                   line['columns'][colname_to_idx['balance']].get('report_line_id', False)))
+                                   line.columns[colname_to_idx['balance']].no_format))
 
         # We are ignoring all grids that have 0 as values, but the belgian government always require a value at
         # least in either the grid 71 or 72. So in the case where both are set to 0, we are adding the grid 71 in the
         # xml with 0 as a value.
         if len([item for item in grids_list if item[0] == '71' or item[0] == '72']) == 0:
-            grids_list.append(('71', 0, False, None))
+            grids_list.append(('71', 0))
 
         # Government expects a value also in grid '00' in case of vat_unit
         if options.get('tax_unit') and options.get('tax_unit') != 'company_only' and len([item for item in grids_list if item[0] == '00']) == 0:
-            grids_list.append(('00', 0, False, None))
+            grids_list.append(('00', 0))
 
         grids_list = sorted(grids_list, key=lambda a: a[0])
-        for code, amount, carryover_bounds, tax_line in grids_list:
-            if carryover_bounds:
-                amount, dummy = report.get_amounts_after_carryover(tax_line, amount,
-                                                                 carryover_bounds, options, 0)
-                # Do not add grids that became 0 after carry over
-                if amount == 0:
-                    continue
-
-            grid_amount_data = {
-                'code': code,
-                'amount': '%.2f' % amount,
-            }
-            rslt += Markup("""
-            <ns2:Amount GridNumber="%(code)s">%(amount)s</ns2:Amount>""") % grid_amount_data
+        for code, amount in grids_list:
+            # These tags are carried over the next period, they should not appear in the xml if amount is below 0
+            if code not in ('81', '82', '83', '86', '87', '88') or currency_id.compare_amounts(amount, 0) == 1:
+                grid_amount_data = {
+                    'code': code,
+                    'amount': '%.2f' % amount,
+                }
+                rslt += Markup("""
+                <ns2:Amount GridNumber="%(code)s">%(amount)s</ns2:Amount>""") % grid_amount_data
 
         rslt += Markup("""
         </ns2:Data>
@@ -280,26 +252,138 @@ class L10n_BeTaxReportHandler(models.AbstractModel):
         return self.env['ir.qweb']._render('l10n_be_reports.vat_export_prorata', deduction_dict)
 
     def _customize_warnings(self, report, options, all_column_groups_expression_totals, warnings):
-        def _evaluate_check(check_func):
-            return all(
-                check_func(expression_totals)
-                for expression_totals in all_column_groups_expression_totals.values()
-            )
+
+        def val(expr_totals, code):
+            return expr_totals[expr_map[code]]['value']
+
+        def sum_vals(expr_totals, *codes):
+            return sum(val(expr_totals, c) for c in codes)
+
+        def evaluate(check):
+            return all(check(expr_totals) for expr_totals in all_column_groups_expression_totals.values())
 
         super()._customize_warnings(report, options, all_column_groups_expression_totals, warnings)
+
         expr_map = {
             line.code: line.expression_ids.filtered(lambda x: x.label == 'balance')
             for line in report.line_ids
             if line.code
         }
+        currency = self.env.company.currency_id
+        rounding_tolerance = 62.0
 
-        if _evaluate_check(lambda expr_totals: any(
-            [expr_totals[expr_map[grid]]['value'] for grid in ('c44', 'c46L', 'c46T', 'c48s44', 'c48s46L', 'c48s46T')]
-        )):
-            # remind user to submit EC Sales Report if any ec sales related taxes
-            warnings['l10n_be_reports.tax_report_warning_ec_sales_reminder'] = {}
+        checks = [
+            (
+                # Code 13
+                self.env._("Negative amounts not allowed"),
+                lambda e: all(
+                    currency.compare_amounts(val(e, code), 0.0) >= 0
+                    for code, expr in expr_map.items()
+                    if code not in ('c81', 'c82', 'c83', 'c86', 'c87', 'c88')  # carryover lines
+                ),
+            ),
+            (
+                # Code C
+                self.env._('[55] > 0 if [86] > 0 or [88] > 0'),
+                lambda e: currency.compare_amounts(val(e, 'c55'), 0.0) > 0
+                if currency.compare_amounts(val(e, 'c86'), 0.0) > 0 or currency.compare_amounts(val(e, 'c88'), 0.0) > 0 else True,
+            ),
+            (
+                # Code D
+                self.env._('[56] + [57] > 0 if [87] > 0'),
+                lambda e: currency.round(sum_vals(e, 'c56', 'c57')) > 0 if val(e, 'c87') > 0 else True,
+            ),
+            (
+                # Code O
+                '[01] * 6% + [02] * 12% + [03] * 21% = [54] ± 62',
+                lambda e: currency.compare_amounts(rounding_tolerance, abs(
+                    val(e, 'c01') * 0.06 +
+                    val(e, 'c02') * 0.12 +
+                    val(e, 'c03') * 0.21 -
+                    val(e, 'c54')
+                )) >= 0,
+            ),
+            (
+                # Code P
+                '([84] + [86] + [88]) * 21% >= [55] - 62',
+                lambda e: currency.compare_amounts(sum_vals(e, 'c84', 'c86', 'c88') * 0.21, val(e, 'c55') - rounding_tolerance) >= 0,
+            ),
+            (
+                # Code Q
+                '([85] + [87]) * 21% >= ([56] + [57]) - 62',
+                lambda e: currency.compare_amounts(sum_vals(e, 'c85', 'c87') * 0.21, sum_vals(e, 'c56', 'c57') - rounding_tolerance) >= 0,
+            ),
+            (
+                # Code S
+                '([81] + [82] + [83] + [84] + [85]) * 50% >= [59]',
+                lambda e: currency.compare_amounts(sum_vals(e, 'c81', 'c82', 'c83', 'c84', 'c85') * 0.5, val(e, 'c59')) >= 0,
+            ),
+            (
+                # Code T
+                '[85] * 21% >= [63] - 62',
+                lambda e: currency.compare_amounts(val(e, 'c85') * 0.21, val(e, 'c63') - rounding_tolerance) >= 0,
+            ),
+            (
+                # Code U
+                '[49] * 21% >= [64] - 62',
+                lambda e: currency.compare_amounts(val(e, 'c49') * 0.21, val(e, 'c64') - rounding_tolerance) >= 0,
+            ),
+            (
+                # Code AC
+                self.env._('[88] < ([81] + [82] + [83] + [84]) * 100 if [88] > 99,999'),
+                lambda e: currency.compare_amounts(val(e, 'c88'), sum_vals(e, 'c81', 'c82', 'c83', 'c84') * 100) == -1
+                if currency.compare_amounts(val(e, 'c88'), 99_999) > 0 else True,
+            ),
+            (
+                # Code AD
+                self.env._('[44] < ([00] + [01] + [02] + [03] + [45] + [46] + [47] + [48] + [49]) * 200 if [44] > 99,999'),
+                lambda e: currency.compare_amounts(val(e, 'c44'), sum_vals(e, 'c00', 'c01', 'c02', 'c03', 'c45', 'c46', 'c47', 'c48', 'c49') * 200) == -1
+                if currency.compare_amounts(val(e, 'c44'), 99_999) > 0 else True,
+            ),
+        ]
 
-        if _evaluate_check(lambda expr_totals: any(
-            self.env.company.currency_id.compare_amounts(expr_totals[expr]['value'], 0) < 0 for expr in expr_map.values()
-        )):
-            warnings['l10n_be_reports.tax_report_warning_negative_amounts'] = {'alert_type': 'danger'}
+        failed_controls = [name for name, check in checks if not evaluate(check)]
+        if failed_controls:
+            warnings['l10n_be_reports.tax_report_warning_checks'] = {
+                'failed_controls': failed_controls,
+                'alert_type': 'danger',
+            }
+
+    def generate_zip_file_from_intervat(self, options):
+        """ Fetch pdf and xml file from intervat for one vat declaration.
+
+        :return: Zip file with both pdf and xml file of the declaration.
+        """
+        tax_return = self.env['account.return'].browse(options['return_id'])
+        vat_declaration = self.env['l10n_be.vat.declaration'].search([
+            ('return_id', '=', tax_return.id),
+            ('rectification_declaration_id', '=', False),
+        ], limit=1)
+        if not vat_declaration:
+            raise UserError(self.env._("No VAT declaration found for this period."))
+
+        file_name = f"intervat_{options['date']['date_from']}_{options['date']['date_to']}"
+        if not vat_declaration.declaration_file:
+            pdf_file = vat_declaration.return_id.company_id._l10n_be_fetch_document_from_myminfin(vat_declaration.pdf_ref)
+            xml_file = vat_declaration.return_id.company_id._l10n_be_fetch_document_from_myminfin(vat_declaration.xml_ref)
+
+            with io.BytesIO() as buffer:
+                with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_DEFLATED) as zipfile_obj:
+                    zipfile_obj.writestr(f"{file_name}.pdf", pdf_file)
+                    zipfile_obj.writestr(f"{file_name}.xml", xml_file)
+
+                file = {
+                    'file_name': f"{file_name}.zip",
+                    'file_content': buffer.getvalue(),
+                    'file_type': 'zip',
+                }
+                tax_return._add_attachment(file)
+                vat_declaration.declaration_file = BinaryBytes(file['file_content'])
+
+                return file
+
+        return {
+            'file_name': f"{file_name}.zip",
+            'file_content': vat_declaration.declaration_file.content,
+            'file_type': 'zip',
+        }

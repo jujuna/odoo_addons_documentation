@@ -3,14 +3,21 @@
 from collections import defaultdict
 import time
 import uuid
+import logging
 
 from werkzeug.urls import url_quote
 from markupsafe import Markup
+from datetime import timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from odoo import _, api, fields, models, Command
-from odoo.exceptions import UserError, ValidationError
-from odoo.tools import get_lang, is_html_empty, format_date
+from odoo.exceptions import UserError, ValidationError, AccessError
+from odoo.tools import SQL, get_lang, is_html_empty, format_date, formataddr, html2plaintext
 from odoo.tools.urls import urljoin as url_join
+
+MAX_EXTERNAL_SIGNATURE_UPLOAD_SIZE = 25 * 1024 * 1024
+
+_logger = logging.getLogger(__name__)
 
 
 class SignRequest(models.Model):
@@ -28,7 +35,7 @@ class SignRequest(models.Model):
     @api.model
     def _selection_target_model(self):
         return [(model.model, model.name)
-                for model in self.env['ir.model'].sudo().search([('model', '!=', 'sign.request'), ('is_mail_thread', '=', 'True')])]
+                for model in self.env['ir.model'].sudo().search([('model', '!=', 'sign.request'), ('is_mail_thread', '=', True)])]
 
     template_id = fields.Many2one('sign.template', string="Template", required=True, index=True)
     subject = fields.Char(string="Email Subject")
@@ -42,6 +49,7 @@ class SignRequest(models.Model):
     request_item_ids = fields.One2many('sign.request.item', 'sign_request_id', string="Signers", copy=True)
     state = fields.Selection([
         ("shared", "Shared"),
+        ("scheduled", "Scheduled"),
         ("sent", "To Sign"),
         ("signed", "Signed"),
         ("canceled", "Cancelled"),
@@ -49,19 +57,21 @@ class SignRequest(models.Model):
     ], default='sent', tracking=True, group_expand=True, copy=False, index=True)
 
     template_document_ids = fields.Many2many('sign.document', string="Documents", compute='_compute_template_document_ids')
-    completed_document_ids = fields.One2many('sign.completed.document', 'sign_request_id', string="Completed Documents Binaries", copy=False)
+    # only holds the working copies that already exist, as they are created lazily, so anything
+    # about to write into a document's file wants to call _get_signing_documents() instead
+    request_document_ids = fields.One2many('sign.request.document', 'sign_request_id', string="Request Documents Binaries", copy=False)
     nb_wait = fields.Integer(string="Sent Requests", compute="_compute_stats", store=True)
     nb_closed = fields.Integer(string="Completed Signatures", compute="_compute_stats", store=True)
     nb_total = fields.Integer(string="Requested Signatures", compute="_compute_stats", store=True)
     progress = fields.Char(string="Progress", compute="_compute_progress", compute_sudo=True)
     start_sign = fields.Boolean(string="Signature Started", help="At least one signer has signed the document.", compute="_compute_progress", compute_sudo=True)
-    integrity = fields.Boolean(string="Integrity of the Sign request", compute='_compute_hashes', compute_sudo=True)
+    integrity = fields.Boolean(string="Integrity of the Sign request", compute='_compute_integrity', compute_sudo=True)
 
     active = fields.Boolean(default=True, string="Active", copy=False)
     favorited_ids = fields.Many2many('res.users', string="Favorite of")
 
     color = fields.Integer()
-    request_item_infos = fields.Binary(compute="_compute_request_item_infos")
+    request_item_infos = fields.Json(compute="_compute_request_item_infos")
     last_action_date = fields.Datetime(related="message_ids.create_date", readonly=True, string="Last Action Date")
     completion_date = fields.Date(string="Completion Date", compute="_compute_completion_date", compute_sudo=True, store=True)
     communication_company_id = fields.Many2one('res.company', string="Company used for communication", default=lambda self: self.env.company)
@@ -79,12 +89,20 @@ class SignRequest(models.Model):
     validity = fields.Date(string='Valid Until')
     reminder_enabled = fields.Boolean(default=False)
     reminder = fields.Integer(string='Reminder', default=7)
-    last_reminder = fields.Date(string='Last reminder', default=lambda self: fields.Date.today())
+    last_reminder = fields.Date(string='Last reminder', default=fields.Date.context_today)
     certificate_reference = fields.Boolean(string="Certificate Reference", default=False)
 
     send_channel = fields.Selection([
         ("email", "Email"),
+        ("shared", "Shared Link"),
     ], string="Delivery Method", default='email', required=True)
+    scheduled_date = fields.Datetime(string='Scheduled Date')
+
+    sign_activity_ids = fields.One2many(
+        'mail.activity',
+        'sign_request_id',
+        string='Linked Activities',
+    )
 
     @api.depends('template_id')
     def _compute_template_document_ids(self):
@@ -121,7 +139,7 @@ class SignRequest(models.Model):
             return NotImplemented
         my_partner_id = self.env.user.partner_id
         documents_ids = self.env['sign.request.item'].search([('partner_id', '=', my_partner_id.id), ('state', '=', 'sent'), ('is_mail_sent', '=', True)]).mapped('sign_request_id').ids
-        return [('id', 'not in', documents_ids)]
+        return [('id', 'in', documents_ids)]
 
     @api.depends('request_item_ids.state')
     def _compute_stats(self):
@@ -148,7 +166,7 @@ class SignRequest(models.Model):
                 'id': item.id,
                 'partner_name': item.display_name,
                 'state': item.state,
-                'signing_date': item.signing_date or ''
+                'signing_date': format_date(self.env, item.signing_date) if item.signing_date else ''
             } for item in request.request_item_ids]
 
     @api.depends('message_follower_ids.partner_id')
@@ -172,8 +190,16 @@ class SignRequest(models.Model):
             sign_request.template_tags = [Command.set(sign_request.template_id.tag_ids.ids)]
             sign_request.attachment_ids.write({'res_model': sign_request._name, 'res_id': sign_request.id})
             sign_request.message_subscribe(partner_ids=sign_request.request_item_ids.partner_id.ids)
+            sign_request._check_and_enforce_signature_ordering()  # in case one of the signers are signing himself using external service
+            sign_request._check_external_signature_documents_size()
             sign_request._populate_constant_items()
             self.env['sign.log'].sudo().create({'sign_request_id': sign_request.id, 'action': 'create'})
+
+            if sign_request.scheduled_date:
+                sign_request.state = 'scheduled'
+                self.env.ref('sign.ir_cron_sign_state_action')._trigger(
+                    at=sign_request.scheduled_date + timedelta(minutes=1)
+                )
 
         if not self.env.context.get('no_sign_mail'):
             sign_requests.send_signature_accesses()
@@ -188,14 +214,13 @@ class SignRequest(models.Model):
                 sign_values_by_role[item.responsible_id][str(item.id)] = {
                     # For constant strikethrough items, use "striked" instead of item name,
                     # since item name returns "strikethrough" but we need "striked" to set the value correctly.
-                    "name": item.name if item.type_id.item_type != 'strikethrough' else 'striked',
+                    "name": item.name if item.type_id.sudo().item_type != 'strikethrough' else 'striked',
                     "type_id": item.type_id.id,
                     "auto_field": item.type_id.sudo().auto_field
                 }
 
         if not sign_values_by_role:
             return
-
         for sign_request_item in self.sudo().request_item_ids:
             if sign_request_item.role_id in sign_values_by_role:
                 sign_items = sign_values_by_role[sign_request_item.role_id]
@@ -203,7 +228,9 @@ class SignRequest(models.Model):
                 for key, value in sign_items.items():
                     corrected_dict[key] = value["name"]
                     if value.get("auto_field"):
-                        corrected_dict[key] = sign_request_item._get_auto_field_value({
+                        # For custom fields, the auto-fill functionality will only work when `auto_field` is defined.
+                        # Because constant fields won't ever have a 'sign.request.item.value' reference to be filled.
+                        corrected_dict[key] = sign_request_item.with_context(populate_constant_item=True)._get_auto_field_value({
                             "id": value.get("type_id"),
                             "auto_field": value.get("auto_field")
                         })
@@ -211,12 +238,19 @@ class SignRequest(models.Model):
                 sign_request_item._fill(corrected_dict)
 
     def write(self, vals):
-        today = fields.Date.today()
-        if vals.get('validity') and fields.Date.from_string(vals['validity']) < today:
-            vals['state'] = 'expired'
+        today = fields.Date.context_today(self)
+        if vals.get('validity'):
+            if fields.Date.from_string(vals['validity']) < today:
+                vals['state'] = 'expired'
+            self.sign_activity_ids.date_deadline = vals['validity']
 
-        res = super().write(vals)
-        return res
+        if vals.get('reference_doc'):
+            model, rec = vals['reference_doc'].split(',')
+            record = self.env[model].browse(int(rec)).exists()
+            if not record or not record.has_access('read'):
+                raise ValidationError(self.env._("You don't have access to the linked document."))
+
+        return super().write(vals)
 
     def copy_data(self, default=None):
         default = dict(default or {})
@@ -240,9 +274,34 @@ class SignRequest(models.Model):
         if any(r.state == 'signed' for r in self):
             raise UserError(_("Signed documents cannot be deleted for legal reasons. Please archive them instead."))
 
+    @api.ondelete(at_uninstall=True)
+    def _unlink_working_documents(self):
+        # The working documents keep their file in an attachment, so they have to be removed
+        # through the ORM. Their 'restrict' foreign key makes sure nothing skips this.
+        self.request_document_ids.sudo().unlink()
+
     def action_archive(self):
         self.filtered(lambda sr: sr.active and sr.state == 'sent').cancel()
         return super().action_archive()
+
+    def action_send(self):
+        if len(self) != 1:
+            raise UserError(self.env._("Please select only one document to send."))
+        return self.template_id.open_sign_send_dialog()
+
+    def action_save_as_template(self):
+        if len(self) != 1:
+            raise UserError(self.env._("Please select only one document to save as a template."))
+        self.template_id.write({'active': True, 'is_one_time_request': False, 'favorited_ids': [Command.link(self.env.user.id)]})
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': self.env._("Saved as a template"),
+                'type': 'success',
+                'next': self.env['ir.actions.act_window']._for_xml_id('sign.sign_template_action'),
+            },
+        }
 
     def _check_senders_validity(self):
         invalid_senders = self.create_uid.filtered(lambda u: not u.email_formatted)
@@ -260,8 +319,13 @@ class SignRequest(models.Model):
     def _check_signers_partners_validity(self):
         for sign_request in self:
             sign_request_items = sign_request.request_item_ids
-            if sign_request.state != 'shared' and any(not sri.partner_id for sri in sign_request_items):
-                raise ValidationError(_("A non-shared sign request's should not have any signer with an empty partner"))
+            if sign_request.state != 'shared':
+                email_list = [sri.signer_email for sri in sign_request_items if sri.signer_email]
+                alias_emails = self.env['mail.alias.domain'].sudo()._find_aliases(email_list)
+                if alias_emails:
+                    raise UserError(_("This email address is already used as a mail alias and cannot be used for signing."))
+                if any(not sri.partner_id for sri in sign_request_items):
+                    raise ValidationError(_("Signer(s) not set."))
 
     def _get_final_recipients(self):
         all_recipients = set(self.request_item_ids.mapped('signer_email')) | \
@@ -281,6 +345,16 @@ class SignRequest(models.Model):
         self.ensure_one()
         request_items = self.request_item_ids.filtered(lambda r: not r.partner_id or (r.state == 'sent' and r.partner_id.id == self.env.user.partner_id.id))
         sequenced_signature_mail = any(req.mail_sent_order > 1 for req in self.request_item_ids)
+
+        can_sign_now = False
+        if request_items:
+            if not sequenced_signature_mail:
+                can_sign_now = True
+            else:
+                # If mail_sent_order set, only allow signing if the current user is in the next batch of signers to receive the mail.
+                next_items = self._get_next_sign_request_items()
+                can_sign_now = self.env.user.partner_id in next_items.partner_id
+
         return {
             'name': self.reference,
             'type': 'ir.actions.client',
@@ -293,6 +367,9 @@ class SignRequest(models.Model):
                 'state': self.state,
                 'request_item_states': {str(item.id): item.is_mail_sent for item in self.request_item_ids},
                 'sequenced_signature_mail': sequenced_signature_mail,
+                'can_sign_now': can_sign_now,
+                'document_count': len(self.sudo().template_id.document_ids),
+                'template_id': self.template_id.id,
             },
         }
 
@@ -303,6 +380,19 @@ class SignRequest(models.Model):
             request_items = self.request_item_ids.filtered(lambda r: not r.partner_id or (r.state == 'sent' and r.partner_id.id == self.env.user.partner_id.id))
         if not request_items:
             return
+        # signer may be opening the document again while an external session is still running,
+        # so it catches up before deciding where they should go
+        request_item_sudo = request_items[:1].sudo()
+        request_item_sudo._sync_external_signature()
+        if request_item_sudo.state == 'sent' and request_item_sudo.role_id.requires_external_signature:
+            # their signature is still valid, so they carry on where they stopped
+            signing_url = request_item_sudo._get_external_signature_url().get('url')
+            if signing_url:
+                return {
+                    'type': 'ir.actions.act_url',
+                    'url': signing_url,
+                    'target': 'self',
+                }
         return {
             'name': self.reference,
             'type': 'ir.actions.client',
@@ -310,12 +400,16 @@ class SignRequest(models.Model):
             'context': {
                 'id': self.id,
                 'token': request_items[:1].sudo().access_token,
+                'need_to_sign': True,
                 'create_uid': self.create_uid.id,
                 'state': self.state,
                 'request_item_states': {item.id: item.is_mail_sent for item in self.request_item_ids},
                 'template_editable': self.nb_closed == 0,
                 'token_list': request_items[1:].sudo().mapped('access_token'),
                 'name_list': [item.partner_id.name for item in request_items[1:]],
+                'document_count': len(self.sudo().template_id.document_ids),
+                'request_item_id_list': request_items[1:].ids,
+                'reference': self.reference,
             },
         }
 
@@ -375,8 +469,8 @@ class SignRequest(models.Model):
             result = {"action": action, "label": _("Back to %s", self.reference_doc._description), "custom_action": True}
         return result
 
-    @api.onchange("progress", "start_sign")
-    def _compute_hashes(self):
+    @api.depends("progress", "start_sign")
+    def _compute_integrity(self):
         for document in self:
             try:
                 document.integrity = self.sign_log_ids._check_document_integrity()
@@ -415,7 +509,7 @@ class SignRequest(models.Model):
             access_token = self.access_token
         subject = _("The document %(template_name)s has been rejected by %(partner_name)s",
             template_name=self.template_id.name,
-            partner_name=partner.name,
+            partner_name=refuser.name,
         )
         base_url = self.get_base_url()
         partner_lang = get_lang(self.env, lang_code=partner.lang).code
@@ -432,23 +526,34 @@ class SignRequest(models.Model):
             body,
             record_name=self.reference,
             notif_values={
-                'model_description': _('Signature'),
+                'model_description': _('Signature Refusal'),
                 'company': self.communication_company_id or self.create_uid.company_id,
                 'partner': partner,
             },
             mail_values={
                 'subject': subject,
+                **({'email_to': formataddr((sign_request_item.partner_id.name, sign_request_item.signer_email))} if sign_request_item else {}),
             },
             force_send=force_send,
         )
 
     def send_signature_accesses(self):
         # Send/Resend accesses for 'sent' sign.request.items by email
-        allowed_request_ids = self.filtered(lambda sr: sr.state == 'sent')
+        today = fields.Date.context_today(self)
+        allowed_request_ids = self.filtered(lambda sr: sr.state in ['scheduled', 'sent'])
         allowed_request_ids._check_senders_validity()
         for sign_request in allowed_request_ids:
             sign_request._get_next_sign_request_items().send_signature_accesses()
-            sign_request.last_reminder = fields.Date.today()
+            sign_request.last_reminder = today
+        if self.env.context.get('show_reminder_notification'):
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'message': self.env._("Reminder sent successfully"),
+                    'type': 'success',
+                },
+            }
 
     @api.model
     def _cron_reminder(self):
@@ -457,24 +562,44 @@ class SignRequest(models.Model):
         # in one query, the code will handle them differently
         # note: archived requests are not fetched.
         self.flush_model()
-        self.env.cr.execute(f'''
+        res = self.env.execute_query(SQL('''
         SELECT id
         FROM sign_request sr
         WHERE sr.state = 'sent'
         AND active = TRUE
         AND (
-            sr.validity < '{today}'
-            OR (sr.reminder_enabled AND sr.last_reminder + sr.reminder * ('1 day'::interval) <= '{today}')
+            sr.validity < %(today)s
+            OR (sr.reminder_enabled AND sr.last_reminder + sr.reminder * ('1 day'::interval) <= %(today)s)
         )
-        ''')
-        res = self.env.cr.fetchall()
+        ''', today=today))
         request_to_send = self.env['sign.request']
         for request in self.browse(v[0] for v in res):
             if request.validity and request.validity < today:
                 request.state = 'expired'
+                for item in request.request_item_ids.filtered('external_signature_session_token'):
+                    item._cancel_external_signature()
+                request.request_document_ids._discard_pending_signature()
             else:
                 request_to_send += request
-        request_to_send.with_context(force_send=False).send_signature_accesses()
+        # If an external signing service already completed the signature, but the
+        # signature was never synchronized back, consider the signer complete instead
+        # of reminding them to sign again.
+        for item in request_to_send.request_item_ids.filtered(
+                lambda item: item.state == 'sent' and item.role_id.requires_external_signature):
+            item._sync_external_signature()
+        request_to_send.filtered(lambda request: request.state == 'sent').with_context(force_send=False).send_signature_accesses()
+
+    @api.model
+    def _cron_update_state(self):
+        """
+        Automatically update sign requests from 'scheduled' to 'sent'
+        when their scheduled_date has passed.
+        """
+        self.env['sign.request'].search([
+            ('state', '=', 'scheduled'),
+            ('scheduled_date', '<=', fields.Datetime.now()),
+            ('scheduled_date', '!=', False),
+        ]).state = 'sent'
 
     def _sign(self):
         """ Sign a SignRequest. It can only be used in the SignRequestItem._sign """
@@ -482,38 +607,341 @@ class SignRequest(models.Model):
         if self.state != 'sent' or any(sri.state != 'completed' for sri in self.request_item_ids):
             raise UserError(_("This sign request cannot be signed"))
         self.write({'state': 'signed'})
+
+        if self.sign_activity_ids:
+            self.sign_activity_ids._action_done()
         self._send_completed_documents()
 
         if self.reference_doc:
             model = self.env['ir.model']._get(self.reference_doc._name)
             if model.is_mail_thread:
-                self.reference_doc.message_post_with_source(
-                    "sign.message_signature_link",
-                    render_values={"request": self, "salesman": self.env.user.partner_id},
-                    subtype_xmlid='mail.mt_note',
-                )
                 # attach a copy of the signed document to the record for easy retrieval
-                attachment_values = []
-                for doc in self.completed_document_ids:
-                    attachment_values.append({
-                        "name": doc.document_id.name,
-                        "datas": doc.file,
-                        "type": "binary",
-                        "res_model": self.reference_doc._name,
-                        "res_id": self.reference_doc.id
-                    })
-                self.env["ir.attachment"].create(attachment_values)
+                attachment_values = [{
+                    "name": doc.document_id.name,
+                    "raw": doc.file,
+                    "type": "binary",
+                    "res_model": self.reference_doc._name,
+                    "res_id": self.reference_doc.id
+                } for doc in self._get_completed_documents()]
+                self.env["ir.attachment"].with_context(no_document=True).create(attachment_values)
+
+        self._write_auto_fields_value(self._sync_auto_field_value())
+
+    def _sync_auto_field_value(self):
+        """ Resolve values from a signed document to candidate target record updates.
+
+        This method processes items configured with ``auto_field`` and ``auto_write``.
+        To prevent data conflicts, if multiple signature items map to the same Odoo field,
+        only fields with exactly one unique new value are returned.
+
+        :return: Mapping of target records to their candidate field updates.
+                 Format: {target_record: {field_name: set(values)}}
+        :rtype: dict
+        """
+        self.ensure_one()
+
+        items_to_update = self.sudo().template_id.sign_item_ids.filtered(
+            lambda i:
+            i.type_id.auto_field and
+            i.type_id.auto_write and
+            not i.constant
+        )
+
+        values_dict = self.env['sign.request.item.value'].sudo()._read_group(
+            [('sign_item_id', 'in', items_to_update.ids), ('sign_request_id', '=', self.id)],
+            groupby=['sign_item_id'],
+            aggregates=['value:array_agg']
+        )
+        signed_values = {
+            sign_item.id: values[0] for sign_item, values in values_dict
+        }
+
+        auto_fields_update = {}
+        failed_fields_by_record = defaultdict(list)
+        lang_code = (self.communication_company_id or self.create_uid.company_id).partner_id.lang
+        for item in items_to_update:
+            sign_request_item = self.request_item_ids.filtered(lambda r: r.role_id.id == item.responsible_id.id)
+            # Get the base record and the raw field path (e.g. 'company_id.name')
+            base_record_sudo = sign_request_item._get_auto_field_target_record(item.type_id)
+            new_value = signed_values.get(item.id)
+            if not base_record_sudo or not new_value:
+                continue
+
+            try:
+                # Resolve the dot notation first to get the actual target record and field
+                field_path = item.type_id.auto_field
+                resolved_record, resolved_field = self.env['sign.request.item']._resolve_auto_field_path(base_record_sudo, field_path)
+                if not resolved_record or not resolved_field:
+                    raise ValueError(self.env._(  # noqa: TRY301
+                        "Could not resolve auto-field path %(path)s from %(record)s",
+                        path=field_path, record=base_record_sudo.display_name,
+                    ))
+
+                # Fetch the field definition from the resolved record's model
+                field_record_sudo = self.env['ir.model.fields'].sudo()._get(resolved_record._name, resolved_field)
+
+                # Format the value using the resolved record and field definition
+                processed_value = self.env['sign.request.item']._parse_auto_field_value(
+                    field_record_sudo=field_record_sudo,
+                    item_type_sudo=item.type_id,
+                    record=resolved_record,
+                    value=new_value,
+                    lang_code=lang_code
+                )
+
+                # Compare against the actual current value of the resolved record
+                # We use `is not None` so we don't accidentally skip valid '0' integers or 'False' booleans
+                if processed_value is not None and processed_value != resolved_record[resolved_field]:
+                    # Group strictly by the resolved record and resolved field
+                    record_fields = auto_fields_update.setdefault(resolved_record, {})
+                    record_fields.setdefault(resolved_field, set()).add(processed_value)
+            except Exception as e:  # noqa: BLE001
+                field_label = self._humanize_auto_field_path(item.type_id.model_id.model, item.type_id.auto_field)
+                failed_fields_by_record[base_record_sudo].append({
+                    'old_value': self.env._("Previous value"),
+                    'new_value': str(new_value),
+                    'label': field_label,
+                })
+                _logger.warning(
+                    "Sign Sync: Failed to resolve auto-field '%s' (value=%s) on %s for sign request %s. Error: %s",
+                    field_label, new_value, base_record_sudo, self.id, e
+                )
+
+        for base_record, changed_fields in failed_fields_by_record.items():
+            self._post_auto_field_tracking_message(
+                record_to_post=self,
+                message=self.env._(
+                    "Failed to auto-update fields on %(record)s",
+                    record=Markup("<b>%s</b>") % base_record._get_html_link(),
+                ),
+                changed_fields=changed_fields,
+                success=False,
+            )
+
+        return auto_fields_update
+
+    def _write_auto_fields_value(self, auto_fields_update):
+        """ Apply candidate field values to their respective target records.
+
+        Each target write is wrapped in its own ``cr.savepoint()`` so that a
+        failure on one target rolls back only that write. The signature itself
+        (already persisted earlier in the transaction) and the other targets'
+        writes are left untouched. On failure the partial write is rolled back
+        before the failure chatter message is posted, so only the chatter
+        persists.
+
+        :param dict auto_fields_update: Mapping of target records to their field updates.
+                                        Format: {target_record: {field_name: set(values)}}
+        """
+        for target_record, fields_map in auto_fields_update.items():
+            # Clean dictionary comprehension to grab only fields with exactly 1 unique change
+            vals_to_write = {
+                field_name: field_unique_values.pop()
+                for field_name, field_unique_values in fields_map.items()
+                if len(field_unique_values) == 1
+            }
+            if not vals_to_write:
+                continue
+
+            # Format old/new values for the chatter the same way Odoo formats
+            # tracked field changes (localized numbers, currency symbol for
+            # monetary, selection labels, ...). ``_create_mail_tracking_values``
+            # covers every field type except ``html``. It lives on the abstract
+            # ``mail.track.mixin`` but its logic is generic, so we call it off
+            # the mixin class with the target record. This works
+            # whether or not the target model inherits the mixin (an auto-field
+            # path may resolve to a non-thread model).
+            fields_info = target_record.fields_get(list(vals_to_write))
+            changed_fields = []
+            for fname, new_val in vals_to_write.items():
+                field_info = fields_info[fname]
+                old_val = target_record[fname]
+                if field_info['type'] == 'html':
+                    old_display = "None" if is_html_empty(old_val) else html2plaintext(old_val)
+                    new_display = "None" if is_html_empty(new_val) else html2plaintext(new_val)
+                else:
+                    # Call it off the class so we can pass the target as ``self``,
+                    # even if the target model doesn't inherit the mixin.
+                    tracking_values = self.pool['mail.track.mixin']._create_mail_tracking_values(
+                        target_record, old_val, new_val, fname, field_info
+                    )
+                    old_display = tracking_values['old_value']
+                    new_display = tracking_values['new_value']
+                changed_fields.append({
+                    'old_value': old_display,
+                    'new_value': new_display,
+                    'label': field_info['string'],
+                })
+
+            # ``_track_discard`` and ``message_post`` only exist on
+            # ``mail.thread`` records, a target not inheriting it has
+            # neither, so guard both chatter operations on this target.
+            target_is_thread = isinstance(target_record, self.pool['mail.thread'])
+            try:
+                sign_request_sender = self.create_uid
+                # Isolate each target write so a failure rolls back only that
+                # write, leaving the signature and the other targets intact.
+                with self.env.cr.savepoint():
+                    target_record.with_user(sign_request_sender).with_context(
+                        mail_notrack=True, tracking_disable=True
+                    ).write(vals_to_write)
+                    if target_is_thread:
+                        target_record.sudo()._track_discard()
+                self._post_auto_field_tracking_message(
+                    record_to_post=self,
+                    message=self.env._(
+                        "Auto-updated fields on %(record)s",
+                        record=Markup("<b>%s</b>") % target_record._get_html_link(),
+                    ),
+                    changed_fields=changed_fields,
+                )
+                if target_is_thread:
+                    self._post_auto_field_tracking_message(
+                        record_to_post=target_record,
+                        message=self.env._(
+                            "Fields auto-updated by signing %(record)s",
+                            record=Markup("<b>%s</b>") % self._get_html_link(),
+                        ),
+                        changed_fields=changed_fields,
+                    )
+            except (UserError, ValidationError, AccessError, ValueError, TypeError) as e:
+                _logger.warning(
+                    "Sign Sync: Failed to update auto-fields on %s with values %s. Error: %s",
+                    target_record, vals_to_write, e
+                )
+                record_link = Markup("<b>%s</b>") % target_record._get_html_link()
+                if isinstance(e, AccessError):
+                    message = self.env._("Auto-update blocked: request sender lacks permission to update %(record)s", record=record_link)
+                else:
+                    message = self.env._("Failed to auto-update fields on %(record)s", record=record_link)
+                self._post_auto_field_tracking_message(
+                    record_to_post=self, message=message,
+                    changed_fields=changed_fields,
+                    success=False,
+                )
+
+    @api.model
+    def _post_auto_field_tracking_message(self, record_to_post, message, changed_fields, success=True):
+        """ Render and post an auto-field tracking message on ``record_to_post``.
+
+        :param record_to_post: record whose chatter receives the message.
+        :param message: the translated headline as ``Markup``.
+        :param changed_fields: list of {'old_value', 'new_value', 'label'} dicts.
+        :param success: when True, render with the success styling; otherwise
+                        render with the failure styling.
+        """
+        if success:
+            title = Markup(
+                '<span class="text-muted">'
+                '<i class="oi text-info me-1" data-icon="wand_stars"></i> %s'
+                '</span>'
+            ) % message
+        else:
+            title = Markup(
+                '<span class="text-muted fw-bold">'
+                '<i class="oi" data-icon="warning"></i> %s'
+                '</span>'
+            ) % message
+        # TDE note: use post with source
+        body = self.env['ir.qweb']._render(
+            'sign.template_sign_auto_field_tracking',
+            {
+                'message_title': title,
+                'changed_fields': changed_fields,
+            }
+        )
+        record_to_post.sudo().message_post(body=body)
+
+    @api.model
+    def _humanize_auto_field_path(self, base_model, field_path):
+        """ Translate a technical dot path (e.g. ``company_id.country_id.code``)
+        into a human-readable chain using each segment's field label
+        (e.g. ``Company > Country > Country Code``). Falls back to the raw
+        segment when a segment cannot be resolved.
+        """
+        labels = []
+        current_model = base_model
+        for fname in field_path.split('.'):
+            field = None
+            if current_model and current_model in self.env:
+                field = self.env[current_model]._fields.get(fname)
+            if not field:
+                labels.append(fname)
+                break
+            labels.append(field._description_string(self.env))
+            current_model = field.comodel_name if field.relational else None
+        return ' > '.join(labels)
 
     def cancel(self):
-        for sign_request in self:
+        # Exclude sign requests that are in 'signed' state as they mustn't be canceled.
+        sign_requests = self.filtered(lambda request: request.state != 'signed')
+        for sign_request in sign_requests:
             sign_request.write({'access_token': self._default_access_token(), 'state': 'canceled'})
-        self.request_item_ids._cancel()
+        sign_requests.request_item_ids._cancel()
 
         # cancel activities for signers
-        for user in self.request_item_ids.sudo().partner_id.user_ids.filtered(lambda u: u.has_group('sign.group_sign_user')):
-            self.activity_unlink(['sign.mail_activity_data_signature_request'], user_id=user.id)
+        for user in sign_requests.request_item_ids.sudo().partner_id.user_ids.filtered(lambda u: u.has_group('sign.group_sign_user')):
+            sign_requests.activity_unlink(['sign.mail_activity_data_signature_request'], user_id=user.id)
+        # Avoid 'MissingError' when canceling from the activity:
+        # The activity's own unlink() runs right after this and expects the record to still exist.
+        if not self.env.context.get('skip_sign_activity_unlink'):
+            self.sign_activity_ids.unlink()
 
-        self.env['sign.log'].sudo().create([{'sign_request_id': sign_request.id, 'action': 'cancel'} for sign_request in self])
+        self.env['sign.log'].sudo().create([{'sign_request_id': sign_request.id, 'action': 'cancel'} for sign_request in sign_requests])
+        sign_requests.request_document_ids.sudo().unlink()
+
+    def _check_and_enforce_signature_ordering(self):
+        """ Forces a strict signing order when any signer cryptographically signs the
+        document himself, so each signature deterministically covers all previous
+        signers' values. """
+        for sign_request in self:
+            items = sign_request.request_item_ids
+            if any(items.role_id.mapped('requires_external_signature')):
+                for order, item in enumerate(items.sorted(key=lambda item: (item.mail_sent_order, item.id)), start=1):
+                    item.mail_sent_order = order
+
+    def _check_external_signature_documents_size(self):
+        """ Refuses a request whose documents size exceeds the signature service limit. """
+        self.ensure_one()
+        if not any(self.request_item_ids.role_id.mapped('requires_external_signature')):
+            return
+        documents_total_size = sum(self.template_id.document_ids.attachment_id.mapped('file_size'))
+        if documents_total_size > MAX_EXTERNAL_SIGNATURE_UPLOAD_SIZE:
+            raise UserError(self.env._(
+                "The documents of this request are too large to be signed with a qualified "
+                "electronic signature. They cannot exceed %s MB in total.",
+                MAX_EXTERNAL_SIGNATURE_UPLOAD_SIZE // (1024 * 1024)))
+
+    def _is_partially_signed(self):
+        """ Whether some signers already signed, so the documents carry their values. """
+        self.ensure_one()
+        return any(item.state == 'completed' for item in self.request_item_ids)
+
+    def _get_completed_documents(self):
+        """ Retrieves all signed documents associated with the request that are in the 'completed' state. """
+        return self.request_document_ids.filtered(lambda document: document.state == 'completed')
+
+    def _get_signing_documents(self):
+        """ The working copies of this request's documents, creating the ones that do not
+        exist yet.
+
+        A working copy carries the file from one signer to the next, so it is only needed
+        once something has to be written into it, like stamping a signer's values, freezing the
+        bytes an external signature will seal, or applying the company seal at the end. We
+        create it here instead of when the request is made, ensuring that abandoned requests
+        consume no resources.
+
+        Every caller about to write into a signing document goes through this method.
+        """
+        self.ensure_one()
+        documents = self.request_document_ids
+        missing_documents = self.template_id.document_ids - documents.document_id
+        if missing_documents:
+            documents += self.env['sign.request.document'].create([{
+                'sign_request_id': self.id,
+                'document_id': document.id,
+            } for document in missing_documents])
+        return documents
 
     def _send_completed_documents(self):
         """ Send the completed document to signers and Contacts in copy with emails
@@ -523,7 +951,7 @@ class SignRequest(models.Model):
             raise UserError(_('The sign request has not been fully signed'))
         self._check_senders_validity()
 
-        if not self.completed_document_ids:
+        if not self._get_completed_documents():
             self._generate_completed_documents()
 
         signers = [{'name': signer.partner_id.name, 'email': signer.signer_email, 'id': signer.partner_id.id} for signer in self.request_item_ids]
@@ -544,10 +972,15 @@ class SignRequest(models.Model):
                 body += self.message_cc
             self.message_post(body=body, attachment_ids=self.attachment_ids.ids + self.completed_document_attachment_ids.ids)
         if self.reference_doc:
-            record_body = _("The document %s has been fully signed.", self._get_html_link())
-            self.reference_doc.message_post(
-                body=record_body,
-                attachment_ids=self.completed_document_attachment_ids.ids,
+            self.reference_doc.message_post_with_source(
+                'sign.template_sign_request_completed',
+                render_values={
+                    'sign_request': self,
+                    'document_url': url_join(self.get_base_url(), 'sign/document/%s/%s' % (self.id, self.access_token)),
+                },
+                # the certificate of completion is generated after the signed documents,
+                # it does not belong on the linked record
+                attachment_ids=self.completed_document_attachment_ids.sorted('id')[:-1].ids,
                 partner_ids=cc_partners_valid.ids,
             )
 
@@ -557,6 +990,12 @@ class SignRequest(models.Model):
             access_token = self.access_token
         partner_lang = get_lang(self.env, lang_code=partner.lang).code
         base_url = self.get_base_url()
+        local_signer = {}
+        if not self.request_item_ids.filtered(lambda sri: sri.is_mail_sent) and not self.write_uid._is_public():
+            # if there is no mail sent, it means that the signature was done locally without sending mails to signers
+            # in this case we want to specify in the email that the signature was done by the local user and not by the signer himself
+            local_signer = {'name': self.create_uid.partner_id.name, 'email': self.create_uid.partner_id.email}
+
         body = self.env['ir.qweb']._render('sign.sign_template_mail_completed', {
             'record': self,
             'link': url_join(base_url, 'sign/document/%s/%s' % (self.id, access_token)),
@@ -566,19 +1005,21 @@ class SignRequest(models.Model):
             'recipient_id': partner.id,
             'signers': signers,
             'request_edited': request_edited,
+            'local_signer': local_signer,
             }, lang=partner_lang, minimal_qcontext=True)
 
         self.with_context(lang=partner.lang or self.env.lang)._message_send_mail(
             body,
             record_name=self.reference,
             notif_values={
-                'model_description': _('Signature'),
+                'model_description': _('Signature Completion'),
                 'company': self.communication_company_id or self.create_uid.company_id,
                 'partner': partner,
             },
             mail_values={
                 'attachment_ids': self.attachment_ids.ids + self.completed_document_attachment_ids.ids,
                 'subject': _('%s has been edited and signed', self.reference) if request_edited else _('%s has been signed', self.reference),
+                **({'email_to': formataddr((sign_request_item.partner_id.name, sign_request_item.signer_email))} if sign_request_item else {}),
             },
             force_send=force_send,
         )
@@ -595,13 +1036,21 @@ class SignRequest(models.Model):
     # PDF Rendering  #
     ##################
 
+    def _get_request_sender_timezone(self):
+        self.ensure_one()
+        return self.create_uid.tz or 'UTC'
+
     def _get_user_formatted_datetime(self, datetime_val):
         """
-        Get the user's preferred datetime format based on their language settings.
+        Format a datetime in the sender's timezone, using the sender's
+        preferred date/time format based on their language settings.
         """
+        if datetime_val.tzinfo is None:
+            datetime_val = datetime_val.replace(tzinfo=timezone.utc)
+        localized = datetime_val.astimezone(ZoneInfo(self._get_request_sender_timezone()))
         lang = self.env['res.lang']._lang_get(self.create_uid.lang)
         user_date_format, user_time_format = lang.date_format, lang.time_format
-        return datetime_val.strftime(f"{user_date_format} {user_time_format}")
+        return localized.strftime(f"{user_date_format} {user_time_format}")
 
     def _get_final_signature_log_hash(self):
         """
@@ -623,19 +1072,15 @@ class SignRequest(models.Model):
             raise UserError(_("The completed document cannot be created because the sign request is not fully signed"))
 
         for record in self:
-            if not record.completed_document_ids:
-                self.env['sign.completed.document'].create([{
-                    'sign_request_id': record.id,
-                    'document_id': document.id,
-                } for document in record.template_id.document_ids])
-                record.completed_document_ids._generate_completed_document()
+            if not record._get_completed_documents():
+                record._get_signing_documents()._finalize_documents()
                 attachment_ids = self.env['ir.attachment'].create([{
                     'name': document.document_id.name,
-                    'datas': document.file,
+                    'raw': document.file,
                     'type': 'binary',
                     'res_model': self._name,
                     'res_id': record.id,
-                } for document in record.completed_document_ids])
+                } for document in record._get_completed_documents()])
 
                 # print the report with the public user in a sudoed env
                 # public user because we don't want groups to pollute the result
@@ -651,7 +1096,7 @@ class SignRequest(models.Model):
                     record.id,
                     data={'format_date': format_date, 'company_id': record.communication_company_id}
                 )
-                attachment_log = self.env['ir.attachment'].create({
+                attachment_log = self.env['ir.attachment'].with_context(no_document=True).create({
                     'name': self.env._("Certificate of completion - %s.pdf", time.strftime('%Y-%m-%d - %H:%M:%S')),
                     'raw': pdf_content,
                     'type': 'binary',
@@ -666,20 +1111,19 @@ class SignRequest(models.Model):
         Returns:
             str: the name of the signature field
         """
-        return self.env.company.name
+        return self.communication_company_id.name
 
     ##################
     # Mail overrides #
     ##################
 
-    def _message_send_mail(self, body, notif_values=None, mail_values=None, record_name=False, force_send=False):
+    def _message_send_mail(self, body, notif_values=None, mail_values=None, record_name=False, force_send=False, scheduled_date=False):
         """ Shortcut to sent a notification or an email. """
         notif_values = notif_values or {}
         company = notif_values.get('company')
         model_description = notif_values.get('model_description')
         partner = notif_values.get('partner')
         notification_layout_xmlid = notif_values.get('notification_layout_xmlid', 'sign.sign_mail_notification_light')
-        scheduled_date = self.env.context.get('scheduled_date', False)
 
         mail_values = mail_values or {}
         if 'author_id' not in mail_values:
@@ -689,7 +1133,7 @@ class SignRequest(models.Model):
             mail_values['email_to'] = partner.email_formatted
 
         if partner and len(partner.user_ids) == 1 and partner.user_ids.notification_type == "inbox":
-            return self.message_notify(
+            self.message_notify(
                 attachment_ids=mail_values.get("attachment_ids"),
                 author_id=self.create_uid.partner_id.id,
                 body=body,

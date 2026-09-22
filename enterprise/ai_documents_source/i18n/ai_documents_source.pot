@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-12-30 18:43+0000\n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 17:48+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -21,9 +21,19 @@ msgid "AI Agent Source"
 msgstr ""
 
 #. module: ai_documents_source
-#. odoo-javascript
-#: code:addons/ai_documents_source/static/src/components/agent_add_source_dialog/agent_add_source_dialog.js:0
-msgid "Add from Documents"
+#: model:ir.model.fields,field_description:ai_documents_source.field_documents_document__ai_sources_ids
+msgid "AI Agent Sources"
+msgstr ""
+
+#. module: ai_documents_source
+#: model:ir.module.module,shortdesc:base.module_ai_documents_source
+msgid "AI Documents Source"
+msgstr ""
+
+#. module: ai_documents_source
+#: model:ir.module.module,description:base.module_ai_documents_source
+#: model:ir.module.module,summary:base.module_ai_documents_source
+msgid "Add documents to AI agents as sources."
 msgstr ""
 
 #. module: ai_documents_source
@@ -39,14 +49,30 @@ msgid "Document"
 msgstr ""
 
 #. module: ai_documents_source
+#: model:ir.model.fields,field_description:ai_documents_source.field_documents_document__embedding_status
+msgid "Embedding Status"
+msgstr ""
+
+#. module: ai_documents_source
+#. odoo-python
+#: code:addons/ai_documents_source/models/documents_document.py:0
+msgid ""
+"Failed to extract content from the document. Content must be at least 10 "
+"characters long."
+msgstr ""
+
+#. module: ai_documents_source
 #: model:ir.model.fields,field_description:ai_documents_source.field_ai_agent_source__id
 #: model:ir.model.fields,field_description:ai_documents_source.field_documents_document__id
 msgid "ID"
 msgstr ""
 
 #. module: ai_documents_source
-#. odoo-python
-#: code:addons/ai_documents_source/models/ai_agent_source.py:0
+#: model:ir.model.fields,field_description:ai_documents_source.field_documents_document__embedding_ids
+msgid "Record embedding ids"
+msgstr ""
+
+#. module: ai_documents_source
 #: model:ir.model.fields,field_description:ai_documents_source.field_ai_agent_source__document_id
 msgid "Source Document"
 msgstr ""
@@ -54,10 +80,4 @@ msgstr ""
 #. module: ai_documents_source
 #: model:ir.model.fields,field_description:ai_documents_source.field_ai_agent_source__type
 msgid "Type"
-msgstr ""
-
-#. module: ai_documents_source
-#. odoo-python
-#: code:addons/ai_documents_source/models/ai_agent_source.py:0
-msgid "id"
 msgstr ""

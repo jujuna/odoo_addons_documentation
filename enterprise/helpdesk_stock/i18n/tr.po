@@ -19,17 +19,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-21 14:20+0000\n"
-"Last-Translator: Odoo Turkish Import <dyki+tr@odoo.com>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 01:17+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
 "helpdesk_stock/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: helpdesk_stock
 #. odoo-python
@@ -49,6 +49,13 @@ msgstr ""
 "                <p>Müşterilere kayıp, hasarlı veya iade edilen bir ürün için "
 "yenisini gönderin</p>\n"
 "            "
+
+#. module: helpdesk_stock
+#: model:ir.module.module,description:base.module_helpdesk_stock
+msgid ""
+"\n"
+"Manage Product returns from helpdesk tickets\n"
+msgstr ""
 
 #. module: helpdesk_stock
 #. odoo-python
@@ -79,7 +86,17 @@ msgid "Create a Ticket"
 msgstr "Destek Talebi Oluşturma"
 
 #. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking__partner_id
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: helpdesk_stock
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: helpdesk_stock
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__partner_id
 msgid "Customer"
 msgstr "Müşteri"
 
@@ -101,29 +118,31 @@ msgid "Delivery created"
 msgstr "Teslimat oluşturuldu"
 
 #. module: helpdesk_stock
-#: model_terms:ir.ui.view,arch_db:helpdesk_stock.view_stock_return_picking_form_inherit_helpdesk_stock
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__picking_id
 msgid "Delivery to Return"
 msgstr "İade Teslimatı"
 
 #. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_sla_report_analysis__display_name
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket__display_name
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket_report_analysis__display_name
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_picking__display_name
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking__display_name
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_line__display_name
-msgid "Display Name"
-msgstr "İsim Göster"
+#: model_terms:ir.ui.view,arch_db:helpdesk_stock.view_stock_return_picking_form
+msgid "Discard"
+msgstr ""
 
 #. module: helpdesk_stock
-#: model:ir.model.fields,help:helpdesk_stock.field_helpdesk_ticket__tracking
-msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr "Deponuzda stoklanabilir bir ürünün izlenebilirliğini sağlayın."
+#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket__display_name
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__display_name
+msgid "Display Name"
+msgstr "İsim Göster"
 
 #. module: helpdesk_stock
 #: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket__has_partner_picking
 msgid "Has Partner Picking"
 msgstr "İş Ortağı Seçimi Var"
+
+#. module: helpdesk_stock
+#: model:ir.module.module,shortdesc:base.module_helpdesk_stock
+msgid "Helpdesk Stock"
+msgstr ""
 
 #. module: helpdesk_stock
 #: model:ir.model,name:helpdesk_stock.model_helpdesk_ticket
@@ -132,19 +151,21 @@ msgid "Helpdesk Ticket"
 msgstr "Yardım Masası Talebi"
 
 #. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_sla_report_analysis__id
 #: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket__id
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket_report_analysis__id
 #: model:ir.model.fields,field_description:helpdesk_stock.field_stock_picking__id
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking__id
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_line__id
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__id
 msgid "ID"
 msgstr "ID"
 
 #. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket__lot_id
-msgid "Lot/Serial Number"
-msgstr "Lot/Seri Numarası"
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: helpdesk_stock
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__write_date
+msgid "Last Updated on"
+msgstr ""
 
 #. module: helpdesk_stock
 #: model:ir.model.fields,help:helpdesk_stock.field_stock_picking__ticket_visibility
@@ -186,25 +207,9 @@ msgstr ""
 "kaldırarak ayrı ayrı değiştirilebilir."
 
 #. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking__picking_id
-msgid "Picking"
-msgstr "Toplama"
-
-#. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_sla_report_analysis__product_id
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket__product_id
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket_report_analysis__product_id
-msgid "Product"
-msgstr "Ürün"
-
-#. module: helpdesk_stock
-#: model:ir.model.fields,help:helpdesk_stock.field_helpdesk_ticket__product_id
-msgid ""
-"Product this ticket is about. If selected, only the sales orders, deliveries "
-"and invoices including this product will be visible."
+#: model:ir.module.module,summary:base.module_helpdesk_stock
+msgid "Project, Tasks, Stock"
 msgstr ""
-"Bu ticketın ilgili olduğu ürün. Seçilirse, yalnızca bu ürünü içeren satış "
-"siparişleri, teslimatlar ve faturalar görünür olacaktır."
 
 #. module: helpdesk_stock
 #: model_terms:ir.ui.view,arch_db:helpdesk_stock.helpdesk_ticket_view_form_inherit_stock_user
@@ -212,7 +217,9 @@ msgid "Replace"
 msgstr "Yerleştirme"
 
 #. module: helpdesk_stock
+#: model:ir.actions.act_window,name:helpdesk_stock.action_stock_return_picking
 #: model_terms:ir.ui.view,arch_db:helpdesk_stock.helpdesk_ticket_view_form_inherit_stock_user
+#: model_terms:ir.ui.view,arch_db:helpdesk_stock.view_stock_return_picking_form
 msgid "Return"
 msgstr "İade"
 
@@ -229,14 +236,15 @@ msgid "Return Orders Count"
 msgstr "İade Sipariş Sayısı"
 
 #. module: helpdesk_stock
-#: model:ir.model,name:helpdesk_stock.model_stock_return_picking
-msgid "Return Picking"
-msgstr "Ters Transfer"
+#: model:ir.model,name:helpdesk_stock.model_stock_return_picking_helpdesk
+msgid "Return Picking in Helpdesk"
+msgstr ""
 
 #. module: helpdesk_stock
-#: model:ir.model,name:helpdesk_stock.model_stock_return_picking_line
-msgid "Return Picking Line"
-msgstr "Ters Transfer Satırları"
+#. odoo-python
+#: code:addons/helpdesk_stock/wizard/stock_picking_return.py:0
+msgid "Returned Picking"
+msgstr ""
 
 #. module: helpdesk_stock
 #: model_terms:ir.ui.view,arch_db:helpdesk_stock.helpdesk_ticket_view_form_inherit_helpdesk_stock
@@ -244,22 +252,17 @@ msgid "Returns"
 msgstr "İadeler"
 
 #. module: helpdesk_stock
-#: model:ir.model,name:helpdesk_stock.model_helpdesk_sla_report_analysis
-msgid "SLA Status Analysis"
-msgstr "SLA Durum Analizi"
-
-#. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking__sale_order_id
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__sale_order_id
 msgid "Sales Order"
 msgstr "Satış Siparişi"
 
 #. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking__suitable_picking_ids
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__suitable_picking_ids
 msgid "Suitable Picking"
 msgstr "Uygun Toplama"
 
 #. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking__suitable_sale_order_ids
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__suitable_sale_order_ids
 msgid "Suitable Sale Order"
 msgstr "Uygun Satış Emri"
 
@@ -270,26 +273,16 @@ msgid "This transfer was created from the ticket"
 msgstr "Bu transfer destek talebinden oluşturulmuştur"
 
 #. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking__ticket_id
+#: model:ir.model.fields,field_description:helpdesk_stock.field_stock_return_picking_helpdesk__ticket_id
 msgid "Ticket"
 msgstr "Bilet"
 
 #. module: helpdesk_stock
-#: model:ir.model,name:helpdesk_stock.model_helpdesk_ticket_report_analysis
-msgid "Ticket Analysis"
-msgstr "Talep Analizi"
-
-#. module: helpdesk_stock
 #. odoo-python
 #: code:addons/helpdesk_stock/models/helpdesk_ticket.py:0
-#: code:addons/helpdesk_stock/wizard/stock_picking_return.py:0
+#: code:addons/helpdesk_stock/models/stock_picking.py:0
 msgid "Ticket: %(ticket_name)s"
 msgstr "Destek Talebi: %(ticket_name)s"
-
-#. module: helpdesk_stock
-#: model:ir.model.fields,field_description:helpdesk_stock.field_helpdesk_ticket__tracking
-msgid "Tracking"
-msgstr "İzleme"
 
 #. module: helpdesk_stock
 #: model:ir.model,name:helpdesk_stock.model_stock_picking
@@ -298,9 +291,12 @@ msgstr "Aktarım"
 
 #. module: helpdesk_stock
 #. odoo-python
+#: code:addons/helpdesk_stock/wizard/stock_picking_return.py:0
+msgid "You may only return on one ticket at a time."
+msgstr ""
+
+#. module: helpdesk_stock
+#. odoo-python
 #: code:addons/helpdesk_stock/models/helpdesk_ticket.py:0
 msgid "id"
 msgstr "kimlik"
-
-#~ msgid "Suitable Product"
-#~ msgstr "Uygun Ürün"

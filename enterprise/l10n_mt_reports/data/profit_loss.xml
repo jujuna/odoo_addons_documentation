@@ -3,6 +3,7 @@
     <record id="account_financial_report_mt_pnl" model="account.report">
         <field name="name">Profit and loss</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
         <field name="country_id" ref="base.mt"/>
@@ -95,8 +96,6 @@
                                                     <record id="account_financial_report_mt_sale_goods_services" model="account.report.line">
                                                         <field name="name">Sale of goods and rendering of services</field>
                                                         <field name="code">MT_sale_goods_services</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_sale_goods_services_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -108,8 +107,6 @@
                                                     <record id="account_financial_report_mt_income_invest" model="account.report.line">
                                                         <field name="name">Income from Investments</field>
                                                         <field name="code">MT_income_invest</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_income_invest_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -121,8 +118,6 @@
                                                     <record id="account_financial_report_mt_commission_income" model="account.report.line">
                                                         <field name="name">Commission Income</field>
                                                         <field name="code">MT_commission_income</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_commission_income_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -134,8 +129,6 @@
                                                     <record id="account_financial_report_mt_rental_income" model="account.report.line">
                                                         <field name="name">Rental Income</field>
                                                         <field name="code">MT_rental_income</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_rental_income_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -147,8 +140,6 @@
                                                     <record id="account_financial_report_mt_amount_non_profit" model="account.report.line">
                                                         <field name="name">Amounts received by non-profit making organisations [NPOs]</field>
                                                         <field name="code">MT_amount_non_profit</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_amount_non_profit_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -160,8 +151,6 @@
                                                     <record id="account_financial_report_mt_realised_gains_loss" model="account.report.line">
                                                         <field name="name">Realised Gains or losses on disposal of fixed assets</field>
                                                         <field name="code">MT_realised_gains_loss</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_realised_gains_loss_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -173,8 +162,6 @@
                                                     <record id="account_financial_report_mt_other_income" model="account.report.line">
                                                         <field name="name">Other income</field>
                                                         <field name="code">MT_other_income</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_other_income_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -199,8 +186,6 @@
                                                     <record id="account_financial_report_mt_opening_stock" model="account.report.line">
                                                         <field name="name">Opening stock</field>
                                                         <field name="code">MT_opening_stock</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_opening_stock_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -212,8 +197,6 @@
                                                     <record id="account_financial_report_mt_purchase" model="account.report.line">
                                                         <field name="name">Purchase</field>
                                                         <field name="code">MT_purchase</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_purchase_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -225,8 +208,6 @@
                                                     <record id="account_financial_report_mt_direct_cost" model="account.report.line">
                                                         <field name="name">Direct cost</field>
                                                         <field name="code">MT_direct_cost</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_direct_cost_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -238,8 +219,6 @@
                                                     <record id="account_financial_report_mt_closing_stock" model="account.report.line">
                                                         <field name="name">Closing stock</field>
                                                         <field name="code">MT_closing_stock</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_closing_stock_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -264,8 +243,6 @@
                                                     <record id="account_financial_report_mt_advertising_promotion" model="account.report.line">
                                                         <field name="name">Advertising and promotion</field>
                                                         <field name="code">MT_advertising_promotion</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_advertising_promotion_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -277,8 +254,6 @@
                                                     <record id="account_financial_report_mt_wages_salaries_employee" model="account.report.line">
                                                         <field name="name">Wages, salaries and employee benefits</field>
                                                         <field name="code">MT_wages_salaries_employee</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_wages_salaries_employee_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -290,8 +265,6 @@
                                                     <record id="account_financial_report_mt_subcontracting_outsourcing" model="account.report.line">
                                                         <field name="name">Sub-contracting and Out-sourcing</field>
                                                         <field name="code">MT_subcontracting_outsourcing</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_subcontracting_outsourcing_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -303,8 +276,6 @@
                                                     <record id="account_financial_report_mt_travel_expenses" model="account.report.line">
                                                         <field name="name">Travel expenses</field>
                                                         <field name="code">MT_travel_expenses</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_travel_expenses_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -316,8 +287,6 @@
                                                     <record id="account_financial_report_mt_insurance" model="account.report.line">
                                                         <field name="name">Insurance</field>
                                                         <field name="code">MT_insurance</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_insurance_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -329,8 +298,6 @@
                                                     <record id="account_financial_report_mt_office_expenses" model="account.report.line">
                                                         <field name="name">Office expenses</field>
                                                         <field name="code">MT_office_expenses</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_office_expenses_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -342,8 +309,6 @@
                                                     <record id="account_financial_report_mt_professional_fees" model="account.report.line">
                                                         <field name="name">Professional fees</field>
                                                         <field name="code">MT_professional_fees</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_professional_fees_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -355,8 +320,6 @@
                                                     <record id="account_financial_report_mt_licences_permits_membership" model="account.report.line">
                                                         <field name="name">Licences, permits and membership</field>
                                                         <field name="code">MT_licences_permits_membership</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_licences_permits_membership_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -368,8 +331,6 @@
                                                     <record id="account_financial_report_mt_rental" model="account.report.line">
                                                         <field name="name">Rental</field>
                                                         <field name="code">MT_rental</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_rental_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -381,8 +342,6 @@
                                                     <record id="account_financial_report_mt_repairs_and_maintenance" model="account.report.line">
                                                         <field name="name">Repairs and maintenance</field>
                                                         <field name="code">MT_repairs_maintenance</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_repairs_and_maintenance_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -394,8 +353,6 @@
                                                     <record id="account_financial_report_mt_supplies" model="account.report.line">
                                                         <field name="name">Supplies</field>
                                                         <field name="code">MT_supplies</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_supplies_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -407,8 +364,6 @@
                                                     <record id="account_financial_report_mt_utilities" model="account.report.line">
                                                         <field name="name">Utilities</field>
                                                         <field name="code">MT_utilities</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_utilities_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -420,8 +375,6 @@
                                                     <record id="account_financial_report_mt_interest_bank_charges" model="account.report.line">
                                                         <field name="name">Interest and bank charges</field>
                                                         <field name="code">MT_interest_bank_charges</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_interest_bank_charges_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -433,8 +386,6 @@
                                                     <record id="account_financial_report_mt_provisions" model="account.report.line">
                                                         <field name="name">Provisions</field>
                                                         <field name="code">MT_provisions</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_provisions_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -446,8 +397,6 @@
                                                     <record id="account_financial_report_mt_amortisation_intangible" model="account.report.line">
                                                         <field name="name">Amortisation of intangible assets</field>
                                                         <field name="code">MT_amortisation_intangible</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_amortisation_intangible_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -459,8 +408,6 @@
                                                     <record id="account_financial_report_mt_depreciation_immovable_property" model="account.report.line">
                                                         <field name="name">Depreciation of Immovable property</field>
                                                         <field name="code">MT_depreciation_immovable_property</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_depreciation_immovable_property_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -472,8 +419,6 @@
                                                     <record id="account_financial_report_mt_depreciation_wasting_assets" model="account.report.line">
                                                         <field name="name">Depreciation of wasting assets</field>
                                                         <field name="code">MT_depreciation_wasting_assets</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_depreciation_wasting_assets_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -485,8 +430,6 @@
                                                     <record id="account_financial_report_mt_depreciation_tangible_assets" model="account.report.line">
                                                         <field name="name">Depreciation of tangible assets</field>
                                                         <field name="code">MT_depreciation_tangible_assets</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_depreciation_tangible_assets_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>
@@ -498,8 +441,6 @@
                                                     <record id="account_financial_report_mt_other_expenses" model="account.report.line">
                                                         <field name="name">Other expenses</field>
                                                         <field name="code">MT_other_expenses</field>
-                                                        <field name="groupby">account_id</field>
-                                                        <field name="foldable" eval="True"/>
                                                         <field name="expression_ids">
                                                             <record id="account_financial_report_mt_other_expenses_expr" model="account.report.expression">
                                                                 <field name="label">balance</field>

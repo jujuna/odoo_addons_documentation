@@ -8,17 +8,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-09 18:43+0000\n"
-"PO-Revision-Date: 2026-01-23 18:03+0000\n"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:21+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "delivery_starshipit/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_starshipit
+#: model:ir.module.module,description:base.module_delivery_starshipit
+msgid ""
+"\n"
+"Send your shippings through Starshipit and track them online\n"
+"============================================================\n"
+"\n"
+"Starshipit is the leading provider of integrated shipping and tracking "
+"solutions for growing e-commerce businesses.\n"
+"Seamlessly integrating with a large range of couriers and platforms,\n"
+"you can streamline every step of your fulfilment process,\n"
+"reduce handling time and improve customer experience.\n"
+msgstr ""
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -39,48 +53,60 @@ msgstr ""
 "yrität uudelleen."
 
 #. module: delivery_starshipit
-#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
-msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Do not forget to select a service "
-"for a valid configuration."
+#: model_terms:ir.ui.view,arch_db:delivery_starshipit.choose_delivery_carrier_view_form
+msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Get more delivery methods"
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> Älä unohda valita palvelua "
-"voimassa olevaa määritystä varten."
+
+#. module: delivery_starshipit
+#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
+msgid ""
+"<i class=\"oi\" data-icon=\"info\"/> Available shipping services depend on "
+"enabled carriers in your Starshipit account."
+msgstr ""
+"<i class=\"oi\" data-icon=\"info\"/> Käytettävissä olevat kuljetuspalvelut "
+"riippuvat Starshipit-tililläsi käytössä olevista huolitsijayhtiöistä."
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> In <b>Test Environment</b>, your "
+"<i class=\"oi\" data-icon=\"warning\"/> Do not forget to select a service "
+"for a valid configuration."
+msgstr ""
+"<i class=\"oi\" data-icon=\"warning\"/> Älä unohda valita palvelua voimassa "
+"olevaa määritystä varten."
+
+#. module: delivery_starshipit
+#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
+msgid ""
+"<i class=\"oi\" data-icon=\"warning\"/> In <b>Test Environment</b>, your "
 "shippings are automatically <b>archived</b> after the label creation. <br/>\n"
 "                        Please note that charges can still occur for label "
 "creations and some shipping carriers may automatically validate the shipment "
 "when printing labels."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> <b>Testiympäristössä</b> "
-"lähetykset <b>arkistoidaan</b> automaattisesti etiketin luomisen jälkeen. "
-"<br/>\n"
+"<i class=\"oi\" data-icon=\"warning\"/> <b>Testiympäristössä</b> lähetykset "
+"<b>arkistoidaan</b> automaattisesti etiketin luomisen jälkeen. <br/>\n"
 "                        Huomaa, että etikettien luomisesta voi edelleen "
 "aiheutua maksuja ja että jotkin rahdinkuljettajat saattavat vahvistaa "
 "lähetyksen automaattisesti, kun ne tulostavat etikettejä."
 
 #. module: delivery_starshipit
-#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
+#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-info-circle\"/> Available shipping services depend on "
-"enabled carriers in your Starshipit account."
+"<i class=\"oi\" data-icon=\"warning\"/> Only administrators can configure "
+"the api keys."
 msgstr ""
-"<i class=\"fa fa-info-circle\"/> Käytettävissä olevat kuljetuspalvelut "
-"riippuvat Starshipit-tililläsi käytössä olevista huolitsijayhtiöistä."
 
 #. module: delivery_starshipit
-#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
-msgid "Cancel"
-msgstr "Peruuta"
+#. odoo-python
+#: code:addons/delivery_starshipit/wizard/starshipit_shipping_wizard.py:0
+msgid "Add a shipping method"
+msgstr "Lisää toimitustapa"
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_package_type__package_carrier_type
 msgid "Carrier"
-msgstr "Huolitsija"
+msgstr "Kuljetusyritys"
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -133,16 +159,26 @@ msgid "Delivery"
 msgstr "Toimitus"
 
 #. module: delivery_starshipit
+#: model:ir.model,name:delivery_starshipit.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
+
+#. module: delivery_starshipit
+#: model:ir.model,name:delivery_starshipit.model_choose_delivery_carrier
+msgid "Delivery Method Selection Wizard"
+msgstr ""
+
+#. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
 msgid "Delivery Service"
 msgstr "Toimituspalvelu"
 
 #. module: delivery_starshipit
+#: model:ir.model.fields,field_description:delivery_starshipit.field_choose_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_starshipit.field_starshipit_shipping_wizard__display_name
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_package_type__display_name
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_picking__display_name
-#: model:ir.model.fields,field_description:delivery_starshipit.field_stock_return_picking__display_name
 msgid "Display Name"
 msgstr "Näyttönimi"
 
@@ -151,8 +187,7 @@ msgstr "Näyttönimi"
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid ""
 "Error: %(file_name)s file could not be obtained for order %(order_name)s."
-msgstr ""
-"Virhe: %(file_name)s tiedostoa ei saatu tilausta %(order_name)s varten."
+msgstr "Virhe: %(file_name)s tiedostoa ei saatu tilausta %(order_name)s varten."
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -161,11 +196,11 @@ msgid "Error: this delivery method is not available for this order."
 msgstr "Virhe: tämä toimitustapa ei ole käytettävissä tähän tilaukseen."
 
 #. module: delivery_starshipit
+#: model:ir.model.fields,field_description:delivery_starshipit.field_choose_delivery_carrier__id
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__id
 #: model:ir.model.fields,field_description:delivery_starshipit.field_starshipit_shipping_wizard__id
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_package_type__id
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_picking__id
-#: model:ir.model.fields,field_description:delivery_starshipit.field_stock_return_picking__id
 msgid "ID"
 msgstr "ID"
 
@@ -269,11 +304,6 @@ msgid "Provider"
 msgstr "Palveluntarjoaja"
 
 #. module: delivery_starshipit
-#: model:ir.model,name:delivery_starshipit.model_stock_return_picking
-msgid "Return Picking"
-msgstr "Palauta keräily"
-
-#. module: delivery_starshipit
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid "Return labels were generated for the order %s"
@@ -348,11 +378,6 @@ msgstr ""
 "laskuttaa."
 
 #. module: delivery_starshipit
-#: model:ir.model,name:delivery_starshipit.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Toimitustavat"
-
-#. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
 msgid "Shipping Product"
 msgstr "Toimitustuote"
@@ -413,10 +438,9 @@ msgid "Starshipit Return Parcel Reference"
 msgstr "Starshipitin palautuspaketin viite"
 
 #. module: delivery_starshipit
-#: model_terms:ir.ui.view,arch_db:delivery_starshipit.res_config_settings_view_form_sale_starshipit
-#: model_terms:ir.ui.view,arch_db:delivery_starshipit.res_config_settings_view_form_stock_starshipit
-msgid "Starshipit Shipping Methods"
-msgstr "Starshipitin toimitustavat"
+#: model:ir.module.module,shortdesc:base.module_delivery_starshipit
+msgid "Starshipit Shipping"
+msgstr ""
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__starshipit_subscription_key
@@ -435,14 +459,20 @@ msgstr ""
 
 #. module: delivery_starshipit
 #. odoo-python
+#: code:addons/delivery_starshipit/models/starshipit_service.py:0
+msgid "Starshipit should be used with a context manager."
+msgstr ""
+
+#. module: delivery_starshipit
+#. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid ""
 "Starshipit: Delivery cost re-evaluated on Sales Order based on updated exact "
 "price (%(final_carrier_price)s) from transfer %(picking_name)s."
 msgstr ""
 "Starshipit: Toimituskulut myyntitilaukselle on arvioitu uudelleen päivitetyn "
-"tarkan hinnan (%(final_carrier_price)s) perusteella siirrosta %"
-"(picking_name)s."
+"tarkan hinnan (%(final_carrier_price)s) perusteella siirrosta %(picking_name)"
+"s."
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -592,16 +622,3 @@ msgstr "Siirto"
 #: code:addons/delivery_starshipit/controllers/download_starshipit_labels.py:0
 msgid "starshipit_labels"
 msgstr "starshipit_labels"
-
-#~ msgid "Please delete the order on Starshipit then try again."
-#~ msgstr "Poista tilaus Starshipitistä ja yritä sitten uudelleen."
-
-#~ msgid "Starshipit returned an error: %(message)s"
-#~ msgstr "Starshipit palautti virheen: %(message)s"
-
-#~ msgid ""
-#~ "The shipping label creation failed with the following error:\n"
-#~ "%(error)s"
-#~ msgstr ""
-#~ "Toimitusetiketin luominen epäonnistui seuraavalla virheellä:\n"
-#~ "%(error)s"

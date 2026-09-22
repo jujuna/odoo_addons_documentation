@@ -1,39 +1,52 @@
+import { onMounted, useListener, useProps } from "@odoo/owl";
 import { useCommand } from "@web/core/commands/command_hook";
-import { getActiveHotkey } from "@web/core/hotkeys/hotkey_service";
 import { FileUploadProgressContainer } from "@web/core/file_upload/file_upload_progress_container";
 import { FileUploadProgressDataRow } from "@web/core/file_upload/file_upload_progress_record";
+import { getActiveHotkey } from "@web/core/hotkeys/hotkey_utils";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { ListRenderer } from "@web/views/list/list_renderer";
 
 import { DocumentsRightPanel } from "@documents/components/documents_right_panel/documents_right_panel";
+import { DocumentsRendererMixin, previewProps } from "@documents/views/documents_renderer_mixin";
 import { DocumentsActionHelper } from "@documents/views/helper/documents_action_helper";
 import { useDraggableDocuments } from "@documents/views/helper/documents_draggable";
 import { DocumentsDropZone } from "@documents/views/helper/documents_drop_zone";
 import { DocumentsFileViewer } from "@documents/views/helper/documents_file_viewer";
-import { DocumentsRendererMixin } from "@documents/views/documents_renderer_mixin";
 
-import { useExternalListener, useRef } from "@odoo/owl";
+export class DocumentsListRendererCommon extends ListRenderer {
+    documentsAttachmentViewerProps = useProps(previewProps);
+    static template = "documents.DocumentsListRendererCommon";
+    static components = Object.assign({}, ListRenderer.components, {
+        DocumentsFileViewer,
+    });
 
-export class DocumentsSecondaryListRenderer extends ListRenderer {
-    static props = [...ListRenderer.props, "previewStore"];
+    onCellClicked(record, column, ev) {
+        if (ev.target.closest(".o_field_documents_type_icon")) {
+            this.onIconClicked(record, ev);
+            return;
+        }
+        super.onCellClicked(...arguments);
+    }
+
+    onIconClicked(record, ev) {
+        record.onClickPreview(ev);
+    }
 }
 
-export class DocumentsListRenderer extends DocumentsRendererMixin(DocumentsSecondaryListRenderer) {
+export class DocumentsListRenderer extends DocumentsRendererMixin(DocumentsListRendererCommon) {
     static template = "documents.DocumentsListRenderer";
     static recordRowTemplate = "documents.DocumentsListRenderer.RecordRow";
-    static components = Object.assign({}, ListRenderer.components, {
+    static components = Object.assign({}, DocumentsListRendererCommon.components, {
         FileUploadProgressContainer,
         FileUploadProgressDataRow,
         DocumentsDropZone,
         DocumentsActionHelper,
-        DocumentsFileViewer,
         DocumentsRightPanel,
     });
 
     setup() {
         super.setup();
-        this.root = useRef("root");
         const { uploads } = useService("file_upload");
 
         this.documentUploads = uploads;
@@ -59,7 +72,7 @@ export class DocumentsListRenderer extends DocumentsRendererMixin(DocumentsSecon
         );
 
         useDraggableDocuments({
-            ref: this.root,
+            ref: this.rootRef,
             model: this.env.model,
             targetSelector: ".o_data_row.o_folder_record",
             elements: ".o_data_row",
@@ -74,8 +87,14 @@ export class DocumentsListRenderer extends DocumentsRendererMixin(DocumentsSecon
             },
         });
 
-        useExternalListener(window, "keydown", (ev) => this.onKeyDown(ev));
-        useExternalListener(window, "keyup", (ev) => this.onKeyUp(ev));
+        onMounted(() =>
+            this.documentService.scrollToFirstSelectedRecord(
+                ".o_data_row.o_data_row_selected",
+                "center"
+            )
+        );
+        useListener(window, "keydown", (ev) => this.onKeyDown(ev));
+        useListener(window, "keyup", (ev) => this.onKeyUp(ev));
     }
 
     getRowClass(record) {
@@ -84,10 +103,6 @@ export class DocumentsListRenderer extends DocumentsRendererMixin(DocumentsSecon
             classes += " o_folder_record";
         }
         return classes;
-    }
-
-    getDocumentsAttachmentViewerProps() {
-        return { previewStore: this.props.previewStore };
     }
 
     /**
@@ -111,14 +126,14 @@ export class DocumentsListRenderer extends DocumentsRendererMixin(DocumentsSecon
     }
 
     onKeyDown(ev) {
-        if (ev.key === "Control") {
-            this.root.el.classList.add("o_documents_dnd_shortcut");
+        if (this.rootRef() && ev.key === "Control") {
+            this.rootRef().classList.add("o_documents_dnd_shortcut");
         }
     }
 
     onKeyUp(ev) {
-        if (ev.key === "Control") {
-            this.root.el.classList.remove("o_documents_dnd_shortcut");
+        if (this.rootRef() && ev.key === "Control") {
+            this.rootRef().classList.remove("o_documents_dnd_shortcut");
         }
     }
 
@@ -130,42 +145,70 @@ export class DocumentsListRenderer extends DocumentsRendererMixin(DocumentsSecon
      */
     onCellClicked(record, column, ev) {
         ev.stopPropagation();
-        const isIcon = ev.target.closest(".o_field_documents_type_icon");
         if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) {
             this.toggleRecordSelection(record, ev);
             return;
         }
-        if (isIcon) {
-            if (record.data.type === "folder") {
-                record.openFolder();
-            } else {
-                record.onClickPreview(ev);
+        if (!ev.target.closest(".o_field_documents_type_icon")) {
+            this.documentService.focusRecord(record);
+            if (!(record.selected && this.editableColumns.includes(column.name))) {
+                return;
             }
+        }
+        super.onCellClicked(...arguments);
+    }
+
+    /**
+     * @override handles the folder.
+     */
+    onIconClicked(record, ev) {
+        if (record.data.type === "folder") {
+            record.openFolder();
             return;
         }
-        this.documentService.focusRecord(record);
-        if (record.selected && this.editableColumns.includes(column.name)) {
-            super.onCellClicked(...arguments);
-        }
+        super.onIconClicked(record, ev);
     }
 
     get editableColumns() {
-        return ["name", "tag_ids", "partner_id", "owner_id", "company_id", "folder_id"];
+        const standardEditable = [
+            "name",
+            "tag_ids",
+            "partner_id",
+            "owner_id",
+            "company_id",
+            "folder_id",
+        ];
+        const customEditable = this.columns
+            .filter((col) => col.name.startsWith("x_") && !col.readonly)
+            .map((col) => col.name);
+        return standardEditable.concat(customEditable);
     }
 
     /**
      * Called when a click event is triggered.
      */
     onGlobalClick(ev) {
-        // We have to check that we are indeed clicking in the list view as on mobile,
-        // the inspector renders above the renderer but it still triggers this event.
-        if (ev.target.closest(".o_data_row") || !ev.target.closest(".o_list_renderer")) {
+        const target = ev.target;
+        // A tag's delete button only exists while the cell is editable, leaving
+        // edit mode here would destroy it before its callback runs
+        if (target.closest(".o_data_row.o_selected_row")) {
             return;
         }
-        if (ev.target.closest(".o_documents_view thead")) {
+        // Ignore clicks in an overlay above us (e.g. a "Search More..." dialog)
+        if (this.activeElement !== this.uiService.activeElement) {
+            return;
+        }
+        this.props.list.leaveEditMode();
+
+        // We have to check that we are indeed clicking in the list view as on mobile,
+        // the inspector renders above the renderer but it still triggers this event.
+        if (target.closest(".o_data_row") || !this.rootRef()?.contains(target)) {
+            return;
+        }
+        if (target.closest(".o_documents_view thead")) {
             return; // We then have to check that we are not clicking on the header
         }
-        this.documentService.focusRecord(this.getContainerRecord());
+        this.documentService.focusRecord(this.env.model.getContainerRecord());
         this.props.list.selection.forEach((el) => el.toggleSelection(false));
     }
 
@@ -204,7 +247,7 @@ export class DocumentsListRenderer extends DocumentsRendererMixin(DocumentsSecon
     }
 
     get isMobile() {
-        return this.env.isSmall;
+        return this.uiService.isSmall;
     }
 
     toggleRecordSelection(record) {

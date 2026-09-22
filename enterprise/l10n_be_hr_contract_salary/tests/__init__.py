@@ -6,3 +6,6 @@ from . import test_code_fields
 from . import test_employee_part_time_mobility_budget
 from . import test_employee_salary_configurator_belgium
 from . import test_sign_contract
+from . import test_sign_contract_controller
+from . import test_contract_company_car
+from . import test_hr_version

@@ -1,6 +1,6 @@
 import logging
 
-from odoo import _, fields, models
+from odoo import api, fields, models, _
 
 _logger = logging.getLogger(__name__)
 
@@ -16,13 +16,6 @@ class PosConfig(models.Model):
         required=True,
     )
 
-    def _get_kitchen_printer(self):
-        res = super()._get_kitchen_printer()
-        for printer in self.printer_ids:
-            if printer.device_identifier:
-                res[printer.id]["device_identifier"] = printer.device_identifier
-        return res
-
     def _load_self_data_models(self):
         models = super()._load_self_data_models()
         models += ['iot.device', 'iot.box']
@@ -36,19 +29,20 @@ class PosConfig(models.Model):
         if not self.self_ordering_iot_available_iot_box_ids:
             return url_in_new_tab_action
 
-        display_identifiers = [
-            d.identifier
+        display_devices = [
+            device
             for box in self.self_ordering_iot_available_iot_box_ids
-            for d in box.device_ids if d.type == 'display'
+            for device in box.device_ids if device.type == 'display'
         ]
 
-        self.env['iot.channel'].send_message({
-            "iot_identifiers": [iot_box.identifier for iot_box in self.self_ordering_iot_available_iot_box_ids],
-            "device_identifiers": display_identifiers,
-            'action': 'open_kiosk',
-            'pos_id': self.id,
-            'access_token': self.access_token,
-        })
+        for display in display_devices:
+            self.env['iot.channel'].send_message({
+                "iot_identifier": display.iot_id.identifier,
+                "device_identifier": display.identifier,
+                'action': 'open_kiosk',
+                'pos_id': self.id,
+                'access_token': self.access_token,
+            })
 
         return {
             'type': 'ir.actions.client',
@@ -64,3 +58,8 @@ class PosConfig(models.Model):
         if self.self_ordering_mode == 'mobile':
             return res
         return res or any(pm.iot_device_id for pm in self.payment_method_ids)
+
+    @api.model
+    def _load_pos_self_data_fields(self, pos_config_id):
+        fields = super()._load_pos_self_data_fields(pos_config_id)
+        return fields + ['self_ordering_iot_available_iot_box_ids']

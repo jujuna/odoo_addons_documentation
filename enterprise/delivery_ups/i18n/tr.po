@@ -23,17 +23,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-21 14:20+0000\n"
-"Last-Translator: Odoo Turkish Import <dyki+tr@odoo.com>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-09-18 01:59+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
 "delivery_ups/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_ups
 #. odoo-python
@@ -52,8 +52,8 @@ msgid ""
 "Access License number is Invalid. Provide a valid number (Length should be "
 "0-35 alphanumeric characters)"
 msgstr ""
-"Access License number is Invalid. Provide a valid number (Length should be "
-"0-35 alphanumeric characters)"
+"Access License number is Invalid. Provide a valid number (Length should be 0-"
+"35 alphanumeric characters)"
 
 #. module: delivery_ups
 #. odoo-python
@@ -129,6 +129,11 @@ msgid "Create a Customer"
 msgstr "Müşteri Oluştur"
 
 #. module: delivery_ups
+#: model:ir.model,name:delivery_ups.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
+
+#. module: delivery_ups
 #: model:ir.model.fields,field_description:delivery_ups.field_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_ups.field_payment_provider__display_name
 #: model:ir.model.fields,field_description:delivery_ups.field_res_partner__display_name
@@ -161,8 +166,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_ups/models/ups_request.py:0
 msgid "Exceeds Total Number of allowed pieces per World Wide Express Shipment."
-msgstr ""
-"Exceeds Total Number of allowed pieces per World Wide Express Shipment."
+msgstr "Exceeds Total Number of allowed pieces per World Wide Express Shipment."
 
 #. module: delivery_ups
 #: model:ir.model.fields,field_description:delivery_ups.field_delivery_carrier__id
@@ -511,11 +515,6 @@ msgid "Shipper phone extension must contain only numbers."
 msgstr "Gönderici telefon uzantısı yalnızca sayılar içermelidir."
 
 #. module: delivery_ups
-#: model:ir.model,name:delivery_ups.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Nakliye Yöntemleri"
-
-#. module: delivery_ups
 #: model:ir.model,name:delivery_ups.model_stock_package_type
 msgid "Stock package type"
 msgstr "Stok Paket Türü"
@@ -634,6 +633,14 @@ msgid "The selected service is not valid with the selected packaging."
 msgstr "The selected service is not valid with the selected packaging."
 
 #. module: delivery_ups
+#: model:ir.module.module,description:base.module_delivery_ups
+msgid ""
+"This is the legacy integration with UPS that is no longer supported.         "
+"Please install the new \"UPS Shipping\" module and uninstall this one as "
+"soon as possible. This integration will stop working in 2024."
+msgstr ""
+
+#. module: delivery_ups
 #. odoo-python
 #: code:addons/delivery_ups/models/ups_request.py:0
 msgid ""
@@ -739,6 +746,11 @@ msgid "UPS Service Type"
 msgstr "UPS Servis Türü"
 
 #. module: delivery_ups
+#: model:ir.module.module,shortdesc:base.module_delivery_ups
+msgid "UPS Shipping (Legacy)"
+msgstr ""
+
+#. module: delivery_ups
 #: model:delivery.carrier,name:delivery_ups.delivery_carrier_ups_us
 #: model:product.template,name:delivery_ups.product_product_delivery_ups_us_product_template
 msgid "UPS US"
@@ -816,15 +828,3 @@ msgstr "Bir UPS hesap numarası girmeniz gerekir."
 #: model:ir.model.fields.selection,name:delivery_ups.selection__delivery_carrier__ups_label_file_type__zpl
 msgid "ZPL"
 msgstr "ZPL"
-
-#~ msgid "Collect on Delivery"
-#~ msgstr "Teslimde Topla"
-
-#~ msgid "UPS Package Type"
-#~ msgstr "UPS Paket Türü"
-
-#~ msgid "UPS Shipper Number"
-#~ msgstr "UPS Taşımacı Numarası"
-
-#~ msgid "UPS Shipping Methods"
-#~ msgstr "UPS Gönderi Yöntemleri"

@@ -13,6 +13,7 @@ class TestRoSaftReport(TestSaftReport):
         export has a slighly different behaviour for non-service products.
         To handle this, we only use service products in the test.
     """
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestSaftReport.setup_country('ro')
@@ -24,52 +25,45 @@ class TestRoSaftReport(TestSaftReport):
             'city': 'Bucharest',
             'zip': '010001',
             'vat': 'RO1234567897',
-            'company_registry': '1234567897',
             'phone': '+40 723545439',
             'account_storno': True,
             'l10n_ro_saft_tax_accounting_basis': 'A',
+            'additional_identifiers': {'RO_EN': '1234567897'}
         })
 
         cls.env['res.partner'].create({
             'name': 'Mr Big CEO',
-            'is_company': False,
             'phone': '+40 723545000',
             'parent_id': cls.company_data['company'].partner_id.id,
         })
 
         cls.partner_a.write({
             'name': 'Romanian Partner',
-            'is_company': True,
             'city': 'Bucharest',
             'zip': '010001',
             'country_id': cls.env.ref('base.ro').id,
             'phone': '+40 234285561',
             'vat': 'RO18547290',
-            'company_registry': '18547290',
+            'additional_identifiers': {'RO_EN': '18547290'},
         })
 
         cls.partner_b.write({
             'name': 'French Partner',
-            'is_company': True,
             'city': 'Saint-Étienne',
             'zip': '42000',
             'country_id': cls.env.ref('base.fr').id,
             'phone': '+33 477284765',
             'vat': 'FR23334175221',
-            'company_registry': 'FR23334175221',
         })
 
-        cls.bank_ro = cls.env['res.bank'].create({'name': 'Romanian Banking United'})
         cls.partner_bank = cls.env['res.partner.bank'].create({
-            'acc_type': 'iban',
             'partner_id': cls.company_data['company'].partner_id.id,
-            'acc_number': 'RO08429863697813',
+            'account_number': 'RO08 4298 6369 7813',
             'allow_out_payment': True,
-            'bank_id': cls.bank_ro.id,
-            'currency_id': cls.env.ref('base.RON').id,
+            'bank_name': 'Romanian Banking United',
         })
 
-        cls.setup_other_currency('EUR', rates=[('2023-10-01', 0.2)])
+        cls.setup_other_currency('EUR', rates=[('2023-09-30', 0.2)])
 
         cls.product_a.write({
             'default_code': 'PA',
@@ -171,10 +165,10 @@ class TestRoSaftReport(TestSaftReport):
         )
 
     def test_saft_report_errors_01(self):
+        self.company_data['company'].bank_ids.action_archive()
         self.company_data['company'].write({
             'l10n_ro_saft_tax_accounting_basis': False,
             'phone': False,
-            'bank_ids': False,
         })
         with self.assertRaises(self.ReportException) as cm:
             self.report_handler.l10n_ro_export_saft_to_xml_monthly(self._generate_options())
@@ -200,7 +194,6 @@ class TestRoSaftReport(TestSaftReport):
         self.partner_a.write({
             'city': False,
             'country_id': False,
-            'vies_valid': False,
         })
         self.product_b.write({
             'default_code': False,
@@ -236,17 +229,16 @@ class TestRoSaftReport(TestSaftReport):
             ],
         }).action_post()
         self.company_data['default_tax_sale'].l10n_ro_saft_tax_type_id = False
-        (self.company_data['company'].partner_id + self.partner_a).write({
+        self.company_data['company'].partner_id.write({
             "vat": False,
-            "company_registry": 'XXXX',
+            "additional_identifiers": False,
         })
         self.product_b.default_code = 'PA'
 
         with self.assertRaises(self.ReportException) as cm:
             self.report_handler.l10n_ro_export_saft_to_xml_monthly(self._generate_options())
         self.assertEqual(set(cm.exception.errors), {
-            'partner_registry_incorrect',
-            'company_registry_number_invalid',
+            'company_vat_registry_number_missing',
             'taxes_tax_type_missing',
             'product_internal_reference_duplicated',
         })
@@ -262,9 +254,9 @@ class TestRoSaftReport(TestSaftReport):
                 }),
             ],
         }).action_post()
-        self.company_data['company'].write({
+        self.company_data['company'].partner_id.write({
             'vat': False,
-            'company_registry': False,
+            'additional_identifiers': False,
         })
         self.partner_a.country_id = self.env.ref('base.fr')
         with self.assertRaises(self.ReportException) as cm:

@@ -2,26 +2,29 @@
 <templates>
 
     <t t-name="documents.SearchPanelUserFolderId" >
-        <div class="d-inline-block my-2 ps-3">
-            <div class="input-group">
-                <input
-                    class="form-control"
-                    placeholder="Search..."
-                    type="text"
-                    t-ref="searchInput"
-                    t-on-change="onFilterChange"
-                />
-                <button class="btn btn-outline-secondary" type="button" t-on-click="onClickClear">
-                    <i class="fa fa-eraser"/>
-                </button>
+        <div class="o_search_panel">
+            <div class="d-inline-block my-2">
+                <div class="input-group">
+                    <input
+                        class="form-control"
+                        placeholder="Search..."
+                        type="text"
+                        t-ref="this.searchInputRef"
+                        t-on-change="this.onFilterChange"
+                    />
+                    <button class="btn btn-outline-secondary" type="button" t-on-click="this.onClickClear">
+                        <i class="oi" data-icon="ink_eraser"/>
+                    </button>
+                </div>
             </div>
+            <section class="o_search_panel_section o_search_panel_category">
+                <ul class="list-group d-block o_search_panel_field" t-att-class="this.ulClass">
+                    <t t-call="documents.SearchPanel.Category.Operations"
+                        values="this.category.rootIds.filter((rId) => !!rId and rId !== 'SHARED' || this.category.values.get(rId)?.childrenIds.length > 0)"
+                        section="this.category"/>
+                </ul>
+            </section>
         </div>
-        <ul class="list-group d-block" t-att-class="ulClass">
-            <t t-call="documents.SearchPanel.Category">
-                <t t-set="values" t-value="category.rootIds.filter((rId) => !!rId and rId !== 'SHARED' || category.values.get(rId)?.childrenIds.length > 0)"/>
-                <t t-set="section" t-value="category"/>
-            </t>
-        </ul>
     </t>
 
 </templates>

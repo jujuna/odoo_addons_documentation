@@ -39,7 +39,7 @@
         <field name="inherit_id" ref="sale_management.sale_order_template_view_tree"/>
         <field name="arch" type="xml">
             <field name="name" position="after">
-                <field name="plan_id" options="{'no_create': True}"/>
+                <field name="plan_id" options="{'no_create': True}" optional="hide"/>
             </field>
         </field>
     </record>
@@ -60,25 +60,43 @@
             <xpath expr="//field[@name='active']" position="after">
                 <field name="is_subscription" invisible="1"/>
             </xpath>
-            <xpath expr="//notebook/page[@name='order_lines']/field/list/field[@name='name']" position="after">
+            <xpath expr="//notebook/page[@name='order_lines']/field/list" position="inside">
                 <field name="recurring_invoice" column_invisible="True"/>
             </xpath>
-            <group name="sale_info" position="after">
-                <group name="sale_info2">
-                    <field name="plan_id" placeholder="None"
-                           options="{'no_create': True}"/>
-                    <field name="is_unlimited" options="{'horizontal': true}"
-                           invisible="not plan_id"/>
-                    <label for="duration_value"
-                           invisible="not plan_id or is_unlimited"/>
-                    <div invisible="not plan_id or is_unlimited">
-                        <field name="duration_value" style="width: 3rem;"/>
-                        <field name="duration_unit" class="oe_inline"/>
-                    </div>
-                    <!-- company_id invisible to be available in domains -->
-                    <field name="company_id" invisible="1"/>
+
+            <xpath expr="//group[@name='sale_info']" position="before">
+                <!-- 'sale_header' will hold both groups 'sale_info' and 'subscription_info' -->
+                <group name="sale_header">
+                    <!-- 'subscription_info' will hold all subscription related fields -->
+                    <group name="subscription_info">
+                        <field
+                            name="plan_id"
+                            placeholder="None"
+                            options="{'no_create': True}"
+                            invisible="template_type == 'section'"
+                        />
+                        <field
+                            name="is_unlimited"
+                            options="{'horizontal': true}"
+                            invisible="not plan_id or template_type == 'section'"
+                        />
+                        <label
+                            for="duration_value"
+                            invisible="not plan_id or is_unlimited or template_type == 'section'"
+                        />
+                        <span invisible="not plan_id or is_unlimited or template_type == 'section'">
+                            <field name="duration_value" style="width: 3rem;"/>
+                            <field name="duration_unit" class="oe_inline"/>
+                        </span>
+                        <!-- company_id invisible to be available in domains -->
+                        <field name="company_id" invisible="1"/>
+                    </group>
                 </group>
-            </group>
+            </xpath>
+            <!-- Move 'sale_info' before the 'subscription_info' group -->
+            <xpath expr="//group[@name='sale_header']/group[@name='subscription_info']" position="before">
+                <xpath expr="//group[@name='sale_info']" position="move"/>
+            </xpath>
         </field>
     </record>
 

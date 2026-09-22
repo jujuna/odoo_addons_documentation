@@ -11,14 +11,18 @@ from odoo.tests import tagged
 
 from odoo.addons.account.tests.test_account_move_send import TestAccountMoveSendCommon
 from odoo.addons.l10n_hr_edi.tests.test_hr_edi_common import TestL10nHrEdiCommon
-from ..tools import (
+from odoo.addons.l10n_hr_edi.tools.api import (
     _mer_api_query_document_process_status_outbox,
     _mer_api_receive_document,
+    _mer_api_query_inbox,
+    _mer_api_send,
 )
 
 
 @tagged('external', 'external_l10n', 'post_install', '-post_install_l10n', '-at_install', '-standard')
 class TestL10nHrEdiMerApi(TestL10nHrEdiCommon, TestAccountMoveSendCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -129,7 +133,7 @@ class TestL10nHrEdiMerApi(TestL10nHrEdiCommon, TestAccountMoveSendCommon):
             'StatusName': 'Preuzet',
             'OutboundFiscalizationStatus': None,
             'ReceiverBusinessNumber': 'BE0477472701',
-            'ReceiverBusinessUnit': '',
+            'ReceiverBusinessUnit': None,
             'ReceiverBusinessName': 'Odoo S.A.',
             'Created': '2025-12-11T13:06:20.3779916',
             'Updated': '2025-12-11T13:08:42.2070931',
@@ -147,6 +151,8 @@ class TestL10nHrEdiMerApi(TestL10nHrEdiCommon, TestAccountMoveSendCommon):
         Test recieving a document with known MER ElectronicId from the MER system and importing it.
         Invoices sent to the demo server are returned as vendor bills.
         """
+        self.modify_demo_bank_account()
+
         electronic_id = '3120260'
         response = _mer_api_receive_document(
             self.env.company,
@@ -201,6 +207,8 @@ class TestL10nHrEdiMerApi(TestL10nHrEdiCommon, TestAccountMoveSendCommon):
         and to not notify MER of successful document import.
         Only a select number of 'trusted' documents are imported to avoid dragging the test out.
         """
+        self.modify_demo_bank_account()
+
         self.env.company._l10n_hr_mer_get_new_documents(
             undelivered_only=False,
             slc=(10, 20),  # Documents 3107515, 3110637, 3110651, 3111902, 3111911, 3114870, 3120196, 3120260, 3120276, 3120289
@@ -217,13 +225,14 @@ class TestL10nHrEdiMerApi(TestL10nHrEdiCommon, TestAccountMoveSendCommon):
             self.assertEqual(any(line.l10n_hr_kpd_category_id for line in move.line_ids), True)
 
     # Currently results in random responses form the test server, cannot be set up to be tested properly
-    # NEEDS TO BE REWRITTEN FOR THE UPDATED PAYMENT FLOW
     def test_mer_flow_report_payment(self):
         """
         Test reporting a payment for a document within the MER system.
         First create a partial payment for the document, then add the remaining payment.
         WARNING: permanently changes the state of the demo server!
         """
+        self.modify_demo_bank_account()
+
         electronic_id = '3084663'
         response = _mer_api_receive_document(
             self.env.company,
@@ -267,3 +276,16 @@ class TestL10nHrEdiMerApi(TestL10nHrEdiCommon, TestAccountMoveSendCommon):
         except UserError as e:
             if 'Error handling request:' in e.args:
                 pass
+
+    def test_api_wrong_credentials(self):
+        """
+        Test that incorrect credentials errors (which have their own format) are handled properly.
+        """
+        self.env.company.write({
+            'l10n_hr_mer_username': 'WRONG USERNAME',
+            'l10n_hr_mer_password': 'WRONG PASSWORD',
+        })
+        with self.assertRaisesRegex(UserError, r"MER service returned an error: Username 'WRONG USERNAME': Korisničko ime i lozinka nisu ispravni\."):
+            _mer_api_query_inbox(self.env.company)
+        with self.assertRaisesRegex(UserError, r"MER service returned an error: Username 'WRONG USERNAME': Korisničko ime i lozinka nisu ispravni\.\. Trace ID:.*"):
+            _mer_api_send(self.env.company, xml_file='Totally a file')

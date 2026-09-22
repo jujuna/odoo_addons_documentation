@@ -1,11 +1,24 @@
 
+$o-sign-frontend-gutter: map-get($spacers, 3);
+
 .o_sign_document {
     height: 100%;
+    background-color: $o-gray-100;
+
+    > .o_sign_pdf_iframe {
+        width: auto;
+        margin-top: $o-sign-frontend-gutter;
+        margin-inline: $o-sign-frontend-gutter;
+        border: $border-width solid $border-color;
+        border-bottom: 0;
+        border-radius: $o-border-radius-xl $o-border-radius-xl 0 0;
+        overflow: hidden;
+    }
 
     > header {
         flex: 0 0 auto;
-        height: $nav-link-height;
-        background-color: $o-brand-lightsecondary;
+        height: $nav-link-height * 1.2;
+        padding-inline: $o-sign-frontend-gutter;
         .o_sign_info {
             $logo-max-wdith: $nav-link-height * 3.75;
             height: 100%;
@@ -49,3 +62,8 @@
         }
     }
 }
+
+.o_sign_refuse_label {
+    font-size: 0.875rem;
+}
+

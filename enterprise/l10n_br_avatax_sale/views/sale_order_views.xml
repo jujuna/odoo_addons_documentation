@@ -28,11 +28,17 @@
                            readonly="locked"
                     />
                 </group>
-                <xpath expr="//notebook/page[@name='order_lines']/field/list/field[@name='product_template_id']" position="after">
+                <xpath expr="//list/column[@name='product_and_description']" position="after">
                     <field name="l10n_br_goods_operation_type_id"
                            column_invisible="parent.country_code != 'BR' or not parent.l10n_br_is_avatax or
                                              parent.l10n_br_is_service_transaction"
                            readonly="state in ['cancel', 'sale']"
+                    />
+                    <field name="l10n_br_item_number"
+                           column_invisible="parent.country_code != 'BR' or not parent.l10n_br_is_avatax or
+                                             parent.l10n_br_is_service_transaction"
+                           readonly="state in ['cancel', 'sale']"
+                           optional="hide"
                     />
                 </xpath>
             </field>

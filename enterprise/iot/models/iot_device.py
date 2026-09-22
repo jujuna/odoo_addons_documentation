@@ -25,7 +25,6 @@ class IotDevice(models.Model):
         string='Type',
         help="Type of device.",
     )
-    manufacturer = fields.Char(string='Manufacturer', readonly=True)
     connection = fields.Selection([
             ('network', 'Network'),
             ('direct', 'USB'),
@@ -37,7 +36,7 @@ class IotDevice(models.Model):
         string="Connection",
         help="Type of connection.",
     )
-    report_ids = fields.Many2many('ir.actions.report', string='Reports')
+    printer_id = fields.Many2one("printer.printer", "Related Printer", compute="_compute_printer_id", store=True)
     iot_ip = fields.Char(related="iot_id.ip")
     company_id = fields.Many2one('res.company', 'Company', related="iot_id.company_id")
     connected_status = fields.Selection([
@@ -49,37 +48,35 @@ class IotDevice(models.Model):
     )
     keyboard_layout = fields.Many2one('iot.keyboard.layout', string='Keyboard Layout')
     display_url = fields.Char(
-        'Display URL',
+        "Display URL",
         help=(
             "URL of the page that will be displayed by the device, "
             "leave empty to use the customer facing display of the POS."
-        )
-    )
-    manual_measurement = fields.Boolean(
-        'Manual Measurement',
-        compute="_compute_manual_measurement",
-        help="Manually read the measurement from the device"
+        ),
+        default="http://localhost:8069/status",
     )
     is_scanner = fields.Boolean(
-        string='Is Scanner',
+        string="Is Scanner",
         compute="_compute_is_scanner",
         inverse="_set_scanner",
         help="Manually switch the device type between keyboard and scanner"
     )
-    subtype = fields.Selection([
-            ('receipt_printer', 'Receipt Printer'),
-            ('label_printer', 'Label Printer'),
-            ('office_printer', 'Office Printer'),
-            ('', '')
+    display_orientation = fields.Selection(
+        selection=[
+            ('normal', 'Normal'),
+            ('right', 'Right'),
+            ('left', 'Left'),
+            ('inverted', 'Inverted'),
         ],
-        default='',
-        help='Subtype of device.',
+        string='Display Orientation',
+        help='Select the orientation of the display for the Kiosk mode',
+        default='normal',
     )
 
-    @api.depends('name', 'iot_id', 'connection')
-    @api.depends_context('formatted_display_name')
+    @api.depends("name", "iot_id", "connection")
+    @api.depends_context("formatted_display_name")
     def _compute_display_name(self):
-        connection_display_values = dict(self._fields['connection'].selection)
+        connection_display_values = dict(self._fields['connection']._description_selection(self.env))
         for device in self:
             if device.env.context.get("formatted_display_name"):
                 connection = connection_display_values.get(device.connection, device.connection) if device.connection else ''
@@ -96,10 +93,30 @@ class IotDevice(models.Model):
         for device in self:
             device.type = 'scanner' if device.is_scanner else 'keyboard'
 
-    @api.depends('manufacturer')
-    def _compute_manual_measurement(self):
+    @api.model
+    def create(self, vals_list):
+        """Override to create a `printer.printer` record when an IoT device
+        of type printer is created."""
+        records = super().create(vals_list)
+        printer = self.env["printer.printer"]
+        for record in records:
+            if (
+                record.type == "printer"
+                and not printer.search([("iot_device_id", "=", record.id)], limit=1)
+            ):
+                printer.create([{
+                    "name": record.name,
+                    "iot_device_id": record.id,
+                    "type": "iot",
+                }])
+
+        return records
+
+    @api.depends("type")
+    def _compute_printer_id(self):
+        printer = self.env["printer.printer"]
         for device in self:
-            device.manual_measurement = device.manufacturer == 'Adam'
+            device.printer_id = printer.search([("iot_device_id", "=", device.id)], limit=1)
 
 
 class IotKeyboardLayout(models.Model):

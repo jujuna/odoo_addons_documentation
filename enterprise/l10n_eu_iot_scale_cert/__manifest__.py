@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'LNE electronic scale certification for PoS',
-    'version': '1.0',
     'category': 'Sales/Point of Sale',
     'summary': 'Ensure scale measurements conform to EU certification standards.',
     'description': """
@@ -10,9 +9,11 @@ a legal requirement in certain EU countries. It enforces certain settings and pr
 can be verified to make sure the code has not been tampered with.
 """,
     'depends': ['pos_iot'],
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'data': [
+        'receipt/pos_order_receipt.xml',
+    ],
     'assets': {
         'point_of_sale._assets_pos': [
             'l10n_eu_iot_scale_cert/static/src/app/**/*',
@@ -20,7 +21,9 @@ can be verified to make sure the code has not been tampered with.
         ],
         'point_of_sale.customer_display_assets': [
             'l10n_eu_iot_scale_cert/static/src/customer_display_overrides/**/*',
-            'l10n_eu_iot_scale_cert/static/src/pos_overrides/components/orderline/*',
+        ],
+        'web.assets_unit_tests': [
+            'l10n_eu_iot_scale_cert/static/tests/unit/**/*',
         ],
     }
 }

@@ -1,12 +1,13 @@
 import { patch } from "@web/core/utils/patch";
-import { OrderDisplay } from "@point_of_sale/app/components/order_display/order_display";
+import { t } from "@odoo/owl";
+import {
+    OrderDisplay,
+    orderDisplayProps,
+} from "@point_of_sale/app/components/order_display/order_display";
 
-patch(OrderDisplay, {
-    props: {
-        ...OrderDisplay.props,
-        refreshAvatax: { type: Function, optional: true },
-        isAvataxConfig: { type: Boolean, optional: true },
-    },
+Object.assign(orderDisplayProps, {
+    refreshAvatax: t.function().optional(),
+    isAvataxConfig: t.boolean().optional(),
 });
 
 patch(OrderDisplay.prototype, {

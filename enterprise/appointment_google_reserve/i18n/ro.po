@@ -3,14 +3,15 @@
 # * appointment_google_reserve
 #
 # Cuciureanu Larisa <larisa.cuciureanu@nexterp.ro>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-10 17:17+0000\n"
-"Last-Translator: Cuciureanu Larisa <larisa.cuciureanu@nexterp.ro>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 01:54+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "appointment_google_reserve/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: appointment_google_reserve
 #. odoo-python
@@ -53,30 +54,44 @@ msgstr ""
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid ""
-"<i class=\"ms-2 fa fa-info-circle\" title=\"Required for Google Reserve\"/>"
+"<i class=\"oi oi-filled ms-2\" data-icon=\"info\" title=\"Required for "
+"Google Reserve\"/>"
 msgstr ""
-"<i class=\"ms-2 fa fa-info-circle\" title=\"Necesar pentru Google Reserve\"/>"
+"<i class=\"oi oi-filled ms-2\" data-icon=\"info\" title=\"Necesar pentru "
+"Google Reserve\"/>"
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid ""
-"<span class=\"fa fa-check fa-fw me-1\"/>Your Google Reserve Synchronization "
-"is active."
+"<span class=\"oi me-1\" data-icon=\"hourglass_empty\"/>Synchronization with "
+"Google Reserve in progress. This can take up to 24 hours."
 msgstr ""
-"<span class=\"fa fa-check fa-fw me-1\"/>Sincronizarea Google Reserve este "
-"activă."
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid ""
-"<span class=\"fa fa-check fa-hourglass me-1\"/>Your Appointment Type is "
-"being synchronized with Google Reserve.<br/>\n"
-"                                This can take up to 24 hours to be active."
+"<span class=\"oi oi-fw me-1\" data-icon=\"check\"/>\n"
+"                                <span>Your Google Reserve Synchronization is "
+"active. </span>"
 msgstr ""
-"<span class=\"fa fa-check fa-hourglass me-1\"/>Tipul de programare este în "
-"curs de sincronizare cu Google Reserve.<br/>\n"
-"                                Acest proces poate dura până la 24 de ore "
-"pentru a deveni activ."
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid ""
+"<span class=\"oi oi-fw me-1\" data-icon=\"map\"/>\n"
+"                                <span>Synchronize your establishment with "
+"Google Reserve. </span>"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "<span> if you encounter any issues.</span>"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "<span> to learn more.</span>"
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__message_needaction
@@ -87,6 +102,11 @@ msgstr "Acțiune necesară"
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__location_id
 msgid "Address"
 msgstr "Adresă"
+
+#. module: appointment_google_reserve
+#: model:ir.module.module,shortdesc:base.module_appointment_google_reserve
+msgid "Appointment Google Reserve"
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model:ir.model,name:appointment_google_reserve.model_appointment_resource
@@ -134,6 +154,16 @@ msgid "Calendar Event"
 msgstr "Eveniment calendar"
 
 #. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "Click here"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__name
+msgid "Company Name"
+msgstr ""
+
+#. module: appointment_google_reserve
 #: model:ir.model.fields,help:appointment_google_reserve.field_appointment_type__google_reserve_merchant_id
 msgid "Configure your company data for Google Reserve"
 msgstr "Configurează datele companiei pentru Google Reserve"
@@ -178,6 +208,11 @@ msgid "Enable Google Booking"
 msgstr "Activează Google Booking"
 
 #. module: appointment_google_reserve
+#: model:ir.module.module,description:base.module_appointment_google_reserve
+msgid "Enable a link between your appointment type and the google API"
+msgstr ""
+
+#. module: appointment_google_reserve
 #: model:ir.model.fields,help:appointment_google_reserve.field_google_reserve_merchant__phone_sanitized
 msgid ""
 "Field used to store sanitized phone number. Helps speeding up searches and "
@@ -207,14 +242,20 @@ msgid "Google Booking Pending Synchronization"
 msgstr "Sincronizare Google Booking în așteptare"
 
 #. module: appointment_google_reserve
+#: model:ir.ui.menu,name:appointment_google_reserve.menu_appointment_google_reserve_merchants
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid "Google Bookings"
 msgstr "Rezervări Google"
 
 #. module: appointment_google_reserve
-#: model:ir.ui.menu,name:appointment_google_reserve.menu_appointment_google_reserve_merchants
-msgid "Google Reserve"
-msgstr "Google Reserve"
+#: model:ir.model.fields,field_description:appointment_google_reserve.field_appointment_type__google_reserve_merchant_id
+msgid "Google Maps Profile"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model:ir.actions.act_window,name:appointment_google_reserve.google_reserve_merchant_action
+msgid "Google Maps Profiles"
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_appointment_type__google_reserve_access_token
@@ -223,14 +264,8 @@ msgstr "Token de acces Google Reserve"
 
 #. module: appointment_google_reserve
 #: model:ir.model,name:appointment_google_reserve.model_google_reserve_merchant
-#: model:ir.model.fields,field_description:appointment_google_reserve.field_appointment_type__google_reserve_merchant_id
 msgid "Google Reserve Merchant"
 msgstr "Comerciant Google Reserve"
-
-#. module: appointment_google_reserve
-#: model:ir.actions.act_window,name:appointment_google_reserve.google_reserve_merchant_action
-msgid "Google Reserve Merchants"
-msgstr "Comercianți Google Reserve"
 
 #. module: appointment_google_reserve
 #. odoo-python
@@ -317,11 +352,6 @@ msgid "Last Updated on"
 msgstr "Actualizat ultima dată la"
 
 #. module: appointment_google_reserve
-#: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__name
-msgid "Merchant Name"
-msgstr "Numele comerciantului"
-
-#. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__message_has_error
 msgid "Message Delivery error"
 msgstr "Eroare de livrare a mesajului"
@@ -388,6 +418,12 @@ msgid "Phone Number"
 msgstr "Număr de telefon"
 
 #. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.google_reserve_merchant_view_form
+msgid ""
+"Please fill in the information exactly as it is displayed on Google Maps"
+msgstr ""
+
+#. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__rating_ids
 msgid "Ratings"
 msgstr "Evaluări"
@@ -429,6 +465,11 @@ msgstr "Oprește sincronizarea"
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
+msgid "Synchronize"
+msgstr ""
+
+#. module: appointment_google_reserve
+#: model_terms:ir.ui.view,arch_db:appointment_google_reserve.appointment_type_view_form
 msgid "Synchronize with Google Reserve"
 msgstr "Sincronizează cu Google Reserve"
 
@@ -449,19 +490,18 @@ msgstr ""
 "ta."
 
 #. module: appointment_google_reserve
-#: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__website_message_ids
-msgid "Website Messages"
-msgstr "Mesaje website"
-
-#. module: appointment_google_reserve
 #: model:ir.model.fields,field_description:appointment_google_reserve.field_google_reserve_merchant__website_url
 msgid "Website URL"
 msgstr "URL website"
 
 #. module: appointment_google_reserve
-#: model:ir.model.fields,help:appointment_google_reserve.field_google_reserve_merchant__website_message_ids
-msgid "Website communication history"
-msgstr "Istoric comunicare website"
+#. odoo-python
+#: code:addons/appointment_google_reserve/models/google_reserve_merchant.py:0
+msgid ""
+"You cannot delete this merchant as it is used in '%(appointment_name)s' to "
+"synchronize with Google Maps Reserve.\n"
+"Turn off the integration first."
+msgstr ""
 
 #. module: appointment_google_reserve
 #: model_terms:ir.ui.view,arch_db:appointment_google_reserve.google_reserve_merchant_view_form

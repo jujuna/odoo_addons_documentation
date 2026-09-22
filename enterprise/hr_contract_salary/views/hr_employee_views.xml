@@ -5,35 +5,22 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//label[@for='wage']" position="attributes">
-                <attribute name="invisible">holidays != 0.0</attribute>
-            </xpath>
-            <xpath expr="//div[@name='wage']" position="attributes">
-                <attribute name="invisible">holidays != 0.0</attribute>
-            </xpath>
-            <xpath expr="//div[@name='wage']" position="after">
-                <label name="label_wage_with_holidays" for="wage_with_holidays" invisible="holidays == 0.0"/>
-                <div class="o_row" name="div_wage_with_holidays" invisible="holidays == 0.0">
-                    <field name="wage_with_holidays" class="o_hr_narrow_field"/>
-                    <span>/ month</span>
-                </div>
-            </xpath>
             <button name="action_open_versions" position="before">
-                <button name="action_show_contract_reviews" class="oe_stat_button" icon="fa-book" type="object" help="Contracts Reviews" invisible="not employee_id or contract_reviews_count == 0">
+                <button name="action_show_contract_reviews" class="oe_stat_button" icon="book" type="object" help="Contracts Reviews" invisible="not employee_id or contract_reviews_count == 0">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value"><field name="contract_reviews_count"/></span>
                         <span class="o_stat_text">Reviews</span>
                     </div>
                 </button>
-                <button name="action_generate_offer" string="Offers" class="oe_stat_button" icon="fa-handshake-o" type="object" help="Generate Offer"
-                        invisible="current_date_version &gt; date_version or salary_offers_count > 0" groups="hr.group_hr_manager" >
+                <button name="action_generate_offer" string="Offers" class="oe_stat_button" icon="handshake" type="object" help="Generate Offer"
+                        invisible="current_date_version &gt; date_version or salary_offers_count > 0" groups="hr_payroll.group_hr_payroll_user" >
                     <div class="o_field_widget o_stat_info ms-1">
                         <span class="o_stat_value">New</span>
                         <span class="o_stat_text">Offers</span>
                     </div>
                 </button>
-                <button name="action_show_offers" string="Offers" class="oe_stat_button" icon="fa-handshake-o" type="object" help="Sent Offers"
-                        invisible="salary_offers_count == 0" groups="hr.group_hr_manager">
+                <button name="action_show_offers" string="Offers" class="oe_stat_button" icon="handshake" type="object" help="Sent Offers"
+                        invisible="salary_offers_count == 0" groups="hr_payroll.group_hr_payroll_user">
                     <div class="o_field_widget o_stat_info ms-1">
                         <span class="o_stat_value"><field name="salary_offers_count"/></span>
                         <span class="o_stat_text">Offers</span>
@@ -42,28 +29,38 @@
             </button>
             <header position="inside">
                 <field name="current_date_version" invisible="1"/>
+                <button name="%(action_hr_salary_simulator)d"
+                    type="action"
+                    string="Simulation"
+                    context="{
+                        'default_employee_id': id,
+                        'default_structure_type_id': structure_type_id,
+                        'default_salary_amount': final_yearly_costs,
+                        'default_budget_type': 'yearly_employer',
+                        'default_final_yearly_costs': final_yearly_costs,
+                        'default_structure_id': structure_id,
+                        'default_resource_calendar_id': resource_calendar_id,
+                        'from_employee' : True,
+                    }"
+                    groups="hr_payroll.group_hr_payroll_user"/>
             </header>
             <group name="contract" position="inside">
                 <field name="originated_offer_id" readonly="1" invisible="not originated_offer_id"/>
             </group>
-            <separator name="schedule" position="before">
-                <separator name="employer_costs" string="Employer Costs"/>
-                <label name="final_yearly_costs" for="final_yearly_costs"/>
-                <div name="final_yearly_costs" class="o_row">
-                    <field name="final_yearly_costs" class="o_hr_narrow_field"/>
-                    <span>/ year</span>
+            <field name="wage" position="after">
+                <div invisible="1">  <!-- Remove in Master -->
+                    <div class="mb-3" invisible="schedule_pay != 'annually'">/ year</div>
+                    <div class="mb-3" invisible="schedule_pay != 'semi-annually'">/ half-year</div>
+                    <div class="mb-3" invisible="schedule_pay != 'quarterly'">/ quarter</div>
+                    <div class="mb-3" invisible="schedule_pay != 'bi-monthly'">/ two months</div>
+                    <div class="mb-3" invisible="schedule_pay != 'semi-monthly'">/ half-month</div>
+                    <div class="mb-3" invisible="schedule_pay != 'bi-weekly'">/ two weeks</div>
+                    <div class="mb-3" invisible="schedule_pay != 'weekly'">/ week</div>
+                    <div class="mb-3" invisible="schedule_pay != 'daily'">/ day</div>
+                    <div class="mb-3" invisible="schedule_pay != '10_days'">/ 10 days</div>
+                    <div class="mb-3" invisible="schedule_pay != '14_days'">/ 14 days</div>
                 </div>
-                <label name="monthly_yearly_costs" for="monthly_yearly_costs"/>
-                <div name="monthly_yearly_costs" class="o_row">
-                    <field name="monthly_yearly_costs" class="o_hr_narrow_field text-muted"/>
-                    <span class="mb-3 text-muted">/ month</span>
-                </div>
-                <label name="wage_on_signature" for="wage_on_signature"/>
-                <div name="wage_on_signature" class="o_row">
-                    <field class="o_hr_narrow_field" name="wage_on_signature"/>
-                    <div name="wage_on_signature_period_label">/ month</div>
-                </div>
-            </separator>
+            </field>
         </field>
     </record>
     <record id="hr_contract_salary_view_employee_form_readonly" model="ir.ui.view">
@@ -79,9 +76,18 @@
                 </div>
             </xpath>
             <xpath expr="//chatter" position="replace"/>
-            <xpath expr="//widget[@name='web_ribbon']" position="replace">
+            <xpath expr="//field[@name='employee_properties']" position="before">
                 <widget name="web_ribbon" title="Draft" bg_color="text-bg-info" groups="hr.group_hr_user"/>
             </xpath>
         </field>
     </record>
+
+    <record id="action_view_partially_signed_contract_statbutton" model="ir.actions.act_window">
+        <field name="name">Contract Details (Read Only) </field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="hr_contract_salary.hr_contract_salary_view_employee_form_readonly"/>
+        <field name="target">current</field>
+    </record>
+
 </odoo>

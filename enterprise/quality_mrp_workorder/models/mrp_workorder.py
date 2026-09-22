@@ -17,7 +17,6 @@ class MrpWorkorder(models.Model):
         action['context'] = {
             'default_company_id': self.company_id.id,
             'default_product_id': self.product_id.id,
-            'default_product_tmpl_id': self.product_id.product_tmpl_id.id,
             'default_workorder_id': self.id,
             'default_production_id': self.production_id.id,
             'default_workcenter_id': self.workcenter_id.id,

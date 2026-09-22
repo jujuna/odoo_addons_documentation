@@ -9,16 +9,86 @@ from odoo import fields, Command
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestBilanComptable(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
-    @TestAccountReportsCommon.setup_country('fr')
+    @TestAccountReportsCommon.setup_country('fr_comp')
     def setUpClass(cls):
         super().setUpClass()
 
     def _get_line(self, lines, line_id):
         return [
             line for line in lines
-            if line['id'].endswith(line_id)
+            if line.id.endswith(line_id)
         ]
+
+    def test_bilan_comptable_pcg_comparison_columns(self):
+        report = self.env.ref('l10n_fr_reports.account_financial_report_l10n_fr_bilan')
+        options = self._generate_options(report, '2025-01-01', '2025-12-31', default_options={
+            'comparison': {
+                'filter': 'same_last_year',
+                'number_period': 1,
+            },
+        })
+
+        self.assertEqual(
+            [column['expression_label'] for column in options['columns']],
+            ['brut', 'amort', 'net', 'net'],
+        )
+        self.assertEqual([header['colspan'] for header in options['column_headers'][0]], [3, 1])
+
+    def test_bilan_comptable_pcg_current_assets(self):
+        current_assets = self.env.ref('l10n_fr_reports.account_financial_report_line_03_0_fr_bilan_actif')
+
+        self.assertEqual(current_assets.children_ids.mapped('code'), [
+            'STOCK_COURS',
+            'ADVANCES_COMMANDES',
+            'CREANCES',
+            'CHARGES_DAVANCE',
+            'CAPITAL_NON_VERSE',
+            'VALEURS_PLACEMENT',
+            'INSTRMENTS_TRESORERIE',
+            'DISPONIBILITES',
+        ])
+
+    def test_bilan_comptable_pcg_account_mapping(self):
+        report = self.env.ref('l10n_fr_reports.account_financial_report_l10n_fr_bilan')
+        self.assertEqual(
+            self.env.ref('l10n_fr_reports.account_financial_report_l10n_fr_bilan_column01').name,
+            'Depreciation and impairment (to be deducted)',
+        )
+        self.assertNotIn('FR_OS', report.line_ids.mapped('code'))
+        expected_formulas = {
+            'l10n_fr_reports.account_financial_report_fr_bilan_actif_total_column3': 'CAPITAL_NON_APPELE.net + FRAIS_ETABLISS.net + ACTIF_IMMOBILISE.net + ACTIF_CIRCULANT.net + FRAIS_EMISSION_EMPRUNTS.net + PRIMES_EMPRUNTS.net + ECARTS_ACTIF.net',
+            'l10n_fr_reports.account_financial_report_line_02_1_0_1_fr_bilan_actif_column2': '-2801 - 2901',
+            'l10n_fr_reports.account_financial_report_line_02_1_0_1_fr_bilan_actif_column3': '201 + 2801 + 2901',
+            'l10n_fr_reports.account_financial_report_line_02_1_0_3_fr_bilan_actif_column1': '205 + 206',
+            'l10n_fr_reports.account_financial_report_line_02_1_0_3_fr_bilan_actif_column2': '-2805 - 2806 - 2905 - 2906',
+            'l10n_fr_reports.account_financial_report_line_02_1_0_4_fr_bilan_actif_column1': '207',
+            'l10n_fr_reports.account_financial_report_line_02_1_0_4_fr_bilan_actif_column2': '-2807 - 2907',
+            'l10n_fr_reports.account_financial_report_line_02_1_0_6_fr_bilan_actif_column2': '-2932',
+            'l10n_fr_reports.account_financial_report_line_02_1_0_6_fr_bilan_actif_column3': '232 + 237 + 2932',
+            'l10n_fr_reports.account_financial_report_line_02_2_0_4_fr_bilan_actif_column2': '-292 - 282 - 2818 - 2918',
+            'l10n_fr_reports.account_financial_report_line_02_2_0_5_fr_bilan_actif_column2': '-2931',
+            'l10n_fr_reports.account_financial_report_line_02_2_0_5_fr_bilan_actif_column3': '231 + 238 + 2931',
+            'l10n_fr_reports.account_financial_report_line_02_3_0_4_fr_bilan_actif_column1': '27682 + 272 + 271',
+            'l10n_fr_reports.account_financial_report_line_02_3_0_6_fr_bilan_actif_column1': r'278 + 277 + 276\(27682,27684) + 275',
+            'l10n_fr_reports.account_financial_report_line_04_0_fr_bilan_actif_column3': '481',
+            'l10n_fr_reports.account_financial_report_line_04_01_3_fr_bilan_actif_column3': '169',
+            'l10n_fr_reports.account_financial_report_line_04_01_4_fr_bilan_actif_column3': '476',
+        }
+        for expression_xmlid, formula in expected_formulas.items():
+            self.assertEqual(self.env.ref(expression_xmlid).formula, formula)
+
+    def test_bilan_comptable_legacy_line_xmlids(self):
+        self.assertEqual(
+            self.env.ref('l10n_fr_reports.account_financial_report_line_04_01_1_fr_bilan_actif').code,
+            'CHARGES_DAVANCE',
+        )
+        self.assertEqual(
+            self.env.ref('l10n_fr_reports.account_financial_report_line_03_01_2_3_fr_bilan_actif').code,
+            'CAPITAL_NON_VERSE',
+        )
 
     def test_bilan_comptable_bank_actif_passif(self):
         """
@@ -27,7 +97,7 @@ class TestBilanComptable(TestAccountReportsCommon):
           (passive section of the report) and amount is display in positive
         """
         report = self.env.ref('l10n_fr_reports.account_financial_report_l10n_fr_bilan')
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(report, '2019-01-01', '2019-12-31')
 
         bank_journal = self.company_data['default_journal_bank']
         bank_account = bank_journal.default_account_id

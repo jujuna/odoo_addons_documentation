@@ -1,7 +1,3 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-import json
-
 from odoo import api, fields, models
 
 
@@ -35,22 +31,3 @@ class ProjectProject(models.Model):
             }
         })
         return action
-
-    # ----------------------------
-    #  Project Updates
-    # ----------------------------
-
-    def _get_stat_buttons(self):
-        buttons = super()._get_stat_buttons()
-        buttons.append({
-            'icon': 'clock-o',
-            'text': self.env._('Timesheets and Planning'),
-            'action_type': 'object',
-            'action': 'open_timesheets_planning_report',
-            'additional_context': json.dumps({
-                'active_id': self.id,
-            }),
-            'show': self.display_planning_timesheet_analysis,
-            'sequence': 63,
-        })
-        return buttons

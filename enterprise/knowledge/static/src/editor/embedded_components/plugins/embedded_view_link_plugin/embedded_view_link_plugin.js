@@ -7,7 +7,7 @@ export class EmbeddedViewLinkPlugin extends Plugin {
     static id = "embeddedViewLink";
     static dependencies = ["history", "dom", "selection"];
     resources = {
-        mount_component_handlers: this.setupNewComponent.bind(this),
+        on_will_mount_component_handlers: this.setupNewComponent.bind(this),
     };
 
     setupNewComponent({ name, props }) {
@@ -15,7 +15,7 @@ export class EmbeddedViewLinkPlugin extends Plugin {
             Object.assign(props, {
                 removeViewLink: (text) => {
                     this.replaceElementWith(props.host, text);
-                    this.dependencies.history.addStep();
+                    this.dependencies.history.commit();
                 },
                 copyViewLink: () => {
                     const cursors = this.dependencies.selection.preserveSelection();

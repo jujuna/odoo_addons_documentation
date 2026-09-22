@@ -166,16 +166,7 @@
             <field name="gas_id" ref="esg_gas_n2o"/>
         </record>
 
-        <!-- 4. Zero Emission Factor -->
-        <record id="esg_zero_emission_factor" model="esg.emission.factor">
-            <field name="name">Zero Emission</field>
-            <field name="source_id" ref="esg_emission_source_neutral"/>
-            <field name="esg_uncertainty_value">0.3</field>
-            <field name="compute_method">monetary</field>
-            <field name="currency_id" ref="base.USD"/>
-        </record>
-
-        <!-- 5. Employee Lunch Factor -->
+        <!-- 4. Employee Lunch Factor -->
         <record id="esg_employee_lunch_factor" model="esg.emission.factor">
             <field name="name">Employee Lunch</field>
             <field name="source_id" ref="esg_emission_source_upstream_1"/>
@@ -202,7 +193,7 @@
             <field name="gas_id" ref="esg_gas_n2o"/>
         </record>
 
-        <!-- 6. Smartphones (Hardware Equipment Production) Factor -->
+        <!-- 5. Smartphones (Hardware Equipment Production) Factor -->
         <record id="esg_smartphones_production_factor" model="esg.emission.factor">
             <field name="name">Smartphones (Hardware Equipment Production)</field>
             <field name="source_id" ref="esg_emission_source_upstream_1"/>
@@ -519,25 +510,23 @@
             <field name="sale_ok" eval="False"/>
             <field name="purchase_ok" eval="True"/>
             <field name="categ_id" eval="ref('product.product_category_expenses', raise_if_not_found=False)"/>
-            <field name="image_1920" type="base64" file="esg/demo/files/product_computer.jpg"/>
+            <field name="image_1920" type="bytes" file="esg/demo/files/product_computer.jpg"/>
         </record>
 
         <!-- Partners -->
         <record id="partner_voltixa" model="res.partner">
             <field name="name">Voltixa</field>
-            <field name="is_company">1</field>
             <field name="street">Avenue du Réseau Électrique 42</field>
             <field name="city">Électroville</field>
             <field name="zip">75321</field>
             <field name="country_id" ref="base.fr"/>
             <field name="email">voltixa@example.com</field>
             <field name="phone">+33 1 99 88 77 66</field>
-            <field name="image_1920" type="base64" file="esg/demo/files/partner_voltixa-image.png"/>
+            <field name="image_1920" type="bytes" file="esg/demo/files/partner_voltixa-image.png"/>
         </record>
 
         <record id="partner_aetheris" model="res.partner">
             <field name="name">Aetheris Digital</field>
-            <field name="is_company">1</field>
             <field name="street">4567 Cloud Avenue</field>
             <field name="state_id" ref="base.state_us_48"/>
             <field name="city">Seattle</field>
@@ -545,19 +534,18 @@
             <field name="country_id" ref="base.us"/>
             <field name="email">aetheris.digital@example.com</field>
             <field name="phone">(206)-555-1234</field>
-            <field name="image_1920" type="base64" file="esg/demo/files/partner_aetheris-image.png"/>
+            <field name="image_1920" type="bytes" file="esg/demo/files/partner_aetheris-image.png"/>
         </record>
 
         <record id="partner_petronyx" model="res.partner">
             <field name="name">Petronyx Fuels</field>
-            <field name="is_company">1</field>
             <field name="street">Rue de l'Énergie 789</field>
             <field name="city">Bruxelles</field>
             <field name="zip">1040</field>
             <field name="country_id" ref="base.be"/>
             <field name="email">petronyx.fuels@example.com</field>
             <field name="phone">+32 2 555 67 89</field>
-            <field name="image_1920" type="base64" file="esg/demo/files/partner_petronyx-image.png"/>
+            <field name="image_1920" type="bytes" file="esg/demo/files/partner_petronyx-image.png"/>
         </record>
 
         <!-- Assignations Rules -->

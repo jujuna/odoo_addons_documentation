@@ -7,8 +7,7 @@
 <template id="report_payslip_ro_lang">
     <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
-            <t t-set="o" t-value="o.with_context(lang=o.env['res.lang']._get_code('ro_RO'))"/>
-            <t t-call="l10n_ro_hr_payroll.report_payslip_ro" t-lang="o.env.lang"/>
+            <t t-call="l10n_ro_hr_payroll.report_payslip_ro"/>
         </t>
     </t>
 </template>

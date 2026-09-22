@@ -8,29 +8,34 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tony Ng (ngto)" <ngto@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 17:48+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:55+0000\n"
+"Last-Translator: \"Tony Ng (ngto)\" <ngto@odoo.com>\n"
 "Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
-"projects/odoo-19/hr_appraisal_survey/zh_Hant/>\n"
+"projects/odoo-master/hr_appraisal_survey/zh_Hant/>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
-msgid "- Feedback requested by -"
-msgstr "- 以下人員要求回應 -"
+#: model:ir.module.module,description:base.module_hr_appraisal_survey
+msgid ""
+"\n"
+"This module adds an integration with Survey to ask feedbacks to any "
+"employee, based on a survey to fill.\n"
+msgstr ""
 
 #. module: hr_appraisal_survey
 #: model:ir.actions.act_window,name:hr_appraisal_survey.survey_survey_action_appraisal
+#: model:ir.module.module,summary:base.module_hr_appraisal_survey
 #: model:ir.ui.menu,name:hr_appraisal_survey.menu_hr_appraisal_surveys
 #: model:mail.message.subtype,description:hr_appraisal_survey.mt_360_feedback
 #: model:mail.message.subtype,name:hr_appraisal_survey.mt_360_feedback
@@ -41,17 +46,13 @@ msgstr "360 回應"
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal_template__survey_template_ids
 msgid "360 Feedback Survey"
-msgstr ""
-
-#. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
-msgid "<i class=\"oi oi-fw oi-arrow-right\"/>Go to Appraisal"
-msgstr "<i class=\"oi oi-fw oi-arrow-right\"/> 前往評核"
+msgstr "360 回應問卷"
 
 #. module: hr_appraisal_survey
 #: model:mail.template,body_html:hr_appraisal_survey.mail_template_appraisal_ask_feedback
 msgid ""
-"<p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: 20px;"
+"\">\n"
 "                    Dear <t t-out=\"object.partner_id.name or "
 "'participant'\">[participant]</t>,\n"
 "                    <br/>\n"
@@ -66,7 +67,7 @@ msgid ""
 "                    It should only take a few minutes, and you can submit "
 "your feedback via the link below:\n"
 "                    <br/>\n"
-"                    </p><div class=\"text-center my-4\">\n"
+"                    <div style=\"text-align: center; margin: 24px 0;\">\n"
 "                        <a t-att-href=\"object.get_start_url()\" t-attf-"
 "style=\"background-color: {{user.company_id.email_secondary_color or "
 "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
@@ -86,8 +87,50 @@ msgid ""
 "comment]</t>\n"
 "                        </div>\n"
 "                    </t>\n"
-"                \n"
+"                </div>\n"
 "            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 13px; line-height: "
+"20px;\">\n"
+"                    親愛的 <t t-out=\"object.partner_id.name or "
+"'participant'\">[參與者]</t>：\n"
+"                    <br/>\n"
+"                    作為本公司 360 度回應流程的一部份，<t t-out=\"ctx.get"
+"('logged_user')\">[目前的使用者]</t> 很希望了解\n"
+"                    你對 <t t-out=\"ctx.get('employee')\">[該員工]</t> 的工作"
+"表現有何看法。\n"
+"                    <br/>\n"
+"                    你的回應十分重要，有助我們認清員工的長處及優勢，同時識別"
+"發展機會及尚可改善之處。\n"
+"                    <br/>\n"
+"                    回應預計只需要幾分鐘。你可透過以下連結，提交回應：\n"
+"                    <br/>\n"
+"                    <div style=\"text-align: center; margin: 24px 0;\">\n"
+"                        <a t-att-href=\"object.get_start_url()\" t-attf-"
+"style=\"background-color: {{user.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: {"
+"{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"font-size:13px;\">\n"
+"                            提供回應意見\n"
+"                        </a>\n"
+"                    </div>\n"
+"                    請於 <t t-out=\"ctx.get('deadline')\">[指定的截止日期]</"
+"t> 之前，完成此項調查。\n"
+"                    <br/>\n"
+"                    感謝你抽空及坦誠分享！\n"
+"                    <br/>\n"
+"                    <t t-if=\"ctx.get('user_body')\">\n"
+"                        <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
+"                            <t t-out=\"ctx.get('user_body')\">[可加入其他說"
+"明]</t>\n"
+"                        </div>\n"
+"                    </t>\n"
+"                </div>\n"
+"            "
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
+msgid "<i class=\"oi me-2\" data-icon=\"east\"/>Go to Appraisal"
 msgstr ""
 
 #. module: hr_appraisal_survey
@@ -106,7 +149,7 @@ msgstr "<span> / </span>"
 msgid ""
 "A new 360 Feedback report has been completed for the appraisal of %"
 "(employee_name)s."
-msgstr "有關 %(employee_name)s 評核的新一份 360 度回應報告，已經完成。"
+msgstr "有關 %(employee_name)s 評核的新一份 360 回應報告，已經完成。"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_1
@@ -147,8 +190,8 @@ msgstr "增加一個新調查"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
-msgid "Add employees..."
-msgstr "加入員工⋯"
+msgid "Add feedback recipients..."
+msgstr ""
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_2_3
@@ -199,6 +242,11 @@ msgid "Appraisal"
 msgstr "評價"
 
 #. module: hr_appraisal_survey
+#: model:ir.module.module,shortdesc:base.module_hr_appraisal_survey
+msgid "Appraisal - Survey"
+msgstr ""
+
+#. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__employee_id
 msgid "Appraisal Employee"
 msgstr "評核的員工"
@@ -246,7 +294,7 @@ msgid "Ask Feedback for Appraisal"
 msgstr "就評核詢問回應"
 
 #. module: hr_appraisal_survey
-#: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__employee_feedback_ids
+#: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__partner_feedback_ids
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.view_hr_appraisal_tree
 msgid "Asked Feedback"
 msgstr "已詢問回應"
@@ -280,11 +328,6 @@ msgstr "正文內容與範本相同"
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__can_edit_body
 msgid "Can Edit Body"
 msgstr "允許編輯內文"
-
-#. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
-msgid "Cancel"
-msgstr "取消"
 
 #. module: hr_appraisal_survey
 #. odoo-python
@@ -380,11 +423,6 @@ msgid "Did not meet standards and expectations"
 msgstr "未有達到標準及期望"
 
 #. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_select_survey_view_form
-msgid "Discard"
-msgstr "捨棄"
-
-#. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__display_name
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_select_survey__display_name
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_hr_appraisal__display_name
@@ -399,11 +437,6 @@ msgstr "顯示名稱"
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_10
 msgid "Do you have any comment to tell him/her in order to improve?"
 msgstr "你有甚麼意見可以告訴他/她，以幫助他/她改進？"
-
-#. module: hr_appraisal_survey
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
-msgid "Employee"
-msgstr "員工"
 
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_hr_appraisal
@@ -470,7 +503,7 @@ msgstr "前往評核表格"
 #. module: hr_appraisal_survey
 #: model:mail.template,name:hr_appraisal_survey.mail_template_appraisal_ask_feedback
 msgid "HR: Ask Feedback 360"
-msgstr ""
+msgstr "人力資源：徵求 360 度回應"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_5
@@ -508,8 +541,7 @@ msgstr "識別號"
 msgid ""
 "Identify professional, performance, or project objectives you recommend for "
 "employee’s continued career development over the coming year."
-msgstr ""
-"就員工未來一年的持續職業發展，確定你認為適合的專業、績效表現或專案項目目標。"
+msgstr "就員工未來一年的持續職業發展，確定你認為適合的專業、績效表現或專案項目目標。"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
@@ -597,13 +629,8 @@ msgid "Meet standards and expectations"
 msgstr "達到標準及期望"
 
 #. module: hr_appraisal_survey
-#. odoo-python
-#: code:addons/hr_appraisal_survey/wizard/appraisal_ask_feedback.py:0
-msgid "Missing email"
-msgstr "缺少電子郵件"
-
-#. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_1_1
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_view_partner_tree
 msgid "Name"
 msgstr "姓名"
 
@@ -642,13 +669,19 @@ msgid ""
 "e.g. {{ object.partner_id.lang }}."
 msgstr ""
 "發送電子郵件時使用的翻譯語言（ISO 代碼），可選填。若未有設定，會使用合作夥伴"
-"的主要語言。通常，這會是佔位表達式，指示適當的語言，例如："
-"{{ object.partner_id.lang }}。"
+"的主要語言。通常，這會是佔位表達式，指示適當的語言，例如：{{ "
+"object.partner_id.lang }}。"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid "Overall Purpose Of Employee Appraisal"
 msgstr "員工評核的整體目的"
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
+#, fuzzy
+msgid "Partner"
+msgstr "業務夥伴"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_survey_user_input__requested_by
@@ -697,7 +730,7 @@ msgid "Rarely"
 msgstr "甚少"
 
 #. module: hr_appraisal_survey
-#: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__employee_ids
+#: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__partner_ids
 msgid "Recipients"
 msgstr "接收者"
 
@@ -741,8 +774,7 @@ msgstr "結果"
 msgid ""
 "Results of the bottom-up survey and mitigation actions to face technical, "
 "organizational, structural and/or relational issues"
-msgstr ""
-"該次由下至上調查的結果，以及用作應付技術、組織、結構及/或關係問題的緩解行動"
+msgstr "該次由下至上調查的結果，以及用作應付技術、組織、結構及/或關係問題的緩解行動"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
@@ -783,6 +815,11 @@ msgstr "已發送調查"
 #: model:mail.template,description:hr_appraisal_survey.mail_template_appraisal_ask_feedback
 msgid "Sent to employees to gather appraisal feedback"
 msgstr "發送給員工以收集評估回應"
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_survey_view_form
+msgid "Shared with everybody"
+msgstr ""
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_4
@@ -866,8 +903,7 @@ msgstr "問券使用者輸入"
 msgid ""
 "Take part in {{ ctx.get('employee_id') and ctx['employee_id'].name or "
 "'this' }} appraisal"
-msgstr ""
-"參與 {{ ctx.get('employee_id') and ctx['employee_id'].name or '此' }} 評核"
+msgstr "參與 {{ ctx.get('employee_id') and ctx['employee_id'].name or '此' }} 評核"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_4
@@ -911,16 +947,6 @@ msgid ""
 msgstr ""
 "員工將負責填寫評核表格草稿，作為自我評估的工具及主管評核的起點。員工可為每項"
 "評核準則加入具體成就例子。完成填寫表格後，員工會將其發送給主管。"
-
-#. module: hr_appraisal_survey
-#. odoo-python
-#: code:addons/hr_appraisal_survey/wizard/appraisal_ask_feedback.py:0
-msgid ""
-"The following employees do not have any email: \n"
-"%s"
-msgstr ""
-"以下員工沒有任何電郵地址：\n"
-"%s"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -1073,6 +1099,24 @@ msgid "ask feedback"
 msgstr ""
 
 #. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
+msgid "at the request of"
+msgstr ""
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_fill_form_start
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.survey_page_print
+#, fuzzy
+msgid "for"
+msgstr "給予"
+
+#. module: hr_appraisal_survey
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
+#, fuzzy
+msgid "on"
+msgstr "於"
+
+#. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_button_form_view
 msgid "or"
 msgstr "或"
@@ -1082,125 +1126,6 @@ msgstr "或"
 msgid "to a selection of colleagues you work with."
 msgstr ""
 
-#~ msgid ""
-#~ "<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
-#~ "                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"/>\n"
-#~ "                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
-#~ "                <div style=\"margin: 0px; padding: 0px;\">\n"
-#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-#~ "\">\n"
-#~ "                        </p><p style=\"margin-left:5px\">Dear <t t-"
-#~ "out=\"object.partner_id.name or 'participant'\">[participant]</t></p>\n"
-#~ "                        <span>\n"
-#~ "                            <t t-out=\"logged_user\">[Current user]</t> "
-#~ "invites you to participate in a survey and provide your feedback on <t t-"
-#~ "out=\"employee\">[employee]</t>.\n"
-#~ "                            Please complete the survey before the <t t-"
-#~ "out=\"deadline\">[specified deadline]</t>.\n"
-#~ "                        </span>\n"
-#~ "                        <br/>\n"
-#~ "                        Thank you!\n"
-#~ "                        <br/><br/>\n"
-#~ "                        <div style=\"margin: 16px 0px 16px 0px; text-"
-#~ "align: center;\">\n"
-#~ "                            <a t-att-href=\"object.get_start_url()\" t-"
-#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
-#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                Give your feedback\n"
-#~ "                            </a>\n"
-#~ "                        </div>\n"
-#~ "                    \n"
-#~ "                </div>\n"
-#~ "            "
-#~ msgstr ""
-#~ "<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
-#~ "                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"/>\n"
-#~ "                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
-#~ "                <div style=\"margin: 0px; padding: 0px;\">\n"
-#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-#~ "\">\n"
-#~ "                        </p><p style=\"margin-left:5px\">親愛的 <t t-"
-#~ "out=\"object.partner_id.name or '參加者'\">[參加者]</t></p>\n"
-#~ "                        <span>\n"
-#~ "                            <t t-out=\"logged_user\">[目前使用者]</t> 邀請"
-#~ "你參與一項調查，提供你對 <t t-out=\"employee\">[員工]</t> 的回應意見。\n"
-#~ "                            請在 <t t-out=\"deadline\">[指定截止日期]</t> "
-#~ "之前完成調查。\n"
-#~ "                        </span>\n"
-#~ "                        <br/>\n"
-#~ "                        謝謝！\n"
-#~ "                        <br/><br/>\n"
-#~ "                        <div style=\"margin: 16px 0px 16px 0px; text-"
-#~ "align: center;\">\n"
-#~ "                            <a t-att-href=\"object.get_start_url()\" t-"
-#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
-#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                提供你的意見\n"
-#~ "                            </a>\n"
-#~ "                        </div>\n"
-#~ "                    \n"
-#~ "                </div>\n"
-#~ "            "
-
-#~ msgid "All answers"
-#~ msgstr "全部答案"
-
-#~ msgid "Appraisal Survey"
-#~ msgstr "評估調查"
-
-#~ msgid "Appraisal Survey Template"
-#~ msgstr "評估調查範本"
-
-#~ msgid "Appraisal: Ask Feedback"
-#~ msgstr "評估：詢問回應"
-
-#~ msgid "Companies"
-#~ msgstr "公司"
-
-#~ msgid "Config Settings"
-#~ msgstr "配置設定"
-
-#~ msgid "Default Template"
-#~ msgstr "預設模板"
-
-#~ msgid "Department"
-#~ msgstr "部門"
-
-#~ msgid "Load template"
-#~ msgstr "使用範本"
-
-#~ msgid "Optional message"
-#~ msgstr "可選填訊息"
-
-#~ msgid ""
-#~ "Optional translation language (ISO code) to select when sending out an "
-#~ "email. If not set, the english version will be used. This should usually "
-#~ "be a placeholder expression that provides the appropriate language, e.g. "
-#~ "{{ object.partner_id.lang }}."
-#~ msgstr ""
-#~ "發送電子郵件時要選擇的可選翻譯語言（ISO 代碼）。如果未設置，將使用英文版"
-#~ "本。這通常應該是提供適當語言的佔位符表達式，例如"
-#~ "{{ object.partner_id.lang }}。"
-
-#~ msgid "Save as a new template"
-#~ msgstr "儲存為新範本"
-
-#~ msgid "Save as new template"
-#~ msgstr "儲存為新範本"
-
-#~ msgid ""
-#~ "This field is used with 360 Feedback setting on Appraisal App, the aim is "
-#~ "to define a default Survey Template related to this department."
-#~ msgstr ""
-#~ "此欄位與表現評核程式上的360回應設置一起使用，目的是定義一個與這個部門有關"
-#~ "的預設調查範本。"
-
-#~ msgid "You can't selected feedback linked to multiples appraisals."
-#~ msgstr "你不可選取已連結至多項評核的回應。"
-
-#~ msgid "You can't selected multiple feedback template."
-#~ msgstr "不可選取多個回應範本。"
+#, fuzzy
+msgid "Is Manager"
+msgstr "是經理"

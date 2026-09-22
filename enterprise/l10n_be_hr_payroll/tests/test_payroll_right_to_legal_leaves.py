@@ -1,9 +1,7 @@
-# -*- coding:utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date
 
-from odoo import Command
 from odoo.tests import tagged
 
 from .common import TestPayrollCommon
@@ -16,29 +14,19 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
     def setUpClass(cls):
         super(TestPayrollRightToLegalLeaves, cls).setUpClass()
 
-        cls.paid_time_off_type = cls.env['hr.leave.type'].create({
-            'name': 'Paid Time Off',
-            'requires_allocation': True,
-            'employee_requests': False,
-            'allocation_validation_type': 'hr',
-            'leave_validation_type': 'both',
-            'responsible_ids': [Command.link(cls.env.ref('base.user_admin').id)],
-            'request_unit': 'day'
-        })
+        cls.paid_time_off_type = cls.env.ref('hr_work_entry.be_work_entry_type_legal_leave')
 
         cls.resource_calendar_24_hours_per_week_5_days_per_week = cls.resource_calendar.copy({
             'name': 'Calendar 24 Hours/Week',
             'full_time_required_hours': 38,
             'attendance_ids': [
-                (0, 0, {'name': 'Monday Morning', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Monday Lunch', 'dayofweek': '0', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                (0, 0, {'name': 'Monday Afternoon', 'dayofweek': '0', 'hour_from': 13, 'hour_to': 15, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Tuesday Morning', 'dayofweek': '1', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Tuesday Lunch', 'dayofweek': '1', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                (0, 0, {'name': 'Tuesday Afternoon', 'dayofweek': '1', 'hour_from': 13, 'hour_to': 15, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Wednesday Morning', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Friday Morning', 'dayofweek': '4', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+                (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '0', 'hour_from': 13, 'hour_to': 15}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 13, 'hour_to': 15}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '4', 'hour_from': 8, 'hour_to': 12}),
             ]
         })
 
@@ -46,18 +34,14 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
             'name': 'Calendar 24 Hours/Week',
             'full_time_required_hours': 38,
             'attendance_ids': [
-                (0, 0, {'name': 'Monday Morning', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Monday Lunch', 'dayofweek': '0', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                (0, 0, {'name': 'Monday Afternoon', 'dayofweek': '0', 'hour_from': 13, 'hour_to': 15, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Tuesday Morning', 'dayofweek': '1', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Monday Lunch', 'dayofweek': '1', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                (0, 0, {'name': 'Tuesday Afternoon', 'dayofweek': '1', 'hour_from': 13, 'hour_to': 15, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Wednesday Morning', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Monday Lunch', 'dayofweek': '2', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                (0, 0, {'name': 'Wednesday Afternoon', 'dayofweek': '2', 'hour_from': 13, 'hour_to': 15, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Monday Lunch', 'dayofweek': '3', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                (0, 0, {'name': 'Thursday Afternoon', 'dayofweek': '3', 'hour_from': 13, 'hour_to': 15, 'day_period': 'afternoon'}),
+                (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '0', 'hour_from': 13, 'hour_to': 15}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 13, 'hour_to': 15}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 13, 'hour_to': 15}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 13, 'hour_to': 15}),
             ]
         })
 
@@ -65,11 +49,11 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
             'name': 'Calendar 20 Hours/Week',
             'full_time_required_hours': 38,
             'attendance_ids': [
-                (0, 0, {'name': 'Monday Morning', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Tuesday Morning', 'dayofweek': '1', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Wednesday Morning', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Friday Morning', 'dayofweek': '4', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+                (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '4', 'hour_from': 8, 'hour_to': 12}),
             ]
         })
 
@@ -86,7 +70,6 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         """
         wizard = self.env['hr.payroll.alloc.paid.leave'].new({
             'year': 2017,
-            'holiday_status_id': self.paid_time_off_type.id
         })
         wizard.alloc_employee_ids = wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_test.id)
         self.assertEqual(wizard.alloc_employee_ids.paid_time_off, 20, "Employee Test should have 20 days for 2018")
@@ -96,7 +79,7 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         allocation.action_approve()
 
         self.assertEqual(allocation.number_of_days, 20)
-        self.assertEqual(allocation.max_leaves_allocated, 152)
+        self.assertEqual(allocation.number_of_hours, 152)
 
         employee_test_current_contract = self.test_contracts[-1]
 
@@ -105,8 +88,6 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
             'date_start': date(2018, 4, 1),
             'date_end': date(2018, 4, 30),
             'resource_calendar_id': self.resource_calendar_30_hours_per_week.id,
-            'leave_type_id': self.paid_time_off_type.id,
-            'previous_contract_creation': True,
         })
         self.assertEqual(wizard.time_off_allocation, 16)
         view = wizard.with_context(force_schedule=True).action_validate()
@@ -122,11 +103,10 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
 
         The calculation of paid time off should be :
         On 01/01/2018, this employee has right 20 days of Paid Time Off.
-        On 01/04/2018, this employee should has 16 days of Paid Time Off.
+        On 01/04/2018, this employee should has 16.5 days of Paid Time Off.
         """
         wizard = self.env['hr.payroll.alloc.paid.leave'].new({
             'year': 2017,
-            'holiday_status_id': self.paid_time_off_type.id
         })
         wizard.alloc_employee_ids = wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_test.id)
         self.assertEqual(wizard.alloc_employee_ids.paid_time_off, 20, "Employee Test should have 20 days for 2018")
@@ -136,12 +116,12 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
         allocation.action_approve()
 
         self.assertEqual(allocation.number_of_days, 20)
-        self.assertEqual(allocation.max_leaves_allocated, 152)
+        self.assertEqual(allocation.number_of_hours, 152)
 
         employee_test_current_contract = self.test_contracts[-1]
 
         leave = self.env['hr.leave'].create({
-            'holiday_status_id': self.paid_time_off_type.id,
+            'work_entry_type_id': self.paid_time_off_type.id,
             'employee_id': self.employee_test.id,
             'request_date_from': date(2018, 2, 1),
             'request_date_to': date(2018, 2, 5),
@@ -153,13 +133,11 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
             'date_start': date(2018, 4, 1),
             'date_end': date(2018, 4, 30),
             'resource_calendar_id': self.resource_calendar_30_hours_per_week.id,
-            'leave_type_id': self.paid_time_off_type.id,
-            'previous_contract_creation': True,
         })
-        self.assertEqual(wizard.time_off_allocation, 16)
+        self.assertEqual(wizard.time_off_allocation, 16.5)
         view = wizard.with_context(force_schedule=True).action_validate()
         self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(date(2018, 4, 1))
-        self.assertEqual(allocation.number_of_days, 16, "15 days left becomes 11.5 (15 * .78, rounded down) + 5 for the days already taken.")
+        self.assertEqual(allocation.number_of_days, 16.5, "4 days taken + 16 remaining * (30/38), rounded to 0.5, gives 16.5.")
 
     def test_credit_time_for_employee_test_example3(self):
         """
@@ -174,7 +152,7 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
 
         The calculation of paid time off should be :
         On 01/01/2018, this employee has right 20 days of Paid Time Off.
-        On 04/01/2018, this employee should has 16 days of Paid Time Off.
+        On 04/01/2018, this employee should has 14.5 days of Paid Time Off.
         """
         employee_test_first_contract = self.test_contracts[-1]
         employee_test_first_contract.write({
@@ -214,21 +192,21 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
 
         wizard = self.env['hr.payroll.alloc.paid.leave'].new({
             'year': 2017,
-            'holiday_status_id': self.paid_time_off_type.id
         })
         wizard.alloc_employee_ids = wizard.alloc_employee_ids.filtered(lambda alloc_employee: alloc_employee.employee_id.id == self.employee_test.id)
-        self.assertEqual(wizard.alloc_employee_ids.paid_time_off, 15)
-        self.assertEqual(wizard.alloc_employee_ids.paid_time_off_to_allocate, 10, "10 days is equal to 20 half days")
+        self.assertEqual(wizard.alloc_employee_ids.paid_time_off, 20)
+        self.assertEqual(wizard.alloc_employee_ids.paid_time_off_to_allocate, 20)
+        self.assertEqual(wizard.alloc_employee_ids.hours_to_allocate, 80)
 
         view = wizard.generate_allocation()
         allocation = self.env['hr.leave.allocation'].search(view['domain'])
         allocation.action_approve()
 
-        self.assertEqual(allocation.number_of_days, 10)
-        self.assertAlmostEqual(allocation.max_leaves_allocated, 15 * 7.6, places=0)
+        self.assertEqual(allocation.number_of_days, 20)
+        self.assertEqual(allocation.number_of_hours, 80)
 
         leave = self.env['hr.leave'].create({
-            'holiday_status_id': self.paid_time_off_type.id,
+            'work_entry_type_id': self.paid_time_off_type.id,
             'employee_id': self.employee_test.id,
             'request_date_from': date(2018, 2, 1),
             'date_from': date(2018, 2, 1),
@@ -243,10 +221,8 @@ class TestPayrollRightToLegalLeaves(TestPayrollCommon):
             'date_start': date(2018, 4, 1),
             'date_end': date(2018, 4, 30),
             'resource_calendar_id': self.resource_calendar_24_hours_per_week_4_days_per_week.id,
-            'leave_type_id': self.paid_time_off_type.id,
-            'previous_contract_creation': True,
         })
-        self.assertEqual(wizard.time_off_allocation, 12.5)
+        self.assertEqual(wizard.time_off_allocation, 14.5)
         view = wizard.with_context(force_schedule=True).action_validate()
         self.env['l10n_be.schedule.change.allocation']._cron_update_allocation_from_new_schedule(date(2018, 4, 1))
-        self.assertEqual(allocation.number_of_days, 12.5, "10 days allocated by the credit")
+        self.assertEqual(allocation.number_of_days, 14.5, "14.5 days allocated by the credit")

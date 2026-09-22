@@ -2,13 +2,21 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.exceptions import UserError
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 from odoo.fields import Command
 
 from .test_common import TestQualityMrpCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestQualityCheck(TestQualityMrpCommon):
+
+    def _make_quants(self, products, location):
+        self.env['stock.quant'].with_context(inventory_mode=True).create({
+            'product_id': product.id,
+            'inventory_quantity': 100,
+            'location_id': location.id,
+        } for product in products).action_apply_inventory()
 
     def test_00_production_quality_check(self):
 
@@ -32,8 +40,12 @@ class TestQualityCheck(TestQualityMrpCommon):
         # Check that Production Order of Laptop Customized to produce 5.0 Unit is created.
         assert self.mrp_production_qc_test1, "Production Order not created."
 
-        # Perform check availability and produce product.
+        # Reserve components and produce product
         self.mrp_production_qc_test1.action_confirm()
+
+        # Create stock for components
+        self._make_quants(self.mrp_production_qc_test1.move_raw_ids.product_id, self.mrp_production_qc_test1.location_src_id)
+
         self.mrp_production_qc_test1.action_assign()
 
         mo_form = Form(self.mrp_production_qc_test1)
@@ -89,13 +101,15 @@ class TestQualityCheck(TestQualityMrpCommon):
         qc.unlink()
 
         # Scrap the Manufacturing Order
-        scrap = self.env['stock.scrap'].with_context(active_model='mrp.production', active_id=mo.id).create({
+        scrap = self.env['stock.move'].with_context(active_model='mrp.production', active_id=mo.id, default_is_scrap=True).create({
             'product_id': product.id,
-            'scrap_qty': 1.0,
-            'product_uom_id': product.uom_id.id,
-            'production_id': mo.id
+            'quantity': 1.0,
+            'production_id': mo.id,
+            'company_id': self.env.company.id,
+            'location_id': mo.location_dest_id.id,
+            'location_dest_id': self.scrap_location_id,
         })
-        scrap.do_scrap()
+        scrap.action_scrap()
         self.assertEqual(len(self.env['quality.check'].search([('product_id', '=', product.id), ('point_id', '=', qp.id)])), 0, "Quality checks should not be created for scrap moves")
 
     def test_03_quality_check_on_operations(self):
@@ -112,6 +126,10 @@ class TestQualityCheck(TestQualityMrpCommon):
         production_form.product_qty = 5.0
         production = production_form.save()
         production.action_confirm()
+
+        # Create stock for components
+        self._make_quants(production.move_raw_ids.product_id, production.location_src_id)
+        production.action_assign()
 
         self.assertEqual(len(production.check_ids), 1)
         self.assertEqual(production.check_ids.point_id, quality_point_operation_type)
@@ -216,6 +234,11 @@ class TestQualityCheck(TestQualityMrpCommon):
         production_form.product_qty = 1
         production = production_form.save()
         production.action_confirm()
+
+        # Create stock for components
+        self._make_quants(production.move_raw_ids.product_id, production.location_src_id)
+        production.action_assign()
+
         production.qty_producing = 1
         production.lot_producing_ids = self.lot_product_27_0
         production.move_raw_ids[0].move_line_ids[0].lot_id = self.lot_product_product_drawer_drawer_0
@@ -268,15 +291,18 @@ class TestQualityCheck(TestQualityMrpCommon):
             'measure_on': 'product',
         })
 
-        self.bom.consumption = 'flexible'
         # Create Production Order of 5.0 Unit.
         production_form = Form(self.env['mrp.production'])
         production_form.product_id = self.env['product.product'].browse(self.product_id)
         production_form.product_qty = 5.0
         self.mrp_production_qc_test1 = production_form.save()
 
-        # Perform check availability and produce product.
+        # Reserve components and produce product
         self.mrp_production_qc_test1.action_confirm()
+
+        # Create stock for components
+        self._make_quants(self.mrp_production_qc_test1.move_raw_ids.product_id, self.mrp_production_qc_test1.location_src_id)
+
         self.mrp_production_qc_test1.action_assign()
 
         mo_form = Form(self.mrp_production_qc_test1)
@@ -317,6 +343,7 @@ class TestQualityCheck(TestQualityMrpCommon):
         """
         self.bom.product_tmpl_id.categ_id = self.product_category_base
         qp = self.env['quality.point'].create({
+            'apply_to': 'categories',
             'product_category_ids': [Command.link(self.product_category_base.id)],
             'picking_type_ids': [Command.link(self.picking_type_id)],
             'measure_on': 'operation',
@@ -338,3 +365,62 @@ class TestQualityCheck(TestQualityMrpCommon):
         self.assertEqual(production.check_ids.point_id, qp)
         production.check_ids.do_pass()
         self.assertEqual(production.check_ids.quality_state, 'pass')
+
+    def test_quality_check_failure_sets_lot_line_from_production_lot(self):
+        test_picking = self.env['stock.picking.type'].create({
+            'name': 'Recepit',
+            'code': 'incoming',
+            'sequence_code': 'TEST_RECEIPT',
+        })
+        quality_point = self.env['quality.point'].create({
+            'measure_on': 'operation',
+            'picking_type_ids': [Command.link(self.picking_type_id), (Command.link(test_picking.id))],
+            'test_type_id': self.env.ref('quality_control.test_type_measure').id,
+            'product_ids': [Command.link(self.product_id)],
+        })
+        mo = self.env['mrp.production'].create({
+            'product_id': self.product_id,
+            'product_qty': 1,
+            'lot_producing_ids': self.lot_product_27_0,
+        })
+        mo.action_confirm()
+        quality_point.update({
+            'picking_type_ids': [Command.unlink(self.picking_type_id)],
+            'measure_on': 'move_line',
+        })
+        check_action = mo.check_quality()
+        quality_wizard = Form(self.env[check_action['res_model']].with_context(**check_action['context']))
+        quality_wizard.measure = 1
+        action = quality_wizard.save().do_measure()
+        failed_check_wizard = Form(self.env[action['res_model']].with_context(**action['context']))
+        failed_check_wizard = failed_check_wizard.save()
+        self.assertEqual(failed_check_wizard.lot_line_id, mo.lot_producing_ids[:1])
+
+    def test_merge_mo_unlinks_cancelled_mo_quality_checks(self):
+        """Test quality checks of the source MOs unlinks after a merge."""
+        quality_point = self.env['quality.point'].create({
+            'product_ids': [Command.link(self.product.id)],
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+        })
+        productions = self.env['mrp.production'].create([{
+            'product_id': self.product.id,
+            'bom_id': self.bom.id,
+            'product_qty': 1,
+            'picking_type_id': self.picking_type_id,
+        }, {
+            'product_id': self.product.id,
+            'bom_id': self.bom.id,
+            'product_qty': 2,
+            'picking_type_id': self.picking_type_id,
+        }])
+        productions.action_confirm()
+        source_checks = productions.check_ids
+        self.assertEqual(len(source_checks), 2)
+
+        action = productions.action_merge()
+        merged_production = self.env['mrp.production'].browse(action['res_id'])
+
+        self.assertEqual(productions.mapped('state'), ['cancel', 'cancel'])
+        self.assertFalse(source_checks.exists())
+        self.assertEqual(merged_production.product_qty, 3)
+        self.assertEqual(merged_production.check_ids.point_id, quality_point)

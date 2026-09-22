@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -11,16 +10,16 @@
     """,
     'auto_install': True,
     'data': [
-        'security/ir.model.access.csv',
-        'views/hr_timesheet_views.xml',
+        'views/account_analytic_line_views.xml',
         'views/helpdesk_team_views.xml',
         'views/helpdesk_ticket_views.xml',
-        'views/helpdesk_sla_views.xml',
         'views/helpdesk_portal_templates.xml',
         'views/project_project_views.xml',
         'views/sale_order_views.xml',
         'report/helpdesk_ticket_analysis_views.xml',
         'report/helpdesk_sla_analysis_views.xml',
+        'report/helpdesk_sale_timesheet_report.xml',
+        'security/ir.access.csv',
     ],
     'demo': ['data/helpdesk_sale_timesheet_demo.xml'],
     'author': 'Odoo S.A.',

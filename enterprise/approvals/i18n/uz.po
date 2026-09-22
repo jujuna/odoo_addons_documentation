@@ -14,22 +14,32 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-08 18:43+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 03:19+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"approvals/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-#, fuzzy
-msgid "%s (copy)"
-msgstr "%s (nusxa)"
+#: model:ir.module.module,description:base.module_approvals
+msgid ""
+"\n"
+"This module manages approvals workflow\n"
+"======================================\n"
+"\n"
+"This module manages approval requests like business trips,\n"
+"out of office, overtime, borrow items, general approvals,\n"
+"procurements, contract approval, etc.\n"
+"\n"
+"According to the approval type configuration, a request\n"
+"creates next activities for the related approvers.\n"
+msgstr ""
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
@@ -38,42 +48,19 @@ msgid "'Approval - %s' % object.name"
 msgstr "'Tasdiqlash - %s' % object.name"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/07/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/08/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "1200"
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuse"
 msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-#, fuzzy
-msgid "<i class=\"fa fa-check text-success me-1\"/>Approve"
-msgstr "<i class=\"fa fa-check text-success me-1\"/>Tasdiqlash"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-#, fuzzy
-msgid "<i class=\"fa fa-times text-danger me-1\"/>Refuse"
-msgstr "<i class=\"fa fa-times text-danger me-1\"/>Rad etish"
+msgid "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Approve"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "<span class=\"col-2 fw-bold\">Description:</span>"
 msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-#, fuzzy
-msgid "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
-msgstr "<span class=\"fa fa-warning\" title=\"Minimal tasdiqlar noto‘g‘ri\"/>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -86,6 +73,13 @@ msgstr "<span class=\"fw-bold\">Kimga</span>"
 #, fuzzy
 msgid "<span class=\"mx-1\">-</span>"
 msgstr "<span class=\"mx-1\">-</span>"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
+">"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
@@ -117,6 +111,11 @@ msgstr "Faoliyat"
 #, fuzzy
 msgid "Activity Exception Decoration"
 msgstr "Faoliyat istisnosi bezagi"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
@@ -155,17 +154,6 @@ msgstr "Administrator"
 #, fuzzy
 msgid "All Approvals"
 msgstr "Barcha tasdiqlar"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,help:approvals.field_approval_request__approval_type
-#, fuzzy
-msgid ""
-"Allows you to define which documents you would like to create once the "
-"request has been approved"
-msgstr ""
-"So‘rov tasdiqlangandan so‘ng qaysi hujjatlarni yaratishni belgilash imkonini "
-"beradi"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__amount
@@ -260,13 +248,7 @@ msgid "Approval Subject"
 msgstr "Tasdiqlash mavzusi"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approval_type
-#, fuzzy
-msgid "Approval Type"
-msgstr "Tasdiqlash turi"
-
-#. module: approvals
+#: model:ir.module.module,shortdesc:base.module_approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_root
 #: model:res.groups.privilege,name:approvals.res_groups_privilege_approvals
 #, fuzzy
@@ -313,16 +295,6 @@ msgid "Approver"
 msgstr "Tasdiqlovchi"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_category.py:0
-#, fuzzy
-msgid ""
-"Approver Sequence can only be activated with at least 1 minimum approver."
-msgstr ""
-"Tasdiqlovchilar ketma-ketligini faqat kamida 1 ta minimal tasdiqlovchi bilan "
-"faollashtirish mumkin."
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__user_ids
 #, fuzzy
 msgid "Approver Users"
@@ -342,13 +314,6 @@ msgstr "Tasdiqlovchi(lar)"
 #, fuzzy
 msgid "Approvers"
 msgstr "Tasdiqlovchilar"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approver_sequence
-#, fuzzy
-msgid "Approvers Sequence?"
-msgstr "Tasdiqlovchilar ketma-ketligi?"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -408,9 +373,8 @@ msgstr "Ilovalar"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
-#, fuzzy
-msgid "Automated Sequence?"
-msgstr "Avtomatlashtirilgan ketma-ketlik?"
+msgid "Automated Sequence"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -489,12 +453,6 @@ msgid "Category Approver"
 msgstr "Turkum tasdiqlovchisi"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
-#, fuzzy
-msgid "Code"
-msgstr "Kod"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category_approver__company_id
@@ -506,15 +464,10 @@ msgstr "Kompaniya"
 
 #. module: approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_config
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 #, fuzzy
 msgid "Configuration"
 msgstr "Sozlamalar"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
-#, fuzzy
-msgid "Confirm Date"
-msgstr "Sanani tasdiqlash"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__partner_id
@@ -536,10 +489,9 @@ msgid "Contract Approval"
 msgstr "Shartnoma tasdiqlash"
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-#, fuzzy
-msgid "Create a new product variant"
-msgstr "Yangi mahsulot turini yaratish"
+#: model:ir.module.module,summary:base.module_approvals
+msgid "Create and validate approvals requests"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid
@@ -683,12 +635,6 @@ msgid "Existing User"
 msgstr "Mavjud foydalanuvchi"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-#, fuzzy
-msgid "Fields"
-msgstr "Maydonlar"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
 #, fuzzy
 msgid "Followers"
@@ -701,22 +647,10 @@ msgid "Followers (Partners)"
 msgstr "Kuzatuvchilar (hamkorlar)"
 
 #. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
-#, fuzzy
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesome belgisi, masalan fa-tasks"
-
-#. module: approvals
 #: model:ir.actions.server,name:approvals.model_approval_request_approve_admin
 #, fuzzy
 msgid "Force Approval"
 msgstr "Majburiy tasdiqlash"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-#, fuzzy
-msgid "From:"
-msgstr "Kimdan:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
@@ -806,20 +740,13 @@ msgstr "Havolasi"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_category__manager_approval
-#, fuzzy
 msgid ""
 "How the employee's manager interacts with this type of approval.\n"
 "\n"
-"        Empty: do nothing\n"
-"        Is Approver: the employee's manager will be in the approver list\n"
-"        Is Required Approver: the employee's manager will be required to "
-"approve the request.\n"
+"        if checked the employee's manager is a required approver of the "
+"request, along with the selected users\n"
 "    "
 msgstr ""
-"Xodimning rahbari bu turdagi tasdiqlash jarayonida qanday ishtirok etishi. "
-"Bo‘sh: hech narsa qilmaydi. Tasdiqlovchi: xodimning rahbari tasdiqlovchilar "
-"ro‘yxatiga kiritiladi. Majburiy tasdiqlovchi: xodimning rahbari so‘rovni "
-"albatta tasdiqlashi shart."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__id
@@ -862,26 +789,10 @@ msgstr "Agar belgilansa, ba'zi xabarlarda yetkazib berish xatosi mavjud."
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,help:approvals.field_approval_request__automated_sequence
-#, fuzzy
 msgid ""
-"If checked, the Approval Requests will have an automated generated name "
-"based on the given code."
+"If enabled, the approval request subject will be generated automatically "
+"using the given prefix code."
 msgstr ""
-"Agar belgilansa, tasdiqlash so‘rovlari berilgan kod asosida avtomatik tarzda "
-"nomlanadi."
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
-#, fuzzy
-msgid ""
-"If checked, the approvers have to approve in sequence (one after the other). "
-"If Employee's Manager is selected as approver, they will be the first in "
-"line."
-msgstr ""
-"Agar belgilansa, tasdiqlovchilar ketma-ketlikda (birin-ketin) tasdiqlashlari "
-"kerak. Agar xodimning rahbari tasdiqlovchi sifatida tanlangan bo‘lsa, u "
-"birinchi bo‘lib tasdiqlaydi."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -903,22 +814,10 @@ msgid "Invalid Minimum Warning"
 msgstr "Noto‘g‘ri minimal ogohlantirish"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__approver
-#, fuzzy
-msgid "Is Approver"
-msgstr "Tasdiqlovchi"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_is_follower
 #, fuzzy
 msgid "Is Follower"
 msgstr "Kuzatuvchi"
-
-#. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__required
-#, fuzzy
-msgid "Is Required Approver"
-msgstr "Majburiy tasdiqlovchi"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_job_referral_award
@@ -1001,6 +900,11 @@ msgid "Marc Demo"
 msgstr "Mark namoyishi"
 
 #. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
 #, fuzzy
 msgid "Message Delivery error"
@@ -1018,6 +922,12 @@ msgstr "Xabarlar"
 #, fuzzy
 msgid "Minimum Approval"
 msgstr "Minimal tasdiqlash"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Minimum Approval must be at least 1."
+msgstr ""
 
 #. module: approvals
 #. odoo-python
@@ -1112,6 +1022,11 @@ msgstr "Keyingi faoliyat xulosasi"
 #, fuzzy
 msgid "Next Activity Type"
 msgstr "Keyingi faoliyat turi"
+
+#. module: approvals
+#: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
+msgid "No"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
@@ -1247,10 +1162,9 @@ msgid "Period:"
 msgstr "Davr:"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-#, fuzzy
-msgid "Print"
-msgstr "Chop etish"
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
+msgid "Prefix Code"
+msgstr ""
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_procurement
@@ -1276,13 +1190,6 @@ msgstr "Mahsulot tavsifi"
 #, fuzzy
 msgid "Product Line"
 msgstr "Mahsulot liniyasi"
-
-#. module: approvals
-#: model:ir.actions.act_window,name:approvals.product_product_action
-#: model:ir.ui.menu,name:approvals.approvals_menu_product_variant
-#, fuzzy
-msgid "Product Variants"
-msgstr "Mahsulot turlari"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.product_template_action
@@ -1424,9 +1331,7 @@ msgid "SMS Delivery error"
 msgstr "SMS yetkazib berishda xatolik"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_approver__sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_category_approver__sequence
 #, fuzzy
 msgid "Sequence"
 msgstr "Ketma-ketlik"
@@ -1493,6 +1398,12 @@ msgstr "Yuborish"
 #, fuzzy
 msgid "Submitted"
 msgstr "Yuborildi"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Submitted Date"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1675,25 +1586,6 @@ msgid "Users"
 msgstr "Foydalanuvchilar"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__waiting
-#: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__waiting
-#, fuzzy
-msgid "Waiting"
-msgstr "Kutilmoqda"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_request__website_message_ids
-#, fuzzy
-msgid "Website Messages"
-msgstr "Veb-sayt xabarlari"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__website_message_ids
-#, fuzzy
-msgid "Website communication history"
-msgstr "Veb-sayt muloqot tarixi"
-
-#. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 #, fuzzy
 msgid "Withdraw"
@@ -1712,13 +1604,6 @@ msgstr "O‘z tasdig‘ingizni tasdiqlash yoki rad etishga ruxsat berilmagan."
 #, fuzzy
 msgid "You can't delete an approved request. Archive it instead."
 msgstr "Tasdiqlangan so‘rovni o‘chira olmaysiz. Buning o‘rniga uni arxivlang."
-
-#. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-#, fuzzy
-msgid "You cannot approve before the previous approver."
-msgstr "Oldingi tasdiqlovchidan avval tasdiqlay olmaysiz."
 
 #. module: approvals
 #. odoo-python
@@ -1769,17 +1654,6 @@ msgstr ""
 "qaytarishingiz kerak."
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-#, fuzzy
-msgid ""
-"You must define a product for everything you sell or purchase,\n"
-"            whether it's a storable product, a consumable or a service."
-msgstr ""
-"Siz sotadigan yoki sotib oladigan har bir narsa uchun mahsulotni "
-"belgilashingiz kerak, u saqlanadigan mahsulot, iste'mol qilinadigan mahsulot "
-"yoki xizmat bo‘lishidan qat'i nazar."
-
-#. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 #, fuzzy
@@ -1814,8 +1688,25 @@ msgstr "menyu"
 msgid "new request"
 msgstr "yangi so‘rov"
 
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 #, fuzzy
-msgid "to:"
-msgstr "ga:"
+#~ msgid ""
+#~ "Approver Sequence can only be activated with at least 1 minimum approver."
+#~ msgstr ""
+#~ "Tasdiqlovchilar ketma-ketligini faqat kamida 1 ta minimal tasdiqlovchi "
+#~ "bilan faollashtirish mumkin."
+
+#, fuzzy
+#~ msgid "Waiting"
+#~ msgstr "Kutilmoqda"
+
+#, fuzzy
+#~ msgid "You cannot approve before the previous approver."
+#~ msgstr "Oldingi tasdiqlovchidan avval tasdiqlay olmaysiz."
+
+#, fuzzy
+#~ msgid "Website Messages"
+#~ msgstr "Veb-sayt xabarlari"
+
+#, fuzzy
+#~ msgid "Website communication history"
+#~ msgstr "Veb-sayt muloqot tarixi"

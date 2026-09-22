@@ -8,8 +8,12 @@ patch(DocumentsKanbanRecord.prototype, {
      * @override
      */
     isViewable() {
+        const isSpreadsheet = ["spreadsheet", "frozen_spreadsheet"].includes(this.data.handler);
+        if (isSpreadsheet && this.model.env.searchModel.context.documents_view_secondary) {
+            return false;
+        }
         return (
-            ["spreadsheet", "frozen_spreadsheet"].includes(this.data.handler) ||
+            isSpreadsheet ||
             XLSX_MIME_TYPES.includes(this.data.mimetype) ||
             this.data.mimetype === "text/csv" ||
             super.isViewable(...arguments)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from datetime import timedelta
 
 from freezegun import freeze_time
 from lxml import etree
@@ -24,6 +25,8 @@ class TestEcEdiXmls(TestEcEdiCommon):
 
     # ===== CUSTOMER INVOICES =====
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_xml_tree_out_invoice_basic(self, invoice_line_args=None, xpath=None):
         out_invoice = self.get_invoice({
             'move_type': 'out_invoice',
@@ -38,6 +41,41 @@ class TestEcEdiXmls(TestEcEdiCommon):
                 <codigoAuxiliar>F010101</codigoAuxiliar>
             </xpath>
         """)
+
+    def test_xml_tree_out_invoice_provider_vat(self):
+        """Checks that the RUC of the selected software provider is the one reported in the XML."""
+        self.company_data['company'].l10n_ec_edi_provider_id = self.env['res.partner'].create({
+            'name': "EC Software Provider",
+            'vat': '0453661050001',
+        })
+        self.test_xml_tree_out_invoice_basic(xpath="""
+            <xpath expr="//campoAdicional[@nombre='RUC Proveedor']" position="replace">
+                <campoAdicional nombre="RUC Proveedor">0453661050001</campoAdicional>
+            </xpath>
+        """)
+
+    def test_xml_tree_with_non_iva_tax(self):
+        ice_tax = self._get_tax_by_xml_id('tax_ice_plastic_bag')
+        invoice = self.get_invoice(
+            {
+                'move_type': 'out_invoice',
+                'partner_id': self.partner_a.id,
+            },
+            invoice_line_args=[
+                Command.create({
+                    'product_id': self.product_a.id,
+                    'tax_ids': [Command.set(ice_tax.ids)],
+                }),
+            ],
+        )
+        invoice.action_post()
+
+        xml_string, errors = self.env['account.edi.format']._l10n_ec_generate_xml(invoice)
+        self.assertFalse(errors)
+
+        tax_node = etree.fromstring(xml_string.encode()).xpath('//detalle/impuestos/impuesto')[0]
+        self.assertEqual(tax_node.findtext('codigoPorcentaje'), ice_tax.l10n_ec_code_ats)
+        self.assertEqual(tax_node.findtext('tarifa'), f'{ice_tax.amount:.6f}')
 
     def test_xml_tree_credit_note_product_extra_fields(self):
         self.product_a.l10n_ec_auxiliary_code = 'F010101'
@@ -239,7 +277,7 @@ class TestEcEdiXmls(TestEcEdiCommon):
         currency_euro = self.env.ref('base.EUR')
         currency_euro.active = True
         self.env['res.currency.rate'].create({
-            'name': self.frozen_today,
+            'name': self.frozen_today - timedelta(days=1),
             'company_rate': 0.5,
             'currency_id': currency_euro.id,
             'company_id': self.env.company.id,
@@ -535,8 +573,11 @@ class TestEcEdiXmls(TestEcEdiCommon):
 
     def test_xml_tree_in_withhold_foreign_partner_dm(self):
         """Checks the XML of a purchase withhold whose invoice originates from a foreign partner."""
-        self.partner_b.country_id = self.env.ref('base.dm').id
-        self.partner_b.l10n_latam_identification_type_id = self.env.ref('l10n_latam_base.it_vat')
+        self.partner_b.write({
+            'country_id': self.env.ref('base.dm').id,
+            'vat': '0453661050',
+            'additional_identifiers': {},
+        })
 
         def create_wth_lines(wizard, invoice):
             self.env['l10n_ec.wizard.account.withhold.line'].create({
@@ -616,12 +657,24 @@ class TestEcEdiXmls(TestEcEdiCommon):
         Fallback tax for goods: company.l10n_ec_withhold_goods_tax_id."""
         self.get_and_test_xml_tree_in_withhold()
 
+    def test_xml_tree_in_withhold_provider_vat(self):
+        """Checks that the RUC of the selected software provider is the one reported in the withhold XML."""
+        self.company_data['company'].l10n_ec_edi_provider_id = self.env['res.partner'].create({
+            'name': "EC Software Provider",
+            'vat': '0453661050001',
+        })
+        self.get_and_test_xml_tree_in_withhold(xpath="""
+            <xpath expr="//campoAdicional[@nombre='RUC Proveedor']" position="replace">
+                <campoAdicional nombre="RUC Proveedor">0453661050001</campoAdicional>
+            </xpath>
+        """)
+
     def test_xml_tree_in_withhold_suggested_tax_fallback_services(self):
         """Checks the XML of a purchase withhold for goods.
         Fallback tax for services: company.l10n_ec_withhold_services_tax_id."""
         self.product_a.type = 'service'
         self.get_and_test_xml_tree_in_withhold(
-            xpath=self.get_withhold_xpath_for_taxes(tax_percent='2.75', withhold_amount='11.00', tax_code=3440)
+            xpath=self.get_withhold_xpath_for_taxes(tax_percent='3.00', withhold_amount='12.00', tax_code=3440)
         )
 
     def test_xml_tree_in_withhold_suggested_tax_taxpayer_type(self):
@@ -936,7 +989,6 @@ class TestEcEdiXmls(TestEcEdiCommon):
             'partner_id': self.partner_a.id,
             'l10n_latam_document_type_id': self.env.ref('l10n_ec.ec_dt_01').id,
             'partner_vat_number': self.partner_a.vat,
-            'partner_vat_type_id': self.partner_a.l10n_latam_identification_type_id.id,
             'partner_country_id': self.partner_a.country_id.id,
             'document_number': '001-001-000000156',
             'date': self.frozen_today,

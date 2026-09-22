@@ -7,29 +7,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-17 03:29+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Hindi <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:58+0000\n"
+"PO-Revision-Date: 2026-09-18 01:56+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Hindi <https://translate.odoo.com/projects/odoo-master/"
 "data_cleaning/hi/>\n"
 "Language: hi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_group.py:0
 msgid "%(model)s - Similarity: %(similarity)s%%"
 msgstr "%(model)s - समानता: %(similarity)s%%"
-
-#. module: data_cleaning
-#. odoo-python
-#: code:addons/data_cleaning/models/data_merge_model.py:0
-msgid "%s (copy)"
-msgstr "%s (कॉपी)"
 
 #. module: data_cleaning
 #. odoo-javascript
@@ -128,7 +122,21 @@ msgid "Archive"
 msgstr "संग्रहित करें"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Archive Suggestion"
+msgstr ""
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Archive Suggestions"
+msgstr ""
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_model_view_search
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Archived"
 msgstr "संग्रहीत किया गया"
@@ -137,15 +145,17 @@ msgstr "संग्रहीत किया गया"
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 msgid ""
-"Are you sure that you want to merge the selected records in their respective "
-"group?"
-msgstr "क्या आप वाकई में चुने गए रिकॉर्ड को उनके ग्रुप में मिलाना चाहते हैं?"
+"Are you sure you want to merge these records in their respective groups? "
+"Like cream swirling into coffee, once done there is no way back."
+msgstr ""
 
 #. module: data_cleaning
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
-msgid "Are you sure that you want to merge these records?"
-msgstr "क्या आप वाकई में इन रिकॉर्ड को मर्ज करना चाहते हैं?"
+msgid ""
+"Are you sure you want to merge these records? Like cream swirling into "
+"coffee, once done there is no way back."
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_model__cleaning_mode__automatic
@@ -244,12 +254,18 @@ msgid "Country"
 msgstr "देश"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Create Date"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model,website_form_label:data_cleaning.model_res_partner
 msgid "Create a Customer"
 msgstr "ग्राहक बनाएं"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__record_create_uid
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Created By"
 msgstr "इन्होंने बनाया"
 
@@ -294,6 +310,11 @@ msgstr "करंट"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__custom_merge_method
 msgid "Custom Merge Method"
 msgstr "पसंद के मुताबिक मर्ज करने का तरीका"
+
+#. module: data_cleaning
+#: model:ir.module.module,shortdesc:base.module_data_cleaning
+msgid "Data Cleaning"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.actions.server,name:data_cleaning.ir_cron_clean_records_ir_actions_server
@@ -377,35 +398,12 @@ msgid "Delete"
 msgstr "हटाएं"
 
 #. module: data_cleaning
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_storage_tree
-msgid "Details"
-msgstr "जानकारी"
-
-#. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__differences
-msgid "Differences"
-msgstr "अंतर"
-
-#. module: data_cleaning
-#: model:ir.model.fields,help:data_cleaning.field_data_merge_record__differences
-msgid "Differences with the master record"
-msgstr "मास्टर रिकॉर्ड में मौजूद जानकारी से अलग जानकारी"
-
-#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.ir_model_view_form
 msgid "Disable Merge"
 msgstr "मर्ज करना बंद करें"
 
 #. module: data_cleaning
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
-msgid "Discard"
-msgstr "खारिज करें"
-
-#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Discarded"
 msgstr "खारिज किया गया"
 
@@ -417,7 +415,6 @@ msgstr "खारिज किया गया"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__display_name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__display_name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__display_name
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__display_name
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_model__display_name
 #: model:ir.model.fields,field_description:data_cleaning.field_res_partner__display_name
 msgid "Display Name"
@@ -452,9 +449,18 @@ msgid "Duplicates to Merge"
 msgstr "मर्ज करने के लिए डुप्लीकेट"
 
 #. module: data_cleaning
-#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__create_threshold
-msgid "Duplicates with a similarity below this threshold will not be suggested"
-msgstr "इस थ्रेशोल्ड से कम समानता वाले डुप्लीकेट नहीं सुझाए जाएंगे"
+#: model:ir.module.module,description:base.module_data_cleaning
+#: model:ir.module.module,summary:base.module_data_cleaning
+msgid ""
+"Easily format text data across multiple records. Find duplicate records and "
+"easily merge them."
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_group_config_menu.js:0
+msgid "Edit Rule"
+msgstr ""
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.ir_model_view_form
@@ -502,11 +508,6 @@ msgid "Field To Clean"
 msgstr "क्लीन करने के लिए फ़ील्ड"
 
 #. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__field_values
-msgid "Field Values"
-msgstr "फ़ील्ड की वैल्यू"
-
-#. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action_case__first
 msgid "First Letters to Uppercase"
 msgstr "शब्दों के पहले अक्षरों को बड़े अक्षरों में बदलना"
@@ -545,7 +546,6 @@ msgstr "पहचान कर ली गई है"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__id
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__id
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_model__id
 #: model:ir.model.fields,field_description:data_cleaning.field_res_partner__id
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
@@ -579,6 +579,14 @@ msgstr ""
 "             और सामान्य डेटा मर्ज का काम उस मॉडल पर उपलब्ध नहीं होता है।"
 
 #. module: data_cleaning
+#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__mix_by_company
+msgid ""
+"In Manual Mode, the system identifies duplicates across your selected "
+"companies for review. In Automated Mode, duplicates across all existing "
+"companies are merged automatically."
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__is_deleted
 msgid "Is Deleted"
 msgstr "मिटा दिया गया है"
@@ -598,6 +606,17 @@ msgstr "मास्टर है"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__last_notification
 msgid "Last Notification"
 msgstr "आखिरी सूचना"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Last Updated"
+msgstr ""
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Last Updated By"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__write_uid
@@ -622,6 +641,11 @@ msgid "Last Updated on"
 msgstr "आखिरी बार अपडेट हुआ"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Last updated on"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_record__used_in
 msgid "List of other models referencing this record"
 msgstr "इस रिकॉर्ड का रेफ़रेंस देने वाले दूसरे मॉडल की सूची"
@@ -635,7 +659,8 @@ msgstr ""
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__notify_user_ids
 msgid "List of users to notify when there are new records to merge"
-msgstr "मर्ज करने के लिए नए रिकॉर्ड होने पर सूचित किए जाने वाले उपयोगकर्ताओं की सूची"
+msgstr ""
+"मर्ज करने के लिए नए रिकॉर्ड होने पर सूचित किए जाने वाले उपयोगकर्ताओं की सूची"
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_model__cleaning_mode__manual
@@ -656,10 +681,25 @@ msgid "Manual Selection - %s"
 msgstr "मैन्युअल सलेक्शन - %s"
 
 #. module: data_cleaning
+#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__similarity_threshold
+msgid ""
+"Manual merge mode: Duplicates with a similarity percentage below this "
+"threshold will not be suggested.\n"
+"Automatic merge mode: Duplicates with a similarity percentage above this "
+"threshold will be merged automatically."
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Master"
+msgstr ""
+
+#. module: data_cleaning
 #. odoo-javascript
 #. odoo-python
 #: code:addons/data_cleaning/models/ir_model.py:0
-#: code:addons/data_cleaning/static/src/views/data_merge_list_view.xml:0
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 #: model:ir.actions.server,name:data_cleaning.merge_action_res_country
 #: model:ir.actions.server,name:data_cleaning.merge_action_res_country_state
 #: model:ir.actions.server,name:data_cleaning.merge_action_res_partner_category
@@ -667,6 +707,13 @@ msgstr "मैन्युअल सलेक्शन - %s"
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
 msgid "Merge"
 msgstr "मिलाना"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Merge Details"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__match_mode
@@ -679,6 +726,12 @@ msgid "Merge Mode"
 msgstr "मर्ज मोड"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "Merge Records"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_model__ref_merge_ir_act_server_id
 msgid "Merge Server Action"
 msgstr "सर्वर ऐक्शन मर्ज करें"
@@ -689,12 +742,19 @@ msgid "Merge action attached"
 msgstr "मर्ज ऐक्शन अटैच किया गया"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "Merge all"
+msgstr ""
+
+#. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_model.py:0
 msgid "Missing required PostgreSQL extension: unaccent"
 msgstr "ज़रूरी PostgreSQL एक्सटेंशन मौजूद नहीं है: unaccent"
 
 #. module: data_cleaning
+#: model:ir.model,name:data_cleaning.model_ir_model
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__res_model_id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__res_model_id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__res_model_id
@@ -702,10 +762,8 @@ msgstr "ज़रूरी PostgreSQL एक्सटेंशन मौजूद �
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__res_model_id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__res_model_id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__res_model_id
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__res_model
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_storage_search
 msgid "Model"
 msgstr "मॉडल"
 
@@ -720,9 +778,14 @@ msgid "Model Name"
 msgstr "मॉडल नाम"
 
 #. module: data_cleaning
-#: model:ir.model,name:data_cleaning.model_ir_model
-msgid "Models"
-msgstr "मॉडल"
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Model Rule"
+msgstr ""
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Model Rules"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_model__notify_frequency_period__months
@@ -734,6 +797,7 @@ msgstr "महीने"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__name
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Name"
 msgstr "नाम"
 
@@ -750,6 +814,18 @@ msgstr "सफ़ाई के लिए कोई सुझाव नहीं"
 #: model_terms:ir.actions.act_window,help:data_cleaning.action_data_merge_record_notification
 msgid "No duplicates found"
 msgstr "कोई डुप्लीकेट नहीं मिला"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "No master exclusive fields"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "No relations will be merged"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__notify_frequency
@@ -771,13 +847,24 @@ msgstr "उपयोगकर्ताओं को सूचित करें
 
 #. module: data_cleaning
 #. odoo-python
+#: code:addons/data_cleaning/models/res_partner.py:0
+msgid "Partners that are used in hashed entries cannot be merged."
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Preview data unavailable for this record."
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-python
 #: code:addons/data_cleaning/models/data_merge_record.py:0
 msgid "Query Failed."
 msgstr "क्वेरी असफल रही।"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_group__record_ids
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__res_id
 msgid "Record"
 msgstr "रिकॉर्ड करें"
 
@@ -827,20 +914,7 @@ msgid "Records must be of the same model"
 msgstr "रिकॉर्ड एक ही मॉडल के होने चाहिए"
 
 #. module: data_cleaning
-#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__merge_threshold
-msgid ""
-"Records with a similarity percentage above this threshold will be "
-"automatically merged"
-msgstr "एक तय सीमा से ज़्यादा मिलते-जुलते रिकॉर्ड अपने आप मर्ज हो जाएंगे"
-
-#. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__name
-msgid "Resource Name"
-msgstr "रिसोर्स का नाम"
-
-#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__rule_ids
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Rule"
 msgstr "नियम"
 
@@ -881,7 +955,7 @@ msgid "Similarity %"
 msgstr "समानता %"
 
 #. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__merge_threshold
+#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__similarity_threshold
 msgid "Similarity Threshold"
 msgstr "समानता की सीमा"
 
@@ -894,22 +968,10 @@ msgstr ""
 "कितने शब्द या वाक्यांश बिल्कुल एक जैसे हैं।"
 
 #. module: data_cleaning
-#: model:ir.actions.act_window,name:data_cleaning.action_data_storage
-#: model:ir.model,name:data_cleaning.model_ir_attachment_report
-#: model:ir.ui.menu,name:data_cleaning.menu_data_cleaning_storage
-msgid "Storage"
-msgstr "स्टोरेज"
-
-#. module: data_cleaning
-#. odoo-python
-#: code:addons/data_cleaning/report/data_storage.py:0
-msgid "Storage Detail: %(name)s"
-msgstr "स्टोरेज की जानकारी: %(name)s"
-
-#. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__rule_ids
 msgid "Suggest to merge records matching at least one of these rules"
-msgstr "रिकॉर्ड को मर्ज करने का सुझाव दें जो इनमें से कम से कम एक नियम से मिलते हों"
+msgstr ""
+"रिकॉर्ड को मर्ज करने का सुझाव दें जो इनमें से कम से कम एक नियम से मिलते हों"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__suggested_value_display
@@ -922,11 +984,6 @@ msgid "Suggested Value"
 msgstr "सुझाई गई वैल्यू"
 
 #. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__create_threshold
-msgid "Suggestion Threshold"
-msgstr "सुझाई गई सीमा"
-
-#. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action_trim__superfluous
 msgid "Superfluous Spaces"
 msgstr "ऐसे स्पेस जो ज़रूरी नहीं होते"
@@ -937,7 +994,14 @@ msgstr "ऐसे स्पेस जो ज़रूरी नहीं होत�
 msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
-msgstr "Python मॉड्यूल phonenumbers इंस्टॉल नहीं है. फ़ोन का फ़ॉर्मैट काम नहीं करेगा।"
+msgstr ""
+"Python मॉड्यूल phonenumbers इंस्टॉल नहीं है. फ़ोन का फ़ॉर्मैट काम नहीं करेगा।"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "The connection timed out. Please try merging fewer records at once."
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.constraint,message:data_cleaning.constraint_data_cleaning_model_check_notif_freq
@@ -975,11 +1039,6 @@ msgid "This name is already taken"
 msgstr "यह नाम पहले ही लिया जा चुका है"
 
 #. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__size
-msgid "Total Size"
-msgstr "कुल साइज़"
-
-#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action_trim
 msgid "Trim"
 msgstr "ट्रिम करें"
@@ -990,16 +1049,21 @@ msgid "Trim Spaces"
 msgstr "स्पेस को ट्रिम करें"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Unarchive Suggestion"
+msgstr ""
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Unarchive Suggestions"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__field_id
 msgid "Unique ID Field"
 msgstr "यूनीक आईडी फ़ील्ड"
-
-#. module: data_cleaning
-#. odoo-javascript
-#: code:addons/data_cleaning/static/src/views/data_cleaning_list_view.xml:0
-#: code:addons/data_cleaning/static/src/views/data_merge_list_view.xml:0
-msgid "Unselect"
-msgstr "चुना हुआ हटाएं"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__record_write_uid
@@ -1017,8 +1081,6 @@ msgid "Used In"
 msgstr "इस्तेमाल में"
 
 #. module: data_cleaning
-#. odoo-javascript
-#: code:addons/data_cleaning/static/src/views/data_cleaning_list_view.xml:0
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
 msgid "Validate"
 msgstr "पुष्टि करें"
@@ -1028,11 +1090,6 @@ msgstr "पुष्टि करें"
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_merge_model__notify_frequency_period__weeks
 msgid "Weeks"
 msgstr "सप्ताह"
-
-#. module: data_cleaning
-#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__mix_by_company
-msgid "When enabled, duplicates across different companies will be suggested"
-msgstr "चालू होने पर, अलग-अलग कंपनियों के डुप्लीकेट सुझाए जाएंगे"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_cleaning_rule__action_trim
@@ -1055,10 +1112,22 @@ msgid "duplicate records with the '"
 msgstr "के साथ डुप्लीकेट रिकॉर्ड"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "fields deleted"
+msgstr ""
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_duplicate
 #: model_terms:ir.ui.view,arch_db:data_cleaning.notification
 msgid "here"
 msgstr "क्लिक करें"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "matching fields"
+msgstr ""
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_merged
@@ -1071,6 +1140,15 @@ msgid "merged into this one"
 msgstr "इसमें मर्ज करें"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "records to Master"
+msgstr ""
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.notification
 msgid "records to clean with the '"
 msgstr "रिकॉर्ड साफ करने के लिए '"
+
+#~ msgid "Discard"
+#~ msgstr "खारिज करें"

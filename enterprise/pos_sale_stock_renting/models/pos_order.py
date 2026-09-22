@@ -11,6 +11,6 @@ class PosOrder(models.Model):
         order_id = super()._process_order(order, existing_order)
         order = self.browse(order_id)
         for line in order.lines:
-            if line.sale_order_line_id and line.product_id.rent_ok and line.product_id.tracking != 'none':
+            if line.sale_order_line_id and line.product_id.rent_periodicity and line.product_id.tracking in ['lot', 'serial']:
                 line.sale_order_line_id.pickedup_lot_ids = self.env['stock.lot'].search([('name', 'in', line.pack_lot_ids.mapped('lot_name')), ('product_id', '=', line.product_id.id)])
         return order_id

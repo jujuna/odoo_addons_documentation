@@ -10,7 +10,7 @@ export class TaxTotalsComponentForWithhold extends TaxTotalsComponent {
     formatData(props) {
         // Prevents super's formatting method from running
         // (its logic is not compatible with withholds)
-        this.totals = props.record.data[this.props.name];
+        return props.record.data[this.props.name];
     }
 }
 

@@ -1,26 +1,23 @@
+import { computed, t, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { GridRow, gridRow } from "../grid_row/grid_row";
 
+export const many2OneGridRowProps = {
+    canOpen: t.boolean().optional(true),
+};
+
 export class Many2OneGridRow extends GridRow {
     static template = "web_grid.Many2OneGridRow";
-    static props = {
-        ...GridRow.props,
-        relation: { type: String, optional: true },
-        canOpen: { type: Boolean, optional: true },
-    }
-    static defaultProps = {
-        ...GridRow.defaultProps,
-        canOpen: true,
-    };
+
+    many2OneProps = useProps(many2OneGridRowProps);
+
+    resId = computed(() => this.value && this.value[0]);
 
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
-    }
-
-    get relation() {
-        return this.props.relation || this.props.model.fieldsInfo[this.props.name].relation;
+        this.relation = this.props.model.fieldsInfo[this.props.name].relation;
     }
 
     get urlRelation() {
@@ -43,19 +40,20 @@ export class Many2OneGridRow extends GridRow {
             : [];
     }
 
-    get resId() {
-        return this.value && this.value[0];
-    }
-
     async openAction() {
-        const action = await this.orm.call(this.relation, "get_formview_action", [[this.resId]], {
-            context: this.props.context,
-        });
+        const action = await this.orm.call(
+            this.relation,
+            "get_record_default_action",
+            [[this.resId()]],
+            {
+                context: this.props.context,
+            }
+        );
         await this.actionService.doAction(action);
     }
 
     onClick(ev) {
-        if (this.props.canOpen) {
+        if (this.many2OneProps.canOpen) {
             ev.stopPropagation();
             this.openAction();
         }

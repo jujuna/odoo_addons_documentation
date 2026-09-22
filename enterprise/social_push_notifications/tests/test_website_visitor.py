@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import json
 from datetime import datetime, timedelta
 
 from odoo.addons.website.tests.test_website_visitor import WebsiteVisitorTests
@@ -17,11 +18,15 @@ class WebsiteVisitorTestsPush(WebsiteVisitorTests):
             'name': 'Push Subscriber Adam',
             'lang_id': self.env.ref('base.lang_en').id,
             'country_id': self.env.ref('base.be').id,
-            'website_id': 1,
+            'website_id': self.ref('base.default_website'),
             'last_connection_datetime': datetime.now() - timedelta(days=8),
             'access_token': 'f9d2f932a8f657d2d002638ea80fb97f',
             'push_subscription_ids': [(0, 0, {
-                'push_token': 'token-1'
+                'endpoint': 'https://fcm.googleapis.com/fcm/send/fake_token_0',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                }),
             })]
         }])
 
@@ -37,10 +42,18 @@ class WebsiteVisitorTestsPush(WebsiteVisitorTests):
         ])
 
         [push_subscription_1, push_subscription_2] = self.env['website.visitor.push.subscription'].create([{
-            'push_token': 'token-1',
+            'endpoint': 'https://fcm.googleapis.com/fcm/send/fake_token_0',
+            'keys': json.dumps({
+                'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+            }),
             'website_visitor_id': main_visitor.id,
         }, {
-            'push_token': 'token-2',
+            'endpoint': 'https://fcm.googleapis.com/fcm/send/fake_token_1',
+            'keys': json.dumps({
+                'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+            }),
             'website_visitor_id': linked_visitor.id,
         }])
 

@@ -3,14 +3,11 @@ import io
 import logging
 import zipfile
 
-from odoo.http import (
-    Controller,
-    content_disposition,
-    request,
-    route,
-    serialize_exception,
-)
 from werkzeug.exceptions import Forbidden, InternalServerError, NotFound
+
+from odoo.http import Controller, request, route
+from odoo.http.dispatcher import serialize_exception
+from odoo.http.stream import content_disposition
 
 from .export_utils import StudioExportSerializer
 

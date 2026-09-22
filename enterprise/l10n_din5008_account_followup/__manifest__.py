@@ -2,9 +2,8 @@
 
 {
     'name': 'DIN 5008 - Payment Follow-up Management',
-    'version': '1.0',
     'category': 'Accounting/Localizations',
-    'author': 'Odoo SA',
+    'author': 'Odoo S.A.',
     'depends': [
         'l10n_din5008',
         'account_followup',

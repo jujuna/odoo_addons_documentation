@@ -19,18 +19,18 @@ test("Facebook Message", () => {
     });
 
     const testMessage =
-        "Hello @[542132] Odoo-Social, check this out: https://www.odoo.com?utm=mail&param=1,2,3 #crazydeals #odoo";
+        "Hello @[542132] Odoo-Social's<>, check this out: https://www.odoo.com?utm=mail&param=1,2,3 #crazydeals #odoo";
     const finalMessage = SocialPostFormatterMixinBase._formatPost(testMessage);
 
     expect(finalMessage.toString()).toEqual(
         [
             "Hello",
-            "<a href='/social_facebook/redirect_to_profile/42/542132?name=Odoo-Social' target='_blank'>Odoo-Social</a>,",
+            `<a href='/social_facebook/redirect_to_profile/542132?name=Odoo-Social&#x27;s%3C%3E&account_ids=[42]' target='_blank'>Odoo-Social&#x27;s&lt;&gt;</a>,`,
             "check this out:",
             "<a href='https://www.odoo.com?utm=mail&amp;param=1,2,3' class='text-truncate' target='_blank' rel='noreferrer noopener'>https://www.odoo.com?utm=mail&amp;param=1,2,3</a>",
             "<a href='https://www.facebook.com/hashtag/crazydeals' target='_blank'>#crazydeals</a>",
             "<a href='https://www.facebook.com/hashtag/odoo' target='_blank'>#odoo</a>",
-        ].join(" ")
+        ].join(` `)
     );
     expect(finalMessage).toBeInstanceOf(Markup);
 });
@@ -94,12 +94,12 @@ test("Twitter Message", () => {
     expect(finalMessage.toString()).toEqual(
         [
             "Hello",
-            "<a href='https://twitter.com/Odoo-Social' target='_blank'>@Odoo-Social</a>,",
+            `<a href='https://twitter.com/Odoo-Social' class="o_social_comment_mention" target='_blank'>@Odoo-Social</a>,`,
             "check this out:",
             "<a href='https://www.odoo.com' class='text-truncate' target='_blank' rel='noreferrer noopener'>https://www.odoo.com</a>",
             "<a href='https://twitter.com/hashtag/crazydeals?src=hash' target='_blank'>#crazydeals</a>",
             "<a href='https://twitter.com/hashtag/odoo?src=hash' target='_blank'>#odoo</a>",
-        ].join(" ")
+        ].join(` `)
     );
     expect(finalMessage).toBeInstanceOf(Markup);
 });

@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_payment_document" inherit_id="account.report_payment_receipt_document">
-        <xpath expr="//div[@name='date']" position="after">
+        <xpath expr="//div[@name='payment_method']" position="after">
             <t t-set="cfdi" t-value="values.get('cfdi')"/>
-            <div t-if="cfdi and o.company_id.vat != cfdi['supplier_rfc']" class="col-6" name="l10n_mx_edi_supplier_rfc">
+            <div t-if="cfdi and o.company_id.vat != cfdi['supplier_rfc']" name="l10n_mx_edi_supplier_rfc">
                 <span>XML VAT: </span>
                 <span t-out="cfdi['supplier_rfc']"/>
             </div>
-            <div t-if="cfdi and o.l10n_mx_edi_payment_method_id" class="col-6" name="l10n_mx_edi_payment_method">
+            <div t-if="cfdi and o.l10n_mx_edi_payment_method_id" name="l10n_mx_edi_payment_method">
                 <strong>Payment Way:</strong>
                 <span t-out="'%s - %s' % (o.l10n_mx_edi_payment_method_id.code, o.l10n_mx_edi_payment_method_id.name)"/>
-            </div>
-        </xpath>
-
-        <xpath expr="//div[hasclass('row')][3]" position="after">
-            <div class="row" t-if="is_cfdi_signed and o.partner_id.l10n_mx_edi_fiscal_regime" name="l10n_mx_edi_fiscal_regime">
-                <div class="col-6">
-                    Fiscal Regime: (<span t-out="o.partner_id.l10n_mx_edi_fiscal_regime"/>) <span t-field="o.partner_id.l10n_mx_edi_fiscal_regime"/>
-                </div>
             </div>
         </xpath>
 

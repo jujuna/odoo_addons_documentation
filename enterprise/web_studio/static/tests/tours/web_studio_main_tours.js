@@ -8,7 +8,6 @@ let createdAppString = null;
 let createdMenuString = null;
 
 registry.category("web_tour.tours").add("web_studio_main_and_rename", {
-    url: "/odoo?debug=1",
     steps: () => [
         {
             trigger: ".o_home_menu_background",
@@ -103,7 +102,7 @@ registry.category("web_tour.tours").add("web_studio_main_and_rename", {
             run: "click",
         },
         {
-            trigger: "input.o_search_hidden",
+            trigger: "input.o_home_menu_search_input",
             // Open Command Palette
             run: `edit ${createdMenuString[0]}`,
         },
@@ -184,7 +183,7 @@ registry.category("web_tour.tours").add("web_studio_main_and_rename", {
         },
         {
             trigger:
-                ".o_record_selector .o-autocomplete--dropdown-menu > li > a:not(:has(.fa-spin))",
+                ".o_record_selector .o-autocomplete--dropdown-menu > li > a:not(:has(.oi-spin))",
             run: "click",
         },
         {
@@ -337,7 +336,7 @@ registry.category("web_tour.tours").add("web_studio_main_and_rename", {
         {
             // select Activity as model
             trigger:
-                '.modal:not(.o_inactive_modal) [name="relation_id"] .o-autocomplete--dropdown-menu li a:not(:has(.fa-spin)):contains(Activity):not(:contains("Activity "))',
+                '.modal:not(.o_inactive_modal) [name="relation_id"] .o-autocomplete--dropdown-menu li a:not(:has(.oi-spin)):contains(Activity):not(:contains("Activity "))',
             run: "click",
         },
         {
@@ -365,9 +364,17 @@ registry.category("web_tour.tours").add("web_studio_main_and_rename", {
             run: "click",
         },
         {
-            // add a statusbar
-            trigger: ".o_web_studio_statusbar_hook",
+            trigger: ".o_web_studio_sidebar .o_web_studio_new",
             run: "click",
+        },
+        {
+            // add a statusbar
+            trigger: ".o_web_studio_component.o_web_studio_field_selection",
+            run: "drag_and_drop(.o_web_studio_statusbar_hook)",
+        },
+        {
+            trigger: ".modal .o_web_studio_add_selection input",
+            run: "edit First Status",
         },
         {
             trigger: ".modal-footer .btn.btn-primary",
@@ -442,7 +449,7 @@ registry.category("web_tour.tours").add("web_studio_main_and_rename", {
             run: "click",
         },
         {
-            trigger: "input.o_search_hidden",
+            trigger: "input.o_home_menu_search_input",
             // Open Command Palette
             run: `edit ${createdMenuString[0]}`,
         },
@@ -529,8 +536,8 @@ registry.category("web_tour.tours").add("web_studio_main_and_rename", {
             },
         },
         {
-            trigger: ".o_kanban_record main",
-            content: "card content has been wrapped in a <main> element",
+            trigger: ".o_kanban_record div[class='o_record_main']",
+            content: "card content has been wrapped in a <div class='o_record_main'> element",
         },
         {
             trigger: ".o_kanban_record aside",
@@ -671,8 +678,92 @@ registry.category("web_tour.tours").add("web_studio_main_and_rename", {
     ],
 });
 
+registry.category("web_tour.tours").add("web_studio_rename", {
+    steps: () => [
+        {
+            trigger: ".o_home_menu_background",
+        },
+        {
+            // open studio
+            trigger: ".o_main_navbar .o_web_studio_navbar_item",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_new_app",
+            run: "click",
+        },
+        {
+            // the next steps are here to create a new app
+            trigger: ".o_web_studio_app_creator_next",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_app_creator_name > input",
+            run: `edit ${(createdAppString = randomString(6))}`,
+        },
+        {
+            trigger: ".o_web_studio_app_creator_next.is_ready",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_menu_creator > input",
+            run: `edit ${(createdMenuString = randomString(6))}`,
+        },
+        {
+            trigger: ".o_web_studio_app_creator_next.is_ready",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_model_configurator_next",
+            run: "click",
+        },
+        {
+            trigger: ".o_menu_toggle:not(.o_menu_toggle_back)",
+        },
+        {
+            // wait for the form editor to be rendered because the sidebar is the same
+            // unfold 'Existing Fields' section
+            trigger: ".o_web_studio_existing_fields_header",
+            run: "click",
+        },
+        {
+            // add an new field
+            trigger:
+                ".o_web_studio_sidebar .o_web_studio_field_type_container:eq(1) .o_web_studio_field_char",
+            run: "drag_and_drop .o_web_studio_form_view_editor .o_inner_group",
+        },
+        {
+            trigger: '.o_web_studio_sidebar input[name="technical_name"]',
+        },
+        {
+            // click on the field
+            trigger: ".o_web_studio_form_view_editor .o_wrap_label:first label",
+            // when it's there
+            run: "click",
+        },
+        {
+            // rename the label
+            trigger: '.o_web_studio_sidebar input[name="string"]',
+            run: "edit السَّلَامُ عَلَيْكُمْ && click .o_web_studio_sidebar",
+        },
+        {
+            // verify that the technical name hasn't changed
+            trigger: '.o_web_studio_sidebar input[name="technical_name"]:value(char_1_1)',
+            timeout: 20000,
+        },
+        {
+            // verify that the field name has changed
+            trigger: '.o_web_studio_sidebar input[name="string"]:value(السَّلَامُ عَلَيْكُمْ)',
+            // the rename operation (/web_studio/rename_field + /web_studio/edit_view)
+            // takes a while and sometimes reaches the default 10s timeout
+        },
+        {
+            trigger: ".o_web_studio_snackbar [data-icon='check']",
+        },
+    ],
+});
+
 registry.category("web_tour.tours").add("web_studio_hide_fields_tour", {
-    url: "/odoo/action-studio?mode=home_menu&debug=1",
     steps: () => [
         {
             trigger: ".o_web_studio_new_app",
@@ -692,7 +783,7 @@ registry.category("web_tour.tours").add("web_studio_hide_fields_tour", {
             // make another interaction to show "next" button
             trigger: `
         .o_web_studio_selectors
-        .o_web_studio_selector_icon > button`,
+        .o_web_studio_selector_icon`,
             run: "click",
         },
         {
@@ -803,7 +894,6 @@ registry.category("web_tour.tours").add("web_studio_hide_fields_tour", {
 });
 
 registry.category("web_tour.tours").add("web_studio_model_option_value_tour", {
-    url: "/odoo/action-studio?mode=home_menu&debug=tests",
     steps: () => [
         {
             trigger: ".o_web_studio_new_app",
@@ -822,7 +912,7 @@ registry.category("web_tour.tours").add("web_studio_model_option_value_tour", {
         {
             trigger: `
         .o_web_studio_selectors
-        .o_web_studio_selector_icon > button`,
+        .o_web_studio_selector_icon`,
             run: "click",
         },
         {
@@ -879,7 +969,6 @@ registry.category("web_tour.tours").add("web_studio_model_option_value_tour", {
 });
 
 registry.category("web_tour.tours").add("web_studio_new_submenu_tour", {
-    url: "/odoo",
     steps: () => [
         {
             trigger: ".o_home_menu_background",
@@ -935,7 +1024,6 @@ registry.category("web_tour.tours").add("web_studio_new_submenu_tour", {
 });
 
 registry.category("web_tour.tours").add("web_studio_new_report_tour", {
-    url: "/odoo",
     steps: () => [
         {
             trigger: ".o_home_menu_background",
@@ -969,13 +1057,17 @@ registry.category("web_tour.tours").add("web_studio_new_report_tour", {
             run: "click",
         },
         {
+            trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable .o-we-hint",
+        },
+        {
             // edit report name
-            trigger: '.o_web_studio_sidebar input[id="name"]',
+            trigger: '.o-web-studio-report-editor-sidebar input[id="name"]',
             run: "edit My Awesome Report && click body",
         },
         {
             // add a new group on the node
-            trigger: '.o_web_studio_sidebar .o_field_many2many_tags[name="group_ids"] input',
+            trigger:
+                '.o-web-studio-report-editor-sidebar .o_field_many2many_tags[name="group_ids"] input',
             run: "click",
         },
         {
@@ -985,30 +1077,21 @@ registry.category("web_tour.tours").add("web_studio_new_report_tour", {
         {
             // wait for the group to appear
             trigger:
-                '.o_web_studio_sidebar .o_field_many2many_tags[name="group_ids"] .o_tag_badge_text:contains(Administrator)',
+                '.o-web-studio-report-editor-sidebar .o_field_many2many_tags[name="group_ids"] .o_tag_badge_text:contains(Administrator)',
         },
         {
             // Focus the editable area
-            trigger:
-                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable div.page div",
+            trigger: ".o-web-studio-report-editor-wysiwyg iframe",
             run: "click",
         },
         {
             trigger:
-                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable div.page div",
+                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable div.page div.o-we-hint",
             run() {
-                this.anchor.ownerDocument.getSelection().setPosition(this.anchor);
                 assertEqual(
                     this.anchor.outerHTML,
-                    `<div class="oe_structure o-paragraph" o-diff-key="3"><br></div>`
+                    `<div class="oe_structure o-paragraph o-we-hint" o-diff-key="3" o-we-hint-text="Type &quot;/&quot; for commands"><br></div>`
                 );
-            },
-        },
-        {
-            trigger:
-                ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable div.page div",
-            run() {
-                assertEqual(this.anchor.classList.contains("o-we-hint"), true);
             },
         },
         {
@@ -1017,12 +1100,12 @@ registry.category("web_tour.tours").add("web_studio_new_report_tour", {
             run: "editor some new text",
         },
         {
-            trigger: ".o_web_studio_menu .o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
             // The report has been saved
-            trigger: ".o_web_studio_menu .o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
         {
             trigger: ".o_web_studio_breadcrumb .o_back_button:contains(Reports)",
@@ -1030,7 +1113,7 @@ registry.category("web_tour.tours").add("web_studio_new_report_tour", {
         },
         {
             content: "open the dropdown",
-            trigger: ".o_kanban_record:contains(My Awesome Report) .dropdown-toggle:not(:visible)",
+            trigger: ".o_kanban_record:contains(My Awesome Report) .dropdown-toggle",
             run: "click",
         },
         {
@@ -1045,20 +1128,15 @@ registry.category("web_tour.tours").add("web_studio_new_report_tour", {
         },
         {
             // switch to 'Report' tab
-            trigger: ".o_web_studio_sidebar input[id='name']",
-            run() {
-                assertEqual(this.anchor.value, "My Awesome Report copy(1)");
-            },
+            trigger:
+                ".o-web-studio-report-editor-sidebar input[id='name']:value(My Awesome Report copy(1))",
         },
         {
-            trigger: ".o-web-studio-report-editor-wysiwyg :iframe div.page div",
-            run() {
-                assertEqual(this.anchor.textContent, "some new text");
-            },
+            trigger: ".o-web-studio-report-editor-wysiwyg :iframe div.page div:text(some new text)",
         },
         {
             trigger:
-                '.o_web_studio_sidebar .o_field_many2many_tags[name="group_ids"] .o_tag_badge_text:contains(Administrator)',
+                '.o-web-studio-report-editor-sidebar .o_field_many2many_tags[name="group_ids"] .o_tag_badge_text:contains(Administrator)',
         },
         {
             trigger: ".o_web_studio_leave > a.btn",
@@ -1069,7 +1147,6 @@ registry.category("web_tour.tours").add("web_studio_new_report_tour", {
 });
 
 registry.category("web_tour.tours").add("web_studio_new_report_basic_layout_tour", {
-    url: "/odoo",
     steps: () => [
         {
             trigger: ".o_home_menu_background",
@@ -1104,12 +1181,13 @@ registry.category("web_tour.tours").add("web_studio_new_report_basic_layout_tour
         },
         {
             // edit report name
-            trigger: '.o_web_studio_sidebar input[id="name"]',
+            trigger: '.o-web-studio-report-editor-sidebar input[id="name"]',
             run: "edit My Awesome basic layout Report && click body",
         },
         {
             // add a new group on the node
-            trigger: '.o_web_studio_sidebar .o_field_many2many_tags[name="group_ids"] input',
+            trigger:
+                '.o-web-studio-report-editor-sidebar .o_field_many2many_tags[name="group_ids"] input',
             run: "click",
         },
         {
@@ -1119,15 +1197,15 @@ registry.category("web_tour.tours").add("web_studio_new_report_basic_layout_tour
         {
             // wait for the group to appear
             trigger:
-                '.o_web_studio_sidebar .o_field_many2many_tags[name="group_ids"] .o_tag_badge_text:contains(Administrator)',
+                '.o-web-studio-report-editor-sidebar .o_field_many2many_tags[name="group_ids"] .o_tag_badge_text:contains(Administrator)',
         },
         {
-            trigger: ".o_web_studio_menu .o-web-studio-save-report.btn-primary",
+            trigger: ".o-web-studio-save-report:not([disabled])",
             run: "click",
         },
         {
             // The report has been saved
-            trigger: ".o_web_studio_menu .o-web-studio-save-report:not(.btn-primary):not(:visible)",
+            trigger: ".o-web-studio-save-report[disabled]",
         },
         {
             // leave the report
@@ -1150,10 +1228,8 @@ registry.category("web_tour.tours").add("web_studio_new_report_basic_layout_tour
             run: "click",
         },
         {
-            trigger: '.o_web_studio_sidebar input[id="name"]',
-            run() {
-                assertEqual(this.anchor.value, "My Awesome basic layout Report copy(1)");
-            },
+            trigger:
+                '.o-web-studio-report-editor-sidebar input[id="name"]:value(My Awesome basic layout Report copy(1))',
         },
         {
             trigger: ".o_web_studio_leave > a.btn",
@@ -1164,7 +1240,6 @@ registry.category("web_tour.tours").add("web_studio_new_report_basic_layout_tour
 });
 
 registry.category("web_tour.tours").add("web_studio_approval_tour", {
-    url: "/odoo?debug=1",
     steps: () => [
         {
             // go to Apps menu
@@ -1207,7 +1282,7 @@ registry.category("web_tour.tours").add("web_studio_approval_tour", {
             run: "click",
         },
         {
-            trigger: ".o_web_studio_snackbar .fa-check",
+            trigger: ".o_web_studio_snackbar [data-icon='check']",
         },
         {
             // add approval rule
@@ -1242,7 +1317,7 @@ registry.category("web_tour.tours").add("web_studio_approval_tour", {
             run: "click",
         },
         {
-            trigger: ".o_web_studio_snackbar .fa-check",
+            trigger: ".o_web_studio_snackbar [data-icon='check']",
         },
         {
             // add second approval rule when the first is set
@@ -1250,7 +1325,7 @@ registry.category("web_tour.tours").add("web_studio_approval_tour", {
             run: "click",
         },
         {
-            trigger: ".o_web_studio_snackbar .fa-check",
+            trigger: ".o_web_studio_snackbar [data-icon='check']",
         },
         {
             // enable 'force different users' for one rule (doesn't matter which)
@@ -1281,6 +1356,11 @@ registry.category("web_tour.tours").add("web_studio_approval_tour", {
         },
         {
             trigger: ".o-dropdown-item:contains(Installed)",
+            run: "click",
+        },
+        {
+            content: "close the filter menu before typing a new search",
+            trigger: ".o_searchview_dropdown_toggler",
             run: "click",
         },
         {
@@ -1326,7 +1406,6 @@ registry.category("web_tour.tours").add("web_studio_approval_tour", {
 });
 
 registry.category("web_tour.tours").add("web_studio_custom_field_tour", {
-    url: "/odoo",
     steps: () => [
         {
             // go to Apps menu
@@ -1373,7 +1452,6 @@ registry.category("web_tour.tours").add("web_studio_custom_field_tour", {
 });
 
 registry.category("web_tour.tours").add("web_studio_local_storage_tour", {
-    url: "/odoo",
     steps: () => [
         {
             trigger: '.o_app[data-menu-xmlid="base.menu_management"]',
@@ -1422,7 +1500,6 @@ registry.category("web_tour.tours").add("web_studio_local_storage_tour", {
 });
 
 registry.category("web_tour.tours").add("web_studio_custom_background_tour", {
-    url: "/odoo",
     steps: () => [
         {
             content: "class for custom background must be enabled (outside studio)",
@@ -1527,10 +1604,9 @@ registry.category("web_tour.tours").add("web_studio_create_app_with_pipeline_and
             trigger: ".o_web_studio_kanban_view_editor",
         },
         {
-            trigger: ".o_avatar.o_m2o_avatar",
+            trigger: ".o_avatar.o_m2o_avatar a",
             run() {
-                const avatarImg = document.querySelector(".o_avatar.o_m2o_avatar a");
-                if (!avatarImg.getAttribute("title") === "Assign") {
+                if (!this.anchor.getAttribute("title") === "Assign") {
                     throw new Error(
                         "It should be possible to assign a record, when no one is currently selected"
                     );
@@ -1547,7 +1623,7 @@ registry.category("web_tour.tours").add("web_studio_alter_field_existing_in_mult
         },
         {
             // open studio
-            trigger: ".o_main_navbar .o_web_studio_navbar_item button",
+            trigger: ".o_main_navbar .o_web_studio_navbar_item",
             run: "click",
         },
         {
@@ -1613,7 +1689,7 @@ registry.category("web_tour.tours").add("web_studio_alter_field_existing_in_mult
         {
             // select the first model
             trigger:
-                ".modal:not(.o_inactive_modal) .o-autocomplete--dropdown-menu > li > a:not(:has(.fa-spin))",
+                ".modal:not(.o_inactive_modal) .o-autocomplete--dropdown-menu > li > a:not(:has(.oi-spin))",
             run: "click",
         },
         {
@@ -1665,7 +1741,7 @@ registry.category("web_tour.tours").add("web_studio_alter_field_existing_in_mult
             run: "click",
         },
         {
-            trigger: ".o_web_studio_snackbar .fa.fa-check",
+            trigger: ".o_web_studio_snackbar [data-icon='check']",
         },
         {
             // check if the invisible option is checked
@@ -1796,7 +1872,7 @@ registry.category("web_tour.tours").add("web_studio_test_create_action_button_in
             run: "click",
         },
         {
-            trigger: ".o_optional_columns_dropdown button",
+            trigger: ".o_optional_columns button",
             run: "click",
         },
         ...addActionButtonSteps(),
@@ -1855,7 +1931,7 @@ registry.category("web_tour.tours").add("web_studio_test_remove_action_button_in
             run: "click",
         },
         {
-            trigger: ".o_optional_columns_dropdown button",
+            trigger: ".o_optional_columns button",
             run: "click",
         },
         {
@@ -1879,7 +1955,6 @@ registry.category("web_tour.tours").add("web_studio_test_remove_action_button_in
 });
 
 registry.category("web_tour.tours").add("web_studio_monetary_create", {
-    url: "/odoo?debug=1",
     steps: () => [
         // This tour drag&drop a monetary field and verify that a currency is created
         {
@@ -1905,10 +1980,8 @@ registry.category("web_tour.tours").add("web_studio_monetary_create", {
         },
         {
             // verify that the currency is set
-            trigger: ".o_web_studio_sidebar .o_web_studio_property_currency_field input",
-            run() {
-                assertEqual(this.anchor.value, "Currency (x_studio_currency_id)");
-            },
+            trigger:
+                ".o_web_studio_sidebar .o_web_studio_property_currency_field input:value(Currency (x_studio_currency_id))",
         },
         {
             // currency field is in the view
@@ -1922,7 +1995,6 @@ registry.category("web_tour.tours").add("web_studio_monetary_create", {
 });
 
 registry.category("web_tour.tours").add("web_studio_monetary_change_currency_name", {
-    url: "/odoo?debug=1",
     steps: () => [
         // Changing currency name also change the currency name in the monetary currency selection
         {
@@ -1957,16 +2029,13 @@ registry.category("web_tour.tours").add("web_studio_monetary_change_currency_nam
         },
         {
             // verify that the currency name changed in the monetary field
-            trigger: ".o_web_studio_sidebar .o_web_studio_property_currency_field input",
-            run() {
-                assertEqual(this.anchor.value, "NewCurrency (x_studio_currency_test)");
-            },
+            trigger:
+                ".o_web_studio_sidebar .o_web_studio_property_currency_field input:value(NewCurrency (x_studio_currency_test))",
         },
     ],
 });
 
 registry.category("web_tour.tours").add("web_studio_related_monetary_creation", {
-    url: "/odoo?debug=1",
     steps: () => [
         {
             trigger: ".o_home_menu_background",
@@ -2021,13 +2090,13 @@ registry.category("web_tour.tours").add("web_studio_related_monetary_creation", 
         },
         {
             // The currency is created
-            trigger: ".o_web_studio_view_renderer [data-field-name='x_studio_x_test_x_studio_currency_test']",
+            trigger:
+                ".o_web_studio_view_renderer [data-field-name='x_studio_x_test_x_studio_currency_test']",
         },
     ],
 });
 
 registry.category("web_tour.tours").add("web_studio_monetary_change_currency_field", {
-    url: "/odoo",
     steps: () => [
         // Change currency and verify that the view take the changes into account (the dollar appears)
         {
@@ -2060,15 +2129,12 @@ registry.category("web_tour.tours").add("web_studio_monetary_change_currency_fie
         },
         {
             // open studio with the record
-            trigger: ".o_main_navbar .o_web_studio_navbar_item button",
+            trigger: ".o_main_navbar .o_web_studio_navbar_item",
             run: "click",
         },
         {
             // check that there is no currency symbol in renderer
-            trigger: "div[name='x_studio_monetary_test'] span",
-            run() {
-                assertEqual(this.anchor.textContent, "0.00");
-            },
+            trigger: "div[name='x_studio_monetary_test'] span:text(0.00)",
         },
         {
             // click on the monetary field
@@ -2092,16 +2158,12 @@ registry.category("web_tour.tours").add("web_studio_monetary_change_currency_fie
         },
         {
             // by changing the currency, we should have a $ symbol in the renderer
-            trigger: "div[name^='x_studio_monetary'] span",
-            run() {
-                assertEqual(this.anchor.textContent, "$ 0.00");
-            },
+            trigger: "div[name^='x_studio_monetary'] span:text($ 0.00)",
         },
     ],
 });
 
 registry.category("web_tour.tours").add("web_studio_monetary_change_currency_not_in_view", {
-    url: "/odoo",
     steps: () => [
         // Change a currency that is not present in the view insert it in the view
         {
@@ -2156,7 +2218,6 @@ registry.category("web_tour.tours").add("web_studio_monetary_change_currency_not
 });
 
 registry.category("web_tour.tours").add("web_studio_monetary_add_existing_monetary", {
-    url: "/odoo?debug=1",
     steps: () => [
         // Add an existing monetary trough the "existing fields" and verify that the currency
         // is added to the view
@@ -2192,10 +2253,8 @@ registry.category("web_tour.tours").add("web_studio_monetary_add_existing_moneta
         },
         {
             // verify that the currency name changed in the monetary field
-            trigger: ".o_web_studio_sidebar .o_web_studio_property_currency_field input",
-            run() {
-                assertEqual(this.anchor.value, "X Studio Currency Test (x_studio_currency_test)");
-            },
+            trigger:
+                ".o_web_studio_sidebar .o_web_studio_property_currency_field input:value(X Studio Currency Test (x_studio_currency_test))",
         },
         {
             // currency field is in the view
@@ -2207,7 +2266,6 @@ registry.category("web_tour.tours").add("web_studio_monetary_add_existing_moneta
 registry
     .category("web_tour.tours")
     .add("web_studio_monetary_create_monetary_with_existing_currency", {
-        url: "/odoo?debug=1",
         steps: () => [
             // Add a new monetary field, since a currency already exists, it should take it instead
             // of creating a new one
@@ -2249,16 +2307,14 @@ registry
             {
                 // there is only one occurence of the currency field in the view
                 trigger: ".o_form_renderer div[data-field-name^='x_studio_monetary']",
-                run() {
-                    const o2mNumber = document.querySelectorAll("div.o_field_many2one");
-                    assertEqual(o2mNumber.length, 1);
-                },
+            },
+            {
+                trigger: `body:has(div.o_field_many2one:count(1))`,
             },
         ],
     });
 
 registry.category("web_tour.tours").add("web_studio_add_field_into_empty_group_by", {
-    url: "/odoo?debug=1",
     steps: () => [
         {
             trigger: ".o_home_menu_background",
@@ -2360,7 +2416,6 @@ registry.category("web_tour.tours").add("web_studio_test_remove_action_in_form_v
 });
 
 registry.category("web_tour.tours").add("web_studio_test_cohort_measure_values", {
-    url: "/web?debug=1",
     steps: () => [
         {
             trigger: ".o_home_menu_background",

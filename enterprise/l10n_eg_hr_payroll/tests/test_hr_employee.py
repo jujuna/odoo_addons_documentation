@@ -17,20 +17,22 @@ class TestEgyptianHrEmployee(TransactionCase):
             'country_id': cls.env.ref('base.eg').id,
             'currency_id': cls.env.ref('base.EGP').id,
         })
-        cls.leave_type = cls.env['hr.leave.type'].create({
+        cls.work_entry_type = cls.env['hr.work.entry.type'].create({
             'name': 'Annual Leave',
+            'code': 'Annual Leave',
             'requires_allocation': 'yes',
-            'company_id': cls.egyptian_company.id,
+            'unit_of_measure': 'day',
+            'count_as': 'absence',
         })
-        cls.egyptian_company.l10n_eg_annual_leave_type_id = cls.leave_type
+        cls.egyptian_company.l10n_eg_annual_work_entry_type_id = cls.work_entry_type
         cls.calendar = cls.env['resource.calendar'].create({
             'name': 'EG Sun-Thu',
             'attendance_ids': [
-                (0, 0, {'name': 'Sun', 'dayofweek': '6', 'hour_from': 8, 'hour_to': 16}),
-                (0, 0, {'name': 'Mon', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 16}),
-                (0, 0, {'name': 'Tue', 'dayofweek': '1', 'hour_from': 8, 'hour_to': 16}),
-                (0, 0, {'name': 'Wed', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 16}),
-                (0, 0, {'name': 'Thu', 'dayofweek': '3', 'hour_from': 8, 'hour_to': 16}),
+                (0, 0, {'dayofweek': '6', 'hour_from': 8, 'hour_to': 16}),
+                (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 16}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 8, 'hour_to': 16}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 8, 'hour_to': 16}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 8, 'hour_to': 16}),
             ],
         })
         cls.employee = cls.env['hr.employee'].create({
@@ -48,7 +50,7 @@ class TestEgyptianHrEmployee(TransactionCase):
 
         allocation = self.env['hr.leave.allocation'].create({
             'name': 'Annual Leave Allocation 2025',
-            'holiday_status_id': self.leave_type.id,
+            'work_entry_type_id': self.work_entry_type.id,
             'number_of_days': 25,
             'employee_id': self.employee.id,
             'date_from': date(2025, 1, 1),
@@ -60,12 +62,11 @@ class TestEgyptianHrEmployee(TransactionCase):
 
         leave = self.env['hr.leave'].create({
             'name': 'Annual Leave Request',
-            'holiday_status_id': self.leave_type.id,
+            'work_entry_type_id': self.work_entry_type.id,
             'employee_id': self.employee.id,
             'request_date_from': date(2025, 8, 24),
             'request_date_to': date(2025, 8, 31),
-            'request_unit_half': False,
-            'request_unit_hours': False,
+            'work_entry_type_request_unit': 'day',
         })
         leave._action_validate()
         result = self.employee._l10n_eg_get_annual_remaining_leaves()

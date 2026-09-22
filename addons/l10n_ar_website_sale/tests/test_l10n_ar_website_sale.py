@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from odoo.fields import Command
 from odoo.tests import tagged
 
@@ -9,6 +7,8 @@ from odoo.addons.website_sale.tests.common import MockRequest
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestL10nArWebsiteSale(TestArCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -34,16 +34,15 @@ class TestL10nArWebsiteSale(TestArCommon):
             'name': 'Color',
             'display_type': 'color',
         })
-        cls.color_white = cls.env['product.attribute.value'].create({
+        cls.color_white, cls.color_black = cls.env['product.attribute.value'].create([{
             'name': 'White',
             'html_color': '#FFFFFF',
             'attribute_id': cls.color_attribute.id,
-        })
-        cls.color_black = cls.env['product.attribute.value'].create({
+        }, {
             'name': 'Black',
             'html_color': '#000000',
             'attribute_id': cls.color_attribute.id,
-        })
+        }])
 
     def assertDictContains(self, actual_dict, expected_subset):
         """Assert that actual_dict contains all key-value pairs from expected_subset."""
@@ -52,13 +51,14 @@ class TestL10nArWebsiteSale(TestArCommon):
 
     def _get_combination_info(self, product_id=None, quantity=1):
         """Helper method to retrieve combination info for a product."""
-        with MockRequest(self.env, website=self.ar_website):
-            return self.product_1._get_additionnal_combination_info(
+        with MockRequest(self.env, website=self.ar_website) as request:
+            return self.product_1._get_additional_combination_info(
                 product_or_template=product_id or self.product_1,
                 quantity=quantity,
                 uom=self.uom_unit,
-                date=datetime(2025, 5, 21),
-                website=self.ar_website
+                website=self.ar_website,
+                pricelist=request.pricelist,
+                fiscal_position=request.fiscal_position,
             )
 
     def test_default_website_sale_legal_values(self):
@@ -76,14 +76,14 @@ class TestL10nArWebsiteSale(TestArCommon):
             })
 
         with self.subTest(scenario="Mixed taxes - 10.5% excluded + 27% included"):
-            template = self.env['account.chart.template']
-            tax_27_included = template.ref('ri_tax_vat_27_ventas')
-            tax_10_5_excluded = template.ref('ri_tax_vat_10_ventas')
+            AccountChartTemplate = self.env['account.chart.template']
+            tax_27_included = AccountChartTemplate.ref('ri_tax_vat_27_ventas')
+            tax_10_5_excluded = AccountChartTemplate.ref('ri_tax_vat_10_ventas')
 
             tax_27_included.price_include = True
             tax_10_5_excluded.price_include = False
 
-            self.product_1.taxes_id = (tax_27_included + tax_10_5_excluded).ids
+            self.product_1.taxes_id = tax_27_included + tax_10_5_excluded
             combo = self._get_combination_info()
             self.assertDictContains(combo, {
                 'list_price': 1082.68,                 # Computed price including all taxes
@@ -92,7 +92,7 @@ class TestL10nArWebsiteSale(TestArCommon):
 
     def test_price_calculation_with_pricelist_rules(self):
         """Check that pricelist rules are taken into account."""
-        self._enable_pricelists()
+        self.pricelist = self._enable_pricelists()
         self.pricelist.update({
             'website_id': self.ar_website.id,
             'item_ids': [
@@ -104,7 +104,7 @@ class TestL10nArWebsiteSale(TestArCommon):
                     'product_tmpl_id': self.product_1.id,
                 }),
                 Command.create({
-                    'compute_price': 'formula',
+                    'compute_price': 'discount',
                     'price_surcharge': 2.0,
                     'applied_on': '3_global',
                 }),

@@ -5,9 +5,10 @@ from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
 from odoo.addons.appointment.tests.common import AppointmentCommon
-from odoo.tests import Form, users
+from odoo.tests import tagged, Form, users
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class AppointmentInviteTest(AppointmentCommon):
 
     def test_gc_appointment_invite(self):

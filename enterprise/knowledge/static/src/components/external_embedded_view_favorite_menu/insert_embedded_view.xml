@@ -7,11 +7,11 @@
                 Knowledge
             </button>
             <t t-set-slot="content">
-                <DropdownItem onSelected.bind="onInsertEmbeddedViewInArticle" closingMode="'none'">
-                    <i class="oi oi-fw oi-view me-1"/>Insert view in article
+                <DropdownItem onSelected.bind="this.onInsertEmbeddedViewInArticle" closingMode="'none'">
+                    <i class="oi oi-fw me-1" data-icon="toolbar"/>Insert view in article
                 </DropdownItem>
-                <DropdownItem onSelected.bind="onInsertViewLinkInArticle" closingMode="'none'" >
-                    <i class="fa fa-fw fa-link me-1"/>Insert link in article
+                <DropdownItem onSelected.bind="this.onInsertViewLinkInArticle" closingMode="'none'" >
+                    <i class="oi oi-fw me-1" data-icon="link"/>Insert link in article
                 </DropdownItem>
             </t>
         </Dropdown>

@@ -2,15 +2,15 @@ import base64
 import logging
 from lxml import etree
 import re
-from requests.exceptions import Timeout, ConnectionError, HTTPError
+from requests.exceptions import RequestException
 import textwrap
 
 from odoo import _, api, fields, models, tools
 
 from odoo.tools import float_compare
 from odoo.tools.zeep import Client, Settings
+from odoo.tools.zeep.exceptions import Error as ZeepError
 from odoo.tools.zeep.wsse.username import UsernameToken
-
 
 RESPONSE_CODE_TO_STATE = {
     # Irreversible states
@@ -138,14 +138,19 @@ class L10n_Uy_EdiDocument(models.Model):
         if applies)"""
         for edi_doc in self:
             if edi_doc.move_id.journal_id.type == 'sale':
-                result = edi_doc._ucfe_inbox("360", {"Uuid": edi_doc.uuid})
+                result = edi_doc._ucfe_inbox(
+                    "360",
+                    {"Uuid": edi_doc.uuid},
+                    terminal_code=edi_doc.move_id.journal_id.l10n_uy_edi_ucfe_terminal_code,
+                )
             else:
                 document_number = re.search(r"([A-Z]*)([0-9]*)", edi_doc.move_id.l10n_latam_document_number).groups()
                 result = edi_doc._ucfe_inbox("650", {
                     "TipoCfe": edi_doc.move_id.l10n_latam_document_type_id_code,
                     "Serie": document_number[0],
                     "NumeroCfe": document_number[1],
-                    "RutEmisor": edi_doc.move_id.partner_id.vat})
+                    "RutEmisor": edi_doc.move_id.partner_id.vat,
+                }, terminal_code=edi_doc.move_id.journal_id.l10n_uy_edi_ucfe_terminal_code)
             edi_doc._update_cfe_state(result)
 
     # Extended methods
@@ -211,6 +216,10 @@ class L10n_Uy_EdiDocument(models.Model):
                 xml_tag=field_name, xml_tag_len=limit, value_len=len(res), value_content=res))
         return errors
 
+    def _get_origin_record(self):
+        self.ensure_one()
+        return self.move_id
+
     @api.model
     def _get_cfe_tag(self, move):
         move.ensure_one()
@@ -239,7 +248,8 @@ class L10n_Uy_EdiDocument(models.Model):
         res = []
         addendas = move_id.l10n_uy_edi_addenda_ids.filtered(lambda x: x.type == addenda_type)
         for addenda in addendas:
-            res.append("{ %s }" % addenda.content if addenda.is_legend else addenda.content)
+            content = addenda.content.strip()
+            res.append("{ %s }" % content if addenda.is_legend else content)
         return "\n".join(res)
 
     @api.model
@@ -250,7 +260,7 @@ class L10n_Uy_EdiDocument(models.Model):
     def _get_pdf(self):
         """ Connect to Uruware with the info of CFE and return the corresponding PDF file
         Legal representation.
-        return: {"errors"; strg(), "file_content": bytes string file content}"""
+        return: {"errors"; strg(), "file_content": base64 file content string}"""
         res = {}
         document_number = re.search(r"([A-Z]*)([0-9]*)", self.l10n_latam_document_number).groups()
         req_data = {
@@ -266,7 +276,7 @@ class L10n_Uy_EdiDocument(models.Model):
         response = result.get("response")
 
         if response is not None:
-            res.update({"file_content": response.findtext(".//{*}" + report_params + "Result").encode()})
+            res.update({"file_content": (response.findtext(".//{*}" + report_params + "Result") or '').strip()})
 
         if result.get("errors"):
             res.update({"errors": result.get("errors")})
@@ -289,7 +299,7 @@ class L10n_Uy_EdiDocument(models.Model):
             self.env.ref('l10n_uy.dc_cn_e_inv_exp') |
             self.env.ref('l10n_uy.dc_dn_e_inv_exp')
         )
-        addenda = self.move_id._l10n_uy_edi_get_addenda()
+        addenda = self._get_origin_record()._l10n_uy_edi_get_addenda()
         parameters = {}
 
         if addenda:
@@ -329,7 +339,9 @@ class L10n_Uy_EdiDocument(models.Model):
         We did not make it as default value because we need the move to set """
         res = move._name + "-" + str(move.id)
         if move.company_id.l10n_uy_edi_ucfe_env == "testing":
-            res = "am" + str(move.id) + "-" + self.env.cr.dbname
+            # Initials of the origin model so their UUIDs differ, account.move still reads "am"
+            prefix = "".join(word[0] for word in move._name.split("."))
+            res = prefix + str(move.id) + "-" + self.env.cr.dbname
         return res[:50]
 
     def _get_ws_url(self, ws_endpoint, company):
@@ -350,16 +362,12 @@ class L10n_Uy_EdiDocument(models.Model):
             base_url = "https://odootest.ucfe.com.uy/"
 
         if ws_endpoint == "inbox":
-            url = self.env["ir.config_parameter"].sudo().get_param(
-                key="l10n_uy_edi.l10n_uy_edi_ucfe_inbox_url",
-                default=base_url + "inbox115/cfeservice.svc",
-            )
+            url = self.env["ir.config_parameter"].sudo().get_str("l10n_uy_edi.l10n_uy_edi_ucfe_inbox_url") \
+                or (base_url + "inbox115/cfeservice.svc")
             pattern = r"https://.*\.ucfe\.com\.uy/inbox.*/cfeservice\.svc"
         elif ws_endpoint == "query":
-            url = self.env["ir.config_parameter"].sudo().get_param(
-                key="l10n_uy_edi.l10n_uy_edi_ucfe_query_url",
-                default=base_url + "query116/webservicesfe.svc",
-            )
+            url = self.env["ir.config_parameter"].sudo().get_str("l10n_uy_edi.l10n_uy_edi_ucfe_query_url") \
+                or (base_url + "query116/webservicesfe.svc")
             pattern = r"https://.*\.ucfe\.com\.uy/query.*/webservicesfe\.svc"
         else:
             url = pattern = None
@@ -374,8 +382,11 @@ class L10n_Uy_EdiDocument(models.Model):
         return "preview-cfe-move-%s.xml" % self.move_id.id
 
     @api.model
-    def _is_connection_info_incomplete(self, company):
-        """ False if everything is ok, Message if there is a problem or something missing """
+    def _is_connection_info_incomplete(self, company, **extra_connection_info):
+        """ False if everything is ok, Message if there is a problem or something missing.
+
+        The terminal code is either given by the caller (point of invoicing) or read from the company
+        (default/fallback terminal); the connection is complete as long as one of them is present. """
 
         field_data = company.fields_get([])
         missing_info = []
@@ -383,10 +394,11 @@ class L10n_Uy_EdiDocument(models.Model):
             "l10n_uy_edi_ucfe_env",
             "l10n_uy_edi_ucfe_password",
             "l10n_uy_edi_ucfe_commerce_code",
-            "l10n_uy_edi_ucfe_terminal_code",
         ):
             if not company[field]:
                 missing_info.append(field_data[field]["string"])
+        if not (extra_connection_info.get("terminal_code") or company.l10n_uy_edi_ucfe_terminal_code):
+            missing_info.append(field_data["l10n_uy_edi_ucfe_terminal_code"]["string"])
         inbox_url = self._get_ws_url("inbox", company)
         if not inbox_url:
             missing_info.append(_("UCFE Provider Inbox URL"))
@@ -434,45 +446,51 @@ class L10n_Uy_EdiDocument(models.Model):
 
         return {"response": response_tree, "errors": errors}
 
-    def _send_dgi(self, request_data):
+    def _send_dgi(self, request_data, **extra_connection_info):
         """ Call endpoint that lets us post a DGI Invoice (310 - Signature and sending of CFE (individual)) """
         self.ensure_one()
-        return self._ucfe_inbox("310", request_data)
+        return self._ucfe_inbox("310", request_data, **extra_connection_info)
 
-    def _ucfe_inbox(self, msg_type, extra_req):
+    def _ucfe_inbox(self, msg_type, extra_req, company=None, **extra_connection_info):
         """ Call Operation on UCFE inbox webservice
         :param msg_type: integer that represents the query we are going to call. For instance:
             360 - Check CFE State
             310 - Create CFE on DGI (send)
             820 - Check Credentials
+        :param extra_req: any additional data necessary to send to UCFE
+        :param company: company holding the UCFE credentials, defaults to the document's own company
+        :param extra_connection_info: connection overrides, currently only ``terminal_code``, the point
+            of invoicing to report instead of the company default
         :returns: dictionary ({"response" etree obj }, "errors": str()) """
         now = fields.Datetime.now()
-        company = extra_req.get('company') or self.company_id or self.env.company
+        company = company or self.company_id or self.env.company
+        commerce_code = company.sudo().l10n_uy_edi_ucfe_commerce_code
+        terminal_code = extra_connection_info.get("terminal_code") or company.sudo().l10n_uy_edi_ucfe_terminal_code
         data = {
-            "CodComercio": company.l10n_uy_edi_ucfe_commerce_code,
-            "CodTerminal": company.l10n_uy_edi_ucfe_terminal_code,
+            "CodComercio": commerce_code,
+            "CodTerminal": terminal_code,
             "RequestDate": now.replace(microsecond=0).isoformat(),
             "Tout": "30000",
             "Req": {
                 "TipoMensaje": msg_type,
-                "CodComercio": company.l10n_uy_edi_ucfe_commerce_code,
-                "CodTerminal": company.l10n_uy_edi_ucfe_terminal_code,
+                "CodComercio": commerce_code,
+                "CodTerminal": terminal_code,
                 "IdReq": 1,
                 **extra_req,
             },
         }
-        return self._ucfe_ws_call(company, "inbox", "Invoke", [data])
+        return self._ucfe_ws_call(company, "inbox", "Invoke", [data], extra_connection_info=extra_connection_info)
 
     def _ucfe_query(self, method, req_data):
         """ Call Query on UCFE Query Webservices """
         company = self.company_id or self.env.company
         return self._ucfe_ws_call(company, "query", method, **req_data)
 
-    def _ucfe_ws_call(self, company, endpoint, method, *args, **kwargs):
+    def _ucfe_ws_call(self, company, endpoint, method, *args, extra_connection_info=None, **kwargs):
         response = None
         errors = []
 
-        if error := self._is_connection_info_incomplete(company):
+        if error := self._is_connection_info_incomplete(company, **(extra_connection_info or {})):
             # An error is possible if the company does not have credentials or if they are incorrect
             return {'response': None, "errors": [error]}
         url = self._get_ws_url(endpoint, company)
@@ -485,7 +503,7 @@ class L10n_Uy_EdiDocument(models.Model):
                 response = client.service[method](*args)
             else:
                 response = client.service[method](**kwargs)
-        except (Timeout, ConnectionError, HTTPError) as exp:
+        except (RequestException, ZeepError) as exp:
             errors.append(_("There was a problem with the connection with Uruware: %s", repr(exp)))
 
         return self._process_response(response, errors)
@@ -517,12 +535,16 @@ class L10n_Uy_EdiDocument(models.Model):
         """DEPRECATED: Use _get_partner_from_xml instead."""
         return self._get_partner_from_xml(xml_tree, partner_vat_RUC)
 
+    @api.model
+    def _l10n_uy_get_state_by_name(self, name):
+        if not name:
+            return self.env["res.country.state"]
+        return self.env["res.country.state"].search([("name", "ilike", name), ("country_id.code", "=", "UY")], limit=1)
+
     def _get_partner_from_xml(self, xml_tree, partner_vat_RUC):
         """Select partner if exists or create partner from vendor bill XML data. """
         partner = self.env["res.partner"]._retrieve_partner(vat=partner_vat_RUC, company=self.company_id)
-        state_id = None
-        if departamento := xml_tree.findtext(".//{*}Departamento"):
-            state_id = self.env["res.country.state"].search([("name", "ilike", departamento), ("country_id.code", "=", "UY")], limit=1)
+        state_id = self._l10n_uy_get_state_by_name(xml_tree.findtext(".//{*}Departamento"))
         return partner or self.env["res.partner"].create({
             "name": xml_tree.findtext(".//{*}RznSoc"),
             "vat": partner_vat_RUC,
@@ -530,8 +552,6 @@ class L10n_Uy_EdiDocument(models.Model):
             "street": xml_tree.findtext(".//{*}DomFiscal"),
             "state_id": state_id.id if state_id else None,
             "country_id": self.env.ref("base.uy").id,
-            "l10n_latam_identification_type_id": self.env.ref("l10n_uy.it_rut").id,
-            "is_company": True
         })
 
     def _create_pdf_vendor_bill(self, move, req_data_pdf):
@@ -554,7 +574,7 @@ class L10n_Uy_EdiDocument(models.Model):
             "res_field": "invoice_pdf_report_file",
             "res_id": self.move_id.id,
             "type": "binary",
-            "datas": response.findtext('.//{*}ObtenerPdfCfeRecibidoResult').encode()
+            "raw": base64.b64decode(response.findtext('.//{*}ObtenerPdfCfeRecibidoResult').encode()),
         })
 
     def cron_l10n_uy_edi_get_vendor_bills(self, batch_size=10):
@@ -593,7 +613,7 @@ class L10n_Uy_EdiDocument(models.Model):
 
                 # 610 - Request notification details.
                 l10n_uy_idreq = response_600['response'].findtext('.//{*}IdReq')
-                response_610 = self._ucfe_inbox("610", {"IdReq": l10n_uy_idreq, 'company': company})
+                response_610 = self._ucfe_inbox("610", {"IdReq": l10n_uy_idreq}, company=company)
                 if errors := response_610['errors']:
                     company_errors[f'{company.id}'] = "\n".join(errors)
                     notifications = False
@@ -619,9 +639,12 @@ class L10n_Uy_EdiDocument(models.Model):
                         "res_id": move.l10n_uy_edi_document_id.id,
                         "res_field": "attachment_file",
                         "type": "binary",
-                        "datas": base64.b64encode(xml_cfe_firmado.encode()
-                                                  if xml_cfe_firmado
-                                                  else etree.tostring(response_610['response']))})
+                        "raw": (
+                            xml_cfe_firmado.encode()
+                            if xml_cfe_firmado
+                            else etree.tostring(response_610['response'])
+                        ),
+                    })
                     move._l10n_uy_edi_complete_cfe_from_xml(etree.fromstring(xml_cfe_firmado))
                 else:
                     # Until now we are not supporting the creation of e-Resguardos and e-Remitos
@@ -686,7 +709,7 @@ class L10n_Uy_EdiDocument(models.Model):
 
     def _notification_consult(self, company=False):
         """ 600 - Consult notifications available on Uruware. """
-        return self._ucfe_inbox("600", {"TipoNotificacion": "7", "company": company})
+        return self._ucfe_inbox("600", {"TipoNotificacion": "7"}, company=company)
 
     def _notification_dismiss(self, company, response):
         """ This is implemented for vendor bills. It is needed to dismiss the last notification if the last vendor bill was
@@ -697,7 +720,7 @@ class L10n_Uy_EdiDocument(models.Model):
         response_620 = self._ucfe_inbox("620", {
             "IdReq": id_req,
             "TipoNotificacion": response.findtext('.//{*}TipoNotificacion'),
-            "company": company})
+        }, company=company)
         return response_620
 
     def _notification_verify_codrta(self, company, response_600):

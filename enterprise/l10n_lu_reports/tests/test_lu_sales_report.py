@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 # pylint: disable=C0326
-
-import base64
 
 from odoo.addons.account_reports.tests.account_sales_report_common import AccountSalesReportCommon
 from odoo.exceptions import ValidationError
 from odoo.tests import Form, tagged
-from odoo.tools.misc import NON_BREAKING_SPACE
 from freezegun import freeze_time
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class LuxembourgSalesReportTest(AccountSalesReportCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @AccountSalesReportCommon.setup_country('lu')
@@ -62,7 +60,7 @@ class LuxembourgSalesReportTest(AccountSalesReportCommon):
             cls.post_example_invoices(invoices, date)
 
     @freeze_time('2019-12-31')
-    def test_ec_sales_report(self):
+    def test_l10n_lu_ec_sales_report(self):
         self._create_invoices([
             (self.partner_a, self.l_tax, 300),
             (self.partner_a, self.l_tax, 300),
@@ -72,7 +70,7 @@ class LuxembourgSalesReportTest(AccountSalesReportCommon):
             (self.partner_b, self.s_tax, 700),
         ])
         report = self.env.ref('l10n_lu_reports.lux_ec_sales_report')
-        options = report.get_options({'date': {'mode': 'range', 'filter': 'this_month'}})
+        options = report.get_options({'date': {'default_opening_date': 'this_month'}})
         lines = report._get_lines(options)
         self.assertLinesValues(
             lines,
@@ -80,12 +78,12 @@ class LuxembourgSalesReportTest(AccountSalesReportCommon):
             #   Partner                country code             VAT Number,              Tax    Amount
             [   0,                     1,                       2,                       3,     4],
             [
-                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'L',   f'600.00{NON_BREAKING_SPACE}€'),
-                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'T',   f'500.00{NON_BREAKING_SPACE}€'),
-                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'S',   f'700.00{NON_BREAKING_SPACE}€'),
-                (self.partner_b.name,  self.partner_b.vat[:2],  self.partner_b.vat[2:],  'T',   f'500.00{NON_BREAKING_SPACE}€'),
-                (self.partner_b.name,  self.partner_b.vat[:2],  self.partner_b.vat[2:],  'S',   f'700.00{NON_BREAKING_SPACE}€'),
-                ("Total",              '',                      '',                      '',    f'3,000.00{NON_BREAKING_SPACE}€'),
+                ("EC Sales Report",    '',                      '',                      '',    3000.0),
+                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'L',    600.0),
+                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'S',    700.0),
+                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'T',    500.0),
+                (self.partner_b.name,  self.partner_b.vat[:2],  self.partner_b.vat[2:],  'S',    700.0),
+                (self.partner_b.name,  self.partner_b.vat[:2],  self.partner_b.vat[2:],  'T',    500.0),
             ],
             options,
         )
@@ -168,7 +166,7 @@ class LuxembourgSalesReportTest(AccountSalesReportCommon):
         options = self._generate_options(report, '2020-04-01', '2020-04-30')
         corrections, compared_declarations = self.env[report.custom_handler_model_name].get_correction_data(options, comparison_files=[])
         self.assertFalse(compared_declarations)
-        self.assertFalse(any([bool(c) for c in corrections.values()]))
+        self.assertFalse(any(corrections.values()))
 
     def test_multiple_comparison(self):
         # Case 1: correct a previous declaration
@@ -177,7 +175,7 @@ class LuxembourgSalesReportTest(AccountSalesReportCommon):
         wizard = self.env['l10n_lu.generate.vat.intra.report'].create({})
         wizard.save_report = False
         wizard.with_context(self.env[report.custom_handler_model_name].open_report_export_wizard(options)['context'], skip_xsd=True).get_xml()
-        declaration_to_compare = base64.b64decode(wizard.report_data.decode("utf-8"))
+        declaration_to_compare = wizard.report_data.content
         invoices = [
             {'partner': self.partner_be, 'product': self.product_1, 'tax': self.l_tax},
             {'partner': self.partner_be_new, 'product': self.product_1, 'tax': self.l_tax},
@@ -201,7 +199,7 @@ class LuxembourgSalesReportTest(AccountSalesReportCommon):
         })
         wizard2.l10n_lu_stored_report_ids = stored_report
         wizard2.with_context(self.env[report.custom_handler_model_name].open_report_export_wizard(options)['context'], skip_xsd=True).get_xml()
-        declaration_to_compare_2 = base64.b64decode(wizard2.report_data.decode("utf-8"))
+        declaration_to_compare_2 = wizard2.report_data.content
         filename = wizard2.filename[:-4]  # remove '.xml' postfix
         expected_xml_tree = self.get_xml_tree_from_string(
             f'''
@@ -372,7 +370,7 @@ class LuxembourgSalesReportTest(AccountSalesReportCommon):
         options = asset_report.get_options({})
         wizard = self.env['l10n_lu.generate.asset.report'].create({})
         wizard.with_context({'model': 'account.report', 'report_generation_options': options, 'skip_xsd': True}).get_xml()
-        declaration_to_compare = base64.b64decode(wizard.report_data.decode("utf-8"))
+        declaration_to_compare = wizard.report_data.content
         with self.assertRaises(ValidationError):
             self.env[report.custom_handler_model_name].get_correction_data(options, comparison_files=[('', declaration_to_compare)])
 

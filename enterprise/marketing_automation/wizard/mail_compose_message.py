@@ -16,7 +16,7 @@ class MailComposeMessage(models.TransientModel):
         # skip update if no marketing activity is linked to the mailing
         if not self.marketing_activity_id:
             return trace_values_all
-        if self.composition_mode == 'mass_mail' and (self.mass_mailing_name or self.mass_mailing_id) and self.marketing_activity_id:
+        if self.composition_mode == 'mass_mail' and (self.mass_mailing_create or self.mass_mailing_id) and self.marketing_activity_id:
             # retrieve trace linked to recipient
             traces = self.env['marketing.trace'].search(
                 [

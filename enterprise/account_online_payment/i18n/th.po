@@ -4,199 +4,124 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-12 13:07+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 04:17+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
 "account_online_payment/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#. module: account_online_payment
-#. odoo-python
-#: code:addons/account_online_payment/models/account_batch_payment.py:0
-msgid ""
-"\n"
-"                This payment requires a KYC flow. As this process can take a "
-"few days, please use SEPA XML export in the meantime.\n"
-"                You will be notified once the KYC flow is completed and you "
-"can proceed with the online payment.\n"
-"            "
-msgstr ""
-"\n"
-"                การชำระเงินนี้จำเป็นต้องมีขั้นตอน KYC เนื่องจากขั้นตอนนี้อาจใช้เวลาสองสามวัน "
-"โปรดใช้การส่งออก XML ของ SEPA ในระหว่างนี้\n"
-"                คุณจะได้รับการแจ้งเตือนเมื่อกระบวนการ KYC เสร็จสมบูรณ์ "
-"และสามารถดำเนินการชำระเงินออนไลน์ได้\n"
-"            "
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: account_online_payment
 #: model:mail.template,body_html:account_online_payment.mail_template_account_payment_activation
 msgid ""
-"<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" "
-"style=\"padding: 20px; background-color: #ededed\" "
-"summary=\"o_mail_notification\">\n"
-"                    <tbody>\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table width=\"590\" border=\"0\" "
-"cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-"
-"color: rgb(135,90,123); padding: 20px;\">\n"
-"                                <tr>\n"
-"                                    <td valign=\"middle\">\n"
-"                                        <span style=\"font-size:20px; "
-"color:white; font-weight: bold;\">\n"
-"                                            Unlock Seamless Payments in "
-"Odoo\n"
-"                                        </span>\n"
-"                                    </td>\n"
-"                                    <td valign=\"middle\" align=\"right\">\n"
-"                                        <img src=\"https://www.odoo.com/"
-"openerp_enterprise/static/img/mail/odoo_logo_white.png\" style=\"padding: "
-"0px; margin: 0px; height: auto; width: 80px;\" alt=\"Odoo S.A.\"/>\n"
-"                                    </td>\n"
-"                                </tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table width=\"590\" border=\"0\" "
-"cellpadding=\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-"
-"color: rgb(255, 255, 255); padding: 20px;\">\n"
-"                                <tbody>\n"
-"                                    <td valign=\"top\" style=\"font-"
-"family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
-"                                        <p>Hi there,</p>\n"
-"                                        <p>We see you haven't activated your "
-"payments feature in Odoo yet. By enabling it, you'll be able to process "
-"payments directly and efficiently through your Odoo account.</p>\n"
-"                                        <p>Of course, if you've already "
-"activated payments since receiving this email, you can simply ignore this "
-"message.</p>\n"
-"                                        <p>Ready to get started? Activate "
-"your payments here! You can also complete this setup later by visiting your "
-"scheduled activities within Odoo.</p>\n"
-"\n"
-"                                        <br/>\n"
-"                                        <br/>\n"
-"\n"
-"                                        <center>\n"
-"                                        <p>\n"
-"                                            <a style=\"background-color: "
-"#1abc9c; padding: 20px; text-decoration: none; color: #fff; border-radius: "
-"5px; font-size: 16px;\" t-att-href=\"ctx.get('url')\">\n"
-"                                                Activate payments\n"
-"                                            </a>\n"
-"                                        </p>\n"
-"\n"
-"                                        <br/><br/><br/>\n"
-"\n"
-"                                        <p>\n"
-"                                            Or copy/paste this link in your "
-"browser:<br/>\n"
-"                                            <a t-att-href=\"ctx.get('url')"
-"\"><t t-out=\"ctx.get('url')\"/></a>\n"
-"                                        </p>\n"
-"                                        </center>\n"
-"                                    </td>\n"
-"                                </tbody>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"\n"
-"                        <tr>\n"
-"                            <td align=\"center\">\n"
-"                                Powered by <a href=\"https://"
-"www.odoo.com\">Odoo</a>.\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
+"<div style=\"font-size: 14px;\">\n"
+"                    <p>Hi there,</p>\n"
+"                    <p>We see you haven't activated your payments feature in "
+"Odoo yet. By enabling it, you'll be able to process payments directly and "
+"efficiently through your Odoo account.</p>\n"
+"                    <p>Of course, if you've already activated payments since "
+"receiving this email, you can simply ignore this message.</p>\n"
+"                    <p>Ready to get started? Activate your payments here! "
+"You can also complete this setup later by visiting your scheduled activities "
+"within Odoo.</p>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"ctx.get('url')\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: "
+"{{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\">\n"
+"                            Activate payments\n"
+"                        </a>\n"
+"                    </div>\n"
+"                </div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 14px;\">\n"
+"                    <p>สวัสดีค่ะ/ครับ</p>\n"
+"                    <p>เราพบว่าคุณยังไม่ได้เปิดใช้งานฟีเจอร์การชำระเงินใน Odoo ของคุณ "
+"หากคุญทำการเปิดใช้งานฟีเจอร์นี้ "
+"คุณจะสามารถดำเนินการชำระเงินได้โดยตรงและมีประสิทธิภาพผ่านบัญชี Odoo ของคุณ</p>\n"
+"                    <p>หากคุณได้เปิดใช้งานฟีเจอร์การชำระเงินแล้วหลังจากได้รับอีเมลนี้ "
+"คุณสามารถปล่อยข้อความนี้ไปได้เลย</p>\n"
+"                    <p>มาเริ่มต้นใช้งานไปด้วยกัน "
+"และเปิดใช้งานฟีเจอร์การชำระเงินของคุณได้ที่นี่! "
+"คุณยังสามารถดำเนินการตั้งค่านี้ได้ในภายหลังโดยไปที่กิจกรรมที่กำหนดไว้ของคุณภายใน Odoo</p>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"ctx.get('url')\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: "
+"{{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\">\n"
+"                            เปิดใช้งานการชำระเงิน\n"
+"                        </a>\n"
+"                    </div>\n"
+"                </div>\n"
+"            "
 
 #. module: account_online_payment
 #: model:mail.template,body_html:account_online_payment.mail_template_account_payment_activation_success
 msgid ""
-"<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" "
-"style=\"padding: 20px; background-color: #ededed\" "
-"summary=\"o_mail_notification\">\n"
-"                    <tbody>\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table width=\"590\" border=\"0\" "
-"cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-"
-"color: rgb(135,90,123); padding: 20px;\">\n"
-"                                <tr>\n"
-"                                    <td valign=\"middle\">\n"
-"                                        <span style=\"font-size:20px; "
-"color:white; font-weight: bold;\">\n"
-"                                            You have just unlocked seamless "
-"payments in Odoo\n"
-"                                        </span>\n"
-"                                    </td>\n"
-"                                    <td valign=\"middle\" align=\"right\">\n"
-"                                        <img src=\"https://www.odoo.com/"
-"openerp_enterprise/static/img/mail/odoo_logo_white.png\" style=\"padding: "
-"0px; margin: 0px; height: auto; width: 80px;\" alt=\"Odoo S.A.\"/>\n"
-"                                    </td>\n"
-"                                </tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table width=\"590\" border=\"0\" "
-"cellpadding=\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-"
-"color: rgb(255, 255, 255); padding: 20px;\">\n"
-"                                <tbody>\n"
-"                                    <td valign=\"top\" style=\"font-"
-"family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
-"                                        <p>Hi there,</p>\n"
-"                                        <p>We're pleased to inform you that "
-"the payments feature in Odoo has been successfully activated. You can now "
-"process payments directly through your Odoo database, ensuring faster, more "
-"secure, and more efficient transactions.</p>\n"
-"                                    </td>\n"
-"                                </tbody>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"\n"
-"                        <tr>\n"
-"                            <td align=\"center\">\n"
-"                                Powered by <a href=\"https://"
-"www.odoo.com\">Odoo</a>.\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
+"<div style=\"font-size: 14px;\">\n"
+"                    <p>Hi there,</p>\n"
+"                    <p>We're pleased to inform you that the payments feature "
+"in Odoo has been successfully activated. </p>\n"
+"                    <p>You can now process payments directly through your "
+"Odoo database, ensuring faster, more secure, and more efficient transactions."
+"</p>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"object.get_base_url()\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: "
+"{{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\">\n"
+"                            Make Payments\n"
+"                        </a>\n"
+"                    </div>\n"
+"                </div>\n"
 "            "
 msgstr ""
+"<div style=\"font-size: 14px;\">\n"
+"                    <p>สวัสดี</p>\n"
+"                    <p>เรามีความยินดีที่จะแจ้งให้คุณทราบว่า ฟีเจอร์การชำระเงินใน Odoo "
+"ได้ถูกเปิดใช้งานเรียบร้อยแล้ว</p>\n"
+"                    <p>คุณสามารถดำเนินการชำระเงินได้โดยตรงผ่านฐานข้อมูล Odoo ของคุณ "
+"ซึ่งจะทำให้การทำธุรกรรมของคุณรวดเร็ว ปลอดภัย และมีประสิทธิภาพมากยิ่งขึ้น</p>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"object.get_base_url()\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: "
+"{{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\">\n"
+"                            ชำระเงิน\n"
+"                        </a>\n"
+"                    </div>\n"
+"                </div>\n"
+"            "
 
 #. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__accepted
+#: model:ir.model.fields.selection,name:account_online_payment.selection__account_payment__payment_online_status__accepted
 msgid "Accepted"
 msgstr "ยอมรับแล้ว"
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__account_online_link_payments_enabled
 msgid "Account Online Link Payments Enabled"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.module.module,shortdesc:base.module_account_online_payment
+msgid "Account Online Payment"
 msgstr ""
 
 #. module: account_online_payment
@@ -212,10 +137,20 @@ msgstr ""
 
 #. module: account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.account_online_link_view_form_inherit
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
 msgid "Activate Payments"
 msgstr "เปิดใช้งานการชำระเงิน"
 
 #. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
+msgid "All payments must have the same payment method."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
 #: model:ir.model,name:account_online_payment.model_account_online_link
 msgid "Bank Connection"
 msgstr "การเชื่อมต่อกับธนาคาร"
@@ -231,7 +166,13 @@ msgid "Batch Payment"
 msgstr "เงินดาวน์"
 
 #. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_bulk_payment_activated
+msgid "Bulk Payment Activated"
+msgstr ""
+
+#. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__canceled
+#: model:ir.model.fields.selection,name:account_online_payment.selection__account_payment__payment_online_status__canceled
 msgid "Canceled"
 msgstr "ถูกยกเลิก"
 
@@ -241,34 +182,100 @@ msgid "Check Status"
 msgstr "ตรวจสอบสถานะ"
 
 #. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_method_code
+msgid "Code"
+msgstr ""
+
+#. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_online_link.py:0
 msgid "Complete your KYC"
 msgstr ""
 
 #. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.account_journal_dashboard_inherit_online_sync
+msgid "Compliance Verification Needed"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.actions.server,name:account_online_payment.action_account_payment_confirm
+msgid "Confirm"
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
+msgid "Connect Bank"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment__could_initiate_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment_register__could_initiate_payment
+msgid "Could Initiate Payment"
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
+msgid "Create Payment"
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
+msgid "Create Payments"
+msgstr ""
+
+#. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__display_name
+#: model:ir.model.fields,field_description:account_online_payment.field_account_journal__display_name
+#: model:ir.model.fields,field_description:account_online_payment.field_account_online_account__display_name
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__display_name
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__display_name
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment_register__display_name
 msgid "Display Name"
 msgstr "แสดงชื่อ"
 
 #. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
+msgid "Generate File"
+msgstr ""
+
+#. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__id
+#: model:ir.model.fields,field_description:account_online_payment.field_account_journal__id
+#: model:ir.model.fields,field_description:account_online_payment.field_account_online_account__id
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__id
 #: model:ir.model.fields,field_description:account_online_payment.field_account_payment__id
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment_register__id
 msgid "ID"
 msgstr "ไอดี"
 
 #. module: account_online_payment
-#: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
-msgid "Initiate Payment"
-msgstr "เริ่มการชำระเงิน"
+#: model:ir.module.module,summary:base.module_account_online_payment
+msgid "Initiate online payments"
+msgstr ""
 
 #. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_in_audit
+msgid "Is In Audit"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__account_online_link_payments_activated
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_activated
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment_register__is_payment_activated
 msgid "Is Payment Activated"
 msgstr "การชำระเงินเปิดใช้งานแล้ว"
+
+#. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__account_online_link_payments_requested
+#: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_activation_requested
+msgid "Is Payment Activation Requested"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_blocked
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment_register__is_payment_blocked
+msgid "Is Payment Blocked"
+msgstr ""
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_payment_enabled
@@ -276,15 +283,100 @@ msgid "Is Payment Enabled"
 msgstr "เปิดใช้งานการชำระเงินแล้ว"
 
 #. module: account_online_payment
+#: model:ir.model,name:account_online_payment.model_account_journal
+msgid "Journal"
+msgstr ""
+
+#. module: account_online_payment
 #. odoo-python
-#: code:addons/account_online_payment/models/account_online_link.py:0
-msgid "KYC Link"
+#: code:addons/account_online_payment/models/account_batch_payment.py:0
+msgid "No online bank connection found for this journal."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
+msgid "Online payments require a bank journal."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
+msgid "Only draft payments can be detached from a batch."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
+msgid "Only outbound payments can be paid online."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
+msgid "Only uninitiated or unsigned payments can be retried."
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_search_inherit_account_online_payment
+msgid "Others"
 msgstr ""
 
 #. module: account_online_payment
 #: model:ir.model.fields,field_description:account_online_payment.field_account_batch_payment__payment_online_status
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_online_status
 msgid "PIS Status"
 msgstr "สถานะ PIS"
+
+#. module: account_online_payment
+#: model:ir.model,name:account_online_payment.model_account_payment_register
+msgid "Pay"
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_list_inherit_account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
+msgid "Pay Now"
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
+msgid "Pay now"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.model,name:account_online_payment.model_account_payment
+msgid "Payment"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_identifier
+msgid "Payment ID"
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
+msgid "Payment Method"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment__payment_method_placeholder
+msgid "Payment Method Placeholder"
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_batch_payment.py:0
+msgid ""
+"Payment activation process is already in progress for this bank connection."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_online_link.py:0
+msgid "Payment activation process is already in progress."
+msgstr ""
 
 #. module: account_online_payment
 #. odoo-python
@@ -293,14 +385,27 @@ msgid "Payment already been signed"
 msgstr "ลงนามชำระเงินเรียบร้อยแล้ว"
 
 #. module: account_online_payment
-#: model:ir.model,name:account_online_payment.model_account_payment
-msgid "Payments"
-msgstr "การชำระเงิน"
+#. odoo-python
+#: code:addons/account_online_payment/wizard/account_payment_register.py:0
+msgid "Payment created"
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_batch_payment.py:0
+msgid "Payments are already activated for this bank connection."
+msgstr ""
 
 #. module: account_online_payment
 #. odoo-python
 #: code:addons/account_online_payment/models/account_online_link.py:0
 msgid "Payments are already activated."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_batch_payment.py:0
+msgid "Payments are not enabled for this bank connection."
 msgstr ""
 
 #. module: account_online_payment
@@ -310,7 +415,13 @@ msgid "Payments successfully activated"
 msgstr ""
 
 #. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.account_journal_dashboard_inherit_online_sync
+msgid "Payments to sign"
+msgstr ""
+
+#. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__pending
+#: model:ir.model.fields.selection,name:account_online_payment.selection__account_payment__payment_online_status__pending
 msgid "Pending"
 msgstr "รอดำเนินการ"
 
@@ -324,13 +435,78 @@ msgstr "โปรดทราบว่าการชำระเงินที
 
 #. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__rejected
+#: model:ir.model.fields.selection,name:account_online_payment.selection__account_payment__payment_online_status__rejected
 msgid "Rejected"
 msgstr "ปฏิเสธแล้ว"
 
 #. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment__show_activate_payments_button
+msgid "Show Activate Payments Button"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_payment__show_connect_bank_button
+msgid "Show Connect Bank Button"
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_register_form_online_payment
+msgid "Sign Later"
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_form_inherit_account_online_payment
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
 msgid "Sign Payment"
 msgstr "ลงนามชำระเงิน"
+
+#. module: account_online_payment
+#: model:ir.model.fields,field_description:account_online_payment.field_account_online_link__is_single_payment_activated
+msgid "Single Payment Activated"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.model.fields,help:account_online_payment.field_account_batch_payment__account_online_link_payments_requested
+#: model:ir.model.fields,help:account_online_payment.field_account_online_link__is_payment_activation_requested
+msgid ""
+"Technical field indicating whether the customer has started the payment "
+"activation process with the provider."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_online_account.py:0
+msgid ""
+"The maximum amount for payments with your bank is %(amount)s.\n"
+"If you want to send your payment(s) through Odoo, please split your batch or "
+"create separate smaller payments."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
+msgid "The payment initiation service is not activated for this journal."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
+msgid "The recipient bank account must be allowed for outgoing payments."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_online_link.py:0
+msgid ""
+"This journal needs to be connected to a bank to check its payments status."
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.module.module,description:base.module_account_online_payment
+msgid ""
+"This module allows customers to pay their invoices online using various "
+"payment methods."
+msgstr ""
 
 #. module: account_online_payment
 #. odoo-python
@@ -340,9 +516,8 @@ msgid ""
 msgstr "การชำระเงินนี้อาจได้รับการลงนามแล้ว กำลังรีเฟรชสถานะการชำระเงิน..."
 
 #. module: account_online_payment
-#. odoo-python
-#: code:addons/account_online_payment/models/account_online_link.py:0
-msgid "Time to complete your KYC"
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_account_payment_search_inherit_account_online_payment
+msgid "To Sign"
 msgstr ""
 
 #. module: account_online_payment
@@ -354,20 +529,14 @@ msgid ""
 msgstr ""
 
 #. module: account_online_payment
-#. odoo-python
-#: code:addons/account_online_payment/models/account_online_link.py:0
-msgid ""
-"To process payments directly from Odoo, please complete your KYC now: %s. "
-"You can also do it later in the bank journal settings."
-msgstr ""
-
-#. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__uninitiated
+#: model:ir.model.fields.selection,name:account_online_payment.selection__account_payment__payment_online_status__uninitiated
 msgid "Uninitiated"
 msgstr "ยังไม่เริ่มต้น"
 
 #. module: account_online_payment
 #: model:ir.model.fields.selection,name:account_online_payment.selection__account_batch_payment__payment_online_status__unsigned
+#: model:ir.model.fields.selection,name:account_online_payment.selection__account_payment__payment_online_status__unsigned
 msgid "Unsigned"
 msgstr "ยังไม่ได้ลงนาม"
 
@@ -375,6 +544,18 @@ msgstr "ยังไม่ได้ลงนาม"
 #: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
 msgid "XML"
 msgstr "XML"
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/wizard/account_payment_register.py:0
+msgid "You can find %s in the payment view."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
+msgid "You can't pay payments from more than one journal."
+msgstr ""
 
 #. module: account_online_payment
 #. odoo-python
@@ -389,3 +570,96 @@ msgid ""
 "You haven't completed your KYC yet, so you can't process payment directly "
 "from Odoo."
 msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_payment.py:0
+msgid "You must select at least one payment."
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/models/account_online_account.py:0
+msgid ""
+"Your bank allows a maximum of %(limit)s payments per batch.\n"
+"If you want to send your payments through Odoo, please split your batch."
+msgstr ""
+
+#. module: account_online_payment
+#: model_terms:ir.ui.view,arch_db:account_online_payment.view_batch_payment_form_inherit
+msgid "Your payment activation is pending, please wait!"
+msgstr ""
+
+#. module: account_online_payment
+#: model:ir.model,name:account_online_payment.model_account_online_account
+msgid "representation of an online bank account"
+msgstr ""
+
+#. module: account_online_payment
+#. odoo-python
+#: code:addons/account_online_payment/wizard/account_payment_register.py:0
+msgid "the payments"
+msgstr ""
+
+#~ msgid ""
+#~ "<span invisible=\"payment_method_code != 'sepa_ct' and not "
+#~ "is_iso_payment_method\" class=\"d-flex flex-column gap-4\">\n"
+#~ "                        <span>Manual processing required</span>\n"
+#~ "                        <span>Download the XML file to import it into "
+#~ "your banking portal.</span>\n"
+#~ "                        <span>(Tip: Connect your bank to pay directly "
+#~ "from Odoo next time!)</span>\n"
+#~ "                    </span>\n"
+#~ "                    <span invisible=\"payment_method_code == 'sepa_ct' or "
+#~ "is_iso_payment_method\" class=\"d-flex flex-column gap-4\">\n"
+#~ "                        <span>Manual processing required</span>\n"
+#~ "                        <span>You can't directly pay payments who aren't "
+#~ "SEPA or iso, but you might want to create a batch.</span>\n"
+#~ "                        <span>(Tip: Connect your bank to pay directly "
+#~ "from Odoo next time!)</span>\n"
+#~ "                    </span>"
+#~ msgstr ""
+#~ "<span invisible=\"payment_method_code != 'sepa_ct' and not "
+#~ "is_iso_payment_method\" class=\"d-flex flex-column gap-4\">\n"
+#~ "                        <span>ต้องดำเนินการด้วยมือ</span>\n"
+#~ "                        <span>ดาวน์โหลดไฟล์ XML เพื่อนำเข้าสู่พอร์ทัลธนาคารของคุณ</"
+#~ "span>\n"
+#~ "                        <span>(เคล็ดลับ: "
+#~ "เชื่อมต่อธนาคารของคุณเพื่อชำระเงินโดยตรงจาก Odoo ในครั้งต่อไป)</span>\n"
+#~ "                    </span>\n"
+#~ "                   <span invisible=\"payment_method_code == 'sepa_ct' or "
+#~ "is_iso_payment_method\" class=\"d-flex flex-column gap-4\">\n"
+#~ "                        <span>ต้องดำเนินการด้วยมือ</span>\n"
+#~ "                        <span>คุณไม่สามารถชำระเงินโดยตรงให้กับผู้รับที่ไม่ใช่ SEPA "
+#~ "หรือ iso ได้ แต่คุณอาจต้องการสร้างชุดการชำระเงิน</span>\n"
+#~ "                        <span>(เคล็ดลับ: "
+#~ "เชื่อมต่อธนาคารของคุณเพื่อชำระเงินโดยตรงจาก Odoo ในครั้งต่อไป)</span>\n"
+#~ "                    </span>"
+
+#~ msgid ""
+#~ "<span invisible=\"payment_method_code != 'sepa_ct' and not "
+#~ "is_iso_payment_method\" class=\"d-flex flex-column gap-4\">\n"
+#~ "                        <span>Ready to pay?</span>\n"
+#~ "                        <span>Send this batch directly to your bank to "
+#~ "validate it securely with a single signature, or generate the XML file "
+#~ "for manual processing.</span>\n"
+#~ "                    </span>\n"
+#~ "                    <span invisible=\"payment_method_code == 'sepa_ct' or "
+#~ "is_iso_payment_method\" class=\"d-flex flex-column gap-4\">\n"
+#~ "                        <span>Manual processing required</span>\n"
+#~ "                        <span>You can't directly pay payments who aren't "
+#~ "SEPA or iso, but you might want to create a batch.</span>\n"
+#~ "                    </span>"
+#~ msgstr ""
+#~ "<span invisible=\"payment_method_code != 'sepa_ct' and not "
+#~ "is_iso_payment_method\" class=\"d-flex flex-column gap-4\">\n"
+#~ "                        <span>พร้อมที่จะชำระเงินแล้วหรือยัง?</span>\n"
+#~ "                        <span>ส่งชุดข้อมูลนี้ไปยังธนาคารของคุณโดยตรงเพื่อตรวจสอบความปลอดภัยด้วยลายเซ็นเดียว "
+#~ "หรือสร้างไฟล์ XML สำหรับการประมวลผลด้วยมือ</span>\n"
+#~ "                    </span>\n"
+#~ "                   <span invisible=\"payment_method_code == 'sepa_ct' or "
+#~ "is_iso_payment_method\" class=\"d-flex flex-column gap-4\">\n"
+#~ "                        <span>ต้องประมวลผลด้วยมือ</span>\n"
+#~ "                        <span>คุณไม่สามารถชำระเงินโดยตรงให้กับผู้รับที่ไม่ใช่ SEPA "
+#~ "หรือ iso แต่คุณอาจต้องการสร้างชุดข้อมูล</span>\n"
+#~ "                    </span>"

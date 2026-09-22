@@ -4,7 +4,6 @@
     <record id="mod_390_section_2" model="account.report">
         <field name="name">IVA Deducible</field>
         <field name="name@es">IVA Deducible</field>
-        <field name="filter_analytic" eval="False"/>
         <field name="filter_date_range" eval="True"/>
         <field name="filter_period_comparison" eval="False"/>
         <field name="filter_journals" eval="True"/>
@@ -1849,6 +1848,7 @@
                                 <field name="label">balance</field>
                                 <field name="engine">aggregation</field>
                                 <field name="formula">aeat_mod_390_65.result_cross_aeat_mod_390_47 - aeat_mod_390_64.balance</field>
+                                <field name="subformula" eval="False"/>
                             </record>
                             <record id="mod_390_casilla_65_result_cross_aeat_mod_390_47" model="account.report.expression">
                                 <field name="label">result_cross_aeat_mod_390_47</field>

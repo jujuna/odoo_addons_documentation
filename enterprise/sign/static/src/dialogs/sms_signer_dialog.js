@@ -1,5 +1,6 @@
+import { SignInfoPlugin } from "@sign/services/sign_info_plugin";
 import { _t } from "@web/core/l10n/translation";
-import { Component, useState, useRef, useEffect } from "@odoo/owl";
+import { Component, onWillDestroy, proxy, signal, t, usePlugin, useProps } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
 import { useService } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
@@ -11,34 +12,27 @@ export class SMSSignerDialog extends Component {
     static components = {
         Dialog,
     };
-    static props = {
-        signerPhone: {
-            type: String,
-            optional: true,
-        },
-        postValidation: Function,
-        close: Function,
-    };
+
+    props = useProps({
+        signerPhone: t.string().optional(),
+        postValidation: t.function(),
+        close: t.function(),
+    });
+
+    codeRef = signal.ref();
+    phoneRef = signal.ref();
 
     setup() {
-        this.validationCodeInput = useRef("code");
-        this.phoneInput = useRef("phone");
         this.dialog = useService("dialog");
-        this.signInfo = useService("signInfo");
+        this.signInfo = usePlugin(SignInfoPlugin);
+        this.uiService = useService("ui");
         this.SMSInfo = { phoneNumber: this.props.signerPhone || "" };
-        this.state = useState({
+        this.state = proxy({
             sendingSMS: false,
             SMSCount: 0,
         });
 
-        useEffect(
-            () => {
-                return () => {
-                    browser.clearTimeout(this.timeout);
-                };
-            },
-            () => []
-        );
+        onWillDestroy(() => browser.clearTimeout(this.timeout));
     }
 
     sendSMS(phoneNumber) {
@@ -77,7 +71,7 @@ export class SMSSignerDialog extends Component {
     onSendSMSClick(e) {
         const sendButton = e.target;
         sendButton.setAttribute("disabled", true);
-        const phoneNumber = this.phoneInput.el.value;
+        const phoneNumber = this.phoneRef().value;
         if (phoneNumber) {
             this.SMSInfo.phoneNumber = phoneNumber;
             this.sendSMS(phoneNumber);
@@ -87,9 +81,9 @@ export class SMSSignerDialog extends Component {
 
     async validateSMS(e) {
         const validateButton = e.target;
-        const validationCode = this.validationCodeInput.el?.value;
+        const validationCode = this.codeRef()?.value;
         if (!validationCode) {
-            this.validationCodeInput.el.classList.toggle("is-invalid");
+            this.codeRef().classList.toggle("is-invalid");
             return false;
         }
         validateButton.setAttribute("disabled", true);
@@ -102,7 +96,7 @@ export class SMSSignerDialog extends Component {
         return {
             size: "md",
             title: _t("Final Validation"),
-            fullscreen: this.env.isSmall,
+            fullscreen: this.uiService.isSmall,
         };
     }
 }

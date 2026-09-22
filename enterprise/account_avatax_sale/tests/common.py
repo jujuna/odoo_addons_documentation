@@ -5,4 +5,6 @@ from odoo.addons.sale.tests.common import TestSaleCommon
 
 
 class TestAccountAvataxSaleCommon(TestSaleCommon, TestAccountAvataxCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     pass

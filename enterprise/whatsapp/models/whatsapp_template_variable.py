@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.urls import urljoin as url_join
@@ -11,7 +10,7 @@ class WhatsappTemplateVariable(models.Model):
     _description = 'WhatsApp Template Variable'
     _order = 'line_type desc, name, id'
 
-    name = fields.Char(string="Placeholder", required=True)
+    name = fields.Char(string="Placeholder", required=True, copy=True)
     button_id = fields.Many2one('whatsapp.template.button', ondelete='cascade', index='btree_not_null')
     wa_template_id = fields.Many2one(comodel_name='whatsapp.template', required=True, index=True, ondelete='cascade')
     model = fields.Char(string="Model Name", related='wa_template_id.model')
@@ -88,10 +87,14 @@ class WhatsappTemplateVariable(models.Model):
                       placeholder=variable.name))
             elif variable.line_type == 'button' and variable.name != variable.button_id.name:
                 raise ValidationError(_("Dynamic button variable name must be the same as its respective button's name"))
-            elif variable.line_type in ('header', 'body') and not variable._extract_variable_index():
-                raise ValidationError(
-                    _('Template variable should be in format {{number}}. Cannot parse "%(placeholder)s"',
-                      placeholder=variable.name))
+            elif variable.line_type in ('header', 'body') and not variable.wa_template_id._is_valid_variable(variable.name):
+                raise ValidationError(_(
+                    'Variable %(placeholder)s is incorrectly formatted. '
+                    'Variable type "%(type)s" expects format like %(expected)s.',
+                    placeholder=variable.name,
+                    type=dict(variable.wa_template_id._fields['variable_type'].selection).get(variable.wa_template_id.variable_type),
+                    expected=variable.wa_template_id._get_variable_format_example(),
+                ))
 
     @api.constrains('button_id', 'line_type')
     def _check_button_id(self):
@@ -148,10 +151,13 @@ class WhatsappTemplateVariable(models.Model):
         self.ensure_one()
         return record.sudo(False)._find_value_from_field_path(self.field_name)
 
-    def _extract_variable_index(self):
-        """ Extract variable index, located between '{{}}' markers. """
+    def _extract_variable_value(self):
+        """Extract the name or index located between the `{{}}` markers."""
         self.ensure_one()
+        value = self.name.removeprefix('{{').removesuffix('}}')
+        if self.wa_template_id.variable_type == 'named':
+            return value
         try:
-            return int(self.name.removeprefix('{{').removesuffix('}}'))
+            return int(value)
         except ValueError:
             return None

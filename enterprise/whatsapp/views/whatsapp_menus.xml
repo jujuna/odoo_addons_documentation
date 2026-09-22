@@ -20,12 +20,23 @@
         id="whatsapp_account_menu"
         parent="whatsapp_configuration_menu"
         action="whatsapp_account_action"/>
+    <menuitem name="WhatsApp Blocklist"
+        id="whatsapp_blocklist_menu"
+        parent="whatsapp_configuration_menu"
+        action="whatsapp_blocklist_action"/>
 
     <menuitem name="Templates"
         id="whatsapp_template_menu"
         parent="whatsapp_menu_main"
         sequence="0"
-        action="whatsapp_template_action"
         groups="whatsapp.group_whatsapp_admin"/>
+    <menuitem name="Message Templates"
+        id="whatsapp_message_template_menu"
+        parent="whatsapp_template_menu"
+        action="whatsapp_template_action"/>
+    <menuitem name="Interactive Templates"
+        id="whatsapp_interactive_template_menu"
+        parent="whatsapp_template_menu"
+        action="whatsapp_interactive_action"/>
 
 </odoo>

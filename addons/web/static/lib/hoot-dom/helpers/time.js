@@ -109,6 +109,8 @@ class HootTimingError extends Error {
     name = "HootTimingError";
 }
 
+const DEFAULT_WAIT_TIMEOUT = 10000;
+
 const ID_PREFIX = {
     animation: "a_",
     interval: "i_",
@@ -397,7 +399,7 @@ export function tick() {
  * The `predicate` is run once initially, and then on each animation frame until
  * it succeeds or fail.
  *
- * The promise automatically rejects after a given `timeout` (defaults to 5 seconds).
+ * The promise automatically rejects after a given `timeout` (defaults to 10 seconds).
  *
  * @template T
  * @param {(last: boolean) => T} predicate
@@ -418,7 +420,7 @@ export async function waitUntil(predicate, options) {
         return result;
     }
 
-    const timeout = $floor(options?.timeout ?? 200);
+    const timeout = $floor(options?.timeout ?? DEFAULT_WAIT_TIMEOUT);
     const maxFrameCount = $ceil(timeout / frameDelay);
     let frameCount = 0;
     let handle;
@@ -450,46 +452,3 @@ export async function waitUntil(predicate, options) {
     });
 }
 
-/**
- * Manually resolvable and rejectable promise. It introduces 2 new methods:
- *  - {@link reject} rejects the deferred with the given reason;
- *  - {@link resolve} resolves the deferred with the given value.
- *
- * @template [T=unknown]
- */
-export class Deferred extends Promise {
-    /** @type {typeof Promise.resolve<T>} */
-    _resolve;
-    /** @type {typeof Promise.reject<T>} */
-    _reject;
-
-    /**
-     * @param {(resolve: (value?: T) => any, reject: (reason?: any) => any) => any} [executor]
-     */
-    constructor(executor) {
-        let _resolve, _reject;
-
-        super(function deferredResolver(resolve, reject) {
-            _resolve = resolve;
-            _reject = reject;
-            executor?.(_resolve, _reject);
-        });
-
-        this._resolve = _resolve;
-        this._reject = _reject;
-    }
-
-    /**
-     * @param {any} [reason]
-     */
-    async reject(reason) {
-        return this._reject(reason);
-    }
-
-    /**
-     * @param {T} [value]
-     */
-    async resolve(value) {
-        return this._resolve(value);
-    }
-}

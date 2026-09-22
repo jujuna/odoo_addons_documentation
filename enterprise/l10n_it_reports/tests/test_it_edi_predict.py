@@ -8,14 +8,15 @@ from odoo.addons.l10n_it_edi.tests.common import TestItEdi
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestItEdiPredict(TestItEdi):
     """ Main test class for the l10n_it_edi vendor bills XML import"""
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
+        cls.italian_partner_a.l10n_it_codice_fiscale = '00465840031'
         cls.italian_partner_c = cls.env['res.partner'].create({
             'company_id': cls.company.id,
-            'is_company': True,
             'country_id': cls.env.ref('base.it').id,
             'name': 'NOT Alessi',
             'vat': 'IT00313371213',
@@ -55,7 +56,6 @@ class TestItEdiPredict(TestItEdi):
             'invoice_line_ids': [
                 (0, 0, {
                     'product_id': self.product_c.id,
-                    'name': self.product_c.display_name,
                     'quantity': 1.0,
                     'tax_ids': [fields.Command.set([self.tax_purchase_c.id])],
                     'account_id': self.predictable_account.id,
@@ -83,7 +83,6 @@ class TestItEdiPredict(TestItEdi):
             - Third line has both tax and account predicted
         """
         self._create_predictable_invoice()
-        self.company.predict_bill_product = True
 
         self._assert_import_invoice(
             'IT01234567888_FPR01.xml', [{
@@ -92,39 +91,6 @@ class TestItEdiPredict(TestItEdi):
                 'amount_tax': 7.38,
                 'invoice_line_ids': [{
                     'product_id': self.product_c.id,
-                    'name': 'Cool stuff',
-                    'account_id': self.predictable_account.id,
-                    'quantity': 5.0,
-                    'price_unit': 1.0,
-                    'tax_ids': [self.tax_purchase_c.id]
-                }, {
-                    'product_id': False,
-                    'name': 'OtherAccount',
-                    'account_id': self.predictable_account.id,
-                    'quantity': 3.0,
-                    'price_unit': 8.0,
-                    'tax_ids': [self.tax_purchase_c.id]
-                }, {
-                    'product_id': False,
-                    'name': 'GuessTaxes',
-                    'account_id': self.predictable_account.id,
-                    'quantity': 1.0,
-                    'price_unit': 10.0,
-                    'tax_ids': [self.tax_purchase_d.id]
-                }],
-            }])
-
-    def test_receive_vendor_bill_without_product_prediction(self):
-        self._create_predictable_invoice()
-        self.company.predict_bill_product = False
-
-        self._assert_import_invoice(
-            'IT01234567888_FPR01.xml', [{
-                'invoice_date': fields.Date.from_string('2014-12-18'),
-                'amount_untaxed': 39.0,
-                'amount_tax': 7.38,
-                'invoice_line_ids': [{
-                    'product_id': False,
                     'name': 'Cool stuff',
                     'account_id': self.predictable_account.id,
                     'quantity': 5.0,
@@ -156,8 +122,6 @@ class TestItEdiPredict(TestItEdi):
             so no tax is added. Real XMLs always have a tax,
             even if that tax has a 0% amount.
         """
-        self.company.predict_bill_product = True
-
         self._assert_import_invoice(
             'IT01234567888_FPR01.xml', [{
                 'invoice_date': fields.Date.from_string('2014-12-18'),

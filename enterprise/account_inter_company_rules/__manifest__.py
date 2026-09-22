@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Inter Company Module for Sale/Purchase Orders and Invoices',
@@ -13,10 +12,8 @@
         'account',
     ],
     'data': [
-        'views/res_company_views.xml',
         'views/res_config_settings_views.xml',
     ],
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

@@ -1,16 +1,18 @@
+import base64
 import csv
 import logging
 import secrets
 import string
 import uuid
+from datetime import datetime
 from urllib.parse import urlparse
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import file_open
+from odoo.tools import BinaryBytes, file_open
 
 from odoo.addons.hr_expense_stripe.controllers.main import StripeIssuingController
-from odoo.addons.hr_expense_stripe.utils import COUNTRY_MAPPING, STRIPE_VALID_JOURNAL_CURRENCIES, make_request_stripe_proxy
+from odoo.addons.hr_expense_stripe.utils import COUNTRY_MAPPING, STRIPE_VALID_JOURNAL_CURRENCIES, STRIPE_SUPPORTED_COUNTRY_CODES, make_request_stripe_proxy
 
 _logger = logging.getLogger(__name__)
 
@@ -48,6 +50,7 @@ class ResCompany(models.Model):
     stripe_account_issuing_tos_accepted = fields.Boolean(groups='base.group_system')
     stripe_account_issuing_tos_acceptance_date = fields.Date(groups='base.group_system')
     stripe_issuing_iap_webhook_uuid = fields.Char(groups='base.group_system')
+    unmapped_mcc_count = fields.Integer(compute="_compute_unmapped_mcc_count")
 
     # IAP Security fields
     stripe_issuing_db_private_key_id = fields.Many2one(
@@ -62,6 +65,9 @@ class ResCompany(models.Model):
         groups='base.group_system',
         copy=False,
     )
+    is_stripe_issuing_supported = fields.Boolean(
+        compute='_compute_is_stripe_issuing_supported',
+    )
 
     _constraint_journal_stripe_activated = models.Constraint(
         definition="CHECK(NOT stripe_issuing_activated OR (stripe_journal_id IS NOT NULL AND stripe_issuing_activated))",
@@ -74,12 +80,22 @@ class ResCompany(models.Model):
             company_country = company.account_fiscal_country_id
             if 'EU' in (company_country.country_group_codes or []):
                 company_currency_code = STRIPE_VALID_JOURNAL_CURRENCIES['EU']
-            elif company_country.code == 'gb':
+            elif company_country.code == 'GB':
                 company_currency_code = STRIPE_VALID_JOURNAL_CURRENCIES['UK']
             else:
-                company_currency_code = STRIPE_VALID_JOURNAL_CURRENCIES.get(company_country.code) or 'USD'
+                company_currency_code = STRIPE_VALID_JOURNAL_CURRENCIES.get(company_country.code) or 'EUR'
             currency = self.env['res.currency'].search([('name', '=ilike', company_currency_code)], limit=1)
             company.stripe_currency_id = currency and currency.id
+
+    def _compute_unmapped_mcc_count(self):
+        for company in self:
+            company.unmapped_mcc_count = self.env['product.mcc.stripe.tag'].search_count([('product_id', '=', False)])
+
+    @api.depends('account_fiscal_country_id')
+    def _compute_is_stripe_issuing_supported(self):
+        for company in self:
+            company_country = company.account_fiscal_country_id
+            company.is_stripe_issuing_supported = company_country.code in STRIPE_SUPPORTED_COUNTRY_CODES
 
     def _stripe_issuing_setup_mcc(self):
         """ Helper to preset the default data for the mccs on all company as the field is company_dependant """
@@ -120,7 +136,7 @@ class ResCompany(models.Model):
         available_to_all_companies = self.browse()  # Empty value means all companies
         for company in self:
             for mcc_ref, product_ref in mcc_ref_to_product_ref.items():
-                mcc = ref_to_mcc.get(mcc_ref).with_company(company)
+                mcc = ref_to_mcc.get(mcc_ref, self.env['product.mcc.stripe.tag']).with_company(company)
                 product = ref_to_product.get(product_ref)
                 if mcc and not mcc.product_id and product and product.company_id in {available_to_all_companies, company}:
                     mcc.product_id = product.id
@@ -135,16 +151,6 @@ class ResCompany(models.Model):
         country_code = COUNTRY_MAPPING.get(self.country_id.code, self.country_id.code)
         return {
             'country': country_code,
-            'email': self.email,
-            'business_type': 'company',
-            'company[address][city]': self.city,
-            'company[address][country]': country_code,
-            'company[address][line1]': self.street,
-            'company[address][line2]': self.street2,
-            'company[address][postal_code]': self.zip,
-            'company[address][state]': self.state_id.name,
-            'company[name]': self.name,
-            'business_profile[name]': self.name,
         }
 
     def _get_account_links_payload(self):
@@ -183,7 +189,7 @@ class ResCompany(models.Model):
     @api.model
     def _get_stripe_mode(self):
         key = 'hr_expense_stripe.stripe_mode'
-        mode = self.env['ir.config_parameter'].sudo().get_param(key, 'live')
+        mode = self.env['ir.config_parameter'].sudo().get_str(key) or 'live'
         if mode not in {'live', 'test'}:
             raise ValidationError(_("System parameter '%(name)s' value is incorrect, expecting 'live', 'test' or no value", name=key))
         return mode
@@ -251,25 +257,25 @@ class ResCompany(models.Model):
             # IAP Data
             'db_webhook_url': self._get_stripe_webhook_url(stripe_issuing_iap_webhook_uuid),
             'db_public_key': db_private_key._get_public_key_bytes().decode(),
-            'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+            'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             'accepted_tos': self.stripe_account_issuing_tos_accepted,
         }
         payload = {key: value for key, value in payload.items() if value is not False}
         response = make_request_stripe_proxy(self.sudo(), 'accounts', payload=payload, method='POST')
         iap_public_key = self.env['certificate.key'].create([{
             'name': _("IAP Public key used for Stripe Issuing"),
-            'content': response['iap_public_key'],
+            'content': BinaryBytes(base64.b64decode(response['iap_public_key'])),  # Need to be decoded before storing in the database because it's stored as binary but sent as a utf-8 string from iap.
             'company_id': self.id,
         }])
         self.write({
             'stripe_id': response['id'],
             'stripe_issuing_iap_webhook_uuid': stripe_issuing_iap_webhook_uuid,
             'stripe_account_issuing_tos_accepted': True,
-            'stripe_account_issuing_tos_acceptance_date': fields.Date.today(),
+            'stripe_account_issuing_tos_acceptance_date': fields.Date.context_today(self),
             'stripe_issuing_db_private_key_id': db_private_key.id,
             'stripe_issuing_iap_public_key_id': iap_public_key.id,
         })
-        self.env['ir.config_parameter'].sudo().set_param(f'hr_expense_stripe.{self.id}_stripe_issuing_pk', response['stripe_pk'])
+        self.env['ir.config_parameter'].sudo().set_str(f'hr_expense_stripe.{self.id}_stripe_issuing_pk', response['stripe_pk'])
 
         self.stripe_issuing_activated = True
         cron = self.env.ref('hr_expense_stripe.hr_expense_stripe_issuing_status_cron', raise_if_not_found=False)
@@ -296,14 +302,15 @@ class ResCompany(models.Model):
             if response['capabilities']['card_issuing'] == 'active':
                 company.stripe_account_issuing_status = 'verified'
             else:
+                if company.stripe_account_issuing_status == 'verified':
+                    # In order for an account to be restricted, it has to be first verified, so we only send the email if the status went from verified to restricted
+                    company._send_stripe_restriction_email(response)
                 company.stripe_account_issuing_status = 'restricted'
 
-            current_pk = company.env['ir.config_parameter'].sudo().get_param(f'hr_expense_stripe.{company.id}_stripe_issuing_pk')
-            if current_pk != response['stripe_pk']:
-                company.env['ir.config_parameter'].sudo().set_param(
-                    f'hr_expense_stripe.{company.id}_stripe_issuing_pk',
-                    response['stripe_pk'],
-                )
+            company.env['ir.config_parameter'].sudo().set_str(
+                f'hr_expense_stripe.{company.id}_stripe_issuing_pk',
+                response['stripe_pk'],
+            )
 
     def action_configure_stripe_account(self):
         """ Action to go back to an interrupted Stripe Onboarding """
@@ -319,3 +326,51 @@ class ResCompany(models.Model):
             'url': response['url'],
             'target': 'self',
         }
+
+    def _send_stripe_restriction_email(self, response):
+        self.ensure_one()
+        template = self.env.ref('hr_expense_stripe.email_template_hr_expense_stripe_restriction', raise_if_not_found=False)
+        admin_user = self.env['res.users'].sudo().search([
+            ('group_ids', 'in', self.env.ref('base.group_system').ids),
+            ('company_ids', '=', self.id)],
+            limit=1,
+            order='id asc')
+        user_name = admin_user.name or self.name
+
+        requirements = response.get('requirements', {})
+        due_timestamp = requirements.get('current_deadline')
+
+        if due_timestamp:
+            due_date = datetime.fromtimestamp(due_timestamp).strftime('%Y-%m-%d')
+        else:
+            due_date = False
+
+        if template:
+            recipient_email = admin_user.partner_id.email or self.email
+
+            template.with_context(
+                user_name=user_name,
+                due_date=due_date,
+                lang=admin_user.lang or self.env.user.lang
+            ).send_mail(
+                self.id,
+                force_send=True,
+                email_values={
+                    'email_to': recipient_email,
+                    'author_id': self.env.user.partner_id.id,
+                }
+            )
+        else:
+            if due_date:
+                message_body = self.env._(
+                    "Stripe has restricted your account. Please update your information by the %(due_date)s to avoid disruption.",
+                    due_date=due_date,
+                )
+            else:
+                message_body = self.env._("Stripe has restricted your account. Please update your information soon to avoid disruption.")
+            self.sudo().message_post(
+                body=message_body,
+                partner_ids=admin_user.partner_id.ids,
+                message_type='comment',
+                subtype_xmlid='mail.mt_note'
+            )

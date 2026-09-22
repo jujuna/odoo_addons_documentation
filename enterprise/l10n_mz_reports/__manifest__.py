@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Mozambique - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Base module for Mozambican reports
@@ -17,7 +15,6 @@ Base module for Mozambican reports
         "data/profit_loss.xml",
     ],
     'auto_install': True,
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

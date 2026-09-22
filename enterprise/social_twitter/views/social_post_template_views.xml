@@ -16,34 +16,38 @@
             </xpath>
             <field name="message" position="after">
                 <field name="is_twitter_post_limit_exceed" invisible="True"/>
-                <field name="twitter_post_limit_message" class="text-muted" invisible="not twitter_post_limit_message or is_twitter_post_limit_exceed or is_split_per_media" string=""/>
-                <field name="twitter_post_limit_message"  class="text-danger" invisible="not has_twitter_account or not is_twitter_post_limit_exceed or is_split_per_media" string=""/>
             </field>
             <xpath expr="//notebook[@name='media_customization']" position="inside">
                 <page string="Twitter" name="twitter_content"
                     invisible="not has_twitter_account">
                     <group>
                         <group>
-                            <field name="twitter_message"
-                                required="is_split_per_media and has_twitter_account and not twitter_image_ids"
-                                string="Message"/>
-                            <field name="twitter_post_limit_message" class="text-muted"
-                                invisible="not twitter_post_limit_message or is_twitter_post_limit_exceed"
-                                string=""/>
-                            <field name="twitter_post_limit_message"  class="text-danger"
-                                invisible="not has_twitter_account or not is_twitter_post_limit_exceed"
-                                string=""/>
+                            <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bolder small o_social_twitter_label_message" colspan="2">Message</div>
+                            <div colspan="2">
+                                <field name="twitter_message" nolabel="1"
+                                    required="is_split_per_media and has_twitter_account and not twitter_image_ids"
+                                    social_media="twitter"
+                                    widget="social_post_message_field"/>
+                            </div>
+                            <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bolder small o_social_twitter_label_media" colspan="2">Media</div>
                             <field name="twitter_image_ids"
-                                widget="many2many_binary"
+                                class="o_social_post_image"
                                 required="is_split_per_media and has_twitter_account and not twitter_message"
-                                string="Images"/>
+                                mode="kanban"
+                                add-label="Add Media"
+                                colspan="2"
+                                nolabel="1"
+                                widget="x2_many_media_viewer"
+                                options="{'force_create': True, 'set_attachment_id': True, 'only_image': True}"/>
+                            <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bolder small o_social_twitter_label_first_comment" colspan="2">Scheduled first comment</div>
+                            <field name="twitter_first_comment" colspan="2" nolabel="1" placeholder="Comment your own post to get the conversation going or share some extra content."/>
                         </group>
-                        <group invisible="not display_twitter_preview">
+                        <group invisible="not display_twitter_preview" class="o_social_post_preview_group">
                             <field name="twitter_preview" nolabel="1"
                                 widget="social_post_preview"
                                 media_type="twitter_preview"
                                 readonly="1"
-                                class="o_social_preview_wrapper m-0 px-4 py-4 bg-200"/>
+                                class="o_social_preview_wrapper m-0 px-4 py-4 bg-200 h-100"/>
                         </group>
                     </group>
                 </page>

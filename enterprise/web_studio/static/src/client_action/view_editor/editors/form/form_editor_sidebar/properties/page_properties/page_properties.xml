@@ -1,17 +1,17 @@
 <templates>
 
 <t t-name="web_studio.ViewEditor.InteractiveEditorProperties.Page">
-    <ModifiersProperties node="props.node" availableOptions="['invisible']"/>
+    <ModifiersProperties node="this.props.node" availableOptions="['invisible']"/>
 
     <Property
         name="'string'"
         type="'string'"
-        value="props.node.attrs.string"
-        onChange.bind="onChangeAttribute">
+        value="this.props.node.attrs.string"
+        onChange.bind="this.onChangeAttribute">
             Label
     </Property>
 
-    <LimitGroupVisibility node="props.node"/>
+    <LimitGroupVisibility node="this.props.node"/>
     <PageNodeToolbox />
 </t>
 

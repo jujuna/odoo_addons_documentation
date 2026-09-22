@@ -2,7 +2,6 @@
 <odoo noupdate="1">
     <record id="booking_table_address" model="res.partner">
         <field name="name">Bistr-Odoo</field>
-        <field name="is_company" eval="True"/>
         <field name="street">Rue des Bourlottes 9</field>
         <field name="city">Ramillies</field>
         <field name="zip">1367</field>
@@ -32,7 +31,7 @@
             (0, 0, {'weekday': weekday, 'start_hour': 12, 'end_hour': 14.50})
             for weekday in ('3', '6', '7')
         ]"/>
-        <field name="image_1920" type="base64" file="appointment/static/src/img/appointment_4.jpg"/>
+        <field name="image_1920" type="bytes" file="appointment/static/src/img/appointment_4.jpg"/>
         <field name="message_intro" type="html">
             <p>Reserve your table at our bistro and enjoy a delightful dining experience at your convenience.</p>
         </field>
@@ -323,4 +322,60 @@
         <field name="pos_table_ids" eval="[(4, ref('pos_restaurant.table_32'))]"/>
     </record>
 
+    <!-- Customer already checked in and is currently occupying the table -->
+    <record id="demo_booking_01" model="calendar.event">
+        <field name="name">Billy Fox</field>
+        <field name="appointment_type_id" ref="appointment_type_restaurant_table"/>
+        <field name="start" eval="(datetime.now() - timedelta(minutes=30)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="stop" eval="(datetime.now() + timedelta(minutes=90)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="appointment_status">attended</field>
+        <field name="resource_ids" eval="[Command.link(ref('pos_restaurant_appointment.appointment_type_restaurant_table_table_01'))]"/>
+        <field name="partner_ids" eval="[Command.clear()]"/>
+        <field name="notes" type="html"><div>Allergic to eggs</div></field>
+    </record>
+
+    <!-- Booking start time passed 15 minutes ago; customer has not checked in yet (late arrival) -->
+    <record id="demo_booking_02" model="calendar.event">
+        <field name="name">Chester Reed</field>
+        <field name="appointment_type_id" ref="appointment_type_restaurant_table"/>
+        <field name="start" eval="(datetime.now() - timedelta(minutes=15)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="stop" eval="(datetime.now() + timedelta(minutes=105)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="appointment_status">booked</field>
+        <field name="resource_ids" eval="[Command.link(ref('pos_restaurant_appointment.appointment_type_restaurant_table_table_05'))]"/>
+        <field name="partner_ids" eval="[Command.clear()]"/>
+    </record>
+
+    <!-- Upcoming booking starting in 15 minutes -->
+    <record id="demo_booking_03" model="calendar.event">
+        <field name="name">Brandon Freeman</field>
+        <field name="appointment_type_id" ref="appointment_type_restaurant_table"/>
+        <field name="start" eval="(datetime.now() + timedelta(minutes=15)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="stop" eval="(datetime.now() + timedelta(minutes=15, hours=2)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="appointment_status">booked</field>
+        <field name="resource_ids" eval="[Command.link(ref('pos_restaurant_appointment.appointment_type_restaurant_table_table_09'))]"/>
+        <field name="partner_ids" eval="[Command.clear()]"/>
+    </record>
+
+    <!-- Upcoming booking starting in 30 minutes -->
+    <record id="demo_booking_04" model="calendar.event">
+        <field name="name">Julie Richards</field>
+        <field name="appointment_type_id" ref="appointment_type_restaurant_table"/>
+        <field name="start" eval="(datetime.now() + timedelta(minutes=30)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="stop" eval="(datetime.now() + timedelta(minutes=30, hours=2)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="appointment_status">booked</field>
+        <field name="resource_ids" eval="[Command.link(ref('pos_restaurant_appointment.appointment_type_restaurant_table_table_03'))]"/>
+        <field name="partner_ids" eval="[Command.clear()]"/>
+        <field name="notes" type="html"><div>2 vegetarians</div></field>
+    </record>
+
+    <!-- Upcoming booking starting in 1 hour -->
+    <record id="demo_booking_05" model="calendar.event">
+        <field name="name">Lumber Inc</field>
+        <field name="appointment_type_id" ref="appointment_type_restaurant_table"/>
+        <field name="start" eval="(datetime.now() + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="stop" eval="(datetime.now() + timedelta(hours=3)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="appointment_status">booked</field>
+        <field name="resource_ids" eval="[Command.link(ref('pos_restaurant_appointment.appointment_type_restaurant_table_table_06'))]"/>
+        <field name="partner_ids" eval="[Command.clear()]"/>
+    </record>
 </odoo>

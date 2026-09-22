@@ -1,5 +1,6 @@
+import { useLayoutEffect, useSubEnv } from "@web/owl2/utils";
 import { _t } from "@web/core/l10n/translation";
-import { Component, onWillUnmount, useEffect, useRef, useSubEnv } from "@odoo/owl";
+import { Component, onWillUnmount, signal, t, useProps } from "@odoo/owl";
 import {
     deleteConfirmationMessage,
     ConfirmationDialog,
@@ -16,6 +17,16 @@ import { CogMenu } from "@web/search/cog_menu/cog_menu";
 import { CallbackRecorder, useSetupAction } from "@web/search/action_hook";
 import { ActionHelper } from "@web/views/action_helper";
 
+export const ganttControllerProps = {
+    ...standardViewProps,
+    Model: t.function(),
+    Renderer: t.function(),
+    buttonTemplate: t.string(),
+    modelParams: t.object(),
+    multiCreateValues: t.object().optional(),
+    scrollPosition: t.object().optional(),
+};
+
 export class GanttController extends Component {
     static components = {
         CogMenu,
@@ -23,36 +34,37 @@ export class GanttController extends Component {
         SearchBar,
         ActionHelper,
     };
-    static props = {
-        ...standardViewProps,
-        Model: Function,
-        Renderer: Function,
-        buttonTemplate: String,
-        modelParams: Object,
-        multiCreateValues: { type: Object, optional: true },
-        scrollPosition: { type: Object, optional: true },
-    };
     static template = "web_gantt.GanttController";
+
+    props = useProps(ganttControllerProps);
+
+    rootRef = signal.ref();
 
     setup() {
         this.actionService = useService("action");
         this.dialogService = useService("dialog");
         this.orm = useService("orm");
+        this.uiService = useService("ui");
 
         useSubEnv({
             getCurrentFocusDateCallBackRecorder: new CallbackRecorder(),
             createFromSelectionCallBackRecorder: new CallbackRecorder(),
         });
 
-        const rootRef = useRef("root");
-
         this.model = useModelWithSampleData(this.props.Model, this.props.modelParams);
         useSetupAction({
-            rootRef,
-            getLocalState: () => ({
-                metaData: this.model.metaData,
-                displayParams: this.model.displayParams,
-            }),
+            rootRef: this.rootRef,
+            getLocalState: () => {
+                const scrollEl = this.rootRef()?.querySelector(".o_gantt_scroll_container");
+                return {
+                    scrollPosition: {
+                        left: scrollEl?.scrollLeft ?? 0,
+                        top: scrollEl?.scrollTop ?? 0,
+                    },
+                    metaData: this.model.metaData,
+                    displayParams: this.model.displayParams,
+                };
+            },
         });
 
         onWillUnmount(() => this.closeDialog?.());
@@ -72,25 +84,26 @@ export class GanttController extends Component {
             }
         });
 
-        useEffect(
+        useLayoutEffect(
             (showNoContentHelp) => {
                 if (showNoContentHelp) {
+                    const rootEl = this.rootRef();
                     const realRows = [
-                        ...rootRef.el.querySelectorAll(
+                        ...rootEl.querySelectorAll(
                             ".o_gantt_row_header:not(.o_sample_data_disabled)"
                         ),
                     ];
                     // interactive rows created in extensions (fromServer undefined)
                     const headerContainerWidth =
-                        rootRef.el.querySelector(".o_gantt_header_groups").clientHeight +
-                        rootRef.el.querySelector(".o_gantt_header_columns").clientHeight;
+                        rootEl.querySelector(".o_gantt_header_groups").clientHeight +
+                        rootEl.querySelector(".o_gantt_header_columns").clientHeight;
 
                     const offset = realRows.reduce(
                         (current, el) => current + el.clientHeight,
                         headerContainerWidth
                     );
 
-                    const noContentHelperEl = rootRef.el.querySelector(".o_view_nocontent");
+                    const noContentHelperEl = rootEl.querySelector(".o_view_nocontent");
                     noContentHelperEl.style.top = `${offset}px`;
                 }
             },
@@ -100,7 +113,7 @@ export class GanttController extends Component {
     }
 
     get className() {
-        if (this.env.isSmall) {
+        if (this.uiService.isSmall) {
             const classList = (this.props.className || "").split(" ");
             classList.push("o_action_delegate_scroll");
             return classList.join(" ");
@@ -142,8 +155,9 @@ export class GanttController extends Component {
                         title: _t("Bye-bye, record!"),
                         body: deleteConfirmationMessage,
                         confirmLabel: _t("Delete"),
+                        confirmClass: "btn-danger",
                         confirm: async () => {
-                            await this.orm.unlink(resModel, [props.resId]);
+                            await this.orm.webUnlink(resModel, [props.resId]);
                             resolve();
                         },
                         cancel: () => {},
@@ -172,13 +186,17 @@ export class GanttController extends Component {
      * @param {Record<string, any>} [options={}]
      * @param {Component} dialog component to instantiate, usually FormViewDialog
      */
-    openDialog(props, options = {}, dialogComponent = FormViewDialog) {
-        this.closeDialog = this.dialogService.add(dialogComponent, this._getDialogProps(props), {
-            ...options,
-            onClose: () => {
-                this.closeDialog = null;
-                this.model.fetchData();
-            },
+    async openDialog(props, options = {}, dialogComponent = FormViewDialog) {
+        // Sync with the mutex to wait for potential changes on the view
+        await this.model.mutex.exec(() => {
+            const dialogProps = this._getDialogProps(props);
+            this.closeDialog = this.dialogService.add(dialogComponent, dialogProps, {
+                ...options,
+                onClose: () => {
+                    this.closeDialog = null;
+                    this.model.fetchData();
+                },
+            });
         });
     }
 

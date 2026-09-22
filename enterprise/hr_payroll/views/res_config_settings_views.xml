@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <record id="open_payroll_modules" model="ir.actions.act_window">
-            <field name="name">Payroll</field>
-            <field name="res_model">ir.module.module</field>
-            <field name="view_mode">kanban,list,form</field>
-            <field name="context">{}</field>
-            <field name="domain">[('name', '=like', 'l10n_%_hr_payroll')]</field>
-            <field name="search_view_id" ref="base.view_module_filter"/>
-        </record>
-
         <record id="res_config_settings_view_form" model="ir.ui.view">
             <field name="name">res.config.settings.view.form.inherit.hr.payroll</field>
             <field name="model">res.config.settings</field>
@@ -17,21 +8,12 @@
             <field name="arch" type="xml">
                 <xpath expr="//form" position="inside">
                     <app data-string="Payroll" string="Payroll" name="hr_payroll" groups="hr_payroll.group_hr_payroll_manager">
-                        <field name="module_l10n_fr_hr_payroll" invisible="1"/>
-                        <field name="module_l10n_be_hr_payroll" invisible="1"/>
-                        <field name="module_l10n_in_hr_payroll" invisible="1"/>
                         <block title="Payroll" id="hr_payroll_settings">
-                            <setting string="Payroll Rules" help="Payroll rules that apply to your country"
-                                invisible="module_l10n_fr_hr_payroll or module_l10n_be_hr_payroll or module_l10n_in_hr_payroll">
-                                <div class="mt8" id="localization_text">
-                                    <button name="%(open_payroll_modules)d" icon="oi-arrow-right" type="action" string="Choose a Payroll Localization Package" class="btn-link"/>
-                                </div>
-                            </setting>
                             <setting string="Contract Expiration Notice Period" id="contract_notice_period">
                                 <span>Warn me </span><field name="contract_expiration_notice_period" class="w-25"/><span>days before end of contract.</span>
                             </setting>
                             <setting string="Work Permit Expiration Notice Period" id="work_permit_notice_period">
-                                 <span>Warn me </span><field name="work_permit_expiration_notice_period" class="w-25"/><span>days before expiration of the Work Permit.</span>
+                                <span>Warn me </span><field name="work_permit_expiration_notice_period" class="w-25"/><span>days before expiration of the Work Permit.</span>
                             </setting>
                             <setting string="YTD Reset Date" id="ytd_reset_date"
                                 title="Day where the 'Year To Date' will be reset every year.">
@@ -40,11 +22,39 @@
                                     <field name="ytd_reset_month" class="o_light_label"/>
                                 </div>
                             </setting>
+                            <setting string="First Payrun Date" id="first_payrun_configuration"
+                                help="Choose the date when you plan to start using Odoo for your Payroll.">
+                                <div class="content-group">
+                                    <field name="first_payrun_date"/>
+                                </div>
+                            </setting>
+                            <setting string="Send payslips to employees" id="payslip_generate_and_send_trigger"
+                                help="Define when payslips are printed and sent to employees">
+                                <div class="content-group">
+                                    <field name="payslip_generate_and_send_trigger" class="o_light_label"/>
+                                </div>
+                            </setting>
+                            <setting string="Payroll Closing Date" id="payrun_configuration"
+                                help="Choose a company closing date for your monthly payruns.">
+                                <div class="content-group">
+                                    <field name="payroll_closing_date"/>
+                                </div>
+                            </setting>
                         </block>
                         <block title="Accounting" id="hr_payroll_accountant">
-                            <setting name="module_hr_payroll_account_iso20022" string="Payroll SEPA" help="Create SEPA payment"
-                                invisible="'SEPA' not in company_country_group_codes">
+                            <setting name="module_hr_payroll_account_iso20022" string="Payroll SEPA" help="Create SEPA payment" invisible="'SEPA' not in company_country_group_codes">
                                 <field name="module_hr_payroll_account_iso20022"/>
+                            </setting>
+                        </block>
+                        <block title="Time Off" id="hr_payroll_time_off_settings">
+                            <setting string="Deferred Time Off" help="Postpone time off after payslip validation">
+                                <div class="content-group">
+                                    <div class="row mt16 ms-2">
+                                        <label string="Responsible" for="deferred_time_off_manager"
+                                            class="col-md-6 p-0 m-0 o_light_label"/>
+                                        <field name="deferred_time_off_manager" class="col-lg-6 p-0" placeholder="No one will be notified"/>
+                                    </div>
+                                </div>
                             </setting>
                         </block>
                     </app>
@@ -56,7 +66,7 @@
             <field name="name">Settings</field>
             <field name="res_model">res.config.settings</field>
             <field name="view_mode">form</field>
-            <field name="context">{'module' : 'hr_payroll', 'bin_size': False}</field>
+            <field name="context">{'module' : 'hr_payroll'}</field>
         </record>
 
 </odoo>

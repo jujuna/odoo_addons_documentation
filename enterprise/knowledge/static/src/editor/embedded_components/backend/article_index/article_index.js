@@ -1,4 +1,5 @@
-import { onWillStart, useState, useSubEnv, Component } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
+import { Component, onWillStart, proxy, t, useProps } from "@odoo/owl";
 import {
     getEmbeddedProps,
     useEmbeddedState,
@@ -19,17 +20,18 @@ export class EmbeddedArticleIndexComponent extends Component {
         EmbeddedComponentToolbar,
         EmbeddedComponentToolbarButton,
     };
-    static props = {
-        host: { type: Object },
-        articles: { type: Object, optional: true },
-        showAllChildren: { type: Boolean, optional: true },
-    };
+
+    props = useProps({
+        host: t.object(),
+        articles: t.object().optional(),
+        showAllChildren: t.boolean().optional(),
+    });
 
     setup() {
         this.orm = useService("orm");
         this.embeddedState = useEmbeddedState(this.props.host);
         this.keepLastFetch = new KeepLast();
-        this.state = useState({
+        this.state = proxy({
             loading: false,
             key: 0,
         });

@@ -3,14 +3,13 @@
     <record id="res_partner_2" model="res.partner">
         <field name="name">General public customer</field>
         <field name="country_id" ref="base.pe"/>
-        <field name="vat">10000000</field>
-        <field name="l10n_latam_identification_type_id" ref="l10n_pe.it_DNI"/>
+        <field name="additional_identifiers" eval="{'PE_DNI': '10000000'}"/>
     </record>
 
     <data noupdate="1">
         <record id="demo_certificate" model="certificate.certificate">
             <field name="name">PE demo certificate</field>
-            <field name="content" type="base64" file="l10n_pe_edi/demo/certificates/certificate.pfx"/>
+            <field name="content" type="bytes" file="l10n_pe_edi/demo/certificates/certificate.pfx"/>
             <field name="pkcs12_password">12345678a</field>
             <field name="company_id" ref="base.demo_company_pe"/>
         </record>

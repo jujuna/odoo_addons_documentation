@@ -23,10 +23,24 @@
                     <setting string="MoL Establishment ID" help="Ministry of Labor Establishment ID" id="l10n_sa_mol_establishment_code">
                         <field name="l10n_sa_mol_establishment_code"/>
                     </setting>
-                    <setting string="Annual Leave Time-off Type" help="Set the time off type used as Annual Leave">
-                        <field name="l10n_sa_annual_leave_type_id"/>
+                    <setting string="Annual Leave Time-off Type" help="Set the time type used as Annual Leave">
+                        <field name="l10n_sa_annual_work_entry_type_id"/>
+                    </setting>
+                    <setting
+                        string="Unpaid Leave EOS Threshold"
+                        help="Unpaid leave days beyond this limit are excluded from the End of Service calculation. Set to 0 to exclude all unpaid days. Affects only the End of Service calculation.">
+                        <div class="o_row">
+                            <field name="l10n_sa_unpaid_leave_eos_threshold" class="oe_inline"/>
+                            <span>days</span>
+                        </div>
                     </setting>
                 </block>
+            </xpath>
+            <xpath expr="//block[@id='contract_work_permit_expiration_notify']" position="inside">
+                <setting string="Employee Probation Period" id="l10n_sa_probation_period_duration"
+                    title="Number of Months to the probation date end that will trigger an alert for the responsible HR Respobsible for the employee.">
+                    <field name="l10n_sa_probation_period_duration" class="w-25"/><span>Months</span>
+                </setting>
             </xpath>
         </field>
     </record>

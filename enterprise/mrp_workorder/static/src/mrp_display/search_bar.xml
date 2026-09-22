@@ -2,12 +2,18 @@
 
 <templates xml:space="preserve">
 
-    <t t-name="mrp_workorder.MrpDisplaySearchBarFacets" t-inherit="web.SearchBar.Facets">
+    <t t-name="mrp_workorder.MrpDisplayFacetIcon" t-inherit="web.SearchBar.NormalFacetIcon">
         <xpath expr="//div[hasclass('o_searchview_facet_label')]" position="attributes">
             <attribute name="t-attf-class">btn-{{facet.color || (facet.type === 'favorite' ? 'favorite' : 'primary')}}</attribute>
         </xpath>
         <xpath expr="//div[hasclass('o_searchview_facet_label')]/small" position="after">
             <small t-if="facet.color === 'info'">WO</small>
+        </xpath>
+    </t>
+
+    <t t-name="mrp_workorder.MrpDisplaySearchBarFacets" t-inherit="web.SearchBar.Facets">
+        <xpath expr="//t[@t-call='web.SearchBar.NormalFacetIcon']" position="attributes">
+            <attribute name="t-call">mrp_workorder.MrpDisplayFacetIcon</attribute>
         </xpath>
     </t>
 

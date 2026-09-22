@@ -3,9 +3,12 @@ from freezegun import freeze_time
 
 from odoo import Command, fields
 from odoo.addons.base.tests.test_ir_cron import CronMixinCase
+from odoo.tests import tagged
+
 from odoo.addons.whatsapp.tests.common import WhatsAppCommon, MockOutgoingWhatsApp
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppCalendar(WhatsAppCommon, MockOutgoingWhatsApp, CronMixinCase):
 
     @classmethod

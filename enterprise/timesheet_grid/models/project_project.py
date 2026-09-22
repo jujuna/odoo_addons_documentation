@@ -1,10 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from pytz import utc
-from datetime import datetime
 from collections import defaultdict
+from datetime import datetime, UTC
 
-from odoo import _, models
+from odoo import _, api, models
+from odoo.fields import Domain
 
 from odoo.tools.intervals import Intervals
 from odoo.tools.date_utils import sum_intervals
@@ -14,27 +14,21 @@ class ProjectProject(models.Model):
     _name = 'project.project'
     _inherit = ["project.project", "timesheet.grid.mixin"]
 
-    def check_can_start_timer(self):
-        self.ensure_one()
-        if self.sudo().company_id.timesheet_encode_uom_id == self.env.ref('uom.product_uom_day'):
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'message': _('You cannot start the timer for a project in a company encoding its timesheets in days.'),
-                    'type': 'danger',
-                    'sticky': False,
-                }
-            }
-        return True
-
     def write(self, vals):
         result = super().write(vals)
         if 'allow_timesheets' in vals and not vals['allow_timesheets']:
-            self.env['timer.timer'].search([
-                ('res_model', '=', "project.task"),
-                ('res_id', 'in', self.with_context(active_test=False).task_ids.ids)
-            ]).unlink()
+            self.env['aw.rule'].search([
+                ('project_id', 'in', self.ids)
+            ]).write({
+                'project_id': False,
+                'task_id': False
+            })
+        if 'company_id' in vals:
+            # sudo: the private rules of the other users have to be cleaned up too
+            self.env['aw.rule'].sudo().search([
+                ('company_id', '!=', False),
+                '|', ('project_id', 'in', self.ids), ('task_id.project_id', 'in', self.ids),
+            ])._remove_records_from_other_companies()
         return result
 
     def get_allocated_hours_field(self):
@@ -47,13 +41,13 @@ class ProjectProject(models.Model):
         absolute_max_end, absolute_min_start = stop, start
         allocated_hours_mapped = defaultdict(float)
         for project in self:
-            absolute_max_end = max(absolute_max_end, utc.localize(datetime.combine(project.date, datetime.max.time())))
-            absolute_min_start = min(absolute_min_start, utc.localize(datetime.combine(project.date_start, datetime.min.time())))
+            absolute_max_end = max(absolute_max_end, datetime.combine(project.date, datetime.max.time(), UTC))
+            absolute_min_start = min(absolute_min_start, datetime.combine(project.date_start, datetime.min.time(), UTC))
 
         users_work_intervals, _dummy = users.sudo()._get_valid_work_intervals(absolute_min_start, absolute_max_end)
         for project in self:
-            project_date_start = utc.localize(datetime.combine(project.date_start, datetime.min.time()))
-            project_date_end = utc.localize(datetime.combine(project.date, datetime.max.time()))
+            project_date_start = datetime.combine(project.date_start, datetime.min.time(), UTC)
+            project_date_end = datetime.combine(project.date, datetime.max.time(), UTC)
             max_start = max(start, project_date_start)
             min_end = min(stop, project_date_end)
             user_id = project.user_id.id
@@ -92,8 +86,35 @@ class ProjectProject(models.Model):
             return {}
         if field != 'user_id':
             raise NotImplementedError(_("This Progress Bar is not implemented."))
-        start, stop = utc.localize(start), utc.localize(stop)
+        start, stop = start.replace(tzinfo=UTC), stop.replace(tzinfo=UTC)
         return dict(
             self._gantt_progress_bar_user_id(res_ids, start, stop),
             warning=_("This user isn't expected to have any projects assigned during this period because they don't have any running contract."),
         )
+
+    @api.model
+    def name_search(self, name='', domain=None, operator='ilike', limit=100):
+        if name or not self.env.context.get('timesheet_timer_search') or not (employee := self.env.user.employee_id):
+            return super().name_search(name=name, domain=domain, operator=operator, limit=limit)
+
+        project_domain = Domain.AND([
+            domain or [],
+            [('active', '=', True)],
+        ])
+        recent_projects = self.env['account.analytic.line']._get_recently_used_records(
+            'project_id',
+            domain=[('project_id', 'any', project_domain), ('employee_id', '=', employee.id), ('project_id', '!=', False)],
+        )
+        if not recent_projects:
+            return super().name_search(name=name, domain=domain, operator=operator, limit=limit)
+
+        if len(recent_projects) >= limit:
+            return recent_projects
+
+        recent_project_ids = [project_id for project_id, _display_name in recent_projects]
+        remaining_projects = super().name_search(
+            name=name,
+            domain=Domain.AND([domain or [], [('id', 'not in', recent_project_ids)]]),
+            operator=operator,
+            limit=limit - len(recent_projects))
+        return recent_projects + remaining_projects

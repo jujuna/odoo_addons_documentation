@@ -2,10 +2,11 @@
 import re
 
 from odoo.exceptions import ValidationError
-from odoo.tests import TransactionCase
+from odoo.tests import tagged, TransactionCase
 from odoo.addons.ai.utils.tools_schema import validators
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestInstanceValidation(TransactionCase):
 
     def validate_instance_with_schema(self, schema, instance, required_parameters=None, error_message=''):
@@ -90,6 +91,31 @@ class TestInstanceValidation(TransactionCase):
             instance=instance,
             error_message=f"The type of the parameter '{param_name}' is incorrect. It should be '{param_type}'."
         )
+
+    def test_numeric_minimum(self):
+        optional = self.validate_instance_with_schema(
+            {'record_id': {'type': 'integer', 'minimum': 1}},
+            {},
+            required_parameters=[],
+        )
+        self.assertIsNone(optional['record_id'])
+
+        for param_type, valid_value in (('integer', 1), ('number', 1.0)):
+            with self.subTest(param_type=param_type, valid=True):
+                schema = {
+                    'record_id': {
+                        'type': param_type,
+                        'minimum': 1,
+                    },
+                }
+                self.validate_instance_with_schema(schema, {'record_id': valid_value})
+
+            with self.subTest(param_type=param_type, valid=False):
+                self.validate_instance_with_schema(
+                    schema,
+                    {'record_id': 0},
+                    error_message="The value of the parameter 'record_id' must be at least 1.",
+                )
 
     def test_wrong_pattern_parameter(self):
         '''
@@ -323,4 +349,71 @@ class TestInstanceValidation(TransactionCase):
             schema=schema,
             instance={'state': 'invalid'},
             error_message="Wrong value invalid, should be in: done, ready",
+        )
+
+    def test_anyof_array_items(self):
+        param_name = 'operations'
+        schema = {
+            param_name: {
+                'type': 'array',
+                'description': 'list of operations',
+                'items': {
+                    'anyOf': [
+                        {
+                            'type': 'object',
+                            'properties': {
+                                'type': {'type': 'string', 'enum': ['navigate']},
+                                'period': {'type': 'string', 'enum': ['day', 'week', 'month']},
+                            },
+                            'required': ['type', 'period'],
+                        },
+                        {
+                            'type': 'object',
+                            'properties': {
+                                'type': {'type': 'string', 'enum': ['find_next', 'find_previous']},
+                                'weekday': {'type': 'integer'},
+                            },
+                            'required': ['type', 'weekday'],
+                        },
+                    ],
+                },
+            },
+        }
+        # Test navigate operation
+        instance = {param_name: [{'type': 'navigate', 'period': 'day'}]}
+        self.validate_instance_with_schema(schema=schema, instance=instance)
+
+        # Test find_next operation
+        instance = {param_name: [{'type': 'find_next', 'weekday': 4}]}
+        self.validate_instance_with_schema(schema=schema, instance=instance)
+
+        # Test mixed operations
+        instance = {param_name: [
+            {'type': 'navigate', 'period': 'month'},
+            {'type': 'find_previous', 'weekday': 0},
+        ]}
+        self.validate_instance_with_schema(schema=schema, instance=instance)
+
+        # Test invalid: navigate without required period
+        instance = {param_name: [{'type': 'navigate'}]}
+        self.validate_instance_with_schema(
+            schema=schema,
+            instance=instance,
+            error_message="The value of parameter 'operations's item' doesn't match any of the expected schemas.",
+        )
+
+        # Test invalid: find_next with wrong weekday type
+        instance = {param_name: [{'type': 'find_next', 'weekday': 'monday'}]}
+        self.validate_instance_with_schema(
+            schema=schema,
+            instance=instance,
+            error_message="The value of parameter 'operations's item' doesn't match any of the expected schemas.",
+        )
+
+        # Test invalid: unknown type
+        instance = {param_name: [{'type': 'unknown_operation', 'period': 'day'}]}
+        self.validate_instance_with_schema(
+            schema=schema,
+            instance=instance,
+            error_message="The value of parameter 'operations's item' doesn't match any of the expected schemas.",
         )

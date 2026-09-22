@@ -1,8 +1,7 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
-import { edit, press, queryAllTexts } from "@odoo/hoot-dom";
+import { edit, press, queryAllTexts, queryAll } from "@odoo/hoot-dom";
 import { advanceTime, animationFrame } from "@odoo/hoot-mock";
-import { onWillRender } from "@odoo/owl";
 import {
     contains,
     defineModels,
@@ -18,6 +17,8 @@ import {
     serverState,
 } from "@web/../tests/web_test_helpers";
 import { registry } from "@web/core/registry";
+// todo owl3 remove after the ListRenderer onWillRender is removed
+import { onWillRender } from "@web/owl2/utils";
 import { ListRenderer } from "@web/views/list/list_renderer";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 import { ListEditorRenderer } from "@web_studio/client_action/view_editor/editors/list/list_editor_renderer";
@@ -401,8 +402,8 @@ test("field widgets correctly displayed and whitelisted in the sidebar (debug=fa
     await contains("thead th[data-studio-xpath]").click();
     await contains(".o_web_studio_property_widget .o_select_menu_toggler").click();
     expect(queryAllTexts(".o_select_menu_menu .o_select_menu_item")).toEqual([
-        "(safeWidgetNoDisplayName)",
         "Test Widget (safeWidget)",
+        "(safeWidgetNoDisplayName)",
     ]);
 });
 
@@ -448,9 +449,9 @@ test("field widgets correctly displayed and whitelisted in the sidebar (debug=tr
     await contains("thead th[data-studio-xpath]").click();
     await contains(".o_web_studio_property_widget .o_select_menu_toggler").click();
     expect(queryAllTexts(".o_select_menu_menu .o_select_menu_item")).toEqual([
-        "(safeWidgetNoDisplayName)",
         "Test Widget (safeWidget)",
         "Text (unsafeWidget)",
+        "(safeWidgetNoDisplayName)",
     ]);
 });
 
@@ -572,9 +573,9 @@ test("many2many, one2many, binary fields and non-stored fields cannot be selecte
 
     await contains(".o_web_studio_property_sort_by input").click();
     expect(queryAllTexts(".dropdown-item.o_select_menu_item")).toEqual([
-        "Char field",
         "Id",
         "M2o field",
+        "Char field",
     ]);
 });
 
@@ -718,7 +719,7 @@ test("deleting selection field value which is linked in other records", async ()
     await contains(".o_web_studio_edit_selection_values").click();
     expect(".modal .o_web_studio_selection_editor > li").toHaveCount(3);
 
-    await contains(".o_web_studio_selection_editor > li:nth-child(3) .fa-trash-o").click();
+    await contains(".o_web_studio_selection_editor > li:nth-child(3) [data-icon='delete']").click();
     expect(".modal .o_web_studio_selection_editor > li").toHaveCount(2);
 
     await contains(".modal .btn-primary").click();
@@ -761,14 +762,16 @@ test("add a selection field in non debug", async () => {
     expect(".modal .o_web_studio_selection_editor > li").toHaveCount(1);
     expect(".modal .o_web_studio_selection_editor > li span:contains(Value 1)").toHaveCount(1);
 
-    await contains(".modal button.fa-pencil-square-o").click();
+    await contains(".modal button[data-icon='edit_square']").click();
     expect(".modal .o_web_studio_selection_editor > li input").toHaveCount(1);
     expect(".modal .o_web_studio_selection_editor > li input:eq(0)").toHaveValue("Value 1");
 
     await contains(".modal .o_web_studio_selection_editor ul:first-child input").edit("Miramar", {
         confirm: false,
     });
-    await contains(".modal .o_web_studio_selection_editor ul:first-child button.fa-check").click();
+    await contains(
+        ".modal .o_web_studio_selection_editor ul:first-child button[data-icon='check']"
+    ).click();
     expect(".modal .o_web_studio_selection_editor ul:first-child li").toHaveText("Miramar");
 
     await contains(".modal .btn-primary").click();
@@ -810,7 +813,7 @@ test("add a selection field in debug", async () => {
     await contains(".modal #new .o-web-studio-interactive-list-item-input").edit("Value 2", {
         confirm: false,
     });
-    await contains(".modal #new button.fa-check").click();
+    await contains(".modal #new button[data-icon='check']").click();
     expect(".modal .o_web_studio_selection_editor > li").toHaveCount(2);
 
     await contains(
@@ -822,7 +825,7 @@ test("add a selection field in debug", async () => {
     await contains(".o_web_studio_selection_full_edit label:nth-child(2) input").edit("My Value", {
         confirm: false,
     });
-    await contains(".o_web_studio_selection_full_edit .fa-check").click();
+    await contains(".o_web_studio_selection_full_edit [data-icon='check']").click();
     expect(".o_web_studio_selection_full_edit").toHaveCount(0);
     expect(
         ".modal .o_web_studio_selection_editor ul li:first-child .o-web-studio-interactive-list-item-label"
@@ -831,10 +834,12 @@ test("add a selection field in debug", async () => {
     await contains(".modal #new .o-web-studio-interactive-list-item-input").edit("Value 3", {
         confirm: false,
     });
-    await contains(".modal #new button.fa-check").click();
+    await contains(".modal #new button[data-icon='check']").click();
     expect(".modal .o_web_studio_selection_editor > li").toHaveCount(3);
 
-    await contains(".modal .o_web_studio_selection_editor > li:nth-child(3) .fa-trash-o").click();
+    await contains(
+        ".modal .o_web_studio_selection_editor > li:nth-child(3) [data-icon='delete']"
+    ).click();
     expect(".modal .o_web_studio_selection_editor > li").toHaveCount(2);
 
     await contains(
@@ -1293,6 +1298,7 @@ test("error during list rendering: undo", async () => {
     patchWithCleanup(ListRenderer.prototype, {
         setup() {
             super.setup();
+            // todo owl3 remove after the ListRenderer onWillRender is removed
             onWillRender(() => {
                 if (triggerError) {
                     triggerError = false;
@@ -1413,15 +1419,15 @@ test("Default group by field in sidebar", async () => {
         return editView(request, "list", newArch);
     });
 
-    await contains(".nav-tabs > li:nth-child(2) a").click();
+    await contains(".nav-tabs > li:nth-child(2) button").click();
     expect(".o_web_studio_property_default_group_by .o_select_menu").toHaveCount(1);
 
     await contains(".o_web_studio_property_default_group_by .o_select_menu input").click();
     expect(queryAllTexts(".o_select_menu_item")).toEqual([
-        "Created on",
-        "Display name",
         "Id",
+        "Display name",
         "Last Modified on",
+        "Created on",
     ]);
 
     await editSelectMenu(".o_web_studio_property_default_group_by .o_select_menu input", {
@@ -1638,5 +1644,77 @@ test("field column width in list editor", async () => {
     await contains(".o_web_studio_view_renderer [data-studio-xpath").click();
     expect(".o_web_studio_sidebar .o_web_studio_property_width").toHaveCount(1);
     await contains(".o_web_studio_sidebar .o_web_studio_property_width input").edit(100);
+    expect.verifySteps(["edit_view"]);
+});
+
+test("buttons in header are moveable", async () => {
+    onRpc("/web_studio/edit_view", async (request) => {
+        expect.step("edit_view");
+        const { params } = await request.json();
+        expect(params.operations[0]).toEqual({
+            node: {
+                attrs: {
+                    name: "action2",
+                },
+                tag: "button",
+                xpath_info: [
+                    {
+                        indice: 1,
+                        tag: "list",
+                    },
+                    {
+                        indice: 1,
+                        tag: "header",
+                    },
+                    {
+                        indice: 2,
+                        tag: "button",
+                    },
+                ],
+            },
+            position: "before",
+            target: {
+                attrs: {
+                    name: "action",
+                },
+                tag: "button",
+                xpath_info: [
+                    {
+                        indice: 1,
+                        tag: "list",
+                    },
+                    {
+                        indice: 1,
+                        tag: "header",
+                    },
+                    {
+                        indice: 1,
+                        tag: "button",
+                    },
+                ],
+            },
+            type: "move",
+        });
+    });
+
+    await mountViewEditor({
+        type: "list",
+        resModel: "partner",
+        arch: `<list>
+            <header>
+                <button name="action" type="action" icon="favorite" string="B1"/>
+                <button name="action2" type="action" icon="favorite" string="B2"/>
+            </header>
+            <field name="display_name" />
+        </list>`,
+    });
+
+    expect(".o-ws-selection-header-buttons .o_web_studio_hook:not(.d-none)").toHaveCount(3);
+    expect(
+        queryAll(".o-ws-selection-header-buttons button.o-draggable").map((e) => e.textContent)
+    ).toEqual(["B1", "B2"]);
+    await contains(".o-ws-selection-header-buttons button:eq(1)").dragAndDrop(
+        ".o-ws-selection-header-buttons .o_web_studio_hook:first-child"
+    );
     expect.verifySteps(["edit_view"]);
 });

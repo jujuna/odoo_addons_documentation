@@ -39,7 +39,7 @@ class MailComposeMessage(models.TransientModel):
         return mails, messages
 
     def action_send_mail(self):
-        if self.model != 'account.return':
+        if self.model != 'account.return' or not self.env.context.get('account_return_finalize_payment'):
             return super().action_send_mail()
 
         return_id = self.env['account.return'].browse(literal_eval(self.res_ids))

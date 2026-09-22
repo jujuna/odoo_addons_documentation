@@ -1,10 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from ast import literal_eval
+from collections import defaultdict
+from lxml import html
 
-from lxml import etree
-
-from odoo import SUPERUSER_ID, _, api, fields, models
+from odoo import SUPERUSER_ID, api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.fields import Domain
 from odoo.http import request
@@ -20,9 +20,7 @@ class Website(models.Model):
 
 
 class IrModel(models.Model):
-    _name = 'ir.model'
-    _description = 'Models'
-    _inherit = ['ir.model']
+    _inherit = 'ir.model'
 
     website_form_access = fields.Boolean('Allowed to use in forms', help='Enable the form builder feature for this model.')
     website_form_default_field_id = fields.Many2one('ir.model.fields', 'Field for custom form data', domain="[('model', '=', model), ('ttype', '=', 'text')]", help="Specify the field which will contain meta and custom form fields datas.")
@@ -55,7 +53,16 @@ class IrModel(models.Model):
     def get_authorized_fields(self, model_name, property_origins):
         """ Return the fields of the given model name as a mapping like method `fields_get`. """
         model = self.env[model_name]
-        fields_get = model.fields_get()
+        fields_get = model.fields_get(attributes=[
+            'required', 'domain', 'readonly', 'type', 'relation', 'manual',
+            'definition_record', 'definition_record_field', 'string', 'selection',
+        ])
+
+        field_details_translated = {}
+        if (with_lang := self.env.context.get('additional_lang')) and with_lang != self.env.context.get('lang'):
+            field_details_translated = self.env[model_name].with_context(lang=with_lang).fields_get(
+                attributes=['string', 'selection'],
+            )
 
         for val in model._inherits.values():
             fields_get.pop(val, None)
@@ -70,19 +77,24 @@ class IrModel(models.Model):
         # (e.g. "[('product_id', '=', product_id)]")
         # Expand properties fields
         for field in list(fields_get):
+            if field_translations := field_details_translated.get(field):
+                fields_get[field]['string_in_website_lang'] = field_translations.get('string')
+                if fields_get[field].get('selection'):
+                    fields_get[field]['selection'] = field_translations.get('selection')
             if 'domain' in fields_get[field] and isinstance(fields_get[field]['domain'], str):
                 del fields_get[field]['domain']
             if fields_get[field].get('readonly') or field in models.MAGIC_COLUMNS or \
-                    fields_get[field]['type'] in ('many2one_reference', 'json'):
+                    fields_get[field]['type'] in ('many2one_reference', 'json', 'reference'):
                 del fields_get[field]
             elif fields_get[field]['type'] == 'properties':
                 property_field = fields_get[field]
                 del fields_get[field]
-                if property_origins:
+                if property_origins is not None:
                     # Add property pseudo-fields
                     # The properties of a property field are defined in a
                     # definition record (e.g. properties inside a project.task
                     # are defined inside its related project.project)
+                    properties_definitions = []
                     definition_record = property_field['definition_record']
                     if definition_record in property_origins:
                         definition_record_field = property_field['definition_record_field']
@@ -93,31 +105,38 @@ class IrModel(models.Model):
                             continue
                         definition_record = definition_model.browse(int(property_origins[definition_record]))
                         properties_definitions = definition_record[definition_record_field]
-                        for property_definition in properties_definitions:
-                            if ((
-                                property_definition['type'] in ['many2one', 'many2many']
-                                and 'comodel' not in property_definition
-                            ) or (
-                                property_definition['type'] == 'selection'
-                                and not property_definition['selection']
-                            ) or (
-                                property_definition['type'] == 'tags'
-                                and not property_definition['tags']
-                            ) or (property_definition['type'] == 'separator')):
-                                # Ignore non-fully defined properties
+                    else:
+                        # If the properties field does not depend on a parent record
+                        # (e.g. res.partner and mailing.contact), In that case
+                        # property definitions must be taken from properties.base.definition,
+                        # which stores property definitions for models without a parent.
+                        properties_definitions = self.env['properties.base.definition'] \
+                            ._get_definition_for_property_field(model_name, field) \
+                            .properties_definition
+                    for property_definition in properties_definitions:
+                        if ((
+                            property_definition['type'] in ['many2one', 'many2many']
+                            and 'comodel' not in property_definition
+                        ) or (
+                            property_definition['type'] == 'selection'
+                            and not property_definition['selection']
+                        ) or (
+                            property_definition['type'] == 'tags'
+                            and not property_definition['tags']
+                        ) or (property_definition['type'] == 'separator')):
+                            # Ignore non-fully defined properties
+                            continue
+                        property_definition['_property'] = {
+                            'field': field,
+                        }
+                        property_definition['required'] = False
+                        if 'domain' in property_definition and isinstance(property_definition['domain'], str):
+                            property_definition['domain'] = literal_eval(property_definition['domain'])
+                            try:
+                                property_definition['domain'] = list(Domain(property_definition['domain']))
+                            except ValueError:
                                 continue
-                            property_definition['_property'] = {
-                                'field': field,
-                            }
-                            property_definition['required'] = False
-                            if 'domain' in property_definition and isinstance(property_definition['domain'], str):
-                                property_definition['domain'] = literal_eval(property_definition['domain'])
-                                try:
-                                    property_definition['domain'] = list(Domain(property_definition['domain']))
-                                except Exception:
-                                    # Ignore non-fully defined properties
-                                    continue
-                            fields_get[property_definition.get('name')] = property_definition
+                        fields_get[property_definition.get('name')] = property_definition
 
         return fields_get
 
@@ -133,7 +152,6 @@ class IrModel(models.Model):
 
 class IrModelFields(models.Model):
     """ fields configuration for form builder """
-    _description = 'Fields'
     _inherit = 'ir.model.fields'
 
     def init(self):
@@ -151,23 +169,52 @@ class IrModelFields(models.Model):
 
     @api.ondelete(at_uninstall=False)
     def _check_if_used_in_website_form(self):
+        if self.env.context.get('force_delete'):
+            return
         """Prevent field deletion if used in a website form."""
+        if not self:
+            return
+
+        fields_by_model = defaultdict(list)
         for field in self:
-            for model_name, field_name in self.env['website']._get_html_fields():
-                domain = [(field_name, 'ilike', f'data-model_name="{field.model}"')]
-                records = self.env[model_name].with_context(active_test=False).search(domain)
-                for record in records:
-                    arch_parsed = etree.fromstring(record[field_name])
-                    xpath_selector = f'//form[@data-model_name="{field.model}"]//*[@name="{field.name}"]'
-                    if arch_parsed.xpath(xpath_selector):
-                        raise ValidationError(_(
+            fields_by_model[field.model].append(field.name)
+
+        def _form_domain(field_name):
+            return Domain.OR([
+                [(field_name, 'ilike', f'data-model_name="{model}"')]
+                for model in fields_by_model
+            ])
+
+        def _check(source_html, display_name):
+            arch_parsed = html.fromstring(source_html)
+            for model, fnames in fields_by_model.items():
+                for fname in fnames:
+                    xpath = f'//form[@data-model_name="{model}"]//*[@name="{fname}"]'
+                    if arch_parsed.xpath(xpath):
+                        raise ValidationError(self.env._(
                             "The field '%(field)s' cannot be deleted because it is referenced in a website view.\n"
                             "Model: %(model)s\n"
                             "View: %(view)s",
-                            field=field.name,
-                            model=field.model,
-                            view=record.display_name,
+                            field=fname,
+                            model=model,
+                            view=display_name,
                         ))
+
+        # Scan `ir.ui.view.arch_db` (always first in `_get_html_fields`) plus
+        # stored HTML columns where a `<form>` can still exist in the database:
+        # - sanitization disabled (`sanitize=False`, e.g. blog.post.content);
+        # - forms allowed (`sanitize_form=False`, e.g. product.template.website_description);
+        # - `sanitize_overridable=True`: users in `base.group_sanitize_override`
+        #   bypass `html_sanitize`, so `<form>` may be stored even when
+        #   `sanitize` and `sanitize_form` are True (e.g. event.sponsor.website_description).
+        # Other HTML fields strip `<form>` on every write and need not be scanned.
+        for model_name, field_name in self.env['website']._get_html_fields():
+            field = self.env[model_name]._fields[field_name]
+            if field.type == 'html' and field.sanitize and field.sanitize_form and not field.sanitize_overridable:
+                continue
+            records = self.env[model_name].sudo().with_context(active_test=False).search(_form_domain(field_name))
+            for record in records:
+                _check(record[field_name], record.display_name)
 
     @api.model
     def formbuilder_whitelist(self, model, fields):

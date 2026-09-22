@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -15,6 +14,10 @@ screen devices.
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'data': [
+        'views/res_group_functional_views.xml',
+        'security/ir.access.csv',
+    ],
     'assets': {
         'web.assets_backend': [
             'mail_enterprise/static/src/core/common/**/*',

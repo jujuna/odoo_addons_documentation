@@ -8,7 +8,7 @@
         <field name="mode">primary</field>
         <field name="priority">20</field>
         <field name="arch" type="xml">
-            <kanban highlight_color="color" class="o_kanban_mobile o_stock_barcode_operations_kanban_view" create="0" sample="1" action="get_action_picking_tree_ready_kanban" type="object" group_create="false">
+            <kanban js_class="stock_barcode_kanban" highlight_color="color" class="o_kanban_mobile o_stock_barcode_operations_kanban_view" create="0" sample="1" action="get_action_picking_tree_ready_kanban" type="object" group_create="false">
                 <field name="color"/>
                 <field name="code"/>
                 <field name="is_barcode_picking_type"/>
@@ -21,7 +21,7 @@
                                 <br/>
                                 <field name="warehouse_id" readonly="1" class="text-muted" groups="stock.group_stock_multi_warehouses"/>
                             </div>
-                            <div class="badge rounded-pill bg-secondary float-end align-self-center p-1 px-2 fs-6"
+                            <div class="badge rounded-pill bg-300 float-end align-self-center p-1 px-2 fs-6"
                                  t-attf-class="{{ record.count_picking_ready.value == 0 ? 'text-muted' : 'fw-bold' }}"
                                  name="get_action_picking_tree_ready_kanban" type="object">
                                 <span name="pickings_count"><field name="count_picking_ready"/></span>
@@ -56,7 +56,8 @@
                 <field name="is_barcode_picking_type" invisible="1"/>
                 <page name="barcode_app" string="Barcode App" invisible="not is_barcode_picking_type">
                     <group>
-                        <field name="show_reserved_sns" groups="stock.group_production_lot"/>
+                        <label for="show_reserved_sns" string="Show reserved lots/SN" invisible="code not in ['incoming', 'outgoing', 'internal']" groups="stock.group_production_lot"/>
+                        <field name="show_reserved_sns" groups="stock.group_production_lot" nolabel="1"/>
                         <field name="show_entire_packs" groups="stock.group_tracking_lot"/>
                     </group>
                     <group>
@@ -64,7 +65,8 @@
                             <field name="restrict_scan_source_location" string="Source Location"
                                    groups="stock.group_stock_multi_locations"
                                    invisible="code == 'incoming'"/>
-                            <field name="restrict_scan_product" string="Product"/>
+                            <label for="restrict_scan_product" string="Product" invisible="code not in ['incoming', 'outgoing', 'internal']"/>
+                            <field name="restrict_scan_product" nolabel="1"/>
                             <field name="restrict_scan_tracking_number" string="Lot/Serial"
                                    invisible="not use_create_lots and not use_existing_lots"
                                    groups="stock.group_production_lot"/>
@@ -75,20 +77,29 @@
                                    invisible="code == 'outgoing'"/>
                         </group>
                         <group name="barcode_options" string="Options">
-                            <field name="barcode_allow_extra_product"/>
+                            <label for="barcode_allow_extra_product" string="Allow extra products" invisible="code not in ['incoming', 'outgoing', 'internal']"/>
+                            <field name="barcode_allow_extra_product" nolabel="1"/>
+                            <field name="group_lines_by_product"
+                                   groups="stock.group_stock_picking_batch"
+                                   invisible="code not in ['incoming', 'outgoing', 'internal']"/>
                         </group>
                     </group>
                     <field name="show_barcode_validation" invisible="1"/>
-                    <group name="barcode_validation" string="Final Validation" invisible="not show_barcode_validation">
-                        <!-- show_barcode_validation handles combined groups/invisible complexity -->
-                        <field name="barcode_validation_full"
-                            invisible="restrict_scan_product"/>
-                        <field name="barcode_validation_all_product_packed"
-                                groups="stock.group_tracking_lot"
-                                invisible="restrict_put_in_pack != 'optional'"/>
-                        <field name="barcode_validation_after_dest_location"
-                                groups="stock.group_stock_multi_locations"
-                                invisible="code == 'outgoing' or restrict_scan_dest_location != 'optional'"/>
+                    <group>
+                        <group name="barcode_validation" string="Final Validation" invisible="not show_barcode_validation">
+                            <!-- show_barcode_validation handles combined groups/invisible complexity -->
+                            <field name="barcode_validation_full"
+                                invisible="restrict_scan_product"/>
+                            <field name="barcode_validation_all_product_packed"
+                                    groups="stock.group_tracking_lot"
+                                    invisible="restrict_put_in_pack != 'optional'"/>
+                            <field name="barcode_validation_after_dest_location"
+                                    groups="stock.group_stock_multi_locations"
+                                    invisible="code == 'outgoing' or restrict_scan_dest_location != 'optional'"/>
+                        </group>
+                        <group name="barcode_instructions_preview" string="Instructions Preview" invisible="not instructions_preview">
+                            <field name="instructions_preview" nolabel="1" colspan="2"/>
+                        </group>
                     </group>
                 </page>
             </xpath>

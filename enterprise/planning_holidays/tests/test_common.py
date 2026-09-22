@@ -13,29 +13,35 @@ class TestCommon(TestCommonPlanning):
         cls.setUpDates()
 
         cls.env.user.tz = 'Europe/Brussels'
-        cls.calendar, cls.flexible_calendar = cls.env['resource.calendar'].create([{
-            'name': 'Calendar',
-        }, {
-            'name': 'Flex Calendar',
-            'tz': 'UTC',
-            'flexible_hours': True,
-            'hours_per_day': 8,
-            'full_time_required_hours': 40,
-            'attendance_ids': [],
-        }])
+        cls.calendar = cls.env['resource.calendar'].create({
+            'attendance_ids': [
+                (0, 0,
+                    {
+                        'dayofweek': weekday,
+                        'hour_from': hour,
+                        'hour_to': hour + 4,
+                    })
+                for weekday in ['0', '1', '2', '3', '4']
+                for hour in [8, 13]
+            ],
+            'name': 'Standard 40h/week',
+        })
         cls.env.company.resource_calendar_id = cls.calendar
 
         # Leave type
-        cls.leave_type = cls.env['hr.leave.type'].create({
+        cls.work_entry_type = cls.env['hr.work.entry.type'].create({
             'name': 'time off',
+            'code': 'time off',
             'requires_allocation': False,
             'request_unit': 'hour',
+            'unit_of_measure': 'hour',
+            'count_as': 'absence',
         })
 
         # Allocations
         cls.allocation_bert = cls.env['hr.leave.allocation'].create({
             'state': 'confirm',
-            'holiday_status_id': cls.leave_type.id,
+            'work_entry_type_id': cls.work_entry_type.id,
             'employee_id': cls.employee_bert.id,
             'date_from': time.strftime('%Y-01-01'),
             'date_to': time.strftime('%Y-12-31'),

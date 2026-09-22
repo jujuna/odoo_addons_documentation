@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-11-13 13:17+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Lithuanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:56+0000\n"
+"PO-Revision-Date: 2026-09-17 23:03+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Lithuanian <https://translate.odoo.com/projects/odoo-master/"
 "social_youtube/lt/>\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n % 10 == 1 && (n % 100 < 11 || n % 100 > "
 "19)) ? 0 : ((n % 10 >= 2 && n % 10 <= 9 && (n % 100 < 11 || n % 100 > 19)) ? "
 "1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: social_youtube
 #: model:ir.model.fields,help:social_youtube.field_social_account__youtube_upload_playlist_id
@@ -35,12 +35,17 @@ msgstr ""
 
 #. module: social_youtube
 #: model_terms:ir.ui.view,arch_db:social_youtube.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-thumbs-o-up me-1\" title=\"Likes\"/>"
+msgid "<i class=\"oi oi-filled me-1\" data-icon=\"thumb_up\" title=\"Likes\"/>"
 msgstr ""
 
 #. module: social_youtube
 #: model_terms:ir.ui.view,arch_db:social_youtube.youtube_preview
 msgid "<span class=\"fw-bold\">Your YouTube Channel</span>"
+msgstr ""
+
+#. module: social_youtube
+#: model_terms:ir.ui.view,arch_db:social_youtube.youtube_preview
+msgid "<span>1 Comment</span>"
 msgstr ""
 
 #. module: social_youtube
@@ -89,11 +94,6 @@ msgid "Author Image"
 msgstr ""
 
 #. module: social_youtube
-#: model_terms:ir.ui.view,arch_db:social_youtube.social_account_revoke_youtube_view_form
-msgid "Cancel"
-msgstr "Atšaukti"
-
-#. module: social_youtube
 #: model:social.stream.type,name:social_youtube.stream_type_youtube_channel_videos
 msgid "Channel"
 msgstr "Kanalas"
@@ -103,6 +103,13 @@ msgstr "Kanalas"
 #: code:addons/social_youtube/static/src/xml/social_youtube_templates.xml:0
 msgid "Clear"
 msgstr "Valyti"
+
+#. module: social_youtube
+#: model_terms:ir.ui.view,arch_db:social_youtube.social_post_view_form
+msgid ""
+"Comment your own post to get the conversation going or share some extra "
+"content."
+msgstr ""
 
 #. module: social_youtube
 #. odoo-javascript
@@ -218,6 +225,11 @@ msgid "ID"
 msgstr "ID"
 
 #. module: social_youtube
+#: model_terms:ir.ui.view,arch_db:social_youtube.social_post_view_form
+msgid "Immediately"
+msgstr ""
+
+#. module: social_youtube
 #: model:ir.model.fields,field_description:social_youtube.field_social_account_revoke_youtube__write_uid
 msgid "Last Updated by"
 msgstr "Paskutinį kartą atnaujino"
@@ -232,6 +244,12 @@ msgstr "Paskutinį kartą atnaujinta"
 #: code:addons/social_youtube/static/src/xml/social_youtube_templates.xml:0
 msgid "Likes"
 msgstr "Teigiami vertinimai"
+
+#. module: social_youtube
+#: model:ir.module.module,description:base.module_social_youtube
+#: model:ir.module.module,summary:base.module_social_youtube
+msgid "Manage your YouTube videos and schedule video uploads"
+msgstr ""
 
 #. module: social_youtube
 #: model:ir.model.fields,field_description:social_youtube.field_social_media__media_type
@@ -288,6 +306,11 @@ msgstr ""
 #: code:addons/social_youtube/models/social_post.py:0
 #: model_terms:ir.ui.view,arch_db:social_youtube.social_post_view_form
 msgid "Please select a single YouTube account at a time."
+msgstr ""
+
+#. module: social_youtube
+#: model_terms:ir.ui.view,arch_db:social_youtube.social_post_view_form
+msgid "Post On"
 msgstr ""
 
 #. module: social_youtube
@@ -409,6 +432,11 @@ msgstr "Socialinių tinklų srautas"
 #. module: social_youtube
 #: model:ir.model,name:social_youtube.model_social_stream_post
 msgid "Social Stream Post"
+msgstr ""
+
+#. module: social_youtube
+#: model:ir.module.module,shortdesc:base.module_social_youtube
+msgid "Social YouTube"
 msgstr ""
 
 #. module: social_youtube
@@ -549,11 +577,9 @@ msgid "Video not found. It could have been removed from Youtube."
 msgstr ""
 
 #. module: social_youtube
-#. odoo-javascript
-#: code:addons/social_youtube/static/src/xml/social_youtube_templates.xml:0
 #: model_terms:ir.ui.view,arch_db:social_youtube.social_stream_post_view_kanban
-msgid "Views"
-msgstr "Rodiniai"
+msgid "View count"
+msgstr ""
 
 #. module: social_youtube
 #. odoo-javascript
@@ -636,6 +662,11 @@ msgid "YouTube Dislikes"
 msgstr ""
 
 #. module: social_youtube
+#: model:ir.model.fields,field_description:social_youtube.field_social_post__youtube_first_comment
+msgid "YouTube First Comment"
+msgstr ""
+
+#. module: social_youtube
 #: model:ir.model.fields,field_description:social_youtube.field_social_stream_post__youtube_likes_count
 msgid "YouTube Likes"
 msgstr ""
@@ -666,17 +697,24 @@ msgid "YouTube Preview"
 msgstr ""
 
 #. module: social_youtube
+#: model:ir.model.fields,field_description:social_youtube.field_social_post__youtube_scheduled_date
+msgid "YouTube Scheduled for"
+msgstr ""
+
+#. module: social_youtube
 #: model_terms:ir.ui.view,arch_db:social_youtube.social_account_view_form
 msgid "YouTube Terms of Service (ToS)"
 msgstr ""
 
 #. module: social_youtube
-#: model_terms:ir.ui.view,arch_db:social_youtube.social_post_view_kanban
+#: model_terms:ir.ui.view,arch_db:social_youtube.social_post_view_card
+#: model_terms:ir.ui.view,arch_db:social_youtube.social_post_view_form
 #: model_terms:ir.ui.view,arch_db:social_youtube.social_stream_post_view_kanban
 msgid "YouTube Thumbnail"
 msgstr "YouTube Miniatūra"
 
 #. module: social_youtube
+#: model:ir.model.fields,field_description:social_youtube.field_social_live_post__youtube_thumbnail_url
 #: model:ir.model.fields,field_description:social_youtube.field_social_post__youtube_thumbnail_url
 #: model:ir.model.fields,field_description:social_youtube.field_social_stream_post__youtube_thumbnail_url
 msgid "YouTube Thumbnail Url"
@@ -716,6 +754,7 @@ msgid "YouTube Video Title"
 msgstr ""
 
 #. module: social_youtube
+#: model:ir.model.fields,field_description:social_youtube.field_social_live_post__youtube_video_url
 #: model:ir.model.fields,field_description:social_youtube.field_social_post__youtube_video_url
 msgid "YouTube Video Url"
 msgstr ""
@@ -782,4 +821,11 @@ msgstr ""
 #. module: social_youtube
 #: model_terms:ir.ui.view,arch_db:social_youtube.social_account_view_form
 msgid "the Google Third-party app account access panel"
+msgstr ""
+
+#. module: social_youtube
+#. odoo-javascript
+#: code:addons/social_youtube/static/src/xml/social_youtube_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:social_youtube.social_stream_post_view_kanban
+msgid "views"
 msgstr ""

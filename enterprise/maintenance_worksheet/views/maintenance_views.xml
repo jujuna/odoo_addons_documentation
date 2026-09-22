@@ -9,29 +9,10 @@
             <xpath expr="//field[@name='equipment_id']" position="after">
                 <field name="worksheet_template_id" options="{'no_create': True, 'no_create_edit':True}"/>
             </xpath>
-            <xpath expr="//field[@name='kanban_state']" position="before">
-                <div class="oe_button_box" name="button_box">
-                    <field name="worksheet_count" invisible="1"/>
-                    <button
-                        class="oe_stat_button oe_worksheet"
-                        name="action_maintenance_worksheet"
-                        icon="fa-pencil" type="object"
-                        invisible="not worksheet_template_id or worksheet_count > 0">
-                        <div class="o_stat_info">
-                            <span class="o_stat_text">Worksheet</span>
-                        </div>
-                    </button>
-                    <button
-                        class="oe_stat_button oe_worksheet_completed text-success"
-                        name="action_maintenance_worksheet"
-                        icon="fa-check" type="object"
-                        invisible="not worksheet_template_id or worksheet_count == 0">
-                        <div class="o_stat_info">
-                            <span class="o_stat_text">Worksheet</span>
-                            <span class="o_stat_text">Complete</span>
-                        </div>
-                    </button>
-                </div>
+            <xpath expr="//page[@name='notes']" position="before">
+                <page name="worksheet_page" string="Worksheet" invisible="not worksheet_template_id">
+                    <field name="worksheet_properties" widget="worksheet_properties"/>
+                </page>
             </xpath>
         </field>
     </record>

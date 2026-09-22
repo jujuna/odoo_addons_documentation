@@ -2,11 +2,11 @@
 <templates>
     <t t-name="account_reports.AccountReportList">
         <div class="account_report_lines_list_x2many">
-            <ul class="p-0" t-ref="root">
+            <ul class="p-0" t-ref="this.rootRef">
                 <!-- Header -->
                 <li class="d-flex justify-content-between">
                     <!-- Columns -->
-                    <t t-foreach="columns" t-as="column" t-key="column.id">
+                    <t t-foreach="this.columns" t-as="column" t-key="column.id">
                         <t t-set="isNameColumn" t-value="column.name === 'name'"/>
 
                         <span
@@ -24,12 +24,10 @@
                 </li>
 
                 <!-- Lines -->
-                <t t-call="account_reports.AccountReportListTree">
-                    <t t-set="lines" t-value="this.formatData()"/>
-                </t>
+                <t t-call="account_reports.AccountReportListTree" lines="this.formatData()"/>
 
                 <!-- Add new line -->
-                <t t-if="props.activeActions.create">
+                <t t-if="this.props.activeActions.create">
                     <li>
                         <a
                             class="column overlined"
@@ -60,10 +58,10 @@
                     <t t-set="record" t-value="this.props.list.records[line.index]"/>
 
                     <!-- Handle -->
-                    <span class="oi oi-draggable o_row_handle"/>
+                    <span class="oi o_row_handle" data-icon="drag_indicator"/>
 
                     <!-- Columns -->
-                    <t t-foreach="columns" t-as="column" t-key="column.id">
+                    <t t-foreach="this.columns" t-as="column" t-key="column.id">
                         <t t-set="isNameColumn" t-value="column.name === 'name'"/>
 
                         <span
@@ -74,14 +72,14 @@
                             }"
                             t-on-click="(ev) => this.onCellClicked(record, column, ev)"
                         >
-                            <t t-out="isNameColumn ? line[column.name] : getFormattedValue(column, record)"/>
+                            <t t-out="isNameColumn ? line[column.name] : this.getFormattedValue(column, record)"/>
 
                             <t t-if="line.out_of_sequence_error">
                                 <span
                                     class="text-danger"
                                     data-tooltip="This line is placed before its parent, which is not allowed. You can fix it by dragging it to the proper position."
                                 >
-                                    <i class="fa fa-exclamation-circle text-danger ms-2 me-1"/>
+                                    <i class="oi text-danger ms-2 me-1" data-icon="error"/>
                                     This line is out of sequence.
                                 </span>
                             </t>
@@ -89,18 +87,16 @@
                     </t>
 
                     <!-- Trash -->
-                    <t t-if="props.activeActions.delete">
+                    <t t-if="this.props.activeActions.delete">
                         <button class="trash" t-on-click="() => this.onDeleteRecord(line.index)">
-                            <i class="fa fa-trash-o"/>
+                            <i class="oi" data-icon="delete"/>
                         </button>
                     </t>
                 </div>
 
                 <t t-if="line.children?.length">
                     <ul>
-                        <t t-call="account_reports.AccountReportListTree">
-                            <t t-set="lines" t-value="line.children"/>
-                        </t>
+                        <t t-call="account_reports.AccountReportListTree" lines="line.children"/>
                     </ul>
                 </t>
             </li>
@@ -114,7 +110,7 @@
             </button>
 
             <t t-set-slot="content">
-                <t t-foreach="optionalFieldGroups" t-as="group" t-key="group_index">
+                <t t-foreach="this.optionalFieldGroups" t-as="group" t-key="group_index">
                     <t t-foreach="group.optionalFields" t-as="field" t-key="field_index">
                         <DropdownItem
                             closingMode="'none'"
@@ -128,7 +124,7 @@
                                 <span class="d-flex align-items-center">
                                     <span class="text-truncate" t-out="field.label"/>
 
-                                    <t t-if="env.debug">
+                                    <t t-if="this.debugMode.isActive()">
                                         <span class="ps-1" t-out="' (' + field.name + ')'"/>
                                     </t>
                                 </span>

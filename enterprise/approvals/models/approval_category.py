@@ -1,9 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-
-from odoo import api, fields, models, tools, _
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
+from odoo.tools import BinaryBytes, file_open
 
 
 CATEGORY_SELECTION = [
@@ -20,8 +19,8 @@ class ApprovalCategory(models.Model):
     _check_company_auto = True
 
     def _get_default_image(self):
-        with tools.file_open('approvals/static/src/img/Folder.png', 'rb') as f:
-            return base64.b64encode(f.read())
+        with file_open('approvals/static/src/img/Folder.png', 'rb') as f:
+            return BinaryBytes(f.read())
 
     name = fields.Char(string="Name", translate=True, required=True)
     company_id = fields.Many2one(
@@ -48,23 +47,18 @@ class ApprovalCategory(models.Model):
     approval_minimum = fields.Integer(string="Minimum Approval", default="1", required=True)
     invalid_minimum = fields.Boolean(compute='_compute_invalid_minimum')
     invalid_minimum_warning = fields.Char(compute='_compute_invalid_minimum')
-    approval_type = fields.Selection(string="Approval Type", selection=[],
-        help="Allows you to define which documents you would like to create once the request has been approved")
-    manager_approval = fields.Selection([('approver', 'Is Approver'), ('required', 'Is Required Approver')],
+    manager_approval = fields.Boolean(
         string="Employee's Manager",
         help="""How the employee's manager interacts with this type of approval.
 
-        Empty: do nothing
-        Is Approver: the employee's manager will be in the approver list
-        Is Required Approver: the employee's manager will be required to approve the request.
+        if checked the employee's manager is a required approver of the request, along with the selected users
     """)
     user_ids = fields.Many2many('res.users', compute='_compute_user_ids', string="Approver Users")
     approver_ids = fields.One2many('approval.category.approver', 'category_id', string="Approvers")
-    approver_sequence = fields.Boolean('Approvers Sequence?', help="If checked, the approvers have to approve in sequence (one after the other). If Employee's Manager is selected as approver, they will be the first in line.")
     request_to_validate_count = fields.Integer("Number of requests to validate", compute="_compute_request_to_validate_count")
-    automated_sequence = fields.Boolean('Automated Sequence?',
-        help="If checked, the Approval Requests will have an automated generated name based on the given code.")
-    sequence_code = fields.Char(string="Code")
+    automated_sequence = fields.Boolean('Automated Sequence',
+        help="If enabled, the approval request subject will be generated automatically using the given prefix code.")
+    sequence_code = fields.Char(string="Prefix Code")
     sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
         copy=False, check_company=True)
     approval_properties_definition = fields.PropertiesDefinition('Approval Properties')
@@ -107,10 +101,10 @@ class ApprovalCategory(models.Model):
             if len(record.approver_ids) != len(record.approver_ids.user_id):
                 raise ValidationError(_('An user may not be in the approver list multiple times.'))
 
-    @api.constrains('approver_sequence', 'approval_minimum')
-    def _constrains_approver_sequence(self):
-        if any(a.approver_sequence and not a.approval_minimum for a in self):
-            raise ValidationError(_('Approver Sequence can only be activated with at least 1 minimum approver.'))
+    @api.constrains('approval_minimum')
+    def _constrains_approval_minimum_not_zero(self):
+        if any(not a.approval_minimum for a in self):
+            raise ValidationError(_('Minimum Approval must be at least 1.'))
 
     @api.model_create_multi
     def create(self, vals_list):

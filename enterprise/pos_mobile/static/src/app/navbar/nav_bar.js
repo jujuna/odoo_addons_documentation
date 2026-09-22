@@ -107,7 +107,7 @@ patch(Navbar.prototype, {
         cookie.set("pos_customer_display_id", displayId);
         mobile.methods
             .showDisplayAndGoToUrl({
-                url: `${this.pos.config._base_url}/pos_customer_display/${this.pos.config.id}/${this.pos.config.access_token}`,
+                url: this.pos.customerDisplayUrl,
                 displayId: displayId,
             })
             .catch((error) => {

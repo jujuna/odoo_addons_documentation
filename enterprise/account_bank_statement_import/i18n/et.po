@@ -15,23 +15,35 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 13:50+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Estonian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 03:08+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Estonian <https://translate.odoo.com/projects/odoo-master/"
 "account_bank_statement_import/et/>\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "%d transactions had a zero amount and were ignored."
+msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "%d transactions had already been imported and were ignored."
 msgstr "%d tehingud on varem imporditud ja neid ignoreeriti."
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "1 transaction had a zero amount and was ignored."
+msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -45,15 +57,28 @@ msgid "A bank account transactions can be imported only once!"
 msgstr "Pangakonto tehinguid saab importida ainult üks kord!"
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,shortdesc:base.module_account_bank_statement_import
+msgid "Account Bank Statement Import"
+msgstr ""
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "All or part of the following file(s) could not be imported:\n"
 msgstr ""
 
 #. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"All transactions in this file either have a zero amount or have already been "
+"imported. There is nothing to import."
+msgstr ""
+
+#. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Pangaväljavõtte rida"
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_setup_bank_manual_config
@@ -100,6 +125,16 @@ msgid "Display Name"
 msgstr "Kuvatav nimi"
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,description:base.module_account_bank_statement_import
+msgid ""
+"Generic Wizard to Import Bank Statements.\n"
+"\n"
+"(This module does not include any type of import format.)\n"
+"\n"
+"OFX and QIF imports are available in Enterprise version."
+msgstr ""
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "Go to Apps"
@@ -123,14 +158,8 @@ msgid "Import ID"
 msgstr "Impordi ID"
 
 #. module: account_bank_statement_import
-#. odoo-python
-#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
-msgid "Import Template for Bank Statement Lines"
-msgstr ""
-
-#. module: account_bank_statement_import
 #. odoo-javascript
-#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import_model.js:0
+#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import/account_bank_statement_import_model.js:0
 msgid "Import Template for Bank Statements"
 msgstr "Impordi mall panga väljavõtte jaoks"
 
@@ -168,6 +197,12 @@ msgstr "Tehingud vastavalt valitud filtritele puuduvad."
 #: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
 msgid "Nothing to do here!"
 msgstr "Siin ei ole midagi teha!"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
+msgid "Template for Bank Statement Lines"
+msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -215,6 +250,14 @@ msgstr ""
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"This file only contains transactions with a zero amount. There is nothing to "
+"import."
+msgstr ""
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "View successfully imported statements"
 msgstr "Vaata edukalt imporditud väljavõtteid"
 
@@ -236,32 +279,5 @@ msgstr "Palun lisage andmikule vaikimisi kasutatav konto: %s"
 msgid "You uploaded an invalid or empty file."
 msgstr "Te laadisite üles vigase või tühja faili."
 
-#~ msgid ""
-#~ "Cannot find in which journal import this statement. Please manually "
-#~ "select a journal."
-#~ msgstr ""
-#~ "Ei tuvasta, millisesse andmikku seda väljavõttet importida. Palun vali "
-#~ "andmik."
-
-#~ msgid ""
-#~ "If it contains transactions for more than one account, it must be "
-#~ "imported on each of them."
-#~ msgstr ""
-#~ "Kui see sisaldab tehinguid rohkem kui ühe konto jaoks, siis tuleb "
-#~ "importida igaühele. "
-
-#~ msgid ""
-#~ "The account of this statement (%s) is not the same as the journal (%s)."
-#~ msgstr ""
-#~ "Selle pangaväljavõtte pangakonto (%s) ei ole sama, mis on andmikus (%s)."
-
-#~ msgid ""
-#~ "The currency of the bank statement (%s) is not the same as the currency "
-#~ "of the journal (%s)."
-#~ msgstr "Valuuta pangaväljavõttel (%s) ei ole sama, mis andmikus (%s)."
-
-#~ msgid "This file doesn't contain any statement for account %s."
-#~ msgstr "Antud fail ei sisalda ühtegi väljavõtet konto jaoks %s."
-
-#~ msgid "This file doesn't contain any transaction for account %s."
-#~ msgstr "Antud fail ei sisalda ühtegi väljavõtet konto jaoks %s."
+#~ msgid "Bank Statement Line"
+#~ msgstr "Pangaväljavõtte rida"

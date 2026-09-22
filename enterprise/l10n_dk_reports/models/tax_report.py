@@ -56,11 +56,11 @@ class DanishReportCustomHandler(models.AbstractModel):
     @api.model
     def _create_envelope(self, body):
         params = {
-            'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+            'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             'body_xml': body,
         }
-        endpoint = self.env['ir.config_parameter'].sudo().get_param('iap.l10n_dk_rsu_proxy_endpoint', 'https://l10n-dk-rsu.api.odoo.com')
-        response = iap_tools.iap_jsonrpc(f'{endpoint}/api/l10n_dk_rsu/v1/create_header', params=params)
+        endpoint = self.env['ir.config_parameter'].sudo().get_str('iap.l10n_dk_rsu_proxy_endpoint') or 'https://l10n-dk-rsu.api.odoo.com'
+        response = iap_tools.iap_jsonrpc(f'{endpoint}/api/l10n_dk_rsu/v1/create_header', params=params, raise_user_error=True)
 
         if error_code := response.get('error'):
             raise UserError(self.ERROR_MESSAGES_IAP[error_code])
@@ -78,6 +78,6 @@ class DanishReportCustomHandler(models.AbstractModel):
             raise UserError(_(
                 "Something went wrong:\n%s",
                 "\n".join(
-                    self.ERROR_MESSAGES.get(error_code.text) or error_code.text for error_code in error_codes
+                    str(self.ERROR_MESSAGES.get(error_code.text) or error_code.text) for error_code in error_codes
                 )
             ))

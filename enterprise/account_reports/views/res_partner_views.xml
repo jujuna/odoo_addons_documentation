@@ -13,20 +13,19 @@
         </field>
     </record>
 
-    <record id="duplicated_vat_partner_tree_view" model="ir.ui.view">
-        <field name="name">duplicated.vat.res.partner.list</field>
+    <record id="duplicate_vat_partner_tree_view" model="ir.ui.view">
+        <field name="name">duplicate.vat.res.partner.list</field>
         <field name="model">res.partner</field>
         <field eval="18" name="priority"/>
         <field name="arch" type="xml">
             <list string="Contacts" sample="1" multi_edit="1" expand="1" >
                 <field name="complete_name" string="Name"/>
-                <field name="is_company"/>
                 <field name="parent_id"/>
                 <button name="set_commercial_partner_main"
                     type="object"
                     string="Set as main"
                     class="btn-primary"
-                    invisible="not context.get('duplicated_partners_vat') or parent_id"
+                    invisible="not context.get('duplicate_partners_vat') or parent_id"
                 />
                 <field name="email"/>
                 <field name="phone" class="o_force_ltr" optional="show"/>
@@ -37,7 +36,7 @@
                 <field name="city" optional="show"/>
                 <field name="state_id" optional="hide" readonly="1"/>
                 <field name="country_id" optional="show" readonly="1"/>
-                <field name="category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                 <field name="company_id" groups="base.group_multi_company" readonly="1"/>
             </list>
         </field>

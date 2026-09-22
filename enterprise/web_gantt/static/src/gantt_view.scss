@@ -1,6 +1,4 @@
 .o_gantt_view {
-	--Gantt__Buttons-height: 50px;
-
 	@media (max-width: 767px) {
 		--Gantt__Buttons-height: 101px; // = 2 times the height in normal display + 1px for the <hr> element
 	}
@@ -17,12 +15,22 @@
 
 	.o_gantt_renderer_controls {
 		@include o-gantt-zindex(controls);
-		height: var(--Gantt__Buttons-height) !important;
+		height: var(--Gantt__Buttons-height, auto) !important;
 	}
 
 	@include media-only(print) {
 		> .o_content {
 			overflow: auto;
+		}
+	}
+
+	.o_content.o_interacting {
+		cursor: grabbing;
+		.o_gantt_row_header {
+			cursor: grabbing;
+		}
+		button {
+			pointer-events: none;
 		}
 	}
 }
@@ -51,7 +59,7 @@
 	grid-template-columns:
 		[row-headers] var(--Gantt__RowHeader-width) [content] 1fr;
 
-	--Gantt__RowHeader-template-column: 16px;
+	--Gantt__RowHeader-template-column: 8px;
 
 	// Allows to use color variables in js
 	--Gantt__Day-background-color: #{$o-view-background-color};
@@ -80,35 +88,65 @@
 		grid-template-columns: var(--Gantt__GridColumns-grid-template-columns);
 	}
 
+	// Row headers and total row sidebar: shared progress bar styles
+	.o_gantt_row_header,
+	.o_gantt_row_total.o_gantt_row_sidebar {
+		.o_gantt_progress_bar {
+			position: relative;
+			margin-inline-end: 8px;
+			height: 5px;
+			border-radius: 3px;
+			background-color: $o-gray-300;
+		}
+	}
+
 	// Row headers
 	.o_gantt_row_header {
-		cursor: pointer;
 		display: grid;
 		grid-column: 1 / -1;
 		grid-row: 3;
 		grid-template-columns: repeat(auto-fill,
 				minmax(var(--Gantt__RowHeader-template-column), 1fr));
+		row-gap: 1px;
+		align-content: center;
 		line-height: var(--Gantt__Pill-height);
-
-		.o_gantt_progress_bar {
-			grid-row: 1;
-			grid-column: 1 / -1;
-		}
 
 		.o_gantt_row_title {
 			grid-row: 1;
+			.o_gantt_row_title_label {
+				padding: 1px;
+			}
+		}
+
+		.o_gantt_progress_bar {
+			grid-row: 2;
+		}
+
+		&.o_has_progress_bar {
+			grid-template-rows: auto 5px;
 		}
 
 		&.o_gantt_group {
 			line-height: initial;
 		}
+	}
 
-		&.o_mobile_progress_bar {
-			grid-template-rows: 1fr var(--Gantt__Pill-height);
-
+	// Total row sidebar: overlay the bar at the bottom without affecting row height
+	.o_gantt_row_total.o_gantt_row_sidebar {
+		&.o_has_progress_bar {
 			.o_gantt_progress_bar {
-				grid-row: 2;
+				position: absolute;
+				bottom: 4px;
+				inset-inline-start: var(--Gantt__RowHeader-template-column);
+				inset-inline-end: 8px;
+				margin-inline-end: 0;
 			}
+		}
+	}
+
+	.o_gantt_cell, .o_gantt_header_cell {
+		&.o_gantt_last_column {
+			border-width: 0 0 1px 0;
 		}
 	}
 
@@ -129,20 +167,51 @@
 	// ===============  Cursors while dragging  ==============
 	// =======================================================
 
-	&.o_grabbing,
-	&.o_grabbing .o_gantt_pill {
-		cursor: move !important;
+	&.o_grabbing {
+		cursor: move;
 	}
 
-	&.o_copying,
-	&.o_copying .o_gantt_pill {
-		cursor: copy !important;
+	&.o_left_resizing {
+		cursor: w-resize;
 	}
 
-	&.o_grabbing_locked,
-	&.o_grabbing_locked .o_gantt_pill {
-		cursor: not-allowed !important;
+	&.o_right_resizing {
+		cursor: e-resize;
 	}
+
+	&.o_copying {
+		cursor: copy;
+	}
+
+	&.o_connect {
+		cursor: grabbing;
+	}
+
+	&.o_grabbing_locked {
+		cursor: not-allowed;
+	}
+
+	&.o_multi_create_mode {
+		&.o_selecting, .o_gantt_cell {
+			cursor: cell;
+		}
+		.o_gantt_row_header, .o_gantt_header_columns {
+			cursor: pointer;
+		}
+	}
+
+	.o_gantt_pill {
+		cursor: pointer;
+	}
+
+	&.o_interacting .o_gantt_cell,
+	&.o_interacting .o_resize_handle,
+	&.o_interacting .o_gantt_pill {
+		cursor: inherit !important;
+	}
+
+
+
 
 	@include media-breakpoint-down(md) {
 		& {
@@ -150,28 +219,21 @@
 		}
 	}
 
-	.o_dragged_pill_ghost {
-		opacity: 0.5;
-	}
-
 	// ================ Header ===============
 	// =======================================
 
 	.o_gantt_title {
-		top: var(--Gantt__Buttons-height);
 		@include o-gantt-zindex(title);
 		border-bottom: 1px solid $gantt-border-color;
 		grid-row: 1 / span 2;
 	}
 
 	.o_gantt_header_groups {
-		top: var(--Gantt__Buttons-height);
 		@include o-gantt-zindex(column-header-groups);
 		grid-row: 1;
 	}
 
 	.o_gantt_header_columns {
-		top: var(--Gantt__Buttons-height);
 		@include o-gantt-zindex(headers);
 		grid-row: 2;
 		margin-top: calc(var(--Gantt__Pill-height) * -1);
@@ -233,12 +295,6 @@
 			border-bottom: 1px solid $gantt-border-color;
 		}
 
-		.o_gantt_progressbar,
-		.o_gantt_text_hoverable {
-			right: 0;
-			height: 100%;
-			background-color: inherit;
-		}
 	}
 
 	// =================== "Regular" & "Group Header" cells ===================
@@ -357,7 +413,7 @@
 			&.o_dragged {
 				opacity: 0.8;
 				box-shadow: 0 5px 25px -10px black;
-				@include o-gantt-zindex(interact);
+				@include o-gantt-zindex(pill-drag);
 
 				.o_gantt_pill {
 					box-shadow: 0 5px 25px -10px black;
@@ -371,12 +427,6 @@
 
 		&.o_undraggable:not(.o_dragged) .o_gantt_lock {
 			display: none;
-		}
-
-		&.o_resizable.o_resized {
-			.o_gantt_pill {
-				cursor: inherit;
-			}
 		}
 
 		.o_gantt_consolidated_pill_title {
@@ -412,10 +462,27 @@
 			.o_gantt_pill.o_gantt_color_#{$index - 1} .o_gantt_progress {
 				background-color: darken($color, 30%);
 			}
-			&.highlight .o_gantt_pill {
+			&.highlight .o_gantt_pill.o_gantt_color_#{$index - 1} {
 			    box-sizing: border-box;
-			    box-shadow: inset 0px 0px 0px 3px rgba(52, 152, 219,1);
+			    box-shadow: inset 0px 0px 0px 2px darken($color, 5%);
 			}
+		}
+	}
+
+	.o_gantt_pill_buffer {
+		height: var(--Gantt__Pill-height);
+		@include o-gantt-zindex(pill-buffer);
+		.o_gantt_pill_buffer_content {
+			@include o-gantt-colors(nth($o-colors-complete, 1));
+			@for $index from 1 through length($o-colors-complete) {
+				&.o_gantt_color_#{$index - 1} {
+					$gantt-color: nth($o-colors-complete, $index);
+					@include o-gantt-colors($gantt-color);
+				}
+			}
+			opacity: 0.6;
+			height: calc(var(--Gantt__Pill-height) * 0.6);
+			top: calc(var(--Gantt__Pill-height) * 0.2);
 		}
 	}
 
@@ -430,12 +497,12 @@
 		overflow: hidden;
 		user-select: none;
 		box-sizing: content-box;
-		cursor: pointer;
 		@include o-gantt-colors(nth($o-colors-complete, 1));
 
 		.o_gantt_pill_title {
-			// Prevent displaying pill's description when size is smaller than 50px
-			max-width: calc((100% - 50px) * 9999);
+			white-space: nowrap;
+			overflow: hidden;
+			min-width: 0;
 		}
 
 		.o_gantt_pill_avatar {
@@ -477,7 +544,7 @@
 			transform: rotate(45deg);
 		}
 
-		@each $color, $value in $theme-colors {
+		@each $color, $value in map-merge($theme-colors, ("secondary": $gray-300)) {
 			&.decoration-#{$color}:before {
 				background: $value;
 			}
@@ -524,9 +591,12 @@
 				$color: nth($o-colors-complete, $index);
 
 				.o_connector_creator_bullet {
-					background-color: $color;
 					color: color-contrast($color);
-					@include o-grab-cursor;
+					cursor: grab;
+
+					&::after {
+						background-color: $color;
+					}
 				}
 
 				.o_connector_creator_top {
@@ -574,16 +644,27 @@
 	}
 
 	.o_connector_creator_bullet {
-		height: $o-connector-creator-bullet-diameter;
-		width: $o-connector-creator-bullet-diameter;
-		outline: $border-width solid var(--Gantt__Day-background-color);
+		height: $o-connector-creator-hitbox-size;
+		width: $o-connector-creator-hitbox-size;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: $o-connector-creator-bullet-diameter;
+			height: $o-connector-creator-bullet-diameter;
+			border-radius: 50%;
+			outline: $border-width solid var(--Gantt__Day-background-color);
+		}
 	}
 
 	.o_connector_creator_top {
 		bottom: 0;
 
 		.o_connector_creator_bullet {
-			top: -0.5 * $o-connector-creator-bullet-diameter;
+			top: -0.5 * $o-connector-creator-hitbox-size;
 		}
 	}
 
@@ -596,7 +677,7 @@
 
 		.o_connector_creator_bullet {
 			/*rtl:ignore*/
-			right: -0.5 * $o-connector-creator-bullet-diameter;
+			right: -0.5 * $o-connector-creator-hitbox-size;
 		}
 	}
 
@@ -604,7 +685,7 @@
 		top: 0;
 
 		.o_connector_creator_bullet {
-			bottom: -0.5 * $o-connector-creator-bullet-diameter;
+			bottom: -0.5 * $o-connector-creator-hitbox-size;
 		}
 	}
 
@@ -614,7 +695,7 @@
 
 		.o_connector_creator_bullet {
 			/*rtl:ignore*/
-			left: -0.5 * $o-connector-creator-bullet-diameter;
+			left: -0.5 * $o-connector-creator-hitbox-size;
 		}
 	}
 
@@ -667,12 +748,19 @@
 		@include o-gantt-zindex(badge);
 	}
 
+	&.o_gantt_hide_connectors .o_gantt_connector:not(.o_connector_highlighted) {
+		opacity: 0;
+		pointer-events: none;
+	}
+
 	.o_gantt_connector {
 		--Connector__ButtonBorder-color: #091124;
 		--Connector__ButtonBackground-color: #ffffff;
 		--Connector__ButtonReschedule-color: #00a09d;
 		--Connector__ButtonRemove-color: #dd3c4f;
 		--Connector__ButtonAccent-color: #ffffff;
+
+		@include o-gantt-zindex(folded);
 
 		&.o_connector_highlighted {
 			@include o-gantt-zindex(interact);

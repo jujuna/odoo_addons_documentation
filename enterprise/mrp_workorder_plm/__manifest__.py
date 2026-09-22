@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'PLM for workorder',
-    'version': '1.0',
     'category': 'Supply Chain/Product Lifecycle Management (PLM)',
     'description': """
 PLM for workorder.
@@ -14,10 +12,6 @@ PLM for workorder.
         'mrp_workorder',
         'mrp_plm',
     ],
-    'data': [
-        'views/mrp_eco_views.xml',
-    ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

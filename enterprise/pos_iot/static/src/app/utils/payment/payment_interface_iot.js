@@ -4,7 +4,7 @@ import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
 export class PaymentInterfaceIot extends PaymentInterface {
     get terminal() {
-        return this.payment_method_id.terminal_proxy;
+        return this.payment_method_id.iot_device_id;
     }
 
     /**
@@ -59,15 +59,14 @@ export class PaymentInterfaceIot extends PaymentInterface {
      */
     onTerminalMessageReceived(data, line) {}
 
-    sendPaymentRequest(uuid) {
+    sendPaymentRequest(line) {
         super.sendPaymentRequest(...arguments);
-        return this._sendTerminalRequest(this.getPaymentData(uuid), false);
+        return this._sendTerminalRequest(this.getPaymentData(line.uuid), false);
     }
 
-    sendPaymentCancel(order, uuid) {
+    sendPaymentCancel(line) {
         super.sendPaymentCancel(...arguments);
-
-        return this._sendTerminalRequest(this.getCancelData(uuid), true);
+        return this._sendTerminalRequest(this.getCancelData(line.uuid), true);
     }
 
     _sendTerminalRequest(data, isCancellation) {
@@ -96,7 +95,7 @@ export class PaymentInterfaceIot extends PaymentInterface {
 
             this.transactionInProgress = true;
             this.pos.iotHttp.action(
-                this.terminal.iotId,
+                this.terminal.iot_id,
                 this.terminal.identifier,
                 data,
                 (e) => this._onValueChange(this.pos.getOrder(), e.result),
@@ -108,7 +107,7 @@ export class PaymentInterfaceIot extends PaymentInterface {
     _keepListening() {
         if (this.transactionInProgress) {
             this.pos.iotHttp.onMessage(
-                this.terminal.iotId,
+                this.terminal.iot_id,
                 this.terminal.identifier,
                 (e) => this._onValueChange(this.pos.getOrder(), e.result),
                 (e) => this._onActionFail(e)
@@ -123,10 +122,12 @@ export class PaymentInterfaceIot extends PaymentInterface {
         }
         this.transactionInProgress = false;
         this._resolvePayment?.(false);
-        if (data?.Disconnected === "disconnected") {
+        if (data?.Disconnected === "disconnected" || data.status === "disconnected") {
             this.env.services.dialog.add(AlertDialog, {
                 title: _t("Connection to terminal failed"),
-                body: _t("Please check if the terminal is still connected."),
+                body: _t(
+                    "The IoT Box cannot detect the payment terminal. Please check if the terminal is still connected."
+                ),
             });
         }
     }
@@ -134,14 +135,14 @@ export class PaymentInterfaceIot extends PaymentInterface {
     _showErrorConfig() {
         this.env.services.dialog.add(AlertDialog, {
             title: _t("Configuration of payment terminal failed"),
-            body: _t("You must select a payment terminal in your POS config."),
+            body: _t("Ensure a payment terminal is properly linked in the settings."),
         });
     }
 
     _onValueChange(order, data) {
         this._keepListening();
         const line = this.getPaymentLineForMessage(order, data);
-        if (line) {
+        if (line && this.transactionInProgress) {
             this.onTerminalMessageReceived(data, line);
         }
     }

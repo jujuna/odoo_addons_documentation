@@ -110,10 +110,15 @@ class L10n_NoTaxReportHandler(models.AbstractModel):
         self.env.cr.execute(SQL(
             '''
             SELECT
-                /* Take the opposite to reflect amounts due to and owed by the tax authorities */
-                SUM(-tdr.tax_amount) AS tax_amount,
-                SUM(-tdr.base_amount) AS base_amount,
-                tax.amount AS rate,
+                /* -Take the opposite to reflect amounts due to and owed by the tax authorities.
+                   -`tax_amount` rounding down to a clean whole number for tax authority rules.
+                   -Negative repartition lines cause the tax and base amounts to have different signs,
+                    use the absolute `base_amount` to align them for the XML.
+                   -Format `rate` for Norwegian rules: drop useless trailing zeros and change the decimal point to a comma.
+                */
+                (FLOOR(SUM(-tdr.tax_amount)))::integer AS tax_amount,
+                (ABS(SUM(tdr.base_amount)))::integer AS base_amount,
+                REPLACE((ROUND(tax.amount, 2)::float)::text, '.', ',') AS rate,
                 %(tax_name)s AS name,
                 SUBSTRING(report_line.code, '[0-9]+') AS tax_code
             FROM (%(tax_details_query)s) AS tdr
@@ -133,6 +138,7 @@ class L10n_NoTaxReportHandler(models.AbstractModel):
             JOIN res_country tax_country ON tax_country.id = tax.country_id
             WHERE tdr.tax_exigible
             GROUP BY tdr.tax_repartition_line_id, tax.id, report_line.code
+            ORDER BY (SUBSTRING(report_line.code, '[0-9]+'))::integer, tdr.tax_repartition_line_id
             ''',
             tax_name=tax_name,
             tax_details_query=tax_details_query,
@@ -155,7 +161,7 @@ class L10n_NoTaxReportHandler(models.AbstractModel):
 
         # Number used for bill payment in Norway to identify the customer and the invoice, abbreviated KID
         # (KID = kundeidentifikasjon)
-        if not sender_company.vat:
+        if not sender_company.has_vat:
             raise UserError(_("No KID number, please set one up for company %s", sender_company.name))
 
         time_interval_dict = self._l10n_no_set_time_interval(options)
@@ -165,7 +171,7 @@ class L10n_NoTaxReportHandler(models.AbstractModel):
             'xmlns': 'no:skatteetaten:fastsetting:avgift:mva:skattemeldingformerverdiavgift:v1.0',
             'submission_ref': 1,  # Always 1 - no online submission (yet)
             'odoo_version': release.version,
-            'company_kid': sender_company.vat,
+            'company_kid': sender_company.vat.upper().removeprefix('NO').removesuffix('MVA'),
             'company_bronnoysund_number': sender_company.l10n_no_bronnoysund_number,
             'company_name': sender_company.name,
             'category': "alminnelig",

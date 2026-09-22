@@ -1,4 +1,4 @@
-from odoo import _, api, fields, models
+from odoo import api, Command, fields, models
 
 
 class L10n_Mx_EdiDocument(models.Model):
@@ -11,6 +11,7 @@ class L10n_Mx_EdiDocument(models.Model):
         column2='pos_order_id',
         copy=False,
         readonly=True,
+        check_company=True,
     )
 
     def _get_source_records(self):
@@ -34,13 +35,35 @@ class L10n_Mx_EdiDocument(models.Model):
         results = super()._get_update_sat_status_domains(from_cron=from_cron)
 
         if not from_cron:
+            # POS documents that may need SAT status update
             results.append([
                 ('state', 'in', ('ginvoice_sent', 'invoice_sent')),
-                ('pos_order_ids', 'any', [('l10n_mx_edi_cfdi_state', '=', 'global_sent')]),
+                ('pos_order_ids', 'any', [
+                    ('l10n_mx_edi_cfdi_state', 'in', ('global_sent', 'sent')),
+                    ('l10n_mx_edi_cfdi_sat_state', '!=', 'cancelled'),
+                ]),
                 ('sat_state', '=', 'valid'),
             ])
 
         return results
+
+    def _create_update_document(self, records, document_values, accept_method):
+        # EXTENDS 'l10n_mx_edi'
+        # sudo because accounting users don't have access to pos.order
+        pos_order_ids_cmd = document_values.pop('pos_order_ids', None)
+        result = super()._create_update_document(records, document_values, accept_method)
+        if pos_order_ids_cmd:
+            result.sudo().write({'pos_order_ids': pos_order_ids_cmd})
+        return result
+
+    @api.model
+    def _create_update_invoice_document_from_invoice(self, invoice, document_values):
+        # EXTENDS 'l10n_mx_edi'
+        # Link POS orders to the document when creating/updating from an invoice.
+        invoice_sudo = invoice.sudo()
+        if invoice_sudo.pos_order_ids:
+            document_values['pos_order_ids'] = [Command.set(invoice_sudo.pos_order_ids.ids)]
+        return super()._create_update_invoice_document_from_invoice(invoice, document_values)
 
     @api.model
     def _create_update_invoice_document_from_pos_order(self, order, document_values):
@@ -112,17 +135,3 @@ class L10n_Mx_EdiDocument(models.Model):
                 .write({'sat_state': 'skip'})
 
         return document
-
-    def action_show_document(self):
-        # EXTENDS 'l10n_mx_edi'
-        self.ensure_one()
-        if self.state.startswith('ginvoice_') and self.pos_order_ids:
-            return {
-                'name': _("Global Invoice"),
-                'type': 'ir.actions.act_window',
-                'res_model': self.pos_order_ids._name,
-                'view_mode': 'list,form',
-                'domain': [('id', 'in', self.pos_order_ids.ids)],
-                'context': {'create': False},
-            }
-        return super().action_show_document()

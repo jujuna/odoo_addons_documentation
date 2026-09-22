@@ -1,19 +1,18 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date
 from typing import Mapping
 from dateutil.relativedelta import relativedelta
-from unittest.mock import patch
 from freezegun import freeze_time
 
 from .common import HelpdeskCommon
-from odoo.tests.common import HttpCase
+from odoo.tests.common import tagged, HttpCase
 from odoo.addons.mail.tests.common import MailCase
 from odoo import fields, Command
 from odoo.addons.mail.tests.common import mail_new_test_user
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHelpdeskRating(HelpdeskCommon, HttpCase, MailCase):
 
     @classmethod
@@ -30,9 +29,6 @@ class TestHelpdeskRating(HelpdeskCommon, HttpCase, MailCase):
             email=cls.partner_1.email,
             groups='base.group_portal',
         )
-
-        # Enable rating feature
-        cls.test_team.write({'use_rating': True})
 
         HelpdeskTicket = cls.env['helpdesk.ticket'].with_context({'mail_create_nolog': True})
         cls.test_team_ticket1 = HelpdeskTicket.create({
@@ -100,7 +96,7 @@ class TestHelpdeskRating(HelpdeskCommon, HttpCase, MailCase):
             3) Check the rating values in the dashboard data.
         """
         yesterday = date.today() - relativedelta(days=1)
-        with patch.object(self.env.cr, 'now', lambda: yesterday):
+        with self.mock_datetime_and_now(yesterday):
             ratings = self.env['rating.rating'].create([
                 {
                     **self.default_rating_vals,
@@ -117,12 +113,10 @@ class TestHelpdeskRating(HelpdeskCommon, HttpCase, MailCase):
             ])
 
         HelpdeskTeam = self.env['helpdesk.team']
-        self.assertTrue(HelpdeskTeam.with_user(self.helpdesk_manager)._check_rating_feature_enabled(True))
         data = HelpdeskTeam.with_user(self.helpdesk_manager).retrieve_dashboard()
         self.assertEqual(data['today']['rating'], 0, 'The average rating of the Helpdesk Manager should be equal to 0 since no rating is done today.')
         self.assertEqual(data['7days']['rating'], 3, 'The average rating of the Helpdesk Manager should be equal to 3 / 5')
 
-        self.assertTrue(HelpdeskTeam.with_user(self.helpdesk_user)._check_rating_feature_enabled(True))
         data = HelpdeskTeam.with_user(self.helpdesk_user).retrieve_dashboard()
         self.assertEqual(data['today']['rating'], 0, 'The average rating of the Helpdesk user should be equal to 0 since no rating is done today.')
         self.assertEqual(data['7days']['rating'], 5, 'The average rating should be equal to 5 / 5.')

@@ -6,7 +6,7 @@
             <field name="model">mail.scheduled.message</field>
             <field name="inherit_id" ref="mail.mail_scheduled_message_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//footer/field[@name='attachment_ids']" position="after">
+                <xpath expr="//footer/field[@name='scheduled_date']" position="after">
                     <field name="body" widget="mail_composer_chatgpt"/>
                 </xpath>
             </field>

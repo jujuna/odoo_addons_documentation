@@ -5,6 +5,7 @@ from .common import TestAccountAvataxCommon
 @tagged("-at_install", "post_install")
 class TestAccountAvalaraRefunds(TestAccountAvataxCommon):
     """https://developer.avalara.com/certification/avatax/refunds-credit-memos-badge/"""
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -34,6 +35,7 @@ class TestAccountAvalaraRefunds(TestAccountAvataxCommon):
         cls.invoice_captured_arguments = capture.val['json']['createTransactionModel']
         with cls._capture_request(return_value={'lines': [], 'summary': []}) as capture:
             cls.invoice.action_post()
+            cls.env.cr.postcommit.run()
 
         with cls._capture_request(return_value={'lines': [], 'summary': []}) as capture:
             move_reversal = cls.env['account.move.reversal'].with_context(
@@ -51,6 +53,7 @@ class TestAccountAvalaraRefunds(TestAccountAvataxCommon):
 
         with cls._capture_request(return_value={'lines': [], 'summary': []}) as capture:
             reverse_move.action_post()
+            cls.env.cr.postcommit.run()
         cls.refund_commit_captured_arguments = capture.val['json']['createTransactionModel']
         return res
 

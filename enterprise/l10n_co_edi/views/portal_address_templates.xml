@@ -4,7 +4,7 @@
         <div id="div_vat" position="after">
             <t t-if="is_used_as_billing and res_company.account_fiscal_country_id.code == 'CO'">
                 <!-- Show fiscal regimen and obligation types-->
-                <div id="div_obligation_types" class="col-xl-6 mb-3">
+                <div id="div_obligation_types" class="col-lg-6 mb-2">
                     <label class="col-form-label" for="l10n_co_edi_obligation_type_ids">
                         Obligation Types
                     </label>
@@ -23,7 +23,7 @@
                     </select>
                 </div>
 
-                <div id="div_fiscal_regimen" class="col-xl-6 mb-3" style="display:none">
+                <div id="div_fiscal_regimen" class="col-lg-6 mb-2" style="display:none">
                     <label class="col-form-label" for="l10n_co_edi_fiscal_regimen">
                         Fiscal Regime
                     </label>
@@ -38,27 +38,6 @@
                     </select>
                 </div>
             </t>
-        </div>
-
-        <div id="div_city" position="before">
-            <div
-                t-if="res_company.account_fiscal_country_id.code == 'CO'"
-                id="div_city_id"
-                class="col-lg-6 mb-3"
-                t-attf-style="(country and country.code != 'CO') and 'display:none;'"
-            >
-                <label class="col-form-label" for="city_id">City</label>
-                <select id="city_id" name="city_id" class="form-select" data-init="1">
-                    <option value="">City...</option>
-                    <option
-                        t-foreach="state_cities"
-                        t-as="city"
-                        t-att-value="city.id"
-                        t-att-selected="city.id == partner_sudo.city_id.id"
-                        t-out="city.name"
-                    />
-                </select>
-            </div>
         </div>
     </template>
 </odoo>

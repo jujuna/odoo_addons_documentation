@@ -1,22 +1,22 @@
-import base64
-
 from odoo import Command
+from odoo.tools import BinaryBytes
 from odoo.tests import tagged
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
 @tagged('post_install', '-at_install')
 class TestInvoiceSignature(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if cls.env.ref('base.module_sign').state != 'installed':
-            cls.skipTest(cls, "`sign` module not installed")
+        cls.ensure_installed('sign')
 
         cls.env.company.sign_invoice = True
 
-        cls.signature_fake_1 = base64.b64encode(b"fake_signature_1")
-        cls.signature_fake_2 = base64.b64encode(b"fake_signature_2")
+        cls.signature_fake_1 = BinaryBytes(b"fake_signature_1")
+        cls.signature_fake_2 = BinaryBytes(b"fake_signature_2")
 
         cls.user.sign_signature = cls.signature_fake_1
         cls.another_user = cls.env['res.users'].create({
@@ -60,23 +60,23 @@ class TestInvoiceSignature(AccountTestInvoicingCommon):
     def test_invoice_signing_user_should_be_the_user_that_posted_it(self):
         self.assertFalse(self.invoice.signing_user,
                          "invoice that weren't created by automated action shouldn't have a signing user")
-        self.assertEqual(self.invoice.signature, False, "There shouldn't be any signature if there isn't a signing user")
+        self.assertFalse(self.invoice.signature, "There shouldn't be any signature if there isn't a signing user")
         self.invoice.action_post()
         self.assertEqual(self.invoice.signing_user, self.user, "The signing user should be the user that posted the invoice")
-        self.assertEqual(self.invoice.signature, self.signature_fake_1, "The signature should be from `self.user`")
+        self.assertEqual(self.invoice.signature.content, self.signature_fake_1.content, "The signature should be from `self.user`")
 
         self.invoice.button_draft()
         self.invoice.with_user(self.another_user).action_post()
         self.assertEqual(self.invoice.signing_user, self.another_user,
                          "The signing user should be the user that posted the invoice")
-        self.assertEqual(self.invoice.signature, self.signature_fake_2, "The signature should be from `self.another_user`")
+        self.assertEqual(self.invoice.signature.content, self.signature_fake_2.content, "The signature should be from `self.another_user`")
 
     def test_invoice_signing_user_should_be_reprensative_user_if_there_is_one(self):
         self.env.company.signing_user = self.user  # set the representative user of the company
         invoice = self.invoice.with_user(self.another_user)
         invoice.action_post()
         self.assertEqual(invoice.signing_user, self.user, "The signing user should be the representative person set in the settings")
-        self.assertEqual(invoice.signature, self.signature_fake_1, "The signature should be from `self.another_user`, the representative user")
+        self.assertEqual(invoice.signature.content, self.signature_fake_1.content, "The signature should be from `self.another_user`, the representative user")
 
     def test_setting_representative_user_shouldnt_change_signer_of_already_posted_invoice(self):
         # Note: Changing this behavior might not be a good idea as having all account.move updated at once
@@ -85,4 +85,4 @@ class TestInvoiceSignature(AccountTestInvoicingCommon):
         self.env.company.signing_user = self.another_user  # set the representative user of the company
         self.assertEqual(self.invoice.signing_user, self.user,
                          "The signing user should be the one that posted the invoice even if a representative has been added later on")
-        self.assertEqual(self.invoice.signature, self.signature_fake_1, "The signature should be from `self.user`")
+        self.assertEqual(self.invoice.signature.content, self.signature_fake_1.content, "The signature should be from `self.user`")

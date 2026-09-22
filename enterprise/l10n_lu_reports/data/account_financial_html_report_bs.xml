@@ -6,6 +6,7 @@
         <field name="name@de">Bilanz</field>
         <field name="name@lb">Bilan</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
@@ -45,8 +46,6 @@
                                 <field name="name@de">I. Nicht eingefordertes gezeichnetes Kapital</field>
                                 <field name="name@lb">I. Abonnéiert Kapital net genannt</field>
                                 <field name="code">LU_BS_103</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">102</field>
                             </record>
                             <record id="account_financial_report_l10n_lu_bs_line_1_1_2" model="account.report.line">
@@ -55,8 +54,6 @@
                                 <field name="name@de">II. Eingefordertes, nicht eingezahltes gezeichnetes Kapital</field>
                                 <field name="name@lb">II.Abonnéiert Kapital, awer onbezuelten</field>
                                 <field name="code">LU_BS_105</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">103</field>
                             </record>
                         </field>
@@ -67,8 +64,6 @@
                         <field name="name@de">B. Aufwendungen für die Errichtung und Erweiterung des Unternehmens </field>
                         <field name="name@lb">B. Bildungskäschten</field>
                         <field name="code">LU_BS_107</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">20</field>
                     </record>
                     <record id="account_financial_report_l10n_lu_bs_line_1_3" model="account.report.line">
@@ -93,8 +88,6 @@
                                         <field name="name@de">1. Entwicklungskosten</field>
                                         <field name="name@lb">1. Käschten vun der Entwécklung</field>
                                         <field name="code">LU_BS_113</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">211</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_1_2" model="account.report.line">
@@ -111,8 +104,6 @@
                                                 <field name="name@de">a) entgeltlich erworben wurden und nicht unter C. I. 3 auszuweisen sind</field>
                                                 <field name="name@lb">a) kaaft fir wäertvoll Iwwerleeung a brauch net ënner C.I.3 gewisen</field>
                                                 <field name="code">LU_BS_117</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">2121</field>
                                             </record>
                                             <record id="account_financial_report_l10n_lu_bs_line_1_3_1_2_2" model="account.report.line">
@@ -121,8 +112,6 @@
                                                 <field name="name@de">b) von dem Unternehmen selbst geschaffen wurden</field>
                                                 <field name="name@lb">b) erstallt duerch d'Schlag selwer</field>
                                                 <field name="code">LU_BS_119</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">2122</field>
                                             </record>
                                         </field>
@@ -133,8 +122,6 @@
                                         <field name="name@de">3. Geschäfts- oder Firmenwert, sofern er entgeltlich erworben wurde</field>
                                         <field name="name@lb">3. Wallen, an de Mooss datt et fir wäertvoll Iwwerleeung kaaft gouf</field>
                                         <field name="code">LU_BS_121</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">213</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_1_4" model="account.report.line">
@@ -143,8 +130,6 @@
                                         <field name="name@de">4. Geleistete Anzahlungen und immaterielle Anlagewerte in Entwicklung</field>
                                         <field name="name@lb">4. Bezuelen op Kont an immaterielle Verméigen ënner der Entwécklung</field>
                                         <field name="code">LU_BS_123</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">214</field>
                                     </record>
                                 </field>
@@ -163,8 +148,6 @@
                                         <field name="name@de">1. Grundstücke und Bauten</field>
                                         <field name="name@lb">1. Land a Gebaier</field>
                                         <field name="code">LU_BS_127</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">221</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_2_2" model="account.report.line">
@@ -173,8 +156,6 @@
                                         <field name="name@de">2. Technische Anlagen und Maschinen</field>
                                         <field name="name@lb">2. Planz a Maschinnen</field>
                                         <field name="code">LU_BS_129</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">222</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_2_3" model="account.report.line">
@@ -183,8 +164,6 @@
                                         <field name="name@de">3. Andere Anlagen, Betriebs- und Geschäftsausstattung</field>
                                         <field name="name@lb">3. Aner Armaturen a Fittingen, Tools an Ausrüstung</field>
                                         <field name="code">LU_BS_131</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">223</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_2_4" model="account.report.line">
@@ -193,8 +172,6 @@
                                         <field name="name@de">4. Geleistete Anzahlungen und Anlagen im Bau</field>
                                         <field name="name@lb">4. Bezuelungen op Kont a knaschteg Verméigen am Bau vum Bau</field>
                                         <field name="code">LU_BS_133</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">224</field>
                                     </record>
                                 </field>
@@ -213,8 +190,6 @@
                                         <field name="name@de">1. Anteile an verbundenen Unternehmen</field>
                                         <field name="name@lb">1. Aktien op Affiliated Undererten</field>
                                         <field name="code">LU_BS_137</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">231</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_3_2" model="account.report.line">
@@ -223,8 +198,6 @@
                                         <field name="name@de">2. Forderungen gegen verbundene Unternehmen</field>
                                         <field name="name@lb">2. Prêten un affiliéiert</field>
                                         <field name="code">LU_BS_139</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">232</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_3_3" model="account.report.line">
@@ -233,8 +206,6 @@
                                         <field name="name@de">3. Beteiligungen</field>
                                         <field name="name@lb">3. Participatioun matzemaachen</field>
                                         <field name="code">LU_BS_141</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">233</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_3_4" model="account.report.line">
@@ -243,8 +214,6 @@
                                         <field name="name@de">4. Forderungen gegen Unternehmen, mit denen ein Beteiligungsverhältnis besteht</field>
                                         <field name="name@lb">4. Prêten zu Schäfferoten mat deenen d'Entreprise verbonne sinn duerch Participatioun vun deelhuelende Interessen</field>
                                         <field name="code">LU_BS_143</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">234</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_3_5" model="account.report.line">
@@ -253,8 +222,6 @@
                                         <field name="name@de">5. Wertpapiere des Anlagevermögens</field>
                                         <field name="name@lb">5. Investitioune gehale wéi fix Verméigen</field>
                                         <field name="code">LU_BS_145</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">235</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_3_3_6" model="account.report.line">
@@ -263,8 +230,6 @@
                                         <field name="name@de">6. Sonstige Ausleihungen</field>
                                         <field name="name@lb">6. Aner Prêten</field>
                                         <field name="code">LU_BS_147</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">236</field>
                                     </record>
                                 </field>
@@ -293,8 +258,6 @@
                                         <field name="name@de">1. Roh-, Hilfs- und Betriebsstoffe</field>
                                         <field name="name@lb">1. Matière première a Verbraucher</field>
                                         <field name="code">LU_BS_155</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">30</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_4_1_2" model="account.report.line">
@@ -303,8 +266,6 @@
                                         <field name="name@de">2. Unfertige Erzeugnisse</field>
                                         <field name="name@lb">2. Schafft amgaang</field>
                                         <field name="code">LU_BS_157</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">31</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_4_1_3" model="account.report.line">
@@ -313,8 +274,6 @@
                                         <field name="name@de">3. Fertige Erzeugnisse und Waren</field>
                                         <field name="name@lb">3. Fäerdeg Wueren a Wueren fir d'Resale</field>
                                         <field name="code">LU_BS_159</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">32 + 36</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_4_1_4" model="account.report.line">
@@ -323,8 +282,6 @@
                                         <field name="name@de">4. Geleistete Anzahlungen</field>
                                         <field name="name@lb">4. Bezuelen op Kont</field>
                                         <field name="code">LU_BS_161</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">37 + 34</field>
                                     </record>
                                 </field>
@@ -351,8 +308,6 @@
                                                 <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                                 <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_167</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">4011 + 4012 + 4013 + 4014 + 4019 + 44113</field>
                                             </record>
                                             <record id="account_financial_report_l10n_lu_bs_line_1_4_2_1_2" model="account.report.line">
@@ -361,8 +316,6 @@
                                                 <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                                 <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                                 <field name="code">LU_BS_169</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">4021 + 4029 + 44123</field>
                                             </record>
                                         </field>
@@ -381,8 +334,6 @@
                                                 <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                                 <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_173</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">4111</field>
                                             </record>
                                             <record id="account_financial_report_l10n_lu_bs_line_1_4_2_2_2" model="account.report.line">
@@ -391,8 +342,6 @@
                                                 <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                                 <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                                 <field name="code">LU_BS_175</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">4112</field>
                                             </record>
                                         </field>
@@ -411,8 +360,6 @@
                                                 <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                                 <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_179</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">4121</field>
                                             </record>
                                             <record id="account_financial_report_l10n_lu_bs_line_1_4_2_3_2" model="account.report.line">
@@ -421,8 +368,6 @@
                                                 <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                                 <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                                 <field name="code">LU_BS_181</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">4122</field>
                                             </record>
                                         </field>
@@ -441,8 +386,6 @@
                                                 <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                                 <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_185</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">421</field>
                                             </record>
                                             <record id="account_financial_report_l10n_lu_bs_line_1_4_2_4_2" model="account.report.line">
@@ -451,8 +394,6 @@
                                                 <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                                 <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                                 <field name="code">LU_BS_187</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">422</field>
                                             </record>
                                         </field>
@@ -473,8 +414,6 @@
                                         <field name="name@de">1. Anteile an verbundenen Unternehmen</field>
                                         <field name="name@lb">1. Aktien op Affiliated Undererten</field>
                                         <field name="code">LU_BS_191</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">501</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_4_3_2" model="account.report.line">
@@ -483,9 +422,7 @@
                                         <field name="name@de">2. Eigene Aktien oder Anteile</field>
                                         <field name="name@lb">2. Eege Aktien</field>
                                         <field name="code">LU_BS_209</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
-                                        <field name="account_codes_formula">503</field>
+                                        <field name="account_codes_formula">502</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_1_4_3_3" model="account.report.line">
                                         <field name="name">3. Other investments</field>
@@ -493,9 +430,7 @@
                                         <field name="name@de">3. Sonstige Wertpapiere</field>
                                         <field name="name@lb">3. Aner Investitiounen</field>
                                         <field name="code">LU_BS_195</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
-                                        <field name="account_codes_formula">502 + 508</field>
+                                        <field name="account_codes_formula">503 + 508</field>
                                     </record>
                                 </field>
                             </record>
@@ -505,8 +440,6 @@
                                 <field name="name@de">IV. Guthaben bei Kreditinstituten, Postscheckguthaben, Schecks und Kassenbestand</field>
                                 <field name="name@lb">Iv.Cash op der Bank an an der Hand</field>
                                 <field name="code">LU_BS_197</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">5130 + 5131 + 516 + 5170 + 5171 + 518</field>
                             </record>
                         </field>
@@ -516,8 +449,6 @@
                         <field name="name@fr">E. Comptes de régularisation</field>
                         <field name="name@de">E. Rechnungsabgrenzungsposten</field>
                         <field name="code">LU_BS_199</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">486 + 481 + 484</field>
                     </record>
                     <record id="account_financial_report_l10n_lu_bs_line_1_6" model="account.report.line">
@@ -552,8 +483,6 @@
                                 <field name="name@de">I. Gezeichnetes Kapital</field>
                                 <field name="name@lb">I. abonnéiert Kapital</field>
                                 <field name="code">LU_BS_303</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-105 - 101 - 104 - 106</field>
                             </record>
                             <record id="account_financial_report_l10n_lu_bs_line_2_1_2" model="account.report.line">
@@ -562,8 +491,6 @@
                                 <field name="name@de">II. Agio</field>
                                 <field name="name@lb">II.Deelen Premium Kont</field>
                                 <field name="code">LU_BS_305</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-11</field>
                             </record>
                             <record id="account_financial_report_l10n_lu_bs_line_2_1_3" model="account.report.line">
@@ -572,8 +499,6 @@
                                 <field name="name@de">III. Neubewertungsrücklagen</field>
                                 <field name="name@lb">III.Revaluatiounspreinung</field>
                                 <field name="code">LU_BS_307</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-12</field>
                             </record>
                             <record id="account_financial_report_l10n_lu_bs_line_2_1_4" model="account.report.line">
@@ -590,8 +515,6 @@
                                         <field name="name@de">1. Gesetzliche Rücklage</field>
                                         <field name="name@lb">1. Legal Reserve</field>
                                         <field name="code">LU_BS_311</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-131</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_1_4_2" model="account.report.line">
@@ -600,8 +523,6 @@
                                         <field name="name@de">2. Rücklage für eigene Aktien oder Anteile</field>
                                         <field name="name@lb">2. Reserve fir eege Aktien</field>
                                         <field name="code">LU_BS_313</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-132</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_1_4_3" model="account.report.line">
@@ -610,8 +531,6 @@
                                         <field name="name@de">3. Satzungsmässige Rücklagen</field>
                                         <field name="name@lb">3. Reserven zur Verfügung gestallt fir vun den Artikelen vun der Associatioun</field>
                                         <field name="code">LU_BS_315</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-133</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_1_4_4" model="account.report.line">
@@ -628,8 +547,6 @@
                                                 <field name="name@de">a) sonstige verfügbare Rücklagen</field>
                                                 <field name="name@lb">a) aner verfügbar Reserven</field>
                                                 <field name="code">LU_BS_431</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">-1381</field>
                                             </record>
                                             <record id="account_financial_report_l10n_lu_bs_line_2_1_4_4_2" model="account.report.line">
@@ -638,8 +555,6 @@
                                                 <field name="name@de">b) sonstige nicht verfügbare Rücklagen</field>
                                                 <field name="name@lb">b) Aner net verfügbar Reserven</field>
                                                 <field name="code">LU_BS_433</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">-1382</field>
                                             </record>
                                         </field>
@@ -653,22 +568,10 @@
                                 <field name="name@lb">V. Profitt oder Verloscht bruecht</field>
                                 <field name="code">LU_BS_319</field>
                                 <field name="expression_ids">
-                                    <record id="account_financial_report_l10n_lu_bs_line_2_1_5_past_pnl" model="account.report.expression">
-                                        <field name="label">past_pnl</field>
-                                        <field name="engine">aggregation</field>
-                                        <field name="subformula">cross_report(l10n_lu_reports.account_financial_report_l10n_lu_pl)</field>
-                                        <field name="formula">LU_PL_669.balance</field>
-                                        <field name="date_scope">to_beginning_of_fiscalyear</field>
-                                    </record>
-                                    <record id="account_financial_report_l10n_lu_bs_line_2_1_5_accounts" model="account.report.expression">
-                                        <field name="label">accounts</field>
-                                        <field name="engine">account_codes</field>
-                                        <field name="formula">-14</field>
-                                    </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_1_5_balance" model="account.report.expression">
                                         <field name="label">balance</field>
-                                        <field name="engine">aggregation</field>
-                                        <field name="formula">LU_BS_319.past_pnl + LU_BS_319.accounts</field>
+                                        <field name="engine">account_codes</field>
+                                        <field name="formula">-14\(142)</field>
                                     </record>
                                 </field>
                             </record>
@@ -683,7 +586,7 @@
                                     <record id="account_financial_report_l10n_lu_bs_line_2_1_6_balance" model="account.report.expression">
                                         <field name="label">balance</field>
                                         <field name="engine">aggregation</field>
-                                        <field name="subformula">cross_report(l10n_lu_reports.account_financial_report_l10n_lu_pl)</field>
+                                        <field name="subformula">cross_report(l10n_lu_reports.account_financial_report_l10n_lu_pl, force_date_scope)</field>
                                         <field name="formula">LU_PL_669.balance</field>
                                         <field name="date_scope">from_fiscalyear</field>
                                     </record>
@@ -695,8 +598,6 @@
                                 <field name="name@de">VII. Vorabdividenden </field>
                                 <field name="name@lb">Vii.Interim Dividenden</field>
                                 <field name="code">LU_BS_323</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-15</field>
                             </record>
                             <record id="account_financial_report_l10n_lu_bs_line_2_1_8" model="account.report.line">
@@ -705,8 +606,6 @@
                                 <field name="name@de">VIII. Investitionszulagen </field>
                                 <field name="name@lb">Viii.Kapital Investitiouns Subventiounen</field>
                                 <field name="code">LU_BS_325</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-16</field>
                             </record>
                         </field>
@@ -725,8 +624,6 @@
                                 <field name="name@de">1. Rückstellungen für Pensionen und ähnliche Verpflichtungen</field>
                                 <field name="name@lb">1. Bestëmmunge fir Pensiounen an ähnlech Obligatiounen</field>
                                 <field name="code">LU_BS_333</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-181</field>
                             </record>
                             <record id="account_financial_report_l10n_lu_bs_line_2_2_2" model="account.report.line">
@@ -735,8 +632,6 @@
                                 <field name="name@de">2. Steuerrückstellungen</field>
                                 <field name="name@lb">2. Bestëmmunge fir Steiererklärung</field>
                                 <field name="code">LU_BS_335</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-183 - 182</field>
                             </record>
                             <record id="account_financial_report_l10n_lu_bs_line_2_2_3" model="account.report.line">
@@ -745,8 +640,6 @@
                                 <field name="name@de">3. Sonstige Rückstellungen</field>
                                 <field name="name@lb">3. Aner Bestëmmunge</field>
                                 <field name="code">LU_BS_337</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-188</field>
                             </record>
                         </field>
@@ -781,8 +674,6 @@
                                                 <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                                 <field name="name@lb">i) ginn an ee Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_441</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">-1921 - 1911</field>
                                             </record>
                                             <record id="account_financial_report_l10n_lu_bs_line_2_3_1_1_2" model="account.report.line">
@@ -791,8 +682,6 @@
                                                 <field name="name@de">ii) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                                 <field name="name@lb">II) ginn duerch méi wéi ee Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_443</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">-1922 - 1912</field>
                                             </record>
                                         </field>
@@ -811,8 +700,6 @@
                                                 <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                                 <field name="name@lb">i) ginn an ee Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_447</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">-1931</field>
                                             </record>
                                             <record id="account_financial_report_l10n_lu_bs_line_2_3_1_2_2" model="account.report.line">
@@ -821,8 +708,6 @@
                                                 <field name="name@de">ii) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                                 <field name="name@lb">II) ginn duerch méi wéi ee Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_449</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">-1932</field>
                                             </record>
                                         </field>
@@ -843,8 +728,6 @@
                                         <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                         <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                         <field name="code">LU_BS_357</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-1941 - 5132 - 5172</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_3_2_2" model="account.report.line">
@@ -853,8 +736,6 @@
                                         <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                         <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                         <field name="code">LU_BS_359</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-1942</field>
                                     </record>
                                 </field>
@@ -873,8 +754,6 @@
                                         <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                         <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                         <field name="code">LU_BS_363</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-431</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_3_3_2" model="account.report.line">
@@ -883,8 +762,6 @@
                                         <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                         <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                         <field name="code">LU_BS_365</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-432</field>
                                     </record>
                                 </field>
@@ -903,8 +780,6 @@
                                         <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                         <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                         <field name="code">LU_BS_369</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-4015 - 44112 - 44111</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_3_4_2" model="account.report.line">
@@ -913,8 +788,6 @@
                                         <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                         <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                         <field name="code">LU_BS_371</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-4412\(44123) - 4025</field>
                                     </record>
                                 </field>
@@ -933,8 +806,6 @@
                                         <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                         <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                         <field name="code">LU_BS_375</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-4421</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_3_5_2" model="account.report.line">
@@ -943,8 +814,6 @@
                                         <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                         <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                         <field name="code">LU_BS_377</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-4422</field>
                                     </record>
                                 </field>
@@ -963,8 +832,6 @@
                                         <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                         <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                         <field name="code">LU_BS_381</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-4511</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_3_6_2" model="account.report.line">
@@ -973,8 +840,6 @@
                                         <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                         <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                         <field name="code">LU_BS_383</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-4512</field>
                                     </record>
                                 </field>
@@ -993,8 +858,6 @@
                                         <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                         <field name="name@lb">a) Gitt an engem Joer bezuelt a bezuelt</field>
                                         <field name="code">LU_BS_387</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-4521</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_3_7_2" model="account.report.line">
@@ -1003,8 +866,6 @@
                                         <field name="name@de">b) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                         <field name="name@lb">b) Wéinst an bezuelt Dir méi wéi ee Joer</field>
                                         <field name="code">LU_BS_389</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-4522</field>
                                     </record>
                                 </field>
@@ -1023,8 +884,6 @@
                                         <field name="name@de">a) Verbindlichkeiten gegenüber Steuerbehörden</field>
                                         <field name="name@lb">a) Steier Autoritéiten</field>
                                         <field name="code">LU_BS_393</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-461</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_3_8_2" model="account.report.line">
@@ -1033,8 +892,6 @@
                                         <field name="name@de">b) Verbindlichkeiten gegenüber Sozialversicherungsträgern</field>
                                         <field name="name@lb">b) Sozialversécherungsautoritéiten</field>
                                         <field name="code">LU_BS_395</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-462</field>
                                     </record>
                                     <record id="account_financial_report_l10n_lu_bs_line_2_3_8_3" model="account.report.line">
@@ -1051,8 +908,6 @@
                                                 <field name="name@de">a) mit einer Restlaufzeit bis zu einem Jahr</field>
                                                 <field name="name@lb">i) ginn an ee Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_399</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">-471</field>
                                             </record>
                                             <record id="account_financial_report_l10n_lu_bs_line_2_3_8_3_2" model="account.report.line">
@@ -1061,8 +916,6 @@
                                                 <field name="name@de">ii) mit einer Restlaufzeit von mehr als einem Jahr</field>
                                                 <field name="name@lb">II) ginn duerch méi wéi ee Joer bezuelt a bezuelt</field>
                                                 <field name="code">LU_BS_401</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="account_codes_formula">-472</field>
                                             </record>
                                         </field>
@@ -1077,8 +930,6 @@
                         <field name="name@de">D. Rechnungsabgrenzungsposten</field>
                         <field name="name@lb">D. ofgeleet Akommes</field>
                         <field name="code">LU_BS_403</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-483 - 485 - 482 - 487</field>
                     </record>
                     <record id="account_financial_report_l10n_lu_bs_line_2_5" model="account.report.line">

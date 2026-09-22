@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:49+0000\n"
-"PO-Revision-Date: 2025-12-06 09:56+0000\n"
-"Last-Translator: Dorin Hongu <dhongu@gmail.com>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:58+0000\n"
+"PO-Revision-Date: 2026-09-18 00:48+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "web_gantt/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -22,13 +22,16 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%(hour)sh%(minute)s"
-msgstr "%(hour)sh%(minute)s"
+#: model:ir.module.module,description:base.module_web_gantt
+msgid ""
+"\n"
+"Odoo Web Gantt chart view.\n"
+"=============================\n"
+"\n"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -38,9 +41,10 @@ msgstr "%s nu poate fi programat în trecut"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%sh"
-msgstr "%sh"
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "%s to schedule"
+msgstr ""
 
 #. module: web_gantt
 #: model:ir.model,name:web_gantt.model_ir_actions_act_window_view
@@ -49,12 +53,14 @@ msgstr "Acțiune Vizualizare Fereastră"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "Activați modul dens"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "Activați modul rar"
@@ -108,7 +114,13 @@ msgstr "Nume afişat"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Drop here to unschedule"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Edit"
 msgstr "Editați"
 
@@ -151,8 +163,8 @@ msgstr "Vizualizare Gantt"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt child can only be field or template, got %s"
-msgstr "Un copil Gantt poate fi doar câmp sau șablon, s-a primit %s"
+msgid "Gantt child can only be field or popover, got %s"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -177,6 +189,18 @@ msgstr ""
 "specificat 'dependency_field'"
 
 #. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover can contain only one templates tag"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover child can only be field or template, got %s"
+msgstr ""
+
+#. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_scale_selector.js:0
 msgid "Gantt start date"
@@ -191,8 +215,8 @@ msgstr "Data de sfârșit Gantt"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt view can contain only one templates tag"
-msgstr "Vizualizarea Gantt poate conține doar o etichetă de șabloane"
+msgid "Gantt view can contain only one popover tag"
+msgstr ""
 
 #. module: web_gantt
 #: model:ir.model.fields,field_description:web_gantt.field_ir_actions_act_window_view__id
@@ -211,6 +235,14 @@ msgstr "Imposibil de programat în trecut."
 #: code:addons/web_gantt/models/models.py:0
 msgid "Insufficient fields for Gantt View!"
 msgstr "Câmpuri insuficiente pentru vizualizarea Gantt!"
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid ""
+"Invalid attributes (%(invalid_attributes)s) in gantt popover. Attributes "
+"must be in (%(valid_attributes)s)"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -248,27 +280,34 @@ msgstr "Metodă de reprogramare invalidă %s"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Load More"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "Month"
 msgstr "Luna"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
-msgid "Name"
-msgstr "Nume"
-
-#. module: web_gantt
-#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_controller.xml:0
 msgid "New"
-msgstr "Nou(ă)"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_controller.js:0
 msgid "No, keep it"
 msgstr "Nu, o păstrez."
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "Nothing to schedule"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
@@ -321,7 +360,13 @@ msgstr "Înregistrare reprogramată"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Show dependencies"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Start"
 msgstr "Începe"
 
@@ -333,7 +378,7 @@ msgstr "Data de început nu poate fi după data de sfârșit"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Stop"
 msgstr "Stop"
 
@@ -353,7 +398,13 @@ msgstr "Dependențele nu sunt valide, există un ciclu."
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Today"
-msgstr "Astăzi"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Toggle Side Panel"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
@@ -375,7 +426,7 @@ msgstr "Nedefinit %s"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 #: model:ir.model,name:web_gantt.model_ir_ui_view
 msgid "View"
 msgstr "Afișare"
@@ -387,16 +438,15 @@ msgid "View Type"
 msgstr "Tip vizualizare"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week"
-msgstr "Săptămână"
+#: model:ir.module.module,shortdesc:base.module_web_gantt
+msgid "Web Gantt"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week %(week)s, %(startDate)s - %(endDate)s"
-msgstr "Săptămâna %(week)s, %(startDate)s - %(endDate)s"
+msgid "Week"
+msgstr "Săptămână"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -422,23 +472,5 @@ msgstr "minute"
 msgid "months"
 msgstr "luni"
 
-#~ msgid "From"
-#~ msgstr "De la"
-
-#~ msgid "From: %(from_date)s to: %(to_date)s"
-#~ msgstr "De la: %(from_date)s la: %(to_date)s"
-
-#~ msgid "to"
-#~ msgstr "la"
-
-#~ msgid "Are you sure to delete this record?"
-#~ msgstr "Sigur doriți să ștergeți această înregistrare?"
-
-#~ msgid "Grouping by date is not supported"
-#~ msgstr "Gruparea după dată nu este acceptată"
-
-#~ msgid "Next"
-#~ msgstr "Înainte"
-
-#~ msgid "Previous"
-#~ msgstr "Anterior"
+msgid "Name"
+msgstr "Nume"

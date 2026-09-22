@@ -3,11 +3,11 @@
 
     <button t-name="stock_barcode.SetReservedQuantityButtonTemplate"
         class="o_button_qty_done d-flex btn btn-secondary rounded-end"
-        t-on-click="_setQuantity" t-att-disabled="!props.record.data[props.name]">
-        <t t-if="props.record.data[props.name]">
-            / <span name="product_uom_qty" class="ms-1" t-out="props.record.data[props.name]"/>
+        t-on-click="this._setQuantity" t-att-disabled="!this.props.record.data[this.props.name]">
+        <t t-if="this.props.record.data[this.props.name]">
+            / <span name="product_uom_qty" class="ms-1" t-out="this.props.record.data[this.props.name]"/>
         </t>
-        <span t-if="displayUOM" name="product_uom_id" class="text-capitalize ms-1" t-out="uom.name"/>
+        <span t-if="this.displayUOM" name="uom_id" class="text-capitalize ms-1" t-out="this.uom.name"/>
     </button>
 
 </templates>

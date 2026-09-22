@@ -3,14 +3,14 @@
 <t t-name="web_studio.ViewEditor.InteractiveEditorProperties.Aside">
     <ViewStructureProperties>
         <ClassAttribute
-            value="props.node.attrs.class"
-            onChange.bind="onChangeAttribute"
+            value="this.props.node.attrs.class"
+            onChange.bind="this.onChangeAttribute"
         />
         <Property
             name="'style'"
             type="'string'"
-            value="props.node.attrs.style"
-            onChange.bind="onChangeAttribute">
+            value="this.props.node.attrs.style"
+            onChange.bind="this.onChangeAttribute">
                 CSS style
         </Property>
     </ViewStructureProperties>

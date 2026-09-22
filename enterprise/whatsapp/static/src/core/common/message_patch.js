@@ -3,9 +3,6 @@ import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 
 patch(Message.prototype, {
-    get showSeenIndicator() {
-        return super.showSeenIndicator && this.message.whatsappStatus !== "error";
-    },
     /**
      * @param {MouseEvent} ev
      */
@@ -13,14 +10,15 @@ patch(Message.prototype, {
         const id = Number(ev.target.dataset.oeId);
         if (ev.target.closest(".o_whatsapp_channel_redirect")) {
             ev.preventDefault();
-            let thread = await this.store.Thread.getOrFetch({ model: "discuss.channel", id });
-            if (!thread?.hasSelfAsMember) {
-                await this.env.services.orm.call("discuss.channel", "add_members", [[id]], {
-                    partner_ids: [this.store.self.id],
+            let channel = await this.store["discuss.channel"].getOrFetch(id);
+            if (!channel?.self_member_id) {
+                await this.store.fetchStoreData("/discuss/channel/add_members", {
+                    channel_id: id,
+                    user_ids: [this.store.self_user.id],
                 });
-                thread = await this.store.Thread.getOrFetch({ model: "discuss.channel", id });
+                channel = await this.store["discuss.channel"].getOrFetch(id);
             }
-            thread.open();
+            channel.open();
             return;
         }
         super.onClick(ev);

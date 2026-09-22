@@ -1,12 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import api, fields, models, _
-from odoo.exceptions import UserError, ValidationError
-from odoo.tools.misc import file_open
-from datetime import datetime
-import base64
-import random
 import logging
+import random
+from datetime import datetime
 
+from dateutil.relativedelta import relativedelta
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, BinaryBytes, file_open
 
 _logger = logging.getLogger(__name__)
 
@@ -50,15 +50,36 @@ class ResCompany(models.Model):
         compute="_compute_l10n_ar_payment_foreign_currency",
         string="Default Policy for Payment in Foreign Currency",
     )
-    l10n_ar_show_withholding_legend = fields.Boolean(
-        string='Show Withholding Legend',
-        help="If this option is selected, the legend 'Operation Subject to Withholding' will be added below the Document Type letter on the Invoice PDF."
+    l10n_ar_invoice_pdf_legend = fields.Selection(
+        selection=[
+            ('payment_on_informed_cbu', 'Payment on Informed CBU'),
+            ('operation_subject_to_withholding', 'Operation Subject to Withholding')
+        ],
+        compute="_compute_l10n_ar_invoice_pdf_legend",
+        store=True,
+        readonly=False,
+        help="Selected legend value will be added below the Document Type letter on the Invoice PDF.")
+
+    # Currency Rate ARCA
+    currency_provider = fields.Selection(
+        selection_add=[('arca', "[AR] ARCA")],
     )
+
+    def _get_country_wise_currency_providers(self):
+        res = super()._get_country_wise_currency_providers()
+        res['AR'] = 'arca'
+        return res
 
     def _compute_l10n_ar_payment_foreign_currency(self):
         for company in self:
-            company.l10n_ar_payment_foreign_currency = self.env["ir.config_parameter"].sudo().get_param(
-                f"l10n_ar_edi.{company.id}_foreign_currency_payment", "No")
+            company.l10n_ar_payment_foreign_currency = self.env["ir.config_parameter"].sudo().get_str(
+                f"l10n_ar_edi.{company.id}_foreign_currency_payment") or "No"
+
+    @api.depends('country_code')
+    def _compute_l10n_ar_invoice_pdf_legend(self):
+        for company in self:
+            if company.country_code != 'AR':
+                company.l10n_ar_invoice_pdf_legend = False
 
     @api.depends('l10n_ar_afip_ws_key_id')
     def _compute_afip_crt(self):
@@ -73,16 +94,6 @@ class ResCompany(models.Model):
                 company.l10n_ar_afip_ws_crt_id = key_to_cert.get(company.l10n_ar_afip_ws_key_id)
             else:
                 company.l10n_ar_afip_ws_crt_id.private_key_id = company.l10n_ar_afip_ws_key_id
-
-    @api.depends('l10n_ar_afip_ws_crt')
-    def _compute_l10n_ar_afip_ws_crt_fname(self):
-        """ Set the certificate name in the company. Needed in unit tests, solved by a similar onchange method in res.config.settings while setting the certificate via web interface """
-        with_crt = self.filtered(lambda x: x.l10n_ar_afip_ws_crt)
-        remaining = self - with_crt
-        for rec in with_crt:
-            certificate = self._l10n_ar_get_certificate_object(rec.with_context(bin_size=False).l10n_ar_afip_ws_crt)
-            rec.l10n_ar_afip_ws_crt_fname = certificate.get_subject().CN
-        remaining.l10n_ar_afip_ws_crt_fname = ''
 
     @api.depends('l10n_ar_afip_ws_crt_id.private_key_id')
     def _compute_afip_key(self):
@@ -137,10 +148,6 @@ class ResCompany(models.Model):
         assign a random certificate to the demo companies. It is also available as button in the res.config.settings
         wizard to let the user change the certificate randomly if the one been set is blocked (because someone else
         is using the same certificate in another database) """
-        def read_datas(path):
-            with file_open(path, 'rb') as f:
-                return base64.b64encode(f.read())
-
         for company in self:
             if company.country_code != 'AR':
                 continue
@@ -149,12 +156,42 @@ class ResCompany(models.Model):
             new_cert_name = 'AR demo certificate %d' % rid
             new_cert = self.env['certificate.certificate'].search([('name', '=', new_cert_name), ('company_id', '=', company.id)], limit=1)
             if not new_cert:
-                cert_file = 'l10n_ar_edi/demo/cert%d.crt' % rid
+                with file_open('l10n_ar_edi/demo/cert%d.crt' % rid, 'rb') as f:
+                    cert_file_content = BinaryBytes(f.read())
                 new_cert = self.env['certificate.certificate'].create({
                     'name': new_cert_name,
-                    'content': read_datas(cert_file),
+                    'content': cert_file_content,
                     'private_key_id': company.l10n_ar_afip_ws_key_id.id,
                     'company_id': company.id,
                 })
             company.l10n_ar_afip_ws_crt_id = new_cert
             _logger.log(25, 'Setting demo certificate from %s to %s in %s company', old_cert_name, new_cert_name, company.name)
+
+    def _parse_arca_data(self, available_currencies):
+        """Fetch the currency rates from ARCA based on the ARCA Currency Code."""
+        if not (self.l10n_ar_afip_ws_key_id and self.l10n_ar_afip_ws_crt_id):
+            raise UserError(
+                _("Please set the ARCA Certificate and Private Key in order to fetch currency rates from ARCA")
+            )
+        if missing_arca_code := available_currencies.filtered(lambda c: not c.l10n_ar_afip_code):
+            raise UserError(_(
+                "The following currencies do not have ARCA Code: %s. "
+                "Please add the required codes or archive these currencies, then click Update again.",
+                ', '.join(missing_arca_code.mapped('name'))
+            ))
+
+        result = {}
+        ar_currency = self.env.ref('base.ARS')
+        arca_date = fields.Datetime.today()
+        currency_rates = (available_currencies - ar_currency)._l10n_ar_get_last_business_day_rate(date_formatting=False)
+        for name, (date, rate) in currency_rates.items():
+            if not rate:
+                continue
+            currency_date = datetime.strptime(date, '%Y%m%d') + relativedelta(days=1)
+            if currency_date < arca_date:
+                arca_date = currency_date
+            result[name] = (1 / rate, currency_date.strftime(DEFAULT_SERVER_DATE_FORMAT))
+
+        # Default ARS rate
+        result['ARS'] = (1.0, arca_date.strftime(DEFAULT_SERVER_DATE_FORMAT))
+        return result

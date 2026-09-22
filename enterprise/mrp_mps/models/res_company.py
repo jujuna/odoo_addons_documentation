@@ -66,7 +66,7 @@ class ResCompany(models.Model):
         period = force_period or self.manufacturing_period
         if not years:
             years = 0
-        first_day = start_of(subtract(fields.Date.today(), years=years), period)
+        first_day = start_of(subtract(fields.Date.context_today(self), years=years), period)
         for _i in range(self['manufacturing_period_to_display_%s' % period]):
             last_day = end_of(first_day, period)
             date_range.append((first_day, last_day))

@@ -9,9 +9,9 @@
                 <tbody t-else="">
                     <t t-foreach="o._l10n_ec_get_payment_data()" t-as="payment">
                         <tr>
-                            <td t-esc="payment['payment_name']"/>
+                            <td t-out="payment['payment_name']"/>
                             <td class="text-end">
-                                <span t-esc="payment['payment_total']"
+                                <span t-out="payment['payment_total']"
                                     t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                             </td>
                         </tr>

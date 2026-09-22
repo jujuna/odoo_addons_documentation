@@ -5,14 +5,15 @@
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-11-16 13:31+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:56+0000\n"
+"PO-Revision-Date: 2026-09-18 02:33+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "project_account_budget/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,25 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: project_account_budget
+#. odoo-python
+#: code:addons/project_account_budget/models/project_project.py:0
+msgid ""
+"\n"
+"                <p class=\"o_view_nocontent_smiling_face\">No budgets found. "
+"Create your first one!</p>\n"
+"                <p>Use budgets to compare actual results with expected "
+"revenues and costs.</p>\n"
+"            "
+msgstr ""
+
+#. module: project_account_budget
+#. odoo-python
+#: code:addons/project_account_budget/models/project_project.py:0
+msgid "%(name)s's Budget Spent"
+msgstr ""
 
 #. module: project_account_budget
 #: model_terms:ir.ui.view,arch_db:project_account_budget.project_update_default_description
@@ -35,6 +54,16 @@ msgstr ") бюджета остается."
 
 #. module: project_account_budget
 #: model_terms:ir.ui.view,arch_db:project_account_budget.project_update_default_description
+msgid ") of the profit is still expected."
+msgstr ") от прибыли все еще ожидается."
+
+#. module: project_account_budget
+#: model_terms:ir.ui.view,arch_db:project_account_budget.view_edit_project_inherit_form_sale_account_budget
+msgid "<span class=\"o_stat_text\">Budget</span>"
+msgstr ""
+
+#. module: project_account_budget
+#: model_terms:ir.ui.view,arch_db:project_account_budget.project_update_default_description
 msgid "<u>Budget</u>"
 msgstr "<u>Бюджет</u>"
 
@@ -44,27 +73,13 @@ msgid "Accounts"
 msgstr "Аккаунты"
 
 #. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.xml:0
-msgid "Actual"
-msgstr "Фактически"
-
-#. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.xml:0
-msgid "Add Budget"
-msgstr "Добавить бюджет"
-
-#. module: project_account_budget
 #: model_terms:ir.ui.view,arch_db:project_account_budget.project_update_default_description
 msgid "Allocated"
 msgstr "Назначено"
 
 #. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.xml:0
 #: model:ir.model,name:project_account_budget.model_budget_analytic
-#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_kanban_view_inherited
+#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_card_view_inherited
 msgid "Budget"
 msgstr "Бюджет"
 
@@ -80,42 +95,30 @@ msgid "Budget Line"
 msgstr "Бюджетная Строка"
 
 #. module: project_account_budget
-#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_kanban_view_inherited
+#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_card_view_inherited
 msgid "Budget allocated"
-msgstr ""
+msgstr "Бюджет выделен"
 
 #. module: project_account_budget
-#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_kanban_view_inherited
+#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_card_view_inherited
 msgid "Budget on track"
-msgstr ""
+msgstr "Бюджет в норме"
 
 #. module: project_account_budget
-#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_kanban_view_inherited
+#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_card_view_inherited
 msgid "Budget overspent"
-msgstr ""
+msgstr "Перерасход бюджета"
 
 #. module: project_account_budget
-#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_kanban_view_inherited
+#: model_terms:ir.ui.view,arch_db:project_account_budget.project_project_card_view_inherited
 msgid "Budget soon overspent"
-msgstr ""
+msgstr "Риск перерасхода бюджета"
 
 #. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.xml:0
+#: model:ir.embedded.actions,name:project_account_budget.project_embedded_action_project_budgets
+#: model:ir.embedded.actions,name:project_account_budget.project_embedded_action_update_budgets
 msgid "Budgets"
-msgstr "Бюджеты"
-
-#. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.xml:0
-msgid "Compare expected and actual revenues and costs."
-msgstr "Сравните ожидаемые и фактические доходы и расходы."
-
-#. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.xml:0
-msgid "Difference"
-msgstr "Разница"
+msgstr ""
 
 #. module: project_account_budget
 #: model:ir.model.fields,field_description:project_account_budget.field_budget_analytic__display_name
@@ -126,12 +129,6 @@ msgid "Display Name"
 msgstr "Display Name"
 
 #. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.xml:0
-msgid "Forecast"
-msgstr "Прогноз"
-
-#. module: project_account_budget
 #: model:ir.model.fields,field_description:project_account_budget.field_budget_analytic__id
 #: model:ir.model.fields,field_description:project_account_budget.field_budget_line__id
 #: model:ir.model.fields,field_description:project_account_budget.field_project_project__id
@@ -140,21 +137,9 @@ msgid "ID"
 msgstr "ID"
 
 #. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.js:0
-msgid "New Budget"
-msgstr "Новый бюджет"
-
-#. module: project_account_budget
 #: model_terms:ir.ui.view,arch_db:project_account_budget.project_update_default_description
 msgid "No Accounts"
 msgstr "Нет счетов"
-
-#. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.xml:0
-msgid "No Budget"
-msgstr "Нет бюджета"
 
 #. module: project_account_budget
 #: model:ir.model,name:project_account_budget.model_project_project
@@ -162,9 +147,19 @@ msgid "Project"
 msgstr "Проект"
 
 #. module: project_account_budget
+#: model:ir.module.module,shortdesc:base.module_project_account_budget
+msgid "Project Budget"
+msgstr ""
+
+#. module: project_account_budget
 #: model:ir.model,name:project_account_budget.model_project_update
 msgid "Project Update"
 msgstr "Обновление проекта"
+
+#. module: project_account_budget
+#: model:ir.module.module,summary:base.module_project_account_budget
+msgid "Project account budget"
+msgstr ""
 
 #. module: project_account_budget
 #: model_terms:ir.ui.view,arch_db:project_account_budget.project_update_default_description
@@ -177,8 +172,6 @@ msgid "Spent"
 msgstr "Потрачено"
 
 #. module: project_account_budget
-#. odoo-javascript
-#: code:addons/project_account_budget/static/src/components/project_right_side_panel/project_right_side_panel.xml:0
 #: model_terms:ir.ui.view,arch_db:project_account_budget.project_update_default_description
 msgid "Total"
 msgstr "Всего"
@@ -188,30 +181,7 @@ msgstr "Всего"
 msgid "budget has been spent."
 msgstr "бюджет был израсходован."
 
-#~ msgid "Analytic Account"
-#~ msgstr "Аналитический Счёт"
-
-#~ msgid ""
-#~ "Budget {{ budget_progress >= 0.25 ? 'on track' : budget_progress >= 0 ? "
-#~ "'soon overspent' : 'overspent' }}"
-#~ msgstr ""
-#~ "Бюджет {{ budget_progress >= 0.25 ? 'в процессе' : budget_progress >= 0 ? "
-#~ "'скоро перерасход' : 'перерасход' }}"
-
-#~ msgid "Budgetary Positions"
-#~ msgstr "Бюджетные позиции"
-
-#~ msgid "Entries..."
-#~ msgstr "Записи..."
-
-#~ msgid "No Budgetary Position"
-#~ msgstr "Нет Бюджетная позиция"
-
-#~ msgid "Total Planned Amount"
-#~ msgstr "Общая запланированная сумма"
-
-#~ msgid "Total Practical Amount"
-#~ msgstr "Общая практическая сумма"
-
-#~ msgid "Total planned amount"
-#~ msgstr "Общая запланированная сумма"
+#. module: project_account_budget
+#: model_terms:ir.ui.view,arch_db:project_account_budget.project_update_default_description
+msgid "projected profit has been realized."
+msgstr "прогнозируемая прибыль была получена."

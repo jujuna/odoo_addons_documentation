@@ -6,8 +6,8 @@ from odoo import models
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
 
-    def _create_revision_bom(self, will_update_version=True):
-        revision_bom = super()._create_revision_bom(will_update_version)
+    def _create_revision_bom(self):
+        revision_bom = super()._create_revision_bom()
         # Copies the operations' steps.
         if revision_bom and self.workorder_ids.check_ids:
             for operation in revision_bom.operation_ids:

@@ -5,7 +5,11 @@ from odoo import api, models, fields
 class L10n_Mx_EdiDocument(models.Model):
     _inherit = 'l10n_mx_edi.document'
 
-    picking_id = fields.Many2one(comodel_name='stock.picking', bypass_search_access=True)
+    picking_id = fields.Many2one(
+        comodel_name='stock.picking',
+        bypass_search_access=True,
+        check_company=True,
+    )
     state = fields.Selection(
         selection_add=[
             ('picking_sent', "Sent"),
@@ -20,6 +24,10 @@ class L10n_Mx_EdiDocument(models.Model):
             'picking_cancel_failed': 'cascade',
         },
     )
+
+    def _get_source_records(self):
+        # EXTENDS 'l10n_mx_edi'
+        return super()._get_source_records() or self.picking_id
 
     def _get_cancel_button_map(self):
         # EXTENDS 'l10n_mx_edi'
@@ -115,24 +123,14 @@ class L10n_Mx_EdiDocument(models.Model):
         return results
 
     @api.model
-    def _decode_cfdi_attachment(self, cfdi_data):
-        # EXTENDS 'l10n_mx_edi'
-        def get_node(node, xpath):
-            nodes = node.xpath(xpath)
-            return nodes[0] if nodes else None
-
-        cfdi_infos = super()._decode_cfdi_attachment(cfdi_data)
-        if not cfdi_infos:
-            return cfdi_infos
-
-        cfdi_node = cfdi_infos['cfdi_node']
-
-        carta_porte_node = get_node(cfdi_node, "//*[local-name()='CartaPorte']")
+    def _get_cfdi_values(self, cfdi_node):
+        cfdi_values = super()._get_cfdi_values(cfdi_node)
+        carta_porte_node = self._get_cfdi_node(cfdi_node, "//*[local-name()='CartaPorte']")
         if carta_porte_node is None:
-            return cfdi_infos
+            return cfdi_values
 
-        cfdi_infos.update({
+        cfdi_values.update({
             'carta_porte_node': carta_porte_node,
             'carta_porte_idccp': carta_porte_node.get('IdCCP', ''),
         })
-        return cfdi_infos
+        return cfdi_values

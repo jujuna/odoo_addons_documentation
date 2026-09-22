@@ -1,8 +1,9 @@
 import { ganttView } from "@web_gantt/gantt_view";
 import { registry } from "@web/core/registry";
 
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
+import { localeCompare } from "@web/core/l10n/utils";
 import { InteractiveEditorSidebar } from "@web_studio/client_action/view_editor/interactive_editor/interactive_editor_sidebar";
 import { Property } from "@web_studio/client_action/view_editor/property/property";
 import { SidebarViewToolbox } from "@web_studio/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox";
@@ -10,26 +11,30 @@ import { useEditNodeAttributes } from "@web_studio/client_action/view_editor/vie
 
 export class GanttEditorSidebar extends Component {
     static template = "web_studio.ViewEditor.GanttEditorSidebar";
-    static props = {
-        openViewInForm: { type: Function, optional: true },
-        openDefaultValues: { type: Function, optional: true },
-    };
     static components = {
         InteractiveEditorSidebar,
         Property,
         SidebarViewToolbox,
     };
 
+    props = useProps({
+        openViewInForm: t.function().optional(),
+        openDefaultValues: t.function().optional(),
+    });
+
     setup() {
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
         this.editArchAttributes = useEditNodeAttributes({ isRoot: true });
     }
 
     get colorChoices() {
-        return this.modelParams.decorationFields.map((value) => ({
-            label: this.modelParams.fields[value].string,
-            value,
-        }));
+        const intFields = Object.entries(this.viewEditorModel.fields)
+            .filter(([name, f]) => f.type === "integer")
+            .map(([name, f]) => ({
+                label: f.string || name,
+                value: name,
+            }));
+        return intFields.toSorted((a, b) => localeCompare(a.label, b.label));
     }
 
     get currentDayPrecision() {
@@ -97,12 +102,22 @@ export class GanttEditorSidebar extends Component {
             }));
     }
 
+    get fieldsFloatChoices() {
+        return Object.values(this.modelParams.fields)
+            .filter((f) => f.store && f.type === "float")
+            .map((f) => ({
+                label: f.string,
+                value: f.name,
+            }));
+    }
+
     get modelParams() {
         return this.viewEditorModel.controllerProps.modelParams.metaData;
     }
 
     get weekAndMonthPrecisionChoices() {
         return [
+            { label: _t("Quarter Day"), value: "day:quarter" },
             { label: _t("Half Day"), value: "day:half" },
             { label: _t("Day"), value: "day:full" },
         ];

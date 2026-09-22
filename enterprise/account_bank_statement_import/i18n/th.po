@@ -8,27 +8,40 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:22+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 03:08+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
 "account_bank_statement_import/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "%d transactions had a zero amount and were ignored."
+msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "%d transactions had already been imported and were ignored."
 msgstr "%d ธุรกรรมถูกนำเข้าแล้วและถูกละเว้น"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "1 transaction had a zero amount and was ignored."
+msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -42,15 +55,28 @@ msgid "A bank account transactions can be imported only once!"
 msgstr "ธุรกรรมในบัญชีธนาคารสามารถนำเข้าได้เพียงครั้งเดียวเท่านั้น!"
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,shortdesc:base.module_account_bank_statement_import
+msgid "Account Bank Statement Import"
+msgstr ""
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "All or part of the following file(s) could not be imported:\n"
+msgstr "ไฟล์ต่อไปนี้ทั้งหมดหรือบางส่วนไม่สามารถนำเข้าได้:\n"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"All transactions in this file either have a zero amount or have already been "
+"imported. There is nothing to import."
 msgstr ""
 
 #. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "รายการใบแจ้งยอดธนาคาร"
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_setup_bank_manual_config
@@ -97,6 +123,16 @@ msgid "Display Name"
 msgstr "แสดงชื่อ"
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,description:base.module_account_bank_statement_import
+msgid ""
+"Generic Wizard to Import Bank Statements.\n"
+"\n"
+"(This module does not include any type of import format.)\n"
+"\n"
+"OFX and QIF imports are available in Enterprise version."
+msgstr ""
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "Go to Apps"
@@ -120,14 +156,8 @@ msgid "Import ID"
 msgstr "นำเข้าไอดี"
 
 #. module: account_bank_statement_import
-#. odoo-python
-#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
-msgid "Import Template for Bank Statement Lines"
-msgstr ""
-
-#. module: account_bank_statement_import
 #. odoo-javascript
-#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import_model.js:0
+#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import/account_bank_statement_import_model.js:0
 msgid "Import Template for Bank Statements"
 msgstr "เทมเพลตการนำเข้าสำหรับรายการเดินบัญชีธนาคาร"
 
@@ -165,6 +195,12 @@ msgstr "ไม่พบธุรกรรมที่ตรงกับตัว
 #: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
 msgid "Nothing to do here!"
 msgstr "ไม่มีอะไรให้ทำที่นี่!"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
+msgid "Template for Bank Statement Lines"
+msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -209,6 +245,14 @@ msgstr ""
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"This file only contains transactions with a zero amount. There is nothing to "
+"import."
+msgstr ""
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "View successfully imported statements"
 msgstr "ดูรายการเดินบัญชีที่นำเข้าสำเร็จ"
 
@@ -229,3 +273,6 @@ msgstr "คุณต้องตั้งค่าบัญชีเริ่ม
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "You uploaded an invalid or empty file."
 msgstr "คุณอัปโหลดไฟล์ที่ไม่ถูกต้องหรือว่างเปล่า"
+
+#~ msgid "Bank Statement Line"
+#~ msgstr "รายการใบแจ้งยอดธนาคาร"

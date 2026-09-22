@@ -8,10 +8,13 @@ from . import test_account_reports_filters
 from . import test_account_reports_journal_filter
 from . import test_account_reports_tours
 from . import test_account_returns
-from . import test_account_sales_report_generic
+from . import test_account_returns_tours
+from . import test_account_sales_report
+from . import test_cumulative_translation_adjustments
 from . import test_general_ledger_report
 from . import test_trial_balance_report
 from . import test_partner_ledger_report
+from . import test_partner_ledger_snapshots
 from . import test_reconciliation_report
 from . import test_aged_receivable_report
 from . import test_aged_payable_report
@@ -21,10 +24,10 @@ from . import test_cash_flow_report
 from . import test_financial_report
 from . import test_multicurrencies_revaluation_report
 from . import test_tour_account_reports
-from . import test_tour_analytic_filters
 from . import test_tax_report_carryover
 from . import test_balance_sheet_report
 from . import test_balance_sheet_balanced
+from . import test_interco_comparison_report
 from . import test_journal_report
 from . import test_report_engines
 from . import test_all_reports_generation
@@ -35,3 +38,4 @@ from . import test_budget
 from . import test_currency_table
 from . import test_followup_report
 from . import test_kpi_provider
+from . import test_snapshots

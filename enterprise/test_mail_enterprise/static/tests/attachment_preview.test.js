@@ -13,9 +13,9 @@ import {
     startServer,
     waitStoreFetch,
 } from "@mail/../tests/mail_test_helpers";
-import { describe, test } from "@odoo/hoot";
+import { describe, expect, test } from "@odoo/hoot";
 import { defineTestMailModels } from "@test_mail/../tests/test_mail_test_helpers";
-import { asyncStep, onRpc, waitForSteps } from "@web/../tests/web_test_helpers";
+import { onRpc } from "@web/../tests/web_test_helpers";
 import { browser } from "@web/core/browser/browser";
 
 describe.current.tags("desktop");
@@ -43,6 +43,7 @@ test("Should not have attachment preview for still uploading attachment", async 
     });
     await start();
     await openFormView("mail.test.simple.main.attachment", recordId);
+    await contains("button[aria-label='Attach files']:enabled");
     const files = [new File([new Uint8Array(1)], "invoice.pdf", { type: "application/pdf" })];
     await dragenterFiles(".o-mail-Chatter", files);
     await dropFiles(".o-Dropzone", files);
@@ -50,7 +51,7 @@ test("Should not have attachment preview for still uploading attachment", async 
     await click(
         ".o-mail-AttachmentContainer:not(.o-isUploading):contains(invoice.pdf) .o-mail-Attachment-unlink"
     );
-    await click(".modal button", { text: "Ok" });
+    await click(".modal button", { text: "Delete Attachment" });
     await contains("iframe[data-src*='/web/static/lib/pdfjs/web/viewer.html']", { count: 0 });
     shouldBlockAttachmentUpload = true;
     await dragenterFiles(".o-mail-Chatter", files);
@@ -86,7 +87,7 @@ test("Attachment on side", async () => {
     });
     patchUiSize({ size: SIZES.XXL });
     onRpc("ir.attachment", "register_as_main_attachment", () =>
-        asyncStep("register_as_main_attachment")
+        expect.step("register_as_main_attachment")
     );
     listenStoreFetch("mail.thread");
     await start();
@@ -107,10 +108,10 @@ test("Attachment on side", async () => {
     await click(".o_move_next");
     await contains(".o-mail-Attachment-imgContainer > img", { count: 0 });
     await contains(".o-mail-Attachment > iframe");
-    await waitForSteps(["register_as_main_attachment"]);
+    await expect.waitForSteps(["register_as_main_attachment"]);
     await click(".o_move_previous");
     await contains(".o-mail-Attachment-imgContainer > img");
-    await waitForSteps(["register_as_main_attachment"]);
+    await expect.waitForSteps(["register_as_main_attachment"]);
 });
 
 test("After switching record with the form pager, when using the attachment preview navigation, the attachment should be switched", async () => {

@@ -1,24 +1,25 @@
-import { browser } from "@web/core/browser/browser";
+import { location, browser } from "@web/core/browser/browser";
 import { Dialog } from "@web/core/dialog/dialog";
-import { useChildRef, useService } from "@web/core/utils/hooks";
+import { useService } from "@web/core/utils/hooks";
 
-import { Component, useExternalListener } from "@odoo/owl";
+import { Component, signal, t, useListener, useProps } from "@odoo/owl";
 
 export class PromoteStudioDialog extends Component {
     static template = "web_enterprise.PromoteStudioDialog";
     static components = { Dialog };
-    static props = {
-        title: String,
-        close: Function,
-    };
+
+    props = useProps({
+        title: t.string(),
+        close: t.function(),
+    });
 
     setup() {
         this.ormService = useService("orm");
         this.uiService = useService("ui");
 
-        this.modalRef = useChildRef();
+        this.modalRef = signal.ref();
 
-        useExternalListener(window, "mousedown", this.onWindowMouseDown);
+        useListener(window, "mousedown", this.onWindowMouseDown.bind(this));
     }
 
     async onClickInstallStudio() {
@@ -36,14 +37,17 @@ export class PromoteStudioDialog extends Component {
         // make sure to keep the page blocked until the reload ends.
         this.uiService.unblock();
         browser.localStorage.setItem("openStudioOnReload", "main");
-        browser.location.reload();
+        location.reload();
     }
 
     /**
      * Close the dialog on outside click.
      */
     onWindowMouseDown(ev) {
-        const dialogContent = this.modalRef.el.querySelector(".modal-content");
+        if (!this.modalRef()) {
+            return;
+        }
+        const dialogContent = this.modalRef().querySelector(".modal-content");
         if (!this.disableClick && !dialogContent.contains(ev.target)) {
             this.props.close();
         }

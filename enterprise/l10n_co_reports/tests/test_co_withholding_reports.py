@@ -6,6 +6,8 @@ from odoo.tests import tagged
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestL10nCoReportsWithholding(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('co')
     def setUpClass(cls):
@@ -92,9 +94,7 @@ class TestL10nCoReportsWithholding(TestAccountReportsCommon):
             ],
             options,
         )
-        expanded_line = self.report_ica.get_expanded_lines(
-            options, lines[0]['id'], self.partner_a, lines[0]['expand_function'], 0, 0, None,
-        )
+        expanded_line = self.report_ica.get_expanded_lines(options, lines[0].id, self.partner_a, lines[0].expand_function, None, None)
         self.assertLinesValues(
             # pylint: disable=bad-whitespace
             expanded_line,
@@ -130,9 +130,7 @@ class TestL10nCoReportsWithholding(TestAccountReportsCommon):
             ],
             options,
         )
-        expanded_line = self.report_iva.get_expanded_lines(
-            options, lines[0]['id'], self.partner_a, lines[0]['expand_function'], 0, 0, None,
-        )
+        expanded_line = self.report_iva.get_expanded_lines(options, lines[0].id, self.partner_a, lines[0].expand_function, None, None)
         self.assertLinesValues(
             # pylint: disable=bad-whitespace
             expanded_line,
@@ -168,9 +166,7 @@ class TestL10nCoReportsWithholding(TestAccountReportsCommon):
             ],
             options,
         )
-        expanded_line = self.report_fuente.get_expanded_lines(
-            options, lines[0]['id'], self.partner_a, lines[0]['expand_function'], 0, 0, None,
-        )
+        expanded_line = self.report_fuente.get_expanded_lines(options, lines[0].id, self.partner_a, lines[0].expand_function, None, None)
         self.assertLinesValues(
             # pylint: disable=bad-whitespace
             expanded_line,

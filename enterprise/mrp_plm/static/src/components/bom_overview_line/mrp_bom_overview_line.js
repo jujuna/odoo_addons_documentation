@@ -1,12 +1,22 @@
 import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { BomOverviewLine } from "@mrp/components/bom_overview_line/mrp_bom_overview_line";
+import { t, useProps } from "@odoo/owl";
 
 patch(BomOverviewLine.prototype, {
+    setup() {
+        super.setup();
+        this.plmProps = useProps({
+            showOptions: t.object({
+                ecos: t.boolean(),
+            }),
+        });
+    },
+
     //---- Handlers ----
 
     get showEcos() {
-        return this.props.showOptions.mode == 'overview' && this.props.showOptions.ecos;
+        return this.props.showOptions.mode == 'overview' && this.plmProps.showOptions.ecos;
     },
 
     async goToEco() {
@@ -19,14 +29,4 @@ patch(BomOverviewLine.prototype, {
             target: "current",
         });
     }
-});
-
-patch(BomOverviewLine, {
-    props: {
-        ...BomOverviewLine.props,
-        showOptions: { 
-            ...BomOverviewLine.showOptions,
-            ecos: Boolean,
-        },
-    },
 });

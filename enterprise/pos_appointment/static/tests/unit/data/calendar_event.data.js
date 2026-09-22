@@ -16,6 +16,7 @@ export class CalendarEvent extends models.ServerModel {
             "appointment_status",
             "appointment_resource_ids",
             "total_capacity_reserved",
+            "waiting_list_capacity",
         ];
     }
 }

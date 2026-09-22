@@ -5,8 +5,8 @@
         <field name="model">res.company</field>
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='vat']" position="after">
-                    <field name="interchange_agreement_id" placeholder="XGTEST" invisible="country_code != 'DE'"/>
+            <xpath expr="//div[@name='identifiers']" position="after">
+                <field name="interchange_agreement_id" placeholder="XGTEST" invisible="country_code != 'DE'"/>
             </xpath>
         </field>
     </record>

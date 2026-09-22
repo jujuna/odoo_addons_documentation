@@ -40,14 +40,14 @@ registry.category("web_tour.tours").add("test_worksheet_quality_check", {
         },
         {
             content: "Open the worksheet Quality Check",
-            trigger: ".o_mrp_record_line button.o_btn_icon:has(.fa-file-text)",
+            trigger: ".o_mrp_record_line button.o_btn_icon:has([data-icon='article'])",
             run: "click",
         },
         {
             trigger: ".modal-header .modal-title:contains(Lovely Worksheet)",
         },
         {
-            trigger: "div[name=x_passed] input[type=checkbox]",
+            trigger: "div.o_property_field_value input[type=checkbox]",
             run: "click",
         },
         {

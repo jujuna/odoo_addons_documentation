@@ -9,11 +9,11 @@ class ResPartnerBank(models.Model):
 
     @api.model
     def _get_display_name_fields(self):
-        return ["acc_number", "acc_holder_name"]
+        return ["account_number", "holder_name"]
 
     @api.model
     def _get_audit_logging_fields(self):
-        return ["acc_number", "aba_bsb", "partner_id", "bank_id"]
+        return ["account_number", "clearing_label_id", "clearing_number", "partner_id", "bank_bic"]
 
     def _records_to_log(self):
         return self.filtered(lambda r: r.partner_id and "AU" in r.partner_id.sudo().employee_ids.mapped("company_country_code"))

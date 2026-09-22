@@ -5,6 +5,7 @@ export function hasOrderCard({
     cancelledQty,
     note,
     comboLine,
+    pending,
 }) {
     let trigger = `.o_pdis_order_card`;
     if (orderNumber) {
@@ -25,12 +26,15 @@ export function hasOrderCard({
     if (note) {
         trigger += `:has(.o_tag_badge_text:contains("${note}"))`;
     }
+    if (pending) {
+        trigger += `:has(.text-bg-warning:contains("Pending"))`;
+    }
     if (Array.isArray(comboLine)) {
         comboLine.forEach((line) => {
-            trigger += `:has(.o_preparation_display_orderline.ms-4.fst-italic .o_pdis_product-name:contains("${line}"))`;
+            trigger += `:has(.o_preparation_display_orderline.ms-4 .o_pdis_product-name:contains("${line}"))`;
         });
     } else if (comboLine) {
-        trigger += `:has(.o_preparation_display_orderline.ms-4.fst-italic .o_pdis_product-name:contains("${comboLine}"))`;
+        trigger += `:has(.o_preparation_display_orderline.ms-4 .o_pdis_product-name:contains("${comboLine}"))`;
     }
     const args = JSON.stringify(arguments[0]);
     return [
@@ -79,7 +83,7 @@ export function isStrickedOrderline(orderNumber, productName) {
     return [
         {
             content: `Check if orderline stricked with order number: ${orderNumber} and product name ${productName}`,
-            trigger: `.o_pdis_order_card:has(.o_pdis_tracking_number:contains("${orderNumber}")) .o_preparation_display_orderline:has(.o_pdis_product-name:contains("${productName}").text-decoration-line-through)`,
+            trigger: `.o_pdis_order_card:has(.o_pdis_tracking_number:contains("${orderNumber}")) .o_preparation_display_orderline:contains("${productName}").text-decoration-line-through`,
         },
     ];
 }
@@ -98,7 +102,7 @@ export function clearFilterButton() {
     return [
         {
             content: "Click on the Clear Filter button",
-            trigger: `.btn.btn-info:contains("Clear All Filter")`,
+            trigger: `.o_pdis_sidebar .btn.btn-lg:contains("Clear All Filter")`,
             run: "click",
         },
     ];
@@ -108,7 +112,7 @@ export function clickFilterButton() {
     return [
         {
             content: "Click on the Filter button",
-            trigger: `.btn.position-relative.h-100.px-4.rounded-0.border-end.shadow-none`,
+            trigger: `.btn.border.p-2.fs-5.rounded`,
             run: "click",
         },
     ];
@@ -117,13 +121,7 @@ export function clickFilterButton() {
 export function checkOrderCardCount(n) {
     return {
         content: `Check that there is ${n} order cards displayed`,
-        trigger: ".o_pdis_orders",
-        run: function () {
-            const count = document.querySelectorAll(".o_pdis_orders .o_pdis_order_card").length;
-            if (count !== n) {
-                throw new Error(`Expected ${n} order cards, but found ${count}.`);
-            }
-        },
+        trigger: `.o_pdis_orders:has(.o_pdis_order_card:count(${n}))`,
     };
 }
 

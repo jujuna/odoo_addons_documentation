@@ -1,7 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from odoo.tests import tagged
+
 from odoo.addons.web_studio.tests.test_view_editor import TestStudioController
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestStudioAiFields(TestStudioController):
     def test_edit_ai_field(self):
         model = self.env['ir.model'].search([('model', '=', 'res.partner')])
@@ -23,7 +26,8 @@ class TestStudioAiFields(TestStudioController):
 
         self.studio_controller.edit_field(model.model, field.name, {'ai': False})
         self.assertFalse(field.ai)
-        self.assertFalse(field.system_prompt)
+        self.assertEqual(field.system_prompt, "<p>Hello</p>")
+        self.assertFalse(self.env['ir.model.fields']._get_field_ai_parameters(model.model, field.name).get('prompt'), None)
 
     def test_create_new_field(self):
         model = self.env['ir.model'].search([('model', '=', 'res.partner')])

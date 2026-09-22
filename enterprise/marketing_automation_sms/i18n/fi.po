@@ -3,31 +3,29 @@
 # * marketing_automation_sms
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-09-16 17:08+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:50+0000\n"
+"PO-Revision-Date: 2026-09-17 23:48+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "marketing_automation_sms/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid "\" <strong>bounced</strong>,"
-msgstr "\" <strong>pomppasi</strong>,"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid "\" gets clicked,"
-msgstr "\" klikataan,"
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.js:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.js:0
+msgid "\"%(sms)s\" bounced"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_campaign__mailing_sms_count
@@ -35,47 +33,11 @@ msgid "# SMS Mailings"
 msgstr "# Tekstiviestipostit"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "<i class=\"fa fa-exclamation-circle\"/> Bounced after"
-msgstr "<i class=\"fa fa-exclamation-circle\"/> Kimposi jälkeen"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "<i class=\"fa fa-hand-pointer-o\"/> Clicked after"
-msgstr "<i class=\"fa fa-hand-pointer-o\"/> Napsautettu sen jälkeen, kun"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "<i class=\"fa fa-hand-pointer-o\"/> Not clicked within"
-msgstr "<i class=\"fa fa-hand-pointer-o\"/> Ei napsautettu aikana"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "<i class=\"fa fa-pie-chart\"/> Details"
-msgstr "<i class=\"fa fa-pie-chart\"/> Yksityiskohdat"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
+#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form_mailing
 msgid ""
-"<i data-trigger-type=\"sms_click\" class=\"fa fa-hand-pointer-o "
-"o_ma_text_processed o_add_child_activity text-success\" title=\"Clicked\" "
-"role=\"img\" aria-label=\"Clicked\"/>\n"
-"                    <i data-trigger-type=\"sms_not_click\" class=\"fa fa-"
-"hand-pointer-o o_ma_text_rejected o_add_child_activity text-danger\" "
-"title=\"Not Clicked\" role=\"img\" aria-label=\"Not Clicked\"/>\n"
-"                    <i data-trigger-type=\"sms_bounce\" class=\"fa fa fa-"
-"exclamation-circle o_ma_text_rejected o_add_child_activity text-danger\" "
-"title=\"Bounced\" role=\"img\" aria-label=\"Bounced\"/>"
+"<i class=\"oi oi-2x mb-auto p-2 bg-300 rounded\" data-icon=\"forum\" "
+"title=\"SMS icon\"/>"
 msgstr ""
-"<i data-trigger-type=\"sms_click\" class=\"fa fa-hand-pointer-o "
-"o_ma_text_processed o_add_child_activity text-success\" title=\"Klikattu\" "
-"role=\"img\" aria-label=\"Klikattu\"/>\n"
-"                    <i data-trigger-type=\"sms_not_click\" class=\"fa fa-"
-"hand-pointer-o o_ma_text_rejected o_add_child_activity text-danger\" "
-"title=\"Ei klikattu\" role=\"img\" aria-label=\"Ei klikattu\"/>\n"
-"                    <i data-trigger-type=\"sms_bounce\" class=\"fa fa fa-"
-"exclamation-circle o_ma_text_rejected o_add_child_activity text-danger\" "
-"title=\"Pompannut\" role=\"img\" aria-label=\"Pompannut\"/>"
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__activity_type
@@ -83,9 +45,30 @@ msgid "Activity Type"
 msgstr "Toimenpidetyyppi"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "Clicked"
-msgstr "Klikattu"
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Cancel"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.js:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.js:0
+msgid "Clicked in \"%(sms)s\""
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+msgid "Clicks"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.js:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.js:0
+msgid "Didn't click in \"%(sms)s\""
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_mailing_mailing__display_name
@@ -94,9 +77,15 @@ msgstr "Klikattu"
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_campaign__display_name
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_trace__display_name
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_sms_composer__display_name
-#: model:ir.model.fields,field_description:marketing_automation_sms.field_sms_tracker__display_name
 msgid "Display Name"
 msgstr "Näyttönimi"
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Email icon"
+msgstr ""
 
 #. module: marketing_automation_sms
 #. odoo-python
@@ -105,20 +94,25 @@ msgid "Exception in SMS Marketing: %s"
 msgstr "Poikkeus tekstiviestimarkkinoinnissa: %s"
 
 #. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Failed on"
+msgstr ""
+
+#. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_mailing_mailing__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_mailing_trace__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_campaign__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_trace__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_sms_composer__id
-#: model:ir.model.fields,field_description:marketing_automation_sms.field_sms_tracker__id
 msgid "ID"
 msgstr "ID"
 
 #. module: marketing_automation_sms
-#: model:ir.model,name:marketing_automation_sms.model_sms_tracker
-msgid "Link SMS to mailing/sms tracking models"
-msgstr "Linkitä tekstiviestit postitus-/tekstiviestiseurantamalleihin"
+#: model:ir.module.module,summary:base.module_marketing_automation_sms
+msgid "Integrate SMS Marketing in marketing campaigns"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_mailing_trace
@@ -139,7 +133,7 @@ msgstr "Markkinointitoiminta"
 #. module: marketing_automation_sms
 #: model:ir.actions.act_window,name:marketing_automation_sms.mail_mass_mailing_action_marketing_automation_sms
 msgid "Marketing Automation SMS"
-msgstr "Markkinoinnin automaatio SMS"
+msgstr "Markkinoinnin automaatio - tekstiviesti"
 
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_marketing_campaign
@@ -149,7 +143,7 @@ msgstr "Markkinointikampanja"
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_marketing_trace
 msgid "Marketing Trace"
-msgstr "Markkinoinnin jälki"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_mailing_mailing
@@ -157,54 +151,64 @@ msgid "Mass Mailing"
 msgstr "Massapostitus"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "Opened"
-msgstr "Avattu"
-
-#. module: marketing_automation_sms
 #. odoo-python
-#: code:addons/marketing_automation_sms/models/marketing_trace.py:0
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
 msgid "Parent activity SMS bounced"
 msgstr "Ylemmän tason aktiviteetin tekstiviesti kimposi"
 
 #. module: marketing_automation_sms
 #. odoo-python
-#: code:addons/marketing_automation_sms/models/marketing_trace.py:0
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
 msgid "Parent activity SMS clicked"
 msgstr "Ylemmän tason aktiviteetin tekstiviestiä napsautettu"
 
 #. module: marketing_automation_sms
+#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form
+#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form_mailing
+msgid "Pick or Create a Template..."
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Run"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__activity_type__sms
 #: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__mass_mailing_id_mailing_type__sms
 #: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__trigger_category__sms
+#: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__trigger_category_ui__sms
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_tree
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_participant_view_form
 msgid "SMS"
-msgstr "SMS"
+msgstr "Tekstiviesti"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "SMS Sent"
-msgstr "Lähetetty tekstiviesti"
+#: model:ir.module.module,shortdesc:base.module_marketing_automation_sms
+msgid "SMS Marketing in Marketing Automation"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form
+#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form_mailing
 msgid "SMS Template"
-msgstr "SMS Malli"
+msgstr "Tekstiviestipohja"
 
 #. module: marketing_automation_sms
 #. odoo-python
 #: code:addons/marketing_automation_sms/models/marketing_activity.py:0
 msgid "SMS cancelled"
-msgstr "SMS peruutettu"
+msgstr "Tekstiviesti peruttu"
 
 #. module: marketing_automation_sms
 #. odoo-python
 #: code:addons/marketing_automation_sms/models/mailing_trace.py:0
 #: code:addons/marketing_automation_sms/models/marketing_activity.py:0
 msgid "SMS failed"
-msgstr "SMS epäonnistui"
+msgstr "Tekstiviesti epäonnistui"
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__trigger_type__sms_bounce
@@ -214,12 +218,27 @@ msgstr "Tekstiviesti: kimposi"
 #. module: marketing_automation_sms
 #: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__trigger_type__sms_click
 msgid "SMS: clicked"
-msgstr "SMS: klikattu"
+msgstr "Tekstiviestit: klikattu"
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__trigger_type__sms_not_click
 msgid "SMS: not clicked"
-msgstr "SMS: ei klikattu"
+msgstr "Tekstiviestit: ei klikattu"
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Scheduled on"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#. odoo-python
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
+#: code:addons/marketing_automation_sms/static/src/components/add_step_button/add_step_button.xml:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+msgid "Send SMS"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_sms_composer
@@ -227,7 +246,14 @@ msgid "Send SMS Wizard"
 msgstr "Ohjattu tekstiviestin lähettäminen"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
+#. odoo-python
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
+msgid "Send SMS: %(mailing_subject)s"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
 msgid "Sent"
 msgstr "Lähetetty"
 
@@ -244,32 +270,101 @@ msgstr ""
 #. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__trigger_category
 msgid "Trigger Category"
-msgstr "Liipaisimen luokka"
+msgstr "Laukaisinkategoria"
+
+#. module: marketing_automation_sms
+#: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__trigger_category_ui
+msgid "Trigger Category Ui"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__trigger_type
 msgid "Trigger Type"
-msgstr "Liipaisin-tyyppi"
+msgstr "Laukaisintyyppi"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid "after the <strong>SMS text message</strong> sent by the Activity \""
-msgstr "toiminnan lähettämän <strong>tekstiviestin</strong> jälkeen \""
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid ""
-"after the Participant <strong>clicked</strong>,<br/>on any link included in "
-"the <strong>SMS text message</strong> sent by the Activity \""
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Triggered on"
 msgstr ""
-"sen jälkeen, kun osallistuja on <strong>klikannut</strong><br/>mitä tahansa "
-"linkkiä, joka sisältyy toiminnon lähettämään <strong>tekstiviestiin</strong>."
-"\""
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid ""
-"if no link included in the <strong>SMS text message</strong> sent by the "
-"Activity \""
+#. odoo-python
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
+msgid "sms_click"
 msgstr ""
-"jos toiminnan lähettämässä <strong>tekstiviestissä</strong> ei ole linkkiä \""
+
+#. module: marketing_automation_sms
+#. odoo-python
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
+msgid "sms_not_click"
+msgstr ""
+
+#~ msgid "\" <strong>bounced</strong>,"
+#~ msgstr "\" <strong>pomppasi</strong>,"
+
+#~ msgid "\" gets clicked,"
+#~ msgstr "\" klikataan,"
+
+#~ msgid "<i class=\"oi\" data-icon=\"error\"/> Bounced after"
+#~ msgstr "<i class=\"oi\" data-icon=\"error\"/> Kimposi jälkeen"
+
+#~ msgid "<i class=\"oi\" data-icon=\"pan_tool_alt\"/> Clicked after"
+#~ msgstr ""
+#~ "<i class=\"oi\" data-icon=\"pan_tool_alt\"/> Napsautettu sen jälkeen, kun"
+
+#~ msgid "<i class=\"oi\" data-icon=\"pan_tool_alt\"/> Not clicked within"
+#~ msgstr "<i class=\"oi\" data-icon=\"pan_tool_alt\"/> Ei napsautettu aikana"
+
+#~ msgid "<i class=\"oi\" data-icon=\"pie_chart\"/> Details"
+#~ msgstr "<i class=\"oi\" data-icon=\"pie_chart\"/> Yksityiskohdat"
+
+#~ msgid ""
+#~ "<i data-trigger-type=\"sms_click\" class=\"oi o_ma_text_processed "
+#~ "o_add_child_activity text-success\" data-icon=\"pan_tool_alt\" "
+#~ "title=\"Clicked\" role=\"img\" aria-label=\"Clicked\"/>\n"
+#~ "                    <i data-trigger-type=\"sms_not_click\" class=\"oi "
+#~ "o_ma_text_rejected o_add_child_activity text-danger\" data-"
+#~ "icon=\"pan_tool_alt\" title=\"Not Clicked\" role=\"img\" aria-label=\"Not "
+#~ "Clicked\"/>\n"
+#~ "                    <i data-trigger-type=\"sms_bounce\" class=\"oi "
+#~ "o_ma_text_rejected o_add_child_activity text-danger\" data-icon=\"error\" "
+#~ "title=\"Bounced\" role=\"img\" aria-label=\"Bounced\"/>"
+#~ msgstr ""
+#~ "<i data-trigger-type=\"sms_click\" class=\"oi o_ma_text_processed "
+#~ "o_add_child_activity text-success\" data-icon=\"pan_tool_alt\" "
+#~ "title=\"Klikattu\" role=\"img\" aria-label=\"Klikattu\"/>\n"
+#~ "                    <i data-trigger-type=\"sms_not_click\" class=\"oi "
+#~ "o_ma_text_rejected o_add_child_activity text-danger\" data-"
+#~ "icon=\"pan_tool_alt\" title=\"Ei klikattu\" role=\"img\" aria-label=\"Ei "
+#~ "klikattu\"/>\n"
+#~ "                    <i data-trigger-type=\"sms_bounce\" class=\"oi "
+#~ "o_ma_text_rejected o_add_child_activity text-danger\" data-icon=\"error\" "
+#~ "title=\"Pompannut\" role=\"img\" aria-label=\"Pompannut\"/>"
+
+#~ msgid "Clicked"
+#~ msgstr "Klikattu"
+
+#~ msgid "Opened"
+#~ msgstr "Avattu"
+
+#~ msgid "SMS Sent"
+#~ msgstr "Lähetetty tekstiviesti"
+
+#~ msgid "after the <strong>SMS text message</strong> sent by the Activity \""
+#~ msgstr "toiminnan lähettämän <strong>tekstiviestin</strong> jälkeen \""
+
+#~ msgid ""
+#~ "after the Participant <strong>clicked</strong>,<br/>on any link included "
+#~ "in the <strong>SMS text message</strong> sent by the Activity \""
+#~ msgstr ""
+#~ "sen jälkeen, kun osallistuja on <strong>klikannut</strong><br/>mitä "
+#~ "tahansa linkkiä, joka sisältyy toiminnon lähettämään "
+#~ "<strong>tekstiviestiin</strong>.\""
+
+#~ msgid ""
+#~ "if no link included in the <strong>SMS text message</strong> sent by the "
+#~ "Activity \""
+#~ msgstr ""
+#~ "jos toiminnan lähettämässä <strong>tekstiviestissä</strong> ei ole "
+#~ "linkkiä \""

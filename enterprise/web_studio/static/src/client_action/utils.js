@@ -1,4 +1,5 @@
-import { reactive, useComponent, useEnv, useSubEnv } from "@odoo/owl";
+import { useProps, proxy, types as t } from "@odoo/owl";
+import { useEnv, useSubEnv } from "@web/owl2/utils";
 
 export function getFieldsInArch(xmlDoc) {
     const res = [];
@@ -23,8 +24,8 @@ export function useDialogConfirmation({ confirm, cancel, before, close }) {
     confirm = confirm || (() => {});
     cancel = cancel || (() => {});
     if (!close) {
-        const component = useComponent();
-        close = () => component.props.close();
+        const compProps = useProps({ close: t.function() });
+        close = () => compProps.close();
     }
 
     let isProtected = false;
@@ -77,10 +78,8 @@ export class Reactive {
         // A function not bound to this returning the original not reactive object
         // This is usefull to be able to read stuff without subscribing the caller
         // eg: when reading internals just for checking
-        this.raw = () => {
-            return raw;
-        };
-        return reactive(this);
+        this.raw = () => raw;
+        return proxy(this);
     }
 }
 

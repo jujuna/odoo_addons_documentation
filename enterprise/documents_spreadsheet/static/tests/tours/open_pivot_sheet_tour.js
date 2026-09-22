@@ -1,15 +1,5 @@
 import { registry } from "@web/core/registry";
 
-function assert(current, expected, info) {
-    if (current !== expected) {
-        fail(info + ': "' + current + '" instead of "' + expected + '".');
-    }
-}
-
-function fail(errorMessage) {
-    console.error(errorMessage);
-}
-
 const SHEETNAME = "Res Partner Test Spreadsheet";
 registry.category("web_tour.tours").add("spreadsheet_open_pivot_sheet", {
     steps: () => [
@@ -48,24 +38,12 @@ registry.category("web_tour.tours").add("spreadsheet_open_pivot_sheet", {
             run: "click",
         },
         {
-            trigger: "button.o-edit-global-filters",
-            content: "Open Filters Side Panel",
-            run: "click",
+            content: "There should be one filter",
+            trigger: "body:has(div.pivot_filter_section:count(1))",
         },
         {
-            trigger: "div.pivot_filter_section",
-            content: "",
-            run: function (actions) {
-                const pivots = document.querySelectorAll("div.pivot_filter_section");
-                assert(pivots.length, 1, "There should be one filter");
-                const pivot = pivots[0];
-                assert(
-                    pivot.querySelector("span.o_side_panel_filter_label").textContent,
-                    "MyFilter1",
-                    "Invalid filter name"
-                );
-                actions.click(pivot.querySelector(".pivot_filter_section"));
-            },
+            trigger: "div.pivot_filter_section span.o_side_panel_filter_label:text(MyFilter1)",
+            run: "click",
         },
         {
             trigger: ".o-sp-breadcrumb",

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { queryAllTexts } from "@odoo/hoot-dom";
-import { animationFrame, Deferred } from "@odoo/hoot-mock";
+import { animationFrame } from "@odoo/hoot-mock";
 import { onMounted } from "@odoo/owl";
 import {
     contains,
@@ -110,8 +110,8 @@ test("templates without a main node are wrapped in a main node by the editor", a
     </kanban>
     `,
     });
-    expect("article.o_kanban_record > main").toHaveCount(1);
-    expect("article.o_kanban_record > main").toHaveAttribute("studioxpath", null, {
+    expect("article.o_kanban_record > .o_record_main").toHaveCount(1);
+    expect("article.o_kanban_record > .o_record_main").toHaveAttribute("studioxpath", null, {
         message: "no xpath is set on this element has it doesn't exist in the original template",
     });
     expect("article.o_kanban_record > .o_web_studio_hook[data-type=kanbanAsideHook]").toHaveCount(
@@ -194,7 +194,7 @@ test("hooks are placed inline around fields displayed in a span", async () => {
     </kanban>
     `,
     });
-    expect("article.o_kanban_record > main").toHaveCount(1);
+    expect("article.o_kanban_record > .o_record_main").toHaveCount(1);
     expect(".inline span.o_web_studio_hook[data-type=field]").toHaveCount(4, {
         message: "hooks are using a span instead of a div",
     });
@@ -486,9 +486,9 @@ test("buttons can be edited when being selected", async () => {
                     Coucou
                     <footer>
                         <a type="action" name="my_first_action" class="btn btn-link" role="button">
-                            <i class="fa fa-recycle"/> Do something
+                            <i class="oi" data-icon="recycling"/> Do something
                         </a>
-                        <button type="action" name="my_last_action" class="btn btn-primary" role="button">
+                        <button type="action" name="my_last_action" class="btn btn-primary">
                             Click me
                         </button>
                     </footer>
@@ -585,7 +585,7 @@ test("kanban editor, grouped on date field, no record", async () => {
 test("kanban editor, grouped on date field granular, no record, progressbar", async () => {
     Coucou._fields.date = fields.Date({ string: "Date" });
     serverState.debug = "1";
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     patchWithCleanup(CodeEditor.prototype, {
         setup() {
             super.setup();
@@ -625,7 +625,7 @@ test("kanban editor, grouped on date field granular, no record, progressbar", as
     expect(".o_kanban_group .o_kanban_counter").toHaveCount(2);
     expect(".o_kanban_record:not(.o_kanban_demo)").toHaveCount(1);
     await contains("button.o_web_studio_open_xml_editor").click();
-    await def;
+    await def.promise;
     expect(".o_web_studio_xml_editor").toHaveCount(1);
     expect(".o_view_controller.o_kanban_view").toHaveCount(1);
 });
@@ -804,7 +804,7 @@ test("sortby and orderby field in kanban sidebar", async () => {
     });
     await contains(".o_web_studio_view").click();
     await contains(".o_web_studio_property_sort_by .o_select_menu .o_select_menu_toggler").click();
-    await contains(".o-overlay-item:nth-child(1) .o-dropdown--menu .dropdown-item:eq(0)").click();
+    await contains(".o-overlay-item:nth-child(1) .o-dropdown--menu .dropdown-item:eq(5)").click();
     expect(".o_web_studio_property_sort_by .o_select_menu input").toHaveValue("Char field");
 
     await contains(
@@ -834,11 +834,87 @@ test("sortby numeric field in kanban sidebar", async () => {
 
     await contains(".o_web_studio_property_sort_by input").click();
     expect(queryAllTexts(".dropdown-item.o_select_menu_item")).toEqual([
-        "Created on",
+        "Int field",
         "Float field",
         "Id",
-        "Int field",
         "Last Modified on",
+        "Created on",
         "Monetary field",
     ]);
+});
+
+test("sum field property cannot be edited without a progressbar", async () => {
+    await mountViewEditor({
+        type: "kanban",
+        resModel: "task",
+        arch: `
+            <kanban>
+                <templates>
+                    <t t-name="card">
+                        <h3>Card</h3>
+                    </t>
+                </templates>
+            </kanban>
+        `,
+    });
+    await contains(".o_web_studio_view").click();
+
+    expect(".o_web_studio_property_sum_field").toHaveCount(0);
+});
+
+test("sum field can be edited from the kanban sidebar", async () => {
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        const operation = params.operations[0];
+
+        expect(operation.type).toBe("attributes");
+        expect(operation.position).toBe("attributes");
+        expect(operation.new_attrs.sum_field).toBe("monetary_field");
+        expect(operation.target).toEqual({
+            tag: "progressbar",
+            xpath_info: [
+                { tag: "kanban", indice: 1 },
+                { tag: "progressbar", indice: 1 },
+            ],
+        });
+
+        expect.step("edit_view");
+
+        const newArch = `
+            <kanban>
+                <progressbar field="display_name" sum_field="monetary_field" colors="{}"/>
+                <templates>
+                    <t t-name="card">
+                        <h3>Card</h3>
+                    </t>
+                </templates>
+            </kanban>
+        `;
+        return editView(params, "kanban", newArch);
+    });
+
+    await mountViewEditor({
+        type: "kanban",
+        resModel: "task",
+        arch: `
+            <kanban>
+                <progressbar field="display_name" colors="{}"/>
+                <templates>
+                    <t t-name="card">
+                        <h3>Card</h3>
+                    </t>
+                </templates>
+            </kanban>
+        `,
+    });
+
+    await contains(".o_web_studio_view").click();
+
+    expect(".o_web_studio_property_sum_field").toHaveCount(1);
+    expect(".o_web_studio_property_sum_field input").toHaveValue("");
+
+    await contains(".o_web_studio_property_sum_field input").click();
+    await contains(".dropdown-item:contains('Monetary field')").click();
+
+    expect.verifySteps(["edit_view"]);
 });

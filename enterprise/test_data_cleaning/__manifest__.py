@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -8,7 +7,7 @@
     'depends': [
         'data_cleaning',
     ],
-    'data': ['security/ir.model.access.csv'],
+    'data': ['security/ir.access.csv'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

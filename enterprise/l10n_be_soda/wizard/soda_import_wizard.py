@@ -4,7 +4,7 @@ from odoo import Command, _, api, fields, models
 
 class SodaImportWizard(models.TransientModel):
     _name = 'soda.import.wizard'
-    _description = 'Import a SODA file and map accounts'
+    _description = 'Import a SODA file and map accounts and analytics'
 
     # A dict mapping the SODA reference to a dict with a list of `entries` and an `attachment_id`
     # {
@@ -15,6 +15,7 @@ class SodaImportWizard(models.TransientModel):
     #                 'name': 'Line Description',
     #                 'debit': '150.0',
     #                 'credit': '0.0',
+    #                 'department': 'DEP',
     #             },
     #             ...
     #         ],
@@ -22,27 +23,54 @@ class SodaImportWizard(models.TransientModel):
     #     },
     #     ...
     # }
+
+    company_id = fields.Many2one(comodel_name='res.company', required=True)
+    journal_id = fields.Many2one(comodel_name='account.journal')
     soda_files = fields.Json()
     # A dict mapping the SODA account code to its description
     soda_code_to_name_mapping = fields.Json(required=False)
-    company_id = fields.Many2one('res.company', required=True)
-    journal_id = fields.Many2one('account.journal')
-    soda_account_mapping_ids = fields.Many2many('soda.account.mapping', compute='_compute_soda_account_mapping_ids', readonly=False)
+    soda_account_mapping_ids = fields.Many2many(comodel_name='soda.account.mapping', compute='_compute_soda_account_mapping_ids', readonly=False)
+
+    soda_departments = fields.Json(required=False)
+    soda_analytic_mapping_ids = fields.Many2many(comodel_name='soda.analytic.mapping', compute='_compute_soda_analytic_mapping_ids', readonly=False)
+    soda_show_analytic = fields.Boolean(compute='_compute_soda_show_analytic')
 
     @api.depends('soda_code_to_name_mapping', 'company_id')
     def _compute_soda_account_mapping_ids(self):
         for wizard in self:
-            soda_account_mappings = self.env['soda.account.mapping'].find_or_create_mapping_entries(
+            soda_account_mappings = self.env['soda.account.mapping'].find_or_create_account_mappings(
                 wizard.soda_code_to_name_mapping,
-                self.company_id
+                wizard.company_id
             )
-            wizard.soda_account_mapping_ids = [Command.set(soda_account_mappings.ids)]
+            wizard.soda_account_mapping_ids = soda_account_mappings.ids
+
+    @api.depends('company_id')
+    def _compute_soda_analytic_mapping_ids(self):
+        for wizard in self:
+            soda_analytic_mapping_ids = self.env['soda.analytic.mapping'].find_or_create_analytic_mappings(
+                wizard.soda_departments,
+                wizard.company_id,
+            )
+            wizard.soda_analytic_mapping_ids = soda_analytic_mapping_ids
+
+    @api.depends('company_id')
+    def _compute_soda_show_analytic(self):
+        for wizard in self:
+            company = wizard.company_id
+            wizard.soda_show_analytic = company.l10n_be_soda_use_analytic and company.l10n_be_soda_analytic_plan
 
     def _action_save_and_import(self, existing_move=None):
         # We find all mapping lines where there's no account set
         soda_account_mapping = {}
-        for mapping in self.soda_account_mapping_ids:
-            soda_account_mapping[mapping.code] = {'account_id': mapping.account_id.id, 'name': mapping.name}
+        for account_mapping in self.soda_account_mapping_ids:
+            soda_account_mapping[account_mapping.code] = {
+                'account_id': account_mapping.account_id.id,
+                'name': account_mapping.name,
+            }
+        soda_analytic_mapping = {}
+        # sudo: only the 'Analytic Accounting' group can access the analytic account, even if analytic accounting is entirely disabled
+        for analytic_mapping in self.soda_analytic_mapping_ids.sudo():
+            soda_analytic_mapping[analytic_mapping.department] = analytic_mapping.analytic_account_id.id
 
         if self.env.context.get('soda_mapping_save_only', False):
             return False
@@ -50,22 +78,23 @@ class SodaImportWizard(models.TransientModel):
         suspense_account = self.journal_id.company_id.account_journal_suspense_account_id
         non_mapped_soda_accounts = set()
         moves = self.env['account.move']
-        line_ids = []
         for ref, soda_file in self.soda_files.items():
+            line_ids = []
             # Every SODA file is linked to a move containing the entries according to the mapping
             for entry in soda_file['entries']:
                 account_id = soda_account_mapping[entry['code']]['account_id']
                 if not account_id:
                     account_id = suspense_account.id
                     non_mapped_soda_accounts.add((entry['code'], entry['name']))
-                line_ids.append(
-                    Command.create({
-                        'name': entry['name'] or soda_account_mapping[entry['code']]['name'],
-                        'account_id': account_id,
-                        'debit': entry['debit'],
-                        'credit': entry['credit'],
-                    })
-                )
+                vals = {
+                    'name': entry['name'] or soda_account_mapping[entry['code']]['name'],
+                    'account_id': account_id,
+                    'debit': entry['debit'],
+                    'credit': entry['credit'],
+                }
+                if (department := entry.get('department')) and (account_id := soda_analytic_mapping.get(department)):
+                    vals['analytic_distribution'] = {account_id: 100}
+                line_ids.append(Command.create(vals))
             if not existing_move:
                 move_vals = {
                     'move_type': 'entry',
@@ -81,6 +110,7 @@ class SodaImportWizard(models.TransientModel):
                 # importing from email alias where _action_save_and_import method is called once per soda file.
                 existing_move = None
 
+            # 'tracking_disable' seems wanted, see odoo/enterprise#61015
             move.with_context(tracking_disable=True).write({
                 'ref': ref,
                 'date': soda_file['date'],
@@ -94,7 +124,7 @@ class SodaImportWizard(models.TransientModel):
                         second=_("They have been imported in the Suspense Account (499000) for now."),
                         link=_(
                             "For future imports, you can map them correctly in %(left)sConfiguration > Settings > Accounting > SODA%(right)s",
-                            left=Markup("<a href='#action=l10n_be_soda.action_open_accounting_settings&model=res.config.settings'>"),
+                            left=Markup("<a href='#action=account.action_account_config&model=res.config.settings'>"),
                             right=Markup("</a>"),
                         ),
                     )
@@ -118,7 +148,7 @@ class SodaImportWizard(models.TransientModel):
             return False
         if len(moves) == 1:
             action_vals.update({
-                'domain': [('id', '=', moves[0].ids)],
+                'domain': [('id', 'in', moves[0].ids)],
                 'views': [[False, "form"]],
                 'view_mode': 'form',
                 'res_id': moves[0].id,

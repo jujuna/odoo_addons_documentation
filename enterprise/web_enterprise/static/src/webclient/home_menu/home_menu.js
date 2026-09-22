@@ -1,27 +1,33 @@
-import { hasTouch, isIosApp, isMacOS } from "@web/core/browser/feature_detection";
-import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
-import { user } from "@web/core/user";
-import { useService } from "@web/core/utils/hooks";
-import { ExpirationPanel } from "./expiration_panel";
-import { useSortable } from "@web/core/utils/sortable_owl";
-import { SysAdminPanel } from "./sysadmin_panel";
-
 import {
     Component,
-    useExternalListener,
     onMounted,
     onPatched,
-    onWillUpdateProps,
-    useState,
-    useRef,
+    usePlugin,
+    proxy,
+    t,
+    useEffect,
+    signal,
+    useListener,
+    useProps,
 } from "@odoo/owl";
+import { hasTouch, isIosApp, isMacOS } from "@web/core/browser/feature_detection";
+import { useDropzone } from "@web/core/dropzone/dropzone_hook";
+import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
+import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
+import { useService } from "@web/core/utils/hooks";
+import { useSortable } from "@web/core/utils/sortable_owl";
+import { ExpirationPanel } from "./expiration_panel";
+import { SysAdminPanel } from "./sysadmin_panel";
+import { OfflinePlugin } from "@web/core/offline/offline_plugin";
 
 class FooterComponent extends Component {
     static template = "web_enterprise.HomeMenu.CommandPalette.Footer";
-    static props = {
+
+    props = useProps({
         //prop added by the command palette
-        switchNamespace: { type: Function, optional: true },
-    };
+        switchNamespace: t.function().optional(),
+    });
 
     setup() {
         this.controlKey = isMacOS() ? "COMMAND" : "CONTROL";
@@ -37,41 +43,37 @@ class FooterComponent extends Component {
 export class HomeMenu extends Component {
     static template = "web_enterprise.HomeMenu";
     static components = { ExpirationPanel, SysAdminPanel };
-    static props = {
-        apps: {
-            type: Array,
-            element: {
-                type: Object,
-                shape: {
-                    actionID: Number,
-                    href: String,
-                    appID: Number,
-                    id: Number,
-                    label: String,
-                    parents: String,
-                    webIcon: {
-                        type: [
-                            Boolean,
-                            String,
-                            {
-                                type: Object,
-                                optional: 1,
-                                shape: {
-                                    iconClass: String,
-                                    color: String,
-                                    backgroundColor: String,
-                                },
-                            },
-                        ],
-                        optional: true,
-                    },
-                    webIconData: { type: String, optional: 1 },
-                    xmlid: String,
-                },
-            },
-        },
-        reorderApps: { type: Function },
-    };
+
+    props = useProps({
+        apps: t.array(
+            t.object({
+                actionID: t.number(),
+                href: t.string(),
+                appID: t.number(),
+                id: t.number(),
+                label: t.string(),
+                parents: t.string(),
+                webIcon: t
+                    .or([
+                        t.boolean(),
+                        t.string(),
+                        t.object({
+                            icon: t.string(),
+                            color: t.string(),
+                            backgroundColor: t.string(),
+                        }),
+                    ])
+                    .optional(),
+                webIconData: t.string().optional(),
+                xmlid: t.string(),
+            })
+        ),
+        // Optional: web_studio's StudioHomeMenu subclass disables app
+        // sorting (see _enableAppsSorting) and never passes this prop.
+        reorderApps: t.function().optional(),
+    });
+    inputRef = signal.ref();
+    rootRef = signal.ref();
 
     /**
      * @param {Object} props
@@ -94,15 +96,15 @@ export class HomeMenu extends Component {
         this.homeMenuService = useService("home_menu");
         this.subscription = useService("enterprise_subscription");
         this.ui = useService("ui");
-        this.state = useState({
+        this.shareTarget = useService("share_target");
+        this.offlinePlugin = usePlugin(OfflinePlugin);
+        this.state = proxy({
             focusedIndex: null,
             isIosApp: isIosApp(),
         });
-        this.inputRef = useRef("input");
-        this.rootRef = useRef("root");
         this.pressTimer;
 
-        if (!this.env.isSmall) {
+        if (!this.ui.isSmall) {
             this._registerHotkeys();
         }
 
@@ -119,19 +121,23 @@ export class HomeMenu extends Component {
             onDrop: (params) => this._sortAppDrop(params),
         });
 
-        onWillUpdateProps(() => {
+        useEffect(() => {
             // State is reset on each remount
+            this.props.apps;
             this.state.focusedIndex = null;
         });
 
         onMounted(() => {
-            if (!hasTouch()) {
+            if (hasTouch()) {
+                // 46px is the navbar height
+                this.rootRef().scrollTo(0, 46);
+            } else {
                 this._focusInput();
             }
         });
 
         onPatched(() => {
-            if (this.state.focusedIndex !== null && !this.env.isSmall) {
+            if (this.state.focusedIndex !== null && !this.ui.isSmall) {
                 const selectedItem = document.querySelector(".o_home_menu .o_menuitem.o_focused");
                 // When TAB is managed externally the class o_focused disappears.
                 if (selectedItem) {
@@ -140,6 +146,9 @@ export class HomeMenu extends Component {
                 }
             }
         });
+        if (this.shareTarget.hasShareTargetItems) {
+            useDropzone(this.rootRef, (ev) => this.shareTarget.display(ev.dataTransfer.files));
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -165,6 +174,14 @@ export class HomeMenu extends Component {
         } else {
             return 6;
         }
+    }
+
+    get searchMenuPlaceholder() {
+        return _t("Search for a menu...");
+    }
+
+    get hasTouch() {
+        return hasTouch();
     }
 
     //--------------------------------------------------------------------------
@@ -254,13 +271,21 @@ export class HomeMenu extends Component {
     }
 
     _focusInput() {
-        if (!this.env.isSmall && this.inputRef.el) {
-            this.inputRef.el.focus({ preventScroll: true });
+        if (!this.ui.isSmall && this.inputRef()) {
+            this.inputRef().focus({ preventScroll: true });
         }
     }
 
     _enableAppsSorting() {
         return true;
+    }
+
+    _isAvailable(app) {
+        return (
+            !this.offlinePlugin.isOffline() ||
+            !app.actionID ||
+            this.offlinePlugin.isAvailableOffline(app.actionID)
+        );
     }
 
     //--------------------------------------------------------------------------
@@ -334,12 +359,12 @@ export class HomeMenu extends Component {
                 allowRepeat: true,
             });
         });
-        useExternalListener(window, "keydown", this._onKeydownFocusInput);
+        useListener(window, "keydown", this._onKeydownFocusInput.bind(this));
     }
 
     _onKeydownFocusInput() {
         if (
-            document.activeElement !== this.inputRef.el &&
+            document.activeElement !== this.inputRef() &&
             this.ui.activeElement === document &&
             !["TEXTAREA", "INPUT"].includes(document.activeElement.tagName)
         ) {
@@ -347,16 +372,18 @@ export class HomeMenu extends Component {
         }
     }
 
+    _onInputClick() {
+        this.command.openMainPalette({ searchValue: "/", FooterComponent });
+    }
+
     _onInputSearch() {
         const onClose = () => {
             this._focusInput();
-            if (this.inputRef.el) {
-                this.inputRef.el.value = "";
-            }
         };
-        const searchValue = this.compositionStart ? "/" : `/${this.inputRef.el.value.trim()}`;
+        const searchValue = this.compositionStart ? "/" : `/${this.inputRef().value.trim()}`;
         this.compositionStart = false;
         this.command.openMainPalette({ searchValue, FooterComponent }, onClose);
+        this.inputRef().value = "";
     }
 
     _onInputBlur() {

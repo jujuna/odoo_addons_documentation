@@ -6,6 +6,7 @@ from odoo.tests.common import tagged, TransactionCase
 
 
 @tagged('headcount')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHeadcount(TransactionCase):
 
     @classmethod
@@ -27,12 +28,10 @@ class TestHeadcount(TransactionCase):
                 'name': '40h',
                 'company_id': cls.company_us.id,
                 'attendance_ids': [(0, 0, {
-                    'name': str(i),
                     'dayofweek': str(i),
                     'hour_from': 8,
                     'hour_to': 12,
                 }) for i in range(5)] + [(0, 0, {
-                    'name': str(i),
                     'dayofweek': str(i),
                     'hour_from': 13,
                     'hour_to': 17,
@@ -41,12 +40,10 @@ class TestHeadcount(TransactionCase):
                 'name': '35h',
                 'company_id': cls.company_us.id,
                 'attendance_ids': [(0, 0, {
-                    'name': str(i),
                     'dayofweek': str(i),
                     'hour_from': 8,
                     'hour_to': 12,
                 }) for i in range(5)] + [(0, 0, {
-                    'name': str(i),
                     'dayofweek': str(i),
                     'hour_from': 13,
                     'hour_to': 16,
@@ -55,17 +52,14 @@ class TestHeadcount(TransactionCase):
                 'name': '65h',
                 'company_id': cls.company_us.id,
                 'attendance_ids': [(0, 0, {
-                    'name': str(i),
                     'dayofweek': str(i),
                     'hour_from': 8,
                     'hour_to': 12,
                 }) for i in range(5)] + [(0, 0, {
-                    'name': str(i),
                     'dayofweek': str(i),
                     'hour_from': 13,
                     'hour_to': 17,
                 }) for i in range(5)] + [(0, 0, {
-                    'name': str(i),
                     'dayofweek': str(i),
                     'hour_from': 18,
                     'hour_to': 23,
@@ -74,12 +68,10 @@ class TestHeadcount(TransactionCase):
                 'name': '30h',
                 'company_id': cls.company_us.id,
                 'attendance_ids': [(0, 0, {
-                    'name': str(i),
                     'dayofweek': str(i),
                     'hour_from': 8,
                     'hour_to': 12,
                 }) for i in range(5)] + [(0, 0, {
-                    'name': str(i),
                     'dayofweek': str(i),
                     'hour_from': 13,
                     'hour_to': 15,
@@ -315,17 +307,8 @@ class TestHeadcount(TransactionCase):
         for employee_id, versions in versions_by_employee.items():
             # verify uniqueness of the lines.
             self.assertEqual(len(headcount_lines_by_employee[employee_id]), 1)
-            # verify the names order of the versions.
-            self.assertEqual(
-                headcount_lines_by_employee[employee_id].version_names,
-                ', '.join(version.name or version.employee_id.name for version in reversed(versions))
-            )
-            self.assertEqual(
-                headcount_lines_by_employee[employee_id].version_names.split(', ')[0],
-                headcount_lines_by_employee[employee_id].version_id.name or headcount_lines_by_employee[employee_id].version_id.employee_id.name
-            )
             # verify the working rates of the versions.
             self.assertEqual(
                 set(headcount_lines_by_employee[employee_id].working_rate_ids.mapped('rate')),
-                {round(version.hours_per_week, 2) for version in versions}
+                {round(version.resource_calendar_id.hours_per_week, 2) for version in versions}
             )

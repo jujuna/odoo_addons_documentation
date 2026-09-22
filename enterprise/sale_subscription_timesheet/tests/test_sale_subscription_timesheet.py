@@ -2,6 +2,8 @@
 
 from odoo import Command
 from odoo.tests import tagged, freeze_time
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSubscriptionCommon
 from odoo.addons.sale_timesheet.tests.common import TestCommonSaleTimesheet
@@ -9,6 +11,8 @@ from odoo.addons.sale_timesheet.tests.common import TestCommonSaleTimesheet
 
 @tagged('-at_install', 'post_install')
 class TestSubscriptionTask(TestSubscriptionCommon, TestCommonSaleTimesheet):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(self):
         super().setUpClass()
@@ -40,6 +44,13 @@ class TestSubscriptionTask(TestSubscriptionCommon, TestCommonSaleTimesheet):
                     }),
                 ],
         })
+        self.field_service_product = self.env['product.product'].create({
+            'name': 'Field Service',
+            'type': 'service',
+            'standard_price': 100,
+            'list_price': 110,
+            'invoice_policy': 'order',
+        })
 
     def test_sub_timesheet_create_recurring_tasks(self):
         # Similar test with recurring tasks: new tasks are created automatically
@@ -51,6 +62,27 @@ class TestSubscriptionTask(TestSubscriptionCommon, TestCommonSaleTimesheet):
             self.subscription_timesheet.action_confirm()
             task = self.subscription_timesheet.tasks_ids
             self.assertTrue(task, "A new task should be created")
+            # Task created by subscription are no longer automatically set as recurring tasks. So we manually set the
+            # task as a recurring one to ensure the timesheet computation and task generation are still working as expected.
+            start_date = datetime.combine(self.subscription_timesheet.next_invoice_date, datetime.min.time())
+            repeat_until = self.subscription_timesheet.end_date and datetime.combine(
+                self.subscription_timesheet.end_date, datetime.min.time())
+            repeat_until = repeat_until and repeat_until + relativedelta(
+                day=int(self.subscription_timesheet.plan_id.billing_period_unit == 'month' and start_date.day))
+            repeat_type = 'until' if repeat_until else 'forever'
+            repeat_interval = self.subscription_timesheet.plan_id.billing_period_value
+            repeat_unit = self.subscription_timesheet.plan_id.billing_period_unit
+            recurrence = self.env['project.task.recurrence'].create({
+                'task_ids': task.ids,
+                'repeat_interval': repeat_interval,
+                'repeat_type': repeat_type,
+                'repeat_unit': repeat_unit,
+                'repeat_until': repeat_until,
+            })
+            task.write({
+                'recurring_task': True,
+                'recurrence_id': recurrence.id,
+            })
             # after confirming the subscription, next invoice date is set to the next period
             self.assertEqual(self.subscription_timesheet.order_line.qty_delivered, 0, "No delivery before creating the first recurring invoice")
             # after creating timesheet line quantity delivered set to 4
@@ -282,3 +314,41 @@ class TestSubscriptionTask(TestSubscriptionCommon, TestCommonSaleTimesheet):
         # An invoice should be created
         self.assertTrue(subscription.invoice_ids)
         self.assertEqual(subscription.invoice_ids.invoice_line_ids[0].quantity, timesheet.unit_amount)
+
+    def test_invoice_subscription_with_undelivered_timesheet(self):
+        """
+        Ensure invoice generation does not crash when a subscription has a mixed
+        basket of invoiceable lines and undelivered timesheet lines.
+        """
+        subscription = self.env['sale.order'].create({
+            'name': 'Mixed Sub No Delivery',
+            'is_subscription': True,
+            'plan_id': self.plan_month.id,
+            'partner_id': self.user_portal.partner_id.id,
+            'order_line': [
+                # Regular product (Ready to invoice immediately)
+                Command.create({
+                    'product_id': self.field_service_product.id,
+                    'product_uom_qty': 1,
+                }),
+                # Timesheet product (Requires delivery, which we will NOT provide)
+                Command.create({
+                    'product_id': self.product_deliver_timesheet.id,
+                    'product_uom_qty': 10,
+                }),
+            ],
+        })
+        subscription.action_confirm()
+
+        timesheet_line = subscription.order_line.filtered(lambda l: l.product_id == self.product_deliver_timesheet)
+        self.assertEqual(timesheet_line.qty_delivered, 0, "Timesheet line should have 0 delivered qty.")
+
+        invoice = subscription._create_recurring_invoice()
+
+        self.assertTrue(invoice, "Invoice should be successfully created.")
+        self.assertEqual(len(invoice.invoice_line_ids), 1, "Invoice should only contain the regular product line.")
+        self.assertEqual(
+            invoice.invoice_line_ids.product_id,
+            self.field_service_product,
+            "The undelivered timesheet product should not be on this invoice."
+        )

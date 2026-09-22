@@ -1,9 +1,10 @@
 /* global StripeTerminal */
 
 import { _t } from "@web/core/l10n/translation";
+import { loadJS } from "@web/core/assets";
 import { PaymentInterface } from "@point_of_sale/app/utils/payment/payment_interface";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { register_payment_method } from "@point_of_sale/app/services/pos_store";
+import { registry } from "@web/core/registry";
 import { logPosMessage } from "@point_of_sale/app/utils/pretty_console_log";
 
 export class PaymentStripe extends PaymentInterface {
@@ -20,24 +21,22 @@ export class PaymentStripe extends PaymentInterface {
     async stripeFetchConnectionToken() {
         // Do not cache or hardcode the ConnectionToken.
         try {
-            const data = await this.pos.data.call(
-                "pos.payment.method",
-                "stripe_connection_token",
-                []
-            );
+            const data = await this.callPaymentMethod("stripe_connection_token", []);
             if (data.error) {
                 throw data.error;
             }
             return data.secret;
         } catch (error) {
             const { message } = error.data || error;
-            this._showError(message, "Fetch Token");
+            this._showError(message, _t("Fetch Token"));
             this.terminal = false;
         }
     }
 
     async discoverReaders() {
-        const discoverResult = await this.terminal.discoverReaders({});
+        const discoverResult = await this.terminal.discoverReaders({
+            simulated: this.payment_method_id.stripe_serial_number === "SIMULATOR",
+        });
         if (discoverResult.error) {
             this._showError(_t("Failed to discover: %s", discoverResult.error));
         } else if (discoverResult.discoveredReaders.length === 0) {
@@ -52,7 +51,7 @@ export class PaymentStripe extends PaymentInterface {
     async checkReader() {
         try {
             if (!this.terminal) {
-                const createStripeTerminal = this.createStripeTerminal();
+                const createStripeTerminal = await this.createStripeTerminal();
                 if (!createStripeTerminal) {
                     throw _t("Failed to load resource: net::ERR_INTERNET_DISCONNECTED.");
                 }
@@ -88,6 +87,8 @@ export class PaymentStripe extends PaymentInterface {
 
     async connectReader() {
         const line = this.pos.getOrder().getSelectedPaymentline();
+        this.pos.discoveredReaders = "[]";
+        await this.discoverReaders();
         const discoveredReaders = JSON.parse(this.pos.discoveredReaders);
         for (const selectedReader of discoveredReaders) {
             if (selectedReader.serial_number == this.payment_method_id.stripe_serial_number) {
@@ -134,6 +135,7 @@ export class PaymentStripe extends PaymentInterface {
 
         const intentCharge = charges.data[0];
         const processPaymentDetails = intentCharge.payment_method_details;
+        const cardPresentNetwork = processPaymentDetails?.card_present?.network;
 
         if (processPaymentDetails.type === "interac_present") {
             // Canadian interac payments should not be captured:
@@ -141,7 +143,7 @@ export class PaymentStripe extends PaymentInterface {
             return ["interac", intentCharge.id];
         }
         const cardPresentBrand = this.getCardBrandFromPaymentMethodDetails(processPaymentDetails);
-        if (cardPresentBrand.includes("eftpos")) {
+        if (cardPresentNetwork === "eftpos_au") {
             // Australian eftpos should not be captured:
             // https://stripe.com/docs/terminal/payments/regional?integration-country=AU
             return [cardPresentBrand, intentCharge.id];
@@ -161,7 +163,11 @@ export class PaymentStripe extends PaymentInterface {
             return false;
         }
         line.setPaymentStatus("waitingCard");
-        const collectPaymentMethod = await this.terminal.collectPaymentMethod(clientSecret);
+        const collectPaymentMethod = await this.terminal.collectPaymentMethod(clientSecret, {
+            config_override: {
+                enable_customer_cancellation: true,
+            },
+        });
         if (collectPaymentMethod.error) {
             this._showError(collectPaymentMethod.error.message, collectPaymentMethod.error.code);
             line.setPaymentStatus("retry");
@@ -178,6 +184,8 @@ export class PaymentStripe extends PaymentInterface {
                 return false;
             } else if (processPayment.paymentIntent) {
                 line.setPaymentStatus("waitingCapture");
+                line.uiState.stripeCardPresentNetwork =
+                    processPayment.paymentIntent.charges?.data[0]?.payment_method_details?.card_present?.network;
 
                 const [captured_card_type, captured_transaction_id] =
                     this._getCapturedCardAndTransactionId(processPayment);
@@ -185,7 +193,10 @@ export class PaymentStripe extends PaymentInterface {
                     line.card_type = captured_card_type;
                     line.transaction_id = captured_transaction_id;
                 } else {
-                    await this.captureAfterPayment(processPayment, line);
+                    if ((await this.captureAfterPayment(processPayment, line)) === false) {
+                        line.setPaymentStatus("retry");
+                        return false;
+                    }
                 }
 
                 line.setPaymentStatus("done");
@@ -194,13 +205,33 @@ export class PaymentStripe extends PaymentInterface {
         }
     }
 
-    createStripeTerminal() {
+    async collectRefund(amount) {
+        const line = this.pos.getOrder().getSelectedPaymentline();
+        line.setPaymentStatus("waitingCard");
+
+        const paymentId = line.uiState.stripePaymentIdToRefund;
+        const refundResult = await this.pos.data.silentCall("pos.payment.method", "stripe_refund", [
+            [line.payment_method_id.id],
+            paymentId,
+            amount,
+        ]);
+
+        if (refundResult.error) {
+            throw new Error(refundResult.error);
+        }
+        line.transaction_id = refundResult.id;
+        line.setPaymentStatus("done");
+
+        return true;
+    }
+
+    async createStripeTerminal() {
         try {
+            await loadJS("https://js.stripe.com/terminal/v1/");
             this.terminal = StripeTerminal.create({
                 onFetchConnectionToken: this.stripeFetchConnectionToken.bind(this),
                 onUnexpectedReaderDisconnect: this.stripeUnexpectedDisconnect.bind(this),
             });
-            this.discoverReaders();
             return true;
         } catch (error) {
             this._showError(_t("Failed to load resource: net::ERR_INTERNET_DISCONNECTED."), error);
@@ -222,44 +253,62 @@ export class PaymentStripe extends PaymentInterface {
     }
 
     async captureAfterPayment(processPayment, line) {
-        const capturePayment = await this.capturePayment(processPayment.paymentIntent.id);
-        if (capturePayment.charges) {
-            line.card_type = this.getCardBrandFromPaymentMethodDetails(
-                capturePayment.charges.data[0].payment_method_details
-            );
+        // Don't capture if the customer can tip, in that case we
+        // will capture later.
+        if (!this.canBeAdjusted(line.uuid)) {
+            const capturePayment = await this.capturePayment(processPayment.paymentIntent.id);
+            if (!capturePayment) {
+                return false;
+            }
+            if (capturePayment.charges) {
+                line.card_type = this.getCardBrandFromPaymentMethodDetails(
+                    capturePayment.charges.data[0].payment_method_details
+                );
+            }
+            line.transaction_id = capturePayment.id;
         }
-        line.transaction_id = capturePayment.id;
+        return true;
     }
 
-    async capturePayment(paymentIntentId) {
-        return this.capturePaymentStripe(paymentIntentId);
+    async sendPaymentAdjust(uuid) {
+        var order = this.pos.getOrder();
+        var line = order.getPaymentlineByUuid(uuid);
+        this.capturePayment(line.transaction_id, line.amount, {
+            stripe_currency_rounding: line.currency_id.rounding,
+        });
     }
 
-    async capturePaymentStripe(paymentIntentId, amount = null, context = {}) {
+    canBeAdjusted(uuid) {
+        var order = this.pos.getOrder();
+        var line = order.getPaymentlineByUuid(uuid);
+        return (
+            this.pos.config.set_tip_after_payment &&
+            line.payment_method_id.payment_provider === "stripe" &&
+            line.card_type !== "interac" &&
+            line.uiState.stripeCardPresentNetwork !== "eftpos_au"
+        );
+    }
+
+    async capturePayment(paymentIntentId, amount = null, context = {}) {
         try {
-            const data = await this.pos.data.call(
-                "pos.payment.method",
-                "stripe_capture_payment",
-                [paymentIntentId],
-                {
-                    amount,
-                    context,
-                }
-            );
+            const data = await this.callPaymentMethod("stripe_capture_payment", [paymentIntentId], {
+                amount,
+                context,
+            });
             if (data.error) {
                 throw data.error;
             }
             return data;
         } catch (error) {
             const { message } = error.data || error;
-            this._showError(message, "Capture Payment");
+            this._showError(message, _t("Capture Payment"));
             return false;
         }
     }
 
     async fetchPaymentIntentClientSecret(payment_method, amount) {
         try {
-            const data = await this.pos.data.call("pos.payment.method", "stripe_payment_intent", [
+            const data = await this.callPaymentMethod("stripe_payment_intent", [
                 [payment_method.id],
                 amount,
             ]);
@@ -269,21 +318,31 @@ export class PaymentStripe extends PaymentInterface {
             return data.client_secret;
         } catch (error) {
             const { message } = error.data || error;
-            this._showError(message, "Fetch Secret");
+            this._showError(message, _t("Fetch Secret"));
             return false;
         }
     }
 
-    async sendPaymentRequest(uuid) {
+    async sendPaymentRequest(line) {
         /**
          * Override
          */
         await super.sendPaymentRequest(...arguments);
-        const line = this.pos.getOrder().getSelectedPaymentline();
+        const isRefund = line.amount < 0;
+
+        if (isRefund && !line.uiState.stripePaymentIdToRefund) {
+            this._showError(_t("You cannot refund a non-Stripe payment via Stripe"));
+            return false;
+        }
+
         line.setPaymentStatus("waiting");
         try {
             if (await this.checkReader()) {
-                return await this.collectPayment(line.amount);
+                if (isRefund) {
+                    return await this.collectRefund(line.amount);
+                } else {
+                    return await this.collectPayment(line.amount);
+                }
             }
         } catch (error) {
             logPosMessage(
@@ -298,12 +357,11 @@ export class PaymentStripe extends PaymentInterface {
         }
     }
 
-    async sendPaymentCancel(order, uuid) {
+    async sendPaymentCancel(line) {
         /**
          * Override
          */
         super.sendPaymentCancel(...arguments);
-        const line = this.pos.getOrder().getSelectedPaymentline();
         const stripeCancel = await this.stripeCancel();
         if (stripeCancel) {
             line.setPaymentStatus("retry");
@@ -342,4 +400,4 @@ export class PaymentStripe extends PaymentInterface {
     }
 }
 
-register_payment_method("stripe", PaymentStripe);
+registry.category("pos_payment_providers").add("stripe", PaymentStripe);

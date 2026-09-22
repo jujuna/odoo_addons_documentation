@@ -38,12 +38,12 @@
                                                     <div>
                                                         <t t-set="is_invalid" t-value="o._is_invalid()"/>
                                                         <t t-if="is_invalid">
-                                                            <strong id="invalid_warning">This payslip is not validated and is not a legal document.</strong>
+                                                            <div class="text-center alert alert-warning">This payslip is draft. This is not a legal document.</div>
                                                         </t>
                                                     </div>
                                                     <div id="pay_period" class="fs-6">
                                                         <span>Pay Period : </span>
-                                                        <span t-if="o.date_from &lt; o.version_id.contract_date_start" t-field="o.version_id.contract_date_start"/>
+                                                        <span t-if="o.version_id.contract_date_start and o.date_from &lt; o.version_id.contract_date_start" t-field="o.version_id.contract_date_start"/>
                                                         <span t-else="" t-field="o.date_from"/>
                                                             to
                                                         <span t-if="o.version_id.contract_date_end and o.date_to &gt; o.version_id.contract_date_end" t-field="o.version_id.contract_date_end"/>
@@ -71,7 +71,7 @@
                                         </tr>
                                         <tr>
                                             <td colspan="1"><strong>Pay Date</strong></td>
-                                            <td colspan="2">: <span t-field="o.compute_date"/></td>
+                                            <td colspan="2">: <span t-out="o.paid_date if o.paid_date else o.compute_date" t-options="{'widget': 'date'}"/></td>
                                             <td colspan="1"><strong>PAN</strong></td>
                                             <td colspan="2">: <span t-field="o.employee_id.l10n_in_pan"/></td>
                                         </tr>
@@ -80,10 +80,10 @@
                                             <td colspan="2">: <span t-field="o.employee_id.l10n_in_esic_number"/></td>
                                             <td colspan="1"><strong>Standard Working Schedule</strong></td>
                                             <td colspan="2">: <t t-if="o.wage_type == 'monthly'">
-                                                    <span t-out="int(o._get_l10n_in_company_working_time())"/> Days
+                                                    <span t-out="int(o._get_l10n_in_employee_working_time())"/> Days
                                                 </t>
                                                 <t t-else="">
-                                                    <span t-out="o._get_l10n_in_company_working_time(return_hours=True)"/> Hours
+                                                    <span t-out="o._get_l10n_in_employee_working_time(return_hours=True)"/> Hours
                                                 </t>
                                             </td>
                                         </tr>
@@ -135,7 +135,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="worked_days_lines">
-                                            <t t-set="worked_days_lines" t-value="o.worked_days_line_ids.filtered(lambda worked_days: worked_days.code != 'OUT')"/>
+                                            <t t-set="worked_days_lines" t-value="o.worked_days_line_ids.filtered(lambda worked_days: worked_days.code != '000.00')"/>
                                             <span t-foreach="worked_days_lines" t-as="worked_days">
                                                 <tr style="color:none">
                                                     <td id="worked_days_name"><span t-field="worked_days.name"/></td>
@@ -163,8 +163,12 @@
                             </td>
                             <td t-if="o.ytd_computation" class="text-end" style="width: 12.5%"><strong>YTD</strong></td>
                         </tr>
-                        <t t-set="earnings_lines" t-value="o.line_ids.filtered(lambda line: line.appears_on_payslip and line.total >= 0 and 'NET' not in line.category_id.code)"/>
-                        <t t-set="deductions_lines" t-value="o.line_ids.filtered(lambda line: line.appears_on_payslip and line.amount &lt; 0)"/>
+                        <t t-set="earnings_lines" t-value="o.line_ids.filtered(lambda line: (line.appears_on_payslip ==
+                           'always' or (line.appears_on_payslip == 'non_zero' and round(line.amount, 2) != 0)) and
+                           line.total >= 0 and 'NET' not in line.category_id.code)"/>
+                        <t t-set="deductions_lines" t-value="o.line_ids.filtered(lambda line: (line.appears_on_payslip
+                           == 'always' or (line.appears_on_payslip == 'non_zero' and round(line.amount, 2) != 0)) and
+                           line.amount &lt; 0)"/>
                         <t t-set="max_length" t-value="max(len(earnings_lines), len(deductions_lines))"/>
                         <t t-foreach="range(max_length)" t-as="i">
                             <tr>
@@ -205,7 +209,9 @@
                             <td t-if="o.ytd_computation"></td>
                             <td><strong>Total Deductions</strong></td>
                             <td t-att-colspan="1 if o.ytd_computation else 2" class="text-end"><strong>
-                                <t t-out="abs(sum(o.line_ids.filtered(lambda line: line.appears_on_payslip and line.amount &lt; 0).mapped('total')))"
+                                <t t-out="abs(sum(o.line_ids.filtered(lambda line: (line.appears_on_payslip == 'always'
+                                   or (line.appears_on_payslip == 'non_zero' and round(line.amount, 2) != 0)) and
+                                   line.amount &lt; 0).mapped('total')))"
                                    t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
                             </strong></td>
                             <td t-if="o.ytd_computation"></td>
@@ -224,7 +230,9 @@
                         <tr>
                             <td colspan="4">Total Deductions</td>
                             <td colspan="2" class="text-end">
-                                <t t-out="abs(sum(o.line_ids.filtered(lambda line: line.appears_on_payslip and line.amount &lt; 0).mapped('total')))"
+                                <t t-out="abs(sum(o.line_ids.filtered(lambda line: (line.appears_on_payslip == 'always'
+                                   or (line.appears_on_payslip == 'non_zero' and round(line.amount, 2) != 0)) and
+                                   line.amount &lt; 0).mapped('total')))"
                                    t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
                             </td>
                         </tr>
@@ -249,7 +257,7 @@
                 <t t-set="allocations" t-value="o.safe_compute_salary_allocations(o.net_wage)" />
                 <t t-if="'__error__' in allocations">
                     <div class="alert alert-danger mt-3">
-                        <i class="fa fa-exclamation-triangle"/> <strong>Salary allocations could not be computed:</strong>
+                        <i class="oi" data-icon="warning"/> <strong>Salary allocations could not be computed:</strong>
                         <span t-out="allocations['__error__']"/>
                     </div>
                 </t>
@@ -264,8 +272,8 @@
                                             <td width="40%" t-att-rowspan="len(o.employee_id.bank_account_ids)">To Pay On</td>
                                         </t>
                                         <td class="text-end">
-                                            <span t-out="bank.acc_number"/>
-                                            <t t-if="bank.bank_id"> - <span t-out="bank.bank_id.name"/></t>
+                                            <span t-out="bank.account_number"/>
+                                            <t t-if="bank.bank_name"> - <span t-out="bank.bank_name"/></t>
                                         </td>
                                         <td class="text-end">
                                             <span t-out="allocations[str(bank.id)]"
@@ -287,8 +295,7 @@
     <template id="report_payslip">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-set="o" t-value="o.with_context(lang=o.employee_id.sudo().lang or o.env.lang)"/>
-                <t t-call="l10n_in_hr_payroll.report_payslip_in" t-lang="o.env.lang"/>
+                <t t-call="l10n_in_hr_payroll.report_payslip_in"/>
             </t>
         </t>
     </template>

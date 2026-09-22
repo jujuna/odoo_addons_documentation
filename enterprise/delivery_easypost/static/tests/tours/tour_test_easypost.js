@@ -45,7 +45,7 @@ registry.category("web_tour.tours").add('test_carrier_type_selection_field', { s
             trigger: ".o_field_carrier_type_selection input:value(Fedex)",
         },
         {
-            trigger: ".btn:contains(Cancel)",
+            trigger: ".btn:contains(Discard)",
             run: "click",
         },
         {

@@ -7,14 +7,15 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-13 14:59+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 01:32+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
 "account_inter_company_rules/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -22,18 +23,13 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: account_inter_company_rules
 #. odoo-python
 #: code:addons/account_inter_company_rules/models/account_move.py:0
 msgid "%(company)s Invoice: %(entry)s"
 msgstr "%(company)s الفاتورة: %(entry)s"
-
-#. module: account_inter_company_rules
-#: model:ir.model,name:account_inter_company_rules.model_account_move_send
-msgid "Account Move Send"
-msgstr "إرسال حركة الحساب"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_bank_statement_line__auto_generated
@@ -55,8 +51,9 @@ msgstr "الأتمتة"
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_res_company
-msgid "Companies"
-msgstr "الشركات"
+#, fuzzy
+msgid "Company"
+msgstr "الشركة "
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_res_config_settings
@@ -69,8 +66,7 @@ msgid "Create Vendor Bills"
 msgstr "إنشاء فواتير المورّدين"
 
 #. module: account_inter_company_rules
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_user_id
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_user_id
+#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
 msgid "Create as"
 msgstr "إنشاء كـ"
 
@@ -91,7 +87,6 @@ msgstr "مسودة"
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_generate_bills_refund
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_generate_bills_refund
-#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.view_company_inter_change_inherit_form
 msgid "Generate Bills and Refunds"
 msgstr "إنشاء الفواتير ورد الأموال"
 
@@ -105,9 +100,23 @@ msgid "ID"
 msgstr "المُعرف"
 
 #. module: account_inter_company_rules
-#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.view_company_inter_change_inherit_form
-msgid "Inter-Company Transactions"
-msgstr "المعاملات بين الشركات"
+#: model:ir.model.fields,help:account_inter_company_rules.field_res_company__intercompany_generate_bills_refund
+#: model:ir.model.fields,help:account_inter_company_rules.field_res_config_settings__intercompany_generate_bills_refund
+#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
+msgid ""
+"If another company confirms an invoice with this company, a bill will be "
+"created in the chosen Purchase journal."
+msgstr ""
+
+#. module: account_inter_company_rules
+#: model:ir.module.module,shortdesc:base.module_account_inter_company_rules
+msgid "Inter Company Module for Sale/Purchase Orders and Invoices"
+msgstr ""
+
+#. module: account_inter_company_rules
+#: model:ir.module.module,summary:base.module_account_inter_company_rules
+msgid "Intercompany SO/PO/INV rules"
+msgstr ""
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_account_move
@@ -120,17 +129,27 @@ msgid "Journal Item"
 msgstr "عنصر اليومية"
 
 #. module: account_inter_company_rules
+#: model:ir.module.module,description:base.module_account_inter_company_rules
+msgid ""
+"Module for synchronization of Documents between several companies. For "
+"example, this allow you to have a Sales Order created automatically when a "
+"Purchase Order is validated with another company of the system as vendor, "
+"and inversely.\n"
+"\n"
+"   Supported documents are invoices/credit notes.\n"
+msgstr ""
+
+#. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_purchase_journal_id
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_purchase_journal_id
 msgid "Purchase Journal"
 msgstr "دفتر يومية المشتريات"
 
 #. module: account_inter_company_rules
-#: model:ir.model.fields,help:account_inter_company_rules.field_res_company__intercompany_user_id
-#: model:ir.model.fields,help:account_inter_company_rules.field_res_config_settings__intercompany_user_id
-msgid ""
-"Responsible user for creation of documents triggered by intercompany rules."
-msgstr "المستخدم المسؤول عن إنشاء مستندات تُفعل من خلال قواعد ما بين الشركات."
+#: model:ir.model,name:account_inter_company_rules.model_account_move_send
+#, fuzzy
+msgid "Shared Send Invoice Wizard Functions"
+msgstr "وظائف معالج إرسال الفواتير المشتركة"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_bank_statement_line__auto_invoice_id
@@ -145,26 +164,14 @@ msgstr "تم التصديق"
 
 #. module: account_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
-msgid "as"
-msgstr "كـ"
+msgid "in Journal"
+msgstr ""
 
-#~ msgid "%s Invoice: %s"
-#~ msgstr "%s الفاتورة: %s"
+#~ msgid "Inter-Company Transactions"
+#~ msgstr "المعاملات بين الشركات"
 
-#~ msgid "Do not synchronize"
-#~ msgstr "عدم القيام بالمزامنة "
-
-#~ msgid "Intercompany Transaction Message"
-#~ msgstr "رسالة المعاملة بين الشركات "
-
-#~ msgid "Rule"
-#~ msgstr "قاعدة"
-
-#~ msgid "Select Company"
-#~ msgstr "اختر شركة"
-
-#~ msgid "Select the type to setup inter company rules in selected company."
-#~ msgstr "اختر النوع لإعداد قواعد ما بين الشركات في الشركة المختارة. "
-
-#~ msgid "Synchronize invoices/bills"
-#~ msgstr "مزامنة فواتير العملاء/فواتير الموردين "
+#~ msgid ""
+#~ "Responsible user for creation of documents triggered by intercompany "
+#~ "rules."
+#~ msgstr ""
+#~ "المستخدم المسؤول عن إنشاء مستندات تُفعل من خلال قواعد ما بين الشركات."

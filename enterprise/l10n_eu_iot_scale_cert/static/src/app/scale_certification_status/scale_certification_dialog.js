@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, types as t } from "@odoo/owl";
 import { useTrackedAsync } from "@point_of_sale/app/hooks/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
@@ -6,16 +6,13 @@ import { useService } from "@web/core/utils/hooks";
 
 export class ScaleCertificationDialog extends Component {
     static components = { Dialog };
-    static props = {
-        errors: {
-            type: Array,
-            element: String,
-        },
-        details: Object,
-        checksum: String,
-        autoFix: { type: Function, optional: true },
-        close: Function,
-    };
+    props = useProps({
+        errors: t.array(t.string()),
+        details: t.object(),
+        checksum: t.string(),
+        autoFix: t.function([], t.promise()).optional(),
+        close: t.function([]),
+    });
     static template = "pos_iot.ScaleCertificationDialog";
 
     setup() {

@@ -8,6 +8,8 @@ from .common import PurchaseTestCommon
 @tagged('post_install', '-at_install')
 class TestPurchaseOrderProcess(PurchaseTestCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @users('purchase_user')
     def test_00_cancel_purchase_order_flow(self):
         """ Test cancel purchase order with group user."""
@@ -42,12 +44,12 @@ class TestPurchaseOrderProcess(PurchaseTestCommon):
                 Command.create({
                     'product_id': self.product.id,
                     'product_qty': 2.0,
-                    'product_uom_id': self.uom.id,
+                    'uom_id': self.uom.id,
                 }),
                 Command.create({
                     'product_id': self.product_2.id,
                     'product_qty': 3.0,
-                    'product_uom_id': self.uom.id,
+                    'uom_id': self.uom.id,
                 })],
         })
         purchase_order.button_confirm()
@@ -148,3 +150,54 @@ class TestPurchaseOrderProcess(PurchaseTestCommon):
         new_picking.move_ids.picked = True
         new_picking.button_validate()
         self.assertEqual(po.order_line.qty_received, po.order_line.product_qty, "We should have received the entire quantity specified in the PO.")
+
+    def test_merge_po_references(self):
+        """
+        Chek that stock references are merged when po are merged.
+        """
+        self.route_mto.active = True
+        self.product.write({
+            'route_ids': [Command.link(self.route_mto.id)],
+            'seller_ids': [Command.create({
+                'partner_id': self.partner.id,
+                'min_qty': 5,
+                'price': 250,
+            })],
+        })
+        references = self.env['stock.reference'].create([
+            {'name': 'ref 1'},
+            {'name': 'ref 2'},
+        ])
+        self.env['stock.rule'].run([
+            self.env['stock.rule'].Procurement(
+                self.product,
+                2.0,
+                self.product.uom_id,
+                self.partner.property_stock_customer,
+                f"test_{ref.name}",
+                f"test_{ref.name}",
+                self.warehouse.company_id,
+                {
+                    'warehouse_id': self.warehouse,
+                    'reference_ids': ref,
+                },
+            ) for ref in references
+        ])
+        purchase_orders = self.env['purchase.order'].search([('partner_id', '=', self.partner.id)], order='id')
+        self.assertRecordValues(purchase_orders, [
+            {'reference_ids': references[0].ids, 'state': 'draft'},
+            {'reference_ids': references[1].ids, 'state': 'draft'},
+        ])
+        move_dest_ids = purchase_orders.order_line.move_dest_ids
+        self.assertRecordValues(move_dest_ids, [
+            {'created_purchase_line_ids': purchase_orders[0].order_line.ids, 'reference_ids': references[0].ids, 'product_qty': 2.0},
+            {'created_purchase_line_ids': purchase_orders[1].order_line.ids, 'reference_ids': references[1].ids, 'product_qty': 2.0},
+        ])
+        Form.from_action(self.env, purchase_orders.action_merge()).save()
+        self.assertRecordValues(purchase_orders, [
+            {'reference_ids': references.ids, 'state': 'draft'},
+            {'reference_ids': references[1].ids, 'state': 'cancel'},
+        ])
+        self.assertRecordValues(purchase_orders[0].order_line, [
+            {'product_qty': 4, 'move_dest_ids': move_dest_ids.ids},
+        ])

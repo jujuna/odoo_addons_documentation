@@ -8,8 +8,12 @@ class AccountMove(models.Model):
     _inherit = ['account.move', 'pos.load.mixin']
 
     @api.model
-    def _load_pos_data_domain(self, data, config):
-        return [('pos_order_ids', 'in', [order['id'] for order in data['pos.order']])]
+    def _load_pos_data_domain(self, data):
+        return [('pos_order_ids', 'in', data['pos.order'].ids)]
+
+    @api.model
+    def _load_pos_data_dependencies(self):
+        return super()._load_pos_data_dependencies() + ['pos.order']
 
     def _l10n_ec_get_payment_data(self):
         # EXTENDS l10n_ec_edi

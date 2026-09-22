@@ -1,5 +1,15 @@
-import { Component, onWillStart, onWillUpdateProps, useState } from "@odoo/owl";
+import {
+    Component,
+    computed,
+    onWillStart,
+    onWillUpdateProps,
+    proxy,
+    t,
+    usePlugin,
+    useProps,
+} from "@odoo/owl";
 import { CheckBox } from "@web/core/checkbox/checkbox";
+import { Domain } from "@web/core/domain";
 import { DomainSelectorDialog } from "@web/core/domain_selector_dialog/domain_selector_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
@@ -16,13 +26,10 @@ import { useEditNodeAttributes } from "@web_studio/client_action/view_editor/vie
 import { useSnackbarWrapper } from "@web_studio/client_action/view_editor/view_editor_hook";
 import { ModifiersProperties } from "@web_studio/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties";
 import { buildApprovalKey } from "@web_studio/approval/approval_hook";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 export class ButtonProperties extends Component {
     static template = "web_studio.ViewEditor.InteractiveEditorProperties.Button";
-    static props = {
-        node: { type: Object },
-        availableOptions: { type: Array, optional: true },
-    };
     static components = {
         CheckBox,
         ClassAttribute,
@@ -36,11 +43,23 @@ export class ButtonProperties extends Component {
         ModifiersProperties,
     };
 
+    props = useProps({
+        node: t.object(),
+        availableOptions: t.array().optional(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
+
+    appovalBlockedByParentRule = computed(() => {
+        const allRules = this.state.allRules || {};
+        return this.state.approvalSpec?.rules?.some((_id) => !!allRules[_id]?.parent_id);
+    });
+
     setup() {
         this.dialog = useService("dialog");
         this.orm = useService("orm");
         this.actionService = useService("action");
-        this.state = useState({
+        this.state = proxy({
             actionsList: [],
         });
         this.editNodeAttributes = useEditNodeAttributes();
@@ -59,16 +78,19 @@ export class ButtonProperties extends Component {
             approval_group_id: {
                 type: "many2one",
                 relation: "res.groups",
+                string: _t("Access Groups"),
                 domain: [["share", "=", false]],
             },
             approver_ids: {
                 type: "many2many",
                 relation: "res.users",
+                string: _t("Users"),
                 related: { activeFields: m2mFieldsToFetch, fields: m2mFieldsToFetch },
             },
             users_to_notify: {
                 type: "many2many",
                 relation: "res.users",
+                string: _t("Users"),
                 related: { activeFields: m2mFieldsToFetch, fields: m2mFieldsToFetch },
             },
         };
@@ -108,7 +130,7 @@ export class ButtonProperties extends Component {
 
     get actionsForModel() {
         return Object.values(this.state.actionsList).map((a) => ({
-            label: odoo.debug ? `${a.name} (${a.xml_id})` : a.name,
+            label: this.debugMode.isActive() ? `${a.name} (${a.xml_id})` : a.name,
             value: a.xml_id,
         }));
     }
@@ -158,9 +180,13 @@ export class ButtonProperties extends Component {
     async createApprovalRule() {
         const params = this.getApprovalParams();
         if (this.state.approvalSpec?.rules.length) {
-            const orders = this.state.approvalSpec.rules.map((id) =>
-                parseInt(this.state.allRules[id]["notification_order"])
-            );
+            const allRules = this.state.allRules;
+            const orders = this.state.approvalSpec.rules.map((id) => {
+                if (!allRules[id].parent_id) {
+                    return parseInt(allRules[id]["notification_order"]);
+                }
+                return 0;
+            });
             params.push(Math.min(Math.max(...orders) + 1, 9).toString());
         }
         await this.decoratedOrmCall("studio.approval.rule", "create_rule", params);
@@ -213,8 +239,8 @@ export class ButtonProperties extends Component {
         const domain = rule.domain;
         this.dialog.add(DomainSelectorDialog, {
             resModel: this.env.viewEditorModel.resModel,
-            domain: JSON.stringify(domain || []),
-            isDebugMode: !!this.env.debug,
+            domain: domain ? new Domain(domain).toString() : "[]",
+            isDebugMode: this.debugMode.isActive(),
             onConfirm: async (domain) => {
                 await this.decoratedOrmWrite("studio.approval.rule", [id], {
                     domain,

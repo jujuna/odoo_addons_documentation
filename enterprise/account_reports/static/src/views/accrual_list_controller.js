@@ -1,19 +1,28 @@
-import { reactive, useEnv, useRef } from "@odoo/owl";
+import { AccrualPlugin } from "@account_reports/views/accrual_plugin";
+import { onMounted, onWillStart, proxy, signal, usePlugin } from "@odoo/owl";
 import { useDateTimePicker } from "@web/core/datetime/datetime_picker_hook";
-import { serializeDate } from "@web/core/l10n/dates";
+import { deserializeDate, serializeDate } from "@web/core/l10n/dates";
+import { render } from "@web/owl2/utils";
 import { ListController } from "@web/views/list/list_controller";
 
 const { DateTime } = luxon;
 
 
 export class AccrualListController extends ListController {
+    dateFilterRef = signal.ref();
+
+    accrual = usePlugin(AccrualPlugin);
+
     setup() {
         super.setup();
-        this.accrualContext = useEnv().accrualContext;
-        this.state = reactive({
-            date: DateTime.now(),
+        this.state = proxy({
+            date: null,
         });
-        this.dateAsString = serializeDate(this.state.date);
+        onWillStart(async () => {
+            const saved = this.accrual.entryDate;
+            const date = saved ? deserializeDate(saved) : null;
+            await this.setDate(date?.isValid ? date : DateTime.now());
+        });
         if (this.model.config.resModel === "purchase.order.line") {
             this.model.config.fields.qty_received_at_date.aggregator = "sum";
         } else {
@@ -21,7 +30,6 @@ export class AccrualListController extends ListController {
         }
             this.model.config.fields.qty_invoiced_at_date.aggregator = "sum";
         this.model.config.fields.amount_to_invoice_at_date.aggregator = "sum";
-        this.dateFilterRef = useRef("filterDate");
         const getPickerProps = () => {
             const pickerProps = {
                 value: this.state.date,
@@ -30,16 +38,22 @@ export class AccrualListController extends ListController {
             return pickerProps;
         };
         this.dateTimePicker = useDateTimePicker({
-            target: "filterDate",
+            target: this.dateFilterRef,
             get pickerProps() {
                 return getPickerProps();
             },
             onApply: (newDate) => {
                 if (newDate) {
                     this.setDate(newDate);
-                    this.render();
+                    render(this);
                 }
             },
+        });
+
+        onMounted(async () => {
+            if (this.props.context?.accrual_entry_date) {
+                await this.setDate(DateTime.fromISO(this.props.context?.accrual_entry_date));
+            }
         });
     }
 
@@ -61,15 +75,11 @@ export class AccrualListController extends ListController {
     async setDate(date) {
         this.dateAsString = serializeDate(date);
         this.model.config.context.accrual_entry_date = this.dateAsString;
-        this.accrualContext.accrual_entry_date = this.dateAsString;
+        this.accrual.entryDate = this.dateAsString;
         this.state.date = date;
 
-        if (this.model.config.groups) {
-            // If records are grouped, update context of grouped lines too.
-            for (const group of Object.values(this.model.config.groups)) {
-                group.context.accrual_entry_date = this.dateAsString;
-            }
-        }
+        delete this.model.config.currentGroups;
+        this.model.config.groups = {};
 
         await this.model.root.load();
         this.model.notify();

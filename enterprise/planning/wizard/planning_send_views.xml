@@ -21,7 +21,7 @@
                 </group>
                 <footer>
                     <button name="action_check_emails" type="object" string="Publish &amp; Send" class='btn-primary' data-hotkey="q"/>
-                    <button name="discard" string="Discard" class='btn-secondary' special="cancel" data-hotkey="x"/>
+                    <button name="discard" class='btn-secondary' special="cancel" data-hotkey="x"/>
                 </footer>
             </form>
         </field>
@@ -35,7 +35,7 @@
                 <p>
                     Define a work email address for the following employees so they will receive the planning.
                 </p>
-                <field name="employees_no_email" nolabel="1" options="{'link': false, 'unlink': false}">
+                <field name="employees_no_email" nolabel="1" link="False" unlink="False">
                     <list editable="bottom">
                         <field name="name" required="1" readonly="1"/>
                         <field name="work_email" required="1"/>
@@ -44,14 +44,14 @@
                 <footer>
                     <button name="action_send" type="object" string="Save &amp; Send Schedule"
                             class='btn-primary'/>
-                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                    <button class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>
     </record>
 
     <record id="planning_send_action" model="ir.actions.act_window">
-        <field name="name">Publish &amp; Send the Schedule by Email</field>
+        <field name="name">Publish &amp; Send the Schedule</field>
         <field name="res_model">planning.send</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="planning_send_view_form"/>

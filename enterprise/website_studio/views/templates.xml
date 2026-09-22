@@ -4,8 +4,7 @@
     <template id="default_record_page">
         <t t-call="website.layout">
             <div id="o_website_record_page wrap">
-                <t t-set="editor_message">Drag building blocks to customize the header of single record pages.</t>
-                <div class="oe_structure oe_empty oe_new" t-att-data-editor-message="editor_message"/>
+                <div class="oe_structure oe_empty oe_new" data-editor-message.translate="Drag building blocks to customize the header of single record pages"/>
                 <div class="container">
                     <ol t-if="listing" class="breadcrumb p-0 my-2">
                         <li class="breadcrumb-item o_not_editable">
@@ -29,8 +28,7 @@
                     </div>
                     <studio_placeholder for="html"/>
                 </div>
-                <t t-set="editor_message">Drag building blocks to customize the footer of single record pages.</t>
-                <div class="oe_structure oe_empty oe_new" t-att-data-editor-message="editor_message"></div>
+                <div class="oe_structure oe_empty oe_new" data-editor-message.translate="Drag building blocks to customize the footer of single record pages"></div>
             </div>
         </t>
     </template>
@@ -79,7 +77,7 @@
                                     <div role="search" class="input-group">
                                         <input type="search" name="search" class="search-query form-control oe_search_box border-0 text-bg-light" placeholder="Search..." t-att-value="search" autocomplete="off"/>
                                         <button type="submit" aria-label="Search" title="Search" class="btn oe_search_button btn-light">
-                                            <i class="oi oi-search"></i>
+                                            <i class="oi" data-icon="search"></i>
                                             <span t-if="search" class="oe_search_found">
                                                 <small>(<t t-out="search_count or 0"/> found)</small>
                                             </span>
@@ -130,11 +128,11 @@
         <div t-attf-class="listing_layout_switcher btn-group ms-3" t-att-data-active-classes="_activeClasses" t-att-data-view-id="view_id">
             <input type="radio" class="btn-check" name="wstudio_layout" id="o_wstudio_apply_grid" value="grid" t-att-checked="'checked' if layout_mode != 'list' else None"/>
             <label t-attf-class="btn btn-light #{_activeClasses if layout_mode != 'list' else None} o_wstudio_apply_grid" title="Grid" for="o_wstudio_apply_grid">
-                <i class="fa fa-th-large"/>
+                <i class="oi" data-icon="view_module"/>
             </label>
             <input type="radio" class="btn-check" name="wstudio_layout" id="o_wstudio_apply_list" t-att-checked="'checked' if layout_mode == 'list' else None" value="list"/>
             <label t-attf-class="btn btn-light #{_activeClasses if layout_mode == 'list' else None} o_wstudio_apply_list" title="List" for="o_wstudio_apply_list">
-                <i class="oi oi-view-list"/>
+                <i class="oi" data-icon="view_list"/>
             </label>
         </div>
     </template>

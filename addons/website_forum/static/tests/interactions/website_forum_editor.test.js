@@ -44,13 +44,16 @@ describe("editor in forum", () => {
         expect(".note-editable").toHaveCount(1);
         expect(wysiwyg.props.fullEdit).toBe(false);
     });
-    test("H1 to H3 are not available as fonts", async () => {
+    test("H1 to H6 are not available as fonts", async () => {
         await startInteractions(makeHtmlContent(1));
         const wysiwyg = await mountedWysiwyg;
-        const fontPlugin = wysiwyg.editor.plugins.find((p) => p.constructor.id === "font");
-        const tagNames = fontPlugin.availableFontItems.map((item) => item.tagName);
+        const fontTypePlugin = wysiwyg.editor.plugins.find((p) => p.constructor.id === "fontType");
+        const tagNames = fontTypePlugin.availableFontTypeItems.map((item) => item.tagName);
         expect(tagNames).not.toInclude("h1");
         expect(tagNames).not.toInclude("h2");
         expect(tagNames).not.toInclude("h3");
+        expect(tagNames).not.toInclude("h4");
+        expect(tagNames).not.toInclude("h5");
+        expect(tagNames).not.toInclude("h6");
     });
 });

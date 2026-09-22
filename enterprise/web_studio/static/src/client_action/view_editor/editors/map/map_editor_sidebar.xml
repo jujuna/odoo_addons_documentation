@@ -4,11 +4,20 @@
         <InteractiveEditorSidebar>
             <t t-set-slot="view">
                 <Property
+                    name="'create'"
+                    type="'boolean'"
+                    value="this.archInfo.activeActions.create"
+                    onChange.bind="this.editAttribute"
+                >
+                    Can Create
+                </Property>
+
+                <Property
                     name="'res_partner'"
                     type="'selection'"
-                    value="modelParams.resPartnerField"
+                    value="this.modelParams.resPartnerField"
                     childProps="{ choices: this.contactFieldChoices, required: false }"
-                    onChange.bind="onViewAttributeChanged"
+                    onChange.bind="this.onViewAttributeChanged"
                 >
                     Contact Field
                 </Property>
@@ -16,8 +25,8 @@
                 <Property
                     name="'hide_name'"
                     type="'boolean'"
-                    value="modelParams.hideName"
-                    onChange.bind="onViewAttributeChanged"
+                    value="this.modelParams.hideName"
+                    onChange.bind="this.onViewAttributeChanged"
                 >
                     Hide Name
                 </Property>
@@ -25,8 +34,8 @@
                 <Property
                     name="'hide_address'"
                     type="'boolean'"
-                    value="modelParams.hideAddress"
-                    onChange.bind="onViewAttributeChanged"
+                    value="this.modelParams.hideAddress"
+                    onChange.bind="this.onViewAttributeChanged"
                 >
                     Hide Address
                 </Property>
@@ -34,55 +43,45 @@
                 <div class="o_map_popup_fields">
                     <label for="additional_fields" class="mb-1">Additional Fields</label>
                     <div class="o_field_widget o_field_many2many_tags" name="additional_fields">
-                        <MultiRecordSelector t-props="multiRecordSelectorProps" />
+                        <MultiRecordSelector t-props="this.multiRecordSelectorProps" />
                     </div>
                 </div>
 
                 <Property
                     name="'routing'"
-                    type="'boolean'"
-                    value="modelParams.routing"
-                    onChange.bind="onViewAttributeChanged"
+                    type="'selection'"
+                    value="this.modelParams.routing"
+                    childProps="{ choices: this.routingChoices, required: false }"
+                    onChange.bind="this.onViewAttributeChanged"
+                    tooltip="this.routingTooltip"
                 >
-                    Enable Routing
+                    Routing
                 </Property>
-
+                <a href="/odoo/settings#token_map_view" class="d-flex gap-1 btn-link" role="button" target="_blank">Mapbox Token <i class="oi pt-1" data-icon="open_in_new"/></a>
                 <Property
-                    t-if="modelParams.routing === true"
+                    t-if="this.modelParams.routing === 'ordered'"
                     name="'default_order'"
                     type="'selection'"
-                    value="modelParams.defaultOrder?.[0]?.name"
+                    value="this.modelParams.defaultOrder?.[0]?.name"
                     childProps="{ choices: this.defaultOrderChoices, required: false }"
-                    onChange.bind="onViewAttributeChanged"
+                    onChange.bind="this.onViewAttributeChanged"
                 >
                     Sort by
                 </Property>
 
                 <Property
-                    t-if="modelParams.defaultOrder
-                        and modelParams.fields[modelParams.defaultOrder[0].name].type === 'integer'
-                        and !modelParams.fields[modelParams.defaultOrder[0].name].readonly"
-                    name="'allow_resequence'"
-                    type="'boolean'"
-                    value="modelParams.allowResequence"
-                    onChange.bind="onViewAttributeChanged"
-                >
-                    Allow Resequencing
-                </Property>
-
-                <Property
                     name="'default_group_by'"
                     type="'selection'"
-                    value="viewEditorModel.studioViewProps.defaultGroupBy"
-                    onChange.bind="editDefaultGroupBy"
-                    childProps="{ choices: defaultGroupbyChoices, required: false, multiSelect: true }"
+                    value="this.viewEditorModel.studioViewProps.defaultGroupBy"
+                    onChange.bind="this.editDefaultGroupBy"
+                    childProps="{ choices: this.defaultGroupbyChoices, required: false, multiSelect: true }"
                 >
                     Default Group By
                 </Property>
 
-                <SidebarViewToolbox onMore="props.openViewInForm"
-                    canEditXml="!viewEditorModel.isEditingSubview"
-                    openDefaultValues="props.openDefaultValues" />
+                <SidebarViewToolbox onMore="this.props.openViewInForm"
+                    canEditXml="!this.viewEditorModel.isEditingSubview"
+                    openDefaultValues="this.props.openDefaultValues" />
             </t>
         </InteractiveEditorSidebar>
     </t>

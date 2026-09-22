@@ -1,11 +1,9 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add('planning_avatar_card_non_hr_user', {
-    url: '/odoo?debug=tests',
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Open the Planning app",
-    tooltipPosition: 'bottom',
     run: "click",
 }, {
     trigger: '.o_gantt_renderer_controls .dropdown-toggle:contains("Week")',
@@ -23,7 +21,7 @@ registry.category("web_tour.tours").add('planning_avatar_card_non_hr_user', {
     content: "Write domain excluding open shifts",
     run() {
         const input = document.querySelector(".o_domain_selector_debug_container textarea")
-        input.value = '[("resource_id", "!=", False)]';
+        input.value = '[("resource_ids", "!=", False)]';
         input.dispatchEvent(new Event("change", { bubbles: true, cancelable: false }));
     }
 }, {
@@ -43,7 +41,7 @@ registry.category("web_tour.tours").add('planning_avatar_card_non_hr_user', {
     content: 'Wait for the resource "3D Printer Room" to be displayed',
     run: "click",
 }, {
-    trigger: ".o_gantt_row_header .o_avatar .o_material_resource > i.fa-wrench",
+    trigger: ".o_gantt_row_header .o_avatar .o_material_resource > i[data-icon='build']",
     content: 'Click on the icon of the material resource "3D Printer Room"',
     run: 'click',
 }, {
@@ -54,7 +52,7 @@ registry.category("web_tour.tours").add('planning_avatar_card_non_hr_user', {
         if (nodes.length !== 2) {
             console.error('Two roles should be displayed on the avatar card of the resource.');
         }
-        const default_role = document.querySelector(".o_avatar_card .o_resource_roles_tags .o_tag > i.fa-star");
+        const default_role = document.querySelector(".o_avatar_card .o_resource_roles_tags .o_tag > i[data-icon='star'].oi-filled");
         if (default_role) {
             console.error('The default role information should not be displayed as it is not accessible for the current user');
         }

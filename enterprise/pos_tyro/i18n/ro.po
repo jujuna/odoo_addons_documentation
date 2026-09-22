@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-11-16 13:37+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:56+0000\n"
+"PO-Revision-Date: 2026-09-18 02:34+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "pos_tyro/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: pos_tyro
+#. odoo-javascript
+#: code:addons/pos_tyro/static/src/app/payment_tyro.js:0
+msgid ""
+"A tip was added on the Tyro terminal, but tipping is not enabled for this "
+"Point of Sale. It will instead be recorded as a surcharge."
+msgstr ""
 
 #. module: pos_tyro
 #: model:ir.model.fields,field_description:pos_tyro.field_pos_payment_method__tyro_always_print_merchant_receipt
@@ -56,12 +64,14 @@ msgstr "Detaliat"
 
 #. module: pos_tyro
 #: model:ir.model.fields,field_description:pos_tyro.field_pos_config__display_name
+#: model:ir.model.fields,field_description:pos_tyro.field_pos_payment__display_name
 #: model:ir.model.fields,field_description:pos_tyro.field_pos_payment_method__display_name
 msgid "Display Name"
 msgstr "Nume afișat"
 
 #. module: pos_tyro
 #: model:ir.model.fields,field_description:pos_tyro.field_pos_config__id
+#: model:ir.model.fields,field_description:pos_tyro.field_pos_payment__id
 #: model:ir.model.fields,field_description:pos_tyro.field_pos_payment_method__id
 msgid "ID"
 msgstr "ID"
@@ -74,6 +84,11 @@ msgid ""
 msgstr ""
 "Dacă este activat, chitanța Tyro va fi inclusă în chitanța Odoo. În caz "
 "contrar, terminalul va tipări o chitanță de plată separată."
+
+#. module: pos_tyro
+#: model:ir.module.module,summary:base.module_pos_tyro
+msgid "Integrate your POS with a Tyro payment terminal (AU)"
+msgstr ""
 
 #. module: pos_tyro
 #: model:ir.model.fields,field_description:pos_tyro.field_pos_payment_method__tyro_integrated_receipts
@@ -92,14 +107,32 @@ msgstr "Jurnale"
 
 #. module: pos_tyro
 #. odoo-javascript
+#: code:addons/pos_tyro/static/src/actions/get_tyro_report.js:0
+#: code:addons/pos_tyro/static/src/actions/pair_tyro_terminal.js:0
+msgid "Merchant ID and/or Terminal ID are not configured."
+msgstr ""
+
+#. module: pos_tyro
+#. odoo-javascript
 #: code:addons/pos_tyro/static/src/app/components/failure_dialog.xml:0
 msgid "OK"
-msgstr "OK"
+msgstr ""
+
+#. module: pos_tyro
+#: model:ir.module.module,shortdesc:base.module_pos_tyro
+msgid "POS Tyro"
+msgstr ""
 
 #. module: pos_tyro
 #: model_terms:ir.ui.view,arch_db:pos_tyro.pos_payment_method_view_form_inherit_pos_tyro
 msgid "Pair Terminal"
 msgstr "Asociază terminalul"
+
+#. module: pos_tyro
+#. odoo-javascript
+#: code:addons/pos_tyro/static/src/actions/pair_tyro_terminal.js:0
+msgid "Pairing timed out."
+msgstr ""
 
 #. module: pos_tyro
 #. odoo-javascript
@@ -119,8 +152,7 @@ msgstr "Plăți disponibile pentru rambursare:"
 #: code:addons/pos_tyro/static/src/overrides/app/order_tabs/order_tabs.js:0
 #: code:addons/pos_tyro/static/src/overrides/app/services/pos_store.js:0
 msgid "Please complete or cancel the payment before navigatating away."
-msgstr ""
-"Vă rugăm să finalizați sau să anulați plata înainte de a părăsi pagina."
+msgstr "Vă rugăm să finalizați sau să anulați plata înainte de a părăsi pagina."
 
 #. module: pos_tyro
 #: model:ir.model,name:pos_tyro.model_pos_config
@@ -128,15 +160,20 @@ msgid "Point of Sale Configuration"
 msgstr "Configurarea Punctului de Vânzare"
 
 #. module: pos_tyro
+#: model:ir.model,name:pos_tyro.model_pos_payment
+msgid "Point of Sale Payment"
+msgstr ""
+
+#. module: pos_tyro
 #: model:ir.model,name:pos_tyro.model_pos_payment_method
-msgid "Point of Sale Payment Methods"
-msgstr "Metode plată Punct de Vânzare"
+msgid "Point of Sale Payment Method"
+msgstr ""
 
 #. module: pos_tyro
 #. odoo-javascript
 #: code:addons/pos_tyro/static/src/app/components/failure_dialog.xml:0
 msgid "Print Receipt"
-msgstr "Tipăriți bon"
+msgstr ""
 
 #. module: pos_tyro
 #: model:ir.model.fields.selection,name:pos_tyro.selection__pos_payment_method__tyro_mode__prod
@@ -144,15 +181,15 @@ msgid "Production Mode"
 msgstr "Mod producție"
 
 #. module: pos_tyro
-#. odoo-javascript
-#: code:addons/pos_tyro/static/src/overrides/screens/payment_screen/payment_lines/payment_lines.xml:0
-msgid "Refund in process"
-msgstr ""
-
-#. module: pos_tyro
 #: model_terms:ir.ui.view,arch_db:pos_tyro.pos_payment_method_view_form_inherit_pos_tyro
 msgid "Reports"
 msgstr "Rapoarte"
+
+#. module: pos_tyro
+#. odoo-javascript
+#: code:addons/pos_tyro/static/src/actions/get_tyro_report.js:0
+msgid "Requesting Tyro Reconciliation Report"
+msgstr ""
 
 #. module: pos_tyro
 #. odoo-javascript
@@ -204,9 +241,20 @@ msgid "Tyro"
 msgstr "Tyro"
 
 #. module: pos_tyro
+#. odoo-javascript
+#: code:addons/pos_tyro/static/src/app/payment_tyro.js:0
+msgid "Tyro Error"
+msgstr ""
+
+#. module: pos_tyro
 #: model:ir.model.fields,field_description:pos_tyro.field_pos_payment_method__tyro_merchant_id
 msgid "Tyro Merchant ID"
 msgstr "ID comerciant Tyro"
+
+#. module: pos_tyro
+#: model:ir.model.fields,field_description:pos_tyro.field_pos_payment__tyro_merchant_receipt
+msgid "Tyro Merchant Receipt"
+msgstr ""
 
 #. module: pos_tyro
 #: model:ir.model.fields,field_description:pos_tyro.field_pos_payment_method__tyro_mode
@@ -229,6 +277,12 @@ msgid "Tyro Terminal ID"
 msgstr "ID terminal Tyro"
 
 #. module: pos_tyro
+#. odoo-javascript
+#: code:addons/pos_tyro/static/src/app/payment_tyro.js:0
+msgid "Tyro Warning"
+msgstr ""
+
+#. module: pos_tyro
 #: model_terms:ir.ui.view,arch_db:pos_tyro.pos_payment_method_view_form_inherit_pos_tyro
 msgid "Tyro logs"
 msgstr "Jurnale Tyro"
@@ -246,6 +300,6 @@ msgstr "Vezi rapoarte"
 
 #. module: pos_tyro
 #. odoo-javascript
-#: code:addons/pos_tyro/static/src/overrides/screens/payment_screen/payment_lines/payment_lines.xml:0
-msgid "Waiting for card"
-msgstr "Așteptați cardul"
+#: code:addons/pos_tyro/static/src/app/payment_tyro.js:0
+msgid "You cannot refund more than the original amount."
+msgstr ""

@@ -7,21 +7,6 @@ registry.category("web_tour.tours").add("frontdesk_basic_tour", {
             trigger: "img",
         },
         {
-            content: "Click on Check in",
-            trigger: ".btn:contains('Check in')",
-            run: "click",
-        },
-        {
-            content: "Click on the back button",
-            trigger: ".oi-arrow-left",
-            run: "click",
-        },
-        {
-            content: "Click on Check in",
-            trigger: ".btn:contains('Check in')",
-            run: "click",
-        },
-        {
             content: "Filling the details",
             trigger: "input#company",
             run: "edit Office",
@@ -38,7 +23,7 @@ registry.category("web_tour.tours").add("frontdesk_basic_tour", {
         },
         {
             content: "Click on the check in button",
-            trigger: ".btn-primary:contains('Check In')",
+            trigger: ".btn:contains('Check In')",
             run: "click",
         },
         {

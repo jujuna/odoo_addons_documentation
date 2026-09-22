@@ -1,13 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import csv
 import io
 from datetime import datetime
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.tools import float_repr, float_round
+from odoo.tools import BinaryBytes, float_repr, float_round
 from odoo.tools.misc import format_date
 
 
@@ -78,7 +77,7 @@ class AccountBatchPayment(models.Model):
             if record.payment_ids and len(record.payment_ids.payment_method_line_id.mapped('l10n_nz_payment_listing_indicator')) != 1:
                 raise UserError(_("All payments batched using the New Zealand EFT format must have the same payment listing indicator."))
 
-    def validate_batch(self):
+    def validate_batch(self, initiate_payment=False):
         """ Verifies the content of a batch and proceeds to its sending if possible.
         If not, opens a wizard listing the errors and/or warnings encountered.
         """
@@ -93,14 +92,14 @@ class AccountBatchPayment(models.Model):
                 errors.append(_("Please specify the Direct Debit Information."))
             if self.l10n_nz_file_format == 'anz' and not self.l10n_nz_dishonour_account_id:
                 errors.append(_("For ANZ, you need to specify the Dishonour Account."))
-            if not self.journal_id.bank_account_id.acc_number:
+            if not self.journal_id.bank_account_id.account_number:
                 errors.append(_("The bank account of journal %(journal_name)s is missing or the account number is missing.",
                                 journal_name=self.journal_id.display_name))
 
         if errors:
             raise UserError('\n'.join(errors))
 
-        return super().validate_batch()
+        return super().validate_batch(initiate_payment=initiate_payment)
 
     @api.model
     def _get_data_export_method(self):
@@ -142,7 +141,7 @@ class AccountBatchPayment(models.Model):
 
             if control:
                 writer.writerow(control)
-            file = base64.encodebytes(output.getvalue().encode())
+            file = output.getvalue().encode()
         else:
             # Note: Only used by BNZ. The doc demands \r\n at the end of each record.
             file_bytes = b''
@@ -155,12 +154,12 @@ class AccountBatchPayment(models.Model):
 
             if control:
                 file_bytes += (','.join(control) + '\r\n').encode('ascii')
-            file = base64.encodebytes(file_bytes)
+            file = file_bytes
 
         file_date = fields.Datetime.context_timestamp(self, datetime.now()).strftime("%Y%m%d%H%M")
         return {
             'filename': f"EFT-{self.journal_id.code}-{file_date}.{file_type}",
-            'file': file,
+            'file': BinaryBytes(file),
         }
 
     # ----------------
@@ -184,10 +183,10 @@ class AccountBatchPayment(models.Model):
             format_date(self.env, self.date, date_format='YYYYMMdd'),  # Payment Date
             '',  # Payment Time - Unsupported in odoo
             format_date(self.env, fields.Date.context_today(self), date_format='YYYYMMdd'),  # Batch creation date
-            self.journal_id.bank_account_id.acc_number.replace('-', '').replace(' ', ''),  # Funds Account
+            self.journal_id.bank_account_id.account_number.replace('-', '').replace(' ', ''),  # Funds Account
             self._get_string_within_limit(self.l10n_nz_dd_info, 7) if is_inbound else '',  # DD Code
             'S' if is_bulk else 'M',  # Reporting Method
-            self.l10n_nz_dishonour_account_id.acc_number.replace('-', '').replace(' ', ''),  # Dishonour Account
+            self.l10n_nz_dishonour_account_id.account_number.replace('-', '').replace(' ', ''),  # Dishonour Account
             self._get_string_within_limit(self.name, 12),  # Batch name
             self._get_string_within_limit(self.l10n_nz_batch_particulars, 12),  # Originator Particulars
             self._get_string_within_limit(self.l10n_nz_batch_code, 12),  # Originator Analysis Code
@@ -250,7 +249,7 @@ class AccountBatchPayment(models.Model):
             self.l10n_nz_dd_info if is_inbound else '',  # Direct Debit Authority Number
             '',  # Spare
             '',  # Spare
-            self.journal_id.bank_account_id.acc_number.replace('-', '').replace(' ', ''),  # Bank number / Credit card number.
+            self.journal_id.bank_account_id.account_number.replace('-', '').replace(' ', ''),  # Bank number / Credit card number.
             '6' if is_inbound else '7',  # File type. 6 for direct debit, 7 for direct credit
             format_date(self.env, self.date, date_format='YYMMdd'),  # Due date
             format_date(self.env, fields.Date.context_today(self), date_format='YYMMdd'),  # File creation date. This date cannot be less than today's date.
@@ -352,7 +351,7 @@ class AccountBatchPayment(models.Model):
             '1',  # Sequence number
             company_account_details[0],  # Originating Bank. Technically should always be 03 (Westpac).
             company_account_details[1],  # Originating Branch
-            self._get_string_within_limit(self.journal_id.bank_account_id.acc_holder_name, 30),  # Customer Name
+            self._get_string_within_limit(self.journal_id.bank_account_id.holder_name, 30),  # Customer Name
             '',  # Customer Number - unused
             self._get_string_within_limit(self.l10n_nz_batch_reference, 20),  # Description
             format_date(self.env, self.date, date_format='ddMMYY'),  # Batch due date.
@@ -394,7 +393,7 @@ class AccountBatchPayment(models.Model):
 
         BNZ claims supporting 19 digits accounts, but I couldn't find any information on that format.
         """
-        sanitized_number = account.acc_number.replace('-', '').replace(' ', '')
+        sanitized_number = account.account_number.replace('-', '').replace(' ', '')
 
         if len(sanitized_number) == 15:
             return sanitized_number[:2], sanitized_number[2:6], sanitized_number[6:13], sanitized_number[13:15]
@@ -408,7 +407,7 @@ class AccountBatchPayment(models.Model):
                 'The supported formats are:\n'
                 'BBbbbbAAAAAAASS\n'
                 'BBbbbbAAAAAAASSS\n'
-                'BBbbbbAAAAAAAASSS', account.acc_number
+                'BBbbbbAAAAAAAASSS', account.account_number
             ))
 
     @api.model
@@ -458,20 +457,20 @@ class AccountBatchPayment(models.Model):
         # Particulars, codes and refs are always using the standard format, so we can format here right away.
         return {
             'company_party': {
-                'name': self.journal_id.bank_account_id.acc_holder_name,
+                'name': self.journal_id.bank_account_id.holder_name,
                 'particular': self._get_string_within_limit(company_particular, 12),
                 'code': self._get_string_within_limit(company_code, 12),
                 'ref': self._get_string_within_limit(payment.memo, 12, from_left=False),
                 'account': self.journal_id.bank_account_id,
-                'account_number': self.journal_id.bank_account_id.acc_number.replace('-', '').replace(' ', ''),
+                'account_number': self.journal_id.bank_account_id.account_number.replace('-', '').replace(' ', ''),
             },
             'other_party': {
-                'name': other_party_account.acc_holder_name,
+                'name': other_party_account.holder_name,
                 'particular': self._get_string_within_limit(other_particular, 12),
                 'code': self._get_string_within_limit(other_code, 12),
                 'ref': self._get_string_within_limit(payment.memo, 12, from_left=False),
                 'account': other_party_account,
-                'account_number': other_party_account.acc_number.replace('-', '').replace(' ', ''),
+                'account_number': other_party_account.account_number.replace('-', '').replace(' ', ''),
             },
         }
 

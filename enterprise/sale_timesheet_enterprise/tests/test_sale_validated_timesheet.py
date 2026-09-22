@@ -18,24 +18,25 @@ class TestSaleValidatedTimesheet(TestCommonSaleTimesheet):
                 4. log other timesheets
                 5. create a second invoice
     """
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
         # create SO
-        cls.sale_order = cls.env['sale.order'].with_context(tracking_disable=True).create({
+        cls.sale_order = cls.env['sale.order'].create({
             'company_id': cls.env.company.id,
             'partner_id': cls.partner_a.id,
             'partner_invoice_id': cls.partner_a.id,
             'partner_shipping_id': cls.partner_a.id,
         })
-        cls.ordered_so_line = cls.env['sale.order.line'].with_context(tracking_disable=True).create({
+        cls.ordered_so_line = cls.env['sale.order.line'].create({
             'product_id': cls.product_order_timesheet3.id,
             'product_uom_qty': 10,
             'order_id': cls.sale_order.id,
         })
-        cls.delivered_so_line = cls.env['sale.order.line'].with_context(tracking_disable=True).create({
+        cls.delivered_so_line = cls.env['sale.order.line'].create({
             'product_id': cls.product_delivery_timesheet3.id,
             'product_uom_qty': 10,
             'order_id': cls.sale_order.id,
@@ -43,7 +44,7 @@ class TestSaleValidatedTimesheet(TestCommonSaleTimesheet):
 
     def test_sale_validated_timesheet(self):
         # set invoiced_timesheet as "Approved timesheet only"
-        self.env['ir.config_parameter'].sudo().set_param('sale.invoiced_timesheet', 'approved')
+        self.env['ir.config_parameter'].sudo().set_str('sale.invoiced_timesheet', 'approved')
         #  confirm SO
         self.sale_order.action_confirm()
 
@@ -115,8 +116,8 @@ class TestSaleValidatedTimesheet(TestCommonSaleTimesheet):
         # check invoiced amount
         self.assertEqual(invoice1.amount_total, self.ordered_so_line.price_unit * 10 + self.delivered_so_line.price_unit * 6, 'Invoiced amount should be equal to Ordered SOL + Delivered SOL unit price * 6')
         # check timesheet is linked to invoice
-        self.assertEqual(delivered_timesheet1.timesheet_invoice_id, invoice1, "The delivered timesheet should be linked to the invoice")
-        self.assertFalse(ordered_timesheet1.timesheet_invoice_id, "The ordered timesheet should not be linked to the invoice, since we are in ordered quantity")
+        self.assertEqual(delivered_timesheet1.reinvoice_move_id, invoice1, "The delivered timesheet should be linked to the invoice")
+        self.assertFalse(ordered_timesheet1.reinvoice_move_id, "The ordered timesheet should not be linked to the invoice, since we are in ordered quantity")
 
         # check invoiced quantity on sale order and on invoice
         ordered_invoice_line = self.ordered_so_line.invoice_lines.filtered(lambda line: line.move_id == invoice1)
@@ -163,7 +164,7 @@ class TestSaleValidatedTimesheet(TestCommonSaleTimesheet):
 
         """
         # set invoiced_timesheet as "Approved timesheet only"
-        self.env['ir.config_parameter'].sudo().set_param('sale.invoiced_timesheet', 'approved')
+        self.env['ir.config_parameter'].sudo().set_str('sale.invoiced_timesheet', 'approved')
         #  confirm SO
         self.sale_order.action_confirm()
 
@@ -284,16 +285,16 @@ class TestSaleValidatedTimesheet(TestCommonSaleTimesheet):
 
     def test_create_invoice_for_past_validated_timesheet(self):
         self.env.user.group_ids += self.quick_ref('hr_timesheet.group_timesheet_manager')
-        self.env['ir.config_parameter'].sudo().set_param('sale.invoiced_timesheet', 'approved')
+        self.env['ir.config_parameter'].sudo().set_str('sale.invoiced_timesheet', 'approved')
         self.employee_user.timesheet_manager_id = self.user_manager_company_B
-        sale_order_2 = self.env['sale.order'].with_context(tracking_disable=True).create({
+        sale_order_2 = self.env['sale.order'].create({
             'company_id': self.env.company.id,
             'partner_id': self.partner_a.id,
             'partner_invoice_id': self.partner_a.id,
             'partner_shipping_id': self.partner_a.id,
         })
 
-        delivered_so_line = self.env['sale.order.line'].with_context(tracking_disable=True).create({
+        delivered_so_line = self.env['sale.order.line'].create({
             'product_id': self.product_delivery_timesheet3.id,
             'product_uom_qty': 10,
             'order_id': sale_order_2.id,

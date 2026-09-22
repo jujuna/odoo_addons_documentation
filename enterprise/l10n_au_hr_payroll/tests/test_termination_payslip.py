@@ -44,9 +44,13 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             'casual_loading': 0,
         })
         # Gives four day of leaves to the employee.
+        self.annual_work_entry_type.l10n_au_work_entry_type = 'annual'
+        self.annual_work_entry_type.unit_of_measure = 'day'
+
         self.env['hr.leave.allocation'].create([{
             'name': 'Paid Time Off 2023-24',
-            'holiday_status_id': self.annual_leave_type.id,
+            'work_entry_type_id': self.annual_work_entry_type.id,
+            'type_request_unit': 'day',
             'number_of_days': 5,
             'employee_id': employee.id,
             'state': 'confirm',
@@ -57,18 +61,14 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
         leave = self.env['hr.leave'].create({
             'name': 'Holiday Request',
             'employee_id': employee.id,
-            'holiday_status_id': self.annual_leave_type.id,
+            'work_entry_type_id': self.annual_work_entry_type.id,
             'request_date_from': date(2023, 7, 6),
             'request_date_to': date(2023, 7, 7),
         })
         leave.action_approve(check_state=False)
-        # Regenerate work entries
-        self.env['hr.work.entry'].search([('employee_id', '=', employee.id)]).unlink()
+
         payslip_date = date(2023, 7, 3)
         payslip_end_date = date(2023, 7, 9)
-        work_entries = contract.generate_work_entries(payslip_date, payslip_end_date)
-        work_entries.action_validate()
-
         # This would be done by the wizard.
         contract.date_end = date(2023, 7, 9)
 
@@ -77,8 +77,8 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 3, 22.8, 830.83),
-                (self.work_entry_types['AU.PT'].id, 2, 15.2, 650.82),
+                (self.work_entry_types['002.00'].id, 3, 22.8, 830.83),
+                (self.work_entry_types['AU.AL'].id, 2, 15.2, 650.82),
             ],
             expected_lines=[
                 # (code, total)
@@ -101,7 +101,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 162.98),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id,
                 'amount': 250,
             }],
             payslip_date_from=payslip_date,
@@ -131,7 +131,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -154,7 +154,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_genuine_redundancy').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_genuine_redundancy').id,
                 'amount': 120000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -184,7 +184,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -207,7 +207,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_early_retirement_scheme').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_early_retirement_scheme').id,
                 'amount': 120000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -237,7 +237,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -260,7 +260,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_harassment').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_harassment').id,
                 'amount': 50000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -290,7 +290,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -313,7 +313,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id,
                 'amount': 120000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -346,7 +346,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -369,7 +369,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_golden_handshake').id,
                 'amount': 200000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -400,7 +400,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 9645.92),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 9645.92),
             ],
             expected_lines=[
                 # (code, total)
@@ -423,7 +423,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 1061.05),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_discrimination').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_discrimination').id,
                 'amount': 250000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -454,7 +454,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -477,7 +477,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 1445.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_in_lieu_of_notice').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_in_lieu_of_notice').id,
                 'amount': 7000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -508,7 +508,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -531,7 +531,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
                 'amount': 120000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -562,7 +562,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -585,7 +585,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_personal_injury').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_personal_injury').id,
                 'amount': 120000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -617,7 +617,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -640,7 +640,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
                 'amount': 170000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -671,7 +671,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -694,7 +694,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_personal_injury').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_personal_injury').id,
                 'amount': 250000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -725,7 +725,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -747,7 +747,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
                 'amount': 15000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -778,7 +778,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -801,7 +801,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
                 'amount': 15000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),
@@ -831,7 +831,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 19.0, 144.4, 6138.44),
+                (self.work_entry_types['002.00'].id, 19.0, 144.4, 6138.44),
             ],
             expected_lines=[
                 # (code, total)
@@ -853,7 +853,7 @@ class TestPayrollTerminationPayment(TestPayrollCommon):
                 ('SUPER', 675.23),
             ],
             input_lines=[{
-                'input_type_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
+                'salary_rule_id': self.env.ref('l10n_au_hr_payroll.input_non_genuine_redundancy').id,
                 'amount': 15000,
             }],
             payslip_date_from=fields.Date.to_date('2024-02-01'),

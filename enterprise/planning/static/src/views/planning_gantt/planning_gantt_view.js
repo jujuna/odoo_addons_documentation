@@ -1,6 +1,7 @@
 import { registry } from "@web/core/registry";
 import { ganttView } from "@web_gantt/gantt_view";
 import { PlanningGanttController } from "./planning_gantt_controller";
+import { PlanningGanttArchParser } from "./planning_gantt_arch_parser";
 import { PlanningGanttModel } from "./planning_gantt_model";
 import { PlanningGanttRenderer } from "./planning_gantt_renderer";
 import { PlanningSearchModel } from "../planning_search_model";
@@ -11,6 +12,7 @@ export const planningGanttView = {
     ...ganttView,
     SearchModel: PlanningSearchModel,
     Controller: PlanningGanttController,
+    ArchParser: PlanningGanttArchParser,
     Renderer: PlanningGanttRenderer,
     Model: PlanningGanttModel,
     buttonTemplate: "planning.PlanningGanttView.Buttons",

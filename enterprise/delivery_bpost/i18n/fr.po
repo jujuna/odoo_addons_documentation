@@ -7,15 +7,16 @@
 # Jolien De Paepe, 2023
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-15 09:12+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 03:20+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "delivery_bpost/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +24,20 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_bpost
+#: model:ir.module.module,description:base.module_delivery_bpost
+msgid ""
+"\n"
+"Send your shippings through bpost and track them online\n"
+"=======================================================\n"
+"\n"
+"Companies located in Belgium can take advantage of shipping with the\n"
+"local Post company.\n"
+"\n"
+"See: https://www.bpost.be/portal/goHome\n"
+msgstr ""
 
 #. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_label_stock_type__a4
@@ -118,6 +132,11 @@ msgid "DOCUMENTS"
 msgstr "DOCUMENTS"
 
 #. module: delivery_bpost
+#: model:ir.model,name:delivery_bpost.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "Mode de livraison"
+
+#. module: delivery_bpost
 #: model:ir.model.fields,field_description:delivery_bpost.field_delivery_carrier__bpost_saturday
 msgid "Delivery on Saturday"
 msgstr "Livraison le samedi"
@@ -137,6 +156,11 @@ msgstr "Nom d'affichage"
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_delivery_nature__domestic
 msgid "Domestic"
 msgstr "National"
+
+#. module: delivery_bpost
+#: model_terms:ir.ui.view,arch_db:delivery_bpost.bpost_shipping_request
+msgid "EUR"
+msgstr "EUR"
 
 #. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_shipment_type__gift
@@ -207,6 +231,26 @@ msgid "Please provide at least one item to ship."
 msgstr "Veuillez fournir au moins un article à expédier."
 
 #. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing a Country of Origin, which is required for "
+"international shipping."
+msgstr ""
+"Le produit [%s] n’a pas de pays d’origine défini, ce qui est requis pour les "
+"expéditions internationales."
+
+#. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing an HS Code, which is required for international "
+"shipping."
+msgstr ""
+"Le produit [%s] n’a pas de code SH, ce qui est requis pour les expéditions "
+"internationales."
+
+#. module: delivery_bpost
 #: model:ir.model.fields,field_description:delivery_bpost.field_delivery_carrier__delivery_type
 msgid "Provider"
 msgstr "Fournisseur"
@@ -249,11 +293,6 @@ msgstr "L'expédition #%s a été annulée"
 #: code:addons/delivery_bpost/models/delivery_bpost.py:0
 msgid "Shipment created into bpost"
 msgstr "Envoi créé dans Bpost"
-
-#. module: delivery_bpost
-#: model:ir.model,name:delivery_bpost.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Modes d'expédition"
 
 #. module: delivery_bpost
 #: model:ir.model,name:delivery_bpost.model_stock_package_type
@@ -308,8 +347,8 @@ msgid ""
 "The recipient address is incomplete or wrong (Missing field(s):  \n"
 " %s)"
 msgstr ""
-"L’adresse du destinataire est incomplète ou erronée (champ(s) "
-"manquant(s) : \n"
+"L’adresse du destinataire est incomplète ou erronée (champ(s) manquant(s) : "
+"\n"
 "%s)"
 
 #. module: delivery_bpost
@@ -413,13 +452,15 @@ msgstr ""
 "l’extérieur de la Belgique. Changez le mode de livraison en bpost Domestic."
 
 #. module: delivery_bpost
-#: model_terms:ir.ui.view,arch_db:delivery_bpost.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_bpost.res_config_settings_view_form_stock
-msgid "bpost Shipping Methods"
-msgstr "Modes d'expédition Bpost"
+#: model:ir.module.module,shortdesc:base.module_delivery_bpost
+msgid "bpost Shipping"
+msgstr ""
 
 #. module: delivery_bpost
 #. odoo-python
 #: code:addons/delivery_bpost/models/bpost_request.py:0
 msgid "bpost did not return prices for this destination country."
 msgstr "Bpost n’a pas indiqué de frais de retour pour ce pays de destination."
+
+msgid "bpost Delivery Methods"
+msgstr "Modes de livraison bpost"

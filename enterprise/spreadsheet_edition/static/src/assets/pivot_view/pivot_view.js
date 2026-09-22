@@ -58,6 +58,13 @@ patch(PivotRenderer.prototype, {
         const { xml_id } = actionId
             ? await this.actionService.loadAction(actionId, this.env.searchModel.context)
             : {};
+        const context = omit(
+            this.model.searchParams.context,
+            ...Object.keys(user.context),
+            "pivot_measures",
+            "pivot_row_groupby",
+            "pivot_column_groupby"
+        )
 
         const actionOptions = {
             preProcessingAsyncAction: "insertPivot",
@@ -66,13 +73,7 @@ patch(PivotRenderer.prototype, {
                 searchParams: {
                     ...this.model.searchParams,
                     domain: this.env.searchModel.domainString,
-                    context: omit(
-                        this.model.searchParams.context,
-                        ...Object.keys(user.context),
-                        "pivot_measures",
-                        "pivot_row_groupby",
-                        "pivot_column_groupby"
-                    ),
+                    context,
                 },
                 colGroupTree: this.model.data.colGroupTree,
                 name,
@@ -83,6 +84,7 @@ patch(PivotRenderer.prototype, {
             type: "PIVOT",
             name,
             actionOptions,
+            context,
         };
         this.env.services.dialog.add(SpreadsheetSelectorDialog, params);
     },

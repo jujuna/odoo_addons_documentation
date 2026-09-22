@@ -1,4 +1,5 @@
-import { expect, test } from "@odoo/hoot";
+import { expect, resize, test } from "@odoo/hoot";
+import { advanceTime } from "@odoo/hoot-mock";
 
 import {
     click,
@@ -31,11 +32,32 @@ const getOptionMockResponse = {
     "report_id": 14,
     "date": {
         "string": "2025",
-        "period_type": "fiscalyear",
-        "mode": "range",
+        "period_type": "year",
         "date_from": "2025-01-01",
         "date_to": "2025-12-31",
-        "filter": "this_year"
+        "default_opening_date": "this_year"
+    },
+    "filter_date": {
+        "filters": {
+            "month": {
+                "key": "month",
+                "start_day": 1,
+                "start_month": 1,
+                "months_per_period": 1,
+            },
+            "quarter": {
+                "key": "quarter",
+                "start_day": 1,
+                "start_month": 1,
+                "months_per_period": 3,
+            },
+            "year": {
+                "key": "year",
+                "start_day": 1,
+                "start_month": 1,
+                "months_per_period": 12,
+            },
+        }
     },
     "available_horizontal_groups": [],
     "selected_horizontal_group_id": null,
@@ -54,10 +76,7 @@ const getOptionMockResponse = {
     "unreconciled": false,
     "rounding_unit": "decimals",
     "rounding_unit_names": {
-        "decimals": [
-            ".$",
-            ""
-        ],
+        "decimals": ".$",
     },
     "search_bar": false,
     "unfold_all": false,
@@ -66,7 +85,7 @@ const getOptionMockResponse = {
     "columns": [
         {
             "name": "A column",
-            "column_group_key": "some_key",
+            "column_group_index": 0,
             "expression_label": "a_column",
             "sortable": false,
             "figure_type": "string",
@@ -74,17 +93,17 @@ const getOptionMockResponse = {
             "style": ""
         },
     ],
-    "column_groups": {"some_key": {"forced_options": {}, "forced_domain": []}
+    "column_groups": {0: {"forced_options": {}, "forced_domain": []}
     },
     "custom_display_config": {},
     "filters": {},
     "user_groups": {},
-}
+};
 
 const getReportInformationMockResponse = {
     "caret_options": {},
     "column_headers_render_data": {"level_colspan": [1], "level_repetitions": [1], "custom_subheaders": []},
-    "column_groups_totals": {"some_key": {}},
+    "column_groups_totals": {0: {}},
     "context": {},
     "annotations": {},
     "lines": [
@@ -95,7 +114,7 @@ const getReportInformationMockResponse = {
                 {
                     "auditable": false,
                     "blank_if_zero": false,
-                    "column_group_key": "some_key",
+                    "column_group_index": 0,
                     "currency": null,
                     "currency_symbol": "",
                     "digits": 1,
@@ -119,7 +138,7 @@ const getReportInformationMockResponse = {
     ],
     "warnings": {},
     "report": { "company_name": "YourCompany", "company_country_code": "US", "company_currency_symbol": "$", "name": "A report", "root_report_id": "account.report()"}
-}
+};
 
 const getExpandedLinesMockResponse = [
     {
@@ -130,7 +149,7 @@ const getExpandedLinesMockResponse = [
             {
                 "auditable": false,
                 "blank_if_zero": false,
-                "column_group_key": "some_key",
+                "column_group_index": 0,
                 "currency": null,
                 "currency_symbol": "$",
                 "digits": 1,
@@ -155,7 +174,7 @@ const getExpandedLinesMockResponse = [
             {
                 "auditable": false,
                 "blank_if_zero": false,
-                "column_group_key": "some_key",
+                "column_group_index": 0,
                 "currency": null,
                 "currency_symbol": "$",
                 "digits": 1,
@@ -172,7 +191,7 @@ const getExpandedLinesMockResponse = [
         ],
         "level": 3
     },
-]
+];
 
 
 test("Test unfold loaded line", async() => {
@@ -188,11 +207,11 @@ test("Test unfold loaded line", async() => {
                 mockRpcReport.getExpandedLineCallCount = (mockRpcReport.getExpandedLineCallCount || 0) + 1;
                 return getExpandedLinesMockResponse;
             }
-            if (method === "get_annotations") {
+            if (method === "get_annotations_from_client") {
                 return [];
             }
         }
-    };
+    }
     onRpc(mockRpcReport);
 
     await mountWithCleanup(WebClient);
@@ -244,4 +263,94 @@ test("can execute account report download actions", async function () {
     });
 
     expect.verifySteps(["/account_reports"]);
+});
+
+test("make sure the virtual grid is somewhat working", async () => {
+    async function mockRpcReport({ method, model }) {
+        if (model === 'account.report') {
+            if (method === 'get_options') {
+                return getOptionMockResponse;
+            }
+            if (method === 'get_report_information') {
+                return getReportInformationMockResponse;
+            }
+            if (method === 'get_expanded_lines') {
+                // duplicate the lines 100 times to get 200 lines so the scrolling has some effect.
+                return getExpandedLinesMockResponse.flatMap(line => {
+                    const copies = [];
+                    for (let i = 0; i < 100; i++) {
+                        copies.push({
+                            ...line,
+                            id: line.id + "_" + i,
+                            name: line.name + " " + i,
+                        });
+                    }
+                    return copies;
+                });
+            }
+            if (method === "get_annotations_from_client") {
+                return [];
+            }
+        }
+    }
+    onRpc(mockRpcReport);
+
+    await mountWithCleanup(WebClient);
+    await getService("action").doAction({
+        type: "ir.actions.client",
+        tag: "account_report",
+        params: {},
+    });
+
+    await click(".btn_foldable");
+    await contains(".unfolded", { count: 1 });
+    expect(document.querySelectorAll('tr[data-id="line"]').length).toBeLessThan(100, { message: "should not have rendered all the lines of the report" });
+    expect(':nth-child(1 of tr:not(.o_hidden)[data-id="line"])').toHaveText("A partner");
+    await contains(':nth-child(2 of tr:not(.o_hidden)[data-id="line"])');
+
+    // prevent the window size to be the height of the table.
+    await resize({ height: 800 });
+    // wait for the resize event to fire, and the virtual grid to recompute (500 should be enough as it takes ~50ms in reality)
+    await advanceTime(500, { animationFrame: true });
+
+    let scrollContainer = document.querySelector(".o_account_report_scroll_container");
+    if ((await getService("ui")).isSmall) {
+        // On mobile, the scroll container changes since the layout change.
+        scrollContainer = document.querySelector(".account_report");
+    }
+    const tbody = scrollContainer.querySelector("tbody");
+    const topSpacer = tbody.querySelector("tr:first-child");
+    const bottomSpacer = tbody.querySelector("tr:last-child");
+    const getSpacerHeight = (el) => parseFloat(el.style.height) || 0;
+
+    expect(getSpacerHeight(topSpacer)).toBe(0, { message: "top spacer should be 0 at scroll top" });
+    expect(getSpacerHeight(bottomSpacer)).toBeGreaterThan(0, { message: "bottom spacer should account for unrendered lines below" });
+
+    scrollContainer.scrollTop = document.querySelector(':nth-last-child(1 of tr:not(.o_hidden)[data-id="line"])').offsetTop;
+    await advanceTime(500, { animationFrame: true });
+    expect(':nth-child(1 of tr:not(.o_hidden)[data-id="line"])').not.toHaveText("A partner");
+    expect(':nth-last-child(1 of tr:not(.o_hidden)[data-id="line"])').not.toHaveText("second move line 99 second value");
+
+    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    await advanceTime(500, { animationFrame: true });
+    expect(':nth-last-child(1 of tr:not(.o_hidden)[data-id="line"])').toHaveText("second move line 99 second value");
+
+    expect(getSpacerHeight(topSpacer)).toBeGreaterThan(0, { message: "top spacer should account for unrendered lines above" });
+    expect(getSpacerHeight(bottomSpacer)).toBe(0, { message: "bottom spacer should be 0 at scroll bottom" });
+
+    // Record the DOM rows at the bottom to verify they are reused (not recreated) when scrolling back up.
+    const rowsAtBottom = [...document.querySelectorAll('tr[data-id="line"]')];
+
+    scrollContainer.scrollTop = 0;
+    await advanceTime(500, { animationFrame: true });
+    expect(':nth-child(1 of tr:not(.o_hidden)[data-id="line"])').toHaveText("A partner");
+    expect(':nth-last-child(1 of tr:not(.o_hidden)[data-id="line"])').not.toHaveText("second move line 99 second value");
+
+    // The virtual grid reuses existing DOM rows rather than destroying and recreating them.
+    const rowsAtTop = [...document.querySelectorAll('tr[data-id="line"]')];
+    expect(rowsAtTop.length).toBe(rowsAtBottom.length, { message: "scrolling should not create or destroy DOM rows" });
+    const rowsAtTopSet = new Set(rowsAtTop);
+    for (const row of rowsAtBottom) {
+        expect(rowsAtTopSet.has(row)).toBe(true, { message: "every DOM row from the bottom should still be present at the top" });
+    }
 });

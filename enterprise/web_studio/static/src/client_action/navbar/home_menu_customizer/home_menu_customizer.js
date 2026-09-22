@@ -2,7 +2,7 @@ import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
-import { browser } from "@web/core/browser/browser";
+import { location } from "@web/core/browser/browser";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { FileInput } from "@web/core/file_input/file_input";
 
@@ -10,7 +10,6 @@ import { Component } from "@odoo/owl";
 
 export class HomeMenuCustomizer extends Component {
     static template = "web_studio.HomeMenuCustomizer";
-    static props = {};
     static components = { FileInput };
 
     setup() {
@@ -62,7 +61,7 @@ export class HomeMenuCustomizer extends Component {
             await rpc("/web_studio/reset_background_image", {
                 context: user.context,
             });
-            browser.location.reload();
+            location.reload();
         } finally {
             this.ui.unblock();
         }
@@ -86,7 +85,7 @@ export class HomeMenuCustomizer extends Component {
             this.ui.block();
             try {
                 await this.setBackgroundImage(file.id);
-                browser.location.reload();
+                location.reload();
             } finally {
                 this.ui.unblock();
             }

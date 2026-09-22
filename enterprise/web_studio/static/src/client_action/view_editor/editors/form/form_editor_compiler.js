@@ -46,6 +46,11 @@ export class FormEditorCompiler extends formView.Compiler {
 
         const compiled = super.compile(key, params);
 
+        const root = compiled.firstElementChild;
+        if (root && !params.isSubView) {
+            root.setAttribute("t-ref", "__comp__.rootRef");
+        }
+
         const sheetBg = compiled.querySelector(".o_form_sheet_bg");
         if (sheetBg) {
             let studioHook;
@@ -88,10 +93,16 @@ export class FormEditorCompiler extends formView.Compiler {
 
         const fieldStatus = compiled.querySelector(`Field[type="'statusbar'"]`); // change selector at some point
         if (!fieldStatus) {
-            const addStatusBar = !compiled.querySelector(".o_form_statusbar");
-            const statusBarFieldHook = createElement("StatusBarFieldHook", { addStatusBar });
-            const el = compiled.querySelector(".o_form_sheet_bg") || compiled;
-            el.prepend(statusBarFieldHook);
+            const statusBarEl = compiled.querySelector(".o_form_statusbar");
+            const statusBarFieldHook = createElement("StatusBarFieldHook", {
+                addStatusBar: !statusBarEl,
+            });
+            if (statusBarEl) {
+                statusBarEl.append(statusBarFieldHook);
+            } else {
+                const parent = compiled.querySelector(".o_form_sheet_bg") || compiled;
+                parent.prepend(statusBarFieldHook);
+            }
         }
 
         // the button box is included in the control panel, which is not visible in Studio
@@ -107,17 +118,16 @@ export class FormEditorCompiler extends formView.Compiler {
             buttonBox = this.compileNode(buttonBoxXml, params);
         } else {
             buttonBox = createElement("ButtonBox");
+            buttonBox.setAttribute("addButtonBox", !buttonBoxXml);
+            const fakeSlot = createElement("t", {
+                "t-set-slot": "fake",
+                isVisible: "false",
+                studio_fake_slot: "true",
+            });
+            buttonBox.append(fakeSlot);
         }
         const el = compiled.querySelector(".o_form_sheet_bg") || compiled;
         el.prepend(buttonBox);
-
-        const buttonHook = createElement(
-            "t",
-            [createElement("ButtonHook", { add_buttonbox: !buttonBoxXml })],
-            { "t-set-slot": `slot_button_hook` }
-        );
-
-        buttonBox.insertAdjacentElement("afterbegin", buttonHook);
 
         // Note: the ribon does not allow to remove an existing avatar!
         const title = compiled.querySelector(".oe_title");
@@ -264,6 +274,35 @@ export class FormEditorCompiler extends formView.Compiler {
                 this.chatterData.remove_follower_ids = true;
             } else if (name === "activity_ids") {
                 this.chatterData.remove_activity_ids = true;
+            }
+        }
+        return compiled;
+    }
+
+    compileHeader(node, params = {}) {
+        const compiled = super.compileHeader(node, params);
+        const statusBarButtons = compiled.querySelector("StatusBarButtons");
+        for (const el of statusBarButtons.children) {
+            if ((el.getAttribute("t-set-slot") || "").startsWith("button_")) {
+                let hasButtons = false;
+                for (const viewButton of el.querySelectorAll("ViewButton")) {
+                    hasButtons = true;
+                    const xpath = viewButton.getAttribute("studioXpath");
+                    let hook = createElement("StudioHook", {
+                        xpath,
+                        position: "'before'",
+                        type: "'statusbar_button'",
+                        ref: "scope.hooksRef",
+                        hookId: "scope.hookId",
+                    });
+                    viewButton.insertAdjacentElement("beforebegin", hook);
+                    hook = hook.cloneNode(true);
+                    hook.setAttribute("position", "'after'");
+                    viewButton.insertAdjacentElement("afterend", hook);
+                }
+                if (hasButtons) {
+                    el.setAttribute("t-slot-scope", "scope");
+                }
             }
         }
         return compiled;

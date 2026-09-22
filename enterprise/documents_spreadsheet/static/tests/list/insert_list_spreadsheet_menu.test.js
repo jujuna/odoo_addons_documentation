@@ -218,5 +218,5 @@ test("Rows of list multi-lines fields are auto-resized", async function () {
 
     const model = getSpreadsheetActionModel(spreadsheetAction);
     const sheetId = model.getters.getActiveSheetId();
-    expect(model.getters.getRowSize(sheetId, 1)).toBe(70);
+    expect(model.getters.getRowSize(sheetId, 1)).toBe(78);
 });

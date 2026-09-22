@@ -40,7 +40,7 @@ import { DocumentsDocument, SpreadsheetTemplate } from "./data";
 async function createSpreadsheetAction(actionTag, params) {
     const SpreadsheetActionComponent =
         actionTag === "action_open_spreadsheet" ? SpreadsheetAction : SpreadsheetTemplateAction;
-    const { webClient } = params;
+    let { webClient } = params;
     /** @type {any} */
     let spreadsheetAction;
     patchWithCleanup(SpreadsheetActionComponent.prototype, {
@@ -52,7 +52,7 @@ async function createSpreadsheetAction(actionTag, params) {
     if (!webClient) {
         await prepareWebClientForSpreadsheet();
         await makeDocumentsSpreadsheetMockEnv(params);
-        await mountWithCleanup(WebClient);
+        webClient = await mountWithCleanup(WebClient);
     }
     await getService("action").doAction(
         {

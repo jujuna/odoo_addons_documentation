@@ -2,38 +2,39 @@
 <templates>
 
 <t t-name="web_studio.ModelConfigurator">
-    <div t-attf-class="{{ props.embed ? 'embed': 'p-3' }}">
+    <div t-attf-class="{{ this.props.embed ? 'embed': 'p-3' }}">
         <div class="row">
-            <div t-foreach="options" t-as="option" t-key="option" class="col-6">
+            <div t-foreach="this.options" t-as="option" t-key="option" class="col-6">
                 <div class="form-check my-3 o_web_studio_model_configurator_option">
-                    <input type="checkbox" class="form-check-input" t-att-id="option" t-att-name="option" t-model="option_value.value"/>
+                    <input type="checkbox" class="form-check-input" t-att-id="option" t-att-name="option" t-model.proxy="option_value.value"/>
                     <label t-att-for="option" class="form-check-label ps-2 border-start">
-                        <strong t-esc="option_value.label"/>
-                        <div class="form-text text-muted" t-esc="option_value.help"/>
+                        <strong t-out="option_value.label"/>
+                        <div class="form-text text-muted" t-out="option_value.help"/>
                     </label>
                 </div>
             </div>
         </div>
         <div class="o_web_studio_model_configurator_buttons d-flex justify-content-between pt-3">
             <button type="button"
-                class="o_web_studio_model_configurator_previous btn oi oi-chevron-left rounded px-3 py-1 border text-muted"
-                t-att-class="{ disabled: state.saving }"
+                class="oi o_web_studio_model_configurator_previous btn rounded px-3 py-1 border text-muted" data-icon="chevron_backward"
+                t-att-class="{ disabled: this.state.saving }"
                 aria-label="Previous"
                 title="Previous"
-                t-on-click="props.onPrevious"
+                t-on-click="this.props.onPrevious"
             />
             <button type="button"
                 class="o_web_studio_model_configurator_next btn rounded px-3 py-1 btn-primary"
-                t-att-class="{ disabled: state.saving }"
+                t-att-class="{ disabled: this.state.saving }"
                 aria-label="Next"
                 title="Next"
-                t-on-click="onConfirm"
-                t-att-disabled="state.saving"
+                t-on-click="this.onConfirm"
+                t-att-disabled="this.state.saving"
             >
-                <span class="pe-2" t-esc="props.label"/>
+                <span class="pe-2" t-out="this.props.label"/>
                 <i
-                    class="fa oi"
-                    t-att-class="{'oi-chevron-right': !state.saving, 'fa-circle-o-notch': state.saving, 'fa-spin': state.saving}"
+                    class="oi"
+                    t-att-data-icon="this.state.saving ? 'autorenew' : 'chevron_forward'"
+                    t-att-class="{ 'oi-spin': this.state.saving }"
                 />
             </button>
         </div>
@@ -42,7 +43,7 @@
 
 <t t-name="web_studio.ModelConfiguratorDialog" >
     <Dialog title.translate="Suggested features for your new model" footer="false" contentClass="'o_web_studio_model_configurator'">
-        <ModelConfigurator embed="true" onConfirmOptions.bind="onConfirm" label="props.confirmLabel" onPrevious.bind="onPrevious"/>
+        <ModelConfigurator embed="true" onConfirmOptions.bind="this.onConfirm" label="this.props.confirmLabel" onPrevious.bind="this.onPrevious"/>
     </Dialog>
 </t>
 

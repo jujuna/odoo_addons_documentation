@@ -54,7 +54,7 @@ registry.category("web_tour.tours").add("spreadsheet_clone_xlsx", {
             run: "click",
         },
         {
-            trigger: "input#willArchive",
+            trigger: 'div[name="archive_document"] input[type="checkbox"]',
             content: "Uncheck sending to trash",
             run: "click",
         },
@@ -96,14 +96,8 @@ registry.category("web_tour.tours").add("spreadsheet_clone_xlsx", {
             run: "click",
         },
         {
-            trigger: ".o_kanban_renderer:not(:has(.o_kanban_record .o_document_xlsx))",
             content: "Check that XLSX is no longer visible",
-            run: function () {
-                const elements = document.querySelectorAll(".o_document_xlsx").length;
-                if (elements) {
-                    console.error(`${elements} elements found.`);
-                }
-            },
+            trigger: ".o_kanban_renderer:not(:has(.o_kanban_record .o_document_xlsx))",
         },
     ],
 });

@@ -3,11 +3,9 @@ import { registry } from "@web/core/registry";
 const today = luxon.DateTime.now();
 
 registry.category("web_tour.tours").add('planning_test_tour', {
-    url: '/odoo',
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Let's start managing your employees' schedule!",
-    tooltipPosition: 'bottom',
     run: "click",
 }, {
     trigger: ".o_gantt_button_add",
@@ -15,7 +13,7 @@ registry.category("web_tour.tours").add('planning_test_tour', {
     id: 'project_planning_start',
     run: "click",
 }, {
-    trigger: ".o_field_widget[name='resource_id'] input",
+    trigger: ".o_field_widget[name='resource_ids'] input",
     content: markup("Assign this shift to your <b>resource</b>, or leave it open for the moment."),
     run: "edit Aaron",
 }, {
@@ -47,10 +45,6 @@ registry.category("web_tour.tours").add('planning_test_tour', {
     content: "Set end datetime",
     run: `edit ${today.toFormat("MM/dd/yyyy")} 11:59`,
 }, {
-    trigger: "button[name='action_save_template']",
-    content: "Save this shift as a template",
-    run: "click",
-}, {
     trigger: "button[special='save']:enabled",
     content: "Save this shift once it is ready.",
     run: "click",
@@ -69,10 +63,36 @@ registry.category("web_tour.tours").add('planning_test_tour', {
         }
     }
 }, {
+    trigger: ".o_gantt_pill :contains('11:59')",
+    content: "Open the slot preview",
+    run: "click",
+}, {
+    trigger: "button:contains('Edit')",
+    content: "Edit the slot",
+    run: "click",
+}, {
+    trigger: "button[aria-label='Expand']",
+    content: "Open the slot's full view",
+    run: "click",
+}, {    //wait for the page to load before clicking the cogwheel
+    trigger: ".o_pager_counter",
+    content: "Wait for the full view to load",
+}, {
+    trigger: ".o_control_panel .o_cp_action_menus .dropdown-toggle",
+    content: "Open the cog action menu",
+    run: "click",
+}, {
+    trigger: "span:contains('Save Template')",
+    content: "Save the slot as a template",
+    run: "click",
+}, {
+    trigger: ".breadcrumb-item",
+    content: "go back to gantt view",
+    run: "click",
+}, {
     isActive: ["mobile"],
     trigger: ".o_control_panel .dropdown-toggle",
     content: "Share the schedule with your team by publishing and sending it. Open the menu to access this option.",
-    tooltipPosition: "top",
     run: "click",
 }, {
     trigger: ".o_gantt_button_send_all",
@@ -83,6 +103,10 @@ registry.category("web_tour.tours").add('planning_test_tour', {
     content: markup("<b>Publish & send</b> your planning to make it available to your employees."),
     run: "click",
 }, {
+    trigger: "button[name='action_send']",
+    content: markup("<b>Save & Send Schedule</b>"),
+    run: "click",
+}, {
     isActive: ["auto"],
     trigger: ".o_gantt_row_header:contains('Aaron') .o_gantt_progress_bar",
     content: "See employee progress bar",
@@ -90,19 +114,17 @@ registry.category("web_tour.tours").add('planning_test_tour', {
         if (this.anchor.querySelector("span").style.width === '') {
             console.error("Progress bar should be displayed");
         }
-        if (!this.anchor.classList.contains("o_gantt_group_success")) {
+        if (!this.anchor.querySelector("span.bg-success")) {
             console.error("Progress bar should be displayed in success");
         }
     }
 }, {
     trigger: ".o_control_panel .dropdown-toggle",
     content: "Plan your shifts in one click by copying the schedule from the previous week. Open the menu to access this option.",
-    tooltipPosition: "top",
     run: "click",
 }, {
     trigger: ".o_gantt_button_copy_previous_week",
     content: "Copy previous week if you want to follow previous week planning schedule",
-    tooltipPosition: "right",
     run: 'click',
 }, {
     id: "planning_check_format_step",
@@ -111,12 +133,10 @@ registry.category("web_tour.tours").add('planning_test_tour', {
 }, {
     trigger: ".o_control_panel .dropdown-toggle",
     content: "Automatically match open shifts and sales orders to the right people, taking into account their working hours, roles, availability, and time off. Open the menu to access this option.",
-    tooltipPosition: "top",
     run: "click",
 }, {
     trigger: ".o_gantt_button_auto_plan",
     content: "Click on Auto Plan button to assign open shifts to employees",
-    tooltipPosition: "right",
     run: 'click',
 }, {
     id: "planning_check_format_step",
@@ -125,11 +145,9 @@ registry.category("web_tour.tours").add('planning_test_tour', {
 }]});
 
 registry.category("web_tour.tours").add('planning_test_tour_no_email', {
-    url: '/odoo',
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Open the planning app, should land in the gantt view",
-    tooltipPosition: 'bottom',
     run: "click",
 }, {
     trigger: ".o_gantt_button_send_all",
@@ -149,7 +167,7 @@ registry.category("web_tour.tours").add('planning_test_tour_no_email', {
     content: "Click on the shift of Aaron",
     run: "click",
 }, {
-    trigger: ".popover-footer button",
+    trigger: ".o_popover_footer button",
     content: "Click on the 'Edit' button in the popover",
     run: "click",
 }, {
@@ -162,10 +180,13 @@ registry.category("web_tour.tours").add('planning_test_tour_no_email', {
 },]});
 
 registry.category("web_tour.tours").add('planning_shift_switching_backend', {
-    url: '/odoo',
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Get in the planning app",
+    run: "click",
+}, {
+    trigger: '.o_switch_view.o_gantt',
+    content: "Switch to Gantt view",
     run: "click",
 }, {
     trigger: '.o_gantt_pill :contains("test_role")',
@@ -173,11 +194,12 @@ registry.category("web_tour.tours").add('planning_shift_switching_backend', {
     run: "click",
 },
 {
-    trigger: ".popover-footer button",
+    trigger: ".o_popover_footer button",
     content: "Click on the 'Edit' button in the popover",
     run: 'click',
 },
 {
+    id: "click_action_switch_shift",
     trigger: 'button[name="action_switch_shift"]',
     content: "Click on the 'Switch Shift' button on the Gantt Form view modal",
     run: "click",
@@ -187,15 +209,16 @@ registry.category("web_tour.tours").add('planning_shift_switching_backend', {
     run: "click",
 },
 {
-    trigger: ".popover-footer button",
+    trigger: ".o_popover_footer button",
     content: "Click again on the 'Edit' button in the popover",
     run: 'click',
 },
 {
-    trigger: '.alert-warning:contains("The employee assigned would like to switch shifts with someone else.")',
+    trigger: '.alert-warning:contains("bert is looking for a replacement")',
     content: "Check that the warning has been shown",
     run: "click",
 }, {
+    id: "close_form_in_gantt",
     trigger: '.btn-close',
     content: "Click on the close button to hide the shift form modal",
     run: "click",
@@ -204,7 +227,6 @@ registry.category("web_tour.tours").add('planning_shift_switching_backend', {
 }]});
 
 registry.category("web_tour.tours").add('planning_assigning_unwanted_shift_backend', {
-    url: '/odoo',
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Get in the planning app",
@@ -215,12 +237,12 @@ registry.category("web_tour.tours").add('planning_assigning_unwanted_shift_backe
     run: "click",
 },
 {
-    trigger: ".popover-footer button",
+    trigger: ".o_popover_footer button",
     content: "Click on the 'Edit' button in the popover",
     run: 'click',
 },
 {
-    trigger: ".o_field_widget[name='resource_id'] input",
+    trigger: ".o_field_widget[name='resource_ids'] input",
     content: "Assign this shift to another employee.",
     run: "edit bety",
 }, {
@@ -228,6 +250,15 @@ registry.category("web_tour.tours").add('planning_assigning_unwanted_shift_backe
     trigger: ".o-autocomplete--dropdown-item > a:contains('bety')",
     run: "click",
 }, {
+    trigger: ".o_field_widget[name='resource_ids'] .o_tag:contains('bety')",
+}, {
+    trigger: ".o_field_widget[name='resource_ids'] .o_tag:contains('bert') .o_delete:not(:visible)",
+    content: "Unassign the employee who asked to be replaced.",
+    run: "click",
+}, {
+    trigger: ".o_field_widget[name='resource_ids']:not(:has(.o_tag:contains('bert')))",
+}, {
+    id: "save_form_in_gantt",
     trigger: ".modal button[special='save']:enabled",
     content: "Save this shift once it is ready.",
     run: "click",

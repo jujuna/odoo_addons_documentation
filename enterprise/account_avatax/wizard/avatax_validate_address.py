@@ -3,6 +3,8 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
 
+from odoo.addons.account_avatax.lib.avatax_client import AvataxClient
+
 
 class AvataxValidateAddress(models.TransientModel):
     _name = 'avatax.validate.address'
@@ -37,7 +39,7 @@ class AvataxValidateAddress(models.TransientModel):
             if country.code not in ('US', 'CA', False):
                 raise ValidationError(_("Address validation is only supported for North American addresses."))
 
-            client = self.env['account.external.tax.mixin']._get_client(company)
+            client = AvataxClient._get_client(company)
             response = client.resolve_address({
                 'line1': wizard.street or '',
                 'line2': wizard.street2 or '',

@@ -7,15 +7,15 @@
 # Cécile Collart <cco@odoo.com>, 2022
 # Jolien De Paepe, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-10-23 08:07+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:54+0000\n"
+"PO-Revision-Date: 2026-09-17 23:56+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "payment_sepa_direct_debit/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: payment_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:payment_sepa_direct_debit.sdd_mandate_form
@@ -46,7 +46,6 @@ msgstr ""
 
 #. module: payment_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:payment_sepa_direct_debit.sdd_mandate_form
-#: model_terms:ir.ui.view,arch_db:payment_sepa_direct_debit.sepa_state_header
 msgid "<strong>Amount: </strong>"
 msgstr "<strong>Montant : </strong>"
 
@@ -63,224 +62,37 @@ msgstr "<strong>Libellé :</strong>"
 #. module: payment_sepa_direct_debit
 #: model:mail.template,body_html:payment_sepa_direct_debit.mail_template_sepa_notify_validation
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Your SEPA Direct Debit "
-"Mandate</span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.partner_bank_id.acc_number or ''\">BE15001559627230</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hello <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
 "\n"
-"                    <p>A SEPA Direct Debit Mandate authorization has just "
-"been validated for use with <t t-out=\"company.name or ''\">YourCompany</t>."
-"</p>\n"
+"<p>A SEPA Direct Debit Mandate authorization has just been validated for use "
+"with <t t-out=\"company.name or ''\">YourCompany</t>.</p>\n"
 "\n"
-"                    <p>You will find a copy of the mandate validation "
-"attached to this email.</p>\n"
+"<p>You will find a copy of the mandate validation attached to this email.</"
+"p>\n"
 "\n"
-"                    <p>Do not hesitate to contact us if you have any "
-"question.</p>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
-"            "
+"<p>Do not hesitate to contact us if you have any question.</p>\n"
+"            </t>"
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Votre mandat de "
-"prélèvement SEPA</span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.partner_bank_id.acc_number or ''\">BE15001559627230</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Bonjour <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,<br/><br/>\n"
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"Bonjour <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/"
+"><br/>\n"
 "\n"
-"                    <p>Un mandat de prélèvement SEPA a été validé pour le "
-"compte de <t t-out=\"company.name or ''\">YourCompany</t>.</p>\n"
+"<p>Une autorisation de mandat de prélèvement SEPA vient d’être validée pour "
+"une utilisation avec <t t-out=\"company.name or ''\">YourCompany</t>.</p>\n"
 "\n"
-"                    <p>Vous trouverez ci-joint une copie de la confirmation "
-"du mandat.</p>\n"
+"<p>Vous trouverez en pièce jointe une copie de la validation du mandat.</p>\n"
 "\n"
-"                    <p>N'hésitez pas à nous contacter si vous avez des "
-"questions.</p>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Généré par <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
-"            "
+"<p>N’hésitez pas à nous contacter si vous avez la moindre question.</p>\n"
+"            </t>"
+
+#. module: payment_sepa_direct_debit
+#: model:ir.module.module,summary:base.module_payment_sepa_direct_debit
+msgid "A payment provider for enabling Sepa Direct Debit in the EU."
+msgstr ""
 
 #. module: payment_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:payment_sepa_direct_debit.sdd_mandate_form
@@ -289,8 +101,8 @@ msgstr "Relevé bancaire"
 
 #. module: payment_sepa_direct_debit
 #: model:ir.model,name:payment_sepa_direct_debit.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Ligne de relevé bancaire"
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: payment_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:payment_sepa_direct_debit.sdd_mandate_form
@@ -319,13 +131,18 @@ msgid "Custom Mode"
 msgstr "Mode personnalisé"
 
 #. module: payment_sepa_direct_debit
+#: model:ir.model,name:payment_sepa_direct_debit.model_account_direct_debit_mandate
+msgid "Direct Debit Mandate"
+msgstr ""
+
+#. module: payment_sepa_direct_debit
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_bank_statement_line__display_name
+#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_direct_debit_mandate__display_name
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_payment_method__display_name
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_payment_provider__display_name
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_payment_token__display_name
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_payment_transaction__display_name
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_res_partner__display_name
-#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_sdd_mandate__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
 
@@ -336,17 +153,17 @@ msgstr "IBAN"
 
 #. module: payment_sepa_direct_debit
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_bank_statement_line__id
+#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_direct_debit_mandate__id
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_payment_method__id
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_payment_provider__id
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_payment_token__id
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_payment_transaction__id
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_res_partner__id
-#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_sdd_mandate__id
 msgid "ID"
 msgstr "ID"
 
 #. module: payment_sepa_direct_debit
-#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_sdd_mandate__is_online_payment
+#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_direct_debit_mandate__is_online_payment
 msgid "Is Online Payment"
 msgstr "Paiement en ligne"
 
@@ -362,7 +179,7 @@ msgid "Missing or invalid IBAN."
 msgstr "IBAN manquant ou invalide."
 
 #. module: payment_sepa_direct_debit
-#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_sdd_mandate__payment_transaction_count
+#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_direct_debit_mandate__payment_transaction_count
 msgid "No. of Payment Transactions"
 msgstr "Nombre de transactions de paiement"
 
@@ -373,13 +190,18 @@ msgstr "Odoo PVT LTD"
 
 #. module: payment_sepa_direct_debit
 #: model:ir.model,name:payment_sepa_direct_debit.model_account_payment_method
-msgid "Payment Methods"
-msgstr "Modes de paiement"
+msgid "Payment Method"
+msgstr "Mode de paiement"
 
 #. module: payment_sepa_direct_debit
 #: model:ir.model,name:payment_sepa_direct_debit.model_payment_provider
 msgid "Payment Provider"
 msgstr "Fournisseur de paiement"
+
+#. module: payment_sepa_direct_debit
+#: model:ir.module.module,shortdesc:base.module_payment_sepa_direct_debit
+msgid "Payment Provider: Sepa Direct Debit"
+msgstr ""
 
 #. module: payment_sepa_direct_debit
 #: model:ir.model,name:payment_sepa_direct_debit.model_payment_token
@@ -392,7 +214,7 @@ msgid "Payment Transaction"
 msgstr "Transaction de paiement"
 
 #. module: payment_sepa_direct_debit
-#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_sdd_mandate__payment_transaction_ids
+#: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_account_direct_debit_mandate__payment_transaction_ids
 msgid "Payment Transactions"
 msgstr "Transactions"
 
@@ -404,7 +226,7 @@ msgstr "Échec du traitement du paiement"
 
 #. module: payment_sepa_direct_debit
 #. odoo-python
-#: code:addons/payment_sepa_direct_debit/models/sdd_mandate.py:0
+#: code:addons/payment_sepa_direct_debit/models/account_direct_debit_mandate.py:0
 msgid "Payments Transactions"
 msgstr "Transactions de paiement"
 
@@ -415,22 +237,19 @@ msgid "Restricted to countries in the SEPA zone. Forbidden countries: %s"
 msgstr "Réservé aux pays de la zone SEPA. Pays interdits : %s"
 
 #. module: payment_sepa_direct_debit
-#: model:ir.model,name:payment_sepa_direct_debit.model_sdd_mandate
-msgid "SDD Mandate"
-msgstr "Mandat de prélèvement SEPA"
-
-#. module: payment_sepa_direct_debit
 #: model:ir.model.fields.selection,name:payment_sepa_direct_debit.selection__payment_provider__custom_mode__sepa_direct_debit
+#: model:payment.method,name:payment_sepa_direct_debit.payment_method_sepa_direct_debit
 msgid "SEPA Direct Debit"
 msgstr "Prélèvement SEPA"
 
 #. module: payment_sepa_direct_debit
-#: model:account.payment.method,name:payment_sepa_direct_debit.payment_method_sepa_direct_debit
+#: model:account.payment.method,name:payment_sepa_direct_debit.account_payment_method_sepa_direct_debit
 msgid "SEPA Direct Debit (provider)"
 msgstr "Prélèvement SEPA (fournisseur)"
 
 #. module: payment_sepa_direct_debit
 #: model:ir.model.fields,field_description:payment_sepa_direct_debit.field_payment_token__sdd_mandate_id
+#: model_terms:ir.ui.view,arch_db:payment_sepa_direct_debit.payment_token_form
 msgid "SEPA Direct Debit Mandate"
 msgstr "Mandat de prélèvement SEPA"
 
@@ -496,6 +315,12 @@ msgid "Validate"
 msgstr "Valider"
 
 #. module: payment_sepa_direct_debit
+#. odoo-python
+#: code:addons/payment_sepa_direct_debit/models/account_direct_debit_mandate.py:0
+msgid "Your SEPA Direct Debit Mandate"
+msgstr "Votre mandat de débit SEPA"
+
+#. module: payment_sepa_direct_debit
 #: model:mail.template,subject:payment_sepa_direct_debit.mail_template_sepa_notify_validation
 msgid "Your SEPA Direct Debit Mandate with {{ object.company_id.name }}"
 msgstr "Votre mandat de prélèvement SEPA avec {{ object.company_id.name }}"
@@ -513,7 +338,7 @@ msgstr ""
 
 #. module: payment_sepa_direct_debit
 #. odoo-python
-#: code:addons/payment_sepa_direct_debit/models/sdd_mandate.py:0
+#: code:addons/payment_sepa_direct_debit/models/account_direct_debit_mandate.py:0
 msgid "id"
 msgstr "id"
 
@@ -530,170 +355,8 @@ msgstr ""
 "(B) votre banque à débiter votre\n"
 "                compte conformément aux instructions de"
 
-#~ msgid "+32123456789"
-#~ msgstr "+32123456789"
+#~ msgid "Bank Statement Line"
+#~ msgstr "Ligne de relevé bancaire"
 
-#~ msgid "<strong>Authenticated by SMS by:</strong>"
-#~ msgstr "<strong>Authentifié par SMS par :</strong>"
-
-#~ msgid "<strong>Date and place of signature:</strong>"
-#~ msgstr "<strong>Date et lieu de la signature :</strong>"
-
-#~ msgid ""
-#~ "<strong>Name of the reference party:</strong>\n"
-#~ "                            ......................................"
-#~ msgstr ""
-#~ "<strong>Nom de la référence :</strong>\n"
-#~ "                            ......................................"
-
-#~ msgid "<strong>Signature:</strong>"
-#~ msgstr "<strong>Signature :</strong>"
-
-#~ msgid "A copy of the mandate will be sent by email to"
-#~ msgstr "Une copie du mandat sera envoyée par email"
-
-#~ msgid "Both the phone number and the verification code are required."
-#~ msgstr ""
-#~ "À la fois le numéro de téléphone et le code de vérification sont requis."
-
-#~ msgid "Buy credits"
-#~ msgstr "Acheter des crédits"
-
-#~ msgid "Code"
-#~ msgstr "Code"
-
-#~ msgid "Could not send the verification code."
-#~ msgstr "Impossible d'envoyer le code de vérification."
-
-#~ msgid "Electronic Signature"
-#~ msgstr "Signature électronique"
-
-#~ msgid "Incorrect phone number."
-#~ msgstr "Numéro de téléphone incorrect."
-
-#~ msgid "No transaction found matching reference %s."
-#~ msgstr "Aucune transaction trouvée correspondant à la référence %s."
-
-#~ msgid "Online Signature"
-#~ msgstr "Signature en ligne"
-
-#~ msgid "Phone Number"
-#~ msgstr "Numéro de téléphone"
-
-#~ msgid "Phone Verification"
-#~ msgstr "Vérification par téléphone"
-
-#~ msgid "Re-send SMS"
-#~ msgstr "Renvoyer le SMS"
-
-#~ msgid "SEPA Direct Debit: Charge Notification"
-#~ msgstr "Prélèvement SEPA : Notification des frais"
-
-#~ msgid "SMS Credits"
-#~ msgstr "Crédits SMS"
-
-#~ msgid "SMS Sent"
-#~ msgstr "SMS envoyé"
-
-#~ msgid "SMS could not be sent due to insufficient credit."
-#~ msgstr "Impossible d'envoyer un SMS en raison d'un crédit insuffisant."
-
-#~ msgid "SMS verification is disabled."
-#~ msgstr "La vérification par SMS est désactivée."
-
-#~ msgid "Send SMS"
-#~ msgstr "Envoi de SMS"
-
-#~ msgid "Sent to the customer to indicate their account will be charged"
-#~ msgstr "Envoyé au client pour indiquer que son compte sera débité"
-
-#~ msgid "Server Error"
-#~ msgstr "Erreur de serveur"
-
-#~ msgid "Signature"
-#~ msgstr "Signature"
-
-#~ msgid "Signed By"
-#~ msgstr "Signé par"
-
-#~ msgid "Signed On"
-#~ msgstr "Signé le"
-
-#~ msgid "Signed online on"
-#~ msgstr "Signé en ligne le "
-
-#~ msgid "The date of the signature"
-#~ msgstr "La date de la signature"
-
-#~ msgid "The mandate was signed by %s."
-#~ msgstr "Le mandat a été signé par %s."
-
-#~ msgid "The mandate was verified with phone number %s."
-#~ msgstr "Le mandat a été vérifié avec le numéro de téléphone %s."
-
-#~ msgid "The name and signature must be provided."
-#~ msgstr "Le nom et la signature doivent être fournis."
-
-#~ msgid "The name of the signer"
-#~ msgstr "Le nom du signataire"
-
-#~ msgid "The phone number does not match."
-#~ msgstr "Le numéro de téléphone ne correspond pas."
-
-#~ msgid "The phone number must be provided and verified."
-#~ msgstr "Le numéro de téléphone doit être fourni et vérifié."
-
-#~ msgid "The phone number should be in international format."
-#~ msgstr "Le numéro de téléphone doit avoir un format international."
-
-#~ msgid "The phone number used for verification by SMS code"
-#~ msgstr "Le numéro de téléphone utilisé pour la vérification par code SMS"
-
-#~ msgid "The technical code of this payment provider."
-#~ msgstr "Le code technique de ce fournisseur de paiement."
-
-#~ msgid "The transaction is not linked to a token."
-#~ msgstr "La transaction n'est pas liée à un jeton."
-
-#~ msgid "The verification code does not match."
-#~ msgstr "Le code de vérification ne correspond pas."
-
-#~ msgid "This mandate has already been verified."
-#~ msgstr "Ce mandat a déjà été vérifié."
-
-#~ msgid "Unknown mandate ID."
-#~ msgstr "ID de mandat inconnu."
-
-#~ msgid "Verification Code"
-#~ msgstr "Code de vérification"
-
-#~ msgid "Verified"
-#~ msgstr "Vérifié"
-
-#~ msgid "We are not able to process your payment."
-#~ msgstr "Nous ne sommes pas en mesure de traiter votre paiement."
-
-#~ msgid "Whether a signature is required to create a new mandate."
-#~ msgstr "Si une signature est requise pour créer un nouveau mandat."
-
-#~ msgid "Whether phone numbers must be verified by an SMS code."
-#~ msgstr "Si les numéros de téléphone doivent être vérifiés par un code SMS."
-
-#~ msgid ""
-#~ "You don't have enough credit to send SMS. You can buy new credits here:"
-#~ msgstr ""
-#~ "Vous n'avez pas assez de crédit pour envoyer des SMS. Vous pouvez "
-#~ "néanmoins en acheter ici :"
-
-#~ msgid ""
-#~ "Your SEPA Direct Debit Mandate with "
-#~ "{{ object.payment_journal_id.company_id.name }}"
-#~ msgstr ""
-#~ "Votre mandat de prélèvement SEPA avec "
-#~ "{{ object.payment_journal_id.company_id.name }}"
-
-#~ msgid "Your confirmation code is %s"
-#~ msgstr "Votre code de confirmation est %s"
-
-#~ msgid "upon validation."
-#~ msgstr "lors de la validation."
+#~ msgid "SDD Mandate"
+#~ msgstr "Mandat de prélèvement SEPA"

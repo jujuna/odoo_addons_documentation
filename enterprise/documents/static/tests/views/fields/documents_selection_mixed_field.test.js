@@ -3,8 +3,8 @@ import {
     getDocumentsTestServerModelsData,
 } from "@documents/../tests/helpers/data";
 import { makeDocumentsMockEnv } from "@documents/../tests/helpers/model";
-import { destroy, expect, test } from "@odoo/hoot";
-import { contains, defineModels, mountView } from "@web/../tests/web_test_helpers";
+import { expect, test } from "@odoo/hoot";
+import { contains, defineModels, destroyApp, mountView } from "@web/../tests/web_test_helpers";
 
 defineModels(DocumentsModels);
 
@@ -35,7 +35,7 @@ test("Documents mixed selection field in form", async () => {
         const resId = idx + 1;
         const options =
             excludeNone === null ? "{}" : `{'exclude_none': ${excludeNone ? "True" : "False"}}`;
-        const view = await mountView({
+        await mountView({
             resModel: "documents.sharing",
             type: "form",
             arch: `
@@ -61,6 +61,6 @@ test("Documents mixed selection field in form", async () => {
             });
         }
         await contains(`.test${resId}.o_field_documents_mixed_selection input`).click();
-        destroy(view);
+        destroyApp();
     }
 });

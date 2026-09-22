@@ -1,4 +1,4 @@
-import { getNonEditableMentions, parseEmail } from "@mail/utils/common/format";
+import { prepareBodyForEditing, parseEmail } from "@mail/utils/common/format";
 import { registerMessageAction } from "@mail/core/common/message_actions";
 import { _t } from "@web/core/l10n/translation";
 import { renderToMarkup } from "@web/core/utils/render";
@@ -23,13 +23,13 @@ export function messageActionOpenFullComposer(title, context, component) {
         },
     };
     component.env.services.action.doAction(action, {
-        onClose: () => thread.fetchNewMessages(),
+        onClose: () => thread.fetchThreadData(thread.fullComposerCloseRequestList),
     });
 }
 
 registerMessageAction("reply-all", {
-    condition: ({ message, thread }) => message.canReplyAll(thread),
-    icon: "fa fa-reply",
+    condition: ({ message, owner }) => !owner.env.inMessagingMenu && message.canReplyAll,
+    icon: "reply",
     name: _t("Reply All"),
     onSelected: async ({ message, owner, thread }) => {
         const recipients = await rpc("/mail/thread/recipients", {
@@ -37,47 +37,58 @@ registerMessageAction("reply-all", {
             thread_id: thread.id,
             message_id: message.id,
         });
-        const recipientIds = recipients.map((r) => r.id);
-        const emailFrom = message.author_id?.email || message.email_from;
-        const [name, email] = parseEmail(emailFrom);
+        // usually reply_to is what you want people to see as being "from"
+        // showing this avoids "leaking" the actual user when reply_to is an alias
+        const emailFrom = message.reply_to || message.email_from || message.author_id?.email;
+        const [name, email] = emailFrom ? parseEmail(emailFrom) : ["", ""];
         const datetime = _t("%(date)s at %(time)s", {
             date: message.datetime.toFormat("ccc, MMM d, yyyy"),
             time: message.datetime.toFormat("hh:mm a"),
         });
         const body = renderToMarkup("mail.Message.bodyInReply", {
-            body: getNonEditableMentions(message.body),
+            body: prepareBodyForEditing(message.body),
             date: datetime,
             email,
             message,
             name: name || email,
+            signature: thread.effectiveSelf.main_user_id?.getSignatureBlock(),
         });
         const context = {
             default_body: body,
             default_composition_mode: "comment",
             default_composition_comment_option: "reply_all",
-            default_partner_ids: recipientIds,
+            default_email_add_signature: false,
+            default_partner_ids: recipients
+                .filter((r) => r.recipient_type !== "cc")
+                .map((r) => r.id),
+            default_partner_cc_ids: recipients
+                .filter((r) => r.recipient_type === "cc")
+                .map((r) => r.id),
         };
         messageActionOpenFullComposer(_t("Reply All"), context, owner);
     },
-    sequence: 71,
+    sequence: ({ message }) => (message.isSelfAuthored ? 55 : 20),
 });
 registerMessageAction("forward", {
-    condition: ({ message, thread }) => message.canForward(thread),
-    icon: "fa fa-share",
+    condition: ({ message, owner }) => !owner.env.inMessagingMenu && message.canForward,
+    icon: "share",
     name: _t("Forward"),
-    onSelected: async ({ message, owner, store }) => {
-        const emailFrom = message.author_id?.email || message.email_from;
-        const [name, email] = parseEmail(emailFrom);
+    onSelected: async ({ message, owner, store, thread }) => {
+        // usually reply_to is what you want people to see as being "from"
+        // showing this avoids "leaking" the actual user when reply_to is an alias
+        const emailFrom = message.reply_to || message.email_from || message.author_id?.email;
+        const [name, email] = emailFrom ? parseEmail(emailFrom) : ["", ""];
         const datetime = _t("%(date)s at %(time)s", {
             date: message.datetime.toFormat("ccc, MMM d, yyyy"),
             time: message.datetime.toFormat("hh:mm a"),
         });
         const body = renderToMarkup("mail.Message.bodyInForward", {
-            body: getNonEditableMentions(message.body),
+            body: prepareBodyForEditing(message.body),
             date: datetime,
             email,
             message,
             name: name || email,
+            signature: thread.effectiveSelf.main_user_id?.getSignatureBlock(),
         });
         const attachmentIds = message.attachment_ids.map((a) => a.id);
         const newAttachmentIds = await store.env.services.orm.call(
@@ -93,8 +104,26 @@ registerMessageAction("forward", {
             default_body: body,
             default_composition_mode: "comment",
             default_composition_comment_option: "forward",
+            default_email_add_signature: false,
         };
         messageActionOpenFullComposer(_t("Forward Message"), context, owner);
     },
-    sequence: 72,
+    sequence: 30,
+});
+registerMessageAction("send-again", {
+    condition: ({ message, owner }) => !owner.env.inMessagingMenu && message.canForward,
+    icon: "send",
+    name: _t("Send Again"),
+    onSelected: ({ message, owner }) => {
+        const context = {
+            default_attachment_ids: message.attachment_ids.map((a) => a.id),
+            default_body: prepareBodyForEditing(message.body),
+            default_composition_mode: "comment",
+            default_email_add_signature: false,
+            default_partner_ids: message.partner_ids.map((p) => p.id),
+            default_partner_cc_ids: message.partner_cc_ids.map((p) => p.id),
+        };
+        messageActionOpenFullComposer(_t("Send Again"), context, owner);
+    },
+    sequence: 35,
 });

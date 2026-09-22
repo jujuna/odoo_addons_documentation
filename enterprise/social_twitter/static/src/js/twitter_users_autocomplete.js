@@ -34,29 +34,27 @@ export class TwitterUsersAutocompleteField extends CharField {
     }
 
     get sources() {
-        return [{
-            optionSlot: "option",
-            options: async (request) => {
-                if(request.length < 2) {
-                    return [];
-                }
-                const accountId = this.props.record.data.account_id.id;
-                const userInfo = await this.orm.call(
-                    'social.account',
-                    'twitter_get_user_by_username',
-                    [[accountId], request]
-                );
-                const options = [];
-                if (userInfo) {
-                    options.push({
+        return [
+            {
+                optionSlot: "option",
+                options: async (request) => {
+                    if (request.length < 2) {
+                        return [];
+                    }
+                    const accountId = this.props.record.data.account_id.id;
+                    const userInfos = await this.orm.call(
+                        "social.account",
+                        "twitter_users_search",
+                        [[accountId], request]
+                    );
+                    return (userInfos || []).map((userInfo) => ({
                         data: userInfo,
                         label: `${userInfo.name} - @${userInfo.username}`,
                         onSelect: () => this.selectTwitterUser(userInfo),
-                    });
-                }
-                return options;
-            }
-        }];
+                    }));
+                },
+            },
+        ];
     }
 }
 

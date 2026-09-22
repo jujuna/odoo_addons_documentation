@@ -4,6 +4,7 @@
         <field name="name">Balance Sheet</field>
         <field name="name@fr">Bilan</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
@@ -50,16 +51,12 @@
                                         <field name="name">Intangible assets</field>
                                         <field name="name@fr">Immobilisations incorporelles</field>
                                         <field name="code">l10n_tn_intangible_assets_gross</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">21 + 231 + 237</field>
                                     </record>
                                     <record id="l10n_tn_bs_intangible_assets_depr" model="account.report.line">
                                         <field name="name">Less: depreciation</field>
                                         <field name="name@fr">Moins: amortissements</field>
                                         <field name="code">l10n_tn_intangible_assets_depr</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">281 + 291 + 2931</field>
                                     </record>
                                     <record id="l10n_tn_bs_intangible_assets_net" model="account.report.line">
@@ -71,16 +68,12 @@
                                         <field name="name">Property, plant and equipment</field>
                                         <field name="name@fr">Immobilisations corporelles</field>
                                         <field name="code">l10n_tn_tangible_assets_gross</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">22 + 232 + 238 + 24</field>
                                     </record>
                                     <record id="l10n_tn_bs_tangible_assets_depr" model="account.report.line">
                                         <field name="name">Less: depreciation</field>
                                         <field name="name@fr">Moins: amortissements</field>
                                         <field name="code">l10n_tn_tangible_assets_depr</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">282 + 292 + 2932 + 294</field>
                                     </record>
                                     <record id="l10n_tn_bs_tangible_assets_net" model="account.report.line">
@@ -92,16 +85,12 @@
                                         <field name="name">Financial assets</field>
                                         <field name="name@fr">Immobilisations financières</field>
                                         <field name="code">l10n_tn_financial_assets_gross</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">25 + 26</field>
                                     </record>
                                     <record id="l10n_tn_bs_financial_assets_depr" model="account.report.line">
                                         <field name="name">Less: provisions</field>
                                         <field name="name@fr">Moins: provisions</field>
                                         <field name="code">l10n_tn_financial_assets_depr</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">284 + 295 + 296</field>
                                     </record>
                                     <record id="l10n_tn_bs_financial_assets_net" model="account.report.line">
@@ -115,8 +104,6 @@
                                 <field name="name">Other non-current assets</field>
                                 <field name="name@fr">Autres actifs non courants</field>
                                 <field name="code">l10n_tn_other_non_current_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">27</field>
                             </record>
                         </field>
@@ -135,16 +122,12 @@
                             <record id="l10n_tn_bs_stocks_gross" model="account.report.line">
                                 <field name="name">Stocks</field>
                                 <field name="code">l10n_tn_stocks_gross</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">31 + 32 + 33 + 34 + 35 + 37</field>
                             </record>
                             <record id="l10n_tn_bs_stocks_depr" model="account.report.line">
                                 <field name="name">Less: provisions</field>
                                 <field name="name@fr">Moins: provisions</field>
                                 <field name="code">l10n_tn_stocks_depr</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">39</field>
                             </record>
                             <record id="l10n_tn_bs_stocks_net" model="account.report.line">
@@ -156,16 +139,12 @@
                                 <field name="name">Trade receivables and related accounts</field>
                                 <field name="name@fr">Clients et comptes rattachés</field>
                                 <field name="code">l10n_tn_receivables_gross</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">41\(419)</field>
                             </record>
                             <record id="l10n_tn_bs_receivables_depr" model="account.report.line">
                                 <field name="name">Less: provisions</field>
                                 <field name="name@fr">Moins: provisions</field>
                                 <field name="code">l10n_tn_receivables_depr</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">491</field>
                             </record>
                             <record id="l10n_tn_bs_receivables_net" model="account.report.line">
@@ -177,16 +156,12 @@
                                 <field name="name">Other current assets</field>
                                 <field name="name@fr">Autres actifs courants</field>
                                 <field name="code">l10n_tn_other_current_assets_gross</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">409 + 42D + 43D + 44D + 45D + 46D + 47D + 48D</field>
                             </record>
                             <record id="l10n_tn_bs_other_current_assets_depr" model="account.report.line">
                                 <field name="name">Less: provisions</field>
                                 <field name="name@fr">Moins: provisions</field>
                                 <field name="code">l10n_tn_other_current_assets_depr</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">49\(491)</field>
                             </record>
                             <record id="l10n_tn_bs_other_current_assets_net" model="account.report.line">
@@ -198,16 +173,12 @@
                                 <field name="name">Investments and other financial assets</field>
                                 <field name="name@fr">Placements et autres actifs financiers</field>
                                 <field name="code">l10n_tn_investments_gross</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">51 + 52 + 55</field>
                             </record>
                             <record id="l10n_tn_bs_investments_depr" model="account.report.line">
                                 <field name="name">Less: depreciation</field>
                                 <field name="name@fr">Moins: amortissements</field>
                                 <field name="code">l10n_tn_investments_depr</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">59</field>
                             </record>
                             <record id="l10n_tn_bs_investments_net" model="account.report.line">
@@ -219,8 +190,6 @@
                                 <field name="name">Cash and cash equivalents</field>
                                 <field name="name@fr">Liquidités et équivalents</field>
                                 <field name="code">l10n_tn_cash_net</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">53 + 54 + 58</field>
                             </record>
                         </field>
@@ -246,31 +215,24 @@
                                 <field name="name">Share capital</field>
                                 <field name="name@fr">Capital social</field>
                                 <field name="code">l10n_tn_share_capital</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-10</field>
                             </record>
                             <record id="l10n_tn_bs_reserves" model="account.report.line">
                                 <field name="name">Reserves</field>
                                 <field name="name@fr">Réserves</field>
                                 <field name="code">l10n_tn_reserves</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-11</field>
                             </record>
                             <record id="l10n_tn_bs_other_equity" model="account.report.line">
                                 <field name="name">Other equity</field>
                                 <field name="name@fr">Autres capitaux propres</field>
                                 <field name="code">l10n_tn_other_equity</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-14</field>
                             </record>
                             <record id="l10n_tn_bs_retained_earnings" model="account.report.line">
                                 <field name="name">Results carried forward</field>
                                 <field name="name@fr">Résultats reportés</field>
                                 <field name="code">l10n_tn_retained_earnings</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tn_bs_retained_earnings_net_account_codes" model="account.report.expression">
                                         <field name="label">net_account_codes</field>
@@ -305,7 +267,7 @@
                                         <field name="label">balance</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">l10n_tn_V.balance</field>
-                                        <field name="subformula">cross_report(l10n_tn_reports.l10n_tn_pl_account_report)</field>
+                                        <field name="subformula">cross_report(l10n_tn_reports.l10n_tn_pl_account_report, force_date_scope)</field>
                                         <field name="date_scope">from_fiscalyear</field>
                                     </record>
                                 </field>
@@ -330,16 +292,12 @@
                                         <field name="name">Loans</field>
                                         <field name="name@fr">Emprunts</field>
                                         <field name="code">l10n_tn_loans</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-16</field>
                                     </record>
                                     <record id="l10n_tn_bs_other_financial_liabilities" model="account.report.line">
                                         <field name="name">Other financial liabilities</field>
                                         <field name="name@fr">Autres passifs financiers</field>
                                         <field name="code">l10n_tn_other_financial_liabilities</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-18</field>
                                     </record>
                                     <record id="l10n_tn_bs_provisions" model="account.report.line">
@@ -366,24 +324,18 @@
                                         <field name="name">Suppliers and related accounts</field>
                                         <field name="name@fr">Fournisseurs et comptes rattachés</field>
                                         <field name="code">l10n_tn_payables</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-401 - 403 - 404 - 405 - 408</field>
                                     </record>
                                     <record id="l10n_tn_bs_other_current_liabilities" model="account.report.line">
                                         <field name="name">Other current liabilities</field>
                                         <field name="name@fr">Autres passifs courants</field>
                                         <field name="code">l10n_tn_other_current_liabilities</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-42C - 43C - 44C - 45C - 46C - 47C - 48C - 419</field>
                                     </record>
                                     <record id="l10n_tn_bs_bank_overdrafts" model="account.report.line">
                                         <field name="name">Bank loans and other financial liabilities</field>
                                         <field name="name@fr">Concours bancaires et autres passifs financiers</field>
                                         <field name="code">l10n_tn_bank_overdrafts</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">-50</field>
                                     </record>
                                 </field>

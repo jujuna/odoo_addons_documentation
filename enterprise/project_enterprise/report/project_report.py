@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 
 from odoo import api, fields, models
+from odoo.tools import SQL
 
 
 class ReportProjectTaskUser(models.Model):
@@ -10,11 +10,11 @@ class ReportProjectTaskUser(models.Model):
     planned_date_begin = fields.Datetime("Start date", readonly=True)
 
     def _select(self):
-        return super()._select() + """,
+        return SQL("""%s,
             t.planned_date_begin
-        """
+        """, super()._select())
 
     def _group_by(self):
-        return super()._group_by() + """,
+        return SQL("""%s,
             t.planned_date_begin
-        """
+        """, super()._group_by())

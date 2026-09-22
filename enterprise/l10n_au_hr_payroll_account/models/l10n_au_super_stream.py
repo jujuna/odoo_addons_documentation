@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import csv
 import io
-import base64
 import re
 from operator import itemgetter
 
@@ -37,7 +36,8 @@ class L10n_auSuperStream(models.Model):
     source_entity_id = fields.Char("Source Entity ID", compute="_compute_sid")
     source_entity_id_type = fields.Selection([("abn", "ABN")], required=True, default="abn")
     super_stream_file = fields.Many2one("ir.attachment", readonly=True, copy=False)
-    journal_id = fields.Many2one(string="Bank Journal", comodel_name="account.journal")
+    journal_id = fields.Many2one(string="Bank Journal", comodel_name="account.journal",
+                                 help="The clearing house will deduct the funds from this bank account via direct debit.")
     paid_date = fields.Datetime(readonly=True, copy=False)
     amount_total = fields.Monetary(compute="_compute_amount_total")
     payment_id = fields.Many2one("account.payment", ondelete="restrict", copy=False)
@@ -61,8 +61,7 @@ class L10n_auSuperStream(models.Model):
     @api.depends("source_entity_id_type")
     def _compute_sid(self):
         for rec in self:
-            if rec.source_entity_id_type == "abn":
-                rec.source_entity_id = rec.vat
+            rec.source_entity_id = rec.vat if rec.source_entity_id_type == "abn" else False
 
     @api.depends(
         "l10n_au_super_stream_lines",
@@ -141,8 +140,12 @@ class L10n_auSuperStream(models.Model):
         if not clearing_house_partner.property_account_payable_id:
             raise UserError(_("Please set the SuperStream Payable Account for company %s.", self.company_id.name))
 
+        # remove the default_state carried over when accesed from the grouped kanban
+        clean_context = dict(self.env.context)
+        clean_context.pop('default_state', None)
+
         # Prepare payment entry
-        self.payment_id = self.env['account.payment'].create({
+        self.payment_id = self.with_context(clean_context).env['account.payment'].create({
             'date': fields.Datetime.now(),
             'amount': self.amount_total,
             'payment_type': 'outbound',
@@ -153,7 +156,7 @@ class L10n_auSuperStream(models.Model):
             'currency_id': self.currency_id.id,
             'payment_method_line_id': pay_method_line.id,
         })
-        self.payment_id.action_post()
+        self.with_context(clean_context).payment_id.action_post()
         # Reconcile Payment with Payslip Journal Entries
         payslip_entries = self.l10n_au_super_stream_lines.payslip_id.move_id
         if all(p.state != 'posted' for p in payslip_entries):
@@ -178,12 +181,12 @@ class L10n_auSuperStream(models.Model):
             writer = csv.writer(output, delimiter=',', quotechar='"', quoting=2)
             data = self.prepare_rendering_data()
             writer.writerows(data)
-            base64_result = base64.encodebytes(output.getvalue().encode())
+            raw = output.getvalue().encode()
 
         self.super_stream_file = self.env["ir.attachment"].create(
             {
                 "name": self.file_id + ".csv",
-                "datas": base64_result,
+                "raw": raw,
                 "type": "binary",
                 "res_model": "l10n_au.super.stream",
                 "res_id": self.id,
@@ -280,7 +283,7 @@ class L10n_auSuperStream(models.Model):
         company_fields = ["name", "vat"]
         message = self._get_error_message(company_fields, self.company_id, "Company")
 
-        message += self._get_error_message(["aba_bsb", "bank_account_id", "bank_acc_number"], self.journal_id, "Bank Journal")
+        message += self._get_error_message(["aba_bsb", "bank_account_id", "bank_account_number"], self.journal_id, "Bank Journal")
 
         message += self.l10n_au_super_stream_lines._get_employee_mandatory_fields()
 
@@ -311,7 +314,8 @@ class L10n_AuSuperStreamLine(models.Model):
     currency_id = fields.Many2one(related="l10n_au_super_stream_id.currency_id", readonly=True)
 
     employer_id = fields.Many2one("res.company", related="l10n_au_super_stream_id.company_id", required=True, string="Employer")
-    sender_id = fields.Many2one("hr.employee", default=lambda self: self.env.user.employee_id, required=True)
+    sender_id = fields.Many2one("hr.employee", default=lambda self: self.env.user.employee_id, required=True,
+                                help="Employee responsible for sending superannuation contributions on behalf of the company.")
     employee_id = fields.Many2one("hr.employee", required=True)
     payee_id = fields.Many2one("l10n_au.super.fund", "Payee/Reciever", related="super_account_id.fund_id", required=True)
 
@@ -327,14 +331,14 @@ class L10n_AuSuperStreamLine(models.Model):
         compute="_compute_payslip_fields", precompute=True, store=True, readonly=False
     )
     award_or_productivity_amount = fields.Monetary(
-        compute="_compute_payslip_fields", precompute=True, store=True, readonly=False
+        compute="_compute_payslip_fields", precompute=True, store=True, readonly=False, help="Computed from the extra compulsory superannuation percentage."
     )
     personal_contributions_amount = fields.Monetary()
     salary_sacrificed_amount = fields.Monetary(
-        compute="_compute_payslip_fields", precompute=True, store=True, readonly=False
+        compute="_compute_payslip_fields", precompute=True, store=True, readonly=False, help="Salary sacrifice for superannuation purposes."
     )
     voluntary_amount = fields.Monetary(
-        compute="_compute_payslip_fields", precompute=True, store=True, readonly=False
+        compute="_compute_payslip_fields", precompute=True, store=True, readonly=False, help="Computed from the extra negotiated superannuation percentage."
     )
     spouse_contributions_amount = fields.Monetary()
     child_contributions_amount = fields.Monetary()
@@ -375,16 +379,14 @@ class L10n_AuSuperStreamLine(models.Model):
 
     @api.depends("payslip_id", 'super_account_id', 'proportion')
     def _compute_payslip_fields(self):
-        super_lines_total = self.payslip_id._get_line_values(['SUPER', 'OTE'], vals_list=['total'])
+        super_to_pay = self.payslip_id._get_super_payable()
         for rec in self:
-            if rec.state != 'draft':
+            if rec.state != 'draft' or not rec.payslip_id:
                 continue
-            contract = rec.payslip_id.version_id
-            rec.superannuation_guarantee_amount = super_lines_total['SUPER'][rec.payslip_id.id]['total'] * rec.proportion
-            rec.salary_sacrificed_amount = contract.l10n_au_salary_sacrifice_superannuation * rec.proportion
-            ote_amount = super_lines_total['OTE'][rec.payslip_id.id]['total']
-            rec.award_or_productivity_amount = (ote_amount * rec.payslip_id.l10n_au_extra_compulsory_super) * rec.proportion
-            rec.voluntary_amount = (ote_amount * rec.payslip_id.l10n_au_extra_negotiated_super) * rec.proportion
+            rec.superannuation_guarantee_amount = super_to_pay[rec.payslip_id.id]['superannuation_guarantee_amount'] * rec.proportion
+            rec.salary_sacrificed_amount = super_to_pay[rec.payslip_id.id]['salary_sacrificed_amount'] * rec.proportion
+            rec.award_or_productivity_amount = super_to_pay[rec.payslip_id.id]['award_or_productivity_amount'] * rec.proportion
+            rec.voluntary_amount = super_to_pay[rec.payslip_id.id]['voluntary_amount'] * rec.proportion
 
     @api.depends('employee_id')
     def _compute_allowed_super_account_ids(self):
@@ -430,7 +432,7 @@ class L10n_AuSuperStreamLine(models.Model):
             self.employer_id.vat.replace(" ", ""),
             self.employer_id.display_name,
             self.l10n_au_super_stream_id.journal_id.aba_bsb,
-            self.l10n_au_super_stream_id.journal_id.bank_acc_number,
+            self.l10n_au_super_stream_id.journal_id.bank_account_number,
             self.l10n_au_super_stream_id.journal_id.bank_account_id.partner_id.name,
 
             # payee/receiver data [R:AC] (12) (17 - 28)
@@ -442,8 +444,8 @@ class L10n_AuSuperStreamLine(models.Model):
             fields.Date.to_string(fields.Date.today()),
             "", "",  # fields for the clearing house [X:Y]
             self.amount_total or "0",
-            self.payee_id.bank_account_id.aba_bsb if is_smsf else "",
-            self.payee_id.bank_account_id.acc_number if is_smsf else "",
+            self.payee_id.bank_account_id._get_clearing_number('AU') if is_smsf else "",
+            self.payee_id.bank_account_id.account_number if is_smsf else "",
             self.payee_id.bank_account_id.partner_id.name if is_smsf else "",
 
             # employer data [AD:AG] (4) (29 - 32)
@@ -528,11 +530,12 @@ class L10n_AuSuperStreamLine(models.Model):
         ]
 
     def _get_employee_mandatory_fields(self):
+        message = ""
         for rec in self:
             employee_fields = ["private_city", "private_zip", "private_state_id", "private_country_id", "private_email",
                 "private_phone", "birthday", "sex"]
             # Payslip Employee
-            message = self.env['l10n_au.super.stream']._get_error_message(employee_fields, rec.employee_id, f"Employee ({rec.employee_id.display_name})")
+            message += self.env['l10n_au.super.stream']._get_error_message(employee_fields, rec.employee_id, f"Employee ({rec.employee_id.display_name})")
             if len(rec.employee_id.name.split(' ')) <= 1:
                 message += _("Please provide First and Last Name for the Employee %s.\n", rec.employee_id.name)
 

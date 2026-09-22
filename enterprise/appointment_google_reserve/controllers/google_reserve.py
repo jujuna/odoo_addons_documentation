@@ -1,12 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import pytz
+from datetime import datetime, timedelta, UTC
 
-from datetime import datetime, timedelta
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from odoo.http import Controller, request, route
-from odoo.tools import consteq, email_normalize, hmac
+from odoo.tools import consteq, email_normalize, formataddr, hmac
 
 
 class GoogleReserveController(Controller):
@@ -38,10 +37,10 @@ class GoogleReserveController(Controller):
         appointment_type_su = self._fetch_appointment(appointment_id, appointment_token)
 
         slot_time_availability = []
-        min_date = datetime.fromtimestamp(int(slot_time[0]['start_sec']), tz=pytz.UTC)
+        min_date = datetime.fromtimestamp(int(slot_time[0]['start_sec']), tz=UTC)
         max_date = min_date + timedelta(seconds=int(slot_time[0]['duration_sec']))
         for slot in slot_time:
-            slot_start = datetime.fromtimestamp(int(slot['start_sec']), tz=pytz.UTC)
+            slot_start = datetime.fromtimestamp(int(slot['start_sec']), tz=UTC)
             slot_stop = slot_start + timedelta(seconds=int(slot['duration_sec']))
 
             if slot_start < min_date:
@@ -165,8 +164,8 @@ class GoogleReserveController(Controller):
             party_size = int(slot_info['resources']['party_size'])
 
         generated_slots = appointment_type_su._slots_generate(
-            start_slot.astimezone(pytz.utc),
-            stop_slot.astimezone(pytz.utc),
+            start_slot.astimezone(UTC),
+            stop_slot.astimezone(UTC),
             'UTC',
         )
         selected_slot = next((
@@ -177,14 +176,14 @@ class GoogleReserveController(Controller):
         if appointment_type_su.schedule_based_on == 'users':
             appointment_type_su._slots_fill_users_availability(
                 slots_to_fill,
-                start_slot.astimezone(pytz.utc),
-                stop_slot.astimezone(pytz.utc),
+                start_slot.astimezone(UTC),
+                stop_slot.astimezone(UTC),
             )
         else:
             appointment_type_su._slots_fill_resources_availability(
                 slots_to_fill,
-                start_slot.astimezone(pytz.utc),
-                stop_slot.astimezone(pytz.utc),
+                start_slot.astimezone(UTC),
+                stop_slot.astimezone(UTC),
                 asked_capacity=party_size,
             )
 
@@ -195,18 +194,33 @@ class GoogleReserveController(Controller):
         booking_response = False
         if appointment_type_su.schedule_based_on == 'resources' and slot and 'available_resource_ids' in slot:
             resources = slot['available_resource_ids']
-            booking_lines = [{
-                'appointment_resource_id': resource.id,
-                'capacity_reserved': party_size,
-                'capacity_used': party_size if resource.shareable and appointment_type_su.manage_capacity else resource.capacity
-            } for resource in resources]
+            resources_remaining_capacity = appointment_type_su._get_resources_remaining_capacity(
+                resources,
+                start_slot,
+                stop_slot,
+                with_linked_resources=False
+            )
+
+            booking_lines = []
+            capacity_to_assign = party_size
+            for resource in resources:
+                resource_remaining_capacity = resources_remaining_capacity.get(resource)
+                new_capacity_reserved = min(resource_remaining_capacity, capacity_to_assign, resource.capacity)
+                capacity_to_assign -= new_capacity_reserved
+                booking_lines.append({
+                    'appointment_resource_id': resource.id,
+                    'capacity_reserved': new_capacity_reserved,
+                    'capacity_used': new_capacity_reserved if resource.shareable and appointment_type_su.manage_capacity else
+                        resource.capacity if appointment_type_su.manage_capacity else 1,
+                })
         elif appointment_type_su.schedule_based_on == 'users' and slot and ('available_staff_users' in slot or 'staff_user_id' in slot):
             staff_user = slot.get('available_staff_users', [False])[0] or slot['staff_user_id']
 
         if booking_lines or staff_user:
             customer_email = email_normalize(user_info['email'])
+            customer_name = ' '.join(filter(None, (user_info.get('given_name'), user_info.get('family_name'))))
             customer = request.env['mail.thread'].sudo()._mail_find_partner_from_emails(
-                [customer_email],
+                [formataddr((customer_name, customer_email)) if customer_email else customer_email],
                 force_create=True
             )
             if customer:
@@ -379,7 +393,7 @@ class GoogleReserveController(Controller):
                     resources=calendar_event.appointment_resource_ids,
                     asked_capacity=calendar_event.total_capacity_reserved,
                     timezone='UTC',
-                    start_dt=calendar_event_vals['start'].astimezone(pytz.utc),
+                    start_dt=calendar_event_vals['start'].astimezone(UTC),
                     duration=calendar_event_vals['duration'],
                     allday=calendar_event.allday,
                 ):
@@ -409,7 +423,7 @@ class GoogleReserveController(Controller):
                     calendar_event_vals['total_capacity_reserved'] = new_party_size
                 else:
                     # otherwise re-generate the slot to find available resources to accommodate it
-                    start_dt_utc = calendar_event_vals['start'].astimezone(pytz.utc)
+                    start_dt_utc = calendar_event_vals['start'].astimezone(UTC)
                     stop_dt_utc = start_dt_utc + timedelta(hours=calendar_event_vals['duration'])
                     slots = calendar_event.appointment_type_id._slots_generate(start_dt_utc, stop_dt_utc, 'UTC')
                     slots = [slot for slot in slots if slot['UTC'][0] == start_dt_utc.replace(tzinfo=None) and slot['UTC'][1] == stop_dt_utc.replace(tzinfo=None)]

@@ -32,7 +32,7 @@ from . import l10n_ch_declaration_statistic
 from . import res_company
 from . import res_config_settings
 from . import hr_leave
-from . import hr_leave_type
+from . import hr_work_entry_type
 from . import l10n_ch_avs_income_splits
 from . import l10n_ch_declaration_bvg_lpp
 from . import l10n_ch_declaration_ema
@@ -45,3 +45,4 @@ from . import l10n_ch_swissdec_declaration_dialog
 from . import l10n_ch_swissdec_declaration_result
 from . import l10n_ch_worked_days
 from . import ir_ui_menu
+from . import hr_salary_attachment

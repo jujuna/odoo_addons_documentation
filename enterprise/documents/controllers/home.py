@@ -1,28 +1,17 @@
 from http import HTTPStatus
 from urllib.parse import urlencode, quote
 
-from odoo.http import request, route
+from odoo.http import Controller, request, route
 
 from odoo.addons.base.models.ir_qweb import keep_query
-from odoo.addons.web.controllers import home as web_home
-from odoo.addons.web.controllers.utils import ensure_db
 from .documents import ShareRoute
 
 
-class Home(web_home.Home):
-    def _web_client_readonly(self, rule, args):
-        """ Force a read/write cursor for documents.access """
-        path = request.httprequest.path
-        if (
-            path.startswith('/odoo/documents')
-            and (request.httprequest.args.get('access_token') or path.removeprefix('/odoo/documents/'))
-            and request.session.uid
-        ):
-            return False
-        return super()._web_client_readonly(rule, args)
+class DocumentsTokenRedirect(Controller):
 
-    @route(readonly=_web_client_readonly)
-    def web_client(self, s_action=None, **kw):
+    # takes precedence over the more general /odoo/<*> route
+    @route(['/odoo/documents/<access_token>'], type='http', auth='public')
+    def documents_token_redirect(self, access_token, **kwargs):
         """ Handle direct access to a document with a backend URL (/odoo/documents/<access_token>).
 
         It redirects to the document either in:
@@ -33,18 +22,6 @@ class Home(web_home.Home):
 
         Goal: Allow to share directly the backend URL of a document.
         """
-        subpath = kw.get('subpath', '')
-        access_token = request.params.get('access_token') or subpath.removeprefix('documents/')
-        if not subpath.startswith('documents') or not access_token or '/' in access_token:
-            return super().web_client(s_action, **kw)
-
-        # This controller should be auth='public' but it actually is
-        # auth='none' for technical reasons (see super). Those three
-        # lines restore the public behavior.
-        ensure_db()
-        request.update_env(user=request.session.uid)
-        request.env['ir.http']._authenticate_explicit('public')
-
         # Public/Portal users use the /documents/<access_token> route
         if not request.env.user._is_internal():
             return request.redirect(
@@ -52,7 +29,7 @@ class Home(web_home.Home):
                 HTTPStatus.TEMPORARY_REDIRECT,
             )
 
-        document_sudo = ShareRoute._from_access_token(access_token, follow_shortcut=False)
+        document_sudo = request.env['documents.document']._from_access_token(access_token, follow_shortcut=False)
 
         if not document_sudo:
             Redirect = request.env['documents.redirect'].sudo()
@@ -66,8 +43,7 @@ class Home(web_home.Home):
         # the document action. We also want (2) the router rewrites
         # /odoo/documents/<id> to /odoo/documents/<access-token> in the
         # URL.
-        # We redirect on /web so this override does kicks in again,
-        # super() is loaded and renders the normal home template. We add
+        # We redirect on /web to render the normal home template. We add
         # custom fragments so we can load them inside the router and
         # rewrite the URL.
         query = {}
@@ -84,6 +60,6 @@ class Home(web_home.Home):
                 for key, value
                 in ShareRoute._documents_get_init_data(document_sudo, request.env.user).items()
             })
-            if 'documents_init_open_preview' in kw:
-                fragment['documents_init_open_preview'] = kw['documents_init_open_preview']
+            if 'documents_init_open_preview' in kwargs:
+                fragment['documents_init_open_preview'] = kwargs['documents_init_open_preview']
         return request.redirect(f'/web?{urlencode(query)}#{urlencode(fragment)}')

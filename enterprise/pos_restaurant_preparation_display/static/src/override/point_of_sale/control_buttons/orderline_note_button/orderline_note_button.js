@@ -31,7 +31,7 @@ patch(InternalNoteButton.prototype, {
             if (!added) {
                 order.uiState.noteHistory[productId].push({
                     old: oldNote,
-                    new: inputNote || "[]",
+                    new: inputNote || "",
                     lineId: selectedOrderline.id,
                     uuid: selectedOrderline.uuid,
                 });

@@ -9,6 +9,7 @@ export class ManualCorrectionModel extends models.Model {
     _inherit = ["extract.mixin.with.words"];
 
     char_field = fields.Char();
+    json_field = fields.Json();
     text_field = fields.Text();
     html_field = fields.Html();
     integer_field = fields.Integer();
@@ -28,4 +29,6 @@ export class ManualCorrectionLineModel extends models.Model {
     char_field = fields.Char();
     float_field = fields.Float();
     date_field = fields.Date();
+    daterange_field_start = fields.Date();
+    daterange_field_end = fields.Date();
 }

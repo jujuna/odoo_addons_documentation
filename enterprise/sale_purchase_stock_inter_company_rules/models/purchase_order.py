@@ -1,28 +1,35 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import Command, models, _
+from odoo import Command, _, models
 from odoo.exceptions import UserError
 
 
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
+    def _get_sale_order_partner(self, user=False):
+        self.ensure_one()
+        return self.picking_type_id.warehouse_id.partner_id or super()._get_sale_order_partner(user)
+
     def _prepare_sale_order_data(self, name, partner, company, direct_delivery_address):
         res = super()._prepare_sale_order_data(name, partner, company, direct_delivery_address)
-        warehouse = company.intercompany_warehouse_id and company.intercompany_warehouse_id.company_id.id == company.id and company.intercompany_warehouse_id or False
+        intercompany_warehouse = self.env['stock.warehouse'].sudo().search([('partner_id', 'parent_of', direct_delivery_address.id)], limit=1)
+        warehouse = intercompany_warehouse.company_id.id == company.id and intercompany_warehouse
+        if not warehouse:
+            warehouse = self.env['stock.warehouse'].sudo().search([('company_id', '=', company.id)], limit=1)
         if not warehouse:
             raise UserError(_('Configure correct warehouse for company(%s) from Menu: Settings/Users/Companies', company.name))
         res['warehouse_id'] = warehouse.id
 
         picking_type_warehouse_partner_id = self.picking_type_id.warehouse_id.partner_id.id
         if picking_type_warehouse_partner_id:
-            res['partner_shipping_id'] = picking_type_warehouse_partner_id or direct_delivery_address
+            res['partner_shipping_id'] = picking_type_warehouse_partner_id or direct_delivery_address.id
 
         return res
 
     def _prepare_sale_order_line_data(self, line, company):
         res = super()._prepare_sale_order_line_data(line, company)
-        if line.product_id.sale_delay:
-            res['customer_lead'] = line.product_id and line.product_id.sale_delay or 0.0
+        if line.product_id.with_company(line.company_id).sale_delay:
+            res['customer_lead'] = line.product_id and line.product_id.with_company(line.company_id).sale_delay or 0.0
         # adds a product_custom_attribute_value_ids if the PO was generated from an SO
         so_lines = self.env['stock.move'].browse(line.move_ids._rollup_move_dests()).mapped('sale_line_id')
         so_line = so_lines[0] if so_lines else line.move_dest_ids.sale_line_id

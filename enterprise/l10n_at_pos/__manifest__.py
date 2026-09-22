@@ -20,16 +20,16 @@ The Austrian Cash Security Regulation (RKSV - Registrierkassensicherheitsverordn
 
 We have implemented all this using Fiskaly.
 """,
-    'version': '1.0',
     'depends': ['l10n_at', 'iap', 'point_of_sale'],
-    'installable': True,
     'data': [
-        'security/ir.model.access.csv',
         'views/res_company_view.xml',
         'views/pos_session_view.xml',
         'views/pos_order_view.xml',
+        'views/res_config_settings_views.xml',
         'views/pos_fiskaly_reports_template.xml',
-        'wizard/pos_fiskaly_details.xml'
+        'wizard/pos_fiskaly_details.xml',
+        'receipt/pos_order_receipt.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_unit_tests': [

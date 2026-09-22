@@ -1,7 +1,7 @@
 from unittest import skip
 
 from odoo.exceptions import UserError
-from odoo.fields import Command, Date, Datetime
+from odoo.fields import Command, Date
 from odoo.tools import float_is_zero, mute_logger
 from odoo.tests import Form, tagged
 from odoo.addons.stock_account.tests.common import TestStockValuationCommon
@@ -9,6 +9,8 @@ from odoo.addons.stock_account.tests.common import TestStockValuationCommon
 
 @tagged('post_install', '-at_install')
 class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @skip('Temporary to fast merge new valuation')
     def test_kit_anglo_saxo_price_diff(self):
@@ -132,7 +134,7 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
             'location_dest_id': customer_location.id,
             'move_ids': [(0, 0, {
                 'product_id': kit.id,
-                'product_uom': kit.uom_id.id,
+                'uom_id': kit.uom_id.id,
                 'product_uom_qty': 1.0,
                 'location_id': stock_location.id,
                 'location_dest_id': customer_location.id,
@@ -152,12 +154,9 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
                 with kit_form.bom_line_ids.edit(1) as line:
                     line.cost_share = 70
 
-        wizard_form = Form(self.env['stock.return.picking'].with_context(active_id=delivery.id, active_model='stock.picking'))
-        wizard = wizard_form.save()
-        wizard.product_return_moves.quantity = 1
-        action = wizard.action_create_returns()
-        return_picking = self.env["stock.picking"].browse(action["res_id"])
-        return_picking.move_ids.move_line_ids.quantity = 1
+        return_picking = delivery._create_return()
+        return_picking.move_ids.product_uom_qty = 1
+        return_picking.action_assign()
         return_picking.button_validate()
 
         self.assertEqual(component01.stock_valuation_layer_ids.mapped('value'), [25, -25, 25])
@@ -186,11 +185,11 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         usd = self.env.ref('base.USD')
         eur = self.env.ref('base.EUR')
         self.env['res.currency.rate'].create({
-            'name': Datetime.today(),
+            'name': Date.subtract(Date.today(), days=1),
             'currency_id': usd.id,
             'rate': 1})
         self.env['res.currency.rate'].create({
-            'name': Datetime.today(),
+            'name': Date.subtract(Date.today(), days=1),
             'currency_id': eur.id,
             'rate': 2})
 
@@ -212,6 +211,61 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         self.assertEqual(svl.value, 50)  # USD
         self.assertEqual(input_aml.amount_currency, 100)  # EUR
         self.assertEqual(input_aml.balance, 50)  # USD
+
+    def test_multicurrency_kit_different_uom_categories(self):
+        """
+            Create a kit with an UoM belonging to a different category than its component UoM.
+            Purchase that kit in a different currency than the company currency and validate the receipt.
+            Check the generated account entries.
+        """
+        eur = self.env.ref('base.EUR')
+
+        uom_unit = self.env.ref('uom.product_uom_unit')
+        uom_meter = self.env.ref('uom.product_uom_meter')
+
+        kit, component = self.env['product.product'].create([
+            {
+                'name': 'Kit multi UoM',
+                'is_storable': True,
+                'uom_id': uom_unit.id,
+                'categ_id': self.category_avco_auto.id,
+            },
+            {
+                'name': 'Component meter',
+                'is_storable': True,
+                'uom_id': uom_meter.id,
+                'categ_id': self.category_avco_auto.id,
+            },
+        ])
+
+        self.env['mrp.bom'].create({
+            'product_tmpl_id': kit.product_tmpl_id.id,
+            'uom_id': uom_unit.id,
+            'product_qty': 1.0,
+            'type': 'phantom',
+            'bom_line_ids': [Command.create({
+                'product_id': component.id,
+                'product_qty': 1.0,
+                'uom_id': uom_meter.id,
+            })],
+        })
+
+        po = self.env['purchase.order'].create({
+            'partner_id': self.vendor.id,
+            'currency_id': eur.id,
+            'order_line': [Command.create({
+                'product_id': kit.id,
+                'product_qty': 1.0,
+                'uom_id': kit.uom_id.id,
+                'price_unit': 100.0,
+            })],
+        })
+        po.button_confirm()
+
+        receipt = po.picking_ids
+        receipt.button_validate()
+
+        self.assertEqual(receipt.move_ids.state, 'done')
 
     @skip('Temporary to fast merge new valuation')
     def test_fifo_cost_adjust_mo_quantity(self):
@@ -282,7 +336,6 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
             mo_form = Form(production)
             mo_form.qty_producing = 1
             production = mo_form.save()
-            production._post_inventory()
             production.button_mark_done()
             return production
 
@@ -361,7 +414,7 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         component01, component02, component03, component04, component05 = self.env['product.product'].create([{
             'name': 'Component %s' % name,
             'categ_id': avco_category.id,
-        } for name in ('01', '02 ', '03', '04', '05')])
+        } for name in ('01', '02', '03', '04', '05')])
 
         giga_kit, super_kit, kit, sub_kit, phantom_kit, triple_kit = self.env['product.product'].create([{
             'name': name,
@@ -415,13 +468,16 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
             ],
         }])
         vendor = self.env['res.partner'].create({'name': 'Super vendor'})
-        purchase_order = self.env['purchase.order'].create({
-            'partner_id': vendor.id,
-            'order_line': [
-                Command.create({'product_id': super_kit.id, 'product_qty': 1, 'price_unit': 1000})
-            ],
-        })
-        purchase_order.button_confirm()
+        purchase_orders = self.env['purchase.order'].create([
+            {
+                'partner_id': vendor.id,
+                'order_line': [
+                    Command.create({'product_id': super_kit.id, 'product_qty': qty, 'price_unit': 1000}),
+                ],
+            }
+            for qty in [1, 3]
+        ])
+        purchase_orders.button_confirm()
 
         # Actual cost shares:
         # Component01:
@@ -441,22 +497,66 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         #   1.0 * 0.6 * 0.5 * 0.5 (0%) = 0.15 -> 15%
         #   1.0 * 0.2 * 0.5 (0%) = 0.1 -> 10%
         #   1.0 * 0.0 * 1.0 = 0.0 -> 0%
-        self.assertEqual(sum(purchase_order.order_line.move_ids.mapped('cost_share')), 100.0)
-        receipt = purchase_order.picking_ids
-        receipt.button_validate()
-        self.assertRecordValues(receipt.move_ids.sorted(lambda m: (m.product_id.id, m.cost_share)), [
-            {'product_id': component01.id, 'cost_share': 3.33, 'value': 33.3},
-            {'product_id': component02.id, 'cost_share': 3.33, 'value': 33.3},
-            {'product_id': component02.id, 'cost_share': 10.0, 'value': 100.0},
-            {'product_id': component02.id, 'cost_share': 15.0, 'value': 150.0},
-            {'product_id': component03.id, 'cost_share': 3.34, 'value': 33.4},
-            {'product_id': component03.id, 'cost_share': 15.0, 'value': 150.0},
-            {'product_id': component04.id, 'cost_share': 10.0, 'value': 100.0},
-            {'product_id': component04.id, 'cost_share': 15.0, 'value': 150.0},
-            {'product_id': component05.id, 'cost_share': 0.0, 'value': 0.0},
-            {'product_id': component05.id, 'cost_share': 10.0, 'value': 100.0},
-            {'product_id': component05.id, 'cost_share': 15.0, 'value': 150.0},
-        ])
+        self.assertEqual(
+            [
+                sum(moves.mapped('cost_share'))
+                for moves in purchase_orders.order_line.move_ids.grouped('picking_id').values()
+            ], [100, 100])
+        receipts = purchase_orders.picking_ids
+        # Create a backorder by receiving only the half of component01
+        receipts[1].move_line_ids.filtered(lambda ml: ml.product_id.id == component01.id).quantity = 3
+        res = receipts.button_validate()
+        self.env[res["res_model"]].with_context(res["context"]).create({}).process()
+        receipts = purchase_orders.picking_ids
+        receipts[2].button_validate()
+
+        self.assertEqual(sum(purchase_orders[0].order_line.move_ids.mapped('cost_share')), 100.0)
+        moves = purchase_orders.order_line.move_ids.sorted(lambda m: (m.picking_id.id, m.cost_share))
+        cost_share_values = moves.mapped('cost_share')
+        expected_cost_share = [
+            0.0, 3.3333333333333, 3.3333333333333, 3.3333333333333, 10.0, 10.0, 10.0, 15.0, 15.0, 15.0, 15.0,  # receipt 1
+            0.0, 3.3333333333333, 3.3333333333333, 3.3333333333333, 10.0, 10.0, 10.0, 15.0, 15.0, 15.0, 15.0,  # receipt 2
+            3.3333333333333,  # receipt 2 backorder
+        ]
+        for actual, expected in zip(cost_share_values, expected_cost_share):
+            self.assertAlmostEqual(actual, expected)
+
+        expected_values = [
+            {'product_id': component01.id, 'value': 33.33},
+            {'product_id': component02.id, 'value': 33.33},
+            {'product_id': component02.id, 'value': 100.0},
+            {'product_id': component02.id, 'value': 150.0},
+            {'product_id': component03.id, 'value': 33.33},
+            {'product_id': component03.id, 'value': 150.0},
+            {'product_id': component04.id, 'value': 100.0},
+            {'product_id': component04.id, 'value': 150.0},
+            {'product_id': component05.id, 'value': 0.0},
+            {'product_id': component05.id, 'value': 100.0},
+            {'product_id': component05.id, 'value': 150.0},
+            {'product_id': component01.id, 'value': 50.0},
+            {'product_id': component02.id, 'value': 100.0},
+            {'product_id': component02.id, 'value': 300.0},
+            {'product_id': component02.id, 'value': 450.0},
+            {'product_id': component03.id, 'value': 100.0},
+            {'product_id': component03.id, 'value': 450.0},
+            {'product_id': component04.id, 'value': 300.0},
+            {'product_id': component04.id, 'value': 450.0},
+            {'product_id': component05.id, 'value': 0.0},
+            {'product_id': component05.id, 'value': 300.0},
+            {'product_id': component05.id, 'value': 450.0},
+            {'product_id': component01.id, 'value': 50.0}
+        ]
+
+        self.assertRecordValues(receipts.move_ids.sorted(lambda m: (m.picking_id, m.product_id.id, m.cost_share)), expected_values)
+
+        move_form = Form(self.env['account.move'].with_context(default_move_type='in_invoice'))
+        move_form.partner_id = purchase_orders[0].partner_id
+        with mute_logger('odoo.tests.form.onchange'):  # Mute "x PO lines added to the bill" notification
+            move_form.purchase_vendor_bill_id = self.env['purchase.bill.union'].browse(-purchase_orders[0].id)
+        move_form.invoice_date = Date.today()
+        move = move_form.save()
+        move.action_post()
+        self.assertRecordValues(receipts.move_ids.sorted(lambda m: (m.picking_id, m.product_id.id, m.cost_share)), expected_values)
 
     def test_kit_bom_cost_share_constraint_with_variants(self):
         """
@@ -494,7 +594,7 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         with self.assertRaises(UserError):
             self.env['mrp.bom'].create({
                 'product_tmpl_id': product_template.id,
-                'product_uom_id': product_template.uom_id.id,
+                'uom_id': product_template.uom_id.id,
                 'product_qty': 1.0,
                 'type': 'phantom',
                 'bom_line_ids': [
@@ -507,7 +607,7 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         with self.assertRaises(UserError):
             self.env['mrp.bom'].create({
                 'product_tmpl_id': product_template.id,
-                'product_uom_id': product_template.uom_id.id,
+                'uom_id': product_template.uom_id.id,
                 'product_qty': 1.0,
                 'type': 'phantom',
                 'bom_line_ids': [
@@ -520,7 +620,7 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         # Check that optional lines (with a product_qty of 0) are ignored -> Valid
         self.env['mrp.bom'].create({
             'product_tmpl_id': product_template.id,
-            'product_uom_id': product_template.uom_id.id,
+            'uom_id': product_template.uom_id.id,
             'product_qty': 1.0,
             'type': 'phantom',
             'bom_line_ids': [
@@ -532,7 +632,7 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         # Variant with S attribute sum up to 100% others to 0% -> Valid
         self.env['mrp.bom'].create({
             'product_tmpl_id': product_template.id,
-            'product_uom_id': product_template.uom_id.id,
+            'uom_id': product_template.uom_id.id,
             'product_qty': 1.0,
             'type': 'phantom',
             'bom_line_ids': [
@@ -545,7 +645,7 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         # All attribute values of a given attribute are equi-distributed -> Valid
         self.env['mrp.bom'].create({
             'product_tmpl_id': product_template.id,
-            'product_uom_id': product_template.uom_id.id,
+            'uom_id': product_template.uom_id.id,
             'product_qty': 1.0,
             'type': 'phantom',
             'bom_line_ids': [
@@ -563,7 +663,7 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         # Set up is fine for S Blue and M Red but fails for other non existing combination -> Valid
         self.env['mrp.bom'].create({
             'product_tmpl_id': product_template.id,
-            'product_uom_id': product_template.uom_id.id,
+            'uom_id': product_template.uom_id.id,
             'product_qty': 1.0,
             'type': 'phantom',
             'bom_line_ids': [
@@ -578,6 +678,192 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
                 Command.create({'product_id': c3.id, 'product_qty': 1, 'cost_share': 70}),  # All attributes
             ]
         })
+
+    def test_avco_purchase_nested_kit_explode_cost_share_2(self):
+        """
+        Test the cost share calculation when purchasing a kit with nested quantities
+        """
+        kit, sub_kit_1, sub_kit_2, component = self.env['product.product'].create([
+            {
+                'name': name,
+                'categ_id': self.category_avco_auto.id,
+            } for name in ('Kit', 'Sub kit 1', 'Sub kit 2', 'Component')
+        ])
+
+        self.env['mrp.bom'].create([
+            {
+                'product_tmpl_id': kit.product_tmpl_id.id,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': sub_kit_1.id, 'product_qty': 2}),
+                    Command.create({'product_id': sub_kit_2.id, 'product_qty': 2}),
+                ],
+            },
+            {
+                'product_tmpl_id': sub_kit_1.product_tmpl_id.id,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': component.id, 'product_qty': 2}),
+                ],
+            },
+            {
+                'product_tmpl_id': sub_kit_2.product_tmpl_id.id,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': component.id, 'product_qty': 2}),
+                ],
+            },
+        ])
+        purchase_order = self.env['purchase.order'].create({
+            'partner_id': self.vendor.id,
+            'order_line': [
+                Command.create({'product_id': kit.id, 'product_qty': 1, 'price_unit': 1000})
+            ],
+        })
+        purchase_order.button_confirm()
+        moves = purchase_order.order_line.move_ids.sorted('cost_share')
+        cost_share_values = moves.mapped('cost_share')
+        self.assertEqual(sum(cost_share_values), 100.0)
+        for cost_share_value in cost_share_values:
+            self.assertAlmostEqual(cost_share_value, 50.0)
+        receipt = purchase_order.picking_ids
+        receipt.button_validate()
+        valued_moves = receipt.move_ids.sorted('value')
+        self.assertEqual(sum(valued_moves.mapped('value')), 1000.0)
+        self.assertRecordValues(valued_moves, [
+            {'value': val} for val in (500.0, 500.0)
+        ])
+
+    def test_avco_purchase_nested_kit_explode_cost_share_backorder(self):
+        """
+        Test the component cost calculation when purchasing and backordering a nested kit
+        that contains the same component twice with different nested cost_share values.
+        """
+        super_kit, kit, sub_kit, component = self.env['product.product'].create([
+            {
+                'name': name,
+                'categ_id': self.category_avco_auto.id,
+            } for name in ('Super Kit', 'Kit', 'Sub kit', 'Component')
+        ])
+
+        boms = self.env['mrp.bom'].create([
+            {
+                'product_tmpl_id': super_kit.product_tmpl_id.id,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': sub_kit.id, 'product_qty': 2}),
+                    Command.create({'product_id': kit.id, 'product_qty': 2}),
+                ],
+            },
+            {
+                'product_tmpl_id': sub_kit.product_tmpl_id.id,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': component.id, 'product_qty': 2}),
+                ],
+            },
+            {
+                'product_tmpl_id': kit.product_tmpl_id.id,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': sub_kit.id, 'product_qty': 2}),
+                    Command.create({'product_id': component.id, 'product_qty': 2}),
+                ],
+            },
+        ])
+        purchase_order = self.env['purchase.order'].create({
+            'partner_id': self.vendor.id,
+            'order_line': [
+                Command.create({'product_id': super_kit.id, 'product_qty': 1, 'price_unit': 1000})
+            ],
+        })
+        purchase_order.button_confirm()
+        moves = purchase_order.order_line.move_ids
+        self.assertRecordValues(moves, [
+            {'product_id': component.id, 'quantity': 4.0, 'cost_share': 50.0, 'bom_line_id': boms[1].bom_line_ids.id},  # from Sub Kit
+            {'product_id': component.id, 'quantity': 8.0, 'cost_share': 25.0, 'bom_line_id': boms[1].bom_line_ids.id},  # from Sub Kit in Kit
+            {'product_id': component.id, 'quantity': 4.0, 'cost_share': 25.0, 'bom_line_id': boms[2].bom_line_ids[1].id},  # from Kit
+        ])
+        receipt = purchase_order.picking_ids
+        # partially validate and backorder
+        receipt.move_ids.quantity = 2.0
+        Form.from_action(self.env, receipt.button_validate()).save().process()
+        backorder = receipt.backorder_ids
+        backorder.button_validate()
+        valued_moves = purchase_order.order_line.move_ids.sorted('id')
+        self.assertEqual(sum(valued_moves.mapped('value')), 1000.0)
+        self.assertRecordValues(valued_moves, [
+            {'quantity': 2.0, 'value': 250.0},
+            {'quantity': 2.0, 'value': 62.5},
+            {'quantity': 2.0, 'value': 125.0},
+            {'quantity': 2.0, 'value': 250.0},
+            {'quantity': 6.0, 'value': 187.5},
+            {'quantity': 2.0, 'value': 125.0},
+        ])
+
+    def test_avco_purchase_nested_kit_explode_cost_share_backorder_2(self):
+        """
+        Test the component cost calculation when purchasing and backordering a nested kit that contains
+        the same component twice with the same nested cost_share, resulting in a merged backorder move.
+        """
+        super_kit, kit, sub_kit, component = self.env['product.product'].create([
+            {
+                'name': name,
+                'categ_id': self.category_avco_auto.id,
+            } for name in ('Super Kit', 'Kit', 'Sub kit', 'Component')
+        ])
+
+        boms = self.env['mrp.bom'].create([
+            {
+                'product_tmpl_id': super_kit.product_tmpl_id.id,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': sub_kit.id, 'product_qty': 2, 'cost_share': 20.0}),
+                    Command.create({'product_id': kit.id, 'product_qty': 2, 'cost_share': 80.0}),
+                ],
+            },
+            {
+                'product_tmpl_id': sub_kit.product_tmpl_id.id,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': component.id, 'product_qty': 2}),
+                ],
+            },
+            {
+                'product_tmpl_id': kit.product_tmpl_id.id,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': sub_kit.id, 'product_qty': 2, 'cost_share': 25.0}),
+                    Command.create({'product_id': component.id, 'product_qty': 2, 'cost_share': 75.0}),
+                ],
+            },
+        ])
+        purchase_order = self.env['purchase.order'].create({
+            'partner_id': self.vendor.id,
+            'order_line': [
+                Command.create({'product_id': super_kit.id, 'product_qty': 1, 'price_unit': 1000})
+            ],
+        })
+        purchase_order.button_confirm()
+        moves = purchase_order.order_line.move_ids
+        self.assertRecordValues(moves, [
+            {'product_id': component.id, 'quantity': 12.0, 'cost_share': 40.0, 'bom_line_id': boms[1].bom_line_ids.id},  # from Sub Kit and from Sub Kit in Kit
+            {'product_id': component.id, 'quantity': 4.0, 'cost_share': 60.0, 'bom_line_id': boms[2].bom_line_ids[1].id},  # from Kit
+        ])
+        receipt = purchase_order.picking_ids
+        # partially validate and backorder
+        receipt.move_ids.quantity = 2.0
+        Form.from_action(self.env, receipt.button_validate()).save().process()
+        backorder = receipt.backorder_ids
+        backorder.button_validate()
+        valued_moves = purchase_order.order_line.move_ids.sorted('id')
+        self.assertEqual(sum(valued_moves.mapped('value')), 1000.0)
+        self.assertRecordValues(valued_moves, [
+            {'quantity': 2.0, 'value': 66.67},
+            {'quantity': 2.0, 'value': 300},
+            {'quantity': 10.0, 'value': 333.33},
+            {'quantity': 2.0, 'value': 300.0},
+        ])
 
     def test_kit_cost_share_variant_and_optional_lines(self):
         """
@@ -611,7 +897,7 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
         ])
         self.env['mrp.bom'].create({
             'product_tmpl_id': product_template.id,
-            'product_uom_id': product_template.uom_id.id,
+            'uom_id': product_template.uom_id.id,
             'product_qty': 1.0,
             'type': 'phantom',
             'bom_line_ids': [
@@ -666,4 +952,52 @@ class TestAngloSaxonValuationPurchaseMRP(TestStockValuationCommon):
             {'product_id': c4.id, 'value': 500.0},
             {'product_id': c5.id, 'value': 500.0},
             {'product_id': c6.id, 'value': 0.0},
+        ])
+
+    def test_kit_components_cost_distribution(self):
+        """
+        Test that the cost of a kit without set cost_share is equidistributed among component moves
+        and that the associated rounding error introduced by this process is handled at closing.
+        """
+        kit, *components = self.env['product.product'].create([{
+            'name': 'Product %s' % i,
+            'is_storable': True,
+            'categ_id': self.category_avco_auto.id,
+        } for i in range(7)])
+        self.env['mrp.bom'].create([{
+            'product_tmpl_id': kit.product_tmpl_id.id,
+            'type': 'phantom',
+            'bom_line_ids': [
+                *[Command.create({'product_id': p.id}) for p in components],
+            ],
+        }])
+
+        kit_price = 100
+        purchase_order = self.env['purchase.order'].create({
+            'partner_id': self.vendor.id,
+            'order_line': [Command.create({
+                'product_id': kit.id,
+                'product_qty': 1,
+                'price_unit': kit_price,
+            })],
+        })
+        purchase_order.button_confirm()
+        receipt = purchase_order.picking_ids
+        receipt.button_validate()
+        # Check that the monetary value of each component move is set to 16.67 ~ 100/6
+        # Even if the total value is therefore of 100.02 rather than 100
+        self.assertRecordValues(receipt.move_ids, [
+            {'value': val} for val in (16.67, 16.67, 16.67, 16.67, 16.67, 16.67)
+        ])
+
+        # Upload the associated bill and process the valuation closing
+        self._create_bill(kit, 1, 100)
+        correction_data = receipt.move_ids.company_id.action_close_stock_valuation()
+        # Check that correction data's counter balance the move values rounding issue
+        closing_move = self.env['account.move'].browse(correction_data['res_id'])
+        valuation_aml = closing_move.line_ids.filtered(lambda l: l.account_id == self.account_stock_valuation)
+        variation_aml = closing_move.line_ids.filtered(lambda l: l.account_id == self.account_stock_variation)
+        self.assertRecordValues(valuation_aml | variation_aml, [
+            {'account_id': self.account_stock_valuation.id, 'debit': 0.02, 'credit': 0},
+            {'account_id': self.account_stock_variation.id, 'debit': 0, 'credit': 0.02},
         ])

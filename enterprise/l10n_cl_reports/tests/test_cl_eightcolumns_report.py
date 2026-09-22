@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
-from odoo import fields
 from odoo.tests import tagged
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestClEightColumnsReport(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestAccountReportsCommon.setup_country('cl')
@@ -47,7 +48,7 @@ class TestClEightColumnsReport(TestAccountReportsCommon):
 
     def test_whole_report(self):
         report = self.env.ref('l10n_cl_reports.cl_eightcolumns_report')
-        options = self._generate_options(report, fields.Date.from_string('2017-01-01'), fields.Date.from_string('2017-12-31'))
+        options = self._generate_options(report, '2017-01-01', '2017-12-31')
 
         # pylint: disable=bad-whitespace
         self.assertLinesValues(

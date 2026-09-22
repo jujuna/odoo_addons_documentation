@@ -8,9 +8,9 @@ class PosPaymentMethod(models.Model):
 
     iot_device_id = fields.Many2one('iot.device', string='Payment Terminal Device')
 
-    @api.onchange('use_payment_terminal')
-    def _onchange_use_payment_terminal(self):
-        super()._onchange_use_payment_terminal()
+    @api.onchange('payment_provider')
+    def _onchange_payment_provider(self):
+        super()._onchange_payment_provider()
         self.iot_device_id = False
 
     @api.model

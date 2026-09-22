@@ -1,15 +1,29 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests.common import HttpCase, new_test_user
+import json
+import io
+import zipfile
+
+from odoo.tests.common import tagged, HttpCase, new_test_user
 from odoo.addons.spreadsheet_edition.tests.spreadsheet_test_case import SpreadsheetTestCase
 
+from freezegun import freeze_time
 
+EXCEL_FILES = [
+    {
+        "content": '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"/>',
+        "path": "[Content_Types].xml",
+    }
+]
+
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class SpreadsheetMixinControllerTest(SpreadsheetTestCase, HttpCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.raoul = new_test_user(cls.env, login='raoul')
+        cls.raoul = new_test_user(cls.env, login='raoul', groups="base.group_user,test_spreadsheet.group_spreadsheet_test,base.group_allow_export")
 
     def test_company_currency(self):
         self.authenticate(self.raoul.login, self.raoul.password)
@@ -68,3 +82,84 @@ class SpreadsheetMixinControllerTest(SpreadsheetTestCase, HttpCase):
         response = self.url_open(f'/spreadsheet/data/spreadsheet.test/{spreadsheet.id}')
         data = response.json()
         self.assertEqual(data['company_colors'], ['#aa0000', '#aa1111', '#FFFFFF', '#875A7B', '#bb0000', '#bb1111'])
+
+    def test_upload_image(self):
+        self.authenticate(self.raoul.login, self.raoul.password)
+        spreadsheet = self.env['spreadsheet.test'].create({})
+
+        image_data = b'test image data'
+        response = self.url_open(
+            f'/spreadsheet/spreadsheet.test/{spreadsheet.id}/upload_image',
+            data={'csrf_token': self.csrf_token()},
+            files={'ufile': ('test_image.png', image_data, 'image/png')},
+        )
+        result = response.json()
+
+        attachment = self.env['ir.attachment'].browse(result['id'])
+        self.assertEqual(attachment.raw.content, image_data)
+        self.assertEqual(spreadsheet.spreadsheet_image_ids, attachment)
+        self.assertEqual(result['url'], f'/web/image/{attachment.id}?access_token={attachment.access_token}')
+
+    def test_fiscal_year_in_response(self):
+        self.env.company.fiscalyear_last_day = 7
+        self.env.company.fiscalyear_last_month = "6"
+        self.authenticate(self.raoul.login, self.raoul.password)
+        spreadsheet = self.env['spreadsheet.test'].create({})
+
+        with freeze_time('2023-10-10'):
+            response = self.url_open(f'/spreadsheet/data/spreadsheet.test/{spreadsheet.id}')
+            data = response.json()
+            self.assertEqual(data["current_fiscal_year_start"], "2023-06-08")
+            self.assertEqual(data["current_fiscal_year_end"], "2024-06-07")
+
+    def test_can_delete_archived_revisions(self):
+        self.authenticate(self.raoul.login, self.raoul.password)
+        spreadsheet = self.env['spreadsheet.test'].create({})
+        commands = self.new_revision_data(spreadsheet)
+        spreadsheet._dispatch_spreadsheet_message(commands)
+        snapshot_uuid = "snapshot-revision-id"
+        self.snapshot(
+            spreadsheet,
+            spreadsheet.current_revision_uuid, snapshot_uuid, {"sheets": [], "revisionId": snapshot_uuid},
+        )
+        archived_revisions = spreadsheet.with_context(active_test=False).spreadsheet_revision_ids
+        self.assertEqual(len(archived_revisions), 2)
+        archived_revisions.unlink()
+
+        # new revision
+        commands = self.new_revision_data(spreadsheet)
+        spreadsheet._dispatch_spreadsheet_message(commands)
+
+        response = self.url_open(f'/spreadsheet/data/spreadsheet.test/{spreadsheet.id}')
+        data = response.json()
+        self.assertEqual(data['revisions'][0]['serverRevisionId'], snapshot_uuid)
+
+    def test_download_spreadsheet_with_image(self):
+        image = self.env["ir.attachment"].create({
+            "name": "image.png",
+            "raw": b"test",
+        })
+        image.generate_access_token()
+        self.authenticate(self.raoul.login, self.raoul.password)
+        files = EXCEL_FILES + [{
+            'path': "xl/media/image1.png",
+            'imageSrc': f"/web/image/{image.id}?access_token={image.access_token}",
+        }]
+
+        response = self.url_open(
+            '/spreadsheet/xlsx',
+            data={
+                'csrf_token': self.csrf_token(),
+                'zip_name': 'image.xlsx',
+            },
+            files={'files': ('files.json', json.dumps(files), 'application/json')},
+        )
+
+        response.raise_for_status()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'application/vnd.ms-excel')
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+            self.assertEqual(archive.namelist(), ['[Content_Types].xml', 'xl/media/image1.png'])
+            self.assertEqual(archive.read('[Content_Types].xml').decode(), EXCEL_FILES[0]['content'])
+            self.assertEqual(archive.read('xl/media/image1.png'), image.raw.content)

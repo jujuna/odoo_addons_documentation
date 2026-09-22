@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, tools
+from odoo.tools import SQL
 
 
 class EditBillableTimeTarget(models.Model):
@@ -14,7 +15,7 @@ class EditBillableTimeTarget(models.Model):
     create_date = fields.Datetime(readonly=True)
     name = fields.Char(readonly=True)
     resource_calendar_id = fields.Many2one('resource.calendar', string="Working Hours", readonly=True)
-    billable_time_target = fields.Float(string="Monthly Billing Time Target")
+    billable_time_target = fields.Float(string="Monthly Billable Target")
     company_id = fields.Many2one('res.company', 'Company', readonly=True)
     department_id = fields.Many2one('hr.department', 'Department', readonly=True)
     job_id = fields.Many2one('hr.job', 'Job Position', readonly=True)
@@ -31,6 +32,7 @@ class EditBillableTimeTarget(models.Model):
     avatar_128 = fields.Image("Avatar 128", related='employee_id.avatar_128', compute_sudo=True)
     avatar_1920 = fields.Image("Avatar 1920", related='employee_id.avatar_1920', compute_sudo=True)
     image_1024 = fields.Image("Image 1024", related='employee_id.image_1024', compute_sudo=True)
+    work_location_type = fields.Selection(related='employee_id.work_location_type', compute_sudo=True)
     work_email = fields.Char(readonly=True)
     work_phone = fields.Char(readonly=True)
     mobile_phone = fields.Char(readonly=True)
@@ -46,7 +48,7 @@ class EditBillableTimeTarget(models.Model):
         employee_vals = {}
         if 'billable_time_target' in vals:
             employee_vals['billable_time_target'] = vals.pop('billable_time_target')
-            self.env.cache._set_field_cache(self, self._fields.get('billable_time_target')).update(dict.fromkeys(self.ids, employee_vals['billable_time_target']))
+            self._fields['billable_time_target']._update_cache(self, employee_vals['billable_time_target'])
 
         self.check_access('write')
         res = True
@@ -55,17 +57,20 @@ class EditBillableTimeTarget(models.Model):
         return res
 
     def _get_fields(self):
-        return 'e.id AS id,e.name AS name,' + ','.join(
-            ('v.%s' if name in self.env['hr.version']._fields and self.env['hr.version']._fields[name].store else 'e.%s') % name
-            for name, field in self._fields.items()
-            if field.store and field.type not in ['many2many', 'one2many'] and name not in ['id', 'name'])
+        yield SQL('e.id')
+        yield SQL('e.name', to_flush=self.env.registry['hr.employee']._fields['name'])
+        for name, field in self._fields.items():
+            if field.store and field.column_type and name not in ['id', 'name']:
+                alias = 'v' if name in self.env['hr.version']._fields and self.env['hr.version']._fields[name].store else 'e'
+                field = self.env.registry['hr.version' if alias == 'v' else 'hr.employee']._fields[name]
+                yield SQL.identifier(alias, name, to_flush=field)
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute(
-            f"""
-                CREATE OR REPLACE VIEW {self._table} AS (
-                        SELECT {self._get_fields()}
+        self.env.cr.execute(SQL(
+            """
+                CREATE OR REPLACE VIEW %s AS (
+                        SELECT %s
                           FROM hr_employee e
                           JOIN (
                               SELECT DISTINCT ON (employee_id) *
@@ -76,5 +81,7 @@ class EditBillableTimeTarget(models.Model):
                             ON e.company_id = company.id
                          WHERE company.timesheet_show_rates IS TRUE
                 )
-            """
-        )
+            """,
+            SQL.identifier(self._table),
+            SQL(',').join(self._get_fields()),
+        ))

@@ -1,8 +1,7 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Quality checks with IoT',
+    'name': 'IoT for Quality Control',
     'category': 'Supply Chain/Internet of Things (IoT)',
     'summary': 'Control the quality of your products with IoT devices',
     'description': """

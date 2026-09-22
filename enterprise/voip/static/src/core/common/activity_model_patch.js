@@ -1,4 +1,4 @@
-import { fields } from "@mail/core/common/record";
+import { fields } from "@mail/model/export";
 import { Activity } from "@mail/core/common/activity_model";
 
 import { patch } from "@web/core/utils/patch";

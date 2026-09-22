@@ -1,4 +1,3 @@
-from base64 import b64decode as bsf_decode
 from freezegun import freeze_time
 
 from odoo import Command
@@ -10,6 +9,8 @@ from odoo.addons.l10n_it_riba.tools import riba
 
 @tagged('post_install', '-at_install', 'post_install_l10n')
 class TestRiba(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @AccountTestInvoicingCommon.setup_country('it')
@@ -26,14 +27,11 @@ class TestRiba(AccountTestInvoicingCommon):
             'l10n_it_codice_fiscale': '03821260985',
             'l10n_it_sia_code': '12345',
         })
-        partner_bank = cls.env['res.bank'].create({
-            'name': 'CRA di Borgo San Giacomo Credito Cooperativo SCRL',
-        })
         cls.partner_bank_account = cls.env['res.partner.bank'].create({
             'partner_id': cls.partner_a.id,
-            'acc_type': 'bank',
-            'acc_number': 'IT94W0333201600000001112418',
-            'bank_id': partner_bank.id,
+            'account_number': 'IT94W0333201600000001112418',
+            'bank_name': 'CRA di Borgo San Giacomo Credito Cooperativo SCRL',
+            'allow_out_payment': True,
         })
         isernia = cls.env.ref('base.state_it_is')
         cls.partner_a.write({
@@ -55,7 +53,6 @@ class TestRiba(AccountTestInvoicingCommon):
             'prefix': company.bank_account_code_prefix,
             'code_digits': 6,
             'account_type': 'asset_current',
-            'reconcile': True,
         })
         cls.riba_payment_terms = cls.env['account.payment.term'].with_company(company).create([
             {
@@ -72,9 +69,9 @@ class TestRiba(AccountTestInvoicingCommon):
         ])
         journal_bank = cls.company_data['default_journal_bank']
         journal_bank.bank_account_id = cls.env['res.partner.bank'].create({
-            'acc_number': 'IT60X0542811101000000123456',
+            'account_number': 'IT60X0542811101000000123456',
             'partner_id': company.partner_id.id,
-            'acc_type': 'bank',
+            'allow_out_payment': True,
         })
         sale_tax = company.account_sale_tax_id
         cls.invoices = cls.env['account.move'].with_company(company).create([
@@ -149,7 +146,7 @@ class TestRiba(AccountTestInvoicingCommon):
     @freeze_time('2024-11-22')
     def test_riba_export(self):
         batch_payment = self._create_payment_batch_and_reconcile(self.invoices)
-        actual_exported_content = bsf_decode(batch_payment.export_file).decode()
+        actual_exported_content = batch_payment.export_file.decode()
         self.assertEqual(actual_exported_content, self._expected_content(batch_payment.payment_ids.ids))
 
     @freeze_time('2024-11-22')
@@ -158,3 +155,30 @@ class TestRiba(AccountTestInvoicingCommon):
         original_riba_values = batch_payment._l10n_it_riba_get_values()
         actual_imported_values = riba.file_import(self._expected_content(batch_payment.payment_ids.ids))
         self.assertTrue(riba.eq_records(actual_imported_values, original_riba_values))
+
+    def test_sm_iban_riba_batch_payment(self):
+        """ Test that the RIBA batch payment method is available for a partner bank with IBAN for San Marino Regional Bank (SM) """
+        partner_bank_account = self.env['res.partner.bank'].create({
+            'partner_id': self.partner_a.id,
+            'account_number': 'SM59 E085 4009 8130 0013 0170 004',
+            'allow_out_payment': True,
+        })
+        self.partner_a.write({
+            'vat': 'SM24165',
+            'country_id': self.env.ref('base.sm').id,
+            'bank_ids': [Command.link(partner_bank_account.id)]
+        })
+        payment = self.env['account.payment'].create({
+            'amount': 100.0,
+            'payment_type': 'inbound',
+            'partner_id': self.partner_a.id,
+            'payment_method_line_id': self.riba_payment_line.id,
+        })
+        payment.action_post()
+        batch_payment = self.env['account.batch.payment'].create({
+            'journal_id': payment.journal_id.id,
+            'payment_method_id': payment.payment_method_id.id,
+            'payment_ids': [Command.set([payment.id])],
+        })
+        batch_payment.validate_batch()
+        self.assertEqual(batch_payment.payment_method_id, self.riba_method)

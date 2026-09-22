@@ -36,12 +36,12 @@ class ResCompany(models.Model):
 
     @api.depends('l10n_lu_accident_insurance_factor')
     def _compute_l10n_lu_accident_insurance_rate(self):
-        rate = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_lu_accident_insurance_rate', raise_if_not_found=False) or 0.7
+        rate = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_lu_accident_insurance_rate', raise_if_not_found=False) or 0.007
         for company in self:
             company.l10n_lu_accident_insurance_rate = float(company.l10n_lu_accident_insurance_factor) * rate
 
     @api.depends('l10n_lu_mutuality_class')
     def _compute_l10n_lu_mutuality_rate(self):
-        rates = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_lu_mutuality_rates', raise_if_not_found=False) or (0.72, 1.22, 1.76, 2.84)
+        rates = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_lu_mutuality_rates', raise_if_not_found=False) or (0.0072, 0.0122, 0.0176, 0.0284)
         for company in self:
             company.l10n_lu_mutuality_rate = rates[int(company.l10n_lu_mutuality_class) - 1]

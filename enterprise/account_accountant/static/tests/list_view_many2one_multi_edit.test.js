@@ -11,10 +11,14 @@ class AccountBankStatement extends models.Model {
 }
 
 class AccountBankStatementLine extends models.Model {
-    name = fields.Char(); 
+    name = fields.Char();
     statement_id = fields.Many2one({ relation: "account.bank.statement" });
     attachment_ids = fields.Many2many({ relation: "ir.attachment" });
     bank_statement_attachment_ids = fields.Many2many({ relation: "ir.attachment" });
+    partner_id = fields.Integer();
+    line_ids = fields.Integer();
+    journal_id = fields.Integer();
+    company_id = fields.Integer();
     _records = [
         { id: 1, name: "Line 1", statement_id: 1 },
         { id: 2, name: "Line 2", statement_id: 1 },

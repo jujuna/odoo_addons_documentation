@@ -10,32 +10,32 @@
                             <div class="page">
                                 <div class="row border">
                                     <div class="col-4 border-end">
-                                        <strong>Nr.</strong> <span t-esc="wizard.id"/>
+                                        <strong>Nr.</strong> <span t-out="wizard.id"/>
                                     </div>
                                     <div class="col-4 border-end">
-                                        <strong>From:</strong> <span t-esc="date_start"/>
+                                        <strong>From:</strong> <span t-out="date_start"/>
                                     </div>
                                     <div class="col-4">
-                                        <strong>To:</strong> <span t-esc="date_end"/>
+                                        <strong>To:</strong> <span t-out="date_end"/>
                                     </div>
                                 </div>
                                 <div class="row border border-top-0">
                                     <div class="col-4 border-end">
                                         <t t-if="wizard.aggregation_type == 'company'">
                                             <strong>Company:</strong> <br/>
-                                            <span t-esc="company.name"/> <br/>
-                                            <span t-esc="company.street"/> <span t-esc="company.street2"/><br/>
-                                            <span t-esc="company.zip"/>,
-                                            <span t-esc="company.city"/> <br/>
-                                            <span t-esc="company.country_id.name"/> <br/>
+                                            <span t-out="company.name"/> <br/>
+                                            <span t-out="company.street"/> <span t-out="company.street2"/><br/>
+                                            <span t-out="company.zip"/>,
+                                            <span t-out="company.city"/> <br/>
+                                            <span t-out="company.country_id.name"/> <br/>
                                         </t>
                                         <t t-else="">
                                             <strong>Employee:</strong> <br/>
-                                            <span t-esc="aggreg_record.name"/> <br/>
-                                            <span t-esc="aggreg_record.private_street"/> <span t-esc="aggreg_record.private_street2"/><br/>
-                                            <span t-esc="aggreg_record.private_zip"/>,
-                                            <span t-esc="aggreg_record.private_city"/> <br/>
-                                            <span t-esc="aggreg_record.private_country_id.name"/> <br/>
+                                            <span t-out="aggreg_record.name"/> <br/>
+                                            <span t-out="aggreg_record.private_street"/> <span t-out="aggreg_record.private_street2"/><br/>
+                                            <span t-out="aggreg_record.private_zip"/>,
+                                            <span t-out="aggreg_record.private_city"/> <br/>
+                                            <span t-out="aggreg_record.private_country_id.name"/> <br/>
                                         </t>
                                     </div>
                                 </div>
@@ -55,10 +55,10 @@
                                     <tbody>
                                         <t t-foreach="line_values[aggreg_record]" t-as="line">
                                             <tr>
-                                                <td><span t-esc="line['code']"/></td>
-                                                <td><span t-esc="line['name']"/></td>
+                                                <td><span t-out="line['code']"/></td>
+                                                <td><span t-out="line['name']"/></td>
                                                 <td class="text-end">
-                                                    <span t-esc="line['total']" t-options='{"widget": "monetary", "display_currency": company.currency_id}'/>
+                                                    <span t-out="line['total']" t-options='{"widget": "monetary", "display_currency": company.currency_id}'/>
                                                 </td>
                                             </tr>
                                         </t>

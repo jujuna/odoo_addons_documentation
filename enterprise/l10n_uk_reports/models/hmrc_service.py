@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime, timedelta
-import pytz
+import hmac
 import ipaddress
 import json
+import logging
 import requests
 import socket
-import hmac
 import uuid
+from datetime import datetime, timedelta
 from hashlib import sha256
 from werkzeug import urls
+from zoneinfo import ZoneInfo
 
-from odoo import api, models, _
+from odoo import api, models
+from odoo.exceptions import UserError
 from odoo.http import request
 from odoo.release import version
-import logging
-from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -41,13 +41,12 @@ class HmrcService(models.AbstractModel):
         :return: False when no login through hmrc needed by the user, otherwise the url action
         """
         user = self.env.user
-        login_needed = False
-        if user.l10n_uk_user_token:
+        if user_token := user.l10n_uk_user_token:
             if not user.l10n_uk_hmrc_vat_token or user.l10n_uk_hmrc_vat_token_expiration_time < datetime.now() + timedelta(minutes=1):
                 try:
                     url = self._get_proxy_server() + '/onlinesync/l10n_uk/get_tokens'
-                    dbuuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
-                    data = json.dumps({'params': {'user_token': self.env.user.l10n_uk_user_token, 'dbuuid': dbuuid}})
+                    dbuuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
+                    data = json.dumps({'params': {'user_token': user_token, 'dbuuid': dbuuid}})
                     resp = requests.request('GET', url, data=data,
                                             headers={'content-type': "application/json"}, timeout=TIMEOUT) #json-rpc
                     resp.raise_for_status()
@@ -61,7 +60,7 @@ class HmrcService(models.AbstractModel):
                     if response.get('error'):
                         self._clean_tokens(user)
                         self.env.cr.commit()  # Even with the raise, we want to commit the cleaning of the tokens in the db
-                        raise UserError(_(
+                        raise UserError(self.env._(
                             'There was a problem refreshing the tokens.  Please log in again. %(error)s',
                             error=response.get('message'),
                         ))
@@ -69,12 +68,12 @@ class HmrcService(models.AbstractModel):
                         # Let the user know they established the connection and can submit the report.
                         self.env.user._bus_send('simple_notification', {
                             'type': 'success',
-                            'message': _("You are successfully connected to HMRC. You can now send the VAT report."),
+                            'message': self.env._("You are successfully connected to HMRC. You can now send the VAT report."),
                         })
         else:
             # if no user_token, ask for one
             url = self._get_proxy_server() + '/onlinesync/l10n_uk/get_user'
-            dbuuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+            dbuuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
             data = json.dumps({'params': {'dbuuid': dbuuid}})
             resp = requests.request('POST', url, data=data, headers={'content-type': 'application/json', 'Accept': 'text/plain'})
             resp.raise_for_status()
@@ -83,9 +82,7 @@ class HmrcService(models.AbstractModel):
             if contents.get('error'):
                 raise UserError(contents.get('message'))
             user.sudo().write({'l10n_uk_user_token': contents.get('user_token')})
-            login_needed = True
-
-        if login_needed:
+            # login
             url = self.env['hmrc.service']._get_oauth_url(user.l10n_uk_user_token)
             return {
                 'type': 'ir.actions.act_url',
@@ -111,7 +108,7 @@ class HmrcService(models.AbstractModel):
                     response = requests.get('https://ipinfo.io/ip', timeout=TIMEOUT)
                     response.raise_for_status()
                 except requests.exceptions.RequestException as e:
-                    raise UserError(_("Sorry, something went wrong: %s", e))
+                    raise UserError(self.env._("Sorry, something went wrong: %s", e))
                 ip = response.content.decode('utf8')
                 remote_address = ip
                 server_ip = ip
@@ -121,14 +118,14 @@ class HmrcService(models.AbstractModel):
 
             tz = self.env.context.get('tz')
             if tz:
-                tz_hour = datetime.now(pytz.timezone(tz)).strftime('%z')
+                tz_hour = datetime.now(ZoneInfo(tz)).strftime('%z')
                 utc_offset = 'UTC' + tz_hour[:3] + ':' + tz_hour[-2:]
             else:
                 utc_offset = 'UTC+00:00'
 
             ICP = self.env['ir.config_parameter'].sudo()
-            enterprise_code = ICP.get_param('database.enterprise_code')
-            db_secret = ICP.get_param('database.secret')
+            enterprise_code = ICP.get_str('database.enterprise_code')
+            db_secret = ICP.get_str('database.secret')
             if enterprise_code:
                 hashed_license = hmac.new(enterprise_code.encode(),
                                           db_secret.encode(),
@@ -140,7 +137,7 @@ class HmrcService(models.AbstractModel):
             module_version = self.sudo().env.ref('base.module_l10n_uk_reports').installed_version
 
             gov_dict['Gov-Client-Connection-Method'] = 'WEB_APP_VIA_SERVER'
-            
+
             gov_dict['Gov-Client-Public-IP'] = urls.url_quote(remote_address)
             gov_dict['Gov-Client-Public-Port'] = urls.url_quote(str(environ.get('REMOTE_PORT')))
             if 'totp_enabled' in self.env.user._fields and self.env.user.totp_enabled:
@@ -161,7 +158,7 @@ class HmrcService(models.AbstractModel):
             gov_dict['Gov-Client-Window-Size'] = f"width={client_data['window_width']}&height={client_data['window_height']}" if client_data else ''
             gov_dict['Gov-Client-Public-Ip-Timestamp'] = datetime.utcnow().isoformat(timespec='milliseconds')+'Z'
             gov_dict['Gov-Vendor-Product-Name'] = urls.url_quote(f"Odoo {version}")
-            gov_dict['Gov-Client-Device-Id'] = (client_data or {}).get('hmrc_gov_client_device_id') or str(uuid.uuid4()) 
+            gov_dict['Gov-Client-Device-Id'] = (client_data or {}).get('hmrc_gov_client_device_id') or str(uuid.uuid4())
             gov_dict['Gov-Vendor-Forwarded'] = f"by={server_ip}&for={remote_address}"
             gov_dict['Gov-Vendor-Public-IP'] = server_ip
             if hashed_license:
@@ -174,15 +171,15 @@ class HmrcService(models.AbstractModel):
         """
         Test the fraud prevention headers during requests. Only valid in test mode, does nothing when in production.
         """
-        if self.env['ir.config_parameter'].sudo().get_param("l10n_uk_reports.hmrc_mode", 'production') == 'production':
+        if (self.env['ir.config_parameter'].sudo().get_str('l10n_uk_reports.hmrc_mode') or 'production') == 'production':
             return
-        
+
         url = self._get_endpoint_url('/test/fraud-prevention-headers/validate')
         response = requests.request('GET', url, headers=headers, timeout=TIMEOUT)
         response.raise_for_status()
         response_dict = response.json()
         if response_dict.get('errors'):
-            raise UserError(_("Invalid HMRC fraud prevention headers"))
+            raise UserError(self.env._("Invalid HMRC fraud prevention headers"))
 
     @api.model
     def _write_tokens(self, user, tokens):
@@ -206,13 +203,13 @@ class HmrcService(models.AbstractModel):
 
     @api.model
     def _get_state(self, userlogin):
-        action = self.env.ref('account_reports.action_account_report_gt')
         # Search your own host
         url = request.httprequest.scheme + '://' + request.httprequest.host
         return json.dumps({
             'url': url,
             'user': userlogin,
-            'action': action.id,
+            'action': self.env.ref('l10n_uk_reports.action_hmrc_redirect').id,
+            'return_id': self.env.context.get('return_id'),
         })
 
     @api.model
@@ -231,18 +228,18 @@ class HmrcService(models.AbstractModel):
 
     @api.model
     def _get_endpoint_url(self, endpoint):
-        mode = self.env['ir.config_parameter'].sudo().get_param("l10n_uk_reports.hmrc_mode", 'production')
+        mode = self.env['ir.config_parameter'].sudo().get_str('l10n_uk_reports.hmrc_mode') or 'production'
         base_url = PRODUCTION_API_URL if mode == 'production' else SANDBOX_API_URL
         return base_url + endpoint
 
     @api.model
     def _get_proxy_server(self):
-        mode = self.env['ir.config_parameter'].sudo().get_param("l10n_uk_reports.hmrc_mode", 'production')
+        mode = self.env['ir.config_parameter'].sudo().get_str('l10n_uk_reports.hmrc_mode') or 'production'
         proxy_server = 'https://l10n-uk-hmrc.api.odoo.com' if mode == 'production' else 'https://l10n-uk-hmrc.test.odoo.com'
         return proxy_server
 
     @api.model
     def _get_hmrc_client_id(self):
-        mode = self.env['ir.config_parameter'].sudo().get_param("l10n_uk_reports.hmrc_mode", 'production')
+        mode = self.env['ir.config_parameter'].sudo().get_str('l10n_uk_reports.hmrc_mode') or 'production'
         hmrc_client_id = 'GqJgi8Hal1hsEwbG6rY6i9Ag1qUa' if mode == 'production' else 'dTdANDSeX4fiw63DicmUaAVQDSMa'
         return hmrc_client_id

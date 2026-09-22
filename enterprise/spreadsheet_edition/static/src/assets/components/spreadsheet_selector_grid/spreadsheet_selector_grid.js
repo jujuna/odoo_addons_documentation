@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, Resource, signal, t } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { useAutofocus } from "@web/core/utils/hooks";
@@ -7,24 +7,23 @@ const DEFAULT_LIMIT = 9;
 
 export class SpreadsheetSelectorGrid extends Component {
     static template = "spreadsheet_edition.SpreadsheetSelectorGrid";
-    static defaultProps = {
-        displayBlank: true,
-    };
-
-    static props = {
-        spreadsheets: Array,
-        onSpreadsheetSelected: Function,
-        onSpreadsheetDblClicked: Function,
-        getThumbnailURL: Function,
-        selectedSpreadsheetId: Number | null,
-        displayBlank: { type: Boolean, optional: true },
-        blankCardLabel: { type: String, optional: true },
-    };
+    props = useProps({
+        spreadsheets: t.array(),
+        onSpreadsheetSelected: t.function(),
+        onSpreadsheetDblClicked: t.function(),
+        getThumbnailURL: t.function(),
+        selectedSpreadsheetId: t.or([t.number(), t.literal(null)]),
+        displayBlank: t.boolean().optional(true),
+        blankCardLabel: t.string().optional(),
+    });
 
     blankThumbnailPlaceholder = "/spreadsheet/static/img/spreadsheet.svg";
 
+    autofocusRef = signal.ref();
+    gridItemRefs = new Resource({ name: "gridItems" });
+
     setup() {
-        useAutofocus();
+        useAutofocus({ ref: this.autofocusRef });
         useHotkey("ArrowRight", () => this._onArrowKey("right"), {
             allowRepeat: true,
         });

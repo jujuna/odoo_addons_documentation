@@ -3,11 +3,11 @@
 import logging
 
 from markupsafe import Markup
+from datetime import datetime, time
 
+from odoo.addons.hr_contract_salary.utils.hr_version import requires_hr_version_context
 from odoo import api, fields, models, _
-from odoo.models import MAGIC_COLUMNS
 from odoo.exceptions import ValidationError
-from odoo.tools import html_sanitize
 
 _logger = logging.getLogger(__name__)
 
@@ -21,13 +21,13 @@ class HrVersion(models.Model):
 
     origin_version_id = fields.Many2one(
         'hr.version', string="Origin Contract", domain="[('company_id', '=', company_id)]",
-        groups="hr.group_hr_user", help="The contract from which this contract has been duplicated.", tracking=True)
+        groups="hr.group_hr_user", help="The contract from which this contract has been duplicated.", tracking=1)
     is_origin_contract_template = fields.Boolean(
         compute='_compute_is_origin_contract_template', string='Is origin contract a contract template?',
         groups="hr.group_hr_user", readonly=True)
-    hash_token = fields.Char('Created From Token', groups="hr.group_hr_user", tracking=True)
+    hash_token = fields.Char('Created From Token', groups="hr.group_hr_user", tracking=1)
     applicant_id = fields.Many2one('hr.applicant', groups="hr.group_hr_user",
-                                   domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", tracking=True)
+                                   domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", tracking=1)
     contract_reviews_count = fields.Integer(compute="_compute_contract_reviews_count",
                                             string="Proposed Contracts Count")
     contract_template_id = fields.Many2one(default=lambda self: self.job_id.contract_template_id or False)
@@ -47,31 +47,12 @@ class HrVersion(models.Model):
                                                       readonly=False, groups="hr.group_hr_user")
     signatures_count = fields.Integer(compute='_compute_signatures_count', string='# Signatures',
         help="The number of signatures on the pdf contract with the most signatures.", groups="hr.group_hr_user")
-    image_1920_filename = fields.Char(groups="hr.group_hr_user", tracking=True)
+    image_1920_filename = fields.Char(groups="hr.group_hr_user", tracking=1)
     image_1920 = fields.Image(related='employee_id.image_1920', groups="hr.group_hr_manager", readonly=False)
-    # YTI FIXME: holidays and wage_with_holidays are defined twice...
-    holidays = fields.Float(string='Extra Time Off', groups="hr.group_hr_user",
-        help="Number of days of paid leaves the employee gets per year.", tracking=True)
-    wage_with_holidays = fields.Monetary(compute='_compute_wage_with_holidays', inverse='_inverse_wage_with_holidays',
-        tracking=True, string="Wage with Holidays", groups="hr.group_hr_manager")
-    wage_on_signature = fields.Monetary(string="Wage on Signature", tracking=True, aggregator="avg",
-                                        groups="hr.group_hr_manager")
-    salary_offer_ids = fields.One2many('hr.contract.salary.offer', 'employee_version_id', groups="hr.group_hr_manager", tracking=True)
+    salary_offer_ids = fields.One2many('hr.contract.salary.offer', 'employee_version_id', groups="hr.group_hr_manager", tracking=1)
     originated_offer_id = fields.Many2one('hr.contract.salary.offer', help="The original offer",
-                                          groups="hr.group_hr_user", tracking=True)
-    salary_offers_count = fields.Integer(compute='_compute_salary_offers_count', compute_sudo=True)
+                                          groups="hr.group_hr_user", tracking=1)
     template_warning = fields.Char(default=_default_get_template_warning, store=False, groups="hr.group_hr_user")
-
-    # Employer costs fields
-    final_yearly_costs = fields.Monetary(
-        compute='_compute_final_yearly_costs',
-        readonly=False, store=True,
-        string="Yearly Cost",
-        tracking=True,
-        aggregator="avg",
-        groups="hr.group_hr_manager")
-    monthly_yearly_costs = fields.Monetary(
-        compute='_compute_monthly_yearly_costs', string='Monthly Cost', readonly=True, groups="hr.group_hr_manager")
 
     @api.constrains('sign_template_signatories_ids')
     def _check_signatories_unicity(self):
@@ -106,118 +87,10 @@ class HrVersion(models.Model):
                 if not version.hr_responsible_id.email_formatted:
                     raise ValidationError(_("HR Responsible %s should have a valid email address when New Contract Document Template is specified", version.hr_responsible_id.name))
 
-    @api.depends('wage', 'wage_on_signature')
-    def _compute_contract_wage(self):
-        super()._compute_contract_wage()
-
-    def _get_contract_wage_field(self):
-        self.ensure_one()
-        if self._is_struct_from_country('BE'):
-            return 'wage_on_signature'
-        return super()._get_contract_wage_field()
-
     @api.depends('origin_version_id')
     def _compute_is_origin_contract_template(self):
         for version in self:
             version.is_origin_contract_template = version.origin_version_id and not version.origin_version_id.employee_id
-
-    def _compute_salary_offers_count(self):
-        offers_data = self.env['hr.contract.salary.offer']._read_group(
-            domain=[('employee_version_id', 'in', self.ids)],
-            groupby=['employee_version_id'],
-            aggregates=['__count'])
-        mapped_data = {version.id: count for version, count in offers_data}
-        for version in self:
-            version.salary_offers_count = mapped_data.get(version.id, 0)
-
-    def _get_yearly_cost_sacrifice_ratio(self):
-        return 1.0 - self.holidays / 231.0
-
-    def _get_yearly_cost_sacrifice_fixed(self):
-        return 0.0
-
-    def _get_yearly_cost_from_wage_with_holidays(self, wage_with_holidays=False):
-        self.ensure_one()
-        ratio = self._get_yearly_cost_sacrifice_ratio()
-        fixed = self._get_yearly_cost_sacrifice_fixed()
-        if wage_with_holidays:
-            return (self._get_benefits_costs() + self._get_salary_costs_factor() * wage_with_holidays + fixed) / ratio
-        return self.final_yearly_costs * ratio - fixed
-
-    def _get_yearly_cost_from_wage(self):
-        self.ensure_one()
-        fixed = self._get_yearly_cost_sacrifice_fixed()
-        return self._get_benefits_costs() + self._get_salary_costs_factor() * self.wage + fixed
-
-    def _is_salary_sacrifice(self):
-        self.ensure_one()
-        return self.holidays
-
-    @api.depends('holidays', 'wage', 'final_yearly_costs')
-    def _compute_wage_with_holidays(self):
-        for version in self:
-            if version._is_salary_sacrifice():
-                yearly_cost = version._get_yearly_cost_from_wage_with_holidays()
-                version.wage_with_holidays = version._get_gross_from_employer_costs(yearly_cost)
-            else:
-                version.wage_with_holidays = version.wage
-
-    def _inverse_wage_with_holidays(self):
-        for version in self:
-            if version._is_salary_sacrifice():
-                yearly = version._get_yearly_cost_from_wage_with_holidays(version.wage_with_holidays)
-                version.wage = version._get_gross_from_employer_costs(yearly)
-            else:
-                if version.wage != version.wage_with_holidays:
-                    version.wage = version.wage_with_holidays
-
-    def _get_benefit_description(self, benefit, new_value=None):
-        self.ensure_one()
-        if hasattr(self, '_get_description_%s' % benefit.field):
-            description = getattr(self, '_get_description_%s' % benefit.field)(new_value)
-        else:
-            description = benefit.description
-        return html_sanitize(description)
-
-    def _get_benefit_fields(self, triggers=True):
-        types = ('float', 'integer', 'monetary', 'boolean', 'properties')
-        if not triggers:
-            types += ('text',)
-        nonstored_whitelist = self._benefit_white_list()
-        benefit_fields = {
-            field.name
-            for field in self._fields.values()
-            if field.type in types and (field.store or not field.store and field.name in nonstored_whitelist) and not field.name.startswith("x_studio_")
-        }
-        if not triggers:
-            benefit_fields |= {'wage_with_holidays'}
-        return tuple(benefit_fields - self._benefit_black_list())
-
-    def _get_employee_vals_to_update(self):
-        vals = super()._get_employee_vals_to_update()
-        if self.originated_offer_id and self.originated_offer_id.job_title:
-            vals['job_title'] = self.originated_offer_id.job_title
-        return vals
-
-    @api.model
-    def _benefit_black_list(self):
-        return set(MAGIC_COLUMNS + [
-            'wage_on_signature', 'active',
-            'date_generated_from', 'date_generated_to'])
-
-    @api.model
-    def _benefit_white_list(self):
-        return []
-
-    @api.depends(lambda self: (
-        'wage',
-        'structure_type_id.salary_benefits_ids.res_field_id',
-        'structure_type_id.salary_benefits_ids.cost_res_field_id',
-        *self._get_benefit_fields()))
-    def _compute_final_yearly_costs(self):
-        for version in self:
-            if abs(version.final_yearly_costs - version._get_yearly_cost_from_wage()) > 0.10:
-                version.final_yearly_costs = version._get_yearly_cost_from_wage()
 
     @api.depends('company_id', 'job_id')
     def _compute_structure_type_id(self):
@@ -228,47 +101,6 @@ class HrVersion(models.Model):
             else:
                 versions |= version
         super(HrVersion, versions)._compute_structure_type_id()
-
-    @api.onchange("wage_with_holidays")
-    def _onchange_wage_with_holidays(self):
-        self._inverse_wage_with_holidays()
-
-    @api.onchange('final_yearly_costs')
-    def _onchange_final_yearly_costs(self):
-        final_yearly_costs = self.final_yearly_costs
-        self.wage = self._get_gross_from_employer_costs(final_yearly_costs)
-        self.env.remove_to_compute(self._fields['final_yearly_costs'], self)
-        self.final_yearly_costs = final_yearly_costs
-
-    @api.depends('final_yearly_costs')
-    def _compute_monthly_yearly_costs(self):
-        for version in self:
-            version.monthly_yearly_costs = version.final_yearly_costs / 12.0
-
-    def _get_benefits_costs(self):
-        self.ensure_one()
-        benefits = self.env['hr.contract.salary.benefit'].search([
-            ('structure_type_id', '=', self.structure_type_id.id),
-            ('cost_res_field_id', '!=', False),
-        ])
-        if not benefits:
-            return 0
-        monthly_benefits = benefits.filtered(lambda a: a.benefit_type_id.periodicity == 'monthly')
-        monthly_cost = sum(self[benefit.cost_field] or 0 for benefit in monthly_benefits if benefit.cost_field in self)
-        yearly_cost = sum(self[benefit.cost_field] or 0 for benefit in benefits - monthly_benefits if benefit.cost_field in self)
-        return monthly_cost * 12 + yearly_cost
-
-    def _get_gross_from_employer_costs(self, yearly_cost):
-        self.ensure_one()
-        remaining_for_gross = yearly_cost - self._get_benefits_costs()
-        salary_costs_factor = self._get_salary_costs_factor()
-        if salary_costs_factor:
-            return remaining_for_gross / salary_costs_factor
-        return 0
-
-    def _get_employer_costs_from_gross(self, gross):
-        self.ensure_one()
-        return (gross * self._get_salary_costs_factor()) + self._get_benefits_costs()
 
     @api.depends('sign_request_ids.nb_closed')
     def _compute_signatures_count(self):
@@ -309,8 +141,8 @@ class HrVersion(models.Model):
 
     def action_generate_offer(self):
 
-        offer_validity_period = int(self.env['ir.config_parameter'].sudo().get_param(
-            'hr_contract_salary.employee_salary_simulator_link_validity', default=30))
+        offer_validity_period = self.env['ir.config_parameter'].sudo().get_int(
+            'hr_contract_salary.employee_salary_simulator_link_validity') or 30
         offer_values = self._get_offer_values()
         offer_values['validity_days_count'] = offer_validity_period
         offer = self.env['hr.contract.salary.offer'].with_context(
@@ -341,6 +173,8 @@ class HrVersion(models.Model):
             'contract_template_id': self.id,
             'employee_version_id': self.id,
             'final_yearly_costs': self.final_yearly_costs,
+            'salary_amount': self.final_yearly_costs,
+            'budget_type': 'yearly_employer',
             'job_title': self.job_id.name,
             'employee_job_id':  self.job_id.id,
             'department_id': self.department_id.id,
@@ -349,11 +183,6 @@ class HrVersion(models.Model):
     def _get_values_dict(self):
         self.ensure_one()
         return self.read(load=None)[0]
-
-    def _get_wage_to_apply(self):
-        # To be overriden in localizations if a new wage applies depending on selected benefits
-        self.ensure_one()
-        return self.wage_with_holidays
 
     def send_offer(self):
         self.ensure_one()
@@ -384,3 +213,76 @@ class HrVersion(models.Model):
         job_positions = self.env['hr.job'].search([('contract_template_id', 'in', self.ids)])
         job_positions.contract_template_id = False
         return res
+
+    @requires_hr_version_context()
+    def _generate_salary_simulation_payslip(self):
+        self.ensure_one()
+        payslip = self.env['hr.payslip'].sudo().create({
+            'employee_id': self.employee_id.id,
+            'version_id': self.id,
+            'struct_id': self.structure_type_id.default_struct_id.id,
+            'company_id': self.employee_id.company_id.id,
+        })
+
+        work_days_data = self.employee_id._get_work_days_data_batch(
+            datetime.combine(payslip.date_from, time.min), datetime.combine(payslip.date_to, time.max),
+            compute_leaves=False, calendar=self.resource_calendar_id,
+        )[self.employee_id.id]
+        payslip.worked_days_line_ids = self.env['hr.payslip.worked_days'].sudo().create({
+            'payslip_id': payslip.id,
+            'version_id': self.id,
+            'work_entry_type_id': self._get_default_work_entry_type_id(),
+            'number_of_days': work_days_data.get('days', 0),
+            'number_of_hours': work_days_data.get('hours', 0),
+        })
+
+        # Part Time Simulation
+        old_wage = payslip.version_id.wage
+        new_payslip_vals = {}
+        if self.env.context.get("simulation_working_schedule"):
+            working_schedule = self.env.context.get("simulation_working_schedule", '100')
+            old_calendar = payslip.version_id.company_id.resource_calendar_id
+            new_calendar = self.env['resource.calendar']
+            if working_schedule == '100':
+                pass
+            elif working_schedule == '90':
+                new_calendar = old_calendar.copy({'global_leave_ids': False})
+                new_calendar.attendance_ids[:1].unlink()
+            elif working_schedule == '80':
+                new_calendar = old_calendar.copy({'global_leave_ids': False})
+                new_calendar.attendance_ids[:2].unlink()
+            elif working_schedule == '60':
+                new_calendar = old_calendar.copy({'global_leave_ids': False})
+                new_calendar.attendance_ids[:4].unlink()
+            elif working_schedule == '50':
+                new_calendar = old_calendar.copy({'global_leave_ids': False})
+                new_calendar.attendance_ids[:5].unlink()
+            elif working_schedule == '40':
+                new_calendar = old_calendar.copy({'global_leave_ids': False})
+                new_calendar.attendance_ids[:6].unlink()
+            elif working_schedule == '20':
+                new_calendar = old_calendar.copy({'global_leave_ids': False})
+                new_calendar.attendance_ids[:8].unlink()
+            new_wage = old_wage * int(working_schedule) / 100.0
+            is_full_time = working_schedule == '100'
+            new_payslip_vals.update({
+                'resource_calendar_id': new_calendar.id,
+                'wage': new_wage,
+            })
+
+        else:
+            is_full_time = True
+
+        payslip = payslip.with_context(
+            is_simulation_offer=True,
+            salary_simulation=True,
+            salary_simulation_full_time=is_full_time,
+            salary_simulation_full_time_yearly_cost=self.final_yearly_costs,
+            origin_version_id=self.env.context.get('origin_version_id', False),
+            lang=None
+        )
+
+        if not is_full_time:
+            payslip.version_id.write(new_payslip_vals)
+
+        return payslip

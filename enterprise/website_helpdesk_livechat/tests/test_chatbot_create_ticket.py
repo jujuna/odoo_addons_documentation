@@ -18,7 +18,13 @@ class TestChatbotCreateTicket(HelpdeskChatbotCase):
         self.assertIn('helpme@example.com', created_ticket.description)
         self.assertIn('+32499112233', created_ticket.description)
 
-        self.assertFalse(bool(created_ticket.team_id))
+        self.assertFalse(created_ticket.team_id)
+
+        # UTMs
+        self.assertEqual(created_ticket.utm_reference, self.chatbot_script)
+        self.assertEqual(created_ticket.source_id, self.env.ref("im_livechat.utm_source_chatbot"))
+        self.assertEqual(created_ticket.medium_id, self.env.ref("utm.utm_medium_website"))
+        self.assertFalse(created_ticket.campaign_id)
 
     def test_chatbot_helpdesk_ticket_portal_user(self):
         """ Create a ticket from a portal user and check that information are correctly propagated. """
@@ -31,6 +37,12 @@ class TestChatbotCreateTicket(HelpdeskChatbotCase):
         self.assertEqual(created_ticket.partner_phone, '+32499112233')
 
         self.assertEqual(created_ticket.team_id, self.helpdesk_team)
+
+        # UTMs
+        self.assertEqual(created_ticket.utm_reference, self.chatbot_script)
+        self.assertEqual(created_ticket.source_id, self.env.ref("im_livechat.utm_source_chatbot"))
+        self.assertEqual(created_ticket.medium_id, self.env.ref("utm.utm_medium_website"))
+        self.assertFalse(created_ticket.campaign_id)
 
     def _chatbot_create_helpdesk_ticket(self):
         data = self.make_jsonrpc_request("/im_livechat/get_session", {

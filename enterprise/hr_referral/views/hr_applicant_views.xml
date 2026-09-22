@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <odoo>
-    <menuitem name="Referrals" id="menu_hr_referral_root" web_icon="hr_referral,static/description/icon.png" sequence="215" groups="hr_referral.group_hr_recruitment_referral_user"/>
+    <menuitem name="Referrals" id="menu_hr_referral_root" web_icon="hr_referral,static/description/icon.png" sequence="210" groups="hr_referral.group_hr_recruitment_referral_user"/>
     <menuitem parent="menu_hr_referral_root" id="menu_hr_referral_configuration" name="Configuration" sequence="50" groups="hr_referral.group_hr_referral_manager,hr_referral.group_hr_referral_reward_responsible_user"/>
+    <menuitem parent="menu_hr_referral_configuration" id="menu_hr_referral_recruitment_configuration" name="Recruitment" sequence="2"/>
+    <menuitem parent="menu_hr_referral_configuration" id="menu_hr_referral_referrals_configuration" name="Referrals" sequence="10"/>
+    <menuitem parent="menu_hr_referral_configuration" id="menu_hr_referral_dashboard_configuration" name="Dashboard" sequence="20"/>
 
     <record model="ir.ui.view" id="hr_applicant_view_form_inherit_referral">
         <field name="name">hr.applicant.view.form.inherit.referral</field>
@@ -15,6 +18,10 @@
                        placeholder="Select the user that send us the applicant"/>
                 <field name="is_accessible_to_current_user" invisible="1"/>
             </xpath>
+            <xpath expr="//field[@name='utm_reference']" position="attributes">
+                <!-- Manipulated using 'ref_user_id' -->
+                <attribute name="invisible">1</attribute>
+            </xpath>
         </field>
     </record>
 
@@ -25,9 +32,6 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='email_from']" position="after">
                 <field name="ref_user_id" string="Referred By" widget="many2one_avatar_user"/>
-            </xpath>
-            <xpath expr="//filter[@name='last_stage_update']" position="after">
-                <filter string="Referred By" name="ref_by_user_id" context="{'group_by':'ref_user_id'}"/>
             </xpath>
         </field>
     </record>
@@ -59,16 +63,16 @@
                                 <field name="partner_name" class="fw-bold fs-4"/>
                                 <field name="job_id" class="text-muted mb-3"/>
                             </div>
-                            <div t-if="record.friend_id.raw_value" class="o_head_friend ms-auto me-2 mt-3 z-0">
-                                <field name="friend_id" widget="image" options="{'preview_image': 'image_head'}"/>
+                            <div t-if="record.friend_id.raw_value" class="o_head_friend ms-auto me-2 mt-3 z-0 rounded-circle">
+                                <field name="image_head" widget="avatarClickableImage" options="{'preview_image': 'image_head'}"/>
                             </div>
                         </div>
                         <div t-else="">
-                            <div t-if="record.friend_id.raw_value" class="o_head_friend ms-auto me-2 mt-3 z-0">
-                                <field name="friend_id" widget="image" options="{'preview_image': 'image_head'}"/>
+                            <div t-if="record.friend_id.raw_value" class="o_head_friend ms-auto me-2 mt-3 z-0 rounded-circle">
+                                <field name="image_head" widget="avatarClickableImage" options="{'preview_image': 'image_head'}"/>
                             </div>
                         </div>
-                        <div t-if="record.user_id.value"><b>Responsible: </b><field name="user_id"/></div>
+                        <div t-if="record.recruiter_id.value"><b>Responsible: </b><field name="recruiter_id"/></div>
                         <h5>
                             <div t-if="record.referral_state.raw_value == 'progress'">
                                 <field name="earned_points"/> / <field name="max_points"/> Points
@@ -83,14 +87,14 @@
                         <table class="table">
                             <tr t-foreach="JSON.parse(record.shared_item_infos.raw_value)" t-as="stage" t-key="stage_index">
                                 <td>
-                                    <t t-if="stage.done"><i class="text-success fa fa-check" title="Done"></i></t>
-                                    <t t-elif="record.referral_state.raw_value == 'closed'"><i class="text-danger fa fa-times" title="Closed"></i></t>
-                                    <t t-else=""><i class="fa fa-square-o" title="Open"></i></t>
+                                    <t t-if="stage.done"><i class="oi text-success" data-icon="check" title="Done"></i></t>
+                                    <t t-elif="record.referral_state.raw_value == 'closed'"><i class="oi text-danger" data-icon="close" title="Closed"></i></t>
+                                    <t t-else=""><i class="oi" data-icon="square" title="Open"></i></t>
                                 </td>
-                                <td><t t-esc="stage.name"/></td>
-                                <td t-if="stage.done">+<t t-esc="stage.points"/> Points</td>
+                                <td><t t-out="stage.name"/></td>
+                                <td t-if="stage.done">+<t t-out="stage.points"/> Points</td>
                                 <td t-elif="record.referral_state.raw_value == 'closed'"></td>
-                                <td t-else="" class="text-muted">+<t t-esc="stage.points"/> Points</td>
+                                <td t-else="" class="text-muted">+<t t-out="stage.points"/> Points</td>
                             </tr>
                         </table>
                     </t>

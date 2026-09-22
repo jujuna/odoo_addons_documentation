@@ -6,14 +6,14 @@
             <field name="model">res.company</field>
             <field name="inherit_id" ref="base.view_company_form"/>
             <field name="arch" type="xml">
-                <field name="vat" position="after">
+                <div name="identifiers" position="after">
                     <field name="l10n_ke_branch_code" invisible="country_code != 'KE'"/>
-                </field>
+                </div>
                 <field name="child_ids" position="before">
                     <div class="text-muted" colspan="2" invisible="country_code != 'KE' or l10n_ke_branch_code != '00'">
                         Information about branches on this company can be fetched from the KRA and used to create branches in Odoo.
                         The OSCU will need to be initialized independently for each of these branches.
-                        <button class="p-0 border-0 oe_inline oe_link" icon="fa-arrow-right" name="action_l10n_ke_create_branches" string="Populate from KRA" type="object"/>
+                        <button class="p-0 border-0 oe_inline oe_link" icon="arrow_forward" name="action_l10n_ke_create_branches" string="Populate from KRA" type="object"/>
                     </div>
                 </field>
             </field>

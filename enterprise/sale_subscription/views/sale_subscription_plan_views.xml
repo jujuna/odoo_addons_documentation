@@ -8,14 +8,14 @@
                 <sheet>
                     <div name="button_box" class="oe_button_box">
                         <button name="action_open_active_sub" type="object"
-                                class="oe_stat_button" icon="fa-refresh">
+                                class="oe_stat_button" icon="refresh">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">Subscriptions</span>
                                 <field name="active_subs_count" class="o_stat_value"/>
                             </div>
                         </button>
                         <button name="action_open_active_subscription_lines" type="object"
-                                class="oe_stat_button" icon="fa-bars">
+                                class="oe_stat_button" icon="menu">
                             <div class="o_stat_info">
                                 <field name="subscription_line_count" class="o_stat_value"/>
                                 <span class="o_stat_text">Subscription Items</span>
@@ -59,20 +59,22 @@
                     </group>
                     <notebook name="main_book">
                         <page string="Pricing" name="pricing">
-                            <field
-                                name="subscription_rule_ids"
-                                context="{'form_view_ref': 'sale_subscription.product_pricelist_item_form_view_recurring'}"
-                            >
-                                <list string="Subscription Pricelist Rules">
+                            <field name="subscription_rule_ids"
+                                   context="{'default_pricelist_id': False, 'default_compute_price': 'fixed'}">
+                                <list string="Subscription Pricelist Rules" editable="bottom">
                                     <field name="product_tmpl_id"/>
                                     <field name="product_id" groups="product.group_product_variant"/>
                                     <field name="pricelist_id" groups="product.group_product_pricelist"/>
-                                    <field name="price"/>
+                                    <field name="fixed_price"
+                                           string="Price"
+                                           widget="monetary"
+                                           options="{'currency_field': 'currency_id', 'field_digits': True}"/>
                                     <field name="min_quantity" optional="hide"/>
 
                                     <field name="base" column_invisible="True"/>
                                     <field name="price_discount" column_invisible="True"/>
                                     <field name="compute_price" column_invisible="True"/>
+                                    <field name="currency_id" column_invisible="True"/>
                                 </list>
                             </field>
                         </page>
@@ -103,9 +105,9 @@
             <search string="Recurring Plan">
                 <field name="name"/>
                 <field name="auto_close_limit" string="Automatic Closing After" filter_domain="[('auto_close_limit', '=', self)]"/>
-                <filter name="closable" string="Closable" domain="[('user_closable', '=', 'True')]"/>
-                <filter name="renew" string="Renew" domain="[('user_extend', '=', 'True')]"/>
-                <filter name="add_product" string="Add Products" domain="[('user_quantity', '=', 'True')]"/>
+                <filter name="closable" string="Closable" domain="[('user_closable', '=', True)]"/>
+                <filter name="renew" string="Renew" domain="[('user_extend', '=', True)]"/>
+                <filter name="add_product" string="Add Products" domain="[('user_quantity', '=', True)]"/>
             </search>
         </field>
     </record>

@@ -3,24 +3,26 @@
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from freezegun import freeze_time
 
 from odoo import fields
 from odoo.exceptions import ValidationError
-from odoo.tests.common import TransactionCase, new_test_user
+from odoo.tests.common import tagged, TransactionCase, new_test_user
 
 
-class TestHrAppraisal(TransactionCase):
+@tagged('at_install', '-post_install')  # LEGACY at_install
+class TestHrAppraisalMultiCompany(TransactionCase):
     """ Test used to check that appraisal works in multicompany."""
 
     @classmethod
     def setUpClass(cls):
-        super(TestHrAppraisal, cls).setUpClass()
+        super().setUpClass()
         cls.HrEmployee = cls.env['hr.employee']
         cls.HrAppraisal = cls.env['hr.appraisal']
         cls.main_company = cls.env['res.company'].create({'name': 'main'})
         cls.other_company = cls.env['res.company'].create({'name': 'other'})
 
-        cls.env['ir.config_parameter'].sudo().set_param("hr_appraisal.appraisal_create_in_advance_days", 8)
+        cls.env['ir.config_parameter'].sudo().set_int("hr_appraisal.appraisal_create_in_advance_days", 8)
 
         cls.user = new_test_user(cls.env, login='My super login', groups='hr_appraisal.group_hr_appraisal_user',
                                   company_ids=[(6, 0, (cls.main_company | cls.other_company).ids)], company_id=cls.main_company.id)
@@ -38,8 +40,10 @@ class TestHrAppraisal(TransactionCase):
             create_date=date.today() - relativedelta(months=6, days=6),
         ))
 
+    @freeze_time("2026-08-12 08:00:00")
     def test_hr_appraisal(self):
         # I create a new Employee with appraisal configuration.
+
         appraisal_count = self.env['hr.appraisal'].search_count
         self.assertEqual(appraisal_count([('employee_id', '=', self.hr_employee.id)]), 0)
         self.assertEqual(appraisal_count([('employee_id', '=', self.hr_employee2.id)]), 0)

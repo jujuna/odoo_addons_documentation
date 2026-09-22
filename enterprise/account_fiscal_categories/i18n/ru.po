@@ -5,14 +5,15 @@
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-08 19:30+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 03:09+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "account_fiscal_categories/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: account_fiscal_categories
 #: model:ir.model,name:account_fiscal_categories.model_account_account
@@ -33,13 +34,20 @@ msgstr "Счёт"
 #. module: account_fiscal_categories
 #: model:ir.model,name:account_fiscal_categories.model_account_fiscal_category
 msgid "Account Fiscal Category"
+msgstr "Категория фискальной позиции счета"
+
+#. module: account_fiscal_categories
+#: model:ir.module.module,description:base.module_account_fiscal_categories
+#: model:ir.module.module,shortdesc:base.module_account_fiscal_categories
+#: model:ir.module.module,summary:base.module_account_fiscal_categories
+msgid "Account Fiscal Report"
 msgstr ""
 
 #. module: account_fiscal_categories
 #. odoo-python
 #: code:addons/account_fiscal_categories/report/account_fiscal_report_handler.py:0
 msgid "Account(s) with Multiple Fiscal Rates"
-msgstr ""
+msgstr "Счет(а) с несколькими фискальными ставками"
 
 #. module: account_fiscal_categories
 #: model:ir.model.fields,field_description:account_fiscal_categories.field_account_fiscal_category__active
@@ -49,12 +57,17 @@ msgstr "Активный"
 #. module: account_fiscal_categories
 #: model_terms:ir.actions.act_window,help:account_fiscal_categories.action_account_fiscal_category_list
 msgid "Add a Fiscal Category"
+msgstr "Добавить фискальную категорию"
+
+#. module: account_fiscal_categories
+#: model_terms:ir.ui.view,arch_db:account_fiscal_categories.view_account_fiscal_category_form
+msgid "All companies"
 msgstr ""
 
 #. module: account_fiscal_categories
 #: model:account.report.column,name:account_fiscal_categories.fiscal_report_total_amount
 msgid "Base Total"
-msgstr ""
+msgstr "Базовый итог"
 
 #. module: account_fiscal_categories
 #: model_terms:ir.ui.view,arch_db:account_fiscal_categories.view_account_fiscal_category_form
@@ -101,51 +114,51 @@ msgstr "Отображаемое имя"
 #. module: account_fiscal_categories
 #: model:account.report.column,name:account_fiscal_categories.fiscal_report_deductible_amount
 msgid "Fiscal Amount"
-msgstr ""
+msgstr "Фискальная сумма"
 
 #. module: account_fiscal_categories
 #: model:ir.actions.act_window,name:account_fiscal_categories.action_account_fiscal_category_list
 #: model:ir.ui.menu,name:account_fiscal_categories.menu_action_account_fiscal_category_list
 msgid "Fiscal Categories"
-msgstr ""
+msgstr "Фискальные категории"
 
 #. module: account_fiscal_categories
 #: model:ir.model.fields,field_description:account_fiscal_categories.field_account_account__fiscal_category_id
 #: model_terms:ir.ui.view,arch_db:account_fiscal_categories.view_account_form
 msgid "Fiscal Category"
-msgstr ""
+msgstr "Фискальная категория"
 
 #. module: account_fiscal_categories
 #: model:ir.model,name:account_fiscal_categories.model_account_account_fiscal_rate
 msgid "Fiscal Rate"
-msgstr ""
+msgstr "Фискальная ставка"
 
 #. module: account_fiscal_categories
 #: model:ir.model.fields,field_description:account_fiscal_categories.field_account_account_fiscal_rate__rate
 msgid "Fiscal Rate (%)"
-msgstr ""
+msgstr "Фискальная ставка (%)"
 
 #. module: account_fiscal_categories
 #: model_terms:ir.ui.view,arch_db:account_fiscal_categories.view_account_form
 msgid "Fiscal Rates"
-msgstr ""
+msgstr "Фискальные ставки"
 
 #. module: account_fiscal_categories
 #: model:account.report,name:account_fiscal_categories.fiscal_report
 #: model:ir.actions.client,name:account_fiscal_categories.action_account_fiscal_report
 #: model:ir.ui.menu,name:account_fiscal_categories.menu_action_account_fiscal_report
 msgid "Fiscal Report"
-msgstr ""
+msgstr "Фискальный отчет"
 
 #. module: account_fiscal_categories
 #: model:ir.model,name:account_fiscal_categories.model_account_fiscal_report_handler
 msgid "Fiscal Report Custom Handler"
-msgstr ""
+msgstr "Кастомный обработчик фискального отчета"
 
 #. module: account_fiscal_categories
 #: model:ir.model.constraint,message:account_fiscal_categories.constraint_account_fiscal_category_unique_code
 msgid "Fiscal category code should be unique."
-msgstr ""
+msgstr "Код фискальной категории должен быть уникальным."
 
 #. module: account_fiscal_categories
 #. odoo-python
@@ -158,6 +171,8 @@ msgstr "Главная Книга"
 msgid ""
 "General: Make sure the deduction for business meals is under the legal limit."
 msgstr ""
+"Общее: Убедитесь, что вычет на представительские расходы (питание) не "
+"превышает установленный законом лимит."
 
 #. module: account_fiscal_categories
 #: model:ir.model.fields,field_description:account_fiscal_categories.field_account_account__id
@@ -188,7 +203,7 @@ msgstr "Дата последнего обновления:"
 #. module: account_fiscal_categories
 #: model:account.return.check.template,name:account_fiscal_categories.account_return_check_template_meal_expense_adjustment
 msgid "Meal expense adjustments"
-msgstr ""
+msgstr "Корректировка расходов на питание"
 
 #. module: account_fiscal_categories
 #: model:ir.model.fields,field_description:account_fiscal_categories.field_account_fiscal_category__name
@@ -222,7 +237,7 @@ msgstr "Дата начала"
 #. odoo-javascript
 #: code:addons/account_fiscal_categories/static/src/components/fiscal_report/warnings.xml:0
 msgid "There are"
-msgstr "Найдено"
+msgstr ""
 
 #. module: account_fiscal_categories
 #. odoo-python
@@ -244,59 +259,10 @@ msgstr "например, налог, не подлежащий вычету"
 #. odoo-javascript
 #: code:addons/account_fiscal_categories/static/src/components/fiscal_report/warnings.xml:0
 msgid "in this period."
-msgstr ""
+msgstr "в этом периоде."
 
 #. module: account_fiscal_categories
 #. odoo-javascript
 #: code:addons/account_fiscal_categories/static/src/components/fiscal_report/warnings.xml:0
 msgid "multiple fiscal rates"
-msgstr ""
-
-#~ msgid "Add a Disallowed Expenses Category"
-#~ msgstr "Добавить категорию запрещенных расходов"
-
-#~ msgid "Category"
-#~ msgstr "Категория"
-
-#~ msgid "Disallowed %"
-#~ msgstr "Запрещенный %"
-
-#~ msgid "Disallowed Amount"
-#~ msgstr "Запрещенная сумма"
-
-#~ msgid "Disallowed Expenses"
-#~ msgstr "Запрещенные расходы"
-
-#~ msgid "Disallowed Expenses Categories"
-#~ msgstr "Категории запрещенных расходов"
-
-#~ msgid "Disallowed Expenses Category"
-#~ msgstr "Категория запрещенных расходов"
-
-#~ msgid "Disallowed Expenses Custom Handler"
-#~ msgstr "Пользовательский обработчик запрещенных расходов"
-
-#~ msgid "Disallowed Expenses Rate"
-#~ msgstr "Ставка за неправомерные расходы"
-
-#~ msgid "Disallowed Expenses Report"
-#~ msgstr "Отчет об отклоненных расходах"
-
-#~ msgid "Disallowed expenses category code should be unique."
-#~ msgstr "Код категории запрещенных расходов должен быть уникальным."
-
-#~ msgid "No Rate"
-#~ msgstr "Нет ставки"
-
-#~ msgid "Rates"
-#~ msgstr "Тарифы"
-
-#~ msgid "Set Rates"
-#~ msgstr "Установить тарифы"
-
-#~ msgid "There are multiple disallowed expenses rates in this period"
-#~ msgstr ""
-#~ "В этом периоде существует несколько тарифов на не учитываемые расходы"
-
-#~ msgid "Total Amount"
-#~ msgstr "Общая сумма"
+msgstr "несколько фискальных ставок"

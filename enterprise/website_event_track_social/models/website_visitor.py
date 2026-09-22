@@ -34,4 +34,4 @@ class WebsiteVisitor(models.Model):
             ('track_id', operator, operand),
             ('is_blacklisted', '=', True)
         ])
-        return [('id', 'not in', subquery.subselect('visitor_id'))]
+        return [('id', 'not in', subquery.subselect(subquery.table.visitor_id))]

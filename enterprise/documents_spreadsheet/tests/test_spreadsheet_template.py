@@ -2,9 +2,13 @@
 
 import json
 
-from .common import SpreadsheetTestCommon, TEST_CONTENT
+from .common import SpreadsheetTestCommon
+from odoo import Command
 from odoo.exceptions import AccessError
-from odoo.tests.common import new_test_user
+from odoo.tests.common import tagged, new_test_user
+
+TEST_CONTENT = "{}"
+
 
 class SpreadsheetTemplate(SpreadsheetTestCommon):
 
@@ -62,13 +66,96 @@ class SpreadsheetTemplate(SpreadsheetTestCommon):
                 {"name": "bye"}
             )
 
+    def test_read_template_of_access_groups(self):
+        group = self.env["res.groups"].create({"name": "Spreadsheet template group"})
+        member = new_test_user(
+            self.env, "Group member", groups="documents.group_documents_user"
+        )
+        member.group_ids = [Command.link(group.id)]
+        template = self.env["spreadsheet.template"].create({
+            "spreadsheet_data": TEST_CONTENT,
+            "name": "Template name",
+            "group_ids": [Command.set(group.ids)],
+        })
+        template.invalidate_recordset()
+
+        self.assertNotIn(
+            template.id,
+            self.env["spreadsheet.template"].with_user(self.spreadsheet_user).search([]).ids,
+            "Document User is not in the access groups of the template"
+        )
+        with self.assertRaises(
+            AccessError, msg="Document User cannot read a template of another group"
+        ):
+            template.with_user(self.spreadsheet_user).read(["name"])
+
+        self.assertIn(
+            template.id,
+            self.env["spreadsheet.template"].with_user(member).search([]).ids,
+            "Group member is in the access groups of the template"
+        )
+        self.assertEqual(template.with_user(member).name, "Template name")
+
+    def test_forbid_write_on_template_of_access_groups(self):
+        """Being in the access groups of a template only grants read access."""
+        group = self.env["res.groups"].create({"name": "Spreadsheet template group"})
+        member = new_test_user(
+            self.env, "Group member", groups="documents.group_documents_user"
+        )
+        member.group_ids = [Command.link(group.id)]
+        template = self.env["spreadsheet.template"].create({
+            "spreadsheet_data": TEST_CONTENT,
+            "name": "Template name",
+            "group_ids": [Command.set(group.ids)],
+        })
+        template.invalidate_recordset()
+        self.assertEqual(
+            template.with_user(member).name,
+            "Template name",
+            "Group member can read the template"
+        )
+
+        with self.assertRaises(
+            AccessError, msg="Document User cannot edit other's templates"
+        ):
+            template.with_user(member).write({"name": "bye"})
+        with self.assertRaises(
+            AccessError, msg="Document User cannot change the access groups of other's templates"
+        ):
+            template.with_user(member).write({"group_ids": [Command.clear()]})
+
+    def test_write_access_groups_on_own_template(self):
+        group = self.env["res.groups"].create({"name": "Spreadsheet template group"})
+        template = self.env["spreadsheet.template"].with_user(self.spreadsheet_user)\
+            .create({
+                "spreadsheet_data": TEST_CONTENT,
+                "name": "Template name",
+            })
+        self.assertEqual(
+            template.group_ids,
+            self.env.ref("base.group_user"),
+            "It should be shared with all the internal users by default"
+        )
+
+        template.write({"group_ids": [Command.set(group.ids)]})
+        self.assertEqual(
+            template.sudo().group_ids,
+            group,
+            "Document User can restrict the access groups of their own templates"
+        )
+        self.assertIn(
+            template.id,
+            self.env["spreadsheet.template"].with_user(self.spreadsheet_user).search([]).ids,
+            "Document User still had access to the template"
+        )
+
     def test_action_create_spreadsheet(self):
         template = self.env["spreadsheet.template"].create({
             "spreadsheet_data": TEST_CONTENT,
             "name": "Template name",
         })
         commands = self.new_revision_data(template)
-        template.dispatch_spreadsheet_message(commands)
+        template._dispatch_spreadsheet_message(commands)
         action = template.action_create_spreadsheet()
         spreadsheet_id = action["params"]["spreadsheet_id"]
         document = self.env["documents.document"].browse(spreadsheet_id)
@@ -95,7 +182,7 @@ class SpreadsheetTemplate(SpreadsheetTestCommon):
             "name": "Template name",
         })
         commands = self.new_revision_data(template)
-        template.dispatch_spreadsheet_message(commands)
+        template._dispatch_spreadsheet_message(commands)
         action = template.with_user(user).action_create_spreadsheet()
         spreadsheet_id = action["params"]["spreadsheet_id"]
         document = self.env["documents.document"].browse(spreadsheet_id)

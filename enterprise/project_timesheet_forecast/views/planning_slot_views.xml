@@ -5,35 +5,20 @@
         <field name="inherit_id" ref="project_forecast.planning_slot_view_form"/>
         <field name="model">planning.slot</field>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='task_id']" position="attributes">
+                <attribute name="widget">task_with_hours</attribute>
+            </xpath>
             <xpath expr="//group[@name='slot_info_right']" position="inside">
-                <field name="company_id" position="move"/>
                 <field name="allow_timesheets" invisible="1"/>
                 <field name="allocation_type" invisible="1"/>
                 <field name="timesheet_ids" invisible="1"/>
-                <field name="can_open_timesheets" invisible="1"/>
-                <field name="encode_uom_in_days" invisible="1"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
-                <!-- Clickable -->
-                <button type="object" name="action_open_timesheets" icon="fa-clock-o" groups="hr_timesheet.group_hr_timesheet_user"
-                    invisible="not can_open_timesheets or not project_id or not allow_timesheets or not employee_id">
+                <button type="object" name="action_open_timesheets" icon="schedule" groups="hr_timesheet.group_hr_timesheet_approver"
+                    invisible="not project_id or not allow_timesheets or not employee_public_ids">
                     <div class="o_stat_info">
                         <span class="o_stat_value">
                             <field name="effective_hours" widget="timesheet_uom"/>
-                            <span invisible="encode_uom_in_days"> Hours</span>
-                            <span invisible="not encode_uom_in_days"> Days</span>
-                        </span>
-                        <span class="o_stat_text">Recorded</span>
-                    </div>
-                </button>
-                <!-- Non Clickable -->
-                <button icon="fa-clock-o" disabled="1" class="pe-none" groups="hr_timesheet.group_hr_timesheet_user"
-                    invisible="can_open_timesheets or not project_id or not allow_timesheets or not employee_id">
-                    <div class="o_stat_info">
-                        <span class="o_stat_value">
-                            <field name="effective_hours" widget="timesheet_uom"/>
-                            <span invisible="encode_uom_in_days"> Hours</span>
-                            <span invisible="not encode_uom_in_days"> Days</span>
                         </span>
                         <span class="o_stat_text">Recorded</span>
                     </div>
@@ -47,7 +32,10 @@
         <field name="model">planning.slot</field>
         <field name="inherit_id" ref="project_forecast.planning_slot_view_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='allocated_percentage']" position="after">
+            <xpath expr="//field[@name='task_id']" position="attributes">
+                <attribute name="widget">task_with_hours</attribute>
+            </xpath>
+            <xpath expr="//field[@name='end_datetime']" position="after">
                 <field name="effective_hours" sum="Effective Hours" widget="float_time" optional="hide" invisible="effective_hours == 0" groups="hr_timesheet.group_hr_timesheet_user"/>
             </xpath>
         </field>
@@ -59,11 +47,12 @@
         <field name="model">planning.slot</field>
         <field name="arch" type="xml">
             <gantt position="attributes">
-                <attribute name="progress_bar">resource_id,project_id</attribute>
+                <attribute name="progress_bar">resource_ids,project_id</attribute>
                 <attribute name="progress">percentage_hours</attribute>
             </gantt>
             <xpath expr="/gantt" position="inside">
                 <field name="percentage_hours" invisible="1"/>
+                <field name="task_id" invisible="1"/>
             </xpath>
         </field>
     </record>
@@ -74,10 +63,8 @@
         <field name="model">planning.slot</field>
         <field name="arch" type="xml">
             <field name="allocated_hours" position="after">
-                <field name="effective_hours" type="measure" widget="float_time" groups="hr_timesheet.group_hr_timesheet_approver"/>
-                <field name="percentage_hours" type="measure" widget="timesheet_uom" groups="hr_timesheet.group_hr_timesheet_approver"/>
+                <field name="effective_hours" widget="float_time" groups="hr_timesheet.group_hr_timesheet_approver"/>
                 <field name="effective_hours" type="measure" invisible="1" groups="!hr_timesheet.group_hr_timesheet_approver"/>
-                <field name="percentage_hours" type="measure" invisible="1" groups="!hr_timesheet.group_hr_timesheet_approver"/>
             </field>
         </field>
     </record>
@@ -89,23 +76,9 @@
         <field name="arch" type="xml">
             <field name="allocated_hours" position="after">
                 <field name="effective_hours" widget="float_time" invisible="1" groups="!hr_timesheet.group_hr_timesheet_approver"/>
-                <field name="percentage_hours" widget="timesheet_uom" invisible="1" groups="!hr_timesheet.group_hr_timesheet_approver"/>
             </field>
         </field>
     </record>
-
-    <record id="planning_view_pivot_view_inherit_timesheet" model="ir.ui.view">
-        <field name="name">planning.action.schedule.project.view.pivot.inherit.update</field>
-        <field name="model">planning.slot</field>
-        <field name="mode">primary</field>
-        <field name="inherit_id" ref="project_forecast.planning_action_schedule_by_project_pivot_inherit"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='percentage_hours']" position="attributes">
-                <attribute name="type">measure</attribute>
-            </xpath>
-        </field>
-    </record>
-
 
     <!--  Update the menu entry to display the gantt view by role  -->
     <!--  Without this, displaying by role does not render the progress bars  -->
@@ -118,6 +91,9 @@
         <field name="context">{
             'planning_groupby_role': True,
             'planning_expand_resource': 1, 'planning_expand_role': 1, 'planning_expand_project': 1,
+            'planning_expand_task': 1,
+            'search_default_group_by_role': 1,
+            'search_default_group_by_resource': 2,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

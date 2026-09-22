@@ -28,9 +28,9 @@
 
     <template id="custom_header_inherit" inherit_id="l10n_ar.custom_header">
         <xpath expr="//span[@id='withholding_legend']" position="inside">
-            <t t-if="document_type_code in ['1', '2', '3', '51', '52', '53'] and o.company_id.l10n_ar_show_withholding_legend">
+            <t t-if="document_type_code in ['1', '2', '3', '51', '52', '53'] and o.company_id.l10n_ar_invoice_pdf_legend">
                 <br/>
-                <span class="d-block small mt-1 lh-1">Operation Subject to Withholding</span>
+                <span class="d-block small mt-1 lh-1" t-field="o.company_id.l10n_ar_invoice_pdf_legend"/>
             </t>
         </xpath>
     </template>

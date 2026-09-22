@@ -1,17 +1,16 @@
+import { Component, computed, proxy, Resource, signal, t, useEffect, useProps } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
+import { uniqueId } from "@web/core/utils/functions";
+import { useOwnedDialogs } from "@web/core/utils/hooks";
 import { formView } from "@web/views/form/form_view";
-import { StudioHook } from "@web_studio/client_action/view_editor/editors/components/studio_hook_component";
-import { NewButtonBoxDialog } from "@web_studio/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog";
 import { FieldSelectorDialog } from "@web_studio/client_action/view_editor/editors/components/field_selector_dialog";
-import { SelectionContentDialog } from "@web_studio/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog";
+import { StudioHook } from "@web_studio/client_action/view_editor/editors/components/studio_hook_component";
 import {
     randomName,
     studioIsVisible,
     useStudioRef,
 } from "@web_studio/client_action/view_editor/editors/utils";
-import { _t } from "@web/core/l10n/translation";
-import { useOwnedDialogs } from "@web/core/utils/hooks";
-
-import { Component, useState, useRef } from "@odoo/owl";
+import { NewButtonBoxDialog } from "@web_studio/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog";
 import { AddButtonAction } from "../../../interactive_editor/action_button/action_button";
 
 /**
@@ -35,18 +34,19 @@ const components = formView.Renderer.components;
  */
 export class FormLabel extends components.FormLabel {
     static template = "web_studio.FormLabel";
-    static props = {
-        ...components.FormLabel.props,
-        studioXpath: String,
-        studioIsVisible: { type: Boolean, optional: true },
-    };
+
+    studioProps = useProps({
+        studioXpath: t.string(),
+        studioIsVisible: t.boolean().optional(),
+    });
+
     setup() {
         super.setup();
-        useStudioRef("rootRef", this.onClick);
+        this.rootRef = useStudioRef(this.onClick.bind(this));
     }
     get className() {
         let className = super.className;
-        if (!studioIsVisible(this.props)) {
+        if (!studioIsVisible(this.studioProps)) {
             className += " o_web_studio_show_invisible";
         }
         className += " o-web-studio-editor--element-clickable";
@@ -55,7 +55,7 @@ export class FormLabel extends components.FormLabel {
     onClick(ev) {
         ev.preventDefault();
         ev.stopPropagation();
-        this.env.config.onNodeClicked(this.props.studioXpath);
+        this.env.config.onNodeClicked(this.studioProps.studioXpath);
     }
 }
 
@@ -68,16 +68,75 @@ export class FormLabel extends components.FormLabel {
 export class Notebook extends components.Notebook {
     static template = "web_studio.Notebook.Hook";
     static components = { ...components.Notebook.components, StudioHook };
-    static props = {
-        ...components.Notebook.props,
-        studioIsVisible: { type: Boolean, optional: true },
-        studioXpath: String,
-    };
+
+    studioProps = useProps({
+        studioIsVisible: t.boolean().optional(),
+        studioXpath: t.string(),
+    });
+
+    static __id = 0;
+    rootRef = signal.ref();
+    hooksRef = new Resource();
+
+    draggableElements = computed(() => {
+        void this.env.viewEditorModel.showInvisible;
+        return this.rootRef()?.querySelectorAll(":scope > li.nav-item button") || [];
+    });
+
+    componentId = ++this.constructor.__id;
+    hookId = "notebook_" + this.componentId;
 
     setup() {
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
         super.setup();
+
+        useEffect(() => {
+            const hooks = this.hooksRef.items();
+            let i = 0;
+            while (i < hooks.length) {
+                hooks[i].classList.remove("d-none");
+                if (hooks[i].nextElementSibling === hooks[i + 1]) {
+                    hooks[i + 1].classList.add("d-none");
+                    i++;
+                }
+                i++;
+            }
+        });
+
+        useEffect(() => {
+            const currentPage = this.getCurrentPage();
+            for (const draggable of this.draggableElements()) {
+                if (draggable.classList.contains("o_web_studio_add_form_page")) {
+                    continue;
+                }
+                draggable.dataset.hookId = this.hookId;
+
+                if (draggable.classList.contains("o-draggable")) {
+                    draggable.classList.remove("o-draggable");
+                }
+                if (currentPage[1].studioXpath === draggable.dataset.studioXpath) {
+                    draggable.classList.add("o-draggable");
+                }
+            }
+        });
+        this.env.viewEditorModel.dropHooks.use({
+            id: this.hookId,
+            accept: ({ element }) => element.dataset.hookId === this.hookId,
+            getHookConfig: ({ targetInfo }) => targetInfo,
+            highlightHooks: ({ element, hooks }) => {
+                const el = this.rootRef();
+                el.classList.add("o_web_studio_hook-highlight");
+                return () => {
+                    el.classList.remove("o_web_studio_hook-highlight");
+                };
+            },
+        });
     }
+
+    getCurrentPage = computed(() =>
+        this.pages().find((page) => page[0] === this.state.currentPage)
+    );
+
     computePages(props) {
         const pages = super.computePages(props);
         pages.forEach((p) => {
@@ -86,6 +145,12 @@ export class Notebook extends components.Notebook {
         });
         return pages;
     }
+
+    studioOnPageClicked(ev, navItem) {
+        this.activatePage(navItem[0]);
+        this.env.config.onNodeClicked(navItem[1].studioXpath, ev.detail);
+    }
+
     onNewPageClicked() {
         const vem = this.viewEditorModel;
         const node = {
@@ -98,9 +163,15 @@ export class Notebook extends components.Notebook {
         vem.doOperation({
             type: "add",
             node,
-            target: vem.getFullTarget(this.props.studioXpath),
+            target: vem.getFullTarget(this.studioProps.studioXpath),
             position: "inside",
         });
+    }
+
+    _getNavItemClasses(navItem) {
+        const classes = super._getNavItemClasses(navItem);
+        classes["o-web-studio-editor--element-clickable"] = true;
+        return classes;
     }
 }
 
@@ -110,71 +181,139 @@ export class StatusBarButtons extends components.StatusBarButtons {
         ...components.StatusBarButtons.components,
         AddButtonAction,
     };
-}
 
-export class StatusBarFieldHook extends Component {
-    static template = "web_studio.AddElementHook";
-    static props = {
-        addStatusBar: { type: Boolean },
-    };
+    hooksRef = new Resource();
+    rootRef = signal.ref();
+    draggableElements = computed(() => {
+        void this.env.viewEditorModel.showInvisible;
+        return this.rootRef()?.querySelectorAll(":scope > *[name][studioxpath]") || [];
+    });
+
+    hookId = uniqueId("statusbar_button_");
+
     setup() {
-        this.addDialog = useOwnedDialogs();
-    }
-    get classNames() {
-        return "o_web_studio_statusbar_hook";
-    }
-    get title() {
-        return _t("Add a pipeline status bar");
-    }
-    onClick() {
-        this.addDialog(SelectionContentDialog, {
-            defaultChoices: [
-                ["status1", _t("First Status")],
-                ["status2", _t("Second Status")],
-                ["status3", _t("Third Status")],
-            ],
-            onConfirm: (choices) => {
-                const viewEditorModel = this.env.viewEditorModel;
-                if (this.props.addStatusBar) {
-                    viewEditorModel.pushOperation({ type: "statusbar" });
+        super.setup();
+        useEffect(() => {
+            const hooks = this.hooksRef.items();
+            let i = 0;
+            while (i < hooks.length) {
+                hooks[i].classList.remove("d-none");
+                if (hooks[i].nextElementSibling === hooks[i + 1]) {
+                    hooks[i + 1].classList.add("d-none");
+                    i++;
                 }
+                i++;
+            }
+        });
 
-                const target = {
-                    tag: "header",
+        useEffect(() => {
+            for (const draggable of this.draggableElements()) {
+                draggable.classList.add("o-draggable");
+                draggable.dataset.structure = "statusBarButton";
+                draggable.dataset.hookId = this.hookId;
+            }
+        });
+        this.env.viewEditorModel.dropHooks.use({
+            id: this.hookId,
+            accept: ({ element }) => element.dataset.hookId === this.hookId,
+            getHookConfig: ({ targetInfo }) => targetInfo,
+            highlightHooks: ({ element, hooks }) => {
+                const el = this.rootRef();
+                el.classList.add("o_web_studio_hook-highlight");
+                return () => {
+                    el.classList.remove("o_web_studio_hook-highlight");
                 };
-                const subViewXpath = viewEditorModel.getSubviewXpath();
-                if (subViewXpath) {
-                    target.subview_xpath = subViewXpath;
-                }
-
-                viewEditorModel.doOperation({
-                    type: "add",
-                    target,
-                    position: "inside",
-                    node: {
-                        attrs: {
-                            widget: "statusbar",
-                            options: "{'clickable': '1'}",
-                        },
-                        field_description: {
-                            default_value: true,
-                            field_description: _t("Pipeline status bar"),
-                            model_name: viewEditorModel.resModel,
-                            name: randomName(`x_studio_selection_field`),
-                            selection: JSON.stringify(choices),
-                            type: "selection",
-                        },
-                        tag: "field",
-                    },
-                });
             },
         });
     }
 }
 
+export class StatusBarFieldHook extends Component {
+    static template = "web_studio.StatusBarFieldHook";
+
+    props = useProps({
+        addStatusBar: t.boolean(),
+    });
+
+    hookRef = signal.ref();
+    setup() {
+        this.addDialog = useOwnedDialogs();
+        this.hookId = "form_statusbar";
+        const vem = this.env.viewEditorModel;
+
+        this.dropHook = {
+            id: this.hookId,
+            accept: ({ element }) => {
+                if (element.dataset.structure === "field") {
+                    const dropData = JSON.parse(element.dataset.drop);
+                    if (["many2one", "selection"].includes(dropData.fieldType)) {
+                        return true;
+                    } else if ("fieldName" in dropData) {
+                        const field = vem.fields[dropData.fieldName];
+                        return ["many2one", "selection"].includes(field.type);
+                    }
+                }
+                return false;
+            },
+            getHookConfig: ({ config }) => {
+                const targetXpath = "/form[1]/header[1]";
+                const target = {
+                    tag: "header",
+                    xpath: targetXpath,
+                    xpath_info: [
+                        {
+                            tag: "form",
+                            indice: 1,
+                        },
+                        {
+                            tag: "header",
+                            indice: 1,
+                        },
+                    ],
+                };
+                const subViewXpath = vem.getSubviewXpath();
+                if (subViewXpath) {
+                    target.subview_xpath = subViewXpath;
+                }
+                return {
+                    ...config,
+                    target,
+                    xpath: targetXpath,
+                    position: "inside",
+                    getOperations: ({ operation }) => {
+                        if (operation.node.field_description?.type === "selection") {
+                            operation.node.field_description.default_value = true;
+                        }
+
+                        Object.assign(operation.node.attrs, {
+                            widget: "statusbar",
+                            options: "{'clickable': '1'}",
+                        });
+                        return this.props.addStatusBar
+                            ? [{ type: "statusbar" }, operation]
+                            : [operation];
+                    },
+                };
+            },
+        };
+        vem.dropHooks.use(this.dropHook);
+    }
+    get classNames() {
+        return "o_web_studio_statusbar_hook o_web_studio_hook_special";
+    }
+    get title() {
+        return _t("Add a pipeline status bar");
+    }
+}
+
 export class AvatarHook extends Component {
     static template = "web_studio.AddElementHook";
-    static props = { fields: Object };
+
+    props = useProps({
+        fields: t.object(),
+    });
+
+    hookRef = signal.ref();
     setup() {
         this.addDialog = useOwnedDialogs();
     }
@@ -205,19 +344,18 @@ export class AvatarHook extends Component {
 }
 
 export class ButtonHook extends Component {
-    static template = "web_studio.AddElementHook";
-    static props = {
-        add_buttonbox: { type: Boolean, optional: true },
-        studioIsVisible: { type: Boolean, optional: true },
-    };
+    static template = "web_studio.AddSmartButton";
+
+    props = useProps({
+        add_buttonbox: t.boolean().optional(),
+        studioIsVisible: t.boolean().optional(),
+    });
+
     setup() {
         this.addDialog = useOwnedDialogs();
     }
     get classNames() {
-        return "oe_stat_button o_web_studio_button_hook flex-grow-1 flex-lg-grow-0 fa fa-plus-square";
-    }
-    get tooltip() {
-        return _t("Add a button");
+        return "oe_stat_button o_web_studio_button_hook flex-grow-1 flex-lg-grow-0";
     }
     onClick() {
         this.addDialog(NewButtonBoxDialog, {
@@ -229,26 +367,63 @@ export class ButtonHook extends Component {
 
 export class ButtonBox extends components.ButtonBox {
     static template = "web_studio.ButtonBox";
-    static components = {};
-    static props = {
-        ...components.ButtonBox.props,
-        studioIsVisible: { type: Boolean, optional: true },
-    };
+    static components = { StudioHook, ButtonHook };
 
+    studioProps = useProps({
+        addButtonBox: t.boolean().optional(false),
+        studioIsVisible: t.boolean().optional(),
+    });
+    togglerRef = signal.ref();
+
+    rootRef = signal.ref();
+    buttonContainers = new Resource();
+    draggableElements = computed(() => {
+        void this.env.viewEditorModel.showInvisible;
+        return this.buttonContainers
+            .items()
+            .flatMap((el) => [...el.querySelectorAll(":scope > *[name][studioxpath]")]);
+    });
+    hookId = uniqueId("button_box_");
     setup() {
         super.setup();
-        this.togglerRef = useRef("toggleRef");
-        this.viewEditorModel = useState(this.env.viewEditorModel);
-        this.expanded = useState({ value: false });
+        this.viewEditorModel = this.env.viewEditorModel;
+        this.expanded = proxy({ value: false });
+        this.viewEditorModel.dropHooks.use({
+            id: this.hookId,
+            accept: ({ element }) => element.dataset.hookId === this.hookId,
+            getHookConfig: ({ targetInfo }) => targetInfo,
+            highlightHooks: ({ element, hooks }) => {
+                const el = this.rootRef();
+                el.classList.add("o_web_studio_hook-highlight");
+                return () => {
+                    el.classList.remove("o_web_studio_hook-highlight");
+                };
+            },
+        });
+
+        useEffect(() => {
+            for (const draggable of this.draggableElements()) {
+                draggable.classList.add("o-draggable");
+                draggable.dataset.structure = "buttonBox";
+                draggable.dataset.hookId = this.hookId;
+            }
+        });
     }
 
     toggle() {
         this.expanded.value = !this.expanded.value;
-        this.togglerRef.el.classList.toggle("show", this.expanded.value);
-        this.togglerRef.el.ariaExpanded = this.expanded.value;
+        this.togglerRef().classList.toggle("show", this.expanded.value);
+        this.togglerRef().ariaExpanded = this.expanded.value;
+    }
+
+    getSlotInfo(slot) {
+        return this.props.slots[slot];
     }
 
     isSlotVisible(slot) {
+        if (slot.studio_fake_slot) {
+            return false;
+        }
         if (this.viewEditorModel.isEditingSubview) {
             return false;
         }

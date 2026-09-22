@@ -4,15 +4,15 @@
 #
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-16 05:26+0000\n"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-09-18 00:33+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "delivery_dhl/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -218,6 +218,11 @@ msgid "DHL EU -> International"
 msgstr "DHL EU -> International"
 
 #. module: delivery_dhl
+#: model:ir.module.module,shortdesc:base.module_delivery_dhl
+msgid "DHL Express Shipping (Legacy)"
+msgstr ""
+
+#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "DHL Пароль"
@@ -270,13 +275,17 @@ msgstr "DHL не поддерживает товары с названием б�
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid "DHL password is missing, please modify your delivery method settings."
-msgstr ""
-"Пароль DHL отсутствует, пожалуйста, измените настройки метода доставки."
+msgstr "Пароль DHL отсутствует, пожалуйста, измените настройки метода доставки."
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
 msgid "DHLxw Package Type"
 msgstr "Тип упаковки DHLxw"
+
+#. module: delivery_dhl
+#: model:ir.model,name:delivery_dhl.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
@@ -497,11 +506,6 @@ msgid "Shipment created into DHL <br/> <b>Tracking Number: </b>%s"
 msgstr "Отправление создано в DHL <br/> <b>Номер отслеживания </b>:%s"
 
 #. module: delivery_dhl
-#: model:ir.model,name:delivery_dhl.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Методы доставки"
-
-#. module: delivery_dhl
 #: model:ir.model,name:delivery_dhl.model_stock_package_type
 msgid "Stock package type"
 msgstr "Тип комплекта поставки"
@@ -529,8 +533,8 @@ msgid ""
 "field(s) :\n"
 " %s)"
 msgstr ""
-"Адрес склада вашей компании отсутствует или неправильный (пропущенные "
-"поле(я) :\n"
+"Адрес склада вашей компании отсутствует или неправильный (пропущенные поле"
+"(я) :\n"
 " %s)"
 
 #. module: delivery_dhl
@@ -566,6 +570,14 @@ msgid ""
 "the DHL product %s"
 msgstr ""
 "На эту доставку нет цены, лучше попробуйте воспользоваться продуктом DHL %s"
+
+#. module: delivery_dhl
+#: model:ir.module.module,description:base.module_delivery_dhl
+msgid ""
+"This is the legacy integration with DHL Express that is no longer "
+"supported.         Please install the new \"DHL Express Shipping\" module "
+"and uninstall this one as soon as possible."
+msgstr ""
 
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_product_code__u
@@ -613,12 +625,3 @@ msgstr "Z - Плата за место назначения"
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_label_image_format__zpl2
 msgid "ZPL2"
 msgstr "ZPL2"
-
-#~ msgid "DHL"
-#~ msgstr "DHL"
-
-#~ msgid "DHL Package Type"
-#~ msgstr "DHL Тип пакета"
-
-#~ msgid "DHL Shipping Methods"
-#~ msgstr "Способы доставки DHL"

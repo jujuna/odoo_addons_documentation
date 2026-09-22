@@ -4,7 +4,6 @@
 from markupsafe import Markup
 
 from odoo import api, fields, models, _
-from odoo.tools import str2bool
 
 
 class AppointmentType(models.Model):
@@ -16,7 +15,12 @@ class AppointmentType(models.Model):
         return super()._get_default_event_videocall_source()
 
     connector_google = fields.Boolean(compute="_compute_connector_google")
-    event_videocall_source = fields.Selection(selection_add=[('google_meet', 'Google Meet')], ondelete={'google_meet': 'set discuss'})
+    event_videocall_source = fields.Selection(selection_add=[('google_meet', 'Google Meet')], ondelete={'google_meet': 'set discuss'},
+        help="""Defines the type of video call link that will be used for the generated events.\n
+            Can be one of:
+                - Odoo Discuss: Generates an internal Odoo Discuss meeting link.
+                - Google Meet: Generates a Google Meet link. Requires Google Calendar synchronization to be configured and active. If the staff user did not synchronize their calendar, no Google Meet link will be added to their meetings.\n
+            Keep it empty to prevent generating meeting url.""")
     users_wo_google_calendar_msg = fields.Html('Users Without Google Calendar Synchronization',
         compute='_compute_users_wo_google_calendar_msg')
 
@@ -45,6 +49,6 @@ class AppointmentType(models.Model):
     def _get_calendars_possible_to_setup(self):
         calendars = super()._get_calendars_possible_to_setup()
         if (self.env['google.service']._get_client_id('calendar') and
-            not str2bool(self.env['ir.config_parameter'].sudo().get_param("google_calendar_sync_paused"))):
+            not self.env['ir.config_parameter'].sudo().get_bool("google_calendar_sync_paused")):
             calendars.append("google")
         return calendars

@@ -5,18 +5,25 @@
         <field name="model">hr.payslip.correction.wizard</field>
         <field name="arch" type="xml">
             <form string="Payslip Correction">
-                <div class="alert alert-warning d-flex align-items-center" role="alert" invisible="not is_multi_payslip">
+                <field name="employee_ids" invisible="1"/>
+                <div class="alert alert-warning d-flex align-items-center" role="alert" invisible="is_button_action">
                     <button type="object" class="btn btn-link me-1 p-0" name="action_show_related_payslips">
-                        <field name="payslip_count"/>&#160;payslips
+                        <field name="payslip_count"/><span invisible="is_multi_payslip"> payslip has</span><span invisible="not is_multi_payslip"> payslips have</span>
                     </button>
-                    have been affected by this version's changes.
+                    been affected by this version's changes.
                 </div>
-                <field name="payslip_id" widget="many2one" readonly="1" invisible="is_multi_payslip"/>
-                <field name="correction_choice" widget="radio" invisible="not is_multi_payslip"/>
+                <div name="description" invisible="is_multi_payslip or is_button_action">
+                    Choose whether to correct this payslip, only revert it or keep it as it is
+                </div>
+                <field name="correction_choice" widget="radio" invisible="not is_multi_payslip or is_button_action"/>
+                <div name="description" invisible="not is_button_action">
+                    Do you want to correct this payslip or only revert it?
+                </div>
                 <footer>
-                    <button name="action_correct_payslips" string="Correct payslip" type="object" class="oe_highlight"/>
+                    <button name="action_correct_payslips" string="Correct" type="object" class="oe_highlight"/>
                     <button name="action_revert_payslips" string="Revert only" type="object" class="btn-secondary"/>
-                    <button string="Discard" special="cancel" data-hotkey="x" class="btn-secondary"/>
+                    <button name="action_keep_wrong_version" string="Keep it as is" invisible="is_button_action" type="object" class="btn-secondary"/>
+                    <button special="cancel" data-hotkey="x" class="btn-secondary"/>
                 </footer>
             </form>
         </field>

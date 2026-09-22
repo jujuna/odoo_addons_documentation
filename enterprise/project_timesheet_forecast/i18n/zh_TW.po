@@ -1,25 +1,65 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* project_timesheet_forecast
+# * project_timesheet_forecast
 #
 # Translators:
 # Wil Odoo, 2025
 # Tony Ng, 2025
 #
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-05-06 11:01+0000\n"
-"Last-Translator: Tony Ng, 2025\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/"
-"zh_TW/)\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 00:44+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
+"projects/odoo-master/project_timesheet_forecast/zh_Hant/>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: project_timesheet_forecast
+#: model:ir.module.module,description:base.module_project_timesheet_forecast
+msgid ""
+"\n"
+"Compare timesheets and plannings\n"
+"================================\n"
+"\n"
+"Better plan your future schedules by considering time effectively spent on "
+"old plannings\n"
+"\n"
+msgstr ""
+
+#. module: project_timesheet_forecast
+#. odoo-python
+#: code:addons/project_timesheet_forecast/models/project_project.py:0
+#, fuzzy
+msgid "%(effective)s %(uom_name)s"
+msgstr "%(effective)s %(uom_name)s"
+
+#. module: project_timesheet_forecast
+#. odoo-python
+#: code:addons/project_timesheet_forecast/models/project_project.py:0
+msgid "%(effective)s / %(planned)s %(uom_name)s"
+msgstr ""
+
+#. module: project_timesheet_forecast
+#. odoo-python
+#: code:addons/project_timesheet_forecast/models/project_project.py:0
+#, fuzzy
+msgid "%(exceeding_hours)s %(uom_name)s (+%(exceeding_rate)s%%)"
+msgstr "%(exceeding_hours)s %(uom_name)s (+%(exceeding_rate)s%%)"
+
+#. module: project_timesheet_forecast
+#. odoo-python
+#: code:addons/project_timesheet_forecast/models/account_analytic_line.py:0
+msgid "%(truncated_name)s..."
+msgstr ""
 
 #. module: project_timesheet_forecast
 #: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_forecast_view_form_inherit_project_timesheet_forecast
@@ -27,15 +67,14 @@ msgid "<span class=\"o_stat_text\">Recorded</span>"
 msgstr "<span class=\"o_stat_text\">已記錄</span>"
 
 #. module: project_timesheet_forecast
-#: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_forecast_view_form_inherit_project_timesheet_forecast
-msgid ""
-"<span invisible=\"encode_uom_in_days\"> Hours</span>\n"
-"                            <span invisible=\"not encode_uom_in_days\"> "
-"Days</span>"
+#: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__effective_costs
+msgid "Actual Costs"
 msgstr ""
-"<span invisible=\"encode_uom_in_days\"> 小時</span>\n"
-"                            <span invisible=\"not encode_uom_in_days\"> 天</"
-"span>"
+
+#. module: project_timesheet_forecast
+#: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__effective_hours
+msgid "Actual Time"
+msgstr ""
 
 #. module: project_timesheet_forecast
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_planning_analysis_report__allocated_hours_cost
@@ -48,19 +87,37 @@ msgid "Allocated time minus the effective time."
 msgstr "已分配時間減去有效時間。"
 
 #. module: project_timesheet_forecast
-#: model:ir.model.fields,field_description:project_timesheet_forecast.field_planning_slot__allow_timesheets
-msgid "Allow timesheets"
-msgstr "允許工時表"
-
-#. module: project_timesheet_forecast
-#: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__user_id
-msgid "Assigned to"
-msgstr "指派給"
+#: model:ir.model,name:project_timesheet_forecast.model_account_analytic_line
+#, fuzzy
+msgid "Analytic Line"
+msgstr "分析資料行"
 
 #. module: project_timesheet_forecast
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__company_id
 msgid "Company"
 msgstr "公司"
+
+#. module: project_timesheet_forecast
+#: model:ir.module.module,summary:base.module_project_timesheet_forecast
+msgid "Compare timesheets and plannings"
+msgstr ""
+
+#. module: project_timesheet_forecast
+#. odoo-python
+#: code:addons/project_timesheet_forecast/models/account_analytic_line.py:0
+msgid "Configuring Planning Slots"
+msgstr ""
+
+#. module: project_timesheet_forecast
+#: model:ir.model,website_form_label:project_timesheet_forecast.model_planning_slot
+msgid "Create a Shift"
+msgstr ""
+
+#. module: project_timesheet_forecast
+#: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__currency_id
+#, fuzzy
+msgid "Currency"
+msgstr "貨幣"
 
 #. module: project_timesheet_forecast
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__entry_date
@@ -69,6 +126,7 @@ msgid "Date"
 msgstr "日期"
 
 #. module: project_timesheet_forecast
+#: model:ir.model.fields,field_description:project_timesheet_forecast.field_account_analytic_line__display_name
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_planning_analysis_report__display_name
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_planning_slot__display_name
@@ -78,11 +136,6 @@ msgid "Display Name"
 msgstr "顯示名稱"
 
 #. module: project_timesheet_forecast
-#: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__effective_costs
-msgid "Effective Costs"
-msgstr "有效成本"
-
-#. module: project_timesheet_forecast
 #: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_forecast_view_tree_inherit_project_timesheet_forecast
 msgid "Effective Hours"
 msgstr "有效時數"
@@ -90,7 +143,6 @@ msgstr "有效時數"
 #. module: project_timesheet_forecast
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_planning_analysis_report__effective_hours
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_planning_slot__effective_hours
-#: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__effective_hours
 msgid "Effective Time"
 msgstr "有效時間"
 
@@ -106,6 +158,7 @@ msgid "Employee"
 msgstr "員工"
 
 #. module: project_timesheet_forecast
+#: model:ir.model.fields,field_description:project_timesheet_forecast.field_account_analytic_line__id
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_planning_analysis_report__id
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_planning_slot__id
@@ -118,11 +171,6 @@ msgstr "識別號"
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__is_published
 msgid "Is Published"
 msgstr "已發佈"
-
-#. module: project_timesheet_forecast
-#: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_view_search
-msgid "Last Week"
-msgstr "上週"
 
 #. module: project_timesheet_forecast
 #: model:ir.model,name:project_timesheet_forecast.model_ir_ui_menu
@@ -138,6 +186,12 @@ msgstr "我的部門"
 #: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_view_search
 msgid "My Projects"
 msgstr "我的專案"
+
+#. module: project_timesheet_forecast
+#: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_view_search
+#, fuzzy
+msgid "My Tasks"
+msgstr "我的任務"
 
 #. module: project_timesheet_forecast
 #: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_view_search
@@ -185,8 +239,8 @@ msgstr "規劃"
 #: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_view_graph
 #: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_view_pivot
 #: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_view_search
-msgid "Planning / Timesheets Analysis"
-msgstr "工作規劃 / 工時表分析"
+msgid "Planning & Timesheets Analysis"
+msgstr ""
 
 #. module: project_timesheet_forecast
 #: model:ir.model,name:project_timesheet_forecast.model_planning_analysis_report
@@ -228,6 +282,13 @@ msgid ""
 msgstr "為不同職能、專案項目及銷售訂單，安排人力及物力資源。"
 
 #. module: project_timesheet_forecast
+#. odoo-python
+#: code:addons/project_timesheet_forecast/models/account_analytic_line.py:0
+#, fuzzy
+msgid "Shift"
+msgstr "排班"
+
+#. module: project_timesheet_forecast
 #: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_analysis_view_tree
 msgid "Sum of Difference"
 msgstr "差值總和"
@@ -243,20 +304,31 @@ msgid "Sum of Planned Hours"
 msgstr "已計劃時數總和"
 
 #. module: project_timesheet_forecast
+#: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__task_id
 #: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_view_search
-msgid "This Week"
-msgstr "本週"
+#, fuzzy
+msgid "Task"
+msgstr "任務"
 
 #. module: project_timesheet_forecast
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_planning_analysis_report__remaining_hours
-#: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__difference
 msgid "Time Remaining"
 msgstr "剩餘時數"
+
+#. module: project_timesheet_forecast
+#: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__difference
+msgid "Time Variance(Planned - Actual)"
+msgstr ""
 
 #. module: project_timesheet_forecast
 #: model:ir.model.fields.selection,name:project_timesheet_forecast.selection__project_timesheet_forecast_report_analysis__line_type__timesheet
 msgid "Timesheet"
 msgstr "工時表"
+
+#. module: project_timesheet_forecast
+#: model:ir.module.module,shortdesc:base.module_project_timesheet_forecast
+msgid "Timesheet and Planning"
+msgstr ""
 
 #. module: project_timesheet_forecast
 #. odoo-python
@@ -270,21 +342,16 @@ msgid "Timesheets can be logged on this slot."
 msgstr "工時表可以記錄至此空檔中。"
 
 #. module: project_timesheet_forecast
-#: model_terms:ir.ui.view,arch_db:project_timesheet_forecast.project_timesheet_forecast_report_view_search
-msgid "Today"
-msgstr "今天"
-
-#. module: project_timesheet_forecast
 #: model_terms:ir.actions.act_window,help:project_timesheet_forecast.project_timesheet_forecast_report_action
 msgid ""
-"Track the progress of your projects by comparing the hours initially planned "
-"with the effective hours recorded"
-msgstr "比較最初計劃以及記錄到的實際有效時數，追蹤專案進度"
+"Track your project's progress by comparing planned hours with actual hours "
+"recorded"
+msgstr ""
 
 #. module: project_timesheet_forecast
 #: model:ir.model.fields,field_description:project_timesheet_forecast.field_project_timesheet_forecast_report_analysis__line_type
 msgid "Type"
 msgstr "類型"
 
-#~ msgid "Group By"
-#~ msgstr "分組依據"
+msgid "Allow timesheets"
+msgstr "允許工時表"

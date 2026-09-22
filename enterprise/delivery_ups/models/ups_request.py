@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import base64
-import binascii
 import io
 import PIL.PdfImagePlugin   # activate PDF support in PIL
 from PIL import Image
@@ -15,6 +13,7 @@ from odoo.tools.zeep.wsdl.utils import etree_to_string
 
 from odoo.tools import _, LazyTranslate
 from odoo.tools.float_utils import float_repr
+from odoo.tools.image import binary_to_image
 from odoo.exceptions import UserError
 
 _lt = LazyTranslate(__name__)
@@ -243,8 +242,7 @@ class UPSRequest():
         img_decoded = base64.decodebytes(image64.encode('utf-8'))
         if label_file_type == 'GIF':
             # Label format is GIF, so need to rotate and convert as PDF
-            image_string = io.BytesIO(img_decoded)
-            im = Image.open(image_string)
+            im = binary_to_image(img_decoded)
             label_result = io.BytesIO()
             im.save(label_result, 'pdf')
             return label_result.getvalue()

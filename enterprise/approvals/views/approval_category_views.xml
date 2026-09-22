@@ -69,7 +69,6 @@
                     </div>
                     <group>
                         <field name="description"/>
-                        <field name="approval_type" invisible="1"/>
                         <field name="automated_sequence"/>
                         <field name="sequence_code" invisible="not automated_sequence" required="automated_sequence"/>
                         <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
@@ -77,7 +76,7 @@
                     <notebook>
                         <page string="Options" name="options">
                             <group>
-                                <group string="Fields" name="option_settings">
+                                <group string="Configuration" name="option_settings">
                                     <field name="active" invisible="1"/>
                                     <field name="requirer_document" string="Document" widget="radio" options="{'horizontal': true}"/>
                                     <field name="has_partner" string="Contact" widget="radio" options="{'horizontal': true}"/>
@@ -93,13 +92,12 @@
                                 </group>
                                 <group string="Approvers" name="approvers">
                                     <field name="manager_approval"/>
-                                    <label for="approver_ids" string="Approvers"/>
+                                    <div colspan="2" class="border-top"/>
                                     <field name="approver_ids" colspan="2" nolabel="1"/>
-                                    <field name="approver_sequence" invisible="approval_minimum == 0"/>
                                     <field name="approval_minimum"/>
                                     <field name="invalid_minimum" invisible="1"/>
                                     <div class="text-warning" colspan="2" invisible="not invalid_minimum">
-                                        <span class="fa fa-warning" title="Invalid minimum approvals"/><field name="invalid_minimum_warning" nolabel="1"/>
+                                        <span class="oi" data-icon="warning" title="Invalid minimum approvals"/><field name="invalid_minimum_warning" nolabel="1"/>
                                     </div>
                                 </group>
                             </group>
@@ -119,7 +117,6 @@
                 "type": "ir.actions.act_window",
                 "res_model": "approval.category",
                 "views": [[False, "form"]],
-                "target": "new",
                 "res_id": records.id,
                 "name": "Approval Settings",
             }

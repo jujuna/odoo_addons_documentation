@@ -3,8 +3,8 @@
     <t t-name="account_reports.AccountReportAgingBasedOn">
         <Dropdown>
             <button class="btn btn-secondary">
-                <i class="fa fa-file me-1"/>Based on
-                <t t-if="controller.cachedFilterOptions.aging_based_on === 'base_on_invoice_date'">
+                <i class="oi oi-filled me-1" data-icon="description"/>Based on
+                <t t-if="this.controller.cachedFilterOptions().aging_based_on === 'base_on_invoice_date'">
                     Invoice Date
                 </t>
                 <t t-else="">
@@ -13,14 +13,14 @@
             </button>
             <t t-set-slot="content">
                 <DropdownItem
-                    class="{ 'selected': controller.cachedFilterOptions.aging_based_on === 'base_on_maturity_date' }"
+                    class="{ 'selected': this.controller.cachedFilterOptions().aging_based_on === 'base_on_maturity_date' }"
                     onSelected="() => this.filterClicked({ optionKey: 'aging_based_on', optionValue: 'base_on_maturity_date', reload: true})"
                 >
                     Due Date
                 </DropdownItem>
 
                 <DropdownItem
-                    class="{ 'selected': controller.cachedFilterOptions.aging_based_on === 'base_on_invoice_date' }"
+                    class="{ 'selected': this.controller.cachedFilterOptions().aging_based_on === 'base_on_invoice_date' }"
                     onSelected="() => this.filterClicked({ optionKey: 'aging_based_on', optionValue: 'base_on_invoice_date', reload: true})"
                 >
                     Invoice Date
@@ -34,15 +34,15 @@
             menuClass="'account_report_filter intervals'"
         >
             <button class="btn btn-secondary">
-                <i class="fa fa-calendar-o me-1"/>
-                <t t-out="controller.cachedFilterOptions.aging_interval"/> Days
+                <i class="oi me-1" data-icon="calendar_today"/>
+                <t t-out="this.controller.cachedFilterOptions().aging_interval"/> Days
             </button>
             <t t-set-slot="content">
                 <div class="dropdown-item interval">
                     <input
                         min="1"
                         type="number"
-                        t-att-value="controller.cachedFilterOptions.aging_interval"
+                        t-att-value="this.controller.cachedFilterOptions().aging_interval"
                         t-on-change="(ev) => this.setAgingInterval(ev)"
                     />
                     <span class="mx-2">Days</span>

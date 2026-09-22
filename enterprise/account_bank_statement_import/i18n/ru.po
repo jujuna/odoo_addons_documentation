@@ -4,16 +4,16 @@
 #
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-12-06 09:47+0000\n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 03:08+0000\n"
 "Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "account_bank_statement_import/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -22,13 +22,25 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "%d transactions had a zero amount and were ignored."
+msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "%d transactions had already been imported and were ignored."
 msgstr "%d транзакций уже импортировались ранее и были проигнорированы."
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid "1 transaction had a zero amount and was ignored."
+msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -43,15 +55,28 @@ msgstr ""
 "Операции по банковскому счету могут быть импортированы только один раз!"
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,shortdesc:base.module_account_bank_statement_import
+msgid "Account Bank Statement Import"
+msgstr ""
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "All or part of the following file(s) could not be imported:\n"
+msgstr "Не удалось импортировать файл(ы) полностью или частично: \n"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"All transactions in this file either have a zero amount or have already been "
+"imported. There is nothing to import."
 msgstr ""
 
 #. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Строка банковской выписки"
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: account_bank_statement_import
 #: model:ir.model,name:account_bank_statement_import.model_account_setup_bank_manual_config
@@ -65,6 +90,8 @@ msgid ""
 "Cannot find in which journal to import the statement for account %s. Please "
 "configure the journal first."
 msgstr ""
+"Не удалось определить журнал для импорта выписки по счету %s. Пожалуйста, "
+"сначала настройте журнал."
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -73,6 +100,8 @@ msgid ""
 "Cannot find in which journal to import this statement. Please manually "
 "select a journal."
 msgstr ""
+"Не удалось определить журнал для импорта этой выписки. Пожалуйста, выберите "
+"журнал вручную."
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -98,6 +127,16 @@ msgid "Display Name"
 msgstr "Display Name"
 
 #. module: account_bank_statement_import
+#: model:ir.module.module,description:base.module_account_bank_statement_import
+msgid ""
+"Generic Wizard to Import Bank Statements.\n"
+"\n"
+"(This module does not include any type of import format.)\n"
+"\n"
+"OFX and QIF imports are available in Enterprise version."
+msgstr ""
+
+#. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "Go to Apps"
@@ -121,14 +160,8 @@ msgid "Import ID"
 msgstr "Идентификатор импорта"
 
 #. module: account_bank_statement_import
-#. odoo-python
-#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
-msgid "Import Template for Bank Statement Lines"
-msgstr ""
-
-#. module: account_bank_statement_import
 #. odoo-javascript
-#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import_model.js:0
+#: code:addons/account_bank_statement_import/static/src/account_bank_statement_import/account_bank_statement_import_model.js:0
 msgid "Import Template for Bank Statements"
 msgstr "Импорт шаблона для банковских выписок"
 
@@ -166,6 +199,12 @@ msgstr "Транзакции, соответствующие вашим филь
 #: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
 msgid "Nothing to do here!"
 msgstr "Здесь нечего делать!"
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_bank_statement.py:0
+msgid "Template for Bank Statement Lines"
+msgstr ""
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -212,6 +251,14 @@ msgstr ""
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
+msgid ""
+"This file only contains transactions with a zero amount. There is nothing to "
+"import."
+msgstr ""
+
+#. module: account_bank_statement_import
+#. odoo-python
+#: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "View successfully imported statements"
 msgstr "Просмотр успешно импортированных заявлений"
 
@@ -233,34 +280,5 @@ msgstr "Для журнала необходимо установить счет
 msgid "You uploaded an invalid or empty file."
 msgstr "Вы загрузили недопустимый или пустой файл."
 
-#~ msgid ""
-#~ "Cannot find in which journal import this statement. Please manually "
-#~ "select a journal."
-#~ msgstr ""
-#~ "Не удается найти, в какой журнал импортировать эту выписку. Пожалуйста, "
-#~ "выберите журнал вручную."
-
-#~ msgid ""
-#~ "If it contains transactions for more than one account, it must be "
-#~ "imported on each of them."
-#~ msgstr ""
-#~ "Если он содержит транзакции по нескольким счетам, его необходимо "
-#~ "импортировать по каждому из них."
-
-#~ msgid ""
-#~ "The account of this statement (%s) is not the same as the journal (%s)."
-#~ msgstr "Счет этой выписки (%s) не совпадает с журналом (%s)."
-
-#~ msgid ""
-#~ "The currency of the bank statement (%s) is not the same as the currency "
-#~ "of the journal (%s)."
-#~ msgstr "Валюта банковской выписки (%s) не совпадает с валютой журнала (%s)."
-
-#~ msgid "The following files could not be imported:\n"
-#~ msgstr "Не удалось импортировать следующие файлы:\n"
-
-#~ msgid "This file doesn't contain any statement for account %s."
-#~ msgstr "Этот файл не содержит каких-либо отчетов для расчетного счета %s."
-
-#~ msgid "This file doesn't contain any transaction for account %s."
-#~ msgstr "Этот файл не содержит транзакций для расчетного счета %s."
+#~ msgid "Bank Statement Line"
+#~ msgstr "Строка банковской выписки"

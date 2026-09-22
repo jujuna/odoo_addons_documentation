@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:10+0000\n"
-"PO-Revision-Date: 2025-12-30 19:10+0000\n"
+"POT-Creation-Date: 2026-09-11 18:15+0000\n"
+"PO-Revision-Date: 2026-09-11 18:15+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,31 @@ msgid ""
 msgstr ""
 
 #. module: l10n_uy_edi
+#: model:ir.module.module,description:base.module_l10n_uy_edi
+msgid ""
+"\n"
+"This module integrate Odoo so you can issue electronic documents (CFE) to DGI. Example: e-Ticket, e-Invoice and related Debit and Credit Notes.\n"
+"\n"
+"After the CFE has been issued, and since the invoice validation is asynchronous, Odoo will run a scheduled action that will connect to DGI to check/update CFE state (Waiting DGI Response, Approved or Rejected)\n"
+"\n"
+"NOTE: Every connection is made using a third-party software named Uruware\n"
+"\n"
+"Configuration\n"
+"-------------\n"
+"\n"
+"1. Need to have an Uruguayan Company (with the Uruguayan COA installed)\n"
+"2. Go to Settings / Accounting / Uruguay Localization section and configure the fields to connect to UCFE: Uruware's platform for connecting to the Dirección General Impositiva (DGI)\n"
+"3. Go to Settings / Users / Companies / Companies and set the Tax ID number, DGI Main House or Branch Code, all your Address related  fields.\n"
+"4. Go to Invoices and validate them. Then use Send and Print to send to the government and generate a CFE. You will see a new field \"CFE Status\" that will show you the status of the electronic document: initially, it will be in \"Waiting DGI response\", and after some time it will be automatically updated to Approved/Rejected. You will also receive the legal PDF and XML files related to the CFE as attachments to the document.\n"
+"\n"
+"Known issues / Roadmap\n"
+"======================\n"
+"\n"
+"* Contingency documents not implemented\n"
+"* Future implementation will have auto synchronization of Vendor bills.\n"
+msgstr ""
+
+#. module: l10n_uy_edi
 #: model:ir.model.fields,help:l10n_uy_edi.field_res_company__l10n_uy_edi_branch_code
 msgid ""
 " This value is part of the XML when creating CFE. If not set properly all the CFEs will be rejected\n"
@@ -34,15 +59,6 @@ msgid ""
 "2. Select option 'Registro único tributario -> Consulta de datos' (menu link at the right side).\n"
 "3. Select option 'Consulta de Datos Registrales -> Consulta de Datos de Entidades'.\n"
 "4. Open the generated PDF. Get the number on section 'Domicilio Fiscal -> Número de Local'"
-msgstr ""
-
-#. module: l10n_uy_edi
-#. odoo-python
-#: code:addons/l10n_uy_edi/models/account_move.py:0
-msgid ""
-"%(dtype)s is not an Uruguayan Identification Type or a Generic one (VAT, "
-"Passport, or Foreign ID). You need to select a valid ID to be able to "
-"invoice"
 msgstr ""
 
 #. module: l10n_uy_edi
@@ -60,8 +76,15 @@ msgstr ""
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.view_move_form_inherit_l10n_uy_edi
 msgid ""
-"<i class=\"fa fa-warning\" role=\"img\" title=\"EDI (Uruguay)\"/>\n"
+"<i class=\"oi\" data-icon=\"warning\" role=\"img\" title=\"EDI (Uruguay)\"/>\n"
 "                        <span class=\"mx-1\">E-invoicing (Uruguay)</span>"
+msgstr ""
+
+#. module: l10n_uy_edi
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi.view_partner_latam_form
+msgid ""
+"<i title=\"Fetch from DGI\" role=\"img\" aria-label=\"Fetch from DGI\" "
+"class=\"oi oi-fw\" data-icon=\"refresh\"/>"
 msgstr ""
 
 #. module: l10n_uy_edi
@@ -75,13 +98,19 @@ msgid ""
 msgstr ""
 
 #. module: l10n_uy_edi
-#: model:ir.model,name:l10n_uy_edi.model_account_move_send
-msgid "Account Move Send"
+#. odoo-python
+#: code:addons/l10n_uy_edi/models/product_template.py:0
+msgid ""
+"A non-billable product cannot have sales taxes. Please remove the taxes from"
+" product '%(product_name)s' to continue."
 msgstr ""
 
 #. module: l10n_uy_edi
-#: model:ir.model,name:l10n_uy_edi.model_account_move_send_wizard
-msgid "Account Move Send Wizard"
+#. odoo-python
+#: code:addons/l10n_uy_edi/models/account_move.py:0
+msgid ""
+"A non-billable product cannot have taxes. Please remove the taxes from line "
+"'%(line_name)s' to continue."
 msgstr ""
 
 #. module: l10n_uy_edi
@@ -225,10 +254,6 @@ msgstr ""
 
 #. module: l10n_uy_edi
 #: model:ir.model,name:l10n_uy_edi.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__company_id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__company_id
 msgid "Company"
@@ -306,6 +331,11 @@ msgid "DGI Main-House or Branch Code"
 msgstr ""
 
 #. module: l10n_uy_edi
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
+msgid "Default Terminal Code"
+msgstr ""
+
+#. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__res_company__l10n_uy_edi_ucfe_env__demo
 msgid "Demo"
 msgstr ""
@@ -320,7 +350,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move.py:0
 msgid ""
-"Discount with Tax %s can only exist if match with regular line with same tax"
+"Discount line '%(line_name)s' must be associated to another line having the "
+"same taxes (%(tax_names)s)."
 msgstr ""
 
 #. module: l10n_uy_edi
@@ -332,6 +363,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_latam_document_type__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__display_name
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_template__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_partner__display_name
@@ -468,6 +500,11 @@ msgid ""
 msgstr ""
 
 #. module: l10n_uy_edi
+#: model:ir.model.fields.selection,name:l10n_uy_edi.selection__account_move__l10n_uy_edi_cfe_sale_mode__91
+msgid "Export under Mandate"
+msgstr ""
+
+#. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/l10n_uy_edi_document.py:0
 msgid "Fault Error - %(msg)s"
@@ -515,6 +552,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_latam_document_type__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_addenda__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_l10n_uy_edi_document__id
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_template__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__id
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_partner__id
@@ -671,6 +709,12 @@ msgid "No response"
 msgstr ""
 
 #. module: l10n_uy_edi
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_product__l10n_uy_edi_is_non_billable
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_product_template__l10n_uy_edi_is_non_billable
+msgid "Non-Billable"
+msgstr ""
+
+#. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/l10n_uy_edi_document.py:0
 msgid ""
@@ -733,6 +777,11 @@ msgid "Problem with Receiver identification number: %(exp_msg)s"
 msgstr ""
 
 #. module: l10n_uy_edi
+#: model:ir.model,name:l10n_uy_edi.model_product_template
+msgid "Product"
+msgstr ""
+
+#. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__l10n_uy_edi_addenda__type__item
 msgid "Product/Service Detail"
 msgstr ""
@@ -747,6 +796,12 @@ msgstr ""
 #. module: l10n_uy_edi
 #: model:ir.model.fields.selection,name:l10n_uy_edi.selection__res_company__l10n_uy_edi_ucfe_env__production
 msgid "Production"
+msgstr ""
+
+#. module: l10n_uy_edi
+#: model:ir.model.fields,help:l10n_uy_edi.field_product_product__l10n_uy_edi_is_non_billable
+#: model:ir.model.fields,help:l10n_uy_edi.field_product_template__l10n_uy_edi_is_non_billable
+msgid "Products with indicator 6 and 7 for EDI."
 msgstr ""
 
 #. module: l10n_uy_edi
@@ -779,6 +834,11 @@ msgstr ""
 #. module: l10n_uy_edi
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.l10n_uy_edi_addenda_view_search
 msgid "Search Description"
+msgstr ""
+
+#. module: l10n_uy_edi
+#: model:ir.model,name:l10n_uy_edi.model_account_move_send_wizard
+msgid "Send Invoice Wizard"
 msgstr ""
 
 #. module: l10n_uy_edi
@@ -818,6 +878,11 @@ msgid "Set your company state"
 msgstr ""
 
 #. module: l10n_uy_edi
+#: model:ir.model,name:l10n_uy_edi.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr ""
+
+#. module: l10n_uy_edi
 #: model:ir.model.fields,help:l10n_uy_edi.field_account_bank_statement_line__l10n_uy_edi_cfe_state
 #: model:ir.model.fields,help:l10n_uy_edi.field_account_move__l10n_uy_edi_cfe_state
 #: model:ir.model.fields,help:l10n_uy_edi.field_l10n_uy_edi_document__state
@@ -825,8 +890,12 @@ msgid "State of the electronic document"
 msgstr ""
 
 #. module: l10n_uy_edi
-#: model_terms:ir.ui.view,arch_db:l10n_uy_edi.res_config_settings_view_form_inherit_l10n_uy_edi
-msgid "Terminal Code"
+#: model:ir.model.fields,help:l10n_uy_edi.field_account_journal__l10n_uy_edi_ucfe_terminal_code
+msgid ""
+"Terminal code (point of invoicing) declared in Uruware for this journal. "
+"When set, it is used instead of the company default terminal code when "
+"sending the CFE of the documents issued from this journal. Leave empty to "
+"fall back to the company terminal code."
 msgstr ""
 
 #. module: l10n_uy_edi
@@ -866,7 +935,7 @@ msgstr ""
 #. module: l10n_uy_edi
 #. odoo-python
 #: code:addons/l10n_uy_edi/models/account_move.py:0
-msgid "The partner of the CFE needs to have an Identification Type"
+msgid "The partner of the CFE needs to have a valid Uruguayan identification."
 msgstr ""
 
 #. module: l10n_uy_edi
@@ -991,6 +1060,11 @@ msgid "UCFE Provider Query URL"
 msgstr ""
 
 #. module: l10n_uy_edi
+#: model:ir.model.fields,field_description:l10n_uy_edi.field_account_journal__l10n_uy_edi_ucfe_terminal_code
+msgid "UCFE Provider Terminal Code"
+msgstr ""
+
+#. module: l10n_uy_edi
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_company__l10n_uy_edi_ucfe_terminal_code
 #: model:ir.model.fields,field_description:l10n_uy_edi.field_res_config_settings__l10n_uy_edi_ucfe_terminal_code
 msgid "UCFE Provider Terminal code"
@@ -1030,6 +1104,11 @@ msgid "UNKNOWN INDICATOR %(ind_fact)s"
 msgstr ""
 
 #. module: l10n_uy_edi
+#: model_terms:ir.ui.view,arch_db:l10n_uy_edi.product_template_form_view
+msgid "UY"
+msgstr ""
+
+#. module: l10n_uy_edi
 #: model:ir.actions.server,name:l10n_uy_edi.ir_cron_get_vendor_bills_received_ir_actions_server
 msgid "UY: Create vendor bills (sync from Uruware)"
 msgstr ""
@@ -1060,6 +1139,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.l10n_uy_edi_document_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_uy_edi.view_move_form_inherit_l10n_uy_edi
 msgid "Update DGI Status"
+msgstr ""
+
+#. module: l10n_uy_edi
+#: model:ir.module.module,shortdesc:base.module_l10n_uy_edi
+msgid "Uruguay - Electronic Invoice"
 msgstr ""
 
 #. module: l10n_uy_edi

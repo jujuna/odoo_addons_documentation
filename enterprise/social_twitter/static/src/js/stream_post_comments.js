@@ -2,18 +2,24 @@ import { _t } from "@web/core/l10n/translation";
 import { StreamPostComments } from '@social/js/stream_post_comments';
 import { StreamPostCommentListTwitter } from './stream_post_comment_list';
 import { StreamPostCommentsReplyTwitter } from './stream_post_comments_reply';
-import { onWillStart } from "@odoo/owl";
+import { onWillStart, t, useProps } from "@odoo/owl";
 
 const MAX_ALLOWED_REPLIES = 3;
 
 export class StreamPostCommentsTwitter extends StreamPostComments {
+    twitterProps = useProps({
+        allComments: t.any(),
+        isReplyLimited: t.any(),
+        onTwitterTweetLike: t.any(),
+        streamId: t.any(),
+    });
 
     setup() {
         super.setup();
 
         this.page = 1;
         this.commentsCount = this.props.commentsCount;
-        this.allComments = this.props.allComments;
+        this.allComments = this.twitterProps.allComments;
         this.state.showLoadMoreComments = this.allComments.length > this.commentsCount;
 
         onWillStart(async () => {
@@ -52,7 +58,7 @@ export class StreamPostCommentsTwitter extends StreamPostComments {
     }
 
     preventAddComment(textarea, replyToCommentId) {
-        if (!this.props.isReplyLimited) {
+        if (!this.twitterProps.isReplyLimited) {
             return false;
         }
 

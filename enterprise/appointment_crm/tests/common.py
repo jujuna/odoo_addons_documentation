@@ -55,7 +55,6 @@ class TestAppointmentCrmCommon(TestCrmCommon):
         default = {
             'name': '%s with %s' % (appointment_type.name, contact.name),
             'start': datetime.now(),
-            'start_date': datetime.now(),
             'stop': datetime.now() + timedelta(hours=1),
             'allday': False,
             'duration': appointment_type.appointment_duration,

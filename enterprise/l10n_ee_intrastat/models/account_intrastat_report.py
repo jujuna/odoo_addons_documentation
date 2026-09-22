@@ -1,6 +1,5 @@
 import copy
 import io
-import zipfile
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
@@ -76,7 +75,7 @@ class IntrastatReportGoodsCustomHandler(models.AbstractModel):
                 'file_content': xlsx_files[0][1],
                 'file_type': 'xlsx',
             }
-        return self._ee_build_zip_response(report, options, xlsx_files)
+        return self._build_zip_response(report, options, xlsx_files)
 
     @api.model
     def _ee_prepare_options_for_xlsx_export(self, options, intrastat_type):
@@ -90,9 +89,9 @@ class IntrastatReportGoodsCustomHandler(models.AbstractModel):
         options_copy['intrastat_grouped'] = False  # deactivate the grouping in case it's activated
         options_copy['intrastat_type'] = intrastat_type
 
-        Move = self.env['account.move']
-        move_types = Move.get_outbound_types(False) if intrastat_type == 'arrivals' else Move.get_inbound_types(False)
-        options_copy.setdefault('forced_domain', []).append(('move_id.move_type', 'in', move_types))
+        options_copy.setdefault('forced_domain', []).append(
+            ('move_id.move_type', 'in', self._get_move_types_for_intrastat(intrastat_type))
+        )
 
         return options_copy
 
@@ -100,9 +99,8 @@ class IntrastatReportGoodsCustomHandler(models.AbstractModel):
     def _ee_intrastat_xlsx_get_data(self, options):
         options['export_mode'] = 'file'
         report = self.env['account.report'].browse(options['report_id'])
-        report._init_currency_table(options)
         expressions = report.line_ids.expression_ids
-        report_results = self._report_custom_engine_intrastat(expressions, options, expressions[0].date_scope, 'id', None)
+        report_results = self._report_engine_intrastat(options, expressions[0].date_scope, expressions.grouped('formula'), 'id', None)[expressions]
         for index, line_result in enumerate(report_results):
             report_results[index] = line_result[1]
         report_results = self._ee_prepare_values_for_export(report_results)
@@ -119,7 +117,7 @@ class IntrastatReportGoodsCustomHandler(models.AbstractModel):
             res_line = []
             for expression_label in col_orders_map:
                 if expression_label == 'registry_code':
-                    res_line.append(self.env.company.company_registry or '')
+                    res_line.append(self.env.company.partner_id._get_additional_identifier('EE_EN') or '')
                 elif expression_label == 'system':
                     res_line.append('1203' if line['system'] == '19' else '1204')
                 elif expression_label == 'period':
@@ -205,9 +203,8 @@ class IntrastatReportGoodsCustomHandler(models.AbstractModel):
         if date_from.day != 1 or date_to != final_day_month:
             raise UserError(_('Wrong date range selected. The intrastat declaration export has to be done monthly.'))
 
-        report._init_currency_table(options)
         expressions = report.line_ids.expression_ids
-        results = self._report_custom_engine_intrastat(expressions, options, expressions[0].date_scope, 'id', None)
+        results = self._report_engine_intrastat(options, expressions[0].date_scope, expressions.grouped('formula'), 'id', None)[expressions]
         for index, line_result in enumerate(results):
             results[index] = line_result[1]
         results = self._ee_prepare_values_for_export(results)
@@ -241,9 +238,8 @@ class IntrastatReportGoodsCustomHandler(models.AbstractModel):
         }
 
     def _ee_get_query_res(self, options):
-        query, params = self._prepare_query(options)
-        self.env.cr.execute(query, params)
-        query_res = self.env.cr.dictfetchall()
+        query = self._prepare_query(options)
+        query_res = self.env.execute_query_dict(query)
         query_res = self._fill_missing_values(query_res)
         query_res = self._ee_prepare_values_for_export(query_res)
         return query_res
@@ -256,16 +252,3 @@ class IntrastatReportGoodsCustomHandler(models.AbstractModel):
             vals['quantity'] = round(vals['quantity'] * float(vals['supplementary_units']) if vals['supplementary_units'] else vals['quantity'], 2)
             vals['weight'] = float(vals['weight']) if vals['weight'] else 0
         return vals_list
-
-    @api.model
-    def _ee_build_zip_response(self, report, options, xlsx_files):
-        with io.BytesIO() as buffer:
-            with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_DEFLATED) as zipfile_obj:
-                for filename, file_content in xlsx_files:
-                    zipfile_obj.writestr(filename, file_content)
-
-            return {
-                'file_name': report.get_default_report_filename(options, 'zip'),
-                'file_content': buffer.getvalue(),
-                'file_type': 'zip',
-            }

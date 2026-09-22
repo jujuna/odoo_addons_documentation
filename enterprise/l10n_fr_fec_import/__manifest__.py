@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -25,14 +24,13 @@ https://github.com/DGFiP/Test-Compta-Demat
     "category": "Accounting/Accounting",
     "depends": [
         "account_accountant",
-        "base_vat",
         "l10n_fr_account",
         "l10n_fr_reports",
         "account_base_import"
     ],
     'data': [
-        'security/ir.model.access.csv',
         'views/views.xml',
+        'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

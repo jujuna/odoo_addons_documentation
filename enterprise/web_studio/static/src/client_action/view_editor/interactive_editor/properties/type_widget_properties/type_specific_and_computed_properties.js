@@ -145,12 +145,4 @@ export const COMPUTED_DISPLAY_OPTIONS = {
     placeholder_field: {
         superOption: "placeholder",
     },
-    edit_max_value: {
-        superOption: "editable",
-        getInvisible: (value) => !value,
-    },
-    no_edit_color: {
-        superOption: "color_field",
-        getInvisible: (value) => !value,
-    },
 };

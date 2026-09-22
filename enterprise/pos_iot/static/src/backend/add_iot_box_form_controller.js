@@ -4,9 +4,6 @@ import { _t } from "@web/core/l10n/translation";
 import { user } from "@web/core/user";
 
 patch(AddIoTBoxFormController.prototype, {
-    setup() {
-        super.setup();
-    },
     async notifyIoTBoxFound(found) {
         if (
             !found ||

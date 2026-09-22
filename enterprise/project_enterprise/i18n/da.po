@@ -9,45 +9,71 @@
 # Martin Trigaux, 2022
 # JonathanStein <jstein@image.dk>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Kira Petersen François (peti)" <peti@odoo.com>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-11-08 19:43+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:56+0000\n"
+"PO-Revision-Date: 2026-09-18 01:20+0000\n"
+"Last-Translator: \"Kira Petersen François (peti)\" <peti@odoo.com>\n"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
 "project_enterprise/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: project_enterprise
+#: model:ir.module.module,description:base.module_project_enterprise
+msgid ""
+"\n"
+"Bridge module for project and enterprise\n"
+msgstr ""
+
+#. module: project_enterprise
+#. odoo-python
+#: code:addons/project_enterprise/models/project_task.py:0
+msgid "%(month)s %(year)s"
+msgstr ""
 
 #. module: project_enterprise
 #. odoo-python
 #: code:addons/project_enterprise/models/project_task.py:0
 msgid "%(partner)s has %(amount)s tasks at the same time."
+msgstr "%(partner)s har %(amount)s opgaver på samme tid."
+
+#. module: project_enterprise
+#. odoo-python
+#: code:addons/project_enterprise/models/project_task.py:0
+msgid "%(users)s has %(task_count)s tasks at the same time."
+msgstr ""
+
+#. module: project_enterprise
+#: model:ir.actions.report,print_report_name:project_enterprise.report_tasks
+msgid "'Tasks'"
 msgstr ""
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form
 msgid ""
-"<i class=\"fa fa-exclamation-circle me-2\" role=\"img\" title=\"Dependency "
+"<i class=\"oi me-2\" data-icon=\"error\" role=\"img\" title=\"Dependency "
 "warning\"/>"
 msgstr ""
-"<i class=\"fa fa-exclamation-circle me-2\" role=\"img\" title=\"Dependency "
+"<i class=\"oi me-2\" data-icon=\"error\" role=\"img\" title=\"Dependency "
 "warning\"/>"
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form
 msgid ""
-"<i class=\"fa fa-random me-2\" role=\"img\" title=\"Planning overlap\"/>"
+"<i class=\"oi me-2\" data-icon=\"shuffle\" role=\"img\" title=\"Planning "
+"overlap\"/>"
 msgstr ""
-"<i class=\"fa fa-random me-2\" role=\"img\" title=\"Planning overlap\"/>"
+"<i class=\"oi me-2\" data-icon=\"shuffle\" role=\"img\" title=\"Planning "
+"overlap\"/>"
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.portal_my_task
@@ -57,12 +83,17 @@ msgstr "<strong>Deadline:</strong>"
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.portal_my_task
 msgid "<strong>Planned Date:</strong>"
-msgstr ""
+msgstr "<strong>Planlagt dato:</strong>"
 
 #. module: project_enterprise
 #: model:ir.model.fields,field_description:project_enterprise.field_project_task__allocated_hours
 msgid "Allocated Time"
 msgstr "Tildelt tid"
+
+#. module: project_enterprise
+#: model:ir.model.fields,field_description:project_enterprise.field_res_users__task_ids
+msgid "Assigned Tasks"
+msgstr ""
 
 #. module: project_enterprise
 #: model:ir.model.fields,field_description:project_enterprise.field_project_task__user_ids
@@ -75,11 +106,16 @@ msgstr "Ansvarlige"
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/view_dialogs/select_auto_plan_create_dialog.xml:0
 msgid "Auto Plan"
+msgstr "Automatisk planlægning"
+
+#. module: project_enterprise
+#: model:ir.module.module,summary:base.module_project_enterprise
+msgid "Bridge module for project and enterprise"
 msgstr ""
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form
-msgid "Check it out <i class=\"oi oi-chevron-right ms-2\"/>"
+msgid "Check it out <i class=\"oi ms-2\" data-icon=\"chevron_forward\"/>"
 msgstr ""
 
 #. module: project_enterprise
@@ -100,19 +136,13 @@ msgid "Date"
 msgstr "Dato"
 
 #. module: project_enterprise
-#: model_terms:ir.ui.view,arch_db:project_enterprise.project_sharing_project_task_view_form_inherited_in_gantt
-#: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form_in_gantt
-msgid "Discard"
-msgstr "Kassér"
-
-#. module: project_enterprise
 #: model:ir.model.fields,field_description:project_enterprise.field_project_project__display_name
 #: model:ir.model.fields,field_description:project_enterprise.field_project_task__display_name
 #: model:ir.model.fields,field_description:project_enterprise.field_project_task_recurrence__display_name
 #: model:ir.model.fields,field_description:project_enterprise.field_report_project_task_user__display_name
 #: model:ir.model.fields,field_description:project_enterprise.field_res_users__display_name
 msgid "Display Name"
-msgstr "Vis navn"
+msgstr "Visningsnavn"
 
 #. module: project_enterprise
 #. odoo-javascript
@@ -136,12 +166,21 @@ msgid "Milestone"
 msgstr "Milepæl"
 
 #. module: project_enterprise
+#. odoo-javascript
+#: code:addons/project_enterprise/static/src/views/project_task_calendar/project_task_calendar_controller.js:0
+#: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_controller.js:0
+msgid "No tasks to print"
+msgstr ""
+
+#. module: project_enterprise
 #. odoo-python
 #: code:addons/project_enterprise/models/project_task.py:0
 msgid ""
 "One parameter is missing to use this method. You should give a start and end "
 "dates."
 msgstr ""
+"Der mangler en parameter for at kunne bruge denne metode. Du skal angive en "
+"start- og en slutdato."
 
 #. module: project_enterprise
 #. odoo-python
@@ -154,14 +193,23 @@ msgstr "Planlagt dato"
 #. module: project_enterprise
 #: model:ir.model.fields,field_description:project_enterprise.field_project_task__planned_date_start
 msgid "Planned Date Start"
-msgstr ""
+msgstr "Planlagt startdato"
 
 #. module: project_enterprise
+#. odoo-python
+#: code:addons/project_enterprise/models/project_task.py:0
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_project_view_gantt
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_gantt
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_gantt_inherited_project_sharing_task
 msgid "Planning"
 msgstr "Planlægning"
+
+#. module: project_enterprise
+#. odoo-javascript
+#: code:addons/project_enterprise/static/src/views/project_task_calendar/project_task_calendar_controller.js:0
+#: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_controller.js:0
+msgid "Print"
+msgstr ""
 
 #. module: project_enterprise
 #: model:ir.model,name:project_enterprise.model_project_project
@@ -171,16 +219,21 @@ msgid "Project"
 msgstr "Projekt"
 
 #. module: project_enterprise
-#. odoo-javascript
-#: code:addons/project_enterprise/static/src/views/project_task_common/milestones_popover.xml:0
-msgid "Project due"
+#: model:ir.module.module,shortdesc:base.module_project_enterprise
+msgid "Project Enterprise"
 msgstr ""
 
 #. module: project_enterprise
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/project_task_common/milestones_popover.xml:0
+msgid "Project due"
+msgstr "Projektfrist"
+
+#. module: project_enterprise
+#. odoo-javascript
+#: code:addons/project_enterprise/static/src/views/project_task_common/milestones_popover.xml:0
 msgid "Project start"
-msgstr ""
+msgstr "Projektstart"
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_sharing_project_task_view_form_inherited_in_gantt
@@ -200,7 +253,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/project_enterprise/models/project_task.py:0
 msgid "Some tasks were planned after their initial deadline."
-msgstr ""
+msgstr "Nogle opgaver blev planlagt efter deres oprindelige deadline."
 
 #. module: project_enterprise
 #. odoo-python
@@ -210,6 +263,10 @@ msgid ""
 "limited availability of the assignees. The planned dates for these tasks may "
 "not align with their allocated hours."
 msgstr ""
+"Nogle opgaver blev planlagt samtidig, hvilket har medført en konflikt på "
+"grund af de tildelte personers begrænsede tilgængelighed. De planlagte "
+"tidspunkter for disse opgaver stemmer muligvis ikke overens med de timer, "
+"der er afsat til dem."
 
 #. module: project_enterprise
 #. odoo-python
@@ -218,6 +275,8 @@ msgid ""
 "Some tasks weren't planned because the closest available starting date was "
 "too far ahead in the future"
 msgstr ""
+"Nogle opgaver blev ikke planlagt, fordi den nærmeste mulige startdato lå for "
+"langt ude i fremtiden"
 
 #. module: project_enterprise
 #: model:ir.model.fields,field_description:project_enterprise.field_project_task__planned_date_begin
@@ -239,54 +298,59 @@ msgstr "Opgavegentagelse"
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_renderer.js:0
 msgid "Task could not be removed"
-msgstr ""
+msgstr "Opgave kunne ikke fjernes"
 
 #. module: project_enterprise
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_renderer.js:0
 msgid "Task duplicated"
-msgstr ""
+msgstr "Opgave duplikeret"
 
 #. module: project_enterprise
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_renderer.js:0
 msgid "Task removed"
-msgstr ""
+msgstr "Opgave fjernet"
 
 #. module: project_enterprise
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_renderer.js:0
 msgid "Task reschedule undone"
-msgstr ""
+msgstr "Omplanlægning af opgave annulleret"
 
 #. module: project_enterprise
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_renderer.js:0
 msgid "Task rescheduled"
+msgstr "Opgave omplanlagt"
+
+#. module: project_enterprise
+#: model:ir.actions.report,name:project_enterprise.report_tasks
+msgid "Tasks"
 msgstr ""
 
 #. module: project_enterprise
 #: model:ir.model,name:project_enterprise.model_report_project_task_user
 msgid "Tasks Analysis"
-msgstr "Opgave analyse"
+msgstr "Opgaveanalyse"
 
 #. module: project_enterprise
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_renderer.js:0
 msgid "Tasks have been successfully scheduled for the upcoming periods."
-msgstr ""
+msgstr "Opgaverne for de kommende perioder er planlagt uden problemer."
 
 #. module: project_enterprise
 #. odoo-python
 #: code:addons/project_enterprise/models/project_task.py:0
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_search_conflict_task_project_enterprise
 msgid "Tasks in Conflict"
-msgstr "Opgaver der konflikter"
+msgstr "Opgaver i konflikt"
 
 #. module: project_enterprise
 #: model:ir.model.constraint,message:project_enterprise.constraint_project_task_planned_dates_check
 msgid "The planned start date must be before the planned end date."
-msgstr ""
+msgstr "Den planlagte startdato skal ligge før den planlagte slutdato."
 
 #. module: project_enterprise
 #. odoo-python
@@ -295,12 +359,14 @@ msgid ""
 "The tasks could not be rescheduled due to the assignees' lack of "
 "availability at this time."
 msgstr ""
+"Opgaverne kunne ikke udskydes, da de udpegede personer ikke var tilgængelige "
+"på det tidspunkt."
 
 #. module: project_enterprise
 #. odoo-python
 #: code:addons/project_enterprise/models/project_task.py:0
 msgid "This Progress Bar is not implemented."
-msgstr ""
+msgstr "Denne statuslinje er ikke implementeret."
 
 #. module: project_enterprise
 #. odoo-python
@@ -309,6 +375,8 @@ msgid ""
 "This task cannot be planned before the following tasks on which it depends: %"
 "(task_list)s"
 msgstr ""
+"Denne opgave kan ikke planlægges før de opgaver, som den afhænger af: %"
+"(task_list)s"
 
 #. module: project_enterprise
 #. odoo-python
@@ -317,11 +385,13 @@ msgid ""
 "This user isn't expected to have any tasks assigned during this period "
 "because they don't have any running contract."
 msgstr ""
+"Denne bruger vil sandsynligvis ikke få tildelt opgaver i denne periode, da "
+"vedkommende ikke har en aktiv kontrakt."
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.res_config_settings_view_form
 msgid "Timesheets"
-msgstr "Timesedler"
+msgstr "Tidsregistreringer"
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_sharing_project_task_view_form_inherited_in_gantt
@@ -329,7 +399,7 @@ msgstr "Timesedler"
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_gantt
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_gantt_inherited_project_sharing_task
 msgid "Unschedule"
-msgstr "Ikke planlagt"
+msgstr "Annullér planlægning"
 
 #. module: project_enterprise
 #: model:ir.model.fields,help:project_enterprise.field_project_task__display_name
@@ -361,58 +431,4 @@ msgstr "Vis opgaver"
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/project_task_map/project_task_map_renderer.xml:0
 msgid "View customer locations for your tasks"
-msgstr ""
-
-#~ msgid "<i class=\"fa fa-long-arrow-right\" title=\"Arrow\"/>"
-#~ msgstr "<i class=\"fa fa-long-arrow-right\" title=\"Arrow\"/>"
-
-#~ msgid "<strong>Assignees — </strong>"
-#~ msgstr "<strong>Ansvarlige — </strong>"
-
-#~ msgid "Created by"
-#~ msgstr "Oprettet af"
-
-#~ msgid "Created on"
-#~ msgstr "Oprettet den"
-
-#~ msgid "End Date"
-#~ msgstr "Slut dato"
-
-#~ msgid "End date"
-#~ msgstr "Slut dato"
-
-#~ msgid "Last Updated by"
-#~ msgstr "Sidst opdateret af"
-
-#~ msgid "Last Updated on"
-#~ msgstr "Sidst opdateret den"
-
-#~ msgid "Lines"
-#~ msgstr "Linjer"
-
-#~ msgid "Mobile"
-#~ msgstr "Mobil"
-
-#~ msgid "Overlapping Tasks"
-#~ msgstr "Overlappende opgaver"
-
-#~ msgid "Planning Overlap"
-#~ msgstr "Planlæggelse overlap"
-
-#~ msgid "Start Date"
-#~ msgstr "Start dato"
-
-#~ msgid "Street"
-#~ msgstr "Vej"
-
-#~ msgid "Unassigned Tasks"
-#~ msgstr "ikke-tildelte opgaver"
-
-#~ msgid "Warning"
-#~ msgstr "Advarsel"
-
-#~ msgid "Wizard"
-#~ msgstr "Guide"
-
-#~ msgid "Zip"
-#~ msgstr "Postnummer"
+msgstr "Vis kundernes placeringer for dine opgaver"

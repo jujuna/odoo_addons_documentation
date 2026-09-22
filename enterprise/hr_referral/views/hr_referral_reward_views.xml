@@ -25,6 +25,7 @@
                                 alt="Reward"
                                 options="{'img_class': 'object-fit-contain'}"
                                 invisible="not image"
+                                class="rounded"
                             />
                             <field name="gift_manager_id" widget="referral_many2one_avatar_user"/>
                         </aside>
@@ -63,10 +64,10 @@
                             <div class="w-100">
                                 <t t-if="record.points_missing.raw_value &lt; 1">
                                     <button name="buy" type="object" class="btn btn-primary w-100 d-none d-md-inline-block" confirm="Do you want to confirm this reward? After confirmation an HR will contact you.">
-                                        <span title='Buy'><i class='fa fa-shopping-basket me-3' role="img" aria-label="Buy"/>Buy</span>
+                                        <span title='Buy'><i class="oi me-3" data-icon="shopping_basket" role="img" aria-label="Buy"/>Buy</span>
                                     </button>
                                     <button name="action_open_buy_view" type="object" class="btn btn-primary w-100 d-inline-block d-md-none">
-                                        <span title='Buy'><i class='fa fa-shopping-basket me-3' role="img" aria-label="Buy"/>Buy</span>
+                                        <span title='Buy'><i class="oi me-3" data-icon="shopping_basket" role="img" aria-label="Buy"/>Buy</span>
                                     </button>
                                 </t>
                                 <t t-else="">
@@ -103,7 +104,7 @@
                 </sheet>
                 <footer>
                     <button string="Ok" type="object" name="buy" class="btn-primary" data-hotkey="q"/>
-                    <button string="Cancel" special="cancel" data-hotkey="x" class="btn-secondary"/>
+                    <button special="cancel" data-hotkey="x" class="btn-secondary"/>
                 </footer>
             </form>
         </field>
@@ -117,7 +118,7 @@
                 <field name="active" invisible="1"/>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_get_employee_awarded" class="oe_stat_button" icon="fa-user"
+                        <button name="action_get_employee_awarded" class="oe_stat_button" icon="person" icon_class="oi-filled"
                             type="object" invisible="awarded_employees == 0">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value">
@@ -209,7 +210,7 @@
         </field>
     </record>
 
-    <menuitem parent="menu_hr_referral_configuration" id="menu_hr_referral_reward_configuration" action="action_hr_referral_reward_configuration" sequence="3"/>
+    <menuitem parent="menu_hr_referral_referrals_configuration" id="menu_hr_referral_reward_configuration" action="action_hr_referral_reward_configuration" sequence="2"/>
 
 
 </odoo>

@@ -32,12 +32,13 @@ export class VoipWorker {
         }
     }
 
-    _onRing({ target: client, data: { data: controlHandle } }) {
+    _onRing({ target: client, data: { data } }) {
+        const { controlHandle, sessionKey } = data;
         if (this.callById.has(controlHandle)) {
             return;
         }
         const call = { expires: Date.now() + 10 * 60 * 1000 };
         this.callById.set(controlHandle, call);
-        client.postMessage({ type: "VOIP:PLAY_INCOMING", data: { controlHandle } });
+        client.postMessage({ type: "VOIP:PLAY_INCOMING", data: { sessionKey } });
     }
 }

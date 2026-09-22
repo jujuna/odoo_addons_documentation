@@ -7,12 +7,15 @@
     'description': """This module integrates website sale with WhatsApp""",
     'depends': ['website_sale', 'whatsapp'],
     'data': [
-        'views/res_config_settings_views.xml'
+        'data/whatsapp_template_data.xml',
+        'data/ir_cron_data.xml',
+        'views/res_config_settings_views.xml',
+        'views/sale_order_views.xml',
     ],
     'demo': [
         'data/demo.xml'
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'auto_install': True
+    'auto_install': True,
 }

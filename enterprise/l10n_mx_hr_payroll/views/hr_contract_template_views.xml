@@ -9,8 +9,7 @@
                 <group string="Options" invisible="country_code != 'MX'">
                     <label for="l10n_mx_holiday_bonus_rate" string="Holiday Bonus Rate"/>
                     <div class="o_row">
-                        <field name="l10n_mx_holiday_bonus_rate" class="o_hr_narrow_field"/>
-                        <span>%</span>
+                        <field name="l10n_mx_holiday_bonus_rate" class="o_hr_narrow_field" widget="percentage"/>
                     </div>
                     <field name="l10n_mx_savings_fund" string="Savings Fund"/>
 
@@ -34,7 +33,7 @@
                             <field name="infonavit_type"/>
                             <field name="discount_factor" invisible="infonavit_type != 'discount_factor'"/>
                             <field name="fixed_monetary_fee" invisible="infonavit_type != 'fixed_monetary_fee'" sum="Total Fixed Monetary Fee"/>
-                            <field name="percentage" invisible="infonavit_type != 'percentage'"/>
+                            <field name="percentage" invisible="infonavit_type != 'percentage'" widget="percentage"/>
                         </list>
                     </field>
                     <separator string="Fonacot"/>

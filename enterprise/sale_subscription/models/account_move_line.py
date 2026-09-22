@@ -3,23 +3,17 @@
 from dateutil.relativedelta import relativedelta
 
 from odoo import fields, models, api
-from odoo.tools.sql import column_exists, create_column
 
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
-
-    def _auto_init(self):
-        # create column manually to skip initial computation
-        if not column_exists(self.env.cr, "account_move_line", "subscription_mrr"):
-            create_column(self.env.cr, "account_move_line", "subscription_mrr", "numeric")
-        return super()._auto_init()
 
     subscription_id = fields.Many2one("sale.order", index=True)
     subscription_mrr = fields.Monetary(
         string="Monthly Recurring Revenue",
         compute="_compute_mrr",
         store=True,
+        init_storage=lambda model: None,
         help="The MRR is computed by dividing the signed amount (in company currency) by the "
         "amount of time between the start and end dates converted in months.\nThis allows "
         "comparison of invoice lines created by subscriptions with different temporalities.\n"
@@ -128,7 +122,7 @@ class AccountMoveLine(models.Model):
                 continue
             sign = 1 if aml.move_id.move_type == 'out_invoice' else -1
             periods.setdefault(aml.deferred_end_date, 0.0)
-            periods[aml.deferred_end_date] += sign * aml.product_uom_id._compute_quantity(aml.quantity, target_uom, round=False)
+            periods[aml.deferred_end_date] += sign * abs(aml.product_uom_id._compute_quantity(aml.quantity, target_uom, round=False))
 
         invoice_dates = [d for d, qty in periods.items() if qty > 0.0]
 

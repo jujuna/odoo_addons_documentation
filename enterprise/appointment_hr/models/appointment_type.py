@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-import pytz
-
+import datetime
 from datetime import timedelta
 from odoo import api, fields, models
 from odoo.tools import groupby
@@ -11,7 +9,9 @@ from odoo.tools import groupby
 class AppointmentType(models.Model):
     _inherit = "appointment.type"
 
-    work_hours_activated = fields.Boolean('Employee Schedule')
+    work_hours_activated = fields.Boolean('Employee Schedule',
+        help='''Takes the employee working hours into account in availabilities.
+        Note that calendar events where you're marked as "busy" are always taken into account, regardless of this setting.''')
 
     def _get_default_range_slots(self, category):
         '''
@@ -107,7 +107,7 @@ class AppointmentType(models.Model):
         """
         values = super()._slot_availability_prepare_users_values(staff_users, start_dt, end_dt)
         values.update(
-            self._slot_availability_prepare_users_values_workhours(staff_users, start_dt.astimezone(pytz.UTC), end_dt.astimezone(pytz.UTC))
+            self._slot_availability_prepare_users_values_workhours(staff_users, start_dt.astimezone(datetime.UTC), end_dt.astimezone(datetime.UTC))
         )
         return values
 
@@ -153,7 +153,7 @@ class AppointmentType(models.Model):
         strict_schedule_employees_tz = [
             employees[0].with_context(tz=user.tz)
             for user, employees in users_to_employees.items()
-            if employees and employees[0].resource_calendar_id and not employees[0].resource_calendar_id.flexible_hours
+            if employees and not employees[0].sudo()._is_flexible(start_dt.date())
         ]
 
         for employee in strict_schedule_employees_tz:
@@ -166,14 +166,15 @@ class AppointmentType(models.Model):
         # Compute work schedules for users having employees
         work_schedules = {}
         for calendar, employees in calendar_to_employees.items():
+            resources_per_tz = employees._get_resources_per_tz(start_dt)
             work_intervals = calendar._work_intervals_batch(
                 start_dt, end_dt,
-                resources=employees.resource_id
+                resources_per_tz=resources_per_tz
             )
             work_schedules.update(dict(
                 (employee.user_partner_id,
-                 [(interval[0].astimezone(pytz.UTC).replace(tzinfo=None),
-                   interval[1].astimezone(pytz.UTC).replace(tzinfo=None)
+                 [(interval[0].astimezone(datetime.UTC).replace(tzinfo=None),
+                   interval[1].astimezone(datetime.UTC).replace(tzinfo=None)
                   )
                   for interval in work_intervals[employee.resource_id.id]
                  ]

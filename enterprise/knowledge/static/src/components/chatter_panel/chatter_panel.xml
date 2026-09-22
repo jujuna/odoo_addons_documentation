@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="knowledge.KnowledgeArticleChatter">
-        <chatter t-if="this.state.isDisplayed" class="o_FormRenderer_chatterContainer o_scroll_view_lg p-0">
+        <chatter t-if="this.panelState.isDisplayed('chatter')" class="o_FormRenderer_chatterContainer p-0 mt-n2">
             <Chatter
                 threadModel="'knowledge.article'"
                 threadId="this.props.record.resId"
@@ -9,8 +9,8 @@
                 hasParentReloadOnAttachmentsChanged="true"
                 hasParentReloadOnFollowersUpdate="true"
                 hasParentReloadOnMessagePosted="true"
-                isChatterAside="isChatterAside"
-                saveRecord="props.record.save.bind(props.record, { reload: false })"
+                isChatterAside="this.isChatterAside"
+                saveRecord="this.props.record.save.bind(this.props.record, { reload: false })"
             />
         </chatter>
     </t>

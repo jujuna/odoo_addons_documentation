@@ -1,7 +1,7 @@
 import { getRawValue } from "@web/views/kanban/kanban_record";
-import { ListRenderer } from '@web/views/list/list_renderer';
+import { ListRenderer } from "@web/views/list/list_renderer";
 
-import { HelpdeskTicketGroupConfigMenu } from '../helpdesk_ticket_group_config_menu';
+import { HelpdeskTicketGroupConfigMenu } from "../helpdesk_ticket_group_config_menu";
 
 export class HelpdeskTicketListRenderer extends ListRenderer {
     static components = {
@@ -29,11 +29,11 @@ export class HelpdeskTicketListRenderer extends ListRenderer {
         return this._selectedTicketSameTeam;
     }
 
-    isCellReadonly(column, record) {
+    isFieldReadonly(column, record) {
         let readonly = false;
         if (column.name === "stage_id") {
             readonly = !this.getSelectedTicketSameTeam();
         }
-        return readonly || super.isCellReadonly(column, record);
+        return readonly || super.isFieldReadonly(column, record);
     }
 }

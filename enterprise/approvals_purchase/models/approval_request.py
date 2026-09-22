@@ -9,6 +9,7 @@ from odoo.tools.misc import clean_context
 class ApprovalRequest(models.Model):
     _inherit = 'approval.request'
 
+    create_rfq = fields.Boolean(related="category_id.create_rfq")
     purchase_order_count = fields.Integer(compute='_compute_purchase_order_count')
 
     @api.depends('product_line_ids.purchase_order_line_id')
@@ -18,7 +19,7 @@ class ApprovalRequest(models.Model):
             request.purchase_order_count = len(purchases)
 
     def action_approve(self, approver=None):
-        if self.approval_type == 'purchase' and any(not line.product_id for line in self.product_line_ids):
+        if self.create_rfq and any(not line.product_id for line in self.product_line_ids):
             raise UserError(_("You must select a product for each line of requested products."))
         return super().action_approve(approver)
 
@@ -26,7 +27,8 @@ class ApprovalRequest(models.Model):
         """ Override to unlink the products of the cancelled Approval Request from Purchase Orders """
         res = super().action_cancel()
         purchase_orders_data_per_state = self._cancel_approval_request()
-        self._log_po_cancellation_to_chatter(purchase_orders_data_per_state)
+        if any(purchase_orders_data_per_state.values()):
+            self._log_po_cancellation_to_chatter(purchase_orders_data_per_state)
         return res
 
     def _cancel_approval_request(self):
@@ -62,7 +64,7 @@ class ApprovalRequest(models.Model):
 
     def action_confirm(self):
         for request in self:
-            if request.approval_type == 'purchase' and not request.product_line_ids:
+            if request.create_rfq and not request.product_line_ids:
                 raise UserError(_("You cannot create an empty purchase request."))
         return super().action_confirm()
 
@@ -77,11 +79,9 @@ class ApprovalRequest(models.Model):
     def _create_purchase_orders(self):
         self.product_line_ids._check_products_vendor()
         for line in self.product_line_ids:
-            seller = line.seller_id or line.product_id.with_company(line.company_id)._select_seller(
-                quantity=line.po_uom_qty,
-                uom_id=line.product_id.uom_id,
-            )
-            vendor = seller.partner_id
+            seller_info = line._get_seller_info()
+            vendor = seller_info.get('partner_id', self.env['res.partner'])
+            seller_uom = seller_info.get('uom_id', self.env['uom.uom'])
             po_domain = line._get_purchase_orders_domain(vendor)
             purchase_orders = self.env['purchase.order'].search(po_domain)
 
@@ -91,7 +91,7 @@ class ApprovalRequest(models.Model):
                 purchase_line = self.env['purchase.order.line'].search([
                     ('order_id', 'in', purchase_orders.ids),
                     ('product_id', '=', line.product_id.id),
-                    ('product_uom_id', '=', line.seller_id.product_uom_id.id or line.product_id.uom_id.id),
+                    ('uom_id', '=', seller_uom.id or line.product_id.uom_id.id),
                 ], limit=1)
                 purchase_order = self.env['purchase.order']
                 if purchase_line:
@@ -102,11 +102,11 @@ class ApprovalRequest(models.Model):
                 else:
                     # No purchase order line found, create one.
                     purchase_order = purchase_orders[0]
-                    seller_uom_qty = line.product_uom_id._compute_quantity(line.quantity, seller.product_uom_id)
+                    seller_uom_qty = line.product_uom_id._compute_quantity(line.quantity, seller_uom)
                     po_line_vals = self.env['purchase.order.line']._prepare_purchase_order_line(
                         line.product_id,
                         seller_uom_qty,
-                        seller.product_uom_id,
+                        seller_uom,
                         line.company_id,
                         vendor,
                         purchase_order,
@@ -127,11 +127,11 @@ class ApprovalRequest(models.Model):
                 # No RFQ found: create a new one.
                 po_vals = line._get_purchase_order_values(vendor)
                 new_purchase_order = self.env['purchase.order'].create(po_vals)
-                seller_uom_qty = line.product_uom_id._compute_quantity(line.quantity, seller.product_uom_id)
+                seller_uom_qty = line.product_uom_id._compute_quantity(line.quantity, seller_uom)
                 po_line_vals = self.env['purchase.order.line']._prepare_purchase_order_line(
                     line.product_id,
                     seller_uom_qty,
-                    seller.product_uom_id,
+                    seller_uom,
                     line.company_id,
                     vendor,
                     new_purchase_order,

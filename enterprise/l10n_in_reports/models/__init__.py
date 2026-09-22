@@ -1,5 +1,6 @@
 from . import account_batch_payment
 from . import account_move
+from . import account_move_line
 from . import gstr_document_summary
 from . import account_return
 from . import res_company
@@ -11,3 +12,4 @@ from . import enet_bank_template
 from . import irn_exception
 from . import ir_attachment
 from . import l10n_in_report_handler
+from . import template_in

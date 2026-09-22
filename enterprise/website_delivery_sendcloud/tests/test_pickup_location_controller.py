@@ -9,13 +9,13 @@ import requests
 from odoo.tests import tagged
 
 from odoo.addons.website_sale.controllers.cart import Cart
-from odoo.addons.website_sale.controllers.delivery import Delivery
+from odoo.addons.website_sale_stock.controllers.location_selector import LocationSelector
 from odoo.addons.website_sale.controllers.main import WebsiteSale
-from odoo.addons.website_sale.tests.common import MockRequest, WebsiteSaleCommon
+from odoo.addons.website_sale.tests.common import WebsiteSaleCommon
 
 
 @contextmanager
-def _mock_call():
+def _mock_call(specific_check=None):
     def _mock_request(*args, **kwargs):
         method = kwargs.get('method') or args[0]
         url = kwargs.get('url') or args[1]
@@ -48,6 +48,8 @@ def _mock_call():
 
         for endpoint, content in responses[method].items():
             if endpoint in url:
+                if specific_check:
+                    specific_check(endpoint, kwargs)
                 response = requests.Response()
                 response._content = json.dumps(content).encode()
                 response.status_code = 200
@@ -60,7 +62,9 @@ def _mock_call():
 
 
 @tagged('post_install', '-at_install')
-class TestWebsiteDeliverySendcloudLocationsController(WebsiteSaleCommon):
+class TestWebsiteLocationSelectorSendcloudLocationsController(WebsiteSaleCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -101,7 +105,7 @@ class TestWebsiteDeliverySendcloudLocationsController(WebsiteSaleCommon):
         })
 
         shipping_product = cls.env['product.product'].create({
-            'name': 'SendCloud Delivery',
+            'name': 'SendCloud LocationSelector',
             'type': 'service'
         })
 
@@ -141,7 +145,11 @@ class TestWebsiteDeliverySendcloudLocationsController(WebsiteSaleCommon):
         cls.sendcloud.sendcloud_use_locations = True
         cls.payment_provider = cls.env['payment.provider'].create({'name': 'test'})
 
-        cls.payment_method_id = cls.env.ref('payment.payment_method_unknown').id
+        cls.payment_method_id = cls.env["payment.method"].create({
+            "name": "Payment method",
+            "code": "unknown",
+            "provider_id": cls.payment_provider.id,
+        }).id
 
         cls.currency = cls.env['res.currency'].create({'name': 'testestset', 'symbol': '€'})
 
@@ -155,6 +163,14 @@ class TestWebsiteDeliverySendcloudLocationsController(WebsiteSaleCommon):
         })
 
     def test_controller_pickup_location(self):
+        # Ensure the address sent to sendcloud is correct when there is no city (only zip)
+        self.eu_partner.city = False
+
+        def address_format_check(endpoint, kwargs):
+            if endpoint == 'service-points':
+                params = kwargs.get('params', {})
+                self.assertEqual(params.get('address', ''), '1367 ')
+
         order = self.env['sale.order'].create({
             'carrier_id': self.sendcloud.id,
             'partner_id': self.env.user.partner_id.id,
@@ -162,10 +178,10 @@ class TestWebsiteDeliverySendcloudLocationsController(WebsiteSaleCommon):
             'transaction_ids': [self.transaction.id],
             'website_id': self.website.id,
         })
-        with MockRequest(self.env, website=self.website, sale_order_id=order.id), _mock_call():
-            response = Delivery().website_sale_get_pickup_locations()
+        with self.mock_request(sale_order_id=order.id), _mock_call(address_format_check):
+            response = LocationSelector().website_sale_get_pickup_locations(zip_code="1367")
             self.assertNotEqual({},
-                Delivery().website_sale_set_pickup_location(
+                LocationSelector().website_sale_set_pickup_location(
                     pickup_location_data=json.dumps(response['pickup_locations'][0])
                 )
             )
@@ -187,16 +203,16 @@ class TestWebsiteDeliverySendcloudLocationsController(WebsiteSaleCommon):
                 'country_code': 'BE',
                 'latitude': '50.634529',
                 'longitude': '4.864696',
-            }, order.pickup_location_data)
+            }, order.partner_shipping_id.pickup_location_data)
 
     def test_sendcloud_delivery_partner(self):
         """
         Test that the delivery associated to a website sale using a sendcloud
         pickup point is associated with a partner of `delivery` type.
         """
+        website = self.env.website
         product = self.product_to_ship1
-        website = self.website.with_user(self.public_user)
-        with MockRequest(website.env, website=website) as request:
+        with self.mock_request(website=website) as request:
             self.WebsiteSaleCartController.add_to_cart(
                 product_template_id=product.product_tmpl_id,
                 product_id=product.id,
@@ -213,18 +229,21 @@ class TestWebsiteDeliverySendcloudLocationsController(WebsiteSaleCommon):
             'zip': '1367',
             'country_id': self.ref('base.be'),
         }
-        with MockRequest(website.env, website=website, sale_order_id=sale_order.id) as req:
+        with self.mock_request(sale_order_id=sale_order.id) as req:
             req.httprequest.method = "POST"
             self.WebsiteSaleController.shop_address_submit(**partner_address)
+
         sale_order.write({
             'carrier_id': self.sendcloud.id,
             'transaction_ids': [self.transaction.id],
         })
-        with MockRequest(self.env, website=website, sale_order_id=sale_order.id), _mock_call():
-            response = Delivery().website_sale_get_pickup_locations()
-            Delivery().website_sale_set_pickup_location(
+        with self.mock_request(website=website, sale_order_id=sale_order.id), _mock_call():
+            response = LocationSelector().website_sale_get_pickup_locations()
+            LocationSelector().website_sale_set_pickup_location(
                 pickup_location_data=json.dumps(response['pickup_locations'][0])
             )
+
+        self.assertEqual(sale_order.partner_shipping_id.email, 'bob@email.com')
 
         sale_order.action_confirm()
         # the delivery adress of the SO and the delivery should have been updated
@@ -235,6 +254,8 @@ class TestWebsiteDeliverySendcloudLocationsController(WebsiteSaleCommon):
             'type': 'delivery',
             'name': 'Station Avia',
             'contact_address_complete': 'Chaussee De Namur 67, 1367 Ramillies, Belgium',
+        }])
+        self.assertRecordValues(delivery.partner_id.parent_id, [{
             'email': 'bob@email.com',
             'phone': '+1 555-555-555',
         }])

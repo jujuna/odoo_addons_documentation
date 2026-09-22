@@ -7,14 +7,10 @@
             <field name="model">cis.monthly.return.wizard</field>
             <field name="arch" type="xml">
                 <form>
-                    <field name="use_wrong_period" invisible="1"/>
-                    <div class="alert alert-warning oe_edit_only" role="alert" invisible="not use_wrong_period">
-                        The report period is not correctly aligned to the CIS period from HMRC, therefore you cannot send the report. Please use the tax period filter.
-                    </div>
                     <div class="alert alert-info oe_edit_only" role="alert" invisible="not already_submited_period">
                         A CIS Monthly return has already been submited for this period.
                     </div>
-                    <group invisible="use_wrong_period">
+                    <group>
                         <group><field name="date_from" readonly="1"/></group>
                         <group><field name="date_to" readonly="1"/></group>
                     </group>
@@ -37,8 +33,9 @@
                         <field name="hmrc_cis_password" password="True"/>
                     </div>
                     <footer>
-                        <widget name="send_cis_monthly_return_button" invisible="not information_correct or not hmrc_cis_password or use_wrong_period"/>
-                        <button string="Cancel" special="cancel" data-hotkey="x"/>
+                        <field name="return_id" invisible="1"/>
+                        <widget name="send_cis_monthly_return_button" invisible="not information_correct or not hmrc_cis_password"/>
+                        <button special="cancel" data-hotkey="x"/>
                     </footer>
                 </form>
             </field>

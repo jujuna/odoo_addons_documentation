@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import datetime
+from dateutil.relativedelta import relativedelta
 from unittest.mock import patch
 
 from odoo import Command
@@ -13,6 +14,8 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 
 @tagged('post_install', '-at_install')
 class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
+    _test_user_groups = None  # FIXME list needed groups
+
     @mute_logger('odoo.addons.base.models.ir_model', 'odoo.models')
     def test_automatic(self):
         self.assertTrue(True)
@@ -51,7 +54,6 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
         self.provider = self.env['payment.provider'].create(
             {'name': 'The Wire',
              'company_id': self.company.id,
-             'state': 'test',
              'redirect_form_view_id': self.env['ir.ui.view'].search([('type', '=', 'qweb')], limit=1).id})
 
         sub.sale_order_template_id = template.id
@@ -66,7 +68,7 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
             self.assertEqual(datetime.date(2021, 2, 3), sub.next_invoice_date, 'next invoice date should be updated')
             inv = sub.invoice_ids.sorted('date')[-1]
             inv_line = inv.invoice_line_ids[0].sorted('id')[0]
-            invoice_periods = inv_line.name.split('\n')[2]
+            invoice_periods = inv_line.name.split('\n')[1]
             self.assertEqual(invoice_periods, "1 Month 01/03/2021 to 02/02/2021")
             self.assertEqual(inv_line.date, datetime.date(2021, 1, 3))
 
@@ -77,7 +79,7 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
             self.assertEqual(datetime.date(2021, 1, 3), sub.start_date, 'start date should not changed')
             self.assertEqual(datetime.date(2021, 3, 3), sub.next_invoice_date, 'next invoice date should be in 1 month')
             inv = sub.invoice_ids.sorted('date')[-1]
-            invoice_periods = inv.invoice_line_ids[1].name.split('\n')[2]
+            invoice_periods = inv.invoice_line_ids[1].name.split('\n')[1]
             self.assertEqual(invoice_periods, "1 Month 02/03/2021 to 03/02/2021")
             self.assertEqual(inv.invoice_line_ids[1].date, datetime.date(2021, 2, 3))
 
@@ -85,7 +87,7 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
             self.env['sale.order']._cron_recurring_create_invoice()
             self.assertEqual(datetime.date(2021, 4, 3), sub.next_invoice_date, 'next invoice date should be in 1 month')
             inv = sub.invoice_ids.sorted('date')[-1]
-            invoice_periods = inv.invoice_line_ids[0].name.split('\n')[2]
+            invoice_periods = inv.invoice_line_ids[0].name.split('\n')[1]
             self.assertEqual(invoice_periods, "1 Month 03/03/2021 to 04/02/2021")
             self.assertEqual(inv.invoice_line_ids[0].date, datetime.date(2021, 3, 3))
 
@@ -285,7 +287,7 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
             # Next invoice date should not be bumped up because it is the first period
             self.assertEqual("2021-02-03", sub.next_invoice_date.strftime("%Y-%m-%d"))
 
-            invoice_periods = sub.invoice_ids.invoice_line_ids.name.split('\n')[2]
+            invoice_periods = sub.invoice_ids.invoice_line_ids.name.split('\n')[1]
             self.assertEqual(invoice_periods, "1 Month 01/03/2021 to 02/02/2021")
             self.assertEqual(sub.invoice_ids.invoice_line_ids.date, datetime.date(2021, 1, 3))
         with freeze_time("2021-02-03"):
@@ -294,7 +296,7 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
             self.assertEqual("2021-02-03", sub.last_invoice_date.strftime("%Y-%m-%d"))
             self.assertEqual("2021-03-03", sub.next_invoice_date.strftime("%Y-%m-%d"))
             inv = sub.invoice_ids.sorted('date')[-1]
-            invoice_periods = inv.invoice_line_ids.name.split('\n')[2]
+            invoice_periods = inv.invoice_line_ids.name.split('\n')[1]
             self.assertEqual(invoice_periods, "1 Month 02/03/2021 to 03/02/2021")
             self.assertEqual(inv.invoice_line_ids.date, datetime.date(2021, 2, 3))
         with freeze_time("2021-03-03"):
@@ -303,7 +305,7 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
             self.assertEqual("2021-03-03", sub.last_invoice_date.strftime("%Y-%m-%d"))
             self.assertEqual("2021-04-03", sub.next_invoice_date.strftime("%Y-%m-%d"))
             inv = sub.invoice_ids.sorted('date')[-1]
-            invoice_periods = inv.invoice_line_ids.name.split('\n')[2]
+            invoice_periods = inv.invoice_line_ids.name.split('\n')[1]
             self.assertEqual(invoice_periods, "1 Month 03/03/2021 to 04/02/2021")
             self.assertEqual(inv.invoice_line_ids.date, datetime.date(2021, 3, 3))
 
@@ -325,9 +327,10 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
                                               'price_unit': 42,
                                               'product_uom_qty': 2,
                                               })]
-            sub.write({'start_date': False, 'next_invoice_date': False, 'end_date': '2021-03-18'})
+            sub.write({'start_date': False, 'next_invoice_date': False})
             sub.plan_id.billing_first_day = True
             sub.action_confirm()
+            sub.write({'end_date': '2021-03-18'})
             inv = sub._create_recurring_invoice()
             self.assertAlmostEqual(inv.amount_untaxed, 84 * 17 / 31, 1, msg="15 to 31 is 17 days (15 and 31 included)")
 
@@ -339,7 +342,7 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
         with freeze_time("2021-03-01"):
             # March
             inv = sub._create_recurring_invoice()
-            self.assertAlmostEqual(inv.amount_untaxed, 84, 1, msg="Last period is full too 01 to 01 even if the end_date occurs in the middle of the period")
+            self.assertAlmostEqual(inv.amount_untaxed, 84 * 18 / 31, 1, msg="Amount should be prorated: base 84 * 18/31 since only 18 days are billed in the final period")
 
     def test_quantity_on_product_invoice_ordered_qty(self):
         # This test checks that the invoiced qty and to_invoice qty have the right behavior
@@ -867,7 +870,7 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
 
         self.assertAlmostEqual(
             self.subscription.with_user(sales_user).amount_invoiced,
-            self.product_a.list_price,
+            self.product_a.lst_price,
             msg="We should get the amount invoiced for non-recurring products",
         )
 
@@ -928,3 +931,103 @@ class TestSubscriptionInvoice(TestSubscriptionCommon, HttpCase):
             sub._create_recurring_invoice()
             self.assertEqual(sub.next_invoice_date, datetime.date(2026, 1, 11))
             self.assertFalse(sub.invoice_ids, "No invoice should be created")
+
+    def test_billing_first_day_monthly(self):
+        """Test billing_first_day aligns invoice periods to calendar month boundaries"""
+        with freeze_time('2025-12-02'):
+            today = datetime.date.today()
+            self.plan_month.billing_first_day = True
+            common_vals = {
+                'is_subscription': True,
+                'plan_id': self.plan_month.id,
+                'partner_id': self.user_portal.partner_id.id,
+                'order_line': [Command.create({'product_id': self.product.id})],
+            }
+            subs = self.env['sale.order'].create([{
+                **common_vals,
+                'name': 'Test Subscription 1st',
+                'start_date': today + relativedelta(months=-1, day=1),
+            }, {
+                **common_vals,
+                'name': 'Test Subscription Mid',
+                'start_date': today + relativedelta(months=-1, day=4),
+            }])
+            subs.action_confirm()
+
+            # Test 1st of month
+            invoice1 = subs[0]._create_invoices()
+            line1 = invoice1.invoice_line_ids[0]
+            self.assertEqual(line1.deferred_start_date, datetime.date(2025, 11, 1))
+            self.assertEqual(line1.deferred_end_date, datetime.date(2025, 11, 30))
+            self.assertEqual((line1.deferred_end_date - line1.deferred_start_date).days + 1, 30)
+
+            # Test mid-month
+            invoice2 = subs[1]._create_invoices()
+            line2 = invoice2.invoice_line_ids[0]
+            self.assertEqual(line2.deferred_start_date, datetime.date(2025, 11, 4))
+            self.assertEqual(line2.deferred_end_date, datetime.date(2025, 11, 30))
+            self.assertEqual((line2.deferred_end_date - line2.deferred_start_date).days + 1, 27)
+
+    def test_billing_first_day_monthly_with_post_paid_advance(self):
+        # Test with future start date and modified next_invoice_date
+        with freeze_time('2026-03-09'):
+            today = datetime.date.today()
+            self.plan_month.billing_first_day = True
+            sub_future = self.env['sale.order'].create({
+                'name': 'Test Subscription',
+                'is_subscription': True,
+                'plan_id': self.plan_month.id,
+                'partner_id': self.user_portal.partner_id.id,
+                'start_date': today + relativedelta(days=3),
+                'order_line': [Command.create({'product_id': self.product.id})],
+            })
+            sub_future.action_confirm()
+            sub_future.next_invoice_date = today + relativedelta(months=1, day=8)
+            invoice_future = sub_future._create_invoices()
+            line_future = invoice_future.invoice_line_ids[0]
+
+            self.assertEqual(line_future.deferred_start_date, datetime.date(2026, 4, 8))
+            self.assertEqual(line_future.deferred_end_date, datetime.date(2026, 4, 30))
+            self.assertEqual((line_future.deferred_end_date - line_future.deferred_start_date).days + 1, 23)
+
+    def test_billing_multiple_months_plan(self):
+        """
+        Ensures that creating an invoice for a recurring plan
+        over multiple months correctly uses the billing_period_value.
+        """
+        with freeze_time('2026-04-15'):
+            self.plan_2_month.billing_first_day = True
+            subscription = self.env['sale.order'].create({
+                'name': 'Subscription',
+                'is_subscription': True,
+                'plan_id': self.plan_2_month.id,
+                'partner_id': self.user_portal.partner_id.id,
+                'start_date': datetime.date.today(),
+                'order_line': [Command.create({'product_id': self.product.id})],
+            })
+            subscription.action_confirm()
+            invoice = subscription._create_invoices()
+            line = invoice.invoice_line_ids[0]
+            self.assertEqual(line.deferred_start_date, datetime.date(2026, 4, 15))
+            self.assertEqual(line.deferred_end_date, datetime.date(2026, 5, 31))
+
+    def test_invoice_creation_for_productless(self):
+        """
+        Test that invoices are created correctly for productless subscription lines.
+        """
+        subscription = self.env['sale.order'].create({
+            'name': 'Productless Subscription',
+            'is_subscription': True,
+            'plan_id': self.plan_month.id,
+            'partner_id': self.user_portal.partner_id.id,
+            'order_line': [
+                Command.create({
+                    'name': 'Productless line',
+                    'product_uom_qty': 1,
+                    'price_unit': 100,
+                }),
+            ],
+        })
+        subscription.action_confirm()
+        invoice = subscription._create_invoices()
+        self.assertEqual(len(invoice.invoice_line_ids), 1)

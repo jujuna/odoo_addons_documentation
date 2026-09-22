@@ -23,7 +23,7 @@ class TimerMixin(models.AbstractModel):
             ('res_model', '=', self._name),
         ])
 
-        return [('id', 'in', running_timer_query.subselect('res_id'))]
+        return [('id', 'in', running_timer_query.subselect(running_timer_query.table.res_id))]
 
     def _search_user_timer_id(self, operator, value):
         timer_query = self.env['timer.timer']._search([
@@ -31,7 +31,7 @@ class TimerMixin(models.AbstractModel):
             ('user_id', '=', self.env.user.id),
             ('res_model', '=', self._name),
         ])
-        return [('id', 'in', timer_query.subselect('res_id'))]
+        return [('id', 'in', timer_query.subselect(timer_query.table.res_id))]
 
     @api.depends_context('uid')
     def _compute_user_timer_id(self):

@@ -6,15 +6,15 @@
             onStateChanged="(isOpen) => !isOpen ? this.applyFilters('currency_rates') : null"
         >
             <button class="btn btn-secondary">
-                <i class="fa fa-line-chart"/> Exchange Rates
+                <i class="oi" data-icon="show_chart"/> Exchange Rates
             </button>
 
             <t t-set-slot="content">
                 <div class="dropdown-header pe-none">
-                    1 <t t-out="controller.cachedFilterOptions.company_currency.currency_main"/>
+                    1 <t t-out="this.controller.cachedFilterOptions().company_currency.currency_main"/>
                 </div>
 
-                <t t-foreach="Object.values(this.controller.cachedFilterOptions.currency_rates)" t-as="currencyRate" t-key="currencyRate.currency_id">
+                <t t-foreach="Object.values(this.controller.cachedFilterOptions().currency_rates)" t-as="currencyRate" t-key="currencyRate.currency_id">
                     <div class="dropdown-item">
                         <div>
                             <input

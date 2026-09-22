@@ -1,3 +1,4 @@
+import { render } from "@web/owl2/utils";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { patch } from "@web/core/utils/patch";
 
@@ -9,7 +10,7 @@ patch(PaymentScreen.prototype, {
             } else {
                 this.currentOrder.invoice_type = "boleta";
             }
-            this.render(true);
+            render(this, true);
         } else {
             await super.toggleIsToInvoice(...arguments);
         }

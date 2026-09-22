@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates xml:space="preserve">
     <t t-name="Appointment.appointment_info_no_slot">
-        <div class="col-md-8 col-lg-6 mx-auto">
+        <div class="col-md-8 mx-auto">
             <div class="px-2 pt-3 pb-5 text-center o_appointment_no_slot_overall_helper_txt">
                 <t t-if="!active">
                     <p>
                         Sorry, it is no longer possible to schedule an appointment.
                     </p>
                 </t>
-                <t t-elif="staffUserName">
+                <t t-elif="selectedEntityName">
                     <p>
-                        Sorry, <span t-out="staffUserName"/> has no availability for an appointment.
+                        Sorry, <span t-out="selectedEntityName"/> has no availability for an appointment.
                     </p>
                 </t>
                 <t t-else="">
@@ -19,17 +19,17 @@
                     </p>
                 </t>
             </div>
-            <div class="o_appointment_no_slot_overall_helper_svg mx-auto">
+            <div class="o_appointment_no_slot_overall_helper_svg mx-auto mb-2">
                 <t t-call="Appointment.appointment_svg"/>
             </div>
         </div>
     </t>
 
     <t t-name="Appointment.appointment_info_no_capacity">
-        <div class="col-8 mx-auto">
-            <div class="pt-2 o_appointment_no_slot_overall_helper_txt">
+        <div class="col-md-8 mx-auto py-3">
+            <div class="o_appointment_no_slot_overall_helper_txt">
                 <p>
-                    Sorry, there is not any more availability for the asked capacity.
+                    Sorry, there is no more availability for the asked capacity. Please select another party size.
                 </p>
             </div>
             <div class="o_appointment_no_slot_overall_helper_svg mx-auto">
@@ -43,9 +43,9 @@
             <div class="o_appointment_no_slot_month_helper_svg w-25 mx-auto">
                 <t t-call="Appointment.appointment_svg"/>
             </div>
-            <t t-if="staffUserName">
+            <t t-if="selectedEntityName">
                 <p>
-                    Sorry, <span t-out="staffUserName"/> has no more slots available for this month.
+                    Sorry, <span t-out="selectedEntityName"/> has no more slots available for this month.
                 </p>
                 <p>
                     Their first availability is <br/>
@@ -65,11 +65,11 @@
     </t>
 
     <t t-name="Appointment.appointment_info_upcoming_appointment">
-        <div class="o_appointment_close_upcoming_appointment_alert col-12 mx-auto alert alert-danger alert-dismissible fade show" data-bs-backdrop="static">
+        <div class="o_appointment_close_upcoming_appointment_alert col-12 mx-auto alert alert-warning alert-dismissible fade show" data-bs-backdrop="static">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"/>
             You already booked "<span class="d-contents" t-out="appointmentTypeName"/>" on
             <a t-out="appointmentStart" t-attf-href="/calendar/view/#{appointmentToken}?partner_id=#{partnerId}"
-                target="_blank" class="fw-bold text-underline text-decoration-underline" title="Review Booking"/>
+                target="_blank" class="alert-link" title="Review Booking"/>
         </div>
     </t>
 </templates>

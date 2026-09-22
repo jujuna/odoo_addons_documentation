@@ -36,15 +36,15 @@ class ResourceCalendarLeaves(models.Model):
         domain = [
             ('start_datetime', '<=', global_leave_end_date),
             ('end_datetime', '>=', global_leave_start_date),
-            ('resource_type', '!=', 'material'),
-            ('resource_id', '!=', False),
+            ('resource_ids', '!=', False),
+            ('resource_ids.resource_type', '=', 'user'),
         ]
         if resource_ids:
             domain = Domain.OR([
                 [
                     ('start_datetime', '<=', leave_end_date),
                     ('end_datetime', '>=', leave_start_date),
-                    ('resource_id', 'in', list(resource_ids)),
+                    ('resource_ids', 'in', list(resource_ids)),
                 ],
                 domain,
             ])
@@ -70,7 +70,7 @@ class ResourceCalendarLeaves(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        if any(field in vals for field in ['resource_id', 'start_datetime', 'end_datetime']):
+        if any(field in vals for field in ['resource_ids', 'start_datetime', 'end_datetime']):
             self._recompute_shifts_in_leave_periods()
         return res
 

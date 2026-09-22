@@ -3,10 +3,10 @@ import json
 
 from odoo import Command
 from odoo.tests.common import HttpCase, tagged
-from odoo.tools import file_open, mute_logger
+from odoo.tools import mute_logger
 
 
-@tagged('-at_install', 'post_install')
+@tagged('-at_install', 'post_install', 'salary')
 class TestSalaryPackageItems(HttpCase):
 
     @classmethod
@@ -53,8 +53,7 @@ class TestSalaryPackageItems(HttpCase):
             'company_ids': [Command.link(cls.company_id.id)],
         })
 
-        with file_open('hr_contract_salary/static/src/demo/employee_contract.pdf', "rb") as f:
-            cls.pdf_content = f.read()
+        cls.pdf_content = cls.file_read('hr_contract_salary/static/src/demo/employee_contract.pdf')
 
         attachment = cls.env['ir.attachment'].create({
             'type': 'binary',
@@ -62,15 +61,45 @@ class TestSalaryPackageItems(HttpCase):
             'name': 'test_employee_contract.pdf',
         })
 
+        version_model = cls.env['ir.model']._get('hr.version')
+        type_employee_name, type_city, type_country_name, type_street = cls.env['sign.item.type'].create([
+            {
+                'name': 'Employee Name',
+                'placeholder': 'name',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'employee_id.name',
+             }, {
+                'name': 'Private City',
+                'placeholder': 'City',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'private_city',
+            }, {
+                'name': 'Country',
+                'placeholder': 'Country',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'private_country_id.name',
+            }, {
+                'name': 'Street',
+                'placeholder': 'Street',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'private_street',
+            },
+        ])
+
         cls.template = cls.env['sign.template'].create({})
         cls.document = cls.env['sign.document'].create({
             'template_id': cls.template.id,
             'attachment_id': attachment.id,
             'sign_item_ids': [
                 Command.create({
-                    'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                    'name': 'employee_id.name',
+                    'type_id': type_employee_name.id,
+                    'name': 'Name',
                     'required': True,
+                    'constant': True,
                     'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                     'page': 1,
                     'posX': 0.273,
@@ -90,9 +119,10 @@ class TestSalaryPackageItems(HttpCase):
                     'height': 0.015,
                 }),
                 Command.create({
-                    'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                    'name': 'private_city',
+                    'type_id': type_city.id,
+                    'name': 'City',
                     'required': True,
+                    'constant': True,
                     'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                     'page': 1,
                     'posX': 0.506,
@@ -101,9 +131,10 @@ class TestSalaryPackageItems(HttpCase):
                     'height': 0.015,
                 }),
                 Command.create({
-                    'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                    'name': 'private_country_id.name',
+                    'type_id': type_country_name.id,
+                    'name': 'Country',
                     'required': True,
+                    'constant': True,
                     'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                     'page': 1,
                     'posX': 0.663,
@@ -112,9 +143,10 @@ class TestSalaryPackageItems(HttpCase):
                     'height': 0.015,
                 }),
                 Command.create({
-                    'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                    'name': 'private_street',
+                    'type_id': type_street.id,
+                    'name': 'Street',
                     'required': True,
+                    'constant': True,
                     'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                     'page': 1,
                     'posX': 0.349,
@@ -226,10 +258,9 @@ class TestSalaryPackageItems(HttpCase):
         self.assertEqual(version.private_city, "Louvain-La-Neuve")
         self.assertEqual(version.private_country_id.id, self.env.ref("base.be").id)
         self.assertEqual(version.private_street, "58 rue des Wallons")
-
         self.assertEqual(
             {
-                item_value.sign_item_id.name: item_value.value
+                item_value.sign_item_id.type_id.auto_field: item_value.value
                 for item_value in request_id.request_item_ids.sign_item_value_ids
             },
             {
@@ -244,6 +275,7 @@ class TestSalaryPackageItems(HttpCase):
     def test_submit_salary_package_employee(self):
         # Create an offer for an employee
         contract = self.employee.version_id
+        contract.structure_type_id = self.structure_type
         salary_offer = self.env['hr.contract.salary.offer'].create([{
             'contract_template_id': self.default_contract.id,
             'employee_version_id': contract.id,
@@ -296,10 +328,9 @@ class TestSalaryPackageItems(HttpCase):
         self.assertEqual(contract_id.private_city, "Louvain-La-Neuve")
         self.assertEqual(contract_id.private_country_id.id, self.env.ref("base.be").id)
         self.assertEqual(contract_id.private_street, "58 rue des Wallons")
-
         self.assertEqual(
             {
-                item_value.sign_item_id.name: item_value.value
+                item_value.sign_item_id.type_id.auto_field: item_value.value
                 for item_value in request_id.request_item_ids.sign_item_value_ids
             },
             {
@@ -311,11 +342,16 @@ class TestSalaryPackageItems(HttpCase):
         )
 
     def test_sign_item_access(self):
+        payroll_group = self.env.ref('hr_payroll.group_hr_payroll_user', raise_if_not_found=False)
+        hradmin_groups = [self.env.ref('hr.group_hr_manager').id]
+        if payroll_group:
+            hradmin_groups.append(payroll_group.id)
+
         hradmin, hruser = self.env['res.users'].create([{
             'name': "foo",
             'login': "foo",
             'email': "foo@bar.com",
-            'group_ids': [Command.set([self.env.ref('hr.group_hr_manager').id])],
+            'group_ids': [Command.set(hradmin_groups)],
         }, {
             'name': "bar",
             'login': "bar",

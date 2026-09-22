@@ -23,15 +23,16 @@ class HrReferralLinkToShare(models.TransientModel):
     def _compute_url(self):
         channel_to_medium = {
             'direct': 'utm.utm_medium_direct',
-            'facebook': 'utm.utm_medium_facebook',
-            'twitter': 'utm.utm_medium_twitter',
-            'linkedin': 'utm.utm_medium_linkedin',
+            'facebook': 'utm.utm_medium_social_media',
+            'twitter': 'utm.utm_medium_social_media',
+            'linkedin': 'utm.utm_medium_social_media',
         }
-
-        if not self.env.user.utm_source_id:
-            self.env.user.utm_source_id = self.env['utm.source'].create({
-                'name': self.env['utm.source']._generate_name(self.env.user, self.env.user.name),
-            }).id
+        channel_to_source = {
+            'direct': 'utm.utm_source_referral',
+            'facebook': 'hr_referral.utm_source_referral_link_facebook',
+            'twitter': 'hr_referral.utm_source_referral_link_twitter',
+            'linkedin': 'hr_referral.utm_source_referral_link_linkedin',
+        }
 
         jobs_without_campaign = [
             wizard.job_id for wizard in self
@@ -47,18 +48,20 @@ class HrReferralLinkToShare(models.TransientModel):
 
         link_trackers_values = []
         for wizard in self:
+            utm_source = self.env.ref(
+                channel_to_source.get(wizard.channel),
+                raise_if_not_found=False,
+            )
+            utm_medium = self.env['utm.mixin']._utm_ref(channel_to_medium.get(wizard.channel))
             url = url_join(self.get_base_url(), '/jobs') if not wizard.job_id else wizard.job_id.full_url
             link_trackers_values.append({
                 'title': _('Referral: %(url)s', url=url),
                 'url': url,
                 'campaign_id': wizard.job_id.utm_campaign_id.id,
-                'source_id': wizard.env.user.utm_source_id.id,
+                'medium_id': utm_medium.id if utm_medium else False,
+                'source_id': utm_source.id if utm_source else False,
+                'utm_reference': f'{self.env.user._name},{self.env.user.id}',
             })
-
-            medium_reference = channel_to_medium.get(wizard.channel)
-            medium = self.env.ref(medium_reference, raise_if_not_found=False) if medium_reference else False
-            if medium:
-                link_trackers_values[-1]['medium_id'] = medium.id
 
         link_trackers = self.env['link.tracker'].search_or_create(link_trackers_values)
 

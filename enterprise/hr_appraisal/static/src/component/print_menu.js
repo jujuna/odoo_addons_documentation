@@ -7,10 +7,9 @@ const cogMenuRegistry = registry.category("cogMenu");
 export class PrintActionMenu extends Component {
     static template = "hr_appraisal.PrintAction";
     static components = { DropdownItem };
-    static props = {};
 
     async print() {
-        window.print()
+        setTimeout(() => window.print(), 200);
     }
 }
 

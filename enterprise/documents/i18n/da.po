@@ -12,23 +12,36 @@
 # Joe Hansen <joedalton2@yahoo.dk>, 2022
 # Martin Trigaux, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Kira Petersen François (peti)" <peti@odoo.com>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-08 19:32+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/documents/"
-"da/>\n"
+"POT-Creation-Date: 2026-09-18 17:46+0000\n"
+"PO-Revision-Date: 2026-09-17 23:42+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
+"documents/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents
+#: model:ir.module.module,description:base.module_documents
+msgid ""
+"\n"
+"App to upload and manage your documents.\n"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_mixin.py:0
+msgid "\"%(document_name)s\" cannot be linked to a record: only folders can."
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -91,6 +104,17 @@ msgid "%s shortcuts have been created."
 msgstr "%s genvejstaster er blevet oprettet."
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "(originally requested from"
+msgstr ""
+
+#. module: documents
+#: model:res.groups.privilege,description:documents.res_groups_privilege_documents
+msgid ""
+"- Basic: Can view or edit, upload, and share their own or shared documents."
+msgstr ""
+
+#. module: documents
 #: model_terms:digest.tip,tip_description:documents.digest_tip_documents_0
 msgid ""
 ". Scanned files will appear automatically in your folder. Then, process your "
@@ -99,14 +123,9 @@ msgid ""
 msgstr ""
 
 #. module: documents
-#: model:documents.tag,name:documents.documents_tag_year_previous
-msgid "2025"
-msgstr "2025"
-
-#. module: documents
-#: model:documents.document,name:documents.document_finance_annual_closing_year_current_folder
-#: model:documents.tag,name:documents.documents_tag_year_current
-msgid "2026"
+#. odoo-javascript
+#: code:addons/documents/static/src/views/fields/documents_shared_group/documents_shared_group.xml:0
+msgid "1 member"
 msgstr ""
 
 #. module: documents
@@ -117,15 +136,26 @@ msgstr "<b class=\"tip_title\">Tip: Bliv en papirløs virksomhed</b>"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "<b>Deselect this page</b> as we plan to process all bills first."
+msgid "<b>Create a new folder</b>"
 msgstr ""
-"<b>Fravælg denne side</b>, da vi planlægger at behandle alle regninger først."
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "<b>Select</b> this page to continue."
-msgstr "<b>Vælg</b> denne side for at fortsætte."
+msgid "<b>Go to 'Company'</b> to view all your company's files and folders."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "<b>Now, click on your folder</b> to open it"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "<b>Set an action</b> to apply on the files of this folder"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_request_done_page
@@ -138,55 +168,92 @@ msgid "<br/>Powered by"
 msgstr "<br/>Drevet af"
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.public_folder_page
-msgid "<i class=\"fa fa-download fa-fw\"/> Download All"
-msgstr "<i class=\"fa fa-download fa-fw\"/> Download alle"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.share_file
-msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
-msgstr "<i class=\"fa fa-download fa-fw\"/> Download filer"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
-msgid "<i class=\"fa fa-external-link me-2\" title=\"This is a shortcut\"/>"
-msgstr ""
-"<i class=\"fa fa-external-link me-2\" title=\"Dette er en genvejstaste\"/>"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
+#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid ""
-"<i class=\"fa fa-external-link text-gray-500\" title=\"This is a shortcut\"/>"
+"<i class=\"oi oi-filled\" data-icon=\"mail\" title=\"Resend Invitation\"/>"
 msgstr ""
-"<i class=\"fa fa-external-link text-gray-500\" title=\"Dette er en "
-"genvejstaste\"/>"
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.share_file
-msgid "<i class=\"fa fa-eye\"/> Preview file"
-msgstr "<i class=\"fa fa-eye\"/> Se en forhåndsvisning af filen"
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid ""
+"<i class=\"oi oi-fw me-1\" data-icon=\"link\"/>\n"
+"                <span> Notes: </span>"
+msgstr ""
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_request_page
-msgid "<i class=\"fa fa-upload fa-fw\"/> Add file"
-msgstr "<i class=\"fa fa-upload fa-fw\"/> Tilføj en fil"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.public_folder_page
-msgid "<i class=\"fa fa-upload\"/>  Upload"
-msgstr "<i class=\"fa fa-upload\"/>  Upload"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.share_file
-msgid "<i class=\"fa fa-upload\"/> Replace file"
-msgstr "<i class=\"fa fa-upload\"/> Erstat fil"
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid ""
+"<i class=\"oi oi-fw me-1\" data-icon=\"share\"/>\n"
+"                <span> Source: </span>"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid ""
-"<i class=\"fa fa-w fa-user-plus col-form-label ps-1 pe-4 fs-4\" "
-"title=\"Invite people\"/>"
+"<i class=\"oi oi-fw oi-filled fs-4\" data-icon=\"group\" title=\"Add "
+"Groups\"/>"
 msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
+msgid ""
+"<i class=\"oi oi-fw oi-filled fs-4\" data-icon=\"person_add\" title=\"Add "
+"people\"/>"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-1\" data-icon=\"description\"/>\n"
+"                <span> Original Name: </span>"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-1\" data-icon=\"person\"/>\n"
+"                <span> Creator: </span>"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.public_folder_page
+msgid "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download All"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download alle"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.share_file
+msgid "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download file"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download filer"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
+msgid ""
+"<i class=\"oi text-gray-500\" data-icon=\"open_in_new\" title=\"This is a "
+"shortcut\"/>"
+msgstr ""
+"<i class=\"oi text-gray-500\" data-icon=\"open_in_new\" title=\"Dette er en "
+"genvejstaste\"/>"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.public_folder_page
+msgid "<i class=\"oi\" data-icon=\"upload\"/>  Upload"
+msgstr "<i class=\"oi\" data-icon=\"upload\"/>  Upload"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_request_page
+msgid "<i class=\"oi\" data-icon=\"upload\"/> Add file"
+msgstr "<i class=\"oi\" data-icon=\"upload\"/> Tilføj en fil"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.share_file
+msgid "<i class=\"oi\" data-icon=\"upload\"/> Replace file"
+msgstr "<i class=\"oi\" data-icon=\"upload\"/> Erstat fil"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.share_file
+msgid "<i class=\"oi\" data-icon=\"visibility\"/> Preview file"
+msgstr ""
+"<i class=\"oi\" data-icon=\"visibility\"/> Se en forhåndsvisning af filen"
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.documents_document_res_partner_view
@@ -225,396 +292,134 @@ msgstr "<span><b>Anmodet dokument</b></span>"
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
-msgid "<span>The following members access were removed:</span>"
+msgid "<span>The following members/groups accesses were removed:</span>"
 msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
-msgid "<span>The following members gained access:</span>"
+msgid "<span>The following members/groups gained access:</span>"
 msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
-msgid "<span>The following members had their rights changed:</span>"
+msgid "<span>The following members/groups had their rights changed:</span>"
 msgstr ""
 
 #. module: documents
 #: model:mail.template,body_html:documents.mail_template_document_share
 msgid ""
+"<t>\n"
 "<t t-set=\"documents\" t-value=\"ctx.get('documents', "
 "object.env['documents.document'])\"/>\n"
-"                <t t-set=\"access_urls_by_partner\" t-"
+"<t t-set=\"access_urls_by_partner\" t-"
 "value=\"ctx.get('access_urls_by_partner', {})\"/>\n"
-"                <t t-set=\"access_urls\" t-"
-"value=\"access_urls_by_partner.get(object) or {}\"/>\n"
-"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"style=\"padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, "
-"Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"
-"\"><tr><td align=\"center\">\n"
-"                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"padding: 16px; background-color: white; color: "
-"#454748; border-collapse:separate;\">\n"
-"                    <tbody>\n"
-"                        <!-- HEADER -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                                    <tr><td valign=\"middle\">\n"
-"                                        <span style=\"font-size: 10px;\" t-"
-"if=\"len(documents) == 1\">\n"
-"                                            Shared Document<br/>\n"
-"                                            <span style=\"font-size: 20px; "
-"font-weight: bold;\" t-out=\"documents.name or ''\"/>\n"
-"                                        </span>\n"
-"                                        <span style=\"font-size: 10px;\" t-"
-"if=\"len(documents) &gt; 1\">\n"
-"                                            Shared Documents<br/>\n"
-"                                            <span style=\"font-size: 20px; "
-"font-weight: bold;\" t-out=\"', "
-"'.join(documents.filtered('name').mapped('name'))\"/>\n"
-"                                        </span>\n"
-"                                        <br/>\n"
-"                                    </td><td valign=\"middle\" "
-"align=\"right\" t-if=\"not user.company_id.uses_default_logo\">\n"
-"                                        <img t-attf-src=\"/logo.png?"
-"company={{ user.company_id.id }}\" style=\"padding: 0px; margin: 0px; "
-"height: auto; width: 80px;\" t-att-alt=\"user.company_id.name\"/>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td colspan=\"2\" style=\"text-"
-"align:center;\">\n"
-"                                      <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                        <!-- CONTENT -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                                    <tr><td valign=\"top\" style=\"font-"
-"size: 13px;\">\n"
-"                                        <div>\n"
-"                                            Hello <t t-out=\"object.name\"/"
-">,\n"
-"                                            <br/><br/>\n"
-"                                            <t t-if=\"len(documents) &lt;= "
-"1\">\n"
-"                                                <t t-if=\"documents.type == "
-"'folder'\" t-set=\"share_message\">shared the following folder with you</t>\n"
-"                                                <t t-else=\"\" t-"
-"set=\"share_message\">shared the following document with you</t>\n"
-"                                            </t>\n"
-"                                            <t t-elif=\"len(documents) &gt; "
-"1\">\n"
-"                                                <t t-set=\"document_types\" "
-"t-value=\"set(documents.mapped('type'))\"/>\n"
-"                                                <t t-if=\"document_types == "
-"{'folder'}\" t-set=\"share_message\">shared the following folders with you</"
-"t>\n"
-"                                                <t t-elif=\"'folder' not in "
-"document_types\" t-set=\"share_message\">shared the following documents with "
-"you</t>\n"
-"                                                <t t-else=\"\" t-"
-"set=\"share_message\">shared the following documents/folders with you</t>\n"
-"                                            </t>\n"
-"                                            <t t-out=\"user.name or "
-"''\">OdooBot</t> (<t t-out=\"user.email or ''\">odoobot@example.com</t>) <t "
-"t-out=\"share_message\"/>:\n"
-"                                            <br/><br/>\n"
-"                                            <center t-if=\"len(documents) "
-"&lt;= 1\">\n"
-"                                                <div t-if=\"len(documents) "
-"== 1\">\n"
-"                                                    <b t-"
-"out=\"documents.name\"/>\n"
-"                                                </div>\n"
-"                                                <div t-"
-"if=\"ctx.get('message')\">\n"
-"                                                    <i t-out=\"ctx['message']"
+"<t t-set=\"access_urls\" t-value=\"access_urls_by_partner.get(object) or {}"
 "\"/>\n"
-"                                                </div>\n"
-"                                                <br/>\n"
-"                                                <div style=\"margin: 16px "
-"0px 16px 0px;\">\n"
-"                                                    <a t-att-"
-"href=\"access_urls.get(documents)\" t-attf-style=\"background-color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px 30px "
-"20px 30px; text-decoration: none; color: "
+"Hello <t t-out=\"object.name\"/>,\n"
+"<br/><br/>\n"
+"<t t-if=\"len(documents) &lt;= 1\">\n"
+"    <t t-if=\"documents.type == 'folder'\" t-set=\"share_message\">shared "
+"the following folder with you</t>\n"
+"    <t t-else=\"\" t-set=\"share_message\">shared the following document "
+"with you</t>\n"
+"</t>\n"
+"<t t-elif=\"len(documents) &gt; 1\">\n"
+"    <t t-set=\"document_types\" t-value=\"set(documents.mapped('type'))\"/>\n"
+"    <t t-if=\"document_types == {'folder'}\" t-set=\"share_message\">shared "
+"the following folders with you</t>\n"
+"    <t t-elif=\"'folder' not in document_types\" t-"
+"set=\"share_message\">shared the following documents with you</t>\n"
+"    <t t-else=\"\" t-set=\"share_message\">shared the following documents/"
+"folders with you</t>\n"
+"</t>\n"
+"<t t-out=\"user.name or ''\">OdooBot</t> (<t t-out=\"user.email or "
+"''\">odoobot@example.com</t>) <t t-out=\"share_message\"/>:\n"
+"<br/><br/>\n"
+"<center t-if=\"len(documents) &lt;= 1\">\n"
+"    <div t-if=\"len(documents) == 1\">\n"
+"        <b t-out=\"documents.name\"/>\n"
+"    </div>\n"
+"    <div t-if=\"ctx.get('message')\">\n"
+"        <i t-out=\"ctx['message']\"/>\n"
+"    </div>\n"
+"    <br/>\n"
+"    <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"        <a t-att-href=\"access_urls.get(documents)\" t-attf-"
+"style=\"background-color: {{user.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 20px 30px 20px 30px; text-decoration: none; color: "
 "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\">\n"
-"                                                        <b>Get your files</"
-"b>\n"
-"                                                    </a>\n"
-"                                                </div>\n"
-"                                            </center>\n"
-"                                            <t t-elif=\"len(documents) &gt; "
-"1\">\n"
-"                                                <div t-"
-"if=\"ctx.get('message')\">\n"
-"                                                    <i t-out=\"ctx['message']"
-"\"/>\n"
-"                                                </div>\n"
-"                                                <ul>\n"
-"                                                    <li t-"
-"foreach=\"documents\" t-as=\"document\">\n"
-"                                                        <a t-att-"
-"href=\"access_urls.get(document)\" t-attf-style=\"color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}}; font-size:13px;\">\n"
-"                                                            <b>Get <t t-"
-"out=\"document.name\"/></b>\n"
-"                                                        </a>\n"
-"                                                    </li>\n"
-"                                                </ul>\n"
-"                                            </t>\n"
+"            <b>Get your files</b>\n"
+"        </a>\n"
+"    </div>\n"
+"</center>\n"
+"<t t-elif=\"len(documents) &gt; 1\">\n"
+"    <div t-if=\"ctx.get('message')\">\n"
+"        <i t-out=\"ctx['message']\"/>\n"
+"    </div>\n"
+"    <ul>\n"
+"        <li t-foreach=\"documents\" t-as=\"document\">\n"
+"            <a t-att-href=\"access_urls.get(document)\" t-attf-"
+"style=\"color: {{user.company_id.email_secondary_color or '#875A7B'}}; font-"
+"size:13px;\">\n"
+"                <b>Get <t t-out=\"document.name\"/></b>\n"
+"            </a>\n"
+"        </li>\n"
+"    </ul>\n"
+"</t>\n"
 "\n"
-"                                            <br/>\n"
-"                                            <t t-if=\"user and "
-"user.signature\" data-o-mail-quote-container=\"1\">\n"
-"                                                <br/>\n"
-"                                                <div data-o-mail-"
-"quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature\" data-"
-"o-mail-quote=\"1\"/></div>\n"
-"                                                <br data-o-mail-quote=\"1\"/"
-">\n"
-"                                            </t>\n"
-"                                        </div>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td style=\"text-align:center;\">\n"
-"                                      <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                        <!-- FOOTER -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;"
-"\">\n"
-"                                    <tr><td valign=\"middle\" "
-"align=\"left\">\n"
-"                                        <t t-out=\"user.company_id.name or "
-"''\">YourCompany</t>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td valign=\"middle\" align=\"left\" "
-"style=\"opacity: 0.7;\">\n"
-"                                        <t t-out=\"user.company_id.phone or "
-"''\">+1 650-123-4567</t>\n"
-"                                        <t t-if=\"user.company_id.email\">\n"
-"                                            | <a t-attf-href=\"mailto:"
-"{{ user.company_id.email }}\" style=\"text-decoration:none; color: "
-"#454748;\" t-out=\"user.company_id.email\">info@yourcompany.com</a>\n"
-"                                        </t>\n"
-"                                        <t t-"
-"if=\"user.company_id.website\">\n"
-"                                            | <a t-att-"
-"href=\"user.company_id.website\" style=\"text-decoration:none; color: "
-"#454748;\" t-out=\"user.company_id.website\">http://www.example.com</a>\n"
-"                                        </t>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                    </tbody>\n"
-"                    </table>\n"
-"                    </td></tr>\n"
-"                    <!-- POWERED BY -->\n"
-"                    <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"                        <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
-"                          <tr><td style=\"text-align: center; font-size: "
-"13px;\">\n"
-"                            Powered by <a target=\"_blank\" href=\"https://"
-"www.odoo.com/app/documents\" t-attf-style=\"color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo Documents</"
-"a>\n"
-"                          </td></tr>\n"
-"                        </table>\n"
-"                    </td></tr>\n"
-"                </table>\n"
-"            "
+"<br/>\n"
+"<t t-if=\"user and user.signature\">\n"
+"    <br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature\"/></div>\n"
+"    <br data-o-mail-quote=\"1\"/>\n"
+"</t>\n"
+"            </t>"
 msgstr ""
 
 #. module: documents
 #: model:mail.template,body_html:documents.mail_template_document_request
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"padding: 16px; background-color: white; color: "
-"#454748; border-collapse:separate;\">\n"
-"                    <tbody>\n"
-"                        <!-- HEADER -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                                    <tr><td valign=\"middle\">\n"
-"                                        <span style=\"font-size: 10px;\">\n"
-"                                            Document Request: <br/>\n"
-"                                            <t t-if=\"object.name\">\n"
-"                                                <span style=\"font-size: "
-"20px; font-weight: bold;\" t-out=\"object.name or ''\">Inbox Financial</"
-"span>\n"
-"                                            </t>\n"
-"                                        </span><br/>\n"
-"                                    </td><td valign=\"middle\" "
-"align=\"right\" t-if=\"not "
-"object.create_uid.company_id.uses_default_logo\">\n"
-"                                        <img t-attf-src=\"/logo.png?"
-"company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-"margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"object.create_uid.company_id.name\"/>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td colspan=\"2\" style=\"text-"
-"align:center;\">\n"
-"                                      <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                        <!-- CONTENT -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                                    <tr><td valign=\"top\" style=\"font-"
-"size: 13px;\">\n"
-"                                        <div>\n"
-"                                            Hello <t t-"
-"out=\"object.requestee_partner_id.name or ''\">OdooBot</t>,\n"
-"                                            <br/><br/>\n"
-"                                            <t t-"
-"out=\"object.create_uid.name or ''\">OdooBot</t> (<t t-"
+"<t>\n"
+"Hello <t t-out=\"object.requestee_partner_id.name or ''\">OdooBot</t>,\n"
+"<br/><br/>\n"
+"<t t-out=\"object.create_uid.name or ''\">OdooBot</t> (<t t-"
 "out=\"object.create_uid.email or ''\">odoobot@example.com</t>) asks you to "
 "provide the following document:\n"
-"                                            <br/><br/>\n"
-"                                            <center>\n"
-"                                                <div>\n"
-"                                                    <t t-"
-"if=\"object.name\">\n"
-"                                                        <b t-"
-"out=\"object.name or ''\">Inbox Financial</b>\n"
-"                                                    </t>\n"
-"                                                </div>\n"
-"                                                <div>\n"
-"                                                    <t t-"
-"if=\"object.request_activity_id.note\">\n"
-"                                                        <i t-"
-"out=\"object.request_activity_id.note or ''\">Example of a note.</i>\n"
-"                                                    </t>\n"
-"                                                </div>\n"
-"                                                <br/>\n"
-"                                                <div style=\"margin: 16px "
-"0px 16px 0px;\">\n"
-"                                                    <a t-att-"
-"href=\"object.access_url\" t-attf-style=\"background-color: "
+"<br/><br/>\n"
+"<center>\n"
+"    <div>\n"
+"        <t t-if=\"object.name\">\n"
+"            <b t-out=\"object.name or ''\">Inbox Financial</b>\n"
+"        </t>\n"
+"    </div>\n"
+"    <div>\n"
+"        <t t-if=\"object.request_activity_id.note\">\n"
+"            <i t-out=\"object.request_activity_id.note or ''\">Example of a "
+"note.</i>\n"
+"        </t>\n"
+"    </div>\n"
+"    <br/>\n"
+"    <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"        <a t-att-href=\"object.access_url\" t-attf-style=\"background-color: "
 "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px 30px "
 "20px 30px; text-decoration: none; color: "
 "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\">\n"
-"                                                        Upload the requested "
-"document\n"
-"                                                    </a>\n"
-"                                                </div>\n"
-"                                            </center><br/>\n"
-"                                            Please provide us with the "
-"missing document before <t t-"
+"            Upload the requested document\n"
+"        </a>\n"
+"    </div>\n"
+"</center><br/>\n"
+"Please provide us with the missing document before <t t-"
 "out=\"object.request_activity_id.date_deadline\">2021-05-17</t>.\n"
-"                                            <t t-if=\"user and "
-"user.signature\" data-o-mail-quote-container=\"1\">\n"
-"                                                <br/>\n"
-"                                                <div data-o-mail-"
-"quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature or ''\" "
-"data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-"                                                <br data-o-mail-quote=\"1\"/"
-">\n"
-"                                            </t>\n"
-"                                        </div>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td style=\"text-align:center;\">\n"
-"                                      <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                        <!-- FOOTER -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;"
-"\">\n"
-"                                    <tr><td valign=\"middle\" "
-"align=\"left\">\n"
-"                                        <t t-"
-"out=\"object.create_uid.company_id.name or ''\">YourCompany</t>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td valign=\"middle\" align=\"left\" "
-"style=\"opacity: 0.7;\">\n"
-"                                        <t t-"
-"out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-"                                        <t t-"
-"if=\"object.create_uid.company_id.email\">\n"
-"                                            | <a t-attf-href=\"mailto:"
-"{{ object.create_uid.company_id.email }}\" style=\"text-decoration:none; "
-"color: #454748;\" t-out=\"object.create_uid.company_id.email or "
-"''\">info@yourcompany.com</a>\n"
-"                                        </t>\n"
-"                                        <t t-"
-"if=\"object.create_uid.company_id.website\">\n"
-"                                            | <a t-att-"
-"href=\"object.create_uid.company_id.website\" style=\"text-decoration:none; "
-"color: #454748;\" t-out=\"object.create_uid.company_id.website or "
-"''\">http://www.example.com</a>\n"
-"                                        </t>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                    </tbody>\n"
-"                    </table>\n"
-"                    </td></tr>\n"
-"                    <!-- POWERED BY -->\n"
-"                    <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"                        <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
-"                          <tr><td style=\"text-align: center; font-size: "
-"13px;\">\n"
-"                            Powered by <a target=\"_blank\" href=\"https://"
-"www.odoo.com/app/documents\" t-attf-style=\"color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo Documents</"
-"a>\n"
-"                          </td></tr>\n"
-"                        </table>\n"
-"                    </td></tr>\n"
-"                </table>\n"
-"            "
+"<t t-if=\"user and user.signature\">\n"
+"    <br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"    <br data-o-mail-quote=\"1\"/>\n"
+"</t>\n"
+"            </t>"
 msgstr ""
 
 #. module: documents
@@ -711,11 +516,11 @@ msgid ""
 "                                            <br/><br/>\n"
 "                                            Thank you,\n"
 "                                            <t t-if=\"user and "
-"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"user.signature\">\n"
 "                                                <br/>\n"
 "                                                <div data-o-mail-"
-"quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature\" data-"
-"o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
+"quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature\">Mitchell Admin</t></div>\n"
 "                                                <br data-o-mail-quote=\"1\"/"
 ">\n"
 "                                            </t>\n"
@@ -786,13 +591,18 @@ msgid ""
 msgstr ""
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.content_email
+msgid "<text x=\"50\" y=\"21\" text-anchor=\"middle\">EMAIL</text>"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,help:documents.field_documents_document__alias_defaults
 msgid ""
 "A Python dictionary that will be evaluated to provide default values when "
 "creating new records for this alias."
 msgstr ""
-"En Python-ordbog, der bruges til at evaluere standardværdier, når der "
-"oprettes nye poster for dette alias."
+"En Python-ordbog, der evalueres for at angive standardværdier ved oprettelse "
+"af nye poster via dette alias."
 
 #. module: documents
 #. odoo-python
@@ -815,13 +625,13 @@ msgstr "En mappe kan ikke inkludere sig selv"
 #. module: documents
 #: model:ir.model.constraint,message:documents.constraint_documents_document_shortcut_document_id_not_id
 msgid "A shortcut cannot point to itself"
-msgstr "En genvejstaste kan ikke henvise til sig selv"
+msgstr "En genvejstast kan ikke henvise til sig selv"
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/core/document_service.js:0
 msgid "A shortcut has been created."
-msgstr "En genvejstaste er blevet oprettet."
+msgstr "En genvejstast er blevet oprettet."
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__access_internal_help
@@ -845,15 +655,15 @@ msgid "Access Via Link Help"
 msgstr ""
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.portal_my_home_documents
+#: model:portal.entry,description:documents.portal_documents_entry
 msgid "Access all your documents"
 msgstr "Tilgå alle dine dokumenter"
 
 #. module: documents
 #. odoo-python
 #: code:addons/documents/models/documents_access.py:0
-msgid "Access documents and partners cannot be changed."
-msgstr "Adgang til dokumenter og partnere kan ikke ændres."
+msgid "Access documents, partners, and groups cannot be changed."
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__access_via_link
@@ -862,7 +672,7 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Access to Automations"
 msgstr "Adgang til automatiseringer"
 
@@ -888,13 +698,7 @@ msgid "Acme_Insurance_Contract_Structured.pdf"
 msgstr ""
 
 #. module: documents
-#: model:documents.document,name:documents.documents_nda
-msgid "Acme_NDA.pdf"
-msgstr ""
-
-#. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
 msgid "Action"
 msgstr "Handling"
@@ -907,8 +711,9 @@ msgstr "Handling påkrævet"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_pin_actions.xml:0
-msgid "Actions on Select"
-msgstr "Handling i forbindelse med udvælgelse"
+#: code:addons/documents/static/src/views/kanban/documents_kanban_actions_popover.xml:0
+msgid "Actions"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__active
@@ -933,6 +738,7 @@ msgid "Activity Exception Decoration"
 msgstr "Markering af undtagelsesaktivitet"
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__activity_plans_ids
 #: model:ir.ui.menu,name:documents.mail_activity_plan_menu
 msgid "Activity Plans"
 msgstr "Aktivitetsplaner"
@@ -987,20 +793,31 @@ msgstr "Tilføj"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_pin_actions.xml:0
-msgid "Add Custom Action"
-msgstr "Tilføj tilpasset handling"
-
-#. module: documents
-#. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
 msgid "Add File"
 msgstr "Tilføj fil"
 
 #. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/document_service.js:0
 #: model:ir.actions.act_window,name:documents.action_folder_form
 msgid "Add Folder"
 msgstr "Tilføj mappe"
+
+#. module: documents
+#: model:ir.model.fields.selection,name:documents.selection__documents_sharing__invite_type__groups
+msgid "Add Groups"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields.selection,name:documents.selection__documents_sharing__invite_type__people
+msgid "Add People"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_sharing__invite_type
+msgid "Add Type"
+msgstr ""
 
 #. module: documents
 #: model:ir.actions.act_window,name:documents.action_url_form
@@ -1014,8 +831,15 @@ msgid "Add an alias tag..."
 msgstr "Tilføj et alias-tag ..."
 
 #. module: documents
-#: model:ir.model.fields.selection,name:documents.selection__documents_operation__operation__add
-msgid "Add attachment to Documents"
+#. odoo-javascript
+#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.xml:0
+msgid "Add as attachment(s)"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.xml:0
+msgid "Add as link(s)"
 msgstr ""
 
 #. module: documents
@@ -1025,10 +849,14 @@ msgstr "Tilføj fil"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/core/common/composer_actions_patch.js:0
-#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.xml:0
+#: code:addons/documents/static/src/core/web/composer_actions_patch.js:0
 #: code:addons/documents/static/src/web/mail_composer_document_selector/mail_composer_document_selector.xml:0
 msgid "Add from Documents"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
+msgid "Add group"
 msgstr ""
 
 #. module: documents
@@ -1050,13 +878,8 @@ msgstr "Tilføj personer eller e-mailadresser"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_shortcut.js:0
-msgid "Add shortcut"
-msgstr "Tilføj genvejstaste"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_star.js:0
+#: code:addons/documents/static/src/views/action/folder_action_star.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Add star"
 msgstr "Tilføj stjerne"
 
@@ -1068,20 +891,20 @@ msgstr "Tilføj tags ..."
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/attachments/attachment_list_patch.xml:0
+#: code:addons/documents/static/src/core/common/attachment_model_patch.js:0
 msgid "Add to Documents"
-msgstr ""
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/attachments/attachment_list_patch.js:0
-msgid "Add to My Documents"
 msgstr ""
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/core/document_service.js:0
 msgid "Add to documents"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/web/document_organize_popover.js:0
+msgid "Added to %(destination)s"
 msgstr ""
 
 #. module: documents
@@ -1126,16 +949,28 @@ msgid "Alias Tags"
 msgstr "Alias-tags"
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_sharing_access__all_partner_ids
+msgid "All Partner"
+msgstr ""
+
+#. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "All"
-msgstr "Alle"
+#: code:addons/documents/static/src/views/search/documents_search_model.js:0
+#: model_terms:ir.ui.view,arch_db:documents.document_view_search
+msgid "All children"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 msgid "All companies"
 msgstr "Alle virksomheder"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "All set. Let's <b>Validate</b>"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__access_ids
@@ -1175,13 +1010,45 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
-msgid "An error occured while uploading."
-msgstr "Der opstod en fejl under upload."
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
+msgid "An error occurred while uploading."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "And <b>add a note.</b>"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "And all actions to perform on the <b>selected file(s).</b>"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "And give it a proper name"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "And upload a new file"
+msgstr ""
 
 #. module: documents
 #: model:documents.document,name:documents.document_finance_annual_closing_folder
 msgid "Annual Closing"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.js:0
+msgid ""
+"Anyone with access to the linked record will be able to access the "
+"attachment."
 msgstr ""
 
 #. module: documents
@@ -1216,12 +1083,6 @@ msgstr "Er du sikker på, at du vil slette denne side?"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
-msgid "Are you sure you want to delete this attachment?"
-msgstr "Er du sikker på, at du vil slette denne vedhæftede fil?"
-
-#. module: documents
-#. odoo-javascript
 #: code:addons/documents/static/src/views/documents_model_mixin.js:0
 msgid "Are you sure you want to permanently erase the selected document?"
 msgstr ""
@@ -1234,12 +1095,19 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
 msgid ""
-"As this PDF contains multiple documents, let's split and process in bulk."
+"Are you sure you will not need this previous version? Once deleted, it is "
+"gone for good."
 msgstr ""
-"Lad os dele denne PDF og behandle den i partier, eftersom den indeholder "
-"flere dokumenter."
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
+msgid ""
+"Are you sure you will not need this version? Once deleted, it is gone for "
+"good and the previous one will be restored."
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1276,6 +1144,18 @@ msgstr "Type vedhæftede fil"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/core/web/attachment_list_patch.js:0
+msgid "Attachment removed. Linked document moved to Trash."
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/controllers/documents.py:0
+msgid "Attachment updated by %(user)s"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_automations.js:0
 msgid "Automations"
 msgstr "Automatiseringer"
@@ -1284,6 +1164,24 @@ msgstr "Automatiseringer"
 #: model:ir.model.fields,field_description:documents.field_documents_document__available_embedded_actions_ids
 msgid "Available Embedded Actions"
 msgstr "Tilgængelige indlejrede handlinger"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Awesome! Let's explore how you can <b>access your files from anywhere in "
+"Odoo.</b>"
+msgstr ""
+
+#. module: documents
+#: model:res.groups.privilege,placeholder:documents.res_groups_privilege_documents
+msgid "Basic"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_document_check_type_binary
+msgid "Binary document should have an attachment"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1320,6 +1218,14 @@ msgid ""
 "Can configure folders, manage access rights, and oversee all documents "
 "within their areas."
 msgstr ""
+"Kan konfigurere mapper, administrere adgangsrettigheder og overse alle "
+"dokumenter i deres område."
+
+#. module: documents
+#: model:res.groups,comment:documents.group_documents_user
+msgid ""
+"Can embed actions on folders, insert in Spreadsheet, and import in Sign."
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -1348,21 +1254,9 @@ msgid "Can only view. Cannot rename, move, or delete."
 msgstr "Kan kun læse. Kan ikke omdøbe, fjerne eller slette."
 
 #. module: documents
-#: model:res.groups,comment:documents.group_documents_user
-msgid "Can view or edit, upload, and share their own or shared documents."
-msgstr ""
-
-#. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:documents.documents_link_to_record_form_view
-msgid "Cancel"
-msgstr "Annullér"
-
-#. module: documents
-#. odoo-python
-#: code:addons/documents/models/documents_access.py:0
-msgid "Cannot invite this member."
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.js:0
+msgid "Caution"
 msgstr ""
 
 #. module: documents
@@ -1406,31 +1300,8 @@ msgstr "Ryd"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Click on a card to <b>select the document</b>."
-msgstr "Klik på et kort for at <b>vælge dokumentet</b>."
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Click on a thumbnail to <b>preview the document</b>."
+msgid "Click on <b>'New'</b> to create a new folder"
 msgstr ""
-"Klik på miniaturebilledet for at se en<b>forhåndsvisning af dokumentet</b>."
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid ""
-"Click on the <b>page separator</b>: we don't want to split these two pages "
-"as they belong to the same document."
-msgstr ""
-"Klik på <b>sidedeleren</b>: De to sider bør ikke deles, da de tilhører samme "
-"dokument."
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Click the cross to <b>exit preview</b>."
-msgstr "Klik på krydset for at <b> afslutte forhåndsvisningen</b>."
 
 #. module: documents
 #. odoo-javascript
@@ -1452,15 +1323,14 @@ msgstr "Luk"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Close (Esc)"
-msgstr "Luk (Esc)"
-
-#. module: documents
-#. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
 msgid "Close split tools"
 msgstr "Luk delingsfunktion"
+
+#. module: documents
+#: model:ir.module.module,summary:base.module_documents
+msgid "Collect, organize and share documents."
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_tag__color
@@ -1479,17 +1349,17 @@ msgid "Common roots for all company users."
 msgstr "Fælles rodmappe for alle virksomhedens brugere."
 
 #. module: documents
-#: model:ir.model,name:documents.model_res_company
-msgid "Companies"
-msgstr "Virksomheder"
-
-#. module: documents
 #. odoo-javascript
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.js:0
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
+#: code:addons/documents/static/src/core/document_service.js:0
+#: code:addons/documents/static/src/js/tours/documents.js:0
 #: code:addons/documents/static/src/views/kanban/documents_kanban_record.js:0
+#: model:ir.model,name:documents.model_res_company
 #: model:ir.model.fields,field_description:documents.field_documents_document__company_id
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__user_root__company
 msgid "Company"
 msgstr "Virksomhed"
 
@@ -1516,6 +1386,13 @@ msgid "Conflicting values passed with user_folder_id."
 msgstr ""
 
 #. module: documents
+#: model_terms:web_tour.tour,rainbow_man_message:documents.documents_tour
+msgid "Congrats on completing the <br> Odoo Documents onboarding!"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 #: model:ir.model,name:documents.model_res_partner
 #: model:ir.model.fields,field_description:documents.field_documents_document__partner_id
 #: model:ir.model.fields,field_description:documents.field_documents_request_wizard__partner_id
@@ -1526,15 +1403,22 @@ msgstr "Kontakt"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/core/document_service.js:0
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Contact your Administrator to get access if needed."
-msgstr "Ved behov kan du kontakte din administrator for at få adgang,"
+msgstr "Ved behov kan du kontakte din administrator for at få adgang."
 
 #. module: documents
 #: model:documents.document,name:documents.document_contracts_folder
 #: model:documents.tag,name:documents.documents_tag_contracts
 msgid "Contracts"
 msgstr "Kontrakter"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_copy_link.js:0
+#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
+msgid "Copy Link"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1545,9 +1429,10 @@ msgstr "Kopiér links"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_operations.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Create Shortcut"
-msgstr "Opret genvejstaste"
+msgstr "Opret genvejstast"
 
 #. module: documents
 #: model:ir.model,website_form_label:documents.model_res_partner
@@ -1569,12 +1454,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:documents.field_documents_document__create_activity_option
 msgid "Create a new activity"
 msgstr "Opret en ny aktivitet"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Create a new document for the remaining page."
-msgstr "Opret et nyt dokument for den resterende side."
 
 #. module: documents
 #. odoo-javascript
@@ -1670,6 +1549,18 @@ msgstr "Slet"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
+msgid "Delete Current Version"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
+msgid "Delete File Version"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.js:0
 msgid "Delete focused or selected pages"
 msgstr "Slet fokuserede eller valgte sider"
@@ -1729,23 +1620,21 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_details.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 msgid "Details"
 msgstr "Detaljer"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/core/document_service.js:0
-#: code:addons/documents/static/src/views/documents_model_mixin.js:0
-#: model_terms:ir.ui.view,arch_db:documents.document_view_form_rename
-#: model_terms:ir.ui.view,arch_db:documents.documents_operation_view_form
-#: model_terms:ir.ui.view,arch_db:documents.documents_request_form_view
-#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
-#: model_terms:ir.ui.view,arch_db:documents.documents_upload_url_view
-#: model_terms:ir.ui.view,arch_db:documents.folder_deletion_form
-#: model_terms:ir.ui.view,arch_db:documents.tag_view_form
+#: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
 msgid "Discard"
 msgstr "Kassér"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "Discover all actions to perform on the <b>current folder.</b>"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1769,7 +1658,6 @@ msgstr "Synlig"
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__display_name
 #: model:ir.model.fields,field_description:documents.field_documents_sharing_access__display_name
 #: model:ir.model.fields,field_description:documents.field_documents_tag__display_name
-#: model:ir.model.fields,field_description:documents.field_documents_unlink_mixin__display_name
 #: model:ir.model.fields,field_description:documents.field_ir_actions_server__display_name
 #: model:ir.model.fields,field_description:documents.field_ir_attachment__display_name
 #: model:ir.model.fields,field_description:documents.field_ir_binary__display_name
@@ -1778,12 +1666,13 @@ msgstr "Synlig"
 #: model:ir.model.fields,field_description:documents.field_kpi_provider__display_name
 #: model:ir.model.fields,field_description:documents.field_mail_activity__display_name
 #: model:ir.model.fields,field_description:documents.field_mail_activity_type__display_name
+#: model:ir.model.fields,field_description:documents.field_mail_thread__display_name
 #: model:ir.model.fields,field_description:documents.field_res_company__display_name
 #: model:ir.model.fields,field_description:documents.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:documents.field_res_partner__display_name
 #: model:ir.model.fields,field_description:documents.field_res_users__display_name
 msgid "Display Name"
-msgstr "Vis navn"
+msgstr "Visningsnavn"
 
 #. module: documents
 #. odoo-javascript
@@ -1799,6 +1688,7 @@ msgstr "Vil du afslutte uden at gemme eller samle sider i ét dokument?"
 #: model:ir.model.fields,field_description:documents.field_documents_tag__document_ids
 #: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
 msgid "Document"
 msgstr "Dokument"
 
@@ -1821,7 +1711,7 @@ msgstr "Antal dokumenter"
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.documents_request_form_view
 msgid "Document Name"
-msgstr "Navn på Dokument"
+msgstr "Dokumentnavn"
 
 #. module: documents
 #: model:ir.actions.act_window,name:documents.mail_activity_plan_action_document
@@ -1846,6 +1736,12 @@ msgstr ""
 
 #. module: documents
 #. odoo-python
+#: code:addons/documents/wizard/documents_request_wizard.py:0
+msgid "Document Request:"
+msgstr ""
+
+#. module: documents
+#. odoo-python
 #: code:addons/documents/models/documents_document.py:0
 #: code:addons/documents/models/mail_activity.py:0
 msgid "Document Request: %(name)s Uploaded by: %(user)s"
@@ -1862,6 +1758,28 @@ msgid "Document Token"
 msgstr "Dokumenttoken"
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.tracking_auto_archive_by_dependency
+msgid "Document archived because its reference record was deleted."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/document_service.js:0
+msgid "Document couldn't be created."
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid "Document created <br/>"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/document_service.js:0
+msgid "Document created in %(destination)s!"
+msgstr ""
+
+#. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/views/widget/documents_operation_confirmation.js:0
 msgid "Document created in %(folder_name)s!"
@@ -1874,15 +1792,22 @@ msgid "Document moved to %(folder_name)s!"
 msgstr ""
 
 #. module: documents
+#. odoo-javascript
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+#: code:addons/documents/static/src/views/documents_model_mixin.js:0
+msgid "Document not found or inaccessible."
+msgstr "Dokument ikke fundet eller ikke tilgængeligt."
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
 msgid "Document preview"
 msgstr "Forhåndsvisning af dokument"
 
 #. module: documents
-#. odoo-python
-#: code:addons/documents/controllers/documents.py:0
-msgid "Document uploaded by %(user)s"
-msgstr "Dokument uploadet af %(user)s"
+#: model:ir.model.fields,field_description:documents.field_mail_activity__requested_document_ids
+msgid "Document requests"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1914,12 +1839,13 @@ msgstr "DocumentSizeIntegerField"
 #: model:ir.model.fields,field_description:documents.field_res_partner__document_ids
 #: model:ir.model.fields,field_description:documents.field_res_users__document_ids
 #: model:ir.model.fields.selection,name:documents.selection__ir_actions_server__usage__documents_embedded
+#: model:ir.module.module,shortdesc:base.module_documents
 #: model:ir.ui.menu,name:documents.dashboard
 #: model:ir.ui.menu,name:documents.menu_root
+#: model:portal.entry,name:documents.portal_documents_entry
 #: model:res.groups.privilege,name:documents.res_groups_privilege_documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
 #: model_terms:ir.ui.view,arch_db:documents.documents_view_activity
-#: model_terms:ir.ui.view,arch_db:documents.portal_my_home_documents
 #: model_terms:ir.ui.view,arch_db:documents.res_config_settings_view_form
 msgid "Documents"
 msgstr "Dokumenter"
@@ -2013,17 +1939,13 @@ msgid "Documents shared with you will appear here"
 msgstr "Dokumenter delt med dig vises her"
 
 #. module: documents
-#: model:ir.model,name:documents.model_documents_unlink_mixin
-msgid "Documents unlink mixin"
-msgstr "Mixin fjerner link til dokumenter"
-
-#. module: documents
 #: model:ir.actions.server,name:documents.ir_cron_documents_access_tracking_ir_actions_server
 msgid "Documents: Access Tracking"
 msgstr ""
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/core/document_service.js:0
 #: code:addons/documents/static/src/views/widget/documents_operation_confirmation.js:0
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid "Done"
@@ -2032,9 +1954,9 @@ msgstr "Udført"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.xml:0
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_download.js:0
+#: code:addons/documents/static/src/views/action/folder_action_download.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_download.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 msgid "Download"
 msgstr "Download"
 
@@ -2083,6 +2005,7 @@ msgstr "Forfaldstype"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_operations.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 #: code:addons/documents/static/src/views/form/folder_form_controller.js:0
 msgid "Duplicate"
@@ -2113,17 +2036,15 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/attachments/document_file_viewer.xml:0
-#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
-msgid "EMAIL"
-msgstr "E-MAIL"
+#: code:addons/documents/static/src/views/fields/documents_datetime/documents_datetime_field.xml:0
+msgid "Edit"
+msgstr "Redigér"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/fields/documents_datetime/documents_datetime_field.xml:0
-#: code:addons/documents/static/src/views/search/documents_search_panel.xml:0
-msgid "Edit"
-msgstr "Redigér"
+#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_pin_actions.xml:0
+msgid "Edit Actions"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -2141,19 +2062,31 @@ msgid "Editor"
 msgstr "Redaktør"
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "Email"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__alias_email
 msgid "Email Alias"
 msgstr "E-mailalias"
 
 #. module: documents
-#: model:ir.model.fields,field_description:documents.field_documents_document__email_cc
-msgid "Email cc"
-msgstr "Email-CC"
+#: model:ir.model,name:documents.model_mail_thread
+msgid "Email Thread"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
+msgid "Email alias"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,help:documents.field_documents_document__alias_domain
 msgid "Email domain e.g. 'example.com' in 'odoo@example.com'"
-msgstr "E-maildomæne f.eks. 'example.com' i 'odoo@example.com'"
+msgstr "E-maildomæne f.eks. 'eksempel.com' i 'odoo@eksempel.com'"
 
 #. module: documents
 #: model:ir.actions.act_window,name:documents.mail_alias_action
@@ -2162,8 +2095,8 @@ msgstr "E-maillinks"
 
 #. module: documents
 #: model:ir.model,name:documents.model_ir_embedded_actions
-msgid "Embedded Actions"
-msgstr "Indlejrede handlinger"
+msgid "Embedded Action"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
@@ -2171,6 +2104,14 @@ msgid "Enable access and save"
 msgstr ""
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing_access.py:0
+msgid "Enable access before inviting"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/document_service.js:0
 #: model:ir.model.fields.selection,name:documents.selection__documents_document__thumbnail_status__error
 msgid "Error"
 msgstr "Fejl"
@@ -2245,11 +2186,6 @@ msgid "File"
 msgstr "Fil"
 
 #. module: documents
-#: model:ir.model.fields,field_description:documents.field_documents_document__datas
-msgid "File Content (base64)"
-msgstr "Filindhold (base64)"
-
-#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__raw
 msgid "File Content (raw)"
 msgstr "Filindhold (rå)"
@@ -2294,6 +2230,13 @@ msgstr ""
 "Filer vil blive sendt til papirkurven og slettet permanent efter %s dage."
 
 #. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Finally, <b>log the note</b> to complete this Documents onboarding tour!"
+msgstr ""
+
+#. module: documents
 #: model:documents.document,name:documents.document_finance_folder
 msgid "Finance"
 msgstr "Finans"
@@ -2324,6 +2267,7 @@ msgstr "Fokus på forrige side"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.xml:0
 #: code:addons/documents/static/src/views/fields/documents_type_icon/documents_type_icon.xml:0
 #: model:ir.model.fields,field_description:documents.field_documents_document__folder_id
@@ -2337,6 +2281,11 @@ msgstr "Mappe"
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__is_folder_only
 msgid "Folder Only"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_document_check_type_folder
+msgid "Folder cannot have an attachment"
 msgstr ""
 
 #. module: documents
@@ -2357,14 +2306,25 @@ msgid "Followers (Partners)"
 msgstr "Følgere (partnere)"
 
 #. module: documents
-#: model:ir.model.fields,help:documents.field_documents_document__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font Awesome-ikon, f.eks. fa-opgaver"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"From here you can access all your files. </br> <b>Let's select the file that "
+"you uploaded earlier.</b>"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"From here, you can <b>grant personal access rights by selecting a specific "
+"person.</b>"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
 msgid "Future Activities"
-msgstr "Fremtidige aktiviteter"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -2384,8 +2344,33 @@ msgstr "GiB"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_open_folder.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 msgid "Go inside"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Great! Now that the file has been added, <b>let's manage its access rights.</"
+"b>"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_access__group_id
+#: model:ir.model.fields,field_description:documents.field_documents_sharing_access__group_id
+msgid "Group"
+msgstr ""
+
+#. module: documents
+#: model:ir.ui.menu,name:documents.res_group_functional_menu
+msgid "Groups"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing_access.py:0
+msgid "Groups cannot be invited"
 msgstr ""
 
 #. module: documents
@@ -2429,16 +2414,25 @@ msgid ""
 "Has full control over all document settings, folders, and user rights across "
 "the application."
 msgstr ""
+"Har fuld kontrol over alle dokumentindstillinger, mapper og "
+"brugerrettigheder på tværs af appen."
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_view_search
-msgid "Hide shortcuts"
-msgstr "Skjul genvejstaster"
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "Hello"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__previous_attachment_ids
 msgid "History"
 msgstr "Historik"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Hold <b>CTRL</b> and click on the document to view the available actions."
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_access__id
@@ -2452,7 +2446,6 @@ msgstr "Historik"
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__id
 #: model:ir.model.fields,field_description:documents.field_documents_sharing_access__id
 #: model:ir.model.fields,field_description:documents.field_documents_tag__id
-#: model:ir.model.fields,field_description:documents.field_documents_unlink_mixin__id
 #: model:ir.model.fields,field_description:documents.field_ir_actions_server__id
 #: model:ir.model.fields,field_description:documents.field_ir_attachment__id
 #: model:ir.model.fields,field_description:documents.field_ir_binary__id
@@ -2461,6 +2454,7 @@ msgstr "Historik"
 #: model:ir.model.fields,field_description:documents.field_kpi_provider__id
 #: model:ir.model.fields,field_description:documents.field_mail_activity__id
 #: model:ir.model.fields,field_description:documents.field_mail_activity_type__id
+#: model:ir.model.fields,field_description:documents.field_mail_thread__id
 #: model:ir.model.fields,field_description:documents.field_res_company__id
 #: model:ir.model.fields,field_description:documents.field_res_config_settings__id
 #: model:ir.model.fields,field_description:documents.field_res_partner__id
@@ -2528,14 +2522,14 @@ msgid "In Company"
 msgstr ""
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_view_search
-msgid "In My Drive"
+#: model:ir.model.fields,field_description:documents.field_documents_sharing_access__user_in_group
+msgid "In Group"
 msgstr ""
 
 #. module: documents
-#: model:ir.model.fields.selection,name:documents.selection__documents_document__thumbnail_status__restricted
-msgid "Inaccessible"
-msgstr "Kan ikke tilgås"
+#: model_terms:ir.ui.view,arch_db:documents.document_view_search
+msgid "In My Drive"
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -2553,6 +2547,12 @@ msgid "Inbox"
 msgstr "Indbakke"
 
 #. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/views/fields/documents_shared_group/documents_shared_group.xml:0
+msgid "Includes You"
+msgstr ""
+
+#. module: documents
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
 msgid ""
@@ -2568,13 +2568,6 @@ msgstr "Indekseret indhold"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_details.js:0
-msgid "Info & Tags"
-msgstr "Info og tags"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 #: code:addons/documents/static/src/views/search/documents_control_panel.xml:0
 msgid "Info & tags"
 msgstr "Info og tags"
@@ -2595,12 +2588,6 @@ msgstr ""
 #: model:documents.document,name:documents.document_insurances_folder
 msgid "Insurances"
 msgstr "Forsikringer"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Internal"
-msgstr "Intern"
 
 #. module: documents
 #. odoo-javascript
@@ -2651,6 +2638,11 @@ msgid "Invalid search operand."
 msgstr ""
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_sharing__invite_group_ids
+msgid "Invite Group"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__invite_partner_ids
 msgid "Invite Partner"
 msgstr ""
@@ -2661,9 +2653,14 @@ msgid "Invoice #INV-2025-001 - Payment Due April 24, 2025"
 msgstr "Faktura #INV-2025-001 – Betaling forfalden den 24. april 2025"
 
 #. module: documents
-#: model:documents.document,name:documents.documents_vendor_bill_inv_007
-msgid "Invoice-INV_2018_0007.pdf"
-msgstr "Faktura-INV_2018_0007.pdf"
+#: model:documents.document,name:documents.document_finance_invoices_email_folder
+msgid "Invoice Email"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__is_company_allowed
+msgid "Is Company Allowed"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing_access__is_deleted
@@ -2679,6 +2676,11 @@ msgstr "Er redigerbar vedhæftet fil"
 #: model:ir.model.fields,field_description:documents.field_documents_document__is_favorited
 msgid "Is Favorited"
 msgstr "Er favorit"
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__is_folder
+msgid "Is Folder"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__message_is_follower
@@ -2792,7 +2794,7 @@ msgstr "Sidst opdateret den"
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
 msgid "Late Activities"
-msgstr "Overskredet aktiviteter"
+msgstr ""
 
 #. module: documents
 #: model:documents.document,name:documents.document_legal_folder
@@ -2803,30 +2805,14 @@ msgstr "Juridisk"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid ""
-"Let's move this document to Finance<br/> <i>Tips: actions can be tailored to "
-"your process, according to the folder.</i>"
+msgid "Let's save your new folder."
 msgstr ""
-"Lad os flyttet dokumentet til Økonomi<br/> <i>Tip: Handlinger kan tilpasses "
-"din proces i henhold til mappen.</i>"
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Let's process documents in this folder.<br/>"
-msgstr "Lad os behandle dokumenter i denne mappe.<br/>"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Let's process these bills: send to Finance folder."
-msgstr "Lad os behandle disse regninger: Send til Økonomimappe."
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Let's process this document, coming from our scanner."
-msgstr "Lad os behandle dette dokument, der kommer fra vores scanner."
+msgid "Let's start by <b>accessing a contact form.</b>"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -2853,6 +2839,7 @@ msgstr "Link-URL"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_copy_link.js:0
 #: code:addons/documents/static/src/views/documents_model_mixin.js:0
 msgid "Link copied to clipboard!"
 msgstr "Link kopieret til udklipsholder!"
@@ -2867,6 +2854,18 @@ msgstr "Link til"
 #: code:addons/documents/static/src/editor/plugins/add_documents_attachment_plugin.js:0
 #: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.js:0
 msgid "Link(s) pasted!"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_ir_attachment__linked_document_id
+#: model:ir.model.fields,field_description:documents.field_product_document__linked_document_id
+msgid "Linked Document"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
+msgid "Linked record"
 msgstr ""
 
 #. module: documents
@@ -2941,9 +2940,19 @@ msgid "Manage Versions of \"%s\""
 msgstr "Administér versioner af \"%s\""
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "Marc Demo"
+msgstr ""
+
+#. module: documents
 #: model:documents.document,name:documents.document_marketing_folder
 msgid "Marketing"
 msgstr "Markedsføring"
+
+#. module: documents
+#: model:ir.model.fields,help:documents.field_documents_document__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -2986,7 +2995,18 @@ msgstr "Mime-type"
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
 msgid "Missing documents reference."
-msgstr "Henvisning til de manglende dokumenter"
+msgstr "Henvisning til de manglende dokumenter."
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing.py:0
+msgid "Missing share template"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "Mitchell Admin"
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -3031,6 +3051,7 @@ msgstr "Flere"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
+#: code:addons/documents/static/src/views/action/folder_action_operations.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 #: model:ir.model.fields.selection,name:documents.selection__documents_operation__operation__move
 msgid "Move"
@@ -3050,16 +3071,8 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
-msgid "Move to Trash"
-msgstr "Flyt til papirkurv"
-
-#. module: documents
-#. odoo-javascript
 #: code:addons/documents/static/src/core/document_service.js:0
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_archive.js:0
-#: code:addons/documents/static/src/views/documents_renderer_mixin.js:0
 #: code:addons/documents/static/src/views/form/folder_form_controller.js:0
 #: model_terms:ir.ui.view,arch_db:documents.folder_deletion_form
 msgid "Move to trash"
@@ -3123,15 +3136,12 @@ msgstr "Mine dokumenter"
 #: code:addons/documents/models/documents_document.py:0
 #: code:addons/documents/models/ir_attachment.py:0
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.js:0
+#: code:addons/documents/static/src/core/document_service.js:0
 #: code:addons/documents/static/src/views/kanban/documents_kanban_record.js:0
 #: code:addons/documents/wizard/documents_operation.py:0
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__user_root__my
 msgid "My Drive"
 msgstr "Mit drev"
-
-#. module: documents
-#: model:ir.model.constraint,message:documents.constraint_documents_access_role_or_last_access_date
-msgid "NULL roles must have a set last_access_date"
-msgstr "En last_access_date skal angives for NULL-roller."
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__name
@@ -3160,9 +3170,9 @@ msgstr "Ny fil"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/search/documents_search_panel.xml:0
+#: code:addons/documents/static/src/views/action/folder_action_new_folder.js:0
 msgid "New Folder"
-msgstr "Ny mappe"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -3239,6 +3249,12 @@ msgstr "Intet dokument er valgt"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/chatter/documents_chatter_overlay.xml:0
+msgid "No document selected"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 msgid "No email alias"
 msgstr "Ingen e-mailalias"
@@ -3257,6 +3273,12 @@ msgstr "Ingen tilknyttet postering"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/fields/documents_shared_group/documents_shared_group.xml:0
+msgid "No members"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #. odoo-python
 #: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
 #: code:addons/documents/wizard/documents_sharing.py:0
@@ -3272,7 +3294,7 @@ msgstr "Ingen ejer"
 #. module: documents
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
-msgid "No partners"
+msgid "No partners/groups"
 msgstr ""
 
 #. module: documents
@@ -3285,6 +3307,11 @@ msgstr "Ingen server fundet for Dokumenter!"
 #: model_terms:ir.actions.act_window,help:documents.mail_alias_action
 msgid "No shared links"
 msgstr "Ingen delte links"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_view_search
+msgid "No shortcuts"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -3306,6 +3333,12 @@ msgstr "Ingen"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/search/documents_search_model.js:0
+msgid "Not allowed, select a folder"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 msgid "Not set"
 msgstr "Ikke angivet"
@@ -3324,6 +3357,20 @@ msgstr "Notifikationsmeddelelse"
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__invite_notify
 msgid "Notify"
 msgstr "Underret"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Now let's <b>add the link of your file</b> to give access to it in the "
+"chatter."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "Now let's <b>attach a file to this note.</b>"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__message_needaction_counter
@@ -3352,7 +3399,7 @@ msgstr "Odoo-logo"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Odoo Studio - Customize workflows in minutes"
 msgstr "Odoo Studio – Tilpas workflows på ingen tid"
 
@@ -3365,6 +3412,12 @@ msgstr "Odoo Hjemmeside"
 #: model:ir.model.fields.selection,name:documents.selection__documents_document__last_access_date_group__0_older
 msgid "Older"
 msgstr "Ældre"
+
+#. module: documents
+#: model:ir.model.fields,help:documents.field_documents_document__is_protected
+msgid ""
+"Only Document Managers can edit, other editors can create/move within it."
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -3392,7 +3445,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/documents/static/src/views/documents_renderer_mixin.js:0
 msgid "Only current page items can be dragged."
-msgstr ""
+msgstr "Kun nuværende sideelementer kan trækkes."
 
 #. module: documents
 #. odoo-python
@@ -3408,12 +3461,6 @@ msgid "Only one value can be searched for child of `folder_id`."
 msgstr ""
 
 #. module: documents
-#. odoo-python
-#: code:addons/documents/models/documents_document.py:0
-msgid "Only one value can be searched for children of `user_folder_id`"
-msgstr ""
-
-#. module: documents
 #. odoo-javascript
 #. odoo-python
 #: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
@@ -3425,12 +3472,6 @@ msgstr "Kun personer med adgang kan åbne via linket"
 #: model_terms:ir.ui.view,arch_db:documents.public_folder_page
 msgid "Open folder {{0}}"
 msgstr "Åbn mappe {{0}}"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Open the actions menu"
-msgstr "Åbn handlingsmenuen"
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.public_folder_page
@@ -3467,11 +3508,25 @@ msgid "Or send emails to"
 msgstr "Eller send e-mails til"
 
 #. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/web/document_organize_popover.xml:0
+msgid "Organize"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/common/attachment_model_patch.js:0
+msgid "Organize in Documents"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing_access__original_expiration_date
 msgid "Original Expiration"
 msgstr ""
 
 #. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 #: model:ir.model.fields,field_description:documents.field_documents_document__owner_id
 #: model:ir.model.fields,field_description:documents.field_documents_request_wizard__requestee_id
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
@@ -3511,12 +3566,6 @@ msgid "Partner"
 msgstr "Partner"
 
 #. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.xml:0
-msgid "Paste Link(s)"
-msgstr ""
-
-#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid "People with access"
 msgstr "Personer med adgang"
@@ -3547,8 +3596,13 @@ msgid "Preview files"
 msgstr "Forhåndsvisning af filer"
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__is_protected
+msgid "Protected"
+msgstr ""
+
+#. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Put in %s"
 msgstr "Læg i %s"
 
@@ -3584,12 +3638,17 @@ msgstr "Nyligt åbnede dokumenter."
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_link_to_record_wizard__resource_ref
 msgid "Record"
-msgstr "Datasæt"
+msgstr "Post"
 
 #. module: documents
 #: model:documents.document,name:documents.document_registrations_folder
 msgid "Registrations"
 msgstr "Tilmeldinger"
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_mixin__document_count
+msgid "Related Document Count"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -3624,16 +3683,17 @@ msgstr "Fjern medlem"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_star.js:0
+#: code:addons/documents/static/src/views/action/folder_action_star.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Remove star"
 msgstr "Fjern stjerne"
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/core/document_service.js:0
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_rename.js:0
+#: code:addons/documents/static/src/views/action/folder_action_rename.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_rename.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 #: model_terms:ir.ui.view,arch_db:documents.document_view_form_rename
 msgid "Rename"
 msgstr "Omdøb"
@@ -3641,6 +3701,7 @@ msgstr "Omdøb"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/views/documents_controller_mixin.xml:0
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__type__request
 #: model_terms:ir.ui.view,arch_db:documents.documents_request_form_view
 msgid "Request"
 msgstr "Anmodning"
@@ -3656,20 +3717,25 @@ msgid "Request To"
 msgstr "Anmod"
 
 #. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/web/activity/activity_menu_patch.xml:0
-msgid "Request a Document"
-msgstr "Anmod om et dokument"
-
-#. module: documents
 #: model:ir.actions.act_window,name:documents.action_request_form
 msgid "Request a file"
 msgstr "Anmod om en fil"
 
 #. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_document_check_type_request
+msgid "Request document cannot have an attachment"
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
 msgid "Requested Documents"
 msgstr "Anmodede dokumenter"
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "Requested document has been uploaded"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__requestee_partner_id
@@ -3679,7 +3745,7 @@ msgstr "Forespørgende partner"
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__res_model_name
 msgid "Res Model Name"
-msgstr "Res-modelnavn"
+msgstr "Navn på ansvarlig model"
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__res_id
@@ -3760,15 +3826,21 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_deep_search.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
+msgid "Search in Folder"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/views/fields/documents_user_folder_id_char/documents_search_panel_user_folder_id.xml:0
 msgid "Search..."
 msgstr "Søg..."
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/core/common/composer_actions_patch.js:0
-#: code:addons/documents/static/src/editor/plugins/add_documents_attachment_plugin.js:0
-#: code:addons/documents/static/src/web/mail_composer_document_selector/mail_composer_document_selector.js:0
+#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.js:0
 msgid "Search: Documents"
 msgstr ""
 
@@ -3788,7 +3860,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.js:0
 msgid "Select a Record To Link"
-msgstr "Vælg et datasæt, der skal forbindes"
+msgstr "Vælg en post, der skal forbindes"
 
 #. module: documents
 #. odoo-javascript
@@ -3802,12 +3874,6 @@ msgstr "Vælg en mappe for at uploade et dokument"
 #: code:addons/documents/static/src/views/list/documents_list_renderer.js:0
 msgid "Select all"
 msgstr "Vælg alle"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/views/chatter/documents_chatter_overlay.xml:0
-msgid "Select an item to open the chatter"
-msgstr "Vælg et element for at åbne chatteren"
 
 #. module: documents
 #. odoo-javascript
@@ -3844,12 +3910,6 @@ msgstr "Vælg tidligere sider i gruppen"
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.js:0
 msgid "Select/Deselect all pages"
 msgstr "Vælg/fravælg alle sider"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Send To Finance"
-msgstr "Send til Økonomi"
 
 #. module: documents
 #: model:ir.actions.server,name:documents.ir_actions_server_send_to_finance
@@ -3906,10 +3966,10 @@ msgstr "Indstillinger"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_share.js:0
+#: code:addons/documents/static/src/js/tours/documents.js:0
+#: code:addons/documents/static/src/views/action/folder_action_share.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_share.js:0
-#: code:addons/documents/static/src/views/search/documents_search_panel.xml:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 #: code:addons/documents/static/src/web/error_dialog/error_dialog_patch.xml:0
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid "Share"
@@ -3938,6 +3998,23 @@ msgid "Shared"
 msgstr "Delt"
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing.py:0
+msgid "Shared Document"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing.py:0
+msgid "Shared Documents"
+msgstr "Delte dokumenter"
+
+#. module: documents
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__user_root__shared
+msgid "Shared With Me"
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
 msgid "Shared with"
 msgstr ""
@@ -3955,6 +4032,16 @@ msgstr ""
 #: code:addons/documents/static/src/views/kanban/documents_kanban_record.js:0
 msgid "Shared with me"
 msgstr "Delt med mig"
+
+#. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_sharing_access_check_partner_or_group
+msgid "Sharing Access must apply to a partner or to a group (but not both)."
+msgstr ""
+
+#. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_access_check_partner_or_group
+msgid "Sharing Access must apply to either a partner or a group."
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__shortcut_ids
@@ -3990,6 +4077,11 @@ msgid "Siblings"
 msgstr ""
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.public_page_layout
+msgid "Sign up"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__is_single
 msgid "Single"
 msgstr "Single"
@@ -3998,6 +4090,12 @@ msgstr "Single"
 #: model_terms:ir.ui.view,arch_db:documents.share_file
 msgid "Size:"
 msgstr "Størrelse:"
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing.py:0
+msgid "Skipped %(count)s (no email)"
+msgstr ""
 
 #. module: documents
 #: model:documents.document,name:documents.document_finance_social_folder
@@ -4039,7 +4137,6 @@ msgstr "Del"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Split PDF"
 msgstr "Del PDF"
@@ -4082,15 +4179,10 @@ msgid "Stay here"
 msgstr "Bliv her"
 
 #. module: documents
-#: model:ir.ui.menu,name:documents.structure
-msgid "Structure"
-msgstr "Struktur"
-
-#. module: documents
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
-msgid "Successfully Shared"
-msgstr "Delt"
+msgid "Successfully shared"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__create_activity_summary
@@ -4102,6 +4194,12 @@ msgstr "Opsummering"
 #: code:addons/documents/models/documents_document.py:0
 msgid "Support"
 msgstr "Support"
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "System"
+msgstr ""
 
 #. module: documents
 #: model:res.groups,name:documents.group_documents_system
@@ -4139,11 +4237,6 @@ msgstr "Tags"
 #: model:documents.document,name:documents.document_finance_taxes_folder
 msgid "Taxes"
 msgstr "Moms"
-
-#. module: documents
-#: model:ir.model.fields,help:documents.field_documents_tag__tooltip
-msgid "Text shown when hovering on this tag"
-msgstr "Tekst vises, når du holder musen over tagget"
 
 #. module: documents
 #: model:ir.model.constraint,message:documents.constraint_res_config_settings_check_deletion_delay
@@ -4221,6 +4314,14 @@ msgstr ""
 #. module: documents
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
+msgid ""
+"The following folders have links to records that cannot be changed.: %"
+"(folder_names)s"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
 msgid "The following shortcuts cannot be set as documents parents: \n"
 msgstr "Følgende genveje kan ikke angives som overordnede dokumenter: \n"
 
@@ -4235,19 +4336,27 @@ msgstr ""
 "– %(lines)s"
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.invitation_expired
+msgid ""
+"The invitation expired, contact the person that shared this link for more "
+"information."
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,help:documents.field_documents_document__alias_name
 msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"Navnet på e-mail aliaset, f.eks. 'jobs', hvis du vil fange e-mails til "
-"<jobs@example.odoo.com>"
+"Navnet på e-mailaliasset, f.eks. 'jobs', hvis du vil modtage e-mails sendt "
+"til <jobs@eksempel.odoo.com>"
 
 #. module: documents
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
 msgid "There are no records to link this document. Create one first."
 msgstr ""
+"Der er ingen poster knyttet til dette dokument. Opret venligst en først."
 
 #. module: documents
 #. odoo-javascript
@@ -4286,6 +4395,12 @@ msgid "This attachment is already a document"
 msgstr "Den vedhæftede fil er allerede et dokument"
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/models/ir_attachment.py:0
+msgid "This document belongs to %(rec)s."
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.not_available
 msgid "This document does not exist or is not publicly available."
 msgstr "Dokumentet findes ikke eller er ikke offentligt tilgængeligt."
@@ -4321,6 +4436,25 @@ msgid "This folder does not exist or is not accessible."
 msgstr "Mappen findes ikke eller er ikke tilgængelig."
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_mixin.py:0
+msgid "This folder is already linked to %(other_record_name)s"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_mixin.py:0
+msgid "This folder is already linked to another record."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
+msgid ""
+"This folder is protected and can only be modified by the documents managers."
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
 msgid "This is a folder"
 msgstr "Dette er en mappe"
@@ -4328,6 +4462,7 @@ msgstr "Dette er en mappe"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/views/search/documents_search_panel.xml:0
+#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
 msgid "This is a shortcut"
 msgstr "Dette er en genvej"
 
@@ -4338,9 +4473,9 @@ msgid "This is a shortcut - Click to access source document"
 msgstr "Dette er en genvej – Klik for at få adgang til kildedokumentet"
 
 #. module: documents
-#: model:ir.model.constraint,message:documents.constraint_documents_access_unique_document_access_partner
-msgid "This partner is already set on this document."
-msgstr "Denne partner er allerede angivet på dette dokument."
+#: model:ir.model.constraint,message:documents.constraint_documents_access_unique_document_access_by_partner_or_group
+msgid "This partner/group is already set on this document."
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -4360,7 +4495,7 @@ msgstr ""
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__thumbnail
 msgid "Thumbnail"
-msgstr "Thumbnail"
+msgstr "Miniature"
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__thumbnail_status
@@ -4392,23 +4527,22 @@ msgstr "I dag"
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
 msgid "Today Activities"
-msgstr "Dagens aktiviteter"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/kanban/documents_kanban_renderer.js:0
+#: code:addons/documents/static/src/views/documents_renderer_mixin.js:0
 msgid "Toggle favorite"
 msgstr "Aktivér favorit"
 
 #. module: documents
-#: model:ir.model.fields,field_description:documents.field_documents_tag__tooltip
-#: model_terms:ir.ui.view,arch_db:documents.tag_view_form
-msgid "Tooltip"
-msgstr "Værktøjstip"
-
-#. module: documents
+#. odoo-javascript
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
+#: code:addons/documents/static/src/views/action/folder_action_archive.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
+#: code:addons/documents/static/src/views/documents_renderer_mixin.js:0
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__user_root__trash
 msgid "Trash"
 msgstr "Papirkurv"
 
@@ -4478,9 +4612,9 @@ msgid "Unlock"
 msgstr "Lås op"
 
 #. module: documents
-#. odoo-python
-#: code:addons/documents/wizard/documents_operation.py:0
-msgid "Unsupported attachment type: %s"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "Unselect the document you just uploaded."
 msgstr ""
 
 #. module: documents
@@ -4507,10 +4641,10 @@ msgid "Upload New Version"
 msgstr "Upload ny version"
 
 #. module: documents
-#. odoo-python
-#: code:addons/documents/models/mail_activity.py:0
-msgid "Upload file request"
-msgstr "Upload filanmodning"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "Upload a new file"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -4525,6 +4659,13 @@ msgid "Usage"
 msgstr "Anvendelse"
 
 #. module: documents
+#: model:ir.model.fields,help:documents.field_documents_document__user_root
+msgid ""
+"Used exclusively to search in \"My Drive\", \"Company\", or \"Shared With "
+"Me\""
+msgstr ""
+
+#. module: documents
 #: model:ir.model,name:documents.model_res_users
 #: model:ir.model.fields,field_description:documents.field_documents_access_tracking__user_id
 #: model:res.groups,name:documents.group_documents_user
@@ -4532,21 +4673,20 @@ msgid "User"
 msgstr "Bruger"
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__user_root
+msgid "User Root"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "User created"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__user_permission
 msgid "User permission"
 msgstr "Brugertilladelse"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.xml:0
-msgid ""
-"Versions are displayed in the order they were uploaded to Documents.\n"
-"                    If you delete the most recent version, the previous one "
-"is automatically restored as the current one."
-msgstr ""
-"Versioner vises i den rækkefølge, de blev uploadet i Dokumenter.\n"
-"                    Hvis du sletter den nyeste version, bliver den forrige "
-"automatisk gendannet som den gældende."
 
 #. module: documents
 #: model:documents.document,name:documents.documents_attachment_video_documents
@@ -4584,14 +4724,16 @@ msgid "Warning"
 msgstr "Advarsel"
 
 #. module: documents
-#: model:ir.model.fields,field_description:documents.field_documents_document__website_message_ids
-msgid "Website Messages"
-msgstr "Beskeder fra hjemmesiden"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "We're all set! Let's go the home page."
+msgstr ""
 
 #. module: documents
-#: model:ir.model.fields,help:documents.field_documents_document__website_message_ids
-msgid "Website communication history"
-msgstr "Hjemmesidens kommunikationshistorik"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "We're all set, this concludes our onboarding of the documents app!"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields.selection,name:documents.selection__documents_document__create_activity_date_deadline_range_type__weeks
@@ -4606,19 +4748,16 @@ msgid "What do you want to do with the remaining pages ?"
 msgstr "Hvad vil du med de resterende sider?"
 
 #. module: documents
-#: model_terms:web_tour.tour,rainbow_man_message:documents.documents_tour
-msgid ""
-"Wow... 6 documents processed in a few seconds, You're good.<br>The tour is "
-"complete. Try uploading your own documents now."
-msgstr ""
-"Wow ... Seks dokumenter behandlet på få sekunder. Godt gået."
-"<br>Rundvisningen er slut. Prøv at uploade dine egne dokumenter nu."
-
-#. module: documents
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
 msgid "Yes"
 msgstr "Ja"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
+msgid "Yes, delete it"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -4640,12 +4779,6 @@ msgid "You are not allowed to change ownerships of documents you do not own."
 msgstr ""
 "Du har ikke tilladelse til at ændre ejerskab af dokumenter, du ikke selv "
 "ejer."
-
-#. module: documents
-#. odoo-python
-#: code:addons/documents/models/documents_document.py:0
-msgid "You are not allowed to delete all these items."
-msgstr "Du har ikke tilladelse til at slette alle disse elementer."
 
 #. module: documents
 #. odoo-python
@@ -4755,6 +4888,12 @@ msgstr ""
 #. module: documents
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
+msgid "You cannot change the type of a documents."
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
 msgid ""
 "You cannot copy a folder into itself or into one of its own descendants."
 msgstr ""
@@ -4802,13 +4941,6 @@ msgstr "Det er ikke muligt at fastgøre denne type handling."
 #: code:addons/documents/wizard/documents_operation.py:0
 msgid "You do not have editor access to any folder."
 msgstr ""
-
-#. module: documents
-#. odoo-python
-#: code:addons/documents/models/documents_document.py:0
-msgid "You do not have sufficient access rights to delete these documents."
-msgstr ""
-"Du har ikke de nødvendige adgangsrettigheder til at slette dokumenterne."
 
 #. module: documents
 #. odoo-javascript
@@ -4911,7 +5043,7 @@ msgstr "f.eks. https://www.youtube.com/watch?v=CP96yVnXNrY"
 #. odoo-javascript
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 msgid "e.g. mycompany.com"
-msgstr "f.eks. mitfirma.com"
+msgstr "f.eks. minvirksomhed.com"
 
 #. module: documents
 #. odoo-python
@@ -4947,19 +5079,24 @@ msgid "folders,"
 msgstr "mapper,"
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.folder_notification_move_out
+msgid "has been moved outside this folder."
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
 msgid "has gained access as"
 msgstr ""
 
 #. module: documents
-#: model:documents.document,name:documents.documents_vendor_bill_extract_azure_interior_document
-msgid "invoice Azure Interior.pdf"
-msgstr "faktura Azure Interior.pdf"
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "has uploaded the requested document"
+msgstr ""
 
 #. module: documents
-#: model:documents.document,name:documents.documents_vendor_bill_extract_open_value_document
-msgid "invoice OpenValue.pdf"
-msgstr "faktura OpenValue.pdf"
+#: model:documents.document,name:documents.documents_vendor_bill_extract_gemini_furniture_document
+msgid "invoice_gemini_furniture.pdf"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_request_page
@@ -4989,6 +5126,17 @@ msgid "link_required"
 msgstr ""
 
 #. module: documents
+#: model:documents.document,name:documents.documents_lumber
+msgid "lumber-invoice.pdf"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/views/fields/documents_shared_group/documents_shared_group.xml:0
+msgid "members"
+msgstr ""
+
+#. module: documents
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
 msgid "mixed"
@@ -5013,9 +5161,22 @@ msgid "parent_id"
 msgstr ""
 
 #. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_access_role_or_last_access_date
+msgid ""
+"partner must either have a role or have a set last_access_date, group must "
+"have a role"
+msgstr ""
+
+#. module: documents
 #: model:documents.document,name:documents.documents_image_people_document
 msgid "people.jpg"
 msgstr "personer.jpg"
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "res_model and res_id must be set together"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
@@ -5035,7 +5196,7 @@ msgstr "delt af"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "status code: %(status)s, message: %(message)s"
 msgstr "statuskode: %(status)s, besked: %(message)s"
 
@@ -5057,11 +5218,6 @@ msgid "unnamed"
 msgstr "unavngivet"
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.folder_notification_move_out
-msgid "was been moved outside this folder."
-msgstr ""
-
-#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.folder_notification_move_in
 msgid "was moved inside this folder."
 msgstr ""
@@ -5080,1326 +5236,12 @@ msgstr ""
 "•\n"
 "                                        <b>URL</b>"
 
-#~ msgid "2024"
-#~ msgstr "2024"
-
-#~ msgid "Allows you to manage his documents."
-#~ msgstr "Giver dig tilladelse til at administrere vedkommendes dokumenter."
+#~ msgid "Select an item to open the chatter"
+#~ msgstr "Vælg et element for at åbne chatteren"
 
 #~ msgid ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "                    <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "white; color: #454748; border-collapse:separate;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <!-- HEADER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\">\n"
-#~ "                                        <span style=\"font-size: 10px;"
-#~ "\">\n"
-#~ "                                            Document Request: <br/>\n"
-#~ "                                            <t t-if=\"object.name\">\n"
-#~ "                                                <span style=\"font-size: "
-#~ "20px; font-weight: bold;\" t-out=\"object.name or ''\">Inbox Financial</"
-#~ "span>\n"
-#~ "                                            </t>\n"
-#~ "                                        </span><br/>\n"
-#~ "                                    </td><td valign=\"middle\" "
-#~ "align=\"right\" t-if=\"not "
-#~ "object.create_uid.company_id.uses_default_logo\">\n"
-#~ "                                        <img t-attf-src=\"/logo.png?"
-#~ "company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-#~ "margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"object.create_uid.company_id.name\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td colspan=\"2\" style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- CONTENT -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"top\" style=\"font-"
-#~ "size: 13px;\">\n"
-#~ "                                        <div>\n"
-#~ "                                            Hello <t t-"
-#~ "out=\"object.owner_id.name or ''\">OdooBot</t>,\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <t t-"
-#~ "out=\"object.create_uid.name or ''\">OdooBot</t> (<t t-"
-#~ "out=\"object.create_uid.email or ''\">odoobot@example.com</t>) asks you "
-#~ "to provide the following document:\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <center>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.name\">\n"
-#~ "                                                        <b t-"
-#~ "out=\"object.name or ''\">Inbox Financial</b>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.request_activity_id.note\">\n"
-#~ "                                                        <i t-"
-#~ "out=\"object.request_activity_id.note or ''\">Example of a note.</i>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div style=\"margin: 16px "
-#~ "0px 16px 0px;\">\n"
-#~ "                                                    <a t-att-"
-#~ "href=\"object.access_url\" t-attf-style=\"background-color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px "
-#~ "30px 20px 30px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                                        Upload the "
-#~ "requested document\n"
-#~ "                                                    </a>\n"
-#~ "                                                </div>\n"
-#~ "                                            </center><br/>\n"
-#~ "                                            Please provide us with the "
-#~ "missing document before <t t-"
-#~ "out=\"object.request_activity_id.date_deadline\">2021-05-17</t>.\n"
-#~ "                                            <t t-if=\"user and "
-#~ "user.signature\" data-o-mail-quote-container=\"1\">\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div data-o-mail-"
-#~ "quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature or "
-#~ "''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-#~ "                                                <br data-o-mail-"
-#~ "quote=\"1\"/>\n"
-#~ "                                            </t>\n"
-#~ "                                        </div>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td style=\"text-align:center;"
-#~ "\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- FOOTER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.name or ''\">YourCompany</t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\" style=\"opacity: 0.7;\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.email\">\n"
-#~ "                                            | <a t-attf-href=\"'mailto:"
-#~ "%s' % {{ object.create_uid.company_id.email }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.email or ''\">info@yourcompany.com</"
-#~ "a>\n"
-#~ "                                        </t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.website\">\n"
-#~ "                                            | <a t-attf-href=\"'%s' % "
-#~ "{{ object.create_uid.company_id.website }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.website or ''\">http://"
-#~ "www.example.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                    </tbody>\n"
-#~ "                    </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr><td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                        <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                          <tr><td style=\"text-align: center; font-size: "
-#~ "13px;\">\n"
-#~ "                            Powered by <a target=\"_blank\" "
-#~ "href=\"https://www.odoo.com/app/documents\" t-attf-style=\"color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo Documents</"
-#~ "a>\n"
-#~ "                          </td></tr>\n"
-#~ "                        </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                </table>\n"
-#~ "            "
+#~ "<i class=\"oi me-2\" data-icon=\"open_in_new\" title=\"This is a "
+#~ "shortcut\"/>"
 #~ msgstr ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "                    <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "white; color: #454748; border-collapse:separate;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <!-- HEADER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\">\n"
-#~ "                                        <span style=\"font-size: 10px;"
-#~ "\">\n"
-#~ "                                            Dokumentanmodning: <br/>\n"
-#~ "                                            <t t-if=\"object.name\">\n"
-#~ "                                                <span style=\"font-size: "
-#~ "20px; font-weight: bold;\" t-out=\"object.name or ''\">Indbakke til "
-#~ "finans</span>\n"
-#~ "                                            </t>\n"
-#~ "                                        </span><br/>\n"
-#~ "                                    </td><td valign=\"middle\" "
-#~ "align=\"right\" t-if=\"not "
-#~ "object.create_uid.company_id.uses_default_logo\">\n"
-#~ "                                        <img t-attf-src=\"/logo.png?"
-#~ "company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-#~ "margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"object.create_uid.company_id.name\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td colspan=\"2\" style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- CONTENT -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"top\" style=\"font-"
-#~ "size: 13px;\">\n"
-#~ "                                        <div>\n"
-#~ "                                            Hej <t t-"
-#~ "out=\"object.owner_id.name or ''\">OdooBot</t>\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <t t-"
-#~ "out=\"object.create_uid.name or ''\">OdooBot</t> (<t t-"
-#~ "out=\"object.create_uid.email or ''\">odoobot@example.com</t>) anmoder "
-#~ "dig om følgende dokument:\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <center>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.name\">\n"
-#~ "                                                        <b t-"
-#~ "out=\"object.name or ''\">Indbakke til finans</b>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.request_activity_id.note\">\n"
-#~ "                                                        <i t-"
-#~ "out=\"object.request_activity_id.note or ''\">Et eksempel på en note.</"
-#~ "i>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div style=\"margin: 16px "
-#~ "0px 16px 0px;\">\n"
-#~ "                                                    <a t-att-"
-#~ "href=\"object.access_url\" t-attf-style=\"background-color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px "
-#~ "30px 20px 30px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                                        Upload det "
-#~ "anmodede dokument\n"
-#~ "                                                    </a>\n"
-#~ "                                                </div>\n"
-#~ "                                            </center><br/>\n"
-#~ "                                            Indsend venligst det "
-#~ "manglende dokument inden den <t t-"
-#~ "out=\"object.request_activity_id.date_deadline\">2021-05-17</t>.\n"
-#~ "                                            <t t-if=\"user and "
-#~ "user.signature\" data-o-mail-quote-container=\"1\">\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div data-o-mail-"
-#~ "quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature or "
-#~ "''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-#~ "                                                <br data-o-mail-"
-#~ "quote=\"1\"/>\n"
-#~ "                                            </t>\n"
-#~ "                                        </div>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td style=\"text-align:center;"
-#~ "\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- FOOTER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.name or ''\">DinVirksomhed</t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\" style=\"opacity: 0.7;\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.email\">\n"
-#~ "                                            | <a t-attf-href=\"'mailto:"
-#~ "%s' % {{ object.create_uid.company_id.email }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.email or ''\">info@yourcompany.com</"
-#~ "a>\n"
-#~ "                                        </t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.website\">\n"
-#~ "                                            | <a t-attf-href=\"'%s' % "
-#~ "{{ object.create_uid.company_id.website }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.website or ''\">http://"
-#~ "www.example.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                    </tbody>\n"
-#~ "                    </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr><td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                        <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                          <tr><td style=\"text-align: center; font-size: "
-#~ "13px;\">\n"
-#~ "                            Drevet af <a target=\"_blank\" href=\"https://"
-#~ "www.odoo.com/app/documents\" t-attf-style=\"color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo "
-#~ "Dokumenter</a>\n"
-#~ "                          </td></tr>\n"
-#~ "                        </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                </table>\n"
-#~ "            "
-
-#~ msgid ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "                    <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "white; color: #454748; border-collapse:separate;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <!-- HEADER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\">\n"
-#~ "                                        <span style=\"font-size: 10px;"
-#~ "\">\n"
-#~ "                                            Document Request: <br/>\n"
-#~ "                                            <t t-if=\"object.name\">\n"
-#~ "                                                <span style=\"font-size: "
-#~ "20px; font-weight: bold;\" t-out=\"object.name or ''\">Inbox Financial</"
-#~ "span>\n"
-#~ "                                            </t>\n"
-#~ "                                        </span><br/>\n"
-#~ "                                    </td><td valign=\"middle\" "
-#~ "align=\"right\">\n"
-#~ "                                        <img t-attf-src=\"/logo.png?"
-#~ "company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-#~ "margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"object.create_uid.company_id.name\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td colspan=\"2\" style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- CONTENT -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"top\" style=\"font-"
-#~ "size: 13px;\">\n"
-#~ "                                        <div>\n"
-#~ "                                            Hello <t t-"
-#~ "out=\"object.owner_id.name or ''\">OdooBot</t>,\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            This is a friendly reminder "
-#~ "to upload your requested document:\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <center>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.name\">\n"
-#~ "                                                        <b t-"
-#~ "out=\"object.name or ''\">Inbox Financial</b>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.request_activity_id.note\">\n"
-#~ "                                                        <i t-"
-#~ "out=\"object.request_activity_id.note or ''\">Example of a note.</i>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div style=\"margin: 16px "
-#~ "0px 16px 0px;\">\n"
-#~ "                                                    <a t-att-"
-#~ "href=\"object.access_url\" t-attf-style=\"background-color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px "
-#~ "30px 20px 30px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                                        Upload the "
-#~ "requested document\n"
-#~ "                                                    </a>\n"
-#~ "                                                </div>\n"
-#~ "                                            </center><br/>\n"
-#~ "                                            Please provide us with the "
-#~ "missing document before <t t-"
-#~ "out=\"object.request_activity_id.date_deadline or ''\">2021-05-17</t>.\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            Thank you,\n"
-#~ "                                            <t t-if=\"user and "
-#~ "user.signature\" data-o-mail-quote-container=\"1\">\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div data-o-mail-"
-#~ "quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature\" "
-#~ "data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-#~ "                                                <br data-o-mail-"
-#~ "quote=\"1\"/>\n"
-#~ "                                            </t>\n"
-#~ "                                        </div>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td style=\"text-align:center;"
-#~ "\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- FOOTER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.name or ''\">YourCompany</t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\" style=\"opacity: 0.7;\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.email\">\n"
-#~ "                                            | <a t-attf-href=\"'mailto:"
-#~ "%s' % {{ object.create_uid.company_id.email }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.email\">info@yourcompany.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.website\">\n"
-#~ "                                            | <a t-att-"
-#~ "href=\"object.create_uid.company_id.website\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.website\">http://www.example.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                    </tbody>\n"
-#~ "                    </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr><td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                        <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                          <tr><td style=\"text-align: center; font-size: "
-#~ "13px;\">\n"
-#~ "                            Powered by <a target=\"_blank\" "
-#~ "href=\"https://www.odoo.com/app/documents\" t-attf-style=\"color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo Documents</"
-#~ "a>\n"
-#~ "                          </td></tr>\n"
-#~ "                        </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                </table>\n"
-#~ "            "
-#~ msgstr ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "                    <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "white; color: #454748; border-collapse:separate;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <!-- HEADER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\">\n"
-#~ "                                        <span style=\"font-size: 10px;"
-#~ "\">\n"
-#~ "                                            Dokumentanmodning: <br/>\n"
-#~ "                                            <t t-if=\"object.name\">\n"
-#~ "                                                <span style=\"font-size: "
-#~ "20px; font-weight: bold;\" t-out=\"object.name or ''\">Indbakke til "
-#~ "finans</span>\n"
-#~ "                                            </t>\n"
-#~ "                                        </span><br/>\n"
-#~ "                                    </td><td valign=\"middle\" "
-#~ "align=\"right\">\n"
-#~ "                                        <img t-attf-src=\"/logo.png?"
-#~ "company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-#~ "margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"object.create_uid.company_id.name\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td colspan=\"2\" style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- CONTENT -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"top\" style=\"font-"
-#~ "size: 13px;\">\n"
-#~ "                                        <div>\n"
-#~ "                                            Hej <t t-"
-#~ "out=\"object.owner_id.name or ''\">OdooBot</t>\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            Husk venligst at uploade dit "
-#~ "ønskede dokument:\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <center>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.name\">\n"
-#~ "                                                        <b t-"
-#~ "out=\"object.name or ''\">Indbakke til finans</b>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.request_activity_id.note\">\n"
-#~ "                                                        <i t-"
-#~ "out=\"object.request_activity_id.note or ''\">Et eksempel på en note.</"
-#~ "i>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div style=\"margin: 16px "
-#~ "0px 16px 0px;\">\n"
-#~ "                                                    <a t-att-"
-#~ "href=\"object.access_url\" t-attf-style=\"background-color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px "
-#~ "30px 20px 30px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                                        Upload det "
-#~ "anmodede dokument\n"
-#~ "                                                    </a>\n"
-#~ "                                                </div>\n"
-#~ "                                            </center><br/>\n"
-#~ "                                            Indsend venligst det "
-#~ "manglende dokument inden den <t t-"
-#~ "out=\"object.request_activity_id.date_deadline or ''\">2021-05-17</t>.\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            På forhånd tak.\n"
-#~ "                                            <t t-if=\"user and "
-#~ "user.signature\" data-o-mail-quote-container=\"1\">\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div data-o-mail-"
-#~ "quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature\" "
-#~ "data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-#~ "                                                <br data-o-mail-"
-#~ "quote=\"1\"/>\n"
-#~ "                                            </t>\n"
-#~ "                                        </div>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td style=\"text-align:center;"
-#~ "\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- FOOTER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.name or ''\">DinVirksomhed</t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\" style=\"opacity: 0.7;\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.email\">\n"
-#~ "                                            | <a t-attf-href=\"'mailto:"
-#~ "%s' % {{ object.create_uid.company_id.email }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.email\">info@yourcompany.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.website\">\n"
-#~ "                                            | <a t-att-"
-#~ "href=\"object.create_uid.company_id.website\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.website\">http://www.example.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                    </tbody>\n"
-#~ "                    </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr><td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                        <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                          <tr><td style=\"text-align: center; font-size: "
-#~ "13px;\">\n"
-#~ "                            Drevet af <a target=\"_blank\" href=\"https://"
-#~ "www.odoo.com/app/documents\" t-attf-style=\"color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo "
-#~ "Dokumenter</a>\n"
-#~ "                          </td></tr>\n"
-#~ "                        </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                </table>\n"
-#~ "            "
-
-#~ msgid "%s Documents"
-#~ msgstr "%s Dokumenter"
-
-#~ msgid "%s Documents (%s locked)"
-#~ msgstr "%s Dokumenter (%s låst)"
-
-#~ msgid "%s file(s) not moved because they are locked by another user"
-#~ msgstr "%s fil(er) ikke flyttet fordi de var låst fra en anden bruger"
-
-#~ msgid ", expired on"
-#~ msgstr ", udløbet den"
-
-#~ msgid "<b>Bytes</b>"
-#~ msgstr "<b>Byte</b>"
-
-#~ msgid "<b>Gb</b>"
-#~ msgstr "<b>Gb</b>"
-
-#~ msgid "<b>Kb</b>"
-#~ msgstr "<b>Kb</b>"
-
-#~ msgid "<b>Mb</b>"
-#~ msgstr "<b>Mb</b>"
-
-#~ msgid "<i class=\"fa fa-download fa-fw\"/>  Download All"
-#~ msgstr "<i class=\"fa fa-download fa-fw\"/>  Download alle"
-
-#~ msgid "<i class=\"fa fa-download fa-fw\"/> Download"
-#~ msgstr "<i class=\"fa fa-download fa-fw\"/> Download"
-
-#~ msgid "<i class=\"fa fa-globe\" title=\"Document url\"/>"
-#~ msgstr "<i class=\"fa fa-globe\" title=\"Document url\"/>"
-
-#~ msgid "<i class=\"fa fa-link\"/> Go to URL"
-#~ msgstr "<i class=\"fa fa-link\"/> Gå til URL"
-
-#~ msgid "<span class=\"o_stat_text\">Actions</span>"
-#~ msgstr "<span class=\"o_stat_text\">Handlinger</span>"
-
-#~ msgid "<span class=\"o_stat_text\">Related <br/> Record</span>"
-#~ msgstr "<span class=\"o_stat_text\">Relateret <br/> Datasæt</span>"
-
-#~ msgid ""
-#~ "A set of condition and actions which will be available to all attachments "
-#~ "matching the conditions"
-#~ msgstr ""
-#~ "En række betingelser og handlinger der vil være tilgængelige for alle "
-#~ "vedhæftninger, som matcher betingelserne"
-
-#~ msgid "A workspace will inherit the tags of its parent workspace"
-#~ msgstr ""
-#~ "Et arbejdsområde vil nedarve tags tilhørende arbejdsområdet hvorfra det "
-#~ "har ophav"
-
-#~ msgid "Access"
-#~ msgstr "Adgang"
-
-#~ msgid "Access Error"
-#~ msgstr "Adgangsfejl"
-
-#~ msgid "Access Groups"
-#~ msgstr "Adgangsgrupper"
-
-#~ msgid "Access Rights"
-#~ msgstr "Adgangsrettigheder"
-
-#~ msgid "Action Button Name"
-#~ msgstr "Handling Knap Navn"
-
-#~ msgid "Action Count"
-#~ msgstr "Handling antal"
-
-#~ msgid "Action Name"
-#~ msgstr "Navn på handling"
-
-#~ msgid "Actions"
-#~ msgstr "Handlinger"
-
-#~ msgid "Activity Note"
-#~ msgstr "Aktivitetsnote"
-
-#~ msgid "Add a Link"
-#~ msgstr "Tilføj et Link"
-
-#~ msgid "Ads"
-#~ msgstr "Reklamer"
-
-#~ msgid "Alias Contact Security"
-#~ msgstr "Alias kontakt sikkerhed"
-
-#~ msgid "Alias domain"
-#~ msgstr "Alias domæne"
-
-#~ msgid "Aliased Model"
-#~ msgstr "Aliased model"
-
-#~ msgid "All files uploaded"
-#~ msgstr "All filer uploadet"
-
-#~ msgid "Allows to"
-#~ msgstr "Tillader at"
-
-#~ msgid "Allows you to manage your documents."
-#~ msgstr "Giver dig mulighed for at håndtere dine dokumenter."
-
-#~ msgid ""
-#~ "An easy way to process incoming mails is to configure your scanner to "
-#~ "send PDFs to your workspace email. Scanned files will appear "
-#~ "automatically in your workspace. Then, process your documents in bulk "
-#~ "with the split tool: launch user defined actions, request a signature, "
-#~ "convert to vendor bills with AI, etc."
-#~ msgstr ""
-#~ "En nem måde at behandle indgående mails på, er at konfigurere din scanner "
-#~ "til at sende PDF'er til dit arbejdsområdes email. Scannede filer vil "
-#~ "vises automatisk i dit arbejdsområde. Behandl derefter dine dokumenter i "
-#~ "partier med delings værktøjet: kør brugerdefinerede handlinger, anmod om "
-#~ "en underskrift, konverter til leverandørfaktura med kunstig intelligens, "
-#~ "osv."
-
-#~ msgid "Archive"
-#~ msgstr "Arkivér"
-
-#~ msgid "Archived"
-#~ msgstr "Arkiveret"
-
-#~ msgid "Ask for Validation"
-#~ msgstr "Spørg efter Bekræftelse"
-
-#~ msgid "Assets"
-#~ msgstr "Aktiver"
-
-#~ msgid "Attached To"
-#~ msgstr "Vedhæftet til"
-
-#~ msgid "Available Rules"
-#~ msgstr "Tilgængelige regler"
-
-#~ msgid "Bill"
-#~ msgstr "Faktura"
-
-#~ msgid "Brochures"
-#~ msgstr "Brochurer"
-
-#~ msgid "Can Upload"
-#~ msgstr "Kan oploade"
-
-#~ msgid "Categorize, share and keep track of all your internal documents."
-#~ msgstr "Kategoriser, del, og følg alle dine interne dokumenter."
-
-#~ msgid "Category"
-#~ msgstr "Kategori"
-
-#~ msgid "Condition type"
-#~ msgstr "Betingelsestype"
-
-#~ msgid "Conditions"
-#~ msgstr "Betingelser"
-
-#~ msgid "Contains"
-#~ msgstr "Indeholder"
-
-#~ msgid "Control panel buttons"
-#~ msgstr "Kontrolpanel knapper"
-
-#~ msgid "Create"
-#~ msgstr "Opret"
-
-#~ msgid "Create Share"
-#~ msgstr "Opret deling"
-
-#~ msgid "Criteria"
-#~ msgstr "Kriterium"
-
-#~ msgid "Custom Bounced Message"
-#~ msgstr "Tilpasset Ikke modtaget Besked"
-
-#~ msgid "Default values for uploaded documents"
-#~ msgstr "Standardværdier for uploadede dokumenter"
-
-#~ msgid "Deprecate"
-#~ msgstr "Foræld"
-
-#~ msgid "Deprecated"
-#~ msgstr "Forældet"
-
-#~ msgid "Description"
-#~ msgstr "Beskrivelse"
-
-#~ msgid "Document Owner"
-#~ msgstr "Dokumentejer"
-
-#~ msgid "Document Request: %s Uploaded by: %s"
-#~ msgstr "Dokument Anmodning: %s Uploaded af: %s"
-
-#~ msgid "Document Workflow Tag Action"
-#~ msgstr "Dokument workflow tag handling"
-
-#~ msgid "Document list"
-#~ msgstr "Dokumentliste"
-
-#~ msgid "Documents Share"
-#~ msgstr "Dokument deling"
-
-#~ msgid "Documents Workspace"
-#~ msgstr "Dokumenter Arbejdsområde"
-
-#~ msgid "Does not contain"
-#~ msgstr "Indeholder ikke"
-
-#~ msgid "Domain"
-#~ msgstr "Domæne"
-
-#~ msgid "Download and Upload"
-#~ msgstr "Download og upload"
-
-#~ msgid "Excluded Tags"
-#~ msgstr "Ekskluderede tags"
-
-#~ msgid "Expense"
-#~ msgstr "Omkostning"
-
-#~ msgid "Expired"
-#~ msgstr "Udløbet"
-
-#~ msgid "Facet already exists in this folder"
-#~ msgstr "Facet eksistere allerede i denne mappe"
-
-#~ msgid "Financial"
-#~ msgstr "Financiel"
-
-#~ msgid "Fiscal"
-#~ msgstr "Finans"
-
-#~ msgid "Fiscal years"
-#~ msgstr "Finansår"
-
-#~ msgid "Group By"
-#~ msgstr "Sortér efter"
-
-#~ msgid ""
-#~ "Groups able to see the workspace and read its documents without create/"
-#~ "edit rights."
-#~ msgstr ""
-#~ "Grupper der kan se arbejdsområdet og læse dets dokumenter uden opret/"
-#~ "rediger rettigheder."
-
-#~ msgid "Groups able to see the workspace and read/create/edit its documents."
-#~ msgstr ""
-#~ "Grupper der kan se arbejdsområdet og læse/oprette/redigere dets "
-#~ "dokumenter."
-
-#~ msgid ""
-#~ "ID of the parent record holding the alias (example: project holding the "
-#~ "task creation alias)"
-#~ msgstr ""
-#~ "ID for overordnet record indeholdende aliaset (eksempel: projekt, der "
-#~ "indeholder opgaveoprettelses aliaset)"
-
-#~ msgid ""
-#~ "If set, this content will automatically be sent out to unauthorized users "
-#~ "instead of the default message."
-#~ msgstr ""
-#~ "Hvis angivet vil dette indhold automatisk blive sendt ud til "
-#~ "uautoriserede brugere, i stedet for standard beskeden."
-
-#~ msgid "Images"
-#~ msgstr "Billeder"
-
-#~ msgid "Knowledge"
-#~ msgstr "Viden"
-
-#~ msgid ""
-#~ "Let's process documents in your Inbox.<br/><i>Tip: Use Tags to filter "
-#~ "documents and structure your process.</i>"
-#~ msgstr ""
-#~ "Lad os behandle dokumenter i din indbakke.<br/><i>Råd: Brug tags til at "
-#~ "filtrere dokumenter samt strukturere din behandling.</i>"
-
-#~ msgid "Let's process these bills: send to Finance workspace."
-#~ msgstr "Lad os behandle disse regninger: Send til Finans arbejdsområde."
-
-#~ msgid "Limit Read Groups to the documents of which they are owner."
-#~ msgstr "Begræns læse grupper til dokumenter hvor de er ejer."
-
-#~ msgid "Live"
-#~ msgstr "Live"
-
-#~ msgid "Log a note..."
-#~ msgstr "Log et notat..."
-
-#~ msgid "Mark As Draft"
-#~ msgstr "Markér som kladde"
-
-#~ msgid "Mark all as Done"
-#~ msgstr "Markér alle som fuldførte"
-
-#~ msgid "Miscellaneous"
-#~ msgstr "Diverse"
-
-#~ msgid "Move To Inbox"
-#~ msgstr "Flyt til indbakke"
-
-#~ msgid "Move to Workspace"
-#~ msgstr "Flyt til arbejdsområde"
-
-#~ msgid "Multiple values"
-#~ msgstr "Flere værdier"
-
-#~ msgid "My Favorites"
-#~ msgstr "Mine favoritter"
-
-#~ msgid "Name of the share link"
-#~ msgstr "Navn på linket til deling"
-
-#~ msgid "No limit"
-#~ msgstr "Ingen grænse"
-
-#~ msgid "Not a file"
-#~ msgstr "Ikke en fil"
-
-#~ msgid "Not attached"
-#~ msgstr "Ikke vedhæftet"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Antal meddelser der kræver handling"
-
-#~ msgid "One record limit"
-#~ msgstr "Et datasæt grænse"
-
-#~ msgid "Open chatter"
-#~ msgstr "Åben chatter"
-
-#~ msgid ""
-#~ "Optional ID of a thread (record) to which all incoming messages will be "
-#~ "attached, even if they did not reply to it. If set, this will disable the "
-#~ "creation of new records completely."
-#~ msgstr ""
-#~ "Valgfri ID for en tråd (record), som alle indgående meddelelser vil blive "
-#~ "vedhæftet, selvom de ikke svarede på det. Hvis opsat, vil dette "
-#~ "fuldstændigt deaktivere oprettelsen af nye poster."
-
-#~ msgid "Other"
-#~ msgstr "Andet"
-
-#~ msgid "Own Documents Only"
-#~ msgstr "Kun egne dokumenter"
-
-#~ msgid "PDF/Document"
-#~ msgstr "PDF/Dokument"
-
-#~ msgid "Parent Model"
-#~ msgstr "Overordnet model"
-
-#~ msgid "Parent Record Thread ID"
-#~ msgstr "Overordnet tråd (record) ID"
-
-#~ msgid "Parent Workspace"
-#~ msgstr "Ophavende arbejdsområde"
-
-#~ msgid ""
-#~ "Parent model holding the alias. The model holding the alias reference is "
-#~ "not necessarily the model given by alias_model_id (example: project "
-#~ "(parent_model) and task (model))"
-#~ msgstr ""
-#~ "Overordnet model der holder aliaset. Modellen med aliasreferencen er ikke "
-#~ "nødvendigvis den model, der er givet af alias_model_id (eksempel: projekt "
-#~ "(parent_model) og opgave (model))."
-
-#~ msgid ""
-#~ "Policy to post a message on the document using the mailgateway.\n"
-#~ "- everyone: everyone can post\n"
-#~ "- partners: only authenticated partners\n"
-#~ "- followers: only followers of the related document or members of "
-#~ "following channels\n"
-#~ msgstr ""
-#~ "Politik til at oprette en besked på dokumentet ved hjælp af "
-#~ "mailgatewayen.\n"
-#~ "- alle: alle kan skrive\n"
-#~ "- partnere: kun godkendte partnere\n"
-#~ "- følgere: kun følgere af det relaterede dokument eller medlemmer af "
-#~ "følgende kanaler\n"
-
-#~ msgid "Presentations"
-#~ msgstr "Præsentationer"
-
-#~ msgid "Project"
-#~ msgstr "Projekt"
-
-#~ msgid "Read Access"
-#~ msgstr "Læseadgang"
-
-#~ msgid "Read Groups"
-#~ msgstr "Læse grupper"
-
-#~ msgid "Record Thread ID"
-#~ msgstr "Optag tråd ID"
-
-#~ msgid "Related Workspace"
-#~ msgstr "Relateret Arbejdsområde"
-
-#~ msgid "Remove"
-#~ msgstr "Fjern"
-
-#~ msgid "Replace"
-#~ msgstr "Erstat"
-
-#~ msgid "Replace by"
-#~ msgstr "Erstat med"
-
-#~ msgid "Requested"
-#~ msgstr "Anmodet"
-
-#~ msgid "Requested Document"
-#~ msgstr "Anmodet dokument"
-
-#~ msgid "Required Tags"
-#~ msgstr "Påkrævede tags"
-
-#~ msgid "Sales"
-#~ msgstr "Salg"
-
-#~ msgid "Schedule Activity"
-#~ msgstr "Skemalæg aktivitet"
-
-#~ msgid ""
-#~ "Send this letter to the legal department, by assigning the right tags."
-#~ msgstr ""
-#~ "Send dette brev til en juridisk afdeling, ved at tildele de korrekte tags."
-
-#~ msgid "Send to Legal"
-#~ msgstr "Send til Juridisk"
-
-#~ msgid "Set Contact"
-#~ msgstr "Angiv kontakt"
-
-#~ msgid "Set Owner"
-#~ msgstr "Angiv ejer"
-
-#~ msgid "Set Tags"
-#~ msgstr "Angiv tags"
-
-#~ msgid "Set the activity on the document owner"
-#~ msgstr "Angiv aktiviteten på dokumentets ejer"
-
-#~ msgid "Share Links"
-#~ msgstr "Del links"
-
-#~ msgid "Share link"
-#~ msgstr "Del link"
-
-#~ msgid "Share links"
-#~ msgstr "Del links"
-
-#~ msgid "Share this domain"
-#~ msgstr "Del dette domæne"
-
-#~ msgid "Share this selection"
-#~ msgstr "Del dette valg"
-
-#~ msgid "Share type"
-#~ msgstr "Del type"
-
-#~ msgid "Share used to create this document"
-#~ msgstr "Deling brugt til at oprette dette dokument"
-
-#~ msgid "Shared Documents"
-#~ msgstr "Delte dokumenter"
-
-#~ msgid "Shared Tags"
-#~ msgstr "Delte tags"
-
-#~ msgid "Shares & Emails"
-#~ msgstr "Delinger & Emails"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Vis alle poster, hvor den næste aktivitetsdato er før i dag"
-
-#~ msgid "Size"
-#~ msgstr "Størrelse"
-
-#~ msgid "Status"
-#~ msgstr "Status"
-
-#~ msgid "Sub workspaces"
-#~ msgstr "Under arbejdsområder"
-
-#~ msgid "Tag Categories"
-#~ msgstr "Tag kategorier"
-
-#~ msgid "Tag Category"
-#~ msgstr "Tag kategori"
-
-#~ msgid "Tag already exists for this facet"
-#~ msgstr "Tag eksisterer allerede for dette facet"
-
-#~ msgid "Tag categories defined for this workspace"
-#~ msgstr "Tag kategorier defineret for dette arbejdsområde"
-
-#~ msgid "Templates"
-#~ msgstr "Skabeloner"
-
-#~ msgid "Text"
-#~ msgstr "Tekst"
-
-#~ msgid "Text shown when hovering on this tag category or its tags"
-#~ msgstr ""
-#~ "Tekst vist ved at holde musen over denne tag kategori eller dets tags"
-
-#~ msgid ""
-#~ "The model (Odoo Document Kind) to which this alias corresponds. Any "
-#~ "incoming email that does not reply to an existing record will cause the "
-#~ "creation of a new record of this model (e.g. a Project Task)"
-#~ msgstr ""
-#~ "Modellen (Odoo Document Kind), som dette alias svarer til. Enhver "
-#~ "indgående e-mail, der ikke svarer til en eksisterende post, vil medføre "
-#~ "oprettelse af en ny rekord af denne model (fx en projektopgave)"
-
-#~ msgid ""
-#~ "The owner of records created upon receiving emails on this alias. If this "
-#~ "field is not set the system will attempt to find the right owner based on "
-#~ "the sender (From) address, or will use the Administrator account if no "
-#~ "system user is found for that address."
-#~ msgstr ""
-#~ "Ejeren af poster oprettet ved modtagelse af e-mails på dette alias. Hvis "
-#~ "dette felt ikke er indstillet, forsøger systemet at finde den rigtige "
-#~ "ejer baseret på afsenderens (Fra) adresse eller bruger "
-#~ "administratorkontoen, hvis der ikke findes en systembruger for den "
-#~ "pågældende adresse."
-
-#~ msgid "This access token already exists"
-#~ msgstr "Denne adgangs token eksistere allerede"
-
-#~ msgid "This attachment will only be available for the selected user groups"
-#~ msgstr ""
-#~ "Denne vedhæftning vil kun være tilgængelig for valgte brugergrupper "
-
-#~ msgid "This workspace will only be available to the selected company"
-#~ msgstr ""
-#~ "Dette arbejdsområde vil kun være tilgængelig for den valgte virksomhed"
-
-#~ msgid "To Validate"
-#~ msgstr "Til Bekræftelse"
-
-#~ msgid "To validate"
-#~ msgstr "Til validering"
-
-#~ msgid "Un-archive"
-#~ msgstr "Af-arkivér"
-
-#~ msgid "Unnamed"
-#~ msgstr "Ikke navngivet"
-
-#~ msgid "Upload Document"
-#~ msgstr "Upload dokument"
-
-#~ msgid "Upload by Email"
-#~ msgstr "Upload via e-mail"
-
-#~ msgid "VAT"
-#~ msgstr "Moms"
-
-#~ msgid "Valid Until"
-#~ msgstr "Gyldig indtil"
-
-#~ msgid "Validate"
-#~ msgstr "Validér"
-
-#~ msgid "Validated"
-#~ msgstr "Valideret"
-
-#~ msgid "Videos"
-#~ msgstr "Videoer"
-
-#~ msgid "Workflow Actions"
-#~ msgstr "Workflow handlinger"
-
-#~ msgid "Workflow Rule"
-#~ msgstr "Workflow regel"
-
-#~ msgid "Workspace"
-#~ msgstr "Arbejdsområde"
-
-#~ msgid "Workspaces"
-#~ msgstr "Arbejdsområder"
-
-#~ msgid ""
-#~ "Wow... 6 documents processed in a few seconds, You're good.<br/>The tour "
-#~ "is complete. Try uploading your own documents now."
-#~ msgstr ""
-#~ "Wow... 6 dokumenter behandlet på et par sekunder; du er god! <br/"
-#~ ">Rundvisningen er færdig. Prøv at lægge dine egne dokumenter op nu."
-
-#~ msgid "Write Access"
-#~ msgstr "Skriveadgang"
-
-#~ msgid "Write Groups"
-#~ msgstr "Skrive grupper"
-
-#~ msgid "Write a tooltip for the action here"
-#~ msgstr "Skriv et tooltip for handlingen her"
-
-#~ msgid "Youtube Video"
-#~ msgstr "YouTube video"
-
-#~ msgid "delete"
-#~ msgstr "slet"
-
-#~ msgid "documents selected"
-#~ msgstr "dokumenter valgt"
-
-#~ msgid "download"
-#~ msgstr "hent"
-
-#~ msgid "e.g. Discuss proposal"
-#~ msgstr "f.eks. drøft forslag"
-
-#~ msgid "name"
-#~ msgstr "navn"
-
-#~ msgid "restore"
-#~ msgstr "genopret"
-
-#~ msgid "selected"
-#~ msgstr "valgte"
-
-#~ msgid "url"
-#~ msgstr "url"
+#~ "<i class=\"oi me-2\" data-icon=\"open_in_new\" title=\"Dette er en "
+#~ "genvejstaste\"/>"

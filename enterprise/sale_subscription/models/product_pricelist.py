@@ -1,34 +1,17 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
+from odoo import models
 from odoo.fields import Domain
 
 
 class ProductPricelist(models.Model):
     _inherit = "product.pricelist"
 
-    def _domain_item_ids(self):
-        # Subscription pricings shouldn't appear in the main tab
-        return Domain.AND([
-            super()._domain_item_ids(),
-            [('plan_id', '=', False)]
-        ])
+    def _compute_price_rule(self, products, quantity, *, plan_id=None, **kwargs):
+        plan_id = plan_id or self.env.context.get("plan_id")
+        return super()._compute_price_rule(products, quantity, plan_id=plan_id, **kwargs)
 
-    def _domain_subscription_item_ids(self):
-        return Domain.AND([
-            self._base_domain_item_ids(),
-            [('plan_id', '!=', False)]
-        ])
-
-    subscription_item_ids = fields.One2many(
-        'product.pricelist.item',
-        'pricelist_id',
-        string="Recurring Pricing",
-        domain=lambda self: self._domain_subscription_item_ids(),
-        copy=True,
-    )
-
-    def _get_applicable_rules(self, products, date, *, plan_id=None, **kwargs):
+    def _get_applicable_rules(self, products, quantity, date, *, plan_id=None, **kwargs):
         if not self:
             return self.env['product.pricelist.item']
 
@@ -39,12 +22,12 @@ class ProductPricelist(models.Model):
             # Prepend the recurring rules if a plan is given, as they are expected to take priority
             # over the standard rules.
             recurring_rules = self.env['product.pricelist.item'].with_context(active_test=False).search(
-                self._get_applicable_rules_domain(products=products, date=date, plan_id=plan_id, **kwargs),
+                self._get_applicable_rules_domain(products=products, date=date, plan_id=plan_id, quantity=quantity, **kwargs),
                 order=self.env['product.pricelist.item']._get_recurring_rules_order(),
             ).with_context(self.env.context)
 
         # Do not give plan_id to super call
-        return recurring_rules | super()._get_applicable_rules(products, date, **kwargs)
+        return recurring_rules | super()._get_applicable_rules(products, quantity, date, **kwargs)
 
     def _get_applicable_rules_domain(self, *args, plan_id=None, any_plan=False, **kwargs):
         # Filter out subscription-rules targeting other products

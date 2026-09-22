@@ -26,7 +26,8 @@
                     <div name="standard_options" class="col-3">
                         <div name="option_send_mail"
                             invisible="not enable_send_mail">
-                            <i class="fa fa-question-circle ml4"
+                            <i class="oi ml4"
+                                data-icon="help"
                                 role="img"
                                 aria-label="Warning"
                                 title="The email address is unknown on the partner"
@@ -67,7 +68,8 @@
                             <field name="mail_template_id"
                                    required="mode == 'multi'"
                                    options="{'no_create': True, 'no_edit': True}"
-                                   context="{'default_model': 'res.partner'}"/>
+                                   context="{'default_model': 'res.partner'}"
+                                   invisible="mode == 'single'"/>
                         </group>
                     </group>
                 </div>
@@ -80,10 +82,15 @@
                             type="object"
                             class="print btn-primary o_mail_send">
                     </button>
-                    <button string="Cancel"
-                            data-hotkey="x"
+                    <button data-hotkey="x"
                             special="cancel"
                             class="btn-secondary"/>
+                    <div class="d-flex align-items-center gap-2" invisible="mode == 'multi'">
+                        <label for="mail_template_id" string="Email Template"/>
+                        <field name="mail_template_id"
+                            options="{'no_create': True, 'no_edit': True}"
+                            context="{'default_model': 'res.partner'}"/>
+                    </div>
                 </footer>
             </form>
         </field>

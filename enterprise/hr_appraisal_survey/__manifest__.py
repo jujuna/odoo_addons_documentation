@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -19,17 +18,20 @@ This module adds an integration with Survey to ask feedbacks to any employee, ba
         'views/hr_appraisal_template_views.xml',
         'views/survey_user_input_views.xml',
         'views/survey_survey_views.xml',
+        'views/survey_templates.xml',
+        'views/survey_templates_print.xml',
         'views/survey_templates_statistics.xml',
-        'security/ir.model.access.csv',
-        'security/hr_appraisal_survey_security.xml',
         'data/hr_appraisal_survey_data.xml',
         'data/mail_template_data.xml',
         'data/mail_message_subtype_data.xml',
+        'security/ir.access.csv',
     ],
     "demo": [
         'data/hr_appraisal_survey_demo.xml',
     ],
-    'installable': True,
+    'other_files': [
+        'data/scenarios/scenario_appraisal_demo.xml',
+    ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'auto_install': True,

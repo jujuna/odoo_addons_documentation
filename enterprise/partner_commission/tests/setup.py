@@ -7,6 +7,8 @@ from odoo.addons.sale.tests.common import TestSaleCommon
 
 class TestCommissionsSetup(TestSaleCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def _setup_accounting(self):
         self.account_receivable = self.company_data['default_account_receivable']
         self.account_sale = self.company_data['default_account_revenue']
@@ -256,7 +258,7 @@ class TestCommissionsSetup(TestSaleCommon):
         self.referrer.grade_id = spec.grade.id
         self.referrer._onchange_grade_id()
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         # commission_plan_frozen is False by default

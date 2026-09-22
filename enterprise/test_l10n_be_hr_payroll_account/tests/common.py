@@ -1,20 +1,17 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import time
 from datetime import date
 
 import odoo.tests
+from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
 from odoo.addons.mail.tests.common import mail_new_test_user
-from odoo.tools import file_open
 
 
-class TestPayrollAccountCommon(odoo.tests.HttpCase):
+class TestPayrollAccountCommon(odoo.tests.HttpCase, TestBelgiumCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-
         # no user available for belgian company so to set hr responsible change company of demo
         demo = mail_new_test_user(
             cls.env,
@@ -23,8 +20,7 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             login='be_demo',
             name="Laurie Poiret",
         )
-        with file_open('hr_contract_salary/static/src/demo/employee_contract.pdf', "rb") as f:
-            cls.pdf_content = f.read()
+        cls.pdf_content = cls.file_read('hr_contract_salary/static/src/demo/employee_contract.pdf')
 
         attachment = cls.env['ir.attachment'].create({
             'type': 'binary',
@@ -39,11 +35,49 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             'template_id': cls.template.id,
         })
 
+        version_model = cls.env['ir.model']._get('hr.version')
+        type_employee_name, type_city, type_country_name, type_street, type_children = cls.env['sign.item.type'].create([
+            {
+                'name': 'Employee Name',
+                'placeholder': 'legal_name',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'employee_id.legal_name',
+             },
+            {
+                'name': 'Private City',
+                'placeholder': 'City',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'private_city',
+            },
+            {
+                'name': 'Country',
+                'placeholder': 'Country',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'private_country_id.name',
+            },
+            {
+                'name': 'Street',
+                'placeholder': 'Street',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'private_street',
+            }, {
+                'name': 'Children',
+                'placeholder': 'Children',
+                'item_type': 'text',
+                'model_id': version_model.id,
+                'auto_field': 'children',
+            }
+        ])
         cls.env['sign.item'].create([
             {
-                'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'employee_id.name',
+                'type_id': type_employee_name.id,
+                'name': 'Name',
                 'required': True,
+                'constant': True,
                 'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                 'page': 1,
                 'posX': 0.273,
@@ -63,9 +97,10 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
                 'width': 0.150,
                 'height': 0.015,
             }, {
-                'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'private_city',
+                'type_id': type_city.id,
+                'name': 'City',
                 'required': True,
+                'constant': True,
                 'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                 'page': 1,
                 'posX': 0.506,
@@ -74,9 +109,10 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
                 'width': 0.150,
                 'height': 0.015,
             }, {
-                'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'private_country_id.name',
+                'type_id': type_country_name.id,
+                'name': 'Country',
                 'required': True,
+                'constant': True,
                 'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                 'page': 1,
                 'posX': 0.663,
@@ -85,9 +121,10 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
                 'width': 0.150,
                 'height': 0.015,
             }, {
-                'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'private_street',
+                'type_id': type_street.id,
+                'name': 'Street',
                 'required': True,
+                'constant': True,
                 'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                 'page': 1,
                 'posX': 0.349,
@@ -129,8 +166,9 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
                 'width': 0.150,
                 'height': 0.015,
             }, {
-                'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'children',
+                'type_id': type_children.id,
+                'constant': True,
+                'name': 'Children',
                 'required': True,
                 'responsible_id': cls.env.ref('hr_sign.sign_item_role_employee_signatory').id,
                 'page': 2,
@@ -139,20 +177,34 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
                 'document_id': cls.document_id.id,
                 'width': 0.150,
                 'height': 0.015,
-            }
+             }
         ])
 
-        cls.extra_days_time_off_type = cls.env['hr.leave.type'].create({
+        cls.extra_days_time_off_type = cls.env['hr.work.entry.type'].create({
             'name': 'Extra Time Off',
+            'code': 'Extra Time Off',
             'requires_allocation': 'yes',
+            'country_id': cls.env.ref('base.be').id,
         })
 
         cls.company_id = cls.env['res.company'].create({
             'name': 'My Belgian Company - TEST',
             'country_id': cls.env.ref('base.be').id,
-            'hr_contract_timeoff_auto_allocation': True,
-            'hr_contract_timeoff_auto_allocation_type_id': cls.extra_days_time_off_type.id,
         })
+        cls.company_id.resource_calendar_id.reference_calendar_id = cls.company_id.resource_calendar_id
+        cls.company_id.current_payroll_config_id.write({
+            'l10n_be_employer_category_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010').id,
+            'hospital_insurance_amount_child': 7.2,
+            'hospital_insurance_amount_adult': 20.5,
+        })
+
+        cls.cp200 = cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200')
+
+        ir_default = cls.env['ir.default'].sudo()
+        ir_default.set('hr.version', 'meal_voucher_amount', 7.45, company_id=cls.company_id.id)
+        ir_default.set('hr.version', 'internet', 38.0, company_id=cls.company_id.id)
+        ir_default.set('hr.version', 'mobile', 30.0, company_id=cls.company_id.id)
+        ir_default.set('hr.version', 'fuel_card', 150.0, company_id=cls.company_id.id)
         partner_id = cls.env['res.partner'].create({
             'name': 'Laurie Poiret',
             'street': '58 rue des Wallons',
@@ -209,11 +261,10 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
 
         vehicle = cls.env['fleet.vehicle'].create({
             'model_id': cls.model_a3.id,
-            'license_plate': '1-JFC-095',
+            'license_plate': '1-JFC-094',
             'acquisition_date': time.strftime('%Y-01-01'),
             'co2': 88,
-            'driver_id': partner_id.id,
-            'plan_to_change_car': True,
+            'plan_to_change_vehicle': True,
             'car_value': 38000,
             'company_id': cls.company_id.id,
         })
@@ -222,7 +273,8 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             'recurring_cost_amount_depreciated': vehicle.model_id.default_recurring_cost_amount_depreciated,
             'purchaser_id': vehicle.driver_id.id,
             'company_id': vehicle.company_id.id,
-            'user_id': vehicle.manager_id.id if vehicle.manager_id else cls.env.user.id
+            'user_id': vehicle.manager_id.id if vehicle.manager_id else cls.env.user.id,
+            'start_date': date.today(),
         })
 
         if not cls.env.ref('fleet.fleet_vehicle_state_waiting_list', raise_if_not_found=False):
@@ -240,7 +292,6 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
         a_recv = cls.env['account.account'].create({
             'code': 'X1012',
             'name': 'Debtors - (test)',
-            'reconcile': True,
             'account_type': 'asset_receivable',
             'company_ids': cls.company_id.ids,
         })
@@ -248,7 +299,6 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             'code': 'X1111',
             'name': 'Creditors - (test)',
             'account_type': 'liability_payable',
-            'reconcile': True,
             'company_ids': cls.company_id.ids,
         })
         cls.env['ir.default'].set(
@@ -264,14 +314,10 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             company_id=cls.company_id.id,
         )
 
-        with file_open('sign/static/demo/signature.png', "rb") as f:
-            img_content = base64.b64encode(f.read())
-
         cls.env.ref('base.user_admin').write({
             'company_ids': [(4, cls.company_id.id)],
-            'company_id': cls.company_id.id,
             'name': 'Mitchell Admin',
-            'sign_signature': img_content,
+            'sign_signature': cls.file_read('sign/static/demo/signature.png'),
         })
         cls.env.ref('base.user_admin').partner_id.write({
             'email': 'mitchell.stephen@example.com',
@@ -283,7 +329,7 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             'state_id': cls.env.ref('base.state_us_39').id,
             'phone': '+1 555-555-5555',
             'tz': 'Europe/Brussels',
-            'company_id': cls.company_id.id,
+            'company_id': cls.env.company.id,
         })
         demo.write({
             'partner_id': partner_id,
@@ -293,49 +339,51 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
         cls.env.ref('base.main_partner').email = "info@yourcompany.example.com"
 
         cls.new_dev_contract = cls.env['hr.version'].with_company(cls.company_id).create({
+            'hospital_insurance_amount_per_child': 7.2,
+            'hospital_insurance_amount_per_adult': 20.5,
             'name': 'New Developer Template Contract',
             'wage': 3000,
             'structure_type_id': cls.env.ref('hr.structure_type_employee_cp200').id,
-            'ip_wage_rate': 25,
+            'ip_wage_rate': 0.25,
             'sign_template_id': cls.template.id,
             'contract_update_template_id': cls.template.id,
             'hr_responsible_id': cls.env.ref('base.user_admin').id,
             'company_id': cls.company_id.id,
-            'representation_fees': 150,
             'meal_voucher_amount': 7.45,
             'fuel_card': 0,
             'internet': 38,
             'mobile': 30,
-            'eco_checks': 250,
-            'has_laptop': True,
-            'car_id': False
+            'car_id': False,
+            'l10n_be_lsa_monthly_pro_other_amount': 150,
+            'l10n_be_joint_committee_id': cls.cp200.id,
+            'laptop': 100,
+            'rd_percentage': 0.75,
         })
 
         cls.senior_dev_contract = cls.env['hr.version'].with_company(cls.company_id).create({
+            'hospital_insurance_amount_per_child': 7.2,
+            'hospital_insurance_amount_per_adult': 20.5,
             'name': 'Senior Developer Template Contract',
             'wage': 6000,
             'structure_type_id': cls.env.ref('hr.structure_type_employee_cp200').id,
-            'ip': True,
-            'ip_wage_rate': 50,
+            'ip_wage_rate': 0.5,
             'sign_template_id': cls.template.id,
             'contract_update_template_id': cls.template.id,
             'hr_responsible_id': cls.env.ref('base.user_admin').id,
             'company_id': cls.company_id.id,
-            'representation_fees': 300,
             'meal_voucher_amount': 7.45,
             'fuel_card': 0,
             'internet': 38,
             'mobile': 30,
-            'eco_checks': 250,
-            'car_id': False
+            'car_id': False,
+            'l10n_be_lsa_monthly_pro_other_amount': 300,
+            'l10n_be_joint_committee_id': cls.cp200.id,
         })
 
         cls.resource_calendar = cls.env['resource.calendar'].create({
             'name': 'Test Calendar',
             'company_id': cls.company_id.id,
             'hours_per_day': 7.6,
-            'tz': "Europe/Brussels",
-            'two_weeks_calendar': False,
             'hours_per_week': 38,
             'full_time_required_hours': 38
         })
@@ -366,12 +414,10 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             'disabled_spouse_bool': False,
             'is_non_resident': False,
             'disabled_children_number': 0,
-            'other_dependent_people': False,
             'other_senior_dependent': 0,
-            'other_disabled_senior_dependent': 0,
+            'other_dependents': 0,
             'other_juniors_dependent': 0,
             'other_disabled_juniors_dependent': 0,
-            'fiscal_voluntarism': 0.0,
             'structure_type_id': cls.env.ref('hr.structure_type_employee_cp200').id,
             'date_version': date.today(),
             'contract_date_start': date.today(),
@@ -381,14 +427,13 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             'commission_on_target': 0.0,
             'fuel_card': 150.0,
             'internet': 38.0,
-            'representation_fees': 150.0,
             'mobile': 30.0,
-            'has_laptop': False,
             'meal_voucher_amount': 7.45,
-            'eco_checks': 250.0,
-            'ip': False,
-            'ip_wage_rate': 25.0,
+            'ip_wage_rate': 0,
             'has_bicycle': False,
+            'l10n_be_lsa_monthly_pro_other_amount': 150,
+            'l10n_be_joint_committee_id': cls.cp200.id,
         }
         default_values.update(values)
-        return cls.env['hr.employee'].create(default_values)
+        employee = cls.env['hr.employee'].create(default_values)
+        return employee

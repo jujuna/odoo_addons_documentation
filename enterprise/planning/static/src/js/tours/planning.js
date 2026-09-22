@@ -3,7 +3,6 @@ import { registry } from "@web/core/registry";
 import { markup } from "@odoo/owl";
 
 registry.category("web_tour.tours").add('planning_tour', {
-    url: '/odoo',
     steps: () => [
     {
         trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
@@ -23,7 +22,7 @@ registry.category("web_tour.tours").add('planning_tour', {
         tooltipPosition: "bottom",
         run: "click",
     }, {
-        trigger: ".o_field_widget[name='resource_id']",
+        trigger: ".o_field_widget[name='resource_ids']",
         content: markup(_t("Assign a <b>resource</b>, or leave it open for the moment. <i>Tip: Create open shifts for the roles you will be needing to complete a mission. Then, assign those open shifts to the resources that are available.</i>")),
         tooltipPosition: "right",
         run: "click",
@@ -45,7 +44,7 @@ registry.category("web_tour.tours").add('planning_tour', {
         run: "click",
     }, {
         isActive: ["mobile"],
-        trigger: 'span.o-dropdown-item:has(i.fa-tasks)',
+        trigger: 'span.o-dropdown-item:has(i[data-icon="clear_all"])',
         content: markup(_t("Let's check out the Gantt view for cool features. Get ready to <b>share your schedule</b> and easily plan your shifts with just one click by <em>copying the previous week's schedule</em>.")),
         tooltipPosition: 'bottom',
         run: "click",
@@ -91,7 +90,7 @@ registry.category("web_tour.tours").add('planning_tour', {
         tooltipPosition: "bottom",
         run: "click",
     }, {
-        trigger: ".o_gantt_renderer_controls button i.oi-arrow-right",
+        trigger: ".o_gantt_renderer_controls button i[data-icon='east']",
         content: markup(_t("Now that this week is ready, let's get started on <b>next week's schedule</b>.")),
         tooltipPosition: "bottom",
         run: "click",

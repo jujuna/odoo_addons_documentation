@@ -14,15 +14,27 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 18:44+0000\n"
-"PO-Revision-Date: 2025-10-08 18:44+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 02:22+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"hr_payroll_expense/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_payroll_expense
+#: model:ir.module.module,description:base.module_hr_payroll_expense
+msgid ""
+"\n"
+"Reimbursement of expenses in Payslips\n"
+"=====================================\n"
+"\n"
+"This application allows you to reimburse expenses in payslips.\n"
+msgstr ""
 
 #. module: hr_payroll_expense
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.view_account_payment_register_form_inherit_hr_payroll_expense
@@ -46,11 +58,23 @@ msgstr "<span class=\"o_stat_text\">Maosh varaqasi</span>"
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_account_move__display_name
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_account_payment_register__display_name
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_expense__display_name
-#: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_payroll_structure__display_name
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_payslip__display_name
+#: model:ir.model.fields,field_description:hr_payroll_expense.field_ir_actions_report__display_name
+#: model:ir.model.fields,field_description:hr_payroll_expense.field_product_template__display_name
 #, fuzzy
 msgid "Display Name"
 msgstr "Ko‘rsatiladigan nom"
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/ir_actions_report.py:0
+msgid "Employee"
+msgstr ""
+
+#. module: hr_payroll_expense
+#: model:ir.model.fields.selection,name:hr_payroll_expense.selection__hr_expense__payment_mode__payslip_account
+msgid "Employee (Through a Payslip)"
+msgstr ""
 
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_hr_expense
@@ -73,28 +97,6 @@ msgid "Expense (\"%(name)s\") will be added to the next payslip."
 msgstr "Xarajat (\"%(name)s\") keyingi maosh varaqasiga qo‘shiladi."
 
 #. module: hr_payroll_expense
-#. odoo-python
-#: code:addons/hr_payroll_expense/models/hr_expense.py:0
-#, fuzzy
-msgid ""
-"Expense reimbursement rule needs to be configured to add expenses to "
-"payslips.\n"
-"Please create one salary rule with the \"%(code)s\" code on the relevant "
-"salary structures."
-msgstr ""
-"Xarajatlarni maosh varaqalariga qo‘shish uchun xarajatlarni qoplash "
-"qoidasini sozlash kerak. Tegishli ish haqi tuzilmalarida \"%(code)s\" kodi "
-"bilan bitta maosh qoidasini yarating."
-
-#. module: hr_payroll_expense
-#. odoo-python
-#: code:addons/hr_payroll_expense/models/hr_payslip.py:0
-#, fuzzy
-msgid "Expense rules"
-msgstr "Xarajat qoidalari"
-
-#. module: hr_payroll_expense
-#: model:hr.payslip.input.type,name:hr_payroll_expense.expense_other_input
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_payslip__expense_ids
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.hr_payslip_view_form_inherit_expense
 #, fuzzy
@@ -114,24 +116,23 @@ msgid "Expenses Reimbursement"
 msgstr "Xarajatlarni qoplash"
 
 #. module: hr_payroll_expense
+#: model:ir.module.module,shortdesc:base.module_hr_payroll_expense
+msgid "Expenses in Payslips"
+msgstr ""
+
+#. module: hr_payroll_expense
 #: model:ir.model.fields,help:hr_payroll_expense.field_hr_payslip__expense_ids
 #, fuzzy
 msgid "Expenses to reimburse to employee."
 msgstr "Xodimga qoplanishi kerak bo‘lgan xarajatlar."
 
 #. module: hr_payroll_expense
-#. odoo-python
-#: code:addons/hr_payroll_expense/models/hr_expense.py:0
-#, fuzzy
-msgid "Go to salary rules"
-msgstr "Maosh qoidalariga o‘tish"
-
-#. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_account_move__id
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_account_payment_register__id
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_expense__id
-#: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_payroll_structure__id
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_payslip__id
+#: model:ir.model.fields,field_description:hr_payroll_expense.field_ir_actions_report__id
+#: model:ir.model.fields,field_description:hr_payroll_expense.field_product_template__id
 #, fuzzy
 msgid "ID"
 msgstr "ID"
@@ -150,14 +151,7 @@ msgstr "Buxgalteriya yozuvi"
 
 #. module: hr_payroll_expense
 #. odoo-python
-#: code:addons/hr_payroll_expense/models/hr_payslip.py:0
-#, fuzzy
-msgid "No debit account for EXPENSES rules"
-msgstr "XARAJATLAR qoidalari uchun debet hisobi yo‘q"
-
-#. module: hr_payroll_expense
-#. odoo-python
-#: code:addons/hr_payroll_expense/models/hr_payroll_structure.py:0
+#: code:addons/hr_payroll_expense/models/account_move.py:0
 #, fuzzy
 msgid ""
 "No debit account found in the '%(rule_name)s' payslip salary rule. Please "
@@ -170,21 +164,11 @@ msgstr ""
 
 #. module: hr_payroll_expense
 #. odoo-python
-#: code:addons/hr_payroll_expense/models/hr_payslip.py:0
-#, fuzzy
-msgid "No rule to handle expenses"
-msgstr "Xarajatlarni boshqarish qoidasi yo‘q"
-
-#. module: hr_payroll_expense
-#. odoo-python
 #: code:addons/hr_payroll_expense/models/hr_expense.py:0
-#, fuzzy
 msgid ""
-"Only approved and posted expenses that were paid by an employee can be "
-"reimbursed in a payslip."
+"Only approved and posted expenses with payslip reimbursement can be reported "
+"in the next payslip."
 msgstr ""
-"Faqat xodim tomonidan to‘langan, tasdiqlangan va e'lon qilingan "
-"xarajatlargina maosh varaqasida qoplanishi mumkin."
 
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_account_payment_register
@@ -199,12 +183,30 @@ msgid "Pay Slip"
 msgstr "Maosh varaqasi"
 
 #. module: hr_payroll_expense
+#: model_terms:ir.ui.view,arch_db:hr_payroll_expense.product_product_expense_form_view
+msgid "Payroll"
+msgstr ""
+
+#. module: hr_payroll_expense
 #. odoo-python
 #: code:addons/hr_payroll_expense/models/hr_expense.py:0
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_expense__payslip_id
 #, fuzzy
 msgid "Payslip"
 msgstr "Maosh varaqasi"
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_expense.py:0
+msgid ""
+"Please add a Salary Rule belonging to Expense Product \"%(name)s\" to report "
+"its expenses in the next payslip"
+msgstr ""
+
+#. module: hr_payroll_expense
+#: model:ir.model,name:hr_payroll_expense.model_product_template
+msgid "Product"
+msgstr ""
 
 #. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_expense__refund_in_payslip
@@ -220,34 +222,37 @@ msgid "Reimbursed Expenses"
 msgstr "Qoplangan xarajatlar"
 
 #. module: hr_payroll_expense
+#: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_expense__payment_mode
+msgid "Reimbursement"
+msgstr ""
+
+#. module: hr_payroll_expense
+#. odoo-javascript
+#: code:addons/hr_payroll_expense/static/src/views/list.xml:0
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.hr_expense_view_form_inherit_payroll
 #, fuzzy
 msgid "Remove from Payslip"
 msgstr "Maosh varaqasidan olib tashlash"
 
 #. module: hr_payroll_expense
-#: model:ir.actions.server,name:hr_payroll_expense.hr_expense_add_to_payslip_action_server
-#: model_terms:ir.ui.view,arch_db:hr_payroll_expense.hr_expense_view_form_inherit_payroll
-#, fuzzy
-msgid "Report in Next Payslip"
-msgstr "Keyingi maosh varaqasida hisobot berish"
+#: model:ir.model,name:hr_payroll_expense.model_ir_actions_report
+msgid "Report Action"
+msgstr ""
+
+#. module: hr_payroll_expense
+#: model:ir.model.fields,field_description:hr_payroll_expense.field_product_product__salary_rule_ids
+#: model:ir.model.fields,field_description:hr_payroll_expense.field_product_template__salary_rule_ids
+msgid "Salary Rules"
+msgstr ""
+
+#. module: hr_payroll_expense
+#: model:ir.module.module,summary:base.module_hr_payroll_expense
+msgid "Submit, validate and reinvoice employee expenses"
+msgstr ""
 
 #. module: hr_payroll_expense
 #. odoo-python
-#: code:addons/hr_payroll_expense/models/hr_payslip.py:0
-#, fuzzy
-msgid "Rules"
-msgstr "Qoidalar"
-
-#. module: hr_payroll_expense
-#: model:ir.model,name:hr_payroll_expense.model_hr_payroll_structure
-#, fuzzy
-msgid "Salary Structure"
-msgstr "Ish haqi tuzilmasi"
-
-#. module: hr_payroll_expense
-#. odoo-python
-#: code:addons/hr_payroll_expense/models/hr_payroll_structure.py:0
+#: code:addons/hr_payroll_expense/models/account_move.py:0
 #, fuzzy
 msgid ""
 "The '%(account_name)s' account for the salary rule '%(rule_name)s' must be "
@@ -258,10 +263,28 @@ msgstr ""
 
 #. module: hr_payroll_expense
 #. odoo-python
+#: code:addons/hr_payroll_expense/models/product_template.py:0
+msgid ""
+"The salary rules linked to a product must have a debit account of type "
+"'Liability Payable'.\n"
+"Please fix the following salary rule(s): %s"
+msgstr ""
+
+#. module: hr_payroll_expense
+#. odoo-python
 #: code:addons/hr_payroll_expense/models/hr_expense.py:0
 #, fuzzy
 msgid "There are no valid expenses selected."
 msgstr "Hech qanday yaroqli xarajat tanlanmagan."
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/product_template.py:0
+msgid ""
+"You cannot assign multiple salary rules to the same structure for this "
+"product.\n"
+"Please fix the following structure(s): %s"
+msgstr ""
 
 #. module: hr_payroll_expense
 #. odoo-python
@@ -299,3 +322,23 @@ msgstr ""
 #, fuzzy
 msgid "You don't have the access rights to post an invoice."
 msgstr "Hisob-fakturani joylashtirish uchun kirish huquqiga ega emassiz."
+
+#, fuzzy
+#~ msgid "Report in Next Payslip"
+#~ msgstr "Keyingi maosh varaqasida hisobot berish"
+
+#, fuzzy
+#~ msgid "Go to salary rules"
+#~ msgstr "Maosh qoidalariga o‘tish"
+
+#, fuzzy
+#~ msgid "Salary Structure"
+#~ msgstr "Ish haqi tuzilmasi"
+
+#, fuzzy
+#~ msgid "Expense rules"
+#~ msgstr "Xarajat qoidalari"
+
+#, fuzzy
+#~ msgid "Rules"
+#~ msgstr "Qoidalar"

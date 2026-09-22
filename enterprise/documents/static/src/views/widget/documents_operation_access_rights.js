@@ -12,6 +12,7 @@ export const DocumentsWithAccessX2ManyField = {
         { name: "access_internal", type: "char" },
         { name: "access_via_link", type: "char" },
         { name: "is_access_via_link_hidden", type: "boolean" },
+        { name: "user_folder_id", type: "char" },
     ],
 };
 

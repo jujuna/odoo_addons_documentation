@@ -1,10 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from . import product_product
-from . import res_partner
-from . import sale_order
-from . import shopee_account
-from . import shopee_item
-from . import shopee_shop
-from . import stock_move
-from . import stock_picking
+from . import (
+    product_product,
+    res_partner,
+    sale_order,
+    shopee_account,
+    shopee_item,
+    shopee_shop,
+    stock_move,
+    stock_picking,
+)

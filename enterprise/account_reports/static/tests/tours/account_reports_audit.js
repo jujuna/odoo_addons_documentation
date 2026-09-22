@@ -1,8 +1,6 @@
-import { Asserts } from "./asserts";
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("account_reports_audit", {
-    url: "/odoo/action-account_reports.action_view_account_audit",
     steps: () => [
         {
             trigger: "button.o-kanban-button-new",
@@ -25,13 +23,18 @@ registry.category("web_tour.tours").add("account_reports_audit", {
             run: "click",
         },
         {
-            trigger: "a[data-tooltip='Back to \"Audit\"']",
+            trigger: "a[data-tooltip='Back to \"Working Files\"']",
             content: "Back to the Audit Kanban",
             run: "click",
         },
         {
-            trigger: ".o_kanban_record:nth-child(1) a[name='action_open_audit_balances']",
-            content: "Open the Balances Part of the Audit",
+            trigger: ".o_account_return_audit_kanban_view .o_kanban_record:nth-child(1)",
+            content: "Open the working file",
+            run: "click",
+        },
+        {
+            trigger: ".o_embedded_actions button:contains('Balances')",
+            content: "Switch to the 'Balances' tab",
             run: "click",
         },
         {
@@ -56,15 +59,12 @@ registry.category("web_tour.tours").add("account_reports_audit", {
         },
         {
             content: "Annotation is posted",
-            trigger: ".o-mail-Message:last-child .o-mail-Message-textContent",
-            run: async () => {
-                const message = document.querySelector(
-                    ".o-mail-Message:last-child .o-mail-Message-textContent"
-                ).innerText;
-                Asserts.isEqual(message, "Annotation from the audit");
-                const annotation = document.querySelector(".o_account_reports_annotation");
-                Asserts.isEqual(annotation.innerText.split("Annotated for").length, 2);
-            },
+            trigger:
+                ".o-mail-Message:last-child .o-mail-Message-textContent:text(Annotation from the audit)",
+        },
+        {
+            trigger:
+                ".o_account_reports_annotation:contains(/^Annotated for [0-9]{2}/[0-9]{2}/[0-9]{4}$/)",
         },
         {
             content: "Close Chatter",

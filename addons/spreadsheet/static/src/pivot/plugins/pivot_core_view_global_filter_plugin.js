@@ -1,6 +1,6 @@
 import { Domain } from "@web/core/domain";
 import { NO_RECORD_AT_THIS_POSITION } from "../pivot_model";
-import { OdooCoreViewPlugin } from "@spreadsheet/plugins";
+import { OdooEvaluationPlugin } from "@spreadsheet/plugins";
 
 /**
  * @typedef {import("@spreadsheet").FieldMatching} FieldMatching
@@ -62,13 +62,14 @@ function pivotPeriodToFilterValue(timeRange, value) {
     }
 }
 
-export class PivotCoreViewGlobalFilterPlugin extends OdooCoreViewPlugin {
+export class PivotCoreViewGlobalFilterPlugin extends OdooEvaluationPlugin {
     static getters = /** @type {const} */ ([
         "getPivotComputedDomain",
         "getFiltersMatchingPivotArgs",
     ]);
     constructor(config) {
         super(config);
+        this._pendingAddDomains = false;
     }
 
     beforeHandle(cmd) {
@@ -91,7 +92,7 @@ export class PivotCoreViewGlobalFilterPlugin extends OdooCoreViewPlugin {
             case "EDIT_GLOBAL_FILTER":
             case "REMOVE_GLOBAL_FILTER":
             case "SET_GLOBAL_FILTER_VALUE":
-                this._addDomains();
+                this._pendingAddDomains = true;
                 break;
             case "UPDATE_PIVOT":
             case "UPDATE_ODOO_PIVOT_DOMAIN":
@@ -117,6 +118,13 @@ export class PivotCoreViewGlobalFilterPlugin extends OdooCoreViewPlugin {
                 }
                 break;
             }
+        }
+    }
+
+    finalize() {
+        if (this._pendingAddDomains) {
+            this._addDomains();
+            this._pendingAddDomains = false;
         }
     }
 
@@ -190,9 +198,8 @@ export class PivotCoreViewGlobalFilterPlugin extends OdooCoreViewPlugin {
                         }
                         // A group by value of "none"
                         if (value === false) {
-                            break;
-                        }
-                        if (JSON.stringify(currentValue?.ids) !== `[${value}]`) {
+                            transformedValue = { operator: "not set" };
+                        } else if (JSON.stringify(currentValue?.ids) !== `[${value}]`) {
                             transformedValue = { operator: "in", ids: [value] };
                         }
                         break;

@@ -1,11 +1,11 @@
+import { proxy } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { SearchModel } from "@web/search/search_model";
-import { useState } from "@odoo/owl";
 
 export class MrpDisplaySearchModel extends SearchModel {
     setup(services, args) {
         super.setup(services);
-        this.state = useState({
+        this.state = proxy({
             workorderFilters: [
                 {
                     name: "ready",

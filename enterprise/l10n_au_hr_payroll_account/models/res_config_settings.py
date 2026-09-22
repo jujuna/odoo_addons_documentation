@@ -16,7 +16,8 @@ class ResConfigSettings(models.TransientModel):
         compute="_compute_super_payable_account",
         inverse="_set_super_payable_account",
         readonly=False,
-        groups="hr_payroll.group_hr_payroll_manager"
+        groups="hr_payroll.group_hr_payroll_manager",
+        help="Counterpart account of superannuation payment entries."
     )
     l10n_au_previous_bms_id = fields.Char(related="company_id.l10n_au_previous_bms_id", readonly=False)
     l10n_au_bms_id = fields.Char(related='company_id.l10n_au_bms_id', readonly=False)

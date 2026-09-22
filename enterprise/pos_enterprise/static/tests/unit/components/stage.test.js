@@ -17,14 +17,14 @@ test("orderCount and preparation_display.archiveAllVisibleOrders", async () => {
     const comp = await mountWithCleanup(Stages, { props: { stages } });
     expect(comp.orderCount(stages[0].id)).toBe(1);
     expect(comp.orderCount(stages[1].id)).toBe(0);
-    const states = store.data.models["pos.prep.state"].getAll();
-    await store.changeStateStage(states);
+    const prepLines = store.data.models["pos.prep.line"].getAll();
+    await store.changeStateStage(prepLines);
     await store.data.initData();
     expect(comp.orderCount(stages[0].id)).toBe(0);
     expect(comp.orderCount(stages[1].id)).toBe(1);
 
     const prepDisplayComp = await mountWithCleanup(PrepDisplay, {});
-    await store.changeStateStage(states);
+    await store.changeStateStage(prepLines);
     await prepDisplayComp.archiveAllVisibleOrders();
     expect(comp.orderCount(stages[2].id)).toBe(0);
 });

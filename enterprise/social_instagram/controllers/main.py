@@ -1,24 +1,24 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import json
+import logging
 import requests
-import werkzeug
+
 from werkzeug.exceptions import Forbidden
 
 from odoo import _, http
-from odoo.addons.auth_oauth.controllers.main import fragment_to_query_string
-from odoo.addons.social.controllers.main import SocialController
 from odoo.addons.social.controllers.main import SocialValidationException
+from odoo.addons.social_facebook.controllers.meta import SocialMetaController
 from odoo.http import request
+from odoo.tools import BinaryBytes
 from odoo.tools.urls import urljoin as url_join
 
+_logger = logging.getLogger(__name__)
 
-class SocialInstagramController(SocialController):
+
+class SocialInstagramController(SocialMetaController):
 
     @http.route('/social_instagram/callback', type='http', auth='user')
-    @fragment_to_query_string
     def social_instagram_callback(self, access_token=None, extended_access_token=None, **kw):
         if not request.env.user.has_group('social.group_social_manager'):
             return request.render('social.social_http_error_view',
@@ -30,7 +30,7 @@ class SocialInstagramController(SocialController):
                                   {'error_message': _('Instagram did not provide a valid access token.')})
 
         media = request.env.ref('social_instagram.social_media_instagram')
-        if media.csrf_token != request_csrf:
+        if media._get_csrf_token() != request_csrf:
             return request.render('social.social_http_error_view',
                                   {'error_message': _('There was a authentication issue during your request.')})
 
@@ -39,7 +39,7 @@ class SocialInstagramController(SocialController):
         except SocialValidationException as e:
             return request.render('social.social_http_error_view', {'error_message': e.get_message(), 'documentation_data': e.get_documentation_data()})
 
-        return request.redirect('/odoo/action-social.action_social_stream_post')
+        return request.render('social.social_http_authentication_done')
 
     # ========================================================
     # COMMENTS / LIKES
@@ -52,9 +52,9 @@ class SocialInstagramController(SocialController):
 
         stream_post = self._get_social_stream_post(stream_post_id, 'instagram')
         if comment_id:
-            result = stream_post._instagram_comment_add(message, comment_id, comment_type='reply')
+            result = stream_post._instagram_comment_add(stream_post.account_id, message, comment_id, comment_type='reply')
         else:
-            result = stream_post._instagram_comment_add(message, stream_post.instagram_post_id)
+            result = stream_post._instagram_comment_add(stream_post.account_id, message, stream_post.instagram_post_id)
 
         return json.dumps(result)
 
@@ -67,6 +67,23 @@ class SocialInstagramController(SocialController):
     def social_instagram_get_comments(self, stream_post_id, next_records_token=False, comments_count=20):
         stream_post = self._get_social_stream_post(stream_post_id, 'instagram')
         return stream_post._instagram_comment_fetch(next_records_token, count=comments_count)
+
+    # ========================================================
+    # WEBHOOK
+    # ========================================================
+
+    @http.route('/social_instagram/webhook', type='http', auth='public', methods=['GET', 'POST'], csrf=False, readonly=False)
+    def social_instagram_webhook(self, **kwargs):
+        if request.httprequest.method == 'GET':
+            webhook_verify_token = self.env['ir.config_parameter'].sudo().get_str(
+                'social.instagram_webhook_verify_token')
+            return self._meta_verify_webhook(kwargs, webhook_verify_token)
+
+        webhook_client_secret = None
+        if self.env['ir.config_parameter'].sudo().get_bool('social.instagram_use_own_account'):
+            webhook_client_secret = self.env['ir.config_parameter'].sudo().get_str('social.instagram_client_secret')
+
+        return self._meta_process_webhook("instagram_account_id", "instagram_access_token", webhook_client_secret)
 
     # ========================================================
     # MISC / UTILITY
@@ -84,7 +101,7 @@ class SocialInstagramController(SocialController):
         social_post._check_post_access()
 
         return request.env['ir.binary']._get_image_stream_from(
-            social_post.instagram_image_ids.filtered(lambda image: image.id == image_id),
+            social_post.instagram_image_ids.filtered(lambda image: image.id == image_id).attachment_id,
             default_mimetype='image/jpeg',
         ).get_response()
 
@@ -143,7 +160,7 @@ class SocialInstagramController(SocialController):
             if account_values['instagram_account_id'] in existing_accounts:
                 has_existing_accounts = True
                 account_values.update({'is_media_disconnected': False})
-                existing_accounts[account_values['instagram_account_id']].write(account_values)
+                existing_accounts[account_values['instagram_account_id']].sudo().write(account_values)
             else:
                 account_values.update({
                     'media_id': media.id,
@@ -152,19 +169,19 @@ class SocialInstagramController(SocialController):
                 accounts_to_create.append(account_values)
 
         if accounts_to_create:
-            request.env['social.account'].create(accounts_to_create)
+            self.env['social.account'].sudo().create(accounts_to_create)
         elif not has_existing_accounts:
             message = _('You need to link your Instagram page to your Facebook account to post with Odoo Social.\n Please create one and make sure it is linked to your account.')
             documentation_link = 'https://help.instagram.com/176235449218188'
             documentation_link_label = _('Read More about Instagram Accounts')
-            documentation_link_icon_class = 'fa fa-instagram'
+            documentation_link_icon_class = 'oi_instagram'
             raise SocialValidationException(message, documentation_link, documentation_link_label, documentation_link_icon_class)
 
     def _instagram_get_extended_access_token(self, access_token, media):
         """ Same mechanism as social_facebook/controllers/main.py#_get_extended_access_token """
 
-        instagram_app_id = request.env['ir.config_parameter'].sudo().get_param('social.instagram_app_id')
-        instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param('social.instagram_client_secret')
+        instagram_app_id = request.env['ir.config_parameter'].sudo().get_str('social.instagram_app_id')
+        instagram_client_secret = request.env['ir.config_parameter'].sudo().get_str('social.instagram_client_secret')
         extended_token_url = url_join(request.env['social.media']._INSTAGRAM_ENDPOINT, "/oauth/access_token")
         extended_token_request = requests.post(extended_token_url,
             params={
@@ -182,4 +199,4 @@ class SocialInstagramController(SocialController):
             request.env['social.media']._INSTAGRAM_ENDPOINT,
             '/v17.0/%s/picture?height=300' % account_id,
         )
-        return base64.b64encode(requests.get(profile_image_url, timeout=10).content)
+        return BinaryBytes(requests.get(profile_image_url, timeout=10).content)  # FIXME check response status

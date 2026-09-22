@@ -1,5 +1,6 @@
 from . import test_iso20022_common
 from . import test_iso20022_charge_bearer
+from . import test_iso20022_force_sepa_for_eur
 from . import test_iso_reconciliation
 from . import test_sepa_credit_transfer
 from . import test_sepa_credit_transfer_pain_updated

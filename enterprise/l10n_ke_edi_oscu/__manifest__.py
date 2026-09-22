@@ -2,15 +2,12 @@
 
 {
     'name': "Kenya eTIMS EDI Integration",
-    'summary': """
-            Kenya eTIMS Device EDI Integration
-        """,
+    'summary': "Kenya eTIMS Device EDI Integration",
     'description': """
        This module integrates with the Kenyan OSCU eTIMS device.
     """,
-    'author': 'Odoo',
+    'author': 'Odoo S.A.',
     'category': 'Accounting/Localizations/EDI',
-    'version': '1.0',
     'license': 'OEEL-1',
     'depends': ['l10n_ke', 'product_unspsc'],
     'data': [
@@ -29,8 +26,8 @@
         'views/l10n_ke_edi_oscu_code_views.xml',
         'views/l10n_ke_edi_oscu_notice_views.xml',
         'views/menuitems.xml',
-        'security/ir.model.access.csv',
         'wizard/account_move_reversal_view.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/demo_company.xml',

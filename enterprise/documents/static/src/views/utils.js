@@ -1,9 +1,13 @@
-/** @typedef {typeof import("@web/model/relational_model/record").Record} RelationalModelRecord */
+/** @typedef {import("@web/model/relational_model/record").Record} RelationalRecord */
 
 /**
  * From multiple documents.document records, return the actions available on all of them.
- * @param {RelationalModelRecord[]} documents
- * @return {{id: Number, name: String}[]}
+ *
+ * @param {RelationalRecord[]} documents
+ * @return {{
+ *  id: number;
+ *  name: string;
+ * }[]}
  */
 export function getCommonEmbeddedActions(documents) {
     if (!documents?.length) {

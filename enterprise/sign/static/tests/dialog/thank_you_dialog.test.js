@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
 import { user } from "@web/core/user";
 import {
-    makeDialogMockEnv,
+    assignDialogTestEnv,
     mockService,
     mountWithCleanup,
     patchWithCleanup,
@@ -12,10 +12,9 @@ import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { ThankYouDialog } from "@sign/dialogs/dialogs";
 import { fakeSignInfoService } from "./dialog_utils";
 
-const createEnv = async (mockRPC) => await makeDialogMockEnv();
-
-const mountThankYouDialog = async (additionalProps = {}) =>
-    mountWithCleanup(ThankYouDialog, {
+async function mountThankYouDialog(additionalProps = {}) {
+    assignDialogTestEnv();
+    await mountWithCleanup(ThankYouDialog, {
         props: {
             message: "bla",
             subtitle: "aha",
@@ -23,6 +22,7 @@ const mountThankYouDialog = async (additionalProps = {}) =>
             ...additionalProps,
         },
     });
+}
 
 const signInfo = {
     documentId: 23,
@@ -48,7 +48,6 @@ beforeEach(() => {
 });
 
 test("Thank you dialog is correctly rendered", async () => {
-    await createEnv();
     await mountThankYouDialog();
 
     expect(".modal-title").toHaveText("It's signed!");
@@ -58,7 +57,6 @@ test("Thank you dialog is correctly rendered", async () => {
 
 test("suggest signup is shown", async () => {
     patchWithCleanup(user, { userId: false });
-    await createEnv();
     await mountThankYouDialog();
 
     expect("a:contains('Odoo Sign')").toHaveCount(1, { message: "Should render sign up link" });
@@ -66,7 +64,6 @@ test("suggest signup is shown", async () => {
 
 test("download button is shown when document is completed", async () => {
     onRpc("/sign/sign_request_state/23/abc", () => "signed");
-    await createEnv();
     await mountThankYouDialog();
 
     expect("button:contains('Download')").toHaveCount(1, {
@@ -76,7 +73,6 @@ test("download button is shown when document is completed", async () => {
 
 test("redirect button works", async () => {
     onRpc("/sign/sign_request_state/23/abc", () => "signed");
-    await createEnv();
     await mountThankYouDialog({
         redirectURL: "https://shorturl.at/jnxMP",
         redirectURLText: "Redirect Button",

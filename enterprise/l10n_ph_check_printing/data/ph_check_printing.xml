@@ -23,7 +23,6 @@
             <field name="model">account.payment</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">l10n_ph_check_printing.print_check</field>
-            <field name="report_file">l10n_ph_check_printing.print_check</field>
             <field name="print_report_name">'PH Check - %s' % (object.partner_id.name or '',)</field>
             <field name="paperformat_id" ref="l10n_ph_check_printing.paperformat_check_ph"/>
             <field name="attachment">'check_'+(object.partner_id.name or '')+'_'+(object.name)+'.pdf'</field>

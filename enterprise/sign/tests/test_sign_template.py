@@ -1,10 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 import base64
+
 from datetime import timedelta
 
-from odoo import fields
-from odoo.exceptions import ValidationError, UserError
+from odoo import Command, fields
+from odoo.exceptions import AccessError, ValidationError, UserError
 from odoo.tools import file_open, mute_logger
 from odoo.tests import tagged, freeze_time
 from odoo.tests.common import TransactionCase, new_test_user
@@ -16,11 +16,11 @@ class TestSignTemplate(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         with file_open('sign/static/demo/sample_contract.pdf', "rb") as f:
-            cls.pdf_data = base64.b64encode(f.read())
+            cls.pdf_data = f.read()
         with file_open('mail/tests/discuss/files/test_AES.pdf', "rb") as f:
-            cls.AES_pdf_data = base64.b64encode(f.read())
+            cls.AES_pdf_data = f.read()
         with file_open('mail/tests/discuss/files/test_unicode.pdf', "rb") as f:
-            cls.unicode_pdf_data = base64.b64encode(f.read())
+            cls.unicode_pdf_data = f.read()
 
         cls.test_user = new_test_user(cls.env,
                                       "test_user_1",
@@ -32,7 +32,7 @@ class TestSignTemplate(TransactionCase):
     def test_create_update_copy_unlink_template(self):
         # create
         res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
-            attachment_data_list=[{'name': 'sample_contract.pdf', 'datas': self.pdf_data}])
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}])
         sign_template_id, name = res.get('id', 0), res.get('name', '')
         sign_template = self.env['sign.template'].with_user(self.test_user).browse(sign_template_id)
         document_id = sign_template.document_ids[0].id
@@ -94,7 +94,7 @@ class TestSignTemplate(TransactionCase):
     def test_update_from_pdfviewer_bad_internet(self):
         # create
         res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
-            attachment_data_list=[{'name': 'sample_contract.pdf', 'datas': self.pdf_data}])
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}])
         sign_template_id = res.get('id', 0)
         sign_template = self.env['sign.template'].with_user(self.test_user).browse(sign_template_id)
         document_id = sign_template.document_ids[0].id
@@ -210,7 +210,7 @@ class TestSignTemplate(TransactionCase):
     def test_sign_item_has_proper_type(self):
         """Tests that a sign item can only be set as read-only if it has certain types."""
         res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
-            attachment_data_list=[{'name': 'sample_contract.pdf', 'datas': self.pdf_data}])
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}])
         sign_template_id = res.get('id', 0)
         sign_template = self.env['sign.template'].with_user(self.test_user).browse(sign_template_id)
         document_id = sign_template.document_ids[0].id
@@ -265,7 +265,7 @@ class TestSignTemplate(TransactionCase):
 
         })
         res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
-            attachment_data_list=[{'name': 'sample_contract.pdf', 'datas': self.pdf_data}])
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}])
         sign_template_id = res.get('id', 0)
         sign_template = self.env['sign.template'].with_user(self.test_user).browse(sign_template_id)
         document_id = sign_template.document_ids[0].id
@@ -290,14 +290,14 @@ class TestSignTemplate(TransactionCase):
         with self.assertRaises(UserError):
             sign_template.model_id = type_cron.id
 
-    @mute_logger('odoo.addons.sign.utils.pdf_handling')
+    @mute_logger('odoo.addons.sign.utils.pdf_handling', 'pypdf._reader')
     def test_invalid_pdf_upload(self):
         """ Make sure that uploading invalid/encrypted PDF upload should raise the error. """
         for fname, data in [('test_AES.pdf', self.AES_pdf_data), ('test_unicode.pdf', self.unicode_pdf_data)]:
             with self.subTest(fname=fname):
                 with self.assertRaises(ValidationError):
                     self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
-                        attachment_data_list=[{'name': fname, 'datas': data}]
+                        attachment_data_list=[{'name': fname, 'raw': data}]
                     )
 
     @mute_logger('odoo.addons.sign.utils.pdf_handling', 'pypdf._reader')
@@ -305,7 +305,7 @@ class TestSignTemplate(TransactionCase):
         """ Make sure that adding invalid/encrypted PDF in Document should raise the error. """
         # create a valid template first
         res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
-            attachment_data_list=[{'name': 'sample_contract.pdf', 'datas': self.pdf_data}]
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}]
         )
         template_id = self.env['sign.template'].with_user(self.test_user).browse(res.get('id', 0))
         self.assertEqual(len(template_id.document_ids), 1)
@@ -313,13 +313,13 @@ class TestSignTemplate(TransactionCase):
         for fname, data in [('test_AES.pdf', self.AES_pdf_data), ('test_unicode.pdf', self.unicode_pdf_data)]:
             with self.subTest(fname=fname):
                 with self.assertRaises(ValidationError):
-                    template_id.update_from_attachment_data(attachment_data_list=[{'name': fname, 'datas': data}])
+                    template_id.update_from_attachment_data(attachment_data_list=[{'name': fname, 'raw': data}])
 
     def test_update_document_preserves_sign_items(self):
         """ Ensure that updating a document in a sign template creates a new template and preserves sign items. """
         # Create a template with one document and one sign item
         res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
-            attachment_data_list=[{'name': 'sample_contract.pdf', 'datas': self.pdf_data}]
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}]
         )
         template_id = res.get('id', 0)
         template = self.env['sign.template'].with_user(self.test_user).browse(template_id)
@@ -337,7 +337,7 @@ class TestSignTemplate(TransactionCase):
         self.assertEqual(len(template.sign_item_ids), 1, 'Template should have 1 sign item before replacement')
 
         # Prepare new document data, call update_document, get the new template and perform the checks.
-        new_attachment_data = {'name': 'new_contract.pdf', 'datas': self.pdf_data}
+        new_attachment_data = {'name': 'new_contract.pdf', 'raw': self.pdf_data}
         action = template.update_document(document.id, new_attachment_data)
         new_template_id = action['params']['id']
         new_template = self.env['sign.template'].browse(new_template_id)
@@ -345,22 +345,21 @@ class TestSignTemplate(TransactionCase):
         self.assertEqual(len(new_template.sign_item_ids), 1, 'Sign items should be preserved in the new template')
 
     def _get_signer_and_item_gc_context(self, sign_template):
-        all_signer_ids = self.env['sign.item'].search([]).mapped('responsible_id.id')
-        active_signer_ids = self.env['sign.item'].search([
-            ('page', '>', -1)
-        ]).mapped('responsible_id.id')
+        template_item_ids = self.env['sign.item'].search([('template_id', '=', sign_template.id)])
+        all_signer_ids = template_item_ids.mapped('responsible_id.id')
+        active_signer_ids = template_item_ids.filtered(lambda item: item.page > -1).mapped('responsible_id.id')
         template_active_signer_ids = sign_template.sign_item_ids.mapped('responsible_id.id')
         signers_without_item_ids = self.env['sign.item.role'].search([
             ('id', 'in', all_signer_ids),
             ('id', 'not in', active_signer_ids)
         ]).ids
-        non_active_item_ids = self.env['sign.item'].search([('page', '<', 0)]).ids
+        non_active_item_ids = template_item_ids.filtered(lambda item: item.page < 0).ids
 
         return all_signer_ids, template_active_signer_ids, signers_without_item_ids, non_active_item_ids
 
     def test_gc_removes_orphan_roles_and_dummy_items(self):
         sign_template_id = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
-            attachment_data_list=[{'name': 'sample_contract.pdf', 'datas': self.pdf_data}])['id']
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}])['id']
         sign_template = self.env['sign.template'].with_user(self.test_user).browse(sign_template_id)
         document_id = sign_template.document_ids[0].id
 
@@ -434,3 +433,275 @@ class TestSignTemplate(TransactionCase):
                              "The loaded sign items in the template should only be the active items.")
             self.assertEqual(len(non_active_item_ids), 0,
                              "The number of non-active sign items should equal to 0 after autovacuum.")
+
+    def test_template_responsible_user_write_access(self):
+        """Only the responsible user (test_user) or an admin (admin_user) can change template responsible (not other_user)."""
+
+        other_user = new_test_user(
+            self.env,
+            "test_user_2",
+            email="test_user_2@nowhere.com",
+            password="test_user_2",
+            tz="UTC",
+            groups='sign.group_sign_user',
+        )
+
+        admin_user = new_test_user(
+            self.env,
+            "test_admin",
+            email="test_admin@nowhere.com",
+            password="test_admin",
+            tz="UTC",
+            groups='sign.group_sign_manager',
+        )
+
+        res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}]
+        )
+        template = self.env['sign.template'].browse(res.get('id'))
+
+        self.assertEqual(template.user_id, self.test_user)
+
+        with self.assertRaises(AccessError):
+            template.with_user(other_user).write({'user_id': other_user.id})
+
+        template.with_user(self.test_user).write({'user_id': other_user.id})
+        self.assertEqual(template.user_id, other_user)
+
+        template.with_user(admin_user).write({'user_id': self.test_user.id})
+        self.assertEqual(template.user_id, self.test_user)
+
+    def test_template_sign_tour(self):
+        """
+            Check that users who do not have the Sign admin group can access
+            the template returned by `trigger_template_tour`, as access errors
+            related to sign items happened during the copy of the original template.
+        """
+        original_template = self.env.ref('sign.template_sign_tour')
+        original_template.sign_request_ids.unlink()
+        original_template.document_ids.sign_item_ids.unlink()
+
+        # check user with limited Sign rights can access the sample template
+        self.env['sign.template'].with_user(self.test_user).trigger_template_tour()
+
+        role = self.env['sign.item.role'].create({'name': 'test'})
+
+        document_id = original_template.document_ids[0].id
+        original_template.update_from_pdfviewer(sign_items={'-1': {
+            'type_id': self.env.ref('sign.sign_item_type_text').id,
+            'name': 'employee_id.name',
+            'required': True,
+            'responsible_id': role.id,
+            'page': 1,
+            'posX': 0.273,
+            'posY': 0.158,
+            'document_id': document_id,
+            'width': 0.150,
+            'height': 0.015,
+            'transaction_id': -1,
+        }})
+        self.assertTrue(original_template.sign_item_ids)
+
+        self.env['sign.request'].create({
+            'template_id': original_template.id,
+            'reference': 'Test Sign Request',
+            'request_item_ids': [Command.create({
+                'partner_id': self.env.user.partner_id.id,
+                'role_id': role.id,
+            })],
+        })
+
+        self.assertTrue(original_template.has_sign_requests)
+
+        # check user with limited Sign rights can access the sample template after items
+        # have been added to it and a sign request has been created.
+        res = self.env['sign.template'].with_user(self.test_user).trigger_template_tour()
+        template_id = res['params']['id']
+        template = self.env['sign.template'].browse(template_id)
+        # check existing sign items have not been copied to avoid access errors
+        self.assertFalse(template.sign_item_ids)
+
+    def test_copy_template_gives_own_roles(self):
+        """
+        When duplicating a template, its sign items should get their own copy of any non-default role,
+        so that editing a role on one template doesn't leak to the other.
+        """
+
+        sign_template_id = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}])['id']
+        sign_template = self.env['sign.template'].with_user(self.test_user).browse(sign_template_id)
+        sign_template.with_user(self.test_user).update_from_attachment_data(
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}])
+        document_id = sign_template.document_ids[0].id
+        document_id_2 = sign_template.document_ids[1].id
+        custom_role_id = sign_template.create_item_and_role(document_id, 'Signer')
+        custom_role_id_2 = sign_template.create_item_and_role(document_id, 'Signer 2')
+        default_role = self.env.ref('sign.sign_item_role_default')
+        sign_template.update_from_pdfviewer(sign_items={'-1': {
+            'type_id': self.env.ref('sign.sign_item_type_text').id,
+            'name': 'employee_id.name',
+            'required': True,
+            'responsible_id': custom_role_id,
+            'page': 1,
+            'posX': 0.273,
+            'posY': 0.158,
+            'document_id': document_id,
+            'width': 0.150,
+            'height': 0.015,
+            'transaction_id': -1,
+        },
+        '-2': {
+            'type_id': self.env.ref('sign.sign_item_type_text').id,
+            'name': 'employee_id.name',
+            'required': True,
+            'responsible_id': default_role.id,
+            'page': 1,
+            'posX': 0.273,
+            'posY': 0.258,
+            'document_id': document_id,
+            'width': 0.150,
+            'height': 0.015,
+            'transaction_id': -2,
+        },
+        '-3': {
+            'type_id': self.env.ref('sign.sign_item_type_text').id,
+            'name': 'employee_id.name',
+            'required': True,
+            'responsible_id': custom_role_id_2,
+            'page': 1,
+            'posX': 0.273,
+            'posY': 0.158,
+            'document_id': document_id_2,
+            'width': 0.150,
+            'height': 0.015,
+            'transaction_id': -1,
+        },
+        '-4': {
+            'type_id': self.env.ref('sign.sign_item_type_text').id,
+            'name': 'employee_id.name',
+            'required': True,
+            'responsible_id': custom_role_id,
+            'page': 1,
+            'posX': 0.273,
+            'posY': 0.158,
+            'document_id': document_id_2,
+            'width': 0.150,
+            'height': 0.015,
+            'transaction_id': -1,
+        },
+        '-5': {
+            'type_id': self.env.ref('sign.sign_item_type_text').id,
+            'name': 'employee_id.name',
+            'required': True,
+            'responsible_id': custom_role_id_2,
+            'page': 1,
+            'posX': 0.273,
+            'posY': 0.158,
+            'document_id': document_id,
+            'width': 0.150,
+            'height': 0.015,
+            'transaction_id': -1,
+        }})
+
+        sign_template_copy = sign_template.copy()
+        copy_custom_item = sign_template_copy.sign_item_ids.filtered(lambda i: not i.responsible_id.default)
+        copy_default_item = sign_template_copy.sign_item_ids.filtered(lambda i: i.responsible_id.default)
+
+        self.assertNotEqual(copy_custom_item.responsible_id, self.env['sign.item.role'].browse(custom_role_id),
+                            'The duplicated template should own a new copy of the non-default role')
+        copied_roles = copy_custom_item.responsible_id
+        self.assertNotIn(custom_role_id, copied_roles.ids,
+                 'The duplicated template should own a new copy of the non-default role')
+        self.assertNotIn(custom_role_id_2, copied_roles.ids,
+                 'The duplicated template should own a new copy of the non-default role')
+        self.assertEqual(copy_default_item.responsible_id, default_role, 'The default role should be shared, not copied')
+
+        # editing the role on the copy must not leak to the original template
+        partner = self.env['res.partner'].create({'name': 'Test Partner'})
+        copied_roles.assign_to = partner
+        roles_original = sign_template.sign_item_ids.filtered(lambda i: not i.responsible_id.default).responsible_id
+        self.assertFalse(roles_original.assign_to,
+                        "Editing the copied role should not affect the original template's role")
+        self.assertEqual(len(copied_roles), len(roles_original),
+                         'A role shared across documents should be copied once, not once per document')
+
+    def test_get_selection_ids_from_value_order(self):
+        """
+        Test that get_selection_ids_from_value returns IDs in the correct order and creates missing ones.
+        """
+        SignItemOption = self.env["sign.item.option"]
+        options = ["Beta", "Alpha", "Gamma"]
+        ids = SignItemOption.get_selection_ids_from_value(options)
+        recs = SignItemOption.browse(ids)
+
+        self.assertEqual(len(recs), 3)
+        self.assertEqual(recs[0].value, "Beta")
+        self.assertEqual(recs[1].value, "Alpha")
+        self.assertEqual(recs[2].value, "Gamma")
+
+        more_options = ["Delta", "Alpha", "Beta"]
+        ids2 = SignItemOption.get_selection_ids_from_value(more_options)
+        recs2 = SignItemOption.browse(ids2)
+        self.assertEqual(len(recs2), 3)
+        self.assertEqual(recs2[0].value, "Delta")
+        self.assertEqual(recs2[1].value, "Alpha")
+        self.assertEqual(recs2[2].value, "Beta")
+
+    def test_authorized_users_propagation(self):
+        """ Test that updating authorized_ids on sign.template propagates to custom sign.item.type (shared or not). """
+        # Create test users and template.
+        user1 = new_test_user(self.env, "auth_user_1", email="auth1@test.com", password="test_user_1", tz="UTC", groups='sign.group_sign_user')
+        user2 = new_test_user(self.env, "auth_user_2", email="auth2@test.com", password="test_user_2", tz="UTC", groups='sign.group_sign_user')
+        user3 = new_test_user(self.env, "auth_user_3", email="auth3@test.com", password="test_user_3", tz="UTC", groups='sign.group_sign_user')
+        res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(attachment_data_list=[{'name': 'test.pdf', 'raw': self.pdf_data}])
+        sign_template = self.env['sign.template'].browse(res.get('id'))
+        document = sign_template.document_ids[0]
+
+        # Create sign item types: custom and not shared, custom and shared (both should update), not custom (should not).
+        custom_type = self.env['sign.item.type'].create({'name': 'Custom', 'item_type': 'text', 'custom': True, 'shared': False})
+        custom_shared_type = self.env['sign.item.type'].create({'name': 'Custom Shared', 'item_type': 'text', 'custom': True, 'shared': True})
+        non_custom_type = self.env['sign.item.type'].create({'name': 'Standard', 'item_type': 'text', 'custom': False, 'shared': False})
+
+        # Create sign items for each type. Clear default authorized_ids (template creation adds test_user by default).
+        default_role = self.env.ref('sign.sign_item_role_default')
+        for idx, type_id in enumerate([custom_type, custom_shared_type, non_custom_type], 1):
+            self.env['sign.item'].create({
+                'template_id': sign_template.id, 'document_id': document.id, 'type_id': type_id.id,
+                'name': f'Field {idx}', 'required': True, 'responsible_id': default_role.id,
+                'page': 1, 'posX': 0.1 * idx, 'posY': 0.1 * idx, 'width': 0.150, 'height': 0.015,
+            })
+        sign_template.write({'authorized_ids': [(5, 0, 0)]})
+
+        # Initially includes template's default authorized user for custom types (shared or not).
+        self.assertEqual(set(custom_type.authorized_users.ids), {self.test_user.id}, "Custom type should include the template creator by default.")
+        self.assertEqual(set(custom_shared_type.authorized_users.ids), {self.test_user.id}, "Custom shared type should include the template creator by default.")
+        self.assertFalse(non_custom_type.authorized_users, "Non-custom type should have no authorized users initially.")
+
+        # Add user1 and user2 to template, should propagate to custom types.
+        sign_template.write({'authorized_ids': [(4, user1.id), (4, user2.id)]})
+        self.assertEqual(set(custom_type.authorized_users.ids), {self.test_user.id, user1.id, user2.id}, "Custom type should have previous and new authorized users after propagation.")
+        self.assertEqual(set(custom_shared_type.authorized_users.ids), {self.test_user.id, user1.id, user2.id}, "Custom shared type should also receive authorized users.")
+        self.assertFalse(non_custom_type.authorized_users, "Non-custom type should not receive authorized users (custom=False).")
+
+        # Add user3 to template,  should add to existing users.
+        sign_template.write({'authorized_ids': [(4, user3.id)]})
+        self.assertEqual(set(custom_type.authorized_users.ids), {self.test_user.id, user1.id, user2.id, user3.id}, "Custom type should accumulate authorized users.")
+        self.assertEqual(set(custom_shared_type.authorized_users.ids), {self.test_user.id, user1.id, user2.id, user3.id}, "Custom shared type should accumulate authorized users as well.")
+        self.assertFalse(non_custom_type.authorized_users, "Non-custom type should still have no authorized users.")
+
+    def test_update_document_base64_data(self):
+        """ Test update_document works successfully with base64 encoded string data. """
+        res = self.env['sign.template'].with_user(self.test_user).create_from_attachment_data(
+            attachment_data_list=[{'name': 'sample_contract.pdf', 'raw': self.pdf_data}]
+        )
+        template = self.env['sign.template'].with_user(self.test_user).browse(res.get('id', 0))
+        document = template.document_ids[0]
+
+        # Use base64 encoded string.
+        base64_pdf = base64.b64encode(self.pdf_data).decode('utf-8')
+        new_attachment_data = {'name': 'base64_contract.pdf', 'raw': base64_pdf}
+
+        action = template.update_document(document.id, new_attachment_data)
+        new_template = self.env['sign.template'].browse(action['params']['id'])
+        self.assertTrue(any(doc.name == 'base64_contract.pdf' for doc in new_template.document_ids))
+        self.assertEqual(len(new_template.document_ids), 1)

@@ -8,23 +8,36 @@
 # Martin Trigaux, 2022
 # lhmflexerp <lhm@flexerp.dk>, 2022
 # Mads Søndergaard, 2022
-# "Kira Petersen François (peti)" <peti@odoo.com>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-11-16 17:51+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:55+0000\n"
+"PO-Revision-Date: 2026-09-18 02:29+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
 "mrp_maintenance/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: mrp_maintenance
+#: model:ir.module.module,description:base.module_mrp_maintenance
+msgid ""
+"\n"
+"Maintenance in MRP\n"
+"==================\n"
+"* Preventive vs corrective maintenance\n"
+"* Define different stages for your maintenance requests\n"
+"* Plan maintenance requests (also recurring preventive)\n"
+"* Equipment related to workcenters\n"
+"* MTBF, MTTR, ...\n"
+msgstr ""
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_production_view_form_inherit_maintenance
@@ -52,6 +65,11 @@ msgid "Activity Exception Decoration"
 msgstr "Markering af undtagelsesaktivitet"
 
 #. module: mrp_maintenance
+#: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
+
+#. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_state
 msgid "Activity State"
 msgstr "Aktivitetsstatus"
@@ -64,7 +82,7 @@ msgstr "Aktivitetstypeikon"
 #. module: mrp_maintenance
 #: model_terms:ir.actions.act_window,help:mrp_maintenance.mrp_workcenter_request_action_from_workcenter
 msgid "Add a new maintenance request"
-msgstr "Tilføj en ny vedligeholdelses forespørgsel"
+msgstr "Tilføj en ny vedligeholdelsesanmodning"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__recurring_leaves_count
@@ -79,7 +97,7 @@ msgstr "Antal vedhæftninger"
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__block_workcenter
 msgid "Block Workcenter"
-msgstr "Blokér arbejdscenter"
+msgstr "Blokér arbejdsplads"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_maintenance_request__recurring_leaves_count
@@ -95,7 +113,7 @@ msgstr "Virksomhed"
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__estimated_next_failure
 msgid "Computed as Latest Failure Date + MTBF"
-msgstr "Udregnet som Seneste fejlet dato + MTBF"
+msgstr "Beregnes som datoen for den seneste fejl + MTBF"
 
 #. module: mrp_maintenance
 #: model_terms:ir.actions.act_window,help:mrp_maintenance.maintenance_workcenter_action
@@ -105,17 +123,12 @@ msgstr "Opret et nyt arbejdscenter"
 #. module: mrp_maintenance
 #: model:maintenance.equipment,name:mrp_maintenance.equipment_furniture1
 msgid "Crosscut Saw: 8 ppi."
-msgstr "Krydsskær sav: 8 ppi."
+msgstr "Fukssav: 8 ppi."
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__maintenance_open_count
 msgid "Current Maintenance"
 msgstr "Nuværende vedligeholdelse"
-
-#. module: mrp_maintenance
-#: model_terms:ir.ui.view,arch_db:mrp_maintenance.maintenance_request_view_form_inherit_mrp
-msgid "Discard"
-msgstr "Kassér"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_equipment__display_name
@@ -125,7 +138,7 @@ msgstr "Kassér"
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__display_name
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workorder__display_name
 msgid "Display Name"
-msgstr "Vis navn"
+msgstr "Visningsnavn"
 
 #. module: mrp_maintenance
 #: model:maintenance.equipment,name:mrp_maintenance.equipment_furniture3
@@ -135,7 +148,7 @@ msgstr "Boremaskine"
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__effective_date
 msgid "Effective Date"
-msgstr "Effektiv dato"
+msgstr "Ikrafttrædelsesdato"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__equipment_id
@@ -168,13 +181,13 @@ msgstr "Forventet MTBF"
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__expected_mtbf
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
 msgid "Expected Mean Time Between Failure"
-msgstr "Forventet Gennemsnits tid mellem fejl"
+msgstr "Forventet gennemsnitlig tid mellem fejl"
 
 #. module: mrp_maintenance
 #: model_terms:ir.actions.act_window,help:mrp_maintenance.mrp_workcenter_request_action_from_workcenter
 msgid ""
 "Follow the process of the request and communicate with the collaborator."
-msgstr "Følg anmodningens forløb, og kommuniker med samarbejdspartneren."
+msgstr "Følg anmodningens forløb, og kommunikér med samarbejdspartneren."
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__message_follower_ids
@@ -185,11 +198,6 @@ msgstr "Følgere"
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Følgere (partnere)"
-
-#. module: mrp_maintenance
-#: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "FontAwesome-ikon, f.eks. fa-opgaver"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__maintenance_for
@@ -260,7 +268,7 @@ msgstr "Seneste fejl"
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__latest_failure_date
 msgid "Latest Failure Date"
-msgstr "Seneste fejl dato"
+msgstr "Dato for seneste fejl"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__leave_ids
@@ -290,9 +298,14 @@ msgid "Maintenance"
 msgstr "Vedligeholdelse"
 
 #. module: mrp_maintenance
+#: model:ir.module.module,shortdesc:base.module_mrp_maintenance
+msgid "Maintenance - MRP"
+msgstr ""
+
+#. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__maintenance_count
 msgid "Maintenance Count"
-msgstr "Antal Vedligeholdelse"
+msgstr "Antal vedligeholdelser"
 
 #. module: mrp_maintenance
 #: model:ir.model,name:mrp_maintenance.model_maintenance_equipment
@@ -308,20 +321,21 @@ msgstr "Anmodning om vedligeholdelse"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/mrp_production.py:0
 #: model:ir.actions.act_window,name:mrp_maintenance.mrp_workcenter_request_action_from_workcenter
+#: model_terms:ir.ui.view,arch_db:mrp_maintenance.maintenance_request_view_gantt_workcenter
 msgid "Maintenance Requests"
 msgstr "Vedligeholdelsesanmodning"
 
 #. module: mrp_maintenance
 #: model:ir.model,name:mrp_maintenance.model_maintenance_stage
 msgid "Maintenance Stage"
-msgstr "Vedligeholdelse stadie"
+msgstr "Vedligeholdelsefase"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__maintenance_team_id
 msgid "Maintenance Team"
-msgstr "Vedligeholdelses hold"
+msgstr "Vedligeholdelsesteam"
 
 #. module: mrp_maintenance
 #: model:ir.model,name:mrp_maintenance.model_mrp_production
@@ -331,7 +345,7 @@ msgstr "Produktionsordre"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "Manufacturing Orders are already scheduled for this time slot."
 msgstr "Der er allerede planlagt produktionsordrer i dette tidsrum."
 
@@ -348,23 +362,28 @@ msgstr ""
 "bruges til beregning, planlægning, kapacitetsstyring m.m."
 
 #. module: mrp_maintenance
+#: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
 msgid "Mean Time Between Failure"
-msgstr "Gennemsnits tid mellem fejl"
+msgstr "Gennemsnitlig tid mellem fejl"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__mtbf
 msgid ""
 "Mean Time Between Failure, computed based on done corrective maintenances."
 msgstr ""
-"Gennemsnits tid mellem fejl, udregnet baseret på udførte korrigerende "
+"Gennemsnitlig tid mellem fejl, beregnet ud fra udførte korrigerende "
 "vedligeholdelser."
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__mttr
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
 msgid "Mean Time To Repair"
-msgstr "Gennemsnits tid til at reparere"
+msgstr "Gennemsnitlig reparationstid"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__message_has_error
@@ -383,7 +402,8 @@ msgstr "Deadline på mine aktiviteter"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/mrp_production.py:0
+#: code:addons/mrp_maintenance/models/mrp_workorder.py:0
 msgid "New Maintenance Request"
 msgstr "Ny vedligeholdelsesanmodning"
 
@@ -409,7 +429,7 @@ msgstr "Næste aktivitetstype"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "No available slot within 700 days after the planned start."
 msgstr ""
 
@@ -436,17 +456,23 @@ msgstr "Antal meddelelser, der kræver handling"
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr "Antal beskeder, der indeholder leveringsfejl"
+msgstr "Antal beskeder med leveringsfejl"
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.maintenance_request_view_search_inherit_mrp
 msgid "Operation"
-msgstr "Handling"
+msgstr "Arbejdsoperation"
+
+#. module: mrp_maintenance
+#: model:ir.actions.act_window,name:mrp_maintenance.maintenance_request_action_view_gantt_workcenter
+#: model:ir.ui.menu,name:mrp_maintenance.maintenance_request_menu_planning_by_workcenter
+msgid "Planning by Workcenter"
+msgstr ""
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_maintenance_request__production_company_id
 msgid "Production Company"
-msgstr "Produktions Virksomhed"
+msgstr "Produktionsvirksomhed"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__rating_ids
@@ -471,12 +497,6 @@ msgid "Request Maintenance"
 msgstr "Vedligeholdelsesanmodning"
 
 #. module: mrp_maintenance
-#. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
-msgid "Request planned for %s"
-msgstr "Anmodning planlagt for %s"
-
-#. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_user_id
 msgid "Responsible User"
 msgstr "Ansvarlig bruger"
@@ -484,7 +504,7 @@ msgstr "Ansvarlig bruger"
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr "SMS leveringsfejl"
+msgstr "Fejl ved SMS-levering"
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.maintenance_request_view_form_inherit_mrp
@@ -492,9 +512,19 @@ msgid "Save"
 msgstr "Gem"
 
 #. module: mrp_maintenance
+#: model:ir.module.module,summary:base.module_mrp_maintenance
+msgid "Schedule and manage maintenance on machine and tools."
+msgstr ""
+
+#. module: mrp_maintenance
 #: model:maintenance.equipment,name:mrp_maintenance.equipment_furniture2
 msgid "Scrub Plane"
 msgstr "Rens overflade"
+
+#. module: mrp_maintenance
+#: model_terms:ir.actions.act_window,help:mrp_maintenance.maintenance_request_action_view_gantt_workcenter
+msgid "Start by adding a new workcenter to use workcenter planning"
+msgstr ""
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_state
@@ -505,9 +535,9 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "Status baseret på aktiviteter\n"
-"Forfaldne: Forfaldsdato er allerede overskredet\n"
-"I dag: Aktivitetsdato er i dag\n"
-"Planlagt: Fremtidige aktiviteter."
+"Forfaldne: Aktivitetens forfaldsdato er overskredet\n"
+"I dag: Aktiviteten er planlagt til i dag\n"
+"Planlagt: Kommende aktiviteter."
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__technician_user_id
@@ -515,14 +545,8 @@ msgid "Technician"
 msgstr "Tekniker"
 
 #. module: mrp_maintenance
-#. odoo-javascript
-#: code:addons/mrp_maintenance/static/src/components/maintenance_request_form_view.js:0
-msgid "The maintenance request has successfully been created."
-msgstr "Vedligeholdelsesanmodningen er blevet oprettet."
-
-#. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid ""
 "The schedule has changed from %(desired_date)s to %(effective_date)s due to "
 "planned manufacturing orders."
@@ -532,7 +556,7 @@ msgstr ""
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "The workcenter is missing for %s."
 msgstr "Arbejdscentret mangler for %s."
 
@@ -544,17 +568,7 @@ msgstr "Denne dato bruges til at beregne den gennemsnitlige tid mellem fejl."
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "Type af undtagelsesaktivitet registreret"
-
-#. module: mrp_maintenance
-#: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__website_message_ids
-msgid "Website Messages"
-msgstr "Beskeder fra hjemmesiden"
-
-#. module: mrp_maintenance
-#: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__website_message_ids
-msgid "Website communication history"
-msgstr "Hjemmesidens kommunikationshistorik"
+msgstr "Type registreret undtagelsesaktivitet."
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_maintenance_stage__create_leaves
@@ -596,7 +610,7 @@ msgstr "Produktionsordre"
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.maintenance_request_view_search_inherit_mrp
 msgid "Workcenter"
-msgstr "Workcenter"
+msgstr "Arbejdscenter"
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
@@ -605,9 +619,12 @@ msgstr "dage"
 
 #. module: mrp_maintenance
 #. odoo-python
-#: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
+#: code:addons/mrp_maintenance/models/maintenance.py:0
 msgid "work centers"
 msgstr "arbejdscentre"
 
-#~ msgid "Production Order"
-#~ msgstr "Produktionsordre"
+msgid "Website Messages"
+msgstr "Beskeder fra hjemmesiden"
+
+msgid "Website communication history"
+msgstr "Hjemmesidens kommunikationshistorik"

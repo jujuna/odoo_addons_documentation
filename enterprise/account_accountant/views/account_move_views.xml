@@ -12,6 +12,7 @@
             <xpath expr="//list" position="inside">
                <header>
                     <button name="action_reconcile" type="object" string="Reconcile" groups="account.group_account_user" data-hotkey="r"/>
+                    <button name="action_split_lines" type="object" string="Split" groups="account.group_account_user"/>
                 </header>
                 <field name="is_account_reconcile" column_invisible="True"/>
                 <field name="has_deferred_moves" column_invisible="True"/>
@@ -50,7 +51,11 @@
                 <field name="inalterable_hash" groups="base.group_no_one"/>
             </xpath>
             <xpath expr="//page[@id='invoice_tab']//list/field[@name='analytic_distribution']" position="after">
-                <field name="deferred_start_date" string="Deferred Date" widget="daterange" options="{'end_date_field': 'deferred_end_date', 'always_range': True}" optional="hide" decoration-warning="has_abnormal_deferred_dates"/>
+                <!-- the deferred dates are shown under account not in a separate column due to widget m2o_cell_with_extra_fields -->
+                <field name="has_deferred_moves" column_invisible="1"/>
+                <field name="has_abnormal_deferred_dates" column_invisible="1"/>
+                <field name="is_deferred_account" column_invisible="1"/>
+                <field name="deferred_start_date" string="Deferred Date" optional="hide" required="is_deferred_account"/>
                 <field name="deferred_end_date" required="deferred_start_date" column_invisible="1"/>
             </xpath>
             <xpath expr="//page[@id='aml_tab']//list/field[@name='analytic_distribution']" position="after">
@@ -60,7 +65,7 @@
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_open_bank_reconciliation_widget_statement"
                         class="oe_stat_button"
-                        icon="fa-bars"
+                        icon="menu"
                         type="object"
                         invisible="not statement_id or state == 'cancel'">
                         <div class="o_stat_info">
@@ -69,7 +74,7 @@
                 </button>
                 <button name="action_open_bank_reconciliation_widget"
                         class="oe_stat_button"
-                        icon="fa-bars"
+                        icon="menu"
                         type="object"
                         invisible="move_type != 'entry' or not id or not statement_line_id or state == 'cancel'">
                         <div class="o_stat_info">
@@ -81,28 +86,28 @@
                 <field name="deferred_entry_type" invisible="1"/>
                 <button name="open_deferred_entries"
                         class="oe_stat_button"
-                        icon="fa-bars"
+                        icon="menu"
                         type="object"
                         invisible="not deferred_move_ids"
                         string="Deferral Entries">
                 </button>
                 <button name="open_deferred_original_entry"
                         class="oe_stat_button"
-                        icon="fa-bars"
+                        icon="menu"
                         type="object"
                         invisible="deferred_entry_type != 'expense' or not deferred_original_move_ids"
                         string="Related Purchase(s)">
                 </button>
                 <button name="open_deferred_original_entry"
                         class="oe_stat_button"
-                        icon="fa-bars"
+                        icon="menu"
                         type="object"
                         invisible="deferred_entry_type != 'revenue' or not deferred_original_move_ids"
                         string="Related Sale(s)">
                 </button>
                 <button name="open_deferred_original_entry"
                         class="oe_stat_button"
-                        icon="fa-bars"
+                        icon="menu"
                         type="object"
                         invisible="deferred_entry_type != 'misc' or not deferred_original_move_ids"
                         string="Related Entries">
@@ -144,7 +149,7 @@
                         </group>
                         <group name="right_group">
                             <field name="date" readonly="True"/>
-                            <field name="tax_ids" widget="many2many_tags" invisible="reconciled_lines_excluding_exchange_diff_ids or tax_line_id" context="{'append_fields': ['type_tax_use']}"/>
+                            <field name="tax_ids" widget="many2many_tags" invisible="reconciled_lines_excluding_exchange_diff_ids or tax_line_id" context="{'append_fields': ['type_tax_use'], 'active_test': True}"/>
                             <field name="analytic_distribution" groups="analytic.group_analytic_accounting" widget="analytic_distribution"
                                    options="{'account_field': 'account_id', 'business_domain': 'general'}"
                             />
@@ -188,10 +193,10 @@
             <xpath expr="//field[@name='date_maturity']" position="attributes">
                 <attribute name="column_invisible">1</attribute>
             </xpath>
-            <xpath expr="//field[@name='amount_residual']" position="attributes">
+            <xpath expr="//field[@name='residual_at_date']" position="attributes">
                 <attribute name="column_invisible">1</attribute>
             </xpath>
-            <xpath expr="//field[@name='amount_residual_currency']" position="attributes">
+            <xpath expr="//field[@name='residual_currency_at_date']" position="attributes">
                 <attribute name="column_invisible">1</attribute>
             </xpath>
         </field>

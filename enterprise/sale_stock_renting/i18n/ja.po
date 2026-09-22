@@ -8,17 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2026-01-23 18:03+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 23:04+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "sale_stock_renting/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -41,22 +41,27 @@ msgstr "%(product)s （%(qty)s 項目）"
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.rental_order_wizard_view_form
 msgid ""
-"<i class=\"fa fa-warning\"/>\n"
+"<i class=\"oi\" data-icon=\"warning\"/>\n"
 "                        <span>\n"
-"                            Some products don't have the requested qty "
-"available for pickup\n"
+"                            Some products don't have the requested quantity "
+"available for pickup.\n"
 "                        </span>"
 msgstr ""
-"<i class=\"fa fa-warning\"/>\n"
+"<i class=\"oi\" data-icon=\"warning\"/>\n"
 "                        <span>\n"
-"                            プロダクトによっては、ご希望の数量が集荷できない"
-"場合があります。\n"
+"                            一部のプロダクトは、ご希望の数量を店頭で受け取る"
+"ことができません。\n"
 "                        </span>"
 
 #. module: sale_stock_renting
+#: model:ir.model,name:sale_stock_renting.model_res_groups
+msgid "Access Groups"
+msgstr ""
+
+#. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "Activate to use stock deliveries and receipts for rental orders"
-msgstr "レンタルオーダに在庫配送と荷受を利用可能にする。"
+msgid "Activate to use stock deliveries and receipts for rental orders."
+msgstr "レンタルオーダ用に在庫出荷と荷受の使用を有効にします。"
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.stock_lot_kanban_allocation
@@ -69,22 +74,9 @@ msgid "Add a line"
 msgstr "明細追加"
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,help:sale_stock_renting.field_res_company__padding_time
-msgid ""
-"Amount of time (in hours) during which a product is considered unavailable "
-"prior to renting (preparation time)."
+#: model:ir.module.module,summary:base.module_sale_stock_renting
+msgid "Allows use of stock application to manage rentals inventory"
 msgstr ""
-"レンタル前にプロダクトが利用できない（準備期間）とみなされる時間（時間単"
-"位）。"
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,help:sale_stock_renting.field_res_config_settings__padding_time
-msgid ""
-"Amount of time (in hours) during which a product is considered "
-"unavailableprior to renting (preparation time)."
-msgstr ""
-"プロダクトが利用できないとみなされる時間(レンタル前の準備時間)の時間数(時間単"
-"位)。"
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.sale_order_line_form_lot_allocation
@@ -116,18 +108,13 @@ msgstr "レンタル利用可能"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr "会社"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_res_config_settings
 msgid "Config Settings"
 msgstr "構成設定"
-
-#. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "Default Padding Time"
-msgstr "デフォルトバッファ時間"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_account_move__display_name
@@ -138,23 +125,17 @@ msgstr "デフォルトバッファ時間"
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:sale_stock_renting.field_res_groups__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_rental_report__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_lot__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_picking__display_name
-#: model:ir.model.fields,field_description:sale_stock_renting.field_stock_return_picking__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse_orderpoint__display_name
 msgid "Display Name"
 msgstr "表示名"
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,help:sale_stock_renting.field_rental_order_wizard_line__tracking
-#: model:ir.model.fields,help:sale_stock_renting.field_sale_order_line__tracking
-msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr "倉庫の在庫可能品を追跡できるようにします。"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard__has_lines_missing_stock
@@ -175,17 +156,22 @@ msgstr "追跡対象プロダクト明細あり"
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__id
+#: model:ir.model.fields,field_description:sale_stock_renting.field_res_groups__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_rental_report__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_lot__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_move__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_picking__id
-#: model:ir.model.fields,field_description:sale_stock_renting.field_stock_return_picking__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse_orderpoint__id
 msgid "ID"
 msgstr "ID"
+
+#. module: sale_stock_renting
+#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
+msgid "Inventory"
+msgstr "在庫"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__is_product_storable
@@ -219,11 +205,6 @@ msgid "Minimum Inventory Rule"
 msgstr "最小在庫規則"
 
 #. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "Minimum amount of time between two rentals"
-msgstr "2つのレンタル間の最小の間隔"
-
-#. module: sale_stock_renting
 #. odoo-python
 #: code:addons/sale_stock_renting/models/sale_order_line.py:0
 msgid ""
@@ -244,12 +225,8 @@ msgstr ""
 "%(reserved_qty)s が引当されていますが、在庫に%(stock_qty)sしかありません。"
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__padding_time
-msgid "Padding"
-msgstr "パディング"
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__padding_time
+#: model:ir.model.fields,field_description:sale_stock_renting.field_product_product__preparation_time
+#: model:ir.model.fields,field_description:sale_stock_renting.field_product_template__preparation_time
 msgid "Padding Time"
 msgstr "パディング時間"
 
@@ -309,6 +286,11 @@ msgid "Rental Location"
 msgstr "レンタルロケーション"
 
 #. module: sale_stock_renting
+#: model:ir.module.module,shortdesc:base.module_sale_stock_renting
+msgid "Rental Stock Management"
+msgstr ""
+
+#. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
 msgid "Rental Transfers"
 msgstr "レンタル転送"
@@ -330,12 +312,6 @@ msgid "RentalOrderLine transient representation"
 msgstr "レンタルオーダ明細 暫定表記"
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_product_product__preparation_time
-#: model:ir.model.fields,field_description:sale_stock_renting.field_product_template__preparation_time
-msgid "Reserve product"
-msgstr "プロダクト引当"
-
-#. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__reserved_lot_ids
 msgid "Reserved Lots"
 msgstr "引当済ロット"
@@ -345,11 +321,6 @@ msgstr "引当済ロット"
 #: code:addons/sale_stock_renting/static/src/widgets/qty_at_date_widget.xml:0
 msgid "Reserved lots unavailable"
 msgstr "引当ロットは使用できません"
-
-#. module: sale_stock_renting
-#: model:ir.model,name:sale_stock_renting.model_stock_return_picking
-msgid "Return Picking"
-msgstr "返品ピッキング"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__returnable_lot_ids
@@ -391,6 +362,14 @@ msgid "Stock Move"
 msgstr "在庫移動"
 
 #. module: sale_stock_renting
+#: model:ir.model.fields,help:sale_stock_renting.field_rental_order_wizard_line__tracking
+#: model:ir.model.fields,help:sale_stock_renting.field_sale_order_line__tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
+
+#. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_product_product__preparation_time
 #: model:ir.model.fields,help:sale_stock_renting.field_product_template__preparation_time
 msgid "Temporarily make this product unavailable before pickup."
@@ -409,19 +388,19 @@ msgstr ""
 #. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_res_company__rental_loc_id
 msgid ""
-"This technical location serves as stock for products currently in rentalThis "
-"location is internal because products in rentalare still considered as "
+"This technical location serves as stock for products currently in rental. "
+"This location is internal because products in rental are still considered as "
 "company assets."
 msgstr ""
-"この技術的ロケーションは、現在レンタル中のプロダクトの在庫として機能する。レ"
-"ンタル中のプロダクトも会社の資産とみなされるため、このロケーションは社内的な"
-"ものです。"
+"この技術的なロケーションは、現在レンタル中のプロダクトの在庫として機能しま"
+"す。レンタル中のプロダクトは依然として会社の資産とみなされるため、このロケー"
+"ションは内部用です。"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__tracking
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__tracking
-msgid "Tracking"
-msgstr "追跡"
+msgid "Tracking Method"
+msgstr ""
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -436,7 +415,7 @@ msgstr ""
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_stock_picking
 msgid "Transfer"
-msgstr "振替"
+msgstr "在庫移動"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__unavailable_lot_ids
@@ -466,17 +445,13 @@ msgid "You cannot change the product of lines linked to stock moves."
 msgstr "在庫移動にリンクした明細のプロダクトを変更することはできません。"
 
 #. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "hours"
-msgstr "時間"
-
-#. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.product_template_inherit_view_form_stock_rental
-msgid "hours before its picking time"
-msgstr "時間前(引取時間の)"
-
-#. module: sale_stock_renting
 #. odoo-javascript
 #: code:addons/sale_stock_renting/static/src/widgets/qty_at_date_widget.xml:0
 msgid "to"
-msgstr "to"
+msgstr "から"
+
+#~ msgid "Ensure the traceability of a storable product in your warehouse."
+#~ msgstr "倉庫の在庫可能品を追跡できるようにします。"
+
+#~ msgid "Tracking"
+#~ msgstr "追跡"

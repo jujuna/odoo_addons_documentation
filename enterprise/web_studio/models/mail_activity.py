@@ -26,7 +26,7 @@ class MailActivity(models.Model):
                 ])
             domain = Domain.OR(domains)
             extra_requests = self.env["studio.approval.request"].sudo().search(domain)
-            extra_activities_to_mark_as_done = extra_requests.mail_activity_id - approval_activities
+            extra_activities_to_mark_as_done = extra_requests.mail_activity_id
             extra_activities_to_mark_as_done = self.env['mail.activity'].browse(extra_activities_to_mark_as_done.ids)
             super(MailActivity, extra_activities_to_mark_as_done)._action_done(feedback=feedback, attachment_ids=attachment_ids)
             for (res_id, rule) in pairs:

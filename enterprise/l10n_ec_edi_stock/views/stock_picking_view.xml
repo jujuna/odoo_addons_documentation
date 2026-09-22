@@ -29,6 +29,9 @@
                     </group>
                 </group>
                 <xpath expr="//header" position="after">
+                    <div class="m-0" name="l10n_ec_edi_alerts" invisible="not l10n_ec_edi_alerts">
+                        <field name="l10n_ec_edi_alerts" class="o_field_html" widget="actionable_errors"/>
+                    </div>
                     <div class="d-flex alert alert-info justify-content-between" role="alert"
                         invisible="l10n_ec_delivery_guide_error or l10n_ec_edi_status != 'to_send'">
                          <div>The delivery guide will soon be sent to SRI</div>

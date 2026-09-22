@@ -31,13 +31,3 @@ class HrVersion(models.Model):
             'res_model': 'sign.request',
             'domain': [('id', 'in', self.sign_request_ids.ids)]
         }
-
-    def action_signature_request_wizard(self):
-        self.ensure_one()
-        action = self.env['ir.actions.actions']._for_xml_id('hr_sign.sign_contract_wizard_action')
-        action['context'] = {
-            'active_id': self.id,
-            'active_model': 'hr.version',
-        }
-
-        return action

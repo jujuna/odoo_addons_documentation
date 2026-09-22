@@ -1,33 +1,14 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-from markupsafe import Markup
-
-from odoo import api, models, _
+from odoo import api, models
 
 
 class ProjectTask(models.Model):
     _inherit = 'project.task'
 
     @api.model
-    def get_empty_list_help(self, help_message):
-        default_alias = self.env.ref("project_enterprise_hr.mail_alias_todo", raise_if_not_found=False)
-        if default_alias and self.env.company.alias_domain_id and self.env.context.get('show_todo_mail_helper', False):
-            bounce_mail = default_alias.alias_name + "@" + self.env.company.alias_domain_id.name
-            help_message += Markup("<p>%s</p>") % (
-                _(
-                    "Create new to-dos by sending an email to %s",
-                    Markup("<a href='mailto:{0}'>{0}</a>").format(bounce_mail),
-                )
-            )
-        return super().get_empty_list_help(help_message)
-
-    @api.model
-    def message_new(self, msg_dict, custom_values=None):
-        if custom_values is None:
-            custom_values = {}
-        if not custom_values.get('project_id', True) and msg_dict.get('email_from'):
-            user_ids, _dummy, _dummy = self._find_internal_users_from_address_mail(msg_dict.get('email_from'))
-            if user_ids:
-                custom_values['user_ids'] = user_ids
-
-        return super().message_new(msg_dict, custom_values)
+    def get_gantt_data(self, domain, groupby, read_specification, limit=None, offset=0, unavailability_fields=None, progress_bar_fields=None, start_date=None, stop_date=None, scale=None):
+        result = super(ProjectTask, self.with_context(scale=scale)).get_gantt_data(domain, groupby, read_specification, limit=limit, offset=offset, unavailability_fields=unavailability_fields, progress_bar_fields=progress_bar_fields, start_date=start_date, stop_date=stop_date, scale=scale)
+        if "user_ids" in groupby:
+            user_ids = [group["user_ids"][0] for group in result["groups"] if group["user_ids"]]
+            employees = self.env["hr.employee"].sudo().with_context(active_test=False).search([('user_id', 'in', user_ids)])
+            result["working_periods"] = employees._get_working_periods_by_field(start_date, stop_date, 'user_id')
+        return result

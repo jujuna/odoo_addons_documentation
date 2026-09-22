@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Canadian Checks Layout',
-    'version': '1.0',
-    'author': 'Odoo SA, OERP Canada',
+    'author': 'Odoo S.A., OERP Canada',
     'category': 'Accounting/Localizations/Check',
     'summary': 'Print CA Checks',
     'description': """
@@ -26,7 +24,6 @@ Supported formats
         'report/print_check_middle.xml',
         'report/print_check_bottom.xml',
     ],
-    'installable': True,
     'auto_install': ['l10n_ca'],
     'license': 'OEEL-1',
     'assets': {

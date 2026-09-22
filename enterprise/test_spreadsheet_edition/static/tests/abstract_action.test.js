@@ -1,4 +1,4 @@
-import { expect, test } from "@odoo/hoot";
+import { describe, expect, test } from "@odoo/hoot";
 import { animationFrame, rightClick, runAllTimers, waitFor } from "@odoo/hoot-dom";
 import { EventBus } from "@odoo/owl";
 
@@ -12,6 +12,7 @@ import {
 } from "@spreadsheet/../tests/helpers/commands";
 import { doMenuAction } from "@spreadsheet/../tests/helpers/ui";
 import { insertPivot } from "@spreadsheet_edition/../tests/helpers/collaborative_helpers";
+import { AbstractSpreadsheetAction } from "@spreadsheet_edition/bundle/actions/abstract_spreadsheet_action";
 import {
     defineTestSpreadsheetEditionModels,
     SpreadsheetTest,
@@ -23,9 +24,12 @@ import {
     mockService,
     mountWithCleanup,
     onRpc,
+    patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
+import { router } from "@web/core/browser/router";
+import { getDummyBasicServerData } from "./helpers/data";
 
-const { cellMenuRegistry } = registries;
+const { cellMenuRegistry, topbarMenuRegistry } = registries;
 const { toZone } = helpers;
 
 defineTestSpreadsheetEditionModels();
@@ -163,6 +167,7 @@ test("The geoJson service is given to the model for geo charts", async function 
         "North America",
         "United States",
         "South America",
+        "Oceania",
     ]);
 
     expect(model.getters.getGeoJsonFeatures("world")).toEqual(undefined);
@@ -176,3 +181,172 @@ test("The geoJson service is given to the model for geo charts", async function 
         },
     ]);
 });
+
+describe("sheetId router synchronization", () => {
+    function mockRouter(initialState = {}) {
+        const routerState = { ...initialState };
+        patchWithCleanup(router, {
+            get current() {
+                return routerState;
+            },
+            pushState(state) {
+                Object.assign(routerState, state);
+            },
+            replaceState(state) {
+                Object.assign(routerState, state);
+            },
+        });
+        return routerState;
+    }
+    async function createTestSpreadsheet() {
+        const spreadsheetId = 1;
+        const serverData = getDummyBasicServerData();
+        serverData.models["spreadsheet.test"].records = [
+            {
+                name: "Untitled Dummy Spreadsheet",
+                spreadsheet_data: JSON.stringify({
+                    sheets: [
+                        { id: "sheet1", name: "Sheet1" },
+                        { id: "sheet2", name: "Sheet2" },
+                    ],
+                }),
+                id: spreadsheetId,
+            },
+        ];
+        const { model, env } = await createSpreadsheetTestAction("spreadsheet_test_action", {
+            serverData,
+            spreadsheetId,
+        });
+        return { model, env };
+    }
+
+    test("activates sheet from router on initialization", async () => {
+        mockRouter({ sid: "sheet2" });
+        const { model } = await createTestSpreadsheet();
+        expect(model.getters.getActiveSheetId()).toBe("sheet2");
+    });
+
+    test("falls back to first sheet and syncs router when sid is invalid", async () => {
+        const routerState = mockRouter({ sid: "invalid" });
+        const { model } = await createTestSpreadsheet();
+        expect(model.getters.getActiveSheetId()).toBe("sheet1");
+        expect(routerState.sid).toBe("sheet1");
+    });
+
+    test("falls back to first sheet and sets router when sid is absent", async () => {
+        const routerState = mockRouter();
+        const { model } = await createTestSpreadsheet();
+        expect(model.getters.getActiveSheetId()).toBe("sheet1");
+        expect(routerState.sid).toBe("sheet1");
+    });
+
+    test("syncs router when active sheet changes", async () => {
+        const routerState = mockRouter();
+        const { model } = await createTestSpreadsheet();
+        expect(routerState.sid).toBe("sheet1");
+        model.dispatch("ACTIVATE_SHEET", {
+            sheetIdFrom: "sheet1",
+            sheetIdTo: "sheet2",
+        });
+        expect(routerState.sid).toBe("sheet2");
+    });
+
+    test("updates router when the active sheet is deleted", async () => {
+        const routerState = mockRouter();
+        const { model } = await createTestSpreadsheet();
+        expect(routerState.sid).toBe("sheet1");
+        model.dispatch("DELETE_SHEET", {
+            sheetId: "sheet1",
+            sheetName: "Sheet1",
+        });
+        expect(model.getters.getActiveSheetId()).toBe("sheet2");
+        expect(routerState.sid).toBe("sheet2");
+    });
+
+    test("preserve sid when navigating through breadcrumb", async function () {
+        const routerState = mockRouter({ sid: "sheet2" });
+        const { model, env } = await createTestSpreadsheet();
+        expect(model.getters.getActiveSheetId()).toBe("sheet2");
+
+        await insertPivot(model, "sheet2");
+        setCellContent(model, "A1", '=PIVOT.VALUE(1, "probability:sum")', "sheet2");
+        await doMenuAction(cellMenuRegistry, ["pivot_see_records"], env);
+        expect(".o_list_renderer").toHaveCount(1);
+
+        await contains(".o_back_button").click();
+        expect(model.getters.getActiveSheetId()).toBe("sheet2");
+        expect(routerState.sid).toBe("sheet2");
+    });
+});
+
+test("The action should redirect to the home menu and not sync the sid when access is denied", async function () {
+    onRpc("/spreadsheet/data/*", () => {
+        expect.step("try-open-spreadsheet");
+        throw new Response("", { status: 403 });
+    });
+    mockService("action", {
+        async doAction(actionRequest) {
+            if (actionRequest === "menu") {
+                expect.step("redirect-to-home-menu");
+                return;
+            }
+            return super.doAction(...arguments);
+        },
+    });
+    patchWithCleanup(AbstractSpreadsheetAction.prototype, {
+        syncSheetFromRouter() {
+            expect.step("sync-sheet-from-router")
+            return super.syncSheetFromRouter(...arguments);
+        },
+    });
+    await mountWithCleanup(WebClient);
+    await getService("action").doAction({
+        type: "ir.actions.client",
+        tag: "spreadsheet_test_action",
+        params: {
+            spreadsheet_id: 1,
+        },
+    }).catch(() => {});
+    expect.verifySteps(["try-open-spreadsheet", "redirect-to-home-menu"]);
+});
+
+test("The action should redirect to the home menu when the related record cannot be found", async function () {
+    const menuDef = Promise.withResolvers();
+    onRpc("/spreadsheet/data/*", () => {
+        expect.step("try-open-spreadsheet");
+        throw new Response("", { status: 404 });
+    });
+    mockService("action", {
+        async doAction(actionRequest) {
+            if (actionRequest === "menu") {
+                expect.step("redirect-to-home-menu");
+                menuDef.resolve();
+            }
+            return super.doAction(...arguments);
+        },
+    });
+    await mountWithCleanup(WebClient);
+    getService("action")
+        .doAction({
+            type: "ir.actions.client",
+            tag: "spreadsheet_test_action",
+            params: {
+                spreadsheet_id: 1,
+            },
+        })
+        .catch(() => {});
+    await menuDef.promise;
+    expect.verifySteps(["try-open-spreadsheet", "redirect-to-home-menu"]);
+});
+
+
+test("Can open the command palette from the topbar menu", async function () {
+  const { env } = await createSpreadsheetTestAction("spreadsheet_test_action");
+  await doMenuAction(
+      topbarMenuRegistry,
+      ["help", "command_palette"],
+      env
+  );
+  await animationFrame();
+  expect(".o_command_palette").toHaveCount(1);
+})

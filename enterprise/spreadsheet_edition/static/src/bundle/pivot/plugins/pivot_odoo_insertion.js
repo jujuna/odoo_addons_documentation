@@ -1,10 +1,8 @@
 import { _t } from "@web/core/l10n/translation";
-import { constants, helpers } from "@odoo/o-spreadsheet";
+import { helpers } from "@odoo/o-spreadsheet";
 import { OdooUIPlugin } from "@spreadsheet/plugins";
 
-const { PIVOT_TABLE_CONFIG } = constants;
-const uuidGenerator = new helpers.UuidGenerator();
-const { sanitizeSheetName, getUniqueText } = helpers;
+const { sanitizeSheetName, getUniqueText, UuidGenerator } = helpers;
 
 export class PivotOdooInsertion extends OdooUIPlugin {
     static getters = /** @type {const} */ ([]);
@@ -15,66 +13,67 @@ export class PivotOdooInsertion extends OdooUIPlugin {
      */
     handle(cmd) {
         switch (cmd.type) {
-            case "ADD_AND_INSERT_NEW_ODOO_PIVOT":
-                this.addNewOdooPivot(cmd.pivotId, cmd.resModel, cmd.name);
+            case "INSERT_NEW_ODOO_PIVOT":
+                this.insertNewOdooPivot(
+                    cmd.pivotId,
+                    cmd.pivotName,
+                    cmd.tableExport,
+                    cmd.insertInNewSheet,
+                    cmd.mode
+                );
                 break;
         }
     }
 
-    addNewOdooPivot(pivotId, resModel, pivotName) {
-        this.dispatch("ADD_PIVOT", {
-            pivotId,
-            pivot: {
-                type: "ODOO",
-                model: resModel,
-                name: pivotName,
-                domain: [],
-                context: {},
-                columns: [],
-                rows: [],
-                measures: [],
-                sortedColumn: undefined,
-            },
-        });
-        const sheetId = uuidGenerator.smallUuid();
-        const sheetIdFrom = this.getters.getActiveSheetId();
-        const formulaId = this.getters.getPivotFormulaId(pivotId);
-        const sheetName = this.getPivotDuplicateSheetName(
-            _t("%(pivot_name)s (Pivot #%(pivot_id)s)", {
-                pivot_name: pivotName,
-                pivot_id: formulaId,
-            })
-        );
-        this.dispatch("CREATE_SHEET", {
-            sheetId,
-            position: this.getters.getSheetIds().length,
-            name: sheetName,
-        });
-        this.dispatch("ACTIVATE_SHEET", { sheetIdFrom, sheetIdTo: sheetId });
-        this.dispatch("UPDATE_CELL", {
+    /** Insert a new pivot (OdooPivot) and add a sheet for it if needed. */
+    insertNewOdooPivot(pivotId, pivotName, tableExport, insertInNewSheet, mode) {
+        const sheetName = this._computePivotSheetName(pivotId, pivotName);
+        if (insertInNewSheet) {
+            this._createAndActivateSheet(sheetName);
+        } else {
+            this._renameCurrentSheet(sheetName);
+        }
+
+        const sheetId = this.getters.getActiveSheetId();
+        this.dispatch("INSERT_PIVOT_WITH_TABLE", {
             sheetId,
             col: 0,
             row: 0,
-            content: `=PIVOT("${formulaId}")`,
-        });
-        this.dispatch("CREATE_TABLE", {
-            tableType: "dynamic",
-            sheetId,
-            ranges: [
-                this.getters.getRangeDataFromZone(sheetId, {
-                    left: 0,
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                }),
-            ],
-            config: { ...PIVOT_TABLE_CONFIG },
+            pivotId,
+            table: tableExport,
+            pivotMode: mode,
         });
     }
 
-    getPivotDuplicateSheetName(sheetName) {
-        const names = this.getters.getSheetIds().map((id) => this.getters.getSheetName(id));
-        const sanitizedName = sanitizeSheetName(sheetName);
-        return getUniqueText(sanitizedName, names);
+    _computePivotSheetName(pivotId, pivotName) {
+        const name = _t("%(pivot_name)s (Pivot #%(pivot_id)s)", {
+            pivot_name: pivotName,
+            pivot_id: this.getters.getPivotFormulaId(pivotId),
+        });
+        const sanitized = sanitizeSheetName(name);
+        const allNames = this.getters.getSheetIds().map((id) => this.getters.getSheetName(id));
+        return getUniqueText(sanitized, allNames);
+    }
+
+    _renameCurrentSheet(sheetName) {
+        const sheetId = this.getters.getActiveSheetId();
+        this.dispatch("RENAME_SHEET", {
+            sheetId,
+            oldName: this.getters.getSheetName(sheetId),
+            newName: sheetName,
+        });
+    }
+
+    _createAndActivateSheet(sheetName) {
+        const newSheetId = UuidGenerator.smallUuid();
+        this.dispatch("CREATE_SHEET", {
+            sheetId: newSheetId,
+            position: this.getters.getSheetIds().length,
+            name: sheetName,
+        });
+        this.dispatch("ACTIVATE_SHEET", {
+            sheetIdFrom: this.getters.getActiveSheetId(),
+            sheetIdTo: newSheetId,
+        });
     }
 }

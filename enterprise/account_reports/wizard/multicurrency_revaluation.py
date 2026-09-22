@@ -112,9 +112,9 @@ class AccountMulticurrencyRevaluationWizard(models.TransientModel):
                     return parsed_res_id
 
         def _get_adjustment_balance(line):
-            for column in line.get('columns'):
-                if column.get('expression_label') == 'adjustment':
-                    return column.get('no_format')
+            for column in line.columns:
+                if column.expression_label == 'adjustment':
+                    return column.no_format
 
         report = self.env.ref('account_reports.multicurrency_revaluation_report')
         included_line_id = report.line_ids.filtered(lambda l: l.code == 'multicurrency_included').id
@@ -124,7 +124,7 @@ class AccountMulticurrencyRevaluationWizard(models.TransientModel):
         move_lines = []
 
         for report_line in report._get_unfolded_lines(report_lines, generic_included_line_id):
-            parsed_line_id = report._parse_line_id(report_line.get('id'))
+            parsed_line_id = report._parse_line_id(report_line.id)
             balance = _get_adjustment_balance(report_line)
             # parsed_line_id[-1][-2] corresponds to res_model of the current line
             if (

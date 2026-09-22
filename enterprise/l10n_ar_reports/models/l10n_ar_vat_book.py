@@ -1,13 +1,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import api, models, _
-from odoo.exceptions import UserError, RedirectWarning
-from odoo.tools import SQL
-from odoo.tools.float_utils import float_split_str
-
-from collections import defaultdict, OrderedDict
+import io
 import re
 import zipfile
-import io
+from collections import OrderedDict, defaultdict
+from csv import DictWriter
+
+from odoo import _, api, models
+from odoo.exceptions import RedirectWarning, UserError
+from odoo.tools import SQL
+from odoo.tools.float_utils import float_split_str
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
+from odoo.addons.l10n_ar.tools.partner_identifiers import AR_CUIT_AFIP_CODE
 
 
 class L10n_ArTaxReportHandler(models.AbstractModel):
@@ -16,10 +19,10 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
     _description = 'Argentinian Tax Report Custom Handler'
 
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
-        # dict of the form {move_id: {column_group_key: {expression_label: value}}}
+        # dict of the form {move_id: {column_group_index: {expression_label: value}}}
         move_info_dict = {}
 
-        # dict of the form {column_group_key: total_value}
+        # dict of the form {column_group_index: total_value}
         total_values_dict = {}
 
         # Every key/expression_label that is a number (and should be rendered like one)
@@ -28,12 +31,12 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
         # Build full query
         query_list = []
         options_per_col_group = report._split_options_per_column_group(options)
-        for column_group_key, column_group_options in options_per_col_group.items():
-            query = self._build_query(report, column_group_options, column_group_key)
+        for column_group_index, column_group_options in options_per_col_group.items():
+            query = self._build_query(report, column_group_options, column_group_index)
             query_list.append(SQL("(%s)", query))
 
-            # Set defaults here since the results of the query for this column_group_key might be empty
-            total_values_dict.setdefault(column_group_key, dict.fromkeys(number_keys, 0.0))
+            # Set defaults here since the results of the query for this column_group_index might be empty
+            total_values_dict.setdefault(column_group_index, dict.fromkeys(number_keys, 0.0))
 
         full_query = SQL(" UNION ALL ").join(query_list)
         self.env.cr.execute(full_query)
@@ -41,7 +44,7 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
         for result in results:
             # Iterate over these results in order to fill the move_info_dict dictionary
             move_id = result['id']
-            column_group_key = result['column_group_key']
+            column_group_index = result['column_group_index']
 
             # Convert date to string to be displayed in the xlsx report
             result['date'] = result['date'].strftime("%Y-%m-%d")
@@ -52,10 +55,10 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
             current_move_info = move_info_dict.setdefault(move_id, {})
 
             current_move_info['line_name'] = result['move_name']
-            current_move_info[column_group_key] = result
+            current_move_info[column_group_index] = result
 
             # Apply sign and add values to totals
-            totals = total_values_dict[column_group_key]
+            totals = total_values_dict[column_group_index]
             for key in number_keys:
                 result[key] = sign * result[key]
                 totals[key] += result[key]
@@ -81,23 +84,23 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
             column_sums = defaultdict(float)
             for _line_sequence, line in lines_to_hide:
                 for col_index in col_indices_to_sum:
-                    column_sums[col_index] += line['columns'][col_index]['no_format']
+                    column_sums[col_index] += line.columns[col_index].no_format
 
-            lines.append((0, {
-                'id': report._get_generic_line_id(None, None, markup='placeholder'),
-                'name': _("+%s non-previewed lines", len(lines_to_hide)),
-                'columns': [
-                    {
-                        'class': 'number',
-                        'no_format': column_sums[col_index],
-                        'name': report.format_value(options_per_col_group[col['column_group_key']], column_sums[col_index], figure_type='monetary'),
-                    }
+            lines.append((0, AccountReportLineData(
+                id=report._get_generic_line_id(None, None, markup='placeholder'),
+                name=_("+%s non-previewed lines", len(lines_to_hide)),
+                columns=[
+                    report._build_column_data(
+                        column_sums[col_index],
+                        options['columns'][col_index],
+                    )
                     if col_index in column_sums
-                    else {}
+                    else report._build_column_data(None, None)
+
                     for col_index, col in enumerate(options['columns'])
                 ],
-                'level': 2,
-            }))
+                level=2,
+            )))
 
         # Single total line if only one type of journal is selected
         if len(self._vat_book_get_selected_tax_types(options)) < 2:
@@ -108,16 +111,12 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
 
-        # Add export button
-        zip_export_button = {
-            'name': _('VAT Book (ZIP)'),
-            'sequence': 30,
-            'action': 'export_file',
-            'action_param': 'vat_book_export_files_to_zip',
-            'file_export_type': _('ZIP'),
-        }
-
-        options['buttons'].append(zip_export_button)
+        # Add export buttons
+        options['buttons'].extend([
+            {'name': _('VAT Book (ZIP)'), 'sequence': 3, 'action': 'export_file', 'action_param': 'vat_book_export_files_to_zip', 'file_export_type': _('ZIP'), 'branch_allowed': True},
+            {'name': _('VAT Simple Report (ZIP)'), 'sequence': 31, 'action': 'export_file', 'action_param': 'vat_simple_export_files_to_zip', 'file_export_type': _('ZIP')},
+            {'name': _('VAT Book (PDF)'), 'sequence': 32, 'action': 'export_file', 'action_param': 'vat_book_print_without_letterhead', 'file_export_type': _('PDF')},
+        ])
         options['ar_vat_book_tax_types_available'] = previous_options.get('ar_vat_book_tax_types_available') or {
             'sale': {'name': _('Sales'), 'selected': True},
             'purchase': {'name': _('Purchases'), 'selected': True},
@@ -148,19 +147,23 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
             'components': {
                 'AccountReportFilters': 'L10nARTaxReportFilters',
             },
+            'pdf_export': {
+                'pdf_export_main': 'l10n_ar_reports.l10n_ar_tax_report_pdf_export_main',
+            },
         }
+        options['l10n_ar_exclude_page_header'] = previous_options.get('l10n_ar_exclude_page_header', False)
 
     ####################################################
     # REPORT LINES: CORE
     ####################################################
 
-    def _build_query(self, report, options, column_group_key) -> SQL:
+    def _build_query(self, report, options, column_group_index) -> SQL:
         #pylint: disable=sql-injection
         query = report._get_report_query(options, 'strict_range')
 
         tax_types = tuple(self._vat_book_get_selected_tax_types(options))
 
-        return self.env['account.ar.vat.line']._ar_vat_line_build_query(query.from_clause, query.where_clause, column_group_key, tax_types)
+        return self.env['account.ar.vat.line']._ar_vat_line_build_query(query.from_clause, query.where_clause, column_group_index, tax_types)
 
     def _create_report_line(self, report, options, move_vals, move_id, number_values):
         """ Create a standard (non total) line for the report
@@ -172,17 +175,17 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
         columns = []
         for column in options['columns']:
             expression_label = column['expression_label']
-            value = move_vals.get(column['column_group_key'], {}).get(expression_label)
+            value = move_vals.get(column['column_group_index'], {}).get(expression_label)
 
-            columns.append(report._build_column_dict(value, column, options=options))
+            columns.append(report._build_column_data(value, column, options=options))
 
-        return {
-            'id': report._get_generic_line_id('account.move', move_id),
-            'caret_options': 'account.move',
-            'name': move_vals['line_name'],
-            'columns': columns,
-            'level': 2,
-        }
+        return AccountReportLineData(
+            id=report._get_generic_line_id('account.move', move_id),
+            caret_options='account.move',
+            name=move_vals['line_name'],
+            columns=columns,
+            level=2,
+        )
 
     def _create_report_total_line(self, report, options, total_vals):
         """ Create a total line for the report
@@ -192,16 +195,17 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
         columns = []
         for column in options['columns']:
             expression_label = column['expression_label']
-            value = total_vals.get(column['column_group_key'], {}).get(expression_label)
+            value = total_vals.get(column['column_group_index'], {}).get(expression_label)
 
-            columns.append(report._build_column_dict(value, column, options=options))
-        return {
-            'id': report._get_generic_line_id(None, None, markup='total'),
-            'name': _('Total'),
-            'class': 'total',
-            'level': 1,
-            'columns': columns,
-        }
+            columns.append(report._build_column_data(value, column, options=options))
+
+        return AccountReportLineData(
+            id=report._get_generic_line_id(None, None, markup='total'),
+            name=self.env._('Total'),
+            css_class='total',
+            level=1,
+            columns=columns,
+        )
 
     ####################################################
     # EXPORT/PRINT
@@ -259,8 +263,52 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
         vouchers_data = '\r\n'.join(self._vat_book_get_REGINFO_CV_CBTE(options, aliquots, tax_type, invoices)).encode('ISO-8859-1', 'ignore')
         return vouchers_data, aliquots_data
 
+    def vat_simple_export_files_to_zip(self, options):
+        """ Export method that lets us export the IVA Simple Report to a zip archive.
+        It contains the files that we upload to ARCA for vat uploads.
+        Specification: https://www.afip.gob.ar/iva/responsables-inscriptos/ayuda/manuales.asp"""
+        tax_types = self._vat_book_get_selected_tax_types(options)
+
+        missing_fallback_activity = 'sale' in tax_types and not self.env.company.l10n_ar_arca_activity_id
+        if missing_fallback_activity and not options.get('l10n_ar_simple_ignore_errors'):
+            report = self.env['account.report'].browse(options['report_id'])
+            error_msg = _('Warning, activities are not set as a fallback on the company. As such the Sales VAT Simple files may be incorrect. Please set a fallback activity on the company or ignore this warning to generate the file anyway.')
+            action_vals = report.export_file({**options, 'l10n_ar_simple_ignore_errors': True}, 'vat_simple_export_files_to_zip')
+            raise RedirectWarning(error_msg, action_vals, _('Generate VAT Simple Report'))
+
+        file_types = [f"{tax}_{suffix}" for tax in tax_types for suffix in ['invoice', 'refund']]
+        file_names = {
+            'sale_invoice': 'DEBITO',
+            'sale_refund': 'REST_DEBITO',
+            'purchase_invoice': 'CREDITO',
+            'purchase_refund': 'REST_CREDITO',
+        }
+
+        stream = io.BytesIO()
+        with zipfile.ZipFile(stream, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+            for file_type in file_types:
+                move_ids = self._vat_simple_get_csv_move_ids(options, file_type)
+                if not move_ids:
+                    continue
+                file_data = self._vat_simple_get_data(file_type, move_ids)
+                if file_data:
+                    file_name = f"{file_names[file_type]}_{options['date']['date_to']}.csv"
+                    zf.writestr(file_name, file_data)
+        file_content = stream.getvalue()
+        return {
+            'file_name': f"IVA_simple_{options['date']['date_to']}",
+            'file_content': file_content,
+            'file_type': 'zip',
+        }
+
+    def vat_book_print_without_letterhead(self, options):
+        """Generate VAT Book PDF without header/footer."""
+        report = self.env['account.report'].with_context(exclude_page_footer=True).browse(options['report_id'])
+        options['l10n_ar_exclude_page_header'] = True
+        return report.export_to_pdf(options)
+
     ####################################################
-    # HELPERS
+    # VAT BOOK HELPERS
     ####################################################
 
     def _vat_book_get_selected_tax_types(self, options):
@@ -275,16 +323,18 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
 
     @api.model
     def _vat_book_get_lines_domain(self, options):
-        company_ids = self.env.company.ids
+        company_ids = self.env['account.report'].get_report_company_ids(options)
         selected_journal_types = self._vat_book_get_selected_tax_types(options)
         domain = [('journal_id.type', 'in', selected_journal_types),
-                  ('l10n_latam_use_documents', '=', True), ('company_id', 'in', company_ids)]
+            ('l10n_latam_use_documents', '=', True),
+            ('company_id', 'in', company_ids),
+            ('date', '<=', options['date']['date_to']),
+        ]
         state = options.get('all_entries') and 'all' or 'posted'
         if state and state.lower() != 'all':
             domain += [('state', '=', state)]
-        if options.get('date').get('date_to'):
-            domain += [('date', '<=', options['date']['date_to'])]
-        if options.get('date').get('date_from'):
+
+        if options['date'].get('date_from'):
             domain += [('date', '>=', options['date']['date_from'])]
         return domain
 
@@ -308,15 +358,16 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
         # CUIT is mandatory for all except for final consummer
         if partner.l10n_ar_afip_responsibility_type_id.code == '5' or (
                 partner.l10n_ar_afip_responsibility_type_id.code == '10' and not partner.commercial_partner_id.is_company):
-            doc_code = f"{int(partner.l10n_latam_identification_type_id.l10n_ar_afip_code):0>2d}"
-            doc_number = partner.vat or ''
+            doc_code = f"{int(partner.l10n_ar_afip_code or 0):0>2d}"
+            doc_number = partner.l10n_ar_afip_id_value or ''
             # we clean the letters that are not supported
             doc_number = re.sub("[^0-9]", "", doc_number)
-        elif partner.l10n_ar_afip_responsibility_type_id.code == '9':
+        elif partner.l10n_ar_afip_responsibility_type_id.code in ('8', '9'):
             commercial_partner = partner.commercial_partner_id
-            doc_number = partner.l10n_ar_vat or (commercial_partner.country_id.l10n_ar_legal_entity_vat
+            is_cuit = partner.l10n_ar_afip_code == AR_CUIT_AFIP_CODE
+            doc_number = (is_cuit and partner.vat) or (commercial_partner.country_id.l10n_ar_legal_entity_vat
                 if commercial_partner.is_company else commercial_partner.country_id.l10n_ar_natural_vat)
-            doc_code = '80'
+            doc_code = AR_CUIT_AFIP_CODE
             if not commercial_partner.country_id:
                 raise RedirectWarning(
                     message=_("The partner '%s' does not have a country configured.", commercial_partner.name),
@@ -349,7 +400,7 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
                 )
         else:
             doc_number = partner.ensure_vat()
-            doc_code = '80'
+            doc_code = AR_CUIT_AFIP_CODE
         return doc_code, doc_number.rjust(20, '0')
 
     @api.model
@@ -421,7 +472,8 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
             invoice_number, pos_number = self._vat_book_get_pos_and_invoice_invoice_number(inv)
             doc_code, doc_number = self._vat_book_get_partner_document_code_and_number(inv.partner_id)
 
-            amounts = inv._l10n_ar_get_amounts()
+            base_lines, _tax_lines = inv._get_rounded_base_and_tax_lines()
+            amounts = inv._l10n_ar_get_amounts(base_lines=base_lines)
             vat_amount = amounts['vat_amount']
             vat_exempt_base_amount = amounts['vat_exempt_base_amount']
             vat_untaxed_base_amount = amounts['vat_untaxed_base_amount']
@@ -431,7 +483,7 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
             mun_perc_amount = amounts['mun_perc_amount']
             intern_tax_amount = amounts['intern_tax_amount']
             perc_imp_nacionales_amount = amounts['profits_perc_amount'] + amounts['other_perc_amount']
-            if inv.move_type in ('out_refund', 'in_refund') and \
+            if inv.is_refund() and \
                     inv.l10n_latam_document_type_id.code in inv._get_l10n_ar_codes_used_for_inv_and_ref():
                 amount_total = -inv.amount_total
             else:
@@ -563,3 +615,260 @@ class L10n_ArTaxReportHandler(models.AbstractModel):
             res[inv] = lines
 
         return res
+
+    ####################################################
+    # VAT SIMPLE HELPERS
+    ####################################################
+    @api.model
+    def _vat_simple_get_lines_domain(self, options):
+        company_ids = self.env.company.ids
+        domain = [
+            ('state', '=', 'posted'),
+            ('journal_id.l10n_latam_use_documents', '=', True),
+            ('company_id', 'in', company_ids),
+            ('date', '<=', options['date']['date_to']),
+        ]
+
+        if options['date'].get('date_from'):
+            domain += [('date', '>=', options['date']['date_from'])]
+        return domain
+
+    def _vat_simple_get_csv_move_ids(self, options, file_type):
+        """ All we care about are the ids of the moves we want to include in the report.
+            As such, we can get only the ids instead of prefetch everything related to the records."""
+        if options.get('all_entries'):
+            raise UserError(_('Can only generate CSV files using posted entries.'
+                              ' Please remove "Include unposted entries" filter and try again'))
+
+        domain = [('l10n_latam_document_type_id.code', '!=', False)] + self._vat_simple_get_lines_domain(options)
+        if file_type == 'sale_invoice':
+            domain += [('journal_id.type', '=', 'sale'), ('move_type', '=', 'out_invoice')]
+        elif file_type == 'sale_refund':
+            domain += [('journal_id.type', '=', 'sale'), ('move_type', '=', 'out_refund')]
+        elif file_type == 'purchase_invoice':
+            domain += [('journal_id.type', '=', 'purchase'), ('move_type', '=', 'in_invoice')]
+        else:
+            domain += [('journal_id.type', '=', 'purchase'), ('move_type', '=', 'in_refund')]
+        return tuple(self.env['account.move'].search(domain, order='invoice_date asc, name asc, id asc').ids)
+
+    def _vat_simple_transform_column(self, value):
+        """ ARCA requires all numbers to use ',' as decimal separator"""
+        if isinstance(value, (int, float)):
+            if value < 0:
+                value = -value
+            value = str(value)
+        if "." in value:
+            value = value.replace(".", ",")
+        return value
+
+    def _vat_simple_get_data(self, file_type, move_ids):
+        if 'sale_' in file_type:
+            results = self._vat_simple_build_sale_query(file_type, move_ids)
+        else:
+            results = self._vat_simple_build_purchase_query(file_type, move_ids)
+
+        fp = io.StringIO()
+        headers = results[0].keys() if results else []
+        writer = DictWriter(fp, fieldnames=headers, delimiter=';', lineterminator='\n')
+        writer.writeheader()
+        writer.writerows(results)
+        return fp.getvalue()
+
+    def _vat_simple_get_taxes_from_row(self, row):
+        """ Taxes are not aggregated in the query, so we need to compute them manually."""
+        aml_ids = row.get('aml_ids')
+        total = row.get('balance')
+        line_ids = self.env['account.move.line'].browse(aml_ids)
+
+        currency_id = line_ids[:1].move_id.currency_id
+        tax_data = line_ids.tax_ids.filtered('tax_group_id.l10n_ar_vat_afip_code').compute_all(total, currency=currency_id)
+        return currency_id.round(tax_data['total_included'] - tax_data['total_excluded'])
+
+    def _vat_simple_build_purchase_query(self, file_type, move_ids):
+        columns_map = {"Concepto": 'concept', "Codigo de Alicuota": 'rate_code', "Monto Neto Gravado": 'balance', "Credito Fiscal Facturado": 'vat_amount'}
+        if file_type == 'purchase_invoice':
+            # Additional column for vendor bills
+            columns_map["Credito Fiscal Computable"] = 'vat_amount'
+
+        query = SQL(
+            """
+                WITH move_lines_with_concept AS (
+                    SELECT DISTINCT ON (aml.id)
+                        aml.*,
+                        CASE
+                            WHEN tag_rel.account_account_tag_id = %(lease_tag_id)s THEN 2
+                            WHEN tag_rel.account_account_tag_id = %(fixed_tag_id)s THEN 4
+                            WHEN pt.type = 'consu' THEN 1
+                            WHEN pt.type = 'service' THEN 3
+                            ELSE 1
+                        END as concept,
+                        btg.l10n_ar_vat_afip_code AS rate_code
+                    FROM account_move_line aml
+                    LEFT JOIN product_product pp ON aml.product_id = pp.id
+                    LEFT JOIN product_template pt ON pp.product_tmpl_id = pt.id
+                    LEFT JOIN account_account_account_tag tag_rel
+                        ON aml.account_id = tag_rel.account_account_id
+                        AND tag_rel.account_account_tag_id IN (%(lease_tag_id)s, %(fixed_tag_id)s)
+                    LEFT JOIN account_move_line_account_tax_rel amltr ON aml.id = amltr.account_move_line_id
+                    LEFT JOIN account_tax bt ON amltr.account_tax_id = bt.id
+                    LEFT JOIN account_tax_group btg ON bt.tax_group_id = btg.id
+                    WHERE
+                        aml.move_id IN %(move_ids)s AND
+                        btg.l10n_ar_vat_afip_code IN ('3', '4', '5', '6', '8', '9') AND
+                        aml.partner_id IS NOT NULL
+                    ORDER BY
+                        aml.id,
+                        -- Prioritize lease tag over fixed asset tag for concept determination on the distinct selection
+                        (CASE
+                            WHEN tag_rel.account_account_tag_id = %(lease_tag_id)s THEN 1
+                            WHEN tag_rel.account_account_tag_id = %(fixed_tag_id)s THEN 2
+                            ELSE 3
+                        END)
+                )
+                SELECT
+                    concept,
+                    rate_code,
+                    SUM(balance) AS balance,
+                    ARRAY_AGG(DISTINCT id) as aml_ids,
+                    ARRAY_AGG(DISTINCT move_id) as move_ids
+                FROM move_lines_with_concept
+                GROUP BY concept, rate_code
+                ORDER BY concept, rate_code;
+            """,
+            lease_tag_id=self.env.ref("l10n_ar.tag_leases_rentals_account").id,
+            fixed_tag_id=self.env.ref("l10n_ar.tag_fixed_asset_account").id,
+            move_ids=move_ids,
+        )
+
+        self.env.cr.execute(query)
+        data = self.env.cr.dictfetchall()
+
+        results = []
+        for row in data:
+            row_data = {}
+            for header_name, column in columns_map.items():
+                if column == 'vat_amount':
+                    value = self._vat_simple_get_taxes_from_row(row)
+                else:
+                    value = row.get(column, "")
+                value = self._vat_simple_transform_column(value)
+                row_data[header_name] = value
+            results.append(row_data)
+        return results
+
+    def _vat_simple_build_sale_query(self, file_type, move_ids):
+        columns_map = {
+            "Actividad": 'activity',
+            "Tipo de Operacion": 'operation_type',
+            "Tipo de sujeto comprador": 'responsibility_type_code',
+            "Codigo de Alicuota": 'rate_code',
+            "Monto Neto Gravado": 'balance',
+        }
+        if file_type == 'sale_invoice':
+            tag_id = self.env.ref("l10n_ar.tag_fixed_asset_account")
+            operation_type_query = SQL(
+                """
+                (CASE
+                    WHEN btg.l10n_ar_vat_afip_code IN ('0', '1', '2') THEN 3
+                    WHEN aaat.account_account_tag_id = %(tag_id)s THEN 2
+                    ELSE 1
+                END)
+                """,
+                tag_id=tag_id.id,
+            )
+            columns_map["Debito Fiscal Facturado"] = 'vat_amount'
+            columns_map["Debito Fiscal O.D.P."] = 'vat_amount'
+            exempt_operation_type = 3
+            # Since we are SELECT DISTINCT ON, we need a stable ORDER BY. Prioritize fixed asset tag for the op type.
+            cte_order_query = SQL("ORDER BY aml.id, (CASE when aaat.account_account_tag_id = %(tag_id)s THEN 1 ELSE 2 END)", tag_id=tag_id.id)
+        else:
+            operation_type_query = SQL(
+                """
+                (CASE
+                    WHEN btg.l10n_ar_vat_afip_code IN %(code_values)s THEN 2
+                    ELSE 1
+                END)
+                """,
+                code_values=('0', '1', '2'),
+                )
+            columns_map["Debito Fiscal a Restituir"] = 'vat_amount'
+            exempt_operation_type = 2
+            cte_order_query = SQL("ORDER BY aml.id")
+        columns_map["Monto Neto Exento o No Gravado"] = 'exempt_balance'
+
+        query = SQL(
+            """
+                WITH move_lines_with_operation_type AS (
+                    SELECT DISTINCT ON (aml.id)
+                        aml.balance,
+                        aml.id,
+                        aml.move_id,
+                        COALESCE(amlact.code, cmpact.code, '0') AS activity,
+                        %(operation_query)s AS operation_type,
+                        rprt.code as partner_responsibility_code,
+                        btg.l10n_ar_vat_afip_code
+                    FROM account_move_line aml
+                    LEFT JOIN account_account acc ON aml.account_id = acc.id
+                    LEFT JOIN l10n_ar_arca_activity amlact ON acc.l10n_ar_arca_activity_id = amlact.id
+                    LEFT JOIN res_company cmp ON aml.company_id = cmp.id
+                    LEFT JOIN l10n_ar_arca_activity cmpact ON cmp.l10n_ar_arca_activity_id = cmpact.id
+                    LEFT JOIN account_account_account_tag aaat ON acc.id = aaat.account_account_id
+                    LEFT JOIN res_partner rp ON aml.partner_id = rp.id
+                    LEFT JOIN l10n_ar_afip_responsibility_type rprt ON rp.l10n_ar_afip_responsibility_type_id = rprt.id
+                    LEFT JOIN account_move_line_account_tax_rel amltr ON aml.id = amltr.account_move_line_id
+                    LEFT JOIN account_tax bt ON amltr.account_tax_id = bt.id
+                    LEFT JOIN account_tax_group btg ON bt.tax_group_id = btg.id
+                    WHERE
+                        btg.l10n_ar_vat_afip_code IS NOT NULL AND aml.move_id IN %(move_ids)s
+                    %(cte_order_query)s
+                )
+                SELECT
+                    activity,
+                    operation_type,
+                    operation_type = %(exempt_op_type)s AS is_exempt,
+                    CASE
+                        WHEN operation_type = %(exempt_op_type)s THEN ''
+                        WHEN partner_responsibility_code = '1' THEN '1'
+                        WHEN partner_responsibility_code IN ('6', '13') THEN '2'
+                        WHEN partner_responsibility_code IN ('4', '5', '7', '8', '9', '10', '16') THEN '3'
+                        ELSE ''
+                    END AS responsibility_type_code,
+                    CASE
+                        WHEN operation_type = %(exempt_op_type)s THEN ''
+                        ELSE l10n_ar_vat_afip_code
+                    END AS rate_code,
+                    CASE
+                        WHEN operation_type != %(exempt_op_type)s THEN ''
+                        ELSE REPLACE(ABS(SUM(balance))::TEXT, '.', ',')
+                    END AS exempt_balance,
+                    SUM(balance) AS balance,
+                    ARRAY_AGG(DISTINCT id) as aml_ids,
+                    ARRAY_AGG(DISTINCT move_id) as move_ids
+                FROM move_lines_with_operation_type
+                GROUP BY activity, operation_type, responsibility_type_code, rate_code
+                ORDER BY activity, operation_type, responsibility_type_code, rate_code;
+            """,
+                operation_query=operation_type_query,
+                cte_order_query=cte_order_query,
+                exempt_op_type=exempt_operation_type,
+                move_ids=move_ids,
+            )
+
+        self.env.cr.execute(query)
+        data = self.env.cr.dictfetchall()
+        exempt_columns = ["Actividad", "Tipo de Operacion", "Monto Neto Exento o No Gravado"]
+
+        results = []
+        for row in data:
+            row_data = {}
+            for header_name, column in columns_map.items():
+                if row['is_exempt'] and header_name not in exempt_columns:
+                    value = ""
+                elif column == 'vat_amount':
+                    value = self._vat_simple_get_taxes_from_row(row)
+                else:
+                    value = row.get(column, "")
+                value = self._vat_simple_transform_column(value)
+                row_data[header_name] = value
+            results.append(row_data)
+        return results

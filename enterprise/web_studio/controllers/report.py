@@ -1,20 +1,24 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import json
-from contextlib import contextmanager
+from collections import defaultdict
 from copy import deepcopy
+from itertools import groupby
+
 from lxml import etree, html
 from lxml.html.clean import Cleaner
 from psycopg2 import OperationalError
-from itertools import groupby
-from collections import defaultdict
 
-from odoo import http, _, Command, models
-from odoo.http import request, serialize_exception
-from odoo.addons.web_studio.controllers import main
-from odoo.addons.web_studio.controllers.keyed_xml_differ import KeyedXmlDiffer, DIFF_ATTRIBUTE
-from odoo.tools.template_inheritance import apply_inheritance_specs
+from odoo import Command, _, api, http, models
+from odoo.http import request
+from odoo.http.dispatcher import serialize_exception
 from odoo.tools.safe_eval import safe_eval
+from odoo.tools.template_inheritance import apply_inheritance_specs
+
+from odoo.addons.web_studio.controllers import main
+from odoo.addons.web_studio.controllers.keyed_xml_differ import (
+    DIFF_ATTRIBUTE,
+    KeyedXmlDiffer,
+)
 
 # We are dealing with an HTML document that has QWeb syntax in it (<t />, t-att etc..)
 # in addition to some attributes that are specific to the reportEditor (oe-..., ws-...)
@@ -176,7 +180,7 @@ def human_readable_dotted_expr(env, model, chain):
         field = model._fields[fname] if fname in model._fields else None
         if field is not None:
             human_readable.append(field.get_description(env, ["string"])["string"])
-            model = env[field.comodel_name] if field.comodel_name else None
+            model = env[field.comodel_name] if field.relational else None
         else:
             model = None
             human_readable.append(fname.split("(")[0])
@@ -233,11 +237,12 @@ def _guess_qweb_variables(tree, report, qcontext):
 
     def qweb_like_eval(expr, values, is_format=False):
         qcontext = {"values": values}
+        compile_context = {}
         if not is_format:
-            compiled = IrQweb._compile_expr(expr)
+            compiled = IrQweb._compile_expr(expr, compile_context)
         else:
             qcontext["self"] = IrQweb
-            compiled = IrQweb._compile_format(expr)
+            compiled = IrQweb._compile_format(expr, compile_context)
         try:
             return safe_eval(compiled, qcontext)
         finally:
@@ -330,9 +335,8 @@ def _guess_qweb_variables(tree, report, qcontext):
             human_readable = expr_to_simple_chain(expr, env, report.model, qcontext) or "Field"
             node.set("data-oe-expression-readable", human_readable)
 
-        tout = [att for att in ("t-out", "t-esc") if att in node.attrib]
-        if tout and not node.get(tout[0]) == "0":
-            expr = node.get(tout[0])
+        if "t-out" in node.attrib and node.get("t-out") != "0":
+            expr = node.get("t-out")
             human_readable = expr_to_simple_chain(expr, env, report.model, qcontext) or "Expression"
             node.set("data-oe-expression-readable", human_readable)
 
@@ -388,21 +392,17 @@ def _get_and_write_studio_view(view, values=None, should_create=True, view_key_t
         vals = {"active": True, **values}
         studio_view.write(vals)
     elif should_create:
-        vals = {"name": key, "key": key, "inherit_id": view.id, "mode": "extension", "priority": 9999999, **values}
+        custo_name = f"Odoo Studio: {view.name} report customization"
+        vals = {"name": custo_name, "key": key, "inherit_id": view.id, "mode": "extension", "priority": 9999999, **values}
         studio_view = view.create(vals)
     return studio_view
 
 
-@contextmanager
-def deactivate_studio_view(main_view):
-    studio_view = None
-    try:
+def _get_arch_without_studio(main_view, studio_view=None):
+    if studio_view is None:
         studio_view = _get_and_write_studio_view(main_view, None, should_create=False, active_test=True)
-        studio_view.active = False
-        yield studio_view
-    finally:
-        if studio_view:
-            studio_view.active = True
+    return main_view.with_context(ir_ui_view_tree_cut_off_view=studio_view).get_combined_arch(), studio_view.arch
+
 
 class WebStudioReportController(main.WebStudioController):
 
@@ -412,7 +412,7 @@ class WebStudioReportController(main.WebStudioController):
             request.update_context(**context)
         request.update_context(studio=1)
 
-        views = self._create_default_report_views(layout)
+        views = self._create_default_report_views(layout, model_name=model_name)
         model = request.env['ir.model']._get(model_name)
         report = request.env['ir.actions.report'].create({
             'name': _('%s Report', model.name),
@@ -429,7 +429,27 @@ class WebStudioReportController(main.WebStudioController):
             'report_name': report.name,
         }
 
-    def _create_default_report_views(self, layout='web.basic_layout'):
+    def _create_address_block(self, **kwargs):
+        if model_name := kwargs.get("model_name"):
+            main_variable = kwargs.get("record_set_address_qweb", "doc")
+            model = self.env[model_name]
+            partner_field_name = next(iter(f for f in model._mail_get_partner_fields(introspect_fields=True) if model._fields[f].type == "many2one"), None)
+            if partner_field_name:
+                company_field = next(iter(f for f in model._fields.values() if f.type == "many2one" and f.comodel_name == "res.company"), None)
+                vat_block = f"""<span t-if="{main_variable}.{partner_field_name}.vat" t-field="{main_variable}.{partner_field_name}.vat"/>"""
+                if company_field and "account_fiscal_country_id" in self.env["res.company"]._fields:
+                    vat_block = f"""
+                    <div t-if="{main_variable}.{partner_field_name}.vat">
+                        <t t-if="{main_variable}.{company_field.name}.account_fiscal_country_id.vat_label" t-out="{main_variable}.{company_field.name}.account_fiscal_country_id.vat_label"/>
+                        <t t-else="">Tax ID</t>: {vat_block}
+                    </div>"""
+
+                return f"""
+                    <address class="mb-0" t-field="{main_variable}.{partner_field_name}" t-options='{{"widget": "contact", "fields": ["address", "name"], "no_marker": True}}'/>
+                    {vat_block}
+                """
+
+    def _create_default_report_views(self, layout='web.basic_layout', **kwargs):
         env = request.env(context={**request.env.context, "studio": 1})
         if layout == 'web.basic_layout':
             arch_document = etree.fromstring("""
@@ -438,13 +458,18 @@ class WebStudioReportController(main.WebStudioController):
                 </t>
                 """)
         else:
+            address_block = self._create_address_block(**kwargs) or ""
+            if address_block:
+                address_block = f"""<t t-set="address">{address_block}</t>"""
+
             arch_document = etree.fromstring("""
                 <t t-name="studio_report_document">
+                    %(address_block)s
                     <t t-call="%(layout)s">
                         <div class="page"><div class="oe_structure" /></div>
                     </t>
                 </t>
-                """ % {'layout': layout})
+                """ % {'layout': layout, "address_block": address_block})
 
         view_document = env['ir.ui.view'].create({
             'name': 'studio_report_document',
@@ -502,7 +527,7 @@ class WebStudioReportController(main.WebStudioController):
         request.update_context(studio=1)
         report = request.env['ir.actions.report'].browse(report_id)
         if not report.report_name or not request.env["ir.ui.view"]._get_template_view(report.report_name, raise_if_not_found=False):
-            report_views = self._create_default_report_views()
+            report_views = self._create_default_report_views(model_name=report.model)
             report.report_name = report_views[0].name
 
         report_data = report.read(fields)
@@ -550,6 +575,7 @@ class WebStudioReportController(main.WebStudioController):
 
         def inline_t_call(tree, variables, recursive_set):
             view_id = tree.get("ws-view-id")
+            view_name = tree.get("t-name")
 
             if recursive_set is None:
                 recursive_set = set()
@@ -598,6 +624,8 @@ class WebStudioReportController(main.WebStudioController):
                         "ws-call-group-key": group_key,
                         "ws-call-key": call_key,
                     })
+                    if view_name:
+                        group_element.set("ws-view-name", view_name)
                     if are_real:
                         group_element.set("ws-real-children", "1")
                         zero.append(group_element)
@@ -629,12 +657,8 @@ class WebStudioReportController(main.WebStudioController):
                 return load_arch(external_layout, variables, recursive_set)
             else:
                 view = IrView._get_template_view(view_name)
-                with deactivate_studio_view(view) as studio_view:
-                    tree = view._get_combined_arch()
-                    KeyedXmlDiffer.assign_node_ids_for_diff(tree)
-                    if studio_view.arch:
-                        apply_inheritance_specs(tree, etree.fromstring(studio_view.arch))
-
+                tree, studio_view_arch = _get_arch_without_studio(view)
+                tree = IrView._prepare_arch_for_diff(tree, studio_view_arch)
                 tree.set("ws-view-id", str(view.id))
                 loaded[view_name] = etree.tostring(tree)
             inline_t_call(tree, variables, recursive_set)
@@ -647,20 +671,26 @@ class WebStudioReportController(main.WebStudioController):
             # This new cursor isolates those evaluations from the main transaction
             # in order to avoid crashes related to them.
             report_safe_cr = report.with_env(report.env(cr=nfg_cursor))
-            render_context = report_safe_cr._get_rendering_context(report_safe_cr, [0], {"studio": True})
+            render_context = report_safe_cr._get_rendering_context(report_safe_cr, [api.NewId()], {"studio": True})
             render_context['report_type'] = "pdf"
             main_qweb = _guess_qweb_variables(main_qweb, report_safe_cr, render_context)
 
         html_container = IrQweb._render("web.html_container", {"studio": True})
         html_container = html.fromstring(html_container)
-        main_qweb.xpath("//*[@id='wrapwrap']")[0]
+        qweb_wrap = main_qweb.xpath("//*[@id='wrapwrap']")[0]
         wrap = html_container.xpath("//*[@id='wrapwrap']")[0]
-        wrap.getparent().replace(wrap, main_qweb.xpath("//*[@id='wrapwrap']")[0])
+        wrap.getparent().replace(wrap, qweb_wrap)
 
         return html.tostring(html_container)
 
     def _render_report(self, report, record_id):
-        return request.env['ir.actions.report'].with_context(studio=True)._render_qweb_html(report, [record_id] if record_id else [], {"studio": True})
+        ctx = {
+            **request.env.context,
+            "studio": True,
+            "inherit_branding": True,
+            "web_studio.clickable_branding": True
+        }
+        return request.env['ir.actions.report'].with_context(ctx)._render_qweb_html(report, [record_id] if record_id else [], {"studio": True})
 
     @http.route("/web_studio/save_report", type="jsonrpc", auth="user")
     def save_report(self, report_id, report_changes=None, html_parts=None, xml_verbatim=None, record_id=None, context=None):
@@ -690,20 +720,22 @@ class WebStudioReportController(main.WebStudioController):
             report_data = report.read(to_write.keys())
             paperformat = report._read_paper_format_measures()
 
-        IrView = request.env["ir.ui.view"].with_context(studio=True, no_cow=True, lang=None)
+        IrUiView = request.env["ir.ui.view"].with_context(studio=True, no_cow=True, lang=None)
         xml_ids = request.env["ir.model.data"]
         if html_parts:
-            for view_id, changes in html_parts.items():
-                view = IrView.browse(int(view_id))
+            views = IrUiView.browse([int(v_id) for v_id in html_parts])
+            for view, changes in zip(views, html_parts.values()):
                 _copy_report_view(view)
                 self._handle_view_changes(view, changes)
 
         if xml_verbatim:
-            for view_id, arch in xml_verbatim.items():
-                view = IrView.browse(int(view_id))
-                _copy_report_view(view)
-                view.write({"arch": arch, "active": True})
-        
+            views = IrUiView.browse([int(v_id) for v_id in xml_verbatim])
+            for view, data in zip(views, xml_verbatim.values()):
+                if combined_arch := data.get("combined_arch"):
+                    self._handle_verbatim_changes(view, combined_arch)
+                elif arch := data.get("arch"):
+                    view.write({"arch": arch, "active": True})
+
         if report_changes:
             xml_ids |= request.env['ir.model.data'].sudo().search(["&", ("model", "=", report._name), ("res_id", "=", report.id)])
 
@@ -741,12 +773,11 @@ class WebStudioReportController(main.WebStudioController):
                 "html": str,
             }
         """
-        with deactivate_studio_view(view) as studio_view:
-            original = view._get_combined_arch()
-            KeyedXmlDiffer.assign_node_ids_for_diff(original)
-            old = deepcopy(original)
-            if studio_view.arch:
-                apply_inheritance_specs(old, etree.fromstring(studio_view.arch))
+        original, studio_view_arch = _get_arch_without_studio(view)
+        original = view._prepare_arch_for_diff(original, None)
+        old = deepcopy(original)
+        if studio_view_arch:
+            apply_inheritance_specs(old, etree.fromstring(studio_view_arch))
 
         # Collect t_call and their groups from the original view
         origin_call_groups = _collect_t_call_content(old)
@@ -776,21 +807,46 @@ class WebStudioReportController(main.WebStudioController):
         new_arch = new_full if new_full is not None else old
         _recompose_arch_with_t_call_parts(new_arch, origin_call_groups, changed_call_groups)
 
-        def is_subtree(node):
-            attribs = node.attrib
-            return any(att in attribs for att in ("t-set", "t-call", "t-name", "t-field"))
-
-        differ = KeyedXmlDiffer(
-            ignore_attributes=["ws-view-id", "ws-call-key", "ws-call-group-key"],
-            is_subtree=is_subtree,
-            xpath_with_meta=True)
-        studio_view_arch = differ.diff_xpath(etree.tostring(original), etree.tostring(new_arch))
+        studio_view_arch = view._get_qweb_xpath_diff(etree.tostring(original), etree.tostring(new_arch)).strip()
         if studio_view_arch:
             studio_view_arch = etree.fromstring(studio_view_arch)
             for node in studio_view_arch.iter(etree.Element):
                 node.attrib.pop(DIFF_ATTRIBUTE, None)
             studio_view_arch = etree.tostring(studio_view_arch)
-        _get_and_write_studio_view(view, {"arch": studio_view_arch or "<data/>"})
+        _get_and_write_studio_view(view, {"arch": studio_view_arch})
+
+    def _handle_verbatim_changes(self, view, arch):
+        lock_attr = "lock-id"
+        new_tree = etree.fromstring(arch)
+        seen_ids = {}
+        last_id = 0
+        # remove duplicates diff-id
+        # we try to keep identified nodes where they were if they were duplicated
+        for el in new_tree.iter(etree.Element):
+            nid = el.attrib.pop(lock_attr, None)
+            if nid:
+                # The diff algo hardcodes which attribute to use
+                el.set(DIFF_ATTRIBUTE, nid)
+                nid = int(nid)
+                if nid not in seen_ids:
+                    seen_ids[nid] = el
+                    last_id = nid
+                else:
+                    if nid > last_id:
+                        seen_ids[nid].attrib.pop(DIFF_ATTRIBUTE)
+                        seen_ids[nid] = el
+                    else:
+                        el.attrib.pop(DIFF_ATTRIBUTE)
+        old_arch, _ = _get_arch_without_studio(view)
+        old_arch = view._prepare_arch_for_diff(old_arch, None)
+
+        studio_view_arch = view._get_qweb_xpath_diff(etree.tostring(old_arch), etree.tostring(new_tree)).strip()
+        if studio_view_arch:
+            studio_view_arch = etree.fromstring(studio_view_arch)
+            for node in studio_view_arch.iter(etree.Element):
+                node.attrib.pop(DIFF_ATTRIBUTE, None)
+            studio_view_arch = etree.tostring(studio_view_arch)
+        _get_and_write_studio_view(view, {"arch": studio_view_arch})
 
     @http.route("/web_studio/reset_report_archs", type="jsonrpc", auth="user")
     def reset_report_archs(self, report_id, include_web_layout=True):

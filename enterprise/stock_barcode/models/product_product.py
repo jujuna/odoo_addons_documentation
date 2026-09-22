@@ -32,6 +32,7 @@ class ProductProduct(models.Model):
             'is_storable',
             'tracking',
             'uom_id',
+            'lot_sequence_id',
         ]
 
     def _get_stock_barcode_specific_data(self):

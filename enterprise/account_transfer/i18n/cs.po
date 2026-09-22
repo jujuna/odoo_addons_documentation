@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:24+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Czech <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 23:32+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-master/"
 "account_transfer/cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,16 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
 "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_transfer
+#: model:ir.module.module,description:base.module_account_transfer
+msgid ""
+"\n"
+"Account Transfers\n"
+"===========================\n"
+"A helper model for managing transfers between accounts.\n"
+msgstr ""
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -65,6 +74,11 @@ msgstr "Model převodu účtu"
 #: model:ir.model,name:account_transfer.model_account_transfer_model_line
 msgid "Account Transfer Model Line"
 msgstr "Řádek modelu převodu účtu"
+
+#. module: account_transfer
+#: model:ir.module.module,shortdesc:base.module_account_transfer
+msgid "Account Transfers"
+msgstr ""
 
 #. module: account_transfer
 #: model:ir.actions.server,name:account_transfer.ir_cron_auto_transfer_ir_actions_server
@@ -202,6 +216,13 @@ msgstr "ID"
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/demo/account_demo.py:0
+#: model:account.journal.group,name:account_transfer.ifrs_group
+msgid "IFRS"
+msgstr ""
+
+#. module: account_transfer
+#. odoo-python
+#: code:addons/account_transfer/demo/account_demo.py:0
 msgid "IFRS Transfers"
 msgstr ""
 
@@ -300,8 +321,7 @@ msgstr "Procenta"
 msgid ""
 "Percentage of the sum of lines from the origin accounts will be transferred "
 "to the destination account"
-msgstr ""
-"Procento ze součtu řádků z původních účtů bude převedeno na cílový účet"
+msgstr "Procento ze součtu řádků z původních účtů bude převedeno na cílový účet"
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -428,75 +448,3 @@ msgstr "např. Měsíční přeúčtování výdajů"
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "forever"
 msgstr "navždy"
-
-#~ msgid "Activate"
-#~ msgstr "aktivovat"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these analytic accounts to the destination account"
-#~ msgstr ""
-#~ "Přidá podmínku pouze k přenosu součtu řádků z počátečních účtů, které "
-#~ "odpovídají těmto analytickým účtům, do cílového účtu"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these partners to the destination account"
-#~ msgstr ""
-#~ "Přidá podmínku pouze k přenosu součtu řádků z účtů původu, které "
-#~ "odpovídají těmto partnerům, do cílového účtu"
-
-#~ msgid "Analytic Filter"
-#~ msgstr "Analytický filtr"
-
-#~ msgid "Automated Transfer"
-#~ msgstr "Automatický přenos"
-
-#~ msgid "Automatic Transfer (%s%% from account %s)"
-#~ msgstr "Automatický přenos (%s%% z účtu %s)"
-
-#~ msgid "Automatic Transfer (-%s%%)"
-#~ msgstr "Automatický přenos (-%s%%)"
-
-#~ msgid ""
-#~ "Automatic Transfer (entries with analytic account(s): %s and partner(s): "
-#~ "%s)"
-#~ msgstr ""
-#~ "Automatický převod (položky s analytickými účty): %s a partner "
-#~ "(partneři): %s)"
-
-#~ msgid "Automatic Transfer (entries with analytic account(s): %s)"
-#~ msgstr "Automatický převod (položky s analytickými účty): %s)"
-
-#~ msgid "Automatic Transfer (entries with partner(s): %s)"
-#~ msgstr "Automatický převod (záznamy s partnerem (partnery)): %s)"
-
-#~ msgid "Automatic Transfer (to account %s)"
-#~ msgstr "Automatický převod (na účet %s)"
-
-#~ msgid "Automatic Transfers"
-#~ msgstr "Automatické přeúčtování"
-
-#~ msgid "Partner Filter"
-#~ msgstr "Filtr partnerů"
-
-#~ msgid "Percent (%)"
-#~ msgstr "Procent (%)"
-
-#~ msgid "Percent Is Readonly"
-#~ msgstr "Procento je pouze pro čtení"
-
-#~ msgid "Running"
-#~ msgstr "Spuštěno"
-
-#~ msgid "The analytic filter %s is duplicated"
-#~ msgstr "Analytický filtr %s je duplikován"
-
-#~ msgid ""
-#~ "The partner filter %s in combination with the analytic filter %s is "
-#~ "duplicated"
-#~ msgstr ""
-#~ "Filtr partnerů %s v kombinaci s analytickým filtrem %s je duplikován"
-
-#~ msgid "The partner filter %s is duplicated"
-#~ msgstr "Filtr partnerů %s je duplikován"

@@ -18,8 +18,20 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.l10n_in_edi_production_env",
         readonly=False
     )
+    l10n_in_gsp = fields.Selection(selection=[
+        ('bvm', 'BVM IT Consulting'),
+        ('tera', 'Tera Software (Deprecated)'),
+    ], string="GSP",
+        inverse="_set_l10n_in_gsp",  # use an inverse method to invalidate existing tokens if the GSP is changed
+        store=False,
+        help="Select the GST Suvidha Provider (GSP) you want to use for GST services.",
+    )
     l10n_in_hsn_code_digit = fields.Selection(
         related='company_id.l10n_in_hsn_code_digit',
+        readonly=False
+    )
+    l10n_in_upi_id = fields.Char(
+        related='company_id.l10n_in_upi_id',
         readonly=False
     )
 
@@ -32,10 +44,6 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.l10n_in_tcs_feature',
         readonly=False
     )
-    l10n_in_withholding_account_id = fields.Many2one(
-        related='company_id.l10n_in_withholding_account_id',
-        readonly=False
-    )
     l10n_in_withholding_journal_id = fields.Many2one(
         related='company_id.l10n_in_withholding_journal_id',
         readonly=False
@@ -46,10 +54,6 @@ class ResConfigSettings(models.TransientModel):
     )
 
     # GST settings
-    l10n_in_is_gst_registered = fields.Boolean(
-        related='company_id.l10n_in_is_gst_registered',
-        readonly=False
-    )
     l10n_in_gstin = fields.Char(
         string="GST Number",
         related='company_id.vat',
@@ -59,13 +63,23 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.l10n_in_gstin_status_feature',
         readonly=False
     )
-    l10n_in_gst_efiling_feature = fields.Boolean(string="GST E-Filing & Matching Feature")
+    l10n_in_gst_registration_type = fields.Selection(
+        related='company_id.l10n_in_gst_registration_type',
+        readonly=False
+    )
+    l10n_in_composition_tax_rate = fields.Selection(
+        related='company_id.l10n_in_composition_tax_rate',
+        readonly=False
+    )
+    l10n_in_gst_efiling_feature = fields.Boolean(string="GST Reports & E-Filing")
+    l10n_in_disable_b2c_hsn_reporting = fields.Boolean(related='company_id.l10n_in_disable_b2c_hsn_reporting', readonly=False)
     l10n_in_fetch_vendor_edi_feature = fields.Boolean(string="Fetch Vendor E-Invoiced Document")
     l10n_in_enet_vendor_batch_payment_feature = fields.Boolean(string="ENet Vendor Batch Payment")
 
     module_l10n_in_reports = fields.Boolean("GST E-Filing & Matching")
     module_l10n_in_edi = fields.Boolean("Indian Electronic Invoicing")
     module_l10n_in_ewaybill = fields.Boolean("Indian Electronic Waybill")
+    module_l10n_in_boe = fields.Boolean("Bill of Entry")
 
     def set_values(self):
         super().set_values()
@@ -94,13 +108,11 @@ class ResConfigSettings(models.TransientModel):
     def _update_l10n_in_feature(self, column):
         """ This way, after installing the module, the field will already be set for the active company. """
         if not column_exists(self.env.cr, "res_company", column):
-            create_column(self.env.cr, "res_company", column, "boolean")
+            create_column(self.env.cr, "res_company", column, "bool")
             self.env.cr.execute(SQL(
-                f"""
-                    UPDATE res_company
-                    SET {column} = true
-                    WHERE id = {self.env.company.id}
-                """
+                "UPDATE res_company SET %s = true WHERE id = %s",
+                SQL.identifier(column),
+                self.env.company.id,
             ))
 
     def l10n_in_edi_buy_iap(self):
@@ -141,3 +153,42 @@ class ResConfigSettings(models.TransientModel):
             branch_companies = self.company_id.child_ids
             if branch_companies:
                 branch_companies._update_l10n_in_fiscal_position()
+
+    def _l10n_in_is_first_time_setup(self):
+        """
+            Check if at least one company for India has been configured with the localization settings.
+            If not, it means it's the first time setup.
+        """
+        all_validity_fields = ['l10n_in_gstr_gst_token_validity', 'l10n_in_edi_token_validity', 'l10n_in_ewaybill_auth_validity']
+        validity_fields = (field_name for field_name in self.company_id._fields if field_name in all_validity_fields)
+        if validity_fields:
+            validity_fields_domain = fields.Domain.OR([[(field_name, '!=', False)] for field_name in validity_fields])
+            configured_company_count = self.env['res.company'].sudo().search_count([
+                ('account_fiscal_country_id.code', '=', 'IN'),
+                *validity_fields_domain
+            ])
+            return not configured_company_count
+        return True
+
+    def get_values(self):
+        res = super().get_values()
+        res['l10n_in_gsp'] = self.env['ir.config_parameter'].sudo().get_str('l10n_in.gsp_provider')
+        if not res['l10n_in_gsp']:
+            if self._l10n_in_is_first_time_setup():
+                # Default to BVM for new databases setting up India localization for the first time
+                res['l10n_in_gsp'] = 'bvm'
+            else:
+                res['l10n_in_gsp'] = 'tera'
+        return res
+
+    def _l10n_in_gsp_provider_changed(self):
+        """ Hook to be overridden in other modules to handle GSP provider change. """
+        self.ensure_one()
+        self.env['ir.config_parameter'].sudo().set_str('l10n_in.gsp_provider', self.l10n_in_gsp)
+
+    def _set_l10n_in_gsp(self):
+        gsp_before = self.env['ir.config_parameter'].sudo().get_str('l10n_in.gsp_provider')
+        for config in self:
+            if gsp_before != config.l10n_in_gsp:
+                config._l10n_in_gsp_provider_changed()
+            return

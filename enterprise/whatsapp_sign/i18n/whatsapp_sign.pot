@@ -4,16 +4,23 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-12-30 18:49+0000\n"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-08-28 17:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: whatsapp_sign
+#: model_terms:ir.ui.view,arch_db:whatsapp_sign.sign_request_logs_user_whatsapp
+msgid ""
+"<small>Phone verification: The signatory has confirmed control of their "
+"phone number by clicking on a unique link</small>"
+msgstr ""
 
 #. module: whatsapp_sign
 #. odoo-python
@@ -29,6 +36,26 @@ msgid "All signers must have a phone number to send messages via WhatsApp."
 msgstr ""
 
 #. module: whatsapp_sign
+#: model_terms:ir.ui.view,arch_db:whatsapp_sign.res_config_settings_view_form
+msgid "Allow users to send documents for signing via WhatsApp"
+msgstr ""
+
+#. module: whatsapp_sign
+#: model:ir.model.fields,help:whatsapp_sign.field_res_config_settings__request_completion_wa_template_id
+msgid "Approved WhatsApp template sent when a signature request is completed."
+msgstr ""
+
+#. module: whatsapp_sign
+#: model:ir.model.fields,help:whatsapp_sign.field_res_config_settings__request_refusal_wa_template_id
+msgid "Approved WhatsApp template sent when a signature request is refused."
+msgstr ""
+
+#. module: whatsapp_sign
+#: model:ir.model.fields,help:whatsapp_sign.field_res_config_settings__sign_send_request_wa_template_id
+msgid "Approved WhatsApp template used to send signature requests."
+msgstr ""
+
+#. module: whatsapp_sign
 #: model:ir.model.fields,field_description:whatsapp_sign.field_sign_request_item__attachments_download_link
 msgid "Attachments Download Link"
 msgstr ""
@@ -40,27 +67,13 @@ msgid "Attachments of Request %s"
 msgstr ""
 
 #. module: whatsapp_sign
-#: model:ir.model.fields,help:whatsapp_sign.field_res_config_settings__send_request_wa_template_id
-msgid "Choose an approved WhatsApp template to send signature requests"
+#: model:ir.model,name:whatsapp_sign.model_res_company
+msgid "Company"
 msgstr ""
 
 #. module: whatsapp_sign
-#: model:ir.model.fields,help:whatsapp_sign.field_res_config_settings__request_completion_wa_template_id
-msgid ""
-"Choose an approved WhatsApp template to send the signature request "
-"completion"
-msgstr ""
-
-#. module: whatsapp_sign
-#: model:ir.model.fields,help:whatsapp_sign.field_res_config_settings__request_refusal_wa_template_id
-msgid ""
-"Choose an approved WhatsApp template to send the signature request refusal"
-msgstr ""
-
-#. module: whatsapp_sign
-#: model:ir.model.fields,field_description:whatsapp_sign.field_res_config_settings__request_completion_wa_template_id
 #: model_terms:ir.ui.view,arch_db:whatsapp_sign.res_config_settings_view_form
-msgid "Completed template"
+msgid "Completion Template"
 msgstr ""
 
 #. module: whatsapp_sign
@@ -74,6 +87,7 @@ msgid "Delivery Method"
 msgstr ""
 
 #. module: whatsapp_sign
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_company__display_name
 #: model:ir.model.fields,field_description:whatsapp_sign.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:whatsapp_sign.field_sign_request__display_name
 #: model:ir.model.fields,field_description:whatsapp_sign.field_sign_request_item__display_name
@@ -88,6 +102,13 @@ msgid "Document Link"
 msgstr ""
 
 #. module: whatsapp_sign
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_company__sign_whatsapp_enabled
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_config_settings__sign_whatsapp_enabled
+msgid "Enable WhatsApp For Signature Requests"
+msgstr ""
+
+#. module: whatsapp_sign
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_company__id
 #: model:ir.model.fields,field_description:whatsapp_sign.field_res_config_settings__id
 #: model:ir.model.fields,field_description:whatsapp_sign.field_sign_request__id
 #: model:ir.model.fields,field_description:whatsapp_sign.field_sign_request_item__id
@@ -110,8 +131,23 @@ msgid "Is Whatsapp Feature Enabled"
 msgstr ""
 
 #. module: whatsapp_sign
+#: model_terms:ir.ui.view,arch_db:whatsapp_sign.res_config_settings_view_form
+msgid "Manage Your Templates"
+msgstr ""
+
+#. module: whatsapp_sign
 #: model:ir.model.fields,field_description:whatsapp_sign.field_sign_request__raw_optional_message
 msgid "Optional Message"
+msgstr ""
+
+#. module: whatsapp_sign
+#: model_terms:ir.ui.view,arch_db:whatsapp_sign.sign_request_logs_user_whatsapp
+msgid "Phone Verification"
+msgstr ""
+
+#. module: whatsapp_sign
+#: model_terms:ir.ui.view,arch_db:whatsapp_sign.res_config_settings_view_form
+msgid "Refusal Template"
 msgstr ""
 
 #. module: whatsapp_sign
@@ -120,20 +156,13 @@ msgid "Refusal reason"
 msgstr ""
 
 #. module: whatsapp_sign
-#: model:ir.model.fields,field_description:whatsapp_sign.field_res_config_settings__request_refusal_wa_template_id
-#: model_terms:ir.ui.view,arch_db:whatsapp_sign.res_config_settings_view_form
-msgid "Refusal template"
-msgstr ""
-
-#. module: whatsapp_sign
 #: model:ir.model.fields,field_description:whatsapp_sign.field_sign_request__refuser_partner
 msgid "Refuser Partner"
 msgstr ""
 
 #. module: whatsapp_sign
-#: model:ir.model.fields,field_description:whatsapp_sign.field_res_config_settings__send_request_wa_template_id
 #: model_terms:ir.ui.view,arch_db:whatsapp_sign.res_config_settings_view_form
-msgid "Request template"
+msgid "Request Template"
 msgstr ""
 
 #. module: whatsapp_sign
@@ -167,8 +196,40 @@ msgid "Signature Request Item"
 msgstr ""
 
 #. module: whatsapp_sign
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_company__request_completion_wa_template_id
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_config_settings__request_completion_wa_template_id
+msgid "Signature completion template"
+msgstr ""
+
+#. module: whatsapp_sign
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_company__request_refusal_wa_template_id
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_config_settings__request_refusal_wa_template_id
+msgid "Signature refusal template"
+msgstr ""
+
+#. module: whatsapp_sign
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_company__sign_send_request_wa_template_id
+#: model:ir.model.fields,field_description:whatsapp_sign.field_res_config_settings__sign_send_request_wa_template_id
+msgid "Signature request template"
+msgstr ""
+
+#. module: whatsapp_sign
 #: model:ir.model.fields,field_description:whatsapp_sign.field_sign_request__signers_name
 msgid "Signers name"
+msgstr ""
+
+#. module: whatsapp_sign
+#: model:ir.module.module,description:base.module_whatsapp_sign
+msgid ""
+"This module allows users to send signature requests via WhatsApp using Odoo "
+"Sign"
+msgstr ""
+
+#. module: whatsapp_sign
+#: model:ir.module.module,summary:base.module_whatsapp_sign
+msgid ""
+"This module enables users to send signature requests via WhatsApp in Odoo "
+"Sign"
 msgstr ""
 
 #. module: whatsapp_sign
@@ -179,4 +240,9 @@ msgstr ""
 #. module: whatsapp_sign
 #: model:ir.model,name:whatsapp_sign.model_whatsapp_template_variable
 msgid "WhatsApp Template Variable"
+msgstr ""
+
+#. module: whatsapp_sign
+#: model:ir.module.module,shortdesc:base.module_whatsapp_sign
+msgid "WhatsApp-Sign"
 msgstr ""

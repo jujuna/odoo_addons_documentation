@@ -16,24 +16,50 @@
 # Piotr Cierkosz <piotr.w.cierkosz@gmail.com>, 2022
 # Tadeusz Karpiński <tadeuszkarpinski@gmail.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Marta (wacm)" <wacm@odoo.com>, 2025, 2026.
+# "Marta (wacm)" <wacm@odoo.com>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~15.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-23 17:54+0000\n"
-"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
-"Language-Team: Polish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 01:01+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
 "delivery_easypost/pl/>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
-"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || "
-"(n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-"X-Generator: Weblate 5.14.3\n"
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__4x4
+msgid "4x4"
+msgstr ""
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__4x6
+msgid "4x6"
+msgstr ""
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__6x4
+msgid "6x4"
+msgstr ""
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__7x3
+msgid "7x3"
+msgstr ""
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__8_5x11
+msgid "8.5x11"
+msgstr ""
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -74,18 +100,12 @@ msgstr "Do załadowania nośników easypost wymagany jest klucz produkcyjny."
 #. odoo-python
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "A production key is required in order to load your insurance fees."
-msgstr ""
-"Klucz produkcyjny jest wymagany do załadowania opłat ubezpieczeniowych."
+msgstr "Klucz produkcyjny jest wymagany do załadowania opłat ubezpieczeniowych."
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "API keys"
 msgstr "Klucze API"
-
-#. module: delivery_easypost
-#: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_easypost_carrier_type
-msgid "Cancel"
-msgstr "Anuluj"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_stock_package_type__package_carrier_type
@@ -144,6 +164,11 @@ msgid "Delivery Carrier"
 msgstr "Przewoźnik"
 
 #. module: delivery_easypost
+#: model:ir.model,name:delivery_easypost.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
+
+#. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__display_name
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__display_name
@@ -199,6 +224,11 @@ msgid "Easypost Label File Type"
 msgstr "Typ pliku etykiety Easypost"
 
 #. module: delivery_easypost
+#: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_label_size
+msgid "Easypost Label Size"
+msgstr ""
+
+#. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_stock_picking__ep_order_ref
 msgid "Easypost Order Reference"
 msgstr "Numer referencyjny zamówienia Easypost"
@@ -209,10 +239,9 @@ msgid "Easypost Service"
 msgstr "Usługa Easypost"
 
 #. module: delivery_easypost
-#: model_terms:ir.ui.view,arch_db:delivery_easypost.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_easypost.res_config_settings_view_form_stock
-msgid "Easypost Shipping Methods"
-msgstr "Sposoby wysyłki Easypost"
+#: model:ir.module.module,shortdesc:base.module_delivery_easypost
+msgid "Easypost Shipping"
+msgstr ""
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -284,6 +313,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Label Format"
 msgstr "Format etykiety"
+
+#. module: delivery_easypost
+#: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
+msgid "Label Size"
+msgstr ""
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__write_uid
@@ -362,6 +396,11 @@ msgid "Select a carrier"
 msgstr "Wybór przewoźnika"
 
 #. module: delivery_easypost
+#: model:ir.module.module,description:base.module_delivery_easypost
+msgid "Send your parcels through Easypost and track them online"
+msgstr ""
+
+#. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__name
 msgid "Service Level Name"
 msgstr "Nazwa poziomu usługi"
@@ -371,11 +410,6 @@ msgstr "Nazwa poziomu usługi"
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "Shipment created into Easypost<br/><b>Tracking Numbers:</b> %s<br/>"
 msgstr "Przesyłka utworzona w Easypost<br/><b>Numery śledzenia:</b>%s<br/>"
-
-#. module: delivery_easypost
-#: model:ir.model,name:delivery_easypost.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Sposoby dostawy"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -396,41 +430,33 @@ msgstr "Testowy klucz API"
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Default Package Type)"
 msgstr ""
-"Brak przewoźnika %s (brakujące pole(a) :\n"
-"Domyślny typ opakowania)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Delivery Carrier Type)"
 msgstr ""
-"Brak przewoźnika %s (brakujące pole(a) :\n"
-"Typ przewoźnika dostawy)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Production API Key)"
 msgstr ""
-"Brak przewoźnika %s (brakujące pole(a) :\n"
-"Produkcyjny klucz API)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Test API Key)"
 msgstr ""
-"Brak przewoźnika %s (brakujące pole(a) :\n"
-"Testowy klucz API)"
 
 #. module: delivery_easypost
 #. odoo-python

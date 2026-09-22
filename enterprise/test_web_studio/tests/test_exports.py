@@ -1,6 +1,5 @@
-import base64
-
 from odoo import Command
+from odoo.tools import BinaryBytes
 from odoo.addons.sale.tests.common import SaleCommon
 
 from .common_exports import StudioExportCase, StudioExportSerializer
@@ -111,6 +110,7 @@ class TestStudioExports(StudioExportCase):
                             </templates>
                         </kanban>
                 </field>
+                <field name="key">studio_customization.{self.get_xmlid(custom_view)}</field>
                 <field name="model">x_furnace_types</field>
                 <field name="name">Kanban view for x_furnace_types</field>
                 <field name="type">kanban</field>
@@ -152,7 +152,7 @@ class TestStudioExports(StudioExportCase):
             ttype="integer",
             model_id=custom_model.id,
         )
-        CustomModel = self.env[custom_model.model].with_user(2).sudo()
+        CustomModel = self.env[custom_model.model].with_user(self.ref('base.user_admin')).sudo()
         CustomModel.create({"x_name": "Austenitization", "x_studio_max_temp": 1200})
 
         # Without export model, the custom model data are not exported
@@ -169,7 +169,7 @@ class TestStudioExports(StudioExportCase):
             ttype="integer",
             model_id=custom_model.id,
         )
-        CustomModel = self.env[custom_model.model].with_user(2).sudo()
+        CustomModel = self.env[custom_model.model].with_user(self.ref('base.user_admin')).sudo()
         furnace_type = CustomModel.create(
             {"x_name": "Austenitization", "x_studio_max_temp": 1200}
         )
@@ -281,7 +281,7 @@ class TestStudioExports(StudioExportCase):
         some_record = self.TestModel.create(
             {
                 "name": "Some record",
-                "binary_data": base64.b64encode(b"My binary attachment"),
+                "binary_data": BinaryBytes(b"My binary attachment"),
             }
         )
         self.create_export_model(self.TestModel._name)
@@ -297,7 +297,7 @@ class TestStudioExports(StudioExportCase):
             f"""<odoo noupdate="1">
             <record id="{self.get_xmlid(some_record)}" model="test.studio_export.model1">
                 <field name="name">Some record</field>
-                <field name="binary_data" type="base64" file="studio_customization/static/src/binary/test_studio_export_model1/{some_record.id}-binary_data"/>
+                <field name="binary_data" type="bytes" file="studio_customization/static/src/binary/test_studio_export_model1/{some_record.id}-binary_data"/>
             </record>
             </odoo>""",
         )
@@ -306,7 +306,7 @@ class TestStudioExports(StudioExportCase):
         some_record = self.TestModel.create(
             {
                 "name": "Some record",
-                "binary_data": base64.b64encode(b"My binary attachment"),
+                "binary_data": BinaryBytes(b"My binary attachment"),
             }
         )
         self.create_export_model(self.TestModel._name, include_attachment=True)
@@ -322,7 +322,7 @@ class TestStudioExports(StudioExportCase):
             f"""<odoo noupdate="1">
             <record id="{self.get_xmlid(some_record)}" model="test.studio_export.model1">
                 <field name="name">Some record</field>
-                <field name="binary_data" type="base64" file="studio_customization/static/src/binary/test_studio_export_model1/{some_record.id}-binary_data"/>
+                <field name="binary_data" type="bytes" file="studio_customization/static/src/binary/test_studio_export_model1/{some_record.id}-binary_data"/>
             </record>
             </odoo>""",
         )
@@ -335,14 +335,14 @@ class TestStudioExports(StudioExportCase):
             model_id=self.env["ir.model"]._get("res.partner").id,
             state="manual",
             depends="name",
-            compute="for partner in self: partner['x_test_binary'] = [{'key': 'value'}]",
+            compute="for partner in self: partner['x_test_binary'] = BinaryBytes(repr([{'key': 'value'}]).encode())",
             field_description="Test Binary Field",
             store=False,
         )
         partner = self.env["res.partner"].create({
             "name": "Test Partner Binary Field",
         })
-        self.assertEqual(partner.x_test_binary, [{'key': 'value'}])
+        self.assertEqual(partner.x_test_binary.content, repr([{'key': 'value'}]).encode())
         wizard_data = self.env["studio.export.wizard.data"].create(
             [{"model": partner._name, "res_id": partner.id}]
         )
@@ -356,7 +356,7 @@ class TestStudioExports(StudioExportCase):
         self._export_iter = iter(self.exporter.serialize())
         self.assertFileContains(
             f"static/src/binary/res_partner/{partner.id}-x_test_binary",
-            "[{'key': 'value'}]"
+            b"[{'key': 'value'}]",
         )
 
     def test_export_model_with_many2one_attachment(self):
@@ -364,7 +364,7 @@ class TestStudioExports(StudioExportCase):
         attachment = self.env["ir.attachment"].create(
             {
                 "name": "Some attachment",
-                "datas": base64.b64encode(b"My attachment"),
+                "raw": b"My attachment",
                 "res_model": self.TestModel._name,
                 "res_id": some_record.id,
                 "res_field": "attachment_id",
@@ -387,7 +387,7 @@ class TestStudioExports(StudioExportCase):
             f"""<odoo noupdate="1">
             <record id="{self.get_xmlid(attachment)}" model="ir.attachment">
                 <field name="name">Some attachment</field>
-                <field name="datas" type="base64" file="studio_customization/static/src/binary/ir_attachment/{attachment.id}-Someattachment"/>
+                <field name="raw" type="bytes" file="studio_customization/static/src/binary/ir_attachment/{attachment.id}-Someattachment"/>
             </record>
             </odoo>""",
         )
@@ -406,7 +406,7 @@ class TestStudioExports(StudioExportCase):
         attachment1 = self.env["ir.attachment"].create(
             {
                 "name": "Some attachment",
-                "datas": base64.b64encode(b"My attachment"),
+                "raw": b"My attachment",
                 "res_model": self.TestModel._name,
                 "res_id": some_record.id,
                 "res_field": "attachment_ids",
@@ -415,7 +415,7 @@ class TestStudioExports(StudioExportCase):
         attachment2 = self.env["ir.attachment"].create(
             {
                 "name": "Another attachment",
-                "datas": base64.b64encode(b"My second attachment"),
+                "raw": b"My second attachment",
                 "res_model": self.TestModel._name,
                 "res_id": some_record.id,
                 "res_field": "attachment_ids",
@@ -439,14 +439,14 @@ class TestStudioExports(StudioExportCase):
             f"""<odoo noupdate="1">
             <record id="{self.get_xmlid(attachment2)}" model="ir.attachment">
                 <field name="name">Another attachment</field>
-                <field name="datas" type="base64" file="studio_customization/static/src/binary/ir_attachment/{attachment2.id}-Anotherattachment" />
+                <field name="raw" type="bytes" file="studio_customization/static/src/binary/ir_attachment/{attachment2.id}-Anotherattachment" />
                 <field name="res_id" ref="{self.get_xmlid(some_record)}" />
                 <field name="res_model">test.studio_export.model1</field>
                 <field name="res_field">attachment_ids</field>
             </record>
             <record id="{self.get_xmlid(attachment1)}" model="ir.attachment">
                 <field name="name">Some attachment</field>
-                <field name="datas" type="base64" file="studio_customization/static/src/binary/ir_attachment/{attachment1.id}-Someattachment" />
+                <field name="raw" type="bytes" file="studio_customization/static/src/binary/ir_attachment/{attachment1.id}-Someattachment" />
                 <field name="res_id" ref="{self.get_xmlid(some_record)}" />
                 <field name="res_model">test.studio_export.model1</field>
                 <field name="res_field">attachment_ids</field>
@@ -495,6 +495,40 @@ class TestStudioExports(StudioExportCase):
             </record>
             <record id="{self.get_xmlid(model2_record2)}" model="test.studio_export.model2">
                 <field name="model2_id" ref="{self.get_xmlid(model2_record1)}"/>
+            </record>
+            </odoo>""",
+        )
+
+    def test_export_property_field(self):
+        model1_record = self.TestModel.create({"name": "Record 1"})
+        model3_record = self.TestModel3.create({
+            "name": "Some record",
+            "model1_id": model1_record.id,
+            "properties": [{'name': 'test', 'type': 'char', 'value': 'TEST', 'definition_changed': True}],
+        })
+        self.create_export_model(self.TestModel._name)
+        self.create_export_model(self.TestModel3._name)
+        self.studio_export()
+        self.assertFileList(
+            "data/test_studio_export_model1.xml",
+            "data/test_studio_export_model3.xml",
+        )
+        self.assertXML(
+            "data/test_studio_export_model1.xml",
+            f"""<odoo noupdate="1">
+            <record id="{self.get_xmlid(model1_record)}" model="test.studio_export.model1">
+                <field name="name">Record 1</field>
+                <field name="properties_definition" eval="[{{'name': 'test', 'type': 'char'}}]"/>
+            </record>
+            </odoo>""",
+        )
+        self.assertXML(
+            "data/test_studio_export_model3.xml",
+            f"""<odoo noupdate="1">
+            <record id="{self.get_xmlid(model3_record)}" model="test.studio_export.model3">
+                <field name="name">Some record</field>
+                <field name="model1_id" ref="{self.get_xmlid(model1_record)}"/>
+                <field name="properties" eval="{{'test': 'TEST'}}"/>
             </record>
             </odoo>""",
         )
@@ -669,7 +703,7 @@ class TestStudioExports(StudioExportCase):
         )
 
     def test_export_abstract_actions_with_proper_types(self):
-        WindowActions = self.env["ir.actions.act_window"].with_user(2)
+        WindowActions = self.env["ir.actions.act_window"].with_user(self.ref('base.user_admin'))
         window_action = WindowActions.create({
             "name": "Test action",
             "type": "ir.actions.act_window",
@@ -678,7 +712,7 @@ class TestStudioExports(StudioExportCase):
             "target": "new",
         })
 
-        URLActions = self.env["ir.actions.act_url"].with_user(2)
+        URLActions = self.env["ir.actions.act_url"].with_user(self.ref('base.user_admin'))
         url_action = URLActions.create({
             "name": "Test action",
             "type": "ir.actions.act_url",
@@ -721,6 +755,8 @@ class TestSpecificStudioExports_SaleOrder(
     SaleCommon,
     StudioExportCase
 ):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_export_demo_sale_orders(self):
         # SPECIFIC: Confirm demo sale orders
         self.sale_order.action_confirm()
@@ -746,11 +782,11 @@ class TestSpecificStudioExports_SaleOrder(
 class TestSpecificStudioExports_Website(StudioExportCase):
     def test_unlink_default_main_menu(self):
         # SPECIFIC: unlink the default main menu from the website if needed
-        website = self.env['website'].get_current_website()
+        website = self.env.ref('base.default_website')
         menus = self.env['website.menu'].search([('website_id', '=', website.id)])
         self.create_export_model("website.menu", domain=[("id", "in", [m.id for m in menus])])
         self.studio_export()
-        if self.get_xmlid(website) != "website.default_website" or not any(r['url'] == '/default-main-menu' for r in menus):
+        if self.get_xmlid(website) != "base.default_website" or not any(r['url'] == '/default-main-menu' for r in menus):
             # Only written for the default website and on a fresh install
             self.skipTest("This test is only written for the default website and on a fresh install")
 
@@ -766,6 +802,6 @@ class TestSpecificStudioExports_Website(StudioExportCase):
         self.assertXML(
             nodes[0],
             """<function model="website.menu" name="unlink">
-                <value model="website.menu" eval="obj().search([('website_id', '=', ref('website.default_website')), ('url', '=', '/default-main-menu')]).id"/>
+                <value model="website.menu" eval="obj().search([('website_id', '=', ref('base.default_website')), ('url', '=', '/default-main-menu')]).id"/>
             </function>""",
         )

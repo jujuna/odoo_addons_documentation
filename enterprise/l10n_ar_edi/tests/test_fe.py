@@ -1,11 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo.addons.account.tests.common import skip_unless_external
 from odoo.addons.l10n_ar_edi.tests.common import TestArEdiCommon
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 
 @tagged('post_install', 'post_install_l10n', '-at_install', *TestArEdiCommon.extra_tags)
 class TestArEdiWsfe(TestArEdiCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestArEdiCommon.setup_afip_ws('wsfe')
@@ -134,3 +137,33 @@ class TestArEdiWsfe(TestArEdiCommon):
     def test_ar_edi_wsfe_payment_foreign_currency(self):
         """ Payment in Foreign Currency  """
         self._test_payment_foreign_currency()
+
+    def test_ar_edi_wsfe_rounding_complex(self):
+        custom_invoice_line_ids = [
+            self._prepare_invoice_line(price_unit=100.545, tax_ids=self.tax_21, discount=25.0),
+            self._prepare_invoice_line(price_unit=100.545, tax_ids=self.tax_21, discount=25.0),
+            self._prepare_invoice_line(price_unit=100.545, tax_ids=self.tax_21, discount=25.0),
+            self._prepare_invoice_line(price_unit=100.545, tax_ids=self.tax_21, discount=25.0),
+        ]
+
+        with self.subTest('invoice_a'), self.cr.savepoint() as sp:
+            self.env.company.tax_calculation_rounding_method = 'round_globally'
+            invoice_a = self._create_invoice_ar(invoice_line_ids=custom_invoice_line_ids)
+            self._validate_and_review(invoice_a, "test_wsfe_round_01")
+            sp.close()
+
+        with self.subTest('invoice_b'):
+            self.env.company.tax_calculation_rounding_method = 'round_per_line'
+            invoice_b = self._create_invoice_ar(invoice_line_ids=custom_invoice_line_ids)
+            self._validate_and_review(invoice_b, "test_wsfe_round_02")
+
+    def test_ar_edi_final_consumer_doc_type(self):
+        # a final consumer with a passport (not a DNI/CUIL/CUIT) must be rejected
+        self.partner_cf.write({
+            'country_id': self.env.ref('base.ar').id,
+            'additional_identifiers': {'PASSPORT': 'ABCDEFGH'},
+        })
+        invoice = self._create_invoice_ar(partner_id=self.partner_cf)
+
+        with self.assertRaisesRegex(UserError, 'For Argentinean contacts with AFIP Responsibility Type "Consumidor Final", the identification type must be DNI or CUIL/CUIT.'):
+            self._validate_and_review(invoice, "")

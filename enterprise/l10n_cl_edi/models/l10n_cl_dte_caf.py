@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 
 from lxml import etree
 
@@ -31,7 +29,10 @@ class L10n_ClDteCaf(models.Model):
     l10n_latam_document_type_id = fields.Many2one('l10n_latam.document.type', string='Document Type')
     start_nb = fields.Integer(string='Start Number', help='CAF Starts from this number')
     final_nb = fields.Integer(string='End Number', help='CAF Ends to this number')
-    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company, readonly=True)
+    company_id = fields.Many2one(
+        'res.company', 'Company', default=lambda self: self.env.company, readonly=True,
+        help='Company drawing folios from this CAF, together with the branches under it sharing its RUT. '
+             'Set it on the parent to share the range with the whole group, on a branch to reserve it.')
     status = fields.Selection([
         ('in_use', 'In Use'),
         ('spent', 'Spent')], string='Status',
@@ -47,7 +48,7 @@ class L10n_ClDteCaf(models.Model):
         """
         This method decodes the file that comes in iso-8859-1 and transforms it to an etree object
         """
-        post = base64.b64decode(self.caf_file).decode('ISO-8859-1')
+        post = self.caf_file.decode('ISO-8859-1')
         return etree.fromstring(post.encode('utf-8'))
 
     def action_enable(self):
@@ -68,12 +69,13 @@ class L10n_ClDteCaf(models.Model):
         ], limit=1)
         self.issued_date = result.xpath('FA')[0].text
         rut_n = result.xpath('RE')[0].text
-        if not self.company_id.vat:
+        root_company = self.company_id._l10n_cl_get_root_company()
+        if not root_company.vat:
             raise UserError(_('The VAT of your company has not been configured. '
                               'Please go to your company data and add it.'))
-        if self._l10n_cl_format_vat(rut_n) != self._l10n_cl_format_vat(self.company_id.vat):
+        if self._l10n_cl_format_vat(rut_n) != self._l10n_cl_format_vat(root_company.vat):
             raise UserError(_('Caf vat %(caf_vat)s should be the same that assigned company\'s vat: %(company_vat)s!',
-                caf_vat=rut_n, company_vat=self.company_id.vat))
+                caf_vat=rut_n, company_vat=root_company.vat))
         self.status = 'in_use'
 
     def action_spend(self):

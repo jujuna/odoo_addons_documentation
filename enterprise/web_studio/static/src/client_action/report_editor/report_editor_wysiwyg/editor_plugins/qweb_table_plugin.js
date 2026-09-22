@@ -1,10 +1,9 @@
 import { Plugin } from "@html_editor/plugin";
-import { closestElement } from "@html_editor/utils/dom_traversal";
-import { Component, reactive } from "@odoo/owl";
+import { closestElement, traverseNode } from "@html_editor/utils/dom_traversal";
+import { Component, proxy, signal, t, useProps } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { _t } from "@web/core/l10n/translation";
-import { visitNode } from "../../utils";
 
 /**
  * @typedef {Object} CellInfo
@@ -14,16 +13,19 @@ import { visitNode } from "../../utils";
 
 class TableMenu extends Component {
     static template = "html_editor.TableMenu";
-    static props = {
-        type: String, // column or row
-        overlay: Object,
-        dropdownState: Object,
-        target: { validate: (el) => el.nodeType === Node.ELEMENT_NODE },
-        editable: { validate: (el) => el.nodeType === Node.ELEMENT_NODE },
-        addColumn: Function,
-        removeColumn: Function,
-    };
+    props = useProps({
+        type: t.string(), // column or row
+        overlay: t.object(),
+        dropdownState: t.object(),
+        target: t.customValidator(t.any(), (el) => el.nodeType === Node.ELEMENT_NODE),
+        editable: t.customValidator(t.any(), (el) => el.nodeType === Node.ELEMENT_NODE),
+        addColumn: t.function(),
+        removeColumn: t.function(),
+    });
     static components = { Dropdown, DropdownItem };
+
+    // The reused "html_editor.TableMenu" template binds t-ref="this.menuRef".
+    menuRef = signal.ref();
 
     setup() {
         this.items = this.props.type === "column" ? this.colItems() : [];
@@ -33,19 +35,19 @@ class TableMenu extends Component {
         return [
             {
                 name: "insert_left",
-                icon: "fa-plus",
+                icon: "add",
                 text: _t("Insert left"),
                 action: this.insertColumn.bind(this, "before"),
             },
             {
                 name: "insert_right",
-                icon: "fa-plus",
+                icon: "add",
                 text: _t("Insert right"),
                 action: this.insertColumn.bind(this, "after"),
             },
             {
                 name: "delete",
-                icon: "fa-trash",
+                icon: "delete",
                 text: _t("Delete"),
                 action: this.deleteColumn.bind(this),
             },
@@ -139,13 +141,16 @@ export class QWebTablePlugin extends Plugin {
     static id = "qweb_table_plugin";
     static dependencies = ["baseContainer", "overlay", "selection", "history"];
     resources = {
-        clean_for_save_handlers: ({ root }) => this.clean(root),
-        normalize_handlers: this.normalize.bind(this),
+        clean_for_save_processors: (root) => {
+            this.clean(root);
+            return root;
+        },
+        normalize_processors: this.normalize.bind(this),
     };
 
     setup() {
         for (const table of this.editable.querySelectorAll("q-table")) {
-            visitNode(table, (node) => {
+            traverseNode(table, (node) => {
                 if (node.tagName !== "T") {
                     node.classList.add("oe_unbreakable");
                 }
@@ -224,7 +229,7 @@ export class QWebTablePlugin extends Plugin {
     }
 
     createDropdownState(menuToClose) {
-        const dropdownState = reactive({
+        const dropdownState = proxy({
             isOpen: false,
             open: () => {
                 dropdownState.isOpen = true;
@@ -242,7 +247,7 @@ export class QWebTablePlugin extends Plugin {
     addColumn(payload) {
         const insertedCells = this._addColumn(payload);
         this.dependencies.selection.setCursorStart(insertedCells[0]);
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
 
     _addColumn({ position, reference }) {
@@ -298,7 +303,7 @@ export class QWebTablePlugin extends Plugin {
         };
 
         for (const table of element.querySelectorAll("q-table")) {
-            visitNode(table, cleanTableNode);
+            traverseNode(table, cleanTableNode);
         }
     }
 
@@ -306,8 +311,10 @@ export class QWebTablePlugin extends Plugin {
         const table = closestElement(payload.cell, "q-table");
         this._removeColumn(payload);
         const firstCell = table.querySelector(CELL_TAGS.join(","));
-        this.dependencies.selection.setCursorEnd(firstCell);
-        this.dependencies.history.addStep();
+        if (firstCell) {
+            this.dependencies.selection.setCursorEnd(firstCell);
+        }
+        this.dependencies.history.commit();
     }
 
     _removeColumn({ cell }) {
@@ -360,8 +367,9 @@ export class QWebTablePlugin extends Plugin {
     createElementFrom(fromElement) {
         const tagName = fromElement.tagName.toLowerCase();
         const newElement = this.document.createElement(tagName);
-        const baseContainer = this.dependencies.baseContainer.createBaseContainer("DIV");
-        baseContainer.append(this.document.createElement("br"));
+        const baseContainer = this.dependencies.baseContainer.createBaseContainer({
+            nodeName: "DIV",
+        });
         newElement.append(baseContainer);
         newElement.classList.add("oe_unbreakable");
         return newElement;
@@ -371,6 +379,7 @@ export class QWebTablePlugin extends Plugin {
         for (const table of el.querySelectorAll("q-table")) {
             this._normalize(table);
         }
+        return el;
     }
     _normalize(table) {
         const { cells, baseLineRow } = new TableSizeComputer().compute(table);

@@ -5,14 +5,15 @@
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-17 03:40+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 03:37+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "hr_recruitment_integration_base/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,18 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_recruitment_integration_base
+#: model:ir.module.module,description:base.module_hr_recruitment_integration_base
+msgid ""
+"\n"
+"Base module for recruitment integration.\n"
+"========================================\n"
+"This module provides a base for the integration of recruitment with "
+"external\n"
+"api from different job boards like indeed, monster, linkedin, etc.\n"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -80,6 +92,11 @@ msgstr "Активность"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Оформление задачи-исключения"
+
+#. module: hr_recruitment_integration_base
+#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_state
@@ -147,11 +164,6 @@ msgid "Avatar 512"
 msgstr "Аватар 512"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__biweekly
-msgid "Bi-Week"
-msgstr "Две недели"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_form
 msgid "Campaign Duration"
 msgstr "Длительность кампании"
@@ -197,11 +209,6 @@ msgstr "Кампания начнется %(start_date)s"
 #: code:addons/hr_recruitment_integration_base/wizard/hr_recruitment_post.py:0
 msgid "Can't postpone posts that are already posted"
 msgstr "Нельзя отложить публикации, которые уже размещены"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
-msgid "Cancel"
-msgstr "Отменить"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__company_id
@@ -253,11 +260,6 @@ msgid "Created on"
 msgstr "Дата создания:"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__currency_id
-msgid "Currency"
-msgstr "Валюта"
-
-#. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_recruitment_post_job_wizard__api_data
 msgid "Data"
 msgstr "Данные"
@@ -271,11 +273,6 @@ msgstr "С"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__date_to
 msgid "Date To"
 msgstr "Дата до"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__daily
-msgid "Day"
-msgstr "День"
 
 #. module: hr_recruitment_integration_base
 #. odoo-javascript
@@ -327,8 +324,7 @@ msgstr "Email"
 #. odoo-python
 #: code:addons/hr_recruitment_integration_base/wizard/hr_recruitment_post.py:0
 msgid "Email is required if the apply method is 'Send an email'.\n"
-msgstr ""
-"Email обязателен, если выбран способ подачи заявки «Отправить email».\n"
+msgstr "Email обязателен, если выбран способ подачи заявки «Отправить email».\n"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
@@ -362,11 +358,6 @@ msgid "Followers (Partners)"
 msgstr "Подписчики"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Шрифт, отличный значок, например. к.-а.-задачи"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
 msgid "From"
 msgstr "От"
@@ -375,11 +366,6 @@ msgstr "От"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__has_message
 msgid "Has Message"
 msgstr "Есть сообщение"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__hourly
-msgid "Hour"
-msgstr "Час"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_applicant__id
@@ -452,6 +438,8 @@ msgstr "Является подписчиком"
 msgid ""
 "Is set, update applicants availability once hired for that specific mission."
 msgstr ""
+"Если выбрано, обновит доступность кандидатов после их найма на эту проектную "
+"задачу."
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban_search
@@ -538,9 +526,9 @@ msgid "Last Updated on"
 msgstr "Дата последнего обновления:"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__salary_max
-msgid "Maximum Salary"
-msgstr "Максимальная зарплата"
+#: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_has_error
@@ -553,11 +541,6 @@ msgid "Messages"
 msgstr "Сообщения"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__salary_min
-msgid "Minimum Salary"
-msgstr "Минимальная зарплата"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
 msgid "Mission Dates"
 msgstr "Сроки проекта"
@@ -565,17 +548,12 @@ msgstr "Сроки проекта"
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_recruitment_post_job_wizard__date_to
 msgid "Mission date end"
-msgstr ""
+msgstr "Дата окончания проекта"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_recruitment_post_job_wizard__date_from
 msgid "Mission date start"
-msgstr ""
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__monthly
-msgid "Month"
-msgstr "Месяц"
+msgstr "Дата начала проекта"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__my_activity_date_deadline
@@ -683,11 +661,6 @@ msgstr "Опубликовать сейчас"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
-msgid "Post on Job Boards"
-msgstr ""
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
 msgid "Posts"
 msgstr "Записи"
 
@@ -749,6 +722,11 @@ msgid "Recruiter"
 msgstr "Специалист по подбору кадров"
 
 #. module: hr_recruitment_integration_base
+#: model:ir.module.module,shortdesc:base.module_hr_recruitment_integration_base
+msgid "Recruitment Integration Base"
+msgstr ""
+
+#. module: hr_recruitment_integration_base
 #: model:ir.model,name:hr_recruitment_integration_base.model_hr_recruitment_platform
 msgid "Recruitment Platform"
 msgstr "Платформа найма"
@@ -759,19 +737,15 @@ msgid "Responsible User"
 msgstr "Ответственный пользователь"
 
 #. module: hr_recruitment_integration_base
+#. odoo-javascript
+#: code:addons/hr_recruitment_integration_base/static/src/widget/integration_state_selection.js:0
+msgid "Ribbon"
+msgstr ""
+
+#. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Ошибка доставки SMS"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
-msgid "Salary Range"
-msgstr "Диапазон зарплаты"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__payment_interval
-msgid "Salary Time Unit"
-msgstr "Единица времени зарплаты"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_recruitment_post_job_wizard__apply_method__email
@@ -882,6 +856,8 @@ msgid ""
 "This will update the applicant's availability status once they are hired for "
 "this position."
 msgstr ""
+"Это обновит статус готовности кандидата приступить к работе после того, как "
+"он будет принят на эту должность."
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__activity_exception_decoration
@@ -906,29 +882,9 @@ msgid "Website"
 msgstr "Сайт"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__website_message_ids
-msgid "Website Messages"
-msgstr "Веб-сайт сообщения"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__website_message_ids
-msgid "Website communication history"
-msgstr "История общений с сайта"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__weekly
-msgid "Week"
-msgstr "Неделя"
-
-#. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__schedule_id
 msgid "Working Schedule"
 msgstr "График работы"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__yearly
-msgid "Year"
-msgstr "Год"
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -939,18 +895,13 @@ msgstr "создано"
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
 msgid "e.g. Health, IT Services, Agriculture ..."
-msgstr ""
+msgstr "например, здравоохранение, ИТ-услуги, сельское хозяйство ..."
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
 #: code:addons/hr_recruitment_integration_base/models/hr_recruitment_platform.py:0
 msgid "failure"
 msgstr "неудача"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
-msgid "per"
-msgstr "за"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
@@ -962,3 +913,9 @@ msgstr "иконка платформы"
 #: code:addons/hr_recruitment_integration_base/wizard/hr_recruitment_post.py:0
 msgid "updated"
 msgstr "обновлено"
+
+msgid "Website Messages"
+msgstr "Веб-сайт сообщения"
+
+msgid "Website communication history"
+msgstr "История общений с сайта"

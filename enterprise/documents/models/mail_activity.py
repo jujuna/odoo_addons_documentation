@@ -2,52 +2,37 @@
 
 from datetime import datetime
 
-from odoo import api, models, _
+from odoo import api, fields, models, _
 from odoo.fields import Domain
 
 
 class MailActivity(models.Model):
     _inherit = 'mail.activity'
 
-    def _prepare_next_activity_values(self):
-        vals = super()._prepare_next_activity_values()
-        current_activity_type = self.activity_type_id
-        next_activity_type = current_activity_type.triggered_next_type_id
-
-        if current_activity_type.category == 'upload_file' and self.res_model == 'documents.document' and next_activity_type.category == 'upload_file':
-            existing_document = self.env['documents.document'].search([('request_activity_id', '=', self.id)], limit=1)
-            if 'summary' not in vals:
-                vals['summary'] = self.summary or _('Upload file request')
-            new_doc_request = self.env['documents.document'].create({
-                'owner_id': existing_document.owner_id.id,
-                'folder_id': next_activity_type.folder_id.id if next_activity_type.folder_id else existing_document.folder_id.id,
-                'tag_ids': [(6, 0, next_activity_type.tag_ids.ids)],
-                'name': vals['summary'],
-            })
-            vals['res_id'] = new_doc_request.id
-        return vals
+    requested_document_ids = fields.One2many('documents.document', 'request_activity_id',
+                                             string='Document requests')
 
     def _action_done(self, feedback=False, attachment_ids=None):
         if not self:
             return super()._action_done(feedback=feedback, attachment_ids=attachment_ids)
         documents = self.env['documents.document'].search([('request_activity_id', 'in', self.ids)])
-        document_without_attachment = documents.filtered(lambda d: not d.attachment_id)
-        if document_without_attachment and not feedback:
-            feedback = _("Document Request: %(name)s Uploaded by: %(user)s",
-                         name=documents[0].name, user=self.env.user.name)
-        messages, next_activities = super(MailActivity, self.with_context(no_document=True))._action_done(
-            feedback=feedback, attachment_ids=attachment_ids)
+        requests = documents.filtered(lambda d: d.type == 'request')
         # Downgrade access link role from edit to view if necessary (if the requestee didn't have a user at the request
         # time, we previously granted him edit access by setting access_via_link to edit on the document).
         documents.filtered(lambda document: document.access_via_link == 'edit').access_via_link = 'view'
-        # Remove request information on the document
-        documents.requestee_partner_id = False
         documents.request_activity_id = False
         # Attachment must be set after documents.request_activity_id is set to False to prevent document write to
         # trigger an action_done.
-        if attachment_ids and document_without_attachment:
-            document_without_attachment.attachment_id = attachment_ids[0]
-        return messages, next_activities
+        if attachment_ids and requests:
+            requests.attachment_id = attachment_ids[0]
+        # Remove request information on the document
+        documents.requestee_partner_id = False
+        if requests and not feedback:
+            feedback = _("Document Request: %(name)s Uploaded by: %(user)s",
+                         name=documents[0].name, user=self.env.user.name)
+        messages = super(MailActivity, self.with_context(no_document=True))._action_done(
+            feedback=feedback, attachment_ids=attachment_ids)
+        return messages
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -55,7 +40,7 @@ class MailActivity(models.Model):
         upload_activities = activities.filtered(lambda act: act.activity_category == 'upload_file')
 
         # link back documents and activities
-        upload_documents_activities = upload_activities.filtered(lambda act: act.res_model == 'documents.document')
+        upload_documents_activities = upload_activities.filtered(lambda act: act.res_model == 'documents.document' and act.res_id)
         if upload_documents_activities:
             documents = self.env['documents.document'].browse(upload_documents_activities.mapped('res_id'))
             for document, activity in zip(documents, upload_documents_activities):
@@ -64,6 +49,7 @@ class MailActivity(models.Model):
 
         # create underlying documents if related record is not a document
         doc_vals = [{
+            'type': 'request',
             'res_model': activity.res_model,
             'res_id': activity.res_id,
             'owner_id': activity.activity_type_id.default_user_id.id or (self.env.user.id if self.env.user.active else False),
@@ -98,3 +84,8 @@ class MailActivity(models.Model):
             ]
             for document_requestee_partner_id in document_requestee_partner_ids
         )).expiration_date = new_expiration_date
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_archive_requested_document(self):
+        # requested_document_ids are cleared once their corresponding document requests have been fulfilled.
+        self.sudo().requested_document_ids.action_archive()

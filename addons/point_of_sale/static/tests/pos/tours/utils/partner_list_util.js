@@ -1,4 +1,5 @@
 import { negateStep } from "@point_of_sale/../tests/generic_helpers/utils";
+import { selectButton } from "@point_of_sale/../tests/pos/tours/utils/common";
 
 export function clickPartner(name = "", { expectUnloadPage = false } = {}) {
     return {
@@ -61,7 +62,6 @@ export function settleCustomerAccount(
     orderPrefix,
     orderSuffix = "",
     checkYear = false,
-    orderSettlement = false,
     availability = true
 ) {
     const steps = [
@@ -70,10 +70,9 @@ export function settleCustomerAccount(
         },
         clickPartnerOptions(`${partner}`),
     ];
-    const buttonText = orderSettlement ? "Settle orders" : "Settle invoices";
     steps.push(
         ...[
-            clickDropDownItemText(buttonText),
+            clickDropDownItemText("Settle invoices"),
             clickSettleOrderName(orderPrefix, orderSuffix, checkYear, availability),
         ]
     );
@@ -115,26 +114,44 @@ export function checkCustomerShown(val) {
         trigger: `.partner-list .partner-info:nth-child(1):contains("${val}")`,
     };
 }
-
-export function searchCustomerValue(val, pressEnter = false) {
-    const steps = [
+export function searchCustomer(val) {
+    return [
         {
             isActive: ["mobile"],
             content: `Click search field`,
-            trigger: `.modal-dialog .fa-search.undefined`,
+            trigger: `.modal-dialog [data-icon="search"].undefined`,
             run: `click`,
         },
         {
             content: `Search customer with "${val}"`,
-            trigger: `.modal-dialog .input-group input`,
+            trigger: `.modal-header:has(.modal-title:contains(choose customer)) .input-group input`,
             run: `edit ${val}`,
         },
+        {
+            content: `Wait for search debounce`,
+            trigger: `.modal-dialog .input-group input`,
+            run: async function () {
+                await new Promise((resolve) => setTimeout(resolve, 350));
+            },
+        },
     ];
+}
+
+export function searchCustomerValue(val, pressEnter = false) {
+    const steps = searchCustomer(val);
 
     if (pressEnter) {
         steps.push({
+            trigger: "body",
+            run: () =>
+                // wait 200ms so state.query can be updated with the new value before triggering keydown
+                new Promise((resolve) => {
+                    setTimeout(resolve, 200);
+                }),
+        });
+        steps.push({
             content: `Manually trigger keyup event`,
-            trigger: ".modal-header .input-group input",
+            trigger: ".modal-header:has(.modal-title:contains(choose customer)) .input-group input",
             run: function () {
                 document
                     .querySelector(".modal-header .input-group input")
@@ -143,7 +160,7 @@ export function searchCustomerValue(val, pressEnter = false) {
         });
         steps.push({
             content: `Press Enter to trigger "search more"`,
-            trigger: `.modal-dialog .input-group input`,
+            trigger: `.modal-header:has(.modal-title:contains(choose customer)) .input-group input`,
             run: function () {
                 document
                     .querySelector(".modal-dialog .input-group input")
@@ -172,5 +189,42 @@ export function isShown() {
             content: "partner list screen is shown",
             trigger: ".modal .partner-list",
         },
+    ];
+}
+
+export function selectFormDiscard() {
+    return [
+        {
+            trigger: "button.o_form_button_cancel",
+            content: "Click on discard the customer form",
+            run: "click",
+        },
+    ];
+}
+
+export function checkInputForm(fieldName, expectedValue) {
+    return [
+        {
+            trigger: `div[name="${fieldName}"] .o_input`,
+            content: `Check if "${expectedValue}" in form div "${fieldName}"`,
+            run() {
+                const input = document.querySelector(`div[name="${fieldName}"] .o_input`);
+                if (!input) {
+                    throw new Error(`Element div[name="${fieldName}"] .o_input not found`);
+                }
+                if (input.value !== expectedValue) {
+                    throw new Error(
+                        `Validation failed: expected "${expectedValue}", got "${input.value}"`
+                    );
+                }
+            },
+        },
+    ];
+}
+
+export function clickPartnerCreateBtn() {
+    return [
+        { ...selectButton("Create"), isActive: ["desktop"] },
+        { ...selectButton("New"), isActive: ["mobile"] },
     ];
 }

@@ -26,7 +26,7 @@
                 <field name="name" />
                 <field name="social_account_handle"/>
                 <field name="media_id" />
-                <field name="create_uid" widget="many2one_avatar_user"/>
+                <field name="create_uid" widget="many2one_avatar_user" string="Connected By"/>
                 <field name="company_id" groups="base.group_multi_company"/>
             </list>
         </field>
@@ -37,7 +37,10 @@
         <field name="model">social.account</field>
         <field name="arch" type="xml">
             <form string="Social Account" create="0">
-                <header></header>
+                <header invisible="not has_livechat" groups="social.group_social_manager">
+                    <button string="Register Webhook" type="object" name="action_register_webhook"/>
+                    <button string="Delete Livechat Webhook" type="object" name="action_delete_webhook"/>
+                </header>
                 <sheet>
                     <field name="image" widget="image" class="oe_avatar"/>
                     <div class="oe_title">

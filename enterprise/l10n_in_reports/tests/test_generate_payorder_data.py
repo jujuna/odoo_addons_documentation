@@ -5,6 +5,8 @@ from odoo.tests import tagged
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestGeneratePayorderData(TestAccountPayment):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -41,7 +43,7 @@ class TestGeneratePayorderData(TestAccountPayment):
                     'date_format': '%d/%m/%Y'
                 },
                 {
-                    'field_name': 'partner_bank_id.acc_number',
+                    'field_name': 'partner_bank_id.account_number',
                     'label': 'Beneficiary Account Number'
                 }
             ]

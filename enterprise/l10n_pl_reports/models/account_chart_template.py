@@ -14,3 +14,12 @@ class AccountChartTemplate(models.AbstractModel):
                 'deferred_expense_account_id': 'chart14000200',
             }
         }
+
+    @template('pl', 'account.return.type')
+    def _get_pl_account_return_type(self):
+        return {
+            'l10n_pl_reports.pl_tax_return_type': {
+                'tax_payable_account_id': 'chart22000100',
+                'tax_receivable_account_id': 'chart22000101',
+            },
+        }

@@ -8,6 +8,8 @@ from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class GermanyBalanceSheetReportTest(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_chart_template('de_skr03')
     def setUpClass(cls, chart_template_ref=None):
@@ -97,8 +99,8 @@ class GermanyBalanceSheetReportTest(TestAccountReportsCommon):
             options
         )
 
-        equity_unaffected_account = self.env['account.account'].search([('account_type', '=', 'equity_unaffected')], limit=1)
-        equity_account = self.env['account.account'].search([('account_type', '=', 'equity')], limit=1)
+        equity_unaffected_account = self.env['account.account'].search([*self.env['account.account']._check_company_domain(self.env.company), ('account_type', '=', 'equity_unaffected')], limit=1)
+        equity_account = self.env['account.account'].search([*self.env['account.account']._check_company_domain(self.env.company), ('account_type', '=', 'equity')], limit=1)
         closing_entry = self.env['account.move'].create({
             'move_type': 'entry',
             'date': '2024-12-31',

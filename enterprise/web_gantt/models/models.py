@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, UTC
+
 from lxml.builder import E
-from pytz import utc
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -173,15 +173,41 @@ class Base(models.AbstractModel):
     def web_gantt_init_old_vals_per_pill_id(self, vals):
         old_vals_per_pill_id = defaultdict(dict)
         for field in vals:
-            field_type = self.fields_get(field)[field]['type']
+            field_type = self.fields_get(field)[field.split('.')[0]]['type']
             if field_type in ['many2many', 'one2many']:
                 old_vals_per_pill_id[self.id][field] = self[field].ids or False
             elif field_type == 'many2one':
                 old_vals_per_pill_id[self.id][field] = self[field].id or False
+            elif field_type == 'properties':
+                old_vals_per_pill_id[self.id][field] = self[field]._values
             else:
                 old_vals_per_pill_id[self.id][field] = self[field]
 
         return old_vals_per_pill_id
+
+    def web_gantt_format_property_fields(self, vals):
+        """
+        Format the property fields in order to be written.
+
+        Get all property fields in order to build the whole property field dict.
+        This process is necessary to avoid losing data on write as the property fields are stored into a unique field.
+
+        :param vals: dict containing the new vals for the moved pill
+        :return: the vals dict with formatted property fields
+        :rtype: dict
+        """
+        formatted_vals = vals.copy()
+        for field in vals:
+            if '.' not in field:
+                continue
+            p_field, p_subfield = field.split('.', 1)
+            f = self._fields.get(p_field)
+            if f and f.type == 'properties':
+                new_value = formatted_vals.pop(field)
+                new_properties = self[p_field]._values.copy()
+                new_properties[p_subfield] = new_value
+                formatted_vals[p_field] = new_properties
+        return formatted_vals
 
     @api.model
     def web_gantt_reschedule(
@@ -218,6 +244,8 @@ class Base(models.AbstractModel):
             raise ValueError(self.env._("Invalid reschedule method %s", reschedule_method))
 
         record = self.env[self._name].browse(record_id)
+        # the property fields need to be formatted before trying to write them
+        new_vals = record.web_gantt_format_property_fields(vals)
 
         message = self.env._("Tasks rescheduled")
         # if the pill is moved without changing dates, or there are no dependencies between pills, or the pill is moved to the past => only write the moved pill (like Manual rescheduling)
@@ -228,15 +256,14 @@ class Base(models.AbstractModel):
             now_value = DATE_FIELD_ADAPTERS[start_date_field.type]['now']()
         if (
             not (
-                start_date_field_name in vals
-                and stop_date_field_name in vals
+                stop_date_field_name in vals
                 and dependency_field_name
                 and dependency_inverted_field_name
             )
             or (start_date and start_date < now_value)
         ):
-            old_vals_per_pill_id = record.web_gantt_init_old_vals_per_pill_id(vals)
-            record.write(vals)
+            old_vals_per_pill_id = record.web_gantt_init_old_vals_per_pill_id(new_vals)
+            record.write(new_vals)
             return {
                 "type": "success",
                 "message": message,
@@ -244,7 +271,14 @@ class Base(models.AbstractModel):
             }
 
         with self.env.cr.savepoint() as sp:
-            log_messages, old_vals_per_pill_id = record._web_gantt_action_reschedule_candidates(dependency_field_name, dependency_inverted_field_name, start_date_field_name, stop_date_field_name, reschedule_method, vals)
+            log_messages, old_vals_per_pill_id = record._web_gantt_action_reschedule_candidates(
+                dependency_field_name,
+                dependency_inverted_field_name,
+                start_date_field_name,
+                stop_date_field_name,
+                reschedule_method,
+                new_vals
+            )
             has_errors = bool(log_messages.get("errors"))
             sp.close(rollback=has_errors)
         notification_type = "success"
@@ -383,10 +417,10 @@ class Base(models.AbstractModel):
             messages = get_messages(log_messages.get("warnings", []))
         return "\n".join(messages)
 
-    def _web_gantt_get_direction(self, start_date_field_name, vals):
-        start_date_field = self.env[self._name]._fields[start_date_field_name]
-        date_start = DATE_FIELD_ADAPTERS[start_date_field.type]['parse'](vals[start_date_field_name])
-        return self._WEB_GANTT_RESCHEDULE_FORWARD if date_start > self[start_date_field_name] else self._WEB_GANTT_RESCHEDULE_BACKWARD
+    def _web_gantt_get_direction(self, bound_date_field_name, vals):
+        bound_date_field = self.env[self._name]._fields[bound_date_field_name]
+        date_bound = DATE_FIELD_ADAPTERS[bound_date_field.type]['parse'](vals[bound_date_field_name])
+        return self._WEB_GANTT_RESCHEDULE_FORWARD if date_bound > self[bound_date_field_name] else self._WEB_GANTT_RESCHEDULE_BACKWARD
 
     def _web_gantt_action_reschedule_candidates(
         self,
@@ -407,10 +441,15 @@ class Base(models.AbstractModel):
                     text if valid = True or the error text if valid = False.
         """
 
-        search_forward = self._web_gantt_get_direction(start_date_field_name, vals) == self._WEB_GANTT_RESCHEDULE_FORWARD
+        is_only_deadline_changed = start_date_field_name not in vals and stop_date_field_name in vals
+        direction_date = stop_date_field_name if is_only_deadline_changed else start_date_field_name
+        search_forward = self._web_gantt_get_direction(direction_date, vals) == self._WEB_GANTT_RESCHEDULE_FORWARD
         candidates_ids = []
+        # If we only move the deadline of the main task, even backward, no dependent task will block the change. However,
+        # if we move the deadline of a dependent task, this should have no effect on the main one. Therefore, the relation
+        # between the pill and candidates will always be expressed with the field dependency_inverted_field_name.
         if self._web_gantt_check_cycle_existance_and_get_rescheduling_candidates(
-            candidates_ids, dependency_inverted_field_name if search_forward else dependency_field_name,
+            candidates_ids, dependency_inverted_field_name if search_forward or start_date_field_name not in vals else dependency_field_name,
             start_date_field_name, stop_date_field_name,
         ):
             return {'errors': self._WEB_GANTT_LOOP_ERROR}, {}
@@ -444,17 +483,19 @@ class Base(models.AbstractModel):
     ):
         for next in self[dependency_inverted_field_name if search_forward else dependency_field_name]:
             if search_forward:
-                end_date = end_date.astimezone(utc)
+                end_date = end_date.astimezone(UTC)
                 first_possible_start_date_per_candidate[next.id] = max(first_possible_start_date_per_candidate.get(next.id, end_date), end_date)
-                if not consume_buffer and next[start_date_field_name] > old_end_date:
-                    buffer_duration = (next[start_date_field_name] - old_end_date).total_seconds()
+                start_date = next[start_date_field_name]
+                if not consume_buffer and start_date and start_date > old_end_date:
+                    buffer_duration = (start_date - old_end_date).total_seconds()
                     start_date_after_buffer = end_date + timedelta(seconds=buffer_duration)
                     first_possible_start_date_per_candidate[next.id] = max(first_possible_start_date_per_candidate.get(next.id, start_date_after_buffer), start_date_after_buffer)
             else:
-                start_date = start_date.astimezone(utc)
+                start_date = start_date.astimezone(UTC)
+                stop_date = next[stop_date_field_name]
                 last_possible_end_date_per_candidate[next.id] = min(last_possible_end_date_per_candidate.get(next.id, start_date), start_date)
-                if not consume_buffer and next[stop_date_field_name] < old_start_date:
-                    buffer_duration = (old_start_date - next[stop_date_field_name]).total_seconds()
+                if not consume_buffer and stop_date and stop_date < old_start_date:
+                    buffer_duration = (old_start_date - stop_date).total_seconds()
                     end_date_after_buffer = start_date - timedelta(seconds=buffer_duration)
                     last_possible_end_date_per_candidate[next.id] = min(last_possible_end_date_per_candidate.get(next.id, end_date_after_buffer), end_date_after_buffer)
 
@@ -473,9 +514,9 @@ class Base(models.AbstractModel):
             boundary_dates = not_replanned_candidates.mapped(boundary_date)
 
             if search_forward:
-                first_possible_start_date_per_candidate[candidate.id] = max(boundary_dates).astimezone(utc)
+                first_possible_start_date_per_candidate[candidate.id] = max(boundary_dates).astimezone(UTC)
             else:
-                last_possible_end_date_per_candidate[candidate.id] = min(boundary_dates).astimezone(utc)
+                last_possible_end_date_per_candidate[candidate.id] = min(boundary_dates).astimezone(UTC)
 
         return first_possible_start_date_per_candidate, last_possible_end_date_per_candidate
 
@@ -498,21 +539,27 @@ class Base(models.AbstractModel):
         }
 
         old_vals_per_pill_id = self.web_gantt_init_old_vals_per_pill_id(vals)
+        if stop_date_field_name in vals and start_date_field_name not in vals:
+            old_vals_per_pill_id[self.id][start_date_field_name] = self[start_date_field_name]
 
         candidates = self.browse([id for id in candidates_ids if id != self.id])
         self.write(vals)
         first_possible_start_date_per_candidate, last_possible_end_date_per_candidate = candidates._web_gantt_get_first_and_last_possible_dates(dependency_field_name, dependency_inverted_field_name, search_forward, stop_date_field_name, start_date_field_name)
 
         self._web_gantt_update_next_pills_first_possible_date(dependency_field_name, dependency_inverted_field_name, search_forward, first_possible_start_date_per_candidate, last_possible_end_date_per_candidate, consume_buffer, start_date_field_name,
-            stop_date_field_name, self[start_date_field_name], self[stop_date_field_name], old_vals_per_pill_id[self.id][start_date_field_name], old_vals_per_pill_id[self.id][stop_date_field_name],
+            stop_date_field_name, self[start_date_field_name], self[stop_date_field_name], old_vals_per_pill_id[self.id].get(start_date_field_name, self[start_date_field_name]), old_vals_per_pill_id[self.id].get(stop_date_field_name, self[stop_date_field_name]),
         )
 
         for candidate in candidates:
             if consume_buffer and not candidate._web_gantt_is_candidate_in_conflict(start_date_field_name, stop_date_field_name, dependency_field_name, dependency_inverted_field_name):
                 continue
 
+            date_candidate = (first_possible_start_date_per_candidate if search_forward else last_possible_end_date_per_candidate).get(candidate.id)
+            if not date_candidate:
+                date_candidate = candidate[start_date_field_name if search_forward else stop_date_field_name].astimezone(timezone.utc)
+
             start_date, end_date = candidate._web_gantt_reschedule_compute_dates(
-                (first_possible_start_date_per_candidate if search_forward else last_possible_end_date_per_candidate)[candidate.id],
+                date_candidate,
                 search_forward,
                 start_date_field_name, stop_date_field_name
             )

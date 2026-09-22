@@ -10,10 +10,20 @@
             </div>
 
             <xpath expr="//block[@id='dutch_localization']" position="inside">
-                <setting company_dependent="1" string="SBR Services">
+                <setting company_dependent="1" string="SBR Services" id="sbr_services">
+                    <div class="text-muted">
+                        Setup Digipoort SBR certificate settings
+                    </div>
                     <div class="row mt16">
+                        <label for="l10n_nl_reports_sbr_use_own_certificate" class="col-lg-3 o_light_label"/>
+                        <div class="col-lg-9">
+                            <field name="l10n_nl_reports_sbr_use_own_certificate"/>
+                            <span class="text-muted ms-2">Use your own certificate instead of Odoo's.</span>
+                        </div>
+                    </div>
+                    <div class="row mt16" invisible="not l10n_nl_reports_sbr_use_own_certificate">
                         <label for="l10n_nl_reports_sbr_cert_id" class="col-lg-3 o_light_label"/>
-                        <field name="l10n_nl_reports_sbr_cert_id" options="{'no_create': True}" domain="[('company_id', '=', company_id), ('is_valid', '=', True)]"/>
+                        <field name="l10n_nl_reports_sbr_cert_id" domain="[('company_id', '=', company_id), ('is_valid', '=', True)]"/>
                     </div>
                 </setting>
             </xpath>

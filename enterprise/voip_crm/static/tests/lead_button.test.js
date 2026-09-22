@@ -1,10 +1,11 @@
 import { click, contains, start, startServer } from "@mail/../tests/mail_test_helpers";
 import { onRpc } from "@web/../tests/web_test_helpers";
 import { describe, test } from "@odoo/hoot";
-import { defineVoipCRMModels } from "@voip_crm/../tests/voip_crm_test_helpers";
+import { openRecentContactSearch } from "@voip/../tests/voip_test_helpers";
+import { setupVoipCRMTests } from "@voip_crm/../tests/voip_crm_test_helpers";
 
 describe.current.tags("desktop");
-defineVoipCRMModels();
+setupVoipCRMTests();
 
 test("LeadButton is hidden when user doesn't have sales team groups", async () => {
     const pyEnv = await startServer();
@@ -14,8 +15,7 @@ test("LeadButton is hidden when user doesn't have sales team groups", async () =
     });
     onRpc("has_group", () => false);
     await start();
-    await click(".o_menu_systray button[title='Show Softphone']");
-    await click("button span:contains('Contacts')");
+    await openRecentContactSearch("Test Partner");
     await click(".o-voip-TabEntry:contains('Test Partner')");
     await contains("button[title='Create a lead']", { count: 0 });
 });
@@ -31,26 +31,28 @@ test("LeadButton is shown when user has sales team groups", async () => {
         return group === "sales_team.group_sale_salesman";
     });
     await start();
-    await click(".o_menu_systray button[title='Show Softphone']");
-    await click("button span:contains('Contacts')");
+    await openRecentContactSearch("Test Partner");
     await click(".o-voip-TabEntry:contains('Test Partner')");
-    await contains("button[title='Create a lead']");
+    await click("button[title='Create']");
+    await contains("span.o-dropdown-item i[data-icon='star'].oi-filled");
+    await contains("span.o-dropdown-item span:contains('Lead')");
 });
 
-test("LeadButton is shown with title 'View lead' and icon 'fa-star' when user has sales team groups", async () => {
+test("LeadButton is shown with title 'View lead' and icon 'star' when user has sales team groups", async () => {
     const pyEnv = await startServer();
     pyEnv["res.partner"].create({
         name: "Test Partner",
         phone: "+1-555-123-4567",
-        opportunity_count: 1,
+        commercial_partner_opportunity_count: 1,
     });
     onRpc("has_group", (args) => {
         const group = args.args[1];
         return group === "sales_team.group_sale_salesman";
     });
     await start();
-    await click(".o_menu_systray button[title='Show Softphone']");
-    await click("button span:contains('Contacts')");
+    await openRecentContactSearch("Test Partner");
     await click(".o-voip-TabEntry:contains('Test Partner')");
-    await contains("button[title='View leads'] i.fa-star");
+    await click("button[title='Go to']");
+    await contains("span.o-dropdown-item i[data-icon='star'].oi-filled");
+    await contains("span.o-dropdown-item span:contains('Lead')");
 });

@@ -2,13 +2,15 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from freezegun import freeze_time
 
-from odoo import Command, fields, tools
+from odoo import Command, tools
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.tests.common import test_xsd
 from odoo.tests import tagged
 
 
 class TestLtSaftReportCommon(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('lt')
     def setUpClass(cls):
@@ -25,14 +27,13 @@ class TestLtSaftReportCommon(TestAccountReportsCommon):
         cls.company_data['company'].write({
             'city': 'Vilnius',
             'zip': 'LT-01000',
-            'company_registry': '123456',
             'phone': '+370 11 11 11 11',
-            'vat': 'LT949170611'
+            'vat': 'LT949170611',
+            'additional_identifiers': {'LT_JAK': '123456'},
         })
 
         cls.env['res.partner'].create({
             'name': 'Mr Big CEO',
-            'is_company': False,
             'phone': '+370 11 11 12 34',
             'parent_id': cls.company_data['company'].partner_id.id,
         })
@@ -103,12 +104,14 @@ class TestLtSaftReportCommon(TestAccountReportsCommon):
 
     def _generate_xml(self):
         report = self.env.ref('account_reports.general_ledger_report')
-        options = self._generate_options(report, fields.Date.from_string('2021-01-01'), fields.Date.from_string('2021-12-31'))
+        options = self._generate_options(report, '2021-01-01', '2021-12-31')
         return self.env[report.custom_handler_model_name].l10n_lt_export_saft_to_xml(options)['file_content']
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestLtSaftReport(TestLtSaftReportCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time('2022-01-01')
     def test_saft_report_values(self):
         with tools.file_open("l10n_lt_saft/tests/xml/expected_test_saft_report.xml", "rb") as expected_xml:
@@ -126,6 +129,8 @@ class TestLtSaftReport(TestLtSaftReportCommon):
 
 @tagged('external_l10n', 'post_install', '-at_install', '-standard', 'external')
 class TestLtSaftReportXmlValidity(TestLtSaftReportCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @test_xsd(url='https://www.vmi.lt/evmi/documents/20142/725548/SAF-T_v2.01_20190306.xsd')
     def test_xml_validity(self):
         return self._generate_xml()

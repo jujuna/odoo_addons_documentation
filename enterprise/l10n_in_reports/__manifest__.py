@@ -1,6 +1,6 @@
 {
     'name': 'Indian - Accounting Reports',
-    'version': '1.1',
+    'version': '1.3',
     'description': """
 Accounting reports for India
 ================================
@@ -15,17 +15,23 @@ Accounting reports for India
         'account_invoice_extract',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'data/service_cron.xml',
         'data/mail_activity_type_data.xml',
         'data/account_tax_report_tds_tcs_data.xml',
+        'data/account_financial_html_report_gstr_iff.xml',
         'data/account_financial_html_report_gstr1.xml',
         'data/account_financial_html_report_gstr2b.xml',
         'data/account_financial_html_report_gstr3b.xml',
+        'data/account_financial_html_report_cmp08.xml',
+        'data/account_financial_html_report_gstr4.xml',
+        'data/account_financial_html_report_schedule3_balance_sheet.xml',
+        'data/account_financial_html_report_schedule3_profit_and_loss.xml',
         'data/profit_and_loss.xml',
         'data/bank_template.xml',
         'data/enet_payment_methods.xml',
         'data/account_return_data.xml',
+        'data/account_return_check_template_form_26.xml',
+        'data/pan_entity_partner_ledger.xml',
         'wizard/gst_otp_validation.xml',
         'views/gstr_document_summary_views.xml',
         'wizard/gstr1_submission_wizard.xml',
@@ -35,12 +41,13 @@ Accounting reports for India
         'views/res_config_settings.xml',
         'views/account_journal_dashboard_view.xml',
         'views/account_batch_payment_views.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/demo_company.xml',
     ],
-    'installable': True,
     'author': 'Odoo S.A.',
+    'iap_paid_service': True,
     'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [

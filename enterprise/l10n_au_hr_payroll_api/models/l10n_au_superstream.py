@@ -3,10 +3,11 @@
 import logging
 from datetime import timedelta
 from markupsafe import Markup
+from operator import itemgetter
 
 from odoo import models, fields, _
 from odoo.exceptions import ValidationError, UserError
-from odoo.tools.misc import groupby, itemgetter
+from odoo.tools.misc import groupby
 from odoo.fields import Domain
 from .l10n_au_super_stream_utils import employerDetails, contributionDetails
 
@@ -54,11 +55,11 @@ Cancelled - If any payments have been dishonoured or requested to be stopped pri
         tracking=True,
         copy=False,
         help="""
-Payment status for the Employer's direct debit to the Clearing House.
-Pending - Employer direct debit has been initiated by SuperChoice.
-Success - Employer direct debit has successfully cleared.
-Source Failed - Employer direct debit has been dishonoured. The employer will need to resubmit with adequate funds in the bank account or with updated bank details.
-Source Cancelled - Employer has requested for the direct debit to be stopped. If SuperChoice have already debited the employer, the funds will be refunded back to the employer's account after Day 3
+Status of the employer’s direct debit payment to the clearing house.
+- Pending: The payment has been started by the clearing house and is being processed.
+- Success: The direct debit has been successfully processed and funds have cleared.
+- Source Failed: The direct debit was dishonoured — typically due to insufficient funds or incorrect bank details. The employer must resubmit the contribution request with sufficient funds or updated bank information.
+- Source Cancelled: The employer has requested to cancel the direct debit. If funds have already been debited by the clearing house, they will be refunded to the employer’s bank account."
 """
     )
     to_be_replaced = fields.Boolean(
@@ -177,7 +178,7 @@ Source Cancelled - Employer has requested for the direct debit to be stopped. If
 
         # If the Direct debit Payment was successful, we need to make a refund payment.
         # Else, ask the user to confirm if the payment was made.
-        if self.source_payment_status == "COMPLETED" or self.payment_id.state == "paid" or force_refund:
+        if self.source_payment_status == "COMPLETED" or self.payment_id.state == "reconciled" or force_refund:
             # Payment was already made, so we need a refund payment
             pay_method_line = self.journal_id.with_context(l10n_au_super_payment=True) \
                 ._get_available_payment_method_lines('inbound') \
@@ -345,7 +346,7 @@ Source Cancelled - Employer has requested for the direct debit to be stopped. If
         # TODO: Partial refund amount for fund failure
 
         self.message_post(body=_("Failed transactions are being resubmitted in a new SuperStream report: %s", duplicated._get_html_link()))
-        return duplicated.get_formview_action()
+        return duplicated.get_record_default_action()
 
 
 class L10n_auSuperStreamLine(models.Model):
@@ -364,6 +365,12 @@ class L10n_auSuperStreamLine(models.Model):
         default="PENDING",
         readonly=True,
         copy=False,
-        help="Payment status for the Clearing House's payment to the Super Fund"
+        help="""
+        Payment status from the clearing house to the employee's nominated super fund.
+        - Pending: Payment is in progress.
+        - Completed: Funds have been successfully received by the employee's super fund.
+        - Destination Failed: Payment failed — the super fund did not receive the contribution.
+        - Destination Cancelled: Payment to the super fund was cancelled."
+        """
     )
     replaced_line_id = fields.Many2one("l10n_au.super.stream.line", "Replaced Line", readonly=True, copy=False)

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { click } from "@odoo/hoot-dom";
-import { makeDialogMockEnv, mockService, mountWithCleanup } from "@web/../tests/web_test_helpers";
+import { assignDialogTestEnv, mockService, mountWithCleanup } from "@web/../tests/web_test_helpers";
 import { user } from "@web/core/user";
 
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
@@ -8,15 +8,17 @@ import { NextDirectSignDialog } from "@sign/dialogs/dialogs";
 import { fakeSignInfoService } from "./dialog_utils";
 
 const mountNextDirectSignDialog = async () => {
-    const env = await makeDialogMockEnv();
+    assignDialogTestEnv();
     await mountWithCleanup(NextDirectSignDialog, { props: { close: () => {} } });
-    return env;
 };
 
 const documentId = 23;
 const signRequestState = "sent";
 const tokenList = ["abc", "def"];
 const nameList = ["Brandon", "Coleen"];
+const requestItemIdList = [11, 12];
+const reference = "Contract.pdf";
+const lastSignedName = "Adam";
 
 const signInfo = {
     documentId,
@@ -24,6 +26,10 @@ const signInfo = {
     signRequestState,
     tokenList,
     nameList,
+    requestItemIdList,
+    reference,
+    lastSignedName,
+    someSignersEmailed: false,
 };
 
 mockService("signInfo", fakeSignInfoService(signInfo));
@@ -37,7 +43,11 @@ test("next direct sign dialog should render", async () => {
         message: "should render next direct sign message",
     });
     expect(".o_nextdirectsign_message p:first-child").toHaveText(
-        "Your signature has been saved. Next signatory is Brandon",
+        "The signature of Adam has been saved.",
+        { message: "the signer who just signed should be shown" }
+    );
+    expect(".o_nextdirectsign_message p:last-child").toHaveText(
+        "Brandon is next. They can sign now on this device, or later by email.",
         { message: "next signatory should be brandon" }
     );
     expect(".btn-primary").toHaveText("Next signatory (Brandon)");
@@ -55,6 +65,9 @@ test("next direct sign dialog should go to next document", async () => {
                 token: "abc",
                 token_list: ["def"],
                 name_list: ["Coleen"],
+                request_item_id_list: [12],
+                reference,
+                some_signers_emailed: false,
             };
             expect(params.additionalContext).toEqual(expected, {
                 message: "action should be called with correct params",

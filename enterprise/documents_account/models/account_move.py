@@ -5,7 +5,7 @@ from odoo import api, fields, models
 
 class AccountMove(models.Model):
     _name = 'account.move'
-    _inherit = ['account.move', 'documents.unlink.mixin']
+    _inherit = ['account.move']
 
     suspense_statement_line_id = fields.Many2one(
         comodel_name='account.bank.statement.line',
@@ -28,39 +28,75 @@ class AccountMove(models.Model):
     def write(self, vals):
         main_attachment_id = vals.get('message_main_attachment_id')
         new_documents = [False] * len(self)
-        journals_changed = [('journal_id' in vals  and move.journal_id.id != vals['journal_id']) for move in self]
+
+        old_journal_per_move = {}
+        if 'journal_id' in vals:
+            moves_changing_journal = self.filtered(lambda m: m.journal_id.id != vals['journal_id'])
+            old_journal_per_move = {m: m.journal_id for m in moves_changing_journal}
+
+        journals_changed = [move in old_journal_per_move for move in self]
         moves_with_updated_partner = self.filtered(
             lambda move: vals.get('partner_id', move.partner_id.id) != move.partner_id.id
         )
         for i, move in enumerate(self):
-            if main_attachment_id and not move.env.context.get('no_document') and move.move_type != 'entry':
+            if not main_attachment_id or move.env.context.get('no_document') or move.move_type == 'entry':
+                continue
+            attachments_to_sync = move._get_document_attachments_to_sync()
+
+            if not attachments_to_sync:
+                new_documents[i] = True
+            elif len(attachments_to_sync) == 1:
                 previous_attachment_id = move.message_main_attachment_id.id
-                if previous_attachment_id == main_attachment_id:
-                    continue
-                document = False
-                if previous_attachment_id:
-                    # Search also in previous_attachment_ids to handle the case where
-                    # the attachment is not the main one due to versioning
-                    document = (
-                        move.env["documents.document"]
-                        .sudo()
-                        .search([
-                            "|",
-                            ("attachment_id", "=", previous_attachment_id),
-                            ("previous_attachment_ids", "in", previous_attachment_id),
-                        ], limit=1)
-                    )
-                if document:
-                    document.attachment_id = main_attachment_id
-                else:
+                if not previous_attachment_id:
                     new_documents[i] = True
+                elif previous_attachment_id != main_attachment_id:
+                    if document := move._get_document_for_attachments([previous_attachment_id]).get(previous_attachment_id):
+                        # Replacing a single existing attachment
+                        document.attachment_id = main_attachment_id
+                    else:
+                        # If no old document found to update, create a new one
+                        new_documents[i] = True
+            # Multiple attachments exist
+            elif not move._get_document_for_attachments([main_attachment_id]).get(main_attachment_id):
+                new_documents[i] = True
+
         res = super().write(vals)
         for new_document, journal_changed, move in zip(new_documents, journals_changed, self):
-            if (new_document or journal_changed) and move.message_main_attachment_id:
-                move._update_or_create_document(move.message_main_attachment_id.id)
+            attachments_to_sync = move._get_document_attachments_to_sync()
+            if (new_document or journal_changed) and attachments_to_sync:
+                old_journal = old_journal_per_move.get(move)
+                attachments_to_sync._account_update_or_create_documents(move, old_journal=old_journal)
+
         for move in moves_with_updated_partner:
             move._sync_partner_on_document()
         return res
+
+    def _get_document_for_attachments(self, attachment_ids):
+        if not attachment_ids:
+            return {}
+        if any(isinstance(item, bool) or not isinstance(item, int) for item in attachment_ids):
+            raise ValueError(self.env._("Invalid attachment ids: IDs must be integers."))
+
+        # Search also in previous_attachment_ids to handle the case where
+        # the attachment is not the main one due to versioning
+        documents = (
+            self.env["documents.document"]
+            .sudo()
+            .search([
+                "|",
+                ("attachment_id", "in", attachment_ids),
+                ("previous_attachment_ids", "in", attachment_ids),
+            ])
+        )
+        # Create a mapping of documents per attachment_id
+        documents_by_attachment = dict.fromkeys(attachment_ids, self.env["documents.document"])
+        for document in documents:
+            if document.attachment_id.id in attachment_ids:
+                documents_by_attachment[document.attachment_id.id] = document
+            for prev_attachment in document.previous_attachment_ids:
+                if prev_attachment.id in attachment_ids:
+                    documents_by_attachment[prev_attachment.id] = document
+        return documents_by_attachment
 
     def button_reconcile_with_st_line(self):
         """ When using the "Reconciliation Request" next activity on the statement line's chatter, the invoice is linked
@@ -83,32 +119,6 @@ class AccountMove(models.Model):
                 'default_todo_command': default_todo_command,
             },
         )
-
-    def _update_or_create_document(self, attachment_id):
-        setting = self.env['documents.account.folder.setting'].sudo().search(
-            [('journal_id', '=', self.journal_id.id),
-             ('company_id', '=', self.company_id.id)], limit=1)
-        if setting:
-            Documents_sudo = self.env['documents.document'].sudo()
-            doc_sudo = Documents_sudo.with_context(active_test=False).search(
-                [('attachment_id', '=', attachment_id)], limit=1)
-            values = {
-                'active': True,  # if archived, unarchive it
-                'folder_id': setting.folder_id.id,
-                'partner_id': self.partner_id.id or doc_sudo.partner_id.id,
-                'owner_id': self.create_uid.active and self.create_uid.id,
-                'tag_ids': [(4, tag.id) for tag in setting.tag_ids],
-            }
-            if doc_sudo:
-                doc_sudo.write(values)
-            else:
-                # backward compatibility with documents that may be not
-                # registered as attachments yet
-                values.update({
-                    "attachment_id": attachment_id,
-                    "company_id": self.company_id.id,
-                })
-                doc_sudo.create(values)
 
     def _sync_partner_on_document(self):
         for move in self:

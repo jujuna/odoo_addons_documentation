@@ -6,8 +6,8 @@ class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
     analytic_json = fields.Json('Analytic JSON', compute='_compute_analytic_json', store=True)
-    is_above_budget = fields.Boolean('Is Above Budget', compute='_compute_above_budget')
-    budget_line_ids = fields.One2many('budget.line', compute='_compute_budget_line_ids', string='Budget Lines')
+    is_above_budget = fields.Boolean('Is Above Budget', compute='_compute_above_budget', compute_sudo=True)
+    budget_line_ids = fields.One2many('budget.line', compute='_compute_budget_line_ids', string='Budget Lines', groups='account.group_account_readonly')
 
     @api.depends('analytic_distribution')
     def _compute_analytic_json(self):
@@ -24,8 +24,6 @@ class PurchaseOrderLine(models.Model):
     @api.depends('analytic_distribution')
     def _compute_budget_line_ids(self):
         def get_domain(line):
-            if not self.env['budget.analytic'].has_access('read'):
-                return False
             if line.analytic_json and line.product_qty - line.qty_received > 0:
                 project_plan, other_plans = self.env['account.analytic.plan']._get_all_plans()
                 domain_to_add = set()
@@ -54,10 +52,12 @@ class PurchaseOrderLine(models.Model):
             for line in lines:
                 line.budget_line_ids = budget_lines
 
-    @api.depends('budget_line_ids', 'price_unit', 'product_qty', 'qty_invoiced')
+    @api.depends('budget_line_ids', 'price_unit', 'product_qty', 'qty_invoiced', 'non_deductible_tax')
     def _compute_above_budget(self):
         for line in self:
             uncommitted_amount = 0
             if line.order_id.state != 'purchase':
-                uncommitted_amount = line.price_unit * (line.product_qty - line.qty_invoiced)
+                uncommitted_qty = (line.product_qty - line.qty_invoiced)
+                uncommitted_amount = line.price_unit * uncommitted_qty
+                uncommitted_amount += line.non_deductible_tax * uncommitted_qty / line.product_qty if line.product_qty else 0.0
             line.is_above_budget = any(budget.committed_amount + uncommitted_amount > budget.budget_amount for budget in line.budget_line_ids)

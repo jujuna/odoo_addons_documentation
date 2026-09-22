@@ -15,7 +15,7 @@ class PosOrder(models.Model):
     l10n_at_pos_order_receipt_qr_data = fields.Char(string="Encrypted QRdata", readonly=True, copy=False, help="Fiskaly receipt signature QRdata for this order")
     is_fiskaly_order_receipt_signed = fields.Boolean(string="Receipt Signed?", readonly=True, copy=False, help="Fiskaly receipt signature status for this order")
 
-    def _generate_qr_code_image(self, qr_data):
+    def _generate_qr_code_image_b64(self, qr_data):
         qr = qrcode.make(qr_data)
         temp = io.BytesIO()
         qr.save(temp, format="PNG")
@@ -159,8 +159,8 @@ class PosOrder(models.Model):
             }
         }
 
-        response = FiskalyClient(self.company_id, self.company_id.l10n_at_fiskaly_api_key, self.company_id.l10n_at_fiskaly_api_secret).sign_order(self.config_id.l10n_at_cash_regid, self.company_id.l10n_at_fiskaly_access_token, self.l10n_at_pos_order_receipt_id, receipt_data)
-        self.l10n_at_pos_order_receipt_qr_data = self._generate_qr_code_image(response.get("qr_code_data"))
+        response = FiskalyClient(self.company_id, self.company_id.sudo().l10n_at_fiskaly_api_key, self.company_id.sudo().l10n_at_fiskaly_api_secret).sign_order(self.config_id.l10n_at_cash_regid, self.company_id.sudo().l10n_at_fiskaly_access_token, self.l10n_at_pos_order_receipt_id, receipt_data)
+        self.l10n_at_pos_order_receipt_qr_data = self._generate_qr_code_image_b64(response.get("qr_code_data"))
         self.l10n_at_pos_order_receipt_number = int(response.get("receipt_number"))
         self.is_fiskaly_order_receipt_signed = bool(response.get("signed"))
         return (self.is_fiskaly_order_receipt_signed, self.l10n_at_pos_order_receipt_number, self.l10n_at_pos_order_receipt_qr_data)

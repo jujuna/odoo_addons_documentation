@@ -6,9 +6,9 @@
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="model">res.company</field>
         <field type="xml" name="arch">
-            <field name="vat" position="after">
+            <div name="identifiers" position="after">
                 <field name="l10n_uy_edi_branch_code" invisible="country_code != 'UY'"/>
-            </field>
+            </div>
         </field>
     </record>
 

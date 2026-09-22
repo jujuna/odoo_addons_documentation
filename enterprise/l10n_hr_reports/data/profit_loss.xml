@@ -4,6 +4,7 @@
         <field name="name">Profit and loss</field>
         <field name="name@hr">Dobit i gubitak</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
         <field name="country_id" ref="base.hr"/>
@@ -34,8 +35,6 @@
                         <field name="name">I. Revenues from sales with entrepreneurs within the group</field>
                         <field name="name@hr">I. Prihodi od prodaje s poduzetnicima unutar grupe</field>
                         <field name="code">HR_revenu_sales</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_revenu_sales0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -48,8 +47,6 @@
                         <field name="name">II. Sales revenue</field>
                         <field name="name@hr">II. Prihodi od prodaje</field>
                         <field name="code">HR_sales_revenue</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_sales_revenu0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -62,8 +59,6 @@
                         <field name="name">III. Income based on the use of own products, goods and services</field>
                         <field name="name@hr">III. Prihodi temeljem korištenja vlastitih proizvoda, dobara i usluga</field>
                         <field name="code">HR_income_prod</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_income_prod_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -76,8 +71,6 @@
                         <field name="name">IV. Other business income with entrepreneurs within the group</field>
                         <field name="name@hr">IV. Ostali poslovni prihodi s poduzetnicima unutar grupe</field>
                         <field name="code">HR_other_business</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_other_business_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -90,8 +83,6 @@
                         <field name="name">V. Other business income</field>
                         <field name="name@hr">V. Ostali poslovni prihodi</field>
                         <field name="code">HR_other_business1</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_other_business1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -122,8 +113,6 @@
                         <field name="name">I. Changes in the value of inventories of work in progress and finished goods</field>
                         <field name="name@hr">I. Promjene vrijednosti zaliha nedovršene proizvodnje i gotovih proizvoda</field>
                         <field name="code">HR_change</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_change0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -150,8 +139,6 @@
                                 <field name="name">Costs of raw materials and materials</field>
                                 <field name="name@hr">Troškovi sirovina i materijala</field>
                                 <field name="code">HR_cost_raw_mat1</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_cost_raw_mat1_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -167,8 +154,6 @@
                                 <field name="name">Cost of goods sold</field>
                                 <field name="name@hr">Troškovi prodane robe</field>
                                 <field name="code">HR_cost_good_sold</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_cost_good_sold_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -184,8 +169,6 @@
                                 <field name="name">Other external costs</field>
                                 <field name="name@hr">Ostali vanjski troškovi</field>
                                 <field name="code">HR_cost_exter</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_cost_exter_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -214,8 +197,6 @@
                                 <field name="name">Net salaries and wages</field>
                                 <field name="name@hr">Neto plaće i nadnice</field>
                                 <field name="code">HR_net_salaries</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_net_salaries_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -229,8 +210,6 @@
                                 <field name="name">Costs of taxes and contributions from salaries</field>
                                 <field name="name@hr">Troškovi poreza i doprinosa iz plaća</field>
                                 <field name="code">HR_cost_taxes</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_cost_taxes_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -244,8 +223,6 @@
                                 <field name="name">Contributions to salaries</field>
                                 <field name="name@hr">Doprinosi na plaće</field>
                                 <field name="code">HR_contrib_salary</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_contrib_salary_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -259,8 +236,6 @@
                                 <field name="name">Other personnel cost</field>
                                 <field name="name@hr">Ostali troškovi osoblja</field>
                                 <field name="code">HR_other_perso_cost</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_other_perso_cost_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -276,8 +251,6 @@
                         <field name="name">IV. Amortization</field>
                         <field name="name@hr">IV. Amortizacija</field>
                         <field name="code">HR_amort</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_amort0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -291,8 +264,6 @@
                         <field name="name">V. Other cost</field>
                         <field name="name@hr">V. Ostali troškovi</field>
                         <field name="code">HR_other_cost</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_other_cost0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -319,8 +290,6 @@
                                 <field name="name">Fixed assets except financial assets</field>
                                 <field name="name@hr">Dugotrajna imovina osim financijske imovine</field>
                                 <field name="code">HR_fixed_asset</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_fixed_asset_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -334,8 +303,6 @@
                                 <field name="name">Short-term assets other than financial assets</field>
                                 <field name="name@hr">Kratkotrajna imovina osim financijske imovine</field>
                                 <field name="code">HR_short_term_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_short_term_assets_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -364,8 +331,6 @@
                                 <field name="name">Reserves for pensions, severance pay and similar obligations</field>
                                 <field name="name@hr">Pričuve za mirovine, otpremnine i slične obveze</field>
                                 <field name="code">HR_reserv_pension</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_reserv_pension_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -379,8 +344,6 @@
                                 <field name="name">Provisions for tax liabilities</field>
                                 <field name="name@hr">Rezerviranja za porezne obveze</field>
                                 <field name="code">HR_prov_tax_lia</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_prov_tax_lia_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -394,8 +357,6 @@
                                 <field name="name">Reservations for initiated court cases</field>
                                 <field name="name@hr">Rezervacije za pokrenute sudske sporove</field>
                                 <field name="code">HR_reserv_init</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_reserv_init_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -409,8 +370,6 @@
                                 <field name="name">Reserves for the costs of restoration of natural resources</field>
                                 <field name="name@hr">Rezerve za troškove obnove prirodnih bogatstava</field>
                                 <field name="code">HR_reserv_costs_resto</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_reserv_costs_resto_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -424,8 +383,6 @@
                                 <field name="name">Reserves for costs in the warranty periods</field>
                                 <field name="name@hr">Rezerve za troškove u jamstvenom roku</field>
                                 <field name="code">HR_reserv_cost_warrant</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_reserv_cost_warrant_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -439,8 +396,6 @@
                                 <field name="name">Other reservations</field>
                                 <field name="name@hr">Ostale rezervacije</field>
                                 <field name="code">HR_other_res</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_hr_other_res_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -456,8 +411,6 @@
                         <field name="name">VIII. Other business expenses</field>
                         <field name="name@hr">VIII. Ostali poslovni rashodi</field>
                         <field name="code">HR_other_business_exp</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_other_business_exp0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -487,8 +440,6 @@
                         <field name="name">I. Income from investments in shares (shares) of entrepreneurs within the group</field>
                         <field name="name@hr">I. Prihodi od ulaganja u udjele (udjele) poduzetnika unutar grupe</field>
                         <field name="code">HR_income_invest_share0</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_income_invest_share0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -501,8 +452,6 @@
                         <field name="name">II. Income from investments in shares (shares) of companies connected by a participating interest</field>
                         <field name="name@hr">II. Prihodi od ulaganja u dionice (dionice) društava povezanih sudjelujućim interesom</field>
                         <field name="code">HR_income_invest_share1</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_income_invest_share1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -515,8 +464,6 @@
                         <field name="name">III. Income from other long-term financial investments and loans to entrepreneurs within the group</field>
                         <field name="name@hr">III. Prihodi od ostalih dugoročnih financijskih ulaganja i kredita poduzetnicima unutar grupe</field>
                         <field name="code">HR_income_invest_long</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_income_invest_long_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -529,8 +476,6 @@
                         <field name="name">IV. Other income based on interest from relations with entrepreneurs within the group</field>
                         <field name="name@hr">IV. Ostali prihodi po osnovi kamata iz odnosa s poduzetnicima unutar grupe</field>
                         <field name="code">HR_income_interest</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_income_interest_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -543,8 +488,6 @@
                         <field name="name">V. Exchange rate differences and other financial income from relations with entrepreneurs within the group</field>
                         <field name="name@hr">V. Tečajne razlike i ostali financijski prihodi iz odnosa s poduzetnicima unutar grupe</field>
                         <field name="code">HR_exchange_rate</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_exchange_rate_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -557,8 +500,6 @@
                         <field name="name">VI. Income from other long-term financial investments and loans</field>
                         <field name="name@hr">VI. Prihodi od ostalih dugoročnih financijskih ulaganja i zajmova</field>
                         <field name="code">HR_income_other_long</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_income_other_long_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -571,8 +512,6 @@
                         <field name="name">VII. Other income from interest</field>
                         <field name="name@hr">VII. Ostali prihodi od kamata</field>
                         <field name="code">HR_income_other_int</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_income_other_int_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -585,8 +524,6 @@
                         <field name="name">VIII. Exchange differences and other financial income</field>
                         <field name="name@hr">VIII. Tečajne razlike i ostali financijski prihodi</field>
                         <field name="code">HR_exchange_dif</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_exchange_dif_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -599,8 +536,6 @@
                         <field name="name">IX. Unrealized gains (income) from financial assets</field>
                         <field name="name@hr">IX. Nerealizirani dobici (prihodi) od financijske imovine</field>
                         <field name="code">HR_unreal_gain</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_unreal_gain_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -613,8 +548,6 @@
                         <field name="name">X. Other financial income</field>
                         <field name="name@hr">X. Ostali financijski prihodi</field>
                         <field name="code">HR_income_other_finan</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_income_other_finan_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -644,8 +577,6 @@
                         <field name="name">I. Expenses based on interest and similar expenses with entrepreneurs within the group</field>
                         <field name="name@hr">I. Rashodi po osnovi kamata i slični rashodi kod poduzetnika unutar grupe</field>
                         <field name="code">HR_expenses_interest_ent</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_expenses_interest_ent0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -659,8 +590,6 @@
                         <field name="name">II. Exchange rate differences and other expenses with entrepreneurs within the group</field>
                         <field name="name@hr">II. Tečajne razlike i ostali rashodi kod poduzetnika unutar grupe</field>
                         <field name="code">HR_exchange_rate_and_other</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_exchange_rate_and_other_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -674,8 +603,6 @@
                         <field name="name">III. Expenses based on interest and similar expenses</field>
                         <field name="name@hr">III. Rashodi po osnovi kamata i slični rashodi</field>
                         <field name="code">HR_expenses_interest_and_similar</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_expenses_interest_and_similar_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -689,8 +616,6 @@
                         <field name="name">IV. Exchange rate differences and other expenses</field>
                         <field name="name@hr">IV. Tečajne razlike i ostali rashodi</field>
                         <field name="code">HR_expenses_rate_and_other</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_expenses_rate_and_other0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -704,8 +629,6 @@
                         <field name="name">V. Unrealized losses (expenses) from financial assets</field>
                         <field name="name@hr">V. Nerealizirani gubici (rashodi) od financijske imovine</field>
                         <field name="code">HR_unreal_exp</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_unreal_exp_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -719,8 +642,6 @@
                         <field name="name">VI. Value adjustments of financial assets (net)</field>
                         <field name="name@hr">VI. Ispravci vrijednosti financijske imovine (neto)</field>
                         <field name="code">HR_value_adj_asset</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_value_adj_asset_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -734,8 +655,6 @@
                         <field name="name">VII. Other financial expenses</field>
                         <field name="name@hr">VII. Ostali financijski rashodi</field>
                         <field name="code">HR_other_financ_exp</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_other_financ_exp_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -850,7 +769,6 @@
                         <field name="name">I. Profit before tax</field>
                         <field name="name@hr">I. Dobit prije oporezivanja</field>
                         <field name="code">HR_prof_before_tax</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_prof_before_tax_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -866,7 +784,6 @@
                         <field name="name">II. Loss before tax</field>
                         <field name="name@hr">II. Gubitak prije oporezivanja</field>
                         <field name="code">HR_loss_before_tax</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_loss_before_tax_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -904,7 +821,6 @@
                         <field name="name">I. Profit for this period</field>
                         <field name="name@hr">I. Dobit za ovo razdoblje</field>
                         <field name="code">HR_prof_period</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_prof_period_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -920,7 +836,6 @@
                         <field name="name">II. Loss for this period</field>
                         <field name="name@hr">II. Gubitak za ovo razdoblje</field>
                         <field name="code">HR_lossbefore_tax1</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_hr_loss_before_tax1_balance" model="account.report.expression">
                                 <field name="label">balance</field>

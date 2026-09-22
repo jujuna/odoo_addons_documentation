@@ -2,10 +2,10 @@ import { PermissionPanel } from "@knowledge/components/permission_panel/permissi
 import { knowledgeTopbar } from "@knowledge/components/topbar/topbar";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import {
+    assignTestEnv,
     defineActions,
     defineModels,
     fields,
-    makeMockEnv,
     makeMockServer,
     mockService,
     models,
@@ -18,6 +18,7 @@ import { user } from "@web/core/user";
 import { beforeEach, expect, test } from "@odoo/hoot";
 import { click, queryText } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
+import { PanelState } from "@knowledge/components/side_panel/panel_state";
 import { mockKnowledgePermissionPanelRpc } from "./knowledge_test_helpers";
 
 const permissions = {
@@ -56,6 +57,11 @@ class KnowledgeArticle extends models.ServerModel {
     inherited_permission = fields.Selection({ selection: Object.keys(internalPermissions) });
     user_can_write = fields.Boolean({ compute: "_compute_user_can_write" });
     user_permission = fields.Selection({ selection: Object.keys(permissions) });
+    article_properties_definition = fields.PropertiesDefinition({ default: [] });
+    article_properties = fields.Properties({
+        definition_record: "parent_id",
+        definition_record_field: "article_properties_definition",
+    });
 
     _records = [
         {
@@ -245,7 +251,7 @@ defineActions([
 
 const internalPermissionSelector = ".o_internal_permission .dropdown-toggle";
 const internalVisibilitySelector = ".o_internal_visibility .dropdown-toggle";
-const inviteMemberSelector = ".fa-user-plus + .input-group";
+const inviteMemberSelector = ".o_invite_selector";
 
 const expectMember = (member, disabled) => {
     const selector = `.o_knowledge_permission_panel_members > div:contains(${member.name})`;
@@ -276,20 +282,19 @@ patchWithCleanup(knowledgeTopbar, {
 let mockServer;
 beforeEach(async () => {
     mockServer = await makeMockServer();
-    await makeMockEnv({
+    assignTestEnv({
         /** @param {integer} articleId */
         async openArticle(articleId) {
             expect.step(`open ${articleId}`);
-            await this.reactiveRecordWrapper.record.model.load({ resId: articleId });
+            await this.reactiveRecord().model.load({ resId: articleId });
         },
         sendArticleToTrash() {
             expect.step("send to trash");
         },
         save: () => {},
         discard: () => {},
-        commentsState: { isDisplayed: false },
-        chatterPanelState: { isDisplayed: false },
-        propertiesPanelState: { isDisplayed: true },
+        panelState: new PanelState({ displayMode: "handler" }),
+        tocButton: { isRelevant: false },
     });
     patchWithCleanup(PermissionPanel.prototype, {
         load() {
@@ -500,7 +505,7 @@ test("Change inherited internal permission", async () => {
     expect(internalPermissionSelector).toHaveText("Can Edit");
     // child articles do not have the visibility option
     expect(internalVisibilitySelector).toHaveCount(0);
-    expect(".knowledge_internal_permission_based_on_text").toHaveText(
+    expect(".o_knowledge_internal_permission_based_on_text").toHaveText(
         "Based on 👨‍💻Workspace Article"
     );
     await click(internalPermissionSelector);
@@ -676,7 +681,7 @@ test("Change article while permission panel is open", async () => {
     await mountPermissionPanel(6, true);
     await animationFrame();
     expect(internalPermissionSelector).toHaveText("Can Read");
-    await click(".fa-shield + div a:contains('👨‍💻Workspace Article')");
+    await click("[data-icon='security'] + div a:contains('👨‍💻Workspace Article')");
     await animationFrame();
     expect.verifySteps(["open 4"]);
     // check that panel has been reloaded
@@ -735,7 +740,7 @@ test("Restore Article", async () => {
     await animationFrame();
     expect(internalPermissionSelector).toHaveText("Can Read");
     // "based on" should not be visible
-    expect(".knowledge_internal_permission_based_on_text").toHaveCount(0);
+    expect(".o_knowledge_internal_permission_based_on_text").toHaveCount(0);
     // member's dropdown is disabled since its the only editor
     expectMember(members[0], true);
     // should show "restricted" message and "restore" button
@@ -754,7 +759,7 @@ test("Restore Article", async () => {
     await animationFrame();
     // check permission panel is updated and is now "based on"
     expect(internalPermissionSelector).toHaveText("Can Edit");
-    expect(".knowledge_internal_permission_based_on_text").toHaveCount(1);
+    expect(".o_knowledge_internal_permission_based_on_text").toHaveCount(1);
     expectMember(members[0]);
     // should not show "restricted" message and "restore" button anymore
     expect("div:contains('Access Restricted') + button:contains('Restore')").toHaveCount(0);

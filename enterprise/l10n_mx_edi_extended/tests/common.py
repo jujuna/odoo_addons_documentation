@@ -1,14 +1,21 @@
 # coding: utf-8
+from datetime import timedelta
+
 from odoo import Command
 from odoo.addons.l10n_mx_edi.tests.common import TestMxEdiCommon, EXTERNAL_MODE, RATE_WITH_USD, TEST_RATE_WITH_USD
 
 
 class TestMxExtendedEdiCommon(TestMxEdiCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env.company.bank_ids = [Command.create({'acc_number': "0123456789"})]
+        cls.env.company.bank_ids = [Command.create({
+            'account_number': "0123456789",
+            'allow_out_payment': True,
+        })]
         cls.env.company.partner_id.write({
             'street_name': "Campobasso Norte",
             'street_number': 3206,
@@ -33,9 +40,9 @@ class TestMxExtendedEdiCommon(TestMxEdiCommon):
         cls.env.ref('l10n_mx.product_uom_service_unit').l10n_mx_edi_code_aduana = '99'
 
         rate = 1 / (RATE_WITH_USD if EXTERNAL_MODE else TEST_RATE_WITH_USD)
-        cls.usd = cls.setup_other_currency('USD', rates=[(cls.frozen_today.date(), rate)])
+        cls.usd = cls.setup_other_currency('USD', rates=[(cls.frozen_today.date() - timedelta(days=1), rate)])
 
-    def _create_invoice(self, **kwargs):
+    def _create_invoice_mx(self, **kwargs):
         if 'invoice_line_ids' not in kwargs:
             kwargs['invoice_line_ids'] = [
                 Command.create({
@@ -51,4 +58,4 @@ class TestMxExtendedEdiCommon(TestMxEdiCommon):
             kwargs['partner_id'] = self.partner_us.id
         if 'l10n_mx_edi_external_trade_type' not in kwargs:
             kwargs['l10n_mx_edi_external_trade_type'] = '02'
-        return super()._create_invoice(**kwargs)
+        return super()._create_invoice_mx(**kwargs)

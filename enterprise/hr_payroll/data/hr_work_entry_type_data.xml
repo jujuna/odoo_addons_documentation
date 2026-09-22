@@ -1,39 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
-        <record id="hr_work_entry.work_entry_type_leave" model="hr.work.entry.type">
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
+    <data>
+        <function model="hr.work.entry.type" name="write">
+            <value model="hr.work.entry.type" eval="obj().sudo().search([('code', 'in', ['LEAVE100', 'LEAVE105', '002.08', '158.00', '013.00', '016.00'])]).ids"/>
+            <value eval="{'round_days_type': 'DOWN'}"/>
+        </function>
+
+        <function model="hr.work.entry.type" name="write">
+            <value model="hr.work.entry.type" eval="obj().sudo().search([('code', '=', '000.00')]).ids"/>
+            <value eval="{'round_days_type': 'HALF-UP'}"/>
+        </function>
+
+        <record id="hr_work_entry.generic_work_entry_type_attendance" model="hr.work.entry.type">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
         </record>
 
-        <record id="hr_work_entry.work_entry_type_compensatory" model="hr.work.entry.type">
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
-        </record>
-
-        <record id="hr_work_entry.work_entry_type_home_working" model="hr.work.entry.type">
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
-        </record>
-
-        <record id="hr_work_entry.work_entry_type_unpaid_leave" model="hr.work.entry.type">
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
-        </record>
-
-        <record id="hr_work_entry.work_entry_type_sick_leave" model="hr.work.entry.type">
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
-        </record>
-
-        <record id="hr_work_entry.work_entry_type_legal_leave" model="hr.work.entry.type">
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
-        </record>
-
-        <record id="hr_work_entry.hr_work_entry_type_out_of_contract" model="hr.work.entry.type">
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">HALF-UP</field>
-        </record>
+        <function model="hr.work.entry.type" name="write">
+            <value model="hr.work.entry.type" eval="obj().sudo().search([('code', '=', '040.00')]).ids"/>
+            <value eval="{'category_ids': [(4, ref('hr_payroll.EXTRA_HOURS'))]}"/>
+        </function>
     </data>
 </odoo>

@@ -1,4 +1,4 @@
-import { addSectionFromProductCatalog, showProductColumn } from "@account/js/tours/tour_utils";
+import { addSectionFromProductCatalog } from "@account/js/tours/tour_utils";
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add('sale_catalog', {
@@ -33,6 +33,9 @@ registry.category("web_tour.tours").add('sale_catalog', {
             run: "edit Restricted",
         },
         {
+            trigger: '.fst-italic.text-primary:contains("Restricted"):first',
+        },
+        {
             content: "Search for the product",
             trigger: 'input.o_searchview_input',
             run: "press Enter",
@@ -47,21 +50,21 @@ registry.category("web_tour.tours").add('sale_catalog', {
         },
         {
             content: "Add the product to the SO",
-            trigger: '.o_kanban_record:contains("Restricted Product") .fa-shopping-cart',
+            trigger: '.o_kanban_record:contains("Restricted Product") [data-icon="shopping_cart"]',
             run: 'click',
         },
         {
             content: "Wait for product to be added",
-            trigger: '.o_kanban_record:contains("Restricted Product"):not(:has(.fa-shopping-cart))',
+            trigger: '.o_kanban_record:contains("Restricted Product"):not(:has([data-icon="shopping_cart"]))',
         },
         {
             content: "Input a custom quantity",
-            trigger: '.o_kanban_record:contains("Restricted Product") .o_input',
+            trigger: '.o_kanban_record:contains("Restricted Product") input',
             run: "edit 6",
         },
         {
             content: "Increase the quantity",
-            trigger: '.o_kanban_record:contains("Restricted Product") .fa-plus',
+            trigger: '.o_kanban_record:contains("Restricted Product") [data-icon="add"]',
             run: 'click',
         },
         {
@@ -93,7 +96,6 @@ registry.category("web_tour.tours").add('test_add_section_from_product_catalog_o
             trigger: '.o_field_res_partner_many2one .dropdown-item:not([id$="_loading"]):first',
             run: 'click',
         },
-        ...showProductColumn(),
         ...addSectionFromProductCatalog(),
-    ]
+    ],
 });

@@ -1,4 +1,4 @@
-import { Component, useState, xml } from "@odoo/owl";
+import { Component, xml, proxy, t, usePlugin, useProps } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { ModelFieldSelector } from "@web/core/model_field_selector/model_field_selector";
 import { useDialogConfirmation } from "@web_studio/client_action/utils";
@@ -7,59 +7,69 @@ import { _t } from "@web/core/l10n/translation";
 import { DomainSelector } from "@web/core/domain_selector/domain_selector";
 import { SelectionContentDialog } from "@web_studio/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog";
 import { RecordSelector } from "@web/core/record_selectors/record_selector";
+import { ViewEditorModel } from "../../view_editor_model";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
+
+class SelectionValuesModel {
+    selection = "[]";
+
+    get isValid() {
+        return true;
+    }
+}
 
 export class SelectionValuesEditor extends Component {
     static components = {
         SelectionContentDialog,
     };
-    static props = {
-        configurationModel: { type: Object },
-        confirm: { type: Function },
-        cancel: { type: Function },
-    };
     static template = "web_studio.SelectionValuesEditor";
-    static Model = class SelectionValuesModel {
-        constructor() {
-            this.selection = "[]";
-        }
-        get isValid() {
-            return true;
-        }
-    };
+    static Model = SelectionValuesModel;
+
+    props = useProps({
+        configurationModel: t.object(),
+        confirm: t.function(),
+        cancel: t.function(),
+    });
+
     get selection() {
         return JSON.parse(this.props.configurationModel.selection);
     }
+
     onConfirm(choices) {
         this.props.configurationModel.selection = JSON.stringify(choices);
         this.props.confirm();
     }
 }
 
+class RelationalFieldModel {
+    relationId = false;
+    fieldName = false;
+
+    get isValid() {
+        return !!this.relationId;
+    }
+}
+
 export class RelationalFieldConfigurator extends Component {
     static template = "web_studio.RelationalFieldConfigurator";
     static components = { RecordSelector };
-    static props = {
-        configurationModel: { type: Object },
-        resModel: { type: String },
-        fieldType: { type: String },
-    };
-    static Model = class RelationalFieldModel {
-        constructor() {
-            this.relationId = false;
-        }
-        get isValid() {
-            return !!this.relationId;
-        }
-    };
+    static Model = RelationalFieldModel;
+
+    props = useProps({
+        configurationModel: t.object(),
+        resModel: t.string(),
+        fieldType: t.string(),
+    });
 
     setup() {
-        this.state = useState(this.props.configurationModel);
+        this.state = proxy(this.props.configurationModel);
     }
 
     get valueSelectorProps() {
         if (this.props.fieldType === "one2many") {
             return {
                 resModel: "ir.model.fields",
+                fieldString: _t("Fields"),
                 domain: [
                     ["relation", "=", this.props.resModel],
                     ["ttype", "=", "many2one"],
@@ -72,16 +82,43 @@ export class RelationalFieldConfigurator extends Component {
                 },
             };
         }
+        let resId, virtualRecord;
+        if (isNaN(this.state.relationId)) {
+            virtualRecord = this.state.relationId;
+        } else {
+            resId = this.state.relationId;
+        }
         return {
             resModel: "ir.model",
+            fieldString: _t("Models"),
             domain: [
                 ["transient", "=", false],
                 ["abstract", "=", false],
                 ["model", "not in", ["knowledge.article"]],
             ],
-            resId: this.state.relationId,
+            resId: resId || false,
+            virtualRecord,
             update: (resId) => {
+                this.state.fieldName = false;
                 this.state.relationId = resId;
+            },
+            buildQuickCreate: ({ request }) => {
+                const technicalName = "x_" + ViewEditorModel.sanitizeString(request);
+                return {
+                    cssClass: "o_m2o_dropdown_option",
+                    label: _t("Create %(name)s (%(technical_name)s)", {
+                        name: request,
+                        technical_name: technicalName,
+                    }),
+                    onSelect: () => {
+                        this.state.fieldName = `x_studio_${technicalName.slice(2)}_id`;
+                        this.state.relationId = {
+                            id: false,
+                            display_name: request,
+                            model: technicalName,
+                        };
+                    },
+                };
             },
         };
     }
@@ -134,16 +171,19 @@ class RelatedChainBuilderModel {
 }
 
 export class RelatedChainBuilder extends Component {
-    static template = xml`<ModelFieldSelector resModel="props.resModel" path="fieldChain" readonly="false" filter.bind="filter" update.bind="updateChain" />`;
+    static template = xml`<ModelFieldSelector resModel="this.props.resModel" path="this.fieldChain" readonly="false" filter.bind="this.filter" update.bind="this.updateChain" isDebugMode="this.debugMode.isActive()" />`;
     static components = { ModelFieldSelector };
-    static props = {
-        resModel: { type: String },
-        configurationModel: { type: Object },
-    };
     static Model = RelatedChainBuilderModel;
 
+    props = useProps({
+        resModel: t.string(),
+        configurationModel: t.object(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
+
     setup() {
-        this.state = useState(this.props.configurationModel);
+        this.state = proxy(this.props.configurationModel);
         this.relatedParams.related = "";
     }
 
@@ -185,23 +225,23 @@ function useConfiguratorModel(Model, props) {
     );
 
     const model = new Model({ services, props });
-    return useState(model);
+    return proxy(model);
 }
 
 export class FieldConfigurationDialog extends Component {
-    static props = {
-        confirm: { type: Function },
-        cancel: { type: Function },
-        close: { type: Function },
-        Component: { type: Function },
-        componentProps: { type: Object, optional: true },
-        fieldType: { type: String, optional: true },
-        isDialog: { type: Boolean, optional: true },
-        title: { type: String, optional: true },
-        size: { type: String, optional: true },
-    };
     static template = "web_studio.FieldConfigurationDialog";
     static components = { Dialog };
+    props = useProps({
+        confirm: t.function(),
+        cancel: t.function(),
+        close: t.function(),
+        Component: t.function(),
+        componentProps: t.object().optional(),
+        fieldType: t.string().optional(),
+        isDialog: t.boolean().optional(),
+        title: t.string().optional(),
+        size: t.string().optional(),
+    });
 
     setup() {
         const { confirm, cancel } = useDialogConfirmation({
@@ -249,26 +289,29 @@ export class FieldConfigurationDialog extends Component {
     }
 }
 
+class FilterConfigurationModel {
+    filterLabel = "";
+    domain = "[]";
+
+    get isValid() {
+        return !!this.filterLabel;
+    }
+}
+
 export class FilterConfiguration extends Component {
     static components = { DomainSelector };
     static template = "web_studio.FilterConfiguration";
-    static props = {
-        resModel: { type: String },
-        configurationModel: { type: Object },
-    };
-    static Model = class FilterConfigurationModel {
-        constructor() {
-            this.filterLabel = "";
-            this.domain = "[]";
-        }
+    static Model = FilterConfigurationModel;
 
-        get isValid() {
-            return !!this.filterLabel;
-        }
-    };
+    props = useProps({
+        resModel: t.string(),
+        configurationModel: t.object(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
-        this.state = useState(this.props.configurationModel);
+        this.state = proxy(this.props.configurationModel);
     }
 
     get domainSelectorProps() {
@@ -279,7 +322,7 @@ export class FilterConfiguration extends Component {
             update: (domainStr) => {
                 this.state.domain = domainStr;
             },
-            isDebugMode: !!this.env.debug,
+            isDebugMode: this.debugMode.isActive(),
         };
     }
 }

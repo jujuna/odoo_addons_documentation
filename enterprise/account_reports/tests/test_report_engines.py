@@ -2,13 +2,14 @@ from .common import TestAccountReportsCommon
 
 from odoo import fields, Command
 from odoo.tests import tagged
-from odoo.tools import frozendict
 
 from unittest.mock import patch
 
 
 @tagged('post_install', '-at_install')
 class TestReportEngines(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -26,209 +27,6 @@ class TestReportEngines(TestAccountReportsCommon):
             'phone': '123456789',
             'email': 'test@gmail.com',
         })
-
-        cls.garbage_account = cls.env['account.account'].create({
-            'code': "turlututu",
-            'name': "turlututu",
-            'account_type': "asset_current",
-        })
-
-        cls.fake_country = cls.env['res.country'].create({
-            'name': "L'Île de la Mouche",
-            'code': 'YY',
-        })
-
-    # -------------------------------------------------------------------------
-    # HELPERS
-    # -------------------------------------------------------------------------
-
-    def _prepare_test_account_move_line(self, balance, account_code=None, tax_tags=None, date='2020-01-01', **kwargs):
-        if tax_tags:
-            tags = self.env['account.account.tag'].search([
-                ('applicability', '=', 'taxes'),
-                ('country_id', '=', self.fake_country.id),
-                ('name', 'in', tax_tags),
-            ])
-        else:
-            tags = self.env['account.account.tag']
-
-        return {
-            'account_move_line_values': {
-                'name': "turlututu",
-                'account_id': self.garbage_account.id,
-                **kwargs,
-                'debit': balance if balance > 0.0 else 0.0,
-                'credit': -balance if balance < 0.0 else 0.0,
-                'tax_tag_ids': [Command.set(tags.ids)],
-            },
-            'account_move_values': {'date': date},
-            'account_code': account_code,
-        }
-
-    def _create_test_account_moves(self, test_account_move_line_values_list):
-        # Create the missing account on-the-fly.
-        accounts_to_create_by_code = set()
-        for test_account_move_line_values in test_account_move_line_values_list:
-            if test_account_move_line_values.get('account_code'):
-                accounts_to_create_by_code.add(test_account_move_line_values['account_code'])
-
-        if accounts_to_create_by_code:
-            accounts = self.env['account.account'].create([
-                {
-                    'code': account_code,
-                    'name': account_code,
-                    'account_type': "asset_current",
-                }
-                for account_code in accounts_to_create_by_code
-            ])
-            account_by_code = {x.code: x for x in accounts}
-
-            for test_account_move_line_values in test_account_move_line_values_list:
-                account = account_by_code.get(test_account_move_line_values.get('account_code'))
-                if account:
-                    test_account_move_line_values['account_move_line_values']['account_id'] = account.id
-
-        # Create the journal entries.
-        to_create = {}
-        for test_account_move_line_values in test_account_move_line_values_list:
-            account_move_key = frozendict(test_account_move_line_values['account_move_values'])
-            account_move_line_values = test_account_move_line_values['account_move_line_values']
-            account_move_to_create = to_create.setdefault(account_move_key, {
-                'account_move_values': {'line_ids': []},
-                'balance': 0.0,
-            })
-            account_move_to_create['account_move_values']['line_ids'].append(Command.create(account_move_line_values))
-            account_move_to_create['balance'] += account_move_line_values['debit'] - account_move_line_values['credit']
-
-        account_move_create_list = []
-        for account_move_dict, account_move_to_create in to_create.items():
-            open_balance = account_move_to_create['balance']
-            account_move_values = account_move_to_create['account_move_values']
-            if not self.env.company.currency_id.is_zero(open_balance):
-                account_move_values['line_ids'].append(Command.create({
-                    'name': 'open balance',
-                    'account_id': self.garbage_account.id,
-                    'debit': -open_balance if open_balance < 0.0 else 0.0,
-                    'credit': open_balance if open_balance > 0.0 else 0.0,
-                }))
-            account_move_create_list.append({
-                **account_move_dict,
-                **account_move_values,
-            })
-
-        moves = self.env['account.move'].create(account_move_create_list)
-        moves.action_post()
-        return moves
-
-    def _prepare_test_external_values(self, value, date, figure_type=False):
-        field_name = 'text_value' if figure_type == 'string' else 'value'
-        return {
-            'name': date,
-            field_name: value,
-            'date': date,
-        }
-
-    def _prepare_test_expression(self, formula, label='balance', **kwargs):
-        return {
-            'expression_values': {
-                'label': label,
-                'formula': formula,
-                **kwargs,
-            },
-        }
-
-    def _prepare_test_expression_tax_tags(self, formula, **kwargs):
-        return self._prepare_test_expression(engine='tax_tags', formula=formula, **kwargs)
-
-    def _prepare_test_expression_domain(self, formula, subformula, **kwargs):
-        return self._prepare_test_expression(engine='domain', formula=formula, subformula=subformula, **kwargs)
-
-    def _prepare_test_expression_account_codes(self, formula, **kwargs):
-        return self._prepare_test_expression(engine='account_codes', formula=formula, **kwargs)
-
-    def _prepare_test_expression_external(self, formula, external_value_generators, **kwargs):
-        return {
-            **self._prepare_test_expression(engine='external', formula=formula, **kwargs),
-            'external_value_generators': external_value_generators,
-        }
-
-    def _prepare_test_expression_custom(self, formula, **kwargs):
-        return self._prepare_test_expression(engine='custom', formula=formula, **kwargs)
-
-    def _prepare_test_expression_aggregation(self, formula, subformula=None, column='balance', date_scope=None):
-        expression_values = {
-            'label': column,
-            'engine': 'aggregation',
-            'formula': formula,
-            'subformula': subformula,
-        }
-
-        if date_scope:
-            expression_values['date_scope'] = date_scope
-
-        return {
-            'expression_values': expression_values,
-        }
-
-    def _prepare_test_report_line(self, *expression_generators, **kwargs):
-        return {
-            'report_line_values': {
-                **kwargs,
-                'expression_ids': [
-                    Command.create({
-                        'date_scope': 'strict_range',
-                        **expression_values['expression_values'],
-                    })
-                    for expression_values in expression_generators
-                ],
-            },
-            'expression_generators': expression_generators,
-        }
-
-    def _create_report(self, test_report_line_values_list, columns=None, **kwargs):
-        if not columns:
-            columns = ['balance']
-
-        # Create a new report
-        report = self.env['account.report'].create({
-            'name': "_run_report",
-            'filter_date_range': True,
-            'filter_unfold_all': True,
-            **kwargs,
-            'column_ids': [
-                Command.create({
-                    'name': column,
-                    'expression_label': column,
-                    'sequence': i,
-                })
-                for i, column in enumerate(columns)
-            ],
-            'line_ids': [
-                Command.create({
-                    'name': f"test_line_{i}",
-                    **test_report_line_values['report_line_values'],
-                    'sequence': i,
-                })
-                for i, test_report_line_values in enumerate(test_report_line_values_list, start=1)
-            ],
-        })
-
-        # Create the external values
-        external_values_create_list = []
-        for report_line, test_report_line_values in zip(report.line_ids, test_report_line_values_list):
-            for expression, expression_values in zip(report_line.expression_ids, test_report_line_values['expression_generators']):
-                for external_values in expression_values.get('external_value_generators', []):
-                    external_values_create_list.append({
-                        **external_values,
-                        'target_report_expression_id': expression.id,
-                    })
-        self.env['account.report.external.value'].create(external_values_create_list)
-
-        return report
-
-    # -------------------------------------------------------------------------
-    # TESTS
-    # -------------------------------------------------------------------------
 
     def test_engine_tax_tags(self):
         self.env.company.account_fiscal_country_id = self.fake_country
@@ -289,7 +87,7 @@ class TestReportEngines(TestAccountReportsCommon):
             move.line_ids[3],
         ]
         for report_line, expected_amls in zip(report.line_ids, expected_redirection_values_list):
-            report_line_dict = [x for x in report_lines if x['name'] == report_line.name][0]
+            report_line_dict = next(x for x in report_lines if x.name == report_line.name)
             with self.subTest(report_line=report_line.name):
                 action_dict = report.action_audit_cell(options, self._get_audit_params_from_report_line(options, report_line, report_line_dict))
                 self.assertEqual(move.line_ids.filtered_domain(action_dict['domain']), expected_amls)
@@ -306,27 +104,7 @@ class TestReportEngines(TestAccountReportsCommon):
             self._prepare_test_expression_domain(domain, '-sum'),
             groupby='parent_state,account_id',
         )
-        test_line_3 = self._prepare_test_report_line(
-            self._prepare_test_expression_domain(domain, 'sum_if_neg'),
-            groupby='account_id',
-        )
-        test_line_4 = self._prepare_test_report_line(
-            self._prepare_test_expression_domain(domain, '-sum_if_neg'),
-            groupby='account_id',
-        )
-        test_line_5 = self._prepare_test_report_line(
-            self._prepare_test_expression_domain(domain, 'sum_if_pos'),
-            groupby='account_id',
-        )
-        test_line_6 = self._prepare_test_report_line(
-            self._prepare_test_expression_domain(domain, '-sum_if_pos'),
-            groupby='account_id',
-        )
-        test_line_7 = self._prepare_test_report_line(
-            self._prepare_test_expression_domain(domain, 'count_rows'),
-            groupby='account_id',
-        )
-        report = self._create_report([test_line_1, test_line_2, test_line_3, test_line_4, test_line_5, test_line_6, test_line_7])
+        report = self._create_report([test_line_1, test_line_2])
 
         # Create the journal entries.
         move = self._create_test_account_moves([
@@ -356,20 +134,6 @@ class TestReportEngines(TestAccountReportsCommon):
                 ('101002 101002',       300.0),
                 ('101003 101003',       600.0),
                 ('101004 101004',       900.0),
-                ('test_line_3',       -1800.0),
-                ('101002 101002',      -300.0),
-                ('101003 101003',      -600.0),
-                ('101004 101004',      -900.0),
-                ('test_line_4',        1800.0),
-                ('101002 101002',       300.0),
-                ('101003 101003',       600.0),
-                ('101004 101004',       900.0),
-                ('test_line_5',           0.0),
-                ('test_line_6',           0.0),
-                ('test_line_7',             3),
-                ('101002 101002',           1),
-                ('101003 101003',           1),
-                ('101004 101004',           1),
             ],
             options,
         )
@@ -377,7 +141,7 @@ class TestReportEngines(TestAccountReportsCommon):
         # Check redirection.
         expected_amls = move.line_ids.search(domain)
         for report_line in report.line_ids:
-            report_line_dict = [x for x in report_lines if x['name'] == report_line.name][0]
+            report_line_dict = next(x for x in report_lines if x.name == report_line.name)
             with self.subTest(report_line=report_line.name):
                 action_dict = report.action_audit_cell(options, self._get_audit_params_from_report_line(options, report_line, report_line_dict))
                 self.assertEqual(move.line_ids.filtered_domain(action_dict['domain']), expected_amls)
@@ -569,7 +333,7 @@ class TestReportEngines(TestAccountReportsCommon):
             move.line_ids[5],
         ]
         for report_line, expected_amls in zip(report.line_ids, expected_redirection_values_list):
-            report_line_dict = [x for x in report_lines if x['name'] == report_line.name][0]
+            report_line_dict = next(x for x in report_lines if x.name == report_line.name)
             with self.subTest(report_line=report_line.name):
                 action_dict = report.action_audit_cell(options, self._get_audit_params_from_report_line(options, report_line, report_line_dict))
                 self.assertEqual(move.line_ids.filtered_domain(action_dict['domain']), expected_amls)
@@ -701,7 +465,7 @@ class TestReportEngines(TestAccountReportsCommon):
         )
 
     def test_engine_external_editable_percentage(self):
-        self.env.companies = self.env.company
+        self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
 
         # Create the report.
         test_rounding_4 = self._prepare_test_report_line(
@@ -763,11 +527,52 @@ class TestReportEngines(TestAccountReportsCommon):
             options,
         )
 
+    def test_engine_reference(self):
+        lines_with_old_value = [
+            self._prepare_test_report_line(
+                self._prepare_test_expression_reference(
+                    'res.partner',
+                    [self._prepare_test_external_values(f'res.partner:{self.partner_a.id}', '2020-01-01', 'string')],
+                    figure_type='many2one',
+                    date_scope=date_scope,
+                )
+            )
+            for date_scope in ['from_beginning', 'strict_range']
+        ]
+        empty_lines = [
+            self._prepare_test_report_line(
+                self._prepare_test_expression_reference(
+                    'res.partner',
+                    [
+                        self._prepare_test_external_values(f'res.partner:{self.partner_a.id}', '2020-01-01', 'string'),
+                        self._prepare_test_external_values('res.partner:0', '2020-01-02', 'string'),
+                    ],
+                    figure_type='many2one',
+                    date_scope=date_scope,
+                )
+            )
+            for date_scope in ['from_beginning', 'strict_range']
+        ]
+        report = self._create_report(lines_with_old_value + empty_lines)
+        options = self._generate_options(report, '2020-01-02', '2020-01-02')
+        self.assertLinesValues(
+            # pylint: disable=bad-whitespace
+            report._get_lines(options),
+            [    0,             1],
+            [
+                ('test_line_1', self.partner_a.display_name),
+                ('test_line_2', ''),
+                ('test_line_3', ''),
+                ('test_line_4', ''),
+            ],
+            options,
+        )
+
     def test_engine_custom(self):
         # Create the report.
         test_line_1 = self._prepare_test_report_line(
             self._prepare_test_expression_custom('_custom_engine_test', subformula='sum'),
-            groupby='account_id',
+            groupby='account_id', foldability='always_unfolded'
         )
         report = self._create_report([test_line_1])
 
@@ -779,15 +584,12 @@ class TestReportEngines(TestAccountReportsCommon):
 
         # Check the values.
 
-        def _custom_engine_test(expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+        def _custom_engine_test(options, date_scope, formulas_dict, current_groupby, warnings=None):
             domain = [('account_id.code', '=', '101002')]
             domain_key = str(domain)
-            formulas_dict = {domain_key: expressions}
-            domain_result = report._compute_formula_batch_with_engine_domain(
-                options, date_scope, formulas_dict, current_groupby, next_groupby,
-                offset=offset, limit=limit,
-            )
-            return list(domain_result.values())[0]
+            domain_formulas_dict = {domain_key: next(iter(formulas_dict.values()))}
+            domain_result = report._report_engine_domain(options, date_scope, domain_formulas_dict, current_groupby)
+            return {next(iter(formulas_dict.values())): next(iter(domain_result.values()))}
 
         orig_get_custom_report_function = report._get_custom_report_function
 
@@ -936,6 +738,10 @@ class TestReportEngines(TestAccountReportsCommon):
             self._prepare_test_expression_aggregation('test1.external', subformula='if_other_expr_below(test1.aggregation, USD(1000.0))'),
             name='test11_6', code='test11_6',
         )
+        test11_7 = self._prepare_test_report_line(  # Special case: same dependency in the formula and subformula
+            self._prepare_test_expression_aggregation('test1.aggregation', subformula='if_other_expr_above(test1.aggregation, USD(1000.0))'),
+            name='test11_7', code='test11_7',
+        )
 
         # Test sum_children formula (parent_id relationship is populated below)
         test_12_1 = self._prepare_test_report_line(
@@ -963,7 +769,7 @@ class TestReportEngines(TestAccountReportsCommon):
             [
                 test1, test2_1, test2_2, test2_3, test2_4, test3_1, test3_2, test3_3, test4_1, test4_2,
                 test5, test6, test7, test9, test10_1, test10_2, test10_3, test11_1, test11_2, test11_3, test11_4,
-                test11_5, test11_6, test_12_1, test_12_2, test_12_3, test_12_4, test_12_5,
+                test11_5, test11_6, test11_7, test_12_1, test_12_2, test_12_3, test_12_4, test_12_5,
             ],
             country_id=self.fake_country.id,
         )
@@ -1013,6 +819,7 @@ class TestReportEngines(TestAccountReportsCommon):
                 ('test11_4',              0.0),
                 ('test11_5',            100.0),
                 ('test11_6',              0.0),
+                ('test11_7',           1700.0),
                 ('test12_1',           3200.0),
                 ('test12_2',           2000.0),
                 ('test12_3',           -300.0),
@@ -1030,13 +837,15 @@ class TestReportEngines(TestAccountReportsCommon):
         ]
         for report_line_name, expected_amls in expected_amls_to_test:
             report_line = report.line_ids.filtered(lambda x: x.name == report_line_name)
-            report_line_dict = [x for x in report_lines if x['name'] == report_line.name][0]
+            report_line_dict = next(x for x in report_lines if x.name == report_line.name)
             with self.subTest(report_line=report_line.name):
                 action_dict = report.action_audit_cell(options, self._get_audit_params_from_report_line(options, report_line, report_line_dict))
                 self.assertEqual(moves.line_ids.filtered_domain(action_dict['domain']), expected_amls)
 
     def test_engine_aggregation_cross_report(self):
         moves = self._create_test_account_moves([
+            self._prepare_test_account_move_line(10.0, account_code='100000', date='2020-01-01'),
+            self._prepare_test_account_move_line(5.0, account_code='200000', date='2020-01-01'),
             self._prepare_test_account_move_line(2.0, account_code='100000', date='2021-01-01'),
             self._prepare_test_account_move_line(4.0, account_code='200000', date='2021-01-01'),
         ])
@@ -1083,10 +892,18 @@ class TestReportEngines(TestAccountReportsCommon):
             }
         ])
         main_report_line_1 = self._prepare_test_report_line(
-            self._prepare_test_expression_aggregation('report_line_3.balance', subformula='cross_report(account_reports.test_report_cross_report_0)', date_scope='strict_range'),
+            self._prepare_test_expression_aggregation('report_line_3.balance', subformula='cross_report(account_reports.test_report_cross_report_0)'),
             name='main_report_line', code='main_report_line',
         )
-        main_report = self._create_report([main_report_line_1])
+        main_report_line_2 = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('report_line_3.balance', subformula='cross_report(account_reports.test_report_cross_report_0, force_date_scope)', date_scope='from_beginning'),
+            name='main_report_line_from_beginning', code='main_report_line_from_beginning',
+        )
+        main_report_line_total = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('main_report_line.balance + main_report_line_from_beginning.balance'),
+            name='main_report_line_total', code='main_report_line_total',
+        )
+        main_report = self._create_report([main_report_line_1, main_report_line_2, main_report_line_total])
         main_report_options = self._generate_options(main_report, '2021-01-01', '2021-01-01')
 
         self.assertLinesValues(
@@ -1105,16 +922,27 @@ class TestReportEngines(TestAccountReportsCommon):
             [   0,                                      1],
             [
                 ('main_report_line',                    6.0),
+                ('main_report_line_from_beginning',    21.0),
+                ('main_report_line_total',             27.0),
             ],
             main_report_options,
         )
 
         # Target the second other report using the model id
         main_report_line_1 = self._prepare_test_report_line(
-            self._prepare_test_expression_aggregation('report_line_3.balance', subformula=f'cross_report({report1.id})', date_scope='strict_range'),
+            # Use a different date_scope here to ensure it does not get forced and has no effect
+            self._prepare_test_expression_aggregation('report_line_3.balance', subformula=f'cross_report({report1.id})', date_scope='from_beginning'),
             name='main_report_line', code='main_report_line',
         )
-        main_report = self._create_report([main_report_line_1])
+        main_report_line_2 = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('report_line_3.balance', subformula=f'cross_report({report1.id}, force_date_scope)', date_scope='from_beginning'),
+            name='main_report_line_from_beginning', code='main_report_line_from_beginning',
+        )
+        main_report_line_total = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('main_report_line.balance + main_report_line_from_beginning.balance'),
+            name='main_report_line_total', code='main_report_line_total',
+        )
+        main_report = self._create_report([main_report_line_1, main_report_line_2, main_report_line_total])
         main_report_options = self._generate_options(main_report, '2021-01-01', '2021-01-01')
 
         self.assertLinesValues(
@@ -1123,7 +951,7 @@ class TestReportEngines(TestAccountReportsCommon):
             [
                 ('report1_line_1',                      2.0),
                 ('report1_line_2',                      4.0),
-                ('report_line_3',                       -2.0),
+                ('report_line_3',                      -2.0),
             ],
             report1_options,
         )
@@ -1132,21 +960,141 @@ class TestReportEngines(TestAccountReportsCommon):
             main_report_lines,
             [   0,                                      1],
             [
-                ('main_report_line',                    -2.0),
+                ('main_report_line',                   -2.0),
+                ('main_report_line_from_beginning',     3.0),
+                ('main_report_line_total',              1.0),
             ],
             main_report_options,
         )
 
         expected_amls_to_test = [
-            ('main_report_line', moves[0].line_ids[0:2]),
+            ('main_report_line', moves[1].line_ids[0:2]),
+            ('main_report_line_from_beginning', moves[0].line_ids[0:2] + moves[1].line_ids[0:2]),
         ]
 
         for report_line_name, expected_amls in expected_amls_to_test:
             report_line = main_report.line_ids.filtered(lambda x: x.name == report_line_name)
-            report_line_dict = [x for x in main_report_lines if x['name'] == report_line.name][0]
+            report_line_dict = next(x for x in main_report_lines if x.name == report_line.name)
             with self.subTest(report_line=report_line.name):
                 action_dict = main_report.action_audit_cell(main_report_options, self._get_audit_params_from_report_line(main_report_options, report_line, report_line_dict))
                 self.assertEqual(moves.line_ids.filtered_domain(action_dict['domain']), expected_amls)
+
+    def test_engine_aggregation_cross_report_triangle(self):
+        self._create_test_account_moves([
+            self._prepare_test_account_move_line(42.0, account_code='100000', date='2019-04-07'),
+            self._prepare_test_account_move_line(11.0, account_code='100000', date='2020-01-01'),
+        ])
+
+        report_1_line_1 = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('report_2_line_3.balance', subformula='cross_report(account_reports.test_report_cross_report_2)'),
+            name='report_1_line_1', code='report_1_line_1',
+        )
+
+        report_2_line_1 = self._prepare_test_report_line(
+            self._prepare_test_expression_account_codes('1'),
+            name='report_2_line_1', code='report_2_line_1',
+        )
+        report_2_line_2 = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('report_1_line_1.balance', subformula='cross_report(account_reports.test_report_cross_report_1)'),
+            name='report_2_line_2', code='report_2_line_2',
+        )
+        report_2_line_3 = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('report_2_line_1.balance + 13'),
+            name='report_2_line_3', code='report_2_line_3',
+        )
+
+        report_1 = self._create_report([report_1_line_1])
+        report_2 = self._create_report([report_2_line_1, report_2_line_2, report_2_line_3])
+
+        self.env['ir.model.data']._update_xmlids([
+            {
+                'xml_id': "account_reports.test_report_cross_report_1",
+                'record': report_1,
+            },
+            {
+                'xml_id': "account_reports.test_report_cross_report_2",
+                'record': report_2,
+            }
+        ])
+
+        options = self._generate_options(report_2, '2020-01-01', '2020-01-01')
+
+        self.assertLinesValues(
+            report_2._get_lines(options),
+            [   0,                                  1],
+            [
+                ('report_2_line_1',                 11.0),
+                ('report_2_line_2',                 24.0),
+                ('report_2_line_3',                 24.0),
+            ],
+            options,
+        )
+
+    def test_engine_aggregation_cross_report_clashing_codes(self):
+        self._create_test_account_moves([
+            self._prepare_test_account_move_line(11.0, account_code='100000', date='2020-01-01'),
+        ])
+
+        report_1_line_1 = self._prepare_test_report_line(
+            self._prepare_test_expression_account_codes('1'),
+            name='report_1_line_1', code='dudu',
+        )
+        report_1_line_2 = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('dudu.balance'),
+            name='report_1_line_2', code='report_1_line_2',
+        )
+        report_1 = self._create_report([report_1_line_1, report_1_line_2])
+
+        report_2_line_1 = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('report_1_line_2.balance', subformula=f'cross_report({report_1.id})'),
+            name='report_2_line_1', code='dudu',
+        )
+        report_2 = self._create_report([report_2_line_1])
+
+        options = self._generate_options(report_2, '2020-01-01', '2020-01-01')
+        self.assertLinesValues(
+            report_2._get_lines(options),
+            [   0,                                  1],
+            [
+                ('report_2_line_1',                 11.0),
+            ],
+            options,
+        )
+
+    def test_engine_aggregation_cross_report_referencing_local(self):
+        """ Tests the case where a cross-report aggregation also references an expression of its report.
+        """
+        self._create_test_account_moves([
+            self._prepare_test_account_move_line(11.0, account_code='100000', date='2020-01-01'),
+            self._prepare_test_account_move_line(42.0, account_code='200000', date='2020-01-01'),
+        ])
+
+        report_1_line_1 = self._prepare_test_report_line(
+            self._prepare_test_expression_account_codes('1'),
+            name='report_1_line_1', code='report_1_line_1',
+        )
+        report_1 = self._create_report([report_1_line_1])
+
+        report_2_line_1 = self._prepare_test_report_line(
+            self._prepare_test_expression_aggregation('report_1_line_1.balance + report_2_line_2.balance', subformula=f'cross_report({report_1.id})'),
+            name='report_2_line_1', code='report_2_line_1',
+        )
+        report_2_line_2 = self._prepare_test_report_line(
+            self._prepare_test_expression_account_codes('2'),
+            name='report_2_line_2', code='report_2_line_2',
+        )
+        report_2 = self._create_report([report_2_line_1, report_2_line_2])
+
+        options = self._generate_options(report_2, '2020-01-01', '2020-01-01')
+        self.assertLinesValues(
+            report_2._get_lines(options),
+            [   0,                                  1],
+            [
+                ('report_2_line_1',                 53.0),
+                ('report_2_line_2',                 42.0),
+            ],
+            options,
+        )
 
     def test_engine_aggregation_expansion(self):
         report = self._create_report([
@@ -1208,8 +1156,196 @@ class TestReportEngines(TestAccountReportsCommon):
             expr_map['CROSS_REPORT_AGG'] + expr_map['SIMPLE_AGG'] + expr_map['BOUNDED_AGG'] + expr_map['TAG_1'] + expr_map['TAG_2'] + expr_map['TAG_3'],
         )
 
+    def test_engine_aggregation_groupby(self):
+
+        partner_a, partner_b, partner_c = self.env['res.partner'].create([
+            {'name': 'Partner A'},
+            {'name': 'Partner B'},
+            {'name': 'Partner C'},
+        ])
+
+        self._create_test_account_moves([
+            self._prepare_test_account_move_line(100.0, partner_id=partner_a.id, account_code='100000', date='2020-01-01'),
+            self._prepare_test_account_move_line(200.0, partner_id=partner_b.id, account_code='100000', date='2020-01-01'),
+            self._prepare_test_account_move_line(300.0, partner_id=partner_c.id, account_code='100000', date='2020-01-01'),
+            self._prepare_test_account_move_line(10.0, partner_id=partner_a.id, account_code='200000', date='2020-01-01'),
+            self._prepare_test_account_move_line(20.0, partner_id=partner_b.id, account_code='200000', date='2020-01-01'),
+
+            self._prepare_test_account_move_line(150.0, partner_id=partner_a.id, account_code='100000', date='2019-01-01'),
+        ])
+
+        report_1 = self._create_report([
+            # 1. Account code expressions
+            self._prepare_test_report_line(
+                self._prepare_test_expression_account_codes('1'),
+                name='account_code_1', code='account_code_1', foldability='always_unfolded'
+            ),
+            self._prepare_test_report_line(
+                self._prepare_test_expression_account_codes('2'),
+                name='account_code_2', code='account_code_2', foldability='always_unfolded'
+            ),
+            # 2. Aggregation expression groupby (account_code_1 * 2 + account_code_2)
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('account_code_1.balance * 2 + account_code_2.balance'),
+                name='agg_groupby', code='agg_groupby', foldability='always_unfolded',
+            ),
+            # 3. Zero division fallback
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('account_code_1.balance / 0', subformula='ignore_zero_division'),
+                name='zero_div_groupby', code='zero_div_groupby', foldability='always_unfolded',
+            ),
+            # 4. Bounds if_above
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('agg_groupby.balance', subformula='if_above(USD(1000.0))'),
+                name='if_above_groupby', code='if_above_groupby', foldability='always_unfolded',
+            ),
+            # 5. Bounds if_below
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('agg_groupby.balance', subformula='if_below(USD(1000.0))'),
+                name='if_below_groupby', code='if_below_groupby', foldability='always_unfolded',
+            ),
+            # 6. Bounds if_other_expr_above (total of account_code_2 > 20)
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('agg_groupby.balance', subformula='if_other_expr_above(account_code_2.balance, USD(20.0))'),
+                name='if_other_expr_above_groupby', code='if_other_expr_above_groupby', foldability='always_unfolded',
+            ),
+            # 7. Bounds if_other_expr_below (total of account_code_2 < 20)
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('agg_groupby.balance', subformula='if_other_expr_below(account_code_2.balance, USD(20.0))'),
+                name='if_other_expr_below_groupby', code='if_other_expr_below_groupby', foldability='always_unfolded',
+            ),
+        ],
+        groupby='partner_id',
+        )
+
+        options_1 = self._generate_options(report_1, '2020-01-01', '2020-01-01')
+        lines_1 = report_1._get_lines(options_1)
+
+        self.assertLinesValues(
+            # pylint: disable=bad-whitespace
+            lines_1,
+            [   0,                                  1],
+            [
+                # account_code_1 (partner a: 100, b: 200, c: 300) total 600
+                ('account_code_1',              600.0),
+                ('Partner A',                   100.0),
+                ('Partner B',                   200.0),
+                ('Partner C',                   300.0),
+
+                # account_code_2 (account 200000: a: 10, b: 20) total 30
+                ('account_code_2',               30.0),
+                ('Partner A',                    10.0),
+                ('Partner B',                    20.0),
+
+                # agg_groupby (account_code_1 * 2 + account_code_2)
+                # : (a: 100*2 + 10 = 210, b: 200*2 + 20 = 420, c: 300*2 + 0 = 600) total 1230
+                ('agg_groupby',                1230.0),
+                ('Partner A',                   210.0),
+                ('Partner B',                   420.0),
+                ('Partner C',                   600.0),
+
+                # zero_div_groupby (ignore returns 0)
+                ('zero_div_groupby',              0.0),
+                ('Partner A',                     0.0),
+                ('Partner B',                     0.0),
+                ('Partner C',                     0.0),
+
+                # if_above_groupby (agg_groupby if total > 1000 => 1230 > 1000 is True)
+                ('if_above_groupby',           1230.0),
+                ('Partner A',                   210.0),
+                ('Partner B',                   420.0),
+                ('Partner C',                   600.0),
+
+                # if_below_groupby (agg_groupby if total < 1000 => 1230 < 1000 is False, so 0)
+                ('if_below_groupby',              0.0),
+
+                # if_other_expr_above_groupby (agg_groupby if account_code_2 > 20 => 30 > 20 is True)
+                ('if_other_expr_above_groupby', 1230.0),
+                ('Partner A',                   210.0),
+                ('Partner B',                   420.0),
+                ('Partner C',                   600.0),
+
+                # if_other_expr_below_groupby (agg_groupby if account_code_2 < 20 => 30 < 20 is False, so 0)
+                ('if_other_expr_below_groupby',   0.0),
+            ],
+            options_1,
+        )
+
+        ####################
+        # Report 2
+        ####################
+
+        report_2 = self._create_report([
+            # 1. Simple cross_report expression groupby
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('agg_groupby.balance', subformula=f'cross_report({report_1.id})'),
+                name='cross_report_groupby', code='cross_report_groupby', foldability='always_unfolded',
+            ),
+            # 2. cross_report expression groupby with force_date_scope
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('agg_groupby.balance', subformula=f'cross_report({report_1.id}, force_date_scope)', date_scope='from_beginning'),
+                name='cross_report_forced_groupby', code='cross_report_forced_groupby', foldability='always_unfolded',
+            ),
+            self._prepare_test_report_line(
+                self._prepare_test_expression_account_codes('2'),
+                name='account_code_2', code='account_code_2', foldability='always_unfolded'
+            ),
+            # 3. Aggregation expanding to a cross report expression groupby
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('cross_report_groupby.balance * 1.5 + account_code_2.balance'),
+                name='agg_expand_cross_groupby', code='agg_expand_cross_groupby', foldability='always_unfolded',
+            ),
+            # 4. Mix of all cases
+            self._prepare_test_report_line(
+                self._prepare_test_expression_aggregation('cross_report_forced_groupby.balance + agg_expand_cross_groupby.balance + 10'),
+                name='mix_all_groupby', code='mix_all_groupby', foldability='always_unfolded'
+            ),
+        ],
+        groupby='partner_id',
+        )
+
+        options_2 = self._generate_options(report_2, '2020-01-01', '2020-01-01')
+        lines_2 = report_2._get_lines(options_2)
+
+        self.assertLinesValues(
+            # pylint: disable=bad-whitespace
+            lines_2,
+            [   0,                                  1],
+            [
+                # cross_report_groupby (references agg_groupby: a: 200, b: 400, c: 600)
+                ('cross_report_groupby',       1230.0),
+                ('Partner A',                   210.0),
+                ('Partner B',                   420.0),
+                ('Partner C',                   600.0),
+
+                # cross_report_forced_groupby (references agg_groupby with date_scope='from_beginning')
+                ('cross_report_forced_groupby', 1530.0),
+                ('Partner A',                   510.0),  # a: (150(from 2019) + 100(from 2020)) * 2 + 10(from 2020) = 510
+                ('Partner B',                   420.0),  # b: 200 * 2 + 20 = 420
+                ('Partner C',                   600.0),  # c: 300 * 2 + 0 = 600
+
+                ('account_code_2',              30.0),
+                ('Partner A',                   10.0),
+                ('Partner B',                   20.0),
+
+                # agg_expand_cross_groupby (cross_report_groupby * 1.5 + account_code_2)
+                # a: 210*1.5+10= 325, b: 420*1.5+20= 650, c: 600*1.5+0= 900
+                ('agg_expand_cross_groupby',   1875.0),
+                ('Partner A',                   325.0),
+                ('Partner B',                   650.0),
+                ('Partner C',                   900.0),
+
+                # mix_all_groupby (cross_report_forced_groupby.balance + agg_expand_cross_groupby.balance + 10)
+                ('mix_all_groupby',            3415.0),
+                ('Partner A',                   845.0),  # a: 510 + 325 + 10 = 845
+                ('Partner B',                  1080.0),  # b: 420 + 650 + 10 = 1080
+                ('Partner C',                  1510.0),  # c: 600 + 900 + 10 = 1510
+            ],
+            options_2,
+        )
+
     def test_load_more(self):
-        self.env.companies = self.env.company
+        self.env = self.env(context={'allowed_company_ids': self.env.company.ids})
 
         partner_a, partner_b, partner_c = self.env['res.partner'].create([
             {'name': 'Partner A'},
@@ -1227,6 +1363,7 @@ class TestReportEngines(TestAccountReportsCommon):
             test_report_line_values_list=[self._prepare_test_report_line(
                 self._prepare_test_expression_domain([('partner_id', '!=', False)], 'sum'),
                 groupby='partner_id',
+                foldability='always_unfolded',
             )],
             load_more_limit=2,
         )
@@ -1239,10 +1376,10 @@ class TestReportEngines(TestAccountReportsCommon):
             lines,
             [   0,                                1],
             [
-                ('test_line_1',          '6,000.00'),
-                ('Partner A',            '1,000.00'),
-                ('Partner B',            '2,000.00'),
-                ('Load more...',                 ''),
+                ('test_line_1',             6000.00),
+                ('Partner A',               1000.00),
+                ('Partner B',               2000.00),
+                ('1 more',                  3000.00),
             ],
             options,
         )
@@ -1250,12 +1387,12 @@ class TestReportEngines(TestAccountReportsCommon):
         load_more_line = lines[-1]
         load_more_res = report.get_expanded_lines(
             options,
-            load_more_line['id'],
-            load_more_line['groupby'],
-            load_more_line['expand_function'],
-            load_more_line['progress'],
-            load_more_line['offset'],
+            load_more_line.id,
+            load_more_line.groupby,
+            load_more_line.expand_function,
             None,
+            None,
+            ignore_load_more=True,
         )
 
         self.assertLinesValues(
@@ -1263,7 +1400,9 @@ class TestReportEngines(TestAccountReportsCommon):
             load_more_res,
             [   0,                                1],
             [
-                ('Partner C',            '3,000.00'),
+                ('Partner A',               1000.00),
+                ('Partner B',               2000.00),
+                ('Partner C',               3000.00),
             ],
             options,
         )
@@ -1427,6 +1566,8 @@ class TestReportEngines(TestAccountReportsCommon):
             return_type = self.env['account.return.type'].create({
                 'name': "Bat-report",
                 'report_id': tax_report.id,
+                'tax_payable_account_id': self.company_data['default_tax_account_payable'].id,
+                'tax_receivable_account_id': self.company_data['default_tax_account_receivable'].id,
             })
             tax_return = self.env['account.return'].create({
                 'name': "Bat-return",
@@ -1437,7 +1578,7 @@ class TestReportEngines(TestAccountReportsCommon):
             })
 
             with self.allow_pdf_render():
-                tax_return.action_validate()
+                tax_return.action_submit()
 
         self._run_external_engine_default_test_case(True, False, lock_via_tax_closing)
 
@@ -1814,8 +1955,8 @@ class TestReportEngines(TestAccountReportsCommon):
 
         main_options = self._generate_options(report, '2024-01-01', '2024-01-01', default_options={'selected_horizontal_group_id': horizontal_group.id})
         lines = report._get_lines(main_options)
-        for (col_group_key, col_group_options), expected_partner in zip(report._split_options_per_column_group(main_options).items(), [self.partner_a, self.partner_b]):
-            audit_params = self._get_audit_params_from_report_line(col_group_options, report.line_ids, lines[0], column_group_key=col_group_key)
+        for (col_group_index, col_group_options), expected_partner in zip(report._split_options_per_column_group(main_options).items(), [self.partner_a, self.partner_b]):
+            audit_params = self._get_audit_params_from_report_line(col_group_options, report.line_ids, lines[0], column_group_index=col_group_index)
             action_dict = report.action_audit_cell(col_group_options, audit_params)
 
             expected_amls = move.line_ids.filtered(lambda x: x.partner_id == expected_partner)
@@ -1863,7 +2004,7 @@ class TestReportEngines(TestAccountReportsCommon):
                 ('test_line_1',              235.0),
                 ('Partner A',                 55.0),
                 ('Partner B',                 50.0),
-                ('Load more...',                ''),
+                ('2 more',                   130.0),
             ],
             options,
         )
@@ -2081,6 +2222,7 @@ class TestReportEngines(TestAccountReportsCommon):
             'line_ids': [Command.create({
                 'name': "The line",
                 'groupby': 'account_code',
+                'foldability': 'always_unfolded',
                 'expression_ids': [Command.create({
                     'label': 'balance',
                     'engine': 'domain',
@@ -2102,6 +2244,131 @@ class TestReportEngines(TestAccountReportsCommon):
                 (f'{counterpart_account_a.code} {counterpart_account_a.name}',         -20),
                 (account_b2.code,                                                       70),
                 ('Undefined',                                                         -100),
+            ],
+            options,
+        )
+
+    def test_consolidated_report_includes_unmapped_accounts_from_other_companies(self):
+        company_a = self.env['res.company'].sudo().create({
+            'name': "Company A",
+        })
+        company_b = self.env['res.company'].sudo().create({
+            'name': "Company B",
+        })
+
+        context = {
+            **self.env.context,
+            'allowed_company_ids': [company_a.id, company_b.id],
+        }
+        journal_vals = {
+            'name': "Misc",
+            'type': 'general',
+            'code': "MSC",
+        }
+        AccountJournal = self.env['account.journal'].with_context(context)
+        AccountJournal.create(journal_vals | {'company_id': company_a.id})
+        AccountJournal.with_company(company_b).create(journal_vals | {'company_id': company_b.id})
+
+        AccountAccount = self.env['account.account'].with_context(context)
+        account_tag = self.env['account.account.tag']._load_records([
+            {
+                'xml_id': 'account_reports.account_codes_engine_test_tag1',
+                'noupdate': True,
+                'values': {
+                    'name': "account_codes test tag 1",
+                    'applicability': 'accounts',
+                },
+            }
+        ])
+        account_a = AccountAccount.create({
+            'name': "Account A",
+            'code': "100000",
+            'company_ids': company_a.ids,
+            'tag_ids': [(4, account_tag.id)],
+        })
+        counterpart_account_a = AccountAccount.create({
+            'name': "Counterpart A",
+            'code': "200000",
+            'company_ids': company_a.ids,
+            'tag_ids': [(4, account_tag.id)],
+        })
+        account_b = AccountAccount.create({
+            'name': "Account B",
+            'code': "500000",
+            'company_ids': company_b.ids,
+            'tag_ids': [(4, account_tag.id)],
+        })
+        counterpart_account_b = AccountAccount.create({
+            'name': "Counterpart B",
+            'code': "600000",
+            'company_ids': company_b.ids,
+            'tag_ids': [(4, account_tag.id)],
+        })
+
+        date = '2026-01-01'
+
+        AccountMove = self.env['account.move'].with_context(context)
+        AccountMove.create({
+            'move_type': 'entry',
+            'date': date,
+            'line_ids': [
+                Command.create({
+                    'account_id': account_a.id,
+                    'balance': 100,
+                }),
+                Command.create({
+                    'account_id': counterpart_account_a.id,
+                    'balance': -100,
+                }),
+            ],
+            'company_id': company_a.id,
+        }).action_post()
+        AccountMove.create({
+            'move_type': 'entry',
+            'date': date,
+            'line_ids': [
+                Command.create({
+                    'account_id': account_b.id,
+                    'balance': 1000,
+                }),
+                Command.create({
+                    'account_id': counterpart_account_b.id,
+                    'balance': -1000,
+                }),
+            ],
+            'company_id': company_b.id,
+        }).action_post()
+
+        report = self.env['account.report'].with_context(context).create({
+            'name': "Simple Report",
+            'filter_multi_company': 'selector',
+            'column_ids': [Command.create({
+                'name': "Balance",
+                'expression_label': 'balance',
+            })],
+            'line_ids': [Command.create({
+                'name': "The line",
+                'groupby': 'account_id',
+                'foldability': 'always_unfolded',
+                'expression_ids': [Command.create({
+                    'label': 'balance',
+                    'engine': 'account_codes',
+                    'formula': "tag(account_reports.account_codes_engine_test_tag1)",
+                })],
+            })],
+        })
+        options = self._generate_options(report, date, date)
+        lines = report._get_lines(options)
+        self.assertLinesValues(
+            # pylint: disable=bad-whitespace
+            lines,
+            [   0,                                                                       1],
+            [
+                (report.line_ids.name,                                                   0),
+                (f'{account_a.code} {account_a.name}',                                  100),
+                (f'{counterpart_account_a.code} {counterpart_account_a.name}',         -100),
+                (f'{account_b.name}',                                                  1000),
+                (f'{counterpart_account_b.name}',                                     -1000),
             ],
             options,
         )

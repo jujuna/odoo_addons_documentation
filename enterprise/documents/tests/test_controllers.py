@@ -1,7 +1,5 @@
-import base64
 import json
 import zipfile
-from base64 import b64decode, b64encode
 from datetime import timedelta
 from http import HTTPStatus
 from io import BytesIO
@@ -13,20 +11,23 @@ from freezegun import freeze_time
 from reportlab.pdfgen import canvas
 from urllib3.util import parse_url
 
-from odoo import Command, fields, http
+from odoo import Command, fields
+from odoo.http.stream import STATIC_CACHE_LONG
 from odoo.tests.common import RecordCapturer, tagged
-from odoo.tools import file_open, mute_logger
+from odoo.tools import mute_logger
 from odoo.tools.image import image_process
 
 from odoo.addons.base.tests.common import HttpCaseWithUserDemo
-from odoo.addons.documents.tests.test_documents_common import TEXT
-from odoo.addons.mail.tests.common import mail_new_test_user, MockEmail
+from odoo.addons.base.tests.files import GIF_RAW
+from odoo.addons.documents.tests.test_documents_common import TEXT_RAW, get_document_creation_message
+from odoo.addons.mail.tests.common import mail_new_test_user, MailCase
 
 from odoo.addons.documents.controllers.documents import ShareRoute
+from odoo.addons.mail.controllers.attachment import AttachmentController
 
 
 @tagged('post_install', '-at_install')
-class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
+class TestDocumentsControllers(HttpCaseWithUserDemo, MailCase):
     def _assertPathEqual(self, first, second):
         self.assertEqual(parse_url(first).path, parse_url(second).path)
 
@@ -47,6 +48,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
 
         cls.user_manager = mail_new_test_user(cls.env,
             login='manager_test',
+            email='manager@example.com',
             groups='documents.group_documents_manager',
             company_id=cls.env.ref('base.main_company').id,
             name='manager',
@@ -54,15 +56,10 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         )
 
         # make sure the admin user has an avatar
-        with file_open('base/static/img/partner_root-image.png', 'rb') as file:
-            cls.admin_avatar = file.read()
-            cls.admin_avatar_b64 = b64encode(cls.admin_avatar)
-            cls.user_admin.image_1920 = cls.admin_avatar_b64
+        cls.user_admin.image_1920 = cls.file_read('base/static/img/partner_root-image.png')
 
         # use the Document app icon as test file
-        with file_open('documents/static/description/icon.png', 'rb') as file:
-            cls.doc_icon = file.read()
-            cls.doc_icon_b64 = b64encode(cls.doc_icon)
+        cls.doc_icon = cls.file_read('documents/static/description/icon.png').content
 
         Doc = cls.env['documents.document']
 
@@ -103,9 +100,9 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
             'is_access_via_link_hidden': True,
             'owner_id': cls.user_admin.id,
             'folder_id': cls.internal_folder.id,
-            'raw': TEXT,
+            'raw': TEXT_RAW,
         })
-        cls.env['ir.config_parameter'].set_param('ir_attachment.location', 'db')  # force storing in the database
+        cls.env['ir.config_parameter'].set_str('ir_attachment.location', 'db')  # force storing in the database
         cls.env['ir.config_parameter'].flush_model()
         cls.internal_file_textual_on_db = Doc.create({
             'type': 'binary',
@@ -115,9 +112,9 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
             'is_access_via_link_hidden': True,
             'owner_id': cls.user_admin.id,
             'folder_id': cls.internal_folder.id,
-            'raw': TEXT,
+            'raw': TEXT_RAW,
         })
-        cls.env['ir.config_parameter'].set_param('ir_attachment.location', False)  # reset storing location
+        cls.env['ir.config_parameter'].set_str('ir_attachment.location', None)  # reset storing location
         cls.env['ir.config_parameter'].flush_model()
         cls.internal_hidden = Doc.create({
             'type': 'binary',
@@ -128,13 +125,14 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
             'folder_id': cls.internal_folder.id,
             'raw': cls.doc_icon,
         })
-        cls.internal_request = Doc.create({
-            'type': 'binary',
+        cls.internal_request = Doc.with_user(cls.user_manager).create({
+            'type': 'request',
             'name': "internal-request.png",
             'access_internal': 'edit',
             'access_via_link': 'none',
             'owner_id': cls.user_admin.id,
             'folder_id': cls.internal_folder.id,
+            'requestee_partner_id': cls.user_demo.partner_id.id,
         })
         cls.internal_url = Doc.create({
             'type': 'url',
@@ -170,15 +168,16 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
             'access_via_link': 'view',
             'owner_id': cls.user_admin.id,
             'folder_id': cls.public_folder.id,
-            'raw': TEXT,
+            'raw': TEXT_RAW,
         })
-        cls.public_request = Doc.create({
-            'type': 'binary',
+        cls.public_request = Doc.with_user(cls.user_manager).create({
+            'type': 'request',
             'name': "public-request.png",
             'access_internal': 'edit',
             'access_via_link': 'edit',
             'owner_id': cls.user_admin.id,
             'folder_id': cls.public_folder.id,
+            'requestee_partner_id': cls.env['res.partner'].create({'name': "Requestee"}).id,
         })
         cls.public_url = Doc.create({
             'type': 'url',
@@ -216,7 +215,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         ])
 
     def test_doc_ctrl_avatar(self):
-        avatar_128 = b64decode(self.user_admin.avatar_128)
+        avatar_128 = self.user_admin.avatar_128.content
         placeholder = image_process(
             self.user_admin.partner_id._avatar_get_placeholder(),
             size=(128, 128),
@@ -268,7 +267,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         access_portal.expiration_date = fields.Datetime.now() + timedelta(hours=1)
         res = self.url_open(f'/documents/avatar/{self.internal_file.access_token}')
         res.raise_for_status()
-        self.assertEqual(res.content, b64decode(self.user_admin.avatar_128))
+        self.assertEqual(res.content, self.user_admin.avatar_128.content)
 
         access_portal.expiration_date = fields.Datetime.now() - timedelta(hours=1)
         res = self.url_open(f'/documents/avatar/{self.internal_file.access_token}')
@@ -284,7 +283,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
             with self.subTest(user=user):
                 res = self.url_open(f'/documents/avatar/{self.internal_shortcut.access_token}')
                 res.raise_for_status()
-                self.assertEqual(res.content, b64decode(self.user_admin.avatar_128))
+                self.assertEqual(res.content, self.user_admin.avatar_128.content)
 
     def test_doc_ctrl_content_binary(self):
         for document, user, dl, status, content in [
@@ -381,7 +380,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
             self.assertEqual(sorted(reszip.namelist()), ['internal-file.png', 'public-file-textual.txt', 'public-file.png'])
             self.assertEqual(reszip.read('internal-file.png'), self.doc_icon)
             self.assertEqual(reszip.read('public-file.png'), self.doc_icon)
-            self.assertEqual(reszip.read('public-file-textual.txt'), TEXT)
+            self.assertEqual(reszip.read('public-file-textual.txt'), TEXT_RAW)
 
         # check that the name are all unique
         self.public_file.action_create_shortcut(str(self.internal_folder.id))
@@ -390,16 +389,14 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
             'name': 'te/st.tar.gz',  # the `/` in the name should be replaced with `_`
             'folder_id': self.internal_folder.id,
             'access_internal': 'view',
-            'datas': 'test',
+            'raw': b'test',
         } for _ in range(3)] + [{
             'name': self.public_folder.name,
-            'datas': 'test',
             'folder_id': self.public_folder.folder_id.id,
             'access_internal': 'view',
             'type': 'folder',
         } for _ in range(3)] + [{
             'name': '.hidden',
-            'datas': 'test',
             'folder_id': self.public_folder.folder_id.id,
             'access_internal': 'view',
             'type': 'folder',
@@ -486,33 +483,83 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
 
     @mute_logger('odoo.http')
     def test_doc_redirection_partner(self):
-        """Test that the partner is redirected to the signup page."""
-        self.public_file.access_via_link = 'none'
+        """Test the signup flow when sharing documents."""
+        # when we can read the document, we show it, but with a "Sign up" button instead of "Login"
+        partner = self.env["res.partner"].create({'name': 'Test'})
         access = self.env["documents.access"].create({
             'document_id': self.public_file.id,
             'role': 'view',
-            'partner_id': self.env["res.partner"].create({'name': 'Test'}).id,
+            'partner_id': partner.id,
         })
         member_signup_token = access._get_member_signup_token()
         docs_url = f'/documents/{self.public_file.access_token}?member_signup_token={member_signup_token}&member_id={access.id}'
+        self.public_file.access_via_link = 'view'
+        res = self.url_open(docs_url)
+        self.assertIn(f"/documents/signup/{self.public_file.access_token}", res.text)
+        self.assertIn(member_signup_token, res.text)
+        self.assertIn('public-file.png', res.text)
+
+        # when we cannot read the document, we redirect to the signup page
+        self.public_file.access_via_link = 'none'
         res = self.url_open(docs_url, allow_redirects=False)
         res.raise_for_status()
         redirect_url = res.headers.get('Location') or ''
-        self.assertIn('/web/signup', redirect_url, f"Invalid redirect URL: {redirect_url}")
+        self.assertIn('/documents/signup/', redirect_url, f"Invalid redirect URL: {redirect_url}")
         self.assertIn(self.public_file.access_token, redirect_url)
 
+        # test a bad token
         docs_url = f'/documents/{self.public_file.access_token}?member_signup_token=bad_token_{member_signup_token}&member_id={access.id}'
-        res = self.url_open(docs_url, allow_redirects=False)
-        self.assertFalse(res.ok)
-        redirect_url = res.headers.get('Location') or ''
-        self.assertFalse(redirect_url)
+        res = self.url_open(docs_url)
+        self.assertIn('This document does not exist', res.text)
+        self.assertNotIn(member_signup_token, res.text)
+        self.assertIn('/web/login', res.text)
+
+        # expired token
+        urls = [
+            f'/documents/{self.public_file.access_token}?member_signup_token={member_signup_token}&member_id={access.id}',
+            f'/documents/signup/{self.public_file.access_token}?member_signup_token={member_signup_token}&member_id={access.id}',
+        ]
+        access.expiration_date = fields.Datetime.now() - timedelta(days=1)
+        for url in urls:
+            res = self.url_open(url)
+            self.assertIn('The invitation expired', res.text)
 
         # remove the role, should invalidate the invitation link
-        access.last_access_date = fields.Datetime.now()
         access.role = False
+        access.expiration_date = False
+        access.last_access_date = fields.Datetime.now()
+        for url in urls:
+            res = self.url_open(url)
+            self.assertIn('The invitation expired', res.text)
+
+        # the token is valid, and the user registered is logged in
+        self.env['res.users'].create({
+            'partner_id': partner.id,
+            'login': 'test_user',
+            'password': 'test_user',
+            'group_ids': [Command.set([self.env.ref('base.group_portal').id])],
+        })
+        self.authenticate('test_user', 'test_user')
+        access.role = 'view'
         docs_url = f'/documents/{self.public_file.access_token}?member_signup_token={member_signup_token}&member_id={access.id}'
-        res = self.url_open(docs_url, allow_redirects=False)
-        self.assertFalse(res.ok)
+        res = self.url_open(docs_url)
+        self.assertIn(docs_url, res.url)
+        self.assertIn('o_documents_portal_view', res.text)
+
+        # the token is valid, but the user registered and is logged out
+        # redirect to the login page
+        self.authenticate(None, None)
+        access.role = 'view'
+        res = self.url_open(docs_url)
+        self.assertIn('does not exist or is not publicly available', res.text)
+
+        # except if the document is accessible with the link
+        self.public_file.access_via_link = 'view'
+        res = self.url_open(docs_url)
+        self.assertIn('/web/login', res.text)
+        self.assertNotIn(member_signup_token, res.text)
+        self.assertIn('public-file.png', res.text)
+        self.assertNotIn('o_documents_portal_view', res.text)
 
     def test_doc_render_public_templates(self):
         self.authenticate(None, None)
@@ -538,11 +585,11 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         # Folder
         res = self.url_open(self.public_folder.access_url)
         res.raise_for_status()
-        self.assertRegex(res.text, r"0\s+folders,\s+2\s+files")
         self.assertIn(self.public_file.name, res.text)
         self.assertIn(self.public_request.name, res.text)
         self.assertIn(self.public_url.name, res.text)
         self.assertIn(self.public_file_textual.name, res.text)
+        self.assertRegex(res.text, r"0\s+folders,\s+2\s+files")
 
         # Folder with visible shortcut
         self.internal_file.action_update_access_rights(
@@ -551,11 +598,11 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         )
         res = self.url_open(self.public_folder.access_url)
         res.raise_for_status()
-        self.assertRegex(res.text, r"0\s+folders,\s+3\s+files")
         self.assertIn(self.public_file.name, res.text)
         self.assertIn(self.public_request.name, res.text)
         self.assertIn(self.public_url.name, res.text)
         self.assertIn(self.internal_file.name, res.text)
+        self.assertRegex(res.text, r"0\s+folders,\s+3\s+files")
 
         # File
         res = self.url_open(self.public_file.access_url)
@@ -583,27 +630,102 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         with (Image.open(BytesIO(self.doc_icon)) as image,
               Image.open(BytesIO(res.content)) as thumbnail):
             self.assertEqual(image.size, (100, 100))
-            self.assertEqual(thumbnail.size, (100, 70))
+            self.assertEqual(thumbnail.size, (100, 52))
         res = self.url_open(f'/documents/thumbnail/{self.public_file.access_token}?width=bad')
         self.assertEqual(res.status_code, 400)
         self.assertIn('bad', res.text)
 
-    def test_doc_ctrl_thumbnail_textual_access(self):
+    def test_doc_ctrl_render_email_content(self):
+        """Emails are rendered by documents itself, never through the shared engine."""
+        raw = b"From: test@example.com\n\n<p>Hello Email</p>" + b"_" * 1024 + b"end of email"
+        document = self.env['documents.document'].create({
+            'name': 'Test Email',
+            'raw': raw,
+            'access_via_link': 'view',
+            'mimetype': 'application/documents-email',
+        })
+        for head in (0, 1):
+            with self.subTest(head=head):
+                with patch.object(AttachmentController, 'TEXTUAL_THUMBNAIL_SIZE', 1024), \
+                     patch.object(AttachmentController, '_render_text_attachment') as mock_render:
+                    res = self.url_open(
+                        f'/documents/render_text/{document.access_token}?head={head}')
+                mock_render.assert_not_called()
+                self.assertEqual(res.status_code, 200)
+                self.assertIn('o_email_preview_watermark', res.text)
+                self.assertIn('EMAIL', res.text)
+                self.assertIn('Hello Email', res.text)
+                self.assertIn('end of email', res.text, 'emails are never truncated')
+                self.assertEqual('scrolling="no"' in res.text, bool(head))
+
+    def test_doc_ctrl_render_email_headers(self):
+        """Test cache control and security headers specific to the email mimetype in documents."""
+        render_csp = "default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; sandbox;"
+        document = self.env['documents.document'].create({
+            'name': 'Test Email',
+            'raw': b"From: test@example.com\n\nHello Email",
+            'access_via_link': 'view',
+            'mimetype': 'application/documents-email',
+        })
+
+        for unique in (False, True):
+            with self.subTest(unique=unique):
+                url = f'/documents/render_text/{document.access_token}'
+                if unique:
+                    url += f'?unique={document.attachment_id.checksum}'
+                res = self.url_open(url)
+                self.assertEqual(res.status_code, 200)
+                self.assertEqual(res.headers.get("Content-Type"), "text/html; charset=utf-8")
+                self.assertEqual(res.headers.get("X-Content-Type-Options"), "nosniff")
+                self.assertEqual(res.headers.get("Content-Security-Policy"), render_csp)
+                cache_control = res.headers.get("Cache-Control", "")
+                self.assertNotIn("public", cache_control)
+                self.assertIn("private", cache_control)
+
+                if unique:
+                    self.assertIn("immutable", cache_control)
+                    self.assertIn(f"max-age={STATIC_CACHE_LONG}", cache_control)
+                else:
+                    self.assertNotIn("immutable", cache_control)
+                    self.assertNotIn("max-age", cache_control)
+
+    def test_doc_ctrl_render_text_access(self):
         for document, user, status, content in [
             (self.missing_file,           None,  404, "not found"),                # no document
-            (self.public_request,         None,  404, "not found"),                # no attachment_id
+            (self.public_request,         None,  400, "expected a file"),          # no attachment_id
             (self.internal_file,          None,  404, "not found"),                # access_via_link='none'
             (self.internal_shortcut,      None,  404, "not found"),                # access_via_link='none'
             (self.internal_hidden,      'demo', 404, "not found"),                # access_internal='none'
             (self.internal_file_textual,  None, 404, "not found"),                # access_internal='none'
         ]:
             self.authenticate(user, user)
-            res = self.url_open(f'/documents/thumbnail_textual/{document.access_token}')
+            res = self.url_open(f'/documents/render_text/{document.access_token}')
             self.assertEqual(res.status_code, status)
             self.assertIn(content, res.text)
 
+    def test_doc_ctrl_render_text_delegates_to_mail(self):
+        """The documents route must delegate text rendering to the shared mail engine."""
+        cases = [
+            ('text/markdown', b'# Integration'),
+            ('text/html', b'<b>Integration</b>'),
+            ('application/json', b'{"test": "Integration"}'),
+            ('text/plain', b'Integration'),
+        ]
+        for mimetype, raw in cases:
+            with self.subTest(mimetype=mimetype):
+                document = self.env['documents.document'].create({
+                    'name': f'Test {mimetype.replace("/", "_")}',
+                    'raw': raw,
+                    'access_via_link': 'view',
+                    'mimetype': mimetype,
+                })
+                with patch.object(AttachmentController, '_render_text_attachment', return_value="dummy") as mock_render:
+                    res = self.url_open(f'/documents/render_text/{document.access_token}')
+                    self.assertEqual(res.status_code, 200)
+                    mock_render.assert_called_once()
+
     def test_doc_ctrl_thumbnail_textual(self):
-        TEXT_str = TEXT.decode('utf-8')
+        TEXT_str = TEXT_RAW.decode('utf-8')
         original_file_read = self.registry["ir.attachment"]._file_read
         file_read_patch = patch.object(self.registry["ir.attachment"], '_file_read', side_effect=original_file_read, autospec=True)
         for document, user, status, content in [
@@ -617,45 +739,30 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         ]:
             self.authenticate(user, user)
             with file_read_patch as patched:
-                res = self.url_open(f'/documents/thumbnail_textual/{document.access_token}')
+                res = self.url_open(f'/documents/render_text/{document.access_token}?head=1')
             if document is self.internal_file_textual_on_db:
                 patched.assert_not_called()
-            elif document is self.internal_file_textual:
-                patched.assert_called_with(document.attachment_id, document.attachment_id.store_fname, size=4096)
             self.assertEqual(res.status_code, status)
             self.assertIn(content, res.text)
-
-    def test_doc_ctrl_thumbnail_textual_size(self):
-        document = self.internal_file.with_user(self.user_manager).copy()
-        document.mimetype = 'text/plain'
-        TESTING_SIZE = 2000
-        self.assertGreater(len(document.attachment_id.raw), TESTING_SIZE)
-
-        self.authenticate('demo', 'demo')
-        with patch.object(ShareRoute, 'TEXTUAL_THUMBNAIL_SIZE', 1024):
-            res = self.url_open(f'/documents/thumbnail_textual/{document.access_token}')
-        self.assertEqual(res.status_code, 200)
-        self.assertIn("</pre>", res.text)
-        self.assertLess(len(res.content), TESTING_SIZE)
 
     def test_doc_ctrl_upload_folder_public(self):
         self.authenticate(None, None)
 
         # Check errors
         res = self.url_open(f'/documents/upload/{self.internal_folder.access_token}', data={
-            'csrf_token': http.Request.csrf_token(self),
+            'csrf_token': self.csrf_token(),
             'ufile': '',
         })
         self.assertEqual(res.status_code, 404)
         res = self.url_open(f'/documents/upload/{self.public_folder.access_token}', data={
-            'csrf_token': http.Request.csrf_token(self),
+            'csrf_token': self.csrf_token(),
             'ufile': '',
         })
         self.assertEqual(res.status_code, 400)
         self.assertIn("missing files", res.text)
         res = self.url_open(f'/documents/upload/{self.public_folder.access_token}',
             data={
-                'csrf_token': http.Request.csrf_token(self),
+                'csrf_token': self.csrf_token(),
                 'res_model': 'res.users',
             },
             files={'ufile': BytesIO()})
@@ -665,7 +772,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         # Upload a text file
         with RecordCapturer(self.env['documents.document'], []) as capture:
             res = self.url_open(f'/documents/upload/{self.public_folder.access_token}',
-                data={'csrf_token': http.Request.csrf_token(self)},
+                data={'csrf_token': self.csrf_token()},
                 files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
                 allow_redirects=False)
             res.raise_for_status()
@@ -676,12 +783,13 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         self.assertEqual(document.access_via_link, 'view')
         self.assertEqual(document.folder_id, self.public_folder)
         self.assertEqual(document.owner_id, self.public_folder.owner_id)
-        self.assertEqual(document.raw, b"Hello")
+        self.assertEqual(document.raw.content, b"Hello")
         self.assertRegex(document.access_token, r'[A-Za-z0-9-_]{22}')
-        self.assertEqual(document.message_ids.mapped('body'), [
-            "<p>Document uploaded by Public user</p>",
-            "<p>Document created</p>",
-        ])
+        self.assertEqual(len(document.message_ids), 1)
+        creation_msg = document.message_ids
+        self.assertMessageFields(
+            creation_msg, {'body_content': get_document_creation_message('Public user', 'hello.txt', 'User created')}
+        )
         self.assertEqual(res.status_code, HTTPStatus.SEE_OTHER)  # 303
         self._assertPathEqual(res.headers.get('Location'), self.public_folder.access_url)
         self.url_open(res.headers['Location']).raise_for_status()
@@ -690,7 +798,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         with (RecordCapturer(self.env['documents.document'], []) as record_capture,
               self.assertLogs('odoo.tools.mimetypes', 'WARNING') as log_capture):
             res = self.url_open(f'/documents/upload/{self.public_folder.access_token}',
-                data={'csrf_token': http.Request.csrf_token(self)},
+                data={'csrf_token': self.csrf_token()},
                 files={'ufile': ('hello.txt', BytesIO(self.doc_icon), 'text/plain')},
                 allow_redirects=False)
             res.raise_for_status()
@@ -699,73 +807,184 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
                          "the filename must have been neutralized")
         self.assertEqual(document.mimetype, 'image/png',
                          "the mimetype must have been neutralized")
-        self.assertEqual(document.raw, self.doc_icon)
+        self.assertEqual(document.raw.content, self.doc_icon)
         self.assertEqual(log_capture.output, [
             ("WARNING:odoo.tools.mimetypes:File 'hello.txt' has an "
              "invalid extension for mimetype 'image/png', adding '.png'")
         ])
         self.url_open(res.headers['Location']).raise_for_status()
 
+    @mute_logger('odoo.addons.documents.models.documents_document')
     def test_doc_ctrl_upload_request_public(self):
+        self.env = self.env(context={**self.env.context, 'lang': 'en_US'})
         self.authenticate(None, None)
+        # Check that uploading a document to a request is independent from user's access to related record
+        self.public_request.write({'res_id': self.user_demo.id, 'res_model': self.user_demo._name})
+        self.assertFalse(self.user_demo.check_access('read'))
 
         # Upload a text file
-        res = self.url_open(f'/documents/upload/{self.public_request.access_token}',
-            data={'csrf_token': http.Request.csrf_token(self)},
-            files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
-            allow_redirects=False)
-        res.raise_for_status()
+        with self.mock_mail_gateway():
+            res = self.url_open(f'/documents/upload/{self.public_request.access_token}',
+                data={'csrf_token': self.csrf_token()},
+                files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
+                allow_redirects=False)
+            res.raise_for_status()
+
         self.assertEqual(self.public_request.name, 'hello.txt')
         self.assertEqual(self.public_request.mimetype, 'text/plain')
         self.assertEqual(self.public_request.access_internal, 'edit')
         self.assertEqual(self.public_request.access_via_link, 'view')
         self.assertEqual(self.public_request.owner_id, self.user_admin)
-        self.assertEqual(self.public_request.raw, b"Hello")
-        tracking_message_ids = self.public_request.message_ids.filtered('tracking_value_ids')
-        self.assertTracking(tracking_message_ids, [
-            ('name', 'char', 'public-request.png', 'hello.txt'),
-        ], strict=True)
+        self.assertEqual(self.public_request.raw.content, b"Hello")
+        tracking_message_ids = self.public_request.message_ids.filtered(lambda m: m.message_type == 'tracking')
+        self.assertMessageFields(
+            tracking_message_ids, {
+                'tracking_values': [('name', 'char', 'public-request.png', 'hello.txt')],
+            }
+        )
         other_message_ids = self.public_request.message_ids - tracking_message_ids
-        self.assertEqual(other_message_ids.mapped('body'), [
-            "<p>Document uploaded by Public user</p>",
-            "<p>Document created</p>",
-        ])
+        self.assertEqual(len(other_message_ids), 2)
+        update_msg, creation_msg = other_message_ids
+        self.assertMessageFields(
+            creation_msg, {'body_content': get_document_creation_message('manager', 'public-request.png', 'User created')}
+        )
+        # Check that requester is notified when the document is uploaded
+        self.assertMailNotifications(
+            update_msg,
+            [{
+                'content': 'Public user has uploaded the requested document',
+                'message_type': 'notification',
+                'notif': [{'partner': self.user_manager.partner_id, 'type': 'email'}],
+                'subtype': 'mail.mt_note',
+            }]
+        )
+        self.assertIn(
+            f'(originally requested from {self.public_request.requestee_partner_id.name})',
+            update_msg.body,
+            "The update message should explicitly contain the requestee when the uploader is not the requestee."
+        )
         self.assertEqual(res.status_code, HTTPStatus.SEE_OTHER)  # 303
         self._assertPathEqual(res.headers.get('Location'), "/documents/upload/success")
         self.url_open(res.headers['Location']).raise_for_status()
 
-        # Reset the request
-        self.public_request.action_update_access_rights(
-            access_via_link='edit',
-            is_access_via_link_hidden=False,
-        )
+        # new request
+        public_request = self.env['documents.document'].create({
+            'type': 'request',
+            'name': "public-request.png",
+            'access_internal': 'edit',
+            'access_via_link': 'edit',
+            'is_access_via_link_hidden': False,
+            'owner_id': self.user_admin.id,
+            'folder_id': self.public_folder.id,
+        })
 
-        shortcut = self.public_request.action_create_shortcut()
+        shortcut = public_request.action_create_shortcut()
         self.assertFalse(shortcut.thumbnail)
-        self.assertFalse(self.public_request.thumbnail)
+        self.assertFalse(public_request.thumbnail)
 
         # Upload an image but forge the filename/mimetype to pretend it is text
         with self.assertLogs('odoo.tools.mimetypes', 'WARNING') as log_capture:
-            res = self.url_open(f'/documents/upload/{self.public_request.access_token}',
-                data={'csrf_token': http.Request.csrf_token(self)},
+            res = self.url_open(f'/documents/upload/{public_request.access_token}',
+                data={'csrf_token': self.csrf_token()},
                 files={'ufile': ('hello.txt', BytesIO(self.doc_icon), 'text/plain')},
                 allow_redirects=False
             )
             res.raise_for_status()
-        self.assertEqual(self.public_request.name, 'hello.txt.png',
+        self.assertEqual(public_request.name, 'hello.txt.png',
                          "the filename must have been neutralized")
-        self.assertEqual(self.public_request.mimetype, 'image/png',
+        self.assertEqual(public_request.mimetype, 'image/png',
                          "the mimetype must have been neutralized")
-        self.assertEqual(self.public_request.raw, self.doc_icon)
+        self.assertEqual(public_request.raw.content, self.doc_icon)
 
         self.assertTrue(shortcut.thumbnail)
-        self.assertTrue(self.public_request.thumbnail)
+        self.assertTrue(public_request.thumbnail)
 
         self.assertEqual(log_capture.output, [
             ("WARNING:odoo.tools.mimetypes:File 'hello.txt' has an "
              "invalid extension for mimetype 'image/png', adding '.png'")
         ])
         self.url_open(res.headers['Location']).raise_for_status()
+
+        # upload many files at once
+        tag = self.env['documents.tag'].create({'name': 'test tag'})
+
+        # start from a fresh request to simplify the checks bellow
+        public_request = self.env['documents.document'].create({
+            'type': 'request',
+            'name': "public-request.png",
+            'access_internal': 'edit',
+            'access_via_link': 'edit',
+            'owner_id': self.user_admin.id,
+            'folder_id': self.public_folder.id,
+            'tag_ids': tag.ids,
+        })
+        admin_shortcut = public_request.with_user(self.user_admin).action_create_shortcut("MY")
+        admin_shortcut.access_internal = 'none'
+        demo_shortcut = public_request.with_user(self.user_demo).action_create_shortcut("MY")
+        demo_shortcut.access_internal = 'edit'
+        partner = self.env["res.partner"].create({"name": "test"})
+
+        public_request.action_update_access_rights(
+            access_via_link='edit',
+            is_access_via_link_hidden=False,
+            partners={partner: ('edit', False)},
+        )
+
+        with RecordCapturer(self.env['documents.document'], []) as record_capture:
+            res = self.url_open(f'/documents/upload/{public_request.access_token}',
+                data={'csrf_token': self.csrf_token()},
+                files=[
+                    ('ufile', ('hello1.txt', BytesIO(b"Hello 1"), 'text/plain')),
+                    ('ufile', ('hello2.txt', BytesIO(b"Hello 2"), 'text/plain')),
+                ],
+                allow_redirects=False,
+            )
+            res.raise_for_status()
+
+        new_shortcuts = record_capture.records.filtered('shortcut_document_id.id')
+        new_doc = record_capture.records - new_shortcuts
+        self.assertEqual(len(new_doc), 1, "One new record should have been created")
+        self.assertNotEqual(new_doc, public_request)
+        self.assertEqual(public_request.type, "binary")
+        self.assertEqual(new_doc.type, "binary")
+        self.assertNotEqual(new_doc.attachment_id, public_request.attachment_id)
+        self.assertEqual(public_request.name, 'hello1.txt')
+        self.assertEqual(new_doc.name, 'hello2.txt')
+        self.assertEqual(public_request.raw.content, b'Hello 1')
+        self.assertEqual(new_doc.raw.content, b'Hello 2')
+        self.assertEqual(public_request.tag_ids, tag)
+        self.assertEqual(new_doc.tag_ids, tag)
+        self.assertEqual(public_request.owner_id, self.user_admin)
+        self.assertEqual(new_doc.owner_id, self.user_admin)
+
+        self.assertEqual(len(new_shortcuts), 2, "Should have copied the shortcuts of both user")
+        admin_copy = new_shortcuts.filtered(lambda d: d.owner_id == self.user_admin)
+        demo_copy = new_shortcuts.filtered(lambda d: d.owner_id == self.user_demo)
+        self.assertEqual(len(admin_copy), 1)
+        self.assertEqual(len(demo_copy), 1)
+        self.assertEqual(admin_copy.access_internal, 'none')
+        self.assertEqual(demo_copy.access_internal, 'edit')
+
+        # keep the information of who upload at least in `create_uid`
+        self.assertEqual(new_doc.create_uid, self.env.ref('base.public_user'))
+        self.assertEqual(admin_copy.create_uid, self.env.ref('base.public_user'))
+        self.assertEqual(demo_copy.create_uid, self.env.ref('base.public_user'))
+
+        # check that the access are also copied, and that no new access have been added
+        self.assertEqual(public_request.access_ids.partner_id, partner | self.user_admin.partner_id)
+        self.assertEqual(new_doc.access_ids.partner_id, partner | self.user_admin.partner_id)
+        self.assertEqual(admin_copy.access_ids.partner_id, partner | self.user_admin.partner_id)
+        self.assertEqual(demo_copy.access_ids.partner_id, partner | self.user_demo.partner_id | self.user_admin.partner_id)
+
+        self.assertEqual(admin_shortcut.shortcut_document_id.raw.content, b'Hello 1')
+        self.assertEqual(demo_shortcut.shortcut_document_id.raw.content, b'Hello 1')
+        self.assertEqual(admin_copy.shortcut_document_id.raw.content, b'Hello 2')
+        self.assertEqual(demo_copy.shortcut_document_id.raw.content, b'Hello 2')
+
+        self.assertEqual(admin_shortcut.shortcut_document_id.name, 'hello1.txt')
+        self.assertEqual(demo_shortcut.shortcut_document_id.name, 'hello1.txt')
+        self.assertEqual(admin_copy.shortcut_document_id.name, 'hello2.txt')
+        self.assertEqual(demo_copy.shortcut_document_id.name, 'hello2.txt')
 
     @freeze_time('2022-07-24 08:00:00')
     def test_doc_upload_folder_user(self):
@@ -774,7 +993,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         # Errors
         res = self.url_open(f'/documents/upload/{self.internal_folder.access_token}',
             data={
-                'csrf_token': http.Request.csrf_token(self),
+                'csrf_token': self.csrf_token(),
                 'res_id': 'bad'
             },
             files={'ufile': BytesIO()},
@@ -790,7 +1009,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
                 ('res_model', '=', 'documents.document')
               ]) as capture_activity):
             res = self.url_open(f'/documents/upload/{self.internal_folder.access_token}',
-                data={'csrf_token': http.Request.csrf_token(self)},
+                data={'csrf_token': self.csrf_token()},
                 files={'ufile': ('hello.txt', b"Hello", 'text/plain')},
                 allow_redirects=False,
             )
@@ -804,10 +1023,11 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         self.assertFalse(document.res_model)
         self.assertEqual(document.attachment_id.res_id, document.id)
         self.assertEqual(document.attachment_id.res_model, 'documents.document')
-        self.assertEqual(document.message_ids.mapped('body'), [
-            "<p>Document uploaded by Marc Demo</p>",
-            "<p>Document created</p>",
-        ])
+        self.assertEqual(len(document.message_ids), 1)
+        creation_msg = document.message_ids
+        self.assertMessageFields(
+            creation_msg, {'body_content': get_document_creation_message('Marc Demo', 'hello.txt', 'User created')}
+        )
         self.assertFalse(capture_activity.records, 'Activities should only be created when using the mail gateway')
 
         # Upload a fake text file that actually is an image on the demo user
@@ -818,7 +1038,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
               ]) as capture_activity):
             res = self.url_open(f'/documents/upload/{self.internal_folder.access_token}',
                 data={
-                    'csrf_token': http.Request.csrf_token(self),
+                    'csrf_token': self.csrf_token(),
                     'res_id': self.user_demo.partner_id.id,
                     'res_model': 'res.partner',
                 },
@@ -838,19 +1058,21 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         self.assertEqual(document.attachment_id.res_model, 'res.partner')
 
     def test_doc_upload_request_user(self):
+        self.env = self.env(context={**self.env.context, 'lang': 'en_US'})
         self.authenticate('demo', 'demo')
 
-        # res_model/res_id should be ignored
-        res = self.url_open(f'/documents/upload/{self.internal_request.access_token}',
-            data={
-                'res_id': self.user_demo.id,
-                'res_model': 'res.users',
-                'csrf_token': http.Request.csrf_token(self),
-            },
-            files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
-            allow_redirects=False
-        )
-        res.raise_for_status()
+        with self.mock_mail_gateway():
+            # res_model/res_id should be ignored
+            res = self.url_open(f'/documents/upload/{self.internal_request.access_token}',
+                data={
+                    'res_id': self.user_demo.id,
+                    'res_model': 'res.users',
+                    'csrf_token': self.csrf_token(),
+                },
+                files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
+                allow_redirects=False
+            )
+            res.raise_for_status()
 
         self.assertEqual(self.internal_request.name, 'hello.txt')
         self.assertEqual(self.internal_request.mimetype, 'text/plain')
@@ -858,20 +1080,48 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         self.assertFalse(self.internal_request.res_model)
         self.assertEqual(self.internal_request.attachment_id.res_id, self.internal_request.id)
         self.assertEqual(self.internal_request.attachment_id.res_model, 'documents.document')
-        self.assertEqual(self.internal_request.raw, b"Hello")
-        tracking_message_ids = self.internal_request.message_ids.filtered('tracking_value_ids')
-        self.assertTracking(tracking_message_ids, [
-            ('name', 'char', 'internal-request.png', 'hello.txt'),
-        ], strict=True)
+        self.assertEqual(self.internal_request.raw.content, b"Hello")
+        tracking_message_ids = self.internal_request.message_ids.filtered(lambda msg: msg.message_type == 'tracking')
+        self.assertMessageFields(
+            tracking_message_ids, {
+                'tracking_values': [('name', 'char', 'internal-request.png', 'hello.txt')],
+            }
+        )
         other_message_ids = self.internal_request.message_ids - tracking_message_ids
-        self.assertEqual(other_message_ids.mapped('body'), [
-            "<p>Document uploaded by Marc Demo</p>",
-            "<p>Document created</p>",
-        ])
+        self.assertEqual(len(other_message_ids), 2)
+        update_msg, creation_msg = other_message_ids
+        self.assertMessageFields(
+            creation_msg, {'body_content': get_document_creation_message('manager', 'internal-request.png', 'User created')}
+        )
+        # Check that requester is notified when the document is uploaded
+        self.assertMailNotifications(
+            update_msg,
+            [{
+                'content': f'{self.user_demo.name} has uploaded the requested document',
+                'message_type': 'notification',
+                'notif': [{'partner': self.user_manager.partner_id, 'type': 'email'}],
+                'subtype': 'mail.mt_note',
+            }]
+        )
+
+        # test that uploading a document requested by self doesn't notify
+        request = self.internal_request.copy({'requestee_partner_id': self.user_portal.partner_id.id})
+        with self.assertMsgWithoutNotifications():
+            # uploading the document
+            res = self.url_open(f'/documents/upload/{request.access_token}',
+                data={
+                    'res_id': self.user_demo.id,
+                    'res_model': 'res.users',
+                    'csrf_token': self.csrf_token(),
+                },
+                files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
+                allow_redirects=False
+            )
+            res.raise_for_status()
 
         # attempt to upload on the admin's file
         res = self.url_open(f'/documents/upload/{self.internal_hidden.access_token}',
-            data={'csrf_token': http.Request.csrf_token(self)},
+            data={'csrf_token': self.csrf_token()},
             files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
         )
         self.assertEqual(res.status_code, 404)
@@ -885,16 +1135,17 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
             data={
                 'res_id': self.user_demo.id,
                 'res_model': 'res.users',
-                'csrf_token': http.Request.csrf_token(self),
+                'csrf_token': self.csrf_token(),
             },
             files={'ufile': ('test.bmp', img_byte, 'image/bmp')},
             allow_redirects=False,
         )
         res.raise_for_status()
         self.assertEqual(self.internal_request.name, 'test.bmp')
-        self.assertEqual(base64.b64decode(self.internal_request.datas), img_byte)
+        self.assertEqual(self.internal_request.raw.content, img_byte)
 
     def test_doc_ctrl_upload_shortcut(self):
+        self.env = self.env(context={**self.env.context, 'lang': 'en_US'})
         self.authenticate(None, None)
         self.internal_file.action_update_access_rights(access_via_link='edit')
         for access_via_link, hidden in [
@@ -911,7 +1162,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
                 )
                 res = self.url_open(
                     f'/documents/upload/{self.internal_shortcut.access_token}',
-                    data={'csrf_token': http.Request.csrf_token(self)},
+                    data={'csrf_token': self.csrf_token()},
                     files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
                     allow_redirects=False
                 )
@@ -923,7 +1174,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         )
         res = self.url_open(
             f'/documents/upload/{self.internal_shortcut.access_token}',
-            data={'csrf_token': http.Request.csrf_token(self)},
+            data={'csrf_token': self.csrf_token()},
             files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
             allow_redirects=False
         )
@@ -940,17 +1191,20 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         self.assertFalse(self.internal_file.res_model)
         self.assertEqual(self.internal_file.attachment_id.res_id, self.internal_file.id)
         self.assertEqual(self.internal_file.attachment_id.res_model, 'documents.document')
-        self.assertEqual(self.internal_file.raw, b"Hello")
-        tracking_message_ids = self.internal_file.message_ids.filtered('tracking_value_ids')
-        self.assertTracking(tracking_message_ids, [
-            ('name', 'char', 'internal-file.png', 'hello.txt'),
-        ], strict=True)
+        self.assertEqual(self.internal_file.raw.content, b"Hello")
+        tracking_message_ids = self.internal_file.message_ids.filtered(lambda m: m.message_type == 'tracking')
+        self.assertMessageFields(
+            tracking_message_ids, {
+                'tracking_values': [('name', 'char', 'internal-file.png', 'hello.txt')],
+            }
+        )
         other_message_ids = self.internal_file.message_ids - tracking_message_ids
-        self.assertEqual(other_message_ids.mapped('body'), [
-            "<p>Document uploaded by Public user</p>",
-            "<p>Document created</p>",
-        ])
-
+        self.assertEqual(len(other_message_ids), 2)
+        update_msg, creation_msg = other_message_ids
+        self.assertMessageFields(
+            creation_msg, {'body_content': get_document_creation_message('OdooBot', 'internal-file.png', 'User created')}
+        )
+        self.assertMessageFields(update_msg, {'body_content': "<p>Attachment updated by Public user</p>"})
         self.url_open(res.headers['Location']).raise_for_status()
 
     def test_doc_ctrl_zip(self):
@@ -1028,10 +1282,10 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         """Test computed init data depending on access rights."""
         shared_portal_values = {'access_ids': [
             Command.create({'partner_id': self.user_portal.partner_id.id, 'role': 'view'})
-        ]}
+        ], 'raw': 'test'}
         shared_manager_values = {'access_ids': [
             Command.create({'partner_id': self.user_manager.partner_id.id, 'role': 'edit'})
-        ]}
+        ], 'raw': 'test'}
         internal_folder = self.env['documents.document'].create([
             {'type': 'folder', 'name': 'Internal', 'access_internal': 'edit'},
         ])
@@ -1049,18 +1303,19 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
                 shared_portal_values | {'name': 'company_child_share_portal', 'folder_id': internal_folder.id},
                 shared_portal_values | {'name': 'restricted_share_portal', 'folder_id': restricted_folder.id},
                 shared_manager_values | {'name': 'restricted_manager', 'folder_id': restricted_folder.id},
-                {'name': 'restricted_shared_link', 'folder_id': restricted_folder.id, 'access_via_link': 'view'},
+                {'name': 'restricted_shared_link', 'folder_id': restricted_folder.id, 'access_via_link': 'view', 'raw': 'test'},
             ])
         )
         (internal_folder | company_portal).sudo().user_folder_id = "COMPANY"
         archived_doc, archived_folder = archived = doc_as_demo.create([
-            {'type': doc_type, 'name': f'Archived {doc_type}'} for doc_type in ('binary', 'folder')
+            {'type': doc_type, 'name': f'Archived {doc_type}', 'raw': 'test' if doc_type == 'binary' else None}
+            for doc_type in ('binary', 'folder')
         ])
         archived_doc_shortcut, archived_folder_shortcut = archived.action_create_shortcut()
         archived.action_archive()
 
         for user in (self.user_portal, self.user_manager):
-            ShareRoute._upsert_last_access_date(self.env(user=user), shared_via_link)
+            self.env['documents.document'].with_user(user)._upsert_last_access_date(shared_via_link)
 
         for document, user, expected_folder_id, expected_document_id in [
             (demo_personal, self.user_demo, 'MY', demo_personal.id),
@@ -1128,7 +1383,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         with RecordCapturer(self.env['documents.document'], []) as record_capture:
             res = self.url_open(f'/documents/upload',
                 data={
-                    'csrf_token': http.Request.csrf_token(self),
+                    'csrf_token': self.csrf_token(),
                     'allowed_company_ids': f'[{comp.id}]',
                     'user_folder_id': 'COMPANY',
                 },
@@ -1142,7 +1397,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         with RecordCapturer(self.env['documents.document'], []) as record_capture:
             res = self.url_open(f'/documents/upload',
                 data={
-                    'csrf_token': http.Request.csrf_token(self),
+                    'csrf_token': self.csrf_token(),
                     'allowed_company_ids': f'[{main_company.id}]',
                     'user_folder_id': 'COMPANY',
                 },
@@ -1159,7 +1414,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         attachment = self.env['ir.attachment'].create({
             'name': "An Email without attachment",
             'type': 'binary',
-            'raw':  '<p>A mail body</p>',
+            'raw': b'<p>A mail body</p>',
             'mimetype': 'application/documents-email',
             'res_model': 'documents.document',
         })
@@ -1193,11 +1448,11 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         url = '/documents/upload_traceback'
         self.authenticate('admin', 'admin')
         with RecordCapturer(self.env["documents.document"], []) as capture:
-            res = self.url_open(url, data={"csrf_token": http.Request.csrf_token(self)}, files={'ufile': ('TEST_traceback.txt', BytesIO(b"TEST traceback"), 'text/plain')})
+            res = self.url_open(url, data={"csrf_token": self.csrf_token()}, files={'ufile': ('TEST_traceback.txt', BytesIO(b"TEST traceback"), 'text/plain')})
             res.raise_for_status()
             self.assertEqual(res.headers['Content-Type'], 'application/json; charset=utf-8')
             self.assertIsNotNone(res.json()[0])
-            res = self.url_open(url, data={"csrf_token": http.Request.csrf_token(self)}, files={'ufile': ('TEST_traceback2.txt', BytesIO(b"TEST traceback"), 'text/plain')})
+            res = self.url_open(url, data={"csrf_token": self.csrf_token()}, files={'ufile': ('TEST_traceback2.txt', BytesIO(b"TEST traceback"), 'text/plain')})
             res.raise_for_status()
             self.assertEqual(res.headers['Content-Type'], 'application/json; charset=utf-8')
             self.assertIsNotNone(res.json()[0])
@@ -1208,12 +1463,12 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
         self.assertEqual(documents[1].type, 'binary')
         self.assertEqual(documents[1].name, 'TEST_traceback.txt')
         self.assertEqual(documents[1].mimetype, 'text/plain')
-        self.assertEqual(documents[1].raw, b"TEST traceback")
+        self.assertEqual(documents[1].raw.content, b"TEST traceback")
         self.assertEqual(documents[1].folder_id, documents[0])
         self.assertEqual(documents[2].type, 'binary')
         self.assertEqual(documents[2].name, 'TEST_traceback2.txt')
         self.assertEqual(documents[2].mimetype, 'text/plain')
-        self.assertEqual(documents[2].raw, b"TEST traceback")
+        self.assertEqual(documents[2].raw.content, b"TEST traceback")
         self.assertEqual(documents[2].folder_id, documents[0])
 
 
@@ -1221,38 +1476,38 @@ class TestDocumentsControllers(HttpCaseWithUserDemo, MockEmail):
 class TestCaseSecurityRoutes(HttpCaseWithUserDemo):
 
     def setUp(self):
-        super(TestCaseSecurityRoutes, self).setUp()
+        super().setUp()
 
-        self.raw_gif = b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs="
+        self.raw_gif = GIF_RAW
         pdf_buffer = BytesIO()
         canva = canvas.Canvas(pdf_buffer, pagesize=(600, 800))
         canva.drawString(100, 750, "Minimal PDF")
         canva.save()
-        self.raw_pdf = b64encode(pdf_buffer.getvalue())
+        self.raw_pdf = pdf_buffer.getvalue()
 
         self.user_attachment_gif, self.admin_attachment_gif, \
         self.user_attachment_pdf, self.admin_attachment_pdf = self.env['ir.attachment'].create([
             {
-                'datas': self.raw_gif,
+                'raw': self.raw_gif,
                 'name': 'attachmentGif_A.gif',
                 'res_model': False,
                 'res_id': False,
             },
             {
-                'datas': self.raw_gif,
+                'raw': self.raw_gif,
                 'name': 'attachmentGif_B.gif',
                 'res_model': False,
                 'res_id': False,
             },
             {
-                'datas': self.raw_pdf,
+                'raw': self.raw_pdf,
                 'name': 'attachmentPdf_A.pdf',
                 'mimetype': 'application/pdf',
                 'res_model': False,
                 'res_id': False,
             },
             {
-                'datas': self.raw_pdf,
+                'raw': self.raw_pdf,
                 'name': 'attachmentPdf_B.pdf',
                 'mimetype': 'application/pdf',
                 'res_model': False,
@@ -1292,7 +1547,7 @@ class TestCaseSecurityRoutes(HttpCaseWithUserDemo):
         response = self.url_open('/document/zip', data={
             'file_ids': ','.join(map(str, [self.user_document_gif.id, self.admin_document_gif.id])),
             'zip_name': 'testZip.zip',
-            'csrf_token': http.Request.csrf_token(self),
+            'csrf_token': self.csrf_token(),
         })
         self.assertNotEqual(response.status_code, 200)
 
@@ -1314,6 +1569,6 @@ class TestCaseSecurityRoutes(HttpCaseWithUserDemo):
                 }]
             }]),
             'archive': False,
-            'csrf_token': http.Request.csrf_token(self),
+            'csrf_token': self.csrf_token(),
         })
         self.assertNotEqual(response.status_code, 200)

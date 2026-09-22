@@ -1,7 +1,13 @@
+import { t } from "@odoo/owl";
 import { AiPrompt } from "@ai/ai_prompt/ai_prompt";
 import { patch } from "@web/core/utils/patch";
 import { PropertiesField } from "@web/views/fields/properties/properties_field";
-import { PropertyDefinition } from "@web/views/fields/properties/property_definition";
+import {
+    PropertyDefinition,
+    propertyDefinitionProps,
+} from "@web/views/fields/properties/property_definition";
+
+propertyDefinitionProps.propertiesModel = t.string();
 
 patch(PropertiesField.prototype, {
     get additionalPropertyDefinitionProps() {
@@ -12,7 +18,7 @@ patch(PropertiesField.prototype, {
     },
     async onAiClick(propertyName) {
         const value = await this.props.record.computeAiProperty(
-            `${this.props.name}.${propertyName}`,
+            `${this.props.name}.${propertyName}`
         );
         this.onPropertyValueChange(propertyName, value);
     },
@@ -26,7 +32,7 @@ patch(PropertiesField.prototype, {
                 this.props.record._config.resModel,
                 "search",
                 [],
-                { domain: [], limit: 1, order: "id DESC" },
+                { domain: [], limit: 1, order: "id DESC" }
             );
             const resId = lastRecord[0] || 0;
             if (this.props.record._config.resId) {
@@ -44,35 +50,4 @@ patch(PropertiesField.prototype, {
     },
 });
 
-patch(PropertyDefinition, {
-    props: { ...PropertyDefinition.props, propertiesModel: { type: String } },
-    components: { ...PropertyDefinition.components, AiPrompt },
-});
-
-patch(PropertyDefinition.prototype, {
-    onAiChange(newValue) {
-        const propertyDefinition = {
-            ...this.state.propertyDefinition,
-            ai: newValue,
-            default: false,
-        };
-        this.props.onChange(propertyDefinition);
-        this.state.propertyDefinition = propertyDefinition;
-    },
-
-    onSystemPromptChange(newPrompt) {
-        const propertyDefinition = {
-            ...this.state.propertyDefinition,
-            system_prompt: newPrompt,
-        };
-        this.props.onChange(propertyDefinition);
-        this.state.propertyDefinition = propertyDefinition;
-    },
-
-    get comodel() {
-        if (["many2one", "many2many"].includes(this.state.propertyDefinition.type)) {
-            return this.state.propertyDefinition.comodel || undefined;
-        }
-        return undefined;
-    },
-});
+PropertyDefinition.components = { ...PropertyDefinition.components, AiPrompt };

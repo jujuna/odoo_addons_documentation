@@ -18,7 +18,7 @@ class ResPartnerBank(models.Model):
         store=True
     )
 
-    @api.depends('wise_account_type', 'acc_number', 'clearing_number', 'l10n_us_bank_account_type')
+    @api.depends('wise_account_type', 'account_number', 'clearing_number', 'clearing_label_id', 'l10n_us_bank_account_type')
     def _compute_wise_bank_account(self):
         for bank in self:
             # Clear the Wise account if the bank details change

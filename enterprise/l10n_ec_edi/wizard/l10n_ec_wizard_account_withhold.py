@@ -94,7 +94,7 @@ class L10n_EcWizardAccountWithhold(models.TransientModel):
         currency_field='currency_id'
     )
     dividend_fiscal_year = fields.Selection(
-        [(str(year), str(year)) for year in range(_L10N_EC_DIVIDEND_YEAR_MIN, _L10N_EC_DIVIDEND_YEAR_MAX + 1)],
+        lambda self: [(str(year), str(year)) for year in range(_L10N_EC_DIVIDEND_YEAR_MIN, _L10N_EC_DIVIDEND_YEAR_MAX + 1)],
         'Dividend fiscal year',
         help='Enter the fiscal year in which earnings on the reported dividend are generated. The company could pay previous periods'
     )
@@ -411,7 +411,7 @@ class L10n_EcWizardAccountWithhold(models.TransientModel):
                 errors.append(_("Multiple invoices are only supported in customer withholds"))
             if not invoice.l10n_ec_show_add_withhold:
                 errors.append(_("The selected document type does not support withholds."))
-            if invoice.move_type == 'out_invoice' and invoice.commercial_partner_id._l10n_ec_get_identification_type() != 'ruc':
+            if invoice.move_type == 'out_invoice' and invoice.commercial_partner_id._l10n_ec_get_identification_type()[0] != 'ruc':
                 errors.append(_("For recording a withhold the selected partner should have a RUC"))
             if errors:
                 errors.append('')

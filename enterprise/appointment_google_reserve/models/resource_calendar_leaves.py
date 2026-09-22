@@ -62,7 +62,7 @@ class ResourceCalendarLeaves(models.Model):
 
     def _sync_google_reserve_get_appointments(self, old_dates_by_leave=False):
         appointment_resources = self.env['appointment.resource'].search([
-            ('appointment_type_ids.google_reserve_enable', '=', 'True'),
+            ('appointment_type_ids.google_reserve_enable', '=', True),
             ('resource_id', 'in', self.resource_id.ids),
         ])
         appointment_resource_by_resource = appointment_resources.grouped('resource_id')

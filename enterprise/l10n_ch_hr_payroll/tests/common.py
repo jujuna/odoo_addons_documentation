@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import logging
-import pdb
 
 from dateutil.relativedelta import relativedelta
 from odoo.tests.common import tagged, TransactionCase
@@ -37,7 +36,7 @@ class TestSwissdecCommon(TransactionCase):
             'l10n_ch_after_departure_payment': after_payment,
             'payslip_run_id': batch.id,
         }
-        payslip = cls.env['hr.payslip'].with_context(tracking_disable=True).create(vals)
+        payslip = cls.env['hr.payslip'].create(vals)
         cls.env.flush_all()
         payslip.compute_sheet()
         payslip.action_payslip_done()
@@ -62,7 +61,7 @@ class TestSwissdecCommon(TransactionCase):
             "date_start": str(first_of_month),
             "date_end": str(end_of_month)
         })
-        batch.sudo().generate_payslips(batch.sudo()._get_valid_version_ids())
+        batch.sudo()._generate_payslips()
         batch.sudo().action_validate()
         cls.env.flush_all()
         return batch
@@ -106,7 +105,8 @@ class TestSwissdecCommon(TransactionCase):
             'l10n_ch_uid': 'CHE-999.999.996',
             'phone': '0412186532',
             'l10n_ch_30_day_method': True,
-            'currency_id': cls.env.ref("base.CHF").id
+            'currency_id': cls.env.ref("base.CHF").id,
+            'tz': 'Europe/Zurich',
         })
 
         cls.env.user.company_ids |= cls.muster_ag_company

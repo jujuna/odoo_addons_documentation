@@ -3,37 +3,23 @@
 # * worksheet
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2026.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-09-17 09:38+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
+"POT-Creation-Date: 2026-09-18 17:54+0000\n"
+"PO-Revision-Date: 2026-09-17 23:27+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/worksheet/es_419/>\n"
+"odoo-master/worksheet/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#. module: worksheet
-#. odoo-python
-#: code:addons/worksheet/models/worksheet_template.py:0
-msgid "%s (copy)"
-msgstr "%s (copia)"
-
-#. module: worksheet
-#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_form
-msgid "<span class=\"o_stat_text\">Worksheets</span>"
-msgstr "<span class=\"o_stat_text\">Hojas de trabajo</span>"
-
-#. module: worksheet
-#: model:ir.model.fields,field_description:worksheet.field_worksheet_template__action_id
-msgid "Action"
-msgstr "Acción"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: worksheet
 #: model:ir.model.fields,field_description:worksheet.field_worksheet_template__active
@@ -41,24 +27,38 @@ msgid "Active"
 msgstr "Activo"
 
 #. module: worksheet
-#. odoo-python
-#: code:addons/worksheet/models/worksheet_template.py:0
-#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_form
-#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_list
-msgid "Analysis"
-msgstr "Análisis"
+#. odoo-javascript
+#: code:addons/worksheet/static/src/components/worksheet_properties/worksheet_properties_field.xml:0
+msgid "Add Property"
+msgstr "Agregar una propiedad"
 
 #. module: worksheet
 #: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_form
+msgid "Add the fields technicians will fill out for this worksheet."
+msgstr ""
+
+#. module: worksheet
 #: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_search
 msgid "Archived"
 msgstr "Archivado"
 
 #. module: worksheet
+#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_properties_display
+msgid "Binary file"
+msgstr "Archivo binario"
+
+#. module: worksheet
 #: model:ir.model.fields,field_description:worksheet.field_worksheet_template__company_id
+#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_form
 #: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_search
 msgid "Company"
 msgstr "Empresa"
+
+#. module: worksheet
+#: model:ir.module.module,description:base.module_worksheet
+#: model:ir.module.module,summary:base.module_worksheet
+msgid "Create worksheet with property field"
+msgstr "Crear hoja de trabajo con campo de propiedad"
 
 #. module: worksheet
 #: model:ir.model.fields,field_description:worksheet.field_worksheet_template__create_uid
@@ -71,13 +71,20 @@ msgid "Created on"
 msgstr "Creado el"
 
 #. module: worksheet
-#. odoo-javascript
-#: code:addons/worksheet/static/src/open_studio_button_widget/open_studio_button_widget.xml:0
-msgid "Design Template"
-msgstr "Diseñar plantilla"
+#: model:ir.model.fields,field_description:worksheet.field_worksheet_template__currency_id
+msgid "Currency"
+msgstr "Moneda"
 
 #. module: worksheet
-#: model:ir.model.fields,field_description:worksheet.field_ir_model__display_name
+#. odoo-javascript
+#: code:addons/worksheet/static/src/views/worksheet_template_form/worksheet_template_form.js:0
+msgid ""
+"Deleting this template will also delete the related worksheets.\n"
+"\n"
+"Are you sure you want to proceed?"
+msgstr ""
+
+#. module: worksheet
 #: model:ir.model.fields,field_description:worksheet.field_worksheet_template__display_name
 msgid "Display Name"
 msgstr "Nombre en pantalla"
@@ -88,20 +95,9 @@ msgid "Host Model"
 msgstr "Modelo huésped"
 
 #. module: worksheet
-#: model:ir.model.fields,field_description:worksheet.field_ir_model__id
 #: model:ir.model.fields,field_description:worksheet.field_worksheet_template__id
 msgid "ID"
 msgstr "ID"
-
-#. module: worksheet
-#. odoo-python
-#: code:addons/worksheet/models/worksheet_template.py:0
-msgid ""
-"Keep track of and analyze intervention data. Identify recurring patterns and "
-"take preventive measures accordingly."
-msgstr ""
-"Monitorea y analiza los datos de las intervenciones, identifica patrones "
-"recurrentes y toma las medidas preventivas adecuadas."
 
 #. module: worksheet
 #: model:ir.model.fields,field_description:worksheet.field_worksheet_template__write_uid
@@ -114,30 +110,16 @@ msgid "Last Updated on"
 msgstr "Última actualización el"
 
 #. module: worksheet
-#: model:ir.model.fields,field_description:worksheet.field_worksheet_template__model_id
-msgid "Model"
-msgstr "Modelo"
-
-#. module: worksheet
-#: model:ir.model,name:worksheet.model_ir_model
-msgid "Models"
-msgstr "Modelos"
-
-#. module: worksheet
 #: model:ir.model.fields,field_description:worksheet.field_worksheet_template__name
+#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_form
 msgid "Name"
 msgstr "Nombre"
 
 #. module: worksheet
-#. odoo-python
-#: code:addons/worksheet/models/worksheet_template.py:0
-msgid "No data to display"
-msgstr "No hay datos para mostrar"
-
-#. module: worksheet
-#: model:ir.model.fields,field_description:worksheet.field_worksheet_template__report_view_id
-msgid "Report View"
-msgstr "Vista de reporte"
+#. odoo-javascript
+#: code:addons/worksheet/static/src/components/worksheet_properties/worksheet_properties_field.js:0
+msgid "Property 1"
+msgstr "Propiedad 1"
 
 #. module: worksheet
 #: model:ir.model.fields,field_description:worksheet.field_worksheet_template__sequence
@@ -156,13 +138,11 @@ msgid "The model that is using this template"
 msgstr "El modelo que está usando esta plantilla"
 
 #. module: worksheet
-#. odoo-python
-#: code:addons/worksheet/models/worksheet_template.py:0
-msgid ""
-"The template to print this worksheet template should be a QWeb template."
+#. odoo-javascript
+#: code:addons/worksheet/static/src/components/worksheet_properties/worksheet_properties_field.xml:0
+msgid "To design this worksheet template, open it on a desktop."
 msgstr ""
-"La plantilla para imprimir esta plantilla de hoja de trabajo debe ser una "
-"plantilla QWeb."
+"Para diseñar la plantilla de esta hoja de trabajo, ábrela en una computadora."
 
 #. module: worksheet
 #. odoo-python
@@ -175,14 +155,27 @@ msgstr ""
 "porque sigue vinculada a tareas dentro de la empresa."
 
 #. module: worksheet
-#: model:ir.model.fields,field_description:worksheet.field_worksheet_template__worksheet_count
-msgid "Worksheet Count"
-msgstr "Número de hojas de trabajo"
+#: model:ir.module.module,shortdesc:base.module_worksheet
+#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_properties_display
+msgid "Worksheet"
+msgstr "Hoja de trabajo"
 
 #. module: worksheet
-#: model:ir.model,name:worksheet.model_worksheet_template
-msgid "Worksheet Template"
-msgstr "Plantilla de hoja de trabajo"
+#: model:ir.model.fields,field_description:worksheet.field_worksheet_template__worksheet_count
+msgid "Worksheet Count"
+msgstr ""
+
+#. module: worksheet
+#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_form
+msgid "Worksheet Fields"
+msgstr ""
+
+#. module: worksheet
+#. odoo-javascript
+#: code:addons/worksheet/static/src/components/worksheet_properties/worksheet_properties_field.js:0
+#: model:ir.model.fields,field_description:worksheet.field_worksheet_template__worksheet_properties_definition
+msgid "Worksheet Properties"
+msgstr "Propiedades de la hoja de trabajo"
 
 #. module: worksheet
 #: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_search
@@ -190,9 +183,9 @@ msgid "Worksheet Template Search"
 msgstr "Búsqueda de plantilla de hoja de trabajo"
 
 #. module: worksheet
-#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_list
-msgid "Worksheets"
-msgstr "Hojas de trabajo"
+#: model:ir.model,name:worksheet.model_worksheet_template
+msgid "Worksheet template using properties field"
+msgstr "Plantilla de hoja de trabajo usando un campo de propiedad"
 
 #. module: worksheet
 #. odoo-python
@@ -212,5 +205,15 @@ msgstr ""
 
 #. module: worksheet
 #: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_form
-msgid "e.g Device Installation"
+msgid "e.g. Device installation"
 msgstr "Por ejemplo, Instalación del dispositivo"
+
+#. module: worksheet
+#: model_terms:ir.ui.view,arch_db:worksheet.view_worksheet_properties_definition_kanban
+#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_form
+#: model_terms:ir.ui.view,arch_db:worksheet.worksheet_template_view_list
+msgid "worksheet"
+msgstr "hoja de trabajo"
+
+#~ msgid "Worksheets Properties"
+#~ msgstr "Propiedades de las hojas de trabajo"

@@ -6,7 +6,7 @@ export class IotDevice extends models.ServerModel {
     _name = "iot.device";
 
     _load_pos_data_fields() {
-        return ["iot_ip", "iot_id", "identifier", "type", "manual_measurement"];
+        return ["iot_ip", "iot_id", "identifier", "type"];
     }
 
     _records = [
@@ -18,6 +18,7 @@ export class IotDevice extends models.ServerModel {
             type: "printer",
             connection: "network",
             connected_status: "disconnected",
+            write_date: "2025-01-01 10:00:00",
         },
         {
             id: 3,
@@ -27,6 +28,7 @@ export class IotDevice extends models.ServerModel {
             type: "display",
             connection: "hdmi",
             connected_status: "disconnected",
+            write_date: "2025-01-01 10:00:00",
         },
         {
             id: 4,
@@ -36,6 +38,7 @@ export class IotDevice extends models.ServerModel {
             type: "scanner",
             connection: "direct",
             connected_status: "disconnected",
+            write_date: "2025-01-01 10:00:00",
         },
         {
             id: 5,
@@ -44,6 +47,16 @@ export class IotDevice extends models.ServerModel {
             identifier: "scale_identifier",
             type: "scale",
             connection: "serial",
+            connected_status: "disconnected",
+            write_date: "2025-01-01 10:00:00",
+        },
+        {
+            id: 7,
+            name: "IOT Payment Terminal Test",
+            iot_id: 2,
+            identifier: "test_terminal_identifier",
+            type: "payment",
+            connection: "network",
             connected_status: "disconnected",
         },
     ];

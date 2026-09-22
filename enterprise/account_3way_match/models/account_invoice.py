@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
 from odoo.tools.float_utils import float_compare
-from odoo.tools.sql import column_exists, create_column
 
 # Available values for the release_to_pay field.
 _release_to_pay_status_list = [('yes', 'Yes'), ('no', 'No'), ('exception', 'Exception')]
@@ -12,19 +10,16 @@ _release_to_pay_status_list = [('yes', 'Yes'), ('no', 'No'), ('exception', 'Exce
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    def _auto_init(self):
-        if not column_exists(self.env.cr, "account_move", "release_to_pay"):
-            # Create column manually to set default value to 'exception' on postgres level.
-            # This way we avoid heavy computation on module installation.
-            self.env.cr.execute("ALTER TABLE account_move ADD COLUMN release_to_pay VARCHAR DEFAULT 'exception'")
-
-        return super()._auto_init()
-
     release_to_pay = fields.Selection(
         _release_to_pay_status_list,
         compute='_compute_release_to_pay',
         copy=False,
         store=True,
+        init_storage=lambda self: (
+            # Create column manually to set default value to 'exception' on postgres level.
+            # This way we avoid heavy computation on module installation.
+            self.env.cr.execute("UPDATE account_move SET release_to_pay = 'exception' WHERE release_to_pay IS NULL")
+        ),
         help="This field can take the following values :\n"
              "  * Yes: you should pay the bill, you have received the products\n"
              "  * No, you should not pay the bill, you have not received the products\n"
@@ -33,7 +28,7 @@ class AccountMove(models.Model):
     release_to_pay_manual = fields.Selection(
         _release_to_pay_status_list,
         string='Should Be Paid',
-        compute='_compute_release_to_pay_manual', store='True', readonly=False,
+        compute='_compute_release_to_pay_manual', store=True, readonly=False,
         help="  * Yes: you should pay the bill, you have received the products\n"
              "  * No, you should not pay the bill, you have not received the products\n"
              "  * Exception, there is a difference between received and billed quantities\n"
@@ -92,15 +87,6 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    def _auto_init(self):
-        if not column_exists(self.env.cr, "account_move_line", "can_be_paid"):
-            # Create column manually to set default value to 'exception' on postgres level.
-            # This way we avoid heavy computation on module installation.
-            self.env.cr.execute("ALTER TABLE account_move_line ADD COLUMN can_be_paid VARCHAR DEFAULT 'exception'")
-
-        return super()._auto_init()
-
-
     @api.depends('purchase_line_id.qty_received', 'purchase_line_id.qty_invoiced', 'purchase_line_id.product_qty', 'price_unit')
     def _can_be_paid(self):
         """ Computes the 'release to pay' status of an invoice line, depending on
@@ -122,7 +108,7 @@ class AccountMoveLine(models.Model):
                 invoice_currency = invoice_line.currency_id
                 order_currency = po_line.currency_id
                 invoice_converted_price = invoice_currency._convert(
-                    invoice_line.price_unit, order_currency, invoice_line.company_id, fields.Date.today())
+                    invoice_line.price_unit, order_currency, invoice_line.company_id)
                 if order_currency.compare_amounts(po_line.price_unit, invoice_converted_price) != 0:
                     invoice_line.can_be_paid = 'exception'
                     continue
@@ -174,4 +160,14 @@ class AccountMoveLine(models.Model):
         compute='_can_be_paid',
         copy=False,
         store=True,
-        string='Release to Pay')
+        string='Release to Pay',
+        init_storage=lambda self: (
+            # Create column manually to set default value to 'exception' on postgres level.
+            # This way we avoid heavy computation on module installation.
+            self.env.cr.execute("""
+                UPDATE account_move_line
+                SET can_be_paid = 'exception'
+                WHERE can_be_paid IS NULL
+            """)
+        ),
+    )

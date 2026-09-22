@@ -33,6 +33,7 @@ class Report extends models.Model {
                         <field name="hierarchy_level" column_invisible="1"/>
                         <field name="name"/>
                         <field name="code" optional="hide"/>
+                        <field name="foldability" optional="hide"/>
                     </list>
                 </field>
             </form>
@@ -48,6 +49,13 @@ class ReportLines extends models.Model {
     hierarchy_level = fields.Integer();
     name = fields.Char();
     code = fields.Char();
+    foldability = fields.Selection({
+        selection: [
+            ["always_unfolded", "Always unfolded"],
+            ["foldable", "Foldable"],
+            ["never_unfolded", "Never unfolded"],
+        ],
+    });
 
     _records = [
         {
@@ -56,6 +64,7 @@ class ReportLines extends models.Model {
             hierarchy_level: 1,
             name: "Root without children",
             code: "RWOC",
+            foldability: "never_unfolded",
         },
         {
             id: 2,
@@ -63,6 +72,7 @@ class ReportLines extends models.Model {
             hierarchy_level: 0,
             name: "Root with children",
             code: "RC",
+            foldability: "always_unfolded",
         },
         {
             id: 3,
@@ -70,6 +80,7 @@ class ReportLines extends models.Model {
             hierarchy_level: 3,
             name: "Child #1",
             code: "C1",
+            foldability: "always_unfolded",
         },
         {
             id: 4,
@@ -77,6 +88,7 @@ class ReportLines extends models.Model {
             hierarchy_level: 5,
             name: "Grandchild",
             code: "GC",
+            foldability: "never_unfolded",
         },
         {
             id: 5,
@@ -84,6 +96,7 @@ class ReportLines extends models.Model {
             hierarchy_level: 3,
             name: "Child #2",
             code: "C2",
+            foldability: "never_unfolded",
         },
     ];
 
@@ -248,6 +261,7 @@ test("can move a root down", async () => {
             hierarchy_level: 1,
             name: "dragged",
             code: "D",
+            foldability: "never_unfolded",
         },
         {
             id: 2,
@@ -255,6 +269,7 @@ test("can move a root down", async () => {
             hierarchy_level: 1,
             name: "noChild",
             code: "N",
+            foldability: "never_unfolded",
         },
         {
             id: 3,
@@ -262,6 +277,7 @@ test("can move a root down", async () => {
             hierarchy_level: 0,
             name: "parent",
             code: "P",
+            foldability: "always_unfolded",
         },
         {
             id: 4,
@@ -269,6 +285,7 @@ test("can move a root down", async () => {
             hierarchy_level: 3,
             name: "child",
             code: "C",
+            foldability: "never_unfolded",
         },
     ];
 
@@ -313,6 +330,7 @@ test("can move a root up", async () => {
             hierarchy_level: 0,
             name: "parent",
             code: "P",
+            foldability: "always_unfolded",
         },
         {
             id: 2,
@@ -320,6 +338,7 @@ test("can move a root up", async () => {
             hierarchy_level: 3,
             name: "child",
             code: "C",
+            foldability: "never_unfolded",
         },
         {
             id: 3,
@@ -327,6 +346,7 @@ test("can move a root up", async () => {
             hierarchy_level: 1,
             name: "noChild",
             code: "N",
+            foldability: "never_unfolded",
         },
         {
             id: 4,
@@ -334,6 +354,7 @@ test("can move a root up", async () => {
             hierarchy_level: 1,
             name: "dragged",
             code: "D",
+            foldability: "never_unfolded",
         },
     ];
 
@@ -378,6 +399,7 @@ test("can move a child down", async () => {
             hierarchy_level: 0,
             name: "parent",
             code: "P",
+            foldability: "always_unfolded",
         },
         {
             id: 2,
@@ -385,6 +407,7 @@ test("can move a child down", async () => {
             hierarchy_level: 3,
             name: "dragged",
             code: "D",
+            foldability: "never_unfolded",
         },
         {
             id: 3,
@@ -392,6 +415,7 @@ test("can move a child down", async () => {
             hierarchy_level: 3,
             name: "child",
             code: "C",
+            foldability: "never_unfolded",
         },
         {
             id: 4,
@@ -399,6 +423,7 @@ test("can move a child down", async () => {
             hierarchy_level: 1,
             name: "noChild",
             code: "N",
+            foldability: "never_unfolded",
         },
     ];
 
@@ -443,6 +468,7 @@ test("can move a child up", async () => {
             hierarchy_level: 0,
             name: "parent",
             code: "P",
+            foldability: "always_unfolded",
         },
         {
             id: 2,
@@ -450,6 +476,7 @@ test("can move a child up", async () => {
             hierarchy_level: 3,
             name: "child",
             code: "C",
+            foldability: "never_unfolded",
         },
         {
             id: 3,
@@ -457,6 +484,7 @@ test("can move a child up", async () => {
             hierarchy_level: 3,
             name: "dragged",
             code: "D",
+            foldability: "never_unfolded",
         },
     ];
 
@@ -500,6 +528,7 @@ test("can move a new root into a child", async () => {
             hierarchy_level: 0,
             name: "parent",
             code: "P",
+            foldability: "always_unfolded",
         },
         {
             id: 2,
@@ -507,6 +536,7 @@ test("can move a new root into a child", async () => {
             hierarchy_level: 3,
             name: "child",
             code: "C",
+            foldability: "never_unfolded",
         },
         {
             id: 3,
@@ -514,6 +544,7 @@ test("can move a new root into a child", async () => {
             hierarchy_level: 1,
             name: "noChild",
             code: "N",
+            foldability: "never_unfolded",
         },
     ];
 

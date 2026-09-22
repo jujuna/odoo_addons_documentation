@@ -2,10 +2,11 @@
 
 
 from odoo.tests import Form
-from odoo.tests.common import new_test_user
+from odoo.tests.common import new_test_user, tagged
 from odoo.addons.spreadsheet_edition.tests.spreadsheet_test_case import SpreadsheetTestCase
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class SaleOrderSpreadsheet(SpreadsheetTestCase):
 
     def test_sale_order_action_open(self):
@@ -80,7 +81,7 @@ class SaleOrderSpreadsheet(SpreadsheetTestCase):
 
         # dispatch a revision to the spreadsheet
         revision = self.new_revision_data(spreadsheet)
-        spreadsheet.dispatch_spreadsheet_message(revision)
+        spreadsheet._dispatch_spreadsheet_message(revision)
 
         new_so = sale_order.copy()
         new_so_spreadsheet = new_so.spreadsheet_ids
@@ -138,8 +139,6 @@ class SaleOrderSpreadsheet(SpreadsheetTestCase):
         Test ensures that spreadsheet template is changed on changing sale order template,
         once spreadsheet has been opened.
         """
-        # Ensure user has access to sale order templates
-        self.env.user.group_ids += self.env.ref('sale_management.group_sale_order_template')
         spreadsheet = self.env["sale.order.spreadsheet"].create({"name": "spreadsheet"})
         spreadsheet2 = self.env["sale.order.spreadsheet"].create({"name": "spreadsheet2"})
         quotation_templates = self.env["sale.order.template"].create(

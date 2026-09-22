@@ -23,6 +23,7 @@ class PosConfig(models.Model):
                     raise UserError(_('Ensure that there is an existing bank journal. Check if chart of accounts is installed in your company.'))
                 credit_card_pm = self.env['pos.payment.method'].create({
                     'name': _('Credit Card'),
+                    'type': 'bank',
                     'company_id': self.env.company.id,
                     'journal_id': bank_journal.id,
                     'sequence': 2,

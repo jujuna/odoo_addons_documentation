@@ -19,7 +19,7 @@ class SocialPostTemplate extends models.ServerModel {
             <div class="o_social_preview o_social_twitter_preview bg-white border rounded overflow-hidden w-100">
                 <div class="w-75 d-flex m-3">
                     <span class="o_social_preview_icon_wrapper overflow-hidden me-2">
-                        <i class="fa fa-twitter fa-2x"></i>
+                        <i class="oi oi-2x" data-icon="oi_x"></i>
                     </span>
                     <div class="o_social_preview_header">
                         <b class="text-900">X Account</b>
@@ -32,7 +32,7 @@ class SocialPostTemplate extends models.ServerModel {
                     <span class="o_social_preview_message">Hello <a href="https://twitter.com/Odoo-Social" target="_blank" rel="noreferrer">@Odoo-Social</a>, check this out: <a href="https://www.odoo.com" class="text-truncate" target="_blank" rel="noreferrer">https://www.odoo.com</a> <a href="https://twitter.com/hashtag/crazydeals?src=hash" target="_blank" rel="noreferrer">#crazydeals</a> <a href="https://twitter.com/hashtag/odoo?src=hash" target="_blank" rel="noreferrer">#odoo</a></span>
                 </div>
                 <a target="_blank" href="https://www.odoo.com" rel="noreferrer">
-                    <div class="o_social_stream_post_image d-flex overflow-hidden                         o_social_stream_post_image_clickable">
+                    <div class="o_social_stream_post_content d-flex overflow-hidden o_social_stream_post_content_clickable">
                             <div class="w-100">
                                 <img alt="Post Image" src="https://www.odoo.com/web/image/54404732-3d9bec26/SPI_homepage.png">
                             </div>
@@ -75,7 +75,7 @@ test("SocialPostFormatterMixin on HtmlField is working as expected", async () =>
     expect(htmlValue).toEqual(
         [
             `Hello`,
-            `<a href="https://twitter.com/Odoo-Social" target="_blank">@Odoo-Social</a>,`,
+            `<a href="https://twitter.com/Odoo-Social" class="o_social_comment_mention" target="_blank">@Odoo-Social</a>,`,
             `check this out:`,
             `<a href="https://www.odoo.com" class="text-truncate" target="_blank" rel="noreferrer noopener">https://www.odoo.com</a>`,
             `<a href="https://twitter.com/hashtag/crazydeals?src=hash" target="_blank">#crazydeals</a>`,

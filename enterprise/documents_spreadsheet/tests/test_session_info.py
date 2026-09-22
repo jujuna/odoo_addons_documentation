@@ -2,7 +2,7 @@
 import json
 from uuid import uuid4
 
-from odoo.tests import common
+from odoo.tests import tagged, common
 
 
 class TestSessionInfo(common.HttpCase):

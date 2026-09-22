@@ -2,9 +2,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from .common import HelpdeskCommon
+from odoo.tests import tagged
+
 from odoo.addons.mail.tests.common import mail_new_test_user
+from odoo.exceptions import AccessError
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHelpdeskTeamPrivacyVisibility(HelpdeskCommon):
     @classmethod
     def setUpClass(cls):
@@ -92,3 +96,17 @@ class TestHelpdeskTeamPrivacyVisibility(HelpdeskCommon):
         self.ticket.message_subscribe([self.portal_partner.id])
 
         self.assertTrue(self.search_test_ticket_with_user(self.portal_user), "A Portal User following the ticket should see it.")
+
+    def test_helpdesk_team_subscribe_portal(self):
+        self.test_team.privacy_visibility = 'portal'
+
+        with self.assertRaises(AccessError):
+            self.test_team.with_user(self.portal_user).message_subscribe(
+                partner_ids=[self.portal_partner.id]
+            )
+        self.assertFalse(self.search_test_ticket_with_user(self.portal_user))
+
+        self.test_team.with_user(self.helpdesk_manager).message_subscribe(
+            partner_ids=[self.portal_partner.id]
+        )
+        self.assertTrue(self.search_test_ticket_with_user(self.portal_user))

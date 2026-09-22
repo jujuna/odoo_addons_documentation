@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Enterprise Resellers',
-    'version': '1.0',
     'summary': 'Enterprise counterpart for Resellers',
     'description': 'Enterprise counterpart for Resellers',
     'category': 'Website/Website',

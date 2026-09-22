@@ -1,4 +1,5 @@
 import { markRaw, markup } from "@odoo/owl";
+import { localeCompare } from "@web/core/l10n/utils";
 import { Reactive } from "@web/core/utils/reactive";
 
 function tryParseJSON(jsonString) {
@@ -80,7 +81,7 @@ export class ModelStore extends Reactive {
             const { models } = response;
             console.info("Models List Loaded", models);
 
-            models.sort((a, b) => a.model.localeCompare(b.model));
+            models.sort((a, b) => localeCompare(a.model, b.model));
 
             const addons = {};
             for (const model of models) {
@@ -193,10 +194,10 @@ export class ModelStore extends Reactive {
             } else {
                 result.error = !json
                     ? body
-                    : [
-                        `<h3 class="mb-1">${json.message}</h3>`,
-                        `<pre class="p-2">${json.debug}</pre>`,
-                    ].join("\n");
+                    : {
+                        title: json.message,
+                        traceback: json.debug,
+                    };
             }
         } catch (error) {
             result.error = error;

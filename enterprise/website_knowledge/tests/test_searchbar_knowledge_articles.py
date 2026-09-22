@@ -13,4 +13,4 @@ class TestSearchbarKnowledgeArticles(HttpCase):
             "is_article_visible_by_everyone": True,
             "website_published": True
         }])
-        self.start_tour(self.env["website"].get_client_action_url("/"), "test_searchbar_within_knowledge_articles", login="admin")
+        self.start_tour(self.env["website"].get_client_action_url("/", True), "test_searchbar_within_knowledge_articles", login="admin")

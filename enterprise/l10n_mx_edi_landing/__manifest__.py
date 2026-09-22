@@ -1,11 +1,9 @@
-# coding: utf-8
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Odoo Mexico Localization for Stock/Landing',
     'countries': ['mx'],
     'summary': 'Generate Electronic Invoice with custom numbers',
-    'version': '1.0',
     'category': 'Accounting/Localizations/EDI',
     'depends': [
         'stock_landed_costs',
@@ -20,9 +18,7 @@
         'views/stock_quant_views.xml',
         'views/account_move_views.xml',
         'views/product_template_views.xml',
-        'views/report_invoice.xml',
     ],
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

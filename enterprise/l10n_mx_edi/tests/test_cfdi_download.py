@@ -1,7 +1,9 @@
 from freezegun import freeze_time
 from io import BytesIO
 from zipfile import ZipFile
+from lxml import etree
 
+from odoo import Command
 from odoo.tests.common import HttpCase, tagged
 from .common import TestMxEdiCommon
 
@@ -9,11 +11,13 @@ from .common import TestMxEdiCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestCFDIDownload(TestMxEdiCommon, HttpCase):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time('2017-01-01')
     def test_cfdi_download(self):
-        invoice_1 = self._create_invoice()
-        invoice_2 = self._create_invoice()
-        invoice_3 = self._create_invoice()
+        invoice_1 = self._create_invoice_mx()
+        invoice_2 = self._create_invoice_mx()
+        invoice_3 = self._create_invoice_mx()
         invoices = invoice_1 + invoice_2 + invoice_3
         with self.with_mocked_pac_sign_success():
             invoice_2._l10n_mx_edi_cfdi_invoice_try_send()
@@ -44,21 +48,20 @@ class TestCFDIDownload(TestMxEdiCommon, HttpCase):
 
     @freeze_time('2017-01-01')
     def test_payment_download(self):
-        invoice = self._create_invoice()
+        invoice = self._create_invoice_mx()
         with self.with_mocked_pac_sign_success():
             invoice._l10n_mx_edi_cfdi_invoice_try_send()
 
         payment = self.env['account.payment.register']\
             .with_context(active_model='account.move', active_ids=invoice.ids)\
             .create([{
-                'payment_date': '2017-06-01',
+                'payment_date': '2017-01-01',
                 'amount': 1160.0,
             }])\
             ._create_payments()
 
         with freeze_time('2017-01-01'), self.with_mocked_pac_sign_success():
             invoice.l10n_mx_edi_cfdi_invoice_try_update_payments()
-            payment.l10n_mx_edi_payment_document_ids.action_force_payment_cfdi()
 
         action_download = payment.l10n_mx_edi_payment_document_ids[0].action_download_file()
         self.authenticate(self.env.user.login, self.env.user.login)
@@ -68,7 +71,7 @@ class TestCFDIDownload(TestMxEdiCommon, HttpCase):
 
     @freeze_time('2017-01-01')
     def test_bank_transaction_download(self):
-        invoice = self._create_invoice()
+        invoice = self._create_invoice_mx()
         with self.with_mocked_pac_sign_success():
             invoice._l10n_mx_edi_cfdi_invoice_try_send()
 
@@ -83,10 +86,76 @@ class TestCFDIDownload(TestMxEdiCommon, HttpCase):
         bank_statement.set_line_bank_statement_line(invoice.line_ids.filtered(lambda account: account.account_type == 'asset_receivable').ids)
         with freeze_time('2017-01-01'), self.with_mocked_pac_sign_success():
             invoice.l10n_mx_edi_cfdi_invoice_try_update_payments()
-            bank_statement.l10n_mx_edi_payment_document_ids.action_force_payment_cfdi()
 
         action_download = bank_statement.l10n_mx_edi_payment_document_ids[0].action_download_file()
         self.authenticate(self.env.user.login, self.env.user.login)
         res = self.url_open(action_download['url'])
 
         self.assertEqual(res.status_code, 200)
+
+    @freeze_time('2017-01-01')
+    def test_bank_statement_download_with_bank_accounts(self):
+        def _evaluate_payment_reported_bank_vat(partner_name, country=None, account_number=None, l10n_mx_edi_vat=None):
+            partner = self.env['res.partner'].create({
+                'name': partner_name,
+                'country_id': country.id if country else None,
+                'bank_ids': [Command.create({
+                    'account_number': account_number,
+                    'l10n_mx_edi_vat': l10n_mx_edi_vat,
+                    'country_id': country.id if country else None,
+                })] if account_number else [],
+            })
+            invoice = self._create_invoice_mx(partner_id=partner.id)
+
+            with self.with_mocked_pac_sign_success():
+                invoice._l10n_mx_edi_cfdi_invoice_try_send()
+
+            bank_statement = self.env['account.bank.statement.line'].create([{
+                'journal_id': self.company_data['default_journal_bank'].id,
+                'payment_ref': 'payment_move_line',
+                'partner_id': partner.id,
+                'amount': 1160,
+                'date': '2017-01-01',
+            }])
+            bank_statement.set_line_bank_statement_line(invoice.line_ids.filtered(lambda account: account.account_type == 'asset_receivable').ids)
+
+            with freeze_time('2017-01-01'), self.with_mocked_pac_sign_success():
+                invoice.l10n_mx_edi_cfdi_invoice_try_update_payments()
+
+            attachment = bank_statement.l10n_mx_edi_payment_document_ids[0].attachment_id
+            result = etree.fromstring(attachment.raw.content).xpath("//*[local-name()='Pago']/@RfcEmisorCtaOrd")
+            return result[0] if result else None
+
+        reported_vat = _evaluate_payment_reported_bank_vat(
+            partner_name='Partner with Mexican bank and vat',
+            country=self.env.ref('base.mx'),
+            account_number='002010077777777771',
+            l10n_mx_edi_vat='BNM840515VB1',
+        )
+        self.assertEqual(reported_vat, 'BNM840515VB1')
+
+        reported_vat = _evaluate_payment_reported_bank_vat(
+            partner_name='Partner with Mexican bank and no vat',
+            country=self.env.ref('base.mx'),
+            account_number='002010077777777771',
+        )
+        self.assertFalse(reported_vat)
+
+        reported_vat = _evaluate_payment_reported_bank_vat(
+            partner_name='Partner with non Mexican bank',
+            country=self.env.ref('base.us'),
+            account_number='1233',
+        )
+        self.assertEqual(reported_vat, 'XEXX010101000')
+
+        reported_vat = _evaluate_payment_reported_bank_vat(
+            partner_name='Partner with no bank',
+            country=self.env.ref('base.us'),
+        )
+        self.assertFalse(reported_vat)
+
+        reported_vat = _evaluate_payment_reported_bank_vat(
+            partner_name='Partner with bank and no country',
+            account_number='1123',
+        )
+        self.assertFalse(reported_vat)

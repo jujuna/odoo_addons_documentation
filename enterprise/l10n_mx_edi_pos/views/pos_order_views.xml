@@ -17,7 +17,7 @@
                         invisible="not l10n_mx_edi_update_sat_needed"/>
             </xpath>
 
-            <xpath expr="//group[@name='order_fields']" position="inside">
+            <xpath expr="//group[@name='order_operational_details']" position="inside">
                 <field name="l10n_mx_edi_cfdi_state"
                        invisible="not l10n_mx_edi_cfdi_state or country_code != 'MX'"/>
                 <field name="l10n_mx_edi_cfdi_sat_state"
@@ -56,7 +56,7 @@
                             <button name="action_show_document"
                                     type="object"
                                     string="Show"
-                                    invisible="not show_button_needed"/>
+                                    invisible="not show_button_needed or parent.id == pos_order_ids"/>
                             <button name="action_download_file"
                                     type="object"
                                     string="Download"

@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { Property } from "@web_studio/client_action/view_editor/property/property";
 import { ModifiersProperties } from "@web_studio/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties";
 import { ViewStructureProperties } from "@web_studio/client_action/view_editor/interactive_editor/properties/view_structure_properties/view_structure_properties";
@@ -11,7 +11,10 @@ export class GroupProperties extends Component {
         Property,
         ViewStructureProperties,
     };
-    static props = ["node"];
+
+    props = useProps({
+        node: t.object(),
+    });
 
     setup() {
         this.editNodeAttributes = useEditNodeAttributes();

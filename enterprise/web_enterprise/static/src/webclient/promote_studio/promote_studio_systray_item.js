@@ -8,7 +8,6 @@ import { Component } from "@odoo/owl";
 
 export class PromoteStudioSystrayItem extends Component {
     static template = "web_enterprise.SystrayItem";
-    static props = {};
 
     setup() {
         this.dialog = useService("dialog");

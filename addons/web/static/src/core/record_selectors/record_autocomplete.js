@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { AutoComplete } from "@web/core/autocomplete/autocomplete";
 import { _t } from "@web/core/l10n/translation";
 import { Domain } from "@web/core/domain";
@@ -6,22 +6,23 @@ import { registry } from "@web/core/registry";
 import { useOwnedDialogs, useService } from "@web/core/utils/hooks";
 
 const SEARCH_LIMIT = 7;
-const SEARCH_MORE_LIMIT = 320;
+const SEARCH_MORE_LIMIT = 1000;
 
 export class RecordAutocomplete extends Component {
-    static props = {
-        resModel: String,
-        update: Function,
-        multiSelect: Boolean,
-        getIds: Function,
-        value: String,
-        domain: { type: Array, optional: true },
-        context: { type: Object, optional: true },
-        className: { type: String, optional: true },
-        fieldString: { type: String, optional: true },
-        placeholder: { type: String, optional: true },
-        slots: { optional: true },
-    };
+    props = useProps({
+        resModel: t.string(),
+        update: t.function(),
+        multiSelect: t.boolean(),
+        getIds: t.function(),
+        value: t.string(),
+        domain: t.array().optional(),
+        context: t.object().optional(),
+        className: t.string().optional(),
+        fieldString: t.string().optional(),
+        placeholder: t.string().optional(),
+        slots: t.any().optional(),
+        buildQuickCreate: t.function().optional(),
+    });
     static components = { AutoComplete };
     static template = "web.RecordAutocomplete";
 
@@ -72,9 +73,20 @@ export class RecordAutocomplete extends Component {
             });
         }
         if (options.length === 0) {
-            options.push({ label: _t("(no result)") });
+            const quickCreateOption = this.getQuickCreateOption({ request: name });
+            if (quickCreateOption) {
+                options.push(quickCreateOption);
+            } else {
+                options.push({ label: _t("(no result)") });
+            }
         }
         return options;
+    }
+
+    getQuickCreateOption({ request }) {
+        if (!!this.props.buildQuickCreate && request.length > 0) {
+            return this.props.buildQuickCreate({ request });
+        }
     }
 
     async onSearchMore(name) {
@@ -100,8 +112,12 @@ export class RecordAutocomplete extends Component {
             : undefined;
         // fine for now but we don't like this kind of dependence of core to views
         const SelectCreateDialog = registry.category("dialogs").get("select_create");
+        let title = _t("Search");
+        if (fieldString && fieldString.trim()) {
+            title = _t("Search: %s", fieldString);
+        }
         this.addDialog(SelectCreateDialog, {
-            title: _t("Search: %s", fieldString),
+            title,
             dynamicFilters,
             domain: this.getDomain(),
             resModel,

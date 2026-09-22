@@ -1,10 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import base64
 
 from odoo import fields, models, _
+from odoo.tools import BinaryBytes
 from ..api.swissdec_declarations import SwissdecDeclaration, SwissdecInstitution
 import re
-import base64
 import math
+import time
 
 
 class L10nCHInsuranceReport(models.Model):
@@ -40,7 +42,7 @@ class L10nCHInsuranceReport(models.Model):
                                         "default_year": declaration.year,
                                         "default_income_to_split": avs_salary
                                     }),
-                                    'blocking': "all",
+                                    'level': "warning",
                                     "action_text": _("Split AVS Salary"),
                                 }
                                 i += 1
@@ -93,7 +95,7 @@ class L10nCHInsuranceReport(models.Model):
         if report_pdf:
             attachment = self.env['ir.attachment'].create({
                 'name': f"AVS_Report_{self.year}.pdf",
-                'datas': report_pdf,  # Must be base64-encoded already
+                'raw': BinaryBytes(base64.b64decode(report_pdf)),
                 'res_id': self.id,
                 'res_model': self._name,
             })
@@ -112,7 +114,7 @@ class L10nCHInsuranceReport(models.Model):
         if report_pdf:
             attachment = self.env['ir.attachment'].create({
                 'name': f"AVS_Free_Report_{self.year}.pdf",
-                'datas': report_pdf,
+                'raw': BinaryBytes(base64.b64decode(report_pdf)),
                 'res_id': self.id,
                 'res_model': self._name,
             })
@@ -131,7 +133,7 @@ class L10nCHInsuranceReport(models.Model):
         if report_pdf:
             attachment = self.env['ir.attachment'].create({
                 'name': f"FAK_Report_{self.year}.pdf",
-                'datas': report_pdf,
+                'raw': BinaryBytes(base64.b64decode(report_pdf)),
                 'res_id': self.id,
                 'res_model': self._name,
             })
@@ -150,7 +152,7 @@ class L10nCHInsuranceReport(models.Model):
         if report_pdf:
             attachment = self.env['ir.attachment'].create({
                 'name': f"KTG_Report_{self.year}.pdf",
-                'datas': report_pdf,
+                'raw': BinaryBytes(base64.b64decode(report_pdf)),
                 'res_id': self.id,
                 'res_model': self._name,
             })
@@ -169,7 +171,7 @@ class L10nCHInsuranceReport(models.Model):
         if report_pdf:
             attachment = self.env['ir.attachment'].create({
                 'name': f"LAA_Report_{self.year}.pdf",
-                'datas': report_pdf,
+                'raw': BinaryBytes(base64.b64decode(report_pdf)),
                 'res_id': self.id,
                 'res_model': self._name,
             })
@@ -188,7 +190,7 @@ class L10nCHInsuranceReport(models.Model):
         if report_pdf:
             attachment = self.env['ir.attachment'].create({
                 'name': f"LAAC_Report_{self.year}.pdf",
-                'datas': report_pdf,
+                'raw': BinaryBytes(base64.b64decode(report_pdf)),
                 'res_id': self.id,
                 'res_model': self._name,
             })
@@ -207,7 +209,7 @@ class L10nCHInsuranceReport(models.Model):
         if report_pdf:
             attachment = self.env['ir.attachment'].create({
                 'name': f"TXB_Report_{self.year}.pdf",
-                'datas': report_pdf,
+                'raw': BinaryBytes(base64.b64decode(report_pdf)),
                 'res_id': self.id,
                 'res_model': self._name,
             })
@@ -226,7 +228,7 @@ class L10nCHInsuranceReport(models.Model):
         if report_pdf.get('tax_accounting_global.pdf'):
             attachment = self.env['ir.attachment'].create({
                 'name': f"Tax_Accounting_Report_{self.year}.pdf",
-                'datas': report_pdf.get('tax_accounting_global.pdf'),
+                'raw': BinaryBytes(base64.b64decode(report_pdf.get('tax_accounting_global.pdf'))),
                 'res_id': self.id,
                 'res_model': self._name,
             })
@@ -279,6 +281,7 @@ class L10nCHInsuranceReport(models.Model):
             if not match:
                 continue
             registration = match.group(1)
+            pdf_raw = BinaryBytes(base64.b64decode(pdf_b64))
 
             employee = employees_mapped_by_registration_number.get(registration, self.env['hr.employee'])
 
@@ -287,15 +290,15 @@ class L10nCHInsuranceReport(models.Model):
                     'employee_id': employee.id,
                     'res_model': self._name,
                     'res_id': self.id,
-                    'pdf_filename': _("Wage_statement_%(year)s_%(name)s", year=self.year, name=employee.name),
+                    'pdf_filename': _("Wage_statement_%(year)s_%(name)s_%(timestamp)s", year=self.year, name=employee.name, timestamp=time.time_ns()),
                     'pdf_to_generate': False,
                     'state': 'pdf_generated',
-                    'pdf_file': pdf_b64
+                    'pdf_file': pdf_raw,
                 })
             else:
                 attachment = self.env['ir.attachment'].create({
                     'name': f"Tax_Accounting_Report_{self.year}_{registration}.pdf",
-                    'datas': pdf_b64,
+                    'raw': pdf_raw,
                     'res_id': self.id,
                     'res_model': self._name,
                 })
@@ -326,8 +329,14 @@ class L10nCHInsuranceReport(models.Model):
         if message:
             attachment = self.env['ir.attachment'].create({
                 'name': _("EIV_%s.xml", self.name),
-                'datas': base64.encodebytes(message.encode()),
+                'raw': BinaryBytes(message.encode()),
                 'res_id': self.id,
                 'res_model': self._name,
             })
             self.message_post(attachment_ids=[attachment.id], body=_('EIV File Successfully Generated'))
+
+    def _get_posted_mail_template(self):
+        return self.env.ref('documents_hr_payroll.mail_template_new_declaration', raise_if_not_found=False)
+
+    def _get_posted_document_owner(self, employee):
+        return employee.user_id

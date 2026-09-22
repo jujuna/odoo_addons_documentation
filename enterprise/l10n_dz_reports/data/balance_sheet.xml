@@ -4,6 +4,7 @@
         <field name="name">Balance sheet</field>
         <field name="name@fr">Bilan</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
@@ -93,8 +94,6 @@
                                 <field name="name">Goodwill</field>
                                 <field name="name@fr">Ecart d'acquisition (ou goodwill)</field>
                                 <field name="code">l10n_dz_goodwill</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_goodwill_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -117,8 +116,6 @@
                                 <field name="name">Intangible assets</field>
                                 <field name="name@fr">Immobilisations incorporelles</field>
                                 <field name="code">l10n_dz_intangible_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_intangible_assets_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -163,8 +160,6 @@
                                         <field name="name">Property</field>
                                         <field name="name@fr">Terrains</field>
                                         <field name="code">l10n_dz_property</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_property_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -187,8 +182,6 @@
                                         <field name="name">Plants</field>
                                         <field name="name@fr">Bâtiments</field>
                                         <field name="code">l10n_dz_plants</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_plants_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -211,8 +204,6 @@
                                         <field name="name">Other tangible assets</field>
                                         <field name="name@fr">Autres immobilisations corporelles</field>
                                         <field name="code">l10n_dz_other_tangible_assets</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_other_tangible_assets_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -235,8 +226,6 @@
                                         <field name="name">Assets under concession</field>
                                         <field name="name@fr">Immobilisations en concession</field>
                                         <field name="code">l10n_dz_assets_under_concession</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_assets_under_concession_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -261,8 +250,6 @@
                                 <field name="name">Assets in progress</field>
                                 <field name="name@fr">Immobilisations en cours</field>
                                 <field name="code">l10n_dz_assets_in_progress</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_assets_in_progress_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -307,8 +294,6 @@
                                         <field name="name">Investments in associates</field>
                                         <field name="name@fr">Titres mis en équivalence - entreprises associées</field>
                                         <field name="code">l10n_dz_investments_in_associates</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_investments_in_associates_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -326,8 +311,6 @@
                                         <field name="name">Other investments and related receivables</field>
                                         <field name="name@fr">Autres participations et créances rattachées</field>
                                         <field name="code">l10n_dz_other_investments_and_related_receivables</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_other_investments_and_related_receivables_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -350,8 +333,6 @@
                                         <field name="name">Other fixed assets</field>
                                         <field name="name@fr">Autres titres immobilisés</field>
                                         <field name="code">l10n_dz_other_fixed_assets</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_other_fixed_assets_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -374,8 +355,6 @@
                                         <field name="name">Loans and other non-current financial assets</field>
                                         <field name="name@fr">Prêts et autres actifs financiers non courants</field>
                                         <field name="code">l10n_dz_Loans_and_other_non_current_financial_assets</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_Loans_and_other_non_current_financial_assets_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -400,8 +379,6 @@
                                 <field name="name">Deferred taxes - Assets</field>
                                 <field name="name@fr">Impôts différés – Actif</field>
                                 <field name="code">l10n_dz_deferred_taxes_assets</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_deferred_taxes_assets_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -443,8 +420,6 @@
                                 <field name="name">Inventories</field>
                                 <field name="name@fr">Stock et encours</field>
                                 <field name="code">l10n_dz_inventories</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_inventories_gross" model="account.report.expression">
                                         <field name="label">gross</field>
@@ -489,8 +464,6 @@
                                         <field name="name">Clients</field>
                                         <field name="name@fr">Clients</field>
                                         <field name="code">l10n_dz_clients</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_clients_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -513,8 +486,6 @@
                                         <field name="name">Other debtors</field>
                                         <field name="name@fr">Autres débiteurs</field>
                                         <field name="code">l10n_dz_other_debtors</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_other_debtors_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -537,8 +508,6 @@
                                         <field name="name">Taxes (assets)</field>
                                         <field name="name@fr">Impôts</field>
                                         <field name="code">l10n_dz_taxes_assets</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_taxes_assets_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -556,8 +525,6 @@
                                         <field name="name">Other current assets</field>
                                         <field name="name@fr">Autres actifs courants</field>
                                         <field name="code">l10n_dz_other_current_assets</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_other_current_assets_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -599,8 +566,6 @@
                                         <field name="name">Investments and other current financial assets</field>
                                         <field name="name@fr">Placements et autres actifs financiers courants</field>
                                         <field name="code">l10n_dz_investments_and_other_current_financial_assets</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_investments_and_other_current_financial_assets_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -618,8 +583,6 @@
                                         <field name="name">Treasury</field>
                                         <field name="name@fr">Trésorerie</field>
                                         <field name="code">l10n_dz_treasury</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_dz_bs_treasury_gross" model="account.report.expression">
                                                 <field name="label">gross</field>
@@ -674,8 +637,6 @@
                                 <field name="name">Issued capital</field>
                                 <field name="name@fr">Capital émis (ou compte de l'exploitant)</field>
                                 <field name="code">l10n_dz_issued_capital</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_issued_capital_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -688,8 +649,6 @@
                                 <field name="name">Uncalled capital</field>
                                 <field name="name@fr">Capital non appelé</field>
                                 <field name="code">l10n_dz_uncalled_capital</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_uncalled_capital_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -702,8 +661,6 @@
                                 <field name="name">Premiums and reserves</field>
                                 <field name="name@fr">Primes et réserves</field>
                                 <field name="code">l10n_dz_premiums_and_reserves</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_premiums_and_reserves_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -716,8 +673,6 @@
                                 <field name="name">Revaluation surplus</field>
                                 <field name="name@fr">Ecart de réévaluation</field>
                                 <field name="code">l10n_dz_revaluation_surplus</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_revaluation_surplus_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -730,8 +685,6 @@
                                 <field name="name">Equivalence difference</field>
                                 <field name="name@fr">Ecart d'équivalence</field>
                                 <field name="code">l10n_dz_equivalence_difference</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_equivalence_difference_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -749,7 +702,7 @@
                                         <field name="label">net</field>
                                         <field name="engine">aggregation</field>
                                         <field name="formula">l10n_dz_X.balance</field>
-                                        <field name="subformula">cross_report(l10n_dz_reports.l10n_dz_pl)</field>
+                                        <field name="subformula">cross_report(l10n_dz_reports.l10n_dz_pl, force_date_scope)</field>
                                         <field name="date_scope">from_fiscalyear</field>
                                     </record>
                                 </field>
@@ -758,7 +711,6 @@
                                 <field name="name">Other equity - Retained earnings</field>
                                 <field name="name@fr">Autres capitaux propres - Report à nouveau</field>
                                 <field name="code">l10n_dz_other_equity</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_other_equity_net_account_codes" model="account.report.expression">
                                         <field name="label">net_account_codes</field>
@@ -792,8 +744,6 @@
                                 <field name="name">Borrowings and financial liabilities</field>
                                 <field name="name@fr">Emprunts et dettes financières</field>
                                 <field name="code">l10n_dz_borrowings_and_financial_liabilities</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_borrowings_and_financial_liabilities_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -806,8 +756,6 @@
                                 <field name="name">Taxes (deferred and provisioned)</field>
                                 <field name="name@fr">Impôts (différés et provisionnés)</field>
                                 <field name="code">l10n_dz_taxes_deferred_and_provisioned</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_taxes_deferred_and_provisioned_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -820,8 +768,6 @@
                                 <field name="name">Other non-current liabilities</field>
                                 <field name="name@fr">Autres dettes non courantes</field>
                                 <field name="code">l10n_dz_other_non_current_liabilities</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_other_non_current_liabilities_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -834,8 +780,6 @@
                                 <field name="name">Provisions and deferred income</field>
                                 <field name="name@fr">Provisions et produits comptabilisés d'avance</field>
                                 <field name="code">l10n_dz_provisions_and_deferred_income</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_provisions_and_deferred_income_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -862,8 +806,6 @@
                                 <field name="name">Accounts payable and related accounts</field>
                                 <field name="name@fr">Fournisseurs et comptes rattachés</field>
                                 <field name="code">l10n_dz_payables</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_payables_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -876,8 +818,6 @@
                                 <field name="name">Taxes (liabilities)</field>
                                 <field name="name@fr">Impôts</field>
                                 <field name="code">l10n_dz_taxes_liabilities</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_taxes_liabilities_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -890,8 +830,6 @@
                                 <field name="name">Other liabilities</field>
                                 <field name="name@fr">Autres dettes</field>
                                 <field name="code">l10n_dz_other_liabilities</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_other_liabilities_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -904,8 +842,6 @@
                                 <field name="name">Treasury Liabilities</field>
                                 <field name="name@fr">Trésorerie Passif</field>
                                 <field name="code">l10n_dz_treasury_liabilities</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_dz_bs_treasury_liabilities_net" model="account.report.expression">
                                         <field name="label">net</field>
@@ -922,9 +858,7 @@
                 <field name="name">OFF-BALANCE SHEET ACCOUNTS</field>
                 <field name="name@fr">COMPTES HORS BILAN</field>
                 <field name="code">l10n_dz_off_sheet</field>
-                <field name="groupby">account_id</field>
                 <field name="hide_if_zero" eval="1"/>
-                <field name="foldable" eval="True"/>
                 <field name="domain_formula">-sum([('account_id.account_type', '=', 'off_balance')])</field>
                 <field name="horizontal_split_side">right</field>
                 <field name="hierarchy_level">0</field>

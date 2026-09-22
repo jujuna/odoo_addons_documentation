@@ -13,12 +13,12 @@ patch(PosStore.prototype, {
             if (
                 (isRefund &&
                     currentOrder.lines.some(
-                        (x) => x.price_subtotal > 0.0 && !x.refunded_orderline_id && !x.coupon_id
+                        (x) => x.price_subtotal > 0.0 && !x.refunded_orderline_id && !x.card_id
                     )) ||
                 (!isRefund && this.currency.isNegative(currentOrder.amount_total))
             ) {
                 this.dialog.add(AlertDialog, {
-                    title: _t("Error"),
+                    title: _t("Oh snap !"),
                     body: _t(
                         "The amount of the order must be positive for a sale and negative for a refund."
                     ),

@@ -4,6 +4,7 @@
     <record id="action_synchronize_all_databases" model="ir.actions.server">
         <field name="name">Synchronize all the Databases</field>
         <field name="model_id" ref="model_project_project"/>
+        <field name="group_ids" eval="[Command.link(ref('databases.group_databases_user'))]"/>
         <field name="state">code</field>
         <field name="code">
             action = model.action_synchronize_all_databases()
@@ -45,7 +46,7 @@
         <field name="model">project.project</field>
         <field name="priority" eval="20"/>
         <field name="arch" type="xml">
-            <list action="action_view_tasks" type="object" class="o_databases_list" js_class="databases_project_list">
+            <list action="action_view_tasks" multi_edit="1" type="object" class="o_databases_list" js_class="databases_project_list">
                 <header>
                     <button name="databases.action_synchronize_all_databases" type="action" string="Synchronize"
                         display="always" groups="databases.group_databases_user"/>
@@ -61,11 +62,24 @@
                 <field name="database_nb_users" optional="show" string="Users" invisible="database_nb_users == 0"/>
                 <field name="database_kpi_properties"/>
                 <field name="database_last_synchro" optional="hide"/>
-                <button icon="fa-sign-in" string="Connect" name="action_database_connect" type="object"
+                <button icon="login" string="Connect" name="action_database_connect" type="object"
                         invisible="not database_can_access"/>
-                <button icon="fa-gear" string="Settings" name="action_open_self" type="object"
+                <button icon="settings" icon_class="oi-filled" string="Settings" name="action_open_self" type="object"
                         groups="databases.group_databases_manager"/>
             </list>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_databases_project_filter">
+        <field name="name">project.project.view.inherit.databases</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_project_filter"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <search position="inside">
+                <field name="database_user_ids"
+                       filter_domain="['|', ('database_user_ids.name', 'ilike', self), ('database_user_ids.login', 'ilike', self)]"/>
+            </search>
         </field>
     </record>
 
@@ -76,6 +90,7 @@
         <field name="domain">[("database_hosting", "!=", False)]</field>
         <field name="view_mode">list,kanban,form,calendar,activity</field>
         <field name="view_id" ref="view_databases_list"/>
+        <field name="search_view_id" ref="view_databases_project_filter"/>
         <field name="context">{'default_privacy_visibility': 'followers', 'databases_template': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -127,7 +142,7 @@
                             <field name="database_url" invisible="not database_hosting" required="database_hosting"/>
                             <field name="database_name" invisible="(database_hosting or 'other') == 'other'"/>
                             <field name="database_api_login" invisible="(database_hosting or 'other') == 'other'"/>
-                            <field name="database_api_key" invisible="(database_hosting or 'other') == 'other'"/>
+                            <field name="database_api_key" password="1" invisible="(database_hosting or 'other') == 'other'"/>
                         </group>
                         <group invisible="(database_hosting or 'other') == 'other' and not is_template">
                             <span class="o_wrap_label"><span class="o_form_label">Fetch</span></span>
@@ -140,7 +155,7 @@
                         </group>
                     </group>
                     <group string="User Management" invisible="not database_hosting or is_template">
-                        <field name="database_user_ids" colspan="2" nolabel="1" options="{'write': false, 'delete': false}">
+                        <field name="database_user_ids" colspan="2" nolabel="1" write="False" delete="False">
                             <list>
                                 <control>
                                     <button name="action_invite_users" type="object" string="Add a user" class="btn-link" groups="databases.group_databases_manager"/>
@@ -149,7 +164,7 @@
                                 <field name="login"/>
                                 <field name="latest_authentication"/>
                                 <field name="local_user_id" widget="many2one_avatar_user"/>
-                                <button name="action_remove_users" type="object" groups="databases.group_databases_manager" icon="fa-trash" title="Remove User" invisible="local_user_id == uid"/>
+                                <button name="action_remove_users" type="object" groups="databases.group_databases_manager" icon="delete" icon_class="oi-filled" title="Remove User" invisible="local_user_id == uid"/>
                             </list>
                         </field>
                     </group>

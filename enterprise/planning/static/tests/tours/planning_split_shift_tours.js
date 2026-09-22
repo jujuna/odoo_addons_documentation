@@ -18,11 +18,9 @@ async function splitPill(helpers, index = 0) {
 }
 
 registry.category("web_tour.tours").add('planning_split_shift_week', {
-    url: '/odoo?debug=tests',
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Let's start managing your employees' schedule!",
-    tooltipPosition: 'bottom',
     run: "click",
 }, {
     trigger: '.o_gantt_renderer_controls .dropdown-toggle:contains("Week")',
@@ -35,7 +33,7 @@ registry.category("web_tour.tours").add('planning_split_shift_week', {
     async run({ click, waitFor }) {
         await click();
         await waitFor(`.o_popover`, { timeout: 2000 });
-        await click(`.o_popover button:contains(delete)`);
+        await click(`.o_popover button.btn-delete`);
         await waitFor(`.modal`, { timeout: 2000 });
         await click(`.modal button:contains(delete)`);
     }
@@ -54,7 +52,7 @@ registry.category("web_tour.tours").add('planning_split_shift_week', {
     content: "Write domain excluding open shifts",
     run() {
         const input = document.querySelector(".o_domain_selector_debug_container textarea")
-        input.value = '[("resource_id", "!=", False)]';
+        input.value = '[("resource_ids", "!=", False)]';
         input.dispatchEvent(new Event("change", { bubbles: true, cancelable: false }));
     }
 }, {
@@ -112,8 +110,14 @@ registry.category("web_tour.tours").add('planning_split_shift_week', {
 }, {
     trigger: ".o_gantt_cells .o_gantt_pill_wrapper:eq(3)",
     content: "Wait for 4 pills to be displayed",
-},
-{
+}, {
+    trigger: ".o_gantt_renderer_controls button:has([data-icon='dock_to_left'])",
+    content: "Hide the side panel to ensure split shifts remain visible",
+    run: "click",
+}, {
+    trigger: "body:not(:has(.o_gantt_sidepanel))",
+    content: "Wait for the side panel to be hidden",
+}, {
     trigger: ".o_gantt_pill_wrapper[data-pill-id='__pill__1'] .o_gantt_pill",
     content: "Split the slot assigned to Aramis after one day",
     async run(helpers) {

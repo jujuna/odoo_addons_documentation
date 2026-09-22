@@ -5,44 +5,55 @@ import { TextField, textField } from "@web/views/fields/text/text_field";
 import { Tooltip } from "@web/core/tooltip/tooltip";
 import { usePopover } from "@web/core/popover/popover_hook";
 
-import { useRef } from "@odoo/owl";
-
+import { signal } from "@odoo/owl";
 
 export class WhatsappVariablesTextField extends TextField {
     static template = "whatsapp.WhatsappVariablesTextField";
     static components = { ...TextField.components };
+    variablesButtonRef = signal.ref();
+
     setup() {
         super.setup();
-        this.textareaRef = useRef('textarea');
-        this.variablesButton = useRef('variablesButton');
         this.popover = usePopover(Tooltip, { animation: false, position: "left" });
     }
 
     _onClickAddVariables() {
-        const originalContent = this.textareaRef.el.value;
-        const start = this.textareaRef.el.selectionStart;
-        const end = this.textareaRef.el.selectionEnd;
+        const originalContent = this.textareaRef().value;
+        const start = this.textareaRef().selectionStart;
+        const end = this.textareaRef().selectionEnd;
 
-        const matches = Array.from(originalContent.matchAll(/{{(\d+)}}/g));
-        const integerList = matches.map(match => parseInt(match[1]));
-        const nextVariable = Math.max(...integerList, 0) + 1;
+        const matches = Array.from(originalContent.matchAll(/{{([^{}]*)}}/g));
+        const variableType = this.props.record.data.variable_type;
 
-        if (nextVariable > 10){
+        if (matches.length >= 10) {
             // Show tooltip
-            this.popover.open(this.variablesButton.el, { tooltip: _t("You can set a maximum of 10 variables.") });
+            this.popover.open(this.variablesButtonRef(), {
+                tooltip: _t("You can set a maximum of 10 variables."),
+            });
             browser.setTimeout(this.popover.close, 2600);
             return;
         }
 
-        const separator = originalContent.slice(0, start) ? ' ' : '';
-        this.textareaRef.el.value = originalContent.slice(0, start) + separator + '{{' + nextVariable + '}}' + originalContent.slice(end, originalContent.length);
+        let newVariable = "{{}}";
+        if (variableType === "positional") {
+            const numberedMatches = matches.map(m => m[1]).filter(s => /^\d+$/.test(s)).map(Number);
+            const nextVariable = Math.max(...numberedMatches, 0) + 1;
+            newVariable = `{{${nextVariable}}}`;
+        }
+        const separator = originalContent.slice(0, start) ? " " : "";
+        this.textareaRef().value =
+            originalContent.slice(0, start) +
+            separator +
+            newVariable +
+            originalContent.slice(end, originalContent.length);
         // Trigger onInput from input_field hook to set field as dirty
-        this.textareaRef.el.dispatchEvent(new InputEvent("input"));
-        // Keydown on "enter" serves to both commit the changes in input_field and trigger onchange for some fields
-        this.textareaRef.el.dispatchEvent(new KeyboardEvent("keydown", {key: 'Enter'}));
-        this.textareaRef.el.focus();
-        const newCursorPos = start + separator.length + nextVariable.toString().length + 4; // 4 is the number of brackets {{ }}
-        this.textareaRef.el.setSelectionRange(newCursorPos, newCursorPos);
+        this.textareaRef().dispatchEvent(new InputEvent("input"));
+        // Change event serves to both commit the changes in input_field and trigger onchange for some fields
+        this.textareaRef().dispatchEvent(new Event("change"));
+        this.textareaRef().focus();
+        const cursorOffset = variableType === "named" ? 2 : newVariable.length;
+        const newCursorPos = start + separator.length + cursorOffset;
+        this.textareaRef().setSelectionRange(newCursorPos, newCursorPos);
     }
 }
 

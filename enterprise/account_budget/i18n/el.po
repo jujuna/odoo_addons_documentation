@@ -15,30 +15,37 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~12.1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:23+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Greek <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:13+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Greek <https://translate.odoo.com/projects/odoo-master/"
 "account_budget/el/>\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_budget
+#: model:ir.module.module,description:base.module_account_budget
+msgid ""
+"\n"
+"Use budgets to compare actual with expected revenues and costs\n"
+"--------------------------------------------------------------\n"
+msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_kanban
 msgid ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
-"title=\"Period\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Period\" title=\"Period\"/>"
 msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+"<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
 msgstr ""
 
 #. module: account_budget
@@ -77,6 +84,11 @@ msgid "Activity Exception Decoration"
 msgstr "Δραστηριότητα Εξαίρεσης Διακόσμησης"
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_state
 msgid "Activity State"
 msgstr "Κατάσταση Δραστηριότητας"
@@ -111,6 +123,16 @@ msgid "Analytic Budget"
 msgstr ""
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_analytic_line
+msgid "Analytic Line"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model,name:account_budget.model_analytic_plan_fields_mixin
+msgid "Analytic Plan Fields"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__analytical_plan_ids
 msgid "Analytic Plans"
 msgstr "Αναλυτικά Σχέδια"
@@ -132,7 +154,6 @@ msgstr "Και τα δύο"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_analytic
-#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_report__line_type__budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -150,6 +171,8 @@ msgid "Budget %s"
 msgstr ""
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_account_bank_statement_line__budget_analytic_ids
+#: model:ir.model.fields,field_description:account_budget.field_account_move__budget_analytic_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_analytic_id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_analytic_id
 msgid "Budget Analytic"
@@ -159,6 +182,7 @@ msgstr ""
 #: model:ir.model,name:account_budget.model_budget_line
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__budget_line_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_line_id
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budget Line"
 msgstr "Γραμμή Προϋπολογισμού"
 
@@ -175,6 +199,11 @@ msgstr "Γραμμή Προϋπολογισμού"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_tree
 msgid "Budget Lines"
 msgstr "Γραμμές Προϋπολογισμού"
+
+#. module: account_budget
+#: model:ir.module.module,shortdesc:base.module_account_budget
+msgid "Budget Management"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__name
@@ -217,17 +246,18 @@ msgid "Budget end date may not be before the starting date."
 msgstr ""
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budgeted"
 msgstr ""
 
 #. module: account_budget
 #. odoo-python
+#: code:addons/account_budget/models/account_move.py:0
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 #: model:ir.actions.act_window,name:account_budget.act_budget_analytic_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_account_analytic_account_form_inherit_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:account_budget.view_move_form_inherit_budget
 msgid "Budgets"
 msgstr "Προϋπολογισμοί"
 
@@ -235,11 +265,6 @@ msgstr "Προϋπολογισμοί"
 #: model:ir.actions.act_window,name:account_budget.act_budget_lines_view
 msgid "Budgets Analysis"
 msgstr "Ανάλυση Προϋπολογισμών"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "Cancel"
-msgstr "Ακύρωση"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -255,6 +280,13 @@ msgstr "Ακυρώθηκε"
 #: model_terms:ir.actions.act_window,help:account_budget.act_budget_analytic_view
 msgid "Click to create a new budget."
 msgstr "Κάντε κλικ για να δημιουργήσετε έναν νέο προϋπολογισμό."
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
+#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
+msgid "Commitment"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__company_id
@@ -285,6 +317,7 @@ msgstr "Νόμισμα"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__date
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
 msgid "Date"
 msgstr "Ημερομηνία"
@@ -302,6 +335,9 @@ msgstr "Περιγραφή"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_move__display_name
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__display_name
@@ -354,16 +390,6 @@ msgid "Followers (Partners)"
 msgstr "Ακόλουθοι (Συνεργάτες)"
 
 #. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Γραμματοσειρά awesome π.χ. fa-tasks"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "From"
-msgstr "Από"
-
-#. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Future Activities"
 msgstr "Μελλοντικές Δραστηριότητες"
@@ -386,6 +412,9 @@ msgstr "Έχει Μήνυμα"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__id
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:account_budget.field_account_move__id
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__id
@@ -430,6 +459,11 @@ msgid "Is Follower"
 msgstr "Είναι Ακόλουθος"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__write_uid
@@ -447,6 +481,17 @@ msgstr "Τελευταία Ενημέρωση στις"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Late Activities"
 msgstr "Καθυστερημένες Δραστηριότητες"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__liquidation_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__liquidation
+msgid "Liquidation"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_has_error
@@ -712,16 +757,6 @@ msgid "User"
 msgstr "Χρήστης"
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__website_message_ids
-msgid "Website Messages"
-msgstr "Μηνύματα Ιστότοπου"
-
-#. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__website_message_ids
-msgid "Website communication history"
-msgstr "Ιστορικό επικοινωνίας ιστότοπου"
-
-#. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_split_wizard__period__year
 msgid "Year"
 msgstr "Έτος"
@@ -749,67 +784,8 @@ msgstr ""
 msgid "id"
 msgstr ""
 
-#~ msgid "Accounts"
-#~ msgstr "Λογαριασμοί"
+msgid "Website Messages"
+msgstr "Μηνύματα Ιστότοπου"
 
-#~ msgid "Achievement"
-#~ msgstr "Επίτευξη"
-
-#~ msgid "Approve"
-#~ msgstr "Έγκριση"
-
-#~ msgid "Budget Items"
-#~ msgstr "Αντικείμενα Προϋπολογισμού"
-
-#~ msgid "Budgetary Position"
-#~ msgstr "Προϋπολογιζόμενη Θέση"
-
-#~ msgid "Budgetary Positions"
-#~ msgstr "Προϋπολογιζόμενες Θέσεις"
-
-#~ msgid "Cancelled"
-#~ msgstr "Ακυρώθηκε"
-
-#~ msgid "Confirm"
-#~ msgstr "Επιβεβαίωση"
-
-#~ msgid "Confirmed"
-#~ msgstr "Επιβεβαιώθηκε"
-
-#~ msgid "Group By"
-#~ msgstr "Ομαδοποίηση κατά"
-
-#~ msgid "Name"
-#~ msgstr "Περιγραφή"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Πλήθος μηνυμάτων που απαιτούν ενέργεια"
-
-#~ msgid "Paid Date"
-#~ msgstr "Ημερομηνία Εξόφλησης"
-
-#~ msgid "Planned Amount"
-#~ msgstr "Προϋπολογιζόμενο Ποσό"
-
-#~ msgid "Practical Amount"
-#~ msgstr "Πρακτικό Ποσό"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr ""
-#~ "Εμφάνιση όλων των εγγραφών όπου η ημερομηνία επόμενης δράσης είναι πριν "
-#~ "από σήμερα"
-
-#~ msgid "The budget must have at least one account."
-#~ msgstr "Ο προϋπολογισμός πρέπει να έχει τουλάχιστον ένα λογαριασμό."
-
-#~ msgid "Theoretical Amount"
-#~ msgstr "Υπολογιζόμενο Ποσό"
-
-#~ msgid "To Approve"
-#~ msgstr "Προς Έγκριση"
-
-#~ msgid "To Approve Budgets"
-#~ msgstr "Προϋπολογισμός προς Έγκριση"
-
-#~ msgid "Validated"
-#~ msgstr "Επικυρωμένο"
+msgid "Website communication history"
+msgstr "Ιστορικό επικοινωνίας ιστότοπου"

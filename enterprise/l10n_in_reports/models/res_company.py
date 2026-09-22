@@ -2,7 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models
-from odoo.exceptions import RedirectWarning
 
 
 class ResCompany(models.Model):
@@ -33,16 +32,16 @@ class ResCompany(models.Model):
             and self.sudo().l10n_in_gstr_gst_token_validity > fields.Datetime.now()
         )
 
-    def _check_tax_return_configuration(self):
-        """
-        Check if the e-filling feature is enabled in configuration for tax returns.
-        :raises RedirectWarning: if something is wrong configured.
-        """
-
-        if self.country_code != 'IN':
-            return super()._check_tax_return_configuration()
-
-        if not self.l10n_in_gst_efiling_feature:
-            msg = self.env._("First enable GST e-Filing feature from configuration for company %s.", (self.name))
-            action = self.env.ref("account.action_account_config")
-            raise RedirectWarning(msg, action.id, self.env._('Go to configuration'))
+    def write(self, vals):
+        res = super().write(vals)
+        if set(vals) & {'account_return_periodicity', 'account_fiscal_country_id', 'l10n_in_gst_registration_type'}:
+            iff_return_type = self.env.ref('l10n_in_reports.in_gstr_iff_return_type', raise_if_not_found=False)
+            if iff_return_type:
+                for company in self:
+                    is_iff_applicable = (
+                        company.account_fiscal_country_id.code == 'IN'
+                        and company.account_return_periodicity == 'trimester'
+                        and company.l10n_in_gst_registration_type == 'regular'
+                    )
+                    iff_return_type.with_context(propagate_active_to_report=True).active = is_iff_applicable
+        return res

@@ -22,15 +22,25 @@ class AccountBankStatementLine(models.Model):
     @api.model
     def get_import_templates(self):
         return [{
-            'label': _('Import Template for Bank Statement Lines'),
+            'label': _('Template for Bank Statement Lines'),
             'template': '/account_bank_statement_import/static/xls/bank_statement_line_import_template.xlsx'
         }]
 
-    def _action_open_bank_reconciliation_widget(self, extra_domain=None, default_context=None, name=None, kanban_first=True):
-        res = super()._action_open_bank_reconciliation_widget(extra_domain, default_context, name, kanban_first)
-        res['help'] = Markup("<p class='o_view_nocontent_smiling_face'>{}</p><p>{}<br/>{}</p>").format(
+    @api.model
+    def _get_bank_reconciliation_empty_help(self):
+        return Markup("<p class='o_view_nocontent_smiling_face'>{}</p><p>{}<br/>{}</p>").format(
             _('Nothing to do here!'),
             _('No transactions matching your filters were found.'),
             _('Click "New" or upload a %s.', ", ".join(self.env['account.journal']._get_bank_statements_available_import_formats())),
         )
+
+    @api.model
+    def get_empty_list_help(self, help_message):
+        if self.env.context.get('bank_rec_widget'):
+            return self._get_bank_reconciliation_empty_help()
+        return super().get_empty_list_help(help_message)
+
+    def _action_open_bank_reconciliation_widget(self, extra_domain=None, default_context=None, name=None, kanban_first=True):
+        res = super()._action_open_bank_reconciliation_widget(extra_domain, default_context, name, kanban_first)
+        res['help'] = self._get_bank_reconciliation_empty_help()
         return res

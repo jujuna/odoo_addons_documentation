@@ -25,7 +25,7 @@
                             invisible="not l10n_mx_edi_update_sat_needed"/>
                 </xpath>
 
-                <xpath expr="//sheet/group//group[last()]" position="inside">
+                <xpath expr="//group[@id='header_right_group']" position="inside">
                     <field name="l10n_mx_edi_cfdi_state"
                            invisible="not l10n_mx_edi_cfdi_state"/>
                     <field name="l10n_mx_edi_cfdi_sat_state"
@@ -40,20 +40,25 @@
                 </xpath>
 
                 <xpath expr="//field[@name='ref']" position="after">
+                    <field name="l10n_mx_edi_payment_policy"
+                           invisible="not l10n_mx_edi_is_cfdi_needed and not (country_code == 'MX' and move_type in ('in_invoice', 'in_refund'))"
+                           required="state != 'draft' and l10n_mx_edi_is_cfdi_needed"
+                           readonly="l10n_mx_edi_cfdi_state == 'sent'"/>
                     <field name="l10n_mx_edi_payment_method_id"
                            invisible="not l10n_mx_edi_is_cfdi_needed or l10n_mx_edi_payment_policy == 'PPD'"
-                           readonly="state != 'draft'"
+                           required="state != 'draft' and l10n_mx_edi_payment_policy == 'PUE'"
+                           readonly="l10n_mx_edi_cfdi_state == 'sent'"
                            options="{'no_open': True}"/>
-                    <field name="l10n_mx_edi_payment_policy"
-                           invisible="not l10n_mx_edi_is_cfdi_needed"
-                           readonly="l10n_mx_edi_cfdi_state == 'sent'"/>
                     <field name="l10n_mx_edi_usage"
                            invisible="not l10n_mx_edi_is_cfdi_needed"
                            readonly="state != 'draft'"/>
                 </xpath>
 
                 <xpath expr="//page[@id='other_tab']//group[@name='sale_info_group']" position="inside">
-                    <field name="l10n_mx_edi_addenda_ids" invisible="not l10n_mx_edi_is_cfdi_needed" widget="many2many_tags"/>
+                    <field name="l10n_mx_edi_addenda_ids"
+                           invisible="not l10n_mx_edi_is_cfdi_needed"
+                           widget="many2many_tags"
+                           groups="account.group_account_invoice"/>
                 </xpath>
 
                 <!-- Publico General -->
@@ -67,7 +72,7 @@
                 <!-- Invoice lines -->
                 <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='price_total']" position="after">
                     <field name="l10n_mx_edi_tax_object"
-                           required="parent.l10n_mx_edi_is_cfdi_needed and display_type not in ('line_section', 'line_note')"
+                           required="parent.l10n_mx_edi_is_cfdi_needed and display_type not in ('line_section', 'line_note') and price_unit and quantity"
                            column_invisible="not parent.l10n_mx_edi_is_cfdi_needed"
                            readonly="parent.l10n_mx_edi_cfdi_state in ('sent', 'global_sent')"
                            optional="hide"
@@ -114,14 +119,14 @@
                                         type="object"
                                         string="Retry"
                                         invisible="not retry_button_needed"/>
-                                <button name="action_force_payment_cfdi"
-                                        type="object"
-                                        string="Force CFDI"
-                                        invisible="state != 'payment_sent_pue' or not move_id"/>
                                 <button name="action_cancel"
                                         type="object"
                                         string="Cancel"
                                         invisible="not cancel_button_needed"/>
+                                <button name="action_download_cancellation_ack_report"
+                                        type="object"
+                                        string="Print"
+                                        invisible="not print_cancellation_ack_button_needed"/>
                             </list>
                         </field>
                     </page>

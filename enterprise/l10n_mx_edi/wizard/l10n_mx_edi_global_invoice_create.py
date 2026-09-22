@@ -2,12 +2,13 @@ from odoo import api, fields, models, Command
 from odoo.addons.l10n_mx_edi.models.l10n_mx_edi_document import GLOBAL_INVOICE_PERIODICITY_DEFAULT_VALUES
 
 
-class L10n_Mx_EdiGlobal_InvoiceCreate(models.Model):
+class L10n_Mx_EdiGlobal_InvoiceCreate(models.TransientModel):
     _name = 'l10n_mx_edi.global_invoice.create'
     _description = "Create a global invoice"
 
     move_ids = fields.Many2many(comodel_name='account.move')
 
+    date = fields.Date(required=True, default=lambda self: fields.Date.context_today(self).replace(day=1))
     periodicity = fields.Selection(
         **GLOBAL_INVOICE_PERIODICITY_DEFAULT_VALUES,
         required=True,
@@ -27,4 +28,4 @@ class L10n_Mx_EdiGlobal_InvoiceCreate(models.Model):
 
     def action_create_global_invoice(self):
         self.ensure_one()
-        self.move_ids._l10n_mx_edi_cfdi_global_invoice_try_send(periodicity=self.periodicity)
+        self.move_ids._l10n_mx_edi_cfdi_global_invoice_try_send(self.date, periodicity=self.periodicity)

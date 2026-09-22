@@ -4,6 +4,7 @@ from markupsafe import Markup
 from odoo.exceptions import ValidationError
 
 from odoo import fields, models
+from odoo.addons.portal.controllers.thread import PortalWebClientController
 
 
 class HelpdeskSaleGiftcardGenerateWizard(models.TransientModel):
@@ -24,8 +25,15 @@ class HelpdeskSaleGiftcardGenerateWizard(models.TransientModel):
         coupon.ensure_one()
         self.ticket_id.coupon_ids |= coupon
 
-        for message in coupon.website_message_ids:
-            self.ticket_id.message_post(body=message.body, attachment_ids=message.attachment_ids.ids)
+        messages = self.env["mail.message"].search_fetch(
+            PortalWebClientController._get_portal_message_fetch_domain(coupon),
+            ["body", "attachment_ids"],
+        )
+        for message in messages:
+            self.ticket_id.message_post(
+                body=message.body,
+                attachment_ids=message.attachment_ids.ids,
+            )
 
         action_id = self.env.ref('helpdesk_sale_loyalty.loyalty_open_card_action').id
         url = f'/odoo/helpdesk/{self.ticket_id.team_id.id}/tickets/{self.ticket_id.id}/action-{action_id}/{coupon.id}'

@@ -10,8 +10,6 @@ from odoo.addons.iap.tools.iap_tools import iap_jsonrpc
 
 _logger = logger.getLogger(__name__)
 
-MOBILE_APP_IDENTIFIER = 'com.odoo.mobile'
-FIREBASE_DEFAULT_LINK = 'https://redirect-url.email/'
 BLACK_LIST_PARAM = {
     'access_token',
     'auth_signup_token',
@@ -21,47 +19,43 @@ BLACK_LIST_PARAM = {
 class MailThread(models.AbstractModel):
     _inherit = 'mail.thread'
 
-    def _notify_thread(self, message, msg_vals=False, **kwargs):
+    def _notify_thread(self, message, **kwargs):
         # Main notification method. Override to add support of sending OCN notifications.
         scheduled_date = self._is_notification_scheduled(kwargs.get('scheduled_date'))
-        recipients_data = super()._notify_thread(message, msg_vals=msg_vals, **kwargs)
+        recipients_data = super()._notify_thread(message, **kwargs)
 
         # if scheduled for later: notification queue will call the notification method
         if not scheduled_date:
-            self._notify_thread_by_ocn(message, recipients_data, msg_vals, **kwargs)
+            self._notify_thread_by_ocn(message, recipients_data, **kwargs)
         return recipients_data
 
-    def _notify_thread_by_ocn(self, message, recipients_data, msg_vals=False, **kwargs):
+    def _notify_thread_by_ocn(self, message, recipients_data, **kwargs):
         """ Method to send cloud notifications for every mentions of a partner
         and every direct message. We have to take into account the risk of
         duplicated notifications in case of a mention in a channel of `chat` type.
 
-        :param record message: <mail.message> record being notified. May be
-          void as 'msg_vals' superseeds it;
+        :param record message: <mail.message> record being notified.
         :param list recipients_data: list of recipients data based on <res.partner>
           records formatted like a list of dicts containing information. See
           ``MailThread._notify_get_recipients()``;
-        :param dict msg_vals: values dict used to create the message, allows to
-          skip message usage and spare some queries if given;
 
         """
         icp_sudo = self.env['ir.config_parameter'].sudo()
         # Avoid to send notification if this feature is disabled or if no user use the mobile app.
-        if not icp_sudo.get_param('odoo_ocn.project_id') or not icp_sudo.get_param('mail_mobile.enable_ocn'):
+        if not icp_sudo.get_str('odoo_ocn.project_id') or not icp_sudo.get_bool('mail_mobile.enable_ocn'):
             return
 
-        pids = self._notify_get_recipients_for_extra_notifications(message, recipients_data, msg_vals=msg_vals)
+        pids = self._notify_get_recipients_for_extra_notifications(message, recipients_data)
         if not pids:
             return
 
-        self._notify_by_ocn_send(message, pids, msg_vals=msg_vals, **kwargs)
+        self._notify_by_ocn_send(message, pids, **kwargs)
 
-    def _notify_by_ocn_send(self, message, partner_ids, msg_vals=False, **kwargs):
+    def _notify_by_ocn_send(self, message, partner_ids, **kwargs):
         """ Send the notification to a list of partners
 
         :param message: current mail.message record
         :param partner_ids: list of partner IDs
-        :param msg_vals: see ``_notify_thread_by_ocn()``;
         """
         if not partner_ids:
             return
@@ -71,16 +65,13 @@ class MailThread(models.AbstractModel):
         ])
         if receiver_ids:
             endpoint = self.env['res.config.settings']._get_endpoint()
-            payload = self._notify_by_ocn_prepare_payload(
-                message, receiver_ids, msg_vals=msg_vals,
-                force_record_name=kwargs.get('force_record_name', False),
-            )
+            payload = self._notify_by_ocn_prepare_payload(message, receiver_ids, force_record_name=kwargs.get('force_record_name', False))
 
             # prepare chunks
             chunks = []
             at_mention_ocn_token_list = []
             identities_ocn_token_list = []
-            at_mention_analyser_id_list = self._at_mention_analyser(msg_vals['body'] if msg_vals and 'body' in msg_vals else message.body)
+            at_mention_analyser_id_list = self._at_mention_analyser(message.body)
             for receiver_id in receiver_ids:
                 if receiver_id.id in at_mention_analyser_id_list:
                     at_mention_ocn_token_list.append(receiver_id.ocn_token)
@@ -109,30 +100,21 @@ class MailThread(models.AbstractModel):
                 except Exception as e:
                     _logger.error('An error occurred while contacting the ocn server: %s', e)
 
-    def _notify_by_ocn_prepare_payload(self, message, receiver_ids, msg_vals=False,
-                                       force_record_name=False):
+    def _notify_by_ocn_prepare_payload(self, message, receiver_ids, force_record_name=False):
         """Returns dictionary containing message information for mobile device.
         This info will be delivered to mobile device via Google Firebase Cloud
         Messaging (FCM). And it is having limit of 4000 bytes (4kb)
         """
-        msg_vals = msg_vals or {}
-        author_id = msg_vals['author_id'] if 'author_id' in msg_vals else message.author_id.ids
-        author_name = self.env['res.partner'].browse(author_id).name
-        body = msg_vals['body'] if 'body' in msg_vals else message.body
-        model = msg_vals['model'] if 'model' in msg_vals else message.model
-        res_id = msg_vals['res_id'] if 'res_id' in msg_vals else message.res_id
-        record_name = force_record_name or message.record_name
-        subject = msg_vals['subject'] if 'subject' in msg_vals else message.subject
-
         payload = {
             "android_channel_id": "Following",
-            "author_name": author_name,
-            "model": model,
-            "res_id": res_id,
+            "author_name": message.author_id.name,
+            "model": message.model,
+            "res_id": message.res_id,
             "db_id": self.env['res.config.settings']._get_ocn_uuid(),
-            "subject": record_name or subject
+            "subject": force_record_name or message.record_name or message.subject
         }
 
+        body = message.body
         # Check payload limit of 4000 bytes (4kb) and if remain space add the body
         payload_length = len(str(payload).encode('utf-8'))
         # FIXME: when msg_type is 'user_notification', the type value of msg_vals.get('body') is bytes
@@ -140,7 +122,6 @@ class MailThread(models.AbstractModel):
             body = body.decode("utf-8")
         if payload_length < 4000:
             payload_body = tools.html2plaintext(body)
-            payload_body += self._generate_tracking_message(message)
             payload['body'] = payload_body[:4000 - payload_length]
 
         return payload
@@ -170,17 +151,17 @@ class MailThread(models.AbstractModel):
                     _logger.error("Invalid conversion to int: %s" % match_id)
         return at_mention_ids
 
-    # Firebase Dynamic Links
+    # Redirect URL
 
-    def _notify_get_action_link(self, link_type, **kwargs):
-        original_link = super(MailThread, self)._notify_get_action_link(link_type, **kwargs)
-        # BLACK_LIST_PARAM to avoid leak of token (3rd party: Firebase)
+    def _notify_get_action_link(self, link_type, model=False, res_id=False, **kwargs):
+        original_link = super()._notify_get_action_link(link_type, model=model, res_id=res_id, **kwargs)
+        # BLACK_LIST_PARAM to avoid leak of token
         if link_type != 'view' or BLACK_LIST_PARAM.intersection(kwargs.keys()):
             return original_link
 
         # Check if feature is enable to avoid request and computation
-        disable_redirect_fdl = self.env['ir.config_parameter'].sudo().get_param(
-            'mail_mobile.disable_redirect_firebase_dynamic_link', default=False)
+        disable_redirect_fdl = self.env['ir.config_parameter'].sudo().get_bool(
+            'mail_mobile.disable_redirect_firebase_dynamic_link')
         if disable_redirect_fdl:
             return original_link
 
@@ -189,15 +170,10 @@ class MailThread(models.AbstractModel):
         # but in some case "this" is not defined.
         # The base url is not prepend it's why we do it manually.
         if original_link.startswith('/'):
-            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            base_url = self.env['ir.config_parameter'].sudo().get_str('web.base.url')
             original_link = base_url + original_link
 
-        # https://firebase.google.com/docs/dynamic-links/create-manually
         url_params = urllib.parse.urlencode({
             'link': original_link,
-            'apn': MOBILE_APP_IDENTIFIER,
-            'afl': original_link,
-            'ibi': MOBILE_APP_IDENTIFIER,
-            'ifl': original_link,
         })
-        return "%s?%s" % (FIREBASE_DEFAULT_LINK, url_params)
+        return "%s?%s" % ('https://redirect-url.email/', url_params)

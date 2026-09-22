@@ -1,7 +1,6 @@
 {
     'name': 'Stock Transport Enterprise',
     'summary': 'Bridge module for stock_fleet and enterprise',
-    'version': '1.0',
     'description': """
     Bridge module for stock_fleet and enterprise""",
     'depends': ['stock_fleet', 'web_gantt', 'web_map'],

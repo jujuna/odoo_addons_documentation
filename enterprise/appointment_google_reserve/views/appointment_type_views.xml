@@ -11,17 +11,33 @@
                     groups="appointment.group_appointment_manager">
                     <group>
                         <group>
+                            <div class="alert alert-info" role="alert" colspan="2"
+                                invisible="google_reserve_enable or google_reserve_pending_sync">
+                                <span class="oi oi-fw me-1" data-icon="map"/>
+                                <span>Synchronize your establishment with Google Reserve. </span>
+                                <a
+                                    href="https://www.odoo.com/documentation/master/applications/productivity/appointments/google_reserve.html"
+                                    target="_blank"
+                                >Click here</a>
+                                <span> to learn more.</span>
+                            </div>
                             <div class="alert alert-success" role="alert" colspan="2"
                                 invisible="not google_reserve_enable or google_reserve_pending_sync">
-                                <span class="fa fa-check fa-fw me-1"/>Your Google Reserve Synchronization is active.
+                                <span class="oi oi-fw me-1" data-icon="check"/>
+                                <span>Your Google Reserve Synchronization is active. </span>
+                                <a
+                                    href="https://www.odoo.com/documentation/master/applications/productivity/appointments/google_reserve.html"
+                                    target="_blank"
+                                >Click here</a>
+                                <span> if you encounter any issues.</span>
                             </div>
                             <div class="alert alert-warning" role="alert" colspan="2"
                                 invisible="not google_reserve_enable or not google_reserve_pending_sync">
-                                <span class="fa fa-check fa-hourglass me-1"/>Your Appointment Type is being synchronized with Google Reserve.<br/>
-                                This can take up to 24 hours to be active.
+                                <span class="oi me-1" data-icon="hourglass_empty"/>Synchronization with Google Reserve in progress. This can take up to 24 hours.
                             </div>
+                            <field name="google_reserve_merchant_id" required="google_reserve_enable"/>
                             <button name="action_google_reserve_enable" type="object"
-                                string="Synchronize with Google Reserve" class="btn btn-primary"
+                                string="Synchronize" class="btn btn-primary"
                                 confirm="Ready to synchronize your Appointment Type with Google Reserve? Make sure your setup is complete — changes may take up to 24 hours to appear once live."
                                 confirm-title="Synchronize with Google Reserve" confirm-label="I'm ready, synchronize!" cancel-label="Not yet"
                                 invisible="google_reserve_enable"
@@ -34,7 +50,6 @@
                                 invisible="not google_reserve_enable"
                                 colspan="2"
                             />
-                            <field name="google_reserve_merchant_id" required="google_reserve_enable"/>
                         </group>
                     </group>
                 </page>
@@ -46,7 +61,7 @@
                 <label for="assignment_method" invisible="not google_reserve_enable"/>
                 <div invisible="not google_reserve_enable">
                     <field name="assignment_method" readonly="1" class="oe_inline"/>
-                    <i class="ms-2 fa fa-info-circle" title="Required for Google Reserve"/>
+                    <i class="oi oi-filled ms-2" data-icon="info" title="Required for Google Reserve"/>
                 </div>
             </xpath>
             <xpath expr="//field[@name='select_first']" position="attributes">

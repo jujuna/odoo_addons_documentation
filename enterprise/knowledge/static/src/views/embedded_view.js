@@ -1,13 +1,10 @@
 import { KnowledgeSearchModelMixin } from "@knowledge/search_model/search_model";
 import { SearchModel } from "@web/search/search_model";
 import { View } from "@web/views/view";
+import { useProps } from "@odoo/owl";
 
 export class EmbeddedView extends View {
-    static props = {
-        ...View.props,
-        saveEmbeddedViewFavoriteFilter: Function,
-        deleteEmbeddedViewFavoriteFilter: Function,
-    };
+    props = useProps();
 
     async loadView(props) {
         const {

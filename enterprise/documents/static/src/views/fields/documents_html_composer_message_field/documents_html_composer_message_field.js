@@ -4,6 +4,7 @@ import {
 } from "@mail/views/web/fields/html_composer_message_field/html_composer_message_field";
 import { registry } from "@web/core/registry";
 import { useBus } from "@web/core/utils/hooks";
+import { createElementWithContent, htmlJoin } from "@web/core/utils/html";
 import { markup } from "@odoo/owl";
 
 export class DocumentsHtmlComposerMessageField extends HtmlComposerMessageField {
@@ -13,7 +14,7 @@ export class DocumentsHtmlComposerMessageField extends HtmlComposerMessageField 
             useBus(this.env.model.bus, "PASTE_SHARE_LINKS", (ev) => {
                 this.editor.shared.dom.insert(this.formatLinks(ev.detail.links));
                 this.editor.editable.focus();
-                this.editor.shared.history.addStep();
+                this.editor.shared.history.commit();
             });
         }
     }
@@ -23,15 +24,15 @@ export class DocumentsHtmlComposerMessageField extends HtmlComposerMessageField 
      * @param {Array} response - The response containing document details.
      */
     formatLinks(response) {
-        const html = response
-            .map(
-                ({ display_name, access_url }) =>
-                    markup`<a href="${access_url}" target="_blank" class="d-block">${display_name}</a>`
+        return createElementWithContent(
+            "div",
+            htmlJoin(
+                response.map(
+                    ({ display_name, access_url }) =>
+                        markup`<a href="${access_url}" target="_blank" class="d-block">${display_name}</a>`
+                )
             )
-        const cleanHTML = markup(Array(html.length + 1).fill(""), ...html);
-        const root = document.createElement("div");
-        root.innerHTML = cleanHTML;
-        return root;
+        );
     }
 }
 

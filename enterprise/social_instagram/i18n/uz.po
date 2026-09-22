@@ -14,21 +14,47 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 18:49+0000\n"
-"PO-Revision-Date: 2025-10-08 18:49+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 02:39+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"social_instagram/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 #, fuzzy
 msgid "(between 1.91:1 and 4:5)."
 msgstr "(1,91:1 va 4:5 oralig‘ida)."
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"- Check permissions: Your site's robots.txt might be blocking Instagram from "
+"accessing the media folder (make sure /social_instagram is not blocked)."
+msgstr ""
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"- Check your connection: Your server may be offline or temporarily "
+"unreachable."
+msgstr ""
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"- Check your file: Ensure it isn't corrupted and is from 320 to 1440 pixels "
+"wide, 8MB maximum, aspect ratio between 4:5 and 1.91:1."
+msgstr ""
 
 #. module: social_instagram
 #: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
@@ -37,47 +63,32 @@ msgid "34 SECONDS AGO"
 msgstr "34 soniya oldin"
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
-#, fuzzy
-msgid "<i class=\"fa fa-comments me-1\" title=\"Comments\"/>"
-msgstr "<i class=\"fa fa-comments me-1\" title=\"Izohlar\"/>"
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
+msgid ""
+"<i class=\"oi me-1\" data-icon=\"warning\"/>\n"
+"            At least one image is required when posting on Instagram."
+msgstr ""
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
-#, fuzzy
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 msgid ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
-"                At least one image is required when posting on Instagram."
+"<i class=\"oi me-1\" data-icon=\"warning\"/>\n"
+"            Your image appears to be corrupted, please try loading it again."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/> Instagramga post joylashda "
-"kamida bitta rasm bo‘lishi shart."
-
-#. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
-"                You can only post up to 10 images at once."
-msgstr ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/> Bir vaqtning o‘zida faqat 10 "
-"tagacha rasm joylashingiz mumkin."
-
-#. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
-"                Your image appears to be corrupted, please try loading it "
-"again."
-msgstr ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/> Rasmingiz buzilganga "
-"o‘xshaydi, iltimos, uni qayta yuklashga urinib ko‘ring."
 
 #. module: social_instagram
 #: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
-#, fuzzy
-msgid "<i class=\"fa fa-heart me-1\" title=\"Likes\"/>"
-msgstr "<i class=\"fa fa-heart me-1\" title=\"Yoqtirishlar\"/>"
+msgid "<i class=\"oi oi-filled me-1\" data-icon=\"favorite\" title=\"Likes\"/>"
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_view_form
+msgid ""
+"<span class=\"badge rounded-pill text-bg-warning py-1 px-2\" invisible=\"not "
+"instagram_is_story_expired\">\n"
+"                    Expired\n"
+"                </span>"
+msgstr ""
 
 #. module: social_instagram
 #: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
@@ -92,11 +103,37 @@ msgid "<span class=\"mt-1 fw-bold\">My Instagram Page</span>"
 msgstr "<span class=\"mt-1 fw-bold\">Mening Instagram sahifam</span>"
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+msgid ""
+"<span class=\"o_social_preview_icon_wrapper d-inline-block overflow-hidden "
+"me-2\">\n"
+"                        <i class=\"oi oi-2x\" data-icon=\"oi_instagram\"/>\n"
+"                    </span>\n"
+"                    <b class=\"me-1\">My Page</b> <span>7h</span>"
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+msgid "<span>1 Comment</span>"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_access_token
 #: model:ir.model.fields,field_description:social_instagram.field_social_post_template__instagram_access_token
 #, fuzzy
 msgid "Access Token"
 msgstr "Kirish tokeni"
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid "Add Media"
+msgstr ""
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid "An error occurred while contacting the Instagram API, please try again."
+msgstr ""
 
 #. module: social_instagram
 #: model_terms:ir.ui.view,arch_db:social_instagram.res_config_settings_view_form
@@ -136,6 +173,18 @@ msgstr ""
 "foydalanmoqchi bo‘lsangiz, buni belgilang."
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid ""
+"Comment your own post to get the conversation going or share some extra "
+"content."
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
+msgid "Comments"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model,name:social_instagram.model_res_config_settings
 #, fuzzy
 msgid "Config Settings"
@@ -149,6 +198,11 @@ msgid "Could not find any account to add."
 msgstr "Qo‘shiladigan hisob topilmadi."
 
 #. module: social_instagram
+#: model:ir.model,name:social_instagram.model_discuss_channel
+msgid "Discussion Channel"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_post__display_instagram_preview
 #: model:ir.model.fields,field_description:social_instagram.field_social_post_template__display_instagram_preview
 #, fuzzy
@@ -156,6 +210,7 @@ msgid "Display Instagram Preview"
 msgstr "Instagram ko‘rinishini namoyish etish"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_discuss_channel__display_name
 #: model:ir.model.fields,field_description:social_instagram.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:social_instagram.field_social_account__display_name
 #: model:ir.model.fields,field_description:social_instagram.field_social_live_post__display_name
@@ -189,6 +244,7 @@ msgid "Has Instagram Account"
 msgstr "Instagram hisobiga ega"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_discuss_channel__id
 #: model:ir.model.fields,field_description:social_instagram.field_res_config_settings__id
 #: model:ir.model.fields,field_description:social_instagram.field_social_account__id
 #: model:ir.model.fields,field_description:social_instagram.field_social_live_post__id
@@ -202,10 +258,9 @@ msgid "ID"
 msgstr "ID"
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
-#, fuzzy
-msgid "Images"
-msgstr "Rasmlar"
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_view_form
+msgid "Immediately"
+msgstr ""
 
 #. module: social_instagram
 #: model:ir.model.fields.selection,name:social_instagram.selection__social_media__media_type__instagram
@@ -295,6 +350,12 @@ msgid "Instagram Facebook Author ID"
 msgstr "Instagram Facebook muallif ID si"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_first_comment
+#: model:ir.model.fields,field_description:social_instagram.field_social_post_template__instagram_first_comment
+msgid "Instagram First Comment"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_image_ids
 #: model:ir.model.fields,field_description:social_instagram.field_social_post_template__instagram_image_ids
 #, fuzzy
@@ -322,6 +383,13 @@ msgid "Instagram Post ID"
 msgstr "Instagram post ID si"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_live_post__instagram_post_as_story
+#: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_post_as_story
+#: model:ir.model.fields,field_description:social_instagram.field_social_post_template__instagram_post_as_story
+msgid "Instagram Post Story"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_stream_post__instagram_post_link
 #, fuzzy
 msgid "Instagram Post URL"
@@ -341,6 +409,31 @@ msgid "Instagram Preview"
 msgstr "Instagram ko‘rinishi"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_stream_post__instagram_saved_count
+msgid "Instagram Saved"
+msgstr ""
+
+#. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_scheduled_date
+msgid "Instagram Scheduled for"
+msgstr ""
+
+#. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_live_post__instagram_is_story_expired
+msgid "Instagram Story Expired"
+msgstr ""
+
+#. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_stream_post__instagram_views_count
+msgid "Instagram Views"
+msgstr ""
+
+#. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_res_config_settings__instagram_webhook_verify_token
+msgid "Instagram Webhook Verify Token"
+msgstr ""
+
+#. module: social_instagram
 #. odoo-python
 #: code:addons/social_instagram/controllers/main.py:0
 #, fuzzy
@@ -348,11 +441,39 @@ msgid "Instagram did not provide a valid access token."
 msgstr "Instagram yaroqli kirish tokenini taqdim etmadi."
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
+msgid "Instagram stories can only contain a single picture."
+msgstr ""
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"Instagram took too long to process the request. This can happen with large "
+"images, try posting a smaller one."
+msgstr ""
+
+#. module: social_instagram
 #. odoo-javascript
 #: code:addons/social_instagram/static/src/xml/social_instagram_templates.xml:0
 #, fuzzy
 msgid "Likes"
 msgstr "Yoqtirishlar"
+
+#. module: social_instagram
+#: model:ir.module.module,summary:base.module_social_instagram
+msgid "Manage your Instagram Business accounts and schedule posts"
+msgstr ""
+
+#. module: social_instagram
+#: model:ir.module.module,description:base.module_social_instagram
+msgid "Manage your Instagram Business accounts and schedule posts."
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid "Media"
+msgstr ""
 
 #. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_media__media_type
@@ -368,6 +489,12 @@ msgstr "Xabar"
 
 #. module: social_instagram
 #. odoo-python
+#: code:addons/social_instagram/models/social_post_template.py:0
+msgid "Oops! Instagram stories can only contain a single picture."
+msgstr ""
+
+#. module: social_instagram
+#. odoo-python
 #: code:addons/social_instagram/models/social_media.py:0
 #, fuzzy
 msgid ""
@@ -378,6 +505,12 @@ msgstr ""
 "Voy! Hozircha sizda faol obuna yo‘q ekan. Xavotir olmang! Uni bu yerdan "
 "osongina olishingiz mumkin: %s. Obuna oling va ajoyib xususiyatlar dunyosini "
 "oching!"
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_account.py:0
+msgid "Oops, we couldn't show this file."
+msgstr ""
 
 #. module: social_instagram
 #. odoo-python
@@ -404,6 +537,16 @@ msgid "Post Image"
 msgstr "Post rasmi"
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_view_form
+msgid "Post On"
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid "Post as Story"
+msgstr ""
+
+#. module: social_instagram
 #. odoo-python
 #: code:addons/social_instagram/controllers/main.py:0
 #, fuzzy
@@ -411,10 +554,33 @@ msgid "Read More about Instagram Accounts"
 msgstr "Instagram hisoblari haqida ko‘proq ma'lumot"
 
 #. module: social_instagram
+#. odoo-javascript
+#: code:addons/social_instagram/static/src/xml/social_instagram_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
+msgid "Save"
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid "Scheduled first comment"
+msgstr ""
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_account.py:0
+msgid "See in Instagram"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model,name:social_instagram.model_social_account
 #, fuzzy
 msgid "Social Account"
 msgstr "Ijtimoiy tarmoq hisobi"
+
+#. module: social_instagram
+#: model:ir.module.module,shortdesc:base.module_social_instagram
+msgid "Social Instagram"
+msgstr ""
 
 #. module: social_instagram
 #: model:ir.model,name:social_instagram.model_social_live_post
@@ -463,7 +629,7 @@ msgstr ""
 "Facebook ID raqami."
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 #, fuzzy
 msgid "The following images are not in the correct format (jpg/jpeg)."
 msgstr "Quyidagi rasmlar to‘g‘ri formatda (jpg/jpeg) emas."
@@ -479,7 +645,7 @@ msgid ""
 msgstr "Quyidagi rasmlar to‘g‘ri formatda (jpg/jpeg) emas.  %(images)s"
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 #, fuzzy
 msgid "The following images do not meet the"
 msgstr "Quyidagi rasmlar talablarga javob bermaydi"
@@ -496,6 +662,18 @@ msgid ""
 msgstr ""
 "Quyidagi rasmlar kerakli tomonlar nisbatiga (1.91:1 va 4:5 oralig‘ida) mos "
 "kelmaydi.  %(images)s"
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid "The media container expired."
+msgstr ""
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid "The media container failed to process."
+msgstr ""
 
 #. module: social_instagram
 #. odoo-python
@@ -536,6 +714,23 @@ msgstr ""
 "kerak bo‘lganda taqqoslash uchun ishlatiladi."
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.res_config_settings_view_form
+msgid "Verify Token"
+msgstr ""
+
+#. module: social_instagram
+#. odoo-javascript
+#: code:addons/social_instagram/static/src/xml/social_instagram_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
+msgid "Views"
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.res_config_settings_view_form
+msgid "Webhook"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model.fields,help:social_instagram.field_social_post__instagram_image_ids
 #: model:ir.model.fields,help:social_instagram.field_social_post_template__instagram_image_ids
 #, fuzzy
@@ -545,6 +740,7 @@ msgstr "Postlaringizga rasmlar biriktiriladi."
 #. module: social_instagram
 #. odoo-python
 #: code:addons/social_instagram/models/social_post.py:0
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 #, fuzzy
 msgid "You can only post up to 10 images at once."
 msgstr "Bir vaqtning o‘zida faqat 10 tagacha rasm joylashtirish mumkin."
@@ -570,7 +766,43 @@ msgid "Your image appears to be corrupted, please try loading it again."
 msgstr "Rasmingiz buzilganga o‘xshaydi, uni qayta yuklashga harakat qiling."
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"Your media didn't go through. This is usually caused by one of the following:"
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 #, fuzzy
 msgid "required aspect ratio"
 msgstr "talab qilinadigan tomonlar nisbati"
+
+#, fuzzy
+#~ msgid ""
+#~ "<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
+#~ "                At least one image is required when posting on Instagram."
+#~ msgstr ""
+#~ "<i class=\"fa fa-exclamation-triangle me-1\"/> Instagramga post joylashda "
+#~ "kamida bitta rasm bo‘lishi shart."
+
+#, fuzzy
+#~ msgid ""
+#~ "<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
+#~ "                You can only post up to 10 images at once."
+#~ msgstr ""
+#~ "<i class=\"fa fa-exclamation-triangle me-1\"/> Bir vaqtning o‘zida faqat "
+#~ "10 tagacha rasm joylashingiz mumkin."
+
+#, fuzzy
+#~ msgid ""
+#~ "<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
+#~ "                Your image appears to be corrupted, please try loading it "
+#~ "again."
+#~ msgstr ""
+#~ "<i class=\"fa fa-exclamation-triangle me-1\"/> Rasmingiz buzilganga "
+#~ "o‘xshaydi, iltimos, uni qayta yuklashga urinib ko‘ring."
+
+#, fuzzy
+#~ msgid "Images"
+#~ msgstr "Rasmlar"

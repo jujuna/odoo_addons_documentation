@@ -3,7 +3,7 @@
 import datetime
 from freezegun import freeze_time
 
-from odoo import fields, Command
+from odoo import Command
 import odoo.tests
 from . import common
 
@@ -17,11 +17,10 @@ class TestEmployeeJobChange(common.TestPayrollAccountCommon):
         super().setUpClass()
 
         cls.env.ref('base.user_admin').group_ids |= cls.env.ref('hr.group_hr_user')
-        cls.env['hr.job'].create({
+        cls.new_job = cls.env['hr.job'].create({
             'name': 'Senior Developer BE',
             'company_id': cls.company_id.id,
             'contract_template_id': cls.senior_dev_contract.id,
-            'l10n_be_contract_ip': True,
         })
         partner = cls.env['res.partner'].create({
             'name': 'Jean Jasse',
@@ -39,30 +38,24 @@ class TestEmployeeJobChange(common.TestPayrollAccountCommon):
             'name': 'Jean Jasse',
             'company_id': cls.company_id.id,
         })
-        bank_ing = cls.env['res.bank'].create({
-            'name': 'ING',
-            'bic': 'BBRUBEBB'
-        })
         account = cls.env['res.partner.bank'].create({
-            'acc_number': 'BE02151804051200',
-            'bank_id': bank_ing.id,
+            'account_number': 'BE02151804051200',
+            'bank_name': 'ING',
+            'bank_bic': 'BBRUBEBB',
             'partner_id': partner.id,
             'company_id': cls.company_id.id,
         })
-        employee = cls.env['hr.employee'].create({
+        cls.employee = cls.env['hr.employee'].create({
             'name': 'Jean Jasse',
             'company_id': cls.company_id.id,
             'country_id': cls.env.ref('base.be').id,
             'bank_account_ids':  [Command.link(account.id)],
-            'sex': 'male',
             'children': 0,
             'km_home_work': 0,
             'place_of_birth': 'Charleroi',
             'country_of_birth': cls.env.ref('base.be').id,
-            'birthday': fields.Date.from_string('1988-05-10'),
-            'identification_id': '11.11.11-111.11',
+            'niss': '88051056350',
             'certificate': 'master',
-            'study_school': 'UCL',
             'study_field': 'Civil Engineering',
             'work_contact_id': work_contact.id,
             'work_email': 'jeanjasse@doublehelice.be',
@@ -81,21 +74,23 @@ class TestEmployeeJobChange(common.TestPayrollAccountCommon):
             'hr_responsible_id': cls.env.ref('base.user_admin').id,
             'contract_template_id': cls.new_dev_contract.id,
             'sign_template_id': cls.template.id,
-            'ip_wage_rate': 25,
+            'ip_wage_rate': 0.25,
             'internet': 0,
             'date_version': datetime.date(2020, 1, 1),
             'contract_date_start': datetime.date(2020, 1, 1),
+            'l10n_be_joint_committee_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200').id,
         })
         cls.env['res.users'].create({
-            'create_employee_id': employee.id,
-            'employee_id': employee.id,
-            'name': employee.name,
+            'create_employee_id': cls.employee.id,
+            'employee_id': cls.employee.id,
+            'name': cls.employee.name,
             'email': 'jeanjasse@doublehelice.be',
             'login': 'jeanjasse',
             'password': 'jeanjasse',
             'company_id': cls.company_id.id,
             'company_ids': cls.company_id.ids,
         })
+        cls.senior_dev_contract.l10n_be_joint_committee_id = cls.env.ref('l10n_be_hr_payroll.l10n_be_joint_committee_200')
         cls.env.flush_all()
 
     def test_employee_job_change(self):
@@ -103,13 +98,17 @@ class TestEmployeeJobChange(common.TestPayrollAccountCommon):
         # the values of the new job instead of the values of the old one.
         # This test also ensure that every required values that can be prefilled using the
         # employee's data is indeed prefilled.
+        # Employee's New job has been changed here, because field has been removed from the tour.
+        self.employee.job_id = self.new_job.id
         with freeze_time("2022-01-01"):
-            self.start_tour("/", 'hr_contract_salary_tour_job_change', login='admin')
+            self.start_tour("/odoo", 'hr_contract_salary_tour_job_change', login='admin')
         job_changing_employee = self.env['hr.employee'].search([('name', '=', 'Jean Jasse')])
         new_version = self.env['hr.version'].search([
             ('employee_id', '=', job_changing_employee.id),
             ('active', '=', False),
         ])
         self.assertTrue(job_changing_employee.active, 'Employee is active')
-        self.assertTrue(new_version.ip, 'The new contract should have an IP')
-        self.assertEqual(new_version.ip_wage_rate, 50, 'The new contract should have an ip_wage_rate of 50')
+        self.assertTrue(new_version.metro_transport_employee_amount, 300)
+        self.assertTrue(new_version.metro_transport_reimbursed_amount, (300 / 12) * 0.718)
+        self.assertTrue(new_version.metro_transport_periodicity, 'yearly')
+        self.assertEqual(new_version.ip_wage_rate, 0.5, 'The new contract should have an ip_wage_rate of 0.5 (50%)')

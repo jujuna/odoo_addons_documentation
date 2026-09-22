@@ -7,6 +7,8 @@ from odoo.addons.account_reports.tests.account_sales_report_common import Accoun
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestCZIntrastatExport(AccountSalesReportCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountSalesReportCommon.setup_country('cz')
     def setUpClass(cls):
@@ -92,7 +94,7 @@ class TestCZIntrastatExport(AccountSalesReportCommon):
             # 0/name, 1/system, 2/country, 3/transaction code, 4/region code, 5/commodity code, 6/origin country, 12/value
             [                                            0,                     1,           2,     3,       4,            5,      6,       12],
             [
-                (                              'Intrastat',                  None,        None,  None,    None,         None,   None, 300800.0),
+                (                              'Intrastat',                    '',          '',    '',      '',           '',     '', 300800.0),
                 # Arrival invoice
                 ( 'Arrival - BE0897223670 - 88023000 - BE',        '29 (Arrival)',   'Belgium',  '11',      '',   '88023000',   'ES',   300000),
                 (                      'BILL/2025/07/0001',        '29 (Arrival)',   'Belgium',  '11',      '',   '88023000',   'ES',   300000),

@@ -8,9 +8,10 @@ from .common import TestPlanningContractCommon
 
 import unittest
 from odoo.exceptions import UserError
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestRecurrencySlotGeneration(TestCommonPlanning):
 
     @classmethod
@@ -63,7 +64,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             slot = self.env['planning.slot'].create({
                 'start_datetime': datetime(2019, 6, 27, 8, 0, 0),
                 'end_datetime': datetime(2019, 6, 27, 17, 0, 0),
-                'resource_id': self.resource_joseph.id,
+                'resource_ids': self.resource_joseph.ids,
                 'repeat': True,
                 'repeat_type': 'forever',
                 'repeat_interval': 1,
@@ -119,7 +120,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 27, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 27, 17, 0, 0),
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_interval': 1,
@@ -154,7 +155,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 27, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 27, 17, 0, 0),
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_interval': 1,
@@ -203,7 +204,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             self.env['planning.slot'].create({
                 'start_datetime': datetime(2019, 9, 1, 8, 0, 0),
                 'end_datetime': datetime(2019, 9, 1, 17, 0, 0),
-                'resource_id': self.resource_joseph.id,
+                'resource_ids': self.resource_joseph.ids,
                 'repeat': True,
                 'repeat_type': 'forever',
                 'repeat_interval': 1,
@@ -248,7 +249,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             self.env['planning.slot'].create({
                 'start_datetime': datetime(2019, 6, 1, 8, 0, 0),
                 'end_datetime': datetime(2019, 6, 1, 17, 0, 0),
-                'resource_id': self.resource_joseph.id,
+                'resource_ids': self.resource_joseph.ids,
                 'repeat': True,
                 'repeat_type': 'until',
                 'repeat_interval': 1,
@@ -272,7 +273,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         planning_slot = self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 27, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 27, 17, 0, 0),
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_interval': 1,
@@ -319,7 +320,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             self.env['planning.slot'].create({
                 'start_datetime': datetime(2019, 6, 1, 8, 0, 0),
                 'end_datetime': datetime(2019, 6, 1, 17, 0, 0),
-                'resource_id': self.resource_joseph.id,
+                'resource_ids': self.resource_joseph.ids,
                 'repeat': True,
                 'repeat_type': 'forever',
                 'repeat_interval': 4,
@@ -374,7 +375,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             self.env['planning.slot'].create({
                 'start_datetime': datetime(2020, 4, 20, 8, 0, 0),
                 'end_datetime': datetime(2020, 4, 20, 17, 0, 0),
-                'resource_id': self.resource_joseph.id,
+                'resource_ids': self.resource_joseph.ids,
                 'repeat': True,
                 'repeat_interval': 1,
                 'repeat_type': 'x_times',
@@ -414,7 +415,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         slot = self.env['planning.slot'].create({
             'start_datetime': datetime(2020, 4, 20, 8, 0, 0),
             'end_datetime': datetime(2020, 4, 20, 17, 0, 0),
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
             'repeat': True,
             'repeat_interval': 1,
             'repeat_unit': 'day',
@@ -458,7 +459,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         slot1 = self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 3, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 3, 17, 0, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'forever',
             'repeat_interval': 1,
@@ -471,7 +472,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         slot1 = self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 3, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 3, 17, 0, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'forever',
             'repeat_interval': 1,
@@ -486,7 +487,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         slot2 = self.env['planning.slot'].create({
             'start_datetime': datetime(2019, 6, 3, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 3, 17, 0, 0),
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
             'repeat': True,
             'repeat_type': 'forever',
             'repeat_interval': 1,
@@ -529,7 +530,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             {
                 'start_datetime': datetime(2025, 1, 1, 8, 0, 0),
                 'end_datetime': datetime(2025, 1, 1, 17, 0, 0),
-                'resource_id': self.resource_bert.id,
+                'resource_ids': self.resource_bert.ids,
                 'repeat': True,
                 'repeat_type': 'until',
                 'repeat_interval': 1,
@@ -539,7 +540,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             {
                 'start_datetime': datetime(2025, 1, 1, 8, 0, 0),
                 'end_datetime': datetime(2025, 1, 1, 17, 0, 0),
-                'resource_id': self.resource_joseph.id,
+                'resource_ids': self.resource_joseph.ids,
                 'repeat': True,
                 'repeat_type': 'until',
                 'repeat_interval': 1,
@@ -563,7 +564,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         slot = self.env['planning.slot'].create({
             'start_datetime': datetime(2020, 1, 1, 8, 0, 0),
             'end_datetime': datetime(2020, 1, 1, 17, 0, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_until': datetime(2020, 2, 29, 17, 0, 0),
@@ -582,7 +583,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             self.env['planning.slot'].create({
                 'start_datetime': datetime(2020, 1, 1, 8, 0, 0),
                 'end_datetime': datetime(2020, 1, 1, 17, 0, 0),
-                'resource_id': self.resource_joseph.id,
+                'resource_ids': self.resource_joseph.ids,
                 'repeat': True,
                 'repeat_type': 'until',
                 'repeat_until': datetime(2019, 12, 25, 17, 0, 0),
@@ -611,7 +612,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2020, 10, 20, 6, 0, 0),
             'end_datetime': datetime(2020, 10, 20, 15, 0, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_until': datetime(2022, 6, 27, 15, 0, 0),
@@ -645,7 +646,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         self.env['planning.slot'].create({
             'start_datetime': datetime(2020, 10, 25, 0, 30, 0),
             'end_datetime': datetime(2020, 10, 25, 9, 0, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_until': datetime(2022, 6, 27, 15, 0, 0),
@@ -662,7 +663,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             'name': 'coucou',
             'start_datetime': datetime(2020, 10, 25, 0, 30, 0),
             'end_datetime': datetime(2020, 10, 25, 9, 0, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_until': datetime(2020, 12, 25, 0, 0, 0),
@@ -697,11 +698,11 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         dummy, slot = PlanningSlot.create([{
             'start_datetime': datetime(2020, 1, 8, 8, 0),
             'end_datetime': datetime(2020, 1, 8, 17, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
         }, {
             'start_datetime': datetime(2020, 1, 6, 8, 0),
             'end_datetime': datetime(2020, 1, 6, 17, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_unit': 'day',
             'repeat_type': 'until',
@@ -709,7 +710,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             'repeat_interval': 1,
         }])
 
-        open_shift_count = PlanningSlot.search_count([('resource_id', '=', False), ('recurrency_id', '=', slot.recurrency_id.id)])
+        open_shift_count = PlanningSlot.search_count([('resource_ids', '=', False), ('recurrency_id', '=', slot.recurrency_id.id)])
         self.assertEqual(open_shift_count, 1, 'Open shift should be created instead of recurring shift if resource already has a shift planned')
         self.assertEqual(len(self.get_by_employee(self.employee_bert)), 5, 'There should be 5 shifts: 1 already planned shift and 4 recurring shifts')
 
@@ -720,7 +721,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             'name': 'coucou',
             'start_datetime': datetime(2020, 1, 31, 8, 0),
             'end_datetime': datetime(2020, 1, 31, 9, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'until',
             'repeat_until': datetime(2020, 6, 1, 0, 0),
@@ -746,7 +747,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             'name': 'coucou',
             'start_datetime': datetime(2020, 1, 28, 8, 0),
             'end_datetime': datetime(2020, 1, 28, 9, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'x_times',
             'repeat_number': 2,
@@ -756,11 +757,11 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             'name': 'concurrent slot',
             'start_datetime': datetime(2020, 2, 28, 8, 0),
             'end_datetime': datetime(2020, 2, 28, 11, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
         }])
 
         self.assertFalse(
-            slot.recurrency_id.slot_ids[1].resource_id,
+            slot.recurrency_id.slot_ids[1].resource_ids,
             'The second slot should be an open shift as the resource has a concurrent shift'
         )
 
@@ -885,7 +886,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         first_slot = self.env['planning.slot'].create([{  # this should land on a Monday
             'start_datetime': self.random_monday_date + timedelta(hours=8),
             'end_datetime': self.random_monday_date + timedelta(hours=14),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'allocated_hours': 2,
             'repeat': True,
             'repeat_type': 'x_times',
@@ -895,22 +896,22 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         }, {
             'start_datetime': self.random_monday_date + timedelta(days=1, hours=8),
             'end_datetime': self.random_monday_date + timedelta(days=1, hours=14),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'allocated_hours': 1,
         }, {
             'start_datetime': self.random_monday_date + timedelta(days=1, hours=12),
             'end_datetime': self.random_monday_date + timedelta(days=1, hours=16),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'allocated_hours': 1,
         }, {
             'start_datetime': self.random_monday_date + timedelta(days=1, hours=7),
             'end_datetime': self.random_monday_date + timedelta(days=1, hours=10),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'allocated_hours': 1,
         }])[0]
 
         self.assertTrue(
-            first_slot.recurrency_id.slot_ids[1].resource_id,
+            first_slot.recurrency_id.slot_ids[1].resource_ids,
             'The 2nd recurring slot can be generated normally as the recurrent shift and the other occuring shifts would not pass 100 percent allocated percentage.'
         )
 
@@ -927,7 +928,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         first_slot = self.env['planning.slot'].create([{  # this should land on a Monday
             'start_datetime': self.random_monday_date + timedelta(hours=8),
             'end_datetime': self.random_monday_date + timedelta(hours=11),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'allocated_hours': 2,
             'repeat': True,
             'repeat_type': 'x_times',
@@ -937,17 +938,17 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         }, {
             'start_datetime': self.random_monday_date + timedelta(days=1, hours=8),
             'end_datetime': self.random_monday_date + timedelta(days=1, hours=10),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'allocated_hours': 2,
         }])[0]
 
         self.assertEqual(
-            first_slot.recurrency_id.slot_ids[0].resource_id.id,
+            first_slot.recurrency_id.slot_ids[0].resource_ids.id,
             self.resource_bert.id,
             'The 1st recurring slot will be generated normally since the resource is available on that day.'
         )
         self.assertFalse(
-            first_slot.recurrency_id.slot_ids[1].resource_id,
+            first_slot.recurrency_id.slot_ids[1].resource_ids,
             'The 2nd recurring slot will be generated as an open shift because the resource cannot accomodate the extra slot given its allocated hours.'
         )
 
@@ -961,7 +962,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         first_slot = self.env['planning.slot'].create({  # this should land on a Monday
             'start_datetime': self.random_monday_date + timedelta(hours=18),
             'end_datetime': self.random_monday_date + timedelta(hours=20),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'x_times',
             'repeat_number': 5,
@@ -969,7 +970,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             'repeat_unit': 'day',
         })
 
-        resources_per_slot = [slot.resource_id.id for slot in first_slot.recurrency_id.slot_ids]
+        resources_per_slot = [slot.resource_ids.id for slot in first_slot.recurrency_id.slot_ids]
 
         self.assertTrue(
             all(resources_per_slot),
@@ -989,24 +990,23 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         """
         part_time_calendar = self.env['resource.calendar'].create({
             'name': 'Part time calendar',
-            'tz': 'UTC',
             'hours_per_day': 8.0,
             'attendance_ids': [
-                (0, 0, {'name': 'Monday Morning', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Monday Afternoon', 'dayofweek': '0', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Tuesday Morning', 'dayofweek': '1', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Wednesday Morning', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Wednesday Afternoon', 'dayofweek': '2', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
-                (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Friday Morning', 'dayofweek': '4', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Friday Afternoon', 'dayofweek': '4', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'})
+                (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '0', 'hour_from': 13, 'hour_to': 17}),
+                (0, 0, {'dayofweek': '1', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 13, 'hour_to': 17}),
+                (0, 0, {'dayofweek': '3', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '4', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '4', 'hour_from': 13, 'hour_to': 17})
             ]
         })
         self.employee_bert.resource_calendar_id = part_time_calendar
         first_slot = self.env['planning.slot'].create({  # this should land on a Monday
             'start_datetime': self.random_monday_date + timedelta(hours=15),
             'end_datetime': self.random_monday_date + timedelta(hours=16),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'x_times',
             'repeat_number': 5,
@@ -1014,18 +1014,16 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             'repeat_unit': 'day',
         })
 
-        resources_per_slot = [slot.resource_id.id for slot in first_slot.recurrency_id.slot_ids]
-
         self.assertFalse(
-            all(resources_per_slot),
+            all(s.resource_ids for s in first_slot.recurrency_id.slot_ids),
             'Since the initial slot was planned during work hours, recurring slots outside work hours are generated as open shifts.'
         )
         self.assertFalse(
-            first_slot.recurrency_id.slot_ids[1].resource_id,
+            first_slot.recurrency_id.slot_ids[1].resource_ids,
             'The recurring shift to be planned on Tuesday should be an open shift.'
         )
         self.assertFalse(
-            first_slot.recurrency_id.slot_ids[3].resource_id,
+            first_slot.recurrency_id.slot_ids[3].resource_ids,
             'The recurring shift to be planned on Thursday should be an open shift.'
         )
 
@@ -1040,7 +1038,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
                 'name': 'coucou',
                 'start_datetime': datetime(2024, 6, 16, 8, 0, 0),
                 'end_datetime': datetime(2024, 6, 16, 17, 0, 0),
-                'resource_id': self.resource_joseph.id,
+                'resource_ids': self.resource_joseph.ids,
                 'repeat': True,
                 'repeat_type': 'x_times',
                 'repeat_number': 6,
@@ -1049,7 +1047,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
                 'name': 'concurrent slot',
                 'start_datetime': datetime(2024, 6, 16, 8, 0, 0),
                 'end_datetime': datetime(2024, 6, 16, 17, 0, 0),
-                'resource_id': self.resource_bert.id,
+                'resource_ids': self.resource_bert.ids,
                 'repeat': True,
                 'repeat_type': 'x_times',
                 'repeat_number': 6,
@@ -1087,7 +1085,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             'name': 'Full month recurrency',
             'start_datetime': datetime(2020, 1, 1, 8, 0),
             'end_datetime': datetime(2020, 1, 31, 15, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'x_times',
             'repeat_number': 4,
@@ -1117,11 +1115,20 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
            the allocated hours should be equal to the original shift.
         """
         # set the calendar for the employee as flexible
-        self.employee_bert.resource_calendar_id = self.flex_50h_calendar
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+            'hours_per_week': 50,
+            'hours_per_day': 10,
+        })
+        self.employee_bert.write({
+            'resource_calendar_id': flexible_calendar.id,
+        })
 
         # create the recutting shift
         self.env['planning.slot'].create({
-            'resource_id': self.employee_bert.resource_id.id,
+            'resource_ids': self.employee_bert.resource_id.ids,
             'start_datetime': datetime(2022, 1, 10, 10, 0),     # Monday
             'end_datetime': datetime(2022, 1, 10, 17, 0),       # shift of 7 hours
             'repeat': True,
@@ -1144,18 +1151,23 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         Test that recurring shifts are assigned to fully flexible employees even if they generate conflicts with existing shifts.
         """
         # Create an employee working fully flexible hours
-        self.employee_bert.resource_calendar_id = False
+        fully_flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Fully Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+        })
+        self.employee_bert.resource_calendar_id = fully_flexible_calendar
 
         # Plan some shifts for the employee
         shift = self.env['planning.slot'].create({
-            'resource_id': self.employee_bert.resource_id.id,
+            'resource_ids': self.employee_bert.resource_id.ids,
             'start_datetime': datetime(2022, 1, 10, 10, 0),
             'end_datetime': datetime(2022, 1, 10, 17, 0),
         })
 
         # Create a recurring shift for the employee
         self.env['planning.slot'].create({
-            'resource_id': self.employee_bert.resource_id.id,
+            'resource_ids': self.employee_bert.resource_id.ids,
             'start_datetime': datetime(2022, 1, 10, 9, 0),      # Monday
             'end_datetime': datetime(2022, 1, 10, 18, 0),       # shift of 9 hours
             'repeat': True,
@@ -1168,7 +1180,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         # Fetch all shifts for the employee within the week
         shifts = self.env['planning.slot'].search([
             ('id', '!=', shift.id),
-            ('resource_id', '=', self.employee_bert.resource_id.id),
+            ('resource_ids', 'in', self.employee_bert.resource_id.id),
             ('start_datetime', '>=', datetime(2022, 1, 10, 0, 0)),
             ('end_datetime', '<=', datetime(2022, 1, 16, 23, 59, 59)),
         ])
@@ -1191,7 +1203,7 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
             'name': 'Full month recurrency',
             'start_datetime': datetime(2024, 9, 16, 8, 0),
             'end_datetime': datetime(2024, 9, 20, 17, 0),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'x_times',
             'repeat_number': 4,
@@ -1216,13 +1228,14 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         shift=self.env['planning.slot'].create({
             'start_datetime': datetime(2024, 12, 25, 8, 0, 0),
             'end_datetime': datetime(2024, 12, 25, 17, 0, 0),
-            'resource_id': self.resource_joseph.id,
+            'resource_ids': self.resource_joseph.ids,
         })
         self.resource_joseph.action_archive()
         shift.write({'repeat': True, 'repeat_interval': 1, 'repeat_type': 'forever'})
-        self.assertFalse((shift.recurrency_id.slot_ids - shift).resource_id)
+        self.assertFalse((shift.recurrency_id.slot_ids - shift).resource_ids)
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestPlanningContract(TestPlanningContractCommon):
 
     @freeze_time('2024-03-11 08:00:00')
@@ -1244,7 +1257,7 @@ class TestPlanningContract(TestPlanningContractCommon):
         recurrent_slot = self.env['planning.slot'].create({  # this should be a Monday
             'start_datetime': self.random_monday_date + timedelta(hours=15),
             'end_datetime': self.random_monday_date + timedelta(hours=16),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'forever',
             'repeat_interval': 1,
@@ -1276,7 +1289,7 @@ class TestPlanningContract(TestPlanningContractCommon):
         recurrent_slot = self.env['planning.slot'].create({  # this should land on a Monday
             'start_datetime': self.random_monday_date + timedelta(hours=15),
             'end_datetime': self.random_monday_date + timedelta(hours=16),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'forever',
             'repeat_interval': 1,
@@ -1308,7 +1321,7 @@ class TestPlanningContract(TestPlanningContractCommon):
         recurrent_slot = self.env['planning.slot'].create({  # this should be a Monday
             'start_datetime': self.random_monday_date + timedelta(hours=15),
             'end_datetime': self.random_monday_date + timedelta(hours=16),
-            'resource_id': self.resource_bert.id,
+            'resource_ids': self.resource_bert.ids,
             'repeat': True,
             'repeat_type': 'forever',
             'repeat_interval': 1,

@@ -1,14 +1,15 @@
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { user } from "@web/core/user";
-import { Component, onWillStart } from "@odoo/owl";
+import { Component, onWillStart, t, useProps } from "@odoo/owl";
 
 export class SetReservedQuantityButton extends Component {
-    static props = {
-        ...standardFieldProps,
-        fieldToSet: { type: String },
-    };
     static template = "stock_barcode.SetReservedQuantityButtonTemplate";
+
+    props = useProps({
+        ...standardFieldProps,
+        fieldToSet: t.string(),
+    });
 
     setup() {
         onWillStart(async () => {
@@ -17,7 +18,7 @@ export class SetReservedQuantityButton extends Component {
     }
 
     get uom() {
-        const { id, display_name: name } = this.props.record.data.product_uom_id || {};
+        const { id, display_name: name } = this.props.record.data.uom_id || {};
         return { id, name };
     }
 

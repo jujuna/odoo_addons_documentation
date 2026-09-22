@@ -1,10 +1,8 @@
 import { registry } from "@web/core/registry";
-import { batched, reactive } from "@odoo/owl";
-import { Deferred } from "@web/core/utils/concurrency";
+import { batched, effect, proxy } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
 import { browser } from "@web/core/browser/browser";
 import { uuid } from "@web/core/utils/strings";
-import { effect } from "@web/core/utils/reactive";
 
 const ARTICLE_THREAD_FIELDS = [
     "id",
@@ -28,16 +26,16 @@ export const knowledgeCommentsService = {
     dependencies: ["orm", "mail.store"],
     start(env, services) {
         this.services = services;
-        this.commentsState = reactive({
+        this.commentsState = proxy({
             articleId: undefined,
             activeThreadId: undefined,
             shouldOpenActiveThread: false,
             /** @returns {boolean} */
-            get isDisplayed () {
+            get isDisplayed() {
                 return this.displayMode === "panel";
             },
             /** @returns {boolean} */
-            get hasComments () {
+            get hasComments() {
                 return Object.keys(this.threadRecords).length > 0;
             },
             // database records
@@ -55,21 +53,19 @@ export const knowledgeCommentsService = {
             },
         });
         let previousArticleId;
-        effect(
-            (state) => {
-                if (previousArticleId !== state.articleId) {
-                    this.resetForArticleId();
-                    previousArticleId = state.articleId;
-                }
-            },
-            [this.commentsState]
-        );
+        this.resetForArticleId();
+        const disposeEffect = effect(() => {
+            if (previousArticleId !== this.commentsState.articleId) {
+                this.resetForArticleId();
+                previousArticleId = this.commentsState.articleId;
+            }
+        });
+        registry.category("services").addEventListener("CLEANUP", disposeEffect, { once: true });
         return {
             createThread: this.createThread.bind(this),
             createThreadAndPost: this.createThreadAndPost.bind(this),
             createVirtualThread: this.createVirtualThread.bind(this),
             deleteThread: this.deleteThread.bind(this),
-            fetchMessages: this.fetchMessages.bind(this),
             getCommentsState: this.getCommentsState.bind(this),
             loadRecords: this.loadRecords.bind(this),
             loadThreads: this.loadThreads.bind(this),
@@ -94,7 +90,7 @@ export const knowledgeCommentsService = {
         this.commentsState.editorThreads[record.id] = this.commentsState.editorThreads["undefined"];
         delete this.commentsState.editorThreads["undefined"];
         this.commentsState.editorThreads[record.id].setThreadId(record.id);
-        const thread = this.services["mail.store"].Thread.insert({
+        const thread = this.services["mail.store"]["mail.thread"].insert({
             id: record.id,
             model: "knowledge.article.thread",
             articleId: this.commentsState.articleId,
@@ -116,11 +112,13 @@ export const knowledgeCommentsService = {
         return thread;
     },
     createVirtualThread() {
-        this.commentsState.threads["undefined"] = this.services["mail.store"].Thread.insert({
-            id: undefined,
-            model: "knowledge.article.thread",
-            articleId: this.commentsState.articleId,
-        });
+        this.commentsState.threads["undefined"] = this.services["mail.store"]["mail.thread"].insert(
+            {
+                id: undefined,
+                model: "knowledge.article.thread",
+                articleId: this.commentsState.articleId,
+            }
+        );
         clearThreadComposer(this.commentsState.threads["undefined"].composer);
         return this.commentsState.threads["undefined"];
     },
@@ -130,15 +128,6 @@ export const knowledgeCommentsService = {
         }
         this.batchedDeleteThread.threadIds.add(resId);
         this.batchedDeleteThread();
-    },
-    // threadId is a number
-    async fetchMessages(threadId) {
-        const deferred = new Deferred();
-        this.batchedFetchMessages.deferredPromises[threadId] ||= [];
-        this.batchedFetchMessages.deferredPromises[threadId].push(deferred);
-        this.batchedFetchMessages.threadIds.add(threadId);
-        this.batchedFetchMessages();
-        return await deferred;
     },
     getCommentsState() {
         return this.commentsState;
@@ -164,7 +153,7 @@ export const knowledgeCommentsService = {
     },
     loadThreads(resIds) {
         for (const resId of resIds) {
-            this.commentsState.threads[resId] = this.services["mail.store"].Thread.insert({
+            this.commentsState.threads[resId] = this.services["mail.store"]["mail.thread"].insert({
                 id: resId === "undefined" ? undefined : resId,
                 model: "knowledge.article.thread",
                 articleId: this.commentsState.articleId,
@@ -198,42 +187,6 @@ export const knowledgeCommentsService = {
             }
         };
         const batch = batched(deleteThread);
-        batch.threadIds = new Set();
-        batch.loadingId = this.loadingId;
-        return batch;
-    },
-    makeBatchedFetchMessages() {
-        const fetchMessages = async () => {
-            if (this.loadingId !== batch.loadingId) {
-                return;
-            }
-            const deferredPromises = batch.deferredPromises;
-            const thread_ids = Array.from(batch.threadIds);
-            batch.threadIds = new Set();
-            batch.deferredPromises = {};
-            let error;
-            let result;
-            try {
-                result = await rpc("/knowledge/threads/messages", {
-                    thread_model: "knowledge.article.thread",
-                    thread_ids,
-                });
-            } catch (e) {
-                error = e;
-            }
-            // thread_id is a number, not a string (used for backend)
-            for (const thread_id in deferredPromises) {
-                for (const deferred of deferredPromises[thread_id]) {
-                    if (error) {
-                        deferred.reject(error);
-                    } else {
-                        deferred.resolve(result[thread_id]);
-                    }
-                }
-            }
-        };
-        const batch = batched(fetchMessages);
-        batch.deferredPromises = {};
         batch.threadIds = new Set();
         batch.loadingId = this.loadingId;
         return batch;
@@ -343,7 +296,6 @@ export const knowledgeCommentsService = {
         this.commentsState.threads = {};
         this.commentsState.disabledEditorThreads = {};
         this.commentsState.editorThreads = {};
-        this.batchedFetchMessages = this.makeBatchedFetchMessages();
         this.batchedDeleteThread = this.makeBatchedDeleteThread();
         this.batchedLoadRecords = this.makeBatchedLoadRecords();
         this._loadRecords = this.makeLoadRecords();
@@ -351,7 +303,6 @@ export const knowledgeCommentsService = {
     setArticleId(articleId) {
         if (articleId !== this.commentsState.articleId) {
             this.commentsState.articleId = articleId;
-            this.resetForArticleId();
         }
     },
     async updateResolveState(resId, resolvedState) {

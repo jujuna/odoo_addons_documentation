@@ -24,9 +24,10 @@ class HrAppraisalGoal(models.Model):
 
     @api.depends("goal_skill_ids")
     def _compute_current_goal_skill_ids(self):
+        today = fields.Date.context_today(self)
         for goal in self:
             goal.current_goal_skill_ids = goal.goal_skill_ids.filtered(
-                lambda goal_skill: not goal_skill.valid_to or goal_skill.valid_to >= fields.Date.today()
+                lambda goal_skill: not goal_skill.valid_to or goal_skill.valid_to >= today
             )
 
     def _search_current_goal_skill_ids(self, operator, value):
@@ -35,7 +36,7 @@ class HrAppraisalGoal(models.Model):
         goal_skill_ids = []
         domain = Domain.OR([
             Domain('valid_to', '=', False),
-            Domain('valid_to', '>=', fields.Date.today()),
+            Domain('valid_to', '>=', 'today'),
         ])
         if operator == 'any' and isinstance(value, Domain):
             domain = Domain.AND([domain, value])

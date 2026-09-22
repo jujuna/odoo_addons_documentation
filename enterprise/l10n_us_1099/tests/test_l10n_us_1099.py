@@ -1,13 +1,14 @@
-# coding: utf-8
 from odoo import Command
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.tests import tagged
 
-import base64
 from freezegun import freeze_time
+
 
 @tagged('post_install_l10n', "post_install", "-at_install")
 class Test1099(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -132,7 +133,7 @@ class Test1099(AccountTestInvoicingCommon):
         self.assertEqual(wizard.lines_to_export, expected_lines, "Wizard should contain the credit part of the 1099 vendor entry.")
 
         wizard.action_generate()
-        csv_content = base64.b64decode(wizard.generated_csv_file).decode().splitlines()
+        csv_content = wizard.generated_csv_file.decode().splitlines()
 
         self.maxDiff = None  # show the full diff in case of errors
         header = (
@@ -233,7 +234,7 @@ class Test1099(AccountTestInvoicingCommon):
         lines_to_export = (move_1 + move_2 + move_3).line_ids.filtered('credit')
         wizard = self.env['l10n_us_1099.wizard'].create({'lines_to_export': lines_to_export})
         wizard.action_generate()
-        csv_content = base64.b64decode(wizard.generated_csv_file).decode().splitlines()
+        csv_content = wizard.generated_csv_file.decode().splitlines()
 
         self.maxDiff = None  # show the full diff in case of errors
         header = (
@@ -291,7 +292,7 @@ class Test1099(AccountTestInvoicingCommon):
         lines_to_export = (move_1 + move_2).line_ids.filtered('credit')
         wizard = self.env['l10n_us_1099.wizard'].create({'lines_to_export': lines_to_export})
         wizard.action_generate()
-        csv_content = base64.b64decode(wizard.generated_csv_file).decode().splitlines()
+        csv_content = wizard.generated_csv_file.decode().splitlines()
 
         self.maxDiff = None  # show the full diff in case of errors
         header = (

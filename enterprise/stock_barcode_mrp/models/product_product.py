@@ -9,4 +9,4 @@ class ProductProduct(models.Model):
 
     @api.model
     def _get_fields_stock_barcode(self):
-        return super()._get_fields_stock_barcode() + ['is_kits']
+        return super()._get_fields_stock_barcode() + ['is_kits', 'lot_sequence_id']

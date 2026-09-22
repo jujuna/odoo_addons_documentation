@@ -3,14 +3,18 @@
 import base64
 import copy
 import json
-from unittest.mock import patch
 
 from odoo import Command, fields
-from odoo.addons.ai.utils.llm_api_service import LLMApiService
-from odoo.addons.ai_fields.tools import UnresolvedQuery
-from odoo.addons.base.tests.test_ir_cron import CronMixinCase
 from odoo.tests import TransactionCase, tagged
 from odoo.tools import SQL
+
+from odoo.addons.ai.utils.ai_fields_tools import UnresolvedQuery
+from odoo.addons.test_ai_fields.tests.common import TestAIFieldsCommon
+from odoo.addons.base.tests.files import PNG_B64, PNG_RAW
+from odoo.addons.base.tests.test_ir_cron import CronMixinCase
+
+PDF_RAW = b'%PDF-1.4\ndummy\n%%EOF'
+TXT_RAW = b'My txt content'
 
 
 @tagged('post_install', '-at_install')
@@ -50,6 +54,8 @@ class TestAiFieldsCrons(TransactionCase, CronMixinCase):
             self.assertTrue(len(capt.records))
 
     def test_ai_properties_cron_trigger(self):
+        ai_base_char = self.env['ir.model.fields']._get('test.ai.fields.model', 'ai_base_char')
+        ai_base_char.ai = False
         ai_properties_cron = self.env.ref('ai_fields.ir_cron_fill_ai_fields').id
         definition_no_ai = self.env["test.ai.fields.parent"].create({"properties_definition": []})
         definition_with_ai = self.env["test.ai.fields.parent"].create({"properties_definition": [
@@ -89,17 +95,10 @@ class TestAiFieldsCrons(TransactionCase, CronMixinCase):
 
 
 @tagged('post_install', '-at_install')
-class TestAiFields(TransactionCase):
-    def _mock_llm_api_get_token(self):
-        def _mock_get_api_token(self):
-            return "dummy"
-        return patch.object(LLMApiService, '_get_api_token', _mock_get_api_token)
+class TestAiFields(TestAIFieldsCommon):
 
     def test_ai_field_cron_fields(self):
         """Check that the cron only process NULL textual fields (that are in the ai_domain)."""
-        def _mocked_llm_api_request(self, method, endpoint, headers, body):
-            return {'output': [{'type': 'message', 'content': [{'text': json.dumps({'value': f"response value {body['input'][1]['content'][0]['text']}", 'is_resolved': True})}]}]}
-
         model = self.env["test.ai.fields.model"]
 
         # create ai fields of different types
@@ -133,8 +132,10 @@ class TestAiFields(TransactionCase):
         self.assertEqual(result[records[2].id], ("existing", "existing", "<p>existing</p>", 5, True))
 
         # run the cron job
-        with patch.object(LLMApiService, '_request', _mocked_llm_api_request), self.enter_registry_test_mode(), \
-            self._mock_llm_api_get_token():
+        def mock_responses():
+            while True:
+                yield self.mock_ai_field_response("response value")
+        with self.mock_completion_request(mock_responses()), self.enter_registry_test_mode():
             self.env.ref('ai_fields.ir_cron_fill_ai_fields').method_direct_trigger()
 
         self.env.flush_all()
@@ -143,7 +144,7 @@ class TestAiFields(TransactionCase):
 
         self.assertEqual(
             result[records[0].id],
-            (None, "response value text prompt", "<p>response value html prompt</p>", 0, False),
+            (None, "response value", "<p>response value</p>", 0, False),
             "Textual fields should have been updated (except char which is excluded by ai_domain)"
         )
         # only NULL textual fields should be updated
@@ -151,10 +152,6 @@ class TestAiFields(TransactionCase):
         self.assertEqual(result[records[2].id], ("existing", "existing", "<p>existing</p>", 5, True), "No field should have been updated")
 
     def test_ai_field_cron_properties(self):
-
-        def _mocked_llm_api_request(self, method, endpoint, headers, body):
-            return {'output': [{'type': 'message', 'content': [{'text': json.dumps({'value': f"response value {body['input'][1]['content'][0]['text']}"})}]}]}
-
         parent = self.env["test.ai.fields.parent"].create({})
 
         # Record created before the definition has been created
@@ -185,47 +182,46 @@ class TestAiFields(TransactionCase):
         self.assertEqual(result.get(record_4.id), {"char": False})
         self.assertEqual(result.get(record_5.id), {})
 
-        with patch.object(LLMApiService, '_request', _mocked_llm_api_request), self.enter_registry_test_mode(), \
-            self._mock_llm_api_get_token():
+        def mock_responses():
+            while True:
+                yield self.mock_ai_field_response("response value")
+
+        with self.mock_completion_request(mock_responses()), self.enter_registry_test_mode():
             self.env.ref('ai_fields.ir_cron_fill_ai_fields').method_direct_trigger()
         self.env.flush_all()
 
         self.env.cr.execute(SQL("SELECT id, properties FROM test_ai_fields_model WHERE id = ANY(%s)", records.ids))
         result = dict(self.env.cr.fetchall())
         self.assertEqual(result.get(record_0.id), None)
-        self.assertEqual(result.get(record_1.id), {"char": f"response value id={{{{id}}}}\n# Context Dict\n{json.dumps({'test.ai.fields.model': [{'id': record_1.id}]}, indent=2)}\nThe current record is {{'model': test.ai.fields.model, 'id': {record_1.id}}}"})
+        self.assertEqual(result.get(record_1.id), {"char": "response value"})
         self.assertEqual(result.get(record_2.id), {}, "The AI domain should have prevented the update of that record")
         self.assertEqual(result.get(record_3.id), {"char": False})
         self.assertEqual(result.get(record_4.id), {"char": False})
-        self.assertEqual(result.get(record_5.id), {"char": f"response value id={{{{id}}}}\n# Context Dict\n{json.dumps({'test.ai.fields.model': [{'id': record_5.id}]}, indent=2)}\nThe current record is {{'model': test.ai.fields.model, 'id': {record_5.id}}}"})
+        self.assertEqual(result.get(record_5.id), {"char": "response value"})
 
     def test_get_ai_context(self):
         partner_1, partner_2 = self.env['res.partner'].create([
             {
                 'name': "partner 1",
                 'bank_ids': [
-                    Command.create({'acc_number': f'bank_{i}', 'note': f'note {i}'})
+                    Command.create({'account_number': f'bank_{i}', 'note': f'note {i}'})
                     for i in range(3)
                 ],
             },
             {
                 'name': "partner 2",
                 'bank_ids': [
-                    Command.create({'acc_number': f'bank_{i}', 'note': f'note {i}'})
+                    Command.create({'account_number': f'bank_{i}', 'note': f'note {i}'})
                     for i in range(2)
                 ]
             }
         ])
-        vals, files = partner_1._get_ai_context(["name", "bank_ids.acc_number", "bank_ids.note"])
+        vals, files_parts = partner_1._get_ai_context(["name", "bank_ids.account_number", "bank_ids.note"])
         vals = json.loads(vals)
         self.assertEqual(len(vals), 2)
         self.assertEqual(vals['res.partner'], [{'id': partner_1.id, 'bank_ids': {'model': 'res.partner.bank', 'ids': partner_1.bank_ids.ids}, 'name': partner_1.name}])
-        self.assertCountEqual(vals['res.partner.bank'], partner_1.bank_ids.read(['acc_number', 'note']))
-        self.assertFalse(files)
-
-        pdf_datas = base64.b64encode(b'%PDF-1.4\ndummy\n%%EOF')
-        png_datas = b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
-        txt_datas = base64.b64encode(b'My txt content')
+        self.assertCountEqual(vals['res.partner.bank'], partner_1.bank_ids.read(['account_number', 'note']))
+        self.assertFalse(files_parts)
 
         record = self.env['test.ai.read.model'].create({
             'currency_id': self.env.ref('base.EUR').id,
@@ -235,21 +231,27 @@ class TestAiFields(TransactionCase):
                     'author_id': partner_1.id,
                     'body': '<div data-oe-version="2.0"><span class="h2-fs"><font style="background-color:red">Hello World</font></span></div>',
                     'attachment_ids': [
-                        Command.create({'name': 'dummy pdf', 'datas': pdf_datas}),
-                        Command.create({'name': 'dummy png', 'datas': png_datas}),
-                        Command.create({'name': 'dummy txt', 'datas': txt_datas}),
+                        Command.create({'name': 'dummy pdf', 'raw': PDF_RAW}),
+                        Command.create({'name': 'dummy png', 'raw': PNG_RAW}),
+                        Command.create({'name': 'dummy txt', 'raw': TXT_RAW}),
                     ],
                     'model': 'test.ai.read.model',
                 })
             ],
             'message_partner_ids': [partner_1.id, partner_2.id]
             })
-        vals, files = record._get_ai_context([
+
+        attachments = self.env['ir.attachment'].search([], order='id desc', limit=3)
+        pdf_checksum = attachments[2].checksum
+        png_checksum = attachments[1].checksum
+        png_attachment_id = attachments[1].id
+        txt_checksum = attachments[0].checksum
+        vals, files_parts = record._get_ai_context([
             "price",  # check that currency is added
             "message_ids.body",  # check that only inner_content is used
             "message_ids.attachment_ids",  # check that images and pdfs are handled separately as binaries
             "create_date",  # check that dates are formatted
-            "message_partner_ids.bank_ids.acc_number"  # check nested M2M
+            "message_partner_ids.bank_ids.account_number"  # check nested M2M
         ])
         vals = json.loads(vals)
         self.assertEqual(len(vals), 5)
@@ -268,28 +270,28 @@ class TestAiFields(TransactionCase):
         ])
 
         self.assertEqual({v['id'] for v in vals['ir.attachment']}, set(record.message_ids[1].attachment_ids.ids))
-        self.assertEqual({v['file'] for v in vals['ir.attachment']}, {'<file_#1>', '<file_#2>', '<file_#3>'})
+        self.assertEqual({v['file'] for v in vals['ir.attachment']}, {f'<file_{pdf_checksum}/>', f'<file_{png_checksum}/>', f'<file_{txt_checksum}/>'})
         self.assertCountEqual(vals['res.partner'], [
             {'id': record.message_partner_ids[0].id, 'bank_ids': {'model': 'res.partner.bank', 'ids': record.message_partner_ids[0].bank_ids.ids}},
             {'id': record.message_partner_ids[1].id, 'bank_ids': {'model': 'res.partner.bank', 'ids': record.message_partner_ids[1].bank_ids.ids}}
         ])
-        self.assertCountEqual(vals['res.partner.bank'], record.message_partner_ids.bank_ids.read(['acc_number']))
-        self.assertCountEqual(files, [
-            {'value': pdf_datas.decode(), 'mimetype': 'application/pdf', 'file_ref': '<file_#1>'},
-            {'value': png_datas.decode(), 'mimetype': 'image/png', 'file_ref': '<file_#2>'},
-            {'value': "My txt content", 'mimetype': 'text/plain', 'file_ref': '<file_#3>'},
+        self.assertCountEqual(vals['res.partner.bank'], record.message_partner_ids.bank_ids.read(['account_number']))
+        self.assertEqual(files_parts, [
+            {'type': 'inline_data', 'mimetype': 'application/pdf', 'data': base64.b64encode(PDF_RAW).decode()},
+            {'type': 'inline_data', 'mimetype': 'image/png', 'data': PNG_B64, 'metadata': {'image_path': f'/web/image/ir.attachment/{png_attachment_id}/raw', 'aspect_ratio': '1:1'}},
+            {'type': 'text', 'text': "Content of file 'dummy txt' (text/plain): My txt content"},
         ])
 
         # Check that the name are truncated
         partner_2.name = "_" * 1000
         for field_path in ("message_partner_ids", "message_partner_ids.name", "message_partner_ids.display_name"):
-            vals, _files = record._get_ai_context([field_path])
+            vals = record._get_ai_context([field_path])[0]
             self.assertNotIn(partner_2.name, vals)
             self.assertIn(partner_2._ai_truncate(partner_2.name), vals)
 
         # Check we have correct ids when record is a temporary record
         tmp_record = record.new(origin=record)
-        vals, files = tmp_record._get_ai_context(["message_partner_ids.bank_ids"])
+        vals = tmp_record._get_ai_context(["message_partner_ids.bank_ids"])[0]
         vals = json.loads(vals)
         self.assertEqual(vals['test.ai.read.model'][0]['id'], tmp_record.id.origin)
         self.assertEqual(vals['test.ai.read.model'][0]['message_partner_ids']['ids'], [_id.origin for _id in tmp_record.message_partner_ids._ids])
@@ -300,7 +302,7 @@ class TestAiFields(TransactionCase):
 
         # Check we have correct ids when record is a new record
         new_record = self.env['test.ai.read.model'].new({'message_partner_ids': [[0, 'virtual_1', {'name': 'Frank'}], [0, 'virtual_2', {'name': 'Bill'}]]})
-        vals, files = new_record._get_ai_context(["message_partner_ids.name"])
+        vals = new_record._get_ai_context(["message_partner_ids.name"])[0]
         vals = json.loads(vals)
         self.assertEqual(vals['test.ai.read.model'][0]['id'], str(new_record.id))
         self.assertEqual(vals['test.ai.read.model'][0]['message_partner_ids']['ids'], [str(_id) for _id in new_record.message_partner_ids._ids])
@@ -311,16 +313,11 @@ class TestAiFields(TransactionCase):
 
     def test_ai_read_dirty_binary(self):
         record = self.env['test.ai.read.model'].create({})
-        changed_png_data = base64.b64encode(b"unsaved-changed-png")
-        dirty_record = record.new({"new_binary_field": changed_png_data}, origin=record)
+        dirty_record = record.new({"new_binary_field": PNG_B64}, origin=record)
 
-        __, files_dict = dirty_record._ai_read(['new_binary_field'], {})
-
+        files_parts = dirty_record._ai_read(['new_binary_field'])[1]
         self.assertTrue(
-            any(
-                b"unsaved-changed-png" in base64.b64decode(f['value'])
-                for f in files_dict.values()
-            ),
+            PNG_B64 in [p['data'] for p in files_parts],
             "Expected changed (unsaved) PNG data in files_dict for Binary field"
         )
 
@@ -372,11 +369,11 @@ class TestAiFields(TransactionCase):
             'system_prompt': 'prompt',
         })
 
-        def _mocked_llm_api_request(self, method, endpoint, headers, body):
-            return {'output': [{'type': 'message', 'content': [{'text': json.dumps({'value': '<p><img src="x" onerror="alert(1)"/></p>'})}]}]}
+        mock_responses = [
+            self.mock_ai_field_response('<p><img src="x" onerror="alert(1)"/></p>')
+        ]
 
-        with patch.object(LLMApiService, '_request', _mocked_llm_api_request), self.enter_registry_test_mode(), \
-            self._mock_llm_api_get_token():
+        with self.mock_completion_request(mock_responses), self.enter_registry_test_mode():
             value = record.get_ai_field_value("x_ai_html", None)
             self.assertEqual(value, '<p><img src="x"></p>')
 
@@ -390,9 +387,7 @@ class TestAiFields(TransactionCase):
             }],
         })
         record.flush_recordset()
-        with patch.object(LLMApiService, '_request', _mocked_llm_api_request), \
-            self._mock_llm_api_get_token(), \
-            self.enter_registry_test_mode():
+        with self.mock_completion_request(mock_responses), self.enter_registry_test_mode():
             value = record.get_ai_property_value("properties.test_html", None)
         self.assertEqual(value, '<p><img src="x"></p>')
 
@@ -406,11 +401,12 @@ class TestAiFields(TransactionCase):
         })
         record = self.env['test.ai.fields.model']
 
-        def _mocked_llm_api_request(self, method, endpoint, headers, body):
-            return {'output': [{'type': 'message', 'content': [{'text': json.dumps({'value': 'Sorry', 'could_not_resolve': True, 'unresolved_cause': "Missing context"})}]}]}
+        mock_responses = [
+            self.mock_ai_field_response('Sorry', False, "Missing context")
+        ]
 
-        with patch.object(LLMApiService, '_request', _mocked_llm_api_request), self.enter_registry_test_mode(), \
-            self._mock_llm_api_get_token(), self.assertRaises(UnresolvedQuery) as cm_1:
+        with self.mock_completion_request(mock_responses), self.enter_registry_test_mode(), \
+            self.assertRaises(UnresolvedQuery) as cm_1:
             record.get_ai_field_value('x_ai_char', None)
         self.assertEqual(str(cm_1.exception), "Missing context")
 
@@ -421,16 +417,13 @@ class TestAiFields(TransactionCase):
             'system_prompt': 'Hello',
         }]}).id})
 
-        with patch.object(LLMApiService, '_request', _mocked_llm_api_request), self.enter_registry_test_mode(), \
-            self._mock_llm_api_get_token(), self.assertRaises(UnresolvedQuery) as cm_2:
+        with self.mock_completion_request(mock_responses), self.enter_registry_test_mode(), \
+            self.assertRaises(UnresolvedQuery) as cm_2:
             record.get_ai_property_value('properties.char', None)
         self.assertEqual(str(cm_2.exception), "Missing context")
 
     def test_fill_ai_field_exception(self):
         """Check that if an error occurs during the method filling the fields, an empty string is set so that field will not be reprocessed for the record"""
-        def _mocked_llm_api_request(self, method, endpoint, headers, body):
-            return {'output': [{'type': 'message', 'content': [{'text': json.dumps({'value': "", 'could_not_resolve': True, 'unresolved_cause': "missing context"})}]}]}
-
         model = self.env["test.ai.fields.model"]
         self.env["ir.model.fields"].create({"name": "x_ai_char", "ttype": "char", "ai": True, "system_prompt": "char prompt", "model_id": self.env["ir.model"]._get(model._name).id})
         record = model.create({})
@@ -438,7 +431,11 @@ class TestAiFields(TransactionCase):
         self.env.cr.execute(SQL("SELECT x_ai_char FROM test_ai_fields_model WHERE id = %s", record.id))
         res = self.env.cr.fetchone()
         self.assertEqual(res[0], None)
-        record._fill_ai_field(model._fields.get('x_ai_char'))
+        mock_responses = [
+            self.mock_ai_field_response("", False, "missing context")
+        ]
+        with self.mock_completion_request(mock_responses):
+            record._fill_ai_field(model._fields.get('x_ai_char'))
         self.env.flush_all()
         self.env.cr.execute(SQL("SELECT x_ai_char FROM test_ai_fields_model WHERE id = %s", record.id))
         res = self.env.cr.fetchone()
@@ -446,24 +443,82 @@ class TestAiFields(TransactionCase):
 
     def test_fill_ai_property_exception(self):
         """Check that if an error occurs during the method filling the properties, a falsy value is set so that the property will not be reprocessed for the record"""
-        def _mocked_llm_api_request(self, method, endpoint, headers, body):
-            return {'output': [{'type': 'message', 'content': [{'text': json.dumps({'value': "", 'could_not_resolve': True, 'unresolved_cause': "missing context"})}]}]}
-
         parent = self.env["test.ai.fields.parent"].create({})
         ai_char_p_def = {"type": "char", "name": "char", "ai": True, "system_prompt": 'hey'}
         parent.write({"properties_definition": [ai_char_p_def]})
 
         record = self.env["test.ai.fields.model"].create([
             {"parent_id": parent.id, "properties": [{"type": "char", "name": "char"}]},
-
         ])
 
         self.env.flush_all()
         self.env.cr.execute(SQL("SELECT properties FROM test_ai_fields_model WHERE id = %s", record.id))
         res = self.env.cr.fetchone()
         self.assertEqual(res[0], {})
-        record._fill_ai_property('properties', ai_char_p_def)
+        mock_responses = [
+            self.mock_ai_field_response("", False, "missing context")
+        ]
+        with self.mock_completion_request(mock_responses):
+            record._fill_ai_property('properties', ai_char_p_def)
         self.env.flush_all()
         self.env.cr.execute(SQL("SELECT properties FROM test_ai_fields_model WHERE id = %s", record.id))
         res = self.env.cr.fetchone()
         self.assertEqual(res[0], {"char": False})
+
+    def test_base_field_ai(self):
+        IrModelFields = self.env['ir.model.fields']
+        ai_model = self.env['test.ai.fields.model']
+        ai_field = ai_model._fields['ai_base_char']
+        self.assertEqual(ai_field.ai, "Python prompt")
+        ir_field_ai = IrModelFields._get('test.ai.fields.model', 'ai_base_char')
+        self.assertEqual(ir_field_ai.state, "base")
+
+        self.assertTrue(ir_field_ai.ai)
+        self.assertEqual(ir_field_ai.system_prompt, '<p>Python prompt</p>')
+        self.assertEqual(
+            IrModelFields._get_field_ai_parameters(ai_field).get("prompt"),
+            '<p>Python prompt</p>'
+        )
+
+        ir_field_ai.system_prompt = "Test prompt"
+        self.assertEqual(self.env['test.ai.fields.model']._fields['ai_base_char'].ai, "Python prompt")
+        self.assertEqual(ir_field_ai.system_prompt, '<p>Test prompt</p>')
+        self.assertEqual(
+            IrModelFields._get_field_ai_parameters(ai_field).get("prompt"),
+            '<p>Test prompt</p>'
+        )
+
+        ir_field_ai.ai = False
+        self.assertEqual(self.env['test.ai.fields.model']._fields['ai_base_char'].ai, "Python prompt")
+        self.assertFalse(ir_field_ai.ai)
+        self.assertEqual(
+            IrModelFields._get_field_ai_parameters(ai_field).get("prompt"),
+            None
+        )
+
+    def test_base_field_ai_execute(self):
+        IrModelFields = self.env['ir.model.fields']
+        ai_model = self.env['test.ai.fields.model']
+        ai_field = ai_model._fields['ai_base_char']
+        self.assertEqual(ai_field.ai, "Python prompt")
+        ir_field_ai = IrModelFields._get('test.ai.fields.model', 'ai_base_char')
+
+        record = ai_model.create({})
+
+        with self.mock_completion_request([
+            self.mock_ai_field_response('run 1'),
+            self.mock_ai_field_response('run 2'),
+        ]) as mock_request:
+            record._fill_ai_field(ai_field)
+            self.assertEqual(record.ai_base_char, 'run 1')
+
+            self.assertTrue("Python prompt" in mock_request.call_args.args[0][0]['content'][0]['text'])
+
+            ir_field_ai.system_prompt = "Test prompt"
+            record._fill_ai_field(ai_field)
+            self.assertEqual(record.ai_base_char, 'run 2')
+            self.assertTrue("Test prompt" in mock_request.call_args.args[0][0]['content'][0]['text'])
+
+        ir_field_ai.ai = False
+        with self.assertRaises(ValueError):
+            record._fill_ai_field(ai_field)

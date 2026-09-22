@@ -9,6 +9,8 @@ from .common import TestInterCompanyRulesCommonStock
 
 @tagged('post_install', '-at_install')
 class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -52,8 +54,8 @@ class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
         ])
         self.product_consultant.standard_price = 450.0
 
-        def generate_purchase_and_validate_sale_order(first_company, second_company, warehouse_id):
-            stock_picking_type = self.env['stock.picking.type'].search(['&', ('warehouse_id', '=', warehouse_id), ('name', '=', 'Receipts')])
+        def generate_purchase_and_validate_sale_order(first_company, second_company, warehouse):
+            stock_picking_type = self.env['stock.picking.type'].search(['&', ('warehouse_id', '=', warehouse.id), ('name', '=', 'Receipts')])
             purchase_order = Form(self.env['purchase.order'])
             purchase_order.partner_id = second_company.partner_id
             purchase_order.company_id = first_company
@@ -64,28 +66,28 @@ class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
                     line.name = 'Service'
                     line.product_id = self.product_consultant
                     line.price_unit = 450.0
-                    line.product_uom_id = self.product_consultant.uom_id
+                    line.uom_id = self.product_consultant.uom_id
                     line.discount = 10.0
             purchase_order.with_company(first_company).button_confirm()
-            self.validate_generated_sale_order(purchase_order, first_company, second_company)
+            self.validate_generated_sale_order(purchase_order, first_company, second_company, warehouse.partner_id)
 
         for warehouse in warehouses:
-            generate_purchase_and_validate_sale_order(self.company_b, self.company_a, warehouse.id)
+            generate_purchase_and_validate_sale_order(self.company_b, self.company_a, warehouse)
 
-    def validate_generated_sale_order(self, purchase_order, company, partner):
+    def validate_generated_sale_order(self, purchase_order, so_company, po_company, so_partner):
         """ Validate sale order which has been generated from purchase order
         and test its state, total_amount, product_name and product_quantity.
         """
 
         # Find related sale order based on client order reference.
-        sale_order = self.env['sale.order'].with_company(partner).search([('client_order_ref', '=', purchase_order.name)], limit=1)
+        sale_order = self.env['sale.order'].with_company(po_company).search([('client_order_ref', '=', purchase_order.name)], limit=1)
 
         self.assertEqual(sale_order.state, "draft", "sale order should be in draft state.")
-        self.assertEqual(sale_order.partner_id, company.partner_id, "Vendor does not correspond to Company %s." % company)
-        self.assertEqual(sale_order.company_id, partner, "Applied company in created sale order is incorrect.")
+        self.assertEqual(sale_order.partner_id, so_partner, "Vendor does not correspond to Company %s." % so_company)
+        self.assertEqual(sale_order.company_id, po_company, "Applied company in created sale order is incorrect.")
         self.assertEqual(sale_order.amount_total, 465.75, "Total amount is incorrect.")
         self.assertEqual(sale_order.order_line[0].product_id, self.product_consultant, "Product in line is incorrect.")
-        self.assertEqual(sale_order.order_line[0].name, 'Service', "Product name is incorrect.")
+        self.assertEqual(sale_order.order_line[0].label, 'Service', "Product name is incorrect.")
         self.assertEqual(sale_order.order_line[0].product_uom_qty, 1, "Product qty is incorrect.")
         self.assertEqual(sale_order.order_line[0].price_unit, 450, "Unit Price in line is incorrect.")
         self.assertEqual(sale_order.order_line[0].price_subtotal, 405, "Subtotal in line is incorrect.")
@@ -105,7 +107,6 @@ class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
         })
 
         mto_route = self.env['stock.route'].with_context(active_test=False).search([('name', '=', 'Replenish on Order (MTO)')])
-        buy_route = self.env['stock.route'].search([('name', '=', 'Buy')])
         mto_route.active = True
 
         product_storable = self.env['product.product'].create({
@@ -113,7 +114,7 @@ class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
             'is_storable': True,
             'taxes_id': [(6, 0, (self.company_a.account_sale_tax_id + self.company_b.account_sale_tax_id).ids)],
             'supplier_taxes_id': [(6, 0, (self.company_a.account_purchase_tax_id + self.company_b.account_purchase_tax_id).ids)],
-            'route_ids': [(6, 0, [buy_route.id, mto_route.id])],
+            'route_ids': [Command.set([mto_route.id])],
             'company_id': False,
             'seller_ids': [
                 (0, 0, {
@@ -140,7 +141,7 @@ class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
         with Form(purchase_order.with_company(self.company_b)) as po:
             with po.order_line.new() as line:
                 line.product_id = product_storable
-                line.product_uom_id = product_storable.uom_id
+                line.uom_id = product_storable.uom_id
 
         purchase_order.date_planned = today + relativedelta(days=7)
         # Confirm Purchase order
@@ -370,8 +371,6 @@ class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
         mto_route = self.env.ref('stock.route_warehouse0_mto')
         mto_route.active = True
         mto_route.rule_ids.procure_method = 'make_to_order'
-        buy_route = self.env.ref('purchase_stock.route_warehouse0_buy')
-        buy_route.product_selectable = True
 
         product = self.env['product.product'].create({
             'is_storable': True,
@@ -382,10 +381,7 @@ class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
                 Command.create({'partner_id': vendor.id, 'company_id': self.company_a.id}),
                 Command.create({'partner_id': self.company_a.partner_id.id, 'company_id': self.company_b.id}),
             ],
-            'route_ids': [
-                Command.link(mto_route.id),
-                Command.link(buy_route.id),
-            ]
+            'route_ids': [Command.set([mto_route.id])]
         })
 
         # Create a sale order from Company B to the customer
@@ -446,6 +442,7 @@ class TestInterCompanyPurchaseToSaleWithStock(TestInterCompanyRulesCommonStock):
         except ValueError:
             self.skipTest('This test requires the following module: stock_dropshipping')
 
+        self.env.user.group_ids |= self.env.ref('stock.group_production_lot')
         (self.company_a | self.company_b).write({
             'intercompany_generate_sales_orders': True,
             'intercompany_generate_purchase_orders': True,

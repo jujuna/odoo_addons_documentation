@@ -1,8 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import base64
 from ..api.swissdec_declarations import SwissdecDeclaration
 from odoo import fields, models, _
 from odoo.exceptions import ValidationError
+from odoo.tools import BinaryBytes
 
 
 class L10nCHInsuranceReport(models.Model):
@@ -80,7 +82,7 @@ class L10nCHInsuranceReport(models.Model):
             if report_pdf:
                 self.env['ir.attachment'].create({
                     'name': f"QST_Report_{institution.get('CantonID')}_{self.year}_{self.month.zfill(2)}.pdf",
-                    'datas': report_pdf,
+                    'raw': BinaryBytes(base64.b64decode(report_pdf)),
                     'res_id': self.id,
                     'res_model': self._name,
                 })

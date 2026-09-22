@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -19,12 +18,12 @@ Website Forum integration for the helpdesk module
 
     """,
     'data': [
-        'security/ir.model.access.csv',
         'views/forum_forum_templates.xml',
         'views/helpdesk_templates.xml',
         'views/helpdesk_views.xml',
         'views/forum_forum_views.xml',
         'wizards/helpdesk_ticket_select_forum.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'data/helpdesk_demo.xml',

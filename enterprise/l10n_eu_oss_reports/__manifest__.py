@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -13,13 +12,13 @@ Provides Reports for OSS with export files for available EU countries.
     """,
     'depends': ['account_reports', 'l10n_eu_oss'],
     'data': [
-        'security/ir.model.access.csv',
         'views/report_export_templates.xml',
         'views/res_company_views.xml',
         'views/product_views.xml',
         'data/account_reports.xml',
         'data/account_return_data.xml',
         'wizard/return_submission_wizard.xml',
+        'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

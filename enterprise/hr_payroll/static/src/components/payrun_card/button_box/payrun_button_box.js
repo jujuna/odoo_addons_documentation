@@ -1,7 +1,6 @@
-import { onWillStart, onWillRender, Component } from "@odoo/owl";
+import { onWillStart, Component, useProps, t, computed, proxy } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
-import { useService } from "@web/core/utils/hooks";
 import { user } from "@web/core/user";
 
 export class PayRunButtonBox extends Component {
@@ -10,25 +9,26 @@ export class PayRunButtonBox extends Component {
         Dropdown,
         DropdownItem,
     };
-    static props = {
-        slots: { type: Object, optional: true },
-        class: { type: String, optional: true },
-    };
-    static defaultProps = {
-        slots: {},
-        class: "",
-    };
+    props = useProps({
+        slots: t.object().optional({}),
+        class: t.string().optional(""),
+    });
+
+    get isSelectionActive() {
+        const selection = this.env.model?.root?.selection;
+        return selection && selection.length > 0;
+    }
+
+    buttonVisibility = computed(() =>
+        this.computeAllowedButtons(this.props.slots, this.cacheAllowedGroups)
+    );
 
     setup() {
-        this.ui = useService("ui");
-        this.cacheAllowedGroups = [];
+        this.cacheAllowedGroups = proxy([]);
         onWillStart(async () => {
             if (Object.values(this.props.slots).some((slot) => slot.group)) {
                 await this.computeAllowedGroups(this.props.slots);
             }
-        });
-        onWillRender(() => {
-            this.computeAllowedButtons(this.props.slots, this.cacheAllowedGroups);
         });
     }
 
@@ -44,7 +44,6 @@ export class PayRunButtonBox extends Component {
     }
 
     computeAllowedButtons(slots, cacheAllowedGroups = []) {
-        const maxVisibleButtons = [0, 0, 0, 1, 1, 2, 2][this.ui.size] ?? 0;
         const allVisibleButtons = Object.entries(slots).map(([slotName, slot]) => {
             if (!slot.isVisible) {
                 return null;
@@ -67,28 +66,15 @@ export class PayRunButtonBox extends Component {
                 [[], [], []]
             );
 
-        this.allSmartButtons = smartButtonsVisible;
         const allVisibleActionButtons = [
             ...priorityVisibleActionButtons,
             ...normalVisibleActionButtons,
         ];
-        switch (maxVisibleButtons) {
-            case 1:
-                this.visibleActionButtons = allVisibleActionButtons.slice(0, 1);
-                this.additionalActionButtons = allVisibleActionButtons.slice(1);
-                break;
-            case 2:
-                if (priorityVisibleActionButtons.length > 0) {
-                    this.visibleActionButtons = allVisibleActionButtons.slice(0, 2);
-                    this.additionalActionButtons = allVisibleActionButtons.slice(2);
-                } else {
-                    this.visibleActionButtons = allVisibleActionButtons.slice(0, 1);
-                    this.additionalActionButtons = allVisibleActionButtons.slice(1);
-                }
-                break;
-            default:
-                this.visibleActionButtons = [];
-                this.additionalActionButtons = allVisibleActionButtons;
-        }
+        const inlineCount = priorityVisibleActionButtons.length ? 2 : 1;
+        return {
+            allSmartButtons: smartButtonsVisible,
+            inlineActionButtons: allVisibleActionButtons.slice(0, inlineCount),
+            menuActionButtons: allVisibleActionButtons.slice(inlineCount),
+        };
     }
 }

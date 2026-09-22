@@ -10,7 +10,7 @@ export class InsertPendingElementPlugin extends Plugin {
     static id = "insertPendingElement";
     static dependencies = ["baseContainer", "history", "dom", "selection"];
     resources = {
-        start_edition_handlers: this.insertEmbeddedBluePrint.bind(this),
+        on_editor_started_handlers: this.insertEmbeddedBluePrint.bind(this),
     };
 
     insertEmbeddedBluePrint() {
@@ -26,11 +26,12 @@ export class InsertPendingElementPlugin extends Plugin {
             if (isPhrasingContent(embeddedBlueprint)) {
                 insert = () => {
                     // insert phrasing content
-                    const paragraph = this.dependencies.baseContainer.createBaseContainer();
-                    paragraph.appendChild(embeddedBlueprint);
+                    const paragraph = this.dependencies.baseContainer.createBaseContainer({
+                        children: [embeddedBlueprint],
+                    });
                     this.dependencies.selection.setCursorEnd(this.editable);
                     this.dependencies.dom.insert(paragraph);
-                    this.dependencies.history.addStep();
+                    this.dependencies.history.commit();
                 };
             } else {
                 insert = () => {
@@ -52,11 +53,10 @@ export class InsertPendingElementPlugin extends Plugin {
                         this.dependencies.selection.setCursorEnd(this.editable);
                         this.dependencies.dom.insert(embeddedBlueprint);
                         const paragraph = this.dependencies.baseContainer.createBaseContainer();
-                        paragraph.appendChild(this.document.createElement("br"));
                         this.dependencies.selection.setCursorEnd(this.editable);
                         this.dependencies.dom.insert(paragraph);
                     }
-                    this.dependencies.history.addStep();
+                    this.dependencies.history.commit();
                 };
             }
             insert();

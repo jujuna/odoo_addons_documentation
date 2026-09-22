@@ -1,6 +1,6 @@
 import { MIN_THREAD_WIDTH, KnowledgeCommentsThread } from "../comment/comment";
 import { useCallbackRecorder } from "@web/search/action_hook";
-import { batched, Component, reactive, useEffect, useState, useSubEnv } from "@odoo/owl";
+import { Component, proxy, t, useEffect, useProps } from "@odoo/owl";
 import { CommentBeaconManager } from "../../comments/comment_beacon_manager";
 import { useService } from "@web/core/utils/hooks";
 import { debounce } from "@web/core/utils/timing";
@@ -12,55 +12,36 @@ const SMALL_THREAD_WIDTH = 40; // o_knowledge_small_ui
 export class KnowledgeCommentsHandler extends Component {
     static template = "knowledge.KnowledgeCommentsHandler";
     static components = { KnowledgeCommentsThread };
-    static props = {
-        commentBeaconManager: { type: CommentBeaconManager },
-        contentRef: { type: Object },
-    };
+
+    props = useProps({
+        commentBeaconManager: t.instanceOf(CommentBeaconManager),
+        contentRef: t.function([], t.ref()),
+    });
+
+    threadHeights = proxy({});
 
     setup() {
         this.commentsService = useService("knowledge.comments");
-        this.commentsState = useState(this.commentsService.getCommentsState());
+        this.commentsState = proxy(this.commentsService.getCommentsState());
         const debouncedThreadDimensions = debounce(() => {
-            this.computeThreadDimensions();
+            this.computeHorizontalDimensions();
         }, 300);
-        const batchedComputeVerticalDimensions = batched(this.computeVerticalDimensions.bind(this));
-        useSubEnv({
-            threadHeights: reactive({}, batchedComputeVerticalDimensions),
-        });
-        this.lastActiveThreadId;
-        this.state = useState({
+        this.state = proxy({
             threadDimensions: {
                 horizontal: {},
-                threadTops: {},
             },
         });
         useCallbackRecorder(this.env.__onLayoutGeometryChange__, debouncedThreadDimensions);
-        let activeThreadId;
-        useEffect(
-            () => {
-                if (this.commentsState.activeThreadId !== activeThreadId) {
-                    activeThreadId = this.commentsState.activeThreadId;
-                    batchedComputeVerticalDimensions();
-                }
-            },
-            () => [this.commentsState.activeThreadId]
-        );
-        useEffect(
-            () => {
-                const editorThreads = Object.keys(this.commentsState.editorThreads);
-                if (
-                    editorThreads.some((threadId) => {
-                        return this.props.commentBeaconManager.sortedThreadIds.includes(threadId);
-                    })
-                ) {
-                    debouncedThreadDimensions();
-                }
-            },
-            () => [
-                this.commentsState.editorThreads,
-                Object.keys(this.commentsState.editorThreads).toString(),
-            ]
-        );
+        useEffect(() => {
+            const editorThreads = Object.keys(this.commentsState.editorThreads);
+            if (
+                editorThreads.some((threadId) =>
+                    this.props.commentBeaconManager.sortedThreadIds.includes(threadId)
+                )
+            ) {
+                debouncedThreadDimensions();
+            }
+        });
     }
 
     get mainPositionThreadId() {
@@ -78,7 +59,7 @@ export class KnowledgeCommentsHandler extends Component {
     }
 
     computeHorizontalDimensions() {
-        if (!this.props.contentRef.el) {
+        if (!this.props.contentRef()) {
             return;
         }
         const rtl = localization.direction === "rtl";
@@ -94,12 +75,12 @@ export class KnowledgeCommentsHandler extends Component {
                 right: "left",
             });
         }
-        const contentStyle = getComputedStyle(this.props.contentRef.el);
+        const contentStyle = getComputedStyle(this.props.contentRef());
         const paddingRight = parseInt(contentStyle[keys.paddingRight]) || 0;
 
         // Manually calculate margin to circumvent zero-margin bug in chromium-based browsers
-        const contentRect = this.props.contentRef.el.getBoundingClientRect();
-        const parentRect = this.props.contentRef.el.parentElement.getBoundingClientRect();
+        const contentRect = this.props.contentRef().getBoundingClientRect();
+        const parentRect = this.props.contentRef().parentElement.getBoundingClientRect();
         const marginRight = Math.abs(parentRect[keys.right] - contentRect[keys.right]);
         const marginLeft = Math.abs(parentRect[keys.left] - contentRect[keys.left]);
 
@@ -122,10 +103,11 @@ export class KnowledgeCommentsHandler extends Component {
         this.state.threadDimensions.horizontal = { left, width };
     }
 
-    computeVerticalDimensions() {
+    get threadTops() {
+        const tops = {};
         const activeId = this.mainPositionThreadId;
         if (!activeId || this.commentsState.editorThreads[activeId]?.top === undefined) {
-            return;
+            return tops;
         }
         const threadIds = this.props.commentBeaconManager.sortedThreadIds.filter(
             (threadId) =>
@@ -133,44 +115,27 @@ export class KnowledgeCommentsHandler extends Component {
                 this.commentsState.editorThreads[threadId].top !== undefined
         );
         const index = threadIds.indexOf(activeId);
-        this.setThreadTop(activeId, this.commentsState.editorThreads[activeId].top);
-        let masterTop = this.getThreadTop(activeId);
+        tops[activeId] = this.commentsState.editorThreads[activeId].top;
+        let masterTop = tops[activeId];
         for (let i = index - 1; i >= 0; i--) {
             const threadId = threadIds[i];
             const expectedTop = this.commentsState.editorThreads[threadId].top;
-            const height = this.env.threadHeights[threadId]?.height || 0;
+            const height = this.threadHeights[threadId]?.height || 0;
             if (expectedTop + height < masterTop) {
                 masterTop = expectedTop;
             } else {
                 masterTop -= height;
             }
-            this.setThreadTop(threadId, masterTop);
+            tops[threadId] = masterTop;
         }
-        masterTop = this.getThreadTop(activeId) + (this.env.threadHeights[activeId]?.height || 0);
+        masterTop = tops[activeId] + (this.threadHeights[activeId]?.height || 0);
         for (let i = index + 1; i < threadIds.length; i++) {
             const threadId = threadIds[i];
             const expectedTop = this.commentsState.editorThreads[threadId].top;
             masterTop = Math.max(masterTop, expectedTop);
-            this.setThreadTop(threadId, masterTop);
-            masterTop += this.env.threadHeights[threadId]?.height || 0;
+            tops[threadId] = masterTop;
+            masterTop += this.threadHeights[threadId]?.height || 0;
         }
-    }
-
-    computeThreadDimensions() {
-        this.computeHorizontalDimensions();
-        this.computeVerticalDimensions();
-    }
-
-    setThreadTop(threadId, top) {
-        if (!(threadId in this.state.threadDimensions.threadTops)) {
-            this.state.threadDimensions.threadTops[threadId] = {
-                top: undefined,
-            };
-        }
-        this.state.threadDimensions.threadTops[threadId].top = top;
-    }
-
-    getThreadTop(threadId) {
-        return this.state.threadDimensions.threadTops[threadId]?.top;
+        return tops;
     }
 }

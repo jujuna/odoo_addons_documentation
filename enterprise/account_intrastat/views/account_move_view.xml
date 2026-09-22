@@ -38,7 +38,7 @@
             <field name="mode">primary</field>
             <field eval="110" name="priority"/>
             <field name="arch" type="xml">
-                <list string="Account move line" multi_edit="1" duplicate="false" editable="bottom" expand="context.get('expand', False)">
+                <list string="Journal Items" multi_edit="1" duplicate="false" editable="bottom" expand="context.get('expand', False)">
                     <field name="move_id" readonly="1"/>
                     <field name="product_id" readonly="1"/>
                     <field name="partner_id" readonly="1"/>
@@ -74,7 +74,7 @@
                 </list>
             </field>
         </record>
-        
+
         <record id="account_intrastat_aml_missing_product_tree" model="ir.ui.view">
             <field name="name">account.intrastat.aml.missing.product.list</field>
             <field name="model">account.move.line</field>

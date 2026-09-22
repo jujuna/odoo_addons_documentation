@@ -1,3 +1,5 @@
+from . import account_bank_statement
+from . import account_document_import_mixin
 from . import account_journal
 from . import account_move
 from . import account_report

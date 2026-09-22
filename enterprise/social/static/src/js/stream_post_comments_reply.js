@@ -2,46 +2,45 @@ import { _t } from "@web/core/l10n/translation";
 import { FileUploader } from "@web/views/fields/file_handler";
 import { useAutofocus, useService } from "@web/core/utils/hooks";
 import { useEmojiPicker } from "@web/core/emoji_picker/emoji_picker";
-import { Component, useState, useRef, markup, onMounted } from "@odoo/owl";
+import { Component, markup, onMounted, useProps, proxy, signal, t } from "@odoo/owl";
 
 export class StreamPostCommentsReply extends Component {
     static template = "social.StreamPostCommentsReply";
     static components = { FileUploader };
-    static props = {
-        comment: {type: Object, optional: true},
-        account: {type: Object, optional: true},
-        originalPost: {type: Object, optional: true},
-        bubble_design: {type: Boolean, optional: true},
-        classes: {type: String, optional: true},
-        initialValue: {type: String, optional: true},
-        attachmentSrc: {type: String, optional: true},
-        isCommentEdit: {type: Boolean, optional: true},
-        isCommentReply: {type: Boolean, optional: true},
-        mediaSpecificProps: Object,
-        onAddComment: Function,
-        preventAddComment: Function,
-        toggleEditMode: {type: Function, optional: true},
-    };
-    static defaultProps = {
-        isCommentReply: false,
-        isCommentEdit: false,
-    };
+    props = useProps({
+        comment: t.object().optional(),
+        account: t.object().optional(),
+        originalPost: t.object().optional(),
+        classes: t.string().optional(),
+        initialValue: t.string().optional(),
+        attachmentSrc: t.string().optional(),
+        isCommentEdit: t.boolean().optional(false),
+        isCommentReply: t.boolean().optional(false),
+        mediaSpecificProps: t.object(),
+        onAddComment: t.function(),
+        preventAddComment: t.function(),
+        toggleEditMode: t.function().optional(),
+    });
+
+    autofocusRef = signal.ref();
+    emojiPickerRef = signal.ref();
 
     setup() {
         super.setup();
-        this.state = useState({
+        this.state = proxy({
             disabled: false,
             attachmentSrc: false,
+            value: this.initialValue || "",
         });
-        this.inputRef = useAutofocus();
+        useAutofocus({ ref: this.autofocusRef });
         this._onAddEmoji = this._onAddEmoji.bind(this);
         this.notification = useService("notification");
-        useEmojiPicker(useRef("emoji-picker"), {
+        useEmojiPicker(this.emojiPickerRef, {
             onSelect: (str) => this._onAddEmoji(str),
             onClose: () => this.state.autofocus++,
         });
         onMounted(() => {
-            this.inputRef.el.value = this.initialValue || "";
+            this.autofocusRef().value = this.initialValue || "";
         });
     }
 
@@ -63,6 +62,7 @@ export class StreamPostCommentsReply extends Component {
         ) {
             return;
         }
+        this.state.value = textarea.value;
         this.state.disabled = true;
         this._addComment(textarea);
     }
@@ -125,7 +125,8 @@ export class StreamPostCommentsReply extends Component {
                 this.props.onAddComment(comment);
             }
             this.state.attachmentSrc = false;
-            this.inputRef.el.value = "";
+            this.autofocusRef().value = "";
+            this.state.value = "";
             this.state.disabled = false;
             if (this.isCommentEdit) {
                 this.props.toggleEditMode();
@@ -141,7 +142,7 @@ export class StreamPostCommentsReply extends Component {
      * @private
      */
     _onAddEmoji(str) {
-        const input = this.inputRef.el;
+        const input = this.autofocusRef();
         const selectionStart = input.selectionStart;
         input.value =
             input.value.slice(0, selectionStart) + str + input.value.slice(selectionStart);

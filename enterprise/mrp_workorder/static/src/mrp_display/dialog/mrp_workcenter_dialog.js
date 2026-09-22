@@ -1,19 +1,22 @@
 import { _t } from "@web/core/l10n/translation";
-import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import {
+    ConfirmationDialog,
+    confirmationDialogProps,
+} from "@web/core/confirmation_dialog/confirmation_dialog";
 import { useService } from "@web/core/utils/hooks";
-import { onWillStart, useState } from "@odoo/owl";
+import { onWillStart, useProps, proxy, t } from "@odoo/owl";
 
 export class MrpWorkcenterDialog extends ConfirmationDialog {
     static template = "mrp_workorder.MrpWorkcenterDialog";
-    static props = {
-        ...ConfirmationDialog.props,
-        body: { type: String, optional: true },
-        workcenters: { type: Array, optional: true },
-        disabled: { type: Array, optional: true },
-        active: { type: Array, optional: true },
-        radioMode: { type: Boolean, default: false, optional: true },
-        showWarning: { type: Boolean, default: false, optional: true },
-    };
+    props = useProps({
+        ...confirmationDialogProps,
+        body: t.string().optional(),
+        workcenters: t.array().optional(),
+        disabled: t.array().optional(),
+        active: t.array().optional(),
+        radioMode: t.boolean().optional(false),
+        showWarning: t.boolean().optional(false),
+    });
 
     setup() {
         super.setup();
@@ -22,7 +25,7 @@ export class MrpWorkcenterDialog extends ConfirmationDialog {
         this.notification = useService("notification");
         this.action = useService("action");
         this.workcenters = this.props.workcenters || [];
-        this.state = useState({
+        this.state = proxy({
             activeWorkcenters: this.props.active ? [...this.props.active] : [],
             noWorkcenters: false,
         });
@@ -38,15 +41,15 @@ export class MrpWorkcenterDialog extends ConfirmationDialog {
         return encodeURIComponent(this.menu.getCurrentApp()?.name || _t("Shop Floor"));
     }
 
-    get active() {
-        return this.state.activeWorkcenters.includes(this.workcenter.id);
-    }
-
     get disabled() {
         if (!this.props.disabled) {
             return false;
         }
         return this.props.disabled.includes(this.workcenter.id);
+    }
+
+    active(workcenter) {
+        return this.state.activeWorkcenters.includes(workcenter.id);
     }
 
     selectWorkcenter(workcenter) {
@@ -72,7 +75,7 @@ export class MrpWorkcenterDialog extends ConfirmationDialog {
     }
 
     async _loadWorkcenters() {
-        this.workcenters = await this.ormService.searchRead("mrp.workcenter", [], ["display_name"]);
+        this.workcenters = await this.ormService.searchRead("mrp.workcenter", [], ["display_name", "barcode"]);
         if (!this.workcenters.length) {
             this.state.noWorkcenters = true;
         }

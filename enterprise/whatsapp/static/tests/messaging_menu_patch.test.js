@@ -1,4 +1,11 @@
-import { click, contains, start, startServer } from "@mail/../tests/mail_test_helpers";
+import {
+    click,
+    contains,
+    openMessagingMenu,
+    start,
+    startServer,
+    MENU_ACTIVE_IDS,
+} from "@mail/../tests/mail_test_helpers";
 import { describe, test } from "@odoo/hoot";
 import { defineWhatsAppModels } from "@whatsapp/../tests/whatsapp_test_helpers";
 
@@ -12,7 +19,7 @@ test("WhatsApp Channel notification items should have thread icon", async () => 
         channel_type: "whatsapp",
     });
     await start();
-    await click(".o_menu_systray i[aria-label='Messages']");
+    await openMessagingMenu(MENU_ACTIVE_IDS.WHATSAPP);
     await contains(".o-mail-NotificationItem .o-mail-ThreadIcon");
 });
 
@@ -30,5 +37,7 @@ test("Notification items should have unread counter for unread messages", async 
     });
     await start();
     await click(".o_menu_systray i[aria-label='Messages']");
-    await contains(".o-mail-MessagingMenu-counter", { text: "1" });
+    await contains(
+        ".o-mail-MessagingMenu-tab[aria-label='WhatsApp'] .o-mail-MessagingMenu-tabCounter:text('1')"
+    );
 });

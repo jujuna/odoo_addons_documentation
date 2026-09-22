@@ -7,7 +7,7 @@
                     <ambiente t-out="l10n_ec_production_env"/>
                     <tipoEmision>1</tipoEmision>
                     <razonSocial t-out="l10n_ec_legal_name"/>
-                    <nombreComercial t-if="commercial_company_name" t-out="commercial_company_name"/>
+                    <nombreComercial t-if="parent_name" t-out="parent_name"/>
                     <ruc t-out="company_vat"/>
                     <claveAcceso t-out="l10n_ec_authorization_number"/>
                     <codDoc>06</codDoc>
@@ -49,9 +49,10 @@
                         </detalles>
                     </destinatario>
                 </destinatarios>
-                <infoAdicional t-if="note or origin">
+                <infoAdicional t-if="note or origin or provider_vat">
                     <campoAdicional nombre="Novedades" t-out="note"/>
                     <campoAdicional nombre="Pedido" t-out="origin"/>
+                    <campoAdicional nombre="RUC Proveedor" t-out="provider_vat"/>
                 </infoAdicional>
             </guiaRemision>
         </template>

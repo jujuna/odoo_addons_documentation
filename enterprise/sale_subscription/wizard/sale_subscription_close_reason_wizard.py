@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import _, api, fields, models
+from odoo.fields import Date
 from odoo.exceptions import ValidationError
 
 
@@ -9,6 +10,16 @@ class SaleSubscriptionCloseReasonWizard(models.TransientModel):
     _description = 'Subscription Close Reason Wizard'
 
     close_reason_id = fields.Many2one("sale.order.close.reason", string="Close Reason", required=True)
+    close_date = fields.Date(required=True)
+
+    @api.model
+    def default_get(self, fields):
+        res = super().default_get(fields)
+        sale_order = self.env['sale.order'].browse(self.env.context.get('active_id'))
+        res['close_date'] = sale_order.end_date if sale_order.end_date else Date.context_today(self)
+        res['close_reason_id'] = sale_order.close_reason_id
+
+        return res
 
     @api.model
     def new(self, values=None, origin=None, ref=None):
@@ -30,4 +41,6 @@ class SaleSubscriptionCloseReasonWizard(models.TransientModel):
         self.ensure_one()
         sale_order = self.env['sale.order'].browse(self.env.context.get('active_id'))
         sale_order.close_reason_id = self.close_reason_id
-        sale_order.set_close(close_reason_id=self.close_reason_id.id)
+        sale_order.end_date = self.close_date
+        if self.close_date and self.close_date <= Date.context_today(self):
+            sale_order.set_close(close_reason_id=self.close_reason_id.id)

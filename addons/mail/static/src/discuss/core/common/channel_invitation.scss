@@ -20,23 +20,27 @@
     button {
         background-color: mix($o-view-background-color, $o-action, 85%);
 
-        &:not(:hover) .oi-close {
+        &:not(:hover) .oi[data-icon="close_small"] {
             border-color: transparent !important;
         }
 
-        &:hover .oi-close {
+        &:hover .oi[data-icon="close_small"] {
             color: $danger;
             border-color: $danger !important;
         }
     }
 }
 
-.o-discuss-ChannelInvitation-avatar {
-    width: 32px;
-    aspect-ratio: 1;
-}
-
 .o-discuss-ChannelInvitation-invitationBox {
     position: sticky;
     bottom: - map-get($spacers, 2); // Ignore p-2 class of ActionPanel
+}
+
+.o-discuss-ChannelInvitation-iconContainer {
+    margin-top: 1px;
+}
+
+.o-discuss-ChannelInvitation-iconPlus {
+    top: -4px;
+    right: -5px;
 }

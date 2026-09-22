@@ -6,7 +6,6 @@ import { useOwnDebugContext } from "@web/core/debug/debug_context";
 import { Component, onMounted } from "@odoo/owl";
 
 export class KnowledgePortalWebClient extends Component {
-    static props = {};
     static components = { ActionContainer, MainComponentsContainer };
     static template = "knowledge.KnowledgePortalWebClient";
 
@@ -14,7 +13,7 @@ export class KnowledgePortalWebClient extends Component {
         window.parent.document.body.style.margin = "0"; // remove the margin in the parent body
         this.actionService = useService("action");
         useOwnDebugContext({ categories: ["default"] });
-        useBus(routerBus, "ROUTE_CHANGE", this._showView);
+        useBus(routerBus, "ROUTE_CHANGE", this._showView.bind(this));
         onMounted(() => { this._showView(); });
     }
 

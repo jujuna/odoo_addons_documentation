@@ -1,6 +1,4 @@
 import copy
-import io
-import zipfile
 
 from odoo import api, models
 from odoo.exceptions import RedirectWarning
@@ -30,35 +28,14 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
             filename = self.env._("%(type)s_%(filename)s", type=intrastat_type, filename=report.get_default_report_filename(options, 'csv'))
             csv_files.append((filename, content))
 
-        return self._fi_build_zip_response(report, options, csv_files)
+        return self._build_zip_response(report, options, csv_files)
 
     @api.model
     def _fi_get_report_results_for_file_export(self, options):
         """ Retrieve Intrastat report data for export. """
         report = self.env['account.report'].browse(options['report_id'])
         expressions = report.line_ids.expression_ids
-        report._init_currency_table(options)
-        return self._report_custom_engine_intrastat(
-            expressions=expressions,
-            options=options,
-            date_scope=expressions[0].date_scope,
-            current_groupby='id',
-            next_groupby=None,
-        )
-
-    @api.model
-    def _fi_build_zip_response(self, report, options, csv_files):
-        """ Build a ZIP response containing both arrivals and dispatches CSV files """
-        with io.BytesIO() as buffer:
-            with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_DEFLATED) as zipfile_obj:
-                for filename, content in csv_files:
-                    zipfile_obj.writestr(filename, content)
-
-            return {
-                'file_name': report.get_default_report_filename(options, 'zip'),
-                'file_content': buffer.getvalue(),
-                'file_type': 'zip',
-            }
+        return self._report_engine_intrastat(options, expressions[0].date_scope, expressions.grouped('formula'), 'id')[expressions]
 
     @api.model
     def _fi_prepare_options_for_export(self, options, intrastat_type):
@@ -67,14 +44,9 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
 
         options_copy = copy.deepcopy(options)
         options_copy['intrastat_type'] = intrastat_type
-
-        AccountMove = self.env['account.move']
-        move_types = (
-            AccountMove.get_outbound_types(include_receipts=False)
-            if intrastat_type == 'arrivals'
-            else AccountMove.get_inbound_types(include_receipts=False)
+        options_copy.setdefault('forced_domain', []).append(
+            ('move_id.move_type', 'in', self._get_move_types_for_intrastat(intrastat_type))
         )
-        options_copy.setdefault('forced_domain', []).append(('move_id.move_type', 'in', move_types))
 
         return options_copy
 

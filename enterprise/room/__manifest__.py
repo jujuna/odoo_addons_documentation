@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -6,7 +5,6 @@
     'summary': 'Manage Meeting Rooms',
     'description': 'Experience the Ease of Booking Meeting Rooms with Real-Time Availability Display.',
     'category': 'Productivity/Room',
-    'version': '1.0',
     'depends': ['mail', 'web_gantt'],
     'data': [
         'views/room_booking_views.xml',
@@ -16,14 +14,13 @@
         'views/room_office_views.xml',
         'data/res_groups_privilege_data.xml',
         'security/ir_rule.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/room_office.xml',
         'demo/room_room.xml',
         'demo/room_booking.xml',
     ],
-    'installable': True,
     'application': True,
     'assets': {
         'web.assets_backend_lazy': [
@@ -47,8 +44,7 @@
             'web/static/lib/bootstrap/scss/_variables-dark.scss',
             'web/static/lib/bootstrap/scss/_maps.scss',
             ('include', 'web._assets_bootstrap_backend'),
-            "web/static/src/libs/fontawesome/css/font-awesome.css",
-            "web/static/lib/odoo_ui_icons/*",
+            ('include', 'web.icons_fonts'),
             'web/static/src/scss/base_frontend.scss',
             'web/static/src/core/utils/transitions.scss',
             'web/static/src/core/notifications/notification.scss',

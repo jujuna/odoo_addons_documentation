@@ -5,7 +5,6 @@ import { stepUtils } from "@web_tour/tour_utils";
 import { markup } from "@odoo/owl";
 
 registry.category("web_tour.tours").add("social_tour", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
@@ -15,7 +14,13 @@ registry.category("web_tour.tours").add("social_tour", {
             run: "click",
         },
         {
-            trigger: 'button.o_stream_post_kanban_new_stream',
+            trigger: '.o_cp_action_menus',
+            content: markup(_t("Let's <b>connect</b> to Facebook, LinkedIn or X.")),
+            tooltipPosition: 'bottom',
+            run: "click",
+        },
+        {
+            trigger: '.o_popover .o_menu_item:has([data-icon="link"])',
             content: markup(_t("Let's <b>connect</b> to Facebook, LinkedIn or X.")),
             tooltipPosition: 'bottom',
             run: "click",
@@ -39,7 +44,7 @@ registry.category("web_tour.tours").add("social_tour", {
             run: 'edit Awesome post!',
         },
         {
-            trigger: 'button[name="action_post"]',
+            trigger: 'button[name="action_post_now"]',
             content: _t("Happy with the result? Let's post it!"),
             tooltipPosition: 'bottom',
             run: "click",

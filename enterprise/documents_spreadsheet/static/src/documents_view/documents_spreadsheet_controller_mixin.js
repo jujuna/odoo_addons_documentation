@@ -1,26 +1,14 @@
+import {
+    STATIC_COG_GROUP_ACTION_BASE,
+    STATIC_COG_GROUP_ACTION_NATIVE,
+} from "@documents/views/cog_menu/documents_cog_menu_group";
+import { XLSX_MIME_TYPES } from "@documents_spreadsheet/helpers";
 import { TemplateDialog } from "@documents_spreadsheet/spreadsheet_template/spreadsheet_template_dialog";
-import { useService } from "@web/core/utils/hooks";
 import { loadBundle } from "@web/core/assets";
-
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { SpreadsheetCloneCSVXlsxDialog } from "@documents_spreadsheet/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog";
 import { _t } from "@web/core/l10n/translation";
 
-import { XLSX_MIME_TYPES } from "@documents_spreadsheet/helpers";
-
 export const DocumentsSpreadsheetControllerMixin = () => ({
-    setup() {
-        super.setup(...arguments);
-        this.orm = useService("orm");
-        this.action = useService("action");
-        this.dialogService = useService("dialog");
-        this.documentService = useService("document.document");
-        this.notification = useService("notification");
-        // Hack-ish way to do this but the function is added by a hook which we can't really override.
-        this.baseOnOpenDocumentsPreview = this.onOpenDocumentsPreview.bind(this);
-        this.onOpenDocumentsPreview = this._onOpenDocumentsPreview.bind(this);
-    },
-
     /**
      * Prevents spreadsheets from being in the viewable attachments list
      * when previewing a file in the FileViewer.
@@ -37,10 +25,10 @@ export const DocumentsSpreadsheetControllerMixin = () => ({
     /**
      * @override
      */
-    async _onOpenDocumentsPreview({ mainDocument }) {
+    async onOpenDocumentsPreview({ mainDocument }) {
         const mainDocumentOrTarget = mainDocument.shortcutTarget;
         if (["spreadsheet", "frozen_spreadsheet"].includes(mainDocumentOrTarget.data.handler)) {
-            this.action.doAction({
+            this.actionService.doAction({
                 type: "ir.actions.client",
                 tag: "action_open_spreadsheet",
                 params: {
@@ -71,17 +59,12 @@ export const DocumentsSpreadsheetControllerMixin = () => ({
                     confirmLabel: _t("Restore"),
                 });
             } else if (this.documentService.userIsInternal) {
-                const fileType = mainDocument.data.mimetype === "text/csv" ? "CSV" : "Excel";
-                this.dialogService.add(SpreadsheetCloneCSVXlsxDialog, {
-                    title: fileType + _t(" file preview"),
-                    cancel: () => {},
-                    cancelLabel: _t("Discard"),
-                    documentId: mainDocumentOrTarget.resId,
-                    confirmLabel: _t("Open with Odoo Spreadsheet"),
+                this.actionService.doAction("documents_spreadsheet.import_to_spreadsheet_action", {
+                    additionalContext: { default_document_id: mainDocumentOrTarget.resId },
                 });
             }
         } else {
-            return this.baseOnOpenDocumentsPreview(...arguments);
+            return super.onOpenDocumentsPreview(...arguments);
         }
     },
 
@@ -119,13 +102,15 @@ export const DocumentsSpreadsheetControllerMixin = () => ({
         );
         const model = await fetchSpreadsheetModel(this.env, "documents.document", doc.resId);
         const spreadsheetData = JSON.stringify(await freezeOdooData(model));
-        const excelFiles = model.exportXLSX().files;
+        const excelFiles = await model.exportXLSX();
+        const files = excelFiles.files;
+        model.dispatch("LOG_DATASOURCE_EXPORT", { action: "freeze" });
 
         // Create a new <documents.document> with the frozen data
         const record = await this.orm.call("documents.document", "action_freeze_and_copy", [
             doc.resId,
             spreadsheetData,
-            excelFiles,
+            files,
         ]);
 
         await this.env.searchModel._reloadSearchModel(true);
@@ -133,37 +118,44 @@ export const DocumentsSpreadsheetControllerMixin = () => ({
     },
 
     getTopBarActionMenuItems() {
-        const isInTrash = this.env.searchModel.getSelectedFolderId() === "TRASH";
         const menuItems = super.getTopBarActionMenuItems();
-        const selectionCount = this.model.targetRecords.length;
-        const singleSelection = selectionCount === 1 && this.targetRecords[0];
         menuItems.download.isAvailable = () =>
             this.model.targetRecords.some(
-                (r) => !r.isRequest() && r.data.handler !== "spreadsheet"
+                (r) => !r.isRequest() && r.data.handler !== "spreadsheet" && r.data.type !== "url"
             );
-        const prevShareAvailable = menuItems.share.isAvailable || (() => true);
-        menuItems.share.isAvailable = () =>
-            prevShareAvailable() &&
-            !(isInTrash && this.model.targetRecords.some((r) => r.data.handler === "spreadsheet"));
         return {
             ...menuItems,
             freezeAndShare: {
                 isAvailable: () =>
-                    !isInTrash &&
                     this.documentService.userIsInternal &&
-                    singleSelection?.data?.handler === "spreadsheet",
-                sequence: 52,
+                    this.targetRecords.length === 1 &&
+                    this.targetRecords[0]?.data?.handler === "spreadsheet",
+                sequence: 30,
                 description: _t("Freeze and Share"),
-                icon: "fa fa-share-alt",
+                icon: "share",
                 callback: () => this.onClickFreezeAndShareSpreadsheet(),
-                groupNumber: 1,
+                groupNumber: STATIC_COG_GROUP_ACTION_BASE,
             },
         };
     },
 
     getStaticActionMenuItems() {
         const menuItems = super.getStaticActionMenuItems(...arguments);
-        menuItems.insert.isAvailable = () => this.documentService.userIsInternal;
+        // Not present in activity view
+        if (menuItems.insert) {
+            menuItems.insert.isAvailable = () => this.documentService.userIsInternal;
+            menuItems.insert.iconClass = "invisible";
+            menuItems.insert.sequence = 110;
+            menuItems.insert.groupNumber = STATIC_COG_GROUP_ACTION_NATIVE;
+        }
+
+        const superVersionIsAvailable = menuItems.version.isAvailable;
+        menuItems.version.isAvailable = () =>
+            superVersionIsAvailable() &&
+            !["spreadsheet", "frozen_spreadsheet"].includes(
+                this.model.targetRecords[0].data.handler
+            );
+
         return menuItems;
     },
 });

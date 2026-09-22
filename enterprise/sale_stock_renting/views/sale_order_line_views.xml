@@ -26,7 +26,7 @@
         <field name="inherit_id" ref="sale_renting.sale_order_line_form_schedule"/>
         <field name="arch" type="xml">
             <field name="product_id" position="after">
-                <field name="reserved_lot_ids" invisible="tracking == 'none'" widget="many2many_tags"/>
+                <field name="reserved_lot_ids" invisible="tracking not in ['lot', 'serial']" widget="many2many_tags"/>
             </field>
             <field name="company_id" position="before">
                 <field name="warehouse_id" groups="stock.group_stock_multi_warehouses"/>
@@ -36,9 +36,7 @@
 
     <record id="sale_renting.action_rental_order_schedule" model="ir.actions.act_window">
         <field name="context">{
-            'in_rental_app': 1,
             'in_rental_schedule': 1,
-            'search_default_confirmed': 1,
             'search_default_groupby_product': 1,
             'search_default_groupby_reserved_lot': 2,
             'convert_default_order_line_values': 1,

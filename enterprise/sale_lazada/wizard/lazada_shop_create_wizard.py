@@ -10,11 +10,11 @@ from odoo import fields, models
 
 
 class LazadaShopCreateWizard(models.TransientModel):
-    _name = 'lazada.shop.create.wizard'
+    _name = "lazada.shop.create.wizard"
     _description = "Lazada Shop Creation Wizard"
 
     company_id = fields.Many2one(
-        'res.company', string='Company', default=lambda self: self.env.company, required=True
+        "res.company", string="Company", default=lambda self: self.env.company, required=True
     )
     app_key = fields.Char(
         help="Your Lazada application key (App Key). You can find this in your Lazada "
@@ -32,11 +32,11 @@ class LazadaShopCreateWizard(models.TransientModel):
     def action_create_shop(self):
         """Create a shop using the given credentials and redirect to Lazada authorization page."""
         self.ensure_one()
-        shop = self.env['lazada.shop'].create({
-            'name': self.env._("New Lazada Shop"),
-            'app_key': self.app_key,
-            'app_secret': self.app_secret,
-            'company_id': self.company_id.id,
+        shop = self.env["lazada.shop"].create({
+            "name": self.env._("New Lazada Shop"),
+            "app_key": self.app_key,
+            "app_secret": self.app_secret,
+            "company_id": self.company_id.id,
         })
 
         # Redirect to authorization flow

@@ -1,7 +1,9 @@
 declare module "services" {
-    import { IotWebsocketService } from "@iot/iot_websocket_service";
+    import { iotLongpollingService } from "@iot/network_utils/iot_longpolling";
+    import { iotHttpService } from "@iot/network_utils/iot_http_service";
 
     export interface Services {
-        iot_websocket: typeof IotWebsocketService
+        iot_longpolling: typeof iotLongpollingService;
+        iot_http: typeof iotHttpService;
     }
 }

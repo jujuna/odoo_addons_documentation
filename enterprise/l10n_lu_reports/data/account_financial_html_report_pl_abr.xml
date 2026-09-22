@@ -6,6 +6,7 @@
         <field name="name@de">Gewinn und Verlust (gekürzt)</field>
         <field name="name@lb">Profitt &amp; Verloscht (verkierzt)</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_date_range" eval="True "/>
@@ -29,8 +30,6 @@
                 <field name="name@de">1. bis 5. Rohergebnis</field>
                 <field name="name@lb">1. Op 5. Brutto Gewënn oder Verloscht</field>
                 <field name="code">LU_PLABR_651</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_l10n_lu_pl_abr_line_1_balance" model="account.report.expression">
@@ -61,8 +60,6 @@
                         <field name="name@de">a) Löhne und Gehälter</field>
                         <field name="name@lb">a) Léin a Gehälter</field>
                         <field name="code">LU_PLABR_607</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_6_1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -91,8 +88,6 @@
                                 <field name="name@de">i) Altersversorgung</field>
                                 <field name="name@lb">i) bezitt op Pensiounen</field>
                                 <field name="code">LU_PLABR_653</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_l10n_lu_pl_abr_line_6_2_1_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -107,8 +102,6 @@
                                 <field name="name@de">ii) Sonstige soziale Aufwendungen</field>
                                 <field name="name@lb">II) aner Sozialversécherungskäschten</field>
                                 <field name="code">LU_PLABR_655</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_l10n_lu_pl_abr_line_6_2_2_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -125,8 +118,6 @@
                         <field name="name@de">c) Sonstiger Personalaufwand</field>
                         <field name="name@lb">c) Aner Mataarbechter Käschten</field>
                         <field name="code">LU_PLABR_613</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_6_3_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -158,8 +149,6 @@
                         <field name="name@de">a) zu Aufwendungen für die Errichtungund Erweiterung des Unternehmensund zu Sachanlagen undimmateriellen Anlagewerten</field>
                         <field name="name@lb">a) am Respekt vun der Formatkäschten a vun konkreten an immaterielle fixen Verméigen</field>
                         <field name="code">LU_PLABR_659</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_7_1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -174,8 +163,6 @@
                         <field name="name@de">b) von Gegenständen des Umlaufvermögens</field>
                         <field name="name@lb">b) Am Respekt vun aktuellen Verméigen</field>
                         <field name="code">LU_PLABR_661</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_7_2_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -192,8 +179,6 @@
                 <field name="name@de">8. Sonstige betriebliche Aufwendungen</field>
                 <field name="name@lb">8. Aner Operatiounskäschte</field>
                 <field name="code">LU_PLABR_621</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_l10n_lu_pl_abr_line_8_balance" model="account.report.expression">
@@ -224,8 +209,6 @@
                         <field name="name@de">a) aus verbundenen Unternehmen</field>
                         <field name="name@lb">a) ofgeleet vu verbonne vun der Entreprise</field>
                         <field name="code">LU_PLABR_717</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_9_1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -240,8 +223,6 @@
                         <field name="name@de">b) sonstige Beteiligungserträge</field>
                         <field name="name@lb">b) Aner Akommes vun deelzehuelen Interesse</field>
                         <field name="code">LU_PLABR_719</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_9_2_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -273,8 +254,6 @@
                         <field name="name@de">a) aus verbundenen Unternehmen</field>
                         <field name="name@lb">a) ofgeleet vu verbonne vun der Entreprise</field>
                         <field name="code">LU_PLABR_723</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_10_1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -289,8 +268,6 @@
                         <field name="name@de">b) sonstige Erträge die nichtunter a) enthalten sind</field>
                         <field name="name@lb">b) Aner Akommes net ënner engem) abegraff)</field>
                         <field name="code">LU_PLABR_725</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_10_2_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -322,8 +299,6 @@
                         <field name="name@de">a) aus verbundenen Unternehmen</field>
                         <field name="name@lb">a) ofgeleet vu verbonne vun der Entreprise</field>
                         <field name="code">LU_PLABR_729</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_11_1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -338,8 +313,6 @@
                         <field name="name@de">b) sonstige Zinsen und ähnliche Erträge</field>
                         <field name="name@lb">b) Aner Interesse an Ähnlech Akommes</field>
                         <field name="code">LU_PLABR_731</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_11_2_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -356,8 +329,6 @@
                 <field name="name@de">12. Teil der Ergebnisse nach der Equity Methode</field>
                 <field name="name@lb">12. Deelen vum Gewënn oder Verloscht vun der Entloossunge fir ënner der Equity Method virgesinn</field>
                 <field name="code">LU_PLABR_663</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_l10n_lu_pl_abr_line_12_balance" model="account.report.expression">
@@ -373,8 +344,6 @@
                 <field name="name@de">13. Wertberichtigungen zu Finanzanlagenund zu Wertpapieren des Umlaufvermögens</field>
                 <field name="name@lb">13. Wäert Upassunge am Respekt vu finanziellen Verméigen an d'Investitiounen als aktuell Verméigen ofgehalen</field>
                 <field name="code">LU_PLABR_665</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_l10n_lu_pl_abr_line_13_balance" model="account.report.expression">
@@ -405,8 +374,6 @@
                         <field name="name@de">a) an verbundene Unternehmen</field>
                         <field name="name@lb">a) betreffend allgemeng Ënnerbewosstsinn</field>
                         <field name="code">LU_PLABR_629</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_14_1_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -421,8 +388,6 @@
                         <field name="name@de">b) sonstige Zinsen und ähnliche Aufwendungen</field>
                         <field name="name@lb">b) Aner Interesse an ähnlech Ausgaben</field>
                         <field name="code">LU_PLABR_631</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_l10n_lu_pl_abr_line_14_2_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -439,8 +404,6 @@
                 <field name="name@de">15. Steuern auf das Ergebnis</field>
                 <field name="name@lb">15. Steier op Gewënn oder Verloscht</field>
                 <field name="code">LU_PLABR_635</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_l10n_lu_pl_abr_line_15_balance" model="account.report.expression">
@@ -471,8 +434,6 @@
                 <field name="name@de">17. Sonstige Steuern, soweit nicht unterden Posten 1-16 enthalten</field>
                 <field name="name@lb">17. Aner Steieren net ënner Artikelen 1 bis 16 gewisen</field>
                 <field name="code">LU_PLABR_637</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_l10n_lu_pl_abr_line_17_balance" model="account.report.expression">

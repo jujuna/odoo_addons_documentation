@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -12,11 +11,10 @@
         'base_setup',
         'mail',
         'utm',
-        'rating',
+        'portal_rating',
         'web_tour',
         'web_cohort',
         'resource',
-        'portal',
         'digest',
     ],
     'description': """
@@ -39,7 +37,6 @@ Features:
     """,
     'data': [
         'security/helpdesk_security.xml',
-        'security/ir.model.access.csv',
         'data/digest_data.xml',
         'data/mail_message_subtype_data.xml',
         'data/mail_template_data.xml',
@@ -47,6 +44,8 @@ Features:
         'data/ir_cron_data.xml',
         'data/ir_sequence_data.xml',
         'data/helpdesk_tour.xml',
+        'data/mail_templates.xml',
+        'data/portal_entry_data.xml',
         'views/helpdesk_ticket_views.xml',
         'report/helpdesk_ticket_analysis_views.xml',
         'report/helpdesk_sla_report_analysis_views.xml',
@@ -60,9 +59,9 @@ Features:
         'views/rating_rating_views.xml',
         'views/res_partner_views.xml',
         'views/mail_activity_views.xml',
-        'views/helpdesk_templates.xml',
         'views/helpdesk_menus.xml',
         'wizard/helpdesk_stage_delete_views.xml',
+        'security/ir.access.csv',
     ],
     'demo': ['data/helpdesk_demo.xml'],
     'application': True,

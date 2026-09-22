@@ -41,9 +41,10 @@ class WhatsAppSecurityCase(WhatsAppCommon):
 
 
 @tagged('wa_account', 'security')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppAccountSecurity(WhatsAppSecurityCase):
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_account_access(self):
         """ Test MC-enabled access on whastapp account model """
         # main company access only
@@ -108,10 +109,11 @@ class WhatsAppControllerSecurity(MockIncomingWhatsApp, WhatsAppSecurityCase):
 
 
 @tagged('wa_message', 'security')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppDiscussSecurity(WhatsAppSecurityCase):
 
     @users('admin')
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_member_creation(self):
         channel_wa = self.env['discuss.channel'].create(
            {
@@ -133,11 +135,12 @@ class WhatsAppDiscussSecurity(WhatsAppSecurityCase):
 
 
 @tagged('wa_message', 'security')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppMessageSecurity(WhatsAppSecurityCase):
 
     @mute_logger('odoo.addons.auth_signup.models.res_users',
                  'odoo.addons.base.models.ir_cron',
-                 'odoo.addons.base.models.ir_model')
+                 'odoo.addons.base.models.ir_access')
     def test_message_signup_token(self):
         """Assert the template values sent to the whatsapp API are not fetched
         as sudo/SUPERUSER, even when going through the cron/queue. """
@@ -213,11 +216,53 @@ class WhatsAppMessageSecurity(WhatsAppSecurityCase):
         whatsapp_message.invalidate_recordset()
         self.assertEqual(whatsapp_message.failure_reason, "We were not able to fetch value of field 'signup_type'")
 
+    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    def test_message_body_spoof_prevention(self):
+        """Ensure a non-WA-admin user cannot spoof mail_message_id to read
+        a restricted mail.message body via the whatsapp.message body related field.
+
+        Even if ACLs are changed in the future to allow writing mail_message_id,
+        the body of a restricted mail.message should not be accessible through
+        the related field.
+        """
+        # create a mail.message linked to a whatsapp.account of company 2
+        # that user_employee (company 1) cannot access via mail.message access rules
+        restricted_msg = self.env['mail.message'].sudo().create({
+            'body': 'Confidential Content',
+            'message_type': 'comment',
+            'model': 'whatsapp.account',
+            'res_id': self.whatsapp_account.id,
+            'record_company_id': self.company_2.id,
+        })
+
+        # confirm employee cannot read the restricted mail.message directly
+        with self.assertRaises(exceptions.AccessError):
+            self.env['mail.message'].with_user(self.user_employee_c2).browse(restricted_msg.id).read(['body'])
+
+        # create a whatsapp.message owned by user_employee_c2
+        wa_msg = self.env['whatsapp.message'].sudo().create({
+            'mail_message_id': restricted_msg.id,
+            'mobile_number': '+32478000000',
+            'wa_account_id': self.whatsapp_account.id,
+        })
+
+        # confirm user cannot spoof mail_message_id via write (blocked by ACLs)
+        other_restricted_msg = self.env['mail.message'].sudo().create({
+            'body': 'Other Confidential Content',
+            'message_type': 'comment',
+            'model': 'whatsapp.account',
+            'res_id': self.whatsapp_account.id,
+            'record_company_id': self.company_2.id,
+        })
+        with self.assertRaises(exceptions.AccessError):
+            self.env['whatsapp.message'].with_user(self.user_employee_c2).browse(wa_msg.id).write({'mail_message_id': other_restricted_msg.id})
+
 
 @tagged('wa_template', 'security')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppTemplateSecurity(WhatsAppSecurityCase):
 
-    @mute_logger('odoo.addons.base.models.ir_model')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_tpl_create(self):
         """ Creation is for WA admins only """
         template = self.env['whatsapp.template'].with_user(self.user_wa_admin).create({
@@ -232,7 +277,7 @@ class WhatsAppTemplateSecurity(WhatsAppSecurityCase):
                 'name': 'Test 2',
             })
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_tpl_read_allowed_users(self):
         """ Test 'allowed_users' that restricts access to the template """
         template = self.env['whatsapp.template'].with_user(self.user_wa_admin).create({
@@ -247,7 +292,7 @@ class WhatsAppTemplateSecurity(WhatsAppSecurityCase):
         with self.assertRaises(exceptions.AccessError):
             self.assertEqual(template.with_user(self.user_employee2).name, 'Test')
 
-    @mute_logger('odoo.addons.base.models.ir_model')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_tpl_phone_field_update(self):
         """ Check 'phone_field' update is done using the same rules as dynamic
         fields: either limited to allowed fields, either user is a sysadmin. """
@@ -257,6 +302,7 @@ class WhatsAppTemplateSecurity(WhatsAppSecurityCase):
             'name': 'WhatsApp Template',
             'template_name': 'Phone Field Chain',
             'status': 'approved',
+            'use_default_recipient': False,
             'wa_account_id': self.whatsapp_account.id,
         })
         test_partner = self.env['res.partner'].create({
@@ -354,3 +400,34 @@ class WhatsAppTemplateSecurity(WhatsAppSecurityCase):
         # changing fields other than variables should not trigger security check
         template.write({'name': 'Can Update'})
         self.assertEqual(template.name, 'Can Update')
+
+
+@tagged('wa_interactive', 'security')
+class WhatsAppInteractiveSecurity(WhatsAppSecurityCase):
+
+    @mute_logger('odoo.addons.base.models.ir_access')
+    def test_interactive_read_allowed_users(self):
+        """ Test 'allowed_users' that restricts access to the interactive
+        template, buttons following their template """
+        interactive = self.env['whatsapp.interactive'].with_user(self.user_wa_admin).create({
+            'body': 'Hello',
+            'button_ids': [(0, 0, {'button_type': 'quick_reply', 'name': 'Yes'})],
+            'interactive_type': 'button',
+            'name': 'Test Interactive'})
+        button = interactive.button_ids
+        self.assertEqual(interactive.with_user(self.user_employee).name, 'Test Interactive')
+        self.assertEqual(interactive.with_user(self.user_employee2).name, 'Test Interactive')
+        self.assertEqual(button.with_user(self.user_employee).name, 'Yes')
+        self.assertEqual(button.with_user(self.user_employee2).name, 'Yes')
+
+        # update, limit allowed users
+        interactive.write({'allowed_user_ids': [(4, self.user_employee.id)]})
+        # WA admins are not impacted by the restriction
+        self.assertEqual(interactive.with_user(self.user_wa_admin).name, 'Test Interactive')
+        self.assertEqual(interactive.with_user(self.user_employee).name, 'Test Interactive')
+        self.assertEqual(button.with_user(self.user_wa_admin).name, 'Yes')
+        self.assertEqual(button.with_user(self.user_employee).name, 'Yes')
+        with self.assertRaises(exceptions.AccessError):
+            self.assertEqual(interactive.with_user(self.user_employee2).name, 'Test Interactive')
+        with self.assertRaises(exceptions.AccessError):
+            self.assertEqual(button.with_user(self.user_employee2).name, 'Yes')

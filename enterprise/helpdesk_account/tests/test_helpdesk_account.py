@@ -83,7 +83,7 @@ class TestHelpdeskAccount(common.HelpdeskCommon):
             - Check the credit note state
             - Create a credit note With Form
         """
-        journal_id = self.env['account.journal'].search([('type', '=', 'sale'), ('company_id', '=', self.main_company_id)], limit=1).id
+        journal_id = self.env['account.journal'].search([('type', '=', 'sale'), ('company_id', '=', self.main_company.id)], limit=1).id
         self.env['sale.order.line'].create({
             'product_id': self.product.id,
             'price_unit': 10,
@@ -136,6 +136,8 @@ class TestHelpdeskAccount(common.HelpdeskCommon):
             'default_helpdesk_ticket_id': ticket.id,
         }), view=self.env.ref('helpdesk_account.view_account_move_reversal_inherit_helpdesk_account'))
         for inv in self.so.invoice_ids:
+            if inv.state != 'posted':
+                continue
             credit_note_form.move_ids.add(inv)
         credit_note_form.reason = 'test'
         credit_note_form.save()

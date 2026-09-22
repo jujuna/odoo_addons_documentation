@@ -10,12 +10,14 @@ from .common import TestL10nAUPayrollAPICommon
 
 @tagged("post_install_l10n", "post_install", "-at_install", "l10n_au_hr_payroll")
 class TestPayrollSuperStreamApi(TestPayrollSuperStream, TestL10nAUPayrollAPICommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country("au")
     def setUpClass(cls):
         super().setUpClass()
         cls.env.user.group_ids |= cls.env.ref("hr_payroll.group_hr_payroll_manager")
-        cls.env["ir.config_parameter"].sudo().set_param("l10n_au_payroll_test_server_url", "http://127.0.0.1:8070")
+        cls.env["ir.config_parameter"].sudo().set_str("l10n_au_payroll_test_server_url", "http://127.0.0.1:8070")
         # Created as 'demo' and switched to 'test' so no api request is tiggered
         cls.proxy_user = cls.env['account_edi_proxy_client.user']._register_proxy_user(cls.company_data['company'], 'l10n_au_payroll', 'demo')
         cls.proxy_user.edi_mode = 'test'
@@ -191,4 +193,12 @@ class TestPayrollSuperStreamApi(TestPayrollSuperStream, TestL10nAUPayrollAPIComm
         refund_payment = self.env["account.payment"].search([("memo", "=", superstream.name + " (Refund)")])
         self.assertEqual(refund_payment.payment_type, "inbound")
         self.assertEqual(refund_payment.amount, superstream.amount_total)
-        self.assertEqual(refund_payment.state, "in_process")
+        self.assertEqual(refund_payment.state, "paid")
+
+    def test_06_no_lines_no_crash(self):
+        stream = self.env['l10n_au.super.stream'].create({
+            'journal_id': self.bank_journal.id,
+        })
+
+        result_message = stream.l10n_au_super_stream_lines._get_employee_mandatory_fields()
+        self.assertEqual(result_message, "", "Should return empty string when there are no lines.")

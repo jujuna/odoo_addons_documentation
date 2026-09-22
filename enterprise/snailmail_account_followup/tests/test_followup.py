@@ -3,14 +3,16 @@ from unittest import mock
 
 from odoo import Command
 from odoo.tests import tagged
-from odoo.tools import file_open
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+from odoo.addons.base.tests.files import PDF_RAW
 from odoo.addons.iap.tools import iap_tools
 
 
 @tagged('post_install', '-at_install')
 class TestSnailmailAccountFollowup(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -26,8 +28,8 @@ class TestSnailmailAccountFollowup(AccountTestInvoicingCommon):
             'country_id': cls.env.ref('base.lu').id,
         })
 
-        mock_wkhtmltopdf = mock.patch.object(cls.env.registry['ir.actions.report'], '_run_wkhtmltopdf', lambda *args, **kwargs: b"0")
-        cls.startClassPatcher(mock_wkhtmltopdf)
+        mock_pdf_engine = mock.patch.object(cls.env.registry['ir.actions.report'], '_run_pdf_engine_without_processing', lambda *args, **kwargs: b"0")
+        cls.startClassPatcher(mock_pdf_engine)
 
     def _mock_generate_report_pdf(self, info_dict):
         function_path = 'odoo.addons.snailmail_account_followup.models.snailmail_letter.SnailmailLetter._generate_report_pdf'
@@ -38,10 +40,7 @@ class TestSnailmailAccountFollowup(AccountTestInvoicingCommon):
                 'options': self.env.context.get('followup_options'),
                 'letter_id': self.id,
             })
-            # Return a fake filename and pdf to avoid generating a PDF in a test
-            with file_open('base/tests/minimal.pdf', 'rb') as file:
-                pdf_bytes = file.read()
-            return "filename.pdf", pdf_bytes
+            return "filename.pdf", PDF_RAW
 
         return mock.patch(function_path, _fill_info_dict)
 
@@ -61,14 +60,13 @@ class TestSnailmailAccountFollowup(AccountTestInvoicingCommon):
 
     def test_cron_generate_report_pdf(self):
         self.env.company.snailmail_cover = True
+        self.company_data['company'].automatic_invoice_reminder = True
 
         followup_line = self.env['account_followup.followup.line'].create({
             'company_id': self.company_data['company'].id,
-            'name': 'First Reminder',
             'delay': 15,
             'send_email': False,
             'send_letter': True,
-            'auto_execute': True,
         })
 
         self.env['account.move'].create({
@@ -92,56 +90,4 @@ class TestSnailmailAccountFollowup(AccountTestInvoicingCommon):
 
         options = info_dict['options']
         expected_options = {'followup_line': followup_line, 'partner_id': self.partner_a.id}
-        self.assertEqual({key: options[key] for key in expected_options}, expected_options)
-
-    def test_manual_generate_report_pdf(self):
-        self.env.company.snailmail_cover = True
-
-        followup_line = self.env['account_followup.followup.line'].create({
-            'company_id': self.company_data['company'].id,
-            'name': 'First Reminder',
-            'delay': 15,
-            'send_email': False,
-            'send_letter': True,
-            'auto_execute': True,
-        })
-
-        self.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'invoice_date': '2016-01-01',
-            'invoice_date_due': '2016-01-01',
-            'date': '2016-01-01',
-            'partner_id': self.partner_a.id,
-            'invoice_line_ids': [Command.create({
-                'quantity': 1,
-                'price_unit': 500,
-            })]
-        }).action_post()
-
-        wizard = self.env['account_followup.manual_reminder'].with_context(
-            active_model='res.partner',
-            active_ids=self.partner_a.ids,
-        ).create({})
-        wizard.write({
-            'email': False,
-            'sms': False,
-            'print': False,
-            'snailmail': True,
-        })
-
-        info_dict = {}
-        with freeze_time('2022-01-10'), self._mock_generate_report_pdf(info_dict), self._mock_iap_jsonrpc_credit_error(), mock.patch.object(self.env.cr, 'commit', lambda *args, **kwargs: None):
-            wizard.process_followup()
-
-        self.assertEqual(info_dict.get('report_id'), self.env.ref('account_followup.action_report_followup').id)
-        self.assertTrue(self.env['snailmail.letter'].browse(info_dict.get('letter_id')).cover)
-        options = info_dict.get('options', {})
-        expected_options = {
-            'followup_line': followup_line,
-            'sms': False,
-            'email': False,
-            'snailmail': True,
-            'manual_followup': True,
-            'partner_id': self.partner_a.id,
-        }
         self.assertEqual({key: options[key] for key in expected_options}, expected_options)

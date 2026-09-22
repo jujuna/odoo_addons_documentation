@@ -4,7 +4,6 @@
     'name': 'Sweden - SIE 5 Import',
     'countries': ['se'],
     'summary': 'Import Accounting Data from SIE 5 files',
-    'version': '1.0',
     'description': """
         Module for the import of SIE 5 standard files.
 
@@ -22,8 +21,8 @@
         'l10n_se',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'wizard/l10n_se_sie_wizard.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [
@@ -32,5 +31,4 @@
     },
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'installable': True,
 }

@@ -29,7 +29,7 @@
             <span id="span_tag" position="before">
                 <span invisible="not current_goal_skill_ids">Skills:</span>
                 <field name="current_goal_skill_ids" widget="many2many_tags"
-                    invisible="not current_goal_skill_ids" options="{'color_field': 'color'}"/>
+                    invisible="not current_goal_skill_ids" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
             </span>
         </field>
     </record>
@@ -40,7 +40,7 @@
         <field name="inherit_id" ref="hr_appraisal.hr_appraisal_goal_template_view_list"/>
         <field name="arch" type="xml">
             <field name="child_ids" position="before">
-                <field name="current_goal_skill_ids" widget="many2many_tags" options="{'color_field': 'color'}"
+                <field name="current_goal_skill_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"
                     string="Recommended for"/>
             </field>
         </field>

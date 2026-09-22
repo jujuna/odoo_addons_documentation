@@ -10,4 +10,4 @@ class QualityPoint(models.Model):
         if not self:
             return tuple()
         self.ensure_one()
-        return (self.test_type_id, self.title, self.component_id)
+        return (self.test_type_id, self.title, self.bom_line_id.product_id, self.byproduct_id.product_id)

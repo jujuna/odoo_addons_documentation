@@ -4,11 +4,12 @@
 import io
 import logging
 
+from copy import deepcopy
 from lxml import etree
 
 from odoo import models, _
 from odoo.exceptions import UserError
-from odoo.addons.base.models.res_bank import sanitize_account_number
+from odoo.addons.base.models.res_partner_bank import sanitize_account_number
 from odoo.addons.account_bank_statement_import_camt.lib.camt import CAMT
 
 _logger = logging.getLogger(__name__)
@@ -71,10 +72,10 @@ class AccountJournal(models.Model):
                 # Date 0..1
                 date = CAMT._get_transaction_date(entry, namespaces=ns) or statement_date
 
-                transaction_details = entry.xpath('.//ns:TxDtls', namespaces=ns)
+                transaction_details_node = entry.xpath('.//ns:TxDtls', namespaces=ns)
                 entry_details_sum = 0
                 largest_entry_vals = {'amount': 0}
-                for entry_details in transaction_details or [entry]:
+                for entry_details in transaction_details_node or [entry]:
                     sequence += 1
                     counter_party = CAMT._get_counter_party(entry_details, entry, namespaces=ns)
                     partner_name = CAMT._get_partner_name(entry_details, placeholder=counter_party, namespaces=ns)
@@ -109,6 +110,7 @@ class AccountJournal(models.Model):
                     entry_vals.update(CAMT._get_transaction_type(BkTxCd, namespaces=ns))
                     notes = []
                     entry_info = CAMT._get_additional_entry_info(entry, namespaces=ns)
+                    transaction_details = deepcopy(entry_vals)
                     if entry_info:
                         notes.append(_('Entry Info: %s', entry_info))
                     text_info = CAMT._get_additional_text_info(entry_details, namespaces=ns)
@@ -119,24 +121,31 @@ class AccountJournal(models.Model):
                     partner_address = CAMT._get_partner_address(entry_details, ns, counter_party)
                     if partner_address:
                         notes.append(_('Address:\n%s', partner_address))
+                        transaction_details['partner_address'] = partner_address
                     transaction_id = CAMT._get_transaction_id(entry_details, namespaces=ns)
                     if transaction_id:
                         notes.append(_('Transaction ID: %s', transaction_id))
+                        transaction_details['transaction_id'] = transaction_id
                     instruction_id = CAMT._get_instruction_id(entry_details, namespaces=ns)
                     if instruction_id:
                         notes.append(_('Instruction ID: %s', instruction_id))
+                        transaction_details['instruction_id'] = instruction_id
                     end_to_end_id = CAMT._get_end_to_end_id(entry_details, namespaces=ns)
                     if end_to_end_id:
                         notes.append(_('End to end ID: %s', end_to_end_id))
+                        transaction_details['end_to_end_id'] = end_to_end_id
                     mandate_id = CAMT._get_mandate_id(entry_details, namespaces=ns)
                     if mandate_id:
                         notes.append(_('Mandate ID: %s', mandate_id))
+                        transaction_details['mandate_id'] = mandate_id
                     check_number = CAMT._get_check_number(entry_details, namespaces=ns)
                     if check_number:
                         notes.append(_('Check Number: %s', check_number))
+                        transaction_details['check_number'] = check_number
                     entry_vals['narration'] = "\n".join(notes)
 
                     unique_import_set.add(entry_vals['unique_import_id'])
+                    entry_vals['transaction_details'] = transaction_details
                     transactions.append(entry_vals)
 
                     entry_details_sum += entry_vals['amount']
@@ -159,7 +168,7 @@ class AccountJournal(models.Model):
 
         # If statements target multiple journals, returns thoses targeting the current journal
         if len(statements_per_iban) > 1:
-            account_no = sanitize_account_number(self.bank_acc_number)
+            account_no = sanitize_account_number(self.bank_account_number)
             _logger.warning("The following statements will not be imported because they are targeting another journal (current journal id: %s):\n- %s",
                             account_no, "\n- ".join("{}: {} statement(s)".format(iban, len(statements)) for iban, statements in statements_per_iban.items() if iban != account_no))
             if not account_no:

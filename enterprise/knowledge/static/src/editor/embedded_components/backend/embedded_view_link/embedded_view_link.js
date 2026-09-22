@@ -7,16 +7,20 @@ import { useService } from "@web/core/utils/hooks";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { EmbeddedViewLinkPopover } from "@knowledge/editor/embedded_components/backend/embedded_view_link/embedded_view_link_popover";
 import { EmbeddedViewLinkEditDialog } from "@knowledge/editor/embedded_components/backend/embedded_view_link/embedded_view_link_edit_dialog";
-import { ReadonlyViewLinkComponent } from "@knowledge/editor/embedded_components/backend/embedded_view_link/readonly_embedded_view_link";
+import {
+    ReadonlyViewLinkComponent,
+    readonlyViewLinkProps,
+} from "@knowledge/editor/embedded_components/backend/embedded_view_link/readonly_embedded_view_link";
+import { useProps, t } from "@odoo/owl";
 
 export class EmbeddedViewLinkComponent extends ReadonlyViewLinkComponent {
     static template = "knowledge.EmbeddedViewLink";
-    static props = {
-        ...ReadonlyViewLinkComponent.props,
-        host: { type: Object },
-        copyViewLink: { type: Function },
-        removeViewLink: { type: Function },
-    };
+    props = useProps({
+        ...readonlyViewLinkProps,
+        host: t.object(),
+        copyViewLink: t.function(),
+        removeViewLink: t.function(),
+    });
 
     setup() {
         this.actionService = useService("action");

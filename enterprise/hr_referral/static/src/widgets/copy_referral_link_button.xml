@@ -3,19 +3,16 @@
 
     <t t-name="hr_referral.CopyButtonReferral">
         <a
-            t-ref="button"
             role="button"
-            class="btn btn-secondary d-flex flex-column"
-            t-on-click.stop="onClick">
-            <span>
-                <i role="img" class="fa fa-2x fa-link" aria-label="Link to share"/>
+            class="d-flex align-items-center justify-content-between w-100 text-decoration-none text-body p-0"
+            t-on-click.stop="this.onClick">
+            <span class="d-flex align-items-center">
+                <i role="img" class="oi oi-lg oi-fw me-2 text-center" data-icon="assignment" aria-label="Copy Link"/>
+                Copy Link
             </span>
-            <div t-if="this.props.record.data.directclicks" class="text-primary py-2">            
-                <span><t t-esc="this.props.record.data.directclicks"/> Click(s)</span>
-            </div>
-            <div t-else="" class="text-primary py-2"> 
-                Share Now
-            </div>
+            <span class="text-primary ms-2">
+                <t t-if="this.props.record.data.directclicks"><t t-out="this.props.record.data.directclicks"/> click(s)</t>
+            </span>
         </a>
     </t>
 </templates>

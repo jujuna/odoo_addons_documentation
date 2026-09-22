@@ -87,8 +87,12 @@ test("multi_create: render and basic creation/deletion", async () => {
         `,
         groupBy: ["stage_id"],
     });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
     let gridContent = getGridContent();
     expect(gridContent.rows).toEqual([
+        {
+            title: "Undefined Stage",
+        },
         {
             pills: [
                 {
@@ -151,6 +155,9 @@ test("multi_create: render and basic creation/deletion", async () => {
     gridContent = getGridContent();
     expect(gridContent.rows).toEqual([
         {
+            title: "Undefined Stage",
+        },
+        {
             pills: [
                 {
                     colSpan: "01 December 2018 -> 04 December 2018",
@@ -214,7 +221,7 @@ test("multi_create: render and basic creation/deletion", async () => {
         targetCell: getCell("17", "December 2018", "done"),
     });
 
-    await click(".o_multi_selection_buttons .btn .fa-trash");
+    await click(".o_multi_selection_buttons .btn [data-icon='delete'].oi-filled");
     await animationFrame();
     expect(".o_dialog .modal-body").toHaveText(
         "Are you sure you want to delete the 5 selected records?"
@@ -224,6 +231,9 @@ test("multi_create: render and basic creation/deletion", async () => {
 
     gridContent = getGridContent();
     expect(gridContent.rows).toEqual([
+        {
+            title: "Undefined Stage",
+        },
         {
             pills: [
                 {
@@ -280,7 +290,7 @@ test(`multi_create: no button "Delete" if no record selected`, async () => {
     });
     expect(".o_selection_box").toHaveText("0\nselected");
     expect(".o_multi_selection_buttons .btn:contains(Add)").toHaveCount(1);
-    expect(".o_multi_selection_buttons .btn .fa-trash").toHaveCount(0);
+    expect(".o_multi_selection_buttons .btn [data-icon='delete'].oi-filled").toHaveCount(0);
 });
 
 test("multi_create: selection with ctrl", async () => {
@@ -298,8 +308,12 @@ test("multi_create: selection with ctrl", async () => {
         `,
         groupBy: ["stage_id"],
     });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
     let gridContent = getGridContent();
     expect(gridContent.rows).toEqual([
+        {
+            title: "Undefined Stage",
+        },
         {
             pills: [
                 {
@@ -378,6 +392,9 @@ test("multi_create: selection with ctrl", async () => {
 
     gridContent = getGridContent();
     expect(gridContent.rows).toEqual([
+        {
+            title: "Undefined Stage",
+        },
         {
             pills: [
                 {
@@ -505,7 +522,7 @@ test("multi_create: selection with ctrl", async () => {
 
     expect(".o_selection_box").toHaveText("14\nselected");
 
-    await contains(".o_multi_selection_buttons .btn .fa-trash").click();
+    await contains(".o_multi_selection_buttons .btn [data-icon='delete'].oi-filled").click();
     await animationFrame();
     expect(".o_dialog .modal-body").toHaveText(
         "Are you sure you want to delete the 14 selected records?"
@@ -515,6 +532,9 @@ test("multi_create: selection with ctrl", async () => {
 
     gridContent = getGridContent();
     expect(gridContent.rows).toEqual([
+        {
+            title: "Undefined Stage",
+        },
         {
             title: "in_progress",
             pills: [
@@ -566,8 +586,9 @@ test("multi_create: create single record from selection", async () => {
         `,
         groupBy: ["stage_id"],
     });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
     let gridContent = getGridContent();
-    expect(gridContent.rows).toEqual([{ title: "" }]);
+    expect(gridContent.rows).toEqual([{ title: "Undefined Stage" }]);
 
     await selectBlock({
         sourceCell: getCell("17", "December 2018"),
@@ -634,8 +655,9 @@ test("multi_create: create single record if no selection", async () => {
         `,
         groupBy: ["stage_id"],
     });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
     let gridContent = getGridContent();
-    expect(gridContent.rows).toEqual([{ title: "" }]);
+    expect(gridContent.rows).toEqual([{ title: "Undefined Stage" }]);
     expect(".o_multi_selection_buttons").toHaveCount(0);
 
     await contains(".o_gantt_button_add").click();
@@ -710,7 +732,7 @@ test(`multi_create: plan button if plan="1" and one cell selected`, async () => 
         groupBy: ["stage_id"],
     });
     let gridContent = getGridContent();
-    expect(gridContent.rows).toEqual([{ title: "" }]);
+    expect(gridContent.rows).toEqual([{ title: "Undefined Stage" }]);
 
     await click(getCell("17", "December 2018"));
     await animationFrame();
@@ -784,8 +806,12 @@ test("multi_create: can start selection over locked pills", async () => {
         `,
         groupBy: ["stage_id"],
     });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
     let gridContent = getGridContent();
     expect(gridContent.rows).toEqual([
+        {
+            title: "Undefined Stage",
+        },
         {
             pills: [
                 {
@@ -846,6 +872,9 @@ test("multi_create: can start selection over locked pills", async () => {
 
     gridContent = getGridContent();
     expect(gridContent.rows).toEqual([
+        {
+            title: "Undefined Stage",
+        },
         {
             pills: [
                 {
@@ -983,4 +1012,194 @@ test("multi_create: can cancel multi-selection", async () => {
 
     expect(".o_cell_ghost").not.toHaveCount();
     expect(".o_selection_box").not.toHaveCount();
+});
+
+test("multi_create: select column header with click, shift+click, and ctrl+click", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `
+            <gantt
+                date_start="start"
+                date_stop="stop"
+                precision="{'day':'hour:full', 'week':'day:full', 'month':'day:full'}"
+                multi_create_view="multi_create_form"
+            >
+                <field name="progress"/>
+            </gantt>
+        `,
+        groupBy: ["stage_id"],
+    });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
+
+    await contains(".o_gantt_header_cell:contains('01')").click();
+    await animationFrame();
+    expect(".o_cell_ghost").toHaveCount(5);
+    expect(".o_selection_box").toHaveText("2 selected", { inline: true });
+
+    await keyDown("Shift");
+    await contains(".o_gantt_header_cell:contains('03')").click();
+    await animationFrame();
+    await keyUp("Shift");
+    expect(".o_cell_ghost").toHaveCount(15);
+    expect(".o_selection_box").toHaveText("2 selected", { inline: true });
+
+    await keyDown("Control");
+    await contains(".o_gantt_header_cell:contains('05')").click();
+    await animationFrame();
+    await keyUp("Control");
+    expect(".o_cell_ghost").toHaveCount(20);
+    expect(".o_selection_box").toHaveText("2 selected", { inline: true });
+});
+
+test("multi_create: select row header with click, shift+click, and ctrl+click", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `
+            <gantt
+                date_start="start"
+                date_stop="stop"
+                precision="{'day':'hour:full', 'week':'day:full', 'month':'day:full'}"
+                multi_create_view="multi_create_form"
+            >
+                <field name="progress"/>
+            </gantt>
+        `,
+        groupBy: ["stage_id"],
+    });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
+
+    await contains(".o_gantt_row_header:contains('todo')").click();
+    await animationFrame();
+    expect(".o_cell_ghost").toHaveCount(90);
+    expect(".o_selection_box").toHaveText("1 selected", { inline: true });
+
+    await keyDown("Shift");
+    await contains(".o_gantt_row_header:contains('done')").click();
+    await animationFrame();
+    await keyUp("Shift");
+    expect(".o_cell_ghost").toHaveCount(270);
+    expect(".o_selection_box").toHaveText("4 selected", { inline: true });
+
+    await keyDown("Control");
+    await contains(".o_gantt_row_header:contains('cancel')").click();
+    await animationFrame();
+    await keyUp("Control");
+    expect(".o_cell_ghost").toHaveCount(360);
+    expect(".o_selection_box").toHaveText("6 selected", { inline: true });
+});
+
+test("multi_create: cell click resets header selection anchors", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `
+            <gantt
+                date_start="start"
+                date_stop="stop"
+                precision="{'day':'hour:full', 'week':'day:full', 'month':'day:full'}"
+                multi_create_view="multi_create_form"
+            >
+                <field name="progress"/>
+            </gantt>
+        `,
+        groupBy: ["stage_id"],
+    });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
+
+    await contains(".o_gantt_row_header:contains('todo')").click();
+    await keyDown("Shift");
+    await contains(".o_gantt_row_header:contains('done')").click();
+    await animationFrame();
+    await keyUp("Shift");
+    expect(".o_cell_ghost").toHaveCount(270);
+    await click(getCell("17", "December 2018", "done"));
+    await animationFrame();
+    expect(".o_cell_ghost").toHaveCount(1);
+    await keyDown("Shift");
+    await contains(".o_gantt_row_header:contains('done')").click();
+    await animationFrame();
+    await keyUp("Shift");
+    expect(".o_cell_ghost").toHaveCount(90);
+});
+
+test("multi_create: header click does nothing when multi_create is not enabled", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `
+            <gantt
+                date_start="start"
+                date_stop="stop"
+                precision="{'day':'hour:full', 'week':'day:full', 'month':'day:full'}"
+            >
+                <field name="progress"/>
+            </gantt>
+        `,
+        groupBy: ["stage_id"],
+    });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
+
+    await contains(".o_gantt_header_cell:contains('01')").click();
+    await animationFrame();
+    expect(".o_cell_ghost").not.toHaveCount();
+    expect(".o_selection_box").not.toHaveCount();
+
+    await contains(".o_gantt_row_header:contains('todo')").click();
+    await animationFrame();
+    expect(".o_cell_ghost").not.toHaveCount();
+    expect(".o_selection_box").not.toHaveCount();
+});
+
+test("multi_create: select column header then ctrl+click on folded column keeps selection", async () => {
+    const unavailabilities = [
+        {
+            start: "2018-12-02 23:00:00",
+            stop: "2018-12-04 23:00:00",
+        },
+    ];
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
+        result.unavailabilities = {
+            __default: { false: unavailabilities },
+            stage_id: {
+                1: unavailabilities,
+                2: unavailabilities,
+                3: unavailabilities,
+                4: unavailabilities,
+                false: unavailabilities,
+            },
+        };
+        return result;
+    });
+
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `
+            <gantt
+                date_start="start"
+                date_stop="stop"
+                precision="{'day':'hour:full', 'week':'day:full', 'month':'day:full'}"
+                multi_create_view="multi_create_form"
+                display_unavailability="1"
+            >
+                <field name="progress"/>
+            </gantt>
+        `,
+        groupBy: ["stage_id"],
+        domain: [["id", "=", 4]],
+    });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
+
+    expect(".o_gantt_header_folded").toHaveCount(1);
+
+    await contains(".o_gantt_header_cell:contains('01')").click();
+    await animationFrame();
+    expect(".o_cell_ghost").toHaveCount(2);
+    expect(".o_selection_box").toHaveText("0 selected", { inline: true });
+
+    await keyDown("Control");
+    await contains(".o_gantt_header_folded").click();
+    await animationFrame();
+    await keyUp("Control");
+    expect(".o_cell_ghost").toHaveCount(6);
+    expect(".o_selection_box").toHaveText("0 selected", { inline: true });
+    expect(".o_gantt_header_folded").toHaveCount(0);
 });

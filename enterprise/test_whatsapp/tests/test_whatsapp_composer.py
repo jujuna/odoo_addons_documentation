@@ -67,6 +67,7 @@ Welcome to {{4}} office''',
 
 
 @tagged('wa_composer')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppComposerRendering(WhatsAppComposerCase, WhatsAppFullCase, CronMixinCase, MockIncomingWhatsApp):
     """ Test rendering based on various templates, notably using static or
     dynamic content, headers, ... """
@@ -212,11 +213,85 @@ class WhatsAppComposerRendering(WhatsAppComposerCase, WhatsAppFullCase, CronMixi
         )
 
     @users('employee')
+    def test_composer_tpl_free_text_edit_with_demo_fallback(self):
+        """ Test sending a WhatsApp template where some free text fields are user-edited
+        and others retain their demo values. """
+        # Initial demo values
+        body_var_1 = 'Nishant'
+        body_var_2 = 'Rahul Prajapati'  # intentionally not edited
+        body_var_3 = 'Akshat'
+        header_var = 'Jigar'
+        # Compose final values for edited fields
+        user_input_header_var = f'{header_var} Vaghela'
+        user_input_body_var_1 = f'{body_var_1} Jain'
+        user_input_body_var_3 = f'{body_var_3} Trivedi'
+
+        # template and record setup
+        self.template_basic.write({
+            'body': 'Say hi to {{1}}, {{2}}, and {{3}}',
+            'header_text': 'Hello {{1}}',
+            'header_type': 'text',
+            'model_id': self.env['ir.model']._get_id('whatsapp.test.base'),
+            'variable_ids': [
+                (5, 0, 0),
+                (0, 0, {'name': '{{1}}', 'line_type': 'body', 'field_type': 'free_text', 'demo_value': body_var_1}),
+                (0, 0, {'name': '{{2}}', 'line_type': 'body', 'field_type': 'free_text', 'demo_value': body_var_2}),
+                (0, 0, {'name': '{{3}}', 'line_type': 'body', 'field_type': 'free_text', 'demo_value': body_var_3}),
+                (0, 0, {'name': '{{1}}', 'line_type': 'header', 'field_type': 'free_text', 'demo_value': header_var}),
+            ],
+            'wa_account_id': self.whatsapp_account.id,
+        })
+        common_btn_vals = {'button_type': 'url', 'url_type': 'dynamic'}
+        self._add_button_to_template(self.template_basic, 'Visit Odoo', website_url='https://www.odoo.com', **common_btn_vals)
+        self._add_button_to_template(self.template_basic, 'Learn Runbot', website_url='https://runbot.odoo.com/', **common_btn_vals)
+        template = self.template_basic.with_user(self.env.user)
+        test_record = self.test_base_records[0]
+
+        # Instantiate composer and verify composer's free text fields are initially empty; demo values appear only as placeholders
+        composer = self._instanciate_wa_composer_from_records(template, test_record)
+        for field in [
+            'header_text_1',
+            'free_text_1',
+            'free_text_2',
+            'free_text_3',
+            'button_dynamic_url_1',
+            'button_dynamic_url_2',
+        ]:
+            self.assertFalse(composer[field], f'Expected field {field} to be empty in composer.')
+
+        # Set the user-edited values to free text fields
+        # free_text_2 and button_dynamic_url_1 left empty to test that demo values are sent in that case
+        composer.header_text_1 = user_input_header_var
+        composer.free_text_1 = user_input_body_var_1
+        composer.free_text_3 = user_input_body_var_3
+        composer.button_dynamic_url_2 = 'events'
+
+        # Send template and verify user-edited and demo values in message
+        with self.mockWhatsappGateway():
+            composer.action_send_whatsapp_template()
+        expected_body = (
+            f'<p><b>Hello {user_input_header_var}</b></p>'
+            f'<p>Say hi to {user_input_body_var_1}, {body_var_2}, and {user_input_body_var_3}</p>'
+        )
+        self.assertWAMessageFromRecord(
+            test_record,
+            fields_values={
+                'body': expected_body,
+                'free_text_json': {
+                    'header_text': user_input_header_var,
+                    'free_text_1': user_input_body_var_1,
+                    'free_text_3': user_input_body_var_3,
+                    'button_dynamic_url_2': 'events',
+                }
+            },
+        )
+
+    @users('employee')
     def test_composer_tpl_header_attachments(self):
         """ Send a template with a header attachment set through the composer."""
         doc_attach_clone = self.document_attachment.copy({'name': 'pdf_clone.pdf'})
         self.template_dynamic.write({
-            'header_attachment_ids': [(6, 0, self.document_attachment.ids)],
+            'header_attachment_id': self.document_attachment.id,
             'header_type': 'document',
         })
 
@@ -333,14 +408,14 @@ class WhatsAppComposerRendering(WhatsAppComposerCase, WhatsAppFullCase, CronMixi
                  ] + base_variable_ids,
                  },
                 # image
-                {'header_attachment_ids': [(6, 0, self.image_attachment.ids)]},
+                {'header_attachment_id': self.image_attachment.id},
                 # video
-                {'header_attachment_ids': [(6, 0, self.video_attachment.ids)]},
+                {'header_attachment_id': self.video_attachment.id},
                 # document
-                {'header_attachment_ids': [(6, 0, self.document_attachment.ids)]},
+                {'header_attachment_id': self.document_attachment.id},
                 {'report_id': self.test_wa_base_report.id},
                 {
-                    'header_attachment_ids': [(6, 0, self.document_attachment.ids)],
+                    'header_attachment_id': self.document_attachment.id,
                     'report_id': self.test_wa_base_report.id,
                 },
                 # location
@@ -359,21 +434,21 @@ class WhatsAppComposerRendering(WhatsAppComposerCase, WhatsAppFullCase, CronMixi
                 # image
                 {
                     'name': self.image_attachment.name,
-                    'datas': self.image_attachment.datas,
+                    'raw': self.image_attachment.raw.content,
                     'res_model': self.test_base_records._name,
                     'res_id': self.test_base_records[0].id,
                 },
                 # video
                 {
                     'name': self.video_attachment.name,
-                    'datas': self.video_attachment.datas,
+                    'raw': self.video_attachment.raw.content,
                     'res_model': self.test_base_records._name,
                     'res_id': self.test_base_records[0].id,
                 },
                 # document
                 {
                     'name': self.document_attachment.name,
-                    'datas': self.document_attachment.datas,
+                    'raw': self.document_attachment.raw.content,
                     'res_model': self.test_base_records._name,
                     'res_id': self.test_base_records[0].id,
                 },
@@ -411,7 +486,7 @@ class WhatsAppComposerRendering(WhatsAppComposerCase, WhatsAppFullCase, CronMixi
         ):
             with self.subTest(header_type=header_type):
                 self.template_dynamic.write({
-                    'header_attachment_ids': [(5, 0, 0)],
+                    'header_attachment_id': False,
                     'header_type': header_type,
                     'report_id': False,
                     **template_upd_values,
@@ -431,8 +506,44 @@ class WhatsAppComposerRendering(WhatsAppComposerCase, WhatsAppFullCase, CronMixi
                     fields_values=fields_values,
                 )
 
+    @users('employee')
+    def test_composer_tpl_named_variable(self):
+        """ Test sending a message with a named variable type template. """
+        self.template_basic.write({
+            'body': 'Your appointment is on {{appointment_date}} with {{doctor_name}}.',
+            'header_type': 'text',
+            'header_text': 'Hello {{customer_name}}',
+            'variable_type': 'named',
+            'variable_ids': [
+                (5, 0, 0),
+                (0, 0, {'name': '{{customer_name}}', 'line_type': 'header', 'field_type': 'free_text', 'demo_value': 'Yagnik'}),
+                (0, 0, {'name': '{{appointment_date}}', 'line_type': 'body', 'field_type': 'free_text', 'demo_value': 'April 19'}),
+                (0, 0, {'name': '{{doctor_name}}', 'line_type': 'body', 'field_type': 'free_text', 'demo_value': 'Dr. Sage'}),
+            ],
+        })
+        template = self.template_basic.with_user(self.env.user)
+        test_record = self.test_base_records[0].with_env(self.env)
+        composer = self._instanciate_wa_composer_from_records(template, from_records=test_record)
+        composer.header_text_1 = 'Jett'
+        composer.free_text_1 = 'May 6'
+
+        with self.mockWhatsappGateway():
+            composer.action_send_whatsapp_template()
+
+        self.assertWAMessageFromRecord(
+            test_record,
+            fields_values={
+                'body': '<p><b>Hello Jett</b></p><p>Your appointment is on May 6 with Dr. Sage.</p>',
+                'free_text_json': {
+                    'header_text': 'Jett',
+                    'free_text_1': 'May 6',
+                },
+            },
+        )
+
 
 @tagged('wa_composer')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppComposerSending(WhatsAppFullCase, WhatsAppComposerCase):
 
     def test_composer_send_duplicates(self):
@@ -445,7 +556,7 @@ class WhatsAppComposerSending(WhatsAppFullCase, WhatsAppComposerCase):
             - Regardless of static attachments (which should be the same for the same template)
         """
         self.template_dynamic.write({
-            'header_attachment_ids': [(6, 0, self.document_attachment.ids)],
+            'header_attachment_id': self.document_attachment.id,
             'header_type': 'document',
         })
         composer = self.env['whatsapp.composer'].create({

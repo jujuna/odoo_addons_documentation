@@ -1,9 +1,7 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Planning Time Off',
-    'version': '1.0',
     'category': 'Human Resources/Planning',
     'sequence': 50,
     'summary': 'Planning integration with holidays',
@@ -13,7 +11,6 @@ Planning integration with time off
 """,
     'data': [
         'views/planning_slot_views.xml',
-        'report/planning_report_views.xml',
     ],
     'assets': {
         'web.assets_unit_tests': [

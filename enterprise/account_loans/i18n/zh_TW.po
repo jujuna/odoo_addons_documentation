@@ -7,21 +7,31 @@
 # Wil Odoo, 2025
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tony Ng (ngto)" <ngto@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-11 23:43+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 03:11+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
-"projects/odoo-19/account_loans/zh_Hant/>\n"
+"projects/odoo-master/account_loans/zh_Hant/>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_loans
+#: model:ir.module.module,description:base.module_account_loans
+msgid ""
+"\n"
+"Loans management\n"
+"=================\n"
+"Keeps track of loans, and creates corresponding journal entries.\n"
+msgstr ""
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_form_view
@@ -51,29 +61,18 @@ msgstr "30U/360"
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_form_view
 msgid ""
-"<span class=\"oe_inline\" invisible=\"duration == 1\">months</span>\n"
-"                                        <span class=\"oe_inline\" "
-"invisible=\"duration != 1\">month</span>"
+"<span invisible=\"duration == 1\">months</span>\n"
+"                                        <span invisible=\"duration != "
+"1\">month</span>"
 msgstr ""
-"<span class=\"oe_inline\" invisible=\"duration == 1\">個月</span>\n"
-"                                        <span class=\"oe_inline\" "
-"invisible=\"duration != 1\">個月</span>"
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
 msgid ""
-"<span class=\"oe_inline\" invisible=\"loan_term == 1\">years</span>\n"
-"                                    <span class=\"oe_inline\" "
-"invisible=\"loan_term != 1\">year</span>"
+"<span invisible=\"loan_term == 1\">years</span>\n"
+"                                    <span invisible=\"loan_term != 1\">year</"
+"span>"
 msgstr ""
-"<span class=\"oe_inline\" invisible=\"loan_term == 1\">年</span>\n"
-"                                    <span class=\"oe_inline\" "
-"invisible=\"loan_term != 1\">年</span>"
-
-#. module: account_loans
-#: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
-msgid "<span class=\"oe_inline\">%</span>"
-msgstr "<span class=\"oe_inline\">%</span>"
 
 #. module: account_loans
 #: model:ir.model.fields.selection,name:account_loans.selection__account_loan_compute_wizard__compounding_method__a/360
@@ -94,6 +93,11 @@ msgstr "A/A AFB"
 #: model:ir.model.fields.selection,name:account_loans.selection__account_loan_compute_wizard__compounding_method__a/a_isda
 msgid "A/A ISDA"
 msgstr "A/A ISDA"
+
+#. module: account_loans
+#: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_form_view
+msgid "Account Loan Line"
+msgstr "賬戶貸款資料行"
 
 #. module: account_loans
 #: model:ir.model,name:account_loans.model_account_return
@@ -132,6 +136,16 @@ msgid "Amount Borrowed Difference"
 msgstr "已借貸金額差額"
 
 #. module: account_loans
+#: model:ir.model.fields,field_description:account_loans.field_account_loan__analytic_distribution
+msgid "Analytic Distribution"
+msgstr ""
+
+#. module: account_loans
+#: model:ir.model.fields,field_description:account_loans.field_account_loan__analytic_precision
+msgid "Analytic Precision"
+msgstr ""
+
+#. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_close_wizard
 #: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
 msgid "Apply"
@@ -166,6 +180,11 @@ msgstr "附件數目"
 #: code:addons/account_loans/wizard/account_loan_compute_wizard.py:0
 msgid "Balance"
 msgstr "結餘"
+
+#. module: account_loans
+#: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_kanban_view
+msgid "Balance:"
+msgstr "結餘："
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_form_view
@@ -229,7 +248,7 @@ msgstr "複利計算方式"
 #. odoo-javascript
 #: code:addons/account_loans/static/src/components/loans/file_upload.xml:0
 msgid "Compute"
-msgstr "計算"
+msgstr ""
 
 #. module: account_loans
 #. odoo-python
@@ -298,12 +317,6 @@ msgid "Date"
 msgstr "日期"
 
 #. module: account_loans
-#: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_close_wizard
-#: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
-msgid "Discard"
-msgstr "捨棄"
-
-#. module: account_loans
 #: model:ir.model.fields,field_description:account_loans.field_account_asset__display_name
 #: model:ir.model.fields,field_description:account_loans.field_account_asset_group__display_name
 #: model:ir.model.fields,field_description:account_loans.field_account_journal__display_name
@@ -314,6 +327,11 @@ msgstr "捨棄"
 #: model:ir.model.fields,field_description:account_loans.field_account_return__display_name
 msgid "Display Name"
 msgstr "顯示名稱"
+
+#. module: account_loans
+#: model:ir.model.fields,field_description:account_loans.field_account_loan__distribution_analytic_account_ids
+msgid "Distribution Analytic Account"
+msgstr ""
 
 #. module: account_loans
 #: model:ir.model.fields.selection,name:account_loans.selection__account_loan__state__draft
@@ -459,6 +477,11 @@ msgid "Interests"
 msgstr "利息"
 
 #. module: account_loans
+#: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_kanban_view
+msgid "Interests:"
+msgstr "利息："
+
+#. module: account_loans
 #: model:ir.model.fields,field_description:account_loans.field_account_loan__message_is_follower
 msgid "Is Follower"
 msgstr "是關注者"
@@ -491,7 +514,8 @@ msgid "Journal Entry"
 msgstr "日記賬記項"
 
 #. module: account_loans
-#: model:account.journal,name:account_loans.account_loans_journal_loan
+#. odoo-python
+#: code:addons/account_loans/demo/account_demo.py:0
 msgid "Journal Loan Demo"
 msgstr "日記賬貸款範例"
 
@@ -569,6 +593,18 @@ msgstr "貸款日期"
 
 #. module: account_loans
 #. odoo-python
+#: code:addons/account_loans/demo/account_demo.py:0
+msgid "Loan Demo 1"
+msgstr ""
+
+#. module: account_loans
+#. odoo-python
+#: code:addons/account_loans/demo/account_demo.py:0
+msgid "Loan Demo 2"
+msgstr ""
+
+#. module: account_loans
+#. odoo-python
 #: code:addons/account_loans/models/account_loan.py:0
 msgid "Loan Entries"
 msgstr "貸款記項"
@@ -632,6 +668,11 @@ msgstr "貸款"
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_pivot_view
 msgid "Loans Analysis"
 msgstr "貸款分析"
+
+#. module: account_loans
+#: model:ir.module.module,shortdesc:base.module_account_loans
+msgid "Loans Management"
+msgstr ""
 
 #. module: account_loans
 #: model:account.return.check.template,name:account_loans.account_return_check_template_loans_classification
@@ -775,6 +816,11 @@ msgstr "本金及利息"
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_list_view
 msgid "Principals"
 msgstr "本金"
+
+#. module: account_loans
+#: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_kanban_view
+msgid "Principals:"
+msgstr "本金："
 
 #. module: account_loans
 #: model:ir.model.fields,field_description:account_loans.field_account_loan__loan_properties
@@ -995,7 +1041,7 @@ msgstr "本金總額"
 #. odoo-javascript
 #: code:addons/account_loans/static/src/components/loans/file_upload.xml:0
 msgid "Upload"
-msgstr "上載"
+msgstr ""
 
 #. module: account_loans
 #. odoo-python
@@ -1010,18 +1056,8 @@ msgid ""
 "to this date (included) and not create entries for them. This is useful if "
 "you have already manually created entries prior to the creation of this loan."
 msgstr ""
-"貸款確認後，Odoo 會忽略截至此日期（包括當天）的貸款資料行，不會為它們建立記"
-"項。若在建立此貸款之前，已經有手動建立的記項，此功能便很有用。"
-
-#. module: account_loans
-#: model:ir.model.fields,field_description:account_loans.field_account_loan__website_message_ids
-msgid "Website Messages"
-msgstr "網站資訊"
-
-#. module: account_loans
-#: model:ir.model.fields,help:account_loans.field_account_loan__website_message_ids
-msgid "Website communication history"
-msgstr "網站溝通記錄"
+"貸款確認後，Odoo 會忽略截至此日期（包括當天）的貸款資料行，不會為它們建立記項"
+"。若在建立此貸款之前，已經有手動建立的記項，此功能便很有用。"
 
 #. module: account_loans
 #. odoo-python
@@ -1041,5 +1077,8 @@ msgstr "已撤銷"
 msgid "will be deleted and the loan will be marked as closed."
 msgstr "將被刪除，而貸款將被標記為已關閉。"
 
-#~ msgid "Group By"
-#~ msgstr "分組依據"
+msgid "Website Messages"
+msgstr "網站資訊"
+
+msgid "Website communication history"
+msgstr "網站溝通記錄"

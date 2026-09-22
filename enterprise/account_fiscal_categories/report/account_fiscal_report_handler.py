@@ -1,7 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import models, _
-from odoo.tools import SQL, Query
+from odoo.models import Query
+from odoo.tools import SQL
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
 
 class AccountFiscalReportHandler(models.AbstractModel):
@@ -14,8 +16,8 @@ class AccountFiscalReportHandler(models.AbstractModel):
         lines = []
 
         totals = {
-            column_group_key: {key: 0.0 for key in ['total_amount', 'deductible_amount']}
-            for column_group_key in options['column_groups']
+            column_group_index: {key: 0.0 for key in ['total_amount', 'deductible_amount']}
+            for column_group_index in range(len(options['column_groups']))
         }
 
         for group_key, result in results.items():
@@ -40,7 +42,7 @@ class AccountFiscalReportHandler(models.AbstractModel):
                     ('date', '<=', options['date']['date_to']),
                     ('parent_state', '=', 'posted'),
                 ]
-            ).subselect('account_id')),
+            ).subselect(SQL('account_id'))),
         ]
         rg = self.env['account.account.fiscal.rate']._read_group(
             period_domain,
@@ -130,7 +132,7 @@ class AccountFiscalReportHandler(models.AbstractModel):
         current = self._parse_line_id(options, line_dict_id)
         category_name = self.env['account.fiscal.category']._field_to_sql('category', 'name')
 
-        query = Query(self.env, alias='aml', table=SQL.identifier('account_move_line'))
+        query = Query(self.env['account.move.line'], alias='aml')
         query.add_join('LEFT JOIN', alias='account', table='account_account', condition=SQL('aml.account_id = account.id'))
         account_code = self.env['account.account']._field_to_sql('account', 'code', query)
 
@@ -235,14 +237,14 @@ class AccountFiscalReportHandler(models.AbstractModel):
     def _get_query_results(self, options, line_dict_id=None, primary_fields=None, secondary_fields=None, selector=None):
         grouped_results = {}
 
-        for column_group_key, column_group_options in self.env['account.report']._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in self.env['account.report']._split_options_per_column_group(options).items():
             select, from_, where, group_by, order_by, order_by_rate = self._get_query(column_group_options, line_dict_id)
-            select = SQL("%s, %s AS column_group_key", select, column_group_key)
+            select = SQL("%s, %s AS column_group_index", select, column_group_index)
             self.env.cr.execute(SQL(' ').join([select, from_, where, group_by, order_by, order_by_rate]))
 
             for results in self.env.cr.dictfetchall():
                 key = self._get_group_key(results, primary_fields, secondary_fields, selector)
-                grouped_results.setdefault(key, {})[column_group_key] = results
+                grouped_results.setdefault(key, {})[column_group_index] = results
 
         return grouped_results
 
@@ -272,7 +274,7 @@ class AccountFiscalReportHandler(models.AbstractModel):
             ]
         }
 
-    def _report_expand_unfoldable_line_category_line(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_category_line(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         results = self._get_query_results(options, line_dict_id, ['category_id', 'account_id'])
         lines = []
 
@@ -281,9 +283,9 @@ class AccountFiscalReportHandler(models.AbstractModel):
             level = len(self._parse_line_id(options, line_dict_id)) + 1
             lines.append(self._get_account_line(options, result, current, level))
 
-        return {'lines': lines}
+        return lines
 
-    def _report_expand_unfoldable_line_account_line(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_account_line(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         results = self._get_query_results(options, line_dict_id, ['category_id', 'account_id', 'account_rate'])
         lines = []
 
@@ -294,20 +296,20 @@ class AccountFiscalReportHandler(models.AbstractModel):
             account_id = self._get_single_value(base_line_values, 'account_id')
             lines.append(self._get_rate_line(options, result, current, level, account_id))
 
-        return {'lines': lines}
+        return lines
 
     def _get_column_values(self, options, values, is_total_line=False):
         column_values = []
 
         report = self.env['account.report'].browse(options['report_id'])
         for column in options['columns']:
-            vals = values.get(column['column_group_key'], {})
+            vals = values.get(column['column_group_index'], {})
             if vals and not is_total_line:
                 vals['rate'] = self._get_current_rate(vals)
                 vals['deductible_amount'] = self._get_current_deductible_amount(vals)
             col_val = vals.get(column['expression_label'])
 
-            column_values.append(report._build_column_dict(
+            column_values.append(report._build_column_data(
                 col_val,
                 column,
                 options=options,
@@ -317,62 +319,57 @@ class AccountFiscalReportHandler(models.AbstractModel):
         return column_values
 
     def _update_total_values(self, total, options, values):
-        for column_group_key in options['column_groups']:
-            for key in total[column_group_key]:
-                total[column_group_key][key] += values.get(column_group_key, {}).get(key) or 0.0
+        for column_group_index in range(len(options['column_groups'])):
+            for key in total[column_group_index]:
+                total[column_group_index][key] += values.get(column_group_index, {}).get(key) or 0.0
 
     def _get_total_line(self, report, options, totals):
-        return {
-            'id': report._get_generic_line_id(None, None, markup='total'),
-            'name': _('Total'),
-            'level': 1,
-            'columns': self._get_column_values(options, totals, is_total_line=True),
-        }
+        return AccountReportLineData(
+            id=report._get_generic_line_id(None, None, markup='total'),
+            name=_("Total"),
+            level=1,
+            columns=self._get_column_values(options, totals, is_total_line=True),
+        )
 
     def _get_category_line(self, options, values, current, level):
         base_line_values = next(iter(values.values()))
-        return {
-            **self._get_base_line(options, current, level),
-            'name': '%s %s' % (base_line_values['category_code'][0], base_line_values['category_name'][0]),
-            'columns': self._get_column_values(options, values),
-            'level': level,
-            'unfoldable': True,
-            'expand_function': '_report_expand_unfoldable_line_category_line',
-        }
+        line = self._get_base_line(options, current, level)
+        line.name = '%s %s' % (base_line_values['category_code'][0], base_line_values['category_name'][0])
+        line.columns = self._get_column_values(options, values)
+        line.level = level
+        line.unfoldable = True
+        line.expand_function = '_report_expand_unfoldable_line_category_line'
+        return line
 
     def _get_account_line(self, options, values, current, level):
         base_line_values = next(iter(values.values()))
         unfoldable = options.get('multi_rate_in_period')
-        return {
-            **self._get_base_line(options, current, level),
-            'name': '%s %s' % (base_line_values['account_code'][0], base_line_values['account_name'][0]),
-            'columns': self._get_column_values(options, values),
-            'level': level,
-            'unfoldable': unfoldable,
-            'caret_options': False if unfoldable else 'account.account',
-            'account_id': base_line_values['account_id'][0],
-            'expand_function': unfoldable and '_report_expand_unfoldable_line_account_line',
-        }
+        line = self._get_base_line(options, current, level)
+        line.name = '%s %s' % (base_line_values['account_code'][0], base_line_values['account_name'][0])
+        line.columns = self._get_column_values(options, values)
+        line.level = level
+        line.unfoldable = unfoldable
+        line.caret_options = None if unfoldable else 'account.account'
+        line.expand_function = unfoldable and '_report_expand_unfoldable_line_account_line'
+        return line
 
     def _get_rate_line(self, options, values, current, level, markup=None):
         base_line_values = next(iter(values.values()))
-        return {
-            **self._get_base_line(options, current, level, markup),
-            'name': f"{base_line_values['account_code'][0]} {base_line_values['account_name'][0]}",
-            'columns': self._get_column_values(options, values),
-            'level': level,
-            'unfoldable': False,
-            'caret_options': 'account.account',
-            'account_id': base_line_values['account_id'][0],
-        }
+        line = self._get_base_line(options, current, level, markup)
+        line.name = f"{base_line_values['account_code'][0]} {base_line_values['account_name'][0]}"
+        line.columns = self._get_column_values(options, values)
+        line.level = level
+        line.unfoldable = False
+        line.caret_options = 'account.account'
+        return line
 
     def _get_base_line(self, options, current, level, markup=None):
         current_line_id = self._build_line_id(options, current, level, markup=markup)
-        return {
-            'id': current_line_id,
-            'parent_id': self._build_line_id(options, current, level, parent=True, markup=markup),
-            'unfolded': current_line_id in options.get('unfolded_lines') or options.get('unfold_all'),
-        }
+        return AccountReportLineData(
+            id=current_line_id,
+            parent_id=self._build_line_id(options, current, level, parent=True),
+            unfolded=current_line_id in options.get('unfolded_lines') or options.get('unfold_all'),
+        )
 
     def _get_single_value(self, values, key):
         return all(values[key][0] == x for x in values[key]) and values[key][0]

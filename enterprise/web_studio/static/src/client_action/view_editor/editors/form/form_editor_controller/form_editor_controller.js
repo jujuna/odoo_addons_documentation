@@ -1,5 +1,6 @@
-import { useState, onMounted, onPatched } from "@odoo/owl";
+import { onMounted, onPatched, useProps, proxy, t } from "@odoo/owl";
 import { formView } from "@web/views/form/form_view";
+import { formControllerProps } from "@web/views/form/form_controller";
 import { useModelConfigFetchInvisible } from "@web_studio/client_action/view_editor/editors/utils";
 
 /**
@@ -10,16 +11,15 @@ import { useModelConfigFetchInvisible } from "@web_studio/client_action/view_edi
  * `<field name="..." invisible="not parent.id" />` in the child view to work.
  */
 function useExternalParentInModel(model, parentRecord) {
-    model._createRoot = (config, data) => {
-        return new model.constructor.Record(model, config, data, { parentRecord });
-    };
+    model._createRoot = (config, data) =>
+        new model.constructor.Record(model, config, data, { parentRecord });
 }
 
 export class FormEditorController extends formView.Controller {
-    static props = {
-        ...formView.Controller.props,
-        parentRecord: { type: [Object, { value: null }], optional: true },
-    };
+    props = useProps({
+        ...formControllerProps,
+        parentRecord: t.or([t.object(), t.literal(null)]).optional(),
+    });
 
     setup() {
         super.setup();
@@ -27,17 +27,26 @@ export class FormEditorController extends formView.Controller {
         this.mailTemplate = null;
         this.hasFileViewerInArch = false;
 
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
 
         if (this.props.parentRecord) {
             useExternalParentInModel(this.model, this.props.parentRecord);
         }
 
+        const xpathTargetIsPageRe = /\/notebook(\[\d*?\])?\/page(\[\d*?\])?$/;
         onMounted(() => {
             const xpath = this.viewEditorModel.lastActiveNodeXpath;
-            if (xpath && xpath.includes("notebook")) {
+            const autoClickParams = this.viewEditorModel.autoClickParams();
+            if (
+                xpath &&
+                xpath.includes("notebook") &&
+                !(
+                    (autoClickParams.targetInfo?.xpath || "").match(xpathTargetIsPageRe) &&
+                    autoClickParams.targetInfo?.position !== "inside"
+                )
+            ) {
                 const tabXpath = xpath.match(/.*\/page\[\d+\]/)[0];
-                const tab = document.querySelector(`[data-studio-xpath='${tabXpath}'] a`);
+                const tab = document.querySelector(`[data-studio-xpath='${tabXpath}']`);
                 if (tab) {
                     // store the targetted element to restore it after being patched
                     this.notebookElementData = {
@@ -46,7 +55,14 @@ export class FormEditorController extends formView.Controller {
                         sidebarTab: this.viewEditorModel.sidebarTab,
                         isTab: xpath.length === tabXpath.length,
                     };
-                    tab.click();
+                    tab.dispatchEvent(
+                        new CustomEvent("click", {
+                            bubbles: true,
+                            detail: {
+                                discard_studio_click: true,
+                            },
+                        })
+                    );
                 }
             } else {
                 this.notebookElementData = null;

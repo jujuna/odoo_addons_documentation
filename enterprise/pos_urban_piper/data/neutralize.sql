@@ -1,4 +1,5 @@
 -- disable urbanpiper
-UPDATE res_company
-SET pos_urbanpiper_username = 'demo',
-    pos_urbanpiper_apikey = 'demo';
+UPDATE pos_urbanpiper_store
+SET urbanpiper_username = 'demo',
+    urbanpiper_apikey = 'demo',
+    is_webhook_register = False;

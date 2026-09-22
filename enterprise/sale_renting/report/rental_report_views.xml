@@ -63,7 +63,7 @@
                 <field name="partner_id"/>
                 <field name="user_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
-                <group name="report_group_by">
+                <group>
                     <filter string="Salesperson" name="User" context="{'group_by':'user_id'}"/>
                     <filter string="Customer" name="Customer" context="{'group_by':'partner_id'}"/>
                     <filter string="Product" name="Product" context="{'group_by':'product_id'}"/>
@@ -100,7 +100,6 @@
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">sale_renting.report_rental_order</field>
-        <field name="report_file">sale_renting.report_rental_order</field>
         <field name="print_report_name">(object.rental_status not in ('draft', 'sent') and 'Delivery or Return Receipt - %s' %(object.name)) or 'Order - %s' % (object.name)</field>
         <field name="binding_model_id" ref="model_sale_order"/>
         <field name="binding_type">report</field>

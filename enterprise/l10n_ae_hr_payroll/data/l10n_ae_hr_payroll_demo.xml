@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <odoo>
     <record id="base.partner_demo_company_ae" model="res.partner" forcecreate="1">
-        <field name="name">AE Company</field>
+        <field name="name">My Emirati Company</field>
         <field name="vat"/>
         <field name="street">A شارع ملقا</field>
         <field name="city">الشارقة</field>
@@ -14,13 +14,15 @@
     </record>
 
     <record id="base.demo_company_ae" model="res.company" forcecreate="1">
-        <field name="name">AE Company</field>
+        <field name="name">My Emirati Company</field>
         <field name="partner_id" ref="base.partner_demo_company_ae"/>
         <field name="currency_id" ref="base.AED"/>
         <field name="street">A شارع ملقا</field>
         <field name="city">الشارقة</field>
         <field name="state_id" ref="base.state_ae_uq"/>
         <field name="country_id" ref="base.ae"/>
+        <field name="tz">Asia/Dubai</field>
+        <field name="resource_calendar_id" ref="l10n_ae_hr_payroll.resource_calendar_def_40h"/>
     </record>
 
     <record id="base.user_admin" model="res.users">
@@ -34,6 +36,26 @@
     <record id="ae_hr_department_rd" model="hr.department">
         <field name="name">R&amp;D AE</field>
         <field name="company_id" ref="base.demo_company_ae"/>
+    </record>
+
+    <record id="l10n_ae_hr_payroll.resource_calendar_def_40h" model="resource.calendar">
+        <field name="company_id" ref="base.demo_company_ae"/>
+    </record>
+
+    <record id="l10n_ae_full_week_40h_resource_calendar" model="resource.calendar">
+        <field name="name">Calender Days 40h/week</field>
+        <field name="company_id" ref="base.demo_company_ae"/>
+        <field name="attendance_ids"
+            eval="[(5, 0, 0),
+                (0, 0, {'dayofweek': '0', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '1', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '2', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '3', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '4', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                (0, 0, {'dayofweek': '5', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0, 'work_entry_type_id': ref('hr_work_entry.l10n_ae_work_entry_type_weekend')}),
+                (0, 0, {'dayofweek': '6', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0, 'work_entry_type_id': ref('hr_work_entry.l10n_ae_work_entry_type_weekend')}),
+            ]"
+        />
     </record>
 
 
@@ -73,64 +95,46 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_ae'))]"/>
         <field name="company_id" ref="base.demo_company_ae"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_ngh-image.jpg"/>
-    </record>
-
-    <record id="ae_res_bank_emirates_nbd" model="res.bank">
-        <field name="name">Emirates NBD</field>
-        <field name="bic">EBILAEADXXX</field>
-        <field name="street">Emirates NBD Street</field>
-        <field name="city">Abu Dhabi</field>
-        <field name="zip">00000</field>
-        <field name="state" ref="base.state_ae_az"/>
-        <field name="country" ref="base.ae"/>
-        <field name="phone">099-847 2841</field>
-    </record>
-    <record id="ae_res_bank_emirates_nbd" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_ae_hr_payroll.ae_res_bank_emirates_nbd')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="ae_res_abu_dhabi_commercial" model="res.bank">
-        <field name="name">Abu Dhabi Commercial Bank</field>
-        <field name="bic">ADCBAEAAXXX</field>
-        <field name="street">Abu Dhabi Commercial Bank Avenue</field>
-        <field name="city">Abu Dhabi</field>
-        <field name="zip">00000</field>
-        <field name="state" ref="base.state_ae_sh"/>
-        <field name="country" ref="base.ae"/>
-        <field name="phone">099-763 9240</field>
-    </record>
-    <record id="ae_res_abu_dhabi_commercial" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_ae_hr_payroll.ae_res_abu_dhabi_commercial')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_ngh-image.jpg"/>
     </record>
 
     <record id="res_partner_bank_account_aisha" model="res.partner.bank">
-        <field name="acc_number">AE07 0999 2345 6789 0123 456</field>
+        <field name="account_number">AE07 0999 2345 6789 0123 456</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_ae_hr_payroll.ae_res_bank_emirates_nbd"/>
+        <field name="bank_name">Emirates NBD</field>
+        <field name="bank_bic">EBILAEADXXX</field>
+        <field name="street">Emirates NBD Street</field>
+        <field name="city">Abu Dhabi</field>
+        <field name="zip">00000</field>
+        <field name="state_id" ref="base.state_ae_az"/>
+        <field name="country_id" ref="base.ae"/>
         <field name="partner_id" ref="l10n_ae_hr_payroll.res_partner_aisha"/>
         <field name="company_id" ref="base.demo_company_ae"/>
-        <field name="currency_id" ref="base.AED"/>
     </record>
 
     <record id="res_partner_bank_account_saeed" model="res.partner.bank">
-        <field name="acc_number">AE07 0999 7890 3456 8901 890</field>
+        <field name="account_number">AE07 0999 7890 3456 8901 890</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_ae_hr_payroll.ae_res_abu_dhabi_commercial"/>
+        <field name="bank_name">Abu Dhabi Commercial Bank</field>
+        <field name="bank_bic">ADCBAEAAXXX</field>
+        <field name="street">Abu Dhabi Commercial Bank Avenue</field>
+        <field name="city">Abu Dhabi</field>
+        <field name="zip">00000</field>
+        <field name="state_id" ref="base.state_ae_sh"/>
+        <field name="country_id" ref="base.ae"/>
         <field name="partner_id" ref="l10n_ae_hr_payroll.res_partner_saeed"/>
         <field name="company_id" ref="base.demo_company_ae"/>
-        <field name="currency_id" ref="base.AED"/>
     </record>
 
     <record id="hr_employee_aisha" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_aisha')).name"/>
         <field name="job_title">Technical Lead</field>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_mit-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_mit-image.jpg"/>
         <field name="work_phone">099-456 0001</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_aisha')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_ae_hr_payroll.res_partner_aisha"/>
-        <field name="company_id" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_aisha')).company_id"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="company_id" ref="base.demo_company_ae"/>
+        <field name="resource_calendar_id" ref="l10n_ae_hr_payroll.resource_calendar_def_40h"/>
         <field name="tz">Asia/Dubai</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_aisha')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_aisha')).city"/>
@@ -150,7 +154,6 @@
         <field name="emergency_phone">099-849 2417</field>
         <field name="certificate">master</field>
         <field name="study_field">Engineering</field>
-        <field name="study_school">Abu Dhabi University</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_ae_hr_payroll.res_partner_bank_account_aisha'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -161,17 +164,18 @@
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="contract_date_start" eval="datetime(2020, 3, 16).date()"/>
         <field name="date_version" eval="datetime(2020, 3, 16).date()"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <record id="hr_employee_saeed" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_saeed')).name"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_al-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_al-image.jpg"/>
         <field name="work_phone">099-456 0002</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_saeed')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_ae_hr_payroll.hr_employee_aisha"/>
         <field name="user_id" ref="l10n_ae_hr_payroll.user_saeed"/>
         <field name="company_id" ref="base.demo_company_ae"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="l10n_ae_hr_payroll.resource_calendar_def_40h"/>
         <field name="tz">Asia/Dubai</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_saeed')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_ae_hr_payroll.res_partner_saeed')).city"/>
@@ -191,32 +195,20 @@
         <field name="emergency_phone">099-474 8235</field>
         <field name="certificate">master</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">American University of Sharjah</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_ae_hr_payroll.res_partner_bank_account_saeed'))]"/>
         <field name="job_id" ref="hr.job_consultant"/>
         <field name="department_id" ref="l10n_ae_hr_payroll.ae_hr_department_rd"/>
-        <field name="company_id" ref="base.demo_company_ae"/>
         <field name="structure_type_id" ref="l10n_ae_hr_payroll.uae_employee_payroll_structure_type"/>
         <field name="wage_type">monthly</field>
         <field name="wage">16500</field>
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="contract_date_start" eval="datetime(2022, 6, 1).date()"/>
         <field name="date_version" eval="datetime(2022, 6, 1).date()"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
-    <function model="hr.version" name="generate_work_entries">
-        <value model="hr.employee" eval="[obj(ref('l10n_ae_hr_payroll.hr_employee_saeed')).version_id.id]"/>
-        <value eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-1)).date()"/>
-        <value eval="DateTime.today().date()"/>
-    </function>
-
-    <function model="hr.work.entry" name="action_validate">
-        <value model="hr.work.entry" eval="obj().search([('employee_id', '=', ref('l10n_ae_hr_payroll.hr_employee_saeed'))]).ids"/>
-    </function>
-
     <record id="hr_payslip_saeed_june" model="hr.payslip">
-        <field name="name" eval="'Mitchell Admin ' + time.strftime('June %Y')"/>
         <field name="version_id" model="hr.employee" eval="obj(ref('l10n_ae_hr_payroll.hr_employee_saeed')).version_id.id"/>
         <field name="date_from" eval="time.strftime('%Y-06-01')"/>
         <field name="date_to" eval="time.strftime('%Y-06-30')"/>
@@ -224,26 +216,22 @@
         <field name="struct_id" ref="l10n_ae_hr_payroll.uae_employee_payroll_structure"/>
         <field name="company_id" ref="base.demo_company_ae"/>
     </record>
-    <record id="l10n_ae_input_salary_arrears" model="hr.payslip.input">
-        <field name="payslip_id" ref="l10n_ae_hr_payroll.hr_payslip_saeed_june"/>
-        <field name="input_type_id" ref="l10n_ae_hr_payroll.input_salary_arrears"/>
-        <field name="amount">1500</field>
+
+    <record id="hr_payslip_saeed_june" model="hr.payslip">
+        <field name="input_line_ids" eval="[
+            (0, 0, {'salary_rule_id': ref('l10n_ae_hr_payroll.uae_salary_arrears_salary_rule'), 'amount': 1500}),
+            (0, 0, {'salary_rule_id': ref('l10n_ae_hr_payroll.uae_other_earnings_salary_rule'), 'amount': 250}),
+            (0, 0, {'salary_rule_id': ref('l10n_ae_hr_payroll.uae_salary_deduction_salary_rule'), 'amount': 500}),
+            (0, 0, {'salary_rule_id': ref('l10n_ae_hr_payroll.uae_other_deduction_salary_rule'), 'amount': 100}),
+        ]"/>
     </record>
-    <record id="l10n_ae_input_other_earnings" model="hr.payslip.input">
-        <field name="payslip_id" ref="l10n_ae_hr_payroll.hr_payslip_saeed_june"/>
-        <field name="input_type_id" ref="l10n_ae_hr_payroll.input_other_earnings"/>
-        <field name="amount">250</field>
-    </record>
-    <record id="l10n_ae_input_salary_deduction" model="hr.payslip.input">
-        <field name="payslip_id" ref="l10n_ae_hr_payroll.hr_payslip_saeed_june"/>
-        <field name="input_type_id" ref="l10n_ae_hr_payroll.input_salary_deduction"/>
-        <field name="amount">500</field>
-    </record>
-    <record id="l10n_ae_input_other_deduction" model="hr.payslip.input">
-        <field name="payslip_id" ref="l10n_ae_hr_payroll.hr_payslip_saeed_june"/>
-        <field name="input_type_id" ref="l10n_ae_hr_payroll.input_other_deduction"/>
-        <field name="amount">100</field>
-    </record>
+
+    <data noupdate="1">
+        <record id="l10n_ae_hr_accrual_plan_paid_time_off" model="hr.leave.accrual.plan">
+            <field name="company_id" ref="base.demo_company_ae"/>
+            <field name="work_entry_type_id" ref="hr_work_entry.uae_work_entry_type_legal_leave"/>
+        </record>
+    </data>
 
     <function model="hr.payslip" name="action_refresh_from_work_entries" eval="[[p.id for p in [
         obj().env.ref('l10n_ae_hr_payroll.hr_payslip_saeed_june'),

@@ -1,22 +1,15 @@
 .o_knowledge_form_view {
-    background-color: var(--knowledge-view-bg, $o-white);
+    --knowledge-gutter: #{map-get($spacers, 3)};
+
     .o_knowledge_sidebar {
-        .o_knowledge_create_article,
-        .o_knowledge_search,
-        .o_knowledge_toggle_sidebar,
-        .o_knowledge_join_article_members,
-        .o_section_create {
-            &:hover {
-                background-color: rgba($knowledge-bg--hover, 0.3);
-            }
-        }
+        $o-sidebar-indent: .75rem;
         ul {
             list-style: none;
             padding: 0;
         }
         li > ul > li {
             &:not(.o_dragged) {
-                padding-left: 12px; // nested list tab size
+                padding-left: $o-sidebar-indent;
             }
             &:last-child {
                 padding-bottom: 0;
@@ -25,14 +18,39 @@
                 }
             }
         }
+        .o_knowledge_tree_scroller {
+            scrollbar-width: thin;
+        }
+    }
+    .o_knowledge_sidebar_content > * {
+        padding-left: map-get($spacers, 3);
+        padding-right: map-get($spacers, 3);
+
+        @include media-breakpoint-up(md) {
+            padding-left: var(--knowledge-gutter);
+            padding-right: 0;
+        }
     }
     // = Resizer
     // --------------------------------------------------------------------------
     .o_knowledge_article_form_resizer {
+        @include o-position-absolute($top: 0, $right: calc(-1 * var(--knowledge-gutter)), $bottom: 0);
         cursor: col-resize;
         touch-action: none;
-        span:hover, span.o_resizer_bg {
-            background-color: rgb(169, 169, 169);
+        transform: translateX(50%);
+        width: $border-width * 2;
+        z-index: 1;
+
+        &:hover > span,
+        > span.o_resizer_bg {
+            @include o-position-absolute($top: 0, $bottom: var(--knowledge-gutter), $right: 0);
+            background-color: $gray-400;
+            width: 100%;
+            flex-grow: 0;
+        }
+
+        > span.o_resizer_bg {
+            background-color: $primary;
         }
     }
     // = Cover

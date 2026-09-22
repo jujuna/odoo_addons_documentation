@@ -22,7 +22,9 @@ class ChatbotScriptStep(models.Model):
             # sudo - discuss.channel: can access messages to build the description
             "description": description + discuss_channel.sudo()._get_channel_history(),
             "name": name,
-            "source_id": self.chatbot_script_id.source_id.id,
+            'medium_id': self.env['utm.mixin']._utm_ref("utm.utm_medium_website").id,
+            'source_id': self.env.ref("im_livechat.utm_source_chatbot").id,
+            'utm_reference': f'{self.chatbot_script_id._name},{self.chatbot_script_id.id}',
             "team_id": self.helpdesk_team_id.id,
         }
 

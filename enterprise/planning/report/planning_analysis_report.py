@@ -14,37 +14,32 @@ class PlanningAnalysisReport(models.Model):
     allocated_percentage = fields.Float("Allocated Time (%)", readonly=True, aggregator="avg")
     company_id = fields.Many2one("res.company", string="Company", readonly=True)
     department_id = fields.Many2one("hr.department", readonly=True)
-    employee_id = fields.Many2one("hr.employee", string="Employee", readonly=True)
+    employee_ids = fields.Many2many("hr.employee", string="Employees", related='slot_id.employee_ids', readonly=True)
     end_datetime = fields.Datetime("End Date", readonly=True)
-    job_title = fields.Char("Job Title", readonly=True)
     manager_id = fields.Many2one("hr.employee", string="Manager", readonly=True)
     name = fields.Text("Note", readonly=True)
     publication_warning = fields.Boolean(
         "Modified Since Last Publication", readonly=True,
         help="If checked, it means that the shift contains has changed since its last publish.")
     recurrency_id = fields.Many2one("planning.recurrency", readonly=True)
-    resource_id = fields.Many2one("resource.resource", string="Resource", readonly=True)
-    resource_type = fields.Selection([
-        ("user", "Human"),
-        ("material", "Material")], string="Type",
-        default="user", readonly=True)
+    resource_ids = fields.Many2many("resource.resource", string="Resources", relation="planning_slot_resource_resource_rel", column1="planning_slot_id", column2="resource_resource_id", readonly=True)
     role_id = fields.Many2one("planning.role", string="Role", readonly=True)
     start_datetime = fields.Datetime("Start Date", readonly=True)
     state = fields.Selection([
-        ("draft", "Draft"),
-        ("published", "Published"),
+        ("1_draft", "Draft"),
+        ("2_published", "Scheduled"),
     ], string="Status", readonly=True)
-    user_id = fields.Many2one("res.users", string="User", readonly=True)
+    user_ids = fields.Many2many("res.users", related="slot_id.user_ids", string="User", readonly=True)
     slot_id = fields.Many2one("planning.slot", string="Planning Slot", readonly=True)
-    request_to_switch = fields.Boolean('Has there been a request to switch on this shift slot?', readonly=True)
+    switch_employee_ids = fields.Many2many('hr.employee', 'planning_slot_switch_hr_employee_rel', column1='planning_slot_id', column2='hr_employee_id', readonly=True)
 
     @property
-    def _table_query(self):
-        return "%s %s %s %s" % (self._select(), self._from(), self._join(), self._group_by())
+    def _table_sql(self):
+        return SQL("(%s %s %s %s)", self._select(), self._from(), self._join(), self._group_by())
 
     @api.model
     def _select(self):
-        return """
+        return SQL("""
             SELECT
                 S.id AS id,
                 S.id AS slot_id,
@@ -52,64 +47,42 @@ class PlanningAnalysisReport(models.Model):
                 S.allocated_percentage AS allocated_percentage,
                 S.company_id AS company_id,
                 S.department_id AS department_id,
-                S.employee_id AS employee_id,
                 S.end_datetime AS end_datetime,
-                J.name AS job_title,
                 S.manager_id AS manager_id,
                 S.name AS name,
                 S.publication_warning AS publication_warning,
-                S.request_to_switch AS request_to_switch,
-                S.resource_id AS resource_id,
-                R.resource_type AS resource_type,
                 S.role_id AS role_id,
                 S.recurrency_id AS recurrency_id,
                 S.start_datetime AS start_datetime,
-                S.state AS state,
-                S.user_id AS user_id
-        """
+                S.state AS state
+        """)
 
     @api.model
     def _from(self):
-        return """
+        return SQL("""
             FROM planning_slot S
-        """
+        """)
 
     @api.model
     def _join(self):
-        return """
-            LEFT JOIN hr_employee E ON E.id = S.employee_id
-            LEFT JOIN (
-                SELECT DISTINCT ON (employee_id) *
-                FROM hr_version
-                ORDER BY employee_id, date_version DESC
-            ) V ON V.employee_id = E.id
-            LEFT JOIN hr_job J ON J.id = V.job_id
-            LEFT JOIN resource_resource R ON R.id = S.resource_id
-        """
+        return SQL()
 
     @api.model
     def _group_by(self):
-        return """
+        return SQL("""
             GROUP BY S.id,
                      S.allocated_hours,
                      S.allocated_percentage,
                      S.company_id,
-                     S.department_id,
-                     S.employee_id,
                      S.end_datetime,
-                     J.name,
-                     S.manager_id,
                      S.name,
                      S.publication_warning,
-                     S.resource_id,
-                     R.resource_type,
                      S.role_id,
                      S.recurrency_id,
                      S.start_datetime,
-                     S.state,
-                     S.user_id
-        """
+                     S.state
+        """)
 
     def init(self):
         drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute(SQL("""CREATE or REPLACE VIEW %s as (%s)""", SQL.identifier(self._table), SQL(self._table_query)))
+        self.env.cr.execute(SQL("""CREATE or REPLACE VIEW %s as (%s)""", SQL.identifier(self._table), self._table_sql))

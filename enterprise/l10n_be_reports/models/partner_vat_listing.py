@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, _
-from odoo.tools import groupby, SQL
+from datetime import date
+
+from odoo import fields, models, _
+from odoo.tools import SQL
+from odoo.fields import Domain
 from odoo.exceptions import UserError
 from markupsafe import Markup
 from .account_report import _raw_phonenumber, _get_xml_export_representative_node
 
-from stdnum.eu.vat import compact
 from stdnum.be.vat import compact as vat_be_compact
-from stdnum.exceptions import ValidationError
 
 
 class L10n_BePartnerVatHandler(models.AbstractModel):
@@ -28,8 +29,46 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
             ],
         }
 
+    def _get_custom_groupby_map(self):
+        def vat_number_domain_builder(vat_number):
+            return list(
+                Domain('partner_id.vat', '=', vat_number)
+                | Domain('move_id.partner_id.vat', '=', vat_number)
+            )
+
+        def vat_number_label_builder(vat_numbers):
+            return {
+                vat_number: vat_number
+                for vat_number in vat_numbers
+            }
+
+        return {
+            'vat_number': {
+                'model': None,
+                'domain_builder': vat_number_domain_builder,
+                'label_builder': vat_number_label_builder,
+            },
+        }
+
     def _custom_options_initializer(self, report, options, previous_options):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
+
+        period_type = options.get('date', {}).get('period_type')
+        if period_type in ('year', 'fiscalyear'):
+            # The Belgian Partner VAT Listing always covers a civil year (01/01 - 12/31),
+            civil_year = fields.Date.from_string(options['date']['date_from']).year
+            options['date'].update(report._build_date_dict(
+                options,
+                date(civil_year, 1, 1),
+                date(civil_year, 12, 31),
+                period_type='year',
+            ))
+
+            for header_row in options.get('column_headers', []):
+                for header in header_row:
+                    if header.get('name'):
+                        header['name'] = str(civil_year)
+
         operations_tags_expr = [
             'l10n_be.tax_report_line_00_tag', 'l10n_be.tax_report_line_01_tag', 'l10n_be.tax_report_line_02_tag',
             'l10n_be.tax_report_line_03_tag', 'l10n_be.tax_report_line_45_tag', 'l10n_be.tax_report_line_49_tag',
@@ -116,18 +155,9 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
             'query': report._get_report_query(new_options, 'strict_range'),
         }
 
-    def _report_custom_engine_partner_vat_listing(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_partner_vat_listing(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         def build_result_dict(query_res_lines, partners_vat_map):
-            vat_number = None
-            if current_groupby == 'partner_id':
-                partner_vat = partners_vat_map[query_res_lines[0]['grouping_key']]
-                try:
-                    vat_number = compact(partner_vat)
-                except ValidationError:
-                    vat_number = partner_vat
-
             rslt = {
-                'vat_number': vat_number,
                 'turnover': 0,
                 'vat_amount': 0,
                 'has_sublines': True,
@@ -140,20 +170,21 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
             return rslt
 
         report = self.env['account.report'].browse(options['report_id'])
-        report._check_groupby_fields((next_groupby.split(',') if next_groupby else []) + ([current_groupby] if current_groupby else []))
+        if current_groupby:
+            report._check_groupby_fields([current_groupby])
 
         partners_vat_map = self._get_accepted_partners_vat_map(report, options)
 
         partner_ids = [partner_id for partner_id in partners_vat_map]
 
         if not partner_ids:
-            return [] if current_groupby else {'vat_number': None, 'turnover': 0, 'vat_amount': 0, 'has_sublines': False}
-
-        tail_query = report._get_engine_query_tail(offset, limit)
+            return {next(iter(formulas_dict.values())): [] if current_groupby else {'turnover': 0, 'vat_amount': 0, 'has_sublines': False}}
 
         query_fun_params = self._get_query_fun_params(report, options) | {'partner_ids': partner_ids}
 
-        if current_groupby == 'partner_id':
+        if current_groupby == 'vat_number':
+            grouping_key_param = SQL.identifier('res_partner', 'vat')
+        elif current_groupby == 'partner_id':
             grouping_key_param = SQL.identifier('res_partner', 'id')
         elif current_groupby:
             grouping_key_param = self.env['account.move.line']._field_to_sql('account_move_line', current_groupby, query_fun_params['query'])
@@ -208,7 +239,6 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
           ) AS subquery
           GROUP BY subquery.grouping_key
           ORDER BY subquery.grouping_key
-          %(tail_query)s
             """,
             grouping_key_param=grouping_key_param,
             turnover_from=turnover_from,
@@ -218,14 +248,13 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
             vat_amounts_from=vat_amounts_from,
             vat_amounts_where=vat_amounts_where,
             groupby_clause=SQL('GROUP BY %s', grouping_key_param) if grouping_key_param else SQL(),
-            tail_query=tail_query,
         )
 
         self.env.cr.execute(query)
         all_query_res = self.env.cr.dictfetchall()
 
         if not current_groupby:
-            return build_result_dict(all_query_res, partners_vat_map)
+            return {next(iter(formulas_dict.values())): build_result_dict(all_query_res, partners_vat_map)}
         else:
             rslt = []
             all_res_per_grouping_key = {}
@@ -237,7 +266,7 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
             for grouping_key, query_res_lines in all_res_per_grouping_key.items():
                 rslt.append((grouping_key, build_result_dict(query_res_lines, partners_vat_map)))
 
-            return rslt
+            return {next(iter(formulas_dict.values())): rslt}
 
     def _get_accepted_partners_vat_map(self, report, options):
         query_fun_params = self._get_query_fun_params(report, options, remove_forced_domain=True)
@@ -249,12 +278,20 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
         be_format = r'BE%'
         query = SQL(
             """
-            SELECT res_partner.id, res_partner.vat
-            FROM %(turnover_from)s
-            WHERE %(turnover_where)s
-            AND res_partner.vat ILIKE %(be_format)s
-            GROUP BY res_partner.id, res_partner.vat
-            HAVING SUM(account_move_line.credit - account_move_line.debit) > 250
+            WITH partner_turnover AS (
+                SELECT
+                    res_partner.id,
+                    res_partner.vat,
+                    -- Include different partners with the same vat number with a turnover of more than 250.
+                    SUM(account_move_line.credit - account_move_line.debit) OVER (PARTITION BY res_partner.vat) AS vat_total_turnover
+               FROM %(turnover_from)s
+              WHERE %(turnover_where)s
+                AND res_partner.vat ILIKE %(be_format)s
+            )
+            SELECT id, vat
+              FROM partner_turnover
+             WHERE vat_total_turnover > 250
+          GROUP BY id, vat
 
             UNION
 
@@ -310,6 +347,7 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
                 SELECT res_partner.id as id, res_partner.country_id as country_id, res_partner.vat as vat
                 FROM %(turnover_from)s
                 WHERE %(turnover_where)s
+                AND COALESCE(res_partner.vat, '') != '/'
                 GROUP BY res_partner.id
                 HAVING SUM(account_move_line.credit - account_move_line.debit) > 250
 
@@ -318,6 +356,7 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
                 SELECT res_partner.id as id, res_partner.country_id as country_id, res_partner.vat as vat
                 FROM %(refund_base_from)s
                 WHERE %(refund_base_where)s
+                AND COALESCE(res_partner.vat, '') != '/'
                 GROUP BY res_partner.id
                 HAVING SUM(account_move_line.balance) > 0
 
@@ -326,6 +365,7 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
                 SELECT res_partner.id as id, res_partner.country_id as country_id, res_partner.vat as vat
                 FROM %(vat_amounts_from)s
                 WHERE %(vat_amounts_where)s
+                AND COALESCE(res_partner.vat, '') != '/'
                 GROUP BY res_partner.id
                 HAVING SUM(account_move_line.debit) > 0
             ) as partner_ids
@@ -531,7 +571,7 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
         if addr.get('invoice', False):
             addr_partner = self.env['res.partner'].browse([addr['invoice']])
             phone = addr_partner.phone and _raw_phonenumber(addr_partner.phone) or address.phone and _raw_phonenumber(address.phone)
-            email = addr_partner.email or ''
+            email = addr_partner.email or address.email
             city = addr_partner.city or ''
             zip_code = addr_partner.zip or ''
 
@@ -544,30 +584,33 @@ class L10n_BePartnerVatHandler(models.AbstractModel):
             if addr_partner.country_id:
                 country = addr_partner.country_id.code
 
-        # Turnover and Farmer tags are not included
-        options['date']['date_from'] = options['date']['date_from'][0:4] + '-01-01'
-        options['date']['date_to'] = options['date']['date_to'][0:4] + '-12-31'
+        # Set export_mode to 'file' to bypass load_more_limit and get all partners
+        options['export_mode'] = 'file'
         lines = report._get_lines(options)
-        partner_lines = filter(lambda line: report._get_model_info_from_id(line['id'])[0] == 'res.partner', lines)
+        vat_lines = [
+            line for line in lines
+            if line.level == 2
+            and report._get_model_info_from_id(line.id)[0] is None
+            and line.groupby == 'partner_id'
+        ]
 
         data_client_info = ''
         seq = 0
         sum_turnover = 0.00
         sum_tax = 0.00
 
-        for vat_number, values in groupby(partner_lines, key=lambda line: line['columns'][0]['name']):
+        for line in vat_lines:
+            vat_number = line.name
             turnover = 0.0
             vat_amount = 0.0
 
-            for value in list(values):
+            for column in line.columns:
+                col_expr_label = column.expression_label
 
-                for column in value['columns']:
-                    col_expr_label = column['expression_label']
-
-                    if col_expr_label == 'turnover':
-                        turnover += column['no_format'] or 0.0
-                    elif col_expr_label == 'vat_amount':
-                        vat_amount += column['no_format'] or 0.0
+                if col_expr_label == 'turnover':
+                    turnover = column.no_format or 0.0
+                elif col_expr_label == 'vat_amount':
+                    vat_amount = column.no_format or 0.0
 
             seq += 1
             sum_turnover += turnover

@@ -4,97 +4,100 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-22 18:42+0000\n"
-"PO-Revision-Date: 2025-11-10 14:28+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 01:52+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
 "appointment_account_payment/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: appointment_account_payment
 #. odoo-python
-#: code:addons/appointment_account_payment/models/calendar_booking.py:0
+#: code:addons/appointment_account_payment/models/appointment_type.py:0
 msgid ""
 "%(name)s\n"
 "%(date_start)s at %(time_start)s to %(date_end)s at %(time_end)s (%"
 "(timezone)s)"
 msgstr ""
+"%(name)s\n"
+"%(date_start)s ตอนเวลา %(time_start)s ถึง %(date_end)s ตอนเวลา %(time_end)s (%"
+"(timezone)s)"
 
 #. module: appointment_account_payment
 #. odoo-python
-#: code:addons/appointment_account_payment/models/calendar_booking.py:0
+#: code:addons/appointment_account_payment/models/appointment_type.py:0
 msgid ""
-"%(name)s with %(staff_user)s\n"
+"%(name)s with %(user_name)s\n"
 "%(date_start)s at %(time_start)s to %(date_end)s at %(time_end)s (%"
 "(timezone)s)"
 msgstr ""
+"%(name)s กับ %(user_name)s\n"
+"%(date_start)s ตั้งแต่ %(time_start)s ถึง %(date_end)s ตอน %(time_end)s (%"
+"(timezone)s)"
+
+#. module: appointment_account_payment
+#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
+msgid "(<i class=\"oi oi-fw\" data-icon=\"schedule\"/>"
+msgstr ""
+
+#. module: appointment_account_payment
+#: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
+msgid ""
+"<i class=\"oi oi-filled oi-fw me-1\" data-icon=\"edit\"/>Edit my appointment"
+msgstr ""
+"<i class=\"oi oi-filled oi-fw me-1\" data-icon=\"edit\"/>แก้ไขการนัดหมายของฉัน"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_validated
 msgid ""
-"<i class=\"fa fa-check-circle text-success me-3\"/>Appointment Scheduled!"
+"<i class=\"oi oi-filled text-success me-3\" data-icon=\"check_circle\"/"
+">Appointment Scheduled!"
 msgstr ""
-"<i class=\"fa fa-check-circle text-success me-3\"/>กำหนดการนัดหมายเรียบร้อยแล้ว!"
-
-#. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
-msgid "<i class=\"fa fa-pencil fa-fw me-1\"/>Edit my appointment"
-msgstr "<i class=\"fa fa-pencil fa-fw me-1\"/>แก้ไขการนัดหมายของฉัน"
-
-#. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
-msgid ""
-"<i class=\"fa fa-pencil-square-o text-warning me-3\"/>Appointment waiting "
-"for payment"
-msgstr "<i class=\"fa fa-pencil-square-o text-warning me-3\"/> นัดหมายรอชำระเงิน"
-
-#. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
-msgid ""
-"<i class=\"fa fa-times-circle text-danger me-3\"/>Appointment Unavailable!"
-msgstr ""
-"<i class=\"fa fa-times-circle text-danger me-3\"/>ไม่สามารถทำการนัดหมายได้!"
+"<i class=\"oi oi-filled text-success me-3\" data-icon=\"check_circle\"/>กำหนด"
+"การนัดหมายเรียบร้อยแล้ว!"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_type_view_form
 msgid ""
-"<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/> Configure Payment "
+"<i class=\"oi oi-fw o_button_icon\" data-icon=\"east\"/> Configure Payment "
 "Providers"
 msgstr ""
-"<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/> กำหนดค่าผู้ให้บริการชำระเงิน"
+"<i class=\"oi oi-fw o_button_icon\" data-icon=\"east\"/> กำหนดค่าผู้ให้บริการชำระเ"
+"งิน"
 
 #. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_type_view_form
-msgid ""
-"<span invisible=\"manage_capacity\" class=\"ms-1\">per booking</span>\n"
-"                            <span invisible=\"not manage_capacity\" "
-"class=\"ms-1\">per seat</span>"
+#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
+msgid "<span class=\"fw-bold\">Attendees</span>"
 msgstr ""
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
-msgid "<span>Online</span>"
-msgstr "<span>ออนไลน์</span>"
+msgid "<span class=\"fw-bold\">Online</span>"
+msgstr ""
 
 #. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_progress_bar
+#: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_type_view_form
 msgid ""
-"<span>Payment</span>\n"
-"            <span class=\"d-inline-block mx-sm-3 fa fa-angle-right text-"
-"muted fs-5\"/>"
+"<span invisible=\"manage_capacity\">per booking</span>\n"
+"                        <span invisible=\"not manage_capacity\">per seat</"
+"span>"
 msgstr ""
-"<span>การชำระเงิน</span>\n"
-"            <span class=\"d-inline-block mx-sm-3 fa fa-angle-right text-"
-"muted fs-5\"/>"
+
+#. module: appointment_account_payment
+#: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_form
+msgid "<span>Proceed to Payment</span>"
+msgstr ""
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -102,8 +105,8 @@ msgid ""
 "<strong>Warning</strong> Make sure you are logged in as the right partner "
 "before making this payment."
 msgstr ""
-"<strong>คำเตือน</strong> "
-"ตรวจสอบให้แน่ใจว่าคุณได้เข้าสู่ระบบในฐานะพาร์ทเนอร์ที่ถูกต้องก่อนที่จะชำระเงินนี้"
+"<strong>คำเตือน</strong> ตรวจสอบให้แน่ใจว่าคุณได้เข้าสู่ระบบในฐานะพาร์ทเนอร์ที่ถูกต้องก่อนที่จะ"
+"ชำระเงินนี้"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -124,6 +127,11 @@ msgstr "โทเค็นการเข้าถึง"
 #: model:ir.model.constraint,message:appointment_account_payment.constraint_appointment_type_check_product_and_payment_step
 msgid "Activating the payment step requires a product"
 msgstr "การเปิดใช้งานขั้นตอนการชำระเงินจำเป็นต้องมีสินค้า"
+
+#. module: appointment_account_payment
+#: model:ir.module.module,description:base.module_appointment_account_payment
+msgid "Add a payment step at the end of appointment and resource bookings"
+msgstr ""
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__allday
@@ -167,24 +175,28 @@ msgid "Appointment Type"
 msgstr "ประเภทการนัดหมาย"
 
 #. module: appointment_account_payment
+#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
+msgid ""
+"Appointment Unavailable! <i class=\"oi oi-filled text-danger me-3\" data-"
+"icon=\"cancel\"/>"
+msgstr ""
+
+#. module: appointment_account_payment
+#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
+msgid ""
+"Appointment waiting for payment <i class=\"oi text-warning me-3\" data-"
+"icon=\"hourglass_bottom\"/>"
+msgstr ""
+
+#. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__asked_capacity
 msgid "Asked Capacity"
 msgstr "ความจุที่ขอ"
 
 #. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
-msgid "Attendees"
-msgstr "ผู้เข้าร่วม"
-
-#. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view_form
 msgid "Booking"
 msgstr "การจอง"
-
-#. module: appointment_account_payment
-#: model:product.template,name:appointment_account_payment.default_booking_product_product_template
-msgid "Booking Fees"
-msgstr "ค่าธรรมเนียมการจอง"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__booking_line_ids
@@ -249,16 +261,13 @@ msgid "Description"
 msgstr "คำอธิบาย"
 
 #. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
-msgid "Details"
-msgstr "รายละเอียด"
-
-#. module: appointment_account_payment
 #: model_terms:appointment.type,message_intro:appointment_account_payment.appointment_type_online_cooking_lesson
 msgid ""
 "Discover the secrets kept in high-end kitchens with one of our starred "
 "chefs, from the comfort of your own home."
-msgstr "ค้นพบความลับที่ถูกเก็บไว้ในครัวระดับสูงกับหนึ่งในเชฟติดดาวของเราจากที่บ้านของคุณเองอย่างสะดวกสบาย"
+msgstr ""
+"ค้นพบความลับที่ถูกเก็บไว้ในครัวระดับสูงกับหนึ่งในเชฟติดดาวของเราจากที่บ้านของคุณเองอย่างสะดวกสบา"
+"ย"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_account_move__display_name
@@ -266,14 +275,11 @@ msgstr "ค้นพบความลับที่ถูกเก็บไว
 #: model:ir.model.fields,field_description:appointment_account_payment.field_appointment_type__display_name
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__display_name
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking_line__display_name
-#: model:ir.model.fields,field_description:appointment_account_payment.field_product_product__display_name
-#: model:ir.model.fields,field_description:appointment_account_payment.field_product_template__display_name
 msgid "Display Name"
 msgstr "แสดงชื่อ"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__duration
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 msgid "Duration"
 msgstr "ระยะเวลา"
 
@@ -293,8 +299,6 @@ msgstr "ลูกค้า"
 #: model:ir.model.fields,field_description:appointment_account_payment.field_appointment_type__id
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__id
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking_line__id
-#: model:ir.model.fields,field_description:appointment_account_payment.field_product_product__id
-#: model:ir.model.fields,field_description:appointment_account_payment.field_product_template__id
 msgid "ID"
 msgstr "ไอดี"
 
@@ -360,8 +364,10 @@ msgstr "ชั้นเรียนทำอาหารออนไลน์"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_validated
-msgid "Oops! Paid appointment cannot be cancelled via our website.<br/>"
-msgstr "ขออภัย! ไม่สามารถยกเลิกการนัดหมายที่ชำระเงินแล้วผ่านทางเว็บไซต์ของเราได้<br/>"
+msgid ""
+"Oops! Paid appointment cannot be rescheduled or cancelled via our website."
+"<br/>"
+msgstr ""
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__staff_user_id
@@ -377,7 +383,24 @@ msgstr ""
 #. module: appointment_account_payment
 #. odoo-python
 #: code:addons/appointment_account_payment/models/templates/appointment_type.py:0
+msgid "Paid Consultation Booking Fees"
+msgstr ""
+
+#. module: appointment_account_payment
+#. odoo-python
+#: code:addons/appointment_account_payment/models/templates/appointment_type.py:0
 msgid "Paid Seats"
+msgstr ""
+
+#. module: appointment_account_payment
+#. odoo-python
+#: code:addons/appointment_account_payment/models/templates/appointment_type.py:0
+msgid "Paid Seats Booking Fees"
+msgstr ""
+
+#. module: appointment_account_payment
+#: model:ir.module.module,shortdesc:base.module_appointment_account_payment
+msgid "Pay to Book"
 msgstr ""
 
 #. module: appointment_account_payment
@@ -391,20 +414,9 @@ msgid "Pick a Product"
 msgstr "เลือกสินค้า"
 
 #. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_form
-msgid "Proceed to Payment"
-msgstr "ดำเนินการชำระเงิน"
-
-#. module: appointment_account_payment
-#: model:ir.model,name:appointment_account_payment.model_product_template
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking__product_id
 msgid "Product"
 msgstr "สินค้า"
-
-#. module: appointment_account_payment
-#: model:ir.model,name:appointment_account_payment.model_product_product
-msgid "Product Variant"
-msgstr "ตัวแปรสินค้า"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,help:appointment_account_payment.field_appointment_type__has_payment_step
@@ -417,7 +429,6 @@ msgid "Resource"
 msgstr "แหล่งข้อมูล"
 
 #. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view_form
 msgid "Resources"
 msgstr "แหล่งข้อมูล"
@@ -453,7 +464,8 @@ msgstr "หยุด"
 msgid ""
 "Thank you for your reservation. We will soon contact you to discuss menu "
 "options."
-msgstr "ขอบคุณสำหรับการจองของคุณ เราจะติดต่อคุณโดยเร็ว เพื่อพูดคุยเกี่ยวกับตัวเลือกของเมนู"
+msgstr ""
+"ขอบคุณสำหรับการจองของคุณ เราจะติดต่อคุณโดยเร็ว เพื่อพูดคุยเกี่ยวกับตัวเลือกของเมนู"
 
 #. module: appointment_account_payment
 #: model:ir.model.constraint,message:appointment_account_payment.constraint_appointment_answer_input_check_event_or_booking
@@ -467,17 +479,15 @@ msgid ""
 "The following booking was not confirmed due to insufficient availability or "
 "configuration changes: %s"
 msgstr ""
-"การจองต่อไปนี้ไม่ได้รับการยืนยันเนื่องจากความพร้อมใช้งานไม่เพียงพอหรือมีการเปลี่ยนแปลงการกำหนดค่า: "
-"%s"
+"การจองต่อไปนี้ไม่ได้รับการยืนยันเนื่องจากความพร้อมใช้งานไม่เพียงพอหรือมีการเปลี่ยนแปลงการกำหนดค่"
+"า: %s"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,help:appointment_account_payment.field_appointment_type__product_lst_price
 msgid ""
-"The sale price is managed from the product template. Click on the 'Configure "
-"Variants' button to set the extra attribute prices."
+"The sale price can be set manually or computed from the product template. "
+"Click on the 'Configure Variants' button to set the extra attribute prices."
 msgstr ""
-"ราคาลดได้รับการจัดการจากเทมเพลตสินค้า คลิกปุ่ม 'กำหนดค่าตัวเลือกย่อยสินค้า' "
-"เพื่อกำหนดราคาคุณสมบัติเพิ่มเติม"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_payment
@@ -509,12 +519,18 @@ msgstr "หากต้องการทำการเปลี่ยนแป
 msgid ""
 "Unfortunately, it looks like this booking is not possible anymore. Please "
 "contact us to find an alternative."
-msgstr "ขออภัย ดูเหมือนว่าการจองนี้จะไม่สามารถทำได้อีกต่อไป โปรดติดต่อเราเพื่อค้นหาทางเลือกอื่น"
+msgstr ""
+"ขออภัย ดูเหมือนว่าการจองนี้จะไม่สามารถทำได้อีกต่อไป โปรดติดต่อเราเพื่อค้นหาทางเลือกอื่น"
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_appointment_type__has_payment_step
 msgid "Up-front Payment"
 msgstr "การชำระเงินล่วงหน้า"
+
+#. module: appointment_account_payment
+#: model:ir.module.module,summary:base.module_appointment_account_payment
+msgid "Up-front payment on bookings"
+msgstr ""
 
 #. module: appointment_account_payment
 #: model:ir.model.fields,field_description:appointment_account_payment.field_calendar_booking_line__appointment_user_id
@@ -523,19 +539,7 @@ msgstr "ผู้ใช้"
 
 #. module: appointment_account_payment
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
-msgid "When"
-msgstr "จาก"
-
-#. module: appointment_account_payment
-#: model_terms:ir.ui.view,arch_db:appointment_account_payment.calendar_booking_view
-msgid "Where"
-msgstr "ที่ไหน"
-
-#. module: appointment_account_payment
-#. odoo-python
-#: code:addons/appointment_account_payment/models/product_product.py:0
-#: code:addons/appointment_account_payment/models/product_template.py:0
-msgid "You cannot delete the default booking product"
+msgid "Your Details"
 msgstr ""
 
 #. module: appointment_account_payment
@@ -557,21 +561,3 @@ msgstr "ผู้คน"
 #: model_terms:ir.ui.view,arch_db:appointment_account_payment.appointment_info
 msgid "per seat"
 msgstr ""
-
-#~ msgid ""
-#~ "%(name)s\n"
-#~ "%(date_start)s at %(time_start)s to\n"
-#~ "%(date_end)s at %(time_end)s (%(timezone)s)"
-#~ msgstr ""
-#~ "%(name)s\n"
-#~ "%(date_start)s เวลา %(time_start)s ถึง\n"
-#~ "%(date_end)s เวลา %(time_end)s (%(timezone)s)"
-
-#~ msgid ""
-#~ "%(name)s with %(staff_user)s\n"
-#~ "%(date_start)s at %(time_start)s to\n"
-#~ "%(date_end)s at %(time_end)s (%(timezone)s)"
-#~ msgstr ""
-#~ "%(name)s กับ %(staff_user)s\n"
-#~ "%(date_start)s เวลา %(time_start)s ถึง\n"
-#~ "%(date_end)s เวลา %(time_end)s (%(timezone)s)"

@@ -5,8 +5,10 @@ from freezegun import freeze_time
 
 from odoo import fields
 from odoo.tests import Form, tagged
-from odoo.tools import file_open, float_compare
+from odoo.tools import float_compare
 
+from odoo.addons.base.tests.files import PDF_RAW
+from odoo.addons.mail.tests.common import MailCase
 from odoo.addons.hr_expense.tests.common import TestExpenseCommon
 from odoo.addons.hr_expense_extract.models.hr_expense import OCR_VERSION
 from odoo.addons.hr_expense_predict_product.models.hr_expense import HrExpense
@@ -14,7 +16,9 @@ from odoo.addons.iap_extract.tests.test_extract_mixin import TestExtractMixin
 
 
 @tagged('post_install', '-at_install')
-class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
+class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin, MailCase):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -25,12 +29,10 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
             'product_id': cls.product_c.id,
         })
 
-        with file_open('base/tests/minimal.pdf', 'rb') as file:
-            pdf_bytes = file.read()
         cls.attachment = cls.env['ir.attachment'].create([{
             'name': 'Attachment 1',
             'res_model': 'hr.expense',
-            'raw': pdf_bytes,
+            'raw': PDF_RAW,
             'mimetype': 'application/pdf',
         }])
         cls.env.company.expense_extract_show_ocr_option_selection = 'auto_send'
@@ -56,8 +58,8 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
         expected_parse_params = {
             'version': OCR_VERSION,
             'account_token': 'test_token',
-            'dbuuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
-            'documents': [self.attachment.datas.decode('utf-8')],
+            'dbuuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
+            'documents': [self.attachment.raw.to_base64()],
             'user_infos': {
                 'user_email': self.expense_user_employee.email,
                 'user_lang': self.env.ref('base.user_root').lang,
@@ -215,7 +217,7 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
 
         self.expense.action_submit()
         self.expense.with_user(self.expense_user_manager).action_approve()
-        self.post_expenses_with_wizard(self.expense)
+        self.post_expenses(self.expense)
 
         move = self.expense.account_move_id
         self.assertFalse(move._needs_auto_extract())
@@ -369,21 +371,24 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
         self.assertEqual(self.expense.date, fields.Date.to_date('2024-01-01'))
 
     def test_expense_ocr_note_author(self):
+        self.env = self.env(context={**self.env.context, 'lang': 'en_US'})
         with self._mock_iap_extract(extract_response=self.parse_success_response()):
             self.expense.message_post(attachment_ids=[self.attachment.id])
 
         self.env.cr.precommit.clear()  # Clear the tracking values
-        with self._mock_iap_extract(extract_response=self.get_result_success_response()):
+        with self.mock_mail_gateway(), self.mock_mail_app(), self._mock_iap_extract(extract_response=self.get_result_success_response()):
             self.expense.check_all_status()
-
-        self.env.cr.flush()  # Runs the precommit hooks to create the tracking message
-        message = self.env['mail.message'].search([
-            ('model', '=', 'hr.expense'),
-            ('res_id', '=', self.expense.id),
-            ('tracking_value_ids', '!=', False),
-        ]).ensure_one()
-        author_name = message.author_id.complete_name
-        self.assertEqual(author_name, 'OdooBot')
+            self.env.cr.flush()  # Runs the precommit hooks to create the tracking message
+        self.assertEqual(len(self._new_msgs), 1)
+        self.assertMessageFields(
+            self._new_msgs, {
+                'author_id': self.env.ref('base.user_root').partner_id,
+                'tracking_values': [
+                    ('total_amount', 'monetary', 0.0, 99.99, {'currency': self.env.ref('base.USD')}),
+                    ('total_amount_currency', 'monetary', 0.0, 99.99, {'currency': self.env.ref('base.EUR')}),
+                ],
+            }
+        )
 
     def test_action_create_sample_expense(self):
         receipt_values = {
@@ -396,3 +401,94 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
         expense = self.env['hr.expense'].search([('name', '=', f"Sample Receipt: {receipt_values['name']}")], limit=1)
         self.assertTrue(expense)
         self.assertEqual(expense.total_amount, receipt_values['amount'])
+
+    def test_create_empty_expense_then_use_orm(self):
+        """Ensure that an expense without name and product will have these 2 fields provided if using the OCR"""
+        expense = self.env['hr.expense'].create({
+            'employee_id': self.expense_employee.id,
+        })
+
+        self.assertFalse(expense.name)
+        self.assertFalse(expense.product_id)
+
+        with self._mock_iap_extract(extract_response=self.parse_success_response()):
+            expense.message_post(attachment_ids=[self.attachment.id])
+
+        with self._mock_iap_extract(self.get_result_success_response()):
+            expense._check_ocr_status()
+
+        self.assertTrue(expense.name)
+        self.assertTrue(expense.product_id)
+
+    def test_extract_conversion_when_currency_already_set(self):
+        """ Test that if EUR is already set on the record, the USD total still updates correctly from OCR """
+        eur_currency = self.env.ref('base.EUR')
+        eur_currency.active = True
+
+        self.expense.message_main_attachment_id = self.attachment
+        self.env['res.currency.rate'].create({
+            'name': '2022-02-22',
+            'rate': 1.0 / 3.0,
+            'currency_id': eur_currency.id,
+            'company_id': self.env.company.id,
+        })
+
+        self.expense.write({
+            'currency_id': eur_currency.id,
+            'total_amount_currency': 1.0,
+            'total_amount': 3.0,
+        })
+
+        ocr_results = self.get_result_success_response()['results'][0]
+        ocr_results['total']['selected_value']['content'] = 50.0
+        ocr_results['currency']['selected_value']['content'] = 'EUR'
+        ocr_results['date']['selected_value']['content'] = '2022-02-22'
+
+        self.expense.name = ""
+        self.expense._fill_document_with_results(ocr_results=ocr_results)
+
+        self.assertEqual(self.expense.total_amount_currency, 50.0)
+        self.assertAlmostEqual(self.expense.total_amount, 150.0)
+
+    def test_skip_extract_for_stripe_expense(self):
+        """ Test OCR should not be triggered for expense created from stripe payment. """
+        if 'hr_expense_stripe' not in self.env['ir.module.module']._installed():
+            self.skipTest("hr_expense_stripe module is not installed.")
+
+        self.company.stripe_id = 'acct_1234567890'
+        card = self.env['hr.expense.stripe.card'].with_user(self.expense_user_manager).create([{  # noqa: OLS03001
+            'employee_id': self.expense_employee.id,
+            'name': 'Test Card',
+            'company_id': self.company.id,
+        }])
+        expense_vals = {
+            'card_id': card.id,
+            'employee_id': self.expense_employee.id,
+            'product_id': self.product_c.id,
+            'total_amount_currency': 200.0,
+        }
+
+        # test skip ocr for auto ocr
+        self.company.expense_extract_show_ocr_option_selection = 'auto_send'
+        expense_1 = self.env['hr.expense'].create(expense_vals)
+        self.assertTrue(expense_1.is_card_expense)
+        with self._mock_iap_extract(extract_response=self.parse_success_response()):
+            expense_1.message_post(attachment_ids=[self.attachment.id])
+        with self._mock_iap_extract(extract_response=self.get_result_success_response()):
+            expense_1.check_all_status()
+        self.assertRecordValues(expense_1, [
+            {'total_amount_currency': 200.0, 'state': 'draft', 'extract_state': 'done'},
+        ])
+
+        # test skip ocr for ocr on demand
+        self.company.expense_extract_show_ocr_option_selection = 'manual_send'
+        expense_2 = self.env['hr.expense'].create(expense_vals)
+        self.assertTrue(expense_2.is_card_expense)
+        expense_2.message_post(attachment_ids=[self.attachment.id])
+        with self._mock_iap_extract(extract_response=self.parse_success_response()):
+            expense_2.action_send_batch_for_digitization()
+        with self._mock_iap_extract(extract_response=self.get_result_success_response()):
+            expense_2.check_all_status()
+        self.assertRecordValues(expense_2, [
+            {'total_amount_currency': 200.0, 'state': 'draft', 'extract_state': 'done'},
+        ])

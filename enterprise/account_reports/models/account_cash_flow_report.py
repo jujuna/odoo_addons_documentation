@@ -1,5 +1,8 @@
-from odoo import models, _
-from odoo.tools import SQL, Query
+from odoo import _, fields, models
+from odoo.models import Query
+from odoo.tools import SQL
+
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
 
 class AccountCashFlowReportHandler(models.AbstractModel):
@@ -43,6 +46,7 @@ class AccountCashFlowReportHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         report._init_options_journals(options, previous_options=previous_options, additional_journals_domain=[('type', 'in', ('bank', 'cash', 'general'))])
+        report._init_options_journals_names(options, previous_options=previous_options, additional_journals_domain=[('type', 'in', ('bank', 'cash', 'general'))])
 
     def _get_report_data(self, report, options, layout_data):
         report_data = {}
@@ -81,21 +85,21 @@ class AccountCashFlowReportHandler(models.AbstractModel):
 
         report_data is a dictionnary where the keys are keys from _cash_flow_report_get_layout_data() (used for mapping)
         and the values can contain 2 dictionnaries:
-            * (required) 'balance' where the key is the column_group_key and the value is the balance of the line
+            * (required) 'balance' where the key is the column_group_index and the value is the balance of the line
             * (optional) 'aml_groupby_account' where the key is an account_id and the values are the aml data
         """
-        def _report_update_parent(layout_line_id, aml_column_group_key, aml_balance, layout_data, report_data):
+        def _report_update_parent(layout_line_id, aml_column_group_index, aml_balance, layout_data, report_data):
             # Update the balance in report_data of the parent of the layout_line_id recursively (Stops when the line has no parent)
             if 'parent_line_id' in layout_data[layout_line_id]:
                 parent_line_id = layout_data[layout_line_id]['parent_line_id']
 
                 report_data.setdefault(parent_line_id, {'balance': {}})
-                report_data[parent_line_id]['balance'].setdefault(aml_column_group_key, 0.0)
-                report_data[parent_line_id]['balance'][aml_column_group_key] += aml_balance
+                report_data[parent_line_id]['balance'].setdefault(aml_column_group_index, 0.0)
+                report_data[parent_line_id]['balance'][aml_column_group_index] += aml_balance
 
-                _report_update_parent(parent_line_id, aml_column_group_key, aml_balance, layout_data, report_data)
+                _report_update_parent(parent_line_id, aml_column_group_index, aml_balance, layout_data, report_data)
 
-        aml_column_group_key = aml_data['column_group_key']
+        aml_column_group_index = aml_data['column_group_index']
         aml_account_id = aml_data['account_id']
         aml_account_code = aml_data['account_code']
         aml_account_name = aml_data['account_name']
@@ -120,13 +124,13 @@ class AccountCashFlowReportHandler(models.AbstractModel):
             'balance': {},
         })
 
-        report_data[layout_line_id]['balance'].setdefault(aml_column_group_key, 0.0)
-        report_data[layout_line_id]['balance'][aml_column_group_key] += aml_balance
+        report_data[layout_line_id]['balance'].setdefault(aml_column_group_index, 0.0)
+        report_data[layout_line_id]['balance'][aml_column_group_index] += aml_balance
 
-        report_data[layout_line_id]['aml_groupby_account'][aml_account_id]['balance'].setdefault(aml_column_group_key, 0.0)
-        report_data[layout_line_id]['aml_groupby_account'][aml_account_id]['balance'][aml_column_group_key] += aml_balance
+        report_data[layout_line_id]['aml_groupby_account'][aml_account_id]['balance'].setdefault(aml_column_group_index, 0.0)
+        report_data[layout_line_id]['aml_groupby_account'][aml_account_id]['balance'][aml_column_group_index] += aml_balance
 
-        _report_update_parent(layout_line_id, aml_column_group_key, aml_balance, layout_data, report_data)
+        _report_update_parent(layout_line_id, aml_column_group_index, aml_balance, layout_data, report_data)
 
     def _get_tags_ids(self):
         ''' Get a dict to pass on to _dispatch_aml_data containing information mapping account tags to report lines. '''
@@ -232,31 +236,27 @@ class AccountCashFlowReportHandler(models.AbstractModel):
         '''
         queries = []
 
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             query = report._get_report_query(column_group_options, date_scope, domain=[('account_id', 'in', payment_account_ids)])
-            account_alias = query.join(lhs_alias='account_move_line', lhs_column='account_id', rhs_table='account_account', rhs_column='id', link='account_id')
-            account_name = self.env['account.account']._field_to_sql(account_alias, 'name')
-            account_code = self.env['account.account']._field_to_sql(account_alias, 'code', query)
+            account_t = query.table._sudo()._join('account_id', kind='JOIN')
 
             queries.append(SQL(
                 '''
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     account_move_line.account_id,
                     %(account_code)s AS account_code,
                     %(account_name)s AS account_name,
                     SUM(%(balance_select)s) AS balance
                 FROM %(table_references)s
-                %(currency_table_join)s
                 WHERE %(search_condition)s
                 GROUP BY account_move_line.account_id, %(account_code)s, %(account_name)s
                 ''',
-                column_group_key=column_group_key,
-                account_code=account_code,
-                account_name=account_name,
+                column_group_index=column_group_index,
+                account_code=account_t.code,
+                account_name=account_t.name,
+                balance_select=query.table.consolidation_balance,
                 table_references=query.from_clause,
-                balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-                currency_table_join=report._currency_table_aml_join(column_group_options),
                 search_condition=query.where_clause,
             ))
 
@@ -277,20 +277,17 @@ class AccountCashFlowReportHandler(models.AbstractModel):
 
         queries = []
 
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             move_ids_query = self._get_move_ids_query(report, payment_account_ids, column_group_options)
-            query = Query(self.env, 'account_move_line')
-            account_alias = query.join(lhs_alias='account_move_line', lhs_column='account_id', rhs_table='account_account', rhs_column='id', link='account_id')
-            account_code = self.env['account.account']._field_to_sql(account_alias, 'code', query)
-            account_name = self.env['account.account']._field_to_sql(account_alias, 'name')
-            account_type = SQL.identifier(account_alias, 'account_type')
+            query = Query(self.env['account.move.line'].with_context(date_to=column_group_options['date']['date_to']))
+            account_t = query.table._sudo()._join('account_id', kind='JOIN')
 
             queries.append(SQL(
                 '''
                 (WITH payment_move_ids AS (%(move_ids_query)s)
                 -- Credit amount of each account
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     account_move_line.account_id,
                     %(account_code)s AS account_code,
                     %(account_name)s AS account_name,
@@ -298,7 +295,6 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                     account_account_account_tag.account_account_tag_id AS account_tag_id,
                     SUM(%(partial_amount_select)s) AS balance
                 FROM %(from_clause)s
-                %(currency_table_join)s
                 LEFT JOIN account_partial_reconcile
                     ON account_partial_reconcile.credit_move_id = account_move_line.id
                 LEFT JOIN account_account_account_tag
@@ -313,7 +309,7 @@ class AccountCashFlowReportHandler(models.AbstractModel):
 
                 -- Debit amount of each account
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     account_move_line.account_id,
                     %(account_code)s AS account_code,
                     %(account_name)s AS account_name,
@@ -321,7 +317,6 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                     account_account_account_tag.account_account_tag_id AS account_tag_id,
                     -SUM(%(partial_amount_select)s) AS balance
                 FROM %(from_clause)s
-                %(currency_table_join)s
                 LEFT JOIN account_partial_reconcile
                     ON account_partial_reconcile.debit_move_id = account_move_line.id
                 LEFT JOIN account_account_account_tag
@@ -336,7 +331,7 @@ class AccountCashFlowReportHandler(models.AbstractModel):
 
                 -- Total amount of each account
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     account_move_line.account_id AS account_id,
                     %(account_code)s AS account_code,
                     %(account_name)s AS account_name,
@@ -344,7 +339,6 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                     account_account_account_tag.account_account_tag_id AS account_tag_id,
                     SUM(%(aml_balance_select)s) AS balance
                 FROM %(from_clause)s
-                %(currency_table_join)s
                 LEFT JOIN account_account_account_tag
                     ON account_account_account_tag.account_account_id = account_move_line.account_id
                     AND account_account_account_tag.account_account_tag_id IN %(cash_flow_tag_ids)s
@@ -352,15 +346,14 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                     AND account_move_line.account_id NOT IN %(payment_account_ids)s
                 GROUP BY account_move_line.account_id, %(account_code)s, %(account_name)s, account_account_type, account_account_account_tag.account_account_tag_id)
                 ''',
-                column_group_key=column_group_key,
+                column_group_index=column_group_index,
                 move_ids_query=move_ids_query,
-                account_code=account_code,
-                account_name=account_name,
-                account_type=account_type,
+                account_code=account_t.code,
+                account_name=account_t.name,
+                account_type=account_t.account_type,
+                partial_amount_select=SQL("account_partial_reconcile.amount * %s", query.table.consolidation_rate),
+                aml_balance_select=query.table.consolidation_balance,
                 from_clause=query.from_clause,
-                currency_table_join=report._currency_table_aml_join(column_group_options),
-                partial_amount_select=report._currency_table_apply_rate(SQL("account_partial_reconcile.amount")),
-                aml_balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
                 cash_flow_tag_ids=tuple(cash_flow_tag_ids),
                 payment_account_ids=payment_account_ids,
                 date_from=column_group_options['date']['date_from'],
@@ -371,8 +364,8 @@ class AccountCashFlowReportHandler(models.AbstractModel):
 
         for aml_data in self.env.cr.dictfetchall():
             reconciled_aml_groupby_account.setdefault(aml_data['account_id'], {})
-            reconciled_aml_groupby_account[aml_data['account_id']].setdefault(aml_data['column_group_key'], {
-                'column_group_key': aml_data['column_group_key'],
+            reconciled_aml_groupby_account[aml_data['account_id']].setdefault(aml_data['column_group_index'], {
+                'column_group_index': aml_data['column_group_index'],
                 'account_id': aml_data['account_id'],
                 'account_code': aml_data['account_code'],
                 'account_name': aml_data['account_name'],
@@ -381,7 +374,7 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                 'balance': 0.0,
             })
 
-            reconciled_aml_groupby_account[aml_data['account_id']][aml_data['column_group_key']]['balance'] -= aml_data['balance']
+            reconciled_aml_groupby_account[aml_data['account_id']][aml_data['column_group_index']]['balance'] -= aml_data['balance']
 
         return list(reconciled_aml_groupby_account.values())
 
@@ -395,29 +388,28 @@ class AccountCashFlowReportHandler(models.AbstractModel):
         :return:                        A list of tuple (account_id, account_code, account_name, account_type, amount).
         '''
 
-        reconciled_account_ids = {column_group_key: set() for column_group_key in options['column_groups']}
-        reconciled_percentage_per_move = {column_group_key: {} for column_group_key in options['column_groups']}
-        currency_table = report._get_currency_table(options)
+        reconciled_account_ids = {column_group_index: set() for column_group_index in range(len(options['column_groups']))}
+        reconciled_percentage_per_move = {column_group_index: {} for column_group_index in range(len(options['column_groups']))}
 
         queries = []
 
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             move_ids_query = self._get_move_ids_query(report, payment_account_ids, column_group_options)
+            AccountMoveLine = self.env['account.move.line'].with_context(date_to=column_group_options['date']['date_to'])
+            credit_query = Query(AccountMoveLine, 'credit_line')
+            debit_query = Query(AccountMoveLine, 'debit_line')
 
             queries.append(SQL(
                 '''
                 (WITH payment_move_ids AS (%(move_ids_query)s)
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     debit_line.move_id,
                     debit_line.account_id,
-                    SUM(%(partial_amount)s) AS balance
-                FROM account_move_line AS credit_line
+                    SUM(%(partial_amount_credit)s) AS balance
+                FROM %(from_credit)s
                 LEFT JOIN account_partial_reconcile
                     ON account_partial_reconcile.credit_move_id = credit_line.id
-                JOIN %(currency_table)s
-                    ON account_currency_table.company_id = account_partial_reconcile.company_id
-                    AND account_currency_table.rate_type = 'current' -- For payable/receivable accounts it'll always be 'current' anyway
                 INNER JOIN account_move_line AS debit_line
                     ON debit_line.id = account_partial_reconcile.debit_move_id
                 WHERE credit_line.move_id IN (SELECT unnest(payment_move_ids.move_id) FROM payment_move_ids)
@@ -430,16 +422,13 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                 UNION ALL
 
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     credit_line.move_id,
                     credit_line.account_id,
-                    -SUM(%(partial_amount)s) AS balance
-                FROM account_move_line AS debit_line
+                    -SUM(%(partial_amount_debit)s) AS balance
+                FROM %(from_debit)s
                 LEFT JOIN account_partial_reconcile
                     ON account_partial_reconcile.debit_move_id = debit_line.id
-                JOIN %(currency_table)s
-                    ON account_currency_table.company_id = account_partial_reconcile.company_id
-                    AND account_currency_table.rate_type = 'current' -- For payable/receivable accounts it'll always be 'current' anyway
                 INNER JOIN account_move_line AS credit_line
                     ON credit_line.id = account_partial_reconcile.credit_move_id
                 WHERE debit_line.move_id IN (SELECT unnest(payment_move_ids.move_id) FROM payment_move_ids)
@@ -450,72 +439,70 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                 GROUP BY credit_line.move_id, credit_line.account_id)
                 ''',
                 move_ids_query=move_ids_query,
-                column_group_key=column_group_key,
+                column_group_index=column_group_index,
                 payment_account_ids=payment_account_ids,
                 date_from=column_group_options['date']['date_from'],
                 date_to=column_group_options['date']['date_to'],
-                currency_table=currency_table,
-                partial_amount=report._currency_table_apply_rate(SQL("account_partial_reconcile.amount")),
+                partial_amount_credit=SQL("account_partial_reconcile.amount * %s", credit_query.table.consolidation_rate),
+                from_credit=credit_query.from_clause,
+                partial_amount_debit=SQL("account_partial_reconcile.amount * %s", debit_query.table.consolidation_rate),
+                from_debit=debit_query.from_clause,
             ))
 
         self.env.cr.execute(SQL(' UNION ALL ').join(queries))
 
         for aml_data in self.env.cr.dictfetchall():
-            reconciled_percentage_per_move[aml_data['column_group_key']].setdefault(aml_data['move_id'], {})
-            reconciled_percentage_per_move[aml_data['column_group_key']][aml_data['move_id']].setdefault(aml_data['account_id'], [0.0, 0.0])
-            reconciled_percentage_per_move[aml_data['column_group_key']][aml_data['move_id']][aml_data['account_id']][0] += aml_data['balance']
+            reconciled_percentage_per_move[aml_data['column_group_index']].setdefault(aml_data['move_id'], {})
+            reconciled_percentage_per_move[aml_data['column_group_index']][aml_data['move_id']].setdefault(aml_data['account_id'], [0.0, 0.0])
+            reconciled_percentage_per_move[aml_data['column_group_index']][aml_data['move_id']][aml_data['account_id']][0] += aml_data['balance']
 
-            reconciled_account_ids[aml_data['column_group_key']].add(aml_data['account_id'])
+            reconciled_account_ids[aml_data['column_group_index']].add(aml_data['account_id'])
 
         if not reconciled_percentage_per_move:
             return []
 
         queries = []
 
+        today = fields.Date.context_today(self)
         for column in options['columns']:
+            query = Query(self.env['account.move.line'].with_context(date_to=today))
             queries.append(SQL(
                 '''
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     account_move_line.move_id,
                     account_move_line.account_id,
                     SUM(%(balance_select)s) AS balance
-                FROM account_move_line
-                JOIN %(currency_table)s
-                    ON account_currency_table.company_id = account_move_line.company_id
-                    AND account_currency_table.rate_type = 'current' -- For payable/receivable accounts it'll always be 'current' anyway
+                FROM %(from_clause)s
                 WHERE account_move_line.move_id IN %(move_ids)s
                     AND account_move_line.account_id IN %(account_ids)s
                 GROUP BY account_move_line.move_id, account_move_line.account_id
                 ''',
-                column_group_key=column['column_group_key'],
-                currency_table=currency_table,
-                balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-                move_ids=tuple(reconciled_percentage_per_move[column['column_group_key']].keys()) or (None,),
-                account_ids=tuple(reconciled_account_ids[column['column_group_key']]) or (None,)
+                column_group_index=column['column_group_index'],
+                balance_select=query.table.consolidation_balance,
+                from_clause=query.from_clause,
+                move_ids=tuple(reconciled_percentage_per_move[column['column_group_index']].keys()) or (None,),
+                account_ids=tuple(reconciled_account_ids[column['column_group_index']]) or (None,)
             ))
 
         self.env.cr.execute(SQL(' UNION ALL ').join(queries))
 
         for aml_data in self.env.cr.dictfetchall():
-            if aml_data['account_id'] in reconciled_percentage_per_move[aml_data['column_group_key']][aml_data['move_id']]:
-                reconciled_percentage_per_move[aml_data['column_group_key']][aml_data['move_id']][aml_data['account_id']][1] += aml_data['balance']
+            if aml_data['account_id'] in reconciled_percentage_per_move[aml_data['column_group_index']][aml_data['move_id']]:
+                reconciled_percentage_per_move[aml_data['column_group_index']][aml_data['move_id']][aml_data['account_id']][1] += aml_data['balance']
 
         reconciled_aml_per_account = {}
 
         queries = []
 
-        query = Query(self.env, 'account_move_line')
-        account_alias = query.join(lhs_alias='account_move_line', lhs_column='account_id', rhs_table='account_account', rhs_column='id', link='account_id')
-        account_code = self.env['account.account']._field_to_sql(account_alias, 'code', query)
-        account_name = self.env['account.account']._field_to_sql(account_alias, 'name')
-        account_type = SQL.identifier(account_alias, 'account_type')
+        query = Query(self.env['account.move.line'].with_context(date_to=today))
+        account_t = query.table._sudo()._join('account_id', kind='JOIN')
 
         for column in options['columns']:
             queries.append(SQL(
                 '''
                 SELECT
-                    %(column_group_key)s AS column_group_key,
+                    %(column_group_index)s AS column_group_index,
                     account_move_line.move_id,
                     account_move_line.account_id,
                     %(account_code)s AS account_code,
@@ -524,28 +511,26 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                     account_account_account_tag.account_account_tag_id AS account_tag_id,
                     SUM(%(balance_select)s) AS balance
                 FROM %(from_clause)s
-                %(currency_table_join)s
                 LEFT JOIN account_account_account_tag
                     ON account_account_account_tag.account_account_id = account_move_line.account_id
                     AND account_account_account_tag.account_account_tag_id IN %(cash_flow_tag_ids)s
                 WHERE account_move_line.move_id IN %(move_ids)s
                 GROUP BY account_move_line.move_id, account_move_line.account_id, %(account_code)s, %(account_name)s, account_account_type, account_account_account_tag.account_account_tag_id
                 ''',
-                column_group_key=column['column_group_key'],
-                account_code=account_code,
-                account_name=account_name,
-                account_type=account_type,
+                column_group_index=column['column_group_index'],
+                account_code=account_t.code,
+                account_name=account_t.name,
+                account_type=account_t.account_type,
+                balance_select=query.table.consolidation_balance,
                 from_clause=query.from_clause,
-                currency_table_join=report._currency_table_aml_join(options),
-                balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
                 cash_flow_tag_ids=tuple(cash_flow_tag_ids),
-                move_ids=tuple(reconciled_percentage_per_move[column['column_group_key']].keys()) or (None,)
+                move_ids=tuple(reconciled_percentage_per_move[column['column_group_index']].keys()) or (None,)
             ))
 
         self.env.cr.execute(SQL(' UNION ALL ').join(queries))
 
         for aml_data in self.env.cr.dictfetchall():
-            aml_column_group_key = aml_data['column_group_key']
+            aml_column_group_index = aml_data['column_group_index']
             aml_move_id = aml_data['move_id']
             aml_account_id = aml_data['account_id']
             aml_account_code = aml_data['account_code']
@@ -558,17 +543,17 @@ class AccountCashFlowReportHandler(models.AbstractModel):
             total_reconciled_amount = 0.0
             total_amount = 0.0
 
-            for reconciled_amount, amount in reconciled_percentage_per_move[aml_column_group_key][aml_move_id].values():
+            for reconciled_amount, amount in reconciled_percentage_per_move[aml_column_group_index][aml_move_id].values():
                 total_reconciled_amount += reconciled_amount
                 total_amount += amount
 
             # Compute matched percentage for each account.
-            if total_amount and aml_account_id not in reconciled_percentage_per_move[aml_column_group_key][aml_move_id]:
+            if total_amount and aml_account_id not in reconciled_percentage_per_move[aml_column_group_index][aml_move_id]:
                 # Lines being on reconciled moves but not reconciled with any liquidity move must be valued at the
                 # percentage of what is actually paid.
                 reconciled_percentage = total_reconciled_amount / total_amount
                 aml_balance *= reconciled_percentage
-            elif not total_amount and aml_account_id in reconciled_percentage_per_move[aml_column_group_key][aml_move_id]:
+            elif not total_amount and aml_account_id in reconciled_percentage_per_move[aml_column_group_index][aml_move_id]:
                 # The total amount to reconcile is 0. In that case, only add entries being on these accounts. Otherwise,
                 # this special case will lead to an unexplained difference equivalent to the reconciled amount on this
                 # account.
@@ -585,14 +570,14 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                 # --------------------------------------
                 # Receivable      |           | 200
                 # Receivable      | 200       |             <- Only the reconciled part of this entry must be added.
-                aml_balance = -reconciled_percentage_per_move[aml_column_group_key][aml_move_id][aml_account_id][0]
+                aml_balance = -reconciled_percentage_per_move[aml_column_group_index][aml_move_id][aml_account_id][0]
             else:
                 # Others lines are not considered.
                 continue
 
             reconciled_aml_per_account.setdefault(aml_account_id, {})
-            reconciled_aml_per_account[aml_account_id].setdefault(aml_column_group_key, {
-                'column_group_key': aml_column_group_key,
+            reconciled_aml_per_account[aml_account_id].setdefault(aml_column_group_index, {
+                'column_group_index': aml_column_group_index,
                 'account_id': aml_account_id,
                 'account_code': aml_account_code,
                 'account_name': aml_account_name,
@@ -601,7 +586,7 @@ class AccountCashFlowReportHandler(models.AbstractModel):
                 'balance': 0.0,
             })
 
-            reconciled_aml_per_account[aml_account_id][aml_column_group_key]['balance'] -= aml_balance
+            reconciled_aml_per_account[aml_account_id][aml_column_group_index]['balance'] -= aml_balance
 
         return list(reconciled_aml_per_account.values())
 
@@ -638,21 +623,21 @@ class AccountCashFlowReportHandler(models.AbstractModel):
 
         for column in options['columns']:
             expression_label = column['expression_label']
-            column_group_key = column['column_group_key']
+            column_group_index = column['column_group_index']
 
-            value = report_data[layout_line_id][expression_label].get(column_group_key, 0.0) if layout_line_id in report_data else 0.0
+            value = report_data[layout_line_id][expression_label].get(column_group_index, 0.0) if layout_line_id in report_data else 0.0
 
-            column_values.append(report._build_column_dict(value, column, options=options))
+            column_values.append(report._build_column_data(value, column, options=options))
 
-        return {
-            'id': line_id,
-            'name': layout_line_data['name'],
-            'level': layout_line_data['level'],
-            'class': layout_line_data.get('class', ''),
-            'columns': column_values,
-            'unfoldable': unfoldable,
-            'unfolded': line_id in options['unfolded_lines'] or layout_line_data.get('unfolded') or (options.get('unfold_all') and unfoldable),
-        }
+        return AccountReportLineData(
+            id=line_id,
+            name=layout_line_data['name'],
+            level=layout_line_data['level'],
+            css_class=layout_line_data.get('class', ''),
+            columns=column_values,
+            unfoldable=unfoldable,
+            unfolded=line_id in options['unfolded_lines'] or layout_line_data.get('unfolded') or (options.get('unfold_all') and unfoldable),
+        )
 
     def _get_aml_line(self, report, options, aml_data):
         parent_line_id = report._get_generic_line_id(None, None, aml_data['parent_line_id'])
@@ -662,20 +647,20 @@ class AccountCashFlowReportHandler(models.AbstractModel):
 
         for column in options['columns']:
             expression_label = column['expression_label']
-            column_group_key = column['column_group_key']
+            column_group_index = column['column_group_index']
 
-            value = aml_data[expression_label].get(column_group_key, 0.0)
+            value = aml_data[expression_label].get(column_group_index, 0.0)
 
-            column_values.append(report._build_column_dict(value, column, options=options))
+            column_values.append(report._build_column_data(value, column, options=options))
 
-        return {
-            'id': line_id,
-            'name': f"{aml_data['account_code']} {aml_data['account_name']}" if aml_data['account_code'] else aml_data['account_name'],
-            'caret_options': 'account.account',
-            'level': aml_data['level'],
-            'parent_id': parent_line_id,
-            'columns': column_values,
-        }
+        return AccountReportLineData(
+            id=line_id,
+            name=f"{aml_data['account_code']} {aml_data['account_name']}" if aml_data['account_code'] else aml_data['account_name'],
+            caret_options='account.account',
+            level=aml_data['level'],
+            parent_id=parent_line_id,
+            columns=column_values,
+        )
 
     def _get_unexplained_difference_line(self, report, options, report_data):
         unexplained_difference = False
@@ -683,18 +668,18 @@ class AccountCashFlowReportHandler(models.AbstractModel):
 
         for column in options['columns']:
             expression_label = column['expression_label']
-            column_group_key = column['column_group_key']
+            column_group_index = column['column_group_index']
 
-            opening_balance = report_data['opening_balance'][expression_label].get(column_group_key, 0.0) if 'opening_balance' in report_data else 0.0
-            closing_balance = report_data['closing_balance'][expression_label].get(column_group_key, 0.0) if 'closing_balance' in report_data else 0.0
-            net_increase = report_data['net_increase'][expression_label].get(column_group_key, 0.0) if 'net_increase' in report_data else 0.0
+            opening_balance = report_data['opening_balance'][expression_label].get(column_group_index, 0.0) if 'opening_balance' in report_data else 0.0
+            closing_balance = report_data['closing_balance'][expression_label].get(column_group_index, 0.0) if 'closing_balance' in report_data else 0.0
+            net_increase = report_data['net_increase'][expression_label].get(column_group_index, 0.0) if 'net_increase' in report_data else 0.0
 
             balance = closing_balance - opening_balance - net_increase
 
             if not self.env.company.currency_id.is_zero(balance):
                 unexplained_difference = True
 
-            column_values.append(report._build_column_dict(
+            column_values.append(report._build_column_data(
                 balance,
                 {
                     'figure_type': 'monetary',
@@ -704,9 +689,9 @@ class AccountCashFlowReportHandler(models.AbstractModel):
             ))
 
         if unexplained_difference:
-            return {
-                'id': report._get_generic_line_id(None, None, markup='unexplained_difference'),
-                'name': 'Unexplained Difference',
-                'level': 1,
-                'columns': column_values,
-            }
+            return AccountReportLineData(
+                id=report._get_generic_line_id(None, None, markup='unexplained_difference'),
+                name=self.env._("Unexplained Difference"),
+                level=1,
+                columns=column_values,
+            )

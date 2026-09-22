@@ -15,9 +15,11 @@ class AccountMoveLine(models.Model):
         query = super()._search(*args, **kwargs)
         if self.env.context.get('account_report_cash_basis'):
             self.env['account.report']._prepare_lines_for_cash_basis()
+            join, sql, condition = query._joins['account_move_line']
             if self.env.context.get('account_report_analytic_groupby'):
                 self.env['account.report']._prepare_lines_for_analytic_groupby_with_cash_basis()
-                query._tables['account_move_line'] = SQL.identifier('analytic_cash_basis_temp_account_move_line')
+                sql = SQL.identifier('analytic_cash_basis_temp_account_move_line')
             else:
-                query._tables['account_move_line'] = SQL.identifier('cash_basis_temp_account_move_line')
+                sql = SQL.identifier('cash_basis_temp_account_move_line')
+            query._joins['account_move_line'] = join, sql, condition
         return query

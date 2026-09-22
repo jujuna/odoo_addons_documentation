@@ -1,12 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 
-from datetime import date, datetime
-import pytz
+from datetime import date, datetime, UTC
 
 from odoo import fields
+from odoo.tests import tagged
+
 from .common import TestCommonForecast
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestUnavailabilityForForecasts(TestCommonForecast):
     @classmethod
     def setUpClass(cls):
@@ -14,7 +16,6 @@ class TestUnavailabilityForForecasts(TestCommonForecast):
 
         cls.setUpEmployees()
         cls.setUpProjects()
-        cls.employee_bert.resource_calendar_id.tz = 'UTC'
         # extra employee to test _gantt_unavailability grouped by resource_id
         cls.employee_lionel = cls.env['hr.employee'].create({
             'name': 'lionel',
@@ -43,10 +44,10 @@ class TestUnavailabilityForForecasts(TestCommonForecast):
         }
         generated = {}
         for resource in [self.resource_bert, self.resource_lionel, self.resource_joseph]:
-            generated[resource.id] = self.env['planning.slot'].create({'resource_id': resource.id, **values})
+            generated[resource.id] = self.env['planning.slot'].create({'resource_ids': resource.ids, **values})
 
         unavailabilities = self.env['planning.slot']._gantt_unavailability(
-            'resource_id',
+            'resource_ids',
             [self.resource_bert.id, self.resource_joseph.id, self.resource_lionel.id],
             datetime(2019, 1, 1),
             datetime(2019, 1, 7),
@@ -54,10 +55,10 @@ class TestUnavailabilityForForecasts(TestCommonForecast):
         )
 
         expected_unavailabilities = [
-            {'start': datetime(2019, 1, 1, 17, 0, tzinfo=pytz.utc), 'stop': datetime(2019, 1, 2, 8, 0, tzinfo=pytz.utc)},
-            {'start': datetime(2019, 1, 2, 17, 0, tzinfo=pytz.utc), 'stop': datetime(2019, 1, 3, 8, 0, tzinfo=pytz.utc)},
-            {'start': datetime(2019, 1, 3, 17, 0, tzinfo=pytz.utc), 'stop': datetime(2019, 1, 4, 8, 0, tzinfo=pytz.utc)},
-            {'start': datetime(2019, 1, 4, 17, 0, tzinfo=pytz.utc), 'stop': datetime(2019, 1, 7, 0, 0, tzinfo=pytz.utc)},
+            {'start': datetime(2019, 1, 1, 17, 0, tzinfo=UTC), 'stop': datetime(2019, 1, 2, 8, 0, tzinfo=UTC)},
+            {'start': datetime(2019, 1, 2, 17, 0, tzinfo=UTC), 'stop': datetime(2019, 1, 3, 8, 0, tzinfo=UTC)},
+            {'start': datetime(2019, 1, 3, 17, 0, tzinfo=UTC), 'stop': datetime(2019, 1, 4, 8, 0, tzinfo=UTC)},
+            {'start': datetime(2019, 1, 4, 17, 0, tzinfo=UTC), 'stop': datetime(2019, 1, 7, 0, 0, tzinfo=UTC)},
         ]
 
         bert_unavailabilities = unavailabilities[self.resource_bert.id]

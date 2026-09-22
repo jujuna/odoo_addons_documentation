@@ -16,6 +16,8 @@ from freezegun import freeze_time
 @tagged('post_install', '-at_install')
 class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def _assert_filter_date(self, report, previous_options, expected_date_values):
         """ Initializes and checks the 'date' option computed for the provided report and previous_options
         """
@@ -49,6 +51,115 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
 
         # Test the default account_report reports. Don't choose US variants based on the fiscal country.
         cls.env['account.report'].search([]).variant_report_ids.active = False
+        cls.env['account.report'].search([]).filter_journals = True
+
+    @freeze_time('2026-12-31')
+    def test_filter_date_non_escalating(self):
+        self.env.company.write({
+            'fiscalyear_last_month': '6',
+            'fiscalyear_last_day': 30,
+        })
+
+        self._assert_filter_date(
+            self.date_range_report,
+            {'date': {'default_opening_date': 'this_year'}},
+            {
+                'string': 'Jul 2026 - Jun 2027',
+                'period_type': 'year',
+                'date_from': '2026-07-01',
+                'date_to': '2027-06-30',
+            },
+        )
+
+        # Simulate another company with normal fiscal year passing the previously generated options
+        self.env.company.write({
+            'fiscalyear_last_month': '12',
+            'fiscalyear_last_day': 31,
+        })
+
+        self._assert_filter_date(
+            self.date_range_report,
+            {
+                'date': {
+                    'string': 'Jul 2026 - Jun 2027',
+                    'period_type': 'year',
+                    'date_from': '2026-07-01',
+                    'date_to': '2027-06-30',
+                }
+            },
+            {
+                'string': '2027',
+                'period_type': 'year',
+                'date_from': '2027-01-01',
+                'date_to': '2027-12-31',
+            },
+        )
+
+        # Simulate again with the first "company" settings with anualigned fiscal year passing the previously generated options
+        self.env.company.write({
+            'fiscalyear_last_month': '6',
+            'fiscalyear_last_day': 30,
+        })
+
+        self._assert_filter_date(
+            self.date_range_report,
+            {
+                'date': {
+                    'string': '2027',
+                    'period_type': 'year',
+                    'date_from': '2027-01-01',
+                    'date_to': '2027-12-31',
+                }
+            },
+            {
+                'string': 'Jul 2026 - Jun 2027',
+                'period_type': 'year',
+                'date_from': '2026-07-01',
+                'date_to': '2027-06-30',
+            },
+        )
+
+        # Sanity test, making sure it does not give different things than what was ouputed with the same input.
+        self._assert_filter_date(
+            self.date_range_report,
+            {
+                'date': {
+                    'string': 'Jul 2026 - Jun 2027',
+                    'period_type': 'year',
+                    'date_from': '2026-07-01',
+                    'date_to': '2027-06-30',
+                }
+            },
+            {
+                'string': 'Jul 2026 - Jun 2027',
+                'period_type': 'year',
+                'date_from': '2026-07-01',
+                'date_to': '2027-06-30',
+            },
+        )
+
+        self.env.company.write({
+            'fiscalyear_last_month': '12',
+            'fiscalyear_last_day': 31,
+        })
+
+        self._assert_filter_date(
+            self.date_range_report,
+            {
+                'date': {
+                    'string': '2027',
+                    'period_type': 'year',
+                    'date_from': '2027-01-01',
+                    'date_to': '2027-12-31',
+                }
+            },
+            {
+                'string': '2027',
+                'period_type': 'year',
+                'date_from': '2027-01-01',
+                'date_to': '2027-12-31',
+            },
+        )
 
     ####################################################
     # DATES RANGE
@@ -59,105 +170,84 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         ''' Test the filter_date with 'this_month'/'last_month' in 'range' mode.'''
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'this_month', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'this_month'}},
             {
                 'string': 'Dec 2017',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'this_month',
                 'date_from': '2017-12-01',
                 'date_to': '2017-12-31',
-                'currency_table_period_key': '2017-12-01_2017-12-31',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'previous_month', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'previous_month'}},
             {
                 'string': 'Nov 2017',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'previous_month',
-                'period': -1,
                 'date_from': '2017-11-01',
                 'date_to': '2017-11-30',
-                'currency_table_period_key': '2017-11-01_2017-11-30',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'next_month', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'next_month'}},
             {
                 'string': 'Jan 2018',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'next_month',
-                'period': 1,
                 'date_from': '2018-01-01',
                 'date_to': '2018-01-31',
-                'currency_table_period_key': '2018-01-01_2018-01-31',
             },
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_month', 'mode': 'range'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_month'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
                     'string': 'Nov 2017',
                     'period_type': 'month',
-                    'mode': 'range',
                     'date_from': '2017-11-01',
                     'date_to': '2017-11-30',
-                    'currency_table_period_key': '2017-11-01_2017-11-30',
                 },
                 {
                     'string': 'Oct 2017',
                     'period_type': 'month',
-                    'mode': 'range',
                     'date_from': '2017-10-01',
                     'date_to': '2017-10-31',
-                    'currency_table_period_key': '2017-10-01_2017-10-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_month', 'mode': 'range'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_month'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
                     'string': 'Dec 2016',
                     'period_type': 'month',
-                    'mode': 'range',
                     'date_from': '2016-12-01',
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': '2016-12-01_2016-12-31',
                 },
                 {
                     'string': 'Dec 2015',
                     'period_type': 'month',
-                    'mode': 'range',
                     'date_from': '2015-12-01',
                     'date_to': '2015-12-31',
-                    'currency_table_period_key': '2015-12-01_2015-12-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_month', 'mode': 'range'}, 'comparison':{'filter': 'custom', 'date_from': '2016-12-01', 'date_to': '2016-12-31'}},
+            {'date': {'default_opening_date': 'this_month'}, 'comparison': {'filter': 'custom', 'date_from': '2016-12-01', 'date_to': '2016-12-31'}},
             [
                 {
                     'string': 'Dec 2016',
                     'period_type': 'month',
-                    'mode': 'range',
                     'date_from': '2016-12-01',
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': '2016-12-01_2016-12-31',
                 },
             ],
         )
@@ -167,105 +257,84 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         ''' Test the filter_date with 'this_quarter'/'last_quarter' in 'range' mode.'''
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'this_quarter', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'this_quarter'}},
             {
                 'string': 'Oct - Dec 2017',
                 'period_type': 'quarter',
-                'mode': 'range',
-                'filter': 'this_quarter',
                 'date_from': '2017-10-01',
                 'date_to': '2017-12-31',
-                'currency_table_period_key': '2017-10-01_2017-12-31',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'previous_quarter', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'previous_quarter'}},
             {
                 'string': 'Jul - Sep 2017',
                 'period_type': 'quarter',
-                'mode': 'range',
-                'filter': 'previous_quarter',
-                'period': -1,
                 'date_from': '2017-07-01',
                 'date_to': '2017-09-30',
-                'currency_table_period_key': '2017-07-01_2017-09-30',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'next_quarter', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'next_quarter'}},
             {
                 'string': 'Jan - Mar 2018',
                 'period_type': 'quarter',
-                'mode': 'range',
-                'filter': 'next_quarter',
-                'period': 1,
                 'date_from': '2018-01-01',
                 'date_to': '2018-03-31',
-                'currency_table_period_key': '2018-01-01_2018-03-31',
             },
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_quarter', 'mode': 'range'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_quarter'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
                     'string': 'Jul - Sep 2017',
                     'period_type': 'quarter',
-                    'mode': 'range',
                     'date_from': '2017-07-01',
                     'date_to': '2017-09-30',
-                    'currency_table_period_key': '2017-07-01_2017-09-30',
                 },
                 {
                     'string': 'Apr - Jun 2017',
                     'period_type': 'quarter',
-                    'mode': 'range',
                     'date_from': '2017-04-01',
                     'date_to': '2017-06-30',
-                    'currency_table_period_key': '2017-04-01_2017-06-30',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_quarter', 'mode': 'range'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_quarter'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
                     'string': 'Oct - Dec 2016',
                     'period_type': 'quarter',
-                    'mode': 'range',
                     'date_from': '2016-10-01',
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': '2016-10-01_2016-12-31',
                 },
                 {
                     'string': 'Oct - Dec 2015',
                     'period_type': 'quarter',
-                    'mode': 'range',
                     'date_from': '2015-10-01',
                     'date_to': '2015-12-31',
-                    'currency_table_period_key': '2015-10-01_2015-12-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_quarter', 'mode': 'range'}, 'comparison': {'filter': 'custom', 'date_from': '2016-10-01', 'date_to': '2016-12-31'}},
+            {'date': {'default_opening_date': 'this_quarter'}, 'comparison': {'filter': 'custom', 'date_from': '2016-10-01', 'date_to': '2016-12-31'}},
             [
                 {
                     'string': 'Oct - Dec 2016',
                     'period_type': 'quarter',
-                    'mode': 'range',
                     'date_from': '2016-10-01',
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': '2016-10-01_2016-12-31',
                 },
             ],
         )
@@ -275,107 +344,102 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         ''' Test the filter_date with 'this_year'/'last_year' in 'range' mode when the fiscal year ends the 12-31.'''
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'this_year'}},
             {
                 'string': '2017',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'this_year',
+                'period_type': 'year',
                 'date_from': '2017-01-01',
                 'date_to': '2017-12-31',
-                'currency_table_period_key': '2017-01-01_2017-12-31',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'previous_year', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'previous_year'}},
             {
                 'string': '2016',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'previous_year',
-                'period': -1,
+                'period_type': 'year',
                 'date_from': '2016-01-01',
                 'date_to': '2016-12-31',
-                'currency_table_period_key': '2016-01-01_2016-12-31',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'next_year', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'next_year'}},
             {
                 'string': '2018',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'next_year',
-                'period': 1,
+                'period_type': 'year',
                 'date_from': '2018-01-01',
                 'date_to': '2018-12-31',
-                'currency_table_period_key': '2018-01-01_2018-12-31',
             },
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
                     'string': '2016',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'period_type': 'year',
                     'date_from': '2016-01-01',
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': '2016-01-01_2016-12-31',
                 },
                 {
                     'string': '2015',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'period_type': 'year',
                     'date_from': '2015-01-01',
                     'date_to': '2015-12-31',
-                    'currency_table_period_key': '2015-01-01_2015-12-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
                     'string': '2016',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'period_type': 'year',
                     'date_from': '2016-01-01',
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': '2016-01-01_2016-12-31',
                 },
                 {
                     'string': '2015',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'period_type': 'year',
                     'date_from': '2015-01-01',
                     'date_to': '2015-12-31',
-                    'currency_table_period_key': '2015-01-01_2015-12-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'custom', 'date_from': '2016-01-01', 'date_to': '2016-12-31'}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'custom', 'date_from': '2016-01-01', 'date_to': '2016-12-31'}},
             [
                 {
                     'string': '2016',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'period_type': 'year',
                     'date_from': '2016-01-01',
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': '2016-01-01_2016-12-31',
                 },
             ],
+        )
+
+    @freeze_time('2024-06-15')
+    def test_filter_comparison_custom_default_date_capped_to_today(self):
+        ''' The default 'custom' comparison range must not extend into the future: for a 'this_year'
+        report queried before year-end, it should be capped to today instead of the report's date_to. '''
+        options = self.date_range_report.get_options({'date': {'default_opening_date': 'this_year'}})
+
+        self.assertEqual(options['date']['date_to'], '2024-12-31')
+        self.assertEqual(
+            options['comparison']['date_to'], '2024-06-15',
+            "The default comparison range must be capped to today, not the report's future date_to.",
+        )
+        self.assertEqual(
+            options['comparison']['date_from'], '2024-01-01',
+            "The default comparison range must start at the beginning of the fiscal year containing today.",
         )
 
     @freeze_time('2017-12-31')
@@ -386,232 +450,306 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'this_year'}},
             {
-                'string': '2017 - 2018',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'this_year',
+                'string': 'Jul 2017 - Jun 2018',
+                'period_type': 'year',
                 'date_from': '2017-07-01',
                 'date_to': '2018-06-30',
-                'currency_table_period_key': '2017-07-01_2018-06-30',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'previous_year', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'previous_year'}},
             {
-                'string': '2016 - 2017',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'previous_year',
-                'period': -1,
+                'string': 'Jul 2016 - Jun 2017',
+                'period_type': 'year',
                 'date_from': '2016-07-01',
                 'date_to': '2017-06-30',
-                'currency_table_period_key': '2016-07-01_2017-06-30',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'next_year', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'next_year'}},
             {
-                'string': '2018 - 2019',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'next_year',
-                'period': 1,
+                'string': 'Jul 2018 - Jun 2019',
+                'period_type': 'year',
                 'date_from': '2018-07-01',
                 'date_to': '2019-06-30',
-                'currency_table_period_key': '2018-07-01_2019-06-30',
             },
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
-                    'string': '2016 - 2017',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'string': 'Jul 2016 - Jun 2017',
+                    'period_type': 'year',
                     'date_from': '2016-07-01',
                     'date_to': '2017-06-30',
-                    'currency_table_period_key': '2016-07-01_2017-06-30',
                 },
                 {
-                    'string': '2015 - 2016',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'string': 'Jul 2015 - Jun 2016',
+                    'period_type': 'year',
                     'date_from': '2015-07-01',
                     'date_to': '2016-06-30',
-                    'currency_table_period_key': '2015-07-01_2016-06-30',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
-                    'string': '2016 - 2017',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'string': 'Jul 2016 - Jun 2017',
+                    'period_type': 'year',
                     'date_from': '2016-07-01',
                     'date_to': '2017-06-30',
-                    'currency_table_period_key': '2016-07-01_2017-06-30',
                 },
                 {
-                    'string': '2015 - 2016',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'string': 'Jul 2015 - Jun 2016',
+                    'period_type': 'year',
                     'date_from': '2015-07-01',
                     'date_to': '2016-06-30',
-                    'currency_table_period_key': '2015-07-01_2016-06-30',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'custom', 'date_from': '2016-07-01', 'date_to': '2017-06-30'}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'custom', 'date_from': '2016-07-01', 'date_to': '2017-06-30'}},
             [
                 {
-                    'string': '2016 - 2017',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
+                    'string': 'Jul 2016 - Jun 2017',
+                    'period_type': 'year',
                     'date_from': '2016-07-01',
                     'date_to': '2017-06-30',
-                    'currency_table_period_key': '2016-07-01_2017-06-30',
                 },
             ],
         )
 
-    @freeze_time('2017-12-31')
+    @freeze_time('2025-12-31')
+    def test_filter_date_custom_with_fy(self):
+        # Set fiscal year end to 31th March
+        self.env.company.fiscalyear_last_month = '3'
+
+        # Single date reports
+        self._assert_filter_date(
+            self.single_date_report,
+            {'date': {'period_type': 'custom', 'date_to': '2025-12-31'}},
+            {
+                'string': 'As of 12/31/2025',
+                'period_type': 'month',
+                'fallback_from': 'custom',
+                'date_from': None,
+                'date_to': '2025-12-31',
+            },
+        )
+        self._assert_filter_date(
+            self.single_date_report,
+            {'date': {'period_type': 'custom', 'date_to': '2025-03-31'}},
+            {
+                'string': 'As of 03/31/2025',
+                'period_type': 'year',
+                'fallback_from': 'custom',
+                'date_from': None,
+                'date_to': '2025-03-31',
+            },
+        )
+
+        self.single_date_report.use_fiscal_periods = False
+        self._assert_filter_date(
+            self.single_date_report,
+            {'date': {'period_type': 'custom', 'date_to': '2025-12-31'}},
+            {
+                'string': 'As of 12/31/2025',
+                'period_type': 'year',
+                'fallback_from': 'custom',
+                'date_from': None,
+                'date_to': '2025-12-31',
+            },
+        )
+        self._assert_filter_date(
+            self.single_date_report,
+            {'date': {'period_type': 'custom', 'date_to': '2025-03-31'}},
+            {
+                'string': 'As of 03/31/2025',
+                'period_type': 'month',
+                'fallback_from': 'custom',
+                'date_from': None,
+                'date_to': '2025-03-31',
+            },
+        )
+
+        # Range reports
+        self._assert_filter_date(
+            self.date_range_report,
+            {'date': {'period_type': 'custom', 'date_from': '2025-01-01', 'date_to': '2025-12-31'}},
+            {
+                'string': 'Jan 2025 - Dec 2025',
+                'period_type': 'custom',
+                'date_from': '2025-01-01',
+                'date_to': '2025-12-31',
+            },
+        )
+        self._assert_filter_date(
+            self.date_range_report,
+            {'date': {'period_type': 'custom', 'date_from': '2024-04-01', 'date_to': '2025-03-31'}},
+            {
+                'string': 'Apr 2024 - Mar 2025',
+                'period_type': 'year',
+                'fallback_from': 'custom',
+                'date_from': '2024-04-01',
+                'date_to': '2025-03-31',
+            },
+        )
+
+        self.date_range_report.use_fiscal_periods = False
+        self._assert_filter_date(
+            self.date_range_report,
+            {'date': {'period_type': 'custom', 'date_from': '2025-01-01', 'date_to': '2025-12-31'}},
+            {
+                'string': '2025',
+                'period_type': 'year',
+                'fallback_from': 'custom',
+                'date_from': '2025-01-01',
+                'date_to': '2025-12-31',
+            },
+        )
+        self._assert_filter_date(
+            self.date_range_report,
+            {'date': {'period_type': 'custom', 'date_from': '2024-04-01', 'date_to': '2025-03-31'}},
+            {
+                'string': 'Apr 2024 - Mar 2025',
+                'period_type': 'custom',
+                'date_from': '2024-04-01',
+                'date_to': '2025-03-31',
+            },
+        )
+
+    @freeze_time('2025-12-31')
     def test_filter_date_fiscalyear_range_custom_years(self):
-        ''' Test the filter_date with 'this_year'/'last_year' in 'range' mode with custom account.fiscal.year records.'''
-        # Create a custom fiscal year for the nine previous quarters.
-        today = fields.Date.from_string('2017-12-31')
-        for i in range(9):
-            quarter_df, quarter_dt = date_utils.get_quarter(today - relativedelta(months=i * 3))
+        ''' Test the filter_date with 'this_year'/'last_year' in 'range' mode with custom account.fiscal.year records. It should also handle gaps between custom FY'''
+        custom_ranges = [
+            ('2024-02-14', '2024-12-31', 'FY 2024_2'),
+            ('2025-01-01', '2025-04-30', 'FY 2025_1'),
+            ('2025-05-01', '2025-12-31', 'FY 2025_2'),
+            ('2026-05-01', '2026-06-30', 'FY 2026_2'),
+        ]
+
+        for custom_range in custom_ranges:
             self.env['account.fiscal.year'].create({
-                'name': 'custom %s' % i,
-                'date_from': fields.Date.to_string(quarter_df),
-                'date_to': fields.Date.to_string(quarter_dt),
+                'name': custom_range[2],
+                'date_from': custom_range[0],
+                'date_to': custom_range[1],
                 'company_id': self.env.company.id,
             })
-        quarter_df, quarter_dt = date_utils.get_quarter(today + relativedelta(months=3))
-        # Adding a next quarter
-        self.env['account.fiscal.year'].create({
-            'name': 'custom next quarter',
-            'date_from': fields.Date.to_string(quarter_df),
-            'date_to': fields.Date.to_string(quarter_dt),
-            'company_id': self.env.company.id,
-        })
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'next_year', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'prev_year'}},
             {
-                'string': 'custom next quarter',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'next_year',
-                'period': 1,
-                'date_from': '2018-01-01',
-                'date_to': '2018-03-31',
-                'currency_table_period_key': '2018-01-01_2018-03-31',
+                'string': 'FY 2025_1',
+                'period_type': 'year',
+                'date_from': '2025-01-01',
+                'date_to': '2025-04-30',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'this_year'}},
             {
-                'string': 'custom 0',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'this_year',
-                'date_from': '2017-10-01',
-                'date_to': '2017-12-31',
-                'currency_table_period_key': '2017-10-01_2017-12-31',
+                'string': 'FY 2025_2',
+                'period_type': 'year',
+                'date_from': '2025-05-01',
+                'date_to': '2025-12-31',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'previous_year', 'mode': 'range'}},
+            {'date': {'default_opening_date': 'next_year'}},
             {
-                'string': 'custom 1',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'previous_year',
-                'period': -1,
-                'date_from': '2017-07-01',
-                'date_to': '2017-09-30',
-                'currency_table_period_key': '2017-07-01_2017-09-30',
+                'string': 'Jan 2026 - Apr 2026',
+                'period_type': 'year',
+                'date_from': '2026-01-01',
+                'date_to': '2026-04-30',
+            },
+        )
+
+        self._assert_filter_date(
+            self.date_range_report,
+            {'date': {'period_type': 'year', 'date_to': '2024-06-14'}},
+            {
+                'string': 'FY 2024_2',
+                'period_type': 'year',
+                'date_from': '2024-02-14',
+                'date_to': '2024-12-31',
+            },
+        )
+
+        self._assert_filter_date(
+            self.date_range_report,
+            {'date': {'period_type': 'year', 'date_to': '2024-01-14'}},
+            {
+                'string': '01/01/2024 - 02/13/2024',
+                'period_type': 'year',
+                'date_from': '2024-01-01',
+                'date_to': '2024-02-13',
             },
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {
+                'date': {'default_opening_date': 'next_year'},
+                'comparison': {'filter': 'previous_period', 'number_period': 3},
+            },
             [
                 {
-                    'string': 'custom 1',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
-                    'date_from': '2017-07-01',
-                    'date_to': '2017-09-30',
-                    'currency_table_period_key': '2017-07-01_2017-09-30',
+                    'string': 'FY 2025_2',
+                    'period_type': 'year',
+                    'date_from': '2025-05-01',
+                    'date_to': '2025-12-31',
                 },
                 {
-                    'string': 'custom 2',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
-                    'date_from': '2017-04-01',
-                    'date_to': '2017-06-30',
-                    'currency_table_period_key': '2017-04-01_2017-06-30',
+                    'string': 'FY 2025_1',
+                    'period_type': 'year',
+                    'date_from': '2025-01-01',
+                    'date_to': '2025-04-30',
+                },
+                {
+                    'string': 'FY 2024_2',
+                    'period_type': 'year',
+                    'date_from': '2024-02-14',
+                    'date_to': '2024-12-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {
+                'date': {'default_opening_date': 'this_year'},
+                'comparison': {'filter': 'same_last_year', 'number_period': 2},
+            },
             [
                 {
-                    'string': 'custom 4',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
-                    'date_from': '2016-10-01',
-                    'date_to': '2016-12-31',
-                    'currency_table_period_key': '2016-10-01_2016-12-31',
+                    'string': 'May 2024 - Dec 2024',
+                    'period_type': 'year',
+                    'date_from': '2024-05-01',
+                    'date_to': '2024-12-31',
                 },
                 {
-                    'string': 'custom 8',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
-                    'date_from': '2015-10-01',
-                    'date_to': '2015-12-31',
-                    'currency_table_period_key': '2015-10-01_2015-12-31',
-                },
-            ],
-        )
-
-        self._assert_filter_comparison(
-        self.date_range_report,
-            {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'custom', 'date_from': '2017-07-01', 'date_to': '2017-09-30'}},
-            [
-                {
-                    'string': 'custom 1',
-                    'period_type': 'fiscalyear',
-                    'mode': 'range',
-                    'date_from': '2017-07-01',
-                    'date_to': '2017-09-30',
-                    'currency_table_period_key': '2017-07-01_2017-09-30',
+                    'string': 'May 2023 - Dec 2023',
+                    'period_type': 'year',
+                    'date_from': '2023-05-01',
+                    'date_to': '2023-12-31',
                 },
             ],
         )
@@ -621,40 +759,33 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         ''' Test the filter_date with a custom dates range.'''
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'custom', 'mode': 'range', 'date_from': '2017-01-01', 'date_to': '2017-01-15'}},
+            {'date': {'date_from': '2017-01-01', 'date_to': '2017-01-15'}},
             {
-                'string': 'From %s\nto  %s' % (format_date(self.env, '2017-01-01'), format_date(self.env, '2017-01-15')),
+                'string': '%s - %s' % (format_date(self.env, '2017-01-01'), format_date(self.env, '2017-01-15')),
                 'period_type': 'custom',
-                'mode': 'range',
-                'filter': 'custom',
                 'date_from': '2017-01-01',
                 'date_to': '2017-01-15',
-                'currency_table_period_key': '2017-01-01_2017-01-15',
             },
         )
 
         self._assert_filter_comparison(
             self.date_range_report,
             {
-                'date': {'filter': 'custom', 'mode': 'range', 'date_from': '2017-01-01', 'date_to': '2017-01-15'},
+                'date': {'date_from': '2017-01-01', 'date_to': '2017-01-15'},
                 'comparison': {'filter': 'previous_period', 'number_period': 2},
             },
             [
                 {
-                    'string': 'Dec 2016',
-                    'period_type': 'month',
-                    'mode': 'range',
-                    'date_from': '2016-12-01',
+                    'string': '2016',
+                    'period_type': 'year',
+                    'date_from': '2016-01-01',
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': '2016-12-01_2016-12-31',
                 },
                 {
-                    'string': 'Nov 2016',
-                    'period_type': 'month',
-                    'mode': 'range',
-                    'date_from': '2016-11-01',
-                    'date_to': '2016-11-30',
-                    'currency_table_period_key': '2016-11-01_2016-11-30',
+                    'string': '2015',
+                    'period_type': 'year',
+                    'date_from': '2015-01-01',
+                    'date_to': '2015-12-31',
                 },
             ],
         )
@@ -662,25 +793,21 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         self._assert_filter_comparison(
             self.date_range_report,
             {
-                'date': {'filter': 'custom', 'mode': 'range', 'date_from': '2017-01-01', 'date_to': '2017-01-15'},
+                'date': {'date_from': '2017-01-01', 'date_to': '2017-01-15'},
                 'comparison': {'filter': 'same_last_year', 'number_period': 2},
             },
             [
                 {
-                    'string': 'From %s\nto  %s' % (format_date(self.env, '2016-01-01'), format_date(self.env, '2016-01-15')),
+                    'string': '%s - %s' % (format_date(self.env, '2016-01-01'), format_date(self.env, '2016-01-15')),
                     'period_type': 'custom',
-                    'mode': 'range',
                     'date_from': '2016-01-01',
                     'date_to': '2016-01-15',
-                    'currency_table_period_key': '2016-01-01_2016-01-15',
                 },
                 {
-                    'string': 'From %s\nto  %s' % (format_date(self.env, '2015-01-01'), format_date(self.env, '2015-01-15')),
+                    'string': '%s - %s' % (format_date(self.env, '2015-01-01'), format_date(self.env, '2015-01-15')),
                     'period_type': 'custom',
-                    'mode': 'range',
                     'date_from': '2015-01-01',
                     'date_to': '2015-01-15',
-                    'currency_table_period_key': '2015-01-01_2015-01-15',
                 },
             ],
         )
@@ -692,43 +819,37 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         '''
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'custom', 'mode': 'range', 'date_from': '2017-12-01', 'date_to': '2017-12-31'}},
+            {'date': {'date_from': '2017-12-01', 'date_to': '2017-12-31'}},
             {
                 'string': 'Dec 2017',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'custom',
+                'fallback_from': 'custom',
                 'date_from': '2017-12-01',
                 'date_to': '2017-12-31',
-                'currency_table_period_key': '2017-12-01_2017-12-31',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'custom', 'mode': 'range', 'date_from': '2017-10-01', 'date_to': '2017-12-31'}},
+            {'date': {'date_from': '2017-10-01', 'date_to': '2017-12-31'}},
             {
                 'string': 'Oct - Dec 2017',
                 'period_type': 'quarter',
-                'mode': 'range',
-                'filter': 'custom',
+                'fallback_from': 'custom',
                 'date_from': '2017-10-01',
                 'date_to': '2017-12-31',
-                'currency_table_period_key': '2017-10-01_2017-12-31',
             },
         )
 
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'custom', 'mode': 'range', 'date_from': '2017-01-01', 'date_to': '2017-12-31'}},
+            {'date': {'date_from': '2017-01-01', 'date_to': '2017-12-31'}},
             {
                 'string': '2017',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'custom',
+                'period_type': 'year',
+                'fallback_from': 'custom',
                 'date_from': '2017-01-01',
                 'date_to': '2017-12-31',
-                'currency_table_period_key': '2017-01-01_2017-12-31',
             },
         )
 
@@ -736,15 +857,13 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         self.env.company.fiscalyear_last_month = '6'
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'custom', 'mode': 'range', 'date_from': '2016-07-01', 'date_to': '2017-06-30'}},
+            {'date': {'date_from': '2016-07-01', 'date_to': '2017-06-30'}},
             {
-                'string': '2016 - 2017',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'custom',
+                'string': 'Jul 2016 - Jun 2017',
+                'period_type': 'year',
+                'fallback_from': 'custom',
                 'date_from': '2016-07-01',
                 'date_to': '2017-06-30',
-                'currency_table_period_key': '2016-07-01_2017-06-30',
             },
         )
 
@@ -756,15 +875,13 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         })
         self._assert_filter_date(
             self.date_range_report,
-            {'date': {'filter': 'custom', 'mode': 'range', 'date_from': '2017-10-01', 'date_to': '2017-12-31'}},
+            {'date': {'date_from': '2017-10-01', 'date_to': '2017-12-31'}},
             {
                 'string': 'custom 0',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'custom',
+                'period_type': 'year',
+                'fallback_from': 'custom',
                 'date_from': '2017-10-01',
                 'date_to': '2017-12-31',
-                'currency_table_period_key': '2017-10-01_2017-12-31',
             },
         )
 
@@ -777,75 +894,62 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         ''' Test the filter_date with 'today' in 'single' mode.'''
         self._assert_filter_date(
             self.single_date_report,
-            {'date': {'filter': 'today', 'mode': 'single'}},
+            {'date': {'default_opening_date': 'today'}},
             {
                 'string': 'As of %s' % format_date(self.env, '2017-12-30'),
                 'period_type': 'today',
-                'mode': 'single',
-                'filter': 'today',
-                'date_from': '2017-01-01',
+                'date_from': None,
                 'date_to': '2017-12-30',
-                'currency_table_period_key': 'None_2017-12-30',
             },
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'today', 'mode': 'single'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'today'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-12-31'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2016-01-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': 'None_2016-12-31',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2015-12-31'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2015-01-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2015-12-31',
-                    'currency_table_period_key': 'None_2015-12-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'today', 'mode': 'single'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'today'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-12-30'),
                     'period_type': 'today',
-                    'mode': 'single',
-                    'date_from': '2016-01-01',
+                    'date_from': None,
                     'date_to': '2016-12-30',
-                    'currency_table_period_key': 'None_2016-12-30',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2015-12-30'),
                     'period_type': 'today',
-                    'mode': 'single',
-                    'date_from': '2015-01-01',
+                    'date_from': None,
                     'date_to': '2015-12-30',
-                    'currency_table_period_key': 'None_2015-12-30',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'today', 'mode': 'single'}, 'comparison': {'filter': 'custom', 'date_to': '2016-12-31'}},
+            {'date': {'default_opening_date': 'today'}, 'comparison': {'filter': 'custom', 'date_to': '2016-12-31'}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-12-31'),
-                    'period_type': 'custom',
-                    'mode': 'single',
-                    'date_from': False,
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': 'None_2016-12-31',
                 },
             ],
         )
@@ -855,60 +959,49 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         ''' Test the filter_date with 'this_month'/'last_month' in 'single' mode.'''
         self._assert_filter_date(
             self.single_date_report,
-            {'date': {'filter': 'this_month', 'mode': 'single'}},
+            {'date': {'default_opening_date': 'this_month'}},
             {
                 'string': 'As of %s' % format_date(self.env, '2017-12-31'),
                 'period_type': 'month',
-                'mode': 'single',
-                'filter': 'this_month',
-                'date_from': '2017-12-01',
+                'date_from': None,
                 'date_to': '2017-12-31',
-                'currency_table_period_key': 'None_2017-12-31',
             },
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_month', 'mode': 'single'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_month'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2017-11-30'),
                     'period_type': 'month',
-                    'mode': 'single',
-                    'date_from': '2017-11-01',
+                    'date_from': None,
                     'date_to': '2017-11-30',
-                    'currency_table_period_key': 'None_2017-11-30',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2017-10-31'),
                     'period_type': 'month',
-                    'mode': 'single',
-                    'date_from': '2017-10-01',
+                    'date_from': None,
                     'date_to': '2017-10-31',
-                    'currency_table_period_key': 'None_2017-10-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_month', 'mode': 'single'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_month'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-12-31'),
                     'period_type': 'month',
-                    'mode': 'single',
-                    'date_from': '2016-12-01',
+                    'date_from': None,
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': 'None_2016-12-31',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2015-12-31'),
                     'period_type': 'month',
-                    'mode': 'single',
-                    'date_from': '2015-12-01',
+                    'date_from': None,
                     'date_to': '2015-12-31',
-                    'currency_table_period_key': 'None_2015-12-31',
                 },
             ],
         )
@@ -918,60 +1011,49 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         ''' Test the filter_date with 'this_quarter'/'last_quarter' in 'single' mode.'''
         self._assert_filter_date(
             self.single_date_report,
-            {'date': {'filter': 'this_quarter', 'mode': 'single'}},
+            {'date': {'default_opening_date': 'this_quarter'}},
             {
                 'string': 'As of %s' % format_date(self.env, '2017-12-31'),
                 'period_type': 'quarter',
-                'mode': 'single',
-                'filter': 'this_quarter',
-                'date_from': '2017-10-01',
+                'date_from': None,
                 'date_to': '2017-12-31',
-                'currency_table_period_key': 'None_2017-12-31',
             },
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_quarter', 'mode': 'single'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_quarter'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2017-09-30'),
                     'period_type': 'quarter',
-                    'mode': 'single',
-                    'date_from': '2017-07-01',
+                    'date_from': None,
                     'date_to': '2017-09-30',
-                    'currency_table_period_key': 'None_2017-09-30',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2017-06-30'),
                     'period_type': 'quarter',
-                    'mode': 'single',
-                    'date_from': '2017-04-01',
+                    'date_from': None,
                     'date_to': '2017-06-30',
-                    'currency_table_period_key': 'None_2017-06-30',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_quarter', 'mode': 'single'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_quarter'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-12-31'),
                     'period_type': 'quarter',
-                    'mode': 'single',
-                    'date_from': '2016-10-01',
+                    'date_from': None,
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': 'None_2016-12-31',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2015-12-31'),
                     'period_type': 'quarter',
-                    'mode': 'single',
-                    'date_from': '2015-10-01',
+                    'date_from': None,
                     'date_to': '2015-12-31',
-                    'currency_table_period_key': 'None_2015-12-31',
                 },
             ],
         )
@@ -981,60 +1063,49 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         ''' Test the filter_date with 'this_year'/'last_year' in 'single' mode when the fiscal year ends the 12-31.'''
         self._assert_filter_date(
             self.single_date_report,
-            {'date': {'filter': 'this_year', 'mode': 'single'}},
+            {'date': {'default_opening_date': 'this_year'}},
             {
                 'string': 'As of %s' % format_date(self.env, '2017-12-31'),
-                'period_type': 'fiscalyear',
-                'mode': 'single',
-                'filter': 'this_year',
-                'date_from': '2017-01-01',
+                'period_type': 'year',
+                'date_from': None,
                 'date_to': '2017-12-31',
-                'currency_table_period_key': 'None_2017-12-31',
             },
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_year', 'mode': 'single'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-12-31'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2016-01-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': 'None_2016-12-31',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2015-12-31'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2015-01-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2015-12-31',
-                    'currency_table_period_key': 'None_2015-12-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_year', 'mode': 'single'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-12-31'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2016-01-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2016-12-31',
-                    'currency_table_period_key': 'None_2016-12-31',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2015-12-31'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2015-01-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2015-12-31',
-                    'currency_table_period_key': 'None_2015-12-31',
                 },
             ],
         )
@@ -1047,134 +1118,139 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
 
         self._assert_filter_date(
             self.single_date_report,
-            {'date': {'filter': 'this_year', 'mode': 'single'}},
+            {'date': {'default_opening_date': 'this_year'}},
             {
                 'string': 'As of %s' % format_date(self.env, '2018-06-30'),
-                'period_type': 'fiscalyear',
-                'mode': 'single',
-                'filter': 'this_year',
-                'date_from': '2017-07-01',
+                'period_type': 'year',
+                'date_from': None,
                 'date_to': '2018-06-30',
-                'currency_table_period_key': 'None_2018-06-30',
             },
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_year', 'mode': 'single'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2017-06-30'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2016-07-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2017-06-30',
-                    'currency_table_period_key': 'None_2017-06-30',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-06-30'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2015-07-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2016-06-30',
-                    'currency_table_period_key': 'None_2016-06-30',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_year', 'mode': 'single'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2017-06-30'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2016-07-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2017-06-30',
-                    'currency_table_period_key': 'None_2017-06-30',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-06-30'),
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2015-07-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2016-06-30',
-                    'currency_table_period_key': 'None_2016-06-30',
                 },
             ],
         )
 
-    @freeze_time('2017-12-31')
+    @freeze_time('2025-12-31')
     def test_filter_date_fiscalyear_single_custom_years(self):
         ''' Test the filter_date with 'this_year'/'last_year' in 'single' mode with custom account.fiscal.year records.'''
-        # Create a custom fiscal year for the nine previous quarters.
-        today = fields.Date.from_string('2017-12-31')
-        for i in range(9):
-            quarter_df, quarter_dt = date_utils.get_quarter(today - relativedelta(months=i * 3))
+        custom_ranges = [
+            ('2024-02-14', '2024-12-31', 'FY 2024_2'),
+            ('2025-01-01', '2025-04-30', 'FY 2025_1'),
+            ('2025-05-01', '2025-12-31', 'FY 2025_2'),
+            ('2026-05-01', '2026-06-30', 'FY 2026_2'),
+        ]
+
+        for custom_range in custom_ranges:
             self.env['account.fiscal.year'].create({
-                'name': 'custom %s' % i,
-                'date_from': fields.Date.to_string(quarter_df),
-                'date_to': fields.Date.to_string(quarter_dt),
+                'name': custom_range[2],
+                'date_from': custom_range[0],
+                'date_to': custom_range[1],
                 'company_id': self.env.company.id,
             })
 
         self._assert_filter_date(
             self.single_date_report,
-            {'date': {'filter': 'this_year', 'mode': 'single'}},
+            {'date': {'default_opening_date': 'this_year'}},
             {
-                'string': 'custom 0',
-                'period_type': 'fiscalyear',
-                'mode': 'single',
-                'filter': 'this_year',
-                'date_from': '2017-10-01',
-                'date_to': '2017-12-31',
-                'currency_table_period_key': 'None_2017-12-31',
+                'string': 'FY 2025_2',
+                'period_type': 'year',
+                'date_from': None,
+                'date_to': '2025-12-31',
+            },
+        )
+
+        with freeze_time('2026-05-01'):
+            self._assert_filter_date(
+                self.single_date_report,
+                {'date': {'default_opening_date': 'this_year'}},
+                {
+                    'string': 'FY 2026_2',
+                    'period_type': 'year',
+                    'date_from': None,
+                    'date_to': '2026-06-30',
+                },
+            )
+
+        self._assert_filter_date(
+            self.single_date_report,
+            {'date': {'period_type': 'year', 'date_to': '2024-01-01'}},
+            {
+                'string': 'As of 02/13/2024',
+                'period_type': 'year',
+                'date_from': None,
+                'date_to': '2024-02-13',
             },
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_year', 'mode': 'single'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
-                    'string': 'custom 1',
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2017-07-01',
-                    'date_to': '2017-09-30',
-                    'currency_table_period_key': 'None_2017-09-30',
+                    'string': 'FY 2025_1',
+                    'period_type': 'year',
+                    'date_from': None,
+                    'date_to': '2025-04-30',
                 },
                 {
-                    'string': 'custom 2',
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2017-04-01',
-                    'date_to': '2017-06-30',
-                    'currency_table_period_key': 'None_2017-06-30',
+                    'string': 'FY 2024_2',
+                    'period_type': 'year',
+                    'date_from': None,
+                    'date_to': '2024-12-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'this_year', 'mode': 'single'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'default_opening_date': 'this_year'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
-                    'string': 'custom 4',
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2016-10-01',
-                    'date_to': '2016-12-31',
-                    'currency_table_period_key': 'None_2016-12-31',
+                    'string': 'As of 12/31/2024',
+                    'period_type': 'year',
+                    'date_from': None,
+                    'date_to': '2024-12-31',
                 },
                 {
-                    'string': 'custom 8',
-                    'period_type': 'fiscalyear',
-                    'mode': 'single',
-                    'date_from': '2015-10-01',
-                    'date_to': '2015-12-31',
-                    'currency_table_period_key': 'None_2015-12-31',
+                    'string': 'As of 12/31/2023',
+                    'period_type': 'year',
+                    'date_from': None,
+                    'date_to': '2023-12-31',
                 },
             ],
         )
@@ -1184,60 +1260,49 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         ''' Test the filter_date with a custom date in 'single' mode.'''
         self._assert_filter_date(
             self.single_date_report,
-            {'date': {'filter': 'custom', 'mode': 'single', 'date_to': '2018-01-15'}},
+            {'date': {'date_to': '2018-01-15'}},
             {
                 'string': 'As of %s' % format_date(self.env, '2018-01-15'),
                 'period_type': 'custom',
-                'mode': 'single',
-                'filter': 'custom',
-                'date_from': '2018-01-01',
+                'date_from': None,
                 'date_to': '2018-01-15',
-                'currency_table_period_key': 'None_2018-01-15',
             },
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'custom', 'mode': 'single', 'date_to': '2018-01-15'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'date_to': '2018-01-15'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2017-12-31'),
-                    'period_type': 'month',
-                    'mode': 'single',
-                    'date_from': '2017-12-01',
+                    'period_type': 'year',
+                    'date_from': None,
                     'date_to': '2017-12-31',
-                    'currency_table_period_key': 'None_2017-12-31',
                 },
                 {
-                    'string': 'As of %s' % format_date(self.env, '2017-11-30'),
-                    'period_type': 'month',
-                    'mode': 'single',
-                    'date_from': '2017-11-01',
-                    'date_to': '2017-11-30',
-                    'currency_table_period_key': 'None_2017-11-30',
+                    'string': 'As of %s' % format_date(self.env, '2016-12-31'),
+                    'period_type': 'year',
+                    'date_from': None,
+                    'date_to': '2016-12-31',
                 },
             ],
         )
 
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'custom', 'mode': 'single', 'date_to': '2018-01-15'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
+            {'date': {'date_to': '2018-01-15'}, 'comparison': {'filter': 'same_last_year', 'number_period': 2}},
             [
                 {
                     'string': 'As of %s' % format_date(self.env, '2017-01-15'),
                     'period_type': 'custom',
-                    'mode': 'single',
-                    'date_from': '2017-01-01',
+                    'date_from': None,
                     'date_to': '2017-01-15',
-                    'currency_table_period_key': 'None_2017-01-15',
                 },
                 {
                     'string': 'As of %s' % format_date(self.env, '2016-01-15'),
                     'period_type': 'custom',
-                    'mode': 'single',
-                    'date_from': '2016-01-01',
+                    'date_from': None,
                     'date_to': '2016-01-15',
-                    'currency_table_period_key': 'None_2016-01-15',
                 },
             ],
         )
@@ -1245,48 +1310,21 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
     @freeze_time('2021-09-01')
     def test_filter_date_custom_single_period_type_month(self):
         ''' Test the filter_date with a custom date in 'single' mode.'''
-        self._assert_filter_date(
-            self.single_date_report,
-            {
-                'date': {
-                    'period_type': 'today',
-                    'mode': 'single',
-                    'date_from': '2021-09-01',
-                    'date_to': '2019-07-18',
-                    'filter': 'custom',
-                    'currency_table_period_key': 'None_2019-07-18',
-                }
-            },
-            {
-                'string': 'As of %s' % format_date(self.env, '2019-07-18'),
-                'period_type': 'custom',
-                'mode': 'single',
-                'filter': 'custom',
-                'date_from': '2019-07-01',
-                'date_to': '2019-07-18',
-                'currency_table_period_key': 'None_2019-07-18',
-            },
-        )
-
         self._assert_filter_comparison(
             self.single_date_report,
-            {'date': {'filter': 'custom', 'mode': 'single', 'date_to': '2019-07-18'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
+            {'date': {'date_to': '2019-07-18'}, 'comparison': {'filter': 'previous_period', 'number_period': 2}},
             [
                 {
-                    'string': 'As of %s' % format_date(self.env, '2019-06-30'),
-                    'period_type': 'month',
-                    'mode': 'single',
-                    'date_from': '2019-06-01',
-                    'date_to': '2019-06-30',
-                    'currency_table_period_key': 'None_2019-06-30',
+                    'string': 'As of %s' % format_date(self.env, '2018-12-31'),
+                    'period_type': 'year',
+                    'date_from': None,
+                    'date_to': '2018-12-31',
                 },
                 {
-                    'string': 'As of %s' % format_date(self.env, '2019-05-31'),
-                    'period_type': 'month',
-                    'mode': 'single',
-                    'date_from': '2019-05-01',
-                    'date_to': '2019-05-31',
-                    'currency_table_period_key': 'None_2019-05-31',
+                    'string': 'As of %s' % format_date(self.env, '2017-12-31'),
+                    'period_type': 'year',
+                    'date_from': None,
+                    'date_to': '2017-12-31',
                 },
             ],
         )
@@ -1303,7 +1341,7 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             'model_id': 'account.move.line',
             'user_ids': [self.uid],
             'name': 'To Check',
-            'domain': '[("move_id.checked", "=", False)]',
+            'domain': '[("move_id.review_state", "in", ("todo", "anomaly"))]',
         })
 
         report = self.env['account.report'].create({
@@ -1336,7 +1374,7 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
                 + self.init_invoice("out_invoice", self.partner_a, "2023-09-01", amounts=[1000])
         )
         moves.action_post()
-        moves[0].checked = False
+        moves[0].review_state = 'todo'
 
         options = self._generate_options(report, '2023-01-01', '2023-12-31')
 
@@ -1371,7 +1409,7 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             })],
         } for i in range(1, 4)]).action_post()
 
-        self.start_tour("/odoo", 'account_reports_hide_0_lines', login=self.env.user.login)
+        self.start_tour("/odoo/action-account_reports.action_account_report_bs", 'account_reports_hide_0_lines', login=self.env.user.login)
 
     @freeze_time('2020-01-16')
     def test_hide_line_at_0_tour_with_string_columns(self):
@@ -1390,7 +1428,7 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             })],
         }).action_post()
 
-        self.start_tour("/odoo", 'account_reports_hide_0_lines_with_string_columns', login=self.env.user.login)
+        self.start_tour("/odoo/action-account_reports.action_account_report_general_ledger", 'account_reports_hide_0_lines_with_string_columns', login=self.env.user.login)
 
     def test_rounding_unit_tour(self):
         self.env['account.move'].create({
@@ -1405,7 +1443,7 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             })],
         }).action_post()
 
-        self.start_tour("/odoo", 'account_reports_rounding_unit', login=self.env.user.login)
+        self.start_tour("/odoo/action-account_reports.action_account_report_bs", 'account_reports_rounding_unit', login=self.env.user.login)
 
     def test_filter_multi_company(self):
         def _check_company_filter(allowed_companies, expected_companies, message=None, match_active=True):
@@ -1502,7 +1540,7 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         )
 
         _check_company_filter(
-            tax_unit.company_ids + branch_2_1,
+            main_company | tax_unit.company_ids + branch_2_1,
             main_company + branch_1_2,
             "Opening the report with a company selector matching more than the content of the tax unit should not select the tax unit, "
             "but take the accessible branches with the same VAT number as the active company.",
@@ -1536,20 +1574,20 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
     @freeze_time('2017-12-31')
     def test_period_order(self):
         report = self.date_range_report
-        previous_options = {'date': {'filter': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'same_last_year', 'number_period': 1, 'period_order': 'descending'}}
+        previous_options = {'date': {'default_opening_date': 'this_year', 'mode': 'range'}, 'comparison': {'filter': 'same_last_year', 'number_period': 1, 'period_order': 'descending'}}
         options = report.get_options(previous_options)
 
         expected_values = [
             {
                 'name': '2017',
                  'forced_options': {
-                    'date': {'string': '2017', 'period_type': 'fiscalyear', 'mode': 'range', 'date_from': '2017-01-01', 'date_to': '2017-12-31', 'filter': 'this_year', 'currency_table_period_key': '2017-01-01_2017-12-31'}
+                    'date': {'string': '2017', 'period_type': 'year', 'date_from': '2017-01-01', 'date_to': '2017-12-31'}
                  }
             },
             {
                 'name': '2016',
                 'forced_options': {
-                    'date': {'string': '2016', 'period_type': 'fiscalyear', 'mode': 'range', 'date_from': '2016-01-01', 'date_to': '2016-12-31', 'currency_table_period_key': '2016-01-01_2016-12-31'}
+                    'date': {'string': '2016', 'period_type': 'year', 'date_from': '2016-01-01', 'date_to': '2016-12-31'}
                 }
             },
         ]
@@ -1582,11 +1620,8 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             {
                 'string': 'Sep 2024',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'this_month',
                 'date_from': '2024-09-01',
                 'date_to': '2024-09-30',
-                'currency_table_period_key': '2024-09-01_2024-09-30',
             },
         )
 
@@ -1602,27 +1637,19 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             {
                 'string': 'Aug 2024',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'previous_month',
-                'period': -1,
                 'date_from': '2024-08-01',
                 'date_to': '2024-08-31',
-                'currency_table_period_key': '2024-08-01_2024-08-31',
             },
         )
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'period': -8, 'filter': 'previous_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': fields.Date.today() + relativedelta(months=-8), 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Jan 2024',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'previous_month',
-                'period': -8,
                 'date_from': '2024-01-01',
                 'date_to': '2024-01-31',
-                'currency_table_period_key': '2024-01-01_2024-01-31',
             },
         )
 
@@ -1630,16 +1657,27 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'period': -1, 'filter': 'previous_return_period'}, 'no_report_reroute': True},
+            {'date': {'default_opening_date': 'previous_return_period'}, 'no_report_reroute': True},
             {
                 'string': '2023',
-                'period_type': 'fiscalyear',
-                'mode': 'range',
-                'filter': 'previous_year',
-                'period': -1,
+                'period_type': 'year',
                 'date_from': '2023-01-01',
                 'date_to': '2023-12-31',
-                'currency_table_period_key': '2023-01-01_2023-12-31',
+            },
+        )
+
+        self.env.company.fiscalyear_last_day = 31
+        self.env.company.fiscalyear_last_month = '5'
+
+        # Tax report has the filter use_fiscal_periods set to False, so it should not take the fiscal years dates into account.
+        self._assert_filter_date(
+            generic_tax_report,
+            {'date': {'default_opening_date': 'previous_return_period'}, 'no_report_reroute': True},
+            {
+                'string': '2023',
+                'period_type': 'year',
+                'date_from': '2023-01-01',
+                'date_to': '2023-12-31',
             },
         )
 
@@ -1652,12 +1690,8 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             {
                 'string': 'Jan 2024 - Jun 2024',
                 'period_type': 'return_period',
-                'mode': 'range',
-                'filter': 'previous_return_period',
-                'period': -1,
                 'date_from': '2024-01-01',
                 'date_to': '2024-06-30',
-                'currency_table_period_key': '2024-01-01_2024-06-30',
             },
         )
 
@@ -1666,152 +1700,112 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2024-08-01', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2024-08-01', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Aug 2024',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'previous_month',
-                'period': -1,
                 'date_from': '2024-08-01',
                 'date_to': '2024-08-31',
-                'currency_table_period_key': '2024-08-01_2024-08-31',
             },
         )
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2023-08-01', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2023-08-01', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Aug 2023',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'previous_month',
-                'period': -13,
                 'date_from': '2023-08-01',
                 'date_to': '2023-08-31',
-                'currency_table_period_key': '2023-08-01_2023-08-31',
             },
         )
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2021-08-01', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2021-08-01', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Aug 2021',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'previous_month',
-                'period': -37,
                 'date_from': '2021-08-01',
                 'date_to': '2021-08-31',
-                'currency_table_period_key': '2021-08-01_2021-08-31',
             },
         )
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2025-08-01', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2025-08-01', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Aug 2025',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'next_month',
-                'period': 11,
                 'date_from': '2025-08-01',
                 'date_to': '2025-08-31',
-                'currency_table_period_key': '2025-08-01_2025-08-31',
             },
         )
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2025-02-01', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2025-02-01', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Feb 2025',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'next_month',
-                'period': 5,
                 'date_from': '2025-02-01',
                 'date_to': '2025-02-28',
-                'currency_table_period_key': '2025-02-01_2025-02-28',
             },
         )
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2024-12-01', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2024-12-01', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Dec 2024',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'next_month',
-                'period': 3,
                 'date_from': '2024-12-01',
                 'date_to': '2024-12-31',
-                'currency_table_period_key': '2024-12-01_2024-12-31',
             },
         )
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2023-11-01', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2023-11-01', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Nov 2023',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'previous_month',
-                'period': -10,
                 'date_from': '2023-11-01',
                 'date_to': '2023-11-30',
-                'currency_table_period_key': '2023-11-01_2023-11-30',
             },
         )
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2023-03-01', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2023-03-01', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Mar 2023',
                 'period_type': 'month',
-                'mode': 'range',
-                'filter': 'previous_month',
-                'period': -18,
                 'date_from': '2023-03-01',
                 'date_to': '2023-03-31',
-                'currency_table_period_key': '2023-03-01_2023-03-31',
             },
         )
 
         return_type.deadline_periodicity = 'trimester'
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2023-03-01', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2023-03-01', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Jan - Mar 2023',
                 'period_type': 'quarter',
-                'mode': 'range',
-                'filter': 'previous_quarter',
-                'period': -6,
                 'date_from': '2023-01-01',
                 'date_to': '2023-03-31',
-                'currency_table_period_key': '2023-01-01_2023-03-31',
             },
         )
 
         self._assert_filter_date(
             generic_tax_report,
-            {'date': {'date_to': '2022-12-31', 'filter': 'custom_return_period'}, 'no_report_reroute': True},
+            {'date': {'date_to': '2022-12-31', 'period_type': 'return_period'}, 'no_report_reroute': True},
             {
                 'string': 'Oct - Dec 2022',
                 'period_type': 'quarter',
-                'mode': 'range',
-                'filter': 'previous_quarter',
-                'period': -7,
                 'date_from': '2022-10-01',
                 'date_to': '2022-12-31',
-                'currency_table_period_key': '2022-10-01_2022-12-31',
             },
         )
 
@@ -1854,6 +1848,7 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             'line_ids': [Command.create({
                 'name': "The line",
                 'groupby': 'account_id',
+                'foldability': 'always_unfolded',
                 'expression_ids': [Command.create({
                     'label': 'balance',
                     'engine': 'domain',
@@ -1868,8 +1863,8 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             [0, 1],
             [
                 ('The line', 100),
-                ('121000 Account Receivable', 50),
-                ('121000 Account Receivable', 50),
+                ('121000 Accounts Receivable', 50),
+                ('121000 Accounts Receivable', 50),
                 ('Total The line', 100)
             ],
             options,
@@ -1881,7 +1876,7 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             [0, 1],
             [
                 ('The line', 100),
-                ('121000 Account Receivable', 100),
+                ('121000 Accounts Receivable', 100),
                 ('Total The line', 100)
             ],
             options,
@@ -1963,13 +1958,29 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
 
         self.company_data['company'].chart_template = 'us'
         options = self._generate_options(root_report, '2024-01-01', '2024-12-31')
-        # Multi-company environment with first company with US COA and second with generic COA
-        assert_available_variants_match(options, root_report + report_always + report_generic_coa + report_us_coa + report_us_country)
+        assert_available_variants_match(options, root_report + report_always + report_us_coa + report_us_country)
 
         # only allow company 1 (US COA)
         self.env.user.company_ids = self.company_data['company']
         options = self._generate_options(root_report, '2024-01-01', '2024-12-31')
         assert_available_variants_match(options, root_report + report_always + report_us_coa + report_us_country)
+
+        report_consolidation = self.env['account.report'].create({
+            'name': "Report Consolidation",
+            'root_report_id': root_report.id,
+            'availability_condition': 'consolidation',
+        })
+
+        options = self._generate_options(root_report, '2024-01-01', '2024-12-31', default_options={'selected_variant_id': None})
+        assert_available_variants_match(options, root_report + report_always + report_us_coa + report_us_country)
+        self.assertEqual(options['selected_variant_id'], report_us_country.id)
+
+        # Selecting a second company makes the consolidation variant available, and it becomes the default
+        # variant to open, ahead of the still-matching country/coa variants.
+        self.env.user.company_ids = self.company_data['company'] + self.company_data_2['company']
+        options = self._generate_options(root_report, '2024-01-01', '2024-12-31', default_options={'selected_variant_id': None})
+        assert_available_variants_match(options, root_report + report_always + report_us_coa + report_consolidation + report_us_country)
+        self.assertEqual(options['selected_variant_id'], report_consolidation.id)
 
     def test_send_customer_statement_without_template(self):
         """Test sending the customer statement without an email template."""
@@ -1986,3 +1997,15 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         self.assertFalse(wizard.mail_template_id)
 
         wizard.action_send_and_print()
+
+    def test_fiscalyear_end_on_feb_29(self):
+        """Ensure that when the fiscal year ends on February 29, the reporting
+        options correctly compute the start of the next fiscal period.
+        """
+        current_company = self.env.company
+        current_company.write({'fiscalyear_last_day': 29, 'fiscalyear_last_month': '2'})
+        report = self.env.ref('account_reports.customer_statement_report')
+        options = report.get_options({})
+
+        self.assertEqual(options['filter_date']['filters']['month']['start_day'], 1)
+        self.assertEqual(options['filter_date']['filters']['month']['start_month'], 3)

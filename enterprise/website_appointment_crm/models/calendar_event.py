@@ -9,7 +9,7 @@ class CalendarEvent(models.Model):
 
     def _get_lead_values(self, partner):
         lead_values = super()._get_lead_values(partner)
-        visitor_sudo = self.env['website.visitor']._get_visitor_from_request()
+        visitor_sudo = self.env['ir.http']._get_visitor_from_request()
         # Ensures that we enrich the lead with the actual visitor information
         # (i.e. either anonymous or identified as the partner booking the appointment)
         if visitor_sudo and (not visitor_sudo.partner_id or visitor_sudo.partner_id == partner):

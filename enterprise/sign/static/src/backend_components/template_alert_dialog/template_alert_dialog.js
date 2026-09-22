@@ -1,13 +1,10 @@
-import { ConfirmationDialog, AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { AlertDialog, alertDialogProps } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { useProps, t } from "@odoo/owl";
 
 export class TemplateAlertDialog extends AlertDialog {
-    static props = {
-        ...AlertDialog.props,
-        body: { type: String, optional: true },
-    };
-    static defaultProps = {
-        ...ConfirmationDialog.defaultProps,
-        ...AlertDialog.defaultProps,
-    };
+    props = useProps({
+        ...alertDialogProps,
+        body: t.string().optional(),
+    });
     static template = "sign.TemplateAlertDialog";
 }

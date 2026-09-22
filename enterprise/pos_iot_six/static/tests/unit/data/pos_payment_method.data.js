@@ -12,15 +12,13 @@ PosPaymentMethod._records = [
     {
         id: 4,
         name: "SIX",
-        is_cash_count: false,
-        split_transactions: false,
         type: "bank",
         image: false,
         sequence: 1,
         payment_method_type: "terminal",
-        use_payment_terminal: "six_iot",
+        payment_provider: "six_iot",
         default_qr: false,
-        is_online_payment: false,
         iot_device_id: 6,
+        write_date: "2025-01-01 10:00:00",
     },
 ];

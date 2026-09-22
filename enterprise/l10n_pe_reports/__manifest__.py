@@ -9,8 +9,7 @@ Electronic accounting reports
 
 P&L + balance Sheet
     """,
-    "version": "1.0",
-    "author": "Vauxoo, Odoo SA",
+    "author": "Vauxoo, Odoo S.A.",
     "category": "Accounting/Localizations/Reporting",
     "website": "https://www.odoo.com/app/accounting",
     "license": "OEEL-1",
@@ -19,7 +18,6 @@ P&L + balance Sheet
         "account_reports",
     ],
     "data": [
-        "security/ir.model.access.csv",
         "data/balance_sheet.xml",
         "data/profit_loss.xml",
         "data/account_ple_purchase_8_1_report.xml",
@@ -27,9 +25,11 @@ P&L + balance Sheet
         "data/account_ple_sales_14_1_report.xml",
         "data/l10n_pe.ple.usage.csv",
         "data/res.country.csv",
+        "data/tax_report.xml",
+        "data/account_return_data.xml",
         "views/account_move_view.xml",
         "views/res_config_settings_views.xml",
+        'security/ir.access.csv',
     ],
-    "installable": True,
     "auto_install": True,
 }

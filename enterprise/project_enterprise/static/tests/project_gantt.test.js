@@ -1,8 +1,8 @@
 import { beforeEach, describe, test, expect } from "@odoo/hoot";
-import { queryAllTexts, click } from "@odoo/hoot-dom";
-import { animationFrame } from "@odoo/hoot-mock";
+import { queryAllTexts, click, waitFor } from "@odoo/hoot-dom";
+import { runAllTimers } from "@odoo/hoot-mock";
 
-import { onRpc } from "@web/../tests/web_test_helpers";
+import { contains, onRpc } from "@web/../tests/web_test_helpers";
 
 import { mailModels } from "@mail/../tests/mail_test_helpers";
 
@@ -46,14 +46,14 @@ test("should display 'View Tasks' and 'Edit' buttons in the popover footer", asy
     await mountGanttView({
         arch: `
             <gantt date_start="date_start" date_stop="date">
-                <templates>
-                    <div t-name="gantt-popover">
-                        <footer replace="0">
+                <popover>
+                    <templates>
+                        <div t-name="popover-footer" replace="0">
                             <button name="action_view_tasks" type="object" string="View Tasks"
                                 class="btn btn-sm btn-primary"/>
-                        </footer>
-                    </div>
-                </templates>
+                        </div>
+                    </templates>
+                </popover>
             </gantt>
         `,
         resModel: "project.project",
@@ -72,12 +72,12 @@ test("should display 'View Tasks' and 'Edit' buttons in the popover footer", asy
     });
     expect(SELECTORS.pill).toHaveCount(1);
 
-    await click(SELECTORS.pill);
-    await animationFrame();
-    expect(".o_popover").toHaveCount(1);
-    expect(".o_popover .popover-footer button").toHaveCount(2);
-    expect(queryAllTexts(".o_popover .popover-footer button")).toEqual(["Edit", "View Tasks"]);
-    await click(".o_popover .popover-footer button:first-child");
-    await click(".o_popover .popover-footer button:last-child");
+    await contains(SELECTORS.pill).click();
+    await runAllTimers();
+    await waitFor(".o_popover");
+    expect(".o_popover .o_popover_footer button").toHaveCount(2);
+    expect(queryAllTexts(".o_popover .o_popover_footer button")).toEqual(["Edit", "View Tasks"]);
+    await click(".o_popover .o_popover_footer button:first-child");
+    await click(".o_popover .o_popover_footer button:last-child");
     expect.verifySteps(["Edit", "view tasks"]);
 });

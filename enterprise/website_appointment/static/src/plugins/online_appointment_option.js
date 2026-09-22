@@ -1,13 +1,14 @@
-import { BaseOptionComponent, useDomState } from "@html_builder/core/utils";
+import { BaseOptionComponent } from "@html_builder/core/base_option_component";
+import { useDomState } from "@html_builder/core/utils";
 import { onWillStart } from "@odoo/owl";
-import { Deferred } from "@web/core/utils/concurrency";
+import { registry } from "@web/core/registry";
 
 const { DateTime } = luxon;
 
 export class OnlineAppointmentOption extends BaseOptionComponent {
+    static id = "online_appointment_option";
     static template = "website_appointment.OnlineAppointmentOption";
     static dependencies = ["OnlineAppointmentOption"];
-    static selector = ".s_online_appointment";
 
     setup() {
         super.setup();
@@ -16,10 +17,10 @@ export class OnlineAppointmentOption extends BaseOptionComponent {
         this.fetchAppointmentTypes = this.dependencies.OnlineAppointmentOption.fetchAppointmentTypes;
         this.datetime_now = DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss");
         this.current_website = this.env.services.website.currentWebsite;
-        const onReady = new Deferred();
+        const onReady = Promise.withResolvers();
         this.state = useDomState(
             async (editingElement) => {
-                await onReady;
+                await onReady.promise;
                 const appointmentTypes = JSON.parse(editingElement.dataset.appointmentTypes);
                 const currentAppointmentId =
                     appointmentTypes.length === 1 ? appointmentTypes[0] : null;
@@ -81,3 +82,5 @@ export class OnlineAppointmentOption extends BaseOptionComponent {
         }
     }
 }
+
+registry.category("website-options").add(OnlineAppointmentOption.id, OnlineAppointmentOption);

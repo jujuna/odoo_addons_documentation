@@ -1,4 +1,5 @@
 import { expect, test } from "@odoo/hoot";
+import { waitFor } from "@odoo/hoot-dom";
 import { animationFrame, runAllTimers } from "@odoo/hoot-mock";
 import { EventBus } from "@odoo/owl";
 import {
@@ -58,7 +59,7 @@ test("Shareable error dialog", async () => {
     await mountWithCleanup(MainComponentsContainer);
 
     Promise.reject(error);
-    await animationFrame();
+    await waitFor(".modal");
     expect.verifyErrors(["Message"]);
     expect(".modal-footer button:contains(Close)").toHaveCount(1);
     expect(".modal-footer button:contains(Share)").toHaveCount(1);
@@ -67,8 +68,7 @@ test("Shareable error dialog", async () => {
     expect(".modal-footer button:contains(Share)").not.toBeEnabled();
     await animationFrame();
     expect.verifySteps(["Upload traceback", "test url", "Success notification"]);
-    expect(".modal-footer .o_field_CopyClipboardChar").toHaveCount(1);
-    expect(".modal-footer .o_field_CopyClipboardChar").toHaveText("test url");
+    expect(".modal-footer button:contains(Share) + div").toHaveText("test url");
     await contains(".o_clipboard_button").click();
     await animationFrame();
     expect.verifySteps(["test url"]);
@@ -88,7 +88,7 @@ test("Error dialog is not shareable for portal user", async () => {
     await mountWithCleanup(MainComponentsContainer);
 
     Promise.reject(error);
-    await animationFrame();
+    await waitFor(".modal");
     expect.verifyErrors(["Message"]);
     expect(".modal-footer button:contains(Close)").toHaveCount(1);
     expect(".modal-footer button:contains(Share)").toHaveCount(0);
@@ -160,8 +160,7 @@ test("Multiple error dialogs", async () => {
     expect(".modal-footer button:contains(Share):eq(2)").not.toBeEnabled();
     await animationFrame();
     expect.verifySteps(["Upload traceback", "test url", "Success notification"]);
-    expect(".modal-footer .o_field_CopyClipboardChar").toHaveCount(1);
-    expect(".modal-footer .o_field_CopyClipboardChar").toHaveText("test url");
+    expect(".modal-footer button:contains(Share) + div").toHaveText("test url");
     await contains(".o_clipboard_button").click();
     await animationFrame();
     expect.verifySteps(["test url"]);

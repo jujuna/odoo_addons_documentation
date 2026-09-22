@@ -2,49 +2,52 @@ import { formatDate, deserializeDate } from "@web/core/l10n/dates";
 import { Dialog } from "@web/core/dialog/dialog";
 import { user } from "@web/core/user";
 
-import { useState, Component, onWillRender } from "@odoo/owl";
+import { Component, computed, proxy, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
-import { groupBy, sortBy } from "@web/core/utils/arrays";
+import { sortBy } from "@web/core/utils/arrays";
 
 export class StudioApprovalInfos extends Component {
     static template = "StudioApprovalInfos";
     static components = { Dialog };
-    static props = {
-        isPopover: Boolean,
-        approval: Object,
-        close: { type: Function, optional: true },
-    };
+    props = useProps({
+        isPopover: t.boolean(),
+        approval: t.object(),
+        close: t.function().optional(),
+    });
+
+    ruleIdToEntry = computed(() =>
+        Object.fromEntries(this.state.entries.map((e) => [e.rule_id[0], e]))
+    );
+
+    canRevokeByRuleId = computed(() => {
+        let ruleGrouped = Object.groupBy(
+            Object.values(this.props.approval.rules),
+            (rule) => rule.notification_order
+        );
+
+        ruleGrouped = sortBy(Object.entries(ruleGrouped), ([key]) => parseInt(key), "desc");
+
+        const result = {};
+
+        let canRevoke = false;
+        for (const group of ruleGrouped) {
+            const localCanRevoke = canRevoke;
+            group[1].forEach((rule) => {
+                result[rule.id] = localCanRevoke;
+                canRevoke ||= rule.can_validate;
+            });
+        }
+
+        return result;
+    });
 
     setup() {
         this.user = user;
         const approval = this.props.approval;
         this.approval = approval;
-        this.state = useState(approval.state);
+        this.state = proxy(approval.state);
         this.actionService = useService("action");
-        onWillRender(() => {
-            this.ruleIdToEntry = Object.fromEntries(
-                this.state.entries.map((e) => [e.rule_id[0], e])
-            );
-
-            let ruleGrouped = groupBy(
-                Object.values(this.props.approval.rules),
-                "notification_order"
-            );
-            ruleGrouped = sortBy(
-                Object.entries(ruleGrouped),
-                ([key, group]) => parseInt(key),
-                "desc"
-            );
-
-            let canRevoke = false;
-            for (const group of ruleGrouped) {
-                const localCanRevoke = canRevoke;
-                group[1].forEach((r) => {
-                    r._canRevoke = localCanRevoke;
-                    canRevoke = canRevoke || r.can_validate;
-                });
-            }
-        });
+        this.uiService = useService("ui");
     }
 
     formatDate(val, format) {
@@ -52,7 +55,7 @@ export class StudioApprovalInfos extends Component {
     }
 
     getEntry(ruleId) {
-        return this.ruleIdToEntry[ruleId];
+        return this.ruleIdToEntry()[ruleId];
     }
 
     setApproval(ruleId, approved) {
@@ -60,9 +63,8 @@ export class StudioApprovalInfos extends Component {
     }
 
     canRevokeEntry(ruleId) {
-        const rule = this.props.approval.rules[ruleId];
         const entry = this.getEntry(ruleId);
-        return entry.user_id[0] === this.user.userId || rule._canRevoke;
+        return entry.user_id[0] === this.user.userId || this.canRevokeByRuleId()[ruleId];
     }
 
     cancelApproval(ruleId) {

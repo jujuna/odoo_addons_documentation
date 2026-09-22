@@ -65,7 +65,7 @@ class L10n_AuAuditLoggingMixin(models.AbstractModel):
         self.env["l10n_au.audit.log"].sudo().create(logs_to_create)
 
     def write(self, vals):
-        records_to_log = self._records_to_log()
+        records_to_log = self.sudo()._records_to_log()
 
         if not records_to_log:
             return super().write(vals)
@@ -78,7 +78,7 @@ class L10n_AuAuditLoggingMixin(models.AbstractModel):
             before_groups = {rec.id: rec.group_ids for rec in records_to_log}
         # Log from res.groups the same as when write is triggered on res.user
         elif self._name == "res.groups" and "user_ids" in vals:
-            users_changed = self.env["res.users"].browse(vals.get("user_ids")[0][2])._records_to_log()
+            users_changed = self.env["res.users"].browse(vals.get("user_ids")[0][2]).sudo()._records_to_log()
             before_groups = {user.id: user.group_ids for user in users_changed}
 
         res = super().write(vals)
@@ -96,7 +96,7 @@ class L10n_AuAuditLoggingMixin(models.AbstractModel):
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
-        records_to_log = records._records_to_log()
+        records_to_log = records.sudo()._records_to_log()
         if records_to_log:
             records_to_log._create_audit_logs(records_to_log._get_audit_logging_fields())
             if self._name == "res.users":

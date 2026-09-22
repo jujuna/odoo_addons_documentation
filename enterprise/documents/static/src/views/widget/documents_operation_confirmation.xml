@@ -5,7 +5,7 @@
         <button
             t-on-click="() => this.onClick()"
             t-out="this.buttonLabel"
-            t-att-disabled="!this.props.record.data.display_name || this.props.record.data.user_permission !== 'edit'"
+            t-att-disabled="!this.props.record.data.display_name || this.props.record.data.user_permission !== 'edit' || this.preventNoOperation"
             class="btn btn-primary w-100"
         />
     </t>

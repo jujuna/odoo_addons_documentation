@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 
-from lxml import html, etree
+from lxml import etree, html
 
 from odoo import models
 from odoo.tools.translate import _
@@ -30,10 +30,6 @@ class WebsitePage(models.Model):
                 # Remove \ufeff character from the html (it is a BOM character that is not supported by lxml)
                 el = html.fromstring(snippet.replace('\ufeff', ''))
 
-                # TODO: Add the data-snippet attribute to identify the snippet
-                # for compatibility code
-                # el.attrib['data-snippet'] = snippet["name"]
-
                 # Tweak the shape of the first snippet to connect it
                 # properly with the header color in some themes
                 if i == 1:
@@ -56,10 +52,10 @@ class WebsitePage(models.Model):
 
     def _create_header(self, homepage_data):
         # Remove all website menus, keep only the top menu "container"
-        self.env['website.menu'].search([('website_id', '=', self.website_id.id)]).unlink()
+        self.env['website.menu'].sudo().search([('website_id', '=', self.website_id.id)]).unlink()
 
         # Create the top menu of which to bind the menu buttons to.
-        top_menu = self.env['website.menu'].create({
+        top_menu = self.env['website.menu'].sudo().create({
             'name': _('Top Menu for Website %s', self.website_id.id),
             'url': '/default-main-menu',
             'website_id': self.website_id.id,
@@ -75,7 +71,7 @@ class WebsitePage(models.Model):
                     parent_menu = self._create_menu(button, top_menu)
                     # Create the submenu menu.
                     children_menus = button.get('menu_content', {}).get('content', [])
-                    self.env['website.menu'].create([{
+                    self.env['website.menu'].sudo().create([{
                         'name': child_menu['name'],
                         'url': child_menu['href'],
                         'parent_id': parent_menu and parent_menu.id,
@@ -87,7 +83,7 @@ class WebsitePage(models.Model):
                     mega_menu_content = button.get('menu_content', {}).get('content')
                     if not button_name or not button_href or not mega_menu_content:
                         return
-                    self.env['website.menu'].create({
+                    self.env['website.menu'].sudo().create({
                         'name': button_name,
                         'url': button_href,
                         'website_id': self.website_id.id,
@@ -109,19 +105,18 @@ class WebsitePage(models.Model):
         menu_name = menu_vals.get('name')
         menu_href = menu_vals.get('href')
         if not menu_name or not menu_href:
-            return
-        menu = self.env['website.menu'].create({
+            return None
+        return self.env['website.menu'].sudo().create({
             'name': menu_name,
             'url': menu_href,
             'parent_id': top_menu.id,
             'website_id': self.website_id.id,
         })
-        return menu
 
     def _apply_website_themes(self, homepage_data):
         user_color_palette = homepage_data.get('user_color_palette', {})
         if user_color_palette:
-            self.env['website.assets'].make_scss_customization(
+            self.env['website.assets'].with_context(website_id=self.website_id.id).make_scss_customization(
                 '/website/static/src/scss/options/colors/user_color_palette.scss',
                 user_color_palette,
             )
@@ -133,7 +128,7 @@ class WebsitePage(models.Model):
             user_values.update({'footer-template': f"'imported-footer-{self.website_id.id}'"})
 
         if user_values:
-            self.env['website.assets'].make_scss_customization(
+            self.env['website.assets'].with_context(website_id=self.website_id.id).make_scss_customization(
                 '/website/static/src/scss/options/user_values.scss',
                 user_values,
             )
@@ -156,7 +151,7 @@ class WebsitePage(models.Model):
         <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">{"".join(rendered_snippets)}</div>
     </xpath>"""
 
-        self.env['ir.ui.view'].create({
+        self.env['ir.ui.view'].sudo().create({
             'name': 'Template WS Custom Footer',
             'type': 'qweb',
             'key': f'website_generator.template_ws_custom_footer_{self.website_id.id}',

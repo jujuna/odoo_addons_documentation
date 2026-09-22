@@ -1,3 +1,4 @@
+import { useEnv } from "@web/owl2/utils";
 import { rpc, rpcBus } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { SearchModel } from "@web/search/search_model";
@@ -9,7 +10,7 @@ import {
     parseStringToXml,
     serializeXmlToString,
 } from "@web_studio/client_action/view_editor/editors/xml_utils";
-import { EventBus, markRaw, useEnv, reactive, toRaw } from "@odoo/owl";
+import { EventBus, markRaw, proxy, toRaw, computed, Resource, types as t } from "@odoo/owl";
 import { user } from "@web/core/user";
 import { parseXML } from "@web/core/utils/xml";
 import { viewTypeToString } from "@web_studio/studio_service";
@@ -22,7 +23,8 @@ import { getModifier, resetViewCompilerCache } from "@web/views/view_compiler";
 import { _t } from "@web/core/l10n/translation";
 import { EditorOperations, SnackbarIndicator } from "@web_studio/client_action/editor/edition_flow";
 import { Race } from "@web/core/utils/concurrency";
-import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { AlertDialog, ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { SelectionContentDialog } from "./interactive_editor/field_configuration/selection_content_dialog";
 
 const editorsRegistry = registry.category("studio_editors");
 const viewRegistry = registry.category("views");
@@ -98,7 +100,17 @@ export class ViewEditorModel extends Reactive {
         this.bus = markRaw(new EventBus());
         this._services = markRaw(services);
         this._studio = services.studio;
-
+        this.dropHooks = new Resource({
+            validation: t.object({
+                id: t.string(),
+                accept: t.function(),
+                getHookConfig: t.function(),
+                highlightHooks: t.function().optional(),
+            }),
+        });
+        this.dropHooksMapped = computed(() =>
+            Object.fromEntries(this.dropHooks.items().map((i) => [i.id, i]))
+        );
         this._snackBar = new SnackbarIndicator();
         this._operations = new EditorOperationsWithSnackbar({
             do: this._handleOperations.bind(this),
@@ -246,7 +258,7 @@ export class ViewEditorModel extends Reactive {
 
             let field;
             if (isField) {
-                field = reactive(this.fields[attrs.name]);
+                field = proxy(this.fields[attrs.name]);
                 Object.defineProperty(field, "label", {
                     get() {
                         return field.string;
@@ -254,7 +266,7 @@ export class ViewEditorModel extends Reactive {
                     configurable: true,
                 });
             }
-            return reactive({
+            return proxy({
                 arch: node,
                 attrs,
                 humanName,
@@ -594,7 +606,7 @@ export class ViewEditorModel extends Reactive {
         // store the last active xpath in this variable
         this.activeNodeXpath = undefined;
 
-        const resetEl = this.viewRef.el;
+        const resetEl = this.viewRef();
         if (resetEl) {
             cleanClickedElements(resetEl);
         }
@@ -621,7 +633,12 @@ export class ViewEditorModel extends Reactive {
     async renameField(fieldName, newName, { label, autoUnique = true } = {}) {
         newName = ViewEditorModel.sanitizeString(newName);
 
-        if (!newName.startsWith("x_studio_")) {
+        if (newName.startsWith("_")) {
+            // keep default fieldName (randomly generated) if the new name is full of
+            // invalid chars (example arabic letters) to prevent having x_studio__ (which contains
+            // forbidden double underscore pattern)
+            newName = fieldName;
+        } else if (!newName.startsWith("x_studio_")) {
             newName = `x_studio_${newName}`;
         }
 
@@ -671,6 +688,71 @@ export class ViewEditorModel extends Reactive {
         this.setRenameableField(fieldName, false);
         this.setRenameableField(newName, true);
         this._operations.doMulti(JSON.parse(strOperations.replace(re, `$1${newName}$2`)));
+    }
+
+    getNewFieldName(fieldType, relatedField = null) {
+        const existingFields = this.fields;
+        let fieldNamePrefix = `x_studio_${fieldType}`;
+        // Studio fields name should be in the form: `x_studio_<field_type>_<incement>`
+        // And for related fields: `x_studio_related_<field_name>_<increment>`
+        if (relatedField && fieldType == "related") {
+            const matchRelatedField = relatedField.match(/([^.]*)$/);
+            if (matchRelatedField) {
+                fieldNamePrefix = fieldNamePrefix.concat(`_${matchRelatedField[1]}`);
+            }
+        }
+        // We need to find the biggest existing increment of the homonym in case
+        // some fields were deleted
+        const homonymsIncrement = Object.keys(existingFields)
+            .filter((name) => name.startsWith(fieldNamePrefix))
+            .map((name) => {
+                const matchIncrement = name.match(/_(\d+)$/);
+                return matchIncrement ? parseInt(matchIncrement[1]) : 0;
+            });
+        const maxIncrement = homonymsIncrement.length ? Math.max(...homonymsIncrement) : 0;
+        return `${fieldNamePrefix}_${maxIncrement + 1}`;
+    }
+
+    editFieldSelectionChoices({ resModel, fieldName }) {
+        resModel = resModel || this.resModel;
+        const field = this.viewDescriptions.relatedModels[resModel].fields[fieldName];
+        this._services.dialog.add(SelectionContentDialog, {
+            defaultChoices: toRaw(field).selection.map((s) => [...s]),
+            onConfirm: async (choices) => {
+                const result = await this._decoratedRpc("/web_studio/edit_field", {
+                    model_name: resModel,
+                    field_name: field.name,
+                    values: { selection: JSON.stringify(choices) },
+                    force_edit: false,
+                });
+                let reflectChanges = !result;
+                if (result && result.records_linked) {
+                    reflectChanges = false;
+                    await new Promise((resolve) => {
+                        this._services.dialog.add(ConfirmationDialog, {
+                            body:
+                                result.message ||
+                                _t("Are you sure you want to remove the selection values?"),
+                            confirmLabel: _t("Delete Values"),
+                            confirm: async () => {
+                                await this._decoratedRpc("/web_studio/edit_field", {
+                                    model_name: resModel,
+                                    field_name: field.name,
+                                    values: { selection: JSON.stringify(choices) },
+                                    force_edit: true,
+                                });
+                                reflectChanges = true;
+                                resolve();
+                            },
+                            cancel: () => resolve(),
+                        });
+                    });
+                }
+                if (reflectChanges) {
+                    field.selection = choices;
+                }
+            },
+        });
     }
 
     //-----------------------------------------------------------------

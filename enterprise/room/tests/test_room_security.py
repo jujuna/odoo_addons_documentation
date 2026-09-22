@@ -9,6 +9,7 @@ from odoo.addons.room.tests.common import RoomCommon
 from odoo.tests.common import tagged, users
 
 @tagged("room_acl")
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestRoomSecurity(RoomCommon, MailCase):
     """Test ACLs on models"""
     @classmethod

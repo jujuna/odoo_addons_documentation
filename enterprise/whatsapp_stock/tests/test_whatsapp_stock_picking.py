@@ -1,9 +1,14 @@
 from odoo import Command
 from odoo.addons.stock.tests.common import TestStockCommon
+from odoo.tests import tagged
+
 from odoo.addons.whatsapp.tests.common import WhatsAppCommon, MockOutgoingWhatsApp
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsappStockPicking(TestStockCommon, WhatsAppCommon, MockOutgoingWhatsApp):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -31,13 +36,14 @@ class WhatsappStockPicking(TestStockCommon, WhatsAppCommon, MockOutgoingWhatsApp
             'move_line_ids': [
                 Command.create({
                     'product_id': self.productA.id,
-                    'product_uom_id': self.productA.uom_id.id,
+                    'uom_id': self.productA.uom_id.id,
                     'location_id': self.stock_location.id,
                     'location_dest_id': self.customer_location.id,
                     'quantity': 1,
                 }),
             ],
         })
+        self.env.company.stock_text_confirmation = True
         self.env.company.stock_confirmation_type = 'whatsapp'
         self.env.company.stock_confirmation_wa_template_id = self.wa_template.id
         with self.mockWhatsappGateway():

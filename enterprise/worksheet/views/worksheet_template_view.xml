@@ -1,38 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="worksheet_template_view_form" model="ir.ui.view">
         <field name="name">worksheet.template.view.form</field>
         <field name="model">worksheet.template</field>
         <field name="priority">10</field>
         <field name="arch" type="xml">
-            <form create="0" duplicate="0">
-                <header>
-                    <field name="model_id" invisible="True"/>
-                    <widget name="open_studio_button" invisible="not model_id" groups="base.group_system"/>
-                    <button name="action_analysis_report" type="object" string="Analysis" data-hotkey="r"/>
-                </header>
+            <form string="worksheet" js_class="worksheet_template_form">
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_worksheets" type="object" class="oe_stat_button" icon="fa-pencil" invisible="worksheet_count &lt;= 0">
-                            <div class="o_field_widget o_stat_info">
-                                <span class="o_stat_value"><field name="worksheet_count"/></span>
-                                <span class="o_stat_text">Worksheets</span>
-                            </div>
-                        </button>
-                    </div>
-                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                     <group>
-                        <group>
-                            <field name="name" placeholder="e.g Device Installation"/>
-                            <field name="active" invisible="1"/>
-                            <field name="company_id" options="{'no_create': 1, 'no_edit': 1, 'no_open': 1}"/>
-                        </group>
-                        <group>
-                            <field name="model_id" invisible="1"/>
-                            <field name="res_model" invisible="1"/>
-                        </group>
+                        <field string="Name" name="name" placeholder="e.g. Device installation"/>
+                        <field name="id" invisible="1"/> <!-- invisible field is needed for the widget 'properties_definition' -->
+                        <field name="worksheet_count" invisible="1"/> <!-- needed for the custom deletion confirmation dialog message -->
+                        <field string="Company" name="company_id"/>
                     </group>
+                    <group string="Worksheet Fields" id="worksheet_group"/>
+                    <div class="fst-italic text-muted mb-2">
+                        Add the fields technicians will fill out for this worksheet.
+                    </div>
+                    <field name="worksheet_properties_definition" widget="worksheet_properties_definition"/>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <record id="worksheet_template_view_form_quick_create" model="ir.ui.view">
+        <field name="name">worksheet.template.view.form</field>
+        <field name="model">worksheet.template</field>
+        <field name="priority">20</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="worksheet.worksheet_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@id='worksheet_group']" position="replace"/>
         </field>
     </record>
 
@@ -40,14 +38,28 @@
         <field name="name">worksheet.template.view.list</field>
         <field name="model">worksheet.template</field>
         <field name="arch" type="xml">
-            <list editable="bottom" multi_edit="1" sample="1" duplicate="0">
+            <list string="worksheet" multi_edit="1" js_class="worksheet_template_list">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="company_id" options="{'no_create': 1, 'no_edit': 1, 'no_open': 1}" optional="hide"/>
-                <field name="worksheet_count" string="Worksheets" optional="show"/>
-                <widget name="open_studio_button"/>
-                <button name="action_analysis_report" class="btn btn-secondary p-1 px-2" type="object" string="Analysis"/>
+                <field name="worksheet_count" column_invisible="1"/> <!-- needed for the custom deletion confirmation dialog message -->
+                <field name="company_id" optional="hide"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_worksheet_properties_definition_kanban" model="ir.ui.view">
+        <field name="name">worksheet.template.properties.definition.kanban</field>
+        <field name="model">worksheet.template</field>
+        <field name="arch" type="xml">
+            <kanban string="worksheet" js_class="worksheet_template_kanban">
+                <templates>
+                    <t t-name="card">
+                        <field name="name"/>
+                        <field name="company_id"/>
+                        <field name="worksheet_count" invisible="1"/> <!-- needed for the custom deletion confirmation dialog message -->
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
 

@@ -11,8 +11,8 @@ from odoo.tools.urls import urljoin as url_join
 class EventTrack(models.Model):
     _inherit = 'event.track'
 
-    firebase_enable_push_notifications = fields.Boolean('Enable Web Push Notifications',
-        compute='_compute_firebase_enable_push_notifications')
+    enable_push_notifications = fields.Boolean('Enable Web Push Notifications',
+        compute='_compute_enable_push_notifications')
     push_reminder = fields.Boolean('Push Reminder',
         help="Check this if you want to send a push notification reminder to everyone that has favorited this track.",
         compute='_compute_push_reminder', store=True, readonly=False)
@@ -24,18 +24,18 @@ class EventTrack(models.Model):
         groups="social.group_social_manager")
 
     @api.depends('event_id')
-    def _compute_firebase_enable_push_notifications(self):
-        current_website = self.env['website'].get_current_website()
+    def _compute_enable_push_notifications(self):
+        current_website = self.env.website
         for track in self:
             website = track.event_id.website_id or current_website
-            track.firebase_enable_push_notifications = website.firebase_enable_push_notifications
+            track.enable_push_notifications = website.enable_push_notifications
 
-    @api.depends('event_id', 'firebase_enable_push_notifications')
+    @api.depends('event_id', 'enable_push_notifications')
     def _compute_push_reminder(self):
         for track in self:
-            if track.firebase_enable_push_notifications and not track.push_reminder:
+            if track.enable_push_notifications and not track.push_reminder:
                 track.push_reminder = True
-            elif not track.firebase_enable_push_notifications or not track.push_reminder:
+            elif not track.enable_push_notifications or not track.push_reminder:
                 track.push_reminder = False
 
     @api.depends('push_reminder')
@@ -108,7 +108,7 @@ class EventTrack(models.Model):
             for social_post in existing_reminders
         }
 
-        current_website = self.env['website'].get_current_website()
+        current_website = self.env.website or self.env.website.browse(self.env.context.get('host_id')) or self.env.ref('base.default_website')
         posts_to_create = []
         for track in self:
             social_account = push_account_by_website.get(track.event_id.website_id or current_website)
@@ -126,9 +126,7 @@ class EventTrack(models.Model):
                 # TODO awa: fetch Youtube thumbnail if no image and youtube_url? Might slow down create.
                 'push_notification_image': track.website_image if track.website_image else False,
                 'account_ids': [(4, social_account.id)],
-                'post_method': 'scheduled',
                 'state': 'scheduled',
-                'use_visitor_timezone': False,
                 'scheduled_date': track.date - relativedelta(minutes=track.push_reminder_delay),
                 'event_track_id': track.id
             }

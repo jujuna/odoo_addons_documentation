@@ -1,8 +1,8 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { click } from "@odoo/hoot-dom";
 import {
+    assignDialogTestEnv,
     contains,
-    makeDialogMockEnv,
     mockService,
     mountWithCleanup,
     onRpc,
@@ -13,15 +13,14 @@ import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { SignRefusalDialog, ThankYouDialog } from "@sign/dialogs/dialogs";
 import { fakeSignInfoService } from "./dialog_utils";
 
-const createEnvForDialog = async () => await makeDialogMockEnv();
-
-const mountSignRefusalDialog = async () => {
+async function mountSignRefusalDialog() {
+    assignDialogTestEnv();
     await mountWithCleanup(SignRefusalDialog, {
         props: {
             close: () => {},
         },
     });
-};
+}
 
 const documentId = 23;
 const signRequestItemToken = "abc";
@@ -37,7 +36,7 @@ describe.current.tags("desktop");
 defineMailModels();
 
 test("sign refusal dialog should render", async () => {
-    await mountSignRefusalDialog(await createEnvForDialog());
+    await mountSignRefusalDialog();
 
     expect(".o_sign_refuse_confirm_message").toHaveCount(1, { message: "should show textarea" });
     expect("button.refuse-button").toHaveCount(1, { message: "should show button" });
@@ -52,7 +51,6 @@ test("sign refusal dialog should call refuse route when confirmed", async () => 
         return true;
     });
 
-    await createEnvForDialog();
     mockService("dialog", {
         add(component) {
             if (component === ThankYouDialog) {
@@ -78,7 +76,6 @@ test("sign refusal dialog should show error dialog when rpc fails", async () => 
         return false;
     });
 
-    await createEnvForDialog();
     mockService("dialog", {
         add(component) {
             if (component === AlertDialog) {

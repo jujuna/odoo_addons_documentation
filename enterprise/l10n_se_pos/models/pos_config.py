@@ -8,7 +8,7 @@ from odoo.tools.translate import _
 class PosConfig(models.Model):
     _inherit = "pos.config"
 
-    iface_sweden_fiscal_data_module = fields.Many2one(
+    iot_fdm_se_id = fields.Many2one(
         "iot.device",
         domain="[('type', '=', 'fiscal_data_module'), '|', ('company_id', '=', False), ('company_id', '=', company_id)]",
     )
@@ -16,31 +16,27 @@ class PosConfig(models.Model):
     def _compute_iot_device_ids(self):
         super()._compute_iot_device_ids()
         for config in self:
-            if config.is_posbox:
-                config.iot_device_ids += config.iface_sweden_fiscal_data_module
+            if config.use_iot_box:
+                config.iot_device_ids += config.iot_fdm_se_id
 
     def _check_before_creating_new_session(self):
-        if self.iface_sweden_fiscal_data_module:
+        if self.iot_fdm_se_id:
             self._check_pos_settings_for_sweden()
         return super()._check_before_creating_new_session()
 
     def _check_pos_settings_for_sweden(self):
-        if self.iface_sweden_fiscal_data_module and not self.company_id.company_registry:
+        if self.iot_fdm_se_id and not self.company_id.partner_id._get_additional_identifier('SE_EN'):
             raise ValidationError(
                 _("The company require a company registry when you are using the blackbox.")
             )
-        if self.iface_sweden_fiscal_data_module and not self.company_id.vat:
+        if self.iot_fdm_se_id and not self.company_id.vat:
             raise ValidationError(
                 _("The company require a VAT number when you are using the blackbox.")
             )
-        if self.iface_sweden_fiscal_data_module and not self.cash_control:
+        if self.iot_fdm_se_id and not self.cash_control:
             raise ValidationError(
                 _("You cannot use the sweden blackbox without cash control.")
             )
-        if self.iface_sweden_fiscal_data_module and self.iface_splitbill:
-            raise ValidationError(
-                _("You cannot use the sweden blackbox with the bill splitting setting.")
-            )
 
     def get_order_sequence_number(self):
-        return self.order_seq_id.number_next_actual
+        return self.order_seq_id._next()

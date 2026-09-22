@@ -123,7 +123,7 @@
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">ZM_NET_PROFIT.balance</field>
                                                 <field name="date_scope">from_fiscalyear</field>
-                                                <field name="subformula">cross_report(l10n_zm_reports.profit_loss_zm)</field>
+                                                <field name="subformula">cross_report(l10n_zm_reports.profit_loss_zm, force_date_scope)</field>
                                             </record>
                                         </field>
                                     </record>
@@ -173,7 +173,6 @@
                         <field name="name">Retained Earnings</field>
                         <field name="code">ZM_EQUITY_RETAINED_EARNINGS</field>
                         <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="domain_formula">-sum([('account_id.account_type', '=', 'equity')])</field>
                     </record>
                 </field>

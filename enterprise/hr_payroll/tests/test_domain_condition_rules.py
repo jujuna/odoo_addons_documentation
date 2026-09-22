@@ -8,6 +8,7 @@ from odoo.addons.hr_payroll.tests.common import TestPayslipContractBase
 
 
 @tagged('payslip_domain_condition')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDomainCondition(TestPayslipContractBase):
 
     @classmethod
@@ -39,7 +40,6 @@ class TestDomainCondition(TestPayslipContractBase):
         date_to = date_from + relativedelta(months=1, days=-1)
 
         test_payslip = self.env['hr.payslip'].create({
-            'name': 'Payslip for domain condition tests - ' + str(date_from),
             'employee_id': employee.id,
             'company_id': employee.company_id.id,
             'struct_id': struct.id,
@@ -69,8 +69,8 @@ class TestDomainCondition(TestPayslipContractBase):
         self.env['hr.salary.rule'].create({
             'name': 'Always True Domain Rule',
             'code': 'DOMTRUE',
-            'category_id': self.env.ref('hr_payroll.ALW').id,
-            'struct_id': domain_test_structure_01.id,
+            'category_ids': [(4, self.env.ref('hr_payroll.ALW').id)],
+            'struct_ids': [(4, domain_test_structure_01.id)],
             'condition_select': 'domain',
             'condition_domain': "[]",
             'amount_select': 'fix',
@@ -80,8 +80,8 @@ class TestDomainCondition(TestPayslipContractBase):
         self.env['hr.salary.rule'].create({
             'name': 'Shrek Specific Domain Rule',
             'code': 'DOMSHREK',
-            'category_id': self.env.ref('hr_payroll.ALW').id,
-            'struct_id': domain_test_structure_01.id,
+            'category_ids': [(4, self.env.ref('hr_payroll.ALW').id)],
+            'struct_ids': [(4, domain_test_structure_01.id)],
             'condition_select': 'domain',
             'condition_domain': "[('employee_id.name', '=', 'Shrek')]",
             'amount_select': 'fix',
@@ -91,8 +91,8 @@ class TestDomainCondition(TestPayslipContractBase):
         self.env['hr.salary.rule'].create({
             'name': 'Always False Domain Rule',
             'code': 'DOMFALSE',
-            'category_id': self.env.ref('hr_payroll.ALW').id,
-            'struct_id': domain_test_structure_01.id,
+            'category_ids': [(4, self.env.ref('hr_payroll.ALW').id)],
+            'struct_ids': [(4, domain_test_structure_01.id)],
             'condition_select': 'domain',
             'condition_domain': "[('id', '=', 0)]",
             'amount_select': 'fix',
@@ -119,8 +119,8 @@ class TestDomainCondition(TestPayslipContractBase):
         self.env['hr.salary.rule'].create({
             'name': 'Date Specific Domain Rule',
             'code': 'DOMDATE',
-            'category_id': self.env.ref('hr_payroll.ALW').id,
-            'struct_id': domain_test_structure_02.id,
+            'category_ids': [(4, self.env.ref('hr_payroll.ALW').id)],
+            'struct_ids': [(4, domain_test_structure_02.id)],
             'condition_select': 'domain',
             'condition_domain': '[("date_from", ">=", "2024-06-01")]',
             'amount_select': 'fix',
@@ -130,8 +130,8 @@ class TestDomainCondition(TestPayslipContractBase):
         self.env['hr.salary.rule'].create({
             'name': 'Company Specific Domain Rule',
             'code': 'DOMCOMP',
-            'category_id': self.env.ref('hr_payroll.ALW').id,
-            'struct_id': domain_test_structure_02.id,
+            'category_ids': [(4, self.env.ref('hr_payroll.ALW').id)],
+            'struct_ids': [(4, domain_test_structure_02.id)],
             'condition_select': 'domain',
             'condition_domain': '[("company_id.name", "=", "Donkey Comp")]',
             'amount_select': 'fix',
@@ -163,8 +163,8 @@ class TestDomainCondition(TestPayslipContractBase):
         self.env['hr.salary.rule'].create({
             'name': 'Complex Domain Rule',
             'code': 'DOMCOMPX',
-            'category_id': self.env.ref('hr_payroll.ALW').id,
-            'struct_id': domain_test_structure_03.id,
+            'category_ids': [(4, self.env.ref('hr_payroll.ALW').id)],
+            'struct_ids': [(4, domain_test_structure_03.id)],
             'condition_select': 'domain',
             'condition_domain': "[('employee_id.name', 'in', ['Prince', 'Shrek']), ('date_from.year_number', '=', 2024)]",
             'amount_select': 'fix',
@@ -192,8 +192,8 @@ class TestDomainCondition(TestPayslipContractBase):
         self.env['hr.salary.rule'].create({
             'name': 'Complex Domain Rule',
             'code': 'DOMCOMPX',
-            'category_id': self.env.ref('hr_payroll.ALW').id,
-            'struct_id': domain_test_structure_04.id,
+            'category_ids': [(4, self.env.ref('hr_payroll.ALW').id)],
+            'struct_ids': [(4, domain_test_structure_04.id)],
             'condition_select': 'domain',
             'condition_domain': "['|', ('employee_id.name', 'in', ['Prince', 'Shrek']), ('date_from.year_number', '=', 2024)]",
             'amount_select': 'fix',
@@ -239,8 +239,8 @@ class TestDomainCondition(TestPayslipContractBase):
         self.env['hr.salary.rule'].create({
             'name': 'Complex Domain Rule with property fields',
             'code': 'DOMCOMPX',
-            'category_id': self.env.ref('hr_payroll.ALW').id,
-            'struct_id': domain_test_structure_05.id,
+            'category_ids': [(4, self.env.ref('hr_payroll.ALW').id)],
+            'struct_ids': [(4, domain_test_structure_05.id)],
             'condition_select': 'domain',
             'condition_domain': "[('employee_id.employee_properties.payroll_property', '=', 'Pomme'), ('date_from.year_number', '=', 2024)]",
             'amount_select': 'fix',

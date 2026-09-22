@@ -11,7 +11,8 @@
                 <field name="pdf_filename" column_invisible="True"/>
                 <field name="pdf_file" readonly="1" filename="pdf_filename" widget="binary"/>
                 <field name="pdf_to_generate" optional="hide"/>
-                <field name="state" decoration-info="state == 'draft'" decoration-warning="state in ['pdf_to_generate', 'pdf_to_post']" decoration-success="state == 'pdf_generated'" decoration-primary="state == 'pdf_posted'" widget="badge"/>
+                <field name="state" decoration-info="state == 'draft'" decoration-warning="state in ['pdf_to_generate', 'pdf_to_post']" decoration-success="state == 'pdf_generated'" decoration-primary="state == 'pdf_posted'" decoration-danger="state == 'error'" widget="badge"/>
+                <field name="declaration_error" optional="hide"/>
             </list>
         </field>
     </record>

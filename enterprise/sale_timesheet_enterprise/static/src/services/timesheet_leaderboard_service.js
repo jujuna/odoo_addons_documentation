@@ -1,14 +1,13 @@
 import { registry } from "@web/core/registry";
 import { browser } from "@web/core/browser/browser";
 import { serializeDate } from "@web/core/l10n/dates";
-
-const { DateTime } = luxon;
+import { getPeriodRange } from "../utils/kpi_leaderboard_period";
 
 export const timesheetLeaderboardService = {
     async: ["getLeaderboardData"],
     dependencies: ["orm"],
     start(env, { orm }) {
-        let leaderboardData = { leaderboard: [], tip: null };
+        const leaderboardData = { leaderboard: [], tip: null };
         if (!browser.localStorage.getItem("leaderboardType")) {
             browser.localStorage.setItem("leaderboardType", "billing_rate");
         }
@@ -31,7 +30,8 @@ export const timesheetLeaderboardService = {
         };
 
         const resetLeaderboard = () => {
-            leaderboardData = { leaderboard: [], tip: null };
+            leaderboardData.leaderboard = [];
+            leaderboardData.tip = null;
         };
 
         return {
@@ -39,46 +39,29 @@ export const timesheetLeaderboardService = {
                 return leaderboardType;
             },
             get showLeaderboard() {
-                return Boolean(leaderboardData.showLeaderboard);
-            },
-            get showIndicators() {
-                return leaderboardData.billableTimeTarget > 0;
+                return "currentEmployee" in leaderboardData;
             },
             get data() {
                 return leaderboardData;
             },
-            async getLeaderboardData(
-                { periodStart, periodEnd, fetchTips, kwargs } = { fetchTips: true, kwargs: {} }
-            ) {
-                const today = DateTime.local().startOf("day");
-
-                const start = periodStart || today.startOf("month");
-                const stop = periodEnd || today.endOf("month");
+            async getLeaderboardData({ periodStart, fetchTips = true, kwargs = {} }) {
+                const { start, stop } = getPeriodRange(periodStart);
                 if (leaderboardData.anchor?.equals(start)) {
                     return;
                 }
-                const {
-                    billable_time_target,
-                    total_time_target,
-                    leaderboard,
-                    employee_id,
-                    show_leaderboard,
-                    tip
-                } = await orm.call(
+                leaderboardData.anchor = start;
+                const { leaderboard, employee_id, tip } = await orm.call(
                     "res.company",
                     "get_timesheet_ranking_data",
-                    [serializeDate(start), serializeDate(stop), serializeDate(today), !!fetchTips],
+                    [serializeDate(start), serializeDate(stop), !!fetchTips],
                     kwargs
                 );
                 if (!leaderboard) {
                     resetLeaderboard();
                     return;
                 }
-                leaderboardData.billableTimeTarget = billable_time_target || 0;
-                leaderboardData.totalTimeTarget = total_time_target;
                 leaderboardData.leaderboardRaw = leaderboard;
                 leaderboardData.leaderboard = sortAndFilterLeaderboard(leaderboard);
-                leaderboardData.showLeaderboard = show_leaderboard;
 
                 if (fetchTips && tip) {
                     leaderboardData.tip = tip;
@@ -88,7 +71,6 @@ export const timesheetLeaderboardService = {
                 leaderboardData.currentEmployee = setCurrentEmployeeIndexFromLeaderboard(
                     leaderboardData.leaderboard
                 );
-                leaderboardData.anchor = start;
             },
             changeLeaderboardType(type) {
                 leaderboardType = type;

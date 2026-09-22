@@ -2,9 +2,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.addons.helpdesk.tests import common
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHelpdeskSaleCoupon(common.HelpdeskCommon):
     """ Test used to check that the functionalities of After sale in Helpdesk (sale_coupon).
     """
@@ -37,7 +38,7 @@ class TestHelpdeskSaleCoupon(common.HelpdeskCommon):
         }))
         coupon_form.program = program
         sale_coupon = coupon_form.save()
-        sale_coupon.action_coupon_generate_send()
+        composer_action = sale_coupon.action_coupon_generate_send()
 
         coupon = self.env['loyalty.card'].search([
             ('partner_id', '=', self.partner.id),
@@ -49,3 +50,24 @@ class TestHelpdeskSaleCoupon(common.HelpdeskCommon):
             "The ticket is not linked to a coupon")
         self.assertEqual(coupon[0], ticket.coupon_ids[0],
             "The correct coupon should be referenced in the ticket")
+        self.assertIn("Coupon created", ticket.message_ids[0].preview)
+
+        # simulate the user sending the coupon email from the composer
+        attachment = self.env['ir.attachment'].create({
+            'name': 'coupon.txt',
+            'raw': b'coupon',
+        })
+        old_ticket_messages = ticket.message_ids
+        composer = self.env['mail.compose.message'].with_context(composer_action['context']).create({
+            'body': '<p>Here is your coupon code</p>',
+            'attachment_ids': [(6, 0, attachment.ids)],
+        })
+        composer.action_send_mail()
+
+        new_ticket_message = ticket.message_ids - old_ticket_messages
+        self.assertEqual(len(new_ticket_message), 1,
+            "Sending the coupon email should log exactly one message in the ticket's chatter")
+        self.assertIn('Here is your coupon code', new_ticket_message.body,
+            "The email body should be logged in the ticket's chatter")
+        self.assertIn(attachment, new_ticket_message.attachment_ids,
+            "The email attachment should be logged in the ticket's chatter")

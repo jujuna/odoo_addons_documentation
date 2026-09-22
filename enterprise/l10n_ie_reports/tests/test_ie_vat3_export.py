@@ -2,12 +2,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.tests import tagged
-from odoo import fields
 from odoo import tools
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestIeVat3Export(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestAccountReportsCommon.setup_country('ie')
@@ -21,17 +22,14 @@ class TestIeVat3Export(TestAccountReportsCommon):
 
         cls.partner_a.write({
             'name': 'Irish Partner',
-            'is_company': True,
             'country_id': cls.env.ref('base.ie').id,
         })
         cls.partner_b.write({
             'name': 'French Partner',
-            'is_company': True,
             'country_id': cls.env.ref('base.fr').id,
         })
         cls.partner_c = cls.env['res.partner'].create({
             'name': 'English Partner',
-            'is_company': True,
             'country_id': cls.env.ref('base.uk').id,
         })
 
@@ -134,7 +132,7 @@ class TestIeVat3Export(TestAccountReportsCommon):
 
     def test_vat3_export(self):
         report = self.env.ref('l10n_ie.l10n_ie_tr')
-        options = self._generate_options(report, fields.Date.from_string('2023-01-01'), fields.Date.from_string('2023-02-28'))
+        options = self._generate_options(report, '2023-01-01', '2023-02-28')
         stringified_xml = self.env[report.custom_handler_model_name].l10n_ie_export_vat3_to_xml(options)['file_content']
         with tools.file_open('l10n_ie_reports/tests/expected_xmls/vat3.xml', 'rb') as expected_xml_file:
             self.assertXmlTreeEqual(

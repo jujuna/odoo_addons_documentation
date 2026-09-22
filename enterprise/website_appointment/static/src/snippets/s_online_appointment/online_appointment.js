@@ -31,4 +31,3 @@ export class OnlineAppointmentCta extends Interaction {
 registry
     .category("public.interactions")
     .add("website_appointment.online_appointments", OnlineAppointmentCta);
-

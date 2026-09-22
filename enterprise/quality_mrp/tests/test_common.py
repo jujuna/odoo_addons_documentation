@@ -32,17 +32,17 @@ class TestQualityMrpCommon(TestQualityCommon):
         })
         cls.bom = cls.env['mrp.bom'].create({
             'product_tmpl_id': cls.product_tmpl_id,
-            'product_uom_id': cls.product_uom_id,
+            'uom_id': cls.product_uom_id,
             'bom_line_ids': [
                 (0, 0, {
                     'product_id': cls.product_product_drawer_drawer.id,
                     'product_qty': 1,
-                    'product_uom_id': cls.product_uom_id,
+                    'uom_id': cls.product_uom_id,
                     'sequence': 1,
                 }), (0, 0, {
                     'product_id': product_product_drawer_case.id,
                     'product_qty': 1,
-                    'product_uom_id': cls.product_uom_id,
+                    'uom_id': cls.product_uom_id,
                     'sequence': 1,
                 })
             ]

@@ -7,47 +7,53 @@
 # Larissa Manderfeld, 2023
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025.
+# "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-12-10 10:26+0000\n"
+"POT-Creation-Date: 2026-09-11 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 03:36+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
 "hr_payroll_account/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_payroll_account
+#: model:ir.module.module,description:base.module_hr_payroll_account
+msgid ""
+"\n"
+"Generic Payroll system Integrated with Accounting.\n"
+"==================================================\n"
+"\n"
+"    * Expense Encoding\n"
+"    * Payment Encoding\n"
+"    * Company Contribution Management\n"
+msgstr ""
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_count
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_move__payslip_count
 msgid "# of Payslips"
-msgstr "# Gehaltsabrechnungen"
+msgstr "Anzahl Gehaltsabrechnungen"
 
 #. module: hr_payroll_account
-#. odoo-javascript
-#: code:addons/hr_payroll_account/static/src/components/payrun_card/payrun_card.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_kanban
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
 msgid "(Canceled)"
 msgstr "(Storniert)"
 
 #. module: hr_payroll_account
-#. odoo-javascript
-#: code:addons/hr_payroll_account/static/src/components/payrun_card/payrun_card.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_kanban
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
 msgid "(Draft)"
 msgstr "(Entwurf)"
 
 #. module: hr_payroll_account
-#. odoo-javascript
-#: code:addons/hr_payroll_account/static/src/components/payrun_card/payrun_card.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_kanban
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
 msgid "(Posted)"
 msgstr "(Gebucht)"
 
@@ -61,12 +67,23 @@ msgid ""
 "                        <span class=\"o_stat_text\" invisible=\"move_state !"
 "= 'cancel'\">Journal Entry <br/>(Canceled)</span>"
 msgstr ""
-"<span class=\"o_stat_text\" invisible=\"move_state != "
-"'draft'\">Journalbuchung <br/>(Entwurf)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state !"
-"= 'posted'\">Journalbuchung <br/>(Gebucht)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state !"
-"= 'cancel'\">Journalbuchung <br/>(Storniert)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">"
+"Journalbuchung <br/>(Entwurf)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state "
+"!= 'posted'\">Journalbuchung <br/>(Gebucht)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state "
+"!= 'cancel'\">Journalbuchung <br/>(Storniert)</span>"
+
+#. module: hr_payroll_account
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
+msgid ""
+"<span class=\"o_stat_text\">\n"
+"                            Journal Entry <br/> (Preview)\n"
+"                        </span>"
+msgstr ""
+"<span class=\"o_stat_text\">\n"
+"                            Journalbuchung <br/> (Vorschau)\n"
+"                        </span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -74,26 +91,32 @@ msgid "<span class=\"o_stat_text\">Payslip</span>"
 msgstr "<span class=\"o_stat_text\">Gehaltsabrechnung</span>"
 
 #. module: hr_payroll_account
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
+msgid "<span invisible=\"reference\">No payrun id passed in context.</span>"
+msgstr ""
+"<span invisible=\"reference\">Im Kontext wurde keine Abrechnungslauf-ID "
+"übergeben.</span>"
+
+#. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__account
+msgid "Account"
+msgstr "Konto"
+
+#. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_chart_template
 msgid "Account Chart Template"
 msgstr "Kontenplanvorlage"
 
 #. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "Account Journal not configured on Structure"
-msgstr "Buchhaltungsjournal nicht in Struktur konfiguriert"
-
-#. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/account_chart_template.py:0
-msgid "Account Payslip Houserental"
-msgstr "Konto Gehaltsabrechnung Hausmiete"
-
-#. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_salary_rule_view_form
 msgid "Accounting"
 msgstr "Buchhaltung"
+
+#. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__date
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__accounting_date
+msgid "Accounting Date"
+msgstr "Buchungsdatum"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__move_id
@@ -105,12 +128,6 @@ msgstr "Buchungseintrag"
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 msgid "Adjustment Entry"
 msgstr "Berichtigungsbuchung"
-
-#. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "An employee bank account is untrusted"
-msgstr "Das Bankkonto eines Mitarbeiters ist nicht vertrauenswürdig"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_employee__analytic_distribution
@@ -127,39 +144,37 @@ msgid "Analytic Precision"
 msgstr "Kostengenauigkeit"
 
 #. module: hr_payroll_account
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_kanban
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
+msgid "Anonymize Journal Entries"
+msgstr "Journalbuchungen anonymisieren"
+
+#. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid "Are you sure you want to proceed?"
 msgstr "Sind Sie sicher, dass Sie fortfahren möchten?"
 
 #. module: hr_payroll_account
-#: model:ir.actions.act_window,name:hr_payroll_account.action_res_partner_bank_account_form
-#: model:ir.model,name:hr_payroll_account.model_res_partner_bank
-msgid "Bank Accounts"
-msgstr "Bankkonten"
-
-#. module: hr_payroll_account
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_partner_bank_tree_inherit
-msgid "Bank Identifier Code"
-msgstr "BIC"
-
-#. module: hr_payroll_account
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
-msgid "Batch Account Move Lines"
-msgstr "Sammelbuchungszeilen"
+#: model:ir.model.fields,field_description:hr_payroll_account.field_res_config_settings__batch_payroll_move_lines
+msgid "Batch Payroll Journal Items"
+msgstr "Sammelbuchungen für Personalabrechnung"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__batch_payroll_move_lines
+#: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__batch_payroll_move_lines
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__batch_payroll_move_lines
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_company__batch_payroll_move_lines
-#: model:ir.model.fields,field_description:hr_payroll_account.field_res_config_settings__batch_payroll_move_lines
 msgid "Batch Payroll Move Lines"
 msgstr "Sammelbuchungszeilen für Personalabrechnung"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr "Unternehmen"
+
+#. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__company_currency_id
+msgid "Company Currency"
+msgstr "Währung des Unternehmens"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_config_settings
@@ -167,19 +182,24 @@ msgid "Config Settings"
 msgstr "Konfigurationseinstellungen"
 
 #. module: hr_payroll_account
-#. odoo-javascript
-#: code:addons/hr_payroll_account/static/src/components/payrun_card/payrun_card.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_kanban
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
-msgid "Create Draft Entry"
-msgstr "Entwurfseintrag erstellen"
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__create_uid
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__create_uid
+msgid "Created by"
+msgstr "Erstellt von"
 
 #. module: hr_payroll_account
-#: model_terms:ir.actions.act_window,help:hr_payroll_account.action_res_partner_bank_account_form
-msgid "Create a Bank Account"
-msgstr "Ein Bankkonto erstellen"
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__create_date
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__create_date
+msgid "Created on"
+msgstr "Erstellt am"
 
 #. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__credit
+msgid "Credit"
+msgstr "Haben"
+
+#. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_credit
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__account_credit
 msgid "Credit Account"
 msgstr "Habenkonto"
@@ -191,11 +211,12 @@ msgid "Credit Tax Grids"
 msgstr "Haben-Steuerraster"
 
 #. module: hr_payroll_account
-#: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__date
-msgid "Date Account"
-msgstr "Buchungsdatum"
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__debit
+msgid "Debit"
+msgstr "Soll"
 
 #. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__salary_rule_account_debit
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__account_debit
 msgid "Debit Account"
 msgstr "Sollkonto"
@@ -207,9 +228,10 @@ msgid "Debit Tax Grids"
 msgstr "Soll-Steuerraster"
 
 #. module: hr_payroll_account
+#: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip_line__salary_rule_account_debit
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__account_debit
-msgid "Default account defined on the journal of the salary structure."
-msgstr "Standardkonto ist auf Journal der Gehaltsstruktur festgelegt."
+msgid "Default account defined on the journal of the pay structure."
+msgstr "Standardkonto, das im Journal der Gehaltsstruktur definiert ist."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_chart_template__display_name
@@ -219,14 +241,16 @@ msgstr "Standardkonto ist auf Journal der Gehaltsstruktur festgelegt."
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_payment__display_name
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_payment_register__display_name
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payroll_structure__display_name
+#: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payroll_warning__display_name
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__display_name
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__display_name
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__display_name
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__display_name
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_version__display_name
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__display_name
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__display_name
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_company__display_name
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_config_settings__display_name
-#: model:ir.model.fields,field_description:hr_payroll_account.field_res_partner_bank__display_name
 msgid "Display Name"
 msgstr "Anzeigename"
 
@@ -254,16 +278,26 @@ msgstr "Mitarbeiter"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_res_config_settings__batch_payroll_move_lines
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
 msgid ""
 "Enable this option to merge all the accounting entries for the same period "
-"into a single account move line. This will anonymize the accounting entries "
-"but also disable single payment generations."
+"into a single journal item. This will anonymize the accounting entries but "
+"also disable single payment generations."
 msgstr ""
-"Aktivieren Sie diese Option, um alle Buchungseinträge für denselben Zeitraum "
-"in einer einzigen Kontobuchungszeile zusammenzufassen. Dadurch werden die "
-"Buchungseinträge anonymisiert, aber auch die Generierung von Einzelzahlungen "
-"deaktiviert."
+"Aktivieren Sie diese Option, um alle Buchungen für denselben Zeitraum in "
+"einer einzigen Journalbuchung zusammenzufassen. Dadurch werden die Buchungen "
+"anonymisiert, aber auch die Generierung einzelner Zahlungen deaktiviert."
+
+#. module: hr_payroll_account
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
+msgid ""
+"Enable this option to merge journal entries when processing a payrun, so "
+"individual employee amount are not distinguishable in accounting. This also "
+"disables the pay button on individual payslips."
+msgstr ""
+"Aktivieren Sie diese Option, um Journalbuchungen bei der Verarbeitung einer "
+"Gehaltsabrechnung zusammenzuführen, sodass einzelne Mitarbeiterbeträge in "
+"der Buchhaltung nicht unterscheidbar sind. Dadurch wird auch die "
+"Schaltfläche „Bezahlen“ für einzelne Gehaltsabrechnungen deaktiviert."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__employee_move_line
@@ -278,11 +312,8 @@ msgstr ""
 msgid ""
 "Enable this option to split the accountig entries for this rule according to "
 "the payslip line name. It could be useful for deduction/reimbursement or "
-"salary adjustments for instance."
+"payslip adjustments for instance."
 msgstr ""
-"Aktivieren Sie diese Option, um die Buchungen für diese Regel entsprechend "
-"dem Namen der Gehaltsabrechnungszeile aufzuteilen. Dies kann beispielsweise "
-"für Abzüge/Erstattungen oder Gehaltsanpassungen nützlich sein."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
@@ -290,23 +321,14 @@ msgid "Excluded from Net"
 msgstr "Aus Netto ausgeschlossen"
 
 #. module: hr_payroll_account
-#: model_terms:ir.actions.act_window,help:hr_payroll_account.action_res_partner_bank_account_form
-msgid ""
-"From here you can manage all bank accounts linked to you and your contacts."
-msgstr ""
-"Von hier aus können Sie alle mit Ihnen und Ihren Kontakten verbundenen "
-"Bankkonten verwalten."
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
+msgid "Generate Draft Journal Entries"
+msgstr "Journalbuchungen im Entwurf generieren"
 
 #. module: hr_payroll_account
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_kanban
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
 msgid "Generated Journal Entries"
 msgstr "Generierte Journalbuchungen"
-
-#. module: hr_payroll_account
-#: model:ir.model.fields,field_description:hr_payroll_account.field_account_setup_bank_manual_config__has_alt_bank_account
-#: model:ir.model.fields,field_description:hr_payroll_account.field_res_partner_bank__has_alt_bank_account
-msgid "Has Alt Bank Account"
-msgstr "Hat alternatives Bankkonto"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_chart_template__id
@@ -316,14 +338,16 @@ msgstr "Hat alternatives Bankkonto"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_payment__id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_payment_register__id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payroll_structure__id
+#: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payroll_warning__id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_version__id
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__id
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_company__id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_config_settings__id
-#: model:ir.model.fields,field_description:hr_payroll_account.field_res_partner_bank__id
 msgid "ID"
 msgstr "ID"
 
@@ -351,6 +375,16 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_payroll_account/wizard/hr_payroll_payment_report_wizard.py:0
 msgid ""
+"Invalid IBAN for the following Beneficiaries:\n"
+"%s"
+msgstr ""
+"Ungültige IBAN für die folgenden Begünstigten:\n"
+"%s"
+
+#. module: hr_payroll_account
+#. odoo-python
+#: code:addons/hr_payroll_account/wizard/hr_payroll_payment_report_wizard.py:0
+msgid ""
 "Invalid IBAN for the following employees:\n"
 "%s"
 msgstr ""
@@ -359,21 +393,20 @@ msgstr ""
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_journal
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__journal_name
 msgid "Journal"
 msgstr "Journal"
 
 #. module: hr_payroll_account
-#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 #: code:addons/hr_payroll_account/models/hr_payslip_run.py:0
-#: code:addons/hr_payroll_account/static/src/components/payrun_card/payrun_card.xml:0
 #: model:ir.model,name:hr_payroll_account.model_account_move
 msgid "Journal Entry"
 msgstr "Journalbuchung"
 
 #. module: hr_payroll_account
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_kanban
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payrun_payslip_kanban_card_view
 msgid "Journal Entry <br/>"
 msgstr "Journalbuchung<br/>"
 
@@ -383,11 +416,44 @@ msgid "Journal Item"
 msgstr "Buchungszeile"
 
 #. module: hr_payroll_account
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
+msgid "Journal Items"
+msgstr "Buchungszeilen"
+
+#. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip__date
 msgid "Keep empty to use the period of the validation(Payslip) date."
 msgstr ""
 "Leer lassen, um den Zeitraum des Validierungsdatums (Gehaltsabrechnung) zu "
 "verwenden."
+
+#. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__label
+msgid "Label"
+msgstr "Bezeichnung"
+
+#. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_uid
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__write_uid
+msgid "Last Updated by"
+msgstr "Zuletzt aktualisiert von"
+
+#. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__write_date
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__write_date
+msgid "Last Updated on"
+msgstr "Zuletzt aktualisiert am"
+
+#. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__line_ids
+msgid "Line"
+msgstr "Zeile"
+
+#. module: hr_payroll_account
+#: model:ir.model,name:hr_payroll_account.model_mock_account_move_line
+msgid "Mock version of an account move line used for simulations"
+msgstr ""
+"Beispielversion für eine Buchungszeile, die für Simulationen verwendet wird"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_id
@@ -400,13 +466,28 @@ msgid "Move State"
 msgstr "Buchungsstatus"
 
 #. module: hr_payroll_account
+#: model:hr.payroll.warning,name:hr_payroll_account.hr_payroll_warning_no_journal
+msgid "No Journal"
+msgstr "Kein Journal"
+
+#. module: hr_payroll_account
+#. odoo-python
+#: code:addons/hr_payroll_account/models/hr_payroll_warning.py:0
+msgid "No Journal on Structure"
+msgstr "Kein Journal in Struktur"
+
+#. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_salary_rule_view_form
 msgid "None"
 msgstr "Keine"
 
 #. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__partner
+msgid "Partner"
+msgstr "Partner"
+
+#. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid "Pay"
 msgstr "Zahlen"
 
@@ -421,15 +502,25 @@ msgid "Pay Slip"
 msgstr "Gehaltsabrechnung"
 
 #. module: hr_payroll_account
+#: model:ir.model,name:hr_payroll_account.model_account_payment
+msgid "Payment"
+msgstr "Zahlung"
+
+#. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/wizard/account_payment_register.py:0
 msgid "Payment done at %s"
 msgstr "Zahlung getätigt am %s"
 
 #. module: hr_payroll_account
-#: model:ir.model,name:hr_payroll_account.model_account_payment
-msgid "Payments"
-msgstr "Zahlungen"
+#: model:ir.module.module,shortdesc:base.module_hr_payroll_account
+msgid "Payroll Accounting"
+msgstr ""
+
+#. module: hr_payroll_account
+#: model:ir.model,name:hr_payroll_account.model_hr_payroll_warning
+msgid "Payroll Warning"
+msgstr "Warnung für Personalabrechnung"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payslip_line
@@ -437,10 +528,30 @@ msgid "Payslip Line"
 msgstr "Gehaltsabrechnungszeile"
 
 #. module: hr_payroll_account
+#: model:hr.payroll.warning,description:hr_payroll_account.hr_payroll_warning_no_journal
+msgid "Payslip has no journal defined"
+msgstr "Die Gehaltsabrechnung hat kein definiertes Journal"
+
+#. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_ids
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_move__payslip_ids
 msgid "Payslips"
 msgstr "Gehaltsabrechnungen"
+
+#. module: hr_payroll_account
+#: model:ir.actions.act_window,name:hr_payroll_account.action_open_payrun_move_preview
+msgid "Preview of Journal Entry"
+msgstr "Vorschau der Journalbuchung"
+
+#. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_wizard__reference
+msgid "Reference"
+msgstr "Referenz"
+
+#. module: hr_payroll_account
+#: model:hr.payroll.warning,button_name:hr_payroll_account.hr_payroll_warning_no_journal
+msgid "Review Records"
+msgstr "Datensätze prüfen"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -482,7 +593,7 @@ msgstr "Pro Name trennen"
 
 #. module: hr_payroll_account
 #. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
+#: code:addons/hr_payroll_account/models/hr_payroll_warning.py:0
 msgid "Structure"
 msgstr "Struktur"
 
@@ -511,6 +622,11 @@ msgstr ""
 "werden in der Journalbuchung auf der Sollseite angewendet."
 
 #. module: hr_payroll_account
+#: model:ir.model.fields,field_description:hr_payroll_account.field_mock_account_move_line__tax_tag_ids
+msgid "Tax Grids"
+msgstr "Steuerraster"
+
+#. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 msgid ""
@@ -519,27 +635,26 @@ msgstr ""
 "Das Aufwandsjournal „%s“ hat kein ordungsgemäß konfiguriertes Standardkonto!"
 
 #. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "The credit account on the NET salary rule is not reconciliable"
-msgstr "Das Habenkonto in der Regel NETTO-Gehalt ist nicht abstimmbar"
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
+msgid "Total Credit"
+msgstr "Summe Haben"
 
 #. module: hr_payroll_account
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_partner_bank_form_inherit_hr_payroll_account
-msgid "This will replace the employee existing bank account."
-msgstr "Dadurch wird das vorhandene Bankkonto des Mitarbeiters ersetzt."
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.mock_account_move_wizard_form
+msgid "Total Debit"
+msgstr "Summe Soll"
 
 #. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "You can only register payment for posted journal entries."
-msgstr "Sie können nur Zahlungen für gebuchte Journalposten registrieren."
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
+msgid "Validate"
+msgstr "Validieren"
 
 #. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "You can only register payments for unpaid documents."
-msgstr "Sie können nur Zahlungen für unbezahlte Dokumente registrieren."
+#: model:ir.model,name:hr_payroll_account.model_mock_account_move_wizard
+msgid "Wizard to show previews of account moves related to pay runs."
+msgstr ""
+"Assistent für die Vorschau von Buchungszeilen im Zusammenhang mit "
+"Abrechnungsläufen."
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -552,46 +667,19 @@ msgstr ""
 #. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/models/account_journal.py:0
-msgid "You cannot delete the journal linked to a Salary Structure"
+msgid "You cannot delete the journal linked to a Pay Structure"
 msgstr ""
 "Sie können das mit einer Gehaltsstruktur verknüpfte Journal nicht löschen."
 
-#~ msgid ""
-#~ "Some contracts for these payslips have no structure type, employees: %s"
-#~ msgstr ""
-#~ "Einige Verträge für diese Gehaltsabrechnungen haben keinen Strukturtyp, "
-#~ "Mitarbeiter: %s"
-
-#~ msgid "Some payroll structures have no account journal defined on it: %s"
-#~ msgstr ""
-#~ "Einige Gehaltsabrechnungsstrukturen verfügen über kein definiertes "
-#~ "Kontojournal: %s"
-
-#~ msgid "Analytic Account"
-#~ msgstr "Kostenstelle"
-
-#~ msgid "Contract history"
-#~ msgstr "Vertragshistorie"
-
-#~ msgid "Not computed in net accountably"
-#~ msgstr "Nicht in der Nettoberechnung berücksichtigt"
-
-#~ msgid "One of the contract for these payslips has no structure type."
-#~ msgstr ""
-#~ "Einer der Verträge für diese Gehaltsabrechnungen hat keinen Strukturtyp."
-
-#~ msgid "One of the payroll structures has no account journal defined on it."
-#~ msgstr ""
-#~ "In einer der Abrechnungsstrukturen ist kein Kontenjournal definiert."
+#~ msgid "Account Payslip Houserental"
+#~ msgstr "Konto Gehaltsabrechnung Hausmiete"
 
 #~ msgid ""
-#~ "This field allows you to delete the value of this rule in the \"Net "
-#~ "Salary\" rule at the accounting level to explicitly display the value of "
-#~ "this rule in the accounting. For example, if you want to display the "
-#~ "value of your representation fees, you can check this field."
+#~ "Enable this option to split the accountig entries for this rule according "
+#~ "to the payslip line name. It could be useful for deduction/reimbursement "
+#~ "or salary adjustments for instance."
 #~ msgstr ""
-#~ "Mit diesem Feld können Sie den Wert dieser Regel in der „Nettogehalt“-"
-#~ "Regel auf der Buchhaltungsebene löschen, um den Wert dieser Regel "
-#~ "explizit in der Buchhaltung anzuzeigen. Wenn Sie zum Beispiel den Wert "
-#~ "Ihrer Repräsentationsgebühren anzeigen möchten, können Sie dieses Feld "
-#~ "ankreuzen."
+#~ "Aktivieren Sie diese Option, um die Buchungen für diese Regel "
+#~ "entsprechend dem Namen der Gehaltsabrechnungszeile aufzuteilen. Dies kann "
+#~ "beispielsweise für Abzüge/Erstattungen oder Gehaltsanpassungen nützlich "
+#~ "sein."

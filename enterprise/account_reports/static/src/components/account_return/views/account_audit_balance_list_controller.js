@@ -1,15 +1,17 @@
-import { useService } from "@web/core/utils/hooks";
 import { ListController } from "@web/views/list/list_controller";
-import { useAuditBalanceListChatterService } from "./account_audit_balance_list_chatter_service";
-import { onWillStart } from "@odoo/owl";
+import { auditBalanceListChatterPlugin } from "./account_audit_balance_list_chatter_plugin";
+import { onWillStart, providePlugins, usePlugin } from "@odoo/owl";
+import { ORM } from "@web/core/orm_plugin";
 
 export class AccountAuditBalanceListController extends ListController {
     static template = "account_reports.account_audit_balance_list_controller";
 
+    orm = usePlugin(ORM);
+
     setup() {
+        providePlugins([auditBalanceListChatterPlugin]);
         super.setup();
-        this.orm = useService("orm");
-        this.chatterService = useAuditBalanceListChatterService();
+        this.chatterPlugin = usePlugin(auditBalanceListChatterPlugin);
 
         onWillStart(async () => {
             const working_file_id = this.props.context?.working_file_id;
@@ -24,7 +26,7 @@ export class AccountAuditBalanceListController extends ListController {
                 { limit: 1 }
             );
             if (working_file.length === 1) {
-                this.chatterService.chatterState.date_to = working_file[0]?.date_to;
+                this.chatterPlugin.date_to.set(working_file[0].date_to);
             }
         });
     }

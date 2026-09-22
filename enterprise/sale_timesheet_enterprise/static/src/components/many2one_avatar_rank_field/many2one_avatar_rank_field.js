@@ -1,18 +1,13 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 
 export class Many2OneAvatarRankField extends Component {
     static template = "sale_timesheet_enterprise.Many2OneAvatarRankField";
-    static props = {
-        rank: { type: Number },
-        id: { type: Number, optional: true },
-        size: { type: String, optional: true },
-        class: { type: String, optional: true },
-    };
-    static defaultProps = {
-        id: 0,
-        size: "small",
-        class: "",
-    };
+    props = useProps({
+        rank: t.number(),
+        id: t.number().optional(0),
+        size: t.string().optional("small"),
+        class: t.string().optional(""),
+    });
 
     get imgSrc() {
         return this.props.id === 0 ? "/hr/static/src/img/default_image.png" : `/web/image/hr.employee.public/${this.props.id}/avatar_128`;

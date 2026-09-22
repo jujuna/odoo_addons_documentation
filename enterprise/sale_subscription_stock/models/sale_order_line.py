@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from datetime import datetime, time
+
 from dateutil.relativedelta import relativedelta
+import zoneinfo
 
 from odoo import  models, api, fields
 from odoo.tools import format_date, clean_context
@@ -52,7 +55,7 @@ class SaleOrderLine(models.Model):
     def _get_stock_subscription_lines(self):
         """ Return the sale.order.line of self which relate to a subscription of storable products
         """
-        return self.filtered(lambda line: line.recurring_invoice and line.product_id.type == 'consu')
+        return self.filtered(lambda line: line.recurring_invoice and not line._subscription_is_one_time_sale() and line.product_id.type == 'consu')
 
     def _get_invoice_line_parameters(self):
         self.ensure_one()
@@ -150,12 +153,17 @@ class SaleOrderLine(models.Model):
         else:
             move_date = self.order_id.next_invoice_date - relativedelta(days=1)
 
-        current_period_start = self.order_id.last_invoice_date or self.order_id.start_date or fields.Date.today()
+        current_period_start = self.order_id.last_invoice_date or self.order_id.start_date or fields.Date.context_today(self)
         lang_code = self.order_id.partner_id.lang
         format_start = format_date(self.env, current_period_start, lang_code=lang_code)
         format_end = format_date(self.env, move_date, lang_code=lang_code)
+        if self.order_id.last_invoice_date:
+            company_tz = zoneinfo.ZoneInfo(self.order_id.company_id.partner_id.tz or 'UTC')
+            date_planned = datetime.combine(current_period_start, time.min, tzinfo=company_tz).astimezone(zoneinfo.ZoneInfo('UTC')).replace(tzinfo=None)
+        else:
+            date_planned = self.order_id.date_order or fields.Datetime.now()
         values.update({
-            'date_planned': current_period_start,
+            'date_planned': date_planned,
             'date_deadline': move_date,
             'product_description_variants': f'{values.get("product_description_variants", "")}\n{format_start} to {format_end}',
         })

@@ -5,7 +5,7 @@
         <field name="inherit_id" ref="voip.voip_call_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
-                <button name="voip_action_view_applications" class="oe_stat_button" icon="fa-pencil" type="object" invisible="application_count == 0" groups="hr_recruitment.group_hr_recruitment_interviewer">
+                <button name="voip_action_view_applications" class="oe_stat_button" icon="edit" icon_class="oi-filled" type="object" invisible="not partner_id or application_count == 0" groups="hr_recruitment.group_hr_recruitment_interviewer">
                     <field name="application_count" widget="statinfo" string="Applications"/>
                 </button>
             </xpath>

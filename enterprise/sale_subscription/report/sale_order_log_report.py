@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models
+from odoo.tools import SQL
 
 from odoo.addons.sale.models.sale_order import SALE_ORDER_STATE
 from odoo.addons.sale_subscription.models.sale_order import SUBSCRIPTION_PROGRESS_STATE, SUBSCRIPTION_STATES
@@ -40,7 +41,7 @@ class SaleOrderLogReport(models.Model):
     country_id = fields.Many2one('res.country', 'Customer Country', readonly=True)
     industry_id = fields.Many2one('res.partner.industry', 'Customer Industry', readonly=True)
     commercial_partner_id = fields.Many2one('res.partner', 'Customer Entity', readonly=True)
-    subscription_state = fields.Selection(SUBSCRIPTION_STATES, readonly=True)
+    subscription_state = fields.Selection(SUBSCRIPTION_STATES, string="State before", readonly=True)
     state = fields.Selection(selection=SALE_ORDER_STATE, string="Status", readonly=True)
     campaign_id = fields.Many2one('utm.campaign', 'Campaign', readonly=True)
     origin_order_id = fields.Many2one('sale.order', 'First Order', readonly=True)
@@ -54,7 +55,7 @@ class SaleOrderLogReport(models.Model):
     def _with(self):
         companies = self.env['res.company'].search([('active', '=', True)], order='id asc')
         main_company_id = companies[:1]
-        return f"""
+        return SQL("""
         rate_query AS(
             SELECT DISTINCT ON (rc.id)
                    rc.id AS currency_id,
@@ -63,13 +64,13 @@ class SaleOrderLogReport(models.Model):
               FROM res_currency rc
               LEFT JOIN res_currency_rate rcr ON rc.id = rcr.currency_id
              WHERE rc.active = true
-               AND (rcr.company_id IS NULL OR (rcr.company_id = {main_company_id.id} AND rcr.name <= CURRENT_DATE))
+               AND (rcr.company_id IS NULL OR (rcr.company_id = %s AND rcr.name <= CURRENT_DATE))
           ORDER BY rc.id, rcr.name DESC
         )
-        """
+        """, main_company_id.id)
 
     def _select(self):
-        select = f"""
+        return SQL("""
             log.id AS id,
             so.client_order_ref AS client_order_ref,
             log.order_id AS order_id,
@@ -97,7 +98,7 @@ class SaleOrderLogReport(models.Model):
             r1.rate AS currency_rate,
             r2.rate AS user_rate,
             log.currency_id AS log_currency_id,
-            {self.env.company.currency_id.id} AS currency_id,
+            %s AS currency_id,
             log.company_id AS log_cmp,
             CASE
                 WHEN event_type = '0_creation' THEN 1
@@ -108,8 +109,7 @@ class SaleOrderLogReport(models.Model):
             so.first_contract_date AS first_contract_date,
             so.end_date AS end_date,
             so.close_reason_id AS close_reason_id
-        """
-        return select
+        """, self.env.company.currency_id.id)
 
     def _from(self):
         # To avoid looking at the res_currency table for all records, we build a small table with one line per
@@ -118,22 +118,22 @@ class SaleOrderLogReport(models.Model):
         active_id = self.env.context.get('active_model') == 'sale.order' and self.env.context.get('active_id')
         if active_id:
             currency_id = self.env['sale.order'].browse(active_id).currency_id.id
-        return f"""
+        return SQL("""
             sale_order_log log
             JOIN sale_order so ON so.id = log.order_id
             JOIN res_partner partner ON so.partner_id = partner.id
             LEFT JOIN sale_order_close_reason close ON close.id=so.close_reason_id
             JOIN rate_query r1 ON r1.currency_id=log.currency_id
-            JOIN rate_query r2 ON r2.currency_id={currency_id}
-        """
+            JOIN rate_query r2 ON r2.currency_id=%s
+        """, currency_id)
 
     def _where(self):
-        return """
+        return SQL("""
             so.is_subscription
-        """
+        """)
 
     def _group_by(self):
-        return """
+        return SQL("""
             log.id,
             log.order_id,
             log.event_type,
@@ -162,20 +162,21 @@ class SaleOrderLogReport(models.Model):
             partner.commercial_partner_id,
             log.company_id,
             so.close_reason_id
-        """
+        """)
 
     @property
-    def _table_query(self):
-        return self._query()
+    def _table_sql(self):
+        return SQL("(%s)", self._query())
 
     def _query(self):
-        return f"""
-              WITH {self._with()}
-            SELECT {self._select()}
-              FROM {self._from()}
-             WHERE {self._where()}
-          GROUP BY {self._group_by()}
-        """
+        return SQL(
+            "WITH %s SELECT %s FROM %s WHERE %s GROUP BY %s",
+            self._with(),
+            self._select(),
+            self._from(),
+            self._where(),
+            self._group_by(),
+        )
 
     def action_open_sale_order(self):
         self.ensure_one()

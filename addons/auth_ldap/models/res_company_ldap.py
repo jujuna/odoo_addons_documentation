@@ -7,7 +7,6 @@ from ldap.filter import filter_format
 
 from odoo import _, fields, models, tools
 from odoo.exceptions import AccessDenied
-from odoo.tools.misc import str2bool
 
 _logger = logging.getLogger(__name__)
 
@@ -18,6 +17,9 @@ class LDAPWrapper:
 
     def passwd_s(self, *args, **kwargs):
         self.__obj__.passwd_s(*args, **kwargs)
+
+    def modify_s(self, *args, **kwargs):
+        self.__obj__.modify_s(*args, **kwargs)
 
     def search_st(self, *args, **kwargs):
         return self.__obj__.search_st(*args, **kwargs)
@@ -106,8 +108,8 @@ class ResCompanyLdap(models.Model):
         uri = 'ldap://%s:%d' % (conf['ldap_server'], conf['ldap_server_port'])
 
         connection = ldap.initialize(uri)
-        ldap_chase_ref_disabled = self.env['ir.config_parameter'].sudo().get_param('auth_ldap.disable_chase_ref', 'True')
-        if str2bool(ldap_chase_ref_disabled):
+        ldap_chase_ref_disabled = self.env['ir.config_parameter'].sudo().get_bool('auth_ldap.disable_chase_ref', True)
+        if ldap_chase_ref_disabled:
             connection.set_option(ldap.OPT_REFERRALS, ldap.OPT_OFF)
         if conf['ldap_tls']:
             connection.start_tls_s()
@@ -246,15 +248,17 @@ class ResCompanyLdap(models.Model):
 
         raise AccessDenied(_("No local user found for LDAP login and not configured to create one"))
 
-    def _change_password(self, conf, login, old_passwd, new_passwd):
+    def _change_password(self, conf, login, new_passwd):
         changed = False
         dn, entry = self._get_entry(conf, login)
         if not dn:
             return False
+        ldap_password = conf["ldap_password"] or ""
+        ldap_binddn = conf["ldap_binddn"] or ""
         try:
             conn = self._connect(conf)
-            conn.simple_bind_s(dn, old_passwd)
-            conn.passwd_s(dn, old_passwd, new_passwd)
+            conn.simple_bind_s(ldap_binddn, ldap_password)
+            conn.modify_s(dn, [(ldap.MOD_REPLACE, "userPassword", new_passwd.encode())])
             changed = True
             conn.unbind()
         except ldap.INVALID_CREDENTIALS:

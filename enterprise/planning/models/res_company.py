@@ -11,15 +11,17 @@ class ResCompany(models.Model):
 
     planning_employee_unavailabilities = fields.Selection(
         selection=[
-            ('switch', 'Switch shifts with other employees'),
-            ('unassign', 'Unassign themselves from shifts'),
+            ('switch', 'Request a replacement'),
+            ('unassign', 'Remove themselves from shifts'),
         ],
-        string="Employee Unavailabilities",
+        string="Shift Changes",
         default='switch',
         required=True,
     )
 
     planning_self_unassign_days_before = fields.Integer("Days before shift for unassignment", help="Deadline in days for shift unassignment")
+    field_service_travel_fees = fields.Boolean("Travel Fees")
+    website_planning_field_service = fields.Boolean()
 
     _planning_self_unassign_days_before_positive = models.Constraint(
         'CHECK(planning_self_unassign_days_before >= 0)',

@@ -12,9 +12,9 @@ class SaleOrder(models.Model):
             res += ['partner_shipping_id']
         return res
 
-    def _get_avatax_service_params(self, commit=False):
+    def _get_avatax_service_params(self):
         # EXTENDS 'account.external.tax.mixin'
-        res = super()._get_avatax_service_params(commit=commit)
+        res = super()._get_avatax_service_params()
         res.update({
             'document_type': 'SalesOrder',
             'document_date': self.date_order,

@@ -1,7 +1,20 @@
-import { Component, EventBus, onWillDestroy, useState, useSubEnv, xml } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
+import {
+    Component,
+    EventBus,
+    onWillDestroy,
+    xml,
+    proxy,
+    Plugin,
+    useProps,
+    usePlugin,
+    providePlugins,
+} from "@odoo/owl";
 
 import { registry } from "@web/core/registry";
-import { makeActionManager } from "@web/webclient/actions/action_service";
+import { useActionManager } from "@web/webclient/actions/action_plugin";
+import { GlobalBusPlugin } from "@web/core/global_bus_plugin";
+import { DialogPlugin } from "@web/core/dialog/dialog_plugin";
 import { useBus, useService } from "@web/core/utils/hooks";
 
 import { StudioActionContainer } from "./studio_action_container";
@@ -15,8 +28,9 @@ import { useSubEnvAndServices, useServicesOverrides } from "@web_studio/client_a
 import { omit } from "@web/core/utils/objects";
 
 class DialogWithEnv extends Component {
-    static template = xml`<t t-component="props.Component" t-props="componentProps" />`;
-    static props = ["*"];
+    static template = xml`<t t-component="this.props.Component" t-props="this.componentProps" />`;
+
+    props = useProps();
 
     setup() {
         useSubEnvAndServices(this.props.env);
@@ -27,14 +41,32 @@ class DialogWithEnv extends Component {
         return { ...this.props.componentProps, ...additionalProps };
     }
 }
-const dialogService = {
-    dependencies: ["dialog"],
-    start(env, { dialog }) {
-        function addDialog(Component, _props, options) {
-            const props = { env, Component, componentProps: _props };
-            return dialog.add(DialogWithEnv, props, options);
-        }
-        return { ...dialog, add: addDialog };
+class StudioDialogPlugin extends Plugin {
+    static id = DialogPlugin.id;
+
+    dialogPlugin = usePlugin(DialogPlugin);
+
+    studioEnv = null;
+
+    setStudioEnv(env) {
+        this.studioEnv = env;
+    }
+
+    add(dialogClass, props, options) {
+        const wrappedProps = { env: this.studioEnv, Component: dialogClass, componentProps: props };
+        return this.dialogPlugin.add(DialogWithEnv, wrappedProps, options);
+    }
+
+    closeAll(params) {
+        return this.dialogPlugin.closeAll(params);
+    }
+}
+
+const dialogServiceStudio = {
+    start(env) {
+        const dialogPlugin = usePlugin(DialogPlugin);
+        dialogPlugin.setStudioEnv(env);
+        return dialogPlugin;
     },
 };
 
@@ -47,7 +79,7 @@ const actionServiceStudio = {
             stateToUrl() {},
             hideKeyFromUrl: () => {},
         };
-        const action = makeActionManager(env, router);
+        const action = useActionManager(router);
         const _doAction = action.doAction;
 
         async function doAction(actionRequest, options) {
@@ -66,7 +98,6 @@ const actionServiceStudio = {
 const menuButtonsRegistry = registry.category("studio_navbar_menubuttons");
 export class Editor extends Component {
     static template = "web_studio.Editor";
-    static props = {};
     static components = {
         EditorMenu,
         StudioActionContainer,
@@ -74,7 +105,7 @@ export class Editor extends Component {
 
     static menuButtonsId = 1;
     setup() {
-        const globalBus = this.env.bus;
+        const globalBus = usePlugin(GlobalBusPlugin).bus;
         const newBus = new EventBus();
         useBus(globalBus, "CLEAR-UNCOMMITTED-CHANGES", (ev) =>
             newBus.trigger("CLEAR-UNCOMMITTED-CHANGES", ev.detail)
@@ -83,12 +114,14 @@ export class Editor extends Component {
             newBus.trigger("MENUS:APP-CHANGED", ev.detail)
         );
 
+        providePlugins([GlobalBusPlugin, StudioDialogPlugin], { bus: newBus });
+
         useSubEnv({
             bus: newBus,
         });
 
         useServicesOverrides({
-            dialog: dialogService,
+            dialog: dialogServiceStudio,
             action: actionServiceStudio,
         });
         this.studio = useService("studio");
@@ -98,13 +131,16 @@ export class Editor extends Component {
             studio: useStudioServiceAsReactive(),
             view: useService("view"),
         });
+        onWillDestroy(() => {
+            editionFlow.dispose();
+        });
         useSubEnv({
             editionFlow,
         });
 
         this.actionService = useService("action");
 
-        this.state = useState({ actionContainerId: 1 });
+        this.state = proxy({ actionContainerId: 1 });
         useBus(this.studio.bus, "UPDATE", async () => {
             this.state.actionContainerId++;
         });

@@ -1,4 +1,4 @@
-import { useState, onWillStart } from "@odoo/owl";
+import { onWillStart, proxy } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { ImportAction } from "@base_import/import_action/import_action";
@@ -18,7 +18,7 @@ export class AccountLoanImportAction extends ImportAction {
 
         this.orm = useService("orm");
 
-        this.model = useState(new AccountLoanImportModel({
+        this.model = proxy(new AccountLoanImportModel({
             env: this.env,
             context: this.props.action.params.context || {},
             orm: this.orm,

@@ -1,4 +1,4 @@
-import { useState } from "@odoo/owl";
+import { proxy } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { BaseImportModel } from "@base_import/import_model";
 
@@ -21,5 +21,5 @@ class AccountMoveLineImportModel extends BaseImportModel {
  */
 export function useAccountMoveLineImportModel({ env, context }) {
     const orm = useService("orm");
-    return useState(new AccountMoveLineImportModel({ env, context, orm }));
+    return proxy(new AccountMoveLineImportModel({ env, context, orm }));
 }

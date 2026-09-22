@@ -68,7 +68,7 @@ class AccountTax(models.Model):
             results['l10n_ec_code_taxsupport'] = tax_line['l10n_ec_code_taxsupport']
         return results
 
-    def compute_all(self, price_unit, currency=None, quantity=1.0, product=None, partner=None, is_refund=False, handle_price_include=True, include_caba_tags=False, rounding_method=None):
+    def compute_all(self, price_unit, currency=None, quantity=1.0, product=None, partner=None, is_refund=False, handle_price_include=True, include_caba_tags=False, rounding_method=None, document_tax_mode=None):
         """
         Check that the tax is of the withholding type. Send the 'round' context as True, in this way we force the withholdings
         to be computed with 'round per line', not by 'round globally'.
@@ -90,4 +90,5 @@ class AccountTax(models.Model):
             handle_price_include=handle_price_include,
             include_caba_tags=include_caba_tags,
             rounding_method='round_per_line' if is_withhold_tax else rounding_method,
+            document_tax_mode=document_tax_mode,
         )

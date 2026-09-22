@@ -1,10 +1,16 @@
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, proxy, usePlugin, t, useProps } from "@odoo/owl";
 import { components, stores } from "@odoo/o-spreadsheet";
-import { ModelFieldSelector } from "@web/core/model_field_selector/model_field_selector";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
+import { InlineModelFieldSelector } from "../../../components/sidepanel_model_field_selector/sidepanel_model_field_selector";
 
 import { FilterEditorStore } from "../../filter_editor_store";
 import { FilterFieldOffset } from "../filter_field_offset";
-import { sortModelFieldSelectorFields } from "../../../helpers/misc";
+import {
+    sortModelFieldSelectorFields,
+    getDataSourcePriorityFields,
+    filterDataSourceField,
+} from "../../../helpers/misc";
+import { useService } from "@web/core/utils/hooks";
 
 const { Section } = components;
 const { useLocalStore } = stores;
@@ -12,17 +18,19 @@ const { useLocalStore } = stores;
 export class RelatedFilters extends Component {
     static template = "spreadsheet_edition.RelatedFilters";
 
-    static props = {
-        resModel: String,
-        dataSourceId: String,
-        dataSourceType: String,
-    };
+    props = useProps({
+        resModel: t.string(),
+        dataSourceId: t.string(),
+        dataSourceType: t.string(),
+    });
 
-    static components = { ModelFieldSelector, Section, FilterFieldOffset };
+    static components = { InlineModelFieldSelector, Section, FilterFieldOffset };
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
-        this.sortModelFieldSelectorFields = sortModelFieldSelectorFields;
-        this.editedFilters = useState({});
+        this.editedFilters = proxy({});
+        this.fieldsService = useService("field");
         this.stores = {};
         for (const filter of this.env.model.getters.getGlobalFilters()) {
             this.stores[filter.id] = useLocalStore(
@@ -40,6 +48,10 @@ export class RelatedFilters extends Component {
         return Object.values(this.stores).every((store) => store.canSave);
     }
 
+    fieldMatchingIsDefined(filterId, fieldMatching) {
+        return fieldMatching.fieldMatch.chain !== undefined || this.editedFilters[filterId]?.linked;
+    }
+
     getFieldMatching(filterId) {
         const fieldMatching = this.stores[filterId].fieldsMatching.find(
             (fieldMatching) =>
@@ -47,10 +59,6 @@ export class RelatedFilters extends Component {
                 fieldMatching.payload().type === this.props.dataSourceType
         );
         return fieldMatching;
-    }
-
-    filterModelFieldSelectorField(filterId, field, path, coModel) {
-        return this.stores[filterId].filterModelFieldSelectorField(field, path, coModel);
     }
 
     updateFieldMatchingOffset(filterId, fieldMatchingId, offset) {
@@ -63,14 +71,53 @@ export class RelatedFilters extends Component {
         this.save();
     }
 
-    removeFieldMatching(filterId, fieldMatchingId) {
+    async removeFieldMatching(filterId, fieldMatchingId) {
+        const path = this.getFieldMatching(filterId).fieldMatch.chain;
+        this.editedFilters[filterId] = { linked: false, lastFieldMatchingId: fieldMatchingId };
+        if (path !== undefined) {
+            const field = await this.fieldsService.loadPath(this.props.resModel, path);
+            this.editedFilters[filterId].path = path;
+            this.editedFilters[filterId].field =
+                field.modelsInfo.at(-1).fieldDefs[field.names.at(-1)];
+        }
         this.stores[filterId].updateFieldMatching(fieldMatchingId, null);
-        this.editedFilters[filterId] = false;
         this.save();
     }
 
     linkFieldMatching(filterId) {
-        this.editedFilters[filterId] = true;
+        if (!this.editedFilters[filterId]) {
+            this.editedFilters[filterId] = { linked: true };
+            return;
+        }
+        this.selectField(
+            filterId,
+            this.editedFilters[filterId].lastFieldMatchingId,
+            this.editedFilters[filterId].path,
+            this.editedFilters[filterId].field
+        );
+        this.editedFilters[filterId] = { ...this.editedFilters[filterId], linked: true };
+    }
+
+    filterFields(filterId, field, path, coModel) {
+        return (
+            this.stores[filterId].filterModelFieldSelectorField(field, path, coModel) &&
+            filterDataSourceField(
+                this.env.model.getters,
+                this.props.dataSourceId,
+                this.props.dataSourceType,
+                field,
+                path
+            )
+        );
+    }
+
+    sortFields(fields) {
+        const priorityFields = getDataSourcePriorityFields(
+            this.env.model.getters,
+            this.props.dataSourceId,
+            this.props.dataSourceType
+        );
+        return sortModelFieldSelectorFields(fields, priorityFields);
     }
 
     save() {

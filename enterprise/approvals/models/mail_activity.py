@@ -41,5 +41,6 @@ class MailActivity(models.Model):
                 lambda approver: activity.user_id == approver.user_id
             )
 
-    def _to_store_defaults(self, target):
-        return super()._to_store_defaults(target) + [Store.One("approver_id", ["status"])]
+    def _store_activity_fields(self, res: Store.FieldList):
+        super()._store_activity_fields(res)
+        res.one("approver_id", ["status", "user_id"])

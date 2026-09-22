@@ -15,3 +15,9 @@ class AccountPaymentMethod(models.Model):
             "country_id": self.env.ref("base.ca").id,
         }
         return res
+
+    @api.model
+    def _get_mandate_type_per_code(self):
+        res = super()._get_mandate_type_per_code()
+        res['cpa005'] = 'cpa005_pad'
+        return res

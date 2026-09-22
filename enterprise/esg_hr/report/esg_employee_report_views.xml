@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <search string="Sex Parity">
                 <field name="department_id"/>
-                <field name="contract_type_id"/>
+                <field name="employee_type_id"/>
                 <filter string="Full-Time Workers" name="full_time" domain="[('is_full_time', '=', True)]"/>
                 <filter string="Part-Time Workers" name="part_time" domain="[('is_full_time', '=', False)]"/>
                 <separator/>
@@ -18,7 +18,7 @@
                     <filter string="Leadership Level" name="group_by_leadership_level" context="{'group_by': 'leadership_level'}"/>
                     <filter string="Department" name="group_by_department_id" context="{'group_by': 'department_id'}"/>
                     <filter string="Job Position" name="group_by_job_id" context="{'group_by': 'job_id'}"/>
-                    <filter string="Contract Type" name="group_by_contract_type_id" context="{'group_by': 'contract_type_id'}"/>
+                    <filter string="Contract Type" name="group_by_employee_type_id" context="{'group_by': 'employee_type_id'}"/>
                     <filter string="Country" name="group_by_country_id" context="{'group_by': 'country_id'}"/>
                 </group>
             </search>

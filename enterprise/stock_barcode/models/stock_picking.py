@@ -1,13 +1,19 @@
-# -*- coding: utf-8 -*-
-
-from odoo import models, api, _
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
+from odoo.fields import Domain
 from odoo.tools import html2plaintext, is_html_empty
-from odoo.exceptions import UserError
 
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
     _barcode_field = 'name'
+
+    display_batch_button = fields.Boolean(compute='_compute_display_batch_button')
+
+    @api.depends('batch_id')
+    def _compute_display_batch_button(self):
+        for picking in self:
+            picking.display_batch_button = picking.batch_id and picking.batch_id.state == 'in_progress'
 
     def action_cancel_from_barcode(self):
         self.ensure_one()
@@ -22,6 +28,61 @@ class StockPicking(models.Model):
             'target': 'new',
             'context': dict(self.env.context, default_picking_id=self.id),
         }
+
+    def action_batch_pickings_from_barcode(self, picking_to_batch_ids, **kwargs):
+        """ Batch current picking(s) with given pickings into either a new batch,
+        either the current picking(s)' batch, then return the action to open the batch in barcode.
+        :param list picking_to_batch_ids: `stock.picking` ids to batch.
+        :param int product_id: since this action is called following a product's scan, this
+                               parameter can help to keep track of the scanned product and thus,
+                               increment one of the batched pickings' move line, and even then,
+                               auto-select the line when opening the batch in the Barcode app.
+        :param int qty_done:
+        :param int uom_id:
+        :return: An action redirecting to the batch's barcode operation.
+        :rtype: dict
+        """
+        product_move_line = self.env['stock.move.line']
+        picking_ids = set(self.ids + picking_to_batch_ids)
+        pickings_to_batch = self.env['stock.picking'].browse(picking_ids)
+        pickings_to_batch.picking_type_id.ensure_one()
+        # Chose (or create) a batch which will contain all the pickings.
+        batch = pickings_to_batch.batch_id[:1]
+        if not batch:
+            batch = self.env['stock.picking.batch'].create({
+                'user_id': self.user_id.id,
+                'company_id': self.company_id.id,
+                'picking_type_id': self.picking_type_id.id,
+            })
+        else:
+            # If a batch already exist, get all other pickings to batch them,
+            # which acts like mergign multiple batches in one.
+            picking_ids.update(pickings_to_batch.batch_id.picking_ids.ids)
+            pickings_to_batch = self.env['stock.picking'].browse(picking_ids)
+
+        # Batch all the pickings into a single batch, confirm it (needed if the
+        # batch was created) and return the action to open it in Barcode app.
+        pickings_to_batch.batch_id = batch
+        batch.action_confirm()
+
+        # If a product ID is given, find a move line of this product in the
+        # batch and increment its `qty_done` to simulate a scan.
+        if product_id := kwargs.get('product_id'):
+            product_move_line = (batch.picking_ids - self).move_line_ids.filtered(
+                lambda mvl: mvl.product_id.id == product_id and not mvl.picked
+            )[0]
+            qty_done = kwargs.get('qty_done', 1)
+            if uom_id := kwargs.get('uom_id'):
+                uom = self.env['uom.uom'].browse(uom_id)
+                if uom and uom != product_move_line.uom_id:
+                    qty_done = uom._compute_quantity(qty_done, product_move_line.uom_id)
+            product_move_line.qty_done += qty_done
+
+        return self.batch_id.action_client_action(product_move_line.id)
+
+    def action_open_batch_picking(self):
+        self.ensure_one()
+        return self.batch_id.action_client_action()
 
     @api.model
     def action_open_new_picking(self):
@@ -58,6 +119,9 @@ class StockPicking(models.Model):
         from a button on the kanban view
         """
         self.ensure_one()
+        if not self.env.user.has_group('stock.group_stock_picking_batch') and self.batch_id:
+            # If picking is batched but batch setting is not enabled, open the batch instead.
+            return self.batch_id.action_client_action()
         action = self.env["ir.actions.actions"]._for_xml_id("stock_barcode.stock_barcode_picking_client_action")
         context = {'active_id': self.id}
         return dict(action, context=context)
@@ -67,10 +131,10 @@ class StockPicking(models.Model):
         Create a return picking for the current picking and open it in the barcode app
         """
         self.ensure_one()
-        return_picking = self.with_context(active_model='stock.picking', active_id=self.id).env['stock.return.picking'].create({})
-        for line in return_picking.product_return_moves:
-            line.quantity = line.move_id.quantity
-        new_picking = return_picking._create_return()
+        new_picking = self._create_return()
+        new_picking.action_return_all()
+        new_picking.action_confirm()
+        new_picking.action_assign()
         return new_picking.action_open_picking_client_action()
 
     def action_print_barcode(self):
@@ -82,6 +146,11 @@ class StockPicking(models.Model):
     def action_print_packges(self):
         return self.env.ref('stock.action_report_picking_packages').report_action(self)
 
+    def action_unbatch(self):
+        self.ensure_one()
+        if self.batch_id:
+            self.batch_id = False
+
     def _get_stock_barcode_data(self):
         # Avoid to get the products full name because code and name are separate in the barcode app.
         self = self.with_context(display_default_code=False)
@@ -91,7 +160,7 @@ class StockPicking(models.Model):
         # Fetch all implied products in `self` and adds last used products to avoid additional rpc.
         products = self.move_ids.product_id | move_lines.product_id
 
-        uoms = products.uom_id | move_lines.product_uom_id | move_lines.packaging_uom_id | products.uom_ids
+        uoms = products.uom_id | move_lines.uom_id | move_lines.packaging_uom_id | products.uom_ids | products.extra_uom_ids
         # If UoM setting is active, fetch all UoM's data.
         if self.env.user.has_group('uom.group_uom'):
             uoms |= self.env['uom.uom'].search([])
@@ -102,7 +171,13 @@ class StockPicking(models.Model):
         source_locations = self.env['stock.location'].search([('id', 'child_of', self.location_id.ids)])
         destination_locations = self.env['stock.location'].search([('id', 'child_of', self.location_dest_id.ids)])
         package_locations = self.env['stock.location'].search([('id', 'child_of', self.location_dest_id.ids), ('usage', '!=', 'customer')])
-        locations = self.location_id | self.location_dest_id |  move_lines.location_id | move_lines.location_dest_id | source_locations | destination_locations
+        scrap_location = self.env.company.scrap_location_id
+        locations = (
+            self.location_id | self.location_dest_id | self.picking_type_id.allocated_location_id |
+            self.picking_type_id.default_location_dest_id | self.picking_type_id.default_location_src_id |
+            move_lines.location_id | move_lines.location_dest_id |
+            source_locations | destination_locations | scrap_location
+        )
 
         # Fetch `stock.package` and `stock.package.type` if group_tracking_lot.
         packages = self.env['stock.package']
@@ -139,12 +214,14 @@ class StockPicking(models.Model):
             picking['note'] = False if is_html_empty(picking['note']) else html2plaintext(picking['note'])
 
         data['config'] = self.picking_type_id._get_barcode_config()
-        if self._should_ignore_backorders():
-            data['config']['create_backorder'] = 'never'
+        data['config']['show_backorder_dialog'] = not self._should_ignore_backorders()
         data['line_view_id'] = self.env.ref('stock_barcode.stock_move_line_product_selector').id
         data['form_view_id'] = self.env.ref('stock_barcode.stock_picking_barcode').id
         data['scrap_view_id'] = self.env.ref('stock_barcode.scrap_product_selector').id
         data['package_view_id'] = self.env.ref('stock_barcode.stock_quant_barcode_kanban').id
+
+        data['candidate_pickings_to_batch'] = self._get_suggest_batch_data()
+
         return data
 
     @api.model
@@ -184,18 +261,28 @@ class StockPicking(models.Model):
             'move_line_ids',
             'name',
             'note',
+            'origin',
             'partner_id',
             'picking_type_code',
             'picking_type_entire_packs',
             'picking_type_id',
             'picking_warning_text',
-            'return_id',
             'signature',
             'state',
             'use_create_lots',
             'use_existing_lots',
             'user_id',
         ]
+
+    def _get_without_quantities_error_message(self):
+        if self.env.context.get('barcode_view'):
+            return _(
+                'You cannot validate a transfer if no quantities are reserved nor done. '
+                'You can use the info button on the top right corner of your screen '
+                'to remove the transfer in question from the batch.'
+            )
+        else:
+            return super()._get_without_quantities_error_message()
 
     @api.model
     def filter_on_barcode(self, barcode):
@@ -204,7 +291,10 @@ class StockPicking(models.Model):
         barcode_type = None
         nomenclature = self.env.company.nomenclature_id
         if nomenclature.is_gs1_nomenclature:
-            parsed_results = nomenclature.parse_barcode(barcode)
+            try:
+                parsed_results = nomenclature.parse_barcode(barcode)
+            except ValidationError:
+                parsed_results = False
             if parsed_results:
                 # filter with the last feasible rule
                 for result in parsed_results[::-1]:
@@ -224,6 +314,7 @@ class StockPicking(models.Model):
 
         picking_nums = 0
         additional_context = {'active_id': active_id}
+        product = None
         if barcode_type == 'product' or not barcode_type:
             product = self.env['product.product'].search([('barcode', '=', barcode)], limit=1)
             if not product and is_uom_enabled:  # Packaging barcode is also of type 'product' (barcodes unique accross product & packaging)
@@ -256,6 +347,7 @@ class StockPicking(models.Model):
                 return {
                     'warning': {
                         'message': _("No %(picking_type)s ready for this %(barcode_type)s", picking_type=picking_type.name, barcode_type=barcode_type),
+                        'product_found': bool(product),
                     }
                 }
             title, message = self._get_barcode_filter_warning(is_lot_enabled, is_pack_enabled, is_uom_enabled, barcode)
@@ -263,6 +355,7 @@ class StockPicking(models.Model):
                 'warning': {
                     'title': title,
                     'message': message,
+                    'product_found': bool(product),
                 }
             }
 
@@ -294,3 +387,42 @@ class StockPicking(models.Model):
                     _("Scan a product or a packaging to filter the transfers."))
         return (_("No product found for barcode %s", barcode),
                 _("Scan a product to filter the transfers."))
+
+    # BATCH SUGGEST METHODS
+    def _get_candidates_for_suggest_batch_domain(self):
+        domain = Domain([
+            ('id', '!=', self.id),
+            ('company_id', '=', self.company_id.id),
+            ('picking_type_id', '=', self.picking_type_id.id),
+            ('partner_id', '=', self.partner_id.id),
+            ('state', '=', self.state),
+        ])
+        if self.batch_id:
+            domain = Domain.AND([domain, Domain('batch_id', '!=', self.batch_id.id)])
+        return domain
+
+    def _get_suggest_batch_data(self):
+        suggest_batch_data = []
+        if self._is_candidate_for_suggest_batch():
+            # Fetch sibling operations for potential batch.
+            picking_domain = self._get_candidates_for_suggest_batch_domain()
+            pickings = self.env['stock.picking'].search(picking_domain)
+            for picking in pickings:
+                unpicked_move_lines = picking.move_line_ids.filtered(lambda mv: not mv.picked)
+                suggest_batch_data.append({
+                    'id': picking.id,
+                    'name': picking.display_name,
+                    'origin': picking.origin,
+                    'product_ids': unpicked_move_lines.product_id.ids,
+                    'date': picking.scheduled_date,
+                    'partner_name': picking.partner_id.display_name,
+                })
+        return suggest_batch_data
+
+    def _is_candidate_for_suggest_batch(self):
+        return (
+            len(self) == 1 and
+            self.partner_id and
+            self.picking_type_id.code == 'incoming' and
+            self.state not in ['done', 'cancel']
+        )

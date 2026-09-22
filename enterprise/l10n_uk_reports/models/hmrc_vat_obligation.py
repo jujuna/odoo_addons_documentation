@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import RedirectWarning, UserError
 import json
 import requests
 import logging
@@ -49,7 +49,7 @@ class L10n_UkVatObligation(models.Model):
         return headers
 
     @api.model
-    def retrieve_vat_obligations(self, vat, from_date, to_date, client_data=None, status=''):
+    def retrieve_vat_obligations(self, vat, from_date, to_date, status=''):
         """ Retrieve vat obligations
 
         The User should be logged in before doing this
@@ -64,7 +64,7 @@ class L10n_UkVatObligation(models.Model):
 
         user = self.env.user
         bearer = user.l10n_uk_hmrc_vat_token
-        headers = self._get_auth_headers(bearer, client_data)
+        headers = self._get_auth_headers(bearer, self.env.context.get('client_data'))
         self.env['hmrc.service']._validate_fraud_prevention_headers(headers)
 
         url = self.env['hmrc.service']._get_endpoint_url('/organisations/vat/%s/obligations' % vat)
@@ -99,13 +99,24 @@ class L10n_UkVatObligation(models.Model):
             error_message = response.get('message', error_code)
         raise UserError(error_message)
 
-    def _get_vat(self):
+    def _get_vat(self, return_id=None):
         # Use company's VAT if company is British, otherwise try to look for a UK fiscal position.
-        foreign_vat = False
-        if not self.env.company.country_id.code == 'GB':
-            foreign_vat = self.env.company.fiscal_position_ids.filtered(lambda fp: fp.country_id.code == 'GB').foreign_vat
+        vat = ""
+        return_record = self.env['account.return'].browse(return_id)
+        if return_record and return_record.tax_unit_id and return_record.tax_unit_id.vat:
+            vat = return_record.tax_unit_id.vat
+        if not vat:
+            foreign_vat = False
+            if self.env.company.country_id.code != 'GB':
+                foreign_vat = self.env.company.fiscal_position_ids.filtered(lambda fp: fp.country_id.code == 'GB').foreign_vat
+            vat = foreign_vat or self.env.company.vat
 
-        vat = foreign_vat or self.env.company.vat
+        if not vat:
+            raise RedirectWarning(
+                self.env._("No VAT number associated with %(company_name)s. Please define one", company_name=self.env.company.name),
+                self.env.company._get_records_action(),
+                self.env._("Company Settings")
+            )
 
         # The VAT sent to HMRC should not include the GB or XI prefix.
         if vat.startswith(('GB', 'XI')):
@@ -113,7 +124,7 @@ class L10n_UkVatObligation(models.Model):
 
         return vat
 
-    def import_vat_obligations(self, client_data=None):
+    def import_vat_obligations(self):
         today = datetime.date.today()
         res = self.env['hmrc.service']._login()
         if res: # If you can not login, return url for re-login
@@ -121,10 +132,9 @@ class L10n_UkVatObligation(models.Model):
 
         # look for open obligations in the -6 months +6 months range
         obligations = self.retrieve_vat_obligations(
-            self._get_vat(),
+            self._get_vat(self.env.context.get('return_id')),
             (today + relativedelta(months=-6)).strftime('%Y-%m-%d'),
-            (today + relativedelta(months=6,leapdays=-1)).strftime('%Y-%m-%d'),
-            client_data
+            (today + relativedelta(months=6, leapdays=-1)).strftime('%Y-%m-%d')
         )
         for new_obligation in obligations:
             obligation = self.env['l10n_uk.vat.obligation'].search([('period_key', '=', new_obligation.get('periodKey')),
@@ -162,29 +172,38 @@ class L10n_UkVatObligation(models.Model):
 
         values = {}
         for line in lines:
-            line_id = self.env['account.report']._parse_line_id(line['id'])[-1][-1]
+            line_id = self.env['account.report']._parse_line_id(line.id)[-1][-1]
             if reverse_table.get(line_id):
                 # Do a get for the no_format as for the totals you have twice the line, without and with amount
                 # We cannot pass a negative netVatDue to the API and the amounts of sales/purchases/goodssupplied/ ... must be rounded
                 if reverse_table[line_id] == 'netVatDue':
-                    values[reverse_table[line_id]] = abs(round(line['columns'][0].get('no_format', 0.0), 2))
+                    values[reverse_table[line_id]] = abs(round(line.columns[0].no_format or 0.0, 2))
                 elif reverse_table[line_id] in ('totalValueSalesExVAT', 'totalValuePurchasesExVAT', 'totalValueGoodsSuppliedExVAT', 'totalAcquisitionsExVAT'):
-                    values[reverse_table[line_id]] = round(line['columns'][0].get('no_format', 0.0))
+                    values[reverse_table[line_id]] = round(line.columns[0].no_format or 0.0)
                 else:
-                    values[reverse_table[line_id]] = round(line['columns'][0].get('no_format', 0.0), 2)
+                    values[reverse_table[line_id]] = round(line.columns[0].no_format or 0.0, 2)
         return values
 
     def action_submit_vat_return(self, data=None):
         self.ensure_one()
+        # Enforce the obligation from account return.
+        if 'return_id' not in self.env.context:
+            raise UserError(self.env._(
+                "No Tax Return associated with the current obligation. Please process the obligation submission from the related Tax Return."
+            ))
+
         report = self.env.ref('l10n_uk.tax_report')
-        options = report.get_options({})
-        options['date'].update({'date_from': fields.Date.to_string(self.date_start),
-                        'date_to': fields.Date.to_string(self.date_end),
-                        'filter': 'custom',
-                        'mode': 'range'})
+        return_id = self.env.context['return_id']
+        return_record = self.env['account.return'].browse(return_id)
+        options = report.get_options({
+            'date': {
+                'date_from': return_record.date_from,
+                'date_to': return_record.date_to,
+            },
+        })
         report_values = report._get_lines(options)
         values = self._fetch_values_from_report(report_values)
-        vat = self._get_vat()
+        vat = self._get_vat(return_id)
         res = self.env['hmrc.service']._login()
         if res: # If you can not login, return url for re-login
             return res
@@ -216,6 +235,16 @@ class L10n_UkVatObligation(models.Model):
                     msg += Markup('<b>%s</b>: %s</br>') % (sent_key, data[sent_key])
             self.sudo().message_post(body=msg)
             self.sudo().write({'status': "fulfilled"})
+
+            # Post a message on the return chatter.
+            return_record.message_post(
+                body=self.env._(
+                    "The VAT obligation of period %(date_start)s -> %(date_end)s has been submitted to HMRC.",
+                    date_start=self.date_start,
+                    date_end=self.date_end,
+                )
+            )
+            return_record._proceed_with_submission()
 
             # Show a confirmation popup.
             self.env.user._bus_send('simple_notification', {

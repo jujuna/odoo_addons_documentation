@@ -3,33 +3,28 @@
 # * data_cleaning
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-09-16 12:13+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:58+0000\n"
+"PO-Revision-Date: 2026-09-18 01:56+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
 "data_cleaning/ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_group.py:0
 msgid "%(model)s - Similarity: %(similarity)s%%"
 msgstr "%(model)s - 유사성: %(similarity)s%%"
-
-#. module: data_cleaning
-#. odoo-python
-#: code:addons/data_cleaning/models/data_merge_model.py:0
-msgid "%s (copy)"
-msgstr "%s (사본)"
 
 #. module: data_cleaning
 #. odoo-javascript
@@ -128,7 +123,21 @@ msgid "Archive"
 msgstr "보관"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Archive Suggestion"
+msgstr ""
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Archive Suggestions"
+msgstr ""
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_model_view_search
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Archived"
 msgstr "보관 처리됨"
@@ -137,15 +146,17 @@ msgstr "보관 처리됨"
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 msgid ""
-"Are you sure that you want to merge the selected records in their respective "
-"group?"
-msgstr "선택한 레코드를 해당 그룹에서 병합하시겠습니까?"
+"Are you sure you want to merge these records in their respective groups? "
+"Like cream swirling into coffee, once done there is no way back."
+msgstr ""
 
 #. module: data_cleaning
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
-msgid "Are you sure that you want to merge these records?"
-msgstr "정말 이 데이터를 병합하시겠습니까?"
+msgid ""
+"Are you sure you want to merge these records? Like cream swirling into "
+"coffee, once done there is no way back."
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_model__cleaning_mode__automatic
@@ -243,12 +254,18 @@ msgid "Country"
 msgstr "국가"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Create Date"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model,website_form_label:data_cleaning.model_res_partner
 msgid "Create a Customer"
 msgstr "고객 만들기"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__record_create_uid
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Created By"
 msgstr "작성자"
 
@@ -293,6 +310,11 @@ msgstr "현재"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__custom_merge_method
 msgid "Custom Merge Method"
 msgstr "사용자 지정 병합 방식"
+
+#. module: data_cleaning
+#: model:ir.module.module,shortdesc:base.module_data_cleaning
+msgid "Data Cleaning"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.actions.server,name:data_cleaning.ir_cron_clean_records_ir_actions_server
@@ -376,35 +398,12 @@ msgid "Delete"
 msgstr "삭제"
 
 #. module: data_cleaning
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_storage_tree
-msgid "Details"
-msgstr "세부 정보"
-
-#. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__differences
-msgid "Differences"
-msgstr "차이"
-
-#. module: data_cleaning
-#: model:ir.model.fields,help:data_cleaning.field_data_merge_record__differences
-msgid "Differences with the master record"
-msgstr "마스터 레코드와의 차이"
-
-#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.ir_model_view_form
 msgid "Disable Merge"
 msgstr "병합 비활성화"
 
 #. module: data_cleaning
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
-msgid "Discard"
-msgstr "취소"
-
-#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Discarded"
 msgstr "취소됨"
 
@@ -416,7 +415,6 @@ msgstr "취소됨"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__display_name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__display_name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__display_name
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__display_name
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_model__display_name
 #: model:ir.model.fields,field_description:data_cleaning.field_res_partner__display_name
 msgid "Display Name"
@@ -451,9 +449,18 @@ msgid "Duplicates to Merge"
 msgstr "병합할 중복 항목"
 
 #. module: data_cleaning
-#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__create_threshold
-msgid "Duplicates with a similarity below this threshold will not be suggested"
-msgstr "이 임계값 미만의 유사도를 가진 중복 항목은 권장되지 않습니다"
+#: model:ir.module.module,description:base.module_data_cleaning
+#: model:ir.module.module,summary:base.module_data_cleaning
+msgid ""
+"Easily format text data across multiple records. Find duplicate records and "
+"easily merge them."
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_group_config_menu.js:0
+msgid "Edit Rule"
+msgstr ""
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.ir_model_view_form
@@ -501,11 +508,6 @@ msgid "Field To Clean"
 msgstr "정리할 필드"
 
 #. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__field_values
-msgid "Field Values"
-msgstr "필드값"
-
-#. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action_case__first
 msgid "First Letters to Uppercase"
 msgstr "첫번째 글자는 대문자입니다"
@@ -527,8 +529,8 @@ msgid ""
 "every letter to lowercase except the first letter of each word, which is set "
 "to uppercase."
 msgstr ""
-"규칙에 따라 대소문자가 설정되는 방식입니다. '첫 글자는 대문자로' 는 첫 글자"
-"만 대문자로 표시되며 나머지 글자는 모두 소문자로 설정됩니다."
+"규칙에 따라 대소문자가 설정되는 방식입니다. '첫 글자는 대문자로' 는 첫 "
+"글자만 대문자로 표시되며 나머지 글자는 모두 소문자로 설정됩니다."
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_duplicate
@@ -544,7 +546,6 @@ msgstr "확인했습니다"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__id
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__id
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_model__id
 #: model:ir.model.fields,field_description:data_cleaning.field_res_partner__id
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
@@ -557,8 +558,8 @@ msgid ""
 "If True, the generic data merge tool is available in the contextual menu of "
 "this model."
 msgstr ""
-"True면 해당 모델의 컨텍스트 메뉴에서 일반 데이터 병합 도구를 사용할 수 있습니"
-"다."
+"True면 해당 모델의 컨텍스트 메뉴에서 일반 데이터 병합 도구를 사용할 수 "
+"있습니다."
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__is_contextual_merge_action
@@ -566,8 +567,8 @@ msgid ""
 "If True, this record is used for contextual menu action \"Merge\" on the "
 "target model."
 msgstr ""
-"True이면 해당 레코드는 대상 모델에서 상황에 맞는 메뉴 작업 “병합”에 사용됩니"
-"다."
+"True이면 해당 레코드는 대상 모델에서 상황에 맞는 메뉴 작업 “병합”에 "
+"사용됩니다."
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__hide_merge_action
@@ -581,6 +582,14 @@ msgstr ""
 "`_merge_disabled`은\n"
 "             True로 설정되어야 하며, 해당 모델에서는 일반 데이터 병합 작업을 "
 "할 수 없습니다."
+
+#. module: data_cleaning
+#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__mix_by_company
+msgid ""
+"In Manual Mode, the system identifies duplicates across your selected "
+"companies for review. In Automated Mode, duplicates across all existing "
+"companies are merged automatically."
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__is_deleted
@@ -604,6 +613,17 @@ msgid "Last Notification"
 msgstr "최근 알림"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Last Updated"
+msgstr ""
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Last Updated By"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__write_uid
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__write_uid
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__write_uid
@@ -624,6 +644,11 @@ msgstr "최근 갱신한 사람"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__write_date
 msgid "Last Updated on"
 msgstr "최근 갱신 일자"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Last updated on"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_record__used_in
@@ -659,10 +684,25 @@ msgid "Manual Selection - %s"
 msgstr "수동 선택 - %s"
 
 #. module: data_cleaning
+#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__similarity_threshold
+msgid ""
+"Manual merge mode: Duplicates with a similarity percentage below this "
+"threshold will not be suggested.\n"
+"Automatic merge mode: Duplicates with a similarity percentage above this "
+"threshold will be merged automatically."
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Master"
+msgstr ""
+
+#. module: data_cleaning
 #. odoo-javascript
 #. odoo-python
 #: code:addons/data_cleaning/models/ir_model.py:0
-#: code:addons/data_cleaning/static/src/views/data_merge_list_view.xml:0
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 #: model:ir.actions.server,name:data_cleaning.merge_action_res_country
 #: model:ir.actions.server,name:data_cleaning.merge_action_res_country_state
 #: model:ir.actions.server,name:data_cleaning.merge_action_res_partner_category
@@ -670,6 +710,13 @@ msgstr "수동 선택 - %s"
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
 msgid "Merge"
 msgstr "병합"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Merge Details"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__match_mode
@@ -682,6 +729,12 @@ msgid "Merge Mode"
 msgstr "병합 모드"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "Merge Records"
+msgstr "레코드 병합"
+
+#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_model__ref_merge_ir_act_server_id
 msgid "Merge Server Action"
 msgstr "서버 작업 병합"
@@ -692,12 +745,19 @@ msgid "Merge action attached"
 msgstr "병합 작업 첨부"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "Merge all"
+msgstr "모두 병합"
+
+#. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_model.py:0
 msgid "Missing required PostgreSQL extension: unaccent"
 msgstr "필수 PostgreSQL 확장자 누락: unaccent"
 
 #. module: data_cleaning
+#: model:ir.model,name:data_cleaning.model_ir_model
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__res_model_id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__res_model_id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__res_model_id
@@ -705,10 +765,8 @@ msgstr "필수 PostgreSQL 확장자 누락: unaccent"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__res_model_id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__res_model_id
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__res_model_id
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__res_model
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_storage_search
 msgid "Model"
 msgstr "모델"
 
@@ -723,9 +781,14 @@ msgid "Model Name"
 msgstr "모델명"
 
 #. module: data_cleaning
-#: model:ir.model,name:data_cleaning.model_ir_model
-msgid "Models"
-msgstr "모델"
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Model Rule"
+msgstr ""
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
+msgid "Model Rules"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_model__notify_frequency_period__months
@@ -737,6 +800,7 @@ msgstr "월"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__name
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__name
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Name"
 msgstr "이름"
 
@@ -753,6 +817,18 @@ msgstr "추천할 자료정리가 없습니다"
 #: model_terms:ir.actions.act_window,help:data_cleaning.action_data_merge_record_notification
 msgid "No duplicates found"
 msgstr "중복된 정보가 없습니다"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "No master exclusive fields"
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "No relations will be merged"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__notify_frequency
@@ -774,13 +850,24 @@ msgstr "사용자 알림"
 
 #. module: data_cleaning
 #. odoo-python
+#: code:addons/data_cleaning/models/res_partner.py:0
+msgid "Partners that are used in hashed entries cannot be merged."
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "Preview data unavailable for this record."
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-python
 #: code:addons/data_cleaning/models/data_merge_record.py:0
 msgid "Query Failed."
 msgstr "쿼리 실패."
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_group__record_ids
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__res_id
 msgid "Record"
 msgstr "기록"
 
@@ -830,20 +917,7 @@ msgid "Records must be of the same model"
 msgstr "레코드는 동일한 모델이어야 합니다"
 
 #. module: data_cleaning
-#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__merge_threshold
-msgid ""
-"Records with a similarity percentage above this threshold will be "
-"automatically merged"
-msgstr "이 임계값을 초과하는 유사도 비율을 가진 레코드는 자동으로 병합됩니다"
-
-#. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__name
-msgid "Resource Name"
-msgstr "리소스명"
-
-#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__rule_ids
-#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Rule"
 msgstr "규칙"
 
@@ -884,7 +958,7 @@ msgid "Similarity %"
 msgstr "유사도 %"
 
 #. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__merge_threshold
+#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__similarity_threshold
 msgid "Similarity Threshold"
 msgstr "유사도 임계값"
 
@@ -893,19 +967,6 @@ msgstr "유사도 임계값"
 msgid ""
 "Similarity coefficient based on the amount of text fields exactly in common."
 msgstr "정확히 일치하는 텍스트 필드 수를 기반으로 한 유사도 계수입니다."
-
-#. module: data_cleaning
-#: model:ir.actions.act_window,name:data_cleaning.action_data_storage
-#: model:ir.model,name:data_cleaning.model_ir_attachment_report
-#: model:ir.ui.menu,name:data_cleaning.menu_data_cleaning_storage
-msgid "Storage"
-msgstr "저장 공간"
-
-#. module: data_cleaning
-#. odoo-python
-#: code:addons/data_cleaning/report/data_storage.py:0
-msgid "Storage Detail: %(name)s"
-msgstr "저장소 세부 정보: %(name)s"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__rule_ids
@@ -923,11 +984,6 @@ msgid "Suggested Value"
 msgstr "제안값"
 
 #. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__create_threshold
-msgid "Suggestion Threshold"
-msgstr "제안 임계값"
-
-#. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action_trim__superfluous
 msgid "Superfluous Spaces"
 msgstr "불필요한 빈칸"
@@ -939,8 +995,14 @@ msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
 msgstr ""
-"'phonenumbers'라는 Python 모듈이 설치되어 있지 않습니다. 전화번호형식이 동작"
-"하지 않습니다."
+"'phonenumbers'라는 Python 모듈이 설치되어 있지 않습니다. 전화번호형식이 "
+"동작하지 않습니다."
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "The connection timed out. Please try merging fewer records at once."
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.constraint,message:data_cleaning.constraint_data_cleaning_model_check_notif_freq
@@ -978,11 +1040,6 @@ msgid "This name is already taken"
 msgstr "이미 사용 중인 이름입니다"
 
 #. module: data_cleaning
-#: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__size
-msgid "Total Size"
-msgstr "총 크기"
-
-#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action_trim
 msgid "Trim"
 msgstr "자르기"
@@ -993,16 +1050,21 @@ msgid "Trim Spaces"
 msgstr "빈 칸 조정"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Unarchive Suggestion"
+msgstr ""
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_list
+msgid "Unarchive Suggestions"
+msgstr ""
+
+#. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__field_id
 msgid "Unique ID Field"
 msgstr "고유 ID 필드"
-
-#. module: data_cleaning
-#. odoo-javascript
-#: code:addons/data_cleaning/static/src/views/data_cleaning_list_view.xml:0
-#: code:addons/data_cleaning/static/src/views/data_merge_list_view.xml:0
-msgid "Unselect"
-msgstr "선택 취소"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__record_write_uid
@@ -1020,8 +1082,6 @@ msgid "Used In"
 msgstr "다음에서 사용"
 
 #. module: data_cleaning
-#. odoo-javascript
-#: code:addons/data_cleaning/static/src/views/data_cleaning_list_view.xml:0
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
 msgid "Validate"
 msgstr "승인"
@@ -1031,11 +1091,6 @@ msgstr "승인"
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_merge_model__notify_frequency_period__weeks
 msgid "Weeks"
 msgstr "주"
-
-#. module: data_cleaning
-#: model:ir.model.fields,help:data_cleaning.field_data_merge_model__mix_by_company
-msgid "When enabled, duplicates across different companies will be suggested"
-msgstr "활성화하면 여러 회사의 중복 항목이 제안됩니다"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_cleaning_rule__action_trim
@@ -1058,10 +1113,22 @@ msgid "duplicate records with the '"
 msgstr "레코드 복사 '"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "fields deleted"
+msgstr ""
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_duplicate
 #: model_terms:ir.ui.view,arch_db:data_cleaning.notification
 msgid "here"
 msgstr "여기"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "matching fields"
+msgstr ""
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_merged
@@ -1074,6 +1141,15 @@ msgid "merged into this one"
 msgstr "이 항목으로 병합"
 
 #. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/js/merge_dialog/merge_preview_dialog.xml:0
+msgid "records to Master"
+msgstr ""
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.notification
 msgid "records to clean with the '"
 msgstr "정리할 레코드 '"
+
+#~ msgid "Discard"
+#~ msgstr "취소"

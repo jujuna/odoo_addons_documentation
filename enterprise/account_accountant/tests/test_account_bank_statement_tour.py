@@ -7,6 +7,8 @@ from odoo.tests import tagged, HttpCase
 @tagged('post_install', '-at_install')
 class TestAccountBankStatementTour(TestBankRecWidgetCommon, HttpCase):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def _request_handler(cls, s: Session, r: PreparedRequest, /, **kw):
         # mock odoofin requests
@@ -19,8 +21,8 @@ class TestAccountBankStatementTour(TestBankRecWidgetCommon, HttpCase):
 
     def test_tour_bank_rec_widget(self):
         self.partner_a.name = "AAAA"  # To have this partner as the first one in the list
-        self._create_invoice_line('out_invoice', partner_id=self.partner_a.id, invoice_line_ids=[{'price_unit': 100.0}])
-        self._create_invoice_line('out_invoice', partner_id=self.partner_a.id, invoice_line_ids=[{'price_unit': 150.0}])
+        self._create_invoice_one_line_reco(partner_id=self.partner_a.id, price_unit=100.0)
+        self._create_invoice_one_line_reco(partner_id=self.partner_a.id, price_unit=150.0)
         self.env['account.bank.statement'].create({
             'name': 'Test Statement',
             'journal_id': self.company_data['default_journal_bank'].id,
@@ -32,3 +34,9 @@ class TestAccountBankStatementTour(TestBankRecWidgetCommon, HttpCase):
         self._create_st_line(amount=100.0)
 
         self.start_tour('/odoo', 'account_accountant_bank_reconciliation_widget_reload_activies_when_add_a_new_one', login=self.env.user.login)
+
+    def test_tour_set_partner_with_child_contact(self):
+        """ Test that a contact that has a parent contact can't be selected via the 'Set Partner' button """
+        partner = self.env['res.partner'].create({'name': 'test child contact', 'parent_id': self.partner_a.id})
+        self._create_invoice_one_line_reco(partner_id=partner.id, price_unit=100.0)
+        self.start_tour('/odoo', 'account_accountant_set_partner_with_child_contact', login=self.env.user.login)

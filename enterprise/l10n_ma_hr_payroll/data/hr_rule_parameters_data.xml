@@ -236,6 +236,17 @@
             <field name="date_from" eval="datetime(2017, 1, 1).date()"/>
         </record>
 
+        <record id="l10n_ma_rule_parameter_hours_per_month" model="hr.rule.parameter">
+            <field name="name">Morocco: Hours Per Month</field>
+            <field name="code">l10n_ma_hours_per_month</field>
+            <field name="country_id" ref="base.ma"/>
+        </record>
+        <record id="l10n_ma_rule_parameter_hours_per_month_value_2017" model="hr.rule.parameter.value">
+            <field name="parameter_value">176</field>
+            <field name="rule_parameter_id" ref="l10n_ma_rule_parameter_hours_per_month"/>
+            <field name="date_from" eval="datetime(2017, 1, 1).date()"/>
+        </record>
+
         <record id="l10n_ma_rule_parameter_social_security_ceil" model="hr.rule.parameter">
             <field name="name">Social Security Ceiling</field>
             <field name="code">l10n_ma_social_security_ceil</field>
@@ -248,4 +259,3 @@
         </record>
     </data>
 </odoo>
-

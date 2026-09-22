@@ -9,6 +9,8 @@ from odoo.addons.website_sale_subscription.tests.common import WebsiteSaleSubscr
 @tagged('post_install', '-at_install')
 class TestWebsiteSaleSubscriptionConfigurators(HttpCase, WebsiteSaleSubscriptionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_website_sale_subscription_product_configurator(self):
         optional_product = self._create_product(
             name="Optional product",
@@ -25,7 +27,7 @@ class TestWebsiteSaleSubscriptionConfigurators(HttpCase, WebsiteSaleSubscription
                 Command.create({'plan_id': self.plan_month.id, 'fixed_price': 15}),
             ],
         )
-        self.start_tour('/', 'website_sale_subscription_product_configurator')
+        self.start_tour('/shop?search=Main product', 'website_sale_subscription_product_configurator')
 
     def test_website_sale_subscription_combo_configurator(self):
         combo = self.env['product.combo'].create({
@@ -44,7 +46,7 @@ class TestWebsiteSaleSubscriptionConfigurators(HttpCase, WebsiteSaleSubscription
                 Command.create({'plan_id': self.plan_month.id, 'fixed_price': 15}),
             ],
         )
-        self.start_tour('/', 'website_sale_subscription_combo_configurator')
+        self.start_tour('/shop?search=Combo product', 'website_sale_subscription_combo_configurator')
 
     @classmethod
     def _create_product(cls, **kwargs):

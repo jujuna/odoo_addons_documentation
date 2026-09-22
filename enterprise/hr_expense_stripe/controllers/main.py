@@ -2,12 +2,20 @@ import base64
 import logging
 import traceback
 
-from odoo import SUPERUSER_ID, _, api
-from odoo.exceptions import MissingError, ValidationError
+from werkzeug.utils import secure_filename
+
+from odoo import SUPERUSER_ID, api
+from odoo.exceptions import MissingError, UserError, ValidationError
 from odoo.http import Controller, request, route
 from odoo.tools.safe_eval import time
 
-from odoo.addons.hr_expense_stripe.utils import STRIPE_REQUEST_REFUSED_REASONS, StripeIssuingDatabaseError, format_amount_from_stripe
+from odoo.addons.hr_expense_stripe.utils import (
+    STRIPE_FILE_UPLOAD_CONFIG,
+    STRIPE_REQUEST_REFUSED_REASONS,
+    StripeIssuingDatabaseError,
+    format_amount_from_stripe,
+    make_request_stripe_proxy,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -82,6 +90,94 @@ class StripeIssuingController(Controller):
             status = StripeIssuingDatabaseError.DB_ERROR if event['type'] != 'issuing_authorization.request' else 200
         return request.make_json_response(data=response, headers=response_headers, status=status)
 
+    @route('/stripe_issuing/upload_file', type='jsonrpc', auth='user', methods=['POST'])
+    def stripe_issuing_upload_file(self, model, record_id, field_name, purpose, file_name, b64_file_data, content_type):
+        if model != 'hr.expense.stripe.dispute':
+            raise UserError(self.env._("You cannot upload stripe attachment for the given model."))
+
+        if not isinstance(record_id, int):
+            raise UserError(self.env._("Uploading a file is only supported for single disputes."))
+
+        record = self.env[model].browse(record_id)
+        if not record.exists():
+            raise UserError(self.env._("The record doesn't exist."))
+
+        record._check_can_upload_stripe_attachment(field_name)
+
+        if not b64_file_data:
+            raise UserError(self.env._("No file provided for upload."))
+
+        upload_config = STRIPE_FILE_UPLOAD_CONFIG.get(purpose)
+        if not upload_config:
+            raise UserError(self.env._("The purpose provided is not valid."))
+
+        if model not in upload_config['supported_models']:
+            raise UserError(self.env._("The purpose '%(purpose)s' is not allowed to be used with this model.", purpose=purpose))
+
+        if content_type not in upload_config['mimetypes']:
+            raise UserError(self.env._("The content type provided is not valid for the purpose '%(purpose)s'.", purpose=purpose))
+
+        file_data = base64.b64decode(b64_file_data)
+        if len(file_data) > upload_config['max_size']:
+            MiB = 1024 * 1024
+            raise UserError(self.env._(
+                "The file provided is too large. Maximum size is %(size)s MiB.",
+                size=upload_config['max_size'] // MiB,
+            ))
+
+        if not isinstance(file_name, str) or not file_name.strip():
+            raise UserError(self.env._("The file name provided is not valid. Only use alpha-numeric characters or '.-_'."))
+        file_name = secure_filename(file_name)
+
+        company_sudo = record.company_id.sudo() if 'company_id' in record._fields else self.env.company.sudo()
+        route = 'files'
+        payload = {
+            'account': company_sudo.stripe_id,
+            'purpose': purpose,
+        }
+        files = {'file': (file_name, file_data, content_type)}
+        response = make_request_stripe_proxy(company_sudo, route, {}, method='POST', payload=payload, files=files)
+        record[field_name] = response['id']
+
+    @route('/stripe_issuing/download_file', type='http', auth='user', methods=['GET'])
+    def stripe_issuing_download_file(self, model, record_id, field_name):
+        if model != 'hr.expense.stripe.dispute':
+            raise UserError(self.env._("You cannot download stripe attachment for the given model."))
+
+        try:
+            record_id = int(record_id)  # Given from window.open in params instead of rpc calls, so id is a string here.
+        except ValueError:
+            raise UserError(self.env._("Downloading a file is only supported for single disputes.")) from None
+
+        record = self.env[model].browse(record_id)
+        if not record.exists():
+            raise UserError(self.env._("The record doesn't exist."))
+
+        record._check_can_download_stripe_attachment(field_name)
+
+        stripe_file_id = record[field_name]
+        if not stripe_file_id:
+            raise UserError(self.env._("No file was uploaded for this field."))
+
+        company_sudo = record.company_id.sudo()
+        route = 'files/{file_id}'
+        route_params = {'file_id': stripe_file_id}
+        payload = {'account': company_sudo.stripe_id}
+        response = make_request_stripe_proxy(company_sudo, route, route_params, method='GET', payload=payload)
+
+        filename = f'attachment; filename="{response["filename"]}"'
+
+        route = 'files/{file_id}/contents'
+        content_type, content = make_request_stripe_proxy(company_sudo, route, route_params, method='GET', payload=payload, raw=True)
+
+        return request.make_response(
+            data=content,
+            headers=[
+                ('Content-Type', content_type),
+                ('Content-Disposition', filename),
+            ],
+        )
+
     # --------------------------------------------
     # Events processing methods
     # --------------------------------------------
@@ -97,12 +193,10 @@ class StripeIssuingController(Controller):
             raise MissingError(env._("A card that doesn't exist on the database was used"))
         if event['type'] == 'issuing_authorization.request':
             amount = format_amount_from_stripe(auth_object['pending_request']['amount'], card.currency_id)
-            mcc = env['product.mcc.stripe.tag'].search([
-                ('code', '=', auth_object['merchant_data']['category_code']),
-            ])
+            mcc_code = auth_object['merchant_data']['category_code']
             country = env['res.country'].search([('code', 'ilike', auth_object['merchant_data']['country'])], limit=1)
 
-            can_pay, refusal_reason = card._can_pay_amount(amount, mcc, country)
+            can_pay, refusal_reason = card._can_pay_amount(amount, mcc_code, country)
             if can_pay:
                 # We only create it when the capture happens
                 return {'message': 'Authorization request approved', 'approved': True}
@@ -112,23 +206,35 @@ class StripeIssuingController(Controller):
                 return {'message': refusal_reason, 'approved': False}
 
         if event['type'] in {'issuing_authorization.created', 'issuing_authorization.updated'}:
-            default_request_history = [{'approved': False, 'reason': _("Unknown")}]
+            default_reason = env._("Unknown reason.")
+            default_request_history = [{'approved': False, 'reason': default_reason}]
             request_history = auth_object.setdefault('request_history', default_request_history)[0]
-            if auth_object['status'] == 'closed' and not request_history['approved']:
-                # There will be no capture, we need to create a refused expense to log the refusal reason
-                technical_reason = request_history['reason']
-                if technical_reason == 'webhook_declined':
-                    refusal_reason = auth_object['metadata'].get('message', STRIPE_REQUEST_REFUSED_REASONS[request_history['reason']])
-                else:
-                    refusal_reason = STRIPE_REQUEST_REFUSED_REASONS[request_history['reason']]
-                env['hr.expense']._create_from_stripe_authorization(auth_object, refusal_reason)
-                return {'message': 'Refused expense created'}
+            response_message = ''
+            match auth_object['status'], request_history['approved']:
+                case 'pending', True:
+                    env['hr.expense']._create_from_stripe_authorization(auth_object)
+                    response_message = 'Draft expense created'
 
-            elif auth_object['status'] == 'pending':
-                env['hr.expense']._create_from_stripe_authorization(auth_object)
-                return {'message': 'Draft expense created'}
+                case ('closed', False) | ('reversed' | 'expired', False | True):
+                    # There will be no capture, we need to create a refused expense to log the refusal reason
+                    technical_reason = request_history['reason']
+                    if technical_reason == 'webhook_declined':
+                        refusal_reason = auth_object['metadata'].get(
+                            'message',
+                            STRIPE_REQUEST_REFUSED_REASONS.get(technical_reason, default_reason),
+                        )
+                    elif technical_reason == 'webhook_approved':
+                        refusal_reason = env._(
+                            "The authorization was approved by the webhook, but was later reversed or closed without any capture."
+                        )
+                    else:
+                        refusal_reason = STRIPE_REQUEST_REFUSED_REASONS.get(technical_reason, default_reason)
+                    env['hr.expense']._create_from_stripe_authorization(auth_object, refusal_reason)
+                    response_message = 'Refused expense created'
 
-            return {'message': 'Event ignored, not a refused or draft expense'}
+                case _:
+                    response_message = 'Event ignored, not a refused or draft expense'
+            return {'message': response_message}
         raise ValidationError(env._("Invalid event type '%(invalid_event)s'", invalid_event=event['type']))
 
     @api.model
@@ -138,7 +244,7 @@ class StripeIssuingController(Controller):
         company = env.company
         journal = company.stripe_journal_id
         last_balance_timestamp = journal.stripe_issuing_balance_timestamp
-        if last_balance_timestamp > event['created']:
+        if last_balance_timestamp >= event['created']:
             return {'message': 'Balance ignored, a more recent one was already received'}
         stripe_currency = journal.stripe_currency_id
         if issuing_object['available']:  # May be empty if 0
@@ -150,6 +256,26 @@ class StripeIssuingController(Controller):
             'stripe_issuing_balance': issuing_amount,
             'stripe_issuing_balance_timestamp': event['created'],
         })
+
+        if stripe_currency.compare_amounts(issuing_amount, 0) < 0:
+            amount_to_dispute = -issuing_amount
+            # Remove amount from force captures already disputed and not yet reinstated
+            disputes = env['hr.expense.stripe.dispute'].search([
+                ('state', 'in', ('submitted', 'won')),
+                ('reason', '=', 'no_valid_authorization'),
+                ('company_id', '=', env.company.id),
+            ])
+            reinstated_dispute_stripe_ids = {
+                stripe_id
+                for stripe_id,
+                in env['account.bank.statement.line']._read_group(
+                    domain=[('stripe_id', 'in', disputes.mapped('stripe_id')), ('amount', '>', 0)],
+                    groupby=['stripe_id'],
+                )
+            }
+            disputes = disputes.filtered(lambda d: d.stripe_id not in reinstated_dispute_stripe_ids)
+            amount_to_dispute -= sum(disputes.expense_ids.mapped('disputed_amount'))
+            env['hr.expense']._dispute_force_captures(amount_to_dispute)
 
         return {'message': 'Balance updated'}
 
@@ -222,7 +348,31 @@ class StripeIssuingController(Controller):
 
     @api.model
     def _process_dispute_event(self, env, event):
-        return {'message': 'Not Implemented'}
+        dispute_object = event['data']['object']
+        existing_expense = env['hr.expense'].search([('stripe_transaction_id', '=', dispute_object['transaction'])], limit=1)
+
+        if not existing_expense:
+            raise MissingError(env._("An expense that doesn't exist on the database was used"))
+
+        if (
+            dispute_object.get('metadata', {}).get('automated_dispute')
+            and event['type'] in {'issuing_dispute.created', 'issuing_dispute.updated', 'issuing_dispute.submitted'}
+        ):
+            return {'message': "Dispute Event skipped for Automatically Disputed Force Captures with negative balance."}
+
+        if event['type'] in {'issuing_dispute.created', 'issuing_dispute.updated', 'issuing_dispute.submitted', 'issuing_dispute.closed'}:
+            env['hr.expense.stripe.dispute'].with_context(from_webhook=True)._create_or_update_from_stripe(dispute_object)
+
+        elif event['type'] == 'issuing_dispute.funds_reinstated':
+            # Stripe seems to send this event 2 times in test mode, If this happens in production, consider
+            # adding env.cr.commit. A flush wont work, since the 2 events will be using different cursor since
+            # they will be on different threads.
+            env['account.bank.statement.line']._create_from_stripe_dispute(dispute_object, 'reinstated')
+
+        elif event['type'] == 'issuing_dispute.funds_rescinded':
+            env['account.bank.statement.line']._create_from_stripe_dispute(dispute_object, 'rescinded')
+
+        return {'message': "Dispute Created/Updated"}
 
     @api.model
     def _process_topup_event(self, env, event):

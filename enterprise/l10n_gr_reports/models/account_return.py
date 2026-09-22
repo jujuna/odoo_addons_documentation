@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+
 from odoo import api, fields, models
 
 
@@ -15,3 +16,12 @@ class AccountReturn(models.Model):
             return deadline_date
 
         return super()._evaluate_deadline(company, return_type, return_type_external_id, date_from, date_to)
+
+    def _prepare_submission(self):
+        # Extends account_reports
+        if self.type_external_id == 'l10n_gr_reports.gr_tax_return_type':
+            return self.env['l10n_gr_reports.tax.return.submission.wizard']._open_submission_wizard(self)
+        if self.type_external_id == 'l10n_gr_reports.gr_ec_sales_list_return_type':
+            return self.env['l10n_gr_reports.ec.sales.list.submission.wizard']._open_submission_wizard(self)
+
+        return super()._prepare_submission()

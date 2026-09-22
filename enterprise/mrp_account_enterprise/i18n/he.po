@@ -17,10 +17,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.5alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-11-16 13:52+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Hebrew <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 03:50+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Hebrew <https://translate.odoo.com/projects/odoo-master/"
 "mrp_account_enterprise/he/>\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -28,26 +28,31 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
 "n % 10 == 0) ? 2 : 3));\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
-msgid "Average Component Cost / Unit"
-msgstr "עלות רכיב/יחידה ממוצעת"
+#: model:ir.module.module,description:base.module_mrp_account_enterprise
+msgid ""
+"\n"
+"Analytic Accounting in MRP\n"
+"==========================\n"
+"\n"
+"* Cost structure report\n"
+msgstr ""
 
 #. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
-msgid "Average Operation Cost / Unit"
-msgstr "עלות תפעול ממוצעת / יחידה"
+#: model:ir.module.module,shortdesc:base.module_mrp_account_enterprise
+msgid "Accounting - MRP"
+msgstr ""
 
 #. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
-msgid "Average Total Cost / Unit"
-msgstr "עלות כוללת ממוצעת / יחידה"
+#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__extra_cost
+msgid "Additional cost per manufactured unit (e.g. labour, energy, packaging)"
+msgstr ""
 
 #. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_form_view
-msgid "Average Workcenter Cost / Unit"
+#: model:ir.module.module,summary:base.module_mrp_account_enterprise
+msgid "Analytic accounting in Manufacturing"
 msgstr ""
 
 #. module: mrp_account_enterprise
@@ -61,20 +66,10 @@ msgid "Company"
 msgstr "חברה"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_component_cost
-msgid "Component Cost / Unit"
-msgstr "עלות רכיב / יחידה"
-
-#. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_component_cost
 msgid ""
 "Component cost per unit produced (in product UoM) of manufacturing order"
 msgstr "עלות רכיב ליחידה מיוצרת (ביחידות מידה של מוצר) של הזמנת ייצור"
-
-#. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_cost
-msgid "Cost / Unit"
-msgstr "עלות / יחידה"
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_cost
@@ -123,14 +118,19 @@ msgid "Expected Employee Cost / Unit"
 msgstr "עלות עובד/יחידה צפוי"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__expected_operation_cost_unit
-msgid "Expected Operation Cost / Unit"
-msgstr "צפי עלות תפעול/יחידה"
-
-#. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__expected_total_cost_unit
 msgid "Expected Total Cost / Unit"
 msgstr "צפי עלות כוללת/יחידה"
+
+#. module: mrp_account_enterprise
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__expected_workcenter_cost_unit
+msgid "Expected Work Center Cost / Unit"
+msgstr ""
+
+#. module: mrp_account_enterprise
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__extra_cost
+msgid "Extra Cost"
+msgstr ""
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__id
@@ -154,15 +154,9 @@ msgid "No data yet!"
 msgstr "אין דירוג עדיין"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_operation_cost
-msgid ""
-"Operation cost per unit produced (in product UoM) of manufacturing order"
-msgstr "עלות תפעול ליחידה מיוצרת (ביחידת מידה של מוצר) של הזמנת ייצור"
-
-#. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_duration
-msgid "Operation duration (minutes) per unit produced of manufacturing order"
-msgstr "משך הפעולה (דקות) ליחידה המיוצרת מסדר ייצור"
+msgid "Operation duration per unit produced of manufacturing order"
+msgstr ""
 
 #. module: mrp_account_enterprise
 #: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
@@ -188,7 +182,6 @@ msgstr "כמות נדרשת"
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__qty_produced
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
 msgid "Quantity Produced"
 msgstr "כמות מיוצרת"
 
@@ -203,9 +196,20 @@ msgid "Total Component Cost"
 msgstr "עלות רכיבים כוללת"
 
 #. module: mrp_account_enterprise
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_component_cost
+msgid "Total Component Cost / Unit"
+msgstr ""
+
+#. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__total_cost
 msgid "Total Cost"
 msgstr "עלות כוללת"
+
+#. module: mrp_account_enterprise
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_cost
+#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_pivot_view
+msgid "Total Cost / Unit"
+msgstr ""
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__duration
@@ -213,18 +217,13 @@ msgid "Total Duration of Operations"
 msgstr "משך הפעילות הכולל"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__operation_cost
-msgid "Total Operation Cost"
-msgstr "עלות תפעול כוללת"
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__workcenter_cost
+msgid "Total Work Center Cost"
+msgstr ""
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_operation_cost
-msgid "Total Operation Cost / Unit"
-msgstr "עלות תפעול כוללת / יחידה"
-
-#. module: mrp_account_enterprise
-#: model_terms:ir.ui.view,arch_db:mrp_account_enterprise.mrp_report_form_view
-msgid "Total Workcenter Cost"
+#: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__unit_workcenter_cost
+msgid "Total Work Center Cost / Unit"
 msgstr ""
 
 #. module: mrp_account_enterprise
@@ -241,14 +240,9 @@ msgstr ""
 "עלות כוללת של פקודת הייצור (עלות רכיבים + עלות פעולות + עלות קבלנות משנה)"
 
 #. module: mrp_account_enterprise
-#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__operation_cost
-msgid "Total cost of operations for manufacturing order"
-msgstr "סך העלות של פעולות עבור הזמנת ייצור"
-
-#. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__duration
-msgid "Total duration (minutes) of operations for manufacturing order"
-msgstr "משך הזמן הכולל (דקות) של פעולות עבור הזמנת ייצור"
+msgid "Total duration of operations for manufacturing order"
+msgstr ""
 
 #. module: mrp_account_enterprise
 #: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__qty_demanded
@@ -261,123 +255,48 @@ msgid "Total quantity produced in product's UoM"
 msgstr "הכמות הכוללת המיוצרת ביחידת המידה של המוצר"
 
 #. module: mrp_account_enterprise
+#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__workcenter_cost
+msgid "Total work center cost for manufacturing order"
+msgstr ""
+
+#. module: mrp_account_enterprise
+#: model:ir.model.fields,help:mrp_account_enterprise.field_mrp_report__unit_workcenter_cost
+msgid ""
+"Work center cost per unit produced (in product UoM) of manufacturing order"
+msgstr ""
+
+#. module: mrp_account_enterprise
 #: model:ir.model.fields,field_description:mrp_account_enterprise.field_mrp_report__yield_rate
 msgid "Yield Percentage(%)"
 msgstr "אחוז תשואה (%)"
 
-#~ msgid "'Cost Analysis - %s ' % object.name"
-#~ msgstr "'ניתוח עלויות - %s ' % object.name"
+#~ msgid "Average Component Cost / Unit"
+#~ msgstr "עלות רכיב/יחידה ממוצעת"
 
-#~ msgid "'Cost Structure Analysis - %s' % object.name"
-#~ msgstr "'ניתוח מבנה עלויות - %s' % object.name"
+#~ msgid "Average Operation Cost / Unit"
+#~ msgstr "עלות תפעול ממוצעת / יחידה"
 
-#~ msgid ", from"
-#~ msgstr ", מ"
+#~ msgid "Average Total Cost / Unit"
+#~ msgstr "עלות כוללת ממוצעת / יחידה"
 
-#~ msgid "<span>Avg Cost of Components Per Unit</span>"
-#~ msgstr "<span>עלות ממוצעת של רכיבים ליחידה</span>"
+#~ msgid "Component Cost / Unit"
+#~ msgstr "עלות רכיב / יחידה"
 
-#~ msgid "<span>Avg Cost of Operations Per Unit</span>"
-#~ msgstr "<span>עלות תפעול ממוצעת ליחידה</span>"
+#~ msgid "Cost / Unit"
+#~ msgstr "עלות / יחידה"
 
-#~ msgid "<span>Avg Total Cost Per Unit</span>"
-#~ msgstr "<span>עלות כוללת ממוצעת ליחידה</span>"
+#~ msgid "Expected Operation Cost / Unit"
+#~ msgstr "צפי עלות תפעול/יחידה"
 
-#~ msgid "<span>Components</span>"
-#~ msgstr "<span>רכיבים</span>"
+#~ msgid ""
+#~ "Operation cost per unit produced (in product UoM) of manufacturing order"
+#~ msgstr "עלות תפעול ליחידה מיוצרת (ביחידת מידה של מוצר) של הזמנת ייצור"
 
-#~ msgid "<span>Cost/hour</span>"
-#~ msgstr "<span>עלות/שעה</span>"
+#~ msgid "Total Operation Cost"
+#~ msgstr "עלות תפעול כוללת"
 
-#~ msgid "<span>Operation</span>"
-#~ msgstr "<span>פעולה</span>"
+#~ msgid "Total Operation Cost / Unit"
+#~ msgstr "עלות תפעול כוללת / יחידה"
 
-#~ msgid "<span>Product</span>"
-#~ msgstr "<span>מוצר</span>"
-
-#~ msgid "<span>Quantity</span>"
-#~ msgstr "<span>כמות</span>"
-
-#~ msgid "<span>Scraps</span>"
-#~ msgstr "<span>פסולים</span>"
-
-#~ msgid "<span>Total Cost</span>"
-#~ msgstr "<span>עלות כוללת</span>"
-
-#~ msgid "<span>Unit Cost</span>"
-#~ msgstr "<span>עלות ליחידה</span>"
-
-#~ msgid "<span>Unit of Measure</span>"
-#~ msgstr "<span>יחידת מידה</span>"
-
-#~ msgid "<span>Working Time</span>"
-#~ msgstr "<span>זמן עבודה</span>"
-
-#~ msgid "<strong>Total Cost of Components</strong>"
-#~ msgstr "<strong>עלות רכיבים כוללת</strong>"
-
-#~ msgid "<strong>Total Cost of Operations</strong>"
-#~ msgstr "<strong>עלות כוללת של הפעולות</strong>"
-
-#~ msgid "<strong>Total Cost of Scraps</strong>"
-#~ msgstr "<strong>עלות כוללת של הפסולים</strong>"
-
-#~ msgid "<strong>Total Production Cost</strong>"
-#~ msgstr "<strong>עלות ייצור כוללת</strong>"
-
-#~ msgid "By product(s)"
-#~ msgstr "לפי מוצר (ים)"
-
-#~ msgid "Cost Analysis"
-#~ msgstr "ניתוח עלות"
-
-#~ msgid "Cost Analysis Report"
-#~ msgstr "דוח ניתוח עלויות"
-
-#~ msgid "Cost Breakdown of Products"
-#~ msgstr "פירוט עלויות של מוצרים"
-
-#~ msgid "Cost Structure Analysis"
-#~ msgstr "ניתוח מבנה העלויות"
-
-#~ msgid "Cost of Components"
-#~ msgstr "עלות רכיבים"
-
-#~ msgid "Cost of Components per unit (in"
-#~ msgstr "עלות רכיבים ליחידה (ב"
-
-#~ msgid "Cost of Operations"
-#~ msgstr "עלות הפעולות"
-
-#~ msgid "Cost of Operations per unit (in"
-#~ msgstr "עלות תפעול ליחידה (ב"
-
-#~ msgid "Cost of Scraps"
-#~ msgstr "עלות הפסולים"
-
-#~ msgid "Group by"
-#~ msgstr "קבץ לפי"
-
-#~ msgid "ID"
-#~ msgstr "מזהה"
-
-#~ msgid "MRP Cost Structure Report"
-#~ msgstr "דו\"ח מבנה עלות MRP"
-
-#~ msgid "Product Template Cost Structure Report"
-#~ msgstr "דו\"ח מבנה עלות תבנית מוצר"
-
-#~ msgid "Product Variant"
-#~ msgstr "וריאנט מוצר"
-
-#~ msgid "Some of the Manufacturing Order(s) selected are not done yet"
-#~ msgstr "חלק מהוראות הייצור שנבחרו עדיין לא בוצעו"
-
-#~ msgid "Total Cost per unit (in"
-#~ msgstr "עלות כוללת ליחידה (ב"
-
-#~ msgid "hours"
-#~ msgstr "שעות"
-
-#~ msgid "manufacturing order(s)."
-#~ msgstr "הזמנה(ות) ייצור"
+#~ msgid "Total cost of operations for manufacturing order"
+#~ msgstr "סך העלות של פעולות עבור הזמנת ייצור"

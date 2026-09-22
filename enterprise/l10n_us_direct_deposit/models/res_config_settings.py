@@ -33,7 +33,7 @@ class ResConfigSettings(models.TransientModel):
     )
 
     def button_wise_enable_logging(self):
-        self.env['ir.config_parameter'].sudo().set_param(
+        self.env['ir.config_parameter'].sudo().set_str(
             ICP_LOG_NAME,
             (fields.Datetime.now() + timedelta(minutes=30)).strftime(DEFAULT_SERVER_DATETIME_FORMAT),
         )

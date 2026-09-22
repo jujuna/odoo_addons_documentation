@@ -5,13 +5,24 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr_payroll.payroll_hr_employee_view_form"/>
         <field name="arch" type="xml">
+
+            <div name="final_yearly_costs" position="after">
+                <field name="l10n_mx_is_seventh_day"
+                    string="Seventh Day"
+                    invisible="schedule_pay not in ['weekly', '14_days'] or country_code != 'MX'"/>
+            </div>
+
+            <field name="registration_number" position="before">
+                <field name="l10n_mx_min_wage_zone" invisible="country_code != 'MX'"/>
+            </field>
+
             <group name="payroll_group" position="inside">
                 <group string="Options" invisible="company_country_code != 'MX'">
                     <label for="l10n_mx_holiday_bonus_rate" string="Holiday Bonus Rate"/>
                     <div class="o_row">
-                        <field name="l10n_mx_holiday_bonus_rate" class="o_hr_narrow_field"/>
-                        <span>%</span>
+                        <field name="l10n_mx_holiday_bonus_rate" class="o_hr_narrow_field" widget="percentage"/>
                     </div>
+                    <field name="l10n_mx_christmas_bonus"/>
                     <field name="l10n_mx_savings_fund" string="Savings Fund"/>
 
                     <separator string="Vouchers"/>
@@ -34,7 +45,7 @@
                             <field name="infonavit_type"/>
                             <field name="discount_factor" invisible="infonavit_type != 'discount_factor'"/>
                             <field name="fixed_monetary_fee" invisible="infonavit_type != 'fixed_monetary_fee'" sum="Total Fixed Monetary Fee"/>
-                            <field name="percentage" invisible="infonavit_type != 'percentage'"/>
+                            <field name="percentage" invisible="infonavit_type != 'percentage'" widget="percentage"/>
                         </list>
                     </field>
                     <separator string="Fonacot"/>
@@ -48,6 +59,10 @@
                     </field>
                 </page>
             </page>
+
+            <field name="identification_id" position="after">
+                <field name="l10n_mx_ssn" invisible="country_code != 'MX'"/>
+            </field>
         </field>
     </record>
 </odoo>

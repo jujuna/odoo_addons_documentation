@@ -21,14 +21,15 @@ export class JobPostNoSaveFormController extends FormController {
             duplicate: {
                 isAvailable: () => activeActions.edit,
                 sequence: 30,
-                icon: "fa fa-clone",
+                icon: "content_copy",
                 description: _t("Duplicate"),
                 callback: () => this.duplicateRecord(),
             },
             delete: {
                 isAvailable: () => activeActions.delete && !this.model.root.isNew,
                 sequence: 40,
-                icon: "fa fa-trash-o",
+                icon: "delete",
+                iconClass: "oi-filled",
                 description: _t("Delete"),
                 callback: () => this.deleteRecord(),
                 skipSave: true,

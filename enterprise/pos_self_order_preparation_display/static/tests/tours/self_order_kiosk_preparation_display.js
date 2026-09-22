@@ -27,7 +27,7 @@ registry.category("web_tour.tours").add("test_ensure_mobile_order_preparation_di
             Utils.clickBtn("Checkout"),
             Utils.clickBtn("Order"),
             {
-                trigger: ".confirmation-page:contains('Pay $ 2.53 at the counter')",
+                trigger: ".o_pos_order_due_amount:contains('$ 2.53')",
             },
             Utils.clickBtn("Ok"),
             Utils.clickBtn("My Order"),

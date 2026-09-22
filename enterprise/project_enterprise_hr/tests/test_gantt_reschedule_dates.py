@@ -7,18 +7,17 @@ from dateutil.relativedelta import relativedelta
 from odoo.addons.project_enterprise.tests.gantt_reschedule_dates_common import fake_now
 from .auto_shift_dates_hr_common import AutoShiftDatesHRCommon
 from odoo.fields import Command
-from odoo.tests import freeze_time
+from odoo.tests import tagged, freeze_time
 
 
 @freeze_time(fake_now)
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestGanttRescheduleOnTasks(AutoShiftDatesHRCommon):
 
     def test_auto_shift_employee_integration(self):
         # We have to bypass the calendar validity computation for employees/students,
         # Otherwise, we will fallback on company calendar if there are no contracts
         # once the test is launched in project_enterprise_hr_contract by extension
-        self.armande_employee.employee_type = 'freelance'
-
         self.task_4.depend_on_ids = [Command.clear()]
         new_task_3_begin_date = self.task_1_date_deadline - timedelta(hours=2)  # 2021 06 24 10:00
 
@@ -73,7 +72,7 @@ class TestGanttRescheduleOnTasks(AutoShiftDatesHRCommon):
         })
         self.assertEqual(self.task_3.planned_date_begin,
                          new_task_1_begin_date + relativedelta(days=1, hour=13), failed_message)
-        failed_message = "The auto shift date feature should work for tasks landing on the edge of employee create_date or on the edge of departure_date, even when falling in the middle of the allocated_hours."
+        failed_message = "The auto shift date feature should work for tasks landing on the edge of employee create_date or on the edge of departure_date, preserving the task's planned span."
         new_task_3_begin_date = self.armande_employee_create_date + relativedelta(hour=10)
         self.armande_employee.write({
             'resource_calendar_id': self.calendar_morning.id,
@@ -83,7 +82,7 @@ class TestGanttRescheduleOnTasks(AutoShiftDatesHRCommon):
             'date_deadline': (new_task_3_begin_date + (self.task_3_date_deadline - self.task_3_planned_date_begin)).strftime('%Y-%m-%d %H:%M:%S'),
         })
         self.assertEqual(self.task_1.planned_date_begin,
-                         new_task_3_begin_date + relativedelta(hour=9), failed_message)
+                         new_task_3_begin_date - relativedelta(days=3, hour=11), failed_message)
         new_task_1_begin_date = self.armande_departure_date + relativedelta(hour=10)
         self.gantt_reschedule_consume_buffer(self.task_1, {
             'planned_date_begin': new_task_1_begin_date.strftime('%Y-%m-%d %H:%M:%S'),
@@ -123,7 +122,7 @@ class TestGanttRescheduleOnTasks(AutoShiftDatesHRCommon):
         self.env["hr.employee"].create([{
                 "name": user.name,
                 "user_id": user.id,
-                "employee_type": "freelance",
+                "tz": "UTC",
             } for user in [self.user1, self.user2]
         ])
 
@@ -132,19 +131,19 @@ class TestGanttRescheduleOnTasks(AutoShiftDatesHRCommon):
             'date_from': datetime(year=2024, month=2, day=15, hour=0),
             'date_to': datetime(year=2024, month=2, day=15, hour=23),
             'resource_id': self.user1.employee_id.resource_id.id,
-            'time_type': 'leave',
+            'count_as': 'absence',
         }, {
             'name': 'scheduled leave',
             'date_from': datetime(year=2024, month=2, day=20, hour=0),
             'date_to': datetime(year=2024, month=2, day=20, hour=23),
             'resource_id': self.user1.employee_id.resource_id.id,
-            'time_type': 'leave',
+            'count_as': 'absence',
         }, {
             'name': 'scheduled leave',
             'date_from': datetime(year=2024, month=2, day=16, hour=0),
             'date_to': datetime(year=2024, month=2, day=16, hour=23),
             'resource_id': self.user2.employee_id.resource_id.id,
-            'time_type': 'leave',
+            'count_as': 'absence',
         }])
 
         self.annual_holiday.write({
@@ -190,7 +189,7 @@ class TestGanttRescheduleOnTasks(AutoShiftDatesHRCommon):
         })
         self.assert_new_dates(
             self.project2_task_0,
-            datetime(year=2024, month=2, day=7, hour=14),
+            datetime(year=2024, month=2, day=8, hour=9),
             datetime(year=2024, month=2, day=8, hour=14),
         )
 
@@ -264,6 +263,7 @@ class TestGanttRescheduleOnTasks(AutoShiftDatesHRCommon):
 
 
 @freeze_time(fake_now)
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestGanttRescheduleOnTasksWithVersion(AutoShiftDatesHRCommon):
 
     @classmethod
@@ -285,11 +285,9 @@ class TestGanttRescheduleOnTasksWithVersion(AutoShiftDatesHRCommon):
         cls.armande_user_calendar = cls.env['resource.calendar'].create({
             'name': 'Wednesday calendar',
             'attendance_ids': [
-                (0, 0, {'name': 'Wednesday Morning', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                (0, 0, {'name': 'Wednesday Lunch', 'dayofweek': '2', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                (0, 0, {'name': 'Wednesday Evening', 'dayofweek': '2', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 8, 'hour_to': 12}),
+                (0, 0, {'dayofweek': '2', 'hour_from': 13, 'hour_to': 17}),
             ],
-            'tz': 'UTC',
         })
 
     def test_auto_shift_employee_contract_integration(self):

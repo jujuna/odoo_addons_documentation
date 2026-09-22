@@ -77,6 +77,7 @@ For Development information go to http://www.afip.gob.ar/fe/documentos/WSBFEv1%2
     'depends': [
         'l10n_ar',
         'certificate',
+        'currency_rate_live',
     ],
     'external_dependencies': {
         'python': ['zeep'],
@@ -91,17 +92,15 @@ For Development information go to http://www.afip.gob.ar/fe/documentos/WSBFEv1%2
         'views/res_config_settings_view.xml',
         'views/account_move_view.xml',
         'views/account_journal_view.xml',
-        'views/res_currency_view.xml',
         'views/product_template_view.xml',
         'views/report_invoice.xml',
-        'security/ir.model.access.csv',
         'data/ir_actions_act_url_data.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/res_company_demo.xml',
         'demo/res_config_settings_demo_view.xml',
     ],
-    'installable': True,
     'auto_install': ['l10n_ar'],
     'license': 'OEEL-1',
 }

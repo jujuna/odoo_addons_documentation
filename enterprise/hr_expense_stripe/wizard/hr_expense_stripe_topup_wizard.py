@@ -1,7 +1,7 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
-from odoo.addons.hr_expense_stripe.utils import make_request_stripe_proxy, format_amount_to_stripe
+from odoo.addons.hr_expense_stripe.utils import format_amount_to_stripe, make_request_stripe_proxy
 
 
 class HrExpenseStripeTopupWizard(models.TransientModel):
@@ -18,7 +18,7 @@ class HrExpenseStripeTopupWizard(models.TransientModel):
     company_id = fields.Many2one(comodel_name='res.company', string="Company", readonly=True, required=True)
     currency_id = fields.Many2one(comodel_name='res.currency', string="Currency", readonly=True, required=True)
     partner_bank_id = fields.Many2one(comodel_name='res.partner.bank', string="IBAN", readonly=True)
-    account_number = fields.Char(string="Account number", related='partner_bank_id.acc_number', readonly=True)
+    account_number = fields.Char(string="Account number", related='partner_bank_id.account_number', readonly=True)
     bic = fields.Char(string="BIC", related='partner_bank_id.bank_bic', readonly=True)
     qr_code = fields.Html(string="QR Code URL", compute="_compute_qr_code")
     is_live_mode = fields.Boolean(string="Live Mode", readonly=True, required=True, default=True)
@@ -65,19 +65,21 @@ class HrExpenseStripeTopupWizard(models.TransientModel):
             break
 
         if not financial_address:
-            raise UserError(_("Only IBAN is supported for Stripe Issuing funding instructions right now"))
+            raise UserError(self.env._("Only IBAN or BACS are supported for Stripe Issuing funding instructions right now"))
 
-        if not 'sepa' in supported_networks:
-            raise UserError(_("Only SEPA is supported for Stripe Issuing funding instructions right now"))
+        account_number = financial_address.get('iban') or financial_address.get('account_number')
+        if not account_number:
+            # Only case where we don't have an account number is USD
+            raise UserError(self.env._("Stripe Issuing funding instructions with USD currency aren't supported right now"))
 
-        # Search or create the partner
         partner_bank = self.env['res.partner.bank'].search(
-            domain=[('acc_number', '=', financial_address['iban'])],
+            domain=[('account_number', '=', account_number)],
             limit=1,
         )
 
         if not partner_bank:
-            partner_country = self.env['res.country'].search([('code', 'ilike', financial_address['country'])], limit=1)
+            # That means the partner itself doesn't exist yet
+            partner_country = self.env['res.country'].search([('code', 'ilike', fi_object['bank_transfer']['country'])], limit=1)
             account_holder_address = financial_address['account_holder_address']
             state = self.env['res.country.state'].search([('name', 'ilike', account_holder_address['state'])], limit=1)
             partner = self.env['res.partner'].create([{
@@ -92,29 +94,42 @@ class HrExpenseStripeTopupWizard(models.TransientModel):
                 'website': 'https://www.stripe.com',
             }])
 
-            bank = self.env['res.bank'].search([('bic', 'ilike', financial_address['bic'])], limit=1)
-            if not bank:
-                bank_address = financial_address['bank_address']
-                bank_country = self.env['res.country'].search([('code', 'ilike', bank_address['country'])], limit=1)
-                bank_state = self.env['res.country.state'].search([('name', 'ilike', bank_address['state'])], limit=1)
-                bank = self.env['res.bank'].create([{
-                    'name': _("Stripe Partner Bank"),
-                    'bic': financial_address['bic'],
-                    'country': bank_country and bank_country.id,
-                    'state': bank_state and bank_state.id,
+            bank_address = financial_address['bank_address']
+            bank_country = self.env['res.country'].search([('code', 'ilike', bank_address['country'])], limit=1)
+            bank_state = self.env['res.country.state'].search([('name', 'ilike', bank_address['state'])], limit=1)
+            partner_bank = self.env['res.partner.bank']._find_or_create_bank_account(
+                account_number=account_number,
+                partner=partner,
+                company=self.company_id,
+                extra_create_vals={
+                    'bank_name': self.env._("Stripe Partner Bank"),
+                    'country_id': bank_country and bank_country.id,
+                    'state_id': bank_state and bank_state.id,
                     'city': bank_address['city'],
                     'street': bank_address['line1'],
                     'street2': bank_address['line2'],
                     'zip': bank_address['postal_code'],
-                }])
+                },
+            )
 
-            partner_bank = self.env['res.partner.bank'].create([{
-                'acc_number': financial_address['iban'],
-                'currency_id': currency.id,
-                'partner_id': partner.id,
-                'bank_id': bank.id,
-                'allow_out_payment': True,
-            }])
+        match currency.name:
+            case 'EUR':
+                if 'sepa' not in supported_networks:
+                    raise UserError(self.env._("Only SEPA is supported for Stripe Issuing funding instructions in the EU right now"))
+                if partner_bank.bank_bic != financial_address['bic']:
+                    partner_bank.bank_bic = financial_address['bic']
+            case 'GBP':
+                if 'bacs' not in supported_networks:
+                    raise UserError(self.env._("Only BACS is supported for Stripe Issuing funding instructions in the UK right now"))
+                if partner_bank.clearing_number != financial_address['sort_code']:
+                    partner_bank.clearing_number = financial_address['sort_code']
+                sort_label = self.env['clearing.label'].search([('country_code', '=', 'GB')], limit=1)
+                if sort_label and partner_bank.clearing_label_id != sort_label:
+                    partner_bank.clearing_label_id = sort_label
+            case 'USD':
+                raise UserError(self.env._("Stripe Issuing funding instructions with USD currency aren't supported right now"))
+
+        partner_bank.allow_out_payment = True
 
         return self.create([{
             'company_id': self.env.company.id,

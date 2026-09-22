@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from freezegun import freeze_time
 from lxml import etree
@@ -14,6 +14,8 @@ from .common import TestEsEdiTbaiCommon
 
 @tagged('post_install', '-at_install', 'post_install_l10n')
 class TestEdiTbaiXmls(TestEsEdiTbaiCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -94,7 +96,7 @@ class TestEdiTbaiXmls(TestEsEdiTbaiCommon):
         currency_usd.active = True
         date = str(self.out_invoice.invoice_date)
         self.env['res.currency.rate'].create({
-            'name': date,
+            'name': self.out_invoice.invoice_date - timedelta(days=1),
             'company_id': self.company_data['company'].id,
             'currency_id': currency_usd.id,
             'rate': 0.5})
@@ -227,7 +229,7 @@ class TestEdiTbaiXmls(TestEsEdiTbaiCommon):
         """Test XML of vendor bill for LROE Batuz autonomos (modelo 140)"""
         self.company_data['company'].l10n_es_tbai_tax_agency = 'bizkaia'
         self.company_data['company'].vat = '09760433S'
-        self.env['ir.config_parameter'].sudo().set_param('l10n_es_edi_tbai.epigrafe', '102100')
+        self.env['ir.config_parameter'].sudo().set_str('l10n_es_edi_tbai.epigrafe', '102100')
 
         with freeze_time(self.frozen_today):
             self.in_invoice = self.env['account.move'].create({

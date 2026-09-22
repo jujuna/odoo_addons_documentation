@@ -11,6 +11,8 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 @tagged('post_install', '-at_install')
 class TestSaleSubscriptionProductTemplate(TestSubscriptionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -46,3 +48,18 @@ class TestSaleSubscriptionProductTemplate(TestSubscriptionCommon):
         )
 
         self.assertEqual(configurator_data['price_info'], "per month")
+
+    def test_subscription_import_with_recurring_invoice_changed(self):
+        """
+        Checks that an error is raised when trying to import a subscription that already has been sold, if in the
+        import fields, the recurrence has changed.
+        """
+        self.subscription.action_confirm()
+        self.subscription._create_invoices()
+        self.env.flush_all()
+        fields = ['id', 'name', 'recurring_invoice']
+        export = self.subscription.order_line[0].product_id[0].export_data(fields)
+        rows = export['datas']
+        rows[0][2] = "False"
+        result = self.env['product.product'].with_context({'import_file': True}).load(fields, rows)
+        self.assertEqual(result['messages'][0]['type'], 'error')

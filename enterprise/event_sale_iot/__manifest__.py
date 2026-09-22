@@ -5,7 +5,6 @@
 Bridge module for Event/Sale/IoT. Only used to prevent auto-printing if a registration is not yet sold.
 """,
     'category': 'Marketing/Events',
-    'version': '1.0',
     'depends': ['iot', 'event_sale'],
     'assets': {
         'web.assets_backend': [

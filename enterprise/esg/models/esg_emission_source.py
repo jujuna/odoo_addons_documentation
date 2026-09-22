@@ -1,5 +1,4 @@
 from odoo import api, fields, models
-from odoo.exceptions import ValidationError
 from odoo.fields import Domain
 
 
@@ -28,7 +27,9 @@ class EsgEmissionSource(models.Model):
         readonly=False,
         recursive=True,
         required=True,
+        help="Shows whether emissions are direct, from energy use, or indirect from the value chain.",
     )
+    emission_factor_ids = fields.One2many('esg.emission.factor', 'source_id')
 
     activity_flow_direct_indirect = fields.Selection(
         selection=[
@@ -54,13 +55,6 @@ class EsgEmissionSource(models.Model):
 
     level = fields.Integer(compute='_compute_level', store=True, recursive=True)
 
-    @api.constrains('parent_id')
-    def _check_no_cyclic_dependencies(self):
-        for source in self:
-            parent_path_ids = source.parent_path[:-1].split("/")
-            if len(parent_path_ids) != len(set(parent_path_ids)):
-                raise ValidationError(self.env._("You cannot create a cyclic hierarchy of emission sources."))
-
     @api.depends('parent_id.level')
     def _compute_level(self):
         for source in self:
@@ -79,22 +73,23 @@ class EsgEmissionSource(models.Model):
     @api.depends('scope', 'activity_flow_indirect_others')
     def _compute_activity_flow(self):
         for source in self:
+            source.activity_flow_direct_indirect = source.activity_flow = False
             match source.scope:
                 case 'direct':
                     source.activity_flow_direct_indirect = source.activity_flow = 'company_reporting'
                 case 'indirect':
                     source.activity_flow_direct_indirect = source.activity_flow = 'upstream'
                 case 'indirect_others':
-                    source.activity_flow_direct_indirect = False
                     source.activity_flow = source.activity_flow_indirect_others
 
     @api.depends('name', 'parent_id.complete_name', 'scope')
     def _compute_complete_name(self):
         for source in self:
             if source.parent_id:
-                source.complete_name = f"{source.parent_id.complete_name} > {source.name}"
+                prefix = source.parent_id.complete_name
             else:
-                source.complete_name = f"{dict(self.env['esg.emission.source']._fields['scope']._description_selection(self.env)).get(source.scope)} > {source.name}"
+                prefix = dict(self.env['esg.emission.source']._fields['scope']._description_selection(self.env)).get(source.scope)
+            source.complete_name = f"{prefix} > {source.name}" if source.name else prefix
 
     @api.model
     def _search_complete_name(self, operator, value):

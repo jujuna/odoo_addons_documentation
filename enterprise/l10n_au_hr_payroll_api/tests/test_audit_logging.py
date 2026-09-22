@@ -30,34 +30,25 @@ class TestAuditLogging(TestL10nAUPayrollAPICommon):
             'name': "Test Calendar : 38 Hours/Week",
             'company_id': cls.env.company.id,
             'hours_per_day': 7.6,
-            'tz': "Australia/Sydney",
-            'two_weeks_calendar': False,
             'hours_per_week': 38.0,
             'full_time_required_hours': 38.0,
             'attendance_ids': [(5, 0, 0)] + [(0, 0, {
-                'name': "Attendance",
                 'dayofweek': dayofweek,
                 'hour_from': hour_from,
                 'hour_to': hour_to,
-                'day_period': day_period,
-                'work_entry_type_id': cls.env.ref('hr_work_entry.work_entry_type_attendance').id
+                'work_entry_type_id': cls.env.ref('hr_work_entry.au_work_entry_type_attendance').id
 
-            }) for dayofweek, hour_from, hour_to, day_period in [
-                ("0", 8.0, 12.0, "morning"),
-                ("0", 12.0, 13.0, "lunch"),
-                ("0", 13.0, 16.6, "afternoon"),
-                ("1", 8.0, 12.0, "morning"),
-                ("1", 12.0, 13.0, "lunch"),
-                ("1", 13.0, 16.6, "afternoon"),
-                ("2", 8.0, 12.0, "morning"),
-                ("2", 12.0, 13.0, "lunch"),
-                ("2", 13.0, 16.6, "afternoon"),
-                ("3", 8.0, 12.0, "morning"),
-                ("3", 12.0, 13.0, "lunch"),
-                ("3", 13.0, 16.6, "afternoon"),
-                ("4", 8.0, 12.0, "morning"),
-                ("4", 12.0, 13.0, "lunch"),
-                ("4", 13.0, 16.6, "afternoon"),
+            }) for dayofweek, hour_from, hour_to in [
+                ("0", 8.0, 12.0),
+                ("0", 13.0, 16.6),
+                ("1", 8.0, 12.0),
+                ("1", 13.0, 16.6),
+                ("2", 8.0, 12.0),
+                ("2", 13.0, 16.6),
+                ("3", 8.0, 12.0),
+                ("3", 13.0, 16.6),
+                ("4", 8.0, 12.0),
+                ("4", 13.0, 16.6),
             ]],
         }])
         cls.Logs = cls.env["l10n_au.audit.log"].sudo()
@@ -82,16 +73,13 @@ class TestAuditLogging(TestL10nAUPayrollAPICommon):
             "l10n_au_tax_free_threshold": True,
             "sex": "male",
         })
-        cls.bank_cba = cls.env["res.bank"].create({
-            "name": "Commonwealth Bank of Australia",
-            "bic": "CTBAAU2S",
-            "country": cls.env.ref("base.au").id,
-        })
         bank_account = cls.env['res.partner.bank'].create({
-            "bank_id": cls.bank_cba.id,
-            "acc_number": '12344321',
-            "acc_type": 'aba',
-            "aba_bsb": '123456',
+            "bank_name": "Commonwealth Bank of Australia",
+            "bank_bic": "CTBAAU2S",
+            "country_id": cls.env.ref("base.au").id,
+            "account_number": '12344321',
+            "clearing_label_id": cls.env.ref('base.clearing_label_au').id,
+            "clearing_number": '123456',
             "company_id": cls.company.id,
             "partner_id": cls.company.partner_id.id,
         })

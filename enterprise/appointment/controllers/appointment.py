@@ -1,17 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
-import pytz
+from datetime import datetime, date, UTC
+from urllib.parse import quote, unquote_plus
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from markupsafe import Markup
-from pytz.exceptions import UnknownTimeZoneError
-from werkzeug.exceptions import BadRequest
-
-from babel.dates import format_datetime, format_date, format_time
-from datetime import datetime, date
+from babel.dates import format_date
 from dateutil.relativedelta import relativedelta
-from urllib.parse import quote, unquote_plus
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 from werkzeug.urls import url_encode
 
 from odoo import fields, http, _
@@ -72,7 +69,7 @@ class AppointmentController(http.Controller):
     # ------------------------------------------------------------
 
     @route(['/calendar', '/calendar/page/<int:page>'],
-            type='http', auth="public", website=True, sitemap=True)
+            type='http', auth="public", website=True, sitemap=False)
     def appointment_type_index_old(self, page=1, **kwargs):
         """ For backward compatibility """
         return request.redirect(
@@ -93,12 +90,12 @@ class AppointmentController(http.Controller):
         types filter selection
         """
         kwargs['domain'] = self._appointment_website_domain()
-        return request.render('appointment.appointments_list_layout', self._prepare_appointments_list_data(**kwargs))
+        return request.render('appointment.appointments_selection', self._prepare_appointments_selection_data(**kwargs))
 
     # Tools / Data preparation
     # ------------------------------------------------------------
 
-    def _prepare_appointments_list_data(self, appointment_types=None, **kwargs):
+    def _prepare_appointments_selection_data(self, appointment_types=None, **kwargs):
         """Compute specific data used to render the list layout
 
         :param recordset appointment_types: Record set of appointments to show.
@@ -174,22 +171,20 @@ class AppointmentController(http.Controller):
     # APPOINTMENT TYPE PAGE VIEW
     # ------------------------------------------------------------
 
-    @route(['/calendar/<string:appointment_type>'],
-            type='http', auth="public", website=True, sitemap=True)
-    def appointment_type_page_old(self, appointment_type, **kwargs):
-        """ For backward compatibility:
-        appointment_type is transformed from a recordset to a string because we removed the rights for public user.
-        """
-        return request.redirect('/appointment/%s?%s' % (request.env['ir.http']._unslug(appointment_type)[1], keep_query('*')), code=301)
+    @route(['/calendar/<string:appointment_type_slug>'],
+            type='http', auth="public", website=True, sitemap=False)
+    def appointment_type_page_old(self, appointment_type_slug, **kwargs):
+        """For backward compatibility"""
+        return request.redirect('/appointment/%s?%s' % (appointment_type_slug, keep_query('*')), code=301)
 
-    @route(['/appointment/<int:appointment_type_id>'],
+    @route(['/appointment/<string:appointment_type_slug>'],
            type='http', auth="public", website=True, sitemap=True)
-    def appointment_type_page(self, appointment_type_id, state=False, staff_user_id=False, resource_selected_id=False, **kwargs):
+    def appointment_type_page(self, appointment_type_slug, state=False, staff_user_id=False, resource_selected_id=False, **kwargs):
         """
         This route renders the appointment page: It first computes a dict of values useful for all potential
         views and to choose between them in _get_appointment_type_page_view, that renders the chosen one.
 
-        :param appointment_type_id: the appointment_type_id of the appointment type that we want to access
+        :param appointment_type_slug: the appointment_type_slug of the appointment type that we want to access
         :param state: the type of message that will be displayed in case of an error/info. Possible values:
             - cancel: Info message to confirm that an appointment has been canceled
             - failed-staff-user: Error message displayed when the slot has been taken while doing the registration
@@ -209,14 +204,18 @@ class AppointmentController(http.Controller):
             kwargs.get('invite_token'),
             domain=kwargs['domain']
         )
-        appointment_type = available_appointments.filtered(lambda appt: appt.id == int(appointment_type_id))
+        appointment_type = available_appointments.filtered(lambda appt: appt.id == request.env['ir.http']._unslug(appointment_type_slug)[1])
+        appointment_type = appointment_type.with_prefetch()  # avoid prefetching all available_appointments
 
         kwargs['available_appointments'] = available_appointments
         if not appointment_type:
             raise NotFound()
 
+        rescheduled_event = request.env["calendar.event"]
+        if state == 'reschedule':
+            rescheduled_event = self._fetch_and_check_rescheduled_event(appointment_type, kwargs.get('access_token'))
         page_values = self._prepare_appointment_type_page_values(appointment_type, staff_user_id, resource_selected_id, **kwargs)
-        return self._get_appointment_type_page_view(appointment_type, page_values, state, **kwargs)
+        return self._get_appointment_type_page_view(appointment_type, page_values, state, rescheduled_event, **kwargs)
 
     def _get_slots_from_filter(self, appointment_type, filter_records, asked_capacity=1):
         """
@@ -240,22 +239,20 @@ class AppointmentController(http.Controller):
             'month_first_available': next((month['id'] for month in slots if month['has_availabilities']), False),
         }
 
-    def _get_slots_values(self, appointment_type, selected_filter_record, default_filter_record, possible_filter_records, asked_capacity=1):
+    def _get_slots_values(self, appointment_type, default_filter_record, possible_filter_records, asked_capacity=1):
         """
         Compute the slots and the first month that has available slots from the given filters.
 
         :param appointment_type: the appointment type that we want to access.
-        :param selected_filter_record: the selected users/resources
-        :param default_filter_record: the default users/resources
+        :param default_filter_record: the default users/resources. If set, we try using it first to find
+            any availability. If none is found, we use the first available record instead, trying all
+            records in possible_filter_records in order.
         :param possible_filter_records: the possible users/resources
         :param asked_capacity: the capacity asked by the user
         :return: a dict containing:
             - slots: the available slots
             - month_first_available: the first month that has available slots or False if there is none
         """
-        if selected_filter_record:
-            return self._get_slots_from_filter(appointment_type, selected_filter_record, asked_capacity)
-
         if not default_filter_record:
             return self._get_slots_from_filter(appointment_type, possible_filter_records, asked_capacity)
 
@@ -270,7 +267,7 @@ class AppointmentController(http.Controller):
                 return values
         return values
 
-    def _get_appointment_type_page_view(self, appointment_type, page_values, state=False, **kwargs):
+    def _get_appointment_type_page_view(self, appointment_type, page_values, state=False, rescheduled_event=None, **kwargs):
         """
         Renders the appointment information alongside the calendar for the slot selection, after computation of
         the slots and preparation of other values, depending on the arguments values. This is the method to override
@@ -279,27 +276,19 @@ class AppointmentController(http.Controller):
         :param appointment_type: the appointment type that we want to access.
         :param page_values: dict containing common appointment page values. See _prepare_appointment_type_page_values for details.
         :param state: the type of message that will be displayed in case of an error/info. See appointment_type_page.
+        :param rescheduled_event: a calendar event record that is being rescheduled.
         """
         request.session['timezone'] = self._get_default_timezone(appointment_type)
-        asked_capacity = int(kwargs.get('asked_capacity', 1))
-        filter_prefix = 'user' if appointment_type.schedule_based_on == "users" else 'resource'
-        slots_values = self._get_slots_values(appointment_type,
-            selected_filter_record=page_values[f'{filter_prefix}_selected'],
-            default_filter_record=page_values[f'{filter_prefix}_default'],
-            possible_filter_records=page_values[f'{filter_prefix}s_possible'],
-            asked_capacity=asked_capacity)
-        formated_days = _formated_weekdays(get_lang(request.env).code)
-
         render_params = {
             'appointment_type': appointment_type,
+            'formated_days': _formated_weekdays(get_lang(request.env).code),
             'is_html_empty': is_html_empty,
-            'formated_days': formated_days,
             'main_object': appointment_type,
-            'month_kept_from_update': False,
+            'partner_id': kwargs.get('partner_id'),
+            'rescheduled_event': rescheduled_event,
             'state': state,
             'timezone': request.session['timezone'],  # bw compatibility
             **page_values,
-            **slots_values,
         }
         # Do not let the browser store the page, this ensures correct timezone and params management in case
         # the user goes back and forth to this endpoint using browser controls (or mouse back button)
@@ -312,76 +301,54 @@ class AppointmentController(http.Controller):
         :return: a dict containing:
             - available_appointments: all available appointments according to current filters and invite tokens.
             - filter_appointment_type_ids, filter_staff_user_ids and invite_token parameters.
-            - user_default: the first of possible staff users. It will be selected by default (in the user select dropdown)
-            if no user_selected. Otherwise, the latter will be preselected instead. It is only set if there is at least one
-            possible user and the choice is activated in appointment_type, or used for having the user name in title if there
-            is a single possible user, for random selection.
-            - user_selected: the user corresponding to staff_user_id in the url and to the selected one. It can be selected
-            upstream, from the operator_select screen (see WebsiteAppointment controller), or coming back from an error.
-            It is only set if among the possible users.
+            - user_default: the first of possible staff users. In the case of a manual selection with user selected first,
+            it will be the user selected by default if user_selected is not set. Otherwise, the latter will be preselected
+            instead. If the user has no availability, we will select the first user in users_possible with availability
+            instead, see `_get_slots_values`.
             - users_possible: all possible staff users considering filter_staff_user_ids and staff members of appointment_type.
-            - resource_selected: the resource corresponding to resource_selected_id in the url and to the selected one. It can be selected
-            upstream, from the operator_select screen (see WebsiteAppointment controller), or coming back from an error.
+            user_selected and user_default are only set if part of users_possible.
+            - resource_default: same as user_default, for resources.
             - resources_possible: all possible resources considering filter_resource_ids and resources of appointment type.
-            - max_capacity: the maximum capacity that can be selected by the user to make an appointment on a resource.
-            - hide_select_dropdown: True if the user select dropdown should be hidden. (e.g. an operator has been selected before)
-            Even if hidden, it can still be in the view and used to update availabilities according to the selected user in the js.
+            - hide_entity_selection: True if the user or resource selection cards should be hidden, e.g. when the selection is
+            implicit, when one or less user / resource can be selected.
         """
         filter_staff_user_ids = json.loads(unquote_plus(kwargs.get('filter_staff_user_ids') or '[]'))
         filter_resource_ids = json.loads(unquote_plus(kwargs.get('filter_resource_ids') or '[]'))
         users_possible = self._get_possible_staff_users(appointment_type, filter_staff_user_ids)
         user_forced = self._get_forced_staff_user(appointment_type, users_possible)
         resources_possible = self._get_possible_resources(appointment_type, filter_resource_ids)
-        user_default = user_selected = request.env['res.users']
-        resource_default = resource_selected = request.env['appointment.resource']
+        user_default = request.env['res.users']
+        resource_default = request.env['appointment.resource']
         staff_user_id = int(staff_user_id) if staff_user_id else False
         resource_selected_id = int(resource_selected_id) if resource_selected_id else False
 
-        if appointment_type.schedule_based_on == 'users':
-            if (not appointment_type.is_auto_assign and
-                not appointment_type.is_date_first and
-                users_possible
-            ):
+        # When coming back from an error, pre-select the manually selected entity.
+        if (not kwargs.get("use_any_entity") and
+            not appointment_type.is_auto_assign and
+            not appointment_type.is_date_first
+        ):
+            if appointment_type.schedule_based_on == 'users' and users_possible:
                 if staff_user_id and staff_user_id in users_possible.ids:
-                    user_selected = request.env['res.users'].sudo().browse(staff_user_id)
-                user_default = users_possible[0]
-            elif appointment_type.is_auto_assign and len(users_possible) == 1:
-                user_default = users_possible[0]
-        elif resources_possible:
-            if (resource_selected_id and
-                resource_selected_id in resources_possible.ids and
-                not (appointment_type.is_date_first and not appointment_type.is_auto_assign)
-            ):
-                resource_selected = request.env['appointment.resource'].sudo().browse(resource_selected_id)
-            elif not appointment_type.is_auto_assign and not appointment_type.is_date_first:
-                resource_default = resources_possible[0]
-        if appointment_type.manage_capacity:
-            if appointment_type.schedule_based_on == 'users':
-                max_capacity_possible = appointment_type.user_capacity
-            else:
-                max_capacity_possible = self._get_max_capacity_possible(
-                    resources_possible,
-                    resource_selected_id=(resource_selected or resource_default).id,
-                )
-        else:
-            max_capacity_possible = 1
-        allowed_max_capacity = int(request.env['ir.config_parameter'].sudo().get_param('appointment.resource_max_capacity_allowed', default=12))
+                    user_default = request.env['res.users'].sudo().browse(staff_user_id)
+            elif resources_possible:
+                if resource_selected_id and resource_selected_id in resources_possible.ids:
+                    resource_default = request.env['appointment.resource'].sudo().browse(resource_selected_id)
 
         return {
             'asked_capacity': int(kwargs['asked_capacity']) if kwargs.get('asked_capacity') else False,
-            'available_appointments': kwargs['available_appointments'],
+            'available_appointments': kwargs.get('available_appointments'),
             'filter_appointment_type_ids': kwargs.get('filter_appointment_type_ids'),
-            'filter_staff_user_ids': kwargs.get('filter_staff_user_ids'),
             'filter_resource_ids': kwargs.get('filter_resource_ids'),
-            'hide_select_dropdown': len(users_possible if appointment_type.schedule_based_on == 'users' else resources_possible) <= 1,
+            'filter_staff_user_ids': kwargs.get('filter_staff_user_ids'),
+            'hide_entity_selection': len(users_possible if appointment_type.schedule_based_on == 'users' else resources_possible) <= 1,
             'invite_token': kwargs.get('invite_token'),
-            'max_capacity': min(allowed_max_capacity, max_capacity_possible),
             'resource_default': resource_default,
-            'resource_selected': resource_selected,
+            'resource_selected_id': resource_selected_id,
             'resources_possible': resources_possible,
+            'use_any_entity': kwargs.get("use_any_entity"),
             'user_default': user_default,
             'user_forced': user_forced,
-            'user_selected': user_selected,
+            'user_selected_id': staff_user_id,
             'users_possible': users_possible,
         }
 
@@ -507,13 +474,13 @@ class AppointmentController(http.Controller):
     # APPOINTMENT TYPE BOOKING
     # ------------------------------------------------------------
 
-    @http.route(['/appointment/<int:appointment_type_id>/info'],
+    @http.route(['/appointment/<string:appointment_type_slug>/info'],
                 type='http', auth="public", website=True, sitemap=False)
-    def appointment_type_id_form(self, appointment_type_id, date_time, duration, staff_user_id=None, resource_selected_id=None, available_resource_ids=None, asked_capacity=1, **kwargs):
+    def appointment_type_id_form(self, appointment_type_slug, date_time, duration, staff_user_id=None, resource_selected_id=None, available_resource_ids=None, asked_capacity=1, **kwargs):
         """
         Render the form to get information about the user for the appointment
 
-        :param appointment_type_id: the appointment type id related
+        :param appointment_type_slug: the appointment type slug related
         :param date_time: the slot datetime selected for the appointment
         :param duration: the duration of the slot
         :param staff_user_id: the user selected for the appointment
@@ -534,7 +501,7 @@ class AppointmentController(http.Controller):
             kwargs.get('invite_token'),
             domain=domain,
         )
-        appointment_type = available_appointments.filtered(lambda appt: appt.id == int(appointment_type_id))
+        appointment_type = available_appointments.filtered(lambda appt: appt.id == request.env['ir.http']._unslug(appointment_type_slug)[1])
 
         if not appointment_type:
             raise NotFound()
@@ -545,11 +512,8 @@ class AppointmentController(http.Controller):
         partner = self._get_customer_partner()
         partner_data = partner.read(fields=['name', 'phone', 'email'])[0] if partner else {}
         allday = bool(int(kwargs.get('allday', 0)))
-        date_time = unquote_plus(date_time)
-        date_time_object = datetime.strptime(date_time, dtf)
-        day_name = format_datetime(date_time_object, 'EEE', locale=get_lang(request.env).code)
-        date_formated = format_date(date_time_object.date(), locale=get_lang(request.env).code)
-        time_locale = format_time(date_time_object.time(), locale=get_lang(request.env).code, format='short')
+        datetime_object = datetime.strptime(unquote_plus(date_time), dtf)
+        display_duration = int(float(duration) / 24) if allday else float(duration)  # only show days for allday slots
         resource = request.env['appointment.resource'].sudo().browse(int(resource_selected_id)) if resource_selected_id else request.env['appointment.resource']
         staff_user = request.env['res.users'].browse(int(staff_user_id)) if staff_user_id else request.env['res.users']
         users_possible = self._get_possible_staff_users(
@@ -567,12 +531,10 @@ class AppointmentController(http.Controller):
             'available_appointments': available_appointments,
             'is_html_empty': is_html_empty,
             'main_object': appointment_type,
-            'datetime': date_time,
-            'date_locale': f'{day_name} {date_formated}',
-            'time_locale': time_locale,
+            'datetime_object': datetime_object.replace(second=0, microsecond=0),
             'datetime_str': date_time,
             'duration_str': duration,
-            'duration': float(duration),
+            'duration': display_duration,
             'staff_user': staff_user,
             'resource': resource,
             'asked_capacity': int(asked_capacity),
@@ -625,16 +587,16 @@ class AppointmentController(http.Controller):
         try:
             session_tz = request.session.get('timezone', appointment_type.appointment_tz)
             if not allday:
-                tz_info = pytz.timezone(session_tz)
+                tz_info = ZoneInfo(session_tz)
             else:
-                tz_info = pytz.timezone(appointment_type.appointment_tz)
-            start_dt_utc = tz_info.localize(fields.Datetime.from_string(start_dt)).astimezone(pytz.utc)
-        except (ValueError, UnknownTimeZoneError):
+                tz_info = ZoneInfo(appointment_type.appointment_tz)
+            start_dt_utc = fields.Datetime.from_string(start_dt).replace(tzinfo=tz_info).astimezone(UTC)
+        except (ValueError, ZoneInfoNotFoundError):
             # ValueError: the datetime may be ill-formatted
             return False
 
         # we shouldn't be able to book an appointment in the past
-        if start_dt_utc < datetime.today().astimezone(pytz.utc):
+        if start_dt_utc < datetime.today().astimezone(UTC):
             return False
 
         if appointment_type.schedule_based_on == 'users':
@@ -675,62 +637,19 @@ class AppointmentController(http.Controller):
         if request.session.uid and not request.validate_csrf(csrf_token):
             raise BadRequest('Session expired (invalid CSRF token)')
 
-        domain = self._appointments_base_domain(
-            filter_appointment_type_ids=kwargs.get('filter_appointment_type_ids'),
-            search=kwargs.get('search'),
-            invite_token=kwargs.get('invite_token')
-        )
-
-        available_appointments = self._fetch_and_check_private_appointment_types(
-            kwargs.get('filter_appointment_type_ids'),
-            kwargs.get('filter_staff_user_ids'),
-            kwargs.get('filter_resource_ids'),
-            kwargs.get('invite_token'),
-            domain=domain,
-        )
-        appointment_type = available_appointments.filtered(lambda appt: appt.id == int(appointment_type_id))
-
+        appointment_type = self._get_appointment_type_using_controller_access(appointment_type_id, **kwargs)
         if not appointment_type:
             raise NotFound()
-        timezone = request.session.get('timezone') or appointment_type.appointment_tz
-        tz_session = pytz.timezone(timezone)
-        allday = bool(int(kwargs.get('allday', 0)))
-        datetime_str = unquote_plus(datetime_str)
-        start_dt = fields.Datetime.from_string(datetime_str)
-        if allday:
-            # If it's an allday slot we ignore the session tz and use the timezone of the appointment type.
-            # This is done to be sure to keep the intended day selected by the staff user.
-            date_start = pytz.timezone(appointment_type.appointment_tz).localize(start_dt).astimezone(pytz.utc).replace(tzinfo=None)
-        else:
-            date_start = tz_session.localize(start_dt).astimezone(pytz.utc).replace(tzinfo=None)
-        duration = float(duration_str)
-        date_end = date_start + relativedelta(hours=duration)
-        invite_token = kwargs.get('invite_token')
 
-        staff_user = request.env['res.users']
-        resources = request.env['appointment.resource']
-        resource_ids = None
-        asked_capacity = int(asked_capacity)
-        resources_remaining_capacity = None
-        users_remaining_capacity = None
-        if appointment_type.schedule_based_on == 'resources':
-            resource_ids = json.loads(unquote_plus(available_resource_ids))
-            # Check if there is still enough capacity (in case someone else booked with a resource in the meantime)
-            resources = request.env['appointment.resource'].sudo().browse(resource_ids).exists()
-            if any(resource not in appointment_type.resource_ids for resource in resources):
-                raise NotFound()
-            resources_remaining_capacity = appointment_type._get_resources_remaining_capacity(resources, date_start, date_end, with_linked_resources=False)
-            if resources_remaining_capacity['total_remaining_capacity'] < asked_capacity:
-                return request.redirect('/appointment/%s?%s' % (appointment_type.id, keep_query('*', state='failed-resource')))
-        else:
-            # check availability of the selected user again (in case someone else booked while the client was entering the form)
-            staff_user = request.env['res.users'].sudo().search([('id', '=', int(staff_user_id))])
-            if staff_user not in appointment_type.staff_user_ids:
-                raise NotFound()
-            users_remaining_capacity = appointment_type._get_users_remaining_capacity(staff_user, date_start, date_end)
-            if (staff_user and not staff_user.partner_id.calendar_verify_availability(date_start, date_end, appointment_type)) or \
-                users_remaining_capacity['total_remaining_capacity'] < asked_capacity:
-                return request.redirect('/appointment/%s?%s' % (appointment_type.id, keep_query('*', state='failed-staff-user')))
+        slot_values = self._get_submission_slot_details(
+            appointment_type, datetime_str, duration_str, kwargs.get('allday', 0),
+        )
+        availability_values = self._check_and_get_submission_availability_values(
+            appointment_type, slot_values, asked_capacity, staff_user_id, available_resource_ids,
+        )
+        # redirect in case of failure (availability of resources or staff users)
+        if redirect_url := availability_values.get('redirect_url'):
+            return request.redirect(redirect_url)
 
         guests = None
         if appointment_type.allow_guests:
@@ -788,10 +707,7 @@ class AppointmentController(http.Controller):
                 )
 
         if question_description_bits:
-            question_description = Markup('<br/>').join([
-                Markup('<br/><strong>%s</strong>') % _("Questions & Answers"),
-                Markup('<br/>').join(question_description_bits),
-            ])
+            question_description = Markup('<br/>') + Markup('<br/>').join(question_description_bits)
 
         # avoid doing anything based on visitor if csrf isn't checked to avoid leaking last-login info
         customer = self._get_customer_partner() if csrf_token else self.env['res.partner']
@@ -833,37 +749,18 @@ class AppointmentController(http.Controller):
                 'partner_id': customer.id,
             }
 
-        booking_line_values = []
-        if appointment_type.schedule_based_on == 'resources':
-            capacity_to_assign = asked_capacity
-            for resource in resources:
-                resource_remaining_capacity = resources_remaining_capacity.get(resource)
-                new_capacity_reserved = min(resource_remaining_capacity, capacity_to_assign, resource.capacity)
-                capacity_to_assign -= new_capacity_reserved
-                booking_line_values.append({
-                    'appointment_resource_id': resource.id,
-                    'capacity_reserved': new_capacity_reserved,
-                    'capacity_used': new_capacity_reserved if resource.shareable and appointment_type.manage_capacity else
-                        resource.capacity if appointment_type.manage_capacity else 1,
-                })
-        else:
-            user_remaining_capacity = users_remaining_capacity['total_remaining_capacity']
-            new_capacity_reserved = min(user_remaining_capacity, asked_capacity, appointment_type.user_capacity)
-            # appointment_user_id is filled with the organizer of the event automatically.
-            booking_line_values.append({
-                'capacity_reserved': new_capacity_reserved,
-                'capacity_used': new_capacity_reserved,
-            })
+        booking_line_values = self._get_submission_booking_line_values(appointment_type, availability_values)
 
-        if invite_token:
+        if invite_token := kwargs.get('invite_token'):
             appointment_invite = request.env['appointment.invite'].sudo().search([('access_token', '=', invite_token)])
         else:
             appointment_invite = request.env['appointment.invite']
 
         return self._handle_appointment_form_submission(
-            appointment_type, date_start, date_end, description, duration, allday, answer_input_values, name,
-            customer, appointment_invite, guests, staff_user, asked_capacity, booking_line_values,
-            self._get_extra_calendar_event_params(**kwargs),
+            appointment_type, slot_values['date_start'], slot_values['date_end'], description,
+            slot_values['duration'], slot_values['allday'], answer_input_values, name, customer,
+            appointment_invite, guests, availability_values['staff_user'], availability_values['asked_capacity'],
+            booking_line_values, self._get_extra_calendar_event_params(**kwargs),
         )
 
     def _get_extra_calendar_event_params(self, **kwargs):
@@ -897,8 +794,201 @@ class AppointmentController(http.Controller):
         })
         return request.redirect(f"/calendar/view/{event.access_token}?partner_id={customer.id}&{keep_query('*', state='new')}")
 
+    @http.route(['/appointment/<int:appointment_type_id>/submit_reschedule'],
+                type='http', auth="public", website=True, methods=["POST"])
+    def appointment_form_submit_reschedule(
+        self, appointment_type_id, datetime_str, duration_str, access_token, staff_user_id=None,
+        available_resource_ids=None, asked_capacity=1,
+        **kwargs,
+    ):
+        """ This route is used to reschedule an existing appointment. It is very similar to appointment_form_submit
+            but instead of creating a new event, it updates the existing one with the new values.
+
+            :returns: a redirect to the updated appointment confirmation page
+        """
+        appointment_type = self._get_appointment_type_using_controller_access(appointment_type_id, **kwargs)
+        if not appointment_type:
+            raise NotFound()
+
+        rescheduled_event = self._fetch_and_check_rescheduled_event(appointment_type, access_token)
+        # Using pop() to avoid passing resource_selected_id twice via **kwargs
+        resource_selected_id = kwargs.pop('resource_selected_id', False)
+        if not self._check_appointment_is_valid_slot(
+            appointment_type, staff_user_id, resource_selected_id, available_resource_ids, datetime_str, duration_str, asked_capacity, **kwargs
+        ):
+            raise NotFound()
+
+        slot_values = self._get_submission_slot_details(
+            appointment_type, datetime_str, duration_str, kwargs.get('allday', 0),
+        )
+        availability_values = self._check_and_get_submission_availability_values(
+            appointment_type, slot_values, asked_capacity, staff_user_id, available_resource_ids,
+        )
+        if redirect_url := availability_values.get('redirect_url'):
+            return request.redirect(redirect_url)
+
+        date_start = slot_values['date_start']
+        date_end = slot_values['date_end']
+        allday = slot_values['allday']
+        if allday:
+            date_end -= relativedelta(days=1)
+            tz = ZoneInfo(appointment_type.appointment_tz)
+            date_start = date_start.astimezone(tz).replace(tzinfo=None)
+            date_end = date_end.astimezone(tz).replace(tzinfo=None)
+
+        booking_line_values = self._get_submission_booking_line_values(appointment_type, availability_values)
+        values_to_update = {
+            'allday': allday,
+            'appointment_status': appointment_type._get_default_appointment_status(date_start, date_end, int(asked_capacity)),
+            'booking_line_ids': [Command.clear(), *(Command.create(vals) for vals in booking_line_values)],
+            'start': fields.Datetime.to_string(date_start),
+            'stop': fields.Datetime.to_string(date_end),
+        }
+
+        original_booker = rescheduled_event.appointment_booker_id
+        staff_user = availability_values['staff_user']
+
+        # if appointment is based on users, we need to update partner_ids based on the new staff user
+        if appointment_type.schedule_based_on == 'users':
+            partners = (
+                rescheduled_event.partner_ids
+                - rescheduled_event.user_id.partner_id
+                + original_booker
+                + staff_user.partner_id
+            )
+            values_to_update.update({
+                'user_id': staff_user.id,
+                'partner_ids': partners.ids,
+            })
+
+        message_body = _("Appointment rescheduled")
+        if partner_id := kwargs.get('partner_id'):
+            if partner := rescheduled_event.partner_ids.filtered(lambda p: p.id == int(partner_id)):
+                message_body = _("Appointment rescheduled by: %(name)s", name=partner.display_name)
+        rescheduled_event._track_set_log_message(message_body)
+        rescheduled_event.write(values_to_update)
+
+        accepted_partners = original_booker | (staff_user.partner_id if staff_user else request.env['res.partner'])
+        rescheduled_event.attendee_ids.filtered(lambda attendee: attendee.partner_id in accepted_partners).write({'state': 'accepted'})
+        return request.redirect(f"/calendar/view/{rescheduled_event.access_token}?partner_id={original_booker.id or kwargs.get('partner_id') or ''}&{keep_query('*', state='new')}")
+
+    # Submission / Rescheduling
+    # ------------------------------------------------------------
+
+    def _check_and_get_submission_availability_values(
+        self, appointment_type, slot_values, asked_capacity=1, staff_user_id=None, available_resource_ids=None,
+    ):
+        """ Check the selected staff/resources availability and remaining capacity for a
+            submission. And return potential redirection url and availability values.
+        """
+        staff_user = request.env['res.users']
+        resources = request.env['appointment.resource']
+        asked_capacity = int(asked_capacity)
+        resources_remaining_capacity = None
+        users_remaining_capacity = None
+        slug = request.env['ir.http']._slug
+        date_start = slot_values['date_start']
+        date_end = slot_values['date_end']
+        redirect_url = False
+
+        if appointment_type.schedule_based_on == 'resources':
+            if isinstance(available_resource_ids, str):
+                resource_ids = json.loads(unquote_plus(available_resource_ids))
+            else:
+                resource_ids = available_resource_ids or []
+            # Check if there is still enough capacity (in case someone else booked with a resource in the meantime)
+            resources = request.env['appointment.resource'].sudo().browse(resource_ids).exists()
+            if any(resource not in appointment_type.resource_ids for resource in resources):
+                raise NotFound()
+            resources_remaining_capacity = appointment_type._get_resources_remaining_capacity(
+                resources, date_start, date_end, with_linked_resources=False,
+            )
+            if resources_remaining_capacity['total_remaining_capacity'] < asked_capacity:
+                redirect_url = request.redirect('/appointment/%s?%s' % (slug(appointment_type), keep_query('*', state='failed-resource')))
+        else:
+            # check availability of the selected user again (in case someone else booked while the client was entering the form)
+            staff_user = request.env['res.users'].sudo().search([('id', '=', int(staff_user_id))])
+            if staff_user not in appointment_type.staff_user_ids:
+                raise NotFound()
+            users_remaining_capacity = appointment_type._get_users_remaining_capacity(staff_user, date_start, date_end)
+            if (staff_user and not staff_user.partner_id.calendar_verify_availability(date_start, date_end, appointment_type)) or \
+                users_remaining_capacity['total_remaining_capacity'] < asked_capacity:
+                redirect_url = request.redirect('/appointment/%s?%s' % (slug(appointment_type), keep_query('*', state='failed-staff-user')))
+
+        return {
+            'redirect_url': redirect_url,
+            'staff_user': staff_user,
+            'asked_capacity': asked_capacity,
+            'resources': resources,
+            'resources_remaining_capacity': resources_remaining_capacity,
+            'users_remaining_capacity': users_remaining_capacity,
+        }
+
+    def _get_submission_booking_line_values(self, appointment_type, availability_values):
+        asked_capacity = availability_values['asked_capacity']
+        resources = availability_values.get('resources') or []
+        resources_remaining_capacity = availability_values.get('resources_remaining_capacity') or {}
+        user_remaining_capacity = (availability_values.get('users_remaining_capacity') or {}).get('total_remaining_capacity') or {}
+
+        booking_line_values = []
+        if appointment_type.schedule_based_on == 'resources':
+            capacity_to_assign = asked_capacity
+            for resource in resources:
+                resource_remaining_capacity = resources_remaining_capacity.get(resource)
+                new_capacity_reserved = min(resource_remaining_capacity, capacity_to_assign, resource.capacity)
+                capacity_to_assign -= new_capacity_reserved
+                booking_line_values.append({
+                    'appointment_resource_id': resource.id,
+                    'capacity_reserved': new_capacity_reserved,
+                    'capacity_used': new_capacity_reserved if resource.shareable and appointment_type.manage_capacity else
+                        resource.capacity if appointment_type.manage_capacity else 1,
+                })
+        else:
+            new_capacity_reserved = min(user_remaining_capacity, asked_capacity, appointment_type.user_capacity)
+            # appointment_user_id is filled with the organizer of the event automatically.
+            booking_line_values.append({
+                'capacity_reserved': new_capacity_reserved,
+                'capacity_used': new_capacity_reserved,
+            })
+
+        return booking_line_values
+
+    def _get_submission_slot_details(self, appointment_type, datetime_str, duration_str, allday):
+        timezone = request.session.get('timezone') or appointment_type.appointment_tz
+        tz_session = ZoneInfo(timezone)
+        allday = bool(int(allday))
+        datetime_str = unquote_plus(datetime_str)
+        start_dt = fields.Datetime.from_string(datetime_str)
+        if allday:
+            # If it's an allday slot we ignore the session tz and use the timezone of the appointment type.
+            # This is done to be sure to keep the intended day selected by the staff user.
+            date_start = start_dt.replace(tzinfo=ZoneInfo(appointment_type.appointment_tz)).astimezone(UTC).replace(tzinfo=None)
+        else:
+            date_start = start_dt.replace(tzinfo=tz_session).astimezone(UTC).replace(tzinfo=None)
+        duration = float(duration_str)
+        date_end = date_start + relativedelta(hours=duration)
+        return {
+            'date_start': date_start,
+            'date_end': date_end,
+            'duration': duration,
+            'allday': allday,
+        }
+
     # Tools / Data preparation
     # ------------------------------------------------------------
+
+    def _fetch_and_check_rescheduled_event(self, appointment_type, access_token):
+        """ Fetch the event to reschedule and check if the user has the right to reschedule it.
+            :param appointment_type: the appointment type of the event
+            :param access_token: the access token of the event
+            :return: the event to reschedule
+        """
+        if not access_token or not appointment_type:
+            raise NotFound()
+        event = request.env['calendar.event'].sudo().search([('access_token', '=', access_token)], limit=1)
+        if not event or event.appointment_type_id != appointment_type:
+            raise NotFound()
+        return event
 
     def _get_allowed_companies(self, organizer):
         """ Get the allowed companies of the organizer of the event
@@ -906,6 +996,30 @@ class AppointmentController(http.Controller):
         :return: recordset of res.company
         """
         return organizer.company_ids
+
+    def _get_appointment_type_using_controller_access(self, appointment_type_id, **kwargs):
+        """ Get an appointment type using the standard controller access checks.
+        Controllers requiring different access rules should implement their own
+        appointment type lookup.
+
+        :param appointment_type_id: the id of the appointment type to get
+        :param kwargs: the kwargs to filter the appointment types
+        :return: record of appointment.type or None if not found
+        """
+        domain = self._appointments_base_domain(
+            filter_appointment_type_ids=kwargs.get('filter_appointment_type_ids'),
+            search=kwargs.get('search'),
+            invite_token=kwargs.get('invite_token')
+        )
+
+        available_appointments = self._fetch_and_check_private_appointment_types(
+            kwargs.get('filter_appointment_type_ids'),
+            kwargs.get('filter_staff_user_ids'),
+            kwargs.get('filter_resource_ids'),
+            kwargs.get('invite_token'),
+            domain=domain,
+        )
+        return available_appointments.filtered(lambda appt: appt.id == int(appointment_type_id))
 
     def _get_customer_partner(self):
         partner = request.env['res.partner']
@@ -995,86 +1109,118 @@ class AppointmentController(http.Controller):
             'valid_access_tokens': [appt['access_token'] for appt in upcoming_appointments] if request.env.user._is_public() else [],
         }
 
-    @http.route(['/appointment/<int:appointment_type_id>/get_message_intro'],
-                type="jsonrpc", auth="public", methods=['POST'], website=True)
-    def get_appointment_message_intro(self, appointment_type_id, **kwargs):
-        domain = self._appointments_base_domain(
-            filter_appointment_type_ids=kwargs.get('filter_appointment_type_ids'),
-            search=kwargs.get('search'),
-            invite_token=kwargs.get('invite_token')
-        )
-
-        available_appointments = self._fetch_and_check_private_appointment_types(
-            kwargs.get('filter_appointment_type_ids'),
-            kwargs.get('filter_staff_user_ids'),
-            kwargs.get('filter_resource_ids'),
-            kwargs.get('invite_token'),
-            domain=domain,
-        )
-        appointment_type = available_appointments.filtered(lambda appt: appt.id == int(appointment_type_id))
-
-        if not appointment_type:
-            raise NotFound()
-
-        return appointment_type.message_intro or ''
-
-    @http.route(['/appointment/<int:appointment_type_id>/update_available_slots'],
+    @http.route(['/appointment/<int:appointment_type_id>/get_availability_data'],
                 type="jsonrpc", auth="public", website=True)
-    def appointment_update_available_slots(self, appointment_type_id, staff_user_id=None, resource_selected_id=None, asked_capacity=1, timezone=None, **kwargs):
+    def appointment_get_availability_data(self, appointment_type_id, staff_user_id=None, resource_selected_id=None, asked_capacity=False, asked_month=None, timezone=None, **kwargs):
         """
-            Route called when the selected user or resource or asked_capacity or the timezone is modified to adapt the possible slots accordingly
+            This route returns slot and calendar data, both on the first loading of the date selection
+            page and on any other further update (e.g. tz update / manual selection)
+
+            :param staff_user_id: On loading, we try using the corresponding staff user to fill slots.
+                If unavaiable, we try other available staff users (see `_get_slots_values`)
+                On any other update, corresponds to the manually selected staff user if any.
+            :param resource_selected_id: same as staff_user_id, for resource.
+            :param asked_month: tuple (month, year). If set, compute availability for that month.
+            :return: dict containing the data necessary to render slots and calendar. Returns an empty
+                dict when filters do not match any valid entity.
         """
-        domain = self._appointments_base_domain(
-            filter_appointment_type_ids=kwargs.get('filter_appointment_type_ids'),
-            search=kwargs.get('search'),
-            invite_token=kwargs.get('invite_token')
-        )
-
-        available_appointments = self._fetch_and_check_private_appointment_types(
-            kwargs.get('filter_appointment_type_ids'),
-            kwargs.get('filter_staff_user_ids'),
-            kwargs.get('filter_resource_ids'),
-            kwargs.get('invite_token'),
-            domain=domain,
-        )
-        appointment_type = available_appointments.filtered(lambda appt: appt.id == int(appointment_type_id))
-
+        appointment_type = self._get_appointment_type_using_controller_access(appointment_type_id, **kwargs)
         if not appointment_type:
             raise ValueError()
 
         request.session['timezone'] = timezone or appointment_type.appointment_tz
+
+        asked_capacity = int(asked_capacity) if asked_capacity else False
+        based_on_users = appointment_type.schedule_based_on == "users"
         filter_staff_user_ids = json.loads(kwargs.get('filter_staff_user_ids') or '[]')
         filter_resource_ids = json.loads(kwargs.get('filter_resource_ids') or '[]')
-        filter_users = filter_resources = False
-        # If no staff_user_id is set, use only the filtered staff users to compute slots.
-        if staff_user_id:
-            filter_users = request.env['res.users'].sudo().browse(int(staff_user_id))
-        elif resource_selected_id:
-            filter_resources = request.env['appointment.resource'].sudo().browse(int(resource_selected_id))
+        filter_users = (
+            self._get_possible_staff_users(appointment_type, filter_staff_user_ids)
+            if based_on_users
+            else request.env['res.users']
+        )
+        filter_resources = (
+            self._get_possible_resources(appointment_type, filter_resource_ids)
+            if not based_on_users
+            else request.env['appointment.resource']
+        )
+        initial_selected_entity = False
+
+        # Filters are outdated or incorrect
+        if not filter_users and not filter_resources:
+            return {}
+
+        # Search first available user / resource if needed, see _get_slots_values
+        if kwargs.get("is_first_loading"):
+            page_values = self._prepare_appointment_type_page_values(appointment_type, staff_user_id, resource_selected_id, **kwargs)
+            filter_prefix = 'user' if based_on_users else 'resource'
+
+            # When appropriate, attempt using 2 as a default capacity, instead of 1.
+            attempt_2_capacity = False
+            if appointment_type.manage_capacity and not asked_capacity:
+                appointment_max_capacity = (
+                    appointment_type.user_capacity if based_on_users else
+                    sum(page_values['resources_possible'].mapped('capacity'))
+                )
+                asked_capacity = max(1, min(appointment_max_capacity, 2))
+                attempt_2_capacity = asked_capacity == 2
+
+            for capacity_candidate in ([2, 1] if attempt_2_capacity else [asked_capacity or 1]):
+                asked_capacity = capacity_candidate
+                slot_values = self._get_slots_values(
+                    appointment_type,
+                    default_filter_record=page_values[f'{filter_prefix}_default'],
+                    possible_filter_records=page_values[f'{filter_prefix}s_possible'],
+                    asked_capacity=capacity_candidate
+                )
+                # We found some availability, no need to test other candidate.
+                if slot_values["month_first_available"] is not False:
+                    break
+
+            slots = slot_values["slots"]
+            month_first_available = slot_values["month_first_available"]
+            initial_selected_entity = slot_values.get("user_selected") or slot_values.get("resource_selected")
         else:
-            filter_users = self._get_possible_staff_users(appointment_type, filter_staff_user_ids)
-            filter_resources = self._get_possible_resources(appointment_type, filter_resource_ids)
-        asked_capacity = int(asked_capacity)
-        slots = appointment_type._get_appointment_slots(request.session['timezone'], filter_users, filter_resources, asked_capacity=asked_capacity)
-        month_first_available = next((month['id'] for month in slots if month['has_availabilities']), False)
+            # If no entity is selected, use only the filters to compute slots.
+            if staff_user_id:
+                filter_users = request.env['res.users'].sudo().browse(int(staff_user_id))
+            elif resource_selected_id:
+                filter_resources = request.env['appointment.resource'].sudo().browse(int(resource_selected_id))
+
+            slots = appointment_type._get_appointment_slots(
+                request.session['timezone'],
+                filter_users,
+                filter_resources,
+                asked_capacity=asked_capacity,
+                asked_month=asked_month,
+            )
+            month_first_available = next((month['id'] for month in slots if month['has_availabilities']), False)
+
         month_before_update = kwargs.get('month_before_update')
-        month_kept_from_update = next((month['id'] for month in slots if month['month'] == month_before_update), False) if month_before_update else False
-        formated_days = _formated_weekdays(get_lang(request.env).code)
+        month_kept_from_update = next((
+            month['id'] for month in slots if month['month'] == month_before_update
+        ), False) if month_before_update else False
+
         if not appointment_type.manage_capacity:
             max_possible_capacity = 1
-        elif appointment_type.schedule_based_on == 'users':
+        elif based_on_users:
             max_possible_capacity = appointment_type.user_capacity
         else:
+            resource_selected_id = initial_selected_entity.id if initial_selected_entity else resource_selected_id
             max_possible_capacity = self._get_max_capacity_possible(filter_resources, resource_selected_id)
 
-        return request.env['ir.qweb']._render('appointment.appointment_calendar', {
-            'appointment_type': appointment_type,
-            'available_appointments': available_appointments,
-            'asked_capacity': asked_capacity,
-            'timezone': request.session['timezone'],
-            'formated_days': formated_days,
+        max_possible_capacity = min(
+            request.env['ir.config_parameter'].sudo().get_int('appointment.resource_max_capacity_allowed', 20),
+            max_possible_capacity
+        )
+        if appointment_type.slot_interval_capacity > 0:
+            max_possible_capacity = min(max_possible_capacity, appointment_type.slot_interval_capacity)
+
+        return {
             'slots': slots,
             'month_kept_from_update': month_kept_from_update,
             'month_first_available': month_first_available,
-            'max_resource_capacity': max_possible_capacity,
-        })
+            'max_possible_capacity': max_possible_capacity,
+            'initial_capacity': asked_capacity,
+            'initial_selected_entity_id': initial_selected_entity.id if initial_selected_entity else False
+        }

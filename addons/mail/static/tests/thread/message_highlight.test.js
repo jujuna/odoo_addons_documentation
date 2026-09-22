@@ -1,16 +1,19 @@
 import {
     click,
+    contains,
     defineMailModels,
     isInViewportOf,
     openDiscuss,
     start,
     startServer,
 } from "@mail/../tests/mail_test_helpers";
-import { Thread } from "@mail/core/common/thread";
+import { UseForwardRefsToParent } from "@mail/utils/common/hooks";
 import { describe, test } from "@odoo/hoot";
-import { advanceTime, Deferred, tick, waitFor } from "@odoo/hoot-dom";
+import { advanceTime, tick, waitFor } from "@odoo/hoot-dom";
 import { disableAnimations } from "@odoo/hoot-mock";
-import { patchWithCleanup } from "@web/../tests/web_test_helpers";
+import { router, routerBus } from "@web/core/browser/router";
+import { range } from "@web/core/utils/numbers";
+import { mountWebClient, patchWithCleanup } from "@web/../tests/web_test_helpers";
 
 defineMailModels();
 describe.current.tags("desktop");
@@ -55,22 +58,21 @@ test("can highlight message (slow ref registration)", async () => {
         }
     }
     await pyEnv["discuss.channel"].set_message_pin(channelId, middleMessageId, true);
-    let slowRegisterMessageDef;
-    patchWithCleanup(Thread.prototype, {
-        async registerMessageRef(...args) {
+    const { promise: refRegistered, resolve: resolveRefRegistration } = Promise.withResolvers();
+    patchWithCleanup(UseForwardRefsToParent.prototype, {
+        async registerRef(...args) {
             // Ensure scroll is made even when messages are mounted later.
-            await slowRegisterMessageDef;
-            return super.registerMessageRef(...args);
+            await refRegistered;
+            return super.registerRef(...args);
         },
     });
     await start();
     await openDiscuss(channelId);
     await tick(); // Wait for the scroll to first unread to complete.
     await isInViewportOf(".o-mail-Message:contains(message 199)", ".o-mail-Thread");
-    slowRegisterMessageDef = new Deferred();
     await click("a[data-oe-type='highlight']");
     await advanceTime(1000);
-    slowRegisterMessageDef.resolve();
+    resolveRefRegistration();
     await isInViewportOf(".o-mail-Message:contains(message 100)", ".o-mail-Thread");
 });
 
@@ -102,4 +104,27 @@ test("highlight scrolls to beginning of long message", async () => {
         ".o-mail-Message:contains('long message') .o-mail-Message-avatar", // avatar is at beginning of message
         ".o-mail-Thread"
     );
+});
+
+test("Chatter jumps when navigating to a specific message link", async () => {
+    const pyEnv = await startServer();
+    const partnerId = pyEnv["res.partner"].create({ name: "John Doe" });
+    const messageIds = range(0, 31).map((i) =>
+        pyEnv["mail.message"].create({
+            body: `message ${i}`,
+            model: "res.partner",
+            res_id: partnerId,
+        })
+    );
+    await mountWebClient();
+    router.pushState(
+        router.urlToState(
+            new URL(
+                `${window.location.origin}/odoo/res.partner/${partnerId}?highlight_message_id=${messageIds[0]}`
+            )
+        ),
+        { sync: true }
+    );
+    routerBus.trigger("ROUTE_CHANGE");
+    await contains(".o-mail-Message.o-highlighted .o-mail-Message-content", { text: "message 0" });
 });

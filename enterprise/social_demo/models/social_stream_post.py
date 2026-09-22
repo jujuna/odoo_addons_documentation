@@ -23,7 +23,7 @@ class SocialStreamPost(models.Model):
             'summary': {'total_count': 2}
         }
 
-    def _facebook_comment_post(self, endpoint_url, message, existing_attachment_id=None, attachment=None):
+    def _facebook_comment_post(self, account_id, endpoint_url, message, existing_attachment_id=None, attachment=None):
         """ Returns a fake comment containing the passed 'message' """
         return self._get_new_comment_demo(message)
 
@@ -33,7 +33,7 @@ class SocialStreamPost(models.Model):
 
     # INSTAGRAM
 
-    def _instagram_comment_add(self, message, object_id, comment_type="comment"):
+    def _instagram_comment_add(self, account_id, message, object_id, comment_type="comment"):
         return self._get_new_comment_demo(message)
 
     def _instagram_comment_fetch(self, next_records_token=False, count=20):
@@ -43,7 +43,7 @@ class SocialStreamPost(models.Model):
 
     # LINKEDIN
 
-    def _linkedin_comment_add(self, message, comment_urn=None, attachment=None):
+    def _linkedin_comment_add(self, account_id, post_urn, message, comment_urn=None, attachment=None):
         """ Returns a fake comment containing the passed 'message' """
         return {
             'id': 'urn:li:comment:(urn:li:activity:12547,452542)',
@@ -51,7 +51,7 @@ class SocialStreamPost(models.Model):
             'likes': {'summary': {'total_count': 0}},
             'from': {
                 'name': 'Mitchell Admin',
-                'profile_image_url_https': '/web/image/res.users/2/avatar_128',
+                'profile_image_url_https': self.twitter_profile_image_url,
                 'authorUrn': 'urn:li:organization:2414183',
             },
             'message': message,
@@ -83,7 +83,7 @@ class SocialStreamPost(models.Model):
 
     # TWITTER
 
-    def _twitter_comment_add(self, stream, comment_id, message, attachment):
+    def _twitter_comment_add(self, account_id, tweet_id, comment_id, message, attachment=None):
         """ Returns a fake comment containing the passed 'message' """
         comment = self._get_new_comment_demo(message)
         comment['in_reply_to_tweet_id'] = comment_id
@@ -119,7 +119,7 @@ class SocialStreamPost(models.Model):
 
     # YOUTUBE
 
-    def _youtube_comment_add(self, comment_id, message, is_edit=False):
+    def _youtube_comment_add(self, account_id, video_id, comment_id, message, is_edit=False):
         return self._get_new_comment_demo(message)
 
     def _youtube_comment_fetch(self, next_page_token=False, count=20):
@@ -135,7 +135,7 @@ class SocialStreamPost(models.Model):
             'likes': {'summary': {'total_count': 0}},
             'from': {
                 'name': 'Mitchell Admin',
-                'profile_image_url_https': '/web/image/res.users/2/avatar_128'
+                'profile_image_url_https': self.twitter_profile_image_url,
             },
             'message': message,
             'comments': {'data': []},
@@ -148,10 +148,10 @@ class SocialStreamPost(models.Model):
     def _get_demo_comments(self):
         """ Return some fake comments. """
 
-        res_partner_2 = self.env.ref('social_demo.res_partner_2', raise_if_not_found=False)
-        res_partner_3 = self.env.ref('social_demo.res_partner_3', raise_if_not_found=False)
-        res_partner_4 = self.env.ref('social_demo.res_partner_4', raise_if_not_found=False)
-        res_partner_10 = self.env.ref('social_demo.res_partner_10', raise_if_not_found=False)
+        res_partner_2 = self.env.ref('base.res_partner_2', raise_if_not_found=False)
+        res_partner_3 = self.env.ref('base.res_partner_3', raise_if_not_found=False)
+        res_partner_4 = self.env.ref('base.res_partner_4', raise_if_not_found=False)
+        res_partner_10 = self.env.ref('base.res_partner_10', raise_if_not_found=False)
 
         if not all(res_partner for res_partner in [res_partner_2, res_partner_3, res_partner_4, res_partner_10]):
             return []
@@ -187,10 +187,10 @@ class SocialStreamPost(models.Model):
         }]
 
     def _get_demo_sub_comments(self):
-        res_partner_2 = self.env.ref('social_demo.res_partner_2', raise_if_not_found=False)
-        res_partner_3 = self.env.ref('social_demo.res_partner_3', raise_if_not_found=False)
-        res_partner_4 = self.env.ref('social_demo.res_partner_4', raise_if_not_found=False)
-        res_partner_10 = self.env.ref('social_demo.res_partner_10', raise_if_not_found=False)
+        res_partner_2 = self.env.ref('base.res_partner_2', raise_if_not_found=False)
+        res_partner_3 = self.env.ref('base.res_partner_3', raise_if_not_found=False)
+        res_partner_4 = self.env.ref('base.res_partner_4', raise_if_not_found=False)
+        res_partner_10 = self.env.ref('base.res_partner_10', raise_if_not_found=False)
 
         if not all(res_partner for res_partner in [res_partner_2, res_partner_3, res_partner_4, res_partner_10]):
             return []

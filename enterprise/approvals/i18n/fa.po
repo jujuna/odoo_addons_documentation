@@ -7,23 +7,32 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-08 20:04+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Persian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 03:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Persian <https://translate.odoo.com/projects/odoo-master/"
 "approvals/fa/>\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "%s (copy)"
-msgstr "%s (کپی)"
+#: model:ir.module.module,description:base.module_approvals
+msgid ""
+"\n"
+"This module manages approvals workflow\n"
+"======================================\n"
+"\n"
+"This module manages approval requests like business trips,\n"
+"out of office, overtime, borrow items, general approvals,\n"
+"procurements, contract approval, etc.\n"
+"\n"
+"According to the approval type configuration, a request\n"
+"creates next activities for the related approvers.\n"
+msgstr ""
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
@@ -31,39 +40,19 @@ msgid "'Approval - %s' % object.name"
 msgstr ""
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/07/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/08/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "1200"
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuse"
 msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-check text-success me-1\"/>Approve"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-times text-danger me-1\"/>Refuse"
+msgid "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Approve"
 msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "<span class=\"col-2 fw-bold\">Description:</span>"
 msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
-msgstr "<span class=\"fa fa-warning\" title=\"Invalid minimum مصوبات\"/>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -74,6 +63,14 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
 msgid "<span class=\"mx-1\">-</span>"
 msgstr "<span class=\"mx-1\">-</span>"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
+">"
+msgstr ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum مصوبات\"/>"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
@@ -100,6 +97,11 @@ msgstr "فعالیت"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "دکوراسیون استثنایی فعالیت"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
@@ -132,16 +134,6 @@ msgstr "مدیر"
 #: model:ir.ui.menu,name:approvals.approvals_approval_menu_all
 msgid "All Approvals"
 msgstr "همه مصوبات"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,help:approvals.field_approval_request__approval_type
-msgid ""
-"Allows you to define which documents you would like to create once the "
-"request has been approved"
-msgstr ""
-"به شما امکان می دهد پس از موافقت درخواست، اسنادی را که می خواهید ایجاد کنید، "
-"تعریف کنید"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__amount
@@ -219,12 +211,7 @@ msgid "Approval Subject"
 msgstr "موضوع مصوبه"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approval_type
-msgid "Approval Type"
-msgstr "نوع تایید"
-
-#. module: approvals
+#: model:ir.module.module,shortdesc:base.module_approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_root
 #: model:res.groups.privilege,name:approvals.res_groups_privilege_approvals
 msgid "Approvals"
@@ -265,13 +252,6 @@ msgid "Approver"
 msgstr "تصویب‌کننده"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_category.py:0
-msgid ""
-"Approver Sequence can only be activated with at least 1 minimum approver."
-msgstr "توالی تصویب کنندگان فقط با حداقل 1 تصویب کننده قابل فعال است."
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__user_ids
 msgid "Approver Users"
 msgstr "کاربران تصویب کننده"
@@ -288,12 +268,6 @@ msgstr "تصویب‌کننده(ها)"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Approvers"
 msgstr "تایید ‌کنندگان"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approver_sequence
-msgid "Approvers Sequence?"
-msgstr "توالی تصویب کنندگان"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -345,8 +319,8 @@ msgstr "پیوست ها"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
-msgid "Automated Sequence?"
-msgstr "دنباله خودکار؟"
+msgid "Automated Sequence"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -413,11 +387,6 @@ msgid "Category Approver"
 msgstr "تصویب کننده دسته بندی"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
-msgid "Code"
-msgstr "کد"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category_approver__company_id
@@ -428,13 +397,9 @@ msgstr "شرکت"
 
 #. module: approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_config
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 msgid "Configuration"
 msgstr "پیکربندی"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
-msgid "Confirm Date"
-msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__partner_id
@@ -453,9 +418,9 @@ msgid "Contract Approval"
 msgstr "مصوبه قرارداد"
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid "Create a new product variant"
-msgstr "ایجاد یک گونه جدید محصول"
+#: model:ir.module.module,summary:base.module_approvals
+msgid "Create and validate approvals requests"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid
@@ -578,11 +543,6 @@ msgid "Existing User"
 msgstr "کاربر موجود"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "Fields"
-msgstr "فیلدها"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
 msgid "Followers"
 msgstr "دنبال کنندگان"
@@ -593,19 +553,9 @@ msgid "Followers (Partners)"
 msgstr "پیروان (شرکاء)"
 
 #. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "آیکون فونت عالی به عبارتی fa-tasks"
-
-#. module: approvals
 #: model:ir.actions.server,name:approvals.model_approval_request_approve_admin
 msgid "Force Approval"
 msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "From:"
-msgstr "از:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
@@ -686,17 +636,10 @@ msgstr "دارای مرجع"
 msgid ""
 "How the employee's manager interacts with this type of approval.\n"
 "\n"
-"        Empty: do nothing\n"
-"        Is Approver: the employee's manager will be in the approver list\n"
-"        Is Required Approver: the employee's manager will be required to "
-"approve the request.\n"
+"        if checked the employee's manager is a required approver of the "
+"request, along with the selected users\n"
 "    "
 msgstr ""
-"مدیر کارمندان چگونه با این نوع تأیید تعامل می‌کند. \n"
-"خالی: هیچ کاری انجام ندهید\n"
-"تأیید کننده: مدیر کارمندان در فهرست تأییدکنندگان است\n"
-"تأییدکننده‌ی الزامی: مدیر کارمندان ملزم به تأیید درخواست است.\n"
-"    "
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__id
@@ -736,23 +679,9 @@ msgstr "اگر علامت زده شود، برخی از پیام ها دارای
 #: model:ir.model.fields,help:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,help:approvals.field_approval_request__automated_sequence
 msgid ""
-"If checked, the Approval Requests will have an automated generated name "
-"based on the given code."
+"If enabled, the approval request subject will be generated automatically "
+"using the given prefix code."
 msgstr ""
-"در صورت علامت‌گذاری، یک نام خودکار بر اساس کد داده برای درخواست‌های مصوبه "
-"ایجاد خواهد شد."
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
-msgid ""
-"If checked, the approvers have to approve in sequence (one after the other). "
-"If Employee's Manager is selected as approver, they will be the first in "
-"line."
-msgstr ""
-"در صورت انتخاب این گزینه، تأییدکنندگان باید درخواست‌ها را به نوبت تأیید کنند "
-"(یکی پس از دیگری). اگر مدیر کارمندان به عنوان تأییدکننده انتخاب شود، اولین "
-"نفر در صف تأییدکنندگان خواهد بود."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -771,19 +700,9 @@ msgid "Invalid Minimum Warning"
 msgstr "حداقل هشدار نامعتبر"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__approver
-msgid "Is Approver"
-msgstr "تایید کننده است"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_is_follower
 msgid "Is Follower"
 msgstr "آیا دنبال می کند"
-
-#. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__required
-msgid "Is Required Approver"
-msgstr "تأییدکننده‌ی الزامی"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_job_referral_award
@@ -854,6 +773,11 @@ msgid "Marc Demo"
 msgstr "دموی مارچ"
 
 #. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
 msgid "Message Delivery error"
 msgstr "خطای تحویل پیام"
@@ -868,6 +792,12 @@ msgstr "پیام ها"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__approval_minimum
 msgid "Minimum Approval"
 msgstr "حداقل مصوبه"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Minimum Approval must be at least 1."
+msgstr ""
 
 #. module: approvals
 #. odoo-python
@@ -947,6 +877,11 @@ msgstr "خلاصه فعالیت بعدی"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_type_id
 msgid "Next Activity Type"
 msgstr "نوع فعالیت بعدی"
+
+#. module: approvals
+#: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
+msgid "No"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
@@ -1063,9 +998,9 @@ msgid "Period:"
 msgstr ""
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "Print"
-msgstr "چاپ"
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
+msgid "Prefix Code"
+msgstr ""
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_procurement
@@ -1087,12 +1022,6 @@ msgstr "شرح محصول"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__product_line_ids
 msgid "Product Line"
 msgstr "سطر محصول"
-
-#. module: approvals
-#: model:ir.actions.act_window,name:approvals.product_product_action
-#: model:ir.ui.menu,name:approvals.approvals_menu_product_variant
-msgid "Product Variants"
-msgstr "گونه های محصول"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.product_template_action
@@ -1216,9 +1145,7 @@ msgid "SMS Delivery error"
 msgstr "خطای تحویل پیامک"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_approver__sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_category_approver__sequence
 msgid "Sequence"
 msgstr "دنباله"
 
@@ -1276,6 +1203,12 @@ msgstr "ارسال"
 #: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__pending
 msgid "Submitted"
 msgstr "ارسال ‌شده"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Submitted Date"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1430,22 +1363,6 @@ msgid "Users"
 msgstr "کاربران"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__waiting
-#: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__waiting
-msgid "Waiting"
-msgstr "در انتظار"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_request__website_message_ids
-msgid "Website Messages"
-msgstr "پیام های وب سایت"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__website_message_ids
-msgid "Website communication history"
-msgstr "تاریخچه ارتباط با وبسایت"
-
-#. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "Withdraw"
 msgstr "خارج‌شدن"
@@ -1461,12 +1378,6 @@ msgstr ""
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You can't delete an approved request. Archive it instead."
 msgstr ""
-
-#. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "You cannot approve before the previous approver."
-msgstr "امکان تصویب پیش از تصویب کننده قبلی وجود ندارد."
 
 #. module: approvals
 #. odoo-python
@@ -1508,15 +1419,6 @@ msgid "You must cancel and then back to draft the approval first."
 msgstr ""
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid ""
-"You must define a product for everything you sell or purchase,\n"
-"            whether it's a storable product, a consumable or a service."
-msgstr ""
-"شما باید برای هر چیزی که می فروشید یا می خرید یک محصول تعریف کنید،\n"
-"             خواه یک محصول قابل ذخیره سازی، یک کالای مصرفی یا یک سرویس باشد."
-
-#. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Your minimum approval exceeds the total of default approvers."
@@ -1544,7 +1446,12 @@ msgstr "منو"
 msgid "new request"
 msgstr "درخواست جدید"
 
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "to:"
-msgstr "به:"
+#~ msgid ""
+#~ "Approver Sequence can only be activated with at least 1 minimum approver."
+#~ msgstr "توالی تصویب کنندگان فقط با حداقل 1 تصویب کننده قابل فعال است."
+
+#~ msgid "Waiting"
+#~ msgstr "در انتظار"
+
+#~ msgid "You cannot approve before the previous approver."
+#~ msgstr "امکان تصویب پیش از تصویب کننده قبلی وجود ندارد."

@@ -7,12 +7,16 @@ import os
 import re
 import sys
 import typing as t
-import warnings
 from shutil import copyfileobj
 from types import CodeType
 
 from werkzeug import urls
-from werkzeug.datastructures import FileStorage, MultiDict
+from werkzeug.datastructures import (
+    FileStorage,
+    MultiDict,
+    WWWAuthenticate,
+    iter_multi_items,
+)
 from werkzeug.routing import Rule
 from werkzeug.urls import _decode_idna
 from werkzeug.wrappers import Request, Response
@@ -382,15 +386,13 @@ class URL(BaseURL):
         """Encodes the URL to a tuple made out of bytes.  The charset is
         only being used for the path, query and fragment.
         """
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", "'werkzeug", DeprecationWarning)
-            return BytesURL(
-                self.scheme.encode("ascii"),
-                self.encode_netloc(),
-                self.path.encode(charset, errors),
-                self.query.encode(charset, errors),
-                self.fragment.encode(charset, errors),
-            )
+        return BytesURL(
+            self.scheme.encode("ascii"),
+            self.encode_netloc(),
+            self.path.encode(charset, errors),
+            self.query.encode(charset, errors),
+            self.fragment.encode(charset, errors),
+        )
 
 
 class BytesURL(BaseURL):
@@ -417,15 +419,13 @@ class BytesURL(BaseURL):
         """Decodes the URL to a tuple made out of strings.  The charset is
         only being used for the path, query and fragment.
         """
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", "'werkzeug", DeprecationWarning)
-            return URL(
-                self.scheme.decode("ascii"),  # type: ignore
-                self.decode_netloc(),
-                self.path.decode(charset, errors),  # type: ignore
-                self.query.decode(charset, errors),  # type: ignore
-                self.fragment.decode(charset, errors),  # type: ignore
-            )
+        return URL(
+            self.scheme.decode("ascii"),  # type: ignore
+            self.decode_netloc(),
+            self.path.decode(charset, errors),  # type: ignore
+            self.query.decode(charset, errors),  # type: ignore
+            self.fragment.decode(charset, errors),  # type: ignore
+        )
 
 
 _unquote_maps: dict[frozenset[int], dict[bytes, int]] = {frozenset(): _hextobyte}
@@ -468,8 +468,6 @@ def _url_encode_impl(
     sort: bool,
     key: t.Callable[[tuple[str, str]], t.Any] | None,
 ) -> t.Iterator[str]:
-    from werkzeug.datastructures import iter_multi_items
-
     iterable: t.Iterable[tuple[str, str]] = iter_multi_items(obj)
 
     if sort:
@@ -551,9 +549,7 @@ def url_parse(
 
     result_type = URL if is_text_based else BytesURL
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", "'werkzeug", DeprecationWarning)
-        return result_type(scheme, netloc, url, query, fragment)
+    return result_type(scheme, netloc, url, query, fragment)
 
 
 def _make_fast_url_quote(
@@ -648,9 +644,7 @@ def url_quote_plus(
         Will be removed in Werkzeug 2.4. Use ``urllib.parse.quote_plus`` instead.
     """
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", "'werkzeug", DeprecationWarning)
-        return url_quote(string, charset, errors, safe + " ", "+").replace(" ", "+")
+    return url_quote(string, charset, errors, safe + " ", "+").replace(" ", "+")
 
 
 def url_unparse(components: tuple[str, str, str, str, str]) -> str:
@@ -734,9 +728,7 @@ def url_unquote_plus(
     else:
         s = s.replace(b"+", b" ")
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", "'werkzeug", DeprecationWarning)
-        return url_unquote(s, charset, errors)
+    return url_unquote(s, charset, errors)
 
 
 def url_fix(s: str, charset: str = "utf-8") -> str:
@@ -765,13 +757,11 @@ def url_fix(s: str, charset: str = "utf-8") -> str:
     if s.startswith("file://") and s[7:8].isalpha() and s[8:10] in (":/", "|/"):
         s = f"file:///{s[7:]}"
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", "'werkzeug", DeprecationWarning)
-        url = url_parse(s)
-        path = url_quote(url.path, charset, safe="/%+$!*'(),")
-        qs = url_quote_plus(url.query, charset, safe=":&%=+$!*'(),")
-        anchor = url_quote_plus(url.fragment, charset, safe=":&%=+$!*'(),")
-        return url_unparse((url.scheme, url.encode_netloc(), path, qs, anchor))
+    url = url_parse(s)
+    path = url_quote(url.path, charset, safe="/%+$!*'(),")
+    qs = url_quote_plus(url.query, charset, safe=":&%=+$!*'(),")
+    anchor = url_quote_plus(url.fragment, charset, safe=":&%=+$!*'(),")
+    return url_unparse((url.scheme, url.encode_netloc(), path, qs, anchor))
 
 
 def url_decode(
@@ -867,9 +857,7 @@ def url_decode_stream(
 
         cls = MultiDict
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", "'make_chunk_iter", DeprecationWarning)
-        return cls(decoder)
+    return cls(decoder)
 
 
 def _url_decode_impl(
@@ -1044,6 +1032,12 @@ def patch_module():
     Request.json_module = Response.json_module = scriptsafe
 
     FileStorage.save = lambda self, dst, buffer_size=(1 << 20): copyfileobj(self.stream, dst, buffer_size)
+
+    # https://github.com/pallets/werkzeug/issues/3127
+    def _stripped_to_header(*args, **kwargs):
+        return orig_to_header(*args, **kwargs).rstrip()
+    orig_to_header = WWWAuthenticate.to_header
+    WWWAuthenticate.to_header = _stripped_to_header
 
     def _multidict_deepcopy(self, memo=None):
         return orig_deepcopy(self)

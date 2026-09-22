@@ -7,7 +7,7 @@ class L10n_AuSuperFund(models.Model):
     _name = 'l10n_au.super.fund'
     _description = "Super Fund"
     _inherit = ["mail.thread"]
-    _rec_names_search = ["name", "abn", "usi"]
+    _rec_names_search = ("name", "abn", "usi")
 
     name = fields.Char(string="Name", required=True, tracking=True)
     abn = fields.Char(string="ABN", required=True, tracking=True)
@@ -15,6 +15,7 @@ class L10n_AuSuperFund(models.Model):
     fund_type = fields.Selection([
         ("APRA", "APRA"),
         ("SMSF", "SMSF"),
-    ], default="APRA", string="Type", required=True)
+    ], default="APRA", string="Type", required=True, help="""APRA: Super funds regulated by the Australian Prudential Regulation Authority.
+SMSF: Self-Managed Superannuation Funds.""")
     usi = fields.Char(string="USI", help="Unique Superannuation Identifier", tracking=True)
     esa = fields.Char(string="ESA", help="Electronic Service Address", tracking=True)

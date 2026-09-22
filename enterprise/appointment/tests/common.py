@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import pytz
 from contextlib import contextmanager
-from datetime import date, datetime
+from datetime import date, datetime, UTC
 from unittest.mock import patch
 
+from odoo import fields
 from odoo.addons.appointment.models.res_partner import ResPartner
 from odoo.addons.calendar.models.calendar_event import CalendarEvent
 from odoo.addons.resource.models.resource_calendar import ResourceCalendar
@@ -194,19 +194,34 @@ class AppointmentCommon(MailCase, common.HttpCase):
         url += ('?' not in url and '?' or '&') + 'nocache'
         return self.url_open(url)
 
-    def _create_meetings(self, user, time_info, appointment_type_id=None, show_as='busy'):
-        return self.env['calendar.event'].with_context(self._test_context).create([
+    def _create_meetings(
+        self, user, time_info, appointment_type_id=None, show_as='busy',
+        meeting_values=None, organizer_is_attendee=True, partners=None,
+        suppress_mail=True,
+    ):
+        partners = partners or self.env['res.partner']
+        if organizer_is_attendee:
+            partners += user.partner_id
+        if isinstance(meeting_values, dict):
+            meeting_values = [meeting_values] * len(time_info)
+        elif meeting_values is None:
+            meeting_values = [{}] * len(time_info)
+        CalendarEvent = self.env['calendar.event']
+        if suppress_mail:
+            CalendarEvent = CalendarEvent.with_context(self._test_context)
+        return CalendarEvent.create([
             {'allday': allday,
-             'attendee_ids': [(0, 0, {'partner_id': user.partner_id.id})],
+             'attendee_ids': [(0, 0, {'partner_id': partner.id}) for partner in partners],
              'name': 'Event for %s (%s / %s - %s)' % (user.name, allday, start, stop),
-             'partner_ids': [(4, user.partner_id.id)],
+             'partner_ids': [(4, partner.id) for partner in partners],
              'start': start,
              'stop': stop,
              'user_id': user.id,
              'appointment_type_id': appointment_type_id,
              'show_as': show_as
-            }
-            for start, stop, allday in time_info
+            } | meeting_vals
+            for (start, stop, allday), meeting_vals
+            in zip(time_info, meeting_values, strict=True)
         ])
 
     def _create_invite_test_data(self):
@@ -239,13 +254,13 @@ class AppointmentCommon(MailCase, common.HttpCase):
         slots_info = []
         for month in slots:
             # We use the last day of the first week to be sure that we use the correct month
-            last_day_first_week = month['weeks'][0][-1]['day']
+            last_day_first_week = self.day_date(month['weeks'][0][-1]['day'])
             month_tuple = (last_day_first_week.month, last_day_first_week.year)
             if filter_months and month_tuple not in filter_months:
                 continue
             for week in month['weeks']:
                 for day in week:
-                    if not day['slots'] or (filter_weekdays and day['day'].weekday() not in filter_weekdays):
+                    if not day['slots'] or (filter_weekdays and self.day_date(day['day']).weekday() not in filter_weekdays):
                         continue
                     for slot in day['slots']:
                         if filter_users and slot.get('staff_user_id') not in filter_users.ids:
@@ -256,12 +271,15 @@ class AppointmentCommon(MailCase, common.HttpCase):
                         slots_info.append(slot)
         return slots_info
 
+    def day_date(self, date_string):
+        return fields.Date.from_string(date_string)
+
     def assertSlots(self, slots, exp_months, slots_data):
         """ Check slots content. Method to be improved soon, currently doing
         only basic checks. """
         self.assertEqual(len(slots), len(exp_months), 'Slots: wrong number of covered months')
-        self.assertEqual(slots[0]['weeks'][0][0]['day'], slots_data['startdate'], 'Slots: wrong starting date')
-        self.assertEqual(slots[-1]['weeks'][-1][-1]['day'], slots_data['enddate'], 'Slots: wrong ending date')
+        self.assertEqual(self.day_date(slots[0]['weeks'][0][0]['day']), slots_data['startdate'], 'Slots: wrong starting date')
+        self.assertEqual(self.day_date(slots[-1]['weeks'][-1][-1]['day']), slots_data['enddate'], 'Slots: wrong ending date')
         for month, expected_month in zip(slots, exp_months):
             self.assertEqual(month['month'], expected_month['name_formated'])
             self.assertEqual(len(month['weeks']), expected_month['weeks_count'])
@@ -279,7 +297,7 @@ class AppointmentCommon(MailCase, common.HttpCase):
 
             for week in month['weeks']:
                 for day in week:
-                    day_date = day['day']
+                    day_date = self.day_date(day['day'])
                     # days linked to "next month" or "previous month" are there for filling but have no slots
                     is_void = day_date.month != expected_month['month_date'].month
 
@@ -325,7 +343,7 @@ class AppointmentCommon(MailCase, common.HttpCase):
         :param filter_resources<recordset>: the resources for which the appointment was booked for
         :param expected_available_resource_ids<list>: list of resource ids available for the slot we want to check
         """
-        slots = appointment_type._slots_generate(start_dt.astimezone(pytz.utc), end_dt.astimezone(pytz.utc), timezone, reference_date=reference_date)
+        slots = appointment_type._slots_generate(start_dt.astimezone(UTC), end_dt.astimezone(UTC), timezone, reference_date=reference_date)
         slots = [slot for slot in slots if slot['UTC'] == (start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None))]
         appointment_type._slots_fill_resources_availability(slots, start_dt, end_dt, filter_resources=filter_resources, asked_capacity=asked_capacity)
         self.assertEqual(set(expected_available_resource_ids), set(slots[0]['available_resource_ids'].ids))

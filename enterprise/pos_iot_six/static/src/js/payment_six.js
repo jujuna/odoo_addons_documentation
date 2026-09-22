@@ -1,5 +1,5 @@
 import { _t } from "@web/core/l10n/translation";
-import { register_payment_method } from "@point_of_sale/app/services/pos_store";
+import { registry } from "@web/core/registry";
 import { PaymentInterfaceIot } from "@pos_iot/app/utils/payment/payment_interface_iot";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
@@ -13,7 +13,7 @@ export class PaymentSix extends PaymentInterfaceIot {
             currency: this.pos.currency.name,
             cid: uuid,
             posId: this.pos.session.id,
-            userId: this.pos.session.user_id.id,
+            userId: this.pos.user?.id || 2,
         };
     }
 
@@ -26,7 +26,7 @@ export class PaymentSix extends PaymentInterfaceIot {
 
     getPaymentLineForMessage(order, data) {
         const line = order.getPaymentlineByUuid(data.cid);
-        const terminalProxy = line?.payment_method_id.terminal_proxy;
+        const terminalProxy = line?.payment_method_id.iot_device_id;
         if (line && terminalProxy) {
             return line;
         }
@@ -34,7 +34,6 @@ export class PaymentSix extends PaymentInterfaceIot {
     }
 
     onTerminalMessageReceived(data, line) {
-        this._setCardAndReceipt(data, line);
         if (data.Stage === "Cancel") {
             // Result of a cancel request
             if (data.Error) {
@@ -65,26 +64,18 @@ export class PaymentSix extends PaymentInterfaceIot {
                 });
                 this._resolvePayment?.(false);
             } else if (data.Response === "Approved") {
+                if (data.Card) {
+                    line.card_type = data.Card;
+                }
                 this._resolvePayment?.(true);
-            } else if (["WaitingForCard", "WaitingForPin"].includes(data.Stage)) {
-                line.setPaymentStatus("waitingCard");
             }
-        }
-    }
-
-    _setCardAndReceipt(data, line) {
-        if (data.Ticket) {
-            line.setReceiptInfo(data.Ticket);
-        }
-        if (data.Card) {
-            line.card_type = data.Card;
         }
     }
 
     _onBalanceComplete(data) {
         if (data.Error || !data.Ticket) {
             const error_msg =
-                data.Error && data.Error != ""
+                data.Error && data.Error !== ""
                     ? data.Error
                     : _t("Failed to get balance report from the terminal. Please retry.");
             this.env.services.dialog.add(AlertDialog, {
@@ -93,23 +84,23 @@ export class PaymentSix extends PaymentInterfaceIot {
             });
             return;
         }
-        const wrapper = document.createElement("div");
-        wrapper.innerHTML = `<div class='pos-receipt'>
-                <div class='pos-payment-terminal-receipt' style='font-size: 32px;'>
-                    ${data.Ticket.replace(/\n/g, "<br>")}
-                </div>
-            </div>`;
-        const element = wrapper.firstElementChild;
-        this.pos.hardwareProxy.printer.printReceipt(element);
+        const printer = this.pos.ticketPrinter;
+        if (printer.defaultPrinter) {
+            printer
+                .generateIframe("pos_iot_six.pos_six_balance_receipt", {
+                    lines: data.Ticket.split("\n"),
+                })
+                .then((iframe) => printer.printWithFallback({ iframe }));
+        }
     }
 
     async sendBalance() {
-        var self = this;
-        if (!self.terminal) {
+        if (!this.terminal) {
             this._showErrorConfig();
             return false;
         }
-        const printer = this.pos.hardwareProxy.printer;
+        const printer =
+            this.pos.ticketPrinter.defaultPrinter || (await this.pos.ticketPrinter.selectPrinter());
         if (!printer) {
             this.env.services.dialog.add(AlertDialog, {
                 title: _t("No printer configured"),
@@ -121,12 +112,12 @@ export class PaymentSix extends PaymentInterfaceIot {
         }
         const data = {
             messageType: "Balance",
-            posId: self.pos.session.id,
-            userId: self.pos.session.user_id.id,
+            posId: this.pos.session.id,
+            userId: this.pos.session.user_id.id,
         };
 
         return this.pos.iotHttp.action(
-            this.terminal.iotId,
+            this.terminal.iot_id,
             this.terminal.identifier,
             data,
             (e) => this._onBalanceComplete(e.result),
@@ -135,4 +126,4 @@ export class PaymentSix extends PaymentInterfaceIot {
     }
 }
 
-register_payment_method("six_iot", PaymentSix);
+registry.category("pos_payment_providers").add("six_iot", PaymentSix);

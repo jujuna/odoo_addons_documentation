@@ -1,7 +1,8 @@
 import { mapView } from "@web_map/map_view/map_view";
 import { registry } from "@web/core/registry";
+import { _t } from "@web/core/l10n/translation";
 
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { InteractiveEditorSidebar } from "@web_studio/client_action/view_editor/interactive_editor/interactive_editor_sidebar";
 import { Property } from "@web_studio/client_action/view_editor/property/property";
 import { SidebarViewToolbox } from "@web_studio/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox";
@@ -12,10 +13,6 @@ import { fieldsToChoices } from "@web_studio/client_action/view_editor/editors/u
 
 export class MapEditorSidebar extends Component {
     static template = "web_studio.ViewEditor.MapEditorSidebar";
-    static props = {
-        openViewInForm: { type: Function, optional: true },
-        openDefaultValues: { type: Function, optional: true },
-    };
     static components = {
         InteractiveEditorSidebar,
         Property,
@@ -24,8 +21,13 @@ export class MapEditorSidebar extends Component {
         MultiRecordSelector,
     };
 
+    props = useProps({
+        openViewInForm: t.function().optional(),
+        openDefaultValues: t.function().optional(),
+    });
+
     setup() {
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
         this.editArchAttributes = useEditNodeAttributes({ isRoot: true });
     }
 
@@ -33,9 +35,18 @@ export class MapEditorSidebar extends Component {
         return this.viewEditorModel.controllerProps.modelParams;
     }
 
+    get archInfo() {
+        return this.viewEditorModel.controllerProps.archInfo;
+    }
+
+    editAttribute(value, name) {
+        return this.editArchAttributes({ [name]: value });
+    }
+
     get multiRecordSelectorProps() {
         return {
             resModel: "ir.model.fields",
+            fieldString: _t("Fields"),
             update: this.changeAdditionalFields.bind(this),
             resIds: this.currentAdditionalFieldsIds,
             domain: [
@@ -70,6 +81,20 @@ export class MapEditorSidebar extends Component {
                 (field) => field.store && !["one2many", "many2many", "binary"].includes(field.type)
             )
             .map((field) => ({ label: `${field.string} (${field.name})`, value: field.name }));
+    }
+
+    get routingChoices() {
+        return [
+            { label: _t("Disabled"), value: false },
+            { label: _t("Ordered"), value: "ordered" },
+            { label: _t("Optimized"), value: "optimized" },
+        ];
+    }
+
+    get routingTooltip() {
+        return _t(
+            `Select your Mapbox routing preference:\n- Ordered: Keeps stops in their predefined order\n- Optimized: Reorders stops to minimize travel time and distance`
+        );
     }
 
     get defaultGroupbyChoices() {

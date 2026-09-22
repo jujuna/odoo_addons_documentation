@@ -1,4 +1,4 @@
-import { Chatter } from "@mail/chatter/web_portal/chatter";
+import { Chatter } from "@mail/chatter/web_portal_project/chatter";
 import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 
@@ -22,16 +22,15 @@ patch(Chatter.prototype, {
                     { onClose: resolve }
                 );
             });
-            this.store.Thread.insert({
-                model: this.props.threadModel,
-                id: this.props.threadId,
-            }).fetchNewMessages();
+            if (thread === this.thread()) {
+                thread.fetchNewMessages();
+            }
         };
-        if (this.state.thread.id) {
-            send(this.state.thread);
+        if (this.thread().id) {
+            send(this.thread());
         } else {
             this.onThreadCreated = send;
-            this.props.saveRecord?.();
+            this.webChatterProps.saveRecord?.();
         }
     },
 });

@@ -7,22 +7,45 @@
 # Jolien De Paepe, 2022
 # Erwin van der Ploeg <erwin@odooexperts.nl>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Bren Driesen <brdri@odoo.com>, 2025.
+# Bren Driesen <brdri@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-23 08:32+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 00:18+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
 "sale_amazon/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_amazon
+#: model:ir.module.module,description:base.module_sale_amazon
+msgid ""
+"\n"
+"Import your Amazon orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and marketplaces.\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(SKU in Amazon).\n"
+"* Deliveries confirmed in Odoo are synchronized in Amazon.\n"
+"* Support for both Fulfilment by Amazon (FBA) and Fulfilment by Merchant "
+"(FBM):\n"
+"    * FBA: A stock location and stock moves allow to monitor your stock in "
+"Amazon Fulfilment\n"
+"      Centers.\n"
+"    * FBM: Delivery notifications are sent to Amazon for each confirmed "
+"picking (partial delivery\n"
+"      friendly).\n"
+msgstr ""
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
@@ -367,8 +390,8 @@ msgid ""
 "Add any new marketplace that this account has "
 "gained                                           access to."
 msgstr ""
-"Voeg elke nieuwe marktplaats toe waarvoor dit "
-"account                                            toegang heeft verkregen."
+"Voeg elke nieuwe marktplaats toe waarvoor dit account"
+"                                            toegang heeft verkregen."
 
 #. module: sale_amazon
 #: model:ir.ui.menu,name:sale_amazon.root_menu
@@ -389,6 +412,11 @@ msgstr "Amazon account"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.res_config_settings_view_form
 msgid "Amazon Accounts"
 msgstr "Amazon accounts"
+
+#. module: sale_amazon
+#: model:ir.module.module,shortdesc:base.module_sale_amazon
+msgid "Amazon Connector"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__amazon_feed_ref
@@ -487,28 +515,6 @@ msgstr ""
 "Amazon vereist bepaalde informatie voor de verzendlocatie. Zorg ervoor dat "
 "de volgende informatie is ingesteld voor '%(location_name)s' (%(location)s): "
 "straat, land en landcode."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"Since the current carrier doesn't automatically provide a tracking "
-"reference, you need to set one manually."
-msgstr ""
-"Amazon vereist dat bij elke levering een trackingreferentie wordt verstrekt. "
-"Aangezien de huidige vervoerder niet automatisch een trackingreferentie "
-"verstrekt, moet je deze handmatig instellen."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"You need to assign a carrier to this delivery."
-msgstr ""
-"Amazon vereist dat bij elke levering een trackingreferentie wordt verstrekt. "
-"Je dient een vervoerder toe te wijzen aan deze levering."
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -687,11 +693,6 @@ msgid "Back to my account"
 msgstr "Terug naar mijn account"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
-msgid "Cancel"
-msgstr "Annuleren"
-
-#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__company_id
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__company_id
 msgid "Company"
@@ -782,11 +783,6 @@ msgid "Default Products"
 msgstr "Standaard producten"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
-msgid "Discard"
-msgstr "Negeren"
-
-#. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Disconnect"
 msgstr "Verbinding verbreken"
@@ -817,7 +813,7 @@ msgstr "Weergavenaam"
 #: model:ir.model.fields.selection,name:sale_amazon.selection__amazon_offer__amazon_sync_status__done
 #: model:ir.model.fields.selection,name:sale_amazon.selection__stock_picking__amazon_sync_status__done
 msgid "Done"
-msgstr "Gereed"
+msgstr "Voltooid"
 
 #. module: sale_amazon
 #: model:ir.model.fields.selection,name:sale_amazon.selection__amazon_offer__amazon_sync_status__error
@@ -950,8 +946,13 @@ msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
 msgstr ""
-"Als de verkooporder Vvergrendeld is kun je deze niet meer aanpassen. Het is "
-"wel mogelijk de order te factureren of te leveren."
+"Vergrendelde verkooporders kun je niet meer aanpassen. Je kunt de order wel "
+"nog factureren of leveren."
+
+#. module: sale_amazon
+#: model:ir.module.module,summary:base.module_sale_amazon
+msgid "Import Amazon orders and sync deliveries"
+msgstr "Importeer Amazon-orders en synchroniseer leveringen"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
@@ -1005,8 +1006,8 @@ msgid ""
 "Link your Amazon account with Odoo to start synchronizing your "
 "Amazon                               orders."
 msgstr ""
-"Koppel je Amazon-account aan Odoo om je Amazon-bestellingen "
-"te                               synchroniseren."
+"Koppel je Amazon-account aan Odoo om je Amazon-bestellingen te"
+"                               synchroniseren."
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_order_view_form
@@ -1030,6 +1031,12 @@ msgid "Marketplaces"
 msgstr "Marketplaces"
 
 #. module: sale_amazon
+#. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Missing product name"
+msgstr ""
+
+#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__name
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_marketplace__name
 msgid "Name"
@@ -1044,7 +1051,7 @@ msgstr "Nieuw"
 #. odoo-python
 #: code:addons/sale_amazon/models/amazon_offer.py:0
 msgid "Non-storable product cannot be synced."
-msgstr "Niet-opslagbaar product kan niet worden gesynchroniseerd."
+msgstr "Niet-voorraadproduct kan niet worden gesynchroniseerd."
 
 #. module: sale_amazon
 #: model:ir.model.fields.selection,name:sale_amazon.selection__amazon_marketplace__region__us-east-1
@@ -1127,8 +1134,8 @@ msgid ""
 "confirmed at once."
 msgstr ""
 "Producten die aan Amazon-klanten worden geleverd, moeten hun respectieve "
-"onderdelen in hetzelfde verpakking hebben. Bewerkingen met betrekking tot "
-"het product %s werden niet allemaal tegelijk bevestigd."
+"onderdelen in hetzelfde pakket hebben. Bewerkingen met betrekking tot het "
+"product %s werden niet allemaal tegelijk bevestigd."
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
@@ -1317,7 +1324,7 @@ msgid ""
 "The Amazon order with reference %(ref)s was not recovered because its "
 "currency was missing from the Amazon order data."
 msgstr ""
-"De Amazonn-estelling met referentie %(ref)s werd niet teruggevonden omdat de "
+"De Amazon-bestelling met referentie %(ref)s werd niet teruggevonden omdat de "
 "valuta ontbrak in de Amazon-betalingsgegevens."
 
 #. module: sale_amazon
@@ -1369,11 +1376,11 @@ msgstr "De voorraadbeheereenheid."
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_channel
 msgid ""
-"The channel will be updated with the incomming orders or during the next "
-"stock synchronization."
+"The channel will be updated with the incomming orders or, if left empty, "
+"during the next stock synchronization."
 msgstr ""
-"Het kanaal wordt bijgewerkt met de binnenkomende orders of tijdens de "
-"volgende voorraadsynchronisatie."
+"Het kanaal wordt bijgewerkt met de binnenkomende bestellingen of, indien "
+"leeg gelaten, tijdens de volgende voorraadsynchronisatie."
 
 #. module: sale_amazon
 #. odoo-python
@@ -1524,7 +1531,7 @@ msgstr ""
 "- In behandeling: De leveringsbon is bevestigd en wordt binnenkort "
 "gesynchroniseerd.\n"
 "- In verwerking: De leveringsgegevens zijn verzonden en worden verwerkt.\n"
-"- Gereed: De leveringsgegevens zijn verwerkt.\n"
+"- Voltooid: De leveringsgegevens zijn verwerkt.\n"
 "- Fout: De synchronisatie van de leveringsbon is mislukt."
 
 #. module: sale_amazon
@@ -1538,7 +1545,7 @@ msgid ""
 msgstr ""
 "De synchronisatiestatus van het voorraadniveau van het product naar Amazon:\n"
 "- Verwerken: het voorraadniveau is verzonden en wordt verwerkt.\n"
-"- Gereed: het voorraadniveau is verwerkt.\n"
+"- Voltooid: het voorraadniveau is verwerkt.\n"
 "- Fout: de synchronisatie van het voorraadniveau is mislukt.\n"
 "- Resetten: bij de volgende voorraadsynchronisatie wordt het FBM-"
 "voorraadniveau op 0 gezet."
@@ -1694,207 +1701,3 @@ msgstr "Bijv. Amerikaanse markt"
 #: code:addons/sale_amazon/models/amazon_account.py:0
 msgid "id"
 msgstr "ID"
-
-#~ msgid ""
-#~ "<div>\n"
-#~ "            <p>The synchronization of the Amazon order with reference <t "
-#~ "t-out=\"ctx.get('amazon_order_ref') or ''\">REF</t> encountered an error "
-#~ "and was not completed.</p>\n"
-#~ "            <p>Unless the order is canceled in SellerCentral, no other "
-#~ "synchronization will be attempted.</p>\n"
-#~ "            <p>To schedule a new synchronization attempt, proceed as "
-#~ "follows:\n"
-#~ "                <ol>\n"
-#~ "                    <li>Enter the Developer Tools.</li>\n"
-#~ "                    <li>Open the form of the Amazon Account on which the "
-#~ "order was placed.</li>\n"
-#~ "                    <li>Navigate to the Order Follow-up tab.</li>\n"
-#~ "                    <li>Set a date for <em>Last Orders Sync</em> that is "
-#~ "anterior to the last status update of the order.</li>\n"
-#~ "                    <li>Save the changes and click on the <em>SYNC "
-#~ "ORDERS</em> button.</li>\n"
-#~ "                </ol>\n"
-#~ "            </p>\n"
-#~ "            <p>If the problem persists, contact <a href=\"https://"
-#~ "www.odoo.com/help/\">Odoo support</a>.</p>\n"
-#~ "        </div>\n"
-#~ "        "
-#~ msgstr ""
-#~ "<div>\n"
-#~ "            <p>Bij de synchronisatie van de Amazon-bestelling met "
-#~ "referentie <t t-out=\"ctx.get('amazon_order_ref') or ''\">REF</t>is een "
-#~ "fout opgetreden en deze is niet voltooid.</p>\n"
-#~ "            <p>Tenzij de bestelling wordt geannuleerd in SellerCentral, "
-#~ "wordt er geen andere synchronisatie geprobeerd.</p>\n"
-#~ "            <p>Ga als volgt te werk om een nieuwe synchronisatiepoging te "
-#~ "plannen:\n"
-#~ "                <ol>\n"
-#~ "                    <li>Ga naar de Developer Tools.</li>\n"
-#~ "                    <li>Open het formulier van het Amazon-account waarop "
-#~ "de bestelling is geplaatst.</li>\n"
-#~ "                    <li>Navigeer naar het tabblad Orderopvolging.</li>\n"
-#~ "                    <li>Stel een datum in voor <em>Laatste orders sync</"
-#~ "em> dat is voorafgaand aan de laatste statusupdate van de bestelling.</"
-#~ "li>\n"
-#~ "                    <li>Sla de wijzigingen op en klik op de <em>SYNC "
-#~ "ORDERS</em> knop.</li>\n"
-#~ "                </ol>\n"
-#~ "            </p>\n"
-#~ "            <p>Als het probleem aanhoudt, neem dan contact op met:<a "
-#~ "href=\"https://www.odoo.com/help/\">Odoo Ondersteuning</a>.</p>\n"
-#~ "        </div>\n"
-#~ "        "
-
-#~ msgid "AWS Access Key"
-#~ msgstr "AWS Toegangscode"
-
-#~ msgid "AWS Secret Key"
-#~ msgstr "AWS geheime sleutel"
-
-#~ msgid "AWS Session Token"
-#~ msgstr "AWS Sessietoken"
-
-#~ msgid ""
-#~ "After validation of the credentials, the marketplaces\n"
-#~ "                                                to which this account has "
-#~ "access will be\n"
-#~ "                                                synchronized and "
-#~ "automatically made available."
-#~ msgstr ""
-#~ "Na validatie van de verificatiegegevens, de marktplaatsen\n"
-#~ "Waarvan deze rekening toegang heeft,\n"
-#~ "worden gesynchroniseerd en automatisch beschikbaar gesteld."
-
-#~ msgid "Amazon Email"
-#~ msgstr "Amazon e-mail"
-
-#~ msgid "Error code: %s; description: %s"
-#~ msgstr "Foutcode: %s; omschrijving: %s"
-
-#~ msgid ""
-#~ "If this account gained access to new "
-#~ "marketplaces,                                         synchronize and add "
-#~ "them to the current sync marketplaces"
-#~ msgstr ""
-#~ "Als dit account toegang heeft gekregen tot nieuwe markten, synchroniseer "
-#~ "ze dan en voeg ze toe aan de huidige gesynchroniseerde markten"
-
-#~ msgid "Inactive"
-#~ msgstr "Inactief"
-
-#~ msgid "Is Follow Up Displayed"
-#~ msgstr "Wordt betalingsherinnering getoond"
-
-#~ msgid "Link with Amazon"
-#~ msgstr "Koppel met Amazon"
-
-#~ msgid ""
-#~ "Link your Amazon account with Odoo to start synchronizing your\n"
-#~ "                                Amazon orders."
-#~ msgstr ""
-#~ "Koppel je Amazon-account aan Odoo om te beginnen met het synchroniseren "
-#~ "van je\n"
-#~ "                                Amazon-bestellingen."
-
-#~ msgid "Order Follow-up"
-#~ msgstr "Order opvolging"
-
-#~ msgid "SKU"
-#~ msgstr "SKU"
-
-#~ msgid "SKU must be unique for a given account and marketplace."
-#~ msgstr "SKU moet uniek zijn voor een account en marktplaats."
-
-#~ msgid ""
-#~ "Select the marketplace on which your seller account\n"
-#~ "                                                was originally created."
-#~ msgstr ""
-#~ "Selecteer de marktplaats waar je verkopersaccount\n"
-#~ "is aangemaakt."
-
-#~ msgid "Sign-up Marketplace"
-#~ msgstr "Registreer tot dit marktplaats"
-
-#~ msgid "Stock Location"
-#~ msgstr "Voorraadlocatie"
-
-#~ msgid "Sync Marketplaces"
-#~ msgstr "Sycn marktplaatsen"
-
-#~ msgid ""
-#~ "The communication with the API failed.\n"
-#~ "Error code: %s; description: %s"
-#~ msgstr ""
-#~ "De communicatie met de API is mislukt.\n"
-#~ "Foutcode: %s; Omschrijving: %s"
-
-#~ msgid "The encrypted email of the customer. Does not forward mails."
-#~ msgstr "De versleutelde e-mail van de klant. Stuurt geen e-mails door."
-
-#~ msgid "The moment at which the AWS credentials become invalid."
-#~ msgstr "Het moment waarop de AWS-inloggegevens ongeldig worden."
-
-#~ msgid ""
-#~ "The order has been canceled by the Amazon customer while someproducts "
-#~ "have already been delivered. Please create a return for this order to "
-#~ "adjust the stock."
-#~ msgstr ""
-#~ "De bestelling is geannuleerd door de Amazon-klant terwijl sommige "
-#~ "producten al zijn afgeleverd. Maak een retour aan voor deze bestelling om "
-#~ "de voorraad aan te passen."
-
-#~ msgid ""
-#~ "The original sign-up marketplace of this account. Used for authentication "
-#~ "only."
-#~ msgstr ""
-#~ "De oorspronkelijke marktplaats van deze account. Alleen gebruikt voor "
-#~ "authenticatie."
-
-#~ msgid "The short-lived key used to identify the assumed ARN role on AWS."
-#~ msgstr ""
-#~ "De kortstondige sleutel die werd gebruikt om de veronderstelde ARN-rol op "
-#~ "AWS te identificeren."
-
-#~ msgid ""
-#~ "The short-lived key used to verify the access to the assumed ARN role on "
-#~ "AWS."
-#~ msgstr ""
-#~ "De kortstondige sleutel die wordt gebruikt om de toegang tot de "
-#~ "veronderstelde ARN-rol op AWS te verifiëren."
-
-#~ msgid ""
-#~ "The short-lived token used to query the SP-API with the assumed ARN role "
-#~ "on AWS."
-#~ msgstr ""
-#~ "Het kortstondige token dat wordt gebruikt om de SP-API op te vragen met "
-#~ "de veronderstelde ARN-rol op AWS."
-
-#~ msgid ""
-#~ "This action will disconnect your account with Amazon "
-#~ "and                                          cannot be undone. Are you "
-#~ "sure you want to proceed?"
-#~ msgstr ""
-#~ "Met deze actie wordt je account bij Amazon ontkoppeld en kan dit niet "
-#~ "ongedaan worden gemaakt. Weet je zeker dat je verder wilt gaan?"
-
-#~ msgid "Unlink account"
-#~ msgstr "Account ontkoppelen"
-
-#~ msgid "Update Available Marketplaces"
-#~ msgstr "Update beschikbare marktplaatsen"
-
-#~ msgid "Your Amazon account is linked with Odoo."
-#~ msgstr "Je Amazon-account is gekoppeld aan Odoo."
-
-#~ msgid ""
-#~ "[%s] %s\n"
-#~ "Condition: %s - %s"
-#~ msgstr ""
-#~ "[%s] %s\n"
-#~ "Conditie: %s - %s"
-
-#~ msgid "[%s] Delivery Charges for %s"
-#~ msgstr "[%s] Leveringskosten voor %s"
-
-#~ msgid "[%s] Gift Wrapping Charges for %s"
-#~ msgstr "[%s] Kosten voor cadeauverpakkings %s"

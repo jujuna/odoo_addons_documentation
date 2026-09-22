@@ -17,6 +17,8 @@ _logger = logging.getLogger(__name__)
 
 
 class TestKeEdiCommon(TestAccountMoveSendCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -68,7 +70,7 @@ class TestKeEdiCommon(TestAccountMoveSendCommon):
         currency_eur = cls.env.ref('base.EUR')
         currency_eur.active = True
         cls.env['res.currency.rate'].create({
-            'name': fields.Date.today(),
+            'name': fields.Date.subtract(fields.Date.today(), days=1),
             'currency_id': currency_eur.id,
             'company_id': cls.company_data['company'].id,
             'inverse_company_rate': '100.00',
@@ -202,7 +204,7 @@ class TestKeEdiCommon(TestAccountMoveSendCommon):
 
         # Run cron as current user (not superuser) to limit ourselves to the test company
         self.env.invalidate_all()
-        self.env['ir.cron'].union(*crons_to_trigger).ir_actions_server_id.run()
+        self.env['ir.cron'].union(crons_to_trigger).ir_actions_server_id.run()
 
     def create_reversal(self, invoice, is_modify=False):
         """ Create a credit note that reverses an invoice. """

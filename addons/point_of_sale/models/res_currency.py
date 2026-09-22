@@ -6,12 +6,10 @@ class ResCurrency(models.Model):
     _inherit = ['res.currency', 'pos.load.mixin']
 
     @api.model
-    def _load_pos_data_domain(self, data, config):
-        company_currency_id = config.company_id.currency_id.id
-        config_currency_id = config.currency_id.id
-        if company_currency_id != config_currency_id:
-            return [('id', 'in', [company_currency_id, config_currency_id])]
-        return [('id', '=', config_currency_id)]
+    def _load_pos_data_domain(self, data):
+        config = data['pos.config']
+        currency_ids = config.company_id.currency_id | config.currency_id | data['product.pricelist'].currency_id | config.payment_method_ids.currency_ids
+        return [('id', 'in', currency_ids.ids)]
 
     @api.model
     def _load_pos_data_fields(self, config):

@@ -1,9 +1,11 @@
-import { BaseOptionComponent, useDomState } from "@html_builder/core/utils";
+import { BaseOptionComponent } from "@html_builder/core/base_option_component";
+import { useDomState } from "@html_builder/core/utils";
 import { _t } from "@web/core/l10n/translation";
+import { registry } from "@web/core/registry";
 
 export class DynamicSvgOption extends BaseOptionComponent {
+    static id = "dynamic_svg_option";
     static template = "website.DynamicSvgOption";
-    static selector = "img[src^='/html_editor/shape/'], img[src^='/web_editor/shape/']";
 
     setup() {
         super.setup();
@@ -29,3 +31,5 @@ export class DynamicSvgOption extends BaseOptionComponent {
         });
     }
 }
+
+registry.category("website-options").add(DynamicSvgOption.id, DynamicSvgOption);

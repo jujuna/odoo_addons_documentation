@@ -2,7 +2,6 @@
 {
     'name': 'Accounting - Fleet',
     'category': 'Accounting/Accounting',
-    'version': '1.0',
     'description': """
 Accounting Fleet Bridge
 """,

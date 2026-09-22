@@ -6,24 +6,53 @@
 # Martin Trigaux, 2022
 # Nancy Momoland <thanhnguyen.icsc@gmail.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Thi Huong Nguyen (thng)" <thng@odoo.com>, 2025.
+# "Thi Huong Nguyen (thng)" <thng@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-12-06 09:53+0000\n"
-"Last-Translator: \"Thi Huong Nguyen (thng)\" <thng@odoo.com>\n"
-"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 01:20+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-master/"
 "hr_appraisal/vi/>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_appraisal
+#: model:ir.module.module,description:base.module_hr_appraisal
+msgid ""
+"\n"
+"Periodical Employees appraisal\n"
+"==============================\n"
+"\n"
+"By using this application you can maintain the motivational process by doing "
+"periodical appraisals of your employees performance. The regular assessment "
+"of human resources can benefit your people as well your organization.\n"
+"\n"
+"An appraisal plan can be assigned to each employee. These plans define the "
+"frequency and the way you manage your periodic personal appraisal.\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Ability to create employee's appraisal(s).\n"
+"* An appraisal can be created by an employee's manager or automatically "
+"based on schedule which is defined in the employee form.\n"
+"* The appraisal is done according to a plan in which various surveys can be "
+"created. Each survey can be answered by a particular level in the employees "
+"hierarchy. The final review and appraisal is done by the manager.\n"
+"* Manager, colleague, collaborator, and employee himself/herself receives "
+"email to perform a periodical appraisal.\n"
+"* Every Appraisal Form filled by employees, colleague, collaborator, can be "
+"viewed in a PDF form.\n"
+"* Meeting Requests are created manually according to employees appraisals.\n"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -31,13 +60,6 @@ msgstr ""
 msgid "%(user)s decided, as %(role)s, to publish the employee's feedback"
 msgstr ""
 "%(user)s đã quyết định, với vai trò %(role)s, đăng phản hồi của nhân viên"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal_goal.py:0
-#: code:addons/hr_appraisal/models/hr_appraisal_template.py:0
-msgid "%s (copy)"
-msgstr "%s (sao chép)"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -69,81 +91,10 @@ msgid ". Then, share it with appraisers."
 msgstr ""
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__100
-msgid "100%"
-msgstr "100%"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__025
-msgid "25%"
-msgstr "25%"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_config_settings__module_hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "360 Feedback"
 msgstr "Phản hồi 360"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__050
-msgid "50%"
-msgstr "50%"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__075
-msgid "75%"
-msgstr "75%"
-
-#. module: hr_appraisal
-#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
-msgid ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        An appraisal of <t t-"
-"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
-"                        <br/><br/>\n"
-"                        Please schedule an appraisal date together.\n"
-"                        <br/><br/>\n"
-"                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; text-"
-"align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\"background-color: {{object.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\">\n"
-"                                    View Appraisal\n"
-"                                </a>\n"
-"                            </p>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        Đánh giá của <t t-out=\"ctx.get('employee_to_name')"
-"\">nhân viên</t> đã được xác nhận.\n"
-"                        <br/><br/>\n"
-"                        Vui lòng lên kế hoạch một ngày đánh giá cùng nhau.\n"
-"                        <br/><br/>\n"
-"                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; text-"
-"align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\"background-color: {{object.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\">\n"
-"                                    Xem đánh giá\n"
-"                               </a> \n"
-"                            </p>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_request_from_employee
@@ -156,10 +107,10 @@ msgid ""
 "                        <br/>\n"
 "                        <t t-out=\"ctx.get('author_name', '')\">Addison "
 "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-"\">addison.olson28@example.com</t>) wishes an appraisal.\n"
+"\">addison.olson28@example.com</t>) has requested an appraisal.\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
 "                            <div style=\"margin: 16px 0px 16px 0px; padding: "
-"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
+"8px 16px 8px 16px; background-color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">Annual "
 "appraisal.</t>\n"
 "                            </div>\n"
@@ -167,7 +118,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            <p style=\"margin: 16px 0px 16px 0px; padding: "
 "8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
 "padding: 8px 16px 8px 16px; text-decoration: none; color: "
@@ -181,38 +132,6 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        Xin chào <t t-out=\"ctx.get('employee_to_name')"
-"\">nhân viên</t>,\n"
-"                        <br/>\n"
-"                        <t t-out=\"ctx.get('author_name', '')\">Addison "
-"Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-"\">addison.olson28@example.com</t>) muốn tiến hành đánh giá.\n"
-"                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div style=\"margin: 16px 0px 16px 0px; padding: "
-"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-"                                <t t-out=\"ctx.get('user_body')\">Đánh giá "
-"hàng năm.</t>\n"
-"                            </div>\n"
-"                        </t>\n"
-"                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; padding: "
-"8px 16px 8px 16px; text-align: center;\">\n"
-"                               <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\" margin: auto; background-color: "
-"{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
-"padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
-"radius: 5px;\"> \n"
-"                                    Xem đánh giá\n"
-"                                </a>\n"
-"                            </p>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_reminder
@@ -229,7 +148,8 @@ msgid ""
 "\">[deadline]</t>.\n"
 "                        <br/>\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
+"                            <div class=\"my-3 py-2 px-3\" style=\"background-"
+"color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">[Optional "
 "comment]</t>\n"
 "                            </div>\n"
@@ -237,7 +157,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            You can access your appraisal form here:\n"
 "                            <p class=\"text-center my-3 py-2 px-3\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
 "8px 16px; text-decoration: none; color: "
@@ -257,46 +177,35 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+
+#. module: hr_appraisal
+#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
+msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
 "\">\n"
-"                        Xin chào <t t-out=\"ctx.get('employee_to_name')"
-"\">[nhân viên]</t>,\n"
-"                        <br/>\n"
-"                        Đây là lời nhắc nhanh rằng buổi đánh giá sắp tới của "
-"bạn với <t t-out=\"ctx.get('manager_names')\"> [người đánh giá]</t>\n"
-"                        được lên lịch vào ngày <t t-"
-"out=\"ctx.get('date_close')\">[ngày]</t>.\n"
-"                        <br/>\n"
-"                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
-"                                <t t-out=\"ctx.get('user_body')\">[Ghi chú "
-"bổ sung]</t>\n"
-"                            </div>\n"
-"                        </t>\n"
+"                        The appraisal for <t t-"
+"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
+"                        <br/><br/>\n"
+"                        Please proceed with the appraisal discussion based "
+"on the scheduled date.\n"
+"                        <br/><br/>\n"
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            Bạn có thể truy cập biểu mẫu đánh giá của mình "
-"tại đây:\n"
-"                            <p class=\"text-center my-3 py-2 px-3\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\" margin: auto; background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\"background-color: {{object.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
 "\">\n"
-"                                    Xem đánh giá\n"
+"                                    View Appraisal\n"
 "                                </a>\n"
 "                            </p>\n"
 "                        </t>\n"
-"                        Nếu bạn có bất kỳ câu hỏi nào hoặc cần dời lịch, vui "
-"lòng liên hệ lại.\n"
-"                        <br/>\n"
-"                        <br/>\n"
-"                        <t t-out=\"ctx.get('author_signature')\"/>\n"
-"                        <br/>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -461,6 +370,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "<span class=\"o_stat_text\">Appraisals</span>"
 msgstr "<span class=\"o_stat_text\">Đánh giá</span>"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
+msgid ""
+"<span class=\"o_stat_text\">Appraisals</span>\n"
+"                        <span class=\"o_stat_value\">New</span>"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
@@ -1033,6 +949,7 @@ msgstr "Đang hoạt động"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_root
 msgid "Activities"
 msgstr "Hoạt động"
 
@@ -1048,6 +965,13 @@ msgid "Activity Exception Decoration"
 msgstr "Hoạt động ngoại lệ"
 
 #. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_plans_ids
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_plans_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_plans
+msgid "Activity Plans"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_state
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_state
 msgid "Activity State"
@@ -1058,6 +982,19 @@ msgstr "Trạng thái hoạt động"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
 msgid "Activity Type Icon"
 msgstr "Biểu tượng loại hoạt động"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_type_action_config_appraisal
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_type
+msgid "Activity Types"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid ""
+"Activity plans are used to assign a list of activities in just a few clicks\n"
+"                (e.g. \"Mid-Year Review\", \"Annual Appraisal\", ...)"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1096,19 +1033,10 @@ msgid "All companies"
 msgstr "Tất cả công ty"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-msgid ""
-"Allow to create appraisals in batches:\n"
-"- By Employee: for specific employees\n"
-"- By Company: all employees of the specified company\n"
-"- By Department: all employees of the specified department\n"
-"- By Employee Tag: all employees of the specific employee group category"
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Already Processed"
 msgstr ""
-"Cho phép tạo đánh giá theo lô:\n"
-"- Theo nhân viên: cho các nhân viên cụ thể\n"
-"- Theo công ty: tất cả nhân viên của công ty được chỉ định\n"
-"- Theo phòng ban: tất cả nhân viên của phòng ban được chỉ định\n"
-"- Theo thẻ nhân viên: tất cả nhân viên của nhóm nhân viên cụ thể"
 
 #. module: hr_appraisal
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_reminder
@@ -1124,7 +1052,6 @@ msgstr "Đánh giá khác có cùng những người liên quan đang diễn ra.
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__appraisal_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__appraisal_id
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_activity
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_tree
@@ -1143,10 +1070,8 @@ msgid "Appraisal Assessment Note"
 msgstr "Ghi chú đánh giá"
 
 #. module: hr_appraisal
-#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 msgid "Appraisal Campaign"
 msgstr "Chiến dịch đánh giá"
@@ -1193,8 +1118,8 @@ msgstr "Mục tiêu đánh giá"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_appraisal_goal_tag
-msgid "Appraisal Goal Tags"
-msgstr "Thẻ mục tiêu đánh giá"
+msgid "Appraisal Goal Tag"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1206,6 +1131,11 @@ msgstr "Chuyên viên đánh giá"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__appraisal_plan_posted
 msgid "Appraisal Plan Posted"
 msgstr "Kế hoạch đánh giá đã đăng"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Appraisal Plans"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__appraisal_properties_definition
@@ -1222,6 +1152,12 @@ msgstr ""
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Appraisal Request"
 msgstr "Yêu cầu đánh giá"
+
+#. module: hr_appraisal
+#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
+msgid ""
+"Appraisal Request from {{ hasattr(object, 'name') and object.name or '' }}"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_config_templates_action
@@ -1278,6 +1214,14 @@ msgid "Appraisal to start"
 msgstr "Bắt đầu đánh giá"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_employee_departure.py:0
+msgid ""
+"Appraisal's managers have been updated due to the end of collaboration with "
+"an employee."
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.ir_cron_scheduler_appraisal_ir_actions_server
 msgid "Appraisal: Run employee appraisal"
 msgstr "Đánh giá: thực hiện đánh giá nhân viên"
@@ -1287,13 +1231,13 @@ msgstr "Đánh giá: thực hiện đánh giá nhân viên"
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_action_multiple_appraisals
 #: model:ir.actions.act_window,name:hr_appraisal.open_view_hr_appraisal_tree
+#: model:ir.module.module,shortdesc:base.module_hr_appraisal
 #: model:ir.ui.menu,name:hr_appraisal.menu_hr_appraisal_root
 #: model:ir.ui.menu,name:hr_appraisal.menu_open_view_hr_appraisal_tree
 #: model:res.groups.privilege,name:hr_appraisal.res_groups_privilege_appraisals
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_graph
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_pivot
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_department_view_kanban
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_departure_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 msgid "Appraisals"
 msgstr "Đánh giá"
@@ -1338,6 +1282,11 @@ msgstr "Đã lưu trữ"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "Ask to fill a survey to other employees"
 msgstr "Yêu cầu điền khảo sát về nhân viên khác"
+
+#. module: hr_appraisal
+#: model:ir.module.module,summary:base.module_hr_appraisal
+msgid "Assess your employees"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__assessment_note_ids
@@ -1395,26 +1344,6 @@ msgid "Body content is the same as the template"
 msgstr "Nội dung chính giống với mẫu"
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__company
-msgid "By Company"
-msgstr "Bởi công ty"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__department
-msgid "By Department"
-msgstr "Theo Phòng ban"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__employee
-msgid "By Employee"
-msgstr "Theo nhân viên"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__category
-msgid "By Employee Tag"
-msgstr "Theo thẻ nhân viên"
-
-#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "Bye-bye, record!"
@@ -1442,13 +1371,14 @@ msgid "Can See Manager Publish"
 msgstr "Có thể thấy quản lý đăng"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
-msgid "Cancel"
-msgstr "Hủy"
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__children_progression
+msgid "Children Progression"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Close"
 msgstr "Đóng"
@@ -1466,10 +1396,6 @@ msgstr "Màu sắc"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_res_company
-msgid "Companies"
-msgstr "Công ty"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__company_id
@@ -1495,6 +1421,7 @@ msgid "Configuration"
 msgstr "Cấu hình"
 
 #. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_confirm_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Confirm"
 msgstr "Xác nhận"
@@ -1515,7 +1442,12 @@ msgstr "Nội dung"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
 msgid "Continue"
-msgstr "Tiếp tục"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Create a Appraisal Activity Plan"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__duration_first_appraisal
@@ -1618,16 +1550,6 @@ msgid "Delete"
 msgstr "Xoá"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-msgid "Delete Future Appraisals"
-msgstr "Xoá đánh giá trong tương lai"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-msgid "Delete all appraisal after contract end date."
-msgstr "Xoá tất cả đánh giá sau ngày hợp đồng kết thúc."
-
-#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "Delete with children"
@@ -1636,7 +1558,6 @@ msgstr ""
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_department
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__department_id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__department_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__department_ids
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1654,11 +1575,6 @@ msgid "Departments"
 msgstr "Phòng ban"
 
 #. module: hr_appraisal
-#: model:ir.model,name:hr_appraisal.model_hr_departure_wizard
-msgid "Departure Wizard"
-msgstr "Công cụ hỗ trợ quá trình nghỉ việc"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__description
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
@@ -1668,7 +1584,6 @@ msgstr "Mô tả"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/hr_employee_selection_list/hr_employee_selection_list_view.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 msgid "Discard"
 msgstr "Huỷ bỏ"
 
@@ -1680,8 +1595,8 @@ msgstr "Huỷ bỏ"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__display_name
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__display_name
@@ -1708,9 +1623,14 @@ msgid "Draft"
 msgstr "Nháp"
 
 #. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Edit Feedback"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_mail_template
-msgid "Email Templates"
-msgstr "Mẫu email"
+msgid "Email Template"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_employee
@@ -1738,6 +1658,11 @@ msgid "Employee Autocomplete"
 msgstr "Tự động điền cho nhân viên"
 
 #. module: hr_appraisal
+#: model:ir.model,name:hr_appraisal.model_hr_employee_departure
+msgid "Employee Departure"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_feedback
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__appraisal_employee_feedback_template
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -1755,11 +1680,6 @@ msgid "Employee Feedback Template"
 msgstr "Mẫu phản hồi nhân viên"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__category_id
-msgid "Employee Tag"
-msgstr "Từ khóa nhân sự"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_user_id
 msgid "Employee User"
 msgstr "Người dùng nhân viên"
@@ -1770,6 +1690,8 @@ msgid "Employee to review"
 msgstr ""
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Employee's Feedback"
 msgstr "Phản hồi của nhân viên"
@@ -1798,6 +1720,16 @@ msgstr "Thang đánh giá"
 #: code:addons/hr_appraisal/models/res_company.py:0
 msgid "Exceeds expectations"
 msgstr "Vượt mong đợi"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Employee's Feedback"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Manager's Feedback"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_external
@@ -1837,12 +1769,6 @@ msgstr "Người theo dõi"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Người theo dõi (Đối tác)"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font biểu tượng, ví dụ: fa-tasks"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1953,8 +1879,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__id
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__id
@@ -2155,7 +2081,7 @@ msgstr "Tải trường hợp đánh giá"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "Load sample data"
-msgstr "Tải dữ liệu mẫu"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -2205,6 +2131,8 @@ msgid "Manager Feedback Template"
 msgstr "Mẫu phản hồi của quản lý"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Manager's Feedback"
 msgstr "Phản hồi của quản lý"
@@ -2217,10 +2145,17 @@ msgstr "Quản lý"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/goal_helper_static_actions/goal_helper_static_actions.js:0
+#: model:ir.actions.server,name:hr_appraisal.action_mark_appraisal_as_done
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Mark as Done"
 msgstr "Đánh dấu là hoàn tất"
+
+#. module: hr_appraisal
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2239,17 +2174,6 @@ msgstr "Lỗi gửi tin nhắn"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__message_ids
 msgid "Messages"
 msgstr "Tin nhắn"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-msgid "Mode"
-msgstr "Phương thức"
-
-#. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/components/cog_menu/multiple_appraisals_cog_menu.xml:0
-msgid "Multiple Appraisals"
-msgstr "Nhiều đánh giá"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -2345,16 +2269,15 @@ msgid "Next Appraisal Date"
 msgstr "Ngày đánh giá kế tiếp"
 
 #. module: hr_appraisal
+#: model:res.groups.privilege,placeholder:hr_appraisal.res_groups_privilege_appraisals
+msgid "No"
+msgstr ""
+
+#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "No Appraisals found!"
-msgstr "Không tìm thấy đánh giá nào!"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "No employees have the tag %(category_name)s"
-msgstr "Không có nhân viên nào có thẻ %(category_name)s"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -2367,12 +2290,6 @@ msgstr ""
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "No, keep it"
 msgstr "Không. Hãy giữ lại"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid "Note"
-msgstr "Ghi chú"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__number_of_completed_sibling_goals
@@ -2504,14 +2421,6 @@ msgstr ""
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid ""
-"Please set a final rating to validate these appraisals:\n"
-"- %s"
-msgstr ""
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Previous Appraisals"
 msgstr "Đánh giá trước đó"
 
@@ -2519,7 +2428,7 @@ msgstr "Đánh giá trước đó"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/component/print_menu.xml:0
 msgid "Print"
-msgstr "In"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__note
@@ -2539,7 +2448,8 @@ msgid "Programming"
 msgstr "Lập trình"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression_display
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 msgid "Progress"
 msgstr "Tiến độ"
 
@@ -2547,6 +2457,11 @@ msgstr "Tiến độ"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_kanban
 msgid "Progress:"
 msgstr "Tiến độ:"
+
+#. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+msgid "Progression"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__appraisal_properties
@@ -2605,7 +2520,7 @@ msgstr "Người dùng liên quan đến nguồn lực để quản lý sự tru
 
 #. module: hr_appraisal
 #. odoo-javascript
-#: code:addons/hr_appraisal/static/src/fields/appraisal_remaining_days.js:0
+#: code:addons/hr_appraisal/static/src/fields/appraisal_relative_date.js:0
 msgid "Remaining Days"
 msgstr "Số ngày còn lại"
 
@@ -2626,13 +2541,7 @@ msgstr "Báo cáo"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_public_view_form
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 msgid "Request Appraisal"
-msgstr "Yêu cầu đánh giá"
-
-#. module: hr_appraisal
-#: model:ir.actions.server,name:hr_appraisal.action_create_multi_appraisals
-msgid "Request Appraisals"
 msgstr "Yêu cầu đánh giá"
 
 #. module: hr_appraisal
@@ -2641,6 +2550,13 @@ msgid "Request an Appraisal"
 msgstr "Yêu cầu đánh giá"
 
 #. module: hr_appraisal
+#. odoo-javascript
+#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
+msgid "Request an Appraisal with your manager to assess your work."
+msgstr ""
+
+#. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_appraisal_reset
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Reset"
 msgstr "Đặt lại"
@@ -2674,12 +2590,6 @@ msgid "Schedule"
 msgstr "Lịch trình"
 
 #. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-msgid "Schedule Appraisals"
-msgstr "Lên lịch đánh giá"
-
-#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Schedule Meeting"
 msgstr ""
@@ -2698,7 +2608,7 @@ msgstr "Tìm đánh giá"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
 msgid "Select"
-msgstr "Chọn"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2715,6 +2625,11 @@ msgstr "Bản tự đánh giá sẽ hiện ở đây"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
 msgid "Send"
 msgstr "Gửi"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.action_appraisal_send_by_email
+msgid "Send By Email"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -2784,6 +2699,12 @@ msgstr ""
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_softskills
 msgid "Soft Skills"
 msgstr "Kỹ năng mềm"
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Some appraisals were already in another state and were skipped."
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__state
@@ -2879,12 +2800,6 @@ msgstr ""
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid "The \"Manager Feedback Published\" cannot be changed by an employee."
-msgstr "Nhân viên không thể thay đổi \"Phản hồi của quản lý đã đăng\"."
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "The appraisal's status has been set to Done by %s"
 msgstr "Trạng thái đánh giá đã được %s đặt thành Hoàn tất"
 
@@ -2898,12 +2813,6 @@ msgstr ""
 "thúc ước tính khi được giao"
 
 #. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "The company %(company_name)s doesn't have employees"
-msgstr "Công ty %(company_name)s không có nhân viên"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_employee__next_appraisal_date
 msgid ""
 "The date of the next appraisal is computed by the appraisal plan's dates "
@@ -2911,12 +2820,6 @@ msgid ""
 msgstr ""
 "Ngày đánh giá tiếp theo được tính theo ngày của kế hoạch đánh giá (lần đánh "
 "giá đầu tiên + chu kỳ)."
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "The department %(department_name)s doesn't have employees"
-msgstr "Phòng ban %(department_name)s không có nhân viên"
 
 #. module: hr_appraisal
 #: model:ir.model.constraint,message:hr_appraisal.constraint_res_company_positif_number_months
@@ -3024,13 +2927,29 @@ msgstr "Số lượng mục tiêu chưa hoàn thành"
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"field: %(inaccessible_field)s"
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"fields: %(inaccessible_fields)s"
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Unpublished"
 msgstr "Chưa xuất bản"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_search
-msgid "Upcoming Appraisals"
-msgstr "Đánh giá sắp tới"
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Update"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -3080,6 +2999,8 @@ msgid "Waiting Feedback from Employee/Managers"
 msgstr "Đang chờ phản hồi từ nhân viên/quản lý"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__warning
 msgid "Warning"
 msgstr "Cảnh báo"
@@ -3089,18 +3010,6 @@ msgstr "Cảnh báo"
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
 msgid "Weaknesses"
 msgstr "Điểm yếu"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-msgid "Website Messages"
-msgstr "Thông báo trên trang web"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-msgid "Website communication history"
-msgstr "Lịch sử trao đổi qua trang web"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -3174,6 +3083,12 @@ msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "You cannot modify a finished appraisal."
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
 #: code:addons/hr_appraisal/models/hr_employee.py:0
 msgid "You cannot set 'Next Appraisal Date' in the past."
 msgstr "Bạn không thể đặt 'Ngày đánh giá tiếp theo' trong quá khứ."
@@ -3240,229 +3155,12 @@ msgid "once published"
 msgstr "khi được đăng"
 
 #. module: hr_appraisal
-#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
-msgid ""
-"{{ hasattr(object, 'name') and object.name or '' }} requests an Appraisal"
-msgstr "{{ hasattr(object, 'name') and object.name or '' }} yêu cầu Đánh giá"
-
-#. module: hr_appraisal
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_confirm
 msgid "{{ object.employee_id.name }}: Appraisal Confirmed"
 msgstr "{{ object.employee_id.name }}: Đánh giá đã xác nhận"
 
-#~ msgid "%s Goals"
-#~ msgstr "%s Mục tiêu"
+#~ msgid "Website Messages"
+#~ msgstr "Thông báo trên trang web"
 
-#~ msgid "1 Meeting"
-#~ msgstr "1 cuộc họp"
-
-#~ msgid "<em>Do you need rapid answer to the current situation?</em>"
-#~ msgstr "<em>Bạn có cần câu trả lời nhanh cho tình hình hiện tại?</em>"
-
-#~ msgid "<em>Give an example of long-term objective (&gt; 6 months)</em>"
-#~ msgstr "<em>Cho ví dụ về mục tiêu dài hạn (&gt; 6 tháng)</em>"
-
-#~ msgid "<em>Give an example of short-term objective (&lt; 6 months)</em>"
-#~ msgstr "<em>Cho ví dụ về mục tiêu ngắn hạn (&lt; 6 tháng)</em>"
-
-#~ msgid "<em>Pro-activity</em>"
-#~ msgstr "<em>Chủ động</em>"
-
-#~ msgid "<em>Stress Resistance</em>"
-#~ msgstr "<em>Khả năng đối mặt với căng thẳng</em>"
-
-#~ msgid ""
-#~ "<p class=\"o_view_nocontent_smiling_face\">\n"
-#~ "                            Schedule an appraisal\n"
-#~ "                        </p><p>\n"
-#~ "                            Plan appraisals with your colleagues, collect "
-#~ "and discuss feedback.\n"
-#~ "                        </p>"
-#~ msgstr ""
-#~ "<p class=\"o_view_nocontent_smiling_face\">\n"
-#~ "                            Lên lịch đánh giá\n"
-#~ "                        </p><p>\n"
-#~ "                            Lập kế hoạch đánh giá cùng đồng nghiệp, thu "
-#~ "thập và thảo luận phản hồi.\n"
-#~ "                        </p>"
-
-#~ msgid "<strong><span>Meeting: </span></strong>"
-#~ msgstr "<strong><span>Cuộc họp: </span></strong>"
-
-#~ msgid "Appraisal Employee Feedback Template"
-#~ msgstr "Mẫu phản hồi đánh giá nhân viên"
-
-#~ msgid "Appraisal Manager Feedback Template"
-#~ msgstr "Mẫu phản hồi quản lý đánh giá"
-
-#~ msgid "Appraisal Requested"
-#~ msgstr "Đánh giá đã yêu cầu"
-
-#~ msgid "Appraisal Sent"
-#~ msgstr "Gửi đánh giá"
-
-#~ msgid "Appraisal Statistics"
-#~ msgstr "Thống kê đánh giá"
-
-#~ msgid "Appraisal to Confirm and Send"
-#~ msgstr "Đánh giá cần xác nhận và gửi"
-
-#~ msgid "Automatically generate appraisals"
-#~ msgstr "Tự động tạo đánh giá"
-
-#~ msgid "Basic Employee"
-#~ msgstr "Người dùng cơ bản"
-
-#~ msgid "Calendar Event"
-#~ msgstr "Lịch sự kiện"
-
-#~ msgid "Cancel Future Appraisals"
-#~ msgstr "Hủy đánh giá trong tương lai"
-
-#~ msgid "Cancel all appraisal after contract end date."
-#~ msgstr "Hủy tất cả đánh giá sau ngày hợp đồng kết thúc."
-
-#~ msgid "Cancelled"
-#~ msgstr "Đã hủy"
-
-#~ msgid "Create Date"
-#~ msgstr "Tạo ngày"
-
-#~ msgid "Date"
-#~ msgstr "Ngày"
-
-#~ msgid "Employee Name"
-#~ msgstr "Tên nhân viên"
-
-#~ msgid "Extended Filters..."
-#~ msgstr "Các bộ lọc Mở rộng..."
-
-#~ msgid "Final Interview"
-#~ msgstr "Phỏng vấn cuối cùng"
-
-#~ msgid "Final Interview Date"
-#~ msgstr "Ngày phỏng vấn cuối cùng"
-
-#~ msgid "Goal"
-#~ msgstr "Mục tiêu"
-
-#~ msgid "Group By"
-#~ msgstr "Nhóm theo"
-
-#~ msgid "Group by..."
-#~ msgstr "Nhóm theo..."
-
-#~ msgid "HR: Appraisal Confirmation"
-#~ msgstr "Nhân sự: Xác nhận đánh giá"
-
-#~ msgid "HR: Employee Appraisal Request"
-#~ msgstr "Nhân sự: Yêu cầu đánh giá của nhân viên"
-
-#~ msgid "HR: Manager appraisal request"
-#~ msgstr "Nhân sự: Yêu cầu đánh giá của quản lý"
-
-#~ msgid "How do I feel about my own..."
-#~ msgstr "Tôi cảm thấy thế nào về bản thân mình..."
-
-#~ msgid "How do I feel about the company..."
-#~ msgstr "Tôi cảm thấy thế nào về công ty..."
-
-#~ msgid "In progress Evaluations"
-#~ msgstr "Đang tiến hành"
-
-#~ msgid "Interview"
-#~ msgstr "Phỏng vấn"
-
-#~ msgid "Last Appraisal Date"
-#~ msgstr "Ngày đánh giá cuối cùng"
-
-#~ msgid "Last Meeting"
-#~ msgstr "Cuộc gặp cuối"
-
-#~ msgid "Manager Users"
-#~ msgstr "Người dùng cấp quản lý"
-
-#~ msgid "Meeting Count"
-#~ msgstr "Meeting Count"
-
-#~ msgid "Meetings"
-#~ msgstr "Cuộc gặp"
-
-#~ msgid "Next Meeting"
-#~ msgstr "Cuộc gặp tiếp theo"
-
-#~ msgid "No Meeting"
-#~ msgstr "Không có cuộc gặp"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Số thông báo cần xử lý"
-
-#~ msgid "Operation not supported"
-#~ msgstr "Hoạt động không được hỗ trợ"
-
-#~ msgid ""
-#~ "Optional translation language (ISO code) to select when sending out an "
-#~ "email. If not set, the english version will be used. This should usually "
-#~ "be a placeholder expression that provides the appropriate language, e.g. "
-#~ "{{ object.partner_id.lang }}."
-#~ msgstr ""
-#~ "Ngôn ngữ dịch tuỳ chọn (mã ISO) để chọn khi gửi email. Nếu không đặt, "
-#~ "phiên bản tiếng Anh sẽ được sử dụng. Đây luôn là biểu thức placeholder "
-#~ "cung cấp ngôn ngữ thích hợp, VD: {{ object.partner_id.lang }}."
-
-#~ msgid "People I Manage"
-#~ msgstr "People I Manage"
-
-#~ msgid ""
-#~ "Sent manually to the employee by the manager who wants to do an appraisal"
-#~ msgstr "Gửi thủ công cho nhân viên từ quản lý muốn thực hiện đánh giá"
-
-#~ msgid "Sent manually to the manager by the employee who wants an appraisal"
-#~ msgstr "Gửi thủ công cho quản lý từ nhân viên muốn được đánh giá"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Hiển thị tất cả dữ liệu có ngày xử lý tiếp theo trước ngày hôm nay"
-
-#~ msgid "Such grouping is not allowed."
-#~ msgstr "Nhóm như vậy là không được phép."
-
-#~ msgid "The date of the last appraisal"
-#~ msgstr "Ngày đánh giá cuối cùng"
-
-#~ msgid "To Do"
-#~ msgstr "Cần làm"
-
-#~ msgid "To Start"
-#~ msgstr "Bắt đầu"
-
-#~ msgid "What are my best achievement(s) since my last appraisal?"
-#~ msgstr ""
-#~ "(Những) thành tích lớn nhất của tôi kể từ lần đánh giá cuối cùng là gì?"
-
-#~ msgid "What would I need to improve my work?"
-#~ msgstr "Tôi cần gì để cải thiện công việc của mình?"
-
-#~ msgid "Which parts of my job do I most / least enjoy?"
-#~ msgstr "Tôi thích/ít thích nhất phần nào trong công việc của mình?"
-
-#~ msgid ""
-#~ "Your employee's last appraisal was %s months ago. An appraisal for %s is "
-#~ "created. You can assess %s & determinate the date for '1to1' meeting "
-#~ "before %s."
-#~ msgstr ""
-#~ "Lần đánh giá cuối cùng của nhân viên là %s tháng trước. Đánh giá cho %s "
-#~ "đã được tạo. Bạn có thể truy cập %s & định ngày họp '1:1' trước %s."
-
-#~ msgid ""
-#~ "Your last appraisal was %s months ago. Your appraisal is created you can "
-#~ "assess yourself here. Your manager will determinate the date for your "
-#~ "'1to1' meeting."
-#~ msgstr ""
-#~ "Lần đánh giá cuối cùng của bạn là %s tháng trước. Đánh giá đã được tạo, "
-#~ "bạn có thể xem tại đây. Quản lý của bạn sẽ định ngày họp '1to1' với bạn."
-
-#~ msgid "e.g. Present yourself to your new team"
-#~ msgstr "VD: Giới thiệu bản thân với đội mới"
-
-#~ msgid "oe_kanban_text_red"
-#~ msgstr "oe_kanban_text_red"
+#~ msgid "Website communication history"
+#~ msgstr "Lịch sử trao đổi qua trang web"

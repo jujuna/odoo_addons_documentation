@@ -10,6 +10,7 @@ from odoo import Command, fields
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestRoSaftReportAssets(TestRoSaftReport):
     """ Test the generation of the SAF-T Asset Declaration export for Romania."""
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestAccountReportsCommon.setup_country('ro')
@@ -105,6 +106,52 @@ class TestRoSaftReportAssets(TestRoSaftReport):
         loss_account_id = cls.company_data['default_account_expense'].id
         counterpart_account_id = cls.company_data['default_account_expense'].copy().id
 
+        cls.partner_xyz = cls.env['res.partner'].create({
+            'name': 'Romanian Partner XYZ',
+            'is_company': True,
+            'city': 'Bucharest',
+            'zip': '010001',
+            'country_id': cls.env.ref('base.ro').id,
+            'phone': '+40 987654321',
+            'vat': 'RO1234567897',
+            'additional_identifiers': {'RO_EN': '1234567897'},
+        })
+        cls.last_year_bill = cls.env['account.move'].create([
+            {
+                'move_type': 'in_invoice',
+                'invoice_date': '2022-01-01',
+                'date': '2022-01-01',
+                'partner_id': cls.partner_xyz.id,
+                'invoice_line_ids': [Command.create({
+                    'name': 'Old Truck',
+                    'account_id': asset_account_id,
+                    'quantity': 1.0,
+                    'price_unit': 500.0,
+                })],
+            },
+        ])
+        cls.last_year_bill.action_post()
+
+        # Distribute last year earnings to prevent the error on the undistributed profits and losts
+        cls.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2022-12-31',
+            'line_ids': [
+                Command.create({
+                    'name': 'Distribute earnings',
+                    'account_id': cls.env['account.chart.template'].ref('pcg_105').id,
+                    'debit': 100.0,
+                    'credit': 0.0,
+                }),
+                Command.create({
+                    'name': 'Distribute earnings',
+                    'account_id': cls.company_data['default_account_expense'].id,
+                    'debit': 0.0,
+                    'credit': 100.0,
+                }),
+            ]
+        }).action_post()
+
         cls.bill = cls.env['account.move'].create([
             {
                 'move_type': 'in_invoice',
@@ -122,10 +169,23 @@ class TestRoSaftReportAssets(TestRoSaftReport):
         ])
         cls.bill.action_post()
 
+        cls.company_data['default_account_assets'].asset_depreciation_account_id = cls.company_data['default_account_assets']
+        cls.company_data['default_account_assets'].asset_expense_account_id = cls.company_data['default_account_expense']
+        cls.company_data['default_account_assets'].depreciation_model_id = cls.env['account.depreciation.model'].create({
+            'method': 'linear',
+            'method_number': 5,
+            'method_period': '12',
+            'company_id': cls.env.company.id,
+        })
+
         # Purchase
+        last_year_asset_line = cls.last_year_bill.line_ids.filtered(lambda x: x.account_id.id == asset_account_id)
+        last_year_asset_form = Form(cls.env['account.asset'].with_context(default_original_move_line_ids=last_year_asset_line.ids))
+        last_year_asset_form.l10n_ro_saft_account_asset_category_id = cls.env.ref('l10n_ro_saft.l10n_ro_saft_1_1_2_1')
+        cls.last_year_truck = last_year_asset_form.save()
+        cls.last_year_truck.validate()
         asset_line = cls.bill.line_ids.filtered(lambda x: x.account_id.id == asset_account_id)
         asset_form = Form(cls.env['account.asset'].with_context(default_original_move_line_ids=asset_line.ids))
-        asset_form.account_depreciation_expense_id = cls.company_data['default_account_expense']
         asset_form.l10n_ro_saft_account_asset_category_id = cls.env.ref('l10n_ro_saft.l10n_ro_saft_1_1_2_1')
         cls.truck = asset_form.save()
         cls.truck.validate()
@@ -138,8 +198,8 @@ class TestRoSaftReportAssets(TestRoSaftReport):
         # Positive revaluation
         cls.env['asset.modify'].create({
             'name': 'New beautiful sticker :D',
-            'asset_id': cls.truck_to_increase.id,
-            'value_residual': cls.truck_to_increase._get_residual_value_at_date(fields.Date.to_date('2023-06-30')) + 80,
+            'asset_variant_id': cls.truck_to_increase.main_variant_id.id,
+            'value_residual': cls.truck_to_increase.main_variant_id._get_residual_value_at_date(fields.Date.to_date('2023-06-30')) + 80,
             'salvage_value': 0,
             'date': '2023-06-30',
             "account_asset_counterpart_id": counterpart_account_id,
@@ -148,8 +208,8 @@ class TestRoSaftReportAssets(TestRoSaftReport):
         # Negative revaluation
         cls.env['asset.modify'].create({
             'name': 'Little scratch :(',
-            'asset_id': cls.truck_to_decrease.id,
-            'value_residual': cls.truck_to_decrease._get_residual_value_at_date(fields.Date.to_date('2023-06-30')) - 50,
+            'asset_variant_id': cls.truck_to_decrease.main_variant_id.id,
+            'value_residual': cls.truck_to_decrease.main_variant_id._get_residual_value_at_date(fields.Date.to_date('2023-06-30')) - 50,
             'salvage_value': 0,
             'date': '2023-06-30',
             "account_asset_counterpart_id": counterpart_account_id,
@@ -157,7 +217,7 @@ class TestRoSaftReportAssets(TestRoSaftReport):
 
         # Dispose
         disposal_action_view = cls.env['asset.modify'].create({
-            'asset_id': cls.truck_to_dispose.id,
+            'asset_variant_id': cls.truck_to_dispose.main_variant_id.id,
             'modify_action': 'dispose',
             'loss_account_id': loss_account_id,
             'date': '2023-06-30',
@@ -171,7 +231,7 @@ class TestRoSaftReportAssets(TestRoSaftReport):
             'invoice_line_ids': [Command.create({'price_unit': 900})]  # amount at 2023-06-30 - perfect sale
         })
         cls.env['asset.modify'].create({
-            'asset_id': cls.truck_to_sell.id,
+            'asset_variant_id': cls.truck_to_sell.main_variant_id.id,
             'modify_action': 'sell',
             'invoice_line_ids': closing_invoice.invoice_line_ids,
             'date': '2023-06-30',

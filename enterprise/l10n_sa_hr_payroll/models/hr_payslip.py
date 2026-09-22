@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from dateutil.relativedelta import relativedelta
+from collections import defaultdict
 
 from odoo import api, fields, models
 
@@ -8,68 +8,102 @@ class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
     l10n_sa_wps_file_reference = fields.Char(string="WPS File Reference", copy=False)
+    l10n_sa_disciplinary_action_ids = fields.One2many(
+        'l10n.sa.disciplinary.action', 'payslip_id', readonly=True
+    )
 
     @api.depends('employee_id', 'version_id', 'struct_id', 'date_from', 'date_to')
     def _compute_input_line_ids(self):
         res = super()._compute_input_line_ids()
-        balance_by_employee = self._get_salary_advance_balances()
-        sal_adv_type = self.env.ref('l10n_sa_hr_payroll.l10n_sa_input_salary_advance')
+        advance_balance_by_employee = self._get_salary_advance_balances()
+        loan_balance_by_employee = self._get_loan_balances()
         for slip in self:
-            if not slip.employee_id or not slip.date_from or not slip.date_to or slip.country_code != 'SA':
-                continue
-            if slip.struct_id.code == 'SALARYADVANDLOAN':
-                lines_to_remove = slip.input_line_ids.filtered(lambda x: x.input_type_id == sal_adv_type)
-                to_remove_vals = [(3, line.id, False) for line in lines_to_remove]
-                to_add_vals = [(0, 0, {
-                    'name': self.env._('Salary Advance'),
-                    'amount': 0,
-                    'input_type_id': sal_adv_type.id,
-                })]
-                slip.write({'input_line_ids': to_remove_vals + to_add_vals})
-            else:
-                balance = balance_by_employee[slip.employee_id]
-                if balance <= 0:
-                    continue
-                lines_to_remove = slip.input_line_ids.filtered(
-                    lambda x: x.input_type_id == sal_adv_type
+            if slip.employee_id and slip.date_from and slip.date_to and slip.country_code == 'SA':
+                balance = (
+                    advance_balance_by_employee[slip.employee_id]["ADV"]
+                    + advance_balance_by_employee[slip.employee_id]["ADVDED"]
                 )
-                to_remove_vals = [(3, line.id, False) for line in lines_to_remove]
-                to_add_vals = [(0, 0, {
-                    'name': self.env._('Salary Advance'),
-                    'amount': balance,
-                    'input_type_id': sal_adv_type.id,
-                })]
-                slip.write({'input_line_ids': to_remove_vals + to_add_vals})
+                loan_deduction_balance = loan_balance_by_employee[slip.employee_id]
+                leaves_to_be_recovered = max(0,
+                    advance_balance_by_employee[slip.employee_id]["LEAVEADVPAY"]
+                    - advance_balance_by_employee[slip.employee_id]["LEAVERECPAY"]
+                )
+
+                if balance > 0:
+                    slip._set_input_value('ADVDED', balance)
+                if loan_deduction_balance > 0:
+                    slip._set_input_value('LOAN_DEDUCTION', loan_deduction_balance)
+                total_attendance_days = sum(
+                    d.number_of_days
+                    for d in slip.worked_days_line_ids.filtered(
+                        lambda w: w.code
+                        in [
+                            "002.00",
+                            self.env.company.l10n_sa_annual_work_entry_type_id.code
+                            if self.env.company.l10n_sa_annual_work_entry_type_id
+                            else False,
+                        ]
+                    )
+                )
+                if leaves_to_be_recovered:
+                    slip._set_input_value('LEAVERECPAY', min(total_attendance_days, leaves_to_be_recovered))
         return res
+
+    @api.model
+    def _issues_dependencies(self):
+        dependencies = super()._issues_dependencies()
+        dependencies += [
+            "employee_id.bank_account_ids.clearing_number",
+            "employee_id.bank_account_ids.clearing_label_id",
+            "company_id.l10n_sa_bank_account_id",
+            "company_id.l10n_sa_bank_account_id.clearing_number",
+            "company_id.l10n_sa_bank_account_id.clearing_label_id",
+            "company_id.l10n_sa_bank_account_id.l10n_sa_bank_establishment_code",
+            "company_id.l10n_sa_mol_establishment_code",
+            "employee_id.l10n_sa_employee_code",
+        ]
+        return dependencies
 
     def _get_salary_advance_balances(self):
         balance_by_employee = super()._get_salary_advance_balances()
-        payslips_by_employee = self._read_group(
-            domain=[
-                ('struct_id.country_id', '=', 'SA'),
-                ('state', 'in', ('validated', 'paid')),
-                ('employee_id', 'in', self.employee_id.ids),
-                ('input_line_ids.code', '=', 'ADV'),
-            ],
-            groupby=['employee_id'],
-            aggregates=['id:recordset']
-        )
-        for employee_id, payslips in payslips_by_employee:
-            for input_line in payslips.input_line_ids:
-                if input_line.code != 'ADV':
-                    continue
-                if input_line.payslip_id.struct_id.code == 'SALARYADVANDLOAN':
-                    balance_by_employee[employee_id] += input_line.amount
-                else:
-                    balance_by_employee[employee_id] -= input_line.amount
+        all_payslips = self.search([
+            ('struct_id.country_id', '=', 'SA'),
+            ('state', 'in', ('validated', 'paid')),
+            ('employee_id', 'in', self.employee_id.ids),
+        ])
+        line_values = all_payslips._get_line_values(['ADV', 'ADVDED', 'LEAVEADVPAY', 'LEAVERECPAY'])
+        for payslip in all_payslips:
+            # monetary value
+            balance_by_employee[payslip.employee_id]['ADV'] += line_values['ADV'][payslip.id]['total']
+            balance_by_employee[payslip.employee_id]['ADVDED'] += line_values['ADVDED'][payslip.id]['total']  # negative amount
+
+            # quantity value
+            balance_by_employee[payslip.employee_id]['LEAVEADVPAY'] += payslip._get_input_line_amount('LEAVEADVPAY')
+            balance_by_employee[payslip.employee_id]['LEAVERECPAY'] += payslip._get_input_line_amount('LEAVERECPAY')
+
         return balance_by_employee
+
+    def _get_loan_balances(self):
+        loan_balance_by_employee = defaultdict(float)
+        all_payslips = self.search([
+            ('struct_id.country_id', '=', 'SA'),
+            ('state', 'in', ('validated', 'paid')),
+            ('employee_id', 'in', self.employee_id.ids),
+        ])
+        line_values = all_payslips._get_line_values(['LOAN_DEDUCTION', 'LOANDPAY'])
+        for payslip in all_payslips:
+            loan_balance_by_employee[payslip.employee_id] += line_values['LOAN_DEDUCTION'][payslip.id]['total']
+            loan_balance_by_employee[payslip.employee_id] += line_values['LOANDPAY'][payslip.id]['total']
+
+        return loan_balance_by_employee
 
     def _get_data_files_to_update(self):
         # Note: file order should be maintained
         return super()._get_data_files_to_update() + [(
             'l10n_sa_hr_payroll', [
+                'data/hr_salary_rule_category_data.xml',
+                'data/hr_salary_rule_salary_advance_and_loan_data.xml',
                 'data/hr_salary_rule_saudi_data.xml',
-                'data/hr_payslip_input_type_data.xml',
                 'data/hr_rule_parameter_data.xml',
             ])]
 
@@ -87,20 +121,16 @@ class HrPayslip(models.Model):
 
     def _l10n_sa_get_wps_data(self):
         header = [
-            "[32B-AMT]",
-            "[59-ACC]",
-            "[59-NAME]",
-            "[57-BANK]",
-            "[70-DET]",
-            "[RET-CODE]",
-            "[MOL-BAS]",
-            "[MOL-HAL]",
-            "[MOL-OEA]",
-            "[MOL-DED]",
-            "[MOL-ID]",
-            "[TRN-REF]",
-            "[TRN-STATUS]",
-            "[TRN-DATE]"
+            self.env._("Employee's Net Salary"),
+            self.env._("Employee's bank account"),
+            self.env._("Employee's name"),
+            self.env._("Employee's Bank"),
+            self.env._("Payment Description"),
+            self.env._("Basic Salary"),
+            self.env._("Housing Allowance"),
+            self.env._("Other Earnings"),
+            self.env._("Deductions"),
+            self.env._("Employee's ID "),
         ]
         rows = []
 
@@ -120,79 +150,19 @@ class HrPayslip(models.Model):
 
             rows.append([
                 self._l10n_sa_format_float(net),
-                employee_id.primary_bank_account_id.acc_number or "",
-                employee_id.name or "",
-                (employee_id.primary_bank_account_id.bank_id.l10n_sa_sarie_code or "") if employee_id.primary_bank_account_id.bank_id != payslip.company_id.l10n_sa_bank_account_id.bank_id else "",
-                employee_id.version_id.l10n_sa_wps_description or "",
-                '',  # [RET-CODE]: Required blank cell
+                employee_id.primary_bank_account_id.account_number or "",
+                employee_id.primary_bank_account_id.holder_name or employee_id.name or "",
+                employee_id.primary_bank_account_id._get_clearing_number('SA') or ""
+                if employee_id.primary_bank_account_id.country_code == 'SA' or not employee_id.primary_bank_account_id
+                else employee_id.primary_bank_account_id.bank_bic or "",
+                payslip.name or "",
                 self._l10n_sa_format_float(basic),
                 self._l10n_sa_format_float(housing),
                 self._l10n_sa_format_float(extra_income),
                 self._l10n_sa_format_float(deductions),
                 employee_id.l10n_sa_employee_code or "",
-                '',  # [TRN-REF]: Required blank cell
-                '',  # [TRN-STATUS]: Required blank cell
-                '',  # [TRN-DATE]: Required blank cell
             ])
         return [header, *rows]
-
-    def _l10n_sa_get_eos_benefit(self):
-        result = 0
-        employee = self.employee_id
-        version = self.employee_id.version_id
-        start_date = employee._get_first_version_date()
-        end_date = employee.departure_date
-        total_years = self._l10n_sa_get_number_of_years(start_date, end_date)
-
-        compensation = (self._get_contract_wage() + version.l10n_sa_housing_allowance
-                + version.l10n_sa_transportation_allowance + version.l10n_sa_other_allowances)
-
-        if reason_type := employee.departure_reason_id.l10n_sa_reason_type:
-            if reason_type == 'fired':
-                result = 0
-            elif reason_type in ['end_of_contract', 'retired']:
-                if 1 <= total_years <= 5:
-                    result = total_years * compensation / 2
-                if total_years > 5:
-                    result = (5 * compensation / 2) + ((total_years - 5) * compensation)
-            elif reason_type == 'clause_77':
-                result = compensation
-            elif reason_type == 'resigned':
-                if 2 <= total_years < 10:
-                    result = (total_years * compensation / 2) / 3
-                else:
-                    result = (5 * compensation / 2) + ((total_years - 5) * compensation)
-        return self.company_id.currency_id.round(result)
-
-    def _l10n_sa_get_eos_provision(self):
-        result = 0
-        version = self.employee_id.version_id
-        total_years = self._l10n_sa_get_number_of_years(self.employee_id._get_first_version_date(), self.date_to)
-
-        provision_month = (self._get_contract_wage() + version.l10n_sa_housing_allowance
-                        + version.l10n_sa_transportation_allowance + version.l10n_sa_other_allowances) / 12
-
-        if total_years <= 5:
-            provision_month = provision_month / 2
-
-        if version.work_entry_source == 'calendar':
-            result = provision_month
-        elif 'WORK100' in self.worked_days_line_ids.mapped('code'):
-            total_number_of_days = sum(self.worked_days_line_ids.mapped('number_of_days')) or 1
-            result = ((provision_month / total_number_of_days) / version.resource_calendar_id.hours_per_day) * \
-                    self.worked_days_line_ids.filtered(lambda l: l.code == 'WORK100').number_of_hours
-        return self.company_id.currency_id.round(result)
-
-    def _l10n_sa_get_number_of_years(self, start_date, end_date):
-        worked_duration = relativedelta(end_date, start_date)
-        # 1 Day to be added as per the calculation in the QIWA calculator
-        worked_duration += relativedelta(days=1)
-        # last day of month is calculated to get the actual duration that the employee spent as years
-        # without a need to approximate the days in a year.
-        next_month = (end_date + relativedelta(months=1)).replace(day=1)
-        last_day_of_month = (next_month - end_date.replace(day=1)).days
-        total_years = worked_duration.years + (worked_duration.months / 12) + ((worked_duration.days / last_day_of_month) / 12)
-        return total_years
 
     def action_payslip_payment_report(self, export_format='l10n_sa_wps'):
         action = super().action_payslip_payment_report()
@@ -205,3 +175,123 @@ class HrPayslip(models.Model):
             },
         })
         return action
+
+    def _l10n_sa_get_valid_disciplinary_actions(self):
+        return self.env['l10n.sa.disciplinary.action'].search([
+            ('company_id', '=', self.company_id.id),
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'approved'),
+            ('action_type', '=', 'deduction'),
+            ('payslip_id', 'in', [False, self.id]),
+        ])
+
+    def _l10n_sa_has_disciplinary_action(self):
+        return bool(self._l10n_sa_get_valid_disciplinary_actions())
+
+    def _l10n_sa_get_disciplinary_action_amount(self):
+        self.ensure_one()
+        valid_actions = self._l10n_sa_get_valid_disciplinary_actions()
+        amount = 0
+        for action in valid_actions:
+            amount += action._calculate_deduction_amount()
+        valid_actions.write({'payslip_id': self.id})
+        return amount
+
+    def action_payslip_cancel(self):
+        res = super().action_payslip_cancel()
+        self.filtered(lambda p: p.struct_id.country_id.code == "SA").l10n_sa_disciplinary_action_ids.write({'payslip_id': False})
+        return res
+
+    def _issue_sa_missing_mandatory_fields(self):
+        issues = []
+
+        # Company required fields
+        if not self.company_id.l10n_sa_bank_account_id:
+            issues.append({
+                'message': self.env._("Kindly configure the establishment's bank account"),
+                'action_text': self.env._("Settings"),
+                'action': self.env['ir.actions.actions']._for_xml_id('hr_payroll.action_hr_payroll_configuration'),
+                'level': 'danger' if self.state == 'validated' else 'warning',
+            })
+        if not self.company_id.l10n_sa_mol_establishment_code:
+            issues.append({
+                'message': self.env._("Kindly configure the company's MoL Establishment ID"),
+                'action_text': self.env._("Settings"),
+                'action': self.env['ir.actions.actions']._for_xml_id('hr_payroll.action_hr_payroll_configuration'),
+                'level': 'danger' if self.state == 'validated' else 'warning',
+            })
+
+        # Employee required fields
+        if not self.employee_id.l10n_sa_employee_code:
+            issues.append({
+                'message': self.env._("Kindly set the Saudi National/IQAMA ID for the employees on the Payroll Tab"),
+                'action_text': self.env._("Employee"),
+                'action': self.employee_id._get_records_action(
+                    name=self.env._("Employee"),
+                    context={**self.env.context, 'version_id': self.version_id.id},
+                ),
+                'level': 'danger' if self.state == 'validated' else 'warning',
+            })
+
+        return issues or None
+
+    def _issue_sa_bank_warnings(self):
+        issues = []
+        # Company bank account checks
+        bank_acc = self.company_id.l10n_sa_bank_account_id
+        if bank_acc:
+            if not bank_acc._get_clearing_number('SA'):
+                issues.append({
+                    'message': self.env._("Missing SARIE code on the company bank %s", bank_acc.bank_name),
+                    'action_text': self.env._("Company Bank Account"),
+                    'action': bank_acc._get_records_action(),
+                    'level': 'warning',
+                })
+            if not bank_acc.l10n_sa_bank_establishment_code:
+                issues.append({
+                    'message': self.env._("Missing establishment code on the company bank %s", bank_acc.bank_name),
+                    'action_text': self.env._("Company Bank Account"),
+                    'action': bank_acc._get_records_action(),
+                    'level': 'warning',
+                })
+
+        # Employee bank account checks
+        emp_bank_acc = self.employee_id.primary_bank_account_id
+        if not emp_bank_acc:
+            issues.append({
+                'message': self.env._("Missing bank account for employee"),
+                'action_text': self.env._("Employee"),
+                'action': self.employee_id._get_records_action(),
+                'level': 'warning',
+            })
+
+        elif not emp_bank_acc._get_clearing_number('SA'):
+            issues.append({
+                'message': self.env._("Missing SARIE code for the bank account for the following employee: %s", self.employee_id.name),
+                'action_text': self.env._("Employee Bank Account"),
+                'action': emp_bank_acc._get_records_action(),
+                'level': 'warning',
+            })
+
+        return issues or None
+
+    def _issue_sa_gosi_warning(self):
+        issues = []
+        employee = self.employee_id
+        if (
+                employee.l10n_sa_company_social_insurance_percentage == 0 and
+                employee.l10n_sa_company_oh_insurance_percentage == 0 and
+                employee.l10n_sa_company_unemployment_insurance_percentage == 0 and
+                employee.l10n_sa_employee_social_insurance_percentage == 0 and
+                employee.l10n_sa_employee_unemployment_insurance_percentage == 0
+            ):
+            issues.append({
+                'message': self.env._("Kindly configure the GOSI integration from the payroll settings or manually set the contribution percentages for the employee under the payroll tab"),
+                'action_text': self.env._("Employee"),
+                'action': self.employee_id._get_records_action(
+                    name=self.env._("Employee"),
+                    context={**self.env.context, 'version_id': self.version_id.id},
+                ),
+                'level': 'warning',
+            })
+        return issues or None

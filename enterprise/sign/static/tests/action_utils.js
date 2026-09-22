@@ -13,16 +13,23 @@ export const defaultMockRPC = () =>
         <span>
             def
             <div class='o_sign_cp_pager'>
-                <div class="signer-status">
-                    <p class="o_sign_signer_status o_sign_signer_waiting" data-id="1"></p>
-                    <p class="o_sign_signer_status o_sign_signer_waiting" data-id="2"></p>
-                </div>
                 <input id="o_sign_input_sign_request_state" type="hidden" value="sent"/>
             </div>
             <iframe srcdoc="<body></body>" src="/sign/get_document/5/abc" class="o_iframe o_sign_pdf_iframe"/>
         </span>
         `,
-        context: {},
+        context: {
+            sign_request_token: "abc",
+            signer_status_props_json: JSON.stringify({
+                sequencedSignatureMail: false,
+                currentRequestItem: { id: 99, name: "Current User" }, 
+                waitingSigners: [
+                    { id: 1, name: "Alice" },
+                ],
+                completedSigners: [],
+                canceledSigners: []
+            })
+        },
     });
 
 export const defaultGetOriginalDocuments = () =>
@@ -59,6 +66,7 @@ export async function createDocumentWebClient(config) {
             state: "sent",
             create_uid: 1,
             request_item_states: { 1: true, 2: false },
+            document_count: 1,
             ...config.actionContext,
         },
     };
@@ -67,6 +75,7 @@ export async function createDocumentWebClient(config) {
         getDataFromHTML() {
             config.getDataFromHTML();
             this.requestState = "sent";
+            return true;
         },
         initializeIframe() {
             return;

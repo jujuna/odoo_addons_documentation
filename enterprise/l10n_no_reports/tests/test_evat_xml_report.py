@@ -9,6 +9,8 @@ from odoo import Command, fields
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestEvatXmlReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('no')
     def setUpClass(cls):
@@ -154,6 +156,7 @@ class TestEvatXmlReport(TestAccountReportsCommon):
         set_time_interval_function(options)
 
     def test_evat_xml_report_tax_values(self):
+        self.env = self.env(context={**self.env.context, 'lang': 'en_US'})
         report = self.env.ref('l10n_no.tax_report')
         options = self._generate_options(report, fields.Date.to_date('2021-01-01'), fields.Date.to_date('2021-01-31'))
 
@@ -176,17 +179,17 @@ class TestEvatXmlReport(TestAccountReportsCommon):
                             </periode>
                             <aar>2021</aar>
                         </skattleggingsperiode>
-                        <fastsattMerverdiavgift>1250.0</fastsattMerverdiavgift>
+                        <fastsattMerverdiavgift>1250</fastsattMerverdiavgift>
                         <mvaSpesifikasjonslinje>
                             <mvaKode>3</mvaKode>
                             <mvaKodeRegnskapsystem>25%</mvaKodeRegnskapsystem>
-                            <grunnlag>5000.0</grunnlag>
-                            <sats>25.0</sats>
-                            <merverdiavgift>1250.0</merverdiavgift>
+                            <grunnlag>5000</grunnlag>
+                            <sats>25</sats>
+                            <merverdiavgift>1250</merverdiavgift>
                         </mvaSpesifikasjonslinje>
                     </skattegrunnlagOgBeregnetSkatt>
                     <betalingsinformasjon>
-                        <kundeIdentifikasjonsnummer>NO072274687MVA</kundeIdentifikasjonsnummer>
+                        <kundeIdentifikasjonsnummer>072274687</kundeIdentifikasjonsnummer>
                     </betalingsinformasjon>
                     <skattepliktig>
                         <organisasjonsnummer>987654325</organisasjonsnummer>
@@ -221,22 +224,22 @@ class TestEvatXmlReport(TestAccountReportsCommon):
                             </periode>
                             <aar>2021</aar>
                         </skattleggingsperiode>
-                        <fastsattMerverdiavgift>-600.0</fastsattMerverdiavgift>
+                        <fastsattMerverdiavgift>-600</fastsattMerverdiavgift>
                         <mvaSpesifikasjonslinje>
                             <mvaKode>1</mvaKode>
                             <mvaKodeRegnskapsystem>25%</mvaKodeRegnskapsystem>
-                            <merverdiavgift>-2000.0</merverdiavgift>
+                            <merverdiavgift>-2000</merverdiavgift>
                         </mvaSpesifikasjonslinje>
                         <mvaSpesifikasjonslinje>
                             <mvaKode>3</mvaKode>
                             <mvaKodeRegnskapsystem>25%</mvaKodeRegnskapsystem>
-                            <grunnlag>5600.0</grunnlag>
-                            <sats>25.0</sats>
-                            <merverdiavgift>1400.0</merverdiavgift>
+                            <grunnlag>5600</grunnlag>
+                            <sats>25</sats>
+                            <merverdiavgift>1400</merverdiavgift>
                         </mvaSpesifikasjonslinje>
                     </skattegrunnlagOgBeregnetSkatt>
                     <betalingsinformasjon>
-                        <kundeIdentifikasjonsnummer>NO072274687MVA</kundeIdentifikasjonsnummer>
+                        <kundeIdentifikasjonsnummer>072274687</kundeIdentifikasjonsnummer>
                     </betalingsinformasjon>
                     <skattepliktig>
                         <organisasjonsnummer>987654325</organisasjonsnummer>

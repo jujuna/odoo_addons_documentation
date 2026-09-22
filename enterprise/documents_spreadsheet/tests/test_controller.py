@@ -1,8 +1,6 @@
 import json
 
-from odoo import http
-
-from odoo.tests.common import HttpCase, new_test_user
+from odoo.tests.common import tagged, HttpCase, new_test_user
 from odoo.tools.misc import mute_logger
 
 from .common import SpreadsheetTestCommon
@@ -22,7 +20,7 @@ class TestSpreadsheetDocumentController(SpreadsheetTestCommon, HttpCase):
                     url='/documents/upload',
                     data={
                         'access_token': folder.access_token,
-                        'csrf_token': http.Request.csrf_token(self),
+                        'csrf_token': self.csrf_token(),
                     },
                     files=[('ufile', (name, json.dumps(data), 'application/json'))],
                 )
@@ -40,7 +38,7 @@ class TestSpreadsheetDocumentController(SpreadsheetTestCommon, HttpCase):
             url='/documents/upload',
             data={
                 'access_token': folder.access_token,
-                'csrf_token': http.Request.csrf_token(self),
+                'csrf_token': self.csrf_token(),
             },
             files=[('ufile', ('test.osheet.json', data, 'text/plain'))],
         )
@@ -73,7 +71,7 @@ class TestSpreadsheetDocumentController(SpreadsheetTestCommon, HttpCase):
             url='/documents/upload',
             data={
                 'access_token': folder.access_token,
-                'csrf_token': http.Request.csrf_token(self),
+                'csrf_token': self.csrf_token(),
             },
             files=[('ufile', ('test.osheet.json', json.dumps(data), 'application/json'))],
         )
@@ -89,12 +87,13 @@ class TestSpreadsheetDocumentController(SpreadsheetTestCommon, HttpCase):
         result = response.json()
         self.assertEqual(result['data'], {})
         self.assertEqual(result['revisions'], [], 'It should not have past revisions')
+        self.assertEqual(result['access_token'], spreadsheet.access_token)
 
     def test_get_active_spreadsheet_data(self):
         self.authenticate(self.spreadsheet_user.login, self.spreadsheet_user.password)
         spreadsheet = self.create_spreadsheet()
         commands = self.new_revision_data(spreadsheet)
-        spreadsheet.dispatch_spreadsheet_message(commands)
+        spreadsheet._dispatch_spreadsheet_message(commands)
         response = self.url_open('/spreadsheet/data/documents.document/%s' % spreadsheet.id)
         self.assertEqual(response.status_code, 200)
         result = response.json()
@@ -116,7 +115,7 @@ class TestSpreadsheetDocumentController(SpreadsheetTestCommon, HttpCase):
         )
         response = self.url_open('/spreadsheet/data/documents.document/%s' % document.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['isReadonly'], False)
+        self.assertEqual(response.json()['has_write_access'], True)
         self.assertEqual(response.json()['data'], {})
 
     @mute_logger('odoo.http')
@@ -150,18 +149,18 @@ class TestSpreadsheetDocumentController(SpreadsheetTestCommon, HttpCase):
         # with token
         response = self.url_open('/spreadsheet/data/documents.document/%s/%s' % (document.id, access_token))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['isReadonly'], True)
+        self.assertEqual(response.json()['has_write_access'], False)
 
         # without token and access
         self.authenticate('raoul', 'raoul')  # explicit edit access
         response = self.url_open('/spreadsheet/data/documents.document/%s' % (document.id,))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['isReadonly'], False)
+        self.assertEqual(response.json()['has_write_access'], True)
 
         # with token and access
         response = self.url_open('/spreadsheet/data/documents.document/%s/%s' % (document.id, access_token))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['isReadonly'], False)
+        self.assertEqual(response.json()['has_write_access'], True)
 
     @mute_logger('odoo.http')
     def test_get_readonly_data_with_token(self):
@@ -184,15 +183,7 @@ class TestSpreadsheetDocumentController(SpreadsheetTestCommon, HttpCase):
         # with token
         response = self.url_open('/spreadsheet/data/documents.document/%s/%s' % (document.id, access_token))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['isReadonly'], True)
-
-    def test_spreadsheet_with_token_from_folder_share(self):
-        document_1 = self.create_spreadsheet()
-        self.create_spreadsheet()
-        folder = document_1.folder_id
-        self.assertEqual(len(folder.children_ids), 2, 'there are more than one document in the folder')
-        response = self.url_open('/spreadsheet/data/documents.document/%s' % document_1.id)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['has_write_access'], False)
 
     def test_read_portal_user_with_doc_access(self):
         document = self.create_spreadsheet()
@@ -210,12 +201,12 @@ class TestSpreadsheetDocumentController(SpreadsheetTestCommon, HttpCase):
         raoul = new_test_user(self.env, login='raoul')
         self.authenticate(raoul.login, raoul.password)
         spreadsheet = self.create_spreadsheet()
-        with self._freeze_time('2020-02-02 18:00'):
-            spreadsheet.dispatch_spreadsheet_message(
+        with self.mock_datetime_and_now('2020-02-02 18:00'):
+            spreadsheet._dispatch_spreadsheet_message(
                 self.new_revision_data(spreadsheet)
             )
         spreadsheet.access_internal = 'view'
-        with self._freeze_time('2020-02-03 18:00'):
+        with self.mock_datetime_and_now('2020-02-03 18:00'):
             response = self.url_open('/spreadsheet/data/documents.document/%s' % spreadsheet.id)
             # readonly
             self.assertFalse(

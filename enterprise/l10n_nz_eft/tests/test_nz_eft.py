@@ -1,6 +1,4 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
-
 from odoo import Command, fields
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
@@ -10,6 +8,8 @@ from odoo.tools import format_date
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestNZEFT(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestAccountReportsCommon.setup_country('nz')
@@ -21,20 +21,17 @@ class TestNZEFT(AccountTestInvoicingCommon):
         # -- Setup Common -- #
 
         cls.partner_a.bank_ids = [Command.create({
-            'acc_number': '01-12645-1349786-054',
-            'acc_type': 'bank',
+            'account_number': '01-12645-1349786-054',
             'allow_out_payment': True,
         })]
 
         cls.partner_b.bank_ids = [Command.create({
-            'acc_number': '05-98756-6794815-038',
-            'acc_type': 'bank',
+            'account_number': '05-98756-6794815-038',
             'allow_out_payment': True,
         })]
 
         cls.company_data['company'].partner_id.bank_ids = [Command.create({
-            'acc_number': '01-123654-4532687-012',
-            'acc_type': 'bank',
+            'account_number': '01-123654-4532687-012',
             'allow_out_payment': True,
         })]
 
@@ -220,7 +217,7 @@ class TestNZEFT(AccountTestInvoicingCommon):
         else:
             file = self.inbound_batch._generate_export_file()['file']
 
-        batch_file = base64.decodebytes(file).decode()
+        batch_file = file.decode()
         lines = batch_file.split('\r\n')
         for line_number, (file_line, expected_line) in enumerate(zip(lines, expected_lines), start=1):
             self.assertEqual(file_line, expected_line, f'Line {line_number} did not match with the expected values.')

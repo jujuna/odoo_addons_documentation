@@ -2,24 +2,27 @@
 <templates>
 
 <t t-name="StudioApproval">
-    <div class="o_web_studio_approval d-inline ms-2" t-on-click.stop="toggleApprovalInfo" t-ref="root">
+    <div class="o_web_studio_approval d-inline ms-2" t-on-click.stop="this.toggleApprovalInfo" t-ref="this.rootRef">
         <!-- no rules list: first fetch not done, display spinner -->
-        <t t-if="state.rules === null">
-            <i class="fa fa-circle-o-notch fa-spin"/>
+        <t t-if="this.approval.isAppovalBlockedByParentRule()">
+            <i class="oi" data-icon="gavel"/>
+        </t>
+        <t t-if="this.state.rules === null">
+            <i class="oi oi-spin" data-icon="autorenew"/>
         </t>
         <t t-else="state.rules.length">
              <!-- data fetched; display avatar for rules and entries -->
-            <t t-set="num_rules" t-value="state.rules.length"/>
-            <t t-foreach="state.rules" t-as="ruleId" t-key="ruleId">
+            <t t-set="num_rules" t-value="this.state.rules.length"/>
+            <t t-foreach="this.state.rules" t-as="ruleId" t-key="ruleId" t-if="!this.props.approval.hasParent(ruleId)">
                 <t t-set="rule" t-value="this.props.approval.rules[ruleId]" />
                 <t t-if="num_rules lte 3 || (num_rules gt 3 and ruleId_index lt 2)">
                     <img
-                        t-if="getEntry(rule.id)"
+                        t-if="this.getEntry(rule.id)"
                         t-key="rule.id"
-                        t-attf-src="/web/image/res.users/{{getEntry(rule.id).user_id[0]}}/avatar_128"
-                        t-att-title="getEntry(rule.id).user_id[1]"
-                        t-att-alt="getEntry(rule.id).user_id[1]"
-                        t-attf-class="o_web_studio_approval_avatar rounded-circle border border-{{getEntry(rule.id).approved?'info':'danger'}}"
+                        t-attf-src="/web/image/res.users/{{this.getEntry(rule.id).user_id[0]}}/avatar_128"
+                        t-att-title="this.getEntry(rule.id).user_id[1]"
+                        t-att-alt="this.getEntry(rule.id).user_id[1]"
+                        t-attf-class="o_web_studio_approval_avatar rounded-circle border border-{{this.getEntry(rule.id).approved?'info':'danger'}}"
                     />
                     <img
                         t-else=""
@@ -30,20 +33,15 @@
                         class="o_web_studio_approval_avatar rounded-circle border border-muted"
                     />
                 </t>
-                <t t-if="rule_last and num_rules gt 3">
+                <t t-if="this.rule_last and num_rules gt 3">
                     <t t-set="extra_rules" t-value="num_rules - 2"/>
                     <span
                         t-key="'extra_rules'"
-                        class="o_web_studio_approval_more rounded-circle bg-secondary"
+                        class="o_web_studio_approval_more rounded-circle bg-300"
                         title="Click to see all approval rules.">
-                        +<t t-esc="extra_rules"/>
+                        +<t t-out="extra_rules"/>
                     </span>
                 </t>
-            </t>
-            <t t-if="env.isSmall">
-                <span class="o_web_studio_approval_more rounded-circle bg-primary">
-                    <i class="fa fa-info"/>
-                </span>
             </t>
         </t>
     </div>

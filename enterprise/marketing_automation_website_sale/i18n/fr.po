@@ -3,22 +3,23 @@
 # * marketing_automation_website_sale
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-18 17:09+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:50+0000\n"
+"PO-Revision-Date: 2026-09-17 23:49+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "marketing_automation_website_sale/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: marketing_automation_website_sale
 #: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_purchase_followup_arch
@@ -233,8 +234,19 @@ msgstr "Créer des clients réguliers"
 
 #. module: marketing_automation_website_sale
 #: model:ir.model.fields,field_description:marketing_automation_website_sale.field_marketing_campaign__display_name
+#: model:ir.model.fields,field_description:marketing_automation_website_sale.field_sale_order__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
+
+#. module: marketing_automation_website_sale
+#: model:ir.module.module,shortdesc:base.module_marketing_automation_website_sale
+msgid "E-Commerce Marketing Automation"
+msgstr ""
+
+#. module: marketing_automation_website_sale
+#: model:ir.model.fields,field_description:marketing_automation_website_sale.field_marketing_campaign__enroll_action_type
+msgid "Enroll Action Type"
+msgstr ""
 
 #. module: marketing_automation_website_sale
 #: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_anniversary_arch
@@ -263,6 +275,7 @@ msgstr "Tout se passe bien ?"
 
 #. module: marketing_automation_website_sale
 #: model:ir.model.fields,field_description:marketing_automation_website_sale.field_marketing_campaign__id
+#: model:ir.model.fields,field_description:marketing_automation_website_sale.field_sale_order__id
 msgid "ID"
 msgstr "ID"
 
@@ -315,6 +328,11 @@ msgid "LinkedIn"
 msgstr "LinkedIn"
 
 #. module: marketing_automation_website_sale
+#: model:ir.module.module,summary:base.module_marketing_automation_website_sale
+msgid "Marketing Automation Templates for E-Commerce"
+msgstr ""
+
+#. module: marketing_automation_website_sale
 #: model:ir.model,name:marketing_automation_website_sale.model_marketing_campaign
 msgid "Marketing Campaign"
 msgstr "Campagne marketing"
@@ -338,6 +356,21 @@ msgstr "Besoin de quoi que ce soit ?"
 #: code:addons/marketing_automation_website_sale/models/marketing_campaign.py:0
 msgid "New Arrivals"
 msgstr "Nouveautés"
+
+#. module: marketing_automation_website_sale
+#: model:ir.model.fields,field_description:marketing_automation_website_sale.field_marketing_campaign__product_ids
+msgid "Product"
+msgstr ""
+
+#. module: marketing_automation_website_sale
+#: model:ir.model.fields.selection,name:marketing_automation_website_sale.selection__marketing_campaign__enroll_action_type__product_bought
+msgid "Product Bought"
+msgstr ""
+
+#. module: marketing_automation_website_sale
+#: model:ir.model.fields.selection,name:marketing_automation_website_sale.selection__marketing_campaign__enroll_action_type__product_cart
+msgid "Product in Cart"
+msgstr ""
 
 #. module: marketing_automation_website_sale
 #. odoo-python
@@ -366,6 +399,11 @@ msgstr "Suivi de l'achat récent"
 #: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_anniversary_arch
 msgid "Redeem coupon now"
 msgstr "Utiliser le coupon"
+
+#. module: marketing_automation_website_sale
+#: model:ir.model,name:marketing_automation_website_sale.model_sale_order
+msgid "Sales Order"
+msgstr ""
 
 #. module: marketing_automation_website_sale
 #. odoo-python
@@ -437,8 +475,8 @@ msgstr "Se désabonner"
 
 #. module: marketing_automation_website_sale
 #: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_purchase_followup_arch
-msgid "View Online"
-msgstr "Voir en ligne"
+msgid "View in Browser"
+msgstr "Voir dans le navigateur"
 
 #. module: marketing_automation_website_sale
 #: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_repeat_customer_new_purchase_arch
@@ -526,6 +564,26 @@ msgstr ""
 "              possible sans le soutien de clients comme vous."
 
 #. module: marketing_automation_website_sale
+#. odoo-javascript
+#: code:addons/marketing_automation_website_sale/static/src/components/campaign_flow_view/campaign_flow_view.js:0
+msgid "When Product(s) Bought"
+msgstr ""
+
+#. module: marketing_automation_website_sale
+#. odoo-javascript
+#: code:addons/marketing_automation_website_sale/static/src/components/campaign_flow_view/campaign_flow_view.js:0
+msgid "When Product(s) in Cart"
+msgstr ""
+
+#. module: marketing_automation_website_sale
+#: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_anniversary_arch
+#: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_purchase_followup_arch
+#: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_repeat_customer_new_arrivals_arch
+#: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_repeat_customer_new_purchase_arch
+msgid "X"
+msgstr "X"
+
+#. module: marketing_automation_website_sale
 #. odoo-python
 #: code:addons/marketing_automation_website_sale/models/marketing_campaign.py:0
 msgid "eCommerce"
@@ -548,61 +606,3 @@ msgstr "✨ Nous avons une surprise pour toi ✨"
 #: model_terms:ir.ui.view,arch_db:marketing_automation_website_sale.mailing_repeat_customer_new_arrivals_arch
 msgid "🌟 Exciting News Alert! 🌟"
 msgstr "🌟 Alerte aux nouveautés ! 🌟"
-
-#~ msgid ""
-#~ "-\n"
-#~ "          <span style=\"color: rgb(183, 191, 199); font-size: "
-#~ "12.25px\">September 10 2024</span>"
-#~ msgstr ""
-#~ "-\n"
-#~ "          <span style=\"color: rgb(183, 191, 199); font-size: "
-#~ "12.25px\">10 septembre 2024</span>"
-
-#~ msgid "<b>John DOE</b> • CEO of MyCompany"
-#~ msgstr "<b>John DOE</b> • CEO of MyCompany"
-
-#~ msgid "<i>Cheers to more great years ahead!</i><br/>"
-#~ msgstr "<i>À encore de nombreuses belles années à venir !</i><br/>"
-
-#~ msgid ""
-#~ "<span style=\"font-size: 1.07143rem\">YOU MAKE OUR SUCCESS POSSIBLE</"
-#~ "span>\n"
-#~ "              <font style=\"font-size: 12px\">​</font><br/>"
-#~ msgstr ""
-#~ "<span style=\"font-size: 1.07143rem\">VOUS PARTICIPEZ À NOTRE RÉUSSITE</"
-#~ "span>\n"
-#~ "              <font style=\"font-size: 12px\">​</font><br/>"
-
-#~ msgid ""
-#~ "<span style=\"font-weight: bolder; color: inherit; font-size: 0.857143rem;"
-#~ "\">BUY YOURSELF A GIFT</span><span style=\"font-size: 0.857143rem;\"> !</"
-#~ "span><br/>"
-#~ msgstr ""
-#~ "<span style=\"font-weight: bolder; color: inherit; font-size: 0.857143rem;"
-#~ "\">OFFREZ-VOUS UN CADEAU </span><span style=\"font-size: 0.857143rem;\"> !"
-#~ "</span><br/>"
-
-#~ msgid ""
-#~ "If you need a hand or have any questions, please don't hesitate to\n"
-#~ "              get in touch with our awesome customer service team. They "
-#~ "are here\n"
-#~ "              to help you with any inquiries or concerns you may have. "
-#~ "Just\n"
-#~ "              reach out to them, and they will be more than happy to "
-#~ "assist you."
-#~ msgstr ""
-#~ "Si vous avez besoin d'aide ou si vous avez des questions, n'hésitez pas \n"
-#~ "              à contacter notre formidable équipe de service client. Ils "
-#~ "sont là\n"
-#~ "              pour vous aider à répondre à toutes vos questions. Il "
-#~ "suffit de\n"
-#~ "              les contacter, ils seront très heureux de vous aider."
-
-#~ msgid ""
-#~ "Michael Fletcher<br/>\n"
-#~ "              <span style=\"font-size: 12px; font-weight: bolder\">CEO</"
-#~ "span>"
-#~ msgstr ""
-#~ "Michael Fletcher<br/>\n"
-#~ "              <span style=\"font-size: 12px; font-weight: bolder\">CEO</"
-#~ "span>"

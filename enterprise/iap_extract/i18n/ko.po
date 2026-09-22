@@ -8,17 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-04 05:23+0000\n"
-"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-17 23:46+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
 "iap_extract/ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: iap_extract
 #: model:mail.template,body_html:iap_extract.iap_extract_no_credit
@@ -51,12 +51,13 @@ msgstr "조치 필요"
 msgid ""
 "All fields will be automatically populated by Artificial Intelligence, it "
 "might take 5 seconds."
-msgstr "모든 필드는 인공 지능에 의해 자동으로 입력되며, 약 5초가 소요됩니다."
+msgstr ""
 
 #. module: iap_extract
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__error_status
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__error_status
@@ -90,8 +91,8 @@ msgstr "OCR 처리된 단어가 저장된 문서에서 데이터를 추출하는
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "Buy credits"
-msgstr "크레딧 구매하기"
+msgid "Buy"
+msgstr ""
 
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__extract_can_show_send_button
@@ -100,7 +101,13 @@ msgid "Can show the ocr send button"
 msgstr "OCR 전송 버튼 표시 가능"
 
 #. module: iap_extract
+#: model:ir.module.module,summary:base.module_iap_extract
+msgid "Common module for requesting data from the extract server"
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__done
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__done
@@ -115,14 +122,19 @@ msgid ""
 "Digitize your scanned or PDF vendor bills, expenses and resumes with OCR and "
 "Artificial Intelligence."
 msgstr ""
-"스캔한 PDF 또는 스캔한 공급업체 청구서, 지출 내역 및 이력서를 OCR과 인공 지능"
-"으로 디지털화하세요."
+"스캔한 PDF 또는 스캔한 공급업체 청구서, 지출 내역 및 이력서를 OCR과 인공 "
+"지능으로 디지털화하세요."
 
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__display_name
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin_with_words__display_name
 msgid "Display Name"
 msgstr "표시명"
+
+#. module: iap_extract
+#: model:iap.service,name:iap_extract.iap_service_ocr
+msgid "Document Digitization"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-python
@@ -140,7 +152,7 @@ msgstr "디지털 변환용으로 문서를 전송합니다."
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Document successfully parsed. Please refresh."
-msgstr "문서가 성공적으로 분석되었습니다. 새로고침하세요."
+msgstr ""
 
 #. module: iap_extract
 #: model:iap.service,unit_name:iap_extract.iap_service_ocr
@@ -234,6 +246,11 @@ msgid "ID of the request to IAP-OCR"
 msgstr "IAP-OCR 요청 ID"
 
 #. module: iap_extract
+#: model:ir.module.module,shortdesc:base.module_iap_extract
+msgid "Iap Extract"
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields,help:iap_extract.field_extract_mixin__message_needaction
 #: model:ir.model.fields,help:iap_extract.field_extract_mixin_with_words__message_needaction
 msgid "If checked, new messages require your attention."
@@ -289,6 +306,7 @@ msgstr "메시지"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__no_extract_requested
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__no_extract_requested
@@ -298,7 +316,14 @@ msgid "No extract requested"
 msgstr "요청한 추출 없음"
 
 #. module: iap_extract
+#. odoo-javascript
+#: code:addons/iap_extract/static/src/components/status_header/status.xml:0
+msgid "Not enough credit to scan your document."
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__not_enough_credit
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__not_enough_credit
@@ -347,13 +372,13 @@ msgstr "평가"
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Refresh"
-msgstr "새로 고침"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Retry"
-msgstr "재시도"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-python
@@ -380,8 +405,8 @@ msgid ""
 "The 'invoice_ocr' IAP account token is invalid. Please delete it to let Odoo "
 "generate a new one or fill it with a valid token."
 msgstr ""
-"'invoice_ocr' IAP 계정 토큰이 유효하지 않습니다. 삭제 후 Odoo에서 새로 생성하"
-"거나 유효한 토큰으로 교체하시기 바랍니다."
+"'invoice_ocr' IAP 계정 토큰이 유효하지 않습니다. 삭제 후 Odoo에서 새로 "
+"생성하거나 유효한 토큰으로 교체하시기 바랍니다."
 
 #. module: iap_extract
 #. odoo-python
@@ -403,6 +428,7 @@ msgstr "선택한 문서는 이미 디지털 변환이 완료되었습니다."
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__to_validate
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__to_validate
@@ -425,6 +451,7 @@ msgstr "지원되지 않는 버전입니다."
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__waiting_extraction
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__waiting_extraction
@@ -435,6 +462,7 @@ msgstr "추출 대기 중"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__waiting_validation
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__waiting_validation
@@ -444,18 +472,11 @@ msgid "Waiting validation"
 msgstr "검증 대기 중"
 
 #. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "You don't have enough credit to extract data from your document."
-msgstr "문서에서 데이터를 추출할 크레딧이 부족합니다."
-
-#. module: iap_extract
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 msgid ""
 "Your PDF file is protected by a password. The OCR can't extract data from it"
-msgstr ""
-"PDF 파일이 비밀번호로 보호되고 있습니다. OCR에서 데이터를 추출할 수 없습니다"
+msgstr "PDF 파일이 비밀번호로 보호되고 있습니다. OCR에서 데이터를 추출할 수 없습니다"
 
 #. module: iap_extract
 #. odoo-python
@@ -465,6 +486,7 @@ msgstr "문서에 페이지 수가 너무 많습니다."
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__extract_not_ready
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__extract_not_ready

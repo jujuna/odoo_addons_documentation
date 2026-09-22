@@ -115,15 +115,14 @@ DEFAULT_FIELDS_TO_EXCLUDE = {
         "complete_name",
         "calendar_last_notif_ack",
         "category_id",
-        "commercial_company_name",
+        "parent_name",
         "customer_rank",
         "email_normalized",
         "phone_sanitized",
-        "peppol_eas",
-        "peppol_endpoint",
+        "routing_scheme",
+        "routing_endpoint",
         "contact_address_complete",
         "tz",
-        "company_type",
     },
     "hr.employee": {"employee_token", "resource_calendar_id"},
     "account.analytic.plan": {"complete_name"},
@@ -181,7 +180,7 @@ DEFAULT_FIELDS_TO_EXCLUDE = {
         "team_id",
         "transaction_ids",
         "require_signature",
-        "require_payment",
+        "prepayment_percent",
         "validity_date",
         "note",
         "partner_shipping_id",
@@ -287,7 +286,7 @@ RELATED_MODELS_TO_EXCLUDE = [
 
 class StudioExportModel(models.Model):
     _name = 'studio.export.model'
-    _description = "Studio Export Models"
+    _description = "Studio Export Model"
     _order = "sequence,id"
     _unique_model = models.Constraint(
         'unique(model_id)',
@@ -340,9 +339,9 @@ class StudioExportModel(models.Model):
         to_reset.excluded_fields = None
         for record in self - to_reset:
             RecordModel = self.env[record.model_name]
-            fields_not_to_export = DEFAULT_FIELDS_TO_EXCLUDE.get(
-                record.model_name, set()
-            )
+            fields_not_to_export = set(DEFAULT_FIELDS_TO_EXCLUDE.get(
+                record.model_name, ()
+            ))
 
             # also exclude fields of abstract models
             to_search = {m for m in RecordModel._base_classes__ if m._abstract}

@@ -10,6 +10,8 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestAmazonES(TestAmazonCommon, AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_chart_template('es_full')
     def setUpClass(cls):
@@ -31,15 +33,10 @@ class TestAmazonES(TestAmazonCommon, AccountTestInvoicingCommon):
             self.account._sync_orders(auto_commit=False)
             sale_order = self.env['sale.order'].search([('amazon_order_ref', '=', '123456789')])
 
-        # Validate the picking so we can invoice the sale order. After having filled the required fields
-        # to validate the  `_check_carrier_details_compliance` constrain introduced in sale_amazon.
+        # Validate the picking so we can invoice the sale order.
         picking = sale_order.picking_ids
-        picking.write({
-            'carrier_id': self.carrier,
-            'carrier_tracking_ref': self.tracking_ref,
-        })
         picking.button_validate()
 
         invoice = sale_order._create_invoices()
 
-        self.assertTrue(invoice.l10n_es_is_simplified)
+        self.assertEqual(invoice.l10n_es_invoice_type, 'F2')

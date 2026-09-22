@@ -3,7 +3,7 @@ import { ProductTemplate } from "@point_of_sale/../tests/unit/data/product_templ
 
 patch(ProductTemplate.prototype, {
     _load_pos_data_fields() {
-        return [...super._load_pos_data_fields(), "urbanpiper_pos_config_ids"];
+        return [...super._load_pos_data_fields(), "urbanpiper_store_ids"];
     },
 
     _load_pos_data_read(records) {
@@ -22,7 +22,7 @@ patch(ProductTemplate.prototype, {
 
 ProductTemplate._records = ProductTemplate._records.map((record) => {
     if (record.id == 5) {
-        record.urbanpiper_pos_config_ids = [1];
+        record.urbanpiper_store_ids = [1];
     }
     return record;
 });

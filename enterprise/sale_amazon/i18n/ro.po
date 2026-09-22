@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-12-06 09:55+0000\n"
-"Last-Translator: Alin Ilie <alin.ilie@logit-solutions.com>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 00:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "sale_amazon/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,30 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_amazon
+#: model:ir.module.module,description:base.module_sale_amazon
+msgid ""
+"\n"
+"Import your Amazon orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and marketplaces.\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(SKU in Amazon).\n"
+"* Deliveries confirmed in Odoo are synchronized in Amazon.\n"
+"* Support for both Fulfilment by Amazon (FBA) and Fulfilment by Merchant "
+"(FBM):\n"
+"    * FBA: A stock location and stock moves allow to monitor your stock in "
+"Amazon Fulfilment\n"
+"      Centers.\n"
+"    * FBM: Delivery notifications are sent to Amazon for each confirmed "
+"picking (partial delivery\n"
+"      friendly).\n"
+msgstr ""
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
@@ -56,9 +79,9 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"            <p>Sincronizarea comenzii Amazon cu referința <t t-"
-"out=\"ctx.get('amazon_order_ref') or ''\">REF</t> a întâmpinat o eroare și "
-"nu a fost finalizată.</p>\n"
+"            <p>Sincronizarea comenzii Amazon cu referința <t t-out=\"ctx.get"
+"('amazon_order_ref') or ''\">REF</t> a întâmpinat o eroare și nu a fost "
+"finalizată.</p>\n"
 "            <p>Dacă comanda nu este anulată în SellerCentral, nu va fi "
 "încercată nicio altă sincronizare.</p>\n"
 "            <p>Pentru a programa o nouă încercare de sincronizare, urmați "
@@ -69,10 +92,10 @@ msgstr ""
 "plasată comanda.</li>\n"
 "                    <li>Navigați la fila Urmărire comandă.</li>\n"
 "                    <li>Setați o dată pentru <em>Ultima sincronizare "
-"comenzi</em> care să fie anterioară ultimei actualizări de status a comenzii."
-"</li>\n"
-"                    <li>Salvați modificările și apăsați butonul "
-"<em>SINCRONIZARE COMENZI</em>.</li>\n"
+"comenzi</em> care să fie anterioară ultimei actualizări de status a "
+"comenzii.</li>\n"
+"                    <li>Salvați modificările și apăsați butonul <em>"
+"SINCRONIZARE COMENZI</em>.</li>\n"
 "                </ol>\n"
 "            \n"
 "            <p>Dacă problema persistă, contactați <a href=\"https://"
@@ -395,6 +418,11 @@ msgid "Amazon Accounts"
 msgstr "Conturi Amazon"
 
 #. module: sale_amazon
+#: model:ir.module.module,shortdesc:base.module_sale_amazon
+msgid "Amazon Connector"
+msgstr ""
+
+#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__amazon_feed_ref
 #: model:ir.model.fields,field_description:sale_amazon.field_stock_picking__amazon_feed_ref
 msgid "Amazon Feed Reference"
@@ -491,28 +519,6 @@ msgstr ""
 "Amazon solicită anumite informații pentru locația de expediere. Asigurați-vă "
 "că următoarele informații sunt setate pe „%(location_name)s” (%(location)s): "
 "strada, țara și codul țării."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"Since the current carrier doesn't automatically provide a tracking "
-"reference, you need to set one manually."
-msgstr ""
-"Amazon necesită ca o referință de urmărire să fie furnizată cu fiecare "
-"livrare. Deoarece curierul curent nu furnizează automat o referință de "
-"urmărire, trebuie să o setați manual."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"You need to assign a carrier to this delivery."
-msgstr ""
-"Amazon necesită ca o referință de urmărire să fie furnizată cu fiecare "
-"livrare. Trebuie să atribuiți un curier acestei livrări."
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -691,11 +697,6 @@ msgid "Back to my account"
 msgstr "Înapoi la contul meu"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
-msgid "Cancel"
-msgstr "Anulează"
-
-#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__company_id
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__company_id
 msgid "Company"
@@ -784,11 +785,6 @@ msgstr "Date autentificare"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Default Products"
 msgstr "Produse Implicite"
-
-#. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
-msgid "Discard"
-msgstr "Renunță"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
@@ -955,6 +951,11 @@ msgstr ""
 "putea în continuare să facturați sau să livrați."
 
 #. module: sale_amazon
+#: model:ir.module.module,summary:base.module_sale_amazon
+msgid "Import Amazon orders and sync deliveries"
+msgstr ""
+
+#. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
 msgid "In Processing by Amazon"
 msgstr "În procesare la Amazon"
@@ -1029,6 +1030,12 @@ msgstr "Piață"
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__active_marketplace_ids
 msgid "Marketplaces"
 msgstr "Piețe"
+
+#. module: sale_amazon
+#. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Missing product name"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__name
@@ -1275,8 +1282,7 @@ msgstr "Sincronizarea stocului Amazon a eșuat"
 #: model:mail.template,subject:sale_amazon.order_sync_failure
 msgid ""
 "Synchronization of Amazon order {{ ctx.get('amazon_order_ref') }} has failed"
-msgstr ""
-"Sincronizarea comenzii Amazon {{ ctx.get('amazon_order_ref') }} a eșuat"
+msgstr "Sincronizarea comenzii Amazon {{ ctx.get('amazon_order_ref') }} a eșuat"
 
 #. module: sale_amazon
 #: model:mail.template,subject:sale_amazon.picking_sync_failure
@@ -1368,11 +1374,9 @@ msgstr "Unitatea de stocare."
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_channel
 msgid ""
-"The channel will be updated with the incomming orders or during the next "
-"stock synchronization."
+"The channel will be updated with the incomming orders or, if left empty, "
+"during the next stock synchronization."
 msgstr ""
-"Canalul va fi actualizat cu comenzile primite sau în timpul următoarei "
-"sincronizări a stocului."
 
 #. module: sale_amazon
 #. odoo-python
@@ -1688,150 +1692,3 @@ msgstr "de exemplu. Piața americană"
 #: code:addons/sale_amazon/models/amazon_account.py:0
 msgid "id"
 msgstr "id"
-
-#~ msgid "AWS Access Key"
-#~ msgstr "Cheie de acces AWS"
-
-#~ msgid "AWS Secret Key"
-#~ msgstr "Cheie secretă AWS"
-
-#~ msgid "AWS Session Token"
-#~ msgstr "Token de sesiune AWS"
-
-#~ msgid ""
-#~ "After validation of the credentials, the marketplaces\n"
-#~ "                                                to which this account has "
-#~ "access will be\n"
-#~ "                                                synchronized and "
-#~ "automatically made available."
-#~ msgstr ""
-#~ "După validarea acreditărilor, piețele\n"
-#~ "                                                la care are acces acest "
-#~ "cont\n"
-#~ "                                              vor fi sincronizate și "
-#~ "disponibile automat."
-
-#~ msgid "Amazon Email"
-#~ msgstr "Email Amazon"
-
-#~ msgid "Error code: %s; description: %s"
-#~ msgstr "Cod eroare: %s; descriere: %s"
-
-#~ msgid ""
-#~ "If this account gained access to new "
-#~ "marketplaces,                                         synchronize and add "
-#~ "them to the current sync marketplaces"
-#~ msgstr ""
-#~ "Dacă acest cont a obținut acces la noi piețe, sincronizați-le și adăugați-"
-#~ "le la piețele de sincronizare curente"
-
-#~ msgid "Inactive"
-#~ msgstr "Inactiv(ă)"
-
-#~ msgid "Is Follow Up Displayed"
-#~ msgstr "Este afișat Urmărirea"
-
-#~ msgid "Link with Amazon"
-#~ msgstr "Legătură cu Amazon"
-
-#~ msgid ""
-#~ "Link your Amazon account with Odoo to start synchronizing your\n"
-#~ "                                Amazon orders."
-#~ msgstr ""
-#~ "Conectați-vă contul Amazon cu Odoo pentru a începe sincronizarea\n"
-#~ "                                comenzilor Amazon."
-
-#~ msgid "Order Follow-up"
-#~ msgstr "Urmărire comandă"
-
-#~ msgid "SKU"
-#~ msgstr "SKU"
-
-#~ msgid "SKU must be unique for a given account and marketplace."
-#~ msgstr "SKU trebuie să fie unic pentru contul dat și piață."
-
-#~ msgid ""
-#~ "Select the marketplace on which your seller account\n"
-#~ "                                                was originally created."
-#~ msgstr ""
-#~ "Selectați piața pe care a fost creat inițial\n"
-#~ "                                                contul de vânzător"
-
-#~ msgid "Sign-up Marketplace"
-#~ msgstr "Inscrie-re piață"
-
-#~ msgid "Stock Location"
-#~ msgstr "Locație stoc"
-
-#~ msgid "Sync Marketplaces"
-#~ msgstr "Sincronizare Piață"
-
-#~ msgid ""
-#~ "The communication with the API failed.\n"
-#~ "Error code: %s; description: %s"
-#~ msgstr ""
-#~ "Comunicarea cu API a eșuat.\n"
-#~ "Cod eroare: %s; descriere: %s"
-
-#~ msgid "The encrypted email of the customer. Does not forward mails."
-#~ msgstr "Emailul criptat al clienților. Nu trimite mesaje."
-
-#~ msgid "The moment at which the AWS credentials become invalid."
-#~ msgstr "Momentul la care credențialele AWS devin invalide."
-
-#~ msgid ""
-#~ "The order has been canceled by the Amazon customer while someproducts "
-#~ "have already been delivered. Please create a return for this order to "
-#~ "adjust the stock."
-#~ msgstr ""
-#~ "Comanda a fost anulată de către clientul Amazon în timp ce unele produse "
-#~ "au fost deja livrate. Vă rugăm să creați un retur pentru această comandă "
-#~ "pentru"
-
-#~ msgid ""
-#~ "The original sign-up marketplace of this account. Used for authentication "
-#~ "only."
-#~ msgstr ""
-#~ "Piața inițială de înscriere a acestui cont. Folosit numai pentru "
-#~ "autentificare."
-
-#~ msgid "The short-lived key used to identify the assumed ARN role on AWS."
-#~ msgstr ""
-#~ "Cheia de durată scurtă folosită pentru a identifica rolul ARN presupus pe "
-#~ "AWS."
-
-#~ msgid ""
-#~ "The short-lived key used to verify the access to the assumed ARN role on "
-#~ "AWS."
-#~ msgstr ""
-#~ "Cheia de durată scurtă folosită pentru a verifica accesul la rolul ARN "
-#~ "presupus pe AWS."
-
-#~ msgid ""
-#~ "The short-lived token used to query the SP-API with the assumed ARN role "
-#~ "on AWS."
-#~ msgstr ""
-#~ "Tokenul de durată scurtă folosit pentru a interoga SP-API cu rolul ARN "
-#~ "presupus pe AWS."
-
-#~ msgid "Unlink account"
-#~ msgstr "Deconectați-vă contul"
-
-#~ msgid "Update Available Marketplaces"
-#~ msgstr "Actualizare piețe disponibile"
-
-#~ msgid "Your Amazon account is linked with Odoo."
-#~ msgstr "Contul dvs. Amazon este conectat cu Odoo."
-
-#~ msgid ""
-#~ "[%s] %s\n"
-#~ "Condition: %s - %s"
-#~ msgstr ""
-#~ "[%s] %s\n"
-#~ "Stare: %s - %s"
-
-#~ msgid "[%s] Delivery Charges for %s"
-#~ msgstr "[%s] Taxe Livrare Pentru %s"
-
-#~ msgid "[%s] Gift Wrapping Charges for %s"
-#~ msgstr "[%s] Taxe Ambalare Cadouri pentru %s"

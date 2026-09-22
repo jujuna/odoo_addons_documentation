@@ -14,4 +14,5 @@ class SignImportFromDocuments(models.TransientModel):
         if not self.selected_document:
             raise UserError(_("No document selected to import and sign."))
 
-        return self.selected_document.document_sign_create_sign_template()
+        sign_folder = self.env.ref('documents_sign.document_sign_folder', raise_if_not_found=False)
+        return self.selected_document.document_sign_create_sign_template(sign_folder and sign_folder.id)

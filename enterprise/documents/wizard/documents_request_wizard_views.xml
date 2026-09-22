@@ -27,8 +27,7 @@
                         </group>
                         <group>
                             <field name="folder_id"
-                                options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"
-                                widget="documents_folder_many2one"/>
+                                options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
                             <field name="tag_ids" widget="many2many_tags"/>
                         </group>
                     </group>
@@ -36,7 +35,7 @@
                     <field name="activity_note" class="embedded-editor-height-4" placeholder="Extra comments..."/>
                     <footer>
                         <button name="request_document" type="object" string="Request" class="btn btn-primary" data-hotkey="q"/>
-                        <button string="Discard" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                        <button class="btn-secondary" special="cancel" data-hotkey="x"/>
                     </footer>
                 </sheet>
             </form>

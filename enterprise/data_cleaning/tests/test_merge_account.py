@@ -20,13 +20,11 @@ class TestMerge(TransactionCase):
             'code': '40001',
             'name': 'Account Sale A',
             'account_type': 'asset_receivable',
-            'reconcile': True,
         })
         cls.account_sale_b = cls.env['account.account'].create({
             'code': '40002',
             'name': 'Account Sale B',
             'account_type': 'asset_receivable',
-            'reconcile': True,
         })
         cls.partner_a = cls.env['res.partner'].create({'name': 'Partner A'})
         cls.partner_b = cls.env['res.partner'].create({'name': 'Partner B'})

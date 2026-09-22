@@ -19,20 +19,12 @@ class PosOrder(models.Model):
     sweden_blackbox_tax_category_c = fields.Float(readonly=True)
     sweden_blackbox_tax_category_d = fields.Float(readonly=True)
     sweden_blackbox_device = fields.Many2one(
-        related="session_id.config_id.iface_sweden_fiscal_data_module", readonly=True
+        related="session_id.config_id.iot_fdm_se_id", readonly=True
     )
     is_reprint = fields.Boolean(readonly=True)
 
     @api.ondelete(at_uninstall=True)
     def _unlink_except_registered_order(self):
         for order in self:
-            if order.config_id.iface_sweden_fiscal_data_module:
+            if order.config_id.iot_fdm_se_id:
                 raise UserError(_("Deleting of registered orders is not allowed."))
-
-    def set_is_reprint(self):
-        """No longer used, remove in master"""
-        return True
-
-    def is_already_reprint(self):
-        """No longer used, remove in master"""
-        return True

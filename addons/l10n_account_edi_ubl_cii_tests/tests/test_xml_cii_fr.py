@@ -6,6 +6,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestCIIFR(TestUBLCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestUBLCommon.setup_country('fr')
     def setUpClass(cls):
@@ -18,7 +20,7 @@ class TestCIIFR(TestUBLCommon):
             'city': "Paris",
             'vat': 'FR05677404089',
             'country_id': cls.env.ref('base.fr').id,
-            'bank_ids': [(0, 0, {'acc_number': 'FR15001559627230'})],
+            'bank_ids': [(0, 0, {'account_number': 'FR15001559627230', 'allow_out_payment': True})],
             'phone': '+1 (650) 555-0111',
             'email': "partner1@yourcompany.com",
             'ref': 'ref_partner_1',
@@ -32,7 +34,7 @@ class TestCIIFR(TestUBLCommon):
             'city': "Colombey-les-Deux-Églises",
             'vat': 'FR35562153452',
             'country_id': cls.env.ref('base.fr').id,
-            'bank_ids': [(0, 0, {'acc_number': 'FR90735788866632'})],
+            'bank_ids': [(0, 0, {'account_number': 'FR90735788866632', 'allow_out_payment': True})],
             'ref': 'ref_partner_2',
             'invoice_edi_format': 'facturx',
         })
@@ -115,8 +117,9 @@ class TestCIIFR(TestUBLCommon):
 
     def test_export_pdf(self):
         acc_bank = self.env['res.partner.bank'].create({
-            'acc_number': 'FR15001559627231',
+            'account_number': 'FR15001559627231',
             'partner_id': self.company_data['company'].partner_id.id,
+            'allow_out_payment': True,
         })
 
         invoice = self._generate_move(
@@ -377,6 +380,10 @@ class TestCIIFR(TestUBLCommon):
     def test_import_and_create_partner_facturx(self):
         """ Tests whether the partner is created at import if no match is found when decoding the EDI attachment
         """
+        self.env['res.partner.bank'].sudo().create({
+            'account_number': 'FR15001559627230',
+            'partner_id': self.company_data['company'].partner_id.id,
+        })
         partner_vals = {
             'name': "Buyer",
             'email': "buyer@yahoo.com",
@@ -443,13 +450,17 @@ class TestCIIFR(TestUBLCommon):
         )
 
     def test_import_fnfe_examples(self):
+        self.env['res.partner.bank'].sudo().create({
+            'account_number': 'FR76 1254 2547 2569 8542 5874 698',
+            'partner_id': self.company_data['company'].partner_id.id,
+        })
         # Source: official documentation of the FNFE (subdirectory: "5. FACTUR-X 1.0.06 - Examples")
         subfolder = 'tests/test_files/from_factur-x_doc'
         # the 2 following files have the same pdf but one is labelled as an invoice and the other as a refund
         invoice_vals = {
             'amount_total': 233.47,
             'amount_tax': 14.99,
-            'invoice_lines': [{'price_subtotal': 20.48}, {'price_subtotal': 198}]
+            'invoice_lines': [{'price_subtotal': 20.5}, {'price_subtotal': 198.0}, {'price_subtotal': -0.02}]
         }
         # source: Avoir_FR_type380_EN16931.pdf
         self._assert_imported_invoice_from_file(
@@ -478,7 +489,7 @@ class TestCIIFR(TestUBLCommon):
             invoice_vals={
                 'amount_total': 100,
                 'amount_tax': 0,
-                'invoice_lines': [{'price_subtotal': p} for p in (-5, 10, 60, 30, 5)],
+                'invoice_lines': [{'price_subtotal': p} for p in (10.0, -5.0, 60.0, 30.0, 5.0)],
             },
             move_type='in_refund',
         )
@@ -488,6 +499,10 @@ class TestCIIFR(TestUBLCommon):
         See the tests above to create these xml attachments ('test_export_with_fixed_taxes_case_[X]').
         NB: use move_type = 'out_invoice' s.t. we can retrieve the taxes used to create the invoices.
         """
+        self.env['res.partner.bank'].sudo().create({
+            'account_number': 'FR15001559627230',
+            'partner_id': self.company_data['company'].partner_id.id,
+        })
         subfolder = "tests/test_files/from_odoo"
         kwargs = {
             'subfolder': subfolder,
@@ -497,7 +512,7 @@ class TestCIIFR(TestUBLCommon):
                 'amount_tax': 22,
                 'currency_id': self.other_currency.id,
                 'invoice_lines': [{
-                    'name': "product_a",
+                    'label': "product_a",
                     'quantity': 1,
                     'price_unit': 99,
                     'discount': 0,
@@ -510,7 +525,7 @@ class TestCIIFR(TestUBLCommon):
         kwargs['invoice_vals'].update({
             'amount_tax': 23,
             'invoice_lines': [{
-                'name': "product_a",
+                'label': "product_a",
                 'quantity': 1,
                 'price_unit': 98,
                 'discount': 0,

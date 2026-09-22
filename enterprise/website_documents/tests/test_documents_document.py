@@ -2,9 +2,10 @@
 
 from odoo.exceptions import AccessError
 from odoo.fields import Command
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import tagged, TransactionCase
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDocumentsShare(TransactionCase):
     @classmethod
     def setUpClass(cls):
@@ -49,6 +50,7 @@ class TestDocumentsShare(TransactionCase):
 
         # Test URL domain when sharing documents with a company with a website.
         self.folder.company_id = self.company_1
+        self.assertEqual(self.folder.website_id, self.website_company_1)
         self.assertSequenceEqual(self.folder.access_url[:21], 'https://company_1.com')
 
         # Test share URL domain when sharing documents/folder with a company without a website.
@@ -77,32 +79,39 @@ class TestDocumentsShare(TransactionCase):
                 'name': 'test1.txt',
                 'company_id': self.company_1.id,
                 'website_id': self.website_company_3.id,
+                'raw': 'test',
             })
         with self.assertRaises(AccessError):
             self.env['documents.document'].with_user(self.user).create({
                 'name': 'test2.txt',
                 'website_id': self.website_company_3.id,
+                'raw': 'test',
             })
         # don't raise AccessError in sudo mode
         self.env['documents.document'].with_user(self.user).sudo().create({
             'name': 'test2.txt',
             'website_id': self.website_company_3.id,
+            'raw': 'test',
         })
         self.document_1 = self.env['documents.document'].with_user(self.user).create({
             'name': 'doc1.txt',
             'company_id': self.company_1.id,
             'website_id': self.website_company_2.id,
+            'raw': 'test',
         })
         self.document_2 = self.env['documents.document'].create({
             'name': 'doc2.txt',
             'company_id': self.company_3.id,
+            'raw': 'test',
         })
         self.document_without_company = self.env['documents.document'].with_user(self.user).create({
             'website_id': self.website_company_1.id,
+            'raw': 'test',
         })
         self.document_without_website = self.env['documents.document'].with_user(self.user).create({
             'company_id': self.company_1.id,
             'website_id': False,
+            'raw': 'test',
         })
         self.assertFalse(self.document_without_website.website_id)
 
@@ -111,3 +120,17 @@ class TestDocumentsShare(TransactionCase):
             (self.document_1 + self.document_2).website_id = self.website_company_3.id
         self.document_2.website_id = self.website_company_3.id
         (self.document_2 + self.document_without_company).website_id = self.website_company_2.id
+
+    def test_website_id_recomputed_on_moves(self):
+        folder_company_1 = self.env["documents.document"].create({
+            "company_id": self.company_1.id,
+            "name": "Folder C1",
+            "type": "folder",
+            "user_folder_id": "COMPANY",
+        })
+        self.assertEqual(self.folder.website_id, self.website_main_company)
+        self.assertSequenceEqual(self.folder.access_url[:24], 'https://main.company.com')
+
+        self.folder.folder_id = folder_company_1
+        self.assertEqual(self.folder.website_id, self.website_company_1)
+        self.assertSequenceEqual(self.folder.access_url[:21], 'https://company_1.com')

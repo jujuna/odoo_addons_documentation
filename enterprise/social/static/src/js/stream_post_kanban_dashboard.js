@@ -1,20 +1,24 @@
 import { _t } from "@web/core/l10n/translation";
 import { formatInteger } from '@web/views/fields/formatters';
 import { useService } from '@web/core/utils/hooks';
-import { Component, onMounted, onWillUnmount, useRef } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, signal, t, useProps } from "@odoo/owl";
 
 export class StreamPostDashboard extends Component {
     static template = "social.KanbanDashboard";
-    static props = {
-        accounts: Array,
-        isSocialManager: Boolean,
-    };
+
+    props = useProps({
+        accounts: t.array(),
+        isSocialManager: t.boolean(),
+        onNewStream: t.function(),
+    });
+
+    dashboardRef = signal.ref();
 
     setup() {
         super.setup();
-        this.dashboard = useRef('dashboard');
         this.notification = useService('notification');
         this.orm = useService('orm');
+        this.action = useService("action");
         this.popover = [];
 
         onMounted(() => this._initPopover());
@@ -26,12 +30,19 @@ export class StreamPostDashboard extends Component {
         return formatInteger(statValue);
     }
 
-    _onRelinkAccount(event) {
-        const mediaId = parseInt(event.currentTarget.dataset.mediaId);
+    _getRelinkContext(account) {
+        return {};
+    }
+
+    async _onRelinkAccount(account) {
         if (this.props.isSocialManager) {
-            this.orm.call('social.media', 'action_add_account', [mediaId]).then((action) => {
-                document.location = action.url;
-            });
+            const action = await this.orm.call(
+                "social.media",
+                "action_add_account",
+                [account.media_id[0]],
+                { context: this._getRelinkContext(account) }
+            );
+            this.action.doAction(action);
         } else {
             this.notification.add(
                 _t('Sorry, you\'re not allowed to re-link this account, please contact your administrator.'),
@@ -41,7 +52,7 @@ export class StreamPostDashboard extends Component {
     }
 
     _initPopover() {
-        this.dashboard.el.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+        this.dashboardRef().querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
             this.popover.push(new Popover(el, {
                 trigger: 'hover',
                 delay: {show: 500, hide: 0},

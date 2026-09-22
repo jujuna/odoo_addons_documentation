@@ -37,8 +37,12 @@ export class StreamPostCommentTwitter extends StreamPostComment {
         return false;
     }
 
+    get likesIcon() {
+        return 'favorite';
+    }
+
     get likesClass() {
-        return 'fa-heart';
+        return 'oi-filled';
     }
 
     get commentName() {

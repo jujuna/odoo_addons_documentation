@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -12,7 +11,7 @@ Accounting reports for Ecuador
     ''',
     'author': 'TRESCLOUD',
     'category': 'Accounting/Localizations/Reporting',
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'depends': [
         'l10n_ec',
         'account_reports',
@@ -22,5 +21,4 @@ Accounting reports for Ecuador
         'data/account_return_data.xml',
     ],
     'auto_install': True,
-    'installable': True,
 }

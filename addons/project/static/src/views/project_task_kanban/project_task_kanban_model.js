@@ -7,6 +7,23 @@ export class ProjectTaskKanbanDynamicGroupList extends RelationalModel.DynamicGr
     get isGroupedByStage() {
         return !!this.groupByField && this.groupByField.name === "stage_id";
     }
+
+    async _unlinkGroups(groups) {
+        if (this.isGroupedByStage) {
+            const action = await this.model.orm.call(
+                this.groupByField.relation,
+                'unlink_wizard',
+                groups.map((g) => g.value),
+                { context: this.context },
+            );
+            return new Promise((resolve) => {
+                this.model.action.doAction(action, {
+                    onClose: ({ success }) => resolve(!!success),
+                });
+            });
+        }
+        return super._unlinkGroups(groups);
+    }
 }
 
 export class ProjectTaskRecord extends Record {
@@ -17,7 +34,7 @@ export class ProjectTaskRecord extends Record {
     }
 
     async toggleSubtasksList() {
-        const { display_name, project_id, state, user_ids, sequence } = this.config.fields;
+        const { display_name, project_id, state, user_ids, sequence, company_id } = this.config.fields;
         const activeField = makeActiveField({ onChange: true });
         activeField.related = {
             activeFields: {
@@ -26,6 +43,7 @@ export class ProjectTaskRecord extends Record {
                 user_ids: makeActiveField(),
                 project_id: makeActiveField(),
                 sequence: makeActiveField(),
+                company_id: makeActiveField(),
             },
             fields: {
                 display_name,
@@ -33,6 +51,7 @@ export class ProjectTaskRecord extends Record {
                 state,
                 user_ids,
                 sequence,
+                company_id,
             },
         };
         await this._load({

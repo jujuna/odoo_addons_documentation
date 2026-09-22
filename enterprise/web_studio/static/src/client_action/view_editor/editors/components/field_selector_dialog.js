@@ -1,24 +1,24 @@
 import { Dialog } from "@web/core/dialog/dialog";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
-import { Component, useRef } from "@odoo/owl";
+import { Component, useProps, signal, t, usePlugin } from "@odoo/owl";
 
 export class FieldSelectorDialog extends Component {
     static template = "web_studio.FieldSelectorDialog";
     static components = { Dialog };
-    static props = {
-        close: { type: Function },
-        onConfirm: { type: Function },
-        fields: { type: Array },
-        showNew: { type: Boolean, optional: true },
-    };
-    static defaultProps = {
-        showNew: false,
-    };
-    setup() {
-        this.selectRef = useRef("select");
-    }
+
+    props = useProps({
+        close: t.function(),
+        onConfirm: t.function(),
+        fields: t.array(),
+        showNew: t.boolean().optional(false),
+    });
+    selectRef = signal.ref();
+
+    debugMode = usePlugin(DebugModePlugin);
+
     onConfirm() {
-        const field = this.selectRef.el.value;
+        const field = this.selectRef().value;
         this.props.onConfirm(field);
         this.props.close();
     }

@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from . import models
-from . import wizard
-from . import report
+from . import models, report, wizard
 
 
 def _ensure_rental_stock_moves_consistency(env):
@@ -23,5 +20,5 @@ def _ensure_rental_stock_moves_consistency(env):
         line.with_company(line.company_id)._move_qty(
             line.qty_delivered - line.qty_returned,
             line.order_id.warehouse_id.lot_stock_id,
-            line.company_id.rental_loc_id
+            line.company_id.rental_loc_id,
         )

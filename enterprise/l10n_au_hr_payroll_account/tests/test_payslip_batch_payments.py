@@ -12,6 +12,8 @@ from .tools import mock_skip_stp_api_calls
 @tagged("post_install_l10n", "post_install", "-at_install", "aba_file")
 class TestPayslipRun(L10nPayrollAccountCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @mock_skip_stp_api_calls()
     def _prepare_payslip_run(self):
         payslip_run = self.env["hr.payslip.run"].create(
@@ -20,9 +22,10 @@ class TestPayslipRun(L10nPayrollAccountCommon):
                 "date_end": "2023-01-31",
                 "name": "January Batch",
                 "company_id": self.company.id,
+                "structure_id": self.default_payroll_structure.id,
             }
         )
-        payslip_run.generate_payslips(employee_ids=[self.employee_1.id, self.employee_2.id])
+        payslip_run._generate_payslips()
         payslip_run.action_validate()
         return payslip_run
 
@@ -34,7 +37,7 @@ class TestPayslipRun(L10nPayrollAccountCommon):
         )
         # Post journal entries
         payslip_run.slip_ids.move_id._post()
-        payments = self._register_payment(payslip_run)
+        payments = self._register_payment_hr_payroll(payslip_run)
 
         self.assertEqual(payslip_run.l10n_au_payment_batch_id.payment_ids, payments)
         self.assertEqual(payslip_run.l10n_au_payment_batch_id.batch_type, "outbound")
@@ -75,25 +78,44 @@ class TestPayslipRun(L10nPayrollAccountCommon):
 
         self.assertEqual(payslip_run.l10n_au_payment_batch_id.state, "reconciled", "Batch Should be in reconciled state!")
 
+    @freeze_time("2023-01-31")
     def test_payslip_aba(self):
+        # ABA file generation can be done from both Payslip Batch and Batch Payment
         payslip_run = self._prepare_payslip_run()
+        payslip_run.slip_ids.flush_recordset()
+
         self.assertEqual(
             payslip_run.state, "02_close", "Payslip run should be in close state"
         )
+        # Post journal entries and generate aba file from Payment Batch first
+        # Using the hr.payroll.payment.report.wizard first will replace the export file generated on batch payment
+        payslip_run.slip_ids.move_id._post()
+        self._register_payment_hr_payroll(payslip_run)
+        payslip_run.l10n_au_payment_batch_id.validate_batch()
+        self.assertTrue(payslip_run.l10n_au_payment_batch_id.export_file, "Aba file should be generated on payment batch!")
+
+        # Generate ABA file from Payslip Run
+        # hr.payroll.payment.report.wizard
         action = payslip_run.action_payment_report('aba')
         self.env["hr.payroll.payment.report.wizard"].with_context(
             **action["context"]
         ).create({}).generate_payment_report()
-        self.assertTrue(payslip_run.payment_report, "Aba File should be generated!")
-
-        payslip_run.slip_ids.move_id._post()
-        self._register_payment(payslip_run)
-        payslip_run.l10n_au_payment_batch_id.validate_batch()
+        self.assertTrue(payslip_run.payment_report, "Aba file should be generated on payslip wizard!")
 
         self.assertEqual(
-            payslip_run.l10n_au_payment_batch_id.export_file,
-            payslip_run.payment_report
+            payslip_run.l10n_au_payment_batch_id.export_file.decode(),
+            payslip_run.payment_report.decode()
         )
+
+        file = payslip_run.payment_report.decode()
+        expected_lines = [
+            "0                 01CBA       Test Ltd                  111111PAYROLL     310123",
+            f"1123-456  123-777 530000406800mel (hr.group_hr_manager)       {str(payslip_run.slip_ids[0].id).ljust(18)}123-456 12344321company_1_data  00000000",
+            f"1654-321  123-888 530000537500Harry                           {str(payslip_run.slip_ids[1].id).ljust(18)}123-456 12344321company_1_data  00000000",
+            "7999-999            000094430000009443000000000000                        000002",
+        ]
+        actual_lines = [line.strip() for line in file.split('\r\n')][:-1]
+        self.assertListEqual(actual_lines, expected_lines, "ABA file content mismatch")
 
     def test_single_payslip_payment(self):
         payslip_run = self._prepare_payslip_run()
@@ -109,11 +131,9 @@ class TestPayslipRun(L10nPayrollAccountCommon):
         payment_register = Form.from_action(self.env, action)
         self.assertTrue(payment_register.amount)
 
-        action_create_payment = payment_register.save().action_create_payments()
-        payment = self.env["account.payment"].browse(action_create_payment['res_id'])
         amount = sum(payslip.move_id.line_ids.filtered_domain([("partner_id", "!=", False), ("price_total", ">", 0)]).mapped("price_total"))
-        self.assertAlmostEqual(payment.amount, amount, msg='Payment amount is not correct!')
-        self.assertIn(payment.partner_bank_id, payslip.employee_id.bank_account_ids)
+        payments = payment_register.save()._create_payments()
+        payment = payments.filtered(lambda p: p.amount == amount)[0]
         self.assertTrue(payment.is_reconciled, 'Payment should be Reconciled!')
 
         stmnt = self.env['account.bank.statement'].create({

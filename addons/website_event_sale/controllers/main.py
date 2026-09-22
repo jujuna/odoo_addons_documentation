@@ -3,6 +3,7 @@
 
 from collections import defaultdict
 from odoo.http import request, route
+from odoo.tools import float_is_zero
 
 from odoo.addons.portal.controllers.portal import CustomerPortal
 from odoo.addons.website_event.controllers.main import WebsiteEventController
@@ -28,11 +29,11 @@ class WebsiteEventSaleController(WebsiteEventController):
             for event_ticket in request.env['event.event.ticket'].sudo().browse(event_ticket_ids)
         }
 
-        if all(event_ticket.price == 0 for event_ticket in event_ticket_by_id.values()) and not request.cart.id:
+        if all(event_ticket.total_price == 0 for event_ticket in event_ticket_by_id.values()) and not request.cart.id:
             # all chosen tickets are free AND no existing SO -> skip SO and payment process
             return super()._create_attendees_from_registration_post(event, registration_data)
 
-        order_sudo = request.cart or request.website._create_cart()
+        order_sudo = request.cart or self.env.website._create_cart()
         tickets_data = defaultdict(int)
         for data in registration_data:
             event_slot_id = data.get('event_slot_id', False)
@@ -49,6 +50,12 @@ class WebsiteEventSaleController(WebsiteEventController):
                 event_ticket_id=ticket_id,
                 event_slot_id=slot_id,
             )
+            for product in ticket_sudo.additional_product_ids:
+                order_sudo._cart_add(
+                    product_id=product.id,
+                    quantity=count,
+                    linked_line_id=cart_values['line_id'],
+                )
             cart_data[slot_id, ticket_id] = cart_values['line_id']
 
         for data in registration_data:
@@ -73,7 +80,13 @@ class WebsiteEventSaleController(WebsiteEventController):
 
         # we have at least one registration linked to a ticket -> sale mode activate
         if any(info['event_ticket_id'] for info in registrations):
-            if order_sudo.amount_total:
+            # free tickets -> order with amount = 0: auto-confirm, no checkout
+            if all(line.event_ticket_id and float_is_zero(line.event_ticket_id.price, precision_digits=2) for line in order_sudo.order_line):
+                order_sudo.action_confirm()  # tde notsure: email sending ?
+                self.env.website.sale_reset()
+                request.session['sale_last_order_id'] = order_sudo.id
+                return request.redirect("/shop/confirmation")
+            elif order_sudo:
                 if order_sudo._is_anonymous_cart():
                     booked_by_partner, feedback_dict = CustomerPortal()._create_or_update_address(
                         request.env['res.partner'].sudo(),
@@ -85,11 +98,4 @@ class WebsiteEventSaleController(WebsiteEventController):
                         order_sudo._update_address(booked_by_partner.id, ['partner_id'])
                 request.session['sale_last_order_id'] = order_sudo.id
                 return request.redirect("/shop/checkout?try_skip_step=true")
-            else:
-                # Free order -> auto confirmation without checkout
-                order_sudo.action_confirm()  # tde notsure: email sending ?
-                request.website.sale_reset()
-                request.session['sale_last_order_id'] = order_sudo.id
-                return request.redirect("/shop/confirmation")
-
         return res

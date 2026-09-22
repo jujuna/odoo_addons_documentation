@@ -2,15 +2,14 @@
 
 import json
 import logging
-import requests
-import pytz
-
+from datetime import UTC
 from pathlib import Path
+
+import requests
 from werkzeug.urls import url_join
 
 from odoo import fields
-from odoo.exceptions import AccessError
-from odoo.addons.iap.tools.iap_tools import iap_jsonrpc, IAPServerError
+from odoo.addons.iap.tools.iap_tools import iap_jsonrpc
 from odoo.tools import file_open_temporary_directory
 
 _logger = logging.getLogger(__name__)
@@ -54,7 +53,7 @@ class GoogleReserveIAP:
                 "/api/google_reserve/1/appointment/register"
             ),
             params={
-                "db_uuid": appointment_type.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                "db_uuid": appointment_type.env['ir.config_parameter'].sudo().get_str('database.uuid'),
                 "merchant_details": self._format_merchant_details(merchant),
                 "appointment_details": {
                     "appointment_type_id": appointment_type.id,
@@ -65,6 +64,7 @@ class GoogleReserveIAP:
                     "min_schedule_hours": appointment_type.min_schedule_hours,
                 },
             },
+            raise_user_error=True,
         )
 
     def unregister_appointment(self, appointment_type):
@@ -77,8 +77,9 @@ class GoogleReserveIAP:
                 f"/api/google_reserve/1/appointment/{appointment_type.google_reserve_access_token}/unregister"
             ),
             params={
-                "db_uuid": appointment_type.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                "db_uuid": appointment_type.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             },
+            raise_user_error=True,
         )
 
     def update_merchant(self, merchant):
@@ -90,9 +91,10 @@ class GoogleReserveIAP:
                 "/api/google_reserve/1/merchant/update"
             ),
             params={
-                "db_uuid": merchant.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                "db_uuid": merchant.env['ir.config_parameter'].sudo().get_str('database.uuid'),
                 "merchant_details": self._format_merchant_details(merchant),
             },
+            raise_user_error=True,
         )
 
     # ------------------------------------------------------------
@@ -102,8 +104,8 @@ class GoogleReserveIAP:
     def update_availabilities(self, appointment_types, start_time, end_time):
         """ Replace the availabilities of the appointment types. """
         for appointment_type in appointment_types:
-            start_time = start_time.astimezone(pytz.utc)
-            end_time = end_time.astimezone(pytz.utc)
+            start_time = start_time.astimezone(UTC)
+            end_time = end_time.astimezone(UTC)
 
             availabilities = appointment_type._google_reserve_get_availabilities(
                 start_time=start_time,
@@ -114,7 +116,7 @@ class GoogleReserveIAP:
             # which is enforced by Google
             # there does not seem to be another way to do it than a 'dirty' replace
             data = {
-                "db_uuid": appointment_types.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                "db_uuid": appointment_types.env['ir.config_parameter'].sudo().get_str('database.uuid'),
                 "availabilities": availabilities,
                 "start_time": start_time.isoformat().replace('+00:00', 'Z'),  # UTC (RFC3339)
                 "end_time": end_time.isoformat().replace('+00:00', 'Z'),  # UTC (RFC3339)
@@ -129,7 +131,7 @@ class GoogleReserveIAP:
                     params=data,
                     timeout=5,
                 )
-            except (IAPServerError, AccessError) as e:
+            except requests.RequestException as e:
                 _logger.warning("Could not update availabilities: %s", e)
 
     # ------------------------------------------------------------
@@ -180,11 +182,11 @@ class GoogleReserveIAP:
                 params={
                     'booking_ids': calendar_event_ids,
                     'booking_values': booking_values,
-                    'db_uuid': appointment_type.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                    'db_uuid': appointment_type.env['ir.config_parameter'].sudo().get_str('database.uuid'),
                 },
                 timeout=5,
             )
-        except (IAPServerError, AccessError) as e:
+        except requests.RequestException as e:
             _logger.warning("Could not update booking: %s", e)
 
     # ------------------------------------------------------------
@@ -222,7 +224,7 @@ class GoogleReserveIAP:
                             '/api/google_reserve/1/merchant/upload_availabilities_feed',
                         ),
                         data={
-                            'db_uuid': merchant.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                            'db_uuid': merchant.env['ir.config_parameter'].sudo().get_str('database.uuid'),
                             'merchant_id': merchant.id,
                         },
                         files={'upload_file': path.open()},

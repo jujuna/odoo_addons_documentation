@@ -2,6 +2,7 @@
 // These values are hard coded in grid_renderer.js
 $o-web-grid-first-column-width: 3rem;
 $o-web-grid-cell-minwidth: 10ch;
+$o-web-grid-column-gutter: map-get($spacers, 1); // 4px on each side of a column
 
 @mixin o-grid-zindex($level) {
     z-index: map-get(
@@ -21,23 +22,49 @@ $o-web-grid-cell-minwidth: 10ch;
         min-width: fit-content;
     }
 
-    .o_grid_row, .o_grid_section, .o_grid_column_title {
-        &:not(.o_grid_highlighted) {
-            > .o_grid_cell_overlay:not(.o_grid_unavailable), > .o_grid_cell_overlay_total {
-                --bg-opacity: 0;
-            }
+    // Columns are separated using a border inside the cells instead of a column-gap
+    // to prevent the background from being visible underneath.
+    .o_grid_column_cell {
+        border-inline: $o-web-grid-column-gutter solid var(--o-grid-column-gutter-color, #{$o-view-background-color});
 
-            > .o_grid_cell_overlay.o_grid_unavailable {
-                --bg-opacity: .05;
+        // Paint the border with a pseudo element to prevent the gutter from appearing
+        &.o_grid_section, &.o_grid_column_total:not(.o_grid_bar_chart_container) {
+            &::before {
+                @include o-position-absolute($top: 0);
+
+                content: "";
+                inset-inline: calc(-1 * #{$o-web-grid-column-gutter});
+                border-top: $border-width solid $border-color;
             }
         }
+    }
+
+    // Compensate the border inline value for columns that touch left/right panels
+    .o_grid_first_cell {
+        margin-inline-end: calc(-1 * #{$o-web-grid-column-gutter});
+    }
+
+    .o_grid_last_cell {
+        margin-inline-start: calc(-1 * #{$o-web-grid-column-gutter});
+    }
+
+    // Prevent the section from being sliced by the border inline
+    .o_grid_section {
+        --o-grid-column-gutter-color: #{$o-gray-200};
+    }
+
+    // Inset edited/hovered cell with the same value as the border inline
+    .o_grid_cell {
+        margin-inline: $o-web-grid-column-gutter;
     }
 
     .o_grid_column_title {
         @include o-grid-zindex(interact);
 
         > .o_grid_cell_overlay_today {
-            --bg-opacity: .5;
+            // Clipped instead of inset, to line up with the gutters of the
+            // column underneath
+            clip-path: inset(0 $o-web-grid-column-gutter round #{$border-radius-lg} #{$border-radius-lg} 0 0);
         }
 
         span {
@@ -50,27 +77,12 @@ $o-web-grid-cell-minwidth: 10ch;
     }
 
     .o_grid_highlighted, .o_grid_row_highlighted {
-        > .o_grid_cell_overlay {
-            --bg-opacity: .1;
+        .o_grid_cell_overlay {
+            background: rgba($o-enterprise-action-color, $table-hover-bg-factor);
         }
-
-        > .o_grid_cell_overlay_today, > .o_grid_cell_overlay_total {
-            --bg-opacity: .4;
+        .o_grid_cell_overlay_today {
+            background: rgba($o-enterprise-action-color, $table-hover-bg-factor * 2);
         }
-    }
-
-    .o_grid_cell_highlighted:not(.o_grid_row_title):not(.o_grid_section_title):not(.o_grid_column_total) {
-        > .o_grid_cell_overlay {
-            --bg-opacity: .15;
-        }
-
-        > .o_grid_cell_overlay_today, > .o_grid_cell_overlay_total {
-            --bg-opacity: .5;
-        }
-    }
-
-    .o_grid_section .o_grid_cell_overlay_today {
-        --bg-opacity: .25;
     }
 
     .o_grid_section ~ .o_grid_row.o_grid_row_title {
@@ -85,13 +97,6 @@ $o-web-grid-cell-minwidth: 10ch;
         }
     }
 
-    // To have at least one day shown in My Timesheets on mobile
-    .o_grid_row_timer + .o_grid_row_title {
-        @include media-breakpoint-down(md) {
-            max-width: calc(100vw - #{$o-web-grid-cell-minwidth} - #{$o-web-grid-first-column-width})
-        }
-    }
-
     .o_grid_grid .o_input {
         text-align: center;
         padding: 0;
@@ -99,5 +104,9 @@ $o-web-grid-cell-minwidth: 10ch;
 
     .o_grid_navigation_wrap {
         @include o-grid-zindex(top);
+    }
+
+    .o_grid_column_total {
+        background-image: linear-gradient(to bottom, transparent, $o-view-background-color);
     }
 }

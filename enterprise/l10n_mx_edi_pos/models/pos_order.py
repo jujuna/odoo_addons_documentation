@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from odoo import _, api, models, fields, Command
 from odoo.addons.l10n_mx_edi.models.l10n_mx_edi_document import CANCELLATION_REASON_SELECTION, CFDI_DATE_FORMAT, USAGE_SELECTION
 from odoo.exceptions import UserError, ValidationError
@@ -86,12 +87,18 @@ class PosOrder(models.Model):
         if self.company_id.country_id.code == 'MX':
             if self.refunded_order_id and not self.refunded_order_id.account_move:
                 raise UserError(_("You cannot invoice this refund since the related order is not invoiced yet."))
-        action_values = super().action_pos_order_invoice()
 
+        # Create global refund before invoice to ensure correct origin of global refund
         for order in self:
             if order.l10n_mx_edi_cfdi_state == 'global_sent':
-                order._l10n_mx_edi_cfdi_invoice_try_send()
+                # Validate customer selection to prevent duplicate CFDI creation
+                if not order.partner_id:
+                    raise UserError(_("You need to select a customer to invoice this order."))
+                # Skip if auto-refund already sent (prevents duplicates on retry)
+                if not order.l10n_mx_edi_document_ids.filtered(lambda d: d.state == 'invoice_sent' and not d.move_id):
+                    order._l10n_mx_edi_cfdi_invoice_try_send()
 
+        action_values = super().action_pos_order_invoice()
         return action_values
 
     def _l10n_mx_edi_check_autogenerate_cfdi_refund(self):
@@ -99,7 +106,8 @@ class PosOrder(models.Model):
             if (
                 order.company_id.country_id.code == 'MX'
                 and not order.l10n_mx_edi_cfdi_state
-                and order.refunded_order_id and order.refunded_order_id.l10n_mx_edi_cfdi_state == 'global_sent'
+                and order.refunded_order_id
+                and order.refunded_order_id.l10n_mx_edi_document_ids.filtered(lambda d: d.state.startswith('ginvoice_'))
             ):
                 order._l10n_mx_edi_cfdi_invoice_try_send()
 
@@ -190,7 +198,7 @@ class PosOrder(models.Model):
             failed_orders = orders.filtered(lambda x: (
                 not x.l10n_mx_edi_is_cfdi_needed
                 or x.l10n_mx_edi_cfdi_state in ('sent', 'global_sent')
-                or x.account_move
+                or x.is_singly_invoiced
             ))
             if failed_orders:
                 orders_str = ", ".join(failed_orders.mapped('name'))
@@ -222,6 +230,23 @@ class PosOrder(models.Model):
                         order.l10n_mx_edi_cfdi_sat_state = doc.sat_state
                     order.l10n_mx_edi_cfdi_state = 'sent'
                     order.l10n_mx_edi_cfdi_attachment_id = doc.attachment_id
+                    break
+                elif doc.state == 'invoice_sent':
+                    # Skip auto-refund documents (TipoDeComprobante == 'E')
+                    cfdi_infos = self.env['l10n_mx_edi.document']._decode_cfdi_attachment(doc.attachment_id.raw.content)
+                    if cfdi_infos.get('cfdi_node') is not None and cfdi_infos['cfdi_node'].get('TipoDeComprobante') == 'E':
+                        continue
+                    if doc.sat_state != 'skip':
+                        order.l10n_mx_edi_cfdi_sat_state = doc.sat_state
+                    order.l10n_mx_edi_cfdi_state = 'sent'
+                    order.l10n_mx_edi_cfdi_attachment_id = doc.attachment_id
+                    break
+                elif doc.state == 'invoice_cancel':
+                    order.l10n_mx_edi_cfdi_sat_state = doc.sat_state
+                    order.l10n_mx_edi_cfdi_attachment_id = doc.attachment_id
+                    # For refunds, leave cfdi_state unset so they're re-eligible for a new global invoice.
+                    if not order.refunded_order_id:
+                        order.l10n_mx_edi_cfdi_state = 'sent'
                     break
                 elif doc.state == 'ginvoice_sent':
                     if doc.sat_state != 'skip':
@@ -259,7 +284,8 @@ class PosOrder(models.Model):
     def _compute_l10n_mx_edi_cfdi_uuid(self):
         for order in self:
             if order.l10n_mx_edi_cfdi_attachment_id:
-                cfdi_infos = self.env['l10n_mx_edi.document']._decode_cfdi_attachment(order.l10n_mx_edi_cfdi_attachment_id.raw)
+                cfdi_infos = self.env['l10n_mx_edi.document']._decode_cfdi_attachment(
+                    order.l10n_mx_edi_cfdi_attachment_id.raw.content)
                 order.l10n_mx_edi_cfdi_uuid = cfdi_infos.get('uuid')
             else:
                 order.l10n_mx_edi_cfdi_uuid = None
@@ -288,7 +314,7 @@ class PosOrder(models.Model):
                         order.refunded_order_id
                         and any(line.price_subtotal > 0.0 for line in order_lines.filtered(
                             lambda l: not l.refunded_orderline_id and (
-                                'coupon_id' not in l._fields or not l.coupon_id
+                                'card_id' not in l._fields or not l.card_id
                             )
                         ))
                     )
@@ -317,7 +343,7 @@ class PosOrder(models.Model):
             ))
 
         # == Check the order ==
-        base_lines = self.lines._l10n_mx_edi_cfdi_lines()._prepare_tax_base_line_values()
+        base_lines = self.lines._l10n_mx_edi_cfdi_lines()._prepare_base_lines_for_taxes_computation()
         negative_lines = [
             x
             for x in base_lines
@@ -348,6 +374,7 @@ class PosOrder(models.Model):
         self.ensure_one()
 
         document_values = {
+            'company_id': self.company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'invoice_sent_failed',
             'sat_state': None,
@@ -371,6 +398,7 @@ class PosOrder(models.Model):
         self.ensure_one()
 
         document_values = {
+            'company_id': self.company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'invoice_sent',
             'sat_state': 'not_defined',
@@ -392,6 +420,7 @@ class PosOrder(models.Model):
         self.ensure_one()
 
         document_values = {
+            'company_id': self.company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'invoice_sent',
             'sat_state': 'skip',
@@ -410,6 +439,7 @@ class PosOrder(models.Model):
         self.ensure_one()
 
         document_values = {
+            'company_id': self.company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'invoice_cancel_failed',
             'sat_state': None,
@@ -429,6 +459,7 @@ class PosOrder(models.Model):
         self.ensure_one()
 
         document_values = {
+            'company_id': self.company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'invoice_cancel',
             'sat_state': 'not_defined',
@@ -447,6 +478,7 @@ class PosOrder(models.Model):
         :return:                The created/updated document.
         """
         document_values = {
+            'company_id': self[:1].company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'ginvoice_sent_failed',
             'sat_state': None,
@@ -467,6 +499,7 @@ class PosOrder(models.Model):
         :return:                The created/updated document.
         """
         document_values = {
+            'company_id': self[:1].company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'ginvoice_sent',
             'sat_state': 'not_defined',
@@ -485,6 +518,7 @@ class PosOrder(models.Model):
         :return:                The created/updated document.
         """
         document_values = {
+            'company_id': self[:1].company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'ginvoice_sent',
             'sat_state': 'skip',
@@ -501,6 +535,7 @@ class PosOrder(models.Model):
         :return:                The created/updated document.
         """
         document_values = {
+            'company_id': self[:1].company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'ginvoice_cancel_failed',
             'sat_state': None,
@@ -520,6 +555,7 @@ class PosOrder(models.Model):
         self.l10n_mx_edi_cfdi_attachment_id.ensure_one()
 
         document_values = {
+            'company_id': self[:1].company_id.id,
             'pos_order_ids': [Command.set(self.ids)],
             'state': 'ginvoice_cancel',
             'sat_state': 'not_defined',
@@ -551,25 +587,36 @@ class PosOrder(models.Model):
             self.ensure_one()
             Document = self.env['l10n_mx_edi.document']
             order_lines = self.lines._l10n_mx_edi_cfdi_lines()
-            base_lines = order_lines._prepare_tax_base_line_values()
+            base_lines = order_lines._prepare_base_lines_for_taxes_computation()
             base_lines = Document._add_and_round_tax_details(base_lines, self.company_id)
             dispatched_lines = Document._dispatch_negative_base_lines(base_lines, self.company_id)
-            if dispatched_lines['remaining_negative_base_lines']:
-                cfdi_values['errors'] = [_("Failed to distribute some negative lines")]
-                return
-            base_lines = dispatched_lines['base_lines']
+            remaining = dispatched_lines['remaining_negative_base_lines']
+            if remaining:
+                # For 'E' type CFDI (individual refund), remaining negative lines are the refunded
+                # amounts. This occurs when order.is_refund=False but lines have negative quantities.
+                # Flip them to positive to represent credits in the CFDI.
+                AccountTax = self.env['account.tax']
+                flipped = AccountTax._turn_base_lines_is_refund_flag_off([
+                    {**bl, 'is_refund': True} for bl in remaining
+                ])
+                base_lines = dispatched_lines['base_lines'] + flipped
+            else:
+                base_lines = dispatched_lines['base_lines']
             if not base_lines:
                 cfdi_values['errors'] = ['empty_cfdi']
                 return
 
             cfdi_values['tipo_de_comprobante'] = 'E'
-            if self.amount_total < 0:
+            # Determine origin UUID for CFDI relation
+            if self.amount_total < 0 and self.l10n_mx_edi_cfdi_state != 'global_sent':
                 # The order is a refund.
-                Document._add_document_origin_cfdi_values(cfdi_values, f"01|{self.refunded_order_id.l10n_mx_edi_cfdi_uuid}")
+                origin_uuid = self.refunded_order_id.l10n_mx_edi_cfdi_uuid
             else:
                 # Refund of the pos order itself.
-                Document._add_document_origin_cfdi_values(cfdi_values, f'01|{self.l10n_mx_edi_cfdi_uuid}')
+                global_doc = self.l10n_mx_edi_document_ids.filtered(lambda d: d.state == 'ginvoice_sent' and d.attachment_uuid)
+                origin_uuid = global_doc[0].attachment_uuid if global_doc else self.l10n_mx_edi_cfdi_uuid
 
+            Document._add_document_origin_cfdi_values(cfdi_values, f'01|{origin_uuid}')
             Document._add_base_cfdi_values(cfdi_values)
             Document._add_currency_cfdi_values(cfdi_values, self.currency_id)
             Document._add_document_name_cfdi_values(cfdi_values, self.name)
@@ -581,6 +628,10 @@ class PosOrder(models.Model):
             )
             Document._add_tax_objected_cfdi_values(cfdi_values, base_lines)
             Document._add_base_lines_cfdi_values(cfdi_values, base_lines)
+            # Force description as this is required for refunds of global invoices
+            for base_line in cfdi_values['base_lines']:
+                base_line['l10n_mx_cfdi_values']['description'] = "Devoluciones, descuentos o bonificaciones"
+
             Document._add_payment_policy_cfdi_values(cfdi_values, payment_method=self.l10n_mx_edi_payment_method_id)
             cfdi_values['condiciones_de_pago'] = None
 
@@ -666,7 +717,7 @@ class PosOrder(models.Model):
         for document in documents.filtered_domain(documents._get_update_sat_status_domain(from_cron=False)):
             document._update_sat_state()
 
-    def _l10n_mx_edi_cfdi_global_invoice_try_send(self, periodicity='04', origin=None):
+    def _l10n_mx_edi_cfdi_global_invoice_try_send(self, document_date, periodicity='04', origin=None):
         """ Create a CFDI global invoice.
 
         :param periodicity: The value to fill the 'Periodicidad' value.
@@ -678,8 +729,11 @@ class PosOrder(models.Model):
 
         # == Check the config ==
         orders = self.filtered(lambda order: not order.refunded_order_id)
-        orders |= self.env['pos.order.line'].search([('refunded_orderline_id.order_id', 'in', orders.ids)]).order_id
-        pos_journal = self.config_id.invoice_journal_id
+        orders |= self.env['pos.order.line'].search([
+            ('refunded_orderline_id.order_id', 'in', orders.ids),
+            ('order_id.state', '!=', 'cancel'),
+        ]).order_id
+        pos_journal = self.config_id.journal_id
         errors = []
         for order in orders:
             errors += order._l10n_mx_edi_cfdi_check_order_config()
@@ -717,7 +771,7 @@ class PosOrder(models.Model):
 
                 # Dispatch the negative lines on the order itself.
                 order_lines = order.lines._l10n_mx_edi_cfdi_lines()
-                base_lines = order_lines._prepare_tax_base_line_values()
+                base_lines = order_lines._prepare_base_lines_for_taxes_computation()
                 base_lines = Document._add_and_round_tax_details(base_lines, self.company_id)
                 dispatched_lines = Document._dispatch_negative_base_lines(base_lines, self.company_id)
                 if dispatched_lines['remaining_negative_base_lines']:
@@ -730,22 +784,25 @@ class PosOrder(models.Model):
 
                 # Find the refund lines targeting this order.
                 all_refund_order_lines = self.env['pos.order.line']\
-                    .search([('refunded_orderline_id', 'in', order_lines.ids)])\
+                    .search([
+                        ('refunded_orderline_id', 'in', order_lines.ids),
+                        ('order_id.state', '!=', 'cancel'),
+                    ])\
                     ._l10n_mx_edi_cfdi_lines()
 
                 # Manage the refunds.
                 for refund_order_lines in all_refund_order_lines.grouped('order_id').values():
 
                     # Dispatch the positive lines on the refund itself.
-                    refund_base_lines = refund_order_lines._prepare_tax_base_line_values()
+                    refund_base_lines = refund_order_lines._prepare_base_lines_for_taxes_computation()
                     refund_base_lines = Document._add_and_round_tax_details(refund_base_lines, self.company_id)
                     refund_dispatched_lines = Document._dispatch_negative_base_lines(refund_base_lines, self.company_id)
-                    if refund_dispatched_lines['remaining_negative_base_lines']:
-                        cfdi_values['errors'] = [_("Failed to distribute some negative lines")]
-                        return
 
                     # Dispatch the remaining negative lines from the refund on the invoice.
-                    refund_base_lines = AccountTax._turn_base_lines_is_refund_flag_off(refund_dispatched_lines['base_lines'])
+                    # Include both the internally-dispatched positive lines and any remaining negative
+                    # lines (e.g. the full-refund case) so they cancel out the main order's lines.
+                    all_refund_dispatched = refund_dispatched_lines['base_lines'] + refund_dispatched_lines['remaining_negative_base_lines']
+                    refund_base_lines = AccountTax._turn_base_lines_is_refund_flag_off(all_refund_dispatched)
                     dispatched_lines = Document._dispatch_negative_base_lines(base_lines + refund_base_lines, self.company_id)
                     if dispatched_lines['remaining_negative_base_lines']:
                         cfdi_values['errors'] = [_("Failed to distribute some negative lines")]
@@ -772,6 +829,7 @@ class PosOrder(models.Model):
             Document._add_global_invoice_cfdi_values(
                 cfdi_values,
                 base_lines,
+                document_date,
                 periodicity=periodicity,
                 origin=origin,
             )
@@ -799,6 +857,14 @@ class PosOrder(models.Model):
             on_failure,
             on_success,
         )
+        if (
+            origin
+            and (new_doc := orders[0].l10n_mx_edi_invoice_document_ids.sorted()[0])
+            and new_doc.state == 'ginvoice_sent'
+            and (original_doc := new_doc._get_original_document())
+            and original_doc.state == 'ginvoice_sent'
+        ):
+            original_doc.invoice_ids._l10n_mx_edi_cfdi_global_invoice_try_cancel(original_doc, '01')
 
     def _l10n_mx_edi_cfdi_global_invoice_try_cancel(self, document, cancel_reason):
         """ Create a CFDI global invoice for multiple pos orders.
@@ -815,8 +881,25 @@ class PosOrder(models.Model):
 
         def on_success():
             self._l10n_mx_edi_cfdi_global_invoice_document_cancel(document, cancel_reason)
+            self._l10n_mx_edi_cfdi_cancel_related_refund_documents(document.attachment_uuid, cancel_reason)
 
         document._cancel_api(self.company_id, cancel_reason, on_failure, on_success)
+
+    def _l10n_mx_edi_cfdi_cancel_related_refund_documents(self, gi_uuid, cancel_reason):
+        """ Cancel the auto-generated refund CFDIs that referenced the cancelled global invoice.
+
+        Without this cascade the refund's pos.order keeps cfdi_state='sent' and blocks
+        the creation of a new global invoice for the same chain.
+        """
+        if not gi_uuid:
+            return
+        for refund in self._l10n_mx_edi_collect_orders_in_chain() - self:
+            refund_doc = refund.l10n_mx_edi_document_ids.filtered(
+                lambda d: d.state == 'invoice_sent'
+                and d.attachment_origin == f'01|{gi_uuid}'
+            )[:1]
+            if refund_doc:
+                refund._l10n_mx_edi_cfdi_invoice_try_cancel(refund_doc, cancel_reason)
 
     def _l10n_mx_edi_cfdi_global_invoice_update_document_sat_state(self, document, sat_state, error=None):
         """ Update the SAT state of the document for the current global invoice.
@@ -830,10 +913,12 @@ class PosOrder(models.Model):
             if document.sat_state not in ('valid', 'cancelled', 'skip'):
                 document.sat_state = 'skip'
 
+            gi_uuid = document.attachment_uuid
             document = self._l10n_mx_edi_cfdi_global_invoice_document_cancel(
                 document,
                 CANCELLATION_REASON_SELECTION[1][0],  # Force '02'.
             )
+            self._l10n_mx_edi_cfdi_cancel_related_refund_documents(gi_uuid, CANCELLATION_REASON_SELECTION[1][0])
 
         document.sat_state = sat_state
         document.message = None
@@ -858,11 +943,3 @@ class PosOrder(models.Model):
             'target': 'new',
             'context': {'default_pos_order_ids': [Command.set(self.ids)]},
         }
-
-    @api.model
-    def _get_invoice_lines_values(self, line_values, pos_line, move_type):
-        # EXTENDS point_of_sale
-        invoice_lines_values = super()._get_invoice_lines_values(line_values, pos_line, move_type)
-        if pos_line.company_id.country_code == 'MX':
-            invoice_lines_values['account_id'] = line_values['account_id'].id
-        return invoice_lines_values

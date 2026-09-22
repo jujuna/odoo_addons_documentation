@@ -3,28 +3,56 @@
 # * documents_account
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-10-08 02:40+0000\n"
-"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 02:01+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/documents_account/es_419/>\n"
+"odoo-master/documents_account/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents_account
+#: model:ir.module.module,description:base.module_documents_account
+msgid ""
+"\n"
+"Bridge module between the accounting and documents apps. It enables\n"
+"the creation invoices from the Documents module, and adds a\n"
+"button on Accounting's reports allowing to save the report into the\n"
+"Documents app in the desired format(s).\n"
+msgstr ""
 
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/ir_actions_server.py:0
 msgid "\"New Journal Entry\" can only be applied to Document."
 msgstr "Solo se puede aplicar \"Nuevo asiento de diario\" a un documento."
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "%(model_name)s"
+msgstr "%(model_name)s"
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "%(model_name)s (%(journal_name)s)"
+msgstr "%(model_name)s (%(journal_name)s)"
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "%(operation)s tag %(tag)s"
+msgstr "%(operation)s con etiqueta %(tag)s"
 
 #. module: documents_account
 #. odoo-javascript
@@ -51,6 +79,11 @@ msgid "A setting already exists for this journal"
 msgstr "Ya existe un ajuste para este diario"
 
 #. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_documents_document__account_setting_ids
+msgid "Account Setting"
+msgstr "Ajustes de la cuenta"
+
+#. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.res_config_settings_view_form
 msgid "Accounting"
 msgstr "Contabilidad"
@@ -71,6 +104,12 @@ msgstr "Reporte contable"
 #: code:addons/documents_account/static/src/js/tour.js:0
 msgid "Action"
 msgstr "Acción"
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_add_tag_ids
+#: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_add_tag_ids
+msgid "Add Tags"
+msgstr "Agregar etiquetas"
 
 #. module: documents_account
 #. odoo-javascript
@@ -99,9 +138,21 @@ msgid "Attachment"
 msgstr "Archivo adjunto"
 
 #. module: documents_account
+#: model:ir.model,name:documents_account.model_account_bank_statement
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_bank_statement
 msgid "Bank Statement"
 msgstr "Estado de cuenta bancario"
+
+#. module: documents_account
+#: model:ir.model,name:documents_account.model_account_document_import_mixin
+msgid "Business document import mixin"
+msgstr "Mixin para importación de documentos comerciales"
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Cannot add and remove tags at the same time: %s"
+msgstr "No puedes agregar y eliminar etiquetas al mismo tiempo: %s"
 
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.res_config_settings_view_form
@@ -134,8 +185,8 @@ msgstr "Haga clic en una tarjeta para <b>seleccionar el documento</b>."
 #: code:addons/documents_account/static/src/js/tour.js:0
 msgid "Click on a thumbnail to <b>preview the document</b>."
 msgstr ""
-"Haga clic sobre una miniatura para<b>tener una vista previa del documento</"
-"b>."
+"Haga clic sobre una miniatura para<b>tener una vista previa del documento</b>"
+"."
 
 #. module: documents_account
 #. odoo-javascript
@@ -162,10 +213,6 @@ msgstr "Cerrar (Esc)"
 
 #. module: documents_account
 #: model:ir.model,name:documents_account.model_res_company
-msgid "Companies"
-msgstr "Empresas"
-
-#. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__company_id
 msgid "Company"
 msgstr "Empresa"
@@ -187,59 +234,16 @@ msgid "Create"
 msgstr "Crear"
 
 #. module: documents_account
-#. odoo-python
-#: code:addons/documents_account/models/ir_actions_server.py:0
-msgid "Create %(model_name)s"
-msgstr "Crear %(model_name)s"
-
-#. module: documents_account
-#. odoo-python
-#: code:addons/documents_account/models/ir_actions_server.py:0
-msgid "Create %(model_name)s (%(journal_name)s)"
-msgstr "Crear %(model_name)s (%(journal_name)s)"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note_code
-msgid "Create Credit Note"
-msgstr "Crear nota de crédito"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note
-msgid "Create Customer Credit Note"
-msgstr "Crear una nota de crédito para el cliente"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice_code
-msgid "Create Customer Invoice"
-msgstr "Crear factura de cliente"
-
-#. module: documents_account
 #. odoo-javascript
 #: code:addons/documents_account/static/src/js/tour.js:0
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry_code
 msgid "Create Misc Entry"
 msgstr "Crear un asiento misceláneo"
 
 #. module: documents_account
 #. odoo-javascript
 #: code:addons/documents_account/static/src/js/tour.js:0
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill_code
 msgid "Create Vendor Bill"
 msgstr "Crear factura de proveedor"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund_code
-msgid "Create Vendor Credit Note"
-msgstr "Crear nota de crédito de proveedor"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_receipt
-msgid "Create Vendor Receipt"
-msgstr "Crear recibo de proveedor"
 
 #. module: documents_account
 #. odoo-javascript
@@ -264,11 +268,31 @@ msgid "Credit Note"
 msgstr "Nota de crédito"
 
 #. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note
+msgid "Customer Credit Note"
+msgstr "Nota de crédito del cliente"
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Customer Credit Notes"
+msgstr "Notas de crédito del cliente"
+
+#. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_out_invoice
 msgid "Customer Invoice"
 msgstr "Factura del cliente"
 
 #. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Customer Invoices"
+msgstr "Facturas del cliente"
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_account_bank_statement__display_name
+#: model:ir.model.fields,field_description:documents_account.field_account_document_import_mixin__display_name
 #: model:ir.model.fields,field_description:documents_account.field_account_journal__display_name
 #: model:ir.model.fields,field_description:documents_account.field_account_move__display_name
 #: model:ir.model.fields,field_description:documents_account.field_account_report__display_name
@@ -287,6 +311,11 @@ msgstr "Nombre en pantalla"
 #: model:ir.model,name:documents_account.model_documents_document
 msgid "Document"
 msgstr "Documento"
+
+#. module: documents_account
+#: model:ir.module.module,shortdesc:base.module_documents_account
+msgid "Documents - Accounting"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_account_create_model
@@ -327,6 +356,12 @@ msgstr "Formato de exportación para reportes contables"
 #: model:ir.model,name:documents_account.model_account_reports_export_wizard
 msgid "Export wizard for accounting's reports"
 msgstr "Asistente de exportación para reportes contables"
+
+#. module: documents_account
+#. odoo-javascript
+#: code:addons/documents_account/static/src/components/mail_attachments/mail_attachments_selector_patch.js:0
+msgid "Failed to paste links: "
+msgstr "Ocurrió un error al pegar los enlaces: "
 
 #. module: documents_account
 #. odoo-javascript
@@ -372,6 +407,8 @@ msgid "Has Embedded PDF"
 msgstr "Tiene un PDF integrado"
 
 #. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_account_bank_statement__id
+#: model:ir.model.fields,field_description:documents_account.field_account_document_import_mixin__id
 #: model:ir.model.fields,field_description:documents_account.field_account_journal__id
 #: model:ir.model.fields,field_description:documents_account.field_account_move__id
 #: model:ir.model.fields,field_description:documents_account.field_account_report__id
@@ -388,20 +425,33 @@ msgstr "ID"
 
 #. module: documents_account
 #: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement
-#: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement_code
-msgid "Import Bank Statement"
+msgid "Import Statement"
 msgstr "Importar estado de cuenta bancario"
 
 #. module: documents_account
+#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
+msgid "In Journal"
+msgstr "En el diario"
+
+#. module: documents_account
 #. odoo-python
-#: code:addons/documents_account/models/documents_document.py:0
-msgid "Invoices"
-msgstr "Facturas"
+#: code:addons/documents_account/models/account_move.py:0
+msgid "Invalid attachment ids: IDs must be integers."
+msgstr "IDs de archivos adjuntos no válidos: Los IDs deben ser enteros."
+
+#. module: documents_account
+#: model:documents.document,name:documents_account.documents_vendor_bill_inv_007
+msgid "Invoice-INV_2018_0007.pdf"
+msgstr "Invoice-INV_2018_0007.pdf"
+
+#. module: documents_account
+#: model:ir.module.module,summary:base.module_documents_account
+msgid "Invoices from Documents"
+msgstr ""
 
 #. module: documents_account
 #: model:ir.model,name:documents_account.model_account_journal
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__journal_id
-#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
 msgid "Journal"
 msgstr "Diario"
 
@@ -424,6 +474,11 @@ msgstr "Diarios"
 #: model:ir.actions.act_window,name:documents_account.action_folder_settings_installer
 msgid "Journals to synchronize"
 msgstr "Diarios a sincronizar"
+
+#. module: documents_account
+#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
+msgid "Keep in existing folder"
+msgstr "Mantener en la carpeta actual"
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_documents_account_folder_setting__write_uid
@@ -468,36 +523,54 @@ msgstr ""
 "acciones pueden adaptarse a su proceso según la carpeta correspondiente.</i>"
 
 #. module: documents_account
+#. odoo-javascript
+#: code:addons/documents_account/static/src/components/mail_attachments/mail_attachments_selector_patch.js:0
+msgid "Links pasted"
+msgstr "Enlaces pegados"
+
+#. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry
+msgid "Misc Entry"
+msgstr "Asiento misceláneo"
+
+#. module: documents_account
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_entry
 msgid "Miscellaneous Operations"
 msgstr "Operaciones varias"
 
 #. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_credit_note_move
-msgid "Move Document To Taxes"
-msgstr "Mover documento a impuestos"
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Move to %s"
+msgstr "Mover a %s"
 
 #. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_customer_invoice_move
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill_move
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund_move
-msgid "Move Document to Taxes"
-msgstr "Mover documento a impuestos"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_create_misc_entry_move
-msgid "Move Documents to Annual Closing"
-msgstr "Mover documentos al cierre anual"
-
-#. module: documents_account
-#: model:ir.actions.server,name:documents_account.ir_actions_server_bank_statement_move
-msgid "Move to Annual Closing"
-msgstr "Mover a cierre anual"
+#: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_folder_id
+#: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_folder_id
+msgid "Move to Folder"
+msgstr "Mover a carpeta"
 
 #. module: documents_account
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__state__documents_account_record_create
 msgid "New Journal Entry"
 msgstr "Nuevo asiento contable"
+
+#. module: documents_account
+#: model_terms:ir.ui.view,arch_db:documents_account.view_server_action_form_template
+msgid "None"
+msgstr "Ninguna"
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Only one folder move is allowed per action."
+msgstr "Solo es posible mover una carpeta por acción."
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/ir_actions_server.py:0
+msgid "Only tag/folder updates are allowed as child actions."
+msgstr "Solo puedes actualizar etiquetas o carpetas como acciones secundarias."
 
 #. module: documents_account
 #. odoo-javascript
@@ -509,6 +582,12 @@ msgstr "Abrir el menú de acciones"
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_in_receipt
 msgid "Purchase Receipt"
 msgstr "Recibo de compra"
+
+#. module: documents_account
+#: model:ir.model.fields,field_description:documents_account.field_ir_actions_server__documents_remove_tag_ids
+#: model:ir.model.fields,field_description:documents_account.field_ir_cron__documents_remove_tag_ids
+msgid "Remove Tags"
+msgstr "Eliminar etiquetas"
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_account_bank_statement_line__suspense_statement_line_id
@@ -548,8 +627,7 @@ msgstr "Impuestos"
 #. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.view_account_move_form_inherit_documents_account
 msgid "This invoice has been initiated by a bank transaction."
-msgstr ""
-"Se inició el trámite de esta factura debido a una transacción bancaria."
+msgstr "Se inició el trámite de esta factura debido a una transacción bancaria."
 
 #. module: documents_account
 #. odoo-javascript
@@ -596,14 +674,34 @@ msgstr ""
 "servidor\n"
 
 #. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_bill
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_in_invoice
 msgid "Vendor Bill"
 msgstr "Factura de proveedor"
 
 #. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Vendor Bills"
+msgstr "Facturas de proveedores"
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Vendor Receipts"
+msgstr "Recibos del proveedor"
+
+#. module: documents_account
+#: model:ir.actions.server,name:documents_account.ir_actions_server_create_vendor_refund
 #: model:ir.model.fields.selection,name:documents_account.selection__ir_actions_server__documents_account_create_model__account_move_in_refund
-msgid "Vendor Credit Note"
-msgstr "Nota de crédito de proveedor"
+msgid "Vendor Refund"
+msgstr "Reembolso del proveedor"
+
+#. module: documents_account
+#. odoo-python
+#: code:addons/documents_account/models/documents_document.py:0
+msgid "Vendor Refunds"
+msgstr "Reembolsos del proveedor"
 
 #. module: documents_account
 #. odoo-javascript
@@ -611,7 +709,7 @@ msgstr "Nota de crédito de proveedor"
 msgid ""
 "Want to become a <b>paperless company</b>? Let's discover Odoo Documents."
 msgstr ""
-"¿Quiere convertirse en una <b>empresa libre de papel</b>? Descubra la "
+"¿Quieres que tu empresa sea <b>una empresa libre de papel</b>? Descubre la "
 "aplicación Documentos de Odoo."
 
 #. module: documents_account
@@ -626,8 +724,8 @@ msgstr ""
 #. module: documents_account
 #. odoo-python
 #: code:addons/documents_account/models/documents_document.py:0
-msgid "You can not create account move on folder."
-msgstr "No puede crear un movimiento de cuenta en esta carpeta."
+msgid "You can not create a journal entry from a folder."
+msgstr "No puedes crear un asiento contable desde una carpeta."
 
 #. module: documents_account
 #: model:ir.model.fields,field_description:documents_account.field_res_config_settings__account_folder_id
@@ -635,6 +733,14 @@ msgid "account default folder"
 msgstr "carpeta de cuenta predeterminada"
 
 #. module: documents_account
+#: model:documents.document,name:documents_account.documents_vendor_bill_extract_ready_mat_document
+msgid "ready_mat.xml"
+msgstr "ready_mat.xml"
+
+#. module: documents_account
 #: model_terms:ir.ui.view,arch_db:documents_account.view_account_move_form_inherit_documents_account
 msgid "to mark this invoice as paid."
 msgstr "para marcar esta factura como pagada."
+
+msgid "invoice Azure Interior.pdf"
+msgstr "invoice Azure Interior.pdf"

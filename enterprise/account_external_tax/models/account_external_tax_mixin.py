@@ -75,12 +75,33 @@ class AccountExternalTaxMixin(models.AbstractModel):
             'document_date': None,
         }
 
+    def _search_existing_external_tax(self, company, tax_key_field, tax_name, price_include_override=False, type_tax_use=False, ctx_active_test=False):
+        """ Returns the existing tax the avatax data refers to based on:
+            :param company:                         the company in which the taxes belong to
+            :param tax_key_field:                   the name of the field used to find the external tax
+                                                    (Ex. For l10n_br, `l10n_br_avatax_code` is the field used to find the external taxes)
+            :param tax_name:                        the value that is being matched against the value of tax_key_field
+            :param price_include_override:          the value that denotes whether the tax is 'tax_included' or 'tax_excluded'
+            :param type_tax_use:                    the value that denotes whether the tax is a 'sale' or 'purchase' tax
+            :param ctx_active_test:                 a boolean value that searches through active and/or inactive records
+        """
+        price_include_override_domain = []
+        type_tax_use_domain = []
+        if price_include_override:
+            price_include_override_domain = [('price_include_override', '=', price_include_override)]
+        if type_tax_use:
+            type_tax_use_domain = [('type_tax_use', '=', type_tax_use)]
+        tax_name_domain = [(tax_key_field, '=', tax_name)]
+        return self.env['account.tax'].with_context(active_test=ctx_active_test).search([
+            *self.env['account.tax']._check_company_domain(company),
+            *tax_name_domain,
+            *price_include_override_domain,
+            *type_tax_use_domain,
+        ], limit=1)
+
     @api.model
     def _set_external_taxes(self, mapped_taxes):
         """ Sets extra_tax_data based on a dict that maps line records to base lines. """
-        for line in mapped_taxes:
-            line.tax_ids = False
-
         for line, base_line in mapped_taxes.items():
             extra_tax_data = self.env["account.tax"]._export_base_line_extra_tax_data(base_line)
             line.write({
@@ -126,20 +147,14 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
         tax_by_name = {}
         for tax_name, tax_values in tax_names.items():
-            price_include_override_domain = []
-            type_tax_use_domain = []
-            if 'price_include_override' in tax_values:
-                price_include_override_domain = [('price_include_override', '=', tax_values['price_include_override'])]
-            if 'type_tax_use' in tax_values:
-                type_tax_use_domain = [('type_tax_use', '=', tax_values['type_tax_use'])]
-
-            existing_tax = self.env['account.tax'].with_context(active_test=not search_archived_taxes).search([
-                *self.env['account.tax']._check_company_domain(company),
-                (tax_key_field, 'in', tax_name),
-                *price_include_override_domain,
-                *type_tax_use_domain,
-            ], limit=1)
-            if existing_tax:
+            if existing_tax := self._search_existing_external_tax(
+                company,
+                tax_key_field,
+                tax_name,
+                tax_values.get('price_include_override'),
+                type_tax_use=tax_values.get('type_tax_use'),
+                ctx_active_test=not search_archived_taxes
+            ):
                 tax_by_name[existing_tax[tax_key_field]] = existing_tax
 
                 if search_archived_taxes and not existing_tax.active:
@@ -157,6 +172,7 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
         for base_line, tax_values_list in base_line_with_tax_values:
             manual_tax_amounts = base_line['manual_tax_amounts'] = {}  # clear old taxes
+            base_line['manual_total_excluded_currency'] = None  # clear old pre-tax base
             for _tax_group_values, tax_values, manual_amounts in tax_values_list:
                 tax_id = str(tax_by_name[tax_values['name']].id)
                 if tax_id in manual_tax_amounts:
@@ -177,16 +193,15 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
     def _enable_external_tax_logging(self, icp_name):
         """ Start logging requests for 30 minutes. """
-        self.env['ir.config_parameter'].sudo().set_param(
+        self.env['ir.config_parameter'].sudo().set_str(
             icp_name,
             (fields.Datetime.now() + timedelta(minutes=30)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         )
 
+    @api.model
     def _log_external_tax_request(self, module_name, icp_name, message):
         """ Log when the ICP's value is in the future. """
-        log_end_date = self.env['ir.config_parameter'].sudo().get_param(
-            icp_name, ''
-        )
+        log_end_date = self.env['ir.config_parameter'].sudo().get_str(icp_name)
         try:
             log_end_date = datetime.strptime(log_end_date, DEFAULT_SERVER_DATETIME_FORMAT)
             need_log = fields.Datetime.now() < log_end_date

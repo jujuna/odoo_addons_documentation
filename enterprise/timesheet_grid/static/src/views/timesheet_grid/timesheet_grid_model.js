@@ -1,6 +1,8 @@
 import { serializeDate } from "@web/core/l10n/dates";
+import { localeCompare } from "@web/core/l10n/utils";
 import { GridModel } from "@web_grid/views/grid_model";
 import { Domain } from "@web/core/domain";
+import { location } from "@web/core/browser/browser";
 
 export class TimesheetGridModel extends GridModel {
     get workingHoursData() {
@@ -41,7 +43,7 @@ export class TimesheetGridModel extends GridModel {
                         secondRowFieldData in orderField.selection
                             ? orderField.selection[secondRowFieldData]
                             : secondRowFieldData;
-                 }
+                }
                 if (firstRowFieldData === secondRowFieldData) {
                     continue;
                 }
@@ -51,9 +53,7 @@ export class TimesheetGridModel extends GridModel {
                 if (!secondRowFieldData) {
                     return 1;
                 }
-                return firstRowFieldData
-                    .toLowerCase()
-                    .localeCompare(secondRowFieldData.toLowerCase());
+                return localeCompare(firstRowFieldData, secondRowFieldData);
             }
             return 0;
         });
@@ -72,7 +72,11 @@ export class TimesheetGridModel extends GridModel {
             this._fetchAllTimesheetM2OAvatarData(metaData),
         ];
 
-        if ((metaData.sectionField?.name || (metaData.searchParams.groupBy?.length === 1 && metaData.searchParams.groupBy?.[0]) === this.employeeField.name)) {
+        if (
+            metaData.sectionField?.name ||
+            (metaData.searchParams.groupBy?.length === 1 && metaData.searchParams.groupBy?.[0]) ===
+                this.employeeField.name
+        ) {
             result.push(this._fetchDailyWorkingHours(metaData));
         }
 
@@ -100,6 +104,17 @@ export class TimesheetGridModel extends GridModel {
                 serializeDate(this.navigationInfo.periodEnd),
             ]
         );
+    }
+
+    _getActiveRangeName(params) {
+        const urlParams = new URLSearchParams(location.search);
+        const scale = urlParams.get("reminder_interval");
+        if (scale === "months") {
+            return "month";
+        } else if (scale === "weeks") {
+            return "week";
+        }
+        return super._getActiveRangeName(params);
     }
 
     async _getInitialData(metaData) {
@@ -143,9 +158,11 @@ export class TimesheetGridModel extends GridModel {
         const previousWeekTimesheetPromise = this.orm
             .formattedReadGroup(
                 this.resModel,
-                Domain.and([searchParams.domain, this._getPreviousWeekTimesheetDomain()]).toList({}),
+                Domain.and([searchParams.domain, this._getPreviousWeekTimesheetDomain()]).toList(
+                    {}
+                ),
                 this._getGroupByFields(metaData),
-                this.aggregates,
+                this.aggregates
             )
             .then((additionalDataFetched) => {
                 const additionalData = {};
@@ -207,6 +224,7 @@ export class TimesheetGridModel extends GridModel {
             }
         }
         return super._fetchUnavailabilityDays(metaData, {
+            ...args,
             res_ids: employeeIds,
             groupby: groupByEmployee ? "employee_id" : "",
         });
@@ -274,10 +292,13 @@ export class TimesheetGridModel extends GridModel {
         const isProjectOrTaskInRows = rowFields.some((field) =>
             fieldsToConsider.includes(field.name)
         );
-        if (!(rowFields.some((field) => field.name === 'task_id') || (
-            (isProjectOrTaskAsSectionField || isProjectOrTaskInRows) &&
-            (isProjectIdInDomainFields || isTaskIdInDomainFields)
-        ))) {
+        if (
+            !(
+                rowFields.some((field) => field.name === "task_id") ||
+                ((isProjectOrTaskAsSectionField || isProjectOrTaskInRows) &&
+                    (isProjectIdInDomainFields || isTaskIdInDomainFields))
+            )
+        ) {
             return additionalGroups;
         }
 
@@ -418,7 +439,7 @@ export class TimesheetGridModel extends GridModel {
         const addTaskData = (taskDomain, limit) => {
             additionalGroups.push(
                 this.orm
-                    .webSearchRead("project.task", taskDomain.toList({}), {
+                    .call("project.task", "get_additional_groups", [], {
                         specification: {
                             display_name: {},
                             project_id: {
@@ -426,6 +447,7 @@ export class TimesheetGridModel extends GridModel {
                             },
                         },
                         limit: limit,
+                        domain: taskDomain.toList({}),
                     })
                     .then((data) => {
                         const records = data.records.map(({ id, display_name, project_id }) => ({
@@ -470,7 +492,9 @@ export class TimesheetGridModel extends GridModel {
                         row.valuePerFieldName[fieldName] && isMany2oneField
                             ? row.valuePerFieldName[fieldName][0]
                             : row.valuePerFieldName[fieldName];
-                    values.add(value);
+                    if (value) {
+                        values.add(value);
+                    }
                 }
             }
         }

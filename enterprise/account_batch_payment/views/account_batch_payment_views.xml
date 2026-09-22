@@ -5,7 +5,7 @@
             <field name="name">Create batch payment</field>
             <field name="model_id" ref="account.model_account_payment"/>
             <field name="binding_model_id" ref="account.model_account_payment"/>
-            <field name="binding_view_types">kanban</field>
+            <field name="binding_view_types">list,kanban</field>
             <field name="state">code</field>
             <field name="code">
 if records:
@@ -19,29 +19,21 @@ if records:
             <field name="arch" type="xml">
                 <form string="Batch Payment">
                 <header>
-                    <field name="id" invisible="1"/>
-                    <field name="file_generation_enabled" invisible="1"/>
                     <button id="print_button" name="print_batch_payment" string="Print" type="object" invisible="state != 'sent'"/>
                     <button id="regenerate_file_button" name="validate_batch_button" string="Re-generate Export File" type="object" invisible="not file_generation_enabled or state != 'sent' or not payment_ids"/>
                     <button id="validate_button" name="validate_batch_button" class="oe_highlight" string="Validate" type="object" invisible="state != 'draft' or not payment_ids"/>
                     <field name="state" widget="statusbar"/>
                 </header>
-                <field name="invalid_sct_partners_ids" invisible="1"/>
-                <div class="alert alert-danger" invisible="not invalid_sct_partners_ids" role="alert">
-                    The country or city of <a type="object" name="action_invalid_partners_from_sct">these partners</a>
-                    is not set, which could cause the file to be refused by the bank.
-                </div>
                 <sheet>
                     <group>
                         <group>
                             <field name="batch_type" readonly="payment_ids.length" force_save="1"/>
                             <field name="journal_id" domain="[('type', '=', 'bank')]" options="{'no_open': True, 'no_create': True}" readonly="state != 'draft'"/>
-                            <field name="currency_id" invisible="1"/>
-                            <field name="available_payment_method_ids" invisible="1"/>
                             <field name="payment_method_id" options="{'no_create': True, 'no_open': True}"
                                    required="1"
                                    readonly="state != 'draft' or payment_ids"/>
                             <field name="payment_method_code" invisible="1"/> <!--For use in modules depending on this one-->
+                            <field name="currency_id" invisible="1"/> <!-- Needed for the monetary field -->
                         </group><group>
                             <field name="date" readonly="state != 'draft'"/>
                             <field name="name" placeholder="Leave empty to generate automatically..." required="0" readonly="state != 'draft'"/>
@@ -61,13 +53,15 @@ if records:
                                     <field name="date" readonly="1"/>
                                     <field name="partner_id" readonly="1"/>
                                     <field name="memo" readonly="1"/>
-                                    <field name="payment_method_name" optional="hide" string="Payment method" readonly="1"/>
-                                    <field name="amount_signed" sum="Total" string="Amount" readonly="1"/>
-                                    <field name="currency_id" column_invisible="True"/>
-                                    <field name="state" column_invisible="True"/>
-                                    <field name="payment_method_id" column_invisible="True"/>
+                                    <field name="amount" readonly="1"/>
+                                    <field name="currency_id" invisible="1"/> <!-- Needed for the monetary field -->
                                 </list>
                             </field>
+                            <group class="px-3">
+                                <group class="oe_subtotal_footer" colspan="2">
+                                    <field name="amount_unsigned" string="Total"/>
+                                </group>
+                            </group>
                         </page>
                     </notebook>
                 </sheet>
@@ -104,7 +98,6 @@ if records:
                     <field name="date" readonly="state != 'draft'"/>
                     <field name="amount"/>
                     <field name="activity_ids" widget="list_activity" optional="show"/>
-                    <field name="currency_id" column_invisible="True"/>
                     <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'sent'" />
                 </list>
             </field>
@@ -167,8 +160,7 @@ if records:
                                     <field name="date"/>
                                     <field name="activity_ids" widget="kanban_activity"/>
                                 </div>
-                                <field name="state" class="ms-auto" widget="label_selection"
-                                       options="{'classes': {'new': 'default', 'sent': 'default', 'reconciled': 'success'}}"/>
+                                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'sent'" />
                             </footer>
                         </t>
                     </templates>
@@ -176,7 +168,7 @@ if records:
             </field>
         </record>
 
-        <menuitem action="action_batch_payment_in" name="Batch Payments" id="menu_batch_payment_sales" parent="account.menu_finance_receivables" sequence="18" groups="account.group_account_basic,account.group_account_readonly"/>
-        <menuitem action="action_batch_payment_out" name="Batch Payments" id="menu_batch_payment_purchases" parent="account.menu_finance_payables" sequence="21" groups="account.group_account_basic,account.group_account_readonly"/>
+        <menuitem action="action_batch_payment_in" name="Batch Payments" id="menu_batch_payment_sales" parent="account.menu_finance_receivables" sequence="18" groups="base.group_no_one"/>
+        <menuitem action="action_batch_payment_out" name="Batch Payments" id="menu_batch_payment_purchases" parent="account.menu_finance_payables" sequence="21" groups="base.group_no_one"/>
 
 </odoo>

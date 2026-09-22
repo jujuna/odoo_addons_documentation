@@ -1,18 +1,19 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 
 export class Box extends Component {
     static template = "iap_extract.Box";
-    static props = {
-        box: Object,
-        pageWidth: String,
-        pageHeight: String,
-        onClickBoxCallback: Function,
-    };
+    props = useProps({
+        box: t.object(),
+        pageWidth: t.string(),
+        pageHeight: t.string(),
+        onClickBoxCallback: t.function(),
+        onMouseHoverBoxCallback: t.function(),
+    });
     /**
      * @override
      */
     setup() {
-        this.state = useState(this.props.box);
+        this.state = proxy(this.props.box);
     }
 
     //--------------------------------------------------------------------------
@@ -38,5 +39,13 @@ export class Box extends Component {
 
     onClick() {
         this.props.onClickBoxCallback(this.state.id, this.state.page);
+    }
+
+    onMouseOver() {
+        this.props.onMouseHoverBoxCallback(this.state.id, true);
+    }
+
+    onMouseOut() {
+        this.props.onMouseHoverBoxCallback(this.state.id, false);
     }
 };

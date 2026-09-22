@@ -18,6 +18,7 @@ class HrPayslipRun(models.Model):
         ("error", "Error"),
     ], string="STP Status", compute="_compute_stp_status", help="Is the payslip ready for STP submission?")
     l10n_au_stp_count = fields.Integer(compute='_compute_stp_count')
+    l10n_au_superstream_submitted = fields.Boolean(string="SuperStream Submitted", compute="_compute_superstream_submitted")
 
     @api.depends('slip_ids', 'slip_ids.state')
     def _compute_stp_status(self):
@@ -37,14 +38,16 @@ class HrPayslipRun(models.Model):
     def _compute_stp_count(self):
         slip_stp = self.slip_ids._get_payslip_stp()
         for run in self:
-            run.l10n_au_stp_count = len(self.env["l10n_au.stp"].union(*(slip_stp[slip.id] for slip in run.slip_ids)))
+            run.l10n_au_stp_count = len(self.env["l10n_au.stp"].union(slip_stp[slip.id] for slip in run.slip_ids))
+
+    def _compute_superstream_submitted(self):
+        for run in self:
+            run.l10n_au_superstream_submitted = all(s.state == 'sent' for s in run.slip_ids._get_superstreams())
 
     def action_register_payment(self):
         self.ensure_one()
         if any(m.state != 'posted' for m in self.slip_ids.move_id):
             raise UserError(_("You can only register payment for posted journal entries."))
-        if not self.slip_ids.struct_id.rule_ids.filtered(lambda r: r.code == "NET").account_credit.reconcile:
-            raise UserError(_('The credit account on the NET salary rule is not reconciliable'))
 
         faulty_bank_accounts = self.slip_ids.employee_id.sudo().bank_account_ids.filtered(lambda b: not b.allow_out_payment)
         if faulty_bank_accounts:
@@ -71,6 +74,9 @@ class HrPayslipRun(models.Model):
     def action_open_payment_batch(self):
         return self.l10n_au_payment_batch_id._get_records_action()
 
+    def action_open_superstream(self):
+        return self.slip_ids.action_open_superstream()
+
     def action_post(self):
         self.slip_ids.move_id.action_post()
 
@@ -88,7 +94,7 @@ class HrPayslipRun(models.Model):
 
     def action_open_stp(self):
         return self.env["l10n_au.stp"]\
-            .union(*self.slip_ids._get_payslip_stp().values())\
+            .union(self.slip_ids._get_payslip_stp().values())\
             ._get_records_action(name=_("Single Touch Payroll"))
 
     def _are_payslips_ready(self):
@@ -101,5 +107,5 @@ class HrPayslipRun(models.Model):
     @api.ondelete(at_uninstall=False)
     def _l10n_au_on_payrun_delete(self):
         self.env["l10n_au.stp"] \
-            .union(*self.slip_ids._get_payslip_stp().values()) \
+            .union(self.slip_ids._get_payslip_stp().values()) \
             .unlink()

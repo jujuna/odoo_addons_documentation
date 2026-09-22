@@ -1,20 +1,114 @@
-import { useEffect } from "@odoo/owl";
-import { browser } from "../browser/browser";
+import { onMounted, onPatched, untrack } from "@odoo/owl";
+import { useLayoutEffect } from "@web/owl2/utils";
+import { memoize } from "@web/core/utils/functions";
+
+// ── Batch infrastructure ─────────────────────────────────────────────────────
+
+const pendingResizes = new Map(); // el → options, deduplicates by element
+let flushScheduled = false;
+/** @type {CanvasRenderingContext2D | null} lazily-created, reused to measure placeholder text */
+let measureCtx = null;
+
+function flushResizes() {
+    flushScheduled = false;
+    const items = [...pendingResizes];
+    pendingResizes.clear();
+
+    const inputs = items.filter(([el]) => el instanceof HTMLInputElement);
+    const textareas = items.filter(([el]) => !(el instanceof HTMLInputElement));
+
+    // ── Inputs: 3 reflows total regardless of N ──────────────────────────────
+    // Phase 1: write 100% to all
+    for (const [el] of inputs) {
+        el.style.width = "100%";
+    }
+    // Phase 2: read maxWidths from all
+    const maxWidths = inputs.map(([el]) => el.clientWidth);
+    // Phase 3: write 10px to all
+    for (const [el] of inputs) {
+        el.style.width = "10px";
+    }
+    // Phase 4: read scrollWidths + computed styles from all
+    const finalWidths = inputs.map(([el], i) => {
+        const style = window.getComputedStyle(el);
+        const borderWidth = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+        const paddingWidth = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+        let desiredWidth;
+        if (el.value === "" && el.placeholder !== "") {
+            // scrollWidth ignores the placeholder, so measure it directly.
+            measureCtx ??= document.createElement("canvas").getContext("2d");
+            measureCtx.font = style.font;
+            desiredWidth =
+                measureCtx.measureText(el.placeholder).width + borderWidth + paddingWidth + 1;
+        } else {
+            let boxExtraWidth = borderWidth;
+            if (doesScrollWidthExcludePadding()) {
+                boxExtraWidth += paddingWidth;
+            }
+            desiredWidth = el.scrollWidth + boxExtraWidth + 1;
+        }
+        return desiredWidth > maxWidths[i] ? "100%" : `${desiredWidth}px`;
+    });
+    // Phase 5: write final widths
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i][0].style.width = finalWidths[i];
+    }
+
+    // ── Textareas: 2 reflows total regardless of N ───────────────────────────
+    // Phase 1: read computed styles from all (no reflow)
+    const textareaData = textareas.map(([el, options]) => {
+        const style = window.getComputedStyle(el);
+        const previousStyle = {
+            borderTopWidth: style.borderTopWidth,
+            borderBottomWidth: style.borderBottomWidth,
+            padding: style.padding,
+        };
+        let heightOffset = 0;
+        if (style.boxSizing === "border-box") {
+            heightOffset =
+                parseFloat(style.paddingTop) +
+                parseFloat(style.paddingBottom) +
+                parseFloat(style.borderTopWidth) +
+                parseFloat(style.borderBottomWidth);
+        }
+        return { el, options, previousStyle, heightOffset };
+    });
+    // Phase 2: write intermediate styles to all (one reflow)
+    for (const { el } of textareaData) {
+        Object.assign(el.style, {
+            height: "auto",
+            borderTopWidth: 0,
+            borderBottomWidth: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+        });
+    }
+    // Phase 3: read scrollHeights from all
+    const heights = textareaData.map(({ el, options, heightOffset }) =>
+        Math.max(options.minimumHeight || 0, el.scrollHeight + heightOffset)
+    );
+    // Phase 4: write final styles to all (one reflow)
+    for (let i = 0; i < textareaData.length; i++) {
+        const { el, previousStyle } = textareaData[i];
+        Object.assign(el.style, previousStyle, { height: `${heights[i]}px` });
+        el.parentElement.style.height = `${heights[i]}px`;
+    }
+
+    // ── Callbacks ─────────────────────────────────────────────────────────────
+    for (const [el, options] of items) {
+        options.onResize?.(el, options);
+    }
+}
+
+// ── Public API ───────────────────────────────────────────────────────────────
 
 /**
- * This is used on text inputs or textareas to automatically resize it based on its
- * content each time it is updated. It takes the reference of the element as
- * parameter and some options. Do note that it may introduce mild performance issues
- * since it will force a reflow of the layout each time the element is updated.
- * Do also note that it only works with textareas that are nested as only child
- * of some parent div (like in the text_field component).
- *
  * @param {Ref} ref
  */
 export function useAutoresize(ref, options = {}) {
     let wasProgrammaticallyResized = false;
     let resize = null;
-    useEffect(
+    useLayoutEffect(
         (el) => {
             if (el) {
                 resize = (programmaticResize = false) => {
@@ -22,16 +116,15 @@ export function useAutoresize(ref, options = {}) {
                     if (options.ignoreIfEmpty && !el.value) {
                         return;
                     }
-                    if (el instanceof HTMLInputElement) {
-                        resizeInput(el, options);
-                    } else {
-                        resizeTextArea(el, options);
+                    pendingResizes.set(el, options);
+                    if (!flushScheduled) {
+                        flushScheduled = true;
+                        queueMicrotask(flushResizes);
                     }
-                    options.onResize?.(el, options);
                 };
-                el.addEventListener("input", () => resize(true));
+                const onInput = () => resize(true);
+                el.addEventListener("input", onInput);
                 const resizeObserver = new ResizeObserver(() => {
-                    // This ensures that the resize function is not called twice on input or page load
                     if (wasProgrammaticallyResized) {
                         wasProgrammaticallyResized = false;
                         return;
@@ -40,63 +133,45 @@ export function useAutoresize(ref, options = {}) {
                 });
                 resizeObserver.observe(el);
                 return () => {
-                    el.removeEventListener("input", resize);
+                    el.removeEventListener("input", onInput);
                     resizeObserver.unobserve(el);
                     resizeObserver.disconnect();
                     resize = null;
                 };
             }
         },
-        () => [ref.el]
+        () => [untrack(ref)]
     );
-    useEffect(() => {
+    const resizeProgrammatically = () => {
         if (resize) {
             resize(true);
         }
-    });
+    };
+    onMounted(resizeProgrammatically);
+    onPatched(resizeProgrammatically);
 }
 
 /**
- * @param {HTMLInputElement} input
- * @param {{ offset?: number }} [options]
- */
-function resizeInput(input, options) {
-    // This mesures the maximum width of the input which can get from the flex layout.
-    input.style.width = "100%";
-    const maxWidth = input.clientWidth;
-    // Somehow Safari 16 computes input sizes incorrectly. This is fixed in Safari 17
-    const isSafari16 = /Version\/16.+Safari/i.test(browser.navigator.userAgent);
-    // Minimum width of the input
-    input.style.width = "10px";
-    if (input.value === "" && input.placeholder !== "") {
-        input.style.width = "auto";
-        return;
-    }
-    if (input.scrollWidth + 5 + (isSafari16 ? 8 : 0) > maxWidth) {
-        input.style.width = "100%";
-        return;
-    }
-    input.style.width = input.scrollWidth + 5 + (isSafari16 ? 8 : 0) + (options.offset || 0) + "px";
-}
-
-/**
- * @param {HTMLTextAreaElement} input
+ * Exported for callers that resize a textarea directly (outside useAutoresize).
+ * @param {HTMLTextAreaElement} textarea
  * @param {{ minimumHeight?: number }} [options]
  */
 export function resizeTextArea(textarea, options = {}) {
     const minimumHeight = options.minimumHeight || 0;
-    let heightOffset = 0;
     const style = window.getComputedStyle(textarea);
-    if (style.boxSizing === "border-box") {
-        const paddingHeight = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
-        const borderHeight = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
-        heightOffset = borderHeight + paddingHeight;
-    }
     const previousStyle = {
         borderTopWidth: style.borderTopWidth,
         borderBottomWidth: style.borderBottomWidth,
         padding: style.padding,
     };
+    let heightOffset = 0;
+    if (style.boxSizing === "border-box") {
+        heightOffset =
+            parseFloat(style.paddingTop) +
+            parseFloat(style.paddingBottom) +
+            parseFloat(style.borderTopWidth) +
+            parseFloat(style.borderBottomWidth);
+    }
     Object.assign(textarea.style, {
         height: "auto",
         borderTopWidth: 0,
@@ -104,8 +179,24 @@ export function resizeTextArea(textarea, options = {}) {
         paddingTop: 0,
         paddingBottom: 0,
     });
-    textarea.style.height = "auto";
     const height = Math.max(minimumHeight, textarea.scrollHeight + heightOffset);
     Object.assign(textarea.style, previousStyle, { height: `${height}px` });
     textarea.parentElement.style.height = `${height}px`;
 }
+
+const doesScrollWidthExcludePadding = memoize(() => {
+    const input = document.createElement("input");
+    input.style.cssText = `
+        position: absolute;
+        visibility: hidden;
+        padding: 0;
+        border: 0;
+        width: auto;
+    `;
+    document.body.appendChild(input);
+    const widthWithoutPadding = input.scrollWidth;
+    input.style.padding = "10px";
+    const widthWithPadding = input.scrollWidth;
+    input.remove();
+    return widthWithPadding === widthWithoutPadding;
+});

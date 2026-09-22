@@ -1,4 +1,4 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { InteractiveEditorSidebar } from "@web_studio/client_action/view_editor/interactive_editor/interactive_editor_sidebar";
 import {
     ExistingFields,
@@ -35,10 +35,6 @@ class ListFieldNodeProperties extends FieldProperties {
 
 export class ListEditorSidebar extends Component {
     static template = "web_studio.ViewEditor.ListEditorSidebar";
-    static props = {
-        openViewInForm: { type: Function, optional: true },
-        openDefaultValues: { type: Function, optional: true },
-    };
     static components = {
         InteractiveEditorSidebar,
         NewFields,
@@ -48,8 +44,13 @@ export class ListEditorSidebar extends Component {
         SidebarViewToolbox,
     };
 
+    props = useProps({
+        openViewInForm: t.function().optional(),
+        openDefaultValues: t.function().optional(),
+    });
+
     setup() {
-        this.viewEditorModel = useState(this.env.viewEditorModel);
+        this.viewEditorModel = proxy(this.env.viewEditorModel);
         this.editArchAttributes = useEditNodeAttributes({ isRoot: true });
         this.propertiesComponents = {
             button: {

@@ -9,6 +9,8 @@ from .common import _check_with_xsd_patch, TestL10nClEdiCommon
 @tagged('post_install_l10n', 'post_install', '-at_install', 'l10n_cl_fetchmail_iec')
 @patch('odoo.tools.xml_utils._check_with_xsd', _check_with_xsd_patch)
 class TestClFetchmailServerIec(TestL10nClEdiCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

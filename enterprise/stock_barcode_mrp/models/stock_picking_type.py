@@ -1,4 +1,5 @@
 from odoo import fields, models
+from odoo.fields import Domain
 
 
 class StockPickingType(models.Model):
@@ -14,6 +15,15 @@ class StockPickingType(models.Model):
                 ('reservation_state', '=', 'assigned'),
             ])
 
+    def _compute_show_barcode_validation(self):
+        other_operation_types = self.env['stock.picking.type']
+        for picking_type in self:
+            if picking_type.code == 'mrp_operation':
+                picking_type.show_barcode_validation = not picking_type.restrict_scan_product
+            else:
+                other_operation_types |= picking_type
+        super(StockPickingType, other_operation_types)._compute_show_barcode_validation()
+
     def _compute_is_barcode_picking_type(self):
         for picking_type in self:
             if picking_type.code == 'mrp_operation':
@@ -24,7 +34,10 @@ class StockPickingType(models.Model):
     def get_action_picking_tree_ready_kanban(self):
         if self.code == 'mrp_operation':
             res = self._get_action('stock_barcode_mrp.mrp_action_kanban')
-            res['domain'] = [('picking_type_id.active', '=', True)]
+            res['domain'] = Domain.AND([
+                res['domain'],
+                [('picking_type_id.active', '=', True)],
+            ])
             return res
         return super().get_action_picking_tree_ready_kanban()
 

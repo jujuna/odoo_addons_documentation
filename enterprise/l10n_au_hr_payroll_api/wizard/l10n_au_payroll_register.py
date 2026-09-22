@@ -61,9 +61,9 @@ class L10n_AuPayrollRegister(models.TransientModel):
     payroll_responsible_phone = fields.Char(related="payroll_responsible_id.work_phone")
 
     journal_id = fields.Many2one(string="Bank Journal", comodel_name="account.journal", inverse="_inverse_journal_id")
-    bank_name = fields.Char(related="journal_id.bank_id.name", string="Bank Name", readonly=True)
+    bank_name = fields.Char(related="journal_id.bank_account_id.bank_name", string="Bank Name", readonly=True)
     bank_account_name = fields.Char(related="journal_id.company_partner_id.name", string="Account Name", readonly=True)
-    bank_account_number = fields.Char(related="journal_id.bank_acc_number", string="Bank Account Number", readonly=True)
+    bank_account_number = fields.Char(related="journal_id.bank_account_number", string="Bank Account Number", readonly=True)
     bank_account_bsb = fields.Char(related="journal_id.aba_bsb", string="BSB", readonly=True)
 
     attachment_ids = fields.Many2many(
@@ -155,11 +155,11 @@ class L10n_AuPayrollRegister(models.TransientModel):
                             action=self.journal_id._get_records_action(name=_("Configure Journal"), target="new"),
                             button_text=_("Configure Journal Bank Account")
                         )
-            if not bank_account.aba_bsb or not bank_account.bank_id:
+            if not bank_account._get_clearing_number('AU') or not bank_account.bank_bic:
                 raise RedirectWarning(
                     message=_("The account %(account_number)s, of journal '%(journal_name)s', is not valid.\n"
                     "Either its account number is incorrect or it has no BSB or Bank set.",
-                    account_number=bank_account.acc_number, journal_name=self.journal_id.name),
+                    account_number=bank_account.account_number, journal_name=self.journal_id.name),
                     action=bank_account._get_records_action(name=_("Configure Account"), target="new"),
                     button_text=_("Configure Account")
                 )

@@ -49,6 +49,7 @@ test("The geoJson service is given to the model for geo charts", async function 
         "North America",
         "United States",
         "South America",
+        "Oceania",
     ]);
 
     expect(model.getters.getGeoJsonFeatures("world")).toEqual(undefined);
@@ -76,9 +77,12 @@ test("Can create a geo chart on countries", async function () {
             type: "geo",
             title: { text: "test" },
             legendPosition: "none",
-            dataSets: [{ dataRange: "B1:B3" }],
-            labelRange: "A1:A3",
-            dataSetsHaveTitle: false,
+            dataSource: {
+                type: "range",
+                dataSets: [{ dataRange: "B1:B3" }],
+                dataSetsHaveTitle: false,
+                labelRange: "A1:A3",
+            },
             region: "world",
         },
     });
@@ -122,9 +126,12 @@ test("Can create a geo chart on US states", async function () {
             region: "usa",
             title: { text: "test" },
             legendPosition: "none",
-            dataSets: [{ dataRange: "B1:B3" }],
-            labelRange: "A1:A3",
-            dataSetsHaveTitle: false,
+            dataSource: {
+                type: "range",
+                dataSets: [{ dataRange: "B1:B3" }],
+                labelRange: "A1:A3",
+                dataSetsHaveTitle: false,
+            },
         },
     });
     await runAllTimers();

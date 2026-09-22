@@ -7,15 +7,15 @@
 # Pedro M. Baeza <pedro.baeza@tecnativa.com>, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-27 16:38+0000\n"
-"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
-"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:15+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-master/"
 "account_invoice_extract/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,12 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_invoice_extract
+#: model:ir.module.module,shortdesc:base.module_account_invoice_extract
+msgid "Account Invoice Extract"
+msgstr ""
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__message_needaction
@@ -59,8 +64,8 @@ msgstr "Puede mostrar el botón de reenvío OCR"
 
 #. module: account_invoice_extract
 #: model:ir.model,name:account_invoice_extract.model_res_company
-msgid "Companies"
-msgstr "Compañías"
+msgid "Company"
+msgstr ""
 
 #. module: account_invoice_extract
 #: model:ir.model,name:account_invoice_extract.model_res_config_settings
@@ -75,8 +80,8 @@ msgstr "Contacto"
 #. module: account_invoice_extract
 #. odoo-python
 #: code:addons/account_invoice_extract/models/account_invoice.py:0
-msgid "Couldn't reload AI data."
-msgstr "No se pudieron recargar los datos de IA."
+msgid "Couldn't reload data."
+msgstr ""
 
 #. module: account_invoice_extract
 #. odoo-javascript
@@ -158,12 +163,6 @@ msgid "Extract Detected Layout Id"
 msgstr "Extraer el ID del diseño detectado"
 
 #. module: account_invoice_extract
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_bank_statement_line__extract_partner_name
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_partner_name
-msgid "Extract Detected Partner Name"
-msgstr "Extraer el nombre del contacto detectado"
-
-#. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_bank_statement_line__extract_prefill_data
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_prefill_data
 msgid "Extract Prefill Data"
@@ -173,6 +172,11 @@ msgstr "Extraer datos para el relleno automático"
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_state_processed
 msgid "Extract State Processed"
 msgstr "Estado del estado procesado"
+
+#. module: account_invoice_extract
+#: model:ir.module.module,summary:base.module_account_invoice_extract
+msgid "Extract data from invoice scans to fill them automatically"
+msgstr ""
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_state
@@ -316,11 +320,6 @@ msgid "Ratings"
 msgstr "Calificaciones"
 
 #. module: account_invoice_extract
-#: model_terms:ir.ui.view,arch_db:account_invoice_extract.view_move_form_inherit_ocr
-msgid "Reload AI Data"
-msgstr "Recargar datos de IA"
-
-#. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Error de envío del SMS"
@@ -347,78 +346,19 @@ msgid "Vendor Bills"
 msgstr "Facturas de proveedores"
 
 #. module: account_invoice_extract
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__website_message_ids
-msgid "Website Messages"
-msgstr "Mensajes del sitio web"
-
-#. module: account_invoice_extract
-#: model:ir.model.fields,help:account_invoice_extract.field_account_move__website_message_ids
-msgid "Website communication history"
-msgstr "Historial de comunicación del sitio web"
-
-#. module: account_invoice_extract
 #. odoo-python
 #: code:addons/account_invoice_extract/models/account_invoice.py:0
 msgid "You cannot send a expense that is not in draft state!"
 msgstr "No se puede enviar un gasto que no esté en estado de borrador"
 
-#~ msgid ""
-#~ "All fields will be automated by Artificial Intelligence, it might take 5 "
-#~ "seconds."
-#~ msgstr ""
-#~ "Todos los campos serán automatizados por Inteligencia Artificial. Puede "
-#~ "tardar 5 segundos."
+msgid "Website Messages"
+msgstr "Mensajes del sitio web"
 
-#~ msgid "Created by"
-#~ msgstr "Creado por"
+msgid "Website communication history"
+msgstr "Historial de comunicación del sitio web"
 
-#~ msgid "Created on"
-#~ msgstr "Creado el"
+msgid "Couldn't reload AI data."
+msgstr "No se pudieron recargar los datos de IA."
 
-#~ msgid "Extract Word"
-#~ msgstr "Extraer palabra"
-
-#~ msgid "Extracted words from invoice scan"
-#~ msgstr "Palabras extraídas tras escanear la factura"
-
-#~ msgid "Field"
-#~ msgstr "Campo"
-
-#~ msgid "Invoice"
-#~ msgstr "Facturas"
-
-#~ msgid "Last Updated by"
-#~ msgstr "Última actualización por"
-
-#~ msgid "Last Updated on"
-#~ msgstr "Última actualización el"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Número de mensajes que requieren una acción"
-
-#~ msgid "User Selected"
-#~ msgstr "Usuario seleccionado"
-
-#~ msgid "Word Box Angle"
-#~ msgstr "Ángulo del cuadro de texto"
-
-#~ msgid "Word Box Height"
-#~ msgstr "Alto del cuadro de texto"
-
-#~ msgid "Word Box Midx"
-#~ msgstr "Alineación medio horizontal del cuadro de texto"
-
-#~ msgid "Word Box Midy"
-#~ msgstr "Alineación medio vertical del cuadro de texto"
-
-#~ msgid "Word Box Width"
-#~ msgstr "Ancho del cuadro de texto"
-
-#~ msgid "Word Page"
-#~ msgstr "Página de texto"
-
-#~ msgid "Word Text"
-#~ msgstr "Texto de Palabra"
-
-#~ msgid "You don't have enough credit to extract data from your invoice."
-#~ msgstr "No tiene suficiente crédito para extraer datos de su factura."
+msgid "Reload AI Data"
+msgstr "Recargar datos de IA"

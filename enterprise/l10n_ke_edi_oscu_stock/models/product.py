@@ -40,7 +40,7 @@ class ProductProduct(models.Model):
 
         # We must manually add these domains as this method may be called in a cron, with self.env.company set,
         # but as superuser, which causes issues when using product._read_group()
-        _domain_quant_loc, domain_move_in_loc, domain_move_out_loc = (
+        _domain_quant_loc, domain_move_in_loc, domain_move_out_loc, __, __ = (
             self.env['product.product'].with_context(warehouse=whs.ids)._get_domain_locations()
         )
 
@@ -52,7 +52,7 @@ class ProductProduct(models.Model):
             ('company_id', '=', self.env.company.id),
         ]
         # This param is set when l10n_ke_edi_oscu_stock is installed, and ensures that old moves are not sent.
-        if from_date := self.env['ir.config_parameter'].sudo().get_param('l10n_ke.start_stock_date'):
+        if from_date := self.env['ir.config_parameter'].sudo().get_str('l10n_ke.start_stock_date'):
             domain += [('date', '>=', from_date)]
 
         domain_move_in = domain + domain_move_in_loc
@@ -60,12 +60,12 @@ class ProductProduct(models.Model):
 
         moves_in_qty = sum(
             product_uom._compute_quantity(qty, self.uom_id, round=False)
-            for product_uom, qty in self.env['stock.move']._read_group(domain_move_in, ['product_uom'], ['quantity:sum'])
+            for product_uom, qty in self.env['stock.move']._read_group(domain_move_in, ['uom_id'], ['quantity:sum'])
         )
 
         moves_out_qty = sum(
             product_uom._compute_quantity(qty, self.uom_id, round=False)
-            for product_uom, qty in self.env['stock.move']._read_group(domain_move_out, ['product_uom'], ['quantity:sum'])
+            for product_uom, qty in self.env['stock.move']._read_group(domain_move_out, ['uom_id'], ['quantity:sum'])
         )
 
         correction_qty = -moves_in_qty + moves_out_qty

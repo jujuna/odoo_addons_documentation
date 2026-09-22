@@ -38,7 +38,7 @@ class L10n_Ke_Edi_OscuCode(models.Model):
 
     _order = 'sequence'
 
-    _rec_names_search = ['code', 'name', 'description']
+    _rec_names_search = ('code', 'name', 'description')
 
     code_type = fields.Selection(selection=CODE_TYPES, required=True)
     code = fields.Char(required=True)
@@ -119,7 +119,7 @@ class L10n_Ke_Edi_OscuCode(models.Model):
             return
 
         # The API will return all codes added since this date
-        last_request_date = self.env['ir.config_parameter'].get_param('l10n_ke_oscu.last_code_request_date', '20180101000000')
+        last_request_date = self.env['ir.config_parameter'].get_str('l10n_ke_oscu.last_code_request_date') or '20180101000000'
         error, data, _date = company._l10n_ke_call_etims('selectCodeList', {'lastReqDt': last_request_date})
         if error:
             if error['code'] == '001':
@@ -129,4 +129,4 @@ class L10n_Ke_Edi_OscuCode(models.Model):
             return
         created, updated = self.sudo()._create_or_update_from_vals(self._get_vals_from_json(data))
         _logger.info("Fetched KRA standard codes from the OSCU, created %i and updated %i.", len(created), len(updated))
-        self.env['ir.config_parameter'].sudo().set_param('l10n_ke_oscu.last_code_request_date', format_etims_datetime(fields.Datetime.now()))
+        self.env['ir.config_parameter'].sudo().set_str('l10n_ke_oscu.last_code_request_date', format_etims_datetime(fields.Datetime.now()))

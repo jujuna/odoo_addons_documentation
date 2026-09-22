@@ -12,7 +12,7 @@ class AccountPaymentMethod(models.Model):
     @api.depends('code')
     def _compute_is_iso20022(self):
         for method in self:
-            method.is_iso20022 = method.code and method.code.startswith('iso20022')
+            method.is_iso20022 = method.code and method.code.startswith('iso20022') or method.code == 'sepa_ct'
 
     @api.model
     def _get_payment_method_information(self):

@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("approvals_tour", {
-    url: "/odoo",
     steps: () => [
         {
             trigger: '.o_app[data-menu-xmlid="approvals.approvals_menu_root"]',
@@ -19,13 +18,13 @@ registry.category("web_tour.tours").add("approvals_tour", {
             run: "edit Business Trip To Berlin",
         },
         {
-            trigger: '.o_field_widget[name="date_start"] input',
             content: "give start date",
+            trigger: ".o_field_widget[name='date_start'] input:first",
             run: "edit 12/13/2018 13:00:00",
         },
         {
-            trigger: '.o_field_widget[name="date_end"] input',
             content: "give end date",
+            trigger: ".o_field_widget[name='date_start'] input:last",
             run: "edit 12/20/2018 13:00:00",
         },
         {
@@ -39,12 +38,12 @@ registry.category("web_tour.tours").add("approvals_tour", {
             run: "editor (We need to go, because reason (and also for beer)))",
         },
         {
-            trigger: 'a:contains("Approver(s)"):first',
+            trigger: 'button:contains("Approver(s)"):first',
             content: "open approvers page",
             run: "click",
         },
         {
-            trigger: ".o_field_x2many_list_row_add > a",
+            trigger: ".o_field_x2many_list_row_add > button",
             content: "add an approver",
             run: "click",
         },

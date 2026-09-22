@@ -118,9 +118,8 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
 
         self.env.flush_all()
 
-        report._init_currency_table(options)
         expressions = report.line_ids.expression_ids
-        results = self._report_custom_engine_intrastat(expressions, options, expressions[0].date_scope, 'id', None)
+        results = self._report_engine_intrastat(options, expressions[0].date_scope, expressions.grouped('formula'), 'id', None)[expressions]
 
         # items are divided by regime (system)
         items = defaultdict(list)
@@ -157,7 +156,8 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
     def _get_company_identifier(self, company_id, values):
         """ Return: FR (ISO code of the country) + VAT number key (2 alphanumeric) + SIREN number (9 digits) + NIC complement (5 digits) """
         company_vat = company_id.vat or ''
-        company_nic = company_id.company_registry[9:14] if company_id.company_registry and len(company_id.company_registry) >= 14 else ''
+        siret = company_id.l10n_fr_siret or ''
+        company_nic = siret[9:14] if siret and len(siret) >= 14 else ''
         if not company_vat or not company_nic:
             values['errors']['company_vat_or_siret_missing'] = {
                 'message': _("The VAT or SIRET code is not properly set on the company."),
@@ -181,7 +181,7 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
             missing_required_values['region_code'].append(item['grouping_key'])
 
         if not item['transport_code']:
-            missing_required_values['transport_code'].append(item['move_id'])
+            missing_required_values['transport_code'].append(item['grouping_key'])
 
         # default intrastat use QV OR QN for missing partner VAT code but France does not accept this notation
         if item['system'] == '21' and (not item['partner_vat'] or item['partner_vat'].startswith('QV') or item['partner_vat'].startswith('QN')):
@@ -210,6 +210,7 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
                     context={**self.env.context, 'create': False, 'delete': False, 'expand': True},
                     views=[(move_lines_view.id, "list"), (False, 'form')],
                     options=options,
+                    domain=[('id', '=', move_lines.ids)],
                 ),
             }
 
@@ -234,6 +235,7 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
                     name=_('Invalid transaction intrastat code entries.'),
                     context={**self.env.context, 'create': False, 'delete': False, 'expand': True},
                     views=[(move_lines_view.id, "list"), (False, 'form')],
+                    domain=[('id', '=', move_lines.ids)],
                 ),
             }
 
@@ -259,6 +261,7 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
                     name=_('Invalid transaction intrastat code entries.'),
                     context={**self.env.context, 'create': False, 'delete': False, 'expand': True},
                     views=[(move_lines_view.id, "list"), (False, 'form')],
+                    domain=[('id', '=', move_lines.ids)],
                 ),
             }
 
@@ -302,7 +305,7 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
 
             # Determine values fields
             if is_weight_required:
-                grouped_items = defaultdict(lambda: {'value': 0, 'weight': 0})
+                grouped_items = defaultdict(lambda: {'value': 0, 'weight': 0, 'supplementary_units': 0})
             else:
                 grouped_items = defaultdict(lambda: {'value': 0})
 
@@ -311,7 +314,12 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
                 item_group_key = tuple(item[prop] for prop in grouping_key)
                 grouped_items[item_group_key]['value'] += item['value']
                 if is_weight_required:
-                    grouped_items[item_group_key]['weight'] += float(item['weight'])
+                    item_weight = item['weight']
+                    if not item_weight:
+                        weightless_product = self.env['product.template'].search([["id", '=', item['product_id']]])
+                        raise UserError(_("%s requires a weight.", weightless_product.name))
+                    grouped_items[item_group_key]['weight'] += float(item.get('weight', '0').replace(',', '.'))
+                    grouped_items[item_group_key]['supplementary_units'] += float((item.get('supplementary_units') or '0').replace(',', '.'))
 
             # Convert the grouped_items dictionary back to a list of dictionaries
             items[regime] = [dict(zip(grouping_key, grouped_item_key)) | grouped_item_values
@@ -323,8 +331,9 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
         def round_half_up(value):
             return int(float_round(value, precision_digits=0, rounding_method='HALF-UP'))
 
-        for regime_items in items.values():
-            for item in regime_items:
+        for regime in items:
+            new_item_list = []
+            for item in items[regime]:
                 # The weight must be rounded off in kilograms.
                 # Weights below 1 kilogram should be rounded off above.
                 if item.get('weight'):
@@ -335,8 +344,10 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
                     item['supplementary_units'] = round_half_up(item['supplementary_units']) or 1
 
                 item['value'] = round_half_up(item['value'])
-                if item['value'] <= 0:
-                    regime_items.remove(item)
+                if item['value'] > 0:
+                    new_item_list.append(item)
+
+            items[regime] = new_item_list
 
     @api.model
     def _generate_envelope_data(self, options, company, values):
@@ -458,15 +469,8 @@ class AccountIntrastatServicesReportHandler(models.AbstractModel):
         report = self.env['account.report'].browse(options['report_id'])
         options = report.get_options(previous_options={**options, 'export_mode': 'file'})
 
-        report._init_currency_table(options)
         expressions = report.line_ids.expression_ids
-        results = self._report_custom_engine_intrastat(
-            expressions=expressions,
-            options=options,
-            date_scope=None,
-            current_groupby='id',
-            next_groupby=None,
-        )
+        results = self._report_engine_intrastat(options, None, expressions.grouped('formula'), 'id')[expressions]
         move_ids = {item['move_id'] for _grouping_key, item in results}
         moves = self.env['account.move'].browse(move_ids)
 

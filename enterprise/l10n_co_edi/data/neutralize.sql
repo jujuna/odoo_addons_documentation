@@ -1,3 +1,3 @@
--- disable l10n_co edi integration
 UPDATE res_company
-   SET l10n_co_edi_test_mode = true;
+SET l10n_co_edi_test_environment = true,
+    l10n_co_edi_certification_process = false;

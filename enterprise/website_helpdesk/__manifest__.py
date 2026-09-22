@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -15,7 +14,7 @@
         'data/helpdesk_data.xml',
         'views/helpdesk_views.xml',
         'views/helpdesk_templates.xml',
-        'security/website_helpdesk_security.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',
@@ -30,6 +29,9 @@
         ],
         'website.website_builder_assets': [  # Should use website.website_builder
             'website_helpdesk/static/src/js/website_helpdesk_form_editor.js',
+        ],
+        "website.assets_inside_builder_iframe": [
+            "website_helpdesk/static/src/js/**/*.edit.*",
         ],
         'website.assets_editor': [
             'website_helpdesk/static/src/js/website_helpdesk_edit_menu.js',

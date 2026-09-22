@@ -13,7 +13,7 @@
                         </div>
                     </div>
                     <div class="card-body h-100">
-                        <t t-if="team.website_top_channels" class="card-title">
+                        <t t-if="team.website_top_channels">
                             <small class="text-muted text-uppercase">
                                 <t t-if="len(team.website_top_channels) &gt; 4">Most popular</t>
                                 <t t-else="">Quick Links</t>
@@ -46,28 +46,27 @@
     <template id="search_result" name="Knowledge Base: Slides Search Result">
         <div class="d-flex w-100 py-4 border-top">
             <p class="mt-1 text-400">
-                <i class="fa fa-2x fa-mortar-board" title="eLearning"/>
+                <i class="oi oi-2x" data-icon="school" title="eLearning"/>
             </p>
             <div class="w-100 ms-3">
                 <h5 class="mb-1">
                     <a t-att-href="url" target="_blank" t-out="record.name" class="fw-bold"/>
                 </h5>
                 <small>
-                    <time t-field="record.date_published" t-options='{"format": "d MMM yyyy"}'/>
+                    <time t-field="record.published_date" t-options='{"format": "d MMM yyyy"}'/>
                     <t t-if="record.user_id">
                         , by <a t-attf-href="/profile/user/{{record.user_id.id}}" class="fw-bold" t-out="record.user_id.name"/>
-                        <t t-call="website_slides.slides_misc_user_image">
-                            <t t-set="user" t-value="record.user_id"/>
-                            <t t-set="img_class" t-value="'rounded-circle me-1'"/>
-                            <t t-set="img_style" t-value="'width: 20px; height: 20px; object-fit: cover; vertical-align: sub;'"/>
-                        </t>
+                        <t t-call="website_slides.slides_misc_user_image"
+                            user="record.user_id"
+                            img_class.f="rounded-circle me-1"
+                            img_style.f="width: 20px; height: 20px; object-fit: cover; vertical-align: sub;"/>
                     </t>
                     | <t t-out="record.total_views"/> Views
                     | <t t-out="record.likes"/> Likes
                     | <t t-out="record.comments_count"/> Comments
-                    | <i class="fa fa-folder-open-o"/> <a class="fw-bold" t-att-href="record.channel_id.website_absolute_url" t-out="record.channel_id.name"/>
+                    | <i class="oi" data-icon="folder_open"/> <a class="fw-bold" t-att-href="record.channel_id.website_absolute_url" t-out="record.channel_id.name"/>
                 </small>
-                <div class="whelpdesk_search_description mt-3 text-break text-muted overflow-hidden" t-if="record.description and (record.is_preview or record.channel_id.is_member)" t-out="record.description"/>
+                <div class="whelpdesk_search_description o_line_clamp mt-3 text-break text-muted" style="--lines-clamp: 4;" t-if="record.description and (record.is_preview or record.channel_id.is_member)" t-out="record.description"/>
                 <p class="d-flex gap-1 flex-wrap mt-3 mb-0" t-if="record.tag_ids">
                     <a t-foreach="record.tag_ids" t-as="tag" t-attf-href="?{{ keep_query('*', tag=tag.name.lower()) }}" class="badge text-bg-secondary" t-out="tag.name"/>
                 </p>
@@ -78,7 +77,7 @@
     <template id="channel_search_result" name="Knowledge Base: Slide Channel Search Result">
         <div class="d-flex w-100 py-4 border-top">
             <p class="mt-1 text-400">
-                <i class="fa fa-2x fa-mortar-board" title="eLearning Course"/>
+                <i class="oi oi-2x" data-icon="school" title="eLearning Course"/>
             </p>
             <div class="w-100 ms-3">
                 <h5 class="mb-1">
@@ -88,22 +87,20 @@
                     <time t-field="record.slide_last_update" t-options='{"format": "d MMM yyyy"}'/>
                     <t t-if="record.user_id">
                         , by <a t-attf-href="/profile/user/{{record.user_id.id}}" class="fw-bold" t-out="record.user_id.name"/>
-                        <t t-call="website_slides.slides_misc_user_image">
-                            <t t-set="user" t-value="record.user_id"/>
-                            <t t-set="img_class" t-value="'rounded-circle me-1'"/>
-                            <t t-set="img_style" t-value="'width: 20px; height: 20px; object-fit: cover; vertical-align: sub;'"/>
-                        </t>
+                        <t t-call="website_slides.slides_misc_user_image"
+                            user="record.user_id"
+                            img_class.f="rounded-circle me-1"
+                            img_style.f="width: 20px; height: 20px; object-fit: cover; vertical-align: sub;"/>
                     </t>
                     | <t t-out="record.nbr_document"/> <t t-if="record.channel_type == 'training'">Lessons</t><t t-else="">Documents</t>
                     | <t t-out="round(record.total_time)"/> Hours to Complete
                     | <t t-out="record.members_count"/> Members
-                    | <t t-call="portal_rating.rating_widget_stars_static">
-                        <t t-set="inline_mode" t-value="1"/>
-                        <t t-set="rating_avg" t-value="record.rating_avg_stars"/>
-                        <t t-set="rating_count" t-value="record.rating_count"/>
-                    </t>
+                    | <t t-call="portal_rating.rating_widget_stars_static"
+    inline_mode="1"
+    rating_avg="record.rating_avg_stars"
+    rating_count="record.rating_count"/>
                 </small>
-                <div class="whelpdesk_search_description mt-3 text-break text-muted overflow-hidden" t-if="record.description" t-out="record.description"/>
+                <div class="whelpdesk_search_description o_line_clamp mt-3 text-break text-muted" style="--lines-clamp: 4;" t-if="record.description" t-out="record.description"/>
                 <p class="d-flex gap-1 flex-wrap mt-3 mb-0" t-if="record.tag_ids">
                     <a t-foreach="record.tag_ids" t-as="tag" t-attf-href="?{{ keep_query('*', tag=tag.name.lower()) }}" t-attf-class="o_tag #{'o_color_'+str(tag.color)} badge" t-out="tag.name"/>
                 </p> 
@@ -112,11 +109,10 @@
     </template>
 
     <template id="website_helpdesk_slides.helpdesk_courses">
-        <t t-call="website.layout">
-            <t t-set="body_classname" t-value="'o_wslides_body'"/>
+        <t t-call="website.layout" body_classname.f="o_wslides_body">
             <div id="wrap" class="wrap o_wslides_wrap mt-3">
                 <t t-call="website_slides.courses_search_results"/>
-                <t t-call="website_slides.courses_footer"></t>
+                <t t-call="website_slides.courses_footer"/>
             </div>
         </t>
     </template>

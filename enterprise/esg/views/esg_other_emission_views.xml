@@ -19,7 +19,7 @@
                     <group>
                         <group>
                             <field name="date" widget="esg_daterange" options="{'end_date_field': 'date_end'}"/>
-                            <field name="esg_emission_factor_id"/>
+                            <field name="esg_emission_factor_id" context="{'search_default_my_country_filter': True, 'search_default_group_by_country': True}"/>
                             <field name="company_id"/>
                             <field name="note"/>
                         </group>
@@ -30,7 +30,11 @@
                                 <field name="uom_id" required="compute_method == 'physically'" invisible="not esg_emission_factor_id or compute_method == 'monetary'" placeholder="Unit of Measure"/>
                                 <field name="currency_id" required="compute_method == 'monetary'" invisible="not esg_emission_factor_id or compute_method == 'physically'" placeholder="Currency"/>
                             </div>
-                            <field name="esg_uncertainty_value" widget="percentage"/>
+                            <label for="esg_uncertainty_value"/>
+                            <div class="d-inline-flex">
+                                <field name="esg_uncertainty_value" class="pe-2" widget="percentage"/>
+                                (<field name="esg_uncertainty_absolute_value"/><span class="ps-2">kgCO₂e</span>)
+                            </div>
                         </group>
                     </group>
                 </sheet>

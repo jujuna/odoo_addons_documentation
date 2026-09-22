@@ -2,7 +2,6 @@
 {
     'name': 'Accounting - Expense',
     'category': 'Accounting/Accounting',
-    'version': '1.0',
     'description': """
 Accounting Expense Bridge
 """,

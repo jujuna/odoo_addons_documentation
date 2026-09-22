@@ -1,32 +1,14 @@
+import { registry } from "@web/core/registry";
+import { makeActiveField } from "@web/model/relational_model/utils";
+import { listView } from "@web/views/list/list_view";
 import {
     AttachmentPreviewListController,
     AttachmentPreviewListRenderer,
 } from "../../attachment_preview_list_view/attachment_preview_list_view";
-import { registry } from "@web/core/registry";
-import { listView } from "@web/views/list/list_view";
-import { useChildSubEnv } from "@odoo/owl";
-import { makeActiveField } from "@web/model/relational_model/utils";
+import { BankRecControlPanel } from "../control_action/control_action";
+import { BankRecModel } from "../kanban_renderer";
 
 export class BankRecListController extends AttachmentPreviewListController {
-    setup() {
-        super.setup(...arguments);
-
-        this.skipKanbanRestore = {};
-
-        useChildSubEnv({
-            skipKanbanRestoreNeeded: (stLineId) => this.skipKanbanRestore[stLineId],
-        });
-    }
-
-    /**
-     * Override
-     * Don't allow bank_rec_form to be restored with previous values since the statement line has changed.
-     */
-    async onRecordSaved(record) {
-        this.skipKanbanRestore[record.resId] = true;
-        return super.onRecordSaved(...arguments);
-    }
-
     get previewerStorageKey() {
         return "account.statement_line_pdf_previewer_hidden";
     }
@@ -51,6 +33,55 @@ export class BankRecListController extends AttachmentPreviewListController {
                 mimetype: makeActiveField(),
             },
         };
+        params.config.activeFields.partner_id = makeActiveField();
+        params.config.activeFields.partner_id.related = {
+            fields: {
+                id: { name: "id", type: "int" },
+                property_account_receivable_id: {
+                    name: "property_account_receivable_id",
+                    type: "many2one",
+                },
+                property_account_payable_id: {
+                    name: "property_account_payable_id",
+                    type: "many2one",
+                },
+            },
+            activeFields: {
+                id: makeActiveField(),
+                property_account_receivable_id: makeActiveField(),
+                property_account_payable_id: makeActiveField(),
+            },
+        };
+        params.config.activeFields.line_ids = makeActiveField();
+        params.config.activeFields.line_ids.readonly = true;
+        params.config.activeFields.line_ids.related = {
+            fields: {
+                reconcile_model_id: { name: "reconcile_model_id", type: "many2one" },
+            },
+            activeFields: {
+                reconcile_model_id: makeActiveField(),
+            },
+        };
+        params.config.activeFields.journal_id = makeActiveField();
+        params.config.activeFields.journal_id.related = {
+            fields: {
+                suspense_account_id: { name: "suspense_account_id", type: "many2one" },
+                default_account_id: { name: "default_account_id", type: "many2one" },
+            },
+            activeFields: {
+                suspense_account_id: makeActiveField(),
+                default_account_id: makeActiveField(),
+            },
+        };
+        params.config.activeFields.company_id = makeActiveField();
+        params.config.activeFields.company_id.related = {
+            fields: {
+                id: { name: "id", type: "int" },
+            },
+            activeFields: {
+                id: makeActiveField(),
+            },
+        };
         return params;
     }
 
@@ -72,8 +103,10 @@ export class BankRecListRenderer extends AttachmentPreviewListRenderer {}
 
 export const bankRecListView = {
     ...listView,
+    ControlPanel: BankRecControlPanel,
     Controller: BankRecListController,
     Renderer: BankRecListRenderer,
+    Model: BankRecModel,
 };
 
 registry.category("views").add("bank_rec_list", bankRecListView);

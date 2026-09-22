@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests.common import HttpCase
+from odoo.tests.common import tagged, HttpCase
 
 from odoo.addons.helpdesk.tests.common import HelpdeskCommon
 from odoo.addons.http_routing.tests.common import MockRequest
@@ -8,6 +8,7 @@ from odoo.addons.website_forum.tests.common import TestForumCommon
 from odoo.addons.website_helpdesk_forum.controllers.website_forum import WebsiteForumHelpdesk
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHelpdeskForumTicketCreation(HttpCase, TestForumCommon, HelpdeskCommon):
 
     @classmethod
@@ -48,12 +49,12 @@ class TestHelpdeskForumTicketCreation(HttpCase, TestForumCommon, HelpdeskCommon)
 
         forum = self.env['forum.forum'].create({
             'name': 'Discussions on Mushrooms',
-        })
+        }).with_context(website_id=self.base_website.id)
         self.test_team['website_forum_ids'] = forum
         forum_post = self.env['forum.post'].create({
             'name': 'This is forum post',
             'forum_id': forum.id,
-        })
+        }).with_context(website_id=self.base_website.id)
         slug = self.env['ir.http']._slug
         url = f'/forum/{slug(forum)}/{slug(forum_post)}/get-forum-data'
         forum_data = self.make_jsonrpc_request(url)

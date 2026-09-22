@@ -2,8 +2,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import Command
 from odoo.addons.mrp_plm.tests.test_common import TestPlmCommon
-from odoo.tests import Form
+from odoo.exceptions import UserError
+from odoo.tests import tagged, Form
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMrpWorkorderPlm(TestPlmCommon):
 
     @classmethod
@@ -62,10 +65,10 @@ class TestMrpWorkorderPlm(TestPlmCommon):
         # Creates a new MO and modifies some fields. Don't confirm it since we want to keep the dozen as the used UoM.
         mo_form = Form(self.env['mrp.production'])
         mo_form.bom_id = self.bom_table
-        mo_form.product_uom_id = uom_dozen
+        mo_form.uom_id = uom_dozen
         mo_form.product_qty = 2
         with mo_form.move_raw_ids.edit(1) as table_leg_raw_move:
-            table_leg_raw_move.product_uom = uom_dozen
+            table_leg_raw_move.uom_id = uom_dozen
             table_leg_raw_move.product_uom_qty = 8
         mo = mo_form.save()
         mo_form = Form(mo)
@@ -115,10 +118,12 @@ class TestMrpWorkorderPlm(TestPlmCommon):
             'test_type_id': self.env.ref('quality.test_type_instructions').id,
         })
 
-        # Check correctness
         self.assertEqual(eco1.routing_change_ids[0].change_type, 'update', "Wrong type on operation change line.")
-        self.assertEqual(eco1.routing_change_ids[1].change_type, 'remove', "Wrong type on operation change line.")
-        self.assertEqual(eco1.routing_change_ids[2].change_type, 'add', "Wrong type on operation change line.")
+        self.assertTrue(eco1.routing_change_ids[0].quality_point_id and eco1.routing_change_ids[0].old_quality_point_id)
+        self.assertEqual(eco1.routing_change_ids[1].change_type, 'update', "Wrong type on operation change line.")
+        self.assertTrue(not eco1.routing_change_ids[1].quality_point_id and eco1.routing_change_ids[1].old_quality_point_id)
+        self.assertEqual(eco1.routing_change_ids[2].change_type, 'update', "Wrong type on operation change line.")
+        self.assertTrue(eco1.routing_change_ids[2].quality_point_id and not eco1.routing_change_ids[2].old_quality_point_id)
 
     def test_add_new_step_to_wo_aside_bom(self):
         """
@@ -132,7 +137,7 @@ class TestMrpWorkorderPlm(TestPlmCommon):
             'workorder_ids': [
                 Command.create({
                     'name': 'Test WO',
-                    'product_uom_id': self.table.uom_id.id,
+                    'uom_id': self.table.uom_id.id,
                     'workcenter_id': self.workcenter_1.id,
                 }),
             ]
@@ -150,6 +155,42 @@ class TestMrpWorkorderPlm(TestPlmCommon):
             'name': 'QC Test',
         })
         add_step_check.add_check_in_chain()
+        self.assertFalse(add_step_check.point_id)
+        self.assertFalse(self.bom_table.eco_ids)
+
+    def test_add_check_in_chain_when_operation_match_is_ambiguous_or_missing(self):
+        """
+        Ensure a quality check can only be added when exactly one BOM operation matches the work order operation.
+        """
+        # Make sure both operations have the same name and workcenter
+        self.bom_table.operation_ids[1].write({
+            'name': self.bom_table.operation_ids[0].name,
+            'workcenter_id': self.bom_table.operation_ids[0].workcenter_id.id,
+        })
+        mo = self.env['mrp.production'].create({
+            'product_id': self.table.id,
+            'bom_id': self.bom_table.id,
+            'product_qty': 1,
+        })
+        mo.action_confirm()
+
+        wo = mo.workorder_ids
+        add_step_check = self.env['quality.check'].create({
+            'test_type_id': self.env.ref('quality.test_type_instructions').id,
+            'workorder_id': wo[0].id,
+            'production_id': mo.id,
+            'product_id': self.table.id,
+            'team_id': self.env['quality.alert.team'].search(['|', ('company_id', '=', self.env.company.id), ('company_id', '=', False)], limit=1).id,
+            'name': 'QC Test',
+        })
+        with self.assertRaisesRegex(UserError,
+                'Unable to add the proposed step to the corresponding Engineering Change Order .* for '
+                'this work order .* because multiple operations were matched with the WO. '
+                'Please differentiate the operations by name, work center, or product variant. '
+                'Please let your manager know if you need additional assistance for your proposed change.'
+            ):
+            add_step_check.add_check_in_chain()
+
         self.assertFalse(add_step_check.point_id)
         self.assertFalse(self.bom_table.eco_ids)
 

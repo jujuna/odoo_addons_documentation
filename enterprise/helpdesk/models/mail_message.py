@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from zoneinfo import ZoneInfo
+
 from odoo import models, api
 
 
@@ -60,7 +62,12 @@ class MailMessage(models.Model):
                 if not calendar:
                     continue
 
-                duration_data = calendar.get_work_duration_data(oldest_unanswered_customer_message_date, message.date, compute_leaves=True)
+                tz = self.env.company.tz or 'UTC'
+                duration_data = calendar.get_work_duration_data(
+                    oldest_unanswered_customer_message_date.astimezone(ZoneInfo(tz)),
+                    message.date.astimezone(ZoneInfo(tz)),
+                    compute_leaves=True
+                )
                 delta_hours = duration_data['hours']
                 if not ticket.answered_customer_message_count:
                     ticket.first_response_hours = delta_hours

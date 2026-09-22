@@ -3,22 +3,36 @@
 # * delivery_envia
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Bren Driesen <brdri@odoo.com>, 2025.
+# Bren Driesen <brdri@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-12-30 12:59+0000\n"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-17 23:41+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
 "delivery_envia/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_envia
+#: model:ir.module.module,description:base.module_delivery_envia
+msgid ""
+"\n"
+"Send your shippings through Envia and track them online\n"
+"=======================================================\n"
+"\n"
+"Envia is a provider of integrated shipping and tracking solutions for "
+"growing e-commerce businesses.\n"
+"Seamlessly integrating with a large range of couriers and platforms,\n"
+"you can streamline every step of your fulfilment process,\n"
+"reduce handling time and improve customer experience.\n"
+msgstr ""
 
 #. module: delivery_envia
 #. odoo-python
@@ -34,10 +48,10 @@ msgstr ". Via deze link krijg je persoonlijke aandacht plus lagere prijzen."
 #. module: delivery_envia
 #: model_terms:ir.ui.view,arch_db:delivery_envia.view_shipping_method_envia
 msgid ""
-"<i class=\"fa fa-info-circle\"/> Available shipping services depend on "
+"<i class=\"oi\" data-icon=\"info\"/> Available shipping services depend on "
 "enabled carriers in your Envia account."
 msgstr ""
-"<i class=\"fa fa-info-circle\"/> Beschikbare verzendservices zijn "
+"<i class=\"oi\" data-icon=\"info\"/> Beschikbare verzendservices zijn "
 "afhankelijk van de ingeschakelde vervoerders in je Envia account."
 
 #. module: delivery_envia
@@ -71,11 +85,6 @@ msgstr "Nieuwe dragers toevoegen in Envia"
 #: model:ir.model.fields.selection,name:delivery_envia.selection__stock_package_type__envia_mail_type__box
 msgid "Box"
 msgstr "Doos"
-
-#. module: delivery_envia
-#: model_terms:ir.ui.view,arch_db:delivery_envia.view_shipping_method_envia
-msgid "Cancel"
-msgstr "Annuleren"
 
 #. module: delivery_envia
 #: model:ir.model.fields,field_description:delivery_envia.field_stock_package_type__package_carrier_type
@@ -194,6 +203,11 @@ msgid "Delivery"
 msgstr "Levering"
 
 #. module: delivery_envia
+#: model:ir.model,name:delivery_envia.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "Leveringsmethode"
+
+#. module: delivery_envia
 #: model:ir.model.fields,field_description:delivery_envia.field_delivery_carrier__envia_residential_delivery
 msgid "Delivery Residential Zone"
 msgstr "Levering Woongebied"
@@ -207,6 +221,7 @@ msgstr "Leveringsprijs"
 #: model:ir.model.fields,field_description:delivery_envia.field_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_envia.field_envia_shipping_wizard__display_name
 #: model:ir.model.fields,field_description:delivery_envia.field_stock_package_type__display_name
+#: model:ir.model.fields,field_description:delivery_envia.field_stock_picking__display_name
 msgid "Display Name"
 msgstr "Weergavenaam"
 
@@ -290,10 +305,10 @@ msgid ""
 "does not match the type set on the carrier (%(carrier_package_type)s). Use a "
 "different package or different carrier that matches the mail type."
 msgstr ""
-"Envia Fout: Het Envia-posttype (%(package_types)s) dat is ingesteld op de "
-"verpakking(en) komt niet overeen met het type dat is ingesteld op de "
-"vervoerder (%(carrier_package_type)s). Gebruik een ander pakket of een "
-"andere vervoerder die overeenkomt met het posttype."
+"Envia Fout: Het Envia-posttype (%(package_types)s) dat is ingesteld op je "
+"pakket(ten) komt niet overeen met het type dat is ingesteld op de vervoerder "
+"(%(carrier_package_type)s). Gebruik een ander pakket of een andere "
+"vervoerder die overeenkomt met het posttype."
 
 #. module: delivery_envia
 #. odoo-python
@@ -336,6 +351,11 @@ msgid "Envia Setup"
 msgstr "Envia instellen"
 
 #. module: delivery_envia
+#: model:ir.module.module,shortdesc:base.module_delivery_envia
+msgid "Envia Shipping"
+msgstr ""
+
+#. module: delivery_envia
 #. odoo-python
 #: code:addons/delivery_envia/models/delivery_carrier.py:0
 msgid "Envia order(s) not found to cancel shipment!"
@@ -348,7 +368,7 @@ msgid ""
 "these in a package type that you set as default"
 msgstr ""
 "Envia heeft pakketafmetingen nodig om een nauwkeurige prijs te krijgen, je "
-"kunt deze definiëren in een verpakkingstype dat je als standaard instelt"
+"kunt deze definiëren in een pakkettype dat je als standaard instelt"
 
 #. module: delivery_envia
 #. odoo-python
@@ -382,12 +402,6 @@ msgstr "Envia.com Servicecode"
 #: model:ir.model.fields,field_description:delivery_envia.field_delivery_carrier__envia_service_name
 msgid "Envia.com Service Name"
 msgstr "Envia.com Servicenaam"
-
-#. module: delivery_envia
-#: model_terms:ir.ui.view,arch_db:delivery_envia.res_config_settings_view_form_sale_envia
-#: model_terms:ir.ui.view,arch_db:delivery_envia.res_config_settings_view_form_stock_envia
-msgid "Envia.com Shipping Methods"
-msgstr "Verzendmethoden Envia.com"
 
 #. module: delivery_envia
 #. odoo-python
@@ -439,6 +453,7 @@ msgstr "Genereer een toegangsmunt vanuit het Sandbox-portaal van Envia"
 #: model:ir.model.fields,field_description:delivery_envia.field_delivery_carrier__id
 #: model:ir.model.fields,field_description:delivery_envia.field_envia_shipping_wizard__id
 #: model:ir.model.fields,field_description:delivery_envia.field_stock_package_type__id
+#: model:ir.model.fields,field_description:delivery_envia.field_stock_picking__id
 msgid "ID"
 msgstr "ID"
 
@@ -745,14 +760,17 @@ msgid "Shipment created into Envia"
 msgstr "Zending aangemaakt in Envia"
 
 #. module: delivery_envia
-#: model:ir.model,name:delivery_envia.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Verzendmethoden"
-
-#. module: delivery_envia
 #: model_terms:ir.ui.view,arch_db:delivery_envia.view_shipping_method_envia
 msgid "Shipping Product"
 msgstr "Verzendproduct"
+
+#. module: delivery_envia
+#. odoo-python
+#: code:addons/delivery_envia/models/envia_request.py:0
+msgid ""
+"Shipping from Brazil requires an authorized NF-e on the label, set the "
+"Related Invoice on %(picking_name)s or link its packages on the invoice."
+msgstr ""
 
 #. module: delivery_envia
 #: model_terms:ir.ui.view,arch_db:delivery_envia.view_delivery_carrier_form_inherit_delivery_envia
@@ -775,7 +793,7 @@ msgstr ""
 #. module: delivery_envia
 #: model:ir.model,name:delivery_envia.model_stock_package_type
 msgid "Stock package type"
-msgstr "Verpakkingssoort"
+msgstr "Pakkettype"
 
 #. module: delivery_envia
 #: model_terms:ir.ui.view,arch_db:delivery_envia.view_delivery_carrier_form_inherit_delivery_envia
@@ -819,10 +837,23 @@ msgid "Tracking Numbers:"
 msgstr "Traceernummers:"
 
 #. module: delivery_envia
+#: model:ir.model,name:delivery_envia.model_stock_picking
+msgid "Transfer"
+msgstr "Transfer"
+
+#. module: delivery_envia
 #. odoo-python
 #: code:addons/delivery_envia/models/delivery_carrier.py:0
 msgid "Unable to cancel order: %(order_number)s"
 msgstr "Kan bestelling niet annuleren: %(order_number)s"
+
+#. module: delivery_envia
+#. odoo-python
+#: code:addons/delivery_envia/models/stock_picking.py:0
+msgid ""
+"Validated transfer without NF-e linked. Envia.com label not generated. "
+"Create/link NF-e and click 'Send to Shipper' to generate the label."
+msgstr ""
 
 #. module: delivery_envia
 #: model_terms:ir.ui.view,arch_db:delivery_envia.view_delivery_carrier_form_inherit_delivery_envia

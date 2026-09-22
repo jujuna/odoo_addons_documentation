@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import ast
-import itertools
 import logging
 from collections.abc import Iterable
 from datetime import datetime, date
@@ -35,18 +33,14 @@ class Data_MergeRecord(models.Model):
     is_discarded = fields.Boolean(default=False)
 
     # Original Record
-    name = fields.Char(compute='_compute_fields')
-    res_id = fields.Integer(string='Record ID', readonly=False, aggregator=None, index=True)
+    name = fields.Char(compute='_compute_fields', search='_search_name')
+    res_id = fields.Many2oneReference(string='Record ID', readonly=False, index=True, model_field='res_model_name')
     record_create_date = fields.Datetime(string='Created On', compute='_compute_fields')
     record_create_uid = fields.Char(string='Created By', compute='_compute_fields')
     record_write_date = fields.Datetime(string='Updated On', compute='_compute_fields')
     record_write_uid = fields.Char(string='Updated By', compute='_compute_fields')
     company_id = fields.Many2one('res.company', compute='_compute_fields', search='_search_company_id')
 
-    differences = fields.Char(string='Differences',
-        help='Differences with the master record', compute='_compute_differences', store=True)
-    field_values = fields.Char(string='Field Values',
-        compute='_compute_field_values')
     used_in = fields.Char(string='Used In',
         help='List of other models referencing this record', compute='_compute_usage', store=True)
 
@@ -127,9 +121,16 @@ class Data_MergeRecord(models.Model):
             query = Model.with_context(active_test=False)._search([('company_id', operator, value)])
             from_clause, where_clause = query.from_clause, query.where_clause
             model_table = Model._table
-            from_sql_code = from_clause.code
-            assert from_sql_code.startswith(f'"{model_table}"') and not from_clause.params
-            extra_joins = SQL(from_sql_code[len(f'"{model_table}"'):])
+            from_sql_code, from_params, _from_flush = from_clause._sql_tuple
+            assert from_sql_code.startswith(f'"{model_table}"') and not from_params
+            extra_joins = []
+            for alias, (kind, table, condition) in query._joins.items():
+                if kind:  # skip first table, only keep joins
+                    # odoo.orm.query._sql_from_table
+                    alias_identifier = SQL.identifier(alias)
+                    if alias_identifier != table:
+                        table = SQL("%s AS %s", table, alias_identifier)
+                    extra_joins.append(SQL("%s %s ON (%s)", kind, table, condition))
 
             join_queries.append(SQL(
                 """
@@ -139,7 +140,7 @@ class Data_MergeRecord(models.Model):
                 """,
                 SQL.identifier(model_table),
                 SQL.identifier(model_table),
-                extra_joins,
+                SQL(" ").join(extra_joins),
             ))
             where_queries.append(SQL(
                 "(%s AND data_merge_record.res_model_id = %s)",
@@ -161,6 +162,62 @@ class Data_MergeRecord(models.Model):
         )
         return Domain('id', 'in', sql)
 
+    def _search_name(self, operator, value):
+        """Search merge records by the name of their related records.
+        For each referenced model, a condition is built using EXISTS to check
+        the linked record (via `res_id`). All conditions are combined with OR.
+
+        :param operator: domain operator (e.g. '=', 'ilike')
+        :param value: value to search on the related record name
+        :return: domain filtering matching data_merge.record
+        """
+        self.env['data_merge.model'].flush_model()
+        cr = self.env.cr
+        # Get all unique models(e.g. `res.partner`) used in merge record
+        cr.execute("""
+            SELECT DISTINCT m.res_model_name, m.res_model_id
+              FROM data_merge_model m
+             WHERE m.id IN
+                (SELECT r.model_id
+                   FROM data_merge_record r)
+        """)
+        models_info = [(name, m_id) for name, m_id in cr.fetchall()]
+        if not models_info:
+            return Domain.FALSE
+
+        conditions = []
+        for model_name, model_id in models_info:
+            Model = self.env[model_name]
+            # Build condition to search by display_name on the related model
+            subquery = Model._search([('display_name', operator, value)])
+
+            # Filter records by model and check the linked record (res_id)
+            # res_model_id ensures we don't mix records from different models
+            conditions.append(SQL(
+                """
+                r.res_model_id = %s
+                AND EXISTS (
+                    SELECT 1
+                      FROM %s
+                     WHERE id = r.res_id
+                       AND %s
+                )
+                """,
+                model_id,
+                SQL.identifier(Model._table),
+                subquery.where_clause,
+            ))
+
+        # Combine conditions with OR (record matches if any related model's display_name matches the search)
+        sql = SQL(
+            """
+            SELECT r.id
+              FROM data_merge_record r
+             WHERE %s
+            """,
+            SQL(" OR ").join(conditions),
+        )
+        return Domain('id', 'in', sql)
 
     #############
     ### Computes
@@ -186,7 +243,8 @@ class Data_MergeRecord(models.Model):
             key not in model_fields or \
             model_fields[key].groups or \
             not model_fields[key].export_string_translation or \
-            IrField(key)['ttype'] == 'binary'
+            IrField(key)['ttype'] == 'binary' or \
+            (model_fields[key].compute and not model_fields[key].inverse)
 
         record = self._original_records()
         if not record:
@@ -195,37 +253,15 @@ class Data_MergeRecord(models.Model):
         record_data = record.read(to_read)[0]
         return {str(field_description(key)):format_value(value, self.env) for key, value in record_data.items() if value and not hidden_field(key)}
 
-    @api.depends('res_id')
-    def _compute_field_values(self):
-        model_fields = {}
-        for record in self:
-            if record.model_id not in model_fields.keys():
-                model_fields[record.model_id] = record.model_id.rule_ids.mapped('field_id.name')
-            to_read = model_fields[record.model_id]
-
-            if not to_read:
-                record.field_values = ''
-            else:
-                record.field_values = ', '.join([v for k,v in record._render_values(to_read).items()])
-
-    @api.depends('res_id')
-    def _compute_differences(self):
-        for record in self:
-            if record.group_id.divergent_fields:
-                read_fields = record.group_id.divergent_fields.split(',')
-                record.differences = ', '.join(['%s: %s' % (k, v) for k,v in record._render_values(read_fields).items()])
-            else:
-                record.differences = ''
-
     def _get_references(self):
         """
         Count all the references for the records.
 
         :return dict of tuples with the record ID as key
-            (count, model, model name, fields)
+            (count, model name, model, fields)
                 - `count`: number of records
-                - `model`: technical model name (res.partner)
                 - `model name`: "human" name (Contact)
+                - `model`: technical model name (res.partner)
                 - `fields`: list of fields from the model referencing the record
         """
         res_models = list(set(self.mapped('res_model_name')))
@@ -235,7 +271,7 @@ class Data_MergeRecord(models.Model):
             ('store', '=', True),
             ('ttype', 'in', ('one2many', 'many2one', 'many2many')),
             ('relation', 'in', res_models),
-            ('index', '=', True),
+            ('index', 'in', ('btree', 'btree_not_null')),
         ])
         for field in all_fields:
             if not isinstance(self.env[field.model], models.BaseModel) or \
@@ -268,12 +304,12 @@ class Data_MergeRecord(models.Model):
                     record_id = records_mapped.get(group_value.id)
                     if not record_id:
                         continue
-                    references[record_id].append((count, model_name[model]))
+                    references[record_id].append((count, model_name[model], model, groupby_field))
         return references
 
     @api.depends('res_id')
     def _compute_usage(self):
-        if ast.literal_eval(self.env['ir.config_parameter'].sudo().get_param('data_merge.compute_references', 'True')):
+        if self.env['ir.config_parameter'].sudo().get_bool('data_merge.compute_references', True):
             references = self._get_references()
             for record in self:
                 ref = references[record.id]
@@ -323,8 +359,8 @@ class Data_MergeRecord(models.Model):
             raise ValidationError(_('Records must be of the same model'))
 
         model = model_name.pop()
-        ids = self.mapped('res_id')
-        return self.env[model].with_context(active_test=False).sudo().browse(ids).exists()
+        return self.env[model].with_context(active_test=False).sudo().browse(
+            id_ for id_ in self.mapped('res_id') if id_).exists()
 
     def _record_snapshot(self):
         """ Snapshot of the original record, to be logged in the chatter when merged """
@@ -473,42 +509,42 @@ class Data_MergeRecord(models.Model):
             self._merge_mail_followers(destination, self.env[destination._name].browse(source_ids))
         models_to_adapt = [
             {
-                'table': 'ir_attachment',
-                'id_field': 'res_id',
-                'model_field': 'res_model',
+                'table': SQL('ir_attachment'),
+                'id_field': SQL('res_id'),
+                'model_field': SQL('res_model'),
             }, {
-                'table': 'mail_activity',
-                'id_field': 'res_id',
-                'model_field': 'res_model',
+                'table': SQL('mail_activity'),
+                'id_field': SQL('res_id'),
+                'model_field': SQL('res_model'),
             }, {
-                'table': 'ir_model_data',
-                'id_field': 'res_id',
-                'model_field': 'model',
+                'table': SQL('ir_model_data'),
+                'id_field': SQL('res_id'),
+                'model_field': SQL('model'),
             }, {
-                'table': 'mail_message',
-                'id_field': 'res_id',
-                'model_field': 'model',
+                'table': SQL('mail_message'),
+                'id_field': SQL('res_id'),
+                'model_field': SQL('model'),
             }
         ]
-        query = """
-            UPDATE %(table)s
-            SET %(id_field)s = %%(destination_id)s
-            WHERE %(id_field)s = %%(record_id)s
-            AND %(model_field)s = %%(model)s"""
-        for model in models_to_adapt:
-            q = query % model
+        for model_values in models_to_adapt:
             for rec_id in source_ids:
+                query = SQL(
+                    """
+                    UPDATE %(table)s
+                    SET %(id_field)s = %(destination_id)s
+                    WHERE %(id_field)s = %(record_id)s
+                    AND %(model_field)s = %(model)s""",
+                    **model_values,
+                    destination_id=destination.id,
+                    model=destination._name,
+                    record_id=rec_id,
+                )
                 try:
                     with self.env.cr.savepoint():
-                        params = {
-                            'destination_id': destination.id,
-                            'record_id': rec_id,
-                            'model': destination._name
-                        }
-                        self.env.cr.execute(q, params)
+                        self.env.cr.execute(query)
                 except psycopg2.errors.UniqueViolation:
                     _logger.warning('Query %s failed, due to an unique constraint', query)
-                except psycopg2.IntegrityError as e:
+                except psycopg2.IntegrityError:
                     _logger.warning('Query %s failed', query)
                 except psycopg2.Error:
                     raise ValidationError(_('Query Failed.'))
@@ -665,3 +701,60 @@ class Data_MergeRecord(models.Model):
         MergeRecord.create(records_to_create)
 
         return action
+
+    def action_merge_details(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.client",
+            "tag": "data_merge_details_dialog",
+            "params": {
+                "group_id": self.group_id.id,
+                "record_id": self.id
+            }
+        }
+
+    def _get_group_records_map(self):
+        group_records = {}
+        for rec in self:
+            group_records.setdefault(rec.group_id.id, []).append(rec.id)
+
+        return group_records
+
+    def action_validate_merge(self):
+        group_records = self._get_group_records_map()
+        self.env['data_merge.group'].merge_multiple_records(group_records)
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
+
+    def action_discard_selected_records(self):
+        group_records = self._get_group_records_map()
+
+        if not group_records:
+            return
+
+        groups_record_set = self.env['data_merge.group'].browse(group_records.keys())
+        for group in groups_record_set:
+            group.discard_records(group_records[group.id])
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
+
+    def action_undiscard_selected_records(self):
+        group_records = self._get_group_records_map()
+
+        if not group_records:
+            return
+
+        groups_record_set = self.env['data_merge.group'].browse(group_records.keys())
+        for group in groups_record_set:
+            group.undiscard_records(group_records[group.id])
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }

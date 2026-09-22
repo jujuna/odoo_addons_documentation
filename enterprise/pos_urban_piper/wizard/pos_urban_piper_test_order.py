@@ -1,9 +1,9 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
 import uuid
 
-from odoo import _, fields, models
+from odoo import fields, models, api
 from datetime import datetime, timedelta
-
-from odoo.addons.pos_urban_piper.controllers.main import PosUrbanPiperController
 
 
 class UrbanPiperTestOrderWizard(models.TransientModel):
@@ -21,10 +21,10 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
         default=1,
         help='Test order quantity',
     )
-    discount_amount = fields.Integer(
-        string="Fixed Discount Amount",
-        default=0,
-        help='Fixed discount value for test order.'
+    discount_amount = fields.Float(
+        string="Order Level Discount",
+        default=0.0,
+        help="Fixed discount applied on the entire order."
     )
     packaging_charge = fields.Integer(
         string='Packaging Charge',
@@ -43,32 +43,87 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
         string='Delivery Provider',
         help='Responsible delivery provider for test order, e.g., UberEats, Zomato.'
     )
+    available_ptav_ids = fields.Many2many(
+        'product.template.attribute.value',
+        string='Available Product Options',
+        compute='_compute_available_ptav_ids'
+    )
+    ptav_ids = fields.Many2many(
+        'product.template.attribute.value',
+        'pos_urbanpiper_test_order_wizard_ptav_rel',
+        string='Product Options',
+        help='Product options for test order.',
+        domain="[('id', 'in', available_ptav_ids)]"
+    )
+    is_instant_order = fields.Boolean(string="Quick Order")
+    partner_id = fields.Many2one(
+        'res.partner',
+        string='Customer',
+        help='Test order customer',
+    )
+    line_discount = fields.Float(
+        string="Product Level Discount",
+        default=0.0,
+        help="Percentage discount applied on the product line."
+    )
+
+    @api.depends('product_id')
+    def _compute_available_ptav_ids(self):
+        for record in self:
+            ptav_ids = False
+            if record.product_id:
+                ptav_ids = record.product_id.attribute_line_ids.product_template_value_ids.filtered(
+                    lambda ptav: ptav.ptav_active
+                )
+            record.available_ptav_ids = ptav_ids
+
+    def _get_customer_data(self, customer):
+        customer_data = {
+            'username': 'meet_jivani',
+            'name': 'Meet Jivani',
+            'id': 1111111,
+            'phone': '+919999999999',
+            'email': 'test_user@email.com',
+            'address': {
+                'is_guest_mode': False,
+                'city': 'Gujarat',
+                'pin': '380007',
+                'line_1': '401 & 402, Floor 4, IT Tower 3',
+                'line_2': 'InfoCity Gate, 1, Gandhinagar,',
+                'sub_locality': 'Test Area',
+            }
+        }
+        if not customer:
+            return customer_data
+        return {
+            **customer_data,
+            'name': customer.name,
+            'phone': customer.phone,
+            'email': customer.email,
+            'address': {
+                **customer_data['address'],
+                'city': customer.city,
+                'pin': customer.zip,
+                'line_1': customer.street,
+                'line_2': customer.street2,
+            },
+        }
 
     def test_order_json(self, data):
-        taxes = data['product_id'].taxes_id.compute_all(
-            data['product_id'].list_price, data['product_id'].currency_id, data['quantity']
+        product = data['product_id']
+        tax_types = product.taxes_id.flatten_taxes_hierarchy().mapped('price_include')
+        taxes = product.taxes_id.compute_all(
+            product.list_price, product.currency_id, data['quantity']
         )
-        unit_price = data['product_id'].taxes_id.compute_all(
-            data['product_id'].list_price, data['product_id'].currency_id, 1
-        )['total_excluded']
+        unit_prices = product.taxes_id.compute_all(
+            product.list_price, product.currency_id, 1
+        )
+        unit_price = unit_prices['total_included'] if tax_types and tax_types[0] else unit_prices['total_excluded']
         price_with_tax = taxes['total_included']
         price_without_tax = taxes['total_excluded']
+        data['is_instant_order'] = self.is_instant_order
         payload = {
-            "customer": {
-                "username": "meet_jivani",
-                "name": "Meet Jivani",
-                "id": 1111111,
-                "phone": "+919999999999",
-                "address": {
-                    "is_guest_mode": False,
-                    "city": "Gujarat",
-                    "pin": "380007",
-                    "line_1": "401 & 402, Floor 4, IT Tower 3",
-                    "line_2": "InfoCity Gate, 1, Gandhinagar,",
-                    "sub_locality": "Test Area"
-                },
-                "email": "test_user@email.com"
-            },
+            'customer': self._get_customer_data(data['customer']),
             "order": {
                 "next_states": ["Acknowledged", "Food Ready", "Dispatched", "Completed", "Cancelled"],
                 "items": [{
@@ -81,7 +136,7 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
                     "tags": [],
                     "price": unit_price,
                     "discount": 0.0,
-                    "merchant_id": f'{data["product_id"].id}-XXXXX',
+                    "merchant_id": str(data['product_id'].id),
                     "instructions": "",
                     "charges": [],
                     "extras": {},
@@ -89,7 +144,15 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
                     "total_charge": 0.0,
                     "is_recommended": False,
                     "quantity": data['quantity'],
-                    "options_to_add": data['options_to_add']
+                    "options_to_add": data['options_to_add'],
+                    "taxes": [
+                        {
+                            "liability_on": "aggregator",
+                            "rate": tax.amount,
+                            "title": tax.tax_group_id.name,
+                        }
+                        for tax in data['product_id'].taxes_id
+                    ],
                 }],
                 "details": {
                     "coupon": "",
@@ -104,7 +167,7 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
                     "state": "Placed",
                     "discount": 0.0,
                     "channel": data['delivery_provider_id'].technical_name,
-                    "delivery_datetime": int((datetime.now() + timedelta(minutes=25)).timestamp() * 1000),
+                    "delivery_datetime": int((datetime.now() + timedelta(minutes=data['delivery_datetime'])).timestamp() * 1000),
                     "item_level_total_charges": 0,
                     "item_taxes": 0.0,
                     "modified_to": None,
@@ -125,12 +188,13 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
                     "ext_platforms": [{
                         "kind": "food_aggregator",
                         "name": data['delivery_provider_id'].technical_name,
-                        "delivery_type": "partner",
+                        "delivery_type": "Partner",
                         "extras": {
                             "order_otp": "4175",
                             "deliver_asap": True,
                             "is_delivery_charge_discounted": False,
                             "can_reject_order": True,
+                            "is_instant_order": data.get("is_instant_order"),
                         },
                         "platform_store_id": "6546563516",
                         "id": "MNHLAW3L"
@@ -146,7 +210,7 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
                 "store": {
                     "city": "Gandhinagar",
                     "name": "Odoo India",
-                    "merchant_ref_id": data['config_id'].urbanpiper_store_identifier,
+                    "merchant_ref_id": data['store'].store_identifier,
                     "address": "401 & 402, Floor 4, IT Tower 3 InfoCity Gate, 1, Gandhinagar, Gujarat 382007",
                     "id": 11111
                 },
@@ -164,7 +228,7 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
                         'value': (data['packaging_charge'] * 15) / 100,
                         'title': 'VAT'
                     }
-                ],
+                ] if data['has_tax'] else [],
                 'value': data['packaging_charge'],
                 'title': 'Packaging Charge'
             })
@@ -177,7 +241,7 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
                         'value': (data['delivery_charge'] * 15) / 100,
                         'title': 'VAT'
                     }
-                ],
+                ] if data['has_tax'] else [],
                 'value': data['delivery_charge'],
                 'title': 'Delivery Charge'
             })
@@ -193,49 +257,41 @@ class UrbanPiperTestOrderWizard(models.TransientModel):
         payload['order']['details']['ext_platforms'][0]['discounts'] = discounts
         if data['delivery_instruction']:
             payload['order']['details']['instructions'] = data['delivery_instruction']
+        line_discounts = []
+        if data['line_discount'] > 0:
+            line_discount_value = (taxes['total_included'] / data['quantity']) * data['line_discount'] / 100
+            line_discounts.append({
+                'is_merchant_discount': True,
+                'code': 'TEST',
+                'value': line_discount_value,
+                'title': 'Merchant Discount',
+            })
+        payload['order']['items'][0]['discounts'] = line_discounts
         return payload
 
     def make_test_order(self, delivery_identifier=False):
-        msg = ''
-        user_name = self.env['ir.config_parameter'].sudo().get_param('pos_urban_piper.urbanpiper_username', False)
-        if not user_name:
-            self.env['ir.config_parameter'].sudo().set_param('pos_urban_piper.urbanpiper_username', 'demo')
-        api_key = self.env['ir.config_parameter'].sudo().get_param('pos_urban_piper.urbanpiper_apikey', False)
-        if not api_key:
-            self.env['ir.config_parameter'].sudo().set_param('pos_urban_piper.urbanpiper_apikey', 'demo')
-        config_id = self.env['pos.config'].browse(self.env.context.get('config_id'))
-        if not config_id.current_session_id:
-            msg += _('Please start a POS session first.\n')
-        if not config_id.urbanpiper_store_identifier:
-            msg += _('POS ID is required to place test order.\n')
-        if msg:
-            return self._display_notification(msg, 'danger')
+        store = self.env['pos.urbanpiper.store'].browse(self.env.context.get('store_id'))
+        options_to_add = [{
+            'title': ptav.product_attribute_value_id.name,
+            'quantity': '1',
+            'merchant_id': f'{self.product_id.id}-{ptav.product_attribute_value_id.id}',
+            'total_price': ptav.price_extra,
+        } for ptav in self.ptav_ids]
         data = {
-            'config_id': config_id,
+            'store': store,
             'product_id': self.product_id,
             'quantity': self.quantity,
             'discount_amount': self.discount_amount,
+            'line_discount': self.line_discount,
             'packaging_charge': self.packaging_charge,
             'delivery_charge': self.delivery_charge,
             'delivery_instruction': self.delivery_instruction,
             'delivery_provider_id': self.delivery_provider_id,
             'delivery_identifier': delivery_identifier or str(uuid.uuid4()),
-            'options_to_add': self.env.context.get('options_to_add', [])
+            'options_to_add': options_to_add,
+            'customer': self.partner_id,
+            'has_tax': self.env.context.get('has_tax', True),
+            'delivery_datetime': self.env.context.get('delivery_datetime', 25)
         }
         order_json = self.test_order_json(data)
-        UpController = PosUrbanPiperController()
-        UpController._create_order(order_json)
-        return self._display_notification(_('Test order generated successfully.'))
-
-    def _display_notification(self, message, notification_type='success'):
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Urban Piper'),
-                'message': message,
-                'type': notification_type,
-                'sticky': False,
-                'next': {'type': 'ir.actions.act_window_close'},  # force a form reload
-            }
-        }
+        return self.env['pos.order'].process_urbanpiper_order_placed(order_json, store)

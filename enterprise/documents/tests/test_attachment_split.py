@@ -1,8 +1,8 @@
-import base64
 import io
 
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import tagged, TransactionCase
 from odoo.tools.pdf import OdooPdfFileWriter, OdooPdfFileReader
+
 
 class TestAttachmentSplit(TransactionCase):
 
@@ -16,17 +16,17 @@ class TestAttachmentSplit(TransactionCase):
         """
         writer = OdooPdfFileWriter()
         for _ in range(pages):
-            writer.addBlankPage(width=200, height=200)
+            writer.add_blank_page(width=200, height=200)
 
         if attachments:
             for name, content in attachments:
-                writer.addAttachment(name, content)
+                writer.add_attachment(name, content)
 
         stream = io.BytesIO()
         writer.write(stream)
         return self.env['ir.attachment'].create({
             'name': 'Test PDF with Attachment',
-            'datas': base64.b64encode(stream.getvalue()),
+            'raw': stream.getvalue(),
             'mimetype': 'application/pdf',
         })
 
@@ -34,7 +34,7 @@ class TestAttachmentSplit(TransactionCase):
         """Test that attachments are retained when the PDF is split to produce the same original file."""
         attachment = self._create_attachment(2, [("test_attachment.txt", b"Sample content for attachment")])
 
-        open_file = io.BytesIO(base64.b64decode(attachment.datas))
+        open_file = io.BytesIO(attachment.raw)
 
         # Define the new_files structure to reproduce the original PDF
         new_files = [{
@@ -54,8 +54,8 @@ class TestAttachmentSplit(TransactionCase):
         # Ensure the new PDF has the same attachment
         self.assertEqual(len(new_attachments), 1, "Should produce one new PDF attachment.")
         new_attachment = new_attachments[0]
-        pdf_reader = OdooPdfFileReader(io.BytesIO(base64.b64decode(new_attachment.datas)))
-        attachments = list(pdf_reader.getAttachments())
+        pdf_reader = OdooPdfFileReader(io.BytesIO(new_attachment.raw))
+        attachments = list(pdf_reader.get_attachments())
 
         # Check that the attachment is retained
         self.assertEqual(len(attachments), 1, "New PDF should have 1 attachment.")
@@ -65,7 +65,7 @@ class TestAttachmentSplit(TransactionCase):
         """Test that attachments are removed when the PDF is split."""
 
         attachment = self._create_attachment(2, [("test_attachment.txt", b"Sample content for attachment")])
-        open_file = io.BytesIO(base64.b64decode(attachment.datas))
+        open_file = io.BytesIO(attachment.raw)
 
         # Define the new_files structure to split the PDF
         new_files = [{
@@ -84,8 +84,8 @@ class TestAttachmentSplit(TransactionCase):
         self.assertEqual(len(new_attachments), 2, f"The pdf should be splitted.")
         # Ensure the new PDFs do not have attachments
         for i, new_attachment in enumerate(new_attachments):
-            pdf_reader = OdooPdfFileReader(io.BytesIO(base64.b64decode(new_attachment.datas)))
-            attachments = list(pdf_reader.getAttachments())
+            pdf_reader = OdooPdfFileReader(io.BytesIO(new_attachment.raw))
+            attachments = list(pdf_reader.get_attachments())
             self.assertEqual(len(attachments), 0, f"Attachment {i + 1} should have no attachments.")
 
     def test_attachment_count(self):
@@ -110,13 +110,13 @@ class TestAttachmentSplit(TransactionCase):
         }]
         new_attachments = (attachment_1 | attachment_2)._pdf_split(
             new_files=new_files,
-            open_files=[io.BytesIO(base64.b64decode(attachment_1.datas)), io.BytesIO(base64.b64decode(attachment_2.datas))],
+            open_files=[io.BytesIO(attachment_1.raw), io.BytesIO(attachment_2.raw)],
         )
 
         self.assertEqual(len(new_attachments), 1)
         new_attachment = new_attachments[0]
-        pdf_reader = OdooPdfFileReader(io.BytesIO(base64.b64decode(new_attachment.datas)))
-        attachments = list(pdf_reader.getAttachments())
+        pdf_reader = OdooPdfFileReader(io.BytesIO(new_attachment.raw))
+        attachments = list(pdf_reader.get_attachments())
         self.assertEqual(len(attachments), 3)
 
         new_files = [{
@@ -130,12 +130,12 @@ class TestAttachmentSplit(TransactionCase):
         }]
         new_attachments = (attachment_1 | attachment_2)._pdf_split(
             new_files=new_files,
-            open_files=[io.BytesIO(base64.b64decode(attachment_1.datas)), io.BytesIO(base64.b64decode(attachment_2.datas))],
+            open_files=[io.BytesIO(attachment_1.raw), io.BytesIO(attachment_2.raw)],
         )
         self.assertEqual(len(new_attachments), 1)
         new_attachment = new_attachments[0]
-        pdf_reader = OdooPdfFileReader(io.BytesIO(base64.b64decode(new_attachment.datas)))
-        attachments = list(pdf_reader.getAttachments())
+        pdf_reader = OdooPdfFileReader(io.BytesIO(new_attachment.raw))
+        attachments = list(pdf_reader.get_attachments())
         self.assertEqual(len(attachments), 1)
 
     def test_merge_pdfs_with_mixed_attachments(self):
@@ -167,14 +167,14 @@ class TestAttachmentSplit(TransactionCase):
         new_attachments = (attachment_1 | attachment_2 | attachment_3)._pdf_split(
             new_files=new_files,
             open_files=[
-                io.BytesIO(base64.b64decode(attachment_1.datas)),
-                io.BytesIO(base64.b64decode(attachment_2.datas)),
-                io.BytesIO(base64.b64decode(attachment_3.datas)),
+                io.BytesIO(attachment_1.raw),
+                io.BytesIO(attachment_2.raw),
+                io.BytesIO(attachment_3.raw),
             ],
         )
         self.assertEqual(len(new_attachments), 1)
-        pdf_reader = OdooPdfFileReader(io.BytesIO(base64.b64decode(new_attachments[0].datas)))
-        attachments = list(pdf_reader.getAttachments())
+        pdf_reader = OdooPdfFileReader(io.BytesIO(new_attachments[0].raw))
+        attachments = list(pdf_reader.get_attachments())
         self.assertEqual(len(attachments), 3, "Should keep all attachments when merging with all pages")
 
     def test_split_pdf_with_multiple_attachments(self):
@@ -202,12 +202,12 @@ class TestAttachmentSplit(TransactionCase):
         ]
         new_attachments = attachment._pdf_split(
             new_files=new_files,
-            open_files=[io.BytesIO(base64.b64decode(attachment.datas))],
+            open_files=[io.BytesIO(attachment.raw)],
         )
         self.assertEqual(len(new_attachments), 3)
         for new_attachment in new_attachments:
-            pdf_reader = OdooPdfFileReader(io.BytesIO(base64.b64decode(new_attachment.datas)))
-            attachments = list(pdf_reader.getAttachments())
+            pdf_reader = OdooPdfFileReader(io.BytesIO(new_attachment.raw))
+            attachments = list(pdf_reader.get_attachments())
             self.assertEqual(len(attachments), 0, "Split PDFs should have no attachments")
 
     def test_partial_merge_attachment_handling(self):
@@ -235,13 +235,13 @@ class TestAttachmentSplit(TransactionCase):
         new_attachments = (attachment_1 | attachment_2)._pdf_split(
             new_files=new_files,
             open_files=[
-                io.BytesIO(base64.b64decode(attachment_1.datas)),
-                io.BytesIO(base64.b64decode(attachment_2.datas)),
+                io.BytesIO(attachment_1.raw),
+                io.BytesIO(attachment_2.raw),
             ],
         )
         self.assertEqual(len(new_attachments), 1)
-        pdf_reader = OdooPdfFileReader(io.BytesIO(base64.b64decode(new_attachments[0].datas)))
-        attachments = list(pdf_reader.getAttachments())
+        pdf_reader = OdooPdfFileReader(io.BytesIO(new_attachments[0].raw))
+        attachments = list(pdf_reader.get_attachments())
         self.assertEqual(len(attachments), 1, "Should only keep attachment from PDF with all pages included")
 
     def test_split_pdf_retains_attachments_for_complete_files(self):
@@ -271,7 +271,7 @@ class TestAttachmentSplit(TransactionCase):
         # Perform the split
         new_attachments = attachment._pdf_split(
             new_files=new_files,
-            open_files=[io.BytesIO(base64.b64decode(attachment.datas))],
+            open_files=[io.BytesIO(attachment.raw)],
         )
 
         # Assert that there are two new attachments
@@ -279,12 +279,12 @@ class TestAttachmentSplit(TransactionCase):
 
         # Check the first output file (complete file)
         complete_file_attachment = new_attachments[0]
-        pdf_reader = OdooPdfFileReader(io.BytesIO(base64.b64decode(complete_file_attachment.datas)))
-        attachments = list(pdf_reader.getAttachments())
+        pdf_reader = OdooPdfFileReader(io.BytesIO(complete_file_attachment.raw))
+        attachments = list(pdf_reader.get_attachments())
         self.assertEqual(len(attachments), 2, "Complete file should retain all attachments from the original PDF")
 
         # Check the second output file (empty file)
         empty_file_attachment = new_attachments[1]
-        pdf_reader = OdooPdfFileReader(io.BytesIO(base64.b64decode(empty_file_attachment.datas)))
-        attachments = list(pdf_reader.getAttachments())
+        pdf_reader = OdooPdfFileReader(io.BytesIO(empty_file_attachment.raw))
+        attachments = list(pdf_reader.get_attachments())
         self.assertEqual(len(attachments), 0, "Empty file should not contain any attachments")

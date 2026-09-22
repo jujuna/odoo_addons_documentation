@@ -7,6 +7,7 @@ from odoo.tools import mute_logger
 
 
 @tagged('knowledge_sequence')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleSequence(KnowledgeCommon):
     """ Test sequencing and auto-resequence of articles. """
 

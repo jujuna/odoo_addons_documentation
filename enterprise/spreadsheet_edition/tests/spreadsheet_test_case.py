@@ -11,14 +11,14 @@ class SpreadsheetTestCase(TransactionCase):
             "id": spreadsheet.id,
             "type": "REMOTE_REVISION",
             "clientId": "john",
-            "commands": [{"type": "A_COMMAND"}],
+            "commands": [{"type": "UPDATE_CELL"}],
             "nextRevisionId": uuid4().hex,
             "serverRevisionId": spreadsheet.current_revision_uuid,
             **kwargs,
         }
 
     def snapshot(self, spreadsheet, current_revision_uuid, snapshot_revision_id, data):
-        return spreadsheet.dispatch_spreadsheet_message({
+        return spreadsheet._dispatch_spreadsheet_message({
             "type": "SNAPSHOT",
             "nextRevisionId": snapshot_revision_id,
             "serverRevisionId": current_revision_uuid,

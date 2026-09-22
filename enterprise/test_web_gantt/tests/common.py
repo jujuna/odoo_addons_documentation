@@ -43,6 +43,37 @@ class TestWebGantt(TransactionCase):
         cls.buffer23 = (cls.pill_3[cls.date_start_field_name] - cls.pill_2[cls.date_stop_field_name]).seconds
         cls.buffer34 = (cls.pill_4[cls.date_start_field_name] - cls.pill_3[cls.date_stop_field_name]).seconds
 
+        # Test property fields reschedule
+        cls.pill_5_parent = cls.TestWebGanttPill.create({
+            'name': 'Pill 5',
+            cls.date_start_field_name: cls.pill_1_start_date,
+            cls.date_stop_field_name: cls.pill_1_stop_date,
+            "pill_properties_definition": [
+                {
+                    "name": "my_char",
+                    "type": "char",
+                    "string": "My Char Field",
+                    "default": "Default Value",
+                },
+                {
+                    "name": "my_int",
+                    "type": "integer",
+                    "string": "My Integer Field",
+                    "default": 0,
+                },
+            ],
+        })
+        cls.pill_5_child = cls.TestWebGanttPill.create({
+            'name': 'Pill 5',
+            cls.date_start_field_name: cls.pill_1_start_date,
+            cls.date_stop_field_name: cls.pill_1_stop_date,
+            "pill_properties": {
+                "my_char": "Helloo",
+                "my_int": 19,
+            },
+            'parent_id': cls.pill_5_parent.id,
+        })
+
         """
             Second pills structure (with more nodes and use cases)
 

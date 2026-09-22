@@ -4,16 +4,32 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:09+0000\n"
-"PO-Revision-Date: 2025-12-30 19:09+0000\n"
+"POT-Creation-Date: 2026-09-18 18:21+0000\n"
+"PO-Revision-Date: 2026-09-18 18:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_pl_hr_payroll
+#: model:ir.module.module,description:base.module_l10n_pl_hr_payroll
+msgid ""
+"\n"
+"Polish Payroll Rules.\n"
+"=========================\n"
+"\n"
+"    * Employee Details\n"
+"    * Employee Contracts\n"
+"    * Passport based Contract\n"
+"    * Allowances/Deductions\n"
+"    * Allow to configure Basic/Gross/Net Salary\n"
+"    * Employee Payslip\n"
+"    * Integrated with Leaves Management\n"
+msgstr ""
 
 #. module: l10n_pl_hr_payroll
 #: model:ir.actions.report,print_report_name:l10n_pl_hr_payroll.action_report_payslip_pl
@@ -68,7 +84,13 @@ msgstr ""
 #. module: l10n_pl_hr_payroll
 #: model:ir.model.fields,field_description:l10n_pl_hr_payroll.field_hr_payroll_structure_type__display_name
 #: model:ir.model.fields,field_description:l10n_pl_hr_payroll.field_hr_payslip__display_name
+#: model:ir.model.fields,field_description:l10n_pl_hr_payroll.field_hr_work_entry_type__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.salary.rule,name:l10n_pl_hr_payroll.l10n_pl_hr_payroll_structure_pl_employee_salary_expenses_reimbursement
+msgid "Expenses Reimbursement"
 msgstr ""
 
 #. module: l10n_pl_hr_payroll
@@ -79,6 +101,7 @@ msgstr ""
 #. module: l10n_pl_hr_payroll
 #: model:ir.model.fields,field_description:l10n_pl_hr_payroll.field_hr_payroll_structure_type__id
 #: model:ir.model.fields,field_description:l10n_pl_hr_payroll.field_hr_payslip__id
+#: model:ir.model.fields,field_description:l10n_pl_hr_payroll.field_hr_work_entry_type__id
 msgid "ID"
 msgstr ""
 
@@ -113,8 +136,93 @@ msgid "Pension Contribution (Employer)"
 msgstr ""
 
 #. module: l10n_pl_hr_payroll
+#: model:ir.module.module,shortdesc:base.module_l10n_pl_hr_payroll
+msgid "Poland - Payroll"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_accident_employer_rate
+msgid "Poland: Accident Insurance Contribution Employer Rate"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_childcare_relief
+msgid "Poland: Chilcare Relief"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_disability_employee_rate
+msgid "Poland: Disability Insurance Contribution Employee Rate"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_disability_employer_rate
+msgid "Poland: Disability Insurance Contribution Employer Rate"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.payroll.structure.type,name:l10n_pl_hr_payroll.structure_type_employee_pl
+msgid "Poland: Employee"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_health_employee_rate
+msgid "Poland: Health Insurance Contributions"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_laour_employer_rate
+msgid "Poland: Labour Fund and Solidarity Fund Employer Rate"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_pension_employee_rate
+msgid "Poland: Pension Contribution Employee Rate"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_pension_employer_rate
+msgid "Poland: Pension Contribution Employer Rate"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
 #: model:hr.payroll.structure,name:l10n_pl_hr_payroll.hr_payroll_structure_pl_employee_salary
 msgid "Poland: Regular Pay"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_sickness_employee_rate
+msgid "Poland: Sickness Insurance Contribution Employee Rate"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_social_security_cap
+msgid "Poland: Social Security Cap"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_standard_earning
+msgid "Poland: Standard Earning"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_withholding_tax_rate_high
+msgid "Poland: Wihholding Tax Rate High"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_withholding_tax_rate_low
+msgid "Poland: Wihholding Tax Rate Low"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_withholding_tax_threshold_high
+msgid "Poland: Wihholding Tax Threshold High"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#: model:hr.rule.parameter,name:l10n_pl_hr_payroll.rule_parameter_withholding_tax_threshold_low
+msgid "Poland: Wihholding Tax Threshold Low"
 msgstr ""
 
 #. module: l10n_pl_hr_payroll
@@ -185,7 +293,18 @@ msgid "Taxable Salary"
 msgstr ""
 
 #. module: l10n_pl_hr_payroll
+#: model:ir.model,name:l10n_pl_hr_payroll.model_hr_work_entry_type
+msgid "Time Type"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
 #: model:hr.salary.rule,name:l10n_pl_hr_payroll.l10n_pl_withholding_taxes
 #: model:hr.salary.rule.category,name:l10n_pl_hr_payroll.withholding_taxes
 msgid "Withholding Taxes"
+msgstr ""
+
+#. module: l10n_pl_hr_payroll
+#. odoo-python
+#: code:addons/l10n_pl_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "month"
 msgstr ""

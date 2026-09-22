@@ -23,6 +23,7 @@ class Base(models.AbstractModel):
     _inherit = 'base'
 
     @api.model
+    @api.readonly
     def get_cohort_data(self, date_start, date_stop, measure, interval, domain, mode, timeline):
         """
             Get all the data needed to display a cohort view
@@ -57,9 +58,12 @@ class Base(models.AbstractModel):
         locale = get_lang(self.env).code
 
         domain &= Domain(date_start, '!=', False)  # date not set are no take in account
-        row_groups = self._read_group(
+
+        date_start_spec = date_start + ':' + interval
+        date_stop_spec = date_stop + ':' + interval
+        row_groups, stop_groups = self._read_grouping_sets(
             domain=domain,
-            groupby=[date_start + ':' + interval],
+            grouping_sets=[[date_start_spec], [date_start_spec, date_stop_spec]],
             aggregates=measures,
         )
 
@@ -71,20 +75,16 @@ class Base(models.AbstractModel):
             today = date.today()
             convert_method = fields.Date.to_date
 
+        sub_group_per_start = defaultdict(dict)
+        for start_value, stop_value, __, aggregate_value in stop_groups:
+            sub_group_per_start[start_value][convert_method(stop_value)] = aggregate_value
+
         for group_value, sum_value, value in row_groups:
             total_value += value
             group_domain = domain & Domain([
                 '&', (date_start, '>=', group_value), (date_start, '<', group_value + models.READ_GROUP_TIME_GRANULARITY[interval])
             ])
-            sub_group = self._read_group(
-                domain=group_domain,
-                groupby=[date_stop + ':' + interval],
-                aggregates=[measure],
-            )
-            sub_group_per_period = {
-                convert_method(group_value): aggregate_value
-                for group_value, aggregate_value in sub_group
-            }
+            sub_group_per_period = sub_group_per_start.get(group_value, {})
 
             columns = []
             initial_value = sum_value
@@ -138,10 +138,9 @@ class Base(models.AbstractModel):
                 if mode == 'churn':
                     percentage = 1 - percentage
 
+                columns_avg[col_index]['percentage'] += 100 * percentage * value
+                columns_avg[col_index]['count'] += value
                 percentage = round(100 * percentage, 1)
-
-                columns_avg[col_index]['percentage'] += percentage
-                columns_avg[col_index]['count'] += 1
                 # For 'week' interval, we display a better tooltip (range like : '02 Jul - 08 Jul')
                 if interval == 'week':
                     period = "%s - %s" % (col_start_date.strftime('%d %b'), (col_end_date - relativedelta(days=1)).strftime('%d %b'))

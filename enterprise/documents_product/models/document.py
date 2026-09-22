@@ -67,7 +67,7 @@ class DocumentsDocument(models.Model):
             })
             is_image = (document.mimetype or '').partition('/')[0] == 'image'
             if is_image and not product.image_1920:
-                product.write({'image_1920': document.datas})
+                product.write({'image_1920': document.raw})
 
         view_id = product.get_formview_id()
         return {

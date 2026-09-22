@@ -36,7 +36,7 @@
       darken($o-web-studio-color-warning, 5%)
     );
   }
-  &.btn-dark {
+  &.btn-dark, &.btn-light {
     @include o-web-studio-btn-variation(
       $o-web-studio-bg-medium,
       darken($o-web-studio-bg-medium, 5%)
@@ -54,6 +54,9 @@
 $o-web-studio-sidebar-margin: $grid-gutter-width * 0.5;
 
 .o_web_studio_sidebar {
+    --Notebook-header-zindex: 200;
+    --o-web-studio-bg-dark: #{$o-web-studio-bg-dark};
+
     background-color: $o-web-studio-bg-medium;
     border-right: 3px solid $o-web-studio-bg-dark;
     color-scheme: dark;
@@ -63,18 +66,18 @@ $o-web-studio-sidebar-margin: $grid-gutter-width * 0.5;
     }
 
     .o_notebook {
-        --Notebook__link-background-color: $o-web-studio-bg-medium;
+        --Notebook__link-background-color: #{$o-web-studio-bg-medium};
     }
 
     .o_notebook_headers {
         position: sticky;
         top: 0;
         flex-shrink: 0;
-        z-index: 200;
+        z-index: var(--Notebook-header-zindex);
         margin-bottom: $o-web-studio-sidebar-margin;
         overflow-y: hidden;
         color: $o-web-studio-text-light;
-        --Notebook__link-color--active: $o-web-studio-text-light;
+        --Notebook__link-color--active: #{$o-web-studio-text-light};
 
         .nav {
             border-bottom: none;
@@ -156,6 +159,11 @@ $o-web-studio-sidebar-margin: $grid-gutter-width * 0.5;
             .o_select_menu .o_select_menu_caret, .o_record_autocomplete_with_caret {
                 --o-caret-color: white;
                 padding-right: 4px;
+            }
+
+            button.btn.btn-light {
+                --border-color: none;
+                --background-color: var(--o-web-studio-bg-dark);
             }
 
             .o_tag {
@@ -243,11 +251,11 @@ $o-web-studio-sidebar-margin: $grid-gutter-width * 0.5;
                         right: 18px;
                         top: -2px;
                         font-size: 10px;
-                        font-family: 'FontAwesome';
+                        font-family: 'Material Symbols Outlined';
                         color: $o-web-studio-text-inactive;
                         &:after {
                             border: none;
-                            content: "\f078"
+                            content: "expand_more"
                         }
                     }
                     &:hover .o_dropdown_button {

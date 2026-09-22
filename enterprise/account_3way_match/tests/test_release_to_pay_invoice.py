@@ -4,10 +4,13 @@
 from odoo import Command, fields
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.tests import tagged, Form
+from odoo.tools import mute_logger
 
 
 @tagged('post_install', '-at_install')
 class TestReleaseToPayInvoice(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -37,7 +40,7 @@ class TestReleaseToPayInvoice(AccountTestInvoicingCommon):
                     'name': self.product.name,
                     'product_id': self.product.id,
                     'product_qty': ordered_qty,
-                    'product_uom_id': self.product.uom_id.id,
+                    'uom_id': self.product.uom_id.id,
                     'price_unit': order_price,
                     'date_planned': fields.Datetime.now(),
                 })]
@@ -50,7 +53,8 @@ class TestReleaseToPayInvoice(AccountTestInvoicingCommon):
         for (action, params) in scenario:
             if action == 'invoice':
                 # <field name="purchase_id" invisible="1"/>
-                move_form = Form(AccountMove.with_context(default_purchase_id=purchase_order.id))
+                with mute_logger('odoo.tests.form.onchange'):  # Mute "x PO lines added to the bill" notification
+                    move_form = Form(AccountMove.with_context(default_purchase_id=purchase_order.id))
                 with move_form.invoice_line_ids.edit(0) as line_form:
                     if 'price' in params:
                         line_form.price_unit = params['price']

@@ -10,3 +10,6 @@ from . import stock_picking_type
 from . import stock_move
 from . import mrp_bom
 from . import hr_employee
+from . import stock_rule
+
+from . import res_groups

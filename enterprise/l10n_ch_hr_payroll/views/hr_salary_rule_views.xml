@@ -8,7 +8,7 @@
             <list editable="bottom">
                 <field name="l10n_ch_code"/>
                 <field name="name"/>
-                <field name="struct_id" optional="hidden"/>
+                <field name="struct_ids" widget="many2many_tags" optional="hidden"/>
                 <field name="l10n_ch_gross_included" optional="show"/>
                 <field name="l10n_ch_ac_included" optional="show"/>
                 <field name="l10n_ch_aanp_included" optional="show"/>
@@ -28,14 +28,20 @@
         </field>
     </record>
 
-    <record id="action_hr_salary_rule_l10n_ch_wage_types" model="ir.actions.act_window">
-        <field name="name">Wage Types</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">hr.salary.rule</field>
-        <field name="view_mode">list</field>
-        <field name="domain" model="hr.salary.rule" eval="[('struct_id', '=', obj().env.ref('l10n_ch_hr_payroll.hr_payroll_structure_ch_elm').id)]"/>
-        <field name="context">{}</field>
-        <field name="view_id" ref="hr_salary_rule_view_tree_l10n_ch_wage_types"/>
+    <record id="hr_salary_rule_form_l10n_ch" model="ir.ui.view">
+        <field name="name">hr.salary.rule.form.l10n.ch</field>
+        <field name="model">hr.salary.rule</field>
+        <field name="inherit_id" ref="hr_payroll.hr_salary_rule_form"/>
+        <field name="arch" type="xml">
+            <div id="warning_modified_user" position="attributes">
+                <attribute name="invisible" add="country_code == 'ch'" separator="or"/>
+            </div>
+            <div id="warning_modified_user" position="after">
+                <div class="alert alert-warning d-flex" role="alert" invisible="not modified_by_user or country_code != 'ch'">
+                    This rule has been manually updated. It will be overriden by our system with the next upgrade.
+                    <button string="Reset" type="object" name="action_reset_rule" class="btn-link py-0"/>
+                </div>
+            </div>
+        </field>
     </record>
-
 </odoo>

@@ -1,6 +1,5 @@
 from odoo import api, fields, models
 from odoo.addons.l10n_cz_reports.models.product_template import SUPPLIES_CODE_SELECTION, TRANSACTION_CODE_SELECTION, TRANSACTION_CODE_HELP
-from odoo.tools.sql import column_exists, create_column
 
 
 class AccountMoveLine(models.Model):
@@ -10,6 +9,7 @@ class AccountMoveLine(models.Model):
         string="Transaction code",
         selection=TRANSACTION_CODE_SELECTION,
         compute='_compute_transaction_code',
+        init_storage=lambda model: None,
         store=True,
         readonly=False,
         help=TRANSACTION_CODE_HELP,
@@ -22,6 +22,7 @@ class AccountMoveLine(models.Model):
         help="Code of subject of supply in the domestic reverse charge regime.",
         compute='_compute_l10n_cz_supplies_code',
         store=True,
+        init_storage=lambda model: None,
         readonly=False,
     )
 
@@ -31,13 +32,6 @@ class AccountMoveLine(models.Model):
         help="Whether line contains a tax related to reverse charge transactions",
         compute='_compute_is_reverse_charge',
     )
-
-    def _auto_init(self):
-        if not column_exists(self.env.cr, "account_move_line", "l10n_cz_transaction_code"):
-            # Since l10n_cz_transaction_code column does not exist we can assume l10n_cz_supplies_code doesn't exist either
-            create_column(self.env.cr, "account_move_line", "l10n_cz_transaction_code", "VARCHAR")
-            create_column(self.env.cr, "account_move_line", "l10n_cz_supplies_code", "VARCHAR")
-        return super()._auto_init()
 
     # -------------------------------------------------------------------------
     # COMPUTE METHODS

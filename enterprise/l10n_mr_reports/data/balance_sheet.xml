@@ -4,6 +4,7 @@
         <field name="name">Balance sheet</field>
         <field name="name@fr">Bilan</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="country_id" ref="base.mr"/>
         <field name="filter_multi_company">selector</field>
@@ -43,8 +44,6 @@
                                     <field name="name">Intangible assets</field>
                                     <field name="name@fr">Immobilisations incorporelles</field>
                                     <field name="code">MR_intangible_asset</field>
-                                    <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">2013 + 2030 + 205 + 2370 + 280 + 2905</field>
                                 </record>
                                 <record id="account_financial_report_mr_tangible_asset" model="account.report.line">
@@ -63,48 +62,36 @@
                                             <field name="name">Land</field>
                                             <field name="name@fr">Terrains</field>
                                             <field name="code">MR_tangible_asset_land</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">210 + 211 + 2120 + 2811 + 291 + 2900</field>
                                         </record>
                                         <record id="account_financial_report_mr_tangible_asset_construction" model="account.report.line">
                                             <field name="name">Construction</field>
                                             <field name="name@fr">Constructions</field>
                                             <field name="code">MR_tangible_asset_construction</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">2122 + 2125 + 213 + 2812</field>
                                         </record>
                                         <record id="account_financial_report_mr_tangible_asset_op_equipment" model="account.report.line">
                                             <field name="name">Operating Equipment</field>
                                             <field name="name@fr">Matériel d'exploitation</field>
                                             <field name="code">MR_tangible_asset_op_equipment</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">214 + 2814</field>
                                         </record>
                                         <record id="account_financial_report_mr_tangible_asset_transport_equipment" model="account.report.line">
                                             <field name="name">Transport Equipment</field>
                                             <field name="name@fr">Matériel de transport</field>
                                             <field name="code">MR_tangible_asset_transport_equipment</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">215 + 2813 + 2815</field>
                                         </record>
                                         <record id="account_financial_report_mr_tangible_asset_office_equipment" model="account.report.line">
                                             <field name="name">Office and computer equipment</field>
                                             <field name="name@fr">Matériel de bureau et informatique</field>
                                             <field name="code">MR_tangible_asset_office_equipment</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">216 + 218 + 2816 + 2817 + 2818</field>
                                         </record>
                                         <record id="account_financial_report_mr_tangible_asset_other" model="account.report.line">
                                             <field name="name">Other tangible fixed assets</field>
                                             <field name="name@fr">Autres immobilisations corporelles</field>
                                             <field name="code">MR_tangible_asset_other</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">200 + 217 + 220 + 268 + 282 + 292</field>
                                         </record>
                                     </field>
@@ -113,8 +100,6 @@
                                     <field name="name">Fixed assets in progress</field>
                                     <field name="name@fr">Immobilisations en cours</field>
                                     <field name="code">MR_fixed_in_progress_asset</field>
-                                    <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">2300 + 28103 + 293</field>
                                 </record>
                                 <record id="account_financial_report_mr_financial_asset" model="account.report.line">
@@ -133,16 +118,12 @@
                                             <field name="name">Equity securities</field>
                                             <field name="name@fr">Titres de participation</field>
                                             <field name="code">MR_financial_asset_equity</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">27 + 297</field>
                                         </record>
                                         <record id="account_financial_report_mr_financial_asset_other" model="account.report.line">
                                             <field name="name">Other financial assets</field>
                                             <field name="name@fr">Autres immobilisations financières</field>
                                             <field name="code">MR_financial_asset_other</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">238 + 260 + 264 + 265 + 296</field>
                                         </record>
                                     </field>
@@ -177,16 +158,12 @@
                                             <field name="name">Stocks</field>
                                             <field name="name@fr">Stocks</field>
                                             <field name="code">MR_stocks</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">30 + 31 + 32 + 34 + 35 + 36 + 38 + 390 + 391 + 392 + 394 + 395</field>
                                         </record>
                                             <record id="account_financial_report_mr_operating_in_process" model="account.report.line">
                                             <field name="name">In progress</field>
                                             <field name="name@fr">En-cours</field>
                                             <field name="code">MR_operating_in_process</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">33 + 393</field>
                                         </record>
                                     </field>
@@ -207,48 +184,36 @@
                                             <field name="name">Debtor suppliers</field>
                                             <field name="name@fr">Fournisseurs débiteurs</field>
                                             <field name="code">MR_debtor_supplier</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">412 + 417 + 418</field>
                                         </record>
                                         <record id="account_financial_report_mr_customers_accounts" model="account.report.line">
                                             <field name="name">Customers and related accounts</field>
                                             <field name="name@fr">Clients et comptes rattachés</field>
                                             <field name="code">MR_customers_accounts</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">410 + 415 +419 + 491</field>
                                         </record>
                                         <record id="account_financial_report_mr_staff_accounts" model="account.report.line">
                                             <field name="name">Staff and related accounts</field>
                                             <field name="name@fr">Personnel et comptes rattachés</field>
                                             <field name="code">MR_staff_accounts</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">425 + 4287</field>
                                         </record>
                                         <record id="account_financial_report_mr_state_orgs" model="account.report.line">
                                             <field name="name">State, communities and social organizations</field>
                                             <field name="name@fr">État, collectivités et organismes sociaux</field>
                                             <field name="code">MR_state_orgs</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">4311 + 4350 + 43567 + 43581 + 43582 + 43586</field>
                                         </record>
                                         <record id="account_financial_report_mr_partners_assets" model="account.report.line">
                                             <field name="name">Partners and group</field>
                                             <field name="name@fr">Associés et groupe</field>
                                             <field name="code">MR_partners_assets</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">450 + 451 + 452 + 453 + 454 + 458 + 495</field>
                                         </record>
                                         <record id="account_financial_report_mr_various_debtors" model="account.report.line">
                                             <field name="name">Various debtors</field>
                                             <field name="name@fr">Débiteurs divers</field>
                                             <field name="code">MR_various_debtors</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">462 + 4687 + 4688 + 490 + 496</field>
                                         </record>
                                     </field>
@@ -269,32 +234,24 @@
                                             <field name="name">Short term loans</field>
                                             <field name="name@fr">Prêts à court terme</field>
                                             <field name="code">MR_short_term_loans</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">50 + 51 + 591</field>
                                         </record>
                                         <record id="account_financial_report_mr_investment_securities" model="account.report.line">
                                             <field name="name">Investment securities</field>
                                             <field name="name@fr">Valeurs mobilières de placement</field>
                                             <field name="code">MR_investment_securities</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">52 + 592</field>
                                         </record>
                                         <record id="account_financial_report_mr_banks" model="account.report.line">
                                             <field name="name">Banks</field>
                                             <field name="name@fr">Banques</field>
                                             <field name="code">MR_banks</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">55</field>
                                         </record>
                                         <record id="account_financial_report_mr_cash" model="account.report.line">
                                             <field name="name">Cash</field>
                                             <field name="name@fr">Caisse</field>
                                             <field name="code">MR_cash</field>
-                                            <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">54 + 56 + 57 + 58 + 590</field>
                                         </record>
                                     </field>
@@ -317,24 +274,18 @@
                                     <field name="name">Prepaid Expenses</field>
                                     <field name="name@fr">Charges constatées d'avance</field>
                                     <field name="code">MR_prepaid_expenses</field>
-                                    <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">480</field>
                                 </record>
                                 <record id="account_financial_report_mr_conversion_diff" model="account.report.line">
                                     <field name="name">Conversion differences - Active</field>
                                     <field name="name@fr">Différences de conversion - Actif</field>
                                     <field name="code">MR_conversion_diff</field>
-                                    <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">484</field>
                                 </record>
                                 <record id="account_financial_report_mr_suspense_regularization" model="account.report.line">
                                     <field name="name">Suspense and regularization accounts</field>
                                     <field name="name@fr">Comptes d'attente et à régulariser</field>
                                     <field name="code">MR_suspense_regularization</field>
-                                    <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">4866 + 488</field>
                                 </record>
                             </field>
@@ -381,32 +332,24 @@
                                         <field name="name">Capital</field>
                                         <field name="name@fr">Capital</field>
                                         <field name="code">MR_equity_capital</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">10 + 1500</field>
                                     </record>
                                     <record id="account_financial_report_mr_equity_reserves" model="account.report.line">
                                         <field name="name">Reserves</field>
                                         <field name="name@fr">Réserves</field>
                                         <field name="code">MR_equity_reserves</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">11</field>
                                     </record>
                                     <record id="account_financial_report_mr_equity_carry_fwd" model="account.report.line">
                                         <field name="name">Carry forward</field>
                                         <field name="name@fr">Report à nouveau</field>
                                         <field name="code">MR_equity_carry_fwd</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">12</field>
                                     </record>
                                     <record id="account_financial_report_mr_equity_result_year" model="account.report.line">
                                         <field name="name">Result of the fiscal year</field>
                                         <field name="name@fr">Résultat de l'exercice</field>
                                         <field name="code">MR_equity_result_year</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">13</field>
                                     </record>
                                 </field>
@@ -415,32 +358,24 @@
                                 <field name="name">Equipment grants</field>
                                 <field name="name@fr">Subventions d'équipement</field>
                                 <field name="code">MR_equity_equipment</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">14</field>
                             </record>
                             <record id="account_financial_report_mr_equity_revaluation_diff" model="account.report.line">
                                 <field name="name">Revaluation differences</field>
                                 <field name="name@fr">Ecarts de réévaluation</field>
                                 <field name="code">MR_equity_revaluation_diff</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">151</field>
                             </record>
                             <record id="account_financial_report_mr_equity_revaluation_prov" model="account.report.line">
                                 <field name="name">Special revaluation provision</field>
                                 <field name="name@fr">Provision spéciale de réévaluation</field>
                                 <field name="code">MR_equity_revaluation_prov</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1508</field>
                             </record>
                             <record id="account_financial_report_mr_equity_regulated_prov" model="account.report.line">
                                 <field name="name">Regulated provisions</field>
                                 <field name="name@fr">Provisions réglementées</field>
                                 <field name="code">MR_equity_regulated_prov</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1520</field>
                             </record>
                         </field>
@@ -461,16 +396,12 @@
                                 <field name="name">Long and medium term loans and debts</field>
                                 <field name="name@fr">Emprunts et dettes à long et moyen terme</field>
                                 <field name="code">MR_long_medium_loans</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">160 + 162 + 167 + 168 + 170 + 175 + 178 + 180</field>
                             </record>
                             <record id="account_financial_report_mr_risks_charges_prov" model="account.report.line">
                                 <field name="name">Provisions for risks and charges</field>
                                 <field name="name@fr">Provisions pour risques et charges</field>
                                 <field name="code">MR_risks_charges_prov</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1523 + 190 + 191 + 193 + 194 + 195 + 196 + 197 + 198</field>
                             </record>
                             <record id="account_financial_report_mr_short_term_debts" model="account.report.line">
@@ -489,64 +420,48 @@
                                         <field name="name">Suppliers and related accounts</field>
                                         <field name="name@fr">Fournisseurs et comptes rattachés</field>
                                         <field name="code">MR_suppliers_accounts</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">40</field>
                                     </record>
                                     <record id="account_financial_report_mr_creditor_customers" model="account.report.line">
                                         <field name="name">Creditor customers</field>
                                         <field name="name@fr">Clients créditeurs</field>
                                         <field name="code">MR_creditor_customers</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">165</field>
                                     </record>
                                     <record id="account_financial_report_mr_debt_staff_accounts" model="account.report.line">
                                         <field name="name">Staff and related accounts</field>
                                         <field name="name@fr">Personnel et comptes rattachés</field>
                                         <field name="code">MR_debt_staff_accounts</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">420 + 422 + 426 + 427 + 4280 + 4286</field>
                                     </record>
                                     <record id="account_financial_report_mr_debt_state_orgs" model="account.report.line">
                                         <field name="name">State, communities and social organizations</field>
                                         <field name="name@fr">État, collectivités et organismes sociaux</field>
                                         <field name="code">MR_debt_state_orgs</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">430 + 4310 + 432 + 433 + 434 + 4355 + 4357 + 43587 + 436 + 438 + 44</field>
                                     </record>
                                     <record id="account_financial_report_mr_debt_partners" model="account.report.line">
                                         <field name="name">Partners and group</field>
                                         <field name="name@fr">Associés et groupe</field>
                                         <field name="code">MR_debt_partners</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">455 + 456 + 457</field>
                                     </record>
                                     <record id="account_financial_report_mr_debt_misc_creditors" model="account.report.line">
                                         <field name="name">Miscellaneous creditors</field>
                                         <field name="name@fr">Créditeurs divers</field>
                                         <field name="code">MR_debt_misc_creditors</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">460 + 464</field>
                                     </record>
                                     <record id="account_financial_report_mr_debt_short_term_loans" model="account.report.line">
                                         <field name="name">Short term loans</field>
                                         <field name="name@fr">Prêts à court terme</field>
                                         <field name="code">MR_debt_short_term_loans</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">4680 + 4686</field>
                                     </record>
                                     <record id="account_financial_report_mr_debt_bank_competitions" model="account.report.line">
                                         <field name="name">Current bank competitions</field>
                                         <field name="name@fr">Concours bancaires courants</field>
                                         <field name="code">MR_debt_bank_competitions</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="account_codes_formula">437</field>
                                     </record>
                                 </field>
@@ -569,24 +484,18 @@
                                 <field name="name">Deferred income</field>
                                 <field name="name@fr">Produits constatés d'avance</field>
                                 <field name="code">MR_deferred_income</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">481</field>
                             </record>
                             <record id="account_financial_report_mr_passive_conversion_diff" model="account.report.line">
                                 <field name="name">Conversion differences - Liabilities</field>
                                 <field name="name@fr">Différences de conversion - Passif</field>
                                 <field name="code">MR_passive_conversion_diff</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">485</field>
                             </record>
                             <record id="account_financial_report_mr_passive_suspense_regularization" model="account.report.line">
                                 <field name="name">Suspense and regularization accounts</field>
                                 <field name="name@fr">Comptes d'attente et à régulariser</field>
                                 <field name="code">MR_passive_suspense_regularization</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">4860 + 4867</field>
                             </record>
                         </field>

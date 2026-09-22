@@ -3,17 +3,7 @@ export function increaseQuantityOfTicket(ticket) {
     return [
         {
             content: `increase quantity`,
-            trigger: `.modal .o_event_configurator_popup div:contains('${ticket}') .fa.fa-plus`,
-            run: "click",
-        },
-    ];
-}
-
-export function decreaseQuantityOfTicket(ticket) {
-    return [
-        {
-            content: `decrease quantity`,
-            trigger: `.modal .o_event_configurator_popup div:contains('${ticket}') .fa.fa-minus`,
+            trigger: `.modal .o_event_configurator_popup div:contains('${ticket}') [data-icon="add"]`,
             run: "click",
         },
     ];
@@ -39,42 +29,22 @@ export function answerGlobalSelectQuestion(question, answer) {
     ];
 }
 
+export function answerTicketQuestion(ticketNumber, question, answer) {
+    return [
+        {
+            content: `Answer question ${question} with ${answer} for ticket ${ticketNumber}`,
+            trigger: `.ticket_question:contains('Ticket #${ticketNumber}') .input-group:contains('${question}') input`,
+            run: `edit ${answer}`,
+        },
+    ];
+}
+
 export function answerGlobalTextQuestion(question, answer) {
     return [
         {
             content: `Answer question ${question} with ${answer} for global`,
             trigger: `.global_question:contains('${question}') input`,
             run: `edit ${answer}`,
-        },
-    ];
-}
-
-export function pickTicket(name) {
-    return [
-        {
-            content: `pick ticket with name: ${name}`,
-            trigger: `.modal .o-event-ticket:contains('${name}')`,
-            run: "click",
-        },
-    ];
-}
-
-export function printTicket(mode) {
-    return [
-        {
-            content: `print ticket with mode: ${mode}`,
-            trigger: `.o-event-button .o-event-${mode}`,
-            run: "click",
-        },
-    ];
-}
-
-export function eventRemainingSeat(name, seats) {
-    return [
-        {
-            content: `check remaining seats for ${name}`,
-            trigger: `article:contains('${name}'):contains('${seats} left')`,
-            run: "click",
         },
     ];
 }

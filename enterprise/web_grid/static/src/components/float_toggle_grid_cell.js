@@ -1,95 +1,74 @@
+import { Component, computed, signal, t, useEffect, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { formatFloatFactor } from "@web/views/fields/formatters";
-import { useGridCell, useMagnifierGlass } from "@web_grid/hooks/grid_cell_hook";
-import { standardGridCellProps } from "./grid_cell";
-
-import { Component, useRef, useState, useEffect } from "@odoo/owl";
-
-function formatter(value, options = {}) {
-    return formatFloatFactor(value, options);
-}
+import { standardGridCellProps, useGridCell } from "@web_grid/hooks/grid_cell_hook";
+import { GridCell } from "../views/grid_model";
 
 export class FloatToggleGridCell extends Component {
-    static props = {
-        ...standardGridCellProps,
-        factor: { type: Number, optional: true },
-    };
     static template = "web_grid.FloatToggleGridCell";
 
-    setup() {
-        this.rootRef = useRef("root");
-        this.buttonRef = useRef("toggleButton");
-        this.magnifierGlassHook = useMagnifierGlass();
-        this.state = useState({
-            edit: this.props.editMode,
-            invalid: false,
-            cell: null,
-        });
-        useGridCell();
+    props = useProps({
+        ...standardGridCellProps,
+        digits: t.array().optional(),
+        factor: t.number().optional(),
+        readonly: t.boolean().optional(false),
+        trailingZeros: t.boolean().optional(true),
+    });
 
-        useEffect(
-            (buttonEl) => {
-                if (buttonEl) {
-                    buttonEl.focus();
-                }
-            },
-            () => [this.buttonRef.el]
-        );
-    }
+    invalid = signal(false);
+    cell = signal(null, { type: t.instanceOf(GridCell) });
+    buttonRef = signal.ref(HTMLButtonElement);
 
-    get factor() {
-        return this.props.factor || this.props.fieldInfo.options?.factor || 1;
-    }
-
-    get range() {
-        return this.props.fieldInfo.options?.range || [0.0, 0.5, 1.0];
-    }
-
-    get value() {
-        return (this.state.cell.value || 0) * this.factor;
-    }
-
-    get formattedValue() {
-        return formatter(this.state.cell.value || 0, {
+    factor = computed(() => this.props.factor || this.props.fieldInfo.options?.factor || 1);
+    formattedValue = computed(() =>
+        formatFloatFactor(this.cell()?.value || 0, {
             digits: this.props.fieldInfo.attrs?.digits || 2,
-            factor: this.factor,
-        });
-    }
+            factor: this.factor(),
+            trailingZeros: this.props.trailingZeros,
+        })
+    );
+    isEditable = computed(() => {
+        const cell = this.cell();
+        return !this.props.readonly && cell?.readonly === false && !cell.row.isSection;
+    });
+    range = computed(() => this.props.fieldInfo.options?.range || [0.0, 0.5, 1.0]);
+    value = computed(() => (this.cell().value || 0) * this.factor());
 
-    isEditable(props = this.props) {
-        return (
-            !props.readonly && this.state.cell?.readonly === false && !this.state.cell.row.isSection
-        );
+    gridCellHook = useGridCell(this.cell, this.isEditable);
+
+    setup() {
+        useEffect(() => this.buttonRef()?.focus());
     }
 
     onChange() {
-        let currentIndex = this.range.indexOf(this.value);
+        const range = this.range();
+        let currentIndex = range.indexOf(this.value());
         currentIndex++;
-        if (currentIndex > this.range.length - 1) {
+        if (currentIndex > range.length - 1) {
             currentIndex = 0;
         }
-        this.update(this.range[currentIndex] / this.factor);
+        this.update(range[currentIndex] / this.factor());
     }
 
     update(value) {
-        this.state.cell.update(value);
+        this.cell().update(value);
     }
 
     onCellClick(ev) {
-        if (this.isEditable() && !this.state.edit && !ev.target.closest(".o_grid_search_btn")) {
+        if (this.isEditable() && !this.props.editMode && !ev.target.closest(".o_grid_search_btn")) {
             this.onChange();
             this.props.onEdit(true);
         }
     }
 
     onKeyDown(ev) {
-        this.props.onKeyDown(ev, this.state.cell);
+        this.props.onKeyDown(ev, this.cell());
     }
 }
 
 export const floatToggleGridCell = {
     component: FloatToggleGridCell,
-    formatter,
+    formatter: formatFloatFactor,
 };
 
 registry.category("grid_components").add("float_toggle", floatToggleGridCell);

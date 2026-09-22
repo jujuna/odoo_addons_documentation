@@ -13,22 +13,41 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-23 18:00+0000\n"
-"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/iot/ko/>\n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-17 23:47+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/iot/"
+"ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: iot
+#: model:ir.module.module,description:base.module_iot
+msgid ""
+"\n"
+"This module provides management of your IoT Boxes inside Odoo.\n"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/iot_restart_odoo.js:0
 msgid "%s is currently restarting"
 msgstr "%s 항목은 현재 재시작 중입니다"
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/view_widgets/iot_reset_password.js:0
+msgid "%s new password: %s"
+msgstr "%s 새 비밀번호: %s"
+
+#. module: iot
+#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_kanban
+msgid "<i class=\"oi\" data-icon=\"power\" title=\"device-icon\"/>"
+msgstr ""
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
@@ -40,16 +59,6 @@ msgstr ""
 "<span class=\"spinner-border spinner-border-sm\"/>\n"
 "                    IoT 박스를 검색 중입니다.\n"
 "                    <span id=\"discover_retry_countdown\" class=\"fw-bold\"/>"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_form
-msgid "A fiscal data module has been connected. To use it,"
-msgstr "회계 데이터 모듈이 연결되었습니다. 이용하려면,"
-
-#. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_box__must_install_fdm_module
-msgid "A fiscal data module is connected to this IoT Box"
-msgstr "회계 데이터 모듈이 해당 IoT 박스에 연결되었습니다."
 
 #. module: iot
 #: model:ir.model,name:iot.model_add_iot_box
@@ -70,7 +79,7 @@ msgstr "관리자"
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/test_iot_box.js:0
 msgid "All communication protocols are working properly."
-msgstr "모든 커뮤니케이션 프로토콜이 정상적으로 작동하고 있습니다."
+msgstr ""
 
 #. module: iot
 #: model:ir.model,name:iot.model_iot_discovered_box
@@ -84,19 +93,14 @@ msgid "Are you sure you want to restart Odoo on the IoT Box?"
 msgstr ""
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_box__drivers_auto_update
-msgid "Automatic drivers update"
-msgstr "자동 드라이버 업데이트"
-
-#. module: iot
-#: model:ir.model.fields,help:iot.field_iot_box__drivers_auto_update
-msgid "Automatically update drivers when the IoT Box boots"
-msgstr "IoT Box 부팅시 자동으로 드라이버 업데이트"
-
-#. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__scanner
 msgid "Barcode Scanner"
 msgstr "바코드 스캐너"
+
+#. module: iot
+#: model:ir.module.module,summary:base.module_iot
+msgid "Basic models and helpers to support Internet of Things."
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -152,8 +156,8 @@ msgstr "조명 확인"
 
 #. module: iot
 #: model_terms:ir.actions.act_window,help:iot.iot_box_action
-msgid "Click on the"
-msgstr "다음을 클릭하세요"
+msgid "Click on the connect button to add an IoT Box."
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -168,9 +172,14 @@ msgid "Company"
 msgstr "회사"
 
 #. module: iot
-#: model:ir.ui.menu,name:iot.view_iot_selected_printer_local_action
+#: model:ir.ui.menu,name:iot.iot_configuration_menu
 msgid "Configuration"
 msgstr "환경설정"
+
+#. module: iot
+#: model:res.groups.privilege,description:iot.res_groups_privilege_iot
+msgid "Configure IoT boxes and devices."
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__add_iot_box__stage__connect
@@ -203,12 +212,17 @@ msgid "Connection"
 msgstr "연결"
 
 #. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_longpolling.js:0
+msgid "Connection to IoT Box failed"
+msgstr "IoT Box에 연결하지 못했습니다"
+
+#. module: iot
 #: model:ir.model.fields,field_description:iot.field_add_iot_box__create_uid
 #: model:ir.model.fields,field_description:iot.field_iot_box__create_uid
 #: model:ir.model.fields,field_description:iot.field_iot_device__create_uid
 #: model:ir.model.fields,field_description:iot.field_iot_discovered_box__create_uid
 #: model:ir.model.fields,field_description:iot.field_iot_keyboard_layout__create_uid
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__create_uid
 msgid "Created by"
 msgstr "작성자"
 
@@ -218,12 +232,10 @@ msgstr "작성자"
 #: model:ir.model.fields,field_description:iot.field_iot_device__create_date
 #: model:ir.model.fields,field_description:iot.field_iot_discovered_box__create_date
 #: model:ir.model.fields,field_description:iot.field_iot_keyboard_layout__create_date
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__create_date
 msgid "Created on"
 msgstr "작성일자"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__device_ids
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__device
 msgid "Device"
 msgstr "장치"
@@ -235,7 +247,13 @@ msgstr "장치 수"
 
 #. module: iot
 #. odoo-javascript
-#: code:addons/iot/static/src/backend/iot_device_form.js:0
+#: code:addons/iot/static/src/view_widgets/test_iot_device.js:0
+msgid "Device is connected and operational"
+msgstr ""
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/view_widgets/test_iot_device.js:0
 msgid "Device is disconnected"
 msgstr "장치 연결이 해제되었습니다"
 
@@ -255,10 +273,6 @@ msgstr "장치"
 #. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/iot_remote_debug.xml:0
-#: model_terms:ir.ui.view,arch_db:iot.view_add_iot_box
-#: model_terms:ir.ui.view,arch_db:iot.view_enter_pairing_code
-#: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
-#: model_terms:ir.ui.view,arch_db:iot.view_pair_offline
 msgid "Discard"
 msgstr "작성 취소"
 
@@ -283,11 +297,6 @@ msgid "Display"
 msgstr "표시"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__display_device_ids
-msgid "Display Device"
-msgstr "장치 표시"
-
-#. module: iot
 #: model:ir.model.fields,field_description:iot.field_add_iot_box__display_name
 #: model:ir.model.fields,field_description:iot.field_iot_box__display_name
 #: model:ir.model.fields,field_description:iot.field_iot_channel__display_name
@@ -297,10 +306,17 @@ msgstr "장치 표시"
 #: model:ir.model.fields,field_description:iot.field_ir_actions_report__display_name
 #: model:ir.model.fields,field_description:iot.field_ir_config_parameter__display_name
 #: model:ir.model.fields,field_description:iot.field_ir_http__display_name
+#: model:ir.model.fields,field_description:iot.field_ir_websocket__display_name
+#: model:ir.model.fields,field_description:iot.field_printer_printer__display_name
 #: model:ir.model.fields,field_description:iot.field_publisher_warranty_contract__display_name
 #: model:ir.model.fields,field_description:iot.field_select_printers_wizard__display_name
 msgid "Display Name"
 msgstr "표시명"
+
+#. module: iot
+#: model:ir.model.fields,field_description:iot.field_iot_device__display_orientation
+msgid "Display Orientation"
+msgstr "디스플레이 방향"
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_device__display_url
@@ -308,11 +324,13 @@ msgid "Display URL"
 msgstr "URL 표시"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__do_not_ask_again
-msgid "Do not ask me again"
-msgstr "다시 묻지 않기"
+#. odoo-javascript
+#: code:addons/iot/static/src/backend/iot_device_form.js:0
+msgid "Display settings updated."
+msgstr "디스플레이 설정이 업데이트되었습니다."
 
 #. module: iot
+#: model_terms:ir.actions.act_window,help:iot.iot_box_action
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 msgid "Documentation"
 msgstr "참고 문서"
@@ -322,6 +340,31 @@ msgstr "참고 문서"
 #: model:ir.model.fields,field_description:iot.field_iot_device__iot_ip
 msgid "Domain Address"
 msgstr "도메인 주소"
+
+#. module: iot
+#: model:ir.actions.act_url,name:iot.action_download_iot_box_image
+msgid "Download IoT Box Image"
+msgstr ""
+
+#. module: iot
+#: model:ir.actions.act_url,name:iot.action_download_virtual_iot
+msgid "Download Virtual IoT Box"
+msgstr ""
+
+#. module: iot
+#: model:ir.model.fields,help:iot.field_iot_box__use_custom_handlers
+msgid "Download custom handlers from the database"
+msgstr ""
+
+#. module: iot
+#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__duplex
+msgid "Duplex"
+msgstr ""
+
+#. module: iot
+#: model:ir.model,name:iot.model_printer_printer
+msgid "External Printer"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -341,6 +384,12 @@ msgstr "%s 에서 로그 다운로드 실패"
 #: code:addons/iot/static/src/network_utils/iot_http_service.js:0
 msgid "Failed to initiate print"
 msgstr "인쇄 시작에 실패했습니다."
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_longpolling.js:0
+msgid "Failed to reach IoT Box at %s"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -364,7 +413,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/iot_remote_debug.js:0
 msgid "Failed to toggle remote debug."
-msgstr ""
+msgstr "원격 디버그 전환에 실패했습니다."
 
 #. module: iot
 #. odoo-javascript
@@ -402,7 +451,7 @@ msgstr "회계 데이터 모듈"
 
 #. module: iot
 #. odoo-javascript
-#: code:addons/iot/static/src/backend/iot_device_form.js:0
+#: code:addons/iot/static/src/view_widgets/test_iot_device.js:0
 msgid "Fiscal Data Module is connected and operational"
 msgstr ""
 
@@ -455,6 +504,8 @@ msgstr "홈페이지"
 #: model:ir.model.fields,field_description:iot.field_ir_actions_report__id
 #: model:ir.model.fields,field_description:iot.field_ir_config_parameter__id
 #: model:ir.model.fields,field_description:iot.field_ir_http__id
+#: model:ir.model.fields,field_description:iot.field_ir_websocket__id
+#: model:ir.model.fields,field_description:iot.field_printer_printer__id
 #: model:ir.model.fields,field_description:iot.field_publisher_warranty_contract__id
 #: model:ir.model.fields,field_description:iot.field_select_printers_wizard__id
 msgid "ID"
@@ -472,22 +523,13 @@ msgid "Identifier"
 msgstr "식별 기호"
 
 #. module: iot
-#: model:ir.model.fields,help:iot.field_select_printers_wizard__do_not_ask_again
-msgid ""
-"If checked, this dialog won't appear the next time you print and the "
-"selected printers will be used automatically."
-msgstr ""
-"이 옵션을 선택하면 인쇄할 때 이 대화상자가 다시 나타나지 않고 선택한 프린터"
-"가 자동으로 사용됩니다."
-
-#. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_pair_offline
 msgid ""
 "If your IoT Box has no access to the internet, you can pair it with your "
 "database using the pairing token."
 msgstr ""
-"IoT 박스가 인터넷에 연결되어 있지 않은 경우에는 페어링 토큰을 활용하여 데이터"
-"베이스에 연결할 수 있습니다."
+"IoT 박스가 인터넷에 연결되어 있지 않은 경우에는 페어링 토큰을 활용하여 "
+"데이터베이스에 연결할 수 있습니다."
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_box__version
@@ -499,6 +541,11 @@ msgstr "이미지 버전"
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 msgid "Internet is connected"
 msgstr "인터넷 연결됨"
+
+#. module: iot
+#: model:ir.module.module,shortdesc:base.module_iot
+msgid "Internet of Things"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -513,6 +560,12 @@ msgid "Invalid data in message sent to the blackbox."
 msgstr ""
 
 #. module: iot
+#: model:ir.model.fields.selection,name:iot.selection__iot_device__display_orientation__inverted
+msgid "Inverted"
+msgstr "반전"
+
+#. module: iot
+#: model:ir.model.fields.selection,name:iot.selection__printer_printer__type__iot
 #: model:ir.ui.menu,name:iot.iot_menu_root
 #: model:res.groups.privilege,name:iot.res_groups_privilege_iot
 msgid "IoT"
@@ -521,6 +574,7 @@ msgstr "IoT"
 #. module: iot
 #: model:ir.model,name:iot.model_iot_box
 #: model:ir.model.fields,field_description:iot.field_iot_device__iot_id
+#: model_terms:ir.ui.view,arch_db:iot.iot_device_search
 msgid "IoT Box"
 msgstr "IoT 박스"
 
@@ -535,6 +589,11 @@ msgstr "IoT 박스 %(serial_n)s %(pairing_code)s"
 #: code:addons/iot/wizard/add_iot_box.py:0
 msgid "IoT Box %s found. Connecting..."
 msgstr "%s IoT 박스를 찾았습니다. 연결 중..."
+
+#. module: iot
+#: model:ir.ui.menu,name:iot.iot_download_iot_box_image_menu
+msgid "IoT Box Image"
+msgstr ""
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_add_iot_box
@@ -556,6 +615,11 @@ msgid ""
 msgstr ""
 
 #. module: iot
+#: model:ir.model.fields,field_description:iot.field_add_iot_box__token
+msgid "IoT Box token"
+msgstr "IoT 박스 토큰"
+
+#. module: iot
 #: model:ir.actions.act_window,name:iot.iot_box_action
 #: model:ir.ui.menu,name:iot.iot_box_menu_action
 msgid "IoT Boxes"
@@ -567,14 +631,19 @@ msgid "IoT Device"
 msgstr "IOT 장치"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_ir_actions_report__device_ids
-msgid "IoT Devices"
-msgstr "IOT 장치"
+#: model:ir.model.fields,field_description:iot.field_printer_printer__iot_device_id
+msgid "IoT Printer"
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_add_iot_box__iot_box_to_connect
 msgid "Iot Box To Connect"
 msgstr "연결할 IoT Box"
+
+#. module: iot
+#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__is_duplex_hidden
+msgid "Is Duplex Hidden"
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_device__is_scanner
@@ -593,17 +662,11 @@ msgid "Keyboard Layout"
 msgstr "키보드 레이아웃"
 
 #. module: iot
-#: model:ir.model.fields.selection,name:iot.selection__iot_device__subtype__label_printer
-msgid "Label Printer"
-msgstr "라벨 프린터"
-
-#. module: iot
 #: model:ir.model.fields,field_description:iot.field_add_iot_box__write_uid
 #: model:ir.model.fields,field_description:iot.field_iot_box__write_uid
 #: model:ir.model.fields,field_description:iot.field_iot_device__write_uid
 #: model:ir.model.fields,field_description:iot.field_iot_discovered_box__write_uid
 #: model:ir.model.fields,field_description:iot.field_iot_keyboard_layout__write_uid
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__write_uid
 msgid "Last Updated by"
 msgstr "최근 갱신한 사람"
 
@@ -613,7 +676,6 @@ msgstr "최근 갱신한 사람"
 #: model:ir.model.fields,field_description:iot.field_iot_device__write_date
 #: model:ir.model.fields,field_description:iot.field_iot_discovered_box__write_date
 #: model:ir.model.fields,field_description:iot.field_iot_keyboard_layout__write_date
-#: model:ir.model.fields,field_description:iot.field_select_printers_wizard__write_date
 msgid "Last Updated on"
 msgstr "최근 갱신 일자"
 
@@ -621,6 +683,36 @@ msgstr "최근 갱신 일자"
 #: model:ir.model.fields,field_description:iot.field_iot_keyboard_layout__layout
 msgid "Layout"
 msgstr "배치"
+
+#. module: iot
+#: model:ir.model.fields.selection,name:iot.selection__iot_device__display_orientation__left
+msgid "Left"
+msgstr "왼쪽"
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
+msgid ""
+"Local Network Access configuration is enabled, but your browser is not "
+"Chromium-based. Please use a Chromium-based browser to benefit from this "
+"feature."
+msgstr ""
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
+msgid ""
+"Local Network Access is enabled for this IoT box, but your browser version "
+"does not support it. Please update your browser to the latest version."
+msgstr ""
+
+#. module: iot
+#. odoo-javascript
+#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
+msgid ""
+"Local Network Access permission is denied. Some hardware devices might not "
+"work properly. Please allow Local Network Access in your browser settings."
+msgstr ""
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
@@ -633,29 +725,19 @@ msgid "Make sure the Network lights are on."
 msgstr "네트워크 표시등이 켜져 있는지 확인하세요."
 
 #. module: iot
+#: model:ir.ui.menu,name:iot.manage_printers_action
+msgid "Manage Printers"
+msgstr ""
+
+#. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__add_iot_box__stage__manual
 msgid "Manual"
 msgstr "수동"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_device__manual_measurement
-msgid "Manual Measurement"
-msgstr "수동 측정"
-
-#. module: iot
-#: model:ir.model.fields,help:iot.field_iot_device__manual_measurement
-msgid "Manually read the measurement from the device"
-msgstr "장치에서 수동으로 측정값 읽기"
-
-#. module: iot
 #: model:ir.model.fields,help:iot.field_iot_device__is_scanner
 msgid "Manually switch the device type between keyboard and scanner"
 msgstr "키보드와 스캐너 간에 수동으로 디바이스 유형 전환하기"
-
-#. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_device__manufacturer
-msgid "Manufacturer"
-msgstr "제조사"
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_box__name
@@ -677,10 +759,9 @@ msgid "New IoT Box connected!"
 msgstr "새로운 IoT 박스에 연결되었습니다!"
 
 #. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/view_widgets/iot_reset_password.js:0
-msgid "New SSH password for %s"
-msgstr "%s 새 SSH 비밀번호"
+#: model:res.groups.privilege,placeholder:iot.res_groups_privilege_iot
+msgid "No"
+msgstr ""
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_enter_pairing_code
@@ -694,33 +775,25 @@ msgid "No IoT Box found!"
 msgstr "IoT Box를 찾을 수 없습니다!"
 
 #. module: iot
+#: model_terms:ir.actions.act_window,help:iot.iot_device_action
+msgid "No IoT Device found!"
+msgstr ""
+
+#. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/network_utils/iot_http_service.js:0
 msgid "No Vat Signing Card or Vat Signing Card broken."
 msgstr ""
 
 #. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/select_printer_wizard.js:0
-msgid "No printer selected"
-msgstr "선택한 프린터가 없음"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/client_action/delete_local_storage.xml:0
-msgid "No report to display"
-msgstr "표시할 보고서가 없습니다."
+#: model:ir.model.fields.selection,name:iot.selection__iot_device__display_orientation__normal
+msgid "Normal"
+msgstr "일반"
 
 #. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 msgid "Note: It takes ~1 minute. After that, try to pair manually."
-msgstr ""
-"참고: 약 1분 정도 소요될 예정입니다. 이후 수동으로 페어링을 시도하세요."
-
-#. module: iot
-#: model:ir.model.fields.selection,name:iot.selection__iot_device__subtype__office_printer
-msgid "Office Printer"
-msgstr "사무실 프린터"
+msgstr "참고: 약 1분 정도 소요될 예정입니다. 이후 수동으로 페어링을 시도하세요."
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__add_iot_box__stage__pair_offline
@@ -728,18 +801,6 @@ msgstr "사무실 프린터"
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 msgid "Offline Pairing"
 msgstr "오프라인 페어링"
-
-#. module: iot
-#. odoo-python
-#: code:addons/iot/models/ir_actions_report.py:0
-msgid ""
-"One of the printer used to print the document has been removed.\n"
-"To reset printers, go to the IoT App, Configuration tab, \"Reset Linked "
-"Printers\" and retry the operation."
-msgstr ""
-"일부 문서 인쇄용 프린터가 제거되었습니다.\n"
-"프린터 설정을 초기화하려면 IoT 앱의 환경설정 탭으로 이동하여 \"연결된 프린터 "
-"초기화\" 를 클릭한 후 작업을 다시 시도하세요."
 
 #. module: iot
 #. odoo-javascript
@@ -751,12 +812,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 msgid "Optional: Plug a screen"
 msgstr "선택 항목: 화면 연결"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
-msgid "Out of paper"
-msgstr "용지 없음"
 
 #. module: iot
 #. odoo-javascript
@@ -781,12 +836,6 @@ msgstr "페어링 코드"
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 msgid "Pairing code received from a printer or screen"
 msgstr "프린터 또는 화면에서 페어링 코드를 받았습니다."
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
-msgid "Paper is low"
-msgstr "용지 부족"
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__payment
@@ -815,9 +864,9 @@ msgid "Power the box"
 msgstr "박스 전원 켜짐"
 
 #. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.view_select_printers_wizard
-msgid "Print"
-msgstr "인쇄"
+#: model:ir.model.fields,help:iot.field_select_printers_wizard__duplex
+msgid "Print duplex if the printer allows it."
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__printer
@@ -827,19 +876,14 @@ msgstr "프린터"
 #. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/network_utils/iot_http_service.js:0
-msgid "Printer is not ready"
-msgstr "프린터가 준비되지 않음"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/network_utils/iot_http_service.js:0
 msgid "Printer is unreachable"
 msgstr "프린터에 연결할 수 없음"
 
 #. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.view_select_printers_wizard
-msgid "Printers"
-msgstr "프린터"
+#. odoo-javascript
+#: code:addons/iot/static/src/iot_report_action.js:0
+msgid "Printing document(s) with IoT Box..."
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -853,9 +897,9 @@ msgid "Publisher Warranty Contract For IoT Box"
 msgstr "IoT 박스에 대한 게시자 보증 계약서"
 
 #. module: iot
-#: model:ir.model.fields.selection,name:iot.selection__iot_device__subtype__receipt_printer
-msgid "Receipt Printer"
-msgstr "수신용 프린터"
+#: model:ir.model.fields,field_description:iot.field_iot_device__printer_id
+msgid "Related Printer"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -866,9 +910,8 @@ msgstr "원격 디버깅"
 #. module: iot
 #. odoo-javascript
 #: code:addons/iot/static/src/view_widgets/iot_remote_debug.js:0
-#, fuzzy
 msgid "Remote debug is %s."
-msgstr "원격 디버깅은 %s 입니다."
+msgstr "원격 디버깅이 %s 입니다."
 
 #. module: iot
 #. odoo-javascript
@@ -898,29 +941,11 @@ msgid "Report xml"
 msgstr "xml 보고서"
 
 #. module: iot
-#: model:ir.ui.menu,name:iot.iot_settings_menu_action
+#: model:ir.ui.menu,name:iot.iot_configuration_menu_reporting_section
 msgid "Reporting"
 msgstr "보고"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_device__report_ids
-msgid "Reports"
-msgstr "보고서"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_device_view_form
-msgid "Reports to Auto-Print"
-msgstr "보고서 자동 인쇄"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/client_action/delete_local_storage.xml:0
-msgid "Reports with linked printers"
-msgstr "연결된 프린터가 있는 보고서"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/client_action/delete_local_storage.xml:0
 #: model:ir.ui.menu,name:iot.iot_clear_selected_devices
 msgid "Reset Linked Printers"
 msgstr "연결된 프린터 재설정"
@@ -932,14 +957,14 @@ msgid "Retrying in "
 msgstr "다음 재시도 중: "
 
 #. module: iot
+#: model:ir.model.fields.selection,name:iot.selection__iot_device__display_orientation__right
+msgid "Right"
+msgstr "오른쪽"
+
+#. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_box__ssl_certificate_end_date
 msgid "SSL Certificate End Date"
 msgstr "SSL 인증서 종료일"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.view_select_printers_wizard
-msgid "Sales Details"
-msgstr "판매 세부 사항"
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__type__scale
@@ -958,27 +983,14 @@ msgid "Select IoT Box to connect"
 msgstr "연결할 IoT 박스 선택"
 
 #. module: iot
-#. odoo-python
-#: code:addons/iot/models/ir_actions_report.py:0
-msgid "Select Printers for %s"
-msgstr "%s 용 프린터 선택"
-
-#. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/select_printer_wizard.js:0
-msgid "Select at least one printer"
-msgstr "하나 이상의 프린터를 선택합니다."
-
-#. module: iot
 #: model:ir.model,name:iot.model_select_printers_wizard
-msgid "Selection of printers"
-msgstr "프린터 선택"
+msgid "Select printers to print the report on"
+msgstr ""
 
 #. module: iot
-#. odoo-javascript
-#: code:addons/iot/static/src/iot_report_action.js:0
-msgid "Sending document to printer %s..."
-msgstr "문서를 %s 프린터로 전송 중..."
+#: model:ir.model.fields,help:iot.field_iot_device__display_orientation
+msgid "Select the orientation of the display for the Kiosk mode"
+msgstr ""
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__connection__serial
@@ -1033,16 +1045,6 @@ msgid "Status"
 msgstr "상태"
 
 #. module: iot
-#: model:ir.model.fields,field_description:iot.field_iot_device__subtype
-msgid "Subtype"
-msgstr "하위 유형"
-
-#. module: iot
-#: model:ir.model.fields,help:iot.field_iot_device__subtype
-msgid "Subtype of device."
-msgstr "하위 장치 유형."
-
-#. module: iot
 #: model:ir.model,name:iot.model_ir_config_parameter
 msgid "System Parameter"
 msgstr "시스템 매개변수"
@@ -1053,13 +1055,8 @@ msgid "Technical Information"
 msgstr "기술적인 정보"
 
 #. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_device_view_form
-msgid "Test"
-msgstr "테스트"
-
-#. module: iot
 #. odoo-javascript
-#: code:addons/iot/static/src/backend/iot_device_form.js:0
+#: code:addons/iot/static/src/view_widgets/test_iot_device.js:0
 msgid "Test page printed"
 msgstr "테스트 페이지 인쇄"
 
@@ -1075,25 +1072,9 @@ msgid "The Websocket IoT Channel"
 msgstr "웹소켓 IoT 채널"
 
 #. module: iot
-#. odoo-python
-#: code:addons/iot/models/ir_actions_report.py:0
-msgid ""
-"The report you are trying to print requires an IoT Box to be printed.\n"
-"Make sure you linked the report '%s' to the corresponding IoT printer device."
-msgstr ""
-"해당 보고서를 인쇄하려면 IoT 박스가 있어야 합니다.\n"
-"'%s' 가 IoT 프린터 장치에 연결되어 있는지 확인하세요."
-
-#. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_pair_offline
 msgid "Then click on \"Configure\" under \"Odoo database connected\" section."
-msgstr ""
-"그런 다음 \"Odoo 데이터베이스 연결됨\" 섹션에 있는 \"환경설정\"을 클릭합니다."
-
-#. module: iot
-#: model_terms:ir.actions.act_window,help:iot.iot_device_action
-msgid "There is no device connected to your IoT Boxes"
-msgstr "IoT 박스에 연결된 장치가 없음"
+msgstr "그런 다음 \"Odoo 데이터베이스 연결됨\" 섹션에 있는 \"환경설정\"을 클릭합니다."
 
 #. module: iot
 #. odoo-javascript
@@ -1105,6 +1086,7 @@ msgstr "토큰"
 
 #. module: iot
 #: model:ir.model.fields,field_description:iot.field_iot_device__type
+#: model:ir.model.fields,field_description:iot.field_printer_printer__type
 msgid "Type"
 msgstr "유형"
 
@@ -1124,8 +1106,8 @@ msgid ""
 "URL of the page that will be displayed by the device, leave empty to use the "
 "customer facing display of the POS."
 msgstr ""
-"장치에서 표시 할 페이지의 URL입니다. 고객이 POS를 표시하도록 하려면 비워 두십"
-"시오."
+"장치에서 표시 할 페이지의 URL입니다. 고객이 POS를 표시하도록 하려면 비워 "
+"두십시오."
 
 #. module: iot
 #: model:ir.model.fields.selection,name:iot.selection__iot_device__connection__direct
@@ -1162,9 +1144,24 @@ msgid "Unsupported"
 msgstr "지원되지 않음"
 
 #. module: iot
+#: model:ir.model.fields,field_description:iot.field_iot_box__use_custom_handlers
+msgid "Use Custom Handlers"
+msgstr ""
+
+#. module: iot
+#: model:ir.model.fields,field_description:iot.field_iot_box__use_lna
+msgid "Use Local Network Access"
+msgstr ""
+
+#. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_no_iot_box_found
 msgid "Use Pairing Code"
 msgstr "페어링 코드 사용"
+
+#. module: iot
+#: model:ir.ui.menu,name:iot.iot_configuration_menu_links_section
+msgid "Useful links"
+msgstr ""
 
 #. module: iot
 #: model:res.groups,name:iot.group_iot_user
@@ -1199,16 +1196,14 @@ msgid "Visible to all"
 msgstr "모든 사람에게 표시"
 
 #. module: iot
-#: model:ir.model.fields,help:iot.field_ir_actions_report__device_ids
-msgid ""
-"When setting a device here, the report will be printed through this device "
-"on the IoT Box"
-msgstr "장치를 설정할면 보고서는 IoT 상자에 있는 이 장치를 통해 인쇄됩니다"
-
-#. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.view_select_box_to_connect
 msgid "Which one do you want to connect?<br/><br/>"
 msgstr "어떤 구독을 연결할까요?<br/><br/>"
+
+#. module: iot
+#: model:ir.ui.menu,name:iot.iot_download_virtual_iot_box_installer_menu
+msgid "Windows IoT Box Installer"
+msgstr ""
 
 #. module: iot
 #. odoo-javascript
@@ -1218,24 +1213,9 @@ msgid ""
 msgstr ""
 
 #. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_form
-msgid "app."
-msgstr "앱."
-
-#. module: iot
-#: model_terms:ir.actions.act_window,help:iot.iot_box_action
-msgid "connect"
-msgstr "연결"
-
-#. module: iot
 #: model_terms:ir.ui.view,arch_db:iot.iot_device_view_kanban
 msgid "connection_type"
 msgstr "connection_type"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_kanban
-msgid "device-icon"
-msgstr "device-icon"
 
 #. module: iot
 #. odoo-javascript
@@ -1268,14 +1248,9 @@ msgid ""
 "                <br/>"
 msgstr ""
 "Wi-Fi용입니다.<br/>\n"
-"                그 다음 IoT 박스를 프린터(USB 케이블 사용) 또는 스크린(마이크"
-"로 HDMI 케이블 사용)에 연결하여 페어링 코드를 수신합니다.<br/>\n"
+"                그 다음 IoT 박스를 프린터(USB 케이블 사용) 또는 스크린"
+"(마이크로 HDMI 케이블 사용)에 연결하여 페어링 코드를 수신합니다.<br/>\n"
 "                <br/>"
-
-#. module: iot
-#: model_terms:ir.ui.view,arch_db:iot.iot_box_view_form
-msgid "install the Fiscal Data Module"
-msgstr "회계 데이터 모듈 설치"
 
 #. module: iot
 #. odoo-javascript
@@ -1290,116 +1265,97 @@ msgid "reset.linked.printers"
 msgstr "reset.linked.printers"
 
 #. module: iot
-#: model_terms:ir.actions.act_window,help:iot.iot_box_action
-msgid "to add an IoT Box."
-msgstr "IoT 박스에 추가하기."
+#: model:ir.model,name:iot.model_ir_websocket
+msgid "websocket message handling"
+msgstr "웹소켓 메시지 처리"
 
-#~ msgid "Check if the device is still connected"
-#~ msgstr "디바이스가 아직 연결되어 있는지 확인"
+msgid "Display Device"
+msgstr "장치 표시"
 
-#~ msgid "Connection to device failed"
-#~ msgstr "장치에 연결하지 못했습니다"
+msgid "Do not ask me again"
+msgstr "다시 묻지 않기"
 
-#~ msgid "Are you sure you want to restart Odoo on the IoT box?"
-#~ msgstr "IoT box에서 Odoo를 다시 시작하시곘습니까?"
+msgid ""
+"If checked, this dialog won't appear the next time you print and the "
+"selected printers will be used automatically."
+msgstr ""
+"이 옵션을 선택하면 인쇄할 때 이 대화상자가 다시 나타나지 않고 선택한 "
+"프린터가 자동으로 사용됩니다."
 
-#~ msgid "Cache"
-#~ msgstr "캐시"
+msgid "IoT Devices"
+msgstr "IOT 장치"
 
-#~ msgid "Last restarting process hasn't finished yet"
-#~ msgstr "마지막 재부팅 프로세스가 아직 완료되지 않았습니다"
+msgid "No printer selected"
+msgstr "선택한 프린터가 없음"
 
-#~ msgid "Please wait"
-#~ msgstr "잠시 기다려 주십시오"
+msgid "No report to display"
+msgstr "표시할 보고서가 없습니다."
 
-#~ msgid "Restart Failed"
-#~ msgstr "재부팅 실패"
+msgid ""
+"One of the printer used to print the document has been removed.\n"
+"To reset printers, go to the IoT App, Configuration tab, \"Reset Linked "
+"Printers\" and retry the operation."
+msgstr ""
+"일부 문서 인쇄용 프린터가 제거되었습니다.\n"
+"프린터 설정을 초기화하려면 IoT 앱의 환경설정 탭으로 이동하여 \"연결된 프린터 "
+"초기화\" 를 클릭한 후 작업을 다시 시도하세요."
 
-#~ msgid "Restart finished"
-#~ msgstr "재부팅 완료"
+msgid "Print"
+msgstr "인쇄"
 
-#~ msgid "Restarting"
-#~ msgstr "재부팅 중"
+msgid "Printers"
+msgstr "프린터"
 
-#~ msgid "Select Printers"
-#~ msgstr "프린터 선택"
+msgid "Reports"
+msgstr "보고서"
 
-#~ msgid "Success"
-#~ msgstr "성공"
+msgid "Reports to Auto-Print"
+msgstr "보고서 자동 인쇄"
 
-#~ msgid "Timed out"
-#~ msgstr "시간 초과"
+msgid "Reports with linked printers"
+msgstr "연결된 프린터가 있는 보고서"
 
-#~ msgid "Last Sent Value"
-#~ msgstr "마지막으로 보낸 값"
+msgid "Sales Details"
+msgstr "판매 세부 사항"
 
-#~ msgid "Click here to open your IoT Homepage"
-#~ msgstr ""
-#~ "13\n"
-#~ "IoT 홈페이지를 열려면 여기를 클릭하십시오\n"
-#~ " "
+msgid "Select Printers for %s"
+msgstr "%s 용 프린터 선택"
 
-#~ msgid "Click on Advanced/Show Details/Details/More information"
-#~ msgstr "고급/세부사항 보기/세부사항/추가 정보를 클릭하세요"
+msgid "Select at least one printer"
+msgstr "하나 이상의 프린터를 선택합니다."
 
-#~ msgid ""
-#~ "Click on Proceed to .../Add Exception/Visit this website/Go on to the "
-#~ "webpage"
-#~ msgstr ""
-#~ "웹페이지에서 .../예외 추가/웹사이트 방문/진행 으로 진행을 클릭하십시오."
+msgid "Selection of printers"
+msgstr "프린터 선택"
 
-#~ msgid "Close"
-#~ msgstr "닫기"
+msgid "Sending document to printer %s..."
+msgstr "문서를 %s 프린터로 전송 중..."
 
-#~ msgid "Close this window and try again"
-#~ msgstr "이 창을 닫고 다시 시도하십시오"
+msgid ""
+"The report you are trying to print requires an IoT Box to be printed.\n"
+"Make sure you linked the report '%s' to the corresponding IoT printer device."
+msgstr ""
+"해당 보고서를 인쇄하려면 IoT 박스가 있어야 합니다.\n"
+"'%s' 가 IoT 프린터 장치에 연결되어 있는지 확인하세요."
 
-#~ msgid "Connect an IoT Box"
-#~ msgstr "IoT 박스 연결"
+msgid ""
+"When setting a device here, the report will be printed through this device "
+"on the IoT Box"
+msgstr "장치를 설정할면 보고서는 IoT 상자에 있는 이 장치를 통해 인쇄됩니다"
 
-#~ msgid "Connection to IoT Box failed"
-#~ msgstr "IoT Box에 연결하지 못했습니다"
+msgid "Label Printer"
+msgstr "라벨 프린터"
 
-#~ msgid "Device type"
-#~ msgstr "장치 유형"
+msgid "Manufacturer"
+msgstr "제조사"
 
-#~ msgid "Group By"
-#~ msgstr "그룹별"
+msgid "Office Printer"
+msgstr "사무실 프린터"
 
-#~ msgid "Hdmi"
-#~ msgstr "Hdmi"
+msgid "Receipt Printer"
+msgstr "수신용 프린터"
 
-#~ msgid "Identifier (Mac Address)"
-#~ msgstr "식별자 (맥 주소)"
+msgid "Subtype"
+msgstr "하위 유형"
 
-#~ msgid "If device is connected to the IoT Box"
-#~ msgstr "기기가 IoT Box에 연결된 경우"
-
-#~ msgid ""
-#~ "If you are on a secure server (HTTPS) check if you accepted the "
-#~ "certificate:"
-#~ msgstr "보안 서버 (HTTPS)에 있는 경우 인증서를 수락했는지 확인하십시오."
-
-#~ msgid "IoT Box Home Page"
-#~ msgstr "IoT Box 홈페이지"
-
-#~ msgid "Odoo cannot reach the IoT Box."
-#~ msgstr "Odoo는 IoT Box에 연결할 수 없습니다."
-
-#~ msgid "Pair"
-#~ msgstr "페어링"
-
-#~ msgid "Please check if the IoT Box is still connected."
-#~ msgstr "IoT Box가 여전히 연결되어 있는지 확인하십시오."
-
-#~ msgid "Printer "
-#~ msgstr "프린터 "
-
-#~ msgid "Printer Reports"
-#~ msgstr "프린터 보고서"
-
-#~ msgid "Successfully sent to printer!"
-#~ msgstr "프린터로 성공적으로 전송되었습니다!"
-
-#~ msgid "There is no device connected to this IoT Box"
-#~ msgstr "이 IoT Box에 연결된 장치가 없습니다"
+msgid "Subtype of device."
+msgstr "하위 장치 유형."

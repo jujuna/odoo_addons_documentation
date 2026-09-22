@@ -1,5 +1,5 @@
 import { Dialog } from "@web/core/dialog/dialog";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { user } from "@web/core/user";
 import { _t } from "@web/core/l10n/translation";
 
@@ -88,17 +88,17 @@ function getModelOptions(isMultiCompany) {
 
 export class ModelConfigurator extends Component {
     static template = "web_studio.ModelConfigurator";
-    static components = {};
-    static props = {
-        embed: { type: Boolean, optional: true },
-        label: { type: String },
-        onConfirmOptions: Function,
-        onPrevious: Function,
-    };
+
+    props = useProps({
+        embed: t.boolean().optional(),
+        label: t.string(),
+        onConfirmOptions: t.function(),
+        onPrevious: t.function(),
+    });
 
     setup() {
-        this.state = useState({ saving: false });
-        this.options = useState(getModelOptions(user.allowedCompanies.length > 1));
+        this.state = proxy({ saving: false });
+        this.options = proxy(getModelOptions(user.allowedCompanies.length > 1));
     }
 
     /**
@@ -124,11 +124,11 @@ export class ModelConfiguratorDialog extends Component {
     static components = { Dialog, ModelConfigurator };
     static template = "web_studio.ModelConfiguratorDialog";
 
-    static props = {
-        confirm: { type: Function },
-        close: { type: Function },
-        confirmLabel: { type: String, optional: true },
-    };
+    props = useProps({
+        confirm: t.function(),
+        close: t.function(),
+        confirmLabel: t.string().optional(),
+    });
 
     async onConfirm(data) {
         await this.props.confirm(data);

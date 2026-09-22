@@ -3,10 +3,11 @@ from datetime import date
 from odoo.tests import tagged
 
 from .common import TestPayrollAccountCommon
+from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
-class TestSocialBalanceSheet(TestPayrollAccountCommon):
+class TestSocialBalanceSheet(TestPayrollAccountCommon, TestBelgiumCommon):
 
     @classmethod
     def setUpClass(cls):
@@ -75,25 +76,4 @@ class TestSocialBalanceSheet(TestPayrollAccountCommon):
         self.assertEqual(
             social_balance_wizard.state, 'done',
             "The state should be 'done' after generating the PDF report."
-        )
-
-    def test_social_balance_xlsx_export(self):
-        """
-        Tests Social Balance Sheet XLSX exports.
-        """
-        social_balance_wizard = self.env['l10n.be.social.balance.sheet'].create({
-            'date_from': self.date_from,
-            'date_to': self.date_to,
-            'company_id': self.company_id.id,
-        })
-
-        social_balance_wizard.export_report_xlsx()
-
-        self.assertTrue(
-            social_balance_wizard.social_balance_xlsx,
-            "The XLSX export should generate a file."
-        )
-        self.assertEqual(
-            social_balance_wizard.state_xlsx, 'done',
-            "The XLSX state should be 'done' after generating the report."
         )

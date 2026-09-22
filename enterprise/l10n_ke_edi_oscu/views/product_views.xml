@@ -21,27 +21,6 @@
                 </xpath>
             </field>
         </record>
-        <record id="product_product_form__view_inherit_l10n_ke_edi_oscu" model="ir.ui.view">
-            <field name="name">product.product.form.inherit.l10n.ke.edi.oscu</field>
-            <field name="model">product.product</field>
-            <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//sheet" position="inside">
-                    <field name="fiscal_country_codes" invisible="1"/>
-                    <group name="kra_oscu" string="KRA eTIMS Details" invisible="'KE' not in fiscal_country_codes">
-                        <field name="l10n_ke_packaging_unit_id" readonly="l10n_ke_item_code"/>
-                        <field name="l10n_ke_packaging_quantity"/>
-                        <field name="l10n_ke_origin_country_id" readonly="l10n_ke_item_code"/>
-                        <field name="l10n_ke_product_type_code" readonly="l10n_ke_item_code"/>
-                        <field name="l10n_ke_is_insurance_applicable"/>
-                        <field name="l10n_ke_item_code"/>
-                        <div class="cell"/>
-                        <button name="action_l10n_ke_oscu_save_item" string="Save Item"
-                                type="object" groups="base.group_no_one"/>
-                    </group>
-                </xpath>
-            </field>
-        </record>
 
         <!-- Product variant list view -->
         <record id="l10n_ke_kra_product_tree" model="ir.ui.view">

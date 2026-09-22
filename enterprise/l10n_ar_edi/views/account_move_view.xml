@@ -23,7 +23,7 @@
                     The payment is in foreign currency: <field name="l10n_ar_payment_foreign_currency" nolabel="1" class="oe_inline"/>
                     <span invisible="l10n_ar_payment_foreign_currency_default != 'account'">
                         ( <field name="l10n_ar_payment_foreign_currency_default" /> ) 
-                        <i class="fa fa-info-circle" title="This value depends on the receivable account's currency, To change it to Yes change the account to one that use currency that differs to the company currency" role="img"/>
+                        <i class="oi" data-icon="info" title="This value depends on the receivable account's currency, To change it to Yes change the account to one that use currency that differs to the company currency" role="img"/>
                     </span>
                 </div>
             </sheet>
@@ -69,6 +69,13 @@
                        invisible="l10n_latam_document_type_id_code not in ('201', '206', '211') or country_code != 'AR'"
                        readonly="state != 'draft'"
                        required="l10n_latam_document_type_id_code in ('201', '206', '211')"/>
+                <field name="l10n_ar_afip_asoc_period_start"
+                       string="Associated Period"
+                       help="Argentina: Set this field if the Credit/Debit Note is not linked to an original invoice. This range marks the beginning and end of the period for which the adjustment is made. This only applies to Electronic Invoice - Web Service(FE)."
+                       widget="daterange"
+                       options="{'end_date_field': 'l10n_ar_afip_asoc_period_end', 'always_range': True}"
+                       readonly="state != 'draft'"
+                       invisible="reversed_entry_id or debit_origin_id or l10n_ar_afip_ws != 'wsfe' or l10n_latam_document_internal_type not in ['credit_note', 'debit_note'] or country_code != 'AR'"/>
             </group>
         </field>
     </record>

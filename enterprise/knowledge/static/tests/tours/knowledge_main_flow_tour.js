@@ -15,130 +15,153 @@ import {
 import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
 
-registry.category("web_tour.tours").add('knowledge_main_flow_tour', {
-    url: '/odoo',
-    steps: () => [stepUtils.showAppsMenuItem(), {
-    // open Knowledge App
-    trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
-    run: "click",
-}, {
-    // click on the "New Article" action
-    trigger: '.o_knowledge_create_article',
-    run: "click",
-}, {
-    // check that the article is correctly created (private section)
-    trigger: 'section[data-section="private"] .o_article .o_article_name:contains("Untitled")',
-}, {
-    // check the autofocus
-    trigger: '.note-editable.odoo-editor-editable',
-    run: function () {
-        const selection = document.getSelection();
-        if (!this.anchor.contains(selection.anchorNode)) {
-            throw new Error("The autofocus doesn't work");
-        }
-    }
-}, {
-    trigger: '.note-editable.odoo-editor-editable h1',
-    run: "editor My Private Article",  // modify the article content
-},
-{
-    trigger: 'section[data-section="workspace"]',
-    run: "hover && click section[data-section=workspace] .o_section_create",
-},
-{
-    trigger:
-        'section[data-section="private"] .o_article .o_article_name:contains("My Private Article")',
-},
-{
-    // check that the article is correctly created (workspace section), and that the previous
-    // article has been renamed using its title (first h1 in body).
-    trigger: 'section[data-section="workspace"] .o_article .o_article_name:contains("Untitled")',
-}, {
-    // check the autofocus
-    trigger: '.note-editable.odoo-editor-editable',
-    run: function () {
-        const selection = document.getSelection();
-        if (!this.anchor.contains(selection.anchorNode)) {
-            throw new Error("The autofocus doesn't work");
-        }
-    }
-}, {
-    trigger: '.o_hierarchy_article_name > input',
-    run: 'edit My Workspace Article && click body',  // modify the article name
-}, {
-    trigger: '.note-editable.odoo-editor-editable',
-    run: "editor Content of My Workspace Article",  // modify the article content
-}, {
-    trigger: '.o_article:contains("My Workspace Article")',
-    run: "hover && click .o_article:contains(My Workspace Article) a.o_article_create",
-}, {
-    // check that the article is correctly created (workspace section)
-    trigger: 'section[data-section="workspace"] .o_article .o_article_name:contains("Untitled")',
-}, {
-    // check the autofocus
-    trigger: '.note-editable.odoo-editor-editable',
-    run: function () {
-        const selection = document.getSelection();
-        if (!this.anchor.contains(selection.anchorNode)) {
-            throw new Error("The autofocus doesn't work");
-        }
-    }
-}, {
-    trigger: '.o_hierarchy_article_name > input',
-    run: "edit Child Article 1 && click body",  // modify the article name
-}, {
-    trigger: '.o_article:contains("My Workspace Article")',
-    run: "hover && click .o_article:contains(My Workspace Article) a.o_article_create",
-}, {
-    trigger: 'section[data-section="workspace"] .o_article .o_article_name:contains("Untitled")',
-}, {
-    // check the autofocus
-    trigger: '.note-editable.odoo-editor-editable',
-    run: function () {
-        const selection = document.getSelection();
-        if (!this.anchor.contains(selection.anchorNode)) {
-            throw new Error("The autofocus doesn't work");
-        }
-    }
-}, {
-    trigger: '.o_hierarchy_article_name > input',
-    run: "edit Child Article 2 && click body",  // modify the article name
-}, {
-    // move child article 2 above child article 1
-    trigger: '.o_article_handle:contains("Child Article 2")',
-    run: ({ queryOne }) => {
-        dragAndDropArticle(
-            queryOne('.o_article_handle:contains("Child Article 2")'),
-            queryOne('.o_article_handle:contains("Child Article 1")'),
-        );
-    },
-}, {
-    // verify that the move was done
-    trigger: '.o_article:has(.o_article_name:contains(My Workspace Article)) ul li:first:contains(Child Article 2)',
-}, {
-    // go back to main workspace article
-    trigger: 'section[data-section="workspace"] .o_article .o_article_name:contains("My Workspace Article")',
-    run: "click",
-}, {
-    trigger: '.o_knowledge_editor:contains("Content of My Workspace Article")',
-  // wait for article to be correctly loaded
-}, {
-    // check the autofocus
-    trigger: '.note-editable.odoo-editor-editable',
-    run: function () {
-        const selection = document.getSelection();
-        if (!this.anchor.contains(selection.anchorNode)) {
-            throw new Error("The autofocus doesn't work");
-        }
-    }
-}, {
-    // open the share dropdown
-    trigger: '.o_knowledge_header .btn:contains("Share")',
-    run: "click",
+function checkArticle(section, ...articles) {
+    let trigger = `section[data-section="${section}"]`;
+    articles.forEach((article) => {
+        const [eq, name] = article.split("|");
+        trigger += ` > ul li:eq(${eq}):contains(${name})`;
+    });
+    return {
+        content: `Check that section ${section} has `,
+        trigger,
+    };
+}
+
+function clickOnArticle(...args) {
+    return {
+        ...checkArticle(...args),
+        run: "click",
+    };
+}
+
+function waitUntilArticle(hierarchies) {
+    return {
+        content: `Wait the good article is in DOM`,
+        trigger: `.o_form_editable:has(.o_hierarchy_item:count(${hierarchies.length}))`,
+        async run({ waitUntil, queryAll }) {
+            await waitUntil(
+                () => {
+                    const items = queryAll(`.o_hierarchy_item`);
+                    const items_text = items.map((item) => item.textContent);
+                    return JSON.stringify(items_text) === JSON.stringify(hierarchies);
+                },
+                {
+                    timeout: 3000,
+                    message: "Hierarchy of article is not good",
+                }
+            );
+        },
+    };
+}
+
+function waitUntilAutofocusOnEditorEditable() {
+    return {
+        content: `Wait for autofocus on editor editable`,
+        trigger: `.note-editable.odoo-editor-editable`,
+        async run({ waitUntil, queryFirst }) {
+            await waitUntil(
+                () => queryFirst(document.getSelection().anchorNode, { root: this.anchor }),
+                {
+                    timeout: 3000,
+                    message: "The autofocus doesn't work",
+                }
+            );
+        },
+    };
+}
+
+registry.category("web_tour.tours").add("knowledge_main_flow_tour", {
+    steps: () => [
+        stepUtils.showAppsMenuItem(),
+        {
+            // open Knowledge App
+            trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
+            run: "click",
         },
         {
-            content: "click on 'Invite'",
-            trigger: '.o_knowledge_permission_panel .btn:contains("Invite")',
+            // click on the "New Article" action
+            trigger: ".o_knowledge_create_article",
+            run: "click",
+        },
+        checkArticle("private", "0|Untitled"),
+        waitUntilArticle(["Untitled"]),
+        waitUntilAutofocusOnEditorEditable(),
+        {
+            trigger: ".note-editable.odoo-editor-editable h1",
+            run: "editor My Private Article", // modify the article content
+        },
+        {
+            trigger: ".o_form_button_save",
+            run: "click",
+        },
+        checkArticle("private", "0|My Private Article"),
+        {
+            trigger: 'section[data-section="workspace"]',
+            run: "hover && click section[data-section=workspace] .o_section_create",
+        },
+        checkArticle("workspace", "1|Untitled"),
+        waitUntilArticle(["Untitled"]),
+        waitUntilAutofocusOnEditorEditable(),
+        {
+            trigger: ".o_hierarchy_article_name > input",
+            run: "edit My Workspace Article && click body", // modify the article name
+        },
+        {
+            trigger: ".note-editable.odoo-editor-editable",
+            run: "editor Content of My Workspace Article", // modify the article content
+        },
+        {
+            trigger: '.o_article:contains("My Workspace Article")',
+            run: "hover && click .o_article:contains(My Workspace Article) .o_article_create",
+        },
+        checkArticle("workspace", "1|Untitled"),
+        waitUntilArticle(["My Workspace Article/", "Untitled"]),
+        waitUntilAutofocusOnEditorEditable(),
+        {
+            content: "modify the article name with Child Article 1",
+            trigger: ".o_hierarchy_article_name > input",
+            run: "edit Child Article 1 && click body",
+        },
+        checkArticle("workspace", "1|My Workspace Article", "0|Child Article 1"),
+        {
+            trigger: '.o_article:contains("My Workspace Article")',
+            run: "hover && click .o_article:contains(My Workspace Article) .o_article_create",
+        },
+        clickOnArticle("workspace", "1|My Workspace Article", "1|Untitled"),
+        waitUntilArticle(["My Workspace Article/", "Untitled"]),
+        waitUntilAutofocusOnEditorEditable(),
+        {
+            content: "modify the article name",
+            trigger: ".o_hierarchy_article_name > input",
+            run: "edit Child Article 2 && click body",
+        },
+        {
+            content: "check article 2 is in sidebar",
+            trigger:
+                ".o_knowledge_sidebar .o_knowledge_tree .o_section:eq(0) .o_article:contains(child article 2):not(:has(li))",
+        },
+        {
+            content: "move child article 2 above child article 1",
+            trigger: '.o_article_handle:contains("Child Article 2")',
+            run: ({ queryOne }) => {
+                dragAndDropArticle(
+                    queryOne('.o_article_handle:contains("Child Article 2")'),
+                    queryOne('.o_article_handle:contains("Child Article 1")')
+                );
+            },
+        },
+        checkArticle("workspace", "1|My Workspace Article", "0|Child Article 2"),
+        checkArticle("workspace", "1|My Workspace Article", "1|Child Article 1"),
+        clickOnArticle("workspace", "1|My Workspace Article"),
+        waitUntilArticle(["My Workspace Article"]),
+        {
+            content: "open the share dropdown",
+            trigger: '.o_knowledge_header .btn:contains("Share")',
+            run: "click",
+        },
+        {
+            content: "click on 'Share'",
+            trigger: '.o_knowledge_permission_panel .btn:contains("Share")',
             run: "click",
         },
         {
@@ -152,135 +175,118 @@ registry.category("web_tour.tours").add('knowledge_main_flow_tour', {
             run: "click",
         },
         {
-            content: "Give an email address to the partner",
-            trigger: ".modal .o_field_widget[name=email] input",
-            run: "edit micheline@knowledge.com",
-        },
-        {
             content: "Save the new partner",
-            trigger: ".modal .o_form_button_save:contains(save)",
+            trigger:
+                ".modal:has(.modal-header:contains(create recipients)) .o_form_button_save:contains(save)",
             run: "click",
         },
         {
-            trigger: "body:not(:has(.modal:contains(create recipients)))",
-        },
-        {
-            trigger: ".modal .o_field_tags span.o_badge_text",
+            trigger:
+                ".modal:has(.modal-header:contains(Share)) .o_field_tags .o_badge_text:text(micheline@knowledge.com)",
         },
         {
             content: "Submit the invite wizard",
-            trigger: ".modal button:contains(Invite)",
+            trigger: ".modal:has(.modal-header:contains(Share)) button:contains(Share)",
             run: "click",
         },
         {
-            trigger: "body:not(:has(.modal:contains(invite people)))",
+            trigger: "body:not(:has(.modal))",
         },
         {
-            trigger: ".o_knowledge_permission_panel_members span:contains('micheline@knowledge.com')",
+            trigger:
+                ".o_knowledge_permission_panel_members span:contains('micheline@knowledge.com')",
         },
         {
-    // add to favorite
-    trigger: '.o_knowledge_toggle_favorite',
-    run: "click",
-}, {
-    // check article was correctly added into favorites
-    trigger: 'section[data-section="favorites"] .o_article .o_article_name:contains("My Workspace Article")',
-}, {
-    // go back to private article
-    trigger: 'section[data-section="private"] .o_article .o_article_name:contains("My Private Article")',
-    run: "click",
-}, {
-    trigger: '.o_knowledge_editor:contains("My Private Article")',
-  // wait for article to be correctly loaded
-}, {
-    // check the autofocus
-    trigger: '.note-editable.odoo-editor-editable',
-    run: function () {
-        const selection = document.getSelection();
-        if (!this.anchor.contains(selection.anchorNode)) {
-            throw new Error("The autofocus doesn't work");
-        }
-    }
-}, {
-    // add to favorite
-    trigger: '.o_knowledge_toggle_favorite',
-    run: "click",
-}, {
-    // wait for the article to be registered as favorited
-    trigger: '.o_knowledge_toggle_favorite .fa-star',
-}, {
-    // move private article above workspace article in the favorite section
-    trigger: 'section[data-section="favorites"] .o_article_handle:contains("My Private Article")',
-    run: ({ queryOne }) => {
-        dragAndDropArticle(
-            queryOne('section[data-section="favorites"] .o_article_handle:contains("My Private Article")'),
-            queryOne('section[data-section="favorites"] .o_article_handle:contains("My Workspace Article")'),
-        );
-    },
-}, {
-    // verify that the move was done
-    trigger: 'section[data-section="favorites"] ul li:first:contains(My Private Article)',
-}, {
-    // go back to main workspace article
-    trigger: 'section[data-section="workspace"] .o_article .o_article_name:contains("My Workspace Article")',
-    run: "click",
-}, {
-    trigger: ':contains("Content of My Workspace Article")',
-}, {
-    // check the autofocus
-    trigger: '.note-editable.odoo-editor-editable',
-    run: function () {
-        const selection = document.getSelection();
-        if (!this.anchor.contains(selection.anchorNode)) {
-            throw new Error("The autofocus doesn't work");
-        }
-    }
-}, {
-    // click on the "New Article" action
-    trigger: '.o_knowledge_create_article',
-    run: "click",
-}, {
-    trigger: 'section[data-section="private"] .o_article .o_article_name:contains("Untitled")',
- // check that the article is correctly created (private section)
-}, {
-    // check the autofocus
-    trigger: '.note-editable.odoo-editor-editable',
-    run: function () {
-        const selection = document.getSelection();
-        if (!this.anchor.contains(selection.anchorNode)) {
-            throw new Error("The autofocus doesn't work");
-        }
-    }
-}, {
-    trigger: '.o_hierarchy_article_name > input',
-    run: "edit Article to be moved && click body",  // modify the article name
-}, {// move article
-    trigger: '.o_knowledge_header .dropdown-toggle',
-    run: 'click'
-}, {
-    trigger: '.dropdown-item:contains("Move To")',
-    run: "click",
-}, {
-    trigger: '.o_select_menu_item:contains("Article 3")',
-    run: "click",
-}, {
-    trigger: '.o_select_menu_toggler:contains("Article 3")',
-}, {
-    trigger: '.modal-content .btn-primary:contains("Move Article")',
-    run: "click",
-}, {
-    trigger: 'section[data-section="workspace"] .o_article .o_article_name:contains("Article to be moved")',
-    run: 'click'
-}, {
-    // open the trash
-    trigger: '.o_knowledge_sidebar_trash a:contains("Open the Trash")',
-    run: "click",
-},
-{
-    trigger: '.o_breadcrumb .active:contains("Trash")',
-},
-{
-    // verify that the trash list has been opened correctly and that items are correctly ordered
-    trigger: '.o_data_row:first .o_data_cell[name="display_name"]:contains("Article 2")',
-}, ...endKnowledgeTour()
-]});
+            // add to favorite
+            trigger: ".o_knowledge_toggle_favorite",
+            run: "click",
+        },
+        checkArticle("favorites", "0|My Workspace Article"),
+        clickOnArticle("private", "0|My Private Article"),
+        waitUntilArticle(["My Private Article"]),
+        {
+            // add to favorite
+            trigger: ".o_knowledge_toggle_favorite",
+            run: "click",
+        },
+        {
+            // wait for the article to be registered as favorited
+            trigger: ".o_knowledge_toggle_favorite [data-icon='star']",
+        },
+        {
+            // move private article above workspace article in the favorite section
+            trigger:
+                'section[data-section="favorites"] .o_article_handle:contains("My Private Article")',
+            run: ({ queryOne }) => {
+                dragAndDropArticle(
+                    queryOne(
+                        'section[data-section="favorites"] .o_article_handle:contains("My Private Article")'
+                    ),
+                    queryOne(
+                        'section[data-section="favorites"] .o_article_handle:contains("My Workspace Article")'
+                    )
+                );
+            },
+        },
+        checkArticle("favorites", "0|My Private Article"),
+        clickOnArticle("workspace", "1|My Workspace Article"),
+        waitUntilArticle(["My Workspace Article"]),
+        {
+            // click on the "New Article" action
+            trigger: ".o_knowledge_create_article",
+            run: "click",
+        },
+        checkArticle("private", "1|Untitled"),
+        waitUntilArticle(["Untitled"]),
+        waitUntilAutofocusOnEditorEditable(),
+        {
+            trigger: ".o_hierarchy_article_name > input",
+            run: "edit Article to be moved && click body", // modify the article name
+        },
+        {
+            // move article
+            trigger: ".o_knowledge_header .dropdown-toggle",
+            run: "click",
+        },
+        {
+            trigger: '.dropdown-item:contains("Move To")',
+            run: "click",
+        },
+        {
+            content: "Make sure the dropdown menu is open",
+            trigger: ".o-dropdown--menu.dropdown-menu",
+        },
+        {
+            trigger: '.o_select_menu_item:contains("Article 3")',
+        },
+        {
+            trigger: '.o_select_menu_item:contains("Article 3")',
+            run: "click",
+        },
+        {
+            trigger: '.o_select_menu_toggler:contains("Article 3")',
+        },
+        {
+            trigger: '.modal-content .btn-primary:contains("Move Article")',
+            run: "click",
+        },
+        {
+            trigger:
+                'section[data-section="workspace"] .o_article .o_article_name:contains("Article to be moved")',
+            run: "click",
+        },
+        {
+            // open trash
+            trigger: '.o_knowledge_sidebar_trash a:contains("Trash")',
+            run: "click",
+        },
+        {
+            trigger: '.o_breadcrumb .active:contains("Trash")',
+        },
+        {
+            // verify that the trash list has been opened correctly and that items are correctly ordered
+            trigger: '.o_data_row:first .o_data_cell[name="display_name"]:contains("Article 2")',
+        },
+        ...endKnowledgeTour(),
+    ],
+});

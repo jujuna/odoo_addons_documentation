@@ -1,7 +1,7 @@
 import { SelectCreateAutoPlanDialog } from "@project_enterprise/views/view_dialogs/select_auto_plan_create_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { Avatar } from "@mail/views/web/fields/avatar/avatar";
-import { markup, useEffect } from "@odoo/owl";
+import { markup, onMounted } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
 
@@ -20,10 +20,7 @@ export class TaskGanttRenderer extends TaskGanttRendererCommon {
         super.setup(...arguments);
         this.notificationService = useService("notification");
         this.orm = useService("orm");
-        useEffect(
-            (el) => el.classList.add("o_project_gantt"),
-            () => [this.gridRef.el]
-        );
+        onMounted(() => this.gridRef().classList.add("o_project_gantt"));
     }
 
     /**
@@ -38,6 +35,9 @@ export class TaskGanttRenderer extends TaskGanttRendererCommon {
             ) {
                 pill.className += " opacity-25";
             }
+        }
+        if (enrichedPill?._progress) {
+            enrichedPill._progress = enrichedPill._progress * 100;
         }
         return enrichedPill;
     }
@@ -85,6 +85,14 @@ export class TaskGanttRenderer extends TaskGanttRendererCommon {
         props.onSelectedNoSmartSchedule = props.onSelected;
         props.onSelected = onSelectedAutoPlan;
         props.onCreateEdit = onCreateEdit;
+        props.noContentHelp = markup`
+            <p class="o_view_nocontent_smiling_face">
+                ${_t("No tasks found. Let's create one!")}
+            </p>
+            <p>
+                ${_t("Effortlessly schedule all your tasks at once. They will be automatically planned, considering the allocated time, employee workload, contractual hours, and time off.")}
+            </p>
+        `;
         return props;
     }
 
@@ -95,14 +103,14 @@ export class TaskGanttRenderer extends TaskGanttRendererCommon {
     getNotificationOnSmartSchedule(notifText, old_vals_per_task_id, type) {
         this.closeNotificationFn?.();
         this.closeNotificationFn = this.notificationService.add(
-            markup`<i class="fa btn-link fa-check"></i><span class="ms-1">${notifText}</span>`,
+            markup`<i class="oi btn-link" data-icon="check"></i><span class="ms-1">${notifText}</span>`,
             {
                 type: type,
                 sticky: true,
                 buttons: [
                     {
                         name: "Undo",
-                        icon: "fa-undo",
+                        icon: "undo",
                         onClick: async () => {
                             const ids = Object.keys(old_vals_per_task_id).map(Number);
                             await this.orm.call("project.task", "action_rollback_auto_scheduling", [

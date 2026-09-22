@@ -42,9 +42,9 @@ class StudioExportCase(TransactionCase):
         self._additional_models.search([]).unlink()
         self.exporter = None
         self._export_iter = None
-        self.TestModel = self.env["test.studio_export.model1"].with_user(2)
-        self.TestModel2 = self.env["test.studio_export.model2"].with_user(2)
-        self.TestModel3 = self.env["test.studio_export.model3"].with_user(2)
+        self.TestModel = self.env["test.studio_export.model1"].with_user(self.ref('base.user_admin'))
+        self.TestModel2 = self.env["test.studio_export.model2"].with_user(self.ref('base.user_admin'))
+        self.TestModel3 = self.env["test.studio_export.model3"].with_user(self.ref('base.user_admin'))
 
     def create_customization(self, _model, **kwargs):
         Model = self.env[_model].with_context(studio=True)

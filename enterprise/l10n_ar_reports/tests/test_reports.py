@@ -1,17 +1,23 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import logging
+
+from freezegun import freeze_time
+
 from odoo import fields
-from odoo.addons.l10n_ar.tests.common import TestArCommon
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
+from odoo.addons.l10n_ar.tests.common import TestArCommon
+from odoo.exceptions import RedirectWarning
+from odoo.fields import Command
 from odoo.tests import Form, tagged
 from odoo.tools import file_open
-from odoo.fields import Command
-import logging
 
 _logger = logging.getLogger(__name__)
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestArReports(TestArCommon, TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def _create_test_credit_notes_like_demo(self):
         """ Create in the unit tests the same credit notes created in demo data """
@@ -241,8 +247,8 @@ class TestArReports(TestArCommon, TestAccountReportsCommon):
         purchase_journal = self.env["account.journal"].search([('type', '=', 'purchase'), ('company_id', '=', self.env.company.id)])
         ar_partner = self.env['res.partner'].create({
             'name': 'BEST PARTNER',
+            'country_id': self.env.ref('base.ar').id,
             'vat': '30714295698',
-            'l10n_latam_identification_type_id': self.env.ref('l10n_ar.it_cuit').id
         })
         test_tax_group = self.env['account.tax.group'].create({
             'name': "test tax group",
@@ -329,9 +335,18 @@ class TestArReports(TestArCommon, TestAccountReportsCommon):
 
         # demo_credit_notes are automatically posted thanks to the refund type
         cls._create_test_credit_notes_like_demo(cls)
+        cls.env.company.l10n_ar_arca_activity_id = cls.env.ref("l10n_ar.activity_620100")
 
         cls.options = cls._generate_options(cls.report, fields.Date.from_string('2021-03-01'), fields.Date.from_string('2021-03-31'))
         cls._vat_book_report_create_test_data(cls)
+
+    def _test_csv_file(self, filename, file_type):
+        ReportHandler = self.env['l10n_ar.tax.report.handler']
+        move_ids = ReportHandler._vat_simple_get_csv_move_ids(self.options, file_type)
+        if move_ids:
+            file_data = ReportHandler._vat_simple_get_data(file_type, move_ids).strip()
+            res_file = file_open('l10n_ar_reports/tests/' + filename, 'rb').read().decode().strip()
+            self.assertEqual(file_data, res_file)
 
     def _test_txt_file(self, filename, journal_type):
         filetype = 1 if 'IVA' in filename else 0
@@ -375,6 +390,69 @@ class TestArReports(TestArCommon, TestAccountReportsCommon):
         self.options['txt_type'] = 'goods_import'
         self._test_txt_file('IVA_Importaciones_de_Bienes.txt', 'purchase')
 
+    @freeze_time("2021-04-19")
+    def test_07_sale_vat_book_vouchers_with_branch(self):
+        parent_company = self.env.company
+        branch_A, branch_B = self.env['res.company'].create([
+            {
+                'name': "Branch_A",
+                'parent_id': self.company.id,
+            }, {
+                'name': "Branch_B",
+                'parent_id': self.company.id,
+                'vat': '/'
+            }
+        ])
+
+        # Load CoA
+        self.cr.precommit.run()
+
+        invoice_B = self.env['account.move'].with_company(company=branch_B).create([
+            {
+                "ref": "test_invoice_007: Invoice to gritti support service, vat 21",
+                "company_id": branch_B.id,
+                "partner_id": self.res_partner_adhoc.id,
+                "move_type": "out_invoice",
+                "invoice_date": "2021-03-23",
+                "invoice_date_due": "2021-04-19",
+                "invoice_line_ids": [
+                    Command.create({'product_id': self.service_iva_21.id})
+                ]
+            },
+        ])
+
+        invoice_A = self.env['account.move'].with_company(company=branch_A).create([
+            {
+                "ref": "test_invoice_007: Invoice to gritti support service, vat 21",
+                "company_id": branch_A.id,
+                "partner_id": self.res_partner_gritti_mono.id,
+                "move_type": "out_invoice",
+                "invoice_date": "2021-03-23",
+                "invoice_date_due": "2021-04-19",
+                "invoice_line_ids": [
+                    Command.create({'product_id': self.service_iva_21.id})
+                ]
+            }
+        ])
+        invoice_B.action_post()
+        invoice_A.action_post()
+
+        options = self._generate_options(
+            self.report.with_context({"allowed_company_ids": (parent_company | branch_A | branch_B).ids})
+                .with_company(company=branch_A),
+            fields.Date.from_string('2021-03-22'),
+            fields.Date.from_string('2021-05-31'))
+        options['ar_vat_book_tax_types_available']['sale']['selected'] = True
+        options['ar_vat_book_tax_types_available']['purchase']['selected'] = False
+        options['txt_type'] = 'sale'
+
+        out_txt = self.env['l10n_ar.tax.report.handler']\
+            .with_context({"allowed_company_ids": (parent_company | branch_A | branch_B).ids})\
+            .with_company(company=branch_A)\
+            ._vat_book_get_txt_files(options, 'sale')[0].decode('ISO-8859-1')
+        res_file = file_open('l10n_ar_reports/tests/Ventas_branch.txt', 'rb').read().decode('ISO-8859-1')
+        self.assertEqual(out_txt, res_file)
+
     def test_vat_book_report(self):
         options = self._generate_options(self.report, date_from=fields.Date.from_string('2022-03-01'), date_to=fields.Date.from_string('2022-03-31'))
         lines = self.report._get_lines(options)
@@ -391,9 +469,50 @@ class TestArReports(TestArCommon, TestAccountReportsCommon):
             options,
         )
 
+    def test_07_sale_only_simple_report(self):
+        self.options['ar_vat_book_tax_types_available']['sale']['selected'] = True
+        self.options['ar_vat_book_tax_types_available']['purchase']['selected'] = False
+        self._test_csv_file('SaleRefund.csv', 'sale_refund')
+        self._test_csv_file('SaleInvoice.csv', 'sale_invoice')
+
+    def test_08_purchase_only_simple_report(self):
+        self.options['ar_vat_book_tax_types_available']['sale']['selected'] = False
+        self.options['ar_vat_book_tax_types_available']['purchase']['selected'] = True
+        self._test_csv_file('PurchaseRefund.csv', 'purchase_refund')
+        self._test_csv_file('PurchaseInvoice.csv', 'purchase_invoice')
+
+    def test_09_missing_fallback_activity(self):
+        """ If there is no fallback on the company, a warning should be raised when trying to export the files. """
+        self.env.company.l10n_ar_arca_activity_id = False
+        self.options['ar_vat_book_tax_types_available']['sale']['selected'] = True
+        with self.assertRaisesRegex(
+            RedirectWarning,
+            "Warning, activities are not set as a fallback on the company. As such the Sales VAT Simple files may be incorrect. Please set a fallback activity on the company or ignore this warning to generate the file anyway.",
+        ):
+            self.env['l10n_ar.tax.report.handler'].vat_simple_export_files_to_zip(self.options)
+
+    @freeze_time('2024-01-01')
+    def test_10_mixed_sale_taxes(self):
+        """ VAT Simple tax reports should only include tax values that are of type IVA. Any other
+            taxes should be skipped over. (We use a different date to just check this record versus
+            all the rest)"""
+        self.options['ar_vat_book_tax_types_available']['sale']['selected'] = True
+        self.options['date']['date_from'] = '2024-01-01'
+        self.options['date']['date_to'] = '2024-01-31'
+
+        self.tax_perc_iibb.active = True
+        self.tax_perc_iibb.amount = 3
+        self._create_invoice_one_line(
+            price_unit=10000.0,
+            product_id=self.product_iva_105_perc,
+            partner_id=self.res_partner_servicios_globales,
+            post=True,
+        )
+        self._test_csv_file('SaleInvoiceMixed.csv', 'sale_invoice')
+
     def test_vat_book_report_price_tax_included_plus_IIBB_taxes(self):
         purchase_journal = self.env["account.journal"].search([('type', '=', 'purchase'), ('company_id', '=', self.env.company.id)])
-        self.tax_21.price_include = True
+        self.tax_21.price_include_override = 'tax_included'
         self.tax_21.include_base_amount = True
         iibb_group = self.env['account.tax.group'].create({
             'name': "IIBB Group",
@@ -449,3 +568,32 @@ class TestArReports(TestArCommon, TestAccountReportsCommon):
             ],
             options,
         )
+
+    def test_foreign_provider_vat_book_export(self):
+        """ Test that Proveedor del Exterior (code 8) partners with ForeignID
+            use the country-level VAT, just like Cliente del Exterior (code 9).
+        """
+        foreign_partner = self.env['res.partner'].create({
+            'name': 'foreign partner',
+            'is_company': True,
+            'country_id': self.env.ref('base.ie').id,
+            'vat': 'IE1234567T',
+            'l10n_ar_afip_responsibility_type_id': self.env.ref('l10n_ar.res_EXT_Prov').id,
+        })
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': foreign_partner.id,
+            'invoice_date': '2021-03-15',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_iva_exento.id,
+                    'price_unit': 100.0,
+                    'quantity': 1,
+                }),
+            ],
+        })
+        invoice.action_post()
+        self.options['ar_vat_book_tax_type_selected'] = 'sale'
+        self.options['txt_type'] = 'sale'
+        out = self.env['l10n_ar.tax.report.handler']._vat_book_get_txt_files(self.options, 'sale')
+        self.assertTrue(out)

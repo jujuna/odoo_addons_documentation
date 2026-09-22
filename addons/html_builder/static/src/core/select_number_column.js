@@ -1,4 +1,5 @@
-import { BaseOptionComponent, useDomState } from "@html_builder/core/utils";
+import { BaseOptionComponent } from "@html_builder/core/base_option_component";
+import { useDomState } from "@html_builder/core/utils";
 import { areColsCustomized } from "@html_builder/utils/column_layout_utils";
 
 export class SelectNumberColumn extends BaseOptionComponent {
@@ -17,6 +18,9 @@ export class SelectNumberColumn extends BaseOptionComponent {
                         this.env.editor.config.mobileBreakpoint
                     ),
                 canHaveZeroColumns: editingElement.matches(".s_allow_columns"),
+                hasFixedColumnCount: !!editingElement.querySelector(
+                    ":scope > .row.s_nb_column_fixed"
+                ),
             };
         });
     }

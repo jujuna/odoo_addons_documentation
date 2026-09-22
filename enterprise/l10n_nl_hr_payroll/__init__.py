@@ -1,4 +1,7 @@
-# -*- coding:utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from . import models
+
+
+def _l10n_nl_hr_payroll_post_install(env):
+    env.ref('base.nl')._adapt_work_entry_types_to_country()

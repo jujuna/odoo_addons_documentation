@@ -7,6 +7,7 @@
         <field name="zip">50200</field>
         <field name="city">Kuala Lumpur</field>
         <field name="country_id" ref="base.my"/>
+        <field name="resource_calendar_id" ref="l10n_my_hr_payroll.resource_calendar_def_40h"/>
     </record>
 
     <record id="base.user_admin" model="res.users">
@@ -27,9 +28,10 @@
         <field name="job_id" ref="hr.job_developer"/>
         <field name="country_id" ref="base.my"/>
         <field name="company_id" ref="base.demo_company_my"/>
-        <field name="image_1920" type="base64" file="l10n_my_hr_payroll/static/img/hr_employee_kah_yoon_ooi.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_my_hr_payroll/static/img/hr_employee_kah_yoon_ooi.jpg"/>
         <field name="sex">male</field>
         <field name="structure_type_id" ref="l10n_my_hr_payroll.structure_type_employee_my"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <record id="res_partner_xiu_mei_lee" model="res.partner">
@@ -50,7 +52,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_my'))]"/>
         <field name="company_id" ref="base.demo_company_my"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="l10n_my_hr_payroll/static/img/hr_employe_xiu_mei_lee.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_my_hr_payroll/static/img/hr_employe_xiu_mei_lee.jpg"/>
     </record>
 
     <record id="res_partner_xiu_mei_lee_work_address" model="res.partner">
@@ -68,8 +70,9 @@
     </record>
 
     <record id="res_partner_bank_account_norberta" model="res.partner.bank">
-        <field name="acc_number">MY3193779311764615225576</field>
-        <field name="bank_id" ref="base.bank_ing"/>
+        <field name="account_number">MY3193779311764615225576</field>
+        <field name="bank_name">ING</field>
+        <field name="bank_bic">BBRUBEBB</field>
         <field name="partner_id" ref="l10n_my_hr_payroll.res_partner_xiu_mei_lee_private_address"/>
         <field name="company_id" ref="base.demo_company_my"/>
     </record>
@@ -93,12 +96,11 @@
         <field name="country_of_birth" ref="base.my"/>
         <field name="certificate">master</field>
         <field name="study_field">Civil Engineering</field>
-        <field name="study_school">Kuala Lumpur University</field>
         <field name="parent_id" ref="l10n_my_hr_payroll.hr_employee_kah_yoon_ooi"/>
         <field name="country_id" ref="base.my"/>
         <field name="identification_id">8752027365496</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_my_hr_payroll.res_partner_bank_account_norberta'))]"/>
-        <field name="image_1920" type="base64" file="l10n_my_hr_payroll/static/img/hr_employe_xiu_mei_lee.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_my_hr_payroll/static/img/hr_employe_xiu_mei_lee.jpg"/>
         <field name="company_id" ref="base.demo_company_my"/>
         <field name="user_id" ref="l10n_my_hr_payroll.user_xiu_mei_lee"/>
         <field name="department_id" ref="hr_department_rdmy"/>
@@ -110,6 +112,7 @@
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-2, month=1, day=1))"/>
         <field name="contract_date_end" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-2))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_my').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <function name="create_version" model="hr.employee">

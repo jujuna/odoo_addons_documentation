@@ -1,9 +1,7 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Quality',
-    'version': '1.0',
     'category': 'Supply Chain/Quality',
     'sequence': 120,
     'summary': 'Control the quality of your products',
@@ -25,11 +23,11 @@ Quality Control
         'views/quality_views.xml',
         'views/product_views.xml',
         'views/stock_move_views.xml',
+        'views/stock_picking_batch_views.xml',
         'views/stock_picking_views.xml',
         'views/stock_lot_views.xml',
         'wizard/quality_check_wizard_views.xml',
-        'security/ir.model.access.csv',
-        'security/security.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'data/quality_control_demo.xml',

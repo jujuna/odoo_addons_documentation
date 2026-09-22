@@ -4,12 +4,12 @@
         <record id="account_move_form_inherit_l10n_br_edi" model="ir.ui.view">
             <field name="name">account.move.form.inherit.l10n_br_edi</field>
             <field name="model">account.move</field>
-            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="inherit_id" ref="l10n_br_avatax.account_move_form_inherit"/>
             <field name="arch" type="xml">
                 <xpath expr="//sheet" position="before">
                     <div class="alert alert-warning" role="alert"
                          invisible="not l10n_br_edi_error">
-                        <div class="p-0 m-0"><i class="fa fa-warning" role="img" title="EDI (Brazil)"/>
+                        <div class="p-0 m-0"><i class="oi" data-icon="warning" role="img" title="EDI (Brazil)"/>
                             <span class="mx-1">E-invoicing (Brazil)</span>
                         </div>
                         <field name="l10n_br_edi_error"/>
@@ -43,12 +43,13 @@
                     <!-- Show for Brazilian invoices with an access key and for all Brazilian vendor bills. -->
                     <field name="l10n_br_access_key" invisible="country_code != 'BR' or not l10n_br_is_avatax or (move_type == 'out_invoice' and not l10n_br_access_key)"
                            readonly="(move_type == 'out_invoice' and state in ['cancel', 'posted']) or (move_type == 'in_invoice' and l10n_br_last_edi_status == 'accepted')"/>
-                </field>
-                <group name="sale_info_group" position="inside">
                     <field name="l10n_br_nfse_verification" readonly="True" invisible="not l10n_br_is_service_transaction"/>
-                </group>
+                </field>
                 <xpath expr="//list/field[@name='tax_ids']" position="before">
                     <field name="l10n_br_cfop" column_invisible="not parent.l10n_br_edi_avatax_data" optional="hide"/>
+                </xpath>
+                <xpath expr="//list/field[@name='tax_ids']" position="after">
+                    <field name="l10n_br_tax_details" column_invisible="not parent.l10n_br_edi_avatax_data" optional="hide"/>
                 </xpath>
                 <button name="action_invoice_sent" position="before">
                     <button name="button_l10n_br_edi_get_service_invoice"
@@ -56,6 +57,18 @@
                             string="Check NFS-e Status"
                             invisible="l10n_br_last_edi_status != 'pending'"/>
                 </button>
+                <field name="l10n_br_edi_payment_method" position="after">
+                    <field name="l10n_br_presence" invisible="country_code != 'BR'" readonly="state in ['cancel', 'posted']"/>
+                </field>
+                <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='tax_ids']" position="before">
+                    <field name="l10n_br_cbs_ibs_deduction" optional="hide"/>
+                </xpath>
+                <field name="l10n_br_goods_operation_type_id" position="attributes">
+                    <attribute name="invisible" separator="or" remove="l10n_br_is_service_transaction"/>
+                    <!-- After the reform it's not only for goods. -->
+                    <attribute name="string">Operation Type</attribute>
+                    <attribute name="help">Brazil: This is the operation type related to the transaction. It will identify how taxes will be computed.</attribute>
+                </field>
             </field>
         </record>
 

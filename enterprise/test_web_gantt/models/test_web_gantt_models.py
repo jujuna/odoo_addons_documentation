@@ -18,6 +18,9 @@ class TestWebGanttPill(models.Model):
     date_stop = fields.Datetime("Stop Datetime")
     parent_id = fields.Many2one("test.web.gantt.pill")
 
+    pill_properties_definition = fields.PropertiesDefinition('Pill Properties Definition', default=dict)
+    pill_properties = fields.Properties('Pill Properties', definition="parent_id.pill_properties_definition", copy=True)
+
 
 class TestWebGanttPill2(models.Model):
     _name = 'test.web.gantt.pill2'

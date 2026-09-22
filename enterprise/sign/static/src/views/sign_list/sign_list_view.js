@@ -6,5 +6,6 @@ export const signListView = {
     ...listView,
     Controller: SignListController,
     Renderer: SignListRenderer,
+    buttonTemplate: "sign.SignViews.buttons",
 };
 registry.category("views").add("sign_list", signListView);

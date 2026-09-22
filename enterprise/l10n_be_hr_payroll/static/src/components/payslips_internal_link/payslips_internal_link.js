@@ -1,4 +1,4 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
 import { registry } from "@web/core/registry";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
@@ -7,10 +7,11 @@ import { _t } from "@web/core/l10n/translation";
 
 export class PayslipsInternalLinkComponent extends Component {
     static template = "l10n_be_hr_payroll.PayslipsInternalLinkComponent";
-    static props = { 
+
+    props = useProps({
         ...standardWidgetProps,
-        payslipsYear: { type: String, optional: true },
-    };
+        payslipsYear: t.string().optional(),
+    });
 
     setup() {
         super.setup();
@@ -20,8 +21,8 @@ export class PayslipsInternalLinkComponent extends Component {
     async openNPayslips() {
         await this.props.record.save()
         this.dialog.add(FormViewDialog, {
-            resId: this.props.record.resId,
-            resModel: "hr.payslip.employee.depature.holiday.attests",
+            resId: this.props.record.resModel == 'hr.employee.departure' ? this.props.record.resId : this.props.record.data.departure_id.id,
+            resModel: "hr.employee.departure",
             size: "lg",
             title: _t("Current Year Payslips"),
             canExpand: false,
@@ -38,8 +39,8 @@ export class PayslipsInternalLinkComponent extends Component {
     async openN1Payslips() {
         await this.props.record.save()
         this.dialog.add(FormViewDialog, {
-            resId: this.props.record.resId,
-            resModel: "hr.payslip.employee.depature.holiday.attests",
+            resId: this.props.record.resModel == 'hr.employee.departure' ? this.props.record.resId : this.props.record.data.departure_id.id,
+            resModel: "hr.employee.departure",
             size: "lg",
             title: _t("Previous Year Payslips"),
             canExpand: false,
@@ -62,8 +63,8 @@ export const payslipsInternalLinkComponent = {
         };
     },
     fieldDependencies: [
-        { name: "number_n_payslips_description", type: "char" },
-        { name: "number_n1_payslips_description", type: "char" },
+        { name: "l10n_be_payslip_n_description", type: "char" },
+        { name: "l10n_be_payslip_n1_description", type: "char" },
     ],
 };
 

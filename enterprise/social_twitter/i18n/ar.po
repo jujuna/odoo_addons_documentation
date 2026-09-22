@@ -7,14 +7,15 @@
 # Malaz Abuidris <msea@odoo.com>, 2023
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-10-13 15:01+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:56+0000\n"
+"PO-Revision-Date: 2026-09-17 23:07+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
 "social_twitter/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -22,13 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#. module: social_twitter
-#. odoo-python
-#: code:addons/social_twitter/models/social_post_template.py:0
-msgid "%(current_length)s / %(max_length)s characters to fit in a Post"
-msgstr "%(current_length)s / %(max_length)s رموز لكتابتها في منشور"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
@@ -42,33 +37,44 @@ msgstr "<b class=\"text-900\">حساب X</b>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-comments me-1\" title=\"Comments\"/>"
-msgstr "<i class=\"fa fa-comments me-1\" title=\"التعليقات \"/>"
-
-#. module: social_twitter
-#: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-heart me-1\" title=\"Likes\"/>"
-msgstr "<i class=\"fa fa-heart me-1\" title=\"الإعجابات \"/>"
+msgid "<i class=\"oi me-1\" data-icon=\"repeat\" title=\"Repost a post\"/>"
+msgstr "<i class=\"oi me-1\" data-icon=\"repeat\" title=\"إعادة نشر منشور \"/>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid ""
-"<i class=\"fa fa-pencil me-1\" title=\"Quote a post\"/>\n"
+"<i class=\"oi oi-filled me-1\" data-icon=\"edit\" title=\"Quote a post\"/>\n"
 "                                    <span>Quote</span>"
 msgstr ""
-"<i class=\"fa fa-pencil me-1\" title=\"Quote a post\"/>\n"
+"<i class=\"oi oi-filled me-1\" data-icon=\"edit\" title=\"Quote a post\"/>\n"
 "                                    <span>اقتباس</span>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-retweet me-1\" title=\"Repost a post\"/>"
-msgstr "<i class=\"fa fa-retweet me-1\" title=\"إعادة نشر منشور \"/>"
+msgid "<i class=\"oi oi-filled me-1\" data-icon=\"favorite\" title=\"Likes\"/>"
+msgstr ""
+"<i class=\"oi oi-filled me-1\" data-icon=\"favorite\" title=\"الإعجابات \"/>"
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
+msgid "<span>1 Comment</span>"
+msgstr ""
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
+msgid "@x ·"
+msgstr ""
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "A repost already exists"
 msgstr "لقد قمت بإعادة النشر بالفعل"
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
+msgid "Add Media"
+msgstr ""
 
 #. module: social_twitter
 #. odoo-python
@@ -94,12 +100,6 @@ msgstr ""
 "%s."
 
 #. module: social_twitter
-#. odoo-javascript
-#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
-msgid "Cancel"
-msgstr "إلغاء"
-
-#. module: social_twitter
 #: model:ir.model.fields,help:social_twitter.field_res_config_settings__twitter_use_own_account
 msgid ""
 "Check this if you want to use your personal X Developer Account instead of "
@@ -107,6 +107,19 @@ msgid ""
 msgstr ""
 "قم بتحديد ذلك إذا كنت ترغب في استخدام حساب مطور X الخاص بك عوضاً عن المقدم "
 "إليك."
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
+msgid ""
+"Comment your own post to get the conversation going or share some extra "
+"content."
+msgstr ""
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
+#, fuzzy
+msgid "Comments"
+msgstr "التعليقات"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_res_config_settings
@@ -139,6 +152,13 @@ msgid "Description"
 msgstr "الوصف"
 
 #. module: social_twitter
+#. odoo-javascript
+#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
+#, fuzzy
+msgid "Discard"
+msgstr "إهمال "
+
+#. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:social_twitter.field_social_account__display_name
 #: model:ir.model.fields,field_description:social_twitter.field_social_live_post__display_name
@@ -163,8 +183,7 @@ msgstr "عرض معاينة X"
 msgid ""
 "Easy, tiger! No spamming allowed. Let's stick to three replies per Tweet."
 msgstr ""
-"تمهل! لا يُسمح بإرسال العديد من الرسائل المزعجة. فلنكتفِ بثلاثة ردود لكل "
-"تغريدة."
+"تمهل! لا يُسمح بإرسال العديد من الرسائل المزعجة. فلنكتفِ بثلاثة ردود لكل تغريدة."
 
 #. module: social_twitter
 #. odoo-javascript
@@ -239,9 +258,15 @@ msgid "Image"
 msgstr "صورة"
 
 #. module: social_twitter
-#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
-msgid "Images"
-msgstr "الصور"
+#. odoo-javascript
+#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
+msgid "Image Url"
+msgstr ""
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_view_form
+msgid "Immediately"
+msgstr ""
 
 #. module: social_twitter
 #: model:social.stream.type,name:social_twitter.stream_type_twitter_keyword
@@ -265,14 +290,15 @@ msgid "Likes"
 msgstr "الإعجابات"
 
 #. module: social_twitter
-#. odoo-python
-#: code:addons/social_twitter/models/social_stream.py:0
-msgid ""
-"Looks like you've made too many requests. Please wait a few minutes before "
-"giving it another try."
+#: model:ir.module.module,description:base.module_social_twitter
+#: model:ir.module.module,summary:base.module_social_twitter
+msgid "Manage your X accounts and schedule posts"
 msgstr ""
-"يبدو أنك قمت بإنشاء الكثير من الطلبات. يرجى الانتظار لبضع دقائق قبل المحاولة "
-"مجدداً."
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
+msgid "Media"
+msgstr ""
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_media__media_type
@@ -330,6 +356,11 @@ msgid "Post Image"
 msgstr "صورة المنشور"
 
 #. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_view_form
+msgid "Post On"
+msgstr ""
+
+#. module: social_twitter
 #: model:social.stream.type,name:social_twitter.stream_type_twitter_follow
 msgid "Posts of"
 msgstr "المنشورات الخاصة بـ"
@@ -367,22 +398,32 @@ msgid "Read More about X Accounts"
 msgstr "اقرأ المزيد عن حسابات X"
 
 #. module: social_twitter
+#. odoo-javascript
+#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
+msgid "Reply"
+msgstr ""
+
+#. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "Repost"
 msgstr "إعادة نشر"
 
 #. module: social_twitter
-#: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
-msgid "Repost or Quote"
-msgstr "إعادة نشر أو اقتباس"
-
-#. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
-#: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_retweet_count
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
+msgid "Repost count"
+msgstr ""
+
+#. module: social_twitter
+#: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_retweet_count
 msgid "Reposts"
 msgstr "إعادة النشر"
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
+msgid "Scheduled first comment"
+msgstr ""
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream__twitter_searched_keyword
@@ -441,19 +482,14 @@ msgid "Social Stream Post"
 msgstr "منشور الوسائط الاجتماعية"
 
 #. module: social_twitter
+#: model:ir.module.module,shortdesc:base.module_social_twitter
+msgid "Social X"
+msgstr ""
+
+#. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_twitter_account
 msgid "Social X Account"
 msgstr "حساب X الاجتماعي"
-
-#. module: social_twitter
-#. odoo-python
-#: code:addons/social_twitter/models/social_stream.py:0
-msgid ""
-"The keyword you've typed in does not look valid. Please try again with other "
-"words."
-msgstr ""
-"الكلمة المفتاحية التي كتبتها لا تبدو صالحة. يرجى المحاولة مجدداً باستخدام "
-"كلمات أخرى."
 
 #. module: social_twitter
 #. odoo-python
@@ -550,9 +586,8 @@ msgid ""
 "We could not upload your image, it may be corrupted, it may exceed size "
 "limit or API may have send improper response (error: %s)."
 msgstr ""
-"لم نتمكن من رفع صورتك. قد تكون تالفة أو قد تكون قد تجاوزت الحد الأقصى "
-"المسموح به للحجم، أو قد تكون الواجهة البرمجية قد أرسلت رداً غير مناسب (خطأ: "
-"%s)."
+"لم نتمكن من رفع صورتك. قد تكون تالفة أو قد تكون قد تجاوزت الحد الأقصى المسموح "
+"به للحجم، أو قد تكون الواجهة البرمجية قد أرسلت رداً غير مناسب (خطأ: %s)."
 
 #. module: social_twitter
 #: model:ir.model.fields,help:social_twitter.field_social_post__twitter_image_ids
@@ -561,9 +596,21 @@ msgid "Will attach images to your posts."
 msgstr "سيتم إرفاق الصور بمنشوراتك."
 
 #. module: social_twitter
+#: model:ir.model.fields.selection,name:social_twitter.selection__social_media__media_type__twitter
+#: model:social.media,name:social_twitter.social_media_twitter
+#, fuzzy
+msgid "X"
+msgstr "X"
+
+#. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_author_id
 msgid "X Author ID"
 msgstr "معرّف الكاتب في X"
+
+#. module: social_twitter
+#: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_can_reply
+msgid "X Can Reply"
+msgstr ""
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_res_config_settings__twitter_consumer_key
@@ -584,6 +631,12 @@ msgstr "معرّف المحادثة في X"
 #: model_terms:ir.ui.view,arch_db:social_twitter.res_config_settings_view_form
 msgid "X Developer Account"
 msgstr "حساب المطوِّر في X"
+
+#. module: social_twitter
+#: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_first_comment
+#: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_first_comment
+msgid "X First Comment"
+msgstr ""
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__twitter_id
@@ -629,12 +682,6 @@ msgid "X Post Limit Exceeded"
 msgstr "تم تجاوز الحد  المسموح به للمنشورات في X"
 
 #. module: social_twitter
-#: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_post_limit_message
-#: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_post_limit_message
-msgid "X Post Limit Message"
-msgstr "رسالة الوصول إلى الحد الأقصى للمنشورات على X"
-
-#. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_preview
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_preview
 msgid "X Preview"
@@ -672,6 +719,11 @@ msgid "X Repost Permission"
 msgstr "إذن إعادة النشر على X"
 
 #. module: social_twitter
+#: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_scheduled_date
+msgid "X Scheduled for"
+msgstr ""
+
+#. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_screen_name
 msgid "X Screen Name"
 msgstr "اسم شاشة X"
@@ -706,6 +758,22 @@ msgstr "معرّف منشور X"
 
 #. module: social_twitter
 #. odoo-python
+#: code:addons/social_twitter/models/social_stream.py:0
+msgid ""
+"X: Looks like you've made too many requests. Please wait a few minutes "
+"before giving it another try."
+msgstr ""
+
+#. module: social_twitter
+#. odoo-python
+#: code:addons/social_twitter/models/social_stream.py:0
+msgid ""
+"X: The keyword you've typed in does not look valid. Please try again with "
+"other words."
+msgstr ""
+
+#. module: social_twitter
+#. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "You are not authenticated"
 msgstr "أنت لست مصادقاً"
@@ -728,218 +796,26 @@ msgstr ""
 "المحاولة مجدداً."
 
 #. module: social_twitter
+#. odoo-javascript
+#: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
+msgid ""
+"You cannot reply from an external service because this post doesn't mention "
+"or quote your account."
+msgstr ""
+
+#. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_media.py:0
 msgid ""
 "You need to add the following callback URL to your X application settings: %s"
-msgstr ""
-"تحتاج إلى إضافة رابط الاستدعاء التالي إلى إعدادات تطبيق X الخاصة بك: %s"
+msgstr "تحتاج إلى إضافة رابط الاستدعاء التالي إلى إعدادات تطبيق X الخاصة بك: %s"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_view_form
 msgid "e.g. #odoo"
 msgstr "مثال: #odoo"
 
-#~ msgid "%s / %s characters to fit in a Tweet"
-#~ msgstr "%s / %s خانات لتتسع في التغريدة "
-
-#~ msgid "<b class=\"text-900\">Twitter Account</b>"
-#~ msgstr "<b class=\"text-900\">حساب تويتر</b> "
-
-#~ msgid ""
-#~ "<i class=\"fa fa-pencil me-1\" title=\"Quote a tweet\"/>\n"
-#~ "                                    <span>Quote Tweet</span>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-pencil me-1\" title=\"Quote a tweet\"/>\n"
-#~ "                                    <span>اقتباس التغريدة</span> "
-
-#~ msgid "<i class=\"fa fa-retweet me-1\" title=\"Retweet a tweet\"/>"
-#~ msgstr "<i class=\"fa fa-retweet me-1\" title=\"إعادة تغريد التغريدة \"/>"
-
-#~ msgid "<span class=\"fst-italic\">Empty tweet</span>"
-#~ msgstr "<span class=\"fst-italic\">تغريدة فارغة</span> "
-
-#~ msgid "@twitteraccount ·"
-#~ msgstr "@twitteraccount ·"
-
-#~ msgid "A retweet already exists"
-#~ msgstr "لقد قمت بإعادة التغريد بالفعل "
-
-#~ msgid "An error occurred (%s)"
-#~ msgstr "حدث خطأ ما (%s) "
-
-#~ msgid ""
-#~ "Check this if you want to use your personal Twitter Developer Account "
-#~ "instead of the provided one."
-#~ msgstr ""
-#~ "قم بتحديد ذلك إذا كنت ترغب في استخدام حساب مطور Twitter الخاص بك عوضاً عن "
-#~ "المقدم إليك. "
-
-#~ msgid "Code %i"
-#~ msgstr "الكود %i "
-
-#~ msgid "Display Twitter Preview"
-#~ msgstr "عرض معاينة Twitter "
-
-#~ msgid "Is Twitter Post Limit Exceed"
-#~ msgstr "منشور تويتر يتخطى الحد المسموح به "
-
-#~ msgid ""
-#~ "Looks like this Tweet is a duplicate. Edit its content and try posting "
-#~ "again."
-#~ msgstr "يبدو أن هذه التغريدة مكررة. قم بتحرير محتواها ثم حاول مجدداً لاحقاً. "
-
-#~ msgid "Please select a Twitter account for this stream type."
-#~ msgstr "يرجى تحديد حساب Twitter لنوع التدفق هذا. "
-
-#~ msgid "Quoted tweet author Link"
-#~ msgstr "رابط كاتب التغريدة المقتبسة "
-
-#~ msgid "Quoted tweet author Name"
-#~ msgstr "اسم كاتب التغريدة المقتبسة "
-
-#~ msgid "Quoted tweet message"
-#~ msgstr "رسالة التغريدة المقتبسة "
-
-#~ msgid "Quoted tweet profile image URL"
-#~ msgstr "رابط URL لصورة الملف التعريفي للتغريدة المقتبسة "
-
-#~ msgid "RT"
-#~ msgstr "إعادة التغريد "
-
-#~ msgid "Re-tweets"
-#~ msgstr "إعادات التغريد "
-
-#~ msgid "Retweet"
-#~ msgstr "إعادة التغريد "
-
-#~ msgid "Retweet or Quote"
-#~ msgstr "إعادة التغريد أو الاقتباس "
-
-#~ msgid "Retweets"
-#~ msgstr "إعادات التغريد "
-
-#~ msgid "Social Twitter Account"
-#~ msgstr "حساب Twitter الاجتماعي "
-
-#~ msgid "The tweet is empty. Add a message and try posting again."
-#~ msgstr "التغريدة فارغة. قم بإضافة رسالة ثم حاول نشرها مجدداً. "
-
-#~ msgid "Tweets of"
-#~ msgstr "تغريدات "
-
-#~ msgid "Twitter Author ID"
-#~ msgstr "معرّف كاتب Twitter "
-
-#~ msgid "Twitter Can Retweet"
-#~ msgstr "بإمكان تويتر إعادة التغريد "
-
-#~ msgid "Twitter Consumer Key"
-#~ msgstr "مفتاح مستهلك Twitter "
-
-#~ msgid "Twitter Consumer Secret Key"
-#~ msgstr "مفتاح سر مستهلك Twitter "
-
-#~ msgid "Twitter Developer Account"
-#~ msgstr "حساب مطور تويتر "
-
-#~ msgid "Twitter ID"
-#~ msgstr "معرّف Twitter "
-
-#~ msgid "Twitter Likes"
-#~ msgstr "إعجابات Twitter "
-
-#~ msgid "Twitter OAuth Token"
-#~ msgstr "رمز Twitter OAuth "
-
-#~ msgid "Twitter OAuth Token Secret"
-#~ msgstr "سر رمز Twitter OAuth "
-
-#~ msgid "Twitter Post Limit Message"
-#~ msgstr "رسالة الحد الأقصى لمنشور تويتر "
-
-#~ msgid "Twitter Preview"
-#~ msgstr "معاينة Twitter "
-
-#~ msgid "Twitter Profile Image"
-#~ msgstr "صورة الملف التعريفي لـ Twitter "
-
-#~ msgid "Twitter Profile Image URL"
-#~ msgstr "رابط URL لصورة الملف التعريفي لـ Twitter "
-
-#~ msgid "Twitter Quoted Tweet ID"
-#~ msgstr "معرّف تغريدة تويتر المقتبسة "
-
-#~ msgid "Twitter Retweet ID"
-#~ msgstr "معرّف إعادة التغريدفي تويتر "
-
-#~ msgid "Twitter Screen Name"
-#~ msgstr "اسم شاشة Twitter "
-
-#~ msgid "Twitter Tweet ID"
-#~ msgstr "معرّف تغريدة Twitter "
-
-#~ msgid "Twitter User ID"
-#~ msgstr "معرّف مستخدم Twitter "
-
-#~ msgid "Twitter User Likes"
-#~ msgstr "إعجابات مستخدم Twitter "
-
-#~ msgid "Twitter did not provide a valid access token or it may have expired."
-#~ msgstr "لم يقدم Twitter رمز وصول صالح أو ربما قد انتهت صلاحيته. "
-
-#~ msgid "Twitter did not provide a valid access token."
-#~ msgstr "لم يقدم Twitter رمز وصول صالح. "
-
-#~ msgid "Twitter tweet id"
-#~ msgstr "معرّف تغريدة Twitter "
-
-#~ msgid "Undo Retweet"
-#~ msgstr "إلغاء إعادة التغريد "
-
-#~ msgid "Use your own Twitter Account"
-#~ msgstr "استخدم حساب Twitter الخاص بك "
-
-#~ msgid ""
-#~ "Used to make comparisons when we need to restrict some features to a "
-#~ "specific media ('facebook', 'twitter', ...)."
-#~ msgstr ""
-#~ "يستخدم لإجراء المقارنات عند الحاجة إلى تقييد بعض الخصائص لموقع تواصل "
-#~ "اجتماعي محدد ('facebook'، 'twitter'، ...). "
-
-#~ msgid ""
-#~ "We could not upload your image, try reducing its size and posting it "
-#~ "again (error: %s)."
-#~ msgstr ""
-#~ "لم نتمكن من رفع صورتك. حاول تقليل حجمها ثم نشرها مجدداً (الخطأ: %s). "
-
-#~ msgid ""
-#~ "You can comment only three times a tweet as it may be considered as "
-#~ "spamming by Twitter"
-#~ msgstr ""
-#~ "يمكنك التعليق فقط ثلاث مرات في كل تغريدة لأنه قد يعد ذلك إزعاجاً في تويتر "
-
-#~ msgid "You can not store two times the same tweet on the same stream!"
-#~ msgstr "لا يمكنك تخزين نفس التغريدة مرتين في نفس التغريدة ونفس التيار! "
-
-#~ msgid ""
-#~ "You cannot create a Stream from this Twitter account.\n"
-#~ "It may be because it's protected. To solve this, please make sure you "
-#~ "follow it before trying again."
-#~ msgstr ""
-#~ "لا يمكنك إنشاء تدفق من حساب Twitter هذا. \n"
-#~ "قد يكون السبب هو أنه محمي. لحل هذه المشكلة، يرجى التأكد من أنك تتابعه قبل "
-#~ "المحاولة مجدداً. "
-
-#~ msgid "You don't have an active subscription. Please buy one here: %s"
-#~ msgstr "لا تملك اشتراكاً سارياً. يرجى شراء واحد من هنا: %s "
-
-#~ msgid ""
-#~ "You need to add the following callback URL to your twitter application "
-#~ "settings: %s"
-#~ msgstr ""
-#~ "تحتاج إلى إضافة رابط الاستدعاء التالي إلى إعدادات تطبيق Twitter الخاصة "
-#~ "بك: %s "
-
-#~ msgid "tweet"
-#~ msgstr "تغريدة "
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
+msgid "reposts"
+msgstr ""

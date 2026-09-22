@@ -2,51 +2,63 @@
 
 from datetime import datetime
 
-from odoo.fields import Command
+from odoo import Command
 
 from odoo.addons.sale.tests.common import SaleCommon
 
 
 class SaleRentingCommon(SaleCommon):
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        Recurrence = cls.env['sale.temporal.recurrence']
-        cls.recurrence_hour = Recurrence.create({'duration': 1, 'unit': 'hour'})
-        cls.recurrence_day = Recurrence.create({'duration': 1, 'unit': 'day'})
-        cls.recurrence_night_15_10 = Recurrence.create(
-            {'duration': 24, 'unit': 'hour', 'overnight': True, 'pickup_time': 15, 'return_time': 10}
-        )
+        cls.start_date = datetime(2023, 1, 1, hour=9)
+        cls.end_date = datetime(2023, 1, 1, hour=18)
 
         cls.projector = cls._create_product(
-            name='Projector',
-            type='consu',
-            extra_hourly=7.0,
-            extra_daily=30.0,
+            name="Projector", list_price=3.5, rent_periodicity="hours"
         )
-        cls.env['product.pricing'].create({
-            'price': 3.5,
-            'product_template_id': cls.projector.product_tmpl_id.id,
-            'recurrence_id': cls.recurrence_hour.id,
-        })
-        cls.rental_order = cls._create_rental_order()
-        cls.projector_sol = cls.rental_order.order_line[0]
-        cls.rental_order.action_confirm()
+
+        # Avoid non-determinism in tests.
+        cls.company.rental_resource_calendar_id = False
+
+    @classmethod
+    def default_env_context(cls):
+        # With demo data installed, Robodoo has the Europe/Brussels timezone. This override ensures
+        # the environment timezone (`self.env.tz`) is stable.
+        return {**super().default_env_context(), "tz": "UTC"}
 
     @classmethod
     def _create_product(cls, **kwargs):
-        if 'rent_ok' not in kwargs:
-            kwargs['rent_ok'] = True
+        if "rent_periodicity" not in kwargs:
+            kwargs["rent_periodicity"] = "days"
         return super()._create_product(**kwargs)
 
     @classmethod
-    def _create_rental_order(cls, **kwargs):
-        return cls.env['sale.order'].with_context(in_rental_app=True).create({
-            'partner_id': cls.partner.id,
-            'rental_start_date': datetime(2023, 1, 1, hour=9),
-            'rental_return_date': datetime(2023, 1, 1, hour=18),
-            'order_line': [Command.create({'product_id': cls.projector.id, 'product_uom_qty': 2})],
-            **kwargs,
+    def _create_so(cls, **values):
+        # Provide a default start & end date
+        values.setdefault("rental_start_date", cls.start_date)
+        values.setdefault("rental_return_date", cls.end_date)
+        return super()._create_so(**values)
+
+    @classmethod
+    def _create_rental_calendar(cls, attendance_values):
+        """Create a calendar with specific daily attendances.
+        param attendance_values: dict {day (str): (hour_from, hour_to)}.
+        return: resource.calendar.
+        """
+        days = {
+            "monday": "0",
+            "tuesday": "1",
+            "wednesday": "2",
+            "thursday": "3",
+            "friday": "4",
+            "saturday": "5",
+            "sunday": "6",
+        }
+        return cls.env["resource.calendar"].create({
+            "attendance_ids": [
+                Command.create({"dayofweek": days[day], "hour_from": hour_from, "hour_to": hour_to})
+                for day, (hour_from, hour_to) in attendance_values.items()
+            ]
         })

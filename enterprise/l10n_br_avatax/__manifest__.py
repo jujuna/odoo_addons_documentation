@@ -1,12 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Avatax Brazil',
-    'version': '1.0',
     'category': 'Accounting/Accounting',
     'depends': ['iap', 'l10n_br', 'account_external_tax'],
     'data': [
-        'security/ir.model.access.csv',
-        'security/ir_rule.xml',
         'views/account_tax_views.xml',
         'views/account_fiscal_position_views.xml',
         'views/res_partner_views.xml',
@@ -23,8 +20,8 @@
         'data/l10n_br.ncm.code.csv',
         'data/l10n_br.cnae.code.csv',
         'data/product_product.xml',
-        'data/res_country_data.xml',
         'data/l10n_br_operation_type_data.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'data/l10n_br_service_code_demo.xml',
@@ -35,4 +32,5 @@
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'post_init_hook': 'post_init',
+    'iap_paid_service': True,
 }

@@ -6,6 +6,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestEstonianFiscalRounding(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('ee')
     def setUpClass(cls):
@@ -14,9 +16,8 @@ class TestEstonianFiscalRounding(TestAccountReportsCommon):
         cls.partner_ee = cls.env['res.partner'].create({
             'name': 'Partner EE 1',
             'country_id': cls.env.ref('base.ee').id,
-            'company_registry': '98765432',
+            'additional_identifiers': {'EE_EN': '98765438'},
             'vat': 'EE023456783',
-            'is_company': True,
         })
 
         # sales VAT
@@ -30,7 +31,7 @@ class TestEstonianFiscalRounding(TestAccountReportsCommon):
         cls.difference_loss_acc = cls.company_data['company'].l10n_ee_rounding_difference_loss_account_id
         cls.difference_profit_acc = cls.company_data['company'].l10n_ee_rounding_difference_profit_account_id
 
-        cls.report = cls.env.ref('l10n_ee.tax_report').with_company(cls.company_data['company'])
+        cls.report = cls.env.ref('l10n_ee.kmd_inf_tax_report').with_company(cls.company_data['company'])
 
         cls._standard_line_dict = {
             'name': 'Line1',

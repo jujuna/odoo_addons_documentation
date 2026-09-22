@@ -1,21 +1,21 @@
+import { proxy } from "@odoo/owl";
 import { patch } from "@web/core/utils/patch";
 import { QualityCheck } from "@mrp_workorder/mrp_display/mrp_record_line/quality_check";
-import { useState } from "@odoo/owl";
 import { MrpMeasureDialog } from "./mrp_measure_dialog";
 
 patch(QualityCheck.prototype, {
     setup() {
         super.setup();
-        this.state = useState({ reOpened: false });
+        this.state = proxy({ reOpened: false });
     },
     get icon() {
         switch (this.type) {
             case "passfail":
-                return this.isComplete ? "fa fa-undo" : "fa fa-check";
+                return this.isComplete ? "undo" : "check";
             case "measure":
-                return "fa fa-arrows-h";
+                return "arrow_range";
             case "spreadsheet":
-                return "fa fa-th";
+                return "grid_view";
             default:
                 return super.icon;
         }
@@ -63,7 +63,7 @@ patch(QualityCheck.prototype, {
                     confirm: this.saveMeasurement.bind(this),
                 });
             case "spreadsheet":
-                await this.props.startWorking();
+                await this.qualityCheckProps.startWorking();
                 const { model, resModel, resId } = this.props.record;
                 const result = await model.orm.call(resModel, "action_open_spreadsheet", [resId]);
                 result.params = {
@@ -78,7 +78,7 @@ patch(QualityCheck.prototype, {
     },
     async saveMeasurement() {
         await this.props.record.save({ reload: false });
-        return this.doActionAndNext("do_measure");
+        await this.doActionAndNext("do_measure");
     },
     failCheck() {
         this.state.reOpened = false;

@@ -4,7 +4,6 @@ from unittest.mock import patch
 from freezegun import freeze_time
 
 from odoo.fields import Command
-from odoo.http import Request
 from odoo.tests import tagged
 from odoo.tests.common import HttpCase
 
@@ -62,7 +61,7 @@ class TestEquityPortal(TestEquityCommon, HttpCase):
         with patch.object(PortalEquity, '_prepare_my_companies_values', assert_prepare_my_companies_values):
             response = self.url_open('/my/equity/', data={
                 'access_token': self.access_token,
-                'csrf_token': Request.csrf_token(self),
+                'csrf_token': self.csrf_token(),
             })
 
         self.assertEqual(response.status_code, 200)
@@ -152,7 +151,7 @@ class TestEquityPortal(TestEquityCommon, HttpCase):
         ):
             response = self.url_open(f'/my/equity/{self.company.id}', data={
                 'access_token': self.access_token,
-                'csrf_token': Request.csrf_token(self),
+                'csrf_token': self.csrf_token(),
             })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(return_value['transactions'], [
@@ -268,7 +267,7 @@ class TestEquityPortal(TestEquityCommon, HttpCase):
         self.assertRecordValues(ubo1.holder_id, [{
             "name": "Company Holder 1",
             "country_id": False,
-            "ubo_birth_date": False,
+            "birth_date": False,
             "ubo_national_identifier": False,
             "ubo_pep": False,
         }])
@@ -285,7 +284,7 @@ class TestEquityPortal(TestEquityCommon, HttpCase):
         self.assertRecordValues(ubo2.holder_id, [{
             "name": "Hesham Saleh",
             "country_id": self.env.ref("base.eg").id,
-            "ubo_birth_date": date(2001, 11, 24),
+            "birth_date": date(2001, 11, 24),
             "ubo_national_identifier": "1234552",
             "ubo_pep": True,
         }])
@@ -302,7 +301,7 @@ class TestEquityPortal(TestEquityCommon, HttpCase):
         self.assertRecordValues(ubo3.holder_id, [{
             "name": "Brandon Freeman",
             "country_id": self.env.ref("base.be").id,
-            "ubo_birth_date": date(1980, 2, 21),
+            "birth_date": date(1980, 2, 21),
             "ubo_national_identifier": "3324",
             "ubo_pep": False,
         }])

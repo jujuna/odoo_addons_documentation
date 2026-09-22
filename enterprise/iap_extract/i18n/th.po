@@ -3,21 +3,22 @@
 # * iap_extract
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-09-16 22:57+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/iap_extract/"
-"th/>\n"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-17 23:46+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
+"iap_extract/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: iap_extract
 #: model:mail.template,body_html:iap_extract.iap_extract_no_credit
@@ -50,12 +51,13 @@ msgstr "จำเป็นต้องดำเนินการ"
 msgid ""
 "All fields will be automatically populated by Artificial Intelligence, it "
 "might take 5 seconds."
-msgstr "ฟิลด์ทั้งหมดจะถูกกรอกโดยปัญญาประดิษฐ์โดยอัตโนมัติ ซึ่งอาจใช้เวลา 5 วินาที"
+msgstr "ฟิลด์ทั้งหมดจะถูกกรอกโดย AI แบบอัตโนมัติ ซึ่งอาจใช้เวลา 5 วินาที"
 
 #. module: iap_extract
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__error_status
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__error_status
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__error_status
@@ -89,8 +91,8 @@ msgstr ""
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "Buy credits"
-msgstr "ซื้อเครดิต"
+msgid "Buy"
+msgstr ""
 
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__extract_can_show_send_button
@@ -99,7 +101,13 @@ msgid "Can show the ocr send button"
 msgstr "สามารถแสดงปุ่มส่ง ocr ได้"
 
 #. module: iap_extract
+#: model:ir.module.module,summary:base.module_iap_extract
+msgid "Common module for requesting data from the extract server"
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__done
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__done
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__done
@@ -121,6 +129,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin_with_words__display_name
 msgid "Display Name"
 msgstr "แสดงชื่อ"
+
+#. module: iap_extract
+#: model:iap.service,name:iap_extract.iap_service_ocr
+msgid "Document Digitization"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-python
@@ -232,6 +245,11 @@ msgid "ID of the request to IAP-OCR"
 msgstr "ID ของคำขอไปยัง IAP-OCR"
 
 #. module: iap_extract
+#: model:ir.module.module,shortdesc:base.module_iap_extract
+msgid "Iap Extract"
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields,help:iap_extract.field_extract_mixin__message_needaction
 #: model:ir.model.fields,help:iap_extract.field_extract_mixin_with_words__message_needaction
 msgid "If checked, new messages require your attention."
@@ -287,6 +305,7 @@ msgstr "ข้อความ"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__no_extract_requested
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__no_extract_requested
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__no_extract_requested
@@ -296,7 +315,14 @@ msgid "No extract requested"
 msgstr "ไม่มีการร้องขอการดึง"
 
 #. module: iap_extract
+#. odoo-javascript
+#: code:addons/iap_extract/static/src/components/status_header/status.xml:0
+msgid "Not enough credit to scan your document."
+msgstr ""
+
+#. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__not_enough_credit
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__not_enough_credit
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__not_enough_credit
@@ -345,13 +371,13 @@ msgstr "การให้คะแนน"
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Refresh"
-msgstr "รีเฟรช"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Retry"
-msgstr "ลองใหม่"
+msgstr ""
 
 #. module: iap_extract
 #. odoo-python
@@ -378,8 +404,8 @@ msgid ""
 "The 'invoice_ocr' IAP account token is invalid. Please delete it to let Odoo "
 "generate a new one or fill it with a valid token."
 msgstr ""
-"โทเค็นบัญชี IAP 'invoice_ocr' ไม่ถูกต้อง โปรดลบออกเพื่อให้ Odoo "
-"สร้างอันใหม่หรือใช้โทเค็นที่ถูกต้อง"
+"โทเค็นบัญชี IAP 'invoice_ocr' ไม่ถูกต้อง โปรดลบออกเพื่อให้ Odoo สร้างอันใหม่หรือใช้โทเค็นที่ถูก"
+"ต้อง"
 
 #. module: iap_extract
 #. odoo-python
@@ -401,6 +427,7 @@ msgstr "เอกสารที่เลือกจะถูกแปลงเ
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__to_validate
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__to_validate
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__to_validate
@@ -423,6 +450,7 @@ msgstr "ไม่รองรับเวอร์ชันนี้"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__waiting_extraction
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__waiting_extraction
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__waiting_extraction
@@ -433,6 +461,7 @@ msgstr "รอการดึง"
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__waiting_validation
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__waiting_validation
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__waiting_validation
@@ -442,17 +471,12 @@ msgid "Waiting validation"
 msgstr "กำลังรอการตรวจสอบ"
 
 #. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "You don't have enough credit to extract data from your document."
-msgstr "คุณไม่มีเครดิตเพียงพอที่จะดึงข้อมูลจากเอกสารของคุณ"
-
-#. module: iap_extract
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 msgid ""
 "Your PDF file is protected by a password. The OCR can't extract data from it"
-msgstr "ไฟล์ PDF ของคุณได้รับการป้องกันด้วยรหัสผ่าน OCR ไม่สามารถดึงข้อมูลออกมาได้"
+msgstr ""
+"ไฟล์ PDF ของคุณได้รับการป้องกันด้วยรหัสผ่าน OCR ไม่สามารถดึงข้อมูลออกมาได้"
 
 #. module: iap_extract
 #. odoo-python
@@ -462,6 +486,7 @@ msgstr "เอกสารของคุณมีจำนวนหน้าม
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__extract_not_ready
+#: model:ir.model.fields.selection,name:iap_extract.selection__account_loan__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_move__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin__extract_state__extract_not_ready
 #: model:ir.model.fields.selection,name:iap_extract.selection__extract_mixin_with_words__extract_state__extract_not_ready

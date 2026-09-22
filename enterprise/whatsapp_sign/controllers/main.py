@@ -3,11 +3,12 @@
 import io
 import zipfile
 from os.path import join as opj
+
 from werkzeug.utils import secure_filename
 
-
 from odoo import http
-from odoo.http import Stream, request
+from odoo.http import request
+from odoo.http.stream import Stream
 from odoo.tools import consteq
 
 
@@ -63,7 +64,7 @@ class WhatsappSign(http.Controller):
                 download_name = self._format_attachments_name(
                     sign_request, attachment, existing_document_names
                 )
-                zipfile_obj.writestr(download_name, attachment.raw)
+                zipfile_obj.writestr(download_name, attachment.raw.content)
 
         content = buffer.getvalue()
         filename = f'{self._generate_sign_request_zip_name(sign_request)}.zip'

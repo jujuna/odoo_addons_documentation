@@ -4,49 +4,49 @@
     <div class="o-version-history-wrapper o-spreadsheet d-flex flex-column flex-shrink-0 border user-select-none">
       <div class="header fs-3 d-flex lh-base align-items-center justify-content-between px-3 py-2">
         <div class="title o-fw-bold">Version History</div>
-        <div class="cursor-pointer" t-on-click="props.onCloseSidePanel">✕</div>
+        <div class="cursor-pointer" t-on-click="this.props.onCloseSidePanel">✕</div>
       </div>
       <div
         class="o-version-history overflow-auto border-top"
         tabindex="0"
-        t-ref="container"
-        t-on-keydown.self="onKeyDown"
+        t-ref="this.containerRef"
+        t-on-keydown.self="this.onKeyDown"
       >
-        <Section t-if="revisions.length" class="'p-3'">
+        <Section t-if="this.revisions.length" class="'p-3'">
           <VersionHistoryItem
-            t-foreach="loadedRevisions"
+            t-foreach="this.loadedRevisions"
             t-as="revision"
             t-key="revision.nextRevisionId"
-            active="state.currentRevisionId === revision.nextRevisionId"
-            onActivation.bind="onRevisionClick"
+            active="this.state.currentRevisionId === revision.nextRevisionId"
+            onActivation.bind="this.onRevisionClick"
             revision="revision"
-            onBlur.bind="focus"
-            editable="revision !== revisions.at(-1)"
-            getRevisions="props.getRevisions"
-            renameRevision="props.renameRevision"
-            forkHistory="props.forkHistory"
-            getLocale="props.getLocale"
-            restoreRevision="props.restoreRevision"
+            onBlur.bind="this.focus"
+            editable="revision !== this.revisions.at(-1)"
+            getRevisions="this.props.getRevisions"
+            renameRevision="this.props.renameRevision"
+            forkHistory="this.props.forkHistory"
+            getLocale="this.props.getLocale"
+            restoreRevision="this.props.restoreRevision"
           />
         </Section>
 
-        <Section class="'pt-0 p-3'" t-if="revisions.length">
-          <div t-if="state.loaded &lt; revisions.length"
+        <Section class="'pt-0 p-3'" t-if="this.revisions.length">
+          <div t-if="this.state.loaded &lt; this.revisions.length"
             class="d-flex justify-content-center o-version-history-load-more-container">
-            <button t-on-click="onLoadMoreClicked" class="o-button o-version-history-load-more">
+            <button t-on-click="this.onLoadMoreClicked" class="o-button o-version-history-load-more">
               Load More
             </button>
           </div>
         </Section>
 
         <!-- state loaded and we loaded every revision possible -->
-        <t t-if="!revisions.length">
+        <t t-if="!this.revisions.length">
           <Section class="'p-3'">
             There are no prior revisions for this spreadsheet.
           </Section>
           <Section class="'p-3'">
             <div class="d-flex">
-              <button t-on-click="props.onCloseSidePanel" class="o-button">Back</button>
+              <button t-on-click="this.props.onCloseSidePanel" class="o-button">Back</button>
             </div>
           </Section>
         </t>

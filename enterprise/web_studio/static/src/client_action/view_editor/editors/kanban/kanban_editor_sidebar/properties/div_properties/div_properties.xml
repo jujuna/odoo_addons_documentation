@@ -4,14 +4,14 @@
     <ViewStructureProperties>
         <ClassAttribute
             value="this.props.node.attrs.class"
-            onChange.bind="onChangeAttribute"
+            onChange.bind="this.onChangeAttribute"
         />
-        <ModifiersProperties node="props.node" availableOptions="['invisible']"/>
+        <ModifiersProperties node="this.props.node" availableOptions="['invisible']"/>
         <Property
             name="'style'"
             type="'string'"
-            value="props.node.attrs.style"
-            onChange.bind="onChangeAttribute">
+            value="this.props.node.attrs.style"
+            onChange.bind="this.onChangeAttribute">
                 CSS style
         </Property>
     </ViewStructureProperties>

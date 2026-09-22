@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import datetime
-from unittest.mock import patch
 
 from odoo import Command
 from odoo.tests import freeze_time, tagged
@@ -12,6 +11,8 @@ from odoo.addons.sale_commission_subscription.tests.common import TestSaleSubscr
 
 @tagged('post_install', '-at_install')
 class TestSaleSubCommissionUser(TestSaleSubscriptionCommissionCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def default_env_context(cls):
@@ -234,8 +235,7 @@ class TestSaleSubCommissionUser(TestSaleSubscriptionCommissionCommon):
 
     def test_effective_date(self):
         with freeze_time("2024-02-02"):
-            context_mail = {'tracking_disable': False, 'mail_create_nosubscribe': True, 'mail_create_nolog': True, 'mail_notrack': False}
-            sub = self.env['sale.order'].with_context(context_mail).create({
+            sub = self.env['sale.order'].create({
                 'name': 'TestSubscription',
                 'is_subscription': True,
                 'plan_id': self.plan_month.id,
@@ -299,23 +299,23 @@ class TestSaleSubCommissionUser(TestSaleSubscriptionCommissionCommon):
         (self.product | self.product2).subscription_rule_ids = False
         self.product.lst_price = 50
         self.product2.lst_price = 100
-        context_mail = {'tracking_disable': False, 'mail_create_nosubscribe': True, 'mail_create_nolog': True, 'mail_notrack': False}
         with freeze_time("2024-02-02"):
             self.env['res.currency.rate'].create([{
                 'rate': 60,
                 'currency_id': currency_inr.id,
+                'name': '2024-02-01',
             },{
                 'rate': 57,
-                'name': '2023-01-07',
+                'name': '2023-01-06',
                 'currency_id': currency_inr.id,
             }, {
                 'rate': 55,
-                'name': '2022-01-07',
+                'name': '2022-01-06',
                 'currency_id': currency_inr.id,
             }])
             self.env['res.currency.rate'].flush_model()
             self.env['res.currency'].flush_model()
-            sub = self.env['sale.order'].with_context(context_mail).create({
+            sub = self.env['sale.order'].create({
                 'name': 'TestSubscription',
                 'is_subscription': True,
                 'plan_id': self.plan_month.id,
@@ -466,9 +466,8 @@ class TestSaleSubCommissionUser(TestSaleSubscriptionCommissionCommon):
         first_now = datetime.datetime(2024, 2, 2, 8, 0, 0)
         second_now = datetime.datetime(2024, 3, 2, 8, 0, 0)
         third_now = datetime.datetime(2024, 3, 3, 9, 0, 0)
-        with freeze_time("2024-02-02"), patch.object(self.env.cr, 'now', lambda: first_now):
-            context_mail = {'tracking_disable': False, 'mail_create_nosubscribe': True, 'mail_create_nolog': True, 'mail_notrack': False}
-            sub = self.env['sale.order'].with_context(context_mail).create({
+        with self.mock_datetime_and_now(first_now):
+            sub = self.env['sale.order'].create({
                 'name': 'TestSubscription Duplicated ID',
                 'is_subscription': True,
                 'plan_id': self.plan_month.id,
@@ -495,16 +494,18 @@ class TestSaleSubCommissionUser(TestSaleSubscriptionCommissionCommon):
             self.assertAlmostEqual(inv.amount_untaxed, 100, 2, msg="The untaxed invoiced amount should be equal to 1000")
             self.assertEqual(sub.recurring_monthly, 100)
             self.flush_tracking()
-        with freeze_time("2024-03-03"), patch.object(self.env.cr, 'now', lambda: second_now):
+        with self.mock_datetime_and_now(second_now):
             sub.order_line.product_uom_qty = 5
             self.flush_tracking()
-        with freeze_time("2024-03-04"), patch.object(self.env.cr, 'now', lambda: third_now):
+        with self.mock_datetime_and_now(third_now):
             sub.order_line.product_uom_qty = 10
             self.flush_tracking()
             self.assertEqual(sub.recurring_monthly, 1000, "We need to logs on the same date")
             inv = sub._create_invoices()
             inv._post()
             self.flush_tracking()  # needed to run precommit _update_effective_date
+
+            self.env.invalidate_all()
             order_log_ids = sub.order_log_ids.sorted('id')
             sub_data = [(
                 log.event_type,
@@ -516,12 +517,11 @@ class TestSaleSubCommissionUser(TestSaleSubscriptionCommissionCommon):
                 log.create_date
             ) for log in order_log_ids]
             self.assertEqual(sub_data, [
-                ('0_creation', datetime.date(2024, 2, 2), '1_draft', 100, 100, datetime.date(2024, 2, 2), datetime.datetime(2024, 2, 2, 8, 0)),
-                ('1_expansion', datetime.date(2024, 3, 3), '3_progress', 400.0, 500.0, datetime.date(2024, 3, 2), datetime.datetime(2024, 3, 2, 8, 0)),
-                ('1_expansion', datetime.date(2024, 3, 4), '3_progress', 500.0, 1000.0, datetime.date(2024, 3, 2), datetime.datetime(2024, 3, 3, 9, 0))
+                ('0_creation', datetime.date(2024, 2, 2), '1_draft', 100.0, 100.0, datetime.date(2024, 2, 2), datetime.datetime(2024, 2, 2, 8, 0)),
+                ('1_expansion', datetime.date(2024, 3, 2), '3_progress', 400.0, 500.0, datetime.date(2024, 3, 2), datetime.datetime(2024, 3, 2, 8, 0)),
+                ('1_expansion', datetime.date(2024, 3, 3), '3_progress', 500.0, 1000.0, datetime.date(2024, 3, 2), datetime.datetime(2024, 3, 3, 9, 0))
             ])
-            self.flush_tracking()
-            self.env.invalidate_all()
+
             self.env['sale.commission.achievement.report']._pre_achievement_operation()
             achievements = self.env['sale.commission.achievement.report'].search([('plan_id', '=', self.commission_plan_sub.id)])
             self.assertEqual(sum(achievements.mapped('achieved')), 100, 'Regular invoice, 10 percent of 100')
@@ -562,7 +562,7 @@ class TestSaleSubCommissionUser(TestSaleSubscriptionCommissionCommon):
             }])
             self.commission_plan_sub.action_approve()
             self.flush_tracking()
-            sub.require_payment = False
+            sub.prepayment_percent = 0
             sub.action_confirm()
             self.flush_tracking()
             sub._create_recurring_invoice()
@@ -599,3 +599,112 @@ class TestSaleSubCommissionUser(TestSaleSubscriptionCommissionCommon):
             self.assertEqual(len(achievements), 4, 'We should have 4 ahcievements: creation, 2 transfer and one contraction')
             self.assertEqual(sum(achievements.mapped('achieved')), 83.33, '80 - 80 + 100 - 16.87')
             self.assertEqual(sum(commissions.mapped('commission')), 83.33, "Commission = achieved in this case")
+
+    def test_sub_commission_no_currency_rate(self):
+        """Test that commissions work correctly when res_currency_rate table is empty."""
+        self.env['res.currency.rate'].sudo().search([]).unlink()
+
+        with freeze_time("2024-02-03"):
+            sub = self.env['sale.order'].create({
+                'name': 'TestSubscription',
+                'is_subscription': True,
+                'plan_id': self.plan_month.id,
+                'note': "original subscription description",
+                'partner_id': self.user_portal.partner_id.id,
+                'sale_order_template_id': self.subscription_tmpl.id,
+                'user_id': self.commission_user_1.id
+            })
+            sub._onchange_sale_order_template_id()
+            sub.order_line.price_unit = 50
+            self.commission_plan_sub.achievement_ids = self.env['sale.commission.plan.achievement'].create([{
+                'type': 'mrr',
+                'rate': 0.1,
+                'plan_id': self.commission_plan_sub.id,
+                'recurring_plan_id': sub.plan_id.id,
+            }])
+            self.flush_tracking()
+            sub.action_confirm()
+            self.flush_tracking()
+            self.commission_plan_sub.action_approve()
+            sub._create_recurring_invoice()
+            self.flush_tracking()
+            self.env.flush_all()
+            self.env.invalidate_all()
+            self.env['sale.commission.achievement.report']._pre_achievement_operation()
+            achievements = self.env['sale.commission.achievement.report'].search([('plan_id', '=', self.commission_plan_sub.id)])
+            commissions = self.env['sale.commission.report'].search([('plan_id', '=', self.commission_plan_sub.id)])
+            self.assertEqual(sum(achievements.mapped('achieved')), 10, 'Regular invoice, 10 percent of 100')
+            self.assertEqual(sum(commissions.mapped('commission')), 10, 'Regular invoice, 10 percent of 100')
+
+    @freeze_time('2024-02-02')
+    def test_dynamic_mrr_plan(self):
+        commission_other = self.env['sale.commission.plan'].create({
+            'name': "Other plan",
+            'company_id': self.env.company.id,
+            'date_from': datetime.date(year=2024, month=1, day=1),
+            'date_to': datetime.date(year=2024, month=12, day=31),
+            'periodicity': 'month',
+            'type': 'achieve',
+            'user_type': 'person',
+            'target_type': 'static',
+
+        })
+        commission_other.achievement_ids = self.env['sale.commission.plan.achievement'].create([{
+            'type': 'mrr',
+            'rate': 0.5,
+            'plan_id': commission_other.id,
+            'recurring_plan_id': self.plan_month.id,
+        }])
+        commission_other.target_ids.amount = 75
+        commission_other.user_ids = self.env['sale.commission.plan.user'].create([{
+            'user_id': self.env.user.id,
+            'plan_id': commission_other.id,
+        }])
+        commission_other.action_approve()
+        commission_not_taken = commission_other.copy()
+        # ensure that we don't take into account the commissions of this plan because it is not used in the dynamic_plan_ids field
+        commission_not_taken.action_approve()
+        self.commission_plan_manager.write({
+            'periodicity': 'month',
+            'type': 'achieve',
+            'user_type': 'person',
+            'target_type': 'dynamic',
+            'dynamic_plan_ids': [Command.link(commission_other.id)]
+        })
+        self.commission_plan_manager.achievement_ids = self.env['sale.commission.plan.achievement'].create([{
+            'type': 'mrr',
+            'rate': 0.5,
+            'plan_id': self.commission_plan_user.id,
+            'recurring_plan_id': self.plan_month.id,
+        }])
+        # The sale order log done by the create_uid of the self.commission_manager are taken into account into the commission
+        self.commission_plan_manager.user_ids.user_id = self.commission_manager
+        self.commission_plan_manager.user_ids.user_ids = [Command.link(self.env.user.id)]
+        self.commission_plan_manager.action_approve()
+        self.flush_tracking()
+        sub = self.env['sale.order'].create({
+            'name': 'TestSubscription',
+            'is_subscription': True,
+            'plan_id': self.plan_month.id,
+            'note': "original subscription description",
+            'partner_id': self.user_portal.partner_id.id,
+            'sale_order_template_id': self.subscription_tmpl.id,
+        })
+        sub._onchange_sale_order_template_id()
+        sub.order_line.price_unit = 100
+        self.flush_tracking()
+        sub.action_confirm()
+        self.flush_tracking()
+        am = sub._create_recurring_invoice()
+        self.flush_tracking()
+        self.env.flush_all()
+        self.env.invalidate_all()
+        self.env['sale.commission.achievement.report']._pre_achievement_operation()
+        achievements = self.env['sale.commission.achievement.report'].search([('plan_id', '=', self.commission_plan_manager.id)])
+        commissions = self.env['sale.commission.report'].search([('plan_id', '=', self.commission_plan_manager.id)])
+        self.assertEqual(am.invoice_user_id, self.env.user)
+        self.assertEqual(sub.order_log_ids.user_id, self.env.user)
+        self.assertAlmostEqual(achievements.achieved, 100, msg="The achieved amount should be 100, 200/2")
+        self.assertAlmostEqual(sum(commissions.mapped('commission')), 100, msg="The achieved amount should be 100")
+        self.assertEqual(commissions.mapped('target_amount'), [75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0])
+        self.assertEqual(achievements.document_user_id, sub.user_id, "Dynamic plan can have document_user_id")

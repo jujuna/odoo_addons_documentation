@@ -9,21 +9,35 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tony Ng (ngto)" <ngto@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-08 19:42+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-09-18 17:46+0000\n"
+"PO-Revision-Date: 2026-09-17 23:45+0000\n"
+"Last-Translator: \"Tony Ng (ngto)\" <ngto@odoo.com>\n"
 "Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
-"projects/odoo-19/documents/zh_Hant/>\n"
+"projects/odoo-master/documents/zh_Hant/>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents
+#: model:ir.module.module,description:base.module_documents
+msgid ""
+"\n"
+"App to upload and manage your documents.\n"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_mixin.py:0
+msgid "\"%(document_name)s\" cannot be linked to a record: only folders can."
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -86,6 +100,17 @@ msgid "%s shortcuts have been created."
 msgstr "已建立 %s 個捷徑。"
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "(originally requested from"
+msgstr ""
+
+#. module: documents
+#: model:res.groups.privilege,description:documents.res_groups_privilege_documents
+msgid ""
+"- Basic: Can view or edit, upload, and share their own or shared documents."
+msgstr ""
+
+#. module: documents
 #: model_terms:digest.tip,tip_description:documents.digest_tip_documents_0
 msgid ""
 ". Scanned files will appear automatically in your folder. Then, process your "
@@ -94,14 +119,9 @@ msgid ""
 msgstr ""
 
 #. module: documents
-#: model:documents.tag,name:documents.documents_tag_year_previous
-msgid "2025"
-msgstr "2025"
-
-#. module: documents
-#: model:documents.document,name:documents.document_finance_annual_closing_year_current_folder
-#: model:documents.tag,name:documents.documents_tag_year_current
-msgid "2026"
+#. odoo-javascript
+#: code:addons/documents/static/src/views/fields/documents_shared_group/documents_shared_group.xml:0
+msgid "1 member"
 msgstr ""
 
 #. module: documents
@@ -112,14 +132,26 @@ msgstr "<b class=\"tip_title\">提示：成為一間無紙化公司</b>"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "<b>Deselect this page</b> as we plan to process all bills first."
-msgstr "<b>取消選擇此頁面</b>，因為我們計劃先處理所有賬單。"
+msgid "<b>Create a new folder</b>"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "<b>Select</b> this page to continue."
-msgstr "<b>選取</b>此頁面以繼續。"
+msgid "<b>Go to 'Company'</b> to view all your company's files and folders."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "<b>Now, click on your folder</b> to open it"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "<b>Set an action</b> to apply on the files of this folder"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_request_done_page
@@ -132,52 +164,90 @@ msgid "<br/>Powered by"
 msgstr "<br/>官方技術支援"
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.public_folder_page
-msgid "<i class=\"fa fa-download fa-fw\"/> Download All"
-msgstr "<i class=\"fa fa-download fa-fw\"/> 下載全部"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.share_file
-msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
-msgstr "<i class=\"fa fa-download fa-fw\"/> 下載檔案"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
-msgid "<i class=\"fa fa-external-link me-2\" title=\"This is a shortcut\"/>"
-msgstr "<i class=\"fa fa-external-link me-2\" title=\"這是一個捷徑\"/>"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
+#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid ""
-"<i class=\"fa fa-external-link text-gray-500\" title=\"This is a shortcut\"/>"
-msgstr "<i class=\"fa fa-external-link text-gray-500\" title=\"此為捷徑\"/>"
+"<i class=\"oi oi-filled\" data-icon=\"mail\" title=\"Resend Invitation\"/>"
+msgstr ""
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.share_file
-msgid "<i class=\"fa fa-eye\"/> Preview file"
-msgstr "<i class=\"fa fa-eye\"/> 預覽檔案"
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid ""
+"<i class=\"oi oi-fw me-1\" data-icon=\"link\"/>\n"
+"                <span> Notes: </span>"
+msgstr ""
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_request_page
-msgid "<i class=\"fa fa-upload fa-fw\"/> Add file"
-msgstr "<i class=\"fa fa-upload fa-fw\"/> 加入檔案"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.public_folder_page
-msgid "<i class=\"fa fa-upload\"/>  Upload"
-msgstr "<i class=\"fa fa-upload\"/> 上載"
-
-#. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.share_file
-msgid "<i class=\"fa fa-upload\"/> Replace file"
-msgstr "<i class=\"fa fa-upload\"/> 取代檔案"
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid ""
+"<i class=\"oi oi-fw me-1\" data-icon=\"share\"/>\n"
+"                <span> Source: </span>"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid ""
-"<i class=\"fa fa-w fa-user-plus col-form-label ps-1 pe-4 fs-4\" "
-"title=\"Invite people\"/>"
+"<i class=\"oi oi-fw oi-filled fs-4\" data-icon=\"group\" title=\"Add "
+"Groups\"/>"
 msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
+msgid ""
+"<i class=\"oi oi-fw oi-filled fs-4\" data-icon=\"person_add\" title=\"Add "
+"people\"/>"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-1\" data-icon=\"description\"/>\n"
+"                <span> Original Name: </span>"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-1\" data-icon=\"person\"/>\n"
+"                <span> Creator: </span>"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.public_folder_page
+msgid "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download All"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"download\"/> 下載全部"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.share_file
+msgid "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download file"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"download\"/> 下載檔案"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
+msgid ""
+"<i class=\"oi text-gray-500\" data-icon=\"open_in_new\" title=\"This is a "
+"shortcut\"/>"
+msgstr ""
+"<i class=\"oi text-gray-500\" data-icon=\"open_in_new\" title=\"此為捷徑\"/>"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.public_folder_page
+msgid "<i class=\"oi\" data-icon=\"upload\"/>  Upload"
+msgstr "<i class=\"oi\" data-icon=\"upload\"/> 上載"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_request_page
+msgid "<i class=\"oi\" data-icon=\"upload\"/> Add file"
+msgstr "<i class=\"oi\" data-icon=\"upload\"/> 加入檔案"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.share_file
+msgid "<i class=\"oi\" data-icon=\"upload\"/> Replace file"
+msgstr "<i class=\"oi\" data-icon=\"upload\"/> 取代檔案"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.share_file
+msgid "<i class=\"oi\" data-icon=\"visibility\"/> Preview file"
+msgstr "<i class=\"oi\" data-icon=\"visibility\"/> 預覽檔案"
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.documents_document_res_partner_view
@@ -216,397 +286,240 @@ msgstr "<span><b>請求的文件</b></span>"
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
-msgid "<span>The following members access were removed:</span>"
+msgid "<span>The following members/groups accesses were removed:</span>"
 msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
-msgid "<span>The following members gained access:</span>"
+msgid "<span>The following members/groups gained access:</span>"
 msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
-msgid "<span>The following members had their rights changed:</span>"
+msgid "<span>The following members/groups had their rights changed:</span>"
 msgstr ""
 
 #. module: documents
 #: model:mail.template,body_html:documents.mail_template_document_share
 msgid ""
+"<t>\n"
 "<t t-set=\"documents\" t-value=\"ctx.get('documents', "
 "object.env['documents.document'])\"/>\n"
-"                <t t-set=\"access_urls_by_partner\" t-"
+"<t t-set=\"access_urls_by_partner\" t-"
 "value=\"ctx.get('access_urls_by_partner', {})\"/>\n"
-"                <t t-set=\"access_urls\" t-"
-"value=\"access_urls_by_partner.get(object) or {}\"/>\n"
-"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"style=\"padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, "
-"Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"
-"\"><tr><td align=\"center\">\n"
-"                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"padding: 16px; background-color: white; color: "
-"#454748; border-collapse:separate;\">\n"
-"                    <tbody>\n"
-"                        <!-- HEADER -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                                    <tr><td valign=\"middle\">\n"
-"                                        <span style=\"font-size: 10px;\" t-"
-"if=\"len(documents) == 1\">\n"
-"                                            Shared Document<br/>\n"
-"                                            <span style=\"font-size: 20px; "
-"font-weight: bold;\" t-out=\"documents.name or ''\"/>\n"
-"                                        </span>\n"
-"                                        <span style=\"font-size: 10px;\" t-"
-"if=\"len(documents) &gt; 1\">\n"
-"                                            Shared Documents<br/>\n"
-"                                            <span style=\"font-size: 20px; "
-"font-weight: bold;\" t-out=\"', "
-"'.join(documents.filtered('name').mapped('name'))\"/>\n"
-"                                        </span>\n"
-"                                        <br/>\n"
-"                                    </td><td valign=\"middle\" "
-"align=\"right\" t-if=\"not user.company_id.uses_default_logo\">\n"
-"                                        <img t-attf-src=\"/logo.png?"
-"company={{ user.company_id.id }}\" style=\"padding: 0px; margin: 0px; "
-"height: auto; width: 80px;\" t-att-alt=\"user.company_id.name\"/>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td colspan=\"2\" style=\"text-"
-"align:center;\">\n"
-"                                      <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                        <!-- CONTENT -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                                    <tr><td valign=\"top\" style=\"font-"
-"size: 13px;\">\n"
-"                                        <div>\n"
-"                                            Hello <t t-out=\"object.name\"/"
-">,\n"
-"                                            <br/><br/>\n"
-"                                            <t t-if=\"len(documents) &lt;= "
-"1\">\n"
-"                                                <t t-if=\"documents.type == "
-"'folder'\" t-set=\"share_message\">shared the following folder with you</t>\n"
-"                                                <t t-else=\"\" t-"
-"set=\"share_message\">shared the following document with you</t>\n"
-"                                            </t>\n"
-"                                            <t t-elif=\"len(documents) &gt; "
-"1\">\n"
-"                                                <t t-set=\"document_types\" "
-"t-value=\"set(documents.mapped('type'))\"/>\n"
-"                                                <t t-if=\"document_types == "
-"{'folder'}\" t-set=\"share_message\">shared the following folders with you</"
-"t>\n"
-"                                                <t t-elif=\"'folder' not in "
-"document_types\" t-set=\"share_message\">shared the following documents with "
-"you</t>\n"
-"                                                <t t-else=\"\" t-"
-"set=\"share_message\">shared the following documents/folders with you</t>\n"
-"                                            </t>\n"
-"                                            <t t-out=\"user.name or "
-"''\">OdooBot</t> (<t t-out=\"user.email or ''\">odoobot@example.com</t>) <t "
-"t-out=\"share_message\"/>:\n"
-"                                            <br/><br/>\n"
-"                                            <center t-if=\"len(documents) "
-"&lt;= 1\">\n"
-"                                                <div t-if=\"len(documents) "
-"== 1\">\n"
-"                                                    <b t-"
-"out=\"documents.name\"/>\n"
-"                                                </div>\n"
-"                                                <div t-"
-"if=\"ctx.get('message')\">\n"
-"                                                    <i t-out=\"ctx['message']"
+"<t t-set=\"access_urls\" t-value=\"access_urls_by_partner.get(object) or {}"
 "\"/>\n"
-"                                                </div>\n"
-"                                                <br/>\n"
-"                                                <div style=\"margin: 16px "
-"0px 16px 0px;\">\n"
-"                                                    <a t-att-"
-"href=\"access_urls.get(documents)\" t-attf-style=\"background-color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px 30px "
-"20px 30px; text-decoration: none; color: "
+"Hello <t t-out=\"object.name\"/>,\n"
+"<br/><br/>\n"
+"<t t-if=\"len(documents) &lt;= 1\">\n"
+"    <t t-if=\"documents.type == 'folder'\" t-set=\"share_message\">shared "
+"the following folder with you</t>\n"
+"    <t t-else=\"\" t-set=\"share_message\">shared the following document "
+"with you</t>\n"
+"</t>\n"
+"<t t-elif=\"len(documents) &gt; 1\">\n"
+"    <t t-set=\"document_types\" t-value=\"set(documents.mapped('type'))\"/>\n"
+"    <t t-if=\"document_types == {'folder'}\" t-set=\"share_message\">shared "
+"the following folders with you</t>\n"
+"    <t t-elif=\"'folder' not in document_types\" t-"
+"set=\"share_message\">shared the following documents with you</t>\n"
+"    <t t-else=\"\" t-set=\"share_message\">shared the following documents/"
+"folders with you</t>\n"
+"</t>\n"
+"<t t-out=\"user.name or ''\">OdooBot</t> (<t t-out=\"user.email or "
+"''\">odoobot@example.com</t>) <t t-out=\"share_message\"/>:\n"
+"<br/><br/>\n"
+"<center t-if=\"len(documents) &lt;= 1\">\n"
+"    <div t-if=\"len(documents) == 1\">\n"
+"        <b t-out=\"documents.name\"/>\n"
+"    </div>\n"
+"    <div t-if=\"ctx.get('message')\">\n"
+"        <i t-out=\"ctx['message']\"/>\n"
+"    </div>\n"
+"    <br/>\n"
+"    <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"        <a t-att-href=\"access_urls.get(documents)\" t-attf-"
+"style=\"background-color: {{user.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 20px 30px 20px 30px; text-decoration: none; color: "
 "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\">\n"
-"                                                        <b>Get your files</"
-"b>\n"
-"                                                    </a>\n"
-"                                                </div>\n"
-"                                            </center>\n"
-"                                            <t t-elif=\"len(documents) &gt; "
-"1\">\n"
-"                                                <div t-"
-"if=\"ctx.get('message')\">\n"
-"                                                    <i t-out=\"ctx['message']"
-"\"/>\n"
-"                                                </div>\n"
-"                                                <ul>\n"
-"                                                    <li t-"
-"foreach=\"documents\" t-as=\"document\">\n"
-"                                                        <a t-att-"
-"href=\"access_urls.get(document)\" t-attf-style=\"color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}}; font-size:13px;\">\n"
-"                                                            <b>Get <t t-"
-"out=\"document.name\"/></b>\n"
-"                                                        </a>\n"
-"                                                    </li>\n"
-"                                                </ul>\n"
-"                                            </t>\n"
+"            <b>Get your files</b>\n"
+"        </a>\n"
+"    </div>\n"
+"</center>\n"
+"<t t-elif=\"len(documents) &gt; 1\">\n"
+"    <div t-if=\"ctx.get('message')\">\n"
+"        <i t-out=\"ctx['message']\"/>\n"
+"    </div>\n"
+"    <ul>\n"
+"        <li t-foreach=\"documents\" t-as=\"document\">\n"
+"            <a t-att-href=\"access_urls.get(document)\" t-attf-"
+"style=\"color: {{user.company_id.email_secondary_color or '#875A7B'}}; font-"
+"size:13px;\">\n"
+"                <b>Get <t t-out=\"document.name\"/></b>\n"
+"            </a>\n"
+"        </li>\n"
+"    </ul>\n"
+"</t>\n"
 "\n"
-"                                            <br/>\n"
-"                                            <t t-if=\"user and "
-"user.signature\" data-o-mail-quote-container=\"1\">\n"
-"                                                <br/>\n"
-"                                                <div data-o-mail-"
-"quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature\" data-"
-"o-mail-quote=\"1\"/></div>\n"
-"                                                <br data-o-mail-quote=\"1\"/"
-">\n"
-"                                            </t>\n"
-"                                        </div>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td style=\"text-align:center;\">\n"
-"                                      <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                        <!-- FOOTER -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;"
-"\">\n"
-"                                    <tr><td valign=\"middle\" "
-"align=\"left\">\n"
-"                                        <t t-out=\"user.company_id.name or "
-"''\">YourCompany</t>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td valign=\"middle\" align=\"left\" "
-"style=\"opacity: 0.7;\">\n"
-"                                        <t t-out=\"user.company_id.phone or "
-"''\">+1 650-123-4567</t>\n"
-"                                        <t t-if=\"user.company_id.email\">\n"
-"                                            | <a t-attf-href=\"mailto:"
-"{{ user.company_id.email }}\" style=\"text-decoration:none; color: "
-"#454748;\" t-out=\"user.company_id.email\">info@yourcompany.com</a>\n"
-"                                        </t>\n"
-"                                        <t t-"
-"if=\"user.company_id.website\">\n"
-"                                            | <a t-att-"
-"href=\"user.company_id.website\" style=\"text-decoration:none; color: "
-"#454748;\" t-out=\"user.company_id.website\">http://www.example.com</a>\n"
-"                                        </t>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                    </tbody>\n"
-"                    </table>\n"
-"                    </td></tr>\n"
-"                    <!-- POWERED BY -->\n"
-"                    <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"                        <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
-"                          <tr><td style=\"text-align: center; font-size: "
-"13px;\">\n"
-"                            Powered by <a target=\"_blank\" href=\"https://"
-"www.odoo.com/app/documents\" t-attf-style=\"color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo Documents</"
-"a>\n"
-"                          </td></tr>\n"
-"                        </table>\n"
-"                    </td></tr>\n"
-"                </table>\n"
-"            "
+"<br/>\n"
+"<t t-if=\"user and user.signature\">\n"
+"    <br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature\"/></div>\n"
+"    <br data-o-mail-quote=\"1\"/>\n"
+"</t>\n"
+"            </t>"
 msgstr ""
+"<t>\n"
+"<t t-set=\"documents\" t-value=\"ctx.get('documents', "
+"object.env['documents.document'])\"/>\n"
+"<t t-set=\"access_urls_by_partner\" t-"
+"value=\"ctx.get('access_urls_by_partner', {})\"/>\n"
+"<t t-set=\"access_urls\" t-value=\"access_urls_by_partner.get(object) or {}"
+"\"/>\n"
+"<t t-out=\"object.name\"/> 你好！\n"
+"<br/><br/>\n"
+"<t t-if=\"len(documents) &lt;= 1\">\n"
+"    <t t-if=\"documents.type == 'folder'\" t-set=\"share_message\">已向你分享"
+"以下資料夾</t>\n"
+"    <t t-else=\"\" t-set=\"share_message\">已向你分享以下文件</t>\n"
+"</t>\n"
+"<t t-elif=\"len(documents) &gt; 1\">\n"
+"    <t t-set=\"document_types\" t-value=\"set(documents.mapped('type'))\"/>\n"
+"    <t t-if=\"document_types == {'folder'}\" t-set=\"share_message\">已向你分"
+"享以下資料夾</t>\n"
+"    <t t-elif=\"'folder' not in document_types\" t-set=\"share_message\">已向"
+"你分享以下文件</t>\n"
+"    <t t-else=\"\" t-set=\"share_message\">已向你分享以下文件/資料夾</t>\n"
+"</t>\n"
+"<t t-out=\"user.name or ''\">OdooBot</t> (<t t-out=\"user.email or "
+"''\">odoobot@example.com</t>) <t t-out=\"share_message\"/>：\n"
+"<br/><br/>\n"
+"<center t-if=\"len(documents) &lt;= 1\">\n"
+"    <div t-if=\"len(documents) == 1\">\n"
+"        <b t-out=\"documents.name\"/>\n"
+"    </div>\n"
+"    <div t-if=\"ctx.get('message')\">\n"
+"        <i t-out=\"ctx['message']\"/>\n"
+"    </div>\n"
+"    <br/>\n"
+"    <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"        <a t-att-href=\"access_urls.get(documents)\" t-attf-"
+"style=\"background-color: {{user.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 20px 30px 20px 30px; text-decoration: none; color: "
+"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"font-size:13px;\">\n"
+"            <b>取得你的檔案</b>\n"
+"        </a>\n"
+"    </div>\n"
+"</center>\n"
+"<t t-elif=\"len(documents) &gt; 1\">\n"
+"    <div t-if=\"ctx.get('message')\">\n"
+"        <i t-out=\"ctx['message']\"/>\n"
+"    </div>\n"
+"    <ul>\n"
+"        <li t-foreach=\"documents\" t-as=\"document\">\n"
+"            <a t-att-href=\"access_urls.get(document)\" t-attf-"
+"style=\"color: {{user.company_id.email_secondary_color or '#875A7B'}}; font-"
+"size:13px;\">\n"
+"                <b>取得 <t t-out=\"document.name\"/></b>\n"
+"            </a>\n"
+"        </li>\n"
+"    </ul>\n"
+"</t>\n"
+"\n"
+"<br/>\n"
+"<t t-if=\"user and user.signature\">\n"
+"    <br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature\"/></div>\n"
+"    <br data-o-mail-quote=\"1\"/>\n"
+"</t>\n"
+"            </t>"
 
 #. module: documents
 #: model:mail.template,body_html:documents.mail_template_document_request
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"padding: 16px; background-color: white; color: "
-"#454748; border-collapse:separate;\">\n"
-"                    <tbody>\n"
-"                        <!-- HEADER -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                                    <tr><td valign=\"middle\">\n"
-"                                        <span style=\"font-size: 10px;\">\n"
-"                                            Document Request: <br/>\n"
-"                                            <t t-if=\"object.name\">\n"
-"                                                <span style=\"font-size: "
-"20px; font-weight: bold;\" t-out=\"object.name or ''\">Inbox Financial</"
-"span>\n"
-"                                            </t>\n"
-"                                        </span><br/>\n"
-"                                    </td><td valign=\"middle\" "
-"align=\"right\" t-if=\"not "
-"object.create_uid.company_id.uses_default_logo\">\n"
-"                                        <img t-attf-src=\"/logo.png?"
-"company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-"margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"object.create_uid.company_id.name\"/>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td colspan=\"2\" style=\"text-"
-"align:center;\">\n"
-"                                      <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                        <!-- CONTENT -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                                    <tr><td valign=\"top\" style=\"font-"
-"size: 13px;\">\n"
-"                                        <div>\n"
-"                                            Hello <t t-"
-"out=\"object.requestee_partner_id.name or ''\">OdooBot</t>,\n"
-"                                            <br/><br/>\n"
-"                                            <t t-"
-"out=\"object.create_uid.name or ''\">OdooBot</t> (<t t-"
+"<t>\n"
+"Hello <t t-out=\"object.requestee_partner_id.name or ''\">OdooBot</t>,\n"
+"<br/><br/>\n"
+"<t t-out=\"object.create_uid.name or ''\">OdooBot</t> (<t t-"
 "out=\"object.create_uid.email or ''\">odoobot@example.com</t>) asks you to "
 "provide the following document:\n"
-"                                            <br/><br/>\n"
-"                                            <center>\n"
-"                                                <div>\n"
-"                                                    <t t-"
-"if=\"object.name\">\n"
-"                                                        <b t-"
-"out=\"object.name or ''\">Inbox Financial</b>\n"
-"                                                    </t>\n"
-"                                                </div>\n"
-"                                                <div>\n"
-"                                                    <t t-"
-"if=\"object.request_activity_id.note\">\n"
-"                                                        <i t-"
-"out=\"object.request_activity_id.note or ''\">Example of a note.</i>\n"
-"                                                    </t>\n"
-"                                                </div>\n"
-"                                                <br/>\n"
-"                                                <div style=\"margin: 16px "
-"0px 16px 0px;\">\n"
-"                                                    <a t-att-"
-"href=\"object.access_url\" t-attf-style=\"background-color: "
+"<br/><br/>\n"
+"<center>\n"
+"    <div>\n"
+"        <t t-if=\"object.name\">\n"
+"            <b t-out=\"object.name or ''\">Inbox Financial</b>\n"
+"        </t>\n"
+"    </div>\n"
+"    <div>\n"
+"        <t t-if=\"object.request_activity_id.note\">\n"
+"            <i t-out=\"object.request_activity_id.note or ''\">Example of a "
+"note.</i>\n"
+"        </t>\n"
+"    </div>\n"
+"    <br/>\n"
+"    <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"        <a t-att-href=\"object.access_url\" t-attf-style=\"background-color: "
 "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px 30px "
 "20px 30px; text-decoration: none; color: "
 "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\">\n"
-"                                                        Upload the requested "
-"document\n"
-"                                                    </a>\n"
-"                                                </div>\n"
-"                                            </center><br/>\n"
-"                                            Please provide us with the "
-"missing document before <t t-"
+"            Upload the requested document\n"
+"        </a>\n"
+"    </div>\n"
+"</center><br/>\n"
+"Please provide us with the missing document before <t t-"
 "out=\"object.request_activity_id.date_deadline\">2021-05-17</t>.\n"
-"                                            <t t-if=\"user and "
-"user.signature\" data-o-mail-quote-container=\"1\">\n"
-"                                                <br/>\n"
-"                                                <div data-o-mail-"
-"quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature or ''\" "
-"data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-"                                                <br data-o-mail-quote=\"1\"/"
-">\n"
-"                                            </t>\n"
-"                                        </div>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td style=\"text-align:center;\">\n"
-"                                      <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                        <!-- FOOTER -->\n"
-"                        <tr>\n"
-"                            <td align=\"center\" style=\"min-width: 590px;"
-"\">\n"
-"                                <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;"
-"\">\n"
-"                                    <tr><td valign=\"middle\" "
-"align=\"left\">\n"
-"                                        <t t-"
-"out=\"object.create_uid.company_id.name or ''\">YourCompany</t>\n"
-"                                    </td></tr>\n"
-"                                    <tr><td valign=\"middle\" align=\"left\" "
-"style=\"opacity: 0.7;\">\n"
-"                                        <t t-"
-"out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-"                                        <t t-"
-"if=\"object.create_uid.company_id.email\">\n"
-"                                            | <a t-attf-href=\"mailto:"
-"{{ object.create_uid.company_id.email }}\" style=\"text-decoration:none; "
-"color: #454748;\" t-out=\"object.create_uid.company_id.email or "
-"''\">info@yourcompany.com</a>\n"
-"                                        </t>\n"
-"                                        <t t-"
-"if=\"object.create_uid.company_id.website\">\n"
-"                                            | <a t-att-"
-"href=\"object.create_uid.company_id.website\" style=\"text-decoration:none; "
-"color: #454748;\" t-out=\"object.create_uid.company_id.website or "
-"''\">http://www.example.com</a>\n"
-"                                        </t>\n"
-"                                    </td></tr>\n"
-"                                </table>\n"
-"                            </td>\n"
-"                        </tr>\n"
-"                    </tbody>\n"
-"                    </table>\n"
-"                    </td></tr>\n"
-"                    <!-- POWERED BY -->\n"
-"                    <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"                        <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
-"                          <tr><td style=\"text-align: center; font-size: "
-"13px;\">\n"
-"                            Powered by <a target=\"_blank\" href=\"https://"
-"www.odoo.com/app/documents\" t-attf-style=\"color: "
-"{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo Documents</"
-"a>\n"
-"                          </td></tr>\n"
-"                        </table>\n"
-"                    </td></tr>\n"
-"                </table>\n"
-"            "
+"<t t-if=\"user and user.signature\">\n"
+"    <br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"    <br data-o-mail-quote=\"1\"/>\n"
+"</t>\n"
+"            </t>"
 msgstr ""
+"<t>\n"
+"<t t-out=\"object.requestee_partner_id.name or ''\">OdooBot</t> 你好！\n"
+"<br/><br/>\n"
+"<t t-out=\"object.create_uid.name or ''\">OdooBot</t> (<t t-"
+"out=\"object.create_uid.email or ''\">odoobot@example.com</t>) 要求你提供以下"
+"文件：\n"
+"<br/><br/>\n"
+"<center>\n"
+"    <div>\n"
+"        <t t-if=\"object.name\">\n"
+"            <b t-out=\"object.name or ''\">收件箱財務</b>\n"
+"        </t>\n"
+"    </div>\n"
+"    <div>\n"
+"        <t t-if=\"object.request_activity_id.note\">\n"
+"            <i t-out=\"object.request_activity_id.note or ''\">備註範例文字。"
+"</i>\n"
+"        </t>\n"
+"    </div>\n"
+"    <br/>\n"
+"    <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"        <a t-att-href=\"object.access_url\" t-attf-style=\"background-color: "
+"{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px 30px "
+"20px 30px; text-decoration: none; color: "
+"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"font-size:13px;\">\n"
+"            上載所需文件\n"
+"        </a>\n"
+"    </div>\n"
+"</center><br/>\n"
+"請於 <t t-out=\"object.request_activity_id.date_deadline\">2021-05-17</t> 之"
+"前，向我們提供缺漏的文件。\n"
+"<t t-if=\"user and user.signature\">\n"
+"    <br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"    <br data-o-mail-quote=\"1\"/>\n"
+"</t>\n"
+"            </t>"
 
 #. module: documents
 #: model:mail.template,body_html:documents.mail_template_document_request_reminder
@@ -702,11 +615,11 @@ msgid ""
 "                                            <br/><br/>\n"
 "                                            Thank you,\n"
 "                                            <t t-if=\"user and "
-"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"user.signature\">\n"
 "                                                <br/>\n"
 "                                                <div data-o-mail-"
-"quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature\" data-"
-"o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
+"quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature\">Mitchell Admin</t></div>\n"
 "                                                <br data-o-mail-quote=\"1\"/"
 ">\n"
 "                                            </t>\n"
@@ -775,6 +688,172 @@ msgid ""
 "                </table>\n"
 "            "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"padding: 16px; background-color: white; color: "
+"#454748; border-collapse:separate;\">\n"
+"                    <tbody>\n"
+"                        <!-- HEADER -->\n"
+"                        <tr>\n"
+"                            <td align=\"center\" style=\"min-width: 590px;"
+"\">\n"
+"                                <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
+"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                                    <tr><td valign=\"middle\">\n"
+"                                        <span style=\"font-size: 10px;\">\n"
+"                                            文件請求：<br/>\n"
+"                                            <t t-if=\"object.name\">\n"
+"                                                <span style=\"font-size: "
+"20px; font-weight: bold;\" t-out=\"object.name or ''\">收件箱財務</span>\n"
+"                                            </t>\n"
+"                                        </span><br/>\n"
+"                                    </td><td valign=\"middle\" "
+"align=\"right\">\n"
+"                                        <img t-attf-src=\"/logo.png?"
+"company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
+"margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"object.create_uid.company_id.name\"/>\n"
+"                                    </td></tr>\n"
+"                                    <tr><td colspan=\"2\" style=\"text-"
+"align:center;\">\n"
+"                                      <hr width=\"100%\" style=\"background-"
+"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
+"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                                    </td></tr>\n"
+"                                </table>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                        <!-- CONTENT -->\n"
+"                        <tr>\n"
+"                            <td align=\"center\" style=\"min-width: 590px;"
+"\">\n"
+"                                <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
+"white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                                    <tr><td valign=\"top\" style=\"font-"
+"size: 13px;\">\n"
+"                                        <div>\n"
+"                                            <t t-"
+"out=\"object.requestee_partner_id.name or ''\">OdooBot</t> 你好！\n"
+"                                            <br/><br/>\n"
+"                                            提醒你，請上載下列由其他使用者要"
+"求的文件：\n"
+"                                            <br/><br/>\n"
+"                                            <center>\n"
+"                                                <div>\n"
+"                                                    <t t-"
+"if=\"object.name\">\n"
+"                                                        <b t-"
+"out=\"object.name or ''\">收件箱財務</b>\n"
+"                                                    </t>\n"
+"                                                </div>\n"
+"                                                <div>\n"
+"                                                    <t t-"
+"if=\"object.request_activity_id.note\">\n"
+"                                                        <i t-"
+"out=\"object.request_activity_id.note or ''\">備註範例文字。</i>\n"
+"                                                    </t>\n"
+"                                                </div>\n"
+"                                                <br/>\n"
+"                                                <div style=\"margin: 16px "
+"0px 16px 0px;\">\n"
+"                                                    <a t-att-"
+"href=\"object.access_url\" t-attf-style=\"background-color: "
+"{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px 30px "
+"20px 30px; text-decoration: none; color: "
+"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"font-size:13px;\">\n"
+"                                                        上載被要求文件\n"
+"                                                    </a>\n"
+"                                                </div>\n"
+"                                            </center><br/>\n"
+"                                            請於 <t t-"
+"out=\"object.request_activity_id.date_deadline or ''\">2021-05-17</t> 之前，"
+"向我們提供缺漏的文件。\n"
+"                                            <br/><br/>\n"
+"                                            謝謝！\n"
+"                                            <t t-if=\"user and "
+"user.signature\">\n"
+"                                                <br/>\n"
+"                                                <div data-o-mail-"
+"quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature\">Mitchell Admin</t></div>\n"
+"                                                <br data-o-mail-quote=\"1\"/"
+">\n"
+"                                            </t>\n"
+"                                        </div>\n"
+"                                    </td></tr>\n"
+"                                    <tr><td style=\"text-align:center;\">\n"
+"                                      <hr width=\"100%\" style=\"background-"
+"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
+"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                                    </td></tr>\n"
+"                                </table>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                        <!-- FOOTER -->\n"
+"                        <tr>\n"
+"                            <td align=\"center\" style=\"min-width: 590px;"
+"\">\n"
+"                                <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
+"white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;"
+"\">\n"
+"                                    <tr><td valign=\"middle\" "
+"align=\"left\">\n"
+"                                        <t t-"
+"out=\"object.create_uid.company_id.name or ''\">YourCompany</t>\n"
+"                                    </td></tr>\n"
+"                                    <tr><td valign=\"middle\" align=\"left\" "
+"style=\"opacity: 0.7;\">\n"
+"                                        <t t-"
+"out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
+"                                        <t t-"
+"if=\"object.create_uid.company_id.email\">\n"
+"                                            | <a t-attf-href=\"mailto:"
+"{{ object.create_uid.company_id.email }}\" style=\"text-decoration:none; "
+"color: #454748;\" t-"
+"out=\"object.create_uid.company_id.email\">info@yourcompany.com</a>\n"
+"                                        </t>\n"
+"                                        <t t-"
+"if=\"object.create_uid.company_id.website\">\n"
+"                                            | <a t-att-"
+"href=\"object.create_uid.company_id.website\" style=\"text-decoration:none; "
+"color: #454748;\" t-out=\"object.create_uid.company_id.website\">http://"
+"www.example.com</a>\n"
+"                                        </t>\n"
+"                                    </td></tr>\n"
+"                                </table>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                    </tbody>\n"
+"                    </table>\n"
+"                    </td></tr>\n"
+"                    <!-- POWERED BY -->\n"
+"                    <tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"                        <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
+"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"                          <tr><td style=\"text-align: center; font-size: "
+"13px;\">\n"
+"                            <a target=\"_blank\" href=\"https://www.odoo.com/"
+"app/documents\" t-attf-style=\"color: "
+"{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo 文件管理</a> "
+"技術驅動\n"
+"                          </td></tr>\n"
+"                        </table>\n"
+"                    </td></tr>\n"
+"                </table>\n"
+"            "
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.content_email
+msgid "<text x=\"50\" y=\"21\" text-anchor=\"middle\">EMAIL</text>"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,help:documents.field_documents_document__alias_defaults
@@ -833,15 +912,15 @@ msgid "Access Via Link Help"
 msgstr ""
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.portal_my_home_documents
+#: model:portal.entry,description:documents.portal_documents_entry
 msgid "Access all your documents"
 msgstr "存取你的所有文件"
 
 #. module: documents
 #. odoo-python
 #: code:addons/documents/models/documents_access.py:0
-msgid "Access documents and partners cannot be changed."
-msgstr "文件存取權限及合作夥伴不可更改。"
+msgid "Access documents, partners, and groups cannot be changed."
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__access_via_link
@@ -850,7 +929,7 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Access to Automations"
 msgstr "存取自動化操作"
 
@@ -876,13 +955,7 @@ msgid "Acme_Insurance_Contract_Structured.pdf"
 msgstr ""
 
 #. module: documents
-#: model:documents.document,name:documents.documents_nda
-msgid "Acme_NDA.pdf"
-msgstr ""
-
-#. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
 msgid "Action"
 msgstr "動作"
@@ -895,8 +968,9 @@ msgstr "需要採取行動"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_pin_actions.xml:0
-msgid "Actions on Select"
-msgstr "選取時的動作"
+#: code:addons/documents/static/src/views/kanban/documents_kanban_actions_popover.xml:0
+msgid "Actions"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__active
@@ -921,6 +995,7 @@ msgid "Activity Exception Decoration"
 msgstr "活動異常圖示"
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__activity_plans_ids
 #: model:ir.ui.menu,name:documents.mail_activity_plan_menu
 msgid "Activity Plans"
 msgstr "活動計劃"
@@ -975,20 +1050,31 @@ msgstr "加入"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_pin_actions.xml:0
-msgid "Add Custom Action"
-msgstr "加入自訂動作"
+#: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
+msgid "Add File"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
-msgid "Add File"
-msgstr "加入文件"
-
-#. module: documents
+#: code:addons/documents/static/src/core/document_service.js:0
 #: model:ir.actions.act_window,name:documents.action_folder_form
 msgid "Add Folder"
 msgstr "加入資料夾"
+
+#. module: documents
+#: model:ir.model.fields.selection,name:documents.selection__documents_sharing__invite_type__groups
+msgid "Add Groups"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields.selection,name:documents.selection__documents_sharing__invite_type__people
+msgid "Add People"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_sharing__invite_type
+msgid "Add Type"
+msgstr ""
 
 #. module: documents
 #: model:ir.actions.act_window,name:documents.action_url_form
@@ -1002,8 +1088,15 @@ msgid "Add an alias tag..."
 msgstr "新增別名標籤⋯"
 
 #. module: documents
-#: model:ir.model.fields.selection,name:documents.selection__documents_operation__operation__add
-msgid "Add attachment to Documents"
+#. odoo-javascript
+#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.xml:0
+msgid "Add as attachment(s)"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.xml:0
+msgid "Add as link(s)"
 msgstr ""
 
 #. module: documents
@@ -1013,10 +1106,14 @@ msgstr "加入檔案"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/core/common/composer_actions_patch.js:0
-#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.xml:0
+#: code:addons/documents/static/src/core/web/composer_actions_patch.js:0
 #: code:addons/documents/static/src/web/mail_composer_document_selector/mail_composer_document_selector.xml:0
 msgid "Add from Documents"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
+msgid "Add group"
 msgstr ""
 
 #. module: documents
@@ -1038,13 +1135,8 @@ msgstr "加入用戶或電郵地址"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_shortcut.js:0
-msgid "Add shortcut"
-msgstr "加入捷徑"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_star.js:0
+#: code:addons/documents/static/src/views/action/folder_action_star.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Add star"
 msgstr "加入星號"
 
@@ -1056,20 +1148,20 @@ msgstr "加入標籤⋯"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/attachments/attachment_list_patch.xml:0
+#: code:addons/documents/static/src/core/common/attachment_model_patch.js:0
 msgid "Add to Documents"
-msgstr ""
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/attachments/attachment_list_patch.js:0
-msgid "Add to My Documents"
 msgstr ""
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/core/document_service.js:0
 msgid "Add to documents"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/web/document_organize_popover.js:0
+msgid "Added to %(destination)s"
 msgstr ""
 
 #. module: documents
@@ -1114,16 +1206,28 @@ msgid "Alias Tags"
 msgstr "別名標籤"
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_sharing_access__all_partner_ids
+msgid "All Partner"
+msgstr ""
+
+#. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "All"
-msgstr "所有"
+#: code:addons/documents/static/src/views/search/documents_search_model.js:0
+#: model_terms:ir.ui.view,arch_db:documents.document_view_search
+msgid "All children"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 msgid "All companies"
 msgstr "所有公司"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "All set. Let's <b>Validate</b>"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__access_ids
@@ -1161,13 +1265,45 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
-msgid "An error occured while uploading."
-msgstr "上載時發生錯誤"
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
+msgid "An error occurred while uploading."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "And <b>add a note.</b>"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "And all actions to perform on the <b>selected file(s).</b>"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "And give it a proper name"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "And upload a new file"
+msgstr ""
 
 #. module: documents
 #: model:documents.document,name:documents.document_finance_annual_closing_folder
 msgid "Annual Closing"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.js:0
+msgid ""
+"Anyone with access to the linked record will be able to access the "
+"attachment."
 msgstr ""
 
 #. module: documents
@@ -1180,7 +1316,7 @@ msgstr "任何有連結的人"
 #. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
 msgid "Archive original file(s)"
-msgstr "封存原始文件"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1202,12 +1338,6 @@ msgstr "確定要刪除此頁面？"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
-msgid "Are you sure you want to delete this attachment?"
-msgstr "確定要刪除此附件？"
-
-#. module: documents
-#. odoo-javascript
 #: code:addons/documents/static/src/views/documents_model_mixin.js:0
 msgid "Are you sure you want to permanently erase the selected document?"
 msgstr ""
@@ -1220,10 +1350,19 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
 msgid ""
-"As this PDF contains multiple documents, let's split and process in bulk."
-msgstr "由於此 PDF 包含多個文件檔，所以讓我們分拆並批量處理吧。"
+"Are you sure you will not need this previous version? Once deleted, it is "
+"gone for good."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
+msgid ""
+"Are you sure you will not need this version? Once deleted, it is gone for "
+"good and the previous one will be restored."
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1260,6 +1399,18 @@ msgstr "附件類型"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/core/web/attachment_list_patch.js:0
+msgid "Attachment removed. Linked document moved to Trash."
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/controllers/documents.py:0
+msgid "Attachment updated by %(user)s"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_automations.js:0
 msgid "Automations"
 msgstr "自動化"
@@ -1268,6 +1419,24 @@ msgstr "自動化"
 #: model:ir.model.fields,field_description:documents.field_documents_document__available_embedded_actions_ids
 msgid "Available Embedded Actions"
 msgstr "可用的嵌入操作"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Awesome! Let's explore how you can <b>access your files from anywhere in "
+"Odoo.</b>"
+msgstr ""
+
+#. module: documents
+#: model:res.groups.privilege,placeholder:documents.res_groups_privilege_documents
+msgid "Basic"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_document_check_type_binary
+msgid "Binary document should have an attachment"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1306,6 +1475,12 @@ msgid ""
 msgstr ""
 
 #. module: documents
+#: model:res.groups,comment:documents.group_documents_user
+msgid ""
+"Can embed actions on folders, insert in Spreadsheet, and import in Sign."
+msgstr ""
+
+#. module: documents
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
 msgid "Can modify, delete, and rename."
@@ -1331,21 +1506,9 @@ msgid "Can only view. Cannot rename, move, or delete."
 msgstr "只可檢視，不可重新命名、移動或刪除項目。"
 
 #. module: documents
-#: model:res.groups,comment:documents.group_documents_user
-msgid "Can view or edit, upload, and share their own or shared documents."
-msgstr ""
-
-#. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:documents.documents_link_to_record_form_view
-msgid "Cancel"
-msgstr "取消"
-
-#. module: documents
-#. odoo-python
-#: code:addons/documents/models/documents_access.py:0
-msgid "Cannot invite this member."
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.js:0
+msgid "Caution"
 msgstr ""
 
 #. module: documents
@@ -1389,28 +1552,8 @@ msgstr "清除"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Click on a card to <b>select the document</b>."
-msgstr "按下卡片以<b>選擇文件</b>。"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Click on a thumbnail to <b>preview the document</b>."
-msgstr "按下縮圖以<b>預覽文件</b>。"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid ""
-"Click on the <b>page separator</b>: we don't want to split these two pages "
-"as they belong to the same document."
-msgstr "按下<b>分頁符號</b>：我們不想分拆這兩個頁面，因為它們屬於同一個文件。"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Click the cross to <b>exit preview</b>."
-msgstr "按一下交叉圖示，以<b>離開預覽</b>。"
+msgid "Click on <b>'New'</b> to create a new folder"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1432,15 +1575,14 @@ msgstr "關閉"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Close (Esc)"
-msgstr "關閉(Esc)"
-
-#. module: documents
-#. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
 msgid "Close split tools"
 msgstr "關閉分拆工具"
+
+#. module: documents
+#: model:ir.module.module,summary:base.module_documents
+msgid "Collect, organize and share documents."
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_tag__color
@@ -1459,17 +1601,17 @@ msgid "Common roots for all company users."
 msgstr "所有公司使用者的共同根位置。"
 
 #. module: documents
-#: model:ir.model,name:documents.model_res_company
-msgid "Companies"
-msgstr "公司"
-
-#. module: documents
 #. odoo-javascript
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.js:0
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
+#: code:addons/documents/static/src/core/document_service.js:0
+#: code:addons/documents/static/src/js/tours/documents.js:0
 #: code:addons/documents/static/src/views/kanban/documents_kanban_record.js:0
+#: model:ir.model,name:documents.model_res_company
 #: model:ir.model.fields,field_description:documents.field_documents_document__company_id
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__user_root__company
 msgid "Company"
 msgstr "公司"
 
@@ -1496,6 +1638,13 @@ msgid "Conflicting values passed with user_folder_id."
 msgstr ""
 
 #. module: documents
+#: model_terms:web_tour.tour,rainbow_man_message:documents.documents_tour
+msgid "Congrats on completing the <br> Odoo Documents onboarding!"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 #: model:ir.model,name:documents.model_res_partner
 #: model:ir.model.fields,field_description:documents.field_documents_document__partner_id
 #: model:ir.model.fields,field_description:documents.field_documents_request_wizard__partner_id
@@ -1506,7 +1655,7 @@ msgstr "聯絡人"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/core/document_service.js:0
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Contact your Administrator to get access if needed."
 msgstr "如有需要，請聯絡你的系統管理員，以取得存取權限。"
 
@@ -1518,6 +1667,13 @@ msgstr "合約"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_copy_link.js:0
+#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
+msgid "Copy Link"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid "Copy Links"
@@ -1525,6 +1681,7 @@ msgstr "複製連結"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_operations.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Create Shortcut"
 msgstr "建立捷徑"
@@ -1549,12 +1706,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:documents.field_documents_document__create_activity_option
 msgid "Create a new activity"
 msgstr "建立新‎‎活動"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Create a new document for the remaining page."
-msgstr "為其餘頁面建立一個新文件。"
 
 #. module: documents
 #. odoo-javascript
@@ -1649,6 +1800,18 @@ msgstr "刪除"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
+msgid "Delete Current Version"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
+msgid "Delete File Version"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.js:0
 msgid "Delete focused or selected pages"
 msgstr "刪除目前或所選頁面"
@@ -1708,23 +1871,21 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_details.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 msgid "Details"
 msgstr "詳細資訊"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/core/document_service.js:0
-#: code:addons/documents/static/src/views/documents_model_mixin.js:0
-#: model_terms:ir.ui.view,arch_db:documents.document_view_form_rename
-#: model_terms:ir.ui.view,arch_db:documents.documents_operation_view_form
-#: model_terms:ir.ui.view,arch_db:documents.documents_request_form_view
-#: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
-#: model_terms:ir.ui.view,arch_db:documents.documents_upload_url_view
-#: model_terms:ir.ui.view,arch_db:documents.folder_deletion_form
-#: model_terms:ir.ui.view,arch_db:documents.tag_view_form
+#: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
 msgid "Discard"
 msgstr "捨棄"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "Discover all actions to perform on the <b>current folder.</b>"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1748,7 +1909,6 @@ msgstr "可被發現"
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__display_name
 #: model:ir.model.fields,field_description:documents.field_documents_sharing_access__display_name
 #: model:ir.model.fields,field_description:documents.field_documents_tag__display_name
-#: model:ir.model.fields,field_description:documents.field_documents_unlink_mixin__display_name
 #: model:ir.model.fields,field_description:documents.field_ir_actions_server__display_name
 #: model:ir.model.fields,field_description:documents.field_ir_attachment__display_name
 #: model:ir.model.fields,field_description:documents.field_ir_binary__display_name
@@ -1757,6 +1917,7 @@ msgstr "可被發現"
 #: model:ir.model.fields,field_description:documents.field_kpi_provider__display_name
 #: model:ir.model.fields,field_description:documents.field_mail_activity__display_name
 #: model:ir.model.fields,field_description:documents.field_mail_activity_type__display_name
+#: model:ir.model.fields,field_description:documents.field_mail_thread__display_name
 #: model:ir.model.fields,field_description:documents.field_res_company__display_name
 #: model:ir.model.fields,field_description:documents.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:documents.field_res_partner__display_name
@@ -1768,7 +1929,7 @@ msgstr "顯示名稱"
 #. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_exit_dialog/pdf_exit_dialog.xml:0
 msgid "Do you want to exit without saving or gather pages into one document ?"
-msgstr "確定不儲存並退出，還是將頁面合併至一個文件？"
+msgstr ""
 
 #. module: documents
 #: model:ir.model,name:documents.model_documents_document
@@ -1778,6 +1939,7 @@ msgstr "確定不儲存並退出，還是將頁面合併至一個文件？"
 #: model:ir.model.fields,field_description:documents.field_documents_tag__document_ids
 #: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
 msgid "Document"
 msgstr "文件"
 
@@ -1820,7 +1982,13 @@ msgstr "‎文件請求‎"
 #. module: documents
 #: model:mail.template,subject:documents.mail_template_document_request
 msgid "Document Request {{ object.name != False and ': '+ object.name or '' }}"
-msgstr "‎文件請求‎ {{ object.name != False and ':'+ object.name or '' }}."
+msgstr "文件請求{{ object.name != False and '：' + object.name or '' }}"
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_request_wizard.py:0
+msgid "Document Request:"
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -1840,6 +2008,28 @@ msgid "Document Token"
 msgstr "文件權杖"
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.tracking_auto_archive_by_dependency
+msgid "Document archived because its reference record was deleted."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/document_service.js:0
+msgid "Document couldn't be created."
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_creation_message_template
+msgid "Document created <br/>"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/document_service.js:0
+msgid "Document created in %(destination)s!"
+msgstr ""
+
+#. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/views/widget/documents_operation_confirmation.js:0
 msgid "Document created in %(folder_name)s!"
@@ -1852,15 +2042,22 @@ msgid "Document moved to %(folder_name)s!"
 msgstr ""
 
 #. module: documents
+#. odoo-javascript
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+#: code:addons/documents/static/src/views/documents_model_mixin.js:0
+msgid "Document not found or inaccessible."
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
 msgid "Document preview"
 msgstr "文件預覽"
 
 #. module: documents
-#. odoo-python
-#: code:addons/documents/controllers/documents.py:0
-msgid "Document uploaded by %(user)s"
-msgstr "文件由 %(user)s 上載"
+#: model:ir.model.fields,field_description:documents.field_mail_activity__requested_document_ids
+msgid "Document requests"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -1892,12 +2089,13 @@ msgstr "DocumentSizeIntegerField"
 #: model:ir.model.fields,field_description:documents.field_res_partner__document_ids
 #: model:ir.model.fields,field_description:documents.field_res_users__document_ids
 #: model:ir.model.fields.selection,name:documents.selection__ir_actions_server__usage__documents_embedded
+#: model:ir.module.module,shortdesc:base.module_documents
 #: model:ir.ui.menu,name:documents.dashboard
 #: model:ir.ui.menu,name:documents.menu_root
+#: model:portal.entry,name:documents.portal_documents_entry
 #: model:res.groups.privilege,name:documents.res_groups_privilege_documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
 #: model_terms:ir.ui.view,arch_db:documents.documents_view_activity
-#: model_terms:ir.ui.view,arch_db:documents.portal_my_home_documents
 #: model_terms:ir.ui.view,arch_db:documents.res_config_settings_view_form
 msgid "Documents"
 msgstr "文件"
@@ -1991,17 +2189,13 @@ msgid "Documents shared with you will appear here"
 msgstr "其他人與你共享的文件，會在此處顯示"
 
 #. module: documents
-#: model:ir.model,name:documents.model_documents_unlink_mixin
-msgid "Documents unlink mixin"
-msgstr "文件取消連結混入程式"
-
-#. module: documents
 #: model:ir.actions.server,name:documents.ir_cron_documents_access_tracking_ir_actions_server
 msgid "Documents: Access Tracking"
 msgstr ""
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/core/document_service.js:0
 #: code:addons/documents/static/src/views/widget/documents_operation_confirmation.js:0
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid "Done"
@@ -2010,9 +2204,9 @@ msgstr "完成"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.xml:0
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_download.js:0
+#: code:addons/documents/static/src/views/action/folder_action_download.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_download.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 msgid "Download"
 msgstr "下載"
 
@@ -2061,6 +2255,7 @@ msgstr "截止類型"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_operations.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 #: code:addons/documents/static/src/views/form/folder_form_controller.js:0
 msgid "Duplicate"
@@ -2091,17 +2286,15 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/attachments/document_file_viewer.xml:0
-#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
-msgid "EMAIL"
-msgstr "電郵"
+#: code:addons/documents/static/src/views/fields/documents_datetime/documents_datetime_field.xml:0
+msgid "Edit"
+msgstr "編輯"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/fields/documents_datetime/documents_datetime_field.xml:0
-#: code:addons/documents/static/src/views/search/documents_search_panel.xml:0
-msgid "Edit"
-msgstr "編輯"
+#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_pin_actions.xml:0
+msgid "Edit Actions"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -2119,14 +2312,26 @@ msgid "Editor"
 msgstr "編輯"
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "Email"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__alias_email
 msgid "Email Alias"
 msgstr "郵箱別名"
 
 #. module: documents
-#: model:ir.model.fields,field_description:documents.field_documents_document__email_cc
-msgid "Email cc"
-msgstr "電郵副本抄送"
+#: model:ir.model,name:documents.model_mail_thread
+msgid "Email Thread"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
+msgid "Email alias"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,help:documents.field_documents_document__alias_domain
@@ -2140,8 +2345,8 @@ msgstr "電郵連結"
 
 #. module: documents
 #: model:ir.model,name:documents.model_ir_embedded_actions
-msgid "Embedded Actions"
-msgstr "嵌入動作"
+msgid "Embedded Action"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
@@ -2149,6 +2354,14 @@ msgid "Enable access and save"
 msgstr ""
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing_access.py:0
+msgid "Enable access before inviting"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/document_service.js:0
 #: model:ir.model.fields.selection,name:documents.selection__documents_document__thumbnail_status__error
 msgid "Error"
 msgstr "錯誤"
@@ -2181,7 +2394,7 @@ msgstr "離開時不儲存"
 #. odoo-javascript
 #: code:addons/documents/static/src/views/fields/documents_datetime/documents_datetime_field.xml:0
 msgid "Exp:"
-msgstr "到期："
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_access__expiration_date
@@ -2221,11 +2434,6 @@ msgstr "最愛："
 #: model:ir.model.fields.selection,name:documents.selection__documents_document__type__binary
 msgid "File"
 msgstr "文件"
-
-#. module: documents
-#: model:ir.model.fields,field_description:documents.field_documents_document__datas
-msgid "File Content (base64)"
-msgstr "檔案內容 (base64)"
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__raw
@@ -2271,6 +2479,13 @@ msgid "Files will be sent to trash and deleted forever after %s days."
 msgstr "檔案會被傳送至垃圾桶，並在 %s 天後永久刪除。"
 
 #. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Finally, <b>log the note</b> to complete this Documents onboarding tour!"
+msgstr ""
+
+#. module: documents
 #: model:documents.document,name:documents.document_finance_folder
 msgid "Finance"
 msgstr "財務"
@@ -2301,6 +2516,7 @@ msgstr "移至上一頁"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.xml:0
 #: code:addons/documents/static/src/views/fields/documents_type_icon/documents_type_icon.xml:0
 #: model:ir.model.fields,field_description:documents.field_documents_document__folder_id
@@ -2314,6 +2530,11 @@ msgstr "資料夾"
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__is_folder_only
 msgid "Folder Only"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_document_check_type_folder
+msgid "Folder cannot have an attachment"
 msgstr ""
 
 #. module: documents
@@ -2334,9 +2555,20 @@ msgid "Followers (Partners)"
 msgstr "關注人（業務夥伴）"
 
 #. module: documents
-#: model:ir.model.fields,help:documents.field_documents_document__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesome 圖示，例如，fa-task"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"From here you can access all your files. </br> <b>Let's select the file that "
+"you uploaded earlier.</b>"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"From here, you can <b>grant personal access rights by selecting a specific "
+"person.</b>"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
@@ -2361,8 +2593,33 @@ msgstr "GiB"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_open_folder.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 msgid "Go inside"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Great! Now that the file has been added, <b>let's manage its access rights.</"
+"b>"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_access__group_id
+#: model:ir.model.fields,field_description:documents.field_documents_sharing_access__group_id
+msgid "Group"
+msgstr ""
+
+#. module: documents
+#: model:ir.ui.menu,name:documents.res_group_functional_menu
+msgid "Groups"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing_access.py:0
+msgid "Groups cannot be invited"
 msgstr ""
 
 #. module: documents
@@ -2408,14 +2665,21 @@ msgid ""
 msgstr ""
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_view_search
-msgid "Hide shortcuts"
-msgstr "隱藏捷徑"
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "Hello"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__previous_attachment_ids
 msgid "History"
 msgstr "歷史"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Hold <b>CTRL</b> and click on the document to view the available actions."
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_access__id
@@ -2429,7 +2693,6 @@ msgstr "歷史"
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__id
 #: model:ir.model.fields,field_description:documents.field_documents_sharing_access__id
 #: model:ir.model.fields,field_description:documents.field_documents_tag__id
-#: model:ir.model.fields,field_description:documents.field_documents_unlink_mixin__id
 #: model:ir.model.fields,field_description:documents.field_ir_actions_server__id
 #: model:ir.model.fields,field_description:documents.field_ir_attachment__id
 #: model:ir.model.fields,field_description:documents.field_ir_binary__id
@@ -2438,6 +2701,7 @@ msgstr "歷史"
 #: model:ir.model.fields,field_description:documents.field_kpi_provider__id
 #: model:ir.model.fields,field_description:documents.field_mail_activity__id
 #: model:ir.model.fields,field_description:documents.field_mail_activity_type__id
+#: model:ir.model.fields,field_description:documents.field_mail_thread__id
 #: model:ir.model.fields,field_description:documents.field_res_company__id
 #: model:ir.model.fields,field_description:documents.field_res_config_settings__id
 #: model:ir.model.fields,field_description:documents.field_res_partner__id
@@ -2503,14 +2767,14 @@ msgid "In Company"
 msgstr ""
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.document_view_search
-msgid "In My Drive"
+#: model:ir.model.fields,field_description:documents.field_documents_sharing_access__user_in_group
+msgid "In Group"
 msgstr ""
 
 #. module: documents
-#: model:ir.model.fields.selection,name:documents.selection__documents_document__thumbnail_status__restricted
-msgid "Inaccessible"
-msgstr "不可存取"
+#: model_terms:ir.ui.view,arch_db:documents.document_view_search
+msgid "In My Drive"
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -2528,6 +2792,12 @@ msgid "Inbox"
 msgstr "收件箱"
 
 #. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/views/fields/documents_shared_group/documents_shared_group.xml:0
+msgid "Includes You"
+msgstr ""
+
+#. module: documents
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
 msgid ""
@@ -2542,13 +2812,6 @@ msgstr "索引的內容"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_details.js:0
-msgid "Info & Tags"
-msgstr "資訊及標籤"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 #: code:addons/documents/static/src/views/search/documents_control_panel.xml:0
 msgid "Info & tags"
 msgstr "資訊及標籤"
@@ -2569,12 +2832,6 @@ msgstr ""
 #: model:documents.document,name:documents.document_insurances_folder
 msgid "Insurances"
 msgstr ""
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Internal"
-msgstr "內部"
 
 #. module: documents
 #. odoo-javascript
@@ -2625,6 +2882,11 @@ msgid "Invalid search operand."
 msgstr ""
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_sharing__invite_group_ids
+msgid "Invite Group"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__invite_partner_ids
 msgid "Invite Partner"
 msgstr ""
@@ -2635,9 +2897,14 @@ msgid "Invoice #INV-2025-001 - Payment Due April 24, 2025"
 msgstr "發票 #INV-2025-001 - 付款到期日：2025 年 4 月 24 日"
 
 #. module: documents
-#: model:documents.document,name:documents.documents_vendor_bill_inv_007
-msgid "Invoice-INV_2018_0007.pdf"
-msgstr "發票-INV_2018_0007.pdf"
+#: model:documents.document,name:documents.document_finance_invoices_email_folder
+msgid "Invoice Email"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__is_company_allowed
+msgid "Is Company Allowed"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing_access__is_deleted
@@ -2653,6 +2920,11 @@ msgstr "是可編輯附件"
 #: model:ir.model.fields,field_description:documents.field_documents_document__is_favorited
 msgid "Is Favorited"
 msgstr "已被加入最愛"
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__is_folder
+msgid "Is Folder"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__message_is_follower
@@ -2776,30 +3048,14 @@ msgstr "法律"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid ""
-"Let's move this document to Finance<br/> <i>Tips: actions can be tailored to "
-"your process, according to the folder.</i>"
+msgid "Let's save your new folder."
 msgstr ""
-"讓我們將這份文件移交至財務部門。<br/><i></i>提示：你可為不同資料夾自訂操作，"
-"以適應你的工作流程。"
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Let's process documents in this folder.<br/>"
-msgstr "讓我們處理此資料夾中的文件。<br/>"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Let's process these bills: send to Finance folder."
-msgstr "讓我們處理這些賬單：將它們傳送至財務資料夾。"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Let's process this document, coming from our scanner."
-msgstr "讓我們處理這個文件，由我們的掃瞄器開始。"
+msgid "Let's start by <b>accessing a contact form.</b>"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -2826,6 +3082,7 @@ msgstr "連結網址"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_copy_link.js:0
 #: code:addons/documents/static/src/views/documents_model_mixin.js:0
 msgid "Link copied to clipboard!"
 msgstr "連結已複製到剪貼板!"
@@ -2840,6 +3097,18 @@ msgstr "連接到"
 #: code:addons/documents/static/src/editor/plugins/add_documents_attachment_plugin.js:0
 #: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.js:0
 msgid "Link(s) pasted!"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields,field_description:documents.field_ir_attachment__linked_document_id
+#: model:ir.model.fields,field_description:documents.field_product_document__linked_document_id
+msgid "Linked Document"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
+msgid "Linked record"
 msgstr ""
 
 #. module: documents
@@ -2914,9 +3183,19 @@ msgid "Manage Versions of \"%s\""
 msgstr "管理不同版本的「%s」"
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "Marc Demo"
+msgstr ""
+
+#. module: documents
 #: model:documents.document,name:documents.document_marketing_folder
 msgid "Marketing"
 msgstr "市場推廣"
+
+#. module: documents
+#: model:ir.model.fields,help:documents.field_documents_document__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr "Material 符號圖示，例如：檢查清單"
 
 #. module: documents
 #. odoo-python
@@ -2964,6 +3243,17 @@ msgstr "缺漏文件參考。"
 #. module: documents
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
+msgid "Missing share template"
+msgstr ""
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "Mitchell Admin"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing.py:0
 msgid "Mixed rights"
 msgstr ""
 
@@ -2999,11 +3289,12 @@ msgstr "月"
 #. odoo-javascript
 #: code:addons/documents/static/src/views/action/documents_actions.xml:0
 msgid "More"
-msgstr "更多"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
+#: code:addons/documents/static/src/views/action/folder_action_operations.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 #: model:ir.model.fields.selection,name:documents.selection__documents_operation__operation__move
 msgid "Move"
@@ -3023,16 +3314,8 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
-msgid "Move to Trash"
-msgstr "移至垃圾桶"
-
-#. module: documents
-#. odoo-javascript
 #: code:addons/documents/static/src/core/document_service.js:0
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_archive.js:0
-#: code:addons/documents/static/src/views/documents_renderer_mixin.js:0
 #: code:addons/documents/static/src/views/form/folder_form_controller.js:0
 #: model_terms:ir.ui.view,arch_db:documents.folder_deletion_form
 msgid "Move to trash"
@@ -3096,15 +3379,12 @@ msgstr "我的文件"
 #: code:addons/documents/models/documents_document.py:0
 #: code:addons/documents/models/ir_attachment.py:0
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.js:0
+#: code:addons/documents/static/src/core/document_service.js:0
 #: code:addons/documents/static/src/views/kanban/documents_kanban_record.js:0
 #: code:addons/documents/wizard/documents_operation.py:0
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__user_root__my
 msgid "My Drive"
 msgstr "我的雲端硬碟"
-
-#. module: documents
-#: model:ir.model.constraint,message:documents.constraint_documents_access_role_or_last_access_date
-msgid "NULL roles must have a set last_access_date"
-msgstr "NULL 角色必須設定 last_access_date"
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__name
@@ -3123,7 +3403,7 @@ msgstr "名稱不可留空。"
 #. odoo-javascript
 #: code:addons/documents/static/src/views/documents_controller_mixin.xml:0
 msgid "New"
-msgstr "新增"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -3133,9 +3413,9 @@ msgstr "新增文件"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/search/documents_search_panel.xml:0
+#: code:addons/documents/static/src/views/action/folder_action_new_folder.js:0
 msgid "New Folder"
-msgstr "新資料夾"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -3212,6 +3492,12 @@ msgstr "未選取文件"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/chatter/documents_chatter_overlay.xml:0
+msgid "No document selected"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 msgid "No email alias"
 msgstr "沒有電郵別名"
@@ -3230,6 +3516,12 @@ msgstr "沒有已連結記錄"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/fields/documents_shared_group/documents_shared_group.xml:0
+msgid "No members"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #. odoo-python
 #: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
 #: code:addons/documents/wizard/documents_sharing.py:0
@@ -3245,7 +3537,7 @@ msgstr "沒有擁有人"
 #. module: documents
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
-msgid "No partners"
+msgid "No partners/groups"
 msgstr ""
 
 #. module: documents
@@ -3258,6 +3550,11 @@ msgstr "找不到與文件管理相關的伺服器操作。"
 #: model_terms:ir.actions.act_window,help:documents.mail_alias_action
 msgid "No shared links"
 msgstr "沒有共享連結"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.document_view_search
+msgid "No shortcuts"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -3279,9 +3576,15 @@ msgstr "無"
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/search/documents_search_model.js:0
+msgid "Not allowed, select a folder"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 msgid "Not set"
-msgstr "未設定"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__create_activity_note
@@ -3297,6 +3600,20 @@ msgstr "通知訊息"
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__invite_notify
 msgid "Notify"
 msgstr "通知"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid ""
+"Now let's <b>add the link of your file</b> to give access to it in the "
+"chatter."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "Now let's <b>attach a file to this note.</b>"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__message_needaction_counter
@@ -3325,7 +3642,7 @@ msgstr "Odoo 標誌"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Odoo Studio - Customize workflows in minutes"
 msgstr "Odoo Studio － 幾分鐘即可自訂工作流程"
 
@@ -3338,6 +3655,12 @@ msgstr "Odoo 網站"
 #: model:ir.model.fields.selection,name:documents.selection__documents_document__last_access_date_group__0_older
 msgid "Older"
 msgstr "過時"
+
+#. module: documents
+#: model:ir.model.fields,help:documents.field_documents_document__is_protected
+msgid ""
+"Only Document Managers can edit, other editors can create/move within it."
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -3377,12 +3700,6 @@ msgid "Only one value can be searched for child of `folder_id`."
 msgstr ""
 
 #. module: documents
-#. odoo-python
-#: code:addons/documents/models/documents_document.py:0
-msgid "Only one value can be searched for children of `user_folder_id`"
-msgstr ""
-
-#. module: documents
 #. odoo-javascript
 #. odoo-python
 #: code:addons/documents/static/src/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog.xml:0
@@ -3394,12 +3711,6 @@ msgstr "只限擁有存取權限的人，才可使用該連結開啟"
 #: model_terms:ir.ui.view,arch_db:documents.public_folder_page
 msgid "Open folder {{0}}"
 msgstr "開啟資料夾 {{0}}"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Open the actions menu"
-msgstr "開啟操作選單"
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.public_folder_page
@@ -3430,7 +3741,19 @@ msgstr "不支援此操作。請改用「還原」/ `action_unarchive`。"
 #. odoo-javascript
 #: code:addons/documents/static/src/views/helper/documents_action_helper.xml:0
 msgid "Or send emails to"
-msgstr "或發送電郵至"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/web/document_organize_popover.xml:0
+msgid "Organize"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/core/common/attachment_model_patch.js:0
+msgid "Organize in Documents"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing_access__original_expiration_date
@@ -3438,6 +3761,8 @@ msgid "Original Expiration"
 msgstr ""
 
 #. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 #: model:ir.model.fields,field_description:documents.field_documents_document__owner_id
 #: model:ir.model.fields,field_description:documents.field_documents_request_wizard__requestee_id
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
@@ -3477,12 +3802,6 @@ msgid "Partner"
 msgstr "業務夥伴"
 
 #. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.xml:0
-msgid "Paste Link(s)"
-msgstr ""
-
-#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid "People with access"
 msgstr "有存取權限的人"
@@ -3511,8 +3830,13 @@ msgid "Preview files"
 msgstr "預覽檔案"
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__is_protected
+msgid "Protected"
+msgstr ""
+
+#. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Put in %s"
 msgstr "放入 %s"
 
@@ -3556,6 +3880,11 @@ msgid "Registrations"
 msgstr "報名"
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_mixin__document_count
+msgid "Related Document Count"
+msgstr ""
+
+#. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.js:0
 msgid "Remaining Pages"
@@ -3586,16 +3915,17 @@ msgstr "移除成員"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_star.js:0
+#: code:addons/documents/static/src/views/action/folder_action_star.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Remove star"
 msgstr "移除星號"
 
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/core/document_service.js:0
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_rename.js:0
+#: code:addons/documents/static/src/views/action/folder_action_rename.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_rename.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 #: model_terms:ir.ui.view,arch_db:documents.document_view_form_rename
 msgid "Rename"
 msgstr "重新命名"
@@ -3603,6 +3933,7 @@ msgstr "重新命名"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/views/documents_controller_mixin.xml:0
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__type__request
 #: model_terms:ir.ui.view,arch_db:documents.documents_request_form_view
 msgid "Request"
 msgstr "請求"
@@ -3618,20 +3949,25 @@ msgid "Request To"
 msgstr "請求要"
 
 #. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/web/activity/activity_menu_patch.xml:0
-msgid "Request a Document"
-msgstr "請求文件"
-
-#. module: documents
 #: model:ir.actions.act_window,name:documents.action_request_form
 msgid "Request a file"
 msgstr "請求文件"
 
 #. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_document_check_type_request
+msgid "Request document cannot have an attachment"
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
 msgid "Requested Documents"
 msgstr "請求的文件"
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "Requested document has been uploaded"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__requestee_partner_id
@@ -3722,15 +4058,21 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
+#: code:addons/documents/static/src/views/action/folder_action_deep_search.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
+msgid "Search in Folder"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
 #: code:addons/documents/static/src/views/fields/documents_user_folder_id_char/documents_search_panel_user_folder_id.xml:0
 msgid "Search..."
 msgstr "搜尋⋯"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/core/common/composer_actions_patch.js:0
-#: code:addons/documents/static/src/editor/plugins/add_documents_attachment_plugin.js:0
-#: code:addons/documents/static/src/web/mail_composer_document_selector/mail_composer_document_selector.js:0
+#: code:addons/documents/static/src/views/view_dialogs/select_add_document_create_dialog.js:0
 msgid "Search: Documents"
 msgstr ""
 
@@ -3767,12 +4109,6 @@ msgstr "全選"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/chatter/documents_chatter_overlay.xml:0
-msgid "Select an item to open the chatter"
-msgstr "選擇一個項目，以開啟聊天視窗"
-
-#. module: documents
-#. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.js:0
 msgid "Select focused page"
 msgstr "選取目前頁面"
@@ -3806,12 +4142,6 @@ msgstr "選擇組別的前一頁"
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.js:0
 msgid "Select/Deselect all pages"
 msgstr "選擇/取消選擇所有頁面"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
-msgid "Send To Finance"
-msgstr "傳送至財務"
 
 #. module: documents
 #: model:ir.actions.server,name:documents.ir_actions_server_send_to_finance
@@ -3866,10 +4196,10 @@ msgstr "設定"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/cog_menu/documents_cog_menu_item_share.js:0
+#: code:addons/documents/static/src/js/tours/documents.js:0
+#: code:addons/documents/static/src/views/action/folder_action_share.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
-#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_item_share.js:0
-#: code:addons/documents/static/src/views/search/documents_search_panel.xml:0
+#: code:addons/documents/static/src/views/list/action_widget/documents_list_action_widget.js:0
 #: code:addons/documents/static/src/web/error_dialog/error_dialog_patch.xml:0
 #: model_terms:ir.ui.view,arch_db:documents.documents_sharing_view_form
 msgid "Share"
@@ -3898,6 +4228,23 @@ msgid "Shared"
 msgstr "分享"
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing.py:0
+msgid "Shared Document"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing.py:0
+msgid "Shared Documents"
+msgstr ""
+
+#. module: documents
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__user_root__shared
+msgid "Shared With Me"
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
 msgid "Shared with"
 msgstr "已分享給"
@@ -3915,6 +4262,16 @@ msgstr ""
 #: code:addons/documents/static/src/views/kanban/documents_kanban_record.js:0
 msgid "Shared with me"
 msgstr "向我分享"
+
+#. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_sharing_access_check_partner_or_group
+msgid "Sharing Access must apply to a partner or to a group (but not both)."
+msgstr ""
+
+#. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_access_check_partner_or_group
+msgid "Sharing Access must apply to either a partner or a group."
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__shortcut_ids
@@ -3937,7 +4294,7 @@ msgstr "捷徑不可更改目標文件。"
 #. odoo-javascript
 #: code:addons/documents/static/src/views/widget/documents_operation_confirmation.js:0
 msgid "Shortcuts created in %(folder_name)s!"
-msgstr ""
+msgstr "捷徑已在資料夾中建立：%(folder_name)s"
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_search
@@ -3950,14 +4307,25 @@ msgid "Siblings"
 msgstr ""
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.public_page_layout
+msgid "Sign up"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_sharing__is_single
 msgid "Single"
-msgstr "單身"
+msgstr "單項"
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.share_file
 msgid "Size:"
 msgstr "尺寸："
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/wizard/documents_sharing.py:0
+msgid "Skipped %(count)s (no email)"
+msgstr ""
 
 #. module: documents
 #: model:documents.document,name:documents.document_finance_social_folder
@@ -3995,11 +4363,10 @@ msgstr "來源文件擁有人"
 #. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_manager/pdf_manager.xml:0
 msgid "Split"
-msgstr "分拆"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/js/tours/documents.js:0
 #: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "Split PDF"
 msgstr "分拆 PDF"
@@ -4042,15 +4409,10 @@ msgid "Stay here"
 msgstr "留在此頁"
 
 #. module: documents
-#: model:ir.ui.menu,name:documents.structure
-msgid "Structure"
-msgstr "結構"
-
-#. module: documents
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
-msgid "Successfully Shared"
-msgstr "成功分享"
+msgid "Successfully shared"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__create_activity_summary
@@ -4062,6 +4424,12 @@ msgstr "摘要"
 #: code:addons/documents/models/documents_document.py:0
 msgid "Support"
 msgstr "支援"
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "System"
+msgstr ""
 
 #. module: documents
 #: model:res.groups,name:documents.group_documents_system
@@ -4099,11 +4467,6 @@ msgstr "標籤"
 #: model:documents.document,name:documents.document_finance_taxes_folder
 msgid "Taxes"
 msgstr "稅項"
-
-#. module: documents
-#: model:ir.model.fields,help:documents.field_documents_tag__tooltip
-msgid "Text shown when hovering on this tag"
-msgstr "滑鼠停在此標籤時顯示的文字"
 
 #. module: documents
 #: model:ir.model.constraint,message:documents.constraint_res_config_settings_check_deletion_delay
@@ -4177,6 +4540,14 @@ msgstr "以下文件/捷徑的類型不相符： \n"
 #. module: documents
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
+msgid ""
+"The following folders have links to records that cannot be changed.: %"
+"(folder_names)s"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
 msgid "The following shortcuts cannot be set as documents parents: \n"
 msgstr "以下捷徑不可設為文件母項： \n"
 
@@ -4189,6 +4560,13 @@ msgid ""
 msgstr ""
 "以下使用者不可擁有根目錄的文件/資料夾：\n"
 "- %(lines)s"
+
+#. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.invitation_expired
+msgid ""
+"The invitation expired, contact the person that shared this link for more "
+"information."
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields,help:documents.field_documents_document__alias_name
@@ -4238,6 +4616,12 @@ msgid "This attachment is already a document"
 msgstr "此附件已是文件"
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/models/ir_attachment.py:0
+msgid "This document belongs to %(rec)s."
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.not_available
 msgid "This document does not exist or is not publicly available."
 msgstr "此文件不存在，或未有公開提供。"
@@ -4272,6 +4656,25 @@ msgid "This folder does not exist or is not accessible."
 msgstr "此資料夾不存在，或不可存取。"
 
 #. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_mixin.py:0
+msgid "This folder is already linked to %(other_record_name)s"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_mixin.py:0
+msgid "This folder is already linked to another record."
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
+msgid ""
+"This folder is protected and can only be modified by the documents managers."
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
 msgid "This is a folder"
 msgstr "此為資料夾"
@@ -4279,6 +4682,7 @@ msgstr "此為資料夾"
 #. module: documents
 #. odoo-javascript
 #: code:addons/documents/static/src/views/search/documents_search_panel.xml:0
+#: model_terms:ir.ui.view,arch_db:documents.document_view_kanban
 msgid "This is a shortcut"
 msgstr "這是一個捷徑"
 
@@ -4289,9 +4693,9 @@ msgid "This is a shortcut - Click to access source document"
 msgstr "這是捷徑 － 按一下可存取目標文件"
 
 #. module: documents
-#: model:ir.model.constraint,message:documents.constraint_documents_access_unique_document_access_partner
-msgid "This partner is already set on this document."
-msgstr "此文件已有設置此合作夥伴。"
+#: model:ir.model.constraint,message:documents.constraint_documents_access_unique_document_access_by_partner_or_group
+msgid "This partner/group is already set on this document."
+msgstr ""
 
 #. module: documents
 #. odoo-python
@@ -4344,19 +4748,18 @@ msgstr ""
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/kanban/documents_kanban_renderer.js:0
+#: code:addons/documents/static/src/views/documents_renderer_mixin.js:0
 msgid "Toggle favorite"
 msgstr "切換最愛"
 
 #. module: documents
-#: model:ir.model.fields,field_description:documents.field_documents_tag__tooltip
-#: model_terms:ir.ui.view,arch_db:documents.tag_view_form
-msgid "Tooltip"
-msgstr "工具提示"
-
-#. module: documents
+#. odoo-javascript
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
+#: code:addons/documents/static/src/views/action/folder_action_archive.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
+#: code:addons/documents/static/src/views/documents_renderer_mixin.js:0
+#: model:ir.model.fields.selection,name:documents.selection__documents_document__user_root__trash
 msgid "Trash"
 msgstr "垃圾桶"
 
@@ -4426,9 +4829,9 @@ msgid "Unlock"
 msgstr "解鎖"
 
 #. module: documents
-#. odoo-python
-#: code:addons/documents/wizard/documents_operation.py:0
-msgid "Unsupported attachment type: %s"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "Unselect the document you just uploaded."
 msgstr ""
 
 #. module: documents
@@ -4455,10 +4858,10 @@ msgid "Upload New Version"
 msgstr "上載新版本"
 
 #. module: documents
-#. odoo-python
-#: code:addons/documents/models/mail_activity.py:0
-msgid "Upload file request"
-msgstr "上載檔案請求"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "Upload a new file"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -4473,6 +4876,13 @@ msgid "Usage"
 msgstr "用途"
 
 #. module: documents
+#: model:ir.model.fields,help:documents.field_documents_document__user_root
+msgid ""
+"Used exclusively to search in \"My Drive\", \"Company\", or \"Shared With "
+"Me\""
+msgstr ""
+
+#. module: documents
 #: model:ir.model,name:documents.model_res_users
 #: model:ir.model.fields,field_description:documents.field_documents_access_tracking__user_id
 #: model:res.groups,name:documents.group_documents_user
@@ -4480,20 +4890,20 @@ msgid "User"
 msgstr "使用者"
 
 #. module: documents
+#: model:ir.model.fields,field_description:documents.field_documents_document__user_root
+msgid "User Root"
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "User created"
+msgstr ""
+
+#. module: documents
 #: model:ir.model.fields,field_description:documents.field_documents_document__user_permission
 msgid "User permission"
 msgstr "使用者權限"
-
-#. module: documents
-#. odoo-javascript
-#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.xml:0
-msgid ""
-"Versions are displayed in the order they were uploaded to Documents.\n"
-"                    If you delete the most recent version, the previous one "
-"is automatically restored as the current one."
-msgstr ""
-"不同版本會依據其上載至文件管理程式的順序顯示。\n"
-"                    若刪除最新版本，系統會自動將之前一個版本還原為目前版本。"
 
 #. module: documents
 #: model:documents.document,name:documents.documents_attachment_video_documents
@@ -4529,14 +4939,16 @@ msgid "Warning"
 msgstr "警告"
 
 #. module: documents
-#: model:ir.model.fields,field_description:documents.field_documents_document__website_message_ids
-msgid "Website Messages"
-msgstr "網站資訊"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "We're all set! Let's go the home page."
+msgstr ""
 
 #. module: documents
-#: model:ir.model.fields,help:documents.field_documents_document__website_message_ids
-msgid "Website communication history"
-msgstr "網站溝通記錄"
+#. odoo-javascript
+#: code:addons/documents/static/src/js/tours/documents.js:0
+msgid "We're all set, this concludes our onboarding of the documents app!"
+msgstr ""
 
 #. module: documents
 #: model:ir.model.fields.selection,name:documents.selection__documents_document__create_activity_date_deadline_range_type__weeks
@@ -4548,22 +4960,19 @@ msgstr "星期"
 #. odoo-javascript
 #: code:addons/documents/static/src/owl/components/pdf_exit_dialog/pdf_exit_dialog.xml:0
 msgid "What do you want to do with the remaining pages ?"
-msgstr "您想如何處理剩餘頁面？"
-
-#. module: documents
-#: model_terms:web_tour.tour,rainbow_man_message:documents.documents_tour
-msgid ""
-"Wow... 6 documents processed in a few seconds, You're good.<br>The tour is "
-"complete. Try uploading your own documents now."
 msgstr ""
-"嘩！幾秒鐘便處理了 6 個文件，你真棒！<br>導覽完成，現在嘗試上載你自己的文件"
-"吧。"
 
 #. module: documents
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
 msgid "Yes"
 msgstr "是"
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/components/documents_manage_versions_panel/documents_manage_versions_panel.js:0
+msgid "Yes, delete it"
+msgstr ""
 
 #. module: documents
 #. odoo-javascript
@@ -4582,12 +4991,6 @@ msgstr "你沒有權限封存或取消封存文件。"
 #: code:addons/documents/models/documents_document.py:0
 msgid "You are not allowed to change ownerships of documents you do not own."
 msgstr "你沒有權限更改不屬於你的文件的擁有人。"
-
-#. module: documents
-#. odoo-python
-#: code:addons/documents/models/documents_document.py:0
-msgid "You are not allowed to delete all these items."
-msgstr "你不可刪除所有這些項目。"
 
 #. module: documents
 #. odoo-python
@@ -4685,6 +5088,12 @@ msgstr "你不可更改不屬於你的文件的擁有人。"
 #. module: documents
 #. odoo-python
 #: code:addons/documents/models/documents_document.py:0
+msgid "You cannot change the type of a documents."
+msgstr ""
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
 msgid ""
 "You cannot copy a folder into itself or into one of its own descendants."
 msgstr ""
@@ -4730,12 +5139,6 @@ msgstr "你不可釘選該類型的操作。"
 #: code:addons/documents/wizard/documents_operation.py:0
 msgid "You do not have editor access to any folder."
 msgstr ""
-
-#. module: documents
-#. odoo-python
-#: code:addons/documents/models/documents_document.py:0
-msgid "You do not have sufficient access rights to delete these documents."
-msgstr "你沒有足夠存取權限去刪除這些文件。"
 
 #. module: documents
 #. odoo-javascript
@@ -4874,19 +5277,24 @@ msgid "folders,"
 msgstr "資料夾，"
 
 #. module: documents
+#: model_terms:ir.ui.view,arch_db:documents.folder_notification_move_out
+msgid "has been moved outside this folder."
+msgstr ""
+
+#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
 msgid "has gained access as"
 msgstr ""
 
 #. module: documents
-#: model:documents.document,name:documents.documents_vendor_bill_extract_azure_interior_document
-msgid "invoice Azure Interior.pdf"
-msgstr "發票-天藍室內設計.pdf"
+#: model_terms:ir.ui.view,arch_db:documents.requested_document_uploaded
+msgid "has uploaded the requested document"
+msgstr ""
 
 #. module: documents
-#: model:documents.document,name:documents.documents_vendor_bill_extract_open_value_document
-msgid "invoice OpenValue.pdf"
-msgstr "發票-OpenValue.pdf"
+#: model:documents.document,name:documents.documents_vendor_bill_extract_gemini_furniture_document
+msgid "invoice_gemini_furniture.pdf"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.document_request_page
@@ -4902,7 +5310,7 @@ msgstr "is_readonly_model"
 #. odoo-javascript
 #: code:addons/documents/static/src/components/documents_details_panel/documents_details_panel.xml:0
 msgid "items,"
-msgstr "個項目，"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.format_file_size
@@ -4913,6 +5321,17 @@ msgstr "kiB"
 #. odoo-python
 #: code:addons/documents/wizard/documents_sharing.py:0
 msgid "link_required"
+msgstr ""
+
+#. module: documents
+#: model:documents.document,name:documents.documents_lumber
+msgid "lumber-invoice.pdf"
+msgstr ""
+
+#. module: documents
+#. odoo-javascript
+#: code:addons/documents/static/src/views/fields/documents_shared_group/documents_shared_group.xml:0
+msgid "members"
 msgstr ""
 
 #. module: documents
@@ -4940,9 +5359,22 @@ msgid "parent_id"
 msgstr "parent_id"
 
 #. module: documents
+#: model:ir.model.constraint,message:documents.constraint_documents_access_role_or_last_access_date
+msgid ""
+"partner must either have a role or have a set last_access_date, group must "
+"have a role"
+msgstr ""
+
+#. module: documents
 #: model:documents.document,name:documents.documents_image_people_document
 msgid "people.jpg"
 msgstr "人物.jpg"
+
+#. module: documents
+#. odoo-python
+#: code:addons/documents/models/documents_document.py:0
+msgid "res_model and res_id must be set together"
+msgstr ""
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.tracking_access_members_change
@@ -4962,7 +5394,7 @@ msgstr "分享者"
 
 #. module: documents
 #. odoo-javascript
-#: code:addons/documents/static/src/views/hooks.js:0
+#: code:addons/documents/static/src/views/documents_controller_mixin.js:0
 msgid "status code: %(status)s, message: %(message)s"
 msgstr "狀態代碼：%(status)s，訊息：%(message)s"
 
@@ -4984,11 +5416,6 @@ msgid "unnamed"
 msgstr "未命名"
 
 #. module: documents
-#: model_terms:ir.ui.view,arch_db:documents.folder_notification_move_out
-msgid "was been moved outside this folder."
-msgstr ""
-
-#. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.folder_notification_move_in
 msgid "was moved inside this folder."
 msgstr ""
@@ -4996,7 +5423,7 @@ msgstr ""
 #. module: documents
 #: model:mail.template,subject:documents.mail_template_document_share
 msgid "{{ len(ctx.get('documents', [])) }} document(s) shared with you"
-msgstr ""
+msgstr "向你共用 {{ len(ctx.get('documents', [])) }} 個文件"
 
 #. module: documents
 #: model_terms:ir.ui.view,arch_db:documents.public_folder_page
@@ -5007,963 +5434,8 @@ msgstr ""
 "•\n"
 "                                        <b>網址</b>"
 
-#~ msgid "2024"
-#~ msgstr "2024"
-
-#~ msgid "Allows you to manage his documents."
-#~ msgstr "允許你管理他的文件。"
-
 #~ msgid ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "                    <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "white; color: #454748; border-collapse:separate;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <!-- HEADER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\">\n"
-#~ "                                        <span style=\"font-size: 10px;"
-#~ "\">\n"
-#~ "                                            Document Request: <br/>\n"
-#~ "                                            <t t-if=\"object.name\">\n"
-#~ "                                                <span style=\"font-size: "
-#~ "20px; font-weight: bold;\" t-out=\"object.name or ''\">Inbox Financial</"
-#~ "span>\n"
-#~ "                                            </t>\n"
-#~ "                                        </span><br/>\n"
-#~ "                                    </td><td valign=\"middle\" "
-#~ "align=\"right\" t-if=\"not "
-#~ "object.create_uid.company_id.uses_default_logo\">\n"
-#~ "                                        <img t-attf-src=\"/logo.png?"
-#~ "company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-#~ "margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"object.create_uid.company_id.name\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td colspan=\"2\" style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- CONTENT -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"top\" style=\"font-"
-#~ "size: 13px;\">\n"
-#~ "                                        <div>\n"
-#~ "                                            Hello <t t-"
-#~ "out=\"object.owner_id.name or ''\">OdooBot</t>,\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <t t-"
-#~ "out=\"object.create_uid.name or ''\">OdooBot</t> (<t t-"
-#~ "out=\"object.create_uid.email or ''\">odoobot@example.com</t>) asks you "
-#~ "to provide the following document:\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <center>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.name\">\n"
-#~ "                                                        <b t-"
-#~ "out=\"object.name or ''\">Inbox Financial</b>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.request_activity_id.note\">\n"
-#~ "                                                        <i t-"
-#~ "out=\"object.request_activity_id.note or ''\">Example of a note.</i>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div style=\"margin: 16px "
-#~ "0px 16px 0px;\">\n"
-#~ "                                                    <a t-att-"
-#~ "href=\"object.access_url\" t-attf-style=\"background-color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px "
-#~ "30px 20px 30px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                                        Upload the "
-#~ "requested document\n"
-#~ "                                                    </a>\n"
-#~ "                                                </div>\n"
-#~ "                                            </center><br/>\n"
-#~ "                                            Please provide us with the "
-#~ "missing document before <t t-"
-#~ "out=\"object.request_activity_id.date_deadline\">2021-05-17</t>.\n"
-#~ "                                            <t t-if=\"user and "
-#~ "user.signature\" data-o-mail-quote-container=\"1\">\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div data-o-mail-"
-#~ "quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature or "
-#~ "''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-#~ "                                                <br data-o-mail-"
-#~ "quote=\"1\"/>\n"
-#~ "                                            </t>\n"
-#~ "                                        </div>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td style=\"text-align:center;"
-#~ "\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- FOOTER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.name or ''\">YourCompany</t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\" style=\"opacity: 0.7;\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.email\">\n"
-#~ "                                            | <a t-attf-href=\"'mailto:"
-#~ "%s' % {{ object.create_uid.company_id.email }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.email or ''\">info@yourcompany.com</"
-#~ "a>\n"
-#~ "                                        </t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.website\">\n"
-#~ "                                            | <a t-attf-href=\"'%s' % "
-#~ "{{ object.create_uid.company_id.website }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.website or ''\">http://"
-#~ "www.example.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                    </tbody>\n"
-#~ "                    </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr><td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                        <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                          <tr><td style=\"text-align: center; font-size: "
-#~ "13px;\">\n"
-#~ "                            Powered by <a target=\"_blank\" "
-#~ "href=\"https://www.odoo.com/app/documents\" t-attf-style=\"color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo Documents</"
-#~ "a>\n"
-#~ "                          </td></tr>\n"
-#~ "                        </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                </table>\n"
-#~ "            "
+#~ "<i class=\"oi me-2\" data-icon=\"open_in_new\" title=\"This is a "
+#~ "shortcut\"/>"
 #~ msgstr ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "                    <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "white; color: #454748; border-collapse:separate;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <!-- HEADER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\">\n"
-#~ "                                        <span style=\"font-size: 10px;"
-#~ "\">\n"
-#~ "                                            文件請求：<br/>\n"
-#~ "                                            <t t-if=\"object.name\">\n"
-#~ "                                                <span style=\"font-size: "
-#~ "20px; font-weight: bold;\" t-out=\"object.name or ''\">收件箱財務</span>\n"
-#~ "                                            </t>\n"
-#~ "                                        </span><br/>\n"
-#~ "                                    </td><td valign=\"middle\" "
-#~ "align=\"right\" t-if=\"not "
-#~ "object.create_uid.company_id.uses_default_logo\">\n"
-#~ "                                        <img t-attf-src=\"/logo.png?"
-#~ "company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-#~ "margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"object.create_uid.company_id.name\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td colspan=\"2\" style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- CONTENT -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"top\" style=\"font-"
-#~ "size: 13px;\">\n"
-#~ "                                        <div>\n"
-#~ "                                            <t t-"
-#~ "out=\"object.owner_id.name or ''\">OdooBot</t> 你好！\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <t t-"
-#~ "out=\"object.create_uid.name or ''\">OdooBot</t>（<t t-"
-#~ "out=\"object.create_uid.email or ''\">odoobot@example.com</t>）要求你提供"
-#~ "以下文件：\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <center>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.name\">\n"
-#~ "                                                        <b t-"
-#~ "out=\"object.name or ''\">收件箱財務</b>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.request_activity_id.note\">\n"
-#~ "                                                        <i t-"
-#~ "out=\"object.request_activity_id.note or ''\">備註範例文字。</i>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div style=\"margin: 16px "
-#~ "0px 16px 0px;\">\n"
-#~ "                                                    <a t-att-"
-#~ "href=\"object.access_url\" t-attf-style=\"background-color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px "
-#~ "30px 20px 30px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                                        上載要求的文件\n"
-#~ "                                                    </a>\n"
-#~ "                                                </div>\n"
-#~ "                                            </center><br/>\n"
-#~ "                                            請在 <t t-"
-#~ "out=\"object.request_activity_id.date_deadline\">2021-05-17</t> 之前，向我"
-#~ "們提供缺漏的文件。\n"
-#~ "                                            <t t-if=\"user and "
-#~ "user.signature\" data-o-mail-quote-container=\"1\">\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div data-o-mail-"
-#~ "quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature or "
-#~ "''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-#~ "                                                <br data-o-mail-"
-#~ "quote=\"1\"/>\n"
-#~ "                                            </t>\n"
-#~ "                                        </div>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td style=\"text-align:center;"
-#~ "\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- FOOTER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.name or ''\">YourCompany</t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\" style=\"opacity: 0.7;\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.email\">\n"
-#~ "                                            | <a t-attf-href=\"'mailto:"
-#~ "%s' % {{ object.create_uid.company_id.email }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.email or ''\">info@yourcompany.com</"
-#~ "a>\n"
-#~ "                                        </t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.website\">\n"
-#~ "                                            | <a t-attf-href=\"'%s' % "
-#~ "{{ object.create_uid.company_id.website }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.website or ''\">http://"
-#~ "www.example.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                    </tbody>\n"
-#~ "                    </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr><td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                        <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                          <tr><td style=\"text-align: center; font-size: "
-#~ "13px;\">\n"
-#~ "                            由 <a target=\"_blank\" href=\"https://"
-#~ "www.odoo.com/app/documents\" t-attf-style=\"color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo 文件管理</"
-#~ "a> 驅動\n"
-#~ "                          </td></tr>\n"
-#~ "                        </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                </table>\n"
-#~ "            "
-
-#~ msgid ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "                    <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "white; color: #454748; border-collapse:separate;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <!-- HEADER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\">\n"
-#~ "                                        <span style=\"font-size: 10px;"
-#~ "\">\n"
-#~ "                                            Document Request: <br/>\n"
-#~ "                                            <t t-if=\"object.name\">\n"
-#~ "                                                <span style=\"font-size: "
-#~ "20px; font-weight: bold;\" t-out=\"object.name or ''\">Inbox Financial</"
-#~ "span>\n"
-#~ "                                            </t>\n"
-#~ "                                        </span><br/>\n"
-#~ "                                    </td><td valign=\"middle\" "
-#~ "align=\"right\">\n"
-#~ "                                        <img t-attf-src=\"/logo.png?"
-#~ "company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-#~ "margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"object.create_uid.company_id.name\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td colspan=\"2\" style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- CONTENT -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"top\" style=\"font-"
-#~ "size: 13px;\">\n"
-#~ "                                        <div>\n"
-#~ "                                            Hello <t t-"
-#~ "out=\"object.owner_id.name or ''\">OdooBot</t>,\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            This is a friendly reminder "
-#~ "to upload your requested document:\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <center>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.name\">\n"
-#~ "                                                        <b t-"
-#~ "out=\"object.name or ''\">Inbox Financial</b>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.request_activity_id.note\">\n"
-#~ "                                                        <i t-"
-#~ "out=\"object.request_activity_id.note or ''\">Example of a note.</i>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div style=\"margin: 16px "
-#~ "0px 16px 0px;\">\n"
-#~ "                                                    <a t-att-"
-#~ "href=\"object.access_url\" t-attf-style=\"background-color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px "
-#~ "30px 20px 30px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                                        Upload the "
-#~ "requested document\n"
-#~ "                                                    </a>\n"
-#~ "                                                </div>\n"
-#~ "                                            </center><br/>\n"
-#~ "                                            Please provide us with the "
-#~ "missing document before <t t-"
-#~ "out=\"object.request_activity_id.date_deadline or ''\">2021-05-17</t>.\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            Thank you,\n"
-#~ "                                            <t t-if=\"user and "
-#~ "user.signature\" data-o-mail-quote-container=\"1\">\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div data-o-mail-"
-#~ "quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature\" "
-#~ "data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-#~ "                                                <br data-o-mail-"
-#~ "quote=\"1\"/>\n"
-#~ "                                            </t>\n"
-#~ "                                        </div>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td style=\"text-align:center;"
-#~ "\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- FOOTER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.name or ''\">YourCompany</t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\" style=\"opacity: 0.7;\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.email\">\n"
-#~ "                                            | <a t-attf-href=\"'mailto:"
-#~ "%s' % {{ object.create_uid.company_id.email }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.email\">info@yourcompany.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.website\">\n"
-#~ "                                            | <a t-att-"
-#~ "href=\"object.create_uid.company_id.website\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.website\">http://www.example.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                    </tbody>\n"
-#~ "                    </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr><td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                        <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                          <tr><td style=\"text-align: center; font-size: "
-#~ "13px;\">\n"
-#~ "                            Powered by <a target=\"_blank\" "
-#~ "href=\"https://www.odoo.com/app/documents\" t-attf-style=\"color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo Documents</"
-#~ "a>\n"
-#~ "                          </td></tr>\n"
-#~ "                        </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                </table>\n"
-#~ "            "
-#~ msgstr ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-#~ "align=\"center\">\n"
-#~ "                    <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "white; color: #454748; border-collapse:separate;\">\n"
-#~ "                    <tbody>\n"
-#~ "                        <!-- HEADER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\">\n"
-#~ "                                        <span style=\"font-size: 10px;"
-#~ "\">\n"
-#~ "                                            文件請求：<br/>\n"
-#~ "                                            <t t-if=\"object.name\">\n"
-#~ "                                                <span style=\"font-size: "
-#~ "20px; font-weight: bold;\" t-out=\"object.name or ''\">收件箱財務</span>\n"
-#~ "                                            </t>\n"
-#~ "                                        </span><br/>\n"
-#~ "                                    </td><td valign=\"middle\" "
-#~ "align=\"right\">\n"
-#~ "                                        <img t-attf-src=\"/logo.png?"
-#~ "company={{ object.create_uid.company_id.id }}\" style=\"padding: 0px; "
-#~ "margin: 0px; height: auto; width: 80px;\" t-att-"
-#~ "alt=\"object.create_uid.company_id.name\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td colspan=\"2\" style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- CONTENT -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"top\" style=\"font-"
-#~ "size: 13px;\">\n"
-#~ "                                        <div>\n"
-#~ "                                            <t t-"
-#~ "out=\"object.owner_id.name or ''\">OdooBot</t> 你好！\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            提醒你，請上載被要求的文件：\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            <center>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.name\">\n"
-#~ "                                                        <b t-"
-#~ "out=\"object.name or ''\">收件箱財務</b>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <div>\n"
-#~ "                                                    <t t-"
-#~ "if=\"object.request_activity_id.note\">\n"
-#~ "                                                        <i t-"
-#~ "out=\"object.request_activity_id.note or ''\">備註範例文字。</i>\n"
-#~ "                                                    </t>\n"
-#~ "                                                </div>\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div style=\"margin: 16px "
-#~ "0px 16px 0px;\">\n"
-#~ "                                                    <a t-att-"
-#~ "href=\"object.access_url\" t-attf-style=\"background-color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}}; padding: 20px "
-#~ "30px 20px 30px; text-decoration: none; color: "
-#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-#~ "font-size:13px;\">\n"
-#~ "                                                        上載被要求的文件\n"
-#~ "                                                    </a>\n"
-#~ "                                                </div>\n"
-#~ "                                            </center><br/>\n"
-#~ "                                            請在 <t t-"
-#~ "out=\"object.request_activity_id.date_deadline or ''\">2021-05-17</t> 之"
-#~ "前，向我們提供缺漏的文件。\n"
-#~ "                                            <br/><br/>\n"
-#~ "                                            謝謝。\n"
-#~ "                                            <t t-if=\"user and "
-#~ "user.signature\" data-o-mail-quote-container=\"1\">\n"
-#~ "                                                <br/>\n"
-#~ "                                                <div data-o-mail-"
-#~ "quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"user.signature\" "
-#~ "data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
-#~ "                                                <br data-o-mail-"
-#~ "quote=\"1\"/>\n"
-#~ "                                            </t>\n"
-#~ "                                        </div>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td style=\"text-align:center;"
-#~ "\">\n"
-#~ "                                      <hr width=\"100%\" "
-#~ "style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\"/>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                        <!-- FOOTER -->\n"
-#~ "                        <tr>\n"
-#~ "                            <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                                <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.name or ''\">YourCompany</t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                    <tr><td valign=\"middle\" "
-#~ "align=\"left\" style=\"opacity: 0.7;\">\n"
-#~ "                                        <t t-"
-#~ "out=\"object.create_uid.company_id.phone or ''\">+1 650-123-4567</t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.email\">\n"
-#~ "                                            | <a t-attf-href=\"'mailto:"
-#~ "%s' % {{ object.create_uid.company_id.email }}\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.email\">info@yourcompany.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                        <t t-"
-#~ "if=\"object.create_uid.company_id.website\">\n"
-#~ "                                            | <a t-att-"
-#~ "href=\"object.create_uid.company_id.website\" style=\"text-"
-#~ "decoration:none; color: #454748;\" t-"
-#~ "out=\"object.create_uid.company_id.website\">http://www.example.com</a>\n"
-#~ "                                        </t>\n"
-#~ "                                    </td></tr>\n"
-#~ "                                </table>\n"
-#~ "                            </td>\n"
-#~ "                        </tr>\n"
-#~ "                    </tbody>\n"
-#~ "                    </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr><td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                        <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                          <tr><td style=\"text-align: center; font-size: "
-#~ "13px;\">\n"
-#~ "                            由 <a target=\"_blank\" href=\"https://"
-#~ "www.odoo.com/app/documents\" t-attf-style=\"color: "
-#~ "{{user.company_id.email_secondary_color or '#875A7B'}};\">Odoo 文件管理</"
-#~ "a> 驅動\n"
-#~ "                          </td></tr>\n"
-#~ "                        </table>\n"
-#~ "                    </td></tr>\n"
-#~ "                </table>\n"
-#~ "            "
-
-#~ msgid "%s has been copied in My Drive."
-#~ msgstr "%s 已複製至「我的雲端硬碟」。"
-
-#~ msgid "%s have been copied in My Drive."
-#~ msgstr "%s 已複製至「我的雲端硬碟」。"
-
-#~ msgid "%s shared with you"
-#~ msgstr "%s 已與你分享"
-
-#~ msgid ""
-#~ ". Scanned files will appear automatically in your workspace. Then, "
-#~ "process your documents in bulk with the split tool: launch user defined "
-#~ "actions, request a signature, convert to vendor bills with AI, etc."
-#~ msgstr ""
-#~ "處理收到的郵件的一個簡單方法是配置掃描儀以將PDF發送到您的工作區電子郵件。"
-#~ "掃描的文檔將自動出現在您的工作區中。然後，使用分拆工具批量處理文檔：啟動用"
-#~ "戶定義的動作、請求籤名、使用AI轉換為供應商賬單等。"
-
-#~ msgid ".<br/>"
-#~ msgstr "。<br/>"
-
-#~ msgid "<br/>At least one document hasn't been moved."
-#~ msgstr "<br/>最少有一個文件未移動。"
-
-#~ msgid "Access to a folder or a document"
-#~ msgstr "資料夾或文件存取權限"
-
-#~ msgid ""
-#~ "Activity plans are used to assign a list of activities in just a few "
-#~ "clicks\n"
-#~ "                    (e.g. \"NDA signature process\", \"Workspace "
-#~ "workflow\", ...)"
-#~ msgstr ""
-#~ "「活動計劃」用於簡易分配一系列活動，按幾下便完成。\n"
-#~ "                    （例如：保密協議簽名流程、工作區工作流程等）"
-
-#~ msgid "Add Tag Validated"
-#~ msgstr "加入已驗證標籤"
-
-#~ msgid "Administrative"
-#~ msgstr "管理"
-
-#~ msgid "Ads"
-#~ msgstr "廣告"
-
-#~ msgid ""
-#~ "All users with access to this %(documentType)s or its parent will have "
-#~ "edit permissions."
-#~ msgstr ""
-#~ "所有有權存取此 %(documentType)s 類型或其母級文件的使用者，都將會擁有編輯權"
-#~ "限。"
-
-#~ msgid ""
-#~ "An easy way to process incoming mails is to configure your scanner to "
-#~ "send PDFs to your workspace email. Scanned files will appear "
-#~ "automatically in your workspace. Then, process your documents in bulk "
-#~ "with the split tool: launch user defined actions, request a signature, "
-#~ "convert to vendor bills with AI, etc."
-#~ msgstr ""
-#~ "處理收到郵件的一個簡單方法，是將掃瞄器配置至將 PDF 發送到你的工作區電郵。"
-#~ "掃瞄的文件會自動在你的工作區出現。然後，你可使用分拆工具大批處理文件：例如"
-#~ "啟動用戶定義的操作、要求簽名、利用 AI 轉換為供應商賬單等。"
-
-#~ msgid "Anyone on the internet with the link can edit"
-#~ msgstr "互聯網上任何擁有該連結的人，都可編輯"
-
-#~ msgid "Anyone on the internet with the link can view"
-#~ msgstr "互聯網上任何擁有該連結的人，都可檢視"
-
-#~ msgid "Are you sure you want to permanently erase the document?"
-#~ msgstr "確定永久清除文件？"
-
-#~ msgid "Are you sure you want to permanently erase the documents?"
-#~ msgstr "確定永久清除這些文件？"
-
-#~ msgid "Bill"
-#~ msgstr "帳單"
-
-#~ msgid "Brochures"
-#~ msgstr "宣傳冊"
-
-#~ msgid "Control panel buttons"
-#~ msgstr "控制面板按鈕"
-
-#~ msgid "Copy Link"
-#~ msgstr "複製連結"
-
-#~ msgid "Deprecated"
-#~ msgstr "已棄用"
-
-#~ msgid "Document Access Internal"
-#~ msgstr "內部文件存取"
-
-#~ msgid "Document Access Link"
-#~ msgstr "文件存取連結"
-
-#~ msgid "Documents Access Invite"
-#~ msgstr "文件存取邀請"
-
-#~ msgid "DocumentsMany2OneReference"
-#~ msgstr "DocumentsMany2OneReference"
-
-#~ msgid "Draft"
-#~ msgstr "草稿"
-
-#~ msgid "Expense"
-#~ msgstr "開支"
-
-#~ msgid "Financial"
-#~ msgstr "財務"
-
-#~ msgid "Fiscal"
-#~ msgstr "財務"
-
-#~ msgid "General access"
-#~ msgstr "一般存取權限"
-
-#~ msgid "Group By"
-#~ msgstr "分組依據"
-
-#~ msgid "Images"
-#~ msgstr "圖片"
-
-#~ msgid "Impossible to invite partners on multiple documents at once."
-#~ msgstr "不可同時在多個文件上邀請合作夥伴。"
-
-#~ msgid "Internal users can edit"
-#~ msgstr "內部使用者可編輯"
-
-#~ msgid "Internal users can view"
-#~ msgstr "內部使用者可檢視"
-
-#~ msgid "Invite People"
-#~ msgstr "邀請人"
-
-#~ msgid "Invite people"
-#~ msgstr "邀請人員"
-
-#~ msgid ""
-#~ "It is not possible to move archived documents or documents to archived "
-#~ "folders."
-#~ msgstr "不可移動已封存的文件，或將任何文件移至已封存的資料夾。"
-
-#~ msgid "Items moved to the trash will be deleted forever after %s days."
-#~ msgstr "移至垃圾桶的項目會在 %s 天後永久刪除。"
-
-#~ msgid ""
-#~ "Let's process documents in your Inbox.<br/><i>Tip: Use Tags to filter "
-#~ "documents and structure your process.</i>"
-#~ msgstr ""
-#~ "讓我們處理收件箱中的文件。<br/><span>提示：使用標籤以篩選文件並組織流程。"
-#~ "</span>"
-
-#~ msgid "Let's process these bills: send to Finance workspace."
-#~ msgstr "讓我們處理這些賬單：發送到財務工作區。"
-
-#~ msgid ""
-#~ "Let's tag this mail as legal<br/> <i>Tips: actions can be tailored to "
-#~ "your process, according to the workspace.</i>"
-#~ msgstr ""
-#~ "讓我們把這封郵件標記為法律法件。<br/><span>提示：根據工作空間，動作可以根"
-#~ "據你的流程進行調整。</span>"
-
-#~ msgid "Link copied to the clipboard."
-#~ msgstr "連結已複製至剪貼簿。"
-
-#~ msgid "Optional message..."
-#~ msgstr "可選填訊息⋯"
-
-#~ msgid "Other"
-#~ msgstr "其他"
-
-#~ msgid "People"
-#~ msgstr "人物"
-
-#~ msgid "Pinned to Company roots"
-#~ msgstr "置頂於公司根級資料夾"
-
-#~ msgid "Presentations"
-#~ msgstr "展示"
-
-#~ msgid "Project"
-#~ msgstr "專案"
-
-#~ msgid ""
-#~ "Requested\n"
-#~ "                                ∙"
-#~ msgstr ""
-#~ "已要求\n"
-#~ "                                。"
-
-#~ msgid "Sales"
-#~ msgstr "銷售"
-
-#~ msgid "Save or discard changes first"
-#~ msgstr "請先儲存或捨棄變更"
-
-#~ msgid "Saving..."
-#~ msgstr "儲存中⋯"
-
-#~ msgid ""
-#~ "Send this letter to the legal department, by assigning the right tags."
-#~ msgstr "通過分配正確的標籤，把這封信寄到法律部門。"
-
-#~ msgid "Set expiration date"
-#~ msgstr "設定到期日"
-
-#~ msgid "Shortcuts can only be created one at a time."
-#~ msgstr "每次只可建立一個捷徑。"
-
-#~ msgid "Text"
-#~ msgstr "文字"
-
-#~ msgid "This action can not be executed on the current document."
-#~ msgstr "此操作不可在目前文件上執行。"
-
-#~ msgid ""
-#~ "This document has been requested.\n"
-#~ "                <b "
-#~ "onclick=\"document.querySelector('.o_request_upload').click()\" "
-#~ "style=\"cursor:pointer;\">Upload it</b>."
-#~ msgstr ""
-#~ "已要求提供此文件。\n"
-#~ "                <b "
-#~ "onclick=\"document.querySelector('.o_request_upload').click()\" "
-#~ "style=\"cursor:pointer;\">上載</b>。"
-
-#~ msgid "To validate"
-#~ msgstr "待驗證"
-
-#~ msgid "User Access Role"
-#~ msgstr "使用者存取角色"
-
-#~ msgid "VAT"
-#~ msgstr "增值稅"
-
-#~ msgid "Validated"
-#~ msgstr "已驗證"
-
-#~ msgid "Videos"
-#~ msgstr "影片"
-
-#~ msgid "You are not allowed to read the permission panel data."
-#~ msgstr "你沒有權限讀取權限設定面板的資料。"
-
-#~ msgid "You can't move documents out of folders you cannot edit."
-#~ msgstr "你不可將文件從你無權編輯的資料夾移出。"
-
-#~ msgid "You cannot remove this partner"
-#~ msgstr "你不可移除此合作夥伴"
-
-#~ msgid "You must be in a specific writable workspace to upload files"
-#~ msgstr "你必須在特定可寫入的工作區，才可上載檔案"
-
-#~ msgid "Your Role: %s"
-#~ msgstr "你的角色：%s"
-
-#~ msgid "folder"
-#~ msgstr "文件夾"
-
-#~ msgid "shared a document with you.<br/>"
-#~ msgstr "與你分享了一份文件。<br/>"
-
-#~ msgid "shared a folder with you.<br/>"
-#~ msgstr "與你分享了一個資料夾。<br/>"
-
-#~ msgid "shared this document with you:"
-#~ msgstr "向你分享文件："
-
-#~ msgid "shared this folder with you:"
-#~ msgstr "向你分享資料夾："
+#~ "<i class=\"oi me-2\" data-icon=\"open_in_new\" title=\"這是一個捷徑\"/>"

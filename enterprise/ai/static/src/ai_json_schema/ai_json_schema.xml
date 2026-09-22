@@ -4,10 +4,10 @@
         <t t-if="this.state.technical_mode">
             <div>
                 <textarea
-                    t-ref="textarea"
+                    t-ref="this.textareaRef"
                     class="o_input"
-                    t-on-blur="onBlur"
-                    t-out="props.record.data[props.name] or ''"
+                    t-on-blur="this.onBlur"
+                    t-out="this.props.record.data[this.props.name] or ''"
                 />
             </div>
             <button class="btn btn-link mt-1"
@@ -22,7 +22,8 @@
                         <td>
                             Name
                             <i
-                                class="fa fa-question-circle ml4"
+                                class="oi ml4"
+                                data-icon="help"
                                 role="img"
                                 title="Those parameters will be passed as global variables of the actions."
                             />
@@ -35,8 +36,8 @@
                         <td></td>  <!-- Delete button -->
                     </tr>
                 </thead>
-                <tbody t-ref="table">
-                    <tr t-foreach="arguments" t-as="argument" t-key="argument[0]">
+                <tbody t-ref="this.tableRef">
+                    <tr t-foreach="this.arguments" t-as="argument" t-key="argument[0]">
                         <t t-set="name" t-value="argument[0]"/>
                         <t t-set="values" t-value="argument[1]"/>
                         <t t-set="required" t-value="argument[2]"/>
@@ -65,7 +66,7 @@
                                 t-on-change="(ev) => this.onTypeChange(ev.target.value, name)"
                                 t-on-click.stop="() => {}">
                                 <option
-                                    t-foreach="types"
+                                    t-foreach="this.types"
                                     t-as="type"
                                     t-key="type[0]"
                                     class="text-black"
@@ -112,7 +113,7 @@
                         </td>
                         <td>
                             <button class="btn text-danger p-0" t-on-click="() => this.onDelete(name)">
-                                <i class="fa fa-trash-o"/>
+                                <i class="oi" data-icon="delete"/>
                             </button>
                         </td>
                     </tr>

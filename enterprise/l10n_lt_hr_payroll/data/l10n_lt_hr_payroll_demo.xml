@@ -13,6 +13,7 @@
         <field name="zip">02243</field>
         <field name="city">Vilnius</field>
         <field name="country_id" ref="base.lt"/>
+        <field name="resource_calendar_id" ref="l10n_lt_hr_payroll.resource_calendar_def_40h"/>
     </record>
 
     <record id="base.user_admin" model="res.users">
@@ -64,7 +65,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_lt'))]"/>
         <field name="company_id" ref="base.demo_company_lt"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="l10n_lt_hr_payroll/static/img/hr_employe_norberta.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_lt_hr_payroll/static/img/hr_employe_norberta.jpg"/>
     </record>
 
     <record id="res_partner_norberta_work_address" model="res.partner">
@@ -76,60 +77,42 @@
         <field name="company_id" ref="base.demo_company_lt"/>
     </record>
 
-    <record id="lt_res_bank_siauliu" model="res.bank">
-        <field name="name">Šiaulių bankas</field>
-        <field name="bic">CBSBLT26XXX</field>
+    <record id="res_partner_bank_account_linas" model="res.partner.bank">
+        <field name="account_number">LT601010012345678901</field>
+        <field name="allow_out_payment" eval="True"/>
+        <field name="bank_name">Šiaulių bankas</field>
+        <field name="bank_bic">CBSBLT26XXX</field>
         <field name="street">Šiaulių bankas Rd</field>
         <field name="city">Vilnius</field>
         <field name="zip">01199</field>
-        <field name="state" ref="base.state_lt_vl" />
-        <field name="country" ref="base.lt"/>
-        <field name="phone">09 947 4829</field>
-    </record>
-    <record id="lt_res_bank_siauliu" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_lt_hr_payroll.lt_res_bank_siauliu')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="lt_res_bank_swedbank" model="res.bank">
-        <field name="name">Swedbank</field>
-        <field name="bic">HABALT22XXX</field>
-        <field name="street">Swedbank Street</field>
-        <field name="city">Vilnius</field>
-        <field name="zip">10904</field>
-        <field name="state" ref="base.state_lt_vl" />
-        <field name="country" ref="base.lt"/>
-        <field name="phone">09 948 7382</field>
-    </record>
-    <record id="lt_res_bank_swedbank" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_lt_hr_payroll.lt_res_bank_swedbank')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="res_partner_bank_account_linas" model="res.partner.bank">
-        <field name="acc_number">LT601010012345678901</field>
-        <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_lt_hr_payroll.lt_res_bank_siauliu"/>
+        <field name="state_id" ref="base.state_lt_vl" />
+        <field name="country_id" ref="base.lt"/>
         <field name="partner_id" ref="l10n_lt_hr_payroll.res_partner_linas"/>
         <field name="company_id" ref="base.demo_company_lt"/>
-        <field name="currency_id" ref="base.EUR"/>
     </record>
 
     <record id="res_partner_bank_account_norberta" model="res.partner.bank">
-        <field name="acc_number">LT031279991443975186</field>
+        <field name="account_number">LT031279991443975186</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_lt_hr_payroll.lt_res_bank_swedbank"/>
+        <field name="bank_name">Swedbank</field>
+        <field name="bank_bic">HABALT22XXX</field>
+        <field name="street">Swedbank Street</field>
+        <field name="city">Vilnius</field>
+        <field name="zip">10904</field>
+        <field name="state_id" ref="base.state_lt_vl" />
+        <field name="country_id" ref="base.lt"/>
         <field name="partner_id" ref="l10n_lt_hr_payroll.res_partner_norberta"/>
         <field name="company_id" ref="base.demo_company_lt"/>
-        <field name="currency_id" ref="base.EUR"/>
     </record>
 
     <record id="hr_employee_linas" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_lt_hr_payroll.res_partner_linas')).name"/>
-        <field name="image_1920" type="base64" file="l10n_lt_hr_payroll/static/img/hr_employee_linas.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_lt_hr_payroll/static/img/hr_employee_linas.jpg"/>
         <field name="work_phone">09 944 7104</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_lt_hr_payroll.res_partner_linas')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_lt_hr_payroll.res_partner_linas"/>
         <field name="company_id" model="res.partner" eval="obj(ref('l10n_lt_hr_payroll.res_partner_linas')).company_id"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="l10n_lt_hr_payroll.resource_calendar_def_40h"/>
         <field name="tz">Europe/Vilnius</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_lt_hr_payroll.res_partner_linas')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_lt_hr_payroll.res_partner_linas')).city"/>
@@ -149,7 +132,6 @@
         <field name="emergency_phone">09 944 7105</field>
         <field name="certificate">master</field>
         <field name="study_field">Computer Science</field>
-        <field name="study_school">Vilnius University</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_lt_hr_payroll.res_partner_bank_account_linas'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -160,22 +142,28 @@
         <field name="hr_responsible_id" ref="base.user_demo"/>
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-3, month=1, day=1))"/>
-        <field name="date_generated_from" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1))"/>
-        <field name="date_generated_to" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_lt').id)], limit=1)"/>
-        <field name="l10n_lt_benefits_in_kind">400</field>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
+    </record>
+
+    <record id="hr_employee_linas" model="hr.employee">
+        <field name="payroll_properties"
+            eval="{
+                str(ref('l10n_lt_hr_payroll.l10n_lt_employees_salary_bik')): 400,
+            }"
+        />
     </record>
 
     <record id="hr_employee_norberta" model="hr.employee">
         <field name="address_id" ref="l10n_lt_hr_payroll.res_partner_norberta_work_address"/>
         <field name="name" model="res.partner" eval="obj(ref('l10n_lt_hr_payroll.res_partner_norberta')).name"/>
-        <field name="image_1920" type="base64" file="l10n_lt_hr_payroll/static/img/hr_employe_norberta.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_lt_hr_payroll/static/img/hr_employe_norberta.jpg"/>
         <field name="work_phone">09 943 9451</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_lt_hr_payroll.res_partner_norberta')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_lt_hr_payroll.hr_employee_linas"/>
         <field name="user_id" ref="l10n_lt_hr_payroll.user_norberta"/>
         <field name="company_id" ref="base.demo_company_lt"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="l10n_lt_hr_payroll.resource_calendar_def_40h"/>
         <field name="tz">Europe/Vilnius</field>
         <field name="private_street" model="res.partner" eval="obj(ref('l10n_lt_hr_payroll.res_partner_norberta')).street"/>
         <field name="private_city" model="res.partner" eval="obj(ref('l10n_lt_hr_payroll.res_partner_norberta')).city"/>
@@ -195,7 +183,6 @@
         <field name="emergency_phone">09 943 9452</field>
         <field name="certificate">master</field>
         <field name="study_field">Electrical Engineering</field>
-        <field name="study_school">Université Catholique de Louvain-la-Neuve</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_lt_hr_payroll.res_partner_bank_account_norberta'))]"/>
         <field name="job_id" ref="hr.job_developer"/>
@@ -208,7 +195,15 @@
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-2, month=1, day=1))"/>
         <field name="contract_date_end" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-2))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_lt').id)], limit=1)"/>
-        <field name="l10n_lt_benefits_in_kind">400</field>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
+    </record>
+
+    <record id="hr_employee_norberta" model="hr.employee">
+        <field name="payroll_properties"
+            eval="{
+                str(ref('l10n_lt_hr_payroll.l10n_lt_employees_salary_bik')): 400,
+            }"
+        />
     </record>
 
     <function name="create_version" model="hr.employee">

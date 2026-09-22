@@ -23,7 +23,7 @@ class L10n_Uy_EdiAddenda(models.Model):
         This is needed because when we see the addenda, legends, and additional info from the move m2m tag widget
         we are not able to easily identify which type is being applied only with the name
         """
-        type_name = dict(self._fields['type'].selection)
+        type_name = dict(self._fields['type']._description_selection(self.env))
         for item in self:
             if item.is_legend:
                 item.display_name = _("%(name)s (Mandatory Disclosure - %(type)s)", name=item.name, type=type_name.get(item.type))

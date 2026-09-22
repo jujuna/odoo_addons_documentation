@@ -1,11 +1,12 @@
 /** @ts-check */
 
 import { stores, components } from "@odoo/o-spreadsheet";
-import { onWillStart, Component } from "@odoo/owl";
+import { onWillStart, Component, t, useProps } from "@odoo/owl";
 import { FilterEditorStore } from "../../filter_editor_store";
 import { FilterEditorFieldMatching } from "./filter_editor_field_matching";
 import { GlobalFilterFooter } from "../global_filter_footer/global_filter_footer";
 import { _t } from "@web/core/l10n/translation";
+import { getEmptyFilterValue } from "@spreadsheet/global_filters/helpers";
 
 const { Checkbox, Section, SidePanelCollapsible, TextInput, ValidationMessages } = components;
 const { useLocalStore } = stores;
@@ -35,16 +36,29 @@ export class AbstractFilterEditorSidePanel extends Component {
         GlobalFilterFooter,
         ValidationMessages,
     };
-    static props = {
-        id: { type: String, optional: true },
-        label: { type: String, optional: true },
-        fieldMatching: { type: Object, optional: true },
-        onCloseSidePanel: { type: Function, optional: true },
-    };
+
+    props = useProps({
+        id: t.string().optional(),
+        label: t.string().optional(),
+        fieldMatching: t.object().optional(),
+        onCloseSidePanel: t.function().optional(),
+        onClickCancel: t.function().optional(),
+        field: t.object().optional(),
+    });
 
     setup() {
-        this.store = useLocalStore(FilterEditorStore, this.props, this.type);
-        onWillStart(async () => await this.store.loadData);
+        this.store = useLocalStore(FilterEditorStore, useProps(), this.type);
+        onWillStart(async () => {
+            await this.store.loadData;
+            if (this.props.field) {
+                this.store.fieldsMatching.forEach((fieldMatching, i) => {
+                    const fields = fieldMatching.fields();
+                    if (fields?.[this.props.field.name]?.string === this.props.field.string) {
+                        this.store.updateFieldMatching(i, this.props.field.name, this.props.field);
+                    }
+                });
+            }
+        });
     }
 
     get type() {
@@ -58,11 +72,23 @@ export class AbstractFilterEditorSidePanel extends Component {
         this.store.update({ label });
     }
 
-    updateDefaultValue(defaultValue) {
-        if (Array.isArray(defaultValue) && defaultValue.length === 0) {
-            this.store.update({ defaultValue: undefined });
+    updateOperator(operator) {
+        const previousValue = this.store.filter.defaultValue;
+        const emptyValue = getEmptyFilterValue(this.store.filter, operator);
+        this.store.update({ defaultValue: { ...emptyValue, ...previousValue, operator } });
+    }
+
+    updateDefaultValue(value) {
+        if (value) {
+            this.store.update({ defaultValue: value });
         } else {
-            this.store.update({ defaultValue });
+            const filter = this.store.filter;
+            this.store.update({
+                defaultValue: {
+                    ...filter.defaultValue,
+                    ...getEmptyFilterValue(filter, filter.defaultValue?.operator),
+                },
+            });
         }
     }
 
@@ -86,10 +112,12 @@ export class AbstractFilterEditorSidePanel extends Component {
                       );
                   },
             onClickCancel: () => {
-                this.env.replaceSidePanel(
-                    "GLOBAL_FILTERS_SIDE_PANEL",
-                    `${this.constructor.name}_${this.props.id}`
-                );
+                this.props.onClickCancel
+                    ? this.props.onClickCancel(`${this.constructor.name}_${this.props.id}`)
+                    : this.env.replaceSidePanel(
+                          "GLOBAL_FILTERS_SIDE_PANEL",
+                          `${this.constructor.name}_${this.props.id}`
+                      );
             },
         };
     }

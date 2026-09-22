@@ -1,13 +1,14 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 from odoo import fields, models, api, release
 
 
 class PosPaymentMethod(models.Model):
     _inherit = "pos.payment.method"
 
-    def _get_payment_terminal_selection(self):
-        return super()._get_payment_terminal_selection() + [("tyro", "Tyro")]
+    def _get_terminal_provider_selection(self):
+        return super()._get_terminal_provider_selection() + [("tyro", "Tyro")]
+
+    def _allowed_actions_in_self_order(self):
+        return super()._allowed_actions_in_self_order() + ["get_tyro_product_info"]
 
     tyro_mode = fields.Selection([("prod", "Production Mode"), ("test", "Test Mode"), ("simulator", "Simulator Mode")], default="prod")
     tyro_merchant_id = fields.Char("Tyro Merchant ID")
@@ -62,7 +63,7 @@ class PosPaymentMethod(models.Model):
 
     def get_tyro_product_info(self):
         self.ensure_one()
-        api_key = self.env["ir.config_parameter"].sudo().get_param("pos_tyro.api_key") if self.tyro_mode == "prod" else "testApiKey"
+        api_key = self.env["ir.config_parameter"].sudo().get_str("pos_tyro.api_key") if self.tyro_mode == "prod" else "testApiKey"
         return {
             "posProductVendor": "Odoo",
             "posProductName": "Odoo Point of Sale",

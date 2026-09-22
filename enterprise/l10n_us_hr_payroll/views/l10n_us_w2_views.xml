@@ -19,11 +19,10 @@
                             <field name="date_end"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="allowed_payslip_ids" invisible="1"/>
-                            <field name="csv_filename" invisible="1"/>
                         </group>
                     </group>
                     <p invisible="not csv_file">
-                        Download the CSV file: <field name="csv_file" filename="csv_filename"/>
+                        Download the CSV file: <field name="csv_file" />
                     </p>
                     <field name="payslip_ids">
                         <list create="False">

@@ -1,57 +1,47 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning
-from odoo.fields import Date
 
 
 class MontlhyReturnWizard(models.TransientModel):
     _name = "cis.monthly.return.wizard"
     _description = "CIS monthly return wizard"
 
-    date_from = fields.Date(string="Date From")
-    date_to = fields.Date(string="Date To")
+    return_id = fields.Many2one('account.return', string="Return", required=True)
+    date_from = fields.Date(string="Date From", related="return_id.date_from")
+    date_to = fields.Date(string="Date To", related="return_id.date_to")
     subcontractor_verification = fields.Boolean(string="Subcontractor Verification")
     employment_status = fields.Boolean(string="Employment Status")
     inactivity_indicator = fields.Boolean(string="Inactivity Indicator")
     information_correct = fields.Boolean(string="Information Correct")
     hmrc_cis_password = fields.Char(string="CIS password", store=False)
-    use_wrong_period = fields.Boolean(string="Use Wrong Password")
-    already_submited_period = fields.Boolean(string="Already Submited Period")
+    already_submited_period = fields.Boolean(string="Already Submited Period", compute="_compute_already_submited_period")
 
-    @api.model
-    def default_get(self, fields):
-        res = super().default_get(fields)
-        options = self.env.context.get('options')
-        if not options:
-            return res
-        date_from = Date.from_string(options['date']['date_from'])
-        date_to = Date.from_string(options['date']['date_to'])
-
-        if 'date_from' in fields:
-            res['date_from'] = date_from
-
-        if 'date_to' in fields:
-            res['date_to'] = date_to
-
-        if 'use_wrong_period' in fields:
-            if options['date']['period_type'] != 'tax_period':
-                period_start, period_end = self.env.ref('l10n_uk_reports_cis.uk_cis_tax_return_type')._get_period_boundaries(self.env.company, date_to)
-                res['use_wrong_period'] = period_start != date_from or period_end != date_to
-            else:
-                res['use_wrong_period'] = False
-
-        if 'already_submited_period' in fields:
-            res['already_submited_period'] = self.env['l10n_uk.hmrc.transaction'].search_count([
-                ('company_id.id', '=', self.env.company.id),
-                ('period_start', '=', date_from),
-                ('period_end', '=', date_to),
+    @api.depends("return_id.date_from", "return_id.date_to")
+    def _compute_already_submited_period(self):
+        for record in self:
+            record.already_submited_period = bool(self.env['l10n_uk.hmrc.transaction'].search_count([
+                ('company_id', '=', self.env.company.id),
+                ('period_start', '=', record.date_from),
+                ('period_end', '=', record.date_to),
                 ('state', 'in', ('polling', 'success', 'deleted')),
-            ], limit=1) > 0
-
-        return res
+            ], limit=1))
 
     @api.model
-    def action_send_montlhy_return(self, date_from, date_to, employment_status, subcontractor_verification, inactivity_indicator, hmrc_cis_password):
+    def _open_submission_wizard(self, account_return):
+        wizard = self.create({'return_id': account_return.id})
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self.env._("Submit CIS return"),
+            'view_mode': 'form',
+            'res_model': wizard._name,
+            'target': 'new',
+            'res_id': wizard.id,
+        }
+
+    @api.model
+    def action_send_montlhy_return(self, return_id, employment_status, subcontractor_verification, inactivity_indicator, hmrc_cis_password):
         cis_report = self.env.ref('l10n_uk_reports_cis.tax_report_cis')
+        account_return = self.env['account.return'].browse(return_id)
 
         if not self.env.company.l10n_uk_hmrc_unique_taxpayer_reference or not self.env.company.l10n_uk_hmrc_account_office_reference:
             raise RedirectWarning(
@@ -67,11 +57,14 @@ class MontlhyReturnWizard(models.TransientModel):
             )
 
         # Ensure that `export_mode` is set to `file` so we use default groupby and don't display comparison
-        options = cis_report.get_options({'export_mode': 'file'})
-        options['date'].update({
-            'date_from': date_from,
-            'date_to': date_to,
+        options = cis_report.get_options({
+            'export_mode': 'file',
+            'date': {
+                'date_from': account_return.date_from,
+                'date_to': account_return.date_to,
+            },
         })
+
         lines = cis_report._get_lines(options)
 
         # The report gives us the lines for sales and purchase.
@@ -80,7 +73,7 @@ class MontlhyReturnWizard(models.TransientModel):
         cis_purchase_report_line_id = self.env.ref('l10n_uk_reports_cis.account_uk_cis_report_line_purchase').id
         partner_lines = [
             line for line in lines
-            if line['groupby'] == 'move_id'
+            if line.groupby == 'move_id'
                 and self.env['account.report']._get_res_id_from_line_id(line['id'], 'account.report.line') == cis_purchase_report_line_id
         ]
 
@@ -97,18 +90,19 @@ class MontlhyReturnWizard(models.TransientModel):
             partner_id = cis_report._get_res_id_from_line_id(partner_line['id'], 'res.partner')
             document_data['subcontractor_return_ids'].append({
                 'id': partner_id,
-                'total_payment_made': partner_line['columns'][colname_to_idx['payment']].get('no_format', 0.0),
-                'direct_cost_of_materials': partner_line['columns'][colname_to_idx['materials']].get('no_format', 0.0),
-                'total_amount_deducted': partner_line['columns'][colname_to_idx['deduction']].get('no_format', 0.0),
+                'total_payment_made': partner_line.columns[colname_to_idx['payment']].no_format or 0.0,
+                'direct_cost_of_materials': partner_line.columns[colname_to_idx['materials']].no_format or 0.0,
+                'total_amount_deducted': partner_line.columns[colname_to_idx['deduction']].no_format or 0.0,
             })
             document_data['subcontractor_ids'].append(partner_id)
 
         transaction = self.env['l10n_uk.hmrc.transaction'].create({
             'transaction_type': 'cis_monthly_return',
-            'period_start': date_from,
-            'period_end': date_to,
+            'period_start': account_return.date_from,
+            'period_end': account_return.date_to,
             'company_id': self.env.company.id,
             'sender_user_id': self.env.user.id,
+            'return_id': account_return.id,
         })
 
         transaction.sudo()._submit_cis_mr_transaction(

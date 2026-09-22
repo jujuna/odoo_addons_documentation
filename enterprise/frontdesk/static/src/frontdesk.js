@@ -1,15 +1,11 @@
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
-import { VisitorForm } from "@frontdesk/visitor_form/visitor_form";
 import { WelcomePage } from "@frontdesk/welcome_page/welcome_page";
 import { RegisterPage } from "@frontdesk/register_page/register_page";
-import { DrinkPage } from "@frontdesk/drink_page/drink_page";
 import { Navbar } from "@frontdesk/navbar/navbar";
-import { HostPage } from "@frontdesk/host_page/host_page";
 import { EndPage } from "@frontdesk/end_page/end_page";
-import { QuickCheckIn } from "@frontdesk/quick_check_in/quick_check_in";
 
-import { Component, useState, onWillStart, markup } from "@odoo/owl";
+import { Component, onWillStart, markup, proxy, t, useProps } from "@odoo/owl";
 
 import { isHtmlEmpty } from "@web/core/utils/html";
 
@@ -18,23 +14,19 @@ export class Frontdesk extends Component {
     static components = {
         WelcomePage,
         Navbar,
-        VisitorForm,
-        QuickCheckIn,
-        HostPage,
         RegisterPage,
-        DrinkPage,
         EndPage,
     };
-    static props = {
-        id: Number,
-        isMobile: Boolean,
-        currentLang: String,
-    };
+
+    props = useProps({
+        id: t.number(),
+        isMobile: t.boolean(),
+        currentLang: t.string(),
+    });
     setup() {
         this.isHtmlEmpty = isHtmlEmpty;
-        this.state = useState({
-            currentComponent: !this.props.isMobile ? WelcomePage : VisitorForm,
-            plannedVisitors: [],
+        this.state = proxy({
+            currentComponent: WelcomePage,
         });
         const urlToken = window.location.href.split("/").findLast((s) => s);
         this.token = urlToken.includes("?") ? urlToken.split("?")[0] : urlToken;
@@ -61,25 +53,6 @@ export class Frontdesk extends Component {
         this.station.description = this.station.description ? markup(this.station.description) : "";
     }
 
-    /* This method updates the plannedVisitors */
-    updatePlannedVisitors() {
-        this._getPlannedVisitors();
-        this.intervalId = setInterval(() => this._getPlannedVisitors(), 600000); // 10 minutes
-    }
-
-    /**
-     * Get the plannedVisitors from the backend through rpc call
-     *
-     * @private
-     */
-    async _getPlannedVisitors() {
-        this.state.plannedVisitors = await rpc(`${this.frontdeskUrl}/get_planned_visitors`);
-        for (const visitor of this.state.plannedVisitors) {
-            // markup: message is coming from HTML field on frontdesk.visitor
-            visitor.message = visitor.message ? markup(visitor.message) : "";
-        }
-    }
-
     /* This method creates the visitor in the backend through rpc call */
     async createVisitor() {
         const result = await rpc(`${this.frontdeskUrl}/prepare_visitor_data`, {
@@ -87,7 +60,7 @@ export class Frontdesk extends Component {
             phone: this.visitorData.visitorPhone,
             email: this.visitorData.visitorEmail,
             company: this.visitorData.visitorCompany,
-            host_ids: this.hostData ? [this.hostData.hostId] : [],
+            host_id: this.hostData ? this.hostData.hostId : false,
         });
         this.visitorId = result.visitor_id;
     }
@@ -114,17 +87,10 @@ export class Frontdesk extends Component {
         this.state.currentComponent = component;
     }
 
-    /* This method clears the interval for updatePlannedVisitors */
-    clearUpdatePlannedVisitors() {
-        clearInterval(this.intervalId);
-    }
-
     /* Reset the data */
     resetData() {
         this.hostData = null;
         this.visitorData = null;
-        this.plannedVisitorData = null;
-        this.isDrinkSelected = false;
     }
 
     /**
@@ -142,6 +108,10 @@ export class Frontdesk extends Component {
         };
     }
 
+    getVisitorData() {
+        return this.visitorData;
+    }
+
     /**
      * @param {Object} host
      */
@@ -152,26 +122,6 @@ export class Frontdesk extends Component {
         };
     }
 
-    /**
-     * @param {number} plannedVisitorId
-     * @param {string||ReturnType<import("@odoo/owl").markup>} plannedVisitorMessage
-     * @param {Array} plannedVisitorHosts
-     */
-    setPlannedVisitorData(plannedVisitorId, plannedVisitorMessage, plannedVisitorHosts) {
-        this.plannedVisitorData = {
-            plannedVisitorId: plannedVisitorId,
-            plannedVisitorMessage: plannedVisitorMessage,
-            plannedVisitorHosts: plannedVisitorHosts,
-        };
-    }
-
-    /**
-     * @param {boolean} boolean
-     */
-    setDrink(boolean) {
-        this.isDrinkSelected = boolean;
-    }
-
     // -------------------------------------------------------------------------
     // Getters
     // -------------------------------------------------------------------------
@@ -180,36 +130,19 @@ export class Frontdesk extends Component {
         let props = {};
         if (this.state.currentComponent === WelcomePage) {
             props = {
-                showScreen: this.showScreen.bind(this),
                 resetData: this.resetData.bind(this),
-                onChangeLang: this.onChangeLang.bind(this),
-                token: this.token,
                 companyName: this.frontdeskData.company.name,
-                stationInfo: this.station,
-                langs: this.frontdeskData.langs.length > 1 ? this.frontdeskData.langs : false,
-                currentLang: this.props.currentLang,
-            };
-        } else if (this.state.currentComponent === VisitorForm) {
-            props = {
                 onChangeLang: this.onChangeLang.bind(this),
                 showScreen: this.showScreen.bind(this),
-                clearUpdatePlannedVisitors: this.clearUpdatePlannedVisitors.bind(this),
                 setVisitorData: this.setVisitorData.bind(this),
-                updatePlannedVisitors: this.updatePlannedVisitors.bind(this),
-                visitorData: this.visitorData || false,
+                getVisitorData: this.getVisitorData.bind(this),
+                visitorData: this.getVisitorData() || false,
                 isMobile: this.props.isMobile,
                 currentComponent: this.state.currentComponent.name,
-                isPlannedVisitors: this.state.plannedVisitors.length ? true : false,
                 stationInfo: this.station,
                 langs: this.frontdeskData.langs.length > 1 ? this.frontdeskData.langs : false,
                 currentLang: this.props.currentLang,
-                theme: this.station.theme,
-            };
-        } else if (this.state.currentComponent === HostPage) {
-            props = {
-                stationId: this.station.id,
                 token: this.token,
-                showScreen: this.showScreen.bind(this),
                 setHostData: this.setHostData.bind(this),
                 theme: this.station.theme,
             };
@@ -220,30 +153,14 @@ export class Frontdesk extends Component {
                 createVisitor: this.createVisitor.bind(this),
                 theme: this.station.theme,
                 isMobile: this.props.isMobile,
-                isDrinkVisible: this.frontdeskData.drinks?.length ? true : false,
-                plannedVisitorData: this.plannedVisitorData,
                 hostData: this.hostData,
-            };
-        } else if (this.state.currentComponent === DrinkPage) {
-            props = {
-                showScreen: this.showScreen.bind(this),
-                setDrink: this.setDrink.bind(this),
-                theme: this.station.theme,
-                drinkInfo: this.frontdeskData.drinks,
-                stationId: this.props.id,
-                token: this.token,
-                visitorId: this.plannedVisitorData
-                    ? this.plannedVisitorData.plannedVisitorId
-                    : this.visitorId,
             };
         } else if (this.state.currentComponent === EndPage) {
             props = {
                 showScreen: this.showScreen.bind(this),
                 onClose: this.onClose.bind(this),
                 isMobile: this.props.isMobile,
-                isDrinkSelected: this.isDrinkSelected,
                 theme: this.station.theme,
-                plannedVisitorData: this.plannedVisitorData,
                 hostData: this.hostData,
             };
         }
@@ -256,22 +173,10 @@ export class Frontdesk extends Component {
             currentComponent: this.state.currentComponent.name,
             companyInfo: this.frontdeskData.company,
             isMobile: this.props.isMobile,
-            isPlannedVisitors: this.state.plannedVisitors.length ? true : false,
             theme: this.station.theme,
             onChangeLang: this.onChangeLang.bind(this),
             langs: this.frontdeskData.langs.length > 1 ? this.frontdeskData.langs : false,
             currentLang: this.props.currentLang,
-        };
-    }
-
-    get quickCheckInProps() {
-        return {
-            setPlannedVisitorData: this.setPlannedVisitorData.bind(this),
-            showScreen: this.showScreen.bind(this),
-            stationId: this.props.id,
-            token: this.token,
-            plannedVisitors: this.state.plannedVisitors,
-            theme: this.station.theme,
         };
     }
 }

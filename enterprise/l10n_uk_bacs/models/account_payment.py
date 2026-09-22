@@ -25,7 +25,7 @@ class AccountPayment(models.Model):
         # Register BACS Direct Debit payments on DDIs or trigger an error if no DDI is available.
         draft_bacs = self.filtered(lambda p: p.payment_method_code == 'bacs_dd' and p.state == 'draft')
         res = super().write(vals)
-        for pay in draft_bacs.filtered(lambda p: p.state == 'in_process'):
+        for pay in draft_bacs.filtered(lambda p: p.state == 'paid'):
             usable_ddi = pay.get_usable_ddi()
             if not usable_ddi:
                 raise UserError(_(
@@ -53,12 +53,17 @@ class AccountPayment(models.Model):
     def _check_bacs_bank_account(self):
         bacs_dc_payment_method = self.env.ref('l10n_uk_bacs.payment_method_bacs_dc')
         bacs_dd_payment_method = self.env.ref('l10n_uk_bacs.payment_method_bacs_dd')
-        for rec in self:
-            if rec.payment_method_id in (bacs_dc_payment_method, bacs_dd_payment_method):
-                if not rec.journal_id.bank_account_id or rec.journal_id.bank_account_id.acc_type != 'iban' or rec.journal_id.bank_account_id.acc_number[:2] != 'GB':
-                    raise ValidationError(_("The journal '%s' requires a proper IBAN account to initiate a BACS Payment. Please configure it first.", rec.journal_id.name))
-                if rec.payment_method_id == bacs_dc_payment_method and (rec.partner_bank_id.acc_type != 'iban' or rec.partner_bank_id.sanitized_acc_number[:2].upper() != 'GB'):
-                    raise ValidationError(_("The selected vendor account needs to be a valid UK IBAN"))
+        for payment in self:
+            if payment.payment_method_id in (bacs_dc_payment_method, bacs_dd_payment_method):
+                if not payment.journal_id.bank_account_id:
+                    raise ValidationError(_(
+                        "The journal '%(journal)s' requires a UK bank account to initiate a BACS Payment. "
+                        "Please configure an account number first.", journal=payment.journal_id.name
+                    ))
+                if not payment.journal_id.bank_account_id._is_valid_uk_bank_account():
+                    raise ValidationError(_("The journal '%s' requires a proper UK bank account to initiate a BACS Payment. Please configure an account number and sort code first.", payment.journal_id.name))
+                if payment.payment_method_id == bacs_dc_payment_method and not payment.partner_bank_id._is_valid_uk_bank_account():
+                    raise ValidationError(_("The selected vendor account needs to be a valid UK bank account to initiate a BACS Payment. Please configure an account number and sort code first."))
 
     def _get_payment_method_codes_to_exclude(self):
         res = super()._get_payment_method_codes_to_exclude()

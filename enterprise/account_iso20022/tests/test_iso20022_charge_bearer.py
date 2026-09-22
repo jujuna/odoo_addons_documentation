@@ -5,6 +5,8 @@ from odoo.tests import tagged
 
 @tagged('post_install', '-at_install')
 class TestISO20022ChargeBearer(TestISO20022CommonCreditTransfer):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -12,13 +14,10 @@ class TestISO20022ChargeBearer(TestISO20022CommonCreditTransfer):
         cls.env.user.group_ids |= cls.env.ref('account.group_validate_bank_account')
         cls.payment_method = cls.env.ref('account_iso20022.account_payment_method_iso20022')
         cls.bank_journal = cls.company_data['default_journal_bank']
-        cls.bank_ing = cls.env['res.bank'].create({
-            'name': 'ING',
-            'bic': 'BBRUBEBB',
-        })
         cls.bank_journal.write({
-            'bank_id': cls.bank_ing.id,
-            'bank_acc_number': 'BE48363523682327',
+            'bank_account_number': 'BE48363523682327',
+            'bank_name': 'ING',
+            'bank_bic': 'BBRUBEBB',
             'currency_id': cls.env.ref('base.EUR').id,
             'available_payment_method_ids': [Command.link(cls.payment_method.id)],
         })
@@ -28,12 +27,11 @@ class TestISO20022ChargeBearer(TestISO20022CommonCreditTransfer):
             'journal_id': cls.company_data['default_journal_bank'].id
         }])
         cls.env['res.partner.bank'].create({
-            'acc_type': 'iban',
             'partner_id': cls.partner_a.id,
-            'acc_number': 'BE08429863697813',
+            'account_number': 'BE08429863697813',
             'allow_out_payment': True,
-            'bank_id': cls.bank_ing.id,
-            'currency_id': cls.env.ref('base.USD').id,
+            'bank_name': 'ING',
+            'bank_bic': 'BBRUBEBB',
         })
         # A country is required for sepa transfer
         cls.partner_a.country_id = cls.env.ref('base.us')

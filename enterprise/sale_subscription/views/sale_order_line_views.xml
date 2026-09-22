@@ -6,7 +6,13 @@
         <field name="arch" type="xml">
             <list string="Subscription Items" multi_edit="1">
                 <field name="name" string="Product"/>
-                <field name="product_template_variant_value_ids" string="Product Varient" widget="many2many_tags" groups="product.group_product_variant"/>
+                <field
+                    name="product_template_variant_value_ids"
+                    string="Product Variant"
+                    widget="many2many_tags_color_dot"
+                    options="{'color_field': 'html_color'}"
+                    groups="product.group_product_variant"
+                />
                 <field name="order_id" string="Subscription" readonly="1"/>
                 <field name="order_partner_id"/>
                 <field name="pricelist_id" groups="product.group_product_pricelist"/>

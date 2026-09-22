@@ -5,7 +5,6 @@ from markupsafe import Markup, escape
 
 from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, UserError
-from odoo.tools.misc import str2bool
 
 REFERRAL_FIELDS = {
     'sequence', 'partner_name', 'job_id', 'referral_points_ids', 'earned_points', 'max_points', 'active', 'response_id',
@@ -16,9 +15,7 @@ REFERRAL_FIELDS = {
 class HrApplicant(models.Model):
     _inherit = "hr.applicant"
 
-    ref_user_id = fields.Many2one('res.users', string='Referred By User', tracking=True,
-        compute='_compute_ref_user_id', readonly=False, store=True, copy=False)
-    source_id = fields.Many2one(compute="_compute_source_id", store=True, readonly=False)
+    ref_user_id = fields.Many2one('res.users', string='Referred By User', tracking=True, copy=False)
     referral_points_ids = fields.One2many('hr.referral.points', 'applicant_id', copy=False)
     earned_points = fields.Integer(compute='_compute_earned_points')
     referral_state = fields.Selection([
@@ -27,7 +24,8 @@ class HrApplicant(models.Model):
         ('closed', 'Not Hired')], required=True, default='progress')
     shared_item_infos = fields.Text(compute="_compute_shared_item_infos")
     max_points = fields.Integer(related="job_id.max_points")
-    friend_id = fields.Many2one('hr.referral.friend', copy=False)
+    friend_id = fields.Many2one('hr.referral.friend', copy=False, index='btree_not_null')
+    image_head = fields.Binary(related='friend_id.image_head')
     last_valuable_stage_id = fields.Many2one('hr.recruitment.stage', "Last Valuable Stage")
     is_accessible_to_current_user = fields.Boolean(
         compute='_compute_is_accessible_to_current_user',
@@ -57,35 +55,6 @@ class HrApplicant(models.Model):
                 if not applicant.is_accessible_to_current_user:
                     raise AccessError(_("You are not allowed to access this application record because you're not one of the interviewers of this application. If you think that's an error, please contact your administrator."))
 
-    @api.depends('source_id')
-    def _compute_ref_user_id(self):
-        utm_source_referral = self.env.ref('utm.utm_source_referral', raise_if_not_found=False)
-        for applicant in self:
-            if applicant.source_id != utm_source_referral:
-                applicant.ref_user_id = False
-
-    @api.depends('ref_user_id')
-    def _compute_source_id(self):
-        utm_source_referral = self.env.ref('utm.utm_source_referral', raise_if_not_found=False)
-        for applicant in self:
-            if applicant.ref_user_id and utm_source_referral:
-                applicant.source_id = utm_source_referral.id
-
-    @api.model
-    @api.deprecated("Override of a deprecated method")
-    def check_field_access_rights(self, operation, field_names):
-        referral_fields = REFERRAL_FIELDS
-
-        result = super().check_field_access_rights(operation, field_names)
-        if field_names:
-            if (
-                not self.env.is_admin() and not self.env.user.has_group('hr_referral.group_hr_recruitment_referral_user')
-                and operation == 'read' and not set(field_names) - referral_fields
-            ):
-                raise AccessError(_('You are not allowed to access applicant records.'))
-            return result
-        return [field_name for field_name in result if field_name not in referral_fields]
-
     def _has_field_access(self, field, operation):
         return super()._has_field_access(field, operation) and (
             self.env.is_admin()
@@ -94,9 +63,10 @@ class HrApplicant(models.Model):
             or field.name in REFERRAL_FIELDS
         )
 
-    def _check_field_access(self, field, operation):
+    @api.model
+    def check_field_access(self, field, operation):
         try:
-            return super()._check_field_access(field, operation)
+            return super().check_field_access(field, operation)
         except AccessError as e:
             if field.name in REFERRAL_FIELDS:
                 raise AccessError(_('You are not allowed to access applicant records.')) from e
@@ -240,41 +210,44 @@ class HrApplicant(models.Model):
         self_sudo = self.sudo()
         if not self.env.user:
             return
-        if self_sudo.ref_user_id == self.env.user and not self_sudo.friend_id:
+        if self_sudo.ref_user_id == self.env.user:
             # Use sudo, user has normaly not the right to write on applicant
             self_sudo.write({'friend_id': friend_id})
 
     def _get_onboarding_steps(self):
         return [{
             'text': onboarding.text,
-            'image': onboarding.image
+            'image': onboarding.image.to_base64(),
         } for onboarding in self.env['hr.referral.onboarding'].search([])]
 
-    def _get_friends(self, applicant_names):
-        return [{
-            'id': friend.id,
-            'friend': applicant_names.get(friend.id, ''),
-            'name': applicant_names.get(friend.id, friend.name),
-            'position': friend.position,
-            'image': friend.image,
-        } for friend in self.env['hr.referral.friend'].search([]) if friend.id in applicant_names]
+    def _get_friend_data(self, limit=False):
+        friends_data = []
+        applicants_by_friend = self.filtered('friend_id').grouped('friend_id')
+        for i, (friend, applicants) in enumerate(applicants_by_friend.items()):
+            if i >= limit:
+                break
+            friends_data.append({
+                'image': friend.image.to_base64(),
+                'position': friend.position,
+                'names': applicants.mapped('partner_name')
+            })
+        return friends_data
 
-    def _get_friends_head(self, applicant_names):
+    def _get_friends_head(self):
         return [{
             'id': friend.id,
-            'friend': applicant_names.get(friend.id, ''),
             'name': friend.name,
-            'image': friend.image_head,
+            'image': friend.image_head.to_base64(),
         } for friend in self.env['hr.referral.friend'].search([])]
 
     @api.model
     def retrieve_referral_data(self):
         return {
-            'show_grass': str2bool(self.env["ir.config_parameter"].sudo().get_param('hr_referral.show_grass')),
+            'show_grass': self.env["ir.config_parameter"].sudo().get_bool('hr_referral.show_grass'),
         }
 
     @api.model
-    def retrieve_referral_welcome_screen(self):
+    def retrieve_referral_welcome_screen(self, friend_limit):
         result = self.retrieve_referral_data()
         user_id = self.env.user
 
@@ -284,26 +257,30 @@ class HrApplicant(models.Model):
             result['onboarding'] = self._get_onboarding_steps()
             return result
 
+        if self.env.context.get('choose_avatar', False):
+            applicant_to_change = self.browse(self.env.context.get('applicant_id', False))
+            result['choose_new_friend'] = True
+            result['new_friend_name'] = applicant_to_change.partner_name
+            result['new_friend_id'] = applicant_to_change.id
+            result['friends'] = self._get_friends_head()
+            return result
+
         applicant = self.sudo().search([('ref_user_id', '=', user_id.id), ('company_id', 'in', self.env.companies.ids)])
         applicants_hired = applicant.filtered(lambda r: r.referral_state == 'hired')
-        applicant_name = {applicant_hired.friend_id.id: applicant_hired.partner_name for applicant_hired in applicants_hired}
         applicant_without_friend = applicants_hired.filtered(lambda r: not r.friend_id)
 
-        # If there are applicant hired without friend and available friends.
-        available_friend_count = self.env['hr.referral.friend'].search_count([])
-        if bool(applicant_without_friend) and (len(applicants_hired) - len(applicant_without_friend) < available_friend_count):
+        if applicant_without_friend and self.env['hr.referral.friend'].search_count([]):
             result['choose_new_friend'] = True
             result['new_friend_name'] = applicant_without_friend[0].partner_name
             result['new_friend_id'] = applicant_without_friend[0].id
-
-            result['friends'] = self._get_friends_head(applicant_name)
+            result['friends'] = self._get_friends_head()
             return result
 
-        result['friends'] = self._get_friends(applicant_name)
+        result['friends'] = applicants_hired._get_friend_data(limit=friend_limit)
 
-        referal_points = self.env['hr.referral.points'].search([('ref_user_id', '=', user_id.id)])
-        result['point_received'] = sum(referal_points.filtered(lambda x: not x.hr_referral_reward_id).mapped('points'))
-        result['point_to_spend'] = sum(referal_points.mapped('points'))
+        referral_points = self.env['hr.referral.points'].search([('ref_user_id', '=', user_id.id)])
+        result['point_received'] = sum(referral_points.filtered(lambda x: not x.hr_referral_reward_id).mapped('points'))
+        result['point_to_spend'] = sum(referral_points.mapped('points'))
 
         # Employee comes for the first time on this app
         if not user_id.hr_referral_level_id:
@@ -313,7 +290,7 @@ class HrApplicant(models.Model):
         next_level = self.env['hr.referral.level'].search([('points', '>', current_level.points)], order='points asc', limit=1)
 
         result['level'] = {
-            'image': current_level.image,
+            'image': current_level.image.to_base64(),
             'name': current_level.name,
             'points': current_level.points
         }
@@ -332,7 +309,7 @@ class HrApplicant(models.Model):
             'progress': len(applicant.filtered(lambda r: r.referral_state == 'progress')),
         }
 
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         messages = self.env['hr.referral.alert'].search([
             ('active', '=', True), ('dismissed_user_ids', 'not in', self.env.user.id),
             '|', ('date_from', '<=', today), ('date_from', '=', False),
@@ -369,14 +346,23 @@ class HrApplicant(models.Model):
     def default_get(self, fields):
         # To set the source_id as "Referral" instead of utm_source that was generated for every individual referrer
         values = super().default_get(fields)
-        utm_source_referral = self.env.ref('utm.utm_source_referral', raise_if_not_found=False)
         if (
             'ref_user_id' in fields
-            and (utm_source := values.get('source_id'))
-            and (user := self.env['res.users'].search([('utm_source_id', '=', utm_source)], limit=1))
+            and (utm_reference := values.get('utm_reference'))
         ):
-            values['ref_user_id'] = user.id
-            values['source_id'] = utm_source_referral.id if utm_source_referral else False
+            ref_user_id = False
+            if isinstance(utm_reference, str):  # reference field in the form 'res.users,42'
+                if utm_reference.startswith('res.users,'):
+                    ref_user_id = int(utm_reference.split(',')[1])
+            else:  # browserecord
+                if utm_reference._name == 'res.users':
+                    values['ref_user_id'] = utm_reference.id
+
+            if ref_user_id:
+                values['ref_user_id'] = ref_user_id
+                if 'source_id' in fields and not values.get('source_id'):
+                    utm_source_referral = self.env['utm.mixin']._utm_ref('utm.utm_source_referral')
+                    values['source_id'] = utm_source_referral.id if utm_source_referral else False
         return values
 
     def reset_applicant(self):
@@ -389,4 +375,4 @@ class HrRecruitmentStage(models.Model):
     _inherit = "hr.recruitment.stage"
 
     points = fields.Integer('Points', help="Amount of points that the referent will receive when the applicant will reach this stage")
-    use_in_referral = fields.Boolean('Show in Referrals', help="This option is used in app 'Referrals'. If checked, the stage is displayed in 'Referrals Dashboard' and points are given to the employee.")
+    use_in_referral = fields.Boolean('Show to Referrer', help="This option is used in app 'Referrals'. If checked, the stage is displayed in 'Referrals Dashboard' and points are given to the employee.")

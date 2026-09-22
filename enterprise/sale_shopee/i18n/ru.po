@@ -4,14 +4,15 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-17 03:15+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-04 18:03+0000\n"
+"PO-Revision-Date: 2026-09-18 02:45+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "sale_shopee/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,29 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_shopee
+#: model:ir.module.module,description:base.module_sale_shopee
+msgid ""
+"\n"
+"Import your Shopee orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and shops\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(item_id or model_id in\n"
+"  Shopee)\n"
+"* Support for both Fulfillment by Shopee (FBS), Fulfillment by Merchant "
+"(FBM) and Fulfilled by Cross\n"
+"  Border Seller (Hybrid):\n"
+"* FBS: Importing the completed orders\n"
+"* FBM/Hybrid: Delivery information is fetched from Shopee, track and "
+"synchronize the stock level to\n"
+"  Shopee\n"
+msgstr ""
 
 #. module: sale_shopee
 #: model:mail.template,body_html:sale_shopee.order_sync_failure
@@ -60,16 +83,16 @@ msgstr ""
 "li>\n"
 "                        <li>Откройте форму аккаунта Shopee, на котором был "
 "размещен заказ.</li>\n"
-"                        <li>Перейдите на вкладку «Отслеживание заказа».</"
-"li>\n"
+"                        <li>Перейдите на вкладку «Отслеживание заказа».</li>"
+"\n"
 "                        <li>Установите дату для «<em>Синхронизация последних "
 "заказов</em>», которая предшествует последнему обновлению статуса заказа.</"
 "li>\n"
-"                        <li>Сохраните изменения и нажмите на кнопку "
-"<em>СИНХРОНИЗИРОВАТЬ ЗАКАЗЫ</em>.</li>\n"
+"                        <li>Сохраните изменения и нажмите на кнопку <em>"
+"СИНХРОНИЗИРОВАТЬ ЗАКАЗЫ</em>.</li>\n"
 "                    </ol>\n"
 "                \n"
-"                <p>Если проблема сохраняется, обратитесь в <a href=\"https://"
+"                <p>Если проблема повторится, обратитесь в <a href=\"https://"
 "www.odoo.com/help/\">службу поддержки Odoo</a>.</p>\n"
 "            </div>\n"
 "        "
@@ -169,20 +192,24 @@ msgstr ""
 "                    border-collapse: collapse;\n"
 "                }\n"
 "\n"
+"\n"
 "                .shopee_table th,\n"
 "                .shopee_table td {\n"
 "                    border: 1px solid #888;\n"
 "                }\n"
 "\n"
+"\n"
 "                .shopee_table th {\n"
 "                    white-space: nowrap;\n"
 "                }\n"
+"\n"
 "\n"
 "                .shopee_table thead th {\n"
 "                    padding: 0.5em 0.5em;\n"
 "                    text-align: center;\n"
 "                    border-bottom: 1px solid #888;\n"
 "                }\n"
+"\n"
 "\n"
 "                .shopee_table tbody th,\n"
 "                .shopee_table tbody td {\n"
@@ -217,7 +244,7 @@ msgstr ""
 "Shopee произошла неизвестная ошибка.\n"
 "                                    К сожалению, необходимо вручную "
 "проверить актуальность статуса заказа.\n"
-"                                    Если проблема сохраняется, обратитесь в "
+"                                    Если проблема повторится, обратитесь в "
 "<a href=\"https://www.odoo.com/help/\">службу поддержки Odoo</a>.\n"
 "                                </t>\n"
 "                            </td>\n"
@@ -324,8 +351,8 @@ msgstr ""
 "            <body><div>\n"
 "                <p>При синхронизации остатков товаров для магазина Shopee с "
 "номером\n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></"
-"b>\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></b>"
+"\n"
 "                    произошла ошибка.</p>\n"
 "                <p>Мы получили следующую информацию о возникшей проблеме от "
 "Shopee: </p>\n"
@@ -339,8 +366,8 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></"
-"th>\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></th>"
+"\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
@@ -348,7 +375,7 @@ msgstr ""
 "Shopee произошла неизвестная ошибка.\n"
 "                                    К сожалению, необходимо вручную "
 "проверить, корректно ли указано доступное количество товара.\n"
-"                                    Если проблема сохраняется, обратитесь в "
+"                                    Если проблема повторится, обратитесь в "
 "<a href=\"https://www.odoo.com/help/\">службу поддержки Odoo </a>.\n"
 "                                </t>\n"
 "                            </td>\n"
@@ -389,14 +416,14 @@ msgstr ""
 "значения expires_in (срок действия истекает), полученного от Shopee."
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
+msgid "Account"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Account Name"
 msgstr "Имя аккаунта"
-
-#. module: sale_shopee
-#: model:ir.ui.menu,name:sale_shopee.accounts_menu
-msgid "Accounts"
-msgstr "Аккаунты"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__active
@@ -476,7 +503,13 @@ msgid "Authorization Remaining Days"
 msgstr "Осталось дней до окончания авторизации"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Authorize New Shop"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "Authorize Shop"
 msgstr "Авторизовать магазин"
 
@@ -485,11 +518,6 @@ msgstr "Авторизовать магазин"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Bundle Deal"
 msgstr "Комплект товаров"
-
-#. module: sale_shopee
-#: model_terms:ir.ui.view,arch_db:sale_shopee.quick_create_account_form
-msgid "Cancel"
-msgstr "Отменить"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__cancelled
@@ -536,6 +564,11 @@ msgid "Create Shopee Accounts"
 msgstr "Создать аккаунты Shopee"
 
 #. module: sale_shopee
+#: model:ir.model,name:sale_shopee.model_shopee_shop_create
+msgid "Create Shopee Shop Wizard"
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model,website_form_label:sale_shopee.model_res_partner
 msgid "Create a Customer"
 msgstr "Создать клиента"
@@ -544,6 +577,7 @@ msgstr "Создать клиента"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_uid
 msgid "Created by"
 msgstr "Создано:"
 
@@ -551,6 +585,7 @@ msgstr "Создано:"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_date
 msgid "Created on"
 msgstr "Дата создания:"
 
@@ -581,6 +616,7 @@ msgstr "Продавец по умолчанию"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__display_name
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__display_name
 msgid "Display Name"
@@ -686,6 +722,7 @@ msgstr "Фулфилмент от Shopee"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__id
 msgid "ID"
@@ -712,6 +749,11 @@ msgstr ""
 #: model:ir.model.fields,help:sale_shopee.field_shopee_account__company_ids
 msgid "If this field is empty, all companies will be allowed."
 msgstr "Если поле не заполнено, будут разрешены все компании."
+
+#. module: sale_shopee
+#: model:ir.module.module,summary:base.module_sale_shopee
+msgid "Import Shopee orders and sync deliveries"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_shop__status__inactive
@@ -755,6 +797,7 @@ msgstr "Дата последней синхронизации"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_uid
 msgid "Last Updated by"
 msgstr "Последнее обновление:"
 
@@ -762,6 +805,7 @@ msgstr "Последнее обновление:"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_date
 msgid "Last Updated on"
 msgstr "Дата последнего обновления:"
 
@@ -769,6 +813,11 @@ msgstr "Дата последнего обновления:"
 #: model_terms:ir.ui.view,arch_db:sale_shopee.view_order_form
 msgid "Lock"
 msgstr "Заблокировать"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Manage Accounts"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__name
@@ -783,8 +832,19 @@ msgstr "Необходимо повторно запланировать дос�
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_list
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_list
 msgid "New"
 msgstr "Новый"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "New Account"
+msgstr ""
+
+#. module: sale_shopee
+#: model:ir.actions.act_window,name:sale_shopee.shopee_shop_create_wizard_action
+msgid "New Shop"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__not_available
@@ -795,6 +855,12 @@ msgstr "Недоступно"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__order_count
 msgid "Order Count"
 msgstr "Кол-во заказов"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Order Discount"
+msgstr "Скидка по заказу"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
@@ -837,6 +903,16 @@ msgstr "Продвижение товара"
 #: model:ir.model,name:sale_shopee.model_product_product
 msgid "Product Variant"
 msgstr "Вариант товара"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid ""
+"Promotion: %(promotion_type)s - id: %(promotion_id)d\n"
+"Original price: %(price)s"
+msgstr ""
+"Акция: %(promotion_type)s - id: %(promotion_id)d\n"
+"Исходная цена: %(price)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__ready
@@ -905,6 +981,13 @@ msgid "Save And Authorize"
 msgstr "Сохранить и авторизовать"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid ""
+"Select the Shopee account on which to authorize the new shop, or register "
+"another account."
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__confirmed
 msgid "Shipment Arranged"
 msgstr "Доставка запланирована"
@@ -929,6 +1012,12 @@ msgstr "Отправлено через Shopee"
 #: code:addons/sale_shopee/models/stock_picking.py:0
 msgid "Shipping Label Not Ready"
 msgstr "Транспортная этикетка не готова"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Shipping: %(carrier)s"
+msgstr "Доставка: %(carrier)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__shop_id
@@ -977,14 +1066,9 @@ msgid "Shopee"
 msgstr "Shopee"
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_account.py:0
-msgid "Shopee API Account - %(partner_id)s"
-msgstr "Аккаунт API Shopee - %(partner_id)s"
-
-#. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_shopee_account
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__account_id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__account_id
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shopee Account"
 msgstr "Аккаунт Shopee"
@@ -1005,6 +1089,11 @@ msgstr "Корректировка суммы Shopee"
 #: model:ir.model.fields,field_description:sale_shopee.field_res_users__shopee_buyer_identifier
 msgid "Shopee Buyer ID"
 msgstr "ID покупателя Shopee"
+
+#. module: sale_shopee
+#: model:ir.module.module,shortdesc:base.module_sale_shopee
+msgid "Shopee Connector"
+msgstr ""
 
 #. module: sale_shopee
 #. odoo-python
@@ -1037,7 +1126,6 @@ msgstr "ID товара Shopee"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 #: model:ir.actions.act_window,name:sale_shopee.sale_shopee_item_action
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__shopee_item_ids
-#: model:ir.ui.menu,name:sale_shopee.items_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_item_view_list
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Shopee Items"
@@ -1065,6 +1153,11 @@ msgstr "Заказ Shopee %(order)s в магазине mock_shopee_shop"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Shopee Order %(shopee_order_ref)s at %(shop_name)s"
 msgstr "Заказ Shopee %(shopee_order_ref)s в магазине %(shop_name)s"
+
+#. module: sale_shopee
+#: model:product.template,name:sale_shopee.default_discount_product_product_template
+msgid "Shopee Order Discount"
+msgstr "Скидка по заказу Shopee"
 
 #. module: sale_shopee
 #. odoo-python
@@ -1211,6 +1304,7 @@ msgstr "Shopee: синхронизировать транспортные эти
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_account.py:0
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__shop_ids
+#: model:ir.ui.menu,name:sale_shopee.shops_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shops"
 msgstr "Магазины"
@@ -1281,6 +1375,11 @@ msgstr ""
 "Конечная точка API для обращений к API Shopee. Существуют продакшн и "
 "тестовые конечные точки. Выберите ту, которая географически ближе к целевому "
 "маркетплейсу."
+
+#. module: sale_shopee
+#: model:ir.model.fields,help:sale_shopee.field_shopee_shop_create__account_id
+msgid "The Shopee account on which the new shop is authorized."
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_sale_order__shopee_shop_id
@@ -1444,22 +1543,6 @@ msgid "You are not allowed to access this page."
 msgstr "У вас нет доступа к этой странице."
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid "[%(sku)s] %(product_name)s"
-msgstr "[%(sku)s] %(product_name)s"
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid ""
-"[%(sku)s] %(product_title)s\n"
-"Promotion: %(promotion_type)s - id: %(promotion_id)d"
-msgstr ""
-"[%(sku)s] %(product_title)s\n"
-"Акция: %(promotion_type)s - ID: %(promotion_id)d"
-
-#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "e.g. American Market"
 msgstr "например, Американский рынок"
@@ -1479,10 +1562,10 @@ msgstr "id"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "shop_id"
-msgstr ""
+msgstr "shop_id"
 
 #. module: sale_shopee
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "shopee_shop_id"
-msgstr ""
+msgstr "shopee_shop_id"

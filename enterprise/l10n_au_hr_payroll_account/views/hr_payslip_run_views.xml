@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="hr_payslip_run_kanban_inherit_l10n_au_hr_payroll" model="ir.ui.view">
+    <record id="hr_payrun_payslip_kanban_card_view" model="ir.ui.view">
         <field name="name">hr.payslip.run.kanban.inherit.l10n_au_hr_payroll</field>
         <field name="model">hr.payslip.run</field>
-        <field name="inherit_id" ref="hr_payroll.hr_payslip_run_view_kanban"/>
+        <field name="inherit_id" ref="hr_payroll.hr_payrun_payslip_kanban_card_view"/>
         <field name="arch" type="xml">
-            <t t-name='menu' position="inside">
+            <t t-name='payrun_menu' position="inside">
                 <button class="oe_stat_button" type="object" name="action_open_payment_batch"
                         options="{'is_smart_button': true}"
-                        icon="fa-dollar" invisible="not l10n_au_payment_batch_id">
+                        icon="attach_money" invisible="not l10n_au_payment_batch_id">
                     <div class="o_stat_info">
                         <span class="o_stat_text">Payment Batch</span>
                         <span class="o_stat_value text-center">
@@ -16,7 +16,7 @@
                         </span>
                     </div>
                 </button>
-                <button name="action_open_stp" class="oe_stat_button" icon="fa-book"
+                <button name="action_open_stp" class="oe_stat_button" icon="book"
                         type="object" help="Generated Payslips"
                         options="{'is_smart_button': true}"
                         invisible="l10n_au_stp_status not in ['ready', 'sent'] or country_code != 'AU'">
@@ -25,11 +25,24 @@
                         <span class="o_stat_value"><field name="l10n_au_stp_count"/></span>
                     </div>
                 </button>
+                <button name="action_open_superstream" class="oe_stat_button" icon="payments"
+                        type="object" help="View Superstreams"
+                        options="{'is_smart_button': true}"
+                        invisible="l10n_au_superstream_submitted or country_code != 'AU' or state == '01_ready'">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Super Submissions</span>
+                    </div>
+                </button>
             </t>
             <button name="action_paid" position="before">
                 <button name="action_open_stp"
                     string="Submit to ATO" type="object" class="btn-primary"
+                    options="{'is_priority': True}"
                     invisible="l10n_au_stp_status != 'ready' or country_code != 'AU'"/>
+                <button name="action_open_superstream"
+                    string="Submit to Super" type="object" class="btn-primary"
+                    options="{'is_priority': True}"
+                    invisible="l10n_au_superstream_submitted or country_code != 'AU' or state == '01_ready'"/>
                 <button name="action_register_payment"
                         type="object" string="Pay"
                         invisible="state != '02_close' or l10n_au_stp_status != 'sent' or country_code != 'AU'"

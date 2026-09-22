@@ -1,16 +1,17 @@
 import { renderToString } from "@web/core/utils/render";
 import {
     startHelperLines,
-    offset,
     normalizePosition,
     generateRandomId,
-    startSmoothScroll,
+    edgeScrollStep,
+    startEdgeScroll,
+    getOffsetFromIframe,
     startResize,
-    getAutoScrollOffset,
+    getIframeViewerContainer,
 } from "@sign/components/sign_request/utils";
-import { isMobileOS } from "@web/core/browser/feature_detection";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
+import { setRecurringAnimationFrame } from "@web/core/utils/timing";
 
 /**
  * Mixin that adds edit features into PDF_iframe classes like drag/drop, resize, helper lines
@@ -147,11 +148,6 @@ export const EditablePDFIframeMixin = (pdfClass) =>
             this.font = font;
         }
 
-        setupDragAndDrop() {
-            this.startDragAndDrop();
-            this.helperLines = startHelperLines(this.root);
-        }
-
         /**
          * Callback executed when a sign item is resized
          * @param {SignItem} signItem
@@ -223,30 +219,51 @@ export const EditablePDFIframeMixin = (pdfClass) =>
         }
 
         /**
-         * @override
+         * Returns the position of mouse pointer inside the iframe viewer
+         * @param {mouseX} clientX 
+         * @param {mouseY} clientY 
+         * @returns 
          */
-        renderSignItem() {
-            const signItem = super.renderSignItem(...arguments);
-            if (isMobileOS()) {
-                for (const node of signItem.querySelectorAll(
-                    ".o_sign_config_handle, .o_resize_handler"
-                )) {
-                    node.classList.add("d-none");
-                }
+        getMousePositionInViewerContainer(clientX, clientY) {
+            const rect = this.viewerContainer.getBoundingClientRect();
+            const {scrollTop, scrollLeft} = this.viewerContainer;
+
+            const mousePosition = {
+                x: (clientX - rect.left) + scrollLeft,
+                y: (clientY - rect.top) + scrollTop
             }
-            return signItem;
+
+            return mousePosition;
         }
 
         /**
-         * Handles the selection events of multiple sign elements
+         * Attaches event listeners to a sign item to enable and manage dragging,
+         * multi-dragging, and resizing interactions.
+         *
+         * @param {Object} signItem - The sign item object to which the interactions will be attached.
         */
-        startMultiElementsSelect() {
-            this.animationFrameId = null;
-            this.root.addEventListener('mouseup', (e) => this.onMouseUp(e));
+        startSignItemInteractions(signItem) {
+            // Add listeners to enable multi-dragging functionality
+            const handle = signItem.el.querySelector(".o_sign_config_handle");
+            handle.setAttribute("draggable", true);
+            handle.addEventListener("dragstart", (e) => this.onMultiDragStart(e));
+            handle.addEventListener("dragend", (e) => this.onMultiDragEnd(e));
+        }
 
-            this.viewerContainer = this.root.querySelector("#viewerContainer");
-            this.viewerContainer.addEventListener('mousedown', (e) => this.onMouseDown(e));
-            this.viewerContainer.addEventListener('mousemove', (e) => this.onMouseMove(e));
+        /**
+         * Adds event listeners to the viewer container and pages
+         * to support multi-drag and multi-select functionality.
+        */
+        startMultiDragAndDrop() {
+            this.viewerContainer = getIframeViewerContainer(this);
+            this.viewerContainer.addEventListener('mousedown', (e) => this.onMultiSelectMouseDown(e));
+            this.root.querySelectorAll(".page").forEach((page) => {
+                if (!page.hasAttribute("updated")) {
+                    page.addEventListener("dragover", (e) => this.onMultiDragOver(e));
+                    page.addEventListener("drop", (e) => this.handleMultiItemDrop(e));
+                    page.setAttribute("updated", true);
+                }
+            });
         }
 
         /**
@@ -254,11 +271,12 @@ export const EditablePDFIframeMixin = (pdfClass) =>
          * It handles the selection rectangle drawing start
          * @param {MouseEvent} e
         */
-        onMouseDown(e) {
+        onMultiSelectMouseDown(e) {
             const isInSelectedElement = this.selectedElements?.some(element => element.el.contains(e.target));
             if (isInSelectedElement) {
-                return;
-            }
+                return; // return in case it's the starting of multiDragging
+            } 
+
             /**
              * Only allow drawing the selection rectangle in empty spaces
              * where the cursor is auto and the left button is pressed.
@@ -270,15 +288,40 @@ export const EditablePDFIframeMixin = (pdfClass) =>
             }
 
             e.preventDefault();
-            this.resetSelection();
+            this.resetSelection(); // Reset selection in case the event was triggered by a mouse click
 
             // Disable text selection while dragging to create selection rectangle
             this.viewerContainer.style.userSelect = 'none';
 
             // Start the selection rectangle drawing process
+            this.mousePosition = this.getMousePositionInViewerContainer(e.clientX, e.clientY);
             this.startPos = this.mousePosition;
-            this.isDragging = true;
+            this.isMultiSelecting = true;
+            this.selectionAnimationFrameCancel = setRecurringAnimationFrame(this.updateSelectionRect.bind(this));
             this.updateSelectionRect();
+
+            const onMouseMove = (e) => this.onMultiSelectMouseMove(e);
+            this.viewerContainer.addEventListener('mousemove', onMouseMove);
+
+            // Trigger multiSelect termination on mouseup, blur, and mouse leave
+            const multiSelectEndingEvents = ["mouseup", "blur", "mouseleave", "contextmenu"];
+            const onMultiSelectEnd = (e) => this.onMultiSelectEnd(e);
+            multiSelectEndingEvents.forEach(eventType => this.viewerContainer.addEventListener(eventType, onMultiSelectEnd));
+
+            this.multiSelectCleanups = []; // cleanup functions to be called at the end of multi selection
+            this.multiSelectCleanups.push(() => {
+                this.viewerContainer.style.userSelect = '';
+                this.startPos = null;
+                this.isMultiSelecting = false;
+                this.viewerContainer.removeEventListener('mousemove', onMouseMove);
+                multiSelectEndingEvents.forEach(eventType => this.viewerContainer.removeEventListener(eventType, onMultiSelectEnd));
+                // Clear the canvas to remove the selection rectangle.
+                // Then refresh the sign items to redraw any other persistent drawings,
+                // such as the radio button line in between them.
+                // TODO: Optimize in the future to support multiple drawing canvases
+                this.clearCanvas();
+                this.refreshSignItems();
+            });
         }
 
         /**
@@ -287,33 +330,20 @@ export const EditablePDFIframeMixin = (pdfClass) =>
          * It also handles the auto scroll if selection occurs in multiple pages
          * @param {MouseEvent} e
         */
-        onMouseMove(e) {
-            const rect = this.viewerContainer.getBoundingClientRect();
-            const {scrollTop, scrollLeft} = this.viewerContainer;
-
-            this.mousePosition = {
-                x: (e.clientX - rect.left) + scrollLeft,
-                y: (e.clientY - rect.top) + scrollTop
-            }
-
-            if (this.isDragging) {
+        onMultiSelectMouseMove(e) {
+            if (this.isMultiSelecting) {
                 e.preventDefault();
-
-                if (!this.animationFrameId) {
-                    this.animationFrameId = requestAnimationFrame(() => this.updateSelectionRect());
-                }
-
-                if (this.autoScroll) {
-                    this.autoScroll.updatePosition({
-                        x: e.clientX - rect.left,
-                        y: e.clientY - rect.top
-                    });
-                } else {
-                    this.autoScroll = getAutoScrollOffset(
-                        this.viewerContainer,
-                        {x: e.clientX - rect.left, y: e.clientY - rect.top}
-                    );
-                }
+                this.mousePosition = this.getMousePositionInViewerContainer(e.clientX, e.clientY);
+                const mouseIframeOffset = getOffsetFromIframe(
+                    document.querySelector(".o_sign_documents_container"), 
+                    e.clientX, 
+                    e.clientY
+                );
+                edgeScrollStep(
+                    this.root.querySelector('#viewerContainer'), 
+                    mouseIframeOffset, 
+                    {boundary: 0.15, maxDragAmount: 25}
+                ); // Manually scroll the viewer container
             }
         }
 
@@ -322,25 +352,11 @@ export const EditablePDFIframeMixin = (pdfClass) =>
          * It stops the selection rectangle drawing process
          * It updates the list of selected elements and clears the canvas
         */
-        onMouseUp() {
-            if (this.isDragging) {
-                // Enable text selection again
-                this.viewerContainer.style.userSelect = '';
-
+        onMultiSelectEnd() {
+            if (this.isMultiSelecting) {
                 this.updateSelectedElementsList();
-                this.isDragging = false;
-                this.clearCanvas();
-
-                // Stop the animation frame if it is in progress
-                if (this.animationFrameId) {
-                    cancelAnimationFrame(this.animationFrameId);
-                    this.animationFrameId = null;
-                }
-
-                // Stop the auto scroll if it is in progress
-                if (this.autoScroll) {
-                    this.autoScroll.stopScrolling();
-                    this.autoScroll = null;
+                while (this.multiSelectCleanups?.length) {
+                    this.multiSelectCleanups.pop()();
                 }
             }
         }
@@ -360,12 +376,8 @@ export const EditablePDFIframeMixin = (pdfClass) =>
          * Recursively updates the selection rectangle until the mouse is released
         */
         updateSelectionRect() {
-            if (this.isDragging) {
-                this.clearCanvas();
+            if (this.isMultiSelecting) {
                 this.drawSelectionRect();
-                this.animationFrameId = requestAnimationFrame(() => this.updateSelectionRect());
-            } else {
-                this.animationFrameId = null;
             }
         }
 
@@ -391,16 +403,24 @@ export const EditablePDFIframeMixin = (pdfClass) =>
             this.clearCanvas();
             const canvas = this.getCanvas();
             const ctx = canvas.getContext('2d');
-            const width = this.mousePosition.x - this.startPos.x;
-            const height = this.mousePosition.y - this.startPos.y;
+
+            // Normalize mouse coordinates to canvas space
+            const scale = this.getCanvasScale();
+            const startX = this.startPos.x / scale;
+            const startY = this.startPos.y / scale;
+            const mouseX = this.mousePosition.x / scale;
+            const mouseY = this.mousePosition.y / scale;
+            const width = mouseX - startX;
+            const height = mouseY - startY;
+
             canvas.style.position = 'absolute';
             canvas.style.zIndex = 100;
-            ctx.strokeStyle = 'rgb(89, 105, 196, 0.3)';
-            ctx.fillStyle = 'rgb(89, 105, 196, 0.3)';
+            ctx.strokeStyle = 'rgba(89, 105, 196, 0.35)';
+            ctx.fillStyle = 'rgba(89, 105, 196, 0.1)';
             ctx.lineWidth = 1;
             ctx.setLineDash([]);
-            ctx.fillRect(this.startPos.x, this.startPos.y, width, height);
-            ctx.strokeRect(this.startPos.x, this.startPos.y, width, height);
+            ctx.fillRect(startX, startY, width, height);
+            ctx.strokeRect(startX, startY, width, height);
         }
 
         /**
@@ -480,7 +500,7 @@ export const EditablePDFIframeMixin = (pdfClass) =>
          * and the ratio of the (x, y) position inside the page.
          */
         getPositionData(x, y, itemWidth = 0, itemHeight = 0) {
-            const viewerContainer = this.viewerContainer || this.root.querySelector("#viewerContainer");
+            const viewerContainer = this.viewerContainer || getIframeViewerContainer(this);
 
             for (let page = 1; page <= this.pageCount; page++) {
                 const pageElement = this.getPageContainer(page);
@@ -636,10 +656,8 @@ export const EditablePDFIframeMixin = (pdfClass) =>
         renderSignItems() {
             super.renderSignItems();
             if (this.allowEdit) {
-                this.startDragAndDrop();
-                this.startMultiElementsSelect();
+                this.startMultiDragAndDrop();
                 this.helperLines = startHelperLines(this.root);
-                this.setupDragAndDrop();
             }
         }
 
@@ -660,7 +678,14 @@ export const EditablePDFIframeMixin = (pdfClass) =>
                 signItem.data.page = targetPage;
                 this.signItems[targetPage][signItem.data.id] = signItem;
                 delete this.signItems[initialPage][signItem.data.id];
-                page.appendChild(signItemEl.parentElement.removeChild(signItemEl));
+
+                // Check if the parent element exists before removing the sign element,
+                // since the parent page might not be loaded due to iframe lazy loading.
+                if (signItemEl.parentElement && signItemEl.parentElement.contains(signItemEl)) {
+                    signItemEl.parentElement.removeChild(signItemEl);
+                }
+
+                page.appendChild(signItemEl);
             }
             Object.assign(signItem.data, {
                 posX,
@@ -672,44 +697,62 @@ export const EditablePDFIframeMixin = (pdfClass) =>
                 left: `${posX * 100}%`,
                 visibility: "visible",
             });
-            startResize(signItem, this.onResizeItem.bind(this));
         }
 
-        setIsActive(active) {
-            this.isActive = active;
-        }
-
-        startDragAndDrop() {
-            this.root.querySelectorAll(".page").forEach((page) => {
-                if (!page.hasAttribute("updated")) {
-                    page.addEventListener("dragover", (e) => this.onDragOver(e));
-                    page.addEventListener("drop", (e) => this.onDrop(e));
-                    page.setAttribute("updated", true);
-                }
-            });
-
-            document.querySelectorAll(".o_sign_field_type_button").forEach((sidebarItem) => {
-                if (!sidebarItem.hasAttribute(`updated-${this.documentId}`)) {
-                    sidebarItem.setAttribute("draggable", true);
-                    sidebarItem.addEventListener("dragstart", (e) => this.onSidebarDragStart(e));
-                    sidebarItem.addEventListener("dragend", (e) => this.onSidebarDragEnd(e));
-                    sidebarItem.setAttribute(`updated-${this.documentId}`, true);
-                }
-            });
-        }
-
-        onDragStart(e) {
-            this.setCanvasVisibility("hidden");
-            const signElement = e.currentTarget.parentElement.parentElement.parentElement;
-            const isSelectedItemDrag = this.selectedElements?.some(item => item.el === signElement);
-
-            /* If the sign element is picked up and there are multiple selected elements,
-            then start multi-drag */
-            if (isSelectedItemDrag && this.selectedElements.length > 1) {
-                this.startMultiDrag(e);
-            } else {
-                this.startSingleDrag(e, signElement);
+        /**
+         * Queues a page to be refreshed later.
+         *
+         * This method ensures that the `pagesToRefresh` list is initialized
+         * if it hasn't been already, then appends the given page to the list.
+         * These pages are typically refreshed as part of a batch operation
+         * to update their sign item positions.
+         *
+         * @param {Object} page - The page object to be marked for refresh.
+        */
+        markPageForItemPositionRefresh(page) {
+            if (!this.pagesToRefreshPositions) {
+                this.pagesToRefreshPositions = [];
             }
+            this.pagesToRefreshPositions.push(Number(page.dataset.pageNumber));
+        }
+
+        /**
+         * Refreshes the positions of sign items on all pages marked for refresh.
+         * Typically called after layout changes or cleanup operations.
+         *
+         * @returns {void}
+        */
+        refreshSignItemPositions() {
+            while (this.pagesToRefreshPositions && this.pagesToRefreshPositions.length) {
+                const itemsToUpdate = this.signItems[this.pagesToRefreshPositions.pop()];
+                if (itemsToUpdate) {
+                    Object.values(itemsToUpdate).forEach(signItem => {
+                        if (signItem && signItem.el && signItem.data) {
+                            const { posX, posY } = signItem.data;
+                            const element = signItem.el;
+                            element.style.top = `${posY * 100}%`;
+                            element.style.left = `${posX * 100}%`;
+                        }
+                    });
+                }
+            }
+        }
+
+        /**
+         * finds the page number of the passed sign item
+         * @param {Set} targetItem 
+         * @returns page number of passed sign item
+         */
+        findPageForSignItem(targetItem) {
+            for (const [page, items] of Object.entries(this.signItems)) {
+                for (const item of Object.values(items)) {
+                    if (item === targetItem) {
+                        return page;
+                    }
+                }
+            }
+
+            return null; // not found
         }
 
         /**
@@ -721,12 +764,14 @@ export const EditablePDFIframeMixin = (pdfClass) =>
             this.multiDragState = {
                 items: this.selectedElements.map(signItem => {
                     const ItemRect = signItem.el.getBoundingClientRect();
-                    const pageElement = signItem.el.closest('.page');
+                    const pageNumber = 
+                        Number(signItem.el.parentElement.dataset.pageNumber) 
+                        || this.findPageForSignItem(signItem); // In case the element’s page is not rendered yet (iframe uses lazy loading)
                     const offsetX = e.clientX - ItemRect.left;
                     const offsetY = e.clientY - ItemRect.top;
                     return {
                         signItem,
-                        pageNumber: Number(pageElement.dataset.pageNumber),
+                        pageNumber: pageNumber,
                         offsetX: offsetX,
                         offsetY: offsetY
                     };
@@ -784,55 +829,49 @@ export const EditablePDFIframeMixin = (pdfClass) =>
                 this.selectedElements.forEach(item => item.el.style.visibility = 'hidden');
             });
 
-            this.scrollCleanup = startSmoothScroll(
-                this.viewerContainer,
-                dragContainer,
-                null,
-                this.helperLines
-            );
-            e.dataTransfer.setData("isMultiDrag", "true");
+            this.mouseOffset = {x: 0, y: 0};
+            this.scrollCleanup = startEdgeScroll(this.root.querySelector('#viewerContainer'), this.mouseOffset);
+            this.isMultiDrag = true;
         }
 
-        /**
-         * Starts single-drag for a sign element
-         * @param {MouseEvent} e - The mouse event
-         * @param {HTMLElement} signElement - The sign element to drag
-        */
-        startSingleDrag(e, signElement) {
-            const page = signElement.parentElement;
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("page", page.dataset.pageNumber);
-            e.dataTransfer.setData("id", signElement.dataset.id);
+        onMultiDragStart(e) {
+            this.setCanvasVisibility("hidden");
+            const signElement = e.currentTarget.parentElement.parentElement.parentElement;
+            const isSelectedItemDrag = this.selectedElements?.some(item => item.el === signElement);
 
-            // Align drag image with cursor, save offsets for subtracting them on onDrop.
-            const rect = signElement.getBoundingClientRect();
-            const offsetX = e.clientX - rect.left;
-            const offsetY = e.clientY - rect.top;
-            e.dataTransfer.setDragImage(signElement, offsetX, offsetY);
-            e.dataTransfer.setData("offsetX", offsetX);
-            e.dataTransfer.setData("offsetY", offsetY);
+            /* If the sign element is picked up and there are selected elements,
+            then start multi-drag */
+            if (isSelectedItemDrag && this.selectedElements.length > 0) {
+                this.startMultiDrag(e);
+            } else {
+                e.preventDefault(); // prevent default so it doesn't intercept the dragging framework in case there is no selected elements to be dragged
+            }
+        }
 
-            // workaround to hide element while keeping the drag image visible
-            requestAnimationFrame(() => {
-                if (signElement) {
-                    signElement.style.visibility = "hidden";
-                }
-            }, 0);
-            this.scrollCleanup = startSmoothScroll(
-                this.root.querySelector("#viewerContainer"),
-                signElement,
-                null,
-                this.helperLines,
-                offsetX,
-                offsetY,
+        onMultiDragOver(e) {
+            e.preventDefault();
+            if (!this.isMultiDrag || !this.multiDragState) return;
+
+            // Update the mouseIframeOffset object to trigger edge scrolling based on the new mouse position
+            const mouseIframeOffset = getOffsetFromIframe(
+                document.querySelector(".o_sign_documents_container"), 
+                e.clientX, 
+                e.clientY
             );
+            this.mouseOffset.x = mouseIframeOffset.x;
+            this.mouseOffset.y = mouseIframeOffset.y;
+
+            e.dataTransfer.dropEffect = "move";
         }
 
         /**
          * Ends the drag operation
          * @param {MouseEvent} e - The mouse drag end event
         */
-        onDragEnd(e) {
+        onMultiDragEnd(e) {
+            if (!this.isMultiDrag) return;
+
+            this.isMultiDrag = false;
             this.scrollCleanup();
             // Make sign item visible again after dragging ends. It is a mandatory step when
             // moving items out of bounds since in that flow the items don't get re-rendered.
@@ -845,138 +884,17 @@ export const EditablePDFIframeMixin = (pdfClass) =>
             this.setCanvasVisibility("visible");
         }
 
-        onSidebarDragStart(e) {
-            const firstPage = this.root.querySelector('.page[data-page-number="1"]');
-            if (!firstPage) {
-                e.preventDefault();
-                return;
-            } else if (!this.isActive) {
-                return;
-            }
-            this.setCanvasVisibility("hidden");
-            const signTypeElement = e.currentTarget;
-            firstPage.insertAdjacentHTML(
-                "beforeend",
-                renderToString(
-                    "sign.signItem",
-                    this.createSignItemDataFromType(signTypeElement.dataset)
-                )
-            );
-            this.ghostSignItem = firstPage.lastChild;
-            const itemData = this.signItemTypesById[signTypeElement.dataset.itemTypeId];
-            this.updateSignItemFontSize({el: this.ghostSignItem, data: {type: itemData.item_type}});
-            e.dataTransfer.setData("itemTypeId", signTypeElement.dataset.itemTypeId);
-            e.dataTransfer.setData("roleId", signTypeElement.dataset.roleId);
-            e.dataTransfer.setData("roleName", signTypeElement.dataset.roleName);
-            e.dataTransfer.setDragImage(this.ghostSignItem, 0, 0);
-            this.scrollCleanup = startSmoothScroll(
-                this.root.querySelector("#viewerContainer"),
-                e.currentTarget,
-                this.ghostSignItem,
-                this.helperLines
-            );
-            // workaround to set original element to hidden while keeping the cloned element visible
-            requestAnimationFrame(() => {
-                if (this.ghostSignItem) {
-                    this.ghostSignItem.style.visibility = "hidden";
-                }
-            }, 0);
-        }
-
-        onSidebarDragEnd() {
-            if (!this.isActive) {
-                return;
-            }
-            this.scrollCleanup();
-            const firstPage = this.root.querySelector('.page[data-page-number="1"]');
-            if (firstPage.contains(this.ghostSignItem)) {
-                firstPage.removeChild(this.ghostSignItem);
-            }
-            this.ghostSignItem = false;
-            this.setCanvasVisibility("visible");
-        }
-
-        onDragOver(e) {
-            if (!this.isActive) {
-                return;
-            }
-            e.preventDefault();
-            e.dataTransfer.dropEffect = "move";
-        }
-
-        onDrop(e) {
-            if (!this.isActive) {
-                return;
-            }
-            e.preventDefault();
-            const page = e.currentTarget;
-            const textLayer = page.querySelector(".textLayer");
-            if (!textLayer) return;
-            const targetPage = Number(page.dataset.pageNumber);
-
-            const { top, left } = offset(textLayer);
-            const itemTypeId = e.dataTransfer.getData("itemTypeId");
-            const roleId = e.dataTransfer.getData("roleId");
-            const roleName = e.dataTransfer.getData("roleName");
-            const box = textLayer.getBoundingClientRect();
-            const height = box.bottom - box.top;
-            const width = box.right - box.left;
-            if (itemTypeId) {
-                const id = generateRandomId();
-                const data = this.createSignItemDataFromType({ itemTypeId, roleId, roleName });
-                const posX =
-                    Math.round(normalizePosition((e.pageX - left) / width, data.width) * 1000) /
-                    1000;
-                const posY =
-                    Math.round(normalizePosition((e.pageY - top) / height, data.height) * 1000) /
-                    1000;
-                Object.assign(data, { id, posX, posY, page: targetPage });
-                if (data.type === "initial") {
-                    this.helperLines.hide();
-                    if (this.pageCount > 1) {
-                        return this.openDialogAfterInitialDrop(data);
-                    }
-                } else if (data.type == "radio") {
-                    return this.addRadioSet(data);
-                }
-                this.signItems[targetPage][id] = {
-                    data,
-                    el: this.renderSignItem(data, page),
-                };
-                this.refreshSignItems();
-
-            } else if (e.dataTransfer.getData("isMultiDrag") == "true") {
-                this.handleMultiItemDrop(e);
-
-            } else if (e.dataTransfer.getData("page") && e.dataTransfer.getData("id")) {
-                const initialPage = Number(e.dataTransfer.getData("page"));
-                const id = Number(e.dataTransfer.getData("id"));
-                const signItem = this.signItems[initialPage][id];
-                const posX =
-                    Math.round(
-                        normalizePosition((e.pageX - left - e.dataTransfer.getData("offsetX")) / width, signItem.data.width) * 1000
-                    ) / 1000;
-                const posY =
-                    Math.round(
-                        normalizePosition((e.pageY - top - e.dataTransfer.getData("offsetY")) / height, signItem.data.height) * 1000
-                    ) / 1000;
-
-                const positionContext = { posX, posY, targetPage, initialPage, page };
-                this.updateSignItemPosition(signItem, positionContext);
-            } else {
-                return;
-            }
-
-            this.setTemplateChanged();
-            this.refreshSignItems();
-        }
-
         /**
          * Handles the multi-item drop event
          * @param {MouseEvent} e - The mouse event
          */
         handleMultiItemDrop(event) {
-            if (!this.multiDragState) return;
+            event.preventDefault();
+            // Stop event propagation to prevent dragged elements from being dropped on parent elements,
+            // since the native drop API is used.
+            event.stopPropagation();
+
+            if (!this.isMultiDrag || !this.multiDragState) return;
 
             // First check if all items can be properly dropped
             const dropPositions = [];
@@ -1026,6 +944,62 @@ export const EditablePDFIframeMixin = (pdfClass) =>
 
             this.multiDragState = null;
             this.helperLines?.hide();
+
+            this.setTemplateChanged();
+            this.refreshSignItems();
+        }
+
+        dropSignItem(element, page, pageX, pageY) {
+            const textLayer = page.querySelector(".textLayer");
+            const targetPage = Number(page.dataset.pageNumber);
+            const itemTypeId = element.dataset.itemTypeId;
+            const roleId = element.dataset.roleId;
+            const roleName = element.dataset.roleName;
+            const box = textLayer.getBoundingClientRect();
+            const height = box.bottom - box.top;
+            const width = box.right - box.left;
+            if (itemTypeId) { // new sign element
+                const id = generateRandomId();
+                const data = this.createSignItemDataFromType({ itemTypeId, roleId, roleName });
+                const posX =
+                    Math.round(normalizePosition(pageX / width, data.width) * 1000) /
+                    1000;
+                const posY =
+                    Math.round(normalizePosition(pageY / height, data.height) * 1000) /
+                    1000;
+                Object.assign(data, { id, posX, posY, page: targetPage });
+                if (data.type === "initial") {
+                    if (this.pageCount > 1) {
+                        return this.openDialogAfterInitialDrop(data);
+                    }
+                } else if (data.type == "radio") {
+                    return this.addRadioSet(data);
+                }
+                this.signItems[targetPage][id] = {
+                    data,
+                    el: this.renderSignItem(data, page),
+                };
+            } else if (element.dataset.pageNumber && element.dataset.id) { // repositioning an existing sign element
+                const initialPage = Number(element.dataset.pageNumber);
+                const id = Number(element.dataset.id);
+                const signItem = this.signItems[initialPage][id];
+                const posX =
+                    Math.round(
+                        normalizePosition(pageX / width, signItem.data.width) * 1000
+                    ) / 1000;
+                const posY =
+                    Math.round(
+                        normalizePosition(pageY / height, signItem.data.height) * 1000
+                    ) / 1000;
+
+                const positionContext = { posX, posY, targetPage, initialPage, page };
+                this.updateSignItemPosition(signItem, positionContext);
+            } else {
+                return;
+            }
+
+            this.setTemplateChanged();
+            this.refreshSignItems();
         }
 
         /**
@@ -1035,8 +1009,8 @@ export const EditablePDFIframeMixin = (pdfClass) =>
         enableCustom(signItem) {
             super.enableCustom(signItem);
             if (signItem.data.isSignItemEditable) {
-                startResize(signItem, this.onResizeItem.bind(this));
-                this.registerDragEventsForSignItem(signItem);
+                startResize(this, signItem, this.onResizeItem.bind(this));
+                this.startSignItemInteractions(signItem);
             }
         }
 
@@ -1106,20 +1080,13 @@ export const EditablePDFIframeMixin = (pdfClass) =>
 
         setTemplateChanged() {}
 
-        registerDragEventsForSignItem(signItem) {
-            const handle = signItem.el.querySelector(".o_sign_config_handle");
-            handle.setAttribute("draggable", true);
-            handle.addEventListener("dragstart", (e) => this.onDragStart(e));
-            handle.addEventListener("dragend", (e) => this.onDragEnd(e));
-        }
-
         /**
          * Deletes a sign item from the template
          * @param {SignItem} signItem
          */
         deleteSignItem(signItem) {
             const { id, page } = signItem.data;
-            signItem.el.parentElement.removeChild(signItem.el);
+            signItem.el.parentElement?.removeChild(signItem.el);
             delete this.signItems[page][id];
             this.setTemplateChanged();
         }

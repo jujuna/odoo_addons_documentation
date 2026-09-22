@@ -36,7 +36,7 @@ class SaleOrderLog(models.Model):
         readonly=True,
         index=True,
     )
-    event_date = fields.Date(string='Event Date', required=True, index=True, default=fields.Date.today)
+    event_date = fields.Date(string='Event Date', required=True, index=True, default=fields.Date.context_today)
     effective_date = fields.Date(index=True)
     recurring_monthly = fields.Monetary(string='New MRR', required=True,
                                         help="MRR, after applying the changes of that particular event", readonly=True)
@@ -134,7 +134,10 @@ class SaleOrderLog(models.Model):
         parent_churn = parent_order.order_log_ids.filtered(lambda log: log.event_type == '2_churn')
 
         # If at least 30 days between next invoice date and start_date, churn and creation instead of transfer
-        if parent_order.next_invoice_date + timedelta(days=30) < order.start_date:
+        if (
+            parent_order.next_invoice_date
+            and parent_order.next_invoice_date + timedelta(days=30) < order.start_date
+        ):
             if not parent_churn:
                 result += self._create_churn_log(parent_order, {})
             return result + self._create_creation_log(order, initial_values)
@@ -252,7 +255,10 @@ class SaleOrderLog(models.Model):
         for order, dates in log_date_values.items():
             if upsell:
                 ratio = order._get_ratio_value()
-                amount = sum([line.recurring_monthly / ratio for line in order.order_line])
+                if not ratio:
+                    amount = 0
+                else:
+                    amount = sum(line.recurring_monthly / ratio for line in order.order_line)
                 logs = order.subscription_id.order_log_ids.filtered(lambda log:
                     not log.effective_date and
                     log.event_date == dates['event_date']

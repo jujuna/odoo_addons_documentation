@@ -41,9 +41,9 @@ class TimerTimer(models.Model):
             self.write({'timer_start': fields.Datetime.now()})
 
     def action_timer_stop(self):
-        """ Stop the timer and return the spent minutes since it started
-            :return minutes_spent if the timer is started,
-                    otherwise return False
+        """
+        Stop the timer and return the spent minutes since it started
+        :return minutes_spent if the timer is started, otherwise return False
         """
         if not self.timer_start:
             return False

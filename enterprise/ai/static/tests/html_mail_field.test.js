@@ -56,7 +56,45 @@ test("HtmlMail should have the AI prompt command when dynamic placeholder plugin
     setSelectionInHtmlField();
     await insertText(htmlEditor, "/prompt");
     await press("enter");
-    expect(".o_editor_prompt").toHaveCount(1);
+    expect(`.odoo-editor-editable .o_editor_prompt`).toHaveCount(1);
+});
+
+test("HtmlMail should be able to undo a prompt banner", async function () {
+    enableTransitions();
+    await mountView({
+        type: "form",
+        resId: 1,
+        resModel: "custom.message",
+        arch: `
+        <form>
+            <field name="body" widget="html_mail" options="{'dynamic_placeholder': true}"/>
+        </form>`,
+    });
+    setSelectionInHtmlField();
+    await insertText(htmlEditor, "/prompt");
+    await press("enter");
+    expect(`.odoo-editor-editable .o_editor_prompt`).toHaveCount(1);
+    await press(["CTRL", "Z"]);
+    expect(`.odoo-editor-editable .o_editor_prompt`).toHaveCount(0);
+});
+
+test("HtmlMail should add a prompt empty banner", async function () {
+    enableTransitions();
+    await mountView({
+        type: "form",
+        resId: 1,
+        resModel: "custom.message",
+        arch: `
+        <form>
+            <field name="body" widget="html_mail" options="{'dynamic_placeholder': true}"/>
+        </form>`,
+    });
+    setSelectionInHtmlField();
+    await insertText(htmlEditor, "abc");
+    await insertText(htmlEditor, "/prompt");
+    await press("enter");
+    expect(`.odoo-editor-editable .o_editor_prompt_content`).toHaveInnerHTML(`
+        <div class="o-paragraph o-we-hint" o-we-hint-text="Type &quot;/&quot; for commands"><br></div>`);
 });
 
 test("Only dynamic placeholder command should be available inside an AI prompt", async function () {
@@ -75,5 +113,5 @@ test("Only dynamic placeholder command should be available inside an AI prompt",
     await insertText(htmlEditor, "/");
     await animationFrame();
     expect(".o-we-command").toHaveCount(1);
-    expect(".o-we-command .o-we-command-name").toHaveText("Dynamic Placeholder");
+    expect(".o-we-command .o-we-command-name").toHaveText("Field");
 });

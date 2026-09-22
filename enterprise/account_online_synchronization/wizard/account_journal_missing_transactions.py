@@ -13,11 +13,11 @@ class AccountMissingTransactionWizard(models.TransientModel):
 
     date = fields.Date(
         string="Starting Date",
-        default=lambda self: fields.Date.today() - relativedelta(months=1),
+        default=lambda self: fields.Date.context_today(self) - relativedelta(months=1),
     )
     journal_id = fields.Many2one(
         comodel_name='account.journal',
-        domain="[('type', '=', 'bank'), ('account_online_account_id', '!=', 'False'), ('account_online_link_state', '=', 'connected')]"
+        domain="[('type', '=', 'bank'), ('account_online_account_id', '!=', False), ('account_online_link_state', '=', 'connected')]"
     )
 
     def _get_manual_bank_statement_lines(self):
@@ -51,11 +51,12 @@ class AccountMissingTransactionWizard(models.TransientModel):
         if self.journal_id.account_online_link_state != 'connected':
             raise UserError(_("You can't find missing transactions for a journal that isn't connected."))
 
-        transactions = self.journal_id.account_online_account_id._retrieve_transactions(date=self.date, transactions_type='posted')
-        pendings = self.journal_id.account_online_account_id._retrieve_transactions(date=self.date, transactions_type='pending')
+        online_account = self.journal_id.account_online_account_id
+        transactions = online_account._retrieve_transactions(date=self.date, transactions_type='posted')
+        pendings = online_account._retrieve_transactions(date=self.date, transactions_type='pending')
 
         pendings = [{**pending, 'state': 'pending'} for pending in pendings]
-        filtered_transactions = self.journal_id.account_online_account_id._get_filtered_transactions(transactions + pendings)
+        filtered_transactions = online_account._get_filtered_transactions(transactions + pendings)
 
         transient_transactions_ids = self.env['account.bank.statement.line.transient'].create(filtered_transactions)
 

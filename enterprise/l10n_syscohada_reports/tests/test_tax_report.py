@@ -6,6 +6,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class SyscohadaReportsTest(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_syscohada_variants_availability(self):
         # Ensure syscohada variants are available from their root reports (using coa-children availability condition)
         self.company_data['company'].chart_template = 'bj'  # Benin is a child country of syscohada

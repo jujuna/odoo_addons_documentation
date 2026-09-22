@@ -25,15 +25,19 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box"/>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
-                    <h2><field name="name" readonly="1"/></h2>
+                    <h1 class="d-flex">
+                        <span invisible="not id" class="text-nowrap me-1"><field name="name" readonly="1"/>:</span>
+                        <field name="title" placeholder="e.g. Check Dimensions" class="flex-grow-1"/>
+                    </h1>
                     <group>
                         <group>
                             <field name="active" invisible="1"/>
                             <field name="company_id" invisible="1"/>
-                            <field name="title"/>
-                            <field name="product_ids" widget="many2many_tags"/>
-                            <field name="product_category_ids" widget="many2many_tags"/>
-                            <field name="picking_type_ids" string="Operations" widget="many2many_tags"/>
+                            <field name="apply_to" widget="radio" options="{'horizontal': True}"/>
+                            <field name="product_ids" widget="many2many_tags" placeholder="All Products" invisible="apply_to != 'products'"/>
+                            <field name="product_category_ids" widget="many2many_tags" string="Categories" placeholder="All Categories" invisible="apply_to != 'categories'"/>
+                            <field name="picking_type_ids" string="Operations" widget="many2many_tags"
+                                options="{'no_quick_create': True}"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="user_id" widget="many2one_avatar_user"/>
                         </group>
@@ -41,7 +45,9 @@
                             <field name="test_type" invisible="1"/>
                             <field string="Type" name="test_type_id" options="{'no_open': True, 'no_create': True}"/>
                             <field name="team_id" options="{'no_open': True, 'no_create': True}"/>
-                            <field name="failure_location_ids" invisible="not show_failure_location" groups="stock.group_stock_multi_locations" widget="many2many_tags"/>
+                            <field name="failure_location_ids" invisible="not show_failure_location"
+                                groups="stock.group_stock_multi_locations" widget="many2many_tags"
+                                placeholder="e.g. Quarantine, Second Inspection"/>
                         </group>
                     </group>
                     <notebook>
@@ -64,8 +70,7 @@
         <field name="arch" type="xml">
             <list sample="1">
                 <field name="name" decoration-bf="1"/>
-                <field name="product_tmpl_id" optional="show"/>
-                <field name="product_id" optional="hide"/>
+                <field name="product_id" optional="show"/>
                 <field name="lot_ids" optional="hide" groups="stock.group_production_lot" widget="many2many_tags"/>
                 <field name="team_id" optional="show"/>
                 <field name="user_id" optional="show" widget='many2one_avatar_user'/>
@@ -84,9 +89,9 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name" string="Quality Alert" filter_domain="[
-                    '|', '|', '|', ('name', 'ilike', self), ('product_id', 'ilike', self), ('product_tmpl_id', 'ilike', self), ('lot_ids', 'ilike', self)]"/>
+                    '|', '|', ('name', 'ilike', self), ('product_id', 'ilike', self), ('lot_ids', 'ilike', self)]"/>
                 <field name="product_id" string="Product" filter_domain="[
-                    '|', '|', ('product_id', 'ilike', self), ('product_tmpl_id', 'ilike', self), ('lot_ids', 'ilike', self)]"/>
+                    '|', ('product_id', 'ilike', self), ('lot_ids', 'ilike', self)]"/>
                 <field name="tag_ids"/>
                 <field name="user_id"/>
                 <filter string="My Alerts" name="myalerts" domain="[('user_id', '=', uid)]"/>

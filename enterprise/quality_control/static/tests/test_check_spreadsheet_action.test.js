@@ -132,7 +132,7 @@ describe("quality check spreadsheet action", () => {
             data: {},
             name: "spreadsheet name",
             revisions: [],
-            isReadonly: false,
+            has_write_access: true,
             quality_check_display_name: "The check name",
             quality_check_cell: "not a valid cell reference",
         }));
@@ -152,7 +152,7 @@ describe("quality check spreadsheet action", () => {
             data: {},
             name: "spreadsheet name",
             revisions: [],
-            isReadonly: false,
+            has_write_access: true,
             quality_check_display_name: "The check name",
             quality_check_cell: false, // False = no value in the py orm
         }));

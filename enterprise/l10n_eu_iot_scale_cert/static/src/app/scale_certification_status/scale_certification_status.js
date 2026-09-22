@@ -3,7 +3,6 @@ import { useService } from "@web/core/utils/hooks";
 import { ScaleCertificationDialog } from "@l10n_eu_iot_scale_cert/app/scale_certification_status/scale_certification_dialog";
 
 export class ScaleCertificationStatus extends Component {
-    static props = {};
     static template = "pos_iot.ScaleCertificationStatus";
 
     setup() {
@@ -25,7 +24,6 @@ export class ScaleCertificationStatus extends Component {
 
     async fixCertificationErrors() {
         await this.orm.call("pos.config", "fix_rounding_for_scale_certification");
-
-        window.location.reload();
+        await this.pos.reloadData();
     }
 }

@@ -1,16 +1,17 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { RelativeTime } from "@mail/core/common/relative_time";
 import { deserializeDateTime } from "@web/core/l10n/dates";
 
 export class MrpDisplayEmployeesPanel extends Component {
     static template = "mrp_workorder.MrpDisplayEmployeesPanel";
-    static props = {
-        employees: { type: Object },
-        setSessionOwner: { type: Function },
-        popupAddEmployee: { type: Function },
-    };
     static components = { RelativeTime };
+
+    props = useProps({
+        employees: t.object(),
+        setSessionOwner: t.function(),
+        popupAddEmployee: t.function(),
+    });
 
     setup() {
         this.ui = useService("ui");

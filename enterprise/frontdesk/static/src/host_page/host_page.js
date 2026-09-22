@@ -1,20 +1,21 @@
 import { registry } from "@web/core/registry";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { HostManualSelection } from "@frontdesk/host_page/host_manual_selection";
 
 export class HostPage extends Component {
     static template = "frontdesk.HostPage";
     static components = { HostManualSelection };
-    static props = {
-        setHostData: Function,
-        showScreen: Function,
-        stationId: Number,
-        token: String,
-        theme: String,
-    };
+
+    props = useProps({
+        setHostData: t.function(),
+        showScreen: t.function(),
+        stationId: t.number(),
+        token: t.string(),
+        theme: t.string(),
+    });
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             showManualSelection: false,
             hostName: "",
         });

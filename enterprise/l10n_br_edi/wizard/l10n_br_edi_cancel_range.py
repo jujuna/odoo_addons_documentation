@@ -50,7 +50,7 @@ class L10n_Br_EdiCancelRange(models.Model):
             attachments |= self.env["ir.attachment"].create(
                 {
                     "name": f"{self.journal_id.name} cancel {response['status']['number']}.xml",
-                    "datas": response["xml"]["base64"],
+                    "raw": response["xml"]["base64"],  # assign b64 str which gets decoded
                 }
             )
 

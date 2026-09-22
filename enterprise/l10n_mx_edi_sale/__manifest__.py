@@ -1,6 +1,5 @@
 {
     'name': 'CFDI 4.0 fields for sale orders',
-    'version': '1.0',
     'category': 'Accounting/Localizations/EDI',
     'depends': [
         'sale',
@@ -10,7 +9,6 @@
         'report/sale_order_templates.xml',
         'views/sale_order_view.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

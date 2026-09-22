@@ -1,9 +1,6 @@
 import { registry } from "@web/core/registry";
-import { _t } from "@web/core/l10n/translation";
-import { stepUtils } from "@web_tour/tour_utils";
 
 registry.category("web_tour.tours").add("website_helpdesk_forum_tour", {
-    url: "/forum/help-1",
     steps: () => [
         {
             content: "Ask the question in this forum by clicking on the button.",
@@ -13,7 +10,7 @@ registry.category("web_tour.tours").add("website_helpdesk_forum_tour", {
         },
         {
             trigger: "input[name=post_name]",
-            content: _t("Give your post title."),
+            content: "Give your post title.",
             run: "edit Test",
         },
         {
@@ -25,11 +22,10 @@ registry.category("web_tour.tours").add("website_helpdesk_forum_tour", {
             trigger: ".note-editable p:not(:has(br))",
         },
         {
-            trigger: ".o_select_menu_toggler",
-            content: _t("Insert tags related to your question."),
-            run: "click",
+            trigger: ".o_select_menu input",
+            content: "Insert tags related to your question.",
+            run: "edit Test",
         },
-        ...stepUtils.editSelectMenuInput(".o_select_menu input", "Test"),
         {
             content: "Select found select menu item",
             trigger: ".o_popover.o_select_menu_menu .o_select_menu_item:contains('Test')",
@@ -37,7 +33,7 @@ registry.category("web_tour.tours").add("website_helpdesk_forum_tour", {
         },
         {
             trigger: "button:contains(/^Post/)",
-            content: _t("Click to post your question."),
+            content: "Click to post your question.",
             run: "click",
             expectUnloadPage: true,
         },
@@ -58,7 +54,7 @@ registry.category("web_tour.tours").add("website_helpdesk_forum_tour", {
         },
         {
             trigger: "input[id=ticketTitle]",
-            content: _t("Give your post title."),
+            content: "Give your post title.",
             run: "edit Helpdesk Ticket(Test)",
         },
         {

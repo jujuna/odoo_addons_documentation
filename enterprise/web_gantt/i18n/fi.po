@@ -3,28 +3,31 @@
 # * web_gantt
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Saara Hakanen <sahak@odoo.com>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:49+0000\n"
-"PO-Revision-Date: 2025-12-06 10:07+0000\n"
+"POT-Creation-Date: 2026-08-28 17:58+0000\n"
+"PO-Revision-Date: 2026-09-18 00:47+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "web_gantt/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%(hour)sh%(minute)s"
-msgstr "%(hour)sh%(minute)s"
+#: model:ir.module.module,description:base.module_web_gantt
+msgid ""
+"\n"
+"Odoo Web Gantt chart view.\n"
+"=============================\n"
+"\n"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -34,9 +37,10 @@ msgstr "%s ei voida ajoittaa menneisyyteen"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%sh"
-msgstr "%sh"
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "%s to schedule"
+msgstr ""
 
 #. module: web_gantt
 #: model:ir.model,name:web_gantt.model_ir_actions_act_window_view
@@ -45,12 +49,14 @@ msgstr "Toimintoikkunan näkymä"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "Aktivoi tiheä tila"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "Aktivoi harva tila"
@@ -104,7 +110,13 @@ msgstr "Näyttönimi"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Drop here to unschedule"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Edit"
 msgstr "Muokkaa"
 
@@ -147,8 +159,8 @@ msgstr "Gantt-näkymä"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt child can only be field or template, got %s"
-msgstr "Gantt-kaavion alataso voi olla vain kenttä tai malli, saatiin %s"
+msgid "Gantt child can only be field or popover, got %s"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -173,6 +185,18 @@ msgstr ""
 "'dependency_field' on määritetty"
 
 #. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover can contain only one templates tag"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover child can only be field or template, got %s"
+msgstr ""
+
+#. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_scale_selector.js:0
 msgid "Gantt start date"
@@ -187,8 +211,8 @@ msgstr "Ganttin lopetuspäivä"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt view can contain only one templates tag"
-msgstr "Gantt-näkymä voi sisältää vain yhden mallitunnisteen"
+msgid "Gantt view can contain only one popover tag"
+msgstr ""
 
 #. module: web_gantt
 #: model:ir.model.fields,field_description:web_gantt.field_ir_actions_act_window_view__id
@@ -207,6 +231,14 @@ msgstr "Menneisyyteen ei voi ajastaa."
 #: code:addons/web_gantt/models/models.py:0
 msgid "Insufficient fields for Gantt View!"
 msgstr "Kenttiä ei ole tarpeeksi Gantt-näkymään!"
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid ""
+"Invalid attributes (%(invalid_attributes)s) in gantt popover. Attributes "
+"must be in (%(valid_attributes)s)"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -244,15 +276,15 @@ msgstr "Virheellinen aikataulun muuttamistapa %s"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Month"
-msgstr "Kuukausi"
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Load More"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
-msgid "Name"
-msgstr "Nimi"
+#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
+msgid "Month"
+msgstr "Kuukausi"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -268,6 +300,13 @@ msgstr "Ei, pidä se"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "Nothing to schedule"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_controller.js:0
 msgid "Open"
 msgstr "Avoin"
@@ -277,7 +316,7 @@ msgstr "Avoin"
 #: code:addons/web_gantt/static/src/gantt_multi_selection_buttons.xml:0
 #: code:addons/web_gantt/static/src/gantt_renderer.js:0
 msgid "Plan"
-msgstr "Suunnittele"
+msgstr "Suunnitelma"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -317,7 +356,13 @@ msgstr "Tietueen aikataulu päivitetty"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Show dependencies"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Start"
 msgstr "Aloita"
 
@@ -329,7 +374,7 @@ msgstr "Alkamispäivä ei voi olla päättymispäivän jälkeen"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Stop"
 msgstr "Lopeta"
 
@@ -354,6 +399,12 @@ msgstr "Tänään"
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Toggle Side Panel"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Toolbar menu"
 msgstr "Työkalurivin valikko"
 
@@ -371,7 +422,7 @@ msgstr "Määrittelemätön %s"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 #: model:ir.model,name:web_gantt.model_ir_ui_view
 msgid "View"
 msgstr "Näytä"
@@ -383,16 +434,15 @@ msgid "View Type"
 msgstr "Näkymän tyyppi"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week"
-msgstr "Viikko"
+#: model:ir.module.module,shortdesc:base.module_web_gantt
+msgid "Web Gantt"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week %(week)s, %(startDate)s - %(endDate)s"
-msgstr "Viikko %(week)s, %(startDate)s - %(endDate)s"
+msgid "Week"
+msgstr "Viikko"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -418,11 +468,5 @@ msgstr "minuutit"
 msgid "months"
 msgstr "kuukaudet"
 
-#~ msgid "From"
-#~ msgstr "Alkaa"
-
-#~ msgid "From: %(from_date)s to: %(to_date)s"
-#~ msgstr "Alkaen: %(from_date)s päättyen: %(to_date)s"
-
-#~ msgid "to"
-#~ msgstr "->"
+msgid "Name"
+msgstr "Nimi"

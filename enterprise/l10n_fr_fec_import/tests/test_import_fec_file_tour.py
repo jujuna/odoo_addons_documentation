@@ -1,11 +1,18 @@
 import datetime
 
 from odoo.tests import tagged
-from odoo.addons.account.tests.common import AccountTestInvoicingHttpCommon
+from odoo.addons.account.tests.common import AccountTestInvoicingHttpCommon, AccountTestInvoicingCommon
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestImportFecFileTour(AccountTestInvoicingHttpCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
+    @classmethod
+    @AccountTestInvoicingCommon.setup_country('fr_comp')
+    def setUpClass(cls):
+        super().setUpClass()
+
     def test_import_fec_file(self):
         """
         Test the correct importation of the following models:
@@ -15,7 +22,7 @@ class TestImportFecFileTour(AccountTestInvoicingHttpCommon):
         4. Moves
         5. Move lines
         """
-        self.start_tour('/odoo', 'import_fec_file_tour', login=self.env.user.login)
+        self.start_tour('/odoo/action-account_base_import.action_open_import_guide', 'import_fec_file_tour', login=self.env.user.login)
 
         with self.subTest(test='Test imported accounts'):
             account_codes = ('401000', '445660', '622700')
@@ -27,11 +34,11 @@ class TestImportFecFileTour(AccountTestInvoicingHttpCommon):
                 'account_type': 'liability_payable',
                 'reconcile': True
             }, {
-                'name': 'ASSURANCE',
+                'name': 'Deductible VAT on other goods and services',
                 'account_type': 'asset_current',
                 'reconcile': False,
             }, {
-                'name': 'Legal costs and litigation',
+                'name': 'Legal and litigation fees',
                 'account_type': 'expense',
                 'reconcile': False,
             }]

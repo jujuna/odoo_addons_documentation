@@ -3,27 +3,27 @@
 
   <t t-name="web_studio.ViewEditor.ViewToolbox">
     <div
-      t-if="env.debug"
-      class="o_web_studio_sidebar_toolbox d-flex flex-wrap border-top pt-3 mt-4 gap-2 border-secondary"
+      t-if="this.debugMode.isActive()"
+      class="o_web_studio_sidebar_toolbox d-flex flex-wrap border-top pt-3 mt-4 gap-2"
     >
       <button
         class="o_web_studio_parameters btn btn-secondary btn-lg w-30"
-        t-on-click="() => props.onMore()"
+        t-on-click="() => this.props.onMore()"
       >
-        <i class="fa fa-cog me-2"/>More
+        <i class="oi oi-filled me-2" data-icon="settings"/>More
       </button>
-      <button t-if="props.canEditXml"
+      <button t-if="this.props.canEditXml"
         class="o_web_studio_open_xml_editor btn btn-secondary btn-lg"
-        t-on-click="() => env.viewEditorModel.switchMode()"
+        t-on-click="() => this.env.viewEditorModel.switchMode()"
       >
-        <i class="fa fa-code me-2"/>XML
+        <i class="oi me-2" data-icon="code"/>XML
       </button>
-      <button t-if="props.canEditDefaultValues" class="o_web_studio_defaults btn btn-secondary btn-lg" t-on-click="props.openDefaultValues">
+      <button t-if="this.props.canEditDefaultValues" class="o_web_studio_defaults btn btn-secondary btn-lg" t-on-click="this.props.openDefaultValues">
         Default Values
       </button>
       <button
         class="o_web_studio_restore btn btn-danger btn-lg mt-0 w-100"
-        t-on-click="() => env.viewEditorModel.restoreDefaultView(env.viewEditorModel.mainView.id)"
+        t-on-click="() => this.env.viewEditorModel.restoreDefaultView(this.env.viewEditorModel.mainView.id)"
       >
         Restore Default View
       </button>
@@ -34,8 +34,8 @@
     <Property
       name="'show_invisible'"
       type="'boolean'"
-      value="env.viewEditorModel.showInvisible"
-      onChange.bind="(value) => env.viewEditorModel.showInvisible = value"
+      value="this.env.viewEditorModel.showInvisible"
+      onChange.bind="(value) => this.env.viewEditorModel.showInvisible = value"
     >
         Show Invisible Elements
     </Property>

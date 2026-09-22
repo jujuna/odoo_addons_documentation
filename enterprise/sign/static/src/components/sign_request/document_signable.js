@@ -1,29 +1,45 @@
-import { App, Component, xml, whenReady, useEffect, useComponent, useState } from "@odoo/owl";
-import { MainComponentsContainer } from "@web/core/main_components_container";
-import { useService } from "@web/core/utils/hooks";
-import { getTemplate } from "@web/core/templates";
-import { makeEnv, startServices } from "@web/env";
-import { SignablePDFIframe } from "./signable_PDF_iframe";
-import { buildPDFViewerURL, injectPDFCustomStyles } from "@sign/components/sign_request/utils";
-import { _t, appTranslateFn } from "@web/core/l10n/translation";
-import { rpc } from "@web/core/network/rpc";
-import { hidePDFJSButtons } from "@web/core/utils/pdfjs";
+import { SignInfoPlugin } from "@sign/services/sign_info_plugin";
 import {
-    SignRefusalDialog,
-    SignNameAndSignatureDialog,
-    ThankYouDialog,
-    PublicSignerDialog,
-    SMSSignerDialog,
+    Component,
+    onMounted,
+    proxy,
+    t,
+    useEffect,
+    usePlugin,
+    useProps,
+    whenReady,
+    xml,
+} from "@odoo/owl";
+import { buildPDFViewerURL, injectPDFCustomStyles } from "@sign/components/sign_request/utils";
+import {
+    DelegateSignDialog,
     NextDirectSignDialog,
+    PublicSignerDialog,
+    SignNameAndSignatureDialog,
+    SignRefusalDialog,
+    SMSSignerDialog,
+    ThankYouDialog,
+    openAllSetDirectSignDialog,
 } from "@sign/dialogs/dialogs";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
+import { MainComponentsContainer } from "@web/core/main_components_container";
+import { rpc } from "@web/core/network/rpc";
+import { useService } from "@web/core/utils/hooks";
+import { hidePDFJSButtons } from "@web/core/utils/pdfjs";
+import { mountComponent } from "@web/env";
+import { SignablePDFIframe } from "./signable_PDF_iframe";
 
 export function datasetFromElements(elements) {
-    return Array.from(elements).map((el) => {
-        return Object.entries(el.dataset).reduce((dataset, [key, value]) => {
+    return Array.from(elements).map((el) =>
+        Object.entries(el.dataset).reduce((dataset, [key, value]) => {
             try {
                 const parsed = JSON.parse(value);
-                if (key === "value" && typeof parsed === 'number' && parsed > Number.MAX_SAFE_INTEGER) {
+                if (
+                    key === "value" &&
+                    typeof parsed === "number" &&
+                    parsed > Number.MAX_SAFE_INTEGER
+                ) {
                     // Keep numbers as strings below to avoid MAX_SAFE_INTEGER issues.
                     dataset[key] = value;
                 } else {
@@ -33,79 +49,87 @@ export function datasetFromElements(elements) {
                 dataset[key] = value;
             }
             return dataset;
-        }, {});
-    });
+        }, {})
+    );
 }
 
 export class Document extends Component {
-    static template = xml`<t t-slot='default'/>`;
-    static props = ["parent", "PDFIframeClass"];
+    static template = xml`<t t-call-slot='default'/>`;
+
+    props = useProps({
+        parent: t.any(),
+        PDFIframeClass: t.any(),
+    });
 
     setup() {
         this.orm = useService("orm");
         this.dialog = useService("dialog");
         this.ui = useService("ui");
-        this.signInfo = useService("signInfo");
+        this.signInfo = usePlugin(SignInfoPlugin);
 
-        this.state = useState({
+        this.state = proxy({
             documentsWithUnsignedItems: new Set(),
             viewedDocuments: new Set(),
             openedDocumentIndex: 0,
         });
 
-        useEffect(
-            () => {
-                this.getDataFromHTML();
-                if (!this.requestID) {
-                    return;
-                }
-                this.signInfo.set({
-                    documentId: this.requestID,
-                    signRequestToken: this.requestToken,
-                    signRequestState: this.requestState,
-                    signRequestItemId: this.signRequestItemId,
-                    signRequestItemToken: this.accessToken,
-                    todayFormattedDate: this.todayFormattedDate,
-                    dateFormat: this.dateFormat,
-                });
-            },
-            () => []
-        );
+        useEffect(() => {
+            // Tracked read of the forwarded parent ref — the effect's only
+            // dependency. `getDataFromHTML` reaches the same ref through
+            // `resolveRefEl`, which UNTRACKS, so without this read the effect
+            // would never re-run once the parent element is populated on mount.
+            if (!this.getParentEl() || !this.getDataFromHTML()) {
+                return;
+            }
+            if (!this.requestID) {
+                return;
+            }
+            this.signInfo.set({
+                documentId: this.requestID,
+                signRequestToken: this.requestToken,
+                signRequestState: this.requestState,
+                signRequestItemId: this.signRequestItemId,
+                signRequestItemToken: this.accessToken,
+                todayFormattedDate: this.todayFormattedDate,
+                dateFormat: this.dateFormat,
+            });
+        });
 
-        useEffect(
-            () => {
-                if (
-                    !this.state.documentsWithUnsignedItems ||
-                    !this.state.viewedDocuments ||
-                    !this.documents ||
-                    this.documents.length === 0
-                ) {
-                    return;
-                }
+        useEffect(() => {
+            // Subscribe to both original deps: documentsWithUnsignedItems is read in
+            // the guard below, but openedDocumentIndex is only read conditionally, so
+            // force its subscription here.
+            void this.state.openedDocumentIndex;
+            if (
+                !this.state.documentsWithUnsignedItems ||
+                !this.state.viewedDocuments ||
+                !this.documents ||
+                this.documents.length === 0
+            ) {
+                return;
+            }
 
-                const hasUnsignedDocs = this.state.documentsWithUnsignedItems.size > 0;
-                const currentDocUnsigned = this.isDocumentUnsigned();
-                const allDocsViewed = this.state.viewedDocuments.size === this.documents.length;
+            const hasUnsignedDocs = this.state.documentsWithUnsignedItems.size > 0;
+            const currentDocUnsigned = this.isDocumentUnsigned();
+            const allDocsViewed = this.state.viewedDocuments.size === this.documents.length;
 
-                if (!hasUnsignedDocs && allDocsViewed) {
-                    // If all documents are signed and viewed, show validation banner
-                    this.showBanner(this.validateBanner);
-                    return;
-                }
+            if (!hasUnsignedDocs && allDocsViewed) {
+                // If all documents are signed and viewed, show validation banner
+                this.showBanner(this.validateBanner);
+                return;
+            }
 
-                // Hide validation banner since there are unsigned/un-viewed documents
-                this.hideBanner(this.validateBanner);
+            // Hide validation banner since there are unsigned/un-viewed documents
+            this.hideBanner(this.validateBanner);
 
-                if (currentDocUnsigned) {
-                    // If current document needs signing, hide "next document" banner
-                    this.hideBanner(this.nextDocumentBanner);
-                } else {
-                    // If current document is signed or have nothing to sign, show "next document" banner
-                    this.showBanner(this.nextDocumentBanner);
-                }
-            },
-            () => [this.state.documentsWithUnsignedItems, this.state.openedDocumentIndex]
-        );
+            if (currentDocUnsigned) {
+                // If current document needs signing, hide "next document" banner
+                this.hideBanner(this.nextDocumentBanner);
+            } else {
+                // If current document is signed or have nothing to sign, show "next document" banner
+                this.showBanner(this.nextDocumentBanner);
+            }
+        });
     }
 
     /**
@@ -120,8 +144,10 @@ export class Document extends Component {
      * Checks if the current document has unsigned items
      * @returns {boolean}
      */
-    isDocumentUnsigned(){
-        if(!this.documents) return false;
+    isDocumentUnsigned() {
+        if (!this.documents) {
+            return false;
+        }
         const documentId = this.documents[this.state.openedDocumentIndex].id;
         return this.state.documentsWithUnsignedItems.has(documentId);
     }
@@ -139,34 +165,35 @@ export class Document extends Component {
             newSet.delete(documentId);
         }
         this.state.documentsWithUnsignedItems = newSet;
-        this.controlNavigatorVisibility(hasUnsignedItems);
     }
 
     documentNavigate(shift) {
-        this.state.openedDocumentIndex = (this.state.openedDocumentIndex + shift + this.documents.length) % this.documents.length;
+        this.state.openedDocumentIndex =
+            (this.state.openedDocumentIndex + shift + this.documents.length) %
+            this.documents.length;
         this.state.viewedDocuments.add(this.documents[this.state.openedDocumentIndex].id);
         this.documents.forEach((doc, index) => {
             if (index === this.state.openedDocumentIndex) {
                 doc.iframe.classList.remove("d-none");
+                doc.iframe.contentWindow?.dispatchEvent(new Event("resize"));
             } else {
                 doc.iframe.classList.add("d-none");
             }
         });
         document.querySelectorAll(".o_sign_document_navigator_text").forEach((text) => {
-            if (text)
-                text.textContent = (this.state.openedDocumentIndex + 1) + " / " + this.documents.length;
+            if (text) {
+                text.textContent =
+                    this.state.openedDocumentIndex + 1 + " / " + this.documents.length;
+            }
         });
     }
 
     showBanner(banner) {
         if (banner) {
             banner.style.display = "block";
-            const an = banner.animate(
-                { opacity: 1 },
-                { duration: 500, fill: "forwards" }
-            );
+            const an = banner.animate({ opacity: 1 }, { duration: 500, fill: "forwards" });
             an.finished.then(() => {
-                if (this.env.isSmall) {
+                if (this.ui.isSmall) {
                     banner.scrollIntoView({
                         behavior: "smooth",
                         block: "center",
@@ -185,37 +212,38 @@ export class Document extends Component {
     }
 
     /**
-     * Controls the visibility of the navigator to be invisible if current document is signed
+     * Reads the forwarded parent element in a TRACKED way so that effects using
+     * it in their dependencies re-run when it becomes available: setting the
+     * (backend) parent ref on mount then re-runs the effect. Reading it with
+     * `untrack` instead would never re-fire those effects.
+     *
+     * @returns {HTMLElement | null | undefined}
      */
-    controlNavigatorVisibility(hasUnsignedItems) {
-        if (this.documents) {
-            const currentDoc = this.documents[this.state.openedDocumentIndex];
-            const iframeManager = currentDoc.iframeManager;
-            if (iframeManager && iframeManager.navigator) {
-                // If hasUnsignedItems is false, we need to check if there are unsigned items for the current role in the document
-                if (!hasUnsignedItems && this.isDocumentUnsigned()) {
-                    // Check if there are items for the current role
-                    hasUnsignedItems = Object.values(iframeManager.signItems || {}).some(pageItems =>
-                        Object.values(pageItems).some(item => item.data.responsible === iframeManager.currentRole)
-                    );
-                }
-                iframeManager.navigator.toggle(hasUnsignedItems);
-            }
-        }
+    getParentEl() {
+        return this.props.parent();
     }
 
+    /**
+     * Populates the component state from the sign HTML rendered in the parent
+     * element. Returns false when the parent element is not available yet (a
+     * no-op); the caller re-runs this once the parent element is populated.
+     *
+     * @returns {boolean} whether the data could be read from the parent element
+     */
     getDataFromHTML() {
-        const { el: parentEl } = this.props.parent;
-        this.documents = datasetFromElements(parentEl.querySelectorAll(".o_sign_document_input_info"));
+        const parentEl = this.props.parent();
+        if (!parentEl) {
+            return false;
+        }
+        this.documents = datasetFromElements(
+            parentEl.querySelectorAll(".o_sign_document_input_info")
+        );
         const iframes = parentEl.querySelectorAll(".o_sign_pdf_iframe");
         for (let i = 0; i < this.documents.length; i++) {
             if (i > 0) {
                 iframes[i].classList.add("d-none");
             }
-            iframes[i].setAttribute(
-                "src",
-                buildPDFViewerURL(this.documents[i].attachmentLocation, this.env.isSmall)
-            );
+            iframes[i].setAttribute("src", buildPDFViewerURL(this.documents[i].attachmentLocation));
             hidePDFJSButtons(iframes[i], {
                 hideDownload: true,
                 hidePrint: true,
@@ -229,12 +257,13 @@ export class Document extends Component {
                 setTimeout(() => {
                     document.iframeManager = this.initializeIframe(document.iframe, document.id);
                 }, 1);
-            })
+            });
         });
 
         document.querySelectorAll(".o_sign_document_navigator_text").forEach((text) => {
-            if (text)
+            if (text) {
                 text.textContent = "1 / " + this.documents.length;
+            }
         });
         document.querySelectorAll(".o_sign_document_navigator_left_arrow").forEach((arrow) => {
             arrow?.addEventListener("click", (e) => this.documentNavigate(-1));
@@ -251,31 +280,36 @@ export class Document extends Component {
         this.requestID = parseInt(parentEl.querySelector("#o_sign_input_sign_request_id")?.value);
         this.requestToken = parentEl.querySelector("#o_sign_input_sign_request_token")?.value;
         this.requestState = parentEl.querySelector("#o_sign_input_sign_request_state")?.value;
-        this.signRequestItemId = parseInt(parentEl.querySelector("#o_sign_input_sign_request_item_id")?.value);
+        this.signRequestItemId = parseInt(
+            parentEl.querySelector("#o_sign_input_sign_request_item_id")?.value
+        );
         this.accessToken = parentEl.querySelector("#o_sign_input_access_token")?.value;
-        this.todayFormattedDate = parentEl.querySelector("#o_sign_input_today_formatted_date")?.value;
-        this.dateFormat= parentEl.querySelector("#o_sign_input_date_format")?.value;
+        this.todayFormattedDate = parentEl.querySelector(
+            "#o_sign_input_today_formatted_date"
+        )?.value;
+        this.dateFormat = parentEl.querySelector("#o_sign_input_date_format")?.value;
         this.templateEditable = Boolean(parentEl.querySelector("#o_sign_input_template_editable"));
         this.authMethod = parentEl.querySelector("#o_sign_input_auth_method")?.value;
         this.signerName = parentEl.querySelector("#o_sign_signer_name_input_info")?.value;
         this.signerPhone = parentEl.querySelector("#o_sign_signer_phone_input_info")?.value;
         this.redirectURL = parentEl.querySelector("#o_sign_input_optional_redirect_url")?.value;
-        this.redirectURLText = parentEl.querySelector(
-            "#o_sign_input_optional_redirect_url"
-        )?.value;
+        this.redirectURLText = parentEl.querySelector("#o_sign_input_optional_redirect_url")?.value;
         this.redirectURLText = parentEl.querySelector(
             "#o_sign_input_optional_redirect_url_text"
         )?.value;
-        this.isSignerHasCompany = Boolean(parentEl.querySelector("#o_sign_input_is_signer_user")?.value);
+        this.isSignerHasCompany = Boolean(
+            parentEl.querySelector("#o_sign_input_is_signer_user")?.value
+        );
         this.types = datasetFromElements(
             parentEl.querySelectorAll(".o_sign_field_type_input_info")
         );
         const items = datasetFromElements(parentEl.querySelectorAll(".o_sign_item_input_info"));
-        this.documents.forEach((document) => document.items = items.filter(item => item.document_id === document.id));
+        this.documents.forEach(
+            (document) =>
+                (document.items = items.filter((item) => item.document_id === document.id))
+        );
         this.state.documentsWithUnsignedItems = new Set(
-            this.documents
-                .filter(doc => doc.items?.length > 0)
-                .map(doc => doc.id)
+            this.documents.filter((doc) => doc.items?.length > 0).map((doc) => doc.id)
         );
         this.state.viewedDocuments = new Set([this.documents[0].id]);
         this.selectOptions = datasetFromElements(
@@ -297,6 +331,7 @@ export class Document extends Component {
         this.nextDocumentButton?.addEventListener("click", () => {
             this.documentNavigate(1);
         });
+        return true;
     }
 
     initializeIframe(iframe, sign_document_id) {
@@ -314,7 +349,7 @@ export class Document extends Component {
                 ui: this.ui,
                 signInfo: this.signInfo,
             },
-            props,
+            props
         );
         return iframeManager;
     }
@@ -391,7 +426,8 @@ export class Document extends Component {
         };
         for (let i = 0; i < this.documents.length; i++) {
             const iframeManager = this.documents[i].iframeManager;
-            const [signatureValues, frameValues] = iframeManager.getSignatureValuesFromConfiguration();
+            const [signatureValues, frameValues] =
+                iframeManager.getSignatureValuesFromConfiguration();
             Object.assign(this.signatureInfo.signatureValues, signatureValues);
             Object.assign(this.signatureInfo.frameValues, frameValues);
         }
@@ -404,7 +440,7 @@ export class Document extends Component {
         this._signDocuments();
     }
 
-    _signDocuments(){
+    _signDocuments() {
         this.validateButton.setAttribute("disabled", true);
         if (this.signatureInfo.hasNoSignature) {
             const signature = {
@@ -498,7 +534,7 @@ export class Document extends Component {
         const response = await rpc(route, params).finally(() => this.ui.unblock());
         this.validateButton.removeAttribute("disabled");
         if (response.success) {
-            this.signInfo.set({companyCountryCode: response.company_country_code});
+            this.signInfo.set({ companyCountryCode: response.company_country_code });
             if (response.url) {
                 document.location.pathname = response.url;
             } else {
@@ -506,7 +542,10 @@ export class Document extends Component {
                 // only available in backend
                 const nameList = this.signInfo.get("nameList");
                 if (nameList && nameList.length > 0) {
+                    this.signInfo.set({ lastSignedName: this.signerName, lastEmailedName: false });
                     this.dialog.add(NextDirectSignDialog);
+                } else if (this.signInfo.get("someSignersEmailed")) {
+                    openAllSetDirectSignDialog(this.env, this.signInfo);
                 } else {
                     this.openThankYouDialog();
                 }
@@ -524,9 +563,9 @@ export class Document extends Component {
                     AlertDialog,
                     {
                         title: _t("Error"),
-                        body: _t(
-                            "Sorry, an error occurred, please try to fill the document again."
-                        ),
+                        body:
+                            response.message ||
+                            _t("Sorry, an error occurred, please try to fill the document again."),
                     },
                     {
                         onClose: () => {
@@ -576,23 +615,29 @@ export class Document extends Component {
 }
 
 function usePublicRefuseButton() {
-    const component = useComponent();
-    useEffect(
-        () => {
-            const refuseButtons = document.querySelectorAll(".o_sign_refuse_document_button");
-            if (refuseButtons) {
-                refuseButtons.forEach((button) =>
-                    button.addEventListener("click", () => {
-                        component.dialog.add(SignRefusalDialog);
-                    })
-                );
-                if (new URLSearchParams(window.location.search).get("refuse_document") === "1") {
-                    refuseButtons[0].click();
-                }
+    const dialog = useService("dialog");
+    onMounted(() => {
+        const refuseButtons = document.querySelectorAll(".o_sign_refuse_document_button");
+        const delegateButton = document.querySelectorAll(".o_sign_delegate_document_button");
+        if (refuseButtons) {
+            refuseButtons.forEach((button) =>
+                button.addEventListener("click", () => {
+                    dialog.add(SignRefusalDialog);
+                })
+            );
+            if (new URLSearchParams(window.location.search).get("refuse_document") === "1") {
+                refuseButtons[0].click();
             }
-        },
-        () => []
-    );
+        }
+
+        if (delegateButton) {
+            delegateButton.forEach((button) =>
+                button.addEventListener("click", () => {
+                    dialog.add(DelegateSignDialog);
+                })
+            );
+        }
+    });
 }
 
 export class SignableDocument extends Document {
@@ -605,35 +650,37 @@ export class SignableDocument extends Document {
         super.setup();
         this.coords = {};
         usePublicRefuseButton();
-        useEffect(
-            () => {
-                if (this.requestID) {
-                    // Geolocation
-                    const { el: parentEl } = this.props.parent;
-                    const askLocation = parentEl.getElementById(
-                        "o_sign_ask_location_input"
-                    );
-                    if (askLocation && navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                            ({ coords: { latitude, longitude } }) => {
-                                Object.assign(this.coords, {
-                                    latitude,
-                                    longitude,
-                                });
-                                if (this.requestState !== "shared") {
-                                    rpc(
-                                        `/sign/save_location/${this.requestID}/${this.accessToken}`,
-                                        this.coords
-                                    );
-                                }
-                            }
-                        , () => {}, {enableHighAccuracy: true}
-                        );
-                    }
-                }
-            },
-            () => [this.requestID]
-        );
+        useEffect(() => {
+            // Tracked read of the forwarded parent ref — the effect's only
+            // reactive dependency. `requestID` is a plain property, but it is
+            // only ever (re)computed by `getDataFromHTML`, which the sibling
+            // effect runs off this same ref: whenever `requestID` changes, the
+            // ref changed too, so this effect re-runs with it.
+            const parentEl = this.getParentEl();
+            if (!parentEl || !this.requestID) {
+                return;
+            }
+            // Geolocation
+            const askLocation = parentEl.getElementById?.("o_sign_ask_location_input");
+            if (askLocation && navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    ({ coords: { latitude, longitude } }) => {
+                        Object.assign(this.coords, {
+                            latitude,
+                            longitude,
+                        });
+                        if (this.requestState !== "shared") {
+                            rpc(
+                                `/sign/save_location/${this.requestID}/${this.accessToken}`,
+                                this.coords
+                            );
+                        }
+                    },
+                    () => {},
+                    { enableHighAccuracy: true }
+                );
+            }
+        });
     }
 
     getIframeProps(sign_document_id) {
@@ -646,23 +693,15 @@ export class SignableDocument extends Document {
 
 /**
  * Mounts the SignableComponent
- * @param { HTMLElement } parent
+ * @param { Document } parent
  */
 export async function initDocumentToSign(parent) {
-    // Manually add 'sign' to module list and load the translations
-    const env = makeEnv();
-    await startServices(env);
     await whenReady();
-    const app = new App(SignableDocument, {
+    await mountComponent(SignableDocument, parent.body, {
         name: "Signable Document",
-        env,
         props: {
-            parent: {el: parent},
-            PDFIframeClass: SignablePDFIframe },
-        getTemplate,
-        dev: env.debug,
-        translatableAttributes: ["data-tooltip"],
-        translateFn: appTranslateFn,
+            parent: () => parent,
+            PDFIframeClass: SignablePDFIframe,
+        },
     });
-    await app.mount(parent.body);
 }

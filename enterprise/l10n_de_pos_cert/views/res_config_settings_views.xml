@@ -9,16 +9,19 @@
                 <field name="pos_is_company_country_germany" invisible="1"/>
                 <div invisible="not pos_is_company_country_germany">
                     <block title="Fiskaly API" invisible="pos_l10n_de_fiskaly_tss_id">
-                        <setting string="Create TSS" help="Create a Technical Security System which is mandatory by the new regulations of Germany.">
-                            <field name="pos_l10n_de_create_tss_flag"/>
+                        <setting>
+                            <button name="action_create_tss" type="object"
+                                string="Create TSS"
+                                confirm="Registering this POS with Fiskaly will link it permanently to a Technical Security System (TSS). Once activated, these credentials cannot be changed or removed, and Test Mode will be disabled for this Point of Sale. To decommission this register in the future, you must use the 'Archive' function."/>
+                            <p class="text-muted mt-3">Create a Technical Security System which is mandatory by the new regulations of Germany</p>
                         </setting>
                     </block>
                     <block title="Fiskaly API" invisible="not pos_l10n_de_fiskaly_tss_id">
                         <setting>
-                            <field name="pos_l10n_de_fiskaly_tss_id"/>
+                            <field name="pos_l10n_de_fiskaly_tss_id" widget="CopyClipboardChar"/>
                         </setting>
                         <setting>
-                            <field name="pos_l10n_de_fiskaly_client_id"/>
+                            <field name="pos_l10n_de_fiskaly_client_id" widget="CopyClipboardChar"/>
                         </setting>
                     </block>
                 </div>

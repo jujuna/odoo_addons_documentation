@@ -13,10 +13,12 @@ from odoo import api, Command, fields, models, _
 from odoo.addons.html_editor.tools import handle_history_divergence
 from odoo.exceptions import AccessError, ValidationError, UserError
 from odoo.fields import Domain
-from odoo.tools import get_lang, OrderedSet
+from odoo.tools import get_lang, is_html_empty, OrderedSet
 from odoo.tools.sql import create_index, make_index_name, SQL
-from odoo.tools.translate import html_translate
+from odoo.tools.translate import LazyTranslate
 from odoo.tools.urls import urljoin as url_join
+
+_lt = LazyTranslate(__name__)
 
 ARTICLE_PERMISSION_LEVEL = {'none': 0, 'read': 1, 'write': 2}
 
@@ -88,6 +90,9 @@ class KnowledgeArticle(models.Model):
     parent_id = fields.Many2one(
         "knowledge.article", string="Parent Article", tracking=30,
         index=True, ondelete="cascade")
+    # display_name is a plain string and cannot carry the default icon rendered
+    # next to icon-less articles, so the breadcrumb needs the raw icon values.
+    parent_emoji = fields.Char(string="Parent Emoji", related="parent_id.icon")
     # used to speed-up hierarchy operators such as child_of/parent_of
     # see '_parent_store' implementation in the ORM for details
     parent_path = fields.Char(index=True)
@@ -105,9 +110,10 @@ class KnowledgeArticle(models.Model):
         default=0,  # Set default=0 to avoid false values and messed up sequence order inside same parent
         help="The sequence is computed only among the articles that have the same parent.")
     root_article_id = fields.Many2one(
-        'knowledge.article', string="Menu Article", recursive=True,
+        'knowledge.article', string="Menu Article", recursive=True, index=True,
         compute="_compute_root_article_id", store=True, compute_sudo=True, tracking=10,
         help="The subject is the title of the highest parent in the article hierarchy.")
+    root_article_emoji = fields.Char(string="Menu Article Emoji", related="root_article_id.icon")
     # Item management
     is_article_item = fields.Boolean('Is Item?', index=True)
     stage_id = fields.Many2one('knowledge.article.stage', string="Item Stage",
@@ -122,10 +128,11 @@ class KnowledgeArticle(models.Model):
         # Stored to improve performance when loading the article tree. (avoid looping through members if 'workspace')
     # Same as write_uid/_date but limited to the body
     last_edition_uid = fields.Many2one(
-        "res.users", string="Last Edited by", readonly=True, copy=False)
+        "res.users", string="Last Edited by", readonly=True, copy=False, index='btree_not_null')
     last_edition_date = fields.Datetime(
         string="Last Edited on", readonly=True, copy=False)
     last_edition_user_avatar = fields.Image(string="Last Editor's Avatar", related="last_edition_uid.avatar_128")
+    summary = fields.Text('Summary', compute='_compute_summary')
     # Favorite
     is_user_favorite = fields.Boolean(
         string="Is Favorited",
@@ -150,7 +157,7 @@ class KnowledgeArticle(models.Model):
     )
     # Trash management
     to_delete = fields.Boolean(string="Trashed", tracking=100,
-        help="""When sent to trash, articles are flagged to be deleted
+        help="""When moved to trash, articles are flagged to be deleted
                 days after last edit. knowledge_article_trash_limit_days config
                 parameter can be used to modify the number of days. 
                 (default is 30)""")
@@ -163,9 +170,9 @@ class KnowledgeArticle(models.Model):
     is_listed_in_templates_gallery = fields.Boolean(string="Is listed in Templates Gallery?",
         help="If checked, the article will appear in the templates gallery under the 'Shared Templates' section")
     is_template = fields.Boolean(string="Is Template")
-    template_body = fields.Text(string="Template Body", translate=html_translate)
+    template_body = fields.Html(string="Template Body", translate=True)
     template_category_id = fields.Many2one("knowledge.article.template.category", string="Template Category",
-        compute="_compute_template_category_id", inverse="_inverse_template_category_id", store=True)
+        compute="_compute_template_category_id", inverse="_inverse_template_category_id", store=True, index='btree_not_null')
     template_category_sequence = fields.Integer(string="Template Category Sequence", related="template_category_id.sequence")
     template_description = fields.Char(string="Template Description", translate=True)
     template_name = fields.Char(string="Template Title", translate=True)
@@ -290,15 +297,6 @@ class KnowledgeArticle(models.Model):
         for article in self:
             if article.inherited_permission != 'write' and not article._has_write_member():
                 raise ValidationError(_("The article '%s' needs at least one member with 'Write' access.", article.display_name))
-
-    @api.constrains('parent_id')
-    def _check_parent_id_recursion(self):
-        if self._has_cycle():
-            raise ValidationError(
-                _('Articles %s cannot be updated as this would create a recursive hierarchy.',
-                  ', '.join(self.mapped('name'))
-                 )
-            )
 
     @api.constrains('is_template', 'parent_id')
     def _check_template_hierarchy(self):
@@ -561,7 +559,7 @@ class KnowledgeArticle(models.Model):
         if self.env.user.share:
             return Domain(operator == 'in')
 
-        articles_with_access = KnowledgeArticle._get_internal_permission(filter_domain=[('internal_permission', '=', 'write')])
+        articles_with_access = KnowledgeArticle._get_internal_permission(internal_permission='write')
         member_permissions = KnowledgeArticle._get_partner_member_permissions(self.env.user.partner_id)
         articles_with_member_access = [article_id for article_id, perm in member_permissions.items() if perm == 'write']
         articles_with_no_member_access = list(set(member_permissions.keys() - set(articles_with_member_access)))
@@ -725,15 +723,27 @@ class KnowledgeArticle(models.Model):
         trashed_articles = self.filtered(lambda article: article.to_delete)
         (self - trashed_articles).deletion_date = False
         if trashed_articles:
-            limit_days = self.env["ir.config_parameter"].sudo().get_param(
-                "knowledge.knowledge_article_trash_limit_days"
+            limit_days = self.env["ir.config_parameter"].sudo().get_int(
+                "knowledge.knowledge_article_trash_limit_days",
+                self.DEFAULT_ARTICLE_TRASH_LIMIT_DAYS,
             )
-            try:
-                limit_days = int(limit_days)
-            except ValueError:
-                limit_days = self.DEFAULT_ARTICLE_TRASH_LIMIT_DAYS
             for article in trashed_articles:
                 article.deletion_date = article.write_date + timedelta(days=limit_days)
+
+    @api.depends('body')
+    def _compute_summary(self):
+        for article in self:
+            if is_html_empty(article.body):
+                article.summary = False
+                continue
+            root = html.fragment_fromstring(article.body, create_parent=True)
+            selector = "//*[@data-embedded]"
+            for element in root.xpath(selector):
+                element.getparent().remove(element)
+
+            text = ' '.join(root.itertext())
+            text = re.sub(r'\s+', ' ', text).strip()
+            article.summary = text[:100] + (_('...') if len(text) > 100 else '')
 
     # ------------------------------------------------------------
     # CRUD
@@ -838,11 +848,6 @@ class KnowledgeArticle(models.Model):
                 vals["body"] = Markup('<h1>%s</h1>') % vals["name"] if vals.get("name") \
                                else Markup('<h1 class="oe-hint"><br></h1>')
 
-            vals.update({
-                'last_edition_date': fields.Datetime.now(),
-                'last_edition_uid': self.env.user.id,
-            })
-
             can_sudo = False
             # get values from vals or defaults
             member_ids = vals.get('article_member_ids') or defaults.get('article_member_ids') or False
@@ -852,12 +857,41 @@ class KnowledgeArticle(models.Model):
                 parent_ids.add(parent_id)
 
             if not self.env.user._is_internal() and not self.env.su:
+                allowed_fields = self._get_portal_write_fields_allowlist() | {'active', 'to_delete', 'parent_id'}
+                write_fields = {
+                    key[len("default_"):] for key in self.env.context if key.startswith("default_")
+                } | set(vals)
+                forbidden_fields = write_fields - allowed_fields
+                if forbidden_fields and (
+                    # A private root requires both its private permission and a membership granting
+                    # its portal creator write access, so allow these two otherwise forbidden fields.
+                    forbidden_fields - {'internal_permission', 'article_member_ids'}
+                    or not (
+                        # Restrict the exception to a new private root with one exact self-membership command.
+                        not parent_id
+                        and internal_permission == 'none'
+                        and member_ids
+                        and len(member_ids) == 1
+                        and member_ids[0][0] == Command.CREATE
+                        and member_ids[0][2] == {
+                            'partner_id': self.env.user.partner_id.id,
+                            'permission': 'write',
+                        }
+                    )
+                ):
+                    raise AccessError(_('Only internal users are allowed to modify this information.'))
+
                 if not parent_id and internal_permission != 'none':
                     raise AccessError(_('Only internal users are allowed to create workspace root articles.'))
 
                 if internal_permission != 'none' and 'is_article_visible_by_everyone' in vals:
                     # do not let portal specify the visibility, it will inherit from the root article
                     del vals['is_article_visible_by_everyone']
+
+            vals.update({
+                'last_edition_date': fields.Datetime.now(),
+                'last_edition_uid': self.env.user.id,
+            })
 
             # force write permission for workspace articles
             if not parent_id and not internal_permission:
@@ -1023,14 +1057,6 @@ class KnowledgeArticle(models.Model):
             article.with_context(active_test=False).copy_data(default=default)[0]
             for article in to_copy
         ])
-        # update translations, skip name (hardcoded in default anyway) and o2m fields
-        # as we don't need anything translated from them
-        for old, new in zip(to_copy, duplicates):
-            old.copy_translations(
-                new,
-                excluded=list(default.keys()) if default else [] + ['name', 'article_member_ids', 'favorite_ids']
-            )
-
         return duplicates
 
     @api.model
@@ -1058,16 +1084,20 @@ class KnowledgeArticle(models.Model):
 
     @api.autovacuum
     def _gc_trashed_articles(self):
-        limit_days = self.env["ir.config_parameter"].sudo().get_param(
-            "knowledge.knowledge_article_trash_limit_days"
+        return self.with_context(active_test=False).search(
+            self._get_gc_trashed_articles_domain(), limit=100
+        ).unlink()
+
+    def _get_gc_trashed_articles_domain(self):
+        limit_days = self.env["ir.config_parameter"].sudo().get_int(
+            "knowledge.knowledge_article_trash_limit_days",
+            self.DEFAULT_ARTICLE_TRASH_LIMIT_DAYS
         )
-        try:
-            limit_days = int(limit_days)
-        except ValueError:
-            limit_days = self.DEFAULT_ARTICLE_TRASH_LIMIT_DAYS
         timeout_ago = datetime.utcnow() - timedelta(days=limit_days)
-        domain = [("write_date", "<", timeout_ago), ("to_delete", "=", True)]
-        return self.with_context(active_test=False).search(domain, limit=100).unlink()
+        return [
+            ("write_date", "<", timeout_ago),
+            ("to_delete", "=", True),
+        ]
 
     def action_archive(self):
         self._action_archive_articles()
@@ -1083,8 +1113,8 @@ class KnowledgeArticle(models.Model):
         It also allows pasting an article display_name into a m2o field and using the quick creation
         if it does not exist.
 
-        Without this override, you would get '📄🚀 Article With Icon' (placeholder added as icon is
-        not detected) instead of '🚀 Article With Icon' as result. """
+        Without this override, the emoji would be kept as part of the 'name' field instead of being
+        extracted into the dedicated 'icon' field. """
 
         article_name, icon = self._extract_icon_from_name(name)
         if not icon:
@@ -1098,19 +1128,11 @@ class KnowledgeArticle(models.Model):
 
     @api.depends('name', 'template_name', 'icon', 'is_template')
     def _compute_display_name(self):
+        """ Articles without an icon are displayed with their name only: the UI
+        renders a default icon next to it, which a plain string cannot carry. """
         for rec in self:
             name = (rec.template_name if rec.is_template else rec.name) or _('Untitled')
-            rec.display_name = f"{rec.icon or self._get_no_icon_placeholder()} {name}"
-
-    def _get_no_icon_placeholder(self):
-        """ Emoji used in templates as a placeholder when icon is False. It's
-        here as a method because some lxml builds on macOS can not parse emoji
-        characters, and a user using such a device would not be able to install
-        the Knowledge module without an error.
-        This method should be removed as soon as a solution is found allowing
-        emojis to be parsed directly from a template on those devices.
-        """
-        return "📄"
+            rec.display_name = f"{rec.icon} {name}" if rec.icon else name
 
     @api.model
     def _search_display_name(self, operator, value):
@@ -1136,34 +1158,23 @@ class KnowledgeArticle(models.Model):
                 value = [value]
             return super()._search_display_name(operator, value)
 
-        if icon == self._get_no_icon_placeholder():
-            # special case using the icon placeholder (no icon stored but the display_name returns one)
-            domain = [
-                ('name', operator, article_name),
-                '|',
-                ('icon', '=', icon),
-                ('icon', '=', False),
-            ]
-        else:
-            domain = [
-                ('name', operator, article_name),
-                ('icon', '=', icon),
-            ]
-
-        return domain
+        return [
+            ('name', operator, article_name),
+            ('icon', '=', icon),
+        ]
 
     def _get_transformed_body_from(self, source_article):
         """ Returns the body of the source article with the following transformations:
         - Updates the embedded views so that the views listing the article items
         of the source article now lists the article items of the current article.
-        - Removes the history steps from the document.
+        - Removes the history commits from the document.
         :param <knowledge.article> source_article: Source article
         """
         fragment = html.fragment_fromstring(source_article.body, create_parent=True)
 
-        # Remove history steps to prevent divergence errors:
-        for element in fragment.findall('.//*[@data-last-history-steps]'):
-            del element.attrib["data-last-history-steps"]
+        # Remove history commits to prevent divergence errors:
+        for element in fragment.findall('.//*[@data-last-history-commits]'):
+            del element.attrib["data-last-history-commits"]
 
         # Update the embedded views:
         for element in fragment.findall(".//*[@data-embedded='view']"):
@@ -1174,7 +1185,7 @@ class KnowledgeArticle(models.Model):
                 context.update({"active_id": self.id, "default_parent_id": self.id})
                 element.set("data-embedded-props", json.dumps(embedded_props))
 
-        return html.tostring(fragment, encoding="unicode")
+        return "".join(html.tostring(node, encoding="unicode") for node in fragment)
 
     # ------------------------------------------------------------
     # ACTIONS
@@ -1205,7 +1216,7 @@ class KnowledgeArticle(models.Model):
             'name': name,
         })
 
-        # Remove the history steps and transform the embedded views:
+        # Remove the history commits and transform the embedded views:
         article.write({
             'body': article._get_transformed_body_from(self)
         })
@@ -1610,7 +1621,7 @@ class KnowledgeArticle(models.Model):
         # Escape special characters recognized by the 'ILIKE' keyword
         search_pattern = '%' + re.sub(r'(%|_|\\)', r'\\\1', search_query) + '%'
         ts_query = SQL("plainto_tsquery('knowledge_config', %(search_query)s)", search_query=search_query)
-        cut_off = max(self.env['ir.config_parameter'].sudo().get_param('knowledge.fts_search_cut_off', 100), limit)
+        cut_off = max(self.env['ir.config_parameter'].sudo().get_int('knowledge.fts_search_cut_off', 100), limit)
 
         self.env.cr.execute(SQL('''
             WITH
@@ -1702,12 +1713,11 @@ class KnowledgeArticle(models.Model):
                 sorted_article['icon'] = False
             # Get the display name of the root article using the same logic as
             # in name_get.
+            root_article_name = sorted_article['root_article_name'] or _('Untitled')
+            root_article_icon = sorted_article['root_article_icon']
             sorted_article['root_article_id'] = (
                 sorted_article['root_article_id'],
-                "%s %s" % (
-                    sorted_article['root_article_icon'] or self._get_no_icon_placeholder(),
-                    sorted_article['root_article_name'] or _('Untitled')
-                )
+                f"{root_article_icon} {root_article_name}" if root_article_icon else root_article_name
             )
             del sorted_article['root_article_icon']
             del sorted_article['root_article_name']
@@ -1859,6 +1869,8 @@ class KnowledgeArticle(models.Model):
 
     def get_permission_panel_members(self):
         self.ensure_one()
+        if not self.user_has_access:
+            return []
         res_partner_fields_list = [('name', 'name'), ('partner_share', 'partner_share'), ('id', 'partner_id')]
         if self.env.user._is_internal():
             res_partner_fields_list.append(('email', 'email'))
@@ -1932,6 +1944,7 @@ class KnowledgeArticle(models.Model):
             self.sudo().write({'article_member_ids': members_command})
             self._send_invite_mail(partners, permission, message)
 
+        self.env.transaction.invalidate_access_cache(self._name)
         return True
 
     def set_internal_permission(self, permission):
@@ -2451,26 +2464,18 @@ class KnowledgeArticle(models.Model):
     # ------------------------------------------------------------
 
     @api.model
-    def _get_internal_permission(self, filter_domain=None):
-        """ Compute article based permissions.
-
-        Note: we don't use domain because we cannot include properly the where clause
-        in the custom sql query. The query's output table and fields names does not match
-        the model we are working on.
-        """
+    def _get_internal_permission(self, *, internal_permission=None):
+        """ Compute article based permissions. """
         self.flush_model()
 
         base_where_domain = SQL()
         if self.ids:
             base_where_domain = SQL("WHERE id in %s", tuple(self.ids))
 
-        where_clause = SQL()
-        if filter_domain:
-            query = self.with_context(active_test=False)._search(filter_domain or [], bypass_access=True)
-            where_clause = query.where_clause
-            if where_clause:
-                where_clause = SQL(where_clause.code.replace(query.table, "article_perms"), *where_clause.params)
-                where_clause = SQL('WHERE %s', where_clause)
+        if internal_permission:
+            where_clause = SQL("WHERE internal_permission = %s", internal_permission)
+        else:
+            where_clause = SQL()
 
         return dict(self.env.execute_query(SQL('''
     WITH RECURSIVE article_perms as (
@@ -2675,7 +2680,7 @@ class KnowledgeArticle(models.Model):
               FROM effective_memberships AS %(alias)s
                    %(join_clauses)s
             """,
-            alias=SQL(alias),
+            alias=SQL.identifier(alias),
             article_ids_clause=article_ids_clause,
             select_fields_clause=select_fields_clause,
             join_clauses=join_clauses,
@@ -2704,14 +2709,14 @@ class KnowledgeArticle(models.Model):
     # MAILING
     # ------------------------------------------------------------
 
-    def _mail_track(self, tracked_fields, initial_values):
-        changes, tracking_value_ids = super()._mail_track(tracked_fields, initial_values)
+    def _mail_track(self, tracked_fields_get, initial_values):
+        changes, tracking_values = super()._mail_track(tracked_fields_get, initial_values)
         if {'parent_id', 'root_article_id'} & changes and not self.user_has_write_access:
             partner_name = self.env.user.partner_id.display_name
             message_body = _("Logging changes from %(partner_name)s without write access on article %(article_name)s due to hierarchy tree update",
                 partner_name=partner_name, article_name=self.display_name)
             self._track_set_log_message(Markup("<p>%s</p>") % message_body)
-        return changes, tracking_value_ids
+        return changes, tracking_values
 
     def _send_invite_mail(self, partners, permission, message=None):
         self.ensure_one()
@@ -2744,15 +2749,14 @@ class KnowledgeArticle(models.Model):
                 email_layout_xmlid='mail.mail_notification_layout',
                 partner_ids=partner.ids,
                 subject=subject,
-                subtitles=[self.display_name, _('Your Access: %s', permission_label)],
+                subtitles=[self.display_name, _lt('Your Access: %s', permission_label)],
             )
 
-    def _notify_get_recipients_groups(self, message, model_description, msg_vals=False):
-        groups = super()._notify_get_recipients_groups(message, model_description, msg_vals=msg_vals)
-        msg_vals = msg_vals or {}
-        partner_ids = msg_vals['partner_ids'] if 'partner_ids' in msg_vals else message.partner_ids.ids
-        if not self or not partner_ids:
+    def _notify_get_recipients_groups(self, message, model_description):
+        groups = super()._notify_get_recipients_groups(message, model_description)
+        if not self or not message.partner_ids:
             return groups
+        partner_ids = message.partner_ids.ids
         new_group = []
         for member in self.article_member_ids.filtered(
             lambda member: member.partner_id.id in partner_ids and member.partner_id.partner_share
@@ -2778,47 +2782,60 @@ class KnowledgeArticle(models.Model):
         to retrieve the first accessible article that will be considered for
         them as the root trashed article. A notification is sent to each partner
         to notify with the list of their own accessible articles."""
-        partners_to_notify = self.article_member_ids.filtered(
+        members_to_notify = self.article_member_ids.filtered(
             lambda member: member.permission in ['read', 'write']
-        ).partner_id
+                and not member.partner_id.partner_share
+                and member.partner_id.id != self.env.user.partner_id.id)
+        partners_to_notify = members_to_notify.partner_id
 
-        KnowledgeArticle = self.env["knowledge.article"].with_context(active_test=False, allowed_company_ids=[])
         sent_messages = self.env['mail.message']
-        for partner in partners_to_notify.filtered(lambda p: not p.partner_share):
+        if not partners_to_notify:
+            return sent_messages
+
+        Article = self.env["knowledge.article"].with_context(
+            active_test=False, allowed_company_ids=[])
+        days_until_deletion = self.env["ir.config_parameter"].sudo().get_int(
+            "knowledge.knowledge_article_trash_limit_days",
+            self.DEFAULT_ARTICLE_TRASH_LIMIT_DAYS)
+
+        for partner in partners_to_notify:
             # if only one article, all the partner_to_notify have access to the article.
             if len(self) == 1:
-                main_articles, children = self, KnowledgeArticle
+                main_articles, children = self, Article
             else:
-                # Current partner may have no access to some of the articles_to_notify.
+                # Current partner may have no access to some of the trashed articles.
                 # Get all accessible articles for the current partner
                 partner_user = partner.user_ids.filtered(lambda u: not u.share)[0]
-                accessible_articles = KnowledgeArticle.with_user(partner_user).search(
-                    [('id', 'in', self.ids)]
-                )
+                accessible_articles = Article.with_user(partner_user).search([('id', 'in', self.ids)])
 
                 # "Main articles" are articles that:
                 #   - has no parent
-                #   - OR the current partner as no access to their parent
+                #   - OR the current partner has no access to their parent
                 #   - OR the parent article can be accessed but is not archived.
                 main_articles = accessible_articles.sudo().filtered(
-                    lambda a: a.parent_id not in accessible_articles
-                )
+                    lambda a: a.parent_id not in accessible_articles)
                 children = accessible_articles - main_articles
+
+            if len(main_articles) + len(children) == 0:
+                continue
 
             # Set the partner lang in context to send mail in partner lang.
             partner_lang = get_lang(self.env, lang_code=partner.lang).code
             self = self.with_context(lang=partner_lang)  # force translation of subject
 
             if len(main_articles) == 1:
-                subject = _("%s has been sent to Trash", main_articles.name or _("Untitled"))
+                subject = _("%s has been moved to Trash", main_articles.name or _("Untitled"))
+                subtitles = [main_articles.display_name]
             else:
-                subject = _("Some articles have been sent to Trash")
+                subject = _lt("Some articles have been moved to Trash")
+                subtitles = []
 
             body = self.env['ir.qweb'].with_context(lang=partner_lang)._render(
                 'knowledge.knowledge_article_trash_notification', {
                     'articles': main_articles,
                     'recipient': partner,
                     'child_articles': children,
+                    'days_until_deletion': days_until_deletion,
                 })
 
             # If multiple "main articles", to keep sending only one mail,
@@ -2826,9 +2843,10 @@ class KnowledgeArticle(models.Model):
             document_to_notify = main_articles if len(main_articles) == 1 else self.env['mail.thread']
             sent_messages += document_to_notify.with_context(lang=partner_lang).message_notify(
                 body=body,
-                email_layout_xmlid='mail.mail_notification_light',
+                email_layout_xmlid='mail.mail_notification_layout',
                 partner_ids=partner.ids,
                 subject=subject,
+                subtitles=subtitles,
             )
 
         return sent_messages
@@ -3257,12 +3275,10 @@ class KnowledgeArticle(models.Model):
         # -> Use the specific context key of that action to target it.
         if not "search_default_filter_trashed" in self.env.context:
             return super().get_empty_list_help(help_message)
-        get_param = self.env['ir.config_parameter'].sudo().get_param
-        limit_days = get_param('knowledge.knowledge_article_trash_limit_days')
-        try:
-            limit_days = int(limit_days)
-        except ValueError:
-            limit_days = self.DEFAULT_ARTICLE_TRASH_LIMIT_DAYS
+        limit_days = self.env['ir.config_parameter'].sudo().get_int(
+            "knowledge.knowledge_article_trash_limit_days",
+            self.DEFAULT_ARTICLE_TRASH_LIMIT_DAYS
+        )
         title = _("No Article in Trash")
         description = Markup(
             _("""Deleted articles are stored in Trash an extra <b>%(threshold)s</b> days
@@ -3380,4 +3396,7 @@ class KnowledgeArticle(models.Model):
         ancestor_ids = self._get_ancestor_ids()
         if exclude_article_ids:
             ancestor_ids.difference_update(exclude_article_ids)
-        return self.sudo().browse(reversed(list(ancestor_ids))).read(["display_name", "user_has_access"])
+        return self.sudo().browse(reversed(list(ancestor_ids))).read(["display_name", "icon", "user_has_access"])
+
+
+KnowledgeArticle._resequence.__override__ = False  # whitelist super()

@@ -97,15 +97,15 @@ beforeEach(async () => {
         list: `<list><field name="name"/></list>`,
         kanban: `<kanban><t t-name="card"><field name="name"/></t></kanban>`,
         gantt: `<gantt date_start="planned_date_begin" date_stop="date_deadline" js_class="task_sharing_gantt" dependency_field="depend_on_ids">
+                <field name="portal_user_names"/>
+                <popover>
                     <templates>
-                        <t t-name="gantt-popover">
-                            <footer replace="0">
-                                <button name="action_unschedule_task" type="object" string="Unschedule"
-                                    class="btn btn-sm btn-secondary"/>
-                            </footer>
+                        <t t-name="popover-footer" replace="0">
+                            <button name="action_unschedule_task" type="object" string="Unschedule"
+                                class="btn btn-sm btn-secondary"/>
                         </t>
                     </templates>
-                <field name="portal_user_names"/>
+                </popover>
             </gantt>
         `,
         search: `<search></search>`,
@@ -129,7 +129,7 @@ test("Chatter remains hidden until form view is expanded", async () => {
     await setupAction();
     click(".o_gantt_pill");
     await animationFrame();
-    click(".o_popover .popover-footer button", { text: "Edit" });
+    click(".o_popover .o_popover_footer button", { text: "Edit" });
     expect(".o-mail-ChatterContainer").toHaveCount(0);
     await animationFrame();
     click(".o_expand_button");

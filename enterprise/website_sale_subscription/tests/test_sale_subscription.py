@@ -8,6 +8,8 @@ from odoo.addons.sale_subscription.tests.common_sale_subscription import TestSub
 @tagged('post_install', '-at_install')
 class TestSaleSubscription(TestSubscriptionCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_delivery_line_not_applied_prorata_discount(self):
         """Ensure delivery lines keep their original price and are not prorated in subscription invoices and upsell order."""
         with freeze_time("2025-09-15"):

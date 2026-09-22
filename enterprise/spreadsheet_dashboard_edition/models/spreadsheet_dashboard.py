@@ -1,6 +1,7 @@
 import json
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models, _, tools
+from odoo.exceptions import ValidationError
 
 
 class SpreadsheetDashboard(models.Model):
@@ -27,6 +28,23 @@ class SpreadsheetDashboard(models.Model):
         for dashboard in self:
             dashboard.is_from_data = bool(xml_ids.get(dashboard.id) and dashboard.sample_dashboard_file_path)
 
+    @api.constrains("spreadsheet_binary_data")
+    def _check_spreadsheet_data(self):
+        super()._check_spreadsheet_data()
+        # Test-only validation for source dashboards; this code never runs in production.
+        if not (tools.config['test_enable'] or tools.config['test_file']):
+            return
+        for dashboard in self.filtered(lambda d: d.spreadsheet_binary_data and d.sample_dashboard_file_path):
+            data = json.loads(dashboard.spreadsheet_binary_data.content)
+            for list_def in data.get("lists", {}).values():
+                if not list_def.get("translateHeaders", False) and \
+                    any(isinstance(column, dict) and "string" in column for column in list_def.get("columns", [])):
+                    raise ValidationError(_(
+                        "List columns in dashboard '%(dashboard)s' must not define 'string' explicitly. "
+                        "They should fall back to the translated field label.",
+                        dashboard=dashboard.display_name,
+                    ))
+
     def _get_spreadsheet_metadata(self, *args, **kwargs):
         return dict(
             super()._get_spreadsheet_metadata(*args, **kwargs),
@@ -44,26 +62,31 @@ class SpreadsheetDashboard(models.Model):
             },
         }
 
+    def _get_dashboard_commands(self):
+        """list of commands to apply when opening the dashboard"""
+        return [
+            {
+                "type": "UPDATE_LOCALE",
+                "locale": self.env["res.lang"]._get_user_spreadsheet_locale(),
+            }
+        ]
+
     def _get_serialized_readonly_dashboard(self):
         self.ensure_one()
-        update_locale_command = {
-            "type": "UPDATE_LOCALE",
-            "locale": self.env["res.lang"]._get_user_spreadsheet_locale(),
-        }
         self._check_collaborative_spreadsheet_access("read")
         revisions = self.sudo()._get_spreadsheet_serialized_revisions()
-        revisions.append(json.dumps(self._build_new_revision_data([update_locale_command])))
+        revisions.append(json.dumps(self._build_new_revision_data(self._get_dashboard_commands())))
         serialized_revisions = "[%s]" % ",".join(revisions)
         serialized_snapshot = self._get_spreadsheet_serialized_snapshot()
         metadata = self._get_spreadsheet_metadata()
-        default_currency = metadata["default_currency"]
-        translation_namespace = metadata["translation_namespace"]
-        serialized_default_currency = json.dumps(default_currency, ensure_ascii=False)
-        serialized_data = '{"snapshot": %s,"revisions": %s,"default_currency": %s,"translation_namespace": "%s"}' % (
+        metadata_items = [
+            f'"{key}": {json.dumps(value, ensure_ascii=False)}'
+            for key, value in metadata.items()
+        ]
+        serialized_data = '{"snapshot": %s,"revisions": %s,%s}' % (
             serialized_snapshot,
             serialized_revisions,
-            serialized_default_currency,
-            translation_namespace
+            ",".join(metadata_items)
         )
         return serialized_data
 

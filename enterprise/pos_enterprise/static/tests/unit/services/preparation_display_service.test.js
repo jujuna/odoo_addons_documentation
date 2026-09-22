@@ -27,186 +27,186 @@ test("togglePreset", async () => {
 
 describe("checkStateVisibility", () => {
     describe("no filters", () => {
-        test("returns true for state todo=true", async () => {
+        test("returns true for preparation line todo=true", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            const visible = store.checkStateVisibility(state);
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(true);
         });
-        test("returns false for state with todo=false", async () => {
+        test("returns false for preparation line with todo=false", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            state.todo = false;
-            const visible = store.checkStateVisibility(state);
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            prepLine.todo = false;
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(true);
         });
     });
 
     describe("product category filter", () => {
-        test("returns true for state with products in selected category", async () => {
+        test("returns true for preparation line with products in selected category", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            store.toggleCategory(state.categories[0]);
-            const visible = store.checkStateVisibility(state);
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            store.toggleCategory(prepLine.categories[0]);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(true);
         });
 
-        test("returns false for state with no products in selected category", async () => {
+        test("returns false for preparation line with no products in selected category", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
             const otherCategory = store.data.models["pos.category"]
                 .getAll()
-                .find((c) => !state.categories.map((cat) => cat.id).includes(c.id));
+                .find((c) => !prepLine.categories.map((cat) => cat.id).includes(c.id));
             store.toggleCategory(otherCategory);
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(false);
         });
     });
 
     describe("product filter", () => {
-        test("returns true for state with selected products", async () => {
+        test("returns true for preparation line with selected products", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            state.product.categoryIds = state.categories.map((c) => c.id);
-            store.toggleProduct(state.product);
-            const visible = store.checkStateVisibility(state);
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            prepLine.product.categoryIds = prepLine.categories.map((c) => c.id);
+            store.toggleProduct(prepLine.product);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(true);
         });
 
-        test("returns false for state with no selected products", async () => {
+        test("returns false for preparation line with no selected products", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
             const otherProduct = store.data.models["product.product"]
                 .getAll()
-                .find((p) => p.id !== state.product.id);
+                .find((p) => p.id !== prepLine.product.id);
             otherProduct.categoryIds = otherProduct.pos_categ_ids.map((c) => c.id);
             store.toggleProduct(otherProduct);
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(false);
         });
     });
 
     describe("time filter", () => {
-        test("returns true for state in selected time", async () => {
+        test("returns true for preparation line in selected time", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
             store.toggleTime("today");
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(true);
         });
 
-        test("returns false for state not in selected time", async () => {
+        test("returns false for preparation line not in selected time", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
             store.toggleTime("yesterday");
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(false);
         });
         test("returns true when timeCheck is false but timeToShow is 0 and 'now' is selected", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            state.timeToShow = 0;
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            prepLine.timeToShow = 0;
             store.toggleTime("now");
             store.toggleTime("tomorrow"); // force timeCheck to fail
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(true);
         });
 
         test("returns false when timeToShow is not 0 even if 'now' is selected", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            state.timeToShow = 10;
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            prepLine.timeToShow = 10;
             store.toggleTime("now");
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(false);
         });
         test("returns true for order date two days in the future when 'next_days' is selected", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            state.prep_line_id.prep_order_id.pos_order_id.preset_time = DateTime.now().plus({
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            prepLine.prep_order_id.pos_order_id.preset_time = DateTime.now().plus({
                 days: 2,
             });
             store.toggleTime("next_days");
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(true);
         });
 
         test("returns false for tomorrow when only 'next_days' is selected", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            state.prep_line_id.prep_order_id.pos_order_id.preset_time = DateTime.now().plus({
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            prepLine.prep_order_id.pos_order_id.preset_time = DateTime.now().plus({
                 days: 1,
             });
             store.toggleTime("next_days");
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(false);
         });
         test("returns true when preset_time is missing and 'today' is selected", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            state.prep_line_id.prep_order_id.pos_order_id.preset_time = null;
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            prepLine.prep_order_id.pos_order_id.preset_time = null;
             store.toggleTime("today");
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(true);
         });
 
         test("returns false when preset_time is missing and 'today' is not selected", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
-            state.prep_line_id.prep_order_id.pos_order_id.preset_time = null;
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
+            prepLine.prep_order_id.pos_order_id.preset_time = null;
             store.toggleTime("tomorrow");
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(false);
         });
     });
 
     describe("preset filter", () => {
-        test("returns true for state with selected preset", async () => {
+        test("returns true for preparation line with selected preset", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
             const preset = store.data.models["pos.preset"].getAll()[0];
-            state.prep_line_id.prep_order_id.pos_order_id.preset_id = preset;
+            prepLine.prep_order_id.pos_order_id.preset_id = preset;
             store.togglePreset(preset.id);
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(true);
         });
 
-        test("returns false for state with no selected preset", async () => {
+        test("returns false for preparation linepreparation line with no selected preset", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
             const preset = store.data.models["pos.preset"].getAll()[0];
-            state.prep_line_id.prep_order_id.pos_order_id.preset_id = preset;
+            prepLine.prep_order_id.pos_order_id.preset_id = preset;
             const otherPreset = store.data.models["pos.preset"]
                 .getAll()
                 .find((p) => p.id !== preset.id);
             store.togglePreset(otherPreset.id);
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(false);
         });
 
-        test("returns false when a preset is selected but state has no preset_id", async () => {
+        test("returns false when a preset is selected but preparation line has no preset_id", async () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
-            const state = store.data.models["pos.prep.state"].getAll()[0];
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
             const preset = store.data.models["pos.preset"].getAll()[0];
             store.togglePreset(preset.id);
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(false);
         });
     });
@@ -216,19 +216,19 @@ describe("checkStateVisibility", () => {
             const store = await setupPosPrepDisplayEnv();
             await createPrepDisplayTicket(store);
 
-            const state = store.data.models["pos.prep.state"].getAll()[0];
+            const prepLine = store.data.models["pos.prep.line"].getAll()[0];
 
             // Matching category
-            store.toggleCategory(state.categories[0]);
+            store.toggleCategory(prepLine.categories[0]);
 
             // Non-matching product
             const otherProduct = store.data.models["product.product"]
                 .getAll()
-                .find((p) => p.id !== state.product.id);
+                .find((p) => p.id !== prepLine.product.id);
             otherProduct.categoryIds = otherProduct.pos_categ_ids.map((c) => c.id);
             store.toggleProduct(otherProduct);
 
-            const visible = store.checkStateVisibility(state);
+            const visible = store.checkStateVisibility(prepLine);
             expect(visible).toBe(false);
         });
     });
@@ -255,26 +255,62 @@ describe("orderNextStage", () => {
 test("doneOrders", async () => {
     const store = await setupPosPrepDisplayEnv();
     await createPrepDisplayTicket(store);
-    const states = store.data.models["pos.prep.state"].getAll();
-    await store.doneOrders(states);
-    expect(states.every((s) => s.todo === false)).toBe(true);
+    const prepLines = store.data.models["pos.prep.line"].getAll();
+    await store.doneOrders(prepLines);
+    expect(prepLines.every((s) => s.todo === false)).toBe(true);
 });
 
 test("changeStateStage", async () => {
     const store = await setupPosPrepDisplayEnv();
     await createPrepDisplayTicket(store);
-    const states = store.data.models["pos.prep.state"].getAll();
-    await store.changeStateStage(states);
+    const prepLines = store.data.models["pos.prep.line"].getAll();
+    await store.changeStateStage(prepLines);
     await store.data.initData();
-    expect(states[0].stage_id.id).toBe(2);
+    expect(store.data.models["pos.prep.line"].getAll()[0].stage_id.id).toBe(2);
 });
 
 test("filteredOrders", async () => {
     const store = await setupPosPrepDisplayEnv();
     await createPrepDisplayTicket(store);
-    const states = store.data.models["pos.prep.state"].getAll();
+    const prepLines = store.data.models["pos.prep.line"].getAll();
     expect(store.filteredOrders.length).toBe(1);
-    await store.changeStateStage(states);
+    await store.changeStateStage(prepLines);
     await store.data.initData();
     expect(store.filteredOrders.length).toBe(0);
+});
+
+test("[removeOrdersByPosOrderIds] removes POS order and related preparation records", async () => {
+    const store = await setupPosPrepDisplayEnv();
+    await createPrepDisplayTicket(store);
+    const models = store.data.models;
+    const posOrder = models["pos.order"].getFirst();
+
+    expect(models["pos.order"].length).toBe(1);
+    expect(models["pos.prep.order"].length).toBe(1);
+    expect(models["pos.prep.line"].length).toBe(2);
+    expect(models["pos.prep.line"].length).toBe(2);
+
+    store.removeOrdersByPosOrderIds([posOrder.id]);
+    expect(models["pos.order"].length).toBe(0);
+    expect(models["pos.prep.order"].length).toBe(0);
+    expect(models["pos.prep.line"].length).toBe(0);
+    expect(models["pos.prep.line"].length).toBe(0);
+});
+
+test("moveAllOrdersToNextStage -> when order not in lastStage", async () => {
+    const store = await setupPosPrepDisplayEnv();
+    await createPrepDisplayTicket(store);
+    await store.moveAllOrdersToNextStage();
+    await store.data.initData();
+    const prepLines = store.data.models["pos.prep.line"].getAll();
+    expect(prepLines[0].stage_id.id).toBe(2);
+});
+
+test("moveAllOrdersToNextStage -> when order is in lastStage", async () => {
+    const store = await setupPosPrepDisplayEnv();
+    await createPrepDisplayTicket(store);
+    const orders = store.filteredOrders;
+    orders[0].stage = store.lastStage;
+    await store.moveAllOrdersToNextStage();
+    expect(orders[0].prepLines.every((s) => s.todo === false)).toBe(true);
 });

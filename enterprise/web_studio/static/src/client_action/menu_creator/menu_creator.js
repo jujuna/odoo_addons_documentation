@@ -1,4 +1,4 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, useProps, proxy, signal, t } from "@odoo/owl";
 import { useOwnedDialogs, useAutofocus } from "@web/core/utils/hooks";
 import { Dialog } from "@web/core/dialog/dialog";
 
@@ -42,18 +42,18 @@ export class MenuCreatorModel {
 
 export class MenuCreator extends Component {
     static template = "web_studio.MenuCreator";
+
+    autofocusRef = signal.ref();
     static components = { RecordSelector };
-    static props = {
-        menuCreatorModel: { type: Object },
-        showValidation: { type: Boolean, optional: true },
-    };
-    static defaultProps = {
-        showValidation: false,
-    };
+    props = useProps({
+        menuCreatorModel: t.object(),
+        showValidation: t.boolean().optional(false),
+    });
 
     get multiRecordSelectorProps() {
         return {
             resModel: "ir.model",
+            fieldString: _t("Models"),
             resId: this.state.data.modelId && this.state.data.modelId[0],
             update: (resId) => (this.state.data.modelId = [resId]),
             domain: [
@@ -64,8 +64,8 @@ export class MenuCreator extends Component {
     }
 
     setup() {
-        useAutofocus();
-        this.state = useState(this.props.menuCreatorModel);
+        useAutofocus({ ref: this.autofocusRef });
+        this.state = proxy(this.props.menuCreatorModel);
     }
 
     isValid(fieldName) {
@@ -76,12 +76,15 @@ export class MenuCreator extends Component {
 export class MenuCreatorDialog extends Component {
     static template = "web_studio.MenuCreatorDialog";
     static components = { Dialog, MenuCreator };
-    static props = { confirm: { type: Function }, close: { type: Function } };
+    props = useProps({
+        confirm: t.function(),
+        close: t.function(),
+    });
 
     setup() {
         this.addDialog = useOwnedDialogs();
-        this.menuCreatorModel = useState(new MenuCreatorModel({ allowNoModel: true }));
-        this.state = useState({ showValidation: false });
+        this.menuCreatorModel = proxy(new MenuCreatorModel({ allowNoModel: true }));
+        this.state = proxy({ showValidation: false });
         const { confirm, cancel } = useDialogConfirmation({
             confirm: async (data = {}) => {
                 if (!this.menuCreatorModel.isValid) {

@@ -1,11 +1,12 @@
 from markupsafe import Markup
 
-from odoo.tests.common import users
+from odoo.tests.common import tagged, users
 from odoo.tools import mute_logger
 
 from odoo.addons.knowledge.tests.common import KnowledgeCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
     """ Test suite dedicated to the search feature of the command palette.
         This test suite should ensure that:
@@ -107,14 +108,14 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'icon': False,
                 'name': "10 unknown facts about Pim's",
                 'is_user_favorite': True,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ("10 unknown facts about Pim's", False, [{
                 'id': self.workspace_article_visible.id,
                 'icon': False,
                 'name': "10 unknown facts about Pim's",
                 'is_user_favorite': True,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ('shape', False, [{
                 'id': self.workspace_article_visible.id,
@@ -122,14 +123,14 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': "10 unknown facts about Pim's",
                 'headline': 'circular in <strong>shape</strong>, making them easier',
                 'is_user_favorite': True,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ('Ingredients', False, [{
                 'id': self.workspace_child_article_visible.id,
                 'icon': False,
                 'name': 'Ingredients',
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ('biscuit marmalade chocolate', False, [{
                 'id': self.workspace_child_article_visible.id,
@@ -137,7 +138,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': 'Ingredients',
                 'headline': "Most Pim's are made with <strong>biscuit</strong>, <strong>marmalade</strong> and <strong>chocolate</strong>",
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ('HR', False, []),
             ('HR', True, [{
@@ -145,7 +146,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'icon': False,
                 'name': 'HR',
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+                'root_article_id': (self.workspace_article_hidden.id, 'HR')
             }]),
             ('company', False, []),
             ('company', True, [{
@@ -154,7 +155,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': 'HR',
                 'headline': '<strong>company</strong> has 50 amazing employees',
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+                'root_article_id': (self.workspace_article_hidden.id, 'HR')
             }]),
             ('Recruitment', False, []),
             ('Recruitment', True, [{
@@ -162,7 +163,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'icon': False,
                 'name': 'Recruitment',
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+                'root_article_id': (self.workspace_article_hidden.id, 'HR')
             }]),
             ('semester', False, []),
             ('semester', True, [{
@@ -171,14 +172,14 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': 'Recruitment',
                 'headline': "That's amazing! We hired 3 new employees this <strong>semester</strong>",
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+                'root_article_id': (self.workspace_article_hidden.id, 'HR')
             }]),
             ('TODO list', False, [{
                 'id': self.shared_article.id,
                 'icon': False,
                 'name': 'TODO list',
                 'is_user_favorite': False,
-                'root_article_id': (self.shared_article.id, '📄 TODO list')
+                'root_article_id': (self.shared_article.id, 'TODO list')
             }]),
             ("Purchase Pim's", False, [{
                 'id': self.shared_article.id,
@@ -186,14 +187,14 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': 'TODO list',
                 'headline': "<strong>Purchase</strong> <strong>Pim</strong>'<strong>s</strong>",
                 'is_user_favorite': False,
-                'root_article_id': (self.shared_article.id, '📄 TODO list')
+                'root_article_id': (self.shared_article.id, 'TODO list')
             }]),
             ("My favorite Pim's flavors", False, [{
                 'id': self.private_article_admin.id,
                 'icon': False,
                 'name': "My favorite Pim's flavors",
                 'is_user_favorite': False,
-                'root_article_id': (self.private_article_admin.id, "📄 My favorite Pim's flavors")
+                'root_article_id': (self.private_article_admin.id, "My favorite Pim's flavors")
             }]),
             ('Orange', False, [{
                 'id': self.private_article_admin.id,
@@ -201,7 +202,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': "My favorite Pim's flavors",
                 'headline': '<strong>Orange</strong>, Raspberry',
                 'is_user_favorite': False,
-                'root_article_id': (self.private_article_admin.id, "📄 My favorite Pim's flavors")
+                'root_article_id': (self.private_article_admin.id, "My favorite Pim's flavors")
             }]),
             ("Secret Luc's birthday party", False, []),
             ('forget', False, [])
@@ -225,14 +226,14 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'icon': False,
                 'name': 'Ingredients',
                 'is_user_favorite': True,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ("10 unknown facts about Pim's", False, [{
                 'id': self.workspace_article_visible.id,
                 'icon': False,
                 'name': "10 unknown facts about Pim's",
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ('shape', False, [{
                 'id': self.workspace_article_visible.id,
@@ -240,14 +241,14 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': "10 unknown facts about Pim's",
                 'headline': 'circular in <strong>shape</strong>, making them easier',
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ('Ingredients', False, [{
                 'id': self.workspace_child_article_visible.id,
                 'icon': False,
                 'name': 'Ingredients',
                 'is_user_favorite': True,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ('biscuit marmalade chocolate', False, [{
                 'id': self.workspace_child_article_visible.id,
@@ -255,7 +256,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': 'Ingredients',
                 'headline': "Most Pim's are made with <strong>biscuit</strong>, <strong>marmalade</strong> and <strong>chocolate</strong>",
                 'is_user_favorite': True,
-                'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+                'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
             }]),
             ('HR', False, []),
             ('HR', True, [{
@@ -263,7 +264,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'icon': False,
                 'name': 'HR',
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+                'root_article_id': (self.workspace_article_hidden.id, 'HR')
             }]),
             ('company', False, []),
             ('company', True, [{
@@ -272,7 +273,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': 'HR',
                 'headline': '<strong>company</strong> has 50 amazing employees',
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+                'root_article_id': (self.workspace_article_hidden.id, 'HR')
             }]),
             ('Recruitment', False, []),
             ('Recruitment', True, [{
@@ -280,7 +281,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'icon': False,
                 'name': 'Recruitment',
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+                'root_article_id': (self.workspace_article_hidden.id, 'HR')
             }]),
             ('semester', False, []),
             ('semester', True, [{
@@ -289,14 +290,14 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': 'Recruitment',
                 'headline': "That's amazing! We hired 3 new employees this <strong>semester</strong>",
                 'is_user_favorite': False,
-                'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+                'root_article_id': (self.workspace_article_hidden.id, 'HR')
             }]),
             ('TODO list', False, [{
                 'id': self.shared_article.id,
                 'icon': False,
                 'name': 'TODO list',
                 'is_user_favorite': False,
-                'root_article_id': (self.shared_article.id, '📄 TODO list')
+                'root_article_id': (self.shared_article.id, 'TODO list')
             }]),
             ("Purchase Pim's", False, [{
                 'id': self.shared_article.id,
@@ -304,7 +305,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': 'TODO list',
                 'headline': "<strong>Purchase</strong> <strong>Pim</strong>'<strong>s</strong>",
                 'is_user_favorite': False,
-                'root_article_id': (self.shared_article.id, '📄 TODO list')
+                'root_article_id': (self.shared_article.id, 'TODO list')
             }]),
             ("My favorite Pim's flavors", False, []),
             ('Gift', False, []),
@@ -313,7 +314,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'icon': False,
                 'name': "Secret Luc's birthday party",
                 'is_user_favorite': False,
-                'root_article_id': (self.private_article_user.id, "📄 Secret Luc's birthday party")
+                'root_article_id': (self.private_article_user.id, "Secret Luc's birthday party")
             }]),
             ('forget', False, [{
                 'id': self.private_article_user.id,
@@ -321,7 +322,7 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
                 'name': "Secret Luc's birthday party",
                 'headline': '<strong>forget</strong> to bring some',
                 'is_user_favorite': False,
-                'root_article_id': (self.private_article_user.id, "📄 Secret Luc's birthday party")
+                'root_article_id': (self.private_article_user.id, "Secret Luc's birthday party")
             }])
         ]
 
@@ -350,27 +351,27 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
             'name': "10 unknown facts about Pim's",
             'headline': "<strong>Pim</strong>'<strong>s</strong> are circular in shape, making them easier",
             'is_user_favorite': True,
-            'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+            'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
         }, {
             'id': self.private_article_admin.id,
             'icon': False,
             'name': "My favorite Pim's flavors",
             'is_user_favorite': False,
-            'root_article_id': (self.private_article_admin.id, "📄 My favorite Pim's flavors")
+            'root_article_id': (self.private_article_admin.id, "My favorite Pim's flavors")
         }, {
             'id': self.shared_article.id,
             'icon': False,
             'name': 'TODO list',
             'headline': "Purchase <strong>Pim</strong>'<strong>s</strong>",
             'is_user_favorite': False,
-            'root_article_id': (self.shared_article.id, '📄 TODO list')
+            'root_article_id': (self.shared_article.id, 'TODO list')
         }, {
             'id': self.workspace_child_article_visible.id,
             'icon': False,
             'name': 'Ingredients',
             'headline': "Most <strong>Pim</strong>'<strong>s</strong> are made with biscuit, marmalade and chocolate",
             'is_user_favorite': False,
-            'root_article_id': (self.workspace_article_visible.id, "📄 10 unknown facts about Pim's")
+            'root_article_id': (self.workspace_article_visible.id, "10 unknown facts about Pim's")
         }])
 
         self.assertEqual(Article.get_user_sorted_articles('amazing employees', hidden_mode=True), [{
@@ -378,12 +379,12 @@ class TestKnowledgeArticleFullTextSearch(KnowledgeCommon):
             'icon': False,
             'name': 'HR',
             'headline': 'company has 50 <strong>amazing</strong> <strong>employees</strong>', 'is_user_favorite': False,
-            'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+            'root_article_id': (self.workspace_article_hidden.id, 'HR')
         }, {
             'id': self.workspace_child_article_hidden.id,
             'icon': False,
             'name': 'Recruitment',
             'headline': "That's <strong>amazing</strong>! We hired 3 new <strong>employees</strong> this semester",
             'is_user_favorite': False,
-            'root_article_id': (self.workspace_article_hidden.id, '📄 HR')
+            'root_article_id': (self.workspace_article_hidden.id, 'HR')
         }])

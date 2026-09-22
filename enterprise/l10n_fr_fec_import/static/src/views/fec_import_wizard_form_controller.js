@@ -1,4 +1,4 @@
-import { useChildSubEnv } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
 import { registry } from "@web/core/registry";
 import { FormController } from "@web/views/form/form_controller";
 import { formView } from "@web/views/form/form_view";
@@ -6,7 +6,7 @@ import { formView } from "@web/views/form/form_view";
 class FecImportWizardFormController extends FormController {
     setup() {
         super.setup();
-        useChildSubEnv({
+        useSubEnv({
             fecFileState: { file: {} },
         });
     }

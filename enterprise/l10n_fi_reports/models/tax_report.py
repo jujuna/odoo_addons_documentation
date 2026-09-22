@@ -20,9 +20,9 @@ class FinlandTaxReportCustomHandler(models.AbstractModel):
 
     def l10n_fi_export_tax_report(self, options):
         error_messages = []
-        if options['date']['period_type'] not in {'month', 'quarter', 'fiscalyear'}:
+        if options['date']['period_type'] not in {'month', 'quarter', 'year'}:
             error_messages.append(_("The declaration should be month by month, quarter per quarter or year by year. Please select only a right period."))
-        if not self.env.company.company_registry:
+        if not self.env.company.partner_id._get_additional_identifier('FI_EN'):
             error_messages.append(_("The current company needs a Business ID to export VSRALVKV."))
         if not self.env.company.phone:
             error_messages.append(_("The current company needs a phone number to export VSRALVKV."))

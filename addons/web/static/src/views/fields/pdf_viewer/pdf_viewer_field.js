@@ -5,7 +5,7 @@ import { url } from "@web/core/utils/urls";
 import { standardFieldProps } from "../standard_field_props";
 import { FileUploader } from "../file_handler";
 
-import { Component, onWillUpdateProps, useEffect, useRef, useState } from "@odoo/owl";
+import { Component, onWillUpdateProps, proxy, signal, t, useOnChange, useProps } from "@odoo/owl";
 import { hidePDFJSButtons } from "@web/core/utils/pdfjs";
 
 export class PdfViewerField extends Component {
@@ -13,33 +13,35 @@ export class PdfViewerField extends Component {
     static components = {
         FileUploader,
     };
-    static props = {
+    props = useProps({
         ...standardFieldProps,
-    };
+        fileNameField: t.string().optional(),
+    });
+
+    iframeViewerPdfRef = signal.ref();
 
     setup() {
         this.notification = useService("notification");
         this.action = useService("action");
-        this.state = useState({
+        this.state = proxy({
             isValid: true,
             objectUrl: "",
         });
-        this.iframeViewerPdfRef = useRef("iframeViewerPdf");
         onWillUpdateProps((nextProps) => {
             if (nextProps.readonly) {
                 this.state.objectUrl = "";
             }
         });
-        useEffect(
+        useOnChange(
+            () => [this.iframeViewerPdfRef()],
             (el) => {
                 if (el) {
-                    hidePDFJSButtons(this.iframeViewerPdfRef.el, {
+                    hidePDFJSButtons(el, {
                         hideDownload: true,
                         hidePrint: true,
                     });
                 }
-            },
-            () => [this.iframeViewerPdfRef.el]
+            }
         );
     }
 
@@ -63,8 +65,15 @@ export class PdfViewerField extends Component {
         return `/web/static/lib/pdfjs/web/viewer.html?file=${file}#page=${page}`;
     }
 
-    update({ data }) {
-        const changes = { [this.props.name]: data || false };
+    update({ name, data }) {
+        const payload = data || name ? {
+            filename: name || "",
+            content: data || false,
+        } : false;
+        const changes = { [this.props.name]: payload };
+        if (this.props.fileNameField && this.props.record.data[this.props.fileNameField] !== name) {
+            changes[this.props.fileNameField] = name || false;
+        }
         return this.props.record.update(changes);
     }
 
@@ -81,10 +90,10 @@ export class PdfViewerField extends Component {
         });
     }
 
-    onFileUploaded({ data, objectUrl }) {
+    onFileUploaded({ name, data, objectUrl }) {
         this.state.isValid = true;
         this.state.objectUrl = objectUrl;
-        this.update({ data });
+        this.update({ name, data });
     }
 
     onLoadFailed() {
@@ -107,6 +116,7 @@ export const pdfViewerField = {
         },
     ],
     supportedTypes: ["binary"],
+    extractProps: ({ attrs }) => ({ fileNameField: attrs.filename }),
 };
 
 registry.category("fields").add("pdf_viewer", pdfViewerField);

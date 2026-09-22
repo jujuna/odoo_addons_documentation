@@ -14,14 +14,14 @@ class HrLeave(models.Model):
     l10n_ch_continued_pay_percentage = fields.Float("Continued Pay %", default=1)
     l10n_ch_disability_percentage = fields.Float("Disability %", default=1)
     l10n_ch_swissdec_work_interruption = fields.Boolean(compute="_compute_l10n_ch_swissdec_work_interruption")
-    l10n_ch_swissdec_payroll_impact = fields.Boolean(related='holiday_status_id.l10n_ch_swissdec_payroll_impact')
+    l10n_ch_swissdec_payroll_impact = fields.Boolean(related='work_entry_type_id.l10n_ch_swissdec_payroll_impact')
 
-    @api.constrains('date_from', 'date_to', 'holiday_status_id')
+    @api.constrains('request_date_from', 'request_date_to', 'work_entry_type_id')
     def _check_work_interruption(self):
-        work_interruption = self.env.ref('hr_holidays.l10n_ch_swissdec_interruption_of_work_lt', raise_if_not_found=False)
+        work_interruption = self.env.ref('hr_work_entry.l10n_ch_swissdec_interruption_wt', raise_if_not_found=False)
         for leave in self:
-            if leave.holiday_status_id and leave.holiday_status_id == work_interruption:
-                if leave.date_from.day != 1 or leave.date_to.day != (datetime.date(leave.date_to.year, leave.date_to.month, 1) + relativedelta(months=1, days=-1)).day:
+            if leave.work_entry_type_id and leave.work_entry_type_id == work_interruption:
+                if leave.request_date_from.day != 1 or leave.request_date_to.day != (datetime.date(leave.request_date_to.year, leave.request_date_to.month, 1) + relativedelta(months=1, days=-1)).day:
                     raise ValidationError(_("Work interruptions must Start on the first of the month and end on the last of the month."))
 
     @api.constrains('date_from', 'date_to', 'employee_id')
@@ -29,7 +29,7 @@ class HrLeave(models.Model):
         """
         Swiss Override, we never want to let a payroll impacting leave be placed on validated payslips even for a super user or time off officer
         """
-        payroll_impacting_leave_types = self.env['hr.payslip']._get_payroll_impacting_swissdec()
+        payroll_impacting_work_entry_types = self.env['hr.payslip']._get_payroll_impacting_swissdec()
 
         all_payslips = self.env['hr.payslip'].sudo().search([
             ('employee_id', 'in', self.employee_id.ids),
@@ -38,7 +38,17 @@ class HrLeave(models.Model):
             ('state', 'in', ['validated', 'paid']),
         ])
 
-        for leave in self.filtered(lambda l: l.holiday_status_id.id in payroll_impacting_leave_types.ids):
+        payroll_impacting_leaves = self.filtered(
+            lambda leave: leave.work_entry_type_id.id in payroll_impacting_work_entry_types.ids and (
+                leave.l10n_ch_swissdec_work_interruption or
+                leave.l10n_ch_swissdec_payroll_impact and (
+                    leave.l10n_ch_continued_pay_percentage < 1 or
+                    leave.l10n_ch_disability_percentage < 1
+                )
+            )
+        )
+
+        for leave in payroll_impacting_leaves:
             if any(
                 p.employee_id == leave.employee_id and
                 p.date_from <= leave.date_to.date() and
@@ -48,8 +58,8 @@ class HrLeave(models.Model):
             ):
                 raise ValidationError(_("The selected period is covered by a validated payslip. You can't create a time off for that period."))
 
-    @api.depends('holiday_status_id')
+    @api.depends('work_entry_type_id')
     def _compute_l10n_ch_swissdec_work_interruption(self):
-        work_interruption_leave = self.env.ref('hr_holidays.l10n_ch_swissdec_interruption_of_work_lt', raise_if_not_found=False)
+        work_interruption_leave = self.env.ref('hr_work_entry.l10n_ch_swissdec_interruption_wt', raise_if_not_found=False)
         for leave in self:
-            leave.l10n_ch_swissdec_work_interruption = leave.holiday_status_id == work_interruption_leave
+            leave.l10n_ch_swissdec_work_interruption = leave.work_entry_type_id == work_interruption_leave

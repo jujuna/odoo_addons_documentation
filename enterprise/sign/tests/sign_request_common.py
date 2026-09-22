@@ -1,25 +1,19 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 
 from odoo import Command
-from odoo.tools import file_open
-from odoo.tests.common import TransactionCase, new_test_user
 from odoo.addons.mail.tests.common import mail_new_test_user
-from unittest.mock import patch
-from freezegun import freeze_time
-from contextlib import contextmanager
+from odoo.tests.common import TransactionCase, new_test_user
+from odoo.tools import BinaryBytes
+
 
 class SignRequestCommon(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        with file_open('sign/static/demo/sample_contract.pdf', "rb") as f:
-            pdf_content = f.read()
-            cls.pdf_data_64 = base64.b64encode(pdf_content)
-
+        cls.pdf_value = cls.file_read('sign/static/demo/sample_contract.pdf')
         cls.attachment = cls.env['ir.attachment'].create({
             'type': 'binary',
-            'raw': pdf_content,
+            'raw': cls.pdf_value,
             'name': 'test_employee_contract.pdf',
         })
         cls.public_user = mail_new_test_user(
@@ -175,7 +169,7 @@ class SignRequestCommon(TransactionCase):
                 'height': 0.015,
         })
 
-        cls.signature_fake = base64.b64encode(b"fake_signature")
+        cls.signature_fake = BinaryBytes(b"fake_signature")
         cls.signer_1_sign_values = cls.create_sign_values(cls, cls.template_3_roles.sign_item_ids, cls.role_signer_1.id)
         cls.signer_2_sign_values = cls.create_sign_values(cls, cls.template_3_roles.sign_item_ids, cls.role_signer_2.id)
         cls.signer_3_sign_values = cls.create_sign_values(cls, cls.template_3_roles.sign_item_ids, cls.role_signer_3.id)
@@ -243,11 +237,31 @@ class SignRequestCommon(TransactionCase):
             'email': 'char.aznable.a@example.com',
         })
 
-    @contextmanager
-    def mock_datetime_and_now(self, mock_dt):
-        with freeze_time(mock_dt), \
-                patch.object(self.env.cr, 'now', lambda: mock_dt):
-            yield
+    def populate_sign_request_with_dummy_values(self, sign_request):
+        """ Mark the sign request as signed and populate it with dummy data.
+
+        This method iterates through all items in the request's template and creates
+        corresponding values (e.g., 'Signed', 'True', 'Test value') for the sign
+        request. It then updates the request state to 'signed'.
+
+        :param recordset sign_request: The 'sign.request' record to populate.
+        """
+        for req_item in sign_request.request_item_ids:
+            for sign_item in sign_request.template_id.sign_item_ids:
+                itype = sign_item.type_id.item_type
+                if itype in ("signature", "initial", "stamp"):
+                    val = "Signed"
+                elif itype == "checkbox":
+                    val = True
+                else:
+                    val = "Test value"
+
+                self.env['sign.request.item.value'].create({
+                    'sign_request_item_id': req_item.id,
+                    'sign_item_id': sign_item.id,
+                    'value': val,
+                })
+        sign_request.state = 'signed'
 
     def create_sign_request_no_item(self, signer, cc_partners, no_sign_mail=False, validity=False):
         sign_request = self.env['sign.request'].with_context(no_sign_mail=no_sign_mail).create({
@@ -272,6 +286,20 @@ class SignRequestCommon(TransactionCase):
             })],
         })
         sign_request.message_subscribe(partner_ids=cc_partners.ids)
+        return sign_request
+
+    def create_sign_request_1_role_scheduled(self, signer, cc_partners, scheduled_datetime):
+        sign_request = self.env['sign.request'].create({
+            'template_id': self.template_1_role.id,
+            'reference': f"[SCHEDULED] {self.template_1_role.display_name}",
+            'request_item_ids': [Command.create({
+                'partner_id': signer.id,
+                'role_id': self.role_signer_1.id,
+            })],
+            'scheduled_date': scheduled_datetime,
+        })
+        sign_request.message_subscribe(partner_ids=cc_partners.ids)
+        self.env.ref('sign.ir_cron_sign_state_action').method_direct_trigger()
         return sign_request
 
     def create_sign_request_1_role_sms_auth(self, signer, cc_partners):

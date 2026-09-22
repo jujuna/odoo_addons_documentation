@@ -1,12 +1,22 @@
-import base64
-
 from odoo import Command
 from odoo.exceptions import AccessError
 from odoo.tests.common import TransactionCase
+from odoo.addons.base.tests.files import GIF_RAW, PDF_RAW  # noqa: F401
 
-GIF = b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs="
-TEXT = base64.b64encode(b"TEST")
-WEBP = b"UklGRjoAAABXRUJQVlA4IC4AAAAwAQCdASoBAAEAAUAmJaAAA3AA/u/uY//8s//2W/7LeM///5Bj/dl/pJxGAAAA"
+TEXT_RAW = b"TEST"
+
+
+def get_document_creation_message(creator, name, source):
+    return f"""<p>Document created <br>
+                <i class="oi oi-fw oi-filled me-1" data-icon="person"></i>
+                <span> Creator: </span>
+                <b>{creator}</b><br>
+                <i class="oi oi-fw oi-filled me-1" data-icon="description"></i>
+                <span> Original Name: </span>
+                <b>{name}</b><br>
+                <i class="oi oi-fw me-1" data-icon="share"></i>
+                <span> Source: </span>
+                <b>{source}</b><br></p>"""
 
 
 class TransactionCaseDocuments(TransactionCase):
@@ -44,7 +54,7 @@ class TransactionCaseDocuments(TransactionCase):
                 'group_ids': [Command.link(cls.env.ref('base.group_portal').id)],
                 'name': 'Portal user'
             }, {
-                'login': 'public_user',
+                'login': 'documents_public_user',
                 'group_ids': [Command.link(cls.env.ref('base.group_public').id)],
                 'name': 'Public user',
             },
@@ -72,7 +82,7 @@ class TransactionCaseDocuments(TransactionCase):
         ])
         cls.document_gif = cls.env['documents.document'].create({
             'type': 'binary',
-            'datas': GIF,
+            'raw': GIF_RAW,
             'name': 'file.gif',
             'mimetype': 'image/gif',
             'folder_id': cls.folder_b.id,
@@ -80,7 +90,7 @@ class TransactionCaseDocuments(TransactionCase):
         })
         cls.document_txt = cls.env['documents.document'].create({
             'type': 'binary',
-            'datas': TEXT,
+            'raw': TEXT_RAW,
             'name': 'file.txt',
             'mimetype': 'text/plain',
             'folder_id': cls.folder_b.id,
@@ -107,6 +117,7 @@ class TransactionCaseDocuments(TransactionCase):
                 'owner_id': False,
                 'folder_id': False,
                 'access_internal': 'view',
+                'raw': 'test',
             },
         ])
         cls.company_sub_folder.folder_id = cls.company_root_folder.id
@@ -121,4 +132,9 @@ class TransactionCaseDocuments(TransactionCase):
             'state': 'object_write',
             'update_m2m_operation': 'add',
             'resource_ref': f'documents.tag,{cls.tag_a.id}',
+        })
+
+        cls.functional_group_id = cls.env['res.group.functional'].create({
+            'name': 'Functional Group',
+            'user_ids': [Command.link(cls.internal_user.id)]
         })

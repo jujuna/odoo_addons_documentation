@@ -1,6 +1,8 @@
 import csv
 import logging
 
+from psycopg2 import sql
+
 from odoo import tools
 
 _logger = logging.getLogger(__name__)
@@ -16,7 +18,7 @@ def migrate(cr, version):
             return
         next(reader)
         data = [(row[0], row[1]) for row in reader]
-        query = """
+        query = sql.SQL("""
             UPDATE product_unspsc_code p
             SET l10n_mx_edi_hazardous_material = raw.hazardous_value
             FROM (
@@ -31,5 +33,5 @@ def migrate(cr, version):
                 ON imd.module = v.module
             AND imd.name = v.name
             WHERE p.id = imd.res_id
-        """
+        """)
         cr.execute_values(query, data)

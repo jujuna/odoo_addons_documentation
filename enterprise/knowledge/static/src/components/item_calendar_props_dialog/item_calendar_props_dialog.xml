@@ -9,19 +9,19 @@
                 <div class="col-sm-8 my-auto">
                     <input type="text" class="form-control bg-white"
                         placeholder="e.g. Meetings"
-                        t-model="state.name"
-                        t-ref="autofocus"
+                        t-model.proxy="this.state.name"
+                        t-ref="this.autofocusRef"
                         />
                 </div>
             </div>
-            <t t-if="!autoCreateDateProperties">
+            <t t-if="!this.autoCreateDateProperties">
                 <div class="mb-3 row">
                     <label class="col-sm-4 col-form-label">
                         Date Properties
                     </label>
                     <div class="col-sm-8 d-flex justify-content-center my-auto">
                         <div class="o_knowledge_item_calendar_dialog_date_start w-100">
-                            <SelectMenu onSelect.bind="selectDateStart" groups="availableDateStartProperties" value="state.dateStartPropertyId" required="true" placeholder.translate="Start Date" searchPlaceholder.translate="Start typing">
+                            <SelectMenu onSelect.bind="this.selectDateStart" groups="this.availableDateStartProperties" value="this.state.dateStartPropertyId" required="true" placeholder.translate="Start Date" searchPlaceholder.translate="Start typing">
                                 <t t-set-slot="bottomArea" t-slot-scope="select">
                                     <DropdownItem t-if="select.data.searchValue"
                                         onSelected="() => this.createProperty(select.data.searchValue, 'datetime', 'dateStart')"
@@ -41,13 +41,13 @@
                             </SelectMenu>
                         </div>
                         <div class="mx-2 my-auto">
-                            <i class="fa fa-lg fa-fw fa-arrow-right"/>
+                            <i class="oi oi-lg oi-fw" data-icon="arrow_forward"/>
                         </div>
                         <div t-attf-class="o_knowledge_item_calendar_dialog_date_stop w-100 #{this.state.dateStartPropertyId ? '' : 'o_disabled'}">
-                            <SelectMenu onSelect.bind="selectDateStop" groups="availableDateStopProperties" value="state.dateStopPropertyId" placeholder.translate="Stop Date" searchPlaceholder.translate="Start typing">
+                            <SelectMenu onSelect.bind="this.selectDateStop" groups="this.availableDateStopProperties" value="this.state.dateStopPropertyId" placeholder.translate="Stop Date" searchPlaceholder.translate="Start typing">
                                 <t t-set-slot="bottomArea" t-slot-scope="select">
                                     <DropdownItem t-if="select.data.searchValue"
-                                        onSelected="() => this.createProperty(select.data.searchValue, dateStartProperty.type, 'dateStop')"
+                                        onSelected="() => this.createProperty(select.data.searchValue, this.dateStartProperty.type, 'dateStop')"
                                         class="'o_select_menu_item o_create_choice mb-1 d-flex align-items-center'">
                                         <div class="o_select_menu_item_label text-wrap fst-italic ms-3">
                                             Create "<t t-out="select.data.searchValue"/>"
@@ -63,7 +63,7 @@
                         Base Color On
                     </label>
                     <div class="col-sm-8 my-auto">
-                        <SelectMenu onSelect.bind="selectColor" choices="colorChoices" value="state.colorPropertyId" placeholder.translate="Property Field" searchPlaceholder="start_typing">
+                        <SelectMenu onSelect.bind="this.selectColor" choices="this.colorChoices" value="this.state.colorPropertyId" placeholder.translate="Property Field" searchPlaceholder.translate="Start typing">
                             <t t-set-slot="bottomArea" t-slot-scope="select">
                                 <DropdownItem t-if="select.data.searchValue"
                                     onSelected="() => this.createProperty(select.data.searchValue, 'selection', 'color')"
@@ -81,7 +81,7 @@
                         Default Scale
                     </label>
                     <div class="col-sm-8 my-auto">
-                        <SelectMenu onSelect.bind="selectScale" choices="scalesChoices" value="state.scale" required="true"/>
+                        <SelectMenu onSelect.bind="this.selectScale" choices="this.scalesChoices" value="this.state.scale" required="true"/>
                     </div>
                 </div>
                 <div class="mb-3 row">
@@ -90,13 +90,13 @@
                     </label>
                     <div class="col-sm-8 d-flex justify-content-center my-auto">
                         <div class="o_knowledge_item_calendar_dialog_slot_min_time w-100">
-                            <input type="time" t-model.lazy="state.slotMinTime"/>
+                            <input type="time" t-model.proxy.lazy="this.state.slotMinTime"/>
                         </div>
                         <div class="mx-2 my-auto">
-                            <i class="fa fa-lg fa-fw fa-arrow-right"/>
+                            <i class="oi oi-lg oi-fw" data-icon="arrow_forward"/>
                         </div>
                         <div class="o_knowledge_item_calendar_dialog_slot_max_time w-100">
-                            <input type="time" t-model.lazy="state.slotMaxTime"/>
+                            <input type="time" t-model.proxy.lazy="this.state.slotMaxTime"/>
                         </div>
                     </div>
                 </div>
@@ -106,15 +106,15 @@
                     </label>
                     <div class="col-sm-8 d-flex justify-content-center my-auto">
                         <div class="w-100">
-                           <input type="checkbox" t-model="state.showWeekEnds"/>
+                           <input type="checkbox" t-model.proxy="this.state.showWeekEnds"/>
                         </div>
                     </div>
                 </div>
             </t>
             <t t-set-slot="footer">
-                <button t-if="this.props.isNew" class="btn btn-primary" t-on-click="save" data-hotkey="I">Insert</button>
-                <button t-else="" class="btn btn-primary" t-on-click="save" data-hotkey="R">Save</button>
-                <button class="btn btn-secondary" t-on-click="props.close" data-hotkey="D">Discard</button>
+                <button t-if="this.props.isNew" class="btn btn-primary" t-on-click="this.save" data-hotkey="I">Insert</button>
+                <button t-else="" class="btn btn-primary" t-on-click="this.save" data-hotkey="R">Save</button>
+                <button class="btn btn-secondary" t-on-click="this.props.close" data-hotkey="D">Discard</button>
             </t>
         </Dialog>
     </t>

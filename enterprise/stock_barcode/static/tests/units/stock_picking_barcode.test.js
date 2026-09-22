@@ -47,7 +47,7 @@ test("exclamation-triangle when picking is done", async () => {
 
     await mountWebClient({ WebClient: WebClientEnterprise });
     await getService("action").doAction(this.clientData.action);
-    expect(".fa-5x.fa-exclamation-triangle:not(.d-none)").toHaveCount(1, {
+    expect(".oi-5x[data-icon='warning']:not(.d-none)").toHaveCount(1, {
         message: "Should have warning icon",
     });
 });

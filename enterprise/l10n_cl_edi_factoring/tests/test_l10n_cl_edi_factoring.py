@@ -4,12 +4,14 @@ from freezegun import freeze_time
 from odoo import Command
 
 from odoo.addons.l10n_cl_edi.tests.common import TestL10nClEdiCommon
-from odoo.tools import misc, mute_logger
+from odoo.tools import BinaryBytes, misc, mute_logger
 from odoo.tests import tagged
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestEdiFactoring(TestL10nClEdiCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -22,14 +24,12 @@ class TestEdiFactoring(TestL10nClEdiCommon):
         })
         cls.partner_factoring = cls.env['res.partner'].create({
             'name': 'Partner Factoring S.A.',
-            'is_company': 1,
             'city': 'Pudahuel',
             'country_id': cls.env.ref('base.cl').id,
             'street': 'Puerto Test 105',
             'phone': '+562 0000 1111',
             'email': 'email@myfactoring.cl',
             'l10n_cl_dte_email': 'dte@myfactoring.cl',
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_cl.it_RUT').id,
             'l10n_cl_sii_taxpayer_type': '1',
             'l10n_cl_activity_description': 'activity_test',
             'vat': '76086428-5',
@@ -91,7 +91,7 @@ class TestEdiFactoring(TestL10nClEdiCommon):
 
     @freeze_time('2024-06-10T17:00:00', tz_offset=3)
     def test_factoring_with_aec_other_currency(self):
-        other_currency = self.setup_other_currency('UF', rounding=0.001, rates=[('2016-01-01', 2)])
+        other_currency = self.setup_other_currency('UF', rounding=0.001, rates=[('2015-12-31', 2)])
         self.partner_factoring.currency_id = other_currency.id
 
         invoice = self.env['account.move'].create({
@@ -135,7 +135,7 @@ class TestEdiFactoring(TestL10nClEdiCommon):
 
         move = self.env['account.move'].create({
             'move_type': 'entry',
-            'l10n_cl_aec_attachment_file': b'test',
+            'l10n_cl_aec_attachment_file': BinaryBytes(b'test'),
         })
         signature = move.company_id._get_digital_signature(user_id=self.env.user.id)
         move.company_id.l10n_cl_dte_service_provider = 'SIITEST'

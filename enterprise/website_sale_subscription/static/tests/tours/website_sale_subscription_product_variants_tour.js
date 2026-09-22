@@ -39,11 +39,7 @@ registry.category("web_tour.tours").add("sale_subscription_add_to_cart", {
         {
             trigger: "input[title='White']:checked",
         },
-        {
-            content: "click on add to cart",
-            trigger: "#add_to_cart",
-            run: "click",
-        },
+        ...wsTourUtils.addToCartFromProductPage(),
         wsTourUtils.goToCart(),
         {
             content: "Check the price of the product that has been added",

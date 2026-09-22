@@ -4,7 +4,7 @@ import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { ImportAction } from "@base_import/import_action/import_action";
 import { useBankStatementCSVImportModel } from "./bank_statement_csv_import_model";
-import { x2ManyCommands } from "@web/core/orm_service";
+import { x2ManyCommands } from "@web/core/orm_plugin";
 
 export class BankStatementImportAction extends ImportAction {
     setup() {

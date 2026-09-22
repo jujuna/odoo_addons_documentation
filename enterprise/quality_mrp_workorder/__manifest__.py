@@ -1,13 +1,11 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'MRP features for Quality Control',
-    'version': '1.0',
     'category': 'Supply Chain/Quality',
     'sequence': 50,
     'summary': 'Quality Management with MRP',
-    'depends': ['quality_control', 'mrp_workorder', 'barcodes'],
+    'depends': ['quality_mrp', 'mrp_workorder', 'barcodes'],
     'description': """
 Adds Quality Control to workorders.
 """,

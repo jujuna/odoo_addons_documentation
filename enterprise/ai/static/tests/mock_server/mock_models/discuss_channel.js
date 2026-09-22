@@ -1,34 +1,34 @@
-import { DiscussChannel } from "@mail/../tests/mock_server/mock_models/discuss_channel";
-import { Command } from "@web/../tests/web_test_helpers";
-import { patch } from "@web/core/utils/patch";
+import { mailModels } from "@mail/../tests/mail_test_helpers";
+import { fields } from "@web/../tests/web_test_helpers";
 
-/** @type {DiscussChannel} */
-const discussChannelPatch = {
-    /** @param {import("@mail/../tests/mock_server/mock_models/res_partner").ResPartner} partner */
-    _get_or_create_ai_chat(partner) {
-        const channels = this.env["discuss.channel"].search([
-            ["is_member", "=", true],
-            ["channel_type", "=", "ai_chat"],
-            ["channel_member_ids", "any", ["partner_id", "=", partner.id]],
-        ]);
+export class DiscussChannel extends mailModels.DiscussChannel {
+    ai_agent_id = fields.Many2one({ relation: "ai.agent" });
+    ai_session_ids = fields.One2many({ relation: "ai.session", relation_field: "channel_id" });
 
-        if (!channels[0]) {
-            return this.env["discuss.channel"].create({
-                name: partner.name,
-                channel_type: "ai_chat",
-                channel_member_ids: [
-                    Command.create({
-                        partner_id: this.env.user.partner_id.id,
-                    }),
-                    Command.create({
-                        partner_id: partner.id,
-                    }),
-                ],
-            });
-        }
+    _store_channel_fields(res) {
+        super._store_channel_fields(res);
+        this._store_ai_fields(res);
+    }
 
-        return channels[0];
-    },
-};
+    _store_ai_fields(res) {
+        const isAiAgentChannel = (c) => this._ai_agent_channel_types().includes(c.channel_type);
+        res.one("ai_agent_id", "_store_agent_fields", { predicate: isAiAgentChannel, sudo: true });
+        res.many("ai_session_ids", "_store_session_fields", {
+            predicate: isAiAgentChannel,
+            sudo: true,
+        });
+        res.one("suggestedAiChannel", [], {
+            predicate: (channel) =>
+                channel.channel_type === "ai_chat" && !channel.message_ids?.length,
+            value: (channel) => this.browse(channel.id)._get_suggested_ai_channel(),
+        });
+    }
 
-patch(DiscussChannel.prototype, discussChannelPatch);
+    _get_suggested_ai_channel() {
+        return this.env["discuss.channel"].browse();
+    }
+
+    _ai_agent_channel_types() {
+        return ["ai_chat"];
+    }
+}

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 
-from odoo import models, fields
+from odoo import models
 
 
 class L10n_EsMod347TaxReportHandler(models.AbstractModel):
@@ -26,7 +26,7 @@ class L10n_EsMod347TaxReportHandler(models.AbstractModel):
         the end of the generated BOE file.
         """
         result = super().export_boe(options)
-        file_content = result['file_content']
+        file_content = result['file_content'].decode()
         dummy, year = self._get_mod_period_and_year(options)
         current_company = self.env.company
 
@@ -41,7 +41,7 @@ class L10n_EsMod347TaxReportHandler(models.AbstractModel):
 
         file_content += self._call_on_partner_sublines(boe_report_options, 'l10n_es_real_estates.mod_347_real_estates', lambda report_data: self._write_type2_real_estates_records(report_data, year, current_company))
 
-        result['file_content'] = file_content
+        result['file_content'] = file_content.encode()
         return result
 
     def _get_required_partner_ids_for_boe(self, mod_invoice_type, date_from, date_to, boe_wizard, operation_key, operation_class):
@@ -68,7 +68,7 @@ class L10n_EsMod347TaxReportHandler(models.AbstractModel):
         # This block of data is constant for each of the record associated to
         # this real_estate, so we compute it only once and concatenate it every
         # time in the loop.
-        address = self._l10n_es_boe_format_string(line_real_estate.cadastral_reference, length=1)
+        address = self._l10n_es_boe_format_string(line_real_estate.real_estate_location, length=1)
         address += self._l10n_es_boe_format_string(line_real_estate.street_type, length=5)
         address += self._l10n_es_boe_format_string(line_real_estate.street_name, length=50)
         address += self._l10n_es_boe_format_string(line_real_estate.street_number_type, length=3)
@@ -103,7 +103,7 @@ class L10n_EsMod347TaxReportHandler(models.AbstractModel):
             convert = lambda i: i.currency_id._convert(i.amount_total_signed,
                                                        currency_id,
                                                        current_company,
-                                                       i.date or fields.Date.today(),
+                                                       i.date,
                                                        round=True)
             year_amount_sum = currency_id.round(sum(convert(i) for i in partner_invoices))
             rslt += self._l10n_es_boe_format_number(year_amount_sum, length=16, decimal_places=2, signed=True, sign_pos=' ', in_currency=True)
@@ -112,20 +112,28 @@ class L10n_EsMod347TaxReportHandler(models.AbstractModel):
 
         return rslt
 
-    def _report_custom_engine_operations_real_estates_bought(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_operations_real_estates_bought(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         domain = [
             ('debit', '>', 0.0),
             ('move_id.l10n_es_reports_mod347_invoice_type', '=', 'real_estates'),
             ('move_id.move_type', 'in', ['in_invoice', 'in_refund'])
         ]
 
-        return self._custom_threshold_common(domain, expressions, options, date_scope, current_groupby, next_groupby, offset=offset, limit=limit)
+        return self._custom_threshold_common(domain, next(iter(formulas_dict.values())), options, date_scope, current_groupby)
 
-    def _report_custom_engine_operations_real_estates_sold(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_operations_real_estates_sold(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         domain = [
             ('debit', '>', 0.0),
             ('move_id.l10n_es_reports_mod347_invoice_type', '=', 'real_estates'),
             ('move_id.move_type', 'in', ['out_invoice', 'out_refund'])
         ]
 
-        return self._custom_threshold_common(domain, expressions, options, date_scope, current_groupby, next_groupby, offset=offset, limit=limit)
+        return self._custom_threshold_common(domain, next(iter(formulas_dict.values())), options, date_scope, current_groupby)
+
+    def _report_engine_real_estates_total_count(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        domain = [
+            ('move_id.l10n_es_real_estate_id', '!=', False),
+            ('account_id.account_type', '=', 'asset_receivable'),
+            ('move_id.move_type', 'in', self.env['account.move'].get_inbound_types()),
+        ]
+        return {next(iter(formulas_dict.values())): self._l10n_es_common_count_rows(options, current_groupby, 'move_id.l10n_es_real_estate_id', domain)}

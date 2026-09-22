@@ -7,7 +7,7 @@ from odoo.tools import convert
 class HrAppraisal(models.Model):
     _inherit = "hr.appraisal"
 
-    employee_feedback_ids = fields.Many2many('hr.employee', string="Asked Feedback")
+    partner_feedback_ids = fields.Many2many('res.partner', string="Asked Feedback")
     survey_ids = fields.Many2many('survey.survey', help="Sent out surveys")
     completed_survey_count = fields.Integer(compute="_compute_completed_survey_count")
     total_survey_count = fields.Integer(compute="_compute_total_survey_count")
@@ -47,6 +47,7 @@ class HrAppraisal(models.Model):
     def action_open_survey_inputs(self):
         self.ensure_one()
         view_id = self.env.ref('hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree', raise_if_not_found=False)
+
         return {
             'type': 'ir.actions.act_window',
             'view_mode': 'list',

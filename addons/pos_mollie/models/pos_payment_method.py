@@ -1,4 +1,4 @@
-from odoo import fields, models, api, _
+from odoo import fields, models
 from odoo.exceptions import ValidationError
 from odoo.addons.payment_mollie import const
 
@@ -8,25 +8,20 @@ from odoo.tools import hash_sign
 class PosPaymentMethod(models.Model):
     _inherit = "pos.payment.method"
 
-    def _get_payment_terminal_selection(self):
-        return super()._get_payment_terminal_selection() + [("mollie", "Mollie")]
+    def _get_terminal_provider_selection(self):
+        return super()._get_terminal_provider_selection() + [("mollie", "Mollie")]
+
+    def _allowed_actions_in_self_order(self):
+        return super()._allowed_actions_in_self_order() + ["mollie_create_payment", "mollie_create_refund", "mollie_cancel_payment", "mollie_get_payment"]
 
     mollie_terminal_id = fields.Char("Mollie Terminal ID", copy=False)
     mollie_payment_provider_id = fields.Many2one("payment.provider", domain=[("code", "=", "mollie")])
 
-    @api.constrains('mollie_payment_provider_id')
-    def _check_mollie_payment_provider_id(self):
-        for payment_method in self:
-            if not payment_method.mollie_payment_provider_id:
-                continue
-            if not payment_method.mollie_payment_provider_id.mollie_api_key:
-                raise ValidationError(_(
-                    'Please set the Mollie API Key field on the %s payment provider.',
-                    payment_method.mollie_payment_provider_id.name
-                ))
-
     def mollie_create_payment(self, amount: float, payment_uuid: str, pos_session_id: int):
         self.ensure_one()
+
+        if not self.sudo().mollie_payment_provider_id.mollie_api_key:
+            raise ValidationError(self.env._("Please set the API key on the Mollie payment provider before making a payment."))
 
         user_lang = self.env.context.get("lang")
         currency = self.journal_id.currency_id or self.company_id.currency_id
@@ -48,7 +43,7 @@ class PosPaymentMethod(models.Model):
             "method": "pointofsale",
             "terminalId": self.mollie_terminal_id
         }
-        return self.mollie_payment_provider_id._send_api_request("POST", "/payments", json=payment_request)
+        return self.sudo().mollie_payment_provider_id._send_api_request("POST", "/payments", json=payment_request)
 
     def mollie_create_refund(self, original_payment_id: str, amount: float, payment_uuid: str, pos_session_id: int):
         self.ensure_one()
@@ -61,12 +56,12 @@ class PosPaymentMethod(models.Model):
             },
             "description": f"pos_session_id={pos_session_id},payment_uuid={payment_uuid}",
         }
-        return self.mollie_payment_provider_id._send_api_request("POST", f"/payments/{original_payment_id}/refunds", json=payment_request)
+        return self.sudo().mollie_payment_provider_id._send_api_request("POST", f"/payments/{original_payment_id}/refunds", json=payment_request)
 
     def mollie_cancel_payment(self, payment_id: str):
         self.ensure_one()
-        return self.mollie_payment_provider_id._send_api_request("DELETE", f"/payments/{payment_id}")
+        return self.sudo().mollie_payment_provider_id._send_api_request("DELETE", f"/payments/{payment_id}")
 
-    def _mollie_get_payment(self, payment_id: str):
+    def mollie_get_payment(self, payment_id: str):
         self.ensure_one()
-        return self.mollie_payment_provider_id._send_api_request("GET", f"/payments/{payment_id}")
+        return self.sudo().mollie_payment_provider_id._send_api_request("GET", f"/payments/{payment_id}")

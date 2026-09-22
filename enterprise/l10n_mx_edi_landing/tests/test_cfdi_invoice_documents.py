@@ -7,6 +7,8 @@ from odoo.addons.l10n_mx_edi.tests.common import TestMxEdiCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestCFDIInvoiceDocumentsLanding(TestMxEdiCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_make_cfdi_report_carry_over_canceled_invoice(self):
         """ Test that after a cfdi cancellation of the parent invoice the child invoice still gets the lot values. """
 

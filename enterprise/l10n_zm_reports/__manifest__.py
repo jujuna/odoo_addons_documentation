@@ -2,7 +2,6 @@
 
 {
     'name': 'Zambia - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Accounting reports for Zambia
@@ -19,7 +18,6 @@ Accounting reports for Zambia
         'data/balance_sheet.xml',
     ],
     'auto_install': True,
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

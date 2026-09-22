@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="knowledge.PromptEmbeddedViewNameDialog">
-        <Dialog title="title" size="'md'">
+        <Dialog title="this.title" size="'md'">
             <div class="mb-3 row">
                 <label for="label" class="col-sm-5 col-form-label p-0 ps-3">
                     What items do you want to manage?
                 </label>
                 <div class="col-sm-7 ps-0">
                     <input id="label" type="text" class="form-control"
-                        t-att-placeholder="placeholder"
+                        t-att-placeholder="this.placeholder"
                         t-att-value="this.props.defaultName or ''"
-                        t-on-keydown="onInputKeydown"
-                        t-ref="input"/>
+                        t-on-keydown="this.onInputKeydown"
+                        t-ref="this.inputRef"/>
                 </div>
             </div>
             <t t-set-slot="footer">

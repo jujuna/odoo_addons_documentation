@@ -1,25 +1,23 @@
+import { proxy } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { listView } from "@web/views/list/list_view";
 import { ListController } from "@web/views/list/list_controller";
 import { useService } from "@web/core/utils/hooks";
-import { useState } from "@odoo/owl";
+import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
+import { VersionPayrunListRenderer } from "./hr_version_list_renderer";
 
 export class VersionPayrunListController extends ListController {
+    static template = "hr_payroll.VersionPayrunListController";
 
     setup() {
         super.setup();
         this.orm = useService("orm");
-        this.state = useState({
+        this.dialogService = useService("dialog");
+        this.state = proxy({
             disabled: false,
         });
-    }
-
-    async onReload() {
-        return this.actionService.doAction({type: "ir.actions.client", tag: "soft_reload"});
-    }
-
-    async onClose() {
-        return this.actionService.doAction({type: "ir.actions.act_window_close"});
+        this.baseDomain = this.props.domain || [];
+        this.extraVersionIds = [];
     }
 
     buildRawRecord(rawRecord) {
@@ -28,43 +26,50 @@ export class VersionPayrunListController extends ListController {
             date_start: luxon.DateTime.fromISO(rawRecord.date_start).toISODate(),
             date_end: luxon.DateTime.fromISO(rawRecord.date_end).toISODate(),
             structure_id: rawRecord.structure_id.id,
-            company_id: rawRecord.company_id?.id,
+            company_id: rawRecord.company_id,
         };
     }
 
-    async generatePayslips() {
+    async onSelect() {
+        // if the payrun already exists, just add more employees to it
+        if (this.props.context?.payrun_id) {
+            await this.addVersions();
+        } else {
+            await this.createPayrun();
+        }
+    }
+
+    async _openPayrun(ids, options = {}) {
+        const action = await this.orm.call("hr.payslip.run", "action_open_payslips", [ids]);
+        return this.actionService.doAction(action, options);
+    }
+
+    async addVersions() {
         this.state.disabled = true;
         const selectedVersions = await this.model.root.getResIds(true);
-        if (selectedVersions.length < 1) return;
-        let ids = [this.props.context.active_id];
+        const payrunId = this.props.context.payrun_id;
+        await this.orm.call("hr.payslip.run", "action_add_versions", [payrunId, selectedVersions]);
+        return this._openPayrun(payrunId, { stackPosition: "replaceCurrentAction" });
+    }
+
+    async createPayrun() {
+        this.state.disabled = true;
+        const selectedEmployees = await this.model.root.getResIds(true);
         if (this.props.context.raw_record) {
             const rawRecord = this.buildRawRecord(this.props.context.raw_record);
-            ids = await this.orm.create("hr.payslip.run", [rawRecord]);
-        }
-        try {
-            await this.orm.call(
-                "hr.payslip.run",
-                "generate_payslips",
-                [ids],
-                {
-                    version_ids: selectedVersions,
-                });
-            if (this.props.context.raw_record) {
-                await this.openPayslips(ids);
+            const ids = await this.orm.create("hr.payslip.run", [rawRecord]);
+            if (ids) {
+                await this.orm.call("hr.payslip.run", "action_assign_versions", [ids, selectedEmployees]);
+                return this._openPayrun(ids);
             }
-            await this.onClose();
-            await this.onReload();
-        } finally {
-            this.state.disabled = false;
         }
     }
 
-    async openPayslips(ids){
-        const action = await this.orm.call("hr.payslip.run", "action_open_payslips", [ids]);
-        return this.actionService.doAction(action);
+    async onClose() {
+        return this.actionService.doAction({ type: "ir.actions.act_window_close" });
     }
 
-    async onBack(){
+    async onBack() {
         const rawRecord = this.buildRawRecord(this.props.context.raw_record);
         return this.actionService.doAction("hr_payroll.action_hr_payslip_run_create", {
             additionalContext: Object.fromEntries(
@@ -72,11 +77,49 @@ export class VersionPayrunListController extends ListController {
             ),
         });
     }
+
+    async onCreateEmployee() {
+        this.dialogService.add(FormViewDialog, {
+            resModel: "hr.employee",
+            onRecordSaved: async (record) => {
+                const employeeId = record.resId;
+                const newVersionIds = await this.orm.search("hr.version", [
+                    ["employee_id", "=", employeeId],
+                ]);
+                this.extraVersionIds.push(...newVersionIds);
+                const newDomain = [
+                    "|",
+                    ...this.baseDomain,
+                    ["id", "in", this.extraVersionIds],
+                ];
+                await this.model.load({ domain: newDomain });
+                this.model.notify();
+            },
+        });
+    }
+
+    /**
+     * @override
+     */
+    async openRecord(record, { force, newWindow } = { force: false }) {
+        const dirty = await record.isDirty();
+        if (dirty) {
+            await record.save();
+        }
+        return this.actionService.doAction({
+            type: "ir.actions.act_window",
+            res_model: "hr.employee",
+            res_id: record.resId,
+            views: [[false, "form"]],
+            target: "current",
+        });
+    }
 }
 export const versionPayrunListController = {
     ...listView,
     Controller: VersionPayrunListController,
     buttonTemplate: "hr_payroll.VersionPayrunListController.Buttons",
+    Renderer: VersionPayrunListRenderer,
 };
 
 registry.category("views").add("hr_version_payrun_list", versionPayrunListController);

@@ -20,7 +20,6 @@ import {
     mountWithCleanup,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
-import { Deferred } from "@web/core/utils/concurrency";
 import { WebClient } from "@web/webclient/webclient";
 
 /**
@@ -84,7 +83,7 @@ export async function spawnPivotViewForSpreadsheet(params = {}) {
  */
 export async function createSpreadsheetFromPivotView(params = {}) {
     let spreadsheetAction = {};
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     patchWithCleanup(SpreadsheetAction.prototype, {
         setup() {
             super.setup();
@@ -111,7 +110,7 @@ export async function createSpreadsheetFromPivotView(params = {}) {
         await contains(`.o-spreadsheet-grid div[data-id='${params.documentId}']`).focus();
     }
     await contains(".modal-content > .modal-footer > .btn-primary").click();
-    await def;
+    await def.promise;
     await animationFrame();
     const model = getSpreadsheetActionModel(spreadsheetAction);
     const pivotId = model.getters.getPivotIds()[0];

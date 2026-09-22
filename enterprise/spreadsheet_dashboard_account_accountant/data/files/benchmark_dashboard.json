@@ -1,5 +1,5 @@
 {
-  "version": "18.4.14",
+  "version": "19.3.10",
   "sheets": [
     {
       "id": "Sheet1",
@@ -96,7 +96,9 @@
             },
             "title": { "text": "Gross profit margin", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B2"
+            "dataRange": "Data!B2",
+            "humanize": true,
+            "chartId": "3d4e431e-fdfb-4aba-baba-14a9990b0a22"
           },
           "offset": { "x": 0, "y": 0 },
           "col": 0,
@@ -121,7 +123,9 @@
             },
             "title": { "text": "Net profit margin", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B3"
+            "dataRange": "Data!B3",
+            "humanize": true,
+            "chartId": "777d58a8-e76e-4ef6-a16a-8ded6a18a524"
           },
           "offset": { "x": 670, "y": 0 },
           "col": 0,
@@ -146,7 +150,9 @@
             },
             "title": { "text": "Operating margin", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B4"
+            "dataRange": "Data!B4",
+            "humanize": true,
+            "chartId": "7c87cbda-1869-4ada-a479-f83447de6c35"
           },
           "offset": { "x": 0, "y": 184 },
           "col": 0,
@@ -171,7 +177,9 @@
             },
             "title": { "text": "Current ratio", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B6"
+            "dataRange": "Data!B6",
+            "humanize": true,
+            "chartId": "da7d6686-f16e-4ecc-9e4f-6e855e2472b1"
           },
           "offset": { "x": 0, "y": 368 },
           "col": 0,
@@ -196,7 +204,9 @@
             },
             "title": { "text": "Cash flow ratio", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B7"
+            "dataRange": "Data!B7",
+            "humanize": true,
+            "chartId": "dd3e9285-4be0-4511-b6e9-c1d6b27aa6fa"
           },
           "offset": { "x": 670, "y": 368 },
           "col": 0,
@@ -221,7 +231,9 @@
             },
             "title": { "text": "Working capital", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B8"
+            "dataRange": "Data!B8",
+            "humanize": true,
+            "chartId": "ce3a4fe4-5bd7-4571-942e-913061864e42"
           },
           "offset": { "x": 0, "y": 552 },
           "col": 0,
@@ -246,7 +258,9 @@
             },
             "title": { "text": "Quick ratio", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B9"
+            "dataRange": "Data!B9",
+            "humanize": true,
+            "chartId": "262de936-0aa6-42f5-9c2a-94ca9f3fd6f9"
           },
           "offset": { "x": 670, "y": 552 },
           "col": 0,
@@ -271,7 +285,9 @@
             },
             "title": { "text": "Average debtor days", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B10"
+            "dataRange": "Data!B10",
+            "humanize": true,
+            "chartId": "244bf3e6-9fb6-4979-b01c-303b7737bd7f"
           },
           "offset": { "x": 0, "y": 736 },
           "col": 0,
@@ -296,7 +312,9 @@
             },
             "title": { "text": "Average payable days", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B11"
+            "dataRange": "Data!B11",
+            "humanize": true,
+            "chartId": "19747691-3f23-4572-bda0-4090744d9d13"
           },
           "offset": { "x": 670, "y": 736 },
           "col": 0,
@@ -321,7 +339,9 @@
             },
             "title": { "text": "Debt-to-equity", "bold": true, "color": "#434343" },
             "type": "gauge",
-            "dataRange": "Data!B5"
+            "dataRange": "Data!B5",
+            "humanize": true,
+            "chartId": "c73f1479-08b5-4598-86b3-90ae40a81528"
           },
           "offset": { "x": 670, "y": 184 },
           "col": 0,
@@ -331,6 +351,7 @@
       "tables": [],
       "areGridLinesVisible": true,
       "isVisible": true,
+      "backgroundColor": "#F9FAFB",
       "headerGroups": {
         "ROW": [],
         "COL": []
@@ -417,10 +438,10 @@
         "B8": "=FORMAT.LARGE.NUMBER(IFERROR(B20-B21))",
         "B9": "=IFERROR(B26/ABS(B21))",
         "B10": "=IFERROR(B28/ABS(B14)*30)",
-        "B11": "=IFERROR(B27/ABS(B15)*30)",
+        "B11": { "N": "=", "R": "-R1|+R1" },
         "B13": "=_t(\"Value\")",
         "B14": "=B42",
-        "B15": "=B46",
+        "B15": { "R": "+R4" },
         "B16": "=B14-B15",
         "B17": "=B42+B43",
         "B18": "=B44+B45+B46",
@@ -433,25 +454,14 @@
         "B25": "=B32",
         "B26": "=B31+B32+B34",
         "B27": "=B37",
-        "B28": "=B31",
-        "B30": "=F1",
+        "B28": { "R": "-R6" },
+        "B30": { "R": "F1" },
         "B31": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C31),B$30)",
-        "B32": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C32),B$30)",
-        "B33": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C33),B$30)",
-        "B34": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C34),B$30)",
-        "B35": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C35),B$30)",
-        "B36": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C36),B$30)",
+        "B32:B36": { "R": "+R1|=" },
         "B37": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C37),B$30)",
-        "B38": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C38),B$30)",
-        "B39": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C39),B$30)",
-        "B40": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C40),B$30)",
-        "B41": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C41),B$30)",
-        "B42": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C42),B$30)",
-        "B43": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C43),B$30)",
+        "B38:B43": { "R": "+R1|=" },
         "B44": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C44),B$30)",
-        "B45": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C45),B$30)",
-        "B46": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C46),B$30)",
-        "B47": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C47),B$30)",
+        "B45:B47": { "R": "+R1|=" },
         "C1": "=_t(\"Formula\")",
         "C2": "=_t(\"(Net sales – COGS) / Net sales\")",
         "C3": "=_t(\"Net income / Revenue\")",
@@ -508,7 +518,7 @@
         "E10": "=_t(\"Offset -4 - Month\")",
         "E11": "=_t(\"Offset -4 - Year\")",
         "E12": "=_t(\"Offset -4 - Month-Year\")",
-        "F1": "=ODOO.FILTER.VALUE(\"Month\")",
+        "F1": "=ODOO.FILTER.LABEL(\"Month\")",
         "F2": "=MONTH(F1)",
         "F3": "=YEAR(F1)",
         "F4": "=CONCATENATE(F2,\"/01/\",F3)",
@@ -594,6 +604,7 @@
   "pivots": {},
   "pivotNextId": 1,
   "customTableStyles": {},
+  "namedRanges": {},
   "globalFilters": [
     {
       "id": "069d7cf1-9623-4d6e-8226-ad7c60112662",
@@ -604,5 +615,5 @@
   ],
   "lists": {},
   "listNextId": 1,
-  "chartOdooMenusReferences": {}
+  "odooLinkReferences": {}
 }

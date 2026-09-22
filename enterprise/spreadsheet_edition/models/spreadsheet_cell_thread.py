@@ -12,7 +12,7 @@ class SpreadsheetCellThread(models.Model):
 
     def _compute_display_name(self):
         for record in self:
-            record.display_name = self._get_spreadsheet_record().display_name
+            record.display_name = record._get_spreadsheet_record().display_name
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -20,12 +20,15 @@ class SpreadsheetCellThread(models.Model):
             SpreadsheetCellThread, self.with_context(mail_create_nolog=True)
         ).create(vals_list)
 
-    def _notify_thread_by_email(self, message, recipients_data, *, msg_vals=False, **kwargs):
-        # Set a specific mail template to be sent to users that have been tagged inside a comment.
-        # It is a simple template comprised of the comment sent and the person that tagged the notified user.
-        msg_vals = msg_vals or {}
-        msg_vals['email_layout_xmlid'] = "spreadsheet_edition.mail_notification_layout"
-        return super()._notify_thread_by_email(message, recipients_data, msg_vals=msg_vals, **kwargs)
+    def message_post(self, *, email_layout_xmlid='spreadsheet_edition.mail_notification_layout', **kwargs):
+        # Use spreadsheet specific template which is a simple template comprised of the
+        # # comment sent and the person that tagged the notified user.
+        return super().message_post(email_layout_xmlid=email_layout_xmlid, **kwargs)
+
+    def message_notify(self, *, email_layout_xmlid='spreadsheet_edition.mail_notification_layout', **kwargs):
+        # Use spreadsheet specific template which is a simple template comprised of the
+        # # comment sent and the person that tagged the notified user.
+        return super().message_notify(email_layout_xmlid=email_layout_xmlid, **kwargs)
 
     def _message_compute_subject(self):
         self.ensure_one()
@@ -67,29 +70,12 @@ class SpreadsheetCellThread(models.Model):
 
         return super()._get_access_action(access_uid=access_uid, force_website=force_website)
 
-    def _get_spreadsheet_record(self):
-        return False
+    @api.model
+    def _get_record_fields(self) -> tuple[str, ...]:
+        return ()
 
-    def _check_access(self, operation: str) -> tuple | None:
-        result = super()._check_access(operation)
-        if result:
-            self -= result[0]  # noqa: PLW0642
-        if not self:
-            return result
-
-        forbidden_ids = []
-        function = None
-        for thread in self:
-            # sudo() to avoid infinite recursion when checking access
-            if record := thread.sudo()._get_spreadsheet_record():
-                if rec_result := record.with_env(self.env)._check_access('read'):
-                    forbidden_ids.append(thread.id)
-                    function = function or rec_result[1]
-
-        forbidden = self.browse(forbidden_ids)
-        if result:
-            return (result[0] + forbidden, result[1])
-        elif forbidden:
-            return (forbidden, function)
-        else:
-            return None
+    def _get_spreadsheet_record(self) -> models.BaseModel:
+        for field_name in self._get_record_fields():
+            if rec := self[field_name]:
+                return rec
+        return self.browse()

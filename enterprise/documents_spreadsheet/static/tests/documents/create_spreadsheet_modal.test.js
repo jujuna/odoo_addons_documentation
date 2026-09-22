@@ -330,7 +330,7 @@ test("The folder selection should not display Trash folder", async function () {
 });
 
 test("Offset reset to zero after searching for template in template dialog", async function () {
-    const mockRPC = async function (route, args) {
+    const mockRPC = async function (_route, args) {
         if (args.method === "web_search_read" && args.model === "spreadsheet.template") {
             expect.step(
                 JSON.stringify({
@@ -359,8 +359,8 @@ test("Offset reset to zero after searching for template in template dialog", asy
     await animationFrame();
 
     expect(`${dialogSelector} .o-spreadsheet-grid:not(.o-spreadsheet-grid-ghost-item)`).toHaveCount(
-        5
-    ); // Blank template, Template 1, Template 10, Template 11, Template 12
+        5 // Blank template, Template 1, Template 10, Template 11, Template 12
+    );
     expect.verifySteps([JSON.stringify({ offset: 0, limit: 9 })]);
     expect(`${dialogSelector} .o_pager_value `).toHaveText("1-4", {
         message: "Pager should be reset to 1-4 after searching for a template",

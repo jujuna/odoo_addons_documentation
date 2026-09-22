@@ -1,65 +1,89 @@
 /** @odoo-module **/
 
 /**
- * Helper function that triggers a custom drag event with specified data properties.
+ * Triggers a synthetic PointerEvent on the given element.
+ * Used to simulate pointer-based interactions such as dragging or clicking
+ * when testing or automating UI behavior.
  *
- * @param {HTMLElement} element - The element to trigger the event on
- * @param {string} type - The drag event type ('dragstart', 'drop', 'dragend')
- * @param {Object} data - Additional data to attach to the event (e.g., dataTransfer)
- */
-function triggerDragEvent(element, type, data = {}) {
-    const event = new DragEvent(type, { bubbles: true });
-    for (const key in data) {
-        Object.defineProperty(event, key, {
-            value: data[key],
-        });
-    }
+ * @param {Element} element - The target element to dispatch the event on.
+ * @param {string} type - The type of event (e.g. "pointerdown", "pointermove", "pointerup").
+ * @param {Object} [data={}] - Optional event data, such as coordinates or custom properties.
+*/
+function triggerPointerEvent(element, type, data = {}) {
+    // Create a new pointer event with default and user-specified options
+    const event = new PointerEvent(type, {
+        bubbles: true,        // allow the event to bubble up through the DOM
+        cancelable: true,     // allow event.preventDefault() to be called
+        pointerId: 1,         // arbitrary pointer ID (1 = mouse)
+        pointerType: 'mouse', // simulate a mouse-based pointer
+        clientX: data.clientX || 0, // X position relative to the viewport
+        clientY: data.clientY || 0, // Y position relative to the viewport
+        ...data,              // allow overriding or adding custom event fields
+    });
+
+    // Dispatch the event to the target element
     element.dispatchEvent(event);
 }
 
 /**
- * Performs a drag and drop operation from a source element to a specific position
- * within an iframe containing PDF.js content. This function addresses the limitations
- * of Odoo's default tour drag_and_drop action which doesn't work properly with
- * iframe content controlled by PDF.js.
+ * Waits until the next browser animation frame before continuing execution.
  *
- * The function creates a mock dataTransfer object to simulate real drag events
- * and calculates precise drop coordinates considering iframe scroll and page dimensions.
+ * This is useful when simulating user interactions (like drag-and-drop)
+ * to ensure that the DOM and rendering have updated between steps.
+ * It returns a Promise that resolves on the next repaint cycle.
  *
- * @param {HTMLElement} from - The source element to drag from (e.g., signature button)
- * @param {HTMLElement} to - The target page element within the iframe
- * @param {number} height - Vertical position as fraction of page height (0.0-1.0, default: 0.5)
- * @param {number} width - Horizontal position as fraction of page width (0.0-1.0, default: 0.5)
+ * @returns {Promise<void>} Resolves when the next animation frame occurs.
+*/
+function waitNextFrame() {
+    return new Promise(resolve => requestAnimationFrame(resolve));
+}
+
+/**
+ * Simulates dragging a signature item from one element to another inside an iframe
+ * using PointerEvents. The drag moves smoothly across multiple animation frames
+ * to ensure Odoo tour detects the interaction correctly.
+ *
+ * @param {Element} from - The source element to start dragging from.
+ * @param {Element} to - The destination element to drop onto (page).
+ * @param {number} [height=0.5] - Vertical position (0–1) within the elements to start/drop.
+ * @param {number} [width=0.5] - Horizontal position (0–1) within the elements to start/drop.
+ * @param {number} [steps=1] - Number of intermediate drag movements between the start and end positions.
  */
-function dragAndDropSignItemAtHeight(from, to, height = 0.5, width = 0.5) {
-    const rect = to.getBoundingClientRect();
-    const iframeWindow = to.ownerDocument.defaultView;
-    const toPosition = {
-        x: rect.x + iframeWindow.scrollX + to.clientWidth * width,
-        y: rect.y + iframeWindow.scrollY + to.clientHeight * height,
-    };
+async function dragAndDropSignItemAtHeight(from, to, height = 0.5, width = 0.5, steps=1) {
+    // Get iframe references and bounding boxes
+    const iframe = document.querySelector("iframe");
+    const iframeWindow = iframe.contentWindow;
+    const iframeRect = iframe.getBoundingClientRect();
+    const toRect = to.getBoundingClientRect();
+    const fromRect = from.getBoundingClientRect();
 
-    const dataTransferObject = {};
-    const dataTransferMock = {
-        setData: (key, value) => {
-            dataTransferObject[key] = value;
-        },
-        getData: (key) => dataTransferObject[key],
-        setDragImage: () => {},
-        items: [],
-    };
+    // Compute absolute start and end positions on the page (accounting for iframe offset)
+    const pageStartX = iframeRect.left + to.getBoundingClientRect().left;
+    const pageStartY = iframeRect.top + to.getBoundingClientRect().top;
+    const startX = fromRect.left + fromRect.width * width;
+    const startY = fromRect.top + fromRect.height * height;
+    const endX = pageStartX + toRect.width * width;
+    const endY = pageStartY + toRect.height * height;
 
-    triggerDragEvent(from, "dragstart", {
-        dataTransfer: dataTransferMock,
-    });
+    // ---- Simulate the drag sequence ----
+    // 1. Press down on the source element
+    triggerPointerEvent(from, "pointerdown", { clientX: startX, clientY: startY });
+    await waitNextFrame();
 
-    triggerDragEvent(to, "drop", {
-        pageX: toPosition.x,
-        pageY: toPosition.y,
-        dataTransfer: dataTransferMock,
-    });
+    // 2. Move gradually toward the destination
+    for (let step = 1; step <= steps; step++) {
+        const progress = step / steps;
+        const currentX = startX + (endX - startX) * progress;
+        const currentY = startY + (endY - startY) * progress;
+        triggerPointerEvent(iframeWindow, "pointermove", { clientX: currentX, clientY: currentY});
+        await waitNextFrame();
+    }
 
-    triggerDragEvent(from, "dragend");
+    // 3. Release (drop) on the target element
+    triggerPointerEvent(to, "pointerup", { clientX: endX, clientY: endY });
+
+    // 4. Wait one more frame to allow the UI to update after the drop
+    await waitNextFrame();
 }
 
 export default {

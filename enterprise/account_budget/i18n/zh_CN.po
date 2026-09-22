@@ -8,41 +8,47 @@
 # Raymond Yu <cl_yu@hotmail.com>, 2022
 # Jeffery CHEN <jeffery9@gmail.com>, 2022
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 05:24+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:14+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/account_budget/zh_Hans/>\n"
+"projects/odoo-master/account_budget/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_budget
+#: model:ir.module.module,description:base.module_account_budget
+msgid ""
+"\n"
+"Use budgets to compare actual with expected revenues and costs\n"
+"--------------------------------------------------------------\n"
+msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_kanban
 msgid ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
-"title=\"Period\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Period\" title=\"Period\"/>"
 msgstr ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"期间\" title=\"期间"
-"\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-label=\"期间\" "
+"title=\"期间\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+"<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
 msgstr ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"至\" title=\"至\"/>"
+"<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -80,6 +86,11 @@ msgid "Activity Exception Decoration"
 msgstr "活动异常标示"
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_plans_ids
+msgid "Activity Plans"
+msgstr "活动计划"
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_state
 msgid "Activity State"
 msgstr "活动状态"
@@ -114,6 +125,16 @@ msgid "Analytic Budget"
 msgstr "分析预算"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_analytic_line
+msgid "Analytic Line"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model,name:account_budget.model_analytic_plan_fields_mixin
+msgid "Analytic Plan Fields"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__analytical_plan_ids
 msgid "Analytic Plans"
 msgstr "分析方案"
@@ -135,7 +156,6 @@ msgstr "全部"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_analytic
-#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_report__line_type__budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -153,6 +173,8 @@ msgid "Budget %s"
 msgstr "预算%s"
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_account_bank_statement_line__budget_analytic_ids
+#: model:ir.model.fields,field_description:account_budget.field_account_move__budget_analytic_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_analytic_id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_analytic_id
 msgid "Budget Analytic"
@@ -162,6 +184,7 @@ msgstr "预算分析"
 #: model:ir.model,name:account_budget.model_budget_line
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__budget_line_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_line_id
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budget Line"
 msgstr "预算明细"
 
@@ -178,6 +201,11 @@ msgstr "预算明细"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_tree
 msgid "Budget Lines"
 msgstr "预算明细"
+
+#. module: account_budget
+#: model:ir.module.module,shortdesc:base.module_account_budget
+msgid "Budget Management"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__name
@@ -220,17 +248,18 @@ msgid "Budget end date may not be before the starting date."
 msgstr "预算结束日期不得早于开始日期。"
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budgeted"
 msgstr "已编入预算"
 
 #. module: account_budget
 #. odoo-python
+#: code:addons/account_budget/models/account_move.py:0
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 #: model:ir.actions.act_window,name:account_budget.act_budget_analytic_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_account_analytic_account_form_inherit_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:account_budget.view_move_form_inherit_budget
 msgid "Budgets"
 msgstr "预算"
 
@@ -238,11 +267,6 @@ msgstr "预算"
 #: model:ir.actions.act_window,name:account_budget.act_budget_lines_view
 msgid "Budgets Analysis"
 msgstr "预算辅助核算"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "Cancel"
-msgstr "取消"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -258,6 +282,13 @@ msgstr "已取消"
 #: model_terms:ir.actions.act_window,help:account_budget.act_budget_analytic_view
 msgid "Click to create a new budget."
 msgstr "点击以创建一个新的预算。"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
+#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
+msgid "Commitment"
+msgstr "承诺"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__company_id
@@ -288,6 +319,7 @@ msgstr "币别"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__date
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
 msgid "Date"
 msgstr "日期"
@@ -305,6 +337,9 @@ msgstr "描述"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_move__display_name
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__display_name
@@ -357,16 +392,6 @@ msgid "Followers (Partners)"
 msgstr "关注者（合作伙伴）"
 
 #. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font Awesome图标，例如：fa-tasks"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "From"
-msgstr "来自"
-
-#. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Future Activities"
 msgstr "未来活动"
@@ -389,6 +414,9 @@ msgstr "有消息"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__id
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:account_budget.field_account_move__id
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__id
@@ -433,6 +461,11 @@ msgid "Is Follower"
 msgstr "是关注者"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__write_uid
@@ -450,6 +483,17 @@ msgstr "上次更新日期"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Late Activities"
 msgstr "最近活动"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__liquidation_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__liquidation
+msgid "Liquidation"
+msgstr "清付"
+
+#. module: account_budget
+#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_has_error
@@ -711,16 +755,6 @@ msgid "User"
 msgstr "用户"
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__website_message_ids
-msgid "Website Messages"
-msgstr "网站消息"
-
-#. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__website_message_ids
-msgid "Website communication history"
-msgstr "网站沟通记录"
-
-#. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_split_wizard__period__year
 msgid "Year"
 msgstr "年"
@@ -747,137 +781,3 @@ msgstr "例：2023 年预算"
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 msgid "id"
 msgstr "id"
-
-#~ msgid ""
-#~ "\"End Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr "预算项目的“结束日期”应包含在预算期间"
-
-#~ msgid ""
-#~ "\"Start Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr "预算项目的“开始日期”应包含在预算期间"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Period\" "
-#~ "title=\"Period\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Period\" "
-#~ "title=\"Period\"/>"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
-#~ "title=\"Arrow\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"箭头图标\" "
-#~ "title=\"箭头\"/>"
-
-#~ msgid "<span class=\"o_stat_text\">Budget</span>"
-#~ msgstr "<span class=\"o_stat_text\">预算</span>"
-
-#~ msgid "Accounts"
-#~ msgstr "科目"
-
-#~ msgid "Achievement"
-#~ msgstr "成就"
-
-#~ msgid "Amount really earned/spent."
-#~ msgstr "实际赚到/消费的金额."
-
-#~ msgid "Amount you are supposed to have earned/spent at this date."
-#~ msgstr "您应该在此日期获得/消费的金额。"
-
-#~ msgid ""
-#~ "Amount you plan to earn/spend. Record a positive amount if it is a "
-#~ "revenue and a negative amount if it is a cost."
-#~ msgstr ""
-#~ "你计划赚到或消费的金额。如果它是一个收入和一个负数，如果它是一个成本，记录"
-#~ "一个正的量。"
-
-#~ msgid "Analytic Plan"
-#~ msgstr "分析计划"
-
-#~ msgid "Approve"
-#~ msgstr "批准"
-
-#~ msgid "Budget Items"
-#~ msgstr "预算项"
-
-#~ msgid "Budgetary Position"
-#~ msgstr "预算状况"
-
-#~ msgid "Budgetary Positions"
-#~ msgstr "预算状况"
-
-#~ msgid "Cancelled"
-#~ msgstr "已取消"
-
-#~ msgid ""
-#~ "Comparison between practical and theoretical amount. This measure tells "
-#~ "you if you are below or over budget."
-#~ msgstr "实际量与理论量进行比较。如果你低于或超过预算，这项措施会告诉你。"
-
-#~ msgid "Confirm"
-#~ msgstr "确认"
-
-#~ msgid "Confirmed"
-#~ msgstr "已确认"
-
-#~ msgid "Entries..."
-#~ msgstr "分录..."
-
-#~ msgid "Group By"
-#~ msgstr "分组方式"
-
-#~ msgid "Name"
-#~ msgstr "名称"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "需要采取动作消息数量"
-
-#~ msgid "Paid Date"
-#~ msgstr "支付日期"
-
-#~ msgid "Planned Amount"
-#~ msgstr "计划金额"
-
-#~ msgid "Planned amount"
-#~ msgstr "计划金额"
-
-#~ msgid "Practical Amount"
-#~ msgstr "实际金额"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "显示所有的在今天之前的下一个动作日期的记录"
-
-#~ msgid "The budget must have at least one account."
-#~ msgstr "预算应该至少有一个科目"
-
-#~ msgid "Theoretical Amount"
-#~ msgstr "理论金额"
-
-#~ msgid "Theoretical amount"
-#~ msgstr "理论金额"
-
-#~ msgid "To"
-#~ msgstr "至"
-
-#~ msgid "To Approve"
-#~ msgstr "待批准"
-
-#~ msgid "To Approve Budgets"
-#~ msgstr "待批准的预算"
-
-#~ msgid "Total Planned Amount"
-#~ msgstr "总计划金额"
-
-#~ msgid "Validated"
-#~ msgstr "已验证"
-
-#~ msgid ""
-#~ "You have to enter at least a budgetary position or analytic account on a "
-#~ "budget line."
-#~ msgstr "您必须在预算项目上至少输入预算状况或分析账户。"
-
-#~ msgid "e.g. Budget 2023: Optimistic"
-#~ msgstr "例如：2023预算：乐观"

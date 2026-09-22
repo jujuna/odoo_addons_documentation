@@ -1,27 +1,37 @@
 import time
 
-from odoo import Command, _, api, models
+from odoo import Command, _, models
+from odoo.addons.account.models.chart_template import template
 
 
 class AccountChartTemplate(models.AbstractModel):
     _inherit = "account.chart.template"
 
-    @api.model
-    def _get_demo_data(self, company=False):
-        demo_data = {
-            'account.journal': {},
-            **super()._get_demo_data(company),
+    @template(model='account.journal.group', demo=True)
+    def _auto_transfer_account_journal_group_demo(self, template_code):
+        return {
+            'account_transfer.ifrs_group': {
+                'name': _("IFRS"),
+            },
         }
-        demo_data['account.journal'].update({
+
+    @template(model='account.journal', demo=True)
+    def _auto_transfer_account_journal_demo(self, template_code):
+        return {
             'auto_transfer_journal': {
                 'name': _("IFRS Transfers"),
                 'code': "IFRSA",
                 'type': 'general',
                 'show_on_dashboard': False,
                 'sequence': 1000,
+                'journal_group_id': 'account_transfer.ifrs_group',
             },
-        })
-        demo_data['account.transfer.model'] = {
+        }
+
+    @template(model='account.transfer.model', demo=True)
+    def _auto_transfer_account_transfer_model_demo(self, template_code):
+        company = self.env.company
+        return {
             self.company_xmlid('monthly_model'): {
                 'name': _("IFRS rent expense transfer"),
                 'date_start': time.strftime('%Y-01-01'),
@@ -60,4 +70,3 @@ class AccountChartTemplate(models.AbstractModel):
                 ],
             },
         }
-        return demo_data

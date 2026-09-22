@@ -2,8 +2,9 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { WithSearch } from "@web/search/with_search/with_search";
 import { MrpDisplay } from "@mrp_workorder/mrp_display/mrp_display";
-import { Component, onWillStart } from "@odoo/owl";
+import { Component, onWillStart, useProps } from "@odoo/owl";
 import { MrpDisplaySearchModel } from "@mrp_workorder/mrp_display/search_model";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 
 // from record.js
 const defaultActiveField = { attrs: {}, options: {}, domain: "[]", string: "" };
@@ -11,9 +12,8 @@ const defaultActiveField = { attrs: {}, options: {}, domain: "[]", string: "" };
 export class MrpDisplayAction extends Component {
     static template = "mrp_workorder.MrpDisplayAction";
     static components = { WithSearch, MrpDisplay };
-    static props = {
-        "*": true,
-    };
+
+    props = useProps(standardActionServiceProps);
 
     get fieldsStructure() {
         return {
@@ -31,14 +31,14 @@ export class MrpDisplayAction extends Component {
                 "product_id",
                 "product_qty",
                 "product_tracking",
-                "product_uom_id",
+                "uom_id",
                 "qty_producing",
                 "state",
                 "workorder_ids",
                 "date_start",
                 "product_description_variants",
                 "priority",
-                "log_note",
+                "note",
                 "picking_type_auto_close",
                 "serial_numbers_count",
                 "location_src_id",
@@ -63,7 +63,7 @@ export class MrpDisplayAction extends Component {
                 "worksheet",
                 "check_ids",
                 "employee_ids",
-                "product_uom_id",
+                "uom_id",
                 "is_last_unfinished_wo",
                 "barcode",
                 "date_start",
@@ -72,12 +72,16 @@ export class MrpDisplayAction extends Component {
                 "qty_remaining",
                 "employee_assigned_ids",
                 "product_description_variants",
+                "sequence",
+                "is_planned",
+                "qty_to_produce",
+                "qty_produced",
             ],
             "stock.move": [
                 "id",
                 "operation_id",
                 "product_id",
-                "product_uom",
+                "uom_id",
                 "product_uom_qty",
                 "production_id",
                 "quantity",
@@ -121,11 +125,7 @@ export class MrpDisplayAction extends Component {
                 "next_check_id",
                 "component_barcode",
             ],
-            "stock.lot": [
-                "id",
-                "name",
-                "display_name"
-            ],
+            "stock.lot": ["id", "name", "display_name"],
         };
     }
 

@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 
 {
     'name': 'WhatsApp Tests',
-    'version': '1.0',
     'category': 'Hidden',
     'sequence': 9898,
     'summary': 'WhatsApp Tests',
@@ -17,14 +15,13 @@ applications. """,
         'whatsapp',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_tests': [
             'test_whatsapp/static/tests/tours/**/*',
         ],
     },
-    'installable': True,
     'author': 'Odoo S.A.',
-    'license': 'LGPL-3',
+    'license': 'OEEL-1',
 }

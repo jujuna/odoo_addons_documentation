@@ -1,5 +1,4 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-# -*- coding: utf-8 -*-
 
 import logging
 
@@ -11,6 +10,7 @@ import random
 import odoo.tests
 from odoo import Command, api, http
 from odoo.tools import mute_logger
+from odoo.addons.base.tests.files import GIF_RAW
 from odoo.addons.web_studio.controllers.main import WebStudioController
 
 _logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ _logger = logging.getLogger(__name__)
 class TestUi(odoo.tests.HttpCase):
 
     def test_new_app_and_report(self):
-        self.start_tour("/odoo", 'web_studio_new_app_tour', login="admin")
+        self.start_tour("/odoo/action-studio?mode=home_menu", 'web_studio_new_app_tour', login="admin")
 
         # the new submenu tour is based on the result of the new app tour
         self.start_tour("/odoo", 'web_studio_new_submenu_tour', login="admin")
@@ -30,25 +30,28 @@ class TestUi(odoo.tests.HttpCase):
         self.start_tour("/odoo?debug=tests", "web_studio_new_report_basic_layout_tour", login="admin")
 
     def test_optional_fields(self):
-        self.start_tour("/odoo?debug=tests", 'web_studio_hide_fields_tour', login="admin")
+        self.start_tour("/odoo/action-studio?mode=home_menu&debug=1", 'web_studio_hide_fields_tour', login="admin")
 
     def test_model_option_value(self):
-        self.start_tour("/odoo?debug=tests", 'web_studio_model_option_value_tour', login="admin")
+        self.start_tour("/odoo/action-studio?mode=home_menu&debug=tests", 'web_studio_model_option_value_tour', login="admin")
 
     def test_rename(self):
         self.start_tour("/odoo?debug=tests", 'web_studio_main_and_rename', login="admin", timeout=200)
+
+    def test_rename_2(self):
+        self.start_tour("/odoo?debug=tests", 'web_studio_rename', login="admin", timeout=200)
 
     def test_approval(self):
         self.start_tour("/odoo?debug=tests", 'web_studio_approval_tour', login="admin")
 
     def test_background(self):
         attachment = self.env['ir.attachment'].create({
-            'datas': b'R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=',
+            'raw': GIF_RAW,
             'name': 'testFilename.gif',
             'public': True,
             'mimetype': 'image/gif'
         })
-        self.env.company.background_image = attachment.datas
+        self.env.company.background_image = attachment.raw
         self.start_tour("/odoo?debug=tests", 'web_studio_custom_background_tour', login="admin")
 
     def test_create_app_with_pipeline_and_user_assignment(self):
@@ -107,7 +110,7 @@ def assertViewArchEqual(test, original, expected):
 
 def watch_edit_view(test, on_edit_view):
     def clear_routing():
-        test.env.registry.clear_cache('routing')
+        test.env.transaction.invalidate_ormcache('routing')
 
     clear_routing()
     edit_view = WebStudioController.edit_view
@@ -171,6 +174,10 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
     def setUpClass(cls):
         super().setUpClass()
         setup_view_editor_data(cls)
+
+    def setUp(self):
+        super().setUp()
+        self.env.transaction.will_change_registry()
 
     def create_empty_app(self):
         self.newModel = self.env['ir.model'].create({
@@ -285,7 +292,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
         action = self.env[action.type].browse(action.id)
         assertViewArchEqual(self, studioView.arch, """
             <data>
-                <xpath expr="/list//field[@name='avatar_128']" position="before">
+                <xpath expr="/list//field[@name='create_date']" position="before">
                     <header>
                         <button string="web_studio_new_button_action_name" type="action" name="{actionId}"/>
                     </header>
@@ -293,7 +300,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
             </data>""".format(actionId=action.xml_id))
         self.start_tour("/odoo?debug=tests", 'web_studio_test_remove_action_button_in_list_view', login="admin")
         arch = """<data>
-                <xpath expr="/list//field[@name='avatar_128']" position="before">
+                <xpath expr="/list//field[@name='create_date']" position="before">
                     <header>
                     </header>
                 </xpath>
@@ -563,7 +570,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
 
         hasGroup = self.env["res.groups"].create({
             "name": "studio has group",
-            "user_ids": [Command.link(2)]
+            "user_ids": [Command.link(self.ref('base.user_admin'))]
         })
         hasGroupXmlId = self.env["ir.model.data"].create({
             "name": "studio_test_hasgroup",
@@ -600,7 +607,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
     def test_element_group_in_sidebar(self):
         group = self.env["res.groups"].create({
             "name": "Test Group",
-            "user_ids": [Command.link(2)]
+            "user_ids": [Command.link(self.ref('base.user_admin'))]
         })
         groupXmlId = self.env["ir.model.data"].create({
             "name": "test_group",
@@ -731,7 +738,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
 
         hasGroup = self.env["res.groups"].create({
             "name": "studio has group",
-            "user_ids": [Command.link(2)]
+            "user_ids": [Command.link(self.ref('base.user_admin'))]
         })
         hasGroupXmlId = self.env["ir.model.data"].create({
             "name": "studio_test_hasgroup",
@@ -775,7 +782,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
 
         hasGroup = self.env["res.groups"].create({
             "name": "studio has group",
-            "user_ids": [Command.link(2)]
+            "user_ids": [Command.link(self.ref('base.user_admin'))]
         })
         hasGroupXmlId = self.env["ir.model.data"].create({
             "name": "studio_test_hasgroup",
@@ -904,7 +911,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
             "forbid": False,
         }])
 
-        xml_temp = E.field(name="color", groups=doesNotHaveGroupXmlId.complete_name, column_invisible="True", studio_groups=studio_groups)
+        xml_temp = E.field(name="color", groups=doesNotHaveGroupXmlId.complete_name, column_invisible="True", actual_invisible="False", studio_groups=studio_groups)
 
         expected = '''
             <list>
@@ -940,7 +947,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
                 <field name="display_name"/>
                 <field name="color" invisible="{color_modifiers}"/>
              </list>
-        '''.format(color_modifiers="display_name == &quot;Robert&quot;")
+        '''.format(color_modifiers="&quot;Robert&quot;.lower() in (display_name or &quot;&quot;).lower()")
 
         assertViewArchEqual(self, arch, expected)
 
@@ -1678,7 +1685,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
                     "string": "Test studio new button",
                     "attrs": {
                         "class": "oe_stat_button",
-                        "icon": "fa-diamond"
+                        "icon": "diamond"
                     }
                 }
             }
@@ -1690,7 +1697,13 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
             action_created = True
             context = dict(rec_set.env.context)
             del context["tz"]
-            self.assertEqual(context, {'lang': 'en_US', 'uid': 2, 'arbitrary_key': 'arbitrary', "studio": 1})
+            del context["host_id"]
+            self.assertEqual(context, {
+                'lang': 'en_US',
+                'uid': self.ref('base.user_admin'),
+                'arbitrary_key': 'arbitrary',
+                'studio': 1,
+            })
             return create_action(rec_set, *args, **kwargs)
 
         self.patch(self.env.registry["ir.actions.actions"], "_create", mock_act_create)
@@ -1720,7 +1733,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
         self.assertXMLEqual(response.json()["result"]["views"]["form"]["arch"], f"""
         <form>
           <div class="oe_button_box">
-            <button class="oe_stat_button" icon="fa-diamond" type="action" name="{action.xml_id}">
+            <button class="oe_stat_button" icon="diamond" type="action" name="{action.xml_id}">
               <field widget="statinfo" name="x_user_id_res_partner_count" string="Test studio new button"/>
             </button>
           </div>
@@ -1754,7 +1767,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
                     "string": "aa",
                     "attrs": {
                         "class": "oe_stat_button",
-                        "icon": "fa-diamond"
+                        "icon": "diamond"
                     }
                 }
             }
@@ -1779,7 +1792,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
         <form>
            <sheet>
              <div class="oe_button_box">
-               <button class="oe_stat_button" icon="fa-diamond" type="action" name="{action.xml_id}">
+               <button class="oe_stat_button" icon="diamond" type="action" name="{action.xml_id}">
                  <field widget="statinfo" name="x_parent_id_res_partner_count" string="aa"/>
                </button>
              </div>
@@ -2062,7 +2075,7 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
         """
         self.start_tour("/web?debug=tests", "web_studio_test_drag_before_sheet", login="admin")
         studio_view = _get_studio_view(self.testView)
-        [html_field] = self.env['ir.model.fields'].search([('name', '=like', 'x_studio_html_field_%')], limit=1)
+        [html_field] = self.env['ir.model.fields'].search([('name', '=like', 'x_studio_html_%')], limit=1)
         assertViewArchEqual(self, studio_view.arch, '''
              <data>
                 <xpath expr="/form/sheet/group" position="before">
@@ -2241,10 +2254,11 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
         view_arch_from_studio = self.env[view.model].with_context(studio=True).get_view(view.id, view.type)["arch"]
         tree = etree.fromstring(view_arch_from_studio)
         field_node = tree.find("field")
+        group_id = self.ref('base.group_no_one')
         self.assertDictEqual({**field_node.attrib}, {
             "name": "function",
             "groups": "base.group_no_one",
-            "studio_groups": '[{"id": 7, "name": "Technical Features", "display_name": "Technical Features", "forbid": false}]'
+            "studio_groups": f'[{{"id": {group_id}, "name": "Technical Features", "display_name": "Technical Features", "forbid": false}}]'
         })
 
     def test_add_existing_binary_with_filename(self):
@@ -2279,6 +2293,34 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
             </xpath>
         </data>''')
 
+    def test_negated_groups_do_not_interfere_with_invisible(self):
+        doesNotHaveGroup = self.env["res.groups"].create({
+            "name": "studio does not have"
+        })
+        doesNotHaveGroupXmlId = self.env["ir.model.data"].create({
+            "name": "studio_test_doesnothavegroup",
+            "model": "res.groups",
+            "module": "web_studio",
+            "res_id": doesNotHaveGroup.id,
+        })
+        self.testView.arch = f'''
+            <form>
+                <group>
+                    <field name="name" />
+                    <field name="function" groups="{doesNotHaveGroupXmlId.complete_name}" />
+                </group>
+            </form>
+        '''
+        self.start_tour("/odoo?debug=tests", 'web_studio_test_negated_groups_do_not_interfere_with_invisible', login="admin")
+        studioView = _get_studio_view(self.testView)
+        assertViewArchEqual(self, studioView.arch, """
+            <data>
+                <xpath expr="/form//field[@name='function']" position="attributes">
+                    <attribute name="invisible">"Robert".lower() in (display_name or "").lower()</attribute>
+                </xpath>
+            </data>
+        """)
+
     def test_cohort_measure_values(self):
         testCohortView = self.env["ir.ui.view"].create({
         "name": "simple partner",
@@ -2300,4 +2342,94 @@ class TestStudioUIUnit(odoo.tests.HttpCase):
                     <attribute name="measure">color</attribute>
                 </xpath>
             </data>
+        """)
+
+    def test_drag_drop_on_statusbar(self):
+        self.testView.arch = """
+            <form><sheet/></form>
+        """
+        self.start_tour(f"/odoo/action-{self.testAction.id}?debug=tests", "web_studio_test_drag_drop_on_statusbar", login="admin")
+
+        studio_view = _get_studio_view(self.testView)
+
+        new_field = etree.fromstring(studio_view.arch).xpath("//field")[0]
+
+        assertViewArchEqual(self, studio_view.arch, f"""
+        <data>
+        <xpath expr="/form/sheet" position="before">
+            <header>
+                {etree.tostring(new_field, encoding="unicode")}
+            </header>
+        </xpath>
+        </data>
+        """)
+        self.assertEqual(new_field.get("widget"), "statusbar")
+        self.assertEqual(new_field.get("options"), "{'clickable': '1', 'create_name_field': 'x_name'}")
+
+        self.assertEqual(new_field.get("name"), "x_studio_many2one_1")
+        model_field = self.env["res.partner"]._fields[new_field.get("name")]
+        self.assertEqual(model_field.type, "many2one")
+        self.assertEqual(self.env["ir.model.fields"]._get(model_field.model_name, model_field.name).group_expand, True)
+        self.assertEqual(model_field.comodel_name, "x_new_model_lazy")
+        self.assertEqual(self.env[model_field.comodel_name]._order, "x_studio_sequence asc, id asc")
+
+        studio_view.unlink()
+        self.env["ir.model.fields"]._get("res.partner", new_field.get("name")).unlink()
+
+    def test_get_field_infos_set_tracking(self):
+        self.authenticate("admin", "admin")
+        partner_model = self.env["ir.model"]._get("res.partner")
+        studio_field = self.env["ir.model.fields"].create({
+            "name": "x_studio_test_tracking",
+            "model": "res.partner",
+            "model_id": partner_model.id,
+            "ttype": "char",
+            "field_description": "Studio Test Tracking",
+            "state": "manual",
+        })
+        studio_field.tracking = False
+
+        res = self.url_open(
+            '/web_studio/get_field_infos',
+            data=json.dumps({"params": {"model_name": "res.partner", "field_name": studio_field.name, "company_id": False}}),
+            headers={"Content-Type": "application/json"},
+        )
+        self.assertEqual(res.status_code, 200)
+        result = res.json().get('result')
+        self.assertIn("default_value", result)
+        self.assertIn("tracking", result)
+        self.assertFalse(result["tracking"])
+
+        res_set = self.url_open(
+            '/web_studio/set_field_tracking',
+            data=json.dumps({"params": {"model_name": "res.partner", "field_name": studio_field.name, "tracking_value": True}}),
+            headers={"Content-Type": "application/json"},
+        )
+        self.assertEqual(res_set.status_code, 200)
+        self.assertTrue(bool(res_set.json().get('result')))
+        self.assertTrue(bool(studio_field.tracking))
+        self.addCleanup(studio_field.unlink)
+
+    def test_reset_options_on_widget_change(self):
+        self.testView.write({
+            "model": "res.partner",
+            "type": "form",
+            "arch": '''<form><field name="website" options="{'dynamic_placeholder': true, 'placeholder_field':'city'}"/></form>'''
+        })
+        self.assertFalse(self.testView.inherit_children_ids)
+        self.start_tour("/odoo", "web_studio_test_reset_options_on_widget_change", login="admin")
+        got_views = self.env["res.partner"].get_views([(self.testView.id, "form")])
+        self.assertXMLEqual(got_views["views"]["form"]["arch"],
+        """<form>
+            <field name="website" widget="email"/>
+        </form>"""
+        )
+        self.assertXMLEqual(self.testView.inherit_children_ids.arch,
+        """
+        <data>
+          <xpath expr="/form//field[@name='website']" position="attributes">
+            <attribute name="options"/>
+            <attribute name="widget">email</attribute>
+          </xpath>
+        </data>
         """)

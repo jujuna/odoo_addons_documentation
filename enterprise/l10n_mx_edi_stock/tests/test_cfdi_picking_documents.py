@@ -9,8 +9,7 @@ from .common import TestMXEdiStockCommon
 class TestCFDIPickingWorkflow(TestMXEdiStockCommon):
 
     def test_picking_workflow(self):
-        warehouse = self._create_warehouse()
-        picking = self._create_picking(warehouse)
+        picking = self._create_picking()
 
         # No pac found.
         self.env.company.l10n_mx_edi_pac = None
@@ -161,8 +160,7 @@ class TestCFDIPickingWorkflow(TestMXEdiStockCommon):
         self.env.company.l10n_mx_edi_pac_password = 'test'
 
         with freeze_time('2017-01-01'):
-            warehouse = self._create_warehouse()
-            picking = self._create_picking(warehouse)
+            picking = self._create_picking()
             with self.with_mocked_pac_sign_success():
                 picking.l10n_mx_edi_cfdi_try_send()
             with self.with_mocked_sat_call(lambda _x: 'valid'):

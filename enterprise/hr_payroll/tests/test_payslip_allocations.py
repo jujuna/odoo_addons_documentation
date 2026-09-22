@@ -8,6 +8,7 @@ from odoo.addons.hr_payroll.tests.common import TestPayslipContractBase
 
 
 @tagged('payslip_allocation')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestPayslipAllocations(TestPayslipContractBase):
 
     @classmethod
@@ -16,11 +17,11 @@ class TestPayslipAllocations(TestPayslipContractBase):
 
         # Add two bank accounts for Richard
         cls.bank1 = cls.env['res.partner.bank'].create({
-            'acc_number': '111-222',
+            'account_number': '111-222',
             'partner_id': cls.richard_emp.work_contact_id.id,
         })
         cls.bank2 = cls.env['res.partner.bank'].create({
-            'acc_number': '333-444',
+            'account_number': '333-444',
             'partner_id': cls.richard_emp.work_contact_id.id,
         })
         cls.richard_emp.bank_account_ids = [
@@ -46,7 +47,7 @@ class TestPayslipAllocations(TestPayslipContractBase):
         })
 
     def _compute_alloc(self, total=None):
-        return self.richard_payslip.compute_salary_allocations(total_amount=total)
+        return self.richard_payslip._compute_salary_allocations(total_amount=total)
 
     def test_split_hundred_zero_percentages(self):
         """ If percentages split are 100% and 0%, both should appear in allocations """
@@ -134,7 +135,7 @@ class TestPayslipAllocations(TestPayslipContractBase):
         self.richard_emp.bank_account_ids = [Command.set([self.bank1.id, self.bank2.id])]
 
         bank3 = self.env['res.partner.bank'].create({
-            'acc_number': '555-666',
+            'account_number': '555-666',
             'partner_id': self.richard_emp.work_contact_id.id,
         })
         self.richard_emp.bank_account_ids = [Command.set([self.bank1.id, self.bank2.id, bank3.id])]
@@ -168,7 +169,7 @@ class TestPayslipAllocations(TestPayslipContractBase):
     def test_three_accounts_multiple_fixed_and_percentage(self):
         """ Two fixed amounts and one percentage allocation """
         bank3 = self.env['res.partner.bank'].create({
-            'acc_number': '777-888',
+            'account_number': '777-888',
             'partner_id': self.richard_emp.work_contact_id.id,
         })
         self.richard_emp.bank_account_ids = [Command.set([self.bank1.id, self.bank2.id, bank3.id])]
@@ -199,11 +200,11 @@ class TestPayslipAllocations(TestPayslipContractBase):
     def test_four_accounts_mixed_distribution(self):
         """ Combination of multiple fixed and percentage across 4 accounts """
         bank3 = self.env['res.partner.bank'].create({
-            'acc_number': '999-000',
+            'account_number': '999-000',
             'partner_id': self.richard_emp.work_contact_id.id,
         })
         bank4 = self.env['res.partner.bank'].create({
-            'acc_number': '121-212',
+            'account_number': '121-212',
             'partner_id': self.richard_emp.work_contact_id.id,
         })
         self.richard_emp.bank_account_ids = [Command.set([self.bank1.id, self.bank2.id, bank3.id, bank4.id])]
@@ -242,7 +243,7 @@ class TestPayslipAllocations(TestPayslipContractBase):
     def test_rounding_residual_is_absorbed(self):
         """Rounding differences must be absorbed so that the sum equals the net wage"""
         bank3 = self.env['res.partner.bank'].create({
-            'acc_number': '131-313',
+            'account_number': '131-313',
             'partner_id': self.richard_emp.work_contact_id.id,
         })
         self.richard_emp.write({

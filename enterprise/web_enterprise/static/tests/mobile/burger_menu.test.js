@@ -3,7 +3,7 @@ import { click, queryAll } from "@odoo/hoot-dom";
 import { animationFrame, runAllTimers } from "@odoo/hoot-mock";
 import { defineActions, defineMenus, mountWithCleanup } from "@web/../tests/web_test_helpers";
 
-import { Component, onMounted, xml } from "@odoo/owl";
+import { Component, onMounted, useProps, xml } from "@odoo/owl";
 
 import { registry } from "@web/core/registry";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
@@ -15,9 +15,9 @@ const queryAllRoot = (selector) => queryAll(selector, { root: document.body });
 class TestClientAction extends Component {
     static template = xml`
             <div class="test_client_action">
-                ClientAction_<t t-esc="props.action.params?.description"/>
+                ClientAction_<t t-out="this.props.action.params?.description"/>
             </div>`;
-    static props = ["*"];
+    props = useProps();
     setup() {
         onMounted(() => this.env.config.setDisplayName(`Client action ${this.props.action.id}`));
     }
@@ -104,4 +104,38 @@ test("Burger Menu on home menu over an App", async () => {
     expect(queryAllRoot(".o_burger_menu")).toHaveCount(1);
     expect(queryAllRoot(".o_burger_menu nav.o_burger_menu_content li")).toHaveCount(0);
     expect(queryAllRoot(".o_burger_menu_content")).not.toHaveClass("o_burger_menu_dark");
+});
+
+test("Toggling the burger menu displays a custom icon as the app icon in the sidebar", async () => {
+    expect.assertions(2);
+
+    actionRegistry.add("__test__client__action__", TestClientAction);
+
+    defineMenus([
+        {
+            id: 1,
+            webIcon: "mail,#f1c40f,#FFFFFF",
+        },
+    ]);
+
+    defineActions([
+        {
+            id: 1001,
+            tag: "__test__client__action__",
+            target: "main",
+            type: "ir.actions.client",
+            params: { description: "Id 1" },
+        },
+    ]);
+
+    await mountWithCleanup(WebClientEnterprise);
+    await animationFrame();
+
+    await expect(".o_app").toHaveCount(1);
+    await click(queryAllRoot(".o_draggable:first-of-type .o_app"));
+    await animationFrame();
+
+    await click(queryAllRoot(".o_menu_toggle"));
+    await animationFrame();
+    await expect(queryAllRoot(".o_burger_menu_content i[data-icon='mail']")).toHaveCount(1);
 });

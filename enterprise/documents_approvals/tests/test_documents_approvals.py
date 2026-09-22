@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.exceptions import AccessError
-from odoo.tests import TransactionCase
+from odoo.tests import tagged, TransactionCase
 from odoo.tools import mute_logger
 
 from odoo.addons.mail.tests.common import mail_new_test_user
@@ -9,7 +9,7 @@ from odoo.addons.mail.tests.common import mail_new_test_user
 
 class TestDocumentApprovals(TransactionCase):
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_documents_access(self):
         approval_user = mail_new_test_user(
             self.env,
@@ -23,11 +23,15 @@ class TestDocumentApprovals(TransactionCase):
             self.env, "internal_user_2", "base.group_user"
         )
         self.env.company.documents_approvals_settings = True
-        self.env["documents.access"].create({
+        self.env["documents.access"].create([{
             "document_id": self.env.company.approvals_folder_id.id,
             "partner_id": approval_user.partner_id.id,
             "role": "edit",
-        })
+        }, {
+            "document_id": self.env.company.approvals_folder_id.id,
+            "group_id": self.env['res.group.functional'].create({'name': 'test group'}).id,
+            "role": "edit",
+        }])
 
         approval = self.env["approval.request"].create(
             {
@@ -43,7 +47,7 @@ class TestDocumentApprovals(TransactionCase):
         })
         document = self.env["documents.document"].search([("attachment_id", "=", attachment.id)])
         self.assertEqual(len(document), 1)
-        self.assertEqual(len(document.access_ids), 2)
+        self.assertEqual(len(document.access_ids), 3)
         access_id_by_partner = document.access_ids.grouped('partner_id')
         internal_user_1_access = access_id_by_partner.get(internal_user_1.partner_id)
         self.assertTrue(internal_user_1_access)
@@ -52,6 +56,11 @@ class TestDocumentApprovals(TransactionCase):
         self.assertTrue(access_id_approval_user)
         self.assertIn(access_id_approval_user.role, {'edit', False})
         self.assertEqual(document.owner_id, approval_user)
+
+        # access on group should be propagated
+        access_id_group = document.access_ids.filtered('group_id')
+        self.assertEqual(len(access_id_group), 1)
+        self.assertEqual(access_id_group.role, 'edit')
 
         document.with_user(internal_user_1).read()
         document.with_user(approval_user).read()

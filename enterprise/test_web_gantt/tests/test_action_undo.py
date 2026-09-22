@@ -1,8 +1,11 @@
 from datetime import timedelta
 
+from odoo.tests import tagged
+
 from .common import TestWebGantt
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestActionUndo(TestWebGantt):
 
     def test_undo_pill_rescheduling(self):

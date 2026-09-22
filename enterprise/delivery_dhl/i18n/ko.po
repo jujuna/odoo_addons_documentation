@@ -7,23 +7,23 @@
 # Sarah Park, 2023
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025.
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-16 05:26+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-09-18 00:33+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
 "delivery_dhl/ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -220,6 +220,11 @@ msgid "DHL EU -> International"
 msgstr "DHL EU -> 국제"
 
 #. module: delivery_dhl
+#: model:ir.module.module,shortdesc:base.module_delivery_dhl
+msgid "DHL Express Shipping (Legacy)"
+msgstr ""
+
+#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "DHL 비밀번호"
@@ -275,6 +280,11 @@ msgstr "DHL 암호가 없습니다. 배송 방법 설정을 수정하십시오."
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
 msgid "DHLxw Package Type"
 msgstr "DHLxw 패키지 유형"
+
+#. module: delivery_dhl
+#: model:ir.model,name:delivery_dhl.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "배송 방법"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
@@ -437,8 +447,8 @@ msgid ""
 "Please define an incoterm in the associated sale order or set a default "
 "incoterm for the company in the accounting's settings."
 msgstr ""
-"관련 판매주문서에서 인코텀즈를 정의하거나 회계 설정에서 회사의 기본 인코텀즈"
-"를 설정하십시오."
+"관련 판매주문서에서 인코텀즈를 정의하거나 회계 설정에서 회사의 기본 "
+"인코텀즈를 설정하십시오."
 
 #. module: delivery_dhl
 #. odoo-python
@@ -493,11 +503,6 @@ msgid "Shipment created into DHL <br/> <b>Tracking Number: </b>%s"
 msgstr "DHL 배송 시작 <br/> <b>배송 조회 번호: </b>%s"
 
 #. module: delivery_dhl
-#: model:ir.model,name:delivery_dhl.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "배송 방법"
-
-#. module: delivery_dhl
 #: model:ir.model,name:delivery_dhl.model_stock_package_type
 msgid "Stock package type"
 msgstr "재고 포장 유형"
@@ -537,8 +542,8 @@ msgid ""
 "        More info on https://xmlportal.dhl.com/"
 msgstr ""
 "DHL 사용자 지정 데이터는 json 파일 내용과 같이 구성되어 있습니다.\n"
-"        '요금', '배송', '반품'의 3가지 키가 있으며, 사용자 지정 데이터를 추가"
-"할 수 있습니다.\n"
+"        '요금', '배송', '반품'의 3가지 키가 있으며, 사용자 지정 데이터를 "
+"추가할 수 있습니다.\n"
 "        자세한 정보는 다음을 참고하세요 https://xmlportal.dhl.com/"
 
 #. module: delivery_dhl
@@ -558,8 +563,15 @@ msgstr ""
 msgid ""
 "There is no price available for this shipping, you should rather try with "
 "the DHL product %s"
+msgstr "이 발송에 사용할 수 있는 가격이 없습니다. DHL %s 상품을 사용해 보십시오."
+
+#. module: delivery_dhl
+#: model:ir.module.module,description:base.module_delivery_dhl
+msgid ""
+"This is the legacy integration with DHL Express that is no longer "
+"supported.         Please install the new \"DHL Express Shipping\" module "
+"and uninstall this one as soon as possible."
 msgstr ""
-"이 발송에 사용할 수 있는 가격이 없습니다. DHL %s 상품을 사용해 보십시오."
 
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_product_code__u
@@ -607,9 +619,3 @@ msgstr "Z - 목적지 요금"
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_label_image_format__zpl2
 msgid "ZPL2"
 msgstr "ZPL2"
-
-#~ msgid "DHL"
-#~ msgstr "DHL"
-
-#~ msgid "DHL Shipping Methods"
-#~ msgstr "DHL 선적 방법"

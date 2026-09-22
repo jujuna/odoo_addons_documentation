@@ -11,17 +11,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-02 18:43+0000\n"
-"PO-Revision-Date: 2026-01-07 18:04+0000\n"
+"POT-Creation-Date: 2026-09-11 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 00:07+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
 "pos_enterprise/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: pos_enterprise
+#: model:ir.module.module,description:base.module_pos_enterprise
+msgid ""
+"\n"
+"Advanced features for the PoS.\n"
+msgstr ""
 
 #. module: pos_enterprise
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_kanban
@@ -32,6 +39,13 @@ msgstr "<span>Gemiddelde tijd</span>"
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_kanban
 msgid "<span>In progress</span>"
 msgstr "<span>In behandeling</span>"
+
+#. module: pos_enterprise
+#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_display__use_barcode
+msgid ""
+"A barcode will be printed on the preparation ticket. Scanning it will move "
+"the order to the next stage."
+msgstr ""
 
 #. module: pos_enterprise
 #. odoo-python
@@ -48,6 +62,11 @@ msgstr "Accepteer betalingen met een Tyro-betaalterminal"
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__access_token
 msgid "Access Token"
 msgstr "Toegangstoken"
+
+#. module: pos_enterprise
+#: model:ir.module.module,summary:base.module_pos_enterprise
+msgid "Advanced features for PoS"
+msgstr ""
 
 #. module: pos_enterprise
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_form
@@ -76,6 +95,16 @@ msgid "All categories"
 msgstr "Alle categorieën"
 
 #. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/services/preparation_display_service.js:0
+msgid ""
+"All orders are in the last stage. This action will mark all orders as Done. "
+"Would you like to continue?"
+msgstr ""
+"Alle orders bevinden zich in de laatste fase. Deze actie markeert alle "
+"bestellingen als Voltooid. Wil je doorgaan?"
+
+#. module: pos_enterprise
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_reset_wizard
 msgid ""
 "Archive all preparation display's orders for a fresh start. This will not "
@@ -85,9 +114,26 @@ msgstr ""
 "Dit zal de bestelgeschiedenis van het kassasysteem niet beïnvloeden."
 
 #. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__associated_barcodes
+msgid "Associated Barcodes"
+msgstr ""
+
+#. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__auto_clear
 msgid "Auto clear"
 msgstr "Automatisch wissen"
+
+#. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__auto_print_stage_id
+msgid "Automatic Printing at"
+msgstr ""
+
+#. module: pos_enterprise
+#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_display__auto_print_stage_id
+msgid ""
+"Automatically print a ticket when the order reaches the specified stage on "
+"the display."
+msgstr ""
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_preparation_time_report__avg_preparation_time
@@ -107,7 +153,13 @@ msgstr "Gemiddelde servicetijd van de bestelling"
 #. module: pos_enterprise
 #: model:ir.model.fields,help:pos_enterprise.field_pos_prep_display__average_time
 msgid "Average time of all order that not in a done stage."
-msgstr "Gemiddelde tijd van alle orders die niet gereed zijn."
+msgstr "Gemiddelde tijd van alle orders die niet voltooid zijn."
+
+#. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__use_barcode
+#: model_terms:ir.ui.view,arch_db:pos_enterprise.pos_order_change_receipt
+msgid "Barcode"
+msgstr ""
 
 #. module: pos_enterprise
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_reset_wizard
@@ -123,6 +175,22 @@ msgstr "Alle filters wissen"
 #. module: pos_enterprise
 #. odoo-javascript
 #: code:addons/pos_enterprise/static/src/app/components/preparation_display/preparation_display.xml:0
+msgid "Clear All Orders"
+msgstr "Alle orders wissen"
+
+#. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/services/preparation_display_service.js:0
+msgid ""
+"Clearing all orders will move all the orders of the current stage to the "
+"next one. Would you like to continue?"
+msgstr ""
+"Als je alle orders wist, worden alle orders van de huidige fase naar de "
+"volgende fase verplaatst. Wil je doorgaan?"
+
+#. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/components/preparation_display/preparation_display.xml:0
 msgid "Close"
 msgstr "Sluiten"
 
@@ -130,11 +198,6 @@ msgstr "Sluiten"
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_stage__color
 msgid "Color"
 msgstr "Kleur"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__combo_line_ids
-msgid "Combo Lines"
-msgstr "Combinatieregels"
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__company_id
@@ -157,48 +220,29 @@ msgid "Configure"
 msgstr "Configureren"
 
 #. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/services/preparation_display_service.js:0
+msgid "Continue"
+msgstr "Doorgaan"
+
+#. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__create_uid
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__create_uid
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__create_uid
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_stage__create_uid
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__create_uid
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_preparation_display_reset_wizard__create_uid
 msgid "Created by"
 msgstr "Aangemaakt door"
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__create_date
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__create_date
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__create_date
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_stage__create_date
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__create_date
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_preparation_display_reset_wizard__create_date
 msgid "Created on"
 msgstr "Aangemaakt op"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_order__pdis_general_customer_note
-msgid "Current general-customer-note displayed on preparation display"
+#: model:ir.model,name:pos_enterprise.model_decimal_precision
+msgid "Decimal Precision"
 msgstr ""
-"Huidige algemene opmerking van de klant weergegeven op het "
-"voorbereidingsscherm"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_order__pdis_internal_note
-msgid "Current general-note displayed on preparation display"
-msgstr "Huidige algemene opmerking weergegeven op het voorbereidingsscherm"
-
-#. module: pos_enterprise
-#. odoo-javascript
-#: code:addons/pos_enterprise/static/src/app/components/order/order.xml:0
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__customer_note
-msgid "Customer Note"
-msgstr "Opmerking van de klant"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_line__customer_note
-msgid "Customer notes written at the time of the order"
-msgstr "Opmerkingen van de klant geschreven op het moment van de bestelling"
 
 #. module: pos_enterprise
 #: model_terms:ir.actions.act_window,help:pos_enterprise.action_preparation_display
@@ -209,11 +253,14 @@ msgstr ""
 "schermen gestuurd."
 
 #. module: pos_enterprise
-#: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_reset_wizard
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/services/preparation_display_service.js:0
 msgid "Discard"
 msgstr "Annuleren"
 
 #. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_decimal_precision__display_name
+#: model:ir.model.fields,field_description:pos_enterprise.field_ir_ui_view__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_category__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_config__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_load_mixin__display_name
@@ -223,15 +270,16 @@ msgstr "Annuleren"
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_stage__display_name
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_preparation_display_reset_wizard__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_preset__display_name
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_printer__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_session__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_preparation_time_report__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_product_attribute__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_product_product__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_product_template_attribute_value__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:pos_enterprise.field_res_users__display_name
 #: model:ir.model.fields,field_description:pos_enterprise.field_resource_calendar_attendance__display_name
 msgid "Display Name"
 msgstr "Weergavenaam"
@@ -241,7 +289,7 @@ msgstr "Weergavenaam"
 #: code:addons/pos_enterprise/static/src/app/components/order/order.xml:0
 #: code:addons/pos_enterprise/static/src/app/components/preparation_display/preparation_display.xml:0
 msgid "Done"
-msgstr "Gereed"
+msgstr "Voltooid"
 
 #. module: pos_enterprise
 #. odoo-javascript
@@ -278,14 +326,10 @@ msgid "Food Delivery Connector"
 msgstr "Connector voor voedselbezorging"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__pdis_general_customer_note
-msgid "General Customer Note"
-msgstr "Algemene opmerking van klant"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__pdis_internal_note
-msgid "General Note"
-msgstr "Algemene opmerking"
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/override/point_of_sale/screens/ticket_screen/ticket_screen.xml:0
+msgid "Food Platform"
+msgstr "Voedselplatform"
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_preparation_time_report__order_hour
@@ -293,6 +337,8 @@ msgid "Hour"
 msgstr "Uur"
 
 #. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_decimal_precision__id
+#: model:ir.model.fields,field_description:pos_enterprise.field_ir_ui_view__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_category__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_config__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_load_mixin__id
@@ -302,34 +348,19 @@ msgstr "Uur"
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_stage__id
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_preparation_display_reset_wizard__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_preset__id
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_printer__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_session__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_preparation_time_report__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_product_attribute__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_product_product__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_product_template_attribute_value__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_res_config_settings__id
+#: model:ir.model.fields,field_description:pos_enterprise.field_res_users__id
 #: model:ir.model.fields,field_description:pos_enterprise.field_resource_calendar_attendance__id
 msgid "ID"
 msgstr "ID"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_line__combo_parent_id
-msgid "Indicates the parent line if this is part of a combo"
-msgstr ""
-"Geeft de bovenliggende regel aan als dit deel uitmaakt van een combinatie"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__internal_note
-msgid "Internal Note"
-msgstr "Interne notitie"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_line__internal_note
-msgid "Internal notes written at the time of the order"
-msgstr "Interne notities geschreven op het moment van de bestelling"
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__clear_time_interval
@@ -342,9 +373,19 @@ msgid "Interval in minutes"
 msgstr "Interval in minuten"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_config__module_pos_iot
-msgid "IoT Box"
-msgstr "IoT Box"
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__is_first_stage
+msgid "Is First Stage"
+msgstr "Is eerste fase"
+
+#. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__is_last_stage
+msgid "Is Last Stage"
+msgstr "Is laatste fase"
+
+#. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__is_second_to_last_stage
+msgid "Is Second to Last Stage"
+msgstr "Is voorlaatste fase"
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__contains_bar_restaurant
@@ -353,12 +394,6 @@ msgid "Is a Bar/Restaurant"
 msgstr "Is een bar/restaurant"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_config__module_pos_urban_piper
-msgid "Is an Urbanpiper"
-msgstr "Is een UrbanPiper"
-
-#. module: pos_enterprise
-#: model:ir.actions.server,name:pos_enterprise.action_pos_preparation_display_kitchen_display
 #: model:ir.ui.menu,name:pos_enterprise.menu_point_kitchen_display_root
 msgid "Kitchen Display"
 msgstr "Keukenscherm"
@@ -369,35 +404,28 @@ msgid "Last 30 Days"
 msgstr "Laatste 30 dagen"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__last_stage_change
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__last_stage_id
+msgid "Last Stage"
+msgstr "Laatste fase"
+
+#. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__last_stage_change
 msgid "Last Stage Change"
 msgstr "Laatste faseverandering"
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__write_uid
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__write_uid
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__write_uid
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_stage__write_uid
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__write_uid
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_preparation_display_reset_wizard__write_uid
 msgid "Last Updated by"
 msgstr "Laatst bijgewerkt door"
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__write_date
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__write_date
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__write_date
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_stage__write_date
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__write_date
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_preparation_display_reset_wizard__write_date
 msgid "Last Updated on"
 msgstr "Laatst bijgewerkt op"
-
-#. module: pos_enterprise
-#. odoo-javascript
-#: code:addons/pos_enterprise/static/src/app/components/orderline/orderline.xml:0
-msgid "Line Customer Note"
-msgstr "Regel voor opmerking van klant"
 
 #. module: pos_enterprise
 #. odoo-javascript
@@ -408,8 +436,19 @@ msgstr "Laden..."
 #. module: pos_enterprise
 #: model:ir.model.fields,help:pos_enterprise.field_res_config_settings__pos_module_pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.res_config_settings_view_form
-msgid "Manage your online orders with Urban Piper."
+msgid "Manage your online orders with UrbanPiper."
 msgstr "Beheer je online bestellingen met UrbanPiper."
+
+#. module: pos_enterprise
+#: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_form
+msgid "Manual"
+msgstr ""
+
+#. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/components/preparation_display/preparation_display.xml:0
+msgid "Mode"
+msgstr ""
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__name
@@ -429,12 +468,17 @@ msgid "No data available."
 msgstr "Geen gegevens beschikbaar."
 
 #. module: pos_enterprise
-#: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_form
-msgid "Offer"
-msgstr "Aanbieding"
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/components/preparation_display/preparation_display.js:0
+msgid "No order found for the scanned barcode."
+msgstr ""
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__pos_order_id
+#: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_form
+msgid "None"
+msgstr ""
+
+#. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_preparation_time_report__order_id
 msgid "Order"
 msgstr "Bestelling"
@@ -443,11 +487,6 @@ msgstr "Bestelling"
 #: model:ir.model.fields,field_description:pos_enterprise.field_preparation_time_report__create_date
 msgid "Order Date"
 msgstr "Besteldatum"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__order_name
-msgid "Order Name"
-msgstr "Naam van bestelling"
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__average_time
@@ -460,14 +499,10 @@ msgid "Order count"
 msgstr "Aantal bestellingen"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__pos_order_line_id
-msgid "Original pos order line"
-msgstr "Oorspronkelijke kassaorderregel"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_line__pos_order_line_uuid
-msgid "Original pos order line UUID"
-msgstr "Oorspronkelijke UUID van kassaorderregel"
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/components/preparation_display/preparation_display.js:0
+msgid "Order moved from %s to %s."
+msgstr ""
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_preparation_time_report__pos_config_id
@@ -478,11 +513,6 @@ msgstr "Kassaconfiguratie"
 #: model:ir.model,name:pos_enterprise.model_preparation_time_report
 msgid "POS Preparation Time Report"
 msgstr "Kassa bereidingstijdrapport"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__combo_parent_id
-msgid "Parent Combo Line"
-msgstr "Bovenliggende comboregel"
 
 #. module: pos_enterprise
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.res_config_settings_view_form
@@ -510,14 +540,19 @@ msgid "Point of Sale Configuration"
 msgstr "Kassa-instellingen"
 
 #. module: pos_enterprise
-#: model:ir.model,name:pos_enterprise.model_pos_order_line
-msgid "Point of Sale Order Lines"
-msgstr "Kassaorderregels"
+#: model:ir.model,name:pos_enterprise.model_pos_order
+msgid "Point of Sale Order"
+msgstr "Kassaorder"
 
 #. module: pos_enterprise
-#: model:ir.model,name:pos_enterprise.model_pos_order
-msgid "Point of Sale Orders"
-msgstr "Kassaorders"
+#: model:ir.model,name:pos_enterprise.model_pos_order_line
+msgid "Point of Sale Order Line"
+msgstr "Kassaorderregel"
+
+#. module: pos_enterprise
+#: model:ir.model,name:pos_enterprise.model_pos_printer
+msgid "Point of Sale Printer"
+msgstr ""
 
 #. module: pos_enterprise
 #: model:ir.model,name:pos_enterprise.model_pos_session
@@ -525,9 +560,9 @@ msgid "Point of Sale Session"
 msgstr "Kassasessie"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__pos_order_line_uuid
-msgid "Pos Order Line Uuid"
-msgstr "UUID van kassaorderregel"
+#: model:ir.module.module,shortdesc:base.module_pos_enterprise
+msgid "Point of Sale enterprise"
+msgstr ""
 
 #. module: pos_enterprise
 #: model:ir.model,name:pos_enterprise.model_pos_prep_display
@@ -550,14 +585,10 @@ msgid "Pos Preparation Stage"
 msgstr "Kassa Bereidingsfase"
 
 #. module: pos_enterprise
-#: model:ir.model,name:pos_enterprise.model_pos_prep_state
-msgid "Pos Preparation State"
-msgstr "Kassa Bereidingsstatus"
-
-#. module: pos_enterprise
 #: model:ir.actions.act_url,name:pos_enterprise.action_pos_preparation_display_bar_restaurant_filter_link
 #: model:ir.actions.act_window,name:pos_enterprise.action_preparation_display
 #: model:ir.actions.act_window,name:pos_enterprise.action_preparation_display_bar_restaurant_filter
+#: model:ir.ui.menu,name:pos_enterprise.menu_pos_preparation_display
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_form
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_search
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_tree
@@ -565,24 +596,25 @@ msgid "Preparation Display"
 msgstr "Voorbereidingsscherm"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_order__prep_line_ids
-msgid "Preparation Lines"
-msgstr "Bereidingsregels"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__prep_order_id
-msgid "Preparation Order"
-msgstr "Bereiding bestelling"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__prep_line_id
-msgid "Preparation Orderline"
-msgstr "Bereidingsorderregel"
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__prep_display_ids
+msgid "Preparation Displays"
+msgstr "Voorbereidingsschermen"
 
 #. module: pos_enterprise
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_kanban
 msgid "Preparation Screen"
 msgstr "Keukenscherm"
+
+#. module: pos_enterprise
+#: model_terms:ir.ui.view,arch_db:pos_enterprise.pos_prep_stage_view_form
+msgid "Preparation Stage"
+msgstr "Voorbereidingsfase"
+
+#. module: pos_enterprise
+#: model:ir.actions.act_window,name:pos_enterprise.action_pos_prep_stage_view_tree
+#: model:ir.ui.menu,name:pos_enterprise.menu_pos_prep_stage
+msgid "Preparation Stages"
+msgstr "Voorbereidingsfases"
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_pos_order__avg_preparation_time
@@ -610,15 +642,43 @@ msgid "Preparation Time Report"
 msgstr "Bereidingstijdrapport"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_stage__prep_display_id
-msgid "Preparation display"
-msgstr "Voorbereidingsscherm"
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_stage__prep_display_ids
+msgid "Preparation displays"
+msgstr "Voorbereidingsschermen"
+
+#. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__stage_ids
+msgid "Preparation stages"
+msgstr "Voorbereidingsfases"
 
 #. module: pos_enterprise
 #. odoo-javascript
 #: code:addons/pos_enterprise/static/src/app/components/preparation_display/preparation_display.xml:0
 msgid "Preset"
 msgstr "Voorinstellen"
+
+#. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/components/order/order.xml:0
+msgid "Print"
+msgstr ""
+
+#. module: pos_enterprise
+#: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_form
+msgid "Print at Stage"
+msgstr ""
+
+#. module: pos_enterprise
+#. odoo-python
+#: code:addons/pos_enterprise/models/pos_printer.py:0
+msgid ""
+"Printer type cannot be changed because it is linked to a preparation display."
+msgstr ""
+
+#. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__printer_ids
+msgid "Printers"
+msgstr ""
 
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_preparation_time_report__product_id
@@ -629,11 +689,6 @@ msgstr "Product"
 #: model:ir.model,name:pos_enterprise.model_product_attribute
 msgid "Product Attribute"
 msgstr "Productkenmerk"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__product_id
-msgid "Product ID"
-msgstr "Product ID"
 
 #. module: pos_enterprise
 #: model:ir.model,name:pos_enterprise.model_product_template_attribute_value
@@ -656,15 +711,9 @@ msgid "Product categories that will be displayed on this screen."
 msgstr "Productcategorieën die op dit scherm worden getoond."
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__quantity
 #: model:ir.model.fields,field_description:pos_enterprise.field_preparation_time_report__qty
 msgid "Quantity"
 msgstr "Aantal"
-
-#. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__cancelled
-msgid "Quantity of cancelled product"
-msgstr "Aantal geannuleerde producten"
 
 #. module: pos_enterprise
 #. odoo-javascript
@@ -698,13 +747,12 @@ msgstr "Alle orders resetten"
 #. module: pos_enterprise
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.res_config_settings_view_form
 msgid "Save this page and come back here to set up the feature."
-msgstr ""
-"Sla deze pagina op en kom terug naar hier om deze functie te activeren."
+msgstr "Sla deze pagina op en kom terug naar hier om deze functie te activeren."
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__attribute_value_ids
-msgid "Selected Attributes"
-msgstr "Geselecteerde kenmerken"
+#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_display__printer_ids
+msgid "Select the printer that will print the tickets from this display."
+msgstr ""
 
 #. module: pos_enterprise
 #. odoo-javascript
@@ -724,30 +772,36 @@ msgid "Service Time"
 msgstr "Servicetijd"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__stage_id
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__stage_id
 msgid "Stage"
 msgstr "Fase"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_display__stage_ids
+#: model_terms:ir.ui.view,arch_db:pos_enterprise.pos_prep_stage_view_tree
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.preparation_display_view_form
 msgid "Stages"
 msgstr "Fases"
 
 #. module: pos_enterprise
-#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_state__todo
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_prep_line__todo
 msgid "Status of the orderline"
 msgstr "Status van de orderregel"
 
 #. module: pos_enterprise
 #. odoo-javascript
-#: code:addons/pos_enterprise/static/src/override/point_of_sale/navbar/navbar.xml:0
+#: code:addons/pos_enterprise/static/src/app/components/preparation_display/preparation_display.xml:0
+msgid "Switch to"
+msgstr ""
+
+#. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/override/point_of_sale/navbar/navbar.js:0
 msgid "Switch to Dark Mode"
 msgstr "Overschakelen naar donkere modus"
 
 #. module: pos_enterprise
 #. odoo-javascript
-#: code:addons/pos_enterprise/static/src/override/point_of_sale/navbar/navbar.xml:0
+#: code:addons/pos_enterprise/static/src/override/point_of_sale/navbar/navbar.js:0
 msgid "Switch to Light Mode"
 msgstr "Overschakelen naar lichte modus"
 
@@ -758,7 +812,7 @@ msgid "The interval auto clear time must be positive."
 msgstr "Het interval voor automatisch wissen moet positief zijn."
 
 #. module: pos_enterprise
-#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_state__todo
+#: model:ir.model.fields,help:pos_enterprise.field_pos_prep_line__todo
 msgid "The status of a command line, todo or not"
 msgstr "De status van een commandoregel, uit te voeren of niet"
 
@@ -806,6 +860,18 @@ msgid "Timer after which the order will be highlighted"
 msgstr "Timer waarna de order zal worden gemarkeerd"
 
 #. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/components/order/order.js:0
+msgid "Today"
+msgstr ""
+
+#. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/components/order/order.js:0
+msgid "Tomorrow"
+msgstr ""
+
+#. module: pos_enterprise
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.res_config_settings_view_form
 msgid "Tyro"
 msgstr "Tyro"
@@ -818,8 +884,29 @@ msgstr "Tyro Betaalterminal"
 #. module: pos_enterprise
 #: model:ir.model.fields,field_description:pos_enterprise.field_res_config_settings__pos_module_pos_urban_piper
 #: model_terms:ir.ui.view,arch_db:pos_enterprise.res_config_settings_view_form
-msgid "Urban Piper"
+msgid "UrbanPiper"
 msgstr "UrbanPiper"
+
+#. module: pos_enterprise
+#: model:ir.model.fields,field_description:pos_enterprise.field_pos_config__module_pos_urban_piper
+msgid "Use Urbanpiper"
+msgstr ""
+
+#. module: pos_enterprise
+#: model:ir.model,name:pos_enterprise.model_res_users
+msgid "User"
+msgstr ""
+
+#. module: pos_enterprise
+#: model:ir.model,name:pos_enterprise.model_ir_ui_view
+msgid "View"
+msgstr ""
+
+#. module: pos_enterprise
+#. odoo-javascript
+#: code:addons/pos_enterprise/static/src/app/services/preparation_display_service.js:0
+msgid "Warning"
+msgstr "Waarschuwing"
 
 #. module: pos_enterprise
 #: model:ir.model,name:pos_enterprise.model_resource_calendar_attendance
@@ -852,20 +939,74 @@ msgstr "minuten"
 msgid "or simply wait for orders to be sent for preparation."
 msgstr "of wacht gewoon tot de orders voor bereiding worden verzonden."
 
-#. module: pos_enterprise
-#. odoo-javascript
-#: code:addons/pos_enterprise/static/src/app/components/order/order.xml:0
-msgid "products"
-msgstr "producten"
+#~ msgid "Combo Lines"
+#~ msgstr "Combinatieregels"
 
-#~ msgid ""
-#~ "Connect devices to your PoS (ticket printer, barcode scanner, scale, etc.)"
+#~ msgid "Current general-customer-note displayed on preparation display"
 #~ msgstr ""
-#~ "Sluit apparaten aan op uw kassa (ticketprinter, barcodescanner, "
-#~ "weegschaal, etc.)"
+#~ "Huidige algemene opmerking van de klant weergegeven op het "
+#~ "voorbereidingsscherm"
 
-#~ msgid "Pos IoT is installed"
-#~ msgstr "Pos IoT is geïnstalleerd"
+#~ msgid "Current general-note displayed on preparation display"
+#~ msgstr "Huidige algemene opmerking weergegeven op het voorbereidingsscherm"
 
-#~ msgid "Save"
-#~ msgstr "Opslaan"
+#~ msgid "Customer notes written at the time of the order"
+#~ msgstr "Opmerkingen van de klant geschreven op het moment van de bestelling"
+
+#~ msgid "General Customer Note"
+#~ msgstr "Algemene opmerking van klant"
+
+#~ msgid "General Note"
+#~ msgstr "Algemene opmerking"
+
+#~ msgid "Indicates the parent line if this is part of a combo"
+#~ msgstr ""
+#~ "Geeft de bovenliggende regel aan als dit deel uitmaakt van een combinatie"
+
+#~ msgid "Internal Note"
+#~ msgstr "Interne notitie"
+
+#~ msgid "Internal notes written at the time of the order"
+#~ msgstr "Interne notities geschreven op het moment van de bestelling"
+
+#~ msgid "Offer"
+#~ msgstr "Aanbieding"
+
+#~ msgid "Order Name"
+#~ msgstr "Naam van bestelling"
+
+#~ msgid "Original pos order line"
+#~ msgstr "Oorspronkelijke kassaorderregel"
+
+#~ msgid "Original pos order line UUID"
+#~ msgstr "Oorspronkelijke UUID van kassaorderregel"
+
+#~ msgid "Parent Combo Line"
+#~ msgstr "Bovenliggende comboregel"
+
+#~ msgid "Pos Order Line Uuid"
+#~ msgstr "UUID van kassaorderregel"
+
+#~ msgid "Pos Preparation State"
+#~ msgstr "Kassa Bereidingsstatus"
+
+#~ msgid "Preparation Lines"
+#~ msgstr "Bereidingsregels"
+
+#~ msgid "Preparation Order"
+#~ msgstr "Bereiding bestelling"
+
+#~ msgid "Preparation Orderline"
+#~ msgstr "Bereidingsorderregel"
+
+#~ msgid "Preparation display"
+#~ msgstr "Voorbereidingsscherm"
+
+#~ msgid "Product ID"
+#~ msgstr "Product ID"
+
+#~ msgid "Quantity of cancelled product"
+#~ msgstr "Aantal geannuleerde producten"
+
+#~ msgid "Selected Attributes"
+#~ msgstr "Geselecteerde kenmerken"

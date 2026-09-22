@@ -8,8 +8,6 @@ from odoo.exceptions import ValidationError
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    report_grids = fields.Boolean(string="Print Variant Grids", default=True, help="If set, the matrix of configurable products will be shown on the report of this order.")
-
     """ Matrix loading and update: fields and methods :
 
     NOTE: The matrix functionality was done in python, server side, to avoid js
@@ -141,19 +139,18 @@ class PurchaseOrder(models.Model):
     def get_report_matrixes(self):
         """Reporting method."""
         matrixes = []
-        if self.report_grids:
-            grid_configured_templates = self.order_line.filtered('is_configurable_product').product_template_id
-            # TODO is configurable product and product_variant_count > 1
-            # configurable products are only configured through the matrix in purchase, so no need to check product_add_mode.
-            for template in grid_configured_templates:
-                if len(self.order_line.filtered(lambda line: line.product_template_id == template)) > 1:
-                    matrix = self._get_matrix(template)
-                    matrix_data = []
-                    for row in matrix['matrix']:
-                        if any(column['qty'] != 0 for column in row[1:]):
-                            matrix_data.append(row)
-                    matrix['matrix'] = matrix_data
-                    matrixes.append(matrix)
+        grid_configured_templates = self.order_line.filtered('is_configurable_product').product_template_id
+        # TODO is configurable product and product_variant_count > 1
+        # configurable products are only configured through the matrix in purchase, so no need to check product_add_mode.
+        for template in grid_configured_templates:
+            if len(self.order_line.filtered(lambda line: line.product_template_id == template)) > 1:
+                matrix = self._get_matrix(template)
+                matrix_data = []
+                for row in matrix['matrix']:
+                    if any(column['qty'] != 0 for column in row[1:]):
+                        matrix_data.append(row)
+                matrix['matrix'] = matrix_data
+                matrixes.append(matrix)
         return matrixes
 
 
@@ -163,12 +160,3 @@ class PurchaseOrderLine(models.Model):
     product_template_id = fields.Many2one('product.template', string='Product Template', related="product_id.product_tmpl_id", domain=[('purchase_ok', '=', True)])
     is_configurable_product = fields.Boolean('Is the product configurable?', related="product_template_id.has_configurable_attributes")
     product_template_attribute_value_ids = fields.Many2many(related='product_id.product_template_attribute_value_ids', readonly=True)
-    product_no_variant_attribute_value_ids = fields.Many2many('product.template.attribute.value', string='Product attribute values that do not create variants', ondelete='restrict')
-
-    def _get_product_purchase_description(self, product):
-        name = super(PurchaseOrderLine, self)._get_product_purchase_description(product)
-        product_lang_no_variant_attribute_value_ids = self.with_context(product.env.context).product_no_variant_attribute_value_ids
-        for no_variant_attribute_value in product_lang_no_variant_attribute_value_ids:
-            name += "\n" + no_variant_attribute_value.attribute_id.name + ': ' + no_variant_attribute_value.name
-
-        return name

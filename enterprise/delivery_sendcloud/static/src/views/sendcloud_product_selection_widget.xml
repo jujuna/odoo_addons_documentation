@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates id="template" xml:space="preserve">
     <t t-name="delivery_sendcloud.SendcloudProductWidget">
-        <div t-if="isReturn" colspan="2" class="alert alert-warning" role="status">
-            <p><i class="fa fa-exclamation-triangle"/> 
+        <div t-if="this.isReturn" colspan="2" class="alert alert-warning" role="status">
+            <p><i class="oi" data-icon="warning"/>
                 Please check SendCloud return product documentation before selecting return product. For some products, you can be charged for return labels printed but not used.</p>
         </div>
     <div class="d-flex flex-column gap-1">
         <div class="row">
             <div class="btn-group col-12">
-                <Dropdown t-if="products">
+                <Dropdown t-if="this.products">
                     <button class="btn btn-primary o-dropdown-caret">
-                        <t t-out="activeProduct.name"/>
+                        <t t-out="this.activeProduct.name"/>
                     </button>
                     <t t-set-slot="content">
-                        <t t-foreach="products" t-as="pr" t-key='pr.code'>
+                        <t t-foreach="this.products" t-as="pr" t-key='pr.code'>
                             <DropdownItem onSelected="() => this._onSelected(pr.code)"><t t-out="pr.name"/></DropdownItem>
                         </t>
                     </t>
                 </Dropdown>
             </div>
         </div>
-        <t t-if="!isReturn || state.code !== false">
+        <t t-if="!this.isReturn || this.state.code !== false">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="row">
@@ -28,7 +28,7 @@
                             <label class="o_form_label">Carrier</label>
                         </div>
                         <div class="col-6">
-                            <t t-out="activeProduct.carrier"/>
+                            <t t-out="this.activeProduct.carrier"/>
                         </div>
                     </div>
                     <div class="row">
@@ -36,7 +36,7 @@
                             <label class="o_form_label">Weight range</label>
                         </div>
                         <div class="col-6">
-                            <t t-out="weightRange"/><span> g</span>
+                            <t t-out="this.weightRange"/><span> g</span>
                         </div>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                             <label class="o_form_label">Max length</label>
                         </div>
                         <div class="col-6">
-                            <t t-out="maxLength"/><span> cm</span>
+                            <t t-out="this.maxLength"/><span> cm</span>
                         </div>
                     </div>
                     <div class="row">
@@ -54,7 +54,7 @@
                             <label class="o_form_label">Max width</label>
                         </div>
                         <div class="col-6">
-                            <t t-out="maxWidth"/><span> cm</span>
+                            <t t-out="this.maxWidth"/><span> cm</span>
                         </div>
                     </div>
                     <div class="row">
@@ -62,15 +62,15 @@
                             <label class="o_form_label">Max height</label>
                         </div>
                         <div class="col-6">
-                            <t t-out="maxHeight"/><span> cm</span>
+                            <t t-out="this.maxHeight"/><span> cm</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row mt-2">
                 <div class="col-lg-6">
-                <t t-set='upperMiddleIndex' t-value="Math.ceil(Object.keys(detailFunctionalities).length/2)"/>
-                <t t-foreach="detailFunctionalities" t-as="func" t-key="func">
+                <t t-set='upperMiddleIndex' t-value="Math.ceil(Object.keys(this.detailFunctionalities).length/2)"/>
+                <t t-foreach="this.detailFunctionalities" t-as="func" t-key="func">
                     <t t-if="upperMiddleIndex > func_index">
                         <div class="row">
                             <div class="col-6">
@@ -84,7 +84,7 @@
                 </t>
                 </div>
                 <div class="col-lg-6">
-                <t t-foreach="detailFunctionalities" t-as="func" t-key="func">
+                <t t-foreach="this.detailFunctionalities" t-as="func" t-key="func">
                     <t t-if="upperMiddleIndex &lt;= func_index">
                         <div class="row">
                             <div class="col-6">
@@ -97,13 +97,13 @@
                     </t>
                 </t>
                 </div>
-                <t t-if="boolFunctionalities">
+                <t t-if="this.boolFunctionalities">
                     <div class="row">
                         <div class="col-3">
                             <label class="o_form_label">Other Functionalities</label>
                         </div>
                         <div class="col-9">
-                            <t t-foreach="boolFunctionalities" t-as="func" t-key="func">
+                            <t t-foreach="this.boolFunctionalities" t-as="func" t-key="func">
                                 <span class="badge rounded-pill text-bg-secondary mx-1"><t t-out="func"/></span>
                             </t>
                         </div>

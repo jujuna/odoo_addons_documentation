@@ -10,34 +10,29 @@ from odoo.tools.float_utils import float_round
 
 class L10n_DeEcSalesReportHandler(models.AbstractModel):
     _name = 'l10n_de.ec.sales.report.handler'
-    _inherit = ['account.ec.sales.report.handler']
+    _inherit = ['account.ec.sales.with.tags.report.handler']
     _description = 'German EC Sales Report Custom Handler'
 
     def _custom_options_initializer(self, report, options, previous_options):
-        """
-        Add the invoice lines search domain that is specific to the country.
-        Typically, the taxes account.report.expression ids relative to the country for the triangular, sale of goods
-        or services.
-        :param dict options: Report options
-        :return dict: The modified options dictionary
-        """
-        super()._init_core_custom_options(report, options, previous_options)
-        ec_operation_category = options.get('sales_report_taxes', {'goods': tuple(), 'triangular': tuple(), 'services': tuple()})
-
-        ec_operation_category['goods'] = tuple(self.env.ref('l10n_de.tax_report_de_tag_41_tag')._get_matching_tags().ids)
-        ec_operation_category['triangular'] = tuple(self.env.ref('l10n_de.tax_report_de_tag_42_tag')._get_matching_tags().ids)
-        ec_operation_category['services'] = tuple(self.env.ref('l10n_de.tax_report_de_tag_21_tag')._get_matching_tags().ids)
-
-        # Change the names of the taxes to specific ones that are dependant to the tax type
-        ec_operation_category['operation_category'] = {
-            'goods': 'L',
-            'triangular': 'D',
-            'services': 'S',
+        de_tax_tags = self._get_ec_sales_tax_tags()
+        options['sales_report_operation_types'] = {
+            'goods': {
+                'tax_tag_ids': de_tax_tags['goods'],
+                'name': self.env._('Goods'),
+                'shortcut': 'L',
+            },
+            'services': {
+                'tax_tag_ids': de_tax_tags['services'],
+                'name': self.env._('Services'),
+                'shortcut': 'S',
+            },
+            'triangular': {
+                'tax_tag_ids': de_tax_tags['triangular'],
+                'name': self.env._('Triangular'),
+                'shortcut': 'D',
+            },
         }
-
-        options.update({'sales_report_taxes': ec_operation_category})
-
-        # Buttons
+        super()._custom_options_initializer(report, options, previous_options)
 
         options.setdefault('buttons', []).append({
             'name': _('CSV'),
@@ -49,14 +44,13 @@ class L10n_DeEcSalesReportHandler(models.AbstractModel):
 
     @api.model
     def get_csvs(self, report, options):
-        options['get_file_data'] = True
-        lines = []
-        for line in report._get_lines(options)[:-1]:
-            l = []
-            for column in line['columns']:
-                l.append(column['no_format'])
-            lines.append(tuple(l))
-        # each csv file may only contain up to 1000 lines
+        lines = [
+            tuple(column.no_format for column in line.columns)
+            for line in report._get_lines(options)
+            if isinstance((markup := report._get_markup(line.id)), dict)
+            and markup.get('groupby', '') == 'partner_id_and_sale_type'
+        ]
+
         line_chunks = []
         chunks = [lines[i * 1000:(i + 1) * 1000] for i in range(math.ceil(len(lines) / 1000))]
         for chunk in chunks:
@@ -82,4 +76,11 @@ class L10n_DeEcSalesReportHandler(models.AbstractModel):
             'file_name': report.get_default_report_filename(options, 'ZIP'),
             'file_content': res,
             'file_type': 'zip'
+        }
+
+    def _get_ec_sales_tax_tags(self):
+        return {
+            'goods': tuple(self.env.ref('l10n_de.tax_report_de_tag_41_tag')._get_matching_tags().ids),
+            'triangular': tuple(self.env.ref('l10n_de.tax_report_de_tag_42_tag')._get_matching_tags().ids),
+            'services': tuple(self.env.ref('l10n_de.tax_report_de_tag_21_tag')._get_matching_tags().ids),
         }

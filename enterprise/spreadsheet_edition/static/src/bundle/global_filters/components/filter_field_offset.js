@@ -1,19 +1,24 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
+import { components } from "@odoo/o-spreadsheet";
+
+const { Select } = components;
 
 export class FilterFieldOffset extends Component {
     static template = "spreadsheet_edition.FilterFieldOffset";
-    static props = {
-        onOffsetSelected: Function,
-        selectedOffset: Number,
-        active: Boolean,
-    };
+    static components = { Select };
+
+    props = useProps({
+        onOffsetSelected: t.function(),
+        selectedOffset: t.number(),
+        active: t.boolean(),
+    });
 
     /**
      * @param {Event & { target: HTMLSelectElement }} ev
      */
-    onOffsetSignChanged(ev) {
-        const newOffsetSign = parseInt(ev.target.value);
+    onOffsetSignChanged(newValue) {
+        const newOffsetSign = parseInt(newValue);
         if (newOffsetSign && this.props.selectedOffset === 0) {
             this.props.onOffsetSelected(newOffsetSign);
         } else {
@@ -46,5 +51,13 @@ export class FilterFieldOffset extends Component {
             return 0;
         }
         return this.props.selectedOffset < 0 ? -1 : 1;
+    }
+
+    get offsetOptions() {
+        return [
+            { value: "0", label: _t("No offset") },
+            { value: "-1", label: _t("Previous") },
+            { value: "1", label: _t("Next") },
+        ];
     }
 }

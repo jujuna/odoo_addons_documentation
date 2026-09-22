@@ -41,7 +41,7 @@ class TestPayrollWhm(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 21, 159.6, 5000),
+                (self.work_entry_types['002.00'].id, 21, 159.6, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -80,7 +80,7 @@ class TestPayrollWhm(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 21, 159.6, 5000),
+                (self.work_entry_types['002.00'].id, 21, 159.6, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -118,7 +118,7 @@ class TestPayrollWhm(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 21, 159.6, 5000),
+                (self.work_entry_types['002.00'].id, 21, 159.6, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -160,7 +160,7 @@ class TestPayrollWhm(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 21, 159.6, 5000),
+                (self.work_entry_types['002.00'].id, 21, 159.6, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -219,17 +219,18 @@ class TestPayrollWhm(TestPayrollCommon):
             payslip_end_date = payslip_date + relativedelta(day=31)
 
             # Recompute hours & days information to build the worked days. We don't really need to test these here.
-            contract.generate_work_entries(payslip_date, payslip_end_date)
+            work_entry_vals = contract.generate_work_entries(payslip_date, payslip_end_date)
             hours_per_day = contract.resource_calendar_id.hours_per_day
-            work_hours = contract.get_work_hours(payslip_date, payslip_end_date).get(self.work_entry_types['WORK100'].id)
-            work_days = self.env['hr.payslip']._round_days(self.work_entry_types['WORK100'], round(work_hours / hours_per_day, 5) if hours_per_day else 0)
+            work_hours_dict = contract.get_work_hours(payslip_date, payslip_end_date, work_entries_vals=work_entry_vals)
+            work_hours = sum(hours for (we_type, _), hours in work_hours_dict.items() if we_type == self.work_entry_types['002.00'])
+            work_days = self.env['hr.payslip']._round_days(self.work_entry_types['002.00'], round(work_hours / hours_per_day, 5) if hours_per_day else 0)
 
             self._test_payslip(
                 employee,
                 contract,
                 expected_worked_days=[
                     # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                    (self.work_entry_types['WORK100'].id, work_days, work_hours, 18000),
+                    (self.work_entry_types['002.00'].id, work_days, work_hours, 18000),
                 ],
                 expected_lines=[
                     # (code, total)
@@ -272,7 +273,7 @@ class TestPayrollWhm(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 23, 174.8, 5000),
+                (self.work_entry_types['002.00'].id, 23, 174.8, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -325,7 +326,7 @@ class TestPayrollWhm(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 23, 174.8, 5000),
+                (self.work_entry_types['002.00'].id, 23, 174.8, 5000),
             ],
             expected_lines=[
                 # (code, total)
@@ -376,7 +377,7 @@ class TestPayrollWhm(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 23, 174.8, 5000),
+                (self.work_entry_types['002.00'].id, 23, 174.8, 5000),
             ],
             expected_lines=[
                 # (code, total)

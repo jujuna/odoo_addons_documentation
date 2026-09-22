@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.tests import tagged
+
 from odoo.addons.test_mail_enterprise.tests.common_ai import MailCommonAI
 
 
@@ -34,7 +35,7 @@ class TestMailTemplateAI(MailCommonAI):
         ):
             rendered = self.template._render_field("body_html", [test_record.id])
             self.assertEqual(
-                rendered[test_record.id],
+                str(rendered[test_record.id]),
                 '<div><p>foo<img src="x"></p></div>',
                 msg="Should sanitize the prompt content.",
             )

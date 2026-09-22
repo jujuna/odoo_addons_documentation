@@ -16,7 +16,7 @@ class TestHrContractNoONSS(TestPayrollCommon):
         self.assertAlmostEqual(contract.l10n_be_group_insurance_rate, 0) # To ensure correct computation of yearly cost
         prev_yearly_cost = contract.final_yearly_costs
         contract.write({
-            'no_onss': True
+            'l10n_be_dimona_category': 'dwd',  # DWD is a dimona category with no ONSS
         })
         new_yearly_cost = contract.final_yearly_costs
         correct_yearly_cost = prev_yearly_cost - (contract.wage * 13 * EMPLOYER_ONSS)

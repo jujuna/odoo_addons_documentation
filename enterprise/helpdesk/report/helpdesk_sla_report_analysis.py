@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, tools
+from odoo.tools import SQL
 from odoo.addons.helpdesk.models.helpdesk_ticket import TICKET_PRIORITY
 from odoo.addons.rating.models.rating_data import RATING_LIMIT_MIN
 
@@ -56,7 +56,7 @@ class HelpdeskSlaReportAnalysis(models.Model):
     first_response_hours = fields.Float("Hours to First Response", aggregator="avg", readonly=True)
 
     def _select(self):
-        return """
+        return SQL("""
             SELECT DISTINCT T.id as id,
                             T.id AS ticket_id,
                             T.description,
@@ -78,8 +78,8 @@ class HelpdeskSlaReportAnalysis(models.Model):
                             T.priority AS priority,
                             NULLIF(T.close_hours, 0) AS ticket_close_hours,
                             CASE
-                                WHEN EXTRACT(EPOCH FROM (COALESCE(T.assign_date, NOW() AT TIME ZONE 'UTC') - T.create_date)) / 3600 < 1 THEN NULL
-                                ELSE EXTRACT(EPOCH FROM (COALESCE(T.assign_date, NOW() AT TIME ZONE 'UTC') - T.create_date)) / 3600
+                                WHEN EXTRACT(EPOCH FROM (COALESCE(T.close_date, NOW() AT TIME ZONE 'UTC') - T.create_date)) / 3600 < 1 THEN NULL
+                                ELSE EXTRACT(EPOCH FROM (COALESCE(T.close_date, NOW() AT TIME ZONE 'UTC') - T.create_date)) / 3600
                             END AS ticket_open_hours,
                             NULLIF(T.assign_hours, 0) AS ticket_assignation_hours,
                             NULLIF(T.avg_response_hours, 0) AS avg_response_hours,
@@ -105,10 +105,10 @@ class HelpdeskSlaReportAnalysis(models.Model):
                             CASE
                                 WHEN (SLA_S.deadline IS NOT NULL AND SLA_S.deadline > NOW() AT TIME ZONE 'UTC') THEN TRUE ELSE FALSE
                             END AS sla_success
-        """
+        """)
 
     def _group_by(self):
-        return """
+        return SQL("""
                 t.id,
                 STAGE.fold,
                 SLA.stage_id,
@@ -116,37 +116,43 @@ class HelpdeskSlaReportAnalysis(models.Model):
                 SLA_S.reached_datetime,
                 SLA.id,
                 SLA_S.exceeded_hours
-        """
+        """)
 
     def _from(self):
-        return f"""
+        return SQL("""
             helpdesk_ticket T
             LEFT JOIN rating_rating rt ON rt.res_id = t.id
                     AND rt.res_model = 'helpdesk.ticket'
                     AND rt.consumed = True
-                    AND rt.rating >= {RATING_LIMIT_MIN}
+                    AND rt.rating >= %s
             LEFT JOIN helpdesk_stage STAGE ON T.stage_id = STAGE.id
             RIGHT JOIN helpdesk_sla_status SLA_S ON T.id = SLA_S.ticket_id
             LEFT JOIN helpdesk_sla SLA ON SLA.id = SLA_S.sla_id
-        """
+        """, RATING_LIMIT_MIN)
 
     def _where(self):
-        return """
+        return SQL("""
             T.active = true
-        """
+        """)
 
     def _order_by(self):
-        return """
+        return SQL("""
             id, sla_stage_id
-        """
+        """)
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute("""CREATE or REPLACE VIEW %s as (
+        self.env.cr.execute(SQL("""CREATE or REPLACE VIEW %s as (
             %s
             FROM %s
             WHERE %s
             GROUP BY %s
             ORDER BY %s
-            )""" % (self._table, self._select(), self._from(),
-                    self._where(), self._group_by(), self._order_by()))
+            )""",
+            SQL.identifier(self._table),
+            self._select(),
+            self._from(),
+            self._where(),
+            self._group_by(),
+            self._order_by(),
+        ))

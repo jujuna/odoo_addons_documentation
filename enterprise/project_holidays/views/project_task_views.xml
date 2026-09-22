@@ -9,7 +9,7 @@
                 <div role="alert"
                      class="alert alert-warning d-flex align-items-center"
                      invisible="not leave_warning or not user_ids">
-                        <i class="fa fa-user-times me-2" role="img" title="Leave warning"/>
+                        <i class="oi oi-filled me-2" data-icon="person_remove" role="img" title="Leave warning"/>
                         <field name="leave_warning" nolabel="1" class="m-0"/>
                 </div>
             </xpath>
@@ -24,13 +24,17 @@
             <xpath expr="//gantt" position="attributes">
                 <attribute name="decoration-danger">planning_overlap or leave_warning</attribute>
             </xpath>
+            <xpath expr="//gantt" position="inside">
+                <field name="planning_overlap"/>
+                <field name="leave_warning"/>
+            </xpath>
         </field>
     </record>
 
-    <record id="project_task_view_kanban_inherit_project_holidays" model="ir.ui.view">
-        <field name="name">project.task.task.kanban</field>
+    <record id="project_task_view_card_inherit_project_holidays" model="ir.ui.view">
+        <field name="name">project.task.task.card</field>
         <field name="model">project.task</field>
-        <field name="inherit_id" ref="project_enterprise.view_task_kanban_inherited"/>
+        <field name="inherit_id" ref="project_enterprise.view_task_card_inherited"/>
         <field name="arch" type="xml">
             <field name="planning_overlap" position="after">
                 <field name="leave_warning" class="text-danger mb-2" invisible="not context.get('is_form_gantt', False)"/>

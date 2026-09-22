@@ -7,23 +7,13 @@
             <field name="description">General: Make sure the deduction for business meals is under the legal limit.</field>
             <field name="type">check</field>
             <field name="model" eval="False"/>
-            <field name="cycle">operating_expenses</field>
+            <field name="cycle_id" ref="account_reports.audit_cycle_operating_expenses"/>
             <field name="return_type" ref="account_reports.default_audit_return_type"/>
             <field name="code">_account_return_check_template_meal_expense_adjustment</field>
-            <field name="action_id" ref="account_fiscal_categories.action_account_fiscal_report"/>
-            <field name="additional_action_params">{
-                'options': {
-                    'date': {
-                        'date_from': return_start_date,
-                        'date_to': return_end_date,
-                        'filter': 'custom',
-                        'mode': 'range',
-                    },
-                    'selected_variant_id': ref('account_fiscal_categories.fiscal_report'),
-                    'sections_source_id': ref('account_fiscal_categories.fiscal_report'),
-                    'tax_unit': 'company_only',
-                },
-                'ignore_session': True
+            <field name="action_id" ref="account_reports.action_audit_report"/>
+            <field name="additional_action_context">{
+                'action_xml_id': 'account_fiscal_categories.action_account_fiscal_report',
+                'working_file_id': active_id,
             }</field>
         </record>
     </data>

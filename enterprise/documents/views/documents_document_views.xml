@@ -19,19 +19,20 @@
                 <filter string="My Documents" name="my_documents_filter" domain="['|', ('owner_id', '=', uid), ('partner_id.user_ids', '=', uid)]"/>
                 <filter string="Starred" name="my_favorites_filter" domain="[('favorited_ids', 'in', uid)]"/>
                 <filter string="Shared with anyone" name="shared_anyone_with_the_link" domain="[('access_via_link', '!=', 'none'), ('is_access_via_link_hidden', '=', False)]"/>
+                <filter string="No shortcuts" name="no_shortcuts" domain="[('shortcut_document_id', '=', False)]"/>
                 <separator/>
-                <filter string="Documents" name="documents" domain="[('type', '!=', 'folder')]"/>
-                <filter string="Folders" name="folders" domain="[('type', '=', 'folder')]"/>
                 <filter string="PDF/Documents" name="pdf_doc" domain="['|', ('mimetype', 'ilike', 'pdf'), ('name', 'ilike', '.doc')]"/>
                 <filter string="Image/Video" name="image_video_documents" domain="['|', ('mimetype', 'ilike', 'image'), ('mimetype', 'ilike', 'video')]"/>
                 <filter string="URL" name="url_documents" domain="[('type', '=', 'url')]"/>
-                <filter string="Hide shortcuts" name="no_shortcuts" domain="[('shortcut_document_id', '=', False)]"/>
-                <filter string="Requested Documents" name="requested_filter" domain="[('type', '=', 'binary'), ('attachment_id', '=', False)]"/>
+                <filter string="Requested Documents" name="requested_filter" domain="[('type', '=', 'request')]"/>
+                <filter string="Folders" name="folders" domain="[('type', '=', 'folder')]"/>
                 <separator/>
-                <filter string="In My Drive" name="my_drive_filter" domain="[('user_folder_id', 'child_of', 'MY')]"/>
-                <filter string="In Company" name="my_drive_filter" domain="[('user_folder_id', 'child_of', 'COMPANY')]"/>
+                <filter string="In My Drive" name="my_drive_filter" domain="[('user_root', '=', 'MY')]"/>
+                <filter string="In Company" name="company_filter" domain="[('user_root', '=', 'COMPANY')]"/>
                 <separator/>
                 <field name="type"/>
+                <separator invisible="1"/>
+                <filter string="All children" name="is_deep_search" domain="[]"/>
                 <separator invisible="1"/>
                 <filter invisible="1" string="My Activities" name="filter_activities_my"
                     domain="[('activity_user_id', '=', uid)]"/>
@@ -62,7 +63,7 @@
         <field name="name">documents.document kanban</field>
         <field name="model">documents.document</field>
         <field name="arch" type="xml">
-            <kanban js_class="documents_kanban" create="false">
+            <kanban js_class="documents_kanban" create="false" default_order="create_date DESC, id DESC">
                 <field name="id"/>
                 <field name="active"/>
                 <field name="mimetype"/>
@@ -88,6 +89,7 @@
                 <field name="is_multipage"/>
                 <field name="thumbnail_status"/>
                 <field name="user_permission"/>
+                <field name="is_protected"/>
                 <field name="access_token"/>
                 <field name="access_url"/>
                 <field name="access_via_link"/>
@@ -101,80 +103,85 @@
                 <field name="mail_alias_domain_count"/>
                 <field name="create_activity_type_id"/>
                 <field name="create_activity_user_id"/>
-                <field name="alias_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/> <!-- fetch `color` too -->
+                <field name="alias_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/> <!-- fetch `color` too -->
                 <field name="write_date"/>
                 <templates>
                     <t t-name="card">
-                        <div class="d-flex flex-column o_kanban_attachment o_documents_attachment h-100 pb-2"
-                             t-attf-class="#{record.is_multipage.raw_value ? 'o_kanban_stack' : ''}" t-att-data-id="record.id.raw_value">
-                            <t t-set="fileRequest" t-value="record.type.raw_value === 'binary' and !record.attachment_id.raw_value and !record.shortcut_document_id.raw_value"/>
-                            <div t-if="record.type.raw_value != 'folder'" t-attf-class="#{fileRequest ? 'o_request_image' : ''}">
+                        <div class="d-flex flex-column gap-2 o_kanban_attachment o_documents_attachment h-100"
+                            t-attf-class="{{record.is_multipage.raw_value ? 'o_kanban_stack' : ''}} {{record.type.raw_value === 'folder' ? '': 'pb-2'}}"
+                            t-att-data-id="record.id.raw_value"
+                        >
+                            <t t-set="fileRequest" t-value="record.type.raw_value === 'request' and !record.shortcut_document_id.raw_value"/>
+                            <div t-if="record.type.raw_value !== 'folder'" t-attf-class="#{fileRequest ? 'o_request_image' : ''}">
                                 <t t-set="hasStoredThumbnail" t-value="record.thumbnail_status.raw_value === 'present'"/>
                                 <!-- should be made more generic if we support different websites for videos -->
                                 <t t-set="youtubeUrlMatch" t-value="record.url.raw_value ? record.url.raw_value.match('youtu(?:\.be|be\.com)/(?:.*v(?:/|=)|(?:.*/)?)([a-zA-Z0-9-_]{11})') : false"/>
                                 <t t-set="youtubeVideoToken" t-value="youtubeUrlMatch ? youtubeUrlMatch.length > 1 ? youtubeUrlMatch[1] : false : false"/>
-                                <t t-set="isTextualDocument" t-value="(typeof mimetype === 'string' and mimetype.startsWith('text/') and mimetype !== 'text/csv') || ['application/json', 'application/xml', 'application/documents-email'].includes(mimetype)"/>
-                                <div name="document_preview" class="o_kanban_image_wrapper d-flex justify-content-center position-relative" t-att-title="fileRequest ? 'Upload file' : ''">
-                                    <field name="is_favorited" nolabel="1" widget="document_favorite" class="position-absolute top-0 end-0 p-1 pt-2"/>
+                                <div name="document_preview" class="o_kanban_image_wrapper d-flex justify-content-center position-relative border-bottom rounded-top" t-att-title="fileRequest ? 'Upload file' : ''">
+                                    <field name="is_favorited" nolabel="1" widget="document_favorite" class="position-absolute top-0 end-0 p-1 pt-2 pe-2"/>
                                     <img t-if="youtubeVideoToken" alt="Document"
-                                         t-attf-src="https://img.youtube.com/vi/{{youtubeVideoToken}}/0.jpg"/>
-                                    <a t-elif="record.type.raw_value =='url'" target="_blank" t-att-href="record.url.raw_value" class="o_kanban_image_wrapper">
-                                        <img t-if="record.url_preview_image.raw_value"
+                                         t-attf-src="https://img.youtube.com/vi/{{youtubeVideoToken}}/0.jpg" class="o_documents_preview_image"/>
+                                    <a t-elif="record.type.raw_value === 'url'" target="_blank" t-att-href="record.url.raw_value" class="o_kanban_image_wrapper">
+                                        <img t-if="record.url_preview_image.raw_value" class="o_documents_preview_image"
                                             t-att-src="record.url_preview_image.raw_value" t-att-alt="record.name.raw_value"/>
                                         <t t-else="">
-                                            <span class="fa fa-link fa-3x text-muted"/>
+                                            <span class="oi oi-3x text-muted" data-icon="link"/>
                                         </t>
                                     </a>
-                                    <div t-elif="isTextualDocument" class="overflow-hidden p-0 bg-white pe-none" style="width: 200px; height: 140px;">
-                                        <t t-if="mimetype === 'application/documents-email'">
-                                            <div class="position-absolute top-50 start-50 text-muted opacity-25 fs-1 o_documents_watermark_thumbnail">EMAIL</div>
-                                            <iframe scrolling="no" t-if="documentEmailContent" class="overflow-hidden o_documents_thumbnail_iframe"
-                                                t-att-srcdoc="documentEmailContent" sandbox=""
-                                            />
-                                        </t>
-                                        <iframe t-else="" scrolling="no" class="overflow-hidden o_documents_thumbnail_iframe"
-                                            t-attf-src="/documents/thumbnail_textual/#{encodeURIComponent(record.access_token.raw_value)}" sandbox=""/>
+                                    <div t-elif="thumbnailUrl" class="overflow-hidden p-0 bg-white pe-none w-100 h-100">
+                                        <iframe scrolling="no" class="overflow-hidden o_documents_thumbnail_iframe"
+                                            t-att-src="thumbnailUrl" sandbox=""/>
                                     </div>
                                     <t t-elif="hasStoredThumbnail">
                                         <t t-set="unique" t-value="record.checksum.value ? record.checksum.value.slice(-8) : ''"/>
-                                        <img t-attf-src="/documents/thumbnail/#{window.encodeURIComponent(record.access_token.raw_value)}?unique=#{unique}" alt="Document preview"/>
+                                        <img t-attf-src="/documents/thumbnail/#{window.encodeURIComponent(record.access_token.raw_value)}?unique=#{unique}"
+                                             alt="Document preview" class="o_documents_preview_image"/>
                                     </t>
-                                    <div t-elif="fileRequest" class="fa fa-upload fa-3x text-muted">
-                                        <input type="file" class="o_input_file o_hidden o_kanban_replace_document"/>
+                                    <div t-elif="fileRequest" class="oi oi-3x text-muted" data-icon="upload">
+                                        <input type="file" class="o_input_file o_hidden o_kanban_replace_document" multiple="1"/>
                                     </div>
                                     <div t-else="!hasStoredThumbnail" class="o_image o_image_thumbnail" t-att-data-mimetype="mimetype"/>
                                 </div>
                             </div>
-                            <div class="flex-shrink-1 flex-auto">
+                            <div class="d-flex flex-shrink-1 flex-auto">
                                 <t t-set="discoverable" t-value="record.access_via_link.raw_value === 'none'
                                     or record.access_internal.raw_value !== 'none' or !record.is_access_via_link_hidden.raw_value"/>
-                                <div t-if="record.type.raw_value == 'folder'" class="d-flex align-items-center text-truncate p-2 pb-0">
-                                    <t t-if="record.shortcut_document_id.raw_value">
-                                        <i class="fa fa-external-link me-2" title="This is a shortcut"/>
-                                    </t>
-                                    <i t-else="" class="fa fa-folder-o me-2" title="This is a folder"/>
-                                    <field name="name" class="text-truncate me-1" required="True" string="Document"/>
-                                    <i t-if="!discoverable" class="fa fa-eye-slash me-1" title="Must have the link to access"/>
-                                    <field name="is_favorited" nolabel="1" widget="document_favorite" class="ms-auto"/>
+                                <div t-if="record.type.raw_value === 'folder'" class="o_documents_folder_details d-flex flex-grow-1 gap-2 min-w-0">
+                                    <div class="my-auto">
+                                        <i t-if="record.shortcut_document_id.raw_value" class="fs-3 oi" data-icon="open_in_new" title="This is a shortcut"/>
+                                        <i t-else="" class="fs-3 oi" title="This is a folder" data-icon="folder"/>
+                                    </div>
+                                    <div class="flex-grow-1 min-w-0">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 min-w-0 text-truncate">
+                                                <field name="name" required="True" string="Document"/>
+                                            </div>
+                                            <i t-if="!discoverable" class="oi me-1 flex-shrink-0" data-icon="visibility_off" title="Must have the link to access"/>
+                                            <field name="is_favorited" nolabel="1" widget="document_favorite" class="ms-auto flex-shrink-0"/>
+                                        </div>
+                                        <div t-if="inFolder" class="fw-light text-truncate">
+                                            <span class="o_documents_in_folder">In <span t-out="inFolder"/></span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div t-else="" class="p-2 pb-0">
+                                <div t-else="" class="o_documents_file_details py-0 flex-grow-1 min-w-0">
                                     <div t-att-title="record.name.raw_value" class="fw-bolder w-100 d-flex align-items-center">
-                                        <a t-if="record.type.raw_value == 'url'" t-att-href="record.url.raw_value" class="me-1" t-att-title="record.url.raw_value">
-                                            <i class="fa fa-link"/>
+                                        <a t-if="record.type.raw_value === 'url'" t-att-href="record.url.raw_value" class="me-1" t-att-title="record.url.raw_value">
+                                            <i class="oi" data-icon="link"/>
                                         </a>
                                         <div class="d-flex flex-grow-1 align-items-center gap-2 overflow-hidden">
-                                            <field name="name" class="text-truncate" required="True" string="Document"/>
+                                            <field name="name" class="text-truncate min-w-0" required="True" string="Document"/>
                                             <t t-if="record.shortcut_document_id.raw_value">
-                                                <i class="fa fa-external-link text-gray-500" title="This is a shortcut"/>
+                                                <i class="oi text-gray-500" data-icon="open_in_new" title="This is a shortcut"/>
                                             </t>
                                             <t t-if="record.lock_uid.raw_value">
-                                                <i class="fa fa-lock" t-att-title="record.lock_uid.value"/>
+                                                <i class="oi" data-icon="lock" t-att-title="record.lock_uid.value"/>
                                             </t>
                                         </div>
                                         <div class="d-flex d-flex-row align-items-center ms-2 gap-2">
-                                            <i t-if="!discoverable" class="fa fa-eye-slash" title="Must have the link to access"/>
-                                            <field name="activity_ids" widget="documents_kanban_activity"/>
+                                            <i t-if="!discoverable" class="oi" data-icon="visibility_off" title="Must have the link to access"/>
                                             <field name="owner_id" widget="many2one_avatar_user"/>
+                                            <field name="activity_ids" widget="documents_kanban_activity"/>
                                         </div>
                                     </div>
                                     <div class="o_kanban_record_body text-truncate">
@@ -191,15 +198,9 @@
                                         </t>
                                     </div>
                                 </div>
-                                <div t-if="record.type.raw_value == 'folder' and inFolder"
-                                    class="px-2 fw-light text-nowrap overflow-hidden text-overflow-ellipsis" >
-                                    <!-- exact same padding as folder name above -->
-                                    <i t-if="record.type.raw_value === 'folder'" class="fa fa-folder-o me-2 invisible"/>
-                                    <span class="o_documents_in_folder">In <span t-out="inFolder"/></span>
-                                </div>
                             </div>
-                            <footer t-if="record.type.raw_value != 'folder' and record.tag_ids.raw_value.length" class="d-flex px-2">
-                                <field name="tag_ids" class="d-block text-wrap" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            <footer t-if="record.type.raw_value !== 'folder' and record.tag_ids.raw_value.length" class="d-flex gap-1">
+                                <field name="tag_ids" class="d-block text-wrap" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                             </footer>
                         </div>
                     </t>
@@ -221,7 +222,7 @@
                 </sheet>
                 <footer>
                     <button special="save" data-hotkey="q" string="Rename" class="btn btn-primary"/>
-                    <button special="cancel" data-hotkey="x" string="Discard" class="btn-secondary"/>
+                    <button special="cancel" data-hotkey="x" class="btn-secondary"/>
                 </footer>
             </form>
         </field>
@@ -229,7 +230,6 @@
 
     <record id="documents_upload_url_view" model="ir.ui.view">
         <field name="name">upload url</field>
-        <field name="priority" eval="5"/>
         <field name="model">documents.document</field>
         <field name="arch" type="xml">
             <form>
@@ -238,13 +238,14 @@
                         <field name="url" string="URL" widget="url" required="1" placeholder="e.g. https://www.youtube.com/watch?v=CP96yVnXNrY"/>
                         <field name="name" required="True"/>
                         <field name="url_preview_image" invisible="1" force_save="1"/>
-                        <field name="folder_id" string="Folder" widget="documents_folder_many2one" context="{'default_type':'folder'}"
-                               domain="[('type', '=', 'folder'), ('shortcut_document_id', '=', False), ('user_permission', '=', 'edit')]"/>
+                        <field name="folder_id" string="Folder" context="{'default_type':'folder'}"
+                               domain="[('type', '=', 'folder'), ('shortcut_document_id', '=', False), ('user_permission', '=', 'edit')]"
+                               options="{'no_create_edit': True, 'no_create': True, 'no_open': True}"/>
                         <field name="tag_ids" invisible="1"/>
                     </group>
                 <footer>
                     <button special="save" data-hotkey="q" string="Add" class="btn btn-primary"/>
-                    <button string="Discard" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                    <button class="btn-secondary" special="cancel" data-hotkey="x"/>
                 </footer>
                 </sheet>
             </form>
@@ -270,7 +271,7 @@
                 <field name="display_name" column_invisible="1"/>
                 <field name="owner_id" widget="many2one_avatar_user" optional="show"/>
                 <field name="partner_id" optional="show"/>
-                <field name="tag_ids" widget="many2many_tags" optional="hide" options="{'color_field': 'color'}"/>
+                <field name="tag_ids" widget="many2many_tags" optional="hide" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                 <field name="url" optional="hide"/>
                 <field name="lock_uid" groups="base.group_user" optional="hide"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
@@ -284,6 +285,7 @@
                 <field name="access_token" column_invisible="1"/>
                 <field name="active" column_invisible="1"/>
                 <field name="user_permission" column_invisible="1"/>
+                <field name="is_protected" column_invisible="1"/>
                 <field name="attachment_id" column_invisible="1"/>
                 <field name="res_model" column_invisible="1"/>
                 <field name="res_model_name" column_invisible="1"/>
@@ -294,10 +296,10 @@
                 <field name="alias_email" groups="base.group_user" optional="hide" widget="email"/>
                 <field name="alias_name" column_invisible="1"/>
                 <field name="alias_domain_id" column_invisible="1"/>
-                <field name="alias_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" column_invisible="1"/> <!-- fetch `color` too -->
+                <field name="alias_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" column_invisible="1"/> <!-- fetch `color` too -->
                 <field name="create_activity_type_id" column_invisible="1"/>
                 <field name="create_activity_user_id" column_invisible="1"/>
-                <widget name="documents_list_actions" width="125px"/>
+                <field name="checksum" column_invisible="1"/>
             </list>
         </field>
     </record>
@@ -314,6 +316,9 @@
             <field name="create_date" position="after">
                 <field name="activity_exception_decoration" widget="activity_exception" nolabel="True"/>
             </field>
+            <field name="create_activity_user_id" position="after">
+                <widget name="documents_list_actions" width="125px"/>
+            </field>
         </field>
     </record>
 
@@ -326,8 +331,25 @@
             <list position="attributes">
                 <attribute name="js_class">documents_list_secondary</attribute>
                 <attribute name="expand">1</attribute>
+                <attribute name="multi_edit">0</attribute>
             </list>
-            <widget name="documents_list_actions" position="replace"/>
+        </field>
+    </record>
+
+    <record id="documents_view_kanban_add_documents_attachment" model="ir.ui.view">
+        <field name="name">documents.view.kanban.add.documents.attachment</field>
+        <field name="model">documents.document</field>
+        <field name="inherit_id" ref="document_view_kanban"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <kanban position="attributes">
+                <attribute name="js_class">documents_kanban_secondary</attribute>
+                <attribute name="class">o_documents_kanban_view</attribute>
+                <attribute name="export_xlsx">0</attribute>
+            </kanban>
+            <xpath expr="//field[@name='activity_ids']" position="replace"/>
+            <xpath expr="//field[@name='is_favorited']" position="replace"/>
+            <xpath expr="//field[@name='owner_id']" position="replace"/>
         </field>
     </record>
 
@@ -340,7 +362,7 @@
                 <field name="access_token" invisible="1"/>
 
                 <!-- Load fields for the details panel -->
-                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                 <field name="partner_id"/>
                 <field name="owner_id"/>
                 <field name="type"/>
@@ -360,14 +382,18 @@
                 <field name="alias_email"/>
                 <field name="alias_name"/>
                 <field name="alias_domain_id"/>
-                <field name="alias_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="alias_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                 <field name="mail_alias_domain_count"/>
+                <!-- We use many2many_tags to force loading display_name -->
+                <field name="available_embedded_actions_ids" groups="base.group_user" widget="many2many_tags"/>
+                <field name="lock_uid"/>
 
                 <templates>
                     <div t-name="activity-box">
                         <field name="owner_id" widget="many2one_avatar_user"/>
-                        <div>
+                        <div class="d-flex align-items-center">
                             <field class="o_text_block" name="name" display="full" required="True"/>
+                            <i t-if="record.lock_uid.value" class="oi ms-2" data-icon="lock" t-att-title="record.lock_uid.value"/>
                         </div>
                     </div>
                 </templates>
@@ -393,6 +419,7 @@
         <field name="path">documents</field>
         <field name="res_model">documents.document</field>
         <field name="view_mode">kanban,list,activity</field>
+        <field name="context">{'skip_res_field_check': True}</field>
         <field name="domain">[]</field>
         <field name="view_ids" eval="[(5, 0, 0),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('documents.document_view_kanban')}),

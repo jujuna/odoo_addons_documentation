@@ -8,21 +8,29 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-16 17:48+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 00:34+0000\n"
+"Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
 "helpdesk_sale_timesheet/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.module.module,description:base.module_helpdesk_sale_timesheet
+msgid ""
+"\n"
+"Bill timesheets logged on helpdesk tickets.\n"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:helpdesk.sla,name:helpdesk_sale_timesheet.helpdesk_sla_4
@@ -31,22 +39,21 @@ msgstr "อีก 4 ชั่วโมงจะเสร็จ"
 
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
+msgid "<span class=\"o_stat_text\">Sales Order</span>"
+msgstr "<span class=\"o_stat_text\">คำสั่งขาย</span>"
+
+#. module: helpdesk_sale_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
 msgid ""
-"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"The sales "
+"<span class=\"oi text-warning\" data-icon=\"warning\" title=\"The sales "
 "order associated with this ticket has been cancelled. We recommend either "
 "updating the sales order item or cancelling this ticket in alignment with "
 "the cancellation of the sales order.\" invisible=\"sale_order_state != "
 "'cancel'\"/>"
 msgstr ""
-"<span class=\"fa fa-exclamation-triangle text-warning\" "
-"title=\"ใบสั่งขายที่เกี่ยวข้องกับทิกเก็ตนี้ถูกยกเลิกแล้ว "
-"แนะนำให้อัปเดตรายการในใบสั่งขายหรือยกเลิกทิกเก็ตนี้ให้สอดคล้องกับการยกเลิกใบสั่งขาย\" "
-"invisible=\"sale_order_state != 'cancel'\"/>"
-
-#. module: helpdesk_sale_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
-msgid "<span class=\"o_stat_text\">Sales Order</span>"
-msgstr "<span class=\"o_stat_text\">คำสั่งขาย</span>"
+"<span class=\"oi text-warning\" data-icon=\"warning\" title=\"ใบสั่งขายที่เกี่ยวข้อง"
+"กับทิกเก็ตนี้ถูกยกเลิกแล้ว แนะนำให้อัปเดตรายการในใบสั่งขายหรือยกเลิกทิกเก็ตนี้ให้สอดคล้องกับการยกเ"
+"ลิกใบสั่งขาย\" invisible=\"sale_order_state != 'cancel'\"/>"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_account_analytic_line
@@ -67,6 +74,11 @@ msgstr "แปลงทิกเก็ต Helpdesk เป็นงาน"
 #: model:ir.model,name:helpdesk_sale_timesheet.model_project_task_convert_wizard
 msgid "Convert Project Tasks to Tickets"
 msgstr "แปลงงานโปรเจ็กต์เป็นทิกเก็ต"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.actions.server,name:helpdesk_sale_timesheet.helpdesk_ticket_action_create_invoice
+msgid "Create Invoice"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,website_form_label:helpdesk_sale_timesheet.model_helpdesk_ticket
@@ -104,8 +116,8 @@ msgstr "พนักงาน"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_helpdesk_sla
-msgid "Helpdesk SLA Policies"
-msgstr "นโยบาย SLA ของการดูแลช่วยเหลือ"
+msgid "Helpdesk SLA Policy"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_helpdesk_team
@@ -144,6 +156,28 @@ msgid "No Ticket"
 msgstr ""
 
 #. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because none of the selected tickets are billable."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because none of the selected tickets have sale orders "
+"ready to be invoiced."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because some of the selected tickets are not billable."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.tickets_followup_timesheet
 msgid "Non-billable"
@@ -155,14 +189,9 @@ msgid "Not Billed"
 msgstr "ไม่ถูกเรียกเก็บเงิน"
 
 #. module: helpdesk_sale_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_sla_view_form_inherit_sale_timesheet
-msgid "OR"
-msgstr "หรือ"
-
-#. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_team__project_id
 msgid "Project"
-msgstr "โปรเจ็กต์"
+msgstr "โปรเจกต์"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,help:helpdesk_sale_timesheet.field_helpdesk_team__project_id
@@ -170,6 +199,11 @@ msgid ""
 "Project to which the timesheets of this helpdesk team's tickets will be "
 "linked."
 msgstr "โปรเจ็กต์ที่จะเชื่อมโยงระบบบันทึกเวลาของทิกเก็ตในทีม Helpdesk นี้"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.module.module,summary:base.module_helpdesk_sale_timesheet
+msgid "Project, Helpdesk, Timesheet and Sale Orders"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_ticket__sale_order_id
@@ -244,6 +278,11 @@ msgid "Search in Ticket"
 msgstr "ค้นหาในทิกเก็ต"
 
 #. module: helpdesk_sale_timesheet
+#: model:ir.module.module,shortdesc:base.module_helpdesk_sale_timesheet
+msgid "Sell Helpdesk Timesheet"
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla__product_ids
 msgid "Services"
 msgstr "บริการ"
@@ -282,6 +321,7 @@ msgid "Tickets"
 msgstr "ทิกเก็ต"
 
 #. module: helpdesk_sale_timesheet
+#: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_account_analytic_line__has_billable_helpdesk_team
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla__use_helpdesk_sale_timesheet
 msgid "Time Billing"
 msgstr "เวลาออกบิล"
@@ -324,65 +364,11 @@ msgid ""
 "You cannot link order item %(order_id)s - %(product_id)s to this ticket "
 "because it is not a service product."
 msgstr ""
-"คุณไม่สามารถเชื่อมโยงรายการสั่งซื้อ %(order_id)s - %(product_id)s กับทิกเก็ตนี้ได้ "
-"เนื่องจากไม่ใช่ผลิตภัณฑ์บริการ"
+"คุณไม่สามารถเชื่อมโยงรายการสั่งซื้อ %(order_id)s - %(product_id)s กับทิกเก็ตนี้ได้ เนื่องจากไ"
+"ม่ใช่ผลิตภัณฑ์บริการ"
 
 #. module: helpdesk_sale_timesheet
 #. odoo-python
 #: code:addons/helpdesk_sale_timesheet/models/sale_order.py:0
 msgid "[Helpdesk] %(ticket_name)s"
 msgstr ""
-
-#~ msgid "Analytic Account"
-#~ msgstr "บัญชีวิเคราะห์"
-
-#~ msgid "Days"
-#~ msgstr "วัน"
-
-#~ msgid "Days Spent"
-#~ msgstr "วันที่ใช้ไป"
-
-#~ msgid "Days:"
-#~ msgstr "วัน:"
-
-#~ msgid "Helpdesk"
-#~ msgstr "ดูแลช่วยเหลือ"
-
-#~ msgid "Hours"
-#~ msgstr "ชั่วโมง"
-
-#~ msgid "Hours Spent"
-#~ msgstr "ชั่วโมงที่ใช้"
-
-#~ msgid "Hours:"
-#~ msgstr "ชั่วโมง:"
-
-#~ msgid "Product"
-#~ msgstr "สินค้า"
-
-#~ msgid "Project's sale order"
-#~ msgstr "คำสั่งขายโปรเจกต์"
-
-#~ msgid "Remaining Days on SO"
-#~ msgstr "วันที่คงเหลือบน SO"
-
-#~ msgid "Remaining Days on SO:"
-#~ msgstr "วันที่คงเหลือบน SO:"
-
-#~ msgid "Remaining Hours Available"
-#~ msgstr "ชั่วโมงคงเหลือที่มีอยู่"
-
-#~ msgid "Remaining Hours on SO:"
-#~ msgstr "ชั่วโมงคงเหลือบน SO:"
-
-#~ msgid "SLA Policy"
-#~ msgstr "นโยบาย SLA"
-
-#~ msgid "Sales Order Items"
-#~ msgstr "รายการคำสั่งขาย"
-
-#~ msgid "Sales order to which the project is linked."
-#~ msgstr "คำสั่งขายที่เชื่อมโยงโปรเจกต์"
-
-#~ msgid "Total"
-#~ msgstr "รวม"

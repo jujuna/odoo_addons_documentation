@@ -22,19 +22,22 @@ $headerFont : Avengeance,
 $font-family-sans-serif;
 $subHeaderFont: ToonTime,
 $font-family-sans-serif;
+$o-hr-referral-navbar-background: $o-webclient-background-color;
 
-.o_referral_action {
-    cursor: pointer
+.o_web_client:has(.o_hr_referral_wrapper) .o_main_navbar,
+.o_web_client:has(.o_referral_kanban_view) .o_main_navbar,
+.o_referral_kanban_view .o_search_panel_wrap {
+	background-color: $o-hr-referral-navbar-background;
+}
+
+.o_referral_kanban_view .o_search_panel_sidebar {
+	margin: 0 !important;
 }
 
 .o_hr_referral_title {    
-    color: #FFFFFF;
-
     h1 {
         font-family: $headerFont;
-        text-transform: uppercase;
         font-size: 2rem;
-        margin: 0;
 
         @include media-breakpoint-up(md) {
             font-size: 3rem;
@@ -49,71 +52,31 @@ $font-family-sans-serif;
     }
 }
 
-.o_hr_referral_btn {
-    border-radius: 2px;
-    font-weight: bolder;
-    letter-spacing: .05rem;
-    &.side-btn{
-        background: transparent;
-        border-color: #FFFFFF;
-        color: #FFFFFF;
-        &:hover{
-            background: $o-gray-100;
-            color: $black;
-        }
-    }
-    &.center {
-        @include centerer(true, false);
-        bottom: 1rem;
-    }
-}
-
 .o_hr_referral_background{
     background: center/cover no-repeat;
-    width: 100%;
-    height: 100%;
-    bottom: 0;
-    position: fixed;
-    z-index: -1;
     .hr_referral_bg_city {
 	    background: url('/hr_referral/static/src/img/city.svg') center/cover no-repeat;
-        height: 100%;
 	}
 
 	.hr_referral_bg_grass {
-	    background: url('/hr_referral/static/src/img/grass.svg') top center repeat-x, linear-gradient(0deg, #032a39 80%, rgba(255, 255, 255, 0) 96%);
+	    background: url('/hr_referral/static/src/img/grass.svg') top center repeat-x, linear-gradient(0deg, #1f0971 80%, rgba(255, 255, 255, 0) 96%);
 	    width: 100%;
-	    height: 40%;
+        height: 35%;
         bottom: 0;
         position: absolute;
     }
 
 }
 .o_hr_referral_wrapper {
-    --hrReferral__user-color: #{$o-main-text-color};
-
-    min-height: 100%;
-    position: relative;
-    font-family: "Montserrat", #{$font-family-sans-serif};
-    color: #FFFFFF;
-    overflow: auto visible;
+	.btn {
+		--gradient: none;
+	}
 }
 
 .o_hr_referral {
-    position: absolute;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    right: 0;
-    text-align: center;
-    height: 100%;
-
     .superheroes_box {
         min-height: 220px;
-        height: 100%;
         max-height: 50vh;
-        position: relative;
-        color: #FFFFFF;
         .superheroes {
             position: absolute;
             height: 100%;
@@ -129,6 +92,8 @@ $font-family-sans-serif;
                     transition: .3s;
                     @include centerer(true, false);
                     top:0;
+                    transform: translate(0, 0);
+                    position: static;
                 }
                 .friend-hoverer{
                     z-index: 9;
@@ -153,59 +118,47 @@ $font-family-sans-serif;
             .super_user {
                 grid-area: super_user;
                 z-index: 7;
-                bottom: 0;
                 height: 100%;
             }
             .friend-1{
                 grid-area: friend-1;
-                bottom:1rem;
                 z-index: 6;
                 height: 95%;
             }
             .friend-2{
                 grid-area: friend-2;
-                bottom:1.5rem;
                 z-index: 6;
                 height: 95%;
             }
             .friend-3{
                 grid-area: friend-3;
-                bottom:2rem;
                 z-index: 5;
                 height: 90%;
             }
             .friend-4{
                 grid-area: friend-4;
-                bottom:2.5rem;
                 z-index: 5;
                 height: 90%;
             }
             .friend-5{
                 grid-area: friend-5;
-                bottom:3rem;
                 z-index: 4;
                 height: 85%;
             }
             .friend-6{
                 grid-area: friend-6;
-                bottom:3.5rem;
                 z-index: 4;
                 height: 85%;
             }
             .friend-7{
                 grid-area: friend-7;
-                bottom:4rem;
                 z-index: 3;
                 height: 80%;
             }
             .friend-8{
                 grid-area: friend-8;
-                bottom:4.5rem;
                 z-index: 3;
                 height: 80%;
-            }
-            .behind{
-                z-index: -1;
             }
             .front{
                 bottom: -1rem !important;
@@ -214,30 +167,7 @@ $font-family-sans-serif;
         }
     }
 
-    .user_wrapper {
-        margin: auto;
-        position: relative;
-    }
-    .user {
-        display: flex;
-        @include centerer(true, false);
-        margin-top: 1.5rem;
-        @include media-breakpoint-down(sm) {
-            margin-top: 0;
-            transform: translateX(-50%) scale(.8);
-        }
-    }
     .user_image {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        >img {
-            z-index: 1;
-            background: white;
-            width: 130px;
-            height: 130px;
-            object-fit: cover;
-        }
         .o_employee_image {
             width: 100%;
             height: 100%;
@@ -245,30 +175,14 @@ $font-family-sans-serif;
         }
     }
     .user_info {
-            @include centerer(true, true);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             min-width: 350px;
-            height: 60%;
-            color: var(--hrReferral__user-color);
-            border-radius: 2px;
-            padding: 0 1rem;
+		    min-height: fit-content;
         }
     .user_total, .user_points {
-        width: 25%;
-        text-align: center;
-        font-weight: bold;
         & img {
             width: 20px;
             height: 20px;
         }
-    }
-
-    .user_level:before {
-        content: 'Level:';
-        display: inline-block;
-        font-weight: bold;
     }
 
     @keyframes bounceIn {
@@ -338,67 +252,25 @@ $font-family-sans-serif;
             animation: bounce 3s infinite;
             max-height: 70px;
         }
-
-        p {
-            @include centerer(true, false);
-            bottom: -150%;
-            min-width: 200px;
-            color: #FFFFFF;
-            font-size: 1.5rem;
-            font-family: $headerFont;
-            animation: appear .5s both;
-            animation-delay: 5s;
-        }
     }
     .o_level_up_txt {
         animation-fill-mode: both;
         animation: appear .5s both;
         animation-delay: 5s;
         z-index: 3;
+		color: $white;
 
         p {
             min-width: 200px;
-            color: #FFFFFF;
             font-size: 1.5rem;
             font-family: $headerFont;
             margin-bottom: 0;
         }
     }
-    .o_hr_referral_level_up {
-        cursor: pointer;
-    }
-
-    .activity_wrapper {
-        position: relative;
-        margin-left: auto;
-        margin-right: auto;
-        left: 0;
-        right: 0;
-        bottom: 0;
-    }
     .activity {
         max-width: 400px;
-        margin: 0 auto;
         .activity_stat {
-			text-align:center;
 			transition:.3s;
-			padding: 5px;
-			border-radius: 2px;
-			border: 1px solid transparent;
-			&:hover{
-				background: #ffffff29;
-			}
-        }
-        .activity_number {
-		    margin: 0px auto;
-		    color: #00a09d;
-		    font-size: 2rem;
-		    font-weight: bold;
-		    transition: .3s;
-        }
-
-        .activity_text {
-            color: #FFFFFF;
         }
     }
     div:first-child.space_restart {
@@ -411,22 +283,20 @@ $font-family-sans-serif;
         color: #5A5A5A;
         border-radius: 2px;
         padding: 5px;
-        text-align: center;
         margin-top: 5px;
         margin-bottom: 5px;
         transition: .3s;
         &:hover {
             background: $white;
         }
+		.btn {
+			color: inherit;
+        }
         .img {
         	max-width: 40px;
-        	float: left;
         }
         span {
-            display: inline-block;
             max-width: 90%;
-            margin: auto;
-            vertical-align: middle;
         }
     }
 }
@@ -435,9 +305,6 @@ $font-family-sans-serif;
     position: absolute;
     top: 3rem;
     right: 10px;
-    display: flex;
-    align-items: center;
-    cursor:pointer;
     line-height: 2rem;
     &:before {
         @include o-position-absolute($bottom: 0, $right: 0);
@@ -456,7 +323,6 @@ $font-family-sans-serif;
             display: inline-block;
             height: 100%;
             font-size: 1rem;
-            font-family: "Montserrat", #{$font-family-sans-serif};
             opacity: 0;
             transition: .3s ease;
             transition-delay: .2s;
@@ -477,25 +343,13 @@ $font-family-sans-serif;
 
 .o_choose_friend_wrapper{
 	height: calc(100vh - #{$o-navbar-height});
-	position: relative;
     top: 10%;
-    margin-bottom: 1rem;
-    .friends_avatars{
-    	display: flex;
-    	justify-content: space-evenly;
-    	flex-wrap: wrap;
-    }
     .o_choose_friend{
         > div{
             width: 100px;
             height: 100px;
-            margin: 0 .5rem;
-            background: $white;
-            overflow: hidden;
-            position: relative;
         }
         &.o_choose_friend_available{
-            cursor: pointer;
             div{
                 transition: .3s;
             }
@@ -505,12 +359,8 @@ $font-family-sans-serif;
             }
         }
         &.o_choose_friend_not_available{
-            cursor: not-allowed;
-            .o_choose_friend_not_available {
+            .o_choose_friend_not_available{
                 background: rgba(black, 0.5);
-                position: absolute;
-                height: 100%;
-                width: 100%;
             }
         }
     }
@@ -522,10 +372,6 @@ $font-family-sans-serif;
     }
 }
 
-.o_hr_referral_btn_dismiss {
-    padding-top: 0px;
-    padding-bottom: 0px;
-}
 .o_hr_referral_campaign_mail_body .note-editable {
     padding: 0px;
 }

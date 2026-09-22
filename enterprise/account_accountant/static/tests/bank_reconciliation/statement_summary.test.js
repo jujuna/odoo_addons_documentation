@@ -23,11 +23,11 @@ test("can display a BankRecStatementSummary", async () => {
         },
     });
     const elements = queryOne("div.o_statement_summary").children;
-    await click(elements[2]);
+    await click(elements[1]);
     await animationFrame();
     expect(counter).toBe(1);
     expect(elements[0]).toHaveText("A label");
-    expect(elements[2]).toHaveText("$1,000.00");
+    expect(elements[1]).toHaveText("$1,000.00");
 });
 
 test("no amount displayed if no amount in props", async () => {
@@ -38,7 +38,7 @@ test("no amount displayed if no amount in props", async () => {
         },
     });
     const elements = queryOne("div.o_statement_summary").children;
-    expect(elements).toHaveCount(2);
+    expect(elements).toHaveCount(1);
 });
 
 test("label in text danger when isValid set to False", async () => {

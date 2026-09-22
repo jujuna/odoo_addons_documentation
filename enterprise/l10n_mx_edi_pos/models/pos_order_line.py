@@ -15,20 +15,21 @@ class PosOrderLine(models.Model):
         """
         return self.filtered(lambda line: not line.order_id.currency_id.is_zero(line.price_unit * line.qty))
 
-    def _prepare_base_line_for_taxes_computation(self):
+    def _prepare_base_lines_for_taxes_computation(self):
         # EXTENDS 'point_of_sale'
-        line = super()._prepare_base_line_for_taxes_computation()
-        if (
-            self.order_id.country_code == 'MX'
-            and self.order_id.is_refund
-            and self.company_id.l10n_mx_income_return_discount_account_id
-        ):
-            line['account_id'] = self.company_id.l10n_mx_income_return_discount_account_id
-        elif (
-            self.order_id.country_code == 'MX'
-            and self.order_id.session_id.state == 'closed'
-            and self.company_id.l10n_mx_income_re_invoicing_account_id
-        ):
-            line['account_id'] = self.company_id.l10n_mx_income_re_invoicing_account_id
+        base_lines = super()._prepare_base_lines_for_taxes_computation()
+        for index, line in enumerate(self):
+            if (
+                line.order_id.country_code == 'MX'
+                and line.order_id.is_refund_or_negative()
+                and line.company_id.l10n_mx_income_return_discount_account_id
+            ):
+                base_lines[index]['account_id'] = line.company_id.l10n_mx_income_return_discount_account_id
+            elif (
+                line.order_id.country_code == 'MX'
+                and line.order_id.session_id.state == 'closed'
+                and line.company_id.l10n_mx_income_re_invoicing_account_id
+            ):
+                base_lines[index]['account_id'] = line.company_id.l10n_mx_income_re_invoicing_account_id
 
-        return line
+        return base_lines

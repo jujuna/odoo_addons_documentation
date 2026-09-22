@@ -1,5 +1,5 @@
 div.o_documents_details_panel {
-    border-bottom-width: 2px !important;
+    background-color: rgba($o-component-active-bg, .5);
 
     .o_documents_details_panel_fields > *:nth-child(2n+1) {
         // Make the icons aligned, even if they have different width
@@ -37,9 +37,11 @@ div.o_documents_details_panel {
 
     .o_documents_details_panel_name {
         display: contents;
-        .o_field_input_buttons {
-            position: relative;
-        }
+    }
+
+    .o_documents_mimetype_icon {
+        width: 1em;
+        height: 1em;
     }
 
     .o_field_tags .o_tag {
@@ -56,7 +58,9 @@ div.o_documents_details_panel {
         }
     }
 
+    // The tinted background washes out the default placeholder grey (1.5:1 on it).
+    ::placeholder,
     .o_documents_details_panel_placeholder {
-        @include o-placeholder;
+        color: $text-muted;
     }
 }

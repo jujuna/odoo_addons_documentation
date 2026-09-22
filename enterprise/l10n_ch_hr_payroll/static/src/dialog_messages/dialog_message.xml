@@ -4,25 +4,23 @@
             <t t-foreach="this.props.record.data[this.props.name].records" t-as="dialog_field" t-key="dialog_field.id">
                 <t t-if="dialog_field.data.field_type == 'section'">
                     <div class="mb-4">
-                        <h2 class="fw-bold mb-1" t-esc="dialog_field.data.swissdec_label"/>
+                        <h2 class="fw-bold mb-1" t-out="dialog_field.data.swissdec_label"/>
                         <t t-if="dialog_field.data.swissdec_value">
-                            <h3 class="text-muted" t-esc="dialog_field.data.swissdec_value"/>
+                            <h3 class="text-muted" t-out="dialog_field.data.swissdec_value"/>
                         </t>
                     </div>
                 </t>
                 <t t-elif="dialog_field.data.field_type == 'answer'">
                     <div class="o_field_container d-flex align-items-start mb-3 flex-wrap">
                         <label class="o_field_label me-2 fw-bold">
-                            <t t-esc="dialog_field.data.swissdec_label"/>
+                            <t t-out="dialog_field.data.swissdec_label"/>
                             <t t-if="!dialog_field.data.swissdec_answer_optional">
                                 <span class="text-danger">*</span>
                             </t>
                             :
                         </label>
                         <div class="o_field_input flex-grow-1">
-                            <t t-call="render_answer_field">
-                                <t t-set="field" t-value="dialog_field"/>
-                            </t>
+                            <t t-call="render_answer_field" field="dialog_field"/>
                         </div>
                     </div>
                 </t>
@@ -30,11 +28,11 @@
                     <!-- value field (read-only display) -->
                     <div class="o_field_container d-flex align-items-start mb-3 flex-wrap">
                         <label class="o_field_label fw-bold me-2">
-                            <t t-esc="dialog_field.data.swissdec_label"/>
+                            <t t-out="dialog_field.data.swissdec_label"/>
                         </label>
                         <div class="o_field_input flex-grow-1">
                             <t t-if="dialog_field.data.swissdec_value">
-                                : <span class="text-muted" t-esc="dialog_field.data.swissdec_value"/>
+                                : <span class="text-muted" t-out="dialog_field.data.swissdec_value"/>
                             </t>
                         </div>
                     </div>

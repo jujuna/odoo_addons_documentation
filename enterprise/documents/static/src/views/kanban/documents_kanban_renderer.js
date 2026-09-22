@@ -1,36 +1,55 @@
+import { onMounted, useListener, useProps } from "@odoo/owl";
 import { useCommand } from "@web/core/commands/command_hook";
 import { FileUploadProgressContainer } from "@web/core/file_upload/file_upload_progress_container";
 import { FileUploadProgressKanbanRecord } from "@web/core/file_upload/file_upload_progress_record";
 import { _t } from "@web/core/l10n/translation";
 import { useBus, useService } from "@web/core/utils/hooks";
+import { render } from "@web/owl2/utils";
 import { KanbanRenderer } from "@web/views/kanban/kanban_renderer";
 
 import { DocumentsRightPanel } from "@documents/components/documents_right_panel/documents_right_panel";
-import { DocumentsRendererMixin } from "@documents/views/documents_renderer_mixin";
+import { DocumentsRendererMixin, previewProps } from "@documents/views/documents_renderer_mixin";
 import { DocumentsActionHelper } from "@documents/views/helper/documents_action_helper";
 import { useDraggableDocuments } from "@documents/views/helper/documents_draggable";
 import { DocumentsDropZone } from "@documents/views/helper/documents_drop_zone";
 import { DocumentsFileViewer } from "@documents/views/helper/documents_file_viewer";
 import { DocumentsKanbanRecord } from "@documents/views/kanban/documents_kanban_record";
 
-import { onMounted, useExternalListener, useRef } from "@odoo/owl";
-
-export class DocumentsKanbanRenderer extends DocumentsRendererMixin(KanbanRenderer) {
-    static props = [...KanbanRenderer.props, "previewStore"];
-    static template = "documents.DocumentsKanbanRenderer";
+export class DocumentsKanbanRendererCommon extends KanbanRenderer {
+    documentsAttachmentViewerProps = useProps(previewProps);
+    static template = "documents.DocumentsKanbanRendererCommon";
     static components = Object.assign({}, KanbanRenderer.components, {
+        KanbanRecord: DocumentsKanbanRecord,
+        DocumentsFileViewer,
+    });
+
+    /**
+     * Called when clicking in the kanban renderer.
+     *
+     * @returns {boolean} whether the click was in empty space
+     */
+    onGlobalClick(ev) {
+        // Only when clicking in empty space
+        if (ev.target.closest(".o_kanban_record:not(.o_kanban_ghost)")) {
+            return false;
+        }
+        this.props.list.selection.forEach((el) => el.toggleSelection(false));
+        return true;
+    }
+}
+
+export class DocumentsKanbanRenderer extends DocumentsRendererMixin(DocumentsKanbanRendererCommon) {
+    static template = "documents.DocumentsKanbanRenderer";
+    static components = Object.assign({}, DocumentsKanbanRendererCommon.components, {
         DocumentsDropZone,
         FileUploadProgressContainer,
         FileUploadProgressKanbanRecord,
-        KanbanRecord: DocumentsKanbanRecord,
         DocumentsActionHelper,
-        DocumentsFileViewer,
         DocumentsRightPanel,
     });
 
     setup() {
         super.setup();
-        this.root = useRef("root");
         const { uploads } = useService("file_upload");
         this.documentUploads = uploads;
         this.documentService = useService("document.document");
@@ -44,31 +63,18 @@ export class DocumentsKanbanRenderer extends DocumentsRendererMixin(KanbanRender
                     record.toggleSelection(!allSelected);
                 });
                 const focusedRecord = this.setDefaultFocus();
-                document.querySelector(`.o_kanban_record[data-value-id="${focusedRecord.resId}"]`).focus();
+                document
+                    .querySelector(`.o_kanban_record[data-value-id="${focusedRecord.resId}"]`)
+                    .focus();
             },
             {
                 category: "smart_action",
                 hotkey: "control+a",
             }
         );
-        useCommand(
-            _t("Toggle favorite"),
-            async () => {
-                if (this.selection.length) {
-                    await this.env.model.orm.call("documents.document", "toggle_favorited_multi", [
-                        this.selection.map((record) => record.resId),
-                    ]);
-                    this.env.model.load();
-                }
-            },
-            {
-                category: "smart_action",
-                hotkey: "alt+t",
-            }
-        );
 
         useDraggableDocuments({
-            ref: this.root,
+            ref: this.rootRef,
             model: this.env.model,
             targetSelector: ".o_kanban_record.o_folder_record",
             elements: ".o_kanban_record",
@@ -83,34 +89,32 @@ export class DocumentsKanbanRenderer extends DocumentsRendererMixin(KanbanRender
             },
         });
 
-        useExternalListener(window, "keydown", (ev) => this.onKeyDown(ev));
-        useExternalListener(window, "keyup", (ev) => this.onKeyUp(ev));
+        useListener(window, "keydown", (ev) => this.onKeyDown(ev));
+        useListener(window, "keyup", (ev) => this.onKeyUp(ev));
 
         useBus(this.documentService.bus, "DOCUMENT_ACTIVITY_CHANGED", ({ detail }) => {
             if (
                 this.props.list.selection.length == 1 &&
                 this.props.list.selection[0].data.id == detail.recordId
             ) {
-                this.render(true); // Re-render this Component and its children on activity add/edit/unlink
+                render(this, true); // Re-render this Component and its children on activity add/edit/unlink
             }
         });
         onMounted(() => {
             if (this.isMobile && this.isRecentFolder) {
-                this.root.el.classList.add('o_documents_recent');
+                this.rootRef().classList.add("o_documents_recent");
             }
+            this.documentService.scrollToFirstSelectedRecord(".o_kanban_record.o_record_selected");
         });
     }
 
     /**
-     * Called when clicking in the kanban renderer.
+     * @override
      */
     onGlobalClick(ev) {
-        // Only when clicking in empty space
-        if (ev.target.closest(".o_kanban_record:not(.o_kanban_ghost)")) {
-            return;
+        if (super.onGlobalClick(ev)) {
+            this.documentService.focusRecord(this.env.model.getContainerRecord());
         }
-        this.documentService.focusRecord(this.getContainerRecord());
-        this.props.list.selection.forEach((el) => el.toggleSelection(false));
     }
 
     /**
@@ -147,7 +151,9 @@ export class DocumentsKanbanRenderer extends DocumentsRendererMixin(KanbanRender
                 if ((oldIdx - folderCount) % cardsPerRow >= folderCount % cardsPerRow) {
                     newIdx = folderCount - 1;
                 } else {
-                    newIdx = folderCount - ((folderCount % cardsPerRow) - (oldIdx - folderCount) % cardsPerRow);
+                    newIdx =
+                        folderCount -
+                        ((folderCount % cardsPerRow) - ((oldIdx - folderCount) % cardsPerRow));
                 }
             }
         } else if (direction === "down") {
@@ -179,13 +185,11 @@ export class DocumentsKanbanRenderer extends DocumentsRendererMixin(KanbanRender
         }
     }
 
-    getDocumentsAttachmentViewerProps() {
-        return { previewStore: this.props.previewStore };
-    }
-
     folderCount() {
-        return this.props.list.records
-            .reduce((count, record) => (record.data.type === 'folder' ? count + 1: count), 0);
+        return this.props.list.records.reduce(
+            (count, record) => (record.data.type === "folder" ? count + 1 : count),
+            0
+        );
     }
 
     hasFolders() {
@@ -202,7 +206,7 @@ export class DocumentsKanbanRenderer extends DocumentsRendererMixin(KanbanRender
     }
 
     get isMobile() {
-        return this.env.isSmall;
+        return this.uiService.isSmall;
     }
 
     /**
@@ -249,22 +253,20 @@ export class DocumentsKanbanRenderer extends DocumentsRendererMixin(KanbanRender
     }
 
     onKeyDown(ev) {
-        if (ev.key === "Control") {
-            this.root.el.classList.add("o_documents_dnd_shortcut");
+        if (this.rootRef() && ev.key === "Control") {
+            this.rootRef().classList.add("o_documents_dnd_shortcut");
         }
     }
 
     onKeyUp(ev) {
-        if (ev.key === "Control") {
-            this.root.el.classList.remove("o_documents_dnd_shortcut");
+        if (this.rootRef() && ev.key === "Control") {
+            this.rootRef().classList.remove("o_documents_dnd_shortcut");
         }
     }
 
     toggleSelection(record) {
         const isSelection = record && !record.selected;
         super.toggleSelection(...arguments);
-        if (isSelection) {
-            this.documentService.focusRecord(record, true);
-        }
+        this.documentService.focusRecord(record, isSelection);
     }
 }

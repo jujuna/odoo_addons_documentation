@@ -1,28 +1,71 @@
-import { Component, onWillStart, onWillUpdateProps, toRaw, useState } from "@odoo/owl";
+import { Component, onWillStart, onWillUpdateProps, useProps, toRaw, t, proxy } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
-import { CodeEditor } from "@web/core/code_editor/code_editor";
 import { rpc } from "@web/core/network/rpc";
 import { ResizablePanel } from "@web/core/resizable_panel/resizable_panel";
-import { SelectMenu } from "@web/core/select_menu/select_menu";
+import { SelectMenu, selectMenuProps } from "@web/core/select_menu/select_menu";
+import { IrUiViewCodeEditor } from "@web/core/ir_ui_view_code_editor/code_editor";
+
+export async function loadResources({
+    mainResourceId,
+    url = "/web_studio/get_xml_editor_resources",
+    defaultResourceId = null,
+    checkMainViewKey = false,
+}) {
+    const resources = await rpc(url, { key: mainResourceId });
+    return {
+        resources: resources.views.map((res) => ({
+            ...res,
+            isMainResource:
+                res.key === mainResourceId ||
+                res.id === mainResourceId ||
+                res.xml_id === mainResourceId,
+        })),
+        defaultResource: getDefaultResource(
+            resources.views,
+            resources.main_view_key,
+            defaultResourceId,
+            checkMainViewKey
+        ),
+    };
+}
+
+function getDefaultResource(resources, mainViewKey, defaultResourceId, checkMainViewKey) {
+    if (resources.length <= 0) {
+        return null;
+    }
+
+    let defaultResource;
+    if (checkMainViewKey && mainViewKey) {
+        defaultResource = resources.find((res) => res.key === mainViewKey);
+    }
+
+    if (!defaultResource && (defaultResourceId || mainViewKey)) {
+        const defaultId = defaultResourceId || mainViewKey;
+        defaultResource = resources.find(
+            (resource) =>
+                resource.id === defaultId ||
+                resource.xml_id === defaultId ||
+                resource.key === defaultId
+        );
+    }
+    return defaultResource || resources[0];
+}
 
 class ViewSelector extends SelectMenu {
     static template = "web_studio.ViewSelector";
     static choiceItemTemplate = "web_studio.ViewSelector.ChoiceItemRecursive";
-    static props = {
-        ...SelectMenu.props,
-        choices: {
-            optional: true,
-            type: Array,
-            element: {
-                type: Object,
-                shape: {
-                    value: true,
-                    label: { type: String },
-                    resource: { optional: true },
-                },
-            },
-        },
-    };
+    props = useProps({
+        ...selectMenuProps,
+        choices: t
+            .array(
+                t.object({
+                    value: t.any(),
+                    label: t.string(),
+                    resource: t.any().optional(),
+                })
+            )
+            .optional([]),
+    });
 
     getMainViews() {
         return this.state.displayedOptions.filter((opt) => opt.resource.isMainResource);
@@ -73,61 +116,52 @@ class ViewSelector extends SelectMenu {
     }
 }
 
+export const xmlResourceEditorProps = {
+    onClose: t.function(),
+    onCodeChange: t.function().optional(),
+    onSave: t.function().optional(),
+    mainResourceId: t.any(),
+    defaultResourceId: t.any().optional(),
+    getDefaultResource: t.function().optional(() => () => {}),
+    canSave: t.boolean().optional(true),
+    minWidth: t.number().optional(400),
+    initialWidth: t.number().optional(400),
+    displayAlerts: t.boolean().optional(true),
+    onResourceChange: t.function().optional(() => () => {}),
+};
+
 export class XmlResourceEditor extends Component {
     static template = "web_studio.XmlResourceEditor";
-    static components = { ResizablePanel, CodeEditor, SelectMenu: ViewSelector };
-    static props = {
-        onClose: { type: Function },
-        onCodeChange: { type: Function, optional: true },
-        onSave: { type: Function, optional: true },
-        mainResourceId: { type: true },
-        defaultResourceId: { type: true, optional: true },
-        getDefaultResource: { optional: true, type: Function },
-        canSave: { type: Boolean, optional: true },
-        minWidth: { type: Number, optional: true },
-        reloadSources: { type: Number, optional: true },
-        displayAlerts: { type: Boolean, optional: true },
-        onResourceChange: { type: Function, optional: true },
+    static components = {
+        ResizablePanel,
+        CodeEditor: IrUiViewCodeEditor,
+        SelectMenu: ViewSelector,
     };
-    static defaultProps = {
-        canSave: true,
-        minWidth: 400,
-        reloadSources: 1,
-        displayAlerts: true,
-        onResourceChange: () => {},
-        getDefaultResource: () => {},
-    };
+    props = useProps(xmlResourceEditorProps);
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             resourcesOptions: [],
             currentResourceId: null,
             _codeChanges: null,
         });
-        this.codeEditorKey = this.props.reloadSources;
         onWillStart(() => this.loadResources(this.props.mainResourceId));
 
         onWillUpdateProps(async (nextProps) => {
             const resourceChanged = nextProps.mainResourceId !== this.props.mainResourceId;
-            const shouldReload = resourceChanged || this.codeEditorKey !== nextProps.reloadSources;
             const nextResourceId =
                 nextProps.mainResourceId !== this.props.mainResourceId
                     ? nextProps.mainResourceId
                     : this.state.currentResourceId;
 
             if (resourceChanged) {
-                this.cursorPosition = undefined;
-            }
-
-            if (shouldReload) {
                 this.state._codeChanges = null;
                 await this.loadResources(nextProps.mainResourceId);
                 this.state.currentResourceId = nextResourceId;
             }
-            this.codeEditorKey = nextProps.reloadSources;
         });
 
-        this.alerts = useState({
+        this.alerts = proxy({
             "built-in-file": {
                 message: _t(
                     "Editing a built-in file through this editor is not advised, as it will prevent it from being updated during future App upgrades."
@@ -146,7 +180,8 @@ export class XmlResourceEditor extends Component {
         if (!currentResourceId) {
             return "";
         }
-        return this.tempCode || this.getResourceFromId(currentResourceId).arch;
+        const resource = this.getResourceFromId(currentResourceId);
+        return this.tempCode || resource[this.getResourceArchField(resource)];
     }
 
     get tempCode() {
@@ -162,6 +197,19 @@ export class XmlResourceEditor extends Component {
         }
         this.state._codeChanges = this.state._codeChanges || {};
         this.state._codeChanges[this.state.currentResourceId] = value;
+    }
+
+    get invalidLocators() {
+        const res = this.getResourceFromId(this.state.currentResourceId);
+        return res.invalid_locators;
+    }
+
+    getResourceArchField(resource) {
+        if ("combined_arch" in resource) {
+            return "combined_arch";
+        } else {
+            return "arch";
+        }
     }
 
     getResourceFromId(resourceId) {
@@ -181,65 +229,53 @@ export class XmlResourceEditor extends Component {
         this.props.onClose();
     }
 
-    onCodeChange(code, cursorPosition) {
-        this.cursorPosition = cursorPosition;
+    getChanges() {
+        return { ...toRaw(this.state._codeChanges) };
+    }
+
+    onCodeChange(code) {
         this.tempCode = code;
-        if ("onCodeChange" in this.props) {
-            this.props.onCodeChange({ ...toRaw(this.state._codeChanges) });
+        if (this.props.onCodeChange) {
+            this.props.onCodeChange(this.getChanges());
         }
     }
 
-    onSaveClick() {
+    async onSaveClick() {
         if (!this.tempCode) {
             return;
         }
         const resource = this.getResourceFromId(this.state.currentResourceId);
-        this.props.onSave({
+        await this.props.onSave({
             resourceId: resource.id,
             newCode: this.tempCode,
             oldCode: resource.oldArch,
         });
+        await this.loadResources(this.props.mainResourceId);
     }
 
     onResourceChange(resourceId) {
         this.state.currentResourceId = resourceId;
-        this.cursorPosition = undefined;
         this.props.onResourceChange(this.getResourceFromId(this.state.currentResourceId));
     }
 
     async loadResources(resourceId) {
-        const resources = await rpc("/web_studio/get_xml_editor_resources", {
-            key: resourceId,
+        const { resources, defaultResource } = await loadResources({
+            mainResourceId: resourceId,
+            defaultResourceId: this.props.defaultResourceId,
         });
 
-        const resourcesOptions = resources.views.map((res) => ({
+        const resourcesOptions = resources.map((res) => ({
             label: `${res.name} (${res.xml_id})`,
             value: res.id,
             resource: {
                 ...res,
-                oldArch: res.arch,
-                isMainResource:
-                    res.key === resourceId || res.id === resourceId || res.xml_id === resourceId,
+                oldArch: res[this.getResourceArchField(res)],
             },
         }));
-
         this.state.resourcesOptions = resourcesOptions;
-        if (resourcesOptions.length >= 1) {
-            let defaultResource = this.props.getDefaultResource(
-                resourcesOptions,
-                resources.main_view_key
-            );
-            if (!defaultResource && (this.props.defaultResourceId || resources.main_view_key)) {
-                const defaultId = this.props.defaultResourceId || resources.main_view_key;
-                defaultResource = resourcesOptions.find(
-                    (opt) =>
-                        opt.resource.id === defaultId ||
-                        opt.resource.xml_id === defaultId ||
-                        opt.resource.key === defaultId
-                );
-            }
-            defaultResource = defaultResource || resourcesOptions[0];
-            this.state.currentResourceId = defaultResource.value;
+
+        if (defaultResource) {
+            this.state.currentResourceId = defaultResource.id;
         }
 
         return resourcesOptions;

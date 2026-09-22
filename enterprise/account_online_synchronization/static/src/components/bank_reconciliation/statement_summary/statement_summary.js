@@ -1,18 +1,20 @@
 import { patch } from "@web/core/utils/patch";
 import { useService } from "@web/core/utils/hooks";
-import { BankRecStatementSummary } from "@account_accountant/components/bank_reconciliation/statement_summary/statement_summary";
+import { t, usePlugin } from "@odoo/owl";
+import {
+    BankRecStatementSummary,
+    bankRecStatementSummaryProps,
+} from "@account_accountant/components/bank_reconciliation/statement_summary/statement_summary";
+import { ORM } from "@web/core/orm_plugin";
 
-patch(BankRecStatementSummary, {
-    props: {
-        ...BankRecStatementSummary.props,
-        journalAvailableBalanceAmount: { type: String, optional: true },
-    },
+Object.assign(bankRecStatementSummaryProps, {
+    journalAvailableBalanceAmount: t.string().optional(),
 });
 
 patch(BankRecStatementSummary.prototype, {
     setup() {
         super.setup();
-        this.orm = useService("orm");
+        this.orm = usePlugin(ORM);
         this.action = useService("action");
     },
 

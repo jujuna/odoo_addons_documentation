@@ -1,15 +1,16 @@
 import { Loader } from "@point_of_sale/app/components/loader/loader";
 import { getTemplate } from "@web/core/templates";
-import { mount, reactive, whenReady } from "@odoo/owl";
-import { _t, appTranslateFn } from "@web/core/l10n/translation";
+import { mount, whenReady, proxy } from "@odoo/owl";
+import { appTranslateFn } from "@web/core/l10n/translation";
 import { hasTouch } from "@web/core/browser/feature_detection";
+import { browser } from "@web/core/browser/browser";
 import { localization } from "@web/core/l10n/localization";
 import { user } from "@web/core/user";
 import { session } from "@web/session";
 import { mountComponent } from "@web/env";
 import { Chrome } from "@point_of_sale/app/pos_app";
 
-const loader = reactive({ isShown: true, error: false });
+const loader = proxy({ isShown: true, error: false });
 whenReady(() => {
     mount(Loader, document.body, {
         getTemplate,
@@ -27,19 +28,19 @@ whenReady(() => {
         isEnterprise: session.server_version_info.slice(-1)[0] === "e",
     };
     await whenReady();
+    // If a deletion beacon was sent on unload for this exact session, reload once so
+    // pos_web assigns a clean session. Removing the flag before reloading prevents looping.
+    const recoverySessionId = browser.sessionStorage.getItem("pos_reload_recovery");
+    if (recoverySessionId && parseInt(recoverySessionId) === odoo.pos_session_id) {
+        browser.sessionStorage.removeItem("pos_reload_recovery");
+        window.location.reload();
+        return;
+    }
+    browser.sessionStorage.removeItem("pos_reload_recovery");
     try {
-        const app = await mountComponent(Chrome, document.body, {
+        await mountComponent(Chrome, document.body, {
             name: "Odoo Point of Sale",
             props: { disableLoader: () => (loader.isShown = false) },
-        });
-        window.addEventListener("beforeunload", function (event) {
-            if (app.env.services.pos_data.network.offline) {
-                var confirmationMessage = _t(
-                    "You are currently offline. Reloading the page may cause you to lose unsaved data."
-                );
-                event.returnValue = confirmationMessage;
-                return confirmationMessage;
-            }
         });
         const classList = document.body.classList;
         if (localization.direction === "rtl") {
@@ -48,7 +49,7 @@ whenReady(() => {
         if (user.userId === 1) {
             classList.add("o_is_superuser");
         }
-        if (app.env.debug) {
+        if (odoo.debug) {
             classList.add("o_debug");
         }
         if (hasTouch()) {

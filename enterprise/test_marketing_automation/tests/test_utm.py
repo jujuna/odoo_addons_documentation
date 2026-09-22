@@ -20,15 +20,6 @@ class TestUTMConsistencyMassMailing(TestUTMCommon, TestMACommon):
         utm_campaign = marketing_campaign.utm_campaign_id
 
         with self.assertRaises(UserError):
-            # can't unlink the UTM campaign as it's used by a marketing.activity as its source
-            # unlinking the source would break all the activity statistics
+            # can't unlink the UTM campaign as it's used by a marketing.activity as its campaign
+            # unlinking the campaign would break all the activity statistics
             utm_campaign.unlink()
-
-        marketing_activity = self._create_activity_mail(marketing_campaign)
-        # the source is automatically created when creating a marketing activity
-        utm_source = marketing_activity.source_id
-
-        with self.assertRaises(UserError):
-            # can't unlink the source as it's used by a marketing.activity as its source
-            # unlinking the source would break all the activity statistics
-            utm_source.unlink()

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 # Source: https://www.estv.admin.ch/estv/fr/accueil/impot-federal-direct/impot-a-la-source/baremes-cantonaux.html
@@ -9,7 +8,6 @@ from odoo.exceptions import UserError
 from collections import defaultdict
 from datetime import date
 
-import base64
 import logging
 import requests
 import zipfile
@@ -21,6 +19,12 @@ CANTON_CODES = [
     'AG', 'AI', 'AR', 'BE', 'BL', 'BS', 'FR', 'GE', 'GL', 'GR', 'JU', 'LU', 'NE', 'NW', 'OW',
     'SG', 'SH', 'SO', 'SZ', 'TG', 'TI', 'UR', 'VD', 'VS', 'ZG', 'ZH']
 TAX_SCALES = list('ABCDEFGHIJKLMNOPQRSTUV')
+
+ALL_CANTON_IMPORT_URLS = {
+    "2026": "https://www.estv.admin.ch/dam/de/sd-web/mX9Lw4R3OngC/tar2026txt.zip",
+    "2025": "https://www.estv.admin.ch/dam/de/sd-web/PB2kXbRp1bAQ/qst-ch-tar2025txt-de.zip",
+    "2024": "https://www.estv.admin.ch/dam/de/sd-web/zPXLuV1oabkb/qst-ch-tar2024txt-de.zip"
+}
 
 
 class L10nChTaxRateImportWizard(models.TransientModel):
@@ -57,7 +61,7 @@ class L10nChTaxRateImportWizard(models.TransientModel):
        help="Canton for which to download the official tax file (only relevant if you choose 'Import one canton').")
     year = fields.Integer(
         string='Tax Year',
-        default=lambda self: fields.Date.today().year,
+        default=lambda self: fields.Date.context_today(self).year,
         required=True,
         help='Year for which to download the tax rate file'
     )
@@ -70,7 +74,7 @@ class L10nChTaxRateImportWizard(models.TransientModel):
         for tax_file in self.tax_file_ids:
             count += 1
             _logger.info("Importing swiss tax file %s/%s", count, len(self.tax_file_ids))
-            tax_file_content = base64.b64decode(tax_file.datas).decode('utf-8')
+            tax_file_content = tax_file.raw.decode('utf-8')
             # {(canton, date_from, church_tax, tax_scale, child_count): [(low, high, min_amount, rate)]}
             mapped_rates = defaultdict(list)
             mapped_predefined_categories_rates = defaultdict(list)
@@ -332,13 +336,14 @@ class L10nChTaxRateImportWizard(models.TransientModel):
         try:
             with zipfile.ZipFile(zip_bytes, 'r') as z:
                 for file_name in z.namelist():
-                    if file_name.lower().endswith('.txt'):
+                    f_name_lower = file_name.lower()
+                    if f_name_lower.endswith('.txt') and (self.canton_mode == 'all' or (f"{self.canton.lower()}.txt" in f_name_lower)):
                         txt_bytes = z.read(file_name)
                         self.env['ir.attachment'].create({
                             'name': file_name,
                             'res_model': self._name,
                             'res_id': self.id,
-                            'datas': base64.b64encode(txt_bytes),
+                            'raw': txt_bytes,
                             'mimetype': 'text/plain',
                         })
                         _logger.info("Attached file %s to wizard", file_name)
@@ -352,23 +357,10 @@ class L10nChTaxRateImportWizard(models.TransientModel):
         Return the official ESTV URL based on year + whether we want all or single canton.
         """
         year_str = str(self.year)
-        short_year_str = year_str[-2:]
-        canton_lower = (self.canton or '').lower()
 
-        if self.canton_mode == 'all':
-            # e.g. 2025 =>
-            # https://www.estv.admin.ch/dam/estv/fr/dokumente/qst/schweiz/qst-ch-tar2025txt-fr.zip.download.zip/qst-ch-tar2025txt-fr.zip
-            url = (
-                "https://www.estv.admin.ch/dam/estv/fr/dokumente/qst/schweiz/"
-                f"qst-ch-tar{year_str}txt-fr.zip.download.zip/qst-ch-tar{year_str}txt-fr.zip"
-            )
+        if year_str in ALL_CANTON_IMPORT_URLS:
+            url = ALL_CANTON_IMPORT_URLS[year_str]
         else:
-            # Single canton approach
-            # https://www.estv.admin.ch/dam/estv/fr/dokumente/qst/2025/qst-loehne/qst-tar25ar-fr.zip.download.zip/qst-tar25ar-fr.zip
-            if int(short_year_str) > 25:
-                # New URL for 2026
-                url = f"https://www.estv.admin.ch/dam/estv/fr/dokumente/qst/{year_str}/qst-loehne/tar{short_year_str}{canton_lower}.zip.download.zip/tar{short_year_str}{canton_lower}.zip"
-            else:
-                url = f"https://www.estv.admin.ch/dam/estv/fr/dokumente/qst/{year_str}/qst-loehne/qst-tar{short_year_str}{canton_lower}-fr.zip.download.zip/qst-tar{short_year_str}{canton_lower}-fr.zip"
+            raise UserError(_("It is currently not possible to import Tax rates automatically for this year, please import them manually."))
 
         return url

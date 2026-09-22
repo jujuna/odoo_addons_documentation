@@ -40,6 +40,6 @@ class ProductProduct(models.Model):
                 OR operation_id IN (
                     SELECT ope.id FROM mrp_routing_workcenter AS ope
                     INNER JOIN mrp_bom as bom ON ope.bom_id = bom.id
-                    WHERE bom.active = 't'
+                    WHERE bom.active IS TRUE
                 )
             )""")

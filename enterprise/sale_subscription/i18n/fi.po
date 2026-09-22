@@ -35,17 +35,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-30 09:25+0000\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 02:52+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "sale_subscription/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_subscription
 #. odoo-python
@@ -60,6 +60,18 @@ msgstr ""
 "- Yrität laskuttaa toistuvia tilauksia. Tarkista toimitetun tuotteen määrä "
 "laskutuskäytännön, seuraavan laskupäivämäärän ja sopimuksen päättymispäivän "
 "perusteella."
+
+#. module: sale_subscription
+#: model:ir.module.module,description:base.module_sale_subscription
+msgid ""
+"\n"
+"This module allows you to manage subscriptions.\n"
+"\n"
+"Features:\n"
+"    - Create & edit subscriptions\n"
+"    - Modify subscriptions with sales orders\n"
+"    - Generate invoice automatically at fixed intervals\n"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__nbr
@@ -146,20 +158,6 @@ msgstr ""
 "ajanjaksoon %(start)s - %(end)s"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "(Change Plan)"
-msgstr "(Vaihda tilausta)"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid ""
-")\n"
-"                        <br/>"
-msgstr ""
-")\n"
-"                        <br/>"
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "- Until"
 msgstr "- Päättyen"
@@ -205,89 +203,9 @@ msgid "6 Months"
 msgstr "6 kuukautta"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "<b>Payment Method</b>"
-msgstr "<b>Maksutapa</b>"
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_advance_payment_inv_sale_subscription
 msgid "<b>Subscriptions</b><br/>"
 msgstr "<b>Tilaukset</b><br/>"
-
-#. module: sale_subscription
-#: model:mail.template,body_html:sale_subscription.mail_template_subscription_alert
-msgid ""
-"<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-"family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-"                <table style=\"width:600px;margin:5px auto;\">\n"
-"                    <tbody>\n"
-"                        <tr><td t-if=\"not "
-"object.company_id.uses_default_logo\">\n"
-"                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-"company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
-"                        </td><td style=\"text-align:right;vertical-"
-"align:middle;\">\n"
-"                                Subscription Renewal\n"
-"                        </td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"                <table style=\"width:600px;margin:0px "
-"auto;background:white;border:1px solid #e1e1e1;\">\n"
-"                    <tbody>\n"
-"                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-"                            <p>Dear <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,</p>\n"
-"                            <p>Your subscription <strong t-out=\"object.name "
-"or ''\">Office Cleaning Service\"</strong> needs your attention.</p>\n"
-"                            <p>We invite you to renew it by clicking on the "
-"following link.</p>\n"
-"                            <p>Kind regards.</p>\n"
-"                        </td></tr>\n"
-"                        <tr data-o-mail-quote-container=\"1\"><td "
-"style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</"
-"td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        "
-msgstr ""
-"<div style=\"background:#F0F0F0;color:#515166;padding:10px 0px;font-"
-"family:Arial,Helvetica,sans-serif;font-size:14px;\">\n"
-"                <table style=\"width:600px;margin:5px auto;\">\n"
-"                    <tbody>\n"
-"                        <tr><td t-if=\"not "
-"object.company_id.uses_default_logo\">\n"
-"                            <a href=\"/\"><img t-attf-src=\"/logo.png?"
-"company={{ object.company_id.id }}\" style=\"vertical-align:baseline;max-"
-"width:100px;\"/></a>\n"
-"                        </td><td style=\"text-align:right;vertical-"
-"align:middle;\">\n"
-"                                Tilauksen uusiminen\n"
-"                        </td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"                <table style=\"width:600px;margin:0px "
-"auto;background:white;border:1px solid #e1e1e1;\">\n"
-"                    <tbody>\n"
-"                        <tr><td style=\"padding:15px 20px 10px 20px;\">\n"
-"                            <p>Hyvä <t t-out=\"object.partner_id.name or "
-"''\">Brandon Freeman</t>,</p>\n"
-"                            <p>Tilauksesi <strong t-out=\"object.name or "
-"''\">Toimiston siivouspalvelu\"</strong> vaatii huomiotasi.</p>\n"
-"                            <p>Pyydämme sinua uusimaan sen klikkaamalla "
-"seuraavaa linkkiä.</p>\n"
-"                            <p>Ystävällisin terveisin.</p>\n"
-"                        </td></tr>\n"
-"                        <tr data-o-mail-quote-container=\"1\"><td "
-"style=\"padding:15px 20px 10px 20px;\" t-out=\"object.user_id.signature or "
-"''\" data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</"
-"td></tr>\n"
-"                    </tbody>\n"
-"                </table>\n"
-"            </div>\n"
-"        "
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.mail_template_subscription_rating
@@ -497,53 +415,48 @@ msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "<i class=\"fa fa-download me-1\"/> Download"
-msgstr "<i class=\"fa fa-download me-1\"/> Lataa"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> In Progress"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Käynnissä"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> Paused"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Keskeytetty"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-check\"/> Renewed"
-msgstr "<i class=\"fa fa-fw fa-check\"/> Uusittu"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-remove\"/> Closed"
-msgstr "<i class=\"fa fa-fw fa-remove\"/> Suljettu"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-remove\"/> Closing"
-msgstr "<i class=\"fa fa-fw fa-remove\"/> Sulkeminen"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "<i class=\"fa fa-fw fa-repeat\"/> To Renew"
-msgstr "<i class=\"fa fa-fw fa-repeat\"/> Uudista"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "<i class=\"fa fa-plus\"/> Create address"
-msgstr "<i class=\"fa fa-plus\"/> Luo osoite"
+msgid "<i class=\"oi me-1\" data-icon=\"download\"/> Download"
+msgstr "<i class=\"oi me-1\" data-icon=\"download\"/> Lataa"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
-msgid "<i class=\"oi oi-arrow-right me-1\"/>Back to your subscription"
-msgstr "<i class=\"oi oi-arrow-right me-1\"/>Takaisin tilaukseesi"
+msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Back to your subscription"
+msgstr "<i class=\"oi me-1\" data-icon=\"east\"/>Takaisin tilaukseesi"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
-msgid "<option value=\"\">Choose a reason...</option>"
-msgstr "<option value=\"\">Valitse syy...</option>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"autorenew\"/> To Renew"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> In Progress"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Käynnissä"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> Paused"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Keskeytetty"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/> Renewed"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/> Uusittu"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"close\"/> Closed"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"close\"/> Suljettu"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"close\"/> Closing"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"close\"/> Sulkeminen"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
+msgid "<i class=\"oi\" data-icon=\"add\"/> Create address"
+msgstr "<i class=\"oi\" data-icon=\"add\"/> Luo osoite"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.payment_method_form
@@ -555,22 +468,27 @@ msgstr ""
 "<small class=\"text-600\">Automatisoi linkitettyjen tilausten maksut</small>"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
-msgid ""
-"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"fa fa-fw fa-"
-"repeat\"/> To Renew</span>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<small class=\"text-muted\">Plan</small>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"fa fa-fw fa-"
-"repeat\"/> Uudista</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"fa fa-fw fa-"
-"remove\"/> Closed</span>"
+"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"oi oi-fw\" data-"
+"icon=\"redo\"/> To Renew</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"fa fa-fw fa-"
-"remove\"/> Suljettu</span>"
+"<span class=\"badge rounded-pill text-bg-danger\"><i class=\"oi oi-fw\" data-"
+"icon=\"redo\"/> Uudista</span>"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
+msgid ""
+"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"oi oi-fw\" data-"
+"icon=\"close\"/> Closed</span>"
+msgstr ""
+"<span class=\"badge rounded-pill text-bg-dark\"><i class=\"oi oi-fw\" data-"
+"icon=\"close\"/> Suljettu</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
@@ -583,38 +501,38 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid ""
-"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"fa fa-fw fa-"
-"check\"/> Upsell</span>"
+"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Upsell</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"fa fa-fw fa-"
-"check\"/> Lisämyynti</span>"
+"<span class=\"badge rounded-pill text-bg-primary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Lisämyynti</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"fa fa-fw fa-"
-"check\"/> Renewed</span>"
+"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Renewed</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"fa fa-fw fa-"
-"check\"/> Uusittu</span>"
+"<span class=\"badge rounded-pill text-bg-secondary\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Uusittu</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> In Progress</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> In Progress</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Käynnissä</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Käynnissä</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
 msgid ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Paused</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Paused</span>"
 msgstr ""
-"<span class=\"badge rounded-pill text-bg-success\"><i class=\"fa fa-fw fa-"
-"check\"/> Tauolla</span>"
+"<span class=\"badge rounded-pill text-bg-success\"><i class=\"oi oi-fw\" "
+"data-icon=\"check\"/> Tauolla</span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -650,23 +568,9 @@ msgid "<span class=\"text-muted\">Next Billing</span>"
 msgstr "<span class=\"text-muted\">Seuraava laskutus</span>"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.recurring_details
-msgid "<span class=\"text-start\">Non Recurring</span>:"
-msgstr "<span class=\"text-start\">Ei toistuva</span>:"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.recurring_details
-msgid "<span class=\"text-start\">Recurring</span>:"
-msgstr "<span class=\"text-start\">Toistuva</span>:"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
-msgid ""
-"<span invisible=\"not plan_id or subscription_state == '7_upsell'\">until</"
-"span>"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<span class=\"text-muted\">→</span>"
 msgstr ""
-"<span invisible=\"not plan_id or subscription_state == '7_upsell'\">saakka</"
-"span>"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -693,6 +597,26 @@ msgstr ""
 "        </span>"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "<span>·</span>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Invoices</strong>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Period</strong>"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "<strong class=\"smaller text-uppercase text-muted\">Plan</strong>"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
 msgid "<strong>Recurring Plan</strong>"
 msgstr "<strong>Toistuva tilaus</strong>"
@@ -707,566 +631,199 @@ msgstr ""
 "asetettu. Täytä:"
 
 #. module: sale_subscription
+#: model:mail.template,body_html:sale_subscription.mail_template_subscription_alert
+msgid ""
+"<t>\n"
+"<p>Dear <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,</p>\n"
+"<p>Your subscription <strong t-out=\"object.name or ''\">Office Cleaning "
+"Service\"</strong> needs your attention.</p>\n"
+"<p>We invite you to renew it by clicking on the following link.</p>\n"
+"<p>Kind regards.</p>\n"
+"<p t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">--<br "
+"data-o-mail-quote=\"1\"/>Mitchell Admin</p>\n"
+"        </t>"
+msgstr ""
+"<t>\n"
+"<p>Hyvä <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,</p>\n"
+"<p>Tilauksesi <strong t-out=\"object.name or ''\">Toimiston siivouspalvelu</"
+"strong> vaatii huomiotasi.</p>\n"
+"<p>Kutsumme sinut uusimaan tilauksen klikkaamalla seuraavaa linkkiä.</p>\n"
+"<p>Ystävällisin terveisin</p>\n"
+"<p t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">--<br "
+"data-o-mail-quote=\"1\"/>Mitchell Admin</p>\n"
+"        </t>"
+
+#. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.email_payment_close
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Your Subscription</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Office Cleaning Service</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hello <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Our final attempt to process a payment for your "
-"subscription using your payment method\n"
-"                        <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</"
-"t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">100</t> <t t-out=\"ctx.get('currency') or ''\">$</t> failed.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Your bank or credit institution gave the "
-"following details about the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Our final attempt to process a payment for your "
-"subscription failed because we have no payment method recorded for you.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    As your payment should have been made <strong><t t-"
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Our final attempt to process a payment for your subscription using your "
+"payment method\n"
+"    <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</t>\n"
+"    for <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+"out=\"ctx.get('currency') or ''\">$</t> failed.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Your bank or credit institution gave the following details about the "
+"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Our final attempt to process a payment for your subscription failed "
+"because we have no payment method recorded for you.\n"
+"</t>\n"
+"<br/><br/>\n"
+"As your payment should have been made <strong><t t-"
 "out=\"ctx.get('auto_close_limit') or ''\">5</t> days ago</strong>, your "
 "subscription has been terminated.\n"
-"                    Should you wish to resolve this issue, do not hesitate "
-"to contact us.<br/><br/>\n"
-"                    Thank you for choosing <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Should you wish to resolve this issue, do not hesitate to contact us.<br/"
+"><br/>\n"
+"Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</div>\n"
+"</t>\n"
 "        "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Tilauksesi</span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Toimiston siivouspalvelu</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hei <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Viimeinen yrityksemme tilausmaksusi prosessoimiseksi "
+"Hei <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Viimeinen yrityksemme tilausmaksusi käsittelemiseksi valitsemallasi "
 "maksutavalla\n"
-"                        <t t-out=\"ctx.get('payment_token') or ''\">TUNNUS</"
-"t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">100</t> <t t-out=\"ctx.get('currency') or ''\">$</t> epäonnistui.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Pankkisi tai luottolaitoksesi antoi seuraavat "
-"tiedot ongelmasta: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Viimeinen yrityksemme tilausmaksusi prosessoimiseksi "
-"epäonnistui, koska sinulle ei ole määritetty maksutapaa.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Koska maksusi olisi pitänyt suorittaa <strong><t t-"
+"    <t t-out=\"ctx.get('payment_token') or ''\">TOKEN</t>\n"
+"    hintaan <t t-out=\"ctx['next_invoice_amount'] or ''\">100</t> <t t-"
+"out=\"ctx.get('currency') or ''\">€</t> epäonnistui.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Pankkisi tai luottolaitoksesi antoi seuraavat tiedot ongelmaan "
+"liittyen: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Viimeinen yrityksemme tilausmaksusi käsittelemiseksi epäonnistui, koska "
+"sinulle ei ole määritetty maksutapaa.\n"
+"</t>\n"
+"<br/><br/>\n"
+"Koska maksusi olisi pitänyt suorittaa <strong><t t-"
 "out=\"ctx.get('auto_close_limit') or ''\">5</t> päivää sitten</strong>, "
 "tilauksesi on lopetettu.\n"
-"                    Ethän epäröi ottaa meihin yhteyttä, mikäli haluat "
-"ratkaista ongelman.<br/><br/>\n"
-"                    Kiitos, että valitsit <t t-out=\"company.name or "
-"''\">Yrityksesi</t>!\n"
-"                    <div t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">Yrityksesi</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yrityksesi.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.esimerkki.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Palvelun tarjoaa <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Ethän epäröi ottaa meihin yhteyttä, mikäli haluat selvittää ongelman.<br/"
+"><br/>\n"
+"Kiitos, että valitsit <t t-out=\"company.name or ''\">YrityksesiNimi</t>!\n"
+"<div t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</div>\n"
+"</t>\n"
 "        "
 
 #. module: sale_subscription
 #: model:mail.template,body_html:sale_subscription.email_payment_reminder
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Your Subscription</"
-"span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Office Cleaning Service</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hello <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        We were unable to process a payment for your "
-"subscription using your payment method\n"
-"                        <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">10</t> <t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Your bank or credit institution gave the "
-"following details about the issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Your subscription <t t-out=\"ctx.get('code') or "
-"''\">CODE</t> is due for renewal but we haven’t received your payment yet. "
-"To keep your subscription active, please make your payment as soon as "
-"possible.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Your subscription <t t-out=\"ctx.get('code') or "
-"''\">CODE</t> is still valid but will be <strong>suspended</strong>\n"
-"                    on <t t-out=\"format_date(ctx.get('date_close')) or "
-"''\">05/05/2021</t><br/>\n"
-"                    <div style=\"margin: 16px 0px; text-align: center;\">\n"
-"                        <a t-attf-href=\"{{ ctx.get('payment_link', "
-"object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; padding: "
-"10px 30px; text-decoration: none; background-color: "
-"{{company.email_secondary_color or '#875A7B'}}; color: "
-"{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
-"                            Pay Now\n"
-"                        </a>\n"
-"                    </div>\n"
-"                    <br/>\n"
-"                    If you have any questions, do not hesitate to contact us."
+"Hello <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    We were unable to process a payment for your subscription using your "
+"payment method\n"
+"    <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
+"    for <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+"out=\"ctx.get('currency_name') or ''\">$</t>.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Your bank or credit institution gave the following details about the "
+"issue: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> is "
+"due for renewal but we haven’t received your payment yet. To keep your "
+"subscription active, please make your payment as soon as possible.\n"
+"</t>\n"
 "<br/><br/>\n"
-"                    Thank you for choosing <t t-out=\"company.name or "
-"''\">YourCompany</t>!\n"
-"                    <div>\n"
-"                    <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </t>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yourcompany.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.example.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Your subscription <t t-out=\"object.client_order_ref or ''\">CODE</t> will "
+"be <strong>suspended</strong>\n"
+"<t t-out=\"(ctx.get('date_close') and ('on ' + "
+"format_date(ctx.get('date_close')))) or 'soon'\">05/05/2021</t>\n"
+"if payment is not received.<br/>\n"
+"<div style=\"margin: 16px 0px; text-align: center;\">\n"
+"    <a t-attf-href=\"{{ ctx.get('payment_link', object.get_portal_url()) }}"
+"\" t-attf-style=\"display: inline-block; padding: 10px 30px; text-"
+"decoration: none; background-color: {{company.email_secondary_color or "
+"'#875A7B'}}; color: {{company.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
+"        Pay Now\n"
+"    </a>\n"
+"</div>\n"
+"<br/>\n"
+"If you have any questions, do not hesitate to contact us.<br/><br/>\n"
+"Thank you for choosing <t t-out=\"company.name or ''\">YourCompany</t>!\n"
+"<div>\n"
+"<t t-if=\"user.signature\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</t>\n"
+"</div>\n"
+"</t>\n"
 "        "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
-"align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"padding: 16px; background-color: white; color: #454748; border-"
-"collapse:separate;\">\n"
-"<tbody>\n"
-"    <!-- HEADER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id or "
+"<t>\n"
+"<t t-set=\"company\" t-value=\"object.company_id or "
 "object.user_id.company_id or user.company_id\"/>\n"
-"                    <span style=\"font-size: 10px;\">Tilauksesi</span><br/>\n"
-"                    <span style=\"font-size: 20px; font-weight: bold;\" t-"
-"out=\"object.name or ''\">Toimiston siivouspalvelu</span>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
-"company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
-"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
-"alt=\"company.name\"/>\n"
-"                </td></tr>\n"
-"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- CONTENT -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
-"0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Hei <t t-out=\"object.partner_id.name or ''\">Brandon "
-"Freeman</t>,<br/><br/>\n"
-"                    <t t-if=\"ctx.get('payment_token') and "
-"ctx.get('next_invoice_amount')\">\n"
-"                        Emme onnistuneet prosessoimaan tilausmaksuasi "
-"valitsemallasi maksutavalla\n"
-"                        <t t-out=\"ctx['payment_token'] or ''\">TUNNUS</t>\n"
-"                        for <t t-out=\"ctx['next_invoice_amount'] or "
-"''\">10</t> <t t-out=\"ctx.get('currency_name') or ''\">$</t>.\n"
-"                        <t t-if=\"ctx.get('error')\">\n"
-"                            Pankkisi tai luottolaitoksesi antoi seuraavat "
-"tiedot ongelmaan liittyen: <pre t-out=\"ctx['error'] or ''\"/>.\n"
-"                        </t>\n"
-"                    </t>\n"
-"                    <t t-else=\"\">\n"
-"                        Tilauksesi <t t-out=\"ctx.get('code') or ''\">KOODI</"
-"t> on uusittava, mutta emme ole vielä vastaanottaneet maksuasi. Suorita "
-"maksu mahdollisimman pian pitääksesi tilauksesi aktiivisena.\n"
-"                    </t>\n"
-"                    <br/><br/>\n"
-"                    Tilauksesi <t t-out=\"ctx.get('code') or ''\">KOODI</t> "
-"on yhä voimassa, mutta <strong>se keskeytetään</strong>\n"
-"                     <t t-out=\"format_date(ctx.get('date_close')) or "
-"''\">05/05/2021</t><br/>\n"
-"                    <div style=\"margin: 16px 0px; text-align: center;\">\n"
-"                        <a t-attf-href=\"{{ ctx.get('payment_link', "
-"object.get_portal_url()) }}\" t-attf-style=\"display: inline-block; padding: "
-"10px 30px; text-decoration: none; background-color: "
-"{{company.email_secondary_color or '#875A7B'}}; color: "
-"{{company.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">\n"
-"                            Maksa nyt\n"
-"                        </a>\n"
-"                    </div>\n"
-"                    <br/>\n"
-"                    Ethän epäröi ottaa meihin yhteyttä, mikäli sinulla on "
-"kysyttävää.<br/><br/>\n"
-"                    Kiitos, että valitsit <t t-out=\"company.name or "
-"''\">YrityksenNimi</t>!\n"
-"                    <div>\n"
-"                    <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                        <br/><br/>\n"
-"                        <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"                    </t>\n"
-"                    </div>\n"
-"                </td></tr>\n"
-"                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-"
-"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
-"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"    <!-- FOOTER -->\n"
-"    <tr>\n"
-"        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
-"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
-"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
-"                <tr><td valign=\"middle\" align=\"left\">\n"
-"                    <t t-out=\"company.name or ''\">Yrityksesi</t>\n"
-"                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
-"0.7;\">\n"
-"                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
-"|\n"
-"                    </t>\n"
-"                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
-"''\">info@yrityksesi.com</a> |\n"
-"                    </t>\n"
-"                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
-"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
-"''\">http://www.esimerkki.com</a>\n"
-"                    </t>\n"
-"                </td></tr>\n"
-"            </table>\n"
-"        </td>\n"
-"    </tr>\n"
-"</tbody>\n"
-"</table>\n"
-"</td></tr>\n"
-"<!-- POWERED BY -->\n"
-"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
-"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Palvelun tarjoaa <a target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=mail\" t-attf-style=\"color: "
-"{{company.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"      </td></tr>\n"
-"    </table>\n"
-"</td></tr>\n"
-"</table>\n"
+"Hei <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,<br/><br/"
+">\n"
+"<t t-if=\"ctx.get('payment_token') and ctx.get('next_invoice_amount')\">\n"
+"    Tilausmaksusi käsittely ei onnistunut valitsemallasi maksutavalla\n"
+"    <t t-out=\"ctx['payment_token'] or ''\">TOKEN</t>\n"
+"    for <t t-out=\"ctx['next_invoice_amount'] or ''\">10</t> <t t-"
+"out=\"ctx.get('currency_name') or ''\">€</t>.\n"
+"    <t t-if=\"ctx.get('error')\">\n"
+"        Pankkisi tai luottolaitoksesi antoi seuraavat tiedot ongelmaan "
+"liittyen: <pre t-out=\"ctx['error'] or ''\"/>.\n"
+"    </t>\n"
+"</t>\n"
+"<t t-else=\"\">\n"
+"    Tilauksesi <t t-out=\"object.client_order_ref or ''\">KOODI</t> on "
+"uusittava, mutta emme ole vielä saaneet maksua. Suoritathan maksun "
+"mahdollisimman pian, mikäli haluat pitää tilauksesi aktiivisena.\n"
+"</t>\n"
+"<br/><br/>\n"
+"Tilauksesi <t t-out=\"object.client_order_ref or ''\">KOODI</t> "
+"<strong>keskeytetään</strong>\n"
+"<t t-out=\"(ctx.get('date_close') and ('on ' + "
+"format_date(ctx.get('date_close')))) or 'soon'\">05.05.2021</t>,\n"
+"jos maksua ei ole vastaanotettu.<br/>\n"
+"<div style=\"margin: 16px 0px; text-align: center;\">\n"
+"    <a t-attf-href=\"{{ ctx.get('payment_link', object.get_portal_url()) }}"
+"\" t-attf-style=\"display: inline-block; padding: 10px 30px; text-"
+"decoration: none; background-color: {{company.email_secondary_color or "
+"'#875A7B'}}; color: {{company.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
+"        Maksa nyt\n"
+"    </a>\n"
+"</div>\n"
+"<br/>\n"
+"Ethän epäröi ottaa meihin yhteyttä, mikäli sinulla on kysyttävää.<br/><br/>\n"
+"Kiitos, että valitsit <t t-out=\"company.name or ''\">YrityksesiNimi</t>!\n"
+"<div>\n"
+"<t t-if=\"user.signature\">\n"
+"    <br/><br/>\n"
+"    <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"user.signature or ''\">Mitchell Admin</t></div>\n"
+"</t>\n"
+"</div>\n"
+"</t>\n"
 "        "
 
 #. module: sale_subscription
@@ -1320,11 +877,6 @@ msgstr "ARR-muutos (normalisoitu)"
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__allow_one_time_sale
 msgid "Accept One-Time"
 msgstr "Hyväksy kerran"
-
-#. module: sale_subscription
-#: model:ir.model,name:sale_subscription.model_account_move_send
-msgid "Account Move Send"
-msgstr "Lähetä tilikirjaus"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_needaction
@@ -1484,6 +1036,11 @@ msgstr "Päivämääränä"
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_attachment_count
 msgid "Attachment Count"
 msgstr "Liitteiden määrä"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
+msgid "Attributes"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__authorized
@@ -1656,13 +1213,6 @@ msgid "Campaign"
 msgstr "Kampanja"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_change_customer_view_form
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
-msgid "Cancel"
-msgstr "Peruuta"
-
-#. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log_report__state__cancel
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_cancel
 msgid "Cancelled"
@@ -1679,6 +1229,13 @@ msgstr ""
 "Laskutetun tilauksen peruminen ei olisi reilua asiakasta kohtaan. Kun lasku "
 "on luotu – ja mahdollisesti jo maksettu – asia on loppuun käsitelty. "
 "Tilauksen peruminen aiheuttaisi takuulla vain sekaannusta!"
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
+msgid ""
+"Cannot close %(subscriptions_name)s: subscription order with recurring plan."
+msgstr ""
 
 #. module: sale_subscription
 #: model:product.template,name:sale_subscription.product_car_leasing_product_template
@@ -1731,6 +1288,11 @@ msgid "Choose a product name.<br/><i>(e.g. eLearning Access)</i>"
 msgstr "Valitse tuotenimi.<br/><i>(esim. Access verkko-opinnot)</i>"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
+msgid "Choose a reason..."
+msgstr ""
+
+#. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Choose the invoice duration for your subscription"
@@ -1767,6 +1329,7 @@ msgid "Closable"
 msgstr "Suljettavissa"
 
 #. module: sale_subscription
+#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_close_reason_wizard_action
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_so_portal_template
@@ -1774,7 +1337,11 @@ msgid "Close"
 msgstr "Sulje"
 
 #. module: sale_subscription
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_close_reason_wizard_action
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_date
+msgid "Close Date"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__close_reason_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__close_reason_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_close_reason_wizard__close_reason_id
@@ -1795,6 +1362,12 @@ msgstr "Lopettamisen syyt"
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
 msgid "Close Subscription"
 msgstr "Lopeta tilaus"
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Close the recurring plan dropdown."
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__user_closable_options
@@ -1822,6 +1395,36 @@ msgstr "Sulkeminen"
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid "Closing text: %s"
 msgstr "Lopputeksti: %s"
+
+#. module: sale_subscription
+#: model:ir.model.fields,help:sale_subscription.field_res_config_settings__no_token_reminder_days
+msgid ""
+"Comma-separated list of day offsets relative to the next invoice date (e.g. "
+"0,1,2,7,14,-2,-7,-14) on which a payment reminder is sent for subscriptions "
+"with no saved payment token."
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
+msgid ""
+"Comma-separated list of day offsets relative to the next invoice date (e.g. "
+"0,1,2,7,14,-2,-7,-14) on which a reminder is sent for subscriptions with no "
+"saved payment token."
+msgstr ""
+
+#. module: sale_subscription
+#: model:ir.model.fields,help:sale_subscription.field_res_config_settings__payment_failed_reminder_days
+msgid ""
+"Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
+"reminder email is sent when an automatic payment with a saved token fails."
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.res_config_settings_view_form
+msgid ""
+"Comma-separated list of days after the invoice date (e.g. 2,7,14) on which a "
+"reminder is sent when an automatic payment fails."
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__commercial_partner_id
@@ -2036,6 +1639,11 @@ msgid "Customer State"
 msgstr "Asiakkaan tila"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_tag_ids
+msgid "Customer Tags"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__partner_zip
 msgid "Customer ZIP"
 msgstr "Asiakkaan postinumero"
@@ -2065,11 +1673,6 @@ msgstr ""
 "ensimmäisen kerran."
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Date:"
-msgstr "Päiväys:"
-
-#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Days"
 msgstr "Päivää"
@@ -2091,14 +1694,60 @@ msgid "Define if the subscription product can also be bought as a one-time."
 msgstr "Määritä, voidaanko tilaustuote myös ostaa kertaluontoisesti."
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s months"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s weeks"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every %s years"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every month"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every week"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_subscription_plan.py:0
+msgid "Deliver every year"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
 msgid "Delivery Address"
 msgstr "Toimitusosoite"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__delivery_period_display
+msgid "Delivery Period Display"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Details"
 msgstr "Tiedot"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
+msgid "Discard"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_template
@@ -2131,6 +1780,7 @@ msgstr "Näytä myöhässä olevat"
 #: model:ir.model.fields,field_description:sale_subscription.field_payment_transaction__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__display_name
+#: model:ir.model.fields,field_description:sale_subscription.field_product_product__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__display_name
@@ -2181,6 +1831,11 @@ msgid "Draft"
 msgstr "Luonnos"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Due"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template__duration_unit
 msgid "Duration Unit"
 msgstr "Keston yksikkö"
@@ -2202,7 +1857,8 @@ msgid ""
 "Email template used to send invoicing email automatically.\n"
 "Leave it empty if you don't want to send email automatically."
 msgstr ""
-"Sähköpostipohja laskutussähköpostin automaattiseen lähettämiseen.\n"
+"Sähköpostimalli, jota käytetään laskutussähköpostin automaattiseen "
+"lähettämiseen.\n"
 "Jätä tyhjäksi, jos et halua lähettää sähköpostia automaattisesti."
 
 #. module: sale_subscription
@@ -2227,11 +1883,6 @@ msgid "End Date"
 msgstr "Päättymispäivä"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "End Date:"
-msgstr "Päättymispäivä:"
-
-#. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_end_of_contract
 msgid "End of contract"
 msgstr "Sopimuksen päättyminen"
@@ -2244,11 +1895,8 @@ msgstr "Kauden loppu"
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
-msgid ""
-"Error during renewal of contract %(order_ids)s %(order_refs)s %"
-"(payment_state)s"
+msgid "Error during renewal of contract %(order_ids)s %(order_refs)s"
 msgstr ""
-"Virhe sopimuksen uusimisessa %(order_ids)s %(order_refs)s %(payment_state)s"
 
 #. module: sale_subscription
 #. odoo-python
@@ -2276,9 +1924,9 @@ msgid "Expansion"
 msgstr "Laajennus"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Expiration Date:"
-msgstr "Vanhentumispäivä:"
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__purchase_price
+msgid "Expected Cost"
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -2315,12 +1963,6 @@ msgid "First contract date"
 msgstr "Ensimmäinen sopimuspäivä"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_product_product__subscription_rule_ids_fixed
-#: model:ir.model.fields,field_description:sale_subscription.field_product_template__subscription_rule_ids_fixed
-msgid "Fixed Subscription Pricings"
-msgstr "Kiinteät tilaushinnat"
-
-#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_follower_ids
 msgid "Followers"
 msgstr "Seuraajat"
@@ -2332,6 +1974,12 @@ msgstr "Seuraajat (kumppanit)"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+msgid "For"
+msgstr ""
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "From"
 msgstr "Alkaa"
 
@@ -2349,6 +1997,11 @@ msgstr "Tulevat toimenpiteet"
 #: model:ir.model,name:sale_subscription.model_payment_link_wizard
 msgid "Generate Sales Payment Link"
 msgstr "Luo myynnin maksulinkki"
+
+#. module: sale_subscription
+#: model:ir.module.module,summary:base.module_sale_subscription
+msgid "Generate recurring invoices and manage renewals"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-javascript
@@ -2406,7 +2059,6 @@ msgstr "Täältä löydät tilaukset, joiden uusiminen on myöhässä."
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
 msgid "History"
 msgstr "Historia"
 
@@ -2431,6 +2083,7 @@ msgstr "En käytä sitä"
 #: model:ir.model.fields,field_description:sale_subscription.field_payment_transaction__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__id
+#: model:ir.model.fields,field_description:sale_subscription.field_product_product__id
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__id
 #: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__id
@@ -2479,7 +2132,6 @@ msgstr ""
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_product_product__recurring_invoice
 #: model:ir.model.fields,help:sale_subscription.field_product_template__recurring_invoice
-#: model:ir.model.fields,help:sale_subscription.field_sale_order_line__recurring_invoice
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_template_line__recurring_invoice
 msgid ""
 "If set, confirming a sale order with this product will create a subscription"
@@ -2488,8 +2140,10 @@ msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_line__pricelist_id
-msgid "If you change the pricelist, only newly added lines will be affected."
-msgstr "Hinnaston muuttaminen vaikuttaa ainoastaan uusiin riveihin."
+msgid ""
+"If you change the pricelist, the prices of all order lines will be updated "
+"accordingly."
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
@@ -2546,7 +2200,7 @@ msgstr "Virheellinen käyttöoikeustunniste."
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__invoice_mail_template_id
 msgid "Invoice Email Template"
-msgstr "Laskun sähköpostipohja"
+msgstr "Laskun sähköpostimalli"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__line_invoice_status
@@ -2722,12 +2376,6 @@ msgstr "Lisätään hinta valittuun toistuvuuteen"
 #. module: sale_subscription
 #. odoo-javascript
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
-msgid "Let's choose the customer for your subscription"
-msgstr "Valitaan asiakas tilausta varten"
-
-#. module: sale_subscription
-#. odoo-javascript
-#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Let's go to the catalog to create our first subscription product"
 msgstr "Siirrymme luetteloon luodaksemme ensimmäisen tilaustuotteemme"
 
@@ -2737,6 +2385,8 @@ msgid "Log Currency"
 msgstr "Kirjaa valuutta"
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_monthly
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_sale_order_log_growth_tree
@@ -2797,7 +2447,7 @@ msgid "MRR:"
 msgstr "kuukausittain toistuva laskutus:"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_subscription
+#: model:portal.entry,description:sale_subscription.portal_subscription_entry
 msgid "Manage your subscriptions"
 msgstr "Hallitse tilauksiasi"
 
@@ -2828,6 +2478,11 @@ msgid "Margin"
 msgstr "Myyntikate"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__margin_percent
+msgid "Margin (%)"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__medium_id
 msgid "Medium"
 msgstr "Mediatyyppi"
@@ -2845,7 +2500,7 @@ msgstr "Viesti"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_has_error
 msgid "Message Delivery error"
-msgstr "Ongelma viestin toimituksessa"
+msgstr "Viestin toimitusvirhe"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__message_ids
@@ -2867,6 +2522,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Monthly"
 msgstr "Kuukausittain"
+
+#. module: sale_subscription
+#: model:sale.order.template,name:sale_subscription.monthly_template
+msgid "Monthly Cleaning"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_monthly
@@ -3012,6 +2672,13 @@ msgid "No valid Payment Method"
 msgstr "Ei voimassa olevaa maksutapaa"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__no_token_reminder_days
+msgid "No-token payment reminder days"
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 msgid "Non Recurring"
 msgstr "Ei toistuva"
@@ -3104,11 +2771,6 @@ msgid "Optional Plans"
 msgstr "Valinnaiset tilaussuunnitelmat"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Options"
-msgstr "Vaihtoehdot"
-
-#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__order_reference
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -3126,9 +2788,14 @@ msgid "Order Invoice Status"
 msgstr "Tilauksen laskun tila"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__line_name
+msgid "Order Line Name"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__name
 msgid "Order Reference"
-msgstr "Tilauksen viite"
+msgstr "Tilausviite"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
@@ -3136,9 +2803,9 @@ msgid "Order Status"
 msgstr "Tilauksen tila"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "Orders"
-msgstr "Tilaukset"
+#: model:ir.model,name:sale_subscription.model_sale_order_template
+msgid "Order Templates"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__origin_order_id
@@ -3260,16 +2927,9 @@ msgid "Payment Transaction"
 msgstr "Maksutapahtuma"
 
 #. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid "Payment not recorded"
-msgstr "Maksua ei ole kirjattu"
-
-#. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid "Payment recorded: %s"
-msgstr "Maksu kirjattu: %s"
+#: model:ir.model.fields,field_description:sale_subscription.field_res_config_settings__payment_failed_reminder_days
+msgid "Payment failure reminder days"
+msgstr ""
 
 #. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.email_payment_reminder
@@ -3297,15 +2957,19 @@ msgstr "Vireillä oleva tapahtuma"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__plan_id
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__plan_id
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_list_multi_edit
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_log_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 msgid "Plan"
-msgstr "Suunnittele"
+msgstr "Suunnitelma"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Plan:"
-msgstr "Tilaus:"
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/product/product.xml:0
+msgid "Plan not available"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -3363,7 +3027,7 @@ msgid "Portal: retention step"
 msgstr "Portaali: pidätysvaihe"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
 msgid "Price"
 msgstr "Hinta"
@@ -3408,19 +3072,11 @@ msgid "Product Category"
 msgstr "Tuoteryhmä"
 
 #. module: sale_subscription
+#: model:ir.model,name:sale_subscription.model_product_product
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__product_id
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
 msgid "Product Variant"
-msgstr "Tuotevariaatio"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Product Variants"
-msgstr "Tuotevariaatiot"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sale_order_line_list
-msgid "Product Varient"
 msgstr "Tuotevariantti"
 
 #. module: sale_subscription
@@ -3429,6 +3085,11 @@ msgstr "Tuotevariantti"
 #: model:ir.ui.menu,name:sale_subscription.product_menu_catalog
 msgid "Products"
 msgstr "Tuotteet"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Prorated"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__allow_prorated_price
@@ -3469,8 +3130,6 @@ msgid "Quantity"
 msgstr "Määrä"
 
 #. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order__subscription_state__1_draft
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log__subscription_state__1_draft
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_order_log_report__state__draft
@@ -3485,7 +3144,6 @@ msgid "Quotation Sent"
 msgstr "Myyntitarjous lähetetty"
 
 #. module: sale_subscription
-#: model:ir.model,name:sale_subscription.model_sale_order_template
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 msgid "Quotation Template"
 msgstr "Tarjouspohja"
@@ -3498,7 +3156,7 @@ msgstr "Tarjouspohjarivi"
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_digest
 msgid "Quotation Template:"
-msgstr "Tarjousmalli:"
+msgstr "Tarjouspohja:"
 
 #. module: sale_subscription
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_template_action
@@ -3552,7 +3210,7 @@ msgstr "Arvioiden määrä"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__rating_ids
 msgid "Ratings"
-msgstr "Arviointi"
+msgstr "Arvostelut"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_close_reason__name
@@ -3561,8 +3219,9 @@ msgid "Reason"
 msgstr "Syy"
 
 #. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__is_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_view_search_inherit
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_tree
 #: model_terms:ir.ui.view,arch_db:sale_subscription.view_order_product_search_inherit
@@ -3576,9 +3235,9 @@ msgid "Recurring Amount"
 msgstr "Toistuva määrä"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order__recurring_details
-msgid "Recurring Details"
-msgstr "Toistuvat tiedot"
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
+msgid "Recurring Invoice"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist_item__plan_id
@@ -3594,23 +3253,12 @@ msgid "Recurring Plan"
 msgstr "Toistuva suunnitelma"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "Recurring Plan:"
-msgstr "Toistuva suunnitelma:"
-
-#. module: sale_subscription
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_plan_action
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_plans
 msgid "Recurring Plans"
 msgstr "Toistuvat suunnitelmat"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
-msgid "Recurring Prices"
-msgstr "Toistuvat hinnat"
-
-#. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_product_pricelist__subscription_item_ids
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__subscription_rule_ids
 msgid "Recurring Pricing"
 msgstr "Toistuva hinnoittelu"
@@ -3618,7 +3266,22 @@ msgstr "Toistuva hinnoittelu"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_total
 msgid "Recurring Revenue"
-msgstr "Toistuvat tulot"
+msgstr "Toistuva liikevaihto"
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"Recurring order with this product will be invoiced at the beginning of the "
+"period."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"Recurring order with this product will be invoiced at the end of the period."
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -3630,16 +3293,6 @@ msgid ""
 msgstr ""
 "Toistuvan jakson on oltava positiivinen luku. Varmista, että syötetty arvo "
 "on kelvollinen positiivinen numeroarvo."
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
-msgid "Recurring prices"
-msgstr "Toistuvat hinnat"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
-msgid "Reference:"
-msgstr "Viittaus:"
 
 #. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__payment_transaction__renewal_state__cancel
@@ -3717,15 +3370,6 @@ msgstr "Avaa tilauksesi uudelleen"
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_report
 msgid "Reporting"
 msgstr "Raportointi"
-
-#. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
-msgid ""
-"Request a online payment from the customer to confirm the order. For a "
-"subscription, a payment will be required also before each renewal"
-msgstr ""
-"Pyydä asiakkaalta verkkomaksua tilauksen vahvistamiseksi. Jos kyseessä on "
-"tilaus, maksu vaaditaan myös ennen jokaista uusimista"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
@@ -3870,6 +3514,12 @@ msgid "Save"
 msgstr "Tallenna"
 
 #. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Save your subscription."
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
 msgid "Search Sales Order"
 msgstr "Hae myyntitilausta"
@@ -3884,6 +3534,18 @@ msgstr "Hae mallipohjaa"
 #: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
 msgid "Select a recurring product"
 msgstr "Valitse toistuva tuote"
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Select this product."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-javascript
+#: code:addons/sale_subscription/static/src/js/tours/sale_subscription.js:0
+msgid "Select this recurring plan."
+msgstr ""
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_view_form
@@ -3906,12 +3568,6 @@ msgid "Send Mail (manual payment)"
 msgstr "Lähetä posti (manuaalinen maksu)"
 
 #. module: sale_subscription
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_act_window_sms_composer_multi
-#: model:ir.actions.act_window,name:sale_subscription.sale_subscription_act_window_sms_composer_single
-msgid "Send an SMS Text Message"
-msgstr "Lähetä tekstiviesti"
-
-#. module: sale_subscription
 #: model:mail.template,description:sale_subscription.email_payment_close
 msgid ""
 "Sent to customer to indicate that subscription is automatically terminated"
@@ -3930,7 +3586,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_close_reason__sequence
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__sequence
 msgid "Sequence"
-msgstr "Järjestys"
+msgstr "Sekvenssi"
 
 #. module: sale_subscription
 #: model:mail.template,description:sale_subscription.mail_template_subscription_rating
@@ -3952,9 +3608,14 @@ msgid "Settings"
 msgstr "Asetukset"
 
 #. module: sale_subscription
+#: model:ir.model,name:sale_subscription.model_account_move_send
+msgid "Shared Send Invoice Wizard Functions"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order__starred
 msgid "Show Subscription on dashboard"
-msgstr "Näytä tilaus koontinäytöllä"
+msgstr "Näytä tilaus kojelaudalla"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
@@ -3972,18 +3633,27 @@ msgstr "Lähde"
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__subscription_start_date
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_sales_order_line_filter
 msgid "Start Date"
-msgstr "Alkupäivä"
+msgstr "Aloituspäivä"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_digest
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
 msgid "Start Date:"
-msgstr "Alkupäivämäärä:"
+msgstr "Aloituspäivä:"
+
+#. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
+msgid "Started"
+msgstr ""
 
 #. module: sale_subscription
 #: model:mail.message.subtype,name:sale_subscription.subtype_state_change
 msgid "State Change"
 msgstr "Vaiheen muutos"
+
+#. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
+msgid "State before"
+msgstr ""
 
 #. module: sale_subscription
 #. odoo-python
@@ -4109,17 +3779,11 @@ msgid "Subscription Logs"
 msgstr "Tilauslokit"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "Subscription Manager:"
-msgstr "Tilausten hallinta:"
-
-#. module: sale_subscription
 #: model:ir.model,name:sale_subscription.model_sale_subscription_plan
 msgid "Subscription Plan"
 msgstr "Kestotilaus"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_view
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_plan_view_form
 msgid "Subscription Pricelist Rules"
 msgstr "Tilausten hinnastosäännöt"
@@ -4133,7 +3797,6 @@ msgstr "Tilaushinnoittelu"
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_product_product__recurring_invoice
 #: model:ir.model.fields,field_description:sale_subscription.field_product_template__recurring_invoice
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__recurring_invoice
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_template_line__recurring_invoice
 msgid "Subscription Product"
 msgstr "Toistuvaislaskutettava tilaustuote"
@@ -4145,7 +3808,6 @@ msgstr "Tilaustarjous"
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log__subscription_state
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_log_report__subscription_state
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__subscription_state
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 msgid "Subscription State"
@@ -4196,19 +3858,9 @@ msgid "Subscription will be paused from %(date_from)s to %(date_to)s."
 msgstr "Tilaus keskeytetään ajalle %(date_from)s - %(date_to)s."
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_order_portal_content_inherit
-msgid "Subscription:"
-msgstr "Tilaus:"
-
-#. module: sale_subscription
 #: model:mail.template,name:sale_subscription.mail_template_subscription_alert
 msgid "Subscription: Default Email Alert"
 msgstr "Tilaus: Oletussähköpostihälytys"
-
-#. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_default_alert
-msgid "Subscription: Default SMS Alert"
-msgstr "Tilaus: Tekstiviestihälytys"
 
 #. module: sale_subscription
 #: model:mail.template,name:sale_subscription.email_payment_close
@@ -4221,36 +3873,28 @@ msgid "Subscription: Payment Reminder"
 msgstr "Tilaus: Maksumuistutus"
 
 #. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_payment_failure
-msgid "Subscription: Payment failure"
-msgstr "Tilaus: Maksu epäonnistui"
-
-#. module: sale_subscription
-#: model:sms.template,name:sale_subscription.sms_template_data_payment_reminder
-msgid "Subscription: Payment reminder"
-msgstr "Tilaus: Maksumuistutus"
-
-#. module: sale_subscription
 #: model:mail.template,name:sale_subscription.mail_template_subscription_rating
 msgid "Subscription: Rating Request"
 msgstr "Tilaus: Arvostelupyyntö"
 
 #. module: sale_subscription
 #. odoo-python
-#: code:addons/sale_subscription/models/res_partner.py:0
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_action
 #: model:ir.actions.act_window,name:sale_subscription.sale_subscription_action_filtered
 #: model:ir.model.fields,field_description:sale_subscription.field_res_partner__subscription_count
 #: model:ir.model.fields,field_description:sale_subscription.field_res_users__subscription_count
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_plan__active_subs_count
+#: model:ir.module.module,shortdesc:base.module_sale_subscription
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_action
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_analysis
 #: model:ir.ui.menu,name:sale_subscription.menu_sale_subscription_root
+#: model:portal.entry,name:sale_subscription.portal_subscription_entry
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_menu_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_home_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.portal_my_subscriptions
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_pricelist_item_view_search_inherit
+#: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_only_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_search_view_inherit_sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.product_template_view_form_recurring
 #: model_terms:ir.ui.view,arch_db:sale_subscription.res_partner_view_inherit_sale_subscription
@@ -4307,7 +3951,7 @@ msgstr "Miksi olet lähdössä?"
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_report_search
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "Template"
-msgstr "Malli"
+msgstr "Mallipohja"
 
 #. module: sale_subscription
 #: model:mail.template,description:sale_subscription.mail_template_subscription_alert
@@ -4435,6 +4079,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_subscription/controllers/portal.py:0
 msgid ""
+"The payment method you selected can only pay amounts starting from %s. "
+"Please create or select another one."
+msgstr ""
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/controllers/portal.py:0
+msgid ""
 "The payment method you selected can only pay amounts up to %s. Please create "
 "or select another one."
 msgstr ""
@@ -4472,6 +4124,20 @@ msgstr "Uudistus %s on peruttu."
 #: model:ir.model.fields,help:sale_subscription.field_sale_order_line__subscription_start_date
 msgid "The start date indicate when the subscription periods begin."
 msgstr "Aloituspäivämäärä osoittaa, milloin tilausjaksot alkavat."
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
+msgid ""
+"The start date of an upsell cannot be greater or equal to the next invoice "
+"date of the subscription %s.\n"
+"You should first invoice the original subscription, use an earlier start "
+"date for the upsell or create a renewal quotation."
+msgstr ""
+"Lisämyynnin aloituspäivä ei voi olla myöhemmin tai samana päivänä kuin "
+"tilauksen seuraava laskutuspäivä %s.\n"
+"Sinun pitäisi ensin laskuttaa alkuperäinen tilaus, käyttää aikaisempaa "
+"alkamispäivää lisämyynnille tai luoda uusintatarjous."
 
 #. module: sale_subscription
 #: model:sale.order.close.reason,name:sale_subscription.close_reason_renew
@@ -4638,6 +4304,11 @@ msgid "Type of event"
 msgstr "Tapahtuman tyyppi"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__utm_reference
+msgid "UTM Reference"
+msgstr ""
+
+#. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_view_search
 msgid "Unassigned"
 msgstr "Vastuuttamaton"
@@ -4669,6 +4340,11 @@ msgid "Unpaid subscription"
 msgstr "Maksamaton tilaus"
 
 #. module: sale_subscription
+#: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_delivered_amount
+msgid "Untaxed Amount Delivered"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__untaxed_amount_invoiced
 msgid "Untaxed Amount Invoiced"
 msgstr "Laskutettu veroton summa"
@@ -4690,6 +4366,7 @@ msgstr "Verottomat yhteensä:"
 
 #. module: sale_subscription
 #: model_terms:ir.ui.view,arch_db:sale_subscription.report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_order_view_form
 msgid "Until"
 msgstr "Kunnes"
 
@@ -4754,9 +4431,9 @@ msgid "User Pause Start"
 msgstr "Käyttäjä, Keskeytä, Aloita"
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order_line__product_template_variant_value_ids
-msgid "Variant Values"
-msgstr "Varianttien arvot"
+#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+msgid "Valid until"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_order_close_reason__visible_in_portal
@@ -4831,29 +4508,29 @@ msgid "We don't want you to leave us like this."
 msgstr "Emme halua, että jätät meidät näin."
 
 #. module: sale_subscription
-#: model:ir.model.fields,field_description:sale_subscription.field_sale_order__website_message_ids
-msgid "Website Messages"
-msgstr "Verkkosivun ilmoitukset"
-
-#. module: sale_subscription
-#: model:ir.model.fields,help:sale_subscription.field_sale_order__website_message_ids
-msgid "Website communication history"
-msgstr "Verkkosivun viestihistoria"
-
-#. module: sale_subscription
 #: model:ir.model.fields.selection,name:sale_subscription.selection__sale_subscription_plan__billing_period_unit__week
 msgid "Weeks"
 msgstr "Viikot"
 
 #. module: sale_subscription
+#: model_terms:ir.ui.view,arch_db:sale_subscription.sale_subscription_close_reason_wizard_view_form
+msgid "When"
+msgstr ""
+
+#. module: sale_subscription
 #: model:ir.model.fields,help:sale_subscription.field_sale_order__starred
 msgid "Whether this subscription should be displayed on the dashboard or not"
-msgstr "Pitäisikö tämä tilaus näyttää koontinäytöllä vai ei"
+msgstr "Näytetäänkö tämä tilaus kojelaudalla"
 
 #. module: sale_subscription
 #: model:sale.subscription.plan,name:sale_subscription.subscription_plan_year
 msgid "Yearly"
-msgstr "Vuosittainen"
+msgstr "Vuosittain"
+
+#. module: sale_subscription
+#: model:sale.order.template,name:sale_subscription.yearly_template
+msgid "Yearly Cleaning"
+msgstr ""
 
 #. module: sale_subscription
 #: model:ir.model.fields,field_description:sale_subscription.field_sale_subscription_report__recurring_yearly
@@ -4892,6 +4569,16 @@ msgid ""
 msgstr ""
 "Olet sulkemassa pysyvästi tilauksen, joka on voimassa, kunnes\n"
 "                    &amp;nbsp;"
+
+#. module: sale_subscription
+#. odoo-python
+#: code:addons/sale_subscription/models/product_template.py:0
+msgid ""
+"You can not change the recurring property of this product because it has "
+"been sold already (%s)"
+msgstr ""
+"Et voi muuttaa tämän tuotteen toistuvaa ominaisuutta, koska se on jo myyty "
+"(%s)"
 
 #. module: sale_subscription
 #. odoo-python
@@ -5054,16 +4741,6 @@ msgstr "Et voi myydä tilausta eri valuutalla."
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid ""
-"You cannot upsell a subscription whose next invoice date is in the past.\n"
-"Please, invoice directly the %s contract."
-msgstr ""
-"Et voi myydä tilausta, jonka seuraava laskutuspäivä on menneisyydessä.\n"
-"Laskuta suoraan %s-sopimuksesta."
-
-#. module: sale_subscription
-#. odoo-python
-#: code:addons/sale_subscription/models/sale_order.py:0
-msgid ""
 "You cannot validate a renewal quotation starting before the next invoice "
 "date of the parent contract. Please update the start date after the %s."
 msgstr ""
@@ -5085,7 +4762,8 @@ msgstr ""
 "                    oli se sitten varasto-, kulutus- tai palvelutuote."
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_content
+#. odoo-python
+#: code:addons/sale_subscription/models/sale_order.py:0
 msgid "Your Subscription"
 msgstr "Tilauksesi"
 
@@ -5168,11 +4846,6 @@ msgid "next_invoice_date"
 msgstr "next_invoice_date"
 
 #. module: sale_subscription
-#: model_terms:ir.ui.view,arch_db:sale_subscription.subscription_portal_sidebar
-msgid "on"
-msgstr "on"
-
-#. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_order.py:0
 msgid "order_id"
@@ -5206,13 +4879,13 @@ msgstr "kuukausittain"
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "per week"
-msgstr "viikottain"
+msgstr "per viikko"
 
 #. module: sale_subscription
 #. odoo-python
 #: code:addons/sale_subscription/models/sale_subscription_plan.py:0
 msgid "per year"
-msgstr "vuodessa"
+msgstr "per vuosi"
 
 #. module: sale_subscription
 #. odoo-python
@@ -5261,17 +4934,6 @@ msgid "until"
 msgstr "aina saakka"
 
 #. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_payment_failure
-msgid ""
-"{{ object.company_id.name }}: Our final attempt to process a payment for "
-"your subscription failed. As your payment should have been made on "
-"{{ object.next_invoice_date }}, your subscription has been terminated."
-msgstr ""
-"{{ object.company_id.name }}: Viimeinen yrityksemme käsitellä tilauksesi "
-"maksua epäonnistui. Koska maksusi on pitänyt suorittaa "
-"{{ object.next_invoice_date }}, tilauksesi on päättynyt."
-
-#. module: sale_subscription
 #: model:mail.template,subject:sale_subscription.mail_template_subscription_alert
 msgid ""
 "{{ object.company_id.name }}: Please check the subscription {{ object.name }}"
@@ -5282,941 +4944,5 @@ msgstr "{{ object.company_id.name }}: Tarkista tilaus {{ object.name }}"
 msgid "{{ object.company_id.name }}: Service Rating Request"
 msgstr "{{ object.company_id.name }}: Palvelun luokituspyyntö"
 
-#. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_payment_reminder
-msgid ""
-"{{ object.company_id.name }}: We were unable to process a payment for your "
-"subscription. Your subscription {{ object.name }} is still valid but will be "
-"suspended on {{ object.next_invoice_date }} unless the payment succeeds in "
-"the meantime."
-msgstr ""
-"{{ object.company_id.name }}: Emme pystyneet käsittelemään tilauksenne "
-"maksua. Tilauksesi {{ object.name }} on edelleen voimassa, mutta se "
-"keskeytetään {{ object.next_invoice_date }}, ellei maksu onnistu sillä välin."
-
-#. module: sale_subscription
-#: model:sms.template,body:sale_subscription.sms_template_data_default_alert
-msgid ""
-"{{ object.company_id.name }}: Your subscription {{ object.name }} needs your "
-"attention. If you have some concerns about it, please contact "
-"{{ object.user_id.name }}, your contact person."
-msgstr ""
-"{{ object.company_id.name }}: {{ object.name }} tarvitsee huomiotasi. Jos "
-"sinulla on siihen liittyviä huolenaiheita, ota yhteyttä yhteyshenkilöösi "
-"{{ object.user_id.name }}."
-
-#~ msgid "Applied On"
-#~ msgstr "Pätee"
-
-#~ msgid "%s to %s"
-#~ msgstr ""
-#~ "\n"
-#~ "%s - %s"
-
-#~ msgid "(Wrong address?)"
-#~ msgstr "(Väärä osoite?)"
-
-#~ msgid "3 Months"
-#~ msgstr "3 Kuukautta"
-
-#~ msgid ""
-#~ "<b>Congratulations</b>, your first subscription quotation is ready to be "
-#~ "sent!"
-#~ msgstr ""
-#~ "<b>Onneksi olkoon</b>, ensimmäinen tilaustarjouksesi on valmis "
-#~ "lähetettäväksi!"
-
-#~ msgid "<i class=\"fa fa-comment\"/> Send message"
-#~ msgstr "<i class=\"fa fa-comment\"/> Lähetä viesti"
-
-#~ msgid "<i class=\"fa fa-download\"/> Download"
-#~ msgstr "<i class=\"fa fa-download\"/> Lataa"
-
-#~ msgid "<i class=\"fa fa-print\"/> Print"
-#~ msgstr "<i class=\"fa fa-print\"/> Tulosta"
-
-#~ msgid "<small class=\"text-muted\">Subscription -</small>"
-#~ msgstr "<small class=\"text-muted\">Tilaus -</small>"
-
-#~ msgid "<span class=\"align-middle\">for this subscription.</span>"
-#~ msgstr "<span class=\"align-middle\">tätä tilausta varten.</span>"
-
-#~ msgid "<span>Disc.%</span>"
-#~ msgstr "<span>Ale%</span>"
-
-#~ msgid "<strong class=\"mr16\">Subtotal</strong>"
-#~ msgstr "<strong class=\"mr16\">Välisumma</strong>"
-
-#~ msgid "<strong class=\"text-muted\">Subscription Manager:</strong>"
-#~ msgstr "<strong class=\"text-muted\">Tilaushallinta:</strong>"
-
-#~ msgid ""
-#~ "<strong>\n"
-#~ "                            Recurrency\n"
-#~ "                        </strong>"
-#~ msgstr ""
-#~ "<strong>\n"
-#~ "                            Uusiutuminen\n"
-#~ "                        </strong>"
-
-#~ msgid "<strong> and </strong>"
-#~ msgstr "<strong> ja </strong>"
-
-#~ msgid "<strong>Next Billing Amount:</strong>"
-#~ msgstr "<strong>Seuraavan laskun summa:</strong>"
-
-#~ msgid "<strong>Recurrence:</strong>"
-#~ msgstr "<strong>Uusiutuminen:</strong>"
-
-#~ msgid "<strong>Subtotal</strong>"
-#~ msgstr "<strong>Välisumma</strong>"
-
-#~ msgid "<strong>to</strong>"
-#~ msgstr "<strong>saakka</strong>"
-
-#~ msgid ""
-#~ "A code server action can be executed from the website, using a dedicated "
-#~ "controller. The address is <base>/website/action/<website_path>. Set this "
-#~ "field as True to allow users to run this action. If it is set to False "
-#~ "the action cannot be run through the website."
-#~ msgstr ""
-#~ "Koodipalvelintoiminto voidaan suorittaa verkkosivustolta erillisen "
-#~ "ohjaimen avulla. Osoite on <base>/website/action/<website_path>. Aseta "
-#~ "tämän kentän arvoksi True, jotta käyttäjät voivat suorittaa tämän "
-#~ "toiminnon. Jos sen arvo on False, toimintoa ei voida suorittaa "
-#~ "verkkosivuston kautta."
-
-#~ msgid "Action"
-#~ msgstr "Toiminto"
-
-#~ msgid "Action Description"
-#~ msgstr "Toiminnon kuvaus"
-
-#~ msgid "Action Name"
-#~ msgstr "Toiminnon nimi"
-
-#~ msgid "Action To Do"
-#~ msgstr "Tehtävät"
-
-#~ msgid "Action Type"
-#~ msgstr "Toiminnon tyyppi"
-
-#~ msgid "Activity"
-#~ msgstr "Toimenpide"
-
-#~ msgid "Activity User Type"
-#~ msgstr "Toiminnon käyttäjätyyppi"
-
-#~ msgid "Add Followers"
-#~ msgstr "Lisää seuraajia"
-
-#~ msgid "Amount:"
-#~ msgstr "Määrä:"
-
-#~ msgid "Analytic Account"
-#~ msgstr "Kustannuspaikka"
-
-#~ msgid "Apply on"
-#~ msgstr "Aseta"
-
-#~ msgid "Archived Product"
-#~ msgstr "Arkistoitu tuote"
-
-#~ msgid "Archived Products"
-#~ msgstr "Arkistoidut tuotteet"
-
-#~ msgid "Assign To"
-#~ msgstr "Vastuuhenkilö"
-
-#~ msgid "Assign a new partner to the contract"
-#~ msgstr "Määritä uusi kumppani sopimukseen"
-
-#~ msgid "Automated Action"
-#~ msgstr "Automatisoitu toiminto"
-
-#~ msgid "Available on the Website"
-#~ msgstr "Saatavana verkkosivustolla"
-
-#~ msgid "Bad"
-#~ msgstr "Huono"
-
-#~ msgid "Bad Health"
-#~ msgstr "Huono terveys"
-
-#~ msgid "Before Update Domain"
-#~ msgstr "Ennen toimialueen päivittämistä"
-
-#~ msgid "Binding Model"
-#~ msgstr "Sitova malli"
-
-#~ msgid "Binding Type"
-#~ msgstr "Sidostyyppi"
-
-#~ msgid "Binding View Types"
-#~ msgstr "Sitovat näkymätyypit"
-
-#~ msgid "Can be Recurring"
-#~ msgstr "Voi olla toistuva"
-
-#~ msgid "Change plan"
-#~ msgstr "Vaihda tilaustyyppiä"
-
-#~ msgid "Child Actions"
-#~ msgstr "Alitason toimenpiteet"
-
-#~ msgid ""
-#~ "Child server actions that will be executed. Note that the last return "
-#~ "returned action value will be used as global return value."
-#~ msgstr ""
-#~ "Palvelintoimintojen alatoiminnot jotka suoritetaan. Huomioi että "
-#~ "viimeistä palautettua arvoa käytetään palautusarvona globaalisti."
-
-#~ msgid ""
-#~ "Choose method for SMS sending:\n"
-#~ "SMS: mass SMS\n"
-#~ "Post as Message: log on document\n"
-#~ "Post as Note: mass SMS with archives"
-#~ msgstr ""
-#~ "Valitse tapa tekstiviestien lähettämiseen:\n"
-#~ "SMS: joukkotekstiviesti\n"
-#~ "Lähetä viestinä: kirjaa dokumenttiin\n"
-#~ "Lähetä huomiona: joukkotekstiviesti liitteen kanssa"
-
-#~ msgid ""
-#~ "Choose method for email sending:\n"
-#~ "EMail: send directly emails\n"
-#~ "Post as Message: post on document and notify followers\n"
-#~ "Post as Note: log a note on document"
-#~ msgstr ""
-#~ "Valitse sähköpostin lähettämisen tapa:\n"
-#~ "EMail: lähetä suoraan sähköpostina\n"
-#~ "Lähetä viestinä: kirjoita dokumentiin ja lähetä huomatus seuraajille\n"
-#~ "Lähetä huomiona: kirjaa huomio dokumenttiin"
-
-#~ msgid "Click here to add some products or services to your quotation."
-#~ msgstr ""
-#~ "Napsauta tätä lisätäksesi joitain tuotteita tai palveluita tarjoukseesi."
-
-#~ msgid "Color"
-#~ msgstr "Väri"
-
-#~ msgid "Create a new subscription alert"
-#~ msgstr "Luo uusi tilaushälytys"
-
-#~ msgid "Create next activity"
-#~ msgstr "Luo seuraava aktiviteetti"
-
-#~ msgid ""
-#~ "Create subscriptions to manage recurring invoicing and payments. "
-#~ "Subscriptions can\n"
-#~ "                be time-bounded or not. In case of a limited period, they "
-#~ "are flagged as to be renewed\n"
-#~ "                one month from the end date."
-#~ msgstr ""
-#~ "Luo tilauksia toistuvien laskujen ja maksujen hallintaa varten. Tilaukset "
-#~ "voivat\n"
-#~ "                olla aikarajoitettuja tai ei. Jos ne ovat määräaikaisia, "
-#~ "ne merkitään uusittaviksi\n"
-#~ "                kuukauden kuluttua päättymispäivästä."
-
-#~ msgid "Cron Nextcall"
-#~ msgstr "Cron Nextcall"
-
-#~ msgid "Current Plan:"
-#~ msgstr "Nykyinen tilaus:"
-
-#~ msgid "Date"
-#~ msgstr "Päivämäärä"
-
-#~ msgid "Date of Next Invoice"
-#~ msgstr "Seuraavan laskun päiväys"
-
-#~ msgid "Define a new subscription"
-#~ msgstr "Määritä uusi tilaus"
-
-#~ msgid "Delay After Trigger"
-#~ msgstr "Viive laukaisun jälkeen"
-
-#~ msgid ""
-#~ "Delay after the trigger date.\n"
-#~ "        You can put a negative number if you need a delay before the\n"
-#~ "        trigger date, like sending a reminder 15 minutes before a meeting."
-#~ msgstr ""
-#~ "Viivästytä laukaisupäivän jälkeen.\n"
-#~ "        Voit asettaa negatiivisen luvun, jos tarvitaan viive ennen "
-#~ "laukeamisaikaa.\n"
-#~ "        Esimerkiksi 15 minuuttia ennen kokousta."
-
-#~ msgid "Delay after trigger date"
-#~ msgstr "Viive ajastetun päivämäärän jälkeen"
-
-#~ msgid "Delay type"
-#~ msgstr "Viivästyksen tyyppi"
-
-#~ msgid "Destination"
-#~ msgstr "Kohde"
-
-#~ msgid "Due Date In"
-#~ msgstr "Erääntyy"
-
-#~ msgid "Due type"
-#~ msgstr "Erääntymisen tyyppi"
-
-#~ msgid "Duration"
-#~ msgstr "Kesto"
-
-#~ msgid "Email Template"
-#~ msgstr "Sähköpostin mallipohja"
-
-#~ msgid "External ID"
-#~ msgstr "Ulkoinen ID"
-
-#~ msgid "Failed Payments"
-#~ msgstr "Epäonnistuneet maksut"
-
-#~ msgid "Fields that trigger the onchange."
-#~ msgstr "Kentät, jotka käynnistävät onchange-laukaisimen."
-
-#~ msgid "Fixed"
-#~ msgstr "Kiinteä"
-
-#~ msgid "Forever"
-#~ msgstr "Ikuisesti"
-
-#~ msgid "Frequency:"
-#~ msgstr "Toistuvuus:"
-
-#~ msgid "Good"
-#~ msgstr "Hyvä"
-
-#~ msgid "Good Health"
-#~ msgstr "Hyvä terveys"
-
-#~ msgid "Group By"
-#~ msgstr "Ryhmittely"
-
-#~ msgid "Groups"
-#~ msgstr "Ryhmät"
-
-#~ msgid "Health"
-#~ msgstr "Terveys"
-
-#~ msgid "Helps you handle subscriptions and recurring invoicing."
-#~ msgstr "Auttaa sinua käsittelemään tilauksia ja toistuvaa laskutusta."
-
-#~ msgid "Hourly and daily pricing are forbidden on recurring products"
-#~ msgstr "Tunti- ja päivähinnoittelu on kielletty toistuvissa tuotteissa"
-
-#~ msgid "ID of the action if defined in a XML file"
-#~ msgstr "Toiminnon ID, jos on määritetty XML-tiedostossa"
-
-#~ msgid ""
-#~ "If checked, the user will be able to close his account from the frontend"
-#~ msgstr "Jos valittu, käyttäjä voi sulkea tilinsä etusivulta"
-
-#~ msgid ""
-#~ "If present, this condition must be satisfied before executing the action "
-#~ "rule."
-#~ msgstr ""
-#~ "Jos käytössä, niin tämän ehdon pitää täyttyä ennenkuin sääntö voidaan "
-#~ "suorittaa."
-
-#~ msgid ""
-#~ "If present, this condition must be satisfied before the update of the "
-#~ "record."
-#~ msgstr ""
-#~ "Jos käytössä, niin tämän ehdon pitää täyttyä ennen tietueen päivitystä."
-
-#~ msgid ""
-#~ "If set, subscriptions with this template will invoice in this journal; "
-#~ "otherwise the sales journal with the lowest sequence is used."
-#~ msgstr ""
-#~ "Jos tämä asetus on asetettu, tämän mallin tilaukset laskutetaan tässä "
-#~ "lehdessä; muussa tapauksessa käytetään myyntipäiväkirjaa, jonka järjestys "
-#~ "on alhaisin."
-
-#~ msgid "If you wish to reopen it, the"
-#~ msgstr "Jos haluat avata sen uudelleen, paina"
-
-#~ msgid ""
-#~ "If you wish to reopen it, you can pay your invoice for the current "
-#~ "invoicing period."
-#~ msgstr ""
-#~ "Jos haluat avata sen uudelleen, voit maksaa laskun kuluvalta "
-#~ "laskutuskaudelta."
-
-#~ msgid "Initial"
-#~ msgstr "Alkuperäinen"
-
-#~ msgid "Invoice Email"
-#~ msgstr "Laskun sähköpostiosoite"
-
-#~ msgid ""
-#~ "Invoice for subscription {{ ctx.get('code', "
-#~ "ctx.get('subscription_name')) }}"
-#~ msgstr ""
-#~ "Lasku tilauksesta {{ ctx.get('code', ctx.get('subscription_name')) }}"
-
-#~ msgid "Invoicing Journal"
-#~ msgstr "Laskutuksen päiväkirja"
-
-#~ msgid "Last Run"
-#~ msgstr "Viimeisin suoritus"
-
-#~ msgid "Latest Rating: Dissatisfied"
-#~ msgstr "Viimeisin luokitus: Tyytymätön"
-
-#~ msgid "Latest Rating: Okay"
-#~ msgstr "Viimeisin luokitus: Okay"
-
-#~ msgid "Latest Rating: Satisfied"
-#~ msgstr "Viimeisin luokitus: Tyytyväinen"
-
-#~ msgid "Least Delay Msg"
-#~ msgstr "Viimeisimmän viiveen viesti"
-
-#~ msgid "Let's configure the product price"
-#~ msgstr "Määritetään tuotteen hinta"
-
-#~ msgid "Link Field"
-#~ msgstr "Linkitetty kenttä"
-
-#~ msgid "Log a note..."
-#~ msgstr "Kirjaa muistiinpano..."
-
-#~ msgid "MRR Between"
-#~ msgstr "kuukausittain toistuva laskutus välillä"
-
-#~ msgid "MRR Change Amount"
-#~ msgstr "kuukausittain toistuvan laskutuksen määrän muutos"
-
-#~ msgid "MRR Change More"
-#~ msgstr "kuukausittain toistuvan laskutuksen lisämuutos"
-
-#~ msgid "MRR Change Period"
-#~ msgstr "kuukausittain toistuvan laskutuksen jakso"
-
-#~ msgid "MRR Change Unit"
-#~ msgstr "kuukausittain toistuvan laskutuksen muutosyksikkö"
-
-#~ msgid "MRR Range Max"
-#~ msgstr "kuukausittain toistuvan laskutuksen enimmäismäärä"
-
-#~ msgid "MRR Range Min"
-#~ msgstr "kuukausittain toistuvan laskutuksen vähimmäismäärä"
-
-#~ msgid "Manage Payment Method"
-#~ msgstr "Hallitse maksutapaa"
-
-#~ msgid "Manage Payment Methods"
-#~ msgstr "Hallitse maksutapoja"
-
-#~ msgid "Model"
-#~ msgstr "Malli"
-
-#~ msgid "Model Name"
-#~ msgstr "Mallin nimi"
-
-#~ msgid ""
-#~ "Model for record creation / update. Set this field only to specify a "
-#~ "different model than the base model."
-#~ msgstr ""
-#~ "Malli tietueen luomiselle tai päivittämiselle. Aseta tämä kenttä vain "
-#~ "määrittämään toisen mallin kuin perusmallin."
-
-#~ msgid "Model on which the server action runs."
-#~ msgstr "Malli, jossa palvelintoiminto ajetaan."
-
-#~ msgid "Modification"
-#~ msgstr "Muutos"
-
-#~ msgid "Neutral"
-#~ msgstr "Neutraali"
-
-#~ msgid "Note"
-#~ msgstr "Muistiinpano"
-
-#~ msgid ""
-#~ "Odoo automatically sets subscriptions to be renewed in a pending\n"
-#~ "            state. After the negotiation, the salesman should close or "
-#~ "renew\n"
-#~ "            pending subscriptions."
-#~ msgstr ""
-#~ "Odoo asettaa tilaukset automaattisesti uusittavaksi vireillä olevassa "
-#~ "tilaussopimuksessa\n"
-#~ "            tilaan. Neuvottelun jälkeen myyjän tulisi sulkea tai uusia "
-#~ "tilaukset\n"
-#~ "            vireillä olevat tilaukset."
-
-#~ msgid "On Change Fields Trigger"
-#~ msgstr "Muuttuvan kentän laukaisin"
-
-#~ msgid "Operation not supported"
-#~ msgstr "Toiminto ei ole tuettu"
-
-#~ msgid ""
-#~ "Optional help text for the users with a description of the target view, "
-#~ "such as its usage and purpose."
-#~ msgstr ""
-#~ "Vaihtoehtoinen ohjeteksti käyttäjälle jossa on kohdenäkymän kuvaus kuten "
-#~ "esim.käyttötarkoitus ja käyttöohje."
-
-#~ msgid "Over"
-#~ msgstr "Yli"
-
-#~ msgid "Pay With"
-#~ msgstr "Maksa maksutavalla"
-
-#~ msgid "Payment method:"
-#~ msgstr "Maksutapa:"
-
-#~ msgid "Period over which the KPI is calculated"
-#~ msgstr "Ajanjakso, jolta KPI-tunnusluku lasketaan"
-
-#~ msgid "Plan Details"
-#~ msgstr "Kestotilauksen tiedot"
-
-#~ msgid "Plans"
-#~ msgstr "Suunnitelmat"
-
-#~ msgid "Please provide another payment method for these subscriptions."
-#~ msgstr "Anna toinen maksutapa näitä tilauksia varten."
-
-#~ msgid "Pricing rule of temporal products"
-#~ msgstr "Ajallisten tuotteiden hinnoittelusääntö"
-
-#~ msgid "Print"
-#~ msgstr "Tulosta"
-
-#~ msgid ""
-#~ "Provide the field used to link the newly created record on the record "
-#~ "used by the server action."
-#~ msgstr ""
-#~ "Anna kenttä, jota käytetään linkittämään uusi luotu tietue siihen "
-#~ "tietueeseen, jota palvelintoiminto käyttää."
-
-#~ msgid "Python Code"
-#~ msgstr "Python-koodi"
-
-#~ msgid "Quotation Template Option"
-#~ msgstr "Tarjouspohja vaihtoehto"
-
-#~ msgid "Quotation templates"
-#~ msgstr "Tarjouspohjat"
-
-#~ msgid "Rating Operator"
-#~ msgstr "Luokitusoperaattori"
-
-#~ msgid "Rating Percentage"
-#~ msgstr "Luokitusprosentti"
-
-#~ msgid ""
-#~ "Rating Satisfaction is the ratio of positive rating to total number of "
-#~ "rating."
-#~ msgstr ""
-#~ "Arviointityytyväisyys on positiivisten arvioiden suhde arvioiden "
-#~ "kokonaismäärään."
-
-#~ msgid "Recurrence"
-#~ msgstr "Toistuvuus"
-
-#~ msgid "Recurrence periods"
-#~ msgstr "Toistumisjaksot"
-
-#~ msgid "Recurring Rule Type"
-#~ msgstr "Toistuvan säännön tyyppi"
-
-#~ msgid "Renewal Allowed"
-#~ msgstr "Uudistaminen sallittu"
-
-#~ msgid "Responsible"
-#~ msgstr "Vastuuhenkilö"
-
-#~ msgid "SMS Template"
-#~ msgstr "SMS Malli"
-
-#~ msgid "Sad face"
-#~ msgstr "Surulliset kasvot"
-
-#~ msgid "Sale Order Alert"
-#~ msgstr "Myyntitilaushälytys"
-
-#~ msgid "Sales"
-#~ msgstr "Myynti"
-
-#~ msgid "Sales Team Leader"
-#~ msgstr "Myyntiryhmän johtaja"
-
-#~ msgid "Select a recurrence"
-#~ msgstr "Valitse toistuvuus"
-
-#~ msgid "Self closable"
-#~ msgstr "Itsesulkeutuva"
-
-#~ msgid ""
-#~ "Send a renewal quotation to the customer.\n"
-#~ "            When it is confirmed, the subscription is running again."
-#~ msgstr ""
-#~ "Lähetä asiakkaalle uusintatarjous.\n"
-#~ "            Kun se on vahvistettu, tilaus on jälleen käynnissä."
-
-#~ msgid "Send an SMS Text Message to the customer"
-#~ msgstr "Lähetä tekstiviesti asiakkaalle"
-
-#~ msgid "Send an email to the customer"
-#~ msgstr "Lähetä sähköpostia asiakkaalle"
-
-#~ msgid "Send as"
-#~ msgstr "Lähetä nimellä"
-
-#~ msgid "Send as (SMS)"
-#~ msgstr "Lähetä tekstiviestinä"
-
-#~ msgid ""
-#~ "Sent automatically with subscription invoice when payment is successful"
-#~ msgstr ""
-#~ "Lähetetään automaattisesti tilauksen laskun mukana, kun maksu on "
-#~ "suoritettu onnistuneesti"
-
-#~ msgid "Sent manually to customers with the invoice in attachment"
-#~ msgstr "Lähetetään manuaalisesti asiakkaille, kun lasku on liitetiedostona"
-
-#~ msgid "Server Actions"
-#~ msgstr "Palvelintoiminnot"
-
-#~ msgid "Set Payment Method"
-#~ msgstr "Aseta maksutapa"
-
-#~ msgid ""
-#~ "Setting a value makes this action available in the sidebar for the given "
-#~ "model."
-#~ msgstr ""
-#~ "Arvon asettaminen saa tämän tominnon saataville annetun mallin "
-#~ "sivupalkkiin."
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Näytä kaikki tietueet joissa on toimenpide myöhässä."
-
-#~ msgid "Show the health status"
-#~ msgstr "Näytä terveydentila"
-
-#~ msgid "Specific Products"
-#~ msgstr "Määrätyt tuotteet"
-
-#~ msgid "Specific Users"
-#~ msgstr "Määrätyt käyttäjät"
-
-#~ msgid "Stage"
-#~ msgstr "Vaihe"
-
-#~ msgid "Stage goes from"
-#~ msgstr "Tila kulkee välillä"
-
-#~ msgid "Subscribe Recipients"
-#~ msgstr "Tilaa vastaanottajat"
-
-#~ msgid "Subscription Revenue End Date"
-#~ msgstr "Tilauksen tulojen loppumispäivä"
-
-#~ msgid "Subscription Revenue Start Date"
-#~ msgstr "Tilauksen tulojen alkamispäivä"
-
-#~ msgid "Subscription Salesperson"
-#~ msgstr "Tilausten myyjä"
-
-#~ msgid "Subscription reached its end date"
-#~ msgstr "Tilaus on saavuttanut päättymispäivänsä"
-
-#~ msgid "Subscription stage category when the change occurred"
-#~ msgstr "Tilausvaiheen luokka, kun muutos tapahtui"
-
-#~ msgid "Subscription: Payment Success And Invoice"
-#~ msgstr "Tilaus: Maksun onnistuminen ja lasku"
-
-#~ msgid "Subscription: Subscription Invoice"
-#~ msgstr "Tilaus: Tilauslasku"
-
-#~ msgid ""
-#~ "Subscriptions can be automatically generated from sales orders in Sales "
-#~ "or eCommerce\n"
-#~ "                apps."
-#~ msgstr ""
-#~ "Tilaukset voidaan luoda automaattisesti myyntitilauksista Myynnissä tai "
-#~ "verkkokaupassa\n"
-#~ "                sovelluksissa."
-
-#~ msgid "Summary"
-#~ msgstr "Yhteenveto"
-
-#~ msgid "Target Model"
-#~ msgstr "Kohdemalli"
-
-#~ msgid "Target Model Name"
-#~ msgstr "Kohdemallin nimi"
-
-#~ msgid "Taxes"
-#~ msgstr "Verot"
-
-#~ msgid "Temporal Type"
-#~ msgstr "Ajallinen tyyppi"
-
-#~ msgid "Terms and Conditions"
-#~ msgstr "Toimitusehdot"
-
-#~ msgid ""
-#~ "The action will be triggered if and only if one of these fields is "
-#~ "updated. If empty, all fields are watched."
-#~ msgstr ""
-#~ "Toiminto voidaan laukaista vain jos jotain sen kentistä päivitetään. Jos "
-#~ "nämä ovat tyhjiä, kaikkia kenttiä seurataan."
-
-#~ msgid "The full URL to access the server action through the website."
-#~ msgstr "Täydellinen URL palvelintoimintoon verkkosivun kautta."
-
-#~ msgid "The renewal %s has been canceled."
-#~ msgstr "Uudistus %s on peruttu."
-
-#~ msgid ""
-#~ "The scheduled action for alerts has been deleted. Update the "
-#~ "Subscriptions module to re-create it."
-#~ msgstr ""
-#~ "Hälytysten ajastettu toiminto on poistettu. Päivitä Subscriptions-moduuli "
-#~ "luodaksesi sen uudelleen."
-
-#~ msgid "The time unit cannot be used. Please chose one of these unit: %s."
-#~ msgstr "Aikayksikköä ei voi käyttää. Valitse jokin näistä yksiköistä: %s."
-
-#~ msgid "The upsell %s has been canceled."
-#~ msgstr "Lisämyynti %s on peruutettu."
-
-#~ msgid ""
-#~ "This payment method cannot be removed as it is currently linked to the "
-#~ "following active subscriptions:"
-#~ msgstr ""
-#~ "Tätä maksutapaa ei voi poistaa, koska se on tällä hetkellä sidottu "
-#~ "seuraaviin aktiivisiin tilauksiin:"
-
-#~ msgid "Timed Condition"
-#~ msgstr "Ajastettu tila"
-
-#~ msgid "Total Recurring"
-#~ msgstr "Toistuva yhteensä"
-
-#~ msgid "Trigger"
-#~ msgstr "Liipaisin"
-
-#~ msgid "Trigger Date"
-#~ msgstr "Liipaisupäivämäärä"
-
-#~ msgid "Trigger Fields"
-#~ msgstr "Laukeavat kentät"
-
-#~ msgid "Trigger Now"
-#~ msgstr "Laukaise nyt"
-
-#~ msgid "Trigger On"
-#~ msgstr "Laukaisin päälle"
-
-#~ msgid ""
-#~ "Trigger alerts for salespersons or customers: churn, invoice not paid, "
-#~ "upsell, etc."
-#~ msgstr ""
-#~ "Käynnistä hälytykset myyjille tai asiakkaille: vaihtuvuus, maksamaton "
-#~ "lasku, lisämyynti jne."
-
-#~ msgid ""
-#~ "Type of server action. The following values are available:\n"
-#~ "- 'Execute Python Code': a block of python code that will be executed\n"
-#~ "- 'Create a new Record': create a new record with new values\n"
-#~ "- 'Update a Record': update the values of a record\n"
-#~ "- 'Execute several actions': define an action that triggers several other "
-#~ "server actions\n"
-#~ "- 'Send Email': post a message, a note or send an email (Discuss)\n"
-#~ "- 'Add Followers': add followers to a record (Discuss)\n"
-#~ "- 'Create Next Activity': create an activity (Discuss)\n"
-#~ "- 'Send SMS Text Message': send SMS, log them on documents (SMS)"
-#~ msgstr ""
-#~ "Palvelintoiminnon tyyppi. Seuraavat ovat mahdollisia:\n"
-#~ "- 'Execute Python Code': ajaa Python-koodia\n"
-#~ "- 'Create a new Record': luo uuden tietueen uusilla arvoilla\n"
-#~ "- 'Update a Record': päivittää tietueen arvot\n"
-#~ "- 'Execute several actions': määrittää toiminnon, joka käynnistää useita "
-#~ "muita toimintoja\n"
-#~ "- 'Send Email': lähettää viestin, huomion tai sähköpostin (Discuss)\n"
-#~ "- 'Add Followers': lisää tietueelle seuraajia (Discuss)\n"
-#~ "- 'Create Next Activity': luo uuden aktiviteetin (Discuss)\n"
-#~ "- 'Send SMS Text Message': lähettää tekstiviestin (SMS), kirjaa ne "
-#~ "dokumenttiin"
-
-#~ msgid "Unit of Measure"
-#~ msgstr "Mittayksikkö"
-
-#~ msgid ""
-#~ "Unpaid subscription after the due date majored by this number of days "
-#~ "will be automatically closed by the subscriptions expiration scheduled "
-#~ "action. \n"
-#~ "If the chosen payment method has failed to renew the subscription after "
-#~ "this time, the subscription is automatically closed."
-#~ msgstr ""
-#~ "Maksamattomat tilaukset, jotka ovat maksamatta tämän päivien määrän "
-#~ "ylittävän eräpäivän jälkeen, suljetaan automaattisesti tilausten "
-#~ "päättymisaikataulun mukaisella toiminnolla.\n"
-#~ "Jos valittu maksutapa ei ole uusinut tilausta tämän ajan kuluttua, tilaus "
-#~ "suljetaan automaattisesti."
-
-#~ msgid "Usage"
-#~ msgstr "Käyttö"
-
-#~ msgid ""
-#~ "Use 'Specific User' to always assign the same user on the next activity. "
-#~ "Use 'Generic User From Record' to specify the field name of the user to "
-#~ "choose on the record."
-#~ msgstr ""
-#~ "Käytä 'Tietty käyttäjä'\" määrittääksesi aina saman käyttäjän seuraavaan "
-#~ "toimintaan. Käytä 'Yleinen käyttäjä tietueesta' määrittääksesi tietueelle "
-#~ "valittavan käyttäjän nimen."
-
-#~ msgid "Use Calendar"
-#~ msgstr "Käytä kalenteria"
-
-#~ msgid "Use employee work schedule"
-#~ msgstr "Käytä työntekijän työaikataulua"
-
-#~ msgid ""
-#~ "Use subscriptions to follow tasks, issues, timesheets or invoicing based "
-#~ "on\n"
-#~ "                work done, expenses and/or sales orders. Odoo will "
-#~ "automatically manage\n"
-#~ "                the alerts for the renewal of the subscriptions to the "
-#~ "right salesperson."
-#~ msgstr ""
-#~ "Käytä tilauksia tehtävien, ongelmien, työaikataulujen tai laskutuksen "
-#~ "seuraamiseen seuraavien tekijöiden perusteella\n"
-#~ "                tehtyyn työhön, kuluihin ja/tai myyntitilauksiin. Odoo "
-#~ "hallinnoi automaattisesti\n"
-#~ "                hälytykset tilausten uusimisesta oikealle myyjälle."
-
-#~ msgid "Use the user's working schedule."
-#~ msgstr "Käytä työntekijän työaikataulua."
-
-#~ msgid "User field name"
-#~ msgstr "Käyttäjäkentän nimi"
-
-#~ msgid "Valid Until:"
-#~ msgstr "Voimassa asti:"
-
-#~ msgid "Value Mapping"
-#~ msgstr "Arvojen kohdistus"
-
-#~ msgid "Website Path"
-#~ msgstr "Verkkosivun polku"
-
-#~ msgid "Website Url"
-#~ msgstr "Verkkosivun URL"
-
-#~ msgid ""
-#~ "When calculating a day-based timed condition, it is possible to use a "
-#~ "calendar to compute the date based on working days."
-#~ msgstr ""
-#~ "Päiväkohtaista ajastusehtoa laskettaessa on mahdollista laskea päivämäärä "
-#~ "työpäivien perusteella kalenterin avulla."
-
-#~ msgid ""
-#~ "When dealing with multiple actions, the execution order is based on the "
-#~ "sequence. Low number means high priority."
-#~ msgstr ""
-#~ "Kun käsitellään useita toimintoja, suoritusjärjestys perustuu "
-#~ "järjestykseen. Pieni numero tarkoittaa korkeaa prioriteettia."
-
-#~ msgid ""
-#~ "When should the condition be triggered.\n"
-#~ "                If present, will be checked by the scheduler. If empty, "
-#~ "will be checked at creation and update."
-#~ msgstr ""
-#~ "Milloin ehto pitäisi laukaista.\n"
-#~ "                 Jos asetettu, Odoon eräajo-ohjelma (cron) käsittelee "
-#~ "tämän. Jos tyhjä, tarkistetaan luonnin ja päivityksen yhteydessä."
-
-#~ msgid "When unchecked, the rule is hidden and will not be executed."
-#~ msgstr "Kun tätä ei ole valittu, sääntö on piilotettu ja sitä ei suoriteta"
-
-#~ msgid ""
-#~ "Write Python code that the action will execute. Some variables are "
-#~ "available for use; help about python expression is given in the help tab."
-#~ msgstr ""
-#~ "Kirjoita Python-koodi, jonka toiminto suorittaa. Jotkut muuttujat ovat "
-#~ "käytettävissä; Ohjeet python-lausekkeesta löytyvät Ohje-välilehdeltä."
-
-#~ msgid ""
-#~ "You can not delete a confirmed subscription. You must first close and "
-#~ "cancel it before you can delete it."
-#~ msgstr ""
-#~ "Vahvistettua tilausta ei voi poistaa. Sinun on ensin suljettava ja "
-#~ "peruutettava tilaus, ennen kuin voit poistaa sen."
-
-#~ msgid ""
-#~ "You cannot save a sale order with a recurrence and no recurring product."
-#~ msgstr ""
-#~ "Et voi tallentaa myyntitilausta, jossa on toistuva tilaus ja jossa ei ole "
-#~ "toistuvaa tuotetta."
-
-#~ msgid ""
-#~ "You cannot save a sale order with recurring product and no recurrence."
-#~ msgstr ""
-#~ "Et voi tallentaa myyntitilausta, jossa on toistuva tuote eikä "
-#~ "toistuvuutta."
-
-#~ msgid ""
-#~ "You cannot set to draft a canceled quotation linked to invoiced "
-#~ "subscriptions. Please create a new quotation."
-#~ msgstr ""
-#~ "Et voi asettaa laskutettuihin tilauksiin liittyvää peruutettua tarjousta "
-#~ "laadittavaksi. Luo uusi tarjous."
-
-#~ msgid "You must be logged in to manage your payment methods."
-#~ msgstr ""
-#~ "Sinun on oltava kirjautuneena sisään, jotta voit hallita maksutapojasi."
-
-#~ msgid ""
-#~ "You will find here the subscriptions to be renewed (end date is close or "
-#~ "passed)"
-#~ msgstr ""
-#~ "Löydät täältä uusittavat tilaukset (päättymispäivä on lähellä tai ohi)"
-
-#~ msgid "Your Details"
-#~ msgstr "Yhteystietosi"
-
-#~ msgid "Your Plan"
-#~ msgstr "Sopimustiedot"
-
-#~ msgid "Your contract is recurrent"
-#~ msgstr "Sopimuksesi on toistuva"
-
-#~ msgid "archived product(s)"
-#~ msgstr "arkistoidut tuotteet"
-
-#~ msgid "e.g. Closed Subscription"
-#~ msgstr "esim. Suljettu tilaus"
-
-#~ msgid "e.g. Discuss proposal"
-#~ msgstr "esim. keskustele tarjouksesta"
-
-#~ msgid "greater than"
-#~ msgstr "suurempi kuin"
-
-#~ msgid "less than"
-#~ msgstr "pienempi kuin"
-
-#~ msgid "missing payments (from"
-#~ msgstr "puuttuvat maksut (alkaen"
-
-#~ msgid "prices"
-#~ msgstr "hinnat"
-
-#~ msgid "to this day) will be automatically processed."
-#~ msgstr "tähän päivään asti) käsitellään automaattisesti."
-
-#~ msgid ""
-#~ "{{ object.company_id.name }} Invoice (Ref {{ object.name or 'n/a' }})"
-#~ msgstr ""
-#~ "{{ object.company_id.name }} Lasku (viite {{ object.name or 'n/a' }})"
+#~ msgid "<i class=\"oi oi-fw\" data-icon=\"redo\"/> To Renew"
+#~ msgstr "<i class=\"oi oi-fw\" data-icon=\"redo\"/> Uudista"

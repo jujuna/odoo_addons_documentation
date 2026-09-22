@@ -3,7 +3,7 @@
 <data noupdate="1">
     <record id="product_product_4d" model="product.product">
         <field name="name">Desk Variant D</field>
-        <field name="image_1920" type="base64" file="social_demo/static/img/table01.jpg"/>
+        <field name="image_1920" type="bytes" file="social_demo/static/img/table01.jpg"/>
     </record>
 
     <record id="social_utm_campaign" model="utm.campaign">
@@ -22,7 +22,7 @@
         <field name="stories">5672</field>
         <field name="stories_trend">-3</field>
         <field name="has_trends" eval="True" />
-        <field name="image" type="base64" file="base/static/img/res_partner_2-image.png"/>
+        <field name="image" type="bytes" file="base/static/img/res_partner_2-image.png"/>
         <field name="media_id" ref="social_facebook.social_media_facebook"/>
     </record>
 
@@ -31,7 +31,7 @@
         <field name="audience">1336</field>
         <field name="engagement">24358</field>
         <field name="stories">7834</field>
-        <field name="image" type="base64" file="base/static/img/res_partner_2-image.png"/>
+        <field name="image" type="bytes" file="base/static/img/res_partner_2-image.png"/>
         <field name="media_id" ref="social_twitter.social_media_twitter"/>
         <field name="twitter_user_id">Odoo</field>
     </record>
@@ -51,7 +51,7 @@
 
     <record id="social_account_youtube" model="social.account">
         <field name="name">My Company</field>
-        <field name="image" type="base64" file="base/static/img/res_partner_2-image.png"/>
+        <field name="image" type="bytes" file="base/static/img/res_partner_2-image.png"/>
         <field name="has_trends" eval="False" />
         <field name="media_id" ref="social_youtube.social_media_youtube"/>
         <field name="linkedin_account_urn">urn:li:organization:31337</field>
@@ -67,7 +67,7 @@
         <field name="stories">-1</field>
         <field name="stories_trend">-1</field>
         <field name="has_trends" eval="True" />
-        <field name="image" type="base64" file="base/static/img/res_partner_2-image.png"/>
+        <field name="image" type="bytes" file="base/static/img/res_partner_2-image.png"/>
         <field name="media_id" ref="social_instagram.social_media_instagram"/>
     </record>
 
@@ -81,22 +81,31 @@
         <field name="account_ids" eval="[(6, 0, [ref('social_demo.social_account_facebook'), ref('social_demo.social_account_twitter'), ref('social_demo.social_account_linkedin')])]" />
     </record>
 
-    <record id="social_post_global_2_image_1" model="ir.attachment">
+    <record id="social_post_global_2_image_attachment_1" model="ir.attachment">
         <field name="name">Table Model 1</field>
         <field name="datas" type="base64" file="social_demo/static/img/table01.jpg"/>
-        <field name="mimetype">image/jpeg</field>
     </record>
 
-    <record id="social_post_global_2_image_2" model="ir.attachment">
+    <record id="social_post_global_2_image_1" model="social.post.image">
+        <field name="attachment_id" ref="social_demo.social_post_global_2_image_attachment_1"/>
+    </record>
+
+    <record id="social_post_global_2_image_attachment_2" model="ir.attachment">
         <field name="name">Table Model 2</field>
         <field name="datas" type="base64" file="social_demo/static/img/table02.jpg"/>
-        <field name="mimetype">image/png</field>
     </record>
 
-    <record id="social_post_global_2_image_3" model="ir.attachment">
+    <record id="social_post_global_2_image_2" model="social.post.image">
+        <field name="attachment_id" ref="social_demo.social_post_global_2_image_attachment_2"/>
+    </record>
+
+    <record id="social_post_global_2_image_attachment_3" model="ir.attachment">
         <field name="name">Table Model 3</field>
         <field name="datas" type="base64" file="social_demo/static/img/table03.jpg"/>
-        <field name="mimetype">image/png</field>
+    </record>
+
+    <record id="social_post_global_2_image_3" model="social.post.image">
+        <field name="attachment_id" ref="social_demo.social_post_global_2_image_attachment_3"/>
     </record>
 
     <record id="social_post_global_2" model="social.post">

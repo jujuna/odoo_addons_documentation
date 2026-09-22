@@ -1,13 +1,23 @@
-import { onMounted, onWillStart, useState, Component, onPatched } from "@odoo/owl";
+import {
+    onMounted,
+    onWillStart,
+    Component,
+    onPatched,
+    onWillUnmount,
+    proxy,
+    usePlugin,
+    useProps,
+} from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
 import { useService } from "@web/core/utils/hooks";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { _t } from "@web/core/l10n/translation";
 import { pyToJsLocale } from "@web/core/l10n/utils";
 import { registry } from "@web/core/registry";
 
 import { UNTITLED_SPREADSHEET_NAME } from "@spreadsheet/helpers/constants";
 import * as spreadsheet from "@odoo/o-spreadsheet";
-import { Model } from "@odoo/o-spreadsheet";
+import { Model, stores } from "@odoo/o-spreadsheet";
 
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
@@ -22,6 +32,11 @@ import { OdooDataProvider } from "@spreadsheet/data_sources/odoo_data_provider";
 import { SpreadsheetNavbar } from "../components/spreadsheet_navbar/spreadsheet_navbar";
 import { deepCopy } from "@web/core/utils/objects";
 import { createDefaultCurrency } from "@spreadsheet/currency/helpers";
+import { cookie } from "@web/core/browser/cookie";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
+
+const { DateTime } = luxon;
+const { ViewportsStore } = stores;
 
 export class VersionHistoryAction extends Component {
     static template = "spreadsheet_edition.VersionHistoryAction";
@@ -31,8 +46,11 @@ export class VersionHistoryAction extends Component {
         SpreadsheetNavbar,
         VersionHistorySidePanel,
     };
-    static props = { ...standardActionServiceProps };
     static target = "fullscreen";
+
+    props = useProps(standardActionServiceProps);
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
         this.params = this.props.action.params;
@@ -47,15 +65,20 @@ export class VersionHistoryAction extends Component {
         this.loadCurrencies = useSpreadsheetCurrencies();
         this.getThumbnail = useSpreadsheetThumbnail();
         this.geoJsonService = useService("geo_json_service");
+        this.commandService = useService("command");
 
         this.spreadsheetName = UNTITLED_SPREADSHEET_NAME;
         this.revisions = [];
         this.restorableRevisions = [];
-        this.state = useState({
+        this.state = proxy({
             currentRevisionId: null,
             shouldReloadPosition: false,
         });
         this.model = null;
+
+        useSubEnv({
+            openPalette: this.commandService.openMainPalette,
+        });
 
         onWillStart(async () => {
             await this.fetchData();
@@ -63,12 +86,16 @@ export class VersionHistoryAction extends Component {
         });
 
         onMounted(() => {
+            document.body.classList.add("o_spreadsheet_edition_o_spreadsheet_action");
             router.pushState({
                 spreadsheet_id: this.resId,
                 res_model: this.resModel,
                 from_snapshot: this.fromSnapshot,
             });
             this.env.config.setDisplayName(this.spreadsheetName);
+        });
+        onWillUnmount(() => {
+            document.body.classList.remove("o_spreadsheet_edition_o_spreadsheet_action");
         });
         onPatched(() => {
             if (this.state.shouldReloadPosition) {
@@ -81,12 +108,13 @@ export class VersionHistoryAction extends Component {
                         sheetIdFrom: this.model.getters.getActiveSheetId(),
                         sheetIdTo: this.state.oldPosition.sheetId,
                     });
-                    if (res.isSuccessful) {
+                    if (res.isSuccessful && this.stores) {
                         this.model.selection.selectZone(
                             { cell: { col, row }, zone },
                             { scrollIntoView: true }
                         );
-                        this.model.dispatch("SET_VIEWPORT_OFFSET", {
+                        const viewStore = this.stores.get(ViewportsStore);
+                        viewStore.setViewportOffset({
                             offsetX: this.state.scroll.scrollX,
                             offsetY: this.state.scroll.scrollY,
                         });
@@ -95,6 +123,13 @@ export class VersionHistoryAction extends Component {
                 }, 0);
             }
         });
+    }
+
+    registerStoreProvider(stores) {
+        // Not great. We cannot really create the store in this component, because the store aren't designed to inject
+        // a new modelStore. We might be able to use `resetStore`, but it isn't tested, only used in demo ATM, and would
+        // bring other issues (we'd really need to make sure we burn every child component when we use it).
+        this.stores = stores;
     }
 
     restoreView() {
@@ -107,9 +142,10 @@ export class VersionHistoryAction extends Component {
             sheetIdFrom: this.model.getters.getActiveSheetId(),
             sheetIdTo: this.state.oldPosition.sheetId,
         });
-        if (res.isSuccessful) {
+        if (res.isSuccessful && this.stores) {
             this.model.selection.selectZone({ cell: { col, row }, zone }, { scrollIntoView: true });
-            this.model.dispatch("SET_VIEWPORT_OFFSET", {
+            const viewStore = this.stores.get(ViewportsStore);
+            viewStore.setViewportOffset({
                 offsetX: this.state.scroll.scrollX,
                 offsetY: this.state.scroll.scrollY,
             });
@@ -131,11 +167,14 @@ export class VersionHistoryAction extends Component {
         if (revisionId === this.state.currentRevisionId) {
             return;
         }
-        const scroll = this.model.getters.getActiveSheetScrollInfo();
         const oldPosition = this.model.getters.getActivePosition();
         this.state.currentRevisionId = revisionId;
         this.loadModel();
-        this.state.scroll = scroll;
+        if (this.stores) {
+            const viewStore = this.stores.get(ViewportsStore);
+            const scroll = viewStore.activeSheetScrollInfo;
+            this.state.scroll = scroll;
+        }
         this.state.oldPosition = oldPosition;
         this.state.shouldReloadPosition = true;
     }
@@ -195,9 +234,10 @@ export class VersionHistoryAction extends Component {
         const spreadsheetHistoryData = await this._fetchData();
         this.spreadsheetData = spreadsheetHistoryData.data;
         this.spreadsheetDataLastDate = spreadsheetHistoryData.initial_date;
+        this.spreadsheetMetadata = spreadsheetHistoryData.metadata;
         this.revisions = spreadsheetHistoryData.revisions;
-        this.defaultCurrency = spreadsheetHistoryData.default_currency
-            ? createDefaultCurrency(spreadsheetHistoryData.default_currency)
+        this.defaultCurrency = this.spreadsheetMetadata.default_currency
+            ? createDefaultCurrency(this.spreadsheetMetadata.default_currency)
             : undefined;
         this.generateRestorableRevisions();
         this.spreadsheetName = spreadsheetHistoryData.name;
@@ -314,6 +354,12 @@ export class VersionHistoryAction extends Component {
                     env: this.env,
                     orm: this.orm,
                     odooDataProvider: this.odooDataProvider,
+                    currentFiscalYearStart: DateTime.fromISO(
+                        this.spreadsheetMetadata.current_fiscal_year_start
+                    ),
+                    currentFiscalYearEnd: DateTime.fromISO(
+                        this.spreadsheetMetadata.current_fiscal_year_end
+                    ),
                 },
                 external: {
                     loadCurrencies: this.loadCurrencies,
@@ -322,6 +368,7 @@ export class VersionHistoryAction extends Component {
                 },
                 mode: "readonly",
                 defaultCurrency: this.defaultCurrency,
+                colorScheme: cookie.get("color_scheme"),
             },
             revisions
         );
@@ -354,7 +401,7 @@ Would you like to load the more recent modifications?"
                 });
             }
         }
-        if (this.env.debug) {
+        if (this.debugMode.isActive()) {
             // eslint-disable-next-line no-import-assign
             spreadsheet.__DEBUG__ = spreadsheet.__DEBUG__ || {};
             spreadsheet.__DEBUG__.model = this.model;

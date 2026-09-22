@@ -1,19 +1,13 @@
+import { useLayoutEffect, useSubEnv } from "@web/owl2/utils";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { getActiveHotkey } from "@web/core/hotkeys/hotkey_service";
+import { getActiveHotkey } from "@web/core/hotkeys/hotkey_utils";
 import { _t } from "@web/core/l10n/translation";
 import { FormController } from '@web/views/form/form_controller';
 import { KnowledgeCoverDialog } from '@knowledge/components/knowledge_cover/knowledge_cover_dialog';
+import { PanelState } from "@knowledge/components/side_panel/panel_state";
 import { KnowledgeSidebar } from '@knowledge/components/sidebar/sidebar';
 import { useBus, useService } from "@web/core/utils/hooks";
-
-import {
-    onWillStart,
-    reactive,
-    useSubEnv,
-    useEffect,
-    useExternalListener,
-    useRef,
-} from "@odoo/owl";
+import { onWillStart, proxy, status, useEffect, useListener } from "@odoo/owl";
 import { ArticleAnnexePickerDialog } from "@knowledge/components/article_annexe_picker_dialog/article_annexe_picker_dialog";
 
 export class KnowledgeArticleFormController extends FormController {
@@ -25,11 +19,11 @@ export class KnowledgeArticleFormController extends FormController {
 
     setup() {
         super.setup();
-        this.root = useRef('root');
         this.orm = useService('orm');
         this.actionService = useService('action');
         this.dialogService = useService("dialog");
         this.commentsService = useService("knowledge.comments");
+        this.panelState = new PanelState(this.commentsService.getCommentsState());
 
         useSubEnv({
             createArticle: this.createArticle.bind(this),
@@ -39,16 +33,34 @@ export class KnowledgeArticleFormController extends FormController {
             renameArticle: this.renameArticle.bind(this),
             sendArticleToTrash: this.sendArticleToTrash.bind(this),
             toggleAsideMobile: this.toggleAsideMobile.bind(this),
-            toggleChatter: this.toggleChatter.bind(this),
-            toggleComments: this.toggleComments.bind(this),
             toggleFavorite: this.toggleFavorite.bind(this),
-            toggleProperties: this.toggleProperties.bind(this),
             save: this.save.bind(this),
             discard: this.discard.bind(this),
-            // Internal states:
-            propertiesPanelState: reactive({ isDisplayed: false }),
-            chatterPanelState: reactive({ isDisplayed: false }),
-            commentsState: this.commentsService.getCommentsState(),
+            // side panel states
+            panelState: this.panelState,
+            sidebarScrollState: { origin: "workspace" },
+            tocButton: proxy({ isRelevant: false }),
+        });
+
+        const tocService = useService("knowledge.toc");
+        let tocManager;
+        useEffect(() => {
+            const tocState = tocService.getTocState();
+            if (status(this) === "destroyed") {
+                return;
+            }
+            if (tocManager !== tocState.tocManager) {
+                tocManager = tocState.tocManager;
+            }
+            if (
+                !tocManager ||
+                (tocManager.structure.headings.length < 3 &&
+                    (!tocManager.structure.isNew || !this.env.tocButton.isRelevant))
+            ) {
+                this.env.tocButton.isRelevant = false;
+            } else {
+                this.env.tocButton.isRelevant = true;
+            }
         });
 
         useBus(this.env.bus, 'KNOWLEDGE:OPEN_ARTICLE', (event) => {
@@ -74,19 +86,19 @@ export class KnowledgeArticleFormController extends FormController {
             }
         });
 
-        useExternalListener(document.documentElement, 'mouseleave', async () => {
-            if (await this.model.root.isDirty()) {
+        useListener(document.documentElement, 'mouseleave', async () => {
+            if (await this.model.root?.isDirty()) {
                 await this.model.root.save();
             }
         });
 
-        useEffect(
+        useLayoutEffect(
             () => {
-                const scrollView = this.root.el?.querySelector(".o_scroll_view_lg");
+                const scrollView = this.rootRef()?.querySelector(".o_scroll_view_lg");
                 if (scrollView) {
                     scrollView.scrollTop = 0;
                 }
-                const mobileScrollView = this.root.el?.querySelector(".o_knowledge_main_view");
+                const mobileScrollView = this.rootRef()?.querySelector(".o_knowledge_main_view");
                 if (mobileScrollView) {
                     mobileScrollView.scrollTop = 0;
                 }
@@ -94,11 +106,11 @@ export class KnowledgeArticleFormController extends FormController {
             () => [this.model.root.resId]
         );
 
-        useExternalListener(window, "keydown", async event => {
+        useListener(window, "keydown", async event => {
             const hotkey = getActiveHotkey(event);
             if (hotkey === "control+s") {
                 event.preventDefault();
-                if (this.model.root.dirty) {
+                if (this.model.root?.dirty) {
                     await this.save({ reload: false });
                 }
             }
@@ -173,7 +185,7 @@ export class KnowledgeArticleFormController extends FormController {
     }
 
     getHtmlTitle() {
-        const titleEl = this.root.el.querySelector(".note-editable.odoo-editor-editable h1");
+        const titleEl = this.rootRef().querySelector(".note-editable.odoo-editor-editable h1");
         if (titleEl) {
             const title = titleEl.textContent.trim();
             if (title) {
@@ -203,11 +215,14 @@ export class KnowledgeArticleFormController extends FormController {
 
     /**
      * @param {integer} - resId: id of the article to open
+     * @param {Object} [options]
+     * @param {string} [options.sidebarScrollOrigin="workspace"] - Origin for scrolling
      */
-    async openArticle(resId) {
+    async openArticle(resId, { sidebarScrollOrigin = "workspace" } = {}) {
         if (!resId || resId === this.resId) {
             return;
         }
+        this.env.sidebarScrollState.origin = sidebarScrollOrigin;
 
         // blur to remove focus on the active element
         document.activeElement.blur();
@@ -237,18 +252,21 @@ export class KnowledgeArticleFormController extends FormController {
             });
             return false;
         }
-        this.toggleAsideMobile(false);
         return true;
     }
 
     openCoverSelector() {
-        this.dialogService.add(KnowledgeCoverDialog, {
+        this.dialogService.add(KnowledgeCoverDialog, this.getKnowledgeCoverDialogProps());
+    }
+
+    getKnowledgeCoverDialogProps(){
+        return {
             articleCoverId: this.model.root.data.cover_image_id.id,
             articleName: this.model.root.data.name || "",
             save: (id) => this.model.root.update({
                 cover_image_id: { id }
             })
-        });
+        }
     }
 
     /**
@@ -281,20 +299,8 @@ export class KnowledgeArticleFormController extends FormController {
      * @param {boolean} force
      */
     toggleAsideMobile(force) {
-        const container = this.root.el.querySelector('.o_knowledge_form_view');
+        const container = this.rootRef().querySelector(".o_knowledge_form_view");
         container.classList.toggle('o_toggle_aside', force);
-    }
-
-    toggleChatter() {
-        this.env.chatterPanelState.isDisplayed = !this.env.chatterPanelState.isDisplayed;
-    }
-
-    toggleComments() {
-        if (this.env.commentsState.displayMode === "handler") {
-            this.env.commentsState.displayMode = "panel";
-        } else {
-            this.env.commentsState.displayMode = "handler";
-        }
     }
 
     /**
@@ -311,15 +317,5 @@ export class KnowledgeArticleFormController extends FormController {
         await this.orm.call(this.model.root.resModel, "action_toggle_favorite", [[this.resId]]);
         // Load to have the correct value for 'is_user_favorite'.
         await this.model.root.load();
-    }
-
-    /**
-     * Toggle the properties panel
-     * @param {boolean} [force] - Flag determining the desired visibility of the properties panel.
-     */
-    toggleProperties(force) {
-        this.env.propertiesPanelState.isDisplayed = (
-            typeof force === "boolean" ? force : !this.env.propertiesPanelState.isDisplayed
-        );
     }
 }

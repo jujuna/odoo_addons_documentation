@@ -28,7 +28,7 @@ class IrModelData(models.Model):
     def _build_insert_xmlids_values(self):
         values = super()._build_insert_xmlids_values()
         if self.env.context.get('studio'):
-            values['studio'] = 'true'
+            values['studio'] = True
         return values
 
     def _xmlid_for_export(self):

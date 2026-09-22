@@ -1,20 +1,18 @@
 import {
     getService,
-    makeMockEnv,
+    makeTestApp,
     patchWithCleanup,
     MockServer,
-    mountWithCleanup,
 } from "@web/../tests/web_test_helpers";
 import { session } from "@web/session";
 import { registry } from "@web/core/registry";
 import { uuidv4 } from "@point_of_sale/utils";
 import { setupPosEnv } from "@point_of_sale/../tests/unit/utils";
-import { PrepDisplay } from "@pos_enterprise/app/components/preparation_display/preparation_display";
-import { unpatchPrepDataService } from "@pos_enterprise/app/services/data_service";
-import { unpatchDataServiceOptions } from "@pos_enterprise/app/models/data_service_options";
+import { unpatchPrepDataPlugin } from "@pos_enterprise/app/plugins/pos_data_plugin";
+import { unpatchDataServiceOptions } from "@pos_enterprise/override/point_of_sale/data_service_options";
 
 export const setupPosEnvForPrepDisplay = async () => {
-    unpatchPrepDataService();
+    unpatchPrepDataPlugin();
     unpatchDataServiceOptions();
     registry.category("services").remove("preparation_display");
     return await setupPosEnv();
@@ -22,6 +20,8 @@ export const setupPosEnvForPrepDisplay = async () => {
 
 export const setupPosPrepDisplayEnv = async () => {
     // Do not change these variables, they are in accordance with the setup data
+    odoo.pos_session_id = 1;
+    odoo.pos_config_id = 1;
     odoo.access_token = uuidv4();
     odoo.info = {
         isEnterprise: true,
@@ -41,12 +41,11 @@ export const setupPosPrepDisplayEnv = async () => {
     // Removing `pos` and its dependent services to avoid conflicts during `preparation_display` data loading.
     // Both `pos` and `preparation_display` rely on `pos_data`, but some models required by `preparation_display` (e.g., `prep.prep.order`)
     // are missing when `pos` is loaded. Hence, these services are excluded.
-    const serviceNames = ["contextual_utils_service", "debug", "report", "pos"];
+    const serviceNames = ["debug", "report", "pos"];
     serviceNames.forEach((serviceName) => registry.category("services").remove(serviceName));
 
-    await makeMockEnv();
+    await makeTestApp();
     const store = getService("preparation_display");
-    await mountWithCleanup(PrepDisplay);
     return store;
 };
 

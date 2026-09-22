@@ -4,6 +4,7 @@
         <field name="name">Profit and loss - Micro</field>
         <field name="name@pl">Rachunek zysków i strat - Mikro</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="country_id" ref="base.pl"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
@@ -22,8 +23,6 @@
                 <field name="name">A. Income from basic operating activities and associated, including variation in products</field>
                 <field name="name@pl">A. Przychody podstawowej działalności operacyjnej i zrównane z nimi, w tym zmiana stanu produktów</field>
                 <field name="code">pl_micro_pl_a</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-70.00 - 73.00 - 74.00</field>
                 <field name="hierarchy_level">0</field>
             </record>
@@ -45,8 +44,6 @@
                         <field name="name">I. Depreciation</field>
                         <field name="name@pl">I. Amortyzacja</field>
                         <field name="code">pl_micro_pl_b_1</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_pl_micro_pl_b_1_balance" model="account.report.expression">
@@ -61,8 +58,6 @@
                         <field name="name">II. Consumption of materials and energy</field>
                         <field name="name@pl">II. Zużycie materiałów i energii</field>
                         <field name="code">pl_micro_pl_b_2</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_pl_micro_pl_b_2_balance" model="account.report.expression">
@@ -77,8 +72,6 @@
                         <field name="name">III. Wages, social security and other benefits</field>
                         <field name="name@pl">III. Wynagrodzenia, ubezpieczenia społeczne i inne świadczenia</field>
                         <field name="code">pl_micro_pl_b_3</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_pl_micro_pl_b_3_balance" model="account.report.expression">
@@ -93,8 +86,6 @@
                         <field name="name">IV. Other costs</field>
                         <field name="name@pl">IV. Pozostałe koszty</field>
                         <field name="code">pl_micro_pl_b_4</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_pl_micro_pl_b_4_balance" model="account.report.expression">
@@ -111,8 +102,6 @@
                 <field name="name">C. Other income and gains, including revaluation of assets</field>
                 <field name="name@pl">C. Pozostałe przychody i zyski, w tym aktualizacja wartości aktywów</field>
                 <field name="code">pl_micro_pl_c</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-75.00 - 76.00 - 999997</field>
                 <field name="hierarchy_level">0</field>
             </record>
@@ -120,8 +109,6 @@
                 <field name="name">D. Other costs and losses, including revaluation of assets</field>
                 <field name="name@pl">D. Pozostałe koszty i straty, w tym aktualizacja wartości aktywów</field>
                 <field name="code">pl_micro_pl_d</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
@@ -137,8 +124,6 @@
                 <field name="name">E. Income tax</field>
                 <field name="name@pl">E. Podatek dochodowy</field>
                 <field name="code">pl_micro_pl_e</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">

@@ -3,11 +3,11 @@
 
     <t t-name="mrp_plm.BomOverviewLine" t-inherit="mrp.BomOverviewLine" t-inherit-mode="extension">
         <xpath expr="//td[@name='td_mrp_bom']" position="after">
-            <td t-if="showEcos" class="text-end">
-                <span t-if="data.version" t-esc="data.version"/>
+            <td t-if="this.showEcos" class="text-end">
+                <span t-if="this.data.version" t-out="this.data.version"/>
             </td>
-            <td t-if="showEcos" class="text-end">
-                <a href="#" t-on-click.prevent="goToEco" t-esc="data.ecos"/>
+            <td t-if="this.showEcos" class="text-end">
+                <a href="#" t-on-click.prevent="this.goToEco" t-out="this.data.ecos"/>
             </td>
         </xpath>
     </t>

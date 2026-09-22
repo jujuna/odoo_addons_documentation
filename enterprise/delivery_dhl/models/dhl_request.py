@@ -68,7 +68,7 @@ class DHLProvider():
 
     def _set_consignee(self, partner_id):
         consignee = self.factory.Consignee()
-        consignee.CompanyName = partner_id.commercial_company_name or partner_id.name
+        consignee.CompanyName = partner_id.parent_name or partner_id.name
         consignee.AddressLine1 = partner_id.street or partner_id.street2
         consignee.AddressLine2 = partner_id.street and partner_id.street2 or None
         consignee.City = partner_id.city
@@ -309,9 +309,9 @@ class DHLProvider():
         currency_id = picking.sale_id and picking.sale_id.currency_id or picking.company_id.currency_id
         for sequence, line in enumerate(move_lines, start=1):
             if line.move_id.sale_line_id:
-                unit_quantity = line.product_uom_id._compute_quantity(line.quantity, line.move_id.sale_line_id.product_uom_id)
+                unit_quantity = line.uom_id._compute_quantity(line.quantity, line.move_id.sale_line_id.product_uom_id)
             else:
-                unit_quantity = line.product_uom_id._compute_quantity(line.quantity, line.product_id.uom_id)
+                unit_quantity = line.uom_id._compute_quantity(line.quantity, line.product_id.uom_id)
             rounded_qty = max(1, float_round(unit_quantity, precision_digits=0, rounding_method='HALF-UP'))
             item = self.factory.ExportLineItem()
             item.LineNumber = sequence

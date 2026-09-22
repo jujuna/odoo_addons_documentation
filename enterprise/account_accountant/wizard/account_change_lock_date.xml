@@ -10,7 +10,7 @@
                     <sheet>
                         <group>
                             <field name="show_draft_entries_warning" invisible="True"/>
-                            <div class="alert alert-warning mb-0 d-flex" role="alert"
+                            <div class="alert alert-warning mb-0 d-flex gap-2 flex-wrap" role="alert"
                                  colspan="2"
                                  invisible="not show_draft_entries_warning">
                                 There are still draft entries in the period you want to lock.
@@ -18,19 +18,19 @@
                                 <a type="object"
                                    class="oe_link fw-bold"
                                    name="action_show_draft_moves_in_locked_period"
-                                   icon="oi-arrow-right">
+                                   icon="east">
                                     Review
                                 </a>
                             </div>
                             <field name="show_posted_tax_closing_warning" invisible="True"/>
-                            <div class="alert alert-warning mb-0 d-flex" role="alert"
+                            <div class="alert alert-warning mb-0 d-flex gap-2 flex-wrap" role="alert"
                                  colspan="2"
                                  invisible="not show_posted_tax_closing_warning">
                                 A posted tax return closing entry exists after this tax lock date. You might want to reset the related tax return to non-submitted.
                                 <a type="object"
                                    class="oe_link fw-bold"
                                    name="action_show_posted_tax_closing_in_locked_period"
-                                   icon="oi-arrow-right">
+                                   icon="east">
                                     Review
                                 </a>
                             </div>
@@ -51,7 +51,7 @@
                                 <field name="sale_lock_date" placeholder="Not locked"
                                        class="oe_inline"
                                        decoration-info="exception_needed_fields and 'sale_lock_date' in exception_needed_fields"
-                                       options="{'warn_future': true}"/>
+                                       options="{'warning': 'future'}"/>
                                 <span class="text-muted o_form_label"
                                       invisible="not min_sale_lock_date_exception_for_me_id">
                                     For me:
@@ -85,7 +85,7 @@
                                 <field name="purchase_lock_date" placeholder="Not locked"
                                        class="oe_inline"
                                        decoration-info="exception_needed_fields and 'purchase_lock_date' in exception_needed_fields"
-                                       options="{'warn_future': true}"/>
+                                       options="{'warning': 'future'}"/>
                                 <span class="text-muted o_form_label"
                                       invisible="not min_purchase_lock_date_exception_for_me_id">
                                     For me:
@@ -119,7 +119,7 @@
                                 <field name="tax_lock_date" placeholder="Not locked"
                                        class="oe_inline"
                                        decoration-info="exception_needed_fields and 'tax_lock_date' in exception_needed_fields"
-                                       options="{'warn_future': true}"/>
+                                       options="{'warning': 'future'}"/>
                                 <span class="text-muted"
                                       invisible="min_tax_lock_date_exception_for_me_id or min_tax_lock_date_exception_for_everyone_id">
                                     <i class="ms-2">after a tax closing</i>
@@ -157,7 +157,7 @@
                                 <field name="fiscalyear_lock_date" placeholder="Not locked"
                                        class="oe_inline"
                                        decoration-info="exception_needed_fields and 'fiscalyear_lock_date' in exception_needed_fields"
-                                       options="{'warn_future': true}"/>
+                                       options="{'warning': 'future'}"/>
                                 <span class="text-muted"
                                       invisible="min_fiscalyear_lock_date_exception_for_me_id or min_fiscalyear_lock_date_exception_for_everyone_id">
                                     <i class="ms-2">but allow exceptions</i>
@@ -212,7 +212,7 @@
                                         <field name="hard_lock_date" placeholder="Not locked"
                                                class="oe_inline mx-3"
                                                decoration-info="exception_needed_fields and 'hard_lock_date' in exception_needed_fields"
-                                               options="{'warn_future': true}"/>
+                                               options="{'warning': 'future'}"/>
                                         <span class="text-danger o_form_label" invisible="hard_lock_date == current_hard_lock_date">
                                             <i>This change is irreversible</i>
                                         </span>
@@ -223,7 +223,7 @@
                     </sheet>
                     <footer>
                         <button string="Save" name="change_lock_date" type="object" class="btn-primary" data-hotkey="q"/>
-                        <button string="Discard" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                        <button class="btn-secondary" special="cancel" data-hotkey="x"/>
                     </footer>
                </form>
             </field>

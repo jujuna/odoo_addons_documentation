@@ -62,7 +62,7 @@ registry.category("web_tour.tours").add("website_knowledge_public_view_tour", {
         },
         {
             content: "Check that the article was opened",
-            trigger: ".o_knowledge_header span:contains('📄 Published Child')",
+            trigger: ".o_knowledge_header span:contains('Published Child')",
         },
         {
             content: "Check that active article in the sidebar was updated",
@@ -70,7 +70,7 @@ registry.category("web_tour.tours").add("website_knowledge_public_view_tour", {
         },
         {
             content: "Click on search bar",
-            trigger: ".o_knowledge_sidebar button:has(i.fa-search)",
+            trigger: ".o_knowledge_sidebar button:has(i[data-icon='search'])",
             run: "click",
         },
         {
@@ -106,7 +106,7 @@ registry.category("web_tour.tours").add("website_knowledge_public_view_tour", {
         },
         {
             content: "Check that the untitled article was opened",
-            trigger: ".o_knowledge_header:contains('📄 Untitled')",
+            trigger: ".o_knowledge_header:contains('Untitled')",
         },
         {
             content: "Check that article is visible in the sidebar",

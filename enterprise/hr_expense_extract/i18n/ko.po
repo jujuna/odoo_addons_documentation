@@ -3,29 +3,30 @@
 # * hr_expense_extract
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-09-16 12:13+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 02:09+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
 "hr_expense_extract/ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_expense_extract
 #. odoo-javascript
 #: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
 msgid "<b>Wasting time recording your receipts?</b> Let’s try a better way."
 msgstr ""
-"<b>영수증 내역을 기록하는데 시간을 낭비하고 있으신가요? </b>더 나은 방법을 찾"
-"아보세요."
+"<b>영수증 내역을 기록하는데 시간을 낭비하고 있으신가요? </b>더 나은 방법을 "
+"찾아보세요."
 
 #. module: hr_expense_extract
 #: model_terms:web_tour.tour,rainbow_man_message:hr_expense_extract.hr_expense_extract_tour
@@ -52,14 +53,8 @@ msgid "Can show the ocr send button"
 msgstr "OCR 전송 버튼 표시 가능"
 
 #. module: hr_expense_extract
-#. odoo-javascript
-#: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
-msgid "Choose a receipt."
-msgstr "영수증 선택."
-
-#. module: hr_expense_extract
 #: model:ir.model,name:hr_expense_extract.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr "회사"
 
 #. module: hr_expense_extract
@@ -143,9 +138,19 @@ msgid "Expenses created from sample receipt"
 msgstr "샘플 영수증에서 생성된 경비"
 
 #. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_attachment_id
+msgid "Extract Attachment"
+msgstr ""
+
+#. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_state_processed
 msgid "Extract State Processed"
 msgstr "진행 상태 추출"
+
+#. module: hr_expense_extract
+#: model:ir.module.module,summary:base.module_hr_expense_extract
+msgid "Extract data from expense scans to fill them automatically"
+msgstr ""
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_state
@@ -156,6 +161,21 @@ msgstr "추출 상태"
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_status
 msgid "Extract status"
 msgstr "추출 상태"
+
+#. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extracted_dates
+msgid "Extracted Dates"
+msgstr ""
+
+#. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extracted_numbers
+msgid "Extracted Numbers"
+msgstr ""
+
+#. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extracted_words
+msgid "Extracted Words"
+msgstr ""
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__message_follower_ids
@@ -171,6 +191,11 @@ msgstr "팔로워 (협력사)"
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__has_message
 msgid "Has Message"
 msgstr "메시지가 있습니다"
+
+#. module: hr_expense_extract
+#: model:ir.module.module,shortdesc:base.module_hr_expense_extract
+msgid "Hr Expense Extract"
+msgstr ""
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_expense_sample_receipt__id
@@ -257,6 +282,12 @@ msgid "Ratings"
 msgstr "평가"
 
 #. module: hr_expense_extract
+#. odoo-python
+#: code:addons/hr_expense_extract/models/hr_expense.py:0
+msgid "Receipt not digitized: the expense already includes Stripe data."
+msgstr ""
+
+#. module: hr_expense_extract
 #. odoo-javascript
 #: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
 msgid "Report this expense to your manager for validation."
@@ -317,16 +348,6 @@ msgid "Upload or drop an expense receipt"
 msgstr "경비 관련 영수증 업로드 또는 삭제"
 
 #. module: hr_expense_extract
-#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__website_message_ids
-msgid "Website Messages"
-msgstr "웹사이트 메시지"
-
-#. module: hr_expense_extract
-#: model:ir.model.fields,help:hr_expense_extract.field_hr_expense__website_message_ids
-msgid "Website communication history"
-msgstr "웹사이트 대화 이력"
-
-#. module: hr_expense_extract
 #. odoo-python
 #: code:addons/hr_expense_extract/models/hr_expense.py:0
 msgid "You cannot send a expense that is not in draft state!"
@@ -343,3 +364,9 @@ msgstr "관리자가 해당 지출결의서를 승인 (또는 반려)할 예정�
 #: code:addons/hr_expense_extract/models/hr_expense.py:0
 msgid "try a sample receipt"
 msgstr "영수증 샘플 사용하기"
+
+msgid "Website Messages"
+msgstr "웹사이트 메시지"
+
+msgid "Website communication history"
+msgstr "웹사이트 대화 이력"

@@ -52,14 +52,14 @@ class ResCompany(models.Model):
     def _l10n_uy_edi_validate_company_data(self):
         self.ensure_one()
         errors = []
-        if not self.vat:
+        if not self.has_vat:
             errors.append(_("Set your company RUT"))
         else:
             # Validate if the VAT is a valid RUT:  we use _check_vat_number to avoid ValidationError
             partner = self.partner_id
             if (
                 partner.vat
-                and partner.l10n_latam_identification_type_id.l10n_uy_dgi_code == "2"
+                and partner.country_code == 'UY'
                 and not partner._check_vat_number('UY', partner.vat)
             ):
                 errors.append(_("Set a valid RUT in your company"))

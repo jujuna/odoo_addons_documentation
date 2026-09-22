@@ -8,7 +8,14 @@ import { createSpreadsheet } from "@documents_spreadsheet/../tests/helpers/sprea
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
 import { animationFrame } from "@odoo/hoot-mock";
 import { Model } from "@odoo/o-spreadsheet";
-import { contains, getService, MockServer, mockService } from "@web/../tests/web_test_helpers";
+import { queryAllTexts } from "@odoo/hoot-dom";
+import {
+    contains,
+    getService,
+    MockServer,
+    mockService,
+    patchWithCleanup,
+} from "@web/../tests/web_test_helpers";
 
 defineDocumentSpreadsheetModels();
 describe.current.tags("desktop");
@@ -152,12 +159,13 @@ test("Freeze&Share spreadsheet from control panel", async function () {
             expect.step("open_share");
         },
     });
-    await createSpreadsheet({
+    const { model: modelBis } = await createSpreadsheet({
         serverData,
         spreadsheetId,
         mockRPC: async function (route, args) {
             if (args.method === "action_freeze_and_copy") {
-                const excel = JSON.parse(JSON.stringify(model.exportXLSX().files));
+                const exportXLSX = await model.exportXLSX();
+                const excel = JSON.parse(JSON.stringify(exportXLSX.files));
 
                 expect(args.args[0]).toEqual(spreadsheetId);
                 expect(args.args[1]).toEqual(JSON.stringify(model.exportData()));
@@ -168,12 +176,22 @@ test("Freeze&Share spreadsheet from control panel", async function () {
             }
         },
     });
+    const dispatched = [];
+    const oldDispatch = modelBis.dispatch;
+    patchWithCleanup(modelBis, {
+        dispatch: (command, args) => {
+            dispatched.push(command);
+            return oldDispatch(command, args);
+        },
+    });
+
     expect(target.querySelector(".spreadsheet_share_dropdown")).toBe(null);
     await contains(".o-topbar-menu[data-id=file]").click();
     await contains(".o-menu-item[data-name=share]").click();
     await contains(".o-menu-item[data-name=freeze_and_share]").click();
 
     expect.verifySteps(["spreadsheet_shared", "open_share"]);
+    expect(dispatched).toInclude("LOG_DATASOURCE_EXPORT");
 });
 
 test("Share spreadsheet from control panel", async function () {
@@ -198,7 +216,7 @@ test("Share spreadsheet from control panel", async function () {
     });
     await createSpreadsheet({ serverData, spreadsheetId });
     expect(target.querySelector(".spreadsheet_share_dropdown")).toBe(null);
-    await contains("button:contains(Share)").click();
+    await contains(".o-spreadsheet-topbar span:contains(Share)").click();
     expect.verifySteps(["open_share"]);
 });
 
@@ -219,7 +237,7 @@ test("Share button is hidden when document is archived (Trash)", async function 
 
     await createSpreadsheet({ serverData, spreadsheetId });
 
-    expect("o-spreadsheet-topbar button:contains(Share)").toHaveCount(0, {
+    expect(".o-spreadsheet-topbar span:contains(Share)").toHaveCount(0, {
         message: "Share button should be hidden for archived spreadsheets",
     });
     await contains(".o-topbar-menu[data-id=file]").click();
@@ -264,11 +282,12 @@ test("Spreadsheet action is named in breadcrumb", async function () {
         views: [[false, "pivot"]],
     });
     await animationFrame();
-    const items = target.querySelectorAll(".breadcrumb-item");
-    const [breadcrumb1, breadcrumb2] = Array.from(items).map((item) => item.innerText);
-    expect(breadcrumb1).toBe("pivot view");
-    expect(breadcrumb2).toBe("Untitled spreadsheet");
-    expect(".o_breadcrumb .active").toHaveText("Partner");
+    await contains(".breadcrumb .dropdown-toggle").click();
+    expect(".o-overlay-container .dropdown-menu").toHaveText("pivot view");
+    expect(queryAllTexts(".breadcrumb-item a, .o_breadcrumb .active")).toEqual([
+        "Untitled spreadsheet",
+        "Partner",
+    ]);
 });
 
 test("Spreadsheet action is named in breadcrumb with the updated name", async function () {
@@ -293,11 +312,12 @@ test("Spreadsheet action is named in breadcrumb with the updated name", async fu
         views: [[false, "pivot"]],
     });
     await animationFrame();
-    const items = target.querySelectorAll(".breadcrumb-item");
-    const [breadcrumb1, breadcrumb2] = Array.from(items).map((item) => item.innerText);
-    expect(breadcrumb1).toBe("pivot view");
-    expect(breadcrumb2).toBe("My awesome spreadsheet");
-    expect(".o_breadcrumb .active span").toHaveText("Partner");
+    await contains(".breadcrumb .dropdown-toggle").click();
+    expect(".o-overlay-container .dropdown-menu").toHaveText("pivot view");
+    expect(queryAllTexts(".breadcrumb-item a, .o_breadcrumb .active")).toEqual([
+        "My awesome spreadsheet",
+        "Partner",
+    ]);
 });
 
 test("Spreadsheet action is named in breadcrumb with the correct name after go back ", async function () {
@@ -310,11 +330,12 @@ test("Spreadsheet action is named in breadcrumb with the correct name after go b
         views: [[false, "pivot"]],
     });
     await animationFrame();
-    const items = target.querySelectorAll(".breadcrumb-item");
-    const [breadcrumb1, breadcrumb2] = Array.from(items).map((item) => item.innerText);
-    expect(breadcrumb1).toBe("pivot view");
-    expect(breadcrumb2).toBe("My awesome spreadsheet");
-    expect(".o_breadcrumb .active span").toHaveText("Partner");
+    await contains(".breadcrumb .dropdown-toggle").click();
+    expect(".o-overlay-container .dropdown-menu").toHaveText("pivot view");
+    expect(queryAllTexts(".breadcrumb-item a, .o_breadcrumb .active")).toEqual([
+        "My awesome spreadsheet",
+        "Partner",
+    ]);
     await contains(".breadcrumb-item:last").click();
     expect(".o_sp_name input").toHaveValue("My awesome spreadsheet");
 });

@@ -2,6 +2,7 @@ import BarcodePickingModel from "@stock_barcode/models/barcode_picking_model";
 import { user } from "@web/core/user";
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
+import { x2ManyCommands } from "@web/core/orm_plugin";
 import { deepEqual } from "@web/core/utils/objects";
 
 export default class BarcodeMRPModel extends BarcodePickingModel {
@@ -41,14 +42,21 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
             {
                 name: _t("Print Finished Product Label (ZPL)"),
                 class: "o_print_finished_product_zpl",
-                action: "mrp.label_manufacture_template",
+                action: "mrp.action_print_finished_product_zpl",
             },
             {
                 name: _t("Print Finished Product Label (PDF)"),
                 class: "o_print_finsihed_product_pdf",
-                action: "mrp.action_report_finished_product",
+                action: "mrp.action_print_finished_product_pdf",
             },
         ];
+        if (this.groups.group_tracking_lot) {
+            buttons.push({
+                name: _t("Print Packages"),
+                class: "o_print_packages",
+                action: "mrp.action_report_mrp_packages",
+            });
+        }
         return buttons;
     }
 
@@ -60,7 +68,7 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
                 message: this.isDone
                     ? _t("This order is already done")
                     : _t("This order is cancelled"),
-                icon: "exclamation-triangle",
+                icon: "warning",
                 warning: true,
             };
         }
@@ -68,7 +76,7 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
             return {
                 message: _t("Scan a component"),
                 class: "scan_component",
-                icon: "tags",
+                icon: "sell",
             };
         } else if (
             barcodeInfo.class === "scan_validate" &&
@@ -77,24 +85,32 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
             return {
                 message: _t("Scan your final product or more components"),
                 class: "scan_final_product",
-                icon: "tags",
+                icon: "sell",
             };
         } else if (barcodeInfo.class === "scan_validate") {
-            barcodeInfo.message = "Press Produce All or scan another component";
+            barcodeInfo.message = _t("Press 'Produce' or scan another component");
         }
         return barcodeInfo;
     }
 
     get displayRegisterByProduct() {
-        return this.groups.group_mrp_byproducts && this.record.product_id;
+        return this.groups.group_mrp_byproducts && this.record.product_id && !this.displayByProduct;
+    }
+
+    get displayAllocationButton() {
+        return Boolean(this.record?.product_qty);
     }
 
     get displayValidateButton() {
-        return true;
+        return !this.displayByProduct;
     }
 
     get displayPutInPackButton() {
-        return false;
+        return (
+            super.displayPutInPackButton &&
+            this.record.state !== "done" &&
+            this.record.state !== "cancel"
+        );
     }
 
     get moveIds() {
@@ -106,12 +122,12 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
     }
 
     get showReservedSns() {
-        return this.record.picking_type_id.show_reserved_sns;
+        return this.record.picking_type_id.show_reserved_sns || this.displayByProduct;
     }
 
     get isComplete() {
         if (
-            this.record.product_id.tracking !== "none" &&
+            ["lot", "serial"].includes(this.record.product_id.tracking) &&
             !(this.record.lot_producing_ids.length || this.record.lot_name)
         ) {
             return false;
@@ -135,14 +151,18 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
     }
 
     get canBeValidate() {
+        if (!this.config.barcode_validation_full && !this.record.qty_producing) {
+            return false;
+        }
         return ["confirmed", "progress", "to_close"].includes(this.record.state);
     }
 
     get canCreateNewLot() {
         const currentLine =
-            this.selectedLine && this.selectedLine.product_id.tracking !== "none"
+            this.selectedLine && ["lot", "serial"].includes(this.selectedLine.product_id.tracking)
                 ? this.selectedLine
-                : this.lastScannedLine && this.lastScannedLine.product_id.tracking !== "none"
+                : this.lastScannedLine &&
+                  ["lot", "serial"].includes(this.lastScannedLine.product_id.tracking)
                 ? this.lastScannedLine
                 : this.selectedLine || this.lastScannedLine;
         if (
@@ -160,8 +180,11 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         const context = {
             ...this._getNewLineDefaultContext(),
             scrapProduct: true,
-            default_location_dest_id: null,
+            default_location_dest_id: this._defaultScrapLocation().id,
+            default_quantity: 1.0,
+            default_is_scrap: true,
         };
+        delete context.default_qty_done;
         if (this.record.state !== "done") {
             context.product_ids = this.pageLines.map((line) => line.product_id.id);
         } else {
@@ -192,11 +215,19 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         ];
     }
 
-    get validateButtonLabel() {
-        if (this.record.qty_producing < this.record.product_qty) {
-            return _t("Produce");
+    get operationSourceLocation() {
+        if (this.record) {
+            return this.cache.getRecord("stock.location", this.record.location_src_id);
         }
-        return _t("Produce All");
+        return false;
+    }
+
+    get validateButtonLabel() {
+        return _t("Produce");
+    }
+
+    get canPutInPack() {
+        return this.resId || super.canPutInPack;
     }
 
     getLineLocation(line) {
@@ -214,6 +245,10 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         return this.displayByProduct || super.lineCanBeSelected(line);
     }
 
+    lineCanBeEdited(line) {
+        return this.displayByProduct || super.lineCanBeEdited(line);
+    }
+
     /** Fetch data and set state */
 
     getActionRefresh(newId) {
@@ -228,6 +263,9 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         super.setData(...arguments);
         this.headerViewId = data.data.header_view_id;
         this.useTrackingNumber = true;
+        if (this.config.restrict_scan_product) {
+            this.validateContext.skip_compute_move_raw_ids = true;
+        }
     }
 
     _getName() {
@@ -260,7 +298,7 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
             return {};
         }
         record.product_id = this.cache.getRecord("product.product", record.product_id);
-        record.product_uom_id = this.cache.getRecord("uom.uom", record.product_uom_id);
+        record.uom_id = this.cache.getRecord("uom.uom", record.uom_id);
         if (record.lot_producing_ids.length > 0) {
             for (const index in record.lot_producing_ids) {
                 record.lot_producing_ids[index] = this.cache.getRecord(
@@ -339,16 +377,15 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
             return {
                 virtual_id: this.record.virtualId,
                 product_id: this.record.product_id,
-                product_uom_id: this.record.product_uom_id,
+                uom_id: this.record.uom_id,
                 location_id: this.cache.getRecord("stock.location", this.record.location_src_id),
                 location_dest_id: this.cache.getRecord(
                     "stock.location",
                     this.record.location_dest_id
                 ),
-                lot_id:
-                    this.record.lot_producing_ids?.length === 1
-                        ? this.record.lot_producing_ids[0]
-                        : false,
+                lot_id: this.record.lot_producing_ids?.length
+                    ? this.record.lot_producing_ids.at(-1)
+                    : false,
                 lot_name: this.record.lot_name,
                 finalProduct: true,
                 package_id: false,
@@ -380,6 +417,13 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         return !barcodeData.match && filters["stock.lot"];
     }
 
+    _canOverrideTrackingNumber(line, newLotName) {
+        if (line.finalProduct) {
+            return true;
+        }
+        return super._canOverrideTrackingNumber(...arguments);
+    }
+
     _shouldCreateLineOnExceed(line) {
         if (line.finalProduct) {
             return false;
@@ -400,11 +444,47 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
     updateLine(line, args) {
         // handle header line updates here
         if (line.finalProduct) {
-            if (args.lot_name) {
-                this.record.lot_name = args.lot_name;
-            }
-            if (args.lot_id) {
-                this.record.lot_producing_ids = [args.lot_id];
+            if (this.record.product_id.tracking === "serial") {
+                let lot = null;
+                if (args.lot_id) {
+                    lot = args.lot_id;
+                } else if (args.lot_name) {
+                    lot = {
+                        name: args.lot_name,
+                        product_id: this.record.product_id.id,
+                        company_id: this.record.company_id,
+                    };
+                }
+                if (lot) {
+                    if (this.record.lot_producing_ids.some((l) => l.name === lot.name)) {
+                        this.notification(
+                            _t("The scanned serial number %s is already used.", lot.name),
+                            { type: "danger" }
+                        );
+                        return;
+                    }
+                    this.record.lot_producing_ids = [...this.record.lot_producing_ids, lot];
+                }
+            } else {
+                const lot =
+                    args.lot_id ||
+                    (args.lot_name && {
+                        name: args.lot_name,
+                        product_id: this.record.product_id.id,
+                        company_id: this.record.company_id,
+                    });
+                if (lot) {
+                    const currentLot = this.record.lot_producing_ids[0];
+                    const sameLot = currentLot && currentLot.name === lot.name;
+                    if (!sameLot) {
+                        this.record.lot_producing_ids = [lot];
+                        if (currentLot) {
+                            args.qty_done = 0;
+                        }
+                    } else if (lot.id && !currentLot.id) {
+                        this.record.lot_producing_ids = [lot];
+                    }
+                }
             }
             this.produceQty(args.qty_done);
             return;
@@ -416,23 +496,23 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
             }
             line.move_id = move;
         }
-        args.manual_consumption = "manual_consumption" in args ? args.manual_consumption : true;
+        args.picked = "picked" in args ? args.picked : true;
         super.updateLine(...arguments);
         if (args.move_uom_id) {
-            line.product_uom_id = this.cache.getRecord("uom.uom", args.move_uom_id);
+            line.uom_id = this.cache.getRecord("uom.uom", args.move_uom_id);
         }
     }
 
-    updateLineQty(virtualId, qty = 1, manual_consumption = true, location_id = null) {
+    updateLineQty(virtualId, qty = 1, picked = true, location_id = null) {
         this.actionMutex.exec(() => {
             const line = this.currentState.lines.find((l) => l.virtual_id === virtualId);
-            this.updateLine(line, { manual_consumption, location_id, qty_done: qty });
+            this.updateLine(line, { picked, location_id, qty_done: qty });
             this.trigger("update");
         });
     }
 
     _updateLineQty(line, args) {
-        line.manual_consumption = args.manual_consumption;
+        line.picked = args.picked;
         super._updateLineQty(...arguments);
     }
 
@@ -452,48 +532,63 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         const locId = this.displayByProduct
             ? this.record.production_location_id
             : this.record.location_src_id;
-        return this.cache.getRecord("stock.location", locId);
+        return this.cache.getRecord("stock.location", locId, false);
     }
 
     _defaultDestLocation() {
         const locId = this.displayByProduct
             ? this.record.location_dest_id
             : this.record.production_location_id;
-        return this.cache.getRecord("stock.location", locId);
+        return this.cache.getRecord("stock.location", locId, false);
     }
 
     _getNewLineDefaultContext() {
         return {
             default_company_id: this.record.company_id,
-            default_location_id: this._defaultLocation().id,
-            default_location_dest_id: this._defaultDestLocation().id,
+            default_location_id: this._defaultLocation()?.id,
+            default_location_dest_id: this._defaultDestLocation()?.id,
             default_production_id: this.resId,
             default_qty_done: 0,
-            final_product_id: this.record.product_id.id,
+            final_product_id: this.record.product_id?.id,
             newByProduct: this.displayByProduct,
+            display_name: this.record.name,
+            mark_picked: true,
         };
     }
 
     isManualConsumptionLine(line) {
         const parentLine = this._getParentLine(line);
         if (!parentLine) {
-            return line.manual_consumption || !line.reserved_uom_qty;
+            return line.picked || !line.reserved_uom_qty;
         }
         for (const subLine of parentLine.lines) {
-            if (subLine.manual_consumption || !subLine.reserved_uom_qty) {
+            if (subLine.picked || !subLine.reserved_uom_qty) {
                 return true;
             }
         }
         return false;
     }
 
-    produceQty(quantity = 1) {
-        const new_producing = this.record.qty_producing + quantity;
-        this.record.qty_producing = new_producing;
+    async produceQty(quantity = 1) {
+        this.record.qty_producing += quantity;
         const ratio = quantity / this.record.product_qty;
 
         for (const moveId of [...this.record.move_raw_ids, ...this.record.move_byproduct_ids]) {
             const move = this.cache.getRecord("stock.move", moveId);
+            const product = this.cache.getRecord("product.product", move.product_id);
+            const isComponent = this.record.move_raw_ids.includes(moveId);
+            if (isComponent) {
+                if (this.config.restrict_scan_product) {
+                    // Don't automatically update move's qty if scanning the product is mandatory.
+                    continue;
+                } else if (
+                    ["lot", "serial"].includes(product.tracking) &&
+                    this.config.restrict_scan_tracking_number
+                ) {
+                    // Don't automatically update tracked component if scanning the lot/SN is mandatory.
+                    continue;
+                }
+            }
             let manualMove = false;
             const moveLines = this.currentState.lines.filter((line) => line.move_id?.id === moveId);
             let qtyRemaining = ratio * move.product_uom_qty;
@@ -514,12 +609,23 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
                     product_id: this.cache.getRecord("product.product", move.product_id),
                     location_id: move.location_id,
                     qty_done: qtyRemaining,
+                    reserved_uom_qty: qtyRemaining,
                     move_id: moveId,
                 };
                 if (this.groups.group_uom) {
-                    fieldsParams.move_uom_id = move.product_uom;
+                    fieldsParams.move_uom_id = move.uom_id;
                 }
                 this._createNewLine({ fieldsParams });
+            }
+            if (this.groups.group_tracking_lot) {
+                // Need to instantly update the final product in order to create
+                // the correct move lines in backend and allow partial packing
+                const finishedLinesIds = await this.orm.call(
+                    "mrp.production",
+                    "barcode_update_qty_producing",
+                    [[this.resId], this.record.qty_producing]
+                );
+                this.record.finished_move_line_ids = finishedLinesIds;
             }
         }
         this.trigger("update");
@@ -531,9 +637,12 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
                 this.trigger("refresh");
             }
         };
+        const context = { barcode_view: true };
         const params = { onClose };
         await this.save();
-        const res = await this.orm.call("mrp.production", "set_lot_producing", [[this.resId]]);
+        const res = await this.orm.call("mrp.production", "set_lot_producing", [[this.resId]], {
+            context,
+        });
         const [lots, action] = res;
         if (lots) {
             this.record.lot_producing_ids = lots;
@@ -549,6 +658,19 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
             return this.action.doAction(action, params);
         }
         this.trigger("update");
+    }
+
+    async generateByproductLot(line) {
+        const sequenceId = line.product_id.lot_sequence_id;
+        if (sequenceId) {
+            const lotName = await this.orm.call("ir.sequence", "next_by_id", [sequenceId]);
+            const params = { lot_name: lotName };
+            if (line.product_id.tracking === "serial" && !line.qty_done) {
+                params.qty_done = 1;
+            }
+            await this.updateLine(line, params);
+            this.trigger("update");
+        }
     }
 
     displayLineQtyDemand(line) {
@@ -573,7 +695,7 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
 
     _getFieldToWrite() {
         const fields = super._getFieldToWrite(...arguments);
-        fields.push("manual_consumption");
+        fields.push("picked");
         return fields;
     }
 
@@ -632,6 +754,15 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
                 },
             ];
         }
+        const lots = this.record.lot_producing_ids;
+        if (Array.isArray(res.lot_producing_ids) && lots.some((l) => !l.id)) {
+            const existingIds = lots.filter((l) => l.id).map((l) => l.id);
+            const newLots = lots.filter((l) => !l.id);
+            res.lot_producing_ids = [
+                x2ManyCommands.set(existingIds),
+                ...newLots.map((l) => x2ManyCommands.create(false, l)),
+            ];
+        }
 
         if (!this.record.company_id) {
             res.company_id = this._getCompanyId();
@@ -655,7 +786,7 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
     _getCommands() {
         return Object.assign(super._getCommands(), {
             OBTPRMO: this.print.bind(this, "mrp.action_report_production_order"),
-            OBTPRPL: this.print.bind(this, "mrp.action_report_finished_product"),
+            OBTPRPL: this.print.bind(this, "mrp.action_print_finished_product_pdf"),
         });
     }
 
@@ -665,8 +796,34 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         return defaultCompanyId || userCompanyId;
     }
 
-    async _putInPack(additionalParams = {}) {
-        const message = _t("You are expected to scan one or more products.");
-        this.notification(message, { type: "danger" });
+    async _putInPack(additionalParams = {}, splitLines = true) {
+        if (!this.resId) {
+            const message = _t("You are expected to scan one or more products.");
+            this.notification(message, { type: "danger" });
+            return;
+        }
+        additionalParams.move_line_ids = false;
+        splitLines = false;
+        if (this.displayByProduct) {
+            additionalParams.move_line_ids =
+                this.selectedLine?.move_id?.move_line_ids || this.record.move_byproduct_line_ids;
+            splitLines = true;
+        }
+        return super._putInPack(additionalParams, splitLines);
+    }
+
+    getPutInPackParams(params) {
+        return {
+            ...super.getPutInPackParams(params),
+            move_line_ids: params.move_line_ids,
+        };
+    }
+
+    mustTryPackUnscannedLine() {
+        return !this.resId && super.mustTryPackUnscannedLine();
+    }
+
+    _putInPackaging() {
+        return false;
     }
 }

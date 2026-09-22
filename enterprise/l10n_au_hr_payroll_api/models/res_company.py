@@ -28,7 +28,11 @@ class ResCompany(models.Model):
         ],
         string="Payroll Mode",
         default="test",
-        required=True
+        required=True,
+        help="""
+        - Testing: use this mode on a testing database (without subscription code) to test Odoo's payroll solution without sending actual data to the ATO.
+        - Production: use this mode on a production database (with a subscription code) to send live STP data to the ATO.
+        """
     )
     l10n_au_abn_valid = fields.Boolean("ABN Validation State", readonly=True, tracking=True)
     l10n_au_employer_registration_ids = fields.One2many(
@@ -112,7 +116,8 @@ class ResCompany(models.Model):
         host = self.env["account_edi_proxy_client.user"]._get_server_url("l10n_au_payroll", self.l10n_au_payroll_mode or "test")
         params = params or {}
         params.update({
-            "db_uuid": self.env['ir.config_parameter'].get_param('database.uuid'),
+            "db_uuid": self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
+            "is_neutralised": self.env['ir.config_parameter'].sudo().get_str('database.is_neutralized', False),
         })
         try:
             response = requests.get(

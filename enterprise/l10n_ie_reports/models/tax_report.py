@@ -5,8 +5,9 @@ from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, models, fields, _
-from odoo.tools import float_repr, float_round
 from odoo.exceptions import UserError
+from odoo.tools import float_repr, float_round
+from odoo.tools.business_data import split_vat
 
 
 class L10n_IeTaxReportHandler(models.AbstractModel):
@@ -47,8 +48,8 @@ class L10n_IeTaxReportHandler(models.AbstractModel):
         }
 
         # Check company PPSN
-        vat_country, vat_number = self.env['res.partner']._split_vat(self.env.company.vat)
-        ppsn = self.env.company.company_registry or (vat_number if vat_country == 'IE' else self.env.company.vat)
+        vat_country, vat_number = split_vat(self.env.company.vat)
+        ppsn = self.env.company.partner_id._get_additional_identifier('IE_PPSN') or (vat_number if vat_country == 'IE' else self.env.company.vat)
         if not stdnum.ie.pps.is_valid(ppsn):
             raise UserError(_('You must set a valid PPSN number in the `Company Registry` field of your Company configuration.'))
         values['ppsn'] = ppsn
@@ -74,7 +75,7 @@ class L10n_IeTaxReportHandler(models.AbstractModel):
 
         # Compute amount of sales, purchases, intra-EU goods and services, and postponed accounting imports
         lines = report._get_lines(options)
-        lines_by_generic_id = {line['id']: line for line in lines}
+        lines_by_generic_id = {line.id: line for line in lines}
         report_lines_to_extract = {
             'sale_vat': 'l10n_ie.l10n_ie_tr_T1',
             'purchase_vat': 'l10n_ie.l10n_ie_tr_T2',
@@ -87,7 +88,7 @@ class L10n_IeTaxReportHandler(models.AbstractModel):
         for key, report_line_ref in report_lines_to_extract.items():
             generic_id = report._get_generic_line_id('account.report.line', self.env.ref(report_line_ref).id)
             line = lines_by_generic_id[generic_id]
-            balance = line['columns'][-1]['no_format']  # We take the last column in case there is a comparison
+            balance = line.columns[-1].no_format  # We take the last column in case there is a comparison
             balance_whole = float_round(balance, precision_digits=0)  # Amounts should be in whole Euro
             values[key] = balance_whole
 

@@ -1,4 +1,5 @@
 import { deserializeDateTime, serializeDateTime } from "@web/core/l10n/dates";
+import { localStartOf } from "@web_gantt/gantt_helpers";
 import { Domain } from "@web/core/domain";
 
 import { TaskGanttModelCommon } from "@project_enterprise/views/project_task_common/task_gantt_model_common";
@@ -30,6 +31,15 @@ export class TaskGanttModel extends TaskGanttModelCommon {
             delete context.user_ids;
         }
         return { ...context, search_default_open_tasks: true };
+    }
+
+    /**
+     * @override
+     */
+    getRangeFromDate(rangeId, date) {
+        const startDate = localStartOf(date, rangeId);
+        const stopDate = startDate.plus({ [rangeId]: 1 }).minus({ day: 1 });
+        return { focusDate: date, startDate, stopDate, rangeId };
     }
 
     /**

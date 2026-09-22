@@ -3,29 +3,28 @@
 # * hr_expense_extract
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-10-13 15:01+0000\n"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 02:09+0000\n"
 "Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
 "hr_expense_extract/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_expense_extract
 #. odoo-javascript
 #: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
 msgid "<b>Wasting time recording your receipts?</b> Let’s try a better way."
-msgstr ""
-"<b>Perdi tempo a registrare le ricevute?</b> Proviamo un modo migliore."
+msgstr "<b>Perdi tempo a registrare le ricevute?</b> Proviamo un modo migliore."
 
 #. module: hr_expense_extract
 #: model_terms:web_tour.tour,rainbow_man_message:hr_expense_extract.hr_expense_extract_tour
@@ -52,15 +51,9 @@ msgid "Can show the ocr send button"
 msgstr "Può mostrare il pulsante di invio OCR"
 
 #. module: hr_expense_extract
-#. odoo-javascript
-#: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
-msgid "Choose a receipt."
-msgstr "Scegli una ricevuta."
-
-#. module: hr_expense_extract
 #: model:ir.model,name:hr_expense_extract.model_res_company
-msgid "Companies"
-msgstr "Aziende"
+msgid "Company"
+msgstr "Azienda"
 
 #. module: hr_expense_extract
 #: model:ir.model,name:hr_expense_extract.model_res_config_settings
@@ -143,9 +136,19 @@ msgid "Expenses created from sample receipt"
 msgstr "Spese create dalla ricevuta campione"
 
 #. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_attachment_id
+msgid "Extract Attachment"
+msgstr "Allegato estratto"
+
+#. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_state_processed
 msgid "Extract State Processed"
 msgstr "Estrai elementi elaborati"
+
+#. module: hr_expense_extract
+#: model:ir.module.module,summary:base.module_hr_expense_extract
+msgid "Extract data from expense scans to fill them automatically"
+msgstr ""
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_state
@@ -156,6 +159,21 @@ msgstr "Stato estrazione"
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_status
 msgid "Extract status"
 msgstr "Stato estrazione"
+
+#. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extracted_dates
+msgid "Extracted Dates"
+msgstr "Date estratte"
+
+#. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extracted_numbers
+msgid "Extracted Numbers"
+msgstr "Numeri estratti"
+
+#. module: hr_expense_extract
+#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extracted_words
+msgid "Extracted Words"
+msgstr "Parole estratte"
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__message_follower_ids
@@ -171,6 +189,11 @@ msgstr "Seguito da (partner)"
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__has_message
 msgid "Has Message"
 msgstr "Contiene messaggio"
+
+#. module: hr_expense_extract
+#: model:ir.module.module,shortdesc:base.module_hr_expense_extract
+msgid "Hr Expense Extract"
+msgstr ""
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_expense_sample_receipt__id
@@ -257,6 +280,12 @@ msgid "Ratings"
 msgstr "Valutazioni"
 
 #. module: hr_expense_extract
+#. odoo-python
+#: code:addons/hr_expense_extract/models/hr_expense.py:0
+msgid "Receipt not digitized: the expense already includes Stripe data."
+msgstr "Ricevuta non digitalizzata: la spesa include già i dati Stripe."
+
+#. module: hr_expense_extract
 #. odoo-javascript
 #: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
 msgid "Report this expense to your manager for validation."
@@ -317,16 +346,6 @@ msgid "Upload or drop an expense receipt"
 msgstr "Carica o rilascia la ricevuta di una spesa"
 
 #. module: hr_expense_extract
-#: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__website_message_ids
-msgid "Website Messages"
-msgstr "Messaggi sito web"
-
-#. module: hr_expense_extract
-#: model:ir.model.fields,help:hr_expense_extract.field_hr_expense__website_message_ids
-msgid "Website communication history"
-msgstr "Cronologia comunicazioni sito web"
-
-#. module: hr_expense_extract
 #. odoo-python
 #: code:addons/hr_expense_extract/models/hr_expense.py:0
 msgid "You cannot send a expense that is not in draft state!"
@@ -343,3 +362,9 @@ msgstr "Il supervisore dovrà approvare (o respingere) le note spese."
 #: code:addons/hr_expense_extract/models/hr_expense.py:0
 msgid "try a sample receipt"
 msgstr "prova una ricevuta campione"
+
+msgid "Website Messages"
+msgstr "Messaggi sito web"
+
+msgid "Website communication history"
+msgstr "Cronologia comunicazioni sito web"

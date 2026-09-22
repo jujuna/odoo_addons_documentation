@@ -1,29 +1,24 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
+from textwrap import dedent
+
+from odoo import models
+
+CRM_LIVECHAT_PREPROMPT = dedent("""
+    ## CRM Integration
+    - Secondary goal: when a user's request cannot be handled with high confidence, collect contact details (if not already known) and create a lead so a human can follow up.
+    - You have access to the "Lead creation" skill which provides tools to create a lead in our CRM.
+
+    ## Decision rules
+    1) If you can answer with high confidence from internal data → answer directly.
+    2) If you cannot answer, the request requires human follow-up, or the user asks to be contacted → start the Lead creation flow (defined by the Lead creation skill).
+    3) If the user provides contact info unsolicited while you are in normal Q&A, confirm whether they'd like a human follow-up; if yes, run the Lead creation flow.
+""").strip()
 
 
 class AIAgent(models.Model):
     _inherit = 'ai.agent'
 
-    created_leads_count = fields.Integer(compute='_compute_created_leads')
-
-    def _compute_created_leads(self):
-        lead_count_by_agent = dict(self.env['crm.lead']._read_group(
-            [('source_id', 'in', self.mapped('source_id').ids)],
-            ['source_id'],
-            ['__count']
-        ))
-        for agent in self:
-            self.created_leads_count = lead_count_by_agent.get(agent.source_id)
-
-    def action_view_leads(self):
-        self.ensure_one()
-        action = {
-            'type': 'ir.actions.act_window',
-            'res_model': 'crm.lead',
-            'name': self.env._('Leads created by %s', self.name),
-            'domain': [('source_id', '=', self.source_id.id)],
-            'view_mode': 'kanban,list,graph,pivot,form,calendar,activity',
-        }
-        return action
+    def _get_livechat_preprompt(self):
+        livechat_preprompt = super()._get_livechat_preprompt()
+        return f"{livechat_preprompt}\n{CRM_LIVECHAT_PREPROMPT}"

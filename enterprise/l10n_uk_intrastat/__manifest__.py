@@ -8,7 +8,6 @@ Generates Intrastat XML report for declaration based on invoices for United King
     'data': [
         'data/account_return_data.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

@@ -14,7 +14,7 @@
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" placeholder="Visible to all"/>
                         </group>
                         <group>
-                            <field name="image" widget="image" class="o_onboarding_form_img bg-dark" nolabel="1" colspan="2"/>
+                            <field name="image" widget="image" nolabel="1" options="{'img_class': 'bg-200'}"/>
                         </group>
                     </group>
                 </sheet>
@@ -35,7 +35,7 @@
                 </header>
                 <field name="sequence" widget="handle"/>
                 <field name="text"/>
-                <field name="image" optional="show" widget="image" class="o_onboarding_list_img bg-dark"/>
+                <field name="image" optional="show" widget="image" nolabel="1" class="text-align-end" options="{'size': [200,150], 'img_class': 'bg-200'}"/>
                 <field name="company_id" optional="hide" groups="base.group_multi_company"/>
             </list>
         </field>
@@ -48,6 +48,6 @@
         <field name="group_ids" eval="[Command.link(ref('hr_referral.group_hr_referral_manager'))]"/>
     </record>
 
-    <menuitem parent="menu_hr_referral_configuration" id="menu_hr_referral_onboarding_configuration" action="action_hr_referral_onboarding_configuration" sequence="7" groups="hr_referral.group_hr_referral_manager"/>
+    <menuitem parent="menu_hr_referral_dashboard_configuration" id="menu_hr_referral_onboarding_configuration" action="action_hr_referral_onboarding_configuration" sequence="3" groups="hr_referral.group_hr_referral_manager"/>
 
 </odoo>

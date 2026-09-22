@@ -29,9 +29,15 @@
                     inset: -$border-width;
                     height: $border-width * 3;
                     background-color: var(--Notebook__link-border-top-color--active);
+                    border-top-left-radius: inherit;
+                    border-top-right-radius: inherit;
                     content: '';
                 }
             }
         }
+    }
+
+    &.vertical .nav-tabs .nav-link.active::after {
+        content: none;
     }
 }

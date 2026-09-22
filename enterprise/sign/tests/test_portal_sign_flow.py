@@ -1,17 +1,19 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.addons.base.tests.common import HttpCaseWithUserPortal
-from odoo.tests import tagged
+from odoo.tests import freeze_time, tagged
 from .sign_request_common import SignRequestCommon
 
 
 @tagged('post_install', '-at_install')
 class TestPortalSignFlow(HttpCaseWithUserPortal, SignRequestCommon):
 
+    @freeze_time('2026-01-01')
     def test_portal_sign_document(self):
         """Test for signing a document from the portal."""
         self.create_sign_request_1_role(self.partner_portal, self.env['res.partner'])
-        self.start_tour("/", 'portal_sign_document', login="portal")
+        self.create_sign_request_1_role_scheduled(self.partner_portal, self.env['res.partner'], '2026-02-01')
+        self.start_tour("/my", 'portal_sign_document', login="portal")
 
     def test_portal_download_signed_document(self):
         """Test for download a signed document using download button."""
@@ -20,4 +22,4 @@ class TestPortalSignFlow(HttpCaseWithUserPortal, SignRequestCommon):
         sign_request_item_signer_1 = sign_request_item[self.role_signer_1]
 
         sign_request_item_signer_1.sudo().sign(self.single_signer_sign_values)
-        self.start_tour("/", 'portal_download_signed_document', login="portal")
+        self.start_tour("/my", 'portal_download_signed_document', login="portal")

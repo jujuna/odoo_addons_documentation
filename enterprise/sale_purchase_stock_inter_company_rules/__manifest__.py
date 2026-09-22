@@ -13,10 +13,9 @@
         'sale_purchase_inter_company_rules'
     ],
     'data': [
-        'views/res_company_views.xml',
+        'data/mail_templates.xml',
         'views/res_config_settings_views.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

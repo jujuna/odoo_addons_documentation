@@ -2,8 +2,10 @@ import logging
 
 from datetime import datetime, timedelta, timezone
 
+from requests.exceptions import RequestException
+
 from odoo import fields, models
-from odoo.exceptions import UserError, AccessError
+from odoo.exceptions import UserError
 from odoo.addons.iap.tools import iap_tools
 from odoo.addons.iap import InsufficientCreditError
 
@@ -43,14 +45,14 @@ class ResConfigSettings(models.TransientModel):
         in_test_mode = self.l10n_uy_edi_ucfe_env == "testing"
         notification_email = "your email"
 
-        if not self.company_id.vat:
+        if not self.company_id.has_vat:
             raise UserError(self.env._('Please configure your company RUT first'))
 
         try:
             res = iap_tools.iap_jsonrpc(
                 (TEST_ENDPOINT if in_test_mode else PROD_ENDPOINT) + "api/l10n_uy_reg_proxy/1/create_account",
                 params={
-                    "db_uuid": self.env["ir.config_parameter"].sudo().get_param("database.uuid", "FAKETESTID"),
+                    "db_uuid": self.env["ir.config_parameter"].sudo().get_str("database.uuid") or "FAKETESTID",
                     "company": self.company_id.id,
                     "company_name": self.company_id.name,
                     "company_vat": self.company_id.vat,
@@ -79,7 +81,7 @@ class ResConfigSettings(models.TransientModel):
             else:  # res == {'success': True, 'email': <email_str>}
                 notification_email = res["email"]
 
-        except (UserError, InsufficientCreditError, AccessError) as exp:
+        except (RequestException, InsufficientCreditError) as exp:
             error = str(exp)
 
         if error:

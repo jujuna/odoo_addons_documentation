@@ -9,29 +9,38 @@
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # "Cécile Collart (cco)" <cco@odoo.com>, 2025.
 # Sylvain Albasser <pandraghon@outlook.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-12-10 10:26+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/approvals/"
-"fr/>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 03:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"approvals/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "%s (copy)"
-msgstr "%s (copie)"
+#: model:ir.module.module,description:base.module_approvals
+msgid ""
+"\n"
+"This module manages approvals workflow\n"
+"======================================\n"
+"\n"
+"This module manages approval requests like business trips,\n"
+"out of office, overtime, borrow items, general approvals,\n"
+"procurements, contract approval, etc.\n"
+"\n"
+"According to the approval type configuration, a request\n"
+"creates next activities for the related approvers.\n"
+msgstr ""
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
@@ -39,40 +48,19 @@ msgid "'Approval - %s' % object.name"
 msgstr "'Validation - %s' % object.name"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/07/2023 10:00:00"
-msgstr "07/07/2023 10:00:00"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/08/2023 10:00:00"
-msgstr "07/08/2023 10:00:00"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "1200"
-msgstr "1200"
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuse"
+msgstr "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuser"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-check text-success me-1\"/>Approve"
-msgstr "<i class=\"fa fa-check text-success me-1\"/>Valider"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-times text-danger me-1\"/>Refuse"
-msgstr "<i class=\"fa fa-times text-danger me-1\"/>Refuser"
+msgid "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Approve"
+msgstr "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Valider"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "<span class=\"col-2 fw-bold\">Description:</span>"
 msgstr "<span class=\"col-2 fw-bold\">Description :</span>"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
-msgstr ""
-"<span class=\"fa fa-warning\" title=\"Validations minimales invalides\"/>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -83,6 +71,15 @@ msgstr "<span class=\"fw-bold\">Pour</span>"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
 msgid "<span class=\"mx-1\">-</span>"
 msgstr "<span class=\"mx-1\">-</span>"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
+">"
+msgstr ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Validations minimales "
+"invalides\"/>"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
@@ -108,7 +105,12 @@ msgstr "Activité"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "Activité exception décoration"
+msgstr "Indicateur d’exception d’activité"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
+msgid "Activity Plans"
+msgstr "Plans d'activité"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
@@ -141,16 +143,6 @@ msgstr "Administrateur"
 #: model:ir.ui.menu,name:approvals.approvals_approval_menu_all
 msgid "All Approvals"
 msgstr "Toutes les validations"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,help:approvals.field_approval_request__approval_type
-msgid ""
-"Allows you to define which documents you would like to create once the "
-"request has been approved"
-msgstr ""
-"Vous permet de définir quels documents vous voulez créer lorsque la demande "
-"à été approuvée"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__amount
@@ -231,12 +223,7 @@ msgid "Approval Subject"
 msgstr "Sujet de la validation"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approval_type
-msgid "Approval Type"
-msgstr "Type de validation"
-
-#. module: approvals
+#: model:ir.module.module,shortdesc:base.module_approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_root
 #: model:res.groups.privilege,name:approvals.res_groups_privilege_approvals
 msgid "Approvals"
@@ -277,15 +264,6 @@ msgid "Approver"
 msgstr "Approbateur"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_category.py:0
-msgid ""
-"Approver Sequence can only be activated with at least 1 minimum approver."
-msgstr ""
-"La séquence d'approbation ne peut être activée qu'avec au moins un "
-"approbateur minimum."
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__user_ids
 msgid "Approver Users"
 msgstr "Approbateur"
@@ -302,12 +280,6 @@ msgstr "Approbateur(s)"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Approvers"
 msgstr "Validateurs"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approver_sequence
-msgid "Approvers Sequence?"
-msgstr "Séqence d'approbation ?"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -359,8 +331,8 @@ msgstr "Pièces jointes"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
-msgid "Automated Sequence?"
-msgstr "Séquence automatisée ?"
+msgid "Automated Sequence"
+msgstr "Séquence automatisée"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -427,11 +399,6 @@ msgid "Category Approver"
 msgstr "Approbateur de catégorie"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
-msgid "Code"
-msgstr "Code"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category_approver__company_id
@@ -442,13 +409,9 @@ msgstr "Société"
 
 #. module: approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_config
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 msgid "Configuration"
 msgstr "Configuration"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
-msgid "Confirm Date"
-msgstr "Confirmer la date"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__partner_id
@@ -467,9 +430,9 @@ msgid "Contract Approval"
 msgstr "Validation de contrats"
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid "Create a new product variant"
-msgstr "Créer une nouvelle variante de produit"
+#: model:ir.module.module,summary:base.module_approvals
+msgid "Create and validate approvals requests"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid
@@ -595,11 +558,6 @@ msgid "Existing User"
 msgstr "Utilisateur existant"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "Fields"
-msgstr "Champs"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
 msgid "Followers"
 msgstr "Abonnés"
@@ -610,19 +568,9 @@ msgid "Followers (Partners)"
 msgstr "Abonnés (Partenaires)"
 
 #. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Icône Font Awesome par ex. fa-tasks"
-
-#. module: approvals
 #: model:ir.actions.server,name:approvals.model_approval_request_approve_admin
 msgid "Force Approval"
 msgstr "Forcer la validation"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "From:"
-msgstr "De :"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
@@ -703,19 +651,10 @@ msgstr "A une référence"
 msgid ""
 "How the employee's manager interacts with this type of approval.\n"
 "\n"
-"        Empty: do nothing\n"
-"        Is Approver: the employee's manager will be in the approver list\n"
-"        Is Required Approver: the employee's manager will be required to "
-"approve the request.\n"
+"        if checked the employee's manager is a required approver of the "
+"request, along with the selected users\n"
 "    "
 msgstr ""
-"Comment le manager de l'employé interagit avec ce type de validation.\n"
-"\n"
-"    Vide : Ne rien faire\n"
-"    Est approbateur : Le nom du supérieur apparaît dans la liste des "
-"approbateurs\n"
-"    Est approbateur requis : La validation du manager devient obligatoire.\n"
-"    "
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__id
@@ -754,23 +693,11 @@ msgstr "Si coché, certains messages ont une erreur de livraison."
 #: model:ir.model.fields,help:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,help:approvals.field_approval_request__automated_sequence
 msgid ""
-"If checked, the Approval Requests will have an automated generated name "
-"based on the given code."
+"If enabled, the approval request subject will be generated automatically "
+"using the given prefix code."
 msgstr ""
-"Si coché, les demandes de validation auront un nom généré automatiquement "
-"basé sur le code donné."
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
-msgid ""
-"If checked, the approvers have to approve in sequence (one after the other). "
-"If Employee's Manager is selected as approver, they will be the first in "
-"line."
-msgstr ""
-"Si coché, les approbateurs doivent approuver dans l'ordre (l'un après "
-"l'autre). Si le manager de l'employé est sélectionné comme approbateur, il "
-"sera le premier dans l'ordre."
+"Si activé, l’objet de la demande d’approbation sera généré automatiquement à "
+"l’aide du code de préfixe fourni."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -789,19 +716,9 @@ msgid "Invalid Minimum Warning"
 msgstr "Avertissement de minimum invalide"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__approver
-msgid "Is Approver"
-msgstr "Est un approbateur"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_is_follower
 msgid "Is Follower"
 msgstr "Est un abonné"
-
-#. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__required
-msgid "Is Required Approver"
-msgstr "Est un approbateur obligatoire"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_job_referral_award
@@ -874,6 +791,11 @@ msgid "Marc Demo"
 msgstr "Marc Demo"
 
 #. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
 msgid "Message Delivery error"
 msgstr "Erreur d'envoi du message"
@@ -888,6 +810,12 @@ msgstr "Messages"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__approval_minimum
 msgid "Minimum Approval"
 msgstr "Validation minimale"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Minimum Approval must be at least 1."
+msgstr ""
 
 #. module: approvals
 #. odoo-python
@@ -968,6 +896,11 @@ msgstr "Résumé de l'activité suivante"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_type_id
 msgid "Next Activity Type"
 msgstr "Type d'activités à venir"
+
+#. module: approvals
+#: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
+msgid "No"
+msgstr ""
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
@@ -1084,9 +1017,9 @@ msgid "Period:"
 msgstr "Période :"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "Print"
-msgstr "Imprimer"
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
+msgid "Prefix Code"
+msgstr "Code de préfixe"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_procurement
@@ -1108,12 +1041,6 @@ msgstr "Description du produit"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__product_line_ids
 msgid "Product Line"
 msgstr "Ligne de produit"
-
-#. module: approvals
-#: model:ir.actions.act_window,name:approvals.product_product_action
-#: model:ir.ui.menu,name:approvals.approvals_menu_product_variant
-msgid "Product Variants"
-msgstr "Variantes de produit"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.product_template_action
@@ -1237,9 +1164,7 @@ msgid "SMS Delivery error"
 msgstr "Erreur de livraison du SMS"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_approver__sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_category_approver__sequence
 msgid "Sequence"
 msgstr "Séquence"
 
@@ -1279,9 +1204,9 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "Statut basé sur les activités\n"
-"En retard : la date d'échéance est déjà dépassée\n"
+"En retard : l'échéance est déjà dépassée\n"
 "Aujourd'hui : la date d'activité est aujourd'hui\n"
-"Planifiée : activités futures"
+"Planifié : activités futures."
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1298,6 +1223,12 @@ msgstr "Soumettre"
 #: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__pending
 msgid "Submitted"
 msgstr "Soumis"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Submitted Date"
+msgstr "Date de soumission"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1453,22 +1384,6 @@ msgid "Users"
 msgstr "Utilisateurs"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__waiting
-#: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__waiting
-msgid "Waiting"
-msgstr "En attente"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_request__website_message_ids
-msgid "Website Messages"
-msgstr "Messages du site web"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__website_message_ids
-msgid "Website communication history"
-msgstr "Historique de communication du site web"
-
-#. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "Withdraw"
 msgstr "Retirer"
@@ -1486,12 +1401,6 @@ msgstr ""
 msgid "You can't delete an approved request. Archive it instead."
 msgstr ""
 "Vous ne pouvez pas supprimer une demande approuvée. Archivez-la à la place."
-
-#. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "You cannot approve before the previous approver."
-msgstr "Vous ne pouvez pas approuver avant l'approbateur précédent."
 
 #. module: approvals
 #. odoo-python
@@ -1536,16 +1445,6 @@ msgstr ""
 "Vous devez d'abord annuler, puis revenir au brouillon pour la validation."
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid ""
-"You must define a product for everything you sell or purchase,\n"
-"            whether it's a storable product, a consumable or a service."
-msgstr ""
-"Vous devez définir un produit pour tout ce que vous vendez ou achetez,\n"
-"            qu'il s'agisse d'un produit stockable, consommable ou d'un "
-"service."
-
-#. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Your minimum approval exceeds the total of default approvers."
@@ -1574,63 +1473,27 @@ msgstr "menu"
 msgid "new request"
 msgstr "nouvelle demande"
 
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "to:"
-msgstr "à :"
-
-#~ msgid "<span class=\"fw-bold\">Description:</span>"
-#~ msgstr "<span class=\"fw-bold\">Description :</span>"
-
-#~ msgid "<span>From: </span>"
-#~ msgstr "<span>De : </span>"
-
-#~ msgid "<span>to: </span>"
-#~ msgstr "<span>à : </span>"
-
-#~ msgid "Approval Type Approver"
-#~ msgstr "Approbateur du type de validation"
-
-#~ msgid "Approvals Types"
-#~ msgstr "Types de validation"
-
-#~ msgid "Approvals Types Image"
-#~ msgstr "Image des types de validations"
+#~ msgid ""
+#~ "Approver Sequence can only be activated with at least 1 minimum approver."
+#~ msgstr ""
+#~ "La séquence d'approbation ne peut être activée qu'avec au moins un "
+#~ "approbateur minimum."
 
 #~ msgid ""
-#~ "Conversion between Units of Measure can only occur if they belong to the "
-#~ "same category. The conversion will be made based on the ratios."
+#~ "How the employee's manager interacts with this type of approval.\n"
+#~ "\n"
+#~ "        if checked the employee's manager must approve the request first, "
+#~ "before proceeding to the rest of the selected users\n"
+#~ "    "
 #~ msgstr ""
-#~ "Il n'est possible de convertir deux unités de mesures que si elles "
-#~ "appartiennent à la même catégorie. Cette conversion utilise les facteurs "
-#~ "définis pour ces unités."
+#~ "Comment le manager de l'employé interagit avec ce type d'approbation.\n"
+#~ "    Si cette option est cochée, le manager de l'employé doit d'abord "
+#~ "approuver la demande avant que les autres utilisateurs sélectionnés "
+#~ "puissent intervenir.\n"
+#~ "    "
 
-#~ msgid "Deadline"
-#~ msgstr "Échéance"
+#~ msgid "Waiting"
+#~ msgstr "En attente"
 
-#~ msgid "Delete"
-#~ msgstr "Supprimer"
-
-#~ msgid "Edit Request"
-#~ msgstr "Modifier la demande"
-
-#~ msgid "Log"
-#~ msgstr "Enregistrer"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Nombre de messages nécessitant une action"
-
-#~ msgid "Request Approval"
-#~ msgstr "Demander une validation"
-
-#~ msgid "Unit of Measure"
-#~ msgstr "Unité de mesure"
-
-#~ msgid ""
-#~ "You cannot assign the same approver multiple times on the same request."
-#~ msgstr ""
-#~ "Vous ne pouvez pas assigner le même approbateur plusieurs fois à la même "
-#~ "demande."
-
-#~ msgid "You have to attach at lease one document."
-#~ msgstr "Vous devez joindre au moins un document."
+#~ msgid "You cannot approve before the previous approver."
+#~ msgstr "Vous ne pouvez pas approuver avant l'approbateur précédent."

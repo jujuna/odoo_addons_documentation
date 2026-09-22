@@ -1,20 +1,13 @@
-from odoo import Command
-from odoo.addons.ai_fields.tools import ai_field_insert
-from odoo.tests import TransactionCase, Form
+from odoo.addons.ai.tests.common import TestAICommon
+from odoo.addons.ai.utils.ai_fields_tools import ai_field_insert
+from odoo.tests import Form
 
 
-class TestAiDocumentsCommon(TransactionCase):
+class TestAiDocumentsCommon(TestAICommon):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user_internal = cls.env['res.users'].create({
-            'name': 'user_test',
-            'login': 'user_test',
-            'group_ids': [
-                Command.set(cls.env.ref('base.group_user').ids),
-            ],
-        })
         cls.ir_action_tools_childs = cls.env["ir.actions.server"].create([{
             "model_id": cls.env["ir.model"]._get_id("documents.document"),
             "state": "code",

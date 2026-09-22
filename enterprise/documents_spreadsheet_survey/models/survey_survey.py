@@ -1,9 +1,14 @@
 import json
-
 from odoo import _, api, fields, models
 from odoo.addons.spreadsheet.utils.formatting import (
     date_to_spreadsheet_date_number,
     datetime_to_spreadsheet_date_number,
+)
+from odoo.addons.spreadsheet.utils.helpers import (
+    DEFAULT_COLUMN_WIDTH,
+    DEFAULT_SHEET_ID,
+    MIN_COLUMNS,
+    MIN_ROWS,
 )
 
 
@@ -33,10 +38,14 @@ class Survey(models.Model):
         timestamp_column = [{'value': ""} for _ in range(n_of_rows)]
         timestamp_column[0]['value'] = _("Timestamp")
         result.append(timestamp_column)
-        if self.users_login_required:
-            user_id_column = [{'value': ""} for _ in range(n_of_rows)]
-            user_id_column[0]['value'] = _("User")
-            result.append(user_id_column)
+        participant_column = [{'value': ""} for _ in range(n_of_rows)]
+        participant_column[0]['value'] = _("Participant")
+        result.append(participant_column)
+
+        status_column = [{'value': ""} for _ in range(n_of_rows)]
+        status_column[0]['value'] = _("Status")
+        result.append(status_column)
+
         if self.is_attempts_limited:
             attempt_column = [{'value': ""} for _ in range(n_of_rows)]
             attempt_column[0]['value'] = _("Attempts")
@@ -56,8 +65,8 @@ class Survey(models.Model):
             user_row_index[user_input] = index + 1  # +1 because of the header row
             timestamp_column[index + 1]['value'] = datetime_to_spreadsheet_date_number(user_input.create_date, tz_name)
             timestamp_column[index + 1]['format'] = date_time_format
-            if self.users_login_required:
-                user_id_column[index + 1]['value'] = user_input.partner_id.name
+            participant_column[index + 1]['value'] = user_input.partner_id.name or user_input.email or user_input.nickname or ""
+            status_column[index + 1]['value'] = dict(user_input._fields['state']._description_selection(self.env)).get(user_input.state, '')
             if self.is_attempts_limited:
                 attempt_column[index + 1]['value'] = user_input.attempts_number
                 attempt_column[index + 1]['format'] = '0"/%s"' % self.attempts_limit
@@ -168,24 +177,34 @@ class Survey(models.Model):
         number_of_columns = len(survey_data['survey_table'])
         number_of_rows = len(survey_data['survey_table'][0])
 
-        style_range = f"A1:{number_to_letters(number_of_columns - 1)}1" if number_of_columns > 1 else "A1"
-
         sheet = {
-            'id': 'sheet1',
+            'id': DEFAULT_SHEET_ID,
             'name': f"{self.title} (#{self.id})",
-            'cols': {str(i): {'size': 150} for i in range(number_of_columns)},
-            'colNumber': max(26, number_of_columns),
-            'rowNumber': max(100, number_of_rows),
+            'cols': {str(i): {'size': DEFAULT_COLUMN_WIDTH} for i in range(number_of_columns)},
+            'colNumber': max(MIN_COLUMNS, number_of_columns),
+            'rowNumber': max(MIN_ROWS, number_of_rows),
             'cells': {
                 'A1': f"=ODOO.SURVEY({self.id})"
-            },
-            'styles': {
-                style_range: 1
             },
             'panes': {
                 'ySplit': 1,
                 'xSplit': 0
-            }
+            },
+            'tables': [{
+                'range': 'A1',
+                'type': 'dynamic',
+                'config': {
+                    'hasFilters': True,
+                    'totalRow': False,
+                    'firstColumn': False,
+                    'lastColumn': False,
+                    'numberOfHeaders': 1,
+                    'bandedRows': True,
+                    'bandedColumns': False,
+                    'automaticAutofill': False,
+                    'styleId': 'TableStyleMedium5'
+                }
+            }]
         }
 
         return {
@@ -193,9 +212,6 @@ class Survey(models.Model):
             'sheets': [sheet],
             'settings': {
                 'locale': locale,
-            },
-            'styles': {
-                '1': {'bold': True}
             },
             'revisionId': 'START_REVISION',
         }
@@ -206,8 +222,8 @@ class Survey(models.Model):
         If the folder does not exist, create it.
         If the folder exists but is archived, unarchive it.
         """
-        folder_id = self.env["ir.config_parameter"].sudo().get_param('documents_spreadsheet_survey.survey_folder', False)
-        folder_sudo = self.env["documents.document"].sudo().browse(int(folder_id))
+        folder_id = self.env["ir.config_parameter"].sudo().get_int('documents_spreadsheet_survey.survey_folder')
+        folder_sudo = self.env["documents.document"].sudo().browse(folder_id)
         if not folder_sudo or not folder_sudo.exists():
             folder_sudo = self.env["documents.document"].sudo().create({
                 'name': self.env._('Survey'),
@@ -216,17 +232,8 @@ class Survey(models.Model):
                 'access_via_link': 'none',
                 'owner_id': False
             })
-            self.env["ir.config_parameter"].sudo().set_param('documents_spreadsheet_survey.survey_folder', folder_sudo.id)
+            self.env["ir.config_parameter"].sudo().set_int('documents_spreadsheet_survey.survey_folder', folder_sudo.id)
         elif not folder_sudo.active:
             folder_sudo.action_unarchive()
 
         return folder_sudo
-
-
-def number_to_letters(n: int) -> str:
-    if n < 0:
-        raise ValueError(f"number must be positive. Got {n}")
-    if n < 26:
-        return chr(65 + n)
-    else:
-        return number_to_letters(n // 26 - 1) + number_to_letters(n % 26)

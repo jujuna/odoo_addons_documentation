@@ -7,11 +7,11 @@ from odoo import models
 class DiscussChannel(models.Model):
     _inherit = 'discuss.channel'
 
-    def _notify_thread_by_ocn(self, message, recipients_data, msg_vals=False, **kwargs):
+    def _notify_thread_by_ocn(self, message, recipients_data, **kwargs):
         # Specifically handle channel members
         icp_sudo = self.env['ir.config_parameter'].sudo()
         # Avoid to send notification if this feature is disabled or if no user use the mobile app.
-        if not icp_sudo.get_param('odoo_ocn.project_id') or not icp_sudo.get_param('mail_mobile.enable_ocn'):
+        if not icp_sudo.get_str('odoo_ocn.project_id') or not icp_sudo.get_bool('mail_mobile.enable_ocn'):
             return
 
         chat_channels = self.filtered(lambda channel: channel.channel_type == 'chat')
@@ -32,15 +32,10 @@ class DiscussChannel(models.Model):
         else:
             channel_rdata = recipients_data
 
-        return super()._notify_thread_by_ocn(message, channel_rdata, msg_vals=msg_vals, **kwargs)
+        return super()._notify_thread_by_ocn(message, channel_rdata, **kwargs)
 
-    def _notify_by_ocn_prepare_payload(self, message, receiver_ids, msg_vals=False,
-                                       force_record_name=False):
-        msg_vals = msg_vals or {}
-        payload = super()._notify_by_ocn_prepare_payload(
-            message, receiver_ids, msg_vals=msg_vals,
-            force_record_name=force_record_name,
-        )
+    def _notify_by_ocn_prepare_payload(self, message, receiver_ids, force_record_name=False):
+        payload = super()._notify_by_ocn_prepare_payload(message, receiver_ids, force_record_name=force_record_name)
         payload['action'] = 'mail.action_discuss'
         record_name = force_record_name or message.record_name
         if self.channel_type == 'chat':

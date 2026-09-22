@@ -3,21 +3,23 @@
 # * delivery_shiprocket
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Abe Manyo (abem)" <abem@odoo.com>, 2026.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-09-15 23:06+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 02:00+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-master/"
 "delivery_shiprocket/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_shiprocket
 #: model_terms:ir.ui.view,arch_db:delivery_shiprocket.view_delivery_carrier_form_inherit_delivery_shiprocket
@@ -27,11 +29,11 @@ msgstr "<b>Klik pada Tambahkan Channel Baru</b>"
 #. module: delivery_shiprocket
 #: model_terms:ir.ui.view,arch_db:delivery_shiprocket.view_delivery_carrier_form_inherit_delivery_shiprocket
 msgid ""
-"<b>Copy your API User's Email and Password and paste into Shipping method's "
+"<b>Copy your API User's Email and Password and paste into Delivery method's "
 "configuration.</b>"
 msgstr ""
-"<b>Salin Email User API dan Password Anda dan tempel ke konfigurasi metode "
-"Pengiriman.</b>"
+"<b>Salin Alamat Email dan Password User API Anda, lalu tempelkan ke "
+"konfigurasi metode Pengiriman.</b>"
 
 #. module: delivery_shiprocket
 #: model_terms:ir.ui.view,arch_db:delivery_shiprocket.view_delivery_carrier_form_inherit_delivery_shiprocket
@@ -44,12 +46,13 @@ msgstr ""
 #. module: delivery_shiprocket
 #: model_terms:ir.ui.view,arch_db:delivery_shiprocket.view_delivery_carrier_form_inherit_delivery_shiprocket
 msgid ""
-"<b>In Odoo configuration click on <i class=\"fa fa-refresh oe_inline\"/> "
-"icon near Shiprocket Channel to sync newly created channels.</b>"
+"<b>In Odoo configuration click on <i class=\"oi oe_inline\" data-"
+"icon=\"refresh\"/> icon near Shiprocket Channel to sync newly created "
+"channels.</b>"
 msgstr ""
-"<b>Di konfigurasi Odoo klik pada <i class=\"fa fa-refresh oe_inline\"/> ikon "
-"di dekat Channel Shiprocket untuk mensinkronisasikan channel yang baru saja "
-"dibuat.</b>"
+"<b>Di konfigurasi Odoo klik pada <i class=\"oi oe_inline\" data-"
+"icon=\"refresh\"/> ikon di dekat Channel Shiprocket untuk mensinkronisasikan "
+"channel yang baru saja dibuat.</b>"
 
 #. module: delivery_shiprocket
 #: model_terms:ir.ui.view,arch_db:delivery_shiprocket.view_delivery_carrier_form_inherit_delivery_shiprocket
@@ -79,14 +82,14 @@ msgstr "<b>Untuk Membuat channel, pergi ke Channel Shiprocket</b>"
 #. module: delivery_shiprocket
 #: model_terms:ir.ui.view,arch_db:delivery_shiprocket.view_delivery_carrier_form_inherit_delivery_shiprocket
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> In test environment, to avoid "
+"<i class=\"oi\" data-icon=\"warning\"/> In test environment, to avoid "
 "charges, your shippings are automatically <b>cancelled</b> after the label "
 "creation. The amount of cancelled shipment will be returned in next 3-4 days."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> Di test environment, untuk "
+"<i class=\"oi\" data-icon=\"warning\"/> Di test environment, untuk "
 "menghindari biaya, pengiriman Anda secara otomatis <b>dibatalkan</b> setelah "
-"pembuatan label. Biaya pengiriman yang dibatalkan akan dikembalikkan dalam "
-"3-4 hari ke depan."
+"pembuatan label. Biaya pengiriman yang dibatalkan akan dikembalikkan dalam 3-"
+"4 hari ke depan."
 
 #. module: delivery_shiprocket
 #: model:ir.model.fields,help:delivery_shiprocket.field_delivery_carrier__shiprocket_manifests_generate
@@ -141,7 +144,7 @@ msgstr "Autentikasi gagal! Silakan periksa kredensial Anda."
 #. module: delivery_shiprocket
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_stock_package_type__package_carrier_type
 msgid "Carrier"
-msgstr "Pembawa"
+msgstr "Ekspedisi"
 
 #. module: delivery_shiprocket
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_shiprocket_channel__channel_code
@@ -154,14 +157,9 @@ msgid "Channel Name"
 msgstr "Channel Nama"
 
 #. module: delivery_shiprocket
-#: model:ir.model,name:delivery_shiprocket.model_res_config_settings
-msgid "Config Settings"
-msgstr "Pengaturan Konfigurasi"
-
-#. module: delivery_shiprocket
 #. odoo-python
 #: code:addons/delivery_shiprocket/models/shiprocket_request.py:0
-msgid "Configure Shiprocket channel in shipping method"
+msgid "Configure Shiprocket channel in delivery method"
 msgstr "Konfigurasikan channel Shiprocket di metode pengiriman"
 
 #. module: delivery_shiprocket
@@ -220,9 +218,13 @@ msgid "Created on"
 msgstr "Dibuat pada"
 
 #. module: delivery_shiprocket
+#: model:ir.model,name:delivery_shiprocket.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "Metode Pengiriman"
+
+#. module: delivery_shiprocket
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_payment_provider__display_name
-#: model:ir.model.fields,field_description:delivery_shiprocket.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_shiprocket_channel__display_name
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_shiprocket_courier__display_name
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_stock_package_type__display_name
@@ -311,19 +313,18 @@ msgstr "Pergi ke"
 #. module: delivery_shiprocket
 #. odoo-python
 #: code:addons/delivery_shiprocket/models/shiprocket_request.py:0
-msgid "Go to Shipping Method"
-msgstr "Pergi ke Metode Pengirima"
+msgid "Go to Delivery Method"
+msgstr "Kunjungi Metode Pengiriman"
 
 #. module: delivery_shiprocket
 #. odoo-python
 #: code:addons/delivery_shiprocket/models/shiprocket_request.py:0
-msgid "Go to Shipping Methods"
-msgstr "Pergi ke Metode-Metode Pengiriman"
+msgid "Go to Delivery Methods"
+msgstr "Kunjungi Metode-Metode Pengiriman"
 
 #. module: delivery_shiprocket
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_delivery_carrier__id
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_payment_provider__id
-#: model:ir.model.fields,field_description:delivery_shiprocket.field_res_config_settings__id
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_shiprocket_channel__id
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_shiprocket_courier__id
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_stock_package_type__id
@@ -397,8 +398,8 @@ msgstr "Pincode dibutuhkan!"
 #. module: delivery_shiprocket
 #. odoo-python
 #: code:addons/delivery_shiprocket/models/shiprocket_request.py:0
-msgid "Please configure Shiprocket credentials in the shipping method"
-msgstr "Mohon konfigurasikan kredensial Shiprocket di metode pengirima"
+msgid "Please configure Shiprocket credentials in the delivery method"
+msgstr "Silakan konfigurasi kredensial Shiprocket di metode pengiriman"
 
 #. module: delivery_shiprocket
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_delivery_carrier__delivery_type
@@ -433,6 +434,11 @@ msgid "Save Manual Channel"
 msgstr "Simpan Channel Manual"
 
 #. module: delivery_shiprocket
+#: model:ir.module.module,description:base.module_delivery_shiprocket
+msgid "Send your parcels through shiprocket and track them online"
+msgstr ""
+
+#. module: delivery_shiprocket
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_shiprocket_courier__name
 msgid "Service Name"
 msgstr "Nama Layanan"
@@ -446,11 +452,6 @@ msgstr "ShipRocket"
 #: model:delivery.carrier,name:delivery_shiprocket.delivery_carrier_shiprocket
 msgid "ShipRocket Domestic"
 msgstr "ShipRocket Domestik"
-
-#. module: delivery_shiprocket
-#: model:ir.model,name:delivery_shiprocket.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Metode Pengiriman"
 
 #. module: delivery_shiprocket
 #: model:ir.model.fields.selection,name:delivery_shiprocket.selection__delivery_carrier__delivery_type__shiprocket
@@ -476,12 +477,8 @@ msgid "Shiprocket Configuration"
 msgstr "Konfigurasi Shiprocket"
 
 #. module: delivery_shiprocket
-#: model:ir.model.fields,field_description:delivery_shiprocket.field_res_config_settings__module_delivery_shiprocket
-msgid "Shiprocket Connector"
-msgstr "Shiprocket Connector"
-
-#. module: delivery_shiprocket
 #: model:ir.model,name:delivery_shiprocket.model_shiprocket_courier
+#: model:ir.model.fields,field_description:delivery_shiprocket.field_stock_picking__shiprocket_courier_name
 msgid "Shiprocket Courier"
 msgstr "Kurir Shiprocket"
 
@@ -520,10 +517,9 @@ msgid "Shiprocket Password"
 msgstr "Password Shiprocket"
 
 #. module: delivery_shiprocket
-#: model_terms:ir.ui.view,arch_db:delivery_shiprocket.res_config_settings_view_form_sale_shiprocket
-#: model_terms:ir.ui.view,arch_db:delivery_shiprocket.res_config_settings_view_form_stock_shiprocket
-msgid "Shiprocket Shipping Methods"
-msgstr "Metode Pengiriman Shiprocket"
+#: model:ir.module.module,shortdesc:base.module_delivery_shiprocket
+msgid "Shiprocket Shipping"
+msgstr ""
 
 #. module: delivery_shiprocket
 #: model_terms:ir.ui.view,arch_db:delivery_shiprocket.view_delivery_carrier_form_inherit_delivery_shiprocket
@@ -610,6 +606,11 @@ msgstr "Sinkronisasi Kurir dari Shiprocket"
 #: model_terms:ir.ui.view,arch_db:delivery_shiprocket.view_delivery_carrier_form_inherit_delivery_shiprocket
 msgid "Test Connection"
 msgstr "Tes Koneksi"
+
+#. module: delivery_shiprocket
+#: model:ir.model.fields,help:delivery_shiprocket.field_stock_picking__shiprocket_courier_name
+msgid "The actual courier name assigned by Shiprocket for this shipment."
+msgstr ""
 
 #. module: delivery_shiprocket
 #: model:ir.model.fields,field_description:delivery_shiprocket.field_delivery_carrier__shiprocket_token_valid_upto

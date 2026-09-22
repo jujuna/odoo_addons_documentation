@@ -11,6 +11,8 @@ from odoo.tests import tagged
 @tagged("post_install", "post_install_l10n")
 class TestAccountReturn(L10nPayrollAccountCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @mock_skip_stp_api_calls()
     def test_closing_entry_includes_salary_withholding_taxes(self):
         # We need to add some datas to the company to pass account return checks (required fields)
@@ -25,9 +27,10 @@ class TestAccountReturn(L10nPayrollAccountCommon):
             'date_end': '2023-01-31',
             'name': 'January Batch',
             'company_id': self.company.id,
+            'structure_id': self.default_payroll_structure.id,
         })
 
-        payslip_run.generate_payslips(employee_ids=[self.employee_1.id, self.employee_2.id])
+        payslip_run._generate_payslips()
         payslip_run.action_validate()
         payslip_run.slip_ids.move_id.action_post()
 
@@ -35,6 +38,8 @@ class TestAccountReturn(L10nPayrollAccountCommon):
             'name': 'VAT Return (Generic)',
             'report_id': self.env.ref('account.generic_tax_report').id,
             'deadline_start_date': '2023-01-01',
+            'tax_payable_account_id': self.company_data['default_tax_account_payable'].id,
+            'tax_receivable_account_id': self.company_data['default_tax_account_receivable'].id,
         })
 
         with freeze_time('2023-01-01'):
@@ -47,7 +52,7 @@ class TestAccountReturn(L10nPayrollAccountCommon):
             })
 
             with self.allow_pdf_render():
-                tax_return.action_validate()
+                tax_return.action_submit()
 
         self.assertRecordValues(tax_return.closing_move_ids.line_ids,
             [

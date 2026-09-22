@@ -1,14 +1,15 @@
-import { Component, useState, onMounted, onWillUnmount } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, proxy, useProps } from "@odoo/owl";
 import { loadJS } from "@web/core/assets";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { TYRO_LIB_URLS } from "@pos_tyro/urls";
+import { _t } from "@web/core/l10n/translation";
 
 const PAIRING_TIMEOUT_MS = 90000;
 
 class PairTyroTerminal extends Component {
-    static props = { ...standardActionServiceProps };
+    props = useProps(standardActionServiceProps);
     static template = "pos_tyro.PairTyroTerminal";
 
     setup() {
@@ -16,7 +17,7 @@ class PairTyroTerminal extends Component {
         this.ui = useService("ui");
         this.dialog = useService("dialog");
         this.notification = useService("notification");
-        this.state = useState({
+        this.state = proxy({
             status: "inProgress",
             message: "Connecting to Tyro...",
             closed: false,
@@ -53,7 +54,7 @@ class PairTyroTerminal extends Component {
     async pairTyroTerminal() {
         const { tyro_mode, payment_method_id, merchant_id, terminal_id } = this.props.action.params;
         if (!merchant_id || !terminal_id) {
-            throw new Error("Merchant ID and/or Terminal ID are not configured.");
+            throw new Error(_t("Merchant ID and/or Terminal ID are not configured."));
         }
 
         const tyro = await this.loadTyroLibrary(tyro_mode);
@@ -64,7 +65,7 @@ class PairTyroTerminal extends Component {
 
         this.state.timeoutId = setTimeout(() => {
             this.ui.unblock();
-            this.state.message = "Pairing timed out.";
+            this.state.message = _t("Pairing timed out.");
             this.state.status = "failure";
         }, PAIRING_TIMEOUT_MS);
         this.ui.block({ delay: PAIRING_TIMEOUT_MS });

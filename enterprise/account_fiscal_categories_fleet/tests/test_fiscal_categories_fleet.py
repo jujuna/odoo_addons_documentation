@@ -1,4 +1,5 @@
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportColumnData
 
 from odoo import Command, fields
 from odoo.tests import tagged, freeze_time
@@ -7,6 +8,8 @@ from odoo.tests import tagged, freeze_time
 @freeze_time('2022-07-15')
 @tagged('post_install', '-at_install')
 class TestAccountFiscalCategoriesFleetReport(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -165,8 +168,8 @@ class TestAccountFiscalCategoriesFleetReport(TestAccountReportsCommon):
         """
         for line in lines:
             # This is just to prevent the name override in l10n_be_hr_payroll_fleet from making the test crash.
-            line['name'] = line['name'].split(' \u2022 ')[0]
-            line['columns'].append({'name': line['level']})
+            line.name = line.name.split(' \u2022 ')[0]
+            line.columns.append(AccountReportColumnData(name=line.level))
 
     def test_fiscal_report_unfold_all(self):
         report, options = self._setup_base_report(unfold=True)
@@ -207,13 +210,13 @@ class TestAccountFiscalCategoriesFleetReport(TestAccountReportsCommon):
             [0,                                           1,               2,            3,                   4],
             [
              ('2345 DNA category',                         3200.0,          '',          1088.0,               1),
-               ('Wayne Enterprises/Batmobile/No Plate',    1300.0,          '',           315.0,               2),
+               ('Wayne Enterprises/Batmobile',             1300.0,          '',           315.0,               2),
                  ('600000 Expenses',                        800.0,          '',           200.0,               3),
                    ('600000 Expenses',                      600.0,          '23.00%',     138.0,               4),
                    ('600000 Expenses',                      200.0,          '31.00%',      62.0,               4),
                  ('600002 Expenses (copy)',                 500.0,          '23.00%',     115.0,               3),
                    ('600002 Expenses (copy)',               500.0,          '23.00%',     115.0,               4),
-               ('Wayne Enterprises/Batpod/No Plate',        700.0,          '56.00%',     392.0,               2),
+               ('Wayne Enterprises/Batpod',                 700.0,          '56.00%',     392.0,               2),
                  ('600000 Expenses',                        300.0,          '56.00%',     168.0,               3),
                    ('600000 Expenses',                      300.0,          '56.00%',     168.0,               4),
                  ('600002 Expenses (copy)',                 400.0,          '56.00%',     224.0,               3),
@@ -402,7 +405,7 @@ class TestAccountFiscalCategoriesFleetReport(TestAccountReportsCommon):
             [
              ('bob DNA category',                         1_100.0,          '',            425.0,                1),
 
-               ('Wayne Enterprises/Batmobile/No Plate',     100.0,          '25.00%',       25.0,                2),
+               ('Wayne Enterprises/Batmobile',              100.0,          '25.00%',       25.0,                2),
                  ('605555 Super expense',                   100.0,          '25.00%',       25.0,                3),
                    ('605555 Super expense',                 100.0,          '25.00%',       25.0,                4),
 
@@ -492,7 +495,7 @@ class TestAccountFiscalCategoriesFleetReport(TestAccountReportsCommon):
         expected_lines = [
             # pylint: disable=C0326
             ('bob DNA category',                          111_100.0,                '',        29_425.0,         1),
-            ('Wayne Enterprises/Batmobile/No Plate',      100_100.0,          '25.00%',        25_025.0,         2),
+            ('Wayne Enterprises/Batmobile',               100_100.0,          '25.00%',        25_025.0,         2),
                 ('605555 Super expense',                      100.0,          '25.00%',            25.0,         3),
                 ('605555 Super expense',                      100.0,          '25.00%',            25.0,         4),
                 ('605556 bob expense',                    100_000.0,          '25.00%',        25_000.0,         3),
@@ -515,7 +518,7 @@ class TestAccountFiscalCategoriesFleetReport(TestAccountReportsCommon):
         # For each report line, ensure that the audited move lines have the same total amount.
         for name, amount, _dummy, _dummy, level in expected_lines[:-1]:  # 'Total' line can't be audited.
             with self.subTest(name=name, amount=amount, level=level):
-                line_id = next(line['id'] for line in lines if (line['name'], line['columns'][0]['no_format'], line['level']) == (name, amount, level))
+                line_id = next(line.id for line in lines if (line.name, line.columns[0].no_format, line.level) == (name, amount, level))
                 action = self.env[report.custom_handler_model_id.model].open_journal_items(options, {'line_id': line_id})
                 amls = self.env['account.move.line'].search(action['domain'])
                 self.assertEqual(sum(amls.mapped('balance')), amount, "The sum of the audited move lines should be equal to the amount of the corresponding report line.")

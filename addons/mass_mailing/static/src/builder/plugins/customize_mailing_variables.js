@@ -57,6 +57,18 @@ const buttonProperties = [
     "border-color",
 ];
 
+const sizedButtonProperties =  [
+    "font-size",
+    "padding-x",
+    "padding-y",
+];
+
+const outlinedButtonProperties = [
+    "background-color",
+    "color",
+    "border-color",
+];
+
 const separatorProperties = [
     "border-top-width",
     "border-style",
@@ -69,7 +81,7 @@ export const CUSTOMIZE_MAILING_VARIABLES = Object.assign(
     generateSimpleMailingVariables("wrapper", ["> [data-snippet]"], wrapperProperties),
     (() => {
         const variables = {};
-        for (const depth of [1, 2, 3]) {
+        for (const depth of [1, 2, 3, 4]) {
             const prefix = `h${depth}`;
             Object.assign(
                 variables,
@@ -86,8 +98,8 @@ export const CUSTOMIZE_MAILING_VARIABLES = Object.assign(
     generateSimpleMailingVariables("text-container", ["p", "ul"], textContainerProperties),
     generateSimpleMailingVariables(
         "link",
-        ["a:not(.btn):not(:has(.fa, img))", "a.btn.btn-link"],
-        textProperties
+        ["a:not(.btn):not(:has(.oi, img))", "a.btn.btn-link"],
+        textProperties.filter((prop) => prop !== "font-size")
     ),
     generateSimpleMailingVariables(
         "btn-primary",
@@ -99,15 +111,45 @@ export const CUSTOMIZE_MAILING_VARIABLES = Object.assign(
         ["a.btn.btn-fill-secondary", "a.btn.btn-outline-secondary", "a.btn.btn-secondary"],
         buttonProperties
     ),
+    generateSimpleMailingVariables(
+        "btn-primary-lg",
+        ["a.btn.btn-fill-primary.btn-lg", "a.btn.btn-outline-primary.btn-lg", "a.btn.btn-primary.btn-lg"],
+        sizedButtonProperties
+    ),
+    generateSimpleMailingVariables(
+        "btn-primary-sm",
+        ["a.btn.btn-fill-primary.btn-sm", "a.btn.btn-outline-primary.btn-sm", "a.btn.btn-primary.btn-sm"],
+        sizedButtonProperties
+    ),
+    generateSimpleMailingVariables(
+        "btn-secondary-lg",
+        ["a.btn.btn-fill-secondary.btn-lg", "a.btn.btn-outline-secondary.btn-lg", "a.btn.btn-secondary.btn-lg"],
+        sizedButtonProperties
+    ),
+    generateSimpleMailingVariables(
+        "btn-secondary-sm",
+        ["a.btn.btn-fill-secondary.btn-sm", "a.btn.btn-outline-secondary.btn-sm", "a.btn.btn-secondary.btn-sm"],
+        sizedButtonProperties
+    ),
+    generateSimpleMailingVariables(
+        "btn-primary-outline",
+        ["a.btn.btn-outline-primary"],
+        outlinedButtonProperties
+    ),
+    generateSimpleMailingVariables(
+        "btn-secondary-outline",
+        ["a.btn.btn-outline-secondary"],
+        outlinedButtonProperties
+    ),
     generateSimpleMailingVariables("separator", ["hr"], separatorProperties)
 );
 
 export const CUSTOMIZE_MAILING_VARIABLES_DEFAULTS = {
     "--wrapper-background-color": {
-        "background-color": "",
+        "background-color": "#FFFFFF",
     },
     "--h1-font-size": {
-        "font-size": "28px",
+        "font-size": "32px",
     },
     "--h1-font-weight": {
         "font-weight": "500",
@@ -128,7 +170,7 @@ export const CUSTOMIZE_MAILING_VARIABLES_DEFAULTS = {
         "margin-bottom": "7px",
     },
     "--h2-font-size": {
-        "font-size": "23px",
+        "font-size": "24px",
     },
     "--h2-font-weight": {
         "font-weight": "500",
@@ -169,6 +211,27 @@ export const CUSTOMIZE_MAILING_VARIABLES_DEFAULTS = {
     "--h3-margin-bottom": {
         "margin-bottom": "7px",
     },
+    "--h4-font-size": {
+        "font-size": "19px",
+    },
+    "--h4-font-weight": {
+        "font-weight": "500",
+    },
+    "--h4-font-style": {
+        "font-style": "",
+    },
+    "--h4-font-family": {
+        "font-family": "Arial,Helvetica Neue,Helvetica,sans-serif",
+    },
+    "--h4-text-decoration-line": {
+        "text-decoration-line": "",
+    },
+    "--h4-color": {
+        color: "rgb(0, 0, 0)",
+    },
+    "--h4-margin-bottom": {
+        "margin-bottom": "7px",
+    },
     "--text-font-size": {
         "font-size": "16px",
     },
@@ -189,9 +252,6 @@ export const CUSTOMIZE_MAILING_VARIABLES_DEFAULTS = {
     },
     "--text-container-margin-bottom": {
         "margin-bottom": "16px",
-    },
-    "--link-font-size": {
-        "font-size": "16px",
     },
     "--link-font-weight": {
         "font-weight": "400",
@@ -237,6 +297,37 @@ export const CUSTOMIZE_MAILING_VARIABLES_DEFAULTS = {
     "--btn-primary-border-color": {
         "border-color": "rgb(53, 151, 156)",
     },
+    "--btn-primary-lg-font-size": {
+        "font-size": "calc(var(--btn-primary-font-size) * 1.5)",
+    },
+    "--btn-primary-lg-padding-x": {
+        "padding-left": "calc(var(--btn-primary-padding-x) * 2.5)",
+        "padding-right": "calc(var(--btn-primary-padding-x) * 2.5)",
+    },
+    "--btn-primary-lg-padding-y": {
+        "padding-top": "calc(var(--btn-primary-padding-y) * 1.5)",
+        "padding-bottom": "calc(var(--btn-primary-padding-y) * 1.5)",
+    },
+    "--btn-primary-sm-font-size": {
+        "font-size": "calc(var(--btn-primary-font-size) * 0.875)",
+    },
+    "--btn-primary-sm-padding-x": {
+        "padding-left": "calc(var(--btn-primary-padding-x) * 0.3)",
+        "padding-right": "calc(var(--btn-primary-padding-x) * 0.3)",
+    },
+    "--btn-primary-sm-padding-y": {
+        "padding-top": "calc(var(--btn-primary-padding-y) * 0.20)",
+        "padding-bottom": "calc(var(--btn-primary-padding-y) * 0.20)",
+    },
+    "--btn-primary-outline-color": {
+        color: "var(--btn-primary-background-color)",
+    },
+    "--btn-primary-outline-background-color": {
+        "background-color": "transparent",
+    },
+    "--btn-primary-outline-border-color": {
+        "border-color": "var(--btn-primary-background-color)",
+    },
     "--btn-secondary-font-size": {
         "font-size": "12px",
     },
@@ -265,6 +356,37 @@ export const CUSTOMIZE_MAILING_VARIABLES_DEFAULTS = {
     },
     "--btn-secondary-border-color": {
         "border-color": "rgb(104, 85, 99)",
+    },
+    "--btn-secondary-lg-font-size": {
+        "font-size": "calc(var(--btn-secondary-font-size) * 1.5)",
+    },
+    "--btn-secondary-lg-padding-x": {
+        "padding-left": "calc(var(--btn-secondary-padding-x) * 2.5)",
+        "padding-right": "calc(var(--btn-secondary-padding-x) * 2.5)",
+    },
+    "--btn-secondary-lg-padding-y": {
+        "padding-top": "calc(var(--btn-secondary-padding-y) * 1.5)",
+        "padding-bottom": "calc(var(--btn-secondary-padding-y) * 1.5)",
+    },
+    "--btn-secondary-sm-font-size": {
+        "font-size": "calc(var(--btn-secondary-font-size) * 0.875)",
+    },
+    "--btn-secondary-sm-padding-x": {
+        "padding-left": "calc(var(--btn-secondary-padding-x) * 0.3)",
+        "padding-right": "calc(var(--btn-secondary-padding-x) * 0.3)",
+    },
+    "--btn-secondary-sm-padding-y": {
+        "padding-top": "calc(var(--btn-secondary-padding-y) * 0.20)",
+        "padding-bottom": "calc(var(--btn-secondary-padding-y) * 0.20)",
+    },
+    "--btn-secondary-outline-color": {
+        color: "var(--btn-secondary-background-color)",
+    },
+    "--btn-secondary-outline-background-color": {
+        "background-color": "transparent",
+    },
+    "--btn-secondary-outline-border-color": {
+        "border-color": "var(--btn-secondary-background-color)",
     },
     "--separator-border-top-width": {
         "border-top-width": "1px",

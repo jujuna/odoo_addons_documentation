@@ -62,10 +62,3 @@ class SaleOrderLine(models.Model):
             partner_ids = self.calendar_event_id.attendee_ids.mapped('partner_id')
             task.message_subscribe(partner_ids.ids)
         return task
-
-    def _action_confirm(self):
-        """ Override: as this method is called when successfully paying the SO, or manually in back-end,
-            we consider that the linked bookings can be transformed to a calendar event """
-        self.order_line.calendar_event_id.action_unarchive()
-        self.order_line.calendar_booking_ids._make_event_from_paid_booking()
-        return super()._action_confirm()

@@ -2,11 +2,11 @@
 
 import json
 
-from collections import defaultdict
 from markupsafe import Markup
 
 from odoo import _, api, fields, models, modules
-from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo.exceptions import UserError, ValidationError
+from odoo.fields import Domain
 
 
 class SocialPost(models.Model):
@@ -22,7 +22,7 @@ class SocialPost(models.Model):
     that will publish their content through the third party API of the social.account. """
 
     _name = 'social.post'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'social.post.template', 'utm.source.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'social.post.template']
     _description = 'Social Post'
     _order = 'create_date desc'
 
@@ -31,7 +31,7 @@ class SocialPost(models.Model):
         ('scheduled', 'Scheduled'),
         ('posting', 'Posting'),
         ('posted', 'Posted')],
-        string='Status', default='draft', readonly=True, required=True,
+        string='Status', default='draft', readonly=True, required=True, copy=False,
         help="The post is considered as 'Posted' when all its sub-posts (one per social account) are either 'Failed' or 'Posted'")
     has_post_errors = fields.Boolean("There are post errors on sub-posts", compute='_compute_has_post_errors')
     account_ids = fields.Many2many(domain="[('id', 'in', account_allowed_ids)]")
@@ -46,25 +46,23 @@ class SocialPost(models.Model):
         help="Sub-posts that will be published on each selected social accounts.")
     live_posts_by_media = fields.Char('Live Posts by Social Media', compute='_compute_live_posts_by_media', readonly=True,
         help="Special technical field that holds a dict containing the live posts names by media ids (used for kanban view).")
-    post_method = fields.Selection([
-        ('now', 'Send now'),
-        ('scheduled', 'Schedule later')], string="When", default='now', required=True,
-        help="Publish your post immediately or schedule it at a later time.")
-    scheduled_date = fields.Datetime('Scheduled Date')
-    published_date = fields.Datetime('Published Date', readonly=True,
+    scheduled_date = fields.Datetime('Scheduled Date', copy=False)
+    has_scheduled_date = fields.Boolean("Has Specific Date", compute='_compute_has_scheduled_date')
+    published_date = fields.Datetime('Published Date', readonly=True, copy=False,
         help="When the global post was published. The actual sub-posts published dates may be different depending on the media.")
     # stored for better calendar view performance
-    calendar_date = fields.Datetime('Calendar Date', compute='_compute_calendar_date', store=True, readonly=False)
+    min_calendar_date = fields.Datetime('Min Calendar Date', compute='_compute_calendar_date', store=True, readonly=False)
+    max_calendar_date = fields.Datetime('Max Calendar Date', compute='_compute_calendar_date', store=True, readonly=False)
     # technical field used by the calendar view (hatch the social post)
     is_hatched = fields.Boolean(string="Hatched", compute='_compute_is_hatched')
     #UTM
     utm_campaign_id = fields.Many2one('utm.campaign', domain="[('is_auto_campaign', '=', False)]",
         string="Campaign", ondelete="set null", index='btree_not_null')
-    source_id = fields.Many2one(readonly=True)
     # Statistics
     stream_posts_count = fields.Integer("Feed Posts Count", compute='_compute_stream_posts_count')
-    engagement = fields.Integer("Engagement", compute='_compute_post_engagement',
-        help="Number of people engagements with the post (Likes, comments...)")
+    likes_count = fields.Integer("Likes", compute='_compute_post_stats')
+    comments_count = fields.Integer("Comments", compute='_compute_post_stats')
+    shares_count = fields.Integer("Shares", compute='_compute_post_stats')
     click_count = fields.Integer('Number of clicks', compute="_compute_click_count")
 
     @api.constrains('account_ids')
@@ -78,25 +76,34 @@ class SocialPost(models.Model):
                     company=post.company_id.name
                 ))
 
-    @api.constrains('state', 'scheduled_date')
-    def _check_scheduled_date(self):
-        if any(post.state in ('draft', 'scheduled') and post.scheduled_date
-               and post.scheduled_date < fields.Datetime.now() for post in self):
-            raise ValidationError(_('You cannot schedule a post in the past.'))
+    @api.depends(lambda self: ['scheduled_date', 'account_ids', *self._scheduled_date_fields().values()])
+    def _compute_has_scheduled_date(self):
+        for post in self:
+            dates = post._get_scheduled_date_per_accounts().values()
+            post.has_scheduled_date = any(dates)
 
-    @api.depends('live_post_ids.engagement')
-    def _compute_post_engagement(self):
+    @api.depends('scheduled_date', 'is_split_per_media')
+    def _compute_scheduled_date_by_media(self):
+        """To be used in sub-modules to compute the media-specific scheduled_date."""
+        scheduled_date_fields = self._scheduled_date_fields().values()
+        for post in self:
+            for field in scheduled_date_fields:
+                if not post[field] or not post.is_split_per_media:
+                    post[field] = post.scheduled_date
+
+    @api.depends('live_post_ids.likes_count', 'live_post_ids.comments_count', 'live_post_ids.shares_count')
+    def _compute_post_stats(self):
         results = self.env['social.live.post']._read_group(
             [('post_id', 'in', self.ids)],
             ['post_id'],
-            ['engagement:sum']
+            ['likes_count:sum', 'comments_count:sum', 'shares_count:sum']
         )
-        engagement_per_post = {
-            post.id: engagement_total
-            for post, engagement_total in results
+        stats_per_post = {
+            post: (likes_count, comments_count, shares_count)
+            for post, likes_count, comments_count, shares_count in results
         }
         for post in self:
-            post.engagement = engagement_per_post.get(post.id, 0)
+            post.likes_count, post.comments_count, post.shares_count = stats_per_post.get(post, (0, 0, 0))
 
     @api.depends('account_allowed_ids')
     def _compute_has_active_accounts(self):
@@ -140,15 +147,17 @@ class SocialPost(models.Model):
         for post in self:
             post.media_ids = post.with_context(active_test=False).account_ids.mapped('media_id')
 
-    @api.depends('state', 'post_method', 'scheduled_date', 'published_date')
+    @api.depends(lambda self: ['scheduled_date', 'account_ids', 'published_date', *self._scheduled_date_fields().values()])
     def _compute_calendar_date(self):
         for post in self:
-            if post.state == 'posted':
-                post.calendar_date = post.published_date
-            elif post.post_method == 'now':
-                post.calendar_date = False
+            scheduled_dates = post._get_scheduled_date_per_accounts().values()
+            if any(scheduled_dates):
+                # for account without scheduled dates, use `published_date`
+                scheduled_dates = [date or post.published_date for date in scheduled_dates]
+                post.min_calendar_date = min(filter(bool, scheduled_dates))
+                post.max_calendar_date = max(filter(bool, scheduled_dates))
             else:
-                post.calendar_date = post.scheduled_date
+                post.min_calendar_date = post.max_calendar_date = post.published_date or post.scheduled_date
 
     @api.depends('live_post_ids.account_id', 'live_post_ids.display_name')
     def _compute_live_posts_by_media(self):
@@ -165,28 +174,32 @@ class SocialPost(models.Model):
             post.is_hatched = post.state == 'draft'
 
     def _compute_click_count(self):
-        # Filter by `medium_id` so we can compute the click count based
-        # on the current companies (1 account == 1 medium)
-        medium_ids = self.account_ids.mapped('utm_medium_id')
+        if not self.ids:
+            self.click_count = 0
+            return
 
-        if not self.source_id.ids or not medium_ids.ids:
-            # not "source_id", the records are not yet created
-            for post in self:
-                post.click_count = 0
-        else:
-            query = """
-                SELECT COUNT(DISTINCT(click.id)) as click_count, link.source_id
-                  FROM link_tracker_click click
-            INNER JOIN link_tracker link ON link.id = click.link_id
-                 WHERE link.source_id IN %s AND link.medium_id IN %s
-              GROUP BY link.source_id
-            """
+        click_data = dict(self.env["link.tracker.click"].sudo()._read_group(
+            domain=[('link_id.utm_reference', 'in', [f'{post._name},{post.id}' for post in self])],
+            groupby=["link_id.utm_reference"],
+            aggregates=["__count"],
+        ))
+        for post in self:
+            post.click_count = click_data.get(f'{post._name},{post.id}', 0)
 
-            self.env.cr.execute(query, [tuple(self.source_id.ids), tuple(medium_ids.ids)])
-            click_data = self.env.cr.dictfetchall()
-            mapped_data = {datum['source_id']: datum['click_count'] for datum in click_data}
-            for post in self:
-                post.click_count = mapped_data.get(post.source_id.id, 0)
+    @api.model
+    def _scheduled_date_fields(self):
+        """Return the "scheduled_date" field per media."""
+        return {}
+
+    def _get_scheduled_date_per_accounts(self):
+        """Return the scheduled dates for each selected accounts."""
+        self.ensure_one()
+        scheduled_date_fields = self._scheduled_date_fields()
+        return {
+            account: self[scheduled_date_fields[account.media_type]]
+            for account in self.account_ids
+            if account.media_type in scheduled_date_fields
+        }
 
     def _prepare_preview_values(self, media):
         values = super(SocialPost, self)._prepare_preview_values(media)
@@ -211,69 +224,10 @@ class SocialPost(models.Model):
         """ When created from the calendar view, we set the post as scheduled at the selected date. """
 
         result = super(SocialPost, self).default_get(fields)
-        default_calendar_date = self.env.context.get('default_calendar_date')
-        if default_calendar_date and ('post_method' in fields or 'scheduled_date' in fields):
-            result.update({
-                'post_method': 'scheduled',
-                'scheduled_date': default_calendar_date
-            })
+        default_calendar_date = self.env.context.get('default_min_calendar_date')
+        if default_calendar_date and 'scheduled_date' in fields:
+            result['scheduled_date'] = default_calendar_date
         return result
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        """Every post will have a unique corresponding utm.source for statistics computation purposes.
-        This way, it will be possible to see every leads/quotations generated through a particular post."""
-
-        # generate the UTM names from `message` (without having it in `_rec_name`)
-        message_fields = ["message"] + list(self._message_fields().values())
-        for vals in vals_list:
-            if not vals.get('name'):
-                new_name = next((vals.get(field) for field in message_fields if vals.get(field)), _("Post"))
-                vals['name'] = self.env['utm.source']._generate_name(self, new_name)
-
-        # if a scheduled_date / published_date is specified, it should be the one used as the calendar date
-        # this is normally handled by the `_compute_calendar_date` but in create mode,
-        # it is not called when a default value for the calendar_date field is passed
-        # if the post_method is set to 'now' unset the calendar_date to avoid displaying it in the calendar
-        for vals in vals_list:
-            if vals.get('state') == 'posted' and 'published_date' in vals:
-                vals['calendar_date'] = vals['published_date']
-            elif vals.get('post_method') == 'now':
-                vals['calendar_date'] = False
-            elif 'scheduled_date' in vals:
-                vals['calendar_date'] = vals['scheduled_date']
-
-        res = super(SocialPost, self).create(vals_list)
-
-        cron = self.env.ref('social.ir_cron_post_scheduled')
-        cron_trigger_dates = set([
-            post.scheduled_date
-            for post in res
-            if post.scheduled_date
-        ])
-        if cron_trigger_dates:
-            cron._trigger(cron_trigger_dates)
-
-        return res
-
-    def write(self, vals):
-        if vals.get('calendar_date'):
-            if any(post.state not in ('draft', 'scheduled') for post in self):
-                raise UserError(_("You cannot reschedule a post that has already been posted."))
-
-            vals['scheduled_date'] = vals['calendar_date']
-
-        if vals.get('scheduled_date'):
-            cron = self.env.ref('social.ir_cron_post_scheduled')
-            cron._trigger(at=fields.Datetime.from_string(vals.get('scheduled_date')))
-
-        # Updating UTM source
-        message_fields = ["message"] + list(self._message_fields().values())
-        if set(vals) & set(message_fields):
-            new_name = next((vals.get(field) for field in message_fields if vals.get(field)), _("Post"))
-            vals['name'] = self.env['utm.source']._generate_name(self.env['social.post'], new_name)
-
-        return super().write(vals)
 
     def social_stream_post_action_my(self):
         action = self.env["ir.actions.actions"]._for_xml_id("social.action_social_stream_post")
@@ -289,48 +243,81 @@ class SocialPost(models.Model):
         """
         Raise an error if the user cannot post on a social media
         """
+        self.check_access("write")  # explicit check
         if any(not post.account_ids for post in self):
-            raise UserError(_(
-                'Please specify at least one account to post into (for post ID(s) %s).',
-                ', '.join([str(post.id) for post in self if not post.account_ids])
-            ))
-        errors = defaultdict(list)
+            raise UserError(_("Almost ready! Just select which accounts you'd like to post from."))
         message_field_per_media = self._message_fields()
         for post in self:
             for media in post.media_ids.filtered(lambda media: media.max_post_length):
                 message_field = message_field_per_media.get(media.media_type)
                 if message_field and len(post[message_field] or '') > media.max_post_length:
-                    errors[post].append(_("%(media_name)s (max %(max_chars)s chars)", media_name=media.name, max_chars=media.max_post_length))
-        if bool(errors):
-            raise ValidationError(_(
-                "Due to length restrictions, the following posts cannot be posted:\n %s",
-                "\n".join(["%s : %s" % (post.display_name, ",".join(err)) for post, err in errors.items()])
-            ))
+                    raise ValidationError(_("Oops! Your post is a bit too long. Try shortening it to fit the limit."))
 
-    def action_schedule(self):
+    def action_duplicate(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'social.post',
+            'res_id': self.copy().id,
+            'context': self.env.context,
+        }
+
+    def action_add_to_queue(self):
+        """Post or schedule the post.
+
+        Post right way the media without a scheduled date, and schedule
+        the posting if there's media with a schedule date.
+        """
+        self.ensure_one()
         self._check_post_access()
-        self.write({'state': 'scheduled'})
+        scheduled_dates = self._get_scheduled_date_per_accounts().values()
+
+        if any(date and date < fields.Datetime.now() for date in scheduled_dates):
+            raise UserError(_('You cannot schedule a post in the past.'))
+
+        if any(scheduled_dates):
+            self.state = 'scheduled'
+            # trigger the CRON for all dates
+            cron = self.env.ref('social.ir_cron_post_scheduled')
+            cron._trigger(at=set(filter(bool, scheduled_dates)))
+
+        if not all(scheduled_dates):
+            self._action_post()
 
     def action_set_draft(self):
         self._check_post_access()
         self.write({'state': 'draft'})
 
-    def action_post(self):
+    def action_post_now(self):
+        """Force to post the post right away, ignoring all scheduled dates."""
         self._check_post_access()
 
-        self.write({
-            'post_method': 'now',
-            'scheduled_date': False
-        })
+        for live_post in self.live_post_ids:
+            if live_post.state == 'posting' and live_post.scheduled_date:
+                # need to manually set the live post as ready
+                # because the CRON will skip live post without a scheduled date
+                # in posting state (they are managed by sub-modules, like
+                # Instagram and Push Notifications, see `@_cron_publish_scheduled`).
+                live_post.state = 'ready'
 
+        self.write(
+            {f: False for f in self._scheduled_date_fields().values()}
+            | {'scheduled_date': False}
+        )
         self._action_post()
+
+    def action_reload(self):
+        """Reload the form view.
+
+        Useful when the post is in "posting" state,
+        and we want to refresh the view.
+        """
+        pass
 
     def action_redirect_to_clicks(self):
         action = self.env["ir.actions.actions"]._for_xml_id("link_tracker.link_tracker_action")
-        action['domain'] = [
-            ('source_id', '=', self.source_id.id),
-            ('medium_id', 'in', self.account_ids.mapped('utm_medium_id').ids),
-        ]
+        action['domain'] = [('utm_reference', 'in', [f'{post._name},{post.id}' for post in self])]
         return action
 
     def _action_post(self):
@@ -338,6 +325,10 @@ class SocialPost(models.Model):
         It will create one social.live.post per social.account and call '_post' on each of them. """
 
         for post in self:
+            if post.live_post_ids:
+                # live posts already created
+                continue
+
             post.write({
                 'state': 'posting',
                 'published_date': fields.Datetime.now(),
@@ -360,9 +351,20 @@ class SocialPost(models.Model):
             # send the live posts
             failed_posts = self.env['social.live.post']
             for live_post in post.live_post_ids:
+                if (
+                    live_post.state == 'posting'
+                    and live_post.scheduled_date
+                    and live_post.scheduled_date <= fields.Datetime.now()
+                ):
+                    # the live post is now ready to be sent
+                    live_post.state = 'ready'
+
+                if live_post.state != 'ready':
+                    continue
+
                 try:
                     live_post._post()
-                except Exception:
+                except Exception:  # noqa: BLE001
                     failed_posts |= live_post
             failed_posts.write({
                 'state': 'failed',
@@ -371,21 +373,24 @@ class SocialPost(models.Model):
 
     def _prepare_live_post_values(self):
         self.ensure_one()
-
         return [{
             'post_id': self.id,
             'account_id': account.id,
-        } for account in self.account_ids]
+            'state': (
+                'ready' if not scheduled_date or scheduled_date <= fields.Datetime.now()
+                else 'posting'
+            )
+        } for account, scheduled_date in self._get_scheduled_date_per_accounts().items()]
 
     @api.model
     def _prepare_post_name(self, message, state=False):
         name = _('Post')
         if message:
             message = message.replace('\n', ' ')  # replace carriage returns as needed name is usually a Char
-            if len(message) < 24:
+            if len(message) < 64:
                 name = message
             else:
-                name = message[:20] + '...'
+                name = message[:60] + '...'
 
         if state:
             state_description_values = {elem[0]: elem[1] for elem in self._fields['state']._description_selection(self.env)}
@@ -408,12 +413,12 @@ class SocialPost(models.Model):
         return []
 
     def _check_post_completion(self):
-        """ This method will check if all live.posts related to the post are completed ('posted' / 'failed').
+        """ This method will check if all live.posts related to the post are completed ('posted' / 'failed' / 'cancel').
         If it's the case, we can mark the post itself as 'posted'. """
 
         posts_to_complete = self.filtered(
             lambda post: all(
-                live_post.state in ('posted', 'failed')
+                live_post.state in ('posted', 'failed', 'cancel')
                 for live_post in post.live_post_ids
             )
         )
@@ -422,7 +427,7 @@ class SocialPost(models.Model):
             posts_failed = Markup('<br>').join([
                 '  - ' + live_post.display_name
                 for live_post in post.live_post_ids
-                if live_post.state == 'failed'
+                if live_post.state in ('failed', 'cancel')
             ])
 
             if posts_failed:
@@ -430,16 +435,19 @@ class SocialPost(models.Model):
             else:
                 post._message_log(body=_("Message posted"))
 
-        if posts_to_complete:
-            posts_to_complete.sudo().write({'state': 'posted'})
+            if post.live_post_ids.account_id == post.account_ids:
+                # all live posts have been sent / failed / canceled
+                post.sudo().write({'state': 'posted'})
 
     @api.model
     def _cron_publish_scheduled(self):
         """ Method called by the cron job that searches for social.posts that were scheduled and need
         to be published and calls _action_post() on them."""
 
-        self.search([
-            ('post_method', '=', 'scheduled'),
-            ('state', '=', 'scheduled'),
-            ('scheduled_date', '<=', fields.Datetime.now())
-        ])._action_post()
+        domain = Domain.FALSE
+        for media, scheduled_date_field in self._scheduled_date_fields().items():
+            domain |= Domain([
+                (scheduled_date_field, '<=', fields.Datetime.now()),
+                ('media_ids.media_type', '=', media),
+            ])
+        self.search(domain & Domain('state', 'in', ('scheduled', 'posting')))._action_post()

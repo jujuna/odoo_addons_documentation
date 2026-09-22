@@ -1,15 +1,17 @@
-from base64 import b64decode
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
 from freezegun import freeze_time
 from lxml import etree
-import pytz
 
 from odoo.tests import tagged
+from odoo.tools.misc import file_open
 from .common import TestECDeliveryGuideCommon
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestECDeliveryGuide(TestECDeliveryGuideCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @freeze_time('2025-02-24')
     def test_send_delivery_guide_flow(self):
@@ -19,7 +21,7 @@ class TestECDeliveryGuide(TestECDeliveryGuideCommon):
                 # First call: send the delivery guide
                 'validarComprobante',
                 {
-                    'xml': b'<guiaRemision id="comprobante" version="1.1.0">\n  <infoTributaria>\n    <ambiente>2</ambiente>\n    <tipoEmision>1</tipoEmision>\n    <razonSocial>EC Test Company (official)</razonSocial>\n    <nombreComercial>EC Test Company</nombreComercial>\n    <ruc>1792366836001</ruc>\n    <claveAcceso>2402202506179236683600120010010000000013121521416</claveAcceso>\n    <codDoc>06</codDoc>\n    <estab>001</estab>\n    <ptoEmi>001</ptoEmi>\n    <secuencial>000000001</secuencial>\n    <dirMatriz>Avenida Machala 42</dirMatriz>\n  </infoTributaria>\n  <infoGuiaRemision>\n    <dirEstablecimiento>Avenida Machala 42</dirEstablecimiento>\n    <dirPartida>Avenida Machala 42</dirPartida>\n    <razonSocialTransportista>Delivery guide Carrier EC</razonSocialTransportista>\n    <tipoIdentificacionTransportista>05</tipoIdentificacionTransportista>\n    <rucTransportista>0750032310</rucTransportista>\n    <obligadoContabilidad>SI</obligadoContabilidad>\n    <fechaIniTransporte>24/02/2025</fechaIniTransporte>\n    <fechaFinTransporte>11/03/2025</fechaFinTransporte>\n    <placa>OBA1413</placa>\n  </infoGuiaRemision>\n  <destinatarios>\n    <destinatario>\n      <identificacionDestinatario>0453661050152</identificacionDestinatario>\n      <razonSocialDestinatario>EC Test Partner A\xc3\xa0\xc3\x81\xc2\xb3$\xc2\xa3\xe2\x82\xac\xc3\xa8\xc3\xaa\xc3\x88\xc3\x8a\xc3\xb6\xc3\x94\xc3\x87\xc3\xa7\xc2\xa1\xe2\x85\x9b&amp;@\xe2\x84\xa2</razonSocialDestinatario>\n      <dirDestinatario>Av. Libertador Sim\xc3\xb3n Bol\xc3\xadvar 1155 -  - Quito - Ecuador</dirDestinatario>\n      <motivoTraslado>Goods Dispatch</motivoTraslado>\n      <detalles>\n        <detalle>\n          <codigoInterno>N/A</codigoInterno>\n          <descripcion>Computadora</descripcion>\n          <cantidad>1.0</cantidad>\n        </detalle>\n      </detalles>\n    </destinatario>\n  </destinatarios>\n</guiaRemision>\n',
+                    'xml': file_open('l10n_ec_edi_stock/tests/expected_files/sent_delivery_guide.xml', 'rb').read(),
                 },
                 {
                     'estado': 'RECIBIDA',
@@ -38,7 +40,7 @@ class TestECDeliveryGuide(TestECDeliveryGuideCommon):
                         'autorizacion': [{
                             'estado': 'AUTORIZADO',
                             'numeroAutorizacion': '1912202406010364761600110010010001912253121521419',
-                            'fechaAutorizacion': datetime(2024, 12, 19, 12, 5, 29, tzinfo=pytz.FixedOffset(-5 * 60)),
+                            'fechaAutorizacion': datetime(2024, 12, 19, 12, 5, 29, tzinfo=timezone(timedelta(minutes=-5 * 60))),
                             'ambiente': 'PRUEBAS',
                             'comprobante': 'dummy',
                             'mensajes': None,
@@ -93,11 +95,56 @@ class TestECDeliveryGuide(TestECDeliveryGuideCommon):
                 ('res_model', '=', 'stock.picking'),
                 ('res_id', '=', stock_picking.id),
             ])
-            decoded_content = b64decode(attachment_id.datas).decode('utf-8')
+            decoded_content = attachment_id.raw.decode('utf-8')
             self.assertXmlTreeEqual(
                 etree.fromstring(decoded_content),
                 etree.fromstring(L10N_EC_EDI_XML_DELIVERY_GUIDE),
             )
+
+    def test_xml_tree_delivery_guide_provider_vat(self):
+        '''
+        Validates that the RUC of the selected software provider is reported in the delivery guide XML
+        '''
+        self.company_data['company'].l10n_ec_edi_provider_id = self.env['res.partner'].create({
+            'name': "EC Software Provider",
+            'vat': '0453661050001',
+        })
+        with freeze_time(self.frozen_today):
+            stock_picking = self.get_stock_picking()
+            self.prepare_delivery_guide(stock_picking)
+            attachment_id = self.env['ir.attachment'].search([
+                ('res_model', '=', 'stock.picking'),
+                ('res_id', '=', stock_picking.id),
+            ])
+            self.assertXmlTreeEqual(
+                etree.fromstring(attachment_id.raw.decode('utf-8')),
+                self.with_applied_xpath(
+                    etree.fromstring(L10N_EC_EDI_XML_DELIVERY_GUIDE),
+                    """
+                        <xpath expr="//campoAdicional[@nombre='RUC Proveedor']" position="replace">
+                            <campoAdicional nombre="RUC Proveedor">0453661050001</campoAdicional>
+                        </xpath>
+                    """,
+                ),
+            )
+
+    def test_delivery_guide_provider_vat_alert(self):
+        ''' Test the software provider RUC warning on a delivery guide. '''
+        stock_picking = self.get_stock_picking()
+        self.company_data['company'].l10n_ec_edi_provider_id = False
+
+        # The warehouse is not configured for delivery guides yet, so nothing is warned about
+        self.assertFalse(stock_picking.l10n_ec_edi_alerts)
+
+        self.wh.write({'l10n_ec_entity': '001', 'l10n_ec_emission': '001'})
+        self.assertIn('l10n_ec_edi_missing_provider_vat', stock_picking.l10n_ec_edi_alerts or {})
+
+        provider = self.env['res.partner'].create({'name': "EC Software Provider", 'vat': '0453661050'})
+        self.company_data['company'].l10n_ec_edi_provider_id = provider
+        self.assertIn('l10n_ec_edi_missing_provider_vat', stock_picking.l10n_ec_edi_alerts or {})
+
+        provider.vat = '0453661050001'
+        self.assertFalse(stock_picking.l10n_ec_edi_alerts)
 
 
 L10N_EC_EDI_XML_DELIVERY_GUIDE = """<autorizacion>
@@ -111,7 +158,6 @@ L10N_EC_EDI_XML_DELIVERY_GUIDE = """<autorizacion>
                 <ambiente>1</ambiente>
                 <tipoEmision>1</tipoEmision>
                 <razonSocial>EC Test Company (official)</razonSocial>
-                <nombreComercial>EC Test Company</nombreComercial>
                 <ruc>1792366836001</ruc>
                 <claveAcceso>2501202206179236683600110010010000000013121521412</claveAcceso>
                 <codDoc>06</codDoc>
@@ -135,7 +181,7 @@ L10N_EC_EDI_XML_DELIVERY_GUIDE = """<autorizacion>
                 <destinatario>
                     <identificacionDestinatario>0453661050152</identificacionDestinatario>
                     <razonSocialDestinatario>EC Test Partner AàÁ³$£€èêÈÊöÔÇç¡⅛&amp;@™</razonSocialDestinatario>
-                    <dirDestinatario>Av. Libertador Simón Bolívar 1155 -  - Quito - Ecuador</dirDestinatario>
+                    <dirDestinatario>Av. Libertador Simón Bolívar 1155 - Quito - Ecuador</dirDestinatario>
                     <motivoTraslado>Goods Dispatch</motivoTraslado>
                     <detalles>
                         <detalle>
@@ -146,6 +192,9 @@ L10N_EC_EDI_XML_DELIVERY_GUIDE = """<autorizacion>
                     </detalles>
                 </destinatario>
             </destinatarios>
+            <infoAdicional>
+                <campoAdicional nombre="RUC Proveedor">1792366836001</campoAdicional>
+            </infoAdicional>
         </guiaRemision>
     </comprobante>
 </autorizacion>

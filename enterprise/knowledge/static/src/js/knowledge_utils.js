@@ -1,4 +1,4 @@
-import { loadEmoji } from "@web/core/emoji_picker/emoji_picker";
+import { emojiLoader } from "@web/core/emoji_picker/emoji_loader";
 
 // List of icons that should be avoided when adding a random icon
 const iconsBlocklist = ["💩", "💀", "☠️", "🤮", "🖕", "🤢", "😒"];
@@ -8,7 +8,7 @@ const iconsBlocklist = ["💩", "💀", "☠️", "🤮", "🖕", "🤢", "😒"
  * @returns {String} emoji
  */
 export async function getRandomIcon() {
-    const { emojis } = await loadEmoji();
+    const { emojis } = await emojiLoader.load();
     const randomEmojis = emojis.filter((emoji) => !iconsBlocklist.includes(emoji.codepoints));
     return randomEmojis[Math.floor(Math.random() * randomEmojis.length)].codepoints;
 }
@@ -22,12 +22,12 @@ export async function getRandomIcon() {
  * @param {Function} callback
  * @returns {IntersectionObserver}
  */
-export function setIntersectionObserver (element, callback) {
+export function setIntersectionObserver(element, callback) {
     const options = {
         root: null,
-        rootMargin: '0px'
+        rootMargin: "0px",
     };
-    const observer = new window.IntersectionObserver(entries => {
+    const observer = new window.IntersectionObserver((entries) => {
         const entry = entries[0];
         if (entry.isIntersecting) {
             observer.unobserve(entry.target);

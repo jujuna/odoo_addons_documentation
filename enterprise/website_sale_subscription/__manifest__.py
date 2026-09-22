@@ -4,13 +4,13 @@
     'name': 'eCommerce Subscription',
     'category': 'Website/Website',
     'summary': 'Sell subscription products on your eCommerce',
-    'version': '1.0',
     'description': """
 This module allows you to sell subscription products in your eCommerce with
 appropriate views and selling choices.
     """,
     'depends': ['website_sale', 'sale_subscription'],
     'data': [
+        'data/donation_data.xml',
         'views/templates.xml',
         'views/sale_order_views.xml',
     ],
@@ -20,9 +20,11 @@ appropriate views and selling choices.
     'assets': {
         'web.assets_frontend': [
             'sale_subscription/static/src/js/combo_configurator_dialog/*',
+            'sale_subscription/static/src/js/product/*',
             'sale_subscription/static/src/js/product_configurator_dialog/*',
-            ('before', 'website_sale/static/src/interactions/website_sale.js', 'website_sale_subscription/static/src/js/variant_mixin.js'),
             'website_sale_subscription/static/src/interactions/*',
+            'website_sale_subscription/static/src/js/cart_service.js',
+            'website_sale_subscription/static/src/xml/donation_snippet.xml',
             'website_sale_subscription/static/src/xml/pricing_view.xml',
         ],
         'web.assets_tests': [

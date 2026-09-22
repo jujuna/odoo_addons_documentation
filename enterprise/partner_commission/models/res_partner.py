@@ -16,12 +16,8 @@ class ResPartnerGrade(models.Model):
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    @api.model
-    def _default_commission_plan(self):
-        return self.grade_id.default_commission_plan_id
-
-    commission_plan_id = fields.Many2one('commission.plan', 'Commission Plan', default=_default_commission_plan, tracking=True)
+    commission_plan_id = fields.Many2one('commission.plan', 'Commission Plan', tracking=True)
 
     @api.onchange('grade_id')
     def _onchange_grade_id(self):
-        self.commission_plan_id = self._default_commission_plan()
+        self.commission_plan_id = self.grade_id.default_commission_plan_id

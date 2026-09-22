@@ -13,6 +13,8 @@ import {
 } from "@mail/../tests/mail_test_helpers";
 import { beforeEach, describe, test } from "@odoo/hoot";
 
+import { range } from "@web/core/utils/numbers";
+
 describe.current.tags("desktop");
 defineMailModels();
 beforeEach(() => patchUiSize({ size: SIZES.XXL }));
@@ -21,15 +23,15 @@ test("Message list loads new messages on scroll", async () => {
     const pyEnv = await startServer();
     const partnerId = pyEnv["res.partner"].create({
         display_name: "Partner 11",
-        description: [...Array(61).keys()].join("\n"),
+        description: range(61).join("\n"),
     });
-    for (let i = 0; i < 60; i++) {
-        pyEnv["mail.message"].create({
+    pyEnv["mail.message"].create(
+        range(60).map(() => ({
             body: "<p>not empty</p>",
             model: "res.partner",
             res_id: partnerId,
-        });
-    }
+        }))
+    );
     registerArchs({
         "res.partner,false,form": `
             <form string="Partners">
@@ -53,17 +55,17 @@ test("Message list is scrolled to new message after posting a message", async ()
     const partnerId = pyEnv["res.partner"].create({
         activity_ids: [],
         display_name: "<p>Partner 11</p>",
-        description: [...Array(60).keys()].join("\n"),
+        description: range(60).join("\n"),
         message_ids: [],
         message_follower_ids: [],
     });
-    for (let i = 0; i < 60; i++) {
-        pyEnv["mail.message"].create({
+    pyEnv["mail.message"].create(
+        range(60).map(() => ({
             body: "<p>not empty</p>",
             model: "res.partner",
             res_id: partnerId,
-        });
-    }
+        }))
+    );
     registerArchs({
         "res.partner,false,form": `
             <form string="Partners">

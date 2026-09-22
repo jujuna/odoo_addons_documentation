@@ -2,15 +2,13 @@ import { useService, useAutofocus } from "@web/core/utils/hooks";
 import { useNestedSortable } from "@web/core/utils/nested_sortable";
 import wUtils from "@website/js/utils";
 import { WebsiteDialog } from "./dialog";
-import { Component, useState, useEffect, onWillStart, useRef } from "@odoo/owl";
-import { _t } from "@web/core/l10n/translation";
+import { Component, onWillStart, proxy, signal, useApp, useEffect, useProps, t } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
 import { isEmail } from "@web/core/utils/strings";
 import { AddPageDialog } from "@website/components/dialog/add_page_dialog";
 import { isAbsoluteURLInCurrentDomain } from "@html_editor/utils/url";
 import { useDebounced } from "@web/core/utils/timing";
 import { KeepLast } from "@web/core/utils/concurrency";
-import { effect } from "@web/core/utils/reactive";
 
 function urlToCheck(url) {
     let relativeUrl = false;
@@ -61,26 +59,29 @@ const toRelativeIfSameDomain = (url) => {
 export class MenuDialog extends Component {
     static template = "website.MenuDialog";
     static components = { WebsiteDialog };
-    static props = {
-        name: { type: String, optional: true },
-        url: { type: String, optional: true },
-        isMegaMenu: { type: Boolean, optional: true },
-        save: Function,
-        close: Function,
-    };
+    props = useProps({
+        name: t.string().optional(),
+        url: t.string().optional(),
+        isMegaMenu: t.boolean().optional(),
+        hasChildren: t.boolean().optional(),
+        save: t.function(),
+        close: t.function(),
+    });
+
+    autofocusRef = signal.ref();
 
     setup() {
         this.website = useService("website");
-        this.title = this.props.isMegaMenu ? _t("Mega menu item") : _t("Menu item");
-        useAutofocus();
+        useAutofocus({ ref: this.autofocusRef });
 
-        this.urlInputRef = useRef("url-input");
+        this.urlInputRef = signal.ref(HTMLInputElement);
         this.urlInputEdited = !!this.props.url;
 
-        this.state = useState({
+        this.state = proxy({
             pageNotFound: false,
             url: this.props.url,
             name: this.props.name,
+            isMegaMenu: this.props.isMegaMenu,
             invalidName: false,
             invalidUrl: false,
         });
@@ -89,33 +90,40 @@ export class MenuDialog extends Component {
         const updatePageNotFound = (url) =>
             keepLast.add(checkUrlExists(url)).then((exists) => (this.state.pageNotFound = !exists));
         const debouncedUpdatePageNotFound = useDebounced(updatePageNotFound, 500);
-        effect(({ url }) => debouncedUpdatePageNotFound(url), [this.state]);
+        useEffect(() => debouncedUpdatePageNotFound(this.state.url));
 
-        useEffect(
-            (input) => {
-                if (!input) {
-                    return;
-                }
-                const options = {
-                    body: this.website.pageDocument.body,
-                    position: "bottom-fit",
-                    classes: {
-                        "ui-autocomplete": "o_edit_menu_autocomplete",
-                    },
-                    urlChosen: () => {
-                        this.state.url = input.value;
-                        this.state.pageNotFound = false;
-                    },
-                };
-                const unmountAutocompleteWithPages = wUtils.autocompleteWithPages(
-                    input,
-                    options,
-                    this.env
-                );
-                return () => unmountAutocompleteWithPages();
-            },
-            () => [this.urlInputRef.el]
-        );
+        const app = useApp();
+        useEffect(() => {
+            const input = this.urlInputRef();
+            if (!input) {
+                return;
+            }
+            const options = {
+                body: this.website.pageDocument.body,
+                position: "bottom-fit",
+                classes: {
+                    "ui-autocomplete": "o_edit_menu_autocomplete",
+                },
+                urlChosen: () => {
+                    this.state.url = input.value;
+                    this.state.pageNotFound = false;
+                },
+            };
+            const unmountAutocompleteWithPages = wUtils.autocompleteWithPages(app, input, options);
+            return () => unmountAutocompleteWithPages();
+        });
+    }
+
+    getUrl() {
+        let url = this.state.url;
+        if (!this.state.isMegaMenu) {
+            try {
+                url = toRelativeIfSameDomain(url);
+            } catch {
+                // Do nothing if URL is invalid.
+            }
+        }
+        return url;
     }
 
     onClickOk() {
@@ -124,15 +132,7 @@ export class MenuDialog extends Component {
             return;
         }
 
-        let url = this.state.url;
-        if (!this.props.isMegaMenu) {
-            try {
-                url = toRelativeIfSameDomain(url);
-            } catch {
-                // Do nothing if URL is invalid.
-            }
-        }
-        this.props.save(this.state.name, url, this.state.pageNotFound);
+        this.props.save(this.state.name, this.getUrl(), this.state.isMegaMenu);
         this.props.close();
     }
 
@@ -147,7 +147,7 @@ export class MenuDialog extends Component {
 
     onTitleInput(ev) {
         this.state.invalidName = false;
-        if (!this.urlInputEdited && !this.props.isMegaMenu) {
+        if (!this.urlInputEdited && !this.state.isMegaMenu) {
             const title = ev.target.value;
             this.state.url = title ? "/" + wUtils.slugify(title) : "";
         }
@@ -156,12 +156,12 @@ export class MenuDialog extends Component {
 
 class MenuRow extends Component {
     static template = "website.MenuRow";
-    static props = {
-        menu: Object,
-        edit: Function,
-        delete: Function,
-        createPage: Function,
-    };
+    props = useProps({
+        menu: t.object(),
+        edit: t.function(),
+        delete: t.function(),
+        createPage: t.function(),
+    });
     static components = {
         MenuRow,
     };
@@ -185,16 +185,20 @@ export class EditMenuDialog extends Component {
         MenuRow,
         WebsiteDialog,
     };
-    static props = ["rootID?", "close", "save?"];
+    props = useProps({
+        rootID: t.or([t.number(), t.literal(null)]).optional(),
+        close: t.function(),
+        save: t.function().optional(),
+    });
+
+    menuEditor = signal.ref();
 
     setup() {
         this.orm = useService("orm");
         this.website = useService("website");
         this.dialogs = useService("dialog");
 
-        this.menuEditor = useRef("menu-editor");
-
-        this.state = useState({ rootMenu: {} });
+        this.state = proxy({ rootMenu: {} });
 
         onWillStart(async () => {
             const menu = await this.orm.call(
@@ -228,7 +232,7 @@ export class EditMenuDialog extends Component {
                 // of the placeholder.
                 element.style.width = getComputedStyle(placeholder).width;
                 element.style.marginLeft =
-                    parent && element.parentElement === this.menuEditor.el ? "2rem" : "";
+                    parent && element.parentElement === this.menuEditor() ? "2rem" : "";
             },
             preventDrag: (el) => el.querySelector(":scope > button"),
         });
@@ -299,27 +303,26 @@ export class EditMenuDialog extends Component {
         }
     }
 
-    addMenu(isMegaMenu) {
+    addMenu() {
         this.dialogs.add(MenuDialog, {
-            isMegaMenu,
             url: "",
-            save: (name, url, pageNotFound, isNewWindow) => {
-                const newMenu = {
+            save: (name, url, isMegaMenu) => {
+                const newMenu = proxy({
                     fields: {
                         id: `menu_${new Date().toISOString()}`,
                         name,
                         url: isMegaMenu || !url ? "#" : url,
-                        new_window: isNewWindow,
+                        new_window: false,
                         is_mega_menu: isMegaMenu,
                         sequence: 0,
                         parent_id: false,
                     },
                     children: [],
-                    page_not_found: pageNotFound,
-                };
+                    page_not_found: false,
+                });
                 this.state.rootMenu.children.push(newMenu);
-                // this.state.rootMenu.children.at(-1) to forces a rerender
-                this.map.set(newMenu.fields["id"], this.state.rootMenu.children.at(-1));
+                this.map.set(newMenu.fields["id"], newMenu);
+                this.checkMenuUrlExists(newMenu, url);
             },
         });
     }
@@ -330,12 +333,26 @@ export class EditMenuDialog extends Component {
             name: menuToEdit.fields["name"],
             url: menuToEdit.fields["url"],
             isMegaMenu: menuToEdit.fields["is_mega_menu"],
-            save: (name, url, pageNotFound) => {
+            hasChildren: menuToEdit.children.length > 0,
+            save: (name, url, isMegaMenu) => {
                 menuToEdit.fields["name"] = name;
-                menuToEdit.fields["url"] = url || "#";
-                menuToEdit.page_not_found = pageNotFound;
+                menuToEdit.fields["url"] = isMegaMenu || !url ? "#" : url;
+                menuToEdit.fields["is_mega_menu"] = isMegaMenu;
+                menuToEdit.page_not_found = false;
+                menuToEdit.is_homepage = !isMegaMenu && menuToEdit.is_homepage;
+                this.checkMenuUrlExists(menuToEdit, url);
             },
         });
+    }
+
+    checkMenuUrlExists(menu, url) {
+        if (url) {
+            checkUrlExists(url).then((exists) => {
+                if (menu.fields["url"] === url) {
+                    menu.page_not_found = !exists;
+                }
+            });
+        }
     }
 
     deleteMenu(id) {
@@ -394,8 +411,11 @@ export class EditMenuDialog extends Component {
         let url = menu.fields["url"];
         url = url.startsWith("/") ? url : "/" + url;
         this.dialogs.add(AddPageDialog, {
-            onAddPage: () => {
-                this.onClickSave(false, url);
+            onAddPage: ({ createdUrl }) => {
+                if (createdUrl) {
+                    menu.fields["url"] = createdUrl;
+                }
+                this.onClickSave(false, createdUrl ?? url);
             },
             websiteId: this.website.currentWebsite.id,
             forcedURL: url,

@@ -1,30 +1,36 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps, usePlugin } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
+import { ORM } from "@web/core/orm_plugin";
 
 export class RefreshButton extends Component {
     static template = "account_online_payment.RefreshButton";
-    static props = ["name", "id", "record", "readonly"];
+    props = useProps({
+        record: t.object(),
+    });
+    orm = usePlugin(ORM);
 
     setup() {
-        this.state = useState({
-            status: this.props.record.data.payment_online_status,
+        this.state = proxy({
             isFetching: false,
         });
-        this.orm = useService("orm");
+    }
+
+    get paymentOnlineStatus() {
+        return this.props.record.data.payment_online_status;
     }
 
     async onClickFetchStatus() {
         this.state.isFetching = true;
 
-        const response = await this.orm.call(
-            "account.batch.payment",
-            "check_online_payment_status",
-            [this.props.record.data.id],
-        );
-
-        this.state.status = response[this.props.record.data.id];
-        this.state.isFetching = false;
+        try {
+            await this.orm.call("account.online.link", "check_online_payment_status", [
+                this.props.record.resId,
+                this.props.record.resModel,
+            ]);
+        } finally {
+            this.props.record.model.load();
+            this.state.isFetching = false;
+        }
     }
 }
 

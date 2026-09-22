@@ -5,22 +5,41 @@ import { StreamPostCommentsReply } from './stream_post_comments_reply';
 import { rpc } from "@web/core/network/rpc";
 import { ConfirmationDialog } from '@web/core/confirmation_dialog/confirmation_dialog';
 import { useService } from '@web/core/utils/hooks';
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useOnChange, useProps } from "@odoo/owl";
 
 export class StreamPostComment extends SocialPostFormatterMixin(Component) {
-    static props = ["*"];
     static template = "social.StreamPostComment";
+
+    props = useProps({
+        _onReplyComment: t.any().optional(),
+        account: t.any().optional(),
+        comment: t.any(),
+        isSubComment: t.any().optional(),
+        mediaSpecificProps: t.any(),
+        onDeleteComment: t.any(),
+        originalPost: t.any(),
+        preventAddComment: t.any(),
+        toggleUserLikes: t.any(),
+    });
 
     setup() {
         super.setup();
         this.dialog = useService('dialog');
-        this.action = useState({
+        this.action = proxy({
             showSubComment: false,
             showReplyComment: false,
         });
-        this.state = useState({
+        this.state = proxy({
+            comment: this.props.comment,
             isEditMode: false,
         });
+        useOnChange(
+            () => [this.props.comment],
+            (comment) => {
+                this.state.comment = comment;
+            },
+            { initialRun: false }
+        );
     }
 
     //----------
@@ -39,10 +58,17 @@ export class StreamPostComment extends SocialPostFormatterMixin(Component) {
         this.state.isEditMode = !this.state.isEditMode;
     }
 
+    _onEditComment(newComment) {
+        this.state.comment = newComment;
+    }
+
     _deleteComment() {
         this.dialog.add(ConfirmationDialog, {
             title: _t('Delete Comment'),
-            body: _t('Do you really want to delete this %s?', this.commentName),
+            body: _t('Do you really want to delete this %(comment)s?\nIt will also be deleted from %(platform)s.', {
+                comment: this.commentName,
+                platform: this.originalPost.media_type.value
+            }),
             confirmLabel: _t("Delete"),
             confirm: () => {
                 this._confirmDeleteComment();
@@ -77,7 +103,7 @@ export class StreamPostComment extends SocialPostFormatterMixin(Component) {
     //----------
 
     get comment() {
-        return this.props.comment;
+        return this.state.comment;
     }
 
     get account() {
@@ -101,7 +127,7 @@ export class StreamPostComment extends SocialPostFormatterMixin(Component) {
     }
 
     get commentName() {
-        return _t('comment/reply');
+        return _t('comment');
     }
 
     get link() {
@@ -128,8 +154,12 @@ export class StreamPostComment extends SocialPostFormatterMixin(Component) {
         return true;
     }
 
+    get likesIcon() {
+        return 'thumb_up';
+    }
+
     get likesClass() {
-        return 'fa-thumbs-up';
+        return 'oi-filled';
     }
 
     get commentComponent() {

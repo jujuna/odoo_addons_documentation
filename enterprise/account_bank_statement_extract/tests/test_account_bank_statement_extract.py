@@ -8,6 +8,8 @@ from ..models.account_bank_statement import OCR_VERSION
 @tagged('post_install', '-at_install')
 class TestBankStatementExtractProcess(AccountTestInvoicingCommon, TestExtractMixin):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -20,7 +22,7 @@ class TestBankStatementExtractProcess(AccountTestInvoicingCommon, TestExtractMix
             'name': 'Bank 123456',
             'code': 'BNK67',
             'type': 'bank',
-            'bank_acc_number': '123456',
+            'bank_account_number': '123456',
             'currency_id': currency.id,
         })
         cls.bank_statement = cls.env['account.bank.statement'].create({
@@ -80,8 +82,8 @@ class TestBankStatementExtractProcess(AccountTestInvoicingCommon, TestExtractMix
         expected_parse_params = {
             'version': OCR_VERSION,
             'account_token': 'test_token',
-            'dbuuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
-            'documents': [self.attachment.datas.decode('utf-8')],
+            'dbuuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
+            'documents': [self.attachment.raw.to_base64()],
             'user_infos': {
                 'user_email': self.user.email,
                 'user_lang': self.env.ref('base.user_root').lang,
@@ -121,6 +123,40 @@ class TestBankStatementExtractProcess(AccountTestInvoicingCommon, TestExtractMix
         self.assertEqual(self.bank_statement.balance_end, extract_results['balance_end']['selected_value']['content'])
         self.assertEqual(str(self.bank_statement.date), extract_results['date']['selected_value']['content'])
         self.assertEqual(len(self.bank_statement.line_ids), len(extract_results['bank_statement_lines']))
+
+    def test_csv_import_debit_credit_not_double_parsed(self):
+        """ Test that debit/credit are parsed once when imported from a CSV: with
+        this module installed they are real fields already parsed by the generic
+        importer, so the wizard must not parse them again and scale them by 100. """
+        attachment = self.env['ir.attachment'].create({
+            'mimetype': 'text/csv',
+            'name': 'test_debit_credit.csv',
+            'raw': b'1.234,56;0,00\n'
+                   b'0,00;2.000,00\n',
+        })
+        action = self.bank_journal.create_document_from_attachment(attachment.ids)
+        import_wizard = self.env['base_import.import'].browse(
+            action['params']['context']['wizard_id']
+        ).with_context(action['params']['context'])
+        res = import_wizard.execute_import(
+            ['debit', 'credit'],
+            [],
+            {
+                'encoding': 'utf-8',
+                'quoting': '"',
+                'bank_stmt_import': True,
+                'headers': False,
+                'separator': ';',
+                'float_thousand_separator': '.',
+                'float_decimal_separator': ',',
+            },
+        )
+
+        lines = self.env['account.bank.statement.line'].browse(res['ids'])
+        self.assertRecordValues(lines.sorted('amount'), [
+            {'amount': -1234.56},
+            {'amount': 2000.00},
+        ])
 
     def test_no_send_for_digitization(self):
         # test that the `no_send` mode for digitization prevents the users from sending

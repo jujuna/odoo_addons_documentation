@@ -1,13 +1,17 @@
-import { useSubEnv } from "@odoo/owl";
-import { SelectCreateDialog } from "@web/views/view_dialogs/select_create_dialog";
+import { useProps, t } from "@odoo/owl";
+import { useSubEnv } from "@web/owl2/utils";
+import {
+    SelectCreateDialog,
+    selectCreateDialogProps,
+} from "@web/views/view_dialogs/select_create_dialog";
 import { useBus, useService } from "@web/core/utils/hooks";
 
 export class MrpSelectQuantDialog extends SelectCreateDialog {
-    static props = { ...SelectCreateDialog.props, record: Object };
+    props = useProps({ ...selectCreateDialogProps, record: t.object() });
     setup() {
         super.setup();
         this.barcode = useService("barcode");
-        useBus(this.barcode.bus, "barcode_scanned", this._onBarcodeScanned);
+        useBus(this.barcode.bus, "barcode_scanned", this._onBarcodeScanned.bind(this));
         useSubEnv({
             config: {
                 ...this.env.config,

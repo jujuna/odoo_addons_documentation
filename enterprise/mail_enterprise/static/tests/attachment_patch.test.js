@@ -8,12 +8,14 @@ import {
     SIZES,
     start,
     startServer,
+    MENU_ACTIVE_IDS,
 } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
 import { patchWithCleanup } from "@web/../tests/web_test_helpers";
 import { methods } from "@web_mobile/js/services/core";
+import { mockUserAgent } from "@odoo/hoot-mock";
 
-describe.current.tags("desktop");
+describe.current.tags("mobile");
 defineMailModels();
 
 test("'backbutton' event should close attachment viewer", async () => {
@@ -21,6 +23,7 @@ test("'backbutton' event should close attachment viewer", async () => {
         overrideBackButton({ enabled }) {},
     });
 
+    mockUserAgent("android");
     patchUiSize({ size: SIZES.SM });
     const pyEnv = await startServer();
     const channelId = pyEnv["discuss.channel"].create({
@@ -38,10 +41,8 @@ test("'backbutton' event should close attachment viewer", async () => {
         res_id: channelId,
     });
     await start();
-    await openDiscuss();
-    await contains("button.active", { text: "Notifications" });
-    await click("button", { text: "Channels" });
-    await click(".o-mail-NotificationItem", { text: "channel" });
+    await openDiscuss(MENU_ACTIVE_IDS.CHANNEL);
+    await click(".o-mail-NotificationItem:has(:text('channel'))");
     await click(".o-mail-AttachmentImage");
     await contains(".o-FileViewer");
     const backButtonEvent = new Event("backbutton");
@@ -59,6 +60,7 @@ test("[technical] attachment viewer should properly override the back button", a
         },
     });
 
+    mockUserAgent("android");
     patchUiSize({ size: SIZES.SM });
     const pyEnv = await startServer();
     const partnerId = pyEnv["res.partner"].create({ name: "partner 1" });

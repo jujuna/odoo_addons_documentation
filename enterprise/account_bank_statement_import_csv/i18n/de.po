@@ -11,22 +11,54 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-09 18:44+0000\n"
-"PO-Revision-Date: 2026-01-23 17:51+0000\n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 03:08+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
 "account_bank_statement_import_csv/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_bank_statement_import_csv
+#: model:ir.module.module,description:base.module_account_bank_statement_import_csv
+msgid ""
+"\n"
+"Module to import CSV bank statements.\n"
+"======================================\n"
+"\n"
+"This module allows you to import CSV Files in Odoo: they are parsed and "
+"stored in human readable format in\n"
+"Accounting \\ Bank and Cash \\ Bank Statements.\n"
+"\n"
+"Important Note\n"
+"---------------------------------------------\n"
+"Because of the CSV format limitation, we cannot ensure the same transactions "
+"aren't imported several times or handle multicurrency.\n"
+"Whenever possible, you should use a more appropriate file format like OFX.\n"
+msgstr ""
+"\n"
+"Modul zum Importieren von CSV-Kontoauszügen.\n"
+"======================================\n"
+"\n"
+"Dieses Modul ermöglicht Ihnen den Import von CSV-Dateien in Odoo: Sie werden "
+"in einem vom Menschen lesbaren Format unter Buchhaltung\\Bank und "
+"Kasse\\Bankauszüge geparst und gespeichert.\n"
+"\n"
+"Wichtiger Hinweis\n"
+"---------------------------------------------\n"
+"Aufgrund der Beschränkung auf das CSV-Format können wir nicht sicherstellen, "
+"dass dieselben Transaktionen nicht mehrfach importiert werden oder dass "
+"mehrere Währungen berücksichtigt werden.\n"
+"Immer wenn möglich, sollten Sie ein passenderes Format wie OFX verwenden.\n"
 
 #. module: account_bank_statement_import_csv
 #: model:ir.model,name:account_bank_statement_import_csv.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Kontoauszugszeile"
+msgid "Bank Transaction"
+msgstr ""
 
 #. module: account_bank_statement_import_csv
 #: model:ir.model,name:account_bank_statement_import_csv.model_base_import_import
@@ -54,6 +86,11 @@ msgid "Import Bank Statement"
 msgstr "Kontoauszug importieren"
 
 #. module: account_bank_statement_import_csv
+#: model:ir.module.module,shortdesc:base.module_account_bank_statement_import_csv
+msgid "Import CSV Bank Statement"
+msgstr ""
+
+#. module: account_bank_statement_import_csv
 #: model_terms:ir.ui.view,arch_db:account_bank_statement_import_csv.view_bank_statement_line_search_bank_rec_widget_inherit_csv
 msgid "Imported Transactions"
 msgstr "Importierte Transaktionen"
@@ -74,8 +111,8 @@ msgstr "Journal"
 #: code:addons/account_bank_statement_import_csv/wizard/account_bank_statement_import_csv.py:0
 msgid "Make sure that an Amount or Debit and Credit is in the file."
 msgstr ""
-"Stellen Sie sicher, dass ein Betrag oder Haben und Soll in der Datei "
-"angegeben ist."
+"Stellen Sie sicher, dass in der Datei ein Betrag sowie ein Haben und ein "
+"Soll angegeben sind."
 
 #. module: account_bank_statement_import_csv
 #. odoo-python
@@ -95,3 +132,6 @@ msgstr "Es kann nur eine CSV-Datei ausgewählt werden."
 #: code:addons/account_bank_statement_import_csv/wizard/account_bank_statement_import_csv.py:0
 msgid "Rows must be sorted by date."
 msgstr "Zeilen müssen nach Datum sortiert werden."
+
+#~ msgid "Bank Statement Line"
+#~ msgstr "Kontoauszugszeile"

@@ -1,24 +1,24 @@
-import { ModelFieldSelectorPopover } from "@web/core/model_field_selector/model_field_selector_popover";
+import {
+    ModelFieldSelectorPopover,
+    modelFieldSelectorPopoverProps,
+} from "@web/core/model_field_selector/model_field_selector_popover";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 
-import { useState, onWillStart } from "@odoo/owl";
+import { onWillStart, useProps, proxy, t } from "@odoo/owl";
 
 export class AiModelFieldSelectorPopover extends ModelFieldSelectorPopover {
     static template = "ai.AiModelFieldSelectorPopover";
-    static props = {
-        ...ModelFieldSelectorPopover.props,
-        updateBatch: Function,
-        fieldsPath: { type: Array, optional: true },
-        aiFieldPath: { type: String, optional: true },
-    };
-    static defaultProps = {
-        ...ModelFieldSelectorPopover.defaultProps,
-        readProperty: true,
-    };
+    props = useProps({
+        ...modelFieldSelectorPopoverProps,
+        updateBatch: t.function(),
+        fieldsPath: t.array().optional(),
+        aiFieldPath: t.string().optional(),
+        readProperty: t.boolean().optional(true),
+    });
 
     setup() {
-        this.aiFieldsState = useState({ selected: [] });
+        this.aiFieldsState = proxy({ selected: [] });
 
         this.orm = useService("orm");
 
@@ -148,13 +148,13 @@ export class AiModelFieldSelectorPopover extends ModelFieldSelectorPopover {
         }
         this.aiFieldsState.selected = selected;
     }
-    
+
     isFieldSelected(fieldDef) {
-    const fullFieldPath = [...this.fieldsChain, fieldDef].map(f => f.name).join('.');
-    
-    // Check if this path exists in selected fields
-    return this.aiFieldsState.selected.some(selectedChain => 
-        selectedChain.map(f => f.name).join('.') === fullFieldPath
-    );
-}
+        const fullFieldPath = [...this.fieldsChain, fieldDef].map((f) => f.name).join(".");
+
+        // Check if this path exists in selected fields
+        return this.aiFieldsState.selected.some(
+            (selectedChain) => selectedChain.map((f) => f.name).join(".") === fullFieldPath
+        );
+    }
 }

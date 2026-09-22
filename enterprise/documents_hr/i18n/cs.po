@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-16 05:27+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Czech <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 02:05+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-master/"
 "documents_hr/cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -24,12 +24,14 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
 "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
-msgstr "<i class=\"fa fa-download fa-fw\"/> Stáhnout soubor"
+#: model:ir.module.module,description:base.module_documents_hr
+msgid ""
+"\n"
+"Easily access your documents from your employee profile.\n"
+msgstr ""
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
@@ -40,6 +42,11 @@ msgstr ""
 #: model:documents.tag,name:documents_hr.documents_tag_absences
 msgid "Absences"
 msgstr "Nepřítomnosti"
+
+#. module: documents_hr
+#: model:ir.module.module,summary:base.module_documents_hr
+msgid "Access documents from the employee profile"
+msgstr ""
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
@@ -69,8 +76,8 @@ msgstr ""
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_res_company
-msgid "Companies"
-msgstr "Společnosti"
+msgid "Company"
+msgstr ""
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_res_config_settings
@@ -78,8 +85,6 @@ msgid "Config Settings"
 msgstr "Konfigurační nastavení"
 
 #. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
 #: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_contracts_tags
 msgid "Contracts"
 msgstr "Smlouvy"
@@ -92,7 +97,6 @@ msgstr ""
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_documents_document__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_documents_redirect__display_name
-#: model:ir.model.fields,field_description:documents_hr.field_documents_tag__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_version__display_name
@@ -107,36 +111,26 @@ msgid "Document"
 msgstr "Dokument"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__document_count
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__document_count
-msgid "Document Count"
-msgstr "Počet dokumentů"
-
-#. module: documents_hr
 #: model:ir.model,name:documents_hr.model_documents_redirect
 msgid "Document Redirect"
 msgstr "Přesměrování dokumentu"
 
 #. module: documents_hr
+#: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__document_count
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_public_view_form
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_view_form
 msgid "Documents"
 msgstr "Dokumenty"
 
 #. module: documents_hr
+#: model:ir.module.module,shortdesc:base.module_documents_hr
+msgid "Documents - HR"
+msgstr ""
+
+#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_contracts_tags
 msgid "Documents Hr Contracts Tags"
 msgstr "Značky Smluvních dokumentů personalistů"
-
-#. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_settings
-msgid "Documents Hr Settings"
-msgstr "Nastavení dokumentů Hr"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "Download file"
-msgstr "Stáhnout soubor"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_employee
@@ -179,8 +173,28 @@ msgid "Employees Subfolders"
 msgstr ""
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__hr_employee_contract_folder_id
-msgid "HR Employee Contract Folder"
+#: model:ir.model.fields,help:documents_hr.field_res_company__documents_hr_group_id
+#: model:ir.model.fields,help:documents_hr.field_res_config_settings__documents_hr_group_id
+msgid ""
+"Group given editor access on the employees folders created from now on. "
+"Changing it does not affect the existing folders."
+msgstr ""
+
+#. module: documents_hr
+#. odoo-python
+#: code:addons/documents_hr/models/res_company.py:0
+msgid "HR (%(company_name)s)"
+msgstr ""
+
+#. module: documents_hr
+#: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
+msgid "HR Access Group"
+msgstr ""
+
+#. module: documents_hr
+#: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_group_id
+#: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_group_id
+msgid "HR Documents Default Group"
 msgstr ""
 
 #. module: documents_hr
@@ -189,14 +203,8 @@ msgid "HR Employee Folder"
 msgstr ""
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_settings
-msgid "Human Resources"
-msgstr "Lidské zdroje"
-
-#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_documents_document__id
 #: model:ir.model.fields,field_description:documents_hr.field_documents_redirect__id
-#: model:ir.model.fields,field_description:documents_hr.field_documents_tag__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_version__id
@@ -208,12 +216,7 @@ msgstr "ID"
 #. module: documents_hr
 #. odoo-python
 #: code:addons/documents_hr/models/documents_document.py:0
-msgid "Impossible to delete employee folder or employee 'Contract' folder"
-msgstr ""
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "My documents"
+msgid "Impossible to delete an employee folder"
 msgstr ""
 
 #. module: documents_hr
@@ -222,19 +225,10 @@ msgid "Public Employee"
 msgstr "Veřejný zaměstnanec"
 
 #. module: documents_hr
-#: model:documents.tag,name:documents_hr.document_tag_signature_request
-msgid "Signature Request"
-msgstr "Žádost o podpis"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "Size:"
-msgstr "Velikost:"
-
-#. module: documents_hr
-#: model:ir.model,name:documents_hr.model_documents_tag
-msgid "Tag"
-msgstr "Štítek"
+#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__document_count
+#: model:ir.model.fields,field_description:documents_hr.field_hr_version__document_count
+msgid "Related Document Count"
+msgstr ""
 
 #. module: documents_hr
 #. odoo-python
@@ -242,86 +236,20 @@ msgstr "Štítek"
 msgid "You cannot access the employee's folder."
 msgstr ""
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/documents_tag.py:0
-msgid ""
-"You cannot delete this tag as it is used to link employee contracts and "
-"signatures."
-msgstr ""
+#~ msgid "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download file"
+#~ msgstr "<i class=\"oi oi-fw\" data-icon=\"download\"/> Stáhnout soubor"
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
-msgid ""
-"You must configure the HR Employee folder in document settings to use "
-"Document's features."
-msgstr ""
+#~ msgid "Document Count"
+#~ msgstr "Počet dokumentů"
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
-msgid ""
-"You must have a contact linked to the employee in order to use Document's "
-"features."
-msgstr ""
+#~ msgid "Documents Hr Settings"
+#~ msgstr "Nastavení dokumentů Hr"
 
-#~ msgid "Departure Wizard"
-#~ msgstr "Průvodce odjezdem"
+#~ msgid "Download file"
+#~ msgstr "Stáhnout soubor"
 
-#~ msgid "Documents Share"
-#~ msgstr "Sdílení dokumentů"
+#~ msgid "Human Resources"
+#~ msgstr "Lidské zdroje"
 
-#~ msgid ""
-#~ "Employee's private email must be set to use \"Send Access Link\" "
-#~ "function:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Soukromý e-mail zaměstnance musí být nastaven pro použití funkce "
-#~ "\"Odeslat přístupový odkaz\":\n"
-#~ "%s"
-
-#~ msgid "HR"
-#~ msgstr "HR"
-
-#~ msgid "HR Documents: %s"
-#~ msgstr "HR dokumenty: %s"
-
-#~ msgid "HR: Document Access Link"
-#~ msgstr "HR: Odkaz pro přístup k dokumentu"
-
-#~ msgid "Send Access Link"
-#~ msgstr "Odeslat přístupová odkaz"
-
-#~ msgid "Send HR Documents Access Link"
-#~ msgstr "Odeslat odkaz na přístup k dokumentům HR"
-
-#~ msgid "Sent manually when recording an employee departure"
-#~ msgstr "Odesláno ručně při záznamu odchodu zaměstnance"
-
-#~ msgid "The access link has been sent to the employee."
-#~ msgstr "Přístupový odkaz byl odeslán zaměstnanci."
-
-#~ msgid "User"
-#~ msgstr "Uživatel"
-
-#~ msgid "Workspace"
-#~ msgstr "Pracoviště"
-
-#~ msgid ""
-#~ "You must set a private address on the Employee in order to use Document's "
-#~ "features."
-#~ msgstr ""
-#~ "Abyste mohli používat funkce dokumentu, musíte zaměstnanci nastavit "
-#~ "soukromou adresu."
-
-#~ msgid "hr Workspace"
-#~ msgstr "hr pracoviště"
-
-#~ msgid "hr default workspace"
-#~ msgstr "výchozí pracoviště hr"
-
-#~ msgid "{{ object.name }}, your personal documents access link is available"
-#~ msgstr ""
-#~ "{{ object.name }}, je k dispozici odkaz pro přístup k vašim osobním "
-#~ "dokumentům"
+#~ msgid "Size:"
+#~ msgstr "Velikost:"

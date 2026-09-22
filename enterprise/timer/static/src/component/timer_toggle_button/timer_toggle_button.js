@@ -1,27 +1,32 @@
 import { _t } from "@web/core/l10n/translation";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { useService } from "@web/core/utils/hooks";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class TimerToggleButton extends Component {
-    static props = {
-        ...standardFieldProps,
-        context: { type: Object },
-    };
     static template = "timer.ToggleButton";
+
+    props = useProps({
+        ...standardFieldProps,
+        context: t.object(),
+    });
 
     setup() {
         this.orm = useService("orm");
     }
 
     get buttonClass() {
-        const layout = this.props.record.data[this.props.name] ? 'danger' : 'primary';
+        const layout = this.props.record.data[this.props.name] ? "danger" : "primary";
         return `bg-${layout} text-bg-${layout}`;
     }
 
     get iconClass() {
+        return "oi oi-filled";
+    }
+
+    get icon() {
         const icon = this.props.record.data[this.props.name] ? "stop" : "play";
-        return `fa fa-${icon}-circle`;
+        return `${icon}_circle`;
     }
 
     get title() {

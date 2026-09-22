@@ -1,6 +1,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.fields import Domain
+from odoo.addons.mail.tools.discuss import Store
 
 
 class DocumentsOperation(models.TransientModel):
@@ -24,7 +25,6 @@ class DocumentsOperation(models.TransientModel):
 
     operation = fields.Selection([
         ('move', 'Move'), ('shortcut', 'Create shortcuts'), ('copy', 'Duplicate to'),
-        ('add', 'Add attachment to Documents')
     ], required=True)
     document_ids = fields.Many2many('documents.document', string="Documents")
     attachment_id = fields.Many2one('ir.attachment', string="Attachment")
@@ -59,23 +59,19 @@ class DocumentsOperation(models.TransientModel):
 
     def action_confirm(self):
         self.ensure_one()
+        store = Store()
         if self.operation == 'move':
             self.document_ids.user_folder_id = self.destination
+            store.add(self.document_ids, '_store_document_fields')
         elif self.operation == 'copy':
             self.document_ids.copy({"user_folder_id": self.destination})
-        elif self.operation == 'add' and self.attachment_id:
-            if self.attachment_id.type not in dict(self.env['documents.document']._fields['type'].selection):
-                raise UserError(self.env._("Unsupported attachment type: %s", self.attachment_id.type))
-            attachment_copy = self.attachment_id.copy({'res_model': False, 'res_id': False})
-            self.env['documents.document'].create({
-                "attachment_id": attachment_copy.id,
-                "type": attachment_copy.type,
-                "user_folder_id": self.destination
-            })
+            if self.attachment_id:
+                store.add(self.attachment_id, '_store_attachment_fields', fields_params={"chatter_fields": True})
         elif self.operation == 'shortcut':
             self.document_ids.action_create_shortcut(location_user_folder_id=self.destination)
         else:
             raise UserError(self.env._("Invalid operation"))
+        return store
 
     @api.readonly
     @api.model

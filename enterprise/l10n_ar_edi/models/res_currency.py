@@ -11,34 +11,36 @@ from odoo.tools import format_date
 class ResCurrency(models.Model):
     _inherit = "res.currency"
 
-    def _l10n_ar_get_last_business_day_rate(self, afip_ws='wsfe', from_date=None):
+    def _l10n_ar_get_last_business_day_rate(self, afip_ws='wsfe', from_date=None, date_formatting=True):
         """ Get last business rate from a given date """
         # Last  ultimo dia habil
-        arca_rate = False
-        arca_date = False
-        max_tries = try_count = 15
-        while not arca_rate and try_count:
-            arca_date, arca_rate = self._l10n_ar_get_afip_ws_currency_rate(afip_ws, date_rate=from_date)
-            if not arca_rate:
-                from_date = from_date - relativedelta(days=1)
-            try_count -= 1
+        currency_rates = {}
+        connection = self.env.company._l10n_ar_get_connection(afip_ws)
+        client, auth = connection._get_client()
+        for currency in self:
+            arca_rate = False
+            arca_date = False
+            max_tries = try_count = 15
+            while not arca_rate and try_count:
+                arca_date, arca_rate = currency._l10n_ar_get_afip_ws_currency_rate(client, auth, afip_ws, date_rate=from_date)
+                if not arca_rate:
+                    from_date = from_date - relativedelta(days=1)
+                try_count -= 1
 
-        if try_count == 0:
-            raise UserError(_(
-                'Did not find any rate last %(max_tries)s days before the given date (%(given_date)s)',
-                max_tries=max_tries,
-                given_date=from_date or fields.Date.context_today(self),
-            ))
+            if try_count == 0:
+                raise UserError(_(
+                    'Did not find any rate last %(max_tries)s days before the given date (%(given_date)s)',
+                    max_tries=max_tries,
+                    given_date=from_date or fields.Date.context_today(self),
+                ))
 
-        arca_date = format_date(
-            self.env, datetime.datetime.strptime(arca_date, '%Y%m%d'), date_format='EEEE, dd MMMM YYYY')
-        return arca_date, arca_rate
+            if date_formatting:
+                arca_date = format_date(
+                    self.env, datetime.datetime.strptime(arca_date, '%Y%m%d'), date_format='EEEE, dd MMMM YYYY')
+            currency_rates[currency.name] = (arca_date, arca_rate)
+        return currency_rates
 
-    def l10n_ar_action_get_afip_ws_currency_rate(self):
-        date, rate = self._l10n_ar_get_last_business_day_rate()
-        raise UserError(_('Last Business Day: %(date)s\nRate: %(rate)s', date=date, rate=rate))
-
-    def _l10n_ar_get_afip_ws_currency_rate(self, afip_ws='wsfe', date_rate=None):
+    def _l10n_ar_get_afip_ws_currency_rate(self, client, auth, afip_ws='wsfe', date_rate=None):
         """ Return the date and rate for a given currency
         This is only for the user so that he can quickly check the last rate on afip por a currency.
         This is really useful. There is a NTH for the future to integrate this with the automtaic currency rates """
@@ -48,8 +50,6 @@ class ResCurrency(models.Model):
         if self.l10n_ar_afip_code == 'PES':
             raise UserError(_('No rate for ARS (is the base currency for ARCA)'))
 
-        connection = self.env.company._l10n_ar_get_connection(afip_ws)
-        client, auth = connection._get_client()
         if afip_ws == 'wsfe':
             req_data = {"MonId": self.l10n_ar_afip_code}
             if date_rate:

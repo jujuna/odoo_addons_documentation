@@ -6,6 +6,8 @@ from odoo.addons.l10n_mx_edi.tests.common import TestMxEdiCommon
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestFrontendFlow(HttpCase, TestMxEdiCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_validate_required_additional_fields(self):
         user_admin = self.env.ref('base.user_admin')
         user_admin.write({
@@ -25,7 +27,8 @@ class TestFrontendFlow(HttpCase, TestMxEdiCommon):
             'sale_ok': True,
             'website_published': True,
         })
-        self.env['ir.config_parameter'].set_param('sale.automatic_invoice', True)
-        self.env['website'].get_current_website().company_id = self.env.company.id
+        self.env.company.sale_automatic_invoice = True
+        website = self.env.ref('base.default_website')
+        website.company_id = self.env.company.id
 
         self.start_tour('/shop', 'test_validate_additional_fields', login='admin')

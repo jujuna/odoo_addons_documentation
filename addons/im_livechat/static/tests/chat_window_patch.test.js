@@ -1,11 +1,15 @@
 import {
     click,
     contains,
+    onRpcBefore,
     openDiscuss,
     openFormView,
+    openMessagingMenu,
+    patchUiSize,
     setupChatHub,
     start,
     startServer,
+    MENU_ACTIVE_IDS,
 } from "@mail/../tests/mail_test_helpers";
 import { withGuest } from "@mail/../tests/mock_server/mail_mock_server";
 import { test } from "@odoo/hoot";
@@ -32,10 +36,9 @@ test("can fold livechat chat windows in mobile", async () => {
             Command.create({ partner_id: partnerId, livechat_member_type: "visitor" }),
         ],
         channel_type: "livechat",
-        livechat_operator_id: serverState.partnerId,
     });
     await start();
-    await click(".o_menu_systray i[aria-label='Messages']");
+    await openMessagingMenu(MENU_ACTIVE_IDS.LIVECHAT);
     await click(".o-mail-NotificationItem", { text: "Visitor" });
     await click(".o-mail-ChatWindow-header [title*='Fold']", {
         parent: [".o-mail-ChatWindow", { text: "Visitor" }],
@@ -61,7 +64,6 @@ test("closing a chat window with no message from admin side unpins it", async ()
             Command.create({ partner_id: partnerId_1, livechat_member_type: "visitor" }),
         ],
         channel_type: "livechat",
-        livechat_operator_id: serverState.partnerId,
     });
     pyEnv["discuss.channel"].create({
         channel_member_ids: [
@@ -74,17 +76,16 @@ test("closing a chat window with no message from admin side unpins it", async ()
         ],
         channel_type: "livechat",
         livechat_end_dt: serializeDate(today()),
-        livechat_operator_id: serverState.partnerId,
     });
     await start();
-    await click(".o_menu_systray i[aria-label='Messages']");
-    await click(".o-mail-NotificationItem", { text: "Partner 2" });
+    await openMessagingMenu(MENU_ACTIVE_IDS.LIVECHAT);
+    await click(".o-mail-NotificationItem:has(:text('Partner 2'))");
     await click(".o-mail-ChatWindow-header [title*='Close Chat Window']", {
         parent: [".o-mail-ChatWindow", { text: "Partner 2" }],
     });
-    await openDiscuss();
-    await contains(".o-mail-DiscussSidebarChannel", { text: "Partner 1" });
-    await contains(".o-mail-DiscussSidebarChannel", { count: 0, text: "Partner 2" });
+    await openDiscuss(MENU_ACTIVE_IDS.LIVECHAT);
+    await contains(".o-mail-MessagingMenuItem:has(:text('Partner 1'))");
+    await contains(".o-mail-MessagingMenuItem:has(:text('Partner 2'))", { count: 0 });
 });
 
 test.tags("desktop", "focus required");
@@ -105,7 +106,7 @@ test("Focus should not be stolen when a new livechat open", async () => {
         },
     ]);
     await start();
-    await click(".o_menu_systray i[aria-label='Messages']");
+    await openMessagingMenu(MENU_ACTIVE_IDS.CHANNEL);
     await click(".o-mail-NotificationItem", { text: "general" });
     await contains(".o-mail-ChatWindow", { text: "general" });
     await contains(".o-mail-Composer-input[placeholder='Message #general…']:focus");
@@ -135,7 +136,6 @@ test("do not ask confirmation if other operators are present", async () => {
             Command.create({ guest_id: guestId, livechat_member_type: "visitor" }),
             Command.create({ partner_id: otherOperatorId, livechat_member_type: "agent" }),
         ],
-        livechat_operator_id: serverState.partnerId,
         channel_type: "livechat",
     });
     setupChatHub({ opened: [channelId] });
@@ -155,11 +155,13 @@ test("Show livechats with new message in chat hub even when in discuss app)", as
     const [livechatId, channelId] = pyEnv["discuss.channel"].create([
         {
             channel_member_ids: [
-                Command.create({ partner_id: serverState.partnerId }),
-                Command.create({ guest_id: guestId }),
+                Command.create({
+                    partner_id: serverState.partnerId,
+                    livechat_member_type: "agent",
+                }),
+                Command.create({ guest_id: guestId, livechat_member_type: "visitor" }),
             ],
             channel_type: "livechat",
-            livechat_operator_id: serverState.partnerId,
         },
         {
             channel_member_ids: [Command.create({ partner_id: serverState.partnerId })],
@@ -189,7 +191,7 @@ test("Show livechats with new message in chat hub even when in discuss app)", as
             thread_model: "discuss.channel",
         })
     );
-    await contains(".o-mail-DiscussSidebar-item:contains('Visitor 11') .badge", { text: "1" });
+    await contains(".o-mail-MessagingMenu-tab:has(:text('Live Chats')) .badge:text(1)");
     await openFormView("res.partner", serverState.partnerId);
     await contains(".o-mail-ChatWindow-header:contains('Visitor 11')");
 });
@@ -203,7 +205,6 @@ test("livechat: non-member can close immediately", async () => {
             Command.create({ partner_id: PartnerId, livechat_member_type: "agent" }),
             Command.create({ guest_id: guestId, livechat_member_type: "visitor" }),
         ],
-        livechat_operator_id: PartnerId,
         channel_type: "livechat",
     });
     await start();
@@ -211,4 +212,79 @@ test("livechat: non-member can close immediately", async () => {
     await contains(".o-mail-ChatWindow");
     await click("[title*='Close Chat Window']");
     await contains(".o-mail-ChatWindow", { count: 0 });
+});
+
+test("Can close all livechat chat windows at once", async () => {
+    const pyEnv = await startServer();
+    const guestId_1 = pyEnv["mail.guest"].create({ name: "Visitor #1" });
+    const guestId_2 = pyEnv["mail.guest"].create({ name: "Visitor #2" });
+    const channelIds = pyEnv["discuss.channel"].create([
+        {
+            channel_member_ids: [
+                Command.create({
+                    partner_id: serverState.partnerId,
+                    livechat_member_type: "agent",
+                }),
+                Command.create({ guest_id: guestId_1, livechat_member_type: "visitor" }),
+            ],
+            channel_type: "livechat",
+        },
+        {
+            channel_member_ids: [
+                Command.create({
+                    partner_id: serverState.partnerId,
+                    livechat_member_type: "agent",
+                }),
+                Command.create({ guest_id: guestId_2, livechat_member_type: "visitor" }),
+            ],
+            channel_type: "livechat",
+        },
+    ]);
+    patchUiSize({ width: 1920 });
+    setupChatHub({ opened: channelIds });
+    await start();
+    await contains(".o-mail-ChatWindow", { count: 2 });
+    await click("button[title='Chat Options']");
+    await click(".o-dropdown-item:text('Close all conversations')");
+    await click("button:text('Yes, leave conversation')", {
+        parent: [".o-mail-ChatWindow:contains('Visitor #1')"],
+    });
+    await click("button:text('Yes, leave conversation')", {
+        parent: [".o-mail-ChatWindow:contains('Visitor #2')"],
+    });
+    await contains(".o-mail-ChatWindow", { count: 0 });
+});
+
+test.tags("desktop", "focus required");
+test("Opening ended livechat and seeing last messages automatically marks it as read", async () => {
+    const pyEnv = await startServer();
+    const guestId = pyEnv["mail.guest"].create({ name: "Visitor" });
+    const channelId = pyEnv["discuss.channel"].create({
+        channel_member_ids: [
+            Command.create({ partner_id: serverState.partnerId, livechat_member_type: "agent" }),
+            Command.create({ guest_id: guestId, livechat_member_type: "visitor" }),
+        ],
+        channel_type: "livechat",
+        livechat_end_dt: serializeDate(today()),
+    });
+    for (let i = 0; i < 2; i++) {
+        pyEnv["mail.message"].create({
+            author_guest_id: guestId,
+            body: "test message".repeat(10),
+            message_type: "comment",
+            model: "discuss.channel",
+            res_id: channelId,
+        });
+    }
+    const { promise, resolve } = Promise.withResolvers();
+    onRpcBefore("/discuss/channel/mark_as_read", async () => await promise);
+    setupChatHub({ folded: [channelId] });
+    await start();
+    await click(".o-mail-ChatBubble[name='Visitor']");
+    await contains(".o-mail-ChatWindow .o-mail-Message", { count: 2 });
+    await contains("span:text('This live chat conversation has ended.')");
+    await contains(".o-mail-ChatWindow .o-mail-Thread.o-focused");
+    await contains(".o-mail-Thread-banner:has(:text('2 new messages'))");
+    resolve();
+    await contains(".o-mail-Thread-banner", { count: 0 });
 });

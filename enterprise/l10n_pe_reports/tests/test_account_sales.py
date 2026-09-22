@@ -8,14 +8,16 @@ from freezegun import freeze_time
 
 @tagged("post_install", "post_install_l10n", "-at_install")
 class TestPeSales(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('pe')
     def setUpClass(cls):
         super().setUpClass()
 
         cls.company_data["company"].vat = "20512528458"
-        cls.partner_a.write({"country_id": cls.env.ref("base.pe").id, "vat": "20557912879", "l10n_latam_identification_type_id": cls.env.ref("l10n_pe.it_RUC").id})
-        cls.partner_b.write({"country_id": cls.env.ref("base.pe").id, "vat": "20557912879", "l10n_latam_identification_type_id": cls.env.ref("l10n_pe.it_RUC").id})
+        cls.partner_a.write({"country_id": cls.env.ref("base.pe").id, "vat": "20557912879"})
+        cls.partner_b.write({"country_id": cls.env.ref("base.pe").id, "vat": "20557912879"})
 
         cls.sale_taxes = cls._get_sale_taxes()
         cls.company_data['default_journal_sale'].l10n_latam_use_documents = True
@@ -73,7 +75,7 @@ class TestPeSales(TestAccountReportsCommon):
 
         moves = self.env["account.move"].create(moves_vals)
         moves.action_post()
-        moves.write({"edi_state": "sent"})
+        moves.write({"l10n_pe_edi_status": "sent"})
 
         # Move in draft must be ignored
         moves[0].copy()
@@ -173,7 +175,7 @@ class TestPeSales(TestAccountReportsCommon):
 
         moves = self.env["account.move"].create(moves_vals)
         moves.action_post()
-        moves.write({"edi_state": "sent"})
+        moves.write({"l10n_pe_edi_status": "sent"})
 
         report = self.env.ref("l10n_pe_reports.tax_report_ple_sales_14_1")
         options = self._generate_options(
@@ -227,7 +229,7 @@ class TestPeSales(TestAccountReportsCommon):
                 })],
         })
         invoice_current.action_post()
-        invoice_current.write({"edi_state": "sent"})
+        invoice_current.write({"l10n_pe_edi_status": "sent"})
 
         reversal_wizard = ((self.env['account.move.reversal']
             .with_context(active_model='account.move', active_ids=invoice_current.id))
@@ -235,7 +237,7 @@ class TestPeSales(TestAccountReportsCommon):
         reversal_id = reversal_wizard.refund_moves()
         credit_note = self.env['account.move'].browse(reversal_id['res_id'])
         credit_note.action_post()
-        credit_note.write({"edi_state": "sent"})
+        credit_note.write({"l10n_pe_edi_status": "sent"})
 
         invoice_previous = self.env['account.move'].create({
             'move_type': 'out_invoice',
@@ -252,7 +254,7 @@ class TestPeSales(TestAccountReportsCommon):
                 })],
         })
         invoice_previous.action_post()
-        invoice_previous.write({"edi_state": "sent"})
+        invoice_previous.write({"l10n_pe_edi_status": "sent"})
 
         reversal_wizard = ((self.env['account.move.reversal']
             .with_context(active_model='account.move', active_ids=invoice_previous.id))
@@ -260,7 +262,7 @@ class TestPeSales(TestAccountReportsCommon):
         reversal_id = reversal_wizard.refund_moves()
         credit_note = self.env['account.move'].browse(reversal_id['res_id'])
         credit_note.action_post()
-        credit_note.write({"edi_state": "sent"})
+        credit_note.write({"l10n_pe_edi_status": "sent"})
 
         # Test that cancelled invoice are not included in the 14.4 txt report
         invoice_current.button_draft()
@@ -280,5 +282,55 @@ class TestPeSales(TestAccountReportsCommon):
 -100.0|0.00|-18.0|0.00
 0.00|-10.0|0.00|-1.8
 0.00|0.00|0.00|0.00
+"""[1:],
+        )
+
+    def test_sale_report_withholding(self):
+        """The IGV withholding is a payment mechanism and must not reduce the total reported to SUNAT"""
+        AccountChartTemplate = self.env["account.chart.template"]
+        taxes = AccountChartTemplate.ref("sale_tax_igv_18") + AccountChartTemplate.ref("sale_tax_withholding_3")
+        move_vals = {
+            "partner_id": self.partner_a.id,
+            "invoice_date": "2022-07-01",
+            "invoice_date_due": "2022-07-01",
+            "date": "2022-07-01",
+            "invoice_payment_term_id": False,
+            "invoice_line_ids": [Command.create({
+                "name": "test",
+                "quantity": 1,
+                "price_unit": 1000,
+                "tax_ids": [Command.set(taxes.ids)],
+            })],
+        }
+        moves = self.env["account.move"].create([
+            {
+                **move_vals,
+                "move_type": "out_invoice",
+                "l10n_latam_document_type_id": self.env.ref("l10n_pe.document_type01").id,
+            },
+            {**move_vals, "move_type": "out_refund"},
+        ])
+        moves.action_post()
+        moves.write({"l10n_pe_edi_status": "sent"})
+
+        report = self.env.ref("l10n_pe_reports.tax_report_ple_sales_14_1")
+        options = self._generate_options(
+            report, fields.Date.from_string("2022-01-01"), fields.Date.from_string("2022-12-31")
+        )
+
+        self.maxDiff = None
+        self.assertEqual(
+            "\n".join(
+                [
+                    "|".join(line.split("|")[14:26])
+                    for line in self.env[report.custom_handler_model_name]
+                    .export_to_txt(options)["file_content"]
+                    .decode()
+                    .split("\r\n")
+                ]
+            ),
+            """
+-1000.0|0.00|-180.0|0.00|0.00|0.00|0.00|0.00|0.00|0.00|0.00|-1180.0
+1000.0|0.00|180.0|0.00|0.00|0.00|0.00|0.00|0.00|0.00|0.00|1180.0
 """[1:],
         )

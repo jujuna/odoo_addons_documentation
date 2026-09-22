@@ -334,7 +334,7 @@ class TestApprovalsPurchase(TestApprovalsCommon):
             'rate_ids': [(0, 0, {
                 'rate': 2.5,
                 'company_id': new_company.id,
-                'name': date_now,
+                'name': date_now - datetime.timedelta(days=1),
             })],
         })
         # Set price vendor with currency_b.
@@ -347,7 +347,7 @@ class TestApprovalsPurchase(TestApprovalsCommon):
         # Define a purchase approval category for the new company.
         approval_category_form = Form(self.env['approval.category'])
         approval_category_form.name = 'Product Request (Kikou Corp)'
-        approval_category_form.approval_type = 'purchase'
+        approval_category_form.create_rfq = True
         purchase_category_2 = approval_category_form.save()
         # Create a new user to use as approver for this company.
         user_approver_2 = self.env['res.users'].create({
@@ -381,6 +381,35 @@ class TestApprovalsPurchase(TestApprovalsCommon):
         self.env.user.company_id = current_company
         self.env.user.company_ids -= new_company
 
+    def test_create_rfq_with_inaccessible_vendor(self):
+        """
+        Ensure an RFQ approval can be created when one of the product vendors
+        belongs to a company inaccessible to the current user.
+        """
+        vendors = accessible_vendor, inaccessible_vendor = self.env['res.partner'].create([
+            {'name': 'accessible vendor'},
+            {'name': 'inaccessible vendor'},
+        ])
+        self.product_mouse.seller_ids = [Command.create({
+            'partner_id': v.id,
+            'min_qty': 1,
+            'price': 5,
+        }) for v in vendors]
+        alt_company = self.env['res.company'].create({'name': 'Alternative Company'})
+        inaccessible_vendor.company_id = alt_company
+
+        request_form = self.create_request_form(approver=self.user_approver)
+        with request_form.product_line_ids.new() as line:
+            line.product_id = self.product_mouse
+            line.quantity = 1
+            line.seller_id = self.product_mouse.seller_ids.filtered(lambda s: s.partner_id == accessible_vendor)
+        request = request_form.save()
+
+        self.assertEqual(
+            request.product_line_ids.seller_id.partner_id,
+            accessible_vendor,
+        )
+
     def test_purchase_06_prevent_multiple_create_purchase(self):
         """ Check that creating RFQs can't be performed more than once. """
         request_form = self.create_request_form(approver=self.user_approver)
@@ -404,7 +433,7 @@ class TestApprovalsPurchase(TestApprovalsCommon):
         the approval request and the UoM on the purchase order line. """
         # Set the product UoM on 'fortnight'.
         self.product_earphone.uom_id = self.uom_fortnight
-        self.product_earphone.seller_ids.product_uom_id = self.env.ref('uom.product_uom_day')
+        self.product_earphone.seller_ids.uom_id = self.env.ref('uom.product_uom_day')
         # Create a request for 2 fortnights of the product.
         request_form = self.create_request_form(approver=self.user_approver)
         with request_form.product_line_ids.new() as line:
@@ -421,7 +450,7 @@ class TestApprovalsPurchase(TestApprovalsCommon):
             request_product_line.product_uom_id.id, self.uom_fortnight.id
         )
         self.assertEqual(
-            purchase_order.order_line[0].product_uom_id.id, self.env.ref('uom.product_uom_day').id
+            purchase_order.order_line[0].uom_id.id, self.env.ref('uom.product_uom_day').id
         )
         self.assertEqual(
             purchase_order.order_line[0].product_qty, 30,
@@ -450,7 +479,7 @@ class TestApprovalsPurchase(TestApprovalsCommon):
             request_product_line.product_uom_id.id, uom_day.id
         )
         self.assertEqual(
-            purchase_order.order_line[0].product_uom_id.id, self.uom_fortnight.id
+            purchase_order.order_line[0].uom_id.id, self.uom_fortnight.id
         )
         self.assertEqual(
             purchase_order.order_line[0].product_qty, 2,
@@ -488,10 +517,10 @@ class TestApprovalsPurchase(TestApprovalsCommon):
         )
         self.assertEqual(len(purchase_order.order_line), 2)
         self.assertEqual(
-            purchase_order.order_line[0].product_uom_id.id, self.uom_unit.id
+            purchase_order.order_line[0].uom_id.id, self.uom_unit.id
         )
         self.assertEqual(
-            purchase_order.order_line[1].product_uom_id.id, self.uom_fortnight.id
+            purchase_order.order_line[1].uom_id.id, self.uom_fortnight.id
         )
         self.assertEqual(purchase_order.order_line[0].product_qty, 7)
         self.assertEqual(
@@ -502,7 +531,7 @@ class TestApprovalsPurchase(TestApprovalsCommon):
     def test_product_line_seller(self):
         category_test = self.env['approval.category'].create({
             'name': "Create RFQ's",
-            'approval_type': 'purchase',
+            'create_rfq': True,
             'has_product': 'required',
             'has_quantity': 'required',
             'automated_sequence': True,
@@ -541,7 +570,7 @@ class TestApprovalsPurchase(TestApprovalsCommon):
                         'partner_id': self.partner_seller_1.id,
                         'min_qty': 1,
                         'price': 8,
-                        'product_uom_id': self.uom_fortnight.id,
+                        'uom_id': self.uom_fortnight.id,
                     }).id
                 }),
                 (0, 0, {
@@ -552,7 +581,7 @@ class TestApprovalsPurchase(TestApprovalsCommon):
                         'partner_id': self.partner_seller_2.id,
                         'min_qty': 1,
                         'price': 8,
-                        'product_uom_id': self.uom_unit.id,
+                        'uom_id': self.uom_unit.id,
                     }).id
                 })
             ],
@@ -620,3 +649,17 @@ class TestApprovalsPurchase(TestApprovalsCommon):
             'price': 250,
         })]
         request_purchase.action_create_purchase_orders()  # Should not raise any error as we added a vendor
+
+    def test_cancel_approval_request_without_purchase_orders(self):
+        """ Check that canceling an approval request without purchase orders doesn't create an empty chatter message. """
+        request_purchase = self.env['approval.request'].create({
+            'category_id': self.purchase_category.id,
+            'approver_ids': [Command.create({'user_id': self.user_approver.id})],
+            'product_line_ids': [Command.create({'product_id': self.product_computer.id, 'quantity': 5})],
+        })
+        request_purchase.action_confirm()
+        messages_before_cancel = len(request_purchase.message_ids)
+        request_purchase.action_cancel()
+        messages_after_cancel = len(request_purchase.message_ids)
+
+        self.assertEqual(messages_before_cancel, messages_after_cancel)

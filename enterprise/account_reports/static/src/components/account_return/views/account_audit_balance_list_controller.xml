@@ -6,17 +6,17 @@
                 data-tooltip="Chatter"
                 class="btn btn-secondary o_switch_view o_kanban active"
                 t-att-class="{
-                    'd-none': !chatterService.chatterState.res_id,
-                    'd-md-inline': chatterService.chatterState.res_id,
+                    'd-none': !this.chatterPlugin.res_id(),
+                    'd-md-inline': this.chatterPlugin.res_id(),
                 }">
-                    <i t-attf-class="fa fa-fw fa-close mt-1"/>
+                    <i class="oi oi-fw mt-1" data-icon="close"/>
             </button>
         </xpath>
 
         <xpath expr="//SelectionBox" position="before">
-            <div t-if="this.model.root.selection.length &gt; 1" t-on-click="openJournalItems">
+            <div t-if="this.model.root.selection.length &gt; 1" t-on-click="this.openJournalItems">
                 <button class="btn btn-secondary">
-                    <i class="fa fa-list me-1"></i>
+                    <i class="oi me-1" data-icon="format_list_bulleted"></i>
                     <span>Journal Items</span>
                 </button>
             </div>

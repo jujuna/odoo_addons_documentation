@@ -1,22 +1,27 @@
 /** @odoo-module **/
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import {_t} from "@web/core/l10n/translation";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 
 
-class WhatIsPeppol extends Component {
-    static props = { ...standardActionServiceProps };
+export class WhatIsPeppol extends Component {
     static template = "account_peppol.WhatIsPeppol";
+
+    props = useProps(standardActionServiceProps);
 
     setup() {
         super.setup();
         this.actionService = useService("action");
     }
 
+    get shouldRegisterOnClose() {
+        return this.props.action.context.action_on_activate.res_model === "peppol.registration";
+    }
+
     closeButtonLabel() {
-        if (this.props.action.context.action_on_activate.res_model === "peppol.registration") {
+        if (this.shouldRegisterOnClose) {
             return _t("Activate")
         } else {
             return _t("Got it !")

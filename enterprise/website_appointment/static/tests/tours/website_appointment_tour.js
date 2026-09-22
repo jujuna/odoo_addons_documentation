@@ -2,7 +2,6 @@ import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
 
 registry.category("web_tour.tours").add('website_appointment_tour', {
-    url: '/odoo',
     steps: () => [
     stepUtils.showAppsMenuItem(),
     {
@@ -23,7 +22,7 @@ registry.category("web_tour.tours").add('website_appointment_tour', {
         run: "edit Test",
     }, {
         content: 'Open the options tab',
-        trigger: 'a[name="options"]',
+        trigger: 'button[name="options"]',
         run: "click",
     }, {
         content: 'Set max scheduled days',
@@ -44,7 +43,7 @@ registry.category("web_tour.tours").add('website_appointment_tour', {
         expectUnloadPage: true,
     }, {
         content: 'Click on first date available',
-        trigger: '.o_slots_list > div > button',
+        trigger: "button[name='submitSlotInfoSelected']",
         run: "click",
         expectUnloadPage: true,
     }, {
@@ -53,7 +52,7 @@ registry.category("web_tour.tours").add('website_appointment_tour', {
         run: "edit 0123456789",
     }, {
         content: 'Click on the add guest link',
-        trigger: 'button.btn-link',
+        trigger: 'button.o_appointment_input_guest_add',
         run: "click",
     }, {
         content: 'Enter the emails of the guests',

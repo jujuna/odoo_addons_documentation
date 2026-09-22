@@ -11,6 +11,7 @@ from odoo.tests import common, tagged
 
 
 @tagged('appointment_google_reserve')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class AppointmentGoogleReserveControllerTest(GoogleReserveCommon, common.HttpCase):
 
     # --------------------------------------
@@ -96,6 +97,39 @@ class AppointmentGoogleReserveControllerTest(GoogleReserveCommon, common.HttpCas
         self.assertEqual(slot_time.get('resource_ids').get('party_size'), 4)
         self.assertEqual(slot_time.get('start_sec'), self._to_utc(start_slot))
         self.assertEqual(availability.get('available'), True)
+
+    @freeze_time('2022-02-14 07-00-00')
+    @patch('odoo.addons.appointment_google_reserve.tools.google_reserve_iap.GoogleReserveIAP.update_availabilities', autospec=True)
+    def test_google_reserve_availability_lookup_resource_on_leave(self, update_availabilities):
+        start_slot = datetime(2022, 2, 14, 15, 0, 0)
+        self.env['appointment.leave'].create({
+            'date_from': datetime(2022, 2, 14, 14, 0, 0),
+            'date_to': datetime(2022, 2, 14, 17, 0, 0),
+            'leave_type': 'resources',
+            'resource_ids': self.apt_type_resources_table_1.ids,
+        })
+
+        response = self.opener.get(
+            f'{self.base_url()}/appointment/{self.apt_type_resource_google.id}/{self.apt_type_resource_google.google_reserve_access_token}/google_reserve/availabilities',
+            data=json.dumps([{
+                'duration_sec': '3600',
+                'resource_ids': {
+                    'party_size': 4,
+                },
+                'start_sec': self._to_utc(start_slot),
+            }]),
+            headers={
+                'Content-Type': 'application/json',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bool(response.json()))
+        availability = response.json()[0]
+        slot_time = availability.get('slot_time')
+        self.assertEqual(slot_time.get('resource_ids').get('party_size'), 4)
+        self.assertEqual(slot_time.get('start_sec'), self._to_utc(start_slot))
+        self.assertFalse(availability.get('available'), False)
 
     @freeze_time('2022-02-14 07-00-00')
     @patch('odoo.addons.appointment_google_reserve.tools.google_reserve_iap.GoogleReserveIAP.update_availabilities', autospec=True)
@@ -189,6 +223,95 @@ class AppointmentGoogleReserveControllerTest(GoogleReserveCommon, common.HttpCas
             self.assertEqual(slot_time.get('start_sec'), expected_start_sec)
             self.assertEqual(availability.get('available'), expected_availability['available'])
 
+    @freeze_time('2022-02-14 07-00-00')
+    @patch('odoo.addons.appointment_google_reserve.tools.google_reserve_iap.GoogleReserveIAP.update_availabilities', autospec=True)
+    def test_google_reserve_availability_lookup_slot_interval_capacity(self, update_availabilities):
+        """" Test the batch availability endpoint and make sure it returns proper availabilities
+        when appointment type has a slot_interval_capacity set. """
+        self.apt_type_resource_google.slot_interval_capacity = 5
+        self.apt_type_resources_table_1.write({
+            'linked_resource_ids': [(4, self.apt_type_resources_table_2.id)],
+            'capacity': 6,
+        })
+        self.apt_type_resources_table_2.write({
+            'linked_resource_ids': [(4, self.apt_type_resources_table_1.id)],
+        })
+
+        # create some dummy bookings. table_1 has 6 capacity, table_2 has 2 capacity.
+        self.env['calendar.event'].create([{
+            'appointment_type_id': self.apt_type_resource_google.id,
+            'name': "Booking 2",
+            'start': datetime(2022, 2, 14, 16, 0, 0),
+            'stop': datetime(2022, 2, 14, 17, 0, 0),
+            'booking_line_ids': [(0, 0, {
+                'appointment_resource_id': self.apt_type_resources_table_2.id,
+                'capacity_reserved': 2,
+                'capacity_used': 2
+            })],
+        }, {
+            'appointment_type_id': self.apt_type_resource_google.id,
+            'name': "Booking 3",
+            'start': datetime(2022, 2, 14, 17, 0, 0),
+            'stop': datetime(2022, 2, 14, 18, 0, 0),
+            'booking_line_ids': [(0, 0, {
+                'appointment_resource_id': self.apt_type_resources_table_1.id,
+                'capacity_reserved': 3,
+                'capacity_used': 4
+            }), (0, 0, {
+                'appointment_resource_id': self.apt_type_resources_table_2.id,
+                'capacity_reserved': 1,
+                'capacity_used': 2
+            })],
+        }])
+
+        start_slot = datetime(2022, 2, 14, 15, 0, 0)
+        # Batch (page load)
+        response = self.opener.get(
+            f'{self.base_url()}/appointment/{self.apt_type_resource_google.id}/{self.apt_type_resource_google.google_reserve_access_token}/google_reserve/availabilities',
+            data=json.dumps(
+                [{
+                    'duration_sec': '3600',
+                    'resource_ids': {
+                        'party_size': party_size,
+                    },
+                    'start_sec': self._to_utc(start_slot + timedelta(hours=i)),
+                } for i in range(3) for party_size in range(1, 7)]
+            ),
+            headers={
+                'Content-Type': 'application/json',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(bool(response.json()))
+
+        expected_availabilities = [
+            {'party_size': 1, 'start_time': 15, 'available': True},
+            {'party_size': 2, 'start_time': 15, 'available': True},
+            {'party_size': 3, 'start_time': 15, 'available': True},
+            {'party_size': 4, 'start_time': 15, 'available': True},
+            {'party_size': 5, 'start_time': 15, 'available': True},
+            {'party_size': 6, 'start_time': 15, 'available': False},  # party size over max slot capacity
+            {'party_size': 1, 'start_time': 16, 'available': True},
+            {'party_size': 2, 'start_time': 16, 'available': True},
+            {'party_size': 3, 'start_time': 16, 'available': True},
+            {'party_size': 4, 'start_time': 16, 'available': False},  # 2/5 slot capacity used, only 3 remaining
+            {'party_size': 5, 'start_time': 16, 'available': False},  # 2/5 slot capacity used, only 3 remaining
+            {'party_size': 6, 'start_time': 16, 'available': False},  # party size over max slot capacity
+            {'party_size': 1, 'start_time': 17, 'available': False},  # no tables available, even if reserved < 5
+            {'party_size': 2, 'start_time': 17, 'available': False},  # no tables available, even if reserved < 5
+            {'party_size': 3, 'start_time': 17, 'available': False},  # no tables available, even if reserved < 5
+            {'party_size': 4, 'start_time': 17, 'available': False},  # no tables available, even if reserved < 5
+            {'party_size': 5, 'start_time': 17, 'available': False},  # no tables available, even if reserved < 5
+            {'party_size': 6, 'start_time': 17, 'available': False},  # no tables available, party size over max slot capacity
+        ]
+
+        for availability, expected_availability in zip(response.json(), expected_availabilities):
+            slot_time = availability.get('slot_time')
+            self.assertEqual(slot_time.get('resource_ids').get('party_size'), expected_availability['party_size'])
+            expected_start_sec = self._to_utc(start_slot.replace(hour=expected_availability['start_time']))
+            self.assertEqual(slot_time.get('start_sec'), expected_start_sec)
+            self.assertEqual(availability.get('available'), expected_availability['available'])
+
     # --------------------------------------
     # BOOKINGS - RESOURCES
     # --------------------------------------
@@ -246,6 +369,7 @@ class AppointmentGoogleReserveControllerTest(GoogleReserveCommon, common.HttpCas
         self.assertEqual(calendar_event.appointment_type_id, self.apt_type_resource_google)
         self.assertEqual(calendar_event.total_capacity_reserved, 4)
         self.assertEqual(calendar_event.start, start_slot)
+        self.assertEqual(calendar_event.appointment_booker_id.name, 'John Doe')
 
         self.assertEqual(update_availabilities.call_count, 1)
         args, _kwargs = update_availabilities.call_args_list[0]
@@ -686,6 +810,58 @@ class AppointmentGoogleReserveControllerTest(GoogleReserveCommon, common.HttpCas
             self.apt_type_resources_table_1,
         )
 
+        # STEP 5: test creation process that combines tables
+        create_response = self.url_open(
+            f'/appointment/{self.apt_type_resource_google.id}/{self.apt_type_resource_google.google_reserve_access_token}/google_reserve/booking/create',
+            data=json.dumps({
+                'idempotency_token': 'token2',
+                'slot': {
+                    'confirmation_mode': 'CONFIRMATION_MODE_SYNCHRONOUS',
+                    'duration_sec': '3600',
+                    'merchant_id': str(self.apt_type_resource_google.id),
+                    'resources': {
+                        'party_size': '11',
+                    },
+                    'service_id': str(self.apt_type_resource_google.id),
+                    'start_sec': self._to_utc(datetime(2022, 2, 14, 16, 0, 0))
+                },
+                'user_information': {
+                    'email': 'john.doe@test.com',
+                    'family_name': 'Doe',
+                    'given_name': 'John',
+                    'telephone': '+32476112233',
+                    'user_id': '1234567890',
+                }
+            }),
+            headers={
+                'Content-Type': 'application/json',
+            },
+        )
+
+        self.assertEqual(create_response.status_code, 200)
+        create_data = create_response.json()
+        self.env['calendar.event'].flush_model()
+
+        self.assertFalse(bool(create_data.get('booking_failure')))
+        self.assertTrue(bool(create_data.get('booking').get('booking_id')))
+        booking_id = create_data['booking']['booking_id']
+        calendar_event = self.env['calendar.event'].browse(int(booking_id))
+        self.assertTrue(bool(calendar_event.exists()))
+        self.assertEqual(calendar_event.appointment_type_id, self.apt_type_resource_google)
+        self.assertEqual(calendar_event.total_capacity_reserved, 11)
+        self.assertEqual(
+            len(calendar_event.booking_line_ids), 3,
+            "By combining all 3 tables we can accommodate 11 people"
+        )
+        self.assertEqual(
+            calendar_event.booking_line_ids.mapped('capacity_reserved'),
+            [5, 4, 2]
+        )
+        self.assertEqual(
+            calendar_event.booking_line_ids.mapped('capacity_used'),
+            [6, 4, 2]
+        )
+
     @freeze_time('2022-02-14 07-00-00')
     @patch('odoo.addons.appointment_google_reserve.tools.google_reserve_iap.GoogleReserveIAP.update_availabilities', autospec=True)
     def test_google_reserve_move_booking(self, update_availabilities):
@@ -1025,6 +1201,16 @@ class AppointmentGoogleReserveControllerTest(GoogleReserveCommon, common.HttpCas
 
         # did not call update availabilities as no update
         self.assertEqual(update_availabilities.call_count, 2)
+
+    def test_google_reserve_default_merchant_website_url(self):
+        """Test the default website URL is set correctly."""
+        google_merchant = self.env['google.reserve.merchant'].create({
+            'name': 'My company',
+            'business_category': 'Test',
+            'location_id': self.test_location.id,
+        })
+
+        self.assertEqual(google_merchant.website_url, self.env.ref('base.default_website').get_base_url())
 
     # --------------------------------------
     # UTILS

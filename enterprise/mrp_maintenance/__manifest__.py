@@ -1,9 +1,7 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Maintenance - MRP',
-    'version': '1.0',
     'category': 'Supply Chain/Manufacturing',
     'summary': 'Schedule and manage maintenance on machine and tools.',
     'website': 'https://www.odoo.com/app/maintenance',
@@ -16,7 +14,7 @@ Maintenance in MRP
 * Equipment related to workcenters
 * MTBF, MTTR, ...
 """,
-    'depends': ['mrp_workorder', 'stock_maintenance'],
+    'depends': ['mrp_workorder', 'stock_maintenance', 'maintenance_enterprise'],
     'data': [
         'data/mrp_maintenance_data.xml',
         'views/maintenance_views.xml',
@@ -25,11 +23,11 @@ Maintenance in MRP
     'demo': ['data/mrp_maintenance_demo.xml'],
     'assets': {
         'web.assets_backend': [
-            'mrp_maintenance/static/src/**/*.js',
             'mrp_maintenance/static/src/**/*.xml',
         ],
     },
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'uninstall_hook': 'uninstall_hook'
 }

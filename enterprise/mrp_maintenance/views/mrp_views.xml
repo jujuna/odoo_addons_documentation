@@ -7,9 +7,11 @@
         <field name="binding_model_id" ref="mrp.model_mrp_workcenter"/>
         <field name="view_mode">kanban,list,form,pivot,graph,calendar</field>
         <field name="context">{
+            'search_default_todo': True,
+            'search_default_done': True,
+            'search_default_cancelled': True,
             'default_maintenance_for': 'workcenter',
             'default_workcenter_id': active_id,
-
         }</field>
         <field name="domain">[('workcenter_id', '=', active_id)]</field>
         <field name="help" type="html">
@@ -45,9 +47,9 @@
                 <button name="%(mrp_workcenter_request_action_from_workcenter)d"
                     type="action"
                     class="oe_stat_button"
-                    context="{'search_default_active': True, 'default_company_id': company_id, 'default_maintenance_team_id': maintenance_team_id}"
-                    icon="fa-wrench">
-                    <field string="Maintenance" name="maintenance_open_count" widget="statinfo"/>
+                    context="{'default_company_id': company_id, 'default_maintenance_team_id': maintenance_team_id}"
+                    icon="build">
+                    <field string="Maintenance" name="maintenance_count" widget="statinfo"/>
                 </button>
             </div>
             <xpath expr="//notebook" position="inside">
@@ -90,7 +92,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='plan_order']" position="after">
                 <div>
-                    <a name="%(maintenance.hr_equipment_request_action)d" type="action">Maintenance</a>
+                    <a name="%(maintenance_request_action_view_gantt_workcenter)d" type="action" context="{'search_default_workcenter_id': id}">Maintenance</a>
                 </div>
             </xpath>
         </field>
@@ -103,7 +105,7 @@
         <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
-                <button name="open_maintenance_request_mo" type="object" class="oe_stat_button" icon="fa-wrench" invisible="maintenance_count == 0" context="{'search_default_production_id': id}">
+                <button name="open_maintenance_request_mo" type="object" class="oe_stat_button" icon="build" invisible="maintenance_count == 0" context="{'search_default_production_id': id}">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value"><field name="maintenance_count"/></span>
                         <span class="o_stat_text">Maintenance</span>

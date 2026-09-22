@@ -1,7 +1,7 @@
 import { expect, test } from "@odoo/hoot";
 import { animationFrame } from "@odoo/hoot-mock";
 import { click } from "@odoo/hoot-dom";
-import { mountWithCleanup, onRpc, makeMockEnv } from "@web/../tests/web_test_helpers";
+import { mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { TimerToggleButton } from "@timer/component/timer_toggle_button/timer_toggle_button";
 
@@ -10,7 +10,6 @@ defineMailModels();
 async function _test_timer_toggle_button(testState) {
     const action = `action_timer_${testState ? "stop" : "start"}`;
     const icon = testState ? "stop" : "play";
-    const env = await makeMockEnv();
     onRpc((args) => {
         if (args.method === action) {
             expect.step(action);
@@ -32,9 +31,9 @@ async function _test_timer_toggle_button(testState) {
             },
         },
     };
-    await mountWithCleanup(TimerToggleButton, { env, props: props });
+    await mountWithCleanup(TimerToggleButton, { props: props });
     await animationFrame();
-    expect("button i").toHaveClass(`fa-${icon}-circle`, {
+    expect("button i").toHaveAttribute("data-icon", `${icon}_circle`, {
         message: "correct icon is used",
     });
     click("button i");

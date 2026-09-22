@@ -6,22 +6,23 @@ patch(DataServiceOptions.prototype, {
         return {
             ...super.databaseTable,
             "event.registration": {
-                key: "id",
+                key: "uuid",
                 condition: (record) =>
-                    !record.pos_order_line_id || record.pos_order_line_id?.order_id?.finalized,
+                    !record.pos_order_line_id ||
+                    record.pos_order_line_id?.order_id?.canBeRemovedFromIndexedDB,
             },
             "event.registration.answer": {
-                key: "id",
+                key: "uuid",
                 condition: (record) =>
                     !record.registration_id ||
-                    record.registration_id?.pos_order_line_id?.order_id?.finalized,
+                    record.registration_id?.pos_order_line_id?.order_id?.canBeRemovedFromIndexedDB,
             },
         };
     },
     get dynamicModels() {
         return [...super.dynamicModels, "event.registration", "event.registration.answer"];
     },
-    get pohibitedAutoLoadedModels() {
-        return [...super.pohibitedAutoLoadedModels, "event.registration"];
+    get prohibitedAutoLoadedModels() {
+        return [...super.prohibitedAutoLoadedModels, "event.registration"];
     },
 });

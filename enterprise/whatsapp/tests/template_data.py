@@ -161,6 +161,46 @@ template_data = {
                 'score': 'RED',
                 'date': 1712830468,
             },
-        }
+        },
+        {
+            "name": "test_named_header_with_named_body",
+            "components": [
+                {
+                    "type": "HEADER",
+                    "format": "TEXT",
+                    "text": "You're invited, {{guest_name}}!",
+                    "example": {
+                        "header_text_named_params": [{
+                            "param_name": "guest_name",
+                            "example": "Yagnik",
+                        }]
+                    }
+                },
+                {
+                    "type": "BODY",
+                    "text": "Join us for *Odoo Bash 2027*! 🚀\n\n📅 Date: {{event_date}}\n📍 Venue: {{venue}}\n\nWe can't wait to see you there!",
+                    "example": {
+                        "body_text_named_params": [
+                            {
+                                "param_name": "event_date",
+                                "example": "XX January, 2027",
+                            },
+                            {
+                                "param_name": "venue",
+                                "example": "Zodiac Party Plot",
+                            }
+                        ]
+                    }
+                }
+            ],
+            "language": "en_US",
+            "status": "APPROVED",
+            "category": "MARKETING",
+            "id": "605909939256362",
+            "quality_score": {
+                "score": "GREEN",
+                "date": 1776690069,
+            },
+        },
     ]
 }

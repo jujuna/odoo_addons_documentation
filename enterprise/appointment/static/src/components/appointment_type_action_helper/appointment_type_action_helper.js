@@ -3,7 +3,6 @@ import { Component, onWillStart } from '@odoo/owl';
 
 export class AppointmentTypeActionHelper extends Component {
     static template = 'appointment.AppointmentTypeActionHelper';
-    static props = {};
 
     setup() {
         this.orm = useService('orm');

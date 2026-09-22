@@ -6,7 +6,7 @@ class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
     @api.model
-    def _generate_all_returns(self, country_code, main_company, tax_unit=None):
+    def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
 
         if country_code == 'BE':
             intrastat_return_type = self.env.ref('l10n_be_intrastat.be_intrastat_goods_return_type')
@@ -20,17 +20,15 @@ class AccountReturnType(models.Model):
                 'date': {
                     'date_from': fields.Date.to_string(instrastat_date_from),
                     'date_to': fields.Date.to_string(instrastat_date_to),
-                    'filter': 'custom',
-                    'mode': 'range',
                 },
                 'selected_variant_id': intrastat_return_type.report_id.id,
                 'sections_source_id': intrastat_return_type.report_id.id,
                 'tax_unit': 'company_only' if not tax_unit else tax_unit.id,
             }
             company_ids = self.env['account.return'].sudo()._get_company_ids(main_company, tax_unit, intrastat_return_type.report_id)
-            options = intrastat_return_type.report_id.with_context(allowed_company_ids=company_ids.ids).get_options(previous_options=options)
+            options = intrastat_return_type.report_id.sudo().with_context(allowed_company_ids=company_ids.ids).get_options(previous_options=options)
 
-            expression_totals_per_col_group = self.env.ref('l10n_be_reports.be_vat_return_type').report_id._compute_expression_totals_for_each_column_group(
+            expression_totals_per_col_group = self.env.ref('l10n_be_reports.be_vat_return_type').sudo().report_id._compute_expression_totals_for_each_column_group(
                 expression,
                 options,
                 warnings={}
@@ -44,17 +42,17 @@ class AccountReturnType(models.Model):
                 months_offset = intrastat_return_type._get_periodicity_months_delay(main_company)
                 intrastat_return_type._try_create_return_for_period(today - relativedelta(months=months_offset), main_company, tax_unit)
 
-        return super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit)
+        return super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)
 
 
 class AccountReturn(models.Model):
     _inherit = 'account.return'
 
-    def action_submit(self):
+    def _prepare_submission(self):
         if self.type_external_id == 'l10n_be_intrastat.be_intrastat_goods_return_type':
             return self.env['l10n_be_intrastat.intrastat.goods.submission.wizard']._open_submission_wizard(self)
 
-        return super().action_submit()
+        return super()._prepare_submission()
 
     def _generate_locking_attachments(self, options):
         super()._generate_locking_attachments(options)

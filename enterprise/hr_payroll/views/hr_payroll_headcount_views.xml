@@ -11,7 +11,7 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_open_lines" type="object" class="oe_stat_button" icon="fa-users" invisible="not employee_count">
+                        <button name="action_open_lines" type="object" class="oe_stat_button" icon="group" icon_class="oi-filled" invisible="not employee_count">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value"><field name="employee_count"/></span>
                                 <span class="o_stat_text">Employees</span>
@@ -75,8 +75,7 @@
                 <field name="currency_id" column_invisible="True"/>
                 <field name="wage_on_payroll"/>
                 <field name="employee_type" optional="hide"/>
-                <field name="version_names" optional="hide"/>
-                <field name="working_rate_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="hide"/>
+                <field name="working_rate_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" optional="hide"/>
             </list>
         </field>
     </record>
@@ -93,7 +92,6 @@
                     <filter string="Department" name="group_by_department" domain="[]" context="{'group_by': 'department_id'}"/>
                     <filter string="Job" name="group_by_job" domain="[]" context="{'group_by': 'job_id'}"/>
                     <filter string="Working Rate" name="group_by_Working_rate" domain="[]" context="{'group_by': 'working_rate_ids'}"/>
-                    <filter string="Employee Type" name="group_by_employee_type" domain="[]" context="{'group_by': 'employee_type'}"/>
                 </group>
             </search>
         </field>
@@ -113,4 +111,11 @@
             </p>
         </field>
     </record>
+
+    <menuitem
+        id="menu_hr_payroll_headcount_action"
+        name="Headcount"
+        action="hr_payroll_headcount_action"
+        sequence="11"
+        parent="hr.hr_menu_hr_reports"/>
 </odoo>

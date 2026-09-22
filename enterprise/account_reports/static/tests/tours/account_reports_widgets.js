@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("account_reports_widgets", {
-    url: "/odoo/action-account_reports.action_account_report_pl",
     steps: () => [
         {
             content: "change date filter",
@@ -11,7 +10,7 @@ registry.category("web_tour.tours").add("account_reports_widgets", {
         {
             content: "Select another date in the future",
             trigger: ".dropdown-menu .dropdown-item:nth-child(3) .btn_next_date",
-            run: 'click'
+            run: "click",
         },
         {
             content: "Apply filter by closing the dropdown",
@@ -20,7 +19,7 @@ registry.category("web_tour.tours").add("account_reports_widgets", {
         },
         {
             content: "wait refresh",
-            trigger: `#filter_date button:not(:contains(${ new Date().getFullYear() }))`,
+            trigger: `#filter_date button:not(:contains(${new Date().getFullYear()}))`,
         },
         {
             content: "change date filter for the second time",
@@ -30,7 +29,7 @@ registry.category("web_tour.tours").add("account_reports_widgets", {
         {
             content: "Select another date in the past first time",
             trigger: ".dropdown-menu .dropdown-item:nth-child(3) .btn_previous_date",
-            run: 'click'
+            run: "click",
         },
         {
             trigger: `.dropdown-menu .dropdown-item:nth-child(3) input[data-value*='${new Date().getFullYear()}']`,
@@ -38,7 +37,7 @@ registry.category("web_tour.tours").add("account_reports_widgets", {
         {
             content: "Select another date in the past second time",
             trigger: ".dropdown-menu .dropdown-item:nth-child(3) .btn_previous_date",
-            run: 'click'
+            run: "click",
         },
         {
             trigger: `.dropdown-menu .dropdown-item:nth-child(3) input[data-value*='${
@@ -52,7 +51,7 @@ registry.category("web_tour.tours").add("account_reports_widgets", {
         },
         {
             content: "wait refresh",
-            trigger: `#filter_date button:contains(${ new Date().getFullYear() - 1 })`,
+            trigger: `#filter_date button:contains(${new Date().getFullYear() - 1})`,
         },
         {
             content: "change comparison filter",
@@ -60,8 +59,8 @@ registry.category("web_tour.tours").add("account_reports_widgets", {
             run: "click",
         },
         {
-            content: "change comparison filter",
-            trigger: ".dropdown-item.period:first()",
+            content: "select custom comparison dates",
+            trigger: "[name='filter_comparison_custom']",
             run: "click",
         },
         {
@@ -70,12 +69,17 @@ registry.category("web_tour.tours").add("account_reports_widgets", {
             run: "click",
         },
         {
-            content: "wait refresh, report should have 4 columns",
+            content: "wait refresh, report should have comparison columns",
             trigger: "th + th + th + th",
         },
         {
-            content: "export xlsx",
-            trigger: "button:contains('XLSX')",
+            content: "Open actions dropdown",
+            trigger: ".o_control_panel_breadcrumbs_actions .dropdown-toggle",
+            run: "click",
+        },
+        {
+            content: "Export XLSX",
+            trigger: ".dropdown-item:contains('XLSX')",
             run: "click",
         },
     ],

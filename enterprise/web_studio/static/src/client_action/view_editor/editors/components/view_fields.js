@@ -1,25 +1,24 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, usePlugin, useProps } from "@odoo/owl";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 import { _t } from "@web/core/l10n/translation";
+import { localeCompare } from "@web/core/l10n/utils";
 import { SidebarDraggableItem } from "@web_studio/client_action/components/sidebar_draggable_item/sidebar_draggable_item";
 
 export class ExistingFields extends Component {
     static components = { SidebarDraggableItem };
-    static props = {
-        fieldsInArch: { type: Array },
-        fields: { type: Object },
-        filterFields: { type: Boolean, optional: true },
-        folded: { type: Boolean, optional: true },
-        resModel: { type: String, optional: true },
-    };
-    static defaultProps = {
-        folded: true,
-        filterFields: true,
-        resModel: "",
-    };
+    props = useProps({
+        fieldsInArch: t.array(),
+        fields: t.object(),
+        filterFields: t.boolean().optional(true),
+        folded: t.boolean().optional(true),
+        resModel: t.string().optional(""),
+    });
     static template = "web_studio.ViewFields.ExistingFields";
 
+    debugMode = usePlugin(DebugModePlugin);
+
     setup() {
-        this.state = useState({
+        this.state = proxy({
             folded: this.props.folded,
             searchValue: "",
         });
@@ -31,7 +30,7 @@ export class ExistingFields extends Component {
         }
         const search = this.state.searchValue.toLowerCase();
         let matches = field.string.toLowerCase().includes(search);
-        if (!matches && this.env.debug && field.name) {
+        if (!matches && this.debugMode.isActive() && field.name) {
             matches = field.name.toLowerCase().includes(search);
         }
         return matches;
@@ -57,9 +56,7 @@ export class ExistingFields extends Component {
                 dropData: JSON.stringify({ fieldName: fName }),
             }))
             .sort((fieldA, fieldB) =>
-                (fieldA.string || fieldA.name)
-                    .toLowerCase()
-                    .localeCompare((fieldB.string || fieldB.name).toLowerCase())
+                localeCompare(fieldA.string || fieldA.name, fieldB.string || fieldB.name)
             );
     }
 
@@ -97,7 +94,6 @@ const newFields = [
 
 export class NewFields extends Component {
     static components = { SidebarDraggableItem };
-    static props = {};
     static template = "web_studio.ViewFields.NewFields";
 
     get newFieldsComponents() {

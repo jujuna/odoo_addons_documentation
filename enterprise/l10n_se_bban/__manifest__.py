@@ -1,6 +1,5 @@
 {
     'name': 'BBAN Plusgiro Bankgiro',
-    'version': '1.0',
     'category': 'Accounting/Localizations',
     'author': 'XCLUDE',
     'summary': 'Implements BBAN Plusgiro Bankgiro',
@@ -14,10 +13,10 @@
     'depends': ['account_iso20022', 'l10n_se'],
     'data': [
         'data/se.bban.clear.range.csv',
-        'security/ir.model.access.csv',
+        'views/account_payment_method_line_views.xml',
         'views/se_bban_clear_range.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': ['l10n_se'],
-    'installable': True,
     'license': 'OEEL-1',
 }

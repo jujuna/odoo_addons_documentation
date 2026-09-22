@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo.tests import tagged
+
 from . import test_common
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDeduplication(test_common.TestCommon):
     def test_deduplication_exact(self):
         self._create_rule('x_name', 'exact')
@@ -83,8 +87,6 @@ class TestDeduplication(test_common.TestCommon):
         self._create_record('x_dm_test_model', x_name='toto', x_email='toto@example.com')
         self._create_record('x_dm_test_model', x_name='toto', x_email='real_toto@example.com')
 
-        self.assertEqual(self.MyModel.create_threshold, 0, 'Suggestion Threshold shoud be at 0')
-
         # Ensure that groups added both records
         self.MyModel.find_duplicates()
         self.MyModel._compute_records_to_merge_count()
@@ -92,13 +94,13 @@ class TestDeduplication(test_common.TestCommon):
         self.assertEqual(self.MyModel.records_to_merge_count, 2, '2 record should have been found')
 
         # Ensure that groups are removed after suggested threshold is changed to above similarity
-        self.MyModel.create_threshold = 70
+        self.MyModel.similarity_threshold = 70
         self.MyModel._compute_records_to_merge_count()
 
         self.assertEqual(self.MyModel.records_to_merge_count, 0, '0 record should have been found')
 
         # Ensure that groups are not updated after suggested threshold is changed to bellow similarity
-        self.MyModel.create_threshold = 40
+        self.MyModel.similarity_threshold = 40
         self.MyModel._compute_records_to_merge_count()
 
         self.assertEqual(self.MyModel.records_to_merge_count, 0, '0 record should have been found')
@@ -179,3 +181,41 @@ class TestDeduplication(test_common.TestCommon):
         })
         dmm.modified(['records_to_merge_count'])
         self.assertEqual(dmm.records_to_merge_count, 0, "records_to_merge_count is calulated without error")
+
+    def test_prune_invalid_duplicate_records(self):
+        """ Ensure duplicate records are removed when they no loner match the rule. """
+        self._create_rule('x_name', 'exact')
+
+        self._create_record('x_dm_test_model', x_name='duplicate')
+        rec2 = self._create_record('x_dm_test_model', x_name='duplicate')
+
+        self.MyModel.find_duplicates()
+        self.MyModel._compute_records_to_merge_count()
+        self.assertEqual(self.MyModel.records_to_merge_count, 2, "2 records should have been detected as duplicates")
+
+        # Change one record so it no longer matches the rule
+        rec2.write({'x_name': 'duplicate 2'})
+
+        self.MyModel.find_duplicates()
+        self.MyModel._compute_records_to_merge_count()
+        self.assertEqual(self.MyModel.records_to_merge_count, 0, "Duplicate record should have been pruned after no longer matching rule")
+
+    def test_add_new_record_to_existing_group(self):
+        """ Ensure new matching records are added to an existing group and no new group is created. """
+        self._create_rule('x_name', 'exact')
+
+        self._create_record('x_dm_test_model', x_name='duplicate')
+        self._create_record('x_dm_test_model', x_name='duplicate')
+
+        self.MyModel.find_duplicates()
+
+        groups = self.DMGroup.search([('model_id', '=', self.MyModel.id)])
+        self.assertEqual(len(groups), 1, "One group should have been created")
+        self.assertEqual(len(groups.record_ids), 2, "Group should initially contain 2 records")
+
+        self._create_record('x_dm_test_model', x_name='duplicate')
+        self.MyModel.find_duplicates()
+
+        groups = self.DMGroup.search([('model_id', '=', self.MyModel.id)])
+        self.assertEqual(len(groups), 1, "Still only one group should exist (no new group created)")
+        self.assertEqual(len(groups.record_ids), 3, "New duplicate record should have been added to existing group")

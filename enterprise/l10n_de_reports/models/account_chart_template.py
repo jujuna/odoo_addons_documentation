@@ -22,3 +22,23 @@ class AccountChartTemplate(models.AbstractModel):
                 'deferred_revenue_account_id': 'chart_skr04_3900',
             }
         }
+
+    @template('de_skr03', 'account.return.type')
+    def _get_de_skr03_account_return_type(self):
+        return {
+            'l10n_de_reports.de_tax_return_type': {
+                'tax_payable_account_id': 'account_1797',
+                'tax_receivable_account_id': 'account_1545',
+                'advance_tax_payment_account_id': 'account_1780',
+            },
+        }
+
+    @template('de_skr04', 'account.return.type')
+    def _get_de_skr04_account_return_type(self):
+        return {
+            'l10n_de_reports.de_tax_return_type': {
+                'tax_payable_account_id': 'chart_skr04_3860',
+                'tax_receivable_account_id': 'chart_skr04_1421',
+                'advance_tax_payment_account_id': 'chart_skr04_3820',
+            },
+        }

@@ -14,8 +14,9 @@ test("Verify presence of chart in top menu bar in a spreadsheet with a chart", a
     const chartId = model.getters.getChartIds(sheetId)[0];
 
     const root = topbarMenuRegistry.getMenuItems().find((item) => item.id === "data");
-    const children = root.children(env);
-    const chartItem = children.find((c) => c.id === `item_chart_${chartId}`);
+    const chartSubmenu = root.children(env).find((c) => c.id === "chart_data_sources");
+    expect(chartSubmenu).not.toBe(undefined);
+    const chartItem = chartSubmenu.children(env).find((c) => c.id === `item_chart_${chartId}`);
     expect(chartItem).not.toBe(undefined);
     expect(chartItem.name(env)).toBe("(#1) PartnerGraph");
 });
@@ -26,11 +27,15 @@ test("Chart focus changes on top bar menu click", async function () {
     const chartId = model.getters.getChartIds(sheetId)[0];
 
     env.openSidePanel("ChartPanel");
-    expect(model.getters.getSelectedFigureId()).toBe(null, {
+    expect(model.getters.getSelectedFigureIds()).toEqual([], {
         message: "No chart should be selected",
     });
-    await doMenuAction(topbarMenuRegistry, ["data", `item_chart_${chartId}`], env);
-    const selectedFigureId = model.getters.getSelectedFigureId();
+    await doMenuAction(
+        topbarMenuRegistry,
+        ["data", "chart_data_sources", `item_chart_${chartId}`],
+        env
+    );
+    const selectedFigureId = model.getters.getSelectedFigureIds()[0];
     expect(model.getters.getChartIdFromFigureId(selectedFigureId)).toBe(chartId, {
         message: "The selected chart should have id " + chartId,
     });

@@ -10,9 +10,3 @@ class StockMoveLine(models.Model):
         fields = super()._get_fields_stock_barcode()
         fields.append('check_state')
         return fields
-
-    def _is_checkable_from_context(self):
-        if self.env.context.get('barcode_trigger'):
-            if not self.picked:
-                return False
-        return super()._is_checkable_from_context()

@@ -7,9 +7,10 @@ from unittest.mock import patch
 from odoo import fields
 from odoo.addons.social_youtube.models.social_account import SocialAccount
 from odoo.addons.social_youtube.models.social_stream import SocialStream
-from odoo.tests import common
+from odoo.tests import tagged, common
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class SocialYouTubeCase(common.TransactionCase):
     def test_youtube_data_cleaning(self):
         with patch.object(SocialAccount, '_create_default_stream_youtube', lambda *args, **kwargs: None), \

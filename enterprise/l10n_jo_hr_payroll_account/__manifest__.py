@@ -2,9 +2,6 @@
 
 {
     'name': 'Jordan - Payroll with Accounting',
-    'countries': ['jo'],
-    'version': '1.0',
-    'countries': ['jo'],
     'category': 'Human Resources',
     'description': """
 Accounting Data for Jordan Payroll Rules
@@ -20,5 +17,5 @@ Accounting Data for Jordan Payroll Rules
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'auto_install': True,
+    'auto_install': ['l10n_jo_hr_payroll', 'hr_payroll_account'],
 }

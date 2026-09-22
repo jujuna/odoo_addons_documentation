@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import json
 
+from odoo import Command
 from odoo.tests import HttpCase, tagged
 
 
@@ -146,6 +147,93 @@ class TestStockBarcodeController(HttpCase):
             'id': 0,
             'params': {
                 "barcode": barcode_value,
+            }
+        })
+        response = self.url_open(
+            '/stock_barcode/scan_from_main_menu',
+            data=payload,
+            headers={'Content-Type': 'application/json'},
+        )
+        result = response.json()['result']
+        self.assertEqual(result['action']['res_model'], 'stock.quant')
+        self.assertIn(['product_id', '=', product.id], result['action']['domain'])
+
+    def test_main_menu_returns_partner_action(self):
+        """ Scanning a contact barcode from the barcode app's main menu opens
+        the picking kanban filtered to that contact's pending transfers across
+        every picking type.
+        """
+        warehouse = self.env['stock.warehouse'].search([], limit=1)
+        customer_loc = self.env['stock.location'].search([('usage', '=', 'customer')], limit=1)
+        product = self.env['product.product'].create({'name': 'p', 'is_storable': True})
+        self.env['stock.quant']._update_available_quantity(product, warehouse.lot_stock_id, 10)
+        acme = self.env['res.partner'].create({
+            'name': 'ACME Corp',
+            'is_company': True,
+            'barcode': 'ACME',
+        })
+        self.env['stock.picking'].create({
+            'picking_type_id': warehouse.out_type_id.id,
+            'location_id': warehouse.lot_stock_id.id,
+            'location_dest_id': customer_loc.id,
+            'partner_id': acme.id,
+            'move_ids': [Command.create({
+                'location_id': warehouse.lot_stock_id.id,
+                'location_dest_id': customer_loc.id,
+                'product_id': product.id,
+                'product_uom_qty': 1,
+                'uom_id': product.uom_id.id,
+            })],
+        }).action_confirm()
+        self.authenticate('admin', 'admin')
+        payload = json.dumps({
+            'jsonrpc': '2.0',
+            'method': 'call',
+            'id': 0,
+            'params': {'barcode': 'ACME'},
+        })
+        response = self.url_open(
+            '/stock_barcode/scan_from_main_menu',
+            data=payload,
+            headers={'Content-Type': 'application/json'},
+        )
+        result = response.json()['result']
+        self.assertIn('action', result)
+        self.assertEqual(result['action']['res_model'], 'stock.picking')
+        self.assertEqual(result['action']['context']['search_default_partner_id'], acme.id)
+        # No picking-type filter -- the kanban shows pickings across types.
+        self.assertNotIn(
+            ('picking_type_id', '=', warehouse.out_type_id.id),
+            result['action']['domain'],
+        )
+
+        # Unknown partner barcode falls through to the existing "no match" handling.
+        payload = json.dumps({
+            'jsonrpc': '2.0',
+            'method': 'call',
+            'id': 0,
+            'params': {'barcode': 'NOBODY'},
+        })
+        response = self.url_open(
+            '/stock_barcode/scan_from_main_menu',
+            data=payload,
+            headers={'Content-Type': 'application/json'},
+        )
+        self.assertIn('warning', response.json()['result'])
+
+    def test_barcode_with_weight_default_nomenclature(self):
+        self.env.company.nomenclature_id = self.env.ref('barcodes.default_barcode_nomenclature')
+        self.authenticate('admin', 'admin')
+        product = self.env['product.product'].create({
+            'name': 'Super product',
+            'barcode': '2155555000000',
+        })
+        payload = json.dumps({
+            'jsonrpc': '2.0',
+            'method': 'call',
+            'id': 0,
+            'params': {
+                "barcode": '2155555050005',
             }
         })
         response = self.url_open(

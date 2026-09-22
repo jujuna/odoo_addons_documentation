@@ -16,6 +16,8 @@ from odoo.addons.l10n_hr_edi.tests.test_hr_edi_common import TestL10nHrEdiCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestHrEdiFlowsMocked(TestL10nHrEdiCommon, TestAccountMoveSendCommon, PatchRequestsMixin):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -169,8 +171,6 @@ class TestHrEdiFlowsMocked(TestL10nHrEdiCommon, TestAccountMoveSendCommon, Patch
         self.setup_partner_as_hr_alt(self.partner_a)
         tax = self.env['account.chart.template'].ref('VAT_S_IN_ROC_25')
 
-        # 1. Create invoice
-
         invoice = self.env['account.move'].create({
             'invoice_date': '2025-01-01',
             'date': '2025-01-01',
@@ -193,17 +193,15 @@ class TestHrEdiFlowsMocked(TestL10nHrEdiCommon, TestAccountMoveSendCommon, Patch
             'l10n_hr_operator_oib': '01234567896',
         }])
 
-        # 2. Send invoice to MER
-
         send_and_print = self.create_send_and_print(invoice)
 
         with file_open('l10n_hr_edi/tests/flows/out_invoice.xml', 'r') as f:
             expected_invoice_xml = f.read()
 
-        with self.assertRaisesRegex(UserError, 'Korisničko ime i lozinka nisu ispravni.. Trace ID: 4f701362-96cc-49c6-a297-854e740ad719.'):
+        with self.assertRaisesRegex(UserError, r"MER service returned an error: Username '12513': Korisničko ime i lozinka nisu ispravni\.\. Trace ID: 4f701362-96cc-49c6-a297-854e740ad719\."):
             with self.assertRequests([
                 (
-                    # Request 1: Send invoice
+                    # Request 1: Send invoice - error should be triggered
                     self._build_request(
                         endpoint='/apis/v2/send',
                         request_args={
@@ -215,7 +213,7 @@ class TestHrEdiFlowsMocked(TestL10nHrEdiCommon, TestAccountMoveSendCommon, Patch
                         response_json={
                             'Username':
                                 {
-                                    'Value': 'Incorrect',
+                                    'Value': '12513',
                                     'Messages': ['Korisničko ime i lozinka nisu ispravni.. Trace ID: 4f701362-96cc-49c6-a297-854e740ad719.']
                                 }
                             }
@@ -230,6 +228,7 @@ class TestHrEdiFlowsMocked(TestL10nHrEdiCommon, TestAccountMoveSendCommon, Patch
 
     def test_20_receive_invoice(self):
         self.setup_partner_as_hr(self.env.company.partner_id)
+        self.modify_demo_bank_account()
 
         # 1. Fetch inbound invoices
 
@@ -369,9 +368,30 @@ class TestHrEdiFlowsMocked(TestL10nHrEdiCommon, TestAccountMoveSendCommon, Patch
         }])
 
         self.assertRecordValues(fetched_invoice.invoice_line_ids, [{
-            'name': '[E-COM10] Pedal Bin',
+            'name': 'Pedal Bin',
             'quantity': 1.0,
             'price_unit': 47.0,
         }])
 
         self.assertEqual(fetched_invoice.invoice_line_ids.tax_ids.amount, 13.0)
+
+    def test_query_inbox_error(self):
+        self.setup_partner_as_hr(self.env.company.partner_id)
+
+        with self.assertRaisesRegex(UserError, r"MER service returned an error: Username '12513': Korisničko ime i lozinka nisu ispravni."):
+            with self.assertRequests([
+                (
+                    # Request 1: queryInbox - error should be triggered
+                    self._build_request(endpoint='/apis/v2/queryInbox'),
+                    self._build_response(
+                        status_code=200,
+                        response_json={
+                            'Username': {
+                                'Value': '12513',
+                                'Messages': ['Korisničko ime i lozinka nisu ispravni.'],
+                            },
+                        }
+                    )
+                ),
+            ]):
+                self.company_data['default_journal_purchase'].l10n_hr_mer_get_new_documents_all()

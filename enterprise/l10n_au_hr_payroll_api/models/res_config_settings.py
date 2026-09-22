@@ -16,6 +16,10 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.l10n_au_registration_status",
         string="Registration Status"
     )
+    l10n_au_current_registration_mode = fields.Selection(
+        related="company_id.l10n_au_employer_registration_id.registration_mode",
+        string="Current Registration Mode"
+    )
 
     def register_payroll(self):
         self.company_id.register_payroll()

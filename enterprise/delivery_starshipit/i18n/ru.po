@@ -3,15 +3,15 @@
 # * delivery_starshipit
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-09 18:43+0000\n"
-"PO-Revision-Date: 2025-12-06 10:04+0000\n"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:22+0000\n"
 "Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "delivery_starshipit/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,21 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_starshipit
+#: model:ir.module.module,description:base.module_delivery_starshipit
+msgid ""
+"\n"
+"Send your shippings through Starshipit and track them online\n"
+"============================================================\n"
+"\n"
+"Starshipit is the leading provider of integrated shipping and tracking "
+"solutions for growing e-commerce businesses.\n"
+"Seamlessly integrating with a large range of couriers and platforms,\n"
+"you can streamline every step of your fulfilment process,\n"
+"reduce handling time and improve customer experience.\n"
+msgstr ""
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -32,45 +46,62 @@ msgid ""
 "Please either continue the configuration or delete the order in Starshipit "
 "before trying again."
 msgstr ""
+"%(order_info)sОднако создание транспортной этикетки завершилось сбоем со "
+"следующей ошибкой:\n"
+"%(error)s\n"
+"\n"
+"Перед повторной попыткой продолжите настройку или удалите заказ в Starshipit."
+
+#. module: delivery_starshipit
+#: model_terms:ir.ui.view,arch_db:delivery_starshipit.choose_delivery_carrier_view_form
+msgid "<i class=\"oi me-1\" data-icon=\"east\"/>Get more delivery methods"
+msgstr ""
+
+#. module: delivery_starshipit
+#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
+msgid ""
+"<i class=\"oi\" data-icon=\"info\"/> Available shipping services depend on "
+"enabled carriers in your Starshipit account."
+msgstr ""
+"<i class=\"oi\" data-icon=\"info\"/> Доступные службы доставки зависят от "
+"включенных перевозчиков в вашем аккаунте Starshipit."
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Do not forget to select a service "
+"<i class=\"oi\" data-icon=\"warning\"/> Do not forget to select a service "
 "for a valid configuration."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> Не забудьте выбрать службу для "
+"<i class=\"oi\" data-icon=\"warning\"/> Не забудьте выбрать службу для "
 "действующей конфигурации."
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> In <b>Test Environment</b>, your "
+"<i class=\"oi\" data-icon=\"warning\"/> In <b>Test Environment</b>, your "
 "shippings are automatically <b>archived</b> after the label creation. <br/>\n"
 "                        Please note that charges can still occur for label "
 "creations and some shipping carriers may automatically validate the shipment "
 "when printing labels."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> В <b>тестовой среде</b> "
-"отправления автоматически <b>архивируются</b> после создания этикетки. <br/"
-">\n"
+"<i class=\"oi\" data-icon=\"warning\"/> В <b>тестовой среде</b> отправления "
+"автоматически <b>архивируются</b> после создания этикетки. <br/>\n"
 "                        Обратите внимание, что за создание этикеток по-"
 "прежнему могут взиматься сборы, а некоторые перевозчики могут автоматически "
 "подтверждать отправление при печати этикеток."
 
 #. module: delivery_starshipit
-#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
+#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-info-circle\"/> Available shipping services depend on "
-"enabled carriers in your Starshipit account."
+"<i class=\"oi\" data-icon=\"warning\"/> Only administrators can configure "
+"the api keys."
 msgstr ""
-"<i class=\"fa fa-info-circle\"/> Доступные службы доставки зависят от "
-"включенных перевозчиков в вашем аккаунте Starshipit."
 
 #. module: delivery_starshipit
-#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
-msgid "Cancel"
-msgstr "Отменить"
+#. odoo-python
+#: code:addons/delivery_starshipit/wizard/starshipit_shipping_wizard.py:0
+msgid "Add a shipping method"
+msgstr "Добавить способ доставки"
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_package_type__package_carrier_type
@@ -128,16 +159,26 @@ msgid "Delivery"
 msgstr "Доставка"
 
 #. module: delivery_starshipit
+#: model:ir.model,name:delivery_starshipit.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
+
+#. module: delivery_starshipit
+#: model:ir.model,name:delivery_starshipit.model_choose_delivery_carrier
+msgid "Delivery Method Selection Wizard"
+msgstr ""
+
+#. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
 msgid "Delivery Service"
 msgstr "Служба доставки"
 
 #. module: delivery_starshipit
+#: model:ir.model.fields,field_description:delivery_starshipit.field_choose_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_starshipit.field_starshipit_shipping_wizard__display_name
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_package_type__display_name
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_picking__display_name
-#: model:ir.model.fields,field_description:delivery_starshipit.field_stock_return_picking__display_name
 msgid "Display Name"
 msgstr "Отображаемое имя"
 
@@ -156,11 +197,11 @@ msgid "Error: this delivery method is not available for this order."
 msgstr "Ошибка: этот способ доставки недоступен для данного заказа."
 
 #. module: delivery_starshipit
+#: model:ir.model.fields,field_description:delivery_starshipit.field_choose_delivery_carrier__id
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__id
 #: model:ir.model.fields,field_description:delivery_starshipit.field_starshipit_shipping_wizard__id
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_package_type__id
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_picking__id
-#: model:ir.model.fields,field_description:delivery_starshipit.field_stock_return_picking__id
 msgid "ID"
 msgstr "ID"
 
@@ -263,11 +304,6 @@ msgid "Provider"
 msgstr "Провайдер"
 
 #. module: delivery_starshipit
-#: model:ir.model,name:delivery_starshipit.model_stock_return_picking
-msgid "Return Picking"
-msgstr "Возвратить комплектование"
-
-#. module: delivery_starshipit
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid "Return labels were generated for the order %s"
@@ -342,11 +378,6 @@ msgstr ""
 "по заказу на продажу."
 
 #. module: delivery_starshipit
-#: model:ir.model,name:delivery_starshipit.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Методы доставки"
-
-#. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
 msgid "Shipping Product"
 msgstr "Доставка товара"
@@ -406,10 +437,9 @@ msgid "Starshipit Return Parcel Reference"
 msgstr "Ссылка на обратную посылку Starshipit"
 
 #. module: delivery_starshipit
-#: model_terms:ir.ui.view,arch_db:delivery_starshipit.res_config_settings_view_form_sale_starshipit
-#: model_terms:ir.ui.view,arch_db:delivery_starshipit.res_config_settings_view_form_stock_starshipit
-msgid "Starshipit Shipping Methods"
-msgstr "Способы доставки Starshipit"
+#: model:ir.module.module,shortdesc:base.module_delivery_starshipit
+msgid "Starshipit Shipping"
+msgstr ""
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__starshipit_subscription_key
@@ -428,14 +458,20 @@ msgstr ""
 
 #. module: delivery_starshipit
 #. odoo-python
+#: code:addons/delivery_starshipit/models/starshipit_service.py:0
+msgid "Starshipit should be used with a context manager."
+msgstr ""
+
+#. module: delivery_starshipit
+#. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid ""
 "Starshipit: Delivery cost re-evaluated on Sales Order based on updated exact "
 "price (%(final_carrier_price)s) from transfer %(picking_name)s."
 msgstr ""
 "Starshipit: Стоимость доставки в заказе на продажу пересчитана на основании "
-"обновленной точной цены (%(final_carrier_price)s) из отгрузки %"
-"(picking_name)s."
+"обновленной точной цены (%(final_carrier_price)s) из отгрузки %(picking_name)"
+"s."
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -505,13 +541,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid "The order '%(order_number)s' has been created!\n"
-msgstr ""
+msgstr "Заказ '%(order_number)s' успешно создан!\n"
 
 #. module: delivery_starshipit
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid "The order has been created!\n"
-msgstr ""
+msgstr "Заказ создан!\n"
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -586,16 +622,3 @@ msgstr "Перевод"
 #: code:addons/delivery_starshipit/controllers/download_starshipit_labels.py:0
 msgid "starshipit_labels"
 msgstr "starshipit_labels"
-
-#~ msgid "Please delete the order on Starshipit then try again."
-#~ msgstr "Пожалуйста, удалите заказ на Starshipit и повторите попытку."
-
-#~ msgid "Starshipit returned an error: %(message)s"
-#~ msgstr "Starshipit выдал ошибку: %(message)s"
-
-#~ msgid ""
-#~ "The shipping label creation failed with the following error:\n"
-#~ "%(error)s"
-#~ msgstr ""
-#~ "Создание транспортной этикетки завершилось со следующей ошибкой:\n"
-#~ "%(error)s"

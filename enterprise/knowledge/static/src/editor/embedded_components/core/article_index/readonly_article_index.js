@@ -1,15 +1,11 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { getEmbeddedProps } from "@html_editor/others/embedded_component_utils";
 
 export class ReadonlyEmbeddedArticleIndexComponent extends Component {
-    static props = {
-        articles: { type: Object, optional: true },
-        showAllChildren: { type: Boolean, optional: true },
-    };
-    static defaultProps = {
-        articles: {},
-        showAllChildren: true,
-    };
+    props = useProps({
+        articles: t.array().optional([]),
+        showAllChildren: t.boolean().optional(true),
+    });
     static template = "knowledge.ReadonlyEmbeddedArticleIndex";
 
     /** @param {integer} articleId */

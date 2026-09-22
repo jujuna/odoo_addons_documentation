@@ -94,7 +94,9 @@ class WhatsAppWebhookCase(WhatsAppFullCase, MockIncomingWhatsApp):
                     'message_type': 'whatsapp_message'
                 }
             )
-            not_sent_message = self.env["mail.message"].browse(data["store_data"]["mail.message"][0]["id"])
+            not_sent_message = self.env["mail.message"].browse(
+                data["store_data"]._build_result()["mail.message"][0]["id"]
+            )
         self.assertWAMessage("error", fields_values={
             "failure_type": "blacklisted",
             "mail_message_id": not_sent_message,
@@ -132,7 +134,9 @@ class WhatsAppWebhookCase(WhatsAppFullCase, MockIncomingWhatsApp):
                 },
             )
             message_id = data["message_id"]
-            self.assertIn(message_id, [m["id"] for m in data["store_data"]["mail.message"]])
+            self.assertIn(
+                message_id, [m["id"] for m in data["store_data"]._build_result()["mail.message"]]
+            )
             sent_message = self.env["mail.message"].browse(message_id)
         self.assertWAMessage("sent", fields_values={
             "failure_type": False,
@@ -322,6 +326,36 @@ class WhatsAppWebhookCase(WhatsAppFullCase, MockIncomingWhatsApp):
         )
         self.assertNotEqual(channel_1, channel_2)
         self.assertEqual(len(channel_1.message_ids), 2)
+
+    @users('user_wa_admin')
+    def test_conversation_match_multi_account_same_waba(self):
+        """ Test receiving messages when multiple accounts share the same account_uid.
+        The signature check should pass and messages should be routed to the correct account
+        based on the phone_uid.
+        """
+        account_3 = self.whatsapp_account.sudo().copy({
+            'phone_uid': '9876543210',
+        })
+
+        accounts = self.env['whatsapp.account'].sudo().search([('account_uid', '=', self.whatsapp_account.account_uid)])
+        self.assertEqual(len(accounts), 2)
+
+        with self.mockWhatsappGateway():
+            self._receive_whatsapp_message(
+                self.whatsapp_account, "Message for Account 1", "32499123456",
+            )
+        channel_1 = self.assertWhatsAppDiscussChannel(
+            "32499123456", wa_account=self.whatsapp_account,
+        )
+
+        with self.mockWhatsappGateway():
+            self._receive_whatsapp_message(
+                account_3, "Message for Account 3", "32499123456",
+            )
+        channel_3 = self.assertWhatsAppDiscussChannel(
+            "32499123456", wa_account=account_3,
+        )
+        self.assertNotEqual(channel_1, channel_3)
 
     def test_receive_no_document(self):
         """ Receive a message that is not linked to any document. It should

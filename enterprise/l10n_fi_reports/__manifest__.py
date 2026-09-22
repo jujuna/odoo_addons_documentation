@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -12,7 +11,6 @@ Accounting reports for Finland
     'category': 'Accounting/Localizations/Reporting',
     'depends': ['l10n_fi', 'account_reports'],
     'data': [
-        'security/ir.model.access.csv',
         'data/account_report_ec_sales_list_report.xml',
         'data/account_return_data.xml',
         'data/balance_sheet.xml',
@@ -22,9 +20,9 @@ Accounting reports for Finland
         'report/ec_sales_list_report_export.xml',
         'wizard/ec_sales_list_submission_wizard.xml',
         'wizard/tax_report_submission_wizard.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': ['l10n_fi', 'account_reports'],
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

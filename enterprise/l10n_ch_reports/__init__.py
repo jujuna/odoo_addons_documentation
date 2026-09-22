@@ -5,3 +5,4 @@
 # Financial contributors: Hasa SA, Open Net SA,
 #                         Prisme Solutions Informatique SA, Quod SA
 # Translation contributors: brain-tec AG, Agile Business Group
+from . import models

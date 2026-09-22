@@ -2,11 +2,12 @@
 <templates xml:space="preserve">
     <t t-name="knowledge.PermissionPanelDialog">
         <Dialog
-            title.translate="Share settings"
-            fullscreen="true"
+            title="this.props.title"
+            fullscreen="this.props.fullscreen"
             footer="false"
-            withBodyPadding="false">
-            <PermissionPanel t-props="this.props"/>
+            withBodyPadding="false"
+            size="this.props.dialogSize">
+            <PermissionPanel t-props="this.permissionPanelProps" />
         </Dialog>
     </t>
 </templates>

@@ -14,8 +14,8 @@ This module allows the import of accounts, journals, partners, taxes and moves f
         'account_base_import',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'wizard/import_wizard_view.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [

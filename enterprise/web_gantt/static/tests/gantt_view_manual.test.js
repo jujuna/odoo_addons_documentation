@@ -1,12 +1,13 @@
 import { beforeEach, expect, test, describe } from "@odoo/hoot";
 import { queryFirst } from "@odoo/hoot-dom";
 import { mockDate } from "@odoo/hoot-mock";
+import { range } from "@web/core/utils/numbers";
 import { mountGanttView } from "./web_gantt_test_helpers";
 import { ResUsers, TASKS_STAGE_SELECTION, Tasks, defineGanttModels } from "./gantt_mock_models";
 
 function randomName(length) {
     const CHARS = "abcdefghijklmnopqrstuvwxyzàùéèâîûêôäïüëö";
-    return [...Array(length)]
+    return range(length)
         .map(() => {
             const char = CHARS[Math.floor(Math.random() * CHARS.length)];
             return Math.random() < 0.5 ? char : char.toUpperCase();
@@ -22,9 +23,9 @@ describe.current.tags("manual testing");
 test.skip("large amount of records (ungrouped)", async () => {
     const NB_TASKS = 10000;
 
-    Tasks._records = [...Array(NB_TASKS)].map((_, i) => ({
-        id: i + 1,
-        name: `Task ${i + 1}`,
+    Tasks._records = range(1, NB_TASKS + 1).map((id) => ({
+        id,
+        name: `Task ${id}`,
         start: `2018-12-01 00:00:00`,
         stop: `2018-12-01 23:00:00`,
     }));
@@ -42,11 +43,11 @@ test.skip("large amount of records (one level grouped)", async () => {
     const NB_USERS = 10000;
     const NB_TASKS = 10000;
 
-    ResUsers._records = [...Array(NB_USERS)].map((_, i) => ({
+    ResUsers._records = range(NB_USERS).map((i) => ({
         id: i + 1,
         name: `${randomName(Math.floor(Math.random() * 8) + 8)} (${i + 1})`,
     }));
-    Tasks._records = [...Array(NB_TASKS)].map((_, i) => {
+    Tasks._records = range(NB_TASKS).map((i) => {
         let day1 = (i % 30) + 1;
         let day2 = (i % 30) + 2;
         if (day1 < 10) {
@@ -80,11 +81,11 @@ test.skip("large amount of records (two level grouped)", async () => {
     const NB_USERS = 100;
     const NB_TASKS = 10000;
 
-    ResUsers._records = [...Array(NB_USERS)].map((_, i) => ({
+    ResUsers._records = range(NB_USERS).map((i) => ({
         id: i + 1,
         name: `${randomName(Math.floor(Math.random() * 8) + 8)} (${i + 1})`,
     }));
-    Tasks._records = [...Array(NB_TASKS)].map((_, i) => ({
+    Tasks._records = range(NB_TASKS).map((i) => ({
         id: i + 1,
         name: `Task ${i + 1}`,
         stage: TASKS_STAGE_SELECTION[i % 2][0],

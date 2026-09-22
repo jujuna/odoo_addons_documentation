@@ -5,7 +5,7 @@ patch(HelpdeskSearchTicketSteps.prototype, {
     _searchTickets() {
         return {
             content: "search Ticket",
-            trigger: ".oi-search",
+            trigger: "[data-icon='search']",
             run: "click",
         };
     },

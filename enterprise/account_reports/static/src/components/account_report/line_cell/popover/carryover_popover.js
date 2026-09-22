@@ -1,19 +1,20 @@
-import { useService } from "@web/core/utils/hooks";
-import { Component } from "@odoo/owl";
+import { ORM } from "@web/core/orm_plugin";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
+
+import { Component, t, usePlugin, useProps } from "@odoo/owl";
 
 export class AccountReportCarryoverPopover extends Component {
     static template = "account_reports.AccountReportCarryoverPopover";
-    static props = {
-        close: Function,
-        carryoverData: Object,
-        options: Object,
-        context: Object,
-    };
 
-    setup() {
-        this.actionService = useService("action");
-        this.orm = useService("orm");
-    }
+    props = useProps({
+        close: t.function(),
+        carryoverData: t.object(),
+        options: t.object(),
+        context: t.object(),
+    });
+
+    actionPlugin = usePlugin(ActionPlugin);
+    orm = usePlugin(ORM);
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -31,7 +32,7 @@ export class AccountReportCarryoverPopover extends Component {
                 context: this.props.context,
             }
         );
-        this.props.close()
-        return this.actionService.doAction(viewCarryoverLinesAction);
+        this.props.close();
+        return this.actionPlugin.doAction(viewCarryoverLinesAction);
     }
 }

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -9,39 +8,41 @@
 Module to automate letters for unpaid invoices, with multi-level recalls.
 =========================================================================
 
-You can define your multiple levels of recall through the menu:
----------------------------------------------------------------
-    Configuration / Follow-up / Follow-up Levels
+You can define your multiple levels of recall through the invoicing settings:
+-----------------------------------------------------------------------------
+    Configuration / Settings / Customer Invoices / Automatic Invoice Reminders
 
-Once it is defined, you can automatically print recalls every day through simply clicking on the menu:
-------------------------------------------------------------------------------------------------------
-    Payment Follow-Up / Send Email and letters
-
-It will generate a PDF / send emails / set activities according to the different levels
-of recall defined. You can define different policies for different companies.
-
+Features:
+---------
+    - Automatic multi-level reminders based on overdue duration.
+    - Send & Print integration:
+        If Send & Print is executed again on an overdue invoice, the system
+        automatically switches to the appropriate reminder template and attaches
+        the follow-up report.
+    - Batch reminders:
+        Users can select multiple invoices from the list view and send reminders
+        to multiple customers at once using the 'Send Reminders' action.
 """,
     'website': 'https://www.odoo.com/app/invoicing',
     'depends': ['mail', 'sms', 'account_reports'],
     'data': [
-        'security/account_followup_security.xml',
-        'security/ir.model.access.csv',
-        'security/sms_security.xml',
-        'data/mail_template.xml',
+        'data/mail_template_data.xml',
         'data/account_followup_data.xml',
         'data/cron.xml',
         'wizard/followup_manual_reminder_views.xml',
         'wizard/followup_missing_information.xml',
+        'wizard/mail_compose_message_views.xml',
         'views/account_followup_views.xml',
         'views/account_followup_line_views.xml',
-        'views/account_move_views.xml',
         'views/partner_view.xml',
         'views/report_followup.xml',
+        'views/account_move_views.xml',
+        'views/res_config_settings_views.xml',
+        'security/ir.access.csv',
         ],
     'demo': [
         'demo/account_followup_demo.xml'
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
@@ -57,8 +58,6 @@ of recall defined. You can define different policies for different companies.
         ],
         'web.assets_backend': [
             'account_followup/static/src/components/**/*.js',
-            'account_followup/static/src/components/**/*.scss',
-            'account_followup/static/src/components/**/*.xml',
         ],
     }
 }

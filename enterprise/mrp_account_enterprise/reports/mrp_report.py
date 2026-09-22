@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models
+from odoo.models import TableSQL
 from odoo.tools import SQL
 
 
@@ -20,15 +21,18 @@ class MrpReport(models.Model):
     total_cost = fields.Monetary(
         "Total Cost", readonly=True,
         help="Total cost of manufacturing order (component + operation costs)")
+    extra_cost = fields.Monetary(
+        "Extra Cost", readonly=True, help="Additional cost per manufactured unit (e.g. labour, energy, packaging)"
+    )
     component_cost = fields.Monetary(
         "Total Component Cost", readonly=True,
         help="Total cost of components for manufacturing order")
-    operation_cost = fields.Monetary(
-        "Total Operation Cost", readonly=True, groups="mrp.group_mrp_routings",
-        help="Total cost of operations for manufacturing order")
+    workcenter_cost = fields.Monetary(
+        "Total Work Center Cost", readonly=True, groups="mrp.group_mrp_routings",
+        help="Total work center cost for manufacturing order")
     duration = fields.Float(
         "Total Duration of Operations", readonly=True, groups="mrp.group_mrp_routings",
-        help="Total duration (minutes) of operations for manufacturing order")
+        help="Total duration of operations for manufacturing order")
 
     qty_produced = fields.Float(
         "Quantity Produced", readonly=True,
@@ -42,19 +46,19 @@ class MrpReport(models.Model):
 
     # note that unit costs take include subtraction of byproduct cost share
     unit_cost = fields.Monetary(
-        "Cost / Unit", readonly=True, aggregator="avg",
+        "Total Cost / Unit", readonly=True, aggregator="avg",
         help="Cost per unit produced (in product UoM) of manufacturing order")
     unit_component_cost = fields.Monetary(
-        "Component Cost / Unit", readonly=True, aggregator="avg",
+        "Total Component Cost / Unit", readonly=True, aggregator="avg",
         help="Component cost per unit produced (in product UoM) of manufacturing order")
-    unit_operation_cost = fields.Monetary(
-        "Total Operation Cost / Unit", readonly=True, aggregator="avg",
+    unit_workcenter_cost = fields.Monetary(
+        "Total Work Center Cost / Unit", readonly=True, aggregator="avg",
         groups="mrp.group_mrp_routings",
-        help="Operation cost per unit produced (in product UoM) of manufacturing order")
+        help="Work center cost per unit produced (in product UoM) of manufacturing order")
     unit_duration = fields.Float(
         "Duration of Operations / Unit", readonly=True, aggregator="avg",
         groups="mrp.group_mrp_routings",
-        help="Operation duration (minutes) per unit produced of manufacturing order")
+        help="Operation duration per unit produced of manufacturing order")
 
     byproduct_cost = fields.Monetary(
         "By-Products Total Cost", readonly=True,
@@ -67,8 +71,8 @@ class MrpReport(models.Model):
         "Expected Employee Cost / Unit", readonly=True, aggregator="avg",
         groups="mrp.group_mrp_routings"
     )
-    expected_operation_cost_unit = fields.Monetary(
-        "Expected Operation Cost / Unit", readonly=True, aggregator="avg",
+    expected_workcenter_cost_unit = fields.Monetary(
+        "Expected Work Center Cost / Unit", readonly=True, aggregator="avg",
         groups="mrp.group_mrp_routings"
     )
     expected_total_cost_unit = fields.Monetary(
@@ -76,130 +80,84 @@ class MrpReport(models.Model):
         groups="mrp.group_mrp_routings"
     )
 
+    def _select_dict_to_list(self, select_dict):
+        return [SQL("%s AS %s", select_dict.get(fname, SQL("NULL")), SQL.identifier(fname)) for fname, field in self._fields.items() if field.store]
+
+    def _left_join(self, alias_str, query, main_table):
+        alias = TableSQL(alias_str, None, main_table._query)
+        main_table._query.add_join('LEFT JOIN', alias, query, SQL("%s = %s", main_table.id, alias.mo_id))
+        return alias
+
     @property
-    def _table_query(self):
-        ''' Report needs to be dynamic to take into account multi-company selected + multi-currency rates '''
-        return '%s %s %s %s' % (self._select(), self._from(), self._where(), self._group_by())
+    def _table_sql(self):
+        today = fields.Date.context_today(self)
+        query = self.env['mrp.production'].with_context(date_to=today)._search([('state', '=', 'done')])
+        return query.subselect(*self._select_dict_to_list(self._select_dict(query.table)))
 
-    def _select_total_cost(self):
-        return "comp_cost.total + op_cost.total"
+    def _total_cost(self, table: TableSQL):
+        mo = self._get_extra_cost(table)
+        return SQL("(%s + %s + (%s * %s))", self._get_component_cost(table).total, self._get_workcenter_cost(table).total, mo.extra_cost, mo.product_qty)
 
-    def _select(self):
-        select_str = f"""
-            SELECT
-                min(mo.id)             AS id,
-                mo.id                  AS production_id,
-                mo.company_id          AS company_id,
-                rc.currency_id         AS currency_id,
-                mo.date_finished       AS date_finished,
-                mo.product_id          AS product_id,
-                prod_qty.product_qty   AS qty_produced,
-                prod_qty.qty_demanded  AS qty_demanded,
-                prod_qty.product_qty / prod_qty.qty_demanded * 100                                                                      AS yield_rate,
-                comp_cost.total * account_currency_table.rate                                                                                   AS component_cost,
-                op_cost.total * account_currency_table.rate                                                                                     AS operation_cost,
-                ({self._select_total_cost()}) * account_currency_table.rate                                                                     AS total_cost,
-                op_cost.total_duration                                                                                                  AS duration,
-                comp_cost.total * (1 - cost_share.byproduct_cost_share) / prod_qty.product_qty * account_currency_table.rate                    AS unit_component_cost,
-                op_cost.total * (1 - cost_share.byproduct_cost_share) / prod_qty.product_qty * account_currency_table.rate                      AS unit_operation_cost,
-                ({self._select_total_cost()}) * (1 - cost_share.byproduct_cost_share) / prod_qty.product_qty * account_currency_table.rate      AS unit_cost,
-                op_cost.total_duration / prod_qty.product_qty                                                                           AS unit_duration,
-                ({self._select_total_cost()}) * cost_share.byproduct_cost_share * account_currency_table.rate                                   AS byproduct_cost
-                {self._expected_component_cost()}
-                {self._expected_employee_cost()}
-                {self._expected_operation_cost()}
-                {self._expected_total_cost()}
+    def _extra_cost(self, table: TableSQL):
+        mo = self._get_extra_cost(table)
+        return SQL("%s * %s", mo.extra_cost, mo.product_qty)
 
-        """
+    def _select_dict(self, table: TableSQL):
+        total_cost = self._total_cost(table)
+        extra_cost = self._extra_cost(table)
+        component_cost = self._get_component_cost(table)
+        wc_cost = self._get_workcenter_cost(table)
+        byproducts_cost_share = self._get_byproducts_cost_share(table)
+        total_qty_produced = self._get_total_qty_produced(table)
+        return {
+            'id': table.id,
+            'production_id': table.id,
+            'company_id': table.company_id,
+            'currency_id': table.company_id.currency_id,
+            'date_finished': table.date_finished,
+            'product_id': table.product_id,
+            'qty_produced': total_qty_produced.product_qty,
+            'qty_demanded': total_qty_produced.qty_demanded,
+            'yield_rate': SQL("%s / %s * 100", total_qty_produced.product_qty, total_qty_produced.qty_demanded),
+            'component_cost': SQL("%s * %s", component_cost.total, table.consolidation_rate),
+            'workcenter_cost': SQL("%s * %s", wc_cost.total, table.consolidation_rate),
+            'total_cost': SQL("%s * %s", total_cost, table.consolidation_rate),
+            'extra_cost': SQL("%s * %s", extra_cost, table.consolidation_rate),
+            'duration': wc_cost.total_duration,
+            'unit_component_cost': SQL("%s * (1 - %s) / %s * %s", component_cost.total, byproducts_cost_share.byproduct_cost_share, total_qty_produced.product_qty, table.consolidation_rate),
+            'unit_workcenter_cost': SQL("%s * (1 - %s) / %s * %s", wc_cost.total, byproducts_cost_share.byproduct_cost_share, total_qty_produced.product_qty, table.consolidation_rate),
+            'unit_cost': SQL("%s * (1 - %s) / %s * %s", total_cost, byproducts_cost_share.byproduct_cost_share, total_qty_produced.product_qty, table.consolidation_rate),
+            'unit_duration': SQL("%s / %s", wc_cost.total_duration, total_qty_produced.product_qty),
+            'byproduct_cost': SQL("%s / %s", total_cost, total_qty_produced.product_qty),
+        }
 
-        return select_str
-
-    def _expected_component_cost(self):
-        return """
-            , 0   AS expected_component_cost_unit
-            """
-
-    def _expected_employee_cost(self):
-        return """
-            , 0   AS expected_employee_cost_unit
-            """
-
-    def _expected_operation_cost(self):
-        return """
-            , 0 AS expected_operation_cost_unit
-            """
-
-    def _expected_total_cost(self):
-        return """
-            , 0 AS expected_total_cost_unit
-            """
-
-    def _from(self):
-        """ MO costs are quite complicated so the table is built with the following subqueries (per MO):
-            1. total component cost (note we cover no components use case)
-            2. total operations cost (note we cover no operations use case)
-            3. total byproducts cost share
-            4. total qty produced based on the product's UoM
-        Note subqueries 3 and 4 exist because 3 subqueries use the stock_move table and combining them would result in duplicated SVL values and
-        subquery 2 (i.e. the nested subquery) exists to prevent duplication of operation costs (i.e. 2+ comp lines and 2+ operations at diff wc in
-        the same MO results in op cost duplication if op cost isn't aggregated first).
-        Subqueries will return 0.0 as value whenever value IS NULL to prevent SELECT calculations from being nulled (e.g. there is no cost then
-        it is mathematically 0 anyways).
-        """
-        currency_table = self.env['res.currency']._get_simple_currency_table(self.env.companies)
-        from_str = """
-            FROM mrp_production AS mo
-            JOIN res_company AS rc ON rc.id = {company_id}
-            {comp_cost}
-            {op_cost}
-            {byproducts_cost}
-            {total_produced}
-            LEFT JOIN {currency_table} ON account_currency_table.company_id = mo.company_id
-            {exp_comp_cost_unit}
-        """.format(
-            currency_table=self.env.cr.mogrify(currency_table).decode(self.env.cr.connection.encoding),
-            company_id=int(self.env.company.id),
-            comp_cost=self._join_component_cost(),
-            op_cost=self._join_operations_cost(),
-            byproducts_cost=self._join_byproducts_cost_share(),
-            total_produced=self._join_total_qty_produced(),
-            exp_comp_cost_unit=self._join_expected_component_cost_unit()
-        )
-
-        return from_str
-
-    def _join_expected_component_cost_unit(self):
-        cr = self.env.cr
-        standard_price_sql = self.env['product.product']._field_to_sql('product', 'standard_price')
-        return f"""
-            LEFT JOIN (
+    def _get_extra_cost(self, main_table):
+        return self._left_join('bom', SQL("""(
                 SELECT
-                    SUM(
-                        {cr.mogrify(standard_price_sql).decode(cr.connection.encoding)}
-                        * bom_line.product_qty
-                    ) / bom.product_qty                                                 AS value,
-                    MIN(mo.id)                                                          AS mo_id
-                FROM mrp_production                                                     AS mo
-                JOIN mrp_bom                                                            AS bom
-                    ON bom.id = mo.bom_id
-                JOIN mrp_bom_line                                                       AS bom_line
-                    ON bom_line.bom_id = mo.bom_id
-                JOIN product_product                                                    AS product
-                    ON product.id = bom_line.product_id
+                    mo.id                      AS mo_id,
+                    mo.extra_cost         AS extra_cost,
+                    mo.product_qty       AS product_qty
+                FROM mrp_production AS mo
+                LEFT JOIN mrp_bom    AS bom ON bom.id = mo.bom_id
                 WHERE mo.state = 'done'
-                GROUP BY
-                    mo.id,
-                    bom.product_qty
-            ) product_standard_price
-                ON product_standard_price.mo_id = mo.id
-        """
+                GROUP BY mo.id, bom.type, bom.extra_cost
+        )"""), main_table)
 
-    def _join_component_cost(self):
-        return """
-            LEFT JOIN (
+    def _get_product_standard_price(self, main_table):
+        query = self.env['mrp.production']._search([('state', '=', 'done')], bypass_access=True)
+        table = query.table
+        bom_line = table._join('bom_id')._join('bom_line_ids')
+        query.groupby = table.id
+        return self._left_join('product_standard_price', query.subselect(
+            SQL("%s AS mo_id", table.id),
+            SQL("SUM(%s * %s / %s) AS value", bom_line.product_id.standard_price, bom_line.product_qty, table.bom_id.product_qty),
+        ), main_table)
+
+    def _get_component_cost(self, main_table):
+        return self._left_join('component_cost', SQL("""(
                 SELECT
                     mo.id                                                                    AS mo_id,
-                    SUM(sm.value)                                                                 AS total
+                    SUM(-sm.value)                                                           AS total
                 FROM mrp_production AS mo
                 LEFT JOIN stock_move AS sm on sm.raw_material_production_id = mo.id
                 LEFT JOIN stock_location AS dest_loc ON sm.location_dest_id = dest_loc.id
@@ -208,22 +166,20 @@ class MrpReport(models.Model):
                     AND dest_loc.usage != 'inventory'
                 GROUP BY
                     mo.id
-            ) comp_cost ON comp_cost.mo_id = mo.id
-        """
+        )"""), main_table)
 
-    def _join_operations_cost(self):
-        return """
-            LEFT JOIN (
+    def _get_workcenter_cost(self, main_table):
+        return self._left_join('wc_cost', SQL("""(
                 SELECT
                     mo_id                                                                    AS mo_id,
-                    SUM(op_costs_hour / 60. * op_duration)                                   AS total,
+                    SUM(wc_costs_hour / 60. * op_duration)                                   AS total,
                     SUM(op_duration)                                                         AS total_duration
                 FROM (
                     SELECT
                         mo.id AS mo_id,
                         CASE
                             WHEN wo.costs_hour != 0.0 AND wo.costs_hour IS NOT NULL THEN wo.costs_hour
-                            ELSE COALESCE(wc.costs_hour, 0.0) END                                       AS op_costs_hour,
+                            ELSE COALESCE(wc.costs_hour, 0.0) END                                       AS wc_costs_hour,
                         CASE
                             WHEN wo.duration_expected != 0.0 AND wo.duration_expected IS NOT NULL AND wo.cost_mode = 'estimated'
                             THEN wo.duration_expected
@@ -237,14 +193,12 @@ class MrpReport(models.Model):
                         mo.id,
                         wc.costs_hour,
                         wo.id
-                    ) AS op_cost_vars
+                    ) AS wc_cost_vars
                 GROUP BY mo_id
-            ) op_cost ON op_cost.mo_id = mo.id
-        """
+        )"""), main_table)
 
-    def _join_byproducts_cost_share(self):
-        return """
-            LEFT JOIN (
+    def _get_byproducts_cost_share(self, main_table):
+        return self._left_join('byproducts_cost_share', SQL("""(
                 SELECT
                     mo.id AS mo_id,
                     COALESCE(SUM(sm.cost_share), 0.0) / 100.0 AS byproduct_cost_share
@@ -257,20 +211,18 @@ class MrpReport(models.Model):
                     AND sm.quantity != 0
                     AND dest_loc.usage != 'inventory'
                 GROUP BY mo.id
-            ) cost_share ON cost_share.mo_id = mo.id
-        """
+        )"""), main_table)
 
-    def _join_total_qty_produced(self):
-        return """
-            LEFT JOIN (
+    def _get_total_qty_produced(self, main_table):
+        return self._left_join('total_qty_produced', SQL("""(
                 SELECT
                     mo.id AS mo_id,
                     mo.name,
-                    SUM(sm.quantity / uom.factor * uom_prod.factor) AS product_qty,
-                    SUM(sm.product_uom_qty / uom.factor * uom_prod.factor) AS qty_demanded
+                    SUM(sm.quantity * uom.factor / uom_prod.factor) AS product_qty,
+                    SUM(sm.product_uom_qty * uom.factor / uom_prod.factor) AS qty_demanded
                 FROM stock_move AS sm
                 JOIN mrp_production AS mo ON sm.production_id = mo.id
-                JOIN uom_uom AS uom ON uom.id = sm.product_uom
+                JOIN uom_uom AS uom ON uom.id = sm.uom_id
                 JOIN product_product AS product ON product.id = sm.product_id
                 JOIN product_template AS template ON template.id = product.product_tmpl_id
                 JOIN uom_uom AS uom_prod ON uom_prod.id = template.uom_id
@@ -282,42 +234,17 @@ class MrpReport(models.Model):
                     AND mo.product_id = sm.product_id
                     AND dest_loc.usage != 'inventory'
                 GROUP BY mo.id
-            ) prod_qty ON prod_qty.mo_id = mo.id
-        """
+        )"""), main_table)
 
-    def _where(self):
-        where_str = """
-            WHERE
-                mo.state = 'done'
-        """
-
-        return where_str
-
-    def _group_by(self):
-        group_by_str = """
-            GROUP BY
-                mo.id,
-                rc.currency_id,
-                cost_share.byproduct_cost_share,
-                comp_cost.total,
-                op_cost.total,
-                op_cost.total_duration,
-                prod_qty.product_qty,
-                prod_qty.qty_demanded,
-                account_currency_table.rate
-        """
-
-        return group_by_str
-
-    def _read_group_select(self, aggregate_spec, query):
-        if aggregate_spec in ('unit_cost:avg', 'unit_component_cost:avg', 'unit_operation_cost:avg', 'unit_duration:avg'):
+    def _read_group_select(self, table, aggregate_spec):
+        if aggregate_spec in ('unit_cost:avg', 'unit_component_cost:avg', 'unit_workcenter_cost:avg', 'unit_duration:avg'):
             # Make a weigthed average instead of simple average for these fields
             fname, *__ = models.parse_read_group_spec(aggregate_spec)
-            sql_field = self._field_to_sql(self._table, fname, query)
-            sql_qty_produced = self._field_to_sql(self._table, 'qty_produced', query)
+            sql_field = table[fname]
+            sql_qty_produced = table.qty_produced
             return SQL("SUM(%s * %s) / SUM(%s)", sql_field, sql_qty_produced, sql_qty_produced)
         if aggregate_spec == 'yield_rate:sum':
-            sql_qty_produced = self._field_to_sql(self._table, 'qty_produced', query)
-            sql_qty_demanded = self._field_to_sql(self._table, 'qty_demanded', query)
+            sql_qty_produced = table.qty_produced
+            sql_qty_demanded = table.qty_demanded
             return SQL("SUM(%s) / SUM(%s) * 100", sql_qty_produced, sql_qty_demanded)
-        return super()._read_group_select(aggregate_spec, query)
+        return super()._read_group_select(table, aggregate_spec)

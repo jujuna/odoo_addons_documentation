@@ -1,9 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo.tests import tagged
+
 from odoo.addons.sale_subscription_partnership.tests.common import SubscriptionsPartnershipCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSubscriptionsPartnership(SubscriptionsPartnershipCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_assign_plan_via_sale_order(self):
         plan, plan_2 = self.env['commission.plan'].create([{

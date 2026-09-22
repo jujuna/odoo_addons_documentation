@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models
+from odoo.tools import SQL
 
 
 class SaleRentalReport(models.Model):
@@ -11,7 +12,7 @@ class SaleRentalReport(models.Model):
     def _quantity(self):
         """For the products tracked by serial numbers, we get one unique row for each serial number
         therefore reserved, delivered and returned quantities are required to be set accordingly."""
-        return """
+        return SQL("""
             CASE
                 WHEN res.stock_lot_id IS NOT NULL
                 THEN 1.0
@@ -31,29 +32,29 @@ class SaleRentalReport(models.Model):
                 THEN 1.0
                 ELSE 0.0
                 END AS qty_returned
-        """
+        """)
 
     def _price(self):
         """For the products tracked by serial numbers, we get one unique row for each serial number
         therefore the price must be set accordingly."""
         price = super()._price()
-        return """
+        return SQL("""
             CASE
                 WHEN res.stock_lot_id IS NOT NULL AND product_uom_qty != 0
                 THEN %s / (product_uom_qty / (u.factor * u2.factor))
                 ELSE %s
-                END """ % (price, price)
+                END """, price, price)
 
     def _from(self):
-        return super()._from() + """
+        return SQL("""%s
             LEFT JOIN rental_reserved_lot_rel AS res ON res.sale_order_line_id=sol.id
             LEFT JOIN rental_pickedup_lot_rel AS pickedup ON pickedup.sale_order_line_id=sol.id
                 AND pickedup.stock_lot_id = res.stock_lot_id
             LEFT JOIN rental_returned_lot_rel AS returned ON returned.sale_order_line_id=sol.id
                 AND returned.stock_lot_id = res.stock_lot_id
-        """
+        """, super()._from())
 
     def _select(self):
-        return super()._select() + """,
+        return SQL("""%s,
             res.stock_lot_id AS lot_id
-        """
+        """, super()._select())

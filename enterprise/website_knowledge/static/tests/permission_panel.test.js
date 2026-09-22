@@ -1,22 +1,29 @@
 import { PermissionPanel } from "@knowledge/components/permission_panel/permission_panel";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
+import { animationFrame, beforeEach, click, expect, test } from "@odoo/hoot";
+import { signal } from "@odoo/owl";
 import {
-    asyncStep,
     defineModels,
+    fields,
+    makeMockServer,
     MockServer,
     models,
     mountWithCleanup,
-    patchWithCleanup,
-    waitForSteps,
 } from "@web/../tests/web_test_helpers";
 import { user } from "@web/core/user";
+import { patch } from "@web/core/utils/patch";
 import { getOrigin } from "@web/core/utils/urls";
 
-import { beforeEach, expect, test } from "@odoo/hoot";
-import { click } from "@odoo/hoot-dom";
-import { animationFrame } from "@odoo/hoot-mock";
-
+const articleId = 1;
+const articleUrl = `${getOrigin()}/knowledge/article/${articleId}`;
 class KnowledgeArticle extends models.ServerModel {
+    _records = [
+        {
+            id: articleId,
+            article_url: articleUrl,
+        },
+    ];
+
     get_permission_panel_members() {
         return [];
     }
@@ -25,81 +32,92 @@ class KnowledgeArticle extends models.ServerModel {
 defineMailModels();
 defineModels([KnowledgeArticle]);
 
-// remove "close" prop of popover
-patchWithCleanup(PermissionPanel, {
-    props: { reactiveRecordWrapper: Object },
-});
+/**
+ * @param {(changes: any) => void} [onUpdate]
+ */
+async function mountPermissionPanel(onUpdate) {
+    function load() {
+        reactiveRecord.set(makeRecord());
+    }
+    function makeRecord() {
+        return {
+            data: env["knowledge.article"].browse(articleId)[0],
+            load,
+            update,
+        };
+    }
+    function update(changes) {
+        env["knowledge.article"].write(articleId, changes);
+        load();
+        onUpdate?.(changes);
+    }
 
-async function mountPermissionPanel(articleId) {
-    let data = KnowledgeArticle._records.find((record) => record.id === articleId);
-    const reactiveRecordWrapper = {
-        record: {
-            load: () => {
-                data = KnowledgeArticle._records.find((record) => record.id === articleId);
-            },
-            data,
-            update: () => {
-                data["website_published"] = !data["website_published"];
-                asyncStep("toggle publish");
-                pp.render();
-            },
+    const { env } = await makeMockServer();
+    const reactiveRecord = signal(makeRecord());
+    const pp = await mountWithCleanup(PermissionPanel, {
+        props: {
+            close: () => {},
+            openArticle: () => {},
+            reactiveRecord,
+            sendArticleToTrash: () => {},
         },
-    };
-    await mountWithCleanup(PermissionPanel, { props: { reactiveRecordWrapper } });
+    });
     await animationFrame();
+    return pp;
 }
 
-let pp;
-const articleUrl = `${getOrigin()}/knowledge/article/1`;
-beforeEach(() => {
-    patchWithCleanup(PermissionPanel.prototype, {
-        setup() {
-            super.setup();
-            pp = this;
-        },
-    });
-    patchWithCleanup(navigator.clipboard, {
+beforeEach(() =>
+    patch(navigator.clipboard, {
         writeText(value) {
-            expect(value).toBe(articleUrl);
-            asyncStep("copy to clipboard");
+            expect.step(`copy: ${value}`);
         },
-    });
-});
+    })
+);
 
 test("Publish an article", async () => {
-    KnowledgeArticle._records = [{ id: 1, user_can_write: true, article_url: articleUrl }];
-    await mountPermissionPanel(1);
+    // FIXME: allows to be written on during the test
+    // This is because writing on related fields does not work in the mock server
+    KnowledgeArticle._fields.website_published = fields.Boolean({ related: false });
+    KnowledgeArticle._records[0].user_can_write = true;
+    await mountPermissionPanel(expect.step);
     await animationFrame();
-    expect("div:contains('Share to web') + .form-switch input").not.toBeChecked();
-    await click(".o_knowledge_permission_panel .fa-globe");
+    expect(
+        ".knowledge_published_status_message:contains('Share to web') + .form-switch input"
+    ).not.toBeChecked();
+    await click(".o_knowledge_permission_panel .flex-grow-1");
     await animationFrame();
-    waitForSteps(["toggle publish"]);
-    expect("div:contains('Article shared to web') + .form-switch input").toBeChecked();
+    await expect.waitForSteps([{ website_published: true }]);
+    expect(
+        ".knowledge_published_status_message:contains('Article shared to web') + .form-switch input"
+    ).toBeChecked();
     await click(".o_clipboard_button");
-    await waitForSteps(["copy to clipboard"]);
-    await click("div:contains('Article shared to web') + .form-switch input");
+    await expect.waitForSteps([`copy: ${articleUrl}`]);
+    await click(
+        ".knowledge_published_status_message:contains('Article shared to web') + .form-switch input"
+    );
     await animationFrame();
-    await waitForSteps(["toggle publish"]);
-    expect("div:contains('Share to web') + .form-switch input").not.toBeChecked();
+    await expect.waitForSteps([{ website_published: false }]);
+    expect(
+        ".knowledge_published_status_message:contains('Share to web') + .form-switch input"
+    ).not.toBeChecked();
     expect(".o_clipboard_button").toHaveCount(0);
 });
 
 test("Published readonly article", async () => {
-    KnowledgeArticle._records = [{ id: 1, article_url: articleUrl }];
-    patchWithCleanup(user, { isAdmin: false });
-    await mountPermissionPanel(1);
+    patch(user, { isAdmin: false });
+    const pp = await mountPermissionPanel();
     await animationFrame();
     // toggle should not be shown as user can't publish the article
     expect(".form-switch").toHaveCount(0);
     // clicking on the publish section shouldn't do anything as user can't publish it
-    await click(".o_knowledge_permission_panel .fa-globe");
+    await click(".o_knowledge_permission_panel .knowledge_published_status_message");
     await animationFrame();
     expect(".knowledge_published_status_message").toHaveText("Article not Published");
     // publish the article
-    MockServer.env["knowledge.article"].write(1, { is_published: true });
-    pp.load();
+    MockServer.env["knowledge.article"].write(articleId, { is_published: true });
+    await pp.load();
     await animationFrame();
-    expect(".o_knowledge_permission_panel > div .fw-bold").toHaveText("Article shared to web");
+    expect(".knowledge_published_status_message").toHaveText("Article shared to web");
     await click(".o_clipboard_button");
-    await waitForSteps(["copy to clipboard"]);
+    await expect.waitForSteps([`copy: ${articleUrl}`]);
 });

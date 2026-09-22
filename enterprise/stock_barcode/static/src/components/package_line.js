@@ -1,8 +1,13 @@
+import { t } from "@odoo/owl";
 import LineComponent from "./line";
 
 export default class PackageLineComponent extends LineComponent {
-    static props = ["displayUOM", "line", "openPackage"];
     static template = "stock_barcode.PackageLineComponent";
+    static props = {
+        displayUOM: t.any(),
+        line: t.any(),
+        openPackage: t.any(),
+    };
 
     get isComplete() {
         return this.qtyDemand ? this.qtyDone == this.qtyDemand : this.qtyDone > 0;

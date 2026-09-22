@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import unittest
-from odoo.tests.common import TransactionCase, tagged
-from odoo.exceptions import UserError
-from ..models.fedex_request import FedexRequest
+from odoo.tests.common import tagged, TransactionCase
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDeliveryFedexInternal(TransactionCase):
     """Unit tests for the delivery_fedex module that don't require external access"""
     def setUp(self):

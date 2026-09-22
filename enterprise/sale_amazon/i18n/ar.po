@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-13 15:01+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 00:17+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
 "sale_amazon/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,30 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_amazon
+#: model:ir.module.module,description:base.module_sale_amazon
+msgid ""
+"\n"
+"Import your Amazon orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and marketplaces.\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(SKU in Amazon).\n"
+"* Deliveries confirmed in Odoo are synchronized in Amazon.\n"
+"* Support for both Fulfilment by Amazon (FBA) and Fulfilment by Merchant "
+"(FBM):\n"
+"    * FBA: A stock location and stock moves allow to monitor your stock in "
+"Amazon Fulfilment\n"
+"      Centers.\n"
+"    * FBM: Delivery notifications are sent to Amazon for each confirmed "
+"picking (partial delivery\n"
+"      friendly).\n"
+msgstr ""
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
@@ -54,16 +77,15 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"            <p>مزامنة طلب أمازون مع المرجع <t t-"
-"out=\"ctx.get('amazon_order_ref') or ''\">REF</t> واجهت خطأ وتعذر إكمالها.</"
-"p>\n"
+"            <p>مزامنة طلب أمازون مع المرجع <t t-out=\"ctx.get"
+"('amazon_order_ref') or ''\">REF</t> واجهت خطأ وتعذر إكمالها.</p>\n"
 "            <p>إلا إذا تم إلغاء الطلب في SellerCentral، لن يتم إجراء أي "
 "محاولة مزامنة أخرى.</p>\n"
 "            <p>لجدولة محاولة مزامنة أخرى، قم باتباع الخطوات التالية:\n"
 "                </p><ol>\n"
 "                    <li>قم بإدخال أدوات المطور.</li>\n"
-"                    <li>افتح الاستمارة من حساب أمازون الذي تم الطلب منه.</"
-"li>\n"
+"                    <li>افتح الاستمارة من حساب أمازون الذي تم الطلب منه.</li>"
+"\n"
 "                    <li>انتقل إلى علامة تبويب متابعة الطلب.</li>\n"
 "                    <li>قم بتعيين تاريخ لـ <em>آخر مزامنة للطلبات</em> التي "
 "تسبق تاريخ آخر تحديث لحالة الطلب.</li>\n"
@@ -366,8 +388,8 @@ msgid ""
 "Add any new marketplace that this account has "
 "gained                                           access to."
 msgstr ""
-"أضف أي سوق جديد حصل هذا الحساب على "
-"صلاحية                                            الوصول إليه."
+"أضف أي سوق جديد حصل هذا الحساب على صلاحية"
+"                                            الوصول إليه."
 
 #. module: sale_amazon
 #: model:ir.ui.menu,name:sale_amazon.root_menu
@@ -388,6 +410,11 @@ msgstr "حساب أمازون"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.res_config_settings_view_form
 msgid "Amazon Accounts"
 msgstr "حسابات أمازون"
+
+#. module: sale_amazon
+#: model:ir.module.module,shortdesc:base.module_sale_amazon
+msgid "Amazon Connector"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__amazon_feed_ref
@@ -485,27 +512,6 @@ msgid ""
 msgstr ""
 "يتطلب موقع أمازون معلومات معينة لموقع الشحن. يرجى التأكد من ضبط المعلومات "
 "التالية على '%(location_name)s' (%(location)s): الشارع والدولة ورمز الدولة."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"Since the current carrier doesn't automatically provide a tracking "
-"reference, you need to set one manually."
-msgstr ""
-"يتطلب أمازون وجود مرجع تتبع مع كل عملية توصيل. بما أن شركة الشحن الحالية لا "
-"تقدم مرجع تتبع تلقائياً، عليك تعيين واحد يدوياً."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"You need to assign a carrier to this delivery."
-msgstr ""
-"يتطلب أمازون وجود مرجع تتبع مع كل عملية توصيل. عليك تعيين شركة شحن لعملية "
-"التوصيل هذه."
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -684,11 +690,6 @@ msgid "Back to my account"
 msgstr "العودة إلى حسابي"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
-msgid "Cancel"
-msgstr "إلغاء"
-
-#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__company_id
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__company_id
 msgid "Company"
@@ -777,11 +778,6 @@ msgstr "بيانات الاعتماد"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Default Products"
 msgstr "المنتجات الافتراضية"
-
-#. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
-msgid "Discard"
-msgstr "إهمال"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
@@ -948,6 +944,11 @@ msgstr ""
 "فوترته أو توصيله."
 
 #. module: sale_amazon
+#: model:ir.module.module,summary:base.module_sale_amazon
+msgid "Import Amazon orders and sync deliveries"
+msgstr ""
+
+#. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
 msgid "In Processing by Amazon"
 msgstr "قيد المعالجة من قِبَل Amazon"
@@ -1020,6 +1021,12 @@ msgstr "السوق"
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__active_marketplace_ids
 msgid "Marketplaces"
 msgstr "الأسواق"
+
+#. module: sale_amazon
+#. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Missing product name"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__name
@@ -1315,8 +1322,8 @@ msgid ""
 "(%(status)s) is not eligible for synchronization for its fulfillment channel "
 "(%(channel)s)."
 msgstr ""
-"طلب Amazon مع المرجع %(ref)s لم تتم استعادته لأن حالته (%(status)s) غير "
-"صالحة للمزامنة لقناة الشحن الخاصة به (%(channel)s)."
+"طلب Amazon مع المرجع %(ref)s لم تتم استعادته لأن حالته (%(status)s) غير صالحة "
+"للمزامنة لقناة الشحن الخاصة به (%(channel)s)."
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_marketplace__region
@@ -1355,9 +1362,9 @@ msgstr "وحدة إدارة المخزون"
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_channel
 msgid ""
-"The channel will be updated with the incomming orders or during the next "
-"stock synchronization."
-msgstr "سيتم تحديث القناة بالطلبات الواردة أو أثناء مزامنة المخزون التالية."
+"The channel will be updated with the incomming orders or, if left empty, "
+"during the next stock synchronization."
+msgstr ""
 
 #. module: sale_amazon
 #. odoo-python
@@ -1481,8 +1488,7 @@ msgstr ""
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__access_token
 msgid "The short-lived token used to query Amazon API on behalf of a seller."
 msgstr ""
-"الرمز قصير الأمد المُستخدَم للاستفسار عن الواجهة البرمجية لأمازون نيابةً عن "
-"البائع."
+"الرمز قصير الأمد المُستخدَم للاستفسار عن الواجهة البرمجية لأمازون نيابةً عن البائع."
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_stock_picking__amazon_sync_status
@@ -1522,8 +1528,7 @@ msgstr ""
 msgid ""
 "The synchronization with Amazon failed. Amazon gave us this information "
 "about the problem:"
-msgstr ""
-"فشلت المزامنة مع Amazon. حصلنا على هذه المعلومات حول المشكلة من Amazon:"
+msgstr "فشلت المزامنة مع Amazon. حصلنا على هذه المعلومات حول المشكلة من Amazon:"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__name
@@ -1660,205 +1665,3 @@ msgstr "مثال: السوق الأمريكي"
 #: code:addons/sale_amazon/models/amazon_account.py:0
 msgid "id"
 msgstr "المعرف"
-
-#~ msgid ""
-#~ "<div>\n"
-#~ "            <p>The synchronization of the Amazon order with reference <t "
-#~ "t-out=\"ctx.get('amazon_order_ref') or ''\">REF</t> encountered an error "
-#~ "and was not completed.</p>\n"
-#~ "            <p>Unless the order is canceled in SellerCentral, no other "
-#~ "synchronization will be attempted.</p>\n"
-#~ "            <p>To schedule a new synchronization attempt, proceed as "
-#~ "follows:\n"
-#~ "                <ol>\n"
-#~ "                    <li>Enter the Developer Tools.</li>\n"
-#~ "                    <li>Open the form of the Amazon Account on which the "
-#~ "order was placed.</li>\n"
-#~ "                    <li>Navigate to the Order Follow-up tab.</li>\n"
-#~ "                    <li>Set a date for <em>Last Orders Sync</em> that is "
-#~ "anterior to the last status update of the order.</li>\n"
-#~ "                    <li>Save the changes and click on the <em>SYNC "
-#~ "ORDERS</em> button.</li>\n"
-#~ "                </ol>\n"
-#~ "            </p>\n"
-#~ "            <p>If the problem persists, contact <a href=\"https://"
-#~ "www.odoo.com/help/\">Odoo support</a>.</p>\n"
-#~ "        </div>\n"
-#~ "        "
-#~ msgstr ""
-#~ "<div>\n"
-#~ "            <p>مزامنة طلب أمازون مع المرجع <t t-"
-#~ "out=\"ctx.get('amazon_order_ref') or ''\">REF</t> واجهت خطأ وتعذر إكمالها."
-#~ "</p>\n"
-#~ "            <p>إلا إذا تم إلغاء الطلب في SellerCentral، لن يتم إجراء أي "
-#~ "محاولة مزامنة أخرى.</p>\n"
-#~ "            <p>لجدولة محاولة مزامنة أخرى، قم باتباع الخطوات التالية:\n"
-#~ "                <ol>\n"
-#~ "                    <li>قم بإدخال أدوات المطور.</li>\n"
-#~ "                    <li>افتح الاستمارة من حساب أمازون الذي تم الطلب منه.</"
-#~ "li>\n"
-#~ "                    <li>انتقل إلى علامة تبويب متابعة الطلب.</li>\n"
-#~ "                    <li>قم بتعيين تاريخ لـ <em>آخر مزامنة للطلبات</em> "
-#~ "التي تسبق تاريخ آخر تحديث لحالة الطلب.</li>\n"
-#~ "                    <li>قم بحفظ التغييرات ثم اضغط على زر <em>مزامنة "
-#~ "الطلبات</em>.</li>\n"
-#~ "                </ol>\n"
-#~ "            </p>\n"
-#~ "            <p>إذا استمرت المشكلة، تواصل مع <a href=\"https://"
-#~ "www.odoo.com/help/\">فريق دعم أودو</a>.</p>\n"
-#~ "        </div>\n"
-#~ "        "
-
-#~ msgid "AWS Access Key"
-#~ msgstr "مفتاح الوصول إلى خدمات أمازون ويب "
-
-#~ msgid "AWS Secret Key"
-#~ msgstr "المفتاح السري لخدمات أمازون ويب "
-
-#~ msgid "AWS Session Token"
-#~ msgstr "رمز جلسة خدمات أمازون ويب "
-
-#~ msgid ""
-#~ "After validation of the credentials, the marketplaces\n"
-#~ "                                                to which this account has "
-#~ "access will be\n"
-#~ "                                                synchronized and "
-#~ "automatically made available."
-#~ msgstr ""
-#~ "بعد تصديق بيانات الاعتماد، سوف تكون الأسواق\n"
-#~ "                                                التي بوسع هذا الحساب "
-#~ "الوصول إليها\n"
-#~ "                                                متزامنة ومتاحة تلقائياً. "
-
-#~ msgid "Amazon Email"
-#~ msgstr "البريد الإلكتروني لأمازون "
-
-#~ msgid "Error code: %s; description: %s"
-#~ msgstr "رمز الخطأ: %s؛ الوصف: %s "
-
-#~ msgid ""
-#~ "If this account gained access to new "
-#~ "marketplaces,                                         synchronize and add "
-#~ "them to the current sync marketplaces"
-#~ msgstr ""
-#~ "إذا حصل هذا الحساب على صلاحية الوصول إلى أسواق "
-#~ "جديدة،                                         قم بمزامنتها وإضافتها إلى "
-#~ "الأسواق الحالية المتزامنة "
-
-#~ msgid "Inactive"
-#~ msgstr "غير نشط"
-
-#~ msgid "Is Follow Up Displayed"
-#~ msgstr "المتابَعة معروضة "
-
-#~ msgid "Link with Amazon"
-#~ msgstr "الربط مع أمازون"
-
-#~ msgid ""
-#~ "Link your Amazon account with Odoo to start synchronizing your\n"
-#~ "                                Amazon orders."
-#~ msgstr ""
-#~ "اربط حساب أمازون الخاص بك مع أودو لبدء مزامنة\n"
-#~ "                                طلبات أمازون الخاصة بك. "
-
-#~ msgid "Order Follow-up"
-#~ msgstr "متابعة الطلب "
-
-#~ msgid "SKU"
-#~ msgstr "وحدة إدارة المخزون "
-
-#~ msgid "SKU must be unique for a given account and marketplace."
-#~ msgstr "يجب أن تكون وحدة إدارة المخزون فريدة لكل حساب وسوق. "
-
-#~ msgid ""
-#~ "Select the marketplace on which your seller account\n"
-#~ "                                                was originally created."
-#~ msgstr ""
-#~ "قم بتحديد السوق الذي تم إنشاء حساب البائع \n"
-#~ "                                                فيه بدايةً. "
-
-#~ msgid "Sign-up Marketplace"
-#~ msgstr "التسجيل في السوق "
-
-#~ msgid "Stock Location"
-#~ msgstr "موقع المخزون "
-
-#~ msgid "Sync Marketplaces"
-#~ msgstr "مزامنة الأسواق "
-
-#~ msgid ""
-#~ "The communication with the API failed.\n"
-#~ "Error code: %s; description: %s"
-#~ msgstr ""
-#~ "فشل الاتصال مع الواجهة البرمجية للتطبيق. \n"
-#~ "رمز الخطأ: %s؛ الوصف: %s "
-
-#~ msgid "The encrypted email of the customer. Does not forward mails."
-#~ msgstr ""
-#~ "البريد الإلكتروني المشفر للعميل. لا يقوم بإعادة توجيه رسائل ابريد "
-#~ "الإلكتروني. "
-
-#~ msgid "The moment at which the AWS credentials become invalid."
-#~ msgstr "اللحظة التي تصبح فيها بيانات اعتماد خدمات أمازون ويب غير صالحة. "
-
-#~ msgid ""
-#~ "The order has been canceled by the Amazon customer while someproducts "
-#~ "have already been delivered. Please create a return for this order to "
-#~ "adjust the stock."
-#~ msgstr ""
-#~ "لقد تم إلغاء هذا الطلب بواسطة عميل أمازون وقد تم توصيل بعض المنتجات "
-#~ "بالفعل. يرجى إنشاء طلب إرجاع لهذا الطلب لتعديل المخزون. "
-
-#~ msgid ""
-#~ "The original sign-up marketplace of this account. Used for authentication "
-#~ "only."
-#~ msgstr "تسجيل السوق الأصلي لهذا الحساب. يُستخدم للمصادقة فقط. "
-
-#~ msgid "The short-lived key used to identify the assumed ARN role on AWS."
-#~ msgstr ""
-#~ "المفتاح قصير الأمد المُستخدَم لتعريف دور رقم المرجع البديل المفترض في خدمات "
-#~ "أمازون ويب. "
-
-#~ msgid ""
-#~ "The short-lived key used to verify the access to the assumed ARN role on "
-#~ "AWS."
-#~ msgstr ""
-#~ "المفتاح قصير الأمد المُستخدَم لتأكيد الوصول إلى دور رقم المرجع البديل "
-#~ "المفترض في خدمات أمازون ويب. "
-
-#~ msgid ""
-#~ "The short-lived token used to query the SP-API with the assumed ARN role "
-#~ "on AWS."
-#~ msgstr ""
-#~ "المفتاح قصير الأمد المُستخدَم للاستفسار عن SP-API مع دور رقم المرجع البديل "
-#~ "المفترض في خدمات أمازون ويب. "
-
-#~ msgid ""
-#~ "This action will disconnect your account with Amazon "
-#~ "and                                          cannot be undone. Are you "
-#~ "sure you want to proceed?"
-#~ msgstr ""
-#~ "سيقوم هذا الإجراء بفصل حسابك مع أمازون ولا يمكن التراجع عنه. هل أنت متأكد "
-#~ "من أنك ترغب في الاستمرار؟ "
-
-#~ msgid "Unlink account"
-#~ msgstr "إلغاء ربط الحساب"
-
-#~ msgid "Update Available Marketplaces"
-#~ msgstr "تحديث الأسواق المتاحة "
-
-#~ msgid "Your Amazon account is linked with Odoo."
-#~ msgstr "حساب أمازون الخاص بك مرتبط بأودو. "
-
-#~ msgid ""
-#~ "[%s] %s\n"
-#~ "Condition: %s - %s"
-#~ msgstr ""
-#~ "[%s] %s\n"
-#~ "الحالة: %s - %s"
-
-#~ msgid "[%s] Delivery Charges for %s"
-#~ msgstr "[%s] رسوم التوصيل لـ %s "
-
-#~ msgid "[%s] Gift Wrapping Charges for %s"
-#~ msgstr "[%s] رسوم تغليف الهدايا لـ %s "

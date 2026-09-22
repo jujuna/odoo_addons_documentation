@@ -9,18 +9,18 @@
                 <xpath expr="//div[@id='inter_companies_rules']" position='replace'>
                     <div class="content-group" name="module_account_inter_company_rules_company_id" invisible="not module_account_inter_company_rules">
                         <field name="intercompany_generate_bills_refund" class="oe_inline o_light_label"/>
-                        <label string="Create Vendor Bills" for="intercompany_generate_bills_refund" class="oe_inline o_light_label ps-1"/>
-                    </div>
-                    <div class="content-group" name="module_inter_company_rules_set_so_po"
-                            invisible="not module_account_inter_company_rules">
-                        <div class="d-flex flex-wrap">
-                            <label for="intercompany_user_id" class="o_light_label flex-shrink-0 me-2"/>
-                            <field name="intercompany_user_id" options="{'no_create_edit': True}" class="me-2"/>
-                            <label for="intercompany_document_state" class="o_light_label me-2"/>
-                            <field name="intercompany_document_state" string="as" widget="radio" class="w-auto"/>
+                        <label string="Create Vendor Bills" for="intercompany_generate_bills_refund" class="oe_inline o_light_label ps-1 me-0"/>
+                        <div class="oi" data-icon="help" title="If another company confirms an invoice with this company, a bill will be created in the chosen Purchase journal."/>
+                        <div>
+                            <label for="intercompany_purchase_journal_id" class="col-5 col-lg-5 o_light_label mb-2" invisible="not intercompany_generate_bills_refund" string="in Journal"/>
+                            <field name="intercompany_purchase_journal_id" options="{'no_create_edit': True}" invisible="not intercompany_generate_bills_refund" required="intercompany_generate_bills_refund"/>
                         </div>
-                        <label for="intercompany_purchase_journal_id" class="col-5 col-lg-5 o_light_label" invisible="not intercompany_generate_bills_refund"/>
-                        <field name="intercompany_purchase_journal_id" options="{'no_create_edit': True}" invisible="not intercompany_generate_bills_refund" required="intercompany_generate_bills_refund"/>
+                    </div>
+                    <div class="content-group mt-2" name="module_inter_company_rules_set_so_po" invisible="not module_account_inter_company_rules">
+                        <div class="row mt8">
+                            <label for="intercompany_document_state" string="Create as" class="o_light_label col-3 me-2"/>
+                            <field name="intercompany_document_state" widget="radio" class="w-auto"/>
+                        </div>
                     </div>
                 </xpath>
             </field>

@@ -1,6 +1,6 @@
 import { _t } from "@web/core/l10n/translation";
 import { WarningDialog } from "@web/core/errors/error_dialogs";
-import { AccountReport } from "@account_reports/components/account_report/account_report";
+import { AccountReportController } from "@account_reports/components/account_report/controller";
 import { AccountReportFilters } from "@account_reports/components/account_report/filters/filters";
 
 export class AgedPartnerBalanceFilters extends AccountReportFilters {
@@ -27,7 +27,7 @@ export class AgedPartnerBalanceFilters extends AccountReportFilters {
             ...super.filterExtraOptionsData,
             'show_currency': {
                 'name': _t("Show Currency"),
-                'show': this.controller.cachedFilterOptions.multi_currency,
+                'show': this.controller.cachedFilterOptions().multi_currency,
             },
             'show_account': {
                 'name': _t("Show Account"),
@@ -36,4 +36,4 @@ export class AgedPartnerBalanceFilters extends AccountReportFilters {
     }
 }
 
-AccountReport.registerCustomComponent(AgedPartnerBalanceFilters);
+AccountReportController.registerCustomComponent(AgedPartnerBalanceFilters);

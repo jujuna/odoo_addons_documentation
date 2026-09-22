@@ -14,10 +14,10 @@ class PlanningSlot(models.Model):
         compute_sudo=True, readonly=True, export_string_translation=False)
 
     @api.depends_context('lang')
-    @api.depends('start_datetime', 'end_datetime', 'employee_id')
+    @api.depends('start_datetime', 'end_datetime', 'employee_ids')
     def _compute_leave_warning(self):
 
-        assigned_slots = self.filtered(lambda s: s.employee_id and s.start_datetime)
+        assigned_slots = self.filtered(lambda s: s.employee_ids and s.start_datetime and s.state != '4_completed')
         (self - assigned_slots).leave_warning = False
         (self - assigned_slots).is_absent = False
 
@@ -29,21 +29,24 @@ class PlanningSlot(models.Model):
         leaves = self.env['hr.leave']._get_leave_interval(
             date_from=date_from,
             date_to=max(assigned_slots.mapped('end_datetime')),
-            employee_ids=assigned_slots.mapped('employee_id')
+            employee_ids=assigned_slots.mapped('employee_ids')
         )
 
         for slot in assigned_slots:
-            warning = False
-            slot_leaves = leaves.get(slot.employee_id.id)
-            if slot_leaves:
-                warning = self.env['hr.leave']._get_leave_warning(
-                    leaves=slot_leaves,
-                    employee=slot.employee_id,
-                    date_from=slot.start_datetime,
-                    date_to=slot.end_datetime
-                )
-            slot.leave_warning = warning
-            slot.is_absent = bool(warning)
+            warnings = []
+            for employee in slot.employee_ids:
+                slot_leaves = leaves.get(employee.id)
+                if slot_leaves:
+                    warning = self.env['hr.leave']._get_leave_warning(
+                        leaves=slot_leaves,
+                        employee=employee,
+                        date_from=slot.start_datetime,
+                        date_to=slot.end_datetime
+                    )
+                    if warning:
+                        warnings.append(warning)
+            slot.leave_warning = '\n'.join(warnings) if warnings else False
+            slot.is_absent = bool(warnings)
 
     @api.model
     def _search_is_absent(self, operator, value):
@@ -52,8 +55,9 @@ class PlanningSlot(models.Model):
 
         today = fields.Datetime.today()
         slots = self.search([
-            ('employee_id', '!=', False),
+            ('resource_ids.resource_type', '=', 'user'),
             ('end_datetime', '>', today),  # only fetch the slots containing today in their period or shifts in the future
+            ('state', '!=', '4_completed'),
         ])
         if not slots:
             return Domain.FALSE if operator == 'in' else Domain.TRUE
@@ -63,13 +67,20 @@ class PlanningSlot(models.Model):
         mapped_leaves = self.env['hr.leave']._get_leave_interval(
             date_from=date_from,
             date_to=max(slots.mapped('end_datetime')),
-            employee_ids=slots.mapped('employee_id'),
+            employee_ids=slots.employee_ids,
         )
 
         slot_ids = []
-        for slot in slots.filtered(lambda s: s.employee_id.id in mapped_leaves):
-            leaves = mapped_leaves[slot.employee_id.id]
-            period = self.env['hr.leave']._group_leaves(leaves, slot.employee_id, slot.start_datetime, slot.end_datetime)
-            if period:
-                slot_ids.append(slot.id)
+        for slot in slots:
+            employees = slot.employee_ids
+            for employee in employees:
+                if employee.id in mapped_leaves:
+                    leaves = mapped_leaves[employee.id]
+                    period = self.env['hr.leave']._group_leaves(leaves, employee, slot.start_datetime, slot.end_datetime)
+                    if period:
+                        slot_ids.append(slot.id)
+                        break
         return [('id', operator, slot_ids)]
+
+    def _get_needs_attention_domain(self):
+        return super()._get_needs_attention_domain() | Domain('is_absent', '=', True)

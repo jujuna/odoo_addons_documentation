@@ -1,9 +1,13 @@
+import { Domain } from "@web/core/domain";
 import { user } from "@web/core/user";
 
+import "@documents/../tests/mock_server/controllers/documents";
+import "@documents/../tests/mock_server/mock_models/ir_attachment";
+import { makeDocumentRecordData } from "@documents/../tests/helpers/document_data";
 import { mailModels } from "@mail/../tests/mail_test_helpers";
 import { fields, models, serverState, webModels } from "@web/../tests/web_test_helpers";
 
-export class DocumentsDocument extends models.Model {
+export class DocumentsDocument extends models.ServerModel {
     _name = "documents.document";
     _parent_name = "folder_id";
 
@@ -31,46 +35,47 @@ export class DocumentsDocument extends models.Model {
             ["today", "Today"],
             ["planned", "Planned"],
         ],
+        readonly: true,
+        store: false,
     });
     name = fields.Char();
     thumbnail = fields.Binary();
     favorited_ids = fields.Many2many({ relation: "res.users" });
-    is_favorited = fields.Boolean({ string: "Name" });
-    is_folder = fields.Boolean(); // used for ordering
+    is_favorited = fields.Boolean({ store: false });
+    is_folder = fields.Boolean({ readonly: true, store: false }); // used for ordering
     is_multipage = fields.Boolean();
 
     user_can_move = fields.Boolean({ default: true });
     is_editable_attachment = fields.Boolean();
-    mimetype = fields.Char();
-    partner_id = fields.Many2one({ string: "Related partner", relation: "res.partner" });
+    mimetype = fields.Char({ readonly: true, store: false });
+    partner_id = fields.Many2one({ relation: "res.partner" });
     owner_id = fields.Many2one({ relation: "res.users" });
-    previous_attachment_ids = fields.Many2many({ string: "History", relation: "ir.attachment" });
+    previous_attachment_ids = fields.Many2many({ relation: "ir.attachment" });
     tag_ids = fields.Many2many({ relation: "documents.tag" });
     folder_id = fields.Many2one({ relation: "documents.document" });
-    user_folder_id = fields.Char({ string: "Parent" });
-    res_model = fields.Char({ string: "Model (technical)" });
+    user_folder_id = fields.Char({ readonly: true, store: false });
+    res_model = fields.Char();
     attachment_id = fields.Many2one({ relation: "ir.attachment" });
     company_id = fields.Many2one({ relation: "res.company" });
     active = fields.Boolean({ default: true });
     activity_ids = fields.One2many({ relation: "mail.activity" });
-    my_activity_date_deadline = fields.Date();
-    checksum = fields.Char();
+    my_activity_date_deadline = fields.Date({ readonly: true, store: false });
+    checksum = fields.Char({ readonly: true, store: false });
     file_extension = fields.Char();
     thumbnail_status = fields.Selection({
         selection: [
             ["present", "Present"],
             ["error", "Error"],
-            ["client_generated", "Client_Generated"],
-            ["restricted", "Inaccessible"],
+            ["client_generated", "Client Generated"],
         ],
     });
     lock_uid = fields.Many2one({ relation: "res.users" });
-    message_attachment_count = fields.Integer();
+    message_attachment_count = fields.Integer({ readonly: true, store: false });
     message_follower_ids = fields.One2many({ relation: "mail.followers" });
     message_ids = fields.One2many({ relation: "mail.message" });
-    res_id = fields.Integer({ string: "Resource ID" });
-    res_name = fields.Char({ string: "Resource Name" });
-    res_model_name = fields.Char({ string: "Resource Model Name" });
+    res_id = fields.Many2oneReference({ model_field: "res_model" });
+    res_name = fields.Char({ readonly: true, store: false });
+    res_model_name = fields.Char({ readonly: true, store: false });
     type = fields.Selection({
         selection: [
             ["binary", "File"],
@@ -81,10 +86,10 @@ export class DocumentsDocument extends models.Model {
     });
     shortcut_document_id = fields.Many2one({ relation: "documents.document" });
     url = fields.Char();
-    url_preview_image = fields.Char({ string: "URL preview image" });
-    file_size = fields.Integer();
-    raw = fields.Char();
-    access_token = fields.Char();
+    url_preview_image = fields.Char();
+    file_size = fields.Integer({ readonly: true });
+    raw = fields.Binary({ store: false });
+    access_token = fields.Char({ readonly: true, store: false });
     user_permission = fields.Selection({
         selection: [
             ["edit", "Editor"],
@@ -93,20 +98,21 @@ export class DocumentsDocument extends models.Model {
         ],
         default: "edit",
     });
+    is_protected = fields.Boolean({ readonly: true, store: false });
     available_embedded_actions_ids = fields.Many2many({
-        string: "Available Actions",
         relation: "ir.embedded.actions",
+        readonly: true,
+        store: false,
     });
     alias_id = fields.Many2one({ relation: "mail.alias" });
-    alias_domain_id = fields.Many2one({ relation: "mail.alias.domain" });
-    alias_name = fields.Char();
+    alias_domain_id = fields.Many2one({ relation: "mail.alias.domain", store: false });
+    alias_name = fields.Char({ store: false });
     alias_tag_ids = fields.Many2many({ relation: "documents.tag" });
-    mail_alias_domain_count = fields.Integer();
+    mail_alias_domain_count = fields.Integer({ readonly: true, store: false });
     create_activity_type_id = fields.Many2one({ relation: "mail.activity.type" });
     create_activity_user_id = fields.Many2one({ relation: "res.users" });
-    description = fields.Char({ string: "Attachment description" });
+    description = fields.Text({ store: false });
     last_access_date_group = fields.Selection({
-        string: "Last Accessed On",
         selection: [
             ["0_older", "Older"],
             ["1_month", "This Month"],
@@ -115,7 +121,9 @@ export class DocumentsDocument extends models.Model {
         ],
         default: "3_day",
     });
-    activity_user_id = fields.Many2one({ relation: "res.users" });
+    activity_user_id = fields.Many2one({ relation: "res.users", readonly: true, store: false });
+    // added here for convenience, do not use in views if the field does not exist (as in "base" `documents`)
+    has_embedded_pdf = fields.Boolean({ string: "Has Embedded PDF" });
 
     get_deletion_delay() {
         return 30;
@@ -145,11 +153,13 @@ export class DocumentsDocument extends models.Model {
     }
 
     /**
-     * Override to implement _search_user_folder_id search method
+     * Override to implement _search_user_folder_id search method, and to hide
+     * the documents the user has no access to (as the record rules do).
      */
     web_search_read() {
-        const domain = arguments[0].domain;
-        if (domain?.length > 0) {
+        const kwargs = arguments[0];
+        const domain = kwargs?.domain;
+        if (domain) {
             const folderLeafIdx = domain.findIndex((leaf) => leaf[0] === "user_folder_id");
             if (folderLeafIdx !== -1) {
                 domain.splice(folderLeafIdx, 1, [
@@ -158,6 +168,10 @@ export class DocumentsDocument extends models.Model {
                     domain[folderLeafIdx][2].toString(),
                 ]);
             }
+            // maybe redundant but should never be incorrect
+            kwargs.domain = Domain.and([domain, [["user_permission", "!=", "none"]]]).toList();
+        } else {
+            kwargs.domain = [["user_permission", "!=", "none"]];
         }
         return super.web_search_read(...arguments);
     }
@@ -169,12 +183,16 @@ export class DocumentsDocument extends models.Model {
 
     /**
      * @override to avoid super() not working for us.
+     * Folders the user has no access to are not returned, as on the server.
      */
     async search_panel_select_range(fieldName) {
         const result = { parent_field: "user_folder_id" };
         result.values = await this._get_search_panel_specials();
         for (const record of this.search_read(
-            [["type", "=", "folder"]],
+            [
+                ["type", "=", "folder"],
+                ["user_permission", "!=", "none"],
+            ],
             [
                 "access_internal",
                 "access_via_link",
@@ -276,6 +294,14 @@ export class DocumentsDocument extends models.Model {
     get_documents_actions(folder_id) {
         return [];
     }
+
+    _store_document_fields(res) {
+        res.attr("name");
+        res.attr("user_can_move");
+        res.attr("user_folder_id");
+        res.one("folder_id", ["display_name"]);
+        res.one("attachment_id", []);
+    }
 }
 
 export class DocumentsOperation extends models.Model {
@@ -317,12 +343,11 @@ export class DocumentsOperation extends models.Model {
     }
 }
 
-export class DocumentsTag extends models.Model {
+export class DocumentsTag extends models.ServerModel {
     _name = "documents.tag";
 
-    name = fields.Char({ string: "Tag Name" });
     color = fields.Integer({ default: 1 });
-    sequence = fields.Integer();
+    sequence = fields.Integer({ default: 10 });
 }
 
 export class DocumentsSharing extends models.Model {
@@ -339,62 +364,6 @@ export class DocumentsSharing extends models.Model {
             ["mixed", "Mixed rights"],
         ],
     });
-}
-
-export class IrEmbeddedActions extends models.Model {
-    _name = "ir.embedded.actions";
-
-    name = fields.Char({ string: "Action Name" });
-}
-
-export class MailAlias extends models.Model {
-    _name = "mail.alias";
-
-    alias_name = fields.Char({ string: "Alias Name" });
-}
-
-export class MailAliasDomain extends models.Model {
-    _name = "mail.alias.domain";
-
-    name = fields.Char({ string: "Alias Domain Name" });
-}
-
-/**
- * @param {Number} id
- * @param {String} name
- * @param {object?} data
- * @return {{}}
- */
-export function makeDocumentRecordData(id, name, data = {}) {
-    const strippedName = name.replace(/\s/g, "");
-    const defaultValues = {
-        available_embedded_actions_ids: [],
-        folder_id: false,
-        company_id: false,
-        owner_id: false,
-        partner_id: false,
-        type: "binary",
-    };
-    const documentType = data.type || defaultValues.type;
-    const user_folder_id =
-        data.user_folder_id ||
-        (data.folder_id
-            ? data.folder_id.toString()
-            : data.owner_id
-            ? data.owner_id === serverState.userId
-                ? "MY"
-                : "SHARED"
-            : "COMPANY");
-    return {
-        ...defaultValues,
-        id,
-        access_token: `accessToken${strippedName}`,
-        is_folder: documentType === "folder",
-        name,
-        type: documentType,
-        user_folder_id,
-        ...data,
-    };
 }
 
 /**
@@ -430,6 +399,7 @@ export function getDocumentsTestServerModelsData(additionalRecords = []) {
         "mail.alias": [
             {
                 id: 1,
+                alias_domain_id: 1,
                 alias_name: "alias",
             },
         ],
@@ -451,9 +421,6 @@ export function getDocumentsTestServerModelsData(additionalRecords = []) {
 
 export const DocumentsModels = {
     ...mailModels,
-    IrEmbeddedActions,
-    MailAlias,
-    MailAliasDomain,
     ResCompany: webModels.ResCompany,
     DocumentsDocument,
     DocumentsOperation,
@@ -468,3 +435,5 @@ export function getDocumentsModel(modelName) {
 export const mimetypeExamplesBase64 = {
     WEBP: "UklGRjoAAABXRUJQVlA4IC4AAAAwAQCdASoBAAEAAUAmJaAAA3AA/u/uY//8s//2W/7LeM///5Bj/dl/pJxGAAAA",
 };
+
+export { makeDocumentRecordData };

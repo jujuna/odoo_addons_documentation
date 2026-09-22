@@ -1,8 +1,8 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { click } from "@odoo/hoot-dom";
 import {
+    assignDialogTestEnv,
     contains,
-    makeDialogMockEnv,
     mockService,
     mountWithCleanup,
     onRpc,
@@ -13,7 +13,7 @@ import { PublicSignerDialog } from "@sign/dialogs/dialogs";
 import { fakeSignInfoService } from "./dialog_utils";
 
 const mountPublicSignerDialog = async (additionalProps = {}) => {
-    await makeDialogMockEnv();
+    assignDialogTestEnv();
     await mountWithCleanup(PublicSignerDialog, {
         props: {
             name: fakeName,

@@ -50,11 +50,11 @@ class WebStudioController(http.Controller):
 
         return action
 
-    def _get_studio_action_acl(self, model, **kwargs):
+    def _get_studio_action_access(self, model, **kwargs):
         return {
-            'name': _('Access Control Lists'),
+            'name': _('Access Records'),
             'type': 'ir.actions.act_window',
-            'res_model': 'ir.model.access',
+            'res_model': 'ir.access',
             'views': [[False, 'list'], [False, 'form']],
             'target': 'current',
             'domain': [],
@@ -63,7 +63,7 @@ class WebStudioController(http.Controller):
                 'search_default_model_id': model.id,
             },
             'help': _("""<p class="o_view_nocontent_smiling_face">
-                Add a new access control list
+                Add a new access record
             </p>
             """),
         }
@@ -297,7 +297,7 @@ class WebStudioController(http.Controller):
             icon_id = request.env['ir.attachment'].browse(icon)
             if not icon_id:
                 raise UserError(_('The icon is not linked to an attachment'))
-            return {'web_icon_data': icon_id.datas}
+            return {'web_icon_data': icon_id.raw.to_base64()}
         elif isinstance(icon, list) and len(icon) == 3:
             return {'web_icon': ','.join(icon)}
         else:
@@ -309,7 +309,7 @@ class WebStudioController(http.Controller):
             request.update_context(**context)
         attachment = request.env['ir.attachment'].browse(attachment_id)
         if attachment:
-            request.env.company.background_image = attachment.datas
+            request.env.company.background_image = attachment.raw
 
     @http.route('/web_studio/reset_background_image', type='jsonrpc', auth='user')
     def reset_background_image(self, context=None):
@@ -531,7 +531,7 @@ class WebStudioController(http.Controller):
             context_cleaned = clean_context(context)
             request.update_context(**context_cleaned)
         IrModelFields = request.env['ir.model.fields']
-        view = request.env['ir.ui.view'].browse(view_id)
+        view = request.env['ir.ui.view'].browse(view_id)._get_closest_primary_view()
         operations = operations or []
         for op in operations:
             if op['type'] not in OPERATIONS_WHITELIST:
@@ -675,29 +675,44 @@ class WebStudioController(http.Controller):
 
         operations = _operations
         for op in operations:
+            model_name = model
             # create a new field if it does not exist
             if 'node' in op:
                 if op['node'].get('tag') == 'field' and op['node'].get('field_description'):
-                    is_special_lines = op['node']['field_description'].get('special') == 'lines'
-                    if not is_special_lines:
-                        model = op['node']['field_description']['model_name']
+                    special = op['node']['field_description'].get('special')
+                    model_name = op['node']['field_description'].get("model_name") or model_name
+                    is_special_lines = special == 'lines'
                     # Check if field exists before creation
                     field = IrModelFields.search([
                         ('name', '=', op['node']['field_description']['name']),
-                        ('model', '=', model),
+                        ('model', '=', model_name),
                     ], limit=1)
 
                     if not field:
                         if is_special_lines:
-                            field = request.env['ir.model']._get(model)._setup_one2many_lines(
+                            field = request.env['ir.model']._get(model_name)._setup_one2many_lines(
                                 op['node']['field_description']['name'])
-                        else:
-                            field = self.create_new_field(op['node']['field_description'])
+                        elif relation_model := op['node']['field_description'].get("relation_id"):
+                            if not isinstance(relation_model, int):
+                                field_type = op['node']['field_description']["type"]
+                                new_model = request.env["ir.model"]._quick_create_model(
+                                    model_values=relation_model,
+                                    parent_field_type=field_type
+                                )
+                                if field_type == "many2one":
+                                    op['node']['field_description']["group_expand"] = op['node']['field_description'].get("group_expand", True)
+                                op['node']['field_description']["relation_id"] = new_model.id
+                        field = field or self.create_new_field(op['node']['field_description'])
+
                     op['node']['attrs']['name'] = field.name
                     if field.ttype == "many2one" and op["type"] == "add":
                         create_name_field = request.env.registry[field.relation]._rec_name
+
+                        # Parse all the options
+                        options = literal_eval(op['node']['attrs'].get('options', '{}'))
                         if create_name_field and create_name_field != "name":
-                            op['node']['attrs']['options'] = "{'create_name_field': '%s'}" % create_name_field
+                            options['create_name_field'] = create_name_field
+                            op['node']['attrs']['options'] = str(options)
 
                 if op['node'].get('tag') == 'filter' and op['node']['attrs'].get('create_group'):
                     op['node']['attrs'].pop('create_group')
@@ -823,8 +838,8 @@ class WebStudioController(http.Controller):
             selection_values = [False] + [x[0] for x in literal_eval(values['selection'])]
             records = request.env[model_name].search([(field_name, 'not in', selection_values)])
             if records and not force_edit:
-                message = _("""There are %s records using selection values not listed in those you are trying to save.
-Are you sure you want to remove the selection values of those records?""", len(records))
+                message = _("""There are %s records that use the values you are trying to remove.
+Are you sure you want to get rid of them?""", len(records))
                 return {'records_linked': len(records), 'message': message}
             records.write({field_name: False})
 
@@ -1511,14 +1526,24 @@ Are you sure you want to remove the selection values of those records?""", len(r
                 'alias_name': alias_name,
             })
 
-    @http.route('/web_studio/get_default_value', type='jsonrpc', auth='user')
-    def get_default_value(self, model_name, field_name, company_id=False):
-        """ Return the default value associated to the given field. """
+    @http.route('/web_studio/get_field_infos', type='jsonrpc', auth='user')
+    def get_field_infos(self, model_name, field_name, company_id=False):
+        """Return default value AND tracking info for a field."""
+        # ---- Default Value ----
         context = {}
         if company_id:
             context["allowed_company_ids"] = [company_id]
+        default_value = self.env['ir.default'].with_context(context)._get(model_name, field_name, company_id=True)
+
+        # ---- Tracking ----
+        field = self.env[model_name]._fields.get(field_name)
+        tracking = False
+        if field and hasattr(field, "tracking"):
+            tracking = bool(field.tracking)
+
         return {
-            'default_value': request.env['ir.default'].with_context(context)._get(model_name, field_name, company_id=True)
+            "default_value": default_value,
+            "tracking": tracking,
         }
 
     @http.route('/web_studio/set_default_value', type='jsonrpc', auth='user')
@@ -1528,6 +1553,11 @@ Are you sure you want to remove the selection values of those records?""", len(r
         if company_id:
             context["allowed_company_ids"] = [company_id]
         request.env['ir.default'].with_context(context).set(model_name, field_name, value, company_id=True)
+
+    @http.route('/web_studio/set_field_tracking', type='jsonrpc', auth='user')
+    def set_field_tracking(self, model_name, field_name, tracking_value):
+        """Set or unset tracking for the given field."""
+        return self.env['ir.model.fields']._get(model_name, field_name).with_context(studio=True).write({'tracking': tracking_value})
 
     @http.route('/web_studio/set_currency', type='jsonrpc', auth='user')
     def set_currency(self, model_name, field_name, value):

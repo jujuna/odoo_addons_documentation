@@ -3,17 +3,22 @@ import {
     getEmbeddedProps,
     useEditableDescendants,
 } from "@html_editor/others/embedded_component_utils";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
+
+export const readonlyFoldableSectionProps = {
+    showContent: t.boolean().optional(),
+};
 
 export class ReadonlyFoldableSection extends Component {
     static template = "knowledge.ReadonlyEmbeddedFoldableSection";
-    static props = {
-        host: { type: Object },
-        showContent: { type: Boolean, optional: true },
-    };
+
+    props = useProps(readonlyFoldableSectionProps);
+
     setup() {
-        this.editableDescendants = useEditableDescendants(this.props.host);
-        this.state = useState({
+        const { descendants, refs } = useEditableDescendants();
+        this.editableDescendants = descendants;
+        this.descendantRefs = refs;
+        this.state = proxy({
             showContent: this.props.showContent,
         });
     }

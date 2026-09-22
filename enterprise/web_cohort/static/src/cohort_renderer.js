@@ -2,7 +2,7 @@ import { _t } from "@web/core/l10n/translation";
 import { formatPercentage } from "@web/views/fields/formatters";
 import { registry } from "@web/core/registry";
 
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { ViewScaleSelector } from "@web/views/view_components/view_scale_selector";
@@ -14,14 +14,14 @@ const formatters = registry.category("formatters");
 export class CohortRenderer extends Component {
     static components = { Dropdown, DropdownItem, ViewScaleSelector, ReportViewMeasures };
     static template = "web_cohort.CohortRenderer";
-    static props = ["class", "model", "onRowClicked"];
+    props = useProps({
+        class: t.any(),
+        model: t.any(),
+        onRowClicked: t.any(),
+    });
 
     setup() {
         this.model = this.props.model;
-    }
-
-    range(n) {
-        return Array.from({ length: n }, (_, i) => i);
     }
 
     getFormattedValue(value) {

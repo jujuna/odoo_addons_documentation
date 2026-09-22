@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Bulgaria - Accounting Reports Ledger',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Module for ledger reports
@@ -16,6 +15,5 @@ Module for ledger reports
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',
-    'installable': True,
     'license': 'OEEL-1',
 }

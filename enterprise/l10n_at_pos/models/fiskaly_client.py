@@ -3,7 +3,7 @@ import logging
 import uuid
 from odoo import _
 from contextlib import contextmanager
-from odoo.addons.iap import jsonrpc
+from odoo.addons.iap.tools import iap_tools
 from odoo.exceptions import ValidationError
 from ...pos_enterprise.models.data_validator import object_of, list_of
 
@@ -90,7 +90,7 @@ class FiskalyClient:
         })
         retry = requests.adapters.HTTPAdapter(max_retries=requests.adapters.Retry(
             total=3,
-            status_forcelist=[400, 403, 404],  # Exclude 401 as we handle it specially
+            status_forcelist=range(500, 600),  # Retry on all server errors per Fiskaly docs
         ))
         session.mount('https://', retry)
 
@@ -115,8 +115,8 @@ class FiskalyClient:
                 resp.raise_for_status()
                 _logger.info('Successfully responded %s %s', method, url)
                 return resp.json()
-            except requests.exceptions.RequestException:
-                raise ValidationError(_("Fiskaly API request failed, %s", resp.text))
+            except requests.exceptions.RequestException as error:
+                raise ValidationError(_("Fiskaly API request failed, %s", error))
         with session:
             yield request
 
@@ -131,10 +131,10 @@ class FiskalyClient:
             access_token = resp.json().get('access_token')
             # Update the company record with the new token
             if self.company:
-                self.company.l10n_at_fiskaly_access_token = access_token
+                self.company.sudo().l10n_at_fiskaly_access_token = access_token
             return access_token
-        except requests.exceptions.RequestException:
-            raise ValidationError(_("Fiskaly authentication failed: %s", resp.text))
+        except requests.exceptions.RequestException as error:
+            raise ValidationError(_("Fiskaly authentication failed: %s", error))
 
     def fon_auth(self, bearer_token, data):
         _is_valid, error = fon_schema(data)
@@ -147,8 +147,12 @@ class FiskalyClient:
         _is_valid, error = scu_schema(data)
         if error:
             raise ValidationError(_("Fiskaly schema validation error, %s", error))
-        scuid = str(uuid.uuid4())
         with self._make_session(bearer_token) as req:
+            # Reuse existing active SCU if limit is already reached
+            existing = req("GET", endpoint='signature-creation-unit', params={"states[]": ["INITIALIZED", "OUTAGE"]})
+            if existing.get('data'):
+                return existing['data'][0]['_id']
+            scuid = str(uuid.uuid4())
             req("PUT", endpoint=f'signature-creation-unit/{scuid}', data=data)
             req("PATCH", endpoint=f'signature-creation-unit/{scuid}', data={"state": "INITIALIZED"})
         return scuid
@@ -180,6 +184,7 @@ class FiskalyClient:
         params = {
             "receipt_types[]": receipt_type,
             "offset": offset,
+            "order": "DESC",
             "limit": 1
         }
 
@@ -203,4 +208,4 @@ def fiskaly_iap_rpc(record, endpoint, params):
         raise ValidationError(_("Fiskaly schema validation error, %s", error))
     iap_url = L10N_AT_FISKALY_URL_LIVE if not record.l10n_at_pos_test_mode else L10N_AT_FISKALY_URL_TEST
     base_url = iap_url + str(IAP_VERSION)
-    return jsonrpc(base_url + endpoint, params=params)
+    return iap_tools.iap_jsonrpc(base_url + endpoint, params=params, raise_user_error=True)

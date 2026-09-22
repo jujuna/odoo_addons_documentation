@@ -266,7 +266,16 @@ test("non measure fields are filtered and sorted", async () => {
             relation: "res.partner",
         }),
         dummy_binary: fields.Binary({ string: "Dummy binary", store: true, aggregator: "sum" }),
-        foo_non_stored: fields.Integer({ string: "Foo non stored", store: false }),
+        foo_non_stored: fields.Integer({
+            string: "Foo non stored",
+            store: false,
+            aggregator: undefined,
+        }),
+        aggregable_non_stored: fields.Integer({
+            string: "Probability",
+            store: false,
+            aggregator: "sum",
+        }),
     };
     Partner._rec_name = undefined;
     Partner._fields = partnerFields;
@@ -277,8 +286,15 @@ test("non measure fields are filtered and sorted", async () => {
             </pivot>`,
     });
     const { store } = makeStoreWithModel(model, PivotSidePanelStore, pivotId);
-    expect(store.measureFields.length).toBe(5);
-    const measures = ["__count", "dummy_float", "dummy_many2one", "dummy_monetary", "probability"];
+    expect(store.measureFields.length).toBe(6);
+    const measures = [
+        "__count",
+        "dummy_float",
+        "dummy_many2one",
+        "dummy_monetary",
+        "probability",
+        "aggregable_non_stored",
+    ];
     expect(store.measureFields.map((m) => m.name)).toEqual(measures);
 });
 

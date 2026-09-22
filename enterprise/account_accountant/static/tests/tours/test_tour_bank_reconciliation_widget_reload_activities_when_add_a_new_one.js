@@ -5,7 +5,6 @@ import { accountTourSteps } from "@account/js/tours/account";
 registry
     .category("web_tour.tours")
     .add("account_accountant_bank_reconciliation_widget_reload_activies_when_add_a_new_one", {
-        url: "/odoo",
         steps: () => [
             stepUtils.showAppsMenuItem(),
             ...accountTourSteps.goToAccountMenu("Open the accounting module"),
@@ -25,7 +24,7 @@ registry
             },
             {
                 content: "Open chatter",
-                trigger: "i.fa.fa-lg.fa-comments-o:not(:visible)",
+                trigger: "i.oi.oi-lg[data-icon='forum']:not(:visible)",
                 run: "click",
             },
             {
@@ -48,7 +47,7 @@ registry
             },
             {
                 content: "Activity is reloaded in the widget",
-                trigger: "div.activity-container > i.fa.fa-lg.fa-clock-o",
+                trigger: "div.activity-container > i.oi.oi-lg[data-icon='schedule']",
             },
         ],
     });

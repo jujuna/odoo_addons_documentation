@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import contextlib
 import requests
 
 from odoo import _, fields, models, tools
@@ -11,6 +12,8 @@ class SocialLivePost(models.Model):
     _inherit = 'social.live.post'
 
     youtube_video_id = fields.Char(related='post_id.youtube_video_id')
+    youtube_thumbnail_url = fields.Char(related='post_id.youtube_thumbnail_url')
+    youtube_video_url = fields.Char(related='post_id.youtube_video_url')
 
     youtube_title = fields.Char(related='post_id.youtube_title')
     youtube_description = fields.Text(related='post_id.youtube_description')
@@ -22,6 +25,12 @@ class SocialLivePost(models.Model):
 
         for post in youtube_live_posts:
             post.live_post_link = f"http://youtube.com/watch?v={post.youtube_video_id}"
+
+    def _compute_has_metrics(self):
+        super()._compute_has_metrics()
+        youtube_live_posts = self._filter_by_media_types(['youtube'])
+        youtube_live_posts.has_likes = True
+        youtube_live_posts.has_comments = True
 
     def _refresh_statistics(self):
         super()._refresh_statistics()
@@ -43,7 +52,7 @@ class SocialLivePost(models.Model):
         # 2. make one batch of requests per account to fetch youtube videos
         youtube_videos = []
         for account in youtube_accounts:
-            account._refresh_youtube_token()
+            access_token = account._get_youtube_access_token()
             video_endpoint_url = url_join(self.env['social.media']._YOUTUBE_ENDPOINT, "youtube/v3/videos")
 
             youtube_video_ids = posts_per_account[account.id].mapped('youtube_video_id')
@@ -53,7 +62,7 @@ class SocialLivePost(models.Model):
                 result = requests.get(video_endpoint_url,
                     params={
                         'id': ','.join(video_ids_batch),
-                        'access_token': account.youtube_access_token,
+                        'access_token': access_token,
                         'part': 'statistics',
                         'maxResults': YOUTUBE_BATCH_SIZE,
                     },
@@ -70,13 +79,8 @@ class SocialLivePost(models.Model):
         for video in youtube_videos:
             video_stats = video['statistics']
             existing_live_posts_by_youtube_video_id.get(video['id']).write({
-                'engagement': sum(int(video_stats.get(key, 0)) for key in [
-                    'likeCount',
-                    'viewCount',
-                    'commentCount',
-                    'dislikeCount',
-                    'favoriteCount'
-                ]),
+                'likes_count': video_stats.get('likeCount', 0),
+                'comments_count': video_stats.get('commentCount', 0),
             })
 
     def _post(self):
@@ -89,7 +93,6 @@ class SocialLivePost(models.Model):
     def _post_youtube(self):
         """ Will simply mark the already uploaded video as 'publicly available'. """
         self.ensure_one()
-        self.account_id._refresh_youtube_token()
 
         youtube_description = self.post_id.youtube_description
         if youtube_description:
@@ -103,7 +106,7 @@ class SocialLivePost(models.Model):
         video_endpoint_url = url_join(self.env['social.media']._YOUTUBE_ENDPOINT, "youtube/v3/videos")
         result = requests.put(video_endpoint_url,
             params={
-                'access_token': self.account_id.youtube_access_token,
+                'access_token': self.account_id._get_youtube_access_token(),
                 'part': 'snippet,status',
             },
             json={
@@ -127,6 +130,19 @@ class SocialLivePost(models.Model):
                 'state': 'posted',
                 'failure_reason': False
             }
+            if self.post_id.youtube_first_comment and self.post_id.youtube_video_privacy != 'private':
+                comment = self.env['mail.render.mixin'].sudo()._shorten_links_text(
+                    self.post_id.youtube_first_comment,
+                    self._get_utm_values()
+                )
+                with contextlib.suppress(Exception):
+                    self.env['social.stream.post']._youtube_comment_add(
+                        self.account_id,
+                        self.youtube_video_id,
+                        None,
+                        comment,
+                    )
+
         else:
             result_json = result.json()
             error_message = _('An error occurred.')

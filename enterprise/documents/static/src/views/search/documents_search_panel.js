@@ -1,77 +1,58 @@
+import { render } from "@web/owl2/utils";
 import { AccessRightsUpdateConfirmationDialog } from "@documents/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
-import { browser } from "@web/core/browser/browser";
 import { SearchPanel } from "@web/search/search_panel/search_panel";
 import { useNestedSortable } from "@web/core/utils/nested_sortable";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { useBus, useService } from "@web/core/utils/hooks";
-import { utils as uiUtils } from "@web/core/ui/ui_service";
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { utils as uiUtils } from "@web/core/ui/ui_utils";
+import { onWillStart, proxy } from "@odoo/owl";
+import { DocumentsSearchPanelActions } from "./documents_search_panel_actions";
 
 const DND_ALLOWED_SPECIAL_DESTINATIONS = ["COMPANY", "MY"];
-const LONG_TOUCH_THRESHOLD = 400;
 
 /**
  * This file defines the DocumentsSearchPanel component, an extension of the
  * SearchPanel to be used in the documents kanban/list views.
  */
 
-export class DocumentsSearchPanelItemSettingsPopover extends Component {
-    static template = "documents.DocumentsSearchPanelItemSettingsPopover";
-    static props = [
-        "close", // Function, close the popover
-        "createChildEnabled", // Whether we have the option to create a new child or not
-        "onCreateChild", // Function, create new child
-        "onEdit", // Function, edit element
-        "isShareable", // Whether we have the option to share
-        "onShare", // Function, share folder
-        "isEditable",
-    ];
-}
-
 export class DocumentsSearchPanel extends SearchPanel {
     static modelExtension = "DocumentsSearchPanel";
-    static template = !uiUtils.isSmall() ? "documents.SearchPanel" : "documents.SearchPanel.Small";
-    static subTemplates = !uiUtils.isSmall()
-        ? {
-              section: "web.SearchPanel.Section",
-              category: "documents.SearchPanel.Category",
-              filtersGroup: "documents.SearchPanel.FiltersGroup",
-          }
-        : {
-              section: "web.SearchPanel.Section",
-              category: "documents.SearchPanel.Category.Small",
-              filtersGroup: "documents.SearchPanel.FiltersGroup.Small",
-          };
+    static template = "documents.SearchPanel";
+    static subTemplates = {
+        section: "web.SearchPanel.Section",
+        category: "documents.SearchPanel.Category",
+        filtersGroup: "documents.SearchPanel.FiltersGroup",
+    };
     static rootIcons = {
-        false: "fa-folder-o",
-        COMPANY: "fa-building",
-        MY: "fa-hdd-o",
-        RECENT: "fa-clock-o",
-        SHARED: "fa-users",
-        TRASH: "fa-trash",
+        false: ["folder", ""],
+        COMPANY: ["business", "oi-filled"],
+        MY: ["storage", ""],
+        RECENT: ["schedule", ""],
+        SHARED: ["group", "oi-filled"],
+        TRASH: ["delete", "oi-filled"],
     };
     setup() {
         super.setup(...arguments);
         const { uploads } = useService("file_upload");
         this.documentService = useService("document.document");
         this.documentUploads = uploads;
-        useState(uploads);
+        proxy(uploads);
         this.notification = useService("notification");
         this.orm = useService("orm");
         this.action = useService("action");
-        this.popover = usePopover(DocumentsSearchPanelItemSettingsPopover, {
-            onClose: () => this.onPopoverClose?.(),
-            popoverClass: "o_search_panel_item_settings_popover",
+        this.popover = usePopover(DocumentsSearchPanelActions, {
+            onClose: () => this.anchor.remove(),
+            popoverClass: "o_search_panel_folder_actions_popover dropdown-menu o-dropdown--menu",
+            position: "bottom-start",
         });
         this.dialog = useService("dialog");
 
         onWillStart(async () => {
+            await this.env.searchModel.sectionsPromise;
             if (this.env.model.config.context.active_model) {
                 // Ensure folders in search panel are folded when users come from another app
-                const categories = await this.env.searchModel.getSections(
-                    (s) => s.type === "category"
-                );
+                const categories = this.env.searchModel.getSections((s) => s.type === "category");
                 for (const category of categories) {
                     this.state.expanded[category.id] = {};
                 }
@@ -90,7 +71,7 @@ export class DocumentsSearchPanel extends SearchPanel {
 
         useBus(this.env.searchModel, "update-search-panel", async () => {
             this.updateActiveValues();
-            this.render();
+            render(this);
         });
 
         useNestedSortable({
@@ -189,6 +170,26 @@ export class DocumentsSearchPanel extends SearchPanel {
         });
     }
 
+    openActionsPopover(ev, section, value) {
+        if (
+            typeof value.id !== "number" ||
+            uiUtils.isSmall() ||
+            this.env.searchModel.context.documents_view_secondary
+        ) {
+            return;
+        }
+        const folder = this.env.searchModel.getFolderById(value.id);
+        this.anchor = document.createElement("div");
+        if (ev.type === "contextmenu") {
+            this.anchor.style.cssText = `position:fixed;width:0;height:0;top:${ev.clientY}px;left:${ev.clientX}px;`;
+        } else {
+            const rect = (ev.currentTarget || ev.target).getBoundingClientRect();
+            this.anchor.style.cssText = `position:fixed;width:0;height:0;top:${rect.bottom}px;left:${rect.left}px;`;
+        }
+        document.body.appendChild(this.anchor);
+        this.popover.open(this.anchor, { env: this.env, folder });
+    }
+
     isUploadingInFolder(folderId) {
         return Object.values(this.documentUploads).find(
             (upload) => upload.data.get("folder_id") === folderId
@@ -228,40 +229,11 @@ export class DocumentsSearchPanel extends SearchPanel {
         }
     }
 
-    //---------------------------------------------------------------------
-    // Edition
-    //---------------------------------------------------------------------
-
-    // Support for edition on mobile
-    resetLongTouchTimer() {
-        if (this.longTouchTimer) {
-            browser.clearTimeout(this.longTouchTimer);
-            this.longTouchTimer = null;
+    onFoldKeyDown(ev, category, value) {
+        if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            this.toggleFold(category, value);
         }
-    }
-
-    onSectionValueTouchStart(ev, section, value) {
-        if (!uiUtils.isSmall() || typeof value !== "number") {
-            return;
-        }
-        this.touchStartMs = Date.now();
-        if (!this.longTouchTimer) {
-            this.longTouchTimer = browser.setTimeout(() => {
-                this.openEditPopover(ev, section, value);
-                this.resetLongTouchTimer();
-            }, LONG_TOUCH_THRESHOLD);
-        }
-    }
-
-    onSectionValueTouchEnd() {
-        const elapsedTime = Date.now() - this.touchStartMs;
-        if (elapsedTime < LONG_TOUCH_THRESHOLD) {
-            this.resetLongTouchTimer();
-        }
-    }
-
-    onSectionValueTouchMove() {
-        this.resetLongTouchTimer();
     }
 
     _expandFolder({ folderId }) {
@@ -279,7 +251,7 @@ export class DocumentsSearchPanel extends SearchPanel {
             }
         }
         if (needRefresh) {
-            this.render(true);
+            render(this, true);
         }
     }
 

@@ -1,6 +1,11 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { SendHmrcButton } from "@l10n_uk_reports/components/send_hmrc/send_hmrc";
+import { mountWithCleanup, defineModels, onRpc } from "@web/../tests/web_test_helpers";
+import { click } from "@odoo/hoot-dom";
+import { mailModels } from "@mail/../tests/mail_test_helpers";
 
+// Due to dependency with mail module, we have to define their models for our tests.
+defineModels(mailModels);
 
 describe("SendHmrcButton - retrieveClientInfo", () => {
 
@@ -10,40 +15,19 @@ describe("SendHmrcButton - retrieveClientInfo", () => {
                 data: {
                     obligation_id: {id: 1, clientData: "Test Obligation"},
                     hmrc_gov_client_device_id: "test-device-123"
-                }
+                },
+                context: {},
             }
         };
 
-        const component = new SendHmrcButton();
-        component.props = mockProps;
+        onRpc('action_submit_vat_return', () => true);
 
-        component.orm = {
-            call: (model, method, args) => {
-                expect(model).toBe('l10n_uk.vat.obligation');
-                expect(method).toBe('action_submit_vat_return');
-                expect(args[0]).toBe(1);
-                return Promise.resolve(true);
-            }
-        };
-
-        component.actionService = {
-            doAction: (action) => {
-                expect(action.type).toBe('ir.actions.act_window_close');
-            }
-        };
-
-        component.env = {
-            services: {
-                ui: {
-                    block: () => console.log("UI blocked"),
-                    unblock: () => console.log("UI unblocked")
-                }
-            }
-        };
-
+        await mountWithCleanup(SendHmrcButton, { props: mockProps });
+        
         localStorage.removeItem('hmrc_gov_client_device_id');
-
-        await component.retrieveClientInfo();
+        
+        expect('a[role="button"]').toHaveCount(1);
+        await click('a[role="button"]');
 
         localStorage.removeItem('hmrc_gov_client_device_id');
     });

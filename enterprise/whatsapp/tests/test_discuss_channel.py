@@ -3,12 +3,13 @@ import time
 from datetime import datetime, timedelta
 from freezegun import freeze_time
 from markupsafe import Markup
+from odoo.addons.mail.tools.discuss import Store
 from odoo.addons.whatsapp.tests.common import WhatsAppCommon, MockIncomingWhatsApp
+from odoo.exceptions import UserError
 from odoo.tests import tagged, users
 
 
-@tagged('wa_message', 'discuss_channel')
-class DiscussChannel(WhatsAppCommon, MockIncomingWhatsApp):
+class DiscussChannelCommon(WhatsAppCommon, MockIncomingWhatsApp):
 
     @classmethod
     def setUpClass(cls):
@@ -48,10 +49,14 @@ We're always happy to assist!""",
             "template_type": "marketing",
         })
 
+
+@tagged('wa_message', 'discuss_channel')
+@tagged('at_install', '-post_install')  # LEGACY at_install
+class DiscussChannel(DiscussChannelCommon):
+
     def test_gc_whatsapp_inactive(self):
         for test_record, delay_days, mark_read in ((self.test_channel_wa, 2, True), (self.test_channel_wa2, 6, False)):  # 2 days - 6 days
             with self.subTest(test_record=test_record), self.mockWhatsappGateway():
-                test_record.channel_pin(pinned=True)
                 member_of_operator = self.env["discuss.channel.member"].search(
                     [
                         ("channel_id", "=", test_record.id),
@@ -72,42 +77,66 @@ We're always happy to assist!""",
                 self.assertFalse(member_of_operator.is_pinned)
 
     def test_post_with_audio_attachment(self):
-        message_vals_all = (
-            {'body': '', 'attachment_ids': self.audio_attachment_wa_admin.ids},
-            {'body': 'TestBody', 'attachment_ids': self.audio_attachment_wa_admin.ids},
-            {'body': 'TestBody', 'attachment_ids': (self.image_attachment_wa_admin + self.audio_attachment_wa_admin).ids},
+        test_cases = (
+            {
+                'body': '',
+                'attachment_ids': self.audio_attachment_wa_admin.ids,
+                'expected_message_count': 1,
+                'is_body_empty': True,
+            },
+            {
+                'body': Markup('<p><br></p>'),
+                'attachment_ids': self.audio_attachment_wa_admin.ids,
+                'expected_message_count': 1,
+                'is_body_empty': True,
+            },
+            {
+                'body': 'TestBody',
+                'attachment_ids': self.audio_attachment_wa_admin.ids,
+                'expected_message_count': 2,
+                'is_body_empty': False,
+            },
+            {
+                'body': 'TestBody',
+                'attachment_ids': (self.image_attachment_wa_admin + self.audio_attachment_wa_admin).ids,
+                'expected_message_count': 2,
+                'is_body_empty': False,
+            },
         )
-        for message_vals in message_vals_all:
-            expected_body = message_vals['body']
-            expect_audio_attachment = self.audio_attachment_wa_admin.id in message_vals['attachment_ids']
-            expect_image_attachment = self.image_attachment_wa_admin.id in message_vals['attachment_ids']
+        for test_case in test_cases:
+            body = test_case['body']
+            attachment_ids = test_case['attachment_ids']
+            expected_message_count = test_case['expected_message_count']
+            is_body_empty = test_case['is_body_empty']
+            expect_audio_attachment = self.audio_attachment_wa_admin.id in attachment_ids
+            expect_image_attachment = self.image_attachment_wa_admin.id in attachment_ids
+
             with self.subTest(
-                body=expected_body, image_attachment=expect_image_attachment, audio_attachment=expect_audio_attachment
+                body=body, image_attachment=expect_image_attachment, audio_attachment=expect_audio_attachment
             ):
                 with self.mockWhatsappGateway(), self.mock_mail_app():
                     return_message = self.test_channel_wa.message_post(
                         author_id=self.test_channel_wa.whatsapp_partner_id.id,
                         message_type='whatsapp_message',
                         subtype_xmlid='mail.mt_comment',
-                        **message_vals,
+                        body=body,
+                        attachment_ids=attachment_ids,
                     )
                     self.assertEqual(len(return_message), 1, "We expect one returned message when posting.")
-                    if expected_body:
+                    if body:
                         self.assertIn(
-                            expected_body, return_message.body,
+                            body, return_message.body,
                             "Should return the message containing the body if two are created."
                         )
                 messages = self._new_msgs
-
-                expected_message_count = bool(message_vals['body']) + bool(expect_audio_attachment)
 
                 self.assertEqual(len(messages), expected_message_count)
                 self.assertEqual(len(self._wa_msg_sent), expected_message_count)
                 self.assertEqual(messages.wa_message_ids.mapped('msg_uid'), self._wa_msg_sent)
 
-                if expected_body:
+                if not is_body_empty:
                     body_message = messages[0]
-                    self.assertIn(expected_body, body_message.body)
+                    self.assertIn(body, body_message.body)
                     if expect_image_attachment:
                         self.assertEqual(len(body_message.attachment_ids), 1)
                         self.assertEqual(body_message.attachment_ids.mimetype, 'image/jpeg')
@@ -115,6 +144,8 @@ We're always happy to assist!""",
                     audio_message = messages[expected_message_count - 1]
                     self.assertEqual(len(audio_message.attachment_ids), 1)
                     self.assertEqual(audio_message.attachment_ids.mimetype, 'audio/mpeg')
+                    if is_body_empty:
+                        self.assertNotIn('caption', self._wa_msg_sent_vals[expected_message_count - 1])
 
     @users('user_wa_admin')
     def test_post_with_outbound(self):
@@ -258,3 +289,59 @@ We're always happy to assist!""",
                 },
             )
         self.assertEqual(self._new_wa_msg.mail_message_id.parent_id, msg.mail_message_id)
+
+    def test_user_can_read_whatsapp_message_state(self):
+        message = self.test_channel_wa.with_user(self.user_wa_admin).message_post(
+            message_type="whatsapp_message",
+            subtype_xmlid="mail.mt_comment",
+        )
+        self.assertNotIn(message, message.with_user(self.user_employee).wa_message_ids.sudo().mail_message_id)
+        message.wa_message_ids.invalidate_model(flush=False)
+        formatted = Store().add(message.with_user(self.user_employee), "_store_message_fields")._build_result()["mail.message"][0]
+        self.assertEqual(formatted["whatsappStatus"], "outgoing")
+
+    @users("user_wa_admin")
+    def test_whatsapp_owner_cannot_leave_channel(self):
+        channel = self.env["discuss.channel"].create({
+            "channel_type": "whatsapp",
+            "name": "Test",
+            "whatsapp_number": "911234567899",
+        })
+        with self.assertRaises(UserError) as exc:
+            channel.action_unfollow()
+        self.assertEqual(
+            exc.exception.args[0],
+            "You can't leave this channel. As you are the owner of this WhatsApp channel, you can only delete it.",
+        )
+
+
+@tagged('discuss_channel', 'wa_blocklist')
+class DiscussChannelInternals(DiscussChannelCommon):
+
+    @users('user_wa_admin')
+    def test_whatsapp_channel_blocked_compute(self):
+        test_channel_wa = self.test_channel_wa.with_env(self.env)
+        test_channel_wa2 = self.test_channel_wa2.with_env(self.env)
+        test_channel_std = self.test_channel_std.with_env(self.env)
+
+        test_channel_wa2.wa_account_id = self.whatsapp_account_2
+        with self.mockWhatsappGateway():
+            self.env['whatsapp.blocklist'].create([
+                {
+                    'number': '+911234567891',
+                    'wa_account_id': self.whatsapp_account.id,
+                }, {
+                    'number': '+911234567891',
+                    'wa_account_id': self.whatsapp_account_2.id,
+                    'active': False,
+                }
+            ])
+        (test_channel_wa | test_channel_wa2 | test_channel_std).invalidate_recordset(['whatsapp_channel_blocked'])
+
+        for channel, expected in (
+            (test_channel_wa, True),
+            (test_channel_wa2, False),
+            (test_channel_std, False),
+        ):
+            with self.subTest(channel=channel.name, expected=expected):
+                self.assertEqual(channel.whatsapp_channel_blocked, expected)

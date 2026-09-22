@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.addons.hr_work_entry_attendance.tests.common import HrWorkEntryAttendanceCommon
+from odoo.addons.hr_holidays_attendance.tests.common import HrWorkEntryAttendanceCommon
 
 from datetime import datetime, date
 
@@ -88,13 +88,12 @@ class TestPayslipAttendance(HrWorkEntryAttendanceCommon):
             'date_version': date(2024, 10, 1),
             'contract_date_start': date(2024, 10, 1),
             'contract_date_end': date(2024, 10, 31),
-            'work_entry_source': 'attendance',
+            'attendance_based': True,
             'structure_type_id': self.struct_type.id,
         })
         contract = employee.version_id
 
         payslip = self.env['hr.payslip'].create({
-            'name': 'Payslip of John',
             'employee_id': employee.id,
             'version_id': contract.id,
             'struct_id': self.struct.id,
@@ -105,3 +104,35 @@ class TestPayslipAttendance(HrWorkEntryAttendanceCommon):
         payslip.compute_sheet()
         basic_salary_line = payslip.line_ids.filtered_domain([('code', '=', 'BASIC')])
         self.assertAlmostEqual(basic_salary_line.amount, 0.0, 2, 'Basic salary = 0 worked hours * hourly wage = 0')
+
+    def test_attendance_open_single_payslip(self):
+        self.payslip.state = 'validated'
+        draft_payslip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'struct_id': self.struct.id,
+            'date_from': '2024-01-01',
+            'date_to': '2024-01-30',
+        })
+        attendance = self.env['hr.attendance'].create({
+            'employee_id': self.employee.id,
+            'check_in': datetime(2024, 1, 20, 8, 0, 0),
+            'check_out': datetime(2024, 1, 20, 16, 0, 0),
+        })
+
+        self.assertEqual(attendance.payslip_id, self.payslip)
+        self.assertNotEqual(attendance.payslip_id, draft_payslip)
+        action = attendance.action_open_payslip()
+        self.assertEqual(action['res_id'], self.payslip.id)
+        self.assertEqual(action['view_mode'], 'form')
+
+    def test_attendance_payslip_uses_timezone_date(self):
+        self.payslip.state = 'validated'
+        attendance = self.env['hr.attendance'].create({
+            'employee_id': self.employee.id,
+            'check_in': datetime(2024, 1, 30, 23, 30, 0),
+            'check_out': datetime(2024, 1, 31, 7, 30, 0),
+        })
+        self.assertEqual(attendance.payslip_id, self.payslip)
+        self.employee.tz = 'Europe/Brussels'
+        attendance.invalidate_recordset(['payslip_id'])
+        self.assertFalse(attendance.payslip_id)

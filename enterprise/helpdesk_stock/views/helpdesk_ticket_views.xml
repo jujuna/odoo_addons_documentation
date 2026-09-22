@@ -6,11 +6,11 @@
         <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
         <field name="arch" type="xml">
             <button name="action_open_helpdesk_ticket" position="before">
-                <button class="oe_stat_button" name="action_view_pickings" icon="fa-truck"
+                <button class="oe_stat_button" name="action_view_pickings" icon="local_shipping"
                     type="object" invisible="pickings_count == 0" groups="stock.group_stock_user">
                     <field name="pickings_count" string="Returns" widget="statinfo" />
                 </button>
-                <button class="oe_stat_button" name="action_view_replacements" icon="fa-truck" type="object"
+                <button class="oe_stat_button" name="action_view_replacements" icon="local_shipping" type="object"
                     invisible="replacement_count == 0 or not use_product_replacements" groups="stock.group_stock_user">
                     <field name="replacement_count" string="Deliveries" widget="statinfo" />
                 </button>
@@ -19,8 +19,6 @@
                 <field name="use_credit_notes" invisible="1"/>
                 <field name="use_product_returns" invisible="1"/>
                 <field name="use_product_repairs" invisible="1"/>
-                <field name="suitable_product_ids" invisible="1"/>
-                <field name="tracking" invisible="1"/>
             </xpath>
         </field>
     </record>
@@ -34,12 +32,12 @@
             <field name="stage_id" position="before">
                 <field name="has_partner_picking" invisible="1" groups="stock.group_stock_user"/>
                 <field name="use_product_returns" invisible="1" groups="stock.group_stock_user"/>
-                <button type="action" name="%(stock.act_stock_return_picking)d"
+                <button type="action" name="%(action_stock_return_picking)d"
                     groups="stock.group_stock_user"
                     string="Return" invisible="not use_product_returns"
                     context="{'default_ticket_id': id, 'default_company_id': company_id}" data-hotkey="q"/>
                 <button type="object" name="action_create_replacement" string="Replace"
-                    invisible="not use_product_replacements or not partner_id" data-hotkey="l"
+                    invisible="not use_product_replacements" data-hotkey="l"
                     groups="stock.group_stock_user"/>
             </field>
         </field>

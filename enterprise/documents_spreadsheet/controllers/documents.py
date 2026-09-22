@@ -2,31 +2,30 @@
 
 import re
 from urllib.parse import quote
+
 from werkzeug.exceptions import BadRequest
 
-from odoo.http import request, route, STATIC_CACHE_LONG
-from odoo.addons.documents.controllers.documents import ShareRoute
-from odoo.addons.spreadsheet.utils.json import extend_serialized_json
+from odoo.http import request, route
+from odoo.http.stream import STATIC_CACHE_LONG
 from odoo.tools import replace_exceptions
+
+from odoo.addons.documents.controllers.documents import ShareRoute
 
 # ends with .osheet.json or .osheet (6).json
 SPREADSHEET_RE = re.compile(r'\.osheet(\s?\(\d+\))?\.json$')
 
+
 class SpreadsheetShareRoute(ShareRoute):
-    def _documents_render_public_view(self, document_sudo):
+    def _documents_render_public_view(self, document_sudo, access_token, member_signup_token, member_id):
         if document_sudo.handler in ("spreadsheet", "frozen_spreadsheet"):
             return self._documents_render_portal_view(document_sudo)
 
-        return super()._documents_render_public_view(document_sudo)
+        return super()._documents_render_public_view(document_sudo, access_token, member_signup_token, member_id)
 
     def _documents_render_portal_view(self, document):
         if document.handler not in ("spreadsheet", "frozen_spreadsheet"):
             return super()._documents_render_portal_view(document)
-
-        # check if the spreadsheet contains "live data", if yes the rendering will fail
-        if document._contains_live_data():
-            return request.render("documents_spreadsheet.documents_error_live_data")
-
+        can_write = document.access_via_link == "edit" or document.sudo(False).has_access("write")
         return request.render(
             "spreadsheet.public_spreadsheet_layout",
             {
@@ -34,9 +33,14 @@ class SpreadsheetShareRoute(ShareRoute):
                 "share": document,
                 "is_frozen": document.handler == "frozen_spreadsheet",
                 "session_info": request.env["ir.http"].session_info(),
+                "spreadsheet_public_component": "spreadsheet_edition.PublicSpreadsheet",
+                "spreadsheet_icon_src": "/spreadsheet/static/description/icon.svg",
                 "props": {
-                    "dataUrl": f"/documents/spreadsheet/{quote(document.access_token, safe='')}",
-                    "downloadExcelUrl": document.excel_export and f"/documents/content/{quote(document.access_token, safe='')}",
+                    "dataUrl": f"/spreadsheet/data/{document._name}/{document.id}/{quote(document.access_token, safe='')}",
+                    "resModel": document._name,
+                    "resId": document.id,
+                    "accessToken": document.access_token,
+                    "mode": "normal" if can_write else "readonly",
                 },
             },
         )
@@ -48,27 +52,10 @@ class SpreadsheetShareRoute(ShareRoute):
         """
         if document_sudo.handler == 'frozen_spreadsheet':
             return request.env['ir.binary']._get_stream_from(document_sudo, 'excel_export')
-        elif document_sudo.handler == 'spreadsheet':
-            raise ValueError("non-frozen spreadsheets have no content")
+        if document_sudo.handler == 'spreadsheet':
+            e = "non-frozen spreadsheets have no content"
+            raise ValueError(e)
         return super()._documents_content_stream(document_sudo)
-
-    @route('/documents/spreadsheet/<access_token>', type='http', auth='public', readonly=True)
-    def documents_spreadsheet(self, access_token):
-        """Download the spreadsheet data for the readonly view."""
-        document_sudo = self._from_access_token(access_token, skip_log=True)
-        if not document_sudo:
-            raise request.not_found()
-
-        # handcraft the json response body, avoiding the need for parsing and re-serializing
-        # the spreadsheet file and the revisions, which can be expensive for large files.
-        spreadsheet_data = document_sudo._get_spreadsheet_serialized_snapshot()
-        serialized_revisions = ','.join(document_sudo._get_spreadsheet_serialized_revisions())
-        body = extend_serialized_json(spreadsheet_data, [('revisions', '[%s]' % serialized_revisions)])
-        headers = [
-            ('Content-Length', len(body)),
-            ('Content-Type', 'application/json; charset=utf-8'),
-        ]
-        return request.make_response(body, headers)
 
     def _documents_upload_create_write(self, *args, **kwargs):
         """Set the correct handler when uploading a spreadsheet"""
@@ -76,14 +63,14 @@ class SpreadsheetShareRoute(ShareRoute):
         if (document_sudo.name
             and SPREADSHEET_RE.search(document_sudo.name)
             and document_sudo.mimetype == 'application/json'
-        ):
+            ):
             document_sudo.handler = 'spreadsheet'
             document_sudo._check_spreadsheet_data()
         return document_sudo
 
     @route(['/documents/display_thumbnail/<access_token>',
             '/documents/display_thumbnail/<access_token>/<int:width>x<int:height>'],
-            type='http', auth='public', readonly=True)
+           type='http', auth='public', readonly=True)
     def documents_display_thumbnail(self, access_token, width='0', height='0', unique=''):
         """Show the thumbnail of the document, or a placeholder.
 
@@ -100,7 +87,7 @@ class SpreadsheetShareRoute(ShareRoute):
         if unique:
             send_file_kwargs['immutable'] = True
             send_file_kwargs['max_age'] = STATIC_CACHE_LONG
-        spreadsheet_sudo = self._from_access_token(access_token, skip_log=True)
+        spreadsheet_sudo = request.env['documents.document']._from_access_token(access_token, skip_log=True)
         return request.env['ir.binary']._get_image_stream_from(
             spreadsheet_sudo, 'display_thumbnail', width=width, height=height
         ).get_response(as_attachment=False, **send_file_kwargs)

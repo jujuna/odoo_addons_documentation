@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Romanian SAF-T Export',
     'icon': '/account/static/description/l10n.png',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': '''
 This module enables generating the D.406 declaration from within Odoo.
@@ -15,7 +13,6 @@ must submit monthly or quarterly, depending on their tax reporting period.
         'l10n_ro', 'account_saft', 'account_asset',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'data/saft_report.xml',
         'data/l10n_ro_saft.tax.type.csv',
         'data/l10n_ro_saft.account.asset.category.csv',
@@ -24,6 +21,7 @@ must submit monthly or quarterly, depending on their tax reporting period.
         'views/res_config_settings_views.xml',
         "views/account_asset_views.xml",
         "views/account_asset_category_views.xml",
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/demo_company.xml',
@@ -31,5 +29,4 @@ must submit monthly or quarterly, depending on their tax reporting period.
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'auto_install': True,
-    'post_init_hook': '_update_saft_fields_on_taxes',
 }

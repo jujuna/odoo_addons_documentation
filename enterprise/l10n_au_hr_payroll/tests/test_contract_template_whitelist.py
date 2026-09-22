@@ -44,11 +44,8 @@ class TestWhitelistFromTemplate(TransactionCase):
         self.assertFalse(contract.l10n_au_eligible_for_leave_loading)
         self.assertEqual(contract.l10n_au_extra_compulsory_super, 0.0)
 
-        wizard = self.env['hr.version.wizard']\
-            .with_company(self.company_au)\
-            .with_context(active_model='hr.employee', active_id=self.employee_au.id)\
-            .create({'contract_template_id': template.id})
-        wizard.action_load_template()
+        self.employee_au.contract_template_id = template
+        self.employee_au._onchange_contract_template_id()
 
         for field in Version._get_whitelist_fields_from_template():
             self.assertEqual(contract[field], template[field])

@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     "name": "Brazilian Accounting EDI for POS",
-    "version": "1.0",
     "author": "Odoo S.A.",
     "description": """
 Brazilian Accounting EDI for POS
@@ -18,6 +17,9 @@ Provides electronic invoicing for Brazil through Avatax in the POS.
         "views/pos_payment_method_views.xml",
         "views/product_template_views.xml",
         "views/res_config_settings_views.xml",
+        "wizard/l10n_br_edi_pos_cancel_nfce_views.xml",
+        "receipt/pos_order_receipt.xml",
+        'security/ir.access.csv',
     ],
     "auto_install": True,
     "assets": {

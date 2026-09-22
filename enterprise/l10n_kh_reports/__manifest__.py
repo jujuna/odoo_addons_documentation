@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Cambodia - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Base module for the Cambodian reports
@@ -16,7 +15,6 @@ Base module for the Cambodian reports
         'data/profit_and_loss_kh.xml',
     ],
     'auto_install': True,
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

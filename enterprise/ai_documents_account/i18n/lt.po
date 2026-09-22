@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 13:54+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Lithuanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 22:38+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Lithuanian <https://translate.odoo.com/projects/odoo-master/"
 "ai_documents_account/lt/>\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -19,24 +19,18 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n % 10 == 1 && (n % 100 < 11 || n % 100 > "
 "19)) ? 0 : ((n % 10 >= 2 && n % 10 <= 9 && (n % 100 < 11 || n % 100 > 19)) ? "
 "1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#. module: ai_documents_account
-#. odoo-python
-#: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid "%(b_open)sContracts & NDAs%(b_close)s go to the %(legal)s folder."
-msgstr ""
-
-#. module: ai_documents_account
-#. odoo-python
-#: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid ""
-"%(b_open)sInsurance contracts%(b_close)s go to the %(insurance)s folder."
-msgstr ""
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: ai_documents_account
 #: model:ir.model.fields,field_description:ai_documents_account.field_documents_document__ai_document_or_env_company_id
 msgid "AI Company"
+msgstr ""
+
+#. module: ai_documents_account
+#: model:ir.module.module,description:base.module_ai_documents_account
+#: model:ir.module.module,shortdesc:base.module_ai_documents_account
+#: model:ir.module.module,summary:base.module_ai_documents_account
+msgid "AI Documents Account"
 msgstr ""
 
 #. module: ai_documents_account
@@ -47,13 +41,13 @@ msgstr ""
 #. module: ai_documents_account
 #. odoo-python
 #: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid "Company > Email"
+msgid "Company > Name"
 msgstr ""
 
 #. module: ai_documents_account
 #. odoo-python
 #: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid "Company > Name"
+msgid "Contracts & NDAs go to the %(legal)s folder."
 msgstr ""
 
 #. module: ai_documents_account
@@ -67,20 +61,6 @@ msgstr "Rodomas pavadinimas"
 #: model:ir.model,name:ai_documents_account.model_documents_document
 msgid "Document"
 msgstr "Dokumentas"
-
-#. module: ai_documents_account
-#. odoo-python
-#: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid ""
-"First, check the file to see if it contains a single document or if several "
-"documents are collated together."
-msgstr ""
-
-#. module: ai_documents_account
-#. odoo-python
-#: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid "For this, use this field: %s"
-msgstr ""
 
 #. module: ai_documents_account
 #: model:ir.model.fields,field_description:ai_documents_account.field_ai_documents_sort__id
@@ -98,28 +78,6 @@ msgstr ""
 #. module: ai_documents_account
 #. odoo-python
 #: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid "If it is false, continue with the normal process"
-msgstr ""
-
-#. module: ai_documents_account
-#. odoo-python
-#: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid ""
-"If it is true, add the tag %(b_open)s\"To Split\"%(b_close)s and stop there. "
-"This way, we'll know we first need to manually split it into different files."
-msgstr ""
-
-#. module: ai_documents_account
-#. odoo-python
-#: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid ""
-"If the customer is %(b_open)sanyone else%(b_close)s, create a Customer "
-"Invoice."
-msgstr ""
-
-#. module: ai_documents_account
-#. odoo-python
-#: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
 msgid ""
 "If the customer is %s it means it is a vendor bill, trigger the Create "
 "Vendor Bill action."
@@ -129,36 +87,20 @@ msgstr ""
 #. odoo-python
 #: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
 msgid ""
-"If the customer of the invoice is us (%(company_name)s, with email %"
-"(company_email)s), create a Vendor Bill."
+"If the document is an invoice, trigger the Vendor Bill action after moving "
+"it."
 msgstr ""
 
 #. module: ai_documents_account
 #. odoo-python
 #: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid ""
-"If the document is %(b_open)snot an invoice%(b_close)s, move it to the "
-"correct folder:"
+msgid "If the document is not an invoice, move it to the correct folder:"
 msgstr ""
 
 #. module: ai_documents_account
 #. odoo-python
 #: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid ""
-"If the document is an %(b_open)sinvoice%(b_close)s, move it to the %"
-"(finance)s folder then trigger the relevant action:"
-msgstr ""
-
-#. module: ai_documents_account
-#. odoo-python
-#: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid "Is considered multipage"
-msgstr ""
-
-#. module: ai_documents_account
-#. odoo-python
-#: code:addons/ai_documents_account/wizard/ai_documents_sort.py:0
-msgid "Otherwise, %s"
+msgid "Insurance contracts go to the %(insurance)s folder."
 msgstr ""
 
 #. module: ai_documents_account

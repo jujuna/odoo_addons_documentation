@@ -1,18 +1,20 @@
-import { Component, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, proxy, signal, t, useProps } from "@odoo/owl";
 import { setIntersectionObserver } from "@knowledge/js/knowledge_utils";
 
 export class WithLazyLoading extends Component {
     static template = "knowledge.WithLazyLoading";
-    static props = {
-        slots: { type: Object },
-    };
+
+    props = useProps({
+        slots: t.object(),
+    });
+
+    loaderRef = signal.ref();
 
     setup() {
-        this.loader = useRef("loader");
-        this.state = useState({ isLoaded: false });
+        this.state = proxy({ isLoaded: false });
 
         onMounted(() => {
-            const { el } = this.loader;
+            const el = this.loaderRef();
             this.observer = setIntersectionObserver(el, () => {
                 this.state.isLoaded = true;
             });

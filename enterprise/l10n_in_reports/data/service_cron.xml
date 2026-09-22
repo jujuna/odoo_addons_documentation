@@ -5,8 +5,8 @@
         <field name="model_id" ref="model_account_return"/>
         <field name="state">code</field>
         <field name="code">model._cron_refresh_gst_token()</field>
-        <field name="interval_number">5</field>
-        <field name="interval_type">hours</field>
+        <field name="interval_number">9999</field>
+        <field name="interval_type">months</field>
     </record>
 
     <record id="ir_cron_auto_sync_gstr2b_data" model="ir.cron">
@@ -16,8 +16,8 @@
 env.ref("l10n_in_reports.ir_cron_auto_match_gstr2b_data")._trigger()
         </field>
         <field name="state">code</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
+        <field name="interval_number">9999</field>
+        <field name="interval_type">months</field>
         <field name="active">True</field>
     </record>
 
@@ -26,8 +26,8 @@ env.ref("l10n_in_reports.ir_cron_auto_match_gstr2b_data")._trigger()
         <field name="model_id" ref="model_account_return"/>
         <field name="code">model._cron_gstr2b_match_data()</field>
         <field name="state">code</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
+        <field name="interval_number">9999</field>
+        <field name="interval_type">months</field>
         <field name="active">True</field>
     </record>
 
@@ -36,8 +36,8 @@ env.ref("l10n_in_reports.ir_cron_auto_match_gstr2b_data")._trigger()
         <field name="model_id" ref="model_account_return"/>
         <field name="state">code</field>
         <field name="code">model._cron_send_gstr1_data()</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
+        <field name="interval_number">9999</field>
+        <field name="interval_type">months</field>
     </record>
 
     <record id="ir_cron_to_check_gstr1_status" model="ir.cron">
@@ -45,8 +45,8 @@ env.ref("l10n_in_reports.ir_cron_auto_match_gstr2b_data")._trigger()
         <field name="model_id" ref="model_account_return"/>
         <field name="state">code</field>
         <field name="code">model._cron_check_gstr1_status()</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
+        <field name="interval_number">9999</field>
+        <field name="interval_type">months</field>
     </record>
 
     <record id="ir_cron_auto_sync_einvoice_irn" model="ir.cron">
@@ -54,8 +54,8 @@ env.ref("l10n_in_reports.ir_cron_auto_match_gstr2b_data")._trigger()
         <field name="model_id" ref="model_account_return"/>
         <field name="code">model._cron_get_irn_data()</field>
         <field name="state">code</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
+        <field name="interval_number">9999</field>
+        <field name="interval_type">months</field>
     </record>
 
     <record id="ir_cron_auto_match_einvoice_irn" model="ir.cron">
@@ -63,17 +63,19 @@ env.ref("l10n_in_reports.ir_cron_auto_match_gstr2b_data")._trigger()
         <field name="model_id" ref="model_account_return"/>
         <field name="code">model._cron_irn_match_data()</field>
         <field name="state">code</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
+        <field name="interval_number">9999</field>
+        <field name="interval_type">months</field>
     </record>
 
-    <record id="ir_cron_auto_fetch_einvoice_details" model="ir.cron">
-        <field name="name">Indian Accounting; Fetch E-Invoice detail bill using IRN</field>
-        <field name="model_id" ref="model_account_move"/>
-        <field name="state">code</field>
-        <field name="code">model._l10n_in_cron_update_with_irn(job_count=50)</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
-    </record>
-
+    <data noupdate="1">
+        <record id="ir_cron_auto_fetch_einvoice_details" model="ir.cron">
+            <field name="name">Indian Accounting; Fetch E-Invoice detail bill using IRN</field>
+            <field name="model_id" ref="model_account_move"/>
+            <field name="state">code</field>
+            <field name="code">model._l10n_in_cron_update_with_irn(job_count=50)</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="False"/>
+        </record>
+    </data>
 </odoo>

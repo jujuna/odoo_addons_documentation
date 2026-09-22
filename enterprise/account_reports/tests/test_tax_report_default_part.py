@@ -10,6 +10,8 @@ from odoo.tests import tagged, Form
 @tagged('post_install', '-at_install')
 class TestTaxReportDefaultPart(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -24,8 +26,8 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
     def checkAmlsRedirection(self, report, options, tax_lines_with_caret_options, expected_amls_based_on_tax_dict):
         # Check the caret options of the tax lines redirect to the correct amls
         for tax_line in tax_lines_with_caret_options:
-            expected_amls = expected_amls_based_on_tax_dict.get(tax_line['name'])
-            action = self.env[report.custom_handler_model_name].caret_option_audit_tax(options, {'line_id': tax_line['id']})
+            expected_amls = expected_amls_based_on_tax_dict.get(tax_line.name)
+            action = self.env[report.custom_handler_model_name].caret_option_audit_tax(options, {'line_id': tax_line.id})
             domain = action['domain']
             actual_amls = self.env['account.move.line'].search(domain)
             self.assertEqual(set(actual_amls), set(expected_amls))
@@ -124,7 +126,7 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.get('caret_options') == 'generic_tax_report']
+        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
         expected_amls_tax_10 = invoice.line_ids.filtered(lambda x: x.tax_line_id == tax_10 or tax_10 in x.tax_ids)
         expected_amls_tax_20 = invoice.line_ids.filtered(lambda x: x.tax_line_id == tax_20_affect_base or tax_20_affect_base in x.tax_ids)
         expected_amls_based_on_tax_dict = {
@@ -238,7 +240,7 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.get('caret_options') == 'generic_tax_report']
+        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
         expected_amls_tax_group_10_20 = invoice.line_ids.filtered(lambda x: x.group_tax_id == tax_group_10_20 or tax_group_10_20 in x.tax_ids)
         expected_amls_tax_group_10_30 = invoice.line_ids.filtered(lambda x: x.group_tax_id == tax_group_10_30 or tax_group_10_30 in x.tax_ids)
         expected_amls_based_on_tax_dict = {
@@ -377,7 +379,7 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.get('caret_options') == 'generic_tax_report']
+        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
         expected_amls_tax_10_affect_base = invoice.line_ids.filtered(lambda x: x.tax_line_id == tax_10_affect_base or tax_10_affect_base in x.tax_ids)
         expected_amls_tax_group = invoice.line_ids.filtered(lambda x: x.tax_line_id or x.tax_ids)
         expected_amls_based_on_tax_dict = {
@@ -482,7 +484,7 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.get('caret_options') == 'generic_tax_report']
+        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
         expected_amls_tax_10 = move.line_ids.filtered(lambda x: x.tax_line_id == tax_10 or x.tax_ids)
         expected_amls_tax_20 = move.line_ids.filtered(lambda x: x.tax_line_id == tax_20 or x.tax_ids)
         expected_amls_based_on_tax_dict = {
@@ -587,7 +589,7 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.get('caret_options') == 'generic_tax_report']
+        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
         expected_amls_tax_10 = move.line_ids.filtered(lambda x: x.tax_line_id == tax_10 or tax_10 in x.tax_ids)
         expected_amls_tax_20 = move.line_ids.filtered(lambda x: x.tax_line_id == tax_20 or tax_20 in x.tax_ids)
         expected_amls_based_on_tax_dict = {
@@ -690,7 +692,7 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.get('caret_options') == 'generic_tax_report']
+        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
         expected_amls_tax_10 = invoice.line_ids.filtered(lambda x: x.tax_line_id == tax_10 or tax_10 in x.tax_ids)
         expected_amls_tax_20 = invoice.line_ids.filtered(lambda x: x.tax_line_id == tax_20 or tax_20 in x.tax_ids)
         expected_amls_based_on_tax_dict = {
@@ -960,7 +962,7 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.get('caret_options') == 'generic_tax_report']
+        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
         expected_amls = invoice.line_ids.filtered(lambda x: x.tax_line_id or x.tax_ids)
         expected_amls_based_on_tax_dict = {
             'tax (10.0%)': expected_amls,
@@ -1046,7 +1048,7 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.get('caret_options') == 'generic_tax_report']
+        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
         expected_amls = invoice.line_ids.filtered(lambda x: x.tax_line_id or x.tax_ids) + invoice.reversal_move_ids.line_ids.filtered(lambda x: x.tax_line_id or x.tax_ids)
         expected_amls_based_on_tax_dict = {
             'tax (10.0%)': expected_amls,
@@ -1130,7 +1132,7 @@ class TestTaxReportDefaultPart(TestAccountReportsCommon):
             options,
         )
 
-        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.get('caret_options') == 'generic_tax_report']
+        tax_lines_with_caret_options = [report_line for report_line in report_lines if report_line.caret_options == 'generic_tax_report']
         expected_amls = move.line_ids.filtered(lambda x: x.tax_line_id or x.tax_ids)
         expected_amls_based_on_tax_dict = {
             'tax (10.0%)': expected_amls,

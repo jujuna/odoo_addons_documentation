@@ -1,4 +1,4 @@
-import { generatePdfThumbnail } from "@mail/utils/common/pdf_thumbnail";
+import { generatePdfThumbnail } from "@web/core/utils/pdfjs";
 
 /**
  * @return {Promise<{thumbnail: string | undefined, pdfEnabled: boolean}>}

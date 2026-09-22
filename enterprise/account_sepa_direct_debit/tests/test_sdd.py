@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import datetime
+from unittest.mock import patch
 
 from odoo import Command, fields
 from odoo.exceptions import AccessError, RedirectWarning, UserError, ValidationError
@@ -12,19 +13,20 @@ from odoo.addons.account_sepa_direct_debit.tests.common import SDDTestCommon
 
 @tagged('post_install', '-at_install')
 class SDDTest(SDDTestCommon):
+
     def test_sdd(self):
         # The invoices should have payments and in payment state thanks to the mandate
         payments_agrolait = self.invoice_agrolait.reconciled_payment_ids
         self.assertEqual(self.invoice_agrolait.payment_state, self.env['account.move']._get_invoice_in_payment_state(), 'This invoice should have payments and in payment state thanks to the mandate')
-        self.assertEqual(payments_agrolait.sdd_mandate_id, self.mandate_agrolait)
+        self.assertEqual(payments_agrolait.mandate_id, self.mandate_agrolait)
         self.assertEqual(self.mandate_agrolait.payment_ids, payments_agrolait, 'The mandate should be linked to the payment')
         payments_china_export = self.invoice_china_export.reconciled_payment_ids
         self.assertEqual(self.invoice_china_export.payment_state, self.env['account.move']._get_invoice_in_payment_state(), 'This invoice should have have payments and in payment state thanks to the mandate')
-        self.assertEqual(payments_china_export.sdd_mandate_id, self.mandate_china_export)
+        self.assertEqual(payments_china_export.mandate_id, self.mandate_china_export)
         self.assertEqual(self.mandate_china_export.payment_ids, payments_china_export, 'The mandate should be linked to the payment')
         payments_no_bic = self.invoice_no_bic.reconciled_payment_ids
         self.assertEqual(self.invoice_no_bic.payment_state, self.env['account.move']._get_invoice_in_payment_state(), 'This invoice should have payments and in payment state thanks to the mandate')
-        self.assertEqual(payments_no_bic.sdd_mandate_id, self.mandate_no_bic)
+        self.assertEqual(payments_no_bic.mandate_id, self.mandate_no_bic)
         self.assertEqual(self.mandate_no_bic.payment_ids, payments_no_bic, 'The mandate should be linked to the payment')
         # Reconcile the payments, to have the invoices fully paid
         payments = (self.invoice_agrolait + self.invoice_china_export + self.invoice_no_bic).reconciled_payment_ids
@@ -56,7 +58,7 @@ class SDDTest(SDDTestCommon):
 
         # Checks that an error is thrown if the city name is missing
         self.partner_china_export.write({'city': False, 'country_id': self.country_china})
-        with self.assertRaises(UserError):
+        with self.assertRaisesRegex(UserError, "The debtor and creditor city name is a compulsary information when generating the SDD XML."):
             payment.generate_xml(self.sdd_company, fields.Date.today(), True)
 
         # Checks that the xml is correctly generated when both the city_name and country are set
@@ -73,28 +75,30 @@ class SDDTest(SDDTestCommon):
         mandate.end_date = '2025-01-30'
         self.assertEqual(mandate.state, 'draft')
         mandate.action_validate_mandate()
-        mandate.cron_update_mandates_states()
+        with patch.object(self.env.registry['ir.cron'], '_commit_progress'):
+            mandate.cron_update_and_remind_expired_mandates()
         self.assertEqual(mandate.state, 'active') # The mandate should stay active even if the start_date is in the future
 
         with freeze_time('2022-12-02'):  # In the 36-month without any use automatic close 30-days warning period (to be closed the 2023-01-01)
             mandates_per_validity = mandate._update_and_partition_state_by_validity()
-            self.assertTrue(mandates_per_validity['expiring'], 'The mandate is expiring soon')
+            self.assertTrue(mandates_per_validity.get('expiring'), 'The mandate is expiring soon')
 
-            new_invoice = self.create_invoice(self.partner_agrolait)
+            new_invoice = self._create_invoice_sepa(self.partner_agrolait)
             payment = self.pay_with_mandate(new_invoice)  # Should reset the 36-month up to 2025-12-02
-            payment.action_validate()
+            if payment.state == "paid":  # Depending on other modules installed, the state of the payment may be either "paid" or "reconciled", thus validation is not always necessary
+                payment.action_validate()
             mandates_per_validity = mandate._update_and_partition_state_by_validity()
-            self.assertTrue(mandates_per_validity['valid'], 'The mandate should not be expiring soon anymore, as we have reset the period')
+            self.assertIn('valid', mandates_per_validity, 'The mandate should not be expiring soon anymore, as we have reset the period')
             new_expiry_date = next(iter(mandate._get_expiry_date_per_mandate().values())).isoformat()
             self.assertEqual(new_expiry_date, '2025-01-30', 'The new expiry date is the end date, as the last collection + 36 month is after that date')
 
         with freeze_time('2025-01-01'):  # Entered the 30-days before end date warning
             mandates_per_validity = mandate._update_and_partition_state_by_validity()
-            self.assertTrue(mandates_per_validity['expiring'], 'The mandate is expiring soon')
+            self.assertTrue(mandates_per_validity.get('expiring'), 'The mandate is expiring soon')
 
         with freeze_time('2025-01-31'):  # Passed the end_date, mandate must be closed
             mandates_per_validity = mandate._update_and_partition_state_by_validity()
-            self.assertTrue(mandates_per_validity['invalid'], 'The mandate is expired')
+            self.assertIn('invalid', mandates_per_validity, 'The mandate is expired')
             self.assertEqual(mandate.state, 'closed')
 
     def test_required_data(self):
@@ -102,10 +106,12 @@ class SDDTest(SDDTestCommon):
             'name': 'stateless partner',
         })
         stateless_iban_account = self.env['res.partner.bank'].create({
-            'acc_number': 'NL61INGB6008851617',
+            'account_number': 'NL61INGB6008851617',
             'partner_id': stateless_partner.id,
+            'allow_out_payment': True,
         })
-        stateless_mandate = self.env['sdd.mandate'].create({
+        stateless_mandate = self.env['account.direct.debit.mandate'].create({
+            'mandate_type': 'sepa',
             'partner_id': stateless_partner.id,
             'partner_bank_id': stateless_iban_account.id,
         })
@@ -115,15 +121,17 @@ class SDDTest(SDDTestCommon):
             'country_id': self.env.ref('base.nl').id,
         })
         not_iban_bank_account = self.env['res.partner.bank'].create({
-            'acc_number': '01',
+            'account_number': '01',
             'partner_id': bankless_partner.id,
+            'allow_out_payment': True,
         })
-        bankless_mandate = self.env['sdd.mandate'].create({
+        bankless_mandate = self.env['account.direct.debit.mandate'].create({
+            'mandate_type': 'sepa',
             'partner_id': bankless_partner.id,
         })
 
         # Check send and print action
-        with self.assertRaises(RedirectWarning, msg="The country of the partner should be set to go forward"):
+        with self.assertRaisesRegex(RedirectWarning, "The customer must have a country"):
             stateless_mandate.action_send_and_print()
         stateless_mandate.partner_id.country_id = self.env.ref('base.nl')
         stateless_mandate.action_send_and_print()
@@ -131,16 +139,17 @@ class SDDTest(SDDTestCommon):
 
         # Check validation action
         stateless_mandate.action_validate_mandate()
-        with self.assertRaises(UserError, msg="No partner bank should raise an error when going forward"):
+        with self.assertRaisesRegex(UserError, "A customer bank account is required to validate a direct debit mandate."):
             bankless_mandate.action_validate_mandate()
 
         bankless_mandate.partner_bank_id = not_iban_bank_account
-        with self.assertRaises(UserError, msg="The bank account isn't an iban bank account"):
+        with self.assertRaisesRegex(UserError, "SEPA Direct Debit scheme only accepts IBAN account numbers."):
             bankless_mandate.action_validate_mandate()
 
         bankless_mandate.partner_bank_id = self.env['res.partner.bank'].create({
-            'acc_number': 'NL43INGB9822994664',
+            'account_number': 'NL43INGB9822994664',
             'partner_id': bankless_partner.id,
+            'allow_out_payment': True,
         })
         bankless_mandate.action_validate_mandate()
 
@@ -160,18 +169,21 @@ class SDDTest(SDDTestCommon):
             'country_id': self.env.ref('base.nl').id,
         })
         iban_account = self.env['res.partner.bank'].create({
-            'acc_number': 'NL61INGB6008851617',
+            'account_number': 'NL61INGB6008851617',
             'partner_id': partner.id,
+            'allow_out_payment': True,
         })
 
         # Test minimal pre-notification period
-        with self.assertRaises(UserError, msg="Cannot have a pre-notification period under 2 days"):
-            self.env['sdd.mandate'].create({
+        with self.assertRaisesRegex(UserError, "The pre-notification period must be at least"):
+            self.env['account.direct.debit.mandate'].create({
+                'mandate_type': 'sepa',
                 'partner_id': partner.id,
                 'partner_bank_id': iban_account.id,
                 'pre_notification_period': 1,
             })
-        mandate = self.env['sdd.mandate'].create({
+        mandate = self.env['account.direct.debit.mandate'].create({
+            'mandate_type': 'sepa',
             'partner_id': partner.id,
             'partner_bank_id': iban_account.id,
             'pre_notification_period': 2,
@@ -181,13 +193,13 @@ class SDDTest(SDDTestCommon):
         mandate.action_validate_mandate()
 
         # Test minimal "new mandates" collection date
-        invoice = self.create_invoice(partner)
+        invoice = self._create_invoice_sepa(partner)
         payment = self.pay_with_mandate(invoice)
         unchanged_data = {
-            'payment_ids': [Command.set(payment.ids)],
+            'payment_ids': payment,
             'journal_id': payment.journal_id.id,
         }
-        with self.assertRaises(ValidationError, msg="Collection date should not be in the 2 day period required for the bank to process"):
+        with self.assertRaisesRegex(ValidationError, "The bank needs to be informed at least"):
             self.env['account.batch.payment'].create({
                 **unchanged_data,
                 'sdd_required_collection_date': fields.Date.context_today(mandate) + datetime.timedelta(days=1)
@@ -220,12 +232,12 @@ class SDDTest(SDDTestCommon):
         self.reconcile_payments(payment)
         self.assertTrue(payment.is_matched)
 
-        new_invoice = self.create_invoice(partner)
+        new_invoice = self._create_invoice_sepa(partner)
         new_payment = self.pay_with_mandate(new_invoice)
         unchanged_data['payment_ids'] = [Command.set(new_payment.ids)]
-        with self.assertRaises(
+        with self.assertRaisesRegex(
                 ValidationError,
-                msg="Collection date should not be in the 2 day period required for the bank to process if all the mandates are already used at least once"
+                "The bank needs to be informed at least"
         ):
             self.env['account.batch.payment'].create({
                 **unchanged_data,
@@ -253,7 +265,7 @@ class SDDTest(SDDTestCommon):
         mandate_china_export = self.create_mandate(self.partner_china_export, self.partner_bank_china_export, False, self.sdd_company)
         mandate_china_export.action_validate_mandate()
 
-        invoices = self.create_invoice(self.partner_agrolait) + self.create_invoice(self.partner_china_export)
+        invoices = self._create_invoice_sepa(self.partner_agrolait) + self._create_invoice_sepa(self.partner_china_export)
         journal = self.sdd_company_bank_journal
         wizard = (
             self.env['account.payment.register']
@@ -275,7 +287,7 @@ class SDDTest(SDDTestCommon):
         Test the register payment when two invoices belonging to different partners are selected and they don't all have valid mandates
         """
         # China export doesn't have a valid mandate
-        invoices = self.create_invoice(self.partner_agrolait) + self.create_invoice(self.partner_china_export)
+        invoices = self._create_invoice_sepa(self.partner_agrolait) + self._create_invoice_sepa(self.partner_china_export)
         journal = self.sdd_company_bank_journal
         wizard = (
             self.env['account.payment.register']
@@ -296,7 +308,7 @@ class SDDTest(SDDTestCommon):
         """
         # China export doesn't have a valid mandate
         self.mandate_agrolait.action_revoke_mandate()
-        invoices = self.create_invoice(self.partner_agrolait) + self.create_invoice(self.partner_china_export)
+        invoices = self._create_invoice_sepa(self.partner_agrolait) + self._create_invoice_sepa(self.partner_china_export)
         journal = self.sdd_company_bank_journal
         wizard = (
             self.env['account.payment.register']
@@ -306,7 +318,7 @@ class SDDTest(SDDTestCommon):
                 'payment_method_line_id': journal.inbound_payment_method_line_ids.filtered(lambda l: l.code == 'sdd').id
             })
         )
-        with self.assertRaises(UserError, msg="As there is no payment that can be generated, we raise an error when trying to do so"):
+        with self.assertRaisesRegex(UserError, "You can't pay any of the selected invoices using direct debit, as no valid mandate is available."):
             wizard.action_create_payments()
 
     def test_batch_payment_group(self):
@@ -320,7 +332,7 @@ class SDDTest(SDDTestCommon):
         mandate_china_export = self.create_mandate(self.partner_china_export, self.partner_bank_china_export, False, self.sdd_company)
         mandate_china_export.action_validate_mandate()
 
-        invoices = self.create_invoice(self.partner_agrolait) + self.create_invoice(self.partner_agrolait) + self.create_invoice(self.partner_china_export)
+        invoices = self._create_invoice_sepa(self.partner_agrolait) + self._create_invoice_sepa(self.partner_agrolait) + self._create_invoice_sepa(self.partner_china_export)
         journal = self.sdd_company_bank_journal
         wizard = self.env['account.payment.register'].with_context({'active_ids': invoices.line_ids.ids, 'active_model': 'account.move.line'}).create({
             'journal_id': journal.id,
@@ -334,8 +346,8 @@ class SDDTest(SDDTestCommon):
     def test_register_payment_other_journal(self):
         """ Test payment from a different journal than the default one """
         bank_journal_copy = self.sdd_company_bank_journal.copy()
-        bank_journal_copy.bank_acc_number = 'CH9300762011623852958'
-        invoices = self.create_invoice(self.partner_agrolait)
+        bank_journal_copy.bank_account_number = 'CH9300762011623852958'
+        invoices = self._create_invoice_sepa(self.partner_agrolait)
         wizard = (
             self.env['account.payment.register']
             .with_context({'active_ids': invoices.line_ids.ids, 'active_model': 'account.move.line'})
@@ -354,5 +366,5 @@ class SDDTest(SDDTestCommon):
             self.env, 'invoicing_banks_user', groups='account.group_account_basic'
         )
 
-        with self.assertRaisesRegex(AccessError, "validate SDD"):
+        with self.assertRaisesRegex(AccessError, "validate direct debit"):
             self.mandate_agrolait.with_user(invoicing_banks_user).action_validate_mandate()

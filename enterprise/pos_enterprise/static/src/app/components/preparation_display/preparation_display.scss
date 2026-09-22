@@ -2,6 +2,15 @@ $o-pdis-sidebar-width: 16rem;
 $o-pdis-navbar-height: 74px;
 $o-pdis-logo-size: 45px;
 
+html, body {
+    touch-action: manipulation;
+    overscroll-behavior: none;
+}
+
+* {
+    touch-action: pan-x pan-y;
+}
+
 .o_pdis_logo > img {
     height: $o-pdis-logo-size;
 }
@@ -17,6 +26,7 @@ $o-pdis-logo-size: 45px;
 .o_pdis_sidebar {
     width: $o-pdis-sidebar-width;
     min-width: $o-pdis-sidebar-width;
+    border-top: 0 !important;
 }
 
 .z-1000 {
@@ -31,27 +41,19 @@ $o-pdis-logo-size: 45px;
     z-index: $zindex-dropdown;
 }
 
-.sub-menu {
-    top: $o-pdis-navbar-height - 1px;
-    right: -1px;
-}
 .openMenu.badge.right {
     position: absolute;
-    top: 5px;
-    right: 4px;
+    top: -9px;
+    right: -5px;
 }
 .openMenu.badge.left {
     position: absolute;
-    top: 5px;
-    right: 40px;
+    top: -9px;
+    left: -5px;
 }
 
 .badge {
     min-width: fit-content;
-}
-
-.o_pdis_note {
-    flex-wrap: wrap;
 }
 
 .o_pdis_zoom {
@@ -61,4 +63,11 @@ $o-pdis-logo-size: 45px;
 .o_notification_manager {
    inset: 84px 1rem auto 1rem;
     left: auto;
+}
+.sidebar-btn {
+    background: #e2e2e2 !important;
+}
+.o_pdis_categories .cursor-pointer:hover {
+    background: #e2e2e269;
+    border-radius: 6px;
 }

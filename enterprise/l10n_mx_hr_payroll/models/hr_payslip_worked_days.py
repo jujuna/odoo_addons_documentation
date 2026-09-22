@@ -12,32 +12,37 @@ class HrPayslipWorkedDays(models.Model):
         for worked_days in mx_worked_days:
             if worked_days.payslip_id.edited or worked_days.payslip_id.state != 'draft':
                 continue
-            if not worked_days.version_id or worked_days.code == 'OUT':
+            if not worked_days.version_id or worked_days.code == '000.00':
                 worked_days.amount = 0
                 continue
             if not worked_days.payslip_id.date_from or not worked_days.payslip_id.date_to:
                 continue
 
-            start_date = max(worked_days.payslip_id.date_from, worked_days.version_id.contract_date_start or worked_days.version_id.date_version)
-            end_date = min(worked_days.payslip_id.date_to, worked_days.version_id.contract_date_end) if worked_days.version_id.contract_date_end else worked_days.payslip_id.date_to
-            in_contract_days = (end_date - start_date).days + 1
-            actual_period_days = (worked_days.payslip_id.date_to - worked_days.payslip_id.date_from).days + 1
-            salary_factor = in_contract_days / actual_period_days
-
             period_wage = worked_days._get_period_wage()
             amount_rate = worked_days.work_entry_type_id.amount_rate
-            worked_days.amount = period_wage * salary_factor * amount_rate
+            worked_days.amount = period_wage * amount_rate
         return super(HrPayslipWorkedDays, self - mx_worked_days)._compute_amount()
 
     def _get_period_wage(self):
         self.ensure_one()
+        version = self.version_id
         if not self.is_paid:
             return 0
-        if self.version_id.wage_type == 'hourly':
-            return self.version_id.hourly_wage * self.number_of_hours
+        if version.wage_type == 'hourly':
+            return version.hourly_wage * self.number_of_hours
         else:
-            attendance_hours = sum(
-                line.number_of_hours for line in self.payslip_id.worked_days_line_ids
-                if line.code != 'OUT' and not line.work_entry_type_id.is_extra_hours
-            ) or 1
-            return self.version_id.wage * self.number_of_hours / attendance_hours
+            payslip = self.payslip_id
+            hourly_wage = payslip.l10n_mx_daily_salary / payslip._get_worked_day_lines_hours_per_day(version=version)
+
+            if self.code == 'SEVENTH_DAY':
+                worked_hours = sum(
+                    line.number_of_hours for line in payslip.worked_days_line_ids
+                    if line.work_entry_type_id.amount_rate and line.work_entry_type_id != self.work_entry_type_id
+                )
+
+                weeks_in_period = 1 if version.schedule_pay == 'weekly' else 2
+                expected_hours = version.resource_calendar_id.hours_per_week * weeks_in_period
+
+                hourly_wage *= worked_hours / expected_hours
+
+            return hourly_wage * self.number_of_hours

@@ -6,10 +6,11 @@ import requests
 from lxml import etree
 from xml.etree import ElementTree as ET
 from markupsafe import Markup
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError
+from odoo.tools import BinaryBytes
 
 TIMEOUT = 10
 DSP_TEST_ENDPOINT_PREFIX = "https://test-transaction-engine.tax.service.gov.uk"
@@ -26,7 +27,7 @@ def _send_request(transaction, xml_document):
         """
         transaction.ensure_one()
         xml_document = Markup('<?xml version="1.0" encoding="UTF-8"?>\n') + xml_document
-        if transaction.env['ir.config_parameter'].sudo().get_param("l10n_uk_hmrc.api_mode", 'production') == 'production':
+        if (transaction.env['ir.config_parameter'].sudo().get_str("l10n_uk_hmrc.api_mode") or 'production') == 'production':
             url_prefix = DSP_PRODUCTION_ENDPOINT_PREFIX
         else:
             url_prefix = DSP_TEST_ENDPOINT_PREFIX
@@ -90,6 +91,10 @@ class HMRCTransaction(models.Model):
         """To be overidden by hmrc transaction specifics to allow the rendering of another body"""
         return None
 
+    def _get_message_destination_record(self):
+        """To be overriden by hmrc transaction specifics to specify where to post success/failure messages."""
+        return self.company_id
+
     ##################################################################
     #                   Requests
     ##################################################################
@@ -117,23 +122,27 @@ class HMRCTransaction(models.Model):
         else:
             self.state = 'deleted'
 
-    def _send_poll_request(self, xml_document):
+    def _send_poll_request(self):
         """
         This is the main part of the transaction engine. It is used to poll HMRC when we sent a request to fetch the result or the next time to poll again
         This should not be overriden
         """
         self.ensure_one()
+        transaction_data = {
+            'correlation_id': self.correlation_id,
+            'class': self._get_transaction_class(),
+            'qualifier': 'poll',
+            'function': 'submit',
+        }
+        xml_document = self.env['ir.qweb']._render('l10n_uk_hmrc/templates/hmrc_transaction_request.xml', values={'transaction': transaction_data})
         response, header = _send_request(self, xml_document)
         if header['qualifier'] == 'acknowledgement':
-            self.next_endpoint = urlparse(header['response_end_point']).path
-            self.state = 'polling'
-            self.correlation_id = header['correlation_id']
-            self.next_polling = fields.Datetime.add(fields.Datetime.now(), seconds=int(header['poll_interval']))
+            self._handle_acknowledgement(header)
             return
 
         self.completed_datetime = fields.Datetime.now()
         tree = etree.fromstring(response.content)
-        self.response_file = etree.tostring(tree, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+        self.response_file = BinaryBytes(etree.tostring(tree, pretty_print=True, xml_declaration=True, encoding='UTF-8'))
         self.response_filename = f'hmrc_transaction_response_{self.period_end}.xml'
         if header['qualifier'] == 'error':
             self.state = 'error'
@@ -157,7 +166,7 @@ class HMRCTransaction(models.Model):
                 <h4>Fatal: %s</h4>
                 <p>%s:%s</p>
             """) % (error_data['code'], error_data['location'], error_data['message'])
-            self.company_id.message_post(body=html_body, attachments=[(self.response_filename, self.response_file)])
+            self._get_message_destination_record().message_post(body=html_body, attachments=[(self.response_filename, self.response_file)])
             return
 
         errors = Markup().join(
@@ -174,7 +183,7 @@ class HMRCTransaction(models.Model):
             <p>%s:</p>
             <ul>%s</ul>
         """) % (error_message, errors)
-        self.company_id.message_post(body=html_body, attachments=[(self.response_filename, self.response_file)])
+        self._get_message_destination_record().message_post(body=html_body, attachments=[(self.response_filename, self.response_file)])
 
     def _handle_submission_error(self, response, header):
         """
@@ -203,7 +212,7 @@ class HMRCTransaction(models.Model):
         else:
             message = _("An error happened when sending the document.\n\nDetails:\n%(code)s: %(message)s", code=error['code'], message=error['message'])
 
-        self.company_id.message_post(body=message)
+        self._get_message_destination_record().message_post(body=message)
         raise UserError(message)
 
     def _handle_success(self):
@@ -212,7 +221,14 @@ class HMRCTransaction(models.Model):
         Can be overidden.
         """
         html_body = Markup("%s") % _("HMRC Monthly return from %(period_start)s to %(period_end)s succeeded", period_start=self.period_start, period_end=self.period_end)
-        self.company_id.message_post(body=html_body, attachments=[(self.response_filename, self.response_file)])
+        self._get_message_destination_record().message_post(body=html_body, attachments=[(self.response_filename, self.response_file)])
+
+    def _handle_acknowledgement(self, header):
+        self.next_endpoint = urlsplit(header['response_end_point']).path
+        self.state = 'polling'
+        self.correlation_id = header['correlation_id']
+        self.next_polling = fields.Datetime.add(fields.Datetime.now(), seconds=int(header['poll_interval']))
+        self._get_message_destination_record().message_post(body=self.env._("Request submitted to HMRC. Check again later for updated status"))
 
     ##################################################################
     #                   Transaction Crons
@@ -229,14 +245,7 @@ class HMRCTransaction(models.Model):
             if transaction.next_polling.timestamp() > fields.Datetime.now().timestamp():
                 continue
 
-            transaction_data = {
-                'correlation_id': transaction.correlation_id,
-                'class': transaction._get_transaction_class(),
-                'qualifier': 'poll',
-                'function': 'submit',
-            }
-            xml_document = self.env['ir.qweb']._render('l10n_uk_hmrc/templates/hmrc_transaction_request.xml', values={'transaction': transaction_data})
-            transaction._send_poll_request(xml_document)
+            transaction._send_poll_request()
 
     @api.model
     def _cron_delete_processed_transactions(self):

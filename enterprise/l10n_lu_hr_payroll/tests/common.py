@@ -31,6 +31,6 @@ class TestLuPayrollCommon(TransactionCase):
             'date_version': '2021-01-01',
             'wage': 6000.0,
         })
-        cls.employee_david.resource_calendar_id.tz = "Europe/Brussels"
-        cls.lux_company.resource_calendar_id.tz = "Europe/Brussels"
+        cls.employee_david.tz = "Europe/Brussels"
+        cls.lux_company.tz = "Europe/Brussels"
         cls.contract_david = cls.employee_david.version_id

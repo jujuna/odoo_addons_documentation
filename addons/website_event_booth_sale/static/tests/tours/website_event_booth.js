@@ -3,11 +3,10 @@ import * as wsTourUtils from '@website_sale/js/tours/tour_utils';
 
 
 registry.category("web_tour.tours").add('website_event_booth_tour', {
-    url: '/event',
     steps: () => [
 {
     content: 'Open "Test Event Booths" event',
-    trigger: 'h5.card-title span:contains("Test Event Booths")',
+    trigger: 'h2.card-title span:contains("Test Event Booths")',
     run: "click",
     expectUnloadPage: true,
 }, {
@@ -39,16 +38,21 @@ registry.category("web_tour.tours").add('website_event_booth_tour', {
     trigger: 'button[type="submit"]',
     run: "click",
     expectUnloadPage: true,
+}, {
+    content: 'Order summary',
+    trigger: 'h4:contains("Order summary")',
 },
 ...wsTourUtils.assertCartAmounts({
     taxes: '20.00',
-    untaxed: '200.00',
     total: '220.00',
 }),
 wsTourUtils.goToCheckout(),
+{
+    content: 'Payment',
+    trigger: '.o_wizard [name=step_name].fw-bold:contains("Payment")',
+},
 ...wsTourUtils.assertCartAmounts({
     taxes: '20.00',
-    untaxed: '200.00',
     total: '220.00',
 }),
 ]});

@@ -87,7 +87,7 @@ class SignItsmeCommon(TestSignControllerCommon):
         sign_request_item = self.sign_request_itsme.request_item_ids[0]
         sign_vals = self.create_sign_values(self.sign_request_itsme.template_id.sign_item_ids, sign_request_item.role_id.id)
         with patch('odoo.addons.iap.models.iap_account.IapAccount.get_credits', lambda self, x: 10):
-            with patch('odoo.addons.sign_itsme.controllers.main.jsonrpc', lambda url, params: {'success': True, 'url': url}):
+            with patch('odoo.addons.iap.tools.iap_tools.iap_jsonrpc', lambda url, **kwargs: {'success': True, 'url': url}):
                 response = self._json_url_open(
                     '/sign/sign/%d/%s' % (self.sign_request_itsme.id, sign_request_item.access_token),
                     data={'signature': sign_vals},
@@ -162,7 +162,7 @@ class SignItsmeCommon(TestSignControllerCommon):
         self.assertEqual(sign_request_item.role_id.auth_method, 'itsme')
 
         sign_vals = self.create_sign_values(sign_request.template_id.sign_item_ids, sign_request_item.role_id.id)
-        with patch('odoo.addons.sign_itsme.controllers.main.jsonrpc', lambda url, params: {'success': True, 'url': url}):
+        with patch('odoo.addons.iap.tools.iap_tools.iap_jsonrpc', lambda url, **kwargs: {'success': True, 'url': url}):
             with patch('odoo.addons.iap.models.iap_account.IapAccount.get_credits', lambda self, x: 10):
                 response = self._json_url_open(
                     '/sign/sign/%d/%s' % (sign_request.id, sign_request_item.access_token),

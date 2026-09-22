@@ -50,7 +50,9 @@ class SaleOrderLine(models.Model):
             if so_line.service_tracking != 'event':
                 continue
 
-            for _count in range(int(so_line.product_uom_qty) - len(so_line.registration_ids)):
+            for _count in range(
+                int(so_line.product_uom_qty) - len(so_line.registration_ids.filtered(lambda reg: reg.state != 'cancel')),
+            ):
                 values = {
                     'sale_order_line_id': so_line.id,
                     'sale_order_id': so_line.order_id.id,
@@ -108,12 +110,6 @@ class SaleOrderLine(models.Model):
                 self._get_sale_order_line_multiline_description_variants()
         else:
             return super()._get_sale_order_line_multiline_description_sale()
-
-    def _use_template_name(self):
-        """ We do not want configured description to get rewritten by template default"""
-        if self.event_ticket_id:
-            return False
-        return super()._use_template_name()
 
     def _get_display_price(self):
         if self.event_ticket_id and self.event_id:

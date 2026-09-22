@@ -8,6 +8,8 @@ from odoo.addons.account.tests.common import AccountTestInvoicingHttpCommon
 @tagged('post_install', '-at_install')
 class TestTourAccountReports(AccountTestInvoicingHttpCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -38,4 +40,4 @@ class TestTourAccountReports(AccountTestInvoicingHttpCommon):
         cls.out_invoice_previous_year.action_post()
 
     def test_tour_account_reports(self):
-        self.start_tour("/odoo", 'account_reports_widgets', login=self.env.user.login)
+        self.start_tour("/odoo/action-account_reports.action_account_report_pl", 'account_reports_widgets', login=self.env.user.login)

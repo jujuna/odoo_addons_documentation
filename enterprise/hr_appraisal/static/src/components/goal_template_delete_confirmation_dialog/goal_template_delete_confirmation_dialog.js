@@ -1,5 +1,7 @@
+import { useProps, t } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import {
+    confirmationDialogProps,
     deleteConfirmationMessage,
     ConfirmationDialog,
 } from "@web/core/confirmation_dialog/confirmation_dialog";
@@ -7,23 +9,20 @@ import {
 export class GoalTemplateDeleteConfirmationDialog extends ConfirmationDialog {
     static template = "hr_appraisal.GoalTemplateDeleteConfirmationDialog";
 
-    static props = {
-        ...ConfirmationDialog.props,
-        hasChildren: Boolean,
-        confirmAllLabel: { type: String, optional: true },
-        confirmAll: Function,
-    }
-
-    static defaultProps = {
-        ...ConfirmationDialog.defaultProps,
-        title: _t("Bye-bye, record!"),
-        body: deleteConfirmationMessage,
-        confirmLabel: _t("Delete"),
-        confirmAllLabel: _t("Delete with children"),
-        cancel: () => {
-            // `ConfirmationDialog` needs this prop to display the cancel
-            // button but we do nothing on cancel.
-        },
-        cancelLabel: _t("No, keep it"),
-    };
+    props = useProps({
+        ...confirmationDialogProps,
+        hasChildren: t.boolean(),
+        confirmAllLabel: t.string().optional(_t("Delete with children")),
+        confirmAll: t.function(),
+        title: t.any().optional(_t("Bye-bye, record!")),
+        body: t.string().optional(deleteConfirmationMessage),
+        confirmLabel: t.string().optional(_t("Delete")),
+        cancel: t.function().optional(
+            () => () => {
+                // `ConfirmationDialog` needs this prop to display the cancel
+                // button but we do nothing on cancel.
+            }
+        ),
+        cancelLabel: t.string().optional(_t("No, keep it")),
+    });
 }

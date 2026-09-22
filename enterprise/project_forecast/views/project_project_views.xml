@@ -4,10 +4,18 @@
         <field name="name">project.view.form.inherit.project.forecast</field>
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.edit_project"/>
-        <field name="priority">32</field>
+        <field name="priority">22</field>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='group_time_managment']" position="attributes">
-                <attribute name="invisible">0</attribute>
+            <xpath expr="//button[@name='action_view_tasks']" position="before">
+                <button class="oe_stat_button" type="object" name="action_project_forecast_from_project" icon="checklist" groups="planning.group_planning_user">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Planned</span>
+                        <span class="o_stat_value">
+                            <field name="total_forecast_time"/>
+                            <span class="o_field_widget ps-1"> Hours </span>
+                        </span>
+                    </div>
+                </button>
             </xpath>
         </field>
     </record>

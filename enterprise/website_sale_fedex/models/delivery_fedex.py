@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import re
@@ -23,12 +22,12 @@ class DeliveryCarrier(models.Model):
         return [('name', operator, value)]
 
     def _get_distance_uom_id_from_ir_config_parameter(self):
-        distance_in_miles_param = self.env['ir.config_parameter'].sudo().get_param('product.volume_in_cubic_feet')
+        distance_in_miles_param = self.env['ir.config_parameter'].sudo().get_str('product.volume_in_cubic_feet') or '0'
         if distance_in_miles_param == '1':
             return self.env.ref('uom.product_uom_mile')
         return self.env.ref('uom.product_uom_km')
 
-    def _fedex_get_close_locations(self, partner_address):
+    def _fedex_get_close_locations(self, partner_address, **kwargs):
         superself = self.sudo()
         srm = FEDEXLocationsRequest(self.log_xml, request_type="locs", prod_environment=self.prod_environment)
         srm.web_authentication_detail(superself.fedex_developer_key, superself.fedex_developer_password)
@@ -69,14 +68,13 @@ class DeliveryCarrier(models.Model):
     def _fedex_update_srm(self, srm, request_type, order=None, picking=None):
         """Add alternate delivery address to the shipment."""
         res = super()._fedex_update_srm(srm, request_type, order, picking)
-        if picking:
-            order = picking.sale_id
-        if order and order.pickup_location_data:
-            pickup_location_data = order.pickup_location_data or {}
+        if picking and picking.partner_id.pickup_location_data:
+            pickup_location_data = picking.partner_id.pickup_location_data or {}
             fedex_loc_details = pickup_location_data.get('additional_data', {}).get('location_detail', {})
 
             hold_at_loc = srm.factory.HoldAtLocationDetail()
-            hold_at_loc.PhoneNumber = order.partner_shipping_id.phone
+            if picking.partner_id.phone:
+                hold_at_loc.PhoneNumber = picking.partner_id.phone
             hold_at_loc.LocationContactAndAddress = fedex_loc_details.get('LocationContactAndAddress', {})
             if 'AddressAncillaryDetail' in hold_at_loc.LocationContactAndAddress:
                 del hold_at_loc.LocationContactAndAddress['AddressAncillaryDetail']

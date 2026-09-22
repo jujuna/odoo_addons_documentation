@@ -8,9 +8,9 @@
     'depends': ['sign', 'whatsapp'],
     'data': [
         'data/sign_request_whatsapp_templates.xml',
-        'data/config_parameter_whatsapp_template.xml',
         'wizard/sign_send_request_views.xml',
         'views/res_config_settings_views.xml',
+        'report/sign_log_reports.xml'
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

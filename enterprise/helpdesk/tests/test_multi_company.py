@@ -2,15 +2,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.exceptions import AccessError, UserError
-from odoo.tests import new_test_user
+from odoo.tests import tagged, new_test_user
 
 from .common import HelpdeskCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHelpdeskMultyCompany(HelpdeskCommon):
 
     def test_team_per_company(self):
-        companies = self.env['res.company'].with_context(tracking_disable=True).create([
+        companies = self.env['res.company'].create([
             {'name': 'new_company1'},
             {'name': 'new_company2'},
             {'name': 'new_company3'},
@@ -27,7 +28,7 @@ class TestHelpdeskMultyCompany(HelpdeskCommon):
 
         This test checks that we have a fallback for this behavior.
         """
-        companies = self.env['res.company'].with_context(tracking_disable=True).create([
+        companies = self.env['res.company'].create([
             {'name': '好色'},
             {'name': '色好'},
         ])
@@ -36,19 +37,19 @@ class TestHelpdeskMultyCompany(HelpdeskCommon):
         self.assertEqual(helpdek_teams.company_id, companies, "Each helpdesk team should be set to a company.")
 
     def test_multi_company(self):
-        Team = self.env['helpdesk.team'].with_context(tracking_disable=True)
-        Ticket = self.env['helpdesk.ticket'].with_context(tracking_disable=True)
+        Team = self.env['helpdesk.team']
+        Ticket = self.env['helpdesk.ticket']
 
         # Main company
         ticket_main = Ticket.with_user(self.helpdesk_user).create({
             'name': 'Partner Ticket 1',
             'team_id': self.test_team.id,
             'partner_id': self.partner.id,
-            'company_id': self.main_company_id
+            'company_id': self.main_company.id
         })
 
         # company B
-        company_b = self.env['res.company'].with_context(tracking_disable=True).create({
+        company_b = self.env['res.company'].create({
             "name": "Test Company B",
         })
         user_b = new_test_user(
@@ -76,7 +77,7 @@ class TestHelpdeskMultyCompany(HelpdeskCommon):
             ('team_id', '=', ticket_main.team_id.id),
         ])
         self.assertTrue(tickets_main.name, "Helpdesk user can read ticket of main company.")
-        team_main = Team.with_user(self.helpdesk_user).search([('company_id', '=', self.main_company_id)], limit=1)
+        team_main = Team.with_user(self.helpdesk_user).search([('company_id', '=', self.main_company.id)], limit=1)
         self.assertTrue(team_main, "Helpdesk user can read team of main company.")
         # try to access the main team with company B
         with self.assertRaises(AccessError):
@@ -105,15 +106,15 @@ class TestHelpdeskMultyCompany(HelpdeskCommon):
             Create a ticket with an associated partner with a different company than the one of the
             ticket
         '''
-        Ticket = self.env['helpdesk.ticket'].with_context(tracking_disable=True)
+        Ticket = self.env['helpdesk.ticket']
         ticket_main = Ticket.with_user(self.helpdesk_user).create({
             'name': 'Partner Ticket 1',
             'team_id': self.test_team.id,
             'partner_id': self.partner.id,
-            'company_id': self.main_company_id
+            'company_id': self.main_company.id
         })
 
-        company_b = self.env['res.company'].with_context(tracking_disable=True).create({
+        company_b = self.env['res.company'].create({
             "name": "Test Company B",
         })
 
@@ -142,8 +143,8 @@ class TestHelpdeskMultyCompany(HelpdeskCommon):
             - add the user as member of a helpdesk team of company A
             - check that only the resources of company A are considered to compute working intervals
         '''
-        Team = self.env['helpdesk.team'].with_context(tracking_disable=True)
-        company = self.env['res.company'].with_context(tracking_disable=True).create({
+        Team = self.env['helpdesk.team']
+        company = self.env['res.company'].create({
             "name": "Test Company",
         })
         user_multi = new_test_user(
@@ -152,7 +153,6 @@ class TestHelpdeskMultyCompany(HelpdeskCommon):
             'helpdesk.group_helpdesk_user',
             name='User Multi Company',
             email='a@b.c',
-            context={'tracking_disable': True},
         )
         helpdesk_user = new_test_user(
             self.env,
@@ -161,7 +161,6 @@ class TestHelpdeskMultyCompany(HelpdeskCommon):
             company_id=company.id,
             name='Helpdesk User',
             email='helpdesk_user@test.com',
-            context={'tracking_disable': True},
         )
         self.env['resource.resource'].create({
             'name': 'Resource A',
@@ -174,7 +173,7 @@ class TestHelpdeskMultyCompany(HelpdeskCommon):
             'assign_method': 'randomly',
             'member_ids': user_multi.ids,
         })
-        ticket = self.env['helpdesk.ticket'].with_company(company).with_user(helpdesk_user).create({
+        ticket = self.env['helpdesk.ticket'].with_context(allowed_company_ids=company.ids).with_user(helpdesk_user).create({
             'name': 'test ticket',
             'team_id': team_a.id,
         })

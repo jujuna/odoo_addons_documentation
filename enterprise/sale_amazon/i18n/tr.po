@@ -22,17 +22,40 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-21 14:41+0000\n"
-"Last-Translator: Odoo Turkish Import <dyki+tr@odoo.com>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 00:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
 "sale_amazon/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_amazon
+#: model:ir.module.module,description:base.module_sale_amazon
+msgid ""
+"\n"
+"Import your Amazon orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and marketplaces.\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(SKU in Amazon).\n"
+"* Deliveries confirmed in Odoo are synchronized in Amazon.\n"
+"* Support for both Fulfilment by Amazon (FBA) and Fulfilment by Merchant "
+"(FBM):\n"
+"    * FBA: A stock location and stock moves allow to monitor your stock in "
+"Amazon Fulfilment\n"
+"      Centers.\n"
+"    * FBM: Delivery notifications are sent to Amazon for each confirmed "
+"picking (partial delivery\n"
+"      friendly).\n"
+msgstr ""
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
@@ -400,6 +423,11 @@ msgid "Amazon Accounts"
 msgstr "Amazon Hesapları"
 
 #. module: sale_amazon
+#: model:ir.module.module,shortdesc:base.module_sale_amazon
+msgid "Amazon Connector"
+msgstr ""
+
+#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__amazon_feed_ref
 #: model:ir.model.fields,field_description:sale_amazon.field_stock_picking__amazon_feed_ref
 msgid "Amazon Feed Reference"
@@ -496,28 +524,6 @@ msgstr ""
 "Amazon, gönderim konumu için belirli bilgiler gerektirir. Lütfen aşağıdaki "
 "bilgilerin '%(location_name)s' (%(location)s) adresinde cadde, ülke ve ülke "
 "kodu bilgilerinin ayarlandığından emin olun."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"Since the current carrier doesn't automatically provide a tracking "
-"reference, you need to set one manually."
-msgstr ""
-"Amazon, her teslimatta bir izleme referansı sağlanmasını gerektirir. Geçerli "
-"taşıyıcı otomatik olarak bir izleme referansı sağlamadığından, manuel olarak "
-"bir izleme referansı ayarlamanız gerekir."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"You need to assign a carrier to this delivery."
-msgstr ""
-"Amazon, her teslimatta bir izleme referansı sağlanmasını gerektirir. Bu "
-"teslimata bir taşıyıcı atamanız gerekir."
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -696,11 +702,6 @@ msgid "Back to my account"
 msgstr "Hesabıma geri dön"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
-msgid "Cancel"
-msgstr "İptal"
-
-#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__company_id
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__company_id
 msgid "Company"
@@ -789,11 +790,6 @@ msgstr "Kimlik bilgileri"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Default Products"
 msgstr "Varsayılan Ürünler"
-
-#. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
-msgid "Discard"
-msgstr "Sil"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
@@ -960,6 +956,11 @@ msgstr ""
 "faturalandırma ve teslim yapabilirsiniz."
 
 #. module: sale_amazon
+#: model:ir.module.module,summary:base.module_sale_amazon
+msgid "Import Amazon orders and sync deliveries"
+msgstr ""
+
+#. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
 msgid "In Processing by Amazon"
 msgstr "Amazon Tarafından İşleniyor"
@@ -1034,6 +1035,12 @@ msgstr "Pazar Yeri"
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__active_marketplace_ids
 msgid "Marketplaces"
 msgstr "Pazaryerleri"
+
+#. module: sale_amazon
+#. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Missing product name"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__name
@@ -1373,11 +1380,9 @@ msgstr "Stok Tutma Birimi."
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_channel
 msgid ""
-"The channel will be updated with the incomming orders or during the next "
-"stock synchronization."
+"The channel will be updated with the incomming orders or, if left empty, "
+"during the next stock synchronization."
 msgstr ""
-"Kanal, gelen siparişlerle veya bir sonraki stok senkronizasyonu sırasında "
-"güncellenecektir."
 
 #. module: sale_amazon
 #. odoo-python
@@ -1560,8 +1565,7 @@ msgstr "Hesabın kullanıcı tanımlı adı."
 #. module: sale_amazon
 #: model:ir.model.constraint,message:sale_amazon.constraint_amazon_marketplace_unique_api_ref
 msgid "There can only exist one marketplace for a given API Identifier."
-msgstr ""
-"Belirli bir API Tanımlayıcısı için yalnızca bir pazar yeri bulunabilir."
+msgstr "Belirli bir API Tanımlayıcısı için yalnızca bir pazar yeri bulunabilir."
 
 #. module: sale_amazon
 #: model:ir.model.constraint,message:sale_amazon.constraint_sale_order_unique_amazon_order_ref
@@ -1697,209 +1701,3 @@ msgstr "örneğin Amerikan Pazarı"
 #: code:addons/sale_amazon/models/amazon_account.py:0
 msgid "id"
 msgstr "kimlik"
-
-#~ msgid ""
-#~ "<div>\n"
-#~ "            <p>The synchronization of the Amazon order with reference <t "
-#~ "t-out=\"ctx.get('amazon_order_ref') or ''\">REF</t> encountered an error "
-#~ "and was not completed.</p>\n"
-#~ "            <p>Unless the order is canceled in SellerCentral, no other "
-#~ "synchronization will be attempted.</p>\n"
-#~ "            <p>To schedule a new synchronization attempt, proceed as "
-#~ "follows:\n"
-#~ "                <ol>\n"
-#~ "                    <li>Enter the Developer Tools.</li>\n"
-#~ "                    <li>Open the form of the Amazon Account on which the "
-#~ "order was placed.</li>\n"
-#~ "                    <li>Navigate to the Order Follow-up tab.</li>\n"
-#~ "                    <li>Set a date for <em>Last Orders Sync</em> that is "
-#~ "anterior to the last status update of the order.</li>\n"
-#~ "                    <li>Save the changes and click on the <em>SYNC "
-#~ "ORDERS</em> button.</li>\n"
-#~ "                </ol>\n"
-#~ "            </p>\n"
-#~ "            <p>If the problem persists, contact <a href=\"https://"
-#~ "www.odoo.com/help/\">Odoo support</a>.</p>\n"
-#~ "        </div>\n"
-#~ "        "
-#~ msgstr ""
-#~ "<div>\n"
-#~ "            <p>Amazon siparişinin referans <t t-"
-#~ "out=\"ctx.get('amazon_order_ref') or ''\">REF</t> ile senkronizasyonu bir "
-#~ "hatayla karşılaştı ve tamamlanmadı.</p>\n"
-#~ "            <p>Sipariş SellerCentral'da iptal edilmediği sürece başka bir "
-#~ "senkronizasyon denenmez.</p>\n"
-#~ "            <p>Yeni bir eşitleme girişimi zamanlamak için aşağıdaki "
-#~ "adımları izleyin:                <ol>\n"
-#~ "                    <li>Geliştirici Araçları'na girin.</li>\n"
-#~ "                    <li>Siparişin verildiği Amazon Hesabı formunu açın.</"
-#~ "li>\n"
-#~ "                    <li>Sipariş Takibi sekmesine gidin.</li>\n"
-#~ "                    <li><em>Son Siparişler Eşitlemesi</em> için, "
-#~ "siparişin son durum güncellemesinin önünde bir tarih ayarlayın.</li>\n"
-#~ "                    <li>Değişiklikleri kaydedin ve <em>SİPARİŞLERİ "
-#~ "SENKRONİZE ET</em> düğmesine tıklayın.</li>\n"
-#~ "                </ol>\n"
-#~ "            </p>\n"
-#~ "            <p>Sorun devam ederse, <a href=\"https://www.odoo.com/help/"
-#~ "\">Odoo desteğine</a> başvurun.</p>\n"
-#~ "        </div>\n"
-#~ "        "
-
-#~ msgid "AWS Access Key"
-#~ msgstr "AWS Erişim Anahtarı"
-
-#~ msgid "AWS Secret Key"
-#~ msgstr "AWS Gizli Anahtarı"
-
-#~ msgid "AWS Session Token"
-#~ msgstr "AWS Oturum Belirteci"
-
-#~ msgid ""
-#~ "After validation of the credentials, the marketplaces\n"
-#~ "                                                to which this account has "
-#~ "access will be\n"
-#~ "                                                synchronized and "
-#~ "automatically made available."
-#~ msgstr ""
-#~ "Kimlik bilgilerinin doğrulanmasından sonra, marketler\n"
-#~ "                                                bu hesabın erişimi olan\n"
-#~ "                                                senkronize edilir ve "
-#~ "otomatik olarak kullanılabilir hale getirilir."
-
-#~ msgid "Amazon Email"
-#~ msgstr "Amazon E-posta"
-
-#~ msgid "Error code: %s; description: %s"
-#~ msgstr "Hata kodu: %s; açıklama: %s"
-
-#~ msgid ""
-#~ "If this account gained access to new "
-#~ "marketplaces,                                         synchronize and add "
-#~ "them to the current sync marketplaces"
-#~ msgstr ""
-#~ "Bu hesap yeni marketlere erişim "
-#~ "kazandıysa,                                         bunları senkronize "
-#~ "edin ve geçerli senkronizasyon marketlerine ekleyin"
-
-#~ msgid "Inactive"
-#~ msgstr "Pasif"
-
-#~ msgid "Is Follow Up Displayed"
-#~ msgstr "Takip Ediliyor mu"
-
-#~ msgid "Link with Amazon"
-#~ msgstr "Amazon ile bağlantı kurun"
-
-#~ msgid ""
-#~ "Link your Amazon account with Odoo to start synchronizing your\n"
-#~ "                                Amazon orders."
-#~ msgstr ""
-#~ "Amazon hesabınızı senkronize etmeye başlamak için Amazon hesabınızı Odoo "
-#~ "ile bağlayın\n"
-#~ "                                Amazon siparişleri."
-
-#~ msgid "Order Follow-up"
-#~ msgstr "Sipariş Takibi"
-
-#~ msgid "SKU"
-#~ msgstr "SKU"
-
-#~ msgid "SKU must be unique for a given account and marketplace."
-#~ msgstr "SKU, belirli bir hesap ve market için benzersiz olmalıdır."
-
-#~ msgid ""
-#~ "Select the marketplace on which your seller account\n"
-#~ "                                                was originally created."
-#~ msgstr ""
-#~ "Satıcı hesabınızın bulunduğu pazar yerini seçin\n"
-#~ "                                                orijinal olarak "
-#~ "yaratılmıştır."
-
-#~ msgid "Sign-up Marketplace"
-#~ msgstr "Kayıt Market"
-
-#~ msgid "Stock Location"
-#~ msgstr "Stok Konumu"
-
-#~ msgid "Sync Marketplaces"
-#~ msgstr "Senkronizasyon Marketleri"
-
-#~ msgid ""
-#~ "The communication with the API failed.\n"
-#~ "Error code: %s; description: %s"
-#~ msgstr ""
-#~ "API ile iletişim başarısız oldu.\n"
-#~ "Hata kodu: %s; açıklama: %s"
-
-#~ msgid "The encrypted email of the customer. Does not forward mails."
-#~ msgstr "Müşterinin şifreli e-postası. Postaları iletmez."
-
-#~ msgid "The moment at which the AWS credentials become invalid."
-#~ msgstr "AWS kimlik bilgilerinin geçersiz hale geldiği an."
-
-#~ msgid ""
-#~ "The order has been canceled by the Amazon customer while someproducts "
-#~ "have already been delivered. Please create a return for this order to "
-#~ "adjust the stock."
-#~ msgstr ""
-#~ "Sipariş, Amazon müşterisi tarafından iptal edilirken, bazı ürünler zaten "
-#~ "teslim edildi. Lütfen stoku ayarlamak için bu sipariş için bir getiri "
-#~ "oluşturun."
-
-#~ msgid ""
-#~ "The original sign-up marketplace of this account. Used for authentication "
-#~ "only."
-#~ msgstr ""
-#~ "Bu hesabın orijinal kayıt pazarı. Yalnızca kimlik doğrulaması için "
-#~ "kullanılır."
-
-#~ msgid "The short-lived key used to identify the assumed ARN role on AWS."
-#~ msgstr ""
-#~ "AWS'de varsayılan ARN rolünü tanımlamak için kullanılan kısa ömürlü "
-#~ "anahtar."
-
-#~ msgid ""
-#~ "The short-lived key used to verify the access to the assumed ARN role on "
-#~ "AWS."
-#~ msgstr ""
-#~ "AWS'de varsayılan ARN rolüne erişimi doğrulamak için kullanılan kısa "
-#~ "ömürlü anahtar."
-
-#~ msgid ""
-#~ "The short-lived token used to query the SP-API with the assumed ARN role "
-#~ "on AWS."
-#~ msgstr ""
-#~ "AWS'de varsayılan ARN rolüyle SP-API'yi sorgulamak için kullanılan kısa "
-#~ "ömürlü belirteç."
-
-#~ msgid ""
-#~ "This action will disconnect your account with Amazon "
-#~ "and                                          cannot be undone. Are you "
-#~ "sure you want to proceed?"
-#~ msgstr ""
-#~ "Bu işlem, hesabınızın Amazon ile bağlantısını keser "
-#~ "ve                                          geri alınamaz. Devam etmek "
-#~ "istediğinizden emin misiniz?"
-
-#~ msgid "Unlink account"
-#~ msgstr "Hesap bağlantısını Kaldır"
-
-#~ msgid "Update Available Marketplaces"
-#~ msgstr "Mevcut Marketleri Güncelleme"
-
-#~ msgid "Your Amazon account is linked with Odoo."
-#~ msgstr "Amazon hesabınız Odoo ile bağlantılıdır."
-
-#~ msgid ""
-#~ "[%s] %s\n"
-#~ "Condition: %s - %s"
-#~ msgstr ""
-#~ "[%s] %s\n"
-#~ "Durum: %s - %s"
-
-#~ msgid "[%s] Delivery Charges for %s"
-#~ msgstr "[%s] %s için Teslimat Ücretleri"
-
-#~ msgid "[%s] Gift Wrapping Charges for %s"
-#~ msgstr "[%s] %s için Hediye Paketi Ücretleri"

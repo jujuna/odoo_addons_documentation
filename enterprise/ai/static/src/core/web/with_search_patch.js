@@ -1,18 +1,14 @@
-import { WithSearch } from "@web/search/with_search/with_search";
+import { t } from "@odoo/owl";
+import { WithSearch, withSearchProps } from "@web/search/with_search/with_search";
 import { patch } from "@web/core/utils/patch";
-import { useViewDetailsGetter } from "@ai/discuss/core/common/view_details";
+import { useDataGetter } from "@ai/utils/bus_data_getter";
 
-patch(WithSearch, {
-    props: {
-        ...WithSearch.props,
-        ai: { type: Object, optional: true },
-    },
-});
+withSearchProps.ai = t.object().optional();
 
 patch(WithSearch.prototype, {
     setup() {
         super.setup(...arguments);
-        useViewDetailsGetter(() => this.getCurrentViewInfo());
+        useDataGetter("view", () => this.getCurrentViewInfo());
     },
     async getCurrentViewInfo() {
         const config = this.env.config;
@@ -22,13 +18,15 @@ patch(WithSearch.prototype, {
         if (config.viewType === "form") {
             return;
         }
+        result.action_name = config.actionName;
         result.action_id = config.actionId;
         result.view_id = config.viewId;
         result.model = searchModel.resModel;
-        result.available_view_types = config.viewSwitcherEntries.map((v) => v.type);
+        result.domain = searchModel.domainString;
+        result.available_view_types = config.viewSwitcherEntries?.map((v) => v.type) || [];
         result.view_type = config.viewType;
         result.order_by = searchModel.orderBy;
-        result.facets = searchModel.facets;
+        result.facets = searchModel.facets.map(({ icon, color, ...rest }) => rest);
         return result;
     },
 });

@@ -1,13 +1,17 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import http, _
 from odoo.http import request
-from odoo.addons.mail.tools.discuss import add_guest_to_context, Store
+from odoo.addons.mail.tools.discuss import add_guest_to_context, mail_route, Store
+
+
+# Exceeding this per-render limit keeps the preview block as plain text links
+# to avoid flooding the discuss UI with cards.
+PREVIEW_MAX_CARDS = 25
 
 
 class AIWebsiteLivechatController(http.Controller):
 
-    @http.route('/ai_website_livechat/create_chat_channel', methods=["POST"], type="jsonrpc", auth='public')
-    @add_guest_to_context
+    @mail_route('/ai_website_livechat/create_chat_channel', methods=["POST"], type="jsonrpc", auth='public')
     def create_chat_channel_with_ai_agent(self, ai_agent_id):
         # Sudo => access is managed through _is_user_access_allowed.
         ai_agent = self.env['ai.agent'].sudo().search([('id', '=', ai_agent_id)])
@@ -26,15 +30,18 @@ class AIWebsiteLivechatController(http.Controller):
             request.update_context(guest=guest)
         if guest:
             store.add_global_values(guest_token=guest.sudo()._format_auth_cookie())
-        # The active chat channel with the AI Agent is removed and a new one is created to limit visitors to a single chat channel.
-        # Not returning the active chat channel and creating a new one instead is a design choice.
-        active_chat_channel = ai_agent._get_ai_chat_channel()
-        if active_chat_channel:
-            active_chat_channel.sudo().unlink()
-        channel = ai_agent._create_ai_chat_channel()
-        request.env["res.users"]._init_store_data(store)
-        store.add(channel)
-        return {'channel_id': channel.id, 'store_data': store.get_result()}
+            # Existing chats are deleted and a new one is created to limit visitors to a single AI chat.
+            # Not returning the active chat channel and creating a new one instead is a design choice.
+            if active_channels := self.env['discuss.channel'].search([('is_member', '=', True), ('channel_type', '=', 'ai_chat')]):
+                active_channels.sudo().unlink()
+        channel = ai_agent._create_ai_chat_channel("AI livechat")
+        self.env['ai.session'].sudo().create({
+            'agent_id': ai_agent.id,
+            'channel_id': channel.id,
+        })
+        store.add_global_values(request.env.user.sudo(False)._store_init_global_fields)
+        store.add(channel, "_store_channel_fields")
+        return {'channel_id': channel.id, 'store_data': store}
 
     def _get_guest_name(self):
         return _("Visitor")
@@ -56,3 +63,24 @@ class AIWebsiteLivechatController(http.Controller):
         operator = livechat_channel._get_operator(country_id=country.id, lang=request.cookies.get("frontend_lang"))
         operator = operator - self.env.user
         return bool(operator)
+
+    @http.route('/ai/preview_cards', methods=["POST"], type="jsonrpc", auth='public', website=True)
+    @add_guest_to_context
+    def get_preview_cards(self, model, record_ids):
+        # Don't attempt to render preview cards if there are too many
+        # records, to avoid performance issues and flooding the UI with cards.
+        if len(record_ids) > PREVIEW_MAX_CARDS:
+            return {'html': False, 'count': 0}
+        if not model or model not in request.env:
+            return {'html': False, 'count': 0}
+        model_obj = request.env[model]
+        if not isinstance(model_obj, request.env.registry['ai.preview.card.mixin']):
+            return {'html': False, 'count': 0}
+        records = model_obj.search_fetch([('id', 'in', record_ids)])
+        record_index = {record_id: index for index, record_id in enumerate(record_ids)}
+        records = records.sorted(key=lambda record: record_index[record.id])
+        result = records._ai_render_preview_cards()
+        if not result:
+            return {'html': False, 'count': 0}
+        cards_html, card_count = result
+        return {'html': cards_html, 'count': card_count}

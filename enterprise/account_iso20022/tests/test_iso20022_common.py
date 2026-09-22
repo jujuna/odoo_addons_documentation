@@ -1,11 +1,12 @@
 from lxml import etree
-import base64
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.tests import tagged
 
 
 @tagged('post_install', '-at_install')
 class TestISO20022CommonCreditTransfer(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def collect_company_accounting_data(cls, company):
         company.update({
@@ -55,7 +56,7 @@ class TestISO20022CommonCreditTransfer(AccountTestInvoicingCommon):
         return batch
 
     def get_sct_doc_from_batch(self, batch):
-        xml_doc = etree.fromstring(base64.b64decode(batch.export_file))
+        xml_doc = etree.fromstring(batch.export_file.content)
         # Check that all unique elements respect the ISO20022 constraints before replacing them for testing purpose
         namespace = {'ns': next(iter(xml_doc.nsmap.values()))}
         MsgId = xml_doc.find('.//ns:MsgId', namespaces=namespace)

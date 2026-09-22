@@ -1,7 +1,6 @@
-import { Record } from "@mail/core/common/record";
+import { Record } from "@mail/model/export";
 
 export class WhatsAppAccount extends Record {
-    static id = "id";
     static _name = "whatsapp.account";
 
     /** @type {number} */

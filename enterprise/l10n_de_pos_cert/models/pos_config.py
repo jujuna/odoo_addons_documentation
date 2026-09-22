@@ -86,7 +86,7 @@ class PosConfig(models.Model):
     def _l10n_de_create_tss_process(self):
         tss_id = str(uuid.uuid4())
         local_tss = self.search([('company_id', '=', self.company_id.id), ('l10n_de_fiskaly_tss_id', '!=', False)])
-        db_uuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        db_uuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
         self.company_id._l10n_de_fiskaly_iap_rpc('/tss', {'tss_id': tss_id, 'db_uuid': db_uuid, 'tss': len(local_tss)})
 
         tss_creation_resp = self.company_id._l10n_de_fiskaly_kassensichv_rpc('PUT', '/tss/%s' % tss_id, {}) # Yes, Fiskaly is asking for a empty object...

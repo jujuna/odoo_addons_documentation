@@ -1,4 +1,4 @@
-import { x2ManyCommands } from "@web/core/orm_service";
+import { x2ManyCommands } from "@web/core/orm_plugin";
 import { _t } from "@web/core/l10n/translation";
 
 import { helpers } from "@odoo/o-spreadsheet";
@@ -185,17 +185,16 @@ export class FieldSyncUIPlugin extends OdooUIPlugin {
         }
     }
 
-    drawLayer({ ctx }, layer) {
-        const activeSheetId = this.getters.getActiveSheetId();
+    drawLayer({ ctx, viewports, sheetId: renderedSheetId }, layer) {
         for (const [{ col, row, sheetId }] of this.getters.getAllFieldSyncs()) {
-            if (sheetId !== activeSheetId) {
+            if (sheetId !== renderedSheetId) {
                 continue;
             }
-            const zone = this.getters.expandZone(activeSheetId, positionToZone({ col, row }));
+            const zone = this.getters.expandZone(sheetId, positionToZone({ col, row }));
             if (zone.left !== col || zone.top !== row) {
                 continue;
             }
-            const { x, y, width } = this.getters.getVisibleRect(zone);
+            const { x, y, width } = viewports.getVisibleRect(sheetId, zone);
             ctx.fillStyle = "#6C4E65";
             ctx.beginPath();
 

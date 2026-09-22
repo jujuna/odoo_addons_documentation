@@ -24,7 +24,7 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
             """
             LEFT JOIN pos_order ON pos_order.account_move = account_move_line__move_id.id
             LEFT JOIN pos_session ON pos_session.id = pos_order.session_id
-            LEFT JOIN account_move session_move ON session_move.id = pos_session.move_id
+            LEFT JOIN account_move session_move ON session_move.pos_session_sales_id = pos_session.id
             %s
             """,
             additional_joined_table_for_aml_aggregates or SQL()
@@ -42,7 +42,7 @@ class L10n_PlTaxReportHandler(models.AbstractModel):
         additional_joined_table = SQL(
             """
             LEFT JOIN pos_order ON pos_order.account_move = account_move_line__move_id.id
-            LEFT JOIN pos_session ON pos_session.move_id = account_move_line__move_id.id
+            LEFT JOIN pos_session ON pos_session.id = account_move_line__move_id.pos_session_sales_id
             %s
             """,
             additional_joined_table or SQL()

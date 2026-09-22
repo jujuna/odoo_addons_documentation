@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 {
     'name': "Germany - Certification for Point of Sale",
@@ -15,18 +14,20 @@ Install this if you are using the Point of Sale app in Germany.
     'version': '0.1',
 
     'depends': ['l10n_de', 'point_of_sale', 'iap'],
-    'installable': True,
     'auto_install': True,
 
     'data': [
-        'security/ir.model.access.csv',
-        'security/l10n_de_pos_cert_security.xml',
         'views/account_view.xml',
         'views/l10n_de_pos_dsfinvk_export_views.xml',
+        'views/l10n_de_pos_tss_export_views.xml',
+        'views/menuitems_views.xml',
         'views/point_of_sale_dashboard.xml',
         'views/res_config_settings_views.xml',
         'views/pos_order_views.xml',
         'views/res_company_views.xml',
+        'receipt/pos_order_receipt.xml',
+
+        'security/ir.access.csv',
     ],
     'assets': {
         'point_of_sale._assets_pos': [

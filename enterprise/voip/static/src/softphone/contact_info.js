@@ -1,33 +1,26 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 
-import { _t } from "@web/core/l10n/translation";
 import { url } from "@web/core/utils/urls";
+import { DiscussAvatar } from "@mail/core/common/discuss_avatar";
 
 /**
  * Displays general information (avatar, name, etc.) about the contact
  * associated with the given call.
  */
 export class ContactInfo extends Component {
-    static defaultProps = { extraClass: "" };
-    static props = {
-        contact: { type: [Object, Boolean], optional: true, default: null },
-        phoneNumber: { type: String, optional: true },
-        extraClass: { type: String, optional: true },
-    };
+    static components = { DiscussAvatar };
+    props = useProps({
+        contact: t.or([t.object(), t.boolean(), t.literal(null)]).optional(null),
+        phoneNumber: t.string().optional(),
+        alias: t.string().optional(),
+        extraClass: t.string().optional(""),
+    });
     static template = "voip.ContactInfo";
 
-    /** @returns {string} */
-    get avatarAlt() {
-        if (!this.contact) {
-            return _t("Default profile picture");
-        }
-        return _t("Profile picture of %(user)s", { user: this.contact.name });
-    }
-
-    /** @returns {string} */
+    /** @returns {?string} */
     get avatarUrl() {
         if (!this.contact) {
-            return "/base/static/img/avatar_grey.png";
+            return null;
         }
         return url("/web/image", {
             model: "res.partner",
@@ -47,8 +40,8 @@ export class ContactInfo extends Component {
             return ""; // TODO
         }
         const info = [];
-        if (this.contact.commercial_company_name) {
-            info.push(this.contact.commercial_company_name);
+        if (this.contact.parent_name) {
+            info.push(this.contact.parent_name);
         }
         // ⚠ French: function = job position
         if (this.contact.function) {
@@ -59,6 +52,6 @@ export class ContactInfo extends Component {
 
     /** @returns {string} */
     get contactName() {
-        return this.contact?.voipName || this.props.phoneNumber;
+        return this.props.alias || this.contact?.voipName || this.props.phoneNumber;
     }
 }

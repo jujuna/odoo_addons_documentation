@@ -14,7 +14,7 @@ class HrReferralPoints(models.Model):
     hr_referral_reward_id = fields.Many2one('hr.referral.reward', string="Reward")
     ref_user_id = fields.Many2one('res.users', required=True, string='User', index=True)
     points = fields.Integer('Points')
-    stage_id = fields.Many2one('hr.recruitment.stage', 'Stage')
+    stage_id = fields.Many2one('hr.recruitment.stage', 'Stage', index='btree_not_null')
     sequence_stage = fields.Integer('Sequence of stage', related='stage_id.sequence')
     company_id = fields.Many2one('res.company', 'Company', required=True, default=lambda self: self.env.company)
 

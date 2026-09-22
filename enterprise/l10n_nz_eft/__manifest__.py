@@ -10,7 +10,6 @@ EFT Batch Payment
 =================
 """,
     'category': 'Accounting/Localizations/EDI',
-    'version': '1.0',
     'depends': ['account_batch_payment', 'l10n_nz'],
     'data': [
         'data/eft_data.xml',
@@ -18,6 +17,5 @@ EFT Batch Payment
         'views/account_journal_views.xml',
         'views/account_payment_views.xml',
     ],
-    'installable': True,
     'license': 'OEEL-1',
 }

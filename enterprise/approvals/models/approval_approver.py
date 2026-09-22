@@ -7,11 +7,9 @@ from odoo.exceptions import AccessError
 class ApprovalApprover(models.Model):
     _name = 'approval.approver'
     _description = 'Approver'
-    _order = 'sequence, id'
 
     _check_company_auto = True
 
-    sequence = fields.Integer('Sequence', default=10)
     user_id = fields.Many2one('res.users', string="User", required=True, check_company=True,
         domain="""
             [
@@ -25,7 +23,6 @@ class ApprovalApprover(models.Model):
     status = fields.Selection([
         ('new', 'New'),
         ('pending', 'To Approve'),
-        ('waiting', 'Waiting'),
         ('approved', 'Approved'),
         ('refused', 'Refused'),
         ('cancel', 'Cancel')], string="Status", default="new", readonly=True)

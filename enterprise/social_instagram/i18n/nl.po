@@ -3,26 +3,59 @@
 # * social_instagram
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# Bren Driesen <brdri@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-09-14 11:59+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 02:39+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
 "social_instagram/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 msgid "(between 1.91:1 and 4:5)."
 msgstr "(tussen 1.91:1 en 4:5)."
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"- Check permissions: Your site's robots.txt might be blocking Instagram from "
+"accessing the media folder (make sure /social_instagram is not blocked)."
+msgstr ""
+"- Controleer de machtigingen: het robots.txt-bestand van je site blokkeert "
+"mogelijk de toegang van Instagram tot de mediamap (zorg ervoor dat /"
+"social_instagram niet wordt geblokkeerd)."
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"- Check your connection: Your server may be offline or temporarily "
+"unreachable."
+msgstr ""
+"- Controleer je verbinding: Je server is mogelijk offline of tijdelijk "
+"onbereikbaar."
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"- Check your file: Ensure it isn't corrupted and is from 320 to 1440 pixels "
+"wide, 8MB maximum, aspect ratio between 4:5 and 1.91:1."
+msgstr ""
+"- Controleer je bestand: Zorg ervoor dat het niet beschadigd is en een "
+"breedte heeft van 320 tot 1440 pixels, maximaal 8 MB groot is, met een "
+"beeldverhouding tussen 4:5 en 1,91:1."
 
 #. module: social_instagram
 #: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
@@ -30,43 +63,37 @@ msgid "34 SECONDS AGO"
 msgstr "34 SECONDEN GELEDEN"
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-comments me-1\" title=\"Comments\"/>"
-msgstr "<i class=\"fa fa-comments me-1\" title=\"Commentaren\"/>"
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
+msgid ""
+"<i class=\"oi me-1\" data-icon=\"warning\"/>\n"
+"            At least one image is required when posting on Instagram."
+msgstr ""
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 msgid ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
-"                At least one image is required when posting on Instagram."
+"<i class=\"oi me-1\" data-icon=\"warning\"/>\n"
+"            Your image appears to be corrupted, please try loading it again."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
-"                Bij het posten op Instagram is ten minste één afbeelding "
-"vereist."
-
-#. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
-msgid ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
-"                You can only post up to 10 images at once."
-msgstr ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
-"                Je kunt maximaal 10 afbeeldingen tegelijk posten."
-
-#. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
-msgid ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
-"                Your image appears to be corrupted, please try loading it "
-"again."
-msgstr ""
-"<i class=\"fa fa-exclamation-triangle me-1\"/>\n"
-"                Je afbeelding lijkt corrupt, probeer deze opnieuw te laden."
 
 #. module: social_instagram
 #: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-heart me-1\" title=\"Likes\"/>"
-msgstr "<i class=\"fa fa-heart me-1\" title=\"Likes\"/>"
+msgid "<i class=\"oi oi-filled me-1\" data-icon=\"favorite\" title=\"Likes\"/>"
+msgstr ""
+"<i class=\"oi oi-filled me-1\" data-icon=\"favorite\" title=\"Likes\"/>"
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_view_form
+msgid ""
+"<span class=\"badge rounded-pill text-bg-warning py-1 px-2\" invisible=\"not "
+"instagram_is_story_expired\">\n"
+"                    Expired\n"
+"                </span>"
+msgstr ""
+"<span class=\"badge rounded-pill text-bg-warning py-1 px-2\" invisible=\"not "
+"instagram_is_story_expired\">\n"
+"                    Verlopen\n"
+"               </span>"
 
 #. module: social_instagram
 #: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
@@ -79,10 +106,38 @@ msgid "<span class=\"mt-1 fw-bold\">My Instagram Page</span>"
 msgstr "<span class=\"mt-1 fw-bold\">My Instagram Page</span>"
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+msgid ""
+"<span class=\"o_social_preview_icon_wrapper d-inline-block overflow-hidden "
+"me-2\">\n"
+"                        <i class=\"oi oi-2x\" data-icon=\"oi_instagram\"/>\n"
+"                    </span>\n"
+"                    <b class=\"me-1\">My Page</b> <span>7h</span>"
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+msgid "<span>1 Comment</span>"
+msgstr "<span>1 Reactie</span>"
+
+#. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_access_token
 #: model:ir.model.fields,field_description:social_instagram.field_social_post_template__instagram_access_token
 msgid "Access Token"
 msgstr "Toegangstoken"
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid "Add Media"
+msgstr "Media toevoegen"
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid "An error occurred while contacting the Instagram API, please try again."
+msgstr ""
+"Er is een fout opgetreden bij het verbinden met de Instagram-API. Probeer "
+"het opnieuw."
 
 #. module: social_instagram
 #: model_terms:ir.ui.view,arch_db:social_instagram.res_config_settings_view_form
@@ -92,7 +147,7 @@ msgstr "App ID"
 #. module: social_instagram
 #: model_terms:ir.ui.view,arch_db:social_instagram.res_config_settings_view_form
 msgid "App Secret"
-msgstr "App geheim"
+msgstr "App-geheim"
 
 #. module: social_instagram
 #. odoo-python
@@ -117,6 +172,20 @@ msgstr ""
 "gebruiken in plaats van de verstrekte."
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid ""
+"Comment your own post to get the conversation going or share some extra "
+"content."
+msgstr ""
+"Plaats een reactie op je eigen bericht om de discussie op gang te brengen of "
+"deel wat extra inhoud."
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
+msgid "Comments"
+msgstr "Reacties"
+
+#. module: social_instagram
 #: model:ir.model,name:social_instagram.model_res_config_settings
 msgid "Config Settings"
 msgstr "Configuratie-instellingen"
@@ -128,12 +197,18 @@ msgid "Could not find any account to add."
 msgstr "Kan geen account vinden om toe te voegen."
 
 #. module: social_instagram
+#: model:ir.model,name:social_instagram.model_discuss_channel
+msgid "Discussion Channel"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_post__display_instagram_preview
 #: model:ir.model.fields,field_description:social_instagram.field_social_post_template__display_instagram_preview
 msgid "Display Instagram Preview"
 msgstr "Instagram-voorbeeld weergeven"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_discuss_channel__display_name
 #: model:ir.model.fields,field_description:social_instagram.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:social_instagram.field_social_account__display_name
 #: model:ir.model.fields,field_description:social_instagram.field_social_live_post__display_name
@@ -165,6 +240,7 @@ msgid "Has Instagram Account"
 msgstr "Heeft Instagram account"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_discuss_channel__id
 #: model:ir.model.fields,field_description:social_instagram.field_res_config_settings__id
 #: model:ir.model.fields,field_description:social_instagram.field_social_account__id
 #: model:ir.model.fields,field_description:social_instagram.field_social_live_post__id
@@ -177,9 +253,9 @@ msgid "ID"
 msgstr "ID"
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
-msgid "Images"
-msgstr "Afbeeldingen"
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_view_form
+msgid "Immediately"
+msgstr ""
 
 #. module: social_instagram
 #: model:ir.model.fields.selection,name:social_instagram.selection__social_media__media_type__instagram
@@ -258,6 +334,12 @@ msgid "Instagram Facebook Author ID"
 msgstr "Instagram Facebook Auteur ID"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_first_comment
+#: model:ir.model.fields,field_description:social_instagram.field_social_post_template__instagram_first_comment
+msgid "Instagram First Comment"
+msgstr "Instagram Eerste reactie"
+
+#. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_image_ids
 #: model:ir.model.fields,field_description:social_instagram.field_social_post_template__instagram_image_ids
 msgid "Instagram Images"
@@ -281,6 +363,13 @@ msgid "Instagram Post ID"
 msgstr "Instagram bericht-ID"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_live_post__instagram_post_as_story
+#: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_post_as_story
+#: model:ir.model.fields,field_description:social_instagram.field_social_post_template__instagram_post_as_story
+msgid "Instagram Post Story"
+msgstr "Instagram Verhaal posten"
+
+#. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_stream_post__instagram_post_link
 msgid "Instagram Post URL"
 msgstr "URL van Instagram-bericht"
@@ -297,16 +386,71 @@ msgid "Instagram Preview"
 msgstr "Instagram-voorbeeld"
 
 #. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_stream_post__instagram_saved_count
+msgid "Instagram Saved"
+msgstr "Instagram Opgeslagen"
+
+#. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_post__instagram_scheduled_date
+msgid "Instagram Scheduled for"
+msgstr ""
+
+#. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_live_post__instagram_is_story_expired
+msgid "Instagram Story Expired"
+msgstr "Instagramverhaal verlopen"
+
+#. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_social_stream_post__instagram_views_count
+msgid "Instagram Views"
+msgstr "Instagram weergaven"
+
+#. module: social_instagram
+#: model:ir.model.fields,field_description:social_instagram.field_res_config_settings__instagram_webhook_verify_token
+msgid "Instagram Webhook Verify Token"
+msgstr ""
+
+#. module: social_instagram
 #. odoo-python
 #: code:addons/social_instagram/controllers/main.py:0
 msgid "Instagram did not provide a valid access token."
 msgstr "Instagram heeft geen geldige toegangstoken verstrekt."
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
+msgid "Instagram stories can only contain a single picture."
+msgstr "Instagramverhalen mogen slechts één foto bevatten."
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"Instagram took too long to process the request. This can happen with large "
+"images, try posting a smaller one."
+msgstr ""
+"Instagram had te veel tijd nodig om het verzoek te verwerken. Dit kan "
+"gebeuren bij grote afbeeldingen. Probeer een kleinere afbeelding te plaatsen."
+
+#. module: social_instagram
 #. odoo-javascript
 #: code:addons/social_instagram/static/src/xml/social_instagram_templates.xml:0
 msgid "Likes"
 msgstr "Vind-ik-leuks"
+
+#. module: social_instagram
+#: model:ir.module.module,summary:base.module_social_instagram
+msgid "Manage your Instagram Business accounts and schedule posts"
+msgstr ""
+
+#. module: social_instagram
+#: model:ir.module.module,description:base.module_social_instagram
+msgid "Manage your Instagram Business accounts and schedule posts."
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid "Media"
+msgstr "Media"
 
 #. module: social_instagram
 #: model:ir.model.fields,field_description:social_instagram.field_social_media__media_type
@@ -320,6 +464,12 @@ msgstr "Bericht"
 
 #. module: social_instagram
 #. odoo-python
+#: code:addons/social_instagram/models/social_post_template.py:0
+msgid "Oops! Instagram stories can only contain a single picture."
+msgstr "Oeps! Instagramverhalen mogen slechts één foto bevatten."
+
+#. module: social_instagram
+#. odoo-python
 #: code:addons/social_instagram/models/social_media.py:0
 msgid ""
 "Oops! You currently don't have an active subscription. No worries, though! "
@@ -329,6 +479,12 @@ msgstr ""
 "Oeps! Je hebt momenteel geen actief abonnement. Geen zorgen, schaf er hier "
 "eenvoudig een aan: %s.\n"
 "Met een abonnement ontdek je een wereld vol fantastische functies!"
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_account.py:0
+msgid "Oops, we couldn't show this file."
+msgstr ""
 
 #. module: social_instagram
 #. odoo-python
@@ -352,15 +508,48 @@ msgid "Post Image"
 msgstr "Plaats afbeelding"
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_view_form
+msgid "Post On"
+msgstr ""
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid "Post as Story"
+msgstr "Als verhaal plaatsen"
+
+#. module: social_instagram
 #. odoo-python
 #: code:addons/social_instagram/controllers/main.py:0
 msgid "Read More about Instagram Accounts"
 msgstr "Meer lezen over Instagram Accounts"
 
 #. module: social_instagram
+#. odoo-javascript
+#: code:addons/social_instagram/static/src/xml/social_instagram_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
+msgid "Save"
+msgstr "Opslaan"
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_post_template_view_form
+msgid "Scheduled first comment"
+msgstr "Geplande eerste reactie"
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_account.py:0
+msgid "See in Instagram"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model,name:social_instagram.model_social_account
 msgid "Social Account"
 msgstr "Social account"
+
+#. module: social_instagram
+#: model:ir.module.module,shortdesc:base.module_social_instagram
+msgid "Social Instagram"
+msgstr ""
 
 #. module: social_instagram
 #: model:ir.model,name:social_instagram.model_social_live_post
@@ -402,7 +591,7 @@ msgstr ""
 "profielfoto op te halen."
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 msgid "The following images are not in the correct format (jpg/jpeg)."
 msgstr "De volgende afbeeldingen hebben niet het juiste formaat (jpg/jpeg)."
 
@@ -419,7 +608,7 @@ msgstr ""
 "%(images)s"
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 msgid "The following images do not meet the"
 msgstr "De volgende afbeeldingen voldoen niet aan"
 
@@ -436,6 +625,18 @@ msgstr ""
 "(tussen 1,91:1 en 4:5).\n"
 "\n"
 "%(images)s"
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid "The media container expired."
+msgstr "De mediacontainer is verlopen."
+
+#. module: social_instagram
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid "The media container failed to process."
+msgstr "De mediacontainer kon niet worden verwerkt."
 
 #. module: social_instagram
 #. odoo-python
@@ -472,6 +673,23 @@ msgstr ""
 "beperken tot een specifiek medium ('facebook', 'X', ...)."
 
 #. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.res_config_settings_view_form
+msgid "Verify Token"
+msgstr ""
+
+#. module: social_instagram
+#. odoo-javascript
+#: code:addons/social_instagram/static/src/xml/social_instagram_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:social_instagram.social_stream_post_view_kanban
+msgid "Views"
+msgstr "Weergaven"
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.res_config_settings_view_form
+msgid "Webhook"
+msgstr ""
+
+#. module: social_instagram
 #: model:ir.model.fields,help:social_instagram.field_social_post__instagram_image_ids
 #: model:ir.model.fields,help:social_instagram.field_social_post_template__instagram_image_ids
 msgid "Will attach images to your posts."
@@ -480,6 +698,7 @@ msgstr "Voegt afbeeldingen toe aan je berichten."
 #. module: social_instagram
 #. odoo-python
 #: code:addons/social_instagram/models/social_post.py:0
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 msgid "You can only post up to 10 images at once."
 msgstr "Je kunt maximaal 10 afbeeldingen tegelijk posten."
 
@@ -502,6 +721,15 @@ msgid "Your image appears to be corrupted, please try loading it again."
 msgstr "Je afbeelding lijkt beschadigd te zijn, probeer deze opnieuw te laden."
 
 #. module: social_instagram
-#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview
+#. odoo-python
+#: code:addons/social_instagram/models/social_live_post.py:0
+msgid ""
+"Your media didn't go through. This is usually caused by one of the following:"
+msgstr ""
+"Je media zijn niet doorgekomen. Dit wordt meestal veroorzaakt door een van "
+"de volgende zaken:"
+
+#. module: social_instagram
+#: model_terms:ir.ui.view,arch_db:social_instagram.instagram_preview_warning
 msgid "required aspect ratio"
 msgstr "de vereiste beeldverhouding"

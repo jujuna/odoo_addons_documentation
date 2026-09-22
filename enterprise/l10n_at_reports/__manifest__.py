@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 # Copyright (c) 2015 WT-IO-IT GmbH (https://www.wt-io-it.at)
@@ -33,6 +32,5 @@ Accounting reports for Austria.
         'data/account_report_ec_sales_list_report.xml',
         'data/account_return_data.xml'
     ],
-    'installable': True,
     'auto_install': ['l10n_at', 'account_reports'],
 }

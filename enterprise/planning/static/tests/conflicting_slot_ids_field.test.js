@@ -9,6 +9,7 @@ class PlanningSlot extends planningModels.PlanningSlot {
     _records = [
         {
             id: 1,
+            name: "Intervention 1",
             start_datetime: "2021-09-01 08:00:00",
             end_datetime: "2021-09-01 12:00:00",
             allocated_hours: 4,
@@ -18,6 +19,7 @@ class PlanningSlot extends planningModels.PlanningSlot {
         },
         {
             id: 2,
+            name: "Intervention 2",
             start_datetime: "2021-09-01 08:00:00",
             end_datetime: "2021-09-01 12:00:00",
             allocated_hours: 4,
@@ -27,6 +29,7 @@ class PlanningSlot extends planningModels.PlanningSlot {
         },
         {
             id: 3,
+            name: "Intervention 3",
             start_datetime: "2021-09-01 10:00:00",
             end_datetime: "2021-09-01 13:00:00",
             allocated_hours: 2,
@@ -36,6 +39,7 @@ class PlanningSlot extends planningModels.PlanningSlot {
         },
         {
             id: 4,
+            name: "Intervention 4",
             start_datetime: "2021-09-01 12:30:00",
             end_datetime: "2021-09-01 17:30:00",
             allocated_hours: 5,
@@ -45,6 +49,7 @@ class PlanningSlot extends planningModels.PlanningSlot {
         },
         {
             id: 5,
+            name: "Intervention 5",
             start_datetime: "2021-09-01 12:30:00",
             end_datetime: "2021-09-01 17:30:00",
             allocated_hours: 5,
@@ -54,6 +59,7 @@ class PlanningSlot extends planningModels.PlanningSlot {
         },
         {
             id: 6,
+            name: "Intervention 6",
             start_datetime: "2021-09-01 12:30:00",
             end_datetime: "2021-09-01 18:00:00",
             allocated_hours: 5.5,
@@ -63,6 +69,7 @@ class PlanningSlot extends planningModels.PlanningSlot {
         },
         {
             id: 7,
+            name: "Intervention 7",
             start_datetime: "2021-09-01 12:30:00",
             end_datetime: "2021-09-01 17:30:00",
             allocated_hours: 5,
@@ -95,17 +102,15 @@ test("display conflicting slot ids field in the form view", async () => {
     });
 
     expect(".o_field_conflicting_slot_ids[name=conflicting_slot_ids]").toHaveCount(1);
-    expect(".o_field_conflicting_slot_ids > p").toHaveText(
-        "Prepare for the ultimate multi-tasking challenge:"
+    expect(".o_field_conflicting_slot_ids > button").toHaveText(
+        "2 conflicts"
     );
-    expect(".o_conflicting_slot").toHaveCount(2);
-    expect(queryAllTexts(".o_conflicting_slot")).toEqual([
-        "Sep 1, 2021, 9:00 AMSep 1, 2021, 1:00 PM\n(4h) (100.00%) - Developer",
-        "Sep 1, 2021, 11:00 AMSep 1, 2021, 2:00 PM\n(2h) (66.67%)",
+    expect(queryAllTexts(".o_field_conflicting_slot_ids")).toEqual([
+        "2 conflicts\nIntervention 2 (9:00 AM - 1:00 PM) and other ones.",
     ]);
 });
 
-test("display 5 shifts in conflict", async () => {
+test("display 6 shifts in conflict", async () => {
     mockTimeZone(+1);
     await mountView({
         resId: 3,
@@ -114,15 +119,10 @@ test("display 5 shifts in conflict", async () => {
     });
 
     expect(".o_field_conflicting_slot_ids[name=conflicting_slot_ids]").toHaveCount(1);
-    expect(".o_field_conflicting_slot_ids > p").toHaveText(
-        "Prepare for the ultimate multi-tasking challenge:"
+    expect(".o_field_conflicting_slot_ids > button").toHaveText(
+        "6 conflicts"
     );
-    expect(".o_conflicting_slot").toHaveCount(5);
-    expect(queryAllTexts(".o_conflicting_slot")).toEqual([
-        "Sep 1, 2021, 9:00 AMSep 1, 2021, 1:00 PM\n(4h) (100.00%) - Developer",
-        "Sep 1, 2021, 9:00 AMSep 1, 2021, 1:00 PM\n(4h) (100.00%) - Developer",
-        "Sep 1, 2021, 1:30 PMSep 1, 2021, 6:30 PM\n(5h) (100.00%) - Developer",
-        "Sep 1, 2021, 1:30 PMSep 1, 2021, 6:30 PM\n(5h) (100.00%)",
-        "Sep 1, 2021, 1:30 PMSep 1, 2021, 7:00 PM\n(5h30) (100.00%)",
+    expect(queryAllTexts(".o_field_conflicting_slot_ids")).toEqual([
+        "6 conflicts\nIntervention 1 (9:00 AM - 1:00 PM) and other ones.",
     ]);
 });

@@ -9,6 +9,7 @@ from odoo.tests import tagged
 
 
 @tagged('multi_company')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSignMulticompany(SignRequestCommon, MockEmail):
 
     @classmethod

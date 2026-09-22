@@ -9,6 +9,8 @@ from odoo.addons.point_of_sale.tests.test_frontend import TestPointOfSaleHttpCom
 
 @tagged('post_install', '-at_install')
 class TestPoSSubscription(TestPointOfSaleHttpCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_pos_recurring_product_invoicing(self):
         """ Test if qty_invoiced is correctly updated when a recurring product is
             invoiced from the POS and the next_invoice_date is updated. """
@@ -57,7 +59,6 @@ class TestPoSSubscription(TestPointOfSaleHttpCommon):
            'lines': [[0,
              0,
              {'discount': 0,
-              'pack_lot_ids': [],
               'price_unit': 250,
               'product_id': self.recurring_product_id.id,
               'price_subtotal': 250,

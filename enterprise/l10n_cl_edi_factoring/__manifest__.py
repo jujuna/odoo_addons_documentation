@@ -1,7 +1,6 @@
 {
     'name': 'Chile - Localization: Factoring Extension',
     'countries': ['cl'],
-    'version': '1.0',
     'category': 'Accounting/Localizations/EDI',
     'description': '''
 E-Invoice Factoring
@@ -24,12 +23,10 @@ Additionally, it marks the invoice as 'yielded' in the payment state.
         'views/res_config_settings_view.xml',
         'views/res_partner_view.xml',
         'wizard/l10n_cl_aec_generator_view.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/partner_demo.xml',
     ],
-    'installable': True,
     'auto_install': ['l10n_cl_edi'],
-    'post_init_hook': 'post_init_hook',
 }

@@ -56,7 +56,7 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
 
         company = self.env.company
         user = self.env.user
-        if not company.company_registry:
+        if not company.partner_id._get_additional_identifier('LT_JAK'):
             error_msg = _('Missing company registry information on the company')
             action_error = {
                 'name': _('company %s', company.name),
@@ -71,9 +71,8 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
         in_vals = []
         out_vals = []
 
-        report._init_currency_table(options)
         expressions = report.line_ids.expression_ids
-        results = self._report_custom_engine_intrastat(expressions, options, expressions[0].date_scope, 'id', None)
+        results = self._report_engine_intrastat(options, expressions[0].date_scope, expressions.grouped('formula'), 'id', None)[expressions]
         for index, line_result in enumerate(results):
             results[index] = line_result[1]
         results = self._prepare_values_for_export(results)

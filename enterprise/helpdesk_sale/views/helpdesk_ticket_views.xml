@@ -5,14 +5,19 @@
         <field name="model">helpdesk.ticket</field>
         <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
         <field name="arch" type="xml">
-            <field name='email_cc' position="after">
+            <xpath expr="//div[./field[@name='partner_phone']]" position="after">
                 <field name="commercial_partner_id" invisible="1"/>
                 <field name="sale_order_id" groups="!sales_team.group_sale_salesman" options='{"no_open": True}' readonly="1" invisible="1"/>
                 <field name="sale_order_id" groups="sales_team.group_sale_salesman" options='{"no_create": True}' readonly="0" invisible="1"/>
-            </field>
+            </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="context">{'res_partner_search_mode': 'customer',
                                             'default_phone': partner_phone}</attribute>
+            </xpath>
+            <xpath expr="//header" position="after">
+                <div class="alert alert-warning" role="alert" invisible="not sale_warning_text">
+                    <field name="sale_warning_text" class="fw-bold"/>
+                </div>
             </xpath>
         </field>
     </record>
@@ -33,12 +38,9 @@
         <field name="model">helpdesk.ticket</field>
         <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_search_base"/>
         <field name="arch" type="xml">
-            <field name="stage_id" position="after">
+            <field name="partner_id" position="after">
                 <field name="sale_order_id" string="Sales Order" filter_domain="['|', ('sale_line_id', 'ilike', self), ('sale_order_id', 'ilike', self)]" groups="helpdesk_sale.group_use_helpdesk_sale_timesheet"/>
             </field>
-            <xpath expr="//filter[@name='unassigned']" position="after">
-                <filter string="My Customers" domain="['|', ('partner_id.user_id', '=', uid), ('sale_order_id.user_id', '=', uid)]" name="my_customers"/>
-            </xpath>
         </field>
     </record>
 

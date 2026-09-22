@@ -2,7 +2,7 @@ import { describe, expect, test } from "@odoo/hoot";
 import { animationFrame, click } from "@odoo/hoot-dom";
 
 import { mockDate } from "@odoo/hoot-mock";
-import { asyncStep, onRpc, selectGroup, waitForSteps } from "@web/../tests/web_test_helpers";
+import { contains, onRpc, selectGroup } from "@web/../tests/web_test_helpers";
 
 import {
     dragPill,
@@ -93,19 +93,10 @@ CalendarEvent._views.gantt = /* xml */ `
         <field name="partner_ids"/>
         <field name="resource_ids"/>
         <field name="user_id"/>
-        <templates>
-            <div t-name="gantt-popover">
-                <ul>
-                    <li>Name: <t t-out="gantt_pill_contact_name"/></li>
-                    <li>Phone: <t t-out="gantt_pill_contact_phone"/></li>
-                    <li>Email: <t t-out="gantt_pill_contact_email"/></li>
-                </ul>
-            </div>
-        </templates>
     </gantt>`;
 
 test("empty default group gantt rendering", async () => {
-    expect.assertions(18);
+    expect.assertions(19);
     mockDate("2022-01-03 08:00:00");
     CalendarEvent._records[0].appointment_type_id = 1;
     CalendarEvent._records[1].appointment_type_id = 1;
@@ -114,8 +105,9 @@ test("empty default group gantt rendering", async () => {
         .replace(`default_range="day"`, "")
         .replace(`default_scale="day"`, "");
 
-    const partners = ["Partner 1", "Partner 214", "Partner 216"];
+    const partners = ["Undefined Attendees", "Partner 1", "Partner 214", "Partner 216"];
     const partnerEvents = [
+        [],
         ["Event 3", "Event 1"],
         ["Event 2", "Event 3", "Event 1"],
         ["Event 2", "Event 3"],
@@ -136,7 +128,7 @@ test("empty default group gantt rendering", async () => {
             expect(linkCommand[0]).toBe(4);
             expect(linkCommand[1]).toBe(100);
 
-            asyncStep("write partners and date");
+            expect.step("write partners and date");
         } else if (
             args.model === "calendar.event" &&
             args.method === "write" &&
@@ -145,9 +137,9 @@ test("empty default group gantt rendering", async () => {
         ) {
             expect(args.args[1].user_id).toBe(100);
 
-            asyncStep("write user id");
+            expect.step("write user id");
         } else if (args.model === "calendar.event" && args.method === "get_gantt_data") {
-            asyncStep("get_gantt_data");
+            expect.step("get_gantt_data");
         }
     });
     await mountGanttView({ resModel: "calendar.event" });
@@ -160,7 +152,7 @@ test("empty default group gantt rendering", async () => {
     }
     const { drop } = await dragPill("Event 2", { nth: 1 });
     await drop({ row: "Partner 1", columnHeader: "21", groupHeader: "January 2022", part: 2 });
-    await waitForSteps([
+    await expect.waitForSteps([
         "get_gantt_data",
         "write partners and date",
         "write user id",
@@ -168,7 +160,7 @@ test("empty default group gantt rendering", async () => {
     ]);
 });
 
-test("'Add Closing Days' button rendering - 1", async () => {
+test("'Add Closing Day' button rendering - 1", async () => {
     onRpc("has_group", ({ args }) => {
         if (args[1] === "appointment.group_appointment_manager") {
             return true;
@@ -176,14 +168,13 @@ test("'Add Closing Days' button rendering - 1", async () => {
     });
     await mountGanttView({
         resModel: "calendar.event",
-        groupBy: ["resource_ids"],
     });
     expect(".o_appointment_booking_gantt_button_add_leaves").toHaveCount(1, {
         message: "the button should have been rendered",
     });
 });
 
-test("'Add Closing Days' button rendering - 2", async () => {
+test("'Add Closing Day' button rendering - 2", async () => {
     onRpc("has_group", ({ args }) => {
         if (args[1] === "appointment.group_appointment_manager") {
             return false;
@@ -191,25 +182,9 @@ test("'Add Closing Days' button rendering - 2", async () => {
     });
     await mountGanttView({
         resModel: "calendar.event",
-        groupBy: ["resource_ids"],
     });
     expect(".o_appointment_booking_gantt_button_add_leaves").toHaveCount(0, {
         message: "the button should not have been rendered: the user is not an appointment manager",
-    });
-});
-
-test("'Add Closing Days' button rendering - 3", async () => {
-    onRpc("has_group", ({ args }) => {
-        if (args[1] === "appointment.group_appointment_manager") {
-            return true;
-        }
-    });
-    await mountGanttView({
-        resModel: "calendar.event",
-        groupBy: ["partner_ids"],
-    });
-    expect(".o_appointment_booking_gantt_button_add_leaves").toHaveCount(0, {
-        message: "the button should not have been rendered: not grouped by 'resource_ids'",
     });
 });
 
@@ -293,4 +268,32 @@ test("appointment status pill colors: no_show", async () => {
     expect(getPill("Event 1", { nth: 2 })).toHaveClass("o_appointment_booking_gantt_color_grey");
     expect(getPill("Event 2", { nth: 2 })).toHaveClass("o_appointment_booking_gantt_color_grey");
     expect(getPill("Event 3", { nth: 2 })).toHaveClass("o_appointment_booking_gantt_color_grey");
+});
+
+test("undo action: move and undo a pill", async () => {
+    expect.assertions(4);
+    mockDate("2022-01-03 08:00:00")
+    CalendarEvent._views.gantt = CalendarEvent._views.gantt
+        .replace(`default_range="day"`, "")
+        .replace(`default_scale="day"`, "");
+
+    onRpc("gantt_undo_drag_drop", function ({ model, args }) {
+        expect(args[0]).toEqual(2);
+        expect(args[1]).toEqual("reschedule");
+        expect(args[2]).toEqual({
+                partner_ids: [ 214, 216 ],
+                start: "2022-01-05 10:00:00",
+                stop: "2022-01-05 11:00:00",
+            },
+        );
+        return this.env[model].write([args[0]], args[2]);
+    });
+
+    await mountGanttView({ resModel: "calendar.event" });
+
+    const { drop } = await dragPill("Event 2", { nth: 1 });
+    await drop({ row: "Partner 1", columnHeader: "21", groupHeader: "January 2022", part: 2 });
+
+    await contains(".o_notification_buttons button i[title='Undo']").click();
+    expect(".o_notification_content").toHaveText("Record reschedule undone");
 });

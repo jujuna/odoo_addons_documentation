@@ -31,6 +31,8 @@
         <field name="team_ids" eval="[(4, ref('helpdesk_team1'))]"/>
         <field name="sequence">3</field>
         <field name="fold" eval="True"/>
+        <field name="rating_active" eval="True"/>
+        <field name="rating_template_id" ref="helpdesk.rating_ticket_request_email_template"/>
     </record>
     <record id="stage_cancelled" model="helpdesk.stage">
         <field name="name">Cancelled</field>

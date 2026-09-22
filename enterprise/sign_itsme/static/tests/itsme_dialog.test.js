@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@odoo/hoot";
 import {
-    makeDialogMockEnv,
+    assignDialogTestEnv,
     mockService,
     mountWithCleanup,
     onRpc,
@@ -15,8 +15,8 @@ const params = {
     test: true,
 };
 
-const mountItsmeDialog = async (additionalProps = {}) => {
-    await makeDialogMockEnv();
+async function mountItsmeDialog(additionalProps = {}) {
+    assignDialogTestEnv();
     await mountWithCleanup(ItsmeDialog, {
         props: {
             route,
@@ -26,7 +26,7 @@ const mountItsmeDialog = async (additionalProps = {}) => {
             ...additionalProps,
         },
     });
-};
+}
 
 describe.current.tags("desktop");
 defineMailModels();

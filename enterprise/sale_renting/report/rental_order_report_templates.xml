@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_rental_order_document">
-        <t t-call="web.external_layout">
-            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
-            <t t-set="address">
-                <span t-field="doc.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'>John Doe</span>
-            </t>
-            <div class="oe_structure"/>
-            <t t-if="doc.partner_shipping_id == doc.partner_invoice_id
-                                 and doc.partner_invoice_id != doc.partner_id
-                                 or doc.partner_shipping_id != doc.partner_invoice_id">
-                <t t-set="information_block">
-                    <strong t-if="doc.partner_shipping_id == doc.partner_invoice_id">Invoicing and Shipping Address:</strong>
-                    <strong t-if="doc.partner_shipping_id != doc.partner_invoice_id">Invoicing Address:</strong>
-                   <span t-field="doc.partner_invoice_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'>123 Main St</span>
-                    <t t-if="doc.partner_shipping_id != doc.partner_invoice_id">
-                        <strong class="d-block mt-3">Shipping Address</strong>
-                        <span t-field="doc.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'>456 Other St</span>
-                    </t>
+        <t t-set="address">
+            <span t-field="doc.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'>John Doe</span>
+        </t>
+        <t t-if="doc.partner_shipping_id == doc.partner_invoice_id
+                            and doc.partner_invoice_id != doc.partner_id
+                            or doc.partner_shipping_id != doc.partner_invoice_id">
+            <t t-set="information_block">
+                <strong t-if="doc.partner_shipping_id == doc.partner_invoice_id">Invoicing and Shipping Address:</strong>
+                <strong t-if="doc.partner_shipping_id != doc.partner_invoice_id">Invoicing Address:</strong>
+                <span t-field="doc.partner_invoice_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'>123 Main St</span>
+                <t t-if="doc.partner_shipping_id != doc.partner_invoice_id">
+                    <strong class="d-block mt-3">Shipping Address</strong>
+                    <span t-field="doc.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'>456 Other St</span>
                 </t>
             </t>
+        </t>
+        <t t-call="web.external_layout" address="address" information_block="information_block">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+            <div class="oe_structure"/>
             <div class="page">
                 <div class="oe_structure"/>
                 <h2>
@@ -31,7 +31,7 @@
                 <div class="oe_structure"/>
                 <div class="row mb-4" id="informations">
                     <div t-if="doc.user_id.name" class="col">
-                        <strong>Salesperson:</strong>
+                        <strong>Contact:</strong>
                         <span t-field="doc.user_id">Jane Doe</span>
                     </div>
                 </div>
@@ -67,5 +67,20 @@
                 <t t-call="sale_renting.report_rental_order_document" t-lang="doc.partner_id.lang"/>
             </t>
         </t>
+    </template>
+
+    <template id="rental_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@id='informations']" position="inside">
+            <t t-if="doc.is_rental_order">
+                <div class="col" name="informations_rental_pickup">
+                    <strong>Pick-up</strong>
+                    <div t-field="doc.rental_start_date" t-options='{"widget": "datetime"}'>2023-12-31</div>
+                </div>
+                <div class="col" name="informations_rental_return">
+                    <strong>Return</strong>
+                    <div t-field="doc.rental_return_date" t-options='{"widget": "datetime"}'>2023-12-31</div>
+                </div>
+            </t>
+        </xpath>
     </template>
 </odoo>

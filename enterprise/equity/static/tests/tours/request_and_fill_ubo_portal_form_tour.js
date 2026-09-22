@@ -1,7 +1,6 @@
-import { inputFiles } from "@web/../tests/utils";
 import { registry } from "@web/core/registry";
 
-async function uploadTestFile(inputId) {
+async function uploadTestFile({ inputFiles }, inputId) {
     const testFile = new File(["hello, world"], "hello_world.pdf", { type: "application/pdf" });
     await inputFiles(`#${inputId}Input input`, [testFile]);
 }
@@ -17,7 +16,7 @@ function endHolder(holderName, endDate, displayedEndDate) {
     return [
         {
             content: `End ${holderName}`,
-            trigger: `tr:contains('${holderName}') td .fa-remove`,
+            trigger: `tr:contains('${holderName}') td [data-icon="close"]`,
             run: "click",
         },
         {
@@ -85,7 +84,7 @@ registry.category("web_tour.tours").add("fill_ubo_portal_form_tour", {
         ...endHolder("Company Holder 2", "2025-06-13", "Jun 13, 2025"),
         {
             content: "Return Company Holder 2",
-            trigger: "tr:contains('Company Holder 2') td .fa-undo",
+            trigger: "tr:contains('Company Holder 2') td [data-icon='undo']",
             run: "click",
         },
         {
@@ -102,7 +101,9 @@ registry.category("web_tour.tours").add("fill_ubo_portal_form_tour", {
             birthDate() { fillDate(this.anchor, "2001-11-24") },
             id: "edit 1234552",
             pep: "click", // to set it to true
-            async doc() { await uploadTestFile("doc") },
+            async doc(helpers) {
+                await uploadTestFile(helpers, "doc");
+            },
             expirationDate() { fillDate(this.anchor, "2026-12-31") },
             startDate() { fillDate(this.anchor, "2025-03-30") },
             controlMethod: "select co_1",
@@ -125,7 +126,9 @@ registry.category("web_tour.tours").add("fill_ubo_portal_form_tour", {
             birthDate() { fillDate(this.anchor, "1980-02-21") },
             id: "edit 3324",
             pep: "click",
-            async doc() { await uploadTestFile("doc") },
+            async doc(helpers) {
+                await uploadTestFile(helpers, "doc");
+            },
             expirationDate() { fillDate(this.anchor, "2027-12-31") },
             startDate() { fillDate(this.anchor, "2024-12-01") },
             controlMethod: "select co_3",
@@ -138,7 +141,7 @@ registry.category("web_tour.tours").add("fill_ubo_portal_form_tour", {
         },
         {
             content: "Remove uploaded file",
-            trigger: ".o_holder_edit_dialog #docInput button.fa-trash",
+            trigger: ".o_holder_edit_dialog #docInput button[data-icon='delete'].oi-filled",
             run: "click",
         },
         ...editHolder({

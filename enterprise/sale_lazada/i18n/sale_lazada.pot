@@ -4,16 +4,32 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-15 18:41+0000\n"
-"PO-Revision-Date: 2026-01-15 18:41+0000\n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-08-28 17:50+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: sale_lazada
+#: model:ir.module.module,description:base.module_sale_lazada
+msgid ""
+"\n"
+"Import your Lazada orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple shops\n"
+"* Orders are matched with Odoo products based on their internal reference (SKU in Lazada)\n"
+"* Support for both Fulfillment by Lazada (FBL), Fulfillment by Merchant (FBM):\n"
+"* FBL: Importing the completed orders\n"
+"* FBM: Delivery information is fetched from Lazada, track and synchronize the stock level to Lazada.\n"
+msgstr ""
 
 #. module: sale_lazada
 #: model:mail.template,body_html:sale_lazada.order_sync_failure
@@ -177,11 +193,6 @@ msgstr ""
 #. module: sale_lazada
 #: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_form
 msgid "Archived"
-msgstr ""
-
-#. module: sale_lazada
-#: model_terms:ir.ui.view,arch_db:sale_lazada.lazada_shop_create_wizard_form
-msgid "Cancel"
 msgstr ""
 
 #. module: sale_lazada
@@ -442,6 +453,11 @@ msgid ""
 msgstr ""
 
 #. module: sale_lazada
+#: model:ir.module.module,summary:base.module_sale_lazada
+msgid "Import Lazada orders and sync deliveries"
+msgstr ""
+
+#. module: sale_lazada
 #. odoo-python
 #: code:addons/sale_lazada/utils.py:0
 msgid ""
@@ -539,9 +555,21 @@ msgid "Lazada API rate limit reached. Please try again later."
 msgstr ""
 
 #. module: sale_lazada
+#. odoo-python
+#: code:addons/sale_lazada/models/lazada_shop.py:0
+#: model:product.template,name:sale_lazada.default_adjustment_product_product_template
+msgid "Lazada Amount Adjustment"
+msgstr ""
+
+#. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_res_partner__lazada_buyer_extern_id
 #: model:ir.model.fields,field_description:sale_lazada.field_res_users__lazada_buyer_extern_id
 msgid "Lazada Buyer ID"
+msgstr ""
+
+#. module: sale_lazada
+#: model:ir.module.module,shortdesc:base.module_sale_lazada
+msgid "Lazada Connector"
 msgstr ""
 
 #. module: sale_lazada
@@ -595,6 +623,13 @@ msgid "Lazada Order %(lazada_order_ref)s at %(name)s"
 msgstr ""
 
 #. module: sale_lazada
+#. odoo-python
+#: code:addons/sale_lazada/models/lazada_shop.py:0
+#: model:product.template,name:sale_lazada.default_discount_product_product_template
+msgid "Lazada Order Discount"
+msgstr ""
+
+#. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_lazada_order_item
 msgid "Lazada Order Item"
 msgstr ""
@@ -642,6 +677,8 @@ msgid "Lazada Seller ID"
 msgstr ""
 
 #. module: sale_lazada
+#. odoo-python
+#: code:addons/sale_lazada/models/lazada_shop.py:0
 #: model:product.template,name:sale_lazada.default_shipping_product_product_template
 msgid "Lazada Shipping"
 msgstr ""
@@ -766,8 +803,20 @@ msgid "Only FBM items can be synced to Lazada."
 msgstr ""
 
 #. module: sale_lazada
+#. odoo-python
+#: code:addons/sale_lazada/models/lazada_item.py:0
+msgid "Only goods are supported with Lazada."
+msgstr ""
+
+#. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__order_count
 msgid "Order Count"
+msgstr ""
+
+#. module: sale_lazada
+#. odoo-python
+#: code:addons/sale_lazada/models/lazada_shop.py:0
+msgid "Order Discount"
 msgstr ""
 
 #. module: sale_lazada
@@ -851,6 +900,18 @@ msgstr ""
 #. module: sale_lazada
 #: model:ir.model,name:sale_lazada.model_sale_order_line
 msgid "Sales Order Line"
+msgstr ""
+
+#. module: sale_lazada
+#. odoo-python
+#: code:addons/sale_lazada/models/lazada_shop.py:0
+msgid "Shipping"
+msgstr ""
+
+#. module: sale_lazada
+#. odoo-python
+#: code:addons/sale_lazada/models/lazada_shop.py:0
+msgid "Shipping: %(carrier)s"
 msgstr ""
 
 #. module: sale_lazada
@@ -1117,6 +1178,14 @@ msgid ""
 msgstr ""
 
 #. module: sale_lazada
+#. odoo-python
+#: code:addons/sale_lazada/models/lazada_item.py:0
+msgid ""
+"This product does not track inventory and can not be synchronized with "
+"Lazada."
+msgstr ""
+
+#. module: sale_lazada
 #: model:ir.model.fields,field_description:sale_lazada.field_lazada_shop__manage_fbl_inventory
 msgid "Track FBL Inventory"
 msgstr ""
@@ -1128,10 +1197,10 @@ msgstr ""
 
 #. module: sale_lazada
 #. odoo-python
-#: code:addons/sale_lazada/models/lazada_item.py:0
+#: code:addons/sale_lazada/models/lazada_shop.py:0
 msgid ""
-"We do not support syncing services or combo products to Lazada. Only "
-"storable products are supported."
+"Voucher id: %(voucher_id)s\n"
+"Original price: %(price)s"
 msgstr ""
 
 #. module: sale_lazada
@@ -1158,20 +1227,6 @@ msgid ""
 "Your unique seller ID assigned by Lazada. This is automatically set during "
 "authorization and ensures the same Lazada shop cannot be linked twice to the"
 " same company."
-msgstr ""
-
-#. module: sale_lazada
-#. odoo-python
-#: code:addons/sale_lazada/models/lazada_shop.py:0
-msgid "[%(sku)s] %(product_name)s"
-msgstr ""
-
-#. module: sale_lazada
-#. odoo-python
-#: code:addons/sale_lazada/models/lazada_shop.py:0
-msgid ""
-"[%(sku)s] %(product_title)s\n"
-"Voucher id: %(promotion_id)s"
 msgstr ""
 
 #. module: sale_lazada

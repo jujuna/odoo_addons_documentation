@@ -14,7 +14,7 @@
         <!-- Appraisal -->
         <record id="hr_appraisal_0" model="hr.appraisal" forcecreate="1">
             <field name="active">True</field>
-            <field name="employee_id" ref="hr.employee_admin"/>
+            <field name="employee_id" ref="hr.employee_sj"/>
             <field name="state">2_pending</field>
             <field name="date_close" eval="(datetime.now()+relativedelta(months=1)).strftime('%Y-%m-1')"/>
             <field name="manager_ids" eval="[(4, ref('hr.employee_mw'))]"/>
@@ -112,7 +112,7 @@
                             </td>
                             <td class="w-25">
                                 <span class="o_stars o_five_stars" id="checkId-1">
-                                    <i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -124,7 +124,7 @@
                             </td>
                             <td class="w-25">
                                 <span class="o_stars o_five_stars" id="checkId-2">
-                                    <i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -141,7 +141,7 @@
                             </td>
                             <td class="w-25">
                                 <span class="o_stars o_five_stars" id="checkId-3">
-                                    <i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -153,7 +153,7 @@
                             </td>
                             <td class="w-25">
                                 <span class="o_stars o_five_stars" id="checkId-4">
-                                    <i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -165,7 +165,7 @@
                             </td>
                             <td class="w-25">
                                 <span class="o_stars o_five_stars" id="checkId-5">
-                                    <i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i><i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i><i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -211,11 +211,11 @@
                             </td>
                             <td class="w-25">
                                 <span class="o_stars o_five_stars" id="checkId-6">
-                                <i class="fa fa-star" contenteditable="false"></i>
-                                <i class="fa fa-star" contenteditable="false"></i>
-                                <i class="fa fa-star" contenteditable="false"></i>
-                                <i class="fa fa-star-o" contenteditable="false"></i>
-                                <i class="fa fa-star-o" contenteditable="false"></i>
+                                <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                <i class="oi" data-icon="star" contenteditable="false"></i>
+                                <i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -227,11 +227,11 @@
                             </td>
                             <td class="w-50">
                                 <span class="o_stars o_five_stars" id="checkId-7">
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -243,11 +243,11 @@
                             </td>
                             <td class="w-50">
                                 <span class="o_stars o_five_stars" id="checkId-8">
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -259,11 +259,11 @@
                             </td>
                             <td class="w-50">
                                 <span class="o_stars o_five_stars" id="checkId-9">
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -275,11 +275,11 @@
                             </td>
                             <td class="w-50">
                                 <span class="o_stars o_five_stars" id="checkId-10">
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star-o" contenteditable="false"></i>
-                                    <i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -332,7 +332,7 @@
             <field name="employee_id" ref="hr.employee_eg"/>
             <field name="state">2_pending</field>
             <field name="date_close" eval="(datetime.now()+relativedelta(months=1)).strftime('%Y-%m-%d')"/>
-            <field name="manager_ids" eval="[Command.set([ref('hr.employee_admin'), ref('hr.employee_sj')])]"/>
+            <field name="manager_ids" eval="[Command.set([ref('hr.employee_mw'), ref('hr.employee_sj')])]"/>
             <field name="employee_feedback_published">False</field>
             <field name="department_id" ref="hr.dep_rd"/>
             <field name="job_id" ref="hr.job_consultant"/>
@@ -377,11 +377,11 @@
                             </td>
                             <td class="w-25">
                                 <span class="o_stars o_five_stars" id="checkId-6">
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -393,11 +393,11 @@
                             </td>
                             <td class="w-50">
                                 <span class="o_stars o_five_stars" id="checkId-7">
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star-o" contenteditable="false"></i>
-                                    <i class="fa fa-star-o" contenteditable="false"></i>
-                                    <i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -409,11 +409,11 @@
                             </td>
                             <td class="w-50">
                                 <span class="o_stars o_five_stars" id="checkId-8">
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -425,11 +425,11 @@
                             </td>
                             <td class="w-50">
                                 <span class="o_stars o_five_stars" id="checkId-9">
-                                <i class="fa fa-star" contenteditable="false"></i>
-                                <i class="fa fa-star" contenteditable="false"></i>
-                                <i class="fa fa-star" contenteditable="false"></i>
-                                <i class="fa fa-star" contenteditable="false"></i>
-                                <i class="fa fa-star-o" contenteditable="false"></i>
+                                <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                <i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>
@@ -441,11 +441,11 @@
                             </td>
                             <td class="w-50">
                                 <span class="o_stars o_five_stars" id="checkId-10">
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star" contenteditable="false"></i>
-                                    <i class="fa fa-star-o" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi oi-filled" data-icon="star" contenteditable="false"></i>
+                                    <i class="oi" data-icon="star" contenteditable="false"></i>
                                 </span>
                             </td>
                         </tr>

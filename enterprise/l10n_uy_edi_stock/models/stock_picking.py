@@ -1,4 +1,4 @@
-import base64
+import logging
 
 from lxml import etree
 from markupsafe import Markup
@@ -9,6 +9,8 @@ from odoo.tools import html2plaintext
 from odoo.tools.xml_utils import cleanup_xml_node
 
 from odoo import api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class StockPicking(models.Model):
@@ -135,8 +137,24 @@ class StockPicking(models.Model):
         return super().action_cancel()
 
     def l10n_uy_edi_action_update_dgi_state(self):
-        self.ensure_one()
+        """Action to update the DGI status of the picking, it will post a message in the chatter if the picking
+        has been rejected by DGI"""
         self.l10n_uy_edi_document_id.action_update_dgi_state()
+        rejected_pickings = self.filtered(lambda x: x.l10n_uy_edi_cfe_state == "rejected")
+        if rejected_pickings:
+            _logger.info(
+                "Rejected picking(s): %s",
+                [(rec.id, rec.name) for rec in rejected_pickings],
+            )
+            for picking in rejected_pickings:
+                picking.message_post(
+                    body=self.env._(
+                        "The CFE has been rejected by DGI. Please, manually check the reject reason "
+                        "and generate/send a new CFE with the fixes"
+                    ),
+                    message_type="comment",
+                    subtype_xmlid="mail.mt_note",
+                )
 
     def l10n_uy_edi_create_delivery_guide(self):
         """ Create the e-Remito (Delivery Guide) CFE and send it to DGI.
@@ -146,7 +164,7 @@ class StockPicking(models.Model):
         C. Subtotales Informativos (optional)
         F. Informacion de Referencia (conditional)
         """
-        # Filter only e-remitos
+        # Filter only e-remitos>
         pickings = self.filtered(
             lambda x: x.country_code == "UY"
             and x.picking_type_code == "outgoing"
@@ -241,10 +259,10 @@ class StockPicking(models.Model):
                     "res_id": edi_doc.id,
                     "name": edi_doc._get_xml_attachment_name(),
                     "type": "binary",
-                    "datas": base64.b64encode(
+                    "raw": (
                         xml_content.encode()
                         if self.l10n_uy_edi_cfe_state in ["received", "accepted"]
-                        else self._l10n_uy_edi_get_xml_content().encode()
+                        else self._l10n_uy_edi_get_xml_content()
                     ),
                 }
             )
@@ -292,7 +310,7 @@ class StockPicking(models.Model):
                 "res_id": edi_doc.id,
                 "name": edi_doc._get_xml_attachment_name(),
                 "type": "binary",
-                "datas": base64.b64encode(self._l10n_uy_edi_get_xml_content().encode()),
+                "raw": self._l10n_uy_edi_get_xml_content(),
             }
         )
         edi_doc.invalidate_recordset(["attachment_id", "attachment_file"])
@@ -311,7 +329,7 @@ class StockPicking(models.Model):
                     "res_field": "l10n_uy_edi_pdf_report_file",
                     "name": self.l10n_uy_edi_document_id._get_xml_attachment_name().replace(".xml", ".pdf"),
                     "type": "binary",
-                    "datas": file_content,
+                    "raw": file_content,
                 }
             )
             res["pdf_file"] = pdf_file
@@ -347,7 +365,7 @@ class StockPicking(models.Model):
             "TipoCfe": int(self.l10n_latam_document_type_id.code),
             "HoraReq": edi_doc.request_datetime.strftime("%H%M%S"),
             "FechaReq": edi_doc.request_datetime.date().strftime("%Y%m%d"),
-            "CfeXmlOTexto": xml_content,
+            "CfeXmlOTexto": xml_content.decode(),
         }
 
         if addenda := self._l10n_uy_edi_get_addenda():
@@ -375,7 +393,7 @@ class StockPicking(models.Model):
             "format_float": format_float,
         }
         cfe = self.env["ir.qweb"]._render(template_name, values=values)
-        return etree.tostring(cleanup_xml_node(cfe)).decode()
+        return etree.tostring(cleanup_xml_node(cfe))
 
     def _l10n_uy_stock_cfe_A_iddoc(self):
         """Prepares XML Section A (Encabezado / Identificacion del Documento)"""
@@ -406,12 +424,13 @@ class StockPicking(models.Model):
     def _l10n_uy_stock_cfe_A_receptor(self):
         """Prepares XML Section A (Encabezado / Receptor)"""
         self.ensure_one()
-        doc_type = self.partner_id._l10n_uy_edi_get_doc_type()
+        doc_type = self.partner_id._l10n_uy_edi_get_dgi_code()
+        doc_number = self.partner_id._get_preferred_legal_entity_identifier_vals().get('value', '')
         values = {
             "TipoDocRecep": doc_type or None,  # A60
             "CodPaisRecep": self.partner_id.country_id.code or ("UY" if doc_type in [2, 3] else "99"),  # A61
-            "DocRecep": self.partner_id.vat if doc_type in [1, 2, 3] else None,  # A62
-            "DocRecepExt": self.partner_id.vat if doc_type not in [1, 2, 3] else None,  # A62.1
+            "DocRecep": doc_number if doc_type in [1, 2, 3] else None,  # A62
+            "DocRecepExt": doc_number if doc_type not in [1, 2, 3] else None,  # A62.1
             "RznSocRecep": self.partner_id.name[:150] or None,  # A63
             "DirRecep": self.partner_id._l10n_uy_edi_get_fiscal_address() or None,  # A64
             "CiudadRecep": self.partner_id.city and self.partner_id.city[:30] or None,  # A65
@@ -475,7 +494,7 @@ class StockPicking(models.Model):
                 if line.description_picking and line.description_picking != line.display_name
                 else None,  # B8
                 "Cantidad": line.quantity,  # B9
-                "UniMed": line.product_uom_id.name[:4] if line.product_uom_id else "N/A",  # B10
+                "UniMed": line.uom_id.name[:4] if line.uom_id else "N/A",  # B10
             }
             empty_values = {}.fromkeys(
                 [
@@ -507,3 +526,13 @@ class StockPicking(models.Model):
                 }
             )
         return res
+
+    def _l10n_uy_edi_stock_cron_update_dgi_state(self, batch_size=10):
+        """Cron to update the DGI state of the stock pickings"""
+        domain = [("l10n_uy_edi_cfe_state", "=", "received")]
+        pickings = self.env["stock.picking"].search(domain, limit=batch_size + 1, order="id")
+        need_retrigger = len(pickings) > batch_size
+        pickings = pickings[:batch_size]
+        pickings.l10n_uy_edi_action_update_dgi_state()
+        if need_retrigger:
+            self.env.ref("l10n_uy_edi_stock.ir_cron_update_dgi_state_pickings")._trigger()

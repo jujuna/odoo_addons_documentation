@@ -1,6 +1,6 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
-import { Deferred, edit } from "@odoo/hoot-dom";
+import { edit } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import {
     contains,
@@ -75,11 +75,11 @@ const defaultRules = {
 };
 
 test("approval components are synchronous", async () => {
-    const def = new Deferred();
+    const def = Promise.withResolvers();
 
     onRpc("get_approval_spec", async () => {
         expect.step("get_approval_spec");
-        await def;
+        await def.promise;
         return {
             all_rules: defaultRules,
             partner: [[[false, "myMethod", false], { rules: [1], entries: [] }]],
@@ -93,10 +93,10 @@ test("approval components are synchronous", async () => {
     });
 
     expect.verifySteps(["get_approval_spec"]);
-    expect("button .o_web_studio_approval .fa-circle-o-notch.fa-spin").toHaveCount(1);
+    expect("button .o_web_studio_approval [data-icon='autorenew'].oi-spin").toHaveCount(1);
     def.resolve();
     await animationFrame();
-    expect("button .o_web_studio_approval .fa-circle-o-notch.fa-spin").toHaveCount(0);
+    expect("button .o_web_studio_approval [data-icon='autorenew'].oi-spin").toHaveCount(0);
     expect("button .o_web_studio_approval .o_web_studio_approval_avatar").toHaveCount(1);
 });
 
@@ -558,7 +558,7 @@ test("approval continues to sync after a component has been destroyed", async ()
         `get_approval_spec: [[{"model":"partner","method":"otherMethod","action_id":false,"res_id":1}]]`,
     ]);
     expect(
-        "button[name='otherMethod'] .o_web_studio_approval .fa-circle-o-notch.fa-spin"
+        "button[name='otherMethod'] .o_web_studio_approval [data-icon='autorenew'].oi-spin"
     ).toHaveCount(0);
     expect(
         "button[name='otherMethod'] .o_web_studio_approval .o_web_studio_approval_avatar"

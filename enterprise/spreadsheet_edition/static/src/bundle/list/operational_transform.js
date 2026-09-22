@@ -4,12 +4,17 @@ const { otRegistry } = spreadsheet.registries;
 otRegistry
     .addTransformation(
         "INSERT_ODOO_LIST",
-        ["INSERT_ODOO_LIST", "DUPLICATE_ODOO_LIST"],
+        ["ADD_ODOO_LIST", "INSERT_ODOO_LIST", "DUPLICATE_ODOO_LIST"],
+        transformNewListCommand
+    )
+    .addTransformation(
+        "ADD_ODOO_LIST",
+        ["ADD_ODOO_LIST", "INSERT_ODOO_LIST", "DUPLICATE_ODOO_LIST"],
         transformNewListCommand
     )
     .addTransformation(
         "DUPLICATE_ODOO_LIST",
-        ["INSERT_ODOO_LIST", "DUPLICATE_ODOO_LIST"],
+        ["ADD_ODOO_LIST", "INSERT_ODOO_LIST", "DUPLICATE_ODOO_LIST"],
         transformNewListCommand
     )
     .addTransformation(
@@ -26,7 +31,7 @@ otRegistry
         "REMOVE_ODOO_LIST",
         ["RE_INSERT_ODOO_LIST", "DUPLICATE_ODOO_LIST"],
         (toTransform, executed) => {
-            if (toTransform.id === executed.listId) {
+            if (toTransform.listId === executed.listId) {
                 return undefined;
             }
             return toTransform;
@@ -34,7 +39,7 @@ otRegistry
     );
 
 function transformNewListCommand(toTransform) {
-    const idKey = "newListId" in toTransform ? "newListId" : "id";
+    const idKey = "newListId" in toTransform ? "newListId" : "listId";
     return {
         ...toTransform,
         [idKey]: (parseInt(toTransform[idKey], 10) + 1).toString(),

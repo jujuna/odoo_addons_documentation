@@ -1,6 +1,5 @@
 from freezegun import freeze_time
 
-from odoo.addons.l10n_mx_edi.tests.common import EXTERNAL_MODE
 from odoo.addons.l10n_mx_edi_extended.tests.common import TestMxExtendedEdiCommon
 from odoo.addons.stock_landed_costs.tests.common import TestStockLandedCostsCommon
 
@@ -8,8 +7,10 @@ from odoo import Command
 from odoo.tests import tagged
 
 
-@tagged('post_install_l10n', 'post_install', '-at_install', *(['-standard', 'external'] if EXTERNAL_MODE else []))
+@tagged('post_install_l10n', 'post_install', '-at_install', *TestMxExtendedEdiCommon.extra_tags)
 class TestCFDIInvoiceLanding(TestMxExtendedEdiCommon, TestStockLandedCostsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -54,7 +55,7 @@ class TestCFDIInvoiceLanding(TestMxExtendedEdiCommon, TestStockLandedCostsCommon
             {
                 'product_id': cls.product_customs.id,
                 'product_uom_qty': 10,
-                'product_uom': cls.product_customs.uom_id.id,
+                'uom_id': cls.product_customs.uom_id.id,
                 'picking_id': cls.picking_in_1.id,
                 'location_id': cls.supplier_location_id,
                 'location_dest_id': cls.warehouse.lot_stock_id.id
@@ -62,7 +63,7 @@ class TestCFDIInvoiceLanding(TestMxExtendedEdiCommon, TestStockLandedCostsCommon
             {
                 'product_id': cls.product_customs.id,
                 'product_uom_qty': 10,
-                'product_uom': cls.product_customs.uom_id.id,
+                'uom_id': cls.product_customs.uom_id.id,
                 'picking_id': cls.picking_in_2.id,
                 'location_id': cls.supplier_location_id,
                 'location_dest_id': cls.warehouse.lot_stock_id.id
@@ -76,7 +77,7 @@ class TestCFDIInvoiceLanding(TestMxExtendedEdiCommon, TestStockLandedCostsCommon
         self.Move.create({
             'product_id': self.no_customs_product.id,
             'product_uom_qty': 10,
-            'product_uom': self.no_customs_product.uom_id.id,
+            'uom_id': self.no_customs_product.uom_id.id,
             'picking_id': self.picking_in_1.id,
             'location_id': self.supplier_location_id,
             'location_dest_id': self.warehouse.lot_stock_id.id

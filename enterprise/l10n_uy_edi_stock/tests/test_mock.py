@@ -6,6 +6,8 @@ from . import common
 @tagged("-at_install", "post_install", "post_install_l10n", "mock")
 class TestMock(common.TestUyEdiStock):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -42,8 +44,7 @@ class TestMock(common.TestUyEdiStock):
         """ Capture error returned by DGI because data sent in the XML is not valid """
         partner_local_with_error = self.env["res.partner"].create({
             "name": "IEB Internacional",
-            "l10n_latam_identification_type_id": self.env.ref("l10n_uy.it_dni").id,
-            "vat": "218435730016",
+            "additional_identifiers": {"UY_DNI": "218435730016"},
             "street": "Bach 0",
             "city": "Aeroparque",
             "state_id": self.env.ref("base.state_uy_02").id,

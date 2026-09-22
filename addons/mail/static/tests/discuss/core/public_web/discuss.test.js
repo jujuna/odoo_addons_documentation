@@ -1,4 +1,5 @@
 import { waitUntilSubscribe } from "@bus/../tests/bus_test_helpers";
+import { WebsocketWorker } from "@bus/workers/websocket_worker";
 import {
     contains,
     defineMailModels,
@@ -7,9 +8,14 @@ import {
     startServer,
 } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
-import { EventBus } from "@odoo/owl";
-import { Command, mockService, patchWithCleanup, withUser } from "@web/../tests/web_test_helpers";
-import { browser } from "@web/core/browser/browser";
+import { mockDate } from "@odoo/hoot-mock";
+import {
+    Command,
+    mockService,
+    patchWithCleanup,
+    serverState,
+    withUser,
+} from "@web/../tests/web_test_helpers";
 
 import { rpc } from "@web/core/network/rpc";
 
@@ -17,26 +23,24 @@ describe.current.tags("desktop");
 defineMailModels();
 
 test("open channel in discuss from push notification", async () => {
-    patchWithCleanup(window.navigator, {
-        serviceWorker: Object.assign(new EventBus(), {
-            register: () => Promise.resolve(),
-            ready: Promise.resolve(),
-        }),
-    });
     const pyEnv = await startServer();
-    const channelId = pyEnv["discuss.channel"].create({ name: "General" });
+    const [generalId, salesId] = pyEnv["discuss.channel"].create([
+        { name: "General" },
+        { name: "Sales" },
+    ]);
     await start();
-    await openDiscuss("mail.box_inbox");
-    await contains(".o-mail-DiscussContent-threadName[title='Inbox']");
-    browser.navigator.serviceWorker.dispatchEvent(
+    await openDiscuss(salesId);
+    await contains(".o-mail-DiscussContent-threadName[title='Sales']");
+    navigator.serviceWorker.dispatchEvent(
         new MessageEvent("message", {
-            data: { action: "OPEN_CHANNEL", data: { id: channelId } },
+            data: { action: "OPEN_CHANNEL", data: { id: generalId } },
         })
     );
     await contains(".o-mail-DiscussContent-threadName[title='General']");
 });
 
 test("notify message to user as non member", async () => {
+    patchWithCleanup(WebsocketWorker, { OUTGOING_BATCH_DELAY: 500 });
     patchWithCleanup(window, {
         Notification: class Notification {
             static get permission() {
@@ -65,6 +69,23 @@ test("notify message to user as non member", async () => {
             thread_model: "discuss.channel",
         })
     );
-    await contains(".o-mail-Message", { text: "Hello!" });
+    await contains(".o-mail-Message:has(:text('Hello!'))");
     expect.verifySteps(["push notification"]);
+});
+
+test("show correspondent local time in DM header when timezones differ", async () => {
+    mockDate("2026-01-01 12:00:00");
+    const pyEnv = await startServer();
+    pyEnv["res.partner"].write([serverState.partnerId], { tz: "Europe/Brussels" });
+    const partnerId = pyEnv["res.partner"].create({ name: "Demo", tz: "Asia/Kolkata" });
+    const channelId = pyEnv["discuss.channel"].create({
+        channel_member_ids: [
+            Command.create({ partner_id: serverState.partnerId }),
+            Command.create({ partner_id: partnerId }),
+        ],
+        channel_type: "chat",
+    });
+    await start();
+    await openDiscuss(channelId);
+    await contains(".o-mail-DiscussContent-header:has(:text('17:30 local time'))");
 });

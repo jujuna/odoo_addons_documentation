@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-import pytz
+import datetime
 
 from odoo import _, api, fields, models
 from odoo.fields import Domain
@@ -9,16 +8,28 @@ from odoo.fields import Domain
 class PlanningSlot(models.Model):
     _inherit = 'planning.slot'
 
-    allow_timesheets = fields.Boolean("Allow timesheets", related='project_id.allow_timesheets', help="Timesheets can be logged on this slot.", readonly=True)
+    allow_timesheets = fields.Boolean(
+        "Allow timesheets",
+        compute='_compute_allow_timesheets',
+        search='_search_allow_timesheets',
+        compute_sudo=True,
+        help="Timesheets can be logged on this slot."
+    )
     effective_hours = fields.Float("Effective Time", compute='_compute_effective_hours', compute_sudo=True, store=True,
         help="Number of time recorded on the employee's Timesheets for this task (and its sub-tasks) during the timeframe of the shift.")
     timesheet_ids = fields.Many2many('account.analytic.line', compute='_compute_timesheet_ids', compute_sudo=True, export_string_translation=False)
-    can_open_timesheets = fields.Boolean(compute='_compute_can_open_timesheet', export_string_translation=False)
     percentage_hours = fields.Float("Progress", compute='_compute_percentage_hours', compute_sudo=True, store=True)
-    encode_uom_in_days = fields.Boolean(compute='_compute_encode_uom_in_days', export_string_translation=False)
 
-    def _compute_encode_uom_in_days(self):
-        self.encode_uom_in_days = self.env.company.timesheet_encode_uom_id == self.env.ref('uom.product_uom_day')
+    @api.depends('project_id')
+    def _compute_allow_timesheets(self):
+        for slot in self:
+            slot.allow_timesheets = slot.project_id.allow_timesheets
+
+    def _search_allow_timesheets(self, operator, value):
+        query = self.env['project.project'].sudo()._search([
+            ('allow_timesheets', operator, value),
+        ])
+        return [('project_id', 'in', query)]
 
     @api.depends('allocated_hours', 'effective_hours')
     def _compute_percentage_hours(self):
@@ -36,15 +47,18 @@ class PlanningSlot(models.Model):
         if not self.project_id:
             return None
         domain = Domain([
-            ('employee_id', '=', self.employee_id.id),
+            ('employee_id', 'in', self.employee_ids.ids),
             ('date', '>=', self.start_datetime.date()),
             ('date', '<=', self.end_datetime.date())
         ])
+        if self.task_id:
+            all_task = self.task_id + self.task_id.with_context(active_test=False)._get_all_subtasks()
+            domain &= Domain('task_id', 'in', all_task.ids)
         if self.project_id:
             domain = Domain('project_id', '=', self.project_id.id) & domain
         return domain
 
-    @api.depends('timesheet_ids')
+    @api.depends('project_id', 'task_id', 'start_datetime', 'end_datetime', 'resource_ids')
     def _compute_effective_hours(self):
         for forecast in self:
             forecast.effective_hours = sum(
@@ -52,7 +66,7 @@ class PlanningSlot(models.Model):
                 for timesheet in forecast.timesheet_ids
             )
 
-    @api.depends('employee_id', 'start_datetime', 'end_datetime', 'project_id.timesheet_ids.unit_amount')
+    @api.depends('resource_ids', 'start_datetime', 'end_datetime')
     def _compute_timesheet_ids(self):
         self.timesheet_ids = False
         Timesheet = self.env['account.analytic.line']
@@ -64,23 +78,6 @@ class PlanningSlot(models.Model):
 
     def _read_group_fields_nullify(self):
         return super()._read_group_fields_nullify() + ['effective_hours:sum', 'effective_hours_cost:sum', 'percentage_hours:sum']
-
-    @api.depends_context('uid')
-    @api.depends('user_id', 'timesheet_ids')
-    def _compute_can_open_timesheet(self):
-        # A timesheet approver will be able to open any slot's timesheets, however
-        # a regular employee will need to be a timesheet user AND be assigned to this slot
-        # to be able to open them.
-        is_approver = self.env.user.has_group('hr_timesheet.group_hr_timesheet_approver')
-        is_user = is_approver or self.env.user.has_group('hr_timesheet.group_hr_timesheet_user')
-        if not is_user:
-            self.can_open_timesheets = False
-        else:
-            for slot in self:
-                if (is_approver or (is_user and self.env.user == slot.user_id)):
-                    slot.can_open_timesheets = True
-                else:
-                    slot.can_open_timesheets = False
 
     def _gantt_progress_bar_project_id(self, res_ids, start, stop):
         planning_read_group = self.env['planning.slot']._read_group(
@@ -113,7 +110,7 @@ class PlanningSlot(models.Model):
 
     def _gantt_progress_bar(self, field, res_ids, start, stop):
         if field == 'project_id':
-            return self._gantt_progress_bar_project_id(res_ids, pytz.utc.localize(start), pytz.utc.localize(stop))
+            return self._gantt_progress_bar_project_id(res_ids, start.replace(tzinfo=datetime.UTC), stop.replace(tzinfo=datetime.UTC))
         return super()._gantt_progress_bar(field, res_ids, start, stop)
 
     def action_open_timesheets(self):
@@ -139,9 +136,10 @@ class PlanningSlot(models.Model):
         })
         action['context'] = {
             'default_date': self.start_datetime.date()\
-                if self.start_datetime < fields.Datetime.now() else fields.Date.today(),
-            'default_employee_id': self.employee_id.id,
+                if self.start_datetime < fields.Datetime.now() else fields.Date.context_today(self),
+            'default_employee_id': self.employee_ids[0].id if self.employee_ids else False,
             'default_project_id': self.project_id.id,
+            'default_task_id': self.task_id.id,
             'grid_anchor': self.start_datetime.date(),
         }
         if self.duration < 24:

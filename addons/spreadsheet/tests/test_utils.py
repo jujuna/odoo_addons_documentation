@@ -1,14 +1,21 @@
 import datetime
 
-from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
+from odoo.tests.common import tagged, TransactionCase
 
 from odoo.addons.spreadsheet.utils.formatting import (
     date_to_spreadsheet_date_number,
     datetime_to_spreadsheet_date_number,
 )
 from odoo.addons.spreadsheet.utils.json import extend_serialized_json
+from odoo.addons.spreadsheet.utils.helpers import (
+    index_to_column_letter,
+    to_cell_reference,
+    spreadsheet_safe_batch
+)
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSpreadsheetUtils(TransactionCase):
 
     def test_extend_serialized_json(self):
@@ -43,6 +50,10 @@ class TestSpreadsheetUtils(TransactionCase):
             extend_serialized_json('{}', [('key1', '1'), ('key2', '2')]),
             '{"key1":1,"key2":2}'
         )
+        self.assertEqual(
+            extend_serialized_json('\n{}\n', [('key1', '1'), ('key2', '2')]),
+            '{"key1":1,"key2":2}'
+        )
 
     def test_date_to_spreadsheet_date_number(self):
         d = datetime.date(1899, 12, 30)
@@ -64,3 +75,53 @@ class TestSpreadsheetUtils(TransactionCase):
 
         dt = datetime.datetime(2023, 10, 1, 12, 0, 0)
         self.assertEqual(datetime_to_spreadsheet_date_number(dt, 'Etc/GMT-8'), 45200.5 + test_tz_offset)
+
+    def test_index_to_column_letter(self):
+        self.assertEqual(index_to_column_letter(0), "A")
+        self.assertEqual(index_to_column_letter(25), "Z")
+        self.assertEqual(index_to_column_letter(26), "AA")
+        self.assertEqual(index_to_column_letter(27), "AB")
+        self.assertEqual(index_to_column_letter(701), "ZZ")
+        self.assertEqual(index_to_column_letter(702), "AAA")
+
+    def test_index_to_column_letter_negative(self):
+        with self.assertRaises(ValueError):
+            index_to_column_letter(-1)
+
+    def test_to_cell_reference(self):
+        self.assertEqual(to_cell_reference(0, 0), "A1")
+        self.assertEqual(to_cell_reference(0, 1), "A2")
+        self.assertEqual(to_cell_reference(1, 1), "B2")
+        self.assertEqual(to_cell_reference(26, 9), "AA10")
+
+    def test_spreadsheet_safe_batch_user_error(self):
+        class BatchTester:
+            @spreadsheet_safe_batch
+            def test_method(self, requests):
+                results = []
+                for req in requests:
+                    if req == 5:
+                        raise UserError("Boom!")
+                    results.append(req * 2)
+                return results
+
+        batch_class = BatchTester()
+        result = batch_class.test_method([4, 5, 6])
+        self.assertEqual(
+            result,
+            [
+                8,
+                {"__error__": "Boom!"},
+                12,
+            ],
+        )
+
+    def test_spreadsheet_safe_batch_all_success(self):
+        class BatchTester:
+            @spreadsheet_safe_batch
+            def test_method(self, requests):
+                return [r * 2 for r in requests]
+
+        batch_class = BatchTester()
+        result = batch_class.test_method([1, 2, 3])
+        self.assertEqual(result, [2, 4, 6])

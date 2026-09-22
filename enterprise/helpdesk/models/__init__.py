@@ -3,7 +3,6 @@
 
 from . import digest
 from . import ir_module
-from . import ir_ui_menu
 from . import helpdesk_team
 from . import helpdesk_stage
 from . import helpdesk_sla_status

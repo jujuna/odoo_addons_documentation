@@ -4,16 +4,23 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-12-30 18:44+0000\n"
+"POT-Creation-Date: 2026-09-04 18:05+0000\n"
+"PO-Revision-Date: 2026-09-04 18:05+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: appointment_hr_recruitment
+#: model:ir.module.module,description:base.module_appointment_hr_recruitment
+msgid ""
+"\n"
+"Keeps track of all appointments related to applicants.\n"
+msgstr ""
 
 #. module: appointment_hr_recruitment
 #: model:mail.template,body_html:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
@@ -36,6 +43,13 @@ msgid ""
 msgstr ""
 
 #. module: appointment_hr_recruitment
+#: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
+msgid ""
+"<i class=\"oi\" data-icon=\"info\"/>\n"
+"                    It may have expired because your application process has already been completed or closed."
+msgstr ""
+
+#. module: appointment_hr_recruitment
 #: model:ir.model,name:appointment_hr_recruitment.model_hr_applicant
 msgid "Applicant"
 msgstr ""
@@ -46,11 +60,6 @@ msgid "Apply for a Job"
 msgstr ""
 
 #. module: appointment_hr_recruitment
-#: model:ir.model,name:appointment_hr_recruitment.model_appointment_invite
-msgid "Appointment Invite"
-msgstr ""
-
-#. module: appointment_hr_recruitment
 #: model:mail.template,subject:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
 msgid ""
 "Can we plan an interview together for your {{ (object.job_id.name + ' ') if "
@@ -58,15 +67,20 @@ msgid ""
 msgstr ""
 
 #. module: appointment_hr_recruitment
-#: model:ir.model.fields,field_description:appointment_hr_recruitment.field_appointment_invite__display_name
 #: model:ir.model.fields,field_description:appointment_hr_recruitment.field_hr_applicant__display_name
 msgid "Display Name"
 msgstr ""
 
 #. module: appointment_hr_recruitment
-#: model:ir.model.fields,field_description:appointment_hr_recruitment.field_appointment_invite__id
 #: model:ir.model.fields,field_description:appointment_hr_recruitment.field_hr_applicant__id
 msgid "ID"
+msgstr ""
+
+#. module: appointment_hr_recruitment
+#: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
+msgid ""
+"If you believe this is a mistake or have questions, feel free to reply to the\n"
+"                    original email or contact the recruitment team directly."
 msgstr ""
 
 #. module: appointment_hr_recruitment
@@ -75,8 +89,23 @@ msgid "Interview Invite Code"
 msgstr ""
 
 #. module: appointment_hr_recruitment
+#: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
+msgid "Interview Link Unavailable"
+msgstr ""
+
+#. module: appointment_hr_recruitment
 #: model:appointment.type,name:appointment_hr_recruitment.appointment_type_interviews
 msgid "Interviews availabilities"
+msgstr ""
+
+#. module: appointment_hr_recruitment
+#: model:ir.module.module,summary:base.module_appointment_hr_recruitment
+msgid "Keep track of recruitment appointments"
+msgstr ""
+
+#. module: appointment_hr_recruitment
+#: model:ir.module.module,shortdesc:base.module_appointment_hr_recruitment
+msgid "Recruitment tracking on appointments"
 msgstr ""
 
 #. module: appointment_hr_recruitment
@@ -88,4 +117,9 @@ msgstr ""
 #: model:mail.template,description:appointment_hr_recruitment.email_template_data_applicant_schedule_interview
 msgid ""
 "Send this email when you want to schedule an interview with an applicant"
+msgstr ""
+
+#. module: appointment_hr_recruitment
+#: model_terms:ir.ui.view,arch_db:appointment_hr_recruitment.appointment_applicant_link_expired
+msgid "This interview is no longer active"
 msgstr ""

@@ -8,17 +8,21 @@ from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class NigeriaReportTest(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('ng')
     def setUpClass(cls):
         super().setUpClass()
         company = cls.company_data['company']
-        cls.tax_tag_carryover = cls.env['account.account.tag'].with_company(company).search([('name', '=', '100')])
-        cls.purchase_tax = cls.env['account.tax'].with_company(company).search([
+        cls.tax_tag_carryover = cls.env['account.account.tag'].search([('name', '=', '100')])
+        cls.purchase_tax = cls.env['account.tax'].search([
+            ('company_id', '=', company.id),
             ('name', '=', '7.5%'),
             ('type_tax_use', '=', 'purchase'),
         ])
-        cls.sales_tax = cls.env['account.tax'].with_company(company).search([
+        cls.sales_tax = cls.env['account.tax'].search([
+            ('company_id', '=', company.id),
             ('name', '=', '7.5%'),
             ('type_tax_use', '=', 'sale'),
         ])
@@ -69,7 +73,7 @@ class NigeriaReportTest(TestAccountReportsCommon):
         return report._get_lines(options)
 
     def _get_lines_amounts(self, report_lines, line_indexes):
-        return [report_lines[idx]['columns'][0]['no_format'] for idx in line_indexes]
+        return [report_lines[idx].columns[0].no_format for idx in line_indexes]
 
     def test_first_carryover_vat_credit(self):
         """

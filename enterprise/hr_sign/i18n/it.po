@@ -11,30 +11,30 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-10-15 16:32+0000\n"
-"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/hr_sign/"
-"it/>\n"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 02:28+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
+"hr_sign/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_sign
 #. odoo-python
 #: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
-msgid "%(employee)s and %(responsible)s are the signatories."
-msgstr "%(employee)s e %(responsible)s sono i firmatari."
+msgid "%(responsible)s, %(employee)s"
+msgstr ""
 
 #. module: hr_sign
 #. odoo-python
 #: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
-msgid "%(user_name)s requested a new signature on the following documents:"
-msgstr "%(user_name)sha richiesto una nuova firma sui documenti seguenti:"
+msgid "%(signer)s"
+msgstr ""
 
 #. module: hr_sign
 #. odoo-python
@@ -75,6 +75,13 @@ msgid "Attachment"
 msgstr "Allegato"
 
 #. module: hr_sign
+#: model:ir.model.fields,help:hr_sign.field_hr_contract_sign_document_wizard__signing_employee
+msgid ""
+"Choose who will sign the document when the selected template has a single "
+"signer."
+msgstr ""
+
+#. module: hr_sign
 #: model:sign.template,redirect_url_text:hr_sign.template_sign_termination
 msgid "Close"
 msgstr "Chiudi"
@@ -83,6 +90,11 @@ msgstr "Chiudi"
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__version_id
 msgid "Contract"
 msgstr "Contratto"
+
+#. module: hr_sign
+#: model:ir.module.module,shortdesc:base.module_hr_sign
+msgid "Contract - Signature"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__cc_partner_ids
@@ -105,11 +117,6 @@ msgid "Customer"
 msgstr "Cliente"
 
 #. module: hr_sign
-#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
-msgid "Discard"
-msgstr "Abbandona"
-
-#. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__display_name
 #: model:ir.model.fields,field_description:hr_sign.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__display_name
@@ -119,16 +126,6 @@ msgstr "Abbandona"
 #: model:ir.model.fields,field_description:hr_sign.field_res_users__display_name
 msgid "Display Name"
 msgstr "Nome visualizzato"
-
-#. module: hr_sign
-#: model:ir.actions.act_window,name:hr_sign.sign_contract_wizard_action
-msgid "Document Signature"
-msgstr "Firma documento"
-
-#. module: hr_sign
-#: model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__sign_template_id
-msgid "Document to sign"
-msgstr "Documento da firmare"
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__sign_template_ids
@@ -157,6 +154,7 @@ msgstr ""
 
 #. module: hr_sign
 #: model:ir.model,name:hr_sign.model_hr_employee
+#: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__signing_employee__employee
 #: model:sign.item.role,name:hr_sign.sign_item_role_employee_signatory
 msgid "Employee"
 msgstr "Dipendente"
@@ -188,6 +186,7 @@ msgid "Employees"
 msgstr "Dipendenti"
 
 #. module: hr_sign
+#: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__signing_employee__hr_responsible
 #: model:sign.item.role,name:hr_sign.sign_item_role_job_responsible
 msgid "HR Responsible"
 msgstr "Responsabile RU"
@@ -209,9 +208,9 @@ msgid "ID"
 msgstr "ID"
 
 #. module: hr_sign
-#: model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__is_signature_request
-msgid "Is Signature Request"
-msgstr "È richiesta la firma"
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__is_single_signer
+msgid "Is Single Signer"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__write_uid
@@ -234,6 +233,11 @@ msgid "Mail Options"
 msgstr "Opzioni e-mail"
 
 #. module: hr_sign
+#: model:ir.module.module,summary:base.module_hr_sign
+msgid "Manage your documents to sign in contracts"
+msgstr ""
+
+#. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__message
 msgid "Message"
 msgstr "Messaggio"
@@ -248,12 +252,6 @@ msgstr "Nessun modello di documento nel database."
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
 msgid "No template available"
 msgstr "Nessun contratto disponibile"
-
-#. module: hr_sign
-#. odoo-python
-#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
-msgid "Only %s has to sign."
-msgstr "Solo %s deve firmare."
 
 #. module: hr_sign
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
@@ -312,6 +310,16 @@ msgid "Send"
 msgstr "Invia"
 
 #. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__show_sign_now
+msgid "Show Sign Now"
+msgstr ""
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Sign Now"
+msgstr ""
+
+#. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__sign_request_ids
 msgid "Sign Request"
 msgstr "Richiesta di firma"
@@ -344,10 +352,26 @@ msgstr "Firma il documento nel contratto"
 #: code:addons/hr_sign/models/hr_employee.py:0
 #: code:addons/hr_sign/wizard/mail_activity_schedule.py:0
 #: model:ir.actions.server,name:hr_sign.action_signature_request_multi
-#: model_terms:ir.ui.view,arch_db:hr_sign.hr_employee_sign_view_form
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
 msgid "Signature Request"
 msgstr "Richiesta di firma"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "Signature requested for the following document(s):"
+msgstr ""
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "Signer(s): %(signatories)s"
+msgstr ""
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__signing_employee
+msgid "Signing Employee"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__subject
@@ -387,48 +411,3 @@ msgid ""
 msgstr ""
 "Impossibile eliminare un contratto collegato a un documento firmato, "
 "procedere invece all'archiviazione."
-
-#~ msgid "%s and %s are the signatories."
-#~ msgstr "%s e %s sono firmatari."
-
-#~ msgid "Contract history"
-#~ msgstr "Cronologia contratto"
-
-#~ msgid ""
-#~ "Documents to sign. Only documents with 1 or 2 different responsible are "
-#~ "selectable.\n"
-#~ "        Documents with 1 responsible will only have to be signed by the "
-#~ "employee while documents with 2 different responsible will have to be "
-#~ "signed by both the employee and the responsible.\n"
-#~ "        "
-#~ msgstr ""
-#~ "Documenti da firmare. Sono selezionabili solo i documenti con 1 o 2 "
-#~ "responsabili diversi. \n"
-#~ "I documenti con 1 responsabile dovranno essere firmati solo dal "
-#~ "dipendente, mentre i documenti con 2 responsabili diversi dovranno essere "
-#~ "firmati sia dal dipendente che dal responsabile."
-
-#~ msgid ""
-#~ "No appropriate template could be found, please make sure you configured "
-#~ "them properly."
-#~ msgstr ""
-#~ "Non è stato trovato alcun modello appropriato, assicurati di averli "
-#~ "configurati correttamente."
-
-#~ msgid "Open Link"
-#~ msgstr "Apri link"
-
-#~ msgid "Plan Wizard"
-#~ msgstr "Procedura di pianificazione"
-
-#~ msgid "Plan activity type"
-#~ msgstr "Tipo di attività pianificazione"
-
-#~ msgid "Signature Request - %s"
-#~ msgstr "Richiesta firma - %s"
-
-#~ msgid "document"
-#~ msgstr "documento"
-
-#~ msgid "documents"
-#~ msgstr "documenti"

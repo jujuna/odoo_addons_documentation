@@ -8,13 +8,13 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     timesheet_show_rates = fields.Boolean(
-        string="Billing Rate Indicators",
+        string="Billable Time Targets",
         related="company_id.timesheet_show_rates",
         readonly=False,
         help="Show the billing indicators on My Timesheets view"
     )
     timesheet_show_leaderboard = fields.Boolean(
-        string="Billing Rate Leaderboard",
+        string="Billable Time Leaderboard",
         related="company_id.timesheet_show_leaderboard",
         readonly=False,
         help="Show the leaderboard on My Timesheets view",
@@ -39,8 +39,8 @@ class ResConfigSettings(models.TransientModel):
             When the qty_delivered field is recomputed, we need to update the
             qty_to_invoice and invoice status fields.
         """
-        old_value = self.env["ir.config_parameter"].sudo().get_param("sale.invoiced_timesheet")
-        if old_value and self.invoiced_timesheet != old_value:
+        old_value = self.env["ir.config_parameter"].sudo().get_str("sale.invoiced_timesheet") or DEFAULT_INVOICED_TIMESHEET
+        if self.invoiced_timesheet != old_value:
             # recompute the qty_delivered in sale.order.line for sale.order
             # where his state is set to 'sale'.
             sale_order_lines = self.env['sale.order.line'].sudo().search([

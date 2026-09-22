@@ -16,6 +16,7 @@ export const taskGanttView = {
     ArchParser: TaskGanttArchParser,
     Model: TaskGanttModel,
     Renderer: TaskGanttRenderer,
+    buttonTemplate: "project_enterprise.TaskGanttView.Buttons",
 };
 
 viewRegistry.add("task_gantt", taskGanttView);

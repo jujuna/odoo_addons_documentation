@@ -1,3 +1,4 @@
+import { proxy } from "@odoo/owl";
 import MainComponent from "@stock_barcode/components/main";
 import BarcodeMRPModel from "../models/barcode_mrp_model";
 import HeaderComponent from "./header";
@@ -5,16 +6,11 @@ import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_d
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { patch } from "@web/core/utils/patch";
-import { useState } from "@odoo/owl";
 
 patch(MainComponent.prototype, {
     setup() {
         super.setup();
-        this.state = useState({ ...this.state, displayByProduct: false });
-    },
-
-    get displayActionButtons() {
-        return super.displayActionButtons && !this.state.displayByProduct;
+        this.state = proxy({ ...this.state, displayByProduct: false });
     },
 
     get displayOperationButtons() {
@@ -46,8 +42,13 @@ patch(MainComponent.prototype, {
     },
 
     get addLineBtnName() {
-        if (this.env.model.resModel == "mrp.production" && this.env.model.record.product_id) {
-            return _t("Add Component");
+        if (this.env.model.resModel == "mrp.production") {
+            if (this.state.displayByProduct) {
+                return _t("Add By-Product");
+            }
+            if (this.env.model.record.product_id) {
+                return _t("Add Component");
+            }
         }
         return super.addLineBtnName;
     },
@@ -56,6 +57,7 @@ patch(MainComponent.prototype, {
         if (this.state.view === "barcodeLines" && this.state.displayByProduct) {
             this.state.displayByProduct = false;
             this.env.model.displayByProduct = false;
+            this.env.model.selectedLineVirtualId = false;
         } else {
             super.exit(...arguments);
         }
@@ -65,8 +67,11 @@ patch(MainComponent.prototype, {
         if (this.resModel == "mrp.production") {
             await new Promise((resolve) => {
                 this.dialog.add(ConfirmationDialog, {
-                    body: _t("Are you sure you want to cancel this manufacturing order?"),
-                    title: _t("Cancel manufacturing order?"),
+                    body: _t(
+                        "Are you sure you want to cancel this manufacturing order?\nThis action cannot be undone."
+                    ),
+                    title: _t("Cancel Manufacturing Order"),
+                    confirmLabel: _t("Cancel this Order"),
                     cancel: () => {},
                     confirm: async () => {
                         await this.orm.call(this.resModel, "action_cancel", [
@@ -116,24 +121,21 @@ patch(MainComponent.prototype, {
             const curr_qty_producing = lineRecord.data.qty_producing;
             const is_product_form = !this.env.model.record.product_id;
             const recordId = lineRecord.resId;
-            let update = Boolean(this.resId);
+            const update = Boolean(this.resId);
             if (!this.resId) {
                 this.resId = recordId;
                 await this.env.model.confirmAndSetData(recordId);
-                this.toggleBarcodeLines();
             }
-            if (!is_product_form && prev_qty_producing != curr_qty_producing){
+            if (!is_product_form && prev_qty_producing != curr_qty_producing) {
                 await this.orm.call("mrp.production", "set_qty_producing", [[recordId]]);
-                await this._onRefreshState({ recordId });
             }
             if (update) {
                 if (lineRecord.data.product_qty != this.env.model.record.product_qty) {
                     // need to reassign moves to update the quants on screen
                     await this.orm.call(this.resModel, "action_assign", [[this.resId]]);
                 }
-                this._onRefreshState({ recordId });
             }
-            return;
+            return await this._onRefreshState({ recordId });
         }
         return super.saveFormView(...arguments);
     },
@@ -143,12 +145,6 @@ patch(MainComponent.prototype, {
         const result = await rpc(route, params);
         await this.env.model.refreshCache(result.data.records);
         this.openByProductLines();
-    },
-
-    onValidateByProduct() {
-        this.state.displayByProduct = false;
-        this.env.model.displayByProduct = false;
-        this.toggleBarcodeLines();
     },
 
     _getBarcodeModel() {

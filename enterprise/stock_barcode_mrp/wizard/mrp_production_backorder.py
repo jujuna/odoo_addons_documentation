@@ -8,6 +8,6 @@ class MrpProductionBackorder(models.TransientModel):
 
     def action_backorder(self):
         res = super().action_backorder()
-        if self.env.context.get('barcode_trigger', False):
+        if self.env.context.get('barcode_view', False):
             return True
         return res

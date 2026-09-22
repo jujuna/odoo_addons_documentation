@@ -1,9 +1,7 @@
-## -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Dominican Republic - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Dominican Republic
     """,
@@ -17,8 +15,12 @@ Accounting reports for Dominican Republic
         'data/profit_and_loss.xml',
         'data/balance_sheet.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'l10n_do_reports/static/src/components/**/*',
+        ],
+    },
     'auto_install': True,
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

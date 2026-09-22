@@ -10,37 +10,25 @@ patch(PartnerLine.prototype, {
         this.pos = usePos();
         this.dialog = useService("dialog");
     },
-    get partnerInfos() {
-        return this.pos.getPartnerCredit(this.props.partner);
+    get limitReached() {
+        return (
+            this.props.partner.over_due &&
+            this.props.isSelected &&
+            this.props.partner.creditLimit > 0
+        );
     },
-    async settleCustomerDue() {
-        this.props.close();
+    get totalDue() {
+        return this.props.partner.commercial_partner_id?.total_due || 0;
+    },
+    onClickDepositMoney(amount = 0) {
         const partnerId = this.props.partner.id;
         const commercialPartnerId = this.props.partner.raw.commercial_partner_id;
-        const settleDueLinesIds = this.pos
-            .getOrder()
-            .lines.filter((line) => line.isSettleDueLine())
-            .map((line) => line.settled_order_id.id);
-        this.dialog.add(CustomSelectCreateDialog, {
-            resModel: "pos.order",
-            noCreate: true,
-            multiSelect: true,
-            listViewId: this.pos.models["ir.ui.view"].find(
-                (v) => v.name == "customer_due_pos_order_list_view"
-            ).id,
-            domain: [
-                ["commercial_partner_id", "=", commercialPartnerId],
-                ["customer_due_total", "!=", 0],
-                ["id", "not in", settleDueLinesIds],
-            ],
-            onSelected: async (orderIds) => {
-                this.pos.onClickSettleDue(orderIds, partnerId, commercialPartnerId);
-            },
-        });
-    },
-    async depositMoney(amount = 0) {
-        this.props.close();
-        this.pos.depositMoney(this.props.partner, amount);
+        const success = this.pos.onClickDepositMoney(amount, partnerId, commercialPartnerId);
+        if (!success) {
+            this.props.close();
+            return;
+        }
+        this.props.onClickPartner(this.props.partner);
     },
     payLaterPaymentExists() {
         return this.pos.models["pos.payment.method"].some(
@@ -53,21 +41,16 @@ patch(PartnerLine.prototype, {
         this.props.close();
         const partnerId = this.props.partner.id;
         const commercialPartnerId = this.props.partner.raw.commercial_partner_id;
-        const settleInvoiceLinesIds = this.pos
-            .getOrder()
-            .lines.filter((line) => line.isSettleInvoiceLine())
-            .map((line) => line.settled_invoice_id.id);
         this.dialog.add(CustomSelectCreateDialog, {
             resModel: "account.move",
             noCreate: true,
             multiSelect: true,
-            listViewId: this.pos.models["ir.ui.view"].find(
-                (v) => v.name == "due_account_move_list_view"
-            ).id,
+            listViewId: this.pos.config._pos_settle_due_due_account_move_list_view_id,
             domain: [
                 ["commercial_partner_id", "=", commercialPartnerId],
-                ["pos_amount_unsettled", "!=", 0],
-                ["id", "not in", settleInvoiceLinesIds],
+                ["amount_residual", "!=", 0],
+                ["move_type", "in", ["out_invoice", "out_receipt", "out_refund"]],
+                ["payment_state", "in", ["not_paid", "partial"]],
             ],
             onSelected: async (invoiceIds) => {
                 this.pos.onClickSettleInvoices(invoiceIds, partnerId, commercialPartnerId);

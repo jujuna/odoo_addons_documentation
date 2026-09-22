@@ -20,6 +20,7 @@ class HelpdeskTicket(models.Model):
             [
                 ('company_id', '=', unquote('company_id')),
                 ('order_partner_id', 'child_of', unquote('commercial_partner_id')),
+                ('state', '=', 'sale'),
             ],
         ])
         return domain
@@ -30,7 +31,7 @@ class HelpdeskTicket(models.Model):
     display_invoice_button = fields.Boolean(compute='_compute_display_invoice_button', compute_sudo=True, export_string_translation=False)
     sale_line_id = fields.Many2one(
         'sale.order.line', string="Sales Order Item", tracking=True,
-        compute="_compute_sale_line_id", store=True, readonly=False,
+        compute="_compute_sale_line_id", store=True, index=True, readonly=False,
         domain=lambda self: str(self._domain_sale_line_id()),
         help="Sales Order Item to which the time spent on this ticket will be added in order to be invoiced to your customer.\n"
              "By default the last prepaid sales order item that has time remaining will be selected.\n"
@@ -120,9 +121,26 @@ class HelpdeskTicket(models.Model):
             domain &= Domain('order_id', '=', order_id.id)
         return domain
 
+    def _sla_status_fix_for_sale_line(self):
+        """Remove partner-only SLA statuses for tickets created with sale_line_id but no explicit partner_id.
+
+        When partner_id is auto-derived from the sale order, partner-only SLA policies must
+        not be applied to such tickets.
+        """
+        self.sla_status_ids.filtered(
+            lambda s: not s.sla_id.product_ids and 'partner_id' in (s.sla_id.criteria_domain or '')
+        ).unlink()
+
     @api.model_create_multi
     def create(self, vals_list):
         tickets = super().create(vals_list)
+        tickets_without_partner = tickets.browse([
+            ticket.id
+            for ticket, vals in zip(tickets, vals_list)
+            if vals.get('sale_line_id') and not vals.get('partner_id')
+        ])
+        if tickets_without_partner:
+            tickets_without_partner._sla_status_fix_for_sale_line()
         sol_ids = {
             vals['sale_line_id']
             for vals in vals_list
@@ -131,6 +149,16 @@ class HelpdeskTicket(models.Model):
         if sol_ids:
             tickets._ensure_sale_order_linked(list(sol_ids))
         return tickets
+
+    def _sla_find(self):
+        result = {}
+        for ticket in self:
+            slas = self.env['helpdesk.sla'].search(ticket._sla_find_domain())
+            result[ticket] = self.env['helpdesk.sla']
+            for sla in slas:
+                if (not sla.criteria_domain and not sla.product_ids) or ticket in sla.search_tickets():
+                    result[ticket] |= sla
+        return result
 
     def _ensure_sale_order_linked(self, sol_ids):
         quotations = self.env['sale.order.line'].sudo()._read_group(
@@ -178,25 +206,6 @@ class HelpdeskTicket(models.Model):
             if ticket.sale_order_id and not ticket.partner_id:
                 ticket.partner_id = ticket.sale_order_id.partner_id
 
-    @api.model
-    def _sla_reset_trigger(self):
-        field_list = super()._sla_reset_trigger()
-        field_list.append('sale_line_id')
-        return field_list
-
-    def _sla_find_false_domain(self):
-        return Domain.AND([
-            super()._sla_find_false_domain(),
-            [('product_ids', '=', False)],
-        ])
-
-    def _sla_find_extra_domain(self):
-        self.ensure_one()
-        return Domain.OR([
-            super()._sla_find_extra_domain(),
-            [('product_ids', 'in', self.sale_line_id.product_template_id.ids)],
-        ])
-
     def action_view_so(self):
         self.ensure_one()
         action_window = {
@@ -228,8 +237,40 @@ class HelpdeskTicket(models.Model):
         return self.env['account.analytic.line'].sudo()._read_group(
             [
                 ('helpdesk_ticket_id', 'in', timesheet_tickets.ids),
-                ('validated', 'in', [True, self.env['ir.config_parameter'].sudo().get_param('sale.invoiced_timesheet', DEFAULT_INVOICED_TIMESHEET) == 'approved']),
+                ('validated', 'in', [True, (self.env['ir.config_parameter'].sudo().get_str('sale.invoiced_timesheet') or DEFAULT_INVOICED_TIMESHEET) == 'approved']),
             ],
             [],
             ['unit_amount:sum']
         )[0][0] or 0.0
+
+    def action_create_invoice(self):
+        msg = False
+        billable_tickets = self.filtered(
+            lambda t: t.team_id.use_helpdesk_sale_timesheet and t.sale_order_id
+        )
+        tickets_to_invoice = billable_tickets.filtered(
+            lambda t: t.sale_order_id.invoice_status == 'to invoice'
+        )
+
+        if not billable_tickets:
+            msg = self.env._("No invoice was created because none of the selected tickets are billable.")
+        elif not tickets_to_invoice:
+            msg = self.env._(
+                "No invoice was created because none of the selected tickets have sale orders ready to be invoiced."
+            )
+        elif len(billable_tickets) < len(self):
+            msg = self.env._("No invoice was created because some of the selected tickets are not billable.")
+        if msg:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'message': msg,
+                    'type': 'warning',
+                }
+            }
+        action = self.env["ir.actions.act_window"]._for_xml_id('sale.action_view_sale_advance_payment_inv')
+        action['context'] = {
+            'active_ids': self.sale_order_id.ids,
+        }
+        return action

@@ -13,7 +13,7 @@ class L10n_LuTaxReportHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         options.setdefault('buttons', []).append(
-            {'name': _('XML'), 'sequence': 30, 'action': 'open_report_export_wizard', 'file_export_type': _('XML')}
+            {'name': _('XML'), 'sequence': 30, 'action': 'open_report_export_wizard', 'file_export_type': _('XML'), 'branch_allowed': True}
         )
 
     def _get_field_values(self, lines):
@@ -22,9 +22,9 @@ class L10n_LuTaxReportHandler(models.AbstractModel):
             # tax report's `code` would contain alpha-numeric string like `LUTAX_XXX` where characters
             # at last three positions will be digits, hence we split `code` with `_` and build dictionary
             # having `code` as dictionary key
-            split_line_code = line.get('code', '') and line['code'].split('_')[-1]
+            split_line_code = line.code and line.code.split('_')[-1]
             if split_line_code and split_line_code.isdigit():
-                balance = "{:.2f}".format(line['columns'][0]['no_format']).replace('.', ',')
+                balance = f"{line.columns[0].no_format:.2f}".replace('.', ',')
                 values[split_line_code] = {'value': balance, 'field_type': 'number'}
 
         return values

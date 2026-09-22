@@ -12,6 +12,8 @@ CalendarEvent._records = [
         appointment_status: "booked",
         appointment_resource_ids: [1],
         total_capacity_reserved: 2,
+        waiting_list_capacity: 2,
+        write_date: "2025-01-01 10:00:00",
     },
     {
         id: 2,
@@ -22,6 +24,8 @@ CalendarEvent._records = [
         appointment_status: "booked",
         appointment_resource_ids: [1],
         total_capacity_reserved: 2,
+        waiting_list_capacity: 2,
+        write_date: "2025-01-01 10:00:00",
     },
     {
         id: 3,
@@ -32,6 +36,8 @@ CalendarEvent._records = [
         appointment_status: "attended",
         appointment_resource_ids: [2],
         total_capacity_reserved: 2,
+        waiting_list_capacity: 2,
+        write_date: "2025-01-01 10:00:00",
     },
     {
         id: 4,
@@ -42,5 +48,7 @@ CalendarEvent._records = [
         appointment_status: "no_show",
         appointment_resource_ids: [2],
         total_capacity_reserved: 2,
+        waiting_list_capacity: 2,
+        write_date: "2025-01-01 10:00:00",
     },
 ];

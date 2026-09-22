@@ -2,16 +2,16 @@
 # This file contains the translation of the following modules:
 # * ai_website_livechat
 #
-# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-12-06 10:20+0000\n"
-"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:49+0000\n"
+"PO-Revision-Date: 2026-09-17 23:36+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "ai_website_livechat/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -19,12 +19,12 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: ai_website_livechat
 #: model_terms:ir.ui.view,arch_db:ai_website_livechat.s_ai_livechat
 msgid "<span class=\"text-muted flex-grow-1\">Ask AI</span>"
-msgstr ""
+msgstr "<span class=\"text-muted flex-grow-1\">Спросить ИИ</span>"
 
 #. module: ai_website_livechat
 #: model_terms:ir.ui.view,arch_db:ai_website_livechat.snippets
@@ -39,9 +39,24 @@ msgid "AI Agent"
 msgstr "ИИ-агент"
 
 #. module: ai_website_livechat
+#: model:ir.model,name:ai_website_livechat.model_ai_preview_card_mixin
+msgid "AI Preview Card Mixin"
+msgstr ""
+
+#. module: ai_website_livechat
+#: model:ir.module.module,shortdesc:base.module_ai_website_livechat
+msgid "AI Website Livechat Integration"
+msgstr ""
+
+#. module: ai_website_livechat
+#: model:ir.module.module,summary:base.module_ai_website_livechat
+msgid "AI website livechat components for web builder"
+msgstr ""
+
+#. module: ai_website_livechat
 #: model_terms:ir.ui.view,arch_db:ai_website_livechat.snippets
 msgid "AI,chat,livechat"
-msgstr ""
+msgstr "ИИ,чат,онлайн-чат"
 
 #. module: ai_website_livechat
 #. odoo-javascript
@@ -61,7 +76,7 @@ msgstr "Свяжитесь с оператором"
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/plugins/ai_livechat_option.xml:0
 msgid "Chat Style"
-msgstr ""
+msgstr "Стиль чата"
 
 #. module: ai_website_livechat
 #. odoo-javascript
@@ -78,14 +93,28 @@ msgstr "Свяжитесь с нами"
 
 #. module: ai_website_livechat
 #: model:ir.model.fields,field_description:ai_website_livechat.field_ai_agent__display_name
+#: model:ir.model.fields,field_description:ai_website_livechat.field_ai_preview_card_mixin__display_name
+#: model:ir.model.fields,field_description:ai_website_livechat.field_mail_message__display_name
 msgid "Display Name"
 msgstr "Display Name"
 
 #. module: ai_website_livechat
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/plugins/ai_livechat_option.xml:0
-msgid "Fallback Button"
+msgid "Displayed only when a support person is available"
 msgstr ""
+
+#. module: ai_website_livechat
+#. odoo-javascript
+#: code:addons/ai_website_livechat/static/src/website/plugins/ai_livechat_option.xml:0
+msgid "Displayed when there are no support personnel online"
+msgstr ""
+
+#. module: ai_website_livechat
+#. odoo-javascript
+#: code:addons/ai_website_livechat/static/src/website/plugins/ai_livechat_option.xml:0
+msgid "Fallback Button"
+msgstr "Резервная кнопка"
 
 #. module: ai_website_livechat
 #. odoo-javascript
@@ -95,14 +124,16 @@ msgstr "Полный экран"
 
 #. module: ai_website_livechat
 #: model:ir.model.fields,field_description:ai_website_livechat.field_ai_agent__id
+#: model:ir.model.fields,field_description:ai_website_livechat.field_ai_preview_card_mixin__id
+#: model:ir.model.fields,field_description:ai_website_livechat.field_mail_message__id
 msgid "ID"
 msgstr "ID"
 
 #. module: ai_website_livechat
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/plugins/ai_livechat_option.xml:0
-msgid "Livechat Channel"
-msgstr "Канал Livechat"
+msgid "Live Chat Channel"
+msgstr ""
 
 #. module: ai_website_livechat
 #. odoo-javascript
@@ -111,33 +142,38 @@ msgid "Loading..."
 msgstr "Загрузка..."
 
 #. module: ai_website_livechat
+#: model:ir.model,name:ai_website_livechat.model_mail_message
+msgid "Message"
+msgstr ""
+
+#. module: ai_website_livechat
 #: model_terms:ir.ui.view,arch_db:ai_website_livechat.s_ai_livechat
 msgid "Need help?<br/>"
-msgstr ""
+msgstr "Нужна помощь?<br/>"
 
 #. module: ai_website_livechat
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/components/ai_livechat_component/ai_livechat.js:0
 msgid "Oops, the Agent linked to this block is archived!"
-msgstr ""
+msgstr "Упс, агент, привязанный к этому блоку, перемещен в архив!"
 
 #. module: ai_website_livechat
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/components/ai_livechat_component/ai_livechat.js:0
 msgid "Oops, there is no Agent linked to this block!"
-msgstr ""
+msgstr "Упс, к этому блоку не привязан ни один агент!"
 
 #. module: ai_website_livechat
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/plugins/ai_livechat_option.xml:0
 msgid "Popup Window"
-msgstr ""
+msgstr "Всплывающее окно"
 
 #. module: ai_website_livechat
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/plugins/ai_livechat_option.xml:0
 msgid "Prompt Placeholder"
-msgstr ""
+msgstr "Заполнитель промпта"
 
 #. module: ai_website_livechat
 #. odoo-javascript
@@ -154,8 +190,8 @@ msgstr "Текст"
 #. module: ai_website_livechat
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/components/ai_livechat_component/ai_livechat.xml:0
-msgid "Thinking..."
-msgstr "Думать..."
+msgid "Thinking"
+msgstr ""
 
 #. module: ai_website_livechat
 #. odoo-javascript
@@ -166,7 +202,7 @@ msgstr "URL"
 #. module: ai_website_livechat
 #: model:ir.model.fields,field_description:ai_website_livechat.field_ai_agent__used_on_website_snippet
 msgid "Used On Website Snippet"
-msgstr ""
+msgstr "Используется в сниппете вебсайта"
 
 #. module: ai_website_livechat
 #. odoo-python
@@ -184,13 +220,13 @@ msgstr "например, /contactus"
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/plugins/ai_livechat_option.xml:0
 msgid "e.g. Ask AI"
-msgstr ""
+msgstr "например, Спросить ИИ"
 
 #. module: ai_website_livechat
 #. odoo-javascript
 #: code:addons/ai_website_livechat/static/src/website/plugins/ai_livechat_option.xml:0
 msgid "e.g. Contact Us"
-msgstr ""
+msgstr "например, Связаться с нами"
 
 #. module: ai_website_livechat
 #. odoo-javascript
@@ -198,3 +234,6 @@ msgstr ""
 #: code:addons/ai_website_livechat/static/src/website/interactions/edit/ai_livechat.edit.xml:0
 msgid "or"
 msgstr "или"
+
+#~ msgid "Thinking..."
+#~ msgstr "Думать..."

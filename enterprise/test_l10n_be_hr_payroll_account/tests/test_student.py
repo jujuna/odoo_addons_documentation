@@ -1,29 +1,25 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime, date
+from datetime import date
 
 from odoo.tests import tagged
-from odoo.addons.account.tests.common import AccountTestInvoicingCommon
-from odoo.tools.float_utils import float_compare
+from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCommon
+from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
 
 
 @tagged('post_install', '-at_install', 'student')
-class TestStudent(AccountTestInvoicingCommon):
+class TestStudent(TestPayslipValidationCommon, TestBelgiumCommon):
 
-    def _validate_payslip(self, payslip, results):
-        error = []
-        line_values = payslip._get_line_values(results.keys())
-        for code, value in results.items():
-            payslip_line_value = line_values[code][payslip.id]['total']
-            if float_compare(payslip_line_value, value, 2):
-                error.append("Computed line %s should have an amount = %s instead of %s" % (code, value, payslip_line_value))
-        self.assertEqual(len(error), 0, '\n' + '\n'.join(error))
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
-    @AccountTestInvoicingCommon.setup_country('be')
+    @TestPayslipValidationCommon.setup_country('be')
     def setUpClass(cls):
         super().setUpClass()
+
+        cls.company_data['company'].current_payroll_config_id.write({
+            'l10n_be_employer_category_id': cls.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010').id,
+        })
 
         cls.env.user.group_ids |= cls.env.ref('hr.group_hr_user') | cls.env.ref('hr_payroll.group_hr_payroll_user')
         cls.new_calendar = cls.env['resource.calendar'].create({
@@ -40,17 +36,15 @@ class TestStudent(AccountTestInvoicingCommon):
             'resource_calendar_id': cls.new_calendar.id,
             'date_version': date(2015, 1, 1),
             'contract_date_start': date(2015, 1, 1),
-            'structure_type_id': cls.env.ref('l10n_be_hr_payroll.structure_type_student').id,
+            'l10n_be_dimona_category': 'stu',
             'wage': 0,
             'wage_type': 'hourly',
             'hourly_wage': 10.87,
             'fuel_card': 0,
             'meal_voucher_amount': 7.45,
-            'representation_fees': 0,
             'commission_on_target': 0,
             'ip_wage_rate': 0,
-            'ip': False,
-            'transport_mode_private_car': True,
+            'private_car_employee_kilometer': 25,
             'distance_home_work': 25,
             'internet': 0,
             'mobile': 0,
@@ -60,17 +54,21 @@ class TestStudent(AccountTestInvoicingCommon):
 
     def test_student(self):
         # CASE: Worked 6 days
-        attendance_work_entry_type = self.env.ref('hr_work_entry.work_entry_type_attendance')
-        self.env['hr.work.entry'].create([{
-            'name': 'Attendance',
-            'employee_id': self.employee.id,
-            'version_id': self.contract.id,
-            'work_entry_type_id': attendance_work_entry_type.id,
-            'date': date(2020, 9, day),
-            'duration': 9,
-            'company_id': self.env.company.id,
-            'state': 'draft',
-        } for day in [1, 2, 3, 4, 7, 8]])
+        attendance_work_entry_type = self.env.ref('hr_work_entry.be_work_entry_type_attendance').sudo()
+        attendance_work_entry_type.requires_allocation = False
+        attendance_work_entry_type.request_unit = 'hour'
+        attendance_work_entry_type.count_as = 'working_time'
+        self.env['hr.leave'].create([
+            {
+                'employee_id': self.employee.id,
+                'work_entry_type_id': attendance_work_entry_type.id,
+                'request_date_from': date(2020, 9, day),
+                'request_date_to': date(2020, 9, day),
+                'request_hour_from': 8,
+                'request_hour_to': 17,
+                'number_of_days': 1,
+            } for day in [1, 2, 3, 4, 7, 8]
+        ])
 
         payslip = self.env['hr.payslip'].with_context(allowed_company_ids=self.env.company.ids).create({
             'name': 'Test Payslip',
@@ -85,15 +83,4 @@ class TestStudent(AccountTestInvoicingCommon):
 
         payslip.compute_sheet()
 
-        self.assertEqual(len(payslip.line_ids), 7)
-
-        payslip_results = {
-            'BASIC': 586.98,  # 10.87 * 54 = 586.98
-            'ONSS': -15.91,
-            'GROSS': 571.07,
-            'CAR.PRIV': 13.85,
-            'MEAL_V_EMP': -6.54,
-            'NET': 578.38,
-            'ONSSEMPLOYER': 31.81,
-        }
-        self._validate_payslip(payslip, payslip_results)
+        self._validate_payslip(payslip)

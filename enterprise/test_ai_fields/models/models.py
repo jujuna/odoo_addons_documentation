@@ -15,6 +15,7 @@ class TestAiFields(models.Model):
     _name = "test.ai.fields.model"
 
     name = fields.Char()
+    ai_base_char = fields.Char(ai="Python prompt")
 
     parent_id = fields.Many2one("test.ai.fields.parent")
 

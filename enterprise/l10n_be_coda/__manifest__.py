@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 # Copyright (c) 2011 Noviat nv/sa (www.noviat.be). All rights reserved.
@@ -55,12 +54,11 @@ description provided by the CODA configuration tables is based upon the CODA
 V2.2 specifications.
 If required, you can manually adjust the descriptions via the CODA configuration menu.
 ''',
-    'depends': ['account_accountant', 'l10n_be', 'account_bank_statement_import', 'base_iban'],
+    'depends': ['account_accountant', 'l10n_be', 'account_bank_statement_import'],
     'data': [
         'views/account_journal_views.xml',
     ],
     'auto_install': True,
     'website': 'https://www.odoo.com/app/accounting',
-    'installable': True,
     'license': 'OEEL-1',
 }

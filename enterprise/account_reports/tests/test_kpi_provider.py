@@ -9,6 +9,8 @@ from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 @tagged('post_install', '-at_install')
 class TestKpiProvider(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -18,6 +20,11 @@ class TestKpiProvider(TestAccountReportsCommon):
             'phone': '555-555-5555',
             'email': 'test@example.com'
         })
+
+        # The kpi are fetched for all companies, disregarding any access rules. We need to make sure no other company in the database
+        # contains return types that could interfere with the test.
+        cls.env['account.return'].sudo().search([]).active = False
+
         cls.return_types = cls.env['account.return.type'].create([
             {'name': 'Return with a report without a root report',
              'report_id': cls.env.ref('account.generic_tax_report').id,
@@ -29,7 +36,7 @@ class TestKpiProvider(TestAccountReportsCommon):
              'deadline_start_date': '2024-01-01'},
         ])
 
-        def generate_all_returns(account_return_type, country_code, main_company, tax_unit=None):
+        def generate_all_returns(account_return_type, country_code, main_company, tax_unit=None, return_types=None):
             for return_type in cls.return_types:
                 return_type._try_create_returns_for_fiscal_year(main_company, tax_unit)
 
@@ -42,8 +49,8 @@ class TestKpiProvider(TestAccountReportsCommon):
              'name': 'Generic Tax report',
              'type': 'return_status',
              'value': 'to_do'},
-            {'id': 'account_return.account_reports_partner_ledger_report',
-             'name': 'Follow-Up Report',
+            {'id': 'account_return.account_reports_followup_report',
+             'name': 'Open Items',
              'type': 'return_status',
              'value': 'to_do'},
             {'id': 'account_return.return_without_a_report',

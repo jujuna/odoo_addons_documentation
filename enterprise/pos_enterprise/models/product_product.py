@@ -6,4 +6,4 @@ class ProductProduct(models.Model):
 
     @api.model
     def _load_pos_preparation_data_fields(self):
-        return ['pos_categ_ids', 'display_name']
+        return ['pos_categ_ids', 'display_name', 'name']

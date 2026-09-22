@@ -1,6 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="l10n_do_pl" model="account.report">
         <field name="name">Profit and loss</field>
+        <field name="groupby">account_id</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
         <field name="country_id" ref="base.do"/>
         <field name="filter_analytic_groupby" eval="True"/>
@@ -26,16 +28,12 @@
                         <field name="name">Net Income</field>
                         <field name="name@es_419">Ingresos Netos</field>
                         <field name="code">l10n_do_pl_income</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-41</field>
                     </record>
                     <record id="l10n_do_pl_cogs" model="account.report.line">
                         <field name="name">Operating Costs</field>
                         <field name="name@es_419">Costos de Operación</field>
                         <field name="code">l10n_do_pl_cogs</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_do_pl_cogs_balance" model="account.report.expression">
@@ -59,8 +57,6 @@
                         <field name="name">Operating Expenses</field>
                         <field name="name@es_419">Gastos de Operación</field>
                         <field name="code">l10n_do_pl_expenses_commercial</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="l10n_do_pl_expenses_commercial_balance" model="account.report.expression">
@@ -84,8 +80,6 @@
                         <field name="name">Other Income</field>
                         <field name="name@es_419">Otros Ingresos</field>
                         <field name="code">l10n_do_pl_income_other</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-42</field>
                     </record>
                 </field>
@@ -94,8 +88,6 @@
                 <field name="name">Corporate Income Tax</field>
                 <field name="name@es_419">Impuesto sobre las Utilidades de las Empresas</field>
                 <field name="code">l10n_do_pl_corporate_tax</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="expression_ids">

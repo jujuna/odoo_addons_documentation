@@ -15,9 +15,10 @@ class TestPaymentAdviceBatch(TestPayrollAccountCommon):
             'date_end': '2023-01-31',
             'name': 'January Batch',
             'company_id': self.company_in.id,
+            'structure_id': self.structure.id,
         })
 
-        payslip_run.generate_payslips(employee_ids=[self.rahul_emp.id, self.jethalal_emp.id])
+        payslip_run._generate_payslips()
         payslip_run.action_validate()
         return payslip_run
 
@@ -59,7 +60,6 @@ class TestPaymentAdviceBatch(TestPayrollAccountCommon):
 
     def test_payment_advice_xlsx_report_from_payslip(self):
         jethalal_payslip = self.env['hr.payslip'].create({
-            'name': 'Jethalal Payslip',
             'employee_id': self.jethalal_emp.id,
             'version_id': self.contract_jethalal.id,
             'date_from': date(2023, 1, 1),
@@ -83,7 +83,6 @@ class TestPaymentAdviceBatch(TestPayrollAccountCommon):
 
     def test_payment_advice_pdf_report_from_payslip(self):
         rahul_payslip = self.env['hr.payslip'].create({
-            'name': 'Rahul Payslip',
             'employee_id': self.rahul_emp.id,
             'version_id': self.contract_rahul.id,
             'date_from': date(2023, 1, 1),

@@ -7,22 +7,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-11-11 23:47+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Kurdish (Central) <https://translate.odoo.com/projects/"
-"odoo-19/project_forecast/ckb/>\n"
+"POT-Creation-Date: 2026-09-18 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 01:21+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Kurdish (Sorani) <https://translate.odoo.com/projects/odoo-"
+"master/project_forecast/ckb/>\n"
 "Language: ku\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: project_forecast
-#. odoo-python
-#: code:addons/project_forecast/models/project_project.py:0
-msgid "%s Hours"
+#: model:ir.module.module,description:base.module_project_forecast
+msgid ""
+"\n"
+"Schedule your teams across projects and estimate deadlines more accurately.\n"
 msgstr ""
 
 #. module: project_forecast
@@ -31,20 +32,46 @@ msgid "<b>Project:</b>"
 msgstr ""
 
 #. module: project_forecast
+#: model_terms:ir.ui.view,arch_db:project_forecast.planning_shift_ics_description_inherit
+msgid "<b>Task:</b>"
+msgstr ""
+
+#. module: project_forecast
+#: model_terms:ir.ui.view,arch_db:project_forecast.project_view_form_inherit_project_forecast
+msgid "<span class=\"o_field_widget ps-1\"> Hours </span>"
+msgstr ""
+
+#. module: project_forecast
+#: model_terms:ir.ui.view,arch_db:project_forecast.project_view_form_inherit_project_forecast
+msgid "<span class=\"o_stat_text\">Planned</span>"
+msgstr ""
+
+#. module: project_forecast
+#: model_terms:ir.ui.view,arch_db:project_forecast.project_task_view_form
+msgid "<span class=\"o_stat_text\">Scheduled</span>"
+msgstr ""
+
+#. module: project_forecast
 #: model:ir.ui.menu,name:project_forecast.planning_menu_schedule_by_project
 msgid "By Project"
 msgstr ""
 
 #. module: project_forecast
-#: model:ir.model.fields,field_description:project_forecast.field_planning_slot_template__company_id
-msgid "Company"
-msgstr "کۆمپانیا"
+#: model:ir.model,website_form_label:project_forecast.model_planning_slot
+msgid "Create a Shift"
+msgstr ""
+
+#. module: project_forecast
+#: model:ir.model,website_form_label:project_forecast.model_project_task
+msgid "Create a Task"
+msgstr ""
 
 #. module: project_forecast
 #: model:ir.model.fields,field_description:project_forecast.field_planning_analysis_report__display_name
 #: model:ir.model.fields,field_description:project_forecast.field_planning_slot__display_name
 #: model:ir.model.fields,field_description:project_forecast.field_planning_slot_template__display_name
 #: model:ir.model.fields,field_description:project_forecast.field_project_project__display_name
+#: model:ir.model.fields,field_description:project_forecast.field_project_task__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -53,6 +80,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:project_forecast.field_planning_slot__id
 #: model:ir.model.fields,field_description:project_forecast.field_planning_slot_template__id
 #: model:ir.model.fields,field_description:project_forecast.field_project_project__id
+#: model:ir.model.fields,field_description:project_forecast.field_project_task__id
 msgid "ID"
 msgstr "ID"
 
@@ -63,7 +91,6 @@ msgstr ""
 
 #. module: project_forecast
 #: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_template_inherit_view_search
-#: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_view_search
 msgid "My Projects"
 msgstr ""
 
@@ -77,8 +104,14 @@ msgstr ""
 
 #. module: project_forecast
 #. odoo-python
-#: code:addons/project_forecast/models/project_project.py:0
-msgid "Planned"
+#: code:addons/project_forecast/models/planning_slot.py:0
+#: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_view_tree
+msgid "None"
+msgstr ""
+
+#. module: project_forecast
+#: model:ir.module.module,summary:base.module_project_forecast
+msgid "Plan your resources on project tasks"
 msgstr ""
 
 #. module: project_forecast
@@ -104,15 +137,27 @@ msgstr ""
 #: model:ir.model.fields,field_description:project_forecast.field_planning_analysis_report__project_id
 #: model:ir.model.fields,field_description:project_forecast.field_planning_slot__project_id
 #: model:ir.model.fields,field_description:project_forecast.field_planning_slot_template__project_id
-#: model_terms:ir.ui.view,arch_db:project_forecast.open_slots_list_template
-#: model_terms:ir.ui.view,arch_db:project_forecast.period_report_template
+#: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_template_inherit_view_kanban
+#: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_template_inherit_view_search
 #: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_view_search
+#: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_view_search_service_requests
+#: model_terms:ir.ui.view,arch_db:project_forecast.planning_view_card
 msgid "Project"
 msgstr "پرۆژە"
 
 #. module: project_forecast
+#: model:ir.module.module,shortdesc:base.module_project_forecast
+msgid "Project Planning"
+msgstr ""
+
+#. module: project_forecast
 #: model_terms:ir.ui.view,arch_db:project_forecast.planning_shift_ics_description_inherit
 msgid "Project:"
+msgstr ""
+
+#. module: project_forecast
+#: model:ir.model.fields,field_description:project_forecast.field_planning_slot__resource_ids
+msgid "Resources"
 msgstr ""
 
 #. module: project_forecast
@@ -135,13 +180,54 @@ msgid ""
 msgstr ""
 
 #. module: project_forecast
+#: model:ir.model.fields,field_description:project_forecast.field_project_task__scheduled_datetime
+msgid "Scheduled Date"
+msgstr ""
+
+#. module: project_forecast
 #: model:ir.model,name:project_forecast.model_planning_slot_template
 msgid "Shift Template"
 msgstr ""
 
 #. module: project_forecast
+#: model:ir.model,name:project_forecast.model_project_task
+#: model:ir.model.fields,field_description:project_forecast.field_planning_analysis_report__task_id
+#: model:ir.model.fields,field_description:project_forecast.field_planning_slot__task_id
+#: model:ir.model.fields,field_description:project_forecast.field_planning_slot_template__task_id
+#: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_template_inherit_view_search
+#: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_view_search_service_requests
+msgid "Task"
+msgstr ""
+
+#. module: project_forecast
+#: model_terms:ir.ui.view,arch_db:project_forecast.planning_shift_ics_description_inherit
+msgid "Task:"
+msgstr ""
+
+#. module: project_forecast
 #: model:planning.role,name:project_forecast.planning_role_tester
 msgid "Tester"
+msgstr ""
+
+#. module: project_forecast
+#: model:ir.model.fields,help:project_forecast.field_project_task__display_name
+msgid ""
+"Use these keywords in the title to set new tasks:\n"
+"\n"
+"        30h Allocate 30 hours to the task\n"
+"        #tags Set tags on the task\n"
+"        @user Assign the task to a user\n"
+"        ! Set the task a medium priority\n"
+"        !! Set the task a high priority\n"
+"        !!! Set the task a urgent priority\n"
+"\n"
+"        Make sure to use the right format and order e.g. Improve the "
+"configuration screen 5h #feature #v16 @Mitchell !"
+msgstr ""
+
+#. module: project_forecast
+#: model:ir.model.constraint,message:project_forecast.constraint_planning_slot_check_project_set_if_task_set
+msgid "You cannot set a task linked to a shift as private."
 msgstr ""
 
 #. module: project_forecast

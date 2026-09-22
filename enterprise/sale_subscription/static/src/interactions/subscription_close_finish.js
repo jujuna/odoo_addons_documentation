@@ -12,7 +12,8 @@ export class SubscriptionCloseFinish extends Interaction {
     onClick() {
         this.el.setAttribute("disabled", "true");
         const spinner = document.createElement("i");
-        spinner.classList.add("fa", "fa-circle-o-notch", "fa-spin");
+        spinner.classList.add("oi", "oi-spin");
+        spinner.dataset.icon = "autorenew";
         this.insert(spinner, this.el, "afterbegin");
         document.querySelector("#wc-modal-close-init form").submit();
     }

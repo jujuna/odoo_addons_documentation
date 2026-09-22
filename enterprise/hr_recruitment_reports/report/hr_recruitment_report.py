@@ -2,6 +2,7 @@
 
 from odoo import tools
 from odoo import fields, models, _
+from odoo.tools import SQL
 
 
 def nlargest(amount, data_list, method):
@@ -28,7 +29,7 @@ class HrRecruitmentReport(models.Model):
         ('refused', 'Refused'),
     ], readonly=True)
 
-    user_id = fields.Many2one('res.users', 'Recruiter', readonly=True)
+    recruiter_id = fields.Many2one('hr.employee', 'Recruiter', readonly=True)
     create_date = fields.Date('Application Date', readonly=True)
     create_uid = fields.Many2one('res.users', 'Creator', readonly=True)
     date_closed = fields.Date('End Date', readonly=True)
@@ -53,10 +54,10 @@ class HrRecruitmentReport(models.Model):
             'target': 'current',
         }
 
-    def _query(self, fields='', from_clause=''):
-        select_ = """
+    def _query(self, fields=SQL(), from_clause=SQL()):
+        select_ = SQL("""
                 a.id as id,
-                a.user_id,
+                a.recruiter_id,
                 a.create_date,
                 a.create_uid,
                 a.date_closed,
@@ -80,24 +81,24 @@ class HrRecruitmentReport(models.Model):
                 CASE WHEN a.active IS NOT FALSE AND a.date_closed IS NULL THEN 1 ELSE 0 END as in_progress,
                 CASE WHEN a.date_closed IS NOT NULL THEN date_part('day', a.date_closed - a.create_date) ELSE NULL END as process_duration
                 %s
-        """ % fields
+        """, fields)
 
-        from_ = """
+        from_ = SQL("""
                 hr_applicant a
                 %s
-        """ % from_clause
+        """, from_clause)
 
-        join_ = """
+        join_ = SQL("""
                 calendar_event m
                 ON a.id = m.applicant_id
                 WHERE a.job_id IS NOT NULL
                 GROUP BY a.id
-        """
-        return '(SELECT %s FROM %s LEFT OUTER JOIN %s)' % (select_, from_, join_)
+        """)
+        return SQL('(SELECT %s FROM %s LEFT OUTER JOIN %s)', select_, from_, join_)
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
-        self.env.cr.execute("""CREATE or REPLACE VIEW %s as (%s)""" % (self._table, self._query()))
+        self.env.cr.execute(SQL("CREATE or REPLACE VIEW %s as (%s)", SQL.identifier(self._table), self._query()))
 
     def get_leaderboard(self):
         query = """
@@ -108,8 +109,9 @@ class HrRecruitmentReport(models.Model):
                 COUNT (m.id) as meetings_amount,
                 SUM (CASE WHEN a.date_closed IS NOT NULL THEN 1 ELSE 0 END) as is_hired
             FROM hr_applicant a
+            JOIN hr_employee e ON a.recruiter_id = e.id
             JOIN res_users u
-            ON a.user_id = u.id
+            ON e.user_id = u.id
             JOIN res_partner p
             ON u.partner_id = p.id
             LEFT JOIN calendar_event m

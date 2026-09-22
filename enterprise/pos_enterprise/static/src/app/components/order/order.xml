@@ -3,94 +3,83 @@
     <t t-name="pos_enterprise.Order">
         <section
             class="o_pdis_order_card position-relative w-100 mx-auto mb-auto overflow-hidden rounded"
-            t-attf-class="{{this.state.changeStageTimeout ? 'o_pdis_stage--animation' : ''}} {{this.cardColor}}">
-            <div class="o_pdis_order_card_header" t-on-click="clickOrder">
+            t-attf-class="{{this.isStageChanging() ? 'o_pdis_stage--animation' : ''}} {{this.cardColor}}">
+            <div class="o_pdis_order_card_header" t-on-click="this.clickOrder">
                 <div
-                    class="o_pdis_order_card_header_top d-flex flex-nowrap align-items-center justify-content-between px-1 pb-1 fw-bold gap-1"
+                    class="o_pdis_order_card_header_top my-2 d-flex small flex-nowrap border-0 align-items-center justify-content-between px-2 fw-bold gap-1"
+                    style="grid-template-columns: 1fr auto 1fr;"
                     t-att-class="this.cardColor">
                     <div class="o_pdis_tracking_number ">
-                        <div class="o_pdis_tracker text-break" style="max-width: 150px;">
-                            <t t-esc="this.order.order_name"/>
+                        <div class="o_pdis_tracker text-break fw-bolder" style="max-width: 150px;">
+                            <t t-out="this.order_name"/>
                         </div>
                     </div>
-                    <div t-if="this.order.pos_order_id.preset_time">
-                        <span t-esc="presetTime"/>
-                        <span class="ps-1" t-esc="presetDate"/>
+                    <div t-if="this.order.pos_order_id.preset_time" class="text-center fw-bold">
+                        <span t-out="this.presetTime"/>
+                        <span class="ps-1" t-out="this.presetDate"/>
                     </div>
                 </div>
-                <div class="o_pdis_order_card_header_bottom d-grid p-2 bg-100">
+                <div class="o_pdis_order_card_header_bottom d-grid p-2 bg-light">
                     <div class="o_pdis_table-info d-flex justify-content-between align-items-center">
-                        <div t-if="this.prepDisplay.selectedStageId === 0" t-esc="this.props.order.stage.name" class=" o_pdis_stage py-1 px-3 rounded-pill"
+                        <div t-if="this.prepDisplay.selectedStageId === 0" t-out="this.props.order.stage.name" class=" o_pdis_stage fw-bold small badge rounded"
                             t-att-style="`background-color: ${this.props.order.stage.color} !important; color: ${this.fontColor}`"/>
-                        <div t-if="this.order.pos_order_id.preset_id?.name" class="d-flex gap-0 align-items-center justify-content-center">
+                        <div t-if="this.order.pos_order_id.preset_id?.name" class="preset-name d-flex align-items-center justify-content-center small fw-bold">
                             <span
-                            class="px-2 py-1 rounded-pill" t-attf-class="o_colorlist_item_color_${this.order.pos_order_id.preset_id.color}"
-                            t-esc="this.order.pos_order_id.preset_id?.name"/>
+                            class="px-2 badge rounded smaller text-dark" t-attf-class="o_colorlist_item_color_${this.order.pos_order_id.preset_id.color}"
+                            t-out="this.order.pos_order_id.preset_id?.name"/>
                         </div>
                         <t t-set="isLastStage" t-value="this.prepDisplay.lastStage.id === this.props.order.stage.id"/>
                         <t t-set="displayAlert" t-value="this.isAlert and !isLastStage"/>
                         <div class="o_pdis_alert-timer">
-                            <div class="rounded-pill py-1 px-3"
+                            <div class="rounded-pill px-2 smaller"
                                 t-att-class="{
-                                    'bg-white': !displayAlert,
+                                    'border': !displayAlert,
                                     'o_pdis_is_alert text-bg-danger': displayAlert,
                                     'o_pdis_archive-order cursor-pointer': isLastStage
                                 }">
-                                <div>
-                                    <i class="fa fa-clock-o pe-1" aria-hidden="true"></i>
-                                    <span t-esc="isLastStage ? this.props.order.prepOrder.completion_time : this.state.duration"/>
-                                </div>
+                                <i class="oi pe-1" data-icon="schedule" aria-hidden="true"></i>
+                                <span t-out="isLastStage ? this.props.order.prepOrder.completion_time : this.state.duration"/>`
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="o_pdis_orderline w-100 bg-white overflow-auto" t-ref="orderlines-container">
-                <t t-foreach="orderlines" t-as="orderline" t-key="orderline_index">
+            <div class="o_pdis_orderline w-100 bg-white overflow-auto" t-ref="this.orderlinesContainerRef">
+                <t t-foreach="this.orderlines" t-as="orderline" t-key="orderline_index">
                     <Orderline orderline="orderline" t-on-click="() => this.changeOrderlineStatus(orderline)"/>
                 </t>
-                <div class="product-down-bubble position-absolute bottom-0 start-50 translate-middle d-flex align-items-center justify-content-center badge rounded-pill py-2 px-3 text-bg-dark bg-opacity-75 small " t-if="this.state.productHighlighted.length">
-                    <t t-if="this.state.productHighlighted.length === 1">
-                        <t t-esc="this.state.productHighlighted[0]" />
-                    </t>
-                    <t t-else="">
-                        <t t-esc="this.state.productHighlighted.length" /> products
-                    </t>
-                    <i class="ms-2 oi oi-arrow-down" aria-hidden="true"></i>
-                </div>
-            </div>
-            <div t-if="this.order.pos_order_id.general_customer_note"
-                t-on-click="clickOrder"
-                class="customer-note w-100 p-2 text-break pb-1">
-                <div class="row m-0">
-                    <div class="col-auto px-1">
-                        <i class="fa fa-sticky-note me-1 fa-lg" role="img"
-                            aria-label="Customer Note" title="Customer Note"/>
-                    </div>
-                    <div class="col ps-0">
-                        <t t-foreach="this.order.pos_order_id.general_customer_note.split('\n')" t-as="subNote"
-                            t-key="subNote_index">
-                            <t t-esc="subNote"/><br/>
-                        </t>
+                <div t-if="this.order.pos_order_id.general_customer_note"
+                    t-on-click="this.clickOrder"
+                    class="smaller p-1 text-break">
+                    <div class="customer-note rounded-3 p-1 px-2 fst-italic text-800">
+                        <div class="col ps-0">
+                            <t t-foreach="this.order.pos_order_id.general_customer_note.split('\n')" t-as="subNote"
+                                t-key="subNote_index">
+                                <t t-out="subNote"/><br/>
+                            </t>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <t t-set="notes" t-value="pdisNotes"/>
-            <div t-if="notes.length" class="list-inline o_pdis_note d-flex gap-1 ms-1 py-2"
-                t-att-class="{ 'o_pdis_orderline_blinking': this.internalNoteState.isActive }">
-                <TagsList tags="notes"/>
-            </div>
-            <div class="o_pdis_order_card_footer bg-100">
-                <t t-set="o_pdis_last_stage" t-value="this.prepDisplay.lastStage.id == this.props.order.stage.id"/>
-                <div t-attf-class="{{ o_pdis_last_stage ? 'd-flex pt-1' : ''}}">
-                    <button class="btn btn-lg btn-secondary flex-grow-1 border-end border-white rounded" type="button" t-on-click.stop="() => this.prepDisplay.changeStateStage(this.props.order.states)" t-if="o_pdis_last_stage">
-                        <i class="fa fa-undo pe-1" aria-hidden="true"></i><span>Reset</span>
-                    </button>
-                    <button class="btn btn-lg btn-secondary flex-grow-1 border-start border-white rounded" type="button" t-on-click.stop="doneOrder" t-if="o_pdis_last_stage">
-                        <span>Done</span>
-                    </button>
+                <t t-set="notes" t-value="this.pdisNotes"/>
+                <div t-if="notes" class="list-inline text-break d-flex gap-1 p-2"
+                    t-att-class="{ 'o_pdis_orderline_blinking': this.internalNoteState.isActive }">
+                    <t t-foreach="notes" t-as="note" t-key="note_index">
+                        <BadgeTag color="note.color" text="note.text"/>
+                    </t>
                 </div>
+            </div>
+            <t t-set="o_pdis_last_stage" t-value="this.prepDisplay.lastStage.id == this.props.order.stage.id"/>
+            <div t-if="o_pdis_last_stage || this.prepDisplay.prepPrinters.length" class="o_pdis_order_card_footer bg-white bolder p-2 d-flex pt-1 gap-1">
+                <button class="btn btn-secondary smaller w-100 flex-grow-1 fw-bolder rounded" type="button" t-on-click.stop="() => this.prepDisplay.changeStateStage(this.props.order.prepLines, 0)" t-if="o_pdis_last_stage">
+                    <i class="oi pe-1" data-icon="undo" aria-hidden="true"></i><span>Reset</span>
+                </button>
+                <button t-if="this.prepDisplay.prepPrinters.length" class="btn btn-secondary smaller w-100 flex-grow-1 rounded" type="button" t-on-click.stop="() => this.prepDisplay.printPreparationTicket(this.props.order)">
+                    <i class="oi pe-1" data-icon="print" aria-hidden="true"></i><span>Print</span>
+                </button>
+                <button class="btn btn-secondary smaller flex-grow-1 rounded w-100" type="button" t-on-click.stop="this.doneOrder" t-if="o_pdis_last_stage">
+                    <span>Done</span>
+                </button>
             </div>
         </section>
     </t>

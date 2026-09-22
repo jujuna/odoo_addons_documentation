@@ -3,12 +3,13 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 from odoo.fields import Date
-from odoo.tests.common import TransactionCase, freeze_time
+from odoo.tests.common import tagged, TransactionCase, freeze_time
 
 from odoo.addons.mail.tests.common import mail_new_test_user
 
 
 @freeze_time("2024-09-20")
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestEmployeeCommutingReport(TransactionCase):
 
     @classmethod

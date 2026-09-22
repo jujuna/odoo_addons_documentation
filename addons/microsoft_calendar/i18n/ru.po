@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-09-16 04:40+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:42+0000\n"
+"PO-Revision-Date: 2026-08-31 15:15+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-s19-4/"
 "microsoft_calendar/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: microsoft_calendar
 #. odoo-python
@@ -94,19 +94,9 @@ msgid "Calendar Event"
 msgstr "Календарное событие"
 
 #. module: microsoft_calendar
-#: model_terms:ir.ui.view,arch_db:microsoft_calendar.microsoft_calendar_reset_account_view_form
-msgid "Cancel"
-msgstr "Отменить"
-
-#. module: microsoft_calendar
 #: model_terms:ir.ui.view,arch_db:microsoft_calendar.res_config_settings_view_form
 msgid "Client ID"
 msgstr "ID клиента"
-
-#. module: microsoft_calendar
-#: model_terms:ir.ui.view,arch_db:microsoft_calendar.res_config_settings_view_form
-msgid "Client Secret"
-msgstr "Секрет клиента"
 
 #. module: microsoft_calendar
 #: model:ir.model,name:microsoft_calendar.model_res_config_settings
@@ -127,8 +117,8 @@ msgstr "Настройка"
 
 #. module: microsoft_calendar
 #: model_terms:ir.ui.view,arch_db:microsoft_calendar.microsoft_calendar_reset_account_view_form
-msgid "Confirm"
-msgstr "Подтвердить"
+msgid "Continue"
+msgstr ""
 
 #. module: microsoft_calendar
 #: model:ir.model.fields,field_description:microsoft_calendar.field_microsoft_calendar_account_reset__create_uid
@@ -141,25 +131,14 @@ msgid "Created on"
 msgstr "Дата создания:"
 
 #. module: microsoft_calendar
-#: model:ir.model.fields.selection,name:microsoft_calendar.selection__microsoft_calendar_account_reset__delete_policy__delete_odoo
-msgid "Delete from Odoo"
-msgstr "Удалить из Odoo"
+#: model:ir.model.fields,field_description:microsoft_calendar.field_microsoft_calendar_account_reset__delete_events
+msgid "Delete synced events from Odoo"
+msgstr ""
 
 #. module: microsoft_calendar
-#: model:ir.model.fields.selection,name:microsoft_calendar.selection__microsoft_calendar_account_reset__delete_policy__delete_both
-msgid "Delete from both"
-msgstr "Удалить из обоих"
-
-#. module: microsoft_calendar
-#: model:ir.model.fields.selection,name:microsoft_calendar.selection__microsoft_calendar_account_reset__delete_policy__delete_microsoft
-msgid "Delete from the current Microsoft Calendar account"
-msgstr "Удаление из текущей учетной записи Microsoft Calendar"
-
-#. module: microsoft_calendar
-#. odoo-javascript
-#: code:addons/microsoft_calendar/static/src/views/microsoft_calendar/microsoft_calendar_controller.js:0
-msgid "Discard"
-msgstr "Отменить"
+#: model:ir.actions.act_window,name:microsoft_calendar.microsoft_calendar_reset_account_action
+msgid "Disconnect Outlook Calendar"
+msgstr ""
 
 #. module: microsoft_calendar
 #: model:ir.model.fields,field_description:microsoft_calendar.field_calendar_alarm_manager__display_name
@@ -313,15 +292,15 @@ msgid "Last synchronization date with Outlook Calendar"
 msgstr "Дата последней синхронизации с календарем Outlook"
 
 #. module: microsoft_calendar
-#: model:ir.model.fields.selection,name:microsoft_calendar.selection__microsoft_calendar_account_reset__delete_policy__dont_delete
-msgid "Leave them untouched"
-msgstr "Оставьте их нетронутыми"
-
-#. module: microsoft_calendar
-#: model:ir.actions.act_window,name:microsoft_calendar.microsoft_calendar_reset_account_action
 #: model:ir.model,name:microsoft_calendar.model_microsoft_calendar_account_reset
 msgid "Microsoft Calendar Account Reset"
 msgstr "Сброс учетной записи календаря Microsoft"
+
+#. module: microsoft_calendar
+#: model:ir.model.fields,field_description:microsoft_calendar.field_res_users__microsoft_account_email
+#: model:ir.model.fields,field_description:microsoft_calendar.field_res_users_settings__microsoft_account_email
+msgid "Microsoft Calendar Email"
+msgstr ""
 
 #. module: microsoft_calendar
 #: model:ir.model.fields,field_description:microsoft_calendar.field_res_config_settings__cal_microsoft_client_id
@@ -345,6 +324,11 @@ msgid "Microsoft Recurrence Master Id"
 msgstr "Microsoft Recurrence Master Id"
 
 #. module: microsoft_calendar
+#: model:ir.model.fields,field_description:microsoft_calendar.field_calendar_event__microsoft_sync_active
+msgid "Microsoft Sync Active"
+msgstr ""
+
+#. module: microsoft_calendar
 #: model:ir.model.fields,field_description:microsoft_calendar.field_res_config_settings__cal_microsoft_sync_paused
 msgid "Microsoft Synchronization Paused"
 msgstr "Синхронизация Microsoft приостановлена"
@@ -360,11 +344,6 @@ msgstr "Нужна синхронизация M"
 #: model_terms:ir.ui.view,arch_db:microsoft_calendar.view_users_form
 msgid "Next Sync Token"
 msgstr "Следующий токен синхронизации"
-
-#. module: microsoft_calendar
-#: model:ir.model.fields,field_description:microsoft_calendar.field_microsoft_calendar_account_reset__sync_policy
-msgid "Next Synchronization"
-msgstr "Следующая синхронизация"
 
 #. module: microsoft_calendar
 #. odoo-python
@@ -386,6 +365,7 @@ msgid "Outlook"
 msgstr "Outlook"
 
 #. module: microsoft_calendar
+#: model:ir.module.module,shortdesc:base.module_microsoft_calendar
 #: model_terms:ir.ui.view,arch_db:microsoft_calendar.view_users_form
 msgid "Outlook Calendar"
 msgstr "Календарь Outlook"
@@ -419,6 +399,16 @@ msgid "Pause Synchronization"
 msgstr "Приостановить синхронизацию"
 
 #. module: microsoft_calendar
+#: model_terms:ir.ui.view,arch_db:microsoft_calendar.view_microsoft_calendar_event_form
+msgid "Recurring events can only be edited from Outlook."
+msgstr ""
+
+#. module: microsoft_calendar
+#: model_terms:ir.ui.view,arch_db:microsoft_calendar.view_microsoft_calendar_event_form
+msgid "Recurring events must be created directly in Outlook Calendar."
+msgstr ""
+
+#. module: microsoft_calendar
 #: model_terms:ir.ui.view,arch_db:microsoft_calendar.view_users_form
 msgid "Refresh Token"
 msgstr "Обновить токен"
@@ -429,24 +419,9 @@ msgid "Reset Account"
 msgstr "Сбросить аккаунт"
 
 #. module: microsoft_calendar
-#: model_terms:ir.ui.view,arch_db:microsoft_calendar.microsoft_calendar_reset_account_view_form
-msgid "Reset Outlook Calendar Account"
-msgstr "Сброс учетной записи календаря Outlook"
-
-#. module: microsoft_calendar
 #: model:ir.model,name:microsoft_calendar.model_microsoft_calendar_sync
 msgid "Synchronize a record with Microsoft Calendar"
 msgstr "Синхронизация записи с календарем Microsoft"
-
-#. module: microsoft_calendar
-#: model:ir.model.fields.selection,name:microsoft_calendar.selection__microsoft_calendar_account_reset__sync_policy__all
-msgid "Synchronize all existing events"
-msgstr "Синхронизируйте все существующие события"
-
-#. module: microsoft_calendar
-#: model:ir.model.fields.selection,name:microsoft_calendar.selection__microsoft_calendar_account_reset__sync_policy__new
-msgid "Synchronize only new events"
-msgstr "Синхронизируйте только новые события"
 
 #. module: microsoft_calendar
 #. odoo-javascript
@@ -459,7 +434,7 @@ msgstr ""
 "использовать ее, хотите ли вы сделать это сейчас?"
 
 #. module: microsoft_calendar
-#: model:ir.model.fields,help:microsoft_calendar.field_microsoft_calendar_account_reset__delete_policy
+#: model:ir.model.fields,help:microsoft_calendar.field_microsoft_calendar_account_reset__delete_events
 msgid "This will only affect events for which the user is the owner"
 msgstr ""
 "Это повлияет только на события, владельцем которых является пользователь"
@@ -493,52 +468,44 @@ msgid "User Token"
 msgstr "Ключ пользователя (токен)"
 
 #. module: microsoft_calendar
-#: model:ir.model.fields,field_description:microsoft_calendar.field_microsoft_calendar_account_reset__delete_policy
+#: model_terms:ir.ui.view,arch_db:microsoft_calendar.res_config_settings_view_form
+msgid "Value"
+msgstr ""
+
+#. module: microsoft_calendar
+#: model_terms:ir.ui.view,arch_db:microsoft_calendar.microsoft_calendar_reset_account_view_form
+msgid "What should happen to previously synced events?"
+msgstr ""
+
+msgid "Client Secret"
+msgstr "Секрет клиента"
+
+msgid "Confirm"
+msgstr "Подтвердить"
+
+msgid "Delete from Odoo"
+msgstr "Удалить из Odoo"
+
+msgid "Delete from both"
+msgstr "Удалить из обоих"
+
+msgid "Delete from the current Microsoft Calendar account"
+msgstr "Удаление из текущей учетной записи Microsoft Calendar"
+
+msgid "Leave them untouched"
+msgstr "Оставьте их нетронутыми"
+
+msgid "Next Synchronization"
+msgstr "Следующая синхронизация"
+
+msgid "Reset Outlook Calendar Account"
+msgstr "Сброс учетной записи календаря Outlook"
+
+msgid "Synchronize all existing events"
+msgstr "Синхронизируйте все существующие события"
+
+msgid "Synchronize only new events"
+msgstr "Синхронизируйте только новые события"
+
 msgid "User's Existing Events"
 msgstr "Существующие события пользователя"
-
-#~ msgid ""
-#~ "For a correct synchronization between Odoo and Outlook Calendar, all "
-#~ "attendees must have an email address. However, some events do not respect "
-#~ "this condition. As long as the events are incorrect, the calendars will "
-#~ "not be synchronized.\n"
-#~ "Either update the events/attendees or archive these events %s:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Для корректной синхронизации между Odoo и календарем Outlook у всех "
-#~ "участников должен быть адрес электронной почты. Однако некоторые события "
-#~ "не соблюдают это условие. До тех пор, пока события не будут корректны, "
-#~ "календари не будут синхронизированы.\n"
-#~ "Либо обновите события/посетителей, либо архивируйте эти события %s:\n"
-#~ "%s"
-
-#~ msgid "Microsoft Calendar Account"
-#~ msgstr "Учетная запись календаря Microsoft"
-
-#~ msgid "Microsoft Calendar Account Data"
-#~ msgstr "Данные учетной записи календаря Microsoft"
-
-#~ msgid "Stop Synchronization"
-#~ msgstr "Остановить синхронизацию"
-
-#~ msgid "Success"
-#~ msgstr "Успех"
-
-#~ msgid "The account for the Outlook Calendar service is not configured."
-#~ msgstr "Учетная запись для службы Outlook Calendar не настроена."
-
-#~ msgid "The synchronization with Outlook calendar was successfully stopped."
-#~ msgstr "Синхронизация с календарем Outlook была успешно остановлена."
-
-#~ msgid "The user has already a microsoft account"
-#~ msgstr "У пользователя уже есть учетная запись microsoft"
-
-#~ msgid ""
-#~ "You are about to stop the synchronization of your calendar with Outlook. "
-#~ "Are you sure you want to continue?"
-#~ msgstr ""
-#~ "Вы собираетесь остановить синхронизацию вашего календаря с Outlook. Вы "
-#~ "уверены, что хотите продолжить?"
-
-#~ msgid "Your administrator paused the synchronization with Outlook Calendar."
-#~ msgstr "Ваш администратор приостановил синхронизацию с Outlook Calendar."

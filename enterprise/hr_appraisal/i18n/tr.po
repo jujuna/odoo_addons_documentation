@@ -23,21 +23,51 @@
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
 # Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# Burkay Yıldızhan <seyil@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-21 14:20+0000\n"
-"Last-Translator: Odoo Turkish Import <dyki+tr@odoo.com>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 01:19+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-master/"
 "hr_appraisal/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_appraisal
+#: model:ir.module.module,description:base.module_hr_appraisal
+msgid ""
+"\n"
+"Periodical Employees appraisal\n"
+"==============================\n"
+"\n"
+"By using this application you can maintain the motivational process by doing "
+"periodical appraisals of your employees performance. The regular assessment "
+"of human resources can benefit your people as well your organization.\n"
+"\n"
+"An appraisal plan can be assigned to each employee. These plans define the "
+"frequency and the way you manage your periodic personal appraisal.\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Ability to create employee's appraisal(s).\n"
+"* An appraisal can be created by an employee's manager or automatically "
+"based on schedule which is defined in the employee form.\n"
+"* The appraisal is done according to a plan in which various surveys can be "
+"created. Each survey can be answered by a particular level in the employees "
+"hierarchy. The final review and appraisal is done by the manager.\n"
+"* Manager, colleague, collaborator, and employee himself/herself receives "
+"email to perform a periodical appraisal.\n"
+"* Every Appraisal Form filled by employees, colleague, collaborator, can be "
+"viewed in a PDF form.\n"
+"* Meeting Requests are created manually according to employees appraisals.\n"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -45,13 +75,6 @@ msgstr ""
 msgid "%(user)s decided, as %(role)s, to publish the employee's feedback"
 msgstr ""
 "%(user)s, %(role)s olarak çalışanın geri bildirimini yayımlamaya karar verdi"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal_goal.py:0
-#: code:addons/hr_appraisal/models/hr_appraisal_template.py:0
-msgid "%s (copy)"
-msgstr "%s (kopya)"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -83,82 +106,10 @@ msgid ". Then, share it with appraisers."
 msgstr ". Sonra da bunu değerlendirme uzmanlarıyla paylaşın."
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__100
-msgid "100%"
-msgstr "100%"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__025
-msgid "25%"
-msgstr "%25"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_config_settings__module_hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "360 Feedback"
 msgstr "360 Feedback"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__050
-msgid "50%"
-msgstr "%50"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__075
-msgid "75%"
-msgstr "%75"
-
-#. module: hr_appraisal
-#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
-msgid ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        An appraisal of <t t-"
-"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
-"                        <br/><br/>\n"
-"                        Please schedule an appraisal date together.\n"
-"                        <br/><br/>\n"
-"                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; text-"
-"align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\"background-color: {{object.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\">\n"
-"                                    View Appraisal\n"
-"                                </a>\n"
-"                            </p>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        <t t-out=\"ctx.get('employee_to_name')\"> "
-"çalışanının</t> bir değerlendirmesi onaylanmıştır.\n"
-"                       <br/><br/>\n"
-"                        Lütfen birlikte bir değerlendirme tarihi planlayın.\n"
-"                       <br/><br/>\n"
-"                       <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; text-"
-"align: center;\">\n"
-"                               <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\"background-color: {{object.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\">{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
-"5px;\">\n"
-"                                    Değerlendirmeyi Görüntüle\n"
-"                               </a>\n"
-"                            </p>\n"
-"                       </t>\n"
-"                    </p>\n"
-"               </div>\n"
-"            "
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_request_from_employee
@@ -171,10 +122,10 @@ msgid ""
 "                        <br/>\n"
 "                        <t t-out=\"ctx.get('author_name', '')\">Addison "
 "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-"\">addison.olson28@example.com</t>) wishes an appraisal.\n"
+"\">addison.olson28@example.com</t>) has requested an appraisal.\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
 "                            <div style=\"margin: 16px 0px 16px 0px; padding: "
-"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
+"8px 16px 8px 16px; background-color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">Annual "
 "appraisal.</t>\n"
 "                            </div>\n"
@@ -182,7 +133,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            <p style=\"margin: 16px 0px 16px 0px; padding: "
 "8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
 "padding: 8px 16px 8px 16px; text-decoration: none; color: "
@@ -199,35 +150,35 @@ msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
 "\">\n"
-"                        Sayın <t t-out=\"ctx.get('employee_to_name')"
-"\">çalışanı</t>,\n"
+"                       <t t-out=\"ctx.get('employee_to_name')\"> 'ın değerli "
+"çalışanı</t>,\n"
 "                       <br/>\n"
-"                        <t t-out=\"ctx.get('author_name', '')\">Addison "
+"                        <t t-out=\"ctx.get('author_name', '')\"> Addison "
 "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-"\">addison.olson28@example.com</t>) bir değerlendirme istiyor.\n"
+"\">addison.olson28@example.com</t>) bir değerlendirme talebinde "
+"bulunmuştur.\n"
 "                       <t t-if=\"ctx.get('user_body')\">\n"
 "                            <div style=\"margin: 16px 0px 16px 0px; padding: "
-"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-"                               <t t-out=\"ctx.get('user_body')\">Yıllık "
+"8px 16px 8px 16px; background-color: #8A9A8A\"> \n"
+"                               <t t-out=\"ctx.get('user_body')\"> Yıllık "
 "değerlendirme.</t>\n"
 "                            </div>\n"
 "                       </t>\n"
-"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                        <t t-if=\"ctx.get('recipient_users')\"> \n"
 "                           <p style=\"margin: 16px 0px 16px 0px; padding: "
 "8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
 "padding: 8px 16px 8px 16px; text-decoration: none; color: "
 "{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
-"radius: 5px;\">{{object.employee_id.company_id.email_primary_color or "
-"'#FFFFFF'}}; border-radius: 5px;\">\n"
+"radius: 5px;\"> \n"
 "                                    Değerlendirmeyi Görüntüle\n"
 "                               </a>\n"
-"                            </p>\n"
+"                            </p> \n"
 "                       </t>\n"
-"                    </p>\n"
-"               </div>\n"
+"                    </p> \n"
+"               </div> \n"
 "            "
 
 #. module: hr_appraisal
@@ -245,7 +196,8 @@ msgid ""
 "\">[deadline]</t>.\n"
 "                        <br/>\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
+"                            <div class=\"my-3 py-2 px-3\" style=\"background-"
+"color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">[Optional "
 "comment]</t>\n"
 "                            </div>\n"
@@ -253,7 +205,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            You can access your appraisal form here:\n"
 "                            <p class=\"text-center my-3 py-2 px-3\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
 "8px 16px; text-decoration: none; color: "
@@ -273,47 +225,35 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+
+#. module: hr_appraisal
+#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
+msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
 "\">\n"
-"                        Merhaba <t t-out=\"ctx.get('employee_to_name')"
-"\">[employee]</t>,\n"
-"                       <br/>\n"
-"                        <t t-out=\"ctx.get('manager_names')\"> [Appraisers] "
-"ile yapacağınız bir sonraki değerlendirmeniz için kısa bir hatırlatma</t>\n"
-"                        <t t-out=\"ctx.get('date_close')\"> [deadline]</t> "
-"için planlanmıştır.\n"
-"                       <br/>\n"
-"                        <t t-if=\"ctx.get('user_body')\">\n"
-"                           <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
-"                                <t t-out=\"ctx.get('user_body')\">[İsteğe "
-"bağlı yorum]</t>\n"
-"                            </div>\n"
-"                       </t>\n"
+"                        The appraisal for <t t-"
+"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
+"                        <br/><br/>\n"
+"                        Please proceed with the appraisal discussion based "
+"on the scheduled date.\n"
+"                        <br/><br/>\n"
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            Değerlendirme formunuza buradan "
-"ulaşabilirsiniz:\n"
-"                           <p class=\"text-center my-3 py-2 px-3\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\" margin: auto; background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\"background-color: {{object.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
 "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\">{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
-"5px;\">\n"
-"                                    Değerlendirmeyi Görüntüle\n"
-"                               </a>\n"
+"\">\n"
+"                                    View Appraisal\n"
+"                                </a>\n"
 "                            </p>\n"
-"                       </t>\n"
-"                        Herhangi bir sorunuz varsa veya yeniden planlamanız "
-"gerekiyorsa, ulaşmaktan çekinmeyin.\n"
-"                       <br/>\n"
-"                        <br/>\n"
-"                       <t t-out=\"ctx.get('author_signature')\"/>\n"
-"                        <br/>\n"
-"                   </p>\n"
+"                        </t>\n"
+"                    </p>\n"
 "                </div>\n"
 "            "
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -496,6 +436,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "<span class=\"o_stat_text\">Appraisals</span>"
 msgstr "<span class=\"o_stat_text\">Değerlendirmeler</span>"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
+msgid ""
+"<span class=\"o_stat_text\">Appraisals</span>\n"
+"                        <span class=\"o_stat_value\">New</span>"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
@@ -1082,6 +1029,7 @@ msgstr "Etkin"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_root
 msgid "Activities"
 msgstr "Aktiviteler"
 
@@ -1097,6 +1045,13 @@ msgid "Activity Exception Decoration"
 msgstr "Etkinlik İstisna Dekorasyonu"
 
 #. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_plans_ids
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_plans_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_plans
+msgid "Activity Plans"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_state
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_state
 msgid "Activity State"
@@ -1109,6 +1064,19 @@ msgid "Activity Type Icon"
 msgstr "Aktivite Türü İmgesi"
 
 #. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_type_action_config_appraisal
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_type
+msgid "Activity Types"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid ""
+"Activity plans are used to assign a list of activities in just a few clicks\n"
+"                (e.g. \"Mid-Year Review\", \"Annual Appraisal\", ...)"
+msgstr ""
+
+#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
 msgid "Activity type"
 msgstr "Aktivite  Türü"
@@ -1117,7 +1085,7 @@ msgstr "Aktivite  Türü"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/hr_employee_selection_list/hr_employee_selection_list_view.xml:0
 msgid "Add Goals to Employees"
-msgstr "Çalışanlara Hedefler Ekleme"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.hr_appraisal_config_templates_action
@@ -1145,20 +1113,10 @@ msgid "All companies"
 msgstr "Tüm şirketler"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-msgid ""
-"Allow to create appraisals in batches:\n"
-"- By Employee: for specific employees\n"
-"- By Company: all employees of the specified company\n"
-"- By Department: all employees of the specified department\n"
-"- By Employee Tag: all employees of the specific employee group category"
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Already Processed"
 msgstr ""
-"Toplu olarak değerlendirme oluşturmaya izin verin:\n"
-"- Çalışana Göre: belirli çalışanlar için\n"
-"- Şirkete göre: belirtilen şirketin tüm çalışanları\n"
-"- Departmana Göre: belirtilen departmanın tüm çalışanları\n"
-"- Çalışan Etiketine Göre: belirli çalışan grubu kategorisindeki tüm "
-"çalışanlar"
 
 #. module: hr_appraisal
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_reminder
@@ -1176,7 +1134,6 @@ msgstr "Aynı kişilerle yürütülen başka bir değerlendirme zaten devam ediy
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__appraisal_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__appraisal_id
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_activity
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_tree
@@ -1195,10 +1152,8 @@ msgid "Appraisal Assessment Note"
 msgstr "Değerleme Değerlendirme Notu"
 
 #. module: hr_appraisal
-#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 msgid "Appraisal Campaign"
 msgstr "Değerlendirme Kampanyası"
@@ -1245,8 +1200,8 @@ msgstr "Değerlendirme Hedefi"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_appraisal_goal_tag
-msgid "Appraisal Goal Tags"
-msgstr "Değerlendirme Hedef Etiketleri"
+msgid "Appraisal Goal Tag"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1258,6 +1213,11 @@ msgstr "Değerlendirme Sorumlusu"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__appraisal_plan_posted
 msgid "Appraisal Plan Posted"
 msgstr "Değerlendirme Planı Yayınlandı"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Appraisal Plans"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__appraisal_properties_definition
@@ -1274,6 +1234,12 @@ msgstr "Değerlendirme Hatırlatması"
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Appraisal Request"
 msgstr "Değerlendirme Talebi"
+
+#. module: hr_appraisal
+#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
+msgid ""
+"Appraisal Request from {{ hasattr(object, 'name') and object.name or '' }}"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_config_templates_action
@@ -1331,6 +1297,14 @@ msgid "Appraisal to start"
 msgstr "Başlangıç Değerlendirmesi"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_employee_departure.py:0
+msgid ""
+"Appraisal's managers have been updated due to the end of collaboration with "
+"an employee."
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.ir_cron_scheduler_appraisal_ir_actions_server
 msgid "Appraisal: Run employee appraisal"
 msgstr "Değerlendirme: Personel değerlendirmesi yapın"
@@ -1340,13 +1314,13 @@ msgstr "Değerlendirme: Personel değerlendirmesi yapın"
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_action_multiple_appraisals
 #: model:ir.actions.act_window,name:hr_appraisal.open_view_hr_appraisal_tree
+#: model:ir.module.module,shortdesc:base.module_hr_appraisal
 #: model:ir.ui.menu,name:hr_appraisal.menu_hr_appraisal_root
 #: model:ir.ui.menu,name:hr_appraisal.menu_open_view_hr_appraisal_tree
 #: model:res.groups.privilege,name:hr_appraisal.res_groups_privilege_appraisals
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_graph
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_pivot
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_department_view_kanban
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_departure_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 msgid "Appraisals"
 msgstr "Değerlendirmeler"
@@ -1391,6 +1365,11 @@ msgstr "Arşivlendi"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "Ask to fill a survey to other employees"
 msgstr "Diğer çalışanlara anket doldurmalarını isteme"
+
+#. module: hr_appraisal
+#: model:ir.module.module,summary:base.module_hr_appraisal
+msgid "Assess your employees"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__assessment_note_ids
@@ -1450,26 +1429,6 @@ msgid "Body content is the same as the template"
 msgstr "Gövde içeriği şablonla aynı"
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__company
-msgid "By Company"
-msgstr "Firmaya Göre"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__department
-msgid "By Department"
-msgstr "Departmana Göre"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__employee
-msgid "By Employee"
-msgstr "Personele Göre"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__category
-msgid "By Employee Tag"
-msgstr "Personel Etiketine Göre"
-
-#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "Bye-bye, record!"
@@ -1497,13 +1456,14 @@ msgid "Can See Manager Publish"
 msgstr "Yönetici Yayınlanmışı Görebilir"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
-msgid "Cancel"
-msgstr "İptal"
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__children_progression
+msgid "Children Progression"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Close"
 msgstr "Kapat"
@@ -1521,10 +1481,6 @@ msgstr "Renk"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_res_company
-msgid "Companies"
-msgstr "Şirketler"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__company_id
@@ -1550,6 +1506,7 @@ msgid "Configuration"
 msgstr "Ayarlar"
 
 #. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_confirm_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Confirm"
 msgstr "Onayla"
@@ -1570,7 +1527,12 @@ msgstr "İçerikler"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
 msgid "Continue"
-msgstr "Devam edin"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Create a Appraisal Activity Plan"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__duration_first_appraisal
@@ -1675,16 +1637,6 @@ msgid "Delete"
 msgstr "Sil"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-msgid "Delete Future Appraisals"
-msgstr "Gelecekteki Değerlemeleri Sil"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-msgid "Delete all appraisal after contract end date."
-msgstr "Sözleşme bitiş tarihinden sonraki tüm değerlendirmeleri silin."
-
-#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "Delete with children"
@@ -1693,7 +1645,6 @@ msgstr "Çocuklarla birlikte silin"
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_department
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__department_id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__department_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__department_ids
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1711,11 +1662,6 @@ msgid "Departments"
 msgstr "Departmanlar"
 
 #. module: hr_appraisal
-#: model:ir.model,name:hr_appraisal.model_hr_departure_wizard
-msgid "Departure Wizard"
-msgstr "Ayrılma Sihirbazı"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__description
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
@@ -1725,7 +1671,6 @@ msgstr "Açıklama"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/hr_employee_selection_list/hr_employee_selection_list_view.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 msgid "Discard"
 msgstr "Sil"
 
@@ -1737,8 +1682,8 @@ msgstr "Sil"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__display_name
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__display_name
@@ -1765,9 +1710,14 @@ msgid "Draft"
 msgstr "Taslak"
 
 #. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Edit Feedback"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_mail_template
-msgid "Email Templates"
-msgstr "E-posta Şablonları"
+msgid "Email Template"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_employee
@@ -1795,6 +1745,11 @@ msgid "Employee Autocomplete"
 msgstr "Çalışan Otomatik Tamamlama"
 
 #. module: hr_appraisal
+#: model:ir.model,name:hr_appraisal.model_hr_employee_departure
+msgid "Employee Departure"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_feedback
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__appraisal_employee_feedback_template
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -1812,11 +1767,6 @@ msgid "Employee Feedback Template"
 msgstr "Çalışan Geri Bildirimi Şablonu"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__category_id
-msgid "Employee Tag"
-msgstr "Personel Etiketi"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_user_id
 msgid "Employee User"
 msgstr "Çalışan Kullanıcısı"
@@ -1827,6 +1777,8 @@ msgid "Employee to review"
 msgstr "İncelenecek çalışan"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Employee's Feedback"
 msgstr "Çalışanın Geri Bildirimi"
@@ -1855,6 +1807,16 @@ msgstr "Değerlendirme Ölçeği"
 #: code:addons/hr_appraisal/models/res_company.py:0
 msgid "Exceeds expectations"
 msgstr "Beklentileri aşıyor"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Employee's Feedback"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Manager's Feedback"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_external
@@ -1894,12 +1856,6 @@ msgstr "Takipçiler"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Takipçiler (İş ortakları)"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Yazı tipi harika simgesi ör. fa-görevler"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -2010,8 +1966,8 @@ msgstr "Şirket hakkında ne hissediyorum?"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__id
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__id
@@ -2215,7 +2171,7 @@ msgstr "Değerlendirme senaryosu yükle"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "Load sample data"
-msgstr "Örnek Verileri Yükle"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -2266,6 +2222,8 @@ msgid "Manager Feedback Template"
 msgstr "Yönetici Geri Bildirim Şablonu"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Manager's Feedback"
 msgstr "Yöneticinin Geri Bildirimi"
@@ -2278,10 +2236,17 @@ msgstr "Yöneticiler"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/goal_helper_static_actions/goal_helper_static_actions.js:0
+#: model:ir.actions.server,name:hr_appraisal.action_mark_appraisal_as_done
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Mark as Done"
 msgstr "Yapıldı Olarak İşaretle"
+
+#. module: hr_appraisal
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2300,17 +2265,6 @@ msgstr "Mesaj Teslim hatası"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__message_ids
 msgid "Messages"
 msgstr "Mesajlar"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-msgid "Mode"
-msgstr "Şekli"
-
-#. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/components/cog_menu/multiple_appraisals_cog_menu.xml:0
-msgid "Multiple Appraisals"
-msgstr "Çoklu Değerlendirmeler"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -2361,7 +2315,7 @@ msgstr "İyileştirme gerekiyorr"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "New Employee"
-msgstr "Yeni Çalışan"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2406,34 +2360,27 @@ msgid "Next Appraisal Date"
 msgstr "Sonraki Değerleme Tarihi"
 
 #. module: hr_appraisal
+#: model:res.groups.privilege,placeholder:hr_appraisal.res_groups_privilege_appraisals
+msgid "No"
+msgstr ""
+
+#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "No Appraisals found!"
-msgstr "Değerlendirme bulunamadı!"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "No employees have the tag %(category_name)s"
-msgstr "Hiçbir çalışan şu etikete %(category_name)s sahip değil"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "No employees to assess yet!"
-msgstr "Henüz değerlendirecek çalışan yok!"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "No, keep it"
 msgstr "Hayır, Kalsın"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid "Note"
-msgstr "Not"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__number_of_completed_sibling_goals
@@ -2502,7 +2449,7 @@ msgstr "Oops! Yalnızca taslak değerlendirmeleri silebilirsiniz."
 #: code:addons/hr_appraisal/static/src/views/kanban/goal_kanban/goal_kanban_view.xml:0
 #: code:addons/hr_appraisal/static/src/views/list/goal_list/goal_list_view.xml:0
 msgid "Open Library"
-msgstr "Açık Kütüphane"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
@@ -2565,17 +2512,6 @@ msgstr ""
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid ""
-"Please set a final rating to validate these appraisals:\n"
-"- %s"
-msgstr ""
-"Lütfen bu değerlendirmeleri doğrulamak için final bir derecelendirme "
-"belirleyin:\n"
-"- %s"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Previous Appraisals"
 msgstr "Önceki Değerlendirmeler"
 
@@ -2583,7 +2519,7 @@ msgstr "Önceki Değerlendirmeler"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/component/print_menu.xml:0
 msgid "Print"
-msgstr "Yazdırın"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__note
@@ -2602,7 +2538,8 @@ msgid "Programming"
 msgstr "Programlama"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression_display
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 msgid "Progress"
 msgstr "İlerleme"
 
@@ -2610,6 +2547,11 @@ msgstr "İlerleme"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_kanban
 msgid "Progress:"
 msgstr "İlerleme:"
+
+#. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+msgid "Progression"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__appraisal_properties
@@ -2669,7 +2611,7 @@ msgstr "Kaynağın erişimini yönetmek için ilişkilendirilmiş kullanıcı."
 
 #. module: hr_appraisal
 #. odoo-javascript
-#: code:addons/hr_appraisal/static/src/fields/appraisal_remaining_days.js:0
+#: code:addons/hr_appraisal/static/src/fields/appraisal_relative_date.js:0
 msgid "Remaining Days"
 msgstr "Kalan Günler"
 
@@ -2690,14 +2632,8 @@ msgstr "Raporlama"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_public_view_form
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 msgid "Request Appraisal"
 msgstr "Değerlendirme Talebi"
-
-#. module: hr_appraisal
-#: model:ir.actions.server,name:hr_appraisal.action_create_multi_appraisals
-msgid "Request Appraisals"
-msgstr "Değerlendirme İsteyin"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_request_appraisal
@@ -2705,6 +2641,13 @@ msgid "Request an Appraisal"
 msgstr "Bir Değerlendirme Talebi"
 
 #. module: hr_appraisal
+#. odoo-javascript
+#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
+msgid "Request an Appraisal with your manager to assess your work."
+msgstr ""
+
+#. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_appraisal_reset
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Reset"
 msgstr "Sıfırla"
@@ -2738,12 +2681,6 @@ msgid "Schedule"
 msgstr "Programlayın"
 
 #. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-msgid "Schedule Appraisals"
-msgstr "Değerlendirmeyi Planlayın"
-
-#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Schedule Meeting"
 msgstr "Toplantı Planlayın"
@@ -2762,7 +2699,7 @@ msgstr "Değerlendirme Arama"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
 msgid "Select"
-msgstr "Seçme"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2779,6 +2716,11 @@ msgstr "Öz Değerlendirme burada gösterilecek"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
 msgid "Send"
 msgstr "Gönder"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.action_appraisal_send_by_email
+msgid "Send By Email"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -2852,6 +2794,12 @@ msgstr "Kardeş Hedefleri Oranı"
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_softskills
 msgid "Soft Skills"
 msgstr "Sosyal Beceriler"
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Some appraisals were already in another state and were skipped."
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__state
@@ -2947,13 +2895,6 @@ msgstr ""
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid "The \"Manager Feedback Published\" cannot be changed by an employee."
-msgstr ""
-"“ Yayımlanan Yönetici Geri Bildirimi”, çalışan tarafından değiştirilemez."
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "The appraisal's status has been set to Done by %s"
 msgstr "Değerlendirmenin durumu, 'Gerçekleştiren' %s olarak ayarlanmıştır"
 
@@ -2965,12 +2906,6 @@ msgid ""
 msgstr "Hedeflerin tamamlanması için ortalama zamanlama. dolduracaktır"
 
 #. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "The company %(company_name)s doesn't have employees"
-msgstr "%(company_name)s şirketinin çalışanı yok"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_employee__next_appraisal_date
 msgid ""
 "The date of the next appraisal is computed by the appraisal plan's dates "
@@ -2978,12 +2913,6 @@ msgid ""
 msgstr ""
 "Bir sonraki performans değerlendirme tarihi, değerlendirme planındaki "
 "tarihlere göre hesaplanır (ilk değerlendirme + periyodiklik)."
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "The department %(department_name)s doesn't have employees"
-msgstr "%(department_name)s departmanının çalışanı yok"
 
 #. module: hr_appraisal
 #: model:ir.model.constraint,message:hr_appraisal.constraint_res_company_positif_number_months
@@ -3091,13 +3020,29 @@ msgstr "Tamamlanmamış Hedef Sayısı"
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"field: %(inaccessible_field)s"
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"fields: %(inaccessible_fields)s"
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Unpublished"
 msgstr "Yayında Değil"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_search
-msgid "Upcoming Appraisals"
-msgstr "Yaklaşan Değerlendirmeler"
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Update"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -3149,6 +3094,8 @@ msgid "Waiting Feedback from Employee/Managers"
 msgstr "Çalışan/Yöneticilerden Geri Bildirim Bekleme"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__warning
 msgid "Warning"
 msgstr "Uyarı"
@@ -3158,18 +3105,6 @@ msgstr "Uyarı"
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
 msgid "Weaknesses"
 msgstr "Güçsüz yanlar"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-msgid "Website Messages"
-msgstr "Websitesi Mesajları"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-msgid "Website communication history"
-msgstr "Websitesi iletişim geçmişi"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -3212,8 +3147,6 @@ msgstr ""
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "Would you like to test with sample data or create your own employees?"
 msgstr ""
-"Örnek verilerle test etmek ister misiniz? veya kendi çalışanlarınızı "
-"oluşturmak ister misiniz?"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3248,6 +3181,12 @@ msgid ""
 msgstr ""
 "Bir hedefi ve alt hedeflerinden birini aynı anda çoğaltamazsınız.\n"
 "Bir hedefi çoğaltmak, alt hedeflerini de çoğaltacaktır."
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "You cannot modify a finished appraisal."
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -3317,288 +3256,12 @@ msgid "once published"
 msgstr "yayınlandıktan sonra"
 
 #. module: hr_appraisal
-#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
-msgid ""
-"{{ hasattr(object, 'name') and object.name or '' }} requests an Appraisal"
-msgstr ""
-"{{ hasattr(object, 'name') and object.name or '' }} bir Değerleme talep eder"
-
-#. module: hr_appraisal
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_confirm
 msgid "{{ object.employee_id.name }}: Appraisal Confirmed"
 msgstr "{{ object.employee_id.name }}: Değerlendirme Onaylandı"
 
-#~ msgid "%s Goals"
-#~ msgstr "%s Hedefler"
-
-#~ msgid "1 Meeting"
-#~ msgstr "1 Toplantı"
-
-#~ msgid "<em>Do you need rapid answer to the current situation?</em>"
-#~ msgstr "<em>Mevcut duruma hızlı bir yanıt gerekiyor mu?</em>"
-
-#~ msgid "<em>Give an example of long-term objective (&gt; 6 months)</em>"
-#~ msgstr "<em>Uzun vadeli bir hedef örneği verin (> 6 ay)</em>"
-
-#~ msgid "<em>Give an example of short-term objective (&lt; 6 months)</em>"
-#~ msgstr "<em>Kısa vadeli bir hedef örneği verin (< 6 ay)</em>"
-
-#~ msgid "<em>Pro-activity</em>"
-#~ msgstr "<em>Proaktiflik</em>"
-
-#~ msgid "<em>Stress Resistance</em>"
-#~ msgstr "<em>Stres Dayanıklılığı</em>"
-
-#~ msgid ""
-#~ "<p class=\"o_view_nocontent_smiling_face\">\n"
-#~ "                            Schedule an appraisal\n"
-#~ "                        </p><p>\n"
-#~ "                            Plan appraisals with your colleagues, collect "
-#~ "and discuss feedback.\n"
-#~ "                        </p>"
-#~ msgstr ""
-#~ "<p class=\"o_view_nocontent_smiling_face\">\n"
-#~ "                            Bir değerlendirme görüşmesi planlayın\n"
-#~ "                        </p><p>\n"
-#~ "                            Çalışma arkadaşlarınızla değerlendirme "
-#~ "planlayın, geri bildirim toplayın ve üzerine konuşun.\n"
-#~ "                        </p>"
-
-#~ msgid "<strong><span>Meeting: </span></strong>"
-#~ msgstr "<strong><span>Toplantı: </span></strong>"
-
-#~ msgid "Appraisal Employee Feedback Template"
-#~ msgstr "Değerlendirme Çalışan Geri Bildirimi Şablonu"
-
-#~ msgid "Appraisal Manager Feedback Template"
-#~ msgstr "Değerlendirme Yöneticisi Geri Bildirim Şablonu"
-
-#~ msgid "Appraisal Requested"
-#~ msgstr "Değerlendirme İstendi"
-
-#~ msgid "Appraisal Sent"
-#~ msgstr "Değerlendirme Gönder"
-
-#~ msgid "Appraisal Statistics"
-#~ msgstr "Değerlendirme İstatistikleri"
-
-#~ msgid "Appraisal to Confirm and Send"
-#~ msgstr "Onaylanacak ve Gönderilecek Değerlendirme"
-
-#~ msgid "Assessment"
-#~ msgstr "Değerlendirme"
-
-#~ msgid "Automatically generate appraisals"
-#~ msgstr "Otomatik olarak değerlendirme oluştur"
-
-#~ msgid "Basic Employee"
-#~ msgstr "Temel Personel"
-
-#~ msgid "Calendar Event"
-#~ msgstr "Takvim Etkinliği"
-
-#~ msgid "Cancel Future Appraisals"
-#~ msgstr "Gelecekteki Değerlendirmeleri İptal Et"
-
-#~ msgid "Cancel all appraisal after contract end date."
-#~ msgstr "Sözleşme bitiş tarihinden sonra tüm değerlendirmeleri iptal edin."
-
-#~ msgid "Cancelled"
-#~ msgstr "İptal Edildi"
-
-#~ msgid "Configure General Feedback Template"
-#~ msgstr "Genel Geri Bildirim Şablonunu Yapılandırma"
-
-#~ msgid "Create Date"
-#~ msgstr "Oluşturma Tarihi"
-
-#~ msgid "Custom Appraisal Templates"
-#~ msgstr "Özel Değerlendirme Şablonları"
-
-#~ msgid "Date"
-#~ msgstr "Tarih"
-
-#~ msgid ""
-#~ "Date of the appraisal, automatically updated when the appraisal is Done "
-#~ "or Cancelled."
-#~ msgstr ""
-#~ "Değerlendirme tarihi, değerlendirme Tamamlandığında veya İptal "
-#~ "Edildiğinde otomatik olarak güncellenir."
-
-#~ msgid "Employee Name"
-#~ msgstr "Çalışan Adı"
-
-#~ msgid "Extended Filters..."
-#~ msgstr "Gelişmiş Filtreler..."
-
-#~ msgid "Feedback Templates"
-#~ msgstr "Geri bildirim şablonları"
-
-#~ msgid "Final Interview"
-#~ msgstr "Nihai Görüşme"
-
-#~ msgid "Final Interview Date"
-#~ msgstr "Son Görüşme Tarihi"
-
-#~ msgid "Goal"
-#~ msgstr "Hedef"
-
-#~ msgid "Group By"
-#~ msgstr "Grupla"
-
-#~ msgid "Group by..."
-#~ msgstr "Grupla ..."
-
-#~ msgid "HR: Appraisal Confirmation"
-#~ msgstr "İK: Değerlendirme Onayı"
-
-#~ msgid "HR: Employee Appraisal Request"
-#~ msgstr "İK: Çalışan Değerlendirme Talebi"
-
-#~ msgid "HR: Manager appraisal request"
-#~ msgstr "İK: Yönetici değerlendirme talebi"
-
-#~ msgid "How do I feel about my own..."
-#~ msgstr "Kendimle ilgili hissettiklerim..."
-
-#~ msgid "How do I feel about the company..."
-#~ msgstr "Şirketle ilgili hissettiklerim..."
-
-#~ msgid "In progress Evaluations"
-#~ msgstr "Değerlendirme DevamEdiyor"
-
-#~ msgid "Interview"
-#~ msgstr "Görüşme"
-
-#~ msgid "Is Appraisal Manager"
-#~ msgstr "Değerlendirme Yöneticisi"
-
-#~ msgid "Is Implicit Manager"
-#~ msgstr "Bağlı Yönetici"
-
-#~ msgid "Last Appraisal Date"
-#~ msgstr "Son Değerlendirme Tarihi"
-
-#~ msgid "Last Meeting"
-#~ msgstr "Son Toplantı"
-
-#~ msgid "Manager Users"
-#~ msgstr "Yöneticiler"
-
-#~ msgid "Meeting Count"
-#~ msgstr "Toplantı Sayısı"
-
-#~ msgid "Meetings"
-#~ msgstr "Toplantılar"
-
-#~ msgid "Next Meeting"
-#~ msgstr "Sonraki Toplantı"
-
-#~ msgid "No Meeting"
-#~ msgstr "Toplantı Yok"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Eylem gerektiren mesaj adedi"
-
-#~ msgid "Operation not supported"
-#~ msgstr "Operasyon desteklenmiyor"
-
-#~ msgid ""
-#~ "Optional translation language (ISO code) to select when sending out an "
-#~ "email. If not set, the english version will be used. This should usually "
-#~ "be a placeholder expression that provides the appropriate language, e.g. "
-#~ "{{ object.partner_id.lang }}."
-#~ msgstr ""
-#~ "E-posta gönderirken seçilecek isteğe bağlı çeviri dili (ISO kodu). "
-#~ "Ayarlanmamışsa, İngilizce sürüm kullanılır. Bu genellikle uygun dili "
-#~ "sağlayan bir yer tutucu ifade olmalıdır, örneğin "
-#~ "{{ object.partner_id.lang }}."
-
-#~ msgid "People I Manage"
-#~ msgstr "Yönetimimde olan İnsanlar"
-
-#~ msgid ""
-#~ "Sent manually to the employee by the manager who wants to do an appraisal"
-#~ msgstr ""
-#~ "Değerlendirme yapmak isteyen yönetici tarafından çalışana manuel olarak "
-#~ "gönderilir"
-
-#~ msgid "Sent manually to the manager by the employee who wants an appraisal"
-#~ msgstr ""
-#~ "Değerlendirme isteyen çalışan tarafından yöneticiye manuel olarak "
-#~ "gönderilir"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr "Bir sonraki eylem tarihi bugünden önce olan tüm kayıtları göster"
-
-#~ msgid "Such grouping is not allowed."
-#~ msgstr "Böyle bir gruplamaya izin verilmez."
-
-#~ msgid "The content of this note is not visible by the Employee."
-#~ msgstr "Bu notun içeriği Çalışan tarafından görülmez."
-
-#~ msgid "The date of the last appraisal"
-#~ msgstr "Son değerlendirme tarihi"
-
-#~ msgid ""
-#~ "The employee %s arrived %s months ago. An appraisal for %s is created. "
-#~ "You can assess %s & determinate the date for '1to1' meeting before %s."
-#~ msgstr ""
-#~ "%s çalışanı %s ay önce geldi. %s için bir değerlendirme oluşturuldu. "
-#~ "%s'yi değerlendirebilir ve %s'den önce birebir toplantı tarihini "
-#~ "belirleyebilirsiniz."
-
-#~ msgid "To Do"
-#~ msgstr "Yapılacak"
-
-#~ msgid "To Start"
-#~ msgstr "Başla"
-
-#~ msgid "What are my best achievement(s) since my last appraisal?"
-#~ msgstr "Son değerlendirmemden bu yana en büyük başarım/başarılarım neler?"
-
-#~ msgid "What would I need to improve my work?"
-#~ msgstr "İşimi geliştirmek için neye ihtiyacım olurdu?"
-
-#~ msgid "Which parts of my job do I most / least enjoy?"
-#~ msgstr "İşimin en keyif aldığım / almadığım yanları neler?"
-
-#~ msgid ""
-#~ "You arrived %s months ago. Your appraisal is created you can assess "
-#~ "yourself here. Your manager will determinate the date for your '1to1' "
-#~ "meeting."
-#~ msgstr ""
-#~ "%s ay önce geldiniz. Değerlendirmeniz oluşturulursa kendinizi buradan "
-#~ "değerlendirebilirsiniz. Yöneticiniz birebir toplantınızın tarihini "
-#~ "belirleyecektir."
-
-#~ msgid "You cannot delete appraisal which is not in draft or canceled state"
-#~ msgstr ""
-#~ "Taslak veya iptal edilmiş durumda olmayan değerlendirmeyi silemezsiniz"
-
-#~ msgid ""
-#~ "Your employee's last appraisal was %s months ago. An appraisal for %s is "
-#~ "created. You can assess %s & determinate the date for '1to1' meeting "
-#~ "before %s."
-#~ msgstr ""
-#~ "Çalışanınızın son değerlendirmesi %s ay önceydi. %s için bir "
-#~ "değerlendirme oluşturulur. %s değerlendirebilir ve %s önce birebir "
-#~ "toplantı tarihini belirleyebilirsiniz."
-
-#~ msgid ""
-#~ "Your last appraisal was %s months ago. Your appraisal is created you can "
-#~ "assess yourself here. Your manager will determinate the date for your "
-#~ "'1to1' meeting."
-#~ msgstr ""
-#~ "Son değerlendirmeniz %s ay önceydi. Değerlendirmeniz oluşturulursa "
-#~ "kendinizi buradan değerlendirebilirsiniz. Yöneticiniz birebir "
-#~ "toplantınızın tarihini belirleyecektir."
-
-#~ msgid "e.g. Present yourself to your new team"
-#~ msgstr "örn. kendinizi yeni ekibinize tanıtın"
-
-#~ msgid "oe_kanban_text_red"
-#~ msgstr "oe_kanban_text_red"
-
-#~ msgid "text-danger"
-#~ msgstr "text-tehlike"
+#~ msgid "Website Messages"
+#~ msgstr "Websitesi Mesajları"
+
+#~ msgid "Website communication history"
+#~ msgstr "Websitesi iletişim geçmişi"

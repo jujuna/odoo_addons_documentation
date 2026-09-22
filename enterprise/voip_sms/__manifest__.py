@@ -1,6 +1,5 @@
 {  # noqa: B018
     "name": "Phone - SMS",
-    "version": "1.0",
     "category": "Sales/Sales",
     "depends": ["voip", "sms"],
     "auto_install": True,

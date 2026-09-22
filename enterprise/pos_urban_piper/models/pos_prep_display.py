@@ -4,17 +4,20 @@ from odoo import models
 class PosPrepDisplay(models.Model):
     _inherit = 'pos.prep.display'
 
-    def _get_open_orderlines_in_display(self):
-        pdis_orderlines = super()._get_open_orderlines_in_display()
-        return pdis_orderlines.filtered(lambda ol: ol.prep_line_id.prep_order_id.pos_order_id.delivery_status in (False, 'acknowledged', 'food_ready', 'cancelled'))
+    def get_preparation_display_orders_domain(self):
+        domain = super().get_preparation_display_orders_domain()
+        domain.append(('prep_order_id.pos_order_id.delivery_status', 'in', (False, 'acknowledged', 'food_ready', 'cancelled')))
+        return domain
 
     def _load_preparation_data_models(self):
         res = super()._load_preparation_data_models()
         return res + ['pos.delivery.provider']
 
-    def _get_preparation_display_order_additional_info(self, prep_states, prep_lines, prep_orders):
+    def _get_preparation_display_order_additional_info(self, prep_lines):
         self.ensure_one()
-        res = super()._get_preparation_display_order_additional_info(prep_states, prep_lines, prep_orders)
-        providers = prep_orders.pos_order_id.delivery_provider_id
+        res = super()._get_preparation_display_order_additional_info(prep_lines)
+        pos_order_ids = [order['id'] for order in res['pos.order']]
+        pos_orders = self.env['pos.order'].browse(pos_order_ids)
+        providers = pos_orders.delivery_provider_id
         res['pos.delivery.provider'] = providers.read(providers._load_pos_preparation_data_fields(), load=False)
         return res

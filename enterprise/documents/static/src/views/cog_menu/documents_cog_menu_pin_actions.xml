@@ -3,11 +3,11 @@
     <t t-name="documents.DocumentCogMenuPinAction">
         <Dropdown>
             <button class="opacity-trigger-hover">
-                <i class="fa fa-fw fa-gear" aria-hidden="true"/>Actions on Select
+                <i class="oi oi-fw" aria-hidden="true"/>Actions
             </button>
             <t t-set-slot="content">
                 <span t-if="this.documentsState.isLoading" class="o-dropdown-item dropdown-item">
-                    <i class='fa fa-spinner fa-spin'/>
+                    <i class="oi oi-spin" data-icon="progress_activity"/>
                 </span>
                 <span t-else="" t-foreach="this.documentsState.actions" t-as="action" t-key="action.id"
                     t-on-click.stop.prevent="() => this.onEnableAction(action.id)"
@@ -18,7 +18,7 @@
                 <hr class="dropdown-divider"/>
                 <span class="o-dropdown-item dropdown-item"
                     t-on-click.stop.prevent="() => this.documentService.goToServerActionsView()">
-                    Add Custom Action
+                    Edit Actions
                 </span>
             </t>
         </Dropdown>

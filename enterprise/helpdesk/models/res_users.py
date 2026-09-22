@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from collections import defaultdict
 
 from dateutil import relativedelta
-from pytz import timezone
 
 from odoo import fields, models
 
@@ -12,9 +10,9 @@ from odoo import fields, models
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    helpdesk_target_closed = fields.Integer(export_string_translation=False, default=1)
-    helpdesk_target_rating = fields.Float(export_string_translation=False, default=4.5)
-    helpdesk_target_success = fields.Float(export_string_translation=False, default=85)
+    helpdesk_target_closed = fields.Integer(user_writeable=True, export_string_translation=False, default=1)
+    helpdesk_target_rating = fields.Float(user_writeable=True, export_string_translation=False, default=4.5)
+    helpdesk_target_success = fields.Float(user_writeable=True, export_string_translation=False, default=85)
 
     _target_closed_not_zero = models.Constraint(
         'CHECK(helpdesk_target_closed > 0)',
@@ -29,28 +27,13 @@ class ResUsers(models.Model):
         "You cannot have negative targets",
     )
 
-    @property
-    def SELF_READABLE_FIELDS(self):
-        return super().SELF_READABLE_FIELDS + [
-            'helpdesk_target_closed',
-            'helpdesk_target_rating',
-            'helpdesk_target_success',
-        ]
-
-    @property
-    def SELF_WRITEABLE_FIELDS(self):
-        return super().SELF_WRITEABLE_FIELDS + [
-            'helpdesk_target_closed',
-            'helpdesk_target_rating',
-            'helpdesk_target_success',
-        ]
-
     def _get_working_user_interval(self, start_dt, end_dt, calendar, compute_leaves=True):
         # This method is intended to be overridden in hr_holidays in order to take non-validated leaves into account
+        resources_per_tz = self.resource_ids._get_resources_per_tz()
         return calendar._work_intervals_batch(
             start_dt,
             end_dt,
-            resources=self.resource_ids,
+            resources_per_tz=resources_per_tz,
             compute_leaves=compute_leaves
         )
 
@@ -67,8 +50,7 @@ class ResUsers(models.Model):
                     The output of this method will be: [[1, 3], [4], [2]]
         :rtype: List[List[int]]
         """
-        tz = timezone(self.env.context.get('tz') or 'UTC')
-        start_dt = fields.Datetime.now().astimezone(tz)
+        start_dt = fields.Datetime.now().astimezone(self.env.tz)
         end_dt = start_dt + relativedelta.relativedelta(days=7, hour=23, minute=59, second=59)
         workers_per_first_working_date = defaultdict(list)
         users_per_calendar = defaultdict(lambda: self.env['res.users'])

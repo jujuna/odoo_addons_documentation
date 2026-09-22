@@ -26,13 +26,7 @@ class QualityCheck(models.Model):
 
     operation_id = fields.Many2one(related="point_id.operation_id")
 
-    def do_pass(self):
-        self.ensure_one()
-        super().do_pass()
-
-    def do_fail(self):
-        self.ensure_one()
-        return super().do_fail()
+    worksheet_document = fields.Binary('Image/PDF', related="point_id.worksheet_document")
 
     def do_measure(self):
         self.ensure_one()
@@ -43,7 +37,6 @@ class QualityCheck(models.Model):
         if isinstance(next_res, dict):
             return next_res
         return {'next_check_id': self._next()}
-
 
     def _next(self):
         self.ensure_one()
@@ -72,18 +65,42 @@ class QualityCheck(models.Model):
             return _('Success') if self.quality_state == 'pass' else _('Failure')
         elif self.test_type == 'measure':
             return '{} {}'.format(self.measure, self.norm_unit)
-        return super(QualityCheck, self)._get_check_result()
+        return super()._get_check_result()
 
     def _check_to_unlink(self):
         self.ensure_one()
         return super()._check_to_unlink() and not self.workorder_id
 
+    def _update_lot_from_lot_line(self):
+        return not self.production_id
+
     def action_pass_and_next(self):
         self.ensure_one()
-        super().do_pass()
+        self.do_pass()
         return {'next_check_id': self._next()}
 
     def action_fail_and_next(self):
         self.ensure_one()
-        super().do_fail()
-        return {'next_check_id': self._next()}
+        self.do_fail()
+        result = self._next()
+        return result if isinstance(result, dict) else {'next_check_id': result}
+
+
+class QualityAlertTeam(models.Model):
+    _inherit = "quality.alert.team"
+
+    @api.model
+    def _get_domain_for_check_count(self):
+        domain = super()._get_domain_for_check_count()
+        domain &= Domain([
+            ('test_type', 'not in', ('register_consumed_materials', 'register_byproducts', 'print_product_label', 'print_lot_label')),
+            '|',
+            ('point_id', '=', False),
+            ('point_id.operation_id', '=', False),
+        ])
+        return domain
+
+    def action_open_quality_check_team(self):
+        action = super().action_open_quality_check_team()
+        action['context'].update({'search_default_quality_checks': 1})
+        return action

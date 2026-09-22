@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
 
-from PIL import Image
-from io import BytesIO
 from uuid import uuid4
 from unittest.mock import patch
 
 from odoo.tests.common import tagged, get_db_name
 from odoo.addons.base.tests.common import HttpCaseWithUserDemo
-from odoo.tools import config, mute_logger
+from odoo.addons.base.tests.files import PNG_RAW
+from odoo.tools import BinaryBytes, config, mute_logger
+from odoo.tools.image import Image, binary_to_image
 
 
 @tagged("-at_install", "post_install")
@@ -129,10 +128,10 @@ class MobileRoutesTest(HttpCaseWithUserDemo):
         This request is used to retrieve the user's picture
         """
         self.authenticate("demo", "demo")
-        self.user_demo.image_1920 = b'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYGAAAAAEAAH2FzhVAAAAAElFTkSuQmCC'
+        self.user_demo.image_1920 = BinaryBytes(PNG_RAW)
         response = self.url_open("/web/image?model=res.users&field=image_medium&id=%s" % self.session.uid)
         self.assertEqual(response.status_code, 200)
-        avatar = Image.open(BytesIO(response.content))
+        avatar = binary_to_image(response.content)
         self.assertIsInstance(avatar, Image.Image)
 
     def test_session_info(self):
@@ -182,9 +181,9 @@ class MobileRoutesMultidbTest(MobileRoutesTest):
             return
         dblist = (get_db_name(), 'another_database')
         assert len(dblist) >= 2, "There should be at least 2 databases"
-        with patch('odoo.http.db_list') as db_list, \
-             patch('odoo.http.db_filter') as db_filter, \
-             patch('odoo.http.Registry') as Registry:
+        with patch('odoo.http.router.db_list') as db_list, \
+             patch('odoo.http.router.db_filter') as db_filter, \
+             patch('odoo.http.router.Registry') as Registry:
             db_list.return_value = dblist
             db_filter.side_effect = lambda dbs, host=None: [db for db in dbs if db in dblist]
             Registry.return_value = self.registry

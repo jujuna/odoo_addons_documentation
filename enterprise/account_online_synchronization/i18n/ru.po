@@ -4,15 +4,15 @@
 #
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-30 13:26+0000\n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 01:36+0000\n"
 "Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "account_online_synchronization/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -38,6 +38,15 @@ msgstr ""
 "сотрудник службы поддержки свяжется с вами в ближайшее время."
 
 #. module: account_online_synchronization
+#: model:ir.module.module,description:base.module_account_online_synchronization
+msgid ""
+"\n"
+"With this module, users will be able to link bank journals to their\n"
+"online bank accounts (for supported banking institutions), and configure\n"
+"a periodic and automatic synchronization of their bank statements.\n"
+msgstr ""
+
+#. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_journal_duplicate_transactions.py:0
 msgid "%s duplicate transactions"
@@ -45,215 +54,52 @@ msgstr "Дублирующиеся транзакции: %s"
 
 #. module: account_online_synchronization
 #. odoo-javascript
-#: code:addons/account_online_synchronization/static/src/components/refresh_spin_journal_widget/refresh_spin_journal_widget.xml:0
+#: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "0 transaction fetched"
 msgstr "получено 0 транзакций"
 
 #. module: account_online_synchronization
-#: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
-msgid "<i class=\"fa fa-trash me-1\"/> Delete Selected"
-msgstr "<i class=\"fa fa-trash me-1\"/> Удалить выбранное"
-
-#. module: account_online_synchronization
-#: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_form
-msgid "<i class=\"oi oi-arrow-right me-2\"/> Send Now"
-msgstr "<i class=\"oi oi-arrow-right me-2\"/> Отправить сейчас"
-
-#. module: account_online_synchronization
 #: model:mail.template,body_html:account_online_synchronization.email_template_sync_reminder
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\">\n"
-"                    <tr>\n"
-"                        <td align=\"center\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-"#FFFFFF; color: #454748; border-collapse:separate;\">\n"
-"                                <tbody>\n"
-"                                    <!-- CONTENT -->\n"
-"                                    <tr>\n"
-"                                        <td align=\"center\" style=\"min-"
-"width: 590px;\">\n"
-"                                            <table border=\"0\" "
-"cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; "
-"background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"
-"\">\n"
-"                                                <tr>\n"
-"                                                    <td valign=\"top\" "
-"style=\"font-size: 13px;\">\n"
-"                                                        <div>\n"
-"                                                            Hello,<br/><br/"
+"<div style=\"font-size: 14px;\">\n"
+"                    <t t-set=\"base_url\" t-value=\"object.get_base_url()\"/"
 ">\n"
-"                                                            The connection "
-"between <b><a t-att-href=\"object.get_base_url()\" t-"
-"out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b> and "
-"<t t-out=\"object.account_online_link_id.name or ''\">Belfius</t> <t t-"
-"if=\"not object.expiring_synchronization_due_day\">expired.</t><t t-"
-"else=\"\">expires in <t t-out=\"object.expiring_synchronization_due_day or "
-"''\">10</t> days.</t><br/>\n"
-"                                                            <div "
-"style=\"margin: 16px 0px 16px 0px;\">\n"
-"                                                                <a t-attf-"
-"href=\"{{ website_url }}/renew_consent/{{ object.id }}?"
-"access_token={{object.access_token}}\" style=\"background-color: #4caf50; "
-"padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-"
-"radius: 5px; font-size:13px;\">\n"
-"                                                                    Renew "
-"Consent\n"
-"                                                                </a>\n"
-"                                                            </div>\n"
-"                                                            Security Tip: "
-"Check that the domain name you are redirected to is: <b><a t-att-"
-"href=\"object.get_base_url()\" t-out=\"object.get_base_url() or ''\">https://"
-"yourcompany.odoo.com</a></b>\n"
-"                                                        </div>\n"
-"                                                    </td>\n"
-"                                                </tr>\n"
-"                                                <tr>\n"
-"                                                    <td style=\"text-"
-"align:center;\">\n"
-"                                                        <hr width=\"100%\" "
-"style=\"background-color:rgb(204,204,204);border:medium "
-"none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-"margin: 16px 0px 16px 0px;\"/>\n"
-"                                                    </td>\n"
-"                                                </tr>\n"
-"                                            </table>\n"
-"                                        </td>\n"
-"                                    </tr>\n"
-"                                </tbody>\n"
-"                            </table>\n"
-"                        </td>\n"
-"                    </tr>\n"
-"                    <!-- POWERED BY -->\n"
-"                    <tr>\n"
-"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
-"                                <tr>\n"
-"                                    <td style=\"text-align: center; font-"
-"size: 13px;\">\n"
-"                                        Powered by <a target=\"_blank\" "
-"href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" t-attf-"
-"style=\"color: {{object.company_id.email_secondary_color or '#875A7B'}};"
-"\">Odoo</a>\n"
-"                                    </td>\n"
-"                                </tr>\n"
-"                            </table>\n"
-"                            <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"                                <tr>\n"
-"                                    <td style=\"text-align: center; font-"
-"size: 11px;\">\n"
-"                                        PS: This is an automated email sent "
-"by Odoo Accounting to remind you before a bank sync consent expiration.\n"
-"                                    </td>\n"
-"                                </tr>\n"
-"                            </table>\n"
-"                        </td>\n"
-"                    </tr>\n"
-"                </table>\n"
+"                    <p>\n"
+"                        Dear <t t-out=\"object.bank_account_id.holder_name "
+"or ''\">Marc Demo</t>,<br/><br/>\n"
+"                        The connection between <b><a t-att-href=\"base_url\" "
+"t-out=\"base_url or ''\">https://yourcompany.odoo.com</a></b>\n"
+"                        and <t t-out=\"object.account_online_link_id.name or "
+"''\">Belfius</t>\n"
+"                        <t t-if=\"not "
+"object.expiring_synchronization_due_day\">expired.</t>\n"
+"                        <t t-else=\"\">expires in <t t-"
+"out=\"object.expiring_synchronization_due_day or ''\">10</t> days.</t>\n"
+"                    </p>\n"
+"                    <p>Renew your consent to keep using bank synchronization "
+"seamlessly with Odoo.</p>\n"
+"                    <t t-set=\"renew_concent_url\" t-value=\"base_url + '/"
+"renew_consent/%s?access_token=%s' % (object.id, object.access_token)\"/>\n"
+"                    <div style=\"margin:16px auto; text-align:center\">\n"
+"                        <a t-att-href=\"renew_concent_url\" t-attf-"
+"style=\"padding: 8px 16px 8px 16px; border-radius: 3px; background-color: "
+"{{object.company_id.email_secondary_color or '#875A7B'}}; text-align:center; "
+"text-decoration:none; color: {{object.company_id.email_primary_color or "
+"'#FFFFFF'}};\">\n"
+"                            Renew Consent\n"
+"                        </a>\n"
+"                    </div>\n"
+"                    <p>This is an automated email sent by Odoo Accounting to "
+"remind you before a bank sync consent expiration.</p>\n"
+"                </div>\n"
 "            "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
-"16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; "
-"color: #454748; width: 100%; border-collapse:separate;\">\n"
-"                    <tr>\n"
-"                        <td align=\"center\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-"#FFFFFF; color: #454748; border-collapse:separate;\">\n"
-"                                <tbody>\n"
-"                                    <!-- CONTENT -->\n"
-"                                    <tr>\n"
-"                                        <td align=\"center\" style=\"min-"
-"width: 590px;\">\n"
-"                                            <table border=\"0\" "
-"cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; "
-"background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"
-"\">\n"
-"                                                <tr>\n"
-"                                                    <td valign=\"top\" "
-"style=\"font-size: 13px;\">\n"
-"                                                        <div>\n"
-"                                                            Здравствуйте!<br/"
-"><br/>\n"
-"                                                            Срок действия "
-"подключения между <b><a t-att-href=\"object.get_base_url()\" t-"
-"out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b> и "
-"<t t-out=\"object.account_online_link_id.name or ''\">Belfius</t> <t t-"
-"if=\"not object.expiring_synchronization_due_day\">истек.</t><t t-"
-"else=\"\">истекает через <t t-out=\"object.expiring_synchronization_due_day "
-"or ''\">10</t> дней.</t><br/>\n"
-"                                                            <div "
-"style=\"margin: 16px 0px 16px 0px;\">\n"
-"                                                                <a t-attf-"
-"href=\"{{ website_url }}/renew_consent/{{ object.id }}?"
-"access_token={{object.access_token}}\" style=\"background-color: #4caf50; "
-"padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-"
-"radius: 5px; font-size:13px;\">\n"
-"                                                                    Продлить "
-"согласие\n"
-"                                                                </a>\n"
-"                                                            </div>\n"
-"                                                            Совет по "
-"безопасности: проверьте, что доменное имя, на которое вы будете "
-"перенаправлены, соответствует <b><a t-att-href=\"object.get_base_url()\" t-"
-"out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b>\n"
-"                                                        </div>\n"
-"                                                    </td>\n"
-"                                                </tr>\n"
-"                                                <tr>\n"
-"                                                    <td style=\"text-"
-"align:center;\">\n"
-"                                                        <hr width=\"100%\" "
-"style=\"background-color:rgb(204,204,204);border:medium "
-"none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-"margin: 16px 0px 16px 0px;\"/>\n"
-"                                                    </td>\n"
-"                                                </tr>\n"
-"                                            </table>\n"
-"                                        </td>\n"
-"                                    </tr>\n"
-"                                </tbody>\n"
-"                            </table>\n"
-"                        </td>\n"
-"                    </tr>\n"
-"                    <!-- POWERED BY -->\n"
-"                    <tr>\n"
-"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
-"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
-"                                <tr>\n"
-"                                    <td style=\"text-align: center; font-"
-"size: 13px;\">\n"
-"                                        Работает на базе <a "
-"target=\"_blank\" href=\"https://www.odoo.com?"
-"utm_source=db&amp;utm_medium=auth\" t-attf-style=\"color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}};\">Odoo</a>\n"
-"                                    </td>\n"
-"                                </tr>\n"
-"                            </table>\n"
-"                            <table border=\"0\" cellpadding=\"0\" "
-"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; "
-"padding: 8px; border-collapse:separate;\">\n"
-"                                <tr>\n"
-"                                    <td style=\"text-align: center; font-"
-"size: 11px;\">\n"
-"                                        PS: Это автоматическое электронное "
-"письмо, отправленное из модуля Бухгалтерия Odoo, чтобы напомнить вам об "
-"истечении срока действия согласия на банковскую синхронизацию.\n"
-"                                    </td>\n"
-"                                </tr>\n"
-"                            </table>\n"
-"                        </td>\n"
-"                    </tr>\n"
-"                </table>\n"
-"            "
+
+#. module: account_online_synchronization
+#: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
+msgid "<i class=\"oi oi-filled me-1\" data-icon=\"delete\"/> Delete Selected"
+msgstr ""
+"<i class=\"oi oi-filled me-1\" data-icon=\"delete\"/> Удалить выбранное"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__access_token
@@ -291,7 +137,6 @@ msgstr "Счет Онлайн счет"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_selection__account_online_link_id
-#: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line__online_link_id
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__account_online_link_id
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__account_online_link_id
 msgid "Account Online Link"
@@ -333,6 +178,11 @@ msgstr "Активность"
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Оформление задачи-исключения"
+
+#. module: account_online_synchronization
+#: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_state
@@ -405,26 +255,20 @@ msgid "Bank Connection"
 msgstr "Подключение к банку"
 
 #. module: account_online_synchronization
-#: model:ir.model,name:account_online_synchronization.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Строка банковской выписки"
-
-#. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Bank Synchronization: Update your consent"
 msgstr "Банковская синхронизация: Обновить согласие"
 
 #. module: account_online_synchronization
+#: model:ir.model,name:account_online_synchronization.model_account_bank_statement_line
+msgid "Bank Transaction"
+msgstr ""
+
+#. module: account_online_synchronization
 #: model:mail.template,name:account_online_synchronization.email_template_sync_reminder
 msgid "Bank connection expiration reminder"
 msgstr "Напоминание об истечении срока действия банковского соединения"
-
-#. module: account_online_synchronization
-#: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_missing_transaction_wizard_view_form
-#: model_terms:ir.ui.view,arch_db:account_online_synchronization.view_account_bank_selection_form_wizard
-msgid "Cancel"
-msgstr "Отменить"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -464,10 +308,6 @@ msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_res_company
-msgid "Companies"
-msgstr "Компании"
-
-#. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__company_id
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__company_id
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__company_id
@@ -478,11 +318,6 @@ msgstr "Компания"
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
 msgid "Connect"
 msgstr "Подключить"
-
-#. module: account_online_synchronization
-#: model_terms:ir.ui.view,arch_db:account_online_synchronization.view_account_bank_selection_form_wizard
-msgid "Connect Bank"
-msgstr "Подключить банк"
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_dashboard_inherit_online_sync
@@ -506,9 +341,9 @@ msgstr "Подключено"
 
 #. module: account_online_synchronization
 #. odoo-javascript
-#: code:addons/account_online_synchronization/static/src/components/connected_until_widget/connected_until_widget.xml:0
+#: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Connected until"
-msgstr "Подключено до"
+msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__renewal_contact_email
@@ -525,16 +360,6 @@ msgstr "Сведения о состоянии соединения"
 #: model:mail.message.subtype,name:account_online_synchronization.bank_sync_consent_renewal
 msgid "Consent Renewal"
 msgstr "Продление согласия"
-
-#. module: account_online_synchronization
-#: model:ir.model,name:account_online_synchronization.model_res_partner
-msgid "Contact"
-msgstr "Контакты"
-
-#. module: account_online_synchronization
-#: model:ir.model,website_form_label:account_online_synchronization.model_res_partner
-msgid "Create a Customer"
-msgstr "Создать клиента"
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_selection__create_uid
@@ -583,7 +408,6 @@ msgstr "Дата истечения срока действия согласия
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__display_name
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__display_name
 #: model:ir.model.fields,field_description:account_online_synchronization.field_res_company__display_name
-#: model:ir.model.fields,field_description:account_online_synchronization.field_res_partner__display_name
 msgid "Display Name"
 msgstr "Отображаемое имя"
 
@@ -612,9 +436,9 @@ msgstr "День истечения срока синхронизации"
 
 #. module: account_online_synchronization
 #. odoo-javascript
-#: code:addons/account_online_synchronization/static/src/components/connected_until_widget/connected_until_widget.xml:0
+#: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Extend Connection"
-msgstr "Продлить соединение"
+msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_account__account_data
@@ -634,7 +458,7 @@ msgstr "Мастер поиска недостающих банковских в
 
 #. module: account_online_synchronization
 #. odoo-javascript
-#: code:addons/account_online_synchronization/static/src/components/refresh_spin_journal_widget/refresh_spin_journal_widget.xml:0
+#: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
 msgid "Fetch Transactions"
 msgstr "Получение транзакций"
@@ -654,9 +478,9 @@ msgstr "Получение статуса"
 
 #. module: account_online_synchronization
 #. odoo-javascript
-#: code:addons/account_online_synchronization/static/src/components/refresh_spin_journal_widget/refresh_spin_journal_widget.xml:0
+#: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Fetching..."
-msgstr "Установка..."
+msgstr ""
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -690,11 +514,6 @@ msgid "Followers (Partners)"
 msgstr "Подписчики"
 
 #. module: account_online_synchronization
-#: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Шрифт, отличный значок, например. к.-а.-задачи"
-
-#. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__foreign_currency_id
 msgid "Foreign Currency"
 msgstr "Иностранная валюта"
@@ -725,7 +544,6 @@ msgstr "Здесь"
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__id
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__id
 #: model:ir.model.fields,field_description:account_online_synchronization.field_res_company__id
-#: model:ir.model.fields,field_description:account_online_synchronization.field_res_partner__id
 msgid "ID"
 msgstr "ID"
 
@@ -785,10 +603,9 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "Import Transactions"
-msgstr "Импортные операции"
+msgstr ""
 
 #. module: account_online_synchronization
-#: model:ir.model.fields,help:account_online_synchronization.field_account_bank_selection__institution_name
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__name
 msgid "Institution Name"
 msgstr "Название учебного заведения"
@@ -896,6 +713,11 @@ msgid "Manual Bank Statement Lines"
 msgstr "Строки банковской выписки вручную"
 
 #. module: account_online_synchronization
+#: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "Message"
@@ -923,7 +745,6 @@ msgid "My Activity Deadline"
 msgstr "Крайний срок моей активности"
 
 #. module: account_online_synchronization
-#: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_selection__institution_name
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__name
 msgid "Name"
 msgstr "Имя"
@@ -1000,6 +821,11 @@ msgid "Online Accounts"
 msgstr "Онлайн-аккаунты"
 
 #. module: account_online_synchronization
+#: model:ir.module.module,shortdesc:base.module_account_online_synchronization
+msgid "Online Bank Statement Synchronization"
+msgstr ""
+
+#. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_account__online_identifier
 msgid "Online Identifier"
 msgstr "Онлайн-идентификатор"
@@ -1008,13 +834,6 @@ msgstr "Онлайн-идентификатор"
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__next_link_synchronization
 msgid "Online Link Next synchronization"
 msgstr "Онлайн-ссылка Следующая синхронизация"
-
-#. module: account_online_synchronization
-#: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line__online_partner_information
-#: model:ir.model.fields,field_description:account_online_synchronization.field_res_partner__online_partner_information
-#: model:ir.model.fields,field_description:account_online_synchronization.field_res_users__online_partner_information
-msgid "Online Partner Information"
-msgstr "Информация о партнере в режиме онлайн"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1046,6 +865,12 @@ msgstr "Имя партнера"
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__payment_ref
 msgid "Payment Ref"
 msgstr "Оплата Реф"
+
+#. module: account_online_synchronization
+#. odoo-python
+#: code:addons/account_online_synchronization/models/account_journal.py:0
+msgid "Payments"
+msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model.fields.selection,name:account_online_synchronization.selection__account_bank_statement_line_transient__state__pending
@@ -1122,9 +947,6 @@ msgid "Reconnect"
 msgstr "Переподключиться"
 
 #. module: account_online_synchronization
-#. odoo-javascript
-#: code:addons/account_online_synchronization/static/src/components/connected_until_widget/connected_until_widget.xml:0
-#: code:addons/account_online_synchronization/static/src/components/refresh_spin_journal_widget/refresh_spin_journal_widget.xml:0
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_dashboard_inherit_online_sync
 msgid "Reconnect Bank"
 msgstr "Банк \"Воссоединение"
@@ -1137,9 +959,9 @@ msgstr "Перенаправление"
 
 #. module: account_online_synchronization
 #. odoo-javascript
-#: code:addons/account_online_synchronization/static/src/components/refresh_spin_journal_widget/refresh_spin_journal_widget.xml:0
+#: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "Refresh"
-msgstr "Обновить"
+msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__refresh_token
@@ -1182,7 +1004,7 @@ msgstr "Ошибка доставки SMS"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "Search over"
-msgstr "Поиск завершен"
+msgstr ""
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.portal_renew_consent
@@ -1195,9 +1017,9 @@ msgstr ""
 
 #. module: account_online_synchronization
 #. odoo-javascript
-#: code:addons/account_online_synchronization/static/src/components/refresh_spin_journal_widget/refresh_spin_journal_widget.xml:0
+#: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "See error"
-msgstr "Увидеть ошибку"
+msgstr ""
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1213,14 +1035,9 @@ msgid "Select a Credit Card Account"
 msgstr "Выберите счет кредитной карты"
 
 #. module: account_online_synchronization
-#: model_terms:ir.ui.view,arch_db:account_online_synchronization.view_account_bank_selection_form_wizard
-msgid "Select the"
-msgstr "Выберите"
-
-#. module: account_online_synchronization
-#: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_selection__selected_account
-msgid "Selected Account"
-msgstr "Выбранный счет"
+#: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_form
+msgid "Send Now"
+msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__sequence
@@ -1239,18 +1056,6 @@ msgid "Setup Bank"
 msgstr "Настроить банк"
 
 #. module: account_online_synchronization
-#. odoo-python
-#: code:addons/account_online_synchronization/models/account_online.py:0
-msgid "Setup Bank Account"
-msgstr "Настроить банковский счет"
-
-#. module: account_online_synchronization
-#. odoo-python
-#: code:addons/account_online_synchronization/models/account_online.py:0
-msgid "Setup Credit Card Account"
-msgstr "Настроить счет кредитной карты"
-
-#. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__show_sync_actions
 msgid "Show Sync Actions"
 msgstr "Показать действия синхронизации"
@@ -1259,7 +1064,7 @@ msgstr "Показать действия синхронизации"
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/views/account_online_authorization_kanban_controller.xml:0
 msgid "Some transactions"
-msgstr "Некоторые транзакции"
+msgstr ""
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_duplicate_transaction_wizard__date
@@ -1321,6 +1126,12 @@ msgid "There are no pending transactions for this journal."
 msgstr "Для этого журнала нет транзакций в статусе «В ожидании»."
 
 #. module: account_online_synchronization
+#. odoo-python
+#: code:addons/account_online_synchronization/models/account_online.py:0
+msgid "There's already a synchronized journal linked to this IBAN"
+msgstr ""
+
+#. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__provider_type
 msgid "Third Party Provider"
 msgstr "Сторонний поставщик"
@@ -1338,6 +1149,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
 msgid "This button will reset the fetching status"
 msgstr "Эта кнопка сбросит статус загрузки операций"
+
+#. module: account_online_synchronization
+#: model:ir.module.module,summary:base.module_account_online_synchronization
+msgid "This module is used for Online bank synchronization."
+msgstr ""
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1380,6 +1196,11 @@ msgid "Transaction Details"
 msgstr "Детали транзакции"
 
 #. module: account_online_synchronization
+#: model:ir.model.fields,field_description:account_online_synchronization.field_account_bank_statement_line_transient__transaction_uuid
+msgid "Transaction Uuid"
+msgstr ""
+
+#. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
 msgid "Transactions"
 msgstr "Транзакции"
@@ -1414,16 +1235,6 @@ msgid "Waiting"
 msgstr "Ожидание"
 
 #. module: account_online_synchronization
-#: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__website_message_ids
-msgid "Website Messages"
-msgstr "Веб-сайт сообщения"
-
-#. module: account_online_synchronization
-#: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__website_message_ids
-msgid "Website communication history"
-msgstr "История общений с сайта"
-
-#. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_duplicate_transaction_wizard
 msgid "Wizard for duplicate transactions"
 msgstr "Мастер поиска дублирующихся транзакций"
@@ -1441,8 +1252,6 @@ msgid ""
 "synchronization\n"
 "                    ("
 msgstr ""
-"Вы импортируете транзакции, датированные до создания онлайн-синхронизации\n"
-"                    ("
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1455,6 +1264,8 @@ msgstr "Вы можете обратиться в службу поддержк�
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "You can manage your bank synchronization consent for this connection %s"
 msgstr ""
+"Вы можете управлять согласием на банковскую синхронизацию для этого "
+"подключения %s"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1489,7 +1300,7 @@ msgstr "Вы не можете импортировать отложенные �
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid "You have"
-msgstr "У вас"
+msgstr ""
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1503,15 +1314,10 @@ msgid "Your bank connection is expiring soon"
 msgstr "Срок действия вашего банковского соединения истекает"
 
 #. module: account_online_synchronization
-#: model_terms:ir.ui.view,arch_db:account_online_synchronization.view_account_bank_selection_form_wizard
-msgid "account to connect:"
-msgstr "учетную запись для подключения:"
-
-#. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "banks"
-msgstr "банки"
+msgstr ""
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -1523,13 +1329,19 @@ msgstr "записи"
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid "here."
+msgstr "здесь."
+
+#. module: account_online_synchronization
+#. odoo-python
+#: code:addons/account_online_synchronization/models/account_journal.py:0
+msgid "journal_id"
 msgstr ""
 
 #. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/bank_configure/bank_configure.xml:0
 msgid "loading..."
-msgstr "загрузка..."
+msgstr ""
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -1549,9 +1361,9 @@ msgstr "представление банковского счета в Инте
 
 #. module: account_online_synchronization
 #. odoo-javascript
-#: code:addons/account_online_synchronization/static/src/components/refresh_spin_journal_widget/refresh_spin_journal_widget.xml:0
+#: code:addons/account_online_synchronization/static/src/components/bank_journal_status/bank_journal_status.xml:0
 msgid "transactions fetched"
-msgstr "полученные транзакции"
+msgstr ""
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -1566,255 +1378,5 @@ msgstr "за этот период, которые не были созданы 
 msgid "within this period."
 msgstr "за этот период."
 
-#~ msgid " If you've already opened this issue don't report it again."
-#~ msgstr " Если вы уже открывали этот вопрос, не сообщайте о нем снова."
-
-#~ msgid ""
-#~ ").\n"
-#~ "                    This might cause duplicate entries."
-#~ msgstr ""
-#~ ").\n"
-#~ "                    Это может привести к дублированию записей."
-
-#~ msgid ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\">\n"
-#~ "                    <tr>\n"
-#~ "                        <td align=\"center\">\n"
-#~ "                            <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "#FFFFFF; color: #454748; border-collapse:separate;\">\n"
-#~ "                                <tbody>\n"
-#~ "                                    <!-- CONTENT -->\n"
-#~ "                                    <tr>\n"
-#~ "                                        <td align=\"center\" style=\"min-"
-#~ "width: 590px;\">\n"
-#~ "                                            <table border=\"0\" "
-#~ "cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: "
-#~ "590px; background-color: white; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                                <tr>\n"
-#~ "                                                    <td valign=\"top\" "
-#~ "style=\"font-size: 13px;\">\n"
-#~ "                                                        <div>\n"
-#~ "                                                            Hello,"
-#~ "<br><br>\n"
-#~ "                                                            The "
-#~ "connection between <b><a t-att-href=\"object.get_base_url()\" t-"
-#~ "out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b> "
-#~ "and <t t-out=\"object.account_online_link_id.name or ''\">Belfius</t> <t "
-#~ "t-if=\"not object.expiring_synchronization_due_day\">expired.</t><t t-"
-#~ "else=\"\">expires in <t t-out=\"object.expiring_synchronization_due_day "
-#~ "or ''\">10</t> days.</t><br>\n"
-#~ "                                                            <div "
-#~ "style=\"margin: 16px 0px 16px 0px;\">\n"
-#~ "                                                                <a t-attf-"
-#~ "href=\"{{ website_url }}/renew_consent/{{ object.id }}?"
-#~ "access_token={{object.access_token}}\" style=\"background-color: #4caf50; "
-#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-"
-#~ "radius: 5px; font-size:13px;\">\n"
-#~ "                                                                    Renew "
-#~ "Consent\n"
-#~ "                                                                </a>\n"
-#~ "                                                            </div>\n"
-#~ "                                                            Security Tip: "
-#~ "Check that the domain name you are redirected to is: <b><a t-att-"
-#~ "href=\"object.get_base_url()\" t-out=\"object.get_base_url() or "
-#~ "''\">https://yourcompany.odoo.com</a></b>\n"
-#~ "                                                        </div>\n"
-#~ "                                                    </td>\n"
-#~ "                                                </tr>\n"
-#~ "                                                <tr>\n"
-#~ "                                                    <td style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                                        <hr width=\"100%"
-#~ "\" style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\">\n"
-#~ "                                                    </td>\n"
-#~ "                                                </tr>\n"
-#~ "                                            </table>\n"
-#~ "                                        </td>\n"
-#~ "                                    </tr>\n"
-#~ "                                </tbody>\n"
-#~ "                            </table>\n"
-#~ "                        </td>\n"
-#~ "                    </tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr>\n"
-#~ "                        <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                            <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                                <tr>\n"
-#~ "                                    <td style=\"text-align: center; font-"
-#~ "size: 13px;\">\n"
-#~ "                                        Powered by <a target=\"_blank\" "
-#~ "href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" "
-#~ "style=\"color: #875A7B;\">Odoo</a>\n"
-#~ "                                    </td>\n"
-#~ "                                </tr>\n"
-#~ "                            </table>\n"
-#~ "                            <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; "
-#~ "padding: 8px; border-collapse:separate;\">\n"
-#~ "                                <tr>\n"
-#~ "                                    <td style=\"text-align: center; font-"
-#~ "size: 11px;\">\n"
-#~ "                                        PS: This is an automated email "
-#~ "sent by Odoo Accounting to remind you before a bank sync consent "
-#~ "expiration.\n"
-#~ "                                    </td>\n"
-#~ "                                </tr>\n"
-#~ "                            </table>\n"
-#~ "                        </td>\n"
-#~ "                    </tr>\n"
-#~ "                </table>\n"
-#~ "            "
-#~ msgstr ""
-#~ "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-"
-#~ "top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-"
-#~ "serif; color: #454748; width: 100%; border-collapse:separate;\">\n"
-#~ "                    <tr>\n"
-#~ "                        <td align=\"center\">\n"
-#~ "                            <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
-#~ "#FFFFFF; color: #454748; border-collapse:separate;\">\n"
-#~ "                                <tbody>\n"
-#~ "                                    <!-- CONTENT -->\n"
-#~ "                                    <tr>\n"
-#~ "                                        <td align=\"center\" style=\"min-"
-#~ "width: 590px;\">\n"
-#~ "                                            <table border=\"0\" "
-#~ "cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: "
-#~ "590px; background-color: white; padding: 0px 8px 0px 8px; border-"
-#~ "collapse:separate;\">\n"
-#~ "                                                <tr>\n"
-#~ "                                                    <td valign=\"top\" "
-#~ "style=\"font-size: 13px;\">\n"
-#~ "                                                        <div>\n"
-#~ "                                                            Здравствуйте,"
-#~ "<br><br>\n"
-#~ "                                                            Связь между "
-#~ "<b><a t-att-href=\"object.get_base_url()\" t-out=\"object.get_base_url() "
-#~ "or ''\">https://yourcompany.odoo.com</a></b> и <t t-"
-#~ "out=\"object.account_online_link_id.name or ''\">Белфиусом</t> <t t-"
-#~ "if=\"not object.expiring_synchronization_due_day\">истекло.</t> "
-#~ "Истекает<t t-else=\"\">через <t t-"
-#~ "out=\"object.expiring_synchronization_due_day or ''\">10</t> дней</t>."
-#~ "<br>\n"
-#~ "                                                            <div "
-#~ "style=\"margin: 16px 0px 16px 0px;\">\n"
-#~ "                                                                <a t-attf-"
-#~ "href=\"{{ website_url }}/renew_consent/{{ object.id }}?"
-#~ "access_token={{object.access_token}}\" style=\"background-color: #4caf50; "
-#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-"
-#~ "radius: 5px; font-size:13px;\">\n"
-#~ "                                                                    Продлить "
-#~ "согласие\n"
-#~ "                                                                </a>\n"
-#~ "                                                            </div>\n"
-#~ "                                                            Совет по "
-#~ "безопасности: Убедитесь, что доменное имя, на которое вы "
-#~ "перенаправляетесь, является: <b><a t-att-href=\"object.get_base_url()\" t-"
-#~ "out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b>\n"
-#~ "                                                        </div>\n"
-#~ "                                                    </td>\n"
-#~ "                                                </tr>\n"
-#~ "                                                <tr>\n"
-#~ "                                                    <td style=\"text-"
-#~ "align:center;\">\n"
-#~ "                                                        <hr width=\"100%"
-#~ "\" style=\"background-color:rgb(204,204,204);border:medium "
-#~ "none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
-#~ "margin: 16px 0px 16px 0px;\">\n"
-#~ "                                                    </td>\n"
-#~ "                                                </tr>\n"
-#~ "                                            </table>\n"
-#~ "                                        </td>\n"
-#~ "                                    </tr>\n"
-#~ "                                </tbody>\n"
-#~ "                            </table>\n"
-#~ "                        </td>\n"
-#~ "                    </tr>\n"
-#~ "                    <!-- POWERED BY -->\n"
-#~ "                    <tr>\n"
-#~ "                        <td align=\"center\" style=\"min-width: 590px;"
-#~ "\">\n"
-#~ "                            <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-"
-#~ "color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"
-#~ "\">\n"
-#~ "                                <tr>\n"
-#~ "                                    <td style=\"text-align: center; font-"
-#~ "size: 13px;\">\n"
-#~ "                                        Работает на <a target=\"_blank\" "
-#~ "href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" "
-#~ "style=\"color: #875A7B;\">Odoo</a>\n"
-#~ "                                    </td>\n"
-#~ "                                </tr>\n"
-#~ "                            </table>\n"
-#~ "                            <table border=\"0\" cellpadding=\"0\" "
-#~ "cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; "
-#~ "padding: 8px; border-collapse:separate;\">\n"
-#~ "                                <tr>\n"
-#~ "                                    <td style=\"text-align: center; font-"
-#~ "size: 11px;\">\n"
-#~ "                                        PS: Это автоматическое письмо, "
-#~ "отправленное Odoo Accounting, чтобы напомнить вам перед истечением срока "
-#~ "действия согласия на банковскую синхронизацию.\n"
-#~ "                                    </td>\n"
-#~ "                                </tr>\n"
-#~ "                            </table>\n"
-#~ "                        </td>\n"
-#~ "                    </tr>\n"
-#~ "                </table>\n"
-#~ "            "
-
-#~ msgid "Automated Bank Synchronization"
-#~ msgstr "Автоматизированная банковская синхронизация"
-
-#~ msgid "Bank Synchronization: Update consent"
-#~ msgstr "Банковская синхронизация: Согласие на обновление"
-
-#~ msgid "Bank reconciliation widget for a single statement line"
-#~ msgstr "Виджет сверки банковских счетов для одной строки выписки"
-
-#~ msgid "Create a Bank Account"
-#~ msgstr "Создайте банковский счет"
-
-#~ msgid ""
-#~ "If possible, we will try to automatically fetch new transactions for this "
-#~ "record"
-#~ msgstr ""
-#~ "Если возможно, мы попытаемся автоматически получить новые транзакции для "
-#~ "этой записи"
-
-#~ msgid "Information needed to interact with third party provider"
-#~ msgstr ""
-#~ "Информация, необходимая для взаимодействия со сторонним поставщиком услуг"
-
-#~ msgid "Last Refresh"
-#~ msgstr "Последнее обновление"
-
-#~ msgid "Last refresh"
-#~ msgstr "Последние обновление"
-
-#~ msgid "Last synchronization"
-#~ msgstr "Последняя синхронизация"
-
-#~ msgid "Opening statement: first synchronization"
-#~ msgstr "Вступительное слово: первая синхронизация"
-
-#~ msgid "Provider Data"
-#~ msgstr "Данные поставщика"
-
-#~ msgid ""
-#~ "within this period that were not created using the online "
-#~ "synchronization. This might cause duplicate entries."
-#~ msgstr ""
-#~ "в течение этого периода, которые не были созданы с помощью онлайн-"
-#~ "синхронизации. Это может привести к дублированию записей."
+#~ msgid "Bank Statement Line"
+#~ msgstr "Строка банковской выписки"

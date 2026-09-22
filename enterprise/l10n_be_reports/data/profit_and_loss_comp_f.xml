@@ -47,7 +47,6 @@
                                     <field name="name@de">70 - Umsatzerlöse</field>
                                     <field name="code">BE_PL_70</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">-70</field>
                                 </record>
                                 <record id="account_financial_report_pl_comp_f_pl_oi_sfgwcp" model="account.report.line">
@@ -57,7 +56,6 @@
                                     <field name="name@de">71 - Bestände an unfertigen und fertigen Erzeugnissen und an in Ausführung befindlichen Bestellungen: Zunahme (Abnahme) (+)/(-)</field>
                                     <field name="code">BE_PL_F_71</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">-71</field>
                                 </record>
                                 <record id="account_financial_report_pl_comp_f_pl_oi_pfa" model="account.report.line">
@@ -67,7 +65,6 @@
                                     <field name="name@de">72 - Andere aktivierte Eigenleistungen</field>
                                     <field name="code">BE_PL_F_72</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">-72</field>
                                 </record>
                                 <record id="account_financial_report_pl_comp_f_pl_oi_ooi" model="account.report.line">
@@ -77,7 +74,6 @@
                                     <field name="name@de">74 - Sonstige betriebliche Erträge</field>
                                     <field name="code">BE_PL_F_74</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">-74</field>
                                 </record>
                                 <record id="account_financial_report_pl_comp_f_pl_oi_nroi" model="account.report.line">
@@ -87,7 +83,6 @@
                                     <field name="name@de">76A - Nicht wiederkehrende betriebliche Erträge</field>
                                     <field name="code">BE_PL_76A</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">-760 - 7620 - 7630 - 764 - 765 - 766 - 767 - 768</field>
                                 </record>
                             </field>
@@ -114,7 +109,7 @@
                                     <field name="name@fr">60 - Approvisionnements et marchandises</field>
                                     <field name="name@de">60 - Waren, Roh-, Hilfs- und Betriebsstoffe</field>
                                     <field name="code">BE_PL_F_60</field>
-                                    <field name="foldable" eval="True"/>
+                                    <field name="foldability">foldable</field>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_oc_grrmc_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -131,7 +126,6 @@
                                             <field name="name@de">600/8 - Käufe</field>
                                             <field name="code">BE_PL_F_600_8</field>
                                             <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="expression_ids">
                                                 <record id="account_financial_report_pl_comp_f_pl_oc_grrmc_p_balance" model="account.report.expression">
                                                     <field name="label">balance</field>
@@ -148,7 +142,6 @@
                                             <field name="name@de">609 - Bestände: Abnahme (Zunahme) (+)/(-)</field>
                                             <field name="code">BE_PL_F_609</field>
                                             <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="expression_ids">
                                                 <record id="account_financial_report_pl_comp_f_pl_oc_grrmc_s_balance" model="account.report.expression">
                                                     <field name="label">balance</field>
@@ -167,7 +160,6 @@
                                     <field name="name@de">61 - Übrige Lieferungen und Leistungen</field>
                                     <field name="code">BE_PL_F_61</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_oc_sog_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -184,7 +176,6 @@
                                     <field name="name@de">62 - Arbeitsentgelte, Soziallasten und Pensionen (+)/(-)</field>
                                     <field name="code">BE_PL_62</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_oc_rssp_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -201,7 +192,6 @@
                                     <field name="name@de">630 - Abschreibungen und Wertminderungen auf Errichtungs- und Erweiterungsaufwendungen, auf immaterielle Anlagewerte und Sachanlagen</field>
                                     <field name="code">BE_PL_630</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_oc_aoawdfeitfa_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -218,7 +208,6 @@
                                     <field name="name@de">631/4 - Wertminderungen von Vorräten, in Ausführung befindlichen Bestellungen und Forderungen aus Lieferungen und Leistungen: Zuführungen (Rücknahmen) (+)/(-)</field>
                                     <field name="code">BE_PL_631_4</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_oc_awdscptd_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -235,7 +224,6 @@
                                     <field name="name@de">635/8 - Rückstellungen für Risiken und Aufwendungen: Zuführungen (Verbrauch und Auflösungen) (+)/(-)</field>
                                     <field name="code">BE_PL_COMP_635_8</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_oc_plc_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -252,7 +240,6 @@
                                     <field name="name@de">640/8 - Sonstige betriebliche Aufwendungen</field>
                                     <field name="code">BE_PL_640_8</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_oc_ooc_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -269,7 +256,6 @@
                                     <field name="name@de">649 - Auf der Aktivseite als Restrukturierungskosten ausgewiesene betriebliche Aufwendungen (-)</field>
                                     <field name="code">BE_PL_649</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_oc_ocrarc_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -286,7 +272,6 @@
                                     <field name="name@de">66A - Nicht wiederkehrende betriebliche Aufwendungen</field>
                                     <field name="code">BE_PL_66A</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_oc_nroc_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -323,7 +308,7 @@
                                     <field name="name@fr">75 - Produits financiers récurrents</field>
                                     <field name="name@de">75 - Wiederkehrende Finanzerträge</field>
                                     <field name="code">BE_PL_F_75</field>
-                                    <field name="foldable" eval="True"/>
+                                    <field name="foldability">foldable</field>
                                     <field name="aggregation_formula">BE_PL_F_750.balance + BE_PL_F_751.balance + BE_PL_F_752_9.balance</field>
                                     <field name="children_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_comp_fi_rfi_iffa" model="account.report.line">
@@ -333,7 +318,6 @@
                                             <field name="name@de">750 - Erträge aus Finanzanlagen</field>
                                             <field name="code">BE_PL_F_750</field>
                                             <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">-750</field>
                                         </record>
                                         <record id="account_financial_report_pl_comp_f_pl_comp_fi_rfi_ica" model="account.report.line">
@@ -343,7 +327,6 @@
                                             <field name="name@de">751 - Erträge aus Gegenständen des Umlaufvermögens</field>
                                             <field name="code">BE_PL_F_751</field>
                                             <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">-751</field>
                                         </record>
                                         <record id="account_financial_report_pl_comp_f_pl_comp_fi_rfi_ofi" model="account.report.line">
@@ -353,7 +336,6 @@
                                             <field name="name@de">752/9 - Sonstige Finanzerträge</field>
                                             <field name="code">BE_PL_F_752_9</field>
                                             <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="account_codes_formula">-752 - 753 - 754 - 755 - 756 - 757 - 758 - 759</field>
                                         </record>
                                     </field>
@@ -365,7 +347,6 @@
                                     <field name="name@de">76B - Nicht wiederkehrende Finanzerträge</field>
                                     <field name="code">BE_PL_76B</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">-761 - 7621 - 763\(7630) - 769</field>
                                 </record>
                             </field>
@@ -392,7 +373,7 @@
                                     <field name="name@fr">65 - Charges financières récurrentes</field>
                                     <field name="name@de">65 - Wiederkehrende Finanzaufwendungen</field>
                                     <field name="code">BE_PL_F_65</field>
-                                    <field name="foldable" eval="True"/>
+                                    <field name="foldability">foldable</field>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_comp_fc_rfc_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -409,7 +390,6 @@
                                             <field name="name@de">650 - Aufwendungen für Verbindlichkeiten</field>
                                             <field name="code">BE_PL_F_650</field>
                                             <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="expression_ids">
                                                 <record id="account_financial_report_pl_comp_f_pl_comp_fc_rfc_dc_balance" model="account.report.expression">
                                                     <field name="label">balance</field>
@@ -426,7 +406,6 @@
                                             <field name="name@de">651 - Wertminderungen von Gegenständen des Umlaufvermögens mit Ausnahme der Vorräten, in Ausführung befindlichen Bestellungen und Forderungen aus Lieferungen und Leistungen: Zuführungen (Rücknahmen) (+)/(-)</field>
                                             <field name="code">BE_PL_F_651</field>
                                             <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="expression_ids">
                                                 <record id="account_financial_report_pl_comp_f_pl_comp_fc_rfc_awdcaoscptd_balance" model="account.report.expression">
                                                     <field name="label">balance</field>
@@ -443,7 +422,6 @@
                                             <field name="name@de">652/9 - Sonstige Finanzaufwendungen</field>
                                             <field name="code">BE_PL_F_652_9</field>
                                             <field name="groupby">account_id</field>
-                                            <field name="foldable" eval="True"/>
                                             <field name="expression_ids">
                                                 <record id="account_financial_report_pl_comp_f_pl_comp_fc_rfc_ofc_balance" model="account.report.expression">
                                                     <field name="label">balance</field>
@@ -462,7 +440,6 @@
                                     <field name="name@de">66B - Nicht wiederkehrende Finanzaufwendungen</field>
                                     <field name="code">BE_PL_66B</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_comp_fc_nrfc_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -491,7 +468,6 @@
                             <field name="hierarchy_level">1</field>
                             <field name="code">BE_PL_780</field>
                             <field name="groupby">account_id</field>
-                            <field name="foldable" eval="True"/>
                             <field name="account_codes_formula">-780</field>
                         </record>
                         <record id="account_financial_report_pl_comp_f_pl_ttdt" model="account.report.line">
@@ -502,7 +478,6 @@
                             <field name="hierarchy_level">1</field>
                             <field name="code">BE_PL_680</field>
                             <field name="groupby">account_id</field>
-                            <field name="foldable" eval="True"/>
                             <field name="expression_ids">
                                 <record id="account_financial_report_pl_comp_f_pl_ttdt_balance" model="account.report.expression">
                                     <field name="label">balance</field>
@@ -535,7 +510,6 @@
                                     <field name="name@de">670/3 - Steuern</field>
                                     <field name="code">BE_PL_F_670_3</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_pl_itr_t_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -552,7 +526,6 @@
                                     <field name="name@de">77 - Steuererstattung und Auflösung von Steuerrückstellungen</field>
                                     <field name="code">BE_PL_F_77</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">-77</field>
                                 </record>
                             </field>
@@ -574,7 +547,6 @@
                             <field name="hierarchy_level">1</field>
                             <field name="code">BE_PL_789</field>
                             <field name="groupby">account_id</field>
-                            <field name="foldable" eval="True"/>
                             <field name="account_codes_formula">-789</field>
                         </record>
                         <record id="account_financial_report_pl_comp_f_pl_ttur" model="account.report.line">
@@ -585,7 +557,6 @@
                             <field name="hierarchy_level">1</field>
                             <field name="code">BE_PL_689</field>
                             <field name="groupby">account_id</field>
-                            <field name="foldable" eval="True"/>
                             <field name="expression_ids">
                                 <record id="account_financial_report_pl_comp_f_pl_ttur_balance" model="account.report.expression">
                                     <field name="label">balance</field>
@@ -638,7 +609,6 @@
                                     <field name="name@de">14P - Gewinnvortrag (Verlustvortrag) aus dem Vorjahr (+)/(-)</field>
                                     <field name="code">BE_PL_14P</field>
                                     <field name="groupby" eval="False"/>
-                                    <field name="foldable" eval="False"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_a_pltba_plppbf_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -666,7 +636,6 @@
                                     <field name="name@de">791 - aus der Einlage</field>
                                     <field name="code">BE_PL_COMP_F_791</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">-791</field>
                                 </record>
                                 <record id="account_financial_report_pl_comp_f_a_tfe_fr" model="account.report.line">
@@ -676,7 +645,6 @@
                                     <field name="name@de">792 - aus den Rücklagen</field>
                                     <field name="code">BE_PL_COMP_F_792</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="account_codes_formula">-792</field>
                                 </record>
                             </field>
@@ -704,7 +672,6 @@
                                     <field name="name@de">691 - an der Einlage</field>
                                     <field name="code">BE_PL_COMP_691</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_a_a_tc_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -721,7 +688,6 @@
                                     <field name="name@de">6920 - an die gesetzliche Rücklage</field>
                                     <field name="code">BE_PL_COMP_6920</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_a_a_tlr_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -738,7 +704,6 @@
                                     <field name="name@de">6921 - an die sonstigen Rücklagen</field>
                                     <field name="code">BE_PL_COMP_6921</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_a_a_tor_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -767,7 +732,6 @@
                             <field name="hierarchy_level">1</field>
                             <field name="code">BE_PL_COMP_794</field>
                             <field name="groupby">account_id</field>
-                            <field name="foldable" eval="True"/>
                             <field name="account_codes_formula">-794</field>
                         </record>
                         <record id="account_financial_report_pl_comp_f_a_ptbd" model="account.report.line">
@@ -793,7 +757,6 @@
                                     <field name="name@de">694 - Vergütung der Einlage</field>
                                     <field name="code">BE_PL_COMP_694</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_a_ptbd_cfc_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -810,7 +773,6 @@
                                     <field name="name@de">695 - Verwalter oder Geschäftsführer</field>
                                     <field name="code">BE_PL_COMP_695</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_a_ptbd_dom_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -827,7 +789,6 @@
                                     <field name="name@de">696 - Arbeitnehmer</field>
                                     <field name="code">BE_PL_COMP_696</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_a_ptbd_e_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -844,7 +805,6 @@
                                     <field name="name@de">697 - Andere Berechtigte</field>
                                     <field name="code">BE_PL_COMP_697</field>
                                     <field name="groupby">account_id</field>
-                                    <field name="foldable" eval="True"/>
                                     <field name="expression_ids">
                                         <record id="account_financial_report_pl_comp_f_a_ptbd_ob_balance" model="account.report.expression">
                                             <field name="label">balance</field>
@@ -864,7 +824,7 @@
 
     <data noupdate="1">
         <record id="account_financial_report_pl_comp_f" model="account.report">
-            <field name="active" eval="False"/>
+            <field name="active_fallback" eval="False"/>
         </record>
     </data>
 </odoo>

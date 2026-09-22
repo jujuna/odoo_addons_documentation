@@ -3,6 +3,7 @@ from odoo.tests.common import HttpCase, tagged
 from odoo.addons.base.tests.common import new_test_user
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class LoadMenusTests(HttpCase):
 
     maxDiff = None
@@ -38,7 +39,7 @@ class LoadMenusTests(HttpCase):
 
     def test_web_icon(self):
         self.menu.web_icon = False
-        self.menu.web_icon_data = b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+BCQAHBQICJmhD1AAAAABJRU5ErkJggg=="
+        self.menu.web_icon_data = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+BCQAHBQICJmhD1AAAAABJRU5ErkJggg=="
 
         menu_loaded = self.url_open("/web/webclient/load_menus")
 

@@ -2,7 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import datetime
-from urllib.parse import urlparse
 import re
 
 from odoo import models, _
@@ -48,7 +47,7 @@ class SocialStream(models.Model):
 
         stream_post_data = posts_response.json()['elements']
 
-        self._prepare_linkedin_stream_post_images(stream_post_data)
+        self._prepare_linkedin_stream_post_attachments(stream_post_data)
 
         linkedin_post_data = {
             stream_post_data.get('id'): self._prepare_linkedin_stream_post_values(stream_post_data)
@@ -104,12 +103,12 @@ class SocialStream(models.Model):
             object_ids=media_urns,
         )
         return {
-            media: media_values["downloadUrl"]
+            media: {"src": media_values["downloadUrl"], "thumbnail": media_values.get('thumbnail', False)}
             for media, media_values in response.json().get('results', {}).items()
             if media_values.get("downloadUrl")
         } if response.ok else {}
 
-    def _prepare_linkedin_stream_post_images(self, posts_data):
+    def _prepare_linkedin_stream_post_attachments(self, posts_data):
         """Fetch the images and videos URLs and insert their URL in posts_data."""
         all_image_urns = set()
         all_video_urns = set()
@@ -117,7 +116,7 @@ class SocialStream(models.Model):
             # multi-images post
             images = post.get('content', {}).get('multiImage', {}).get('images', [])
             all_image_urns |= {image['id'] for image in images}
-            # single image post
+            # single image/video post
             if media_urn := post.get('content', {}).get('media', {}).get('id'):
                 # make sure it's an image or a video
                 if 'image' in media_urn:
@@ -138,18 +137,21 @@ class SocialStream(models.Model):
             # multi-images post
             images = post.get('content', {}).get('multiImage', {}).get('images', [])
             for image in images:
-                image["downloadUrl"] = url_by_urn.get(image.get("id"), '')
+                image["downloadUrl"] = url_by_urn.get(image.get("id"), {}).get('src', False)
 
             # single image or video post
             if media_urn := post.get("content", {}).get("media", {}).get("id"):
                 if 'image' in media_urn:
-                    post["content"]["media"]["downloadUrl"] = url_by_urn.get(media_urn, '')
+                    post["content"]["media"]["downloadUrl"] = url_by_urn.get(media_urn, {}).get('src')
+                    post["content"]["media"]["type"] = "image"
                 elif 'video' in media_urn:
-                    post['commentary'] = f'{post.get("commentary", "")}\n{url_by_urn.get(media_urn, "")}'.strip()
+                    post["content"]["media"]["downloadUrl"] = url_by_urn.get(media_urn, {}).get('src')
+                    post["content"]["media"]["thumbnailUrl"] = url_by_urn.get(media_urn, {}).get('thumbnail')
+                    post["content"]["media"]["type"] = "video"
 
             # article thumbnail
             if thumbnail_urn := post.get("content", {}).get("article", {}).get("thumbnail"):
-                post["content"]["article"]["~thumbnail"] = {"downloadUrl": url_by_urn.get(thumbnail_urn, "")}
+                post["content"]["article"]["~thumbnail"] = {"downloadUrl": url_by_urn.get(thumbnail_urn, {}).get('src')}
 
     def _prepare_linkedin_stream_post_values(self, post_data):
         article = post_data.get('content', {}).get('article', {})
@@ -162,26 +164,31 @@ class SocialStream(models.Model):
             'linkedin_author_urn': post_data.get('author'),
             'linkedin_author_image_url': author_image,
             'message': self._format_from_linkedin_little_text(post_data.get('commentary', '')),
-            'stream_post_image_ids': [(5, 0)] + [(0, 0, image_value) for image_value in self._extract_linkedin_image(post_data)],
+            'stream_post_attachment_ids': [(5, 0)] + [(0, 0, content_vals) for content_vals in self._extract_linkedin_attachments(post_data)],
             **self._extract_linkedin_article(article),
         }
 
-    def _extract_linkedin_image(self, post_data):
+    def _extract_linkedin_attachments(self, post_data):
         # single image post
-        single_image = post_data.get('content', {}).get('media', {}).get('downloadUrl')
-        if single_image:
-            return [{'image_url': self._enforce_url_scheme(single_image)}]
+        media = post_data.get('content', {}).get('media', {})
+        if attachment := media.get('downloadUrl'):
+            content_type = media.get('type')
+            return [{
+                'content_url': self._enforce_url_scheme(attachment),
+                'attachment_content_type': content_type,
+                'thumbnail_url': self._enforce_url_scheme(media.get('thumbnailUrl')) if content_type == 'video' else False
+            }]
 
         # multi-images post
         if images := post_data.get('content', {}).get('multiImage', {}).get('images', []):
             return [
-                {'image_url': self._enforce_url_scheme(image.get('downloadUrl'))}
+                {'content_url': self._enforce_url_scheme(image.get('downloadUrl')), 'attachment_content_type': 'image'}
                 for image in images if image.get('downloadUrl')
             ]
 
         # article with thumbnail
         if thumbnail_url := post_data.get('content', {}).get('article', {}).get('~thumbnail', {}).get('downloadUrl'):
-            return [{'image_url': self._enforce_url_scheme(thumbnail_url)}]
+            return [{'content_url': self._enforce_url_scheme(thumbnail_url), 'attachment_content_type': 'image'}]
 
         return []
 
@@ -194,18 +201,6 @@ class SocialStream(models.Model):
             'link_description': article.get('description', ''),
             'link_url': self._enforce_url_scheme(article.get('source'))
         }
-
-    def _enforce_url_scheme(self, url):
-        """Some URLs doesn't starts by "https://". But if we use those bad URLs
-        in a HTML link, it will redirect the user the actual website.
-        That's why we need to fix those URLs.
-        e.g.:
-            <a href="www.bad_url.com"/>
-        """
-        if not url or urlparse(url).scheme:
-            return url
-
-        return 'https://%s' % url
 
     def _format_from_linkedin_little_text(self, input_string):
         """

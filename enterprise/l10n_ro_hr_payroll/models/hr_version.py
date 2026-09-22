@@ -1,4 +1,6 @@
-from odoo import api, fields, models
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+from odoo import fields, models
 
 
 class HrVersion(models.Model):
@@ -7,14 +9,6 @@ class HrVersion(models.Model):
     l10n_ro_work_type = fields.Selection([
         ('1', 'Normal Conditions'),
         ('2', 'Particular Conditions'),
-        ('3', 'Special Conditions')
-    ], string='Work type', default="1", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-
-    @api.model
-    def _get_whitelist_fields_from_template(self):
-        whitelisted_fields = super()._get_whitelist_fields_from_template() or []
-        if self.env.company.country_id.code == "RO":
-            whitelisted_fields += [
-                "l10n_ro_work_type",
-            ]
-        return whitelisted_fields
+        ('3', 'Special Conditions'),
+    ], string='Work Type',
+        help="Work condition type, used to determine additional pension contribution rates.")

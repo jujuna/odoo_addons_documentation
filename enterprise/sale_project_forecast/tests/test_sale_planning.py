@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 from freezegun import freeze_time
-from datetime import datetime
+from datetime import datetime, date
 
 from odoo.tests import Form, tagged
 
@@ -72,26 +72,51 @@ class TestSaleForecast(TestCommonSalePlanning):
     def test_sale_line_id_value_depending_project(self):
         line1_project = self.sale_order_line1.project_id
         line2_project = self.sale_order_line2.project_id
+        with Form(self.env['planning.slot']) as slot:
+            slot.project_id = line1_project
+            self.assertEqual(slot.sale_line_id, line1_project.sale_line_id, 'Sale order item of Planning should be same as project')
+        with Form(slot.record) as slot:
+            slot.project_id = line2_project
+            # changing project of slot should not change to new project's sol if sol of slot is already set
+            self.assertEqual(slot.sale_line_id, line1_project.sale_line_id, 'Sale order item of Planning should not change to new project\'s sol if it\'s already set')
 
-        slot1 = self.env['planning.slot'].create({
-            'project_id': line1_project.id,
+    def test_shift_follows_sale_order_project_created_later(self):
+        self.plannable_so.action_confirm()
+        slot = self.plannable_sol.planning_slot_ids
+        self.assertFalse(slot.project_id)
+
+        project = self.env['project.project'].create({
+            'name': 'SO Project',
+            'allow_billable': True,
         })
-        self.assertEqual(slot1.sale_line_id, line1_project.sale_line_id, 'Sale order item of Planning should be same as project')
+        self.plannable_so.project_id = project
+        slot.invalidate_recordset(['project_id'])
+        self.assertEqual(slot.project_id, project, "Existing shifts should recompute their project from the sales order.")
 
-        slot1.write({'project_id': line2_project.id})
-        # changing project of slot should not change to new project's sol if sol of slot is already set
-        self.assertEqual(slot1.sale_line_id, line1_project.sale_line_id, 'Sale order item of Planning should not change to new project\'s sol if it\'s already set')
+    def test_shift_inherits_so_project_on_confirm(self):
+        project = self.env['project.project'].create({
+            'name': 'SO Project',
+            'allow_billable': True,
+        })
+        self.plannable_so.project_id = project
+        self.plannable_so.action_confirm()
+        slot = self.plannable_sol.planning_slot_ids
+        self.assertEqual(slot.project_id, project)
 
     @freeze_time('2023-01-01')
     def test_archive_employee_should_move_shifts_to_open_shifts(self):
+        self.employee_joseph.date_version = date(2022, 1, 1)
         slot = self.env['planning.slot'].create([{
-            'resource_id': self.employee_joseph.resource_id.id,
+            'resource_ids': self.employee_joseph.resource_id.ids,
             'start_datetime': datetime(2023, 1, 2, 8, 0),
             'end_datetime': datetime(2023, 1, 2, 17, 0),
             'sale_line_id': self.sale_order_line1.id,
             'project_id': self.sale_order_line1.project_id.id,
         }])
-        self.employee_joseph.action_archive()
-        self.assertFalse(slot.resource_id, "Resource of the shift should be open")
+        self.env['hr.employee.departure'].create([{
+            'employee_id': self.employee_joseph.id,
+            'dismissal_date': date(2022, 12, 31),
+        }]).action_register()
+        self.assertFalse(slot.resource_ids, "Resource of the shift should be open")
         self.assertEqual(slot.sale_line_id, self.sale_order_line1, "Project should be the same")
         self.assertEqual(slot.project_id, self.sale_order_line1.project_id, "SOL should be the same")

@@ -2,28 +2,42 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import Command, models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class AccountPayment(models.Model):
     _inherit = "account.payment"
 
     batch_payment_id = fields.Many2one('account.batch.payment', ondelete='set null', copy=False, index='btree_not_null')
-    amount_signed = fields.Monetary(
-        currency_field='currency_id', compute='_compute_amount_signed',
-        help='Negative value of amount field if payment_type is outbound')
     payment_method_name = fields.Char(related='payment_method_line_id.name')
+    batch_payments_count = fields.Char(compute='_compute_batch_payments_count')
+    show_download_xml_button = fields.Boolean(compute='_compute_show_download_xml_button')
 
-    @api.depends('amount', 'payment_type')
-    def _compute_amount_signed(self):
+    @api.depends('batch_payment_id.payment_ids')
+    def _compute_batch_payments_count(self):
         for payment in self:
-            if payment.payment_type == 'outbound':
-                payment.amount_signed = -payment.amount
-            else:
-                payment.amount_signed = payment.amount
+            payment.batch_payments_count = len(payment.batch_payment_id.payment_ids)
+
+    @api.depends('payment_type', 'payment_method_line_id.code')
+    def _compute_show_download_xml_button(self):
+        exportable_method_codes = self.env['account.batch.payment']._get_methods_generating_files()
+        for payment in self:
+            payment.show_download_xml_button = (
+                payment.payment_type == 'outbound'
+                and payment.payment_method_line_id.code in exportable_method_codes
+            )
+
+    def _create_and_validate_batch_payment(self, initiate_payment=False):
+        batch_payment_action = self.create_batch_payment()
+        if batch_payment_action['res_model'] != 'account.batch.payment':
+            return self.env['account.batch.payment'], batch_payment_action
+
+        batch_payment = self.batch_payment_id
+        return batch_payment, batch_payment.validate_batch(initiate_payment=initiate_payment)
 
     @api.model
     def create_batch_payment(self):
-        valid_payment_states = self.env['account.batch.payment']._valid_payment_states()
+        valid_payment_states = ['draft', *self._valid_payment_states()]
         if any(payment.state not in valid_payment_states for payment in self):
             create_batch_error_wizard = self.env['account.create.batch.error.wizard'].create({'payment_ids': [Command.set(self.ids)]})
             return {
@@ -85,3 +99,36 @@ class AccountPayment(models.Model):
                     message_type='comment',
                 )
         return result
+
+    def action_download_xml(self):
+        if not self:
+            raise UserError(self.env._("You must select at least one payment to generate a file."))
+
+        if any(payment.payment_type != 'outbound' for payment in self):
+            raise UserError(self.env._("Only outbound payments can be exported."))
+
+        if len(self.journal_id) > 1:
+            raise UserError(self.env._("You can't generate a file for payments from more than one journal."))
+
+        if len(self.payment_method_line_id) > 1:
+            raise UserError(self.env._("All payments must have the same payment method."))
+
+        if self.payment_method_line_id.code not in self.env['account.batch.payment']._get_methods_generating_files():
+            raise UserError(self.env._("Selected payments include methods that cannot generate a file."))
+
+        self.action_post()
+
+        batch_payment, batch_payment_action = self._create_and_validate_batch_payment()
+        if not batch_payment:
+            return batch_payment_action
+        if batch_payment_action and batch_payment_action.get('res_model') == 'account.batch.error.wizard':
+            return batch_payment_action
+
+        if not batch_payment.export_file_attachment_id:
+            batch_payment.with_context(xml_export=True).export_batch_payment()
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{batch_payment.export_file_attachment_id.id}?download=true',
+            'close': True,
+        }

@@ -7,31 +7,10 @@ patch(accountTourSteps, {
     goToAccountMenu(description="Open Accounting Menu") {
         return stepUtils.goToAppSteps('accountant.menu_accounting', description);
     },
-    onboarding() {
-        return [
-            {
-                trigger: ".o_widget_account_onboarding .fa-circle",
-            },
-            {
-                trigger: "a[data-method=action_open_step_fiscal_year]",
-                content: _t("Set Periods"),
-                run: "click",
-            },
-            {
-                trigger: "input[data-field=opening_date]",
-                run: "edit 2025-01-01",
-            },
-            {
-                trigger: "button[name=action_save_onboarding_fiscal_year]",
-                content: _t("Save Fiscal Year end"),
-                run: "click",
-            },
-        ];
-    },
     newInvoice() {
         return [
             {
-                trigger: ".o_widget_account_onboarding .fa-check-circle",
+                trigger: ".o_widget_account_onboarding [data-icon='circle'].oi-filled",
             },
             {
                 trigger: "button[name=action_create_new]",

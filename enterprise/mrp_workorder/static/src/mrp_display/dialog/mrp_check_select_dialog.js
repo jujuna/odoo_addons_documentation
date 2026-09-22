@@ -1,13 +1,17 @@
-import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { useProps, t } from "@odoo/owl";
+import {
+    ConfirmationDialog,
+    confirmationDialogProps,
+} from "@web/core/confirmation_dialog/confirmation_dialog";
 
 export class MrpQualityCheckSelectDialog extends ConfirmationDialog {
     static template = "mrp_workorder.MrpQualityCheckSelectDialog";
-    static props = {
-        ...ConfirmationDialog.props,
-        body: { type: String, optional: true },
-        checks: { type: Array, optional: true },
-        type: { type: String, optional: true },
-    };
+    props = useProps({
+        ...confirmationDialogProps,
+        body: t.string().optional(),
+        checks: t.array().optional(),
+        type: t.string().optional(),
+    });
 
     setup() {
         super.setup();

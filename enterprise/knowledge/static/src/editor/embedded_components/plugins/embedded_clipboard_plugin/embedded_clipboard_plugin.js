@@ -14,7 +14,8 @@ export class EmbeddedClipboardPlugin extends Plugin {
                 id: "insertClipboard",
                 title: _t("Clipboard"),
                 description: _t("Add a clipboard section"),
-                icon: "fa-pencil-square",
+                icon: "edit_square",
+                iconClass: "oi-filled",
                 run: this.insertClipboard.bind(this),
                 isAvailable: isHtmlContentSupported,
             },
@@ -44,6 +45,6 @@ export class EmbeddedClipboardPlugin extends Plugin {
         this.dependencies.selection.setCursorStart(
             clipboardBlock.querySelector(baseContainerSelector)
         );
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
 }

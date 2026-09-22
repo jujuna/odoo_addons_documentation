@@ -8,7 +8,7 @@ function setFormActionToCreateOpportunity() {
     return [
         {
             content: "Select contact form",
-            trigger: ":iframe #wrap.o_editable section.s_website_form",
+            trigger: ":iframe #wrap.o_savable section.s_website_form",
             run: "click",
         },
         {
@@ -17,7 +17,7 @@ function setFormActionToCreateOpportunity() {
         {
             content: "Open action select",
             trigger:
-                ".o-snippets-menu [data-container-title='Block'] [data-label='Action'] .dropdown-toggle",
+                ".o-snippets-menu [data-container-title='Form'] [data-label='Action'] .dropdown-toggle",
             run: "click",
         },
         {
@@ -31,7 +31,6 @@ function setFormActionToCreateOpportunity() {
 registerWebsitePreviewTour(
     "website_crm_pre_tour",
     {
-        url: "/contactus",
         edition: true,
     },
     () => [
@@ -45,7 +44,6 @@ registerWebsitePreviewTour(
 );
 
 registry.category("web_tour.tours").add('website_crm_tour', {
-    url: '/contactus',
     steps: () => [{
     content: "Complete name",
     trigger: "input[name=contact_name]",
@@ -81,11 +79,11 @@ registry.category("web_tour.tours").add('website_crm_tour', {
 }]});
 
 registry.category("web_tour.tours").add('website_crm_catch_logged_partner_info_tour', {
-    url: '/contactus',
     steps: () => [
 {
-    content: "Wait the form is patched with values before continue to edit it",
-    trigger: "form#contactus_form input[name=partner_name]:value(yourcompany)",
+    content: "Fill Company Name",
+    trigger: "form#contactus_form input[name=partner_name]",
+    run: "edit Useless Company"
 },
 {
     content: "Complete Subject",
@@ -109,7 +107,6 @@ registry.category("web_tour.tours").add('website_crm_catch_logged_partner_info_t
 registerWebsitePreviewTour(
     "website_crm_form_properties",
     {
-        url: "/contactus",
         edition: true,
     },
     () => [
@@ -117,7 +114,7 @@ registerWebsitePreviewTour(
         {
             content: "Open Sales Team select",
             trigger:
-                ".o-snippets-menu [data-container-title='Block'] [data-label='Sales Team'] .dropdown-toggle",
+                ".o-snippets-menu [data-container-title='Form'] [data-label='Sales Team'] .dropdown-toggle",
             run: "click",
         },
         {
@@ -136,7 +133,7 @@ registerWebsitePreviewTour(
         },
         {
             content: "Open field Type selector",
-            trigger: "[data-container-title=Field] button#type_opt",
+            trigger: "[data-container-title=Field] [data-label=Type] button",
             run: "click",
         },
         {

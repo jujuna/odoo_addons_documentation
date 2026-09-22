@@ -22,11 +22,14 @@ def _account_accountant_post_init(env):
         if module_ids:
             module_ids.sudo().button_install()
 
-    for company in env['res.company'].search([('chart_template', '!=', False)], order="parent_path"):
-        ChartTemplate = env['account.chart.template'].with_company(company)
-        ChartTemplate._load_data({
-            'res.company': ChartTemplate._get_account_accountant_res_company(company.chart_template),
-        })
+    env['account.chart.template']._load_pre_defined_data({
+        'res.company': {
+            'deferred_expense_journal_id',
+            'deferred_revenue_journal_id',
+            'deferred_expense_account_id',
+            'deferred_revenue_account_id',
+        },
+    })
 
 
 def uninstall_hook(env):

@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
-
-import base64
 import io
 
 from odoo import Command
-from odoo.exceptions import AccessError, UserError
-from odoo.tools import file_open, mute_logger
+from odoo.exceptions import AccessError
+from odoo.tools import file_open
 from odoo.tools.pdf import OdooPdfFileWriter
+from odoo.tests import tagged
+
 from odoo.addons.sign.tests.sign_request_common import SignRequestCommon
 
-GIF = b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs="
 
-
+@tagged('post_install', '-at_install')
 class TestCaseDocumentsBridgeSign(SignRequestCommon):
     """
 
@@ -32,32 +30,63 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
             'folder_id': self.folder_a.id,
         })
         self.documents = self.env['documents.document'].create([{
-            'datas': base64.encodebytes(pdf_content),
+            'raw': pdf_content,
             'name': f'file_{idx}.pdf',
             'folder_id': self.folder_a_a.id,
         } for idx in range(2)])
         self.document_pdf_0 = self.documents[0]
+
+    def _create_and_sign_document(self, template=None):
+        """Helper to create and sign a document."""
+        if not template:
+            action = self.document_pdf_0.document_sign_create_sign_template()
+            template = self.env['sign.template'].browse(action.get('params', {}).get('id'))
+
+        document = self.env['sign.document'].search([('template_id', '=', template.id)], limit=1)
+        self.env['sign.item'].create({
+            'type_id': self.env.ref('sign.sign_item_type_text').id,
+            'required': True,
+            'responsible_id': self.env.ref('sign.sign_item_role_default').id,
+            'page': 1,
+            'posX': 0.273,
+            'posY': 0.158,
+            'document_id': document.id,
+            'width': 0.150,
+            'height': 0.015,
+        })
+        sign_request = self.env['sign.request'].create({
+            'template_id': template.id,
+            'reference': template.display_name,
+            'request_item_ids': [Command.create({
+                'partner_id': self.partner_1.id,
+                'role_id': self.env.ref('sign.sign_item_role_default').id,
+            })],
+        })
+        sign_values = self.create_sign_values(template.sign_item_ids, self.env.ref('sign.sign_item_role_default').id)
+        with self.allow_pdf_render():
+            sign_request.request_item_ids[0].with_context(force_report_rendering=True).sign(sign_values)
+
+        return sign_request
 
     def test_bridge_folder_workflow(self):
         """
         tests the create new business model (sign).
         """
         self.assertFalse(self.document_pdf_0.res_model)
-        self.documents.document_sign_create_sign_template(self.folder_a.id)
-        self.assertEqual(self.document_pdf_0.res_model, 'sign.document',
-                            "failed at workflow_bridge_dms_sign new res_model")
-        document = self.env['sign.document'].search([('id', '=', self.document_pdf_0.res_id)])
-        template = self.env['sign.template'].search([('document_ids', 'in', document.id)])
+        action = self.documents.document_sign_create_sign_template(self.folder_a.id)
+        self.assertFalse(self.document_pdf_0.res_model)
+        template_id = action.get('params', {}).get('id')
+        template = self.env['sign.template'].browse(template_id)
+        document = self.env['sign.document'].search([('template_id', '=', template.id)], limit=1)
         self.assertTrue(document.exists(), 'failed at workflow_bridge_dms_account template')
         self.assertTrue(template.exists(), 'failed at workflow_bridge_dms_account template')
 
-    @mute_logger('odoo.addons.documents.models.documents_document', 'pypdf._reader')
     def test_sign_action(self):
         """ Test sign a document from Document app using the workflow rule. """
-        self.document_pdf_0.document_sign_create_sign_template(self.folder_a.id)
-        self.assertEqual(self.document_pdf_0.res_model, 'sign.document')
-        document = self.env['sign.document'].search([('id', '=', self.document_pdf_0.res_id)])
-        template = self.env['sign.template'].search([('document_ids', 'in', document.id)])
+        action = self.document_pdf_0.document_sign_create_sign_template(self.folder_a.id)
+        template_id = action.get('params', {}).get('id')
+        template = self.env['sign.template'].browse(template_id)
+        document = self.env['sign.document'].search([('template_id', '=', template.id)], limit=1)
 
         # Create a sign item directly for the new template
         self.env['sign.item'].create({
@@ -83,12 +112,12 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
         sign_request_item = sign_request.request_item_ids[0]
         sign_values = self.create_sign_values(template.sign_item_ids, self.env.ref('sign.sign_item_role_default').id)
 
-        sign_request_item.sign(sign_values)
+        with self.allow_pdf_render():
+            sign_request_item.with_context(force_report_rendering=True).sign(sign_values)
         self.assertEqual(sign_request_item.state, 'completed', 'The sign.request.item should be completed')
 
-    @mute_logger("odoo.addons.documents.models.documents_document", 'pypdf._reader')  # avoid warning about counting page of PDFs
     def test_signed_documents_access_rights(self):
-        """ Test access rights and owner of signed/certificate documents. """
+        """ Test access rights and owner of signed documents. """
         Document = self.env["documents.document"]
         Partner = self.env["res.partner"]
         User = self.env["res.users"]
@@ -110,15 +139,16 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
             with self.subTest(user_name=user.name):
                 sign_request = self.create_sign_request_1_role(user.partner_id, Partner)
                 # See /sign/sign/<int:sign_request_id>/<token> controller
-                sign_request.request_item_ids[0].with_user(user).sudo().sign(
-                    {str(self.template_1_role.sign_item_ids[0].id): "Test Sign"})
+                with self.allow_pdf_render():
+                    sign_request.request_item_ids[0].with_user(user).sudo().with_context(force_report_rendering=True).sign(
+                        {str(self.template_1_role.sign_item_ids[0].id): "Test Sign"})
                 self.env['documents.access'].invalidate_model()
                 documents_signed = Document.search(
                     [('res_model', '=', 'sign.request'), ('res_id', '=', sign_request.id)])
                 all_documents_signed |= documents_signed
-                self.assertEqual(len(documents_signed), 2)
+                self.assertEqual(len(documents_signed), 1)
                 self.assertFalse(documents_signed.owner_id,
-                                 "Owner of the signed/certificate documents must be false.")
+                                 "Owner of the signed documents must be false.")
                 for doc in documents_signed:
                     self.assertEqual(doc.access_via_link, "none")
                     self.assertEqual(doc.access_internal, "none")
@@ -146,7 +176,7 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
                         doc.with_user(user).write({"name": "New name"})
 
         # user_sign_manager have edit access on all the signed documents
-        self.assertEqual(len(all_documents_signed), 8)
+        self.assertEqual(len(all_documents_signed), 4)
         for doc in all_documents_signed:
             doc.with_user(user_sign_manager).name = "Name overridden by the manager"
 
@@ -155,20 +185,20 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
         Ensures that when documents have identical checksums, the sign request is 
         only linked to the document it originated from."""
         writer = OdooPdfFileWriter()
-        writer.addBlankPage(width=200, height=200)
+        writer.add_blank_page(width=200, height=200)
         stream = io.BytesIO()
         writer.write(stream)
         # create a document
         self.env['documents.document'].create({
             'name': 'another.pdf',
-            'datas': base64.b64encode(stream.getvalue()),
+            'raw': stream.getvalue(),
             'access_internal': 'view',
             'folder_id': self.folder_a_a.id,
         })
         # create a document to sign with the same content
         document_to_sign = self.env['documents.document'].create({
             'name': 'test.pdf',
-            'datas': base64.b64encode(stream.getvalue()),
+            'raw': stream.getvalue(),
             'access_internal': 'view',
             'folder_id': self.folder_a_a.id,
         })
@@ -178,7 +208,7 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
             with self.with_user(self.user_1.login):
                 attachment = self.env['ir.attachment'].create({
                     'name': 'test.pdf',
-                    'datas': base64.b64encode(stream.getvalue()),
+                    'raw': stream.getvalue(),
                     'mimetype': 'application/pdf',
                 })
                 template = self.env['sign.template'].create({
@@ -196,7 +226,6 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
                     'signer_id': self.user_1.partner_id.id,
                 })
                 unrelated_request = wizard.create_request()
-                wizard._create_request_log_note(unrelated_request)
             self.assertIsNone(unrelated_request.reference_doc, "Sign request should not be linked to unrelated documents")
 
         with self.subTest("Ensure sign request links to the correct document"):
@@ -210,24 +239,24 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
                 'signer_id': self.env.user.partner_id.id,
             })
             related_request = wizard.create_request()
-            wizard._create_request_log_note(related_request)
             # Verify that the request got linked to the document_to_sign
             self.assertEqual(related_request.reference_doc, document_to_sign)
 
     def test_import_document(self):
         """
         This test verifies that a user can import a document from the Documents app
-        and create a sign template from it by calling the action_import_and_create method.
+        and create a sign template through `action_import_and_create` and stores the final
+        signed document in the Sign folder instead of the original Documents folder.
         """
         writer = OdooPdfFileWriter()
-        writer.addBlankPage(width=200, height=200)
+        writer.add_blank_page(width=200, height=200)
         stream = io.BytesIO()
         writer.write(stream)
 
         # Create a document
         document = self.env['documents.document'].create({
             'name': 'test_import_document.pdf',
-            'datas': base64.b64encode(stream.getvalue()),
+            'raw': stream.getvalue(),
             'access_internal': 'view',
             'folder_id': self.folder_a_a.id,
         })
@@ -249,7 +278,16 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
         template = self.env['sign.template'].browse(result['params']['id'])
         self.assertTrue(template.exists(), "Sign template should be created")
 
-    @mute_logger("odoo.addons.documents.models.documents_document")
+        sign_request = self._create_and_sign_document(template)
+        signed_docs = self.env['documents.document'].search([
+            ('res_model', '=', 'sign.request'), ('res_id', '=', sign_request.id),
+        ])
+        self.assertEqual(len(signed_docs), 1, "Exactly one signed document should be created")
+        self.assertEqual(signed_docs.folder_id, self.env.ref('documents_sign.document_sign_folder', raise_if_not_found=False),
+                         "Signed document should be placed in the Sign folder")
+        self.assertNotEqual(signed_docs.folder_id, self.folder_a_a,
+                            "Signed document must NOT be placed in the original document's folder")
+
     def test_signed_document_requester_access(self):
         """ Verifies that the requester of a sign request has at least view access to the signed document. """
         Document = self.env["documents.document"]
@@ -272,14 +310,31 @@ class TestCaseDocumentsBridgeSign(SignRequestCommon):
                 'role_id': self.role_signer_1.id,
             })],
         })
-        sign_request.request_item_ids[0].with_user(signer).sudo().sign(
-            {str(self.template_1_role.sign_item_ids[0].id): "Test Sign"})
+        with self.allow_pdf_render():
+            sign_request.request_item_ids[0].with_user(signer).sudo().with_context(force_report_rendering=True).sign(
+                {str(self.template_1_role.sign_item_ids[0].id): "Test Sign"})
         documents_signed = Document.search(
             [('res_model', '=', 'sign.request'), ('res_id', '=', sign_request.id)])
-        self.assertEqual(len(documents_signed), 2)
+        self.assertEqual(len(documents_signed), 1)
         for doc in documents_signed:
             # The requester has view access to the signed document
             access_by_partner = doc.access_ids.grouped('partner_id')
             requester_access = access_by_partner[requester.partner_id]
             self.assertIsNotNone(requester_access, "The requester should have access to the signed document")
             doc.with_user(requester).check_access('read')
+
+    def test_documents_flow_signed_doc_in_original_folder(self):
+        """Documents flow: the signed document must land in the same folder as
+        the original document, not be duplicated in the Sign template folder."""
+        sign_request = self._create_and_sign_document()
+
+        signed_docs = self.env['documents.document'].search([
+            ('res_model', '=', 'sign.request'), ('res_id', '=', sign_request.id),
+        ])
+        self.assertEqual(len(signed_docs), 1, "Exactly one signed document should be created")
+        self.assertEqual(signed_docs.folder_id, self.folder_a_a,
+                         "Signed document should be placed in the same folder as the original")
+        self.assertNotEqual(
+            signed_docs.folder_id, self.env.ref('documents_sign.document_sign_folder', raise_if_not_found=False),
+            "Signed document must NOT be placed in the Sign template folder",
+        )

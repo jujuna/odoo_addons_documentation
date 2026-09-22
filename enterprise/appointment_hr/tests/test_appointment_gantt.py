@@ -1,14 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime, timedelta
 import itertools
-import pytz
+from datetime import datetime, timedelta, UTC
 
-from odoo.tests import users
+from odoo.tests import tagged, users
 from odoo.addons.appointment.tests.test_appointment_gantt import AppointmentGanttTestCommon
 from odoo.tools.intervals import Intervals
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class AppointmentHRGanttTest(AppointmentGanttTestCommon):
     @classmethod
     def setUpClass(cls):
@@ -18,12 +18,12 @@ class AppointmentHRGanttTest(AppointmentGanttTestCommon):
             'resource_calendar_id': cls.env['resource.calendar'].create({
                 'name': 'Appointment Gantt User Calendar',
                 'attendance_ids': [
-                    (0, 0, {'name': 'Monday Morning', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
-                    (0, 0, {'name': 'Monday Lunch', 'dayofweek': '0', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
-                    (0, 0, {'name': 'Monday Afternoon', 'dayofweek': '0', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
+                    (0, 0, {'dayofweek': '0', 'hour_from': 8, 'hour_to': 12}),
+                    (0, 0, {'dayofweek': '0', 'hour_from': 13, 'hour_to': 17}),
                 ],
             }).id,
             'user_id': cls.user_bob.id,
+            'tz': 'Europe/Brussels'
         })
 
     @users('apt_manager', 'staff_user_bxls')
@@ -36,27 +36,27 @@ class AppointmentHRGanttTest(AppointmentGanttTestCommon):
 
         # inverted time slots over the test interval (0 -> 23)
         appointment_slot_unavailabilities = Intervals([(
-            datetime(2022, 2, 14, 0, 0, tzinfo=pytz.UTC),
-            datetime(2022, 2, 14, 9, 0, tzinfo=pytz.UTC),
+            datetime(2022, 2, 14, 0, 0, tzinfo=UTC),
+            datetime(2022, 2, 14, 9, 0, tzinfo=UTC),
             set(),
         ), (
-            datetime(2022, 2, 14, 12, 0, tzinfo=pytz.UTC),
-            datetime(2022, 2, 14, 14, 0, tzinfo=pytz.UTC),
+            datetime(2022, 2, 14, 12, 0, tzinfo=UTC),
+            datetime(2022, 2, 14, 14, 0, tzinfo=UTC),
             set(),
         ), (
-            datetime(2022, 2, 14, 17, 0, tzinfo=pytz.UTC),
-            datetime(2022, 2, 14, 23, 0, tzinfo=pytz.UTC),
+            datetime(2022, 2, 14, 17, 0, tzinfo=UTC),
+            datetime(2022, 2, 14, 23, 0, tzinfo=UTC),
             set(),
         )])
         base_bob_unavailabilities = [{
-            'start': self.reference_monday.replace(hour=0, minute=0, tzinfo=pytz.UTC),
-            'stop': self.reference_monday.replace(hour=7, minute=0, tzinfo=pytz.UTC),
+            'start': self.reference_monday.replace(hour=0, minute=0, tzinfo=UTC),
+            'stop': self.reference_monday.replace(hour=7, minute=0, tzinfo=UTC),
         }, {
-            'start': self.reference_monday.replace(hour=11, minute=0, tzinfo=pytz.UTC),
-            'stop': self.reference_monday.replace(hour=12, minute=0, tzinfo=pytz.UTC)
+            'start': self.reference_monday.replace(hour=11, minute=0, tzinfo=UTC),
+            'stop': self.reference_monday.replace(hour=12, minute=0, tzinfo=UTC)
         }, {
-            'start': self.reference_monday.replace(hour=16, minute=0, tzinfo=pytz.UTC),
-            'stop': self.reference_monday.replace(hour=23, minute=0, tzinfo=pytz.UTC)
+            'start': self.reference_monday.replace(hour=16, minute=0, tzinfo=UTC),
+            'stop': self.reference_monday.replace(hour=23, minute=0, tzinfo=UTC)
         }]
 
         # clean up between @users subtests
@@ -105,15 +105,15 @@ class AppointmentHRGanttTest(AppointmentGanttTestCommon):
                 john_unavailabilities = []
                 if with_meeting:
                     all_company_unavailability = {
-                        'start': self.reference_monday.replace(hour=14, tzinfo=pytz.UTC),
-                        'stop': self.reference_monday.replace(hour=14, tzinfo=pytz.UTC) + timedelta(hours=1),
+                        'start': self.reference_monday.replace(hour=14, tzinfo=UTC),
+                        'stop': self.reference_monday.replace(hour=14, tzinfo=UTC) + timedelta(hours=1),
                     }
                     bob_unavailabilities.append(all_company_unavailability)
                     john_unavailabilities.append(all_company_unavailability)
                 if with_leave:
                     bob_unavailabilities.append({
-                        'start': self.reference_monday.replace(hour=9, tzinfo=pytz.UTC),
-                        'stop': self.reference_monday.replace(hour=9, tzinfo=pytz.UTC) + timedelta(hours=1),
+                        'start': self.reference_monday.replace(hour=9, tzinfo=UTC),
+                        'stop': self.reference_monday.replace(hour=9, tzinfo=UTC) + timedelta(hours=1),
                     })
                 if specific_apt_type:
                     bob_unavailabilities = [{'start': start, 'stop': stop} for start, stop, _ in Intervals([

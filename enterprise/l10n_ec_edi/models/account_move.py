@@ -103,7 +103,6 @@ class AccountMove(models.Model):
         copy=False, readonly=True, tracking=True,
         help="Ecuador: Date on which government authorizes the document, unset if document is cancelled.",
     )
-    l10n_latam_internal_type = fields.Selection(related='l10n_latam_document_type_id.internal_type')
 
     # ===== WITHHOLD fields =====
     l10n_ec_withhold_type = fields.Selection(related='journal_id.l10n_ec_withhold_type')
@@ -161,7 +160,7 @@ class AccountMove(models.Model):
         help='List of purchase invoices used in this reimbursement'
     )
 
-    reimbursement_totals = fields.Binary(
+    reimbursement_totals = fields.Json(
         compute='_compute_l10n_ec_reimbursement_totals',
         exportable=False,
         help='Functional fields to calculate amount totals.'
@@ -349,6 +348,38 @@ class AccountMove(models.Model):
             withhold.l10n_ec_is_dividend_withhold = '10' in withhold.l10n_ec_withhold_line_ids.mapped(
                 'l10n_ec_code_taxsupport')
 
+    # ===== ALERTS =====
+
+    @api.depends(
+        'move_type',
+        'l10n_latam_document_type_id.internal_type',
+        'journal_id.edi_format_ids',
+        'journal_id.l10n_ec_withhold_type',
+        'company_id.l10n_ec_edi_provider_id.vat',
+    )
+    def _compute_alerts(self):
+        # EXTENDS account, add the dependencies of the Ecuadorian alerts
+        super()._compute_alerts()
+
+    def _get_alerts(self):
+        # EXTENDS account
+        alerts = super()._get_alerts()
+        if (
+            self.country_code == 'EC'
+            and any(
+                edi_format.code == 'ecuadorian_edi' and edi_format._get_move_applicability(self)
+                for edi_format in self.journal_id.edi_format_ids
+            )
+            and not self.company_id._l10n_ec_is_provider_vat_valid()
+        ):
+            alerts['l10n_ec_edi_missing_provider_vat'] = {
+                'level': 'warning',
+                'message': self.env._("The contact selected in the Software Provider field must have a valid 13-digit RUC"),
+                'action_text': self.env._("Configure"),
+                'action': self.env.ref('account.action_account_config')._get_action_dict(),
+            }
+        return alerts
+
     # ===== BUTTONS =====
 
     def action_print_pdf(self):
@@ -523,7 +554,7 @@ class AccountMove(models.Model):
     def _is_manual_document_number(self):
         # EXTEND l10n_latam_invoice_document to exclude purchase liquidations and include sales withhold
         self.ensure_one()
-        if self.journal_id.company_id.account_fiscal_country_id.code == 'EC':
+        if self.journal_id.country_code == 'EC':
             if self.journal_id.l10n_ec_is_purchase_liquidation:
                 return False
         return super()._is_manual_document_number()
@@ -591,6 +622,7 @@ class AccountMove(models.Model):
             "Referencia": self.name,  # Reference
             "Vendedor": self.invoice_user_id.name or '',  # Salesperson
             "E-mail": self.invoice_user_id.email or '',
+            "RUC Proveedor": self.company_id.l10n_ec_edi_provider_id.vat or '',
         }
 
     def _l10n_ec_get_taxes_grouped(self, extra_group='tax_group'):
@@ -658,6 +690,8 @@ class AccountMove(models.Model):
             data["Email"] = self.commercial_partner_id.email
         if self.commercial_partner_id.phone:
             data['Telefono'] = self.commercial_partner_id.phone
+        if provider_vat := self.company_id.l10n_ec_edi_provider_id.vat:
+            data["RUC Proveedor"] = provider_vat
         return data
 
     def _l10n_ec_get_withhold_edi_data(self):

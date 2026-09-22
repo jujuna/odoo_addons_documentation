@@ -1,4 +1,4 @@
-import { useSubEnv, onWillRender, onWillDestroy } from "@odoo/owl";
+import { onWillDestroy } from "@odoo/owl";
 import { KanbanController } from "@web/views/kanban/kanban_controller";
 import { makeActiveField } from "@web/model/relational_model/utils";
 import { useService } from "@web/core/utils/hooks";
@@ -13,30 +13,18 @@ export class BankRecKanbanController extends KanbanController {
         super.setup();
         this.orm = useService("orm");
         this.bankReconciliation = useBankReconciliation();
-        useSubEnv({
-            bus: this.bankReconciliation.bus,
-        });
         useHotkey("alt+shift+c", () => this.bankReconciliation.toggleChatter(), {
             bypassEditableProtection: true,
-            withOverlay: () => this.rootRef.el.querySelector(".bank-chatter-btn"),
+            withOverlay: () => this.rootRef().querySelector(".bank-chatter-btn"),
         });
-        onWillRender(() => { user.updateContext({ from_bank_reco : true }) });
-        onWillDestroy(() => { user.updateContext({ from_bank_reco : false }) });
+        user.updateContext({ from_bank_reco: true, auto_statement_processing: true });
+        onWillDestroy(() => {
+            user.updateContext({ from_bank_reco: false, auto_statement_processing: false });
+        });
     }
 
     async createRecord() {
-        this.env.bus.trigger("createRecordQuickCreate");
-    }
-
-    getCheckedField() {
-        return {
-            fields: {
-                checked: { name: "checked", type: "char", }
-            },
-            activeFields : {
-                checked: makeActiveField(),
-            }
-        }
+        this.quickCreateState.openQuickCreate();
     }
 
     get modelParams() {
@@ -46,27 +34,16 @@ export class BankRecKanbanController extends KanbanController {
             fields: {
                 id: { name: "id", type: "int" },
                 display_name: { name: "display_name", type: "char" },
-                attachment_ids: { name: "attachment_ids", type: "one2many" },
-                checked: { name: "checked", type: "char" },
+                review_state: { name: "review_state", type: "char" },
+                inalterable_hash: { name: "inalterable_hash", type: "char" },
             },
             activeFields: {
-                attachment_ids: makeActiveField(),
-                checked: makeActiveField(),
+                review_state: makeActiveField(),
+                inalterable_hash: makeActiveField(),
             },
         };
-        params.config.activeFields.bank_statement_attachment_ids = makeActiveField();
-        params.config.activeFields.bank_statement_attachment_ids.related = {
-            fields: {
-                id: { name: "id", type: "int" },
-                display_name: { name: "display_name", type: "char" },
-            },
-            activeFields: {
-                id: makeActiveField(),
-                display_name: makeActiveField(),
-            },
-        };
-        params.config.activeFields.attachment_ids = makeActiveField();
         params.config.activeFields.partner_id = makeActiveField();
+        params.config.activeFields.statement_line_attachment_ids = makeActiveField();
         params.config.activeFields.partner_id.related = {
             fields: {
                 id: { name: "id", type: "int" },
@@ -91,7 +68,31 @@ export class BankRecKanbanController extends KanbanController {
                 supplier_rank: makeActiveField(),
             },
         };
-
+        params.config.activeFields.currency_id = makeActiveField();
+        params.config.activeFields.currency_id.related = {
+            fields: {
+                id: { name: "id", type: "int" },
+                display_name: { name: "display_name", type: "char" },
+                decimal_places: { name: "decimal_places", type: "int" },
+            },
+            activeFields: {
+                id: makeActiveField(),
+                display_name: makeActiveField(),
+                decimal_places: makeActiveField(),
+            },
+        };
+        params.config.activeFields.foreign_currency_id.related = {
+            fields: {
+                id: { name: "id", type: "int" },
+                display_name: { name: "display_name", type: "char" },
+                decimal_places: { name: "decimal_places", type: "int" },
+            },
+            activeFields: {
+                id: makeActiveField(),
+                display_name: makeActiveField(),
+                decimal_places: makeActiveField(),
+            },
+        };
         params.config.activeFields.line_ids = makeActiveField();
         params.config.activeFields.line_ids.related = {
             fields: {
@@ -107,16 +108,20 @@ export class BankRecKanbanController extends KanbanController {
                 account_id: { name: "account_id", type: "many2one" },
                 partner_id: { name: "partner_id", type: "many2one" },
                 move_id: { name: "move_id", type: "many2one" },
-                move_attachment_ids: { name: "move_attachment_ids", type: "one2many" },
-                reconciled_lines_ids: { name: "reconciled_lines_ids", type: "many2many" },
-                reconciled_lines_excluding_exchange_diff_ids: {
-                    name: "reconciled_lines_excluding_exchange_diff_ids",
-                    type: "many2many",
+                first_reconciled_lines_id: { name: "first_reconciled_lines_id", type: "many2one" },
+                count_reconciled_lines: { name: "count_reconciled_lines", type: "int" },
+                first_reconciled_lines_excluding_exchange_diff_id: {
+                    name: "first_reconciled_lines_excluding_exchange_diff_id",
+                    type: "many2one",
                 },
-                matched_debit_ids: { name: "matched_debit_ids", type: "one2many" },
-                matched_credit_ids: { name: "matched_credit_ids", type: "one2many" },
+                count_reconciled_lines_excluding_exchange_diff: {
+                    name: "count_reconciled_lines_excluding_exchange_diff",
+                    type: "int",
+                },
+                exchange_move_ids: { name: "exchange_move_ids", type: "many2many" },
                 reconcile_model_id: { name: "reconcile_model_id", type: "many2one" },
                 has_invalid_analytics: { name: "has_invalid_analytics", type: "boolean" },
+                analytic_distribution: { name: "analytic_distribution", type: "jsonb" },
                 tax_line_id: { name: "tax_line_id", type: "many2one" },
                 tax_ids: { name: "tax_ids", type: "many2many" },
             },
@@ -133,126 +138,70 @@ export class BankRecKanbanController extends KanbanController {
                 account_id: makeActiveField(),
                 partner_id: makeActiveField(),
                 move_id: makeActiveField(),
-                move_attachment_ids: makeActiveField(),
-                reconciled_lines_ids: makeActiveField(),
-                reconciled_lines_excluding_exchange_diff_ids: makeActiveField(),
-                matched_debit_ids: makeActiveField(),
-                matched_credit_ids: makeActiveField(),
+                first_reconciled_lines_id: makeActiveField(),
+                count_reconciled_lines: makeActiveField(),
+                first_reconciled_lines_excluding_exchange_diff_id: makeActiveField(),
+                count_reconciled_lines_excluding_exchange_diff: makeActiveField(),
+                exchange_move_ids: makeActiveField(),
                 reconcile_model_id: makeActiveField(),
                 has_invalid_analytics: makeActiveField(),
+                analytic_distribution: makeActiveField(),
                 tax_line_id: makeActiveField(),
                 tax_ids: makeActiveField(),
             },
         };
-        params.config.activeFields.line_ids.related.activeFields.move_attachment_ids.related = {
+        params.config.activeFields.line_ids.related.activeFields.reconcile_model_id.related = {
             fields: {
                 id: { name: "id", type: "int" },
                 display_name: { name: "display_name", type: "char" },
+                is_asking_for_autopost: { name: "is_asking_for_autopost", type: "boolean" },
+                use_count: { name: "use_count", type: "integer" },
+                created_automatically: { name: "created_automatically", type: "boolean" },
+                rule_type: { name: "rule_type", type: "char" },
             },
             activeFields: {
                 id: makeActiveField(),
                 display_name: makeActiveField(),
+                is_asking_for_autopost: makeActiveField(),
+                use_count: makeActiveField(),
+                created_automatically: makeActiveField(),
+                rule_type: makeActiveField(),
             },
         };
-        params.config.activeFields.line_ids.related.activeFields.matched_debit_ids.related = {
+        params.config.activeFields.line_ids.related.activeFields.exchange_move_ids.related = {
             fields: {
                 id: { name: "id", type: "int" },
                 display_name: { name: "display_name", type: "char" },
-                exchange_move_id: { name: "exchange_move_id", type: "many2one" },
+                amount_total_signed: { name: "amount_total_signed", type: "float" },
             },
             activeFields: {
                 id: makeActiveField(),
                 display_name: makeActiveField(),
-                exchange_move_id: makeActiveField(),
+                amount_total_signed: makeActiveField(),
             },
         };
-        params.config.activeFields.line_ids.related.activeFields.matched_debit_ids.related.activeFields.exchange_move_id.related =
+        params.config.activeFields.line_ids.related.activeFields.first_reconciled_lines_id.related =
             {
                 fields: {
                     id: { name: "id", type: "int" },
                     display_name: { name: "display_name", type: "char" },
-                    line_ids: { name: "line_ids", type: "one2many" },
+                    move_name: { name: "move_name", type: "char" },
+                    move_id: { name: "move_id", type: "many2one" },
+                    full_reconcile_id: { name: "full_reconcile_id", type: "many2one" },
+                    amount_currency: { name: "amount_currency", type: "monetary" },
+                    currency_id: { name: "currency_id", type: "many2one" },
                 },
                 activeFields: {
                     id: makeActiveField(),
                     display_name: makeActiveField(),
-                    line_ids: makeActiveField(),
+                    move_name: makeActiveField(),
+                    move_id: makeActiveField(),
+                    full_reconcile_id: makeActiveField(),
+                    amount_currency: makeActiveField(),
+                    currency_id: makeActiveField(),
                 },
             };
-        params.config.activeFields.line_ids.related.activeFields.matched_debit_ids.related.activeFields.exchange_move_id.related.activeFields.line_ids.related =
-            {
-                fields: {
-                    id: { name: "id", type: "int" },
-                    display_name: { name: "display_name", type: "char" },
-                    balance: { name: "balance", type: "monetary" },
-                },
-                activeFields: {
-                    id: makeActiveField(),
-                    display_name: makeActiveField(),
-                    balance: makeActiveField(),
-                },
-            };
-        params.config.activeFields.line_ids.related.activeFields.matched_credit_ids.related = {
-            fields: {
-                id: { name: "id", type: "int" },
-                display_name: { name: "display_name", type: "char" },
-                exchange_move_id: { name: "exchange_move_id", type: "many2one" },
-            },
-            activeFields: {
-                id: makeActiveField(),
-                display_name: makeActiveField(),
-                exchange_move_id: makeActiveField(),
-            },
-        };
-        params.config.activeFields.line_ids.related.activeFields.matched_credit_ids.related.activeFields.exchange_move_id.related =
-            {
-                fields: {
-                    id: { name: "id", type: "int" },
-                    display_name: { name: "display_name", type: "char" },
-                    line_ids: { name: "line_ids", type: "one2many" },
-                },
-                activeFields: {
-                    id: makeActiveField(),
-                    display_name: makeActiveField(),
-                    line_ids: makeActiveField(),
-                },
-            };
-        params.config.activeFields.line_ids.related.activeFields.matched_credit_ids.related.activeFields.exchange_move_id.related.activeFields.line_ids.related =
-            {
-                fields: {
-                    id: { name: "id", type: "int" },
-                    display_name: { name: "display_name", type: "char" },
-                    balance: { name: "balance", type: "monetary" },
-                },
-                activeFields: {
-                    id: makeActiveField(),
-                    display_name: makeActiveField(),
-                    balance: makeActiveField(),
-                },
-            };
-        params.config.activeFields.line_ids.related.activeFields.reconciled_lines_ids.related = {
-            fields: {
-                id: { name: "id", type: "int" },
-                display_name: { name: "display_name", type: "char" },
-                move_name: { name: "move_name", type: "char" },
-                move_id: { name: "move_id", type: "many2one" },
-                amount_currency: { name: "amount_currency", type: "monetary" },
-                full_reconcile_id: { name: "full_reconcile_id", type: "many2one" },
-                currency_id: { name: "currency_id", type: "many2one" },
-                move_attachment_ids: { name: "move_attachment_ids", type: "one2many" },
-            },
-            activeFields: {
-                id: makeActiveField(),
-                display_name: makeActiveField(),
-                move_name: makeActiveField(),
-                move_id: makeActiveField(),
-                amount_currency: makeActiveField(),
-                full_reconcile_id: makeActiveField(),
-                currency_id: makeActiveField(),
-                move_attachment_ids: makeActiveField(),
-            },
-        };
-        params.config.activeFields.line_ids.related.activeFields.reconciled_lines_excluding_exchange_diff_ids.related =
+        params.config.activeFields.line_ids.related.activeFields.first_reconciled_lines_excluding_exchange_diff_id.related =
             {
                 fields: {
                     id: { name: "id", type: "int" },
@@ -265,12 +214,14 @@ export class BankRecKanbanController extends KanbanController {
                     move_id: makeActiveField(),
                 },
             };
-        params.config.activeFields.line_ids.related.activeFields.reconciled_lines_ids.related.activeFields.move_id.related =
-            this.getCheckedField();
-        params.config.activeFields.line_ids.related.activeFields.reconciled_lines_excluding_exchange_diff_ids.related.activeFields.move_id.related =
-            this.getCheckedField();
-        params.config.activeFields.line_ids.related.activeFields.move_id.related =
-            this.getCheckedField();
+        params.config.activeFields.line_ids.related.activeFields.move_id.related = {
+            fields: {
+                review_state: { name: "review_state", type: "char" },
+            },
+            activeFields: {
+                review_state: makeActiveField(),
+            },
+        };
         params.config.activeFields.line_ids.related.activeFields.tax_ids.related = {
             fields: {
                 id: { name: "id", type: "int" },
@@ -306,11 +257,13 @@ export class BankRecKanbanController extends KanbanController {
                 id: { name: "id", type: "int" },
                 display_name: { name: "display_name", type: "char" },
                 account_type: { name: "account_type", type: "char" },
+                reconcile: { name: "reconcile", type: "boolean" },
             },
             activeFields: {
                 id: makeActiveField(),
                 display_name: makeActiveField(),
                 account_type: makeActiveField(),
+                reconcile: makeActiveField(),
             },
         };
         params.config.activeFields.journal_id = makeActiveField();
@@ -339,6 +292,10 @@ export class BankRecKanbanController extends KanbanController {
                 currency_id: makeActiveField(),
             },
         };
+        params.config.activeFields.has_attachments = makeActiveField();
+        params.config.activeFields.has_invalid_analytics = makeActiveField();
+        params.config.activeFields.reconciled_lines_name = makeActiveField();
+        params.limit = 40;
         return params;
     }
 }

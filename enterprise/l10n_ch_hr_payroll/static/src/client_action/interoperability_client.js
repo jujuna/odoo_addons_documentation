@@ -1,21 +1,20 @@
 /** @odoo-module **/
 
-import {Component, useState} from "@odoo/owl";
+import { Component, proxy, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { user } from "@web/core/user";
 
 export class SwissdecInteroperabilityClient extends Component {
-    static props = {
-        ...standardActionServiceProps
-    };
     static template = "l10n_ch_hr_payroll.SwissdecInteroperabilityClient";
+
+    props = useProps(standardActionServiceProps);
 
     setup() {
         this.orm = useService("orm");
         this.company = user.activeCompany;
-        this.state = useState({
+        this.state = proxy({
             ping_response: false,
             check_interoperability_response: false,
             second_operand: ""
@@ -38,5 +37,4 @@ export class SwissdecInteroperabilityClient extends Component {
     }
 }
 
-SwissdecInteroperabilityClient.template = "l10n_ch_hr_payroll.SwissdecInteroperabilityClient";
 registry.category("actions").add("swissdec_interoperability_client", SwissdecInteroperabilityClient);

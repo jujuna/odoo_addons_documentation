@@ -7,16 +7,9 @@ from odoo.exceptions import UserError
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    l10n_hk_autopay = fields.Boolean(string="Payroll with HSBC Autopay payment")
-    l10n_hk_autopay_type = fields.Selection(
-        selection=[('h2h', "H2H Submission"), ('hsbcnet', "HSBCnet File Upload")],
-        string="Autopay Type", help="H2H Submission: Directly submit to HSBC. HSBCnet File Upload: Upload file to HSBCnet.",
-        default='h2h',
-    )
     l10n_hk_autopay_partner_bank_id = fields.Many2one(string="Autopay Account", comodel_name='res.partner.bank', copy=False)
     l10n_hk_employer_name = fields.Char("Employer's Name shown on reports", compute='_compute_l10n_hk_employer_name', store=True, readonly=False)
     l10n_hk_employer_file_number = fields.Char("Employer's File Number")
-    l10n_hk_manulife_mpf_scheme = fields.Char("Manulife MPF Scheme", size=8)
     l10n_hk_eoy_pay_month = fields.Selection(
         string="End of Year Payments Month",
         help="If set, End of Year Payments will be included in the payslip of the chose month.\nLeave empty to manually choose when to include it in each payslip.",
@@ -36,10 +29,6 @@ class ResCompany(models.Model):
         ],
         default='12',
     )
-    l10n_hk_use_mpf_offsetting = fields.Boolean(
-        string="Use MPF Offsetting",
-        help="If set, MPF Offsetting will be applied in case of Severance Pay/Long Service Pay for the pre-transition period.\nThis can be overridden for each payment.",
-    )
 
     @api.constrains("l10n_hk_employer_file_number")
     def _check_l10n_hk_employer_file_number(self):
@@ -48,15 +37,33 @@ class ResCompany(models.Model):
                 continue
             file_number = company.l10n_hk_employer_file_number.strip()
             if len(file_number) != 12 or file_number[3] != '-':
-                raise UserError(company.env._("The Employer's File Number must be in the format of XXX-XXXXXXXX."))
-
-    @api.constrains("l10n_hk_manulife_mpf_scheme")
-    def _check_l10n_hk_manulife_mpf_scheme(self):
-        for company in self:
-            if company.l10n_hk_manulife_mpf_scheme and len(company.l10n_hk_manulife_mpf_scheme) != 8:
-                raise UserError(company.env._("The Manulife MPF Scheme must be 8 characters long."))
+                raise UserError(company.env._("The Employer's File Number must be in the format of EEN-12345678."))
 
     @api.depends("name")
     def _compute_l10n_hk_employer_name(self):
         for company in self:
             company.l10n_hk_employer_name = company.l10n_hk_employer_name or company.name
+
+    def _prepare_resource_calendar_values(self):
+        """
+        Override to set the default calendar to
+        40 hours/week for Hong Kong companies
+        """
+        vals = super()._prepare_resource_calendar_values()
+        if self.country_id.code == 'HK':
+            vals.update({
+                'name': self.env._('40 hours/week - %s', self.name),
+                'full_time_required_hours': 40.0,
+                'attendance_ids': [
+                    (0, 0, {'dayofweek': '0', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '1', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '2', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '3', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '4', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0}),
+                    (0, 0, {'dayofweek': '5', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0,
+                            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_hk_work_entry_type_weekend').id}),
+                    (0, 0, {'dayofweek': '6', 'duration_hours': 8, 'hour_from': 0, 'hour_to': 0,
+                            'work_entry_type_id': self.env.ref('hr_work_entry.l10n_hk_work_entry_type_weekend').id}),
+                ],
+            })
+        return vals

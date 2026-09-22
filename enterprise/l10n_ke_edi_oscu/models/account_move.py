@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import contextlib
 import logging
 import json
@@ -65,10 +64,11 @@ class AccountMove(models.Model):
         # EXTENDS 'account'
         super()._compute_tax_totals()
         for move in self:
-            if move.l10n_ke_oscu_invoice_number and move.tax_totals:
+            if move.l10n_ke_oscu_invoice_number and (tax_totals := move.tax_totals):
                 # Disable the recap of tax totals in company currency at the bottom right of the invoice,
                 # since this info is already present in our custom tax totals grid.
-                move.tax_totals['display_in_company_currency'] = False
+                tax_totals['display_in_company_currency'] = False
+                move.tax_totals = tax_totals
 
     @api.depends('l10n_ke_oscu_invoice_number')
     def _compute_show_reset_to_draft_button(self):
@@ -255,7 +255,7 @@ class AccountMove(models.Model):
         else:
             self._update_receipt_content(content, confirmation_datetime, invoice_date, self.partner_id)
 
-        if self.move_type in ('out_refund', 'in_refund'):
+        if self.is_refund():
             content.update({'rfdRsnCd': self.l10n_ke_reason_code_id.code})
         return content
 
@@ -287,7 +287,7 @@ class AccountMove(models.Model):
                 'itemSeq':   index + 1,                                             # Line number
                 'itemCd':    product.l10n_ke_item_code,                             # Item code as defined by us, of the form KE2BFTNE0000000000000039
                 'itemClsCd': product.unspsc_code_id.code,                           # Item classification code, in this case the UNSPSC code
-                'itemNm':    line.name,                                             # Item name
+                'itemNm':    (line.label or '')[:200],                              # Item name
                 'pkgUnitCd': product.l10n_ke_packaging_unit_id.code,                # Packaging code, describes the type of package used
                 'pkg':       product_uom_qty / product.l10n_ke_packaging_quantity,  # Number of packages used
                 'qtyUnitCd': line.product_uom_id.l10n_ke_quantity_unit_id.code,     # The UOMs as defined by the KRA, defined seperately from the UOMs on the line
@@ -318,7 +318,7 @@ class AccountMove(models.Model):
         self.ensure_one()
         if not self.l10n_ke_oscu_attachment_file:
             return {}
-        json_file = base64.b64decode(self.l10n_ke_oscu_attachment_file)
+        json_file = self.l10n_ke_oscu_attachment_file.content
 
         if not self._l10n_ke_oscu_is_vendor_bill_json(json_file):
             return {}
@@ -518,7 +518,8 @@ class AccountMove(models.Model):
                     'l10n_ke_control_unit': company.l10n_ke_control_unit,
                 })
                 return data, error
-            elif error['code'] == 'TIM':
+            elif error['code'] in ('TIM', 'CON'):
+                # Can't determine whether eTIMS has the invoice; don't retry blindly.
                 return data, error
 
         if self.move_type == 'out_refund' and company.l10n_ke_server_mode != 'demo':
@@ -554,7 +555,7 @@ class AccountMove(models.Model):
                 'l10n_ke_oscu_internal_data': data['intrlData'],
                 'l10n_ke_control_unit': company.l10n_ke_control_unit,
             })
-        elif error['code'] != 'TIM':
+        elif error['code'] not in ('TIM', 'CON'):
             # In order not to rollback, but just to avoid consuming the invoice number
             self._l10n_ke_get_invoice_sequence().number_next -= 1
             self.l10n_ke_oscu_invoice_number = False
@@ -636,7 +637,7 @@ class AccountMove(models.Model):
         for company in companies:
             error, data, _date = company._l10n_ke_call_etims(
                 'selectTrnsPurchaseSalesList',
-                {'lastReqDt': format_etims_datetime(company.l10n_ke_oscu_last_fetch_purchase_date or datetime.datetime(2018, 1, 1))}
+                {'lastReqDt': format_etims_datetime(company.l10n_ke_oscu_last_fetch_purchase_date or datetime(2018, 1, 1))}
             )
             if error:
                 if error['code'] == '001':
@@ -662,7 +663,7 @@ class AccountMove(models.Model):
                 move = self.sudo().with_company(company).with_context(default_move_type=move_type).create({})
                 attachment_by_move_id[move.id] = self.sudo().env['ir.attachment'].create({
                     'name': filename,
-                    'raw': json.dumps(purchase, indent=4),
+                    'raw': json.dumps(purchase, indent=4).encode(),
                     'type': 'binary',
                     'res_model': 'account.move',
                     'res_id': move.id,
@@ -780,7 +781,7 @@ class AccountMove(models.Model):
 
                 # If we don't already have a matching UoM from the product
                 line['product_uom_id'] = uom_map.get(item['qtyUnitCd'], self.env['uom.uom']).id or (product and product.uom_id.id) or self.env.ref('uom.product_uom_unit').id
-                line['name'] = item['itemNm']
+                line['label'] = item['itemNm']
                 line['quantity'] = item['qty']
                 line['price_unit'] = item['prc']
                 line['discount'] = item['dcRt']

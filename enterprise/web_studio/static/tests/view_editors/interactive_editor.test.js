@@ -1,7 +1,7 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
 import { edit, press, waitFor } from "@odoo/hoot-dom";
-import { animationFrame, Deferred } from "@odoo/hoot-mock";
+import { animationFrame } from "@odoo/hoot-mock";
 import { onMounted } from "@odoo/owl";
 import {
     contains,
@@ -447,7 +447,7 @@ test("add a many2many field", async () => {
         const { params } = await request.json();
         expect.step("edit_view");
         const fieldDescr = params.operations[0].node.field_description;
-        expect(fieldDescr.name).toMatch(/^x_studio_many2many.*/);
+        expect(fieldDescr.name).toMatch("x_studio_many2many_1");
         delete fieldDescr.name;
         expect(fieldDescr).toEqual({
             field_description: "New Many2Many",
@@ -492,7 +492,7 @@ test("add a many2one field", async () => {
         const { params } = await request.json();
         expect.step("edit_view");
         const fieldDescr = params.operations[0].node.field_description;
-        expect(fieldDescr.name).toMatch(/^x_studio_many2one.*/);
+        expect(fieldDescr.name).toMatch("x_studio_many2one_1");
         delete fieldDescr.name;
         expect(fieldDescr).toEqual({
             field_description: "New Many2One",
@@ -526,6 +526,98 @@ test("add a many2one field", async () => {
     expect.verifySteps(["edit_view"]);
 });
 
+test("add decoration on many2one field", async () => {
+    Partner._fields.woof_id = fields.Many2one({ relation: "woof" });
+
+    class Woof extends models.Model {
+        _name = "woof";
+        m2o = fields.Many2one({ relation: "partner" });
+    }
+    defineModels([Woof]);
+    const arch = `
+        <list>
+            <field name='display_name'/>
+            <field name='m2o'/>
+        </list>
+    `;
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        expect(params.operations).toHaveLength(1);
+        expect(params.operations[0].new_attrs).toEqual({ "decoration-muted": "1" });
+
+        const newArch = `
+            <list>
+                <field name='display_name'/>
+                <field name='m2o' decoration-muted='1'/>
+            </list>`;
+        return editView(request, "list", newArch);
+    });
+
+    await mountViewEditor({
+        type: "list",
+        resModel: "woof",
+        arch,
+    });
+    // Check a decoration property can be set on the m2o field
+    await contains(".o_web_studio_view_renderer th[data-name=m2o]").click();
+    await contains(".o_web_studio_sidebar .o_web_studio_property_decoration .dropdown").click();
+    expect(".o_popover .dropdown-item").toHaveCount(9);
+
+    // Select 'Muted' and check it is displayed in the input box
+    await contains(".dropdown-item:contains('Muted')").click();
+    expect(".o_web_studio_sidebar .o_web_studio_property_decoration input").toHaveValue("Muted");
+
+    // Check display_name doesn't have a decoration property
+    await contains(".o_web_studio_view_renderer th[data-name=display_name]").click();
+    expect(".o_web_studio_sidebar .o_web_studio_property_decoration").toHaveCount(0);
+});
+
+test("modify decoration condition on many2one field", async () => {
+    Partner._fields.woof_id = fields.Many2one({ relation: "woof" });
+
+    class Woof extends models.Model {
+        _name = "woof";
+        m2o = fields.Many2one({ relation: "partner" });
+        box = fields.Boolean();
+    }
+    defineModels([Woof]);
+    const arch = `
+        <list>
+            <field name='display_name'/>
+            <field name='m2o' decoration-muted='display_name'/>
+        </list>
+    `;
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        expect(params.operations).toHaveLength(1);
+        expect(params.operations[0].new_attrs).toEqual({ "decoration-muted": "box" });
+        const newArch = `
+            <list>
+                <field name='display_name'/>
+                <field name='m2o' decoration-muted='box'/>
+            </list>`;
+        return editView(request, "list", newArch);
+    });
+
+    await mountViewEditor({
+        type: "list",
+        resModel: "woof",
+        arch,
+    });
+    // Check m2o have a decoration condition property
+    await contains(".o_web_studio_view_renderer th[data-name=m2o]").click();
+    await contains(
+        ".o_web_studio_sidebar .o_web_studio_property_decoration_condition .dropdown"
+    ).click();
+    expect(".o_popover .dropdown-item").toHaveCount(6);
+
+    // Select 'Box' and check it is displayed in the input box
+    await contains(".dropdown-item:contains('Box')").click();
+    expect(".o_web_studio_sidebar .o_web_studio_property_decoration_condition input").toHaveValue(
+        "Box"
+    );
+});
+
 test("switch mode after element removal", async () => {
     onRpc("/web_studio/edit_view", (request) => {
         expect.step("edit_view");
@@ -554,7 +646,7 @@ test("switch mode after element removal", async () => {
 test("open XML editor in read-only", async () => {
     serverState.debug = "1";
 
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     patchWithCleanup(CodeEditor.prototype, {
         setup() {
             super.setup();
@@ -595,7 +687,7 @@ test("open XML editor in read-only", async () => {
     expect(".o_web_studio_sidebar .o_web_studio_open_xml_editor").toHaveCount(1);
 
     await contains(".o_web_studio_sidebar .o_web_studio_open_xml_editor").click();
-    await def;
+    await def.promise;
     expect.verifySteps(["editor_resources"]);
     expect(
         ".o_web_studio_view_renderer .o_form_readonly:not(.o_web_studio_form_view_editor)"
@@ -606,7 +698,7 @@ test("open XML editor in read-only", async () => {
 test("XML editor: reset operations stack", async () => {
     serverState.debug = "1";
 
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     patchWithCleanup(CodeEditor.prototype, {
         setup() {
             super.setup();
@@ -677,7 +769,7 @@ test("XML editor: reset operations stack", async () => {
     expect(".o_web_studio_sidebar .o_web_studio_open_xml_editor").toHaveCount(1);
     await contains(".o_web_studio_sidebar .o_web_studio_open_xml_editor").click();
 
-    await def;
+    await def.promise;
     await editSelectMenu(".o_web_studio_xml_resource_select_menu .o_select_menu_toggler", {
         index: 1,
     });

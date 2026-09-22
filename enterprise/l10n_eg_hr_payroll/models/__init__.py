@@ -6,3 +6,5 @@ from . import hr_payroll_structure_type
 from . import hr_payslip
 from . import res_config_settings
 from . import res_company
+from . import hr_payroll_warning
+from . import hr_work_entry_type

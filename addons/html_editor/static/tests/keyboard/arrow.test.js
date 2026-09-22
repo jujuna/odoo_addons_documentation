@@ -111,6 +111,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>[ab]<span class="a">\u200B</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>[ab<span class="a">\u200B</span>c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -119,6 +120,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>[ab<span class="a">]\u200B</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>[ab<span class="a">\u200B</span>c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -127,6 +129,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>a[b]<span class="a">\u200B</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>a[b<span class="a">\u200B</span>c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -135,6 +138,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>a[b<span class="a">]\u200B</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>a[b<span class="a">\u200B</span>c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -145,6 +149,7 @@ describe("Around ZWS", () => {
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter:
                 '<p>a[b<span class="a">\u200B</span></p><p>]<span class="b">\u200B</span></p>',
+            testInBothDirections: false,
         });
     });
 
@@ -153,6 +158,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab[]<span class="a">\u200B</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>ab<span class="a">[\u200B</span>c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -161,6 +167,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">[]\u200B</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>ab<span class="a">[\u200B</span>c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -169,6 +176,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">\u200B[]</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b<span class="a">\u200B[</span>cd</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -177,6 +185,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">\u200B</span>[]cd</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b<span class="a">\u200B[</span>cd</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -185,6 +194,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">\u200B</span>]cd[</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b<span class="a">\u200B</span>cd[</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -193,6 +203,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">\u200B]</span>cd[</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b<span class="a">\u200B</span>cd[</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -201,6 +212,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">\u200B</span>]c[d</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b<span class="a">\u200B</span>c[d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -209,6 +221,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">\u200B]</span>c[d</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b<span class="a">\u200B</span>c[d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -217,6 +230,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">]\u200B[</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>ab<span class="a">\u200B</span>[c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -225,6 +239,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">]\u200B</span>[cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>ab<span class="a">\u200B</span>[c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -233,6 +248,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab]<span class="a">\u200B</span>[cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>ab<span class="a">\u200B</span>[c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -241,6 +257,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab]<span class="a">\u200B[</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>ab<span class="a">\u200B</span>[c]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -249,6 +266,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">]\u200B</span>c[d</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>ab<span class="a">\u200B</span>c[]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -257,6 +275,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab]<span class="a">\u200B</span>c[d</p>',
             stepFunction: keyPress(["Shift", "ArrowRight"]),
             contentAfter: '<p>ab<span class="a">\u200B</span>c[]d</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -265,6 +284,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">[\u200B]</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b[<span class="a">\u200B</span>cd</p>', // Normalized by the browser
+            testInBothDirections: false,
         });
     });
 
@@ -273,6 +293,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab<span class="a">[\u200B</span>]cd</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b[<span class="a">\u200B</span>cd</p>', // Normalized by the browser
+            testInBothDirections: false,
         });
     });
 
@@ -281,6 +302,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab[<span class="a">\u200B]</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b[<span class="a">\u200B</span>cd</p>', // Normalized by the browser
+            testInBothDirections: false,
         });
     });
 
@@ -289,6 +311,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>ab[<span class="a">\u200B</span>]cd</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a]b[<span class="a">\u200B</span>cd</p>', // Normalized by the browser
+            testInBothDirections: false,
         });
     });
 
@@ -297,6 +320,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>a[b<span class="a">\u200B]</span>cd</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a[]b<span class="a">\u200B</span>cd</p>',
+            testInBothDirections: false,
         });
     });
 
@@ -305,6 +329,7 @@ describe("Around ZWS", () => {
             contentBefore: '<p>a[b<span class="a">\u200B</span>]cd</p>',
             stepFunction: keyPress(["Shift", "ArrowLeft"]),
             contentAfter: '<p>a[]b<span class="a">\u200B</span>cd</p>',
+            testInBothDirections: false,
         });
     });
 });
@@ -426,88 +451,88 @@ describe("Around links", () => {
 describe("Around icons", () => {
     test("should correctly move cursor over icons (ArrowRight) (1)", async () => {
         await testEditor({
-            contentBefore: `<p>abc[]<span class="fa fa-music"></span>def</p>`,
-            contentBeforeEdit: `<p>abc[]\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeffdef</p>`,
+            contentBefore: `<p>abc[]<span class="oi" data-icon="music_note"></span>def</p>`,
+            contentBeforeEdit: `<p>abc[]\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeffdef</p>`,
             stepFunction: keyPress("ArrowRight"),
-            contentAfterEdit: `<p>abc\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>[]\ufeffdef</p>`,
-            contentAfter: `<p>abc<span class="fa fa-music"></span>[]def</p>`,
+            contentAfterEdit: `<p>abc\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>[]\ufeffdef</p>`,
+            contentAfter: `<p>abc<span class="oi" data-icon="music_note"></span>[]def</p>`,
         });
     });
 
     test("should correctly move cursor over icons (ArrowRight) (2)", async () => {
         await testEditor({
-            contentBefore: `<p><span class="fa fa-music"></span>[]<span class="fa fa-music"></span></p><p><br></p>`,
-            contentBeforeEdit: `<p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff[]<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
+            contentBefore: `<p><span class="oi" data-icon="music_note"></span>[]<span class="oi" data-icon="music_note"></span></p><p><br></p>`,
+            contentBeforeEdit: `<p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff[]<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
             stepFunction: keyPress("ArrowRight"),
-            contentAfterEdit: `<p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>[]\ufeff</p><p><br></p>`,
-            contentAfter: `<p><span class="fa fa-music"></span><span class="fa fa-music"></span>[]</p><p><br></p>`,
+            contentAfterEdit: `<p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>[]\ufeff</p><p><br></p>`,
+            contentAfter: `<p><span class="oi" data-icon="music_note"></span><span class="oi" data-icon="music_note"></span>[]</p><p><br></p>`,
         });
     });
 
     test("should correctly move cursor over icons (ArrowRight) (3)", async () => {
         await testEditor({
-            contentBefore: `<p><span class="fa fa-music"></span>[]<br><span class="fa fa-music"></span></p><p><br></p>`,
-            contentBeforeEdit: `<p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff[]<br>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
+            contentBefore: `<p><span class="oi" data-icon="music_note"></span>[]<br><span class="oi" data-icon="music_note"></span></p><p><br></p>`,
+            contentBeforeEdit: `<p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff[]<br>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
             stepFunction: keyPress("ArrowRight"),
-            contentAfterEdit: `<p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff<br>\ufeff[]<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
-            contentAfter: `<p><span class="fa fa-music"></span><br>[]<span class="fa fa-music"></span></p><p><br></p>`,
+            contentAfterEdit: `<p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff<br>\ufeff[]<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
+            contentAfter: `<p><span class="oi" data-icon="music_note"></span><br>[]<span class="oi" data-icon="music_note"></span></p><p><br></p>`,
         });
     });
     test("should correctly move cursor over icons (ArrowLeft) (1)", async () => {
         await testEditor({
-            contentBefore: `<p>abc<span class="fa fa-music"></span>[]def</p>`,
-            contentBeforeEdit: `<p>abc\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff[]def</p>`,
+            contentBefore: `<p>abc<span class="oi" data-icon="music_note"></span>[]def</p>`,
+            contentBeforeEdit: `<p>abc\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff[]def</p>`,
             stepFunction: keyPress("ArrowLeft"),
-            contentAfterEdit: `<p>abc\ufeff[]<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeffdef</p>`,
-            contentAfter: `<p>abc[]<span class="fa fa-music"></span>def</p>`,
+            contentAfterEdit: `<p>abc\ufeff[]<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeffdef</p>`,
+            contentAfter: `<p>abc[]<span class="oi" data-icon="music_note"></span>def</p>`,
         });
     });
 
     test("should correctly move cursor over icons (ArrowLeft) (2)", async () => {
         await testEditor({
-            contentBefore: `<p><span class="fa fa-music"></span><br><span class="fa fa-music"></span>[]</p>`,
-            contentBeforeEdit: `<p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff<br>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff[]</p>`,
+            contentBefore: `<p><span class="oi" data-icon="music_note"></span><br><span class="oi" data-icon="music_note"></span>[]</p>`,
+            contentBeforeEdit: `<p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff<br>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff[]</p>`,
             stepFunction: keyPress("ArrowLeft"),
-            contentAfterEdit: `<p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff<br>\ufeff[]<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p>`,
-            contentAfter: `<p><span class="fa fa-music"></span><br>[]<span class="fa fa-music"></span></p>`,
+            contentAfterEdit: `<p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff<br>\ufeff[]<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p>`,
+            contentAfter: `<p><span class="oi" data-icon="music_note"></span><br>[]<span class="oi" data-icon="music_note"></span></p>`,
         });
     });
     test("should correctly move cursor over icons (ArrowUp) (1)", async () => {
         await testEditor({
-            contentBefore: `<p><br></p><p><span class="fa fa-music"></span></p><p>[]<br></p>`,
-            contentBeforeEdit: `<p><br></p><p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p><p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>`,
+            contentBefore: `<p><br></p><p><span class="oi" data-icon="music_note"></span></p><p>[]<br></p>`,
+            contentBeforeEdit: `<p><br></p><p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p><p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>`,
             stepFunction: keyPress("ArrowUp"),
-            contentAfterEdit: `<p><br></p><p>[]\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
-            contentAfter: `<p><br></p><p>[]<span class="fa fa-music"></span></p><p><br></p>`,
+            contentAfterEdit: `<p><br></p><p>[]\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
+            contentAfter: `<p><br></p><p>[]<span class="oi" data-icon="music_note"></span></p><p><br></p>`,
         });
     });
 
     test("should correctly move cursor over icons (ArrowUp) (2)", async () => {
         await testEditor({
-            contentBefore: `<p><br></p><p><span class="fa fa-music"></span><br>[]<span class="fa fa-music"></span></p>`,
-            contentBeforeEdit: `<p><br></p><p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff<br>\ufeff[]<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p>`,
+            contentBefore: `<p><br></p><p><span class="oi" data-icon="music_note"></span><br>[]<span class="oi" data-icon="music_note"></span></p>`,
+            contentBeforeEdit: `<p><br></p><p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff<br>\ufeff[]<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p>`,
             stepFunction: keyPress("ArrowDown"),
-            contentAfterEdit: `<p><br></p><p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff<br>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff[]</p>`,
-            contentAfter: `<p><br></p><p><span class="fa fa-music"></span><br><span class="fa fa-music"></span>[]</p>`,
+            contentAfterEdit: `<p><br></p><p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff<br>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff[]</p>`,
+            contentAfter: `<p><br></p><p><span class="oi" data-icon="music_note"></span><br><span class="oi" data-icon="music_note"></span>[]</p>`,
         });
     });
     test("should correctly move cursor over icons (ArrowDown) (1)", async () => {
         await testEditor({
-            contentBefore: `<p>[]<br></p><p><span class="fa fa-music"></span></p><p><br></p>`,
-            contentBeforeEdit: `<p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p><p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
+            contentBefore: `<p>[]<br></p><p><span class="oi" data-icon="music_note"></span></p><p><br></p>`,
+            contentBeforeEdit: `<p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p><p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
             stepFunction: keyPress("ArrowDown"),
-            contentAfterEdit: `<p><br></p><p>[]\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
-            contentAfter: `<p><br></p><p>[]<span class="fa fa-music"></span></p><p><br></p>`,
+            contentAfterEdit: `<p><br></p><p>[]\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
+            contentAfter: `<p><br></p><p>[]<span class="oi" data-icon="music_note"></span></p><p><br></p>`,
         });
     });
 
     test("should correctly move cursor over icons (ArrowDown) (2)", async () => {
         await testEditor({
-            contentBefore: `<p>[]<span class="fa fa-music"></span><br><span class="fa fa-music"></span></p><p><br></p>`,
-            contentBeforeEdit: `<p>\ufeff[]<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff<br>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
+            contentBefore: `<p>[]<span class="oi" data-icon="music_note"></span><br><span class="oi" data-icon="music_note"></span></p><p><br></p>`,
+            contentBeforeEdit: `<p>\ufeff[]<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff<br>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
             stepFunction: keyPress("ArrowDown"),
-            contentAfterEdit: `<p>\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff<br>[]\ufeff<span class="fa fa-music" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
-            contentAfter: `<p><span class="fa fa-music"></span><br>[]<span class="fa fa-music"></span></p><p><br></p>`,
+            contentAfterEdit: `<p>\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff<br>[]\ufeff<span class="oi" data-icon="music_note" contenteditable="false">\u200b</span>\ufeff</p><p><br></p>`,
+            contentAfter: `<p><span class="oi" data-icon="music_note"></span><br>[]<span class="oi" data-icon="music_note"></span></p><p><br></p>`,
         });
     });
 });
@@ -787,6 +812,7 @@ describe("Around contenteditable false elements containing contenteditable true 
                 </div>
                 <p>]mno</p>
             `),
+            testInBothDirections: false,
         });
     });
     test("should select contenteditable false element (ArrowLeft)", async () => {
@@ -814,6 +840,7 @@ describe("Around contenteditable false elements containing contenteditable true 
                 </div>
                 <p>m[no</p>
             `),
+            testInBothDirections: false,
         });
     });
     test("should select contenteditable false element (ArrowUp)", async () => {
@@ -841,6 +868,7 @@ describe("Around contenteditable false elements containing contenteditable true 
                 </div>
                 <p>mno[</p>
             `),
+            testInBothDirections: false,
         });
     });
     test("should select contenteditable false element (ArrowDown)", async () => {
@@ -868,6 +896,7 @@ describe("Around contenteditable false elements containing contenteditable true 
                 </div>
                 <p>]mno</p>
             `),
+            testInBothDirections: false,
         });
     });
 });

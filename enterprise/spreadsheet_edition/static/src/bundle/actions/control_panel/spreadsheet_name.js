@@ -1,6 +1,6 @@
 import { UNTITLED_SPREADSHEET_NAME } from "@spreadsheet/helpers/constants";
 
-import { Component, onMounted, useState, useRef, onWillUpdateProps } from "@odoo/owl";
+import { computed, Component, onMounted, useProps, proxy, signal, t, useEffect } from "@odoo/owl";
 
 const WIDTH_MARGIN = 3;
 const PADDING_RIGHT = 5;
@@ -8,32 +8,27 @@ const PADDING_LEFT = PADDING_RIGHT - WIDTH_MARGIN;
 
 export class SpreadsheetName extends Component {
     static template = "spreadsheet_edition.SpreadsheetName";
-    static props = {
-        name: String,
-        isReadonly: Boolean,
-        onSpreadsheetNameChanged: { type: Function, optional: true },
-    };
-    static defaultProps = {
-        onSpreadsheetNameChanged: () => {},
-    };
+    props = useProps({
+        name: t.string(),
+        isReadonly: t.boolean(),
+        onSpreadsheetNameChanged: t.function().optional(() => () => {}),
+    });
+
+    speadsheetNameInputRef = signal.ref();
 
     setup() {
         this.placeholder = UNTITLED_SPREADSHEET_NAME;
-        this.state = useState({
-            inputSize: 1,
-            isUntitled: this._isUntitled(this.props.name),
+        this.state = proxy({
             name: this.props.name,
+            inputSize: 1,
         });
-        this.input = useRef("speadsheetNameInput");
 
         onMounted(() => {
             this._setInputSize(this.state.name);
         });
-        onWillUpdateProps((nextProps) => {
-            if (nextProps.name !== this.props.name) {
-                this.state.name = nextProps.name;
-                this.state.isUntitled = this._isUntitled(nextProps.name);
-            }
+        this.isUntitled = computed(() => this._isUntitled(this.state.name));
+        useEffect(() => {
+            this.state.name = this.props.name;
         });
     }
 
@@ -42,7 +37,7 @@ export class SpreadsheetName extends Component {
      * @param {string} text in the input element
      */
     _setInputSize(text) {
-        const { fontFamily, fontSize } = window.getComputedStyle(this.input.el);
+        const { fontFamily, fontSize } = window.getComputedStyle(this.speadsheetNameInputRef());
         const font = `${fontSize} ${fontFamily}`;
         this.state.inputSize =
             this._computeTextWidth(text || this.placeholder, font) + PADDING_RIGHT + PADDING_LEFT;

@@ -1,9 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import json
 import logging
-import pytz
 import re
 
 from datetime import datetime
@@ -12,6 +10,7 @@ from itertools import starmap
 from odoo import _, api, fields, models
 from odoo.exceptions import LockError, UserError
 from odoo.addons.l10n_in_ewaybill.tools.ewaybill_api import EWayBillApi, EWayBillError
+from odoo.tools import BinaryBytes
 
 _logger = logging.getLogger(__name__)
 
@@ -131,7 +130,7 @@ class L10nInEwaybill(models.Model):
         ("error", "Error")],
         string="Blocking Level", readonly=True)
 
-    content = fields.Binary(compute='_compute_content', compute_sudo=True)
+    content = fields.Binary(compute='_compute_content')
     cancel_reason = fields.Selection(selection=[
         ("1", "Duplicate"),
         ("2", "Data Entry Mistake"),
@@ -258,7 +257,7 @@ class L10nInEwaybill(models.Model):
                 ewaybill_json = ewaybill._ewaybill_generate_direct_json()
             else:
                 ewaybill_json = {}
-            ewaybill.content = base64.b64encode(json.dumps(ewaybill_json).encode())
+            ewaybill.content = BinaryBytes(json.dumps(ewaybill_json).encode())
 
     @api.depends('name', 'state')
     def _compute_display_name(self):
@@ -326,6 +325,7 @@ class L10nInEwaybill(models.Model):
             self._check_gst_treatment,
             self._check_transporter,
             self._check_state,
+            self._check_pincode,
         ]
         for get_error_message in methods_to_check:
             error_message.extend(get_error_message())
@@ -355,6 +355,14 @@ class L10nInEwaybill(models.Model):
             error_message.append(_(
                 "An E-waybill cannot be generated for a %s move.",
                 dict(self.env['account.move']._fields['state']._description_selection(self.env))[self.account_move_id.state]
+            ))
+        return error_message
+
+    def _check_pincode(self):
+        error_message = []
+        if self.partner_ship_from_id.zip == self.partner_ship_to_id.zip and not self.distance:
+            error_message.append(self.env._(
+                "Set a valid distance when the dispatch and delivery pincodes are the same.",
             ))
         return error_message
 
@@ -469,7 +477,7 @@ class L10nInEwaybill(models.Model):
             vals = {
                 'name': name,
                 'mimetype': 'application/json',
-                'raw': json.dumps(raw_data, indent=4),
+                'raw': json.dumps(raw_data, indent=4).encode(),
                 'res_model': self._name,
                 'res_id': self.id,
                 'res_field': res_field,
@@ -495,8 +503,9 @@ class L10nInEwaybill(models.Model):
         cancel_json_vals = {
             'ewbNo': int(self.name),
             'cancelRsnCode': int(self.cancel_reason),
-            'cancelRmrk': self.cancel_remarks,
         }
+        if self.cancel_remarks:
+            cancel_json_vals['cancelRmrk'] = self.cancel_remarks
         return cancel_json_vals
 
     def _ewaybill_cancel(self):
@@ -573,8 +582,11 @@ class L10nInEwaybill(models.Model):
         return False
 
     @api.model
-    def _get_partner_state_code(self, partner):
-        return int(partner.state_id.l10n_in_tin) if partner.country_id.code == "IN" else 99
+    def _get_partner_state_code(self, partner, is_to_state=False):
+        is_sez = (self.account_move_id or partner).l10n_in_gst_treatment == "special_economic_zone"
+        if partner.country_id.code != "IN" or (is_to_state and is_sez):
+            return 99
+        return int(partner.state_id.l10n_in_tin)
 
     def _get_l10n_in_ewaybill_line_details(self, line, tax_details):
         sign = self.account_move_id.is_inbound() and -1 or 1
@@ -622,7 +634,7 @@ class L10nInEwaybill(models.Model):
 
         def prepare_details(key_paired_function, partner_detail):
             return {
-                f"{place}{key}": fun(partner)
+                f"{place}{key}": fun(partner, place) if key == "StateCode" else fun(partner)
                 for key, fun in key_paired_function
                 for place, partner in partner_detail
             }
@@ -639,13 +651,13 @@ class L10nInEwaybill(models.Model):
                 ),
                 "transDistance": str(self.distance),
                 "docNo": self.document_number,
-                "docDate": (self.document_date or fields.Datetime.now()).strftime("%d/%m/%Y"),
+                "docDate": fields.Date.context_today(self.with_context(tz='Asia/Kolkata'), self.document_date).strftime("%d/%m/%Y"),
                 # bill details
                 **prepare_details(
                     key_paired_function={
                         'Gstin': lambda p: p.commercial_partner_id.vat or "URP",
                         'TrdName': lambda p: p.commercial_partner_id.name,
-                        'StateCode': self._get_partner_state_code,
+                        'StateCode': lambda p, place: self._get_partner_state_code(p, is_to_state=place == 'to'),
                     }.items(),
                     partner_detail={'from': self.partner_bill_from_id, 'to': self.partner_bill_to_id}.items()
                 ),
@@ -655,13 +667,18 @@ class L10nInEwaybill(models.Model):
                         "Addr1": lambda p: p.street and p.street[:120] or "",
                         "Addr2": lambda p: p.street2 and p.street2[:120] or "",
                         "Place": lambda p: p.city and p.city[:50] or "",
-                        "Pincode": lambda p: int(p.zip) if p.country_id.code == "IN" else 999999,
+                        "Pincode": lambda p: p.zip and int(p.zip) if p.country_id.code == "IN" else 999999,
                     }.items(),
                     partner_detail={'from': self.partner_ship_from_id, 'to': self.partner_ship_to_id}.items()
                 ),
-                "actToStateCode": self._get_partner_state_code(self.partner_ship_to_id),
-                "actFromStateCode": self._get_partner_state_code(self.partner_ship_from_id),
+                "actToStateCode": self.partner_ship_to_id.country_id.code != "IN" and 97 or self._get_partner_state_code(self.partner_ship_to_id),
+                "actFromStateCode": self.partner_ship_from_id.country_id.code != "IN" and 97 or self._get_partner_state_code(self.partner_ship_from_id),
         }
+        match self.type_id.sub_type:
+            case "Export":
+                ewaybill_json['toGstin'] = "URP"
+            case "Import":
+                ewaybill_json['fromGstin'] = "URP"
         return ewaybill_json
 
     def _prepare_ewaybill_transportation_json_payload(self):
@@ -722,7 +739,7 @@ class L10nInEwaybill(models.Model):
         self.ensure_one()
         if self.attachment_id:
             try:
-                res_json = json.loads(self.attachment_id.raw.decode("utf-8"))
+                res_json = json.loads(self.attachment_id.raw.content)
             except ValueError:
                 return False
             ewb_name = res_json.get("ewayBillNo") or res_json.get("EwbNo")
@@ -743,7 +760,7 @@ class L10nInEwaybill(models.Model):
         attachment = self.env['ir.attachment'].create({
             'name': f'{doc_label} - {self.document_number}.pdf',
             'type': 'binary',
-            'datas': base64.b64encode(pdf_content),
+            'raw': BinaryBytes(pdf_content),
             'res_model': 'l10n.in.ewaybill',
             'res_id': self.id,
             'mimetype': 'application/pdf',

@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <list string="Monthly Wage Types" create="1" edit="1">
                 <field name="employee_id"/>
-                <field name="input_type_id"/>
+                <field name="salary_rule_id"/>
                 <field name="description"/>
                 <field name="amount"/>
                 <field name="uom"/>
@@ -23,7 +23,7 @@
         <field name="arch" type="xml">
             <pivot string="Monthly Wages Analysis">
                 <field name="employee_id" type="row"/>
-                <field name="input_type_id" type="col"/>
+                <field name="salary_rule_id" type="col"/>
                 <field name="amount" type="measure"/>
                 <field name="type" type="row"/>
                 <field name="date_start" type="col" interval="month"/>
@@ -37,7 +37,7 @@
         <field name="arch" type="xml">
             <search string="Search Monthly Wages">
                 <field name="employee_id"/>
-                <field name="input_type_id"/>
+                <field name="salary_rule_id"/>
                 <field name="description"/>
                 <field name="version_id"/>
                 <field name="type"/>
@@ -47,7 +47,7 @@
                 <filter string="Recurrent Payments" name="recurrent" domain="[('type', '=', 'recurrent')]"/>
                 <group>
                     <filter name="employee" string="Employee" context="{'group_by': 'employee_id'}"/>
-                    <filter name="input_type" string="Wage Type" context="{'group_by': 'input_type_id'}"/>
+                    <filter name="input_type" string="Wage Type" context="{'group_by': 'salary_rule_id'}"/>
                     <filter name="type" string="Payment Type" context="{'group_by': 'type'}"/>
                     <filter name="date_start" string="Pay Period" context="{'group_by': 'date_start:month'}"/>
                 </group>

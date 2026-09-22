@@ -2,8 +2,7 @@
 
 {
     'name': 'Bangladesh - Payroll with Accounting',
-    'author': 'Odoo S.A',
-    'version': '1.0',
+    'author': 'Odoo S.A.',
     'category': 'Human Resources',
     'description': """
 Accounting Data for Bangladesh Payroll Rules
@@ -18,5 +17,5 @@ Accounting Data for Bangladesh Payroll Rules
         'data/l10n_bd_hr_payroll_account_demo.xml',
     ],
     'license': 'OEEL-1',
-    'auto_install': True,
+    'auto_install': ['l10n_bd_hr_payroll', 'hr_payroll_account'],
 }

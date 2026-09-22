@@ -70,8 +70,8 @@ class ShipRocket:
         if not (self.carrier.shiprocket_email and self.carrier.sudo().shiprocket_password):
             action = self.carrier.env.ref('delivery.action_delivery_carrier_form')
             raise RedirectWarning(
-                _("Please configure Shiprocket credentials in the shipping method"), action.id,
-                _("Go to Shipping Method")
+                _("Please configure Shiprocket credentials in the delivery method"), action.id,
+                _("Go to Delivery Method")
             )
         if not self.carrier.shiprocket_access_token or (
             self.carrier.shiprocket_token_valid_upto and
@@ -153,6 +153,9 @@ class ShipRocket:
             rate_json = self._make_api_request('external/courier/international/serviceability', data=data, token=self._get_token())
         if rate_json and rate_json.get('data'):
             available_couriers = rate_json['data'].get('available_courier_companies')
+            available_couriers = [
+                courier for courier in available_couriers if not courier.get('odablock')
+            ]
             recommended_by = ''
             selected_couriers = False
             for available_courier in available_couriers:
@@ -302,7 +305,7 @@ class ShipRocket:
         """
         Prepare parcel for picking shipment based on the package.
         """
-        database_uuid = picking.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        database_uuid = picking.env['ir.config_parameter'].sudo().get_str('database.uuid')
         unique_ref = str(index) + '-' + database_uuid[:5]
         order_name = picking.name
         partner = partner_invoice = picking.partner_id
@@ -380,8 +383,8 @@ class ShipRocket:
         """
         if not self.carrier.shiprocket_channel_id:
             action = self.carrier.env.ref('delivery.action_delivery_carrier_form')
-            raise RedirectWarning(_("Configure Shiprocket channel in shipping method"), action.id,
-                                  _("Go to Shipping Methods"))
+            raise RedirectWarning(_("Configure Shiprocket channel in delivery method"), action.id,
+                                  _("Go to Delivery Methods"))
         parcel_dict = {}
         ship_from = picking.picking_type_id.warehouse_id.partner_id or picking.company_id.partner_id
         default_package = self.carrier.shiprocket_default_package_type_id
@@ -447,7 +450,13 @@ class ShipRocket:
                 if order_id:
                     res['order_ids'].append(str(order_id))
                 res['all_pack'][delivery_package]['order_details'] = order_details
-                res['exact_price'] += float(order_details.get('data', {}).get('charges', {}).get('freight_charges', '0.00'))
+
+                exact_price = order_details.get('data', {}).get('charges', {}).get('freight_charges', '0.00')
+                try:
+                    exact_price = float(exact_price)
+                except ValueError:
+                    exact_price = 0
+                res['exact_price'] += exact_price
             else:
                 picking.message_post(body=_('AWB assignment was unsuccessful: %s') % (self._shiprocket_get_error_message(order_response)))
         return res

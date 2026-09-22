@@ -1,6 +1,6 @@
 import { Dialog } from "@web/core/dialog/dialog";
 import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart } from "@odoo/owl";
+import { Component, onWillStart, t, useProps } from "@odoo/owl";
 
 /**
  * This component will display an appointment template picker.
@@ -11,9 +11,11 @@ import { Component, onWillStart } from "@odoo/owl";
 export class AppointmentTemplatePickerDialog extends Component {
     static template = "appointment.AppointmentTemplatePickerDialog";
     static components = { Dialog };
-    static props = {
-        close: Function,
-    };
+
+    props = useProps({
+        close: t.function(),
+    });
+
     setup() {
         super.setup();
         this.action = useService("action");

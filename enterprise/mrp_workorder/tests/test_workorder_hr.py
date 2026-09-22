@@ -1,4 +1,3 @@
-#  -*- coding: utf-8 -*-
 #  Part of Odoo. See LICENSE file for full copyright and licensing details.
 from datetime import datetime
 from freezegun import freeze_time
@@ -6,6 +5,7 @@ from freezegun import freeze_time
 from odoo import Command
 from odoo.tests import Form, common, users
 from odoo.exceptions import UserError
+
 
 class TestWorkorderDurationHr(common.TransactionCase):
     @classmethod
@@ -27,11 +27,11 @@ class TestWorkorderDurationHr(common.TransactionCase):
         cls.final_product = cls.env['product.product'].create({
             'name': 'DF-41',
             'is_storable': True,
-            'tracking': 'none'})
+        })
         cls.component = cls.env['product.product'].create({
             'name': 'RBCC engine',
             'is_storable': True,
-            'tracking': 'none'})
+        })
         cls.bom = cls.env['mrp.bom'].create({
             'product_tmpl_id': cls.final_product.product_tmpl_id.id,
             'product_qty': 1.0,
@@ -94,7 +94,7 @@ class TestWorkorderDurationHr(common.TransactionCase):
         self.assertEqual(wo.duration, 150)
         # Check that the work order cannot be started when it's finished
         self.mo.qty_producing = 1
-        self.env.user.employee_id = self.employee_1
+        self.env.user.employee_ids = self.employee_1
         wo.do_finish()
         self.assertEqual(wo.state, 'done')
         with self.assertRaises(UserError):

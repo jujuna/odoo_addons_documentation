@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import Command, _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo import Command, api, fields, models
 
 
 class SaleOrder(models.Model):
@@ -40,19 +39,27 @@ class SaleOrder(models.Model):
         self.order_line.calendar_booking_ids._make_event_from_paid_booking()
         return super()._action_confirm()
 
-    def _check_cart_is_ready_to_be_paid(self):
-        self.ensure_one()
+    def _is_cart_ready_for_checkout(self, **kwargs):
+        """Override of `website_sale` to check that all bookings are still available."""
+        ready = super()._is_cart_ready_for_checkout(**kwargs)
+
         bookings = self.order_line.calendar_booking_ids
         unavailable_bookings = bookings._filter_unavailable_bookings()
         if unavailable_bookings:
-            raise ValidationError(
-                _(
-                    "The following bookings are not available anymore during the selected period"
-                    " and your cart must be updated. We are sorry for the inconvenience.\n\n%(bookings)s",
-                    bookings=[booking._get_description() for booking in unavailable_bookings],
-                ),
+            booking_descriptions = [b._get_description() for b in unavailable_bookings]
+            for line in unavailable_bookings.order_line_id:
+                self._cart_update_line_quantity(line_id=line.id, quantity=0)
+
+            self._add_blocking_alert(
+                self.env._(
+                    "Oops! The following timeslots have been booked in the meantime and were removed from your cart:"
+                    "\n\n%(bookings)s",
+                    bookings="\n".join(booking_descriptions),
+                )
             )
-        return super()._check_cart_is_ready_to_be_paid()
+            return False
+
+        return ready
 
     def _cart_find_product_line(self, *args, calendar_booking_id=False, **kwargs):
         """ Avoid returning the lines in case of an appointment if the same product exists in
@@ -77,9 +84,9 @@ class SaleOrder(models.Model):
             return values
         booking_sudo = self.env['calendar.booking'].sudo().browse(calendar_booking_id)
         values['calendar_booking_ids'] = [Command.link(calendar_booking_id)]
-        # Using partner's lang, same as usual behavior in _compute_name.
+        # Using order's lang (via _get_lang()), same as usual behavior in _compute_name.
         # It is linked to partner created / linked on appointment form submission.
-        values['name'] = booking_sudo.with_context(tz=calendar_booking_tz, lang=self.partner_id.lang)._get_description()
+        values['name'] = booking_sudo.with_context(tz=calendar_booking_tz, lang=self._get_lang())._get_description()
         return values
 
     def unlink(self):
@@ -87,3 +94,17 @@ class SaleOrder(models.Model):
         bookings_to_unlink = self.order_line.calendar_booking_ids
         bookings_to_unlink.unlink()
         return super().unlink()
+
+    def _needs_customer_address(self):
+        """Override of `website_sale` to avoid requesting full address details for appointments."""
+        res = super()._needs_customer_address()
+
+        if (
+            self.order_line
+            and all(line.calendar_booking_ids for line in self.order_line)
+        ):
+            return self.env["ir.config_parameter"].sudo().get_bool(
+                    "website_appointment_sale.require_billing_details_for_appointments"
+            )
+
+        return res

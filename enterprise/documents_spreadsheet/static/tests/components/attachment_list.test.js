@@ -12,10 +12,10 @@ import { defineModels } from "@web/../tests/web_test_helpers";
 import { DocumentsDocument } from "../helpers/data";
 import { DocumentsModels } from "@documents/../tests/helpers/data";
 
-const { DocumentsTag, IrEmbeddedActions, MailAlias, MailAliasDomain } = DocumentsModels;
+const { DocumentsTag } = DocumentsModels;
 
 defineMailModels();
-defineModels({ DocumentsDocument, DocumentsTag, IrEmbeddedActions, MailAlias, MailAliasDomain });
+defineModels({ DocumentsDocument, DocumentsTag });
 describe.current.tags("desktop");
 
 test("open spreadsheet attachment in spreadsheet when clicking on it from a discuss channel", async () => {

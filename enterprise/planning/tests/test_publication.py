@@ -3,9 +3,12 @@
 from datetime import datetime
 
 from .common import TestCommonPlanning
+from odoo.tests import tagged
+
 from odoo.addons.mail.tests.common import MailCase
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestPlanningPublishing(TestCommonPlanning, MailCase):
 
     @classmethod
@@ -24,7 +27,7 @@ class TestPlanningPublishing(TestCommonPlanning, MailCase):
         cls.resource_dirk = cls.employee_dirk_no_mail.resource_id
 
         values = {
-            'resource_id': cls.resource_joseph.id,
+            'resource_ids': cls.resource_joseph.ids,
             'allocated_hours': 8,
             'start_datetime': datetime(2019, 6, 6, 8, 0, 0),
             'end_datetime': datetime(2019, 6, 6, 17, 0, 0)
@@ -41,13 +44,13 @@ class TestPlanningPublishing(TestCommonPlanning, MailCase):
 
         with self.mock_mail_gateway():
             self.shift.action_send()
-        self.assertEqual(self.shift.state, 'published', 'planning is published when we call its action_send')
+        self.assertEqual(self.shift.state, '2_published', 'planning is published when we call its action_send')
 
         shift_mails = set(Mails.search([])) ^ set(before_mails)
         self.assertEqual(len(shift_mails), 1, 'only one mail is created when publishing planning')
 
     def test_sending_planning_do_not_create_mail_if_employee_has_no_email(self):
-        self.shift.write({'resource_id': self.resource_dirk.id})
+        self.shift.write({'resource_ids': self.resource_dirk.ids})
 
         self.assertFalse(self.employee_dirk_no_mail.work_email)  # if no work_email
 

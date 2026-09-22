@@ -44,10 +44,6 @@ class SocialPostToLead(models.TransientModel):
     post_datetime = fields.Datetime('Post Datetime', compute='_compute_post_data', store=True, readonly=False)
     post_link = fields.Char('Post Link', compute='_compute_post_data', store=True, readonly=False)
     post_image_urls = fields.Text("Post Images URLs")  # JSON array capturing the URLs of the images
-    #UTMs
-    utm_source_id = fields.Many2one('utm.source', compute='_compute_utm_data')
-    utm_medium_id = fields.Many2one('utm.medium', compute='_compute_utm_data')
-    utm_campaign_id = fields.Many2one('utm.campaign', compute='_compute_utm_data')
 
     @api.depends('author_name')
     def _compute_partner_action_data(self):
@@ -83,34 +79,6 @@ class SocialPostToLead(models.TransientModel):
                 wizard.post_datetime = wizard.post_datetime or False
                 wizard.post_link = wizard.post_link or False
 
-    @api.depends('social_stream_post_id', 'social_account_id')
-    def _compute_utm_data(self):
-        """ UTMs computation logic:
-
-        - The medium is always set to the related social.account of the social.stream.post
-        - If we find a matching social.post, we use its source and campaign
-          Note: there will not always be a matching social.post
-          e.g: when you post directly on your Facebook page on Facebook, then we don't have a
-          social.post record related to that published content in your Odoo database, but it will
-          still appear in the stream view and leads can be created from it
-        - Otherwise, we set the source to a common record created in data.
-          That way, users can still check some statistics based on posts that don't originate from
-          Odoo. """
-
-        utm_source_social_post = self.env.ref('social_crm.utm_source_social_post', raise_if_not_found=False)
-        for wizard in self:
-            wizard.utm_campaign_id = False
-            wizard.utm_medium_id = wizard.social_account_id.utm_medium_id.id
-            wizard.utm_source_id = False
-
-            if wizard.social_stream_post_id:
-                social_post = wizard.social_stream_post_id.sudo()._fetch_matching_post()
-                if social_post:
-                    wizard.utm_campaign_id = social_post.utm_campaign_id.id
-                    wizard.utm_source_id = social_post.source_id.id
-                elif utm_source_social_post:
-                    wizard.utm_source_id = utm_source_social_post.id
-
     def action_convert_to_lead(self):
         """ Creates a crm.lead using the information of the social.stream.post or the comment.
         There are two possible sources:
@@ -118,19 +86,38 @@ class SocialPostToLead(models.TransientModel):
           A social.stream.post, in that case all the information are retrieved from it
         - 'comment'
           A comment or a reply to a comment, in that case there is no record stored so we receive
-          all the necessary information from the default values. """
+          all the necessary information from the default values.
+
+        UTM Logic:
+        - The source is the generic 'utm.source' record matching the account media (e.g: 'Facebook')
+        - The medium is set to the generic 'utm.source' record 'Social Media'
+        - The campaign is the one from the matching social.post (if found)
+        - The utm_reference is the matching social.post (if found) """
 
         self.ensure_one()
         # create partner if needed
         if self.action == 'create':
             self.partner_id = self.env['res.partner'].create({'name': self.author_name})
 
+        utm_campaign = self.env["utm.campaign"]
+        utm_medium = self.env['utm.mixin']._utm_ref("utm.utm_medium_social_media")
+        utm_source = self.env["utm.source"]
+        utm_reference = False
+        if self.social_account_id:
+            utm_source = self.social_account_id.media_id._get_utm_source()
+        if self.social_stream_post_id:
+            social_post = self.social_stream_post_id.sudo()._fetch_matching_post()
+            if social_post:
+                utm_campaign = social_post.utm_campaign_id
+                utm_reference = f'{social_post._name},{social_post.id}'
+
         lead_values = {
             'name': _('Request from %s', self.author_name),
             'partner_id': self.partner_id.id,
-            'source_id': self.utm_source_id.id,
-            'medium_id': self.utm_medium_id.id,
-            'campaign_id': self.utm_campaign_id.id,
+            'utm_reference': utm_reference,
+            'source_id': utm_source.id,
+            'medium_id': utm_medium.id,
+            'campaign_id': utm_campaign.id,
             'description': self.env['ir.qweb']._render("social_crm.social_post_to_lead_description", {
                 'object': self,
                 'post_datetime': format_datetime(self.env, self.post_datetime, dt_format='yyyy-MM-dd HH:mm:ss (ZZZZ)'),
@@ -143,8 +130,7 @@ class SocialPostToLead(models.TransientModel):
             lead_values['contact_name'] = self.author_name
 
         lead_sudo = self.env['crm.lead'].with_context(
-            mail_create_nosubscribe=True,
-            mail_create_nolog=True
+            mail_create_nosubscribe=True
         ).sudo().create(lead_values)
 
         # return to lead (if can see) or simply close wizard (if cannot)

@@ -1,7 +1,8 @@
-from odoo.tests import TransactionCase
+from odoo.tests import tagged, TransactionCase
 from odoo.exceptions import UserError
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSalaryRuleCategory(TransactionCase):
 
     def setUp(self):

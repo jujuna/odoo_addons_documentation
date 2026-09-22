@@ -21,9 +21,17 @@
                         invisible="subscription_state != '4_paused'"/>
             </button>
             <button id="create_invoice" position="attributes">
-                <attribute name="invisible">(not is_subscription and invoice_status != 'to invoice') or (is_subscription and (state != 'sale' or (next_invoice_date &gt; current_date and invoice_status != 'to invoice')))</attribute>
+                <attribute name="invisible" add="is_subscription" separator="or"/>
             </button>
             <button id="create_invoice" position="after">
+                <button
+                    string="Create Invoice"
+                    id="create_invoice_sub_primary"
+                    name="%(sale.action_view_sale_advance_payment_inv)d"
+                    type="action"
+                    class="btn-primary"
+                    data-hotkey="q"
+                    invisible="not is_subscription or state != 'sale' or (next_invoice_date &gt; current_date and invoice_status != 'to invoice')"/>
                 <button id="create_invoice_sub" name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
                     type="action" class="btn-secondary" data-hotkey="q"
                     invisible="(not is_subscription or state != 'sale') or (is_subscription and (invoice_status == 'to invoice') or (next_invoice_date &lt;= current_date))"/>
@@ -69,28 +77,28 @@
                 <button invisible="not is_renewing"
                     name="open_subscription_renewal"
                     class="oe_stat_button"
-                    icon="fa-repeat"
+                    icon="redo"
                     type="object">
                     <field name="renewal_count" widget="statinfo" string="Renewal Quote"/>
                 </button>
                 <button invisible="not is_upselling"
                     name="open_subscription_upsell"
                     class="oe_stat_button"
-                    icon="fa-arrow-circle-o-up"
+                    icon="arrow_circle_up"
                     type="object">
                     <field name="upsell_count" widget="statinfo" string="Upsell Quote"/>
                 </button>
                 <button invisible="history_count &lt; 2"
                     name="open_subscription_history"
                     class="oe_stat_button"
-                    icon="fa-dollar"
+                    icon="attach_money"
                     type="object">
                     <field name="history_count" widget="statinfo" string="Sales History"/>
                 </button>
                 <button invisible="not is_subscription or subscription_state in ['1_draft', '2_renewal'] or state == 'cancel'"
                     name="action_sale_order_log"
                     class="oe_stat_button"
-                    icon="fa-line-chart"
+                    icon="show_chart"
                     type="object">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value d-flex">
@@ -106,13 +114,13 @@
                 <div class="px-2 rounded-pill text-bg-warning float-end" invisible="not pending_transaction">Pending transaction</div>
                 <field name="subscription_state"
                         widget="badge"
-                        class="float-end"
+                        class="float-end w-auto"
                         invisible="subscription_state not in ['2_renewal', '5_renewed', '7_upsell'] or state not in ['draft', 'sent']"
                         decoration-info="subscription_state in ['2_renewal']"
                         decoration-primary="subscription_state in ['7_upsell']"
                         decoration-secondary="subscription_state in ['5_renewed']"
                 />
-                <field name="subscription_state" class="float-end"
+                <field name="subscription_state" class="float-end w-auto"
                        invisible="subscription_state not in ['3_progress', '4_paused', '5_renewed', '6_churn'] or state == 'cancel'"
                        widget="badge"
                        decoration-info="subscription_state in ['1_draft']"
@@ -123,9 +131,9 @@
                      invisible="subscription_state != '1_draft' or state not in ['draft', 'sent']">Subscription Quotation</div>
                 <div name="late_pill" invisible="not display_late">
                     <div name="subscription_to_renew" class="float-end badge rounded-pill fw-bold text-bg-warning"
-                        invisible="not payment_token_id and require_payment">To Renew</div>
+                        invisible="not payment_token_id and prepayment_percent > 0">To Renew</div>
                     <div name="subscription_waiting_payment" class="float-end badge rounded-pill fw-bold text-bg-warning"
-                        invisible="payment_token_id or not require_payment">Waiting customer payment</div>
+                        invisible="payment_token_id or prepayment_percent == 0">Waiting customer payment</div>
                 </div>
                 <div name="subscription_closing_pill"
                      class="o_field_badge float-end fs-6 mx-1"
@@ -137,8 +145,22 @@
                 <attribute name="readonly" separator="and" add="subscription_state not in ['3_progress', '4_paused']"/>
             </field>
             <label for="pricelist_id" position="before">
-                <label name="plan_label" for="plan_id" invisible="not plan_id and state in ['sale', 'cancel']"/>
-                 <div name="plan_block" class="o_row" invisible="not plan_id and state in ['sale', 'cancel']">
+                <label
+                    name="plan_label"
+                    for="plan_id"
+                    invisible="(
+                        (not plan_id and state in ['sale', 'cancel'])
+                        or not (has_recurring_line or plan_id or context.get('default_subscription_state'))
+                    )"
+                />
+                <div
+                    name="plan_block"
+                    class="o_row"
+                    invisible="(
+                        (not plan_id and state in ['sale', 'cancel'])
+                        or not (has_recurring_line or plan_id or context.get('default_subscription_state'))
+                    )"
+                >
                     <field name="plan_id" groups="!sales_team.group_sale_manager"
                            readonly="subscription_state in ['3_progress', '4_paused', '5_renewed', '6_churn', '7_upsell']"
                            options="{'no_create': True}"
@@ -146,8 +168,18 @@
                     <field name="plan_id" groups="sales_team.group_sale_manager"
                            readonly="subscription_state == '7_upsell'"
                            options="{'no_create': True}"/>
-                    <span invisible="not plan_id or subscription_state == '7_upsell'">until</span>
-                    <field name="end_date" invisible="not plan_id or subscription_state == '7_upsell'"/>
+                    <div class="d-flex flex-nowrap align-items-baseline" invisible="not plan_id">
+                        <label for="start_date" string="From"/>
+                        <field name="start_date" groups="!sales_team.group_sale_manager"
+                               readonly="subscription_state in ['2_renewal', '3_progress', '4_paused']"/>
+                        <field name="start_date" groups="sales_team.group_sale_manager"
+                               required="subscription_state in ['3_progress', '4_paused']"
+                               readonly="subscription_state == '2_renewal'"/>
+                    </div>
+                    <div class="d-flex flex-nowrap align-items-baseline" invisible="not plan_id or subscription_state == '7_upsell'">
+                        <label for="end_date" string="Until"/>
+                        <field name="end_date"/>
+                    </div>
                 </div>
                 <field name="next_invoice_date" groups="!sales_team.group_sale_manager"
                        invisible="subscription_state not in ['3_progress', '4_paused'] or not plan_id"
@@ -157,9 +189,9 @@
                        invisible="subscription_state not in ['3_progress', '4_paused'] or not plan_id"
                        required="plan_id and state == 'sale'"/>
                 <field name="close_reason_id" groups="sales_team.group_sale_manager"
-                       invisible="subscription_state != '6_churn'"/>
+                       invisible="not close_reason_id and subscription_state != '6_churn'"/>
                 <field name="close_reason_id" groups="!sales_team.group_sale_manager"
-                       invisible="subscription_state != '6_churn'"
+                       invisible="not close_reason_id and subscription_state != '6_churn'"
                        readonly="True"/>
             </label>
             <xpath expr="//field[@name='order_line']//list//field[@name='name']" position="after">
@@ -171,10 +203,7 @@
             <xpath expr="//field[@name='order_line']//list//field[@name='price_total']" position="attributes">
                 <attribute name="decoration-info">recurring_invoice</attribute>
             </xpath>
-            <field name="require_payment" position="attributes">
-                <attribute name="help">Request a online payment from the customer to confirm the order. For a subscription, a payment will be required also before each renewal</attribute>
-            </field>
-            <page name="customer_signature" position="after">
+            <page name="other_information" position="after">
                 <page string="Notes" name="notes">
                     <field name="internal_note_display" nolabel="1" placeholder="Internal notes"/>
                 </page>
@@ -182,10 +211,6 @@
             <group name="sale_info" position="before">
                 <group name="subscription_info" string="Subscription"
                     invisible="not is_subscription and subscription_state != '7_upsell'">
-                    <field name="start_date" groups="!sales_team.group_sale_manager"
-                           readonly="subscription_state in ['2_renewal', '3_progress', '4_paused']"/>
-                    <field name="start_date" groups="sales_team.group_sale_manager"
-                           readonly="subscription_state == '2_renewal'"/>
                     <field name="first_contract_date" invisible="not origin_order_id"/>
                     <field name="origin_order_id" readonly="1" invisible="not origin_order_id"/>
                     <field name="subscription_id" groups="base.group_no_one" readonly="1"/>
@@ -194,9 +219,6 @@
                     <field name="pending_transaction" groups="base.group_no_one"/>
                 </group>
             </group>
-            <field name="tax_totals" position="after">
-                <field name="recurring_details" nolabel="1" colspan="2" invisible="not recurring_details"/>
-            </field>
         </field>
     </record>
 

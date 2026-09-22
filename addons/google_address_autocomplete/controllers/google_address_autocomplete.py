@@ -60,12 +60,24 @@ class AutoCompleteController(http.Controller):
                         )
                         continue
                     state = request.env['res.country.state'].search(
-                        [('code', '=', google_field['short_name'].upper()),
-                         ('country_id', '=', standard_data['country'][0])])
+                        [
+                            ('country_id', '=', standard_data['country'][0]),
+                            '|',
+                            ('code', '=', google_field['short_name'].upper()),
+                            ('name', 'ilike', google_field['long_name']),
+                        ],
+                    )
                     if len(state) == 1:
                         standard_data[field_standard] = [state.id, state.name]
                 else:
                     standard_data[field_standard] = google_field['long_name']
+        city_name = standard_data.get('city')
+        country = standard_data.get('country')
+        country_id = country[0] if country else False
+        if city := self.env['res.partner']._get_res_city_by_name(city_name, country_id):
+            standard_data['city_id'] = [city.id, city.name]
+            if not standard_data.get('state') and city.state_id:  # Derive state from city if missing
+                standard_data['state'] = [city.state_id.id, city.state_id.name]
         return standard_data
 
     def _guess_number_from_input(self, source_input, standard_address):
@@ -83,7 +95,7 @@ class AutoCompleteController(http.Controller):
         return guessed_house_number
 
     def _perform_place_search(self, partial_address, api_key=None, session_id=None, language_code=None, country_code=None):
-        minimal_input_size = int(request.env['ir.config_parameter'].sudo().get_param('google_address_autocomplete.minimal_partial_address_size', '5'))
+        minimal_input_size = request.env['ir.config_parameter'].sudo().get_int('google_address_autocomplete.minimal_partial_address_size', 5)
         if len(partial_address) <= minimal_input_size:
             return {
                 'results': [],
@@ -183,7 +195,7 @@ class AutoCompleteController(http.Controller):
 
     def _get_api_key(self, use_employees_key):
         assert request.env.user._is_internal()
-        return request.env['ir.config_parameter'].sudo().get_param('google_address_autocomplete.google_places_api_key')
+        return request.env['ir.config_parameter'].sudo().get_str('google_address_autocomplete.google_places_api_key') or None
 
     @http.route('/autocomplete/address', methods=['POST'], type='jsonrpc', auth='public', website=True)
     def _autocomplete_address(self, partial_address, session_id=None, use_employees_key=None):

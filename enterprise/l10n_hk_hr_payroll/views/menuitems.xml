@@ -28,11 +28,24 @@
         sequence="92"/>
 
     <menuitem
-        id="menu_l10n_hk_manulife_mpf"
-        name="Manulife MPF Sheet"
-        action="l10n_hk_manulife_mpf_action"
+        id="menu_l10n_hk_empf"
+        name="eMPF Contributions"
+        action="l10n_hk_empf_action"
         parent="l10n_hk_hr_payroll.menu_reporting_l10n_hk"
         sequence="80"/>
+
+    <menuitem
+        id="menu_hk_empf_settings"
+        name="eMPF"
+        parent="hr_payroll.menu_hr_payroll_configuration"
+        sequence="200"/>
+
+    <menuitem
+        id="menu_hk_mpf_schemes"
+        action="action_l10n_hk_mpf_schemes"
+        parent="menu_hk_empf_settings"
+        name="MPF Schemes"
+        sequence="10"/>
 
     <menuitem
         id="menu_l10n_hk_ir56g"
@@ -40,4 +53,11 @@
         action="l10n_hk_ir56g_action"
         parent="l10n_hk_hr_payroll.menu_reporting_l10n_hk"
         sequence="93"/>
+
+    <menuitem
+        id="menu_l10n_hk_ir56m"
+        name="IR56M Sheet"
+        action="l10n_hk_ir56m_action"
+        parent="l10n_hk_hr_payroll.menu_reporting_l10n_hk"
+        sequence="94"/>
 </odoo>

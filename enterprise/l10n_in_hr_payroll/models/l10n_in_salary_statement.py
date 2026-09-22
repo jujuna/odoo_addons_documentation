@@ -1,6 +1,7 @@
 import calendar
 
 from odoo import api, fields, models, Command, _
+from odoo.tools.float_utils import float_is_zero
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from datetime import datetime
@@ -25,7 +26,7 @@ class L10n_In_Hr_PayrollSalaryStatement(models.Model):
         ('10', 'October'),
         ('11', 'November'),
         ('12', 'December'),
-    ], required=True, default=lambda self: str((fields.Date.today() + relativedelta(months=-1)).month))
+    ], required=True, default=lambda self: str((fields.Date.context_today(self) + relativedelta(months=-1)).month))
 
     _unique_salary_statement_report_per_month_year = models.Constraint(
         'UNIQUE(company_id, month, year)',
@@ -86,22 +87,37 @@ class L10n_In_Hr_PayrollSalaryStatement(models.Model):
             'year': self.year,
             'allow_rules': defaultdict(lambda: {'name': '', 'total': 0, 'total_annual': 0}),
             'deduct_rules': defaultdict(lambda: {'name': '', 'total': 0, 'total_annual': 0}),
+            'net_salary': 0,
+            'net_salary_annual': 0,
             'ctc': 0,
-            'ctc_annual': 0
+            'ctc_annual': 0,
+            'structure': False,
+            'currency': self.company_id.currency_id,
+            'total_deduct_monthly': 0,
+            'total_deduct_yearly': 0,
         })
 
-        for line in payslips.line_ids.filtered(lambda l: l.salary_rule_id.appears_on_payslip):
+        for line in payslips.line_ids.filtered(lambda line: line.appears_on_payslip == 'always' or
+            (line.appears_on_payslip == 'non_zero' and not float_is_zero(line.amount, 2))):
             employee_id = line.employee_id
-            rule_category = result[employee_id]['deduct_rules' if line.total < 0 else 'allow_rules'][line.salary_rule_id]
+            payslip = line.slip_id
+            if line.salary_rule_id.code == 'NET':
+                result[employee_id]['net_salary'] = line.total
+                result[employee_id]['net_salary_annual'] = line.total * 12
+            else:
+                rule_category = result[employee_id]['deduct_rules' if line.total < 0 else 'allow_rules'][line.salary_rule_id]
 
-            rule_category['name'] = line.salary_rule_id.name
-            rule_category['total'] = line.total
-            rule_category['total_annual'] = line.total * 12
+                rule_category['name'] = line.salary_rule_id.name
+                rule_category['total'] = line.total
+                rule_category['total_annual'] = line.total * 12
 
-            if line.code == 'GROSS' or line.total < 0:
-                total = abs(line.total)
-                result[employee_id]['ctc'] += total
-                result[employee_id]['ctc_annual'] += total * 12
+                if any(cat.code == 'DED' for cat in line.salary_rule_id.category_ids):
+                    result[employee_id]['total_deduct_monthly'] += line.total
+                    result[employee_id]['total_deduct_yearly'] += line.total * 12
+
+            result[employee_id]['structure'] = payslip.struct_id
+            result[employee_id]['ctc'] = employee_id.wage
+            result[employee_id]['ctc_annual'] = employee_id.wage * 12
             result[employee_id]['date'] = line.date_from.strftime('%d/%m/%Y')
 
         result = dict(result)

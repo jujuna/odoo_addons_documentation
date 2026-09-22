@@ -158,18 +158,6 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <t t-if="report_name.endswith('ica')">
-                                        Dicha Retención fue consignada oportunamente a nombre de la Secretaría de Hacienda en la Ciudad de
-                                        <t t-out="env.company.city"/>
-                                    </t>
-                                    <t t-else="">
-                                        Dicha Retención fue consignada oportunamente a nombre de la Dirección de Impuestos y Aduanas Nacionales en la Ciudad de
-                                        <t t-out="env.company.city"/>
-                                    </t>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
                                     NO REQUIRE FIRMA AUTOGRAFA. <t t-out="options['article']"/>
                                 </div>
                             </div>
@@ -184,7 +172,6 @@
             <field name="model">l10n_co_reports.certification_report</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">l10n_co_reports.report_certification</field>
-            <field name="report_file">l10n_co_reports.report_certification</field>
             <field name="group_ids" eval="[(4, ref('account.group_account_readonly'))]"/>
         </record>
     </data>

@@ -1,18 +1,20 @@
-import { describe, expect, test } from "@odoo/hoot";
+import { mailModels, STORE_FETCH_ROUTES } from "@mail/../tests/mail_test_helpers";
 import {
+    animationFrame,
+    describe,
+    expect,
     queryAll,
     queryAllAttributes,
     queryAllProperties,
     queryAllTexts,
-    unload,
     queryFirst,
-    waitForNone,
+    runAllTimers,
+    test,
+    unload,
     waitFor,
-} from "@odoo/hoot-dom";
-import { animationFrame, runAllTimers } from "@odoo/hoot-mock";
-import { Component, onMounted, xml } from "@odoo/owl";
-
-import { mailModels, STORE_FETCH_ROUTES } from "@mail/../tests/mail_test_helpers";
+    waitForNone,
+} from "@odoo/hoot";
+import { Component, onMounted, t, useProps, xml } from "@odoo/owl";
 import {
     followRelation,
     getTreeEditorContent,
@@ -25,24 +27,25 @@ import {
     editSelectMenu,
     fields,
     getService,
+    hideTab,
     makeMockServer,
     MockServer,
+    mockService,
     models,
     mountWithCleanup,
     onRpc,
     patchWithCleanup,
     serverState,
 } from "@web/../tests/web_test_helpers";
+import { RPCError } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { RelationalModel } from "@web/model/relational_model/relational_model";
 import { charField } from "@web/views/fields/char/char_field";
 import { ImageField } from "@web/views/fields/image/image_field";
+import { standardFieldProps } from "@web/views/fields/standard_field_props";
+import { Setting } from "@web/views/form/setting/setting";
 import { WebClient } from "@web/webclient/webclient";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
-import { COMPUTED_DISPLAY_OPTIONS } from "@web_studio/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_specific_and_computed_properties";
-
-import { RPCError } from "@web/core/network/rpc";
-import { Setting } from "@web/views/form/setting/setting";
 import {
     disableHookAnimation,
     editView,
@@ -50,7 +53,7 @@ import {
     mountViewEditor,
     openStudio,
 } from "@web_studio/../tests/view_editor_tests_utils";
-import { formEditor } from "@web_studio/client_action/view_editor/editors/form/form_editor";
+import { COMPUTED_DISPLAY_OPTIONS } from "@web_studio/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_specific_and_computed_properties";
 
 describe.current.tags("desktop");
 
@@ -232,7 +235,7 @@ test("optional field not in form editor", async () => {
 });
 
 test("many2one field edition", async () => {
-    onRpc("get_formview_action", () => {
+    onRpc("get_record_default_action", () => {
         throw new Error("The many2one form view should not be opened");
     });
     await mountViewEditor({
@@ -468,6 +471,37 @@ test("integer field should come with 0 as default value", async () => {
     expect.verifySteps(["edit_view"]);
 });
 
+test("daterange field should validate {start,end}_date_field", async () => {
+    Partner._fields.datetime_start = fields.Datetime({ string: "Start date" });
+    Partner._fields.datetime_end = fields.Datetime({ string: "End date" });
+    Partner._fields.datetime_other = fields.Datetime({ string: "Other date" });
+
+    await mountViewEditor({
+        type: "form",
+        resModel: "partner",
+        arch: `
+            <form>
+                <group>
+                    <field name="datetime_start" widget="daterange" options="{'end_date_field': 'datetime_end'}"/>
+                </group>
+            </form>`,
+    });
+
+    mockService("dialog", {
+        add(component, props) {
+            expect(props.body).toBe(
+                "You can't select the 'Start date field' and 'End date field' at the same time"
+            );
+            expect.step("error-dialog");
+        },
+    });
+
+    await contains(".o_form_label").click();
+    await contains(".o_web_studio_property_start_date_field .o_select_menu_toggler").click();
+    await contains(".o_popover .o_select_menu_item:contains('Other date')").click();
+    expect.verifySteps(["error-dialog"]);
+});
+
 test("supports multiple occurences of field", async () => {
     await mountViewEditor({
         type: "form",
@@ -674,7 +708,7 @@ test("option of type 'string' are correctly saved and displayed", async () => {
     });
 
     const arch = `<form><group>
-        <field name="display_name" options='{\"suboption_a\": \"cool cool\"}'/>
+        <field name="display_name" options='{"suboption_a": "cool cool"}'/>
     </group></form>`;
     await mountViewEditor({
         type: "form",
@@ -767,8 +801,11 @@ test("edit options and attributes on a widget node", async () => {
     let editCount = 0;
 
     class MyTestWidget extends Component {
-        static template = xml`<div t-attf-class="bg-{{props.color}}" t-attf-style="width:{{props.width}}px;">Inspector widget</div>`;
-        static props = ["*"];
+        static template = xml`<div t-attf-class="bg-{{this.props.color}}" t-attf-style="width:{{this.props.width}}px;">Inspector widget</div>`;
+        props = useProps({
+            width: t.string().optional(),
+            color: t.string().optional(),
+        });
     }
     registry.category("view_widgets").add("test_widget", {
         component: MyTestWidget,
@@ -829,47 +866,17 @@ test("edit options and attributes on a widget node", async () => {
 });
 
 test("never save record -- hiding tab", async () => {
-    const steps = [];
-    onRpc("web_save", () => {
-        steps.push("web_save");
-    });
-    patchWithCleanup(formEditor, {
-        props() {
-            const props = super.props(...arguments);
-            class TestModel extends props.Model {}
-            TestModel.Record = class extends TestModel.Record {
-                _save() {
-                    steps.push("_save");
-                    return super._save(...arguments);
-                }
-            };
-            props.Model = TestModel;
-            return props;
-        },
-    });
-    const arch = `<form><field name="display_name"/></form>`;
+    onRpc("web_save", () => expect.step("web_save"));
     await mountViewEditor({
         type: "form",
         resModel: "coucou",
-        arch,
+        arch: `<form><field name="display_name"/></form>`,
     });
 
-    const visibilityStateProp = Object.getOwnPropertyDescriptor(
-        Document.prototype,
-        "visibilityState"
-    );
-    const prevVisibilitySate = document.visibilityState;
-    Object.defineProperty(document, "visibilityState", {
-        value: "hidden",
-        configurable: true,
-        writable: true,
-    });
-
-    document.dispatchEvent(new Event("visibilitychange"));
+    // simulate a tab switch
+    await hideTab();
     await animationFrame();
-    expect(steps).toEqual(["_save"]);
-    Object.defineProperty(document, "visibilityState", visibilityStateProp);
-    expect(document.visibilityState).toBe(prevVisibilitySate);
+    expect.verifySteps([]);
 });
 
 test("CharField can edit its placeholder_field option", async () => {
@@ -1410,7 +1417,7 @@ test("invisible form editor", async () => {
     expect(".o_web_studio_form_view_editor .o-web-studio-editor--element-clickable").toHaveCount(1);
     expect(".o_web_studio_form_view_editor .o_web_studio_hook").toHaveCount(2);
 
-    await contains(".o_web_studio_sidebar li:nth-child(2) a").click();
+    await contains(".o_web_studio_sidebar li:nth-child(2) button").click();
     await contains(".o_web_studio_sidebar input#show_invisible").click();
 
     expect(".o_web_studio_form_view_editor .o_web_studio_show_invisible").toHaveCount(2);
@@ -1772,7 +1779,7 @@ test("notebook page hooks", async () => {
         "/form[1]/sheet[1]/notebook[1]/page[1]"
     );
 
-    await contains(".o_notebook .nav-item a:eq(4)").click();
+    await contains(".o_notebook .nav-item button:eq(4)").click();
     expect(".o_notebook .tab-pane.active > .o_web_studio_hook").toHaveCount(1);
     expect(".o_notebook .tab-pane.active > .o_web_studio_hook").toHaveAttribute(
         "data-position",
@@ -1787,7 +1794,7 @@ test("notebook page hooks", async () => {
         "/form[1]/sheet[1]/notebook[1]/page[2]/group[1]"
     );
 
-    await contains(".o_notebook .nav-item a:eq(5)").click();
+    await contains(".o_notebook .nav-item button:eq(5)").click();
     expect(".o_notebook .tab-pane.active > .o_web_studio_hook").toHaveCount(1);
     expect(".o_notebook .tab-pane.active > .o_web_studio_hook").toHaveAttribute(
         "data-position",
@@ -1837,9 +1844,9 @@ test("notebook edition", async () => {
 
     expect(".o_content .o_notebook li").toHaveCount(2);
 
-    await contains(".o_content .o_notebook li:first-child").click();
+    await contains(".o_content .o_notebook li:first-child button").click();
 
-    expect(".o_content .o_notebook li:first-child").toHaveClass(
+    expect(".o_content .o_notebook li:first-child button").toHaveClass(
         "o-web-studio-editor--element-clicked"
     );
 
@@ -1847,7 +1854,7 @@ test("notebook edition", async () => {
     expect(".o_web_studio_property .o_web_studio_sidebar_text input").toHaveValue("Kikou");
     expect(".o_limit_group_visibility").toHaveCount(1);
 
-    await contains(".o_content .o_notebook li:last-child").click();
+    await contains(".o_content .o_notebook li:last-child button").click();
 });
 
 test("notebook with empty page", async () => {
@@ -1863,7 +1870,7 @@ test("notebook with empty page", async () => {
             </form>`,
     });
 
-    await contains(".o_web_studio_view_renderer .o_notebook li").click();
+    await contains(".o_web_studio_view_renderer .o_notebook li button").click();
     expect(".o_web_studio_properties").toHaveClass("active");
 
     expect(".o_web_studio_property").toHaveCount(2);
@@ -1885,13 +1892,13 @@ test("notebook with empty page and fields inside the element", async () => {
             </form>`,
     });
 
-    await contains(".o_web_studio_view_renderer .o_notebook li").click();
-    expect(".o_form_sheet .o_notebook_headers li:nth-child(2)").toHaveAttribute(
+    await contains(".o_web_studio_view_renderer .o_notebook li button").click();
+    expect(".o_form_sheet .o_notebook_headers li:nth-child(2) button").toHaveAttribute(
         "data-studio-xpath",
         "/form[1]/sheet[1]/notebook[1]/page[2]"
     );
 
-    await contains(".o_form_sheet .o_notebook_headers li:nth-child(2) a").click();
+    await contains(".o_form_sheet .o_notebook_headers li:nth-child(2) button").click();
     expect(".o_web_studio_property input:eq(1)").toHaveValue("Empty");
 });
 
@@ -1935,10 +1942,10 @@ test("invisible notebook page in form", async () => {
     });
 
     expect(
-        ".o_web_studio_view_renderer .o_notebook li.o-web-studio-editor--element-clickable"
+        ".o_web_studio_view_renderer .o_notebook li button.o-web-studio-editor--element-clickable"
     ).toHaveCount(2);
 
-    await contains(".o_web_studio_view_renderer .o_notebook li").click();
+    await contains(".o_web_studio_view_renderer .o_notebook li button").click();
     expect(".o_web_studio_sidebar input#invisible").toHaveCount(1);
     expect(".o_web_studio_sidebar input#invisible").not.toBeChecked();
 
@@ -2035,7 +2042,7 @@ test("restore active notebook tab and element", async () => {
     await animationFrame();
     await animationFrame();
     expect.verifySteps(["edit_view"]);
-    expect(".o_form_sheet .nav-item:nth-child(2)").toHaveClass(
+    expect(".o_form_sheet .nav-item:nth-child(2) .nav-link").toHaveClass(
         "o-web-studio-editor--element-clicked"
     );
 
@@ -2043,7 +2050,7 @@ test("restore active notebook tab and element", async () => {
     await contains(".o_notebook .kikou").click();
     await animationFrame();
     await animationFrame();
-    expect(".o_form_sheet .nav-item:nth-child(1)").toHaveClass(
+    expect(".o_form_sheet .nav-item:nth-child(1) .nav-link").toHaveClass(
         "o-web-studio-editor--element-clicked"
     );
 
@@ -2176,8 +2183,6 @@ test("label edition", async () => {
 });
 
 test("add a statusbar", async () => {
-    expect.assertions(8);
-
     await mountViewEditor({
         type: "form",
         resModel: "coucou",
@@ -2191,9 +2196,23 @@ test("add a statusbar", async () => {
 
     onRpc("/web_studio/edit_view", async (request) => {
         const { params } = await request.json();
+        expect.step("edit_view");
         expect(params.operations).toHaveLength(2);
         expect(params.operations[0]).toEqual({ type: "statusbar" });
-        expect(params.operations[1].target).toEqual({ tag: "header" });
+        expect(params.operations[1].target).toEqual({
+            tag: "header",
+            xpath: "/form[1]/header[1]",
+            xpath_info: [
+                {
+                    indice: 1,
+                    tag: "form",
+                },
+                {
+                    indice: 1,
+                    tag: "header",
+                },
+            ],
+        });
         expect(params.operations[1].position).toBe("inside");
         expect(params.operations[1].node.attrs).toEqual({
             widget: "statusbar",
@@ -2202,12 +2221,14 @@ test("add a statusbar", async () => {
     });
 
     expect(".o_web_studio_form_view_editor .o_web_studio_statusbar_hook").toHaveCount(1);
-    await contains(".o_web_studio_form_view_editor .o_web_studio_statusbar_hook").click();
-    expect(".o_dialog .modal").toHaveCount(1);
-    expect(
-        ".o_dialog .o_web_studio_selection_editor li.o-draggable .o-web-studio-interactive-list-item-label"
-    ).toHaveCount(3);
+    await contains(".o_web_studio_sidebar .o_web_studio_field_selection").dragAndDrop(
+        ".o_web_studio_statusbar_hook"
+    );
+    await contains(
+        ".o_dialog .o_web_studio_selection_editor .o-web-studio-interactive-list-item-input"
+    ).edit("custom item");
     await contains(".modal-footer .btn-primary").click();
+    expect.verifySteps(["edit_view"]);
 });
 
 test("move a field in form", async () => {
@@ -2401,7 +2422,9 @@ test("form editor add avatar image", async () => {
     await contains(".oe_avatar").click();
     await contains(".o_web_studio_sidebar .o_web_studio_remove").click();
 
-    expect(".modal-body").toHaveText("Are you sure you want to remove this field from the view?");
+    expect(".modal-body").toHaveText(
+        "Are you sure you want to remove the field Image from the view?\nIf you need it back, add it from the list of existing fields."
+    );
 
     await contains(".modal-footer .btn-primary").click();
 
@@ -2529,7 +2552,7 @@ test("Open form view with button_box in studio", async () => {
         resId: 1,
         arch: `<form>
                 <div name="button_box" class="oe_button_box" invisible="not display_name">
-                    <button type="object" class="oe_stat_button" icon="fa-check-square">
+                    <button type="object" class="oe_stat_button" icon="check_box" icon_class="oi-filled">
                         <field name="display_name"/>
                     </button>
                 </div>
@@ -2568,10 +2591,10 @@ test("new button in buttonbox", async () => {
                 node: {
                     tag: "button",
                     field: 1,
-                    string: "New button",
+                    string: "My new button",
                     attrs: {
                         class: "oe_stat_button",
-                        icon: "fa-diamond",
+                        icon: "diamond",
                     },
                 },
             },
@@ -2583,8 +2606,10 @@ test("new button in buttonbox", async () => {
     expect(".o_dialog .modal").toHaveCount(1);
     expect(".o_dialog .o_input_dropdown .o-autocomplete").toHaveCount(1);
     await contains(".modal-footer button:first-child").click();
-    expect(".o_notification").toHaveCount(1);
     expect(".o_dialog .modal").toHaveCount(1);
+    expect(".o_dialog .o_field_invalid").toHaveCount(2);
+
+    await contains(".o_dialog input[name='string']").edit("My new button");
 
     await contains(".o-autocomplete--input").click();
     await contains(".o-autocomplete .o-autocomplete--dropdown-item").click();
@@ -2593,7 +2618,7 @@ test("new button in buttonbox", async () => {
 });
 
 test("new button in buttonbox through 'Search more'", async () => {
-    expect.assertions(7);
+    expect.assertions(6);
 
     const arch = `<form><sheet><field name='display_name'/></sheet></form>`;
     await mountViewEditor({
@@ -2633,7 +2658,7 @@ test("new button in buttonbox through 'Search more'", async () => {
                     string: "New button",
                     attrs: {
                         class: "oe_stat_button",
-                        icon: "fa-diamond",
+                        icon: "diamond",
                     },
                 },
             },
@@ -2645,9 +2670,9 @@ test("new button in buttonbox through 'Search more'", async () => {
     expect(".o_dialog .modal").toHaveCount(1);
     expect(".o_dialog .o_input_dropdown .o-autocomplete").toHaveCount(1);
     await contains(".modal-footer button:first-child").click();
-    expect(".o_notification").toHaveCount(1);
     expect(".o_dialog .modal").toHaveCount(1);
 
+    await contains(".o_dialog input[name='string']").edit("New button");
     await contains(".o-autocomplete--input").click();
     await contains(".o_m2o_dropdown_option_search_more").click();
     await contains(".o_list_view .o_data_row .o_data_cell").click();
@@ -2721,12 +2746,16 @@ test("element removal", async () => {
 
     await contains("[data-field-name='display_name']").click();
     await contains(".o_web_studio_sidebar .o_web_studio_remove").click();
-    expect(".modal-body").toHaveText("Are you sure you want to remove this field from the view?");
+    expect(".modal-body").toHaveText(
+        "Are you sure you want to remove the field Display name from the view?\nIf you need it back, add it from the list of existing fields."
+    );
     await contains(".modal .btn-primary").click();
 
     await contains("[data-field-name='m2o']").click();
     await contains(".o_web_studio_sidebar .o_web_studio_remove").click();
-    expect(".modal-body").toHaveText("Are you sure you want to remove this field from the view?");
+    expect(".modal-body").toHaveText(
+        "Are you sure you want to remove the field Product from the view?\nIf you need it back, add it from the list of existing fields."
+    );
     await contains(".modal .btn-primary").click();
 
     await contains(".o_inner_group.o-web-studio-editor--element-clickable").click();
@@ -2734,7 +2763,7 @@ test("element removal", async () => {
     expect(".modal-body").toHaveText("Are you sure you want to remove this column from the view?");
     await contains(".modal .btn-primary").click();
 
-    await contains(".o_notebook li.o-web-studio-editor--element-clickable").click();
+    await contains(".o_notebook li button.o-web-studio-editor--element-clickable").click();
     await contains(".o_web_studio_sidebar .o_web_studio_remove").click();
     expect(".modal-body").toHaveText("Are you sure you want to remove this page from the view?");
     await contains(".modal .btn-primary").click();
@@ -2977,6 +3006,24 @@ test("approval one rule by default", async () => {
     expect(".o_statusbar_buttons button img").toHaveCount(1);
 });
 
+test("anchor button: no studio xpath", async () => {
+    // "a[type]" nodes are compiled as ViewButtons, but the form editor compiler
+    // doesn't put an xpath on them: they are not editable in studio.
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch: `
+            <form>
+                <sheet>
+                    <a name="action_confirm" type="object" role="button" class="btn btn-light">Confirm</a>
+                </sheet>
+            </form>`,
+    });
+
+    expect("a[name='action_confirm']").toHaveCount(1);
+    expect("a[name='action_confirm']").not.toHaveClass("o-web-studio-editor--element-clickable");
+});
+
 test("button rainbowman Truish value in sidebar", async () => {
     await mountViewEditor({
         type: "form",
@@ -3110,8 +3157,8 @@ test("Sets 'force_save' attribute when changing readonly attribute in form view"
 
 test("X2Many field widgets not using subviews", async () => {
     class NoSubView extends Component {
-        static template = xml`<div>nosubview <t t-esc="this.props.record.fields[props.name].type"/></div>`;
-        static props = ["*"];
+        static template = xml`<div>nosubview <t t-out="this.props.record.fields[this.props.name].type"/></div>`;
+        props = useProps(standardFieldProps);
     }
     registry.category("fields").add("nosubview", {
         component: NoSubView,
@@ -3286,7 +3333,7 @@ test("edit_view route includes the context of the action", async () => {
         context: { action_key: "some_context_value" },
     });
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_web_studio_form_view_editor div[name='display_name']").click();
     await contains(".o_web_studio_sidebar input[name='string']").edit("new Label");
     expect.verifySteps(["edit_view"]);
@@ -3446,10 +3493,10 @@ test("don't show span, fields in button box", async () => {
         arch: `<form><sheet><div class="oe_button_box" name="button_box">
                 <span id="button_worksheet" invisible="1"/>
                 <field name="char_field" invisible="1"/>
-                <button name="action_visible" type="object" invisible="id != 1" class="oe_stat_button" icon="fa-star">
+                <button name="action_visible" type="object" invisible="id != 1" class="oe_stat_button" icon="star" icon_class="oi-filled">
                     <field name="id" widget="statinfo"/>
                 </button>
-                <button name="action_invisible" type="object" invisible="id == 1" class="oe_stat_button" icon="fa-gear">
+                <button name="action_invisible" type="object" invisible="id == 1" class="oe_stat_button" icon="settings" icon_class="oi-filled">
                     <field name="id" widget="statinfo"/>
                 </button>
             </div></sheet></form>`,
@@ -3467,17 +3514,17 @@ test("don't show span, fields in button box", async () => {
 test("button_box: few visible buttons and no invisible buttons", async () => {
     Coucou._records = [{ id: 1 }];
 
-    const editor = await mountViewEditor({
+    await mountViewEditor({
         type: "form",
         resModel: "coucou",
         resId: 1,
         arch: `<form>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="one" type="object" className="oe_stat_button" icon="fa-star">
+                        <button name="one" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled">
                             <field name="id" widget="statinfo"/>
                         </button>
-                        <button name="two" type="object" className="oe_stat_button" icon="fa-star">
+                        <button name="two" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled">
                             <field name="id" widget="statinfo"/>
                         </button>
                     </div>
@@ -3485,24 +3532,24 @@ test("button_box: few visible buttons and no invisible buttons", async () => {
                 </sheet>
             </form>`,
     });
-    expect(editor.env.services.ui.size).toBe(4);
+    expect(getService("ui").size).toBe(4);
 
-    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:first-child").toHaveClass(
-        "o_web_studio_add_element"
+    expect(".o_form_sheet_bg > div > .o-form-buttonbox div:last-child > button:eq(0)").toHaveClass(
+        "o_web_studio_button_hook"
     );
     expect(queryAllAttributes(".o_form_sheet_bg > div > .o-form-buttonbox button", "name")).toEqual(
-        [null, "one", "two"]
+        ["one", "two", null]
     );
     expect(queryAllAttributes(".o_form_sheet_bg > .o-form-buttonbox button", "name")).toEqual([]);
 
     await contains(".o_web_studio_view").click();
     await contains(".o_web_studio_sidebar input#show_invisible").click();
 
-    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:first-child").toHaveClass(
-        "o_web_studio_add_element"
+    expect(".o_form_sheet_bg > div > .o-form-buttonbox div:last-child > button:eq(0)").toHaveClass(
+        "o_web_studio_button_hook"
     );
     expect(queryAllAttributes(".o_form_sheet_bg > div > .o-form-buttonbox button", "name")).toEqual(
-        [null, "one", "two"]
+        ["one", "two", null]
     );
     expect(queryAllAttributes(".o_form_sheet_bg > .o-form-buttonbox button", "name")).toEqual([]);
 });
@@ -3510,17 +3557,17 @@ test("button_box: few visible buttons and no invisible buttons", async () => {
 test("button_box: few mixed buttons", async () => {
     Coucou._records = [{ id: 1 }];
 
-    const editor = await mountViewEditor({
+    await mountViewEditor({
         type: "form",
         resModel: "coucou",
         resId: 1,
         arch: `<form>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="one" type="object" className="oe_stat_button" icon="fa-star">
+                        <button name="one" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled">
                             <field name="id" widget="statinfo"/>
                         </button>
-                        <button name="two" type="object" className="oe_stat_button" icon="fa-star" invisible="id != 5">
+                        <button name="two" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled" invisible="id != 5">
                             <field name="id" widget="statinfo"/>
                         </button>
                     </div>
@@ -3528,24 +3575,24 @@ test("button_box: few mixed buttons", async () => {
                 </sheet>
             </form>`,
     });
-    expect(editor.env.services.ui.size).toBe(4);
+    expect(getService("ui").size).toBe(4);
 
-    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:first-child").toHaveClass(
-        "o_web_studio_add_element"
+    expect(".o_form_sheet_bg > div > .o-form-buttonbox div:last-child button:eq(0)").toHaveClass(
+        "o_web_studio_button_hook"
     );
     expect(queryAllAttributes(".o_form_sheet_bg > div > .o-form-buttonbox button", "name")).toEqual(
-        [null, "one"]
+        ["one", null]
     );
     expect(queryAllAttributes(".o_form_sheet_bg > .o-form-buttonbox button", "name")).toEqual([]);
 
     await contains(".o_web_studio_view").click();
     await contains(".o_web_studio_sidebar input#show_invisible").click();
 
-    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:first-child").toHaveClass(
-        "o_web_studio_add_element"
+    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:last-child").toHaveClass(
+        "o_web_studio_button_hook"
     );
     expect(queryAllAttributes(".o_form_sheet_bg > div > .o-form-buttonbox button", "name")).toEqual(
-        [null, "one", "two"]
+        ["one", "two", null]
     );
     expect(queryAllAttributes(".o_form_sheet_bg > .o-form-buttonbox button", "name")).toEqual([]);
 });
@@ -3553,26 +3600,29 @@ test("button_box: few mixed buttons", async () => {
 test("button_box: many mixed buttons", async () => {
     Coucou._records = [{ id: 1 }];
 
-    const editor = await mountViewEditor({
+    await mountViewEditor({
         type: "form",
         resModel: "coucou",
         resId: 1,
         arch: `<form>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="one" type="object" className="oe_stat_button" icon="fa-star">
+                        <button name="one" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled">
                             <field name="id" widget="statinfo"/>
                         </button>
-                        <button name="two" type="object" className="oe_stat_button" icon="fa-star">
+                        <button name="two" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled">
                             <field name="id" widget="statinfo"/>
                         </button>
-                        <button name="three" type="object" className="oe_stat_button" icon="fa-star" invisible="id != 5">
+                        <button name="three" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled" invisible="id != 5">
                             <field name="id" widget="statinfo"/>
                         </button>
-                        <button name="four" type="object" className="oe_stat_button" icon="fa-star">
+                        <button name="four" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled">
                             <field name="id" widget="statinfo"/>
                         </button>
-                        <button name="five" type="object" className="oe_stat_button" icon="fa-star">
+                        <button name="five" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled">
+                            <field name="id" widget="statinfo"/>
+                        </button>
+                        <button name="six" type="object" className="oe_stat_button" icon="star" icon_class="oi-filled">
                             <field name="id" widget="statinfo"/>
                         </button>
                     </div>
@@ -3580,43 +3630,39 @@ test("button_box: many mixed buttons", async () => {
                 </sheet>
             </form>`,
     });
-    expect(editor.env.services.ui.size).toBe(4);
+    expect(getService("ui").size).toBe(4);
 
-    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:first-child").toHaveClass(
-        "o_web_studio_add_element"
+    expect(".o_form_sheet_bg > div > .o-form-buttonbox div:last-child button:eq(0)").toHaveClass(
+        "o_web_studio_button_hook"
     );
     expect(queryAllAttributes(".o_form_sheet_bg > div > .o-form-buttonbox button", "name")).toEqual(
-        [null, "one", "two", "four", "five"]
+        ["one", "two", "four", "five", "six", null]
     );
     expect(queryAllAttributes(".o_form_sheet_bg > .o-form-buttonbox button", "name")).toEqual([]);
 
     await contains(".o_web_studio_view").click();
     await contains(".o_web_studio_sidebar input#show_invisible").click();
 
-    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:first-child").toHaveClass(
-        "o_web_studio_add_element"
+    expect(".o_form_sheet_bg > div > .o-form-buttonbox div:last-child button:eq(0)").toHaveClass(
+        "o_web_studio_button_hook"
     );
     expect(queryAllAttributes(".o_form_sheet_bg > div > .o-form-buttonbox button", "name")).toEqual(
-        [null, "one", "two", "three", null]
+        ["one", "two", "three", "four", null, null]
     );
     expect(queryAllAttributes(".o_form_sheet_bg > .o-form-buttonbox button", "name")).toEqual([]);
-    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:last-child").toHaveClass(
+    expect(".o_form_sheet_bg > div > .o-form-buttonbox div:last-child button:eq(1)").toHaveClass(
         "o_button_more"
     );
 
     await contains(".o-form-buttonbox .o_button_more").click();
 
-    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:first-child").toHaveClass(
-        "o_web_studio_add_element"
+    expect(".o_form_sheet_bg > div > .o-form-buttonbox div:last-child button:eq(0)").toHaveClass(
+        "o_web_studio_button_hook"
     );
     expect(queryAllAttributes(".o_form_sheet_bg > div > .o-form-buttonbox button", "name")).toEqual(
-        [null, "one", "two", "three", null]
+        ["one", "two", "three", "four", null, null, "five", "six"]
     );
-    expect(queryAllAttributes(".o_form_sheet_bg > .o-form-buttonbox button", "name")).toEqual([
-        "four",
-        "five",
-    ]);
-    expect(".o_form_sheet_bg > div > .o-form-buttonbox button:last-child").toHaveClass(
+    expect(".o_form_sheet_bg > div > .o-form-buttonbox div:last-child button:eq(1)").toHaveClass(
         "o_button_more"
     );
 });
@@ -3925,7 +3971,6 @@ test("edit one2many list view with widget fieldDependencies and some records", a
 test("entering x2many with view widget", async () => {
     class MyWidget extends Component {
         static template = xml`<div class="myWidget" />`;
-        static props = ["*"];
     }
     const myWidget = {
         component: MyWidget,
@@ -4348,7 +4393,7 @@ test("Change color on many2many tags", async () => {
             <form>
                 <sheet>
                     <group>
-                        <field name="m2m_employees" widget="many2many_tags" options="{'color_field': 'partner_color'}"/>
+                        <field name="m2m_employees" widget="many2many_tags" options="{'color_field': 'partner_color', 'on_tag_click': 'edit_color'}"/>
                     </group>
                 </sheet>
             </form>`;
@@ -4366,6 +4411,133 @@ test("Change color on many2many tags", async () => {
     await contains(".dropdown-item:contains('Partner Color')").click();
     expect("input[name='color_field']").toHaveValue("Partner Color");
     expect.verifySteps(["fields_get"]);
+});
+
+test("Add record to statusbar", async () => {
+    Product._views = {
+        form: `<form><field name="display_name" /></form>`,
+    };
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch: `<form>
+            <header>
+                <field name="m2o" widget="statusbar" options="{'clickable': '1', 'create_name_field': 'display_name'}" />
+            </header>
+        </form>
+    `,
+    });
+    onRpc("product", "web_save", () => {
+        expect.step("web_save");
+    });
+    await contains(".o_field_statusbar button:contains(Add)").click();
+    // Click on add button triggers the sidebar to update
+    await waitFor(".o_web_studio_sidebar input[name='widget']:value(Status (statusbar))");
+    await contains(".o_dialog .o_form_view .o_field_widget[name='display_name'] input").edit(
+        "new Record"
+    );
+    await contains(".o_dialog .o_form_button_save").click();
+    expect.verifySteps(["web_save"]);
+    await waitFor(".o_field_statusbar button:contains(new record)");
+});
+
+test("display default_value in properties", async () => {
+    Coucou._fields.technical_readonly = fields.Char({ readonly: true });
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch: /*xml*/ `
+            <form>
+                <sheet>
+                    <group>
+                        <field name="display_name"/>
+                        <field name="technical_readonly"/>
+                    </group>
+                </sheet>
+            </form>
+        `,
+    });
+
+    await contains(".o_form_view .o_cell:has(.o_field_widget[name='display_name'])").click();
+    await waitFor(".o_web_studio_sidebar input[name='string']:value(Display Name)");
+    expect(".o_web_studio_sidebar input[name='default_value']").toHaveCount(1);
+
+    await contains(".o_form_view .o_cell:has(.o_field_widget[name='technical_readonly'])").click();
+    await waitFor(".o_web_studio_sidebar input[name='string']:value(Technical Readonly)");
+    expect(".o_web_studio_sidebar input[name='default_value']").toHaveCount(0);
+});
+
+test("Fix getFieldChoices when change from any field to m2m field with tags widget", async () => {
+    await mountViewEditor({
+        type: "form",
+        resModel: "product",
+        arch: /*xml*/ `
+            <form>
+                <sheet>
+                    <group>
+                        <field name="display_name"/>
+                        <field name="m2m_employees" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+            </form>
+        `,
+    });
+
+    await contains(".o_form_view .o_cell:has(.o_field_widget[name='display_name'])").click();
+    await waitFor(".o_web_studio_sidebar input[name='string']:value(Display Name)");
+    expect(".o_web_studio_sidebar input[name='default_value']").toHaveCount(1);
+
+    await contains(".o_form_view .o_cell:has(.o_field_widget[name='m2m_employees'])").click();
+    await waitFor(".o_web_studio_sidebar input[name='string']:value(Partners)");
+    expect(".o_web_studio_sidebar input[name='default_value']").toHaveCount(0);
+});
+
+test("Tracking in chatter option for new field", async () => {
+    let trackingValue = null;
+    const arch = `
+        <form>
+            <group>
+                <field name='display_name'/>
+            </group>
+        </form>`;
+
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        const fieldName = params.operations[0].node.field_description.name;
+        const arch = `<form><group><field name='${fieldName}'/><field name='display_name'/></group></form>`;
+        Partner._fields[fieldName] = {
+            type: "char",
+            string: "Hello",
+            manual: true,
+        };
+        return editView(params, "form", arch);
+    });
+
+    onRpc("/web_studio/set_field_tracking", async (request) => {
+        const { params } = await request.json();
+        trackingValue = params.tracking_value;
+        return true;
+    });
+
+    await mountViewEditor({
+        type: "form",
+        resModel: "partner",
+        arch,
+    });
+
+    onRpc("/web_studio/get_field_infos", () => {
+        expect.step("get_field_infos");
+    });
+
+    await contains(".o_web_studio_new_fields .o_web_studio_field_char").dragAndDrop(
+        ".o_inner_group .o_cell.o-draggable"
+    );
+    await contains(".o_form_label:contains('Hello')").click();
+    expect(".o_web_studio_sidebar_checkbox #tracking").not.toBeChecked();
+    await contains(".o_web_studio_sidebar_checkbox #tracking").click();
+    expect(".o_web_studio_sidebar_checkbox #tracking").toBeChecked();
+    expect(trackingValue).toBe(100);
+    expect.verifySteps(["get_field_infos"]);
 });
 
 test("New button is active after adding it", async () => {
@@ -4416,4 +4588,376 @@ test("New button is active after adding it", async () => {
     expect(".o_web_studio_view_renderer button:contains(New button from studio)").toHaveClass(
         "o-web-studio-editor--element-clicked"
     );
+});
+
+test("correctly serialize booleans in approval domain", async () => {
+    expect.assertions(1);
+
+    onRpc("studio.approval.rule", "create_rule", () => ({}));
+    onRpc("studio.approval.rule", "write", ({ args }) => {
+        expect(args[1].domain).toBe(`[("id", "=", False)]`);
+        return {};
+    });
+
+    onRpc("/web/domain/validate", () => true);
+
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch: `<form>
+            <header>
+                <button name="0" string="Test" type="action" class="o_test_action_button"/>
+            </header>
+            <sheet>
+                <field name="m2o"/>
+            </sheet>
+        </form>`,
+    });
+
+    onRpc("studio.approval.rule", "get_approval_spec", () => {
+        const rules = {
+            1: {
+                action_id: "0",
+                approval_group_id: [1, "User types / Internal User"],
+                approver_ids: [],
+                can_validate: true,
+                domain: [["id", "=", false]],
+                exclusive_user: false,
+                id: 1,
+                message: false,
+                method: false,
+                name: false,
+                notification_order: "1",
+                users_to_notify: [],
+            },
+        };
+        return {
+            all_rules: rules,
+            coucou: [[[false, false, "0"], { rules: [1], entries: [] }]],
+        };
+    });
+
+    await contains(".o_form_statusbar button[name='0']").click();
+    await contains(".o_approval_domain").click();
+    await contains(".o_dialog .btn-primary").click();
+});
+
+test("sidebar updates choices correctly when selecting m2m_tags", async () => {
+    await mountViewEditor({
+        type: "form",
+        resModel: "product",
+        arch: `<form>
+            <sheet>
+            <group>
+                <group>
+                    <field name="display_name" />
+                    <field name="m2m_employees" widget="many2many_tags"/>
+                </group>
+            </group>
+            </sheet>
+        </form>`,
+    });
+    await contains(".o_web_studio_view_renderer [data-field-name='display_name']").click();
+    await waitFor(".o_web_studio_sidebar input[name='string']:value(Display Name)");
+
+    await contains(".o_web_studio_view_renderer [data-field-name='m2m_employees']").click();
+    await waitFor(".o_web_studio_sidebar input[name='string']:value(Partners)");
+
+    await contains(".o_web_studio_sidebar input[name='placeholder_field']").click();
+    await waitFor(".o_select_menu_menu");
+
+    expect(".o_select_menu_menu").toHaveText("Display name");
+});
+
+test("buttons in header are moveable", async () => {
+    onRpc("/web_studio/edit_view", async (request) => {
+        expect.step("edit_view");
+        const { params } = await request.json();
+        expect(params.operations[0]).toEqual({
+            node: {
+                attrs: {
+                    name: "action2",
+                },
+                tag: "button",
+                xpath_info: [
+                    {
+                        indice: 1,
+                        tag: "form",
+                    },
+                    {
+                        indice: 1,
+                        tag: "header",
+                    },
+                    {
+                        indice: 2,
+                        tag: "button",
+                    },
+                ],
+            },
+            position: "before",
+            target: {
+                attrs: {
+                    name: "action",
+                },
+                tag: "button",
+                xpath_info: [
+                    {
+                        indice: 1,
+                        tag: "form",
+                    },
+                    {
+                        indice: 1,
+                        tag: "header",
+                    },
+                    {
+                        indice: 1,
+                        tag: "button",
+                    },
+                ],
+            },
+            type: "move",
+        });
+    });
+
+    await mountViewEditor({
+        type: "form",
+        resModel: "product",
+        arch: `<form>
+            <header>
+                <button name="action" type="action" icon="favorite" string="B1"/>
+                <button name="action2" type="action" icon="favorite" string="B2"/>
+            </header>
+        </form>`,
+    });
+
+    expect(".o_statusbar_buttons .o_web_studio_hook:not(.d-none)").toHaveCount(3);
+    expect(queryAll(".o_statusbar_buttons button.o-draggable").map((e) => e.textContent)).toEqual([
+        "B1",
+        "B2",
+    ]);
+    await contains(".o_statusbar_buttons button:eq(1)").dragAndDrop(
+        ".o_statusbar_buttons .o_web_studio_hook:first-child"
+    );
+    expect.verifySteps(["edit_view"]);
+});
+
+test("buttons in button box are moveable", async () => {
+    onRpc("/web_studio/edit_view", async (request) => {
+        expect.step("edit_view");
+        const { params } = await request.json();
+        expect(params.operations[0]).toEqual({
+            node: {
+                attrs: {
+                    name: "action2",
+                },
+                tag: "button",
+                xpath_info: [
+                    {
+                        indice: 1,
+                        tag: "form",
+                    },
+                    {
+                        indice: 1,
+                        tag: "sheet",
+                    },
+                    {
+                        indice: 1,
+                        tag: "div",
+                    },
+                    {
+                        indice: 2,
+                        tag: "button",
+                    },
+                ],
+            },
+            position: "before",
+            target: {
+                attrs: {
+                    name: "action",
+                },
+                tag: "button",
+                xpath_info: [
+                    {
+                        indice: 1,
+                        tag: "form",
+                    },
+                    {
+                        indice: 1,
+                        tag: "sheet",
+                    },
+                    {
+                        indice: 1,
+                        tag: "div",
+                    },
+                    {
+                        indice: 1,
+                        tag: "button",
+                    },
+                ],
+            },
+            type: "move",
+        });
+    });
+
+    await mountViewEditor({
+        type: "form",
+        resModel: "product",
+        arch: `<form>
+            <sheet>
+                <div name="button_box">
+                    <button name="action" type="action" icon="favorite" string="B1"/>
+                    <button name="action2" type="action" icon="favorite" string="B2"/>
+                </div>
+            </sheet>
+        </form>`,
+    });
+
+    expect(".o-form-buttonbox .o_web_studio_hook:not(.d-none)").toHaveCount(3);
+    expect(queryAll(".o-form-buttonbox button.o-draggable").map((e) => e.textContent)).toEqual([
+        "B1",
+        "B2",
+    ]);
+    await contains(".o-form-buttonbox button:eq(1)").dragAndDrop(
+        ".o-form-buttonbox .o_web_studio_hook:first-child"
+    );
+    expect.verifySteps(["edit_view"]);
+});
+
+test("buttons configuration supports icon", async () => {
+    onRpc("/web_studio/edit_view", async (request) => {
+        expect.step("edit_view");
+        const { params } = await request.json();
+        expect(params.operations[0]).toEqual({
+            new_attrs: {
+                icon: "bug_report",
+            },
+            type: "attributes",
+            position: "attributes",
+            target: {
+                tag: "button",
+                attrs: {
+                    name: "action",
+                },
+                xpath_info: [
+                    {
+                        tag: "form",
+                        indice: 1,
+                    },
+                    {
+                        tag: "header",
+                        indice: 1,
+                    },
+                    {
+                        tag: "button",
+                        indice: 1,
+                    },
+                ],
+            },
+            node: {
+                tag: "button",
+                attrs: {
+                    name: "action",
+                    type: "action",
+                    icon: "favorite",
+                },
+            },
+        });
+    });
+
+    await mountViewEditor({
+        type: "form",
+        resModel: "product",
+        arch: `<form>
+            <header>
+                <button name="action" type="action" icon="favorite" />
+            </header>
+        </form>`,
+    });
+
+    await contains("button[name='action']").click();
+    await contains(".o_web_studio_sidebar .o_web_studio_icon_selector").click();
+    await contains(".font-icons-icon:not(.oi-filled)[data-icon='bug_report']").click();
+
+    expect.verifySteps(["edit_view"]);
+});
+
+test("move a page in a notebook", async () => {
+    expect.assertions(5);
+
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch: `<form>
+                <sheet>
+                    <notebook>
+                        <page name='page_1' string='Page 1'>
+                            <group><field name='display_name'/></group>
+                        </page>
+                        <page name='page_2' string='Page 2'>
+                            <group><field name='char_field'/></group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>`,
+    });
+
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        expect(params.operations[0]).toEqual({
+            node: {
+                tag: "page",
+                attrs: { name: "page_1" },
+                xpath_info: [
+                    { indice: 1, tag: "form" },
+                    { indice: 1, tag: "sheet" },
+                    { indice: 1, tag: "notebook" },
+                    { indice: 1, tag: "page" },
+                ],
+            },
+            position: "after",
+            target: {
+                tag: "page",
+                attrs: { name: "page_2" },
+                xpath_info: [
+                    { indice: 1, tag: "form" },
+                    { indice: 1, tag: "sheet" },
+                    { indice: 1, tag: "notebook" },
+                    { indice: 2, tag: "page" },
+                ],
+            },
+            type: "move",
+        });
+
+        const arch = `<form>
+                <sheet>
+                    <notebook>
+                        <page name='page_2' string='Page 2'>
+                            <group><field name='char_field'/></group>
+                        </page>
+                        <page name='page_1' string='Page 1'>
+                            <group><field name='display_name'/></group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>`;
+        return editView(params, "form", arch);
+    });
+
+    expect(
+        queryAllTexts(".o_web_studio_view_renderer .o_notebook_headers .nav-link[name^='page_']")
+    ).toEqual(["Page 1", "Page 2"]);
+    await contains(".o_web_studio_view_renderer .nav-item .nav-link[name='page_1']").click();
+    expect(".o_web_studio_view_renderer .nav-link[name='page_1']").toHaveClass("active");
+
+    // Drag Page 1 and drop it onto the Page 2's "after" hook
+    await contains(".o_web_studio_view_renderer .nav-item .nav-link[name='page_1']").dragAndDrop(
+        ".o_notebook_headers .o_web_studio_page_hook[data-position='after']:last"
+    );
+    await animationFrame();
+    expect(
+        queryAllTexts(".o_web_studio_view_renderer .o_notebook_headers .nav-link[name^='page_']")
+    ).toEqual(["Page 2", "Page 1"]);
+
+    // Check the moved page is the one opened
+    expect(".o_web_studio_view_renderer .nav-link[name='page_1']").toHaveClass("active");
 });

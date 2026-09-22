@@ -7,6 +7,8 @@ from unittest.mock import patch
 
 from . import test_common
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMerge(test_common.TestCommon):
     def test_generic_merge(self):
         self._create_rule('x_name', 'exact')
@@ -177,3 +179,42 @@ class TestMergeLog(test_common.TestCommon):
         self.assertIn("merged into this one", task_1.message_ids.sorted(key=lambda m: m.create_date)[0].body)
         self.assertIn("Task merged into", task_2.message_ids.sorted(key=lambda m: m.create_date)[0].body)
         self.assertIn("Task merged into", task_3.message_ids.sorted(key=lambda m: m.create_date)[0].body)
+
+    def test_partner_merge_batch_limit(self):
+        """ Test merging 12 partners processes only 3 per cron call, leaving rest for next day. """
+        # Create 12 partners with same email for deduplication.
+        partners = self.env['res.partner'].create([
+            {'name': f'Partner {i}', 'email': 'duplicate@test.com'} for i in range(12)
+        ])
+
+        # Setup merge model for res.partner.
+        res_model_id = self.env['ir.model'].search([('model', '=', 'res.partner')])
+        model_id = self.env['data_merge.model'].create({
+            'name': 'res.partner',
+            'res_model_id': res_model_id.id,
+            'merge_mode': 'automatic',
+        })
+        self.env['data_merge.rule'].create({
+            'model_id': model_id.id,
+            'field_id': self.env['ir.model.fields']._get('res.partner', 'email').id,
+            'match_mode': 'exact',
+        })
+
+        # Create merge group with all 12 partners.
+        data_merge_group = self.env['data_merge.group'].create({
+            'model_id': model_id.id,
+            'res_model_id': res_model_id.id,
+            'record_ids': [Command.create({'res_id': p.id, 'is_master': i == 0}) for i, p in enumerate(partners)],
+        })
+
+        # First merge call - should process only 3 partners (2 source + 1 master).
+        res = data_merge_group.merge_records(data_merge_group.record_ids.ids)
+        self.assertEqual(res["records_merged"], 3, "Only 3 partners should be merged per call.")
+        self.assertEqual(len(partners.exists()), 10, "10 partners should remain after first merge.")
+
+        # Simulate next day's cron - merge 2 more into master.
+        remaining_group = self.env['data_merge.group'].search([('id', '=', data_merge_group.id)])
+        if remaining_group and len(remaining_group.record_ids) > 1:
+            res2 = remaining_group.merge_records(remaining_group.record_ids.ids)
+            self.assertEqual(res2["records_merged"], 3, "Another 3 partners should be merged.")
+            self.assertEqual(len(partners.exists()), 8, "8 partners should remain after second merge.")

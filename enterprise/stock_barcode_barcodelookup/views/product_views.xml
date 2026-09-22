@@ -9,6 +9,10 @@
             <xpath expr="//field[@name='barcode']" position="attributes">
                 <attribute name="widget"/>
             </xpath>
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="tracking" invisible="context.get('default_tracking') not in ('lot', 'serial')" groups="stock.group_production_lot"/>
+                <field name="is_storable" invisible="1"/>  <!-- allows us to set the value provided from context -->
+            </xpath>
         </field>
     </record>
 

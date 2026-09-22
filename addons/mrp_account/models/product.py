@@ -41,12 +41,12 @@ class ProductProduct(models.Model):
 
     def button_bom_cost(self):
         self.ensure_one()
-        self._set_price_from_bom()
+        self.with_context(action_button_product=self)._set_price_from_bom()
 
     def action_bom_cost(self):
         boms_to_recompute = self.env['mrp.bom'].search(['|', ('product_id', 'in', self.ids), '&', ('product_id', '=', False), ('product_tmpl_id', 'in', self.mapped('product_tmpl_id').ids)])
         for product in self:
-            product._set_price_from_bom(boms_to_recompute)
+            product.with_context(action_button_product=product)._set_price_from_bom(boms_to_recompute)
 
     def _set_price_from_bom(self, boms_to_recompute=False):
         self.ensure_one()
@@ -60,13 +60,16 @@ class ProductProduct(models.Model):
                 if price:
                     self.standard_price = price
 
-    def _compute_bom_price(self, bom, boms_to_recompute=False, byproduct_bom=False):
+    def _get_bom_components_price(self, bom, boms_to_recompute=False, byproduct_bom=False):
+        """
+        Calculates only the price of the BoM components
+        """
         self.ensure_one()
         if not bom:
             return 0
         if not boms_to_recompute:
             boms_to_recompute = []
-        total = 0
+        total = bom.extra_cost if bom.type == 'normal' else 0
         for opt in bom.operation_ids:
             if opt._skip_operation_line(self):
                 continue
@@ -80,14 +83,14 @@ class ProductProduct(models.Model):
             # Compute recursive if line has `child_line_ids`
             if line.child_bom_id and line.child_bom_id in boms_to_recompute:
                 child_total = line.product_id._compute_bom_price(line.child_bom_id, boms_to_recompute=boms_to_recompute)
-                total += line.product_id.uom_id._compute_price(child_total, line.product_uom_id) * line.product_qty
+                total += line.product_id.uom_id._compute_price(child_total, line.uom_id) * line.product_qty
             else:
-                total += line.product_id.uom_id._compute_price(line.product_id.standard_price, line.product_uom_id) * line.product_qty
+                total += line.product_id.uom_id._compute_price(line.product_id.standard_price, line.uom_id) * line.product_qty
         if byproduct_bom:
             byproduct_lines = bom.byproduct_ids.filtered(lambda b: b.product_id == self and b.cost_share != 0)
             product_uom_qty = 0
             for line in byproduct_lines:
-                product_uom_qty += line.product_uom_id._compute_quantity(line.product_qty, self.uom_id, round=False)
+                product_uom_qty += line.uom_id._compute_quantity(line.product_qty, self.uom_id, round=False)
             byproduct_cost_share = sum(byproduct_lines.mapped('cost_share'))
             if byproduct_cost_share and product_uom_qty:
                 return total * byproduct_cost_share / 100 / product_uom_qty
@@ -95,8 +98,24 @@ class ProductProduct(models.Model):
             byproduct_cost_share = sum(bom.byproduct_ids.mapped('cost_share'))
             if byproduct_cost_share:
                 total *= float_round(1 - byproduct_cost_share / 100, precision_rounding=0.0001)
-            return bom.product_uom_id._compute_price(total / bom.product_qty, self.uom_id)
+            return bom.uom_id._compute_price(total / bom.product_qty, self.uom_id)
         return 0.0
+
+    def _compute_bom_price(self, bom, boms_to_recompute=False, byproduct_bom=False):
+        return self._get_bom_components_price(bom, boms_to_recompute=boms_to_recompute, byproduct_bom=byproduct_bom)
+
+    def _compute_value(self):
+        """
+        Exclude kit products from inventory valuation to avoid double counting.
+        Only non-kit products are valuated; kits are set to zero value.
+        """
+        non_kit_products = self.filtered(lambda product: not product.is_kits)
+        super(ProductProduct, non_kit_products)._compute_value()
+        kit_products = self - non_kit_products
+        for kit_product in kit_products:
+            kit_product.company_currency_id = kit_product.company_id.currency_id or self.env.company.currency_id
+            kit_product.total_value = 0.0
+            kit_product.avg_cost = 0.0
 
 
 class ProductCategory(models.Model):

@@ -1,13 +1,14 @@
 import { registry } from "@web/core/registry";
 import { formView } from "@web/views/form/form_view";
-import { FormController } from "@web/views/form/form_controller";
+import { FormController, formControllerProps } from "@web/views/form/form_controller";
+import { useProps, t } from "@odoo/owl";
 
 class AppointmentInsertLinkFormController extends FormController {
-    static props = {
-        ...FormController.props,
-        insertLink: { type: Function },
-        closeDialog: { type: Function },
-    };
+    props = useProps({
+        ...formControllerProps,
+        insertLink: t.function(),
+        closeDialog: t.function(),
+    });
     async beforeExecuteActionButton(clickParams) {
         if (clickParams.special) {
             if (clickParams.special === "save") { // Insert Link button

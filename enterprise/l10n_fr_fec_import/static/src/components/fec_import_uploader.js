@@ -1,15 +1,16 @@
 import { registry } from "@web/core/registry";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, useProps } from "@odoo/owl";
 import { FileUploader } from "@web/views/fields/file_handler";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
 class FecImportUploader extends Component {
     static template = "l10n_fr_fec_import.FecImportUploader";
-    static props = standardWidgetProps;
     static components = { FileUploader };
 
+    props = useProps(standardWidgetProps);
+
     setup() {
-        this.fecFileState = useState(this.env.fecFileState);
+        this.fecFileState = proxy(this.env.fecFileState);
     }
 
     onFileChanged(file) {

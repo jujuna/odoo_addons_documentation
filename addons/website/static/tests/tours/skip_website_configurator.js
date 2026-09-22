@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("skip_website_configurator", {
-    url: "/odoo/action-website.action_website_configuration",
     steps: () => [
         {
             content: "create a new website",
@@ -21,9 +20,8 @@ registry.category("web_tour.tours").add("skip_website_configurator", {
         },
         {
             content: "skip configurator",
-            // This trigger targets the skip button, it doesn't have a more
-            // explicit class or ID.
-            trigger: ".o_configurator_container .container-fluid .btn.btn-link",
+            trigger:
+                ".o_configurator_container .btn.btn-link:contains('Skip and start from scratch')",
             run: "click",
         },
         {
@@ -32,8 +30,8 @@ registry.category("web_tour.tours").add("skip_website_configurator", {
             timeout: 30000,
         },
         {
-            content: "Wait title is present before close tour",
-            trigger: ":iframe h2:contains(welcome to your)",
+            content: "Check that the editor is opened",
+            trigger: ":iframe #wrapwrap.odoo-editor-editable",
         },
     ],
 });

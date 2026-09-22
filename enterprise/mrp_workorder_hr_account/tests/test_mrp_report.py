@@ -4,10 +4,13 @@
 from freezegun import freeze_time
 from odoo import Command
 from odoo.addons.mrp.tests.common import TestMrpCommon
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMrpReportEmployeeCost(TestMrpCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time("2022-05-28")
     def test_mrp_report_no_operations(self):
         """
@@ -21,6 +24,7 @@ class TestMrpReportEmployeeCost(TestMrpCommon):
             - work_order duration: 0
             unit_component_cost = $20
             unit_duration = 0
+            unit_workcenter_cost = 0
             unit_operation_cost = 0
             unit_cost = 180
         """
@@ -47,6 +51,7 @@ class TestMrpReportEmployeeCost(TestMrpCommon):
 
         report = self.env["mrp.report"].search([("production_id", "=", mo.id)])
 
+        self.assertEqual(report["unit_workcenter_cost"], 0)
         self.assertEqual(report["unit_operation_cost"], 0)
         self.assertEqual(report["unit_duration"], 0)
         self.assertEqual(report["unit_component_cost"], 20)
@@ -95,7 +100,8 @@ class TestMrpReportEmployeeCost(TestMrpCommon):
             [{
                 'expected_component_cost_unit':   100.0,
                 'expected_employee_cost_unit':    30.0,
-                'expected_operation_cost_unit':   20.0,
+                'expected_workcenter_cost_unit':  20.0,
+                'expected_operation_cost_unit':   50.0,
                 'expected_total_cost_unit':       150.0
             } for _ in range(2)]
         )
@@ -118,6 +124,7 @@ class TestMrpReportEmployeeCost(TestMrpCommon):
             'product_qty': 2,
             'bom_id': self.bom_4.id,
         })
+        mo.action_confirm()
         mo.action_assign()
         mo.button_plan()
         mo.workorder_ids.button_start()
@@ -125,7 +132,8 @@ class TestMrpReportEmployeeCost(TestMrpCommon):
         mo.workorder_ids.duration = 10
         mo.move_raw_ids.quantity = 1
         mo.move_raw_ids.picked = True
-        mo.button_mark_done()
+        # Ignore the consumption warning
+        Form.from_action(self.env, mo.button_mark_done()).save().action_confirm()
 
         self.env.flush_all()
         self.assertRecordValues(
@@ -133,11 +141,13 @@ class TestMrpReportEmployeeCost(TestMrpCommon):
             [{
                 'duration': 120.0,
                 'employee_cost': 66.0,
-                'operation_cost': 40.0,
+                'workcenter_cost': 40.0,
+                'operation_cost': 106.0,
                 'total_cost': 106.0,
                 'unit_duration': 60.0,
                 'unit_employee_cost': 33.0,
-                'unit_operation_cost': 20.0,
+                'unit_workcenter_cost': 20.0,
+                'unit_operation_cost': 53.0,
                 'unit_cost': 53.0,
             }]
         )

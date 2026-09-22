@@ -16,7 +16,6 @@ import { useService } from "@web/core/utils/hooks";
 export class FindDuplicateTransactions extends Component {
     static template = "account_online_synchronization.FindDuplicateTransactions";
     static components = { DropdownItem };
-    static props = {};
 
     setup() {
         this.action = useService("action");
@@ -38,27 +37,28 @@ export class FindDuplicateTransactions extends Component {
         return this.action.doActionButton({
             type: "object",
             resModel: "account.journal",
-            name:"action_open_duplicate_transaction_wizard",
+            name: "action_open_duplicate_transaction_wizard",
             resIds: activeIds,
-        })
+        });
     }
 }
 
 export const findDuplicateTransactionItem = {
     Component: FindDuplicateTransactions,
     groupNumber: 5, // same group as fetch missing transactions
-    isDisplayed: ({ config, isSmall }) => {
+    isDisplayed: ({ config }) => {
+        const ui = useService("ui");
         return (
-            !isSmall &&
+            !ui.isSmall &&
             config.actionType === "ir.actions.act_window" &&
             ["kanban", "list"].includes(config.viewType) &&
             ["bank_rec_widget_kanban", "bank_rec_list"].includes(config.viewSubType)
-        )
+        );
     },
 };
 
 registry.category("cogMenu").add(
     "find-duplicate-transaction-menu",
     findDuplicateTransactionItem,
-    { sequence: 3 }, // after fetch missing transactions
+    { sequence: 3 } // after fetch missing transactions
 );

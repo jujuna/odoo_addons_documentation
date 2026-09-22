@@ -3,9 +3,9 @@ from contextlib import contextmanager
 from unittest import SkipTest
 from unittest.mock import patch
 
-from odoo import Command
 from odoo.addons.account_avatax.lib.avatax_client import AvataxClient
 from odoo.addons.account.tests.common import TestTaxCommon
+from odoo.tests import freeze_time
 from odoo.tests.common import TransactionCase
 from .mocked_invoice_1_response import generate_response as generate_response_invoice_1
 from .mocked_invoice_2_response import generate_response as generate_response_invoice_2
@@ -21,6 +21,7 @@ class TestAvataxCommon(TransactionCase):
         cls.env.company.avalara_api_id = os.getenv("AVALARA_LOGIN_ID") or "AVALARA_LOGIN_ID"
         cls.env.company.avalara_api_key = os.getenv("AVALARA_API_KEY") or "AVALARA_API_KEY"
         cls.env.company.avalara_environment = 'sandbox'
+        cls.env.company.avalara_connection_method = 'manual'
         cls.env.company.avalara_commit = True
 
         # Update address of company
@@ -59,14 +60,14 @@ class TestAvataxCommon(TransactionCase):
         class Capture:
             val = None
 
-            def capture_request(self, method, *args, **kwargs):
+            def capture_request(self, *args, **kwargs):
                 self.val = kwargs
                 if return_value is NOTHING:
-                    return return_func(method, *args, **kwargs)
+                    return return_func(*args, **kwargs)
                 return return_value
 
         capture = Capture()
-        with patch(f'{AvataxClient.__module__}.AvataxClient.request', capture.capture_request):
+        with patch(f'{AvataxClient.__module__}.AvataxClient._dispatch', capture.capture_request), patch(f'{AvataxClient.__module__}.AvataxClient.iap_request', capture.capture_request):
             yield capture
 
     @classmethod
@@ -78,6 +79,8 @@ class TestAvataxCommon(TransactionCase):
 
 
 class TestAccountAvataxCommon(TestAvataxCommon, TestTaxCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         res = super().setUpClass()
@@ -140,105 +143,55 @@ class TestAccountAvataxCommon(TestAvataxCommon, TestTaxCommon):
         return res
 
     @classmethod
-    def _create_invoice(cls, post=True, **kwargs):
-        invoice = cls.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': cls.partner.id,
-            'fiscal_position_id': cls.fp_avatax.id,
-            'invoice_date': '2020-01-01',
-            'invoice_line_ids': [
-                (0, 0, {'product_id': cls.product.id, 'price_unit': 100}),
-            ],
-            **kwargs,
-        })
-        if post:
-            invoice.action_post()
-        return invoice
+    @freeze_time('2020-01-01')
+    def _create_invoice_avatax(cls, **invoice_args):
+        invoice_args.setdefault('partner_id', cls.partner)
+        invoice_args.setdefault('fiscal_position_id', cls.fp_avatax)
+        invoice_args.setdefault('post', True)
+        return cls._create_invoice_one_line(
+            product_id=cls.product,
+            price_unit=100.0,
+            **invoice_args,
+        )
 
     @classmethod
+    @freeze_time('2021-01-01')
     def _create_invoice_01_and_expected_response(cls):
-        invoice = cls.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': cls.partner.id,
-            'fiscal_position_id': cls.fp_avatax.id,
-            'invoice_date': '2021-01-01',
-            'invoice_line_ids': [
-                (0, 0, {
-                    'product_id': cls.product_user.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_user.list_price,
-                }),
-                (0, 0, {
-                    'product_id': cls.product_user_discound.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_user_discound.list_price,
-                }),
-                (0, 0, {
-                    'product_id': cls.product_accounting.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_accounting.list_price,
-                }),
-                (0, 0, {
-                    'product_id': cls.product_expenses.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_expenses.list_price,
-                }),
-                (0, 0, {
-                    'product_id': cls.product_invoicing.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_invoicing.list_price,
-                }),
-            ]
-        })
+        invoice = cls._create_invoice(
+            partner_id=cls.partner,
+            fiscal_position_id=cls.fp_avatax,
+            invoice_line_ids=[
+                cls._prepare_invoice_line(product_id=cls.product_user),
+                cls._prepare_invoice_line(product_id=cls.product_user_discound),
+                cls._prepare_invoice_line(product_id=cls.product_accounting),
+                cls._prepare_invoice_line(product_id=cls.product_expenses),
+                cls._prepare_invoice_line(product_id=cls.product_invoicing),
+            ],
+        )
         response = generate_response_invoice_1(invoice.invoice_line_ids)
         return invoice, response
 
     @classmethod
     def _create_invoice_02_and_expected_response(cls):
-        invoice = cls.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': cls.partner.id,
-            'fiscal_position_id': cls.fp_avatax.id,
-            'invoice_line_ids': [
-                (0, 0, {
-                    'product_id': cls.product_user.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_user.list_price,
-                    'discount': 1 / 7 * 100,
-                }),
-                (0, 0, {
-                    'product_id': cls.product_accounting.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_accounting.list_price,
-                }),
-                (0, 0, {
-                    'product_id': cls.product_expenses.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_expenses.list_price,
-                }),
-                (0, 0, {
-                    'product_id': cls.product_invoicing.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_invoicing.list_price,
-                }),
-            ]
-        })
+        invoice = cls._create_invoice(
+            partner_id=cls.partner,
+            fiscal_position_id=cls.fp_avatax,
+            invoice_line_ids=[
+                cls._prepare_invoice_line(product_id=cls.product_user, discount=1 / 7 * 100),
+                cls._prepare_invoice_line(product_id=cls.product_accounting),
+                cls._prepare_invoice_line(product_id=cls.product_expenses),
+                cls._prepare_invoice_line(product_id=cls.product_invoicing),
+            ],
+        )
         response = generate_response_invoice_2(invoice.invoice_line_ids)
         return invoice, response
 
     @classmethod
     def _create_invoice_03_and_expected_response(cls):
-        invoice = cls.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': cls.partner.id,
-            'fiscal_position_id': cls.fp_avatax.id,
-            'invoice_line_ids': [
-                Command.create({
-                    'product_id': cls.product_accounting.id,
-                    'tax_ids': None,
-                    'price_unit': cls.product_accounting.list_price,
-                }),
-            ]
-        })
+        invoice = cls._create_invoice_one_line(
+            product_id=cls.product_accounting,
+            partner_id=cls.partner,
+            fiscal_position_id=cls.fp_avatax,
+        )
         response = generate_response_invoice_3(invoice.invoice_line_ids)
         return invoice, response

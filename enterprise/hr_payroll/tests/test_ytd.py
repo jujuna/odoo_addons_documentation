@@ -4,14 +4,19 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 from odoo.addons.hr_payroll.tests.common import TestPayslipContractBase
+from odoo.tests import tagged
+
 from odoo.exceptions import ValidationError
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestYTD(TestPayslipContractBase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.richard_emp.write({'review_state': '1_reviewed'})
+        cls.jules_emp.write({'review_state': '1_reviewed'})
         # A new company (and a new employee)
         cls.company_2 = cls.env['res.company'].create({'name': 'Odooo'})
         cls.shrek_emp = cls.env['hr.employee'].create({
@@ -22,6 +27,7 @@ class TestYTD(TestPayslipContractBase):
             'wage': 5000.33,
             'structure_type_id': cls.structure_type.id,
         })
+        cls.shrek_emp.write({'review_state': '1_reviewed'})
         cls.shrek_contract = cls.shrek_emp.version_id
 
         # A new company (and a new employee)
@@ -34,6 +40,7 @@ class TestYTD(TestPayslipContractBase):
             'wage': 5000.33,
             'structure_type_id': cls.structure_type.id,
         })
+        cls.donkey_emp.write({'review_state': '1_reviewed'})
         cls.donkey_contract = cls.donkey_emp.version_id
 
     def _generate_payslip(self, date_from, struct, line_value, no_confirm=False,
@@ -46,7 +53,6 @@ class TestYTD(TestPayslipContractBase):
         date_to = date_from + relativedelta(months=1, days=-1)
 
         test_payslip = self.env['hr.payslip'].create({
-            'name': 'Payslip for YTD tests - ' + str(date_from),
             'employee_id': employee.id if employee else self.richard_emp.id,
             'version_id': contract.id if contract else self.contract_cdi.id,
             'company_id': employee.company_id.id if employee else self.richard_emp.company_id.id,
@@ -63,7 +69,7 @@ class TestYTD(TestPayslipContractBase):
         # just create a new line, we must also create a special matching rule.
         test_rule = self.env['hr.salary.rule'].search([
             ('code', '=', 'TEST-YTD'),
-            ('struct_id', '=', struct.id),
+            ('struct_ids', 'in', struct.id),
         ])
 
         if not test_rule:
@@ -73,8 +79,8 @@ class TestYTD(TestPayslipContractBase):
                 'amount_python_compute':
                     "result = payslip.line_ids.filtered(lambda l: l.code == 'TEST-YTD')['total']",
                 'code': 'TEST-YTD',
-                'category_id': self.env.ref('hr_payroll.ALW').id,
-                'struct_id': struct.id,
+                'category_ids': [(4, self.env.ref('hr_payroll.ALW').id)],
+                'struct_ids': [(4, struct.id)],
             })
         test_payslip.line_ids += self.env['hr.payslip.line'].create({
             'code': 'TEST-YTD',
@@ -85,7 +91,7 @@ class TestYTD(TestPayslipContractBase):
         })
 
         # The already existing line, used to check if YTD is working on worked_days_lines
-        test_worked_days = test_payslip.worked_days_line_ids.filtered(lambda l: l.code == 'WORK100')
+        test_worked_days = test_payslip.worked_days_line_ids.filtered(lambda l: l.code == '002.00')
         self.assertEqual(len(test_worked_days), 1)
         test_worked_days.amount = line_value
 
@@ -104,7 +110,7 @@ class TestYTD(TestPayslipContractBase):
             msg="The YTD of the slip line should be " + str(line_goal_value) +
                 "$ but is currently " + str(test_line.ytd) + "$")
 
-        test_worked_days = payslip.worked_days_line_ids.filtered(lambda l: l.code == 'WORK100')
+        test_worked_days = payslip.worked_days_line_ids.filtered(lambda l: l.code == '002.00')
         self.assertAlmostEqual(test_worked_days.ytd, line_goal_value, delta=0.01,
             msg="The YTD of the worked days line should be " + str(line_goal_value) +
                 "$ but is currently " + str(test_worked_days.ytd) + "$")
@@ -263,52 +269,6 @@ class TestYTD(TestPayslipContractBase):
             self.richard_emp.company_id.get_last_ytd_reset_date(date(2020, 6, 1)),
             date(2020, 2, 28)
         )
-
-    def test_ytd_03_edit_payslip_lines_wizard(self):
-        """ This test checks the edit_payslip_lines wizard """
-        # New structure to ensure we have no other payslip in it
-        ytd_test_structure_03 = self.env['hr.payroll.structure'].create({
-            'name': 'Salary Structure for YTD test 03',
-            'type_id': self.structure_type.id,
-            'ytd_computation': True,
-        })
-
-        # First payslip, a classic one
-        payslip_classic_A = self._generate_payslip(date(2024, 1, 1), ytd_test_structure_03, 1001)
-        self._assert_ytd_values(payslip_classic_A, 1001)
-
-        # Second payslip, the one which will be edited
-        payslip_to_edit = self._generate_payslip(
-            date(2024, 6, 1), ytd_test_structure_03, 1002, no_confirm=True
-        )
-        self._assert_ytd_values(payslip_to_edit, 1001 + 1002)
-
-        # Opening the edit_payslip_lines wizard
-        manager = self.env.ref('hr_payroll.group_hr_payroll_manager')
-        self.env.user.group_ids |= manager
-        action = payslip_to_edit.action_edit_payslip_lines()
-        self.env.user.group_ids -= manager
-        wizard = self.env[action['res_model']].browse(action['res_id'])
-
-        # Editing the YTD values
-        test_slip_lines = wizard.line_ids.filtered(lambda l: l.code == 'BASIC')
-        self.assertEqual(len(test_slip_lines), 1)
-        test_slip_lines.ytd = 6010
-
-        test_worked_days = wizard.worked_days_line_ids.filtered(lambda l: l.code == 'WORK100')
-        self.assertEqual(len(test_worked_days), 1)
-        test_worked_days.ytd = 6010
-
-        # Checking if the edit worked on the current payslip
-        wizard.action_validate_edition()
-        payslip_to_edit.action_payslip_done()
-        self._assert_ytd_values(payslip_to_edit, 6010)
-
-        # Two new payslips to ensure that the change is taken into account in the future
-        payslip_classic_B = self._generate_payslip(date(2024, 7, 1), ytd_test_structure_03, 1020)
-        self._assert_ytd_values(payslip_classic_B, 6010 + 1020)
-        payslip_classic_C = self._generate_payslip(date(2024, 8, 1), ytd_test_structure_03, 1040)
-        self._assert_ytd_values(payslip_classic_C, 6010 + 1020 + 1040)
 
     def test_ytd_04_compute_many_payslips_together(self):
         """ This test ensures that the YTD values are computed correctly if we compute

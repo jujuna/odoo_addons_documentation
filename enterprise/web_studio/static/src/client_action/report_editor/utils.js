@@ -45,17 +45,3 @@ export function humanReadableError(error) {
         viewError,
     };
 }
-
-export function visitNode(el, callback) {
-    const iterators = [[el]];
-    while (iterators.length) {
-        const it = iterators.pop();
-        for (const _el of it) {
-            const doChildren = callback(_el);
-            if (doChildren === false) {
-                continue;
-            }
-            iterators.push(_el.children);
-        }
-    }
-}

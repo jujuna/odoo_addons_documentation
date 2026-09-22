@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import io
 from collections import defaultdict
 from datetime import date
@@ -9,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.tools import format_date
+from odoo.tools import BinaryBytes, format_date
 
 
 class L10nChMonthlySummary(models.Model):
@@ -23,7 +22,7 @@ class L10nChMonthlySummary(models.Model):
             raise UserError(_('You must be logged in a Swiss company to use this feature'))
         return super().default_get(fields)
 
-    year = fields.Integer(required=True, default=lambda self: fields.Date.today().year)
+    year = fields.Integer(required=True, default=lambda self: fields.Date.context_today(self).year)
     month = fields.Selection([
         ('1', 'January'),
         ('2', 'February'),
@@ -37,7 +36,7 @@ class L10nChMonthlySummary(models.Model):
         ('10', 'October'),
         ('11', 'November'),
         ('12', 'December'),
-    ], required=True, default=lambda self: str((fields.Date.today() + relativedelta(months=-1)).month))
+    ], required=True, default=lambda self: str((fields.Date.context_today(self) + relativedelta(months=-1)).month))
     date_start = fields.Date(
         'Start Period', store=True, readonly=False,
         compute='_compute_dates')
@@ -51,9 +50,7 @@ class L10nChMonthlySummary(models.Model):
     company_ids = fields.Many2many('res.company', default=lambda self: self.env.companies.filtered(lambda c: c.country_id.code == "CH"))
     currency_id = fields.Many2one('res.currency', related='company_ids.currency_id')
     monthly_summary_pdf_file = fields.Binary('Monthly Summary PDF', readonly=True, attachment=False)
-    monthly_summary_pdf_filename = fields.Char()
     monthly_summary_xls_file = fields.Binary('Monthly Summary XLS', readonly=True, attachment=False)
-    monthly_summary_xls_filename = fields.Char()
 
     @api.depends('date_start')
     def _compute_display_name(self):
@@ -178,8 +175,7 @@ class L10nChMonthlySummary(models.Model):
             self.env.ref('l10n_ch_hr_payroll.action_report_monthly_summary'),
             res_ids=self.ids, data=report_data)
 
-        self.monthly_summary_pdf_filename = filename
-        self.monthly_summary_pdf_file = base64.encodebytes(monthly_summary)
+        self.monthly_summary_pdf_file = BinaryBytes(monthly_summary, filename=filename)
 
     def action_generate_xls(self):
         output = io.BytesIO()
@@ -214,5 +210,4 @@ class L10nChMonthlySummary(models.Model):
         workbook.close()
         xlsx_data = output.getvalue()
 
-        self.monthly_summary_xls_file = base64.encodebytes(xlsx_data)
-        self.monthly_summary_xls_filename = '%s-%s-monthly-summary.xlsx' % (self.date_start.strftime("%d%B%Y"), self.date_end.strftime("%d%B%Y"))
+        self.monthly_summary_xls_file = BinaryBytes(xlsx_data, filename='%s-%s-monthly-summary.xlsx' % (self.date_start.strftime("%d%B%Y"), self.date_end.strftime("%d%B%Y")))

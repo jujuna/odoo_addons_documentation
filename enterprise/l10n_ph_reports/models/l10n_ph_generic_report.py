@@ -5,6 +5,7 @@ from collections import defaultdict
 from odoo import _, api, fields, models
 from odoo.fields import Domain
 from odoo.tools.sql import SQL
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
 
 class L10n_PhGenericReportHandler(models.AbstractModel):
@@ -79,6 +80,17 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
                 condition=SQL("account_move_line.id = tax_rel.account_move_line_id"),
             )
             table_join_conditions.append(SQL("account_tax.id = tax_rel.account_tax_id"))
+            # For group taxes, base lines store the parent tax in tax_rel; match children as well so
+            # child tax tags (e.g. 45A on FWVAT VAT component) can be picked by the report.
+            table_join_conditions.append(SQL(
+                """
+                account_tax.id IN (
+                    SELECT tax_filiation.child_tax
+                    FROM account_tax_filiation_rel tax_filiation
+                    WHERE tax_filiation.parent_tax = tax_rel.account_tax_id
+                )
+                """
+            ))
         if with_tax_lines:
             table_join_conditions.append(SQL("account_tax.id = account_move_line.tax_line_id"))
         query.add_join(
@@ -88,14 +100,69 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
             condition=SQL(" OR ").join(table_join_conditions),
         )
         # Otherwise you could have duplicated rows as the tax & tags are not "linked" in the joins.
-        query.add_where("""EXISTS (
+        query.add_where(SQL("""EXISTS (
             SELECT 1
             FROM account_tax_repartition_line atrl
             JOIN account_account_tag_account_tax_repartition_line_rel aatatrlr ON atrl.id = aatatrlr.account_tax_repartition_line_id
             WHERE atrl.tax_id = account_tax.id AND aatatrlr.account_account_tag_id = account_tag.id
-        )""")
+        )"""))
+
+        if tax_scope := self._get_tax_scope_where():
+            query.add_where(tax_scope)
 
         return query
+
+    def _get_tax_scope_where(self):
+        """ Extra WHERE, on the ``account_tax`` alias, narrowing down the taxes the report covers. """
+        return SQL("")
+
+    def _get_entity_type_warning_where(self):
+        """ Extra SQL WHERE (on the report query aliases) restricting the missing-entity-type
+        warning to the partners actually displayed by this report. """
+        return SQL("")
+
+    def _get_partner_ids_missing_entity_type(self, options):
+        """
+        Return the ids of the partners shown by this report (within the selected period) that
+        have no entity type set. Used to display a non-blocking warning banner, since a missing
+        entity type can skew how partner names are rendered in the PH tax reports.
+        """
+        report = self.env['account.report'].browse(options['report_id'])
+        query = self._get_report_query(report, options)
+        query = SQL(
+            """
+            SELECT DISTINCT account_move_line__move_id.commercial_partner_id AS id
+              FROM %(tables)s
+              JOIN res_partner partner ON partner.id = account_move_line__move_id.commercial_partner_id
+             WHERE %(where_clause)s
+               AND partner.l10n_ph_entity_type IS NULL
+               %(extra_where)s
+            """,
+            tables=query.from_clause,
+            where_clause=query.where_clause,
+            extra_where=self._get_entity_type_warning_where(),
+        )
+        return [row['id'] for row in self.env.execute_query_dict(query)]
+
+    def _l10n_ph_add_warnings(self, report, options, warnings):
+        """ Single entry point to register non-blocking warnings about the report's contents
+        (e.g. data-quality issues on the partners/lines shown). Called from
+        ``_dynamic_lines_generator``; extend in child handlers to add report-specific warnings. """
+        if partner_ids := self._get_partner_ids_missing_entity_type(options):
+            warnings['l10n_ph_reports.warning_partner_without_entity_type'] = {
+                'alert_type': 'warning',
+                'ids': partner_ids,
+                'name': _('Contacts missing entity type'),
+            }
+
+    def action_open_partners_missing_entity_type(self, options, params):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': params['name'],
+            'res_model': 'res.partner',
+            'views': [(False, 'list'), (False, 'form')],
+            'domain': [('id', 'in', params['ids'])],
+        }
 
     def _custom_options_initializer(self, report, options, previous_options):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
@@ -108,6 +175,9 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
         if grand_total_line := self._build_grand_total_line(report, options):
             report_lines.append(grand_total_line)
 
+        if warnings is not None:
+            self._l10n_ph_add_warnings(report, options, warnings)
+
         # Inject sequences on the dynamic lines
         return [(0, line) for line in report_lines]
 
@@ -115,41 +185,39 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
         # TO OVERRIDE
         return []
 
-    def _get_report_expand_unfoldable_line_value(self, report, options, line_dict_id, progress, lines_values, *, report_line_method):
+    def _get_report_expand_unfoldable_line_value(self, report, options, line_dict_id, lines_values, limit_to_load, level, groupby, expand_function_name, *, report_line_method):
         lines = []
-        has_more = False
-        treated_results_count = 0
-        next_progress = progress
 
         for line_key, line_values in lines_values.items():
-            if options['export_mode'] != 'print' and report.load_more_limit and treated_results_count == report.load_more_limit:
-                # We loaded one more than the limit on purpose: this way we know we need a "load more" line
-                has_more = True
+            if limit_to_load and len(lines) >= limit_to_load:
                 break
 
             new_line = report_line_method(report, options, line_key, line_values, parent_line_id=line_dict_id)
             lines.append(new_line)
-            next_progress = {
-                column['column_group_key']: line_col.get('no_format', 0)
-                for column, line_col in zip(options['columns'], new_line['columns'])
-                if column['expression_label'] == 'balance'
-            }
-            treated_results_count += 1
 
-        return {
-            'lines': lines,
-            'offset_increment': treated_results_count,
-            'has_more': has_more,
-            'progress': next_progress,
-        }
+        load_more_count = max(len(lines_values) - limit_to_load, 0) if limit_to_load else 0
+        if load_more_count:
+            lines.append(report._create_load_more_line(
+                self.env['account.report.line'],  # little hack since we don't have a real report line here
+                line_dict_id,
+                options,
+                None,
+                load_more_count,
+                level,
+                groupby,
+                expand_function_name,
+                None,
+            ))
+
+        return lines
 
     def _get_line_columns(self, report, options, data):
         line_columns = []
         for column in options['columns']:
-            col_value = data[column['column_group_key']].get(column['expression_label'])
-            line_columns.append(report._build_column_dict(
-                col_value=col_value or '',
-                col_data=column,
+            col_value = data[column['column_group_index']].get(column['expression_label'])
+            line_columns.append(report._build_column_data(
+                col_value or '',
+                column,
                 options=options,
             ))
         return line_columns
@@ -169,8 +237,8 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
         lines_with_values = {}
         report_grids_map = options['report_grids_map']
         for line, value in lines_values.items():
-            for column_group_key in options['column_groups']:
-                if any(value[column_group_key][grid] != 0 for grid in report_grids_map if grid not in ignored_grids):
+            for column_group_index in range(len(options['column_groups'])):
+                if any(value[column_group_index][grid] != 0 for grid in report_grids_map if grid not in ignored_grids):
                     lines_with_values[line] = value
 
         return lines_with_values
@@ -179,25 +247,23 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
     def _build_grand_total_line(self, report, options):
         """ The grand total line is the sum of all values in the given reporting period. """
         queries = []
-        for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+        for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
             query = self._get_report_query(report, column_group_options)
             queries.append(SQL(
                 """
-                  SELECT %(column_group_key)s                                                                               AS column_group_key,
+                  SELECT %(column_group_index)s                                                                               AS column_group_index,
                          %(account_tag_name)s                                                                               AS tag_name,
                          SUM(%(balance_select)s
                              * CASE WHEN %(balance_negate)s THEN -1 ELSE 1 END
                          )                                                                                                  AS balance
                     FROM %(table_references)s
-                    %(currency_table_join)s
                    WHERE %(search_condition)s
-                GROUP BY column_group_key, %(account_tag_name)s
+                GROUP BY column_group_index, %(account_tag_name)s
                 """,
-                column_group_key=column_group_key,
+                column_group_index=column_group_index,
                 account_tag_name=self.env['account.account.tag'].with_context(lang='en_US')._field_to_sql('account_tag', 'name', query),
                 balance_negate=self.env['account.account.tag']._field_to_sql('account_tag', 'balance_negate', query),
-                balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-                currency_table_join=report._currency_table_aml_join(column_group_options),
+                balance_select=query.table.consolidation_balance,
                 table_references=query.from_clause,
                 search_condition=query.where_clause,
             ))
@@ -210,23 +276,23 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
         """
         lines_values = {}
         for values in data_dict:
-            if values['column_group_key'] not in lines_values:
-                lines_values[values['column_group_key']] = lines_values
-            self._eval_report_grids_map(options, values, column_values=lines_values[values['column_group_key']])
+            if values['column_group_index'] not in lines_values:
+                lines_values[values['column_group_index']] = lines_values
+            self._eval_report_grids_map(options, values, column_values=lines_values[values['column_group_index']])
         return lines_values
 
     def _get_report_line_grand_total(self, report, options, res):
         """ Format the given values to match the report line format. """
         line_columns = self._get_line_columns(report, options, res)
         line_id = report._get_generic_line_id('', '', markup='grand_total')
-        return {
-            'id': line_id,
-            'name': _('Grand Total'),
-            'unfoldable': False,
-            'unfolded': False,
-            'columns': line_columns,
-            'level': 0,
-        }
+        return AccountReportLineData(
+            id=line_id,
+            name=self.env._('Grand Total'),
+            unfoldable=False,
+            unfolded=False,
+            columns=line_columns,
+            level=0,
+        )
 
     # ================
     # .DAT file export
@@ -311,11 +377,7 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
             SELECT
                 partner.id                                    AS payee_id,
                 partner.vat                                   AS payee_tin,
-                partner.branch_code                           AS payee_branch_code,
-                partner.name                                  AS payee_registered_name,
-                partner.last_name                             AS payee_last_name,
-                partner.first_name                            AS payee_first_name,
-                partner.middle_name                           AS payee_middle_name,
+                partner.l10n_ph_branch_code                   AS payee_branch_code,
                 account_tax.id                                AS tax_id,
                 account_tax.l10n_ph_atc                       AS atc_code,
                 %(tax_description)s                           AS income_nature,
@@ -326,7 +388,6 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
                 )                                             AS base_amount
             FROM %(table_references)s
             JOIN res_partner partner ON partner.id = account_move_line__move_id.commercial_partner_id
-                %(currency_table_join)s
             WHERE %(search_condition)s
             AND %(tag_name)s IN %(tags)s
             GROUP BY partner.id, account_tax.id, tag_name
@@ -336,8 +397,7 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
             balance_negate=self.env['account.account.tag']._field_to_sql('account_tag', 'balance_negate', query),
             tax_description=self.env['account.tax']._field_to_sql('account_tax', 'description', query),
             tags=tuple(tags),
-            balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-            currency_table_join=report._currency_table_aml_join(options),
+            balance_select=query.table.consolidation_balance,
             table_references=query.from_clause,
             search_condition=query.where_clause,
         )
@@ -357,11 +417,7 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
             SELECT
                 partner.id                                                           AS payee_id,
                 partner.vat                                                          AS payee_tin,
-                partner.branch_code                                                  AS payee_branch_code,
-                partner.name                                                         AS payee_registered_name,
-                partner.last_name                                                    AS payee_last_name,
-                partner.first_name                                                   AS payee_first_name,
-                partner.middle_name                                                  AS payee_middle_name,
+                partner.l10n_ph_branch_code                                          AS payee_branch_code,
                 account_tax.id                                                       AS tax_id,
                 %(tag_name)s                                                         AS tag_name,
                 SUM(%(balance_select)s
@@ -369,7 +425,6 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
                 )                                                                    AS tax_amount
             FROM %(table_references)s
             JOIN res_partner partner ON partner.id = account_move_line__move_id.commercial_partner_id
-                %(currency_table_join)s
             WHERE %(search_condition)s
             AND %(tag_name)s IN %(tags)s
             GROUP BY partner.id, account_tax.id, tag_name
@@ -378,8 +433,7 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
             tag_name=self.env['account.account.tag'].with_context(lang='en_US')._field_to_sql('account_tag', 'name', query),
             balance_negate=self.env['account.account.tag']._field_to_sql('account_tag', 'balance_negate', query),
             tags=tuple(tags),
-            balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-            currency_table_join=report._currency_table_aml_join(options),
+            balance_select=query.table.consolidation_balance,
             table_references=query.from_clause,
             search_condition=query.where_clause,
         )
@@ -445,7 +499,7 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
     def _get_dat_file_name(self, options):
         company = self.env["res.company"].browse(options["companies"][0]["id"])
         form_type_code = options["form_type_code"]
-        date_to = self._get_report_date_to(options)
+        date_to = fields.Date.from_string(options['date']['date_to'])
 
         filename_date_format = options['filename_date_format']
         return_period = date_to.strftime(filename_date_format)
@@ -483,8 +537,8 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
 
         # For the vat, we want to only keep the numbers, no separators/... and only the first 9 digits are the VAT
         # For the branch code, we want it to always be four characters even if it is 5 in the VAT number.
-        branch_code = (partner.branch_code or vat[9:])[-4:].rjust(4, '0')
-        return vat[:9], branch_code
+        branch_code = (partner.l10n_ph_branch_code or vat[9:])[-4:].rjust(4, '0')
+        return vat[:9], branch_code or '000'
 
     @api.model
     def _format_value(self, value, max_width, quote=False):
@@ -499,11 +553,3 @@ class L10n_PhGenericReportHandler(models.AbstractModel):
         if quote:
             value = f'"{value}"'
         return value
-
-    @api.model
-    def _get_report_date_to(self, options):
-        """
-        Return date_to directly from options, previously used date_to to determine end date based on export periodicity.
-        Kept the method for stable versions, otherwise safe to remove.
-        """
-        return fields.Date.from_string(options['date']['date_to'])

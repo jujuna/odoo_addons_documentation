@@ -8,6 +8,8 @@ from odoo.tests import tagged
 
 @tagged('post_install', '-at_install')
 class TestTrialBalanceReport(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -81,6 +83,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         cls.env['res.currency'].search([('name', '!=', 'USD')]).with_context(force_deactivate=True).active = False
 
         cls.report = cls.env.ref('account_reports.trial_balance_report')
+        cls.report.filter_journals = True
         cls.company_data['company'].totals_below_sections = False
 
     # -------------------------------------------------------------------------
@@ -123,17 +126,17 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         move_2010_03 = self._create_invoice_move('2010-03-01')
         move_2010_03.action_post()
 
-        options = self._generate_options(self.report, fields.Date.from_string('2010-02-01'), fields.Date.from_string('2010-02-28'))
+        options = self._generate_options(self.report, '2010-02-01', '2010-02-28')
 
         self.assertLinesValues(
             self.report._get_lines(options),
             #   Name                                         Initial Balance         Debit          Credit          End Balance
             [0,                                                            1,             2,              3,                 4],
             [
-                ('211000 Account Payable',                            2000.0,         100.0,            0.0,            2100.0),
+                ('211000 Accounts Payable',                           2000.0,         100.0,            0.0,            2100.0),
                 ('400000 Product Sales',                             -3000.0,           0.0,          300.0,           -3300.0),
                 ('600000 Expenses',                                   2000.0,         200.0,            0.0,            2200.0),
-                ('Undistributed Profits/Losses - company_1_data',    -1000.0,           0.0,            0.0,           -1000.0),
+                ('Result Brought Forward - company_1_data',          -1000.0,           0.0,            0.0,           -1000.0),
                 ('Total',                                                0.0,         300.0,          300.0,               0.0),
 
             ],
@@ -162,39 +165,72 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         move_2010_03 = self._create_invoice_move('2010-03-01')
         move_2010_03.action_post()
 
-        options = self._generate_options(self.report, fields.Date.from_string('2010-01-01'), fields.Date.from_string('2010-02-28'))
+        options = self._generate_options(self.report, '2010-01-01', '2010-02-28')
 
         self.assertLinesValues(
             self.report._get_lines(options),
             #    Name                                        Initial Balance         Debit          Credit      End Balance
             [0,                                                            1,             2,             3,              4],
             [
-                ('211000 Account Payable',                            1000.0,        1100.0,           0.0,         2100.0),
+                ('211000 Accounts Payable',                           1000.0,        1100.0,           0.0,         2100.0),
                 ('400000 Product Sales',                                 0.0,           0.0,        3300.0,        -3300.0),
                 ('600000 Expenses',                                      0.0,        2200.0,           0.0,         2200.0),
-                ('Undistributed Profits/Losses - company_1_data',    -1000.0,           0.0,           0.0,        -1000.0),
+                ('Result Brought Forward - company_1_data',          -1000.0,           0.0,           0.0,        -1000.0),
                 ('Total',                                                0.0,        3300.0,        3300.0,            0.0),
             ],
             options,
         )
 
+        # Allocate the prior year's income into retained earnings, zeroing out
+        # the unallocated earnings balance for the fiscal year.
+        equity_unaffected_acc = self.env['account.account'].search([
+            ('account_type', '=', 'equity_unaffected'),
+            ('company_ids', 'in', self.company_data['company'].ids),
+        ], limit=1)
+
+        move_allocation = self.env['account.move'].create([{
+            'move_type': 'entry',
+            'date': fields.Date.from_string('2009-12-31'),
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'line_ids': [
+                Command.create({'debit': 0.0, 'credit': 1000.0, 'name': 'allocate income', 'account_id': self.company_data['default_account_assets'].id}),
+                Command.create({'debit': 1000.0, 'credit': 0.0, 'name': 'allocate income', 'account_id': equity_unaffected_acc.id}),
+            ],
+        }])
+        move_allocation.action_post()
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #    Name                                         Initial Balance         Debit          Credit      End Balance
+            [0,                                                            1,             2,             3,              4],
+            [
+                ('151000 Fixed Assets',                               -1000.0,           0.0,           0.0,        -1000.0),
+                ('211000 Accounts Payable',                            1000.0,        1100.0,           0.0,         2100.0),
+                ('400000 Product Sales',                                  0.0,           0.0,        3300.0,        -3300.0),
+                ('600000 Expenses',                                       0.0,        2200.0,           0.0,         2200.0),
+                ('Total',                                                 0.0,        3300.0,        3300.0,            0.0),
+            ],
+            options,
+        )
+
     def test_trial_balance_whole_report(self):
-        options = self._generate_options(self.report, fields.Date.from_string('2017-01-01'), fields.Date.from_string('2017-12-31'))
+        options = self._generate_options(self.report, '2017-01-01', '2017-12-31')
 
         self.assertLinesValues(
             self.report._get_lines(options),
             #    Name                                     Initial Balance          Debit         Credit      End Balance
             [0,                                                         1,             2,             3,              4],
             [
-                ('121000 Account Receivable',                         0.0,        1000.0,           0.0,          1000.0),
-                ('211000 Account Payable',                          100.0,           0.0,           0.0,           100.0),
-                ('211010 Account Payable',                           50.0,           0.0,           0.0,            50.0),
+                ('121000 Accounts Receivable',                        0.0,        1000.0,           0.0,          1000.0),
+                ('211000 Accounts Payable',                         100.0,           0.0,           0.0,           100.0),
+                ('211010 Accounts Payable',                          50.0,           0.0,           0.0,            50.0),
                 ('400000 Product Sales',                              0.0,       20000.0,           0.0,         20000.0),
                 ('400010 Product Sales',                              0.0,           0.0,         200.0,          -200.0),
                 ('600000 Expenses',                                   0.0,           0.0,       21000.0,        -21000.0),
                 ('600010 Expenses',                                   0.0,         200.0,           0.0,           200.0),
-                ('Undistributed Profits/Losses - company_1_data',  -100.0,           0.0,           0.0,          -100.0),
-                ('Undistributed Profits/Losses - company_2',        -50.0,           0.0,           0.0,           -50.0),
+                ('Result Brought Forward - company_1_data',        -100.0,           0.0,           0.0,          -100.0),
+                ('Result Brought Forward - company_2',             -33.38,           0.0,           0.0,          -33.38),
+                ('Cumulative Translation Adjustments',             -16.62,           0.0,           0.0,          -16.62),
                 ('Total',                                             0.0,       21200.0,       21200.0,             0.0),
             ],
             options,
@@ -204,7 +240,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         self.env = self.env(context=dict(self.env.context, allowed_company_ids=self.env.company.ids))
         self.report = self.report.with_env(self.env)
 
-        options = self._generate_options(self.report, fields.Date.from_string('2017-01-01'), fields.Date.from_string('2017-12-31'))
+        options = self._generate_options(self.report, '2017-01-01', '2017-12-31', default_options={'is_opening_report': True})
         options = self._update_multi_selector_filter(options, 'journals', self.company_data['default_journal_sale'].ids)
 
         self.assertLinesValues(
@@ -212,7 +248,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             #    Name                            Initial Balance         Debit          Credit      End Balance
             [0,                                                1,            2,              3,              4],
             [
-                ('121000 Account Receivable',               0.0,       1000.0,            0.0,         1000.0),
+                ('121000 Accounts Receivable',               0.0,       1000.0,            0.0,         1000.0),
                 ('400000 Product Sales',                    0.0,      20000.0,            0.0,        20000.0),
                 ('600000 Expenses',                         0.0,          0.0,        21000.0,       -21000.0),
                 ('Total',                                   0.0,      21000.0,        21000.0,            0.0),
@@ -231,13 +267,12 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                     'date': {
                         'string': 'As of 12/31/2015',
                         'period_type': 'custom',
-                        'currency_table_period_key': '_trial_balance_middle_periods',
-                        'mode': 'single',
-                        'date_from': False,
+                        'date_from': None,
                         'date_to': '2015-12-31',
                     },
                     'trial_balance_column_block_id': '0',
                     'trial_balance_column_type': 'initial_balance',
+                    'trial_balance_block_end_date': '2016-12-31',
                     'trial_balance_block_fiscalyear_start': '2016-01-01',
                 },
                 'colspan': 1,
@@ -247,9 +282,8 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                 'forced_options': {
                     'date': {
                         'string': '2016',
-                        'period_type': 'fiscalyear',
-                        'currency_table_period_key': '_trial_balance_middle_periods',
-                        'mode': 'range',
+                        'period_type': 'year',
+                        'fallback_from': 'custom',
                         'date_from': '2016-01-01',
                         'date_to': '2016-12-31',
                     },
@@ -260,14 +294,13 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                 'forced_options': {
                     'date': {
                         'string': '2016',
-                        'period_type': 'fiscalyear',
-                        'currency_table_period_key': '_trial_balance_middle_periods',
-                        'mode': 'range',
+                        'period_type': 'custom',
                         'date_from': '2016-01-01',
                         'date_to': '2016-12-31',
                     },
                     'trial_balance_column_block_id': '0',
                     'trial_balance_column_type': 'end_balance',
+                    'trial_balance_block_end_date': '2016-12-31',
                     'trial_balance_block_fiscalyear_start': '2016-01-01',
                 },
                 'colspan': 1,
@@ -278,13 +311,12 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                     'date': {
                         'string': 'As of 12/31/2016',
                         'period_type': 'custom',
-                        'currency_table_period_key': '_trial_balance_middle_periods',
-                        'mode': 'single',
-                        'date_from': False,
+                        'date_from': None,
                         'date_to': '2016-12-31',
                     },
                     'trial_balance_column_block_id': '1',
                     'trial_balance_column_type': 'initial_balance',
+                    'trial_balance_block_end_date': '2017-12-31',
                     'trial_balance_block_fiscalyear_start': '2017-01-01',
                 },
                 'colspan': 1,
@@ -294,12 +326,10 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                 'forced_options': {
                     'date': {
                         'string': '2017',
-                        'period_type': 'fiscalyear',
-                        'currency_table_period_key': '_trial_balance_middle_periods',
-                        'mode': 'range',
+                        'period_type': 'year',
+                        'fallback_from': 'custom',
                         'date_from': '2017-01-01',
                         'date_to': '2017-12-31',
-                        'filter': 'custom',
                     },
                 },
             },
@@ -308,14 +338,13 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                 'forced_options': {
                     'date': {
                         'string': '2017',
-                        'period_type': 'fiscalyear',
-                        'currency_table_period_key': '_trial_balance_middle_periods',
-                        'mode': 'range',
+                        'period_type': 'custom',
                         'date_from': '2017-01-01',
                         'date_to': '2017-12-31',
                     },
                     'trial_balance_column_block_id': '1',
                     'trial_balance_column_type': 'end_balance',
+                    'trial_balance_block_end_date': '2017-12-31',
                     'trial_balance_block_fiscalyear_start': '2017-01-01',
                 },
                 'colspan': 1,
@@ -325,45 +354,48 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         for i, val in enumerate(expected_header_values):
             self.assertDictEqual(options['column_headers'][0][i], val)
 
-        # Rate for 2016 and 2017 is (1/3 (from 2016) * 366 + 1/2 (from 2017) * 365) / 731 => 0.416552668
+        # Rate for 2016 is (1/3 * 365 + 1/2 * 1) / 366 => 0,333788707
+        # Rate for 2017 is 1/2
         self.assertLinesValues(
             self.report._get_lines(options),
             #                                             [Initial Balance]   [     2016       ]    [End Balance]  [Initial Balance]      [       2017        ]       [End Balance]
             #    Name                                             Balance      Debit      Credit         Balance             Balance      Debit          Credit          Balance
             [0,                                                    1,          2,          3,             4,                5,            6,              7,               8],
             [
-                ('121000 Account Receivable',                        0.0,        0.0,         0.0,           0.0,              0.0,       1000.0,          0.0,            1000.0),
-                ('211000 Account Payable',                           0.0,      100.0,         0.0,         100.0,            100.0,          0.0,          0.0,             100.0),
-                ('211010 Account Payable',                           0.0,       50.0,         0.0,          50.0,             50.0,          0.0,          0.0,              50.0),
+                ('121000 Accounts Receivable',                       0.0,        0.0,         0.0,           0.0,              0.0,       1000.0,          0.0,            1000.0),
+                ('211000 Accounts Payable',                          0.0,      100.0,         0.0,         100.0,            100.0,          0.0,          0.0,             100.0),
+                ('211010 Accounts Payable',                          0.0,       50.0,         0.0,          50.0,             50.0,          0.0,          0.0,              50.0),
                 ('400000 Product Sales',                             0.0,        0.0,       300.0,        -300.0,              0.0,      20000.0,          0.0,           20000.0),
-                ('400010 Product Sales',                             0.0,        0.0,       41.66,        -41.66,              0.0,          0.0,       166.62,           -166.62),
+                ('400010 Product Sales',                             0.0,        0.0,       33.38,        -33.38,              0.0,          0.0,        200.0,            -200.0),
                 ('600000 Expenses',                                  0.0,      200.0,         0.0,         200.0,              0.0,          0.0,      21000.0,          -21000.0),
-                ('600010 Expenses',                                  0.0,        0.0,         0.0,           0.0,              0.0,       166.62,          0.0,            166.62),
-                ('Undistributed Profits/Losses - company_1_data',    0.0,        0.0,         0.0,           0.0,           -100.0,          0.0,          0.0,            -100.0),
-                ('Undistributed Profits/Losses - company_2',         0.0,        0.0,         0.0,           0.0,           -41.66,          0.0,          0.0,            -41.66),
-                ('Total',                                            0.0,      350.0,      341.66,          8.34,             8.34,     21166.62,     21166.62,              8.34),
+                ('600010 Expenses',                                  0.0,        0.0,         0.0,           0.0,              0.0,        200.0,          0.0,             200.0),
+                ('Result Brought Forward - company_1_data',          0.0,        0.0,         0.0,           0.0,           -100.0,          0.0,          0.0,            -100.0),
+                ('Result Brought Forward - company_2',               0.0,        0.0,         0.0,           0.0,           -33.38,          0.0,          0.0,            -33.38),
+                ('Cumulative Translation Adjustments',               0.0,        0.0,       16.62,        -16.62,           -16.62,          0.0,          0.0,            -16.62),
+                ('Total',                                            0.0,      350.0,       350.0,           0.0,              0.0,      21200.0,      21200.0,               0.0),
             ],
             options,
         )
 
     def test_trial_with_disabled_comparison_filter(self):
         self.report.filter_period_comparison = False
-        options = self._generate_options(self.report, fields.Date.from_string('2017-01-01'), fields.Date.from_string('2017-12-31'))
+        options = self._generate_options(self.report, '2017-01-01', '2017-12-31')
 
         self.assertLinesValues(
             self.report._get_lines(options),
             #    Name                                      Initial Balance        Debit        Credit      End Balance
             [0,                                                          1,           2,            3,               4],
             [
-                ('121000 Account Receivable',                          0.0,      1000.0,          0.0,          1000.0),
-                ('211000 Account Payable',                           100.0,         0.0,          0.0,           100.0),
-                ('211010 Account Payable',                            50.0,         0.0,          0.0,            50.0),
+                ('121000 Accounts Receivable',                         0.0,      1000.0,          0.0,          1000.0),
+                ('211000 Accounts Payable',                          100.0,         0.0,          0.0,           100.0),
+                ('211010 Accounts Payable',                           50.0,         0.0,          0.0,            50.0),
                 ('400000 Product Sales',                               0.0,     20000.0,          0.0,         20000.0),
                 ('400010 Product Sales',                               0.0,         0.0,        200.0,          -200.0),
                 ('600000 Expenses',                                    0.0,         0.0,      21000.0,        -21000.0),
                 ('600010 Expenses',                                    0.0,       200.0,          0.0,           200.0),
-                ('Undistributed Profits/Losses - company_1_data',   -100.0,         0.0,          0.0,          -100.0),
-                ('Undistributed Profits/Losses - company_2',         -50.0,         0.0,          0.0,           -50.0),
+                ('Result Brought Forward - company_1_data',         -100.0,         0.0,          0.0,          -100.0),
+                ('Result Brought Forward - company_2',              -33.38,         0.0,          0.0,          -33.38),
+                ('Cumulative Translation Adjustments',              -16.62,         0.0,          0.0,          -16.62),
                 ('Total',                                              0.0,     21200.0,      21200.0,             0.0),
             ],
             options,
@@ -387,16 +419,14 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             'type': 'general',
         }])
 
-        self.env['account.group'].create([
-            {'name': 'Group_10', 'code_prefix_start': '10', 'code_prefix_end': '10'},
-            {'name': 'Group_101', 'code_prefix_start': '101', 'code_prefix_end': '101'},
-            {'name': 'Group_1012', 'code_prefix_start': '1012', 'code_prefix_end': '1012'},
-        ])
+        account_parent_10 = self.env['account.account'].create({'code': '10', 'name': 'Group_10', 'account_type': 'asset_current', 'active': False})
+        account_parent_101 = self.env['account.account'].create({'code': '101', 'name': 'Group_101', 'account_type': 'asset_current', 'parent_id': account_parent_10.id, 'active': False})
+        account_parent_1012 = self.env['account.account'].create({'code': '1012', 'name': 'Group_1012', 'account_type': 'asset_current', 'parent_id': account_parent_101.id, 'active': False})
 
         # Create the accounts.
         account_a, account_a1 = self.env['account.account'].create([
-            {'code': '100000', 'name': 'Account A', 'account_type': 'asset_current'},
-            {'code': '101200', 'name': 'Account A1', 'account_type': 'asset_current'},
+            {'code': '100000', 'name': 'Account A', 'account_type': 'asset_current', 'parent_id': account_parent_10.id},
+            {'code': '101200', 'name': 'Account A1', 'account_type': 'asset_current', 'parent_id': account_parent_1012.id},
         ])
 
         move = self.env['account.move'].create([{
@@ -412,7 +442,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         }])
         move.action_post()
 
-        options = self._generate_options(self.report, fields.Date.from_string('2017-06-01'), fields.Date.from_string('2017-06-01'))
+        options = self._generate_options(self.report, '2017-06-01', '2017-06-01', default_options={'is_opening_report': True})
         options = self._update_multi_selector_filter(options, 'journals', test_journal.ids)
         options['unfold_all'] = True
 
@@ -436,9 +466,11 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             This test will check that the action caret_option_open_general_ledger works as expected which means that
             a default_filter_accounts is set and that in case of hierarchy, the group is unfolded
         """
-        self.env['account.group'].create([
-            {'name': 'Group_6', 'code_prefix_start': '6', 'code_prefix_end': '6'},
+        account_parent = self.env['account.account'].create([
+            {'code': '6', 'name': 'Group_6', 'account_type': 'expense', 'company_ids': [self.company_data['company'].id, self.company_data_2['company'].id], 'active': False},
         ])
+        self.company_data['default_account_expense'].parent_id = account_parent
+        self.company_data_2['default_account_expense'].parent_id = account_parent
         options = self._generate_options(self.report, '2017-06-01', '2017-06-01', default_options={'hierarchy': True, 'unfold_all': True})
         lines = self.report._get_lines(options)
         self.assertLinesValues(
@@ -446,28 +478,27 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             #    Name                                      Initial Balance        Debit        Credit      End Balance
             [0,                                                          1,           2,            3,               4],
             [
+                ('121000 Accounts Receivable',                      1000.0,         0.0,          0.0,          1000.0),
+                ('211000 Accounts Payable',                          100.0,         0.0,          0.0,           100.0),
+                ('211010 Accounts Payable',                           50.0,         0.0,          0.0,            50.0),
+                ('400000 Product Sales',                           20000.0,         0.0,          0.0,         20000.0),
+                ('400010 Product Sales',                               0.0,         0.0,        200.0,          -200.0),
                 ('6 Group_6',                                     -21000.0,       200.0,          0.0,        -20800.0),
                 ('600000 Expenses',                               -21000.0,         0.0,          0.0,        -21000.0),
                 ('600010 Expenses',                                    0.0,       200.0,          0.0,           200.0),
-                ('(No Group)',                                     21150.0,         0.0,        200.0,         20950.0),
-                ('121000 Account Receivable',                       1000.0,         0.0,          0.0,          1000.0),
-                ('211000 Account Payable',                           100.0,         0.0,          0.0,           100.0),
-                ('211010 Account Payable',                            50.0,         0.0,          0.0,            50.0),
-                ('400000 Product Sales',                           20000.0,         0.0,          0.0,         20000.0),
-                ('400010 Product Sales',                               0.0,         0.0,        200.0,          -200.0),
-                ('Undistributed Profits/Losses - company_1_data',   -100.0,         0.0,          0.0,          -100.0),
-                ('Undistributed Profits/Losses - company_2',         -50.0,         0.0,          0.0,           -50.0),
+                ('Result Brought Forward - company_1_data',         -100.0,         0.0,          0.0,          -100.0),
+                ('Result Brought Forward - company_2',               -50.0,         0.0,          0.0,           -50.0),
                 ('Total',                                              0.0,       200.0,        200.0,             0.0),
             ],
             options,
         )
         general_ledger = self.env.ref('account_reports.general_ledger_report')
-        params = {'line_id': lines[1]['id']}
+        params = {'line_id': lines[5].id}
         res = self.report.caret_option_open_general_ledger(options, params)
-        self.assertEqual(res['context']['default_filter_accounts'], '600000')
+        self.assertEqual(res['context']['default_filter_accounts'], '6')
         general_ledger_lines = general_ledger._get_lines(res['params']['options'])
-        unfolded_lines = [line for line in general_ledger_lines if line.get("unfolded")]
-        self.assertEqual(len(unfolded_lines), 9)
+        unfolded_lines = [line for line in general_ledger_lines if line.unfolded]
+        self.assertEqual(len(unfolded_lines), 8)
 
     def test_action_general_ledger_unallocated_earnings(self):
         """
@@ -481,7 +512,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
 
         # Test case with more than one company
         res = self.report.caret_option_open_general_ledger(options, params)
-        self.assertEqual(res['context']['default_filter_accounts'], 'Undistributed Profits/Losses - company_1_data')
+        self.assertEqual(res['context']['default_filter_accounts'], 'Result Brought Forward - company_1_data')
 
         # Test case with only one company
         self.env.user.write({
@@ -489,10 +520,10 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             'company_id': self.company_data['company'].id,
         })
         res = self.report.caret_option_open_general_ledger(options, params)
-        self.assertEqual(res['context']['default_filter_accounts'], 'Undistributed Profits/Losses')
+        self.assertEqual(res['context']['default_filter_accounts'], 'Result Brought Forward')
 
     def test_trial_balance_multiple_years_initial_balance(self):
-        # Entries in 2015 for company_1 to test the initial balance for the Undistributed Profits/Losses line.
+        # Entries in 2015 for company_1 to test the initial balance for the Result Brought Forward line.
         move_2015_1 = self.env['account.move'].create({
             'move_type': 'entry',
             'date': fields.Date.from_string('2015-01-01'),
@@ -506,7 +537,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         move_2015_1.action_post()
 
         # Entry in 2016 for company_1 to test the initial balance for equity_unaffected accounts.
-        equity_unaffected_acc = self.env['account.account'].search([('account_type', '=', 'equity_unaffected')], limit=1)
+        equity_unaffected_acc = self.env['account.account'].search([*self.env['account.account']._check_company_domain(self.env.company), ('account_type', '=', 'equity_unaffected')], order='code desc', limit=1)
         move_2016_1 = self.env['account.move'].create({
             'move_type': 'entry',
             'date': fields.Date.from_string('2016-01-01'),
@@ -520,23 +551,27 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
 
         options = self._generate_options(self.report, '2017-01-01', '2017-12-31')
         options = self._update_comparison_filter(options, self.report, 'previous_period', 1, fields.Date.from_string('2017-01-01'), fields.Date.from_string('2017-12-31'))
+
+        # Rate for 2016 is (1/3 * 365 + 1/2 * 1) / 366 => 0,333788707
+        # Rate for 2017 is 1/2
         self.assertLinesValues(
             self.report._get_lines(options),
             #                                              [Initial Balance]   [     2016       ]    [End Balance]  [Initial Balance]      [       2017        ]       [End Balance]
             #    Name                                              Balance      Debit      Credit         Balance             Balance      Debit          Credit          Balance
             [0,                                                     1,          2,          3,             4,                5,            6,              7,               8],
             [
-                ('121000 Account Receivable',                         0.0,        0.0,         0.0,           0.0,              0.0,       1000.0,          0.0,            1000.0),
-                ('211000 Account Payable',                           50.0,      170.0,         0.0,         220.0,            220.0,          0.0,          0.0,             220.0),
-                ('211010 Account Payable',                            0.0,       50.0,         0.0,          50.0,             50.0,          0.0,          0.0,              50.0),
+                ('121000 Accounts Receivable',                         0.0,        0.0,         0.0,           0.0,              0.0,       1000.0,          0.0,            1000.0),
+                ('211000 Accounts Payable',                           50.0,      170.0,         0.0,         220.0,            220.0,          0.0,          0.0,             220.0),
+                ('211010 Accounts Payable',                            0.0,       50.0,         0.0,          50.0,             50.0,          0.0,          0.0,              50.0),
                 ('400000 Product Sales',                              0.0,        0.0,       300.0,        -300.0,              0.0,      20000.0,          0.0,           20000.0),
-                ('400010 Product Sales',                              0.0,        0.0,       41.66,        -41.66,              0.0,          0.0,       166.62,           -166.62),
+                ('400010 Product Sales',                              0.0,        0.0,       33.38,        -33.38,              0.0,          0.0,        200.0,            -200.0),
                 ('600000 Expenses',                                   0.0,      200.0,         0.0,         200.0,              0.0,          0.0,      21000.0,          -21000.0),
-                ('600010 Expenses',                                   0.0,        0.0,         0.0,           0.0,              0.0,       166.62,          0.0,            166.62),
-                ('999999 Undistributed Profits/Losses',               0.0,        0.0,        70.0,         -70.0,              0.0,          0.0,          0.0,               0.0),
-                ('Undistributed Profits/Losses - company_1_data',   -50.0,        0.0,         0.0,         -50.0,           -220.0,          0.0,          0.0,            -220.0),
-                ('Undistributed Profits/Losses - company_2',          0.0,        0.0,         0.0,           0.0,           -41.66,          0.0,          0.0,            -41.66),
-                ('Total',                                             0.0,      420.0,      411.66,          8.34,             8.34,     21166.62,     21166.62,              8.34),
+                ('600010 Expenses',                                   0.0,        0.0,         0.0,           0.0,              0.0,        200.0,          0.0,             200.0),
+                ('999999 Profit or Loss Appropriation',               0.0,        0.0,        70.0,         -70.0,              0.0,          0.0,          0.0,               0.0),
+                ('Result Brought Forward - company_1_data',         -50.0,        0.0,         0.0,         -50.0,           -220.0,          0.0,          0.0,            -220.0),
+                ('Result Brought Forward - company_2',                0.0,        0.0,         0.0,           0.0,           -33.38,          0.0,          0.0,            -33.38),
+                ('Cumulative Translation Adjustments',                0.0,        0.0,       16.62,        -16.62,           -16.62,          0.0,          0.0,            -16.62),
+                ('Total',                                             0.0,      420.0,       420.0,           0.0,              0.0,      21200.0,      21200.0,               0.0),
             ],
             options,
         )
@@ -557,11 +592,11 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             #    Name                                      Balance   Debit  Credit   Debit  Credit  Balance  Balance    Debit   Credit  Debit  Credit   Balance
             [0,                                               1,       2,     3,       4,      5,      6,       7,        8,        9,     10,    11,       12],
             [
-                ('121000 Account Receivable',                0.0,     0.0,   0.0,     0.0,    0.0,    0.0,     0.0,    1000.0,      0.0,  0.0,    0.0,   1000.0),
-                ('211000 Account Payable',                 100.0,     0.0,   0.0,     0.0,    0.0,  100.0,   100.0,       0.0,      0.0,  0.0,    0.0,    100.0),
+                ('121000 Accounts Receivable',                0.0,     0.0,   0.0,     0.0,    0.0,    0.0,     0.0,    1000.0,      0.0,  0.0,    0.0,   1000.0),
+                ('211000 Accounts Payable',                 100.0,     0.0,   0.0,     0.0,    0.0,  100.0,   100.0,       0.0,      0.0,  0.0,    0.0,    100.0),
                 ('400000 Product Sales',                  -300.0,     0.0,   0.0,     0.0,    0.0, -300.0,     0.0,   20000.0,      0.0,  0.0,    0.0,  20000.0),
                 ('600000 Expenses',                        200.0,     0.0,   0.0,     0.0,    0.0,  200.0,     0.0,       0.0,  21000.0,  0.0,    0.0, -21000.0),
-                ('Undistributed Profits/Losses',             0.0,     0.0,   0.0,     0.0,    0.0,    0.0,  -100.0,       0.0,      0.0,  0.0,    0.0,   -100.0),
+                ('Result Brought Forward',                   0.0,     0.0,   0.0,     0.0,    0.0,    0.0,  -100.0,       0.0,      0.0,  0.0,    0.0,   -100.0),
                 ('Total',                                    0.0,     0.0,   0.0,     0.0,    0.0,    0.0,     0.0,   21000.0,  21000.0,  0.0,    0.0,      0.0),
             ],
             options,
@@ -583,11 +618,11 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             #    Name                                      Balance    Debit  Credit    Balance   Balance   Debit    Credit    Balance
             [0,                                               1,        2,       3,       4,       5,        6,        7,         8],
             [
-                ('121000 Account Receivable',                0.0,      0.0,     0.0,     0.0,     0.0,    1000.0,      0.0,    1000.0),
-                ('211000 Account Payable',                   0.0,    100.0,     0.0,   100.0,   100.0,       0.0,      0.0,     100.0),
+                ('121000 Accounts Receivable',                0.0,      0.0,     0.0,     0.0,     0.0,    1000.0,      0.0,    1000.0),
+                ('211000 Accounts Payable',                   0.0,    100.0,     0.0,   100.0,   100.0,       0.0,      0.0,     100.0),
                 ('400000 Product Sales',                     0.0,      0.0,   300.0,  -300.0,     0.0,   20000.0,      0.0,   20000.0),
                 ('600000 Expenses',                          0.0,    200.0,     0.0,   200.0,     0.0,       0.0,  21000.0,  -21000.0),
-                ('Undistributed Profits/Losses',             0.0,      0.0,     0.0,     0.0,  -100.0,       0.0,      0.0,    -100.0),
+                ('Result Brought Forward',                   0.0,      0.0,     0.0,     0.0,  -100.0,       0.0,      0.0,    -100.0),
                 ('Total',                                    0.0,    300.0,   300.0,     0.0,     0.0,   21000.0,  21000.0,       0.0),
 
             ],
@@ -621,16 +656,16 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         self.report.line_ids[0].user_groupby = 'account_id, partner_id, id'
 
         options = self._generate_options(self.report, '2017-01-01', '2017-01-31', default_options={'unfold_all': True, 'test_unfold_all': True})
-
+        lines = self.report._get_lines(options)
         self.assertLinesValues(
-            self.report._get_lines(options),
+            lines,
             #    Name                                  Initial Balance       Debit          Credit      End Balance
             [0,                                                1,               2,             3,             4],
             [
-                ('121000 Account Receivable',                 0.0,           1000.0,           0.0,     1000.0),
+                ('121000 Accounts Receivable',                 0.0,           1000.0,           0.0,     1000.0),
                 ('Unknown',                                   0.0,           1000.0,           0.0,     1000.0),
                 ('INV/2017/00001 2017_1_1',                   0.0,           1000.0,           0.0,     1000.0),
-                ('211000 Account Payable',                  100.0,              0.0,           0.0,      100.0),
+                ('211000 Accounts Payable',                  100.0,              0.0,           0.0,      100.0),
                 ('Unknown',                                 100.0,              0.0,           0.0,      100.0),
                 ('400000 Product Sales',                      0.0,          20100.0,           0.0,    20100.0),
                 ('partner_a',                                 0.0,            100.0,           0.0,      100.0),
@@ -647,7 +682,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                 ('INV/2017/00001 2017_1_7',                   0.0,              0.0,        6000.0,    -6000.0),
                 ('INV/2017/00001 2017_1_8',                   0.0,              0.0,        7000.0,    -7000.0),
                 ('INV/2017/00001 2017_1_9',                   0.0,              0.0,        8000.0,    -8000.0),
-                ('Undistributed Profits/Losses',           -100.0,              0.0,           0.0,     -100.0),
+                ('Result Brought Forward',                 -100.0,              0.0,           0.0,     -100.0),
                 ('Total',                                     0.0,          21100.0,       21100.0,        0.0),
             ],
             options,
@@ -687,30 +722,30 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         })
 
         lines = self.report._get_lines(options)
-        unaff_line = next(line for line in lines if self.report._get_markup(line['id']) == 'undistributed_profits_losses')
-        expense_line = next(line for line in lines if line['name'] == self.company_data['default_account_expense'].display_name)
+        unaff_line = next(line for line in lines if self.report._get_markup(line.id) == 'undistributed_profits_losses')
+        expense_line = next(line for line in lines if line.name == self.company_data['default_account_expense'].display_name)
         trial_balance_top_parent_line = self.report.line_ids[0]
 
-        end_balance_col_group_2023 = options['columns'][3]['column_group_key']
-        end_balance_col_group_2024 = options['columns'][7]['column_group_key']
+        end_balance_col_group_2023 = options['columns'][3]['column_group_index']
+        end_balance_col_group_2024 = options['columns'][7]['column_group_index']
 
         # 1. Expense account in 2023
-        params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, expense_line, column_group_key=end_balance_col_group_2023)
+        params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, expense_line, column_group_index=end_balance_col_group_2023)
         audit_domain = self.report.dispatch_report_action(options, 'action_audit_cell', params)['domain']
         self.assertTrue(move_1_expense_line.filtered_domain(audit_domain))
 
         # 2. Unaffected account in 2023
-        params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, unaff_line, column_group_key=end_balance_col_group_2023)
+        params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, unaff_line, column_group_index=end_balance_col_group_2023)
         audit_domain = self.report.dispatch_report_action(options, 'action_audit_cell', params)['domain']
         self.assertFalse(move_1_expense_line.filtered_domain(audit_domain))
 
         # 3. Expense account in 2024
-        params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, expense_line, column_group_key=end_balance_col_group_2024)
+        params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, expense_line, column_group_index=end_balance_col_group_2024)
         audit_domain = self.report.dispatch_report_action(options, 'action_audit_cell', params)['domain']
         self.assertFalse(move_1_expense_line.filtered_domain(audit_domain))
 
         # 4. Unaffected account in 2024
-        params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, unaff_line, column_group_key=end_balance_col_group_2024)
+        params = self._get_audit_params_from_report_line(options, trial_balance_top_parent_line, unaff_line, column_group_index=end_balance_col_group_2024)
         audit_domain = self.report.dispatch_report_action(options, 'action_audit_cell', params)['domain']
         self.assertTrue(move_1_expense_line.filtered_domain(audit_domain))
 
@@ -745,8 +780,8 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
 
             [0,                                    1,          2,        3,         4,       5,          6,        7,         8,        9,         10,      11,        12],
             [
-                ('211000 Account Payable',       0.0,        0.0,      0.0,        0.0,   1000.0,      0.0,      0.0,       0.0,   1000.0,        0.0,     0.0,       0.0),
-                ('Total',                        0.0,        0.0,      0.0,        0.0,   1000.0,      0.0,      0.0,       0.0,   1000.0,        0.0,     0.0,       0.0),
+                ('211000 Accounts Payable',       0.0,        0.0,      0.0,        0.0,   1000.0,      0.0,      0.0,       0.0,   1000.0,        0.0,     0.0,       0.0),
+                ('Total',                         0.0,        0.0,      0.0,        0.0,   1000.0,      0.0,      0.0,       0.0,   1000.0,        0.0,     0.0,       0.0),
             ],
             options,
         )
@@ -788,9 +823,9 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                 ('600000 Expenses',                           0.0,              0.0,         100.0,     -100.0),
                 ('MISC/2017/01/0001 aml_partner_2',           0.0,              0.0,         100.0,     -100.0),
                 ('Unknown',                                 100.0,          21000.0,       21000.0,      100.0),
-                ('121000 Account Receivable',                 0.0,           1000.0,           0.0,     1000.0),
+                ('121000 Accounts Receivable',                 0.0,           1000.0,           0.0,     1000.0),
                 ('INV/2017/00001 2017_1_1',                   0.0,           1000.0,           0.0,     1000.0),
-                ('211000 Account Payable',                  100.0,              0.0,           0.0,      100.0),
+                ('211000 Accounts Payable',                  100.0,              0.0,           0.0,      100.0),
                 ('400000 Product Sales',                      0.0,          20000.0,           0.0,    20000.0),
                 ('INV/2017/00001 2017_1_2',                   0.0,           2000.0,           0.0,     2000.0),
                 ('INV/2017/00001 2017_1_3',                   0.0,           3000.0,           0.0,     3000.0),
@@ -801,7 +836,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
                 ('INV/2017/00001 2017_1_7',                   0.0,              0.0,        6000.0,    -6000.0),
                 ('INV/2017/00001 2017_1_8',                   0.0,              0.0,        7000.0,    -7000.0),
                 ('INV/2017/00001 2017_1_9',                   0.0,              0.0,        8000.0,    -8000.0),
-                ('Undistributed Profits/Losses',           -100.0,              0.0,           0.0,     -100.0),
+                ('Result Brought Forward',                 -100.0,              0.0,           0.0,     -100.0),
                 ('Total',                                     0.0,          21100.0,       21100.0,        0.0),
             ],
             options,
@@ -813,7 +848,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             a '0.0' value will be blanked, but not in the total line.
         """
         self.report.column_ids.write({'blank_if_zero': True})
-        options = self._generate_options(self.report, '2017-01-01', '2017-01-31', default_options={'unfold_all': True, 'test_unfold_all': True})
+        options = self._generate_options(self.report, '2017-01-01', '2017-01-31', default_options={'unfold_all': True, 'test_unfold_all': True, 'is_opening_report': True})
         options = self._update_multi_selector_filter(options, 'journals', self.company_data['default_journal_sale'].ids)
 
         self.assertLinesValues(
@@ -821,7 +856,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             #    Name                                  Initial Balance       Debit          Credit      End Balance
             [0,                                                1,               2,             3,             4],
             [
-                ('121000 Account Receivable',                  '',          1000.0,           '',         1000.0),
+                ('121000 Accounts Receivable',                  '',          1000.0,           '',         1000.0),
                 ('400000 Product Sales',                       '',         20000.0,           '',        20000.0),
                 ('600000 Expenses',                            '',             '',       21000.0,       -21000.0),
                 ('Total',                                      0.0,        21000.0,      21000.0,            0.0),
@@ -834,7 +869,6 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         Test the analytic accounts groupby
         """
         self.env.user.group_ids += self.env.ref('analytic.group_analytic_accounting')
-        self.report.filter_analytic = True
         self.report.filter_analytic_groupby = True
 
         analytic_plan = self.env['account.analytic.plan'].create({
@@ -844,72 +878,71 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             'name': 'Account XYZ',
             'plan_id': analytic_plan.id
         })
-        move_2019 = self.env['account.move'].create({
+        move_2014 = self.env['account.move'].create({
             'move_type': 'entry',
-            'date': fields.Date.from_string('2019-01-01'),
+            'date': fields.Date.from_string('2014-01-01'),
             'journal_id': self.company_data['default_journal_misc'].id,
             'line_ids': [
                 Command.create({
                     'debit': 50.0,
                     'credit': 0.0,
-                    'name': 'XYZ debit (2019)',
+                    'name': 'XYZ debit (2014)',
                     'account_id': self.company_data['default_account_payable'].id,
                     'analytic_distribution': {analytic_account.id: 100},
                 }),
                 Command.create({
                     'debit': 0.0,
                     'credit': 50.0,
-                    'name': 'XYZ credit (2019)',
+                    'name': 'XYZ credit (2014)',
                     'account_id': self.company_data['default_account_revenue'].id,
                     'analytic_distribution': {analytic_account.id: 100},
                 }),
             ],
         })
-        move_2019.action_post()
-        move_2020 = self.env['account.move'].create({
+        move_2014.action_post()
+        move_2015 = self.env['account.move'].create({
             'move_type': 'entry',
-            'date': fields.Date.from_string('2020-01-01'),
+            'date': fields.Date.from_string('2015-01-01'),
             'journal_id': self.company_data['default_journal_misc'].id,
             'line_ids': [
                 Command.create({
                     'debit': 100.0,
                     'credit': 0.0,
-                    'name': 'XYZ debit (2020)',
+                    'name': 'XYZ debit (2015)',
                     'account_id': self.company_data['default_account_payable'].id,
                     'analytic_distribution': {analytic_account.id: 100},
                 }),
                 Command.create({
                     'debit': 0.0,
                     'credit': 100.0,
-                    'name': 'XYZ credit (2020)',
+                    'name': 'XYZ credit (2015)',
                     'account_id': self.company_data['default_account_revenue'].id,
                     'analytic_distribution': {analytic_account.id: 100},
                 }),
             ],
         })
-        move_2020.action_post()
+        move_2015.action_post()
 
         # add a group by analytic account
         options = self._generate_options(
             self.report,
-            '2020-01-01',
-            '2020-01-31',
+            '2015-01-01',
+            '2015-01-31',
             default_options={
-                'analytic_accounts': [analytic_account.id],
                 'analytic_accounts_groupby': [analytic_account.id],
             }
         )
         lines = self.report._get_lines(options)
         self.assertLinesValues(
             lines,
-            #                                                       [         Initial Balance        ]    [            Jan 2020            ]    [           End Balance          ]
+            #                                                       [         Initial Balance        ]    [            Jan 2015            ]    [           End Balance          ]
             #                                                       [ Account XYZ ]    [    Total    ]    [ Account XYZ ]    [    Total    ]    [ Account XYZ ]    [    Total    ]
             #   Name                                                Debit    Credit    Debit    Credit    Debit    Credit    Debit    Credit    Debit    Credit    Debit    Credit
             [0,                                                         1,       2,        3,       4,        5,       6,        7,       8,        9,      10,       11,      12],
             [
-                ('211000 Account Payable',                           50.0,     0.0,     50.0,     0.0,    100.0,     0.0,    100.0,     0.0,    150.0,     0.0,    150.0,     0.0),
+                ('211000 Accounts Payable',                          50.0,     0.0,     50.0,     0.0,    100.0,     0.0,    100.0,     0.0,    150.0,     0.0,    150.0,     0.0),
                 ('400000 Product Sales',                              0.0,     0.0,      0.0,     0.0,      0.0,   100.0,      0.0,   100.0,      0.0,   100.0,      0.0,   100.0),
-                ('Undistributed Profits/Losses - company_1_data',     0.0,    50.0,      0.0,    50.0,      0.0,     0.0,      0.0,     0.0,      0.0,    50.0,      0.0,    50.0),
+                ('Result Brought Forward - company_1_data',           0.0,    50.0,      0.0,    50.0,      0.0,     0.0,      0.0,     0.0,      0.0,    50.0,      0.0,    50.0),
                 ('Total',                                            50.0,    50.0,     50.0,    50.0,    100.0,   100.0,    100.0,   100.0,    150.0,   150.0,    150.0,   150.0),
             ],
             options,
@@ -918,24 +951,23 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
         # add a group by analytic plan
         options = self._generate_options(
             self.report,
-            '2020-01-01',
-            '2020-01-31',
+            '2015-01-01',
+            '2015-01-31',
             default_options={
-                'analytic_accounts': [analytic_account.id],
                 'analytic_plans_groupby': [analytic_plan.id],
             }
         )
         lines = self.report._get_lines(options)
         self.assertLinesValues(
             lines,
-            #                                                      [         Initial Balance        ]    [            Jan 2020            ]    [           End Balance          ]
+            #                                                      [         Initial Balance        ]    [            Jan 2015            ]    [           End Balance          ]
             #                                                      [   Plan XYZ  ]    [    Total    ]    [   Plan XYZ  ]    [    Total    ]    [   Plan XYZ  ]    [    Total    ]
             #   Name                                               Debit    Credit    Debit    Credit    Debit    Credit    Debit    Credit    Debit    Credit    Debit    Credit
             [0,                                                        1,       2,        3,       4,        5,       6,        7,       8,        9,      10,       11,      12],
             [
-                ('211000 Account Payable',                          50.0,     0.0,     50.0,     0.0,    100.0,     0.0,    100.0,     0.0,    150.0,     0.0,    150.0,     0.0),
+                ('211000 Accounts Payable',                         50.0,     0.0,     50.0,     0.0,    100.0,     0.0,    100.0,     0.0,    150.0,     0.0,    150.0,     0.0),
                 ('400000 Product Sales',                             0.0,     0.0,      0.0,     0.0,      0.0,   100.0,      0.0,   100.0,      0.0,   100.0,      0.0,   100.0),
-                ('Undistributed Profits/Losses - company_1_data',    0.0,    50.0,      0.0,    50.0,      0.0,     0.0,      0.0,     0.0,      0.0,    50.0,      0.0,    50.0),
+                ('Result Brought Forward - company_1_data',          0.0,    50.0,      0.0,    50.0,      0.0,     0.0,      0.0,     0.0,      0.0,    50.0,      0.0,    50.0),
                 ('Total',                                           50.0,    50.0,     50.0,    50.0,    100.0,   100.0,    100.0,   100.0,    150.0,   150.0,    150.0,   150.0),
             ],
             options,
@@ -949,31 +981,25 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             'line_ids': [Command.create({'account_id': account_with_inf_code.id, 'name': ''})],
         })
         move.action_post()
-        options = self._generate_options(
-            self.report,
-            fields.Date.from_string('2025-08-01'),
-            fields.Date.from_string('2025-08-31')
-        )
+        options = self._generate_options(self.report, '2025-08-01', '2025-08-31')
         self.report.export_to_xlsx(options)
 
     def test_trial_balance_export_pdf_filter(self):
         """
         Test if the filter is applied.
-        Test if it is also applied to the name of the group if hirarchy is enabled
+        Test if it is also applied to the name of the parent if hirarchy is enabled
         """
         self.env.lang = self.env['res.lang'].search([('code', '=', 'en_US')]).code
-        self.env['account.group'].create([
-            {'name': 'Group_10', 'code_prefix_start': '10', 'code_prefix_end': '10'},
-            {'name': 'Group_101', 'code_prefix_start': '101', 'code_prefix_end': '101'},
-            {'name': 'Group_1012', 'code_prefix_start': '1012', 'code_prefix_end': '1012'},
-            {'name': 'Group_102', 'code_prefix_start': '102', 'code_prefix_end': '102'},
-        ])
+        account_parent_10 = self.env['account.account'].create({'code': '10', 'name': 'Group_10', 'account_type': 'asset_current', 'active': False})
+        account_parent_101 = self.env['account.account'].create({'code': '101', 'name': 'Group_101', 'account_type': 'asset_current', 'parent_id': account_parent_10.id, 'active': False})
+        account_parent_1012 = self.env['account.account'].create({'code': '1012', 'name': 'Group_1012', 'account_type': 'asset_current', 'parent_id': account_parent_101.id, 'active': False})
+        account_parent_102 = self.env['account.account'].create({'code': '102', 'name': 'Group_102', 'account_type': 'asset_current', 'parent_id': account_parent_10.id, 'active': False})
 
         # Create the accounts.
         account_a, account_a1, account_b2 = self.env['account.account'].create([
-            {'code': '100000', 'name': 'Account A', 'account_type': 'asset_current'},
-            {'code': '101200', 'name': 'Account A1', 'account_type': 'asset_current'},
-            {'code': '102200', 'name': 'Account B2', 'account_type': 'asset_current'},
+            {'code': '100000', 'name': 'Account A', 'account_type': 'asset_current', 'parent_id': account_parent_10.id},
+            {'code': '101200', 'name': 'Account A1', 'account_type': 'asset_current', 'parent_id': account_parent_1012.id},
+            {'code': '102200', 'name': 'Account B2', 'account_type': 'asset_current', 'parent_id': account_parent_102.id},
         ])
 
         move = self.env['account.move'].create({
@@ -996,7 +1022,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             'hierarchy': False,
             'unfold_all': True,
             'export_mode': 'print',
-            'filter_search_bar': '101',
+            'filter_search_bar': '1012',
         }
         options = self._generate_options(self.report, '2017-06-01', '2017-06-01', default_options=default_options)
         self.assertLinesValues(
@@ -1028,7 +1054,7 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             options,
         )
 
-        # Test the filter on account_group and account_code
+        # Test the filter on account parent and account code
         default_options = {
             'hierarchy': True,
             'unfold_all': True,
@@ -1049,20 +1075,63 @@ class TestTrialBalanceReport(TestAccountReportsCommon):
             options,
         )
 
-        # Test the filter on undistributed profits/losses
+        # Test the filter on Result Brought Forward
         default_options = {
             'unfold_all': True,
             'export_mode': 'print',
-            'filter_search_bar': 'undistributed',
+            'filter_search_bar': 'result brought forward',
         }
         options = self._generate_options(self.report, '2017-06-01', '2017-06-01', default_options=default_options)
         self.assertLinesValues(
             self.report._get_lines(options),
             [   0,                                                  1,              2,             3,            4],
             [
-                ['Undistributed Profits/Losses - company_1_data',  -100.0,          0.0,           0.0,          -100.0],
-                ['Undistributed Profits/Losses - company_2',        -50.0,          0.0,           0.0,           -50.0],
+                ['Result Brought Forward - company_1_data',        -100.0,          0.0,           0.0,          -100.0],
+                ['Result Brought Forward - company_2',              -50.0,          0.0,           0.0,           -50.0],
                 ['Total',                                          -150.0,          0.0,           0.0,          -150.0],
+            ],
+            options,
+        )
+
+    def test_trial_balance_cta_unaffected_line_on_multiple_year_comparison(self):
+        """Ensure the rate in the initial balance of the 2025 block for the Account Receivable is the
+        rate of 2025 and not the rate of the main options report which is 2026
+
+        Note: this test is still partially incorrect regarding the Result Brought Forward line, it should functionally adapt to
+        the average rate of each respective fiscal year. This is not yet supported. """
+        usd = self.env.ref('base.USD')
+        eur = self.env.ref('base.EUR')
+        eur.active = True
+        company_usd_data = self.setup_other_company(name="USD Company", currency_id=usd.id)
+        company_eur_data = self.setup_other_company(name="EUR Company", currency_id=eur.id)
+
+        self.init_invoice("out_invoice", self.partner_a, "2024-11-11", amounts=[1000], company=company_usd_data['company'].id, post=True)
+        self.init_invoice("out_invoice", self.partner_a, "2025-11-11", amounts=[1000], company=company_usd_data['company'].id, post=True)
+        self.init_invoice("out_invoice", self.partner_a, "2026-11-11", amounts=[1000], company=company_usd_data['company'].id, post=True)
+
+        self.env.user.write({
+            'company_id': company_eur_data['company'].id,
+            'company_ids': [Command.set([company_eur_data['company'].id, company_usd_data['company'].id])],
+        })
+
+        self.env["res.currency.rate"].create([
+            {"name": "2024-01-01", "rate": 1.0, "currency_id": usd.id},
+            {"name": "2025-01-01", "rate": 2.0, "currency_id": usd.id},
+            {"name": "2026-01-01", "rate": 4.0, "currency_id": usd.id},
+        ])
+
+        options = self._generate_options(self.report, '2026-01-01', '2026-12-31')
+        options = self._update_comparison_filter(options, self.report, comparison_type='previous_period', number_period=2)
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                           [ Initial ]     [    2024    ]     [ End ]   [Initial]  [    2025    ]     [ End ]   [Initial]  [    2026    ]      [ End ]
+            #    Name                                     Balance      Debit      Credit   Balance    Balance   Debit    Credit    Balance    Balance   Debit     Credit     Balance
+            [0,                                              1,          2,        3,          4,       5,       6,         7,        8,          9,      10,        11,        12],
+            [
+                ('Accounts Receivable',                     0.0,     1000.0,      0.0,    1000.0,    500.0,   500.0,      0.0,    1000.0,     500.0,    250.0,      0.0,     750.0),
+                ('Product Sales',                           0.0,        0.0,   1000.0,   -1000.0,      0.0,     0.0,    500.0,    -500.0,       0.0,      0.0,    250.0,    -250.0),
+                ('Result Brought Forward - USD Company',    0.0,        0.0,      0.0,       0.0,  -1000.0,     0.0,      0.0,   -1000.0,   -1000.0,      0.0,      0.0,   -1000.0),
+                ('Total',                                   0.0,     1000.0,   1000.0,       0.0,   -500.0,   500.0,    500.0,    -500.0,    -500.0,    250.0,    250.0,    -500.0),
             ],
             options,
         )

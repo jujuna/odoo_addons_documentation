@@ -1,4 +1,4 @@
-import { useState } from "@odoo/owl";
+import { proxy } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { BaseImportModel } from "@base_import/import_model";
 
@@ -33,5 +33,5 @@ class BankStatementCSVImportModel extends BaseImportModel {
  */
 export function useBankStatementCSVImportModel({ env, context }) {
     const orm = useService("orm");
-    return useState(new BankStatementCSVImportModel({ env, context, orm }));
+    return proxy(new BankStatementCSVImportModel({ env, context, orm }));
 }

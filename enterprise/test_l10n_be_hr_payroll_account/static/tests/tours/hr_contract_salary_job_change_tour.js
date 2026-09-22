@@ -1,18 +1,16 @@
 import { registry } from "@web/core/registry";
-import { inputFiles } from "@web/../tests/utils";
 import { redirect } from "@web/core/utils/urls";
 import { stepUtils } from "@web_tour/tour_utils";
+import { post } from "@web/core/network/http_service";
 
 registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
-    url: "/odoo",
-    wait_for: Promise.resolve(odoo.__TipTemplateDef),
     steps: () => [
         /*
          * Generate offer for the employee
          */
         {
             content: "Log into Belgian Company",
-            trigger: ".o_menu_systray .o_switch_company_menu button.dropdown-toggle",
+            trigger: ".o_menu_systray .o_switch_company_menu",
             run: "click",
         },
         {
@@ -23,11 +21,16 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
         },
         {
             trigger:
-                ".o_menu_systray .o_switch_company_menu button.dropdown-toggle span:contains('My Belgian Company - TEST')",
+                ".o_menu_systray .o_switch_company_menu span:contains('My Belgian Company - TEST')",
         },
         {
             content: "Employees",
             trigger: '.o_app[data-menu-xmlid="hr.menu_hr_root"]',
+            run: "click",
+        },
+        {
+            content: "Open Management menu",
+            trigger: '[data-menu-xmlid="hr.menu_hr_employee_payroll"]',
             run: "click",
         },
         {
@@ -51,18 +54,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
             trigger: ".ui-autocomplete > li > a:contains(Senior Developer Template Contract)",
             run: "click",
         },
-        {
-            content: "Change job position",
-            trigger: ".o_input#employee_job_id_0",
-            run: "edit Senior Developer BE",
-        },
-        {
-            trigger: "ul.o-autocomplete--dropdown-menu",
-        },
-        {
-            trigger: "a.dropdown-item:contains('Senior Developer BE')",
-            run: "click",
-        },
+
         {
             content: "Save Offer",
             trigger: ".o_form_button_save",
@@ -95,7 +87,9 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
                 const regex = "/salary_package/simulation/.*";
                 const url = offer_link.match(regex)[0];
                 localStorage.setItem("url", url);
-                redirect("/web/session/logout");
+
+                const redirect_url = await post('/web/session/logout', { csrf_token: odoo.csrf_token }, "url");
+                redirect(redirect_url);
             },
             expectUnloadPage: true,
         },
@@ -128,13 +122,23 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
             content: "wait for the interaction to load",
             trigger: "#hr_contract_salary[is-ready=true]",
         },
+        {
+            content: "Set metro transport",
+            trigger: 'input[name="metro_transport_reimbursed_amount_manual"]',
+            run: "edit 300",
+        },
+        {
+            content: "Set metro periodicity",
+            trigger: 'label:has(input[name="metro_transport_periodicity_radio"][data-value="yearly"])',
+            run: "click",
+        },
         /*
          * We only modify the IP to check if the change is correctly made
          * according to the job change of the employee.
          */
         {
             content: "Take IP",
-            trigger: "input[name=ip_value_radio]:eq(1):not(:visible)",
+            trigger: 'label:has(input[name="ip_value_radio"][data-value="1"])',
             run: "click",
         },
         // We set internet to show the upload invoice button
@@ -152,8 +156,8 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
         },
         {
             content: "National Identification Number",
-            trigger: 'input[name="identification_id"]',
-            run: "edit 11.11.11-111.11",
+            trigger: 'input[name="niss"]',
+            run: "edit 88.05.10-562.51",
         },
         {
             content: "Nationality",
@@ -183,8 +187,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
         {
             content: "Upload ID card copy (Both Sides)",
             trigger: 'input[name="id_card"]',
-            async run() {
-
+            async run({ inputFiles }) {
                 const file = new File(["hello, world"], "employee_id_card.pdf", {
                     type: "application/pdf",
                 });
@@ -194,7 +197,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
         {
             content: "Upload Mobile Subscription Invoice",
             trigger: 'input[name="mobile_invoice"]',
-            async run() {
+            async run({ inputFiles }) {
                 const file = new File(["hello, world"], "employee_mobile_invoice.pdf", {
                     type: "application/pdf",
                 });
@@ -205,7 +208,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
         {
             content: "Upload Sim Card Copy",
             trigger: 'input[name="sim_card"]',
-            async run() {
+            async run({ inputFiles }) {
                 const file = new File(["hello, world"], "employee_sim_card.pdf", {
                     type: "application/pdf",
                 });
@@ -216,7 +219,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
         {
             content: "Upload Internet Subscription invoice",
             trigger: 'input[name="internet_invoice"]',
-            async run() {
+            async run({ inputFiles }) {
                 const file = new File(["hello, world"], "employee_internet_invoice.pdf", {
                     type: "application/pdf",
                 });
@@ -237,7 +240,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
         {
             content: "Type Date",
             trigger: ":iframe input.ui-selected",
-            run: "edit 17/09/2018",
+            run: "edit 09/17/2018",
         },
         // fill signature
         {
@@ -274,7 +277,7 @@ registry.category("web_tour.tours").add("hr_contract_salary_tour_job_change", {
         {
             content: "Type Date",
             trigger: ":iframe input.ui-selected",
-            run: "edit 17/09/2018",
+            run: "edit 09/17/2018",
         },
         {
             content: "Validate and Sign",

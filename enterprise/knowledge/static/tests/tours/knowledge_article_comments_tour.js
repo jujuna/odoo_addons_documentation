@@ -1,5 +1,4 @@
 import { registry } from "@web/core/registry";
-import { insertText } from "@web/../tests/utils";
 import { stepUtils } from "@web_tour/tour_utils";
 
 import { endKnowledgeTour } from "./knowledge_tour_utils.js";
@@ -8,9 +7,7 @@ import { setSelection } from "@html_editor/../tests/tours/helpers/editor";
 
 const addAnswerComment = (commentText) => [{
     trigger: '.o-mail-Composer-input',
-    run: async () => {
-        await insertText('.o-mail-Composer-input', commentText);
-    }
+    run: `edit ${commentText}`,
 }, {
     // Send comment
     trigger: '.o-mail-Composer-send:enabled',
@@ -20,7 +17,6 @@ const addAnswerComment = (commentText) => [{
 }];
 
 registry.category('web_tour.tours').add('knowledge_article_comments', {
-    url: '/odoo',
     steps: () => [
         stepUtils.showAppsMenuItem(), { // Open Knowledge App
             trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
@@ -35,7 +31,7 @@ registry.category('web_tour.tours').add('knowledge_article_comments', {
             trigger: '.o-mail-Thread :contains("Marc, can you check this?")',
         }, {
             content: "Check that composer doesn't have paper plane button but has a send button",
-            trigger: ".o-mail-Composer:has(button.o-mail-Composer-send):not(:has(i.fa-paper-plane-o))",
+            trigger: ".o-mail-Composer:has(button.o-mail-Composer-send):not(:has(i[data-icon='send']))",
         },
         ...addAnswerComment("Sure thing boss, all done!"),
         {
@@ -69,9 +65,9 @@ registry.category('web_tour.tours').add('knowledge_article_comments', {
             run: "click",
         }, {
             trigger: '.o_knowledge_comments_popover .o-mail-Composer-input',
-            run: async () => {
-                await insertText('.o-mail-Composer-input', 'My Knowledge Comment');
-            }
+        }, {
+            trigger: '.o-mail-Composer-input',
+            run: "edit My Knowledge Comment",
         }, { // Send comment
             trigger: '.o_knowledge_comments_popover .o-mail-Composer-send:enabled',
             run: "click",
@@ -85,8 +81,10 @@ registry.category('web_tour.tours').add('knowledge_article_comments', {
         }, { // Panel loads un-resolved messages
             trigger: '.o-mail-Thread :contains("My Knowledge Comment")',
         }, { // Switch to "resolved" mode
-            trigger: '.o_knowledge_comments_panel select',
-            run: "select resolved",
+            trigger: '.o_knowledge_comments_panel button:contains("Resolved")',
+            run: "click",
+        }, { // Verify active state
+            trigger: '.o_knowledge_comments_panel button.active:contains("Resolved")',
         }, { // Panel loads resolved messages
             trigger: '.o-mail-Thread :contains("Sure thing boss, all done!")',
         }, { // Open the comment to enable replies

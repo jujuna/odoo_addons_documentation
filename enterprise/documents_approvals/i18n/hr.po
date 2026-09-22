@@ -2,15 +2,15 @@
 # This file contains the translation of the following modules:
 # * documents_approvals
 #
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-17 03:39+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Croatian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-17 22:46+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Croatian <https://translate.odoo.com/projects/odoo-master/"
 "documents_approvals/hr/>\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
@@ -18,12 +18,24 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents_approvals
+#: model:ir.module.module,description:base.module_documents_approvals
+msgid ""
+"\n"
+"Adds approvals data to documents\n"
+msgstr ""
 
 #. module: documents_approvals
 #: model:ir.model,name:documents_approvals.model_approval_request
 msgid "Approval Request"
 msgstr "Zahtjev za odobrenjem"
+
+#. module: documents_approvals
+#: model:ir.module.module,summary:base.module_documents_approvals
+msgid "Approval from documents"
+msgstr ""
 
 #. module: documents_approvals
 #: model:documents.document,name:documents_approvals.document_approvals_folder
@@ -33,23 +45,27 @@ msgstr "Odobrenja"
 
 #. module: documents_approvals
 #: model:ir.model.fields,field_description:documents_approvals.field_res_company__approvals_folder_id
+#, fuzzy
 msgid "Approvals Folder"
-msgstr ""
+msgstr "Mapa odobrenja"
 
 #. module: documents_approvals
 #: model:ir.model.fields,field_description:documents_approvals.field_res_company__approvals_tag_ids
+#, fuzzy
 msgid "Approvals Tag"
-msgstr ""
+msgstr "Oznaka odobrenja"
 
 #. module: documents_approvals
 #: model:ir.model.fields,field_description:documents_approvals.field_res_config_settings__approvals_tag_ids
+#, fuzzy
 msgid "Approvals Tags"
-msgstr ""
+msgstr "Oznake odobrenja"
 
 #. module: documents_approvals
 #: model:ir.model.fields,field_description:documents_approvals.field_res_config_settings__approvals_folder_id
+#, fuzzy
 msgid "Approvals default folder"
-msgstr ""
+msgstr "Zadana mapa odobrenja"
 
 #. module: documents_approvals
 #: model_terms:ir.ui.view,arch_db:documents_approvals.res_config_settings_view_form
@@ -58,8 +74,9 @@ msgstr "Centraliziraj privitke vezane uz odobrenja"
 
 #. module: documents_approvals
 #: model:ir.model,name:documents_approvals.model_res_company
-msgid "Companies"
-msgstr "Tvrtke"
+#, fuzzy
+msgid "Company"
+msgstr "Tvrtka"
 
 #. module: documents_approvals
 #: model:ir.model,name:documents_approvals.model_res_config_settings
@@ -74,22 +91,20 @@ msgid "Display Name"
 msgstr "Naziv"
 
 #. module: documents_approvals
-#. odoo-python
-#: code:addons/documents_approvals/models/approval_request.py:0
 #: model_terms:ir.ui.view,arch_db:documents_approvals.approval_request_view_form
 msgid "Documents"
 msgstr "Dokumenti"
+
+#. module: documents_approvals
+#: model:ir.module.module,shortdesc:base.module_documents_approvals
+msgid "Documents - Approvals"
+msgstr ""
 
 #. module: documents_approvals
 #: model:ir.model.fields,field_description:documents_approvals.field_approval_request__documents_enabled
 #: model:ir.model.fields,field_description:documents_approvals.field_res_company__documents_approvals_settings
 msgid "Documents Approvals Settings"
 msgstr "Postavke odobrenja dokumenata"
-
-#. module: documents_approvals
-#: model:ir.model.fields,field_description:documents_approvals.field_approval_request__documents_count
-msgid "Documents Count"
-msgstr "Broj dokumenata"
 
 #. module: documents_approvals
 #: model_terms:ir.ui.view,arch_db:documents_approvals.res_config_settings_view_form
@@ -104,24 +119,14 @@ msgid "ID"
 msgstr "ID"
 
 #. module: documents_approvals
+#: model:ir.model.fields,field_description:documents_approvals.field_approval_request__document_count
+msgid "Related Document Count"
+msgstr ""
+
+#. module: documents_approvals
 #: model_terms:ir.ui.view,arch_db:documents_approvals.res_config_settings_view_form
 msgid "Tags"
 msgstr "Oznake"
 
-#. module: documents_approvals
-#. odoo-python
-#: code:addons/documents_approvals/models/approval_request.py:0
-msgid "res_id"
-msgstr ""
-
-#. module: documents_approvals
-#. odoo-python
-#: code:addons/documents_approvals/models/approval_request.py:0
-msgid "res_model"
-msgstr ""
-
-#. module: documents_approvals
-#. odoo-python
-#: code:addons/documents_approvals/models/approval_request.py:0
-msgid "type"
-msgstr ""
+msgid "Documents Count"
+msgstr "Broj dokumenata"

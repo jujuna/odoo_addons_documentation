@@ -2,8 +2,7 @@
 
 import uuid
 
-from odoo import models, fields, api, _
-from odoo.fields import Date
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -14,21 +13,21 @@ class L10n_UkHmrcSendWizard(models.TransientModel):
     @api.model
     def default_get(self, fields):
         res = super().default_get(fields)
-        if 'client_data' not in self.env.context:
+        if any(key not in self.env.context for key in ['client_data', 'return_id']):
             return res
 
         # Check obligations: should be logged in by now
-        self.env['l10n_uk.vat.obligation'].import_vat_obligations(self.env.context['client_data'])
+        self.env['l10n_uk.vat.obligation'].import_vat_obligations()
 
         if 'obligation_id' in fields:
             obligations = self.env['l10n_uk.vat.obligation'].search([('status', '=', 'open')])
             if not obligations:
-                raise UserError(_('You have no open obligations anymore'))
+                raise UserError(self.env._('No open VAT obligations were found on HMRC. '
+                    'You can manually mark the return as completed or archive it if no further action is required.'))
 
-            date_from = Date.to_date(self.env.context['options']['date']['date_from'])
-            date_to = Date.to_date(self.env.context['options']['date']['date_to'])
+            return_record = self.env['account.return'].browse(self.env.context['return_id'])
             for obl in obligations:
-                if obl.date_start == date_from and obl.date_end == date_to:
+                if obl.date_start == return_record.date_from and obl.date_end == return_record.date_to:
                     res['obligation_id'] = obl.id
                     break
 

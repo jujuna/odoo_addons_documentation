@@ -10,94 +10,108 @@ class BudgetReport(models.Model):
     committed = fields.Float('Committed', readonly=True)
 
     def _get_pol_query(self, plan_fnames):
+        budget_line_domain = self.env.context.get('budget_line_domain') or []
         precision_digits = self.env['decimal.precision'].precision_get('Product Unit')
-        qty_invoiced_table = SQL(
-            """
-               SELECT SUM(
-                          CASE WHEN COALESCE(uom_aml.id != uom_pol.id, FALSE)
-                               THEN ROUND(CAST((aml.quantity / uom_aml.factor) * uom_pol.factor AS NUMERIC), %(precision_digits)s)
-                               ELSE COALESCE(aml.quantity, 0)
-                          END
-                          * CASE WHEN am.move_type = 'in_invoice' THEN 1
-                                 WHEN am.move_type = 'in_refund' THEN -1
-                                 ELSE 0 END
-                      ) AS qty_invoiced,
-                      pol.id AS pol_id
-                 FROM purchase_order po
-            LEFT JOIN purchase_order_line pol ON pol.order_id = po.id
-            LEFT JOIN account_move_line aml ON aml.purchase_line_id = pol.id
-            LEFT JOIN account_move am ON aml.move_id = am.id
-            LEFT JOIN uom_uom uom_aml ON uom_aml.id = aml.product_uom_id
-            LEFT JOIN uom_uom uom_pol ON uom_pol.id = pol.product_uom_id
-                WHERE aml.parent_state = 'posted'
-             GROUP BY pol.id
-        """,
-        precision_digits=precision_digits
-        )
 
+        aml_query = self.env['account.move.line'].sudo()._search([('parent_state', '=', 'posted')])
+        aml_table = aml_query.table
+        aml_query.groupby = aml_table.purchase_line_id
+        qty_invoiced_table = aml_query.select(SQL("""
+            %(pol_id)s AS pol_id,
+            SUM(
+                CASE WHEN COALESCE(%(uom_aml)s != %(uom_pol)s, FALSE)
+                     THEN ROUND(CAST((%(quantity)s / %(uom_aml_factor)s) * %(uom_pol_factor)s AS NUMERIC), %(precision_digits)s)
+                     ELSE COALESCE(%(quantity)s, 0)
+                END
+                * CASE WHEN %(move_type)s = 'in_invoice' THEN 1
+                       WHEN %(move_type)s = 'in_refund' THEN -1
+                       ELSE 0 END
+            ) AS qty_invoiced""",
+            pol_id=aml_table.purchase_line_id,
+            move_type=aml_table.move_id.move_type,
+            quantity=aml_table.quantity,
+            uom_aml=aml_table.product_uom_id, uom_pol=aml_table.purchase_line_id.uom_id,
+            uom_aml_factor=aml_table.product_uom_id.factor, uom_pol_factor=aml_table.purchase_line_id.uom_id.factor,
+            precision_digits=precision_digits,
+        ))
+
+        budget_lines = self.env['budget.line'].sudo().search(budget_line_domain)
+        shape2budget_lines = budget_lines._by_shape()
+
+        # Q1 - PO lines matched to a null-company budget line.
+        # Q2 - PO lines matched to a company-specific budget line.
         company_conditions = [
-            SQL('po.company_id = bl.company_id'),
-            SQL('bl.company_id IS NULL'),
+            lambda pol_table, bl_table: SQL('%s IS NULL', bl_table.company_id),
+            lambda pol_table, bl_table: SQL('%s = %s', pol_table.order_id.company_id, bl_table.company_id),
         ]
 
         queries = []
         for company_condition in company_conditions:
-            queries.append(SQL(
-                """
-            SELECT (pol.id::TEXT || '-' || ROW_NUMBER() OVER (PARTITION BY pol.id ORDER BY pol.id)) AS id,
-                   bl.budget_analytic_id AS budget_analytic_id,
-                   bl.id AS budget_line_id,
-                   'purchase.order' AS res_model,
-                   po.id AS res_id,
-                   po.date_order AS date,
-                   bl.date_to AS bl_date_to,
-                   pol.name AS description,
-                   pol.company_id AS company_id,
-                   po.user_id AS user_id,
-                   'committed' AS line_type,
-                   0 AS budget,
-                   COALESCE(pol.price_subtotal::FLOAT, pol.price_unit::FLOAT * pol.product_qty)
-                        / COALESCE(NULLIF(pol.product_qty, 0), 1)
-                        * (pol.product_qty - COALESCE(qty_invoiced_table.qty_invoiced, 0))
-                        / po.currency_rate
-                        * (a.rate)
-                        * CASE WHEN ba.budget_type = 'both' THEN -1 ELSE 1 END AS committed,
-                   0 AS achieved,
-                   0 AS theoretical,
-                   %(analytic_fields)s
-              FROM purchase_order_line pol
-         LEFT JOIN (%(qty_invoiced_table)s) qty_invoiced_table ON qty_invoiced_table.pol_id = pol.id
-              JOIN purchase_order po ON pol.order_id = po.id AND po.state = 'purchase'
-        CROSS JOIN JSONB_TO_RECORDSET(pol.analytic_json) AS a(rate FLOAT, %(field_cast)s)
-         LEFT JOIN budget_line bl ON %(company_condition)s
-                                 AND po.date_order >= bl.date_from
-                                 AND date_trunc('day', po.date_order) <= bl.date_to
-                                 AND %(condition)s
-         LEFT JOIN budget_analytic ba ON ba.id = bl.budget_analytic_id
-             WHERE pol.product_qty > COALESCE(qty_invoiced_table.qty_invoiced, 0)
-               AND ba.budget_type != 'revenue'
-                """,
-                company_condition=company_condition,
-                analytic_fields=SQL(', ').join(self.env['account.analytic.line']._field_to_sql('a', fname) for fname in plan_fnames),
-                qty_invoiced_table=qty_invoiced_table,
-                field_cast=SQL(', ').join(SQL('%s FLOAT', SQL.identifier(fname)) for fname in plan_fnames),
-                condition=SQL(' AND ').join(SQL(
-                    "(%(bl)s IS NULL OR %(a)s = %(bl)s)",
-                    bl=self.env['budget.line']._field_to_sql('bl', fname),
-                    a=self.env['budget.line']._field_to_sql('a', fname),
-                ) for fname in plan_fnames)
-            ))
+            for shape, line_ids in shape2budget_lines.items():
+                query = self.env['purchase.order.line'].sudo()._search([('order_id.state', '=', 'purchase')])
+                pol_table = query.table
+                analytic_table = query.table._make_alias('analytic', None)
+                query.add_join('JOIN', analytic_table, SQL(
+                    """LATERAL (
+                        SELECT rate, %(analytic_columns)s
+                        FROM JSONB_TO_RECORDSET(%(analytic_json)s) AS x(rate FLOAT, %(field_cast)s)
+                    )""",
+                    analytic_json=pol_table.analytic_json,
+                    analytic_columns=SQL(', ').join(SQL.identifier(fname) for fname in plan_fnames),
+                    field_cast=SQL(', ').join(SQL('%s INT', SQL.identifier(fname)) for fname in plan_fnames),
+                ), SQL("TRUE"))
+                bl_table = self._shape_join('JOIN', analytic_table, 'budget.line', shape, lambda bl_table: SQL(
+                    "%(company_condition)s AND date_trunc('day', %(po_date)s) BETWEEN %(bl_date_from)s AND %(bl_date_to)s AND %(bl_id)s = ANY(%(ids)s)",
+                    company_condition=company_condition(pol_table, bl_table),
+                    po_date=pol_table.order_id.date_order,
+                    bl_date_from=bl_table.date_from, bl_date_to=bl_table.date_to,
+                    bl_id=bl_table.id, ids=line_ids.ids,
+                ))
+                query.add_join('LEFT JOIN', 'qty_invoiced_table', SQL("(%s)", qty_invoiced_table), SQL("qty_invoiced_table.pol_id = %s", pol_table.id))
+                query.add_where(SQL("%(product_qty)s > COALESCE(qty_invoiced_table.qty_invoiced, 0)", product_qty=pol_table.product_qty))
+                query.add_where(SQL("%s != 'revenue'", bl_table.budget_analytic_id.budget_type))
+                queries.append(query.select(
+                    SQL("(%(id)s::TEXT || '-' || ROW_NUMBER() OVER (PARTITION BY %(id)s ORDER BY %(id)s)) AS id", id=pol_table.id),
+                    bl_table.budget_analytic_id,
+                    SQL("%s AS budget_line_id", bl_table.id),
+                    SQL("'purchase.order' AS res_model"),
+                    SQL("%s AS res_id", pol_table.order_id),
+                    SQL("%s AS date", pol_table.order_id.date_order),
+                    SQL("%s AS description", pol_table.name),
+                    pol_table.company_id,
+                    pol_table.order_id.user_id,
+                    SQL("'committed' AS line_type"),
+                    SQL("0 AS budget"),
+                    SQL("0 AS liquidation"),
+                    SQL("""
+                        (
+                            COALESCE(%(price_subtotal)s::FLOAT, %(price_unit)s::FLOAT * %(product_qty)s)
+                            + COALESCE(%(non_deductible_tax)s::FLOAT, 0.0)
+                        ) / COALESCE(NULLIF(%(product_qty)s, 0), 1)
+                        * (%(product_qty)s - COALESCE(qty_invoiced_table.qty_invoiced, 0))
+                        / %(currency_rate)s
+                        * %(analytic_rate)s
+                        * CASE WHEN %(budget_type)s = 'both' THEN -1 ELSE 1 END AS committed""",
+                        price_subtotal=pol_table.price_subtotal,
+                        price_unit=pol_table.price_unit,
+                        non_deductible_tax=pol_table.non_deductible_tax,
+                        product_qty=pol_table.product_qty,
+                        analytic_rate=analytic_table.rate,
+                        currency_rate=pol_table.order_id.currency_rate,
+                        budget_type=bl_table.budget_analytic_id.budget_type,
+                    ),
+                    SQL("0 AS achieved"),
+                    SQL("0 AS theoretical"),
+                    *(analytic_table[fname] for fname in plan_fnames),
+                ))
 
         return SQL(' UNION ALL ').join(queries)
 
     @property
-    def _table_query(self):
-        self.env['purchase.order'].flush_model()
-        self.env['purchase.order.line'].flush_model()
+    def _table_sql(self):
         project_plan, other_plans = self.env['account.analytic.plan']._get_all_plans()
         plan_fnames = [plan._column_name() for plan in project_plan | other_plans]
-        return SQL(
-            "%s UNION ALL %s",
-            super()._table_query,
+        return SQL("(%s)", SQL(" UNION ALL ").join(filter(None, (
+            super()._table_sql,
             self._get_pol_query(plan_fnames),
-        )
+        ))))

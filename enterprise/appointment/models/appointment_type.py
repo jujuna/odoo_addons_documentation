@@ -3,8 +3,9 @@
 import ast
 import calendar as cal
 import random
-import pytz
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, UTC
+from zoneinfo import ZoneInfoNotFoundError, ZoneInfo
+
 from dateutil import rrule
 from dateutil.relativedelta import relativedelta
 from babel.dates import format_datetime, format_time
@@ -14,15 +15,15 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 from odoo.fields import Command, Domain
 from odoo.tools import float_compare, frozendict
-from odoo.tools.misc import babel_locale_parse, get_lang
-from odoo.tools.urls import urljoin as url_join
+from odoo.tools.date_utils import localized
+from odoo.tools.misc import babel_locale_parse, format_duration, get_lang
 from odoo.addons.base.models.res_partner import _tz_get
 
 
 class AppointmentType(models.Model):
     _name = 'appointment.type'
     _description = "Appointment Type"
-    _inherit = ['image.mixin', 'mail.thread', 'mail.activity.mixin']
+    _inherit = ['rating.parent.mixin', 'image.mixin', 'mail.thread', 'mail.activity.mixin']
     _order = "sequence, id"
     _mail_post_access = 'read'
 
@@ -75,11 +76,13 @@ class AppointmentType(models.Model):
     image_1920 = fields.Image("Background Image")  # image.mixin override
     location_id = fields.Many2one('res.partner', string='Location')
     location = fields.Char(
-        'Location formatted', compute='_compute_location', compute_sudo=True,
-        help='Location formatted for one line uses')
+        string="Location formatted",
+        related='location_id.contact_address_inline',
+        help='Location formatted for one line uses',
+    )
     event_videocall_source = fields.Selection([('discuss', 'Odoo Discuss')], string="Video Link",
         help="Defines the type of video call link that will be used for the generated events. Keep it empty to prevent generating meeting url.")
-    allow_guests = fields.Boolean(string='Allow invitations', help="Let attendees invite guests when registering a meeting.")
+    allow_guests = fields.Boolean(string='Allow guests', help="Let attendees invite guests when registering a meeting.")
     manual_confirmation_percentage = fields.Float("Capacity Percentage", default=1.0,
         help="""Bookings will not be automatically confirmed once the total
         reserved user/resource capacity exceeds this percentage of total capacity.""")
@@ -88,6 +91,10 @@ class AppointmentType(models.Model):
     max_bookings = fields.Integer("Total Bookings", compute="_compute_max_bookings", default=1, store=True, readonly=False,
         help="""The maximum amount of bookings per slot the appointment can handle (e.g. Allow 6 bookings for the given user/resource).
             This field is only used if the appointment type is not set to manage capacity.""")
+    responsible_id = fields.Many2one('res.users', string='Responsible', default=lambda self: self.env.user,
+        domain=lambda self: [('all_group_ids', 'in', self.env.ref('appointment.group_appointment_user').id)],
+        help="""Manager of this Appointment Type. Can edit schedule, assigned resources or users, and other settings.
+             In the case of resource appointments, they will be notified on new bookings.""")
     # 'punctual' types are time-bound
     start_datetime = fields.Datetime('Start Datetime')
     end_datetime = fields.Datetime('End Datetime')
@@ -102,12 +109,16 @@ class AppointmentType(models.Model):
         domain=[('model', '=', 'calendar.event')],
         default=_default_canceled_mail_template_id,
         help="If set an email will be sent to the customer when the appointment is cancelled.")
+    feedback_mail_template_id = fields.Many2one(
+        'mail.template', string='Feedback Email', ondelete='restrict',
+        domain=[('model', '=', 'calendar.event')],
+        help="If set, an email will be sent to the customer after the appointment to request some feedback.")
 
     # Assignment flow
     assignment_method = fields.Selection([
         ('auto', 'Automatically'),
         ('manual', 'By visitor')],
-        string="Assignment", compute="_compute_assignment_method", readonly=False,
+        string="Assign", compute="_compute_assignment_method", readonly=False,
         help="How users and resources will be assigned to the meetings that customers book on your website.")
     is_auto_assign = fields.Boolean('Assign automatically')
     is_date_first = fields.Boolean('Select date and time first')
@@ -130,7 +141,7 @@ class AppointmentType(models.Model):
             - Flexible Schedule: the user will create and share to another user a custom appointment type with hand-picked time slots\n
             - Calendar Link: the user will create and share to another user an appointment type covering all their time slots""")
     category_slot_scheduling = fields.Selection(
-        [('weekly', 'Weekly'), ('flexible', 'Flexible')],
+        [('weekly', 'Repeats Weekly'), ('flexible', 'Does not repeat')],
          string="Schedule", readonly=False, compute="_compute_category_slot_scheduling"
     )
     category_time_display = fields.Selection([
@@ -150,7 +161,7 @@ class AppointmentType(models.Model):
 
     # Display Settings
     hide_duration = fields.Boolean('Hide Duration')
-    hide_timezone = fields.Boolean('Hide Time Zone')
+    hide_timezone = fields.Boolean('Hide Time Zone', default=True)
     show_avatars = fields.Boolean('Display pictures',
         compute='_compute_show_avatars', readonly=False, store=True,
         help="""Display user or resource images across the entire booking flow.""")
@@ -165,16 +176,29 @@ class AppointmentType(models.Model):
         relation='appointment_type_appointment_question_rel',
         string='Questions',
         default=_default_question_ids)
+    # Defaulted to an "email" reminder since appointment attendees are usually external people
     reminder_ids = fields.Many2many(
         'calendar.alarm', string="Reminders",
-        default=lambda self: self.env['calendar.alarm'].search([('default_for_new_appointment_type', '=', True)]))
+        default=lambda self: self.env.ref('calendar.alarm_mail_1_day', raise_if_not_found=False))
     schedule_based_on = fields.Selection([
         ('users', 'Users'),
         ('resources', 'Resources')],
         string="Book", default="users", required=True)
-    slot_ids = fields.One2many('appointment.slot', 'appointment_type_id', 'Availabilities', copy=True)
+    slot_ids = fields.One2many('appointment.slot', 'appointment_type_id', 'Slots', copy=True)
+    slot_count = fields.Integer('# Slots', compute='_compute_slot_count')
     slot_creation_interval = fields.Float('Create slot every', default=1.0,
         help="Starting from the beginning of the time slot, Odoo will create a new slot at regular intervals based on the time specified here.")
+    # UI-only field for slot edition that does not need to be stored (in hours, like appointment_duration)
+    slot_creation_mode = fields.Selection([
+        ('single', 'One by one'),
+        ('split', 'Multiple'),
+    ], store=False, readonly=False, compute="_compute_slot_creation_mode")
+    slot_duration = fields.Float(store=False, readonly=False)
+    slot_interval_capacity = fields.Integer("Max slot capacity", default=0,
+        compute="_compute_slot_interval_capacity", store=True, readonly=False,
+        help="""Avoid congestion by setting a maximum capacity that can be booked on any time slot computed from availabilities.
+        Any booking starting between the beginning of a slot and the next will count towards that limit. Set to 0 to disable.""")
+    user_can_manage_slots = fields.Boolean(compute='_compute_user_can_manage_slots')
 
     # Staff Users Management
     staff_user_ids = fields.Many2many(
@@ -200,6 +224,8 @@ class AppointmentType(models.Model):
     appointment_count_upcoming = fields.Integer('# Upcoming Appointments', compute='_compute_appointment_counts')
     appointment_invite_ids = fields.Many2many('appointment.invite', string='Invitation Links', copy=False)
     appointment_invite_count = fields.Integer('# Invitation Links', compute='_compute_appointment_invite_count')
+    appointment_leave_ids = fields.Many2many('appointment.leave', string='Leaves', compute='_compute_appointment_leave_ids')
+    appointment_leave_count = fields.Integer('# Leaves', compute='_compute_appointment_leave_count')
     meeting_ids = fields.One2many('calendar.event', 'appointment_type_id', string="Appointment Meetings")
 
     # Onboarding connectors display (see o_appointment_cal_sync_alert)
@@ -265,6 +291,12 @@ class AppointmentType(models.Model):
                 {} if record.appointment_duration % 1 == 0 and record.appointment_duration < 24 else {'format': 'short'}
             )
 
+    @api.depends_context('uid')
+    def _compute_user_can_manage_slots(self):
+        """True if the user is supposed to see slot edition options."""
+        self.user_can_manage_slots = False
+        self._filtered_access('write').user_can_manage_slots = True
+
     @api.depends('appointment_invite_ids')
     def _compute_appointment_invite_count(self):
         appointment_data = self.env['appointment.invite']._read_group(
@@ -275,6 +307,31 @@ class AppointmentType(models.Model):
         mapped_data = {appointment_type.id: count for appointment_type, count in appointment_data}
         for appointment_type in self:
             appointment_type.appointment_invite_count = mapped_data.get(appointment_type.id, 0)
+
+    @api.depends('staff_user_ids', 'resource_ids')
+    def _compute_appointment_leave_ids(self):
+        leaves = self.env['appointment.leave'].search(Domain.OR([
+            # All appointments leave
+            Domain.AND([Domain('leave_type', '=', 'appointments'), Domain('appointment_type_ids', '=', False)]),
+            # Directly assigned
+            Domain('appointment_type_ids', 'in', self.ids),
+            # Users assigned
+            Domain.AND([Domain('leave_type', '=', 'users'), Domain('appointment_type_ids', '=', False), Domain('user_ids', 'in', self.staff_user_ids.ids)]),
+            # Resources assigned
+            Domain.AND([Domain('leave_type', '=', 'resources'), Domain('appointment_type_ids', '=', False), Domain('resource_ids', 'in', self.resource_ids.ids)]),
+        ]))
+        for appointment_type in self:
+            appointment_type.appointment_leave_ids = leaves.filtered(lambda leave:
+                (leave.leave_type == 'appointments' and not leave.appointment_type_ids)
+                or appointment_type in leave.appointment_type_ids
+                or (not leave.appointment_type_ids and appointment_type.staff_user_ids & leave.user_ids)
+                or (not leave.appointment_type_ids and appointment_type.resource_ids & leave.resource_ids)
+            )
+
+    @api.depends('appointment_leave_ids')
+    def _compute_appointment_leave_count(self):
+        for appointment_type in self:
+            appointment_type.appointment_leave_count = len(appointment_type.appointment_leave_ids)
 
     @api.depends('is_auto_assign')
     def _compute_assignment_method(self):
@@ -346,18 +403,6 @@ class AppointmentType(models.Model):
                 'end_datetime': False,
             })
 
-    @api.depends('location_id')
-    def _compute_location(self):
-        """Use location_id if available, otherwise its name, finally ''. """
-        for record in self:
-            if (record.location_id.contact_address or '').strip():
-                record.location = ', '.join(
-                    frag.strip()
-                    for frag in record.location_id.contact_address.split('\n') if frag.strip()
-                )
-            else:
-                record.location = record.location_id.name or ''
-
     @api.depends('auto_confirm', 'manual_confirmation_percentage')
     def _compute_is_always_confirm(self):
         for appointment_type in self:
@@ -389,6 +434,31 @@ class AppointmentType(models.Model):
     def _onchange_select_first(self):
         for appointment in self:
             appointment.is_date_first = appointment.select_first == 'date'
+
+    @api.depends('slot_ids')
+    def _compute_slot_count(self):
+        for appointment in self:
+            appointment.slot_count = len(appointment.slot_ids)
+
+    @api.depends('slot_duration')
+    def _compute_slot_creation_mode(self):
+        for event in self:
+            event.slot_creation_mode = 'split' if event.slot_duration > 0 else 'single'
+
+    @api.onchange('slot_creation_mode')
+    def _onchange_slot_creation_mode(self):
+        for event in self:
+            if event.slot_creation_mode == 'single':
+                event.slot_duration = 0
+            elif event.slot_creation_mode == 'split' and event.slot_duration == 0:
+                event.slot_duration = 0.5
+
+    @api.depends('category', 'manage_capacity', 'schedule_based_on')
+    def _compute_slot_interval_capacity(self):
+        for appointment in self.filtered(lambda apt:
+            apt.category == 'custom' or not apt.manage_capacity or apt.schedule_based_on != 'resources'
+        ):
+            appointment.slot_interval_capacity = 0
 
     @api.depends('schedule_based_on')
     def _compute_staff_user_ids(self):
@@ -442,6 +512,14 @@ class AppointmentType(models.Model):
         for record in self:
             if not record.appointment_duration > 0.0:
                 raise ValidationError(_('Appointment Duration should be higher than 0.00.'))
+            if any(record.slot_ids.filtered(lambda slot: (
+                slot.start_hour + record.appointment_duration > slot._convert_end_hour_24_format()
+                and slot.slot_type != 'unique'
+            ))):
+                raise ValidationError(_(
+                    "At least one slot duration is shorter than the meeting duration (%s hours)",
+                    format_duration(record.appointment_duration)
+                ))
 
     @api.constrains('category', 'staff_user_ids', 'schedule_based_on')
     def _check_staff_user_configuration(self):
@@ -462,23 +540,30 @@ class AppointmentType(models.Model):
         """ We don't want the current user to be follower of all created types """
         return super(AppointmentType, self.with_context(mail_create_nosubscribe=True)).create(vals_list)
 
+    @api.ondelete(at_uninstall=False)
+    def _unlink_related_appointment_leaves(self):
+        """ Unlink related leaves if all their appointment types have been unlinked.
+        This prevents those leaves to change from specific appointment types to all.
+        """
+        leaves = self.env['appointment.leave'].sudo().search([('appointment_type_ids', 'in', self.ids)])
+        leaves.filtered(lambda leave: leave.appointment_type_ids and not (leave.appointment_type_ids - self)).unlink()
+
     def copy_data(self, default=None):
         vals_list = super().copy_data(default=default)
         return [dict(
             vals,
-            name=self.env._("%s (copy)", appointment_type.name),
             category=appointment_type.category,
         ) for appointment_type, vals in zip(self, vals_list)]
 
     def action_calendar_event_view_request(self):
         action = self.action_calendar_meetings(calendar_event_domain=[('appointment_status', '=', 'request')])
-        action['context'].update({
-            'search_default_filter_appointment_status_request': True,
-            'default_start_date': action['context']['initial_date'],
-        })
+        action['context']['search_default_filter_appointment_status_request'] = True
         return action
 
-    def action_calendar_meetings(self, calendar_event_domain=False):
+    def action_calendar_event_view_today(self):
+        return self.action_calendar_meetings(initial_dt=datetime.today())
+
+    def action_calendar_meetings(self, calendar_event_domain=False, initial_dt=False):
         self.ensure_one()
         if self.schedule_based_on == 'users':
             action = self.env["ir.actions.actions"]._for_xml_id("appointment.calendar_event_action_view_bookings_users")
@@ -487,24 +572,19 @@ class AppointmentType(models.Model):
         domain = Domain('start', '>=', datetime.today())
         if calendar_event_domain:
             domain &= Domain(calendar_event_domain)
-        appointments = self.meeting_ids.filtered_domain(domain)
-        nbr_appointments_week_later = appointments.filtered_domain([
-            ('start', '>=', datetime.today() + timedelta(weeks=1))
-        ])
+        calendar_events = self.meeting_ids.filtered_domain(domain).sorted('start')
 
-        # Add and reorder views
-        action = AppointmentType.insert_reorder_action_views(action, ['gantt', 'calendar'])
+        if not initial_dt:
+            initial_dt = calendar_events[0].start if calendar_events else datetime.today()
 
         action['context'] = ast.literal_eval(action['context'])
         action['context'].update({
-            'default_scale': self._get_gantt_scale(),
             'default_appointment_type_id': self.id,
             'default_duration': self.appointment_duration,
             'default_partner_ids': [],
+            'initialDate': initial_dt,  # gantt
+            'initial_date': initial_dt,  # calendar
             'search_default_appointment_type_id': self.id,
-            'default_mode': "month" if nbr_appointments_week_later else "week",
-            'initial_date': appointments[0].start if appointments else datetime.today(),
-            'default_start_date': datetime.today(),  # gantt view
         })
         return action
 
@@ -521,13 +601,62 @@ class AppointmentType(models.Model):
     @api.model
     def action_calendar_meetings_users_all(self):
         action = self.env["ir.actions.actions"]._for_xml_id("appointment.calendar_event_action_view_bookings_users")
-        action = AppointmentType.insert_reorder_action_views(action, ['gantt'])
         action['context'] = ast.literal_eval(action['context'])
         action['context'].update({
             'default_scale': self.search([('schedule_based_on', '=', 'users')])._get_gantt_scale(),
         })
         action['path'] = 'staff-bookings'
         return action
+
+    def action_appointment_leaves(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id('appointment.appointment_leave_action')
+        action['domain'] = [('id', 'in', self.appointment_leave_ids.ids)]
+        action['context'] = {
+            'default_appointment_type_ids': self.ids,
+        }
+        return action
+
+    def action_clone_last_slots(self, whole_day=False):
+        """Create the next logical slot(s), based on the last slot or all the slots of that date."""
+        self.ensure_one()
+        if self.category != 'custom':
+            raise NotImplementedError(_('Cloning recurrent slots is not implemented.'))
+        # cloning 0 slots gives 0 slots, makes sense
+        if not self.slot_ids:
+            return
+
+        slots = self.slot_ids.sorted('end_datetime')
+        last_slot = slots[-1:]
+        if not whole_day:
+            next_start = last_slot.end_datetime
+            next_end = next_start + (last_slot.end_datetime - last_slot.start_datetime)
+            return last_slot.copy(default={'start_datetime': next_start, 'end_datetime': next_end})
+        tz = ZoneInfo(self.appointment_tz)
+        last_slot_date_start = last_slot.start_datetime.replace(tzinfo=UTC).astimezone(tz).date()
+        last_day_slots = slots.filtered(lambda slot: slot.start_datetime.replace(tzinfo=UTC).astimezone(tz).date() >= last_slot_date_start)
+        next_day_slots = self.env['appointment.slot']
+        for slot in last_day_slots:
+            next_day_slots += slot.copy(default={
+                'start_datetime': slot.start_datetime + relativedelta(days=1),
+                'end_datetime': slot.end_datetime + relativedelta(days=1),
+            })
+        return next_day_slots
+
+    def action_edit_custom_slots(self):
+        self.ensure_one()
+        return {
+            'name': self.display_name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'calendar.event',
+            'view_mode': 'calendar',
+            'target': 'current',
+            'context': {
+                'calendar_editing_custom_appointment_id': self.id,
+                'default_appointment_type_id': self.id,
+                'search_default_appointment_type_id': self.id,
+            },
+        }
 
     def action_share_invite(self):
         return {
@@ -546,47 +675,30 @@ class AppointmentType(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_url',
-            'url': url_join(self.get_base_url(), '/appointment/%s' % self.id),
+            'url': f'{self.get_base_url()}/appointment/{self.env['ir.http']._slug(self)}',
             'target': 'self',
         }
 
-    def get_kanban_record_share_btn_url(self):
+    def action_open_form(self):
         self.ensure_one()
-        existing_invitation = self.env['appointment.invite']._find_identical_config(self.ids, 'all_assigned_resources')
-        if existing_invitation:
-            return existing_invitation.book_url
+        return {
+            'name': self.display_name,
+            'res_model': 'appointment.type',
+            'res_id': self.id,
+            'target': 'current',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+        }
 
-        return self.env['appointment.invite'].create([{
-            'appointment_type_ids': self.ids,
-            'resources_choice': 'all_assigned_resources'
-        }]).book_url
+    def action_open_ratings(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id('appointment.rating_rating_action_appointment')
+        action['domain'] = [('id', 'in', self.rating_ids.ids), ('consumed', '=', True)]
+        return action
 
     # --------------------------------------
     # View Utils
     # --------------------------------------
-
-    @staticmethod
-    def insert_reorder_action_views(action, first_view_names):
-        """Set the first N entries in views_ids of an action dict reusing existing views.
-
-        :param dict action: Dict representing an action.
-        :param list[str] first_view_names: List of the names of the first N views.
-        :return: The original action, with view_mode and view_ids modified.
-        :rtype: dict
-        """
-        existing_views = [view for view in action["view_mode"].split(',') if view not in first_view_names]
-        action['view_mode'] = ",".join(first_view_names + existing_views)
-        for view_type in reversed(first_view_names):
-            to_insert = (False, view_type)
-            try:
-                existing_view_id = next(index for index, view_tuple
-                                        in enumerate(action['views'])
-                                        if view_tuple[1] == view_type)
-                to_insert = action['views'].pop(existing_view_id)
-            except StopIteration:
-                pass
-            action['views'].insert(0, to_insert)
-        return action
 
     @api.model
     def _get_calendars_already_setup(self):
@@ -605,7 +717,7 @@ class AppointmentType(models.Model):
         now = datetime.utcnow()
         last_meeting_values = self.env['calendar.event'].search_read([
             ('appointment_type_id', 'in', self.ids),
-            ('appointment_resource_ids', '!=', False),
+            ('booking_line_ids', '!=', False),
             ('stop', '>=', now.date()),
         ], ['stop'], limit=1, order='stop desc')
         last_meeting_end = last_meeting_values[0]['stop'] if last_meeting_values else False
@@ -634,7 +746,7 @@ class AppointmentType(models.Model):
     @api.model
     def _get_default_slots(self, category):
         range_values = self._get_default_range_slots(category)
-        return [
+        return [Command.clear()] + [
             Command.create({
                 'weekday': str(weekday),
                 'start_hour': start_hour,
@@ -706,21 +818,21 @@ class AppointmentType(models.Model):
         :param datetime first_day: beginning of appointment check boundary. Timezoned to UTC;
         :param datetime last_day: end of appointment check boundary. Timezoned to UTC;
         :param str timezone: requested timezone string e.g.: 'Europe/Brussels' or 'Etc/GMT+1'
-        :param datetime reference_date: starting datetime to fetch slots (in naive UTC). If not
-          given now (in naive UTC) is used instead. Note that minimum schedule hours
+        :param datetime reference_date: starting datetime to fetch slots. Note that minimum schedule hours
           defined on appointment type is added to the beginning of slots if the
           slot start is too close from now;
 
         :return: [ {'slot': slot_record, <timezone>: (date_start, date_end), ...},
                   ... ]
         """
-        if not reference_date:
-            reference_date = datetime.utcnow()
-        appt_tz = pytz.timezone(self.appointment_tz)
-        requested_tz = pytz.timezone(timezone)
-        end_tz_apt_type = self.end_datetime.astimezone(appt_tz) if self.category == 'punctual' else False
+        reference_date = reference_date.astimezone(UTC) if reference_date else datetime.now(UTC)
+        appt_tz = ZoneInfo(self.appointment_tz)
+        # special case for BC because slot['UTC'] and slot[timezone] have a
+        # different logic, but ZoneInfo rejects lowercase utc
+        requested_tz = ZoneInfo("UTC") if timezone == 'utc' else ZoneInfo(timezone)
+        end_tz_apt_type = self.end_datetime.replace(tzinfo=UTC).astimezone(appt_tz) if self.category == 'punctual' else False
         ref_tz_apt_type = reference_date.astimezone(appt_tz)
-        now_tz_apt_type = datetime.utcnow().astimezone(appt_tz)
+        now_tz_apt_type = datetime.now(appt_tz)
         slots = []
 
         # Considering:
@@ -747,23 +859,14 @@ class AppointmentType(models.Model):
             :param date day: day for which we generate slots;
             :param record slot: a <appointment.slot> record
             """
-            local_start = appt_tz.localize(
-                datetime.combine(day,
-                                 time(hour=int(slot.start_hour),
-                                      minute=int(round((slot.start_hour % 1) * 60))
-                                     )
-                                )
-            )
+            local_start = datetime.combine(day, time(hour=int(slot.start_hour), minute=round((slot.start_hour % 1) * 60), tzinfo=appt_tz))
             # Adapt local start to not append slot in the past from ref
             # Using ref_start to consider or not the min schedule hours at the beginning of first slot
             while local_start < ref_start:
                 local_start += relativedelta(hours=self.slot_creation_interval)
             local_end = local_start + relativedelta(hours=self.appointment_duration)
             # localized end time for the entire slot on that day
-            local_slot_end = appt_tz.localize(
-                day.replace(hour=0, minute=0, second=0) +
-                timedelta(hours=slot._convert_end_hour_24_format())
-            )
+            local_slot_end = day.replace(hour=0, minute=0, second=0, tzinfo=appt_tz) + timedelta(hours=slot._convert_end_hour_24_format())
             # Adapt local_slot_end to not append slot if local_slot_end is in the future of the appointment end_datetime
             if end_tz_apt_type and local_start.date() == end_tz_apt_type.date() and local_slot_end > end_tz_apt_type:
                 local_slot_end = end_tz_apt_type
@@ -779,8 +882,8 @@ class AppointmentType(models.Model):
                         local_end.astimezone(requested_tz),
                     ),
                     'UTC': (
-                        local_start.astimezone(pytz.UTC).replace(tzinfo=None),
-                        local_end.astimezone(pytz.UTC).replace(tzinfo=None),
+                        local_start.astimezone(UTC).replace(tzinfo=None),
+                        local_end.astimezone(UTC).replace(tzinfo=None),
                     ),
                     'slot': slot,
                 })
@@ -790,7 +893,7 @@ class AppointmentType(models.Model):
         if self.category != 'custom':
 
             # Don't generate slots if the appointment boundaries are completely in the past or there is no interval in between the slots.
-            if last_day < reference_date.astimezone(pytz.UTC) or self.slot_creation_interval <= 0:
+            if last_day < reference_date.astimezone(UTC) or self.slot_creation_interval <= 0:
                 return slots
 
             # Regular recurring slots (not a custom appointment), generate necessary slots using configuration rules
@@ -809,10 +912,8 @@ class AppointmentType(models.Model):
             )
 
             for slot in unique_slots:
-                start = slot.start_datetime.astimezone(tz=None)
-                end = slot.end_datetime.astimezone(tz=None)
-                startUTC = start.astimezone(pytz.UTC).replace(tzinfo=None)
-                endUTC = end.astimezone(pytz.UTC).replace(tzinfo=None)
+                start = slot.start_datetime.replace(tzinfo=UTC)
+                end = slot.end_datetime.replace(tzinfo=UTC)
                 slots.append({
                     self.appointment_tz: (
                         start.astimezone(appt_tz),
@@ -823,14 +924,38 @@ class AppointmentType(models.Model):
                         end.astimezone(requested_tz),
                     ),
                     'UTC': (
-                        startUTC,
-                        endUTC,
+                        start.replace(tzinfo=None),
+                        end.replace(tzinfo=None),
                     ),
                     'slot': slot,
                 })
         return slots
 
-    def _get_appointment_slots(self, timezone, filter_users=None, filter_resources=None, asked_capacity=1, reference_date=None):
+    def calendar_get_available_slots(self, start_utc, end_utc):
+        """ Get appointment's available slots between start and end datetimes (in UTC) to show
+        slots availability in the calendar view."""
+
+        self.ensure_one()
+        start_utc = localized(fields.Datetime.from_string(start_utc))
+        end_utc = localized(fields.Datetime.from_string(end_utc))
+
+        tz = self.env.user.tz or "UTC"
+        slots = self._slots_generate(start_utc, end_utc, tz, reference_date=start_utc)
+
+        if self.schedule_based_on == "users":
+            self._slots_fill_users_availability(slots, start_utc, end_utc)
+            slot_field_label = "available_staff_users" if not self.is_auto_assign and self.is_date_first else "staff_user_id"
+        else:
+            self._slots_fill_resources_availability(slots, start_utc, end_utc)
+            slot_field_label = "available_resource_ids"
+
+        return [{
+            "allday": slot["slot"].allday if self.category == "custom" else False,
+            "start": slot[tz][0],
+            "end": slot[tz][1],
+        } for slot in slots if slot.get(slot_field_label)]
+
+    def _get_appointment_slots(self, timezone, filter_users=None, filter_resources=None, asked_capacity=1, asked_month=None, reference_date=None):
         """ Fetch available slots to book an appointment.
 
         :param str timezone: timezone string e.g.: 'Europe/Brussels' or 'Etc/GMT+1'
@@ -842,6 +967,7 @@ class AppointmentType(models.Model):
           e.g. with random assignment and filters) If not set, use all resources assigned to this
           appointment type.
         :param int asked_capacity: the capacity the user want to book.
+        :param tuple asked_month: integer values (month, year) of the month to restrict the slots
         :param datetime reference_date: starting datetime to fetch slots. If not
           given now (in UTC) is used instead. Note that minimum schedule hours
           defined on appointment type is added to the beginning of slots;
@@ -865,41 +991,39 @@ class AppointmentType(models.Model):
         """
         self.ensure_one()
 
+        if self.slot_interval_capacity > 0 and self.slot_interval_capacity < asked_capacity:
+            return []
+
         if not self.active:
             return []
-        now = datetime.utcnow()
-        if not reference_date:
+        now = datetime.now(UTC)
+        month, year = asked_month or (False, False)
+        if reference_date:
+            # if the reference date is not zoned assume it should be interpreted
+            # as UTC, otherwise convert it to UTC for comparison with other UTC
+            # datetimes
+            reference_date = reference_date.astimezone(UTC)
+        else:
             reference_date = now
 
-        try:
-            requested_tz = pytz.timezone(timezone)
-        except pytz.UnknownTimeZoneError:
-            requested_tz = self.appointment_tz
-
-        appointment_duration_days = self.max_schedule_days
         unique_slots = self.slot_ids.filtered(lambda slot: slot.slot_type == 'unique')
 
         if self.category == 'custom' and unique_slots:
             # Custom appointment type, the first day is the earliest slot start if in the future, else now
-            start_first_slot = unique_slots[0].start_datetime
-            first_day = requested_tz.fromutc(start_first_slot if reference_date < start_first_slot else reference_date)
-            last_day = requested_tz.fromutc(max(unique_slots.mapped('end_datetime')))
+            start_first_slot = unique_slots[0].start_datetime.replace(tzinfo=UTC)
+            first_day = max(start_first_slot, reference_date)
+            last_day = max(unique_slots.mapped('end_datetime')).replace(tzinfo=UTC)
         elif self.category == 'punctual':
             # Punctual appointment type, the first day is the start_datetime if it is in the future, else the first day is now
-            first_day = requested_tz.fromutc(self.start_datetime if self.start_datetime > now else now)
-            last_day = requested_tz.fromutc(self.end_datetime)
+            first_day = max(self.start_datetime.replace(tzinfo=UTC), now)
+            last_day = self.end_datetime.replace(tzinfo=UTC)
         else:
             # Recurring appointment type
-            first_day = requested_tz.fromutc(reference_date + relativedelta(hours=self.min_schedule_hours))
-            last_day = requested_tz.fromutc(reference_date + relativedelta(days=appointment_duration_days))
+            first_day = reference_date + relativedelta(hours=self.min_schedule_hours)
+            last_day = reference_date + relativedelta(days=self.max_schedule_days)
 
         # Compute available slots (ordered)
-        slots = self._slots_generate(
-            first_day.astimezone(pytz.utc),
-            last_day.astimezone(pytz.utc),
-            timezone,
-            reference_date=reference_date
-        )
+        slots = self._slots_generate(first_day, last_day, timezone, reference_date=reference_date)
 
         # No slots -> skip useless computation
         if not slots:
@@ -912,30 +1036,79 @@ class AppointmentType(models.Model):
         if filter_resources and not valid_resources:
             return []
         # Used to check availabilities for the whole last day as _slot_generate will return all slots on that date.
-        last_day_end_of_day = datetime.combine(
-            last_day.astimezone(pytz.timezone(self.appointment_tz)),
-            time.max
+        appointment_tz = ZoneInfo(self.appointment_tz)
+        first_day_as_utc = first_day.astimezone(UTC)
+        last_day_end_of_day_utc = datetime.combine(
+            last_day.astimezone(appointment_tz),
+            time.max,
+            # this seems broken but it's the existing behaviour as far as I can tell:
+            # - datetime.combine keeps the tzinfo of the *time*
+            # - time.max doesn't have a tzinfo
+            # - datetime(tzinfo=None).astimezone(...) treats the input a local
+            #   datetime, which for odoo should mean UTC, so astimezone(UTC)
+            #   does no conversion and sets the UTC on the dt
+            tzinfo=UTC,
         )
+
+        # If nothing is given:
+        # Just check the first month (based on the first day)
+
+        # If month and year are given, check only that month
+
+        # If no slot -> Go back to original way but stop as soon as a slot exist to get that month
+        month = month or first_day_as_utc.month
+        year = year or first_day_as_utc.year
+
+        fill_slots_from = datetime.combine(
+            first_day_as_utc.replace(day=1, month=month, year=year) if self.category != 'custom' else first_day_as_utc,
+            time.min,
+            tzinfo=UTC,
+        )
+        fill_slots_to = datetime.combine(
+            fill_slots_from + relativedelta(months=1, days=-1) if self.category != 'custom' else last_day_end_of_day_utc,
+            time.max,
+            tzinfo=UTC,
+        )
+
+        self._slots_fill_availability(
+            slots,
+            fill_slots_from,
+            fill_slots_to,
+            valid_resources,
+            valid_users,
+            asked_capacity=asked_capacity
+        )
+
         if self.schedule_based_on == 'users':
-            self._slots_fill_users_availability(
-                slots,
-                first_day.astimezone(pytz.UTC),
-                last_day_end_of_day.astimezone(pytz.UTC),
-                valid_users,
-                asked_capacity,
-            )
             slot_field_label = 'available_staff_users' if not self.is_auto_assign and self.is_date_first else 'staff_user_id'
         else:
-            self._slots_fill_resources_availability(
-                slots,
-                first_day.astimezone(pytz.UTC),
-                last_day_end_of_day.astimezone(pytz.UTC),
-                valid_resources,
-                asked_capacity,
-            )
             slot_field_label = 'available_resource_ids'
-
         total_nb_slots = sum(slot_field_label in slot for slot in slots)
+
+        if asked_month:
+            # Moving from reference date to max date in months until a slot exists.
+            fill_slots_from = datetime.combine(first_day_as_utc.replace(day=1), time.min, tzinfo=UTC)
+            fill_slots_to = datetime.combine(
+                fill_slots_from + relativedelta(months=1, days=-1),
+                time.max,
+            )
+        while not total_nb_slots and fill_slots_from < last_day_end_of_day_utc:
+            if (fill_slots_from.month, fill_slots_to.year) != (month, year):
+                self._slots_fill_availability(
+                    slots,
+                    fill_slots_from,
+                    fill_slots_to,
+                    valid_resources,
+                    valid_users,
+                    asked_capacity=asked_capacity
+                )
+                total_nb_slots = sum(slot_field_label in slot for slot in slots)
+            fill_slots_from += relativedelta(months=1)
+            fill_slots_to = datetime.combine(
+                fill_slots_from + relativedelta(months=1, days=-1),
+                time.max,
+            )
+
         # If there is no slot for the minimum capacity then we return an empty list.
         # This will lead to a screen informing the customer that there is no availability.
         # We don't want to return an empty list if the capacity as been tempered by the customer
@@ -944,8 +1117,13 @@ class AppointmentType(models.Model):
             return []
 
         # Compute calendar rendering and inject available slots
-        today = requested_tz.fromutc(reference_date)
+        try:
+            requested_tz = ZoneInfo(timezone)
+        except ZoneInfoNotFoundError:
+            requested_tz = appointment_tz
+        today = reference_date.astimezone(requested_tz)
         start = slots[0][timezone][0] if slots else today
+        last_day = last_day.astimezone(requested_tz)
         locale = babel_locale_parse(get_lang(self.env).code)
         month_dates_calendar = cal.Calendar(locale.first_week_day).monthdatescalendar
         months = []
@@ -954,15 +1132,18 @@ class AppointmentType(models.Model):
             dates = month_dates_calendar(start.year, start.month)
             for week_index, week in enumerate(dates):
                 for day_index, day in enumerate(week):
-                    mute_cls = weekend_cls = today_cls = None
+                    mute_cls = weekend_cls = today_cls = tomorrow_cls = None
                     today_slots = []
                     if day.weekday() in (locale.weekend_start, locale.weekend_end):
-                        weekend_cls = 'o_weekend bg-light'
+                        weekend_cls = 'o_weekend text-bg-light'
                     if day == today.date() and day.month == today.month:
                         today_cls = 'o_today'
+                    if day == (today.date() + relativedelta(days=1)):
+                        tomorrow_cls = 'o_tomorrow'
                     if day.month != start.month:
                         mute_cls = 'd-none'
                     else:
+                        mute_cls = 'opacity-50'
                         tz = self.appointment_tz if slots and slots[0]['slot'].allday else timezone
                         # slots are ordered, so check all unprocessed slots from until > day
                         while slots and (slots[0][tz][0].date() <= day):
@@ -971,7 +1152,8 @@ class AppointmentType(models.Model):
                             if (slots[0][tz][0].date() == day) and (slot_field_label in slots[0]):
                                 slot_start_dt_tz, slot_end_dt_tz = slots[0][tz]
                                 slot_start_dt_tz_formatted = slot_start_dt_tz.strftime('%Y-%m-%d %H:%M:%S')
-                                slot_duration = slots[0]['slot'].duration or str((slot_end_dt_tz - slot_start_dt_tz).total_seconds() / 3600)
+                                real_slot_end_dt_tz = slot_end_dt_tz + relativedelta(days=1) if is_allday else slot_end_dt_tz
+                                slot_duration = (real_slot_end_dt_tz - slot_start_dt_tz).total_seconds() / 3600
                                 # Remove one second in case the end time slot reached midnight of the next day
                                 # e.g. 6PM (June 1st) to 12AM (June 2nd) should not be considered as a multi day slot
                                 is_multi_day = (
@@ -1030,11 +1212,13 @@ class AppointmentType(models.Model):
                             slots.pop(0)
                     today_slots = sorted(today_slots, key=lambda d: (not d['is_long_duration'], d['datetime']))
                     dates[week_index][day_index] = {
-                        'day': day,
+                        'day': str(day),
+                        'day_number': day.day,
                         'slots': today_slots,
                         'mute_cls': mute_cls,
                         'weekend_cls': weekend_cls,
-                        'today_cls': today_cls
+                        'today_cls': today_cls,
+                        'tomorrow_cls': tomorrow_cls,
                     }
 
                     has_availabilities = has_availabilities or bool(today_slots)
@@ -1044,9 +1228,21 @@ class AppointmentType(models.Model):
                 'month': format_datetime(start, 'LLLL Y', locale=get_lang(self.env).code),
                 'weeks': dates,
                 'has_availabilities': has_availabilities,
+                'month_number': start.month,
+                'year_number': start.year,
             })
             start = start + relativedelta(months=1)
         return months
+
+    def _slots_fill_availability(self, slots, start, end, resources, users, asked_capacity=0):
+        if self.schedule_based_on == 'users':
+            self.with_context(
+                appointment_specific_interval_only=True
+            )._slots_fill_users_availability(slots, start, end, users, asked_capacity)
+        else:
+            self.with_context(
+                appointment_specific_interval_only=True
+            )._slots_fill_resources_availability(slots, start, end, resources, asked_capacity)
 
     def _check_appointment_is_valid_slot(self, staff_user, resources, asked_capacity, timezone, start_dt, duration, allday):
         """
@@ -1093,26 +1289,6 @@ class AppointmentType(models.Model):
             return True
         return False
 
-    @api.model
-    def _get_clean_appointment_context(self):
-        whitelist_default_fields = list(map(
-            lambda field: f'default_{field}',
-            self._get_calendar_view_appointment_type_default_context_fields_whitelist()))
-        return {
-            key: value for key, value in self.env.context.items()
-            if key in whitelist_default_fields or not key.startswith('default_')
-        }
-
-    @api.model
-    def _get_calendar_view_appointment_type_default_context_fields_whitelist(self):
-        """ White list of fields that can be defaulted in the context of the
-        calendar routes creating appointment types and invitations.
-        This is mainly used in /appointment/appointment_type/create_custom and
-        /appointment/appointment_type/search_create_anytime.
-        This list of fields can be updated the fields in other sub-modules.
-        """
-        return []
-
     def _prepare_calendar_event_values(
         self, asked_capacity, booking_line_values, description, duration, allday,
         appointment_invite, guests, name, customer, staff_user, start, stop
@@ -1146,10 +1322,9 @@ class AppointmentType(models.Model):
             [Command.create({'partner_id': guest.id}) for guest in guests - partners if guest]
         if allday:
             stop -= relativedelta(days=1)
-            start = start.astimezone(pytz.timezone(self.appointment_tz)).replace(tzinfo=None)
-            stop = stop.astimezone(pytz.timezone(self.appointment_tz)).replace(tzinfo=None)
+            start = start.astimezone(ZoneInfo(self.appointment_tz)).replace(tzinfo=None)
+            stop = stop.astimezone(ZoneInfo(self.appointment_tz)).replace(tzinfo=None)
         return {
-            'alarm_ids': [Command.set(self.reminder_ids.ids)],
             'allday': allday,
             'appointment_booker_id': customer.id,
             'appointment_invite_id': appointment_invite.id,
@@ -1159,7 +1334,6 @@ class AppointmentType(models.Model):
             'booking_line_ids': [Command.create(vals) for vals in booking_line_values],
             'description': description,
             'duration': duration,
-            'location': self.location,
             'name': _('%(attendee_name)s - %(appointment_name)s Booking',
                         attendee_name=name, appointment_name=self.name),
             'partner_ids': [Command.link(pid) for pid in (partners | guests).ids],
@@ -1167,7 +1341,7 @@ class AppointmentType(models.Model):
             'start_date': fields.Datetime.to_string(start),
             'stop': fields.Datetime.to_string(stop),
             'stop_date': fields.Datetime.to_string(stop),
-            'user_id': staff_user.id if self.schedule_based_on == 'users' else self.create_uid.id,
+            'user_id': staff_user.id if self.schedule_based_on == 'users' else False,
         }
 
     # --------------------------------------
@@ -1188,6 +1362,7 @@ class AppointmentType(models.Model):
         :return: None but instead update ``slots`` adding ``staff_user_id`` or ``available_staff_users`` key
           containing available user(s);
         """
+        self.ensure_one()
         # shuffle the available users into a random order to avoid having the same
         # one assigned every time, force timezone
         available_users = [
@@ -1195,14 +1370,19 @@ class AppointmentType(models.Model):
             for user in (filter_users or self.staff_user_ids)
         ]
         random.shuffle(available_users)
-        available_users_tz = self.env['res.users'].concat(*available_users)
+        available_users_tz = self.env['res.users'].concat(available_users)
 
         # fetch value used for availability in batch
         availability_values = self._slot_availability_prepare_users_values(
             available_users_tz, start_dt, end_dt
         )
 
-        for slot in slots:
+        # We only check availability for slots starting in the given interval
+        interval_slots = filter(
+            lambda slot: start_dt.replace(tzinfo=None) <= slot['UTC'][0] <= end_dt.replace(tzinfo=None), slots
+        ) if self.env.context.get('appointment_specific_interval_only') else slots
+
+        for slot in interval_slots:
             if (self.is_date_first and not self.is_auto_assign) or self.env.context.get('slots_check_all_users', False):
                 available_staff_users = available_users_tz.filtered(
                     lambda staff_user: self._slot_availability_is_user_available(
@@ -1228,9 +1408,11 @@ class AppointmentType(models.Model):
                     slot['staff_user_id'] = available_staff_users
 
     def _slot_availability_is_user_available(self, slot, staff_user, availability_values, asked_capacity=1):
-        """ This method verifies if the user is available for the given capacity
-        on the given slot. It checks whether the user has calendar events clashing
-        and if he is included in slot's restricted users.
+        """ This method verifies if the user is available for the given capacity on the given slot.
+        It checks whether the user:
+        - has calendar events clashing
+        - is included in slot's restricted users
+        - has any leave on that slot
 
         Can be overridden to add custom checks.
 
@@ -1241,8 +1423,8 @@ class AppointmentType(models.Model):
           See ``_slot_availability_prepare_users_values()`` for more details;
         :return: boolean: is user available for an appointment for given slot
         """
-        slot_start_dt_utc, slot_end_dt_utc = slot['UTC'][0], slot['UTC'][1]
-        staff_user_tz = pytz.timezone(staff_user.tz) if staff_user.tz else pytz.utc
+        slot_start_dt_utc, slot_end_dt_utc = slot['UTC']
+        staff_user_tz = ZoneInfo(staff_user.tz) if staff_user.tz else UTC
         slot_start_dt_user_timezone = slot_start_dt_utc.astimezone(staff_user_tz)
         slot_end_dt_user_timezone = slot_end_dt_utc.astimezone(staff_user_tz)
 
@@ -1252,17 +1434,24 @@ class AppointmentType(models.Model):
         if slot['slot'].allday:
             slot_end_dt_utc += relativedelta(days=1)
 
+        # Check staff user appointment leaves
+        slot_start_dt_utc_l, slot_end_dt_utc_l = slot_start_dt_utc.replace(tzinfo=UTC), slot_end_dt_utc.replace(tzinfo=UTC)
+        for i_start, i_stop, _meta in availability_values.get('users_to_apt_leaves', {}).get(staff_user, []):
+            if (i_stop - i_start) > timedelta(microseconds=1) and i_start < slot_end_dt_utc_l and i_stop > slot_start_dt_utc_l:
+                return False
+
+        # Check clashing events
         users_remaining_capacity = self._get_users_remaining_capacity(staff_user, slot['UTC'][0], slot['UTC'][1],
             users_to_bookings=availability_values.get('users_to_bookings'))
         partner_to_events = availability_values.get('partner_to_events') or {}
-        if partner_to_events.get(staff_user.partner_id):
+        if events := partner_to_events.get(staff_user.partner_id):
             for day_dt in rrule.rrule(freq=rrule.DAILY,
                                       dtstart=slot_start_dt_utc,
                                       until=slot_end_dt_utc,
                                       interval=1):
-                day_events = partner_to_events[staff_user.partner_id].get(day_dt.date()) or []
+                day_events = events.get(day_dt.date()) or []
                 for event in day_events:
-                    if not event.allday and (event.start < slot_end_dt_utc and event.stop > slot_start_dt_utc):
+                    if not event.allday and (event.start < slot_end_dt_utc and slot_start_dt_utc < event.stop):
                         # Skip marking user unavailable for the same appointment type until max capacity
                         if self == event.appointment_type_id \
                             and users_remaining_capacity['total_remaining_capacity'] >= asked_capacity:
@@ -1272,7 +1461,7 @@ class AppointmentType(models.Model):
                                       dtstart=slot_start_dt_user_timezone,
                                       until=slot_end_dt_user_timezone,
                                       interval=1):
-                day_events = partner_to_events[staff_user.partner_id].get(day_dt.date()) or []
+                day_events = events.get(day_dt.date()) or []
                 if any(event.allday for event in day_events):
                     return False
         return True
@@ -1373,16 +1562,17 @@ class AppointmentType(models.Model):
         :return: dict containing main values for computation, formatted like
           {
             'partner_to_events': meetings (not declined), based on user_partner_id
-              (see ``_slot_availability_prepare_users_values_meetings()``);
-          },
-          {
+                (see ``_slot_availability_prepare_users_values_meetings()``),
             'users_to_bookings': bookings based on users
-              (see ``_slot_availability_prepare_users_values_bookings()``);
+                (see ``_slot_availability_prepare_users_values_bookings()``),
+            'users_to_apt_leaves': leave intervals based on users
+                (see ``_slot_availability_prepare_users_values_appointment_leaves()``),
           }
         """
 
         users_values = self._slot_availability_prepare_users_values_meetings(staff_users, start_dt, end_dt)
         users_values.update(self._slot_availability_prepare_users_values_bookings(staff_users, start_dt, end_dt))
+        users_values.update(self._slot_availability_prepare_users_values_appointment_leaves(staff_users, start_dt, end_dt))
         return users_values
 
     def _slot_availability_prepare_users_values_meetings(self, staff_users, start_dt, end_dt):
@@ -1444,9 +1634,107 @@ class AppointmentType(models.Model):
 
         return {'partner_to_events': partner_to_events}
 
+    def _slot_availability_prepare_users_values_appointment_leaves(self, staff_users, start_dt_utc, end_dt_utc):
+        """Retrieve a list of unavailabilities for each user for the appointment types present in self,
+        if none, all are considered.
+
+        :param <res.users> staff_users: users to get unavalabilities for;
+        :param datetime start_dt_utc: beginning of appointment check boundary. Timezoned to UTC;
+        :param datetime end_dt_utc: end of appointment check boundary. Timezoned to UTC;
+        :return: dict mapping user ids to unavailable datetime intervals
+           {
+             users_to_apt_leaves: {
+               <res.users, 1>: Intervals object,
+               ...
+             }
+           }
+        """
+        return {
+            'users_to_apt_leaves': self.env['appointment.leave'].sudo()._get_appointment_leave_intervals(
+                start_dt_utc,
+                end_dt_utc,
+                staff_users=staff_users,
+                appointment_types=self
+            )
+        }
+
     # --------------------------------------
     # Resources - Slots Availability
     # --------------------------------------
+
+    def _filter_slots_interval_available(self, ordered_slots, availability_values, add_availability_to_slot=False, asked_capacity=1):
+        """
+        Apply slot_interval_capacity logic to ordered_slots, filter them by only keeping available ones considering the
+        heuristics below, and add 'slot_interval_availability' to them if add_availability_to_slot is True, it being the
+        remaining capacity for the slot's interval in the sense of slot_interval_capacity.
+
+        Subslot Max Capacity Heuristics:
+        ------------------------
+        Here a 'subslot' refers to an interval obtained by splitting an appointment.slot using slot_creation_interval.
+        For instance:
+            if appointment_duration is 2 hours, slot is 9->12 and slot_creation_interval is 30 min
+            -> subslots are 9 to 9.30, 9.30 to 10.00, 10 to 10.30.
+        Availability: all events starting between the start (included) of a subslot and the start of the next one (excluded)
+        contribute to its capacity occupancy. This is done in order to pace bookings, and we include the start as
+        it matches the booked time on the front-end. We consider subslot with booked capacity (+ asked_capacity, if set)
+        over slot_interval_capacity to be unavailable. Using an interval as [subslot_start, subslot_start + slot_creation_interval[
+        also ensures not including too many events for the last subslot if duration is longer than slot_creation_interval.
+
+        :param list ordered_slots: slots (list of slot dict), ordered by increasing start.
+        :param dict availability_values: dict of data used for availability check.
+          See ``_slot_availability_prepare_resources_values()`` for more details.
+        :param bool add_availability_to_slot: if True, will add 'slot_interval_availability' in the dict of each slot.
+        :param integer asked_capacity: asked capacity for the appointment.
+
+        :return: subset of ordered_slots, keeping order, available in the sense of slot_interval_capacity"""
+
+        self.ensure_one()
+        if not ordered_slots:
+            return []
+        if self.slot_interval_capacity <= 0 or not availability_values.get('event_start_to_booking_lines'):
+            return ordered_slots
+
+        available_slots = []
+        starts_to_booking_lines = availability_values['event_start_to_booking_lines']
+        start_index, starts_length = 0, len(starts_to_booking_lines)
+
+        # List of sub-sums with format (start, sum of reserved capacity over booking lines)
+        starts_to_sum_subslot = []
+
+        # Perform a sliding window of subslots over booking lines.
+        # Update starts_to_sum_subslot on each iteration to ensure
+        # we only keep values falling in the subslot window.
+        for slot in ordered_slots:
+            start_subslot = slot['UTC'][0]
+            end_subslot = slot['UTC'][0] + relativedelta(hours=self.slot_creation_interval)
+            # Remove outdated values in starts_to_sum_subslot
+            starts_to_sum_subslot = [
+                val for val in starts_to_sum_subslot
+                if start_subslot <= val[0] < end_subslot
+            ]
+
+            # Advance in booking lines until leaving the subslot window
+            while start_index < starts_length and starts_to_booking_lines[start_index][0] < end_subslot:
+                start, booking_lines = starts_to_booking_lines[start_index]
+                start_index += 1
+                # Booking lines are in subslot window, we update starts_to_sum_subslot
+                if start >= start_subslot:
+                    sum_capacity_reserved = sum(
+                        line.capacity_reserved for line in booking_lines
+                        if line.appointment_resource_id in self.resource_ids
+                    )
+                    # Add new booking lines falling in the window
+                    starts_to_sum_subslot.append((start, sum_capacity_reserved))
+
+            # Check slot availability
+            interval_capacity_reserved = sum(start_sum[1] for start_sum in starts_to_sum_subslot)
+            slot_interval_availability = self.slot_interval_capacity - interval_capacity_reserved
+            if slot_interval_availability >= asked_capacity:
+                if add_availability_to_slot:
+                    slot["slot_interval_availability"] = slot_interval_availability
+                available_slots.append(slot)
+
+        return available_slots
 
     def _slots_fill_resources_availability(self, slots, start_dt_utc, end_dt_utc, filter_resources=None, asked_capacity=1):
         """ Fills the slot structure with a list of available resources
@@ -1462,52 +1750,51 @@ class AppointmentType(models.Model):
         :return: None but instead update ``slots`` adding ``available_resource_ids``
             "available_resource_ids" containing the resources ids which are available for the slot
         """
+        self.ensure_one()
         if self.resource_total_capacity < asked_capacity:
             return False
         available_resources = [
             resource.with_context(tz=resource.tz)
             for resource in (filter_resources or self.resource_ids)
         ]
-        available_resources = self.env['appointment.resource'].concat(*available_resources)
+        available_resources = self.env['appointment.resource'].concat(available_resources)
         available_resources = available_resources.with_prefetch(available_resources.linked_resource_ids.ids)
+
+        # We only check availability for slots starting in the given interval
+        interval_slots = [
+            slot for slot in slots
+            if start_dt_utc.replace(tzinfo=None) <= slot['UTC'][0] <= end_dt_utc.replace(tzinfo=None)
+        ] if self.env.context.get('appointment_specific_interval_only') else slots
+
+        if not interval_slots:
+            return False
 
         availability_values = self._slot_availability_prepare_resources_values(
             available_resources, start_dt_utc, end_dt_utc
         )
-
         capacity_info_to_best_resources = {}
-        for slot in slots:
-            capacity_info = {}
-            for resource in available_resources:
-                if not self._slot_availability_is_resource_available(slot, resource, availability_values):
-                    continue
-                resources_remaining_capacity = self._get_resources_remaining_capacity(
-                    resource,
-                    slot['UTC'][0],
-                    slot['UTC'][1],
-                    resource_to_bookings=availability_values.get('resource_to_bookings'),
-                    filter_resources=slot['slot'].restrict_to_resource_ids & available_resources or available_resources,
-                    with_linked_resources=self.manage_capacity,
-                )
-                if resources_remaining_capacity['total_remaining_capacity'] < asked_capacity:
-                    continue
-                capacity_info[resource] = {
-                    'total_remaining_capacity': resources_remaining_capacity['total_remaining_capacity'],
-                    'remaining_capacity': resources_remaining_capacity[resource],
-                }
-                # Keep only the potential linked resources and add them in capacity_info
-                del resources_remaining_capacity['total_remaining_capacity']
-                del resources_remaining_capacity[resource]
-                for linked_resource, remaining_capacity in resources_remaining_capacity.items():
-                    if not remaining_capacity or linked_resource in capacity_info:
-                        continue
-                    capacity_info[linked_resource] = {
-                        'total_remaining_capacity': remaining_capacity,
-                        'remaining_capacity': remaining_capacity,
-                    }
+
+        # Explicit check to avoid useless sorting
+        if self.slot_interval_capacity > 0 and availability_values.get('event_start_to_booking_lines'):
+            interval_slots.sort(key=lambda slot: slot['UTC'][0])
+            interval_slots = self._filter_slots_interval_available(interval_slots, availability_values, asked_capacity=asked_capacity)
+
+        for slot in interval_slots:
+            slot_available_resources = self._resources_available_for_slot(available_resources, slot, availability_values)
+            resources_remaining_capacity = self._get_resources_remaining_capacity(
+                slot_available_resources,
+                slot['UTC'][0],
+                slot['UTC'][1],
+                resource_to_bookings=availability_values.get('resource_to_bookings'),
+                filter_resources=None,
+                with_linked_resources=False,
+            )
+            capacity_info = self._get_resources_remaining_capacity_combined(
+                slot_available_resources, resources_remaining_capacity, min_capacity=asked_capacity,
+            )
             capacity_info = frozendict(capacity_info)
             if capacity_info:
-                # Compute the best resource a single time for each capacity info
+                # Compute the best resource a single time for each capacity info as we loop on slots
                 if not capacity_info_to_best_resources.get(capacity_info):
                     best_resources_selected = self._slot_availability_select_best_resources(
                         capacity_info,
@@ -1519,40 +1806,85 @@ class AppointmentType(models.Model):
                 if best_resources_selected:
                     slot['available_resource_ids'] = best_resources_selected
 
-    def _slot_availability_is_resource_available(self, slot, resource, availability_values):
-        """ This method verifies if the resource is available on the given slot.
-        It checks whether the resource has bookings clashing and if it
-        is included in slot's restricted resources.
+    def _get_resources_for_capacity(self, asked_capacity, start, stop, available_resources=None):
+        """Select a group of available resources to cover `asked_capacity` between `start` and `stop`.
 
-        Can be overridden to add custom checks.
-
-        :param dict slot: a slot as generated by ``_slots_generate``;
-        :param <appointment.resource> resource: resource to check against slot boundaries.
-          At this point timezone should be correctly set in context;
-        :param dict availability_values: dict of data used for availability check.
-          See ``_slot_availability_prepare_resources_values()`` for more details;
-
-        :return: boolean: is resource available for an appointment for given slot
+        If no group of linked resources can entirely cover the value, get the largest group.
+        Returns a dictionary mapping resources to remaining capacity
         """
-        if slot['slot'].restrict_to_resource_ids and resource not in slot['slot'].restrict_to_resource_ids:
-            return False
+        self.ensure_one()
+        if asked_capacity <= 0 or self.schedule_based_on != 'resources':
+            return self.env['appointment.resource']
+        if available_resources is None:
+            available_resources = self.resource_ids
 
-        slot_start_dt_utc, slot_end_dt_utc = slot['UTC'][0], slot['UTC'][1]
-        resource_to_bookings = availability_values.get('resource_to_bookings')
-        # Check if there is already a booking line for the time slot and make it unavailable
-        # if manage capacity is on and resource is not shareable.
-        # This avoid to mark the resource as "available" and compute unnecessary remaining capacity computation
-        # because of potential linked resources.
-        if resource_to_bookings.get(resource):
-            if resource_to_bookings[resource].filtered(lambda bl: bl.event_start < slot_end_dt_utc and bl.event_stop > slot_start_dt_utc):
-                return resource.shareable if self.manage_capacity else True
+        availability_values = self._slot_availability_prepare_resources_values(
+            available_resources, start.replace(tzinfo=UTC), stop.replace(tzinfo=UTC),
+        )
+        available_resources = self._resources_available_between_times(available_resources, start, stop, availability_values)
+        capacity_info = self._get_resources_remaining_capacity(
+            available_resources,
+            start,
+            stop,
+            resource_to_bookings=availability_values.get('resource_to_bookings'),
+            with_linked_resources=False,  # avoid including all linked resources (to keep only available ones)
+        )
+        combined_capacity_info = self._get_resources_remaining_capacity_combined(available_resources, capacity_info, min_capacity=asked_capacity)
+        if combined_capacity_info:
+            best_resources = self._slot_availability_select_best_resources(
+                combined_capacity_info,
+                asked_capacity,
+            )
+        else:
+            combined_capacity_info = self._get_resources_remaining_capacity_combined(available_resources, capacity_info)
+            best_resources_member = max(
+                available_resources,
+                key=lambda resource: combined_capacity_info[resource]['total_remaining_capacity'],
+                default=self.env['appointment.resource']
+            )
+            best_resources = (best_resources_member + best_resources_member.linked_resource_ids) & available_resources
+        return {resource: capacity_info[resource] for resource in best_resources}
 
-        slot_start_dt_utc_l, slot_end_dt_utc_l = pytz.utc.localize(slot_start_dt_utc), pytz.utc.localize(slot_end_dt_utc)
-        for i_start, i_stop in availability_values.get('resource_unavailabilities', {}).get(resource, []):
-            if (i_stop - i_start) > timedelta(microseconds=1) and i_start < slot_end_dt_utc_l and i_stop > slot_start_dt_utc_l:
-                return False
+    def _resources_available_for_slot(self, resources, slot, availability_values):
+        if slot['slot'].restrict_to_resource_ids:
+            resources = slot['slot'].restrict_to_resource_ids & resources
+        if not resources:
+            return self.env['appointment.resource']
+        return self._resources_available_between_times(resources, slot['UTC'][0], slot['UTC'][1], availability_values)
 
-        return True
+    def _resources_available_between_times(self, resources, start, stop, availability_values):
+        """Check which resources are available between two times, regardless of slots.
+
+        :param resources: resources to check
+        :param datetime start: start of availability range (in naive UTC)
+        :param datetime stop: end of availability range (in naive UTC)
+        :param dict availability_values: dict of data used for availability check.
+            See `_slot_availability_prepare_resources_values()`
+
+        :return: resources that still have some availability during the provided interval
+        """
+        start_dt_utc_l, stop_dt_utc_l = start.replace(tzinfo=UTC), stop.replace(tzinfo=UTC)
+        resource_to_bookings = availability_values.get('resource_to_bookings', {})
+
+        # Mark as unavailable any resource that already has a booking in the time slot.
+        # However, do not do so when resource_manage_capacity is enabled and the resource shareable as
+        # it could be used anyway in that case if it has remaining capacity.
+        return resources.filtered(lambda resource:
+            not (  # Overlapping event while not shareable
+                resource_to_bookings.get(resource) and
+                not (self.manage_capacity and resource.shareable) and
+                any(
+                    booking_line.event_start < stop and booking_line.event_stop > start
+                    for booking_line in resource_to_bookings.get(resource, [])
+                )
+            )
+            and not (  # Resource unavailable
+                any(
+                    (i_stop - i_start) > timedelta(microseconds=1) and i_start < stop_dt_utc_l and i_stop > start_dt_utc_l
+                    for i_start, i_stop, _meta in availability_values.get('resource_to_apt_leaves', {}).get(resource, [])
+                )
+            )
+        )
 
     def _get_resources_remaining_capacity(self, resources, slot_start_utc, slot_stop_utc, resource_to_bookings=None, with_linked_resources=True, filter_resources=None):
         """ Compute the remaining capacities for resources in a particular time slot.
@@ -1597,6 +1929,40 @@ class AppointmentType(models.Model):
         resources_remaining_capacity.update(total_remaining_capacity=sum(resources_remaining_capacity.values()))
         return resources_remaining_capacity
 
+    @api.model
+    def _get_resources_remaining_capacity_combined(self, resources, resources_remaining_capacity, min_capacity=None):
+        """From capacity info of provided resources, build a dict mapping resource to the capacity of their entire group of linked resources.
+
+        Only linked resources that are also inside `resources` are accounted for.
+        Optionally drops resources part of groups that would not fit the desired minimum capacity.
+        """
+        resources_remaining_capacity = dict(resources_remaining_capacity)
+        capacity_info = {}
+        if min_capacity is not None and resources_remaining_capacity['total_remaining_capacity'] < min_capacity:
+            return capacity_info
+        del resources_remaining_capacity['total_remaining_capacity']
+        # Restrict to slot_available_resources
+        for resource in resources_remaining_capacity:
+            total_remaining_capacity = sum(
+                resources_remaining_capacity.get(resource, 0)
+                for resource in resource | (resource.linked_resource_ids & resources)
+            )
+            if min_capacity is not None and total_remaining_capacity < min_capacity:
+                continue
+            capacity_info[resource] = {
+                'remaining_capacity': resources_remaining_capacity[resource],
+                'total_remaining_capacity': total_remaining_capacity,
+            }
+            # Keep also the potential linked resources and add them in capacity_info
+            for linked_resource in resource.linked_resource_ids & resources:
+                if linked_resource in capacity_info:
+                    continue
+                capacity_info[linked_resource] = {
+                    'remaining_capacity': resources_remaining_capacity[linked_resource],
+                    'total_remaining_capacity': total_remaining_capacity,
+                }
+        return capacity_info
+
     def _slot_availability_select_best_resources(self, capacity_info, asked_capacity):
         """ Check and select the best resources for the capacity needed
             :params main_resources_remaining_capacity <dict>: dict containing remaining capacities of resources available
@@ -1605,7 +1971,7 @@ class AppointmentType(models.Model):
             :returns: we return recordset of best resources selected
         """
         self.ensure_one()
-        available_resources = self.env['appointment.resource'].concat(*capacity_info.keys()).sorted('sequence')
+        available_resources = self.env['appointment.resource'].concat(capacity_info.keys()).sorted('sequence')
         if not available_resources:
             return self.env['appointment.resource']
         if not self.manage_capacity:
@@ -1654,14 +2020,16 @@ class AppointmentType(models.Model):
         :return: dict containing main values for computation, formatted like
           {
             'resource_to_bookings': bookings based on resources
-              (see ``_slot_availability_prepare_resources_bookings_values()``);
+                (see ``_slot_availability_prepare_resources_values_bookings()``),
+            'resource_to_apt_leaves': leave intervals based on resources
+                (see ``_slot_availability_prepare_resources_values_appointment_leaves()``),
           }
         """
-        resources_values = self._slot_availability_prepare_resources_bookings_values(resources, start_dt_utc, end_dt_utc)
-        resources_values.update(self._slot_availability_prepare_resources_leave_values(resources, start_dt_utc, end_dt_utc))
+        resources_values = self._slot_availability_prepare_resources_values_bookings(resources, start_dt_utc, end_dt_utc)
+        resources_values.update(self._slot_availability_prepare_resources_values_appointment_leaves(resources, start_dt_utc, end_dt_utc))
         return resources_values
 
-    def _slot_availability_prepare_resources_bookings_values(self, resources, start_dt_utc, end_dt_utc):
+    def _slot_availability_prepare_resources_values_bookings(self, resources, start_dt_utc, end_dt_utc):
         """ This method computes bookings of resources between start_dt and end_dt
         of appointment check. Also, resources can be shared between multiple appointment
         type. So we must consider all bookings in order to avoid booking them more than once.
@@ -1674,6 +2042,13 @@ class AppointmentType(models.Model):
 
         :return: dict containing main values for computation, formatted like
           {
+            'event_start_to_booking_lines': List ordered by start datetime (asc) of tuples
+                (start, appointment.booking.line recordset). Used for slot_interval_capacity.
+              [
+                (event_start_1, booking_lines_with_event_start_1),
+                (event_start_2, booking_lines_with_event_start_2),
+                ...
+              ],
             'resource_to_bookings': bookings, formatted as a dict
               {
                 'appointment_resource_id': recordset of booking line,
@@ -1681,11 +2056,15 @@ class AppointmentType(models.Model):
               },
           }
         """
-
+        event_start_to_booking_lines = []
         resource_to_bookings = {}
-        if resources:
+        check_slot_interval_capacity = self.filtered(lambda apt: apt.slot_interval_capacity > 0)
+        # Check all resources of the appointment(s) in self when checking slot_interval_capacity
+        search_resources = self.resource_ids if check_slot_interval_capacity else resources
+
+        if search_resources:
             domain = Domain([
-                ('appointment_resource_id', 'in', resources.ids),
+                ('appointment_resource_id', 'in', search_resources.ids),
                 ('event_stop', '>', datetime.combine(start_dt_utc, time.min)),
                 ('event_start', '<', datetime.combine(end_dt_utc, time.max)),
             ])
@@ -1694,30 +2073,37 @@ class AppointmentType(models.Model):
             if ignore_event_ids:
                 domain &= Domain('calendar_event_id', 'not in', ignore_event_ids)
             booking_lines = self.env['appointment.booking.line'].sudo().search(domain)
+            if check_slot_interval_capacity:
+                event_start_to_booking_lines = sorted(booking_lines.grouped('event_start').items())
+                # Remove any irrelevant booking line for resource_to_bookings
+                booking_lines = booking_lines.filtered(lambda bl: bl.appointment_resource_id in resources)
             resource_to_bookings = booking_lines.grouped('appointment_resource_id')
 
         return {
+            'event_start_to_booking_lines': event_start_to_booking_lines,
             'resource_to_bookings': resource_to_bookings,
         }
 
-    def _slot_availability_prepare_resources_leave_values(self, appointment_resources, start_dt_utc, end_dt_utc):
-        """Retrieve a list of unavailabilities for each resource.
+    def _slot_availability_prepare_resources_values_appointment_leaves(self, appointment_resources, start_dt_utc, end_dt_utc):
+        """Retrieve a list of unavailabilities for each resource for the appointment types present in self,
+        if none, all are considered.
 
         :param <appointment.resource> appointment_resources: resources to get unavalabilities for;
         :param datetime start_dt_utc: beginning of appointment check boundary. Timezoned to UTC;
         :param datetime end_dt_utc: end of appointment check boundary. Timezoned to UTC;
-        :return: dict mapping resource ids to ordered list of unavailable datetime intervals
+        :return: dict mapping resource ids to unavailable datetime intervals
            {
-             resource_unavailabilities: {
-               <appointment.resource, 1>: [
-                   [datetime(2022, 07, 07, 12, 0, 0), datetime(2022, 07, 07, 13, 0, 0)],
-                   [datetime(2022, 07, 07, 16, 0, 0), datetime(2022, 07, 08, 06, 0, 0)],
-                   ...],
+             'resource_to_apt_leaves': {
+               <appointment.resource, 1>: Intervals object,
                ...
              }
            }
         """
-        unavailabilities = appointment_resources.sudo().resource_id._get_unavailable_intervals(start_dt_utc, end_dt_utc)
-        return {'resource_unavailabilities': {
-            resource: unavailabilities.get(resource.sudo().resource_id.id, []) for resource in appointment_resources
-        }}
+        return {
+            'resource_to_apt_leaves': self.env['appointment.leave'].sudo()._get_appointment_leave_intervals(
+                start_dt_utc,
+                end_dt_utc,
+                appointment_resources=appointment_resources,
+                appointment_types=self
+            )
+        }

@@ -1,34 +1,23 @@
-import { registry } from "@web/core/registry";
-import { Document } from "@sign/components/sign_request/document_signable";
 import { SignRequest } from "@sign/backend_components/sign_request/sign_request_action";
-import { useSubEnv, EventBus } from "@odoo/owl";
 import { SignableRequestControlPanel } from "@sign/backend_components/sign_request/signable_sign_request_control_panel";
 import { SignablePDFIframe } from "@sign/components/sign_request/signable_PDF_iframe";
-
+import { registry } from "@web/core/registry";
 
 export class SignableSignRequest extends SignRequest {
     static components = {
-        ...SignableSignRequest.components,
-        Document: Document,
+        ...SignRequest.components,
         SignRequestControlPanel: SignableRequestControlPanel,
     };
     setup() {
         super.setup();
+        const context = this.props.action.context;
         this.signInfo.set({
-            tokenList: this.tokenList,
-            nameList: this.nameList,
+            tokenList: context.token_list,
+            nameList: context.name_list,
+            requestItemIdList: context.request_item_id_list,
+            reference: context.reference,
+            someSignersEmailed: context.some_signers_emailed || false,
         });
-        useSubEnv({
-            editWhileSigningBus: new EventBus(),
-        });
-    }
-
-    get nameList() {
-        return this.props.action.context.name_list;
-    }
-
-    get tokenList() {
-        return this.props.action.context.token_list;
     }
 
     get documentProps() {

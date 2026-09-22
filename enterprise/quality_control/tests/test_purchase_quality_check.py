@@ -46,7 +46,7 @@ class TestPurchaseQualityCheck(TestQualityCommon):
                     'name': self.product.name,
                     'product_id': self.product.id,
                     'product_qty': 1.0,
-                    'product_uom_id': self.product.uom_id.id,
+                    'uom_id': self.product.uom_id.id,
                     'price_unit': 1.0,
                     'date_planned': fields.Datetime.now(),
                 })]

@@ -10,6 +10,8 @@ from .common import TestEcEdiCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestPortalWithholding(TestEcEdiCommon, AccountTestInvoicingHttpCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -20,7 +22,6 @@ class TestPortalWithholding(TestEcEdiCommon, AccountTestInvoicingHttpCommon):
             'city': "Quito",
             'country_id': cls.env.ref('base.ec').id,
             'vat': "0453661050152",
-            'l10n_latam_identification_type_id': cls.env.ref('l10n_ec.ec_ruc').id,
         }
         cls.user_portal = cls._create_new_portal_user(**partner_vals)
         cls.portal_partner = cls.user_portal.partner_id
@@ -63,7 +64,7 @@ class TestPortalWithholding(TestEcEdiCommon, AccountTestInvoicingHttpCommon):
         self.authenticate(self.user_portal.login, self.user_portal.login)
         res = self.url_open(url)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.content, withhold.invoice_pdf_report_id.raw)
+        self.assertEqual(res.content, withhold.invoice_pdf_report_id.raw.content)
 
     def test_portal_withhold_detail_download_zip(self):
         """ Creates a withholding for a vendor bill for the portal user that can be downloaded

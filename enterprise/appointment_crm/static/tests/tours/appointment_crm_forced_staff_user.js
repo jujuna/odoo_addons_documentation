@@ -1,16 +1,17 @@
 import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
-import AppointmentCrmSteps from "@appointment_crm/../tests/tours/appointment_crm_steps";
-
-const appointmentCrmSteps = new AppointmentCrmSteps();
 
 registry.category("web_tour.tours").add("appointment_crm_forced_staff_user_tour", {
-    url: "/appointment",
     steps: () => [
-    ...appointmentCrmSteps._goToAppointment("Resource Time Appointment"),
+    {
+        content: "Select an appointment.",
+        trigger: `a[title='Book Resource Time Appointment']`,
+        run: "click",
+        expectUnloadPage: true,
+    },
     {
         content: "Select a time slot.",
-        trigger: ".o_slots_list .o_slot_hours:first-child",
+        trigger: "button[name='submitSlotInfoSelected']",
         run: "click",
         expectUnloadPage: true,
     },
@@ -48,14 +49,19 @@ registry.category("web_tour.tours").add("appointment_crm_forced_staff_user_tour"
         expectUnloadPage: true,
     },
     stepUtils.goToUrl("/appointment"),
-    ...appointmentCrmSteps._goToAppointment("Create"),
+    {
+        content: "Select an appointment.",
+        trigger: `a[title='Book Create']`,
+        run: "click",
+        expectUnloadPage: true,
+    },
     {
         content: "Verify presence the forced staff user alert with the correct salesperson.",
         trigger: ".o_appointment_forced_staff_user_assigned:contains('Laetitia Sales Leads')",
     },
     {
         content: "Select a time slot.",
-        trigger: ".o_slots_list .o_slot_hours:first-child",
+        trigger: "button[name='submitSlotInfoSelected']",
         run: "click",
         expectUnloadPage: true,
     },

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { dragoverFiles, dropFiles } from "@web/../tests/utils";
+import { dragoverFiles, dropFiles } from "@mail/../tests/mail_test_helpers_contains";
 import { mountView, onRpc } from "@web/../tests/web_test_helpers";
 import { defineSignModels, signModels } from "./mock_server/mock_models/sign_model";
 
@@ -50,11 +50,11 @@ test("Drop to upload file in kanban", async () => {
     onRpc("sign.template", "create_from_attachment_data", function ({ args, model }) {
         expect.step("attachment create");
         expect(model).toBe("sign.template");
-        expect(args).toHaveLength(2);
+        expect(args).toHaveLength(3);
         const attachmentID = this.env["ir.attachment"].create({
             name: args[0][0].name,
             res_model: model,
-            datas: args[0][0].datas,
+            raw: args[0][0].raw,
         });
         const signTemplateID = this.env[model].create({
             active: true,

@@ -44,7 +44,7 @@ class MrpProduction(models.Model):
         if not self.bom_id:  # Can't do anything if no BoM.
             raise UserError(_("Cannot create an ECO if the Manufacturing Order doesn't use a Bill of Materials"))
         # Tries to retrieves "Bill of Materials" ECO type.
-        eco_type = self.env.ref('mrp_plm.ecotype_bom_update', raise_if_not_found=False)
+        eco_type = self.env.ref('mrp_plm.ecotype_product_revision', raise_if_not_found=False)
         if not eco_type:
             eco_type = self.env['mrp.eco.type'].sudo().search([], limit=1)
         eco_stage = eco_type.stage_ids[:1]
@@ -79,7 +79,7 @@ class MrpProduction(models.Model):
                 production._link_bom(production.latest_bom_id)
         super(MrpProduction, productions_without_latest_bom).action_update_bom()
 
-    def _create_revision_bom(self, will_update_version=True):
+    def _create_revision_bom(self):
         """ Compares the MO's components, by-products and workorders with its BoM's lines,
         by-products and operations to create and return a new BoM that copies the MO's BoM but
         includes the changes, deletions and additions made in the MO.
@@ -100,7 +100,7 @@ class MrpProduction(models.Model):
             'product_id': self.bom_id.product_id.id,
             'product_qty': self.bom_id.product_qty,
             'product_tmpl_id': self.bom_id.product_tmpl_id.id,
-            'product_uom_id': self.bom_id.product_uom_id.id,
-            'version': will_update_version and self.bom_id.version + 1 or self.bom_id.version,
+            'uom_id': self.bom_id.uom_id.id,
+            'version': self.bom_id.version,
         })
         return revision_bom

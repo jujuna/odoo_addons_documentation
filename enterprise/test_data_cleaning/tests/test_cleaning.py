@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo.tests import tagged
+
 from . import test_common
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestCleaning(test_common.TestCommon):
     def test_cleaning_action_trim_all(self):
         jean_claude = self._create_record('data_cleaning.test.model', name='jean claude')
@@ -185,3 +189,19 @@ class TestCleaning(test_common.TestCommon):
         self.assertEqual(jc.name, 'JeanClaude', 'Name should be changed')
         self.assertEqual(bernard.name, 'BERNARd', 'Name should be changed')
         self.assertEqual(gisele.name, 'Gisele', 'Name should be changed')
+
+    def test_prune_invalid_cleaning_records(self):
+        """ Ensure cleaning records are removed when no longer violating rules. """
+        # Create record violating rule (contains spaces)
+        rec = self._create_record('data_cleaning.test.model', name='  test  ')
+        self._create_rule('trim', action_trim='all', field_name='name', sequence=10)
+        self.TestDCModel.action_clean_records()
+        records_found = self.Record.search([('cleaning_model_id', '=', self.TestDCModel.id)])
+        self.assertEqual(len(records_found), 1, "Record should be detected for cleaning")
+
+        # Fix value manually (no longer violates rule)
+        rec.write({'name': 'test'})
+
+        self.TestDCModel.action_clean_records()
+        records_found = self.Record.search([('cleaning_model_id', '=', self.TestDCModel.id)])
+        self.assertEqual(len(records_found), 0, "Cleaning record should be removed when rule no longer matches")

@@ -44,14 +44,13 @@
             <field name="arch" type="xml">
                 <list string="Partner with missing information" multi_edit="1">
                     <field name="name" required="1"/>
-                    <field name="is_company" column_invisible="True"/>
                     <field name="street" required="1"/>
                     <field name="zip" required="1"/>
                     <field name="city" required="1"/>
                     <field name="country_id" required="1"/>
                     <field name="phone" required="'phone' in context.get('required_fields', [])" column_invisible="'phone' not in context.get('required_fields', [])"/>
-                    <field name="vat" required="is_company"/>
-                    <field name="citizen_identification" invisible="is_company" required="not is_company"/>
+                    <field name="vat"/>
+                    <field name="citizen_identification" invisible="is_company"/>
                 </list>
             </field>
         </record>
@@ -59,7 +58,7 @@
         <record id="res_partner_view_form_281_50_required_field" model="ir.ui.view">
             <field name="name">res.partner.view.form</field>
             <field name="model">res.partner</field>
-            <field name="inherit_id" ref="l10n_be_reports.res_partner_view_form_inherit"/>
+            <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="priority" eval="1"/>
             <field name="mode">primary</field>
             <field name="arch" type="xml">
@@ -71,12 +70,6 @@
                 </xpath>
                 <xpath expr="//field[@name='country_id']" position="attributes">
                     <attribute name="required">1</attribute>
-                </xpath>
-                <xpath expr="//field[@name='vat']" position="attributes">
-                    <attribute name="required">is_company</attribute>
-                </xpath>
-                <xpath expr="//field[@name='citizen_identification']" position="attributes">
-                    <attribute name="required">not is_company</attribute>
                 </xpath>
                 <xpath expr="//field[@name='phone']" position="attributes">
                     <attribute name="required">'phone' in context.get('required_fields', [])</attribute>

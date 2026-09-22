@@ -14,15 +14,14 @@ function dragAndDropSignature(isActive) {
         run:
             isActive == "manual"
                 ? "drag_and_drop :iframe #viewer"
-                : function ({ queryFirst }) {
+                : async function ({ queryFirst }) {
                       const to = queryFirst(`:iframe .page[data-page-number="1"]`);
-                      tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.5, 0.25);
+                      await tourUtils.dragAndDropSignItemAtHeight(this.anchor, to, 0.5, 0.25);
                   },
     };
 }
 
 registry.category("web_tour.tours").add("sign_tour", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
@@ -58,7 +57,7 @@ registry.category("web_tour.tours").add("sign_tour", {
             trigger: ".o_field_signer_x2many",
             content: markup(
                 _t(
-                    "Select the contact who should sign, according to their role.<br>In this example, select your own contact to sign the document yourself."
+                    "Select the contact who should sign.<br>In this example, select your own contact to sign the document yourself."
                 )
             ),
             tooltipPosition: "bottom",
@@ -69,7 +68,7 @@ registry.category("web_tour.tours").add("sign_tour", {
             run: "edit admin",
         },
         {
-            trigger: ".o-autocomplete--dropdown-item:first-child",
+            trigger: ".o-autocomplete--dropdown-item:contains('Admin')",
             run: "click",
         },
         {
@@ -83,7 +82,8 @@ registry.category("web_tour.tours").add("sign_tour", {
             run: "click",
         },
         {
-            trigger: ".o_list_table tbody tr.o_data_row:first td:nth-child(2)",
+            trigger:
+                ".o_list_table .o_data_row:has(.o_list_char:contains('Sample Contract')) .o_list_char:contains('Sample Contract')",
             content: "Open first record",
             run: "click",
         },

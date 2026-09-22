@@ -1,323 +1,25 @@
 {
-  "version": "18.4.14",
+  "version": "19.3.10",
   "sheets": [
     {
-      "id": "Sheet1",
+      "id": "dashboard_sheet_id",
       "name": "Dashboard",
-      "colNumber": 9,
-      "rowNumber": 56,
+      "colNumber": 10,
+      "rowNumber": 67,
       "rows": {
-        "6": { "size": 40 },
-        "23": { "size": 36 },
-        "24": { "size": 30 },
-        "25": { "size": 30 },
-        "26": { "size": 30 },
-        "27": { "size": 30 },
-        "28": { "size": 30 },
-        "30": { "size": 36 },
-        "31": { "size": 30 },
-        "32": { "size": 30 },
-        "33": { "size": 30 },
-        "34": { "size": 30 },
-        "36": { "size": 36 },
-        "37": { "size": 30 },
-        "38": { "size": 30 },
-        "39": { "size": 30 },
-        "40": { "size": 30 },
-        "41": { "size": 36 },
-        "42": { "size": 30 },
-        "43": { "size": 30 },
-        "44": { "size": 30 },
-        "45": { "size": 30 }
+        "66": { "size": 11 }
       },
       "cols": {
-        "0": { "size": 175 },
-        "1": { "size": 100 },
-        "2": { "size": 100 },
-        "3": { "size": 100 },
-        "4": { "size": 50 },
-        "5": { "size": 175 },
-        "6": { "size": 100 },
-        "7": { "size": 100 },
-        "8": { "size": 100 }
+        "0": { "size": 136 }
       },
       "merges": [],
-      "cells": {
-        "A7": "[Invoiced](odoo://view/{\"viewType\":\"graph\",\"action\":{\"domain\":[\"&\",[\"state\",\"not in\",[\"draft\",\"cancel\"]],\"|\",[\"move_type\",\"=\",\"out_invoice\"],[\"move_type\",\"=\",\"out_refund\"]],\"context\":{\"group_by\":[\"invoice_date\"],\"graph_measure\":\"price_subtotal\",\"graph_mode\":\"line\",\"graph_groupbys\":[\"invoice_date:month\"]},\"modelName\":\"account.invoice.report\",\"views\":[[false,\"graph\"],[false,\"pivot\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Invoices Analysis\",\"positional\":true})",
-        "A24": "=_t(\"Cash\")",
-        "A25": "=_t(\"Cash received\")",
-        "A26": "=_t(\"Cash spent\")",
-        "A27": "=_t(\"Cash surplus\")",
-        "A28": "=_t(\"Closing bank balance\")",
-        "A31": "=_t(\"Performance\")",
-        "A32": "=_t(\"Gross profit margin\")",
-        "A33": "=_t(\"Net profit margin\")",
-        "A34": "=_t(\"Return on investments\")",
-        "A35": "=_t(\"Financial independence\")",
-        "A37": "=_t(\"Position\")",
-        "A38": "=_t(\"Average debtors days\")",
-        "A39": "=_t(\"Average creditors days\")",
-        "A40": "=_t(\"Short term cash forecast\")",
-        "A42": "=_t(\"Liquidity\")",
-        "A43": "=_t(\"Cash asset ratio\")",
-        "A44": "=_t(\"Quick ratio\")",
-        "A45": "=_t(\"Current assets to liabilities\")",
-        "A46": "=_t(\"Working capital\")",
-        "B24": "=YEAR(Data!E1)",
-        "B25": "=Data!C11",
-        "B26": "=Data!C12",
-        "B27": "=Data!C13",
-        "B28": "=Data!C14",
-        "B31": "=YEAR(Data!E1)",
-        "B32": "=Data!C16",
-        "B33": "=Data!C17",
-        "B34": "=Data!C18",
-        "B35": "=Data!C19",
-        "B37": "=YEAR(Data!E1)",
-        "B38": "=Data!C21",
-        "B39": "=Data!C22",
-        "B40": "=Data!C23",
-        "B42": "=YEAR(Data!E1)",
-        "B43": "=Data!C35",
-        "B44": "=Data!C36",
-        "B45": "=Data!C37",
-        "B46": "=Data!C38",
-        "C24": "=IF(LEN(B$24)=4,B$24-1,LEFT(B$24,3)&RIGHT(B$24,4)-1)",
-        "C25": "=Data!D11",
-        "C26": "=Data!D12",
-        "C27": "=Data!D13",
-        "C28": "=Data!D14",
-        "C31": "=IF(LEN(B$31)=4,B$31-1,LEFT(B$31,3)&RIGHT(B$31,4)-1)",
-        "C32": "=Data!D16",
-        "C33": "=Data!D17",
-        "C34": "=Data!D18",
-        "C35": "=Data!D19",
-        "C37": "=IF(LEN(B$37)=4,B$37-1,LEFT(B$37,3)&RIGHT(B$37,4)-1)",
-        "C38": "=Data!D21",
-        "C39": "=Data!D22",
-        "C40": "=Data!D23",
-        "C42": "=IF(LEN(B$42)=4,B$42-1,LEFT(B$42,3)&RIGHT(B$42,4)-1)",
-        "C43": "=Data!D35",
-        "C44": "=Data!D36",
-        "C45": "=Data!D37",
-        "C46": "=Data!D38",
-        "D24": "Δ",
-        "D25": "=iferror(B25/C25,0)",
-        "D26": "=iferror(B26/C26,0)",
-        "D27": "=iferror(B27/C27,0)",
-        "D28": "=iferror(B28/C28,0)",
-        "D31": "Δ",
-        "D32": "=B32-C32",
-        "D33": "=B33-C33",
-        "D34": "=B34-C34",
-        "D35": "=B35-C35",
-        "D37": "Δ",
-        "D38": "=iferror(B38/C38,0)",
-        "D39": "=iferror(B39/C39,0)",
-        "D40": "=iferror(B40/C40,0)",
-        "D42": "Δ",
-        "D43": "=iferror(B43/C43,0)",
-        "D44": "=B44-C44",
-        "D45": "=iferror(B45/C45,0)",
-        "D46": "=B46-C46",
-        "F24": "=_t(\"Profitability\")",
-        "F25": "=_t(\"Income\")",
-        "F26": "=_t(\"Cost of revenue\")",
-        "F27": "=_t(\"Gross profit\")",
-        "F28": "=_t(\"Expenses\")",
-        "F29": "=_t(\"Net profit\")",
-        "F31": "=_t(\"Balance sheet\")",
-        "F32": "=_t(\"Receivable\")",
-        "F33": "=_t(\"Payables\")",
-        "F34": "=_t(\"Net assets\")",
-        "F37": "=_t(\"Solvency\")",
-        "F38": "=_t(\"Debt to Equity\")",
-        "F39": "=_t(\"Solvency\")",
-        "F40": "=_t(\"Debt ratio\")",
-        "F41": "=_t(\"Permanence\")",
-        "F42": "=_t(\"Financial balance\")",
-        "F43": "=_t(\"Long term working capital\")",
-        "F44": "=_t(\"Return on equity\")",
-        "G24": "=YEAR(Data!E1)",
-        "G25": "=Data!C25",
-        "G26": "=Data!C26",
-        "G27": "=Data!C27",
-        "G28": "=Data!C28",
-        "G29": "=Data!C29",
-        "G31": "=YEAR(Data!E1)",
-        "G32": "=Data!C31",
-        "G33": "=Data!C32",
-        "G34": "=Data!C33",
-        "G37": "=YEAR(Data!E1)",
-        "G38": "=Data!C40",
-        "G39": "=Data!C41",
-        "G40": "=Data!C42",
-        "G41": "=Data!C43",
-        "G42": "=Data!C44",
-        "G43": "=Data!C45",
-        "G44": "=Data!C46",
-        "H24": "=IF(LEN(G$24)=4,G$24-1,LEFT(G$24,3)&RIGHT(G$24,4)-1)",
-        "H25": "=Data!D25",
-        "H26": "=Data!D26",
-        "H27": "=Data!D27",
-        "H28": "=Data!D28",
-        "H29": "=Data!D29",
-        "H31": "=IF(LEN(G$31)=4,G$31-1,LEFT(G$31,3)&RIGHT(G$31,4)-1)",
-        "H32": "=Data!D31",
-        "H33": "=Data!D32",
-        "H34": "=Data!D33",
-        "H37": "=IF(LEN(G$37)=4,G$37-1,LEFT(G$37,3)&RIGHT(G$37,4)-1)",
-        "H38": "=Data!D40",
-        "H39": "=Data!D41",
-        "H40": "=Data!D42",
-        "H41": "=Data!D43",
-        "H42": "=Data!D44",
-        "H43": "=Data!D45",
-        "H44": "=Data!D46",
-        "I24": "Δ",
-        "I25": "=iferror(G25/H25,0)",
-        "I26": "=iferror(G26/H26,0)",
-        "I27": "=iferror(G27/H27,0)",
-        "I28": "=iferror(G28/H28,0)",
-        "I29": "=iferror(G29/H29,0)",
-        "I31": "Δ",
-        "I32": "=iferror(G32/H32,0)",
-        "I33": "=iferror(G33/H33,0)",
-        "I34": "=iferror(G34/H34,0)",
-        "I37": "Δ",
-        "I38": "=iferror(G38/H38,0)",
-        "I39": "=iferror(G39/H39,0)",
-        "I40": "=iferror(G40/H40,0)",
-        "I41": "=iferror(G41/H41,0)",
-        "I42": "=iferror(G42/H42,0)",
-        "I43": "=iferror(G43/H43,0)",
-        "I44": "=iferror(G44/H44,0)"
-      },
-      "styles": {
-        "A7": 1,
-        "A24": 2,
-        "A31": 2,
-        "A37": 2,
-        "A42": 2,
-        "F24": 2,
-        "F31": 2,
-        "F37": 2,
-        "A25:D28": 3,
-        "A32:D35": 3,
-        "A38:D40": 3,
-        "A43:D46": 3,
-        "F25:I29": 3,
-        "F32:I34": 3,
-        "F38:I44": 3,
-        "B24:D24": 4,
-        "B31:D31": 4,
-        "B37:D37": 4,
-        "B42:D42": 4,
-        "G24:I24": 4,
-        "G31:I31": 4,
-        "G37:I37": 4
-      },
-      "formats": {
-        "D25:D28": 1,
-        "D32:D35": 1,
-        "D38:D40": 1,
-        "D43:D46": 1,
-        "I25:I29": 1,
-        "I32:I34": 1,
-        "I38:I44": 1
-      },
-      "borders": {
-        "A7:I7": 1,
-        "A8:I8": 2,
-        "A24:D24": 3,
-        "A31:D31": 3,
-        "A37:D37": 3,
-        "A42:D42": 3,
-        "F24:I24": 3,
-        "F31:I31": 3,
-        "F37:I37": 3,
-        "A25:D25": 4,
-        "A32:D32": 4,
-        "A38:D38": 4,
-        "A43:D43": 4,
-        "F25:I25": 4,
-        "F32:I32": 4,
-        "F38:I38": 4
-      },
-      "conditionalFormats": [
-        {
-          "rule": {
-            "type": "CellIsRule",
-            "operator": "isGreaterThan",
-            "values": ["0"],
-            "style": { "fillColor": "", "textColor": "#10B981", "bold": true }
-          },
-          "id": "f7897e41-2b0a-49ca-9e07-420aa940dbf9",
-          "ranges": ["I44", "D35", "D40", "I27", "I29", "D25", "D27", "D28"]
-        },
-        {
-          "rule": {
-            "type": "CellIsRule",
-            "operator": "isLessThan",
-            "values": ["0"],
-            "style": { "fillColor": "", "textColor": "#FF0000", "bold": true }
-          },
-          "id": "67edfa12-1fda-4ab4-8ccc-5976ea59ac89",
-          "ranges": ["D25", "D27", "D28", "I27", "I29", "D35", "D40", "I44"]
-        }
-      ],
+      "cells": {},
+      "styles": {},
+      "formats": {},
+      "borders": {},
+      "conditionalFormats": [],
       "dataValidationRules": [],
       "figures": [
-        {
-          "id": "151b0f60-aa89-457e-9456-9807ab779be6",
-          "width": 1000,
-          "height": 361,
-          "tag": "chart",
-          "data": {
-            "title": { "text": "" },
-            "background": "",
-            "legendPosition": "none",
-            "metaData": {
-              "groupBy": ["invoice_date:month"],
-              "measure": "price_subtotal",
-              "order": null,
-              "resModel": "account.invoice.report",
-              "mode": "line",
-              "cumulatedStart": false
-            },
-            "searchParams": {
-              "comparison": null,
-              "context": {
-                "group_by": ["invoice_date"]
-              },
-              "domain": [
-                "&",
-                [
-                  "state",
-                  "not in",
-                  ["draft", "cancel"]
-                ],
-                "|",
-                ["move_type", "=", "out_invoice"],
-                ["move_type", "=", "out_refund"]
-              ],
-              "groupBy": ["invoice_date:month"],
-              "orderBy": []
-            },
-            "type": "odoo_line",
-            "dataSets": [],
-            "verticalAxisPosition": "left",
-            "stacked": false,
-            "cumulatedStart": false,
-            "fillArea": true,
-            "fieldMatching": {
-              "7785b753-917c-4640-a937-4b6226222ca8": { "chain": "invoice_date", "type": "date", "offset": 0 }
-            }
-          },
-          "offset": { "x": 0, "y": 177 },
-          "col": 0,
-          "row": 0
-        },
         {
           "id": "86aac7b2-f3a5-46e1-a097-916aa4b8f8d0",
           "width": 200,
@@ -327,13 +29,14 @@
             "baselineColorDown": "#DC6965",
             "baselineColorUp": "#00A04A",
             "baselineMode": "difference",
-            "title": { "text": "Current income", "bold": true, "color": "#434343" },
+            "title": { "text": "Current income", "bold": true, "color": "#01666B" },
             "type": "scorecard",
-            "background": "#FFF7ED",
+            "background": "",
             "baseline": "Data!C3",
             "baselineDescr": { "text": "last period" },
             "keyValue": "Data!C2",
-            "humanize": false
+            "humanize": false,
+            "chartId": "86aac7b2-f3a5-46e1-a097-916aa4b8f8d0"
           },
           "offset": { "x": 0, "y": 10 },
           "col": 0,
@@ -348,14 +51,15 @@
             "baselineColorDown": "#DC6965",
             "baselineColorUp": "#00A04A",
             "baselineMode": "difference",
-            "title": { "text": "Receivables", "bold": true, "color": "#434343" },
+            "title": { "text": "Receivables", "bold": true, "color": "#01666B" },
             "type": "scorecard",
-            "background": "#FFF7ED",
+            "background": "",
             "baselineDescr": { "text": "to receive" },
             "keyValue": "Data!C4",
-            "humanize": false
+            "humanize": false,
+            "chartId": "3586cbc4-6ca3-46af-951f-94d4773f94dc"
           },
-          "offset": { "x": 212, "y": 10 },
+          "offset": { "x": 210, "y": 10 },
           "col": 0,
           "row": 0
         },
@@ -368,15 +72,16 @@
             "baselineColorDown": "#DC6965",
             "baselineColorUp": "#00A04A",
             "baselineMode": "difference",
-            "title": { "text": "Current expense", "bold": true, "color": "#434343" },
+            "title": { "text": "Current expense", "bold": true, "color": "#01666B" },
             "type": "scorecard",
-            "background": "#FFF7ED",
+            "background": "",
             "baseline": "Data!C6",
             "baselineDescr": { "text": "last period" },
             "keyValue": "Data!C5",
-            "humanize": false
+            "humanize": false,
+            "chartId": "57f18f9a-55b7-4b84-b927-480c4c56c026"
           },
-          "offset": { "x": 423, "y": 10 },
+          "offset": { "x": 420, "y": 10 },
           "col": 0,
           "row": 0
         },
@@ -389,130 +94,295 @@
             "baselineColorDown": "#DC6965",
             "baselineColorUp": "#00A04A",
             "baselineMode": "difference",
-            "title": { "text": "Payables", "bold": true, "color": "#434343" },
+            "title": { "text": "Payables", "bold": true, "color": "#01666B" },
             "type": "scorecard",
-            "background": "#FFF7ED",
+            "background": "",
             "baselineDescr": { "text": "to pay" },
             "keyValue": "Data!C7",
-            "humanize": false
+            "humanize": false,
+            "chartId": "8f1fb053-5700-4bb3-b93d-55ceb2083d31"
           },
-          "offset": { "x": 635, "y": 10 },
+          "offset": { "x": 630, "y": 10 },
           "col": 0,
           "row": 0
+        },
+        {
+          "id": "7ec792e7-1af2",
+          "col": 0,
+          "row": 0,
+          "offset": { "x": 0, "y": 126 },
+          "width": 1000,
+          "height": 411,
+          "tag": "carousel",
+          "data": {
+            "chartDefinitions": {
+              "151b0f60-aa89-457e-9456-9807ab779be6": {
+                "title": { "text": "" },
+                "background": "",
+                "legendPosition": "none",
+                "type": "line",
+                "humanize": true,
+                "stacked": false,
+                "fillArea": true,
+                "dataSource": {
+                  "type": "odoo",
+                  "cumulatedStart": false,
+                  "metaData": {
+                    "groupBy": ["invoice_date:month"],
+                    "measure": "price_subtotal",
+                    "order": null,
+                    "resModel": "account.invoice.report",
+                    "mode": "line",
+                    "cumulatedStart": false
+                  },
+                  "searchParams": {
+                    "comparison": null,
+                    "context": {
+                      "group_by": ["invoice_date"]
+                    },
+                    "domain": [
+                      "&",
+                      [
+                        "state",
+                        "not in",
+                        ["draft", "cancel"]
+                      ],
+                      "|",
+                      ["move_type", "=", "out_invoice"],
+                      ["move_type", "=", "out_refund"]
+                    ],
+                    "groupBy": ["invoice_date:month"],
+                    "orderBy": []
+                  }
+                },
+                "dataSetStyles": {}
+              }
+            },
+            "title": { "text": "Invoiced", "bold": true, "fontSize": 21, "color": "#01666B" },
+            "items": [
+              { "type": "chart", "chartId": "151b0f60-aa89-457e-9456-9807ab779be6" }
+            ],
+            "fieldMatching": {
+              "151b0f60-aa89-457e-9456-9807ab779be6": {
+                "7785b753-917c-4640-a937-4b6226222ca8": { "chain": "invoice_date", "type": "date", "offset": 0 }
+              }
+            }
+          }
+        },
+        {
+          "id": "ffb3365a-1d0f",
+          "col": 0,
+          "row": 0,
+          "offset": { "x": 505, "y": 547 },
+          "width": 495,
+          "height": 260,
+          "tag": "carousel",
+          "data": {
+            "chartDefinitions": {},
+            "title": {
+              "text": "Profitability",
+              "fontSize": 21,
+              "color": "#01666B",
+              "bold": true
+            },
+            "items": [
+              {
+                "type": "carouselDataView",
+                "rangeData": {
+                  "_sheetId": "656fcb07-8938",
+                  "_zone": { "top": 0, "left": 5, "bottom": 5, "right": 8 }
+                }
+              }
+            ],
+            "fieldMatching": {}
+          }
+        },
+        {
+          "id": "1842ce8e-6260",
+          "col": 0,
+          "row": 0,
+          "offset": { "x": 0, "y": 547 },
+          "width": 495,
+          "height": 260,
+          "tag": "carousel",
+          "data": {
+            "chartDefinitions": {},
+            "title": { "text": "Cash", "bold": true, "fontSize": 21, "color": "#01666B" },
+            "items": [
+              {
+                "type": "carouselDataView",
+                "rangeData": {
+                  "_sheetId": "656fcb07-8938",
+                  "_zone": { "top": 0, "left": 0, "bottom": 4, "right": 3 }
+                }
+              }
+            ],
+            "fieldMatching": {}
+          }
+        },
+        {
+          "id": "d082936f-c851",
+          "col": 0,
+          "row": 0,
+          "offset": { "x": 505, "y": 817 },
+          "width": 495,
+          "height": 232,
+          "tag": "carousel",
+          "data": {
+            "chartDefinitions": {},
+            "title": {
+              "text": "Balance sheet",
+              "fontSize": 21,
+              "color": "#01666B",
+              "bold": true
+            },
+            "items": [
+              {
+                "type": "carouselDataView",
+                "rangeData": {
+                  "_sheetId": "656fcb07-8938",
+                  "_zone": { "top": 7, "left": 5, "bottom": 10, "right": 8 }
+                }
+              }
+            ],
+            "fieldMatching": {}
+          }
+        },
+        {
+          "id": "c9ff1ec5-4505",
+          "col": 0,
+          "row": 0,
+          "offset": { "x": 0, "y": 817 },
+          "width": 495,
+          "height": 232,
+          "tag": "carousel",
+          "data": {
+            "chartDefinitions": {},
+            "title": {
+              "text": "Performance",
+              "fontSize": 21,
+              "color": "#01666B",
+              "bold": true
+            },
+            "items": [
+              {
+                "type": "carouselDataView",
+                "rangeData": {
+                  "_sheetId": "656fcb07-8938",
+                  "_zone": { "top": 7, "left": 0, "bottom": 11, "right": 3 }
+                }
+              }
+            ],
+            "fieldMatching": {}
+          }
+        },
+        {
+          "id": "8719fa5c-c169",
+          "col": 0,
+          "row": 0,
+          "offset": { "x": 0, "y": 1059 },
+          "width": 495,
+          "height": 210,
+          "tag": "carousel",
+          "data": {
+            "chartDefinitions": {},
+            "title": { "text": "Position", "fontSize": 21, "color": "#01666B", "bold": true },
+            "items": [
+              {
+                "type": "carouselDataView",
+                "rangeData": {
+                  "_sheetId": "656fcb07-8938",
+                  "_zone": { "top": 13, "left": 0, "bottom": 16, "right": 3 }
+                }
+              }
+            ],
+            "fieldMatching": {}
+          }
+        },
+        {
+          "id": "56dd0a68-bbf6",
+          "col": 0,
+          "row": 0,
+          "offset": { "x": 505, "y": 1059 },
+          "width": 495,
+          "height": 450,
+          "tag": "carousel",
+          "data": {
+            "chartDefinitions": {},
+            "title": { "text": "Solvency", "fontSize": 21, "color": "#01666B", "bold": true },
+            "items": [
+              {
+                "type": "carouselDataView",
+                "rangeData": {
+                  "_sheetId": "656fcb07-8938",
+                  "_zone": { "top": 13, "left": 5, "bottom": 20, "right": 8 }
+                }
+              }
+            ],
+            "fieldMatching": {}
+          }
+        },
+        {
+          "id": "9f93dddb-76d2",
+          "col": 0,
+          "row": 0,
+          "offset": { "x": 0, "y": 1279 },
+          "width": 495,
+          "height": 230,
+          "tag": "carousel",
+          "data": {
+            "chartDefinitions": {},
+            "title": { "text": "Liquidity", "bold": true, "fontSize": 21, "color": "#01666B" },
+            "items": [
+              {
+                "type": "carouselDataView",
+                "rangeData": {
+                  "_sheetId": "656fcb07-8938",
+                  "_zone": { "top": 18, "left": 0, "bottom": 22, "right": 3 }
+                }
+              }
+            ],
+            "fieldMatching": {}
+          }
         }
       ],
-      "tables": [
-        {
-          "range": "A24:D28",
-          "type": "static",
-          "config": {
-            "hasFilters": false,
-            "totalRow": false,
-            "firstColumn": false,
-            "lastColumn": false,
-            "numberOfHeaders": 1,
-            "bandedRows": true,
-            "bandedColumns": false,
-            "automaticAutofill": true,
-            "styleId": "None"
-          }
-        },
-        {
-          "range": "A31:D35",
-          "type": "static",
-          "config": {
-            "hasFilters": false,
-            "totalRow": false,
-            "firstColumn": false,
-            "lastColumn": false,
-            "numberOfHeaders": 1,
-            "bandedRows": true,
-            "bandedColumns": false,
-            "automaticAutofill": true,
-            "styleId": "None"
-          }
-        },
-        {
-          "range": "A37:D40",
-          "type": "static",
-          "config": {
-            "hasFilters": false,
-            "totalRow": false,
-            "firstColumn": false,
-            "lastColumn": false,
-            "numberOfHeaders": 1,
-            "bandedRows": true,
-            "bandedColumns": false,
-            "automaticAutofill": true,
-            "styleId": "None"
-          }
-        },
-        {
-          "range": "A42:D46",
-          "type": "static",
-          "config": {
-            "hasFilters": false,
-            "totalRow": false,
-            "firstColumn": false,
-            "lastColumn": false,
-            "numberOfHeaders": 1,
-            "bandedRows": true,
-            "bandedColumns": false,
-            "automaticAutofill": true,
-            "styleId": "None"
-          }
-        },
-        {
-          "range": "F24:I29",
-          "type": "static",
-          "config": {
-            "hasFilters": false,
-            "totalRow": false,
-            "firstColumn": false,
-            "lastColumn": false,
-            "numberOfHeaders": 1,
-            "bandedRows": true,
-            "bandedColumns": false,
-            "automaticAutofill": true,
-            "styleId": "None"
-          }
-        },
-        {
-          "range": "F31:I34",
-          "type": "static",
-          "config": {
-            "hasFilters": false,
-            "totalRow": false,
-            "firstColumn": false,
-            "lastColumn": false,
-            "numberOfHeaders": 1,
-            "bandedRows": true,
-            "bandedColumns": false,
-            "automaticAutofill": true,
-            "styleId": "None"
-          }
-        },
-        {
-          "range": "F37:I44",
-          "type": "static",
-          "config": {
-            "hasFilters": false,
-            "totalRow": false,
-            "firstColumn": false,
-            "lastColumn": false,
-            "numberOfHeaders": 1,
-            "bandedRows": true,
-            "bandedColumns": false,
-            "automaticAutofill": true,
-            "styleId": "None"
-          }
-        }
-      ],
+      "tables": [],
       "areGridLinesVisible": false,
       "isVisible": true,
+      "backgroundColor": "#F9FAFB",
       "headerGroups": {
         "ROW": [],
         "COL": []
+      },
+      "defaultFormat": {
+        "colDefault": {},
+        "rowDefault": {
+          "6": 7,
+          "7": 7,
+          "23": 7,
+          "24": 7,
+          "25": 7,
+          "26": 7,
+          "27": 7,
+          "28": 7,
+          "29": 7,
+          "30": 7,
+          "31": 7,
+          "32": 7,
+          "33": 7,
+          "34": 7,
+          "35": 7,
+          "36": 7,
+          "37": 7,
+          "38": 7,
+          "39": 7,
+          "40": 7,
+          "41": 7,
+          "42": 7,
+          "43": 7,
+          "44": 7,
+          "45": 7
+        }
       },
       "comments": {}
     },
@@ -610,11 +480,11 @@
         "A73": "RETAINED_EARNINGS",
         "A74": "CY_EARN",
         "B2": "=C48",
-        "B3": "=D48",
-        "B4": "=C31",
-        "B5": "=C28",
-        "B6": "=D28",
-        "B7": "=C32",
+        "B3": { "R": "+C1" },
+        "B4": { "R": "C31" },
+        "B5": { "R": "-R3" },
+        "B6": { "R": "+C1" },
+        "B7": { "R": "C32" },
         "B9": "=_t(\"Code\")",
         "B11": "CR",
         "B12": "CS",
@@ -655,20 +525,16 @@
         "B68": "CURR_YEAR_EARNINGS + PREV_YEAR_EARNINGS",
         "B69": "CURR_YEAR_EARNINGS_PNL + CURR_YEAR_EARNINGS_ALLOC",
         "C2": "=FORMAT.LARGE.NUMBER(B2)",
-        "C3": "=FORMAT.LARGE.NUMBER(B3)",
-        "C4": "=FORMAT.LARGE.NUMBER(B4)",
-        "C5": "=FORMAT.LARGE.NUMBER(B5)",
-        "C6": "=FORMAT.LARGE.NUMBER(B6)",
-        "C7": "=FORMAT.LARGE.NUMBER(B7)",
+        "C3:C7": { "R": "+R1" },
         "C9": "=YEAR(E1)",
         "C11": "=ODOO.DEBIT($G11,C$9)-ODOO.DEBIT($G11,D$9)",
         "C12": "=-ODOO.CREDIT($G12,C$9)+ODOO.CREDIT($G12,D$9)",
         "C13": "=C11+C12",
         "C14": "=ODOO.BALANCE($G14,C$9)",
         "C16": "=iferror(C27/C48,0)",
-        "C17": "=iferror(C29/C25,0)",
-        "C18": "=iferror(C29/C50,0)",
-        "C19": "=iferror(C67/C59,0)",
+        "C17": { "N": "=", "R": "+R2|-R23" },
+        "C18": { "N": "=", "R": "=|+R25" },
+        "C19": { "N": "=", "R": "+R38|+R9" },
         "C21": "=iferror(C31/C48*365,0)",
         "C22": "=iferror(C32/(C26+C28)*365,0)",
         "C23": "=C31-C32",
@@ -692,32 +558,27 @@
         "C45": "=C67+C63-C56-C57",
         "C46": "=IFERROR(C70/C67,0)",
         "C48": "=-ODOO.BALANCE($G48,C$9)",
-        "C49": "=-ODOO.BALANCE($G49,C$9)",
+        "C49": { "R": "+R1|=" },
         "C50": "=C51+C56+C57",
         "C51": "=C52+C53+C54+C55",
         "C52": "=ODOO.BALANCE($G52,C$9)",
-        "C53": "=ODOO.BALANCE($G53,C$9)",
-        "C54": "=ODOO.BALANCE($G54,C$9)",
-        "C55": "=ODOO.BALANCE($G55,C$9)",
-        "C56": "=ODOO.BALANCE($G56,C$9)",
-        "C57": "=ODOO.BALANCE($G57,C$9)",
+        "C53:C57": { "R": "+R1|=" },
         "C58": "=C59+C63",
-        "C59": "=C61+C62",
-        "C60": "=C59+C65",
+        "C59": { "R": "+R2|-R1" },
+        "C60": { "R": "-R2|+R3" },
         "C61": "=-ODOO.BALANCE($G61,C$9)",
-        "C62": "=-ODOO.BALANCE($G62,C$9)",
-        "C63": "=-ODOO.BALANCE($G63,C$9)",
+        "C62:C63": { "R": "+R1|=" },
         "C64": "=ODOO.BALANCE($G64,C$9)",
         "C65": "=-ODOO.BALANCE($G65,C$9)",
         "C66": "=C68+C73",
         "C67": "=-ODOO.BALANCE($G67,C$9)",
         "C68": "=C69+C72",
-        "C69": "=C70+C71",
+        "C69": { "R": "+R1|-R1" },
         "C70": "=-ODOO.BALANCE($G70,C$9)",
         "C71": "=-ODOO.BALANCE($G71,C$9)+ODOO.BALANCE($G71,D$9)",
         "C72": "=D68",
         "C73": "=-ODOO.BALANCE($G73,C$9)",
-        "C74": "=-ODOO.BALANCE($G71,C$9)",
+        "C74": { "R": "-R2|=" },
         "D1": "=_t(\"Year Filter\")",
         "D9": "=IF(LEN(C$9)=4,C$9-1,LEFT(C$9,3)&RIGHT(C$9,4)-1)",
         "D11": "=ODOO.DEBIT($G11,D$9)-ODOO.DEBIT($G11,E$9)",
@@ -725,9 +586,9 @@
         "D13": "=D11+D12",
         "D14": "=ODOO.BALANCE($G14,D$9)",
         "D16": "=iferror(D27/D48,0)",
-        "D17": "=iferror(D29/D25,0)",
-        "D18": "=iferror(D29/D50,0)",
-        "D19": "=iferror(D67/D59,0)",
+        "D17": { "N": "=", "R": "+R2|-R23" },
+        "D18": { "N": "=", "R": "=|+R25" },
+        "D19": { "N": "=", "R": "+R38|+R9" },
         "D21": "=iferror(D31/D48*365,0)",
         "D22": "=iferror(D32/(D26+D28)*365,0)",
         "D23": "=D31-D32",
@@ -751,32 +612,27 @@
         "D45": "=D67+D63-D56-D57",
         "D46": "=IFERROR(D70/D67,0)",
         "D48": "=-ODOO.BALANCE($G48,D$9)",
-        "D49": "=-ODOO.BALANCE($G49,D$9)",
+        "D49": { "R": "+R1|=" },
         "D50": "=D51+D56+D57",
         "D51": "=D52+D53+D54+D55",
         "D52": "=ODOO.BALANCE($G52,D$9)",
-        "D53": "=ODOO.BALANCE($G53,D$9)",
-        "D54": "=ODOO.BALANCE($G54,D$9)",
-        "D55": "=ODOO.BALANCE($G55,D$9)",
-        "D56": "=ODOO.BALANCE($G56,D$9)",
-        "D57": "=ODOO.BALANCE($G57,D$9)",
+        "D53:D57": { "R": "+R1|=" },
         "D58": "=D59+D63",
-        "D59": "=D61+D62",
-        "D60": "=D59+D65",
+        "D59": { "R": "+R2|-R1" },
+        "D60": { "R": "-R2|+R3" },
         "D61": "=-ODOO.BALANCE($G61,D$9)",
-        "D62": "=-ODOO.BALANCE($G62,D$9)",
-        "D63": "=-ODOO.BALANCE($G63,D$9)",
+        "D62:D63": { "R": "+R1|=" },
         "D64": "=ODOO.BALANCE($G64,D$9)",
         "D65": "=-ODOO.BALANCE($G65,D$9)",
         "D66": "=D68+D73",
         "D67": "=-ODOO.BALANCE($G67,D$9)",
         "D68": "=D69+D72",
-        "D69": "=D70+D71",
+        "D69": { "R": "+R1|-R1" },
         "D70": "=-ODOO.BALANCE($G70,D$9)",
         "D71": "=-ODOO.BALANCE($G71,D$9)+ODOO.BALANCE($G71,E$9)",
         "D72": "=E68",
         "D73": "=-ODOO.BALANCE($G73,D$9)",
-        "D74": "=-ODOO.BALANCE($G71,D$9)",
+        "D74": { "R": "-R2|=" },
         "E1": "=ODOO.FILTER.VALUE(\"Year\")",
         "E9": "=IF(LEN(D9)=4,D9-1,LEFT(D9,3)&RIGHT(D9,4)-1)",
         "E11": "=ODOO.DEBIT($G11,E$9)-ODOO.DEBIT($G11,F$9)",
@@ -784,9 +640,9 @@
         "E13": "=E11+E12",
         "E14": "=ODOO.BALANCE($G14,E$9)",
         "E16": "=iferror(E27/E48,0)",
-        "E17": "=iferror(E29/E25,0)",
-        "E18": "=iferror(E29/E50,0)",
-        "E19": "=iferror(E67/E59,0)",
+        "E17": { "N": "=", "R": "+R2|-R23" },
+        "E18": { "N": "=", "R": "=|+R25" },
+        "E19": { "N": "=", "R": "+R38|+R9" },
         "E21": "=iferror(E31/E48*365,0)",
         "E22": "=iferror(E32/(E26+E28)*365,0)",
         "E23": "=E31-E32",
@@ -810,87 +666,110 @@
         "E45": "=E67+E63-E56-E57",
         "E46": "=IFERROR(E70/E67,0)",
         "E48": "=-ODOO.BALANCE($G48,E$9)",
-        "E49": "=-ODOO.BALANCE($G49,E$9)",
+        "E49": { "R": "+R1|=" },
         "E50": "=E51+E56+E57",
         "E51": "=E52+E53+E54+E55",
         "E52": "=ODOO.BALANCE($G52,E$9)",
-        "E53": "=ODOO.BALANCE($G53,E$9)",
-        "E54": "=ODOO.BALANCE($G54,E$9)",
-        "E55": "=ODOO.BALANCE($G55,E$9)",
-        "E56": "=ODOO.BALANCE($G56,E$9)",
-        "E57": "=ODOO.BALANCE($G57,E$9)",
+        "E53:E57": { "R": "+R1|=" },
         "E58": "=E59+E63",
-        "E59": "=E61+E62",
-        "E60": "=E59+E65",
+        "E59": { "R": "+R2|-R1" },
+        "E60": { "R": "-R2|+R3" },
         "E61": "=-ODOO.BALANCE($G61,E$9)",
-        "E62": "=-ODOO.BALANCE($G62,E$9)",
-        "E63": "=-ODOO.BALANCE($G63,E$9)",
+        "E62:E63": { "R": "+R1|=" },
         "E64": "=ODOO.BALANCE($G64,E$9)",
         "E65": "=-ODOO.BALANCE($G65,E$9)",
         "E66": "=E68+E73",
         "E67": "=-ODOO.BALANCE($G67,E$9)",
         "E68": "=E69+E72",
-        "E69": "=E70+E71",
+        "E69": { "R": "+R1|-R1" },
         "E70": "=-ODOO.BALANCE($G70,E$9)",
         "E71": "=-ODOO.BALANCE($G71,E$9)+ODOO.BALANCE($G71,F$9)",
-        "E72": "=-ODOO.BALANCE($G71,E$9, -1)-ODOO.BALANCE($G72,E9, -1)-ODOO.BALANCE($G72,E9, -2)-ODOO.BALANCE($G72,E9, -3)-ODOO.BALANCE($G72,E9, -4)-ODOO.BALANCE($G72,E9, -5)",
+        "E72": "=-ODOO.BALANCE($G71,E$9,-1)-ODOO.BALANCE($G72,E9,-1)-ODOO.BALANCE($G72,E9,-2)-ODOO.BALANCE($G72,E9,-3)-ODOO.BALANCE($G72,E9,-4)-ODOO.BALANCE($G72,E9,-5)",
         "E73": "=-ODOO.BALANCE($G73,E$9)",
-        "E74": "=-ODOO.BALANCE($G71,E$9)",
+        "E74": { "R": "-R2|=" },
         "F9": "=IF(LEN(E9)=4,E9-1,LEFT(E9,3)&RIGHT(E9,4)-1)",
         "G9": "=_t(\"Accounts\")",
-        "G11": "=CONCATENATE(ODOO.ACCOUNT.GROUP(\"asset_cash\"),\", \",ODOO.ACCOUNT.GROUP(\"liability_credit_card\"))",
-        "G12": "=CONCATENATE(ODOO.ACCOUNT.GROUP(\"asset_cash\"),\", \",ODOO.ACCOUNT.GROUP(\"liability_credit_card\"))",
+        "G11:G12": "=CONCATENATE(ODOO.ACCOUNT.GROUP(\"asset_cash\"),\", \",ODOO.ACCOUNT.GROUP(\"liability_credit_card\"))",
         "G14": "=CONCATENATE(ODOO.ACCOUNT.GROUP(\"asset_cash\"),\", \",ODOO.ACCOUNT.GROUP(\"liability_credit_card\"))",
         "G26": "=ODOO.ACCOUNT.GROUP(\"expense_direct_cost\")",
-        "G28": "=ODOO.ACCOUNT.GROUP(\"expense\")",
-        "G31": "=ODOO.ACCOUNT.GROUP(\"asset_receivable\")",
-        "G32": "=ODOO.ACCOUNT.GROUP(\"liability_payable\")",
-        "G48": "=ODOO.ACCOUNT.GROUP(\"income\")",
-        "G49": "=ODOO.ACCOUNT.GROUP(\"income_other\")",
-        "G52": "=ODOO.ACCOUNT.GROUP(\"asset_cash\")",
-        "G53": "=ODOO.ACCOUNT.GROUP(\"asset_receivable\")",
-        "G54": "=ODOO.ACCOUNT.GROUP(\"asset_current\")",
-        "G55": "=ODOO.ACCOUNT.GROUP(\"asset_prepayments\")",
-        "G56": "=ODOO.ACCOUNT.GROUP(\"asset_fixed\")",
-        "G57": "=ODOO.ACCOUNT.GROUP(\"asset_non_current\")",
+        "G28": {
+          "S": ["expense"]
+        },
+        "G31": {
+          "S": ["asset_receivable"]
+        },
+        "G32": {
+          "S": ["liability_payable"]
+        },
+        "G48": {
+          "S": ["income"]
+        },
+        "G49": {
+          "S": ["income_other"]
+        },
+        "G52": {
+          "S": ["asset_cash"]
+        },
+        "G53": {
+          "S": ["asset_receivable"]
+        },
+        "G54": {
+          "S": ["asset_current"]
+        },
+        "G55": {
+          "S": ["asset_prepayments"]
+        },
+        "G56": {
+          "S": ["asset_fixed"]
+        },
+        "G57": {
+          "S": ["asset_non_current"]
+        },
         "G61": "=CONCATENATE(ODOO.ACCOUNT.GROUP(\"liability_current\"),\", \",ODOO.ACCOUNT.GROUP(\"liability_credit_card\"))",
         "G62": "=ODOO.ACCOUNT.GROUP(\"liability_payable\")",
-        "G63": "=ODOO.ACCOUNT.GROUP(\"liability_non_current\")",
-        "G64": "=ODOO.ACCOUNT.GROUP(\"expense_depreciation\")",
-        "G65": "=ODOO.ACCOUNT.GROUP(\"liability_credit_card\")",
-        "G67": "=ODOO.ACCOUNT.GROUP(\"equity\")",
+        "G63": {
+          "S": ["liability_non_current"]
+        },
+        "G64": {
+          "S": ["expense_depreciation"]
+        },
+        "G65": {
+          "S": ["liability_credit_card"]
+        },
+        "G67": {
+          "S": ["equity"]
+        },
         "G70": "=CONCATENATE(ODOO.ACCOUNT.GROUP(\"income\"),\",\",ODOO.ACCOUNT.GROUP(\"income_other\"),\",\",ODOO.ACCOUNT.GROUP(\"expense_direct_cost\"),\",\",ODOO.ACCOUNT.GROUP(\"expense\"),\",\",ODOO.ACCOUNT.GROUP(\"expense_depreciation\"))",
         "G71": "=ODOO.ACCOUNT.GROUP(\"equity_unaffected\")",
         "G72": "=CONCATENATE(ODOO.ACCOUNT.GROUP(\"income\"),\",\",ODOO.ACCOUNT.GROUP(\"income_other\"),\",\",ODOO.ACCOUNT.GROUP(\"expense_direct_cost\"),\",\",ODOO.ACCOUNT.GROUP(\"expense\"),\",\",ODOO.ACCOUNT.GROUP(\"expense_depreciation\"))",
         "G73": "=ODOO.ACCOUNT.GROUP(\"equity\")"
       },
       "styles": {
-        "A10": 5,
-        "A15": 5,
-        "A20": 5,
-        "A24": 5,
-        "A30": 5,
-        "A34": 5,
-        "A39": 5,
-        "A47": 5,
-        "A1:C1": 5,
-        "A9:B9": 6,
-        "G9": 6,
-        "C2:C7": 7,
-        "C9": 8,
-        "D9:F9": 9
+        "A10": 1,
+        "A15": 1,
+        "A20": 1,
+        "A24": 1,
+        "A30": 1,
+        "A34": 1,
+        "A39": 1,
+        "A47": 1,
+        "A1:C1": 1,
+        "A9:B9": 2,
+        "G9": 2,
+        "C9": 3,
+        "D9:F9": 4
       },
       "formats": {
-        "C16:F18": 2,
-        "C19:F19": 3,
-        "C36:F36": 3,
-        "C21:F22": 4,
-        "C37:F37": 4,
-        "C35:F35": 5,
-        "C40:F40": 5,
-        "C42:F44": 5,
-        "C46:F46": 5,
-        "C41:F41": 6
+        "C16:F18": 1,
+        "C19:F19": 2,
+        "C36:F36": 2,
+        "C21:F22": 3,
+        "C37:F37": 3,
+        "C35:F35": 4,
+        "C40:F40": 4,
+        "C42:F44": 4,
+        "C46:F46": 4,
+        "C41:F41": 5
       },
       "borders": {},
       "conditionalFormats": [],
@@ -920,47 +799,385 @@
         "COL": []
       },
       "comments": {}
+    },
+    {
+      "id": "656fcb07-8938",
+      "name": "KPIs",
+      "colNumber": 26,
+      "rowNumber": 100,
+      "rows": {
+        "0": { "size": 28 },
+        "1": { "size": 28 },
+        "2": { "size": 28 },
+        "3": { "size": 28 },
+        "4": { "size": 28 },
+        "5": { "size": 28 },
+        "6": { "size": 28 },
+        "7": { "size": 28 },
+        "8": { "size": 28 },
+        "9": { "size": 28 },
+        "10": { "size": 28 },
+        "11": { "size": 28 },
+        "12": { "size": 28 },
+        "13": { "size": 28 },
+        "14": { "size": 28 },
+        "15": { "size": 28 },
+        "16": { "size": 28 },
+        "17": { "size": 28 },
+        "18": { "size": 28 },
+        "19": { "size": 28 },
+        "20": { "size": 28 },
+        "21": { "size": 28 },
+        "22": { "size": 28 }
+      },
+      "cols": {
+        "0": { "size": 106 },
+        "1": { "size": 106 },
+        "2": { "size": 106 },
+        "3": { "size": 106 },
+        "4": { "size": 106 },
+        "5": { "size": 106 },
+        "6": { "size": 106 },
+        "7": { "size": 106 },
+        "8": { "size": 106 },
+        "9": { "size": 106 },
+        "10": { "size": 106 },
+        "11": { "size": 106 },
+        "12": { "size": 106 },
+        "13": { "size": 106 },
+        "14": { "size": 106 },
+        "15": { "size": 106 },
+        "16": { "size": 106 },
+        "17": { "size": 106 },
+        "18": { "size": 106 },
+        "19": { "size": 106 },
+        "20": { "size": 106 },
+        "21": { "size": 106 },
+        "22": { "size": 106 },
+        "23": { "size": 106 },
+        "24": { "size": 106 },
+        "25": { "size": 106 }
+      },
+      "merges": [],
+      "cells": {
+        "A2": "=_t(\"Cash received\")",
+        "A3": "=_t(\"Cash spent\")",
+        "A4": "=_t(\"Cash surplus\")",
+        "A5": "=_t(\"Closing bank balance\")",
+        "A9": "=_t(\"Gross profit margin\")",
+        "A10": "=_t(\"Net profit margin\")",
+        "A11": "=_t(\"Return on investments\")",
+        "A12": "=_t(\"Financial independence\")",
+        "A15": "=_t(\"Average debtors days\")",
+        "A16": "=_t(\"Average creditors days\")",
+        "A17": "=_t(\"Short term cash forecast\")",
+        "A20": "=_t(\"Cash asset ratio\")",
+        "A21": "=_t(\"Quick ratio\")",
+        "A22": "=_t(\"Current assets to liabilities\")",
+        "A23": "=_t(\"Working capital\")",
+        "B1": "=YEAR(Data!E1)",
+        "B2": "=Data!C11",
+        "B3:B5": { "R": "+R1" },
+        "B8": "=YEAR(Data!E1)",
+        "B9": "=Data!C16",
+        "B10:B12": { "R": "+R1" },
+        "B14": "=YEAR(Data!E1)",
+        "B15": "=Data!C21",
+        "B16:B17": { "R": "+R1" },
+        "B19": "=YEAR(Data!E1)",
+        "B20": "=Data!C35",
+        "B21:B23": { "R": "+R1" },
+        "C1": "=IF(LEN(KPIs!B$1)=4,KPIs!B$1-1,LEFT(KPIs!B$1,3)&RIGHT(KPIs!B$1,4)-1)",
+        "C2": "=Data!D11",
+        "C3:C4": { "R": "+R1" },
+        "C5": "4000",
+        "C8": "=IF(LEN(KPIs!B$8)=4,KPIs!B$8-1,LEFT(KPIs!B$8,3)&RIGHT(KPIs!B$8,4)-1)",
+        "C9": "=Data!D16",
+        "C10:C12": { "R": "+R1" },
+        "C14": "=IF(LEN(KPIs!B$14)=4,KPIs!B$14-1,LEFT(KPIs!B$14,3)&RIGHT(KPIs!B$14,4)-1)",
+        "C15": "=Data!D21",
+        "C16:C17": { "R": "+R1" },
+        "C19": "=IF(LEN(KPIs!B$19)=4,KPIs!B$19-1,LEFT(KPIs!B$19,3)&RIGHT(KPIs!B$19,4)-1)",
+        "C20": "=Data!D35",
+        "C21:C23": { "R": "+R1" },
+        "D1": "Δ",
+        "D2": "=iferror(KPIs!B2/KPIs!C2,0)",
+        "D3:D5": { "N": "=", "R": "+R1|+R1" },
+        "D8": "Δ",
+        "D9": "=iferror(KPIs!B9/KPIs!C9,0)",
+        "D10:D12": { "N": "=", "R": "+R1|+R1" },
+        "D14": "Δ",
+        "D15": "=iferror(KPIs!B15/KPIs!C15,0)",
+        "D16:D17": { "N": "=", "R": "+R1|+R1" },
+        "D19": "Δ",
+        "D20": "=iferror(KPIs!B20/KPIs!C20,0)",
+        "D21": "=iferror(KPIs!B21-KPIs!C21,0)",
+        "D22": "=iferror(KPIs!B22/KPIs!C22,0)",
+        "D23": { "N": "=", "R": "+R1|+R1" },
+        "F2": "=_t(\"Income\")",
+        "F3": "=_t(\"Cost of revenue\")",
+        "F4": "=_t(\"Gross profit\")",
+        "F5": "=_t(\"Expenses\")",
+        "F6": "=_t(\"Net profit\")",
+        "F9": "=_t(\"Receivable\")",
+        "F10": "=_t(\"Payables\")",
+        "F11": "=_t(\"Net assets\")",
+        "F15": "=_t(\"Debt to Equity\")",
+        "F16": "=_t(\"Solvency\")",
+        "F17": "=_t(\"Debt ratio\")",
+        "F18": "=_t(\"Permanence\")",
+        "F19": "=_t(\"Financial balance\")",
+        "F20": "=_t(\"Long term working capital\")",
+        "F21": "=_t(\"Return on equity\")",
+        "G1": "=YEAR(Data!E1)",
+        "G2": "=Data!C25",
+        "G3:G6": { "R": "+R1" },
+        "G8": "=YEAR(Data!E1)",
+        "G9": "=Data!C31",
+        "G10:G11": { "R": "+R1" },
+        "G14": "=YEAR(Data!E1)",
+        "G15": "=Data!C40",
+        "G16:G21": { "R": "+R1" },
+        "H1": "=IF(LEN(KPIs!G$1)=4,KPIs!G$1-1,LEFT(KPIs!G$1,3)&RIGHT(KPIs!G$1,4)-1)",
+        "H2": "=Data!D25",
+        "H3:H6": { "R": "+R1" },
+        "H8": "=IF(LEN(KPIs!G$8)=4,KPIs!G$8-1,LEFT(KPIs!G$8,3)&RIGHT(KPIs!G$8,4)-1)",
+        "H9": "=Data!D31",
+        "H10:H11": { "R": "+R1" },
+        "H14": "=IF(LEN(KPIs!G$14)=4,KPIs!G$14-1,LEFT(KPIs!G$14,3)&RIGHT(KPIs!G$14,4)-1)",
+        "H15": "=Data!D40",
+        "H16:H21": { "R": "+R1" },
+        "I1": "Δ",
+        "I2": "=iferror(KPIs!G2/KPIs!H2,0)",
+        "I3:I6": { "N": "=", "R": "+R1|+R1" },
+        "I8": "Δ",
+        "I9": "=iferror(KPIs!G9/KPIs!H9,0)",
+        "I10:I11": { "N": "=", "R": "+R1|+R1" },
+        "I14": "Δ",
+        "I15": "=iferror(KPIs!G15/KPIs!H15,0)",
+        "I16:I21": { "N": "=", "R": "+R1|+R1" }
+      },
+      "styles": {
+        "A1": 5,
+        "A8": 5,
+        "A14": 5,
+        "A19": 5,
+        "A2:D5": 6,
+        "A9:D12": 6,
+        "A15:D17": 6,
+        "A20:D23": 6,
+        "F2:I6": 6,
+        "F9:I11": 6,
+        "F15:I21": 6,
+        "B1:D1": 7,
+        "B8:D8": 7,
+        "B14:D14": 7,
+        "B19:D19": 7,
+        "G1:I1": 7,
+        "G8:I8": 7,
+        "G14:I14": 7,
+        "E1": 8,
+        "E8": 8,
+        "E14": 8,
+        "F1": 9,
+        "F8": 9,
+        "F14": 9
+      },
+      "formats": {
+        "N11": 5,
+        "D2:D5": 6,
+        "D9:D12": 6,
+        "D15:D17": 6,
+        "D20:D23": 6,
+        "I2:I6": 6,
+        "I9:I11": 6,
+        "I15:I21": 6
+      },
+      "borders": {},
+      "conditionalFormats": [
+        {
+          "id": "da9b6626-eba0",
+          "rule": {
+            "type": "CellIsRule",
+            "operator": "isEqual",
+            "style": { "fillColor": "", "textColor": "#434343" },
+            "values": ["0"]
+          },
+          "ranges": ["D2:D5", "D9:D12", "D15:D17", "D20:D23", "I15:I21", "I9:I11", "I2:I6"]
+        },
+        {
+          "id": "12eb6869-e92b",
+          "rule": {
+            "type": "CellIsRule",
+            "operator": "isGreaterOrEqualTo",
+            "style": { "fillColor": "", "textColor": "#28A745" },
+            "values": ["1"]
+          },
+          "ranges": ["D2:D5", "D9:D12", "D15:D17", "D20:D23", "I15:I21", "I9:I11", "I2:I6"]
+        },
+        {
+          "id": "76a1117b-51f3",
+          "rule": {
+            "type": "CellIsRule",
+            "operator": "isLessThan",
+            "style": { "fillColor": "", "textColor": "#D44C59" },
+            "values": ["1"]
+          },
+          "ranges": ["D2:D5", "D9:D12", "D15:D17", "D20:D23", "I15:I21", "I9:I11", "I2:I6"]
+        }
+      ],
+      "dataValidationRules": [],
+      "figures": [],
+      "tables": [
+        {
+          "range": "A1:D5",
+          "type": "static",
+          "config": {
+            "hasFilters": false,
+            "totalRow": false,
+            "firstColumn": false,
+            "lastColumn": false,
+            "numberOfHeaders": 1,
+            "bandedRows": true,
+            "bandedColumns": false,
+            "automaticAutofill": true,
+            "styleId": "None"
+          }
+        },
+        {
+          "range": "F1:I6",
+          "type": "static",
+          "config": {
+            "hasFilters": false,
+            "totalRow": false,
+            "firstColumn": false,
+            "lastColumn": false,
+            "numberOfHeaders": 1,
+            "bandedRows": true,
+            "bandedColumns": false,
+            "automaticAutofill": true,
+            "styleId": "None"
+          }
+        },
+        {
+          "range": "A8:D12",
+          "type": "static",
+          "config": {
+            "hasFilters": false,
+            "totalRow": false,
+            "firstColumn": false,
+            "lastColumn": false,
+            "numberOfHeaders": 1,
+            "bandedRows": true,
+            "bandedColumns": false,
+            "automaticAutofill": true,
+            "styleId": "None"
+          }
+        },
+        {
+          "range": "F8:I11",
+          "type": "static",
+          "config": {
+            "hasFilters": false,
+            "totalRow": false,
+            "firstColumn": false,
+            "lastColumn": false,
+            "numberOfHeaders": 1,
+            "bandedRows": true,
+            "bandedColumns": false,
+            "automaticAutofill": true,
+            "styleId": "None"
+          }
+        },
+        {
+          "range": "A14:D17",
+          "type": "static",
+          "config": {
+            "hasFilters": false,
+            "totalRow": false,
+            "firstColumn": false,
+            "lastColumn": false,
+            "numberOfHeaders": 1,
+            "bandedRows": true,
+            "bandedColumns": false,
+            "automaticAutofill": true,
+            "styleId": "None"
+          }
+        },
+        {
+          "range": "F14:I21",
+          "type": "static",
+          "config": {
+            "hasFilters": false,
+            "totalRow": false,
+            "firstColumn": false,
+            "lastColumn": false,
+            "numberOfHeaders": 1,
+            "bandedRows": true,
+            "bandedColumns": false,
+            "automaticAutofill": true,
+            "styleId": "None"
+          }
+        },
+        {
+          "range": "A19:D23",
+          "type": "static",
+          "config": {
+            "hasFilters": false,
+            "totalRow": false,
+            "firstColumn": false,
+            "lastColumn": false,
+            "numberOfHeaders": 1,
+            "bandedRows": true,
+            "bandedColumns": false,
+            "automaticAutofill": true,
+            "styleId": "None"
+          }
+        }
+      ],
+      "areGridLinesVisible": true,
+      "isVisible": true,
+      "isLocked": false,
+      "headerGroups": {
+        "ROW": [],
+        "COL": []
+      },
+      "comments": {}
     }
   ],
   "styles": {
-    "1": { "textColor": "#01666b", "fontSize": 16, "bold": true },
-    "2": { "textColor": "#434343", "bold": true, "fontSize": 11 },
-    "3": { "textColor": "#434343", "verticalAlign": "middle" },
-    "4": {
+    "1": { "bold": true },
+    "2": { "italic": true, "bold": true },
+    "3": { "italic": true, "bold": true, "align": "right" },
+    "4": { "italic": true },
+    "5": { "textColor": "#434343", "bold": true, "fontSize": 11 },
+    "6": { "textColor": "#434343", "verticalAlign": "middle" },
+    "7": {
       "textColor": "#434343",
       "bold": true,
       "fontSize": 11,
-      "align": "center"
+      "align": "center",
+      "verticalAlign": "top"
     },
-    "5": { "bold": true },
-    "6": { "italic": true, "bold": true },
-    "7": { "fillColor": "#f8f9fa" },
-    "8": { "italic": true, "bold": true, "align": "right" },
-    "9": { "italic": true }
-  },
-  "formats": {
-    "1": "0%",
-    "2": "0.0%",
-    "3": "0.0",
-    "4": "0.00",
-    "5": "#,##0.00",
-    "6": "0.00%"
-  },
-  "borders": {
-    "1": {
-      "bottom": { "style": "thin", "color": "#000" }
-    },
-    "2": {
-      "top": { "style": "thin", "color": "#000" }
-    },
-    "3": {
-      "bottom": { "style": "thin", "color": "#CCCCCC" }
-    },
-    "4": {
-      "top": { "style": "thin", "color": "#CCCCCC" }
+    "8": { "verticalAlign": "top" },
+    "9": {
+      "textColor": "#434343",
+      "bold": true,
+      "fontSize": 11,
+      "verticalAlign": "top"
     }
   },
-  "revisionId": "ba089b85-2ed5-49f0-bd59-4334993cfbb6",
+  "formats": {
+    "1": "0.0%",
+    "2": "0.0",
+    "3": "0.00",
+    "4": "#,##0.00",
+    "5": "0.00%",
+    "6": "0%",
+    "7": ""
+  },
+  "borders": {},
+  "revisionId": "START_REVISION",
   "uniqueFigureIds": true,
   "settings": {
     "locale": {
@@ -977,6 +1194,7 @@
   "pivots": {},
   "pivotNextId": 1,
   "customTableStyles": {},
+  "namedRanges": {},
   "globalFilters": [
     {
       "id": "7785b753-917c-4640-a937-4b6226222ca8",
@@ -987,12 +1205,24 @@
   ],
   "lists": {},
   "listNextId": 1,
-  "chartOdooMenusReferences": {
-    "cb548cd5-6798-46c9-ade5-3b497efbfc4a": "accountant.menu_accounting",
-    "151b0f60-aa89-457e-9456-9807ab779be6": "accountant.menu_accounting",
-    "86aac7b2-f3a5-46e1-a097-916aa4b8f8d0": "account_reports.menu_action_account_report_profit_and_loss",
-    "3586cbc4-6ca3-46af-951f-94d4773f94dc": "account_reports.menu_action_account_report_aged_receivable",
-    "57f18f9a-55b7-4b84-b927-480c4c56c026": "account_reports.menu_action_account_report_profit_and_loss",
-    "8f1fb053-5700-4bb3-b93d-55ceb2083d31": "account_reports.menu_action_account_report_aged_payable"
+  "odooLinkReferences": {
+    "cb548cd5-6798-46c9-ade5-3b497efbfc4a": { "type": "odooMenu", "odooMenuId": "accountant.menu_accounting" },
+    "151b0f60-aa89-457e-9456-9807ab779be6": { "type": "odooMenu", "odooMenuId": "accountant.menu_accounting" },
+    "86aac7b2-f3a5-46e1-a097-916aa4b8f8d0": {
+      "type": "odooMenu",
+      "odooMenuId": "accountant.menu_action_account_report_profit_and_loss"
+    },
+    "3586cbc4-6ca3-46af-951f-94d4773f94dc": {
+      "type": "odooMenu",
+      "odooMenuId": "account_reports.menu_action_account_report_aged_receivable"
+    },
+    "57f18f9a-55b7-4b84-b927-480c4c56c026": {
+      "type": "odooMenu",
+      "odooMenuId": "accountant.menu_action_account_report_profit_and_loss"
+    },
+    "8f1fb053-5700-4bb3-b93d-55ceb2083d31": {
+      "type": "odooMenu",
+      "odooMenuId": "account_reports.menu_action_account_report_aged_payable"
+    }
   }
 }

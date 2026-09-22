@@ -54,6 +54,13 @@ class KnowledgeWebsiteController(KnowledgeController):
 
     @http.route('/knowledge/public/children', type="jsonrpc", auth='public')
     def get_public_article_children(self, article_id):
+        """List the direct children of an article.
+
+        :param int article_id: the parent `knowledge.article`.
+        :return: one dict per child article with its `id`, `name` and `icon`, in the order
+            they are displayed.
+        :rtype: list[dict]
+        """
         return request.env['knowledge.article'].search_read(
             [('parent_id', '=', article_id), ('is_article_item', '=', False)],
             ['icon', 'name'],
@@ -62,6 +69,13 @@ class KnowledgeWebsiteController(KnowledgeController):
 
     @http.route('/knowledge/public/article', type="jsonrpc", auth='public')
     def get_public_article_content(self, article_id):
+        """Render a published article.
+
+        :param int article_id: the `knowledge.article` to render.
+        :return: dict holding `content`, the article rendered as HTML.
+        :rtype: dict
+        :raise NotFound: if the article does not exist or is not published.
+        """
         article = self.env['knowledge.article'].browse(article_id)
         if not article or not article.website_published:
             raise NotFound()
@@ -90,6 +104,13 @@ class KnowledgeWebsiteController(KnowledgeController):
 
     @http.route('/knowledge/public/search', type="jsonrpc", auth='public')
     def search_public_article(self, subsite_root_id, search_value):
+        """Search the published articles of a knowledge subsite.
+
+        :param int subsite_root_id: the root `knowledge.article` of the subsite to search in.
+        :param str search_value: the terms to look for.
+        :return: the matching articles, most relevant first.
+        :rtype: list[dict]
+        """
         sorted_articles = request.env['knowledge.article'].get_sorted_articles(
             search_value,
             [('website_published', '=', True), ('id', 'child_of', subsite_root_id)]

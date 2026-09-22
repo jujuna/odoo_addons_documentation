@@ -7,6 +7,7 @@ from odoo.tests import tagged, users
 
 
 @tagged('mail_activity', 'mail_activity_plan')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestActivitySchedule(ActivityScheduleHRCase, SignRequestCommon):
 
     @classmethod
@@ -28,7 +29,6 @@ class TestActivitySchedule(ActivityScheduleHRCase, SignRequestCommon):
                 'responsible_type': 'employee',
             })]
         })
-        cls.employee_3 = cls.employee_coach
 
     @users('admin')
     def test_sign(self):
@@ -43,6 +43,14 @@ class TestActivitySchedule(ActivityScheduleHRCase, SignRequestCommon):
                 'activity_type_id': self.activity_type_todo,
                 'summary': 'Fill in personal information on the website',
             })
-
             last_message = employee.message_ids[0]
-            self.assertIn(f'{self.env.user.name} requested a new signature on the following documents', last_message.body)
+            self.assertIn(
+                self.template_1_role.name,
+                last_message.body,
+                "The requested document's name should appear in the notification message.",
+            )
+            self.assertIn(
+                employee.display_name,
+                last_message.body,
+                f"Employee '{employee.display_name}' should be present in the notification message."
+            )

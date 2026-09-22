@@ -8,6 +8,7 @@ from odoo.tests import tagged
 
 
 @tagged('appointment_google_reserve')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class AppointmentGoogleReserveAPITest(GoogleReserveCommon):
 
     @freeze_time('2022-02-14 07-00-00')
@@ -62,8 +63,8 @@ class AppointmentGoogleReserveAPITest(GoogleReserveCommon):
         - Archive/Restore an appointment.type
         - Unlink an appointment.type """
 
-        db_uuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
-        self.env['ir.config_parameter'].sudo().set_param(
+        db_uuid = self.env['ir.config_parameter'].sudo().get_str('database.uuid')
+        self.env['ir.config_parameter'].sudo().set_str(
             'appointment_google_reserve.google_reserve_iap_endpoint',
             'https://google-reserve.api.odoo.com'
         )
@@ -275,7 +276,7 @@ class AppointmentGoogleReserveAPITest(GoogleReserveCommon):
                     'startTime': '2022-02-14T10:00:00Z',
                     'duration': str(4 * 3600) + 's'  # 4 hours
                 },
-                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             }
         )
 
@@ -297,7 +298,7 @@ class AppointmentGoogleReserveAPITest(GoogleReserveCommon):
                 'booking_values': {
                     'partySize': '6',
                 },
-                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             }
         )
 
@@ -324,7 +325,7 @@ class AppointmentGoogleReserveAPITest(GoogleReserveCommon):
                 'booking_values': {
                     'status': 'CANCELED',
                 },
-                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             }
         )
 
@@ -365,7 +366,7 @@ class AppointmentGoogleReserveAPITest(GoogleReserveCommon):
                 'booking_values': {
                     'status': 'CANCELED',
                 },
-                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             }
         )
 

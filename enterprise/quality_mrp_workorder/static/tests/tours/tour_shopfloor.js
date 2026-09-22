@@ -17,11 +17,9 @@ registry.category("web_tour.tours").add("test_register_sn_production_quality_che
                     name: "TWH/MO/00001",
                     product: "Lovely Product",
                     quantity: "1 Unit",
-                    steps: [
-                        { label: "Lovely Operation", workcenter: "Lovely Workcenter" },
-                    ],
+                    steps: [{ label: "Lovely Operation", workcenter: "Lovely Workcenter" }],
                 });
-            }
+            },
         },
         ...stepUtils.clickOnWorkcenterButton("Lovely Workcenter"),
         {
@@ -32,15 +30,13 @@ registry.category("web_tour.tours").add("test_register_sn_production_quality_che
                     product: "Lovely Product",
                     operation: "Lovely Operation",
                     quantity: "1 Unit",
-                    steps: [
-                        { label: "Lovely Production Registering" },
-                    ],
+                    steps: [{ label: "Lovely Production Registering" }],
                 });
-            }
+            },
         },
         {
             content: "Register a new serial number",
-            trigger: "button.o_btn_icon:has(.fa-plus)",
+            trigger: "button.o_btn_icon:has([data-icon='add'])",
             run: "click",
         },
         {
@@ -49,7 +45,7 @@ registry.category("web_tour.tours").add("test_register_sn_production_quality_che
         },
         {
             trigger:
-                ".modal-content .o_field_widget[name=lot_producing_ids] .dropdown-item:contains(Create \"SN0012\")",
+                '.modal-content .o_field_widget[name=lot_producing_ids] .dropdown-item:contains(Create "SN0012")',
             run: "click",
         },
         { trigger: ".o_field_widget[name='lot_producing_ids'] span.o_tag[aria-label='SN0012']" },
@@ -60,7 +56,7 @@ registry.category("web_tour.tours").add("test_register_sn_production_quality_che
         },
         {
             trigger:
-                ".o_mrp_display_record:has(.card-header:contains(Lovely Operation)) button:contains(Close Production)",
+                ".o_mrp_display_record:has(.card-header:contains(Lovely Operation)) button:contains(Produce)",
         },
     ],
 });
@@ -78,7 +74,7 @@ registry.category("web_tour.tours").add("test_shop_floor_spreadsheet", {
         },
         {
             content: "Open spreadsheet check action",
-            trigger: ".o_mrp_display_record button.btn-primary.o_btn_icon:has(.fa-th)",
+            trigger: ".o_mrp_display_record button.btn-primary.o_btn_icon:has([data-icon='grid_view'])",
             run: "click",
         },
         {
@@ -93,6 +89,83 @@ registry.category("web_tour.tours").add("test_shop_floor_spreadsheet", {
         {
             content: "Ensure we're back on the Shop Floor",
             trigger: ".o_mrp_display",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_quality_fail_message", {
+    steps: () => [
+        ...stepUtils.openWorkcentersSelector(),
+        ...stepUtils.addWorkcenterToDisplay("Assembly Workcenter"),
+        ...stepUtils.confirmWorkcentersSelection(),
+        {
+            content: "Open the workorder.",
+            trigger: ".o_mrp_record_line i[data-icon='chevron_forward']",
+            run: "click",
+        },
+        {
+            content: "Fail the quality check.",
+            trigger: ".o_mrp_record_line i[data-icon='close']",
+            run: "click",
+        },
+        {
+            content: "Press the Ok button on the failure message popup.",
+            trigger: "button.btn-primary:contains('OK')",
+            run: "click",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_mass_produce_backorder_qc", {
+    steps: () => [
+        ...stepUtils.openWorkcentersSelector(),
+        ...stepUtils.confirmWorkcentersSelection(),
+        {
+            content: "Ensure we are on Overview",
+            trigger: ".o_work_center_btn:contains('Overview')",
+        },
+        {
+            content: "Select the MO card to Register Production",
+            trigger:
+                ".o_mrp_display_record:contains('Serial Gadget') button:contains('Quality Checks')",
+            run: "click",
+        },
+        {
+            content: "Pass the Quality Check",
+            trigger: ".modal-content button[name='do_pass']",
+            run: "click",
+        },
+        {
+            content: "Close the production for this unit",
+            trigger: "button:contains('Produce')",
+            run: "click",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_backorder_qc_without_auto_close", {
+    steps: () => [
+        ...stepUtils.openWorkcentersSelector(),
+        ...stepUtils.confirmWorkcentersSelection(),
+        {
+            content: "Ensure we are on Overview",
+            trigger: ".o_work_center_btn:contains('Overview')",
+        },
+        {
+            content: "Open the MO card to perform Quality Checks",
+            trigger:
+                ".o_mrp_display_record:contains('Serial Gadget') button:contains('Quality Checks')",
+            run: "click",
+        },
+        {
+            content: "Pass the Quality Check",
+            trigger: ".modal-content button[name='do_pass']",
+            run: "click",
+        },
+        {
+            content: "Ensure there is no 'Produce' button",
+            trigger:
+                ".o_mrp_display_record:contains('Serial Gadget'):not(:has(button:contains('Produce')))",
         },
     ],
 });

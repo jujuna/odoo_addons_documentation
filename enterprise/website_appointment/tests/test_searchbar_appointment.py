@@ -19,4 +19,4 @@ class TestSearchbarAppointments(HttpCase):
             "schedule_based_on": "resources",
             "is_published" : True,
         })
-        self.start_tour(self.env["website"].get_client_action_url("/"), "test_searchbar_within_appointments", login="admin")
+        self.start_tour(self.env["website"].get_client_action_url("/", True), "test_searchbar_within_appointments", login="admin")

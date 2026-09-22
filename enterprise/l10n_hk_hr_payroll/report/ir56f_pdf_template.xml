@@ -25,15 +25,15 @@
                                 <tr>
                                     <td style="width: 6.5mm;">1.</td>
                                     <td style="width: 150mm;">
-                                        Employer's File No. : <span class="ps-2" t-esc="report_data.get('FileNo')" />
+                                        Employer's File No. : <span class="ps-2" t-out="report_data.get('FileNo')" />
                                     </td>
-                                    <td class="text-end fw-bold fs-5"><span t-esc="report_data.get('ERN')" /></td>
+                                    <td class="text-end fw-bold fs-5"><span t-out="report_data.get('ERN')" /></td>
                                     <td class="text-end" style="width: 11mm;">****</td>
                                 </tr>
                                 <tr>
                                     <td/>
                                     <td colspan="2">
-                                        Name of Employer: <span class="ps-2" t-esc="report_data.get('ErName')" />
+                                        Name of Employer: <span class="ps-2" t-out="report_data.get('ErName')" />
                                     </td>
                                     <td/>
                                     <td/>
@@ -49,15 +49,15 @@
                                 <tr>
                                     <td>2.</td>
                                     <td>
-                                        Name of Employee or Pensioner : <span class="ps-2 text-uppercase" t-esc="report_data.get('Surname')" />, <span class="text-uppercase" t-esc="report_data.get('GivenName')"/>
+                                        Name of Employee or Pensioner : <span class="ps-2 text-uppercase" t-out="report_data.get('Surname')" />, <span class="text-uppercase" t-out="report_data.get('GivenName')"/>
                                     </td>
-                                    <td rowspan="2" class="text-end fw-bold fs-5"><span class="text-uppercase" t-esc="report_data.get('Surname')" /></td>
+                                    <td rowspan="2" class="text-end fw-bold fs-5"><span class="text-uppercase" t-out="report_data.get('Surname')" /></td>
                                     <td class="text-end">****</td>
                                 </tr>
                                 <tr>
                                     <td/>
                                     <td>
-                                        Full name in Chinese : <span class="ps-2" t-esc="report_data.get('NameInChinese')" />
+                                        Full name in Chinese : <span class="ps-2" t-out="report_data.get('NameInChinese')" />
                                     </td>
                                     <td/>
                                 </tr>
@@ -66,7 +66,7 @@
                                     <td>
                                         (a) H.K. Identity Card Number :
                                     </td>
-                                    <td rowspan="2" class="text-end fw-bold fs-5"><span t-esc="report_data.get('HKID') or report_data.get('PpNum')" /></td>
+                                    <td rowspan="2" class="text-end fw-bold fs-5"><span t-out="report_data.get('HKID') or report_data.get('PpNum')" /></td>
                                     <td class="text-end">****</td>
                                 </tr>
                                 <tr>
@@ -82,7 +82,7 @@
                                     <td>
                                         Sex (M = Male, F = Female) :
                                     </td>
-                                    <td class="text-end fw-bold fs-5"><span t-esc="report_data.get('Sex')" /></td>
+                                    <td class="text-end fw-bold fs-5"><span t-out="report_data.get('Sex')" /></td>
                                     <td class="text-end">****</td>
                                 </tr>
                                 <tr>
@@ -90,46 +90,47 @@
                                     <td>
                                         Marital Status (1 = Single / Widowed / Divorced / Living Apart, 2 = Married) :
                                     </td>
-                                    <td class="text-end fw-bold fs-5"><span t-esc="report_data.get('MaritalStatus')" /></td>
+                                    <td class="text-end fw-bold fs-5"><span t-out="report_data.get('MaritalStatus')" /></td>
                                     <td class="text-end">****</td>
                                 </tr>
                                 <tr>
                                     <td>6.</td>
                                     <td colspan="3">
-                                        (a) If married, full name of spouse : <span class="ps-2" t-esc="report_data.get('SpouseName', 'WONG, MEI ME')" />
+                                        (a) If married, full name of spouse : <span class="ps-2" t-out="report_data.get('SpouseName', 'WONG, MEI ME')" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td/>
                                     <td colspan="3">
                                         (b) Spouse's H.K. Identity Card Number / Passport Number and place of issue (if known) :
-                                        <span class="ps-2" t-esc="report_data.get('SpouseHKID') or report_data.get('SpousePpNum')" />
+                                        <span class="ps-2" t-out="report_data.get('SpouseHKID') or report_data.get('SpousePpNum')" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>7.</td>
                                     <td colspan="3">
                                         Residential Address :
-                                        <span class="ps-2" t-esc="report_data.get('employee_address')" />
+                                        <span class="ps-2" t-out="report_data.get('employee_address')" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>8.</td>
                                     <td colspan="3">
                                         Postal Address (if different from item 7 above) :
+                                        <span class="ps-2" t-out="report_data.get('postal_address')" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>9.</td>
                                     <td colspan="3">
-                                        Capacity in which employed : <span class="ps-2" t-esc="report_data.get('Capacity')" />
+                                        Capacity in which employed : <span class="ps-2" t-out="report_data.get('Capacity')" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>10.</td>
                                     <td colspan="3">
                                         Reason for cessation (e.g. resignation, retirement, dismissal, death etc.) :
-                                        <span class="ps-2" t-esc="report_data.get('cessation_reason_str')" />
+                                        <span class="ps-2" t-out="report_data.get('cessation_reason_str')" />
                                     </td>
                                 </tr>
                                 <tr>
@@ -138,9 +139,9 @@
                                         Period of employment from 1 April to the date of cessation of employment :
                                     </td>
                                     <td class="text-end">
-                                        <span class="fw-bold fs-5" t-esc="emp_start_date" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}" />
+                                        <span class="fw-bold fs-5" t-out="emp_start_date" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}" />
                                         <span class="fs-4 px-1">to</span>
-                                        <span class="fw-bold fs-5" t-esc="emp_end_date" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}" />
+                                        <span class="fw-bold fs-5" t-out="emp_end_date" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}" />
                                     </td>
                                     <td class="text-end">****</td>
                                 </tr>
@@ -169,92 +170,126 @@
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(a)</span> Salary/Wages</td>
                                     <td class="text-center">
-                                        <span t-if="report_data.get('AmtOfSalary')" t-esc="emp_period_str" />
+                                        <span t-if="report_data.get('AmtOfSalary')" t-out="emp_period_str" />
                                     </td>
                                     <td class="text-end px-5">
-                                        <span t-if="report_data.get('AmtOfSalary')" t-esc="'{:,}'.format(report_data['AmtOfSalary'])" />
+                                        <span t-if="report_data.get('AmtOfSalary')" t-out="'{:,}'.format(report_data['AmtOfSalary'])" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(b)</span> Leave Pay</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-end px-5"></td>
+                                    <td class="text-center">
+                                        <span t-if="report_data.get('AmtOfLeavePay')" t-out="emp_period_str" />
+                                    </td>
+                                    <td class="text-end px-5">
+                                        <span t-if="report_data.get('AmtOfLeavePay')" t-out="'{:,}'.format(report_data.get('AmtOfLeavePay'))" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(c)</span> Director's Fee</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-end px-5"></td>
+                                    <td class="text-center">
+                                        <span t-if="report_data.get('AmtOfDirectorFee')" t-out="emp_period_str" />
+                                    </td>
+                                    <td class="text-end px-5">
+                                        <span t-if="report_data.get('AmtOfDirectorFee')" t-out="'{:,}'.format(report_data.get('AmtOfDirectorFee'))" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(d)</span> Commission / Fees</td>
                                     <td class="text-center">
-                                        <span t-if="report_data.get('AmtOfCommFee')" t-esc="emp_period_str" />
+                                        <span t-if="report_data.get('AmtOfCommFee')" t-out="emp_period_str" />
                                     </td>
                                     <td class="text-end px-5">
-                                        <span t-if="report_data.get('AmtOfCommFee')" t-esc="'{:,}'.format(report_data['AmtOfCommFee'])" />
+                                        <span t-if="report_data.get('AmtOfCommFee')" t-out="'{:,}'.format(report_data['AmtOfCommFee'])" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(e)</span> Bonus</td>
                                     <td class="text-center">
-                                        <span t-if="report_data.get('AmtOfBonus')" t-esc="emp_period_str" />
+                                        <span t-if="report_data.get('AmtOfBonus')" t-out="emp_period_str" />
                                     </td>
                                     <td class="text-end px-5">
-                                        <span t-if="report_data.get('AmtOfBonus')" t-esc="'{:,}'.format(report_data['AmtOfBonus'])" />
+                                        <span t-if="report_data.get('AmtOfBonus')" t-out="'{:,}'.format(report_data['AmtOfBonus'])" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(f)</span> Back Pay, Payment in Lieu of Notice, Terminal Awards or Gratuities</td>
                                     <td class="text-center">
-                                        <span t-if="report_data.get('AmtOfBpEtc')" t-esc="emp_period_str" />
+                                        <span t-if="report_data.get('AmtOfBpEtc')" t-out="emp_period_str" />
                                     </td>
                                     <td class="text-end px-5">
-                                        <span t-if="report_data.get('AmtOfBpEtc')" t-esc="'{:,}'.format(report_data['AmtOfBpEtc'])" />
+                                        <span t-if="report_data.get('AmtOfBpEtc')" t-out="'{:,}'.format(report_data['AmtOfBpEtc'])" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(g)</span> Certain Payments from Retirement Schemes</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-end px-5"></td>
+                                    <td class="text-center">
+                                        <span t-if="report_data.get('AmtOfPayRetire')" t-out="emp_period_str" />
+                                    </td>
+                                    <td class="text-end px-5">
+                                        <span t-if="report_data.get('AmtOfPayRetire')" t-out="'{:,}'.format(report_data['AmtOfPayRetire'])" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(h)</span> Salaries Tax paid by Employer</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-end px-5"></td>
+                                    <td class="text-center">
+                                        <span t-if="report_data.get('AmtOfSalTaxPaid')" t-out="emp_period_str" />
+                                    </td>
+                                    <td class="text-end px-5">
+                                        <span t-if="report_data.get('AmtOfSalTaxPaid')" t-out="'{:,}'.format(report_data['AmtOfSalTaxPaid'])" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(i)</span> Education Benefits</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-end px-5"></td>
+                                    <td class="text-center">
+                                        <span t-if="report_data.get('AmtOfEduBen')" t-out="emp_period_str" />
+                                    </td>
+                                    <td class="text-end px-5">
+                                        <span t-if="report_data.get('AmtOfEduBen')" t-out="'{:,}'.format(report_data['AmtOfEduBen'])" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(j)</span> Gain realized under Share Option Scheme</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-end px-5"></td>
+                                    <td class="text-center">
+                                        <span t-if="report_data.get('AmtOfGainShareOption')" t-out="emp_period_str" />
+                                    </td>
+                                    <td class="text-end px-5">
+                                        <span t-if="report_data.get('AmtOfGainShareOption')" t-out="'{:,}'.format(report_data['AmtOfGainShareOption'])" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1" colspan="3"><span class="d-inline-block" style="width:6.5mm;">(k)</span> Any other Rewards, Allowances or Perquisites</td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;" /> (1) Nature :
-                                        <span class="ps-2" t-if="report_data.get('AmtOfOtherRAP1')" t-esc="report_data['NatureOtherRAP1']"/>
+                                        <span class="ps-2" t-if="report_data.get('AmtOfOtherRAP1')" t-out="report_data['NatureOtherRAP1']"/>
                                     </td>
                                     <td class="text-center">
-                                        <span t-if="report_data.get('AmtOfOtherRAP1')" t-esc="emp_period_str" />
+                                        <span t-if="report_data.get('AmtOfOtherRAP1')" t-out="emp_period_str" />
                                     </td>
                                     <td class="text-end px-5">
-                                        <span t-if="report_data.get('AmtOfOtherRAP1')" t-esc="'{:,}'.format(report_data['AmtOfOtherRAP1'])" />
+                                        <span t-if="report_data.get('AmtOfOtherRAP1')" t-out="'{:,}'.format(report_data['AmtOfOtherRAP1'])" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;" /> (2) Nature :</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-end px-5"></td>
+                                        <span class="ps-2" t-if="report_data.get('AmtOfOtherRAP2')" t-out="report_data['NatureOtherRAP2']"/>
+                                    <td class="text-center">
+                                        <span t-if="report_data.get('AmtOfOtherRAP2')" t-out="emp_period_str" />
+                                    </td>
+                                    <td class="text-end px-5">
+                                        <span t-if="report_data.get('AmtOfOtherRAP2')" t-out="'{:,}'.format(report_data['AmtOfOtherRAP2'])" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;" /> (3) Nature :</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-end px-5"></td>
+                                        <span class="ps-2" t-if="report_data.get('AmtOfOtherRAP3')" t-out="report_data['NatureOtherRAP3']"/>
+                                    <td class="text-center">
+                                        <span t-if="report_data.get('AmtOfOtherRAP3')" t-out="emp_period_str" />
+                                    </td>
+                                    <td class="text-end px-5">
+                                        <span t-if="report_data.get('AmtOfOtherRAP3')" t-out="'{:,}'.format(report_data['AmtOfOtherRAP3'])" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ps-1"><span class="d-inline-block" style="width:6.5mm;">(l)</span> Payments that have not been declared above but will be made</td>
@@ -277,7 +312,7 @@
                     <div class="row mx-2">
                         <div class="col text-end">
                             <span class="pe-1">Total :</span>
-                            <span class="d-inline-block text-end pe-2 fw-bold fs-5 border-top border-dark" style="width: 7rem; border-bottom:3px double;"><t t-esc="'{:,}'.format(report_data.get('TotalIncome', 0))" /></span>
+                            <span class="d-inline-block text-end pe-2 fw-bold fs-5 border-top border-dark" style="width: 7rem; border-bottom:3px double;"><t t-out="'{:,}'.format(report_data.get('TotalIncome', 0))" /></span>
                             <span class="d-inline-block ps-1">****</span>
                         </div>
                     </div>
@@ -287,19 +322,19 @@
                                 <tr>
                                     <td style="width: 6.5mm;">13.</td>
                                     <td>Particulars of Place of Residence provided (0 = Not provided, 1 = Provided) :</td>
-                                    <td class="text-end fw-bold fs-5"><span t-esc="report_data.get('PlaceOfResInd')"></span></td>
+                                    <td class="text-end fw-bold fs-5"><span t-out="report_data.get('PlaceOfResInd')"></span></td>
                                      <td class="text-end" style="width: 11mm;">****</td>
                                 </tr>
                                 <tr>
                                     <td />
                                     <td colspan="3">
-                                        Address 1 : <span class="ps-2" t-esc="report_data.get('AddrOfPlace1')"/>
+                                        Address 1 : <span class="ps-2" t-out="report_data.get('AddrOfPlace1')"/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td />
                                     <td colspan="3">
-                                        Address 2 : <span class="ps-2" t-esc="report_data.get('AddrOfPlace2')"/>
+                                        Address 2 : <span class="ps-2" t-out="report_data.get('AddrOfPlace2')"/>
                                     </td>
                                 </tr>
                             </table>
@@ -317,38 +352,38 @@
                                 <tr>
                                     <td />
                                     <td>Nature :</td>
-                                    <td class="text-center"><span t-esc="report_data.get('NatureOfPlace1')"/></td>
-                                    <td class="text-center"><span t-esc="report_data.get('NatureOfPlace2')"/></td>
+                                    <td class="text-center"><span t-out="report_data.get('NatureOfPlace1')"/></td>
+                                    <td class="text-center"><span t-out="report_data.get('NatureOfPlace2')"/></td>
                                 </tr>
                                 <tr>
                                     <td />
                                     <td>Period Provided :</td>
-                                    <td class="text-center"><span t-esc="report_data.get('PerOfPlace1')"/></td>
-                                    <td class="text-center"><span t-esc="report_data.get('PerOfPlace2')"/></td>
+                                    <td class="text-center"><span t-out="report_data.get('PerOfPlace1')"/></td>
+                                    <td class="text-center"><span t-out="report_data.get('PerOfPlace2')"/></td>
                                 </tr>
                                 <tr>
                                     <td />
                                     <td>Rent Paid to Landlord by Employer :</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-center"></td>
+                                    <td class="text-center"><span t-if="report_data.get('RentPaidEr1')" t-out="'{:,}'.format(report_data.get('RentPaidEr1'))"/></td>
+                                    <td class="text-center"><span t-if="report_data.get('RentPaidEr2')" t-out="'{:,}'.format(report_data.get('RentPaidEr2'))"/></td>
                                 </tr>
                                 <tr>
                                     <td />
                                     <td>Rent Paid to Landlord by Employee :</td>
-                                    <td class="text-center"><span t-if="report_data.get('RentPaidEe1')" t-esc="'{:,}'.format(report_data['RentPaidEe1'])"/></td>
-                                    <td class="text-center"><span t-if="report_data.get('RentPaidEe2')" t-esc="'{:,}'.format(report_data['RentPaidEe2'])"/></td>
+                                    <td class="text-center"><span t-if="report_data.get('RentPaidEe1')" t-out="'{:,}'.format(report_data['RentPaidEe1'])"/></td>
+                                    <td class="text-center"><span t-if="report_data.get('RentPaidEe2')" t-out="'{:,}'.format(report_data['RentPaidEe2'])"/></td>
                                 </tr>
                                 <tr>
                                     <td />
                                     <td>Rent Refunded to Employee by Employer :</td>
-                                    <td class="text-center"><span t-if="report_data.get('RentRefund1')" t-esc="'{:,}'.format(report_data['RentRefund1'])"/></td>
-                                    <td class="text-center"><span t-if="report_data.get('RentRefund2')" t-esc="'{:,}'.format(report_data['RentRefund2'])"/></td>
+                                    <td class="text-center"><span t-if="report_data.get('RentRefund1')" t-out="'{:,}'.format(report_data['RentRefund1'])"/></td>
+                                    <td class="text-center"><span t-if="report_data.get('RentRefund2')" t-out="'{:,}'.format(report_data['RentRefund2'])"/></td>
                                 </tr>
                                 <tr>
                                     <td />
                                     <td>Rent Paid to Employer by Employee :</td>
-                                    <td class="text-center"></td>
-                                    <td class="text-center"></td>
+                                    <td class="text-center"><span t-if="report_data.get('RentPaidErByEe1')" t-out="'{:,}'.format(report_data.get('RentPaidErByEe1'))"/></td>
+                                    <td class="text-center"><span t-if="report_data.get('RentPaidErByEe2')" t-out="'{:,}'.format(report_data.get('RentPaidErByEe2'))"/></td>
                                 </tr>
                             </table>
                         </div>
@@ -367,7 +402,7 @@
                                 <tr>
                                     <td />
                                     <td>by a non-Hong Kong company (0 = No, 1 = Yes) :</td>
-                                    <td class="text-end fw-bold fs-5">0</td>
+                                    <td class="text-end fw-bold fs-5" t-out="1 if report_data.get('AmtPaidOverseaCo') else 0"/>
                                     <td class="text-end">****</td>
                                 </tr>
                                 <tr>
@@ -385,6 +420,10 @@
                                 <tr>
                                     <td />
                                     <td colspan="3">Amount (if known) (This amount must also be included in item 12) :</td>
+                                    <td class="text-end" t-if="report_data.get('AmtPaidOverseaCo')">
+                                        <span class="fw-bold fs-5" t-out="'{:,}'.format(abs(report_data.get('AmtPaidOverseaCo', 0)))"/>
+                                        <span class="d-inline-block ps-1">****</span>
+                                    </td>
                                 </tr>
 
                             </table>
@@ -403,9 +442,9 @@
                                     <td class="align-middle" style="padding-left: 23mm;">
                                         <div>
                                             Signature :<br/>
-                                            Name : <span t-esc="report_data.get('NAME_OF_SIGNER')" /><br/>
-                                            Designation : <span t-esc="report_data.get('Designation')" /><br/>
-                                            Date : <span t-esc="report_data.get('SubDate')" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}" /><br/>
+                                            Name : <span t-out="report_data.get('NAME_OF_SIGNER')" /><br/>
+                                            Designation : <span t-out="report_data.get('Designation')" /><br/>
+                                            Date : <span t-out="report_data.get('SubDate')" t-options="{'widget': 'date', 'format': 'dd/MM/YYYY'}" /><br/>
                                         </div>
                                     </td>
                                 </tr>
@@ -414,7 +453,7 @@
                                 </tr>
                             </table>
                         </div>
-                        <div class="col-3" style="width:22%; margin-top: -2rem;">
+                        <div class="col-3" style="width:22%;">
                             <div class="border border-dark" style="width: 53mm;">
                                 <div style="height: 38mm;" />
                                 <div class="border-top border-dark text-center py-1" style="font-size: 0.8rem;">For Official Use</div>

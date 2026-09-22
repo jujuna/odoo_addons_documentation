@@ -1,12 +1,9 @@
-import { deserializeDateTime } from "@web/core/l10n/dates";
 import { Reactive } from "@web/core/utils/reactive";
-
 const { DateTime, Interval } = luxon;
 
 export class TimerReactive extends Reactive {
     constructor(env) {
         super();
-        this.orm = env.services.orm;
         this.resetTimer();
     }
 
@@ -41,56 +38,28 @@ export class TimerReactive extends Reactive {
         this.addMinutes(Math.floor(seconds / 60));
     }
 
-    computeOffset(serverTime) {
-        const { seconds } = this.getInterval(DateTime.now(), serverTime)
-            .toDuration(["seconds", "milliseconds"])
-            .toObject();
-        this.serverOffset = seconds;
-    }
-
-    setTimer(timeElapsed, timerStart, serverTime) {
+    setTimer(timeElapsed, timerStart) {
         this.resetTimer();
         this.addFloatTime(timeElapsed);
         this.timeElapsed = this.toSeconds;
-        if (!serverTime && this.serverOffset !== null) {
-            serverTime = timerStart.plus({ seconds: this.serverOffset });
-        }
-        if (timerStart && serverTime) {
-            const dateStart = timerStart;
-            const { hours, minutes, seconds } = this.getInterval(dateStart, serverTime)
-                .toDuration(["hours", "minutes", "seconds", "milliseconds"]) // avoid having milliseconds in seconds attribute
+
+        if (timerStart) {
+            const { hours, minutes, seconds } = this.getInterval(timerStart, this.getCurrentTime())
+                .toDuration(["hours", "minutes", "seconds", "milliseconds"])
                 .toObject();
             this.addHours(hours);
             this.addMinutes(minutes);
             this.addSeconds(seconds);
-        } else if ((timerStart && !serverTime) || (!timerStart && serverTime)) {
-            console.error(
-                "Missing parameter: the timerStart or serverTime when one of them is defined."
-            );
         }
     }
 
     getInterval(dateA, dateB) {
-        let startDate, endDate;
-        if (dateA <= dateB) {
-            startDate = dateA;
-            endDate = dateB;
-        } else {
-            startDate = dateB;
-            endDate = dateA;
-        }
+        const [startDate, endDate] = dateA <= dateB ? [dateA, dateB] : [dateB, dateA];
         return Interval.fromDateTimes(startDate, endDate);
     }
 
     getCurrentTime() {
-        return DateTime.now().plus({ seconds: this.serverOffset });
-    }
-
-    async getServerTime() {
-        const serverTime = deserializeDateTime(
-            await this.orm.call("timer.timer", "get_server_time")
-        );
-        return serverTime.setZone("utc");
+        return DateTime.now();
     }
 
     addFloatTime(timeElapsed) {
@@ -115,6 +84,7 @@ export class TimerReactive extends Reactive {
         this.hours = 0;
         this.minutes = 0;
         this.seconds = 0;
+        this.timeElapsed = 0;
         this.time = "";
     }
 }

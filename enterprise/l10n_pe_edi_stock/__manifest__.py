@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     "name": """Peruvian - Electronic Delivery Note""",
@@ -23,8 +22,6 @@ guide.
         'demo/vehicle.xml',
     ],
     'data': [
-        'security/ir.model.access.csv',
-        'security/delivery_security.xml',
         'data/edi_delivery_guide.xml',
         'views/product_template_view.xml',
         'views/report_deliveryslip.xml',
@@ -32,7 +29,7 @@ guide.
         "views/res_partner_view.xml",
         'views/stock_picking_views.xml',
         'views/vehicle_views.xml',
+        'security/ir.access.csv',
     ],
-    'installable': True,
     'auto_install': True,
 }

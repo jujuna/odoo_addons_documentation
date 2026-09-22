@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-24 16:20+0000\n"
-"Last-Translator: Cuciureanu Larisa <larisa.cuciureanu@nexterp.ro>\n"
-"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:14+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Romanian <https://translate.odoo.com/projects/odoo-master/"
 "account_budget/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -25,25 +25,30 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_budget
+#: model:ir.module.module,description:base.module_account_budget
+msgid ""
+"\n"
+"Use budgets to compare actual with expected revenues and costs\n"
+"--------------------------------------------------------------\n"
+msgstr ""
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_kanban
 msgid ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
-"title=\"Period\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Period\" title=\"Period\"/>"
 msgstr ""
-"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Perioadă\" "
-"title=\"Perioadă\"/>"
+"<i class=\"oi me-1\" data-icon=\"schedule\" role=\"img\" aria-"
+"label=\"Perioadă\" title=\"Perioadă\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+"<i class=\"oi mx-2\" data-icon=\"east\" aria-label=\"to\" title=\"To\"/>"
 msgstr ""
-"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"către\" "
-"title=\"către\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -79,6 +84,11 @@ msgstr "Activități"
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Activitate Excepție Decorare"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__activity_state
@@ -117,6 +127,16 @@ msgid "Analytic Budget"
 msgstr "Buget analitic"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_analytic_line
+msgid "Analytic Line"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model,name:account_budget.model_analytic_plan_fields_mixin
+msgid "Analytic Plan Fields"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__analytical_plan_ids
 msgid "Analytic Plans"
 msgstr "Planuri analitice"
@@ -138,7 +158,6 @@ msgstr "Ambele"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_analytic
-#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_report__line_type__budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -156,6 +175,8 @@ msgid "Budget %s"
 msgstr "Buget %s"
 
 #. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_account_bank_statement_line__budget_analytic_ids
+#: model:ir.model.fields,field_description:account_budget.field_account_move__budget_analytic_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_analytic_id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_analytic_id
 msgid "Budget Analytic"
@@ -165,6 +186,7 @@ msgstr "Buget analitic"
 #: model:ir.model,name:account_budget.model_budget_line
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__budget_line_ids
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_line_id
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budget Line"
 msgstr "Linie Buget"
 
@@ -181,6 +203,11 @@ msgstr "Linie Buget"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_tree
 msgid "Budget Lines"
 msgstr "Linii buget"
+
+#. module: account_budget
+#: model:ir.module.module,shortdesc:base.module_account_budget
+msgid "Budget Management"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__name
@@ -223,17 +250,18 @@ msgid "Budget end date may not be before the starting date."
 msgstr "Data de sfârșit a bugetului nu poate fi anterioară datei de început."
 
 #. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "Budgeted"
 msgstr "Bugetat"
 
 #. module: account_budget
 #. odoo-python
+#: code:addons/account_budget/models/account_move.py:0
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 #: model:ir.actions.act_window,name:account_budget.act_budget_analytic_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_account_analytic_account_form_inherit_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:account_budget.view_move_form_inherit_budget
 msgid "Budgets"
 msgstr "Bugete"
 
@@ -241,11 +269,6 @@ msgstr "Bugete"
 #: model:ir.actions.act_window,name:account_budget.act_budget_lines_view
 msgid "Budgets Analysis"
 msgstr "Analiză Bugete"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "Cancel"
-msgstr "Anulați"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
@@ -261,6 +284,13 @@ msgstr "Anulat"
 #: model_terms:ir.actions.act_window,help:account_budget.act_budget_analytic_view
 msgid "Click to create a new budget."
 msgstr "Clic aici pentru a crea un buget nou."
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget
+#: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
+msgid "Commitment"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__company_id
@@ -291,6 +321,7 @@ msgstr "Moneda"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__date
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
+#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_line_search
 msgid "Date"
 msgstr "Dată"
@@ -308,6 +339,9 @@ msgstr "Descriere"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__display_name
+#: model:ir.model.fields,field_description:account_budget.field_account_move__display_name
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__display_name
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__display_name
@@ -360,16 +394,6 @@ msgid "Followers (Partners)"
 msgstr "Urmăritori (Parteneri)"
 
 #. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Pictogramă minunată pentru font, de ex. fa-sarcini"
-
-#. module: account_budget
-#: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
-msgid "From"
-msgstr "De la"
-
-#. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Future Activities"
 msgstr "Activități viitoare"
@@ -392,6 +416,9 @@ msgstr "Are mesaj"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__id
+#: model:ir.model.fields,field_description:account_budget.field_account_analytic_line__id
+#: model:ir.model.fields,field_description:account_budget.field_account_move__id
+#: model:ir.model.fields,field_description:account_budget.field_analytic_plan_fields_mixin__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__id
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__id
@@ -436,6 +463,11 @@ msgid "Is Follower"
 msgstr "Este urmăritor"
 
 #. module: account_budget
+#: model:ir.model,name:account_budget.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__write_uid
 #: model:ir.model.fields,field_description:account_budget.field_budget_split_wizard__write_uid
@@ -453,6 +485,17 @@ msgstr "Ultima actualizare pe"
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search
 msgid "Late Activities"
 msgstr "Activități întârziate"
+
+#. module: account_budget
+#: model:ir.model.fields,field_description:account_budget.field_budget_line__liquidation_amount
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__liquidation
+msgid "Liquidation"
+msgstr ""
+
+#. module: account_budget
+#: model:ir.model.fields,help:account_budget.field_budget_analytic__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_has_error
@@ -707,24 +750,13 @@ msgstr "Tipul activității de excepție din înregistrare."
 #. module: account_budget
 #: model_terms:ir.actions.act_window,help:account_budget.act_budget_analytic_view
 msgid "Use budgets to compare actual with expected revenues and costs"
-msgstr ""
-"Utilizați bugetele pentru a compara veniturile și costurile preconizate"
+msgstr "Utilizați bugetele pentru a compara veniturile și costurile preconizate"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__user_id
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 msgid "User"
 msgstr "Utilizator"
-
-#. module: account_budget
-#: model:ir.model.fields,field_description:account_budget.field_budget_analytic__website_message_ids
-msgid "Website Messages"
-msgstr "Mesaje Website"
-
-#. module: account_budget
-#: model:ir.model.fields,help:account_budget.field_budget_analytic__website_message_ids
-msgid "Website communication history"
-msgstr "Istoric comunicare website"
 
 #. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_split_wizard__period__year
@@ -753,138 +785,3 @@ msgstr "ex. Buget 2023"
 #: code:addons/account_budget/wizards/budget_split_wizard.py:0
 msgid "id"
 msgstr "id"
-
-#~ msgid ""
-#~ "\"End Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr ""
-#~ "\"End Date\" din linia bugetară ar trebui să fie inclusă în perioada "
-#~ "bugetului"
-
-#~ msgid ""
-#~ "\"Start Date\" of the budget line should be included in the Period of the "
-#~ "budget"
-#~ msgstr ""
-#~ "\"Start Date\" din linia bugetară ar trebui să fie inclusă în perioada "
-#~ "bugetului"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Period\" "
-#~ "title=\"Period\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-clock-o\" role=\"Perioadă\" aria-label=\"Period\" "
-#~ "title=\"Perioadă\"/>"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
-#~ "title=\"Arrow\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
-#~ "title=\"Arrow\"/>"
-
-#~ msgid "Accounts"
-#~ msgstr "Conturi"
-
-#~ msgid "Achievement"
-#~ msgstr "Realizare"
-
-#~ msgid "Amount really earned/spent."
-#~ msgstr "Suma câștigată/cheluită cu adevărat."
-
-#~ msgid "Amount you are supposed to have earned/spent at this date."
-#~ msgstr ""
-#~ "Suma despre care se presupune că ați câștigat / cheltuit la această dată."
-
-#~ msgid ""
-#~ "Amount you plan to earn/spend. Record a positive amount if it is a "
-#~ "revenue and a negative amount if it is a cost."
-#~ msgstr ""
-#~ "Suma pe care intenționați să o câștigați / cheltuiți. Înregistrați o sumă "
-#~ "pozitivă dacă este un venit și o sumă negativă dacă este un cost."
-
-#~ msgid "Analytic Plan"
-#~ msgstr "Plan analitic"
-
-#~ msgid "Approve"
-#~ msgstr "Aprobă"
-
-#~ msgid "Budget Items"
-#~ msgstr "Elemente bugetare"
-
-#~ msgid "Budgetary Position"
-#~ msgstr "Pozitie Bugetara"
-
-#~ msgid "Budgetary Positions"
-#~ msgstr "Pozitii bugetare"
-
-#~ msgid "Cancelled"
-#~ msgstr "Anulat"
-
-#~ msgid ""
-#~ "Comparison between practical and theoretical amount. This measure tells "
-#~ "you if you are below or over budget."
-#~ msgstr ""
-#~ "Comparație între cantitatea practică și cea teoretică. Această măsură vă "
-#~ "indică dacă sunteți sub sau peste buget."
-
-#~ msgid "Confirm"
-#~ msgstr "Confirmă"
-
-#~ msgid "Confirmed"
-#~ msgstr "Confirmat"
-
-#~ msgid "Entries..."
-#~ msgstr "Înregistrări"
-
-#~ msgid "Group By"
-#~ msgstr "Grupează după"
-
-#~ msgid "Name"
-#~ msgstr "Nume"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Număr de mesaje ce necesită intervenție"
-
-#~ msgid "Paid Date"
-#~ msgstr "Data platii"
-
-#~ msgid "Planned Amount"
-#~ msgstr "Suma planificată"
-
-#~ msgid "Planned amount"
-#~ msgstr "Suma planificată"
-
-#~ msgid "Practical Amount"
-#~ msgstr "Valoarea Efectivă"
-
-#~ msgid "Show all records which has next action date is before today"
-#~ msgstr ""
-#~ "Afișați toate înregistrările care au data următoarei acțiuni în trecut"
-
-#~ msgid "The budget must have at least one account."
-#~ msgstr "Bugetul trebuie să aibă cel puțin un cont."
-
-#~ msgid "Theoretical Amount"
-#~ msgstr "Valoare teoretică"
-
-#~ msgid "Theoretical amount"
-#~ msgstr "Valoare teoretică"
-
-#~ msgid "To"
-#~ msgstr "Către"
-
-#~ msgid "To Approve"
-#~ msgstr "De aprobat"
-
-#~ msgid "To Approve Budgets"
-#~ msgstr "Bugete pentru aprobare"
-
-#~ msgid "Validated"
-#~ msgstr "Validat"
-
-#~ msgid ""
-#~ "You have to enter at least a budgetary position or analytic account on a "
-#~ "budget line."
-#~ msgstr ""
-#~ "Trebuie să introduceți cel puțin o poziție bugetară sau un cont analitic "
-#~ "pe o linie bugetară."

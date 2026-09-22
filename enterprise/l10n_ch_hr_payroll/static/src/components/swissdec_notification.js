@@ -1,12 +1,12 @@
 /** @odoo-module **/
-import {Component} from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class SwissdecNotification extends Component {
     static template = "swissdec_notification_template";
-    static props = {
-        type: { type: String },
-        notifications: { type: Array }
-    };
+    props = useProps({
+        type: t.string(),
+        notifications: t.array(),
+    });
 }
 
 export default SwissdecNotification;

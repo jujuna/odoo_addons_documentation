@@ -25,8 +25,6 @@
         <field name="iot_id" ref="iot_box_shop"/>
         <field name="identifier">printer_identifier</field>
         <field name="type">printer</field>
-        <field name="subtype">receipt_printer</field>
-        <field name="manufacturer"></field>
         <field name="connection">network</field>
         <field name="connected_status">disconnected</field>
     </record>
@@ -36,17 +34,15 @@
         <field name="iot_id" ref="iot_box_shop"/>
         <field name="identifier">scanner_identifier</field>
         <field name="type">scanner</field>
-        <field name="manufacturer"></field>
         <field name="connection">direct</field>
         <field name="connected_status">disconnected</field>
     </record>
 
     <record id="iot_payment" model="iot.device">
-        <field name="name">Payment Terminal</field>
+        <field name="name">IoT Payment Terminal</field>
         <field name="iot_id" ref="iot_box_shop"/>
-        <field name="identifier">payment_identifier</field>
+        <field name="identifier">12345678</field>
         <field name="type">payment</field>
-        <field name="manufacturer"></field>
         <field name="connection">network</field>
         <field name="connected_status">disconnected</field>
     </record>
@@ -56,7 +52,6 @@
         <field name="iot_id" ref="iot_box_shop"/>
         <field name="identifier">scale_identifier</field>
         <field name="type">scale</field>
-        <field name="manufacturer"></field>
         <field name="connection">serial</field>
         <field name="connected_status">disconnected</field>
     </record>
@@ -66,9 +61,9 @@
         <field name="iot_id" ref="iot_box_shop"/>
         <field name="identifier">display_identifier</field>
         <field name="type">display</field>
-        <field name="manufacturer"></field>
         <field name="connection">hdmi</field>
         <field name="connected_status">disconnected</field>
+        <field name="display_orientation">normal</field>
     </record>
 
     <record id="iot_fdm" model="iot.device">
@@ -76,7 +71,6 @@
         <field name="iot_id" ref="iot_box_shop"/>
         <field name="identifier">fdm_identifier</field>
         <field name="type">fiscal_data_module</field>
-        <field name="manufacturer"></field>
         <field name="connection">serial</field>
         <field name="connected_status">disconnected</field>
     </record>
@@ -86,7 +80,6 @@
         <field name="iot_id" ref="iot_box_workshop"/>
         <field name="identifier">keyboard_identifier</field>
         <field name="type">keyboard</field>
-        <field name="manufacturer"></field>
         <field name="connection">direct</field>
         <field name="connected_status">disconnected</field>
     </record>
@@ -96,7 +89,6 @@
         <field name="iot_id" ref="iot_box_workshop"/>
         <field name="identifier">camera_identifier</field>
         <field name="type">camera</field>
-        <field name="manufacturer"></field>
         <field name="connection">direct</field>
         <field name="connected_status">disconnected</field>
     </record>
@@ -106,7 +98,6 @@
         <field name="iot_id" ref="iot_box_workshop"/>
         <field name="identifier">device_identifier</field>
         <field name="type">device</field>
-        <field name="manufacturer"></field>
         <field name="connection">bluetooth</field>
         <field name="connected_status">disconnected</field>
     </record>
@@ -116,7 +107,6 @@
         <field name="iot_id" ref="iot_box_workshop"/>
         <field name="identifier">unsupported_identifier</field>
         <field name="type">unsupported</field>
-        <field name="manufacturer"></field>
         <field name="connection">serial</field>
         <field name="connected_status">disconnected</field>
     </record>

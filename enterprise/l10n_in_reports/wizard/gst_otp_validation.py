@@ -50,11 +50,23 @@ class L10n_InGstOtpValidation(models.TransientModel):
         self._l10n_in_reports_gstr_check_gst_token()
         response = self.env["account.return"]._l10n_in_gstr_otp_request(self.company_id)
 
-        if response.get('error'):
-            error_message = "\n".join(["[%s] %s" % (error.get('code'), error.get('message')) for error in response.get("error", {})])
-            raise UserError(error_message)
-        else:
-            self.gst_token = response.get("txn")
+        error_message_list = []
+        for error in response.get('error', []):
+            code = error.get('code')
+            message = error.get('message')
+            if code == 'AUTH4041':
+                message = self.env._(
+                    "%(message)s\nHint: Please confirm that GST E-filing Username(%(username)s) is associated with GST Number(%(vat)s).",
+                    message=message,
+                    username=self.company_id.l10n_in_gstr_gst_username,
+                    vat=self.company_id.vat,
+                )
+            error_message_list.append(f"[{code}] {message}")
+
+        if error_message_list:
+            raise UserError("\n".join(error_message_list))
+
+        self.gst_token = response.get("txn")
         form = self.env.ref("l10n_in_reports.view_validate_otp_gstr")
         return {
             "name": _("OTP Request"),
@@ -79,6 +91,11 @@ class L10n_InGstOtpValidation(models.TransientModel):
             "l10n_in_gstr_gst_token": self.gst_token,
             "l10n_in_gstr_gst_token_validity": fields.Datetime.now() + timedelta(hours=6)
         })
+        # trigger token refresh cron before expired
+        cron = self.env.ref("l10n_in_reports.ir_cron_auto_refresh_gst_token")
+        if cron.sudo().interval_type == 'hours':
+            cron.sudo().write({'interval_type': 'months', 'interval_number': 9999})
+        cron._trigger(fields.Datetime.now() + timedelta(hours=5, minutes=54))
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',

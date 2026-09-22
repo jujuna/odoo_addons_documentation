@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from datetime import datetime, time, timedelta
 from odoo import _, api, fields, models
+from odoo.addons.mail.tools.discuss import Store
 
 
 class ResourceResource(models.Model):
@@ -14,6 +15,9 @@ class ResourceResource(models.Model):
         compute='_compute_default_role_id', groups='hr.group_hr_user', store=True, readonly=False,
         help="Role that will be selected by default when creating a shift for this resource.\n"
              "This role will also have precedence over the other roles of the resource when planning shifts.")
+    assigned_employee_id = fields.Many2one('hr.employee', string="Assigned To",
+       help="When assigning this employee to a shift, the related material will automatically be assigned as well.")
+    job_id = fields.Many2one('hr.job', string="Job Position", related='employee_id.job_id', store=True, readonly=True)
 
     @api.depends('role_ids')
     def _compute_default_role_id(self):
@@ -52,14 +56,17 @@ class ResourceResource(models.Model):
         return resources
 
     @api.depends('employee_id')
-    @api.depends_context('show_job_title')
+    @api.depends_context('show_job_title', 'formatted_display_name')
     def _compute_display_name(self):
         if not self.env.context.get('show_job_title'):
             return super()._compute_display_name()
         for resource in self:
             resource_default_role_id = resource.sudo().default_role_id
             if resource.resource_type == 'material' and resource_default_role_id:
-                resource.display_name = _("%(resource_name)s (%(role)s)", resource_name=resource.name, role=resource_default_role_id.name)
+                if self.env.context.get('formatted_display_name'):
+                    resource.display_name = _("%(resource_name)s \t --(%(role)s)--", resource_name=resource.name, role=resource_default_role_id.name)
+                else:
+                    resource.display_name = _("%(resource_name)s (%(role)s)", resource_name=resource.name, role=resource_default_role_id.name)
             else:
                 resource.display_name = resource.employee_id.display_name if resource.employee_id else resource.name
 
@@ -67,11 +74,10 @@ class ResourceResource(models.Model):
         res = super().action_archive()
         departure_date = datetime.combine(fields.Date.context_today(self) + timedelta(days=1), time.min)
         planning_slots = self.env['planning.slot'].sudo().search([
-            ('resource_id', 'in', self.ids),
-            ('resource_type', '=', 'material'),
+            ('resource_ids', 'in', self.filtered(lambda r: r.resource_type == 'material').ids),
             ('end_datetime', '>=', departure_date),
         ])
-        planning_slots._manage_archived_resources(departure_date)
+        planning_slots._manage_archived_resources(self, departure_date)
         return res
 
     @api.onchange('company_id')
@@ -79,16 +85,15 @@ class ResourceResource(models.Model):
         if self.resource_type != 'material' or not self.env.context.get('from_planning'):
             super()._onchange_company_id()
 
-    def get_avatar_card_data(self, fields):
-        if self.env.user.has_group('hr.group_hr_user'):
-            fields.append('default_role_id')
-        result = super().get_avatar_card_data(fields)
-        if not result:
-            return []
-        roles_ids = result[0].get('role_ids')
-        if roles_ids:
-            result[0]['role_ids'] = self.env['planning.role'].search_read(
-                domain=[('id', 'in', roles_ids)],
-                fields=['name', 'color'],
-            )
-        return result
+    def _store_avatar_card_fields(self, res: Store.FieldList):
+        super()._store_avatar_card_fields(res)
+        res.many("role_ids", ["color", "name"])
+        if res.target_user().has_group("hr.group_hr_user"):
+            res.one("default_role_id", [])
+
+    def get_materials_assigned_to_human_resources(self):
+        return self.search([
+            ('id', 'not in', self.ids),
+            ('resource_type', '=', 'material'),
+            ('assigned_employee_id.resource_id', 'in', self.ids),
+        ])

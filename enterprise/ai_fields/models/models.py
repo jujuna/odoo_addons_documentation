@@ -5,13 +5,18 @@ import collections
 import logging
 
 from odoo import _, api, Command, models
-from odoo.addons.ai_fields.tools import get_ai_value, get_field_prompt_vals, get_property_prompt_vals, parse_ai_prompt_values
+from odoo.addons.ai.utils.ai_fields_tools import get_ai_value, get_field_prompt_vals, get_property_prompt_vals, parse_ai_prompt_values
 from odoo.exceptions import AccessError
 from odoo.fields import Domain
 from odoo.tools import html_sanitize
 
 
 _logger = logging.getLogger(__name__)
+
+# It doesn't make sense to have AI fields set anything on those
+# models. Moreover, they can trigger stable cache invalidation and
+# make requests heavier
+MODELS_NO_AI = ["ir.config_parameter", "bus.bus"]
 
 
 class Base(models.AbstractModel):
@@ -21,33 +26,39 @@ class Base(models.AbstractModel):
     #  Overrides  #
     ###############
 
-    @api.model
-    def _create(self, data_list):
+    @api.model_create_multi
+    def create(self, vals_list):
         """When a record of a model with an ai field or property is created, trigger the cron to
         fill the ai fields/properties.
         """
+        res = super().create(vals_list)
+        IrModelFields = self.env["ir.model.fields"]
         trigger_cron = False
-        for field in self._fields.values():
-            if field.type == 'properties':
-                values = [d['stored'].get(field.name) for d in data_list]
-                if any(p.get('ai') and p.get('system_prompt') for value in values for p in (value or [])):
-                    trigger_cron = True
-                    break
-            elif field.type in ('char', 'text', 'html') and hasattr(field, 'ai') and field.ai:
-                trigger_cron = True
-                break
+        if self._name not in MODELS_NO_AI:
+            for field in self._fields.values():
+                if field.type == 'properties':
+                    definitions = [field._get_properties_definition(record) or [] for record in res]
+                    if any(field_def.get("ai") and field_def.get("system_prompt") for d in definitions for field_def in d):
+                        trigger_cron = True
+                        break
+                elif field.type in ('char', 'text', 'html'):
+                    ai_params = IrModelFields._get_field_ai_parameters(field)
+                    if ai_params.get("prompt"):
+                        trigger_cron = True
+                        break
 
         if trigger_cron and (ai_fields_cron := self.env.ref('ai_fields.ir_cron_fill_ai_fields', raise_if_not_found=False)):
             ai_fields_cron._trigger()
-
-        return super()._create(data_list)
+        return res
 
     @api.model
     def fields_get(self, allfields=None, attributes=None):
         res = super().fields_get(allfields, attributes)
+        IrModelFields = self.env["ir.model.fields"]
         if attributes is None or 'ai' in attributes:
             for fname, val in res.items():
-                val['ai'] = hasattr(self._fields[fname], 'ai') and self._fields[fname].ai
+                ai_params = IrModelFields._get_field_ai_parameters(self._fields[fname])
+                val['ai'] = "prompt" in ai_params and (ai_params['prompt'] or '')
         return res
 
     def write(self, vals):
@@ -57,7 +68,6 @@ class Base(models.AbstractModel):
         res = super().write(vals)
         if not self:
             return res
-
         trigger_cron = False
         for field in self._fields.values():
             if field.type == 'properties':
@@ -134,12 +144,19 @@ class Base(models.AbstractModel):
 
         :return None
         """
-        if field_prompt is None and not (hasattr(field, 'ai') and field.ai):
+        ai_params = self.env["ir.model.fields"]._get_field_ai_parameters(field)
+        if field_prompt is None and not ai_params.get('prompt'):
             raise ValueError(f"The field {field.name} has no AI prompt")
         user_prompt, context_fields, allowed_values = get_field_prompt_vals(self.env, field, field_prompt)
         for record in self:
             try:
-                record[field.name] = get_ai_value(record, field.type, user_prompt, context_fields, allowed_values)
+                record[field.name] = get_ai_value(
+                    record,
+                    {'type': field.type, 'name': field.name, 'description': field.string},
+                    user_prompt,
+                    context_fields,
+                    allowed_values,
+                )
             except Exception as e:  # noqa: BLE001
                 _logger.info("Could not get a value for an AI Field (%s on %s): %s", field.name, field.model_name, e)
                 if field.type in ('char', 'text', 'html'):
@@ -160,7 +177,13 @@ class Base(models.AbstractModel):
         properties = {v['id']: v[fname] for v in self.read([fname])}
         for record in self:
             try:
-                value = get_ai_value(record, property_definition.get('type'), user_prompt, context_fields, allowed_values)
+                value = get_ai_value(
+                    record,
+                    {'type': property_definition['type'], 'name': property_definition.get('string')},
+                    user_prompt,
+                    context_fields,
+                    allowed_values,
+                )
             except Exception as e:  # noqa: BLE001
                 _logger.info("Could not get a value for an AI property (%s in %s on %s): %s", property_definition['name'], fname, self._name, e)
                 value = False  # prevent query llm again for the property (unresolvable/timeout)
@@ -190,14 +213,21 @@ class Base(models.AbstractModel):
         field = self._fields.get(fname)
         if not field:
             raise ValueError(f"The field {fname} is not defined on {self._name}")
-        if not (hasattr(field, 'ai') and field.ai):
+        ai_params = self.env["ir.model.fields"]._get_field_ai_parameters(field)
+        if not ai_params.get("prompt"):
             raise ValueError(f"The field {fname} has no AI prompt")
         user_prompt, context_fields, allowed_values = get_field_prompt_vals(self.env, field)
         if field.type in ('many2many', 'many2one') and not allowed_values:
             # add most frequent records if no record in prompt
             records = self.ai_find_default_records(field.comodel_name, field.domain, fname)
             allowed_values = {r.id: r.display_name for r in records}
-        val = get_ai_value(record, field.type, user_prompt, context_fields, allowed_values)  # currency?
+        val = get_ai_value(
+            record,
+            {'type': field.type, 'name': field.name, 'description': field.string},
+            user_prompt,
+            context_fields,
+            allowed_values,
+        )  # currency?
         if field.type == 'many2one':
             return bool(val) and self.env[field.comodel_name].browse(val).read(['id', 'display_name'])[0]
         elif field.type == 'many2many':
@@ -246,7 +276,13 @@ class Base(models.AbstractModel):
             # add most frequent records if no record in prompt
             records = self.ai_find_default_records(property_definition.get('comodel'), property_definition.get('domain'), fname, pname)
             allowed_values = {r.id: r.display_name for r in records}
-        val = get_ai_value(record, property_type, user_prompt, context_fields, allowed_values)
+        val = get_ai_value(
+            record,
+            {'type': property_definition['type'], 'name': property_definition['name'], 'description': property_definition.get('string')},
+            user_prompt,
+            context_fields,
+            allowed_values,
+        )
         if property_type == 'many2one':
             return bool(val) and self.env[property_definition['comodel']].browse(val).read(['id', 'display_name'])[0]
         if property_type == 'many2many':
@@ -260,7 +296,7 @@ class Base(models.AbstractModel):
 
         Note that `field_name` can be empty, when creating new field in studio.
         """
-        limit = int(self.env['ir.config_parameter'].sudo().get_param('ai_field.insert_x_first_records', '200'))
+        limit = self.env['ir.config_parameter'].sudo().get_int('ai_field.insert_x_first_records') or 200
         domain = ast.literal_eval(domain or "[]") if isinstance(domain, str) else (domain or [])
 
         if field_name and not self._fields[field_name].store:

@@ -1,16 +1,16 @@
+import { Component, t, useProps } from "@odoo/owl";
+import { Dialog } from "@web/core/dialog/dialog";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { Component } from "@odoo/owl";
-import { Dialog } from "@web/core/dialog/dialog";
 
 class PauseCardWarning extends Component {
     static template = "hr_expense_stripe.pauseCardWarningDialog";
     static components = { Dialog };
 
-    static props = {
-        action: Object,
-        close: Function
-    };
+    props = useProps({
+        action: t.object(),
+        close: t.function(),
+    });
 
     setup() {
         this.card_id = this.props.action.params.res_id;
@@ -21,7 +21,6 @@ class PauseCardWarning extends Component {
         this.notification = useService("notification");
 
         this.close = this.props.close;
-
     }
 
     // Common
@@ -32,12 +31,11 @@ class PauseCardWarning extends Component {
 }
 
 export function PauseCardAction(env, action) {
+    const dialog = useService("dialog");
     return new Promise((resolve) => {
-        env.services.dialog.add(
+        dialog.add(
             PauseCardWarning,
-            {
-                action
-            },
+            { action },
             {
                 onClose: () => {
                     resolve({ type: "ir.actions.act_window_close" });

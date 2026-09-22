@@ -1,7 +1,7 @@
 from itertools import product
+
 from werkzeug.urls import url_encode
 
-from odoo import http
 from odoo.tests import tagged
 
 from .test_appointment_ui import AppointmentUICommon
@@ -42,7 +42,7 @@ class AppointmentControllerSecurity(AppointmentUICommon):
                 self.authenticate(login, login)
                 res = self.url_open(
                     appointment_url,
-                    data=base_appointment_data | ({"csrf_token": http.Request.csrf_token(self)} if with_csrf else {}),
+                    data=base_appointment_data | ({"csrf_token": self.csrf_token()} if with_csrf else {}),
                 )
 
                 if not login or with_csrf:

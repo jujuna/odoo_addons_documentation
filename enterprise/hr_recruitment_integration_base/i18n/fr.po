@@ -4,22 +4,33 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-18 13:51+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 03:37+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "hr_recruitment_integration_base/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_recruitment_integration_base
+#: model:ir.module.module,description:base.module_hr_recruitment_integration_base
+msgid ""
+"\n"
+"Base module for recruitment integration.\n"
+"========================================\n"
+"This module provides a base for the integration of recruitment with "
+"external\n"
+"api from different job boards like indeed, monster, linkedin, etc.\n"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -78,7 +89,12 @@ msgstr "Activités"
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "Activité exception décoration"
+msgstr "Indicateur d’exception d’activité"
+
+#. module: hr_recruitment_integration_base
+#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_plans_ids
+msgid "Activity Plans"
+msgstr "Plans d'activité"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__activity_state
@@ -148,11 +164,6 @@ msgid "Avatar 512"
 msgstr "Avatar 512"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__biweekly
-msgid "Bi-Week"
-msgstr "Bihebdomadaire"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_form
 msgid "Campaign Duration"
 msgstr "Durée de la campagne"
@@ -200,11 +211,6 @@ msgstr "La campagne débutera le %(start_date)s"
 #: code:addons/hr_recruitment_integration_base/wizard/hr_recruitment_post.py:0
 msgid "Can't postpone posts that are already posted"
 msgstr "Impossible de reporter les publications déjà publiées"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
-msgid "Cancel"
-msgstr "Annuler"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__company_id
@@ -256,11 +262,6 @@ msgid "Created on"
 msgstr "Créé le"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__currency_id
-msgid "Currency"
-msgstr "Devise"
-
-#. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_recruitment_post_job_wizard__api_data
 msgid "Data"
 msgstr "Données"
@@ -274,11 +275,6 @@ msgstr "Date début"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__date_to
 msgid "Date To"
 msgstr "Date de fin"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__daily
-msgid "Day"
-msgstr "Jour"
 
 #. module: hr_recruitment_integration_base
 #. odoo-javascript
@@ -365,11 +361,6 @@ msgid "Followers (Partners)"
 msgstr "Abonnés (Partenaires)"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Icône Font Awesome par ex. fa-tasks"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
 msgid "From"
 msgstr "Du"
@@ -378,11 +369,6 @@ msgstr "Du"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__has_message
 msgid "Has Message"
 msgstr "A un message"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__hourly
-msgid "Hour"
-msgstr "Heure"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_applicant__id
@@ -542,9 +528,9 @@ msgid "Last Updated on"
 msgstr "Mis à jour le"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__salary_max
-msgid "Maximum Salary"
-msgstr "Salaire maximum"
+#: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_has_error
@@ -555,11 +541,6 @@ msgstr "Erreur d'envoi du message"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_ids
 msgid "Messages"
 msgstr "Messages"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__salary_min
-msgid "Minimum Salary"
-msgstr "Salaire minimum"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_recruitment_post_job_wizard_view_form
@@ -575,11 +556,6 @@ msgstr "Date de fin de mission"
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_recruitment_post_job_wizard__date_from
 msgid "Mission date start"
 msgstr "Date de début de mission"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__monthly
-msgid "Month"
-msgstr "Mois"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__my_activity_date_deadline
@@ -687,11 +663,6 @@ msgstr "Publier maintenant"
 
 #. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
-msgid "Post on Job Boards"
-msgstr "Publier sur les sites d’emploi"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
 msgid "Posts"
 msgstr "Posts"
 
@@ -753,6 +724,11 @@ msgid "Recruiter"
 msgstr "Recruteur"
 
 #. module: hr_recruitment_integration_base
+#: model:ir.module.module,shortdesc:base.module_hr_recruitment_integration_base
+msgid "Recruitment Integration Base"
+msgstr ""
+
+#. module: hr_recruitment_integration_base
 #: model:ir.model,name:hr_recruitment_integration_base.model_hr_recruitment_platform
 msgid "Recruitment Platform"
 msgstr "Plateforme de recrutement"
@@ -763,19 +739,15 @@ msgid "Responsible User"
 msgstr "Utilisateur responsable"
 
 #. module: hr_recruitment_integration_base
+#. odoo-javascript
+#: code:addons/hr_recruitment_integration_base/static/src/widget/integration_state_selection.js:0
+msgid "Ribbon"
+msgstr ""
+
+#. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Erreur d'envoi SMS"
-
-#. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
-msgid "Salary Range"
-msgstr "Plage salariale"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__payment_interval
-msgid "Salary Time Unit"
-msgstr "Unité de temps du salaire"
 
 #. module: hr_recruitment_integration_base
 #: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_recruitment_post_job_wizard__apply_method__email
@@ -814,9 +786,9 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "Statut basé sur les activités\n"
-"En retard : la date d'échéance est déjà dépassée\n"
+"En retard : l'échéance est déjà dépassée\n"
 "Aujourd'hui : la date d'activité est aujourd'hui\n"
-"Planifiée : activités futures"
+"Planifié : activités futures."
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -846,8 +818,8 @@ msgid ""
 "job             position. The Recruiter is automatically added to all "
 "meetings with the Applicant."
 msgstr ""
-"Le recruteur devient la valeur par défaut pour tous les candidats à "
-"ce             poste. Le recruteur est automatiquement ajouté à toutes les "
+"Le recruteur devient la valeur par défaut pour tous les candidats à ce"
+"             poste. Le recruteur est automatiquement ajouté à toutes les "
 "réunions avec le candidat."
 
 #. module: hr_recruitment_integration_base
@@ -914,29 +886,9 @@ msgid "Website"
 msgstr "Site web"
 
 #. module: hr_recruitment_integration_base
-#: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job_post__website_message_ids
-msgid "Website Messages"
-msgstr "Messages du site web"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields,help:hr_recruitment_integration_base.field_hr_job_post__website_message_ids
-msgid "Website communication history"
-msgstr "Historique de communication du site web"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__weekly
-msgid "Week"
-msgstr "Semaine"
-
-#. module: hr_recruitment_integration_base
 #: model:ir.model.fields,field_description:hr_recruitment_integration_base.field_hr_job__schedule_id
 msgid "Working Schedule"
 msgstr "Horaire de travail"
-
-#. module: hr_recruitment_integration_base
-#: model:ir.model.fields.selection,name:hr_recruitment_integration_base.selection__hr_job__payment_interval__yearly
-msgid "Year"
-msgstr "Année"
 
 #. module: hr_recruitment_integration_base
 #. odoo-python
@@ -956,11 +908,6 @@ msgid "failure"
 msgstr "échec"
 
 #. module: hr_recruitment_integration_base
-#: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.view_hr_job_form
-msgid "per"
-msgstr "par"
-
-#. module: hr_recruitment_integration_base
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_integration_base.hr_job_post_view_kanban
 msgid "plateform icon"
 msgstr "icône de la plateforme"
@@ -970,3 +917,9 @@ msgstr "icône de la plateforme"
 #: code:addons/hr_recruitment_integration_base/wizard/hr_recruitment_post.py:0
 msgid "updated"
 msgstr "mis à jour"
+
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+msgid "Website communication history"
+msgstr "Historique de communication du site web"

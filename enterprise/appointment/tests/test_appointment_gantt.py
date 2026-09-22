@@ -1,10 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime, timedelta
-import pytz
+from datetime import datetime, timedelta, UTC
+from freezegun import freeze_time
 
 from odoo.addons.mail.tests.common import mail_new_test_user
-from odoo.tests import Form, users
+from odoo.tests import tagged, Form, users
 from odoo.tools.intervals import Intervals
 from .common import AppointmentCommon
 
@@ -44,28 +44,26 @@ class AppointmentGanttTestCommon(AppointmentCommon):
             'hours_per_day': 24,
             'attendance_ids': [
                 (0, 0, {
-                    'name': f'{nday} Morning',
                     'dayofweek': str(nday),
                     'hour_from': 0,
                     'hour_to': 12,
-                    'day_period': 'morning',
                 }) for nday in range(6)] + [
                 (0, 0, {
-                    'name': f'{nday} Afternoon',
                     'dayofweek': str(nday),
                     'hour_from': 12,
                     'hour_to': 24,
-                    'day_period': 'afternoon',
                 }) for nday in range(6)]
         }])
         cls.apt_resource_1, cls.apt_resource_2 = cls.env['appointment.resource'].create([{
             'capacity': 1,
             'name': 'Resource 1',
             'resource_calendar_id': cls.apt_resource_calendar.id,
+            'tz': 'UTC',
         }, {
             'capacity': 2,
             'name': 'Resource 2',
             'resource_calendar_id': cls.apt_resource_calendar.id,
+            'tz': 'UTC',
         }])
 
         cls.apt_types = cls.env['appointment.type'].create([{
@@ -89,6 +87,8 @@ class AppointmentGanttTestCommon(AppointmentCommon):
         cls.gantt_context = {'appointment_booking_gantt_show_all_resources': True}
         cls.gantt_domain = [('appointment_type_id', 'in', cls.apt_types.ids)]
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class AppointmentGanttTest(AppointmentGanttTestCommon):
     @users('apt_manager')
     def test_default_assign_user_attendees(self):
@@ -143,7 +143,8 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
         )
 
     def test_gantt_calendar_unavailability(self):
-        """Checks whether the Gantt view correctly excludes free events and considers only busy events for calculating unavailability."""
+        """Checks whether the Gantt view correctly calculates unavailability."""
+        # Check that computation excludes free events and considers only busy events.
         self._create_meetings(
             self.user_john,
             [(self.reference_monday, self.reference_monday + timedelta(hours=2), False)],
@@ -166,6 +167,41 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
 
         self.assertEqual(len(unavailabilities.get(self.user_john.partner_id.id, [])), 1, "Busy events should be counted as unavailability.")
         self.assertEqual(len(unavailabilities.get(self.user_bob.partner_id.id, [])), 0, "Free events should not be counted as unavailability.")
+
+        # Check that slots are unavailable for users other than restricted ones.
+        user_appointment_type = self.user_apt_types[0]
+        user_appointment_type.staff_user_ids = self.apt_users
+        self.apt_users.partner_id.meeting_ids.unlink()  # remove existing meetings to avoid interference
+        user_appointment_type.slot_ids = self.env["appointment.slot"].create([{
+            "start_hour": 9,
+            "end_hour": 10,
+            # restrict to user_john only
+            "restrict_to_user_ids": [(4, self.user_john.id)],
+        }])
+
+        with freeze_time(self.reference_monday.replace(hour=0)):
+            unavailabilities = (
+                self.env["calendar.event"].with_context(default_appointment_type_id=user_appointment_type.id)._gantt_unavailability(
+                    "partner_ids",
+                    self.apt_users.partner_id.ids,
+                    self.reference_monday.replace(hour=9),
+                    self.reference_monday.replace(hour=10),
+                    "day",
+                )
+            )
+
+        # Check that user_bob is unavailable during the slot restricted to user_john
+        self.assertListEqual(
+            [(unavailability['start'], unavailability['stop']) for unavailability in unavailabilities.get(self.user_bob.partner_id.id, [])],
+            [(datetime(2022, 2, 14, 9, 0, tzinfo=UTC), datetime(2022, 2, 14, 10, 0, tzinfo=UTC))],
+            f"{self.user_bob.name} should be unavailable during the slot restricted to {self.user_john.name}.",
+        )
+
+        # Check that user_john is available during the slot restricted to user_john
+        self.assertFalse(
+            unavailabilities.get(self.user_john.partner_id.id, []),
+            f"{self.user_john.name} should be available during the slot restricted to {self.user_john.name}.",
+        )
 
     @users('apt_manager')
     def test_gantt_default_calendar_event_values(self):
@@ -192,7 +228,6 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
                     appointment_context |= {'default_resource_ids': resource_appointment_type.resource_ids.ids}
                 expected_default_dict = {
                     'appointment_type_id': appointment_type.id,
-                    'name': appointment_type.name,
                     'total_capacity_reserved': expected_capacity_reserved,
                 }
                 CalendarEvent = self.env['calendar.event'].with_context(appointment_context)
@@ -210,7 +245,7 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
                 event.invalidate_recordset(['total_capacity_reserved', 'user_id', 'resource_ids'])
                 self.assertDictEqual(event.read(['name', 'total_capacity_reserved'])[0], {
                     'id': event.id,
-                    'name': appointment_type.name,
+                    'name': self.env.user.partner_id.name + ' - ' + appointment_type.name,
                     'total_capacity_reserved': expected_capacity_reserved
                 })
                 event.unlink()
@@ -220,7 +255,7 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
         gantt_data = self.env['calendar.event'].with_context(self.gantt_context).get_gantt_data(
             self.gantt_domain, ['partner_ids'], {}
         )
-        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups']]
+        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups'] if group['partner_ids']]
         self.assertIn(self.user_bob.partner_id.id, group_partner_ids,
                       'Staff assigned to a user-scheduled appointment type should be shown in the default groups')
         self.assertNotIn(self.user_john.partner_id.id, group_partner_ids,
@@ -232,7 +267,7 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
         gantt_data = self.env['calendar.event'].with_context(self.gantt_context).get_gantt_data(
             self.gantt_domain, ['partner_ids'], {}
         )
-        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups']]
+        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups'] if group['partner_ids']]
         self.assertIn(self.user_bob.partner_id.id, group_partner_ids)
         self.assertIn(self.user_john.partner_id.id, group_partner_ids)
 
@@ -241,7 +276,7 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
         gantt_data = self.env['calendar.event'].with_context(context).get_gantt_data(
             self.gantt_domain, ['partner_ids'], {}
         )
-        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups']]
+        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups'] if group['partner_ids']]
         self.assertIn(self.user_bob.partner_id.id, group_partner_ids)
         self.assertNotIn(self.user_john.partner_id.id, group_partner_ids, 'Should only display staff assigned to the default apt type.')
 
@@ -260,14 +295,15 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
         gantt_data = self.env['calendar.event'].with_context(self.gantt_context).get_gantt_data(
             self.gantt_domain, ['partner_ids'], {}
         )
-        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups']]
+        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups'] if group['partner_ids']]
         self.assertNotIn(self.partners[0].id, group_partner_ids, 'Attendees with no users should be hidden from the grouping.')
         self.assertIn(self.user_bob.partner_id.id, group_partner_ids)
         self.assertNotIn(self.user_john.partner_id.id, group_partner_ids)
         self.assertEqual(gantt_data['records'], [{'id': meeting.id}])
 
     def test_gantt_resource_unavailabilities(self):
-        """Check whether the Gantt view includes already booked resource and exclude sharable resource for calculating unavailability."""
+        """Check whether the Gantt view correctly calculates unavailability."""
+        # Check that computation includes already booked resource and excludes sharable resource.
         self.apt_resource_2.shareable = True
         self.env['calendar.event'].sudo().create({
             'appointment_type_id': self.resource_apt_types.id,
@@ -277,15 +313,10 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
             'stop': self.reference_monday.replace(hour=9),
         })
         resource_1_calendar_unavailabilities = Intervals([
-            (datetime(2022, 2, 14, 8, 00, tzinfo=pytz.UTC),
-             datetime(2022, 2, 14, 9, 0, tzinfo=pytz.UTC), set()),
-            (datetime(2022, 2, 14, 22, 59, 59, 999999, tzinfo=pytz.UTC),
-             datetime(2022, 2, 14, 23, 0, tzinfo=pytz.UTC), set()),
+            (datetime(2022, 2, 14, 8, 00, tzinfo=UTC),
+             datetime(2022, 2, 14, 9, 0, tzinfo=UTC), set()),
         ])
-        resource_2_calendar_unavailabilities = Intervals([
-            (datetime(2022, 2, 14, 22, 59, 59, 999999, tzinfo=pytz.UTC),
-             datetime(2022, 2, 14, 23, 0, tzinfo=pytz.UTC), set()),
-        ])
+        resource_2_calendar_unavailabilities = []
         unavailabilities = self.env['calendar.event'].with_context(self.gantt_context)._gantt_unavailability(
             'resource_ids',
             [self.apt_resource_1.id, self.apt_resource_2.id],
@@ -304,6 +335,42 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
             list(resource_2_calendar_unavailabilities)
         )
 
+        # Check that slots are unavailable for resources other than restricted ones.
+        resource_appointment_type = self.resource_apt_types
+        (self.apt_resource_1 + self.apt_resource_2).appointment_type_ids.meeting_ids.unlink()  # remove existing meetings to avoid interference
+        resource_appointment_type.slot_ids = self.env["appointment.slot"].create([{
+            "start_hour": 9,
+            "end_hour": 10,
+            # restrict to apt_resource_1 only
+            "restrict_to_resource_ids": [(4, self.apt_resource_1.id)],
+        }])
+
+        with freeze_time(self.reference_monday.replace(hour=0)):
+            unavailabilities = (
+                self.env["calendar.event"].with_context(
+                    self.gantt_context
+                    | {"default_appointment_type_id": resource_appointment_type.id}
+                )._gantt_unavailability(
+                    "resource_ids",
+                    [self.apt_resource_1.id, self.apt_resource_2.id],
+                    self.reference_monday.replace(hour=9),
+                    self.reference_monday.replace(hour=10),
+                    "day",
+                )
+            )
+
+        # Check that apt_resource_2 is unavailable during the slot restricted to apt_resource_1
+        self.assertListEqual(
+            [(unavailability['start'], unavailability['stop']) for unavailability in unavailabilities.get(self.apt_resource_2.id, [])],
+            [(datetime(2022, 2, 14, 9, 0, tzinfo=UTC), datetime(2022, 2, 14, 10, 0, tzinfo=UTC))],
+            f"{self.apt_resource_2.name} should be unavailable during the slot restricted to {self.apt_resource_1.name}.",
+        )
+        # Check that apt_resource_1 is available during the slot restricted to apt_resource_1
+        self.assertFalse(
+            unavailabilities.get(self.apt_resource_1.id, []),
+            f"{self.apt_resource_1.name} should be available during the slot restricted to {self.apt_resource_1.name}.",
+        )
+
     @users('staff_user_bxls')
     def test_gantt_resource_unavailabilities_multi_company(self):
         """Check that resources outside of allowed companies don't get calendar unavailabilities."""
@@ -313,10 +380,7 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
         })
         self.env.user.sudo().company_ids += company_a + company_b
 
-        resource_calendar_unavailabilities = Intervals([
-            (datetime(2022, 2, 14, 11, 00, tzinfo=pytz.UTC), datetime(2022, 2, 14, 11, 0, tzinfo=pytz.UTC), set()),
-            (datetime(2022, 2, 14, 22, 59, 59, 999999, tzinfo=pytz.UTC), datetime(2022, 2, 14, 23, 0, tzinfo=pytz.UTC), set()),
-        ])
+        resource_calendar_unavailabilities = []
 
         for allowed_company_ids, res_1_company, res_2_company, res_1_unavailabilities, res_2_unavailabilities in [
             ([], False, False, resource_calendar_unavailabilities, resource_calendar_unavailabilities),
@@ -364,7 +428,7 @@ class AppointmentGanttTest(AppointmentGanttTestCommon):
         gantt_data = self.env['calendar.event'].with_context(self.gantt_context).get_gantt_data(
             self.gantt_domain, ['partner_ids'], {}
         )
-        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups']]
+        group_partner_ids = [group['partner_ids'][0] for group in gantt_data['groups'] if group['partner_ids']]
         self.assertIn(self.user_bob.partner_id.id, group_partner_ids)
         self.assertNotIn(self.user_john.partner_id.id, group_partner_ids)
         self.assertEqual(gantt_data['records'], [{'id': meeting.id}])

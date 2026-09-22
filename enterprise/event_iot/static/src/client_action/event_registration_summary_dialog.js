@@ -3,7 +3,7 @@ import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { patch } from "@web/core/utils/patch";
 import { EventRegistrationSummaryDialog } from "@event/client_action/event_registration_summary_dialog";
-import { onMounted, useState } from "@odoo/owl";
+import { onMounted, proxy } from "@odoo/owl";
 
 const PRINT_SETTINGS_LOCAL_STORAGE_KEY = "event.registration_print_settings";
 const DEFAULT_PRINT_SETTINGS = {
@@ -17,7 +17,7 @@ patch(EventRegistrationSummaryDialog.prototype, {
         this.iotHttpService = useService("iot_http");
 
         const storedPrintSettings = browser.localStorage.getItem(PRINT_SETTINGS_LOCAL_STORAGE_KEY);
-        this.printSettings = useState(
+        this.printSettings = proxy(
             storedPrintSettings ? JSON.parse(storedPrintSettings) : DEFAULT_PRINT_SETTINGS
         );
         this.useIotPrinter = this.registration.iot_printers.length > 0;
@@ -35,7 +35,7 @@ patch(EventRegistrationSummaryDialog.prototype, {
             this.printSettings.iotPrinterId = this.registration.iot_printers[0].id;
         }
 
-        this.dialogState = useState({ isHidden: this.willAutoPrint });
+        this.dialogState = proxy({ isHidden: this.willAutoPrint });
 
         onMounted(() => {
             if (
@@ -82,6 +82,10 @@ patch(EventRegistrationSummaryDialog.prototype, {
         }
     },
 
+    async onRegistrationDownloadPdf() {
+        return super.onRegistrationPrintPdf();
+    },
+
     hasSelectedPrinter() {
         return !this.useIotPrinter || this.printSettings.iotPrinterId != null;
     },
@@ -94,7 +98,13 @@ patch(EventRegistrationSummaryDialog.prototype, {
     },
 
     async printWithBadgePrinter() {
-        const reportName = "event_iot.event_registration_badge_printer_report";
+        let reportName;
+        if (this.registration.badge_format === "96x82") {
+            reportName = "event_iot.event_registration_badge_printer_report";
+        } else {
+            reportName = "event.event_registration_report_template_badge";
+        }
+
         const [{ id: reportId }] = await this.orm.searchRead(
             "ir.actions.report",
             [["report_name", "=", reportName]],

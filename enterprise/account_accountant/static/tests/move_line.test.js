@@ -13,8 +13,8 @@ import {
     userContext,
     waitStoreFetch,
 } from "@mail/../tests/mail_test_helpers";
-import { beforeEach, test } from "@odoo/hoot";
-import { asyncStep, onRpc, waitForSteps } from "@web/../tests/web_test_helpers";
+import { beforeEach, expect, test } from "@odoo/hoot";
+import { onRpc } from "@web/../tests/web_test_helpers";
 import { getOrigin } from "@web/core/utils/urls";
 
 const ROUTES_TO_IGNORE = [
@@ -36,13 +36,13 @@ const openPreparedView = async (size) => {
         ) {
             return;
         }
-        asyncStep(`${route} - ${JSON.stringify(args)}`);
+        expect.step(`${route} - ${JSON.stringify(args)}`);
     });
     onRpc(({ kwargs, route }) => {
         if (ROUTES_TO_IGNORE.includes(route)) {
             return;
         }
-        asyncStep(`${route} - {"kwargs":${JSON.stringify(kwargs)}}`);
+        expect.step(`${route} - {"kwargs":${JSON.stringify(kwargs)}}`);
     });
     listenStoreFetch("init_messaging");
     await start();
@@ -103,7 +103,7 @@ beforeEach(async () => {
 test("No preview on small devices", async () => {
     await openPreparedView(SIZES.XL);
     await contains(".o_move_line_list_view");
-    await waitForSteps([
+    await expect.waitForSteps([
         `/web/dataset/call_kw/account.move.line/web_read_group - ${JSON.stringify({
             kwargs: {
                 domain: [],
@@ -113,7 +113,6 @@ test("No preview on small devices", async () => {
                 offset: 0,
                 order: "",
                 auto_unfold: false,
-                opening_info: [],
                 unfold_read_specification: {
                     id: {},
                     name: {},
@@ -124,6 +123,7 @@ test("No preview on small devices", async () => {
                 groupby_read_specification: {},
                 context: {
                     ...userContext(),
+                    bin_size: true,
                     read_group_expand: true,
                     group_by: ["move_id"],
                 },
@@ -134,7 +134,7 @@ test("No preview on small devices", async () => {
     await contains(".o_attachment_preview", { count: 0 }); // The preview component shouldn't be mounted for small screens
     await click(":nth-child(1 of .o_group_header)");
     await contains(".o_data_row", { count: 2 });
-    await waitForSteps([
+    await expect.waitForSteps([
         `/web/dataset/call_kw/account.move.line/web_search_read - ${JSON.stringify({
             kwargs: {
                 specification: {
@@ -148,7 +148,6 @@ test("No preview on small devices", async () => {
                 limit: 80,
                 context: {
                     ...userContext(),
-                    bin_size: true,
                     group_by: ["move_id"],
                     default_move_id: 1,
                 },
@@ -158,12 +157,12 @@ test("No preview on small devices", async () => {
         })}`,
     ]);
     await click(":nth-child(1 of .o_data_row) :nth-child(2 of .o_data_cell)");
-    await contains(":nth-child(1 of .o_data_row) :nth-child(2 of .o_data_cell) input");
+    await contains(":nth-child(1 of .o_data_row) :nth-child(2 of .o_data_cell) textarea");
     // weak test, no guarantee to wait long enough for the potential attachment preview to show
     await contains(".o_attachment_preview", { count: 0 }); // The preview component shouldn't be mounted for small screens even when clicking on a line without attachment
     await click(":nth-child(2 of .o_group_header)");
     await contains(".o_data_row", { count: 4 });
-    await waitForSteps([
+    await expect.waitForSteps([
         `/web/dataset/call_kw/account.move.line/web_search_read - ${JSON.stringify({
             kwargs: {
                 specification: {
@@ -177,7 +176,6 @@ test("No preview on small devices", async () => {
                 limit: 80,
                 context: {
                     ...userContext(),
-                    bin_size: true,
                     group_by: ["move_id"],
                     default_move_id: 2,
                 },
@@ -187,16 +185,16 @@ test("No preview on small devices", async () => {
         })}`,
     ]);
     await click(":nth-child(4 of .o_data_row) :nth-child(2 of .o_data_cell)");
-    await contains(":nth-child(4 of .o_data_row) :nth-child(2 of .o_data_cell) input");
+    await contains(":nth-child(4 of .o_data_row) :nth-child(2 of .o_data_cell) textarea");
     // weak test, no guarantee to wait long enough for the potential attachment preview to show
     await contains(".o_attachment_preview", { count: 0 }); // The preview component shouldn't be mounted for small screens even when clicking on a line with attachment
-    await waitForSteps([], { message: "no extra rpc should be done" });
+    await expect.waitForSteps([], { message: "no extra rpc should be done" });
 });
 
 test("Fetch and preview of attachments on big devices", async () => {
     await openPreparedView(SIZES.XXL);
     await contains(".o_move_line_list_view");
-    await waitForSteps([
+    await expect.waitForSteps([
         `/web/dataset/call_kw/account.move.line/web_read_group - ${JSON.stringify({
             kwargs: {
                 domain: [],
@@ -206,7 +204,6 @@ test("Fetch and preview of attachments on big devices", async () => {
                 offset: 0,
                 order: "",
                 auto_unfold: false,
-                opening_info: [],
                 unfold_read_specification: {
                     id: {},
                     name: {},
@@ -217,6 +214,7 @@ test("Fetch and preview of attachments on big devices", async () => {
                 groupby_read_specification: {},
                 context: {
                     ...userContext(),
+                    bin_size: true,
                     read_group_expand: true,
                     group_by: ["move_id"],
                 },
@@ -230,7 +228,7 @@ test("Fetch and preview of attachments on big devices", async () => {
     await contains(".o_attachment_preview iframe", { count: 0 });
     await click(":nth-child(1 of .o_group_header)");
     await contains(".o_data_row", { count: 2 });
-    await waitForSteps([
+    await expect.waitForSteps([
         `/web/dataset/call_kw/account.move.line/web_search_read - ${JSON.stringify({
             kwargs: {
                 specification: {
@@ -244,7 +242,6 @@ test("Fetch and preview of attachments on big devices", async () => {
                 limit: 80,
                 context: {
                     ...userContext(),
-                    bin_size: true,
                     group_by: ["move_id"],
                     default_move_id: 1,
                 },
@@ -259,7 +256,7 @@ test("Fetch and preview of attachments on big devices", async () => {
     await click(":nth-child(2 of .o_group_header)");
     await contains(".o_data_row", { count: 4 });
     await contains(".o_attachment_preview p", { text: "No attachments linked." });
-    await waitForSteps([
+    await expect.waitForSteps([
         `/web/dataset/call_kw/account.move.line/web_search_read - ${JSON.stringify({
             kwargs: {
                 specification: {
@@ -273,7 +270,6 @@ test("Fetch and preview of attachments on big devices", async () => {
                 limit: 80,
                 context: {
                     ...userContext(),
-                    bin_size: true,
                     group_by: ["move_id"],
                     default_move_id: 2,
                 },
@@ -289,7 +285,7 @@ test("Fetch and preview of attachments on big devices", async () => {
             getOrigin() + "/web/content/1"
         )}#pagemode=none']`
     );
-    await waitForSteps([], { message: "no extra rpc should be done" });
+    await expect.waitForSteps([], { message: "no extra rpc should be done" });
     await click(":nth-child(3 of .o_group_header)");
     await contains(".o_data_row", { count: 6 });
     // weak test, no guarantee to wait long enough for the potential attachment to change
@@ -298,7 +294,7 @@ test("Fetch and preview of attachments on big devices", async () => {
             getOrigin() + "/web/content/1"
         )}#pagemode=none']`
     ); // The previewer content shouldn't change without clicking on another line from another account.move
-    await waitForSteps([
+    await expect.waitForSteps([
         `/web/dataset/call_kw/account.move.line/web_search_read - ${JSON.stringify({
             kwargs: {
                 specification: {
@@ -312,7 +308,6 @@ test("Fetch and preview of attachments on big devices", async () => {
                 limit: 80,
                 context: {
                     ...userContext(),
-                    bin_size: true,
                     group_by: ["move_id"],
                     default_move_id: 3,
                 },
@@ -322,15 +317,15 @@ test("Fetch and preview of attachments on big devices", async () => {
         })}`,
     ]);
     await click(":nth-child(5 of .o_data_row) :nth-child(2 of .o_data_cell)");
-    await contains(":nth-child(5 of .o_data_row) :nth-child(2 of .o_data_cell) input");
+    await contains(":nth-child(5 of .o_data_row) :nth-child(2 of .o_data_cell) textarea");
     await contains(
         `.o_attachment_preview iframe[data-src='/web/static/lib/pdfjs/web/viewer.html?file=${encodeURIComponent(
             getOrigin() + "/web/content/2"
         )}#pagemode=none']`
     );
-    await waitForSteps([]);
+    await expect.waitForSteps([]);
     await click(":nth-child(1 of .o_data_row) :nth-child(2 of .o_data_cell)");
     await contains(".o_attachment_preview iframe", { count: 0 });
     await contains(".o_attachment_preview p");
-    await waitForSteps([]);
+    await expect.waitForSteps([]);
 });

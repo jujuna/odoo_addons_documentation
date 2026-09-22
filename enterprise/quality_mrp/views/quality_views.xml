@@ -12,15 +12,32 @@
         </field>
     </record>
 
+    <record id="quality_alert_view_form_inherit_mrp" model="ir.ui.view">
+        <field name="name">quality.alert.view.form.inherit.mrp</field>
+        <field name="model">quality.alert</field>
+        <field name="inherit_id" ref="quality_control.quality_alert_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_id']" position="attributes">
+                <attribute name="invisible">production_id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='picking_id']" position="after">
+                <field name="production_id"
+                    string="Manufacturing Order"
+                    invisible="picking_id"
+                    groups="base.group_user_regular"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="quality_check_view_form_inherit_mrp" model="ir.ui.view">
         <field name="name">quality.check.view.form.inherit.mrp</field>
         <field name="model">quality.check</field>
         <field name="inherit_id" ref="quality_control.quality_check_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='picking_id']" position="after">
-                <field name="production_id" invisible="(quality_state in ('pass', 'fail') and not production_id) or context.get('from_barcode') or hide_production_id > 0"/>
+                <field name="production_id" invisible="(quality_state in ('pass', 'fail') and not production_id) or context.get('barcode_view') or hide_production_id > 0"/>
             </xpath>
-        </field>    
+        </field>
     </record>
 
 </odoo>

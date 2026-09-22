@@ -1,16 +1,15 @@
 {
     'name': 'ESG HR',
-    'version': '1.0',
     'summary': "Use your employee data to measure important ESG metrics (e.g. employee commuting, sex parity).",
     'depends': [
         'esg',
         'hr',
     ],
     'data': [
-        'security/esg_hr_security.xml',
-        'security/ir.model.access.csv',
+        'data/esg_hr_report_template_data.xml',
         'report/esg_employee_report_views.xml',
         'views/esg_menus.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [

@@ -1,4 +1,5 @@
 import { patch } from "@web/core/utils/patch";
+import { Domain } from "@web/core/domain";
 import { PosStore } from "@point_of_sale/app/services/pos_store";
 
 patch(PosStore.prototype, {
@@ -15,6 +16,28 @@ patch(PosStore.prototype, {
             default_l10n_br_taxpayer: "non",
             default_l10n_br_activity_sector: "finalConsumer",
         };
+    },
+
+    // @override
+    searchProductsFromDBDomain(searchProductWord) {
+        const res = super.searchProductsFromDBDomain(searchProductWord);
+        if (this.config.l10n_br_is_nfce) {
+            // The same domain override as in _get_available_product_domain() in pos_config.py
+            return Domain.and([
+                res,
+                [
+                    [
+                        "taxes_id",
+                        "not any",
+                        [
+                            ["company_id", "in", [false, this.company.id]],
+                            ["price_include", "=", false],
+                        ],
+                    ],
+                ],
+            ]).toList();
+        }
+        return res;
     },
 
     orderDetailsProps(order) {

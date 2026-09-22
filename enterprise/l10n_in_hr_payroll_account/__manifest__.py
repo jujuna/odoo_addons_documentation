@@ -3,7 +3,6 @@
 {
     'name': 'India - Payroll with Accounting',
     'category': 'Human Resources',
-    'countries': ['in'],
     'depends': ['l10n_in_hr_payroll', 'hr_payroll_account', 'l10n_in'],
     'description': """
 Accounting Data for Indian Payroll Rules.
@@ -16,7 +15,7 @@ Accounting Data for Indian Payroll Rules.
     "demo": [
         'data/l10n_in_hr_payroll_account_demo.xml',
     ],
-    'auto_install': True,
+    'auto_install': ['l10n_in_hr_payroll', 'hr_payroll_account'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

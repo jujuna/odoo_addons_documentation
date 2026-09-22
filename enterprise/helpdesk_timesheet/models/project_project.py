@@ -53,21 +53,3 @@ class ProjectProject(models.Model):
             action["views"] = [[False, 'form']]
             action["res_id"] = self.ticket_ids.id
         return action
-
-    # ----------------------------
-    #  Project Updates
-    # ----------------------------
-
-    def _get_stat_buttons(self):
-        buttons = super()._get_stat_buttons()
-        if self.env.user.has_group('helpdesk.group_helpdesk_user'):
-            buttons.append({
-                'icon': 'life-ring',
-                'text': self.env._('Tickets'),
-                'number': self.ticket_count,
-                'action_type': 'object',
-                'action': 'action_open_project_tickets',
-                'show': self.ticket_count > 0,
-                'sequence': 25,
-            })
-        return buttons

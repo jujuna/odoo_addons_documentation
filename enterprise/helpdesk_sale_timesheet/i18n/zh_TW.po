@@ -10,17 +10,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-16 17:48+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 00:34+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
-"projects/odoo-19/helpdesk_sale_timesheet/zh_Hant/>\n"
+"projects/odoo-master/helpdesk_sale_timesheet/zh_Hant/>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.module.module,description:base.module_helpdesk_sale_timesheet
+msgid ""
+"\n"
+"Bill timesheets logged on helpdesk tickets.\n"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:helpdesk.sla,name:helpdesk_sale_timesheet.helpdesk_sla_4
@@ -29,21 +36,21 @@ msgstr "4 小時內要完成"
 
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
+msgid "<span class=\"o_stat_text\">Sales Order</span>"
+msgstr "<span class=\"o_stat_text\">銷售訂單</span>"
+
+#. module: helpdesk_sale_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
 msgid ""
-"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"The sales "
+"<span class=\"oi text-warning\" data-icon=\"warning\" title=\"The sales "
 "order associated with this ticket has been cancelled. We recommend either "
 "updating the sales order item or cancelling this ticket in alignment with "
 "the cancellation of the sales order.\" invisible=\"sale_order_state != "
 "'cancel'\"/>"
 msgstr ""
-"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"與此支援請求"
-"關聯的銷售單已被取消。我們建議更新銷售單項目，或依照銷售單的取消動作取消此支"
-"援請求。\" invisible=\"sale_order_state != 'cancel'\"/>"
-
-#. module: helpdesk_sale_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
-msgid "<span class=\"o_stat_text\">Sales Order</span>"
-msgstr "<span class=\"o_stat_text\">銷售訂單</span>"
+"<span class=\"oi text-warning\" data-icon=\"warning\" title=\"與此支援請求關"
+"聯的銷售單已被取消。我們建議更新銷售單項目，或依照銷售單的取消動作取消此支援"
+"請求。\" invisible=\"sale_order_state != 'cancel'\"/>"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_account_analytic_line
@@ -64,6 +71,11 @@ msgstr "將技術支援請求轉換為任務"
 #: model:ir.model,name:helpdesk_sale_timesheet.model_project_task_convert_wizard
 msgid "Convert Project Tasks to Tickets"
 msgstr "將專案任務轉換為支援請求"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.actions.server,name:helpdesk_sale_timesheet.helpdesk_ticket_action_create_invoice
+msgid "Create Invoice"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,website_form_label:helpdesk_sale_timesheet.model_helpdesk_ticket
@@ -101,8 +113,8 @@ msgstr "員工"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_helpdesk_sla
-msgid "Helpdesk SLA Policies"
-msgstr "技術支援 SLA 政策"
+msgid "Helpdesk SLA Policy"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_helpdesk_team
@@ -141,6 +153,28 @@ msgid "No Ticket"
 msgstr "沒有支援請求"
 
 #. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because none of the selected tickets are billable."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because none of the selected tickets have sale orders "
+"ready to be invoiced."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because some of the selected tickets are not billable."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.tickets_followup_timesheet
 msgid "Non-billable"
@@ -150,11 +184,6 @@ msgstr "非計費"
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.portal_helpdesk_ticket_timesheet
 msgid "Not Billed"
 msgstr "不收費"
-
-#. module: helpdesk_sale_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_sla_view_form_inherit_sale_timesheet
-msgid "OR"
-msgstr "或"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_team__project_id
@@ -167,6 +196,11 @@ msgid ""
 "Project to which the timesheets of this helpdesk team's tickets will be "
 "linked."
 msgstr "此團隊的支援請求工時表會連結至的專案。"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.module.module,summary:base.module_helpdesk_sale_timesheet
+msgid "Project, Helpdesk, Timesheet and Sale Orders"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_ticket__sale_order_id
@@ -241,6 +275,11 @@ msgid "Search in Ticket"
 msgstr "搜尋支援請求"
 
 #. module: helpdesk_sale_timesheet
+#: model:ir.module.module,shortdesc:base.module_helpdesk_sale_timesheet
+msgid "Sell Helpdesk Timesheet"
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla__product_ids
 msgid "Services"
 msgstr "服務"
@@ -279,6 +318,7 @@ msgid "Tickets"
 msgstr "支援請求"
 
 #. module: helpdesk_sale_timesheet
+#: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_account_analytic_line__has_billable_helpdesk_team
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla__use_helpdesk_sale_timesheet
 msgid "Time Billing"
 msgstr "按工時收費"

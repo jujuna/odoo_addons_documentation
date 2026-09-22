@@ -60,3 +60,11 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
         string="Purchase Tax Base Account",
     )
+    l10n_ec_extra_header_legend_ride = fields.Char(
+        related='company_id.l10n_ec_extra_header_legend_ride',
+        readonly=False,
+    )
+    l10n_ec_edi_provider_id = fields.Many2one(
+        related='company_id.l10n_ec_edi_provider_id',
+        readonly=False,
+    )

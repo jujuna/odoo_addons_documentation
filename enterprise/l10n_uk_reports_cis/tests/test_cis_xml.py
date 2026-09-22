@@ -10,6 +10,8 @@ from odoo.tools.misc import file_open
 
 @tagged('post_install', 'post_install_l10n', '-at_install')
 class TestCisXML(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def get_test_credentials(self):
         return {
             'sender_id': 'CISRUSER1033',
@@ -36,7 +38,6 @@ class TestCisXML(AccountTestInvoicingCommon):
         }
         self.env.company.l10n_uk_hmrc_unique_taxpayer_reference = '2325648152'
         self.env.company.l10n_uk_hmrc_account_office_reference = '123PP07654321'
-        self.env.company.partner_id.is_company = False
 
         transaction = self.env['l10n_uk.hmrc.transaction'].create(transaction_create_vals)
         xml_data = transaction._generate_cis_mr_xml_data(
@@ -62,12 +63,10 @@ class TestCisXML(AccountTestInvoicingCommon):
         }
         self.env.company.l10n_uk_hmrc_unique_taxpayer_reference = '7325648155'
         self.env.company.l10n_uk_hmrc_account_office_reference = '123PP87654321'
-        self.env.company.partner_id.is_company = False
 
         transaction = self.env['l10n_uk.hmrc.transaction'].create(transaction_create_vals)
         partner_a = self.env['res.partner'].create({
             'name': 'John Peter Brown',
-            'is_company': False,
             'l10n_uk_cis_enabled': True,
             'l10n_uk_reports_cis_verification_number': 'V6499876214A',
             'l10n_uk_reports_cis_deduction_rate': 'unmatched',
@@ -78,7 +77,6 @@ class TestCisXML(AccountTestInvoicingCommon):
 
         partner_b = self.env['res.partner'].create({
             'name': 'TA Plumbing',
-            'is_company': True,
             'l10n_uk_cis_enabled': True,
             'l10n_uk_reports_cis_verification_number': 'V8745678309AA',
             'l10n_uk_reports_cis_deduction_rate': 'unmatched',

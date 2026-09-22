@@ -6,6 +6,8 @@ from odoo import Command
 
 class TestInterCompanyRulesCommonSOPO(TestInterCompanyRulesCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def get_default_groups(cls):
         groups = super().get_default_groups()
@@ -18,7 +20,7 @@ class TestInterCompanyRulesCommonSOPO(TestInterCompanyRulesCommon):
 
         # Required for `discount` to be visible on the form view
         cls.env.user.group_ids += cls.env.ref('sale.group_discount_per_so_line')
-        # Required for `product_uom_id` to be visible on the form view
+        # Required for `uom_id` to be visible on the form view
         cls.env.user.group_ids += cls.env.ref('uom.group_uom')
 
         cls.res_users_company_a.group_ids += (

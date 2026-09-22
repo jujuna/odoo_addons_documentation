@@ -1,14 +1,15 @@
 import { _t } from "@web/core/l10n/translation";
 import { Plugin } from "@html_editor/plugin";
 import { MAIN_PLUGINS } from "@html_editor/plugin_sets";
-import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
-import { isHtmlContentSupported } from "@html_editor/core/selection_plugin";
+import { FormViewDialog, formViewDialogProps } from "@web/views/view_dialogs/form_view_dialog";
+import { useProps, t } from "@odoo/owl";
+import { isLinkSupported } from "@html_editor/main/link/link_plugin";
 
 class AppointmentFormViewDialog extends FormViewDialog {
-    static props = {
-        ...FormViewDialog.props,
-        insertLink: { type: Function },
-    };
+    props = useProps({
+        ...formViewDialogProps,
+        insertLink: t.function(),
+    });
     setup() {
         super.setup();
         this.viewProps.insertLink = this.props.insertLink;
@@ -25,9 +26,10 @@ class AppointmentPlugin extends Plugin {
                 id: "insertAppointment",
                 title: _t("Appointment"),
                 description: _t("Add a specific appointment"),
-                icon: "fa-calendar",
+                icon: "calendar_today",
+                iconClass: "oi-filled",
                 run: this.addAppointment.bind(this),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: isLinkSupported,
             },
         ],
         powerbox_items: [

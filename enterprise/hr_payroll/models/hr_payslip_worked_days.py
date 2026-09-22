@@ -1,6 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from datetime import date, datetime, time
+from zoneinfo import ZoneInfo
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.tools import float_round
 
 
@@ -9,105 +11,155 @@ class HrPayslipWorkedDays(models.Model):
     _description = 'Payslip Worked Days'
     _order = 'payslip_id, sequence'
 
-    name = fields.Char(compute='_compute_name', store=True, string='Description', readonly=False)
+    custom_name = fields.Char()
+    name = fields.Char(compute='_compute_name', inverse='_inverse_name', store=False, string='Description', readonly=False)
     payslip_id = fields.Many2one('hr.payslip', string='Pay Slip', required=True, ondelete='cascade', index=True)
     date_from = fields.Date(string='From', related="payslip_id.date_from", store=True)
-    employee_id = fields.Many2one('hr.employee', string='Employee', related='payslip_id.employee_id', store=True)
+    employee_id = fields.Many2one('hr.employee', string='Employee', related='payslip_id.employee_id', store=True, index=True)
+    employee_type_id = fields.Many2one(related='employee_id.employee_type_id')
     sequence = fields.Integer(required=True, index=True, default=10)
     code = fields.Char(string='Code', related='work_entry_type_id.code')
-    work_entry_type_id = fields.Many2one('hr.work.entry.type', string='Type', required=True, help="The code that can be used in the salary rules")
+    work_entry_type_id = fields.Many2one('hr.work.entry.type', string='Type', required=True, index=True, help="The code that can be used in the salary rules")
     number_of_days = fields.Float(string='Number of Days')
     number_of_hours = fields.Float(string='Number of Hours')
+    fte = fields.Float(string='FTE', compute='_compute_fte', store=True, copy=True, help="Work Time Rate * (Record Hours / Total Period Hours). For example, 4 hours of sick time for a 4/5 part-time worker (0.8 rate, 30.4 weekly hours) represents 0.105 FTE. Warning: Do not aggregate these FTE values across different pay periods, as fluctuating total hours between periods will distort the final calculation.")
     is_paid = fields.Boolean(compute='_compute_is_paid', store=True)
-    amount = fields.Monetary(string='Amount', compute='_compute_amount', store=True, copy=True)
-    version_id = fields.Many2one(related='payslip_id.version_id', string='Contract',
+    amount = fields.Monetary(string='Amount', compute='_compute_amount', store=True, copy=True, readonly=False)
+    version_id = fields.Many2one('hr.version', required=True, index=True, string='Employee Record',
         help="The contract this worked days should be applied to")
     currency_id = fields.Many2one('res.currency', related='payslip_id.currency_id')
     ytd = fields.Monetary(string='YTD')
+    department_id = fields.Many2one(related='payslip_id.department_id')
+    job_id = fields.Many2one(related='payslip_id.job_id')
+    sex = fields.Selection(related='version_id.sex', string="Sex")
+    resource_calendar_id = fields.Many2one(related='version_id.resource_calendar_id', string="Working Hours")
+    reference_calendar_id = fields.Many2one(related='resource_calendar_id.reference_calendar_id')
+    payslip_run_id = fields.Many2one(related='payslip_id.payslip_run_id')
+    company_id = fields.Many2one('res.company', string='Company', related='employee_id.company_id')
+    period_start_date = fields.Date(string="Period Start", compute='_compute_period_start_date')
+    period_end_date = fields.Date(string="Period End", compute='_compute_period_end_date')
+    category_options_ids = fields.Many2many('hr.salary.rule.category', string="Options")
+    category_ids = fields.Many2many(
+        related='work_entry_type_id.category_ids', string="Categories",
+        groups='hr_payroll.group_hr_payroll_user')
 
     @api.depends(
         'work_entry_type_id', 'payslip_id', 'payslip_id.struct_id',
         'payslip_id.employee_id', 'payslip_id.version_id', 'payslip_id.struct_id', 'payslip_id.date_from', 'payslip_id.date_to')
     def _compute_is_paid(self):
-        unpaid = {struct.id: struct.unpaid_work_entry_type_ids.ids for struct in self.mapped('payslip_id.struct_id')}
         for worked_days in self:
-            worked_days.is_paid = (worked_days.work_entry_type_id.id not in unpaid[worked_days.payslip_id.struct_id.id]) if worked_days.payslip_id.struct_id.id in unpaid else False
+            worked_days.is_paid = worked_days.work_entry_type_id.amount_rate != 0
+
+    @api.depends('payslip_id.worked_days_line_ids.version_id.work_time_rate', 'payslip_id.sum_worked_hours')
+    def _compute_fte(self):
+        for version, worked_days in self.grouped('version_id').items():
+            work_time_rate = version.work_time_rate
+            for payslip, worked_days_by_payslip in worked_days.grouped('payslip_id').items():
+                sum_worked_hours = payslip.sum_worked_hours
+                for worked_day in worked_days_by_payslip:
+                    work_rate = worked_day.number_of_hours / sum_worked_hours if sum_worked_hours else 1
+                    worked_day.fte = work_time_rate * work_rate
 
     @api.depends(
         'is_paid', 'number_of_hours', 'payslip_id', 'version_id.wage', 'version_id.hourly_wage', 'payslip_id.sum_worked_hours',
         'work_entry_type_id.amount_rate', 'work_entry_type_id.is_extra_hours')
     def _compute_amount(self):
+        all_calendar_periods = dict()
+        for payslip_id in self.grouped('payslip_id'):
+            date_from, date_to = payslip_id.date_from, payslip_id.date_to
+            if not date_from or not date_to:
+                continue
+            all_worked_day_line_versions = payslip_id.worked_days_line_ids.version_id
+            for version in all_worked_day_line_versions:
+                calendar = version.resource_calendar_id
+                if calendar._is_flexible():
+                    continue
+                version_start, version_end = version.date_start or date_from, version.date_end or date_to
+                old_period = all_calendar_periods.get(calendar, (version_start, version_end))
+                all_calendar_periods[version] = (
+                    min(version_start, old_period[0], date_from),
+                    max(version_end, old_period[1], date_to),
+                    calendar,
+                )
+
+        work_intervals_per_version = dict()
+        for version, (date_from, date_to, calendar) in all_calendar_periods.items():
+            ctz = ZoneInfo(version._get_tz())
+            dt_from = datetime.combine(date_from, time.min, ctz)
+            dt_to = datetime.combine(date_to, time.max, ctz)
+            work_intervals_per_version[version] = calendar._work_intervals_batch(dt_from, dt_to, compute_leaves=False)[False]
+
+        work_times_per_payslip = dict()
+        for payslip_id in self.grouped('payslip_id'):
+            for version in payslip_id.worked_days_line_ids.grouped('version_id'):
+                date_from, date_to = payslip_id.date_from, payslip_id.date_to
+                work_time = 0
+                if date_from and date_to:
+                    calendar = version.resource_calendar_id
+                    if calendar and not version.sudo()._is_flexible():
+                        tz = ZoneInfo(version._get_tz())
+                        time_start, time_end = datetime.combine(date_from, time.min, tz), datetime.combine(date_to, time.max, tz)
+                        sum_work_time = 0
+                        for interval in work_intervals_per_version.get(version):
+                            if interval[0] <= time_end and interval[1] >= time_start:
+                                sum_work_time += (interval[1] - interval[0]).total_seconds()
+                        work_time = sum_work_time / 3600
+                    else:
+                        work_time = sum(wd.number_of_hours for wd in payslip_id.worked_days_line_ids if not wd.work_entry_type_id.is_extra_hours)
+                work_times_per_payslip[payslip_id] = float_round(work_time, 2)
+
         for worked_days in self:
             if worked_days.payslip_id.edited or worked_days.payslip_id.state != 'draft':
                 continue
-            if not worked_days.version_id or worked_days.code == 'OUT':
+            if not worked_days.version_id or worked_days.code in '000.00':
                 worked_days.amount = 0
                 continue
-            version = worked_days.payslip_id.version_id
+            version = worked_days.version_id
             amount_rate = worked_days.work_entry_type_id.amount_rate
-            if worked_days.payslip_id.wage_type == "hourly":
-                hourly_rate = version.hourly_wage
+            if version.wage_type == "hourly":
+                hourly_rate = version._get_contract_wage()
             else:
-                attendance_hours = sum(
-                    wd.number_of_hours for wd in worked_days.payslip_id.worked_days_line_ids
-                    if not wd.work_entry_type_id.is_extra_hours
-                ) or 1
-                hourly_rate = version.contract_wage / attendance_hours
+                hourly_rate = version._get_contract_wage() / (work_times_per_payslip[worked_days.payslip_id] or 1)
             worked_days.amount = hourly_rate * worked_days.number_of_hours * amount_rate if worked_days.is_paid else 0
 
-    def _is_half_day(self):
+    def _is_incomplete_day(self):
         self.ensure_one()
-        work_hours = self.payslip_id._get_worked_day_lines_hours_per_day()
+        work_hours = self.payslip_id._get_worked_day_lines_hours_per_day(self.version_id)
         # For refunds number of days is negative
         return abs(self.number_of_days) < 1 or float_round(self.number_of_hours / self.number_of_days, 2) < work_hours
 
     @api.depends('work_entry_type_id', 'number_of_days', 'number_of_hours', 'payslip_id')
+    @api.depends_context('lang')
     def _compute_name(self):
         if not self.payslip_id:
             return
 
-        to_check_public_holiday = dict(
-            self.env['resource.calendar.leaves']._read_group(
-                [
-                    ('resource_id', '=', False),
-                    ('work_entry_type_id', 'in', self.mapped('work_entry_type_id').ids),
-                    ('date_from', '<=', max(self.payslip_id.mapped('date_to'))),
-                    ('date_to', '>=', min(self.payslip_id.mapped('date_from'))),
-                ],
-                ['work_entry_type_id'],
-                ['id:recordset']
-            )
-        )
-        work_entries = {
-            (employee, date): we
-            for employee, date, we in self.env['hr.work.entry']._read_group(
-            domain=[
-                ('date', '<=', max(self.payslip_id.mapped('date_to'))),
-                ('date', '>=', min(self.payslip_id.mapped('date_from'))),
-                ('employee_id', 'in', self.payslip_id.employee_id.ids)
-            ],
-            groupby=['employee_id', 'date:day'],
-            aggregates=['id:recordset'])}
-
         for worked_days in self:
-            public_holidays = to_check_public_holiday.get(worked_days.work_entry_type_id, '')
-            holidays = public_holidays and public_holidays.filtered(lambda p:
-               (p.calendar_id.id == worked_days.payslip_id.version_id.resource_calendar_id.id or not p.calendar_id.id)
-                and p.date_from.date() <= worked_days.payslip_id.date_to
-                and p.date_to.date() >= worked_days.payslip_id.date_from
-                and p.company_id == worked_days.payslip_id.company_id)
-            actual_holidays = self.env['resource.calendar.leaves']
-            if holidays:
-                for holiday in holidays:
-                    work_entry_list = work_entries.get(
-                        (worked_days.payslip_id.employee_id, holiday.date_from.date()),
-                        self.env['hr.work.entry']
-                    )
-                    if any(we.code == holiday.work_entry_type_id.code for we in work_entry_list):
-                        actual_holidays |= holiday
-            if actual_holidays:
-                name = (', '.join(actual_holidays.mapped('name')))
+            worked_days.name = worked_days.custom_name or worked_days._get_default_name()
+
+    def _inverse_name(self):
+        for worked_days in self:
+            if worked_days.name != worked_days._get_default_name():
+                worked_days.custom_name = worked_days.name
             else:
-                name = worked_days.work_entry_type_id.name or ''
-            half_day = worked_days._is_half_day()
-            worked_days.name = name + (_(' (Half-Day)') if half_day else '')
+                worked_days.custom_name = False
+
+    @api.depends('version_id.date_start', 'payslip_id.date_from')
+    def _compute_period_start_date(self):
+        for worked_day in self:
+            worked_day.period_start_date = max(worked_day.version_id.date_start, worked_day.payslip_id.date_from)
+
+    @api.depends('version_id.date_end', 'payslip_id.date_to')
+    def _compute_period_end_date(self):
+        for worked_day in self:
+            worked_day.period_end_date = min(worked_day.version_id.date_end or date.max, worked_day.payslip_id.date_to)
+
+    def _get_default_name(self):
+        self.ensure_one()
+        type_name = self.work_entry_type_id.name or ''
+        incomplete_day = self._is_incomplete_day()
+        name = type_name + ('' if not incomplete_day else self.env._(' (Half-Day)') if self.work_entry_type_id.request_unit == 'half_day' else self.env._(' (Custom Hours)'))
+        if self.category_options_ids:
+            options = ', '.join(self.category_options_ids.mapped('name'))
+            name += self.env._(' (%s)', options)
+        return name

@@ -39,13 +39,6 @@ class AppointmentType(models.Model):
         action['context'] = dict(default_type='opportunity', create=False)
         return action
 
-    @api.model
-    def _get_calendar_view_appointment_type_default_context_fields_whitelist(self):
-        """ Add the opportunity_id field to list of fields we accept as default in context """
-        whitelist_fields = super()._get_calendar_view_appointment_type_default_context_fields_whitelist()
-        whitelist_fields.append('opportunity_id')
-        return whitelist_fields
-
     def _prepare_calendar_event_values(
             self, asked_capacity, booking_line_values, description, duration, allday,
             appointment_invite, guests, name, customer, staff_user, start, stop

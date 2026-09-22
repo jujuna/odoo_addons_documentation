@@ -29,6 +29,8 @@ class AppointmentSlot(models.Model):
         compute="_compute_restrict_to_resource_ids", readonly=False, store=True,
         help="If empty, all resources are considered to be available.\n"
              "If set, only the selected resources will be taken into account for this slot.")
+    appointment_type_staff_user_ids = fields.Many2many(related="appointment_type_id.staff_user_ids")
+    appointment_type_resource_ids = fields.Many2many(related="appointment_type_id.resource_ids")
     # Recurring slot
     weekday = fields.Selection([
         ('1', 'Monday'),
@@ -118,7 +120,7 @@ class AppointmentSlot(models.Model):
 
     @api.depends('slot_type', 'weekday', 'start_datetime', 'end_datetime', 'start_hour', 'end_hour')
     def _compute_display_name(self):
-        weekdays = dict(self._fields['weekday'].selection)
+        weekdays = dict(self._fields['weekday']._description_selection(self.env))
         for slot in self:
             if slot.slot_type == 'recurring':
                 slot.display_name = "%s, %02d:%02d - %02d:%02d" % (weekdays.get(slot.weekday), int(slot.start_hour), int(round((slot.start_hour % 1) * 60)), int(slot.end_hour), int(round((slot.end_hour % 1) * 60)))
@@ -134,3 +136,33 @@ class AppointmentSlot(models.Model):
     def _compute_restrict_to_user_ids(self):
         for slot in self:
             slot.restrict_to_user_ids &= slot.appointment_type_id.staff_user_ids
+
+    def action_clone_last_slot(self):
+        """Entry point to be able to call the appointment type method from the slot list view."""
+        self.appointment_type_id.action_clone_last_slots()
+
+    def action_clone_last_day_slots(self):
+        """Entry point to be able to call the appointment type method from the slot list view."""
+        self.appointment_type_id.action_clone_last_slots(whole_day=True)
+
+    @api.autovacuum
+    def _gc_past_slots(self):
+        """Remove past non-repeating slots to keep ongoing appointments clean."""
+        if not self.env['ir.config_parameter'].sudo().get_bool('appointment.unique_slot_gc_enabled', False):
+            return
+        past_days = self.env['ir.config_parameter'].sudo().get_int('appointment.unique_slot_gc_days', 7)
+        # always keep at least `keep_count` slots to be able to have an idea of what the schedule is supposed to be like
+        # defaults to 40 as that's 1 full page of slots, as seen in the form view
+        keep_count = self.env['ir.config_parameter'].sudo().get_int('appointment.unique_slot_gc_keep_count', 40)
+        to_delete = self.env['appointment.slot']
+        for appointment_type_id, slots in self.env['appointment.slot']._read_group(
+            aggregates=['id:recordset'],
+            domain=[
+                ('slot_type', '=', 'unique'),
+                ('end_datetime', '<', self.env.cr.now() - relativedelta(days=past_days)),
+            ],
+            groupby=['appointment_type_id'],
+            having=[('__count', '>', keep_count)],
+        ):
+            to_delete += slots.sorted('end_datetime')[:keep_count]
+        to_delete.unlink()

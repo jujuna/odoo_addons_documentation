@@ -1,4 +1,3 @@
-from . import test_rental_common
-from . import test_rental_schedule
-from . import test_rental_invoicing
-from . import test_rental
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+from . import test_rental, test_rental_common, test_rental_invoicing, test_rental_schedule

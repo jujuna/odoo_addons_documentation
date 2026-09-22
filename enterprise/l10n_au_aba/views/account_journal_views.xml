@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//page[@name='bank_account']/group" position="inside">
                     <group string='ABA' invisible="type != 'bank' or country_code != 'AU'">
-                        <field name="aba_bsb" readonly="not bank_account_id"/>
+                        <field name="aba_bsb"/>
                         <field name='aba_fic'/>
                         <field name='aba_user_spec'/>
                         <field name='aba_user_number'/>

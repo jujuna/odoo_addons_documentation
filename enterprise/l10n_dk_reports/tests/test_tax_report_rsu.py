@@ -7,6 +7,8 @@ from odoo.addons.l10n_dk_reports.wizard.tax_report_wizard import FrequencyCode
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestL10nDKTaxReportRSU(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('dk')
     def setUpClass(cls):

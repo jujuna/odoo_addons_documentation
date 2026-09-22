@@ -2,14 +2,12 @@
 
 {
     'name': 'Documents - Product',
-    'version': '1.0',
     'category': 'Productivity/Documents',
     'summary': 'Products from Documents',
     'description': """
 Adds the ability to create products from the document module and adds the
 option to send products' attachments to the documents app.
 """,
-    'website': ' ',
     'depends': ['documents', 'product'],
     'data': [
         'data/documents_folder_data.xml',
@@ -18,7 +16,6 @@ option to send products' attachments to the documents app.
         'views/res_config_settings_views.xml',
         'views/documents_document_views.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

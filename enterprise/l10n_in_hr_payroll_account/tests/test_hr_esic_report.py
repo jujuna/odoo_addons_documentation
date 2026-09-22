@@ -1,5 +1,4 @@
 import io
-import base64
 import unittest
 
 try:
@@ -48,24 +47,24 @@ class TestHrESICReport(TestPayrollAccountCommon):
             'month': '1',
             'year': '2023',
             'export_report_type': 'esic',
-            'xlsx_filename': 'esic'
         })
 
         # Action to generate the XLSX file
         esic_report.action_export_xlsx()
         self.assertTrue(esic_report.xlsx_file, "The XLS file was not generated.")
 
-        xlsx_data = base64.b64decode(esic_report.xlsx_file)
-
         if load_workbook is None:
             raise unittest.SkipTest("openpyxl not available")
-        xlsx = load_workbook(io.BytesIO(xlsx_data))
+        xlsx = load_workbook(io.BytesIO(esic_report.xlsx_file))
         sheet = xlsx.worksheets[0]
         sheet_values = list(sheet.values)
 
         expected_values = {
+            0: ['ESIC - Monthly Statement', None, None, None, None, None],
+            1: ['Establishment Name', 'Company IN', None, None, None, None],
+            2: ['Establishment ID', None, None, None, None, None],
             # Header
-            0: [
+            4: [
                 "IP Number (10 Digits)",
                 "IP Name (Only alphabets and space)",
                 "No of Days for which wages paid/payable during the month",
@@ -74,7 +73,7 @@ class TestHrESICReport(TestPayrollAccountCommon):
                 "Last Working Day (Format DD/MM/YYYY or DD-MM-YYYY)",
             ],
             # Rows
-            1: [
+            5: [
                 '93487475100284657',
                 'Jethalal',
                 working_days,
@@ -82,7 +81,7 @@ class TestHrESICReport(TestPayrollAccountCommon):
                 0.0,
                 '31-01-2023',
             ],
-            2: [
+            6: [
                 '93874944361284657',
                 'Rahul',
                 working_days,

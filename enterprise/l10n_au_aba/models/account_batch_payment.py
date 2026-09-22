@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, _, api
-from odoo.tools import float_round
+from odoo.tools import BinaryBytes, float_round
 from odoo.exceptions import UserError, RedirectWarning
 
-import base64
 import re
 from datetime import datetime
 
@@ -29,11 +27,11 @@ class AccountBatchPayment(models.Model):
                         action=journal._get_records_action(name=_("Configure Journal"), target="new"),
                         button_text=_("Configure Journal Bank Account")
                     )
-        if bank_account.acc_type != 'aba' or not bank_account.aba_bsb:
+        if bank_account.account_type != 'aba' or not bank_account._get_clearing_number('AU'):
             raise RedirectWarning(
                 message=_("The account %(account_number)s, of journal '%(journal_name)s', is not valid for ABA.\n"
                 "Either its account number is incorrect or it has no BSB set.",
-                account_number=bank_account.acc_number, journal_name=journal.name),
+                account_number=bank_account.account_number, journal_name=journal.name),
                 action=bank_account._get_records_action(name=_("Configure Account"), target="new"),
                 button_text=_("Configure Account")
             )
@@ -41,7 +39,7 @@ class AccountBatchPayment(models.Model):
             raise RedirectWarning(
                         message=_("ABA fields for account '%(account_number)s', of journal '%(journal_name)s',"
                         "are not set. Please set the fields under ABA section!",
-                        account_number=bank_account.acc_number, journal_name=journal.name),
+                        account_number=bank_account.account_number, journal_name=journal.name),
                         action=journal._get_records_action(name=_("Configure Journal"), target="new"),
                         button_text=_("Configure Journal")
                     )
@@ -49,7 +47,7 @@ class AccountBatchPayment(models.Model):
     def _check_payment_accounts_for_aba(self):
         self.ensure_one()
         faulty_accounts = self.payment_ids.partner_bank_id.filtered(
-            lambda acc: acc.acc_type != "aba" or not acc.aba_bsb
+            lambda acc: acc.account_type != "aba" or not acc._get_clearing_number('AU')
         )
         if faulty_accounts:
             raise RedirectWarning(
@@ -82,7 +80,7 @@ class AccountBatchPayment(models.Model):
 
             return {
                 'filename': 'ABA-' + self.journal_id.code + '-' + fields.Datetime.context_timestamp(self, datetime.now()).strftime("%Y%m%d%H%M") + '.aba',
-                'file': base64.encodebytes(self._create_aba_document(self.journal_id, aba_values).encode()),
+                'file': BinaryBytes(self._create_aba_document(self.journal_id, aba_values).encode()),
             }
         return super(AccountBatchPayment, self)._generate_export_file()
 
@@ -136,16 +134,16 @@ class AccountBatchPayment(models.Model):
 
             detail_record = ''.join([
                 '1',  # Record type, must be 1
-                _normalise_bsb(record_data['bank_account'].aba_bsb),  # Bank/State/Branch number.
-                _to_fixed_width(record_data['bank_account'].acc_number, 9, right=True),  # Account number to be credited or debited.
+                _normalise_bsb(record_data['bank_account']._get_clearing_number('AU')),  # Bank/State/Branch number.
+                _to_fixed_width(record_data['bank_account'].account_number, 9, right=True),  # Account number to be credited or debited.
                 record_data.get('indicator', ' '),  # Indicator, mostly used when paying withholding.
                 record_data['transaction_code'],  # 13 for debit, 50 for credit.
                 _to_fixed_width(str(round(aud.round(amount) * 100)), 10, '0', right=True),  # Amount in cents.
-                _to_fixed_width(record_data['bank_account'].acc_holder_name or record_data['account_holder'].name, 32, check_utf8=True),  # Title of the account to be credited or debited.
+                _to_fixed_width(record_data['bank_account'].holder_name or record_data['account_holder'].name, 32, check_utf8=True),  # Title of the account to be credited or debited.
                 _to_fixed_width(record_data['reference'] or 'Payment', 18),  # Lodgement Reference.
-                _normalise_bsb(bank_account.aba_bsb),  # BSB of the user to allow returns if necessary.
-                _to_fixed_width(bank_account.acc_number, 9, right=True),  # Account number for the same reason.
-                _to_fixed_width(bank_account.acc_holder_name or journal.company_id.name, 16, check_utf8=True),  # Account holder name for the same reason.
+                _normalise_bsb(bank_account._get_clearing_number('AU')),  # BSB of the user to allow returns if necessary.
+                _to_fixed_width(bank_account.account_number, 9, right=True),  # Account number for the same reason.
+                _to_fixed_width(bank_account.holder_name or journal.company_id.name, 16, check_utf8=True),  # Account holder name for the same reason.
                 ('0' * 8),  # Amount of tax withholding.
             ])
             # We do not support debit at the moment.
@@ -157,16 +155,16 @@ class AccountBatchPayment(models.Model):
             # See above for lines description.
             detail_record = ''.join([
                 '1',
-                _normalise_bsb(bank_account.aba_bsb),
-                _to_fixed_width(bank_account.acc_number, 9, right=True),
+                _normalise_bsb(bank_account._get_clearing_number('AU')),
+                _to_fixed_width(bank_account.account_number, 9, right=True),
                 ' ',
                 '13',
                 _to_fixed_width(str(round(aud.round(debit) * 100)), 10, fill='0', right=True),
-                _to_fixed_width(bank_account.acc_holder_name or journal.company_id.name, 32, check_utf8=True),
+                _to_fixed_width(bank_account.holder_name or journal.company_id.name, 32, check_utf8=True),
                 _to_fixed_width(aba_values['self_balancing_reference'], 18),
-                _normalise_bsb(bank_account.aba_bsb),
-                _to_fixed_width(bank_account.acc_number, 9, right=True),
-                _to_fixed_width(bank_account.acc_holder_name or journal.company_id.name, 16, check_utf8=True),
+                _normalise_bsb(bank_account._get_clearing_number('AU')),
+                _to_fixed_width(bank_account.account_number, 9, right=True),
+                _to_fixed_width(bank_account.holder_name or journal.company_id.name, 16, check_utf8=True),
                 ('0' * 8),
             ])
             append_detail(detail_summary, detail_record, 0, debit)

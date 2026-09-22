@@ -33,14 +33,18 @@
                 <attribute name="t-if" add="!dashboard['is_account_return_journal']" separator="and"/>
             </t>
 
+            <xpath expr="//t[@name='empty_journal_helper']" position="inside">
+                <span class="text-muted" t-if="dashboard['is_account_return_journal']">Simplify tax filing. Automate return preparation.</span>
+            </xpath>
+
             <t t-name="JournalMiscelaneous" position="after">
                 <t t-name="JournalTaxReturn">
                     <div id="dashboard_return_left" class="col mb-3 mb-sm-0">
                         <div class="row">
                             <div>
                                 <button type="action" name="account_reports.action_server_open_view_account_return" groups="account.group_account_user"
-                                        t-att-class="'me-1 btn ' + (dashboard['tax_return_button_primary'] ? 'btn-primary' : 'btn-secondary')">
-                                    Tax Returns
+                                        t-attf-class="me-1 btn btn-{{dashboard['tax_return_button_color']}}">
+                                    <t t-out="dashboard['tax_return_button_label']"/>
                                 </button>
                             </div>
                         </div>

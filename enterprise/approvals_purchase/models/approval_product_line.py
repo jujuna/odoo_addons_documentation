@@ -19,7 +19,7 @@ class ApprovalProductLine(models.Model):
         else:
             return []
         category = self.env['approval.category'].browse(category_id)
-        if category.approval_type == 'purchase':
+        if category.create_rfq:
             return [('purchase_ok', '=', True)]
 
     po_uom_qty = fields.Float(
@@ -32,11 +32,11 @@ class ApprovalProductLine(models.Model):
         store=True, readonly=False)
     has_no_seller = fields.Boolean(compute='_compute_has_no_seller', export_string_translation=False)
 
-    @api.depends('approval_request_id.approval_type', 'product_uom_id', 'quantity')
+    @api.depends('approval_request_id.create_rfq', 'product_uom_id', 'quantity')
     def _compute_po_uom_qty(self):
         for line in self:
-            approval_type = line.approval_request_id.approval_type
-            if approval_type == 'purchase' and line.product_id and line.quantity:
+            create_rfq = line.approval_request_id.create_rfq
+            if create_rfq and line.product_id and line.quantity:
                 uom = line.product_uom_id or line.product_id.uom_id
                 line.po_uom_qty = uom._compute_quantity(
                     line.quantity,
@@ -49,16 +49,17 @@ class ApprovalProductLine(models.Model):
     def _compute_seller_id(self):
         for line in self:
             if line.product_id and line.po_uom_qty:
-                line.seller_id = line.product_id.with_company(line.company_id)._select_seller(
+                seller_info = line.product_id.with_company(line.company_id)._select_seller(
                     quantity=line.po_uom_qty,
                     uom_id=line.product_id.uom_id,
                 )
-                if not line.seller_id:
+                if not seller_info:
                     # If no vendor found for the right quantity, we still want to display a vendor if any
-                    line.seller_id = line.product_id.with_company(line.company_id)._select_seller(
+                    seller_info = line.product_id.with_company(line.company_id)._select_seller(
                         quantity=None,
                         uom_id=line.product_id.uom_id,
                     )
+                line.seller_id = seller_info.get('supplierinfo')
 
     @api.depends('product_id', 'po_uom_qty', 'product_id.seller_ids')
     def _compute_has_no_seller(self):
@@ -85,6 +86,13 @@ class ApprovalProductLine(models.Model):
                 _('Please select a vendor on product line or set it on product(s) %s.', ', '.join(product_names))
             )
 
+    def _get_seller_info(self):
+        self.ensure_one()
+        return self.seller_id._get_seller_info() or self.product_id.with_company(self.company_id)._select_seller(
+            quantity=self.po_uom_qty,
+            uom_id=self.product_id.uom_id,
+        )
+
     def _get_purchase_orders_domain(self, vendor):
         """ Return a domain to get purchase order(s) where this product line could fit in.
         """
@@ -93,7 +101,7 @@ class ApprovalProductLine(models.Model):
             ('company_id', '=', self.company_id.id),
             ('partner_id', '=', vendor.id),
             ('state', '=', 'draft'),
-            ('currency_id', '=', self.seller_id.currency_id.id),
+            ('currency_id', '=', self._get_seller_info().get('currency_id', self.env['res.currency']).id),
         ])
 
     def _get_purchase_order_values(self, vendor):
@@ -110,6 +118,6 @@ class ApprovalProductLine(models.Model):
             'company_id': self.company_id.id,
             'payment_term_id': vendor.property_supplier_payment_term_id.id,
             'fiscal_position_id':self.env['account.fiscal.position']._get_fiscal_position(vendor).id,
-            'currency_id': self.seller_id.currency_id.id,
+            'currency_id': self._get_seller_info().get('currency_id', self.env['res.currency']).id,
         }
         return vals

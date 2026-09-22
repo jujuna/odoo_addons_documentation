@@ -8,55 +8,53 @@ from odoo.addons.stock_barcode.tests.test_barcode_client_action import TestBarco
 @tagged('post_install', '-at_install')
 class TestPickingBarcodeClientAction(TestBarcodeClientAction):
 
-    def setUp(self):
-        super().setUp()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.component01, cls.component02, cls.component_lot, cls.simple_kit, cls.kit_lot = cls.env['product.product'].create([
+            {
+                'name': 'Compo 01',
+                'is_storable': True,
+                'barcode': 'compo01',
+            }, {
+                'name': 'Compo 02',
+                'is_storable': True,
+                'barcode': 'compo02',
+            }, {
+                'name': 'Compo Lot',
+                'is_storable': True,
+                'barcode': 'compo_lot',
+                'tracking': 'lot',
+            }, {
+                'name': 'Simple Kit',
+                'is_storable': True,
+                'barcode': 'simple_kit',
+            }, {
+                'name': 'Kit Lot',
+                'is_storable': True,
+                'barcode': 'kit_lot',
+            },
+        ])
 
-        self.component01 = self.env['product.product'].create({
-            'name': 'Compo 01',
-            'is_storable': True,
-            'barcode': 'compo01',
-        })
-        self.component02 = self.env['product.product'].create({
-            'name': 'Compo 02',
-            'is_storable': True,
-            'barcode': 'compo02',
-        })
-        self.component_lot = self.env['product.product'].create({
-            'name': 'Compo Lot',
-            'is_storable': True,
-            'barcode': 'compo_lot',
-            'tracking': 'lot',
-        })
-
-        self.simple_kit = self.env['product.product'].create({
-            'name': 'Simple Kit',
-            'is_storable': True,
-            'barcode': 'simple_kit',
-        })
-        self.kit_lot = self.env['product.product'].create({
-            'name': 'Kit Lot',
-            'is_storable': True,
-            'barcode': 'kit_lot',
-        })
-
-        self.bom_kit_lot = self.env['mrp.bom'].create({
-            'product_tmpl_id': self.kit_lot.product_tmpl_id.id,
-            'product_qty': 1.0,
-            'type': 'phantom',
-            'bom_line_ids': [
-                (0, 0, {'product_id': self.component01.id, 'product_qty': 1.0}),
-                (0, 0, {'product_id': self.component_lot.id, 'product_qty': 1.0}),
-            ],
-        })
-        self.bom_simple_kit = self.env['mrp.bom'].create({
-            'product_tmpl_id': self.simple_kit.product_tmpl_id.id,
-            'product_qty': 1.0,
-            'type': 'phantom',
-            'bom_line_ids': [
-                (0, 0, {'product_id': self.component01.id, 'product_qty': 1.0}),
-                (0, 0, {'product_id': self.component02.id, 'product_qty': 1.0}),
-            ],
-        })
+        cls.bom_kit_lot, cls.bom_simple_kit = cls.env['mrp.bom'].create([
+            {
+                'product_tmpl_id': cls.kit_lot.product_tmpl_id.id,
+                'product_qty': 1.0,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': cls.component01.id, 'product_qty': 1.0}),
+                    Command.create({'product_id': cls.component_lot.id, 'product_qty': 1.0}),
+                ],
+            }, {
+                'product_tmpl_id': cls.simple_kit.product_tmpl_id.id,
+                'product_qty': 1.0,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({'product_id': cls.component01.id, 'product_qty': 1.0}),
+                    Command.create({'product_id': cls.component02.id, 'product_qty': 1.0}),
+                ],
+            },
+        ])
 
     def test_immediate_receipt_kit_from_scratch_with_tracked_compo(self):
         receipt_picking = self.env['stock.picking'].create({
@@ -64,7 +62,7 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
             'location_dest_id': self.stock_location.id,
             'picking_type_id': self.picking_type_in.id,
         })
-        url = self._get_client_action_url(receipt_picking.id)
+        url = self._get_client_action_url(receipt_picking)
         self.start_tour(url, 'test_immediate_receipt_kit_from_scratch_with_tracked_compo', login='admin', timeout=180)
 
         self.assertRecordValues(receipt_picking.move_ids.move_line_ids, [
@@ -80,7 +78,7 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
             'location_dest_id': self.stock_location.id,
             'picking_type_id': self.picking_type_in.id,
         })
-        url = self._get_client_action_url(receipt_picking.id)
+        url = self._get_client_action_url(receipt_picking)
         self.start_tour(url, 'test_planned_receipt_kit_from_scratch_with_tracked_compo', login='admin', timeout=180)
 
         self.assertRecordValues(receipt_picking.move_ids.move_line_ids, [
@@ -107,7 +105,7 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
             'move_ids': [Command.create({
                 'product_id': self.simple_kit.id,
                 'product_uom_qty': 1.0,
-                'product_uom': self.simple_kit.uom_id.id,
+                'uom_id': self.simple_kit.uom_id.id,
                 'location_id': self.stock_location.id,
                 'location_dest_id': self.stock_location.id,
             })],
@@ -127,7 +125,7 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
 
         self.env['stock.move.line'].create(create_vals)
 
-        url = self._get_client_action_url(picking.id)
+        url = self._get_client_action_url(picking)
         self.start_tour(url, 'test_picking_product_with_kit_and_packaging', login='admin', timeout=180)
         self.assertEqual(picking.state, 'done')
 
@@ -144,14 +142,14 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
             'move_ids': [Command.create({
                 'product_id': product.id,
                 'product_uom_qty': 1.0,
-                'product_uom': self.kit_lot.uom_id.id,
+                'uom_id': self.kit_lot.uom_id.id,
                 'location_id': self.stock_location.id,
                 'location_dest_id': self.stock_location.id,
             }) for product in [self.kit_lot, self.component_lot]],
         })
         picking.action_confirm()
         picking.move_ids.write({'quantity': 1})
-        url = self._get_client_action_url(picking.id)
+        url = self._get_client_action_url(picking)
         self.start_tour(url, 'test_picking_product_with_kit_and_component', login='admin', timeout=180)
 
     def test_delivery_kit_with_tracked_compo(self):
@@ -180,7 +178,7 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
                 Command.create({
                     'product_id': product.id,
                     'product_uom_qty': 1.0,
-                    'product_uom': product.uom_id.id,
+                    'uom_id': product.uom_id.id,
                     'location_id': self.stock_location.id,
                     'location_dest_id': self.customer_location.id,
                 }) for product in [self.kit_lot, self.component_lot]
@@ -227,7 +225,7 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
                 Command.create({
                     'product_id': blue_sofa.id,
                     'product_uom_qty': 2,
-                    'product_uom': blue_sofa.uom_id.id,
+                    'uom_id': blue_sofa.uom_id.id,
                     'location_id': self.supplier_location.id,
                     'location_dest_id': self.stock_location.id,
                 }),
@@ -235,3 +233,22 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         })
         picking.action_confirm()
         self.start_tour('/odoo/barcode', 'test_picking_kit_variant_packaging', login='admin')
+
+    def test_only_mo_of_current_operation_are_visible(self):
+        """Test that it only returns manufacturing orders for the given picking type."""
+        picking_type_1 = self.warehouse.manu_type_id
+        picking_type_2 = picking_type_1.copy()
+        mo_1 = self.env['mrp.production'].create({
+            'product_id': self.product1.id,
+            'product_qty': 1,
+            'picking_type_id': picking_type_1.id,
+        })
+        mo_2 = self.env['mrp.production'].create({
+            'product_id': self.product1.id,
+            'product_qty': 1,
+            'picking_type_id': picking_type_2.id,
+        })
+        action = picking_type_1.get_action_picking_tree_ready_kanban()
+        productions = self.env['mrp.production'].search(action['domain'])
+        self.assertEqual(productions.ids, [mo_1.id])
+        self.assertNotIn(mo_2.id, productions.ids)

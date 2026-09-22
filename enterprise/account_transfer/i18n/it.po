@@ -5,15 +5,15 @@
 # Translators:
 # Martin Trigaux, 2022
 # Sergio Zanchetta <primes2h@gmail.com>, 2022
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-16 09:06+0000\n"
-"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 23:33+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
 "account_transfer/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,16 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_transfer
+#: model:ir.module.module,description:base.module_account_transfer
+msgid ""
+"\n"
+"Account Transfers\n"
+"===========================\n"
+"A helper model for managing transfers between accounts.\n"
+msgstr ""
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -62,6 +71,11 @@ msgstr "Modello trasferimento conto"
 #: model:ir.model,name:account_transfer.model_account_transfer_model_line
 msgid "Account Transfer Model Line"
 msgstr "Riga modello trasferimento conto"
+
+#. module: account_transfer
+#: model:ir.module.module,shortdesc:base.module_account_transfer
+msgid "Account Transfers"
+msgstr ""
 
 #. module: account_transfer
 #: model:ir.actions.server,name:account_transfer.ir_cron_auto_transfer_ir_actions_server
@@ -195,6 +209,13 @@ msgstr "Ha movimenti in bozza"
 #: model:ir.model.fields,field_description:account_transfer.field_account_transfer_model_line__id
 msgid "ID"
 msgstr "ID"
+
+#. module: account_transfer
+#. odoo-python
+#: code:addons/account_transfer/demo/account_demo.py:0
+#: model:account.journal.group,name:account_transfer.ifrs_group
+msgid "IFRS"
+msgstr "IFRS"
 
 #. module: account_transfer
 #. odoo-python
@@ -437,100 +458,3 @@ msgstr "es. Trasferimento spese mensili"
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "forever"
 msgstr "per sempre"
-
-#~ msgid "Account automatic transfers: Perform transfers"
-#~ msgstr "Trasferimento automatico conto: esegui trasferimenti"
-
-#~ msgid "Activate"
-#~ msgstr "Attiva"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these analytic accounts to the destination account"
-#~ msgstr ""
-#~ "Aggiunge una condizione per trasferire solo la somma delle linee dai "
-#~ "conti di origine che corrispondono a questi conti analitici al conto di "
-#~ "destinazione"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these partners to the destination account"
-#~ msgstr ""
-#~ "Aggiunge una condizione per trasferire solo la somma delle linee dai "
-#~ "conti di origine che corrispondono a questi partner al conto di "
-#~ "destinazione"
-
-#~ msgid "Analytic Filter"
-#~ msgstr "Filtro analitico"
-
-#~ msgid "Automated Transfer"
-#~ msgstr "Trasferimento automatizzato"
-
-#~ msgid "Automatic Transfer (%s%% from account %s)"
-#~ msgstr "Trasferimento automatico (%s%% dal conto %s)"
-
-#~ msgid "Automatic Transfer (-%s%%)"
-#~ msgstr "Trasferimento automatico (-%s%%)"
-
-#~ msgid ""
-#~ "Automatic Transfer (entries with analytic account(s): %s and partner(s): "
-#~ "%s)"
-#~ msgstr ""
-#~ "Trasferimento automatico (registrazioni con conti analitici: %s e "
-#~ "partner: %s)"
-
-#~ msgid "Automatic Transfer (entries with analytic account(s): %s)"
-#~ msgstr "Trasferimento automatico (registrazioni con conti analitici: %s)"
-
-#~ msgid "Automatic Transfer (entries with partner(s): %s)"
-#~ msgstr "Trasferimento automatico (registrazioni con partner: %s)"
-
-#~ msgid ""
-#~ "Automatic Transfer (from account %s with analytic account(s): %s and "
-#~ "partner(s): %s)"
-#~ msgstr ""
-#~ "Trasferimento automatico (dal conto %s con conti analitici: %s e partner: "
-#~ "%s)"
-
-#~ msgid "Automatic Transfer (from account %s with analytic account(s): %s)"
-#~ msgstr "Trasferimento automatico (dal conto %s con conti analitici: %s)"
-
-#~ msgid "Automatic Transfer (from account %s with partner(s): %s)"
-#~ msgstr "Trasferimento automatico (dal conto %s con partner: %s)"
-
-#~ msgid "Automatic Transfer (to account %s)"
-#~ msgstr "Trasferimento automatico (al conto %s)"
-
-#~ msgid "Automatic Transfers"
-#~ msgstr "Trasferimenti automatici"
-
-#~ msgid "IFRS Automatic Transfers"
-#~ msgstr "Trasferimenti automatici IFRS"
-
-#~ msgid "Monthly IFRS rent expense transfer"
-#~ msgstr "Trasferimento mensile spese di leasing IFRS"
-
-#~ msgid "Partner Filter"
-#~ msgstr "Filtro partner"
-
-#~ msgid "Percent (%)"
-#~ msgstr "Percentuale (%)"
-
-#~ msgid "Percent Is Readonly"
-#~ msgstr "Percento in sola lettura"
-
-#~ msgid "Running"
-#~ msgstr "In corso"
-
-#~ msgid "The analytic filter %s is duplicated"
-#~ msgstr "Il filtro analitico %s è duplicato"
-
-#~ msgid ""
-#~ "The partner filter %s in combination with the analytic filter %s is "
-#~ "duplicated"
-#~ msgstr ""
-#~ "Il filtro partner %s, in combinazione con il filtro analitico %s, è "
-#~ "duplicato"
-
-#~ msgid "The partner filter %s is duplicated"
-#~ msgstr "Il filtro partner %s è duplicato"

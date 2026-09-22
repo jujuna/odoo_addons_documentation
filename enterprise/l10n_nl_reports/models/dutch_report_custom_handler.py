@@ -4,6 +4,9 @@ from lxml import etree
 
 from odoo import _, fields, models
 from odoo.exceptions import RedirectWarning, UserError
+from odoo.tools import cleanup_xml_node
+
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData, AccountReportColumnData
 
 
 class L10n_Nl_ReportsTaxReportHandler(models.AbstractModel):
@@ -15,7 +18,6 @@ class L10n_Nl_ReportsTaxReportHandler(models.AbstractModel):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         options['buttons'].append({'name': "XBRL", 'sequence': 30, 'action': 'open_xbrl_wizard', 'file_export_type': 'XBRL'})
         options['l10n_nl_is_correction'] = previous_options.get('l10n_nl_is_correction', False)
-        options['return_id'] = previous_options.get('return_id', False)
 
     def open_xbrl_wizard(self, options):
         report = self.env['account.report'].browse(options['report_id'])
@@ -28,8 +30,6 @@ class L10n_Nl_ReportsTaxReportHandler(models.AbstractModel):
             'date': {
                 'date_from': closing_date_from,
                 'date_to': closing_date_to,
-                'mode': 'range',
-                'filter': 'custom',
             },
             'integer_rounding_enabled': True,
         })
@@ -56,11 +56,16 @@ class L10n_Nl_ReportsTaxReportHandler(models.AbstractModel):
         date_to = fields.Date.to_date(options['date']['date_to'])
         if options['l10n_nl_is_correction']:
             template_xmlid = 'l10n_nl_reports.suppletie_tax_report_sbr'
+            if date_to.year == 2025:
+                template_xmlid = 'l10n_nl_reports.suppletie_tax_report_sbr_nt19'
         else:
             template_xmlid = 'l10n_nl_reports.tax_report_sbr'
             if date_to.year == 2024:
                 # We still need to support the NT18 taxonomy for 2024 until that declaration period is over.
                 template_xmlid = 'l10n_nl_reports.tax_report_sbr_nt18'
+            elif date_to.year == 2025:
+                # We still need to support the NT19 taxonomy for 2025 until that declaration period is over.
+                template_xmlid = 'l10n_nl_reports.tax_report_sbr_nt19'
 
         report_template = self.env.ref(template_xmlid, raise_if_not_found=False)
         if not report_template:
@@ -79,7 +84,7 @@ class L10n_Nl_ReportsTaxReportHandler(models.AbstractModel):
 
         xbrl = self.env['ir.qweb']._render(report_template.id, data)
         xbrl_element = etree.fromstring(xbrl)
-        xbrl_file = etree.tostring(xbrl_element, xml_declaration=True, encoding='utf-8')
+        xbrl_file = etree.tostring(cleanup_xml_node(xbrl_element, remove_blank_nodes=False), xml_declaration=True, encoding='utf-8')
         xbrl_file_name = report.get_default_report_filename(options, 'xbrl')
         if options['l10n_nl_is_correction']:
             xbrl_file_name = xbrl_file_name.replace('.xbrl', '_suppletie.xbrl')
@@ -120,9 +125,9 @@ class L10n_Nl_ReportsTaxReportHandler(models.AbstractModel):
             model_trl_to_codes[self.env.ref(tax_report_line_id).id] = codes
 
         for line in lines:
-            codes = model_trl_to_codes.get(self.env['account.report']._get_model_info_from_id(line['id'])[1]) or []
+            codes = model_trl_to_codes.get(self.env['account.report']._get_model_info_from_id(line.id)[1]) or []
             for code, label in codes:
-                codes_values[code] = str(int(next(col for col in line['columns'] if col['expression_label'] == label)['no_format']))
+                codes_values[code] = str(int(next(col for col in line.columns if col.expression_label == label).no_format))
         return codes_values
 
     def _custom_line_postprocessor(self, report, options, lines):
@@ -137,50 +142,47 @@ class L10n_Nl_ReportsTaxReportHandler(models.AbstractModel):
         line_5e = self.env.ref('l10n_nl.tax_report_rub_btw_5e')
         line_5f = self.env.ref('l10n_nl.tax_report_rub_btw_5f')
         line_5g = self.env.ref('l10n_nl.tax_report_rub_btw_5g')
-        new_line_5e_dict, new_line_5f_dict, new_line_5g_dict = {}, {}, {}
+        new_line_5e_data = AccountReportLineData()
 
         new_lines = []
         # Intercept lines to modify and prepare their values.
         for line in lines:
-            line_record_id = report._get_res_id_from_line_id(line['id'], 'account.report.line')
+            line_record_id = report._get_res_id_from_line_id(line.id, 'account.report.line')
             match line_record_id:
                 case line_5e.id:
-                    new_line_5e_dict.update({
-                        'id': line['id'],
-                        'name': self.env._("5e. End total"),
-                        'parent_id': line['parent_id'],
-                        'level': line['level'],
-                    })
+                    new_line_5e_data.id = line.id
+                    new_line_5e_data.name = self.env._("5e. End total")
+                    new_line_5e_data.parent_id = line.parent_id
+                    new_line_5e_data.level = line.level
                 case line_5f.id:
-                    new_line_5f_dict.update({
-                        'id': line['id'],
-                        'name': self.env._("5f. Balance already declared amount"),
-                        'parent_id': line['parent_id'],
-                        'level': line['level'],
-                        'columns': [{**col} for col in line['columns']],  # Deep copy of the columns
-                    })
+                    new_line_5f_data = AccountReportLineData(
+                        id=line.id,
+                        name=self.env._("5f. Balance already declared amount"),
+                        parent_id=line.parent_id,
+                        level=line.level,
+                        columns=[AccountReportColumnData.copy(col) for col in line.columns],  # Deep copy of the columns
+                    )
                 case line_5g.id:
-                    new_line_5g_dict.update({
-                        'id': line['id'],
-                        'name': line['name'],
-                        'parent_id': line['parent_id'],
-                        'level': line['level'],
-                        'columns': [{**col} for col in line['columns']],  # Deep copy of the columns
-                    })
-                    new_line_5e_dict.update({
-                        'debug_popup_data': line.get('debug_popup_data'),
-                        'columns': [{**col} for col in line['columns']],  # Deep copy of the columns
-                    })
+                    new_line_5g_data = AccountReportLineData(
+                        id=line.id,
+                        name=line.name,
+                        parent_id=line.parent_id,
+                        level=line.level,
+                        columns=[AccountReportColumnData.copy(col) for col in line.columns],  # Deep copy of the columns
+                    )
+                    new_line_5e_data.debug_popup_data = line.debug_popup_data
+                    new_line_5e_data.columns = [AccountReportColumnData.copy(col) for col in line.columns]
                 case _:
                     new_lines.append(line)
 
+        current_return = self.env['account.return']._get_return_from_report_options(options)
         return_generic_domain = [
             ('company_id', '=', report._get_sender_company_for_export(options).id),
             ('type_id', 'in', (
                 self.env.ref('l10n_nl_reports.nl_tax_return_type').id,
                 self.env.ref('l10n_nl_reports.nl_tax_correction_return_type').id,
             )),
-            ('id', '!=', options['return_id']),
+            ('id', '!=', current_return.id),
         ]
 
         # Fill the values in the columns for the new lines.
@@ -188,26 +190,26 @@ class L10n_Nl_ReportsTaxReportHandler(models.AbstractModel):
             if column['expression_label'] != 'tax':
                 continue
 
-            column_date = options['column_groups'][column['column_group_key']]['forced_options']['date']
+            column_date = options['column_groups'][column['column_group_index']]['forced_options']['date']
             previous_returns_result = sum(self.env['account.return'].search([
                 *return_generic_domain,
                 ('date_from', '=', column_date['date_from']),
                 ('date_to', '=', column_date['date_to']),
             ]).mapped('period_amount_to_pay'))
-            amount_payable_reclaimable = new_line_5e_dict['columns'][i]['no_format'] - previous_returns_result
-            new_line_5f_dict['columns'][i].update({
-                'auditable': False,
-                'is_zero': self.env.company.currency_id.is_zero(previous_returns_result),
-                'no_format': previous_returns_result,
-                'report_line_id': None,
-            })
-            new_line_5g_dict['columns'][i].update({
-                'auditable': False,
-                'is_zero': self.env.company.currency_id.is_zero(amount_payable_reclaimable),
-                'no_format': amount_payable_reclaimable,
-                'report_line_id': None,
-            })
+            amount_payable_reclaimable = new_line_5e_data.columns[i].no_format - previous_returns_result
+            new_line_5f_data.columns[i].update_values(
+                auditable=False,
+                is_zero=self.env.company.currency_id.is_zero(previous_returns_result),
+                no_format=previous_returns_result,
+                report_line_id=None,
+            )
+            new_line_5g_data.columns[i].update_values(
+                auditable=False,
+                is_zero=self.env.company.currency_id.is_zero(amount_payable_reclaimable),
+                no_format=amount_payable_reclaimable,
+                report_line_id=None,
+            )
 
-        new_lines.extend([new_line_5e_dict, new_line_5f_dict, new_line_5g_dict])
+        new_lines.extend([new_line_5e_data, new_line_5f_data, new_line_5g_data])
 
         return new_lines

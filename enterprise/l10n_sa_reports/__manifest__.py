@@ -1,6 +1,5 @@
 {
     'name': 'Saudi Arabia - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Saudi Arabia
 ============================================

@@ -1,10 +1,11 @@
-import { expect, test } from "@odoo/hoot";
-import { queryAll } from "@odoo/hoot-dom";
+import { expect, getFixture, test } from "@odoo/hoot";
+import { animationFrame, queryAll, queryOne } from "@odoo/hoot-dom";
 import { mockDate } from "@odoo/hoot-mock";
 import { defineRoomModels, mountRoomBookingView } from "@room/../tests/room_test_helpers";
+import { closestScrollableY } from "@web/core/utils/scrolling";
 import { contains, onRpc } from "@web/../tests/web_test_helpers";
 
-const SCHEDULE_SEL = ".btn.rounded-pill i.fa-calendar-plus-o";
+const SCHEDULE_SEL = ".btn.rounded-pill i[data-icon='calendar_add_on']";
 const DAY_SEL = ".o_room_scheduler > div > div:last-child";
 const slotSel = (slot) => `#slot${slot}`;
 
@@ -22,7 +23,7 @@ defineRoomModels();
  */
 
 function assertSlots(slots) {
-    slots.bookedSlots?.forEach((slot) => expect(`${slotSel(slot)} > .bg-secondary`).toHaveCount(1));
+    slots.bookedSlots?.forEach((slot) => expect(`${slotSel(slot)} > .bg-300`).toHaveCount(1));
     slots.freeSlots?.forEach((slot) => expect(`${slotSel(slot)} > .bg-success`).toHaveCount(1));
     slots.selectedSlots?.forEach((slot) =>
         expect(`${slotSel(slot)} > .text-bg-primary`).toHaveCount(1)
@@ -152,9 +153,9 @@ test("Room Booking Form - Existing bookings", async () => {
         freeSlots: ["1035", "1230"],
     });
     // There should be only 5 booked slots
-    expect(".col > .bg-secondary").toHaveCount(5);
+    expect(".col > .bg-300").toHaveCount(5);
     await contains(slotSel("1100")).click();
-    expect(".col > .bg-secondary").toHaveCount(5);
+    expect(".col > .bg-300").toHaveCount(5);
     expect(".col > .text-bg-primary").toHaveCount(0);
 
     await contains(slotSel("1300")).click();
@@ -218,7 +219,7 @@ test("Room Booking Form - Create a Booking", async () => {
     await contains(slotSel("1100")).click();
     await contains(slotSel("1200")).click();
     await contains(".o_room_scheduler > div:last-child .btn-primary").click();
-    expect(".fa-check-circle.fa-3x").toHaveCount(1);
+    expect("[data-icon='check_circle'].oi-3x").toHaveCount(1);
 });
 
 test("Room Booking Form - Editing booking", async () => {
@@ -248,11 +249,11 @@ test("Room Booking Form - Editing booking", async () => {
     mockDate("2023-06-17 10:35:00", 0);
     await mountRoomBookingView();
 
-    await contains(".o_room_sidebar .list-group-item:first-child").click();
+    await contains(".o_room_sidebar .list-group-item:first-of-type").click();
     expect("input[placeholder='Booking Name']").toHaveValue("Booking 1");
     assertSlots({ bookedSlots: ["1330"], selectedSlots: ["1200", "1230", "1300"] });
 
-    await contains(".o_room_sidebar .list-group-item:last-child").click();
+    await contains(".o_room_sidebar .list-group-item:last-of-type").click();
     expect("input[placeholder='Booking Name']").toHaveValue("Booking 2");
     assertSlots({ bookedSlots: ["1200", "1230"], selectedSlots: ["1300", "1330", "1400"] });
 
@@ -261,7 +262,7 @@ test("Room Booking Form - Editing booking", async () => {
     await contains(slotSel("1400")).click();
     await contains(slotSel("1500")).click();
     await contains(".o_room_scheduler > div:last-child .btn-primary").click();
-    expect(".fa-check-circle.fa-3x").toHaveCount(1);
+    expect("[data-icon='check_circle'].oi-3x").toHaveCount(1);
 });
 
 test("Room Booking Form - Edit Current Booking", async () => {
@@ -285,7 +286,7 @@ test("Room Booking Form - Edit Current Booking", async () => {
     mockDate("2023-06-17 14:35:00", 0);
     await mountRoomBookingView();
 
-    await contains(".o_room_sidebar .list-group-item:first-child").click();
+    await contains(".o_room_sidebar .list-group-item:first-of-type").click();
     expect(`${slotSel("1435")} > .text-bg-primary`).toHaveCount(1);
 
     // Extend the meeting
@@ -293,7 +294,7 @@ test("Room Booking Form - Edit Current Booking", async () => {
     await contains("input[placeholder='Booking Name']").edit("Extended Booking");
     // The start is the current slot, but it should not be considered as a new start
     await contains(".o_room_scheduler > div:last-child .btn-primary").click();
-    expect(".fa-calendar-times-o.fa-3x").toHaveCount(1);
+    expect("[data-icon='event_busy'].oi-3x").toHaveCount(1);
 });
 
 test("Room Booking Form - Receiving new booking", async () => {
@@ -387,11 +388,11 @@ test("Room Booking Form - Day Selector", async () => {
     expect(`${DAY_SEL} button.btn-primary`).toHaveText(/18/);
     assertSlots({ bookedSlots: ["1300"], freeSlots: ["0000", "0030", "1200"] });
 
-    await contains(`${DAY_SEL} .oi-chevron-right`).click();
+    await contains(`${DAY_SEL} [data-icon="chevron_forward"]`).click();
     expect(`${DAY_SEL} button.btn-primary`).toHaveText(/25/);
     assertSlots({ freeSlots: ["1200", "1300"] });
 
-    await contains(".o_room_sidebar .list-group-item:first-child").click();
+    await contains(".o_room_sidebar .list-group-item:first-of-type").click();
     expect(`${DAY_SEL} button.btn-primary`).toHaveText(/17/);
     assertSlots({ selectedSlots: ["1200", "1230", "1300"] });
 });
@@ -408,8 +409,57 @@ test("Room Booking Form - Delete booking being edited", async (assert) => {
     mockDate("2023-06-17 10:35:00", 0);
     const { notifyView } = await mountRoomBookingView(true);
 
-    await contains(".o_room_sidebar .list-group-item:first-child").click();
+    await contains(".o_room_sidebar .list-group-item:first-of-type").click();
     assertSlots({ selectedSlots: ["1200", "1230"] });
     await notifyView("booking/delete", [{ id: 1 }]);
-    expect(".fa-check-circle.fa-3x").toHaveCount(1);
+    expect("[data-icon='check_circle'].oi-3x").toHaveCount(1);
+});
+
+/* Forces the grid to overflow, as it does in the browser (styling not applied) */
+function makeSchedulerScrollable() {
+    const style = document.createElement("style");
+    style.textContent = `
+        .o_room_scheduler { height: 100vh !important; }
+        .o_room_scheduler_slots .col { min-height: 25vh; }
+    `;
+    getFixture().appendChild(style);
+}
+
+test("Room Booking Form - Scroll to 0800 slot on day change", async () => {
+    onRpc("/room/room_test/get_existing_bookings", () => []);
+    mockDate("2023-06-17 10:35:00", 0);
+
+    makeSchedulerScrollable();
+    await mountRoomBookingView();
+    await contains(SCHEDULE_SEL).click();
+    await contains(`${DAY_SEL} button.btn-primary + button:enabled`).click(); // Next day
+
+    // The scheduler scrolled down to 08:00, leaving the night slots out of sight above it.
+    expect(slotSel("0000")).toHaveCount(1);
+    expect(`${slotSel("0000")}:viewPort`).toHaveCount(0);
+    expect(`${slotSel("0800")}:viewPort`).toHaveCount(1);
+});
+
+test("Room Booking Form - Scroll to booking start hour when editing", async () => {
+    onRpc("/room/room_test/get_existing_bookings", () => [
+        {
+            id: 1,
+            name: "Booking 1",
+            start_datetime: "2023-06-17 20:00:00",
+            stop_datetime: "2023-06-17 21:00:00",
+        },
+    ]);
+    mockDate("2023-06-17 07:00:00", 0);
+
+    makeSchedulerScrollable();
+    await mountRoomBookingView();
+    // Open the existing booking for editing (not "schedule new"), so bookingToEdit is set
+    // and the scheduler scrolls to its 20:00 start slot rather than the 08:00 default.
+    await contains(".o_room_sidebar .list-group-item:first-of-type").click();
+    await animationFrame();
+
+    // Guard the premise: without overflow there is nothing to scroll and the rest is vacuous.
+    expect(closestScrollableY(queryOne(slotSel("2000")))).not.toBe(null);
+    expect(`${slotSel("2000")}:viewPort`).toHaveCount(1);
+    expect(`${slotSel("0800")}:viewPort`).toHaveCount(0);
 });

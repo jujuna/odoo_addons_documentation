@@ -7,17 +7,33 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:09+0000\n"
-"PO-Revision-Date: 2025-11-18 17:13+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Slovak <https://translate.odoo.com/projects/odoo-19-l10n/"
+"POT-Creation-Date: 2026-09-18 18:21+0000\n"
+"PO-Revision-Date: 2026-09-18 05:06+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Slovak <https://translate.odoo.com/projects/odoo-master/"
 "l10n_sk_hr_payroll/sk/>\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: l10n_sk_hr_payroll
+#: model:ir.module.module,description:base.module_l10n_sk_hr_payroll
+msgid ""
+"\n"
+"Slovak Payroll Rules.\n"
+"=========================\n"
+"\n"
+"    * Employee Details\n"
+"    * Employee Contracts\n"
+"    * Passport based Contract\n"
+"    * Allowances/Deductions\n"
+"    * Allow to configure Basic/Gross/Net Salary\n"
+"    * Employee Payslip\n"
+"    * Integrated with Leaves Management\n"
+msgstr ""
 
 #. module: l10n_sk_hr_payroll
 #: model:ir.actions.report,print_report_name:l10n_sk_hr_payroll.action_report_payslip_sk
@@ -75,6 +91,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_sk_hr_payroll.field_hr_payroll_structure_type__display_name
 #: model:ir.model.fields,field_description:l10n_sk_hr_payroll.field_hr_payslip__display_name
 #: model:ir.model.fields,field_description:l10n_sk_hr_payroll.field_hr_version__display_name
+#: model:ir.model.fields,field_description:l10n_sk_hr_payroll.field_hr_work_entry_type__display_name
 msgid "Display Name"
 msgstr "Zobrazovaný názov"
 
@@ -97,6 +114,11 @@ msgid "Employer"
 msgstr ""
 
 #. module: l10n_sk_hr_payroll
+#: model:hr.salary.rule,name:l10n_sk_hr_payroll.l10n_sk_hr_payroll_structure_sk_employee_salary_expenses_reimbursement
+msgid "Expenses Reimbursement"
+msgstr ""
+
+#. module: l10n_sk_hr_payroll
 #: model:hr.salary.rule,name:l10n_sk_hr_payroll.l10n_sk_guarantee_insurance_employer
 msgid "Guarantee Insurance (Employer)"
 msgstr ""
@@ -116,6 +138,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_sk_hr_payroll.field_hr_payroll_structure_type__id
 #: model:ir.model.fields,field_description:l10n_sk_hr_payroll.field_hr_payslip__id
 #: model:ir.model.fields,field_description:l10n_sk_hr_payroll.field_hr_version__id
+#: model:ir.model.fields,field_description:l10n_sk_hr_payroll.field_hr_work_entry_type__id
 msgid "ID"
 msgstr "ID"
 
@@ -223,6 +246,26 @@ msgid "Sickness Insurance (Employer)"
 msgstr ""
 
 #. module: l10n_sk_hr_payroll
+#: model:ir.module.module,shortdesc:base.module_l10n_sk_hr_payroll
+msgid "Slovakia - Payroll"
+msgstr ""
+
+#. module: l10n_sk_hr_payroll
+#: model:hr.payroll.structure.type,name:l10n_sk_hr_payroll.structure_type_employee_sk
+msgid "Slovakia: Employee"
+msgstr ""
+
+#. module: l10n_sk_hr_payroll
+#: model:hr.rule.parameter,name:l10n_sk_hr_payroll.rule_parameter_income_tax_threshold
+msgid "Slovakia: Income Tax Threshold"
+msgstr ""
+
+#. module: l10n_sk_hr_payroll
+#: model:hr.rule.parameter,name:l10n_sk_hr_payroll.rule_parameter_monthly_taxable_max
+msgid "Slovakia: Maximum monthly assessment base"
+msgstr ""
+
+#. module: l10n_sk_hr_payroll
 #: model:hr.payroll.structure,name:l10n_sk_hr_payroll.hr_payroll_structure_sk_employee_salary
 msgid "Slovakia: Regular Pay"
 msgstr ""
@@ -255,6 +298,11 @@ msgid "Taxable Salary"
 msgstr ""
 
 #. module: l10n_sk_hr_payroll
+#: model:ir.model,name:l10n_sk_hr_payroll.model_hr_work_entry_type
+msgid "Time Type"
+msgstr ""
+
+#. module: l10n_sk_hr_payroll
 #: model:hr.salary.rule,name:l10n_sk_hr_payroll.l10n_sk_unemployment_insurance_employee
 msgid "Unemployment Insurance"
 msgstr ""
@@ -262,4 +310,10 @@ msgstr ""
 #. module: l10n_sk_hr_payroll
 #: model:hr.salary.rule,name:l10n_sk_hr_payroll.l10n_sk_unemployment_insurance_employer
 msgid "Unemployment Insurance (Employer)"
+msgstr ""
+
+#. module: l10n_sk_hr_payroll
+#. odoo-python
+#: code:addons/l10n_sk_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "month"
 msgstr ""

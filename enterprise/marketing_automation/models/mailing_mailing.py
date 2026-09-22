@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.tools import SQL
 
 
 class MailingMailing(models.Model):
@@ -31,8 +32,9 @@ class MailingMailing(models.Model):
                 vals = {
                     'mass_mailing_id': mass_mailing.id,
                     'campaign_id': activity.campaign_id.utm_campaign_id.id,
-                    'source_id': activity.source_id.id,
                     'medium_id': mass_mailing.medium_id.id,
+                    'source_id': mass_mailing.source_id.id,
+                    'utm_reference': f'{activity._name},{activity.id}',
                 }
                 res[mass_mailing.id] = mass_mailing._shorten_links(
                     mass_mailing.body_html or '',
@@ -48,11 +50,11 @@ class MailingMailing(models.Model):
         if self.env.context.get('default_marketing_activity_id'):
             activity = self.env['marketing.activity'].browse(self.env.context['default_marketing_activity_id'])
             res['campaign_id'] = activity.campaign_id.utm_campaign_id.id
-            res['source_id'] = activity.source_id.id
+            res['utm_reference'] = f'{activity._name},{activity.id}'
         return res
 
-    def _get_seen_list_extra(self):
-        return ('LEFT JOIN marketing_trace m ON (s.marketing_trace_id = m.id)', 'AND (m.is_test IS NULL OR m.is_test = false)')
+    def _get_seen_list_extra(self, query):
+        query.add_where(SQL("%s IS NOT TRUE", query.table.marketing_trace_id.is_test))
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_no_linked_activities(self):
@@ -60,6 +62,18 @@ class MailingMailing(models.Model):
         if protected:
             raise UserError(
                 _("Mailings %(mailing_names)s are used in marketing campaigns. You should take care of this before unlinking the mailings.",
-                  mailing_names=", ".join(protected.mapped("name"))
+                  mailing_names=", ".join(protected.mapped("display_name"))
                 )
             )
+
+    def action_retry_failed(self, extra_domain=None):
+        """
+        Prevent retrying mailings tied to marketing automation.
+        Retrying bypasses the automation filters and targets the entire model.
+        """
+        if self.filtered('use_in_marketing_automation'):
+            raise UserError(_(
+                "Oops! You can't retry sending emails from inside a Marketing Automation campaign."
+            ))
+
+        return super().action_retry_failed(extra_domain=extra_domain)

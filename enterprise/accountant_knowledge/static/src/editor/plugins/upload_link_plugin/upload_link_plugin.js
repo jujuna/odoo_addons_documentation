@@ -12,7 +12,7 @@ export class UploadLinkPlugin extends Plugin {
 
     /** @param {Event} event */
     async onUploadFileBtnClick(event) {
-        if (!event.target.classList.contains("o-upload-link")) {
+        if (!event.target.classList.contains("o-upload-link") || !this.config.allowFile) {
             return;
         }
         const { resId, resModel } = this.config.getRecordInfo();
@@ -26,7 +26,7 @@ export class UploadLinkPlugin extends Plugin {
             for (const attachment of attachments) {
                 this.dependencies.dom.insert(renderEmbeddedFileBox(attachment));
             }
-            this.dependencies.history.addStep();
+            this.dependencies.history.commit();
         }
     }
 }

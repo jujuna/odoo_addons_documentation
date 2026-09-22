@@ -2,23 +2,32 @@
 # This file contains the translation of the following modules:
 # * account_loans
 #
-# Odoo Translation Bot <c3p@odoo.com>, 2025.
+# Odoo Translation Bot <c3p@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-11 23:48+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Azerbaijani <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 03:09+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Azerbaijani <https://translate.odoo.com/projects/odoo-master/"
 "account_loans/az/>\n"
 "Language: az\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_loans
+#: model:ir.module.module,description:base.module_account_loans
+msgid ""
+"\n"
+"Loans management\n"
+"=================\n"
+"Keeps track of loans, and creates corresponding journal entries.\n"
+msgstr ""
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_form_view
@@ -48,22 +57,17 @@ msgstr ""
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_form_view
 msgid ""
-"<span class=\"oe_inline\" invisible=\"duration == 1\">months</span>\n"
-"                                        <span class=\"oe_inline\" "
-"invisible=\"duration != 1\">month</span>"
+"<span invisible=\"duration == 1\">months</span>\n"
+"                                        <span invisible=\"duration != "
+"1\">month</span>"
 msgstr ""
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
 msgid ""
-"<span class=\"oe_inline\" invisible=\"loan_term == 1\">years</span>\n"
-"                                    <span class=\"oe_inline\" "
-"invisible=\"loan_term != 1\">year</span>"
-msgstr ""
-
-#. module: account_loans
-#: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
-msgid "<span class=\"oe_inline\">%</span>"
+"<span invisible=\"loan_term == 1\">years</span>\n"
+"                                    <span invisible=\"loan_term != 1\">year</"
+"span>"
 msgstr ""
 
 #. module: account_loans
@@ -84,6 +88,11 @@ msgstr ""
 #. module: account_loans
 #: model:ir.model.fields.selection,name:account_loans.selection__account_loan_compute_wizard__compounding_method__a/a_isda
 msgid "A/A ISDA"
+msgstr ""
+
+#. module: account_loans
+#: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_form_view
+msgid "Account Loan Line"
 msgstr ""
 
 #. module: account_loans
@@ -123,6 +132,16 @@ msgid "Amount Borrowed Difference"
 msgstr ""
 
 #. module: account_loans
+#: model:ir.model.fields,field_description:account_loans.field_account_loan__analytic_distribution
+msgid "Analytic Distribution"
+msgstr ""
+
+#. module: account_loans
+#: model:ir.model.fields,field_description:account_loans.field_account_loan__analytic_precision
+msgid "Analytic Precision"
+msgstr ""
+
+#. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_close_wizard
 #: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
 msgid "Apply"
@@ -157,6 +176,11 @@ msgstr "Qoşma Sayı"
 #: code:addons/account_loans/wizard/account_loan_compute_wizard.py:0
 msgid "Balance"
 msgstr "Balans"
+
+#. module: account_loans
+#: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_kanban_view
+msgid "Balance:"
+msgstr ""
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_form_view
@@ -220,7 +244,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_loans/static/src/components/loans/file_upload.xml:0
 msgid "Compute"
-msgstr "Hesablamaq"
+msgstr ""
 
 #. module: account_loans
 #. odoo-python
@@ -289,12 +313,6 @@ msgid "Date"
 msgstr "Tarix"
 
 #. module: account_loans
-#: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_close_wizard
-#: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
-msgid "Discard"
-msgstr "Ləğv edin"
-
-#. module: account_loans
 #: model:ir.model.fields,field_description:account_loans.field_account_asset__display_name
 #: model:ir.model.fields,field_description:account_loans.field_account_asset_group__display_name
 #: model:ir.model.fields,field_description:account_loans.field_account_journal__display_name
@@ -305,6 +323,11 @@ msgstr "Ləğv edin"
 #: model:ir.model.fields,field_description:account_loans.field_account_return__display_name
 msgid "Display Name"
 msgstr "Göstəriləcək Ad"
+
+#. module: account_loans
+#: model:ir.model.fields,field_description:account_loans.field_account_loan__distribution_analytic_account_ids
+msgid "Distribution Analytic Account"
+msgstr ""
 
 #. module: account_loans
 #: model:ir.model.fields.selection,name:account_loans.selection__account_loan__state__draft
@@ -450,6 +473,11 @@ msgid "Interests"
 msgstr ""
 
 #. module: account_loans
+#: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_kanban_view
+msgid "Interests:"
+msgstr ""
+
+#. module: account_loans
 #: model:ir.model.fields,field_description:account_loans.field_account_loan__message_is_follower
 msgid "Is Follower"
 msgstr "İzləyicidir"
@@ -482,7 +510,8 @@ msgid "Journal Entry"
 msgstr "Jurnal Girişi"
 
 #. module: account_loans
-#: model:account.journal,name:account_loans.account_loans_journal_loan
+#. odoo-python
+#: code:addons/account_loans/demo/account_demo.py:0
 msgid "Journal Loan Demo"
 msgstr ""
 
@@ -560,6 +589,18 @@ msgstr ""
 
 #. module: account_loans
 #. odoo-python
+#: code:addons/account_loans/demo/account_demo.py:0
+msgid "Loan Demo 1"
+msgstr ""
+
+#. module: account_loans
+#. odoo-python
+#: code:addons/account_loans/demo/account_demo.py:0
+msgid "Loan Demo 2"
+msgstr ""
+
+#. module: account_loans
+#. odoo-python
 #: code:addons/account_loans/models/account_loan.py:0
 msgid "Loan Entries"
 msgstr ""
@@ -622,6 +663,11 @@ msgstr ""
 #: model:ir.ui.menu,name:account_loans.menu_action_loans_analysis
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_pivot_view
 msgid "Loans Analysis"
+msgstr ""
+
+#. module: account_loans
+#: model:ir.module.module,shortdesc:base.module_account_loans
+msgid "Loans Management"
 msgstr ""
 
 #. module: account_loans
@@ -763,6 +809,11 @@ msgstr ""
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_list_view
 msgid "Principals"
+msgstr ""
+
+#. module: account_loans
+#: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_kanban_view
+msgid "Principals:"
 msgstr ""
 
 #. module: account_loans
@@ -980,7 +1031,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_loans/static/src/components/loans/file_upload.xml:0
 msgid "Upload"
-msgstr "Yükləyin"
+msgstr ""
 
 #. module: account_loans
 #. odoo-python
@@ -995,16 +1046,6 @@ msgid ""
 "to this date (included) and not create entries for them. This is useful if "
 "you have already manually created entries prior to the creation of this loan."
 msgstr ""
-
-#. module: account_loans
-#: model:ir.model.fields,field_description:account_loans.field_account_loan__website_message_ids
-msgid "Website Messages"
-msgstr "Veb sayt Mesajları"
-
-#. module: account_loans
-#: model:ir.model.fields,help:account_loans.field_account_loan__website_message_ids
-msgid "Website communication history"
-msgstr "Veb saytın kommunikasiya tarixçəsi"
 
 #. module: account_loans
 #. odoo-python
@@ -1023,3 +1064,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_close_wizard
 msgid "will be deleted and the loan will be marked as closed."
 msgstr ""
+
+msgid "Website Messages"
+msgstr "Veb sayt Mesajları"
+
+msgid "Website communication history"
+msgstr "Veb saytın kommunikasiya tarixçəsi"

@@ -1,12 +1,10 @@
-import { DocumentsCogMenuItem } from "@documents/views/cog_menu/documents_cog_menu_item";
-import { useService } from "@web/core/utils/hooks";
+import { FolderAction } from "@documents/views/action/folder_action";
 
-export class DocumentsCogMenuItemAiAutoSort extends DocumentsCogMenuItem {
+export class DocumentsCogMenuItemAiAutoSort extends FolderAction {
     static template = "ai_documents.DocumentsCogMenuItemAiAutoSort";
 
     setup() {
         super.setup();
-        this.action = useService("action");
         this.folder = this.env.searchModel.getSelectedFolder();
     }
 
@@ -15,7 +13,7 @@ export class DocumentsCogMenuItemAiAutoSort extends DocumentsCogMenuItem {
             return;
         }
 
-        this.action.doAction("ai_documents.ai_documents_sort_action", {
+        await this.action.doAction("ai_documents.ai_documents_sort_action", {
             additionalContext: {
                 default_folder_id: this.folder.id,
             },

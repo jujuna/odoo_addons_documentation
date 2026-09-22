@@ -35,21 +35,3 @@ class ProjectProject(models.Model):
             action["views"] = [[False, 'form']]
             action["res_id"] = contracts.id
         return action
-
-    # ----------------------------
-    #  Project Updates
-    # ----------------------------
-
-    def _get_stat_buttons(self):
-        buttons = super()._get_stat_buttons()
-        if self.env.user.has_group('hr_payroll.group_hr_payroll_user'):
-            buttons.append({
-                'icon': 'book',
-                'text': self.env._('Contracts'),
-                'number': self.contracts_count,
-                'action_type': 'object',
-                'action': 'action_open_project_contracts',
-                'show': self.contracts_count > 0,
-                'sequence': 57,
-            })
-        return buttons

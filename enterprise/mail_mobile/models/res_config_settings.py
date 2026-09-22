@@ -27,37 +27,37 @@ class ResConfigSettings(models.TransientModel):
     enable_ocn = fields.Boolean('Push Notifications', config_parameter='mail_mobile.enable_ocn')
 
     def _get_endpoint(self):
-        return self.env['ir.config_parameter'].sudo().get_param('odoo_ocn.endpoint', DEFAULT_ENDPOINT)
+        return self.env['ir.config_parameter'].sudo().get_str('odoo_ocn.endpoint') or DEFAULT_ENDPOINT
 
     @api.model
     def get_fcm_project_id(self):
         ir_params_sudo = self.env['ir.config_parameter'].sudo()
-        if not ir_params_sudo.get_param('mail_mobile.enable_ocn'):
+        if not ir_params_sudo.get_bool('mail_mobile.enable_ocn'):
             return
-        project_id = ir_params_sudo.get_param('odoo_ocn.project_id')
+        project_id = ir_params_sudo.get_str('odoo_ocn.project_id')
         if not project_id:
             params = {
                 'ocnuuid': self._get_ocn_uuid(),
                 'server_version': odoo.release.version,
                 'db': self.env.cr.dbname,
                 'company_name': self.env.company.name,
-                'url': ir_params_sudo.get_param('web.base.url')
+                'url': ir_params_sudo.get_str('web.base.url')
             }
             try:
                 # Register instance to ocn service. Unique with ocn.uuid
                 project_id = iap_tools.iap_jsonrpc(self._get_endpoint() + '/iap/ocn/enable_service', params=params)
                 # Storing project id for generate token
-                ir_params_sudo.set_param('odoo_ocn.project_id', project_id)
+                ir_params_sudo.set_str('odoo_ocn.project_id', project_id)
             except Exception as e:
                 _logger.error('An error occurred while contacting the ocn server: %s', e.args[0])
         return project_id
 
     @api.model
     def _get_ocn_uuid(self):
-        push_uuid = self.env['ir.config_parameter'].sudo().get_param('ocn.uuid')
+        push_uuid = self.env['ir.config_parameter'].sudo().get_str('ocn.uuid')
         if not push_uuid:
             push_uuid = str(uuid.uuid4())
-            self.env['ir.config_parameter'].sudo().set_param('ocn.uuid', push_uuid)
+            self.env['ir.config_parameter'].sudo().set_str('ocn.uuid', push_uuid)
         return push_uuid
 
     @api.model

@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates>
     <t t-name="documents.DocumentsViews.RightPanel">
-        <div t-if="state.visible"
-            class="o_document_chatter_container o-mail-ChatterContainer"
-            t-att-class="{'mt-2': isMobile, 'h-100 o-aside': !isMobile, 'd-flex flex-column' : !panelDisabled}"
-            t-ref="chatterContainer"
+        <div t-if="this.state.rightPanelVisible and this.documentService.canShowRightPanel"
+            class="o_document_chatter_container o-mail-ChatterContainer o-aside h-100 align-self-start me-3 mb-3 pb-0 border rounded-4 bg-view overflow-hidden"
+            t-att-class="{'d-flex flex-column': !this.panelDisabled}"
         >
-            <t t-if="panelDisabled" t-call="documents.DocumentsViews.ChatterOverlay"/>
-            <DocumentsDetailsPanel t-if="!panelDisabled" record="state.previewedDocument?.record || state.focusedRecord" nbViewItems="props.nbViewItems" />
-            <Chatter t-if="state.focusedRecord?.data and documentService.userIsInternal"
-                threadId="typeof state.focusedRecord.data.id === 'number' and state.focusedRecord.data.id"
+            <t t-if="this.panelDisabled" t-call="documents.DocumentsViews.ChatterOverlay"/>
+            <DocumentsDetailsPanel t-if="!this.panelDisabled" record="this.state.previewedDocument?.record || this.state.focusedRecord" nbViewItems="this.props.nbViewItems" />
+            <Chatter t-if="!this.panelDisabled and this.documentService.userIsInternal"
+                threadId="this.state.focusedRecord.data.id"
                 threadModel="'documents.document'"
-                isChatterAside="!isMobile"/>
+                isChatterAside="true"/>
         </div>
     </t>
 </templates>

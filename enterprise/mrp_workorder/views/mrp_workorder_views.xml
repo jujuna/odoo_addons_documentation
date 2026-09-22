@@ -5,22 +5,15 @@
         <field name="model">mrp.workorder</field>
         <field name="inherit_id" ref="mrp.mrp_production_workorder_form_view_inherit"/>
         <field name="arch" type="xml">
-            <xpath expr="//header" position="replace">
-                <field name="quality_check_fail" invisible="1"/>
-                <header>
-                    <field name="state" widget="statusbar" statusbar_visible="pending,waiting,ready,progress,done"/>
-                </header>
-            </xpath>
-            <page name='time_tracking' position="before">
-                <page string="Instructions" name="finished_steps" invisible="not done_check_ids">
-                    <field name="done_check_ids" readonly="1" context="{'form_view_ref': 'mrp_workorder.quality_check_workorder_form'}">
+            <page name='components' position="after">
+                <page string="Instructions" name="finished_steps" invisible="not check_ids">
+                    <field name="check_ids" readonly="1" context="{'form_view_ref': 'mrp_workorder.quality_check_workorder_form'}">
                         <list default_order="control_date">
                             <field name="quality_state"/>
                             <field name="test_type" column_invisible="True"/>
                             <field name="title"/>
                             <field name="control_date" string="Date"/>
                             <field name="user_id" string="Operator"/>
-                            <field name="finished_lot_ids" string="Finished Lot/Serial Number" column_invisible="parent.product_tracking == 'none'" widget="many2many_tags" options="{'edit_tags': True}"/>
                             <field name="result"/>
                         </list>
                     </field>
@@ -36,18 +29,18 @@
             <xpath expr="//field[@name='time_ids']/list/field[@name='user_id']" position="attributes">
                 <attribute name="column_invisible">True</attribute>
             </xpath>
-            <xpath expr="//field[@name='done_check_ids']/list/field[@name='user_id']" position="after">
+            <xpath expr="//field[@name='check_ids']/list/field[@name='user_id']" position="after">
                 <field name="employee_id" />
             </xpath>
-            <xpath expr="//field[@name='done_check_ids']/list/field[@name='user_id']" position="attributes">
+            <xpath expr="//field[@name='check_ids']/list/field[@name='user_id']" position="attributes">
                 <attribute name="column_invisible">True</attribute>
             </xpath>
-            <xpath expr="//field[@name='workcenter_id']" position="after">
-                <field name="employee_assigned_ids" widget="many2many_avatar_employee" readonly="state == 'done'"/>
+            <xpath expr="//field[@name='workcenter_id']" position="before">
+                <field name="employee_assigned_ids" widget="many2many_avatar_employee" readonly="state == 'done'"
+                    domain="not all_employees_allowed and [('id','in',allowed_employees)] or []"/>
             </xpath>
-            <xpath expr="//header" position="inside">
-                <button name="action_open_mes" type="object" icon="oi-view-kanban" string="Open Shop Floor" groups="mrp_workorder.group_mrp_wo_shop_floor" invisible="state in ['done', 'cancel']"/>
-                <button name="action_mark_as_done" type="object" string="Mark as Done" invisible="state in ['done', 'cancel']"/>
+            <xpath expr="//div[@name='button_box']/button[1]" position="before">
+                <button name="action_open_mes" type="object" icon="oi_view-kanban" string="Open Shop Floor" groups="mrp_workorder.group_mrp_wo_shop_floor" invisible="state in ['done', 'cancel']"/>
             </xpath>
         </field>
     </record>
@@ -85,6 +78,19 @@
         <field name="inherit_id" ref="mrp.workcenter_line_graph"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='duration_expected']" position="after">
+                <field name="employee_costs_hour" invisible="1"/>
+                <field name="worksheet_page" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="workorder_pivot_inherit" model="ir.ui.view">
+        <field name="name">mrp.work.order.pivot.inherit</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.workcenter_line_pivot"/>
+        <field name="arch" type="xml">
+            <xpath expr="//pivot" position="inside">
+                <field name="employee_costs_hour" invisible="1"/>
                 <field name="worksheet_page" invisible="1"/>
             </xpath>
         </field>
@@ -95,38 +101,42 @@
         <field name="model">mrp.workorder</field>
         <field name="priority">20</field>
         <field name="arch" type="xml">
-            <gantt class="o_mrp_workorder_gantt" date_stop="date_finished" date_start="date_start" string="Operations" default_group_by="production_id" create="0" delete="0"
+            <gantt class="o_mrp_workorder_gantt" date_stop="date_finished" date_start="date_start" string="Operations" default_group_by="workcenter_id" create="0" delete="0" schedule="1"
                 progress="progress" plan="0"
-                decoration-danger="json_popover and 'text-danger' in json_popover"
-                decoration-success="state == 'done'"
-                decoration-warning="state == 'cancel' or (json_popover and 'text-warning' in json_popover)"
-                color="workcenter_id"
+                decoration-info="production_state == 'draft'"
+                decoration-danger="has_conflicts"
+                decoration-warning="has_planning_issues"
+                color="color"
                 display_unavailability="0"
-                progress_bar="workcenter_id"
                 total_row="True"
                 js_class="mrp_workorder_gantt"
                 precision="{'day': 'hour:full', 'week': 'day:full', 'month': 'day:full', 'year': 'day:full'}"
-                sample="1"
                 form_view_id="mrp.mrp_production_workorder_form_view_inherit">
 
-                <field name="date_start"/>
-                <field name="state"/>
-                <field name="workcenter_id"/>
-                <field name="json_popover"/>
-
-                <templates>
-                    <div t-name="gantt-popover" class="container-fluid">
-                        <div class="row g-0">
-                            <div class="col">
-                                <ul class="ps-1 mb-0 list-unstyled">
-                                    <li><strong>Start Date: </strong> <t t-esc="date_start.toFormat('F')"/></li>
-                                    <li><strong>Stop Date: </strong> <t t-esc="date_finished.toFormat('F')"/></li>
-                                    <li><strong>Workcenter: </strong> <t t-esc="workcenter_id.display_name"/></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </templates>
+                <field name="has_conflicts"/>
+                <field name="has_planning_issues"/>
+                <field name="production_id"/>
+                <field name="production_state"/>
+                <popover>
+                    <field name="has_conflicts"/>
+                    <field name="has_planning_issues"/>
+                    <templates>
+                        <t t-name="popover-header">
+                            <field name="display_name"/>
+                        </t>
+                        <t t-name="popover-body">
+                            <div><strong>Start: </strong> <field name="date_start"/></div>
+                            <div><strong>Stop: </strong> <field name="date_finished"/></div>
+                            <div><strong>Workcenter: </strong> <field name="workcenter_id"/></div>
+                            <div invisible="not has_conflicts" class="text-danger">This workorder has conflicts</div>
+                            <div invisible="not has_planning_issues" class="text-warning">This workorder is scheduled before its dependencies</div>
+                        </t>
+                        <t t-name="popover-footer" replace="0">
+                            <button name="action_mark_as_done" type="object" string="Mark as Done" class="btn btn-sm btn-secondary"/>
+                            <button invisible="not (has_conflicts or has_planning_issues)" name="action_replan" type="object" string="Replan" class="btn btn-sm btn-secondary"/>
+                        </t>
+                    </templates>
+                </popover>
             </gantt>
         </field>
     </record>
@@ -137,37 +147,78 @@
         <field name="priority">10</field>
         <field name="arch" type="xml">
             <gantt class="o_mrp_workorder_gantt" date_stop="date_finished" date_start="date_start" string="Operations" default_group_by="workcenter_id" create="0"
-                delete="0" sample="1"
+                delete="0" schedule="1"
                 progress="progress" plan="0"
-                decoration-danger="json_popover and 'text-danger' in json_popover"
-                decoration-success="state == 'done'"
-                decoration-warning="state == 'cancel' or (json_popover and 'text-warning' in json_popover)"
-                color="production_id"
+                decoration-info="production_state == 'draft'"
+                decoration-danger="has_conflicts"
+                decoration-warning="has_planning_issues"
+                decoration-secondary="state == 'done'"
+                color="color"
                 display_unavailability="1"
-                progress_bar="workcenter_id"
-                total_row="True"
+                progress_bar="workcenter_id,employee_assigned_ids"
+                total_row="False"
                 js_class="mrp_workorder_gantt"
-                precision="{'day': 'hour:full', 'week': 'day:full', 'month': 'day:full', 'year': 'day:full'}"
+                precision="{'day': 'hour:quarter', 'week': 'day:half', 'month': 'day:half', 'year': 'day:full'}"
+                dependency_field="blocked_by_workorder_ids"
+                dependency_inverted_field="needed_by_workorder_ids"
                 form_view_id="mrp.mrp_production_workorder_form_view_inherit">
 
-                <field name="date_start"/>
+                <field name="has_conflicts"/>
+                <field name="has_planning_issues"/>
+                <field name="production_id"/>
+                <field name="production_state"/>
                 <field name="state"/>
-                <field name="workcenter_id"/>
-                <field name="json_popover"/>
-
-                <templates>
-                    <div t-name="gantt-popover" class="container-fluid">
-                        <div class="row g-0">
-                            <div class="col">
-                                <ul class="ps-1 mb-0 list-unstyled">
-                                    <li><strong>Start Date: </strong><t t-esc="date_start.toFormat('F')"/></li>
-                                    <li><strong>Stop Date: </strong><t t-esc="date_finished.toFormat('F')"/></li>
-                                    <li><strong>Workcenter: </strong> <t t-esc="workcenter_id.display_name"/></li>
-                                </ul>
+                <popover>
+                    <field name="has_conflicts"/>
+                    <field name="has_planning_issues"/>
+                    <field name="date_finished"/>
+                    <field name="state"/>
+                    <templates>
+                        <t t-name="popover-header">
+                            <field name="display_name"/>
+                        </t>
+                        <t t-name="popover-body">
+                            <div class="d-flex gap-1 mb-1 mt-n2">
+                                <i class="oi px-1" data-icon="build" role="img" title="Manufacturing Order"/>
+                                <field name="production_id" widget="many2one"/>
                             </div>
-                        </div>
-                    </div>
-                </templates>
+                            <div class="d-flex gap-1 mb-1">
+                                <i class="oi oi-filled px-1" data-icon="calendar_today" role="img" title="Date"/>
+                                <field name="date_start" widget="daterange" options="{'end_date_field': 'date_finished', 'always_range': True}"/>
+                                <div class="d-flex">
+                                    (<field name="duration_expected" widget="float_time" options="{'unit': 'minutes'}"/>)
+                                </div>
+                            </div>
+                            <div class="d-flex gap-1 mb-1">
+                                <i class="oi oi-filled px-1 o-pt-0_5" data-icon="settings" role="img" title="Work Center"/>
+                                <field name="workcenter_id" widget="many2one"/>
+                            </div>
+                            <div class="o-ps-1_5">
+                                <field name="employee_assigned_ids" widget="many2many_avatar_employee"/>
+                            </div>
+                            <div invisible="not has_conflicts" class="text-danger">This workorder has conflicts</div>
+                            <div invisible="not has_planning_issues" class="text-warning">This workorder is scheduled before its dependencies</div>
+                        </t>
+                        <t t-name="popover-footer" replace="0">
+                            <button invisible="state == 'done'" name="action_mark_as_done" type="object" string="Mark as Done" class="btn btn-sm btn-secondary"/>
+                            <span invisible="state != 'done'" class="align-self-center text-success">This work order is done</span>
+                            <button invisible="not (has_conflicts or has_planning_issues)" name="action_replan" type="object" string="Replan" class="btn btn-sm btn-secondary"/>
+                        </t>
+                    </templates>
+                </popover>
+            </gantt>
+        </field>
+    </record>
+
+    <record id="mrp_workorder_view_gantt_employee" model="ir.ui.view">
+        <field name="name">mrp.workorder.view.gantt.employee</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp_workorder.mrp_workorder_view_gantt"/>
+        <field name="mode">primary</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <gantt position="attributes">
+                <attribute name="default_group_by">employee_assigned_ids</attribute>
             </gantt>
         </field>
     </record>
@@ -176,19 +227,6 @@
         <field name="name">mrp.production.work.order.gantt.production.dependencies</field>
         <field name="model">mrp.workorder</field>
         <field name="inherit_id" ref="workcenter_line_gantt_production"/>
-        <field name="mode">primary</field>
-        <field name="arch" type="xml">
-            <xpath expr="//gantt" position="attributes">
-                <attribute name="dependency_field">blocked_by_workorder_ids</attribute>
-                <attribute name="dependency_inverted_field">needed_by_workorder_ids</attribute>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="mrp_workorder_view_gantt_dependencies" model="ir.ui.view">
-        <field name="name">mrp.workorder.view.gantt.dependencies</field>
-        <field name="model">mrp.workorder</field>
-        <field name="inherit_id" ref="mrp_workorder_view_gantt"/>
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <xpath expr="//gantt" position="attributes">
@@ -208,86 +246,20 @@
     </record>
 
     <record id="action_mrp_workorder_dependencies_production" model="ir.actions.server">
+        <field name="name">Work Orders Planning Kanban</field>
+        <field name="model_id" ref="model_mrp_workorder"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_mrp_workorder_planning()
+        </field>
+    </record>
+
+    <record id="action_mrp_workorder_dependencies_employee" model="ir.actions.server">
         <field name="name">Work Orders Planning</field>
         <field name="model_id" ref="model_mrp_workorder"/>
         <field name="state">code</field>
         <field name="code">
-            action = model.action_mrp_workorder_dependencies('production')
-        </field>
-    </record>
-
-    <!-- MRP.WORKORDER TABLET VIEW -->
-    <record id="mrp_workorder_view_form_tablet" model="ir.ui.view">
-        <field name="name">mrp.workorder.view.form.inherit.quality.tablet.new</field>
-        <field name="model">mrp.workorder</field>
-        <field name="arch" type="xml">
-            <form string="Production Workcenter" delete="0" create="0" class="o_workorder_tablet_form form_top">
-                <field name="allow_producing_quantity_change" invisible="1"/>
-                <field name="company_id" invisible="1"/>
-                <field name="is_last_lot" invisible="1"/>
-                <field name="is_last_unfinished_wo" invisible="1"/>
-                <field name="is_user_working" invisible="1"/>
-                <field name="state" invisible="1"/>
-                <field name="product_tracking" invisible="1"/>
-                <field name="working_state" invisible="1"/>
-                <field name="production_id" invisible="1"/>
-                <field name="current_quality_check_id" invisible="1"/>
-                <div class="o_workorder_bar">
-                    <div class="o_workorder_bar_left o_workorder_bar_content">
-                        <button name="action_back" type="object" class="btn btn-secondary o_exit oi oi-arrow-left o_unblock" title="back"/>
-                        <div class="o_workorder_field">
-                            <field name="production_id" options="{'no_open': True}" readonly="1"/> - <field name="name" readonly="1"/>
-                        </div>
-                    </div>
-                    <div class="o_workorder_bar_center o_workorder_bar_content">
-                        <div class="o_workorder_field">
-                            <field name="product_id" context="{'display_default_code': False}" options="{'no_open': True}" readonly="1"/>
-                            <label for="qty_producing" string=":"/>
-                            <field name="qty_producing" class="oe_inline text-start" required="1" readonly="not allow_producing_quantity_change or product_tracking == 'serial' or state in ('done', 'cancel')"/>
-                            / <field name="qty_remaining" class="oe_inline text-start" invisible="state == 'done'"/> <field name="qty_production" class="oe_inline text-start" invisible="state != 'done'"/>
-                            <label for="product_uom_id" string="" class="oe_inline"/>
-                            <field name="product_uom_id" options="{'no_open': True}" widget="many2one_uom" class="oe_inline" readonly="1"/>
-                        </div>
-                    </div>
-                    <div class="o_workorder_bar_right o_workorder_bar_content">
-                        <span style="width:auto; display:block;">
-                        <button class="btn-secondary btn-link o_unblock" type="workorder_event" name="popupEmployeeManagement">
-                            <span invisible="employee_name">Log In </span>
-                            <field name="employee_name" readonly="1" invisible="not employee_name" class="me-2"/>
-                            <field name="employee_ids" widget="kanban.many2many_avatar_employee" readonly="1" invisible="not employee_name" options="{'no_create': True}"/>
-                        </button>
-                        </span>
-                    </div>
-                </div>
-                <div class="o_workorder_bar">
-                    <div class="o_workorder_bar_left o_workorder_action o_workorder_bar_content">
-                        <button name="openMenuPopup" class="btn btn-secondary o_workorder_icon_btn fa fa-bars" type="workorder_event" title="menu"/>
-                        <span groups="mrp_workorder.group_mrp_wo_tablet_timer">
-                            <button name="button_pending" type="object" class="btn btn-secondary" invisible="True" barcode_trigger="PAUS" string="PAUSE"/>
-                            <button name="button_start" type="object" class="btn btn-warning" invisible="True" barcode_trigger="CONT" string="CONTINUE"/>
-                            <button name="button_unblock" type="object" class="btn btn-secondary btn-danger o_unblock" invisible="working_state != 'blocked'">Unblock</button>
-                            <field name="duration" widget="mrp_timer" class="ms-1" readonly="1"/>
-                        </span>
-                    </div>
-                    <div class="o_workorder_bar_center o_workorder_bar_content">
-                        <div class="o_workorder_field o_workorder_lot">
-                            <div invisible="product_tracking == 'none'">
-                                <label for="finished_lot_ids" string="Lot" invisible="product_tracking != 'lot'"/>
-                                <label for="finished_lot_ids" string="Serial" invisible="product_tracking != 'serial'"/>
-                                <field name="finished_lot_ids" context="{'default_product_id': product_id, 'default_company_id': company_id}" domain="[('product_id', '=', product_id)]" widget="many2many_tags" options="{'edit_tags': True}"/>
-                                <button name="action_generate_serial" type="object" class="o_btn_icon btn btn-secondary" aria-label="Creates a new serial/lot number" title="Creates a new serial/lot number" invisible="finished_lot_ids">
-                                    <i class="fa fa-plus" role="img"/>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="o_workorder_bar_right o_workorder_bar_content">
-                        <button name="do_finish" type="object" string="Mark as Done" icon="fa-check" invisible="current_quality_check_id or not is_last_unfinished_wo and not is_last_lot" class="btn-primary" barcode_trigger="CLWO"/>
-                        <button name="action_open_manufacturing_order" type="object" string="Mark as Done and Close MO" icon="fa-check" invisible="current_quality_check_id or not is_last_unfinished_wo" class="btn-primary" barcode_trigger="CLMO"/>
-                        <button name="record_production" type="object" string="Record production" invisible="current_quality_check_id or is_last_unfinished_wo or is_last_lot" barcode_trigger="RECO" class="btn-primary"/>
-                    </div>
-                </div>
-            </form>
+            action = model.action_mrp_workorder_dependencies('employee')
         </field>
     </record>
 
@@ -318,14 +290,15 @@
         <field name="view_mode">list,kanban,form,calendar,pivot,graph,gantt</field>
         <field name="help" type="html">
           <p class="o_view_nocontent_workorder">
-            No work orders to do!
+            No Work Orders to do!
           </p><p>
-            Work orders are operations to do as part of a manufacturing order.
-            Operations are defined in the bill of materials or added in the manufacturing order directly.
+            Work orders are operations to do as part of a manufacturing order.<br/>
+            Operations are defined in the bills of materials or added in the manufacturing order directly.
+            In both cases, instructions, worksheets and quality checks can be added.
           </p><p>
-            Use the table work center control panel to register operations in the shop floor directly.
-            The tablet provides worksheets for your workers and allow them to scrap products, track time,
-            launch a maintenance request, perform quality tests, etc.
+            You can process work orders here, or use the dedicated Shop Floor application.
+          </p><p>
+            <a type="action" name="mrp.action_mrp_production_form" role="button" class="btn btn-primary btn-large">Create a manufacturing order</a>
           </p>
         </field>
         <field name="context">{'search_default_my_work_order': False, 'search_default_ready': True, 'search_default_waiting': True, 'search_default_progress': True, 'search_default_blocked': True}</field>
@@ -353,7 +326,7 @@
     </record>
 
     <record model="ir.actions.act_window" id="mrp.action_mrp_workorder_workcenter">
-        <field name="view_mode">gantt,list,form,calendar,pivot,graph</field>
+        <field name="view_mode">gantt,kanban,list,form,calendar,pivot,graph</field>
         <field name="view_id" ref="mrp_workorder_view_gantt"/>
          <field name="help" type="html">
           <p class="o_view_nocontent_workorder">
@@ -371,17 +344,35 @@
 
     <record model="ir.actions.act_window" id="mrp.action_mrp_workorder_production">
         <field name="view_mode">gantt,list,form,calendar,pivot,graph</field>
-        <field name="view_id" ref="workcenter_line_gantt_production"/>
-         <field name="help" type="html">
+        <field name="view_id" ref="mrp_workorder_view_gantt"/>
+        <field name="help" type="html">
           <p class="o_view_nocontent_workorder">
+            No Work Orders to do!
+          </p><p>
+            Work orders are operations to do as part of a manufacturing order.<br/>
+            Operations are defined in the bills of materials or added in the manufacturing order directly.
+            In both cases, instructions, worksheets and quality checks can be added.
+          </p><p>
+            You can process work orders here, or use the dedicated Shop Floor application.
+          </p><p>
+            <a type="action" name="mrp.action_mrp_production_form" role="button" class="btn btn-primary btn-large">Create a manufacturing order</a>
+          </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_mrp_planning_gantt">
+        <field name="name">Work Orders Planning</field>
+        <field name="res_model">mrp.workorder</field>
+        <field name="path">employee-planning</field>
+        <field name="view_mode">list,form,calendar,pivot,graph</field>
+        <field name="search_view_id" ref="mrp.view_mrp_production_workorder_form_view_filter"/>
+        <field name="context">{'search_default_ready': True, 'search_default_blocked': True, 'search_default_progress': True}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
             No work orders to do!
           </p><p>
             Work orders are operations to do as part of a manufacturing order.
             Operations are defined in the bill of materials or added in the manufacturing order directly.
-          </p><p>
-            Use the table work center control panel to register operations in the shop floor directly.
-            The tablet provides worksheets for your workers and allow them to scrap products, track time,
-            launch a maintenance request, perform quality tests, etc.
           </p>
         </field>
     </record>
@@ -391,8 +382,8 @@
         <field name="model">mrp.workorder</field>
         <field name="inherit_id" ref="mrp.workcenter_line_kanban"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('o_kanban_workorder_status')]//field[@name='last_working_user_id']" position="replace">
-                <field t-if="record.employee_ids.raw_value" name="employee_ids" widget="list.many2many_avatar_user" class="ms-1"/>
+            <xpath expr="//footer//field[@name='last_working_user_id']" position="replace">
+                <field t-if="record.employee_assigned_ids.raw_value" name="employee_assigned_ids" widget="many2many_avatar_employee" class="ms-1"/>
             </xpath>
         </field>
     </record>
@@ -413,13 +404,15 @@
         <field name="model">mrp.workorder</field>
         <field name="inherit_id" ref="mrp.view_mrp_production_workorder_form_view_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='progress']" position="before">
-                <field name="connected_employee_ids"/>
-                <filter string="My Work Orders" name="my_work_order" domain="[('connected_employee_ids','in',[1])]"/>
+            <xpath expr="//filter[@name='draft']" position="before">
+                <filter string="My Work Orders" name="my_work_order" domain="[('employee_assigned_ids.user_id', '=', uid)]"/>
                 <separator/>
             </xpath>
             <xpath expr="//filter[@name='production']" position="after">
                 <filter string="Assigned" name="assigned_employee" context="{'group_by': 'employee_assigned_ids'}"/>
+            </xpath>
+            <xpath expr="//field[@name='move_raw_ids']" position="after">
+                <field name="employee_assigned_ids"/>
             </xpath>
         </field>
     </record>
@@ -429,9 +422,9 @@
         <field name="model">mrp.workorder</field>
         <field name="inherit_id" ref="mrp.view_mrp_production_work_order_search"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='progress']" position="after">
-                <field name="connected_employee_ids"/>
-                <filter string="My Work Orders" name="my_work_order" domain="[('connected_employee_ids','in',[1])]"/>
+            <xpath expr="//filter[@name='draft']" position="before">
+                <filter string="My Work Orders" name="my_work_order" domain="[('employee_assigned_ids.user_id', '=', uid)]"/>
+                <separator/>
             </xpath>
         </field>
     </record>

@@ -28,8 +28,8 @@ class SocialMedia(models.Model):
         if self.media_type != 'instagram':
             return super()._action_add_account()
 
-        instagram_app_id = self.env['ir.config_parameter'].sudo().get_param('social.instagram_app_id')
-        instagram_client_secret = self.env['ir.config_parameter'].sudo().get_param('social.instagram_client_secret')
+        instagram_app_id = self.env['ir.config_parameter'].sudo().get_str('social.instagram_app_id')
+        instagram_client_secret = self.env['ir.config_parameter'].sudo().get_str('social.instagram_client_secret')
         if instagram_app_id and instagram_client_secret:
             return self._add_instagram_accounts_from_configuration(instagram_app_id)
         else:
@@ -41,14 +41,15 @@ class SocialMedia(models.Model):
 
         params = {
             'client_id': instagram_app_id,
-            'redirect_uri': url_join(base_url, "social_instagram/callback"),
+            'redirect_uri': url_join(base_url, '/social/instagram/start_auth_process'),
             'response_type': 'token',
-            'state': self.csrf_token,
+            'state': self._get_csrf_token(),
             'scope': ','.join([
                 'instagram_basic',
                 'instagram_content_publish',
                 'instagram_manage_comments',
                 'instagram_manage_insights',
+                'instagram_manage_messages',
                 'pages_show_list',
                 'pages_manage_ads',
                 'pages_manage_metadata',
@@ -56,29 +57,25 @@ class SocialMedia(models.Model):
                 'pages_read_user_content',
                 'pages_manage_engagement',
                 'pages_manage_posts',
+                'public_profile',
                 'read_insights',
                 'business_management',
             ])
         }
 
-        return {
-            'type': 'ir.actions.act_url',
-            'url': base_instagram_url % url_encode(params),
-            'target': 'self'
-        }
+        return base_instagram_url % url_encode(params)
 
     def _add_instagram_accounts_from_iap(self):
-        base_url = self.get_base_url()
-        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_param(
-            'social.social_iap_endpoint',
-            self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
-        )
+        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_str(
+            'social.social_iap_endpoint') or self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
 
         iap_add_accounts_url = requests.get(url_join(social_iap_endpoint, 'api/social/instagram/1/add_accounts'),
             params={
-                'returning_url': url_join(base_url, 'social_instagram/callback'),
-                'csrf_token': self.csrf_token,
-                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+                'returning_url': url_join(self.get_base_url(), '/social/instagram/start_auth_process'),
+                'csrf_token': self._get_csrf_token(),
+                'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
+                'client_host_url': self.get_base_url(),
+                'webhook_shared_secret': self._get_webhook_shared_secret(),
             },
             timeout=5
         ).text
@@ -89,8 +86,4 @@ class SocialMedia(models.Model):
                 "You can easily get one here: %s.\n"
                 "Grab a subscription and unlock a world of amazing features!", 'https://www.odoo.com/buy'))
 
-        return {
-            'type': 'ir.actions.act_url',
-            'url': iap_add_accounts_url,
-            'target': 'self'
-        }
+        return iap_add_accounts_url

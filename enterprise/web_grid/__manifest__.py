@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "Grid View",
 
@@ -19,9 +18,6 @@
         'web.assets_unit_tests': [
             'web_grid/static/tests/**/*.test.js',
             'web_grid/static/tests/grid_mock_server.js',
-        ],
-        'web.qunit_suite_tests': [
-            'web_grid/static/tests/legacy/helpers.js',
         ],
     },
     'auto_install': True,

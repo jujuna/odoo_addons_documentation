@@ -6,7 +6,7 @@ import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { _t } from "@web/core/l10n/translation";
 import { SpreadsheetSelectorGrid } from "../spreadsheet_selector_grid/spreadsheet_selector_grid";
 
-import { Component, onWillStart, useState, onWillUnmount } from "@odoo/owl";
+import { Component, onWillStart, onWillUnmount, useProps, proxy, t } from "@odoo/owl";
 
 const DEFAULT_LIMIT = 9;
 
@@ -26,22 +26,16 @@ const DEFAULT_LIMIT = 9;
 export class SpreadsheetSelectorPanel extends Component {
     static template = "spreadsheet_edition.SpreadsheetSelectorPanel";
     static components = { Pager, SpreadsheetSelectorGrid };
-    static defaultProps = {
-        displayBlank: true,
-    };
-    static props = {
-        onSpreadsheetSelected: Function,
-        onSpreadsheetDblClicked: Function,
-        model: String,
-        displayBlank: {
-            type: Boolean,
-            optional: true,
-        },
-    };
+    props = useProps({
+        onSpreadsheetSelected: t.function(),
+        onSpreadsheetDblClicked: t.function(),
+        model: t.string(),
+        displayBlank: t.boolean().optional(true),
+    });
 
     setup() {
         /** @type {State} */
-        this.state = useState({
+        this.state = proxy({
             spreadsheets: [],
             selectedSpreadsheetId: null,
             pagerProps: {
@@ -150,10 +144,10 @@ export class SpreadsheetSelectorPanel extends Component {
      * @returns {string} - URL for the spreadsheet thumbnail
      */
     getThumbnailURL(spreadsheet) {
-        if (!spreadsheet.display_thumbnail) {
+        if (!spreadsheet.display_thumbnail?.content) {
             return false;
         }
 
-        return `data:image/jpeg;charset=utf-8;base64,${spreadsheet.display_thumbnail}`;
+        return `data:image/jpeg;charset=utf-8;base64,${spreadsheet.display_thumbnail.content}`;
     }
 }

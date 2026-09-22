@@ -3,6 +3,7 @@
 
 import logging
 import requests
+from urllib.parse import urlparse
 
 from odoo import models, fields, api
 
@@ -21,11 +22,11 @@ class SocialStream(models.Model):
     _order = 'sequence asc, id asc'
 
     name = fields.Char("Title", translate=True)
-    media_id = fields.Many2one('social.media', string="Social Media", required=True)
+    media_id = fields.Many2one('social.media', string="Social Media", required=True, index=True)
     media_image = fields.Binary(related='media_id.image', string="The related Social Media's image")
     sequence = fields.Integer('Sequence', help="Sequence used to order streams (mainly for the 'Feed' kanban view)")
-    account_id = fields.Many2one('social.account', 'Social Account', required=True, ondelete='cascade')
-    stream_type_id = fields.Many2one('social.stream.type', string="Type", required=True, ondelete='cascade')
+    account_id = fields.Many2one('social.account', 'Social Account', required=True, index=True, ondelete='cascade')
+    stream_type_id = fields.Many2one('social.stream.type', string="Type", required=True, index=True, ondelete='cascade')
     stream_type_type = fields.Char(related='stream_type_id.stream_type')
     stream_post_ids = fields.One2many('social.stream.post', 'stream_id', 'Posts')
     company_id = fields.Many2one('res.company', 'Company', related='account_id.company_id', store=True)
@@ -88,3 +89,15 @@ class SocialStream(models.Model):
     def _apply_default_name(self):
         for stream in self:
             stream.write({'name': stream.stream_type_id.name})
+
+    def _enforce_url_scheme(self, url):
+        """Some URLs doesn't starts by "https://". But if we use those bad URLs
+        in a HTML link, it will redirect the user the actual website.
+        That's why we need to fix those URLs.
+        e.g.:
+            <a href="www.bad_url.com"/>
+        """
+        if not url or urlparse(url).scheme:
+            return url
+
+        return 'https://%s' % url

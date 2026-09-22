@@ -1,40 +1,32 @@
 from dateutil.relativedelta import relativedelta
 
-import base64
-
 from odoo import Command
-from odoo.addons.l10n_mx_edi.tests.common import EXTERNAL_MODE
 from odoo.tests import tagged
-from odoo.tools import misc
 from .common import TestMXEdiStockCommon
 
 
-@tagged('post_install_l10n', 'post_install', '-at_install', *(['-standard', 'external'] if EXTERNAL_MODE else []))
+@tagged('post_install_l10n', 'post_install', '-at_install', *TestMXEdiStockCommon.extra_tags)
 class TestCFDIPickingXml(TestMXEdiStockCommon):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.vehicle_pedro.write({
+        cls.vehicle_pedro.sudo().write({
             'l10n_mx_environment_insurer': 'DEMO INSURER',
             'l10n_mx_environment_insurance_policy': 'DEMO INSURER POLICY',
         })
 
     def test_delivery_guide_outgoing(self):
         with self.mx_external_setup(self.frozen_today):
-            warehouse = self._create_warehouse()
-            picking = self._create_picking(warehouse)
+            picking = self._create_picking()
             with self.with_mocked_pac_sign_success():
                 picking.l10n_mx_edi_cfdi_try_send()
 
             self._assert_picking_cfdi(picking, 'test_delivery_guide_outgoing')
 
-        self._assert_picking_cfdi(picking, 'test_delivery_guide_outgoing')
-
     def test_delivery_guide_incoming(self):
         with self.mx_external_setup(self.frozen_today):
-            warehouse = self._create_warehouse()
-            picking = self._create_picking(warehouse, outgoing=False)
+            picking = self._create_picking(self.mx_warehouse, outgoing=False)
             with self.with_mocked_pac_sign_success():
                 picking.l10n_mx_edi_cfdi_try_send()
 
@@ -45,9 +37,8 @@ class TestCFDIPickingXml(TestMXEdiStockCommon):
         self.product.l10n_mx_edi_material_description = 'Test material description'
 
         with self.mx_external_setup(self.frozen_today):
-            warehouse = self._create_warehouse()
             picking = self._create_picking(
-                warehouse,
+                self.mx_warehouse,
                 picking_vals={
                     'partner_id': self.partner_us.id,
                     'l10n_mx_edi_customs_document_type_id': self.env.ref('l10n_mx_edi_stock.l10n_mx_edi_customs_document_type_02').id,
@@ -68,9 +59,8 @@ class TestCFDIPickingXml(TestMXEdiStockCommon):
         self.product.l10n_mx_edi_material_type = '01'
 
         with self.mx_external_setup(self.frozen_today):
-            warehouse = self._create_warehouse()
             picking = self._create_picking(
-                warehouse,
+                self.mx_warehouse,
                 outgoing=False,
                 picking_vals={
                     'partner_id': self.partner_us.id,
@@ -105,12 +95,12 @@ class TestCFDIPickingXml(TestMXEdiStockCommon):
             self.cr.precommit.run()  # load the CoA
             branch = self.env.company.child_ids
             key = self.env['certificate.key'].create({
-                'content': base64.encodebytes(misc.file_open('l10n_mx_edi/demo/pac_credentials/certificate.key', 'rb').read()),
+                'content': self.file_read('l10n_mx_edi/demo/pac_credentials/certificate.key'),
                 'password': '12345678a',
                 'company_id': branch.id,
             })
             certificate = self.env['certificate.certificate'].create({
-                'content': base64.encodebytes(misc.file_open('l10n_mx_edi/demo/pac_credentials/certificate.cer', 'rb').read()),
+                'content': self.file_read('l10n_mx_edi/demo/pac_credentials/certificate.cer'),
                 'private_key_id': key.id,
                 'company_id': branch.id,
             })
@@ -122,6 +112,7 @@ class TestCFDIPickingXml(TestMXEdiStockCommon):
                 'city_id': self.env.company.partner_id.city_id.id,
             })
             self.product.company_id = branch
+            # Create warehouse with sudo due to another branch
             warehouse = self._create_warehouse(company_id=branch.id, partner_id=branch.partner_id.id)
             picking = self._create_picking(warehouse)
 
@@ -137,8 +128,7 @@ class TestCFDIPickingXml(TestMXEdiStockCommon):
             'l10n_mx_edi_hazard_package_type': '1H1',
         })
         with self.mx_external_setup(self.frozen_today):
-            warehouse = self._create_warehouse()
-            picking = self._create_picking(warehouse)
+            picking = self._create_picking()
 
             with self.with_mocked_pac_sign_success():
                 picking.l10n_mx_edi_cfdi_try_send()
@@ -153,8 +143,7 @@ class TestCFDIPickingXml(TestMXEdiStockCommon):
             'unspsc_code_id': self.env.ref('product_unspsc.unspsc_code_12352106').id,
         })
         with self.mx_external_setup(self.frozen_today):
-            warehouse = self._create_warehouse()
-            picking = self._create_picking(warehouse)
+            picking = self._create_picking()
 
             with self.with_mocked_pac_sign_success():
                 picking.l10n_mx_edi_cfdi_try_send()
@@ -171,8 +160,7 @@ class TestCFDIPickingXml(TestMXEdiStockCommon):
             'l10n_mx_edi_hazard_package_type': '1H1',
         })
         with self.mx_external_setup(self.frozen_today):
-            warehouse = self._create_warehouse()
-            picking = self._create_picking(warehouse)
+            picking = self._create_picking()
 
             with self.with_mocked_pac_sign_success():
                 picking.l10n_mx_edi_cfdi_try_send()
@@ -191,9 +179,8 @@ class TestCFDIPickingXml(TestMXEdiStockCommon):
             'country_id': self.env.ref('base.mx').id,
         })
         with self.mx_external_setup(self.frozen_today):
-            warehouse = self._create_warehouse()
             picking = self._create_picking(
-                warehouse,
+                self.mx_warehouse,
                 picking_vals={'partner_id': delivery_address.id}
             )
 
@@ -201,3 +188,43 @@ class TestCFDIPickingXml(TestMXEdiStockCommon):
                 picking.l10n_mx_edi_cfdi_try_send()
 
             self._assert_picking_cfdi(picking, 'test_delivery_guide_outgoing_delivery_address')
+
+    def test_delivery_guide_operator(self):
+        """Test operator in delivery guide CFDI"""
+        other_operator_pedro = self.env['res.partner'].create({
+            'name': 'Other Amigo Pedro',
+            'vat': 'VAAM130719H60',
+            'street': 'JESUS VALDES SANCHEZ',
+            'city': 'Arteaga',
+            'country_id': self.env.ref('base.mx').id,
+            'state_id': self.env.ref('base.state_mx_coah').id,
+            'zip': '25350',
+            'l10n_mx_edi_operator_licence': 'c654327890',
+        })
+
+        with self.mx_external_setup(self.frozen_today):
+            # Create picking and validate
+            picking = self._create_picking()
+            self.assertEqual(picking.l10n_mx_edi_driver_id.id, self.vehicle_pedro.driver_id.id, "Operator should be vehicle's main driver")
+            self.assertFalse(picking.l10n_mx_edi_show_update_driver)
+            picking.l10n_mx_edi_driver_id = False
+            self.assertFalse(picking.l10n_mx_edi_show_update_driver)
+
+            # Test when the vehicle is set but not the operator
+            with self.with_mocked_pac_sign_success():
+                picking.l10n_mx_edi_cfdi_try_send()
+            self.assertTrue(not picking.l10n_mx_edi_cfdi_state)
+            self.assertRegex(picking.l10n_mx_edi_document_ids[0].message, 'Please define the operator of the vehicle.')
+
+            picking.l10n_mx_edi_driver_id = other_operator_pedro
+            self.assertTrue(picking.l10n_mx_edi_show_update_driver)
+            picking.l10n_mx_edi_action_update_driver()
+            self.assertFalse(picking.l10n_mx_edi_show_update_driver)
+            self.assertEqual(self.vehicle_pedro.driver_id.id, other_operator_pedro.id)
+            with self.with_mocked_pac_sign_success():
+                picking.l10n_mx_edi_cfdi_try_send()
+
+            self._assert_picking_cfdi(picking, 'test_delivery_guide_operator')
+
+            self.vehicle_pedro.driver_id = self.operator_pedro
+            self.assertFalse(picking.l10n_mx_edi_show_update_driver)

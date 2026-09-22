@@ -4,6 +4,7 @@
         <field name="name">Balance Sheet - SYSCEBNL</field>
         <field name="name@fr">Bilan - SYSCEBNL</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="availability_condition">coa_children</field>
         <field name="chart_template">syscebnl</field>
         <field name="filter_unfold_all" eval="True"/>
@@ -56,8 +57,6 @@
                                 <field name="name">AB | Intangible assets</field>
                                 <field name="name@fr">AB | Immobilisations incorporelles</field>
                                 <field name="code">SYSCEBNL_ASSOC_AB</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_ab_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -70,8 +69,6 @@
                                 <field name="name">AC | Tangible and financial fixed assets</field>
                                 <field name="name@fr">AC | Immobilisations corporelles et financières</field>
                                 <field name="code">SYSCEBNL_ASSOC_AC</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_ac_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -98,8 +95,6 @@
                                 <field name="name">AE | Patents, licences, software and similar rights</field>
                                 <field name="name@fr">AE | Brevets, licenses, logiciels et droits similaires</field>
                                 <field name="code">SYSCEBNL_ASSOC_AE</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_ae_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -112,8 +107,6 @@
                                 <field name="name">AF | Other intangible assets</field>
                                 <field name="name@fr">AF | Autres immobilisations incorporelles</field>
                                 <field name="code">SYSCEBNL_ASSOC_AF</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_af_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -126,8 +119,6 @@
                                 <field name="name">AG | Advances and deposits paid on intangible assets</field>
                                 <field name="name@fr">AG | Avances et acomptes versés sur immobilisations incorporelles</field>
                                 <field name="code">SYSCEBNL_ASSOC_AG</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_ag_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -154,8 +145,6 @@
                                 <field name="name">AI | Land</field>
                                 <field name="name@fr">AI | Terrains</field>
                                 <field name="code">SYSCEBNL_ASSOC_AI</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_ai_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -168,8 +157,6 @@
                                 <field name="name">AJ | Buildings</field>
                                 <field name="name@fr">AJ | Bâtiments</field>
                                 <field name="code">SYSCEBNL_ASSOC_AJ</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_aj_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -182,8 +169,6 @@
                                 <field name="name">AK | Fixtures and fittings</field>
                                 <field name="name@fr">AK | Aménagements, agencements et installations</field>
                                 <field name="code">SYSCEBNL_ASSOC_AK</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_ak_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -196,8 +181,6 @@
                                 <field name="name">AL | Equipment, furniture and biological assets</field>
                                 <field name="name@fr">AL | Matériel, mobilier et actifs biologiques</field>
                                 <field name="code">SYSCEBNL_ASSOC_AL</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_al_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -210,8 +193,6 @@
                                 <field name="name">AM | Transport equipment</field>
                                 <field name="name@fr">AM | Matériel de transport</field>
                                 <field name="code">SYSCEBNL_ASSOC_AM</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_am_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -224,8 +205,6 @@
                                 <field name="name">AN | Advance payments on tangible assets</field>
                                 <field name="name@fr">AN | Avances et acomptes versés sur immobilisations corporelles</field>
                                 <field name="code">SYSCEBNL_ASSOC_AN</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_an_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -252,8 +231,6 @@
                                 <field name="name">AX | Investments</field>
                                 <field name="name@fr">AX | Titres de participation</field>
                                 <field name="code">SYSCEBNL_ASSOC_AX</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_ax_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -266,8 +243,6 @@
                                 <field name="name">AY | Other financial assets</field>
                                 <field name="name@fr">AY | Autres immobilisations financières</field>
                                 <field name="code">SYSCEBNL_ASSOC_AY</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_ay_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -307,8 +282,6 @@
                                 <field name="name">BA | Current assets HAO</field>
                                 <field name="name@fr">BA | Actif circulant HAO</field>
                                 <field name="code">SYSCEBNL_ASSOC_BA</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_ba_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -321,8 +294,6 @@
                                 <field name="name">BB | Inventories and outstanding</field>
                                 <field name="name@fr">BB | Stocks et encours</field>
                                 <field name="code">SYSCEBNL_ASSOC_BB</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_bb_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -335,8 +306,6 @@
                                 <field name="name">BC | Trade debtors</field>
                                 <field name="name@fr">BC | Fournisseurs débiteurs</field>
                                 <field name="code">SYSCEBNL_ASSOC_BC</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_bc_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -349,8 +318,6 @@
                                 <field name="name">BD | Members, customer-users</field>
                                 <field name="name@fr">BD | Adhérents, Clients-usagers</field>
                                 <field name="code">SYSCEBNL_ASSOC_BD</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_bd_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -363,8 +330,6 @@
                                 <field name="name">BE | Other receivables</field>
                                 <field name="name@fr">BE | Autres créances</field>
                                 <field name="code">SYSCEBNL_ASSOC_BE</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_be_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -391,8 +356,6 @@
                                 <field name="name">BU | Investment securities</field>
                                 <field name="name@fr">BU | Titres de placement</field>
                                 <field name="code">SYSCEBNL_ASSOC_BU</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_bu_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -405,8 +368,6 @@
                                 <field name="name">BV | Cash in hand</field>
                                 <field name="name@fr">BV | Valeurs à encaisser</field>
                                 <field name="code">SYSCEBNL_ASSOC_BV</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_bv_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -419,8 +380,6 @@
                                 <field name="name">BW | Banks, financial institutions and similar entities</field>
                                 <field name="name@fr">BW | Banques, établissements financiers, caisses et assimilés</field>
                                 <field name="code">SYSCEBNL_ASSOC_BW</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_bw_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -436,8 +395,6 @@
                         <field name="name@fr">BY | Ecart de conversion-Actif</field>
                         <field name="code">SYSCEBNL_ASSOC_BY</field>
                         <field name="hierarchy_level">1</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_syscebnl_assoc_by_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -510,8 +467,6 @@
                                                 <field name="name">CA | Non-expendable allocation without right of withdrawal</field>
                                                 <field name="name@fr">CA | Dotation non consomptible sans droît reprise</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CA</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_ca_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -524,8 +479,6 @@
                                                 <field name="name">CB | Non-expendable appropriation with right of withdrawal</field>
                                                 <field name="name@fr">CB | Dotation non consomptible avec droît reprise</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CB</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_cb_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -538,8 +491,6 @@
                                                 <field name="name">CC | Entrance fee</field>
                                                 <field name="name@fr">CC | Droit d'entrée</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CC</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_cc_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -552,8 +503,6 @@
                                                 <field name="name">CD | Expenditure</field>
                                                 <field name="name@fr">CD | Dotation consomptible</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CD</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_cd_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -566,8 +515,6 @@
                                                 <field name="name">CE | Revaluation surplus</field>
                                                 <field name="name@fr">CE | Ecarts de réévaluation</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CE</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_ce_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -580,8 +527,6 @@
                                                 <field name="name">CF | Reserves</field>
                                                 <field name="name@fr">CF | Réserves</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CF</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_cf_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -594,8 +539,6 @@
                                                 <field name="name">CG | Retained earnings (+ or -)</field>
                                                 <field name="name@fr">CG | Report à nouveau (+ ou -)</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CG</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_cg_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -608,7 +551,6 @@
                                                 <field name="name">CH | Net profit for the year (surplus + or deficit -)</field>
                                                 <field name="name@fr">CH | Résultat net de l'exercice (excédent + ou déficit -)</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CH</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_ch_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -631,7 +573,7 @@
                                                                 <field name="label">balance</field>
                                                                 <field name="engine">aggregation</field>
                                                                 <field name="formula">SYSCEBNL_ASSOC_XE.balance</field>
-                                                                <field name="subformula">cross_report(l10n_syscohada_reports.account_financial_report_syscebnl_pnl_assoc)</field>
+                                                                <field name="subformula">cross_report(l10n_syscohada_reports.account_financial_report_syscebnl_pnl_assoc, force_date_scope)</field>
                                                                 <field name="date_scope">from_beginning</field>
                                                             </record>
                                                         </field>
@@ -642,8 +584,6 @@
                                                 <field name="name">CI | Investment grants</field>
                                                 <field name="name@fr">CI | Subventions d'investissement</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CI</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_ci_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -656,8 +596,6 @@
                                                 <field name="name">CJ | Regulated provisions</field>
                                                 <field name="name@fr">CJ | Provisions réglementées</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CJ</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_cj_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -684,8 +622,6 @@
                                                 <field name="name">CW | Restricted funds and funds from gifts and bequests of fixed assets</field>
                                                 <field name="name@fr">CW | Fonds affectés et provenant de dons et legs d'immobilisations</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CW</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_cw_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -698,8 +634,6 @@
                                                 <field name="name">CX | Deferred funds</field>
                                                 <field name="name@fr">CX | Fonds reportés</field>
                                                 <field name="code">SYSCEBNL_ASSOC_CX</field>
-                                                <field name="groupby">account_id</field>
-                                                <field name="foldable" eval="True"/>
                                                 <field name="expression_ids">
                                                     <record id="account_financial_report_line_syscebnl_assoc_cx_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -728,8 +662,6 @@
                                         <field name="name">DA | Loans and borrowings</field>
                                         <field name="name@fr">DA | Emprunts et dettes financières</field>
                                         <field name="code">SYSCEBNL_ASSOC_DA</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_syscebnl_assoc_da_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -742,8 +674,6 @@
                                         <field name="name">DB | Capital lease liabilities</field>
                                         <field name="name@fr">DB | Dettes de location-acquisition</field>
                                         <field name="code">SYSCEBNL_ASSOC_DB</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_syscebnl_assoc_db_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -756,8 +686,6 @@
                                         <field name="name">DC | Provisions for liabilities and charges</field>
                                         <field name="name@fr">DC | Provisions pour risques et charges</field>
                                         <field name="code">SYSCEBNL_ASSOC_DC</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="account_financial_report_line_syscebnl_assoc_dc_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -786,8 +714,6 @@
                                 <field name="name">DF | Current liabilities HAO</field>
                                 <field name="name@fr">DF | Dettes circulantes HAO</field>
                                 <field name="code">SYSCEBNL_ASSOC_DF</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_df_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -800,8 +726,6 @@
                                 <field name="name">DG | Members, customer creditors</field>
                                 <field name="name@fr">DG | Adhérents, clients-usagers créditeurs</field>
                                 <field name="code">SYSCEBNL_ASSOC_DG</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_dg_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -814,8 +738,6 @@
                                 <field name="name">DH | Suppliers</field>
                                 <field name="name@fr">DH | Fournisseurs</field>
                                 <field name="code">SYSCEBNL_ASSOC_DH</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_dh_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -828,8 +750,6 @@
                                 <field name="name">DI | Other liabilities</field>
                                 <field name="name@fr">DI | Autres dettes</field>
                                 <field name="code">SYSCEBNL_ASSOC_DI</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_di_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -856,8 +776,6 @@
                                 <field name="name">DW | Banks, financial institutions and overdrafts</field>
                                 <field name="name@fr">DW | Banques, établissements financiers et crédits de trésorerie</field>
                                 <field name="code">SYSCEBNL_ASSOC_DW</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_line_syscebnl_assoc_dw_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -873,8 +791,6 @@
                         <field name="name@fr">Ecart de conversion-Passif</field>
                         <field name="code">SYSCEBNL_ASSOC_DY</field>
                         <field name="hierarchy_level">1</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_syscebnl_assoc_dy_balance" model="account.report.expression">
                                 <field name="label">balance</field>

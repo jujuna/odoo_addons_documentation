@@ -3,22 +3,22 @@
 # * delivery_dhl_rest
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-12-06 10:09+0000\n"
-"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
-"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 00:30+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-master/"
 "delivery_dhl_rest/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_dhl_rest
 #: model:ir.model.fields.selection,name:delivery_dhl_rest.selection__delivery_carrier__dhl_product_code__0
@@ -191,8 +191,7 @@ msgstr "Secreto de la API de DHL"
 #. odoo-python
 #: code:addons/delivery_dhl_rest/models/dhl_request.py:0
 msgid "DHL API key is missing, please modify your delivery method settings."
-msgstr ""
-"Falta la clave API de DHL, modifique los ajustes de su método de envío."
+msgstr "Falta la clave API de DHL, modifique los ajustes de su método de envío."
 
 #. module: delivery_dhl_rest
 #. odoo-python
@@ -225,6 +224,11 @@ msgid "DHL Documents"
 msgstr "Documentos de DHL"
 
 #. module: delivery_dhl_rest
+#: model:ir.module.module,shortdesc:base.module_delivery_dhl_rest
+msgid "DHL Express Shipping"
+msgstr ""
+
+#. module: delivery_dhl_rest
 #: model:ir.model.fields,field_description:delivery_dhl_rest.field_delivery_carrier__dhl_product_code
 msgid "DHL Product"
 msgstr "Producto de DHL"
@@ -242,6 +246,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:delivery_dhl_rest.field_delivery_carrier__dhl_default_package_type_id
 msgid "DHLxw Package Type"
 msgstr "Tipo de paquete de DHLxw"
+
+#. module: delivery_dhl_rest
+#: model:ir.model,name:delivery_dhl_rest.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
 
 #. module: delivery_dhl_rest
 #: model:ir.model.fields,field_description:delivery_dhl_rest.field_delivery_carrier__dhl_duty_payment
@@ -463,6 +472,15 @@ msgid "S - Same Day"
 msgstr "S - Same Day"
 
 #. module: delivery_dhl_rest
+#: model:ir.module.module,description:base.module_delivery_dhl_rest
+msgid ""
+"Send your shippings through DHL and track them online. This version of the "
+"DHL connector iscompatible with the DHL REST API available at https://"
+"developer.dhl.com/. It is no longercompatible with the older DHL SOAP APIs "
+"(which have their own credentials)."
+msgstr ""
+
+#. module: delivery_dhl_rest
 #: model:ir.model.fields.selection,name:delivery_dhl_rest.selection__delivery_carrier__dhl_duty_payment__s
 msgid "Sender"
 msgstr "Remitente"
@@ -485,15 +503,10 @@ msgstr ""
 "con otro producto de DHL o selecciona un método de entrega sin seguro."
 
 #. module: delivery_dhl_rest
-#: model:ir.model,name:delivery_dhl_rest.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Métodos de envío"
-
-#. module: delivery_dhl_rest
 #. odoo-python
 #: code:addons/delivery_dhl_rest/models/dhl_request.py:0
 msgid "Something went wrong, please try again later!!"
-msgstr "Ocurrió un error, vuelva a intentarlo más tarde."
+msgstr "Se ha producido un error. Vuelve a intentarlo más tarde."
 
 #. module: delivery_dhl_rest
 #: model:ir.model,name:delivery_dhl_rest.model_stock_package_type
@@ -548,12 +561,6 @@ msgid ""
 msgstr ""
 "No se puede crear el paquete porque el peso total de los productos en el "
 "albarán es 0.0 %s"
-
-#. module: delivery_dhl_rest
-#. odoo-python
-#: code:addons/delivery_dhl_rest/models/delivery_dhl.py:0
-msgid "The planned date for the shipment must be in the future."
-msgstr "La fecha planificada para el envío debe ser en el futuro."
 
 #. module: delivery_dhl_rest
 #. odoo-python
@@ -615,3 +622,15 @@ msgstr "Z - Cargos en destino"
 #: model:ir.model.fields.selection,name:delivery_dhl_rest.selection__delivery_carrier__dhl_label_image_format__zpl2
 msgid "ZPL2"
 msgstr "ZPL2"
+
+#~ msgid ""
+#~ " Extra Info: The scheduled time for the shipment was either not set or "
+#~ "was in the past, so DHL has been sent a planned shipping time of one hour "
+#~ "from now"
+#~ msgstr ""
+#~ " Información adicional: la hora programada para el envío no estaba "
+#~ "configurada o ya había pasado, por lo que se ha enviado a DHL una hora de "
+#~ "envío prevista para dentro de una hora"
+
+#~ msgid "The planned date for the shipment must be in the future."
+#~ msgstr "La fecha planificada para el envío debe ser en el futuro."

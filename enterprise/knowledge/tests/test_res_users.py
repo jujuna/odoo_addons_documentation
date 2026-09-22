@@ -6,6 +6,7 @@ from odoo.tests.common import tagged
 
 
 @tagged('knowledge_user')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestResUsers(KnowledgeCommon):
 
     def test_onboarding_article(self):

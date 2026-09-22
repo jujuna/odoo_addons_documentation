@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-12-30 18:44+0000\n"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-08-28 17:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,10 +16,11 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: approvals_purchase
-#: model:ir.model.fields,help:approvals_purchase.field_approval_category__approval_type
+#: model:ir.module.module,description:base.module_approvals_purchase
 msgid ""
-"Allows you to define which documents you would like to create once the "
-"request has been approved"
+"\n"
+"This module adds to the approvals workflow the possibility to generate\n"
+"RFQ from an approval purchase request.\n"
 msgstr ""
 
 #. module: approvals_purchase
@@ -33,8 +34,8 @@ msgid "Approval Request"
 msgstr ""
 
 #. module: approvals_purchase
-#: model:ir.model.fields,field_description:approvals_purchase.field_approval_category__approval_type
-msgid "Approval Type"
+#: model:ir.module.module,shortdesc:base.module_approvals_purchase
+msgid "Approvals - Purchase"
 msgstr ""
 
 #. module: approvals_purchase
@@ -44,7 +45,8 @@ msgstr ""
 
 #. module: approvals_purchase
 #: model:approval.category,name:approvals_purchase.approval_category_data_rfq
-#: model:ir.model.fields.selection,name:approvals_purchase.selection__approval_category__approval_type__purchase
+#: model:ir.model.fields,field_description:approvals_purchase.field_approval_category__create_rfq
+#: model:ir.model.fields,field_description:approvals_purchase.field_approval_request__create_rfq
 #: model_terms:ir.ui.view,arch_db:approvals_purchase.approval_purchase_request_view_form_inherit
 msgid "Create RFQ's"
 msgstr ""
@@ -86,6 +88,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/approvals_purchase/models/approval_product_line.py:0
 msgid "Please select a vendor on product line or set it on product(s) %s."
+msgstr ""
+
+#. module: approvals_purchase
+#: model_terms:ir.ui.view,arch_db:approvals_purchase.approval_purchase_request_view_form_inherit
+msgid "Print"
 msgstr ""
 
 #. module: approvals_purchase

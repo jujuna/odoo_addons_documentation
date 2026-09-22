@@ -63,6 +63,7 @@ class TestAccountAvalaraAddressValidation(TestAccountAvalaraAddressValidationCom
 
 
 @tagged("-standard", "external")
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestAccountAvalaraAddressValidationExternal(TestAccountAvalaraAddressValidationCommon):
     def test_integration_address_validation_wizard(self):
         with self._skip_no_credentials():

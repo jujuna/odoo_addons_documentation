@@ -4,8 +4,7 @@ from pprint import pformat
 
 from odoo import models, api, fields, _, Command
 from odoo.addons.account_avatax.lib.avatax_client import AvataxClient
-from odoo.exceptions import UserError, ValidationError, RedirectWarning
-from odoo.release import version
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_round
 
 _logger = logging.getLogger(__name__)
@@ -29,14 +28,14 @@ class AccountExternalTaxMixin(models.AbstractModel):
     @api.constrains('partner_id', 'fiscal_position_id')
     def _check_address(self):
         incomplete_partner_to_records = {}
-        for record in self.filtered(lambda r: r.is_avatax and r._get_avatax_service_params()['perform_address_validation']):
+        for record in self.filtered(lambda r: r.is_avatax and r.is_tax_computed_externally and r._get_avatax_service_params()['perform_address_validation']):
             partner = record.partner_id
             country = partner.country_id
             if (
                 partner and partner != self.env.ref('base.public_partner')
                 and (
                     not country
-                    or (country.zip_required and not partner.zip)
+                    or (country.zip_applicability == "required" and not partner.zip)
                     or (country.state_required and not partner.state_id)
                 )
             ):
@@ -55,15 +54,18 @@ class AccountExternalTaxMixin(models.AbstractModel):
             ]
             raise ValidationError(error + "\n" + "\n".join(partner_errors))
 
-    def _get_avatax_service_params(self, commit=False):
+    def _get_avatax_ship_to_partner(self):
+        return self.partner_shipping_id or self.partner_id
+
+    def _get_avatax_service_params(self):
         params = self._get_external_tax_service_params()
         params.update({
             'commercial_partner': self.partner_id.commercial_partner_id.with_company(self.company_id),
-            'shipping_partner': self.partner_shipping_id or self.partner_id,
+            'shipping_partner': self._get_avatax_ship_to_partner(),
             'unique_code': self.avatax_unique_code,
             'reference': self.name,
             'currency': self.currency_id,
-            'commit': commit and self._find_avatax_credentials_company(self.company_id).avalara_commit,  # TODO master: remove commit parameter from method
+            'commit': False,
             'fiscal_position': self.fiscal_position_id,
 
             # To be filled by specific models
@@ -90,16 +92,43 @@ class AccountExternalTaxMixin(models.AbstractModel):
                 name=product.display_name,
                 id=product.id,
             ))
-        item_code = f'UPC:{product.barcode}' if base_line['record'].company_id.avalara_use_upc and product.barcode else product.code
+        item_code = f'UPC:{product.barcode}' if base_line['record'].company_id.avalara_use_upc and product.barcode else product.code or ''
         subtotal = base_line['tax_details']['total_excluded_currency']
-        return {
+        res = {
             'amount': -subtotal if is_refund else subtotal,
             'description': line_data['description'],
             'quantity': abs(base_line['quantity']),
             'taxCode': avatax_category.code,
-            'itemCode': item_code,
+            'itemCode': item_code[:50],
             'number': "%s,%s" % (base_line['record']._name, base_line['id']),
         }
+        if product.avatax_parameter_value_ids:
+            res['parameters'] = [
+                {
+                    'name': param_val.parameter_id.technical_name,
+                    'value': param_val.value,
+                    **({'unit': param_val.avatax_uom_id.code} if param_val.avatax_uom_id else {}),
+                }
+                for param_val in product.avatax_parameter_value_ids
+            ]
+        return res
+
+    @api.model
+    def _clean_avatax_codes(self, params):
+        """Avalara does not allow certain commands in their URLs for company code or transaction code."""
+        mapping = {
+            '#': '_ava23_',
+            '%': '_ava25_',
+            '+': '_ava2b_',
+            '/': '_ava2f_',
+            '?': '_ava3f_',
+            ' ': '%20',
+        }
+        for source, replacement in mapping.items():
+            if source in params['companyCode']:
+                params['companyCode'] = params['companyCode'].replace(source, replacement)
+            if source in params['transactionCode']:
+                params['transactionCode'] = params['transactionCode'].replace(source, replacement)
 
     @api.model
     def _get_avatax_address(self, partner):
@@ -134,7 +163,7 @@ class AccountExternalTaxMixin(models.AbstractModel):
             'customerCode': params['commercial_partner'].avalara_partner_code or params['commercial_partner'].avatax_unique_code,
             'entityUseCode': params['commercial_partner'].avalara_exemption_id.code or '',
             'businessIdentificationNo': params['commercial_partner'].vat or '',
-            'date': (params['document_date'] or fields.Date.today()).isoformat(),
+            'date': (params['document_date'] or fields.Date.context_today(self)).isoformat(),
             'type': params['document_type'],
             'code': params['unique_code'],
             'referenceCode': params['reference'],
@@ -198,7 +227,7 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
         for company, records in self.filtered('is_avatax').grouped("company_id").items():
             base_line_with_tax_values = []
-            client = self._get_client(company)
+            client = AvataxClient._get_client(company)
 
             for record in records:
                 service_params = record._get_avatax_service_params()
@@ -235,23 +264,22 @@ class AccountExternalTaxMixin(models.AbstractModel):
         return res
 
     def _change_avatax_state(self, action):
-        assert action in ('commit', 'uncommit', 'void')
+        assert action in ('uncommit', 'void')
 
         for company, records in self.filtered('is_avatax').grouped('company_id').items():
-            company_commit = self._find_avatax_credentials_company(company).avalara_commit
-            if not company_commit and 'commit' in action:
+            avatax_company = self._find_avatax_credentials_company(company)
+            if action == 'uncommit' and not (avatax_company.sudo().avalara_connection_method == 'iap' or avatax_company.avalara_commit):
                 continue
 
-            client = self._get_client(company)
+            client = AvataxClient._get_client(avatax_company, skip_credentials_check=True)
 
             for record in records:
                 params = {
-                    'companyCode': record.company_id.partner_id.avalara_partner_code,
+                    'companyCode': record.company_id.partner_id.avalara_partner_code or '',
                     'transactionCode': record.avatax_unique_code
                 }
-                if action == 'commit':
-                    query_result = client.commit_transaction(**params)
-                elif action == 'uncommit':
+                self._clean_avatax_codes(params)
+                if action == 'uncommit':
                     query_result = client.uncommit_transaction(**params)
                 else:  # void
                     query_result = client.void_transaction(**params)
@@ -270,9 +298,6 @@ class AccountExternalTaxMixin(models.AbstractModel):
                 if error:
                     raise UserError(error)
 
-    def _commit_avatax_taxes(self):
-        self._change_avatax_state('commit')
-
     def _uncommit_external_taxes(self):
         self._change_avatax_state('uncommit')
         return super()._uncommit_external_taxes()
@@ -281,6 +306,13 @@ class AccountExternalTaxMixin(models.AbstractModel):
         self._change_avatax_state('void')
         return super()._void_external_taxes()
 
+    def _format_avatax_error_detail(self, detail):
+        description = detail.get('description') or ''
+        message = detail.get('message') or ''
+        if description and message and message != description:
+            return f'{description}: {message}'
+        return description or message
+
     def _handle_response(self, response, title):
         if response.get('errors'):  # http error
             _logger.warning(pformat(response), stack_info=True)
@@ -288,39 +320,26 @@ class AccountExternalTaxMixin(models.AbstractModel):
 
         if response.get('error'):  # avatax error
             _logger.warning(pformat(response), stack_info=True)
-            messages = '\n'.join(detail['message'] for detail in response['error']['details'])
-            return '%s\n%s' % (title, messages)
+            if 'details' in response['error']:
+                messages = '\n'.join(self._format_avatax_error_detail(detail) for detail in response['error']['details'])
+            else:
+                messages = f"{response['error']['code']} - {response['error']['message']}"
+            return '%s\n\n%s' % (title, messages)
 
         return None
 
     @api.model
     def _find_avatax_credentials_company(self, company):
-        has_avatax_credentials = company.sudo().avalara_api_id and company.sudo().avalara_api_key
-        if has_avatax_credentials:
+        company_sudo = company.sudo()
+        # Direct credentials only apply in Direct mode; Included routes through the IAP proxy.
+        has_avatax_credentials = (
+            company_sudo.avalara_connection_method != 'iap'
+            and company_sudo.avalara_api_id
+            and company_sudo.avalara_api_key
+        )
+        connected_via_iap = company_sudo.avalara_connection_method == 'iap' and company_sudo.avalara_iap_connected
+        if has_avatax_credentials or connected_via_iap:
             return company
-        elif company.parent_id:
+        if company.parent_id:
             return self._find_avatax_credentials_company(company.parent_id)
-        return None
-
-    def _get_client(self, company):
-        company = self._find_avatax_credentials_company(company)
-        if not company:
-            raise RedirectWarning(
-                _('Please add your AvaTax credentials'),
-                self.env.ref('base_setup.action_general_configuration').id,
-                _("Go to the configuration panel"),
-            )
-
-        client = AvataxClient(
-            app_name='Odoo',
-            app_version=version,
-            environment=company.avalara_environment,
-        )
-        client.add_credentials(
-            company.sudo().avalara_api_id or '',
-            company.sudo().avalara_api_key or '',
-        )
-        client.logger = lambda message: self._log_external_tax_request(
-            'Avatax US', 'account_avatax.log.end.date', message
-        )
-        return client
+        return self.env['res.company']

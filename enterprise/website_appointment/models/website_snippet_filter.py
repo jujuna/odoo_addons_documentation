@@ -13,10 +13,13 @@ class WebsiteSnippetFilter(models.Model):
         return [{
             'message_intro': _("A first step in joining our team as a technical consultant."),
             'name': _('Candidate Interview'),
+            'website_url': '',
         }, {
             'name': _('Online Cooking Lesson'),
+            'website_url': '',
         }, {
             'name': _('Tennis Court'),
+            'website_url': '',
         }]
 
     def _prepare_values(self, limit=None, search_domain=None, **options):

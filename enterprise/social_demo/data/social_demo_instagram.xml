@@ -6,6 +6,7 @@
         <field name="instagram_post_id">Bnjb7LBh8FV</field>
         <field name="post_id" ref="social_post_global_2"/>
         <field name="state">posted</field>
+        <field name="comments_count">47</field>
     </record>
 
     <record id="social_stream_instagram_account" model="social.stream">
@@ -28,8 +29,8 @@
         <field name="twitter_profile_image_url" eval="'/web/image/res.partner/%s/image_128' % ref('base.res_partner_1')" />
     </record>
 
-    <record id="social_stream_post_instagram_image_1" model="social.stream.post.image">
-        <field name="image_url" eval="'/web/image/product.product/%s/image_512' % ref('product.product_product_4')"></field>
+    <record id="social_stream_post_instagram_image_1" model="social.stream.post.attachment">
+        <field name="content_url" eval="'/web/image/product.product/%s/image_512' % ref('product.product_product_4')"></field>
         <field name="stream_post_id" ref="social_stream_post_instagram_1" />
     </record>
 </data>

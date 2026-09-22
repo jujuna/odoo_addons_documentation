@@ -14,15 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 18:44+0000\n"
-"PO-Revision-Date: 2025-10-08 18:44+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 01:16+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"delivery_sendcloud/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -69,46 +71,33 @@ msgid "%(partner_name)s phone required"
 msgstr "%(partner_name)s telefon raqami talab qilinadi"
 
 #. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
-#, fuzzy
+#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Do not forget to load your "
-"SendCloud shipping products for a valid configuration."
+"<i class=\"oi\" data-icon=\"info\"/> Available shipping products depend on "
+"enabled carriers in your Sendcloud account."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> To‘g‘ri sozlash uchun SendCloud "
-"yuk tashish mahsulotlarini yuklashni unutmang."
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> In test environment, to avoid "
+"<i class=\"oi\" data-icon=\"warning\"/> Do not forget to load your SendCloud "
+"shipping products for a valid configuration."
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
+msgid ""
+"<i class=\"oi\" data-icon=\"warning\"/> In test environment, to avoid "
 "charges, your shippings are automatically <b>cancelled</b> after the label "
 "creation."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> Sinov muhitida to‘lovlardan "
-"qochish uchun, yorliq yaratilgandan so‘ng yuklaringiz avtomatik ravishda "
-"<b>bekor qilinadi</b>."
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Only administrators can configure "
+"<i class=\"oi\" data-icon=\"warning\"/> Only administrators can configure "
 "the public and private keys."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> Ochiq va maxfiy kalitlarni faqat "
-"administratorlar sozlashi mumkin."
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-info-circle\"/> Available shipping products depend on "
-"enabled carriers in your Sendcloud account."
-msgstr ""
-"<i class=\"fa fa-info-circle\"/> Mavjud yetkazib berish mahsulotlari "
-"Sendcloud hisobingizdagi faollashtirilgan tashuvchilarga bog‘liq."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__sendcloud_products_code
@@ -128,12 +117,6 @@ msgstr "Mavjud funksiyalar"
 #, fuzzy
 msgid "Can Customize Functionalities"
 msgstr "Funksiyalarni moslashtirish mumkin"
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
-#, fuzzy
-msgid "Cancel"
-msgstr "Bekor qilish"
 
 #. module: delivery_sendcloud
 #. odoo-javascript
@@ -213,6 +196,11 @@ msgstr "Sendcloud uchun standart qadoq turi"
 #, fuzzy
 msgid "Delivery"
 msgstr "Yetkazib berish"
+
+#. module: delivery_sendcloud
+#: model:ir.model,name:delivery_sendcloud.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
@@ -323,6 +311,17 @@ msgid "Integration"
 msgstr "Integratsiya"
 
 #. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid "Invalid SendCloud URL."
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_label_type
+msgid "Label Format"
+msgstr ""
+
+#. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_product__write_uid
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__write_uid
 #, fuzzy
@@ -395,9 +394,11 @@ msgstr "Albatta Sendcloud tashuvchisi bo‘lishi shart!"
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
-#, fuzzy
-msgid "No address found with contact name %s on your sendcloud account."
-msgstr "Sendcloud hisobingizda %s kontakt nomiga ega manzil topilmadi."
+msgid ""
+"No address found matching Warehouse name \"%s\" on your sendcloud account. "
+"Please make sure there is an address with the same name under \"Address Name "
+"(optional)\" in your Sendcloud Address configuration."
+msgstr ""
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -409,24 +410,26 @@ msgstr "Tanlash yoki buyurtma ma'lumotlari ko‘rsatilmagan"
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
-#, fuzzy
 msgid ""
 "Note that a unit of the product '%s' is heavier than the maximum weight "
-"allowed by the shipping method."
+"allowed by the delivery method."
 msgstr ""
-"Diqqat: '%s' mahsulotning bir birligi yetkazib berish usuli uchun "
-"belgilangan maksimal og‘irlikdan ortiq."
 
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
-#, fuzzy
+msgid ""
+"Note that this price is for %s packages since the order weight is more than "
+"the maximum packaging weight."
+msgstr ""
+
+#. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
 msgid ""
 "Note that this price is for %s packages since the order weight is more than "
 "the maximum weight allowed by the shipping method."
 msgstr ""
-"E'tibor bering: bu narx %s ta paket uchun, chunki buyurtma og‘irligi "
-"yetkazib berish usuli ruxsat etgan maksimal og‘irlikdan ortiq."
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
@@ -449,17 +452,23 @@ msgid "Other Functionalities"
 msgstr "Qo‘shimcha imkoniyatlar"
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__application/pdf
+msgid "PDF"
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__image/png
+msgid "PNG"
+msgstr ""
+
+#. module: delivery_sendcloud
 #. odoo-javascript
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
-#, fuzzy
 msgid ""
 "Please check SendCloud return product documentation before selecting return "
 "product. For some products, you can be charged for return labels printed but "
 "not used."
 msgstr ""
-"Qaytarish mahsulotini tanlashdan oldin SendCloud qaytarish mahsuloti "
-"hujjatlarini tekshiring. Ba'zi mahsulotlar uchun chop etilgan, ammo "
-"foydalanilmagan qaytarish yorliqlari uchun to‘lov olinishi mumkin."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__delivery_type
@@ -486,16 +495,22 @@ msgid "Select the country to be used by this delivery method"
 msgstr "Ushbu yetkazib berish usuli uchun foydalaniladigan mamlakatni tanlang"
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields,help:delivery_sendcloud.field_delivery_carrier__sendcloud_label_type
+msgid ""
+"Select the label format to be used when sending shipments with Sendcloud."
+msgstr ""
+
+#. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 #, fuzzy
 msgid "SendCloud Configuration"
 msgstr "SendCloud sozlamalari"
 
 #. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.res_config_settings_view_form_sale
-#, fuzzy
-msgid "SendCloud Shipping Methods"
-msgstr "SendCloud yetkazib berish usullari"
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid "SendCloud should be used with a context manager."
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__delivery_type__sendcloud
@@ -560,15 +575,10 @@ msgstr "Sendcloud maxfiy kaliti"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_id
+#: model:ir.module.module,shortdesc:base.module_delivery_sendcloud
 #, fuzzy
 msgid "Sendcloud Shipping"
 msgstr "Sendcloud orqali yetkazib berish"
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.res_config_settings_view_form_stock
-#, fuzzy
-msgid "Sendcloud Shipping Methods"
-msgstr "Sendcloud yetkazib berish usullari"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_name
@@ -605,10 +615,9 @@ msgid "Shipping Carrier"
 msgstr "Yuk tashuvchi"
 
 #. module: delivery_sendcloud
-#: model:ir.model,name:delivery_sendcloud.model_delivery_carrier
-#, fuzzy
-msgid "Shipping Methods"
-msgstr "Yetkazib berish usullari"
+#: model:ir.module.module,description:base.module_delivery_sendcloud
+msgid "Shipping Integration with Sendcloud platform"
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_product__name
@@ -788,8 +797,8 @@ msgid ""
 "content of your package(s)."
 msgstr ""
 "Quyidagi paketlar uchun mos og‘irlik oralig‘iga ega usul mavjud emas: %s Siz "
-"boshqa tashuvchini tanlashingiz, filtrlaringizni o‘zgartirishingiz yoki "
-"paket(lar)ingiz tarkibini qayta belgilashingiz mumkin."
+"boshqa tashuvchini tanlashingiz, filtrlaringizni o‘zgartirishingiz yoki paket"
+"(lar)ingiz tarkibini qayta belgilashingiz mumkin."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -817,9 +826,8 @@ msgstr "Ko‘chirish"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_use_batch_shipping
-#, fuzzy
-msgid "Use Batch Shipping"
-msgstr "Ommaviy yuk tashishdan foydalanish"
+msgid "Use Multicollo"
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_rules
@@ -873,11 +881,15 @@ msgid "You must have a shipping product configured!"
 msgstr "Yuk tashish mahsuloti sozlangan bo‘lishi kerak!"
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__application/zpl
+msgid "ZPL"
+msgstr ""
+
+#. module: delivery_sendcloud
 #. odoo-javascript
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
-#, fuzzy
 msgid "cm"
-msgstr "sm"
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.sendcloud_label_tracking
@@ -886,3 +898,9 @@ msgid ""
 "created in Sendcloud. <br/>\n"
 "            <b>Tracking Numbers:</b>"
 msgstr "Sendcloud xizmatida yaratildi. <br/> <b>Kuzatuv raqamlari:</b>"
+
+#. module: delivery_sendcloud
+#. odoo-javascript
+#: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
+msgid "g"
+msgstr ""

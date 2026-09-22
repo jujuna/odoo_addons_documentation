@@ -9,7 +9,7 @@ export class OnlineSyncPortal extends Interaction {
     static selector = ".oe_online_sync #renew_consent_button";
     dynamicContent = {
         _root: {
-            "t-on-click.prevent.withTarget": this.onRenewConsentClick,
+            "t-on-click.prevent": this.onRenewConsentClick,
         },
     };
 
@@ -44,10 +44,9 @@ export class OnlineSyncPortal extends Interaction {
 
     /**
      * @param {PointerEvent} ev
-     * @param {HTMLElement} currentTargetEl
      */
-    onRenewConsentClick(ev, currentTargetEl) {
-        const action = JSON.parse(currentTargetEl.getAttribute("iframe-params"));
+    onRenewConsentClick(ev) {
+        const action = JSON.parse(ev.currentTarget.getAttribute("iframe-params"));
         this.OdooFinConnector(action);
     }
 }

@@ -5,7 +5,7 @@ import json
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.fields import Domain
-from odoo.tools import format_datetime, OrderedSet
+from odoo.tools import format_datetime
 
 
 class SocialPostTemplate(models.Model):
@@ -23,7 +23,7 @@ class SocialPostTemplate(models.Model):
     """
     _name = 'social.post.template'
     _description = 'Social Post Template'
-    _rec_names_search = ['display_message']
+    _rec_names_search = ('display_message',)
 
     @api.model
     def default_get(self, fields):
@@ -40,14 +40,19 @@ class SocialPostTemplate(models.Model):
     # Content
     message = fields.Text("Message")
     image_ids = fields.Many2many(
-        'ir.attachment', string='Attach Images', bypass_search_access=True,
+        'social.post.image', string='Attach Images', bypass_search_access=True,
         help="Will attach images to your posts (if the social media supports it).")
+    first_comment = fields.Text("First Comment", help="This will be posted as a comment right after publishing")
     display_message = fields.Char(string='Display Message', compute='_compute_display_message', search='_search_display_message')
     # JSON array capturing the URLs of the images to make it easy to display them in the kanban view
     image_urls = fields.Text(
         'Images URLs', compute='_compute_image_urls')
-    is_split_per_media = fields.Boolean('Split Per Network')
-    media_count = fields.Integer('Media Count', compute='_compute_media_count')
+    is_split_per_media = fields.Boolean(
+        'Split Per Network',
+        # automatically split the post if we have only one media logged
+        default=lambda self: len(self.env['social.account']._read_group([], ['media_id'])) == 1)
+    social_post_mentions = fields.Text('Mentions by Media')
+    max_post_length_per_media = fields.Json('Max Post Length Per Media', compute='_compute_max_post_length_per_media')
     # Account management
     account_ids = fields.Many2many('social.account', string='Social Accounts',
                                    help="The accounts on which this post will be published.",
@@ -59,13 +64,6 @@ class SocialPostTemplate(models.Model):
         for post in self:
             if not post.message and not post.image_ids and not post.is_split_per_media:
                 raise UserError(_("Please specify either a message or upload some images."))
-
-    @api.constrains(lambda self: ['image_ids'] + list(self._images_fields().values()))
-    def _check_image_ids_mimetype(self):
-        image_fields = ['image_ids'] + list(self._images_fields().values())
-        for post in self:
-            if any(not image.mimetype.startswith('image') for field in image_fields for image in post[field]):
-                raise UserError(_('Uploaded file does not seem to be a valid image.'))
 
     @api.depends('message', 'is_split_per_media')
     def _compute_message_by_media(self):
@@ -83,22 +81,36 @@ class SocialPostTemplate(models.Model):
         for post in self:
             for field in images_fields.values():
                 if not post[field] or not post.is_split_per_media:
+                    # keep the fields synced when not splitting
                     post[field] = post.image_ids
 
-    @api.depends(lambda self: ['message', 'is_split_per_media'] + list(self._message_fields().values()))
+    @api.depends('first_comment', 'is_split_per_media')
+    def _compute_first_comment_by_media(self):
+        first_comment_fields = self._first_comment_fields()
+        for post in self:
+            for field in first_comment_fields.values():
+                if not post[field] or not post.is_split_per_media:
+                    post[field] = post.first_comment
+
+    @api.depends(lambda self: ['message', 'is_split_per_media', 'account_ids'] + list(self._message_fields().values()))
     def _compute_display_message(self):
         message_fields = self._message_fields()
         for post in self:
             if not post.is_split_per_media:
-                post.display_message = post.message
+                display_message = post.message
             else:
                 media_types = post.account_ids.mapped('media_type')
-                post.display_message = next((
+                display_message = next((
                     post[message_fields[media_type]]
                     for media_type in media_types
                     if media_type in message_fields
                     and post[message_fields[media_type]]
                 ), False)
+
+            if not display_message and post.account_ids:
+                display_message = ', '.join(post.account_ids.media_id.mapped('name'))
+
+            post.display_message = display_message
 
     def _search_display_message(self, operator, operand):
         if operator in Domain.NEGATIVE_OPERATORS:
@@ -113,13 +125,24 @@ class SocialPostTemplate(models.Model):
         """See field 'help' for more information."""
         image_fields = ['image_ids'] + list(self._images_fields().values())
         for post in self:
-            all_image_ids = OrderedSet([image_id for field in image_fields for image_id in post[field].ids])
-            post.image_urls = json.dumps([f'/web/image/{image_id}' for image_id in all_image_ids if image_id])
+            seen_checksum = set()
+            all_image_ids = [
+                image.id
+                for field in image_fields
+                for image in post[field]
+                if image.attachment_id.checksum not in seen_checksum
+                and not seen_checksum.add(image.attachment_id.checksum)
+            ]
+            post.image_urls = json.dumps([f'/web/image/social.post.image/{image_id}/raw' for image_id in all_image_ids if image_id])
 
     @api.depends('account_ids')
-    def _compute_media_count(self):
+    def _compute_max_post_length_per_media(self):
         for post in self:
-            post.media_count = len(set(post.account_ids.mapped('media_type')))
+            post.max_post_length_per_media = [
+                {"mediaId": media.id, "mediaType": media.media_type, "maxPostLength": media.max_post_length}
+                for media in post.account_ids.media_id
+                if media.max_post_length
+            ]
 
     def _compute_account_ids(self):
         """If there are less than 3 social accounts available, select them all by default."""
@@ -143,34 +166,32 @@ class SocialPostTemplate(models.Model):
             'published_date': format_datetime(self.env, fields.Datetime.now(), tz=self.env.user.tz, dt_format="short"),
         }
         return values
-    def _set_attachemnt_res_id(self):
-        """ Set res_id of created attachements, the many2many_binary widget
-        might create them without res_id, and if it's the case,
-        only the current user will be able to read the attachments
-        (other user will get an access error). """
-        for post in self:
-            if post.image_ids:
-                attachments = self.env['ir.attachment'].sudo().browse(post.image_ids.ids).filtered(
-                    lambda a: a.res_model == self._name and not a.res_id and a.create_uid.id == self.env.uid)
-                if attachments:
-                    attachments.write({'res_id': post.id})
 
     @api.model
     def name_create(self, name):
         record = self.create({'message': name})
         return record.id, record.display_name
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        res = super(SocialPostTemplate, self).create(vals_list)
-        res._set_attachemnt_res_id()
-        return res
-
     @api.depends('display_message')
     def _compute_display_name(self):
         for record in self:
             name = record.display_message or ""
             record.display_name = name if len(name) <= 50 else f"{name[:47]}..."
+
+    @api.model
+    def action_copy_images(self, image_ids):
+        """Copy the images when splitting per media.
+
+        To not share the order of the images when splitting per medias,
+        we need to create copy.
+
+        Not executed on the recordset so we can split without
+        triggering the "required fields" error.
+        """
+        return {
+            field: self.env['social.post.image'].browse(image_ids).copy().ids
+            for field in self._images_fields().values()
+        }
 
     def action_generate_post(self):
         self.ensure_one()
@@ -190,10 +211,12 @@ class SocialPostTemplate(models.Model):
         return {
             'message': self.message,
             'image_ids': self.image_ids.ids,
+            'first_comment': self.first_comment,
             'account_ids': self.account_ids.ids,
             'company_id': False,
             **{field: self[field] for field in self._message_fields().values()},
             **{field: self[field].ids for field in self._images_fields().values()},
+            **{field: self[field] for field in self._first_comment_fields().values()},
         }
 
     @api.model
@@ -216,6 +239,11 @@ class SocialPostTemplate(models.Model):
     @api.model
     def _images_fields(self):
         """Return the images field per media."""
+        return {}
+
+    @api.model
+    def _first_comment_fields(self):
+        """Return the "first comment" field per media."""
         return {}
 
     @api.model

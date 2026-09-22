@@ -3,21 +3,22 @@
 # * delivery_sendcloud
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-09-16 15:29+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 04:56+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "delivery_sendcloud/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -64,42 +65,42 @@ msgid "%(partner_name)s phone required"
 msgstr "%(partner_name)s puhelin vaaditaan"
 
 #. module: delivery_sendcloud
+#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
+msgid ""
+"<i class=\"oi\" data-icon=\"info\"/> Available shipping products depend on "
+"enabled carriers in your Sendcloud account."
+msgstr ""
+"<i class=\"oi\" data-icon=\"info\"/> Saatavilla olevat toimitustuotteet "
+"riippuvat Sendcloud-tililläsi käytössä olevista siirtäjistä."
+
+#. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Do not forget to load your "
-"SendCloud shipping products for a valid configuration."
+"<i class=\"oi\" data-icon=\"warning\"/> Do not forget to load your SendCloud "
+"shipping products for a valid configuration."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> Älä unohda ladata SendCloud-"
+"<i class=\"oi\" data-icon=\"warning\"/> Älä unohda ladata SendCloud-"
 "toimitustuotteitasi, jotta määrityksesi olisi voimassa."
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> In test environment, to avoid "
+"<i class=\"oi\" data-icon=\"warning\"/> In test environment, to avoid "
 "charges, your shippings are automatically <b>cancelled</b> after the label "
 "creation."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> Testiympäristössä lähetys "
-"<b>peruutetaan</b> automaattisesti etiketin luomisen jälkeen, jotta "
+"<i class=\"oi\" data-icon=\"warning\"/> Testiympäristössä lähetys <b>"
+"peruutetaan</b> automaattisesti etiketin luomisen jälkeen, jotta "
 "vältyttäisiin veloituksilta."
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Only administrators can configure "
+"<i class=\"oi\" data-icon=\"warning\"/> Only administrators can configure "
 "the public and private keys."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> Vain ylläpitäjät voivat määrittää "
+"<i class=\"oi\" data-icon=\"warning\"/> Vain ylläpitäjät voivat määrittää "
 "julkisen ja yksityisen avaimen."
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
-msgid ""
-"<i class=\"fa fa-info-circle\"/> Available shipping products depend on "
-"enabled carriers in your Sendcloud account."
-msgstr ""
-"<i class=\"fa fa-info-circle\"/> Saatavilla olevat toimitustuotteet "
-"riippuvat Sendcloud-tililläsi käytössä olevista siirtäjistä."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__sendcloud_products_code
@@ -118,16 +119,11 @@ msgid "Can Customize Functionalities"
 msgstr "Voi mukauttaa toimintoja"
 
 #. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
-msgid "Cancel"
-msgstr "Peruuta"
-
-#. module: delivery_sendcloud
 #. odoo-javascript
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_stock_package_type__package_carrier_type
 msgid "Carrier"
-msgstr "Huolitsija"
+msgstr "Kuljetusyritys"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -188,6 +184,11 @@ msgstr "Sendcloudin oletuspakettityyppi"
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__carrier_id
 msgid "Delivery"
 msgstr "Toimitus"
+
+#. module: delivery_sendcloud
+#: model:ir.model,name:delivery_sendcloud.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
@@ -285,6 +286,17 @@ msgid "Integration"
 msgstr "Integrointi"
 
 #. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid "Invalid SendCloud URL."
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_label_type
+msgid "Label Format"
+msgstr ""
+
+#. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_product__write_uid
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__write_uid
 msgid "Last Updated by"
@@ -340,13 +352,16 @@ msgstr "Vähimmäispaino"
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
 msgid "Must be a Sendcloud carrier!"
-msgstr "Täytyy olla Sendcloud-huolitsija!"
+msgstr "Täytyy olla Sendcloud-kuljetusyritys!"
 
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
-msgid "No address found with contact name %s on your sendcloud account."
-msgstr "Osoitetta ei löytynyt yhteyshenkilön nimellä %s sendcloud-tililtäsi."
+msgid ""
+"No address found matching Warehouse name \"%s\" on your sendcloud account. "
+"Please make sure there is an address with the same name under \"Address Name "
+"(optional)\" in your Sendcloud Address configuration."
+msgstr ""
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -359,10 +374,18 @@ msgstr "Poiminta tai tilaus ei ole mahdollista"
 #: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
 msgid ""
 "Note that a unit of the product '%s' is heavier than the maximum weight "
-"allowed by the shipping method."
+"allowed by the delivery method."
 msgstr ""
-"Huomaa, että tuotteen '%s' yksikkö on painavampi kuin toimitustavan sallima "
-"enimmäispaino."
+
+#. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
+msgid ""
+"Note that this price is for %s packages since the order weight is more than "
+"the maximum packaging weight."
+msgstr ""
+"Huomaa, että tämä on %s paketin hinta, koska tilauksen paino ylittää "
+"pakkauksen enimmäispainon."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -392,6 +415,16 @@ msgid "Other Functionalities"
 msgstr "Muut toiminnot"
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__application/pdf
+msgid "PDF"
+msgstr ""
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__image/png
+msgid "PNG"
+msgstr ""
+
+#. module: delivery_sendcloud
 #. odoo-javascript
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
 msgid ""
@@ -400,8 +433,8 @@ msgid ""
 "not used."
 msgstr ""
 "Tarkista SendCloudin palautustuotedokumentaatio ennen palautustuotteen "
-"valintaa. Joidenkin tuotteiden osalta sinua voidaan veloittaa tulostetuista, "
-"mutta käyttämättömistä palautustarroista."
+"valitsemista. Joidenkin tuotteiden osalta sinua voidaan veloittaa "
+"tulostetuista, mutta käyttämättömistä palautusetiketeistä."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__delivery_type
@@ -424,14 +457,21 @@ msgid "Select the country to be used by this delivery method"
 msgstr "Valitse maa, jota tämä toimitustapa käyttää"
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields,help:delivery_sendcloud.field_delivery_carrier__sendcloud_label_type
+msgid ""
+"Select the label format to be used when sending shipments with Sendcloud."
+msgstr ""
+
+#. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid "SendCloud Configuration"
 msgstr "SendCloudin asetukset"
 
 #. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.res_config_settings_view_form_sale
-msgid "SendCloud Shipping Methods"
-msgstr "SendCloudin toimitustavat"
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid "SendCloud should be used with a context manager."
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__delivery_type__sendcloud
@@ -486,13 +526,9 @@ msgstr "Sendcloudin salainen avain"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_id
+#: model:ir.module.module,shortdesc:base.module_delivery_sendcloud
 msgid "Sendcloud Shipping"
 msgstr "Sendcloud Toimitus"
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.res_config_settings_view_form_stock
-msgid "Sendcloud Shipping Methods"
-msgstr "Sendcloudin toimitustavat"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_name
@@ -523,9 +559,9 @@ msgid "Shipping Carrier"
 msgstr "Rahdinkuljettaja"
 
 #. module: delivery_sendcloud
-#: model:ir.model,name:delivery_sendcloud.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Toimitustavat"
+#: model:ir.module.module,description:base.module_delivery_sendcloud
+msgid "Shipping Integration with Sendcloud platform"
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_product__name
@@ -713,8 +749,8 @@ msgstr "Siirto"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_use_batch_shipping
-msgid "Use Batch Shipping"
-msgstr "Käytä eräkuljetusta"
+msgid "Use Multicollo"
+msgstr "Käytä Multicolloa"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_rules
@@ -761,6 +797,11 @@ msgid "You must have a shipping product configured!"
 msgstr "Sinulla on oltava määritetty toimitustuote!"
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__application/zpl
+msgid "ZPL"
+msgstr ""
+
+#. module: delivery_sendcloud
 #. odoo-javascript
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
 msgid "cm"
@@ -774,3 +815,9 @@ msgid ""
 msgstr ""
 "luotu Sendcloudissa. <br/>\n"
 "           <b>Seurantanumerot:</b>"
+
+#. module: delivery_sendcloud
+#. odoo-javascript
+#: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
+msgid "g"
+msgstr "g"

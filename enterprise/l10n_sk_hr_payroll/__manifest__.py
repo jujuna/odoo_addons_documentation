@@ -1,13 +1,11 @@
-# -*- coding:utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Slovakia - Payroll',
     'countries': ['sk'],
     'category': 'Human Resources/Payroll',
-    'depends': ['hr_payroll', 'hr_work_entry_holidays', 'hr_payroll_holidays'],
+    'depends': ['hr_payroll', 'hr_holidays'],
     'auto_install': ['hr_payroll'],
-    'version': '1.0',
     'description': """
 Slovak Payroll Rules.
 =========================
@@ -24,6 +22,7 @@ Slovak Payroll Rules.
         'data/hr_rule_parameter_data.xml',
         'data/hr_salary_rule_category_data.xml',
         'data/hr_payroll_structure_type_data.xml',
+        'data/hr_work_entry_type_data.xml',
         'views/hr_payroll_report.xml',
         'views/hr_contract_template_views.xml',
         'views/hr_employee_views.xml',
@@ -36,4 +35,5 @@ Slovak Payroll Rules.
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'post_init_hook': '_l10n_sk_hr_payroll_post_install',
 }

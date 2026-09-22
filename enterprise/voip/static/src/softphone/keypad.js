@@ -1,67 +1,80 @@
+import { useLayoutEffect } from "@web/owl2/utils";
 import { useSelection } from "@mail/utils/common/hooks";
-
-import { Component, markup, useEffect, useRef } from "@odoo/owl";
-
-import { KeypadModel } from "@voip/softphone/softphone_model";
-import { tabComponents } from "@voip/softphone/tab";
-import { isCurrentFocusEditable, matchPhoneNumber } from "@voip/utils/utils";
-
-import { isMobileOS } from "@web/core/browser/feature_detection";
+import { Component, markup, useEffect, useProps, proxy, signal, t, untrack } from "@odoo/owl";
+import { useLongPress } from "@voip/hooks/long_press_hook";
+import { ActionButton } from "@voip/softphone/action_button";
+import { AddressBook, PRIORITIZED_CONTACT_LIMIT } from "@voip/softphone/address_book";
+import {
+    getSortedMatchingContacts,
+    makeContactComparator,
+    prioritizeContactsByIds,
+} from "@voip/utils/contact_search";
+import { CountrySelectorItems } from "@voip/softphone/country_selector_items";
+import { KeypadModel } from "@voip/softphone/keypad_model";
+import { highlightT9Name, isT9Code } from "@voip/softphone/t9";
+import { highlightMatch, highlightPhone } from "@voip/utils/highlight";
+import { VoipImStatus } from "@voip/softphone/voip_im_status";
+import { isCurrentFocusEditable } from "@voip/utils/utils";
+import { cleanPhoneNumber } from "@web/core/phone/phone_call";
+import { isBrowserFirefox } from "@web/core/browser/feature_detection";
+import { Dropdown } from "@web/core/dropdown/dropdown";
 import { _t } from "@web/core/l10n/translation";
-import { normalize, normalizedMatch } from "@web/core/l10n/utils";
 import { rpc } from "@web/core/network/rpc";
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
-import { htmlJoin } from "@web/core/utils/html";
 import { useDebounced } from "@web/core/utils/timing";
 
-const T9_MAPPING = Object.freeze({
-    2: "ABC",
-    3: "DEF",
-    4: "GHI",
-    5: "JKL",
-    6: "MNO",
-    7: "PQRS",
-    8: "TUV",
-    9: "WXYZ",
-});
+const MAX_EXACT_OTHER_CONTACTS = 30;
+const KEYPAD_CONTACT_FETCH_LIMIT = MAX_EXACT_OTHER_CONTACTS + 2;
 
 /**
  * The actual keypad, its search bar, and recipient suggestions.
  */
 export class Keypad extends Component {
-    static components = { ...tabComponents };
-    static defaultProps = { dtmf: false };
-    static props = {
-        dtmf: { type: Boolean, optional: true },
-        onClickBack: { type: Function, optional: true },
-        onClickFirstResult: { type: Function, optional: true },
-        onClickTransferPhone: { type: Function, optional: true },
-        state: KeypadModel,
-        slots: { type: Object, optional: true },
+    static components = {
+        ActionButton,
+        AddressBook,
+        CountrySelectorItems,
+        Dropdown,
+        VoipImStatus,
     };
+    props = useProps({
+        dtmf: t.boolean().optional(false),
+        onCallVoicemail: t.function().optional(),
+        onClickBack: t.function().optional(),
+        onClickContact: t.function().optional(),
+        onClickHistory: t.function().optional(),
+        onSubmit: t.function().optional(),
+        state: t.instanceOf(KeypadModel),
+        slots: t.object().optional(),
+    });
     static template = "voip.Keypad";
 
+    keypadRootRef = signal.ref();
+    inputRef = signal.ref();
+    firstSuggestionButtonRef = signal.ref();
+
     setup() {
-        this.action = useService("action");
-        this.userAgent = useService("voip.user_agent");
         this.voip = useService("voip");
-        this.inputRef = useRef("input-ref");
+        this.userAgent = this.voip.userAgent;
+        this.softphone = this.voip.softphone;
+        this.state = proxy(this.props.state);
+        this.compareContacts = makeContactComparator(user.lang);
+        this.prioritizedContactIdsBySearchTerms = new Map();
+        this.prioritizedContacts = proxy({ searchTerms: "", contactIds: [] });
+        this.countryMenuRef = signal.ref();
         this.selection = useSelection({
-            refName: "input-ref",
+            ref: this.inputRef,
             model: this.props.state.input.selection,
-            preserveOnClickAwayPredicate: (ev) =>
-                Boolean(ev.target.closest(".o-voip-Keypad-backspace, .o-voip-Keypad-digitBtn")),
+            preserveOnClickAwayPredicate: (ev) => this.keypadRootRef()?.contains(ev.target),
         });
-        this.ui = useService("ui");
-        this.softphone = useService("voip").softphone;
-        this.isMobile = isMobileOS(); // TODO unused, remove in master
-        useEffect(
+        useLayoutEffect(
             (shouldFocusInput) => {
                 if (
                     shouldFocusInput &&
-                    this.inputRef.el &&
+                    this.inputRef() &&
                     !this.voip.error &&
-                    (document.activeElement === this.inputRef.el || !isCurrentFocusEditable())
+                    (document.activeElement === this.inputRef() || !isCurrentFocusEditable())
                 ) {
                     // By default, the <input> is rendered with "none" as
                     // inputMode, which should ensure that no update from OWL
@@ -71,24 +84,73 @@ export class Keypad extends Component {
                     // using his finger. As soon as the input will change in any
                     // other way than using the mobile keyboard, this will be
                     // switched back to "none".
-                    this.inputRef.el.inputMode = "none";
+                    this.inputRef().inputMode = "none";
 
-                    this.inputRef.el.focus();
+                    // This is important to restore, blur and focus in that
+                    // order here, this is what allows the cursor to be placed
+                    // at the right position AND the input scrolled accordingly,
+                    // especially when the input is full.
+                    // Notice that this does not simulate the exact same thing
+                    // as typing with a real keyboard though:
+                    // - If the cursor is at the end, this is the same.
+                    // - If the cursor is at the start, this is the same.
+                    // - If the cursor is in the middle, and the scroll is not
+                    //   at the start, the cursor stays visually in position as
+                    //   more characters are added, instead of pushing existing
+                    //   characters to the right. This is judged acceptable
+                    //   (also this is only the case on Chrome).
+                    // See KEYPAD_CURSOR.
                     this.selection.restore();
+                    this.inputRef().blur();
+                    this.inputRef().focus();
+
                     this.props.state.input.focus = false;
                 }
             },
-            () => [this.props.state.input.focus]
+            () => [this.props.state.input.focus, this.props.state.showMore]
         );
-        this.onInputDebounced = useDebounced((ev) => {
+        this.onInputSearchBarDebounced = useDebounced((ev) => {
             this.onInputSearchBar(ev);
-            this.updateCountryCode();
         }, 300);
+        const keypad = this;
+        this.addressBookState = {
+            get searchInputValue() {
+                return keypad.props.state.input.value;
+            },
+            set searchInputValue(value) {
+                keypad.props.state.input.value = value;
+            },
+            prioritizedContactIdsBySearchTerms: this.prioritizedContactIdsBySearchTerms,
+        };
+        let isFirstRender = true;
+        useEffect(() => {
+            const prefillContext = this.state.prefillContext;
+            if (isFirstRender) {
+                untrack(() => this.setUpInitCountry());
+            } else if (prefillContext) {
+                untrack(() => this.parsePhoneNumber());
+            }
+            isFirstRender = false;
+        });
+
+        this.longPressHandler = useLongPress(this.onLongPress.bind(this));
+    }
+
+    onCountryDropdownStateChanged(isOpen) {
+        this.props.state.input.focus = !isOpen;
+        if (isOpen) {
+            // Note that `useAutofocus` is not compatible with the softphone
+            // being the active element. It also would not work on mobile
+            // anyway. It is better to follow dropdown state changes and handle
+            // it here in the end, if not adding new generic dropdown options
+            // in the framework.
+            this.countryMenuRef()?.querySelector("input")?.focus();
+        }
     }
 
     get keys() {
         return [
-            { key: "1", letters: "" },
+            { key: "1", longPressAction: this.showVoicemailIcon ? "voicemail" : null },
             { key: "2", letters: "ABC" },
             { key: "3", letters: "DEF" },
             { key: "4", letters: "GHI" },
@@ -97,9 +159,9 @@ export class Keypad extends Component {
             { key: "7", letters: "PQRS" },
             { key: "8", letters: "TUV" },
             { key: "9", letters: "WXYZ" },
-            { key: "*", letters: "", icon: "fa-asterisk" },
-            { key: "0", letters: "+" },
-            { key: "#", letters: "", icon: "fa-hashtag" },
+            { key: "*", letters: "", icon: "emergency" },
+            { key: "0", letters: "+", longPress: "+" },
+            { key: "#", letters: "", icon: "tag" },
         ];
     }
 
@@ -108,132 +170,64 @@ export class Keypad extends Component {
         if (!searchTerms) {
             return { length: 0 };
         }
-        const uniqueMatches = new Set();
-        const nameMatched = [];
-        const phoneNumberMatched = [];
-        const containsLetters = /[A-Z]/i.test(searchTerms);
-        const looksLikeT9 = [...searchTerms].every((letter) => letter in T9_MAPPING);
-        for (const contact of this.voip.softphone.contacts) {
-            if (containsLetters) {
-                const match = highlightMatch(contact.name, searchTerms);
-                if (!match) {
-                    continue;
-                }
-                uniqueMatches.add(contact.id);
-                nameMatched.push({
-                    contact,
-                    id: contact.id + " (by name)",
-                    match,
-                });
-                // Since it contains letters, it's neither a T9 code nor a phone
-                // number: no need to go further.
-                continue;
+        let contacts = getSortedMatchingContacts(
+            this.voip.softphone.contacts,
+            searchTerms,
+            this.compareContacts
+        );
+        if (!this.isTransferKeypad) {
+            const prioritizedContactIds =
+                this.prioritizedContacts.searchTerms === searchTerms
+                    ? this.prioritizedContacts.contactIds
+                    : this.prioritizedContactIdsBySearchTerms.get(searchTerms);
+            if (prioritizedContactIds?.length) {
+                contacts = prioritizeContactsByIds(contacts, prioritizedContactIds);
             }
-            if (looksLikeT9 && contact.t9_name) {
-                const t9NameParts = contact.t9_name.trim().split(" ");
-                for (let i = 0; i < t9NameParts.length; ++i) {
-                    if (!t9NameParts[i].startsWith(searchTerms)) {
-                        continue;
-                    }
-                    const nameParts = contact.name.split(" ");
-                    const match = highlightT9Match(nameParts[i], searchTerms);
-                    if (!match) {
-                        console.warn(
-                            `Unexpected mismatch between name and t9_name: "${contact.name}" and "${contact.t9_name}"`
-                        );
-                        break;
-                    }
-                    uniqueMatches.add(contact.id);
-                    nameMatched.push({
-                        contact,
-                        id: contact.id + " (by name)",
-                        match: htmlJoin(
-                            [...nameParts.slice(0, i), match, ...nameParts.slice(i + 1)],
-                            " "
-                        ),
-                    });
-                    break;
-                }
-            }
-            const phoneMatch = matchPhoneNumber(contact.phone, searchTerms);
-            if (!phoneMatch) {
-                continue;
-            }
-            const { before, match, after } = phoneMatch;
-            uniqueMatches.add(contact.id);
-            phoneNumberMatched.push({
-                contact,
-                id: contact.id + " (by phone)",
-                match: markup`${before}<span class="o-voip-highlighted-letter fw-bolder">${match}</span>${after}`,
-            });
         }
-        const length = uniqueMatches.size;
-        let firstResult = null;
-        if (length > 0) {
-            firstResult = nameMatched[0] ?? phoneNumberMatched[0];
-        }
-        const searchResultsBySearchField = new Map();
-        if (nameMatched.length > 0) {
-            searchResultsBySearchField.set(_t("Name"), nameMatched);
-        }
-        if (phoneNumberMatched.length > 0) {
-            searchResultsBySearchField.set(_t("Phone number"), phoneNumberMatched);
-        }
-        return { length, firstResult, searchResultsBySearchField };
+        return {
+            length: contacts.length,
+            firstResult: contacts[0] ? this.getCalleeSuggestion(contacts[0], searchTerms) : null,
+        };
+    }
+
+    getCalleeSuggestion(contact, searchTerms) {
+        return {
+            contact,
+            name:
+                (isT9Code(searchTerms) &&
+                    highlightT9Name(contact.voipName, contact.t9_name, searchTerms)) ||
+                highlightMatch(contact.voipName, searchTerms) ||
+                highlightMatch(contact.complete_name || "", searchTerms) ||
+                contact.voipName,
+            phone:
+                highlightPhone(contact.phone, searchTerms) ||
+                highlightPhone(contact.phone_formatted || "", searchTerms) ||
+                contact.phone,
+        };
+    }
+
+    get country() {
+        return this.props.state.input.country;
     }
 
     /** @returns {ReturnType<markup>} */
     get firstSuggestion() {
         const suggestion = this.calleeSuggestions.firstResult;
-        const isMatchByName = suggestion.id.endsWith("(by name)");
-        if (isMatchByName) {
-            return markup`${suggestion.match} (${suggestion.contact.phone})`;
-        }
-        return markup`${suggestion.contact.voipName} (${suggestion.match})`;
+        return markup`${suggestion.name} <span class="ms-2">${suggestion.phone}</span>`;
+    }
+
+    get firstSuggestionTooltipText() {
+        return this.calleeSuggestions.firstResult?.contact?.complete_name;
     }
 
     get flagAltLabel() {
-        if (!this.props.state.input.country) {
+        if (!this.country) {
             return "";
         }
-        return _t("%(country)s flag", { country: this.props.state.input.country.name });
-    }
-
-    /** @returns {string} */
-    get inputFontSizeClass() {
-        const length = this.props.state.input.value.length;
-        if (!length) {
-            return "fs-2";
-        }
-        if (length < 12) {
-            return "fs-1";
-        }
-        if (length < 18) {
-            return "fs-2";
-        }
-        return "fs-3";
-    }
-
-    /**
-     * Determines whether the cached country code (if any) still matches the
-     * contents of the keypad input. Useful for hiding the flag and redoing the
-     * request if the content of the input changes.
-     *
-     * @returns {boolean}
-     */
-    get phoneNumberStartsWithCountryCode() {
-        if (!this.props.state.input.country) {
-            return false;
-        }
-        let phoneNumber = this.props.state.input.value.trim();
-        if (phoneNumber.startsWith("00")) {
-            phoneNumber = phoneNumber.slice(2);
-        } else if (phoneNumber.startsWith("+")) {
-            phoneNumber = phoneNumber.slice(1);
-        } else {
-            return false;
-        }
-        return phoneNumber.startsWith(this.props.state.input.country.phone_code);
+        return _t("%(country)s (+%(phone_prefix)s)", {
+            country: this.country.code,
+            phone_prefix: this.country.phone_code,
+        });
     }
 
     get showOthersButtonText() {
@@ -247,184 +241,345 @@ export class Keypad extends Component {
             case 2:
                 return _t("2 others…");
             default:
-                return _t("%s others…", numberOfOthers);
+                return numberOfOthers > MAX_EXACT_OTHER_CONTACTS
+                    ? _t("%s+ others…", numberOfOthers - 1)
+                    : _t("%s others…", numberOfOthers);
         }
     }
 
-    getTitle(entry) {
-        const isMatchByName = entry.id.endsWith("(by name)");
-        return isMatchByName ? entry.match : entry.contact.voipName;
+    get showVoicemailIcon() {
+        return Boolean(this.voip.config.voicemailCode && this.props.onCallVoicemail);
     }
 
-    getSubtitle(entry) {
-        const isMatchByPhone = entry.id.endsWith("(by phone)");
-        return isMatchByPhone ? entry.match : entry.contact.phone;
+    get isTransferKeypad() {
+        return (
+            this.softphone.inCallView.activeView === "transfer" &&
+            this.softphone.inCallView.transferView.activeView === "keypad"
+        );
     }
 
-    onClickActivity(contact) {
-        this.action.doAction({
-            type: "ir.actions.act_window",
-            res_id: false,
-            res_model: "mail.activity",
-            views: [[false, "form"]],
-            view_mode: "form",
-            target: "new",
-            context: {
-                default_activity_type_id: this.voip.callActivityTypeId,
-                default_res_id: contact.id,
-                default_res_model: "res.partner",
-            },
-        });
+    async getLastCall() {
+        const ids = await this.voip.fetchRecentCalls({ limit: 1 });
+        if (!ids) {
+            return null;
+        }
+        return this.voip.store["voip.call"].get(ids[0]);
+    }
+
+    focusInputAtEnd() {
+        this.selection.moveCursor(this.props.state.input.value.length);
+        this.props.state.input.focus = true;
     }
 
     onClickBack() {
         if (this.props.state.showMore) {
             this.props.state.showMore = false;
+            this.focusInputAtEnd();
         } else if (this.props.onClickBack) {
             this.props.onClickBack();
         }
     }
 
-    onClickBackspace() {
-        const { selectionStart, selectionEnd, value } = this.inputRef.el;
-        const cursorPosition =
-            selectionStart === selectionEnd && selectionStart !== 0
-                ? selectionStart - 1
-                : selectionStart;
-        if (selectionEnd !== 0) {
-            this.props.state.input.value =
-                value.slice(0, cursorPosition) + value.slice(selectionEnd);
-            this.updateCountryCode();
+    doBackspace(isLongPress) {
+        const { selectionStart, selectionEnd } = this.inputSelection;
+        const value = this.props.state.input.value;
+        let cursorPosition, newValue;
+        if (isLongPress) {
+            // Wherever the cursor is and how many characters are selected, long
+            // press on the backspace button means "clear the keypad input",
+            // just like in the keypad on smartphones phone apps.
+            cursorPosition = 0;
+            newValue = "";
+        } else {
+            cursorPosition =
+                selectionStart === selectionEnd && selectionStart !== 0
+                    ? selectionStart - 1
+                    : selectionStart;
+            newValue =
+                selectionEnd !== 0
+                    ? value.slice(0, cursorPosition) + value.slice(selectionEnd)
+                    : undefined;
+        }
+        this.voip.invalidatePrefill();
+        if (newValue !== undefined) {
+            this.props.state.input.value = newValue;
+            this.parsePhoneNumber();
         }
         this.selection.moveCursor(cursorPosition);
         this.props.state.input.focus = true;
         this.onInputSearchBar();
     }
 
-    onClickCall(contact) {
-        this.userAgent.makeCall({ partner: contact, phone_number: contact.phone });
+    onClickBackspace() {
+        if (!this.longPressHandler.longPressTriggered) {
+            this.doBackspace(false);
+        }
     }
 
     onClickContact(contact) {
-        this.action.doAction({
-            type: "ir.actions.act_window",
-            res_model: "res.partner",
-            res_id: contact.id,
-            views: [[false, "form"]],
-            target: this.ui.isSmall ? "new" : "current",
-        });
+        this.props.onClickContact(contact);
     }
 
-    onClickFirstResult(contact) {
-        this.props.onClickFirstResult(contact);
+    async onCountrySelected(country) {
+        this.voip.invalidatePrefill();
+        const prefillInputSeq = this.voip._prefillInputSeq;
+        const data = await rpc("/voip/update_country_code", {
+            data: {
+                phone_number: this.props.state.input.value,
+                iso: this.props.state.input.country?.code,
+                itu: this.props.state.input.country?.phone_code,
+            },
+            target_country_data: {
+                iso: country.code,
+                itu: country.phone_code,
+            },
+        });
+        if (prefillInputSeq !== this.voip._prefillInputSeq) {
+            return;
+        }
+        this.props.state.input.country = country;
+        this.props.state.input.value = data.phone_number;
+        this.props.state.input.isValid = data.isValid;
+        this.selection.moveCursor(data.phone_number.length);
+    }
+
+    onPointerDown(ev, key) {
+        if (ev.button !== 0) {
+            return;
+        }
+        // Prevent losing the focus on the input when using the keypad,
+        // otherwise the focus style would flicker on each click. This is also
+        // needed to ensure proper behavior of the cursor when using the keypad
+        // with a full input (see KEYPAD_CURSOR).
+        ev.preventDefault();
+        if (key) {
+            return this.longPressHandler.onPointerDown(ev, key);
+        }
+    }
+
+    onLongPress(key) {
+        if (key === "KEYPAD_BACKSPACE") {
+            this.doBackspace(true);
+        } else if (key.longPressAction === "voicemail") {
+            this.props.onCallVoicemail();
+        } else {
+            this.onClickKey(key.longPress ? key.longPress : key.key);
+        }
+    }
+
+    onKeypadClick(ev, key) {
+        if (!this.longPressHandler.longPressTriggered) {
+            this.onClickKey(key.key);
+        }
     }
 
     /** @param {string} key */
     onClickKey(key) {
         if (this.props.dtmf) {
-            this.userAgent.activeSession?.sipSession?.sessionDescriptionHandler.sendDtmf(key);
+            this.userAgent.frontSession.sendDtmf(key);
             this.props.state.input.value += key;
         } else {
-            const { selectionStart, selectionEnd, value } = this.inputRef.el;
+            const { selectionStart, selectionEnd } = this.inputSelection;
+            const value = this.props.state.input.value;
             this.props.state.input.value =
                 value.slice(0, selectionStart) + key + value.slice(selectionEnd);
+
+            // Forcing the input value immediately here prevents a visual glitch
+            // on Firefox: when the input is full, cursor at the end and that a
+            // keypad button is clicked, the number is added at the right place
+            // and the cursor is effectively moved at the end but visually, it
+            // is not moved immediately over there. TODO find a better way.
+            if (isBrowserFirefox()) {
+                this.inputRef().value = this.props.state.input.value;
+            }
+
             this.selection.moveCursor(selectionStart + 1);
             this.props.state.input.focus = true;
             this.onInputSearchBar();
         }
+        this.voip.invalidatePrefill();
     }
 
     onClickShowMore() {
         this.props.state.showMore = true;
+        this.focusInputAtEnd();
     }
 
-    onInputSearchBar(ev) {
-        const searchTerms = this.props.state.input.value.trim();
-        if (!searchTerms) {
+    /**
+     * Asynchronously initializes the country code when setup.
+     *
+     * Priority: parsed input → last call's country → active company's country.
+     *
+     * @returns {Promise<void>}
+     */
+    async setUpInitCountry() {
+        const prefillInputSeq = this.voip._prefillInputSeq;
+        const hadInput = Boolean(this.props.state.input.value);
+        if (hadInput) {
+            await this.parsePhoneNumber();
+            if (prefillInputSeq !== this.voip._prefillInputSeq || this.props.state.input.country) {
+                return;
+            }
+        }
+        const lastCall = await this.getLastCall();
+        if (
+            (hadInput && prefillInputSeq !== this.voip._prefillInputSeq) ||
+            (!hadInput && this.props.state.prefillContext)
+        ) {
             return;
         }
-        const isT9Code = [...searchTerms].every((letter) => letter in T9_MAPPING);
-        this.updateCountryCode();
-        this.voip.fetchContacts(searchTerms, 0, 30, isT9Code);
+        this.props.state.input.country =
+            lastCall?.country_id ||
+            this.voip.store["res.country"].get(user.activeCompany.country_id) ||
+            null;
+    }
+
+    syncSelectionWithInput() {
+        // On Android, the input is blurred when the native keyboard closes,
+        // so we need to keep the model’s state aligned with the element’s selection.
+        const element = this.inputRef();
+        Object.assign(this.props.state.input.selection, {
+            start: element.selectionStart ?? 0,
+            end: element.selectionEnd ?? 0,
+            direction: element.selectionDirection ?? "none",
+        });
+    }
+
+    onInput(ev) {
+        this.syncSelectionWithInput();
+        this.voip.invalidatePrefill();
+        this.parsePhoneNumber();
+        this.onInputSearchBarDebounced(ev);
+    }
+
+    async onInputSearchBar(ev) {
+        const searchTerms = this.props.state.input.value.trim();
+        if (!searchTerms || this.props.state.showMore) {
+            return;
+        }
+        this.prioritizedContacts.searchTerms = searchTerms;
+        this.prioritizedContacts.contactIds =
+            this.prioritizedContactIdsBySearchTerms.get(searchTerms) || [];
+        const prioritizedContactIds = await this.voip.fetchContacts({
+            searchTerms,
+            limit: KEYPAD_CONTACT_FETCH_LIMIT,
+            prioritizedContactsLimit: this.isTransferKeypad ? 0 : PRIORITIZED_CONTACT_LIMIT,
+        });
+        if (this.props.state.input.value.trim() === searchTerms) {
+            this.prioritizedContactIdsBySearchTerms.set(searchTerms, prioritizedContactIds);
+            this.prioritizedContacts.contactIds = prioritizedContactIds;
+        }
     }
 
     /** @param {KeyboardEvent} ev */
-    onKeydown(ev) {
-        if (ev.key !== "Enter") {
+    onSearchInputKeydown(ev) {
+        if (ev.altKey || ev.ctrlKey || ev.metaKey) {
             return;
         }
-        const inputValue = this.props.state.input.value.trim();
-        if (!inputValue) {
-            return;
-        }
-        if (this.userAgent.activeSession?.sipSession && this.props.onClickTransferPhone) {
-            this.props.onClickTransferPhone();
-        } else {
-            this.userAgent.makeCall({ phone_number: inputValue });
+
+        if (ev.key === "Enter") {
+            const inputValue = this.props.state.input.value.trim();
+            if (!inputValue) {
+                return;
+            }
+            this.props.onSubmit?.();
+        } else if (ev.key === "ArrowDown") {
+            if (!this.firstSuggestionButtonRef()) {
+                return;
+            }
+            // If not at the end of the input, let the ArrowDown key have its
+            // default effect of going to the end of the input.
+            const { value: text, selectionStart, selectionEnd } = ev.currentTarget;
+            if (selectionStart === text.length && selectionEnd === text.length) {
+                // End of input -> Suggestion
+                ev.preventDefault();
+                this.firstSuggestionButtonRef().focus();
+            }
         }
     }
 
-    async updateCountryCode() {
-        const phoneNumber = this.props.state.input.value.trim();
-        // avoid making a request if the country code is already up to date
-        if (this.phoneNumberStartsWithCountryCode) {
+    /** @param {KeyboardEvent} ev */
+    onSuggestionKeydown(ev) {
+        if (ev.altKey || ev.ctrlKey || ev.metaKey) {
             return;
         }
-        if (!phoneNumber.startsWith("00") && !phoneNumber.startsWith("+")) {
+        if (ev.key === "ArrowDown") {
+            if (ev.currentTarget.nextElementSibling) {
+                // Suggestion -> Show more
+                ev.preventDefault();
+                ev.currentTarget.nextElementSibling.focus();
+            }
+        } else if (ev.key === "ArrowUp") {
+            ev.preventDefault();
+            if (ev.currentTarget.previousElementSibling) {
+                // Show more -> Suggestion
+                ev.currentTarget.previousElementSibling.focus();
+            } else {
+                // Suggestion -> Input
+                this.inputRef().focus();
+            }
+        }
+    }
+
+    async parsePhoneNumber() {
+        const prefillInputSeq = this.voip._prefillInputSeq;
+        if (this._parsePhoneNumberRpc) {
+            this._parsePhoneNumberRpc.abort();
+        }
+
+        const phoneNumber = this.props.state.input.value;
+        const invalidPattern = /[^\d+\- ()./]/;
+        if (invalidPattern.test(phoneNumber)) {
             return;
         }
-        const { countryId, storeData } = await rpc("/voip/get_country_store", {
-            phone_number: phoneNumber,
+
+        const currentRpc = rpc("/voip/parse_phone_number", {
+            data: {
+                phone_number: phoneNumber,
+                iso: this.props.state.input.country?.code,
+                itu: this.props.state.input.country?.phone_code,
+            },
         });
-        this.voip.store.insert(storeData);
-        this.props.state.input.country = this.voip.store["res.country"].get(countryId) || null;
-    }
-}
+        this._parsePhoneNumberRpc = currentRpc;
 
-/**
- * @param {string} str
- * @param {string} substr
- * @returns {ReturnType<markup>|string}
- */
-export function highlightMatch(str, substr) {
-    const { start, end, match } = normalizedMatch(str, substr);
-    if (!match) {
-        return "";
-    }
-    return htmlJoin([
-        str.slice(0, start),
-        markup`<span class="o-voip-highlighted-letter fw-bolder">${match}</span>`,
-        str.slice(end),
-    ]);
-}
-
-function highlightT9Match(name, t9) {
-    t9 = [...t9].reverse();
-    const nameAsArr = [...name];
-    let matchEnd = 0;
-    for (matchEnd = 0; matchEnd < nameAsArr.length; ++matchEnd) {
-        if (t9.length < 1) {
-            break;
-        }
-        const normalized = normalize(nameAsArr[matchEnd]).toUpperCase();
-        // extra loop, in case normalizing generates more letters
-        for (const char of normalized) {
-            if (t9.length === 0) {
-                return "";
+        try {
+            var data = await currentRpc;
+        } catch (error) {
+            if (error.event?.type === "abort") {
+                error.event.preventDefault();
+                return;
             }
-            const possibleLetters = T9_MAPPING[t9.pop()];
-            if (!possibleLetters.includes(char)) {
-                return "";
+            if (error.message?.toLowerCase().includes("abort")) {
+                return;
+            }
+            console.error(error);
+            return;
+        } finally {
+            if (this._parsePhoneNumberRpc === currentRpc) {
+                this._parsePhoneNumberRpc = null;
             }
         }
+
+        if (prefillInputSeq !== this.voip._prefillInputSeq) {
+            return;
+        }
+
+        if (this.props.state.input.isValid && !data.isValid) {
+            data.phone_number = cleanPhoneNumber(data.phone_number);
+        }
+        this.props.state.input.value = data.phone_number;
+        if (!this.props.state.input.isValid && data.isValid) {
+            this.selection.moveCursor(data.phone_number.length);
+        }
+        this.props.state.input.isValid = data.isValid;
+        this.voip.store.insert(data.storeData);
+        this.props.state.input.country = this.voip.store["res.country"].get(data.countryId) || null;
     }
-    if (t9.length !== 0) {
-        return "";
+
+    get inputSelection() {
+        return {
+            selectionStart: this.props.state.input.selection.start,
+            selectionEnd: this.props.state.input.selection.end,
+        };
     }
-    return htmlJoin([
-        markup`<span class="o-voip-highlighted-letter fw-bolder">`,
-        ...nameAsArr.slice(0, matchEnd),
-        markup`</span>`,
-        ...nameAsArr.slice(matchEnd),
-    ]);
 }

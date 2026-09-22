@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -7,7 +6,6 @@
     'category': 'Human Resources/Payroll',
     'depends': ['hr_payroll'],
     'auto_install': True,
-    'version': '1.0',
     'description': """
 Morocco Payroll Rules.
 =========================
@@ -16,12 +14,13 @@ Morocco Payroll Rules.
     * Employee Contracts
     """,
     'data': [
+        'data/resource_calendar_data.xml',
         'data/hr_salary_rule_category_data.xml',
         'data/hr_payroll_structure_type_data.xml',
+        'data/hr_work_entry_type_data.xml',
         'data/hr_payroll_structure_data.xml',
         'data/res_partner_data.xml',
         'data/hr_rule_parameters_data.xml',
-        'data/hr_payslip_input_type_data.xml',
         'data/hr_salary_rule_data.xml',
         'views/hr_contract_template_views.xml',
         'views/hr_employee_views.xml',
@@ -33,4 +32,5 @@ Morocco Payroll Rules.
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'post_init_hook': '_l10n_ma_hr_payroll_post_install',
 }

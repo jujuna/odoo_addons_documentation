@@ -2,7 +2,6 @@
 
 {
     "name": "AI Documents Source",
-    "version": "1.0",
     "category": "Hidden",
     "summary": "Add documents to AI agents as sources.",
     "description": "Add documents to AI agents as sources.",
@@ -13,6 +12,9 @@
     "assets": {
         "web.assets_backend": [
             "ai_documents_source/static/src/**/*",
+        ],
+        'web.assets_unit_tests': [
+            'ai_documents_source/static/tests/**/*',
         ],
     },
 }

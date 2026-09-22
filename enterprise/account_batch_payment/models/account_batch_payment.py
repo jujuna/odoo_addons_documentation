@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
-
-from odoo import models, fields, api, _
+from odoo import _, api, fields, models
 from odoo.exceptions import RedirectWarning, ValidationError, UserError
 
 
@@ -54,6 +51,11 @@ class AccountBatchPayment(models.Model):
         compute='_compute_from_payment_ids',
         store=True,
     )
+    amount_unsigned = fields.Monetary(
+        string='Total',
+        compute='_compute_amount_unsigned',
+        currency_field='currency_id'
+    )
     batch_type = fields.Selection(selection=[('inbound', 'Inbound'), ('outbound', 'Outbound')], required=True, default='inbound', tracking=True)
     payment_method_id = fields.Many2one(
         comodel_name='account.payment.method',
@@ -65,28 +67,25 @@ class AccountBatchPayment(models.Model):
         comodel_name='account.payment.method',
         compute='_compute_available_payment_method_ids')
     payment_method_code = fields.Char(related='payment_method_id.code', tracking=True)
-    export_file_create_date = fields.Date(string='Generation Date', default=fields.Date.today, readonly=True, help="Creation date of the related export file.", copy=False)
+    export_file_create_date = fields.Date(string='Generation Date', default=fields.Date.context_today, readonly=True, help="Creation date of the related export file.", copy=False)
     export_file = fields.Binary(string='File', readonly=True, help="Export file related to this batch", copy=False)
+    export_file_attachment_id = fields.Many2one(comodel_name='ir.attachment')
     export_filename = fields.Char(string='File Name', help="Name of the export file generated for this batch", store=True, copy=False)
 
     file_generation_enabled = fields.Boolean(help="Whether or not this batch payment should display the 'Generate File' button instead of 'Print' in form view.", compute='_compute_file_generation_enabled')
-    invalid_sct_partners_ids = fields.Many2many('res.partner', compute='_compute_invalid_sct_partners_ids')
 
     @api.depends('batch_type', 'journal_id', 'payment_method_id')
     def _compute_payment_ids_domain(self):
         for batch in self:
             batch.payment_ids_domain = str([
                 ('batch_payment_id', '=', False),
-                ('state', 'in', self._valid_payment_states()),
+                ('state', 'in', self.env['account.payment']._valid_payment_states()),
                 ('is_sent', '=', False),
                 ('payment_method_id', '=', batch.payment_method_id.id),
                 ('journal_id', '=', batch.journal_id.id),
                 ('payment_type', '=', batch.batch_type),
                 ('amount', '!=', 0),
             ])
-
-    def _valid_payment_states(self):
-        return ['in_process', 'paid'] if self.env['account.move']._get_invoice_in_payment_state() == 'paid' else ['in_process']
 
     @api.depends('batch_type', 'journal_id', 'payment_ids')
     def _compute_payment_method_id(self):
@@ -96,21 +95,8 @@ class AccountBatchPayment(models.Model):
         for batch in self:
             if batch.payment_ids:
                 batch.payment_method_id = batch.payment_ids.payment_method_line_id[0].payment_method_id
-                continue
-
-            if not batch.journal_id:
+            elif not batch.journal_id:
                 batch.available_payment_method_ids = False
-                batch.payment_method_id = False
-                continue
-
-            available_payment_method_lines = batch.journal_id._get_available_payment_method_lines(batch.batch_type)
-
-            batch.available_payment_method_ids = available_payment_method_lines.mapped('payment_method_id')
-
-            # Select the first available one by default.
-            if batch.available_payment_method_ids:
-                batch.payment_method_id = batch.available_payment_method_ids[0]._origin
-            else:
                 batch.payment_method_id = False
 
     @api.depends('batch_type', 'journal_id')
@@ -148,7 +134,7 @@ class AccountBatchPayment(models.Model):
 
     @api.depends('currency_id', 'payment_ids.amount', 'payment_ids.is_matched', 'payment_ids.state')
     def _compute_from_payment_ids(self):
-        valid_payment_states = self._valid_payment_states()
+        valid_payment_states = self.env['account.payment']._valid_payment_states()
         for batch in self:
             amount = 0.0
             amount_residual = 0.0
@@ -213,13 +199,18 @@ class AccountBatchPayment(models.Model):
             batch.amount = amount
             batch.amount_residual_currency = amount_residual_currency
 
+    @api.depends('amount')
+    def _compute_amount_unsigned(self):
+        for batch in self:
+            batch.amount_unsigned = abs(batch.amount)
+
     @api.constrains('batch_type', 'journal_id', 'payment_ids', 'payment_method_id')
     def _check_payments_constrains(self):
         for record in self:
             if record.payment_ids and record.journal_id != record.payment_ids.journal_id:
                 raise ValidationError(_("The journal of the batch payment and of the payments it contains must be the same."))
             all_types = set(record.payment_ids.mapped('payment_type'))
-            if all_types and record.batch_type not in all_types:
+            if all_types and (record.batch_type not in all_types or len(all_types) > 1):
                 raise ValidationError(_("The batch must have the same type as the payments it contains."))
             all_payment_methods = record.payment_ids.payment_method_id
             if len(all_payment_methods) > 1:
@@ -277,6 +268,22 @@ class AccountBatchPayment(models.Model):
                 )
         return super().unlink()
 
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_batch_sent(self):
+        if payments := self.env['account.payment'].search_fetch(domain=[
+            ('is_sent', '=', True),
+            ('batch_payment_id.export_file', '!=', False),
+            ('batch_payment_id', 'in', self.ids),
+        ], field_names=['batch_payment_id']):
+            if len(payments.batch_payment_id) == 1:
+                raise UserError(self.env._("You can't delete a batch payment when an export file is already generated and all payments are marked as sent."))
+            else:
+                raise RedirectWarning(
+                    message=self.env._("Some batches have an export file already generated and all payments marked as sent. You can't delete them."),
+                    action=payments.batch_payment_id._get_records_action(name=self.env._("Sent batches")),
+                    button_text=self.env._("Check batches"),
+                )
+
     @api.model
     def _get_batch_name(self, batch_type, sequence_date, vals):
         if not vals.get('name'):
@@ -288,32 +295,11 @@ class AccountBatchPayment(models.Model):
 
     @api.depends('state')
     def _compute_display_name(self):
-        state_values = dict(self._fields['state'].selection)
+        state_values = dict(self._fields['state']._description_selection(self.env))
         for batch in self:
             batch.display_name = f'{batch.name} ({state_values.get(batch.state)})'
 
-    @api.depends('payment_method_id', 'payment_ids.partner_id.country_id', 'payment_ids.partner_id.city')
-    def _compute_invalid_sct_partners_ids(self):
-        sepa_batches = self.filtered(lambda b: b.payment_method_id.code == 'sepa_ct')
-        for batch in sepa_batches:
-            invalid_partners = self.env['res.partner']
-            for partner in batch.payment_ids.partner_id:
-                # sudo needed for accountant users that are not in hr (employee_ids)
-                addresses = partner.sudo()._get_all_addr()
-                has_valid_address = any(
-                    addr.get('city') and addr.get('country')
-                    for addr in addresses
-                )
-                if not has_valid_address:
-                    invalid_partners |= partner
-
-            batch.invalid_sct_partners_ids = invalid_partners
-        (self - sepa_batches).invalid_sct_partners_ids = self.env['res.partner']
-
-    def action_invalid_partners_from_sct(self):
-        return self.invalid_sct_partners_ids._get_records_action(name=_("Invalid Partners"))
-
-    def validate_batch(self):
+    def validate_batch(self, initiate_payment=False):
         """ Verifies the content of a batch and proceeds to its sending if possible.
         If not, opens a wizard listing the errors and/or warnings encountered.
         """
@@ -396,12 +382,12 @@ class AccountBatchPayment(models.Model):
         #We first try to post all the draft batch payments
         rslt = self._check_and_post_draft_payments(self.payment_ids.filtered(lambda x: x.state == 'draft'))
 
-        valid_payment_states = self._valid_payment_states()
+        valid_payment_states = self.env['account.payment']._valid_payment_states()
         wrong_state_payments = self.payment_ids.filtered(lambda x: x.state not in valid_payment_states)
 
         if wrong_state_payments:
             rslt.append({
-                'title': _("To validate the batch, payments must be in process. But some are already matched with a bank statement."),
+                'title': _("To validate the batch, payments must be paid. But some are already matched with a bank statement."),
                 'records': wrong_state_payments,
                 'help': _("Remove the payments from the batch or change their state.")
             })
@@ -431,11 +417,12 @@ class AccountBatchPayment(models.Model):
         on the following payments. All the encountered errors are then returned
         withing a dictionary, in the same fashion as check_payments_for_errors.
         """
+        self.ensure_one()
         exceptions_mapping = {}
         for payment in draft_payments:
             try:
                 payment.action_post()
-            except UserError as e:
+            except (UserError, RedirectWarning) as e:
                 name = e.args[0]
                 if name in exceptions_mapping:
                     exceptions_mapping[name] += payment
@@ -444,19 +431,28 @@ class AccountBatchPayment(models.Model):
 
         return [{'title': error, 'records': pmts} for error, pmts in exceptions_mapping.items()]
 
+    def _get_amls_for_reconciliation(self, st_line):
+        amls_to_create, has_exchange_diff = self.payment_ids._get_amls_for_reconciliation(st_line)
+        return amls_to_create, has_exchange_diff
+
     def export_batch_payment(self):
         #export and save the file for each batch payment
         self.check_access('write')
+        today = fields.Date.context_today(self)
         for record in self.sudo():
             record = record.with_company(record.journal_id.company_id)
             export_file_data = record._generate_export_file()
             record.export_file = export_file_data['file']
             record.export_filename = export_file_data['filename']
-            record.export_file_create_date = fields.Date.today()
+            record.export_file_attachment_id = self.env['ir.attachment'].create({
+                'name': record.export_filename,
+                'raw': record.export_file.content,
+                'res_model': record._name,
+                'res_id': record.id,
+            })
+            record.export_file_create_date = today
             record.message_post(
-                attachments=[
-                    (record.export_filename, base64.decodebytes(record.export_file)),
-                ]
+                attachment_ids=record.export_file_attachment_id.ids,
             )
 
     def print_batch_payment(self):
@@ -466,7 +462,7 @@ class AccountBatchPayment(models.Model):
         """ To be overridden by modules adding support for different export format.
             This function returns False if no export file could be generated
             for this batch. Otherwise, it returns a dictionary containing the following keys:
-            - file: the content of the generated export file, in base 64.
+            - file: the content of the generated export file
             - filename: the name of the generated file
             - warning: (optional) the warning message to display
 

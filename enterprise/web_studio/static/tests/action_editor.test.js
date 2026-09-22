@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@odoo/hoot";
 import { edit, press } from "@odoo/hoot-dom";
-import { animationFrame, Deferred } from "@odoo/hoot-mock";
+import { animationFrame } from "@odoo/hoot-mock";
 import { contains, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 import { defineStudioEnvironment } from "./studio_tests_context";
@@ -24,7 +24,7 @@ test("add a gantt view", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     await contains(".o_menu_sections button:contains(Views)").click();
     await contains(".o_web_studio_thumbnail_item.o_web_studio_thumbnail_gantt").click();
@@ -39,7 +39,7 @@ test("create unavailable view", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     await contains(".o_menu_sections button:contains(Views)").click();
     await contains(".o_web_studio_thumbnail_item.o_web_studio_thumbnail_activity").click();
@@ -78,7 +78,7 @@ test("disable the view from studio", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     await contains(".o_menu_sections button:contains(Views)").click();
     await contains(".o_web_studio_thumbnail_list .o_web_studio_more").click();
@@ -103,7 +103,7 @@ test("add groups on action", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     await contains(".o_menu_sections button:contains(Views)").click();
 
@@ -112,14 +112,14 @@ test("add groups on action", async () => {
 });
 
 test("concurrency: keep user's input when editing action", async () => {
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     let actionName = "Partner View";
     onRpc("/web_studio/edit_action", async (request) => {
         const { params } = await request.json();
         expect(params.args).toEqual({ name: "testInput" });
         expect.step("edit_action");
         actionName = params.args.name;
-        await def;
+        await def.promise;
     });
     onRpc("/web/action/load", async () => {
         expect.step("load_action");
@@ -144,7 +144,7 @@ test("concurrency: keep user's input when editing action", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     await contains(".o_menu_sections button:contains(Views)").click();
     expect.verifySteps(["load_action"]);
@@ -156,7 +156,7 @@ test("concurrency: keep user's input when editing action", async () => {
     await edit("<p>test help</p>");
 
     def.resolve();
-    await def;
+    await def.promise;
     await animationFrame();
 
     expect.verifySteps(["edit_action", "load_action"]);
@@ -182,7 +182,7 @@ test("active_id and active_ids present in context at reload", async () => {
         `load_action: {"action_id":1,"context":{"lang":"en","tz":"taht","uid":7,"allowed_company_ids":[1]}}`,
     ]);
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_menu_sections button:contains(Views)").click();
 
     await contains(".o_web_studio_sidebar_content input#name").click();

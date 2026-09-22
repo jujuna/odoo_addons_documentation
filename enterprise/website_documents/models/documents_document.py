@@ -11,7 +11,7 @@ class DocumentsDocument(models.Model):
         'website', ondelete='set null', compute='_compute_website_id', readonly=False, store=True,
         domain="['|', ('company_id', '=', company_id), ('company_id', 'in', context.get('allowed_company_ids'))]")
 
-    @api.depends('website_id')
+    @api.depends('website_id.domain', 'company_id')
     def _compute_access_url(self):
         return super()._compute_access_url()
 
@@ -20,6 +20,10 @@ class DocumentsDocument(models.Model):
     def _compute_website_id(self):
         for document in self.filtered(lambda d: not d.website_id or d.website_id.company_id != d.company_id):
             document.website_id = document.company_id.website_id or self.env.company.website_id
+
+    def _update_company(self, company_id):
+        updated_documents_ids = super()._update_company(company_id)
+        self.browse(updated_documents_ids)._compute_website_id()
 
     def _check_website_id(self):
         invalid_docs = []

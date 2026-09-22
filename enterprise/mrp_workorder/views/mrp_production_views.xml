@@ -26,12 +26,18 @@
     </record>
 
 
-    <record id="mrp_production_kanban_view_inherit" model="ir.ui.view">
+    <record id="mrp_production_card_view_inherit" model="ir.ui.view">
         <field name="name">mrp.production.kanban</field>
         <field name="model">mrp.production</field>
-        <field name="inherit_id" ref="mrp.mrp_production_kanban_view"/>
+        <field name="inherit_id" ref="mrp.mrp_production_card_view"/>
         <field name="mode">primary</field>
         <field name="arch" type="xml">
+            <field name="product_default_code" position="attributes">
+                <attribute name="class" add="me-1" separator=" "/>
+            </field>
+            <field name="state" position="attributes">
+                <attribute name="class" add="lh-1 mb-1" separator=" "/>
+            </field>
             <xpath expr="//footer" position="after">
                 <field name="date_deadline" invisible="1"/>
                 <field name="is_delayed" invisible="1"/>
@@ -47,7 +53,7 @@
             <field name="model">mrp.production</field>
             <field name="arch" type="xml">
                 <gantt
-                kanban_view_id="%(mrp_workorder.mrp_production_kanban_view_inherit)d"
+                js_class="mrp_production_gantt"
                 date_start="date_start"
                 date_stop="date_finished"
                 default_group_by="product_id"
@@ -56,12 +62,26 @@
                 string="Manufacturing Orders"
                 color="state_color"
                 decoration-warning="is_delayed">
+                    <field name="product_qty"/>
+                    <field name="uom_id"/>
+                    <field name="is_delayed"/>
+                    <popover card_id="%(mrp_workorder.mrp_production_card_view_inherit)d"/>
                 </gantt>
             </field>
         </record>
 
     <record id="mrp.mrp_production_action" model="ir.actions.act_window">
     <field name="view_mode">list,kanban,form,gantt,calendar,pivot,graph,activity</field>
+    </record>
+
+    <record id="mrp_production_products_gantt" model="ir.actions.act_window">
+        <field name="name">Manufacturing Orders</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_id" ref="mrp.mrp_production_tree_view"/>
+        <field name="search_view_id" ref="mrp.view_mrp_production_filter"/>
+        <field name="domain">[('picking_type_id.active', '=', True)]</field>
+        <field name="context">{'search_default_todo': True, 'default_company_id': allowed_company_ids[0]}</field>
+        <field name="target">new</field>
     </record>
 
     <!-- Manufacturing Order for Planning view -->
@@ -75,7 +95,7 @@
                 <field name="date_start"/>
                 <field name="product_id" readonly="state != 'draft'"/>
                 <field name="product_qty" sum="Total Qty" string="Quantity"/>
-                <field name="product_uom_id" widget="many2one_uom" options="{'no_open':True,'no_create':True}" groups="uom.group_uom"/>
+                <field name="uom_id" widget="many2one_uom" options="{'no_open':True,'no_create':True}" groups="uom.group_uom"/>
                 <field name="reservation_state" string="Availability"/>
                 <field name="origin" readonly="state in ['cancel', 'done']"/>
                 <field name="state"/>
@@ -117,6 +137,7 @@
     <record id="production_order_unplan_server_action" model="ir.actions.server">
         <field name="name">Unplan orders</field>
         <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="group_ids" eval="[Command.link(ref('mrp.group_mrp_routings'))]"/>
         <field name="binding_model_id" ref="mrp.model_mrp_production" />
         <field name="binding_view_types">list,kanban</field>
         <field name="state">code</field>
@@ -129,11 +150,8 @@
         <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_open_shop_floor" type="object" icon="oi-view-kanban" string="Shop Floor"
+                <button name="action_open_shop_floor" type="object" icon="oi_view-kanban" string="Shop Floor"
                         groups="mrp_workorder.group_mrp_wo_shop_floor" invisible="state in ('draft', 'done', 'cancel')"/>
-            </xpath>
-            <xpath expr="//page[@name='miscellaneous']//field[@name='company_id']" position="after">
-                <field name="log_note" string="Notes" help="Additional instructions that can be created and visualised from both here and the shop floor interface."/>
             </xpath>
         </field>
     </record>
@@ -143,25 +161,35 @@
         <field name="model">mrp.production</field>
         <field name="priority">10000</field>
         <field name="arch" type="xml">
-            <form string="Log Note">
-                <field name="log_note"/>
+            <form string="Notes">
+                <field name="note" readonly="False"/>
             </form>
         </field>
     </record>
 
     <menuitem id="mrp_workorder_menu_planning"
         name="Work Orders"
-        sequence="2"
+        sequence="1"
         parent="mrp.mrp_planning_menu_root"
         groups="mrp.group_mrp_routings"/>
     <menuitem id="menu_mrp_workorder_production"
-        name="Planning by Production"
-        sequence="1"
+        name="Kanban"
+        sequence="2"
         action="action_mrp_workorder_dependencies_production"
         parent="mrp_workorder_menu_planning"/>
     <menuitem id="menu_mrp_workorder_workcenter"
-        name="Planning by Workcenter"
-        sequence="2"
+        name="Planning"
+        sequence="1"
         action="action_mrp_workorder_dependencies_workcenter"
         parent="mrp_workorder_menu_planning"/>
+    <menuitem id="mrp_workorder_menu_employee"
+        name="Employees"
+        sequence="2"
+        parent="mrp.mrp_planning_menu_root"
+        groups="mrp.group_mrp_routings"/>
+    <menuitem id="menu_mrp_workorder_employee"
+        name="Planning"
+        sequence="1"
+        action="action_mrp_workorder_dependencies_employee"
+        parent="mrp_workorder_menu_employee"/>
 </odoo>

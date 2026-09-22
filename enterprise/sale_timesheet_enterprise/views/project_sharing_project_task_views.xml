@@ -19,7 +19,7 @@
                 <attribute name="name">portal_progress</attribute>
                 <attribute name="string">Progress</attribute>
             </xpath>
-            <xpath expr="//div[hasclass('text-nowrap')]//field[@name='progress']" position="attributes">
+            <xpath expr="//div[@id='allocated_hours_container']//field[@name='progress']" position="attributes">
                 <attribute name="name">portal_progress</attribute>
                 <attribute name="string">Progress</attribute>
                 <attribute name="decoration-danger">portal_progress &gt; 1.005</attribute>
@@ -37,7 +37,7 @@
                 <attribute name="name">portal_subtask_effective_hours</attribute>
                 <attribute name="invisible">portal_subtask_effective_hours == 0.0</attribute>
             </xpath>
-            <xpath expr="//span[@id='total_hours_spent_label']" position="attributes">
+            <xpath expr="//div[@id='total_hours_spent_label']" position="attributes">
                 <attribute name="invisible">portal_subtask_effective_hours == 0.0</attribute>
             </xpath>
             <xpath expr="//label[@for='total_hours_spent']" position="attributes">
@@ -68,19 +68,20 @@
             </xpath>
             <xpath expr="//page[@id='timesheets_tab']//field[@name='remaining_hours']" position="attributes">
                 <attribute name="name">portal_remaining_hours</attribute>
+                <attribute name="decoration-danger">portal_remaining_hours &lt; 0</attribute>
             </xpath>
         </field>
     </record>
 
-    <record id="project_sharing_kanban_inherit_project_task_view_kanban" model="ir.ui.view">
+    <record id="project_sharing_inherit_project_task_view_card" model="ir.ui.view">
         <field name="name">sale_timesheet_enterprise.project.sharing.project.task.kanban.inherited</field>
         <field name="model">project.task</field>
-        <field name="inherit_id" ref="hr_timesheet.project_sharing_kanban_inherit_project_task_view_kanban"/>
+        <field name="inherit_id" ref="hr_timesheet.project_sharing_inherit_project_task_view_card"/>
         <field name="arch" type="xml">
-            <xpath expr="/kanban/field[@name='progress']" position="attributes">
+            <xpath expr="/card/field[@name='progress']" position="attributes">
                 <attribute name="name">portal_progress</attribute>
             </xpath>
-            <xpath expr="/kanban/field[@name='remaining_hours']" position="attributes">
+            <xpath expr="/card/field[@name='remaining_hours']" position="attributes">
                 <attribute name="name">portal_remaining_hours</attribute>
             </xpath>
             <xpath expr="//t[@t-set='badge' and @t-if='record.progress.raw_value &gt;= 0.8 and record.progress.raw_value &lt;= 1']" position="attributes">

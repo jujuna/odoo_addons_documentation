@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
-import base64
-
 from odoo import _, fields, models, api
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import BinaryBytes
 from .ONSS_country_mapping import ONSS_COUNTRY_CODE_MAPPING
 
 
@@ -221,7 +218,7 @@ class L10n_BeForm28150(models.Model):
     @api.depends('partner_id')
     def _compute_partner_address(self):
         for form in self:
-            form.partner_address = form.partner_id._formated_address() if form.partner_id else ''
+            form.partner_address = form.partner_id._get_formatted_address() if form.partner_id else ''
 
     @api.depends('partner_id')
     def _compute_partner_zip(self):
@@ -338,7 +335,7 @@ class L10n_BeForm28150(models.Model):
 
     def action_download_281_50_individual_pdf(self):
         self.ensure_one()
-        self.partner_id.form_file = base64.b64encode(self._generate_281_50_form_pdf())
+        self.partner_id.form_file = BinaryBytes(self._generate_281_50_form_pdf())
         return {
             'type': 'ir.actions.act_url',
             'name': _("Download 281.50 Form PDF"),

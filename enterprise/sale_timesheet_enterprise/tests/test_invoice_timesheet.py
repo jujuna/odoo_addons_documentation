@@ -10,10 +10,12 @@ from odoo.tests import tagged
 @tagged('-at_install', 'post_install')
 class TestInvoiceTimesheet(TestCommonSaleTimesheet):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_timesheet_transfer_sol(self):
         """ Test transfer of timesheet between sale order line + Test cancel invoice
         """
-        self.env['ir.config_parameter'].sudo().set_param('sale.invoiced_timesheet', 'approved')
+        self.env['ir.config_parameter'].sudo().set_str('sale.invoiced_timesheet', 'approved')
 
         # create SO
         sale_order = self.env['sale.order'].create({
@@ -71,14 +73,14 @@ class TestInvoiceTimesheet(TestCommonSaleTimesheet):
         invoice_1.button_cancel()
 
         self.assertEqual(so_line_product_1.qty_invoiced, 0, "No hours must be invoiced")
-        self.assertEqual(timesheet_1.timesheet_invoice_id, invoice_1, "Timesheet 1 is linked to invoice 1")
-        self.assertFalse(timesheet_2.timesheet_invoice_id, "Timesheet 2 is not linked to invoice")
+        self.assertEqual(timesheet_1.reinvoice_move_id, invoice_1, "Timesheet 1 is linked to invoice 1")
+        self.assertFalse(timesheet_2.reinvoice_move_id, "Timesheet 2 is not linked to invoice")
 
         # Create a second invoice for the first timesheet
         invoice_2 = sale_order._create_invoices()
 
-        self.assertEqual(timesheet_1.timesheet_invoice_id, invoice_2, "Timesheet 1 is linked to invoice 2")
-        self.assertFalse(timesheet_2.timesheet_invoice_id, "Timesheet 2 is not linked to invoice")
+        self.assertEqual(timesheet_1.reinvoice_move_id, invoice_2, "Timesheet 1 is linked to invoice 2")
+        self.assertFalse(timesheet_2.reinvoice_move_id, "Timesheet 2 is not linked to invoice")
         self.assertEqual(so_line_product_1.qty_invoiced, 2, "2 hours must be invoiced")
         self.assertEqual(so_line_product_1.qty_delivered, 2, "Timesheet 1 is validated, so 2 hours must be delivered")
 
@@ -112,5 +114,5 @@ class TestInvoiceTimesheet(TestCommonSaleTimesheet):
         self.assertEqual(so_line_product_2.qty_invoiced, 3, "Timesheet 2 is linked to this so_line (3 hours invoiced)")
         self.assertEqual(so_line_product_2.qty_delivered, 3, "Timesheet 2 is linked to this so_line (3 hours delivered)")
 
-        self.assertEqual(timesheet_1.timesheet_invoice_id, invoice_2, "Timesheet 1 is always linked to invoice 2")
-        self.assertEqual(timesheet_2.timesheet_invoice_id, invoice_3, "Timesheet 2 is linked to invoice 3")
+        self.assertEqual(timesheet_1.reinvoice_move_id, invoice_2, "Timesheet 1 is always linked to invoice 2")
+        self.assertEqual(timesheet_2.reinvoice_move_id, invoice_3, "Timesheet 2 is linked to invoice 3")

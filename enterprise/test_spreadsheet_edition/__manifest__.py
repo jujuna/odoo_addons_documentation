@@ -2,7 +2,6 @@
 
 {
     'name': 'Spreadsheet Test',
-    'version': '1.0',
     'category': 'Hidden',
     'summary': 'Spreadsheet Test, mainly to test the mixin behavior',
     'description': """This module contains tests related to spreadsheet edition.
@@ -11,7 +10,7 @@
     each module implementing the mixin but rather test a dummy implementation of the later,
     hence the need for this test module.
     """,
-    'depends': ['spreadsheet_edition', 'test_spreadsheet'],
+    'depends': ['spreadsheet_edition', 'test_spreadsheet', 'spreadsheet_edition_account'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'assets': {
@@ -21,6 +20,9 @@
         ],
         'web.assets_unit_tests': [
             'test_spreadsheet_edition/static/tests/**/*',
+        ],
+        'web.assets_tests': [
+            'test_spreadsheet_edition/static/tests/tours/*',
         ],
     }
 }

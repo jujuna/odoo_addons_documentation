@@ -1,8 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import date
+from freezegun import freeze_time
 
-from odoo.fields import Command
 from odoo.tests import common, tagged
 
 
@@ -20,11 +20,12 @@ class TestHrEmployee(common.TransactionCase):
             'wage': 15_000.0,
         })
 
-        departure_notice_1 = self.env['hr.departure.wizard'].create({
-            'employee_ids':  [Command.link(employee_1.id)],
-            'departure_date': date(2025, 2, 14),
-            'departure_description': 'foo',
-        })
-        departure_notice_1.with_context(toggle_active=True).action_register_departure()
+        with freeze_time('2025-2-15'):
+            departure_notice_1 = self.env['hr.employee.departure'].create({
+                'employee_id':  employee_1.id,
+                'dismissal_date': date(2025, 2, 14),
+                'departure_description': 'foo',
+            })
+            departure_notice_1.action_register()
 
         self.assertAlmostEqual(employee_1._l10n_ae_get_worked_years(), 2, 2, "This employee has worked for 2 years")

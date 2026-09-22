@@ -2,13 +2,13 @@
 
 from odoo import fields, models
 from odoo.fields import Domain
-from odoo.tools import OrderedSet
+from odoo.tools import SQL
 
 
 class ProjectTask(models.Model):
     _inherit = 'project.task'
 
-    leave_types_count = fields.Integer(compute='_compute_leave_types_count', string="Time Off Types Count")
+    leave_types_count = fields.Integer(compute='_compute_leave_types_count', string="Time Types Count")
     is_timeoff_task = fields.Boolean("Is Time off Task", compute="_compute_is_timeoff_task", search="_search_is_timeoff_task", export_string_translation=False, groups="hr_timesheet.group_hr_timesheet_user")
 
     def _compute_leave_types_count(self):
@@ -33,7 +33,7 @@ class ProjectTask(models.Model):
         timeoff_tasks_ids = {row[0] for row in self.env.execute_query(
             self.env['account.analytic.line']._search(
                 [('task_id', '!=', False), '|', ('holiday_id', '!=', False), ('global_leave_id', '!=', False)],
-            ).select('DISTINCT task_id')
+            ).select(SQL('DISTINCT task_id'))
         )}
 
         if self.env.company.leave_timesheet_task_id:

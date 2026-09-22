@@ -27,15 +27,6 @@ class AccountEdiXmlUbl_A_Nz(models.AbstractModel):
         if process_type == 'billing':
             return 'urn:cen.eu:en16931:2017#conformant#urn:fdc:peppol.eu:2017:poacc:billing:international:aunz:3.0'
 
-    def _ubl_default_tax_category_grouping_key(self, base_line, tax_data, vals, currency):
-        # EXTENDS account.edi.xml.ubl_bis3
-        grouping_key = super()._ubl_default_tax_category_grouping_key(base_line, tax_data, vals, currency)
-        if not grouping_key:
-            return
-
-        grouping_key['scheme_id'] = 'GST'
-        return grouping_key
-
     def _ubl_get_line_allowance_charge_discount_node(self, vals, discount_values):
         # EXTENDS account.edi.xml.ubl_bis3
         discount_node = super()._ubl_get_line_allowance_charge_discount_node(vals, discount_values)
@@ -44,40 +35,25 @@ class AccountEdiXmlUbl_A_Nz(models.AbstractModel):
         discount_node['cbc:BaseAmount'] = None
         return discount_node
 
-    def _ubl_add_values_tax_currency_code(self, vals):
-        # OVERRIDE account.edi.xml.ubl_bis3
-        self._ubl_add_values_tax_currency_code_empty(vals)
-
-    def _add_invoice_tax_total_nodes(self, document_node, vals):
+    def _ubl_add_tax_currency_code_node(self, vals):
         # OVERRIDE
-        document_node['cac:TaxTotal'] = [
-            self._ubl_get_tax_total_node(vals, tax_total)
-            for tax_total in vals['_ubl_values']['tax_totals_currency'].values()
-        ]
+        self._ubl_add_tax_currency_code_node_empty(vals)
 
-    def _get_party_node(self, vals):
+    def _ubl_tax_totals_node_grouping_key(self, base_line, tax_data, vals, currency):
         # EXTENDS account.edi.xml.ubl_bis3
-        party_node = super()._get_party_node(vals)
-        partner = vals['partner']
-        commercial_partner = partner.commercial_partner_id
+        tax_total_keys = super()._ubl_tax_totals_node_grouping_key(base_line, tax_data, vals, currency)
 
-        if commercial_partner.country_code == 'AU' and commercial_partner.vat:
-            vat = commercial_partner.vat.replace(" ", "")
-            party_node['cbc:EndpointID']['_text'] = vat
-            party_node['cac:PartyTaxScheme'][0]['cbc:CompanyID']['_text'] = vat
-            party_node['cac:PartyLegalEntity']['cbc:CompanyID'] = {
-                '_text': vat,
-                'schemeID': '0151',
-            }
+        company_currency = vals['company'].currency_id
+        if (
+            tax_total_keys['tax_total_key']
+            and company_currency != vals['currency']
+            and tax_total_keys['tax_total_key']['currency'] == company_currency
+        ):
+            tax_total_keys['tax_total_key'] = None
 
-        elif commercial_partner.country_code == 'NZ':
-            party_node['cbc:EndpointID']['_text'] = commercial_partner.company_registry
-            party_node['cac:PartyTaxScheme'][0]['cbc:CompanyID']['_text'] = commercial_partner.company_registry
-            party_node['cac:PartyLegalEntity']['cbc:CompanyID'] = {
-                '_text': commercial_partner.company_registry,
-                'schemeID': '0088',
-            }
+        return tax_total_keys
 
-        party_node['cac:PartyTaxScheme'][0]['cac:TaxScheme']['cbc:ID']['_text'] = 'GST'
-
-        return party_node
+    def _ubl_add_customization_id_node(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_customization_id_node(vals)
+        vals['document_node']['cbc:CustomizationID']['_text'] = 'urn:cen.eu:en16931:2017#conformant#urn:fdc:peppol.eu:2017:poacc:billing:international:aunz:3.0'

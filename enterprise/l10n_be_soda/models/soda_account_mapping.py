@@ -1,15 +1,16 @@
 from odoo import api, fields, models
+from odoo.fields import Domain
 
 
 class SodaAccountMapping(models.Model):
     _name = 'soda.account.mapping'
-    _description = 'SODA Account Mapping'
+    _description = 'Account Mapping'
     _order = 'code, company_id'
     _check_company_auto = True
 
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company)
-    code = fields.Char('SODA Account', required=True)
-    name = fields.Char('SODA Label', required=True)
+    code = fields.Char('Account', required=True)
+    name = fields.Char('Label', required=True)
     account_id = fields.Many2one(
         'account.account',
         string='Mapped Account',
@@ -38,7 +39,7 @@ class SodaAccountMapping(models.Model):
             mapping.display_name = f"{mapping.code} {mapping.name}"
 
     @api.model
-    def find_or_create_mapping_entries(self, soda_code_to_name_mapping, company_id):
+    def find_or_create_account_mappings(self, soda_code_to_name_mapping, company_id):
         """Find account mappings for the provided SODA codes and/or create new ones when mappings for some SODA codes
         do not exist yet.
 
@@ -49,9 +50,9 @@ class SodaAccountMapping(models.Model):
         soda_code_to_name_mapping = soda_code_to_name_mapping or {}
         soda_account_codes = list(soda_code_to_name_mapping.keys())
         # Find existing account mappings for the provided SODA codes
-        domain = [*self._check_company_domain(company_id)]
+        domain = self._check_company_domain(company_id)
         if soda_account_codes:
-            domain.append(('code', 'in', soda_account_codes))
+            domain &= Domain('code', 'in', soda_account_codes)
         soda_account_mappings = self.search(domain)
         soda_account_mapping_codes = set(soda_account_mappings.mapped('code'))
         new_soda_account_mappings = []

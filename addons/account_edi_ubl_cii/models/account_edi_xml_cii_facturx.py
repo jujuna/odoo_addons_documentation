@@ -1,5 +1,8 @@
 from odoo import _, models, Command
+from odoo.addons.account.tools import dict_to_xml
+from odoo.addons.account_edi_ubl_cii.tools import CrossIndustryInvoice
 from odoo.tools import float_repr, is_html_empty, html2plaintext, cleanup_xml_node
+from odoo.tools.misc import str2bool
 from lxml import etree
 
 from datetime import datetime
@@ -24,14 +27,16 @@ PAYMENT_MEAN_CODES = {
 
 class AccountEdiXmlCii(models.AbstractModel):
     _name = 'account.edi.xml.cii'
-    _inherit = ['account.edi.common']
-    _description = "Factur-x/XRechnung CII 2.2.0"
+    _inherit = ['account.edi.cii']
+    _description = "Factur-x/ZUGFeRD CII 2.2.0"
 
     def _find_value(self, xpath, tree, nsmap=False):
         # EXTENDS account.edi.common
         return super()._find_value(xpath, tree, CII_NAMESPACES)
 
     def _export_invoice_filename(self, invoice):
+        if invoice.commercial_partner_id.country_code == 'DE':
+            return f"{invoice.name.replace('/', '_')}_zugferd.xml"
         return f"{invoice.name.replace('/', '_')}_factur_x.xml"
 
     def _export_invoice_ecosio_schematrons(self):
@@ -50,7 +55,7 @@ class AccountEdiXmlCii(models.AbstractModel):
                     vals['record'], 'partner_bank_id'
                 ),
                 'seller_payment_instructions_2': self._check_required_fields(
-                    vals['record']['partner_bank_id'], 'sanitized_acc_number',
+                    vals['record']['partner_bank_id'], 'sanitized_account_number',
                     _("The field 'Sanitized Account Number' is required on the Recipient Bank.")
                 ),
             })
@@ -119,6 +124,7 @@ class AccountEdiXmlCii(models.AbstractModel):
             'type_code': '380' if invoice.move_type == 'out_invoice' else '381',
             'issue_date_time': invoice.invoice_date,
             'included_note': html2plaintext(invoice.narration) if invoice.narration else "",
+            'included_note_list': [],
         }
 
     def _export_invoice_vals(self, invoice):
@@ -175,8 +181,10 @@ class AccountEdiXmlCii(models.AbstractModel):
             'scheduled_delivery_time': self._get_scheduled_delivery_time(invoice),
             'intracom_delivery': False,
             'ExchangedDocument_vals': self._get_exchanged_document_vals(invoice),
-            'seller_specified_legal_organization': invoice.company_id.company_registry,
-            'buyer_specified_legal_organization': invoice.commercial_partner_id.company_registry,
+            # FIXME cii_22_templates hard-codes SpecifiedLegalOrganization/ID with schemeID="0002"
+            # (FR SIRENE), so only emit it when the party is French and has a SIREN/SIRET.
+            'seller_specified_legal_organization': invoice.company_id.partner_id._get_all_identifiers(enrich=True).get('FR_SIREN'),  # will retrieve SIREN from SIRET if available
+            'buyer_specified_legal_organization': invoice.commercial_partner_id._get_all_identifiers(enrich=True).get('FR_SIREN'),  # will retrieve SIREN from SIRET if available
             'ship_to_trade_party': invoice.partner_shipping_id if 'partner_shipping_id' in invoice._fields and invoice.partner_shipping_id
                 else invoice.commercial_partner_id,
             # Chorus Pro fields
@@ -191,7 +199,7 @@ class AccountEdiXmlCii(models.AbstractModel):
         # data used for IncludedSupplyChainTradeLineItem / SpecifiedLineTradeSettlement
         for line_vals in template_values['invoice_line_vals_list']:
             line = line_vals['line']
-            line_vals['unece_uom_code'] = self._get_uom_unece_code(line.product_uom_id)
+            line_vals['unece_uom_code'] = line.product_uom_id._get_unece_code()
 
             if line._fields.get('deferred_start_date') and (line.deferred_start_date or line.deferred_end_date):
                 line_vals['billing_start'] = line.deferred_start_date
@@ -245,7 +253,10 @@ class AccountEdiXmlCii(models.AbstractModel):
         template_values['tax_basis_total_amount'] = tax_details['base_amount_currency']
         template_values['tax_total_amount'] = tax_details['tax_amount_currency']
 
-        if self.env['account.payment']._fields.get('sdd_mandate_id') and invoice.reconciled_payment_ids.sdd_mandate_id:
+        if (
+            self.module_installed('account_sepa_direct_debit')
+            and invoice.reconciled_payment_ids.mandate_id.filtered(lambda m: m.mandate_type == 'sepa')
+        ):
             template_values['payment_means_code'] = PAYMENT_MEAN_CODES['SEPA direct debit']
         else:
             template_values['payment_means_code'] = PAYMENT_MEAN_CODES['Payment to bank account']
@@ -253,6 +264,12 @@ class AccountEdiXmlCii(models.AbstractModel):
         return template_values
 
     def _export_invoice(self, invoice):
+        if str2bool(
+            self.env['ir.config_parameter'].sudo().get_bool('account_edi_ubl_cii.use_new_dict_to_xml_helpers', True),
+            default=True,
+        ):
+            return self._export_invoice_new(invoice)
+
         vals = self._export_invoice_vals(invoice.with_context(lang=invoice.partner_id.lang))
         errors = [constraint for constraint in self._export_invoice_constraints(invoice, vals).values() if constraint]
         xml_content = self.env['ir.qweb']._render('account_edi_ubl_cii.account_invoice_facturx_export_22', vals)
@@ -297,6 +314,8 @@ class AccountEdiXmlCii(models.AbstractModel):
             bank_detail_node.findtext('{*}PayeePartyCreditorFinancialAccount/{*}IBANID')
             or bank_detail_node.findtext('{*}PayeePartyCreditorFinancialAccount/{*}ProprietaryID')
             for bank_detail_node in bank_detail_nodes
+            if bank_detail_node.findtext('{*}PayeePartyCreditorFinancialAccount/{*}IBANID')
+            or bank_detail_node.findtext('{*}PayeePartyCreditorFinancialAccount/{*}ProprietaryID')
         ]
         if bank_details:
             self._import_partner_bank(invoice, bank_details=bank_details)
@@ -377,6 +396,7 @@ class AccountEdiXmlCii(models.AbstractModel):
             'allowance_charge_reason_code': './{*}ReasonCode',
             'line_total_amount': './{*}SpecifiedLineTradeSettlement/{*}SpecifiedTradeSettlementLineMonetarySummation/{*}LineTotalAmount',
             'name': [
+                './ram:SpecifiedTradeProduct/ram:Description',
                 './ram:SpecifiedTradeProduct/ram:Name',
             ],
             'product': {
@@ -399,11 +419,81 @@ class AccountEdiXmlCii(models.AbstractModel):
         move_type_code = tree.find('.//{*}ExchangedDocument/{*}TypeCode')
         if move_type_code is None:
             return None, None
-        if move_type_code.text == '381':
+        if move_type_code.text in ['381', '261']:
             return 'refund', 1
-        if move_type_code.text == '380':
-            amount_node = tree.find('.//{*}SpecifiedTradeSettlementHeaderMonetarySummation/{*}TaxBasisTotalAmount')
+        if move_type_code.text in ['380', '389', '527']:
+            amount_node = tree.find('.//{*}SpecifiedTradeSettlementHeaderMonetarySummation/{*}GrandTotalAmount')
             if amount_node is not None and float(amount_node.text) < 0:
                 return 'refund', -1
             return 'invoice', 1
         return None, None
+
+    # -------------------------------------------------------------------------
+    # NEW EXPORT : helpers
+    # -------------------------------------------------------------------------
+
+    def _export_invoice_new(self, invoice):
+        # Validate the structure of the taxes
+        self._validate_taxes(invoice.invoice_line_ids.tax_ids)
+
+        vals = {'invoice': invoice.with_context(lang=invoice.partner_id.lang)}
+        document_node = self._get_invoice_node(vals)
+
+        errors = [constraint for constraint in self._export_invoice_constraints_new(invoice, vals).values() if constraint]
+
+        nsmap = self._get_document_nsmap()
+
+        xml_content = dict_to_xml(document_node, nsmap=nsmap, template=CrossIndustryInvoice)
+
+        return etree.tostring(xml_content, xml_declaration=True, encoding='UTF-8'), set(errors)
+
+    def _export_invoice_constraints_new(self, invoice, vals):
+        constraints = self._invoice_constraints_common(invoice)
+        constraints.update(
+            self._cii_constraints(invoice, vals)
+        )
+        return constraints
+
+    def _get_document_nsmap(self):
+        return {
+            'ram': "urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100",
+            'rsm': "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100",
+            'udt': "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100",
+            'qdt': "urn:un:unece:uncefact:data:standard:QualifiedDataType:100",
+            'xsi': "http://www.w3.org/2001/XMLSchema-instance",
+        }
+
+    def _get_invoice_node(self, vals):
+        self._cii_add_invoice_config_vals(vals)
+
+        vals['document_node'] = document_node = {}
+        self._cii_add_exchanged_document_context_node(vals)
+        self._cii_add_exchanged_document_node(vals)
+        self._cii_add_supply_chain_trade_transaction_node(vals)
+
+        return document_node
+
+    # -------------------------------------------------------------------------
+    # NEW IMPORT : helpers
+    # -------------------------------------------------------------------------
+
+    def _import_invoice_ubl_cii(self, invoice, file_data, new=False):
+        """
+        :param account.move invoice:
+        """
+        if invoice.invoice_line_ids:
+            return invoice._reason_cannot_decode_has_invoice_lines()
+        return self._cii_import_invoice(invoice, file_data, new=new)
+
+    def _import_prepare_missing_customer_create_values(self, collected_values):
+        partner_create_values = super()._import_prepare_missing_customer_create_values(collected_values)
+
+        customer_values = collected_values['customer_values']
+        if (
+                (routing_scheme := customer_values.get('routing_scheme'))
+                and (routing_endpoint := customer_values.get('routing_endpoint'))
+        ):
+            partner_create_values['routing_scheme'] = routing_scheme
+            partner_create_values['routing_endpoint'] = routing_endpoint
+
+        return partner_create_values

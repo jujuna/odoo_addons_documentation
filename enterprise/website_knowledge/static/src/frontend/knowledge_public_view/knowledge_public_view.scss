@@ -1,9 +1,15 @@
+@media screen {
+    .o_knowledge_public_page {
+        overflow: hidden;
+    }
+}
+
 #wrapwrap:has(.o_knowledge_public_view) {
     height: 100%;
 }
 
 .o_knowledge_public_view {
-    @media (min-width: 768px) {
+    @include media-breakpoint-up(md) {
         &:has(.o_knowledge_sidebar_loading) {
             // avoid flicker in desktop view for the sidebar position
             .o_knowledge_sidebar_container {
@@ -14,13 +20,33 @@
             }
         }
     }
-    @media (max-width: 768px) {
+    @include media-breakpoint-down(md) {
         &:has(.o_knowledge_sidebar_loading) {
             // avoid flicker in mobile view for non-full-width articles
             .o_knowledge_article, .o_knowledge_icon {
                 margin-left: 0 !important;
                 margin-right: 0 !important;
             }
+        }
+    }
+
+    // Article card
+    // --------------------------------------------------------------------------
+
+    @include media-breakpoint-up(md) {
+        .o_knowledge_public_content_container {
+            padding: map-get($spacers, 3);
+        }
+
+        .o_knowledge_sidebar_container:is(.o_knowledge_sidebar_loading, :has(.o_knowledge_sidebar))
+            + .o_knowledge_public_content_container {
+            padding-left: 0;
+        }
+
+        .o_knowledge_public_content {
+            border: $border-width solid $border-color;
+            border-radius: $border-radius-lg;
+            overflow: hidden;
         }
     }
 
@@ -31,18 +57,9 @@
         align-items: center;
     }
 
-    @media (min-width: 576px) {
+    @include media-breakpoint-up(sm) {
         .o_knowledge_header_line {
             min-height: 70px;
-        }
-    }
-
-    .o_toggle_public_sidebar {
-        &:hover {
-            background-color: $o-gray-200;
-        }
-        i.oi-panel-right {
-            transform: scaleX(-1);
         }
     }
 
@@ -51,10 +68,18 @@
     }
 
     h1, h2, h3, h4, h5, h6 {
+        border-radius: $border-radius;
         transition: background-color 0.5s ease;
         &.o_embedded_toc_header_highlight {
-            border-radius: 0.25rem;
             background-color: rgba($knowledge-bg--active, 0.2);
+        }
+    }
+
+    .o-public-local-overlay > div:has(.o-heading-link) {
+        isolation: isolate;
+        z-index: 1;
+        a.o-heading-link {
+            color: $gray-600 !important;
         }
     }
 

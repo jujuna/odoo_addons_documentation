@@ -51,10 +51,6 @@
     </function>
 
     <!-- create return delivery order for the ticket -->
-    <record id="helpdesk.helpdesk_ticket_13" model="helpdesk.ticket">
-        <field name="product_id" ref="product.product_product_10"/>
-        <field name="lot_id" ref="lot_product_10_helpdesk"/>
-    </record>
     <record id="helpdesk_stock_return_order_1" model="stock.picking">
         <field name="partner_id" ref="base.partner_demo"/>
         <field name="scheduled_date" eval="time.strftime('%Y-01-01 00:01:00')"/>
@@ -70,7 +66,7 @@
         <field name="location_id" ref="stock.stock_location_stock"/>
         <field name="location_dest_id" ref="stock.stock_location_output"/>
         <field name="product_uom_qty">1</field>
-        <field name="product_uom" ref="uom.product_uom_unit" />
+        <field name="uom_id" ref="uom.product_uom_unit" />
         <field name="quantity">0.0</field>
         <field name="product_id" ref="product.product_product_10"/>
     </record>
@@ -78,9 +74,6 @@
         <field name="picking_ids" eval="[(6, 0, [ref('helpdesk_stock_return_order_1')])]"/>
     </record>
 
-    <record id="helpdesk.helpdesk_ticket_10" model="helpdesk.ticket">
-        <field name="product_id" ref="product.product_product_12"/>
-    </record>
     <record id="helpdesk_stock_return_order_2" model="stock.picking">
         <field name="partner_id" ref="base.res_partner_2"/>
         <field name="scheduled_date" eval="time.strftime('%Y-01-01 00:01:00')"/>
@@ -96,7 +89,7 @@
         <field name="location_id" ref="stock.stock_location_stock"/>
         <field name="location_dest_id" ref="stock.stock_location_output"/>
         <field name="product_uom_qty">1</field>
-        <field name="product_uom" ref="uom.product_uom_unit" />
+        <field name="uom_id" ref="uom.product_uom_unit" />
         <field name="quantity">0.0</field>
         <field name="product_id" ref="product.product_product_12"/>
     </record>

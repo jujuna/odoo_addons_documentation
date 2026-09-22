@@ -129,3 +129,8 @@ class HrSalaryRule(models.Model):
     l10n_ch_13th_month_hourly_included = fields.Boolean()
     l10n_ch_vacation_pay_included = fields.Boolean()
     l10n_ch_is_periodic = fields.Boolean()
+
+    def _set_all_external_identifiers_noupdate(self, noupdate):
+        # Do not flag in noupdate for swissdec
+        if 'CHMONTHLYELM' not in self.struct_ids.mapped('code'):
+            super()._set_all_external_identifiers_noupdate(noupdate)

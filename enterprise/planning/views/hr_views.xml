@@ -8,34 +8,21 @@
         <field name="arch" type="xml">
             <group name="managers" position="after">
                 <group name="planning" string="Planning">
-                    <field name="planning_role_ids" placeholder="e.g. Bartender" widget="many2many_tags" options="{'color_field': 'color', 'edit_tags': True}"/>
+                    <field name="planning_role_ids" placeholder="e.g. Bartender" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'open_form'}"/>
                     <field name="default_planning_role_id" />
                 </group>
             </group>
             <button name="action_open_versions" position="before">
                 <field name="has_slots" invisible="1"/>
-                <button invisible="not has_slots" class="oe_stat_button" icon="fa-tasks" name="action_view_planning" type="object">
+                <button invisible="not has_slots" class="oe_stat_button" icon="clear_all" name="action_view_planning" type="object">
                     <div class="o_stat_info">
                         <span class="o_stat_text">Planning</span>
                     </div>
                 </button>
             </button>
-        </field>
-    </record>
-
-    <record id="view_employee_filter_inherit_hr" model="ir.ui.view">
-        <field name="name">hr.employee.view.search.inherit</field>
-        <field name="model">hr.employee</field>
-        <field name="inherit_id" ref="hr.view_employee_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//filter[@name='inactive']" position="before">
-                <filter name="fixed_hours" string="Fixed Hours" domain="[('is_flexible', '=', False)]" />
-                <filter name="flexible_hours" string="Flexible Hours" domain="[('is_flexible', '!=', False)]" />
-                <separator/>
-            </xpath>
-            <xpath expr="//field[@name='name']" position="after">
-                <field name="planning_role_ids" string="Roles"/>
-            </xpath>
+            <group name="application_group" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </group>
         </field>
     </record>
 
@@ -45,8 +32,15 @@
         <field name="inherit_id" ref="hr.hr_employee_public_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-               <field name="has_slots" invisible="1"/>
-                <button invisible="not is_user or not has_slots" class="oe_stat_button" icon="fa-tasks" name="action_view_planning" type="object">
+                <field name="has_slots" invisible="1"/>
+                <button name="action_view_planning" type="object" invisible="not has_slots or not is_user"
+                        class="oe_stat_button" icon="clear_all">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Planning</span>
+                    </div>
+                </button>
+                <button name="action_view_planning" type="object" invisible="not has_slots or is_user"
+                        class="oe_stat_button" icon="clear_all" groups="planning.group_planning_user">
                     <div class="o_stat_info">
                         <span class="o_stat_text">Planning</span>
                     </div>
@@ -67,7 +61,7 @@
                         <label for="name" string="Employee Name"/>
                         <h1>
                             <field name="name" placeholder="e.g. John Doe" required="True"/>
-                            <a title="Chat" icon="fa-comments" href="#" class="ml8 o_employee_chat_btn" invisible="not context.get('chat_icon') or not user_id" role="button"><i class="fa fa-comments"/></a>
+                            <a title="Chat" icon="forum" icon_class="oi-filled" href="#" class="ml8 o_employee_chat_btn" invisible="not context.get('chat_icon') or not user_id" role="button"/>
                         </h1>
                         <h2>
                             <field name="job_id" placeholder="Job Position" options="{'no_open': True}"/>

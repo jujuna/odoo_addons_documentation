@@ -1,4 +1,4 @@
-import { Chatter } from "@mail/chatter/web_portal/chatter";
+import { Chatter } from "@mail/chatter/web_portal_project/chatter";
 import { useService } from "@web/core/utils/hooks";
 
 export class DocumentsChatter extends Chatter {

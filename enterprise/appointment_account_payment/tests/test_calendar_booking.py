@@ -1,14 +1,15 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import Command, http
-from odoo.addons.appointment_account_payment.tests.common import AppointmentAccountPaymentCommon
-from odoo.tests import users, tagged
-from odoo.tools import mute_logger
-
-from unittest.mock import patch
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
+
+from odoo import Command
+from odoo.tests import tagged, users
+from odoo.tools import mute_logger
+
+from odoo.addons.appointment_account_payment.tests.common import (
+    AppointmentAccountPaymentCommon,
+)
 
 
 @tagged("post_install", "-at_install")
@@ -241,7 +242,7 @@ class AppointmentAccountPaymentTest(AppointmentAccountPaymentCommon):
         max_creation_dt = self.reference_now - relativedelta(months=6)
         max_stop_dt = self.reference_now - relativedelta(months=2)
 
-        with patch.object(self.env.cr, 'now', lambda: max_creation_dt - relativedelta(months=1)):
+        with self.mock_datetime_and_now(max_creation_dt - relativedelta(months=1)):
             booking_1, booking_2 = self.env['calendar.booking'].create([{
                 'start': max_stop_dt + relativedelta(hours=1),
                 'stop': max_stop_dt + relativedelta(hours=2),
@@ -253,7 +254,7 @@ class AppointmentAccountPaymentTest(AppointmentAccountPaymentCommon):
                 'appointment_type_id': self.appointment_users_payment.id,
                 'product_id': self.appointment_users_payment.product_id.id,
             }])
-        with patch.object(self.env.cr, 'now', lambda: self.reference_now):
+        with self.mock_datetime_and_now(self.reference_now):
             booking_3, booking_4 = self.env['calendar.booking'].create([{
                 'start': max_stop_dt + relativedelta(hours=1),
                 'stop': max_stop_dt + relativedelta(hours=2),
@@ -266,7 +267,7 @@ class AppointmentAccountPaymentTest(AppointmentAccountPaymentCommon):
                 'product_id': self.appointment_users_payment.product_id.id,
             }])
 
-        with freeze_time(self.reference_now):
+        with self.mock_datetime_and_now(self.reference_now):
             self.env['calendar.booking']._gc_calendar_booking()
 
         self.assertFalse(booking_1.exists())
@@ -290,7 +291,7 @@ class AppointmentAccountPaymentTest(AppointmentAccountPaymentCommon):
         appointment_data = {
             "asked_capacity": "1",
             "available_resource_ids": [self.resource_1.id],
-            "csrf_token": http.Request.csrf_token(self),
+            "csrf_token": self.csrf_token(),
             "datetime_str": "2022-02-14 14:00:00",
             "duration_str": "1.0",
             "email": "test@test.example.com",

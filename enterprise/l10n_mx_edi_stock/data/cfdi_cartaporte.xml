@@ -43,11 +43,11 @@
                     <cfdi:Concepto
                         t-att-Cantidad="format_float(move.quantity, 6)"
                         t-att-ClaveProdServ="move.product_id.unspsc_code_id.code"
-                        t-att-ClaveUnidad="move.product_uom.unspsc_code_id.code"
+                        t-att-ClaveUnidad="move.uom_id.unspsc_code_id.code"
                         t-att-Descripcion="move.description_picking or move.product_id.name"
                         Importe="0.00"
                         ValorUnitario="0.00"
-                        t-att-Unidad="move.product_uom.name"
+                        t-att-Unidad="move.uom_id.name"
                         ObjetoImp="01"
                         NoIdentificacion="01"/>
                 </t>
@@ -107,7 +107,7 @@
                             <cartaporte31:Mercancia
                                 t-att-BienesTransp="move.product_id.unspsc_code_id.code"
                                 t-att-Cantidad="format_float(move.quantity, 6)"
-                                t-att-ClaveUnidad="move.product_uom.unspsc_code_id.code"
+                                t-att-ClaveUnidad="move.uom_id.unspsc_code_id.code"
                                 t-att-Descripcion="move.description_picking or move.product_id.name"
                                 t-att-PesoEnKg="format_float(move.weight, 3)"
                                 t-att-FraccionArancelaria="move.product_id.l10n_mx_edi_tariff_fraction_id.code
@@ -173,11 +173,11 @@
                     </cartaporte31:Mercancias>
                     <cartaporte31:FiguraTransporte>
                         <cartaporte31:TiposFigura
-                            t-if="record.l10n_mx_edi_vehicle_id.driver_id"
+                            t-if="record.l10n_mx_edi_driver_id"
                             TipoFigura="01"
-                            t-att-RFCFigura="record.l10n_mx_edi_vehicle_id.driver_id.vat"
-                            t-att-NombreFigura="record.l10n_mx_edi_vehicle_id.driver_id.name"
-                            t-att-NumLicencia="record.l10n_mx_edi_vehicle_id.driver_id.l10n_mx_edi_operator_licence"/>
+                            t-att-RFCFigura="record.l10n_mx_edi_driver_id.vat"
+                            t-att-NombreFigura="record.l10n_mx_edi_driver_id.name"
+                            t-att-NumLicencia="record.l10n_mx_edi_driver_id.l10n_mx_edi_operator_licence"/>
                         <t t-foreach="record.l10n_mx_edi_vehicle_id.l10n_mx_figure_ids.sorted(lambda f: f.type)" t-as="figure">
                             <cartaporte31:TiposFigura
                                 t-att-TipoFigura="figure.type"

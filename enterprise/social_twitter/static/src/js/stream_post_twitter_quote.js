@@ -4,7 +4,8 @@ import { SocialPostFormatterMixin } from '@social/js/social_post_formatter_mixin
 
 import { Dialog } from '@web/core/dialog/dialog';
 import { useService } from '@web/core/utils/hooks';
-import { Component, useState } from "@odoo/owl";
+import { getFormattedRecord } from "@web/views/kanban/kanban_record";
+import { Component, proxy } from "@odoo/owl";
 
 export class StreamPostTwitterQuote extends SocialPostFormatterMixin(Component) {
     static template = "social_twitter.TwitterQuoteDialog";
@@ -13,7 +14,7 @@ export class StreamPostTwitterQuote extends SocialPostFormatterMixin(Component) 
     setup() {
         super.setup();
         this.notification = useService('notification');
-        this.state = useState({
+        this.state = proxy({
             isEditMode: false,
         });
     }
@@ -51,7 +52,7 @@ export class StreamPostTwitterQuote extends SocialPostFormatterMixin(Component) 
     }
 
     get originalPost() {
-        return this.props.originalPost;
+        return getFormattedRecord(this.props.originalPost);
     }
 
     get JSON() {

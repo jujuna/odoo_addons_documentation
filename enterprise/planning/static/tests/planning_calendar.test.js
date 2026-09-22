@@ -9,8 +9,8 @@ import {
     definePlanningModels,
     planningModels,
     PlanningRole,
-    ResourceResource,
 } from "./planning_mock_models";
+import { resourceModels } from "@resource/../tests/resource_test_helpers";
 
 import { contains } from "@mail/../tests/mail_test_helpers";
 import {
@@ -31,10 +31,10 @@ class PlanningSlot extends planningModels.PlanningSlot {
             name: "First Record",
             start_datetime: "2019-03-11 08:00:00",
             end_datetime: "2019-03-11 12:00:00",
-            resource_id: 1,
+            resource_ids: [1],
             color: 7,
             role_id: 1,
-            state: "draft",
+            state: "1_draft",
             repeat: true,
         },
         {
@@ -42,10 +42,10 @@ class PlanningSlot extends planningModels.PlanningSlot {
             name: "Second Record",
             start_datetime: "2019-03-13 08:00:00",
             end_datetime: "2019-03-13 12:00:00",
-            resource_id: 2,
+            resource_ids: [2],
             color: 9,
             role_id: 2,
-            state: "published",
+            state: "2_published",
         },
     ];
     _views = {
@@ -57,21 +57,18 @@ class PlanningSlot extends planningModels.PlanningSlot {
                     mode="month"
                     multi_create_view="multi_create_form"
                     js_class="planning_calendar">
-                        <field name="resource_id"
-                                   filters="1"
-                                   avatar_field="avatar_128"
-                                   widget="many2one_avatar_resource"
-                                   write_model="planning.filter.resource"
-                                   write_field="resource_id"
-                                   filter_field="checked"
-                            />
-                        <field name="role_id"/>
-                        <field name="state"/>
-                        <field name="repeat"/>
-                        <field name="recurrence_update"/>
+                        <field name="resource_ids"
+                            invisible="1"
+                            filters="1"
+                            avatar_field="avatar_128"
+                            widget="many2many_avatar_resource"
+                            write_model="planning.filter.resource"
+                            write_field="resource_id"
+                            filter_field="checked"
+                        />
                         <field name="end_datetime"/>
                     </calendar>`,
-        list: `<list js_class="planning_tree"><field name="resource_id"/></list>`,
+        list: `<list js_class="planning_tree"><field name="resource_ids"/></list>`,
         "form,1": `<form>
                     <field name="start_datetime"/>
                     <field name="end_datetime"/>
@@ -104,9 +101,9 @@ defineActions([
 onRpc("has_access", () => true);
 
 beforeEach(() => {
-    ResourceResource._records = [
+    resourceModels.ResourceResource._records = [
         { id: 1, name: "Chaganlal", resource_type: "user" },
-        { id: 2, name: "Maganlal" , resource_type: "user" },
+        { id: 2, name: "Maganlal", resource_type: "user" },
         { id: 3, name: "atlas", resource_type: "material" },
     ];
     PlanningRole._records = [
@@ -145,14 +142,14 @@ test("planning calendar view: copy previous week", async () => {
         return {};
     });
     onRpc("auto_plan_ids", function () {
-        this.env["planning.slot"].write([2], { resource_id: 1 });
+        this.env["planning.slot"].write([2], { resource_ids: [1] });
         return { open_shift_assigned: [2] };
     });
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": true, "resource_type": false},
-            {"id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user"},
-            {"id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user"},
+            { "id": 1, "resource_id": false, "checked": true, "resource_type": false },
+            { "id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user" },
+            { "id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user" },
         ];
     });
     await mountWithCleanup(WebClient);
@@ -204,9 +201,9 @@ test("planning calendar view: copy previous week", async () => {
 test("Resize or Drag-Drop should open recurrence update wizard", async () => {
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": true, "resource_type": false},
-            {"id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user"},
-            {"id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user"},
+            { "id": 1, "resource_id": false, "checked": true, "resource_type": false },
+            { "id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user" },
+            { "id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user" },
         ];
     });
     await mountWithCleanup(WebClient);
@@ -231,9 +228,7 @@ test("Resize or Drag-Drop should open recurrence update wizard", async () => {
     await clickEvent(1);
     expect(".o_cw_popover").toHaveCount(1, { message: "should open a popover clicking on event" });
     expect(
-        queryText(
-            ".o_cw_popover .o_cw_popover_fields_secondary .list-group-item .o_field_datetime"
-        ).split(", ")[1]
+        queryText(".o_field_widget[name=end_datetime]").split(", ")[1]
     ).toBe("2:30 PM", {
         message: "should have correct start date",
     });
@@ -242,9 +237,7 @@ test("Resize or Drag-Drop should open recurrence update wizard", async () => {
     await clickEvent(2);
     expect(".o_cw_popover").toHaveCount(1, { message: "should open a popover clicking on event" });
     expect(
-        queryText(
-            ".o_cw_popover .o_cw_popover_fields_secondary .list-group-item .o_field_datetime"
-        ).split(", ")[1]
+        queryText(".o_field_widget[name=end_datetime]").split(", ")[1]
     ).toBe("2:30 PM", {
         message: "should have correct start date",
     });
@@ -254,9 +247,9 @@ test("should display a popover with an Edit button for users with admin access w
     onRpc("has_group", ({ args }) => args[1] === "planning.group_planning_manager");
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": true, "resource_type": false},
-            {"id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user"},
-            {"id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user"},
+            { "id": 1, "resource_id": false, "checked": true, "resource_type": false },
+            { "id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user" },
+            { "id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user" },
         ];
     });
     await mountWithCleanup(WebClient);
@@ -272,34 +265,12 @@ test("should display a popover with an Edit button for users with admin access w
     });
 });
 
-test("should not display an Edit button in the popover for users without admin access when open popover", async () => {
-    onRpc("has_group", ({ args }) => args[1] !== "planning.group_planning_manager");
-    onRpc("get_calendar_filters", () => {
-        return [
-            {"id": 1, "resource_id": false, "checked": true, "resource_type": false},
-            {"id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user"},
-            {"id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user"},
-        ];
-    });
-    await mountWithCleanup(WebClient);
-    await getService("action").doAction(1);
-
-    // Open popover of the pill
-    await clickEvent(1);
-    expect(".o_cw_popover").toHaveCount(1, {
-        message: "A popover should open when clicking on the event.",
-    });
-    expect(".o_cw_popover .o_cw_popover_edit").toHaveCount(0, {
-        message: "The popover should not contain an Edit button in the footer.",
-    });
-});
-
 test("Display modal to choose recurrence type when deleting recurrent task", async () => {
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": true, "resource_type": false},
-            {"id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user"},
-            {"id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user"},
+            { "id": 1, "resource_id": false, "checked": true, "resource_type": false },
+            { "id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user" },
+            { "id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user" },
         ];
     });
     await mountWithCleanup(WebClient);
@@ -317,9 +288,9 @@ test("Display modal to choose recurrence type when deleting recurrent task", asy
 test("Display confirm delete modal when deleting non recurrent task", async () => {
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": true, "resource_type": false},
-            {"id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user"},
-            {"id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user"},
+            { "id": 1, "resource_id": false, "checked": true, "resource_type": false },
+            { "id": 2, "resource_id": [1, "Chaganlal"], "checked": true, "resource_type": "user" },
+            { "id": 3, "resource_id": [2, "Maganlal"], "checked": true, "resource_type": "user" },
         ];
     });
     await mountWithCleanup(WebClient);
@@ -347,9 +318,9 @@ test("check filters set up, scale display & cosmetic changes", async () => {
 
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": false, "resource_type": false},
-            {"id": 2, "resource_id": [1, "Kalandra"], "checked": false, "resource_type": "user"},
-            {"id": 3, "resource_id": [2, "Zana"], "checked": true, "resource_type": "user"},
+            { "id": 1, "resource_id": false, "checked": false, "resource_type": false },
+            { "id": 2, "resource_id": [1, "Kalandra"], "checked": false, "resource_type": "user" },
+            { "id": 3, "resource_id": [2, "Zana"], "checked": true, "resource_type": "user" },
         ];
     });
     await mountWithCleanup(WebClient);
@@ -373,8 +344,8 @@ test("check filters set up, scale display & cosmetic changes", async () => {
     await animationFrame();
 
     // the material resource has a wrench icon displayed instead of the avatar icon
-    await expect(".o_calendar_filter li.o-autocomplete--dropdown-item:contains('atlas') .fa-wrench").toHaveCount(1);
-    await expect(".o_calendar_filter li.o-autocomplete--dropdown-item:contains('Maganlal') .fa-wrench").toHaveCount(0);
+    await expect(".o_calendar_filter li.o-autocomplete--dropdown-item:contains('atlas') [data-icon='build']").toHaveCount(1);
+    await expect(".o_calendar_filter li.o-autocomplete--dropdown-item:contains('Maganlal') [data-icon='build']").toHaveCount(0);
 
     // switch to 'week' scale
     await click(".scale_button_selection");
@@ -391,22 +362,22 @@ test("check creation of records with only the 'open shifts' filter", async () =>
 
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": true, "resource_type": false},
+            { "id": 1, "resource_id": false, "checked": true, "resource_type": false },
         ];
     });
     let expected_records = [{
         "start_datetime": "2019-03-14 08:00:00",
         "end_datetime": "2019-03-15 16:00:00",
         "template_id": 1,
-        "resource_id": false,
+        "resource_ids": false,
     }, {
         "start_datetime": "2019-03-15 08:00:00",
         "end_datetime": "2019-03-16 16:00:00",
         "template_id": 1,
-        "resource_id": false,
+        "resource_ids": false,
     }];
-    onRpc("create_batch_from_calendar", ({ args: [[], records] }) => {
-        if (JSON.stringify(records) === JSON.stringify(expected_records)){
+    onRpc("create_batch_from_calendar", ({ args: [records] }) => {
+        if (JSON.stringify(records) === JSON.stringify(expected_records)) {
             expect.step("matching record");
         }
         return [];
@@ -423,34 +394,34 @@ test("check creation of records with multiple filters selected", async () => {
 
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": true, "resource_type": false},
-            {"id": 2, "resource_id": [1, "Kalandra"], "checked": false, "resource_type": "user"},
-            {"id": 3, "resource_id": [2, "Zana"], "checked": true, "resource_type": "user"},
+            { "id": 1, "resource_id": false, "checked": true, "resource_type": false },
+            { "id": 2, "resource_id": [1, "Kalandra"], "checked": false, "resource_type": "user" },
+            { "id": 3, "resource_id": [2, "Zana"], "checked": true, "resource_type": "user" },
         ];
     });
     let expected_records = [{
         "start_datetime": "2019-03-14 08:00:00",
         "end_datetime": "2019-03-15 16:00:00",
         "template_id": 1,
-        "resource_id": false,
+        "resource_ids": false,
     }, {
         "start_datetime": "2019-03-14 08:00:00",
         "end_datetime": "2019-03-15 16:00:00",
         "template_id": 1,
-        "resource_id": 2,
+        "resource_ids": [2],
     }, {
         "start_datetime": "2019-03-15 08:00:00",
         "end_datetime": "2019-03-16 16:00:00",
         "template_id": 1,
-        "resource_id": false,
+        "resource_ids": false,
     }, {
         "start_datetime": "2019-03-15 08:00:00",
         "end_datetime": "2019-03-16 16:00:00",
         "template_id": 1,
-        "resource_id": 2,
+        "resource_ids": [2],
     }]
-    onRpc("create_batch_from_calendar", ({ args: [[], records] }) => {
-        if (JSON.stringify(records) === JSON.stringify(expected_records)){
+    onRpc("create_batch_from_calendar", ({ args: [records] }) => {
+        if (JSON.stringify(records) === JSON.stringify(expected_records)) {
             expect.step("matching record");
         }
         return [];
@@ -466,7 +437,7 @@ test("check creation of records with multiple filters selected", async () => {
 test("check creation of records while no filter is selected", async () => {
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": false, "resource_type": false},
+            { "id": 1, "resource_id": false, "checked": false, "resource_type": false },
         ];
     });
     onRpc("write", () => {
@@ -474,7 +445,7 @@ test("check creation of records while no filter is selected", async () => {
         // get_calendar_filters and since the view was already loaded, the value will not get overwritten to true.
         return [];
     });
-    onRpc("create_batch_from_calendar", ({ args: [[], records] }) => {
+    onRpc("create_batch_from_calendar", ({ args: [records] }) => {
         expect.step("create_batch_from_calendar");
     });
 
@@ -492,7 +463,7 @@ test("check creation of records while no filter is selected", async () => {
 test("planning calendar view: print", async () => {
     onRpc("get_calendar_filters", () => {
         return [
-            {"id": 1, "resource_id": false, "checked": false, "resource_type": false},
+            { "id": 1, "resource_id": false, "checked": false, "resource_type": false },
         ];
     });
     onRpc("action_print_plannings", () => {

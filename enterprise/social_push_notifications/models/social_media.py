@@ -16,3 +16,11 @@ class SocialMedia(models.Model):
             return super()._action_add_account()
 
         return None
+
+    def _get_utm_source(self):
+        self.ensure_one()
+
+        if self.media_type == 'push_notifications':
+            return self.env['utm.mixin']._utm_ref('social_push_notifications.utm_source_push_notification')
+
+        return super()._get_utm_source()

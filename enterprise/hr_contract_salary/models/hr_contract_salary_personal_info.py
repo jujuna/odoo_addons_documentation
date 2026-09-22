@@ -13,12 +13,19 @@ class HrContractSalaryPersonalInfo(models.Model):
 
     name = fields.Char(translate=True, required=True)
     sequence = fields.Integer(default=100)
+    active = fields.Boolean(default=True)
     res_field_id = fields.Many2one(
         'ir.model.fields', string="Related Field",
-        domain="[('model', '=', res_model), ('ttype', 'not in', ('one2many', 'many2one', 'many2many')), ('store', '=', True)]", required=True, ondelete='cascade',
+        domain="[('model', '=', res_model), ('ttype', 'not in', ('one2many', 'many2one', 'many2many')), ('store', '=', True)]", required=True, index=True, ondelete='cascade',
         help="Name of the field related to this personal info.")
     field = fields.Char(related='res_field_id.name', readonly=True)
-    structure_type_id = fields.Many2one('hr.payroll.structure.type', string="Salary Structure Type")
+    structure_type_id = fields.Many2one('hr.payroll.structure.type', string="Salary Structure Type", index='btree_not_null')
+    country_id = fields.Many2one(
+        'res.country',
+        related='structure_type_id.country_id',
+        string='Country',
+        store=True,
+        readonly=True)
     placeholder = fields.Char(translate=True)
     helper = fields.Char(translate=True)
     display_type = fields.Selection([
@@ -35,7 +42,7 @@ class HrContractSalaryPersonalInfo(models.Model):
     is_required = fields.Boolean(default=True)
     value_ids = fields.One2many('hr.contract.salary.personal.info.value', 'personal_info_id')
     applies_on = fields.Selection([
-        ('version_personal', 'Version'),
+        ('version_personal', 'Employee Record'),
         ('employee', 'Employee'),
         ('bank_account', 'Bank Account')
     ], default='employee')
@@ -49,6 +56,29 @@ class HrContractSalaryPersonalInfo(models.Model):
     ], string="Selection Nature")
     parent_id = fields.Many2one('hr.contract.salary.personal.info', index=True)
     child_ids = fields.One2many('hr.contract.salary.personal.info', 'parent_id')
+    user_has_access = fields.Boolean(
+        compute='_compute_user_has_access',
+        search='_search_user_has_access',
+        string='User Has Access to personal info'
+    )
+
+    def _compute_user_has_access(self):
+        countries = self.env.companies.country_id
+        for record in self:
+            record.user_has_access = (
+                    not record.structure_type_id or
+                    not record.structure_type_id.country_id or
+                    record.structure_type_id.country_id in countries
+            )
+
+    def _search_user_has_access(self, operator, value):
+        countries = self.env.companies.country_id.ids + [False]
+        domain = [
+            '|',
+            ('structure_type_id', '=', False),
+            ('structure_type_id.country_id', 'in', countries)
+        ]
+        return domain
 
     @api.onchange('applies_on')
     def _onchange_applies_on(self):

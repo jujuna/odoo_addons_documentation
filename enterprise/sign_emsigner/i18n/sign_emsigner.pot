@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-12-30 18:47+0000\n"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 17:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -36,11 +36,31 @@ msgid ""
 msgstr ""
 
 #. module: sign_emsigner
+#. odoo-python
+#: code:addons/sign_emsigner/models/sign_request.py:0
+msgid ""
+"A signer using Aadhaar cannot be part of a request that is signed with a "
+"qualified signature."
+msgstr ""
+
+#. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/backend_components/sign_template_action.js:0
 msgid ""
 "Aadhaar Sign works only with a single signer and document. Adding more will "
 "switch to the standard eSignature."
+msgstr ""
+
+#. module: sign_emsigner
+#. odoo-python
+#: code:addons/sign_emsigner/models/sign_item_role.py:0
+msgid "Aadhaar sign authentication is available only for companies in India."
+msgstr ""
+
+#. module: sign_emsigner
+#: model:ir.module.module,description:base.module_sign_emsigner
+msgid ""
+"Add support for emSigner identification when signing documents (Indian only)"
 msgstr ""
 
 #. module: sign_emsigner
@@ -59,6 +79,11 @@ msgid "Authenticated with emSigner"
 msgstr ""
 
 #. module: sign_emsigner
+#: model:ir.model.fields,field_description:sign_emsigner.field_sign_item_role__auth_method
+msgid "Authentication"
+msgstr ""
+
+#. module: sign_emsigner
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/dialogs/emsigner_dialog.xml:0
 msgid "Continue"
@@ -74,6 +99,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request__display_name
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__display_name
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_send_request__display_name
+#: model:ir.model.fields,field_description:sign_emsigner.field_sign_template__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -111,11 +137,6 @@ msgid "Error"
 msgstr ""
 
 #. module: sign_emsigner
-#: model:ir.model.fields,field_description:sign_emsigner.field_sign_item_role__auth_method
-msgid "Extra Authentication Step"
-msgstr ""
-
-#. module: sign_emsigner
 #: model:ir.model.fields,help:sign_emsigner.field_sign_item_role__auth_method
 msgid "Force the signatory to identify using a second authentication method"
 msgstr ""
@@ -125,6 +146,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request__id
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_request_item__id
 #: model:ir.model.fields,field_description:sign_emsigner.field_sign_send_request__id
+#: model:ir.model.fields,field_description:sign_emsigner.field_sign_template__id
 msgid "ID"
 msgstr ""
 
@@ -144,6 +166,16 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sign_emsigner/static/src/dialogs/emsigner_dialog.xml:0
 msgid "Redirecting to complete the Aadhaar eSign process."
+msgstr ""
+
+#. module: sign_emsigner
+#: model:ir.module.module,summary:base.module_sign_emsigner
+msgid "Sign documents with emSigner"
+msgstr ""
+
+#. module: sign_emsigner
+#: model:ir.module.module,shortdesc:base.module_sign_emsigner
+msgid "Sign emSigner"
 msgstr ""
 
 #. module: sign_emsigner
@@ -170,6 +202,11 @@ msgstr ""
 #. module: sign_emsigner
 #: model:ir.model,name:sign_emsigner.model_sign_request_item
 msgid "Signature Request Item"
+msgstr ""
+
+#. module: sign_emsigner
+#: model:ir.model,name:sign_emsigner.model_sign_template
+msgid "Signature Template"
 msgstr ""
 
 #. module: sign_emsigner
@@ -206,6 +243,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/sign_emsigner/controllers/main.py:0
 msgid "emSigner IAP service could not be found."
+msgstr ""
+
+#. module: sign_emsigner
+#: model:iap.service,name:sign_emsigner.iap_service_emsigner_proxy
+msgid "emSigner Proxy"
 msgstr ""
 
 #. module: sign_emsigner

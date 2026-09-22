@@ -1,42 +1,23 @@
-import { registry } from "@web/core/registry";
-import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
+import { Component, onWillDestroy, onWillStart, proxy, useEffect, useOnChange } from "@odoo/owl";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
-import { KnowledgeCommentsThread } from "../comment/comment";
-import { Component, onWillDestroy, onWillStart, useEffect, useState } from "@odoo/owl";
-import { batched, debounce } from "@web/core/utils/timing";
-import { effect } from "@web/core/utils/reactive";
+import { debounce } from "@web/core/utils/timing";
 import { LOAD_THREADS_LIMIT } from "../../comments/comments_service";
+import { KnowledgeCommentsThread } from "../comment/comment";
 
 export class KnowledgeCommentsPanel extends Component {
     static template = "knowledge.KnowledgeCommentsPanel";
     static components = { KnowledgeCommentsThread };
-    static props = { ...standardWidgetProps };
 
     setup() {
         this.commentsService = useService("knowledge.comments");
-        this.commentsState = useState(this.commentsService.getCommentsState());
+        this.panelState = proxy(this.env.panelState);
         let threadRecordsKeys;
         this.alive = true;
-        effect(
-            batched((state) => {
-                if (!this.alive || state.displayMode !== "panel") {
-                    return;
-                }
-                const threadRecords = state.threadRecords;
-                const threadIds = Object.keys(threadRecords);
-                const keys = threadIds.toString();
-                if (keys !== threadRecordsKeys) {
-                    this.computeThreadIds();
-                    threadRecordsKeys = keys;
-                }
-            }),
-            [this.commentsState]
-        );
         onWillDestroy(() => {
             this.alive = false;
         });
-        this.state = useState({
+        this.state = proxy({
             mode: "unresolved", // "resolved" / "all"
             loadMoreResolved: false,
             loadMoreOpen: false,
@@ -44,9 +25,26 @@ export class KnowledgeCommentsPanel extends Component {
             threadIds: [],
         });
         let firstLoad = true;
-        useEffect(
+        useEffect(() => {
+            if (!this.alive || this.panelState.commentsState.displayMode !== "panel") {
+                return;
+            }
+            const threadRecords = this.panelState.commentsState.threadRecords;
+            const threadIds = Object.keys(threadRecords);
+            const keys = threadIds.toString();
+            if (keys !== threadRecordsKeys) {
+                this.computeThreadIds();
+                threadRecordsKeys = keys;
+            }
+        });
+        useOnChange(
+            () => [
+                this.state.mode,
+                this.panelState.commentsState.articleId,
+                this.panelState.commentsState.displayMode,
+            ],
             () => {
-                if (this.commentsState.displayMode !== "panel") {
+                if (!this.panelState.isDisplayed("comments")) {
                     return;
                 }
                 this.computeThreadIds();
@@ -67,15 +65,14 @@ export class KnowledgeCommentsPanel extends Component {
                             }
                         }
                     });
-            },
-            () => [this.state.mode, this.commentsState.articleId, this.commentsState.displayMode]
+            }
         );
         onWillStart(async () => {
             // TODO ABD: test this use case
             if (
                 this.env.services.action.currentController?.action?.context?.show_resolved_threads
             ) {
-                this.commentsState.displayMode = "panel";
+                this.panelState.setActivePanel("comments");
                 this.mode = "resolved";
                 this.env.services.action.currentController.action.context.show_resolved_threads = false;
             }
@@ -90,13 +87,13 @@ export class KnowledgeCommentsPanel extends Component {
     }
 
     canDisplayRecord(threadId) {
-        if (!this.commentsState.threadRecords[threadId]) {
+        if (!this.panelState.commentsState.threadRecords[threadId]) {
             return true;
         }
         if (this.state.mode === "unresolved") {
-            return !this.commentsState.threadRecords[threadId].is_resolved;
+            return !this.panelState.commentsState.threadRecords[threadId].is_resolved;
         } else if (this.state.mode === "resolved") {
-            return this.commentsState.threadRecords[threadId].is_resolved;
+            return this.panelState.commentsState.threadRecords[threadId].is_resolved;
         }
         return true;
     }
@@ -123,7 +120,9 @@ export class KnowledgeCommentsPanel extends Component {
 
     computeThreadIds() {
         const threadIds = [];
-        for (const [threadId, record] of Object.entries(this.commentsState.threadRecords)) {
+        for (const [threadId, record] of Object.entries(
+            this.panelState.commentsState.threadRecords
+        )) {
             if (
                 this.state.mode === "all" ||
                 (this.state.mode === "resolved" && record.is_resolved) ||
@@ -133,8 +132,8 @@ export class KnowledgeCommentsPanel extends Component {
             }
         }
         this.state.threadIds = threadIds.sort((threadIdA, threadIdB) => {
-            const dateA = this.commentsState.threadRecords[threadIdA].write_date;
-            const dateB = this.commentsState.threadRecords[threadIdB].write_date;
+            const dateA = this.panelState.commentsState.threadRecords[threadIdA].write_date;
+            const dateB = this.panelState.commentsState.threadRecords[threadIdB].write_date;
             if (dateA < dateB) {
                 return 1;
             } else if (dateA > dateB) {
@@ -143,10 +142,6 @@ export class KnowledgeCommentsPanel extends Component {
                 return 0;
             }
         });
-    }
-
-    onChangeMode(ev) {
-        this.state.mode = ev.target.value;
     }
 
     async loadMore() {
@@ -171,10 +166,3 @@ export class KnowledgeCommentsPanel extends Component {
         }
     }
 }
-
-export const knowledgeCommentsPanel = {
-    component: KnowledgeCommentsPanel,
-    additionalClasses: ["col-12", "col-lg-4", "border-top", "d-print-none"],
-};
-
-registry.category("view_widgets").add("knowledge_comments_panel", knowledgeCommentsPanel);

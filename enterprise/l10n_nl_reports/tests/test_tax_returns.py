@@ -7,12 +7,14 @@ from odoo.tools import float_compare
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
 
-def patched_generate_all_returns(account_return_type, country_code, main_company, tax_unit=None):
+def patched_generate_all_returns(account_return_type, country_code, main_company, tax_unit=None, return_types=None):
     TestTaxReturn.basic_return_type._try_create_returns_for_fiscal_year(main_company, tax_unit)
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestTaxReturn(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestAccountReportsCommon.setup_country('nl')
@@ -60,3 +62,10 @@ class TestTaxReturn(TestAccountReportsCommon):
 
         move_line_with_difference_from_rounding_taxes = next(l for l in first_return.closing_move_ids.invoice_line_ids if l.name == 'Difference from rounding taxes')
         self.assertFalse(float_compare(abs(move_line_with_difference_from_rounding_taxes.balance), self.invoice.amount_tax, 2) == 0)
+
+    def test_generate_nl_tax_returns(self):
+        """ Ensure generating nl tax returns does not raise error """
+        self.env['account.return.type']._generate_all_returns(
+            country_code='NL',
+            main_company=self.env.company,
+        )

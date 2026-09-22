@@ -4,6 +4,7 @@ from . import res_users
 from . import hr_employee
 from . import hr_expense
 from . import hr_expense_stripe_card
+from . import hr_expense_stripe_dispute
 from . import product_product
 from . import product_mcc_stripe_tag
 from . import account_chart_template

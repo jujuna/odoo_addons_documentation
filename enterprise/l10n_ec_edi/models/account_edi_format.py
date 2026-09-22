@@ -4,17 +4,17 @@
 from datetime import datetime
 from functools import partial
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 
 from lxml import etree
 from markupsafe import Markup, escape
+from requests.exceptions import RequestException
 
 from odoo import _, api, models
 from odoo.addons.l10n_ec_edi.models.account_move import L10N_EC_VAT_SUBTAXES, L10N_EC_VAT_RATES
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as DTF
 from odoo.tools import float_compare, float_is_zero, float_repr, float_round, html_escape
 from odoo.tools.xml_utils import cleanup_xml_node
-from pytz import timezone
-from requests.exceptions import RequestException
 from odoo.tools.zeep import Client
 from odoo.tools.zeep.exceptions import Error as ZeepError
 from odoo.addons.l10n_ec_edi.models.xml_utils import (
@@ -101,8 +101,8 @@ class AccountEdiFormat(models.Model):
                     address.commercial_partner_id.display_name
                 ))
 
-            if not move.commercial_partner_id.vat:
-                errors.append(_("You must set a VAT number for partner %s", move.commercial_partner_id.display_name))
+            if not move.commercial_partner_id._get_preferred_legal_entity_identifier_vals():
+                errors.append(_("You must set an identification number for partner %s", move.commercial_partner_id.display_name))
 
             if not move.l10n_ec_sri_payment_id and move.move_type in ['out_invoice', 'in_invoice']: # needed for documents excluding credit notes
                 errors.append(_("You must set the Payment Method SRI on document %s", move.display_name))
@@ -249,7 +249,7 @@ class AccountEdiFormat(models.Model):
             'company': move.company_id,
             'journal': move.journal_id,
             'partner': move.commercial_partner_id,
-            'partner_sri_code': move.partner_id._get_sri_code_for_partner().value,
+            'partner_sri_code': move.partner_id._get_sri_code_for_partner(),
             'is_cnote': internal_type == 'credit_note',
             'is_dnote': internal_type == 'debit_note',
             'is_liquidation': internal_type == 'purchase_liquidation',
@@ -266,67 +266,6 @@ class AccountEdiFormat(models.Model):
             'dividend_income_tax': move.l10n_ec_dividend_income_tax,
             'dividend_fiscal_year': move.l10n_ec_dividend_fiscal_year,
         }
-
-    def l10n_ec_merge_negative_and_positive_line(self, negative_line_tax_data, tax_data, precision_digits):
-        # To remove in master
-        def merge_tax_datas(tax_data_to_add, tax_data_to_nullify):
-            keys_to_merge = ['base_amount_currency', 'base_amount', 'tax_amount_currency', 'tax_amount']
-            for key in keys_to_merge:
-                tax_data_to_add[key] += tax_data_to_nullify[key]
-                tax_data_to_nullify[key] = 0.0
-
-        if tax_data['base_amount'] > abs(negative_line_tax_data['base_amount']):
-            merge_tax_datas(tax_data, negative_line_tax_data)
-            for tax in tax_data['tax_details']:
-                merge_tax_datas(tax_data['tax_details'][tax], negative_line_tax_data['tax_details'][tax])
-        else:
-            merge_tax_datas(negative_line_tax_data, tax_data)
-            for tax in tax_data['tax_details']:
-                merge_tax_datas(negative_line_tax_data['tax_details'][tax], tax_data['tax_details'][tax])
-
-    def _l10n_ec_dispatch_negative_line_into_discounts(self, negative_line_tax_data, positive_tax_details_sorted, precision_digits):
-        # To remove in master
-        def is_same_taxes(taxes_1, taxes_2):
-            def tax_dict_to_tuple(tax_dict):
-                return (tax_dict['code'], tax_dict['code_percentage'], tax_dict['rate'], tax_dict['tax_group_id'])
-            return sorted(taxes_1, key=tax_dict_to_tuple) == sorted(taxes_2, key=tax_dict_to_tuple)
-
-        for tax_data in positive_tax_details_sorted:
-            if (
-                not float_is_zero(tax_data['base_amount'], precision_digits=precision_digits)
-                and is_same_taxes(negative_line_tax_data['tax_details'].keys(), tax_data['tax_details'].keys())
-            ):
-                self.l10n_ec_merge_negative_and_positive_line(negative_line_tax_data, tax_data, precision_digits)
-                if float_is_zero(negative_line_tax_data['base_amount'], precision_digits=precision_digits):
-                    continue
-        if not float_is_zero(negative_line_tax_data['base_amount'], precision_digits=precision_digits):
-            return [_("Failed to dispatch negative lines into discounts.")]
-
-    def _l10n_ec_remove_negative_lines_from_move_info(self, move_info):
-        # To remove in master
-        precision_digits = move_info['move'].company_id.currency_id.decimal_places
-
-        tax_details_per_line = move_info['taxes_data']['tax_details_per_record']
-        negative_lines = [line for line, tax_data in tax_details_per_line.items() if float_compare(tax_data['base_amount'], 0.0, precision_digits=precision_digits) == -1]
-
-        if not negative_lines:
-            return []
-
-        negative_amount_total = sum(tax_details_per_line[line]['base_amount'] for line in negative_lines)
-        move_info['discount_total'] += abs(negative_amount_total)
-
-        positive_tax_details_sorted = sorted(
-            [value for key, value in tax_details_per_line.items() if key not in negative_lines],
-            key=lambda tax_data: tax_data['base_amount'],
-            reverse=True
-        )
-        for negative_line in negative_lines:
-            error = self._l10n_ec_dispatch_negative_line_into_discounts(tax_details_per_line[negative_line], positive_tax_details_sorted, precision_digits)
-            if error:
-                return error
-            tax_details_per_line.pop(negative_line)
-
-        return []
 
     def _l10n_ec_get_base_lines(self, move_info):
 
@@ -369,11 +308,12 @@ class AccountEdiFormat(models.Model):
         # Update tax_details with l10n_ec info needed for the xml
         for line_items in base_lines:
             for tax_data in line_items['tax_details']['taxes_data']:
-                code_percentage = L10N_EC_VAT_SUBTAXES[tax_data['tax'].tax_group_id.l10n_ec_type]
+                tax = tax_data['tax']
+                code_percentage = L10N_EC_VAT_SUBTAXES.get(tax.tax_group_id.l10n_ec_type, tax.l10n_ec_code_ats)
                 tax_data.update({
-                    'code': self.env['account.move']._l10n_ec_map_tax_groups(tax_data['tax']),
+                    'code': self.env['account.move']._l10n_ec_map_tax_groups(tax),
                     'code_percentage': code_percentage,
-                    'rate': L10N_EC_VAT_RATES[code_percentage],
+                    'rate': L10N_EC_VAT_RATES.get(code_percentage, tax.amount),
                 })
 
         results = {
@@ -418,17 +358,12 @@ class AccountEdiFormat(models.Model):
         # Generate XML document
         errors = []
         if move_info.get('taxes_data'):
-            # To remove in master: use the old code if the template was not updated
-            template_tree = self.env['ir.qweb']._get_template('l10n_ec_edi.common_details_info_template')[0]
-            if template_tree.findall('.//t')[0].attrib.get('t-value', '') != "taxes_data['base_lines']":
-                errors += self._l10n_ec_remove_negative_lines_from_move_info(move_info)
-            else:
-                dispatched_lines, dispatching_errors = self._l10n_ec_get_base_lines(move_info)
-                errors += dispatching_errors
+            dispatched_lines, dispatching_errors = self._l10n_ec_get_base_lines(move_info)
+            errors += dispatching_errors
 
-                base_lines = dispatched_lines['base_lines']
-                move_info['taxes_data']['base_lines'] = base_lines
-                move_info['discount_total'] = sum(base_line['discount_amount'] for base_line in base_lines)
+            base_lines = dispatched_lines['base_lines']
+            move_info['taxes_data']['base_lines'] = base_lines
+            move_info['discount_total'] = sum(base_line['discount_amount'] for base_line in base_lines)
 
         xml_content = self.env['ir.qweb']._render(template, move_info)
         xml_content = cleanup_xml_node(xml_content)
@@ -486,14 +421,14 @@ class AccountEdiFormat(models.Model):
         """
         Generates an xml attachment to simulate a response from the SRI without the need for a digital signature.
         """
-        move.l10n_ec_authorization_date = datetime.now(tz=timezone('America/Guayaquil')).date()
+        move.l10n_ec_authorization_date = datetime.now(tz=ZoneInfo('America/Guayaquil')).date()
         attachment = self.env['ir.attachment'].create({
             'name': move.display_name + '_demo.xml',
             'res_id': move.id,
             'res_model': move._name,
             'type': 'binary',
             'raw': self._l10n_ec_create_authorization_file(
-                move, xml_string,
+                move.company_id, xml_string,
                 move.l10n_ec_authorization_number, move.l10n_ec_authorization_date),
             'mimetype': 'application/xml',
             'description': f"Ecuadorian electronic document generated for document {move.display_name}."
@@ -529,7 +464,7 @@ class AccountEdiFormat(models.Model):
                 'res_id': move.id,
                 'res_model': move._name,
                 'type': 'binary',
-                'raw': self._l10n_ec_create_authorization_file(move, xml_string, auth_num, auth_date),
+                'raw': self._l10n_ec_create_authorization_file(move.company_id, xml_string, auth_num, auth_date),
                 'mimetype': 'application/xml',
                 'description': f"Ecuadorian electronic document generated for document {move.display_name}."
             })
@@ -665,11 +600,7 @@ class AccountEdiFormat(models.Model):
 
     # ===== Helper methods =====
 
-    def _l10n_ec_create_authorization_file(self, move, xml_string, authorization_number, authorization_date):
-        return self._l10n_ec_create_authorization_file_new(move.company_id, xml_string, authorization_number, authorization_date)
-
-    def _l10n_ec_create_authorization_file_new(self, company_id, xml_string, authorization_number, authorization_date):
-        # TODO master: merge with `_l10n_ec_create_authorization_file`
+    def _l10n_ec_create_authorization_file(self, company_id, xml_string, authorization_number, authorization_date):
         xml_values = {
             'xml_file_content': Markup(xml_string[xml_string.find('?>') + 2:]),  # remove header to embed sent xml
             'mode': 'PRODUCCION' if company_id.l10n_ec_production_env else 'PRUEBAS',
@@ -678,7 +609,7 @@ class AccountEdiFormat(models.Model):
         }
         xml_response = self.env['ir.qweb']._render('l10n_ec_edi.authorization_template', xml_values)
         xml_response = cleanup_xml_node(xml_response)
-        return etree.tostring(xml_response, encoding='unicode')
+        return etree.tostring(xml_response)
 
     def _l10n_ec_format_number(self, value, decimals=2):
         return float_repr(float_round(value, decimals), decimals)

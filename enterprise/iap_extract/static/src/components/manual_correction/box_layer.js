@@ -1,38 +1,35 @@
-import { Box } from '@iap_extract/components/manual_correction/box';
-import { Component, useExternalListener, useRef, useState } from "@odoo/owl";
+import { Box } from "@iap_extract/components/manual_correction/box";
+import { BoxCluster } from "@iap_extract/components/manual_correction/box_cluster";
+import { Component, proxy, signal, t, useListener, useProps } from "@odoo/owl";
 
 export class BoxLayer extends Component {
-    static components = { Box };
+    static components = { Box, BoxCluster };
     static template = "iap_extract.BoxLayer";
-    static props = {
-        boxes: Array,
-        pageLayer: {
-            validate: (pageLayer) => {
-                // target may be inside an iframe, so get the Element constructor
-                // to test against from its owner document's default view
-                const Element = pageLayer?.ownerDocument?.defaultView?.Element;
-                return (
-                    (Boolean(Element) &&
-                        (pageLayer instanceof Element || pageLayer instanceof window.Element)) ||
-                    (typeof pageLayer === "object" && pageLayer?.constructor?.name?.endsWith("Element"))
-                );
-            },
-        },
-        onClickBoxCallback: Function,
-        onBoxesSelectionCallback: Function,
-        mode: String,
-    };
-    /**
-     * @override
-     */
+
+    props = useProps({
+        boxes: t.array(),
+        boxClusters: t.array(),
+        pageLayer: t.customValidator(
+            t.object(),
+            (pageLayer) => pageLayer?.nodeType === Node.ELEMENT_NODE
+        ),
+        onClickBoxCallback: t.function(),
+        onMouseHoverBoxCallback: t.function(),
+        onClickBoxClusterCallback: t.function(),
+        onBoxesSelectionCallback: t.function(),
+        mode: t.string(),
+    });
+
+    boxLayerRef = signal.ref();
+
     setup() {
-        this.state = useState({
+        this.state = proxy({
             boxes: this.props.boxes,
+            boxClusters: this.props.boxClusters,
             isSelecting: false,
             selectionStart: { x: 0, y: 0 },
             selectionEnd: { x: 0, y: 0 },
         });
-        this.boxLayerRef = useRef("boxLayer");
 
         // Used to define the style of the contained boxes
         if (this.isOnPDF) {
@@ -40,11 +37,12 @@ export class BoxLayer extends Component {
             this.pageHeight = this.props.pageLayer.style.height;
 
             // Get the scrollable element of the PDF viewer to listen to scroll events
-            this.viewerScrollableEl = this.props.pageLayer.ownerDocument.getElementById("viewerContainer");
-            useExternalListener(this.viewerScrollableEl, "scroll", this.onScroll);
+            this.viewerScrollableEl =
+                this.props.pageLayer.ownerDocument.getElementById("viewerContainer");
+            useListener(this.viewerScrollableEl, "scroll", this.onScroll.bind(this));
         } else if (this.isOnImg) {
             this.viewerScrollableEl = this.props.pageLayer.parentElement;
-            useExternalListener(this.viewerScrollableEl, "scroll", this.onScroll);
+            useListener(this.viewerScrollableEl, "scroll", this.onScroll.bind(this));
             this.pageWidth = `${this.props.pageLayer.clientWidth}px`;
             this.pageHeight = `${this.props.pageLayer.clientHeight}px`;
         }
@@ -59,11 +57,9 @@ export class BoxLayer extends Component {
             bottom: Math.max(selectionStart.y, selectionEnd.y),
         };
 
-        const boxElements = this.boxLayerRef.el.querySelectorAll('.o_extract_mixin_box');
-
-        boxElements.forEach(boxEl => {
+        for (const boxEl of this.boxLayerRef().getElementsByClassName("o_extract_mixin_box")) {
             const boxId = parseInt(boxEl.dataset.id, 10);
-            const matchedBox = this.props.boxes.find(box => box.id === boxId);
+            const matchedBox = this.props.boxes.find((box) => box.id === boxId);
             const boxRect = boxEl.getBoundingClientRect();
 
             const isOverlapping = !(
@@ -73,7 +69,7 @@ export class BoxLayer extends Component {
                 boxRect.top > selectionRect.bottom
             );
             matchedBox.isHighlighted = isOverlapping;
-        });
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -82,13 +78,17 @@ export class BoxLayer extends Component {
 
     get style() {
         if (this.isOnPDF) {
-            return 'width: ' + this.props.pageLayer.style.width + '; ' +
-                   'height: ' + this.props.pageLayer.style.height + ';';
+            return [
+                `width: ${this.props.pageLayer.style.width}`,
+                `height: ${this.props.pageLayer.style.height}`,
+            ].join(";");
         } else if (this.isOnImg) {
-            return 'width: ' + this.props.pageLayer.clientWidth + 'px; ' +
-                   'height: ' + this.props.pageLayer.clientHeight + 'px; ' +
-                   'left: ' + this.props.pageLayer.offsetLeft + 'px; ' +
-                   'top: ' + this.props.pageLayer.offsetTop + 'px;';
+            return [
+                `width: ${this.props.pageLayer.clientWidth}px`,
+                `height: ${this.props.pageLayer.clientHeight}px`,
+                `left: ${this.props.pageLayer.offsetLeft}px`,
+                `top: ${this.props.pageLayer.offsetTop}px`,
+            ].join(";");
         }
     }
 
@@ -108,11 +108,11 @@ export class BoxLayer extends Component {
     }
 
     get isOnImg() {
-        return this.props.mode === 'img';
+        return this.props.mode === "img";
     }
 
     get isOnPDF() {
-        return this.props.mode === 'pdf';
+        return this.props.mode === "pdf";
     }
 
     //--------------------------------------------------------------------------
@@ -121,8 +121,8 @@ export class BoxLayer extends Component {
 
     onMouseDown(event) {
         this.state.isSelecting = true;
-        this.state.selectionStart = { x: event.clientX, y: event.clientY};
-        this.state.selectionEnd = { x: event.clientX, y: event.clientY};
+        this.state.selectionStart = { x: event.clientX, y: event.clientY };
+        this.state.selectionEnd = { x: event.clientX, y: event.clientY };
         if (this.viewerScrollableEl) {
             this.scrollX = this.viewerScrollableEl.scrollLeft;
             this.scrollY = this.viewerScrollableEl.scrollTop;
@@ -138,10 +138,10 @@ export class BoxLayer extends Component {
 
         this.checkAndHighlightBoxes();
 
-        const selectedBoxes = this.props.boxes.filter(box => box.isHighlighted);
+        const selectedBoxes = this.props.boxes.filter((box) => box.isHighlighted);
         this.props.onBoxesSelectionCallback(selectedBoxes);
 
-        this.props.boxes.forEach(box => box.isHighlighted = false);
+        this.props.boxes.forEach((box) => (box.isHighlighted = false));
         this.state.selectionStart = { x: 0, y: 0 };
         this.state.selectionEnd = { x: 0, y: 0 };
     }
@@ -167,4 +167,4 @@ export class BoxLayer extends Component {
             this.scrollY = scrollY;
         }
     }
-};
+}

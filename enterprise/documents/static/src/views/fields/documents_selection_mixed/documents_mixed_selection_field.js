@@ -1,17 +1,19 @@
+import { t, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { SelectionField, selectionField } from "@web/views/fields/selection/selection_field";
+import {
+    SelectionField,
+    selectionField,
+    selectionFieldProps,
+} from "@web/views/fields/selection/selection_field";
 
 const WRITE_VALUE_PREFIX = "write_";
 
 export class DocumentsMixedSelectionField extends SelectionField {
     static template = "documents.DocumentsMixedSelectionField";
-    static props = {
-        ...SelectionField.props,
-        excludeNone: { type: Boolean, optional: true },
-    };
-    static defaultProps = {
-        excludeNone: false,
-    };
+    props = useProps({
+        ...selectionFieldProps,
+        excludeNone: t.boolean().optional(false),
+    });
 
     setup() {
         super.setup();

@@ -3,8 +3,8 @@
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
 import { useBus, useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, useState, useRef } from "@odoo/owl";
-import { formatDate, deserializeDate } from "@web/core/l10n/dates";
+import { Component, onWillStart, proxy, signal, t, useProps } from "@odoo/owl";
+import { formatDateTime, deserializeDateTime } from "@web/core/l10n/dates";
 import { download } from "@web/core/network/download";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
@@ -12,21 +12,23 @@ export class DocumentsManageVersions extends Component {
     static components = {
         Dialog,
     };
-    static props = {
-        documentId: Number,
-        close: Function,
-    };
     static template = "documents.ManageVersions";
+
+    props = useProps({
+        documentId: t.number(),
+        close: t.function(),
+    });
+
+    uploadFileInputRef = signal.ref();
 
     setup() {
         this.orm = useService("orm");
         this.dialog = useService("dialog");
         this.documentService = useService("document.document");
         this.fileUploadService = useService("file_upload");
-        this.fileInputRef = useRef("uploadFileInput");
-        this.formatDate = (d) => formatDate(deserializeDate(d), { format: "HH:mm DDD" });
+        this.formatDate = (d) => formatDateTime(deserializeDateTime(d), { format: "HH:mm DDD" });
 
-        this.state = useState({ documentName: "", accessToken: "", versions: [] });
+        this.state = proxy({ documentName: "", accessToken: "", versions: [] });
 
         onWillStart(async () => await this.load());
         useBus(this.fileUploadService.bus, "FILE_UPLOAD_LOADED", async () => await this.load());
@@ -63,7 +65,7 @@ export class DocumentsManageVersions extends Component {
     }
 
     onUploadNewVersion() {
-        this.fileInputRef.el.click();
+        this.uploadFileInputRef().click();
     }
 
     async onReplace(ev) {
@@ -84,9 +86,17 @@ export class DocumentsManageVersions extends Component {
     }
 
     async onDelete(attachmentId) {
+        const isCurrentVersion = this.state.versions[0].id === attachmentId;
         return this.dialog.add(ConfirmationDialog, {
-            body: _t("Are you sure you want to delete this attachment?"),
-            confirmLabel: "Delete",
+            title: isCurrentVersion ? _t("Delete Current Version") : _t("Delete File Version"),
+            body: isCurrentVersion
+                ? _t(
+                      "Are you sure you will not need this version? Once deleted, it is gone for good and the previous one will be restored."
+                  )
+                : _t(
+                      "Are you sure you will not need this previous version? Once deleted, it is gone for good."
+                  ),
+            confirmLabel: _t("Yes, delete it"),
             confirm: async () => {
                 await this.orm.call("documents.document", "action_delete_from_history", [
                     this.props.documentId,

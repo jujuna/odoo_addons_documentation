@@ -1,6 +1,7 @@
 import {
     click,
     contains,
+    editInput,
     focus,
     mailModels,
     openFormView,
@@ -10,7 +11,7 @@ import {
     startServer,
 } from "@mail/../tests/mail_test_helpers";
 import { beforeEach, expect, test } from "@odoo/hoot";
-import { queryFirst, manuallyDispatchProgrammaticEvent, waitFor } from "@odoo/hoot-dom";
+import { animationFrame, queryFirst, manuallyDispatchProgrammaticEvent, waitFor, waitForNone } from "@odoo/hoot-dom";
 import { defineModels, onRpc } from "@web/../tests/web_test_helpers";
 import {
     getBoxesData,
@@ -118,6 +119,7 @@ test("basic", async () => {
                     <list editable="bottom">
                         <field name="char_field"/>
                         <field name="date_field"/>
+                        <field name="daterange_field_start" string="Date Range" widget="daterange" options="{'end_date_field': 'daterange_field_end', 'always_range': True}"/>
                         <field name="float_field"/>
                     </list>
                 </field>
@@ -232,15 +234,13 @@ test("basic", async () => {
     await clickOnBox("2020-01-01");
     await contains(dateFieldSelector, { value: "01/01/2020" });
 
-    await focusField(dateFieldSelector);
     rectangularSelection({ x: 0.45, y: 0.15 }, { x: 0.75, y: 0.37 });  // Select boxes "2020-01-15" and "2020-01-03"
     // Selecting multiple values on a date field is invalid, the value should remain unchanged
     await contains(dateFieldSelector, { value: "01/01/2020" });
 
     rectangularSelection({ x: 0.45, y: 0.15 }, { x: 0.75, y: 0.25 });  // Select box "2020-01-15"
     await contains(dateFieldSelector, { value: "01/15/2020" });
-
-    await unfocusField(".o_field_widget[name=date_field]");
+    await unfocusField(dateFieldSelector);
 
     // **** Datetime field ****
     const datetimeFieldSelector = ".o_field_widget[name=datetime_field] input";
@@ -258,7 +258,7 @@ test("basic", async () => {
     rectangularSelection({ x: 0.45, y: 0.15 }, { x: 0.75, y: 0.25 });  // Select box "2020-01-15"
     await contains(datetimeFieldSelector, { value: "01/15/2020 00:00:00" });
 
-    await unfocusField(".o_field_widget[name=datetime_field]");
+    await unfocusField(datetimeFieldSelector);
 
     // **** Many2one field ****
     const many2oneFieldSelector = ".o_field_widget[name=partner_id] input";
@@ -282,34 +282,139 @@ test("basic", async () => {
     await unfocusField(currencyFieldSelector);
 
     // **** One2many field ****
-    await click(".o_field_x2many_list_row_add a");
+    await click(".o_field_x2many_list_row_add button");
     await waitFor(".o_extract_mixin_box", { timeout: 2000 });
+
+    // Check that clicking on a box works properly
+    await focusField(".o_field_one2many .o_field_widget[name=float_field] input");
+    await contains(".o_extract_mixin_box", { count: boxes["number"][0].length });
+    await clickOnBox(123.45);
+    await contains(".o_field_one2many .o_field_widget[name=float_field] input", { value: "123.45" });
 
     // Fill the float column
     await focusField(".o_field_one2many .o_field_widget[name=float_field] input");
     await contains(".o_extract_mixin_box", { count: boxes["number"][0].length });
-    rectangularSelection({ x: 0.85, y: 0.3 }, { x: 1, y: 0.55 }); // Select the column of 3 numbers
-    await contains(".o_field_one2many tr.o_data_row", { count: 3 });  // A line should be created for each number
+    rectangularSelection({ x: 0.85, y: 0.3 }, { x: 1, y: 0.65 }); // Select the column of 5 numbers
+    await contains(".o_field_one2many tr.o_data_row", { count: 5 });  // A line should be created for each number
     await contains(".o_field_one2many .o_field_widget[name=float_field] input", { value: "28.08" });
     await contains(".o_field_one2many tr:nth-of-type(2) td[name=float_field]", { textContent: "19.95" });
     await contains(".o_field_one2many tr:nth-of-type(3) td[name=float_field]", { textContent: "12.00" });
+    await contains(".o_field_one2many tr:nth-of-type(4) td[name=float_field]", { textContent: "168.21" });
+    await contains(".o_field_one2many tr:nth-of-type(5) td[name=float_field]", { textContent: "0.57" });
     await unfocusField(".o_field_one2many .o_field_widget[name=float_field] input");
-
-    // Fill the date column
-    await focusField(".o_field_one2many .o_field_widget[name=date_field] input");
-    await contains(".o_extract_mixin_box", { count: boxes["date"][0].length });
-    rectangularSelection({ x: 0.45, y: 0.3 }, { x: 0.75, y: 0.55 });  // Select the column of dates
-    await contains(".o_field_one2many .o_field_widget[name=date_field] input", { value: "01/03/2020" });
-    await contains(".o_field_one2many tr:nth-of-type(2) td[name=date_field]", { textContent: "Jan 7, 2020" });
-    await contains(".o_field_one2many tr:nth-of-type(3) td[name=date_field]", { textContent: "Jan 13, 2020" });
-    await unfocusField(".o_field_one2many .o_field_widget[name=date_field]");
 
     // Fill the char column
     await focusField(".o_field_one2many .o_field_widget[name=char_field] input");
     await contains(".o_extract_mixin_box", { count: boxes["word"][0].length });
-    rectangularSelection({ x: 0, y: 0.3 }, { x: 0.4, y: 0.55 });  // Select the column of descriptions
+    rectangularSelection({ x: 0, y: 0.3 }, { x: 0.4, y: 0.65 });  // Select the column of descriptions
+    await contains(".o_field_one2many tr.o_data_row", { count: 5 });  // No additional lines should be created
     await contains(".o_field_one2many .o_field_widget[name=char_field] input", { value: "First line" });
     await contains(".o_field_one2many tr:nth-of-type(2) td[name=char_field]", { textContent: "Second line with continuation line" });
     await contains(".o_field_one2many tr:nth-of-type(3) td[name=char_field]", { textContent: "Third line" });
+    await contains(".o_field_one2many tr:nth-of-type(4) td[name=char_field]", { textContent: "Fourth line" });
+    await contains(".o_field_one2many tr:nth-of-type(5) td[name=char_field]", { textContent: "Fifth line" });
     await focusField(".o_field_one2many .o_field_widget[name=char_field] input");
+
+    // Fill the date column by clicking on the column button
+    await focusField(".o_field_one2many .o_field_widget[name=date_field] input");
+    await contains(".o_extract_mixin_box", { count: boxes["date"][0].length });
+    await click(".o_extract_mixin_box_cluster_button");  // Click on the column of dates
+    await contains(".o_field_one2many tr.o_data_row", { count: 5 });  // No additional lines should be created
+    await contains(".o_field_one2many .o_field_widget[name=date_field] input", { value: "01/03/2020" });
+    await contains(".o_field_one2many tr:nth-of-type(2) td[name=date_field]", { textContent: "Jan 7, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(3) td[name=date_field]", { textContent: "Jan 13, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(4) td[name=date_field]", { textContent: "Jan 14, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(5) td[name=date_field]", { textContent: "Jan 15, 2020" });
+    await unfocusField(".o_field_one2many .o_field_widget[name=date_field] input");
+
+    // Manually fill the daterange start date column
+    await editInput(document.body, ".o_field_one2many tr:nth-of-type(1) .o_field_widget[name=daterange_field_start] input:nth-of-type(1)", "01/01/2020");
+    await click(".o_field_one2many tr:nth-of-type(2) .o_field_widget[name=daterange_field_start]");
+    await animationFrame();
+    await editInput(document.body, ".o_field_one2many tr:nth-of-type(2) .o_field_widget[name=daterange_field_start] input:nth-of-type(1)", "01/01/2020");
+    await click(".o_field_one2many tr:nth-of-type(3) .o_field_widget[name=daterange_field_start]");
+    await animationFrame();
+    await editInput(document.body, ".o_field_one2many tr:nth-of-type(3) .o_field_widget[name=daterange_field_start] input:nth-of-type(1)", "01/01/2020");
+    await click(".o_field_one2many tr:nth-of-type(4) .o_field_widget[name=daterange_field_start]");
+    await animationFrame();
+    await editInput(document.body, ".o_field_one2many tr:nth-of-type(4) .o_field_widget[name=daterange_field_start] input:nth-of-type(1)", "01/01/2020");
+    await click(".o_field_one2many tr:nth-of-type(5) .o_field_widget[name=daterange_field_start]");
+    await animationFrame();
+    await editInput(document.body, ".o_field_one2many tr:nth-of-type(5) .o_field_widget[name=daterange_field_start] input:nth-of-type(1)", "01/01/2020");
+
+    // // Fill the daterange end date column
+    await focusField(".o_field_one2many .o_field_widget[name=daterange_field_start] input:nth-of-type(2)");
+    await contains(".o_extract_mixin_box", { count: boxes["date"][0].length });
+    await click(".o_extract_mixin_box_cluster_button");  // Click on the column of dates
+    await animationFrame();
+    await contains(".o_field_one2many tr:nth-of-type(1) .o_field_widget[name=daterange_field_start] span:first-child", { textContent: "Jan 1, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(1) .o_field_widget[name=daterange_field_start] span:nth-of-type(2)", { textContent: "Jan 3, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(2) .o_field_widget[name=daterange_field_start] span:first-child", { textContent: "Jan 1, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(2) .o_field_widget[name=daterange_field_start] span:nth-of-type(2)", { textContent: "Jan 7, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(3) .o_field_widget[name=daterange_field_start] span:first-child", { textContent: "Jan 1, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(3) .o_field_widget[name=daterange_field_start] span:nth-of-type(2)", { textContent: "Jan 13, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(4) .o_field_widget[name=daterange_field_start] span:first-child", { textContent: "Jan 1, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(4) .o_field_widget[name=daterange_field_start] span:nth-of-type(2)", { textContent: "Jan 14, 2020" });
+    await contains(".o_field_one2many tr:nth-of-type(5) .o_field_widget[name=daterange_field_start] button:nth-of-type(1)", { value: "01/01/2020" });
+    await contains(".o_field_one2many tr:nth-of-type(5) .o_field_widget[name=daterange_field_start] input:nth-of-type(1)", { value: "01/15/2020" });
+    await unfocusField(".o_field_one2many tr:nth-of-type(5) .o_field_widget[name=daterange_field_start] input:nth-of-type(1)");
+});
+
+test("focusing on a nested widget inside a json field does not crash", async () => {
+    const pyEnv = await startServer();
+    const recordId = pyEnv["iap_extract.manual.correction"].create({
+        extract_state: "waiting_validation",
+    });
+    const irAttachmentId = pyEnv["ir.attachment"].create({
+        name: "test_image.png",
+        res_model: "iap_extract.manual.correction",
+        res_id: recordId,
+        mimetype: "image/png",
+    });
+    pyEnv["iap_extract.manual.correction"].write([recordId], {
+        extract_attachment_id: irAttachmentId,
+    });
+    pyEnv["mail.message"].create({
+        attachment_ids: [irAttachmentId],
+        model: "iap_extract.manual.correction",
+        res_id: recordId,
+    });
+
+    onRpc("iap_extract.manual.correction", "get_boxes", () => {
+        return boxes;
+    });
+
+    await start();
+    await openFormView("iap_extract.manual.correction", recordId, {
+        arch: `
+        <form js_class="manual_correction_form">
+            <sheet>
+                <group>
+                    <field name="extract_state"/>
+                    <field name="extract_attachment_id"/>
+                    <field name="json_field"/>
+                </group>
+            </sheet>
+            <div class="o_attachment_preview"/>
+            <chatter/>
+        </form>`,
+    });
+    await contains(".o-mail-Attachment-imgContainer");
+
+    // Simulate the DOM structure created by widgets like AnalyticDistribution,
+    // which render nested .o_field_widget elements inside a json field.
+    const jsonWidget = queryFirst(".o_field_widget[name=json_field]");
+    const nestedWidget = document.createElement("div");
+    nestedWidget.className = "o_field_widget";
+    nestedWidget.setAttribute("name", "nested_sub_field");
+    const nestedInput = document.createElement("input");
+    nestedWidget.appendChild(nestedInput);
+    jsonWidget.appendChild(nestedWidget);
+
+    // Focusing on the nested input triggers getBoxType("json_field.nested_sub_field").
+    // Without the fix, this crashes because a json field has no _config property
+    // (only relational fields backed by StaticList/DataPoint have _config).
+    nestedInput.focus();
+    await waitForNone(".o_extract_mixin_box", { timeout: 2000 });
+    await contains(".o_extract_mixin_box", { count: 0 });
 });

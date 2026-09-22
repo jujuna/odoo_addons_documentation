@@ -4,7 +4,7 @@
     <template id="report_payslip_sa" inherit_id="hr_payroll.report_payslip" primary="True">
         <div id="employee_id" position="replace">
             <strong class="me-2">SSN:</strong>
-            <span t-out="('XXX-XX-' + o.employee_id.ssnid[-4:]) if o.employee_id.ssnid else ''"/>
+            <span t-out="('XXX-XX-' + o.employee_id.l10n_sa_ssn[-4:]) if o.employee_id.l10n_sa_ssn else ''"/>
         </div>
 
         <div id="employee_email" position="replace"/>
@@ -29,17 +29,24 @@
 
         <xpath expr="//div[@id='to_pay']" position="replace">
             <div id="to_pay">
-                <t t-if="o.net_wage >= 0">
-                    <t t-set="allocations" t-value="o.compute_salary_allocations()"/>
-                    <t t-foreach="allocations.items()" t-as="alloc">
-                        <t t-set="bank" t-value="o.env['res.partner.bank'].browse(int(alloc[0]))"/>
-                        <p t-if="bank.acc_number">
-                            <span class="fw-bold" t-out="bank.acc_number"/> : 
-                            <span t-out="alloc[1]" t-options='{"widget": "monetary", "display_currency": o.currency_id}' class="fw-bold"/>
-                        </p>
-                    </t>
+                <t t-set="net_to_pay" t-value="o.correction_net_delta if (is_correction and o.origin_payslip_id.state == 'paid') else o.net_wage"/>
+                <t t-if="net_to_pay >= 0">
+                    <t t-set="payments" t-value="o.generate_payments_dict()"/>
+                    <t t-foreach="payments" t-as="payment">
+                    <p>
+                        Paid to
+                        <span class="fw-bold"
+                            t-out="('X' * (len(payment['account_num']) - 4) + payment['account_num'][-4:])
+                                    if payment['account_num'] else 'xxxxxxxxxxxx'"/>
+                        <span t-out="payment['partner']"/>:
+                        <span t-out="payment['amount']"
+                            t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                            class="fw-bold"/>
+                            <br/>
+                    </p>
                 </t>
-                <p t-if="o.net_wage &lt; 0">
+                </t>
+                <p t-else="">
                     The net amount will be recovered from the first positive remuneration established after this.
                 </p>
             </div>
@@ -50,8 +57,7 @@
     <template id="report_payslip_sa_lang">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-set="o" t-value="o.with_context(lang=o.employee_id.lang or o.env.lang)"/>
-                <t t-call="l10n_sa_hr_payroll.report_payslip_sa" t-lang="o.env.lang"/>
+                <t t-call="l10n_sa_hr_payroll.report_payslip_sa"/>
             </t>
         </t>
     </template>
@@ -63,8 +69,7 @@
     <template id="report_advance_and_loan_lang">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-set="o" t-value="o.with_context(lang=o.employee_id.lang or o.env.lang)"/>
-                <t t-call="l10n_sa_hr_payroll.report_advance_and_loan" t-lang="o.env.lang"/>
+                <t t-call="l10n_sa_hr_payroll.report_advance_and_loan"/>
             </t>
         </t>
     </template>

@@ -32,11 +32,11 @@
     </template>
 
     <!-- Generic template to fill details about tax identification for a company
-    To be called with 'o' set as res.partner or res.company
+    To be called with 'o' set as res.partner
     -->
     <template id="tax_id">
         <TaxID>
-            <TaxRegistrationNumber t-out="o.company_registry or ''"/>
+            <TaxRegistrationNumber t-out="o._get_additional_identifier('AT_EN') or ''"/>
             <VATNumber t-if="o.vat" t-out="o.vat"/>
         </TaxID>
     </template>
@@ -61,19 +61,15 @@
     <template id="saft_template_inherit_l10n_at_saft">
         <AuditFile t-attf-xmlns="#{xmlns}">
             <Header>
-                <t t-call="l10n_at_saft.tax_id">
-                    <t t-set="o" t-value="company"/>
-                </t>
+                <t t-call="l10n_at_saft.tax_id" o="company.partner_id"/>
                 <CompanyName t-out="company.name"/>
                 <CompanyAddress>
-                    <t t-call="l10n_at_saft.address">
-                        <t t-set="partner" t-value="company.partner_id"/>
-                    </t>
+                    <t t-call="l10n_at_saft.address" partner="company.partner_id"/>
                 </CompanyAddress>
                 <!-- Exactly 1 <ContactInformation> needed; choose the first one -->
-                <t t-call="l10n_at_saft.contact_information">
-                    <t t-set="contact" t-value="partner_detail_map[company.partner_id.id]['contacts'][0]"/>
-                </t>
+                <t t-call="l10n_at_saft.contact_information"
+                    t-if="partner_detail_map[company.partner_id.id].get('contacts')"
+                    contact="partner_detail_map[company.partner_id.id]['contacts'][0]"/>
                 <TaxAccountingBasis t-out="accounting_basis"/>
                 <TaxEntity t-out="oenace_code"/>
                 <FiscalYear t-out="date_from[:4]"/>
@@ -113,11 +109,9 @@
                         <t t-set="partner" t-value="partner_vals['partner']"/>
                         <AccountID t-out="partner.id"/>
                         <CustomerName t-out="partner.name"/>
-                        <t t-if="partner.company_registry">
+                        <t t-if="partner._get_additional_identifier('AT_EN')">
                             <CustomerTaxID>
-                                <t t-call="l10n_at_saft.tax_id">
-                                    <t t-set="o" t-value="partner"/>
-                                </t>
+                                <t t-call="l10n_at_saft.tax_id" o="partner"/>
                             </CustomerTaxID>
                         </t>
                         <t t-set="customer_addresses" t-value="partner_detail_map[partner.id]['addresses']"/>
@@ -136,11 +130,9 @@
                         <t t-set="partner" t-value="partner_vals['partner']"/>
                         <AccountID t-out="partner.id"/>
                         <SupplierName t-out="partner.name"/>
-                        <t t-if="partner.company_registry">
+                        <t t-if="partner._get_additional_identifier('AT_EN')">
                             <SupplierTaxID>
-                                <t t-call="l10n_at_saft.tax_id">
-                                    <t t-set="o" t-value="partner"/>
-                                </t>
+                                <t t-call="l10n_at_saft.tax_id" o="partner"/>
                             </SupplierTaxID>
                         </t>
                         <Address t-foreach="partner_detail_map[partner.id].get('addresses', [])" t-as="partner">
@@ -153,13 +145,9 @@
                     <OwnerID t-out="company.id"/>
                     <OwnerName t-out="company.name"/>
                     <Address t-foreach="partner_detail_map[company.partner_id.id].get('addresses')" t-as="partner">
-                        <t t-call="l10n_at_saft.address">
-                            <t t-set="partner" t-value="company.partner_id"/>
-                        </t>
+                        <t t-call="l10n_at_saft.address" partner="company.partner_id"/>
                     </Address>
-                    <t t-call="l10n_at_saft.tax_id">
-                        <t t-set="o" t-value="company"/>
-                    </t>
+                    <t t-call="l10n_at_saft.tax_id" o="company.partner_id"/>
                 </Owner>
                 <TaxTable t-foreach="taxtype_dict.keys()" t-as="taxtype">
                     <TaxType  t-out="taxtype"/>
@@ -187,8 +175,8 @@
                         <Description t-out="move_vals['name']"/>
                         <t t-if="move_vals['partner_id']">
                             <t t-set="partner_vals" t-value="partner_detail_map[move_vals['partner_id']]"/>
-                            <CustomerID t-if="partner_vals['type'] == 'customer'" t-out="move_vals['partner_id']"/>
-                            <SupplierID t-if="partner_vals['type'] == 'supplier'" t-out="move_vals['partner_id']"/>
+                            <CustomerID t-if="'customer' in partner_vals['types']" t-out="move_vals['partner_id']"/>
+                            <SupplierID t-if="'supplier' in partner_vals['types']" t-out="move_vals['partner_id']"/>
                         </t>
                         <Line t-foreach="move_vals['line_vals_list']" t-as="line_vals">
                             <RecordID t-out="line_vals['id']"/>

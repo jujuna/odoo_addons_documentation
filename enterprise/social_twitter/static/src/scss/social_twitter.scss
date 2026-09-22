@@ -1,9 +1,38 @@
-.o_social_stream_post_twitter_stats {
-    .o_social_twitter_likes.o_social_twitter_user_likes {
-        @include o-hover-text-color($o-enterprise-color, darken($o-enterprise-color, 10%));
+.o_social_stream_post_twitter_stats,
+.o_social_original_post_twitter_stats {
+    .o_social_twitter_likes {
+        border: $border-width solid transparent;
+        border-radius: 10px;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover {
+            background-color: var(--Social__likes-background-color--hover, rgba($o-enterprise-color, 0.2));
+            color: var(--Social__likes-color--hover, #202e4b);
+        }
     }
-    .o_social_twitter_retweet_icon i.active {
-        @include o-hover-text-color($primary, darken($primary, 10%));
+
+    .o_social_twitter_user_likes {
+        @include o-hover-text-color(var(--Social__likes-color--active, #{$o-enterprise-color}), var(--Social__likes-color--active, #{darken($o-enterprise-color, 10%)}));
+        border-radius: 10px;
+        border: $border-width solid $o-enterprise-color;
+        background-color: var(--Social__likes-background-color--active, rgba($o-enterprise-color, 0.1));
+    }
+}
+
+.o_social_stream_post_twitter_stats {
+    .dropdown:has(.o_social_twitter_retweet_icon) {
+        border-radius: 10px;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover {
+            background-color: var(--Social__likes-background-color--hover, rgba($o-enterprise-color, 0.2));
+        }
+
+        .o_social_subtle_btn {
+            color: var(--Social__likes-color--hover, #202e4b);
+        }
     }
 }
 
@@ -52,14 +81,18 @@
 
 .o_social_twitter_preview {
     --social-twitter-color: #000000;
+
     .o_social_preview_icon_wrapper {
         color: var(--social-twitter-color);
     }
+
     .o_social_twitter_message_exceeding {
         background-color: #fd9bb0;
     }
+
     .o_social_twitter_preview_article {
         margin-top: -2rem;
+
         small {
             background-color: rgba(0, 0, 0, 0.4);
         }
@@ -67,31 +100,27 @@
 }
 
 .o_social_comments_modal_twitter {
-    --social-twitter-color: #000000;
-    a:not(.btn-outline-secondary):not(.o_social_comment_published_date):not(.o_social_post_published_date):not(.dropdown-item) {
-        color: var(--social-twitter-color);
-    }
 
-    a.o_social_original_post_author, a.o_social_comment_author_name {
-        color: #14171a;
-    }
+    a:not(.btn-outline-secondary):not(.o_social_comment_published_date:not(.o_social_post_published_date)):not(.o_social_comment_mention),
+    a.o_social_original_post_author,
+    a.o_social_comment_author_name:not(.dropdown-item) {
 
-    a:not(.btn-outline-secondary):not(.o_social_comment_published_date:not(.o_social_post_published_date)), a.o_social_original_post_author, a.o_social_comment_author_name:not(.dropdown-item) {
         &:hover, &:focus {
-            color: var(--social-twitter-color);
             text-decoration: underline;
         }
     }
 }
 
-.o_social_original_post_twitter_stats {
-    .o_social_twitter_likes.o_social_twitter_user_likes {
-        color: #e0245e;
+.o_social_comments_modal_twitter {
+    .o_social_comment_likes_total.badge {
+        border: $border-width solid $o-enterprise-color;
+        border-radius: 10px;
+        background-color: rgba($o-enterprise-color, 0.1);
+        color: $o-enterprise-color;
     }
 }
 
-.o_social_comments_modal_twitter {
-    .o_social_comment_likes_total.badge {
-        color: #e0245e;
-    }
+.o_stream_post_media_carousel .carousel-item a {
+    max-width: 100%;
+    max-height: 73vh;
 }

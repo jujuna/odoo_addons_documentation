@@ -4,12 +4,10 @@ import { _t } from "@web/core/l10n/translation";
 import { Domain } from "@web/core/domain";
 import { patch } from "@web/core/utils/patch";
 import { PlanningGanttRenderer } from "@planning/views/planning_gantt/planning_gantt_renderer";
-import { useService } from "@web/core/utils/hooks";
 
 patch(PlanningGanttRenderer.prototype, {
     setup() {
         super.setup(...arguments);
-        this.notification = useService("notification");
         this.roleIds = [];
     },
     getPlanDialogDomain() {
@@ -17,11 +15,7 @@ patch(PlanningGanttRenderer.prototype, {
         if (this.roleIds.length) {
             domain = Domain.and([domain, [["role_id", "in", this.roleIds]]]);
         }
-        return Domain.and([
-            domain,
-            [["sale_line_id.state", "!=", "cancel"]],
-            [["sale_line_id", "!=", false]],
-        ]).toList({});
+        return Domain.and([domain, Domain.not([["sale_line_id.state", "=", "cancel"]])]).toList({});
     },
     getSelectCreateDialogProps() {
         const props = super.getSelectCreateDialogProps(...arguments);
@@ -29,27 +23,31 @@ patch(PlanningGanttRenderer.prototype, {
         Object.assign(props.context, {
             default_start_datetime: props.context.start_datetime,
             default_end_datetime: props.context.end_datetime,
-            planning_slots_to_schedule: true,
+            search_default_resource_ids: false,
+            search_default_sale_order_id: props.context.planning_gantt_active_sale_order_id,
         });
         props.noContentHelp = markup`
             <p class="o_view_nocontent_smiling_face">${_t("No shifts found!")}</p>
             <p>${_t(
                 "Assign your sales orders to the right people based on their roles and availability."
             )}</p>`;
-        props.onCreateEdit = () => {
-            this.props.create(props.context);
-        };
         return props;
     },
-    displayFailedPlanningNotification(message) {
-        return this.notification.add(message, { type: "danger" });
-    },
-    openPlanDialogCallback(result) {
-        if (!result) {
-            this.displayFailedPlanningNotification(
-                _t("This resource is not available for this shift during the selected period.")
-            );
+    /**
+     * @override
+     */
+    async updateMultiSelection(block, action) {
+        const { startRow } = block;
+        const rowId = this.rowIdsByFirstRow[startRow];
+        const currentRow = this.rowByIds[rowId];
+        this.roleIds = (currentRow.progressBar?.role_ids) || [];
+        if (this.roleIds.length || !currentRow.resId) {
+            this.model.searchShiftsToPlan(this.getPlanDialogDomain(), true).then((exists) => {
+                this.multiSelectionButtonsReactive.hasAvailableSOL = exists;
+            });
         }
+        delete this.multiSelectionButtonsReactive.hasAvailableSOL;
+        return super.updateMultiSelection(block, action);
     },
     /**
      * @override
@@ -73,7 +71,8 @@ patch(PlanningGanttRenderer.prototype, {
                     false
                 );
                 if (slotIds.length) {
-                    await this.props.model.reschedule(slotIds, schedule, false);
+                    const result = await this.props.model._assignSlot(slotIds, schedule);
+                    this.notifyAssignSlotResult(slotIds, result);
                 } else {
                     this.displayFailedPlanningNotification(
                         _t(
@@ -96,34 +95,5 @@ patch(PlanningGanttRenderer.prototype, {
             return this.onCreate(rowId, columnStart, columnStop);
         }
         super.onPlan(rowId, columnStart, columnStop);
-    },
-    /**
-     * @override
-     */
-    async getPopoverProps(pill) {
-        const popoverProps = await super.getPopoverProps(pill);
-        const { record } = pill;
-        if (record.sale_line_plannable && this.isPlanningManager) {
-            const deleteBtnIndex = popoverProps.buttons.findIndex((btn) =>
-                btn.class.includes("btn-delete")
-            );
-            const unscheduleBtn = {
-                text: _t("Unschedule"),
-                class: "btn btn-secondary",
-                onClick: async () => {
-                    await this.model.orm.call(this.model.metaData.resModel, "action_unschedule", [
-                        record.id,
-                    ]);
-                    await this.model.fetchData(this.model.searchParams);
-                },
-            };
-
-            if (deleteBtnIndex === -1) {
-                popoverProps.buttons.push(unscheduleBtn);
-            } else {
-                popoverProps.buttons.splice(deleteBtnIndex, 0, unscheduleBtn);
-            }
-        }
-        return popoverProps;
     },
 });

@@ -1,5 +1,6 @@
 import json
 
+from odoo import Command
 from odoo.tests import HttpCase, tagged, TransactionCase
 
 
@@ -70,13 +71,33 @@ class TestEpcIntegration(TransactionCase):
         })
         move = self.env['stock.move'].create({
             'product_id': product_serial.id,
-            'product_uom_qty': 30.0,
-            'product_uom': product_serial.uom_id.id,
+            'product_uom_qty': 2.0,
+            'uom_id': product_serial.uom_id.id,
             'location_id': supplier_location.id,
             'location_dest_id': stock_location.id,
             'picking_id': picking.id,
             'state': 'draft',
+            'move_line_ids': [
+                Command.create({
+                    'product_id': product_serial.id,
+                    'uom_id': product_serial.uom_id.id,
+                    'location_id': supplier_location.id,
+                    'location_dest_id': stock_location.id,
+                    'lot_name': 'SN00001',
+                    'quantity': 1.0,
+                }),
+                Command.create({
+                    'product_id': product_serial.id,
+                    'uom_id': product_serial.uom_id.id,
+                    'location_id': supplier_location.id,
+                    'location_dest_id': stock_location.id,
+                    'quantity': 1.0,
+                }),
+            ],
         })
         picking.action_confirm()
-        # move_lines don't have either a lot_id or a lot_name, resulting in an EPC calculation error
-        self.assertIn("Error", move.move_line_ids[0].electronic_product_code)
+        electronic_product_codes = move.move_line_ids.mapped("electronic_product_code")
+        # the move line has a lot_name, so an EPC can be computed
+        self.assertNotIn("Error", electronic_product_codes[0])
+        # this move_line doesn't have either a lot_id or a lot_name, resulting in an EPC calculation error
+        self.assertIn("Error", electronic_product_codes[1])

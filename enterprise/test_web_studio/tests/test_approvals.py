@@ -1,5 +1,6 @@
 from odoo import Command
-from odoo.exceptions import UserError
+from odoo.fields import Domain
+from odoo.exceptions import UserError, AccessError
 
 from odoo.tests.common import TransactionCase, HttpCase, tagged
 from odoo.addons.web_studio.tests.test_ui import setup_view_editor_data
@@ -49,7 +50,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
                 "exclusive_user": True,
             },
             {
@@ -58,7 +59,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
                 "exclusive_user": True,
             },
             {
@@ -77,7 +78,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
                 "exclusive_user": True,
             }
         ])
@@ -123,7 +124,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "domain": "[('step', '<', 1)]",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule 2",
@@ -152,7 +153,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "notification_order": "1",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
         ])
 
@@ -310,7 +311,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "domain": "[('name', '=', 'test')]",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
                 "exclusive_user": True,
             },
             {
@@ -319,7 +320,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
                 "exclusive_user": True,
             },
             {
@@ -361,7 +362,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule 1 - bis",
@@ -370,7 +371,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule 2",
@@ -380,7 +381,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "notification_order": "2",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule3",
@@ -420,7 +421,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule 1 - bis",
@@ -428,7 +429,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule 2",
@@ -437,7 +438,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "notification_order": "2",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
         ])
         with self.with_user("demo"):
@@ -463,7 +464,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule 1 - bis",
@@ -471,7 +472,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule 2",
@@ -480,7 +481,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "notification_order": "2",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
         ])
         with self.with_user("demo"):
@@ -506,7 +507,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule 1 - bis",
@@ -514,7 +515,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "method": "action_confirm",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
             {
                 "name": "rule 2",
@@ -523,7 +524,7 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
                 "notification_order": "2",
                 "approval_group_id": self.env.ref("base.group_user").id,
                 "approver_ids": [Command.link(self.admin_user.id)],
-                "users_to_notify": [Command.link(2)],
+                "users_to_notify": [Command.link(self.ref('base.user_admin'))],
             },
         ])
         with self.with_user("demo"):
@@ -630,6 +631,135 @@ class TestStudioApprovals(TestStudioApprovalsCommon):
         spec = dict(spec["test.studio.model_action"])[model_action.id, "action_step", False]
         self.assertEqual(len(spec["entries"]), 0)
 
+    def test_account_payment_child_rules(self):
+        if "account.move" not in self.env:
+            return self.skipTest("account not installed")
+        self.env.ref("account.group_account_invoice").write({
+            "user_ids": [Command.link(self.test_user_2.id)]
+        })
+        rule = self.env["studio.approval.rule"].create({
+            "model_id": self.env["ir.model"]._get("account.move").id,
+            "method": "action_register_payment",
+            "approver_ids": [Command.link(self.admin_user.id)]
+        })
+        self.assertEqual(rule.child_ids.model_name, "account.move")
+        self.assertEqual(rule.child_ids.method, "action_force_register_payment")
+
+        inv = self.env["account.move"].create({
+            "move_type": "out_invoice",
+            "partner_id": self.env.user.partner_id.id,
+            "line_ids": [Command.create({
+                "price_unit": 3,
+                "quantity": 3
+            })]
+        })
+        inv.action_post()
+
+        # action_force_register_payment is bound by slave rules
+        # to action_register_payment
+        action = inv.with_user(self.admin_user).action_force_register_payment()
+        self.assertEqual(action["type"], "ir.actions.client")
+        self.assertEqual(action["params"]["message"], 'Action disabled due to approval rules')
+
+        # test user not an approver: the action is a display notification
+        action = inv.with_user(self.test_user_2).action_register_payment()
+        self.assertEqual(action["type"], "ir.actions.client")
+        self.assertEqual(action["params"]["message"], "An approval is missing.")
+
+        # admin is an approver: the action is the wizard to register a payment
+        action = inv.with_user(self.admin_user).action_register_payment()
+        self.assertEqual(action["res_model"], "account.payment.register")
+        self.assertEqual(action["type"], "ir.actions.act_window")
+
+    def test_approve_rule_field_no_access_in_domain(self):
+        """
+        Check that if a rule's domain needs to check a field having access rights, it doesn't crash
+        when the user checking the rule doesn't have access to the field
+        """
+        IrModel = self.env["ir.model"]
+        source_model = IrModel._get("test.studio.model_action")
+
+        rule = self.env["studio.approval.rule"].create([
+            {
+                "name": "Rule 1",
+                "model_id": source_model.id,
+                "method": "action_confirm",
+                "approver_ids": [Command.link(self.admin_user.id)],
+                "exclusive_user": True,
+                "domain": [('admin_integer', '<', 10)]
+            }
+        ])
+
+        action_model_record = self.env[source_model.model].create({})
+
+        # Sanity checks
+        self.assertFalse(self.demo_user._is_admin())
+        with self.assertRaises(AccessError):
+            action_model_record.with_user(self.demo_user).admin_integer
+
+        # actual test: the domain of the rule is checked, and is accessing a field
+        # unreadable by a simple user
+        args_list = [{'model': source_model.model, 'method': 'action_confirm', 'action_id': False, 'res_id': action_model_record.id}]
+        result = self.env["studio.approval.rule"].with_user(self.demo_user).get_approval_spec(args_list)
+        self.assertTrue(result)  # just testing to see if it returned a result and not blocked by non-sudo requests
+        action_model_record.with_user(self.demo_user).action_confirm()
+        requests = self.env["studio.approval.request"].search([("rule_id", "=", rule.id), ("res_id", "=", action_model_record.id)])
+        self.assertEqual(len(requests), 1)
+
+    def test_domain_is_cast(self):
+        IrModel = self.env["ir.model"]
+
+        origin_filtered_domain = self.env.registry.get("test.studio.model_action").filtered_domain
+        filter_domain_count = 0
+
+        def mock_filtered_domain(o, domain):
+            self.assertIsInstance(domain, Domain)
+            nonlocal filter_domain_count
+            filter_domain_count += 1
+            return origin_filtered_domain(o, domain)
+
+        self.patch(self.env.registry.get("test.studio.model_action"), "filtered_domain", mock_filtered_domain)
+
+        rules = self.env["studio.approval.rule"].create([
+            {
+                "name": "Rule 1",
+                "model_id": IrModel._get("test.studio.model_action").id,
+                "method": "action_confirm",
+                "approver_ids": [Command.link(self.admin_user.id)],
+                "domain": False,
+            },
+        ])
+        model_action = self.env["test.studio.model_action"].create({
+            "name": "test"
+        })
+        self.assertFalse(model_action.confirmed)
+        spec = self.env["studio.approval.rule"].with_user(self.demo_user).get_approval_spec([dict(model="test.studio.model_action", method="action_confirm", action_id=False, res_id=model_action.id)])
+        self.assertEqual(filter_domain_count, 2)  # one more because of check_access
+        self.assertEqual(spec, {
+            'all_rules':
+            {
+                rules.id: {'id': rules.id, 'name': 'Rule 1', 'message': False, 'exclusive_user': False, 'can_validate': False, 'action_id': False, 'method': 'action_confirm', 'approver_ids': [self.admin_user.id], 'parent_id': False, 'users_to_notify': [], 'approval_group_id': False, 'notification_order': '1', 'domain': False}
+            },
+            'test.studio.model_action': [
+                ((model_action.id, 'action_confirm', False), {'rules': [rules.id], 'entries': []})
+            ]
+        })
+        model_action.with_user(self.demo_user).action_confirm()
+        self.assertEqual(filter_domain_count, 4)
+        self.assertFalse(model_action.confirmed)
+        spec = self.env["studio.approval.rule"].with_user(self.demo_user).get_approval_spec([dict(model="test.studio.model_action", method="action_confirm", action_id=False, res_id=model_action.id)])
+        self.assertEqual(filter_domain_count, 5)
+        self.assertEqual(spec, {
+            'all_rules':
+            {
+                rules.id: {'id': rules.id, 'name': 'Rule 1', 'message': False, 'exclusive_user': False, 'can_validate': False, 'action_id': False, 'method': 'action_confirm', 'approver_ids': [self.admin_user.id], 'parent_id': False, 'users_to_notify': [], 'approval_group_id': False, 'notification_order': '1', 'domain': False}
+            },
+            'test.studio.model_action': [
+                ((model_action.id, 'action_confirm', False), {'rules': [rules.id], 'entries': []})
+            ]
+        })
+
+
 @tagged("-at_install", "post_install")
 class TestStudioApprovalsUIUnit(HttpCase):
     @classmethod
@@ -670,3 +800,15 @@ class TestStudioApprovalsUIUnit(HttpCase):
         url = f"/odoo/action-{self.testAction.id}/studio?mode=editor&_view_type=form&_tab=views&menu_id={self.testMenu.id}"
         self.start_tour(url, "test_web_studio.test_disable_approvals_via_kanban", login="admin")
         self.assertEqual(rule.active, False)
+
+    def test_account_validate_moves(self):
+        if "account.move" not in self.env:
+            return
+        action_to_disable = self.env.ref("account.action_validate_account_moves")
+        self.assertEqual(action_to_disable.binding_model_id.model, "account.move")
+        self.env["studio.approval.rule"].create({
+            "model_id": self.env["ir.model"]._get("account.move").id,
+            "method": "action_post",
+            "approver_ids": [Command.link(self.admin_user.id)]
+        })
+        self.assertFalse(action_to_disable.binding_model_id)

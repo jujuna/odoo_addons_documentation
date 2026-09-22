@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import json
+
 from ast import literal_eval
 from dateutil.relativedelta import relativedelta
 
 from odoo import fields
 from odoo.addons.website_event.tests.common import TestEventOnlineCommon
+from odoo.tests import tagged
+
 from odoo.tools.urls import urljoin as url_join
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestTrackPush(TestEventOnlineCommon):
 
     @classmethod
@@ -36,7 +41,13 @@ class TestTrackPush(TestEventOnlineCommon):
                 'is_wishlisted': True,
                 'track_id': track_1.id
             })],
-            'push_subscription_ids': [(0, 0, {'push_token': 'AAAAAA'})],
+            'push_subscription_ids': [(0, 0, {
+                'endpoint': 'https://fcm.googleapis.com/fcm/send/fake_token_0',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                })
+            })],
             'event_registration_ids': [(0, 0, {
                 'event_id': self.event_0.id
             })]
@@ -47,7 +58,13 @@ class TestTrackPush(TestEventOnlineCommon):
                 'is_wishlisted': True,
                 'track_id': track_1.id
             })],
-            'push_subscription_ids': [(0, 0, {'push_token': 'BBBBBB'})],
+            'push_subscription_ids': [(0, 0, {
+                'endpoint': 'https://fcm.googleapis.com/fcm/send/fake_token_1',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                })
+            })],
             'event_registration_ids': [(0, 0, {
                 'event_id': self.event_0.id
             })]
@@ -60,7 +77,13 @@ class TestTrackPush(TestEventOnlineCommon):
                 'is_wishlisted': True,
                 'track_id': track_2.id
             })],
-            'push_subscription_ids': [(0, 0, {'push_token': 'CCCCCC'})],
+            'push_subscription_ids': [(0, 0, {
+                'endpoint': 'https://fcm.googleapis.com/fcm/send/fake_token_2',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                })
+            })],
             'event_registration_ids': [(0, 0, {
                 'event_id': self.event_0.id
             })]
@@ -80,8 +103,6 @@ class TestTrackPush(TestEventOnlineCommon):
         self.assertEqual(
             url_join(track_1.event_id.get_base_url(), track_1.website_url),
             push_reminder.push_notification_target_url)
-        self.assertEqual('scheduled', push_reminder.post_method)
-        self.assertEqual(False, push_reminder.use_visitor_timezone)
         self.assertEqual(track_1.date - relativedelta(minutes=10), push_reminder.scheduled_date)
 
         targeted_visitors = self.env['website.visitor'].search(literal_eval(push_reminder.visitor_domain))
@@ -114,14 +135,26 @@ class TestTrackPush(TestEventOnlineCommon):
         visitors = self.env['website.visitor'].create([{
             'name': 'Regular Visitor 1',
             'access_token': 'f9d2ee58283634915fa60795172ffcc2',
-            'push_subscription_ids': [(0, 0, {'push_token': 'AAAAAA'})],
+            'push_subscription_ids': [(0, 0, {
+                'endpoint': 'https://fcm.googleapis.com/fcm/send/fake_token_0',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                })
+            })],
             'event_registration_ids': [(0, 0, {
                 'event_id': self.event_0.id
             })]
         }, {
             'name': 'Regular Visitor 2',
             'access_token': 'f9d2c399f328eab40f3b65cf018b2bea',
-            'push_subscription_ids': [(0, 0, {'push_token': 'BBBBBB'})],
+            'push_subscription_ids': [(0, 0, {
+                'endpoint': 'https://fcm.googleapis.com/fcm/send/fake_token_1',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                })
+            })],
             'event_registration_ids': [(0, 0, {
                 'event_id': self.event_0.id
             })]
@@ -134,7 +167,13 @@ class TestTrackPush(TestEventOnlineCommon):
                 'is_blacklisted': True,
                 'track_id': track_1.id
             })],
-            'push_subscription_ids': [(0, 0, {'push_token': 'CCCCCC'})],
+            'push_subscription_ids': [(0, 0, {
+                'endpoint': 'https://fcm.googleapis.com/fcm/send/fake_token_2',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                })
+            })],
             'event_registration_ids': [(0, 0, {
                 'event_id': self.event_0.id
             })]

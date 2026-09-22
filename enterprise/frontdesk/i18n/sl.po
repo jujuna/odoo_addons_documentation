@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-12 15:02+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:29+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-master/"
 "frontdesk/sl/>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: frontdesk
 #. odoo-python
@@ -29,9 +29,10 @@ msgstr ""
 
 #. module: frontdesk
 #. odoo-python
-#: code:addons/frontdesk/models/frontdesk_visitor.py:0
-msgid "%(name)s just checked-in. Requested Drink: %(drink)s."
-msgstr "%(name)sPravkar sem se prijavil. Želena pijača: %(drink)s."
+#: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
+msgid ""
+"%(host_names)s must have a valid Email to be informed about visitor arrival."
+msgstr ""
 
 #. module: frontdesk
 #. odoo-python
@@ -47,12 +48,6 @@ msgstr "%(station)s Prijava: %(visitor)s srečati %(host)s"
 
 #. module: frontdesk
 #. odoo-python
-#: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
-msgid "%s (copy)"
-msgstr "%s (kopija)"
-
-#. module: frontdesk
-#. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%s just checked-in."
 msgstr "%s pravkar sem se prijavil/a."
@@ -63,38 +58,23 @@ msgid "'Badge - %s' % (object.name).replace('/', '')"
 msgstr "'Značka - %s' % (object.name).replace('/', '')"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid ""
-")\n"
-"                        will be notified via email/SMS only, as they are not "
-"available on Discuss."
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid ",<br/>I hope this message finds you well. This is to inform you that"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid ""
-".\n"
-"                    <br/>Please let us know if you would like us to direct "
-"them to a meeting room or if you require any further assistance.\n"
-"                    <br/>After a successful meeting with the visitor, please "
-"proceed to check out their login."
-msgstr ""
-
-#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "22 Oct 24 14:20:10"
 msgstr "22 Okt 24 14:20:10"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_check_out
+#: model:mail.template,body_html:frontdesk.frontdesk_visitor_mail_template
 msgid ""
-"<i class=\"fa fa-check-circle fa-3x d-block mb-3 text-success\"/>\n"
-"                    The visitor has been successfully <br/> checked out"
+"<div>\n"
+"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
+"know you'll be there shortly.\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 msgstr ""
 
 #. module: frontdesk
@@ -112,21 +92,24 @@ msgid "<strong>Visiting:</strong>"
 msgstr "<strong>Obisk:</strong>"
 
 #. module: frontdesk
+#: model:ir.module.module,description:base.module_frontdesk
+msgid ""
+"A comprehensive front desk management system that enables guests to "
+"effortlessly check in and out while ensuring seamless notifications for "
+"hosts."
+msgstr ""
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_needaction
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_needaction
 msgid "Action Needed"
 msgstr "Potreben je ukrep"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__active
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__active
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__active
 msgid "Active"
 msgstr "Aktivno"
-
-#. module: frontdesk
-#: model:ir.actions.client,name:frontdesk.frontdesk_visitor_action_configure_properties_field
-msgid "Add Properties"
-msgstr "Dodaj lastnosti"
 
 #. module: frontdesk
 #: model:res.groups,name:frontdesk.frontdesk_group_administrator
@@ -137,12 +120,7 @@ msgstr "Administrator"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
 msgid "All"
-msgstr "Vse"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "All Employees"
-msgstr "Vsi zaposleni"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
@@ -152,17 +130,10 @@ msgstr "Vsi oddelki"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Allow visitor to select a drink during registration"
-msgstr "Ob registraciji lahko obiskovalec izbere pijačo"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Allows the visitor to pick the host of the meeting from the list"
 msgstr "Obiskovalcu omogoča, da izbere gostitelja sestanka s seznama"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_search
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
@@ -171,37 +142,38 @@ msgid "Archived"
 msgstr "Arhivirano"
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/quick_check_in/quick_check_in.xml:0
-msgid "Are you one of these people?"
-msgstr "Ste eden od teh ljudi?"
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_attachment_count
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_attachment_count
 msgid "Attachment Count"
 msgstr "Število prilog"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__authenticate_guest
-msgid "Authenticate Guest"
-msgstr "Preveri pristnost gosta"
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__auto_checkout_hours
+msgid "Auto-Checkout"
+msgstr ""
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__auto_checkout_time
+msgid "Auto-Checkout Time"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
 #: code:addons/frontdesk/static/src/navbar/navbar.xml:0
 msgid "Back"
-msgstr "Nazaj"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "Best regards,<br/>"
 msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Browse All Hosts"
+msgstr ""
+
+#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Browse Hosts"
 msgstr ""
 
 #. module: frontdesk
@@ -210,18 +182,14 @@ msgid "By Responsible"
 msgstr "Preverjanje pristnosti gostaBy Responsible"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "Cancel"
-msgstr "Prekliči"
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_visitor__state__canceled
-msgid "Cancelled"
-msgstr "Preklicano"
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Change Host"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__check_in
 msgid "Check In"
 msgstr "Prijava"
@@ -232,19 +200,7 @@ msgid "Check Out"
 msgstr "Odjava"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "Check Out Visitor"
-msgstr ""
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
-msgid "Check in"
-msgstr "Prijava"
-
-#. module: frontdesk
+#: model:ir.actions.server,name:frontdesk.action_mass_checkout
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
 msgid "Check out"
@@ -282,8 +238,13 @@ msgid "Checkout"
 msgstr "Zaključi nakup"
 
 #. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Choose how hosts are notified when a guest arrives."
+msgstr ""
+
+#. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Choose who you would like to visit"
 msgstr ""
 
@@ -291,11 +252,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_check_out
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Close"
 msgstr "Zaključi"
 
 #. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__company_id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company_id
 msgid "Company"
@@ -309,31 +272,29 @@ msgid "Company Logo"
 msgstr "Logotip družbe"
 
 #. module: frontdesk
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_config
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid ""
+"Concise summary displayed immediately to the user for quick transparency."
+msgstr ""
+
+#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
 msgid "Configuration"
 msgstr "Nastavitve"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Configure Drinks"
-msgstr "Konfiguriraj pijače"
-
-#. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Continue"
-msgstr "Naprej"
+msgstr ""
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__create_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__create_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__create_uid
 msgid "Created by"
 msgstr "Ustvaril"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__create_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__create_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__create_date
 msgid "Created on"
@@ -350,11 +311,6 @@ msgid "Date"
 msgstr "Datum"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "Dear"
-msgstr "Spoštovani"
-
-#. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "Dear %(visitor_name)s,"
@@ -366,70 +322,10 @@ msgid "Description"
 msgstr "Opis"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__display_name
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__display_name
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__display_name
 msgid "Display Name"
 msgstr "Prikazani naziv"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "Do you want something to drink?"
-msgstr "Bi kaj spil/a?"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_ids
-msgid "Drink"
-msgstr "Pijača"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__drink_image
-msgid "Drink Image"
-msgstr "Slika pijače"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-msgid "Drink Name"
-msgstr "Ime pijače"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__served
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
-msgid "Drink Served"
-msgstr "Pijača postrežena"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/drink_page/drink_page.xml:0
-msgid "Drink image"
-msgstr "Slika pijače"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-msgid "Drink to Serve"
-msgstr "Pijača za postrežbo"
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_drink
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_drinks_report
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__drink_ids
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_drinks_config
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_report_drinks
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_report_view_graph
-msgid "Drinks"
-msgstr "Pijače"
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_open_drink_to_serve_visitor
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_to_serve
-msgid "Drinks to Serve"
-msgstr "Pijače za postrežbo"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-msgid "Drinks to serve"
-msgstr "Pijače za postrežbo"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__duration
@@ -437,15 +333,24 @@ msgid "Duration"
 msgstr "Trajanje"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "E.g. What's your Name"
-msgstr "Npr. Kako ti je ime"
+#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_visitor
+#: model_terms:ir.actions.act_window,help:frontdesk.action_open_guest_on_site_visitor
+#: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
+msgid "Efficiently track and manage all visitor information."
+msgstr ""
 
 #. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_email
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__email
 msgid "Email"
 msgstr "E-pošta"
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__mail_template_id
+msgid "Email Template"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
@@ -459,11 +364,13 @@ msgid "Favorite"
 msgstr "Priljubljeno"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_follower_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_follower_ids
 msgid "Followers"
 msgstr "Sledilci"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_partner_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Sledilci (partnerji)"
@@ -471,6 +378,7 @@ msgstr "Sledilci (partnerji)"
 #. module: frontdesk
 #: model:ir.actions.client,name:frontdesk.frontdesk_action_install_kiosk_pwa
 #: model:ir.model,name:frontdesk.model_frontdesk_frontdesk
+#: model:ir.module.module,shortdesc:base.module_frontdesk
 #: model:ir.ui.menu,name:frontdesk.frontdesk_menu_root
 #: model:res.groups.privilege,name:frontdesk.res_groups_privilege_frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
@@ -478,9 +386,9 @@ msgid "Frontdesk"
 msgstr "Recepcija"
 
 #. module: frontdesk
-#: model:ir.model,name:frontdesk.model_frontdesk_drink
-msgid "Frontdesk Drink"
-msgstr "Pijača na recepciji"
+#: model:mail.template,name:frontdesk.frontdesk_visitor_mail_template
+msgid "Frontdesk Email Template"
+msgstr ""
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__name
@@ -488,20 +396,32 @@ msgid "Frontdesk Name"
 msgstr "Ime na recepciji"
 
 #. module: frontdesk
-#: model:sms.template,name:frontdesk.frontdesk_sms_template
-msgid "Frontdesk SMS Template"
-msgstr "Predloga za SMS na recepciji"
+#: model:ir.model,name:frontdesk.model_frontdesk_visitor
+msgid "Frontdesk Visitor"
+msgstr ""
 
 #. module: frontdesk
-#: model:ir.model,name:frontdesk.model_frontdesk_visitor
-msgid "Frontdesk Visitors"
-msgstr "Obiskovalci recepcije"
+#: model:ir.actions.server,name:frontdesk.cron_auto_checkout_visitors_ir_actions_server
+msgid "Frontdesk: Auto-Checkout Visitors"
+msgstr ""
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid ""
+"Full legal disclosure covering storage, rights, and contact info (accessible "
+"via click)."
+msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
 msgid "Go back"
 msgstr "Nazaj"
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__authenticate_guest
+msgid "Guest Details"
+msgstr ""
 
 #. module: frontdesk
 #: model:ir.actions.act_window,name:frontdesk.action_open_guest_on_site_visitor
@@ -514,22 +434,10 @@ msgid "Guests On Site"
 msgstr "Gosti na lokaciji"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__has_message
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__has_message
 msgid "Has Message"
 msgstr "Ima sporočilo"
-
-#. module: frontdesk
-#: model:sms.template,body:frontdesk.frontdesk_sms_template
-msgid ""
-"Hello, Your visitor {{ object.name }} {{ '(%s)' % object.phone if "
-"object.phone else '' }} {{ '(%s)' % object.company if object.company else "
-"'' }} wants to meet you at {{ object.station_id.name }}. Please let them "
-"know you'll be there shortly."
-msgstr ""
-"Pozdravljeni, Vaš obiskovalec {{ object.name }} {{ '(%s)' % object.phone if "
-"object.phone else '' }} {{ '(%s)' % object.company if object.company else "
-"'' }} se želi srečati z vami {{ object.station_id.name }}. Prosim, sporočite "
-"jim, da boste kmalu tam."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
@@ -551,13 +459,19 @@ msgstr "Gostitelj"
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Host Avatar"
 msgstr ""
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__host_ids
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__host_id
 msgid "Host Name"
 msgstr "Ime gostitelja"
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Host Notifications"
+msgstr ""
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__host_selection
@@ -566,28 +480,25 @@ msgstr "Izbira gostitelja"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__host_ids
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__station_host_ids
 msgid "Hosts"
 msgstr ""
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/drink_page/drink_page.xml:0
-msgid "How can we delight you?"
-msgstr "Kako vas lahko razveselimo?"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__id
 msgid "ID"
 msgstr "ID"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_needaction
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "Če je označeno, zahtevajo nova sporočila vašo pozornost."
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_error
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_sms_error
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_has_error
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
@@ -604,11 +515,20 @@ msgid "Install"
 msgstr "Namesti"
 
 #. module: frontdesk
+#. odoo-python
+#: code:addons/frontdesk/controllers/main.py:0
+msgid ""
+"Invalid domain. Allowed filters are: department_id with '=' and display_name "
+"with 'ilike'."
+msgstr ""
+
+#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__is_favorite
 msgid "Is Favorite"
 msgstr "Je priljubljen"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_is_follower
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_is_follower
 msgid "Is Follower"
 msgstr "Je sledilec"
@@ -617,11 +537,6 @@ msgstr "Je sledilec"
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Karen"
 msgstr "Karen"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-msgid "Kiosk"
-msgstr "Kiosk"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__kiosk_url
@@ -641,14 +556,12 @@ msgid "Last Check-In: %s minutes ago"
 msgstr "Zadnja prijava:  %s pred minutami"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__write_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__write_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__write_uid
 msgid "Last Updated by"
 msgstr "Zadnji posodobil"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__write_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__write_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__write_date
 msgid "Last Updated on"
@@ -684,17 +597,13 @@ msgid "MY PVT LTD"
 msgstr "Moje zasebne družbe z omejeno odgovornostjo"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "Message"
-msgstr "Sporočilo"
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_error
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_has_error
 msgid "Message Delivery error"
 msgstr "Napaka pri dostavi sporočila"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_ids
 msgid "Messages"
 msgstr "Sporočila"
@@ -705,59 +614,33 @@ msgid "My Station"
 msgstr "Moja postaja"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__name
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__name
 msgid "Name"
 msgstr "Naziv"
 
 #. module: frontdesk
-#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_drink
-msgid "No drinks to offer to visitors. Let's add one!"
-msgstr "Obiskovalcem ni pijače. Dodajmo eno!"
+#: model:res.groups.privilege,placeholder:frontdesk.res_groups_privilege_frontdesk
+msgid "No"
+msgstr ""
 
 #. module: frontdesk
 #: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_frontdesk
-#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_frontdesk_tree
 msgid "No stations found. Let's create one!"
 msgstr "Ni najdenih postaj. Ustvarimo eno!"
 
 #. module: frontdesk
 #: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_drink_to_serve_visitor
 #: model_terms:ir.actions.act_window,help:frontdesk.action_open_guest_on_site_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_planned_visitor
 #: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
 msgid "No visitors yet. Let's add one!"
 msgstr "Še ni obiskovalcev. Dodajmo enega!"
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "No, thank you"
-msgstr "Ne, hvala."
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_company__none
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__none
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__none
-msgid "None"
-msgstr "Brez"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/drink_page/drink_page.xml:0
-msgid "Nothing, thanks."
-msgstr "Nič, hvala."
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_warning
-msgid "Notify Warning"
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Notify by Email"
 msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_sms
-msgid "Notify by SMS"
-msgstr "Obvesti prek SMS-a"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_discuss
@@ -770,44 +653,28 @@ msgid "Notify by email"
 msgstr "Obvesti po e-pošti"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Notify the host on guest arrival"
-msgstr "Obvestite gostitelja o prihodu gosta"
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_needaction_counter
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_needaction_counter
 msgid "Number of Actions"
 msgstr "Število aktivnosti"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_error_counter
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_has_error_counter
 msgid "Number of errors"
 msgstr "Število napak"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_needaction_counter
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "Število sporočil, ki zahtevajo ukrepanje"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_error_counter
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Število sporočil, ki niso bila pravilno dostavljena."
-
-#. module: frontdesk
-#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_drink_to_serve_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_guest_on_site_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_planned_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
-msgid "Odoo helps you to track all information related to your visitors."
-msgstr ""
-"Odoo vam pomaga slediti vsem informacijam, povezanim z vašimi obiskovalci."
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_offer
-msgid "Offer Drinks"
-msgstr "Ponudba pijač"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
@@ -825,57 +692,17 @@ msgid "Open Kiosk"
 msgstr "Odpri kiosk"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Open host chat window when guest arrives"
-msgstr "Odpri okno za klepet gostitelja, ko gost prispe"
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_company__optional
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__optional
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__optional
-msgid "Optional"
-msgstr "Neobvezno"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Options"
-msgstr "Možnosti"
-
-#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_company
 msgid "Organization"
 msgstr "Organizacija"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__pending
-msgid "Pending"
-msgstr "Nerešeno"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__notify_user_ids
-msgid "People to Notify"
-msgstr "Osebe, ki jih je treba obvestiti"
-
-#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_phone
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__phone
 msgid "Phone"
 msgstr "Telefon"
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_open_planned_visitor
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_visitor__state__planned
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-msgid "Planned"
-msgstr "Planirano"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/end_page/end_page.xml:0
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "Please have a seat."
-msgstr "Prosim, sedite."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_qr_expired
@@ -893,11 +720,16 @@ msgid "Print Visitor Badge"
 msgstr "Natisni značko za obiskovalce"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__visitor_properties
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
-msgid "Properties"
-msgstr "Lastnosti"
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__privacy_notice
+msgid "Privacy Notice"
+msgstr ""
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__privacy_notice_details
+msgid "Privacy Notice Details"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
@@ -911,32 +743,27 @@ msgid "QR Code Expired."
 msgstr "QR koda je potekla."
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/quick_check_in/quick_check_in.xml:0
-msgid "Quick Check In"
-msgstr "Hitra prijava"
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__rating_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__rating_ids
 msgid "Ratings"
 msgstr "Ocene"
 
 #. module: frontdesk
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_report
-msgid "Reporting"
-msgstr "Poročanje"
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Read More"
+msgstr ""
+
+#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Read more"
+msgstr ""
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Request additional information upon registering"
 msgstr "Zahtevajte dodatne informacije ob registraciji"
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_company__required
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__required
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__required
-msgid "Required"
-msgstr "Obvezno"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
@@ -950,9 +777,7 @@ msgstr "Odgovorne osebe"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__responsible_ids
-msgid ""
-"Responsibles are people who will welcome the client and handle their drinks, "
-"etc."
+msgid "Responsibles are notified if no host is selected."
 msgstr ""
 
 #. module: frontdesk
@@ -961,14 +786,10 @@ msgid "Restrict the hosts available from the client to choose from."
 msgstr ""
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_sms_error
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Napaka pri dostavi SMS"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__sms_template_id
-msgid "SMS Template"
-msgstr "SMS predloga"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -989,8 +810,13 @@ msgstr "Varnostni žeton"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Select Host"
+msgstr ""
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Select Hosts"
 msgstr ""
 
 #. module: frontdesk
@@ -1000,42 +826,24 @@ msgid "Select or create a station on the fly from where the visitor arrived."
 msgstr "Sproti izberite ali ustvarite postajo, od koder je obiskovalec prišel."
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Select the color of the Desk"
-msgstr "Izberite barvo pisalne mize"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
-msgid "Selected host:"
-msgstr ""
-
-#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__self_check_in
 msgid "Self Check-In"
 msgstr "Samopostrežna prijava"
 
 #. module: frontdesk
+#: model:mail.template,description:frontdesk.frontdesk_visitor_mail_template
+msgid "Sent to hosts on guest arrival"
+msgstr ""
+
+#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Send an SMS to the host on guest arrival"
-msgstr "Pošljite SMS gostitelju ob prihodu gosta"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__sequence
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-msgid "Sequence"
-msgstr "Zaporedje"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "Set as Planned"
+msgid "Settings"
 msgstr ""
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Show a QR code on the welcome screen to check-in from mobile"
-msgstr ""
-"Za prijavo z mobilnega telefona prikažite kodo QR na pozdravnem zaslonu"
+msgstr "Za prijavo z mobilnega telefona prikažite kodo QR na pozdravnem zaslonu"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__self_check_in
@@ -1050,11 +858,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Side Message"
 msgstr "Stransko sporočilo"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Some employees ("
-msgstr ""
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__station_id
@@ -1074,17 +877,9 @@ msgstr "Obiskovalci postaje"
 
 #. module: frontdesk
 #: model:ir.actions.act_window,name:frontdesk.action_frontdesk_frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_frontdesk_tree
 #: model:ir.ui.menu,name:frontdesk.frontdesk_menu_stations
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_stations_config
 msgid "Stations"
 msgstr "Postaje"
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_station_report
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-msgid "Statistics"
-msgstr "Statistike"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__state
@@ -1096,7 +891,7 @@ msgstr "Status"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "Thank you for registering!"
-msgstr "Hvala za registracijo!"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-python
@@ -1105,14 +900,19 @@ msgid "Thanks for your understanding."
 msgstr ""
 
 #. module: frontdesk
+#: model:ir.model.constraint,message:frontdesk.constraint_frontdesk_frontdesk_check_auto_checkout_positive
+msgid "The Auto-Checkout value should be positive."
+msgstr ""
+
+#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__theme
 msgid "Theme"
 msgstr "Tema"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-msgid "Today"
-msgstr "Danes"
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__image
+msgid "This image will be used as the kiosk background."
+msgstr ""
 
 #. module: frontdesk
 #: model:res.groups,name:frontdesk.frontdesk_group_user
@@ -1131,17 +931,22 @@ msgid "Visitor Company"
 msgstr "Obiskovalno podjetje"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__visitor_properties_definition
-msgid "Visitor Properties"
-msgstr "Lastnosti za obiskovalce"
+#: model:ir.module.module,summary:base.module_frontdesk
+msgid "Visitor management system"
+msgstr ""
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid ""
+"Visitor sessions expire automatically after the predefined duration. Leave "
+"to 0 to disable."
+msgstr ""
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
 #: model:ir.actions.act_window,name:frontdesk.action_frontdesk_visitor
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_visitors_report
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__visitor_ids
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_report_visitors
 #: model:ir.ui.menu,name:frontdesk.frontdesk_menu_visitors
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_station_report_view_graph
@@ -1160,20 +965,10 @@ msgid ""
 msgstr ""
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__website_message_ids
-msgid "Website Messages"
-msgstr "Sporočila iz spletne strani"
-
-#. module: frontdesk
-#: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__website_message_ids
-msgid "Website communication history"
-msgstr "Kronologija komunikacij spletne strani"
-
-#. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Welcome to"
-msgstr "Dobrodošli"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1193,12 +988,6 @@ msgid "Write message..."
 msgstr "Napiši sporočilo ..."
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "Yes, please"
-msgstr "Da, prosim"
-
-#. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid ""
@@ -1214,39 +1003,14 @@ msgstr "Registrirani ste!"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Company"
-msgstr "Vaše podjetje"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Email"
-msgstr "Vaša e-pošta"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Name"
-msgstr "Vaše ime"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Phone Number"
-msgstr "Vaša telefonska številka"
-
-#. module: frontdesk
-#. odoo-python
-#: code:addons/frontdesk/models/frontdesk_visitor.py:0
-msgid "Your Visitor %(name)s Requested To Meet You"
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Your Information"
 msgstr ""
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/end_page/end_page.xml:0
-msgid "Your drink is on the way."
-msgstr "Vaša pijača je na poti."
+#: model:mail.template,subject:frontdesk.frontdesk_visitor_mail_template
+msgid "Your Visitor {{ object.name }} Requested To Meet You"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-python
@@ -1255,45 +1019,29 @@ msgid "Your host isn't available"
 msgstr ""
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid ""
-"and is here for their scheduled meeting with you.\n"
-"                    They are currently waiting in the"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-msgid "e.g. Coca-Cola"
-msgstr "npr. Coca-Cola"
-
-#. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
 msgid "e.g. John Doe"
 msgstr "npr. Janez Novak"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "e.g. My Company"
 msgstr "npr. Moje podjetje"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "e.g. john@company.com"
 msgstr "npr. john@company.com"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "has arrived from"
-msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
-msgstr "je bil obveščen."
+msgstr ""
 
 #. module: frontdesk
 #. odoo-python
@@ -1308,13 +1056,177 @@ msgid "hosts are"
 msgstr ""
 
 #. module: frontdesk
-#. odoo-python
-#: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
-msgid "station_id.id"
-msgstr "postaja_id.id"
-
-#. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
 msgid "will get back to you."
-msgstr "se vam bom oglasil/a."
+msgstr ""
+
+#~ msgid "Cancelled"
+#~ msgstr "Preklicano"
+
+#~ msgid "Frontdesk SMS Template"
+#~ msgstr "Predloga za SMS na recepciji"
+
+#~ msgid ""
+#~ "Hello, Your visitor {{ object.name }} {{ '(%s)' % object.phone if "
+#~ "object.phone else '' }} {{ '(%s)' % object.company if object.company else "
+#~ "'' }} wants to meet you at {{ object.station_id.name }}. Please let them "
+#~ "know you'll be there shortly."
+#~ msgstr ""
+#~ "Pozdravljeni, Vaš obiskovalec {{ object.name }} {{ '(%s)' % object.phone "
+#~ "if object.phone else '' }} {{ '(%s)' % object.company if object.company "
+#~ "else '' }} se želi srečati z vami {{ object.station_id.name }}. Prosim, "
+#~ "sporočite jim, da boste kmalu tam."
+
+#~ msgid "Notify by SMS"
+#~ msgstr "Obvesti prek SMS-a"
+
+#~ msgid "SMS Template"
+#~ msgstr "SMS predloga"
+
+#~ msgid "Website Messages"
+#~ msgstr "Sporočila iz spletne strani"
+
+#~ msgid "Website communication history"
+#~ msgstr "Kronologija komunikacij spletne strani"
+
+#~ msgid "%(name)s just checked-in. Requested Drink: %(drink)s."
+#~ msgstr "%(name)sPravkar sem se prijavil. Želena pijača: %(drink)s."
+
+#~ msgid "Add Properties"
+#~ msgstr "Dodaj lastnosti"
+
+#~ msgid "All Employees"
+#~ msgstr "Vsi zaposleni"
+
+#~ msgid "Allow visitor to select a drink during registration"
+#~ msgstr "Ob registraciji lahko obiskovalec izbere pijačo"
+
+#~ msgid "Are you one of these people?"
+#~ msgstr "Ste eden od teh ljudi?"
+
+#~ msgid "Authenticate Guest"
+#~ msgstr "Preveri pristnost gosta"
+
+#~ msgid "Cancel"
+#~ msgstr "Prekliči"
+
+#~ msgid "Check in"
+#~ msgstr "Prijava"
+
+#~ msgid "Configure Drinks"
+#~ msgstr "Konfiguriraj pijače"
+
+#~ msgid "Dear"
+#~ msgstr "Spoštovani"
+
+#~ msgid "Do you want something to drink?"
+#~ msgstr "Bi kaj spil/a?"
+
+#~ msgid "Drink"
+#~ msgstr "Pijača"
+
+#~ msgid "Drink Image"
+#~ msgstr "Slika pijače"
+
+#~ msgid "Drink Name"
+#~ msgstr "Ime pijače"
+
+#~ msgid "Drink Served"
+#~ msgstr "Pijača postrežena"
+
+#~ msgid "Drink image"
+#~ msgstr "Slika pijače"
+
+#~ msgid "Drink to Serve"
+#~ msgstr "Pijača za postrežbo"
+
+#~ msgid "Drinks"
+#~ msgstr "Pijače"
+
+#~ msgid "Drinks to Serve"
+#~ msgstr "Pijače za postrežbo"
+
+#~ msgid "Drinks to serve"
+#~ msgstr "Pijače za postrežbo"
+
+#~ msgid "E.g. What's your Name"
+#~ msgstr "Npr. Kako ti je ime"
+
+#~ msgid "Frontdesk Drink"
+#~ msgstr "Pijača na recepciji"
+
+#~ msgid "How can we delight you?"
+#~ msgstr "Kako vas lahko razveselimo?"
+
+#~ msgid "Kiosk"
+#~ msgstr "Kiosk"
+
+#~ msgid "Message"
+#~ msgstr "Sporočilo"
+
+#~ msgid "No drinks to offer to visitors. Let's add one!"
+#~ msgstr "Obiskovalcem ni pijače. Dodajmo eno!"
+
+#~ msgid "No, thank you"
+#~ msgstr "Ne, hvala."
+
+#~ msgid "None"
+#~ msgstr "Brez"
+
+#~ msgid "Nothing, thanks."
+#~ msgstr "Nič, hvala."
+
+#~ msgid "Offer Drinks"
+#~ msgstr "Ponudba pijač"
+
+#~ msgid "Optional"
+#~ msgstr "Neobvezno"
+
+#~ msgid "Options"
+#~ msgstr "Možnosti"
+
+#~ msgid "Pending"
+#~ msgstr "Nerešeno"
+
+#~ msgid "People to Notify"
+#~ msgstr "Osebe, ki jih je treba obvestiti"
+
+#~ msgid "Planned"
+#~ msgstr "Planirano"
+
+#~ msgid "Properties"
+#~ msgstr "Lastnosti"
+
+#~ msgid "Quick Check In"
+#~ msgstr "Hitra prijava"
+
+#~ msgid "Reporting"
+#~ msgstr "Poročanje"
+
+#~ msgid "Required"
+#~ msgstr "Obvezno"
+
+#~ msgid "Select the color of the Desk"
+#~ msgstr "Izberite barvo pisalne mize"
+
+#~ msgid "Send an SMS to the host on guest arrival"
+#~ msgstr "Pošljite SMS gostitelju ob prihodu gosta"
+
+#~ msgid "Sequence"
+#~ msgstr "Zaporedje"
+
+#~ msgid "Statistics"
+#~ msgstr "Statistike"
+
+#~ msgid "Visitor Properties"
+#~ msgstr "Lastnosti za obiskovalce"
+
+#~ msgid "Yes, please"
+#~ msgstr "Da, prosim"
+
+#~ msgid "e.g. Coca-Cola"
+#~ msgstr "npr. Coca-Cola"
+
+#~ msgid "station_id.id"
+#~ msgstr "postaja_id.id"

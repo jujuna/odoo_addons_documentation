@@ -50,17 +50,17 @@
                 <div role="alert" class="alert alert-warning d-flex flex-wrap gap-3"
                     invisible="not planning_overlap">
                     <div class="d-flex align-items-center">
-                        <i class="fa fa-random me-2" role="img" title="Planning overlap"/>
+                        <i class="oi me-2" data-icon="shuffle" role="img" title="Planning overlap"/>
                         <field name="planning_overlap" widget="html"  nolabel="1" class="m-0"/>
                     </div>
                     <a name="action_fsm_view_overlapping_tasks" type="object" class="alert-link ms-auto" invisible="not planning_overlap">
-                        Check it out <i class="oi oi-chevron-right ms-2"/>
+                        Check it out <i class="oi ms-2" data-icon="chevron_forward"/>
                     </a>
                 </div>
                 <div role="alert"
                     class="alert alert-warning d-flex align-items-center"
                     invisible="not dependency_warning">
-                        <i class="fa fa-exclamation-circle me-2" role="img" title="Dependency warning"/>
+                        <i class="oi me-2" data-icon="error" role="img" title="Dependency warning"/>
                         <field name="dependency_warning" widget="html" class="m-0"/>
                 </div>
             </xpath>
@@ -104,17 +104,17 @@
                 <footer>
                     <button string="Save" special="save" data-hotkey="q" class="btn btn-primary" close="1"/>
                     <button name="action_unschedule_task" string="Unschedule" type="object" data-hotkey="u" class="btn btn-secondary" close="1" invisible="not id"/>
-                    <button string="Discard" special="cancel" data-hotkey="x" class="btn btn-secondary" close="1"/>
+                    <button special="cancel" data-hotkey="x" class="btn btn-secondary" close="1"/>
                 </footer>
             </xpath>
         </field>
     </record>
 
-    <record id="view_task_kanban_inherited_project_enterprise" model="ir.ui.view">
-        <field name="name">project.task.kanban.project.enterprise</field>
+    <record id="view_task_card_inherit" model="ir.ui.view">
+        <field name="name">project.task.card.project.enterprise</field>
         <field name="model">project.task</field>
         <field name="mode">primary</field>
-        <field name="inherit_id" ref="project.view_task_kanban"/>
+        <field name="inherit_id" ref="project.view_task_card"/>
         <field name="arch" type="xml">
             <xpath expr="//t[@t-if='record.project_id.raw_value and record.subtask_count.raw_value']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -129,8 +129,8 @@
         <field name="priority">10</field>
         <field name="arch" type="xml">
             <gantt date_start="planned_date_begin"
+                schedule="1"
                 form_view_id="%(project_task_view_form_in_gantt)d"
-                kanban_view_id="%(view_task_kanban_inherited_project_enterprise)d"
                 date_stop="date_deadline"
                 default_scale="month"
                 scales="day,week,month,quarter,year"
@@ -146,13 +146,13 @@
                 total_row="True"
                 dependency_field="depend_on_ids"
                 dependency_inverted_field="dependent_ids">
-                <templates>
-                    <div t-name="gantt-popover">
-                        <footer replace="0">
-                           <button name="action_unschedule_task" type="object" string="Unschedule" class="btn btn-sm btn-secondary"/>
-                        </footer>
-                    </div>
-                </templates>
+                <popover card_id="%(project_enterprise.view_task_card_inherit)d">
+                    <templates>
+                        <t t-name="popover-footer" replace="0">
+                            <button name="action_unschedule_task" type="object" string="Unschedule" class="btn btn-sm btn-secondary"/>
+                        </t>
+                    </templates>
+                </popover>
             </gantt>
         </field>
     </record>
@@ -181,18 +181,6 @@
         </field>
     </record>
 
-    <record id="project_task_gantt_view_project_milestone" model="ir.ui.view">
-        <field name="name">project.task.my.gantt.inherit.project.milestone</field>
-        <field name="model">project.task</field>
-        <field name="inherit_id" ref="view_task_gantt_inherit_my_task"/>
-        <field name="mode">primary</field>
-        <field name="arch" type="xml">
-            <xpath expr="//gantt" position="attributes">
-                <attribute name="default_group_by">milestone_id</attribute>
-            </xpath>
-        </field>
-    </record>
-
     <record id="project_task_dependency_view_gantt" model="ir.ui.view">
         <field name="name">project.task.dependency.view.gantt</field>
         <field name="model">project.task</field>
@@ -200,7 +188,7 @@
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <xpath expr="//gantt" position="attributes">
-                <attribute name="color">stage_id_color</attribute>
+                <attribute name="color">color</attribute>
                 <attribute name="display_mode">sparse</attribute>
             </xpath>
         </field>
@@ -212,7 +200,7 @@
         <field name="model">project.task</field>
         <field name="priority">12</field>
         <field name="arch" type="xml">
-            <map res_partner="partner_id" default_order="sequence, planned_date_begin" allow_resequence="true" routing="1" js_class="project_task_map">
+            <map res_partner="partner_id" default_order="sequence, planned_date_begin" routing="optimized" js_class="project_task_map">
                 <field name="partner_id" string="Customer"/>
                 <field name="project_id" string="Project"/>
                 <field name="milestone_id" string="Milestone"/>
@@ -227,7 +215,7 @@
         <field name="model">project.task</field>
         <field name="priority">12</field>
         <field name="arch" type="xml">
-            <map res_partner="partner_id" default_order="sequence, planned_date_begin" allow_resequence="true" routing="1" js_class="project_task_map">
+            <map res_partner="partner_id" default_order="sequence, planned_date_begin" routing="optimized" js_class="project_task_map">
                 <field name="partner_id" string="Customer"/>
                 <field name="milestone_id" string="Milestone"/>
                 <field name="user_names" string="Assignees"/>
@@ -383,13 +371,6 @@
         <field name="view_mode">gantt</field>
         <field name="act_window_id" ref="project.project_task_action_from_partner"/>
         <field name="view_id" ref="project_task_view_gantt_res_partner"/>
-    </record>
-
-    <record id="project_milestone_action_view_tasks_gantt" model="ir.actions.act_window.view">
-        <field name="act_window_id" ref="project.project_milestone_action_view_tasks"/>
-        <field name="sequence" eval="50"/>
-        <field name="view_mode">gantt</field>
-        <field name="view_id" ref="project_task_gantt_view_project_milestone"/>
     </record>
 
 </odoo>

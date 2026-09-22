@@ -40,6 +40,30 @@ class WhatsappTestBase(models.Model):
         return super()._wa_get_safe_phone_fields() + ['customer_id.phone', 'guest_ids.phone']
 
 
+class WhatsappTestBaseTemplate(models.Model):
+    """ Test model extending the base WhatsApp template for testing purposes. """
+    _name = 'whatsapp.test.base.template'
+    _description = 'WhatsApp Base Template Test'
+    _inherit = ['whatsapp.base.template']
+
+
+class WhatsappTestNophone(models.Model):
+    """ Same as base test model but without phone field """
+    _name = 'whatsapp.test.nophone'
+    _description = 'WhatsApp No Phone Field Test'
+
+    name = fields.Char('Name')
+    country_id = fields.Many2one('res.country', 'Country')
+    customer_id = fields.Many2one('res.partner', 'Customer')
+    user_id = fields.Many2one('res.users', string="Salesperson")
+
+    def _mail_get_partner_fields(self, introspect_fields=False):
+        return ['customer_id']
+
+    def _wa_get_safe_phone_fields(self):
+        return super()._wa_get_safe_phone_fields() + ['customer_id.phone']
+
+
 class WhatsappTestNothread(models.Model):
     """ Same as base test model but with no way to get a responsible. """
     _name = 'whatsapp.test.nothread'

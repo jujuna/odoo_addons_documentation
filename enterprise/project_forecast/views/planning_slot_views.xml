@@ -6,8 +6,20 @@
         <field name="inherit_id" ref="planning.planning_view_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='role_id']" position="after">
-                <field name="project_id" optional="show" options="{'no_open': True}"/>
+                <field name="project_id" readonly="not can_edit" optional="show" options="{'no_open': True}" placeholder="None"/>
+                <field name="task_id" readonly="not can_edit" optional="hide" context="{'default_project_id': project_id}" options="{'no_open': True}" placeholder="None"/>
             </xpath>
+        </field>
+    </record>
+
+    <record id="planning_slot_view_list_service_requests" model="ir.ui.view">
+        <field name="name">planning.slot.view.list.service.requests.inherit.project.forecast</field>
+        <field name="model">planning.slot</field>
+        <field name="inherit_id" ref="planning.planning_slot_view_list_service_requests"/>
+        <field name="arch" type="xml">
+            <field name="project_id" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
         </field>
     </record>
 
@@ -16,36 +28,39 @@
         <field name="model">planning.slot</field>
         <field name="inherit_id" ref="planning.planning_view_form"/>
         <field name="arch" type="xml">
-
-            <xpath expr="//field[@name='role_id']" position="after">
-                <field name="project_id" groups="!project.group_project_user" options="{'no_open': True}"/>
-                <field name="project_id" groups="project.group_project_user"/>
+            <xpath expr="//field[@name='resource_ids']" position="after">
+                <label for="project_id"/>
+                <div name="project_id_div">
+                    <field name="project_id" readonly="not can_edit" groups="!project.group_project_user" options="{'no_open': True}"/>
+                    <field name="project_id" readonly="not can_edit" groups="project.group_project_user"/>
+                </div>
+                <label for="task_id"/>
+                <div name="task_id_div">
+                    <field name="task_id" readonly="not can_edit" groups="!project.group_project_user" options="{'no_open': True}" invisible="not project_id"/>
+                    <field name="task_id" readonly="not can_edit" groups="project.group_project_user" context="{'default_project_id': project_id}" invisible="not project_id"/>
+                </div>
             </xpath>
         </field>
     </record>
 
-    <record id="planning_slot_view_calendar" model="ir.ui.view">
-        <field name="name">planning.slot.calendar</field>
+    <record id="planning_view_card" model="ir.ui.view">
+        <field name="name">planning.slot.card</field>
         <field name="model">planning.slot</field>
-        <field name="inherit_id" ref="planning.planning_view_calendar"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='role_id']" position="after">
-                <field name="project_id" />
-            </xpath>
-        </field>
-    </record>
-
-    <record id="planning_view_kanban" model="ir.ui.view">
-        <field name="name">planning.slot.kanban</field>
-        <field name="model">planning.slot</field>
-        <field name="inherit_id" ref="planning.planning_view_kanban"/>
+        <field name="inherit_id" ref="planning.planning_view_card"/>
         <field name="priority">10</field>
         <field name="arch" type="xml">
-            <xpath expr="/kanban" position="inside">
+            <xpath expr="/card" position="inside">
                 <field name="project_id"/>
+                <field name="task_id"/>
             </xpath>
-            <xpath expr="//t[@name='role']" position="after">
-                <field name="project_id" class="fs-5 fw-bold mb-2 d-block"/>
+            <xpath expr="//div[@name='role']" position="after">
+                <div t-if="record.project_id.raw_value" class="d-flex gap-1" name="project" title="Project">
+                    <i class="oi oi-fw px-1 mt-1" data-icon="check"/>
+                    <div class="d-flex flex-column">
+                        <field name="project_id"/>
+                        <field name="task_id"/>
+                    </div>
+                </div>
             </xpath>
         </field>
     </record>
@@ -54,15 +69,30 @@
         <field name="name">planning.slot.search</field>
         <field name="model">planning.slot</field>
         <field name="inherit_id" ref="planning.planning_view_search_base"/>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='role_id']" position="after">
                 <field name="project_id"/>
             </xpath>
-            <xpath expr="//filter[@name='my_role']" position="after">
-                <filter string="My Projects" name="my_project" domain="[('project_id.user_id','=', uid)]" groups="project.group_project_user"/>
-            </xpath>
             <xpath expr="//filter[@name='group_by_role']" position="after">
                 <filter name="group_by_project" string="Project" context="{'group_by': 'project_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="planning_slot_view_search_service_requests" model="ir.ui.view">
+        <field name="name">planning.slot.view.search.service.requests.inherit.project.forecast</field>
+        <field name="model">planning.slot</field>
+        <field name="priority">30</field>
+        <field name="inherit_id" ref="planning.planning_slot_view_search_service_requests"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="before">
+                <field name="project_id"/>
+                <field name="task_id"/>
+            </xpath>
+            <xpath expr="//group/filter[@name='group_by_company']" position="before">
+                <filter name="group_by_project" string="Project" context="{'group_by': 'project_id'}"/>
+                <filter name="group_by_task" string="Task" context="{'group_by': 'task_id'}"/>
             </xpath>
         </field>
     </record>
@@ -123,7 +153,7 @@
             <xpath expr="//field[@name='start_datetime']" position="replace">
                 <field name="project_id" type="row"/>
             </xpath>
-            <field name="resource_id" position="replace"/>
+            <field name="resource_ids" position="replace"/>
         </field>
     </record>
 
@@ -133,7 +163,7 @@
         <field name="model">planning.slot</field>
         <field name="mode">primary</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='resource_id']" position="before">
+            <xpath expr="//field[@name='resource_ids']" position="before">
                 <field name="project_id"/>
             </xpath>
         </field>
@@ -148,9 +178,12 @@
         <field name="mobile_view_mode">calendar</field>
         <field name="context">{
             'planning_groupby_project': True,
+            'search_default_group_by_project': 1,
+            'search_default_group_by_resource': 2,
             'planning_expand_resource': 1,
             'planning_expand_role': 1,
             'planning_expand_project': 1,
+            'planning_expand_task': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -171,6 +204,7 @@
             'planning_expand_resource': 1,
             'planning_expand_role': 1,
             'planning_expand_project': 1,
+            'planning_expand_task': 1,
             'default_project_id': active_id,
         }</field>
         <field name="help" type="html">
@@ -232,9 +266,11 @@
         <field name="view_id" ref="project_forecast.planning_view_gantt"/>
         <field name="mobile_view_mode">calendar</field>
         <field name="context">{
+            'search_default_group_by_resource': True,
             'planning_expand_resource': 1,
             'planning_expand_role': 1,
             'planning_expand_project': 1,
+            'planning_expand_task': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -292,11 +328,10 @@
         <field name="context">{
             'search_default_my_shifts': 1,
             'my_planning_action': 1,
-            'search_default_open_shifts': 1,
-            'search_default_unwanted_shifts': 1,
             'planning_expand_resource': 1,
             'planning_expand_role': 1,
             'planning_expand_project': 1,
+            'planning_expand_task': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -307,11 +342,23 @@
         </field>
     </record>
 
+    <record id="planning.planning_action_open_shifts" model="ir.actions.act_window">
+        <field name="domain">[('start_datetime', '!=', False), ('end_datetime', '!=', False)]</field>
+        <field name="context">{
+            'search_default_open_shifts': 1,
+            'planning_expand_resource': 1,
+            'planning_expand_role': 1,
+            'planning_expand_project': 1,
+            'planning_expand_task': 1,
+        }</field>
+    </record>
+
     <record id="planning.planning_action_schedule_by_resource" model="ir.actions.act_window">
         <field name="context">{
             'planning_expand_resource': 1,
             'planning_expand_role': 1,
             'planning_expand_project': 1,
+            'planning_expand_task': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -328,6 +375,7 @@
             'planning_expand_resource': 1,
             'planning_expand_role': 1,
             'planning_expand_project': 1,
+            'planning_expand_task': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -348,6 +396,7 @@
             'planning_expand_resource': 1,
             'planning_expand_role': 1,
             'planning_expand_project': 1,
+            'planning_expand_task': 1,
         }</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

@@ -7,9 +7,8 @@
 }
 
 .btn-light {
-    --btn-active-bg: #{$o-gray-100};
     --btn-bg: #{$o-gray-200};
-    --btn-hover-bg: #{$o-gray-200};
+    --btn-border-color: #{$o-gray-300};
 }
 
 .btn-secondary {
@@ -31,6 +30,14 @@
     }
 }
 
+.o_bottom_sheet_body {
+    .btn-secondary {
+        --btn-bg: #{$o-gray-400};
+        --btn-border-color: #{$o-gray-200};
+    }
+    --border-color: #{$o-gray-400};
+}
+
 .fields {
     --search-selected-bg: #{$o-gray-400};
 }
@@ -39,7 +46,7 @@
     --orderline-selected: #{saturate($o-component-active-bg, 10%)};
 }
 
-.rightpane {
+.rightpane, .combo-item {
     --background-color: #{$o-gray-100};
 
     .product {
@@ -81,6 +88,6 @@
     --table-color: #000000;
 }
 
-.pos .fa-star-o {
+.pos [data-icon="star"]:not(.oi-filled) {
     color: $o-gray-900;
 }

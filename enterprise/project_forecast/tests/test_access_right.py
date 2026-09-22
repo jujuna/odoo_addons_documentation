@@ -2,9 +2,10 @@
 
 from .common import TestCommonForecast
 from odoo import Command
-from odoo.tests import new_test_user
+from odoo.tests import tagged, new_test_user
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestForecastAccessRights(TestCommonForecast):
     @classmethod
     def setUpClass(cls):
@@ -20,11 +21,11 @@ class TestForecastAccessRights(TestCommonForecast):
             {
                 'name': 'Private project 1',
                 'privacy_visibility': 'followers',
-                'message_partner_ids': [Command.set([cls.user_projectuser.partner_id.id])],
+                'allowed_internal_user_ids': [Command.set([cls.user_projectuser.id])],
             }, {
                 'name': 'Private project 2',
                 'privacy_visibility': 'followers',
-                'message_partner_ids': [Command.set([cls.user_projectmanager.partner_id.id])],
+                'allowed_internal_user_ids': [Command.set([cls.user_projectmanager.id])],
             },
         ])
 

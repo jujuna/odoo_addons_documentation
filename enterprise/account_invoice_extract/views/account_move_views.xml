@@ -8,14 +8,22 @@
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
                 <button name="action_manual_send_for_digitization" class="oe_highlight" string="Digitize document" type="object"
-                    invisible="not extract_can_show_send_button" data-hotkey="w" />
-                <button name="action_reload_ai_data" string="Reload AI Data" type="object"
-                    invisible="move_type not in ('in_invoice', 'in_refund', 'in_receipt', 'out_invoice', 'out_refund', 'out_receipt') or state != 'draft' or extract_state not in ['waiting_validation', 'validation_to_send']" />
+                    invisible="not extract_can_show_send_button" data-hotkey="w"/>
+            </xpath>
+            <xpath expr="//header//button[@name='action_reload_imported_data']" position="attributes">
+                <attribute name="invisible">(state != 'draft'
+                    or move_type not in ('in_invoice', 'in_refund', 'in_receipt', 'out_invoice', 'out_refund', 'out_receipt')
+                    or (
+                        not import_source_attachment_id
+                        and extract_state not in ('waiting_validation', 'to_validate', 'done')
+                    ))</attribute>
             </xpath>
             <xpath expr="//sheet" position='before'>
                 <field name="extract_error_message" invisible="1"/> <!-- extract_error_message required for the extract_state_header -->
                 <field name="extract_document_uuid" invisible="1"/> <!-- extract_document_uuid required for the extract_state_header -->
-                <field name="extract_state" class="d-block" invisible="not extract_can_show_banners or extract_state in ['waiting_validation', 'no_extract_requested']" widget="extract_state_header"/>
+                <field name="extract_state" class="d-block"
+                       invisible="not extract_can_show_banners or extract_state in ['no_extract_requested', 'waiting_validation', 'to_validate', 'done']"
+                       widget="extract_state_header"/>
                 <field name="extract_attachment_id" invisible="True"/>
                 <field name="extract_can_show_send_button" invisible="True"/>
                 <field name="extract_can_show_banners" invisible="True"/>
@@ -31,6 +39,9 @@
                        groups="base.group_no_one">
                     <field name="extract_document_uuid" widget="CopyClipboardChar"/>
                 </group>
+            </xpath>
+            <xpath expr="//field[@name='invoice_date'][contains(@invisible, 'in_invoice')]" position="attributes">
+                <attribute name="required" add="not extract_can_show_send_button" separator=" and "/>
             </xpath>
         </field>
     </record>

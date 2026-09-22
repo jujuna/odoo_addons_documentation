@@ -22,12 +22,12 @@
                                                 placeholder="Insert your terms &amp; conditions here..."/>
                                     </div>
                                     <div class="mt8" invisible="sign_terms_type != 'html'">
-                                        <button name="action_update_sign_terms" icon="oi-arrow-right" type="object" string="Update Terms" class="btn-link"/>
+                                        <button name="action_update_sign_terms" icon="east" type="object" string="Update Terms" class="btn-link"/>
                                     </div>
                                     <field name="sign_preview_ready" invisible="1"/>
                                     <div class="mt4 ms-1" invisible="not sign_preview_ready">
                                         <a class="btn-link" href="/sign/terms" role="button">
-                                            <i class="oi oi-arrow-right"/>
+                                            <i class="oi" data-icon="east"/>
                                             Preview
                                         </a>
                                     </div>
@@ -36,22 +36,28 @@
                         </setting>
                         <setting help="Allow signatories to provide their identity using itsme®" id="module_sign_itsme">
                             <field name="module_sign_itsme"/>
-                            <widget name="documentation_link" path="https://www.itsme-id.com/en-BE/business/coverage" label="Available in supported countries" icon="oi oi-fw o_button_icon oi-arrow-right"/>
+                            <widget name="documentation_link" path="https://www.itsme-id.com/en-BE/business/coverage" label="Available in supported countries" icon="east" icon_class="oi-fw o_button_icon"/>
                             <widget name="iap_buy_more_credits" service_name="itsme_proxy" hide_service="1"/>
                         </setting>
                         <setting help="Allow users to define the users or groups which have access to the template" id="manage_template_access">
                             <field name="group_manage_template_access"/>
                         </setting>
+                        <setting id="sign_qes" string="Qualified Electronic Signatures"
+                                 help="Let signatories sign with a qualified electronic signature of their own"
+                                 invisible="not has_external_signature_service">
+                            <field name="has_external_signature_service" invisible="1"/>
+                            <widget name="iap_buy_more_credits" service_name="sign_qes" hide_service="1"/>
+                        </setting>
                         <setting id="sms" string="Authenticate by SMS" documentation="/applications/marketing/sms_marketing/pricing/pricing_and_faq.html" help="Deliver one-time codes by SMS to identify signatories when signing a document">
                             <widget name="iap_buy_more_credits" service_name="sms" hide_service="1"/>
                         </setting>
-                        <setting help="Sign your important documents using Aadhaar esign." id="module_sign_emsigner">
+                        <setting help="Sign your important documents using Aadhaar esign." id="module_sign_emsigner" invisible="company_country_code != 'IN'">
                             <field name="module_sign_emsigner"/>
                             <widget name="iap_buy_more_credits" service_name="emsigner_proxy" hide_service="1"/>
                         </setting>
                         <setting id="company_sign_info">
                             <div>
-                                <span class="fw-bold">Cryptographic signature<i class="fa fa-building-o ms-1"/></span>
+                                <span class="fw-bold">Cryptographic signature<i class="oi oi-lg ms-1" data-icon="business"/></span>
                             </div>
                             <div class="text-muted mb-2">
                                 <span groups="base.group_system">
@@ -59,7 +65,7 @@
                                 </span>
                             </div>
                             <group>
-                                <field name="signing_certificate_id" options="{'no_quick_create': True}"/>
+                                <field name="signing_certificate_id" options="{'no_quick_create': True}" widget="certificateM2OWidget"/>
                             </group>
                         </setting>
                     </block>

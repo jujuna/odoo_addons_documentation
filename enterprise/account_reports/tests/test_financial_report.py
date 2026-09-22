@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=C0326
 
+import json
+
 from .common import TestAccountReportsCommon
 
 from odoo import fields, Command
@@ -11,6 +13,8 @@ from freezegun import freeze_time
 
 @tagged('post_install', '-at_install')
 class TestFinancialReport(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -27,33 +31,31 @@ class TestFinancialReport(TestAccountReportsCommon):
             ('account_type', '=', 'equity_unaffected'),
         ]).unlink()
 
-        account_type_data = [
-            ('asset_receivable',    {'reconcile': True}),
-            ('liability_payable',   {'reconcile': True}),
-            ('asset_cash',          {}),
-            ('asset_current',       {}),
-            ('asset_prepayments',   {}),
-            ('asset_fixed',         {}),
-            ('asset_non_current',   {}),
-            ('equity',              {}),
-            ('equity_unaffected',   {}),
-            ('income',              {}),
+        account_types = [
+            'asset_receivable',
+            'liability_payable',
+            'asset_cash',
+            'asset_current',
+            'asset_prepayments',
+            'asset_fixed',
+            'asset_non_current',
+            'equity',
+            'equity_unaffected',
+            'income',
         ]
 
         accounts = cls.env['account.account'].create([{
-            **data[1],
             'name': 'account%s' % i,
             'code': 'code%s' % i,
-            'account_type': data[0],
-        } for i, data in enumerate(account_type_data)])
+            'account_type': account_type,
+        } for i, account_type in enumerate(account_types)])
 
         accounts_2 = cls.env['account.account'].create([{
-            **data[1],
             'name': 'account%s' % (i + 100),
             'code': 'code%s' % (i + 100),
-            'account_type': data[0],
+            'account_type': account_type,
             'company_ids': [Command.link(cls.company_data_2['company'].id)]
-        } for i, data in enumerate(account_type_data)])
+        } for i, account_type in enumerate(account_types)])
 
         for account in accounts_2:
             account.code = account.with_company(cls.company_data_2['company']).code
@@ -139,7 +141,7 @@ class TestFinancialReport(TestAccountReportsCommon):
                     'sequence': 1,
                     'hierarchy_level': 0,
                     'groupby': "account_id",
-                    'foldable': True,
+                    'foldability': 'foldable',
                     'expression_ids': [Command.clear(), Command.create({
                         'label': 'balance',
                         'engine': 'domain',
@@ -153,7 +155,7 @@ class TestFinancialReport(TestAccountReportsCommon):
                     'sequence': 2,
                     'hierarchy_level': 0,
                     'groupby': "account_id",
-                    'foldable': True,
+                    'foldability': 'foldable',
                     'expression_ids': [Command.clear(), Command.create({
                         'label': 'balance',
                         'engine': 'domain',
@@ -182,9 +184,14 @@ class TestFinancialReport(TestAccountReportsCommon):
     def _get_line_id_from_generic_id(self, generic_id):
         return int(generic_id.split('-')[-1])
 
+    def _press_journal_filter(self, options, journals):
+        for option_journal in options['journals']:
+            if option_journal.get('id') in journals.ids:
+                option_journal['selected'] = not option_journal['selected']
+
     def test_financial_report_strict_range_on_report_lines_with_no_parent_id(self):
         """ Tests that lines with no parent can be correctly filtered by date range """
-        options = self._generate_options(self.report_no_parent_id, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(self.report_no_parent_id, '2019-01-01', '2019-12-31')
 
         lines = self.report_no_parent_id._get_lines(options)
         self.assertLinesValues(
@@ -231,8 +238,8 @@ class TestFinancialReport(TestAccountReportsCommon):
         })
         invoice.action_post()
 
-        options = self._generate_options(self.report, fields.Date.from_string('2016-06-01'), fields.Date.from_string('2016-06-06'))
-        options['date']['filter'] = 'today'
+        options = self._generate_options(self.report, '2016-06-01', '2016-06-06')
+        options['date']['default_opening_date'] = 'today'
 
         lines = self.report._get_lines(options)
         self.assertLinesValues(
@@ -247,28 +254,26 @@ class TestFinancialReport(TestAccountReportsCommon):
                 ('Current Assets',                                0.0),
                 ('Prepayments',                                   0.0),
                 ('Total Current Assets',                        110.0),
-                ('Plus Fixed Assets',                             0.0),
-                ('Plus Non-current Assets',                       0.0),
+                ('Fixed Assets',                             0.0),
+                ('Non-current Assets',                       0.0),
                 ('Total ASSETS',                                110.0),
 
                 ('LIABILITIES',                                   0.0),
                 ('Current Liabilities',                           0.0),
                 ('Current Liabilities',                           0.0),
+                ('Credit Card',                                   0.0),
                 ('Payables',                                      0.0),
                 ('Total Current Liabilities',                     0.0),
-                ('Plus Non-current Liabilities',                  0.0),
+                ('Non-current Liabilities',                  0.0),
                 ('Total LIABILITIES',                             0.0),
 
-                ('EQUITY',                                      110.0),
-                ('Unallocated Earnings',                        110.0),
+                ('EQUITY (& EARNINGS)',                         110.0),
+                ('Equity',                                        0.0),
+                ('Earnings',                                    110.0),
                 ('Current Year Unallocated Earnings',           110.0),
-                ('Previous Years Unallocated Earnings',           0.0),
-                ('Total Unallocated Earnings',                  110.0),
-                ('Retained Earnings',                             0.0),
-                ('Current Year Retained Earnings',                0.0),
-                ('Previous Years Retained Earnings',              0.0),
-                ('Total Retained Earnings',                       0.0),
-                ('Total EQUITY',                                110.0),
+                ('Previous Years Earnings',                       0.0),
+                ('Total Earnings',                              110.0),
+                ('Total EQUITY (& EARNINGS)',                   110.0),
 
                 ('LIABILITIES + EQUITY',                        110.0),
             ],
@@ -302,35 +307,33 @@ class TestFinancialReport(TestAccountReportsCommon):
                 ('Current Assets',                                 0.0),
                 ('Prepayments',                                    0.0),
                 ('Total Current Assets',                        6000.0),
-                ('Plus Fixed Assets',                              0.0),
-                ('Plus Non-current Assets',                        0.0),
+                ('Fixed Assets',                              0.0),
+                ('Non-current Assets',                        0.0),
                 ('Total ASSETS',                                6000.0),
 
                 ('LIABILITIES',                                    0.0),
                 ('Current Liabilities',                            0.0),
                 ('Current Liabilities',                            0.0),
+                ('Credit Card',                                    0.0),
                 ('Payables',                                       0.0),
                 ('Total Current Liabilities',                      0.0),
-                ('Plus Non-current Liabilities',                   0.0),
+                ('Non-current Liabilities',                   0.0),
                 ('Total LIABILITIES',                              0.0),
 
-                ('EQUITY',                                      6000.0),
-                ('Unallocated Earnings',                        6000.0),
+                ('EQUITY (& EARNINGS)',                         6000.0),
+                ('Equity',                                         0.0),
+                ('Earnings',                                    6000.0),
                 ('Current Year Unallocated Earnings',           4000.0),
-                ('Previous Years Unallocated Earnings',         2000.0),
-                ('Total Unallocated Earnings',                  6000.0),
-                ('Retained Earnings',                              0.0),
-                ('Current Year Retained Earnings',                 0.0),
-                ('Previous Years Retained Earnings',               0.0),
-                ('Total Retained Earnings',                        0.0),
-                ('Total EQUITY',                                6000.0),
+                ('Previous Years Earnings',                     2000.0),
+                ('Total Earnings',                              6000.0),
+                ('Total EQUITY (& EARNINGS)',                   6000.0),
                 ('LIABILITIES + EQUITY',                        6000.0),
 
             ]
-        options = self._generate_options(self.report, fields.Date.from_string('2016-05-05'), fields.Date.from_string('2016-05-05'))
+        options = self._generate_options(self.report, '2016-05-05', '2016-05-05')
 
         # End of Last Month
-        options['date']['filter'] = 'last_month'
+        options['date']['default_opening_date'] = 'last_month'
         lines = self.report._get_lines(options)
         self.assertLinesValues(
             lines,
@@ -340,7 +343,7 @@ class TestFinancialReport(TestAccountReportsCommon):
             options,
         )
         # Custom
-        options['date']['filter'] = 'custom'
+        options['date']['period_type'] = 'custom'
         lines = self.report._get_lines(options)
         self.assertLinesValues(
             lines,
@@ -354,7 +357,7 @@ class TestFinancialReport(TestAccountReportsCommon):
         self.env.companies = self.env.company
 
         line_id = self._get_basic_line_dict_id_from_report_line_ref('account_reports.account_financial_report_bank_view0')
-        options = self._generate_options(self.report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(self.report, '2019-01-01', '2019-12-31')
         options['unfolded_lines'] = [line_id]
 
         lines = self.report._get_lines(options)
@@ -372,28 +375,26 @@ class TestFinancialReport(TestAccountReportsCommon):
                 ('Current Assets',                               400.0),
                 ('Prepayments',                                -1100.0),
                 ('Total Current Assets',                        -650.0),
-                ('Plus Fixed Assets',                              0.0),
-                ('Plus Non-current Assets',                      700.0),
+                ('Fixed Assets',                              0.0),
+                ('Non-current Assets',                      700.0),
                 ('Total ASSETS',                                  50.0),
 
                 ('LIABILITIES',                                 -200.0),
                 ('Current Liabilities',                         -200.0),
                 ('Current Liabilities',                            0.0),
+                ('Credit Card',                                    0.0),
                 ('Payables',                                    -200.0),
                 ('Total Current Liabilities',                   -200.0),
-                ('Plus Non-current Liabilities',                   0.0),
+                ('Non-current Liabilities',                   0.0),
                 ('Total LIABILITIES',                           -200.0),
 
-                ('EQUITY',                                       250.0),
-                ('Unallocated Earnings',                        -550.0),
+                ('EQUITY (& EARNINGS)',                          250.0),
+                ('Equity',                                       800.0),
+                ('Earnings',                                    -550.0),
                 ('Current Year Unallocated Earnings',           -800.0),
-                ('Previous Years Unallocated Earnings',          250.0),
-                ('Total Unallocated Earnings',                  -550.0),
-                ('Retained Earnings',                            800.0),
-                ('Current Year Retained Earnings',               800.0),
-                ('Previous Years Retained Earnings',               0.0),
-                ('Total Retained Earnings',                      800.0),
-                ('Total EQUITY',                                 250.0),
+                ('Previous Years Earnings',                      250.0),
+                ('Total Earnings',                              -550.0),
+                ('Total EQUITY (& EARNINGS)',                    250.0),
 
                 ('LIABILITIES + EQUITY',                          50.0),
             ],
@@ -415,7 +416,7 @@ class TestFinancialReport(TestAccountReportsCommon):
 
     def test_financial_report_multi_company_currency(self):
         line_id = self._get_basic_line_dict_id_from_report_line_ref('account_reports.account_financial_report_bank_view0')
-        options = self._generate_options(self.report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(self.report, '2019-01-01', '2019-12-31')
         options['unfolded_lines'] = [line_id]
 
         lines = self.report._get_lines(options)
@@ -434,28 +435,26 @@ class TestFinancialReport(TestAccountReportsCommon):
                 ('Current Assets',                               400.0),
                 ('Prepayments',                                -3600.0),
                 ('Total Current Assets',                       -4150.0),
-                ('Plus Fixed Assets',                              0.0),
-                ('Plus Non-current Assets',                     4200.0),
+                ('Fixed Assets',                              0.0),
+                ('Non-current Assets',                     4200.0),
                 ('Total ASSETS',                                  50.0),
 
                 ('LIABILITIES',                                 -200.0),
                 ('Current Liabilities',                         -200.0),
                 ('Current Liabilities',                            0.0),
+                ('Credit Card',                                    0.0),
                 ('Payables',                                    -200.0),
                 ('Total Current Liabilities',                   -200.0),
-                ('Plus Non-current Liabilities',                   0.0),
+                ('Non-current Liabilities',                   0.0),
                 ('Total LIABILITIES',                           -200.0),
 
-                ('EQUITY',                                       250.0),
-                ('Unallocated Earnings',                        -550.0),
+                ('EQUITY (& EARNINGS)',                          250.0),
+                ('Equity',                                       800.0),
+                ('Earnings',                                    -550.0),
                 ('Current Year Unallocated Earnings',           -800.0),
-                ('Previous Years Unallocated Earnings',          250.0),
-                ('Total Unallocated Earnings',                  -550.0),
-                ('Retained Earnings',                            800.0),
-                ('Current Year Retained Earnings',               800.0),
-                ('Previous Years Retained Earnings',               0.0),
-                ('Total Retained Earnings',                      800.0),
-                ('Total EQUITY',                                 250.0),
+                ('Previous Years Earnings',                      250.0),
+                ('Total Earnings',                              -550.0),
+                ('Total EQUITY (& EARNINGS)',                    250.0),
 
                 ('LIABILITIES + EQUITY',                          50.0),
             ],
@@ -478,51 +477,187 @@ class TestFinancialReport(TestAccountReportsCommon):
 
     def test_financial_report_comparison(self):
         line_id = self._get_basic_line_dict_id_from_report_line_ref('account_reports.account_financial_report_bank_view0')
-        options = self._generate_options(self.report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(self.report, '2019-01-01', '2019-12-31')
+
+        for period_order in ('descending', 'ascending'):
+            options = self._update_comparison_filter(options, self.report, 'custom', 1, date_to=fields.Date.from_string('2018-12-31'), period_order=period_order)
+            options['unfolded_lines'] = [line_id]
+
+            lines = self.report._get_lines(options)
+            self.assertColumnPercentComparisonValues(
+                lines,
+                [
+                    ('ASSETS',                                      '-80.0%',       'red'),
+                    ('Current Assets',                              '27.7%',        'red'),
+                    ('Bank and Cash Accounts',                      '10.0%',        'red'),
+                    ('code102 account102',                          '0.0%',       'muted'),
+                    ('code2 account2',                              '30.0%',        'red'),
+                    ('Total Bank and Cash Accounts',                '10.0%',        'red'),
+                    ('Receivables',                                 '4.4%',       'green'),
+                    ('Current Assets',                              'n/a',        'muted'),
+                    ('Prepayments',                                 '44.0%',        'red'),
+                    ('Total Current Assets',                        '27.7%',        'red'),
+                    ('Fixed Assets',                           'n/a',        'muted'),
+                    ('Non-current Assets',                     '20.0%',      'green'),
+                    ('Total ASSETS',                                '-80.0%',       'red'),
+
+                    ('LIABILITIES',                                 'n/a',        'muted'),
+                    ('Current Liabilities',                         'n/a',        'muted'),
+                    ('Current Liabilities',                         'n/a',        'muted'),
+                    ('Credit Card',                                 'n/a',        'muted'),
+                    ('Payables',                                    'n/a',        'muted'),
+                    ('Total Current Liabilities',                   'n/a',        'muted'),
+                    ('Non-current Liabilities',                'n/a',        'muted'),
+                    ('Total LIABILITIES',                           'n/a',        'muted'),
+
+                    ('EQUITY (& EARNINGS)',                         '0.0%',       'muted'),
+                    ('Equity',                                       'n/a',       'muted'),
+                    ('Earnings',                                    '-320.0%',      'red'),
+                    ('Current Year Unallocated Earnings',           '-420.0%',      'red'),
+                    ('Previous Years Earnings',                     'n/a',        'muted'),
+                    ('Total Earnings',                              '-320.0%',      'red'),
+                    ('Total EQUITY (& EARNINGS)',                   '0.0%',       'muted'),
+
+                    ('LIABILITIES + EQUITY',                        '-80.0%',     'green'),
+                ]
+            )
+
+    def test_financial_report_comparison_amount_column(self):
+        """ growth_display='amount' shows the monetary delta in the comparison column, formatted against
+        the active rounding_unit option. """
+        line_id = self._get_basic_line_dict_id_from_report_line_ref('account_reports.account_financial_report_bank_view0')
+        options = self._generate_options(
+            self.report, '2019-01-01', '2019-12-31',
+            default_options={'growth_display': 'amount'},
+        )
         options = self._update_comparison_filter(options, self.report, 'custom', 1, date_to=fields.Date.from_string('2018-12-31'))
         options['unfolded_lines'] = [line_id]
 
         lines = self.report._get_lines(options)
-
-        self.assertColumnPercentComparisonValues(
+        self.assertColumnAmountComparisonValues(
             lines,
             [
-                ('ASSETS',                                      '-80.0%',       'red'),
-                ('Current Assets',                              '27.7%',        'red'),
-                ('Bank and Cash Accounts',                      '10.0%',        'red'),
-                ('code102 account102',                          '0.0%',       'muted'),
-                ('code2 account2',                              '30.0%',        'red'),
-                ('Total Bank and Cash Accounts',                '10.0%',        'red'),
-                ('Receivables',                                 '4.4%',       'green'),
-                ('Current Assets',                              'n/a',        'muted'),
-                ('Prepayments',                                 '44.0%',        'red'),
-                ('Total Current Assets',                        '27.7%',        'red'),
-                ('Plus Fixed Assets',                           'n/a',        'muted'),
-                ('Plus Non-current Assets',                     '20.0%',      'green'),
-                ('Total ASSETS',                                '-80.0%',       'red'),
+                ('ASSETS',                              -200.0,     'red'),
+                ('Current Assets',                      -900.0,     'red'),
+                ('Bank and Cash Accounts',              -300.0,     'red'),
+                ('code102 account102',                     0.0,   'muted'),
+                ('code2 account2',                      -300.0,     'red'),
+                ('Total Bank and Cash Accounts',        -300.0,     'red'),
+                ('Receivables',                          100.0,   'green'),
+                ('Current Assets',                       400.0,   'green'),
+                ('Prepayments',                        -1100.0,     'red'),
+                ('Total Current Assets',                -900.0,     'red'),
+                ('Fixed Assets',                             0,   'muted'),
+                ('Non-current Assets',                   700.0,   'green'),
+                ('Total ASSETS',                        -200.0,     'red'),
+                ('LIABILITIES',                         -200.0,   'green'),
+                ('Current Liabilities',                 -200.0,   'green'),
+                ('Current Liabilities',                      0,   'muted'),
+                ('Credit Card',                              0,   'muted'),
+                ('Payables',                            -200.0,   'green'),
+                ('Total Current Liabilities',           -200.0,   'green'),
+                ('Non-current Liabilities',                  0,   'muted'),
+                ('Total LIABILITIES',                   -200.0,   'green'),
+                ('EQUITY (& EARNINGS)',                    0.0,   'muted'),
+                ('Equity',                               800.0,   'green'),
+                ('Earnings',                            -800.0,     'red'),
+                ('Current Year Unallocated Earnings',  -1050.0,     'red'),
+                ('Previous Years Earnings',              250.0,   'green'),
+                ('Total Earnings',                      -800.0,     'red'),
+                ('Total EQUITY (& EARNINGS)',              0.0,   'muted'),
+                ('LIABILITIES + EQUITY',                -200.0,   'green'),
+            ],
+        )
 
-                ('LIABILITIES',                                 'n/a',        'muted'),
-                ('Current Liabilities',                         'n/a',        'muted'),
-                ('Current Liabilities',                         'n/a',        'muted'),
-                ('Payables',                                    'n/a',        'muted'),
-                ('Total Current Liabilities',                   'n/a',        'muted'),
-                ('Plus Non-current Liabilities',                'n/a',        'muted'),
-                ('Total LIABILITIES',                           'n/a',        'muted'),
+    def test_financial_report_comparison_amount_rounding_unit(self):
+        """ Switching the rounding_unit must reformat the rendered name while leaving the underlying delta intact. """
+        line_id = self._get_basic_line_dict_id_from_report_line_ref('account_reports.account_financial_report_bank_view0')
+        options = self._generate_options(
+            self.report, '2019-01-01', '2019-12-31',
+            default_options={'growth_display': 'amount'},
+        )
+        options = self._update_comparison_filter(options, self.report, 'custom', 1, date_to=fields.Date.from_string('2018-12-31'))
+        options['unfolded_lines'] = [line_id]
 
-                ('EQUITY',                                      '0.0%',       'muted'),
-                ('Unallocated Earnings',                        '-320.0%',      'red'),
-                ('Current Year Unallocated Earnings',           '-420.0%',      'red'),
-                ('Previous Years Unallocated Earnings',         'n/a',        'muted'),
-                ('Total Unallocated Earnings',                  '-320.0%',      'red'),
-                ('Retained Earnings',                           'n/a',        'muted'),
-                ('Current Year Retained Earnings',              'n/a',        'muted'),
-                ('Previous Years Retained Earnings',            'n/a',        'muted'),
-                ('Total Retained Earnings',                     'n/a',        'muted'),
-                ('Total EQUITY',                                '0.0%',       'muted'),
+        lines = self.report._get_lines(options)
+        options['rounding_unit'] = 'thousands'
+        thousands_lines = self.report._get_lines(options)
+        for original, scaled in zip(lines, thousands_lines):
+            self.assertEqual(original.column_percent_comparison_data.no_format, scaled.column_percent_comparison_data.no_format)
+            if original.column_percent_comparison_data.no_format and abs(original.column_percent_comparison_data.no_format) >= 1000:
+                self.assertNotEqual(original.column_percent_comparison_data.name, scaled.column_percent_comparison_data.name)
 
+    def test_financial_report_line_comparison(self):
+        self._create_test_account_moves([
+            self._prepare_test_account_move_line(1000.0, account_code='100000', date='2010-01-01'),
+            self._prepare_test_account_move_line(10.0, account_code='200000', date='2010-01-01'),
+            self._prepare_test_account_move_line(200.0, account_code='300000', date='2010-01-01'),
+            self._prepare_test_account_move_line(2000.0, account_code='500001', date='2010-01-01'),
+        ])
 
-                ('LIABILITIES + EQUITY',                        '-80.0%',     'green'),
-            ]
+        report = self._create_report([
+            self._prepare_test_report_line(self._prepare_test_expression_account_codes('1')),
+            self._prepare_test_report_line(self._prepare_test_expression_account_codes('2')),
+            self._prepare_test_report_line(self._prepare_test_expression_account_codes('3')),
+            self._prepare_test_report_line(self._prepare_test_expression_account_codes('4')),
+            self._prepare_test_report_line(self._prepare_test_expression_account_codes('5')),
+            self._prepare_test_report_line(),
+        ], filter_line_comparison=True)
+
+        options = self._generate_options(
+            report,
+            '2010-01-01',
+            '2010-01-01',
+            default_options={'comparison': {'filter': 'report_line', 'base_report_line': {'id': report.line_ids[0].id, 'name': report.line_ids[0].name}, 'name': report.line_ids[0].name}},
+        )
+
+        lines = report._get_lines(options)
+        self.assertLinesValues(
+            # pylint: disable=bad-whitespace
+            lines,
+            [   0,                          1],
+            [
+                ('test_line_1',        1000.0),
+                ('test_line_2',          10.0),
+                ('test_line_3',         200.0),
+                ('test_line_4',           0.0),
+                ('test_line_5',        2000.0),
+                ('test_line_6',            ''),
+            ],
+            options,
+        )
+
+        self.assertColumnPercentComparisonValues(
+            # pylint: disable=bad-whitespace
+            lines,
+            [
+                ('test_line_1',      '100.0%',         ''),
+                ('test_line_2',        '1.0%',      'red'),
+                ('test_line_3',       '20.0%',      'red'),
+                ('test_line_4',        '0.0%',      'red'),
+                ('test_line_5',      '200.0%',      'green'),
+                ('test_line_6',         'n/a',      'muted'),
+            ],
+        )
+
+        zero_comparison_options = self._generate_options(
+            report,
+            '2010-01-01',
+            '2010-01-01',
+            default_options={'comparison': {'filter': 'report_line', 'base_report_line': {'id': report.line_ids[3].id, 'name': report.line_ids[3].name}, 'name': report.line_ids[3].name}},
+        )
+
+        self.assertColumnPercentComparisonValues(
+            # pylint: disable=bad-whitespace
+            report._get_lines(zero_comparison_options),
+            [
+                ('test_line_1',         'n/a',      'muted'),
+                ('test_line_2',         'n/a',      'muted'),
+                ('test_line_3',         'n/a',      'muted'),
+                ('test_line_4',         'n/a',      'muted'),
+                ('test_line_5',         'n/a',      'muted'),
+                ('test_line_6',         'n/a',      'muted'),
+            ],
         )
 
     def test_financial_report_horizontal_group(self):
@@ -539,7 +674,6 @@ class TestFinancialReport(TestAccountReportsCommon):
             }
         )
         options = self._update_comparison_filter(options, self.report, 'custom', 1, date_to=fields.Date.from_string('2018-12-31'))
-
         lines = self.report._get_lines(options)
         self.assertHeadersValues(
             options['column_headers'],
@@ -562,28 +696,26 @@ class TestFinancialReport(TestAccountReportsCommon):
                 ('Current Assets',                         0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
                 ('Prepayments',                            0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
                 ('Total Current Assets',                    1300.0,             0.0,                 25.0,              0.0,                 1250.0,            0.0,                0.0,                0.0),
-                ('Plus Fixed Assets',                      0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
-                ('Plus Non-current Assets',                0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('Fixed Assets',                      0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('Non-current Assets',                0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
                 ('Total ASSETS',                            1300.0,             0.0,                 25.0,              0.0,                 1250.0,            0.0,                0.0,                0.0),
 
                 ('LIABILITIES',                            0.0,                 0.0,                0.0,                -200.0,             0.0,                0.0,                0.0,                0.0),
                 ('Current Liabilities',                    0.0,                 0.0,                0.0,                -200.0,             0.0,                0.0,                0.0,                0.0),
                 ('Current Liabilities',                    0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('Credit Card',                            0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
                 ('Payables',                               0.0,                 0.0,                0.0,                -200.0,             0.0,                0.0,                0.0,                0.0),
                 ('Total Current Liabilities',              0.0,                 0.0,                0.0,                -200.0,             0.0,                0.0,                0.0,                0.0),
-                ('Plus Non-current Liabilities',           0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('Non-current Liabilities',           0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
                 ('Total LIABILITIES',                      0.0,                 0.0,                0.0,                -200.0,             0.0,                0.0,                0.0,                0.0),
 
-                ('EQUITY',                                 0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
-                ('Unallocated Earnings',                   0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('EQUITY (& EARNINGS)',                    0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('Equity',                                 0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('Earnings',                               0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
                 ('Current Year Unallocated Earnings',      0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
-                ('Previous Years Unallocated Earnings',    0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
-                ('Total Unallocated Earnings',             0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
-                ('Retained Earnings',                      0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
-                ('Current Year Retained Earnings',         0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
-                ('Previous Years Retained Earnings',       0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
-                ('Total Retained Earnings',                0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
-                ('Total EQUITY',                           0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('Previous Years Earnings',                0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('Total Earnings',                         0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
+                ('Total EQUITY (& EARNINGS)',              0.0,                 0.0,                0.0,                0.0,                0.0,                0.0,                0.0,                0.0),
 
                 ('LIABILITIES + EQUITY',                   0.0,                 0.0,                0.0,                -200.0,             0.0,                0.0,                0.0,                0.0),
             ],
@@ -626,20 +758,19 @@ class TestFinancialReport(TestAccountReportsCommon):
                 ('Receivables',                                 2300.0,             25.0,        2325.0),
                 ('Current Assets',                               400.0,              0.0,         400.0),
                 ('Prepayments',                                    0.0,          -1100.0,       -1100.0),
-                ('Plus Fixed Assets',                              0.0,              0.0,           0.0),
-                ('Plus Non-current Assets',                     4200.0,              0.0,        4200.0),
+                ('Fixed Assets',                              0.0,              0.0,           0.0),
+                ('Non-current Assets',                     4200.0,              0.0,        4200.0),
                 ('LIABILITIES',                                    0.0,           -200.0,        -200.0),
                 ('Current Liabilities',                            0.0,           -200.0,        -200.0),
                 ('Current Liabilities',                            0.0,              0.0,           0.0),
+                ('Credit Card',                                    0.0,              0.0,           0.0),
                 ('Payables',                                       0.0,           -200.0,        -200.0),
-                ('Plus Non-current Liabilities',                   0.0,              0.0,           0.0),
-                ('EQUITY',                                       250.0,            800.0,        1050.0),
-                ('Unallocated Earnings',                         250.0,              0.0,         250.0),
+                ('Non-current Liabilities',                   0.0,              0.0,           0.0),
+                ('EQUITY (& EARNINGS)',                          250.0,            800.0,        1050.0),
+                ('Equity',                                         0.0,            800.0,         800.0),
+                ('Earnings',                                     250.0,              0.0,         250.0),
                 ('Current Year Unallocated Earnings',              0.0,              0.0,           0.0),
-                ('Previous Years Unallocated Earnings',          250.0,              0.0,         250.0),
-                ('Retained Earnings',                              0.0,            800.0,         800.0),
-                ('Current Year Retained Earnings',                 0.0,            800.0,         800.0),
-                ('Previous Years Retained Earnings',               0.0,              0.0,           0.0),
+                ('Previous Years Earnings',                      250.0,              0.0,         250.0),
                 ('LIABILITIES + EQUITY',                         250.0,            600.0,         850.0),
             ],
         )
@@ -665,23 +796,58 @@ class TestFinancialReport(TestAccountReportsCommon):
                 ('Receivables',                                 2300.0,                25.0,     2250.0,         0.0),
                 ('Current Assets',                               400.0,                 0.0,        0.0,         0.0),
                 ('Prepayments',                                    0.0,             -1100.0,        0.0,         0.0),
-                ('Plus Fixed Assets',                              0.0,                 0.0,        0.0,         0.0),
-                ('Plus Non-current Assets',                     4200.0,                 0.0,     3500.0,         0.0),
+                ('Fixed Assets',                              0.0,                 0.0,        0.0,         0.0),
+                ('Non-current Assets',                     4200.0,                 0.0,     3500.0,         0.0),
                 ('LIABILITIES',                                    0.0,              -200.0,        0.0,         0.0),
                 ('Current Liabilities',                            0.0,              -200.0,        0.0,         0.0),
                 ('Current Liabilities',                            0.0,                 0.0,        0.0,         0.0),
+                ('Credit Card',                                    0.0,                 0.0,        0.0,         0.0),
                 ('Payables',                                       0.0,              -200.0,        0.0,         0.0),
-                ('Plus Non-current Liabilities',                   0.0,                 0.0,        0.0,         0.0),
-                ('EQUITY',                                       250.0,               800.0,      250.0,         0.0),
-                ('Unallocated Earnings',                         250.0,                 0.0,      250.0,         0.0),
+                ('Non-current Liabilities',                   0.0,                 0.0,        0.0,         0.0),
+                ('EQUITY (& EARNINGS)',                          250.0,               800.0,      250.0,         0.0),
+                ('Equity',                                         0.0,               800.0,        0.0,         0.0),
+                ('Earnings',                                     250.0,                 0.0,      250.0,         0.0),
                 ('Current Year Unallocated Earnings',              0.0,                 0.0,      250.0,         0.0),
-                ('Previous Years Unallocated Earnings',          250.0,                 0.0,        0.0,         0.0),
-                ('Retained Earnings',                              0.0,               800.0,        0.0,         0.0),
-                ('Current Year Retained Earnings',                 0.0,               800.0,        0.0,         0.0),
-                ('Previous Years Retained Earnings',               0.0,                 0.0,        0.0,         0.0),
+                ('Previous Years Earnings',                      250.0,                 0.0,        0.0,         0.0),
                 ('LIABILITIES + EQUITY',                         250.0,               600.0,      250.0,         0.0),
             ],
         )
+
+    def test_show_horizontal_group_ledger(self):
+        """
+        The default horizontal group 'Ledger' should be displayed only when relevant, i.e
+            * If at least 2 companies are running, or
+            * If at least one ledger exists and one journal of the running company is included in a ledger
+        """
+        horizontal_group_ledger = self.env.ref('account_reports.horizontal_group_ledger')
+
+        # 1. No existing ledger but 2 running companies
+        options = self._generate_options(self.report, '2019-01-01', '2019-12-31')
+        self.assertDictEqual(options['available_horizontal_groups'][0], {
+            'id': horizontal_group_ledger.id,
+            'name': horizontal_group_ledger.name,
+        })
+
+        # 2. Switching to only company_data_2
+        env = self.env(context={
+            **self.env.context,
+            'allowed_company_ids': [self.company_data_2['company'].id],
+            'company_id': self.company_data_2['company'].id,
+        })
+        options = self._generate_options(self.report.with_env(env), '2019-01-01', '2019-12-31')
+        self.assertEqual(options['available_horizontal_groups'], [])
+
+        # 2. Creating a ledger including a journal from company_data_2
+        self.env['account.journal.group'].create({
+            'name': 'MISC',
+            'included_journal_ids': self.company_data_2['default_journal_misc'],
+        })
+
+        options = self._generate_options(self.report, '2019-01-01', '2019-12-31')
+        self.assertDictEqual(options['available_horizontal_groups'][0], {
+            'id': horizontal_group_ledger.id,
+            'name': horizontal_group_ledger.name,
+        })
 
     def test_hide_if_zero_with_no_formulas(self):
         """
@@ -780,7 +946,7 @@ class TestFinancialReport(TestAccountReportsCommon):
         # TODO without this, the create() puts newIds in the sublines, and flushing doesn't help. Seems to be an ORM bug.
         self.env.invalidate_all()
 
-        options = self._generate_options(report, fields.Date.from_string('2019-05-01'), fields.Date.from_string('2019-05-01'))
+        options = self._generate_options(report, '2019-05-01', '2019-05-31')
         options = self._update_comparison_filter(options, report, 'previous_period', 2)
 
         self.assertLinesValues(
@@ -825,10 +991,11 @@ class TestFinancialReport(TestAccountReportsCommon):
 
     def test_option_hierarchy(self):
         """ Check that the report lines are correct when the option "Hierarchy and subtotals is ticked"""
-        self.env['account.group'].create({
+        self.company_data['default_account_revenue'].parent_id = self.env['account.account'].create({
+            'code': '40.49',
             'name': 'Sales',
-            'code_prefix_start': '40',
-            'code_prefix_end': '49',
+            'account_type': 'income',
+            'active': False,
         })
 
         move = self.env['account.move'].create({
@@ -851,23 +1018,24 @@ class TestFinancialReport(TestAccountReportsCommon):
         lines = profit_and_loss_report._get_lines(options)
 
         unfolded_lines = profit_and_loss_report._get_unfolded_lines(lines, line_id)
-        unfolded_lines = [{'name': line['name'], 'level': line['level']} for line in unfolded_lines]
+        unfolded_lines = [{'name': line.name, 'level': line.level} for line in unfolded_lines]
 
         self.assertEqual(
             unfolded_lines,
             [
                 {'level': 1, 'name': 'Revenue'},
-                {'level': 2, 'name': '40-49 Sales'},
+                {'level': 2, 'name': '40.49 Sales'},
                 {'level': 3, 'name': '400000 Product Sales'},
             ]
         )
 
     def test_option_hierarchy_with_no_group_lines(self):
-        """ Check that the report lines of 'No Group' have correct ids with the option 'Hierarchy and subtotals' """
-        self.env['account.group'].create({
+        """ Check that the report lines with no parent are correct with the option 'Hierarchy and subtotals' """
+        self.env['account.account'].create({
+            'code': '45.49',
             'name': 'Sales',
-            'code_prefix_start': '45',
-            'code_prefix_end': '49',
+            'account_type': 'income',
+            'active': False,
         })
 
         move = self.env['account.move'].create({
@@ -888,27 +1056,23 @@ class TestFinancialReport(TestAccountReportsCommon):
         options['hierarchy'] = True
         self.env.company.totals_below_sections = False
         lines = profit_and_loss_report._get_lines(options)
-        lines_array = [{'name': line['name'], 'level': line['level']} for line in lines]
+        lines_array = [{'name': line.name, 'level': line.level} for line in lines]
 
         self.assertEqual(
             lines_array,
             [
                 {'name': 'Revenue', 'level': 1},
-                {'name': '(No Group)', 'level': 2},
-                {'name': '400000 Product Sales', 'level': 3},
-                {'name': 'Less Costs of Revenue', 'level': 1},
+                {'name': '400000 Product Sales', 'level': 2},
+                {'name': 'Costs of Revenue', 'level': 1},
                 {'name': 'Gross Profit', 'level': 0},
-                {'name': 'Less Operating Expenses', 'level': 1},
+                {'name': 'Operating Expenses', 'level': 1},
                 {'name': 'Operating Income (or Loss)', 'level': 0},
-                {'name': 'Plus Other Income', 'level': 1},
-                {'name': 'Less Other Expenses', 'level': 1},
+                {'name': 'Other Income', 'level': 1},
+                {'name': 'Other Expenses', 'level': 1},
                 {'name': 'Net Profit', 'level': 0},
-                {'name': 'Less Allocations and Plus Withdrawals', 'level': 1},
-                {'name': 'Net Profit Left After Allocations and Withdrawals', 'level': 0},
+                {'name': 'Allocations and Withdrawals', 'level': 1},
             ]
         )
-
-        self.assertEqual(lines[1]['id'], lines[0]['id'] + '|' + '~account.group~')
 
     def test_parse_line_id(self):
         line_id_1 = self.env['account.report']._parse_line_id('markup1~account.account~5|markup2~res.partner~8|markup3~~')
@@ -918,11 +1082,10 @@ class TestFinancialReport(TestAccountReportsCommon):
         self.assertEqual(line_id_2, [('', 'account.report', 14), ({"groupby_prefix_group": "~"}, 'account.report', 21)])
 
     def test_multi_ledger_horizontal_group(self):
-        def _create_journal_group(name, excluded_journal_ids, company):
+        def _create_journal_group(name, included_journal_ids, company):
             return self.env['account.journal.group'].create({
                 'name': name,
-                'excluded_journal_ids': [Command.set(excluded_journal_ids)],
-                'company_id': company.id if company else False,
+                'included_journal_ids': [Command.set(included_journal_ids)],
             })
         c1 = self.company_data['company']
         c2 = self.company_data_2['company']
@@ -931,13 +1094,11 @@ class TestFinancialReport(TestAccountReportsCommon):
 
         c1_sale = self.company_data['default_journal_sale']
         c2_sale = self.company_data_2['default_journal_sale']
-        c1_no_sale_ledger = _create_journal_group('C1, no Sale', c1_sale.ids, c1)
-        c2_no_sale_ledger = _create_journal_group('C2, no Sale', c2_sale.ids, c2)
-        c1_c2_journals_no_sale = self.env['account.journal'].search([
+        c1_c2_journals_sale = self.env['account.journal'].search([
             ('company_id', 'in', [c1.id, c2.id]),
-            ('id', 'not in', [c1_sale.id, c2_sale.id])
+            ('id', 'in', [c1_sale.id, c2_sale.id])
         ])
-        c1_c2_sale_ledger = _create_journal_group('Sale of C1, C2', c1_c2_journals_no_sale.ids, False)
+        c1_c2_sale_ledger = _create_journal_group('Sale of C1, C2', c1_c2_journals_sale.ids, False)
         report = self.env.ref('account_reports.profit_and_loss')
         horizontal_group = self.env['account.report.horizontal.group'].create({
             'name': 'Multi-Ledger',
@@ -945,7 +1106,7 @@ class TestFinancialReport(TestAccountReportsCommon):
             'rule_ids': [
                 Command.create({
                     'field_name': 'journal_group_id',
-                    'domain':  str([('id', 'in', (c1_no_sale_ledger + c2_no_sale_ledger + c1_c2_sale_ledger).ids)]),
+                    'domain':  str([('id', 'in', (c1_c2_sale_ledger).ids)]),
                 }),
             ],
         })
@@ -991,24 +1152,68 @@ class TestFinancialReport(TestAccountReportsCommon):
         c2_moves = self.env['account.move'].with_company(c2).create(c2_move_data)
         c2_moves.action_post()
 
-        options = self._generate_options(report, '2020-01-01', '2020-12-31', default_options={'selected_horizontal_group_id': horizontal_group.id})
-        lines = report._get_lines(options)
-        # When company specified on ledger, journals for other companies are excluded
+        options = self._generate_options(report, '2020-01-01', '2020-12-31', default_options={'selected_horizontal_group_id': horizontal_group.id, 'is_opening_report': True})
+        options['selected_journal_groups'] = c1_c2_sale_ledger
+        # As the default selected journals are all that are not linked to a group, select all journals
+        self._press_journal_filter(options, (c1_sale + c2_sale))
+
         self.assertLinesValues(
-            lines,
-            #   Name                                                     C1, no sales         C2, no sales       Sale of C1, C2
-            [   0,                                                           1,                   2,                   3],
+            report._get_lines(options),
+            #       Name                                                    C1                   C2              Sale of C1, C2
+            [0,                                                      1,                   2,                    3],
             [
                 ('Revenue',                                                0.0,                 0.0,                150.0),
-                ('Less Costs of Revenue',                                  0.0,                 0.0,                  0.0),
+                ('Costs of Revenue',                                       0.0,                 0.0,                  0.0),
                 ('Gross Profit',                                           0.0,                 0.0,                150.0),
-                ('Less Operating Expenses',                              100.0,                50.0,                  0.0),
+                ('Operating Expenses',                                   100.0,                50.0,                  0.0),
                 ('Operating Income (or Loss)',                          -100.0,               -50.0,                150.0),
-                ('Plus Other Income',                                      0.0,                 0.0,                  0.0),
-                ('Less Other Expenses',                                    0.0,                 0.0,                  0.0),
+                ('Other Income',                                           0.0,                 0.0,                  0.0),
+                ('Other Expenses',                                         0.0,                 0.0,                  0.0),
                 ('Net Profit',                                          -100.0,               -50.0,                150.0),
-                ('Less Allocations and Plus Withdrawals',                  0.0,                 0.0,                  0.0),
-                ('Net Profit Left After Allocations and Withdrawals',   -100.0,               -50.0,                150.0),
+                ('Allocations and Withdrawals',                            0.0,                 0.0,                  0.0),
             ],
             options,
         )
+
+        # If no journal group exists and we're in multicompany, the Ledger group should basically do a grouping per company.
+        c1_c2_sale_ledger.unlink()
+        horizontal_group_ledger = self.env.ref('account_reports.horizontal_group_ledger')
+        options = self._generate_options(report, '2020-01-01', '2020-12-31', default_options={'selected_horizontal_group_id': horizontal_group_ledger.id})
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #       Name                                                    C1                   C2
+            [0,                                                              1,                   2],
+            [
+                ('Revenue',                                              100.0,                50.0),
+                ('Costs of Revenue',                                       0.0,                 0.0),
+                ('Gross Profit',                                         100.0,                50.0),
+                ('Operating Expenses',                                   100.0,                50.0),
+                ('Operating Income (or Loss)',                             0.0,                 0.0),
+                ('Other Income',                                           0.0,                 0.0),
+                ('Other Expenses',                                         0.0,                 0.0),
+                ('Net Profit',                                             0.0,                 0.0),
+                ('Allocations and Withdrawals',                            0.0,                 0.0),
+            ],
+            options,
+        )
+
+    def test_options_sanitization(self):
+        """ Test that options including custom ranges are well-sanitized and can be serialized """
+        report = self.env.ref('account_reports.general_ledger_report')
+
+        for custom_range in [
+            ('2024-02-14', '2024-12-31', 'FY 2024_2'),
+            ('2025-01-01', '2025-04-30', 'FY 2025_1'),
+            ('2025-05-01', '2025-12-31', 'FY 2025_2'),
+            ('2026-05-01', '2026-06-30', 'FY 2026_2'),
+        ]:
+            self.env['account.fiscal.year'].create({
+                'name': custom_range[2],
+                'date_from': custom_range[0],
+                'date_to': custom_range[1],
+                'company_id': self.env.company.id,
+            })
+
+        options = report.get_options({'date': {'default_opening_date': 'this_year'}})
+        json.dumps(options)

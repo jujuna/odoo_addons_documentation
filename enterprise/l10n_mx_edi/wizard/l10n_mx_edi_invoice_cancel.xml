@@ -16,8 +16,8 @@
                 <group>
                     <group>
                         <field name="cancellation_reason" widget="l10n_mx_edi_cancellation_reason"/>
-                        <field name="periodicity"
-                               invisible="not need_replacement_invoice_button or mode != 'ginvoice'"/>
+                        <field name="periodicity" invisible="not need_replacement_invoice_button or mode != 'ginvoice'"/>
+                        <field name="date" invisible="not need_replacement_invoice_button or mode != 'ginvoice'" options="{'min_precision': 'months', 'numeric': True}"/>
                     </group>
                 </group>
 
@@ -36,8 +36,7 @@
                             type="object"
                             class="btn btn-primary">
                     </button>
-                    <button string="Cancel"
-                            data-hotkey="x"
+                    <button data-hotkey="x"
                             special="cancel"
                             class="btn btn-secondary"/>
                 </footer>

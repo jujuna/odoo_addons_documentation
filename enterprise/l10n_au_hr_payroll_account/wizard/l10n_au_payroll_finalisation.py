@@ -16,10 +16,12 @@ class L10n_AuPayrollFinalisationWizard(models.TransientModel):
     name = fields.Char("Name", compute="_compute_name", required=True)
     company_id = fields.Many2one("res.company", default=lambda self: self.env.company, string="Company", readonly=True)
     abn = fields.Char("ABN", related="company_id.vat")
-    branch_code = fields.Char(related="company_id.l10n_au_branch_code")
+    branch_code = fields.Char(related="company_id.l10n_au_branch_code",
+                              help="The branch code of your company, available on the ATO's business portal for your company.")
     bms_id = fields.Char(related="company_id.l10n_au_bms_id")
-    date_deadline = fields.Date("Deadline Date", default=lambda self: fields.Date.today(), required=True)
-    is_eofy = fields.Boolean("EOFY Declaration", default=False)
+    date_deadline = fields.Date("Deadline Date", default=fields.Date.context_today, required=True)
+    is_eofy = fields.Boolean("EOFY Declaration", default=False,
+                             help="Tick this box to create an EOFY declaration report that includes all employees, including terminated employees, for the selected fiscal year. Leave this box ticked off to select employees manually (e.g. in case of a termination).")
     date_start = fields.Date("Date Start", compute="_compute_date_period", required=True)
     date_end = fields.Date("Date End", compute="_compute_date_period", required=True)
     fiscal_year = fields.Selection(selection="_get_fiscal_year_selection", string="Fiscal Year", default=_default_fiscal_year, required=True)
@@ -32,13 +34,14 @@ class L10n_AuPayrollFinalisationWizard(models.TransientModel):
         string="Employees",
     )
     responsible_user_id = fields.Many2one("res.users", string="Responsible User", default=lambda self: self.env.company.l10n_au_stp_responsible_id.user_id, required=True)
-    finalisation = fields.Boolean("Finalisation", default=True, help="Set it to false to un-finalise the employees.")
+    finalisation = fields.Boolean(
+        "Finalisation", default=True, help="Tick this box to alongside an individual or EOFY declaration to finalise YTD values for the selected employees. Untick this box to amend a previous finalisation.")
 
     def _is_past_fiscal_year(self):
         return self.env["l10n_au.payslip.ytd"]._is_past_fiscal_year(self.date_start)
 
     def _get_fiscal_year_selection(self):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         selection = []
         fiscal_start, fiscal_end = date_utils.get_fiscal_year(today, self.env.company.fiscalyear_last_day, int(self.env.company.fiscalyear_last_month))
         for year in range(5):
@@ -61,13 +64,14 @@ class L10n_AuPayrollFinalisationWizard(models.TransientModel):
 
     @api.depends("is_eofy", "fiscal_year")
     def _compute_date_period(self):
+        today = fields.Date.context_today(self)
         for rec in self:
             fiscal_start, fiscal_end = date_utils.get_fiscal_year(fields.Date.to_date(rec.fiscal_year), self.env.company.fiscalyear_last_day, int(self.env.company.fiscalyear_last_month))
             rec.date_start = fiscal_start
             if rec._is_past_fiscal_year():
                 rec.date_end = rec.date_start + date_utils.get_timedelta(1, "year") - date_utils.get_timedelta(1, "day")
             else:
-                rec.date_end = fiscal_end if rec.is_eofy else fields.Date.today()
+                rec.date_end = fiscal_end if rec.is_eofy else today
 
     @api.depends("company_id", "is_eofy", "fiscal_year")
     def _compute_all_employees(self):

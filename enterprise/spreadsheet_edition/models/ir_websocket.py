@@ -45,8 +45,9 @@ class IrWebsocket(models.AbstractModel):
         model_name = params[1]
         if model_name not in self.env:
             return
-        if len(params) == 4:
-            access_token = params[3]
+        # FIXME, remove share_id ?
+        if len(params) == 5:
+            access_token = params[4]
         else:
             access_token = None
         record = self.env[model_name].browse(res_id).exists()

@@ -12,12 +12,14 @@ from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestBEIntrastatReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestAccountReportsCommon.setup_country('be')
     def setUpClass(cls):
         super().setUpClass()
         italy = cls.env.ref('base.it')
-        cls.company_data['company'].company_registry = '0123456789'
+        cls.company_data['company'].partner_id.additional_identifiers = {'BE_EN': '0477472701'}
         cls.report = cls.env.ref('account_intrastat.intrastat_report')
         cls.report_goods_handler = cls.env['account.intrastat.goods.report.handler']
         cls.report_services_handler = cls.env['account.intrastat.services.be.report.handler']
@@ -174,7 +176,7 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
         cls.expected_content_all = b'''
         <DeclarationReport xmlns="http://www.onegate.eu/2010-01-01">
             <Administration>
-                <From declarerType="KBO">0123456789</From>
+                <From declarerType="KBO">0477472701</From>
                 <To>NBB</To>
                 <Domain>SXX</Domain>
             </Administration>

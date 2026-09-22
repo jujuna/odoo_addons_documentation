@@ -6,6 +6,7 @@ from odoo.tests import Form, TransactionCase, tagged
 
 
 @tagged('-standard', 'external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDeliveryDHL(TransactionCase):
 
     def setUp(self):
@@ -251,7 +252,7 @@ class TestDeliveryDHL(TransactionCase):
 
         order1_vals = {
                     'product_id': self.iPadMini.id,
-                    'product_uom': self.uom_unit.id,
+                    'uom_id': self.uom_unit.id,
                     'product_uom_qty': 1.0,
                     'location_id': self.stock_location.id,
                     'location_dest_id': self.customer_location.id}
@@ -274,7 +275,6 @@ class TestDeliveryDHL(TransactionCase):
         delivery_order.button_validate()
         self.assertEqual(delivery_order.state, 'done', 'Shipment state should be done.')
 
-@tagged('standard', '-external')
 class TestMockedDeliveryDHL(TestDeliveryDHL):
 
     @contextmanager

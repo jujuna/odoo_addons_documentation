@@ -59,6 +59,10 @@
                             <td><strong>Registration Number</strong></td>
                             <td><span t-field="o.employee_id.registration_number"/></td>
                         </tr>
+                        <tr t-if="o.version_id.departure_date and o.date_to &gt; o.version_id.departure_date">
+                            <td><strong>Departure Date</strong></td>
+                            <td colspan="3"><span t-out="o.version_id.departure_date" t-options="{'widget': 'date'}"/></td>
+                        </tr>
                     </table>
 
                     <div class="oe_structure"></div>
@@ -71,8 +75,8 @@
                                 <th class="text-end"><strong>Rate</strong></th>
                                 <th class="text-end"><strong>Total</strong></th>
                             </tr>
-                            <tr t-foreach="o.line_ids.filtered(lambda line: line.category_id.code in ['BASIC', 'DIV. IMPOS'])" t-as="line">
-                                <td width="50%"><span t-field="line.name"/></td>
+                            <tr t-foreach="o.line_ids.filtered(lambda line: any(cat.code in ['BASIC', 'DIV. IMPOS'] for cat in line.category_ids))" t-as="line">                                <td width="50%"><span  t-if="is_html_empty(line.salary_rule_id.note)" t-field="line.name"/>
+                            <span t-field="line.salary_rule_id.note" t-if="not is_html_empty(line.salary_rule_id.note)"/></td>
                                 <td class="text-end"><span t-out="line.amount" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
                                 <td class="text-end">
                                     <span t-if="line.quantity != 1 and line.quantity.is_integer()" t-out="int(line.quantity)"/>
@@ -81,36 +85,44 @@
                                 <td class="text-end"><span t-if="line.rate != 100" t-out="str(round(line.rate, 2)) + ' %'"/></td>
                                 <td class="text-end"><span t-out="line.total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
                             </tr>
-                            <tr class="table-secondary" t-foreach="o.line_ids.filtered(lambda line: line.code == 'ANNUAL_SALARY_REVALUED')" t-as="line">
-                                <td class="text-center"><span t-field="line.name"/></td>
+                            <tr class="table-secondary" t-foreach="o.line_ids.filtered(lambda line: line.code == 'REFERENCE_SALARY_REVALUED')" t-as="line">
+                                <td class="text-center"><span t-if="is_html_empty(line.salary_rule_id.note)" t-field="line.name"/>
+                                <span t-field="line.salary_rule_id.note" t-if="not is_html_empty(line.salary_rule_id.note)"/>
+                                </td>
                                 <td colspan="3"></td>
                                 <td class="text-end"><span t-out="line.total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
                             </tr>
-
-                            <t t-set="line_count" t-value="0" />
-                            <tr t-foreach="o.line_ids.filtered(lambda line: line.category_id.code == 'NOTICE_DURATION')" t-as="line">
-                                <t t-if="line_count == 0">
-                                    <td rowspan="3">Notice duration</td>
+                            <t t-set="notice_lines" t-value="o.line_ids.filtered(lambda line: 'NOTICE_DURATION' in line.category_ids.mapped('code'))" />
+                            <tr t-foreach="notice_lines" t-as="line">
+                                <t t-if="line_index == 0">
+                                    <td t-att-rowspan="len(notice_lines)" style="vertical-align: middle;">Notice duration</td>
                                 </t>
                                 <td class="text-end"><span t-out="line.quantity"/></td>
-                                <td colspan="2"><span t-out="line.name"/></td>
+                                <td colspan="2"><span t-if="is_html_empty(line.salary_rule_id.note)" t-field="line.name"/>
+                                <span t-field="line.salary_rule_id.note" t-if="not is_html_empty(line.salary_rule_id.note)"/>
+                                </td>
                                 <td class="text-end"><span t-out="line.total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
-                                <t t-set="line_count" t-value="line_count+1" />
                             </tr>
-                            <t t-foreach="o.line_ids.filtered(lambda line: line.category_id.code == 'NOTICE_SALARY' and line.code != 'EMPLOYERCOST')" t-as="line">
-                                <tr class="table-secondary" t-if="line.code in ['NET', 'BASIC']">
-                                    <td class="text-center"><span t-field="line.name"/></td>
+                            <t t-foreach="o.line_ids.filtered(lambda line: 'NOTICE_SALARY' in line.category_ids.mapped('code') and line.code != 'EMPLOYERCOST')" t-as="line">
+                                <tr class="table-secondary" t-if="line.code in ['NET', 'TERM_BASIC']">
+                                    <td class="text-center"><span t-if="is_html_empty(line.salary_rule_id.note)" t-field="line.name"/>
+                                    <span t-field="line.salary_rule_id.note" t-if="not is_html_empty(line.salary_rule_id.note)"/>
+                                    </td>
                                     <td colspan="3"></td>
                                     <td class="text-end"><span t-out="line.total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
                                 </tr>
                                 <tr t-else="">
-                                    <td colspan="4"><span t-field="line.name"/></td>
+                                    <td colspan="4"><span t-if="is_html_empty(line.salary_rule_id.note)" t-field="line.name"/>
+                                    <span t-field="line.salary_rule_id.note" t-if="not is_html_empty(line.salary_rule_id.note)"/>
+                                    </td>
                                     <td class="text-end"><span t-out="line.total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
                                 </tr>
                             </t>
-                            <t t-foreach="o.line_ids.filtered(lambda line: line.code in ['ONSS', 'GROSS', 'P.P', 'ATTACH_SALARY', 'ASSIG_SALARY', 'CHILD_SUPPORT', 'DEDUCTION', 'REIMBURSEMENT', 'NET'])" t-as="line">
+                            <t t-foreach="o.line_ids.filtered(lambda line: line.code in ['ONSS', 'TERM_GROSS', 'P.P', 'HolPayReg', 'ATTACH_SALARY', 'ASSIG_SALARY', 'CHILD_SUPPORT', 'DEDUCTION', 'REIMBURSEMENT', 'NET'])" t-as="line">
                                 <tr>
-                                    <td colspan="4"><span t-field="line.name"/></td>
+                                    <td colspan="4"><span t-if="is_html_empty(line.salary_rule_id.note)" t-field="line.name"/>
+                                    <span t-field="line.salary_rule_id.note" t-if="not is_html_empty(line.salary_rule_id.note)"/>
+                                    </td>
                                     <td class="text-end"><span t-out="line.total" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
                                 </tr>
                             </t>
@@ -121,31 +133,28 @@
                         <t t-set="allocations" t-value="o.safe_compute_salary_allocations(net_line.total)" />
                         <t t-if="'__error__' in allocations">
                             <div class="alert alert-danger mt-3">
-                                <i class="fa fa-exclamation-triangle"/> <strong>Salary allocations could not be computed:</strong>
+                                <i class="oi" data-icon="warning"/> <strong>Salary allocations could not be computed:</strong>
                                 <span t-out="allocations['__error__']"/>
                             </div>
                         </t>
                         <t t-else="">
                             <table class="table table-sm mt-3">
                                 <tbody>
-                                    <t t-set="line_count" t-value="0" />
-                                    <t t-foreach="o.employee_id.bank_account_ids" t-as="bank">
-                                        <t t-if="str(bank.id) in allocations">
-                                            <tr class="table-secondary">
-                                                <t t-if="line_count == 0">
-                                                    <td width="40%" t-att-rowspan="len(o.employee_id.bank_account_ids)">To Pay On</td>
-                                                </t>
-                                                <td class="text-end">
-                                                    <span t-out="bank.acc_number"/>
-                                                    <t t-if="bank.bank_id"> - <span t-out="bank.bank_id.name"/></t>
-                                                </td>
-                                                <td class="text-end">
-                                                    <span t-out="allocations[str(bank.id)]"
-                                                        t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
-                                                </td>
-                                            </tr>
-                                        </t>
-                                        <t t-set="line_count" t-value="line_count+1" />
+                                    <t t-set="banks_to_pay" t-value="o.employee_id.bank_account_ids.filtered(lambda b: str(b.id) in allocations)" />
+                                    <t t-foreach="banks_to_pay" t-as="bank">
+                                        <tr class="table-secondary">
+                                            <t t-if="bank_index == 0">
+                                                <td width="40%" t-att-rowspan="len(banks_to_pay)">To Pay On</td>
+                                            </t>
+                                            <td class="text-end">
+                                                <span t-out="bank.account_number"/>
+                                                <t t-if="bank.bank_name"> - <span t-out="bank.bank_name"/></t>
+                                            </td>
+                                            <td class="text-end">
+                                                <span t-out="allocations[str(bank.id)]"
+                                                    t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                            </td>
+                                        </tr>
                                     </t>
                                 </tbody>
                             </table>
@@ -163,8 +172,7 @@
 <template id="report_termination_fees_lang">
     <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
-            <t t-set="o" t-value="o.with_context(lang=o.employee_id.lang or o.env.lang)"/>
-            <t t-call="l10n_be_hr_payroll.report_termination_fees" t-lang="o.env.lang"/>
+            <t t-call="l10n_be_hr_payroll.report_termination_fees"/>
         </t>
     </t>
 </template>

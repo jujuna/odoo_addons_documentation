@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <odoo>
 
-    <menuitem name="Appraisals" id="menu_hr_appraisal_root" web_icon="hr_appraisal,static/description/icon.png" sequence="200"/>
+    <menuitem name="Appraisals" id="menu_hr_appraisal_root" web_icon="hr_appraisal,static/description/icon.png" sequence="190"/>
     <menuitem name="Configuration"
         id="menu_hr_appraisal_configuration"
         parent="menu_hr_appraisal_root"
@@ -11,6 +11,7 @@
     <record model="ir.ui.view" id="view_hr_appraisal_form">
         <field name="name">hr.appraisal.form</field>
         <field name="model">hr.appraisal</field>
+        <field name="priority" eval="10"/>
         <field name="arch" type="xml">
             <form string="Appraisal" class="o_appraisal_form">
             <header>
@@ -24,7 +25,7 @@
             </header>
             <sheet>
                 <div class="oe_button_box" name="button_box">
-                    <button class="oe_stat_button" name="action_open_goals" icon="fa-bullseye" type="object">
+                    <button class="oe_stat_button" name="action_open_goals" icon="crisis_alert" type="object">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_value"><field name="uncomplete_goals_count"/></span>
                             <span class="o_stat_text">Goals</span>
@@ -33,7 +34,7 @@
                     <button class="oe_stat_button"
                         name="action_open_employee_appraisals"
                         groups="hr.group_hr_user"
-                        icon="fa-star-half-o" type="object"
+                        icon="star_half" type="object"
                         invisible="employee_appraisal_count &lt; 2 or not employee_id">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_value"><field name="employee_appraisal_count"/></span>
@@ -72,11 +73,15 @@
                     <group>
                         <field name="manager_ids"
                             widget="many2many_avatar_employee"
-                            options="{'color_field': 'color'}"
+                            options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"
                             required="1"
                             string="Appraisers"
                             readonly="state == '3_done' or (state == '2_pending' and not is_manager)"/>
                         <field name="date_close" readonly="state == '3_done'"/>
+                        <field name="assessment_note" options="{'no_create': True, 'no_open': True}"
+                               invisible="state == '1_new' or uid == employee_user_id"
+                               readonly="state == '3_done' or (state == '2_pending' and not is_manager)"/>
+                        <field name="next_appraisal_date" placeholder="On demand" invisible="not assessment_note or state != '3_done'"/>
                         <field name="appraisal_template_id" string="Template"
                                readonly="state != '1_new' or (not is_manager and uid != employee_user_id)"
                                invisible="state != '1_new' or uid == employee_user_id"
@@ -86,10 +91,6 @@
                         <field name="job_id" invisible="not job_id or uid == employee_user_id" readonly="state != '1_new'"/>
                         <field name="department_id" invisible="not department_id or uid == employee_user_id" readonly="state != '1_new'"/>
                         <field name="company_id" groups="base.group_multi_company" required="1" invisible="uid == employee_user_id"/>
-                        <field name="assessment_note" options="{'no_create': True, 'no_open': True}"
-                               invisible="state == '1_new' or uid == employee_user_id"
-                               readonly="state == '3_done' or (state == '2_pending' and not is_manager)"/>
-                        <field name="next_appraisal_date" placeholder="On demand" invisible="not assessment_note or state != '3_done'"/>
                     </group>
                 </group>
                 <field name="appraisal_properties" columns="2"/>
@@ -99,17 +100,25 @@
                             <div class="o_appraisal_feedback col-12 col-md-6">
                                 <div class="row">
                                     <div class="o_appraisal_feedback_title col-12 d-flex justify-content-between">
-                                        <h3>Employee's Feedback</h3>
-                                        <div class="h-100" invisible="state != '2_pending'">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <h3>Employee's Feedback</h3>
+                                            <button type="object" name="action_open_feedback_popup"
+                                                class="btn btn-sm oi mb-2 o_expand_button"
+                                                data-icon="expand_content"
+                                                title="Expand Employee's Feedback"
+                                                context="{'feedback_type': 'employee'}"
+                                                invisible="not can_see_employee_publish and not employee_feedback_published"/>
+                                        </div>
+                                        <div class="h-100" invisible="state == '3_done'">
                                             <strong class="text-info" invisible="employee_feedback_published">Private</strong>
                                             <span invisible="not employee_feedback_published">Private</span>
                                             <field name="employee_feedback_published" nolabel="1" widget="boolean_toggle_confirm"
-                                                invisible="state == '1_new' and uid == employee_user_id" class="ms-2 me-0"/>
+                                                invisible="state == '3_done' and uid == employee_user_id" class="ms-2 me-0"/>
                                             <span invisible="employee_feedback_published">Shared to Appraisers</span>
                                             <strong class="text-success" invisible="not employee_feedback_published">Shared to Appraisers</strong>
                                         </div>
                                     </div>
-                                    <div class="col-12 o_appraisal_input scrollable-section position-relative o_height">
+                                    <div class="col-12 o_appraisal_input position-relative">
                                         <span class="o_appraisal_overlay o_highlight" invisible="can_see_employee_publish or employee_feedback_published or not employee_feedback_template">
                                             <div>Self Assessment will show here</div>
                                             <div>once published</div>
@@ -125,16 +134,24 @@
                             <div class="o_appraisal_feedback o_appraisal_manager_feedback col-12 col-md-6">
                                 <div class="row">
                                     <div class="o_appraisal_feedback_title col-12 d-flex justify-content-between">
-                                        <h3>Manager's Feedback</h3>
-                                        <div class="h-100" invisible="state != '2_pending' or not can_see_manager_publish">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <h3>Manager's Feedback</h3>
+                                            <button type="object" name="action_open_feedback_popup"
+                                                class="btn btn-sm oi mb-2 o_expand_button"
+                                                data-icon="expand_content"
+                                                title="Expand Manager's Feedback"
+                                                context="{'feedback_type': 'manager'}"
+                                                invisible="not can_see_manager_publish and not manager_feedback_published"/>
+                                        </div>
+                                        <div class="h-100" invisible="state == '3_done' or not can_see_manager_publish">
                                             <strong class="text-info" invisible="manager_feedback_published">Private</strong>
                                             <span invisible="not manager_feedback_published">Private</span>
-                                            <field name="manager_feedback_published" nolabel="1" widget="boolean_toggle" class="ms-2 me-0" invisible="not can_see_manager_publish"/>
+                                            <field name="manager_feedback_published" nolabel="1" widget="boolean_toggle" class="ms-2 me-0" invisible="not can_see_manager_publish or state == '3_done'"/>
                                             <span invisible="manager_feedback_published">Shared to Employee</span>
                                             <strong class="text-success" invisible="not manager_feedback_published">Shared to Employee</strong>
                                         </div>
                                     </div>
-                                    <div class="col-12 o_appraisal_input scrollable-section position-relative o_height">
+                                    <div class="col-12 o_appraisal_input position-relative">
                                         <span class="o_appraisal_overlay" invisible="can_see_manager_publish or manager_feedback_published or not manager_feedback_template">
                                             <div>Manager Assessment will show here</div>
                                             <div>once published</div>
@@ -162,9 +179,46 @@
                 <field name="show_manager_feedback_full" invisible="1"/>
                 <field name="is_manager" invisible="1"/>
                 <field name="employee_autocomplete_ids" invisible="1"/>
-                <chatter/>
-          </sheet>
+            </sheet>
+            <chatter/>
           </form>
+        </field>
+    </record>
+
+    <record id="view_hr_appraisal_feedback_popup" model="ir.ui.view">
+        <field name="name">hr.appraisal.feedback.popup</field>
+        <field name="model">hr.appraisal</field>
+        <field name="priority" eval="99"/>
+        <field name="arch" type="xml">
+            <form string="Edit Feedback">
+                <sheet>
+                    <group>
+                        <field name="accessible_employee_feedback"
+                            invisible="context.get('feedback_type') != 'employee'"
+                            readonly="state == '3_done' or not can_see_employee_publish"
+                            nolabel="1"/>
+                        <field name="accessible_manager_feedback"
+                            invisible="context.get('feedback_type') != 'manager'"
+                            readonly="state == '3_done' or not can_see_manager_publish"
+                            nolabel="1"/>
+                    </group>
+                    <footer>
+                        <button string="Update" class="btn-primary" special="save"
+                            invisible="state == '3_done' or
+                                (context.get('feedback_type') == 'employee' and not can_see_employee_publish) or
+                                (context.get('feedback_type') == 'manager' and not can_see_manager_publish)"/>
+                        <button class="btn-secondary" special="cancel"
+                            invisible="state == '3_done' or
+                                (context.get('feedback_type') == 'employee' and not can_see_employee_publish) or
+                                (context.get('feedback_type') == 'manager' and not can_see_manager_publish)"/>
+                        <button string="Close" class="btn-secondary" special="cancel"
+                            invisible="state != '3_done' and (
+                                context.get('feedback_type') == 'employee' and can_see_employee_publish or
+                                context.get('feedback_type') == 'manager' and can_see_manager_publish
+                            )"/>
+                    </footer>
+                </sheet>
+            </form>
         </field>
     </record>
 
@@ -179,6 +233,57 @@
             <p>
                 Plan appraisals with your colleagues, collect and discuss feedback.
             </p>
+        </field>
+    </record>
+
+    <record id="action_confirm_appraisal" model="ir.actions.server">
+        <field name="name">Confirm</field>
+        <field name="sequence" eval="10"/>
+        <field name="model_id" ref="hr_appraisal.model_hr_appraisal"/>
+        <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="binding_model_id" ref="hr_appraisal.model_hr_appraisal"/>
+        <field name="binding_view_types">list,kanban</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_confirm()
+        </field>
+    </record>
+
+    <record id="action_mark_appraisal_as_done" model="ir.actions.server">
+        <field name="name">Mark as Done</field>
+        <field name="sequence" eval="20"/>
+        <field name="model_id" ref="hr_appraisal.model_hr_appraisal"/>
+        <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="binding_model_id" ref="hr_appraisal.model_hr_appraisal"/>
+        <field name="binding_view_types">list,kanban</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_done()
+        </field>
+    </record>
+
+    <record id="action_appraisal_send_by_email" model="ir.actions.act_window">
+        <field name="name">Send By Email</field>
+        <field name="res_model">mail.compose.message</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{
+            'default_composition_mode': 'mass_mail',
+        }</field>
+        <field name="binding_model_id" ref="hr_appraisal.model_hr_appraisal"/>
+        <field name="binding_view_types">list,kanban</field>
+    </record>
+
+    <record id="action_appraisal_reset" model="ir.actions.server">
+        <field name="name">Reset</field>
+        <field name="sequence" eval="50"/>
+        <field name="model_id" ref="hr_appraisal.model_hr_appraisal"/>
+        <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="binding_model_id" ref="hr_appraisal.model_hr_appraisal"/>
+        <field name="binding_view_types">list,kanban</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_back()
         </field>
     </record>
 
@@ -200,7 +305,7 @@
             <list string="Appraisal" multi_edit="1" sample="1" js_class="appraisal_list_view">
                 <header>
                     <button name="%(action_open_appraisal_campaign_wizard)d"
-                            class="btn btn-secondary"
+                            class="btn btn-secondary o_appraisal_launch_campaign_button"
                             string="Launch Campaign"
                             type="action"
                             groups="base.group_user"
@@ -210,7 +315,7 @@
                 <field name="employee_id" string="Name" readonly="1" widget="many2one_avatar_employee"/>
                 <field name="department_id"/>
                 <field name="create_date" options="{'show_time': False}" optional="hide"/>
-                <field name="date_close" widget="appraisal_remaining_days"/>
+                <field name="date_close" widget="appraisal_relative_date"/>
                 <field name="next_appraisal_date" optional="hide"/>
                 <field name="assessment_note" optional="hide"/>
                 <field name="state" widget="badge" readonly="1"
@@ -272,7 +377,7 @@
                     domain="[('my_activity_date_deadline', '&gt;', 'today')]"/>
                 <separator/>
                 <group>
-                    <filter string='Employee' name="employee" icon="fa-user" domain="[]" context="{'group_by': 'employee_id'}"/>
+                    <filter string='Employee' name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
                     <filter string='Department' name="group_by_department_id" context="{'group_by': 'department_id'}"/>
                     <filter string='Final Rating' name="group_by_assessment_note" context="{'group_by': 'assessment_note'}"/>
                     <filter string='Job' name="groupby_job" context="{'group_by': 'job_id'}"/>
@@ -301,23 +406,24 @@
                 <progressbar field="state" colors='{"1_new": "secondary", "2_pending": "success", "3_done": "primary"}'/>
                 <header>
                     <button name="%(action_open_appraisal_campaign_wizard)d"
-                            class="btn btn-secondary"
+                            class="btn btn-secondary o_appraisal_launch_campaign_button"
                             string="Launch Campaign"
                             type="action"
                             groups="base.group_user"
-                            display="always"/>
+                            display="always"
+                            invisible="context.get('hide_campaign_button')"/>
                 </header>
                 <templates>
                     <t t-name="card" class="flex-row">
                             <widget name="web_ribbon" title="Done" bg_color="text-bg-primary" invisible="state != '3_done'"/>
                             <widget name="web_ribbon" title="Confirmed" bg_color="text-bg-success" invisible="state != '2_pending'"/>
-                            <aside class="o_kanban_aside_full">
+                            <aside class="o_card_aside_full">
                                 <field name="avatar_128" widget="background_image" class="d-block position-relative"/>
                             </aside>
                             <main class="ms-2">
                                 <field name="employee_id" class="fw-bolder fs-5" style="max-width: 70%;"/>
                                 <field name="department_id"/>
-                                <field name="date_close" widget="appraisal_remaining_days"/>
+                                <field name="date_close" widget="appraisal_relative_date"/>
                                 <field name="appraisal_properties" widget="properties"/>
                                 <footer class="pt-0">
                                     <field name="activity_ids" widget="kanban_activity" class="ms-auto"/>
@@ -336,7 +442,7 @@
         <field name="arch" type="xml">
             <activity string="Appraisal">
                 <field name="employee_id" class="o_text_block"/>
-                <field name="state" invisible="1"/> <!-- will be used by appraisal_remaining_days widget-->
+                <field name="state" invisible="1"/> <!-- will be used by appraisal_relative_date widget-->
                 <templates>
                     <div t-name="activity-box">
                         <img class="rounded-circle" t-att-src="activity_image('hr.employee', 'avatar_128', record.employee_id.raw_value)" t-att-title="record.employee_id.value" t-att-alt="record.employee_id.value"/>
@@ -345,7 +451,7 @@
                                 <field name="employee_id" class="o_text_block"/>
                             </div>
                             <div class="text-muted">
-                                Deadline: <field name="date_close" widget="appraisal_remaining_days"/>
+                                Deadline: <field name="date_close" widget="appraisal_relative_date"/>
                             </div>
                         </div>
                     </div>
@@ -359,16 +465,21 @@
         <field name="model">hr.appraisal</field>
         <field name="arch" type="xml">
             <gantt
-                js_class="hr_gantt"
+                js_class="appraisal_gantt"
                 color="employee_id"
                 date_start="date_close"
                 date_stop="date_close"
                 default_group_by='department_id'>
-                <templates>
-                    <div t-name="gantt-popover">
-                        <div><strong>Date — </strong><t t-esc="date_close.toFormat('f')"/></div>
-                    </div>
-                </templates>
+                <popover>
+                    <templates>
+                        <t t-name="popover-header">
+                            <field name="display_name"/>
+                        </t>
+                        <t t-name="popover-body">
+                            <div><strong>Date — </strong><field name="date_close"/></div>
+                        </t>
+                    </templates>
+                </popover>
             </gantt>
         </field>
     </record>
@@ -465,4 +576,27 @@
         action="open_view_hr_appraisal_graph"
         parent="menu_hr_appraisal_report"
         sequence="1"/>
+
+    <menuitem
+        id="menu_appraisal_activity_root"
+        name="Activities"
+        parent="menu_hr_appraisal_configuration"
+        sequence="25"
+    />
+
+    <menuitem
+        id="menu_appraisal_activity_type"
+        name="Activity Types"
+        parent="menu_appraisal_activity_root"
+        action="mail_activity_type_action_config_appraisal"
+        sequence="1"
+    />
+
+    <menuitem
+        id="menu_appraisal_activity_plans"
+        name="Activity Plans"
+        parent="menu_appraisal_activity_root"
+        action="mail_activity_plan_action_appraisal"
+        sequence="2"
+    />
 </odoo>

@@ -2,11 +2,9 @@
 <templates>
 
 <t t-name="web_studio.SystrayItem">
-    <div t-attf-class="o_web_studio_navbar_item {{ buttonDisabled ? 'o_disabled' : ''}} d-none d-md-inline-block" t-ref="root" t-on-click.prevent="_onClick">
-        <button title="Toggle Studio" aria-label="Toggle Studio" class="o_nav_entry">
-            <i class="oi oi-studio" role="img"/>
-        </button>
-    </div>
+    <button t-ref="this.rootRef" title="Toggle Studio" aria-label="Toggle Studio" t-attf-class="o_nav_entry o_web_studio_navbar_item d-none d-md-flex {{ this.buttonDisabled ? 'o_disabled' : ''}}" t-on-click="this._onClick">
+        <i class="oi" data-icon="oi_studio" role="img"/>
+    </button>
 </t>
 
 </templates>

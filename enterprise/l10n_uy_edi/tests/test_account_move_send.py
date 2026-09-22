@@ -6,6 +6,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestAccountMoveSend(TestAccountMoveSendCommon, AccountTestMockOnlineSyncCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_chart_template('uy')
     def setUpClass(cls):
@@ -23,6 +25,13 @@ class TestAccountMoveSend(TestAccountMoveSendCommon, AccountTestMockOnlineSyncCo
             'amount_type': 'percent',
             'amount': 0,
             'l10n_uy_tax_category': 'vat',
+        })
+        cls.partner_a.write({
+            'country_id': cls.env.ref('base.uy').id,
+            'state_id': cls.env.ref('base.state_uy_02').id,
+            'city': 'Aeroparque',
+            'street': 'Bach 0',
+            'vat': '218435730016',
         })
 
     def test_download_with_existing_cfe(self):

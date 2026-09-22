@@ -3,7 +3,7 @@ import { animationFrame } from "@odoo/hoot-mock";
 
 import { Model } from "@odoo/o-spreadsheet";
 
-import { x2ManyCommands } from "@web/core/orm_service";
+import { x2ManyCommands } from "@web/core/orm_plugin";
 
 import {
     addColumns,
@@ -161,7 +161,7 @@ test("x2many commands with field sync position bigger than formula", async () =>
     addFieldSync(model, "A3", "product_uom_qty", 2); // doesn't have a matching record
     setCellContent(model, "A1", "111");
     setCellContent(model, "A2", "112");
-    setCellContent(model, "B1", '=ODOO.LIST(1, 1, "order_id")');
+    setCellContent(model, "B1", '=ODOO.LIST.VALUE(1, 1, "order_id")');
     await animationFrame();
     expect(await model.getters.getFieldSyncX2ManyCommands()).toEqual({
         commands: [
@@ -186,8 +186,8 @@ test("load order lines list only once", async () => {
     addFieldSync(model, "A2", "product_uom_qty", 1);
     setCellContent(model, "A1", "111");
     setCellContent(model, "A2", "112");
-    setCellContent(model, "B1", '=ODOO.LIST(1, 1, "order_id")');
-    setCellContent(model, "B1", '=ODOO.LIST(1, 2, "order_id")');
+    setCellContent(model, "B1", '=ODOO.LIST.VALUE(1, 1, "order_id")');
+    setCellContent(model, "B1", '=ODOO.LIST.VALUE(1, 2, "order_id")');
     await animationFrame();
     expect.verifySteps(["web_search_read"]);
     await model.getters.getFieldSyncX2ManyCommands();

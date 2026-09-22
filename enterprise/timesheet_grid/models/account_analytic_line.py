@@ -1,22 +1,24 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-from datetime import timedelta
-from dateutil.relativedelta import relativedelta
-from dateutil.rrule import SU
+import re
 from collections import defaultdict
+from copy import deepcopy
+from datetime import datetime, time, timedelta
+from urllib.parse import urlsplit
+from zoneinfo import ZoneInfo
 
-from odoo import models, fields, api, _
-from odoo.exceptions import RedirectWarning, UserError, AccessError
+from dateutil.relativedelta import relativedelta
+
+from odoo import _, api, fields, models
+from odoo.exceptions import AccessError, RedirectWarning, UserError, MissingError
 from odoo.fields import Domain
-from odoo.tools import format_date
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, format_date
 from odoo.tools.date_utils import localized
-
+from odoo.tools.func import deprecated
 from odoo.addons.timer.utils.timer_utils import round_time_spent
 
 
 class AccountAnalyticLine(models.Model):
     _name = 'account.analytic.line'
-    _inherit = ['account.analytic.line', 'timer.mixin']
+    _inherit = 'account.analytic.line'
     # As this model has his own data merge, avoid to enable the generic data_merge on that model.
     _disable_data_merge = True
 
@@ -28,29 +30,58 @@ class AccountAnalyticLine(models.Model):
     user_can_validate = fields.Boolean(compute='_compute_can_validate',
         help="Whether or not the current user can validate/reset to draft the record.")
 
-    display_timer = fields.Boolean(
-        "Technical field used to display the timer if the encoding unit is 'Hours'.",
-        compute='_compute_display_timer', export_string_translation=False)
     is_hatched = fields.Boolean(compute='_compute_is_hatched', export_string_translation=False)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        if (
+            not self.env.context.get('default_employee_id')
+            and any("employee_id" not in vals and "project_id" in vals for vals in vals_list)
+            and not self.env['hr.employee'].sudo().search_count([], limit=1)
+        ):
+            env_user_id = self.env.context.get('user_id', self.env.user.id)
+            env_company_id = self.env.company.id
+            users_ids = {env_user_id} | {vals["user_id"] for vals in vals_list if vals.get("user_id")}
+            user_by_id = {user.id: user for user in self.env['res.users'].browse(users_ids)}
+            employees_to_create = []
+            created_employees_users = set()
+            Employee = self.env['hr.employee'].sudo()
+            default_user_id = self.env.context.get('default_user_id')
+            default_company_id = self.env.context.get('default_company_id')
+            odoo_bot_id = self.env.ref('base.user_root').id
+
+            for vals in vals_list:
+                if "employee_id" in vals:
+                    continue
+
+                user_id = vals.get("user_id", default_user_id or env_user_id)
+                if user_id == odoo_bot_id:
+                    continue
+
+                company_id = vals.get("company_id", default_company_id or env_company_id)
+                user = user_by_id[user_id]
+                user_and_company = (user_id, company_id)
+                if not user.employee_id and user_and_company not in created_employees_users:
+                    employees_to_create.append({
+                        'name': user.name,
+                        'company_id': company_id,
+                        'user_id': user_id,
+                        **Employee._sync_user(user)
+                    })
+                    created_employees_users.add(user_and_company)
+
+            if len(employees_to_create) == 1:
+                Employee.create(employees_to_create)
+
+        return super().create(vals_list)
 
     @api.constrains('unit_amount')
     def _check_timesheet_unit_amount(self):
-        if any(t.unit_amount > 999999 for t in self if t.project_id):
+        if any(abs(t.unit_amount) > 999999 for t in self if t.project_id):
             raise UserError(_("You can't encode numbers with more than six digits."))
 
     def _is_readonly(self):
         return super()._is_readonly() or self.validated
-
-    def _should_not_display_timer(self):
-        self.ensure_one()
-        return (self.employee_id not in self.env.user.employee_ids) or self.validated
-
-    def _compute_display_timer(self):
-        uom_hour = self.env.ref('uom.product_uom_hour')
-        is_uom_hour = self.env.company.timesheet_encode_uom_id == uom_hour
-        for analytic_line in self:
-            analytic_line.display_timer = is_uom_hour and analytic_line.encoding_uom_id == uom_hour \
-                                          and not analytic_line._should_not_display_timer()
 
     @api.model
     def grid_unavailability(self, start_date, end_date, groupby='', res_ids=()):
@@ -77,10 +108,17 @@ class AccountAnalyticLine(models.Model):
             return list(set(unavailable_days))
 
         def get_company_unavailable_dates():
-            company_calendar = self.env.company.resource_calendar_id
-            if company_calendar.flexible_hours:
-                return []
-            return get_unavailable_dates(company_calendar._work_intervals_batch(from_datetime, to_datetime)[False])
+            return get_unavailable_dates(self.env.company.resource_calendar_id._work_intervals_batch(from_datetime, to_datetime)[False])
+
+        def get_current_user_unavailable_dates():
+            resource = self.env.user.employee_id.resource_id
+            if resource:
+                resource_work_intervals, _ = resource._get_valid_work_intervals(
+                    from_datetime, to_datetime
+                )
+                if resource.id in resource_work_intervals:
+                    return get_unavailable_dates(resource_work_intervals[resource.id])
+            return False
 
         if groupby == 'employee_id':
             employees = self.env['hr.employee'].browse(set(res_ids))
@@ -90,7 +128,7 @@ class AccountAnalyticLine(models.Model):
                 unavailability_intervals_per_employee_id[False] = get_company_unavailable_dates()
                 return unavailability_intervals_per_employee_id
             if self.env.company.resource_calendar_id.id in calendar_work_intervals:
-                company_unavailable_days = [] if self.env.company.resource_calendar_id.flexible_hours else get_unavailable_dates(calendar_work_intervals[self.env.company.resource_calendar_id.id])
+                company_unavailable_days = get_unavailable_dates(calendar_work_intervals[self.env.company.resource_calendar_id.id])
             else:
                 company_unavailable_days = get_company_unavailable_dates()
             unavailability_intervals_per_employee_id = {
@@ -103,8 +141,11 @@ class AccountAnalyticLine(models.Model):
                 for resource_id, employee_id in employee_id_per_resource_id.items()
             }
             unavailability_intervals_per_employee_id[False] = company_unavailable_days
+        elif self.env.context.get('get_current_user_unavailable_dates', False):
+            unavailability_intervals_per_employee_id[False] = get_current_user_unavailable_dates()
         else:
-            if self.env.user.resource_calendar_id.flexible_hours:
+            resource = self.env.user.employee_id.resource_id
+            if resource and resource._is_flexible() and not resource._is_fully_flexible():
                 unavailability_intervals_per_employee_id[False] = []
             else:
                 unavailability_intervals_per_employee_id[False] = get_company_unavailable_dates()
@@ -114,6 +155,34 @@ class AccountAnalyticLine(models.Model):
         # override hr_timesheet to allow the check on field validated to only update the project_id on non validated timesheets.
         non_validated_timesheets = self.filtered(lambda t: not t.validated and t.task_id.project_id.allow_timesheets)
         super(AccountAnalyticLine, non_validated_timesheets)._compute_project_id()
+
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        super()._onchange_project_id()
+        if not (
+            self.env.context.get('timesheet_timer_search')
+            and self.project_id
+            and not self.task_id
+            and (employee := self.env.user.employee_id)
+        ):
+            return
+
+        # Prefill the task of the most recent timesheet the user logged on this project in the
+        # past month; if that timesheet has no task, prefill none.
+        recent_task = self._get_recently_used_records('task_id', limit=1, domain=[
+            ('employee_id', '=', employee.id),
+            ('project_id', '=', self.project_id.id),
+            ('date', '>=', fields.Date.context_today(self) - relativedelta(months=1)),
+            '|',
+                ('task_id', '=', False),
+                ('task_id', 'any', [
+                    ('active', '=', True),
+                    ('project_id', '=', self.project_id.id),
+                    ('has_template_ancestor', '=', False),
+                ]),
+        ])
+        if recent_task:
+            self.task_id = recent_task[0][0]
 
     @api.depends('validated')
     def _compute_validated_status(self):
@@ -204,18 +273,8 @@ class AccountAnalyticLine(models.Model):
             })
             return notification
 
-        analytic_lines._stop_all_users_timer()
-
         analytic_lines.sudo().write({'validated': True})
         analytic_lines._update_last_validated_timesheet_date()
-        # Interrupt the timesheet with a timer running that is before the last validated date for each employee
-        running_analytic_lines = self.env['account.analytic.line'].search([
-            ('employee_id', 'in', analytic_lines.employee_id.ids),
-            ('date', '<', max(analytic_lines.employee_id.sudo().mapped('last_validated_timesheet_date'))),
-            ('is_timer_running', '=', True),
-        ])
-        running_analytic_lines.filtered(
-            lambda aal: aal.date < aal.employee_id.sudo().last_validated_timesheet_date)._stop_all_users_timer()
         if self.env.context.get('use_notification', True):
             notification['params'].update({
                 'message': _("The timesheets have successfully been validated."),
@@ -277,7 +336,7 @@ class AccountAnalyticLine(models.Model):
                 company = line.company_id
                 last_validated_timesheet_date = employee.sudo().last_validated_timesheet_date
                 def is_wrong_date(date):
-                    return date != fields.Date.today() and date <= last_validated_timesheet_date
+                    return date != fields.Date.context_today(line) and date <= last_validated_timesheet_date
 
                 # When an user having this group tries to modify the timesheets of another user in his own team, we shouldn't raise any validation error
                 if not is_timesheet_approver or employee not in employees:
@@ -330,18 +389,6 @@ class AccountAnalyticLine(models.Model):
             },
         }
 
-    def _update_existing_timers(self, vals):
-        if 'task_id' in vals:
-            # Check if there are some running timers linked to the timesheets to also update them.
-            timers = self.env['timer.timer'].search([('res_id', 'in', self.ids)])
-            if timers:
-                timers.write({'parent_res_model': 'project.task' if vals['task_id'] else None, 'parent_res_id': vals['task_id']})
-
-    def write(self, vals):
-        res = super().write(vals)
-        self._update_existing_timers(vals)
-        return res
-
     @api.model
     def _get_timesheet_field_and_model_name(self):
         return 'task_id', 'project.task'
@@ -359,7 +406,7 @@ class AccountAnalyticLine(models.Model):
         non_validated_timesheets = timesheets.filtered(lambda timesheet: not timesheet.validated)
         if len(non_validated_timesheets) > 1 or (len(timesheets) == 1 and timesheets.validated):
             timesheets[0].copy({
-                'name': '/',
+                'name': self.env.context.get('default_name', '/'),
                 measure_field_name: value,
             })
         elif len(non_validated_timesheets) == 1:
@@ -379,7 +426,7 @@ class AccountAnalyticLine(models.Model):
                 raise UserError(_("You cannot adjust the time of the timesheet for a project with timesheets disabled."))
 
             self.create({
-                'name': '/',
+                'name': self.env.context.get('default_name', '/'),
                 'project_id': project_id,
                 field_name: field_value,
                 measure_field_name: value,
@@ -393,260 +440,670 @@ class AccountAnalyticLine(models.Model):
 
         self.check_if_allowed(delete=True)
 
-    def unlink(self):
-        res = super().unlink()
-        self.env['timer.timer'].search([
-            ('res_model', '=', self._name),
-            ('res_id', 'in', self.ids)
-        ]).unlink()
-        return res
-
-    def _get_project_task_from_domain(self, domain):
-        project_id = task_id = False
-        for subdomain in domain:
-            if subdomain[0] == 'project_id' and subdomain[1] == '=':
-                project_id = subdomain[2]
-            elif subdomain[0] == 'task_id' and subdomain[1] == '=':
-                task_id = subdomain[2]
-        return project_id, task_id
-
-    def _prepare_duplicate_timesheet_line_values(self, column_field, day, cell_field, change):
-        # Prepares all values that should be set/modified when duplicating the current analytic line
+    @api.model
+    def _get_rounding_values(self):
         return {
-            'name': '/',
-            column_field: day,
-            cell_field: change,
+            'minimum': self.env['ir.config_parameter'].sudo().get_int('timesheet_grid.timesheet_min_duration', 15),
+            'rounding': self.env['ir.config_parameter'].sudo().get_int('timesheet_grid.timesheet_rounding', 15),
         }
-
-    def _get_last_week(self):
-        today = fields.Date.to_string(fields.Date.today())
-        grid_anchor = self.env.context.get('grid_anchor', today)
-        last_week = fields.Datetime.from_string(grid_anchor)
-        last_week += relativedelta(weekday=SU(-2))
-        return grid_anchor, last_week.date()
-    # ----------------------------------------------------
-    # Timer Methods
-    # ----------------------------------------------------
 
     @api.model
-    def action_start_new_timesheet_timer(self, vals):
-        project = self.env['project.project'].browse(vals.get('project_id', False))
-        if not project:
-            task = self.env['project.task'].browse(vals.get('task_id', False))
-            project = task.project_id or self.env['project.project'].browse(self._get_favorite_project_id())
-        result = bool(project) and project.check_can_start_timer()
-        if result is True:
-            if "default_date" in self.env.context:
-                self = self.with_context(default_date=fields.Date.today())
-            timesheet = self.create({
-                **vals,
-                'project_id': project.id,
-            })
-            timesheet.action_timer_start()
-            return timesheet._get_timesheet_timer_data()
-        return result
-
-    def _get_new_timesheet_timer_vals(self):
+    def _get_aw_timesheet_fields_specification(self):
         return {
-            'name': self.name,
-            'date': fields.Date.today(),
-            'project_id': self.project_id.id,
-            'task_id': self.task_id.id,
+            'id': {},
+            'name': {},
+            'date': {},
+            'user_id': {
+                'fields': {'display_name': {}},
+            },
+            'project_id': {
+                'fields': {'display_name': {}},
+            },
+            'task_id': {
+                'fields': {'display_name': {}},
+            },
+            'unit_amount': {},
+            'company_id': {
+                'fields': {'display_name': {}},
+            },
         }
 
-    def action_timer_start(self):
-        """ Action start the timer of current timesheet
+    @api.model
+    def get_aw_timesheet_data(self, date):
+        date = fields.Date.from_string(date)
+        specification = self._get_aw_timesheet_fields_specification()
+        employee = self.env.user.employee_id
+        if not employee:
+            return {'specification': specification, 'timesheets': [], 'working_hours': False}
 
-            * Override method of hr_timesheet module.
-        """
-        if self.validated:
-            raise UserError(_('You cannot use the timer on validated timesheets.'))
-        timesheet = self
-        if self.employee_id.sudo().last_validated_timesheet_date and self.date < self.employee_id.sudo().last_validated_timesheet_date:
-            timesheet = self.create(self._get_new_timesheet_timer_vals())
-            timesheet.action_timer_start()
-        elif not self.user_timer_id.timer_start and self.display_timer:
-            if self.date != fields.Date.context_today(self) and not self.env.context.get('_from_action_timer'):
-                timesheet = self.create(self._get_new_timesheet_timer_vals())
-                timesheet.with_context(_from_action_timer=True).action_timer_start()
-            else:
-                super().action_timer_start()
-        return timesheet._get_timesheet_timer_data()
+        domain = [('date', '=', date), ('user_id', '=', self.env.user.id), ('project_id', '!=', False)]
+        timesheets = self.web_search_read(domain, specification)
 
-    def _get_last_timesheet_domain(self):
-        self.ensure_one()
-        return [
-            ('id', '!=', self.id),
-            ('user_id', '=', self.env.user.id),
-            ('project_id', '=', self.project_id.id),
-            ('task_id', '=', self.task_id.id),
-            ('date', '=', fields.Date.context_today(self)),
-            ('name', '=', '/'),
-            ('validated', '=', False),
-        ]
-
-    def _add_timesheet_time(self, minutes_spent, try_to_match=False):
-        if self.unit_amount == 0 and not minutes_spent:
-            # Check if unit_amount equals 0,
-            # if yes, then remove the timesheet
-            self.unlink()
-            return 0
-        minutes_spent = self.get_rounded_time(minutes_spent)
-        amount = self.unit_amount + minutes_spent
-        if not try_to_match or self.name != '/':
-            self.write({'unit_amount': amount})
-            return minutes_spent
-
-        domain = self._get_last_timesheet_domain()
-        last_timesheet_id = self.search(domain, limit=1)
-        # If the last timesheet of the day for this project and task has no description,
-        # we match both together.
-        if last_timesheet_id:
-            last_timesheet_id.unit_amount += amount
-            self.unlink()
+        if not employee.sudo()._is_fully_flexible(date):
+            tz = ZoneInfo(self.env.context.get('tz') or 'UTC')
+            start = datetime.combine(date, time.min).replace(tzinfo=tz)
+            end = datetime.combine(date, time.max).replace(tzinfo=tz)
+            working_hours = employee._get_work_days_data_batch(start, end, False)[employee.id]['hours']
         else:
-            self.write({'unit_amount': amount})
-        return minutes_spent
-
-    def action_timer_stop(self, try_to_match=False):
-        """ Action stop the timer of the current timesheet
-            try_to_match: if true, we try to match with another timesheet which corresponds to the following criteria:
-            1. Neither of them has a description
-            2. The last one is not validated
-            3. Match user, project task, and must be the same day.
-
-            * Override method of timer module.
-        """
-        if self.env.user == self.sudo().user_id:
-            # sudo as we can have a timesheet related to a company other than the current one.
-            self = self.sudo()
-        if self.validated:
-            raise UserError(_('You cannot use the timer on validated timesheets.'))
-        amount = 0
-        if self.user_timer_id.timer_start:
-            minutes_spent = super().action_timer_stop()
-            amount = self._add_timesheet_time(minutes_spent, try_to_match)
-        return amount
-
-    def _stop_all_users_timer(self, try_to_match=False):
-        """ Stop ALL the timers of the timesheets (WHOEVER the timer associated user is)
-            try_to_match: if true, we try to match with another timesheet which corresponds to the following criteria:
-            1. Neither of them has a description
-            2. The last one is not validated
-            3. Match user, project task, and must be the same day.
-        """
-        if any(self.sudo().mapped('validated')):
-            raise UserError(_('Sorry, you cannot use a timer for a validated timesheet'))
-        timers = self.env['timer.timer'].sudo().search([('res_id', 'in', self.ids), ('res_model', '=', self._name)])
-        for timer in timers:
-            minutes_spent = timer.action_timer_stop()
-            self.env["account.analytic.line"].browse(timer.res_id).sudo()._add_timesheet_time(minutes_spent, try_to_match)
-            timer.unlink()
-
-    def action_timer_unlink(self):
-        """ Action unlink the timer of the current timesheet
-        """
-        if self.env.user == self.sudo().user_id:
-            # sudo as we can have a timesheet related to a company other than the current one.
-            self = self.sudo()
-        self.user_timer_id.unlink()
-        if not self.unit_amount:
-            self.unlink()
-
-    def _action_interrupt_user_timers(self):
-        self.action_timer_stop()
-
-    def _get_timesheet_timer_field_names(self):
-        return ['date', 'name', 'company_id', 'project_id', 'task_id', 'unit_amount', 'timer_start']
-
-    def _get_timesheet_timer_data(self):
-        """ Get timesheet timer data needed to correctly run the timer
-
-            :return Dictionary containing timer data
-            :rtype {'field_name': field_value}
-        """
-        self.ensure_one()
-        timesheet_data = {'other_company': True}
-        if self.company_id in self.env.companies:
-            timesheet_data = self._read_format(self._get_timesheet_timer_field_names())[0]
-            if timesheet_data['name'] == '/':
-                timesheet_data['name'] = ''
-        return timesheet_data
+            working_hours = None
+        return {'specification': specification, 'timesheets': timesheets, 'working_hours': working_hours}
 
     @api.model
-    def get_running_timer(self):
-        res = {'step_timer': int(self.env['ir.config_parameter'].sudo().get_param('timesheet_grid.timesheet_min_duration', 15))}
-        timer = self.env['timer.timer'].search([
-            ('user_id', '=', self.env.user.id),
-            ('timer_start', '!=', False),
-            ('timer_pause', '=', False),
-            ('res_model', '=', self._name),
-        ], limit=1)
-        if timer:
-            # sudo as we can have a timesheet related to a company other than the current one.
-            res.update(self.sudo().browse(timer.res_id)._get_timesheet_timer_data())
+    def _get_assistant_events_getters(self):
+        """
+        Intended to be overridden in other modules to add methods that provide
+        events to send to the timesheets assistant.
+
+        Each event must be a dictionary containing the following keys:
+
+        - ``start`` (:class:`datetime.datetime`): Event start datetime.
+        - ``stop`` (:class:`datetime.datetime`): Event end datetime.
+        - ``duration`` (:class:`float`, optional): Event duration.
+                If not passed, it will be computed from `start` and `stop`.
+        - ``name`` (:class:`str`): Translated label displayed in the assistant.
+        - ``type`` (:class:`str`): Classification string. Must be one of the values
+        defined in ``aw.rule.type``.
+
+        It is assumed that events are sorted by increasing start time.
+        It is however not assumed that they don't overlap.
+
+        :returns: A dictionary of the form ``{"sequence": int, "getter": function}``
+                containing the event getters. Events from getters with a lower sequence
+                will have higher precedence.
+        :rtype: dict
+        """
+        return []
+
+    @api.model
+    def _normalize_events(self, events):
+        """
+        Normalize a list of events by removing overlaps. When two events overlap,
+        the earlier event takes priority and the later one is clipped so that no
+        overlap remains. Events fully covered by a previous one are discarded.
+
+        The input list is expected to be ordered by increasing ``start`` time.
+
+        :param events: List of event dictionaries. Each event must contain at
+            least ``start`` and ``stop`` datetime values.
+        :type events: list[dict]
+        :returns: A new list of events, ordered and guaranteed to have no
+            overlapping time ranges.
+        :rtype: list[dict]
+        """
+        if not events:
+            return []
+        res = [events[0]]
+        for event in events[1:]:
+            prev = res[-1]
+            if event['start'] >= prev['stop']:
+                res.append(event)
+            elif event['stop'] > prev['stop']:
+                clipped = event.copy()
+                clipped['start'] = prev['stop']
+                if 'duration' in clipped:
+                    clipped['duration'] = (clipped['stop'] - clipped['start']).total_seconds() / 3600.0
+                res.append(clipped)
+
         return res
 
-    @api.model
-    def get_rounded_time(self, timer):
-        minimum_duration = int(self.env['ir.config_parameter'].sudo().get_param('timesheet_grid.timesheet_min_duration', 0))
-        rounding = int(self.env['ir.config_parameter'].sudo().get_param('timesheet_grid.timesheet_rounding', 0))
-        rounded_minutes = round_time_spent(timer, minimum_duration, rounding)
-        return rounded_minutes / 60
+    def get_assistant_events(self, day):
+        def merge(ranges, intervals_to_include):
+            if len(intervals_to_include) == 0:
+                return ranges
+
+            size = len(ranges)
+            if size == 0:
+                return intervals_to_include
+
+            gaps = []
+            if intervals_to_include[0]['start'] < ranges[0]['start']:
+                gaps.append((intervals_to_include[0]['start'], ranges[0]['start']))
+
+            for i in range(size - 1):
+                if ranges[i]['stop'] < ranges[i + 1]['start']:
+                    gaps.append((ranges[i]['stop'], ranges[i + 1]['start']))
+
+            if intervals_to_include[-1]['stop'] > ranges[-1]['stop']:
+                gaps.append((ranges[-1]['stop'], intervals_to_include[-1]['stop']))
+
+            j = 0
+            res = ranges
+            for gap in gaps:
+                # advance if ranges not intersecting with gap
+                while j < len(intervals_to_include) and intervals_to_include[j]['stop'] <= gap[0]:
+                    j += 1
+
+                # move to next gap if no ranges intersecting with the gap
+                while j < len(intervals_to_include) and intervals_to_include[j]['start'] < gap[1]:
+                    interval = deepcopy(intervals_to_include[j])
+                    interval['start'] = max(gap[0], interval['start'])
+                    interval['stop'] = min(gap[1], interval['stop'])
+                    if 'duration' in interval:
+                        interval['duration'] = (interval['stop'] - interval['start']).total_seconds() / 3600.0
+                    res.append(interval)
+                    j += 1
+
+            return sorted(res, key=lambda r: r['start'])
+
+        start = datetime.strptime(day, DEFAULT_SERVER_DATE_FORMAT)
+        end = (start + relativedelta(days=1))
+        ranges = []
+        event_getters = self._get_assistant_events_getters()
+        for event_getter in (g['getter'] for g in sorted(event_getters, key=lambda g: g['sequence'])):
+            events = event_getter(start, end)
+            ranges = merge(ranges, self._normalize_events(events))
+
+        return ranges
 
     @api.model
-    def _add_time_to_timesheet_fields(self):
-        return ['task_id']
+    def _get_url_regex_for_models(self, model_names):
+        base_url = self.env['ir.config_parameter'].sudo().get_str('web.base.url')
+        # Base users may not have access
+        actions = self.env['ir.actions.act_window'].sudo().search([
+            ('res_model', 'in', model_names),
+            ('path', '!=', False),
+        ])
 
-    def action_add_time_to_timesheet(self, vals):
-        minutes = int(self.env['ir.config_parameter'].sudo().get_param('timesheet_grid.timesheet_min_duration', 15))
-        if self:
-            for field in self._add_time_to_timesheet_fields():
-                val = vals.get(field, False)
-                if self[field].id == val and self.project_id.id == vals['project_id']:
-                    self.unit_amount += minutes / 60
-                    return self.id
-        timesheet = self.create({
-            **vals,
-            'unit_amount': minutes / 60,
-        })
-        return timesheet.id
+        model_paths = defaultdict(set)
+        for action in actions:
+            model_paths[action.res_model].add(action.path)
 
-    def action_add_time_to_timer(self, time):
-        if self.validated:
-            raise UserError(_('You cannot use the timer on validated timesheets.'))
-        if not self.user_id.employee_ids:
-            raise UserError(_('An employee must be linked to your user to record time.'))
-        timer = self.user_timer_id
-        if not timer:
-            self.action_timer_start()
-            timer = self.user_timer_id
-        timer.timer_start = min(timer.timer_start - timedelta(0, time), fields.Datetime.now())
+        regexes = {}
+        for model in model_names:
+            parts = list(map(re.escape, model_paths[model]))
+            parts.append(re.escape(model))
+            regexes[model] = rf"{re.escape(base_url)}/odoo/(?:[^/?#]+/)*(?:{'|'.join(parts)})/(\d+)(?:\?|$)"
+
+        return regexes
+
+    @api.model
+    def _get_assistant_odoo_models(self):
+        return {
+            'project.task': {
+                'label': self.env._('Task'),
+                'template': self.env._('Working on $1'),
+                'target': {
+                    'type': 'self',
+                },
+            },
+            'project.project': {
+                'label': self.env._('Project'),
+                'template': self.env._('Working on $1'),
+                'target': {
+                    'type': 'self',
+                },
+            },
+        }
+
+    @api.model
+    @api.ormcache('self.env.lang')
+    def _get_app_lookup_dictionary(self):
+        """
+        Build a lookup dictionary mapping action IDs, models, and action paths
+        to the name of an application module (Sales, Project, etc.).
+        """
+        action_dict = self._map_actions_from_menus()
+        module_to_app = self._map_modules_to_apps()
+        valid_modules = list(module_to_app.keys())
+        model_dict = self._map_models_to_apps()
+        action_dict = self._map_fallback_actions(action_dict, module_to_app, valid_modules)
+
+        path_dict = {}
+        final_action_dict = {}
+
+        if action_ids := [int(k) for k in action_dict]:
+            actions = self.env['ir.actions.act_window'].sudo().search_read(
+                [('id', 'in', action_ids)],
+                ['id', 'res_model', 'path']
+            )
+
+            for action in actions:
+                action_id_str = str(action['id'])
+                app_name = action_dict.get(action_id_str)
+                res_model = action.get('res_model')
+                path = action.get('path')
+
+                if app_name:
+                    final_action_dict[action_id_str] = {
+                        'app_name': app_name,
+                        'res_model': res_model
+                    }
+
+                    if path:
+                        path_dict[path] = {
+                            'app_name': app_name,
+                            'res_model': res_model
+                        }
+
+        path_dict['spreadsheet'] = {'app_name': self.env._("Spreadsheet"), 'res_model': 'documents.document'}
+        return {
+            'actions': final_action_dict,
+            'models': model_dict,
+            'paths': path_dict
+        }
+
+    @api.model
+    def _map_actions_from_menus(self):
+        """Map actions to the source application through the menu hierarchy."""
+        menus = self.env['ir.ui.menu'].sudo().search_read(
+            [], ['id', 'parent_id', 'action', 'name']
+        )
+        menu_dict = {m['id']: m for m in menus}
+
+        def get_root_menu_name(menu_id):
+            current = menu_dict.get(menu_id)
+            while current and current.get('parent_id'):
+                current = menu_dict.get(current['parent_id'][0])
+            return current['name'] if current else None
+
+        action_dict = {}
+        for m in menus:
+            if m.get('action') and m['action'].startswith('ir.actions.act_window,'):
+                action_id = m['action'].split(',')[1]
+                root_name = get_root_menu_name(m['id'])
+                if root_name:
+                    action_dict[action_id] = root_name
+
+        return action_dict
+
+    @api.model
+    # We can cache this because if installed modules change, the cache is wiped
+    # Caching also ensures the mapping is deterministic (which it probably will be regardless, but better be safe)
+    # Keyed on lang since shortdesc (used as the app display name) is a translated field.
+    @api.ormcache('self.env.lang')
+    def _map_modules_to_apps(self):
+        """
+        Map modules to their first ancestor module we can find that is an application.
+        Note that this is a bit naive since we stop at the first found application, which may
+        or may not be the application that additions of the module actually appear in.
+        In practice, cases where this causes inaccuracies should be pretty rare.
+        """
+        modules = self.env['ir.module.module'].sudo().search_fetch(
+            [('state', '=', 'installed')], ['name', 'shortdesc', 'application']
+        )
+        deps = self.env['ir.module.module.dependency'].sudo().search_fetch(
+            [('module_id', 'in', modules.ids)], ['module_id', 'name']
+        )
+
+        name_to_id = {m.name: m.id for m in modules}
+        deps_map = {}
+        for d in deps:
+            deps_map.setdefault(d.module_id.id, []).append(d.name)
+
+        apps = {m.name: m.shortdesc for m in modules if m.application}
+
+        def resolve_app(mod_name, visited=None):
+            if visited is None:
+                visited = set()
+            if mod_name in visited:
+                return None
+            visited.add(mod_name)
+            if mod_name in apps:
+                return apps[mod_name]
+            mod_id = name_to_id.get(mod_name)
+            if mod_id:
+                for dep_name in deps_map.get(mod_id, []):
+                    app_name = resolve_app(dep_name, visited)
+                    if app_name:
+                        return app_name
+            return None
+
+        module_to_app = {}
+        for m in modules:
+            resolved = resolve_app(m.name)
+            if resolved:
+                module_to_app[m.name] = resolved
+
+        return module_to_app
+
+    @api.model
+    @api.ormcache('self.env.lang')
+    def _map_models_to_apps(self):
+        """Map models to an application based on the module -> app mapping."""
+        module_to_app = self._map_modules_to_apps()
+        valid_modules = list(module_to_app.keys())
+
+        models_read = self.env['ir.model'].sudo().search_read([], ['id', 'model'])
+        model_id_to_name = {m['id']: m['model'] for m in models_read}
+
+        data = self.env['ir.model.data'].sudo().search_read(
+            [
+                ('model', '=', 'ir.model'),
+                ('module', 'in', valid_modules)
+            ],
+            ['res_id', 'module']
+        )
+
+        model_dict = {}
+        for d in data:
+            res_id = d.get('res_id')
+            if not res_id:
+                continue
+            if res_id in model_id_to_name:
+                model_name = model_id_to_name[res_id]
+                if model_name not in model_dict:
+                    model_dict[model_name] = module_to_app[d['module']]
+
+        return model_dict
+
+    @api.model
+    def _map_fallback_actions(self, action_dict, module_to_app, valid_modules):
+        """Map actions we can't link to a menu to an application based on the module -> app mapping."""
+        data = self.env['ir.model.data'].sudo().search_read(
+            [
+                ('model', '=', 'ir.actions.act_window'),
+                ('module', 'in', valid_modules)
+            ],
+            ['res_id', 'module']
+        )
+
+        for d in data:
+            res_id = d.get('res_id')
+            if not res_id:
+                continue
+            action_id = str(res_id)
+            if action_id not in action_dict:
+                action_dict[action_id] = module_to_app[d['module']]
+
+        return action_dict
+
+    @deprecated("_get_app_lookup_dictionary now does this")
+    @api.model
+    def _extract_action_paths(self, action_dict):
+        """
+        Extract the paths of actions that have one into their own dict
+        """
+        action_ids = [int(k) for k in action_dict]
+        path_actions = self.env['ir.actions.act_window'].sudo().search_read(
+            [('id', 'in', action_ids), ('path', '!=', False)],
+            ['id', 'path']
+        )
+        path_dict = {
+            pa['path']: action_dict[str(pa['id'])]
+            for pa in path_actions if pa.get('path')
+        }
+
+        return path_dict
+
+    @api.model
+    def _get_assistant_odoo_models_data(self):
+        models = self._get_assistant_odoo_models()
+        url_regexes = self._get_url_regex_for_models(list(models.keys()))
+        return [{
+            'model': model_name,
+            'label': values['label'],
+            'url_regex': url_regexes[model_name],
+            'type': 'odoo',
+            'template': values.get('template', self.env._('Working on $1')),
+        } for model_name, values in models.items()]
+
+    @api.model
+    def resolve_assistant_models_targets(self, ids_per_model):
+        models_data = self._get_assistant_odoo_models()
+
+        results = {}
+        records_per_model = {}
+
+        for model_name, ids in ids_per_model.items():
+            rule = models_data.get(model_name, {}).get('target')
+            if not rule:
+                continue
+
+            records = self.env[model_name].browse(ids).exists()
+            records_per_model[model_name] = records
+
+        task_ids = set()
+        project_ids = set()
+        for model_name, records in records_per_model.items():
+            rule = models_data[model_name]['target']
+
+            for rec in records:
+                if rule['type'] == 'self':
+                    if model_name == 'project.task':
+                        task_ids.add(rec.id)
+                        if rec.project_id:
+                            project_ids.add(rec.project_id.id)
+                    elif model_name == 'project.project':
+                        project_ids.add(rec.id)
+
+                elif rule['type'] == 'field':
+                    target = rec[rule['field']]
+                    if target:
+                        if rule['target_model'] == 'project.task':
+                            task_ids.add(target.id)
+                            if target.project_id:
+                                project_ids.add(target.project_id.id)
+                        elif rule['target_model'] == 'project.project':
+                            project_ids.add(target.id)
+
+        task_data = {t.id: t for t in self.env['project.task'].browse(task_ids)}
+        project_data = {p.id: p for p in self.env['project.project'].browse(project_ids)}
+
+        for model_name, records in records_per_model.items():
+            rule = models_data[model_name]['target']
+            results[model_name] = {}
+            for rec in records:
+                target = {'task_id': None, 'task_name': None, 'project_id': None, 'project_name': None, 'allow_timesheets': True}
+
+                if rule['type'] == 'self':
+                    if model_name == 'project.task':
+                        target.update({
+                            'task_id': rec.id,
+                            'task_name': rec.name,
+                            'project_id': rec.project_id.id if rec.project_id else None,
+                            'project_name': rec.project_id.name if rec.project_id else None,
+                            'allow_timesheets': rec.project_id.allow_timesheets if rec.project_id else True,
+                        })
+                    elif model_name == 'project.project':
+                        target.update({
+                            'project_id': rec.id,
+                            'project_name': rec.name,
+                            'allow_timesheets': rec.allow_timesheets,
+                        })
+                elif rule['type'] == 'field':
+                    target_rec = rec[rule['field']]
+                    if target_rec:
+                        if rule['target_model'] == 'project.task':
+                            t = task_data[target_rec.id]
+                            target.update({
+                                'task_id': t.id,
+                                'task_name': t.name,
+                                'project_id': t.project_id.id if t.project_id else None,
+                                'project_name': t.project_id.name if t.project_id else None,
+                                'allow_timesheets': t.project_id.allow_timesheets if t.project_id else True,
+                            })
+                        elif rule['target_model'] == 'project.project':
+                            p = project_data[target_rec.id]
+                            target.update({
+                                'project_id': p.id,
+                                'project_name': p.name,
+                                'allow_timesheets': p.allow_timesheets,
+                            })
+                    target['source_record_name'] = rec.display_name
+
+                results[model_name][rec.id] = target
+
+        return results
+
+    @api.model
+    def _get_timesheeted_project_task_by_partner(self, partners):
+        if not partners:
+            return {}
+
+        timesheet_groups = self.env['account.analytic.line']._read_group(
+            domain=[
+                ('user_id', '=', self.env.user.id),
+                ('partner_id.commercial_partner_id', 'in', partners.commercial_partner_id.ids),
+                ("project_id", "!=", False),
+                ('project_id.allow_timesheets', '=', True),
+            ],
+            groupby=['partner_id', 'project_id', 'task_id'],
+            aggregates=['date:max'],
+            order='date:max desc',
+        )
+
+        project_task_by_tree = {}
+        for partner, project, task, date_max in timesheet_groups:
+            root = partner.commercial_partner_id.id
+            if root not in project_task_by_tree:
+                project_task_by_tree[root] = (project.id, task.id, date_max)
+
+        if missing_partners := partners.filtered(lambda partner: partner.commercial_partner_id.id not in project_task_by_tree):
+            fallback_tasks = self.env['project.task'].search_fetch(
+                domain=[
+                    ('partner_id.commercial_partner_id', 'in', missing_partners.commercial_partner_id.ids),
+                    ('project_id', '!=', False),
+                    ('allow_timesheets', '=', True),
+                ],
+                field_names=['partner_id', 'project_id'],
+                order='id desc',
+            )
+
+            for task in fallback_tasks:
+                root = task.partner_id.commercial_partner_id.id
+                if root not in project_task_by_tree or project_task_by_tree[root][1] < task.id:
+                    project_task_by_tree[root] = (task.project_id.id, task.id, None)
+
+            if missing_partners := missing_partners.filtered(lambda partner: partner.commercial_partner_id.id not in project_task_by_tree):
+                for project in self.env['project.project'].search_fetch(
+                    domain=[
+                        ('partner_id.commercial_partner_id', 'in', missing_partners.commercial_partner_id.ids),
+                        ('allow_timesheets', '=', True),
+                    ],
+                    field_names=['partner_id'],
+                    order='id desc',
+                ):
+                    root = project.partner_id.commercial_partner_id.id
+                    if root not in project_task_by_tree or project_task_by_tree[root][0] < project.id:
+                        project_task_by_tree[root] = (project.id, None, None)
+
+        return {
+            partner.id: project_task_by_tree.get(partner.commercial_partner_id.id, (None, None, None))
+            for partner in partners
+        }
+
+    @api.model
+    def resolve_gmail_partners(self, emails):
+        if not emails:
+            return {}
+
+        partner_by_email = {}
+        Partner = self.env['res.partner']
+        partners = Partner
+        for partner in Partner.search([
+            ('email', 'in', list(emails)),
+            ('id', '!=', self.env.user.partner_id.id),
+        ]):
+            if not (currentPartner := partner_by_email.get(partner.email)):
+                partner_by_email[partner.email] = partner
+                partners |= partner
+            elif partner.email in partner.user_ids.mapped('login'):
+                partner_by_email[partner.email] = partner
+                partners -= currentPartner
+                partners |= partner
+
+        resolved = self._get_timesheeted_project_task_by_partner(partners)
+        partner_email_to_data = {}
+        for partner in partners:
+            project_id, task_id, _ = resolved.get(partner.id, (False, False, None))
+            partner_email_to_data[partner.email] = {
+                'partner_name': partner.name,
+                'project_id': project_id,
+                'task_id': task_id,
+            }
+
+        return partner_email_to_data
+
+    @api.model
+    def get_assistant_data(self):
+        return {
+            'rounding_values': self._get_rounding_values(),
+            'odoo_models_data': self._get_assistant_odoo_models_data(),
+        }
+
+    @api.model
+    def get_aw_app_from_urls(self, urls):
+        """
+        Receive a list of Odoo URLs from the assistant, and try to match them
+        to the corresponding Odoo application name and record name.
+        """
+        if not urls:
+            return {}
+
+        app_dictionary = self._get_app_lookup_dictionary()
+        resolved_urls = {}
+
+        def get_app_and_model_from_segment(seg):
+            """Checks if a URL segment matches a model, path, or action."""
+            if seg in app_dictionary['models']:
+                return app_dictionary['models'][seg], seg
+
+            if seg in app_dictionary['paths']:
+                return app_dictionary['paths'][seg]['app_name'], app_dictionary['paths'][seg]['res_model']
+
+            action_match = re.match(r'^action-(\d+)$', seg)
+            if action_match:
+                action_id = action_match.group(1)
+                if action_id in app_dictionary['actions']:
+                    return app_dictionary['actions'][action_id]['app_name'], app_dictionary['actions'][action_id]['res_model']
+
+            return None, None
+
+        for url in urls:
+            parsed_url = urlsplit(url)
+            path_segments = [s for s in parsed_url.path.split('/') if s]
+
+            fallback_app_name = None
+            found_model = None
+            record_id = None
+
+            for i in range(len(path_segments) - 1, -1, -1):
+                segment = path_segments[i]
+
+                if segment.isdigit() and i > 0:
+                    app, model = get_app_and_model_from_segment(path_segments[i - 1])
+                    if app:
+                        fallback_app_name = app
+                        found_model = model
+                        record_id = int(segment)
+                        break
+
+                app, model = get_app_and_model_from_segment(segment)
+                if app:
+                    fallback_app_name = app
+                    found_model = model
+                    break
+
+            record_name = False
+            if fallback_app_name:
+                if found_model and record_id is not None:
+                    try:
+                        if found_model in self.env:
+                            record = self.env[found_model].browse(record_id)
+                            if record:
+                                record_name = record.display_name
+                    except (AccessError, MissingError):
+                        pass
+
+                resolved_urls[url] = {
+                    'app_name': fallback_app_name,
+                    'record_name': record_name
+                }
+
+        return resolved_urls
+
+    def action_round_timesheet_time(self):
+        """ Save timesheet inside systray and round time spent
+
+            :return: return the timesheet data saved
+        """
+        self.unit_amount = round_time_spent(self.unit_amount * 60, **self._get_rounding_values()) / 60
+        return self.unit_amount
 
     def change_description(self, description):
         if not self.exists():
             return
-        if True in self.mapped('validated'):
-            raise UserError(_('You cannot use the timer on validated timesheets.'))
         self.write({'name': description})
-
-    def action_change_project_task(self, new_project_id, new_task_id):
-        if self.validated:
-            raise UserError(_('You cannot use the timer on validated timesheets.'))
-        if not self.unit_amount:
-            self.write({
-                'project_id': new_project_id,
-                'task_id': new_task_id,
-            })
-            return self.id
-
-        new_timesheet = self.create({
-            'name': self.name,
-            'project_id': new_project_id,
-            'task_id': new_task_id,
-        })
-        self.user_timer_id.res_id = new_timesheet
-        return new_timesheet.id
 
     def _get_domain_for_validation_timesheets(self, validated=False):
         """ Get the domain to check if the user can validate/invalidate which timesheets
@@ -659,13 +1116,15 @@ class AccountAnalyticLine(models.Model):
             The user cannot validate his own timesheets.
 
             2. Manager (Administrator): with this access right, the user can validate all timesheets.
+
+            3. Employee: with this access right, the user can only validate their own timesheets.
         """
         domain = Domain('project_id', '!=', False) & Domain('validated', '=', validated)
         if not validated:
-            domain &= Domain("date", "<=", fields.Date.today())
+            domain &= Domain("date", "<=", 'today')
 
         if not self.env.user.has_group('hr_timesheet.group_timesheet_manager'):
-            return Domain.AND([
+            domain = Domain.AND([
                 domain,
                 Domain('user_id', '!=', self.env.uid),
                 [
@@ -675,6 +1134,14 @@ class AccountAnalyticLine(models.Model):
                     '&', ('employee_id.timesheet_manager_id', '=', False), ('employee_id.parent_id', '=', False),
                 ],
             ])
+
+        if self.env.user.has_group('hr_timesheet.group_hr_timesheet_approver'):
+            domain |= Domain('user_id', '=', self.env.uid) & Domain([
+                '|',
+                ('employee_id.timesheet_manager_id', '=', self.env.uid),
+                ('employee_id.parent_id.user_id', '=', self.env.uid)
+            ])
+
         return domain
 
     def _get_timesheets_to_merge(self):
@@ -704,18 +1171,13 @@ class AccountAnalyticLine(models.Model):
             'context': dict(self.env.context, active_ids=to_merge.ids),
         }
 
-    def action_timer_increase(self):
-        min_duration = int(self.env['ir.config_parameter'].sudo().get_param('timesheet_grid.timesheet_min_duration', 15))
-        self.update({'unit_amount': self.unit_amount + (min_duration / 60)})
-
-    def action_timer_decrease(self):
-        min_duration = int(self.env['ir.config_parameter'].sudo().get_param('timesheet_grid.timesheet_min_duration', 15))
-        duration = self.unit_amount - (min_duration / 60)
-        self.update({'unit_amount': duration if duration > 0 else 0 })
-
-    def _get_timer_vals(self):
-        vals = super()._get_timer_vals()
-        if self.task_id:
-            vals['parent_res_model'] = 'project.task'
-            vals['parent_res_id'] = self.task_id.id
-        return vals
+    @api.model
+    def _get_recently_used_records(self, groupby_field, domain=None, limit=8):
+        grouped_data = self._read_group(
+            domain=domain or [],
+            groupby=[groupby_field],
+            aggregates=['write_date:max'],
+            order='write_date:max desc',
+            limit=limit,
+        )
+        return [(record.id, record.display_name) for record, _write_date in grouped_data if record]

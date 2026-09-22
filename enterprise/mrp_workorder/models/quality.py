@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 from markupsafe import Markup
 
 from odoo import api, fields, models, _
@@ -18,10 +16,15 @@ class QualityPointTest_Type(models.Model):
         store=False, default=False)
 
     def _get_domain_from_allow_registration(self, operator, value):
-        if value:
+        # The ORM will optimize the domain leaf before calling the search method:
+        # ('field', '=', True) and ('field', '!=', False) become ('field', 'in', OrderedSet([True]))
+        # ('field', '=', False) and ('field', '!=', True) become ('field', ' not in', OrderedSet([True]))
+        if operator not in ('in', 'not in'):
+            return NotImplemented
+        if operator == 'in':
             return []
         else:
-            return [('technical_name', 'not in', ['register_production', 'register_byproducts', 'register_consumed_materials', 'print_label'])]
+            return [('technical_name', 'not in', ['register_production', 'register_byproducts', 'register_consumed_materials', 'print_product_label', 'print_lot_label'])]
 
 
 class MrpRoutingWorkcenter(models.Model):
@@ -81,10 +84,9 @@ class QualityPoint(models.Model):
 
     is_workorder_step = fields.Boolean(compute='_compute_is_workorder_step')
     operation_id = fields.Many2one(
-        'mrp.routing.workcenter', 'Step', check_company=True, index='btree_not_null')
+        'mrp.routing.workcenter', 'Step', check_company=True, index='btree_not_null', ondelete='cascade')
     bom_id = fields.Many2one(related='operation_id.bom_id')
     bom_active = fields.Boolean('Related Bill of Material Active', related='bom_id.active')
-    component_ids = fields.One2many('product.product', compute='_compute_component_ids')
     product_ids = fields.Many2many(
         default=_default_product_ids,
         domain="operation_id and [('id', 'in', bom_product_ids)] or [('type', '=', 'consu'), '|', ('company_id', '=', False), ('company_id', '=', company_id)]")
@@ -92,10 +94,36 @@ class QualityPoint(models.Model):
     test_type_id = fields.Many2one(
         'quality.point.test_type',
         domain="[('allow_registration', '=', operation_id and is_workorder_step)]")
-    test_report_type = fields.Selection([('pdf', 'PDF'), ('zpl', 'ZPL')], string="Report Type", default="pdf", required=True)
+    product_label_format = fields.Selection(
+        selection='_get_product_label_format_selection',
+        string="Product Label Format",
+        default='pdf',
+        required=True,
+    )
+    lot_label_format = fields.Selection(
+        selection='_get_lot_label_format_selection',
+        string="Lot/SN Label Format",
+        default='4x12_lots',
+        required=True,
+    )
     worksheet_document = fields.Binary('Image/PDF')
     # Used with type register_consumed_materials the product raw to encode.
-    component_id = fields.Many2one('product.product', 'Product To Register', check_company=True)
+    allowed_bom_line_ids = fields.Many2many('mrp.bom.line', compute='_compute_allowed_bom_line_ids')
+    bom_line_id = fields.Many2one('mrp.bom.line', domain="[('id', 'in', allowed_bom_line_ids)]")
+    byproduct_id = fields.Many2one('mrp.bom.byproduct', domain="[('bom_id', 'in', bom_id)]")
+
+    @api.model
+    def _get_product_label_format_selection(self):
+        return self.env['stock.picking.type']._get_mrp_product_label_to_print_selection()
+
+    @api.model
+    def _get_lot_label_format_selection(self):
+        return [
+            ('4x12_lots', _('4 x 12 - One per lot/SN')),
+            ('4x12_units', _('4 x 12 - One per unit')),
+            ('zpl_lots', _('ZPL Labels - One per lot/SN')),
+            ('zpl_units', _('ZPL Labels - One per unit')),
+        ]
 
     @api.onchange('bom_product_ids', 'is_workorder_step')
     def _onchange_bom_product_ids(self):
@@ -111,24 +139,6 @@ class QualityPoint(models.Model):
             bom_product_ids = point.bom_id.product_id or point.bom_id.product_tmpl_id.product_variant_ids
             point.bom_product_ids = bom_product_ids.filtered(lambda p: not p.company_id or p.company_id == point.company_id._origin)
 
-    @api.depends('product_ids', 'test_type_id', 'is_workorder_step')
-    def _compute_component_ids(self):
-        self.component_ids = False
-        for point in self:
-            if point.test_type == 'register_byproducts':
-                point.component_ids = point.bom_id.byproduct_ids.product_id
-            else:
-                bom_products = point.bom_id.product_id or point.bom_id.product_tmpl_id.product_variant_ids
-                # If product_ids is set the step will exist only for these product variant then we can filter out for the bom explode
-                if point.product_ids:
-                    bom_products &= point.product_ids._origin
-
-                component_product_ids = set()
-                for product in bom_products:
-                    dummy, lines_done = point.bom_id.explode(product, 1.0)
-                    component_product_ids |= {line[0].product_id.id for line in lines_done}
-                point.component_ids = self.env['product.product'].browse(component_product_ids)
-
     @api.depends('operation_id', 'picking_type_ids')
     def _compute_is_workorder_step(self):
         for quality_point in self:
@@ -141,6 +151,21 @@ class QualityPoint(models.Model):
         for point in self:
             point.show_failure_location = point.show_failure_location and not point.operation_id
 
+    @api.depends('product_ids', 'bom_id', 'test_type_id')
+    def _compute_allowed_bom_line_ids(self):
+        self.allowed_bom_line_ids = False
+        for point in self:
+            if not point.bom_id or point.test_type != 'register_consumed_materials':
+                continue
+            allowed_bom_lines = self.env['mrp.bom.line']
+            bom_products = point.bom_product_ids._origin
+            if point.product_ids:
+                bom_products &= point.product_ids._origin
+            for product in bom_products:
+                _, bom_lines = point.bom_id.explode(product, 1.0)
+                allowed_bom_lines |= self.env['mrp.bom.line'].concat(l[0] for l in bom_lines)
+            point.allowed_bom_line_ids = allowed_bom_lines
+
     def _change_product_ids_for_bom(self, bom_id):
         products = bom_id.product_id or bom_id.product_tmpl_id.product_variant_ids
         self.product_ids = [Command.set(products.ids)]
@@ -149,23 +174,32 @@ class QualityPoint(models.Model):
     def _onchange_operation_id(self):
         if self.operation_id:
             self._change_product_ids_for_bom(self.bom_id)
-
-    @api.onchange('test_type_id')
-    def _onchange_test_type_id(self):
-        if self.test_type_id.technical_name not in ('register_byproducts', 'register_consumed_materials'):
-            self.component_id = False
+            self.apply_to = 'products'
+        else:
+            self.worksheet_document = False
 
     def write(self, vals):
         res = super().write(vals)
         if 'picking_type_ids' in vals:
-            self.filtered(lambda p: not p.is_workorder_step).operation_id = False
+            no_work_orders = self.filtered(lambda p: not p.is_workorder_step)
+            no_work_orders.write({
+                'operation_id': False,
+                'worksheet_document': False
+            })
+
+        if 'test_type_id' in vals:
+            for point in self:
+                if point.test_type != 'register_consumed_materials' and point.bom_line_id:
+                    point.bom_line_id = False
+                if point.test_type != 'register_byproducts' and point.byproduct_id:
+                    point.byproduct_id = False
         return res
 
     def action_view_worksheet_document(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _("Worksheet Preview"),
+            'name': _("Attachment Preview"),
             'res_model': 'quality.point',
             'res_id': self.id,
             'views': [(self.env.ref('mrp_workorder.quality_point_worksheet_document_preview_form').id, 'form')],
@@ -199,18 +233,15 @@ class QualityCheck(models.Model):
     move_id = fields.Many2one(
         'stock.move', 'Stock Move', check_company=True, index='btree_not_null')
     component_id = fields.Many2one(
-        'product.product', 'Component', check_company=True)
+        'product.product', 'Component', check_company=True, index='btree_not_null')
     component_barcode = fields.Char(related='component_id.barcode')
-    component_uom_id = fields.Many2one('uom.uom', related='move_id.product_uom', string='Component Unit', readonly=True)
+    component_uom_id = fields.Many2one('uom.uom', related='move_id.uom_id', string='Component Unit', readonly=True)
 
-    finished_lot_ids = fields.Many2many('stock.lot', 'Finished Lot/Serial', related='production_id.lot_producing_ids')
     component_tracking = fields.Selection(related='component_id.tracking', string="Is Component Tracked")
 
     # Workorder specific fields
     is_user_working = fields.Boolean(related="workorder_id.is_user_working")
-    consumption = fields.Selection(related="workorder_id.consumption")
     working_state = fields.Selection(related="workorder_id.working_state")
-    is_deleted = fields.Boolean('Deleted in production')  # TODO DELETE in MASTER
 
     # Computed fields
     title = fields.Char('Title', compute='_compute_title')
@@ -227,11 +258,9 @@ class QualityCheck(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         quality_points = {value['point_id'] for value in vals_list if value.get('point_id')}
-        quality_points_component_mapping = {
-            point.id: point.component_id.id
-            for point in self.env['quality.point'].browse(list(quality_points))
-            if point.component_id
-        }
+        quality_points_component_mapping = {}
+        for point in self.env['quality.point'].browse(quality_points):
+            quality_points_component_mapping[point.id] = point.bom_line_id.product_id.id or point.byproduct_id.product_id.id
         for value in vals_list:
             if value.get('component_id') or not value.get('point_id'):
                 continue
@@ -266,24 +295,23 @@ class QualityCheck(models.Model):
         return new_checks
 
     def _get_check_result(self):
-        if self.test_type in ('register_consumed_materials', 'register_byproducts'):
+        self.ensure_one()
+        if self.test_type == 'register_byproducts':
             if len(self.lot_ids) == 1:
                 return f'{self.component_id.name} - {self.lot_ids[0].name}, {self.component_uom_id.name}'
             return f'{self.component_id.name}, {self.component_uom_id.name}'
+        if self.test_type == 'register_consumed_materials':
+            return self.env._("Success") if self.quality_state == 'pass' else self.env._("Failure")
         return ''
 
     def action_print(self):
-        quality_point_id = self.point_id
-        report_type = quality_point_id.test_report_type
-
-        if self.product_id.tracking == 'none':
-            res = self._get_product_label_action(report_type)
-        else:
-            if self.workorder_id.finished_lot_ids:
-                res = self._get_lot_label_action(report_type)
+        if self.test_type == 'print_product_label':
+            res = self._get_product_label_action()
+        elif self.test_type == 'print_lot_label':
+            if self.lot_ids:
+                res = self._get_lot_label_action()
             else:
-                raise UserError(_('You did not set a lot/serial number for '
-                                'the final product'))
+                raise UserError(_('You did not set a lot/serial number for the final product'))
 
         # The button goes immediately to the next step
         res['next_check_id'] = self._next()
@@ -291,32 +319,40 @@ class QualityCheck(models.Model):
 
     def _get_print_qty(self):
         uom_unit = self.env.ref('uom.product_uom_unit')
-        if self.product_tracking != 'serial' and self.product_id.uom_id._has_common_reference(uom_unit):
+        if self.product_tracking != 'serial' and self.workorder_id.uom_id._has_common_reference(uom_unit):
             qty = int(self.workorder_id.qty_producing) or int(self.workorder_id.qty_production)
         else:
             qty = 1
         return qty
 
-    def _get_product_label_action(self, report_type):
+    def _get_product_label_action(self):
         self.ensure_one()
-        xml_id = 'product.action_open_label_layout'
-        wizard_action = self.env['ir.actions.act_window']._for_xml_id(xml_id)
-        wizard_action['context'] = {'default_product_ids': self.product_id.ids}
-        if report_type == 'zpl':
-            wizard_action['context']['default_print_format'] = 'zpl'
-        wizard_action['id'] = self.env.ref(xml_id).id
-        return wizard_action
-
-    def _get_lot_label_action(self, report_type):
-        qty = self._get_print_qty()
-
-        if report_type == 'zpl':
-            xml_id = 'stock.label_lot_template'
+        product_label_format = self.point_id.product_label_format
+        if product_label_format in ('pdf', 'zpl'):
+            wizard = self.env['quality.check.label.layout'].create({
+                'quality_check_id': self.id,
+                'print_format': '4x12' if product_label_format == 'pdf' else 'zpl',
+                'with_price': False,
+            })
         else:
-            xml_id = 'stock.action_report_lot_label'
-        res = self.env.ref(xml_id).report_action(self.workorder_id.finished_lot_ids.ids * qty)
-        res['id'] = self.env.ref(xml_id).id
-        return res
+            label_options = self.env['stock.picking.type']._get_product_label_format_options(product_label_format)
+            finished_moves = self.production_id.move_finished_ids.filtered_domain([('product_id', '=', self.product_id.id)])
+            wizard = self.env['product.label.layout'].create({
+                'product_ids': self.product_id.ids,
+                'move_ids': finished_moves.ids,
+                'custom_quantity': self._get_print_qty(),
+                **label_options,
+            })
+        return wizard.process()
+
+    def _get_lot_label_action(self):
+        lot_label_format = self.point_id.lot_label_format
+        wizard = self.env['lot.label.layout'].create({
+            'lot_ids': self.lot_ids.ids,
+            'custom_quantity': self._get_print_qty() if '_units' in lot_label_format else 1,
+            'print_format': 'zpl' if 'zpl' in lot_label_format else '4x12',
+        })
+        return wizard.process()
 
     def action_next(self):
         self.ensure_one()
@@ -337,8 +373,8 @@ class QualityCheck(models.Model):
                 body += Markup("<br/><b>%s</b>%s") % (_("Instruction:"), self.note)
             attachments = []
             if self.worksheet_document:
-                attachments = [('document', base64.b64decode(self.worksheet_document))]
-            self.workorder_id.production_id.bom_id.message_post(body=body, attachments=attachments)
+                attachments = [('document', self.worksheet_document)]
+            self.workorder_id.production_id.bom_id.sudo().message_post(body=body, attachments=attachments)
 
     def _next(self):
         """ This function:
@@ -357,6 +393,19 @@ class QualityCheck(models.Model):
             self.do_pass()
 
         return self.workorder_id._change_quality_check(position='next')
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_repair_chain(self):
+        for check in self:
+            prev = check.previous_check_id
+            nxt = check.next_check_id
+            if prev and nxt:
+                prev.next_check_id = nxt
+                nxt.previous_check_id = prev
+            elif prev:
+                prev.next_check_id = False
+            elif nxt:
+                nxt.previous_check_id = False
 
     def _insert_in_chain(self, position, relative):
         """Insert the quality check `self` in a chain of quality checks.

@@ -20,7 +20,8 @@ class TestWhatsappMessageQueueSend(WhatsAppFullCase):
                         composer = self._instanciate_wa_composer_from_records(
                             self.whatsapp_template, test_record,
                         )
-                        composer._create_whatsapp_messages()
+                        messages_values = composer._create_whatsapp_messages_values()
+                        self.env['whatsapp.message'].create(messages_values)
 
                     self.env.ref('whatsapp.ir_cron_send_whatsapp_queue').method_direct_trigger()
 

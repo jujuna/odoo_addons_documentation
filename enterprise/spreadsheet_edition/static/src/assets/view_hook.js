@@ -17,11 +17,11 @@ export function useInsertInSpreadsheet(env, getExportableFields) {
             .filter((col) => !["binary", "json"].includes(fields[col.name].type))
             .map((col) => {
                 const field = fields[col.name];
-                return { name: col.name, type: field.type, string: field.string };
+                return { name: col.name, string: field.string };
             });
     };
 
-    const _getListForSpreadsheet = async (name) => {
+    const _getListForSpreadsheet = async (name, context) => {
         const root = model.root;
         const { actionId } = config;
         const { xml_id } = actionId ? await action.loadAction(actionId, model.root.context) : {};
@@ -32,7 +32,7 @@ export function useInsertInSpreadsheet(env, getExportableFields) {
                 model: root.resModel,
                 domain: searchModel.domainString,
                 orderBy: root.orderBy.filter((field) => fields[field.name]),
-                context: omit(root.context, ...Object.keys(user.context)),
+                context: context,
                 columns: _getColumnsForSpreadsheet(),
                 name,
                 actionXmlId: xml_id,
@@ -43,6 +43,7 @@ export function useInsertInSpreadsheet(env, getExportableFields) {
 
     const _openSpreadsheetSelectorDialog = async () => {
         const root = model.root;
+        const context = omit(model.root.context, ...Object.keys(user.context))
         const count = root.groups
             ? root.groups.reduce((acc, group) => group.count + acc, 0)
             : root.count;
@@ -56,7 +57,7 @@ export function useInsertInSpreadsheet(env, getExportableFields) {
                 order: root.fields[sortBy.name].string,
             });
         }
-        const { list, fields } = await _getListForSpreadsheet(name);
+        const { list, fields } = await _getListForSpreadsheet(name, context);
 
         // if some records are selected, we replace the domain with a "id in [selection]" clause
         if (selection.length > 0) {
@@ -72,6 +73,7 @@ export function useInsertInSpreadsheet(env, getExportableFields) {
             type: "LIST",
             name,
             actionOptions,
+            context,
         };
         root.model.dialog.add(SpreadsheetSelectorDialog, params);
     };

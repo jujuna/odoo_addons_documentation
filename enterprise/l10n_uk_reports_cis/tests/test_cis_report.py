@@ -11,6 +11,7 @@ class TestCisReport(TestAccountReportsCommon):
 
     See: https://www.gov.uk/government/publications/construction-industry-scheme-schema-and-technical-specifications Under section CIS recognition
     """
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @AccountTestInvoicingCommon.setup_country('gb')
@@ -71,7 +72,6 @@ class TestCisReport(TestAccountReportsCommon):
         """
         partner_a = self.env['res.partner'].create({
             'name': 'John Peter Brown',
-            'is_company': False,
             'l10n_uk_cis_enabled': True,
             'l10n_uk_reports_cis_verification_number': 'V6499876214A',
             'l10n_uk_reports_cis_deduction_rate': 'unmatched',
@@ -82,7 +82,6 @@ class TestCisReport(TestAccountReportsCommon):
 
         partner_b = self.env['res.partner'].create({
             'name': 'TA Plumbing',
-            'is_company': True,
             'l10n_uk_cis_enabled': True,
             'l10n_uk_reports_cis_verification_number': 'V8745678309AA',
             'l10n_uk_reports_cis_deduction_rate': 'unmatched',
@@ -113,7 +112,6 @@ class TestCisReport(TestAccountReportsCommon):
         """
         partner = self.env['res.partner'].create({
             'name': 'Adam George',
-            'is_company': False,
             'l10n_uk_cis_enabled': True,
             'l10n_uk_reports_cis_verification_number': 'V6499876214',
             'l10n_uk_reports_cis_deduction_rate': 'net',
@@ -146,7 +144,7 @@ class TestCisReport(TestAccountReportsCommon):
         """
         partner = self.env['res.partner'].create({
             'name': 'Factory and Warehouse Fabrication Services',
-            'is_company': True,
+            'vat': 'UK0123456789',
             'l10n_uk_cis_enabled': True,
             'l10n_uk_reports_cis_verification_number': 'V6499876214',
             'l10n_uk_reports_cis_deduction_rate': 'net',
@@ -174,7 +172,6 @@ class TestCisReport(TestAccountReportsCommon):
         """
         partner = self.env['res.partner'].create({
             'name': 'George Bailey',
-            'is_company': False,
             'l10n_uk_cis_enabled': True,
             'l10n_uk_reports_cis_verification_number': 'V6499876214',
             'l10n_uk_reports_cis_deduction_rate': 'gross',
@@ -205,12 +202,10 @@ class TestCisReport(TestAccountReportsCommon):
         """
         partner_parent = self.env['res.partner'].create({
             'name': 'Lumber Inc',
-            'is_company': True,
             'l10n_uk_cis_enabled': True,
         })
         partner_child = self.env['res.partner'].create({
             'name': 'Lumber Inc, George Bailey',
-            'is_company': False,
             'parent_id': partner_parent.id,
         })
 
@@ -239,7 +234,6 @@ class TestCisReport(TestAccountReportsCommon):
         """
         partner = self.env['res.partner'].create({
             'name': 'Lumber Inc',
-            'is_company': True,
             'l10n_uk_cis_enabled': True,
         })
 
@@ -280,7 +274,6 @@ class TestCisReport(TestAccountReportsCommon):
         """
         partner = self.env['res.partner'].create({
             'name': 'Lumber Inc',
-            'is_company': True,
         })
 
         move = self.create_invoice_and_post(partner, '2009-04-18', [(3000, True)])
@@ -300,7 +293,7 @@ class TestCisReport(TestAccountReportsCommon):
     def test_cis_report_rounded_values(self):
         partner = self.env['res.partner'].create({
             'name': 'Factory and Warehouse Fabrication Services',
-            'is_company': True,
+            'vat': 'UK0123456789',
             'l10n_uk_cis_enabled': True,
             'l10n_uk_reports_cis_verification_number': 'V6499876214',
             'l10n_uk_reports_cis_deduction_rate': 'net',

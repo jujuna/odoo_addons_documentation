@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from . import account_analytic_line
 from . import account_move_line
 from . import account_move
+from . import account_move_send
 from . import hr_employee
-from . import hr_timesheet
 from . import product_product
 from . import product_template
 from . import project_project

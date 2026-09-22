@@ -1,40 +1,56 @@
 import { _t } from "@web/core/l10n/translation";
-import { status, Component, useState } from "@odoo/owl";
 
-import { useService } from "@web/core/utils/hooks";
 import { WarningDialog } from "@web/core/errors/error_dialogs";
-
 import { DateTimeInput } from '@web/core/datetime/datetime_input';
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { MultiRecordSelector } from "@web/core/record_selectors/multi_record_selector";
+import { RecordSelector } from "@web/core/record_selectors/record_selector";
 import { formatDate, parseDate } from "@web/core/l10n/dates";
-const { DateTime } = luxon;
+import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
+import { ORM } from "@web/core/orm_plugin";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
+import { DialogPlugin } from "@web/core/dialog/dialog_plugin";
+import { NotificationPlugin } from "@web/core/notifications/notification_plugin";
+
+import { status, Component, proxy, useEffect, usePlugin } from "@odoo/owl";
+
+import { AccountReportController } from "@account_reports/components/account_report/controller";
+
+const { DateTime } = luxon;
+
 
 export class AccountReportFilters extends Component {
     static template = "account_reports.AccountReportFilters";
-    static props = {};
     static components = {
         DateTimeInput,
         Dropdown,
         DropdownItem,
         MultiRecordSelector,
+        RecordSelector,
     };
 
+    orm = usePlugin(ORM);
+    controller = usePlugin(AccountReportController);
+    debugMode = usePlugin(DebugModePlugin);
+    dialog = usePlugin(DialogPlugin);
+    notification = usePlugin(NotificationPlugin);
+
+    state = proxy({ dateFilter: this.initDateFilterState() });
+    budgetName = proxy({
+        value: "",
+        invalid: false,
+    });
+    timeout = null;
+
     setup() {
-        this.dialog = useService("dialog");
-        this.orm = useService("orm");
-        this.notification = useService("notification");
-        this.controller = useState(this.env.controller);
-        if (this.env.controller.cachedFilterOptions.date) {
-            this.dateFilter = useState(this.initDateFilters());
-        }
-        this.budgetName = useState({
-            value: "",
-            invalid: false,
+        useEffect(() => {
+            const reportId = this.controller.cachedFilterOptions()?.report_id;
+            if (reportId !== this.dateFilterState.reportId) {
+                this.state.dateFilter = this.initDateFilterState();
+            }
         });
-        this.timeout = null;
     }
 
     focusInnerInput(selectedItem) {
@@ -51,17 +67,17 @@ export class AccountReportFilters extends Component {
                 'group': 'account_readonly',
                 'show': this.controller.filters.show_draft,
             },
+            'unreconciled': {
+                'name': _t("Unreconciled Entries"),
+                'show': this.controller.filters.show_unreconciled,
+            },
             'include_analytic_without_aml': {
                 'name': _t("Analytic Simulations"),
                 'group': 'account_readonly',
             },
             'hierarchy': {
-                'name': _t("Hierarchy and Subtotals"),
-                'show': this.controller.cachedFilterOptions.display_hierarchy_filter,
-            },
-            'unreconciled': {
-                'name': _t("Unreconciled Entries"),
-                'show': this.controller.filters.show_unreconciled,
+                'name': _t("Subtotals"),
+                'show': this.controller.cachedFilterOptions().display_hierarchy_filter,
             },
             'unfold_all': {
                 'name': _t("Unfold All"),
@@ -72,7 +88,7 @@ export class AccountReportFilters extends Component {
             },
             'consolidation': {
                 'name': _t("Consolidation"),
-                'show': this.controller.cachedFilterOptions.show_consolidation,
+                'show': this.controller.cachedFilterOptions().show_consolidation,
             },
             'hide_0_lines': {
                 'name': _t("Hide lines at 0"),
@@ -89,8 +105,8 @@ export class AccountReportFilters extends Component {
     }
 
     get selectedHorizontalGroupName() {
-        for (const horizontalGroup of this.controller.cachedFilterOptions.available_horizontal_groups) {
-            if (horizontalGroup.id === this.controller.cachedFilterOptions.selected_horizontal_group_id) {
+        for (const horizontalGroup of this.controller.cachedFilterOptions().available_horizontal_groups) {
+            if (horizontalGroup.id === this.controller.cachedFilterOptions().selected_horizontal_group_id) {
                 return horizontalGroup.name;
             }
         }
@@ -98,14 +114,14 @@ export class AccountReportFilters extends Component {
     }
 
     get isHorizontalGroupSelected() {
-        return this.controller.cachedFilterOptions.available_horizontal_groups.some((group) => {
-            return group.id === this.controller.cachedFilterOptions.selected_horizontal_group_id;
+        return this.controller.cachedFilterOptions().available_horizontal_groups.some((group) => {
+            return group.id === this.controller.cachedFilterOptions().selected_horizontal_group_id;
         });
     }
 
     get selectedTaxUnitName() {
-        for (const taxUnit of this.controller.cachedFilterOptions.available_tax_units) {
-            if (taxUnit.id === this.controller.cachedFilterOptions.tax_unit) {
+        for (const taxUnit of this.controller.cachedFilterOptions().available_tax_units) {
+            if (taxUnit.id === this.controller.cachedFilterOptions().tax_unit) {
                 return taxUnit.name;
             }
         }
@@ -113,8 +129,8 @@ export class AccountReportFilters extends Component {
     }
 
     get selectedVariantName() {
-        for (const variant of this.controller.cachedFilterOptions.available_variants) {
-            if (variant.id === this.controller.cachedFilterOptions.selected_variant_id) {
+        for (const variant of this.controller.cachedFilterOptions().available_variants) {
+            if (variant.id === this.controller.cachedFilterOptions().selected_variant_id) {
                 return variant.name;
             }
         }
@@ -122,18 +138,18 @@ export class AccountReportFilters extends Component {
     }
 
     get selectedSectionName() {
-        for (const section of this.controller.cachedFilterOptions.sections)
-            if (section.id === this.controller.cachedFilterOptions.selected_section_id)
+        for (const section of this.controller.cachedFilterOptions().sections)
+            if (section.id === this.controller.cachedFilterOptions().selected_section_id)
                 return section.name;
     }
 
     get selectedAccountType() {
-        let selectedAccountType = this.controller.cachedFilterOptions.account_type.filter(
+        let selectedAccountType = this.controller.cachedFilterOptions().account_type.filter(
             (accountType) => accountType.selected,
         );
         if (
             !selectedAccountType.length ||
-            selectedAccountType.length === this.controller.cachedFilterOptions.account_type.length
+            selectedAccountType.length === this.controller.cachedFilterOptions().account_type.length
         ) {
             return _t("All");
         }
@@ -166,7 +182,7 @@ export class AccountReportFilters extends Component {
     }
 
     get selectedAmlIrFilters() {
-        const selectedFilters = this.controller.cachedFilterOptions.aml_ir_filters.filter(
+        const selectedFilters = this.controller.cachedFilterOptions().aml_ir_filters.filter(
             (irFilter) => irFilter.selected,
         );
 
@@ -179,12 +195,31 @@ export class AccountReportFilters extends Component {
         }
     }
 
+    get selectedPartnerFilters() {
+        const options = this.controller.cachedFilterOptions();
+        const partnersCount = options.partner_ids.length;
+        const tagsCount = options.partner_categories.length;
+
+        if (partnersCount && tagsCount) {
+            return _t("Partners: %(partnersCount)s, Tags: %(tagsCount)s", { partnersCount, tagsCount });
+        }
+        else if (partnersCount) {
+            return _t("Partners: %(partnersCount)s", { partnersCount });
+        }
+        else if (tagsCount) {
+            return _t("Tags: %(tagsCount)s", { tagsCount });
+        }
+        else {
+            return _t("Partners");
+        }
+    }
+
     get availablePeriodOrder() {
         return { descending: _t("Descending"), ascending: _t("Ascending") };
     }
 
     get periodOrder() {
-        return this.controller.cachedFilterOptions.comparison.period_order === "descending"
+        return this.controller.cachedFilterOptions().comparison.period_order === "descending"
             ? _t("Descending")
             : _t("Ascending");
     }
@@ -194,7 +229,7 @@ export class AccountReportFilters extends Component {
 
         if (this.controller.cachedUserGroups.account_readonly && this.controller.filters.show_draft) {
             selectedExtraOptions.push(
-                this.controller.cachedFilterOptions.all_entries
+                this.controller.cachedFilterOptions().all_entries
                     ? _t("With Draft Entries")
                     : _t("Posted Entries"),
             );
@@ -202,7 +237,7 @@ export class AccountReportFilters extends Component {
         if (this.controller.filters.show_unreconciled && this.controller.cachedFilterOptions.unreconciled) {
             selectedExtraOptions.push(_t("Unreconciled Entries"));
         }
-        if (this.controller.cachedFilterOptions.include_analytic_without_aml) {
+        if (this.controller.cachedFilterOptions().include_analytic_without_aml) {
             selectedExtraOptions.push(_t("Including Analytic Simulations"));
         }
         return selectedExtraOptions.join(", ");
@@ -236,8 +271,9 @@ export class AccountReportFilters extends Component {
                         return;
                     }
                     const periodType = findNearestDropdownItem(navigator)?.target.dataset.periodType;
-                    if (Object.prototype.hasOwnProperty.call(this.dateFilter, periodType)) {
-                        this.selectPreviousPeriod(periodType);
+                    if(this.dateFilterConfiguration.filters[periodType]) {
+                        const filter = this.dateFilterConfiguration.filters[periodType];
+                        this.selectNewPeriod(filter, -1);
                     }
                 },
                 arrowright: (navigator) => {
@@ -245,8 +281,9 @@ export class AccountReportFilters extends Component {
                         return;
                     }
                     const periodType = findNearestDropdownItem(navigator)?.target.dataset.periodType;
-                    if (Object.prototype.hasOwnProperty.call(this.dateFilter, periodType)) {
-                        this.selectNextPeriod(periodType);
+                    if(this.dateFilterConfiguration.filters[periodType]) {
+                        const filter = this.dateFilterConfiguration.filters[periodType];
+                        this.selectNewPeriod(filter, 1);
                     }
                 },
                 enter: {
@@ -255,12 +292,6 @@ export class AccountReportFilters extends Component {
                             return;
                         }
 
-                        /**
-                         * Workaround for when we're editing a date field, but meanwhile hovering another dropdown item.
-                         * In that case, the active item in the navigator is the hovered one (not necessarily the one
-                         * we're editing). We check here if the current focused element on the page is an input (the one
-                         * we're editing) and in that case find the encompassing dropdown item and select it.
-                         */
                         const focusedElement = document.activeElement;
                         if (focusedElement.nodeName === "INPUT") {
                             for (const navigatorItem of navigator.items) {
@@ -271,37 +302,29 @@ export class AccountReportFilters extends Component {
                             }
                         }
 
-                        const dropdownItem = findNearestDropdownItem(navigator);
-                        const isSelected = dropdownItem?.target.classList.contains("selected");
-                        const periodType = dropdownItem?.target.dataset.periodType;
-                        const mode = dropdownItem?.target.dataset.mode;
+                        const dropdownItem = findNearestDropdownItem(navigator)?.target;
+                        const periodType = dropdownItem.dataset.periodType;
+
                         const inputField =
                             navigator.activeItem.target.nodeName === "INPUT"
                                 ? navigator.activeItem.target
-                                : dropdownItem?.target.querySelector("input.o_input");
-                        if (mode === "view" && periodType) {
-                            dropdownItem?.setActive();
-                            if (!isSelected) {
-                                // Select the period type on first enter.
-                                this.dateFilter.editing = false;
-                                this.filterClicked({
-                                    optionKey: "date.filter",
-                                    optionValue: periodType,
-                                    reload: true,
-                                });
-                            } else {
-                                // Make the input editable on second enter.
-                                this.editDateFilter(periodType, inputField);
+                                : dropdownItem.querySelector("input.o_input");
+
+                        if(this.dateFilterState.editing === periodType) {
+                            if(periodType === 'custom') {
+                                // Not handled by the default writeDate
+                                inputField?.blur();
                             }
-                        } else if (mode === "edit" && periodType) {
-                            // Save the edited period and return focus to the dropdown item.
-                            this.saveDateFilter(periodType, inputField);
-                            dropdownItem?.setActive();
-                        } else if (periodType) {
-                            // Select the period type and potentially blur an input date field to trigger a save.
-                            inputField?.blur();
-                            this.selectDateFilter(periodType, true);
-                            dropdownItem?.setActive();
+                            else {
+                                this.writeDate(this.dateFilterConfiguration.filters[periodType], inputField);
+                            }
+                        }
+                        else {
+                            this.selectDateFilter(periodType);
+                        }
+
+                        if(this.dateFilterState.editing === periodType) {
+                            inputField.focus();
                         }
                     },
                     bypassEditableProtection: true,
@@ -312,7 +335,7 @@ export class AccountReportFilters extends Component {
     }
 
     get periodLabel() {
-        return this.controller.cachedFilterOptions.comparison.number_period > 1 ? _t("Periods") : _t("Period");
+        return this.controller.cachedFilterOptions().comparison.number_period > 1 ? _t("Periods") : _t("Period");
     }
     //------------------------------------------------------------------------------------------------------------------
     // Helpers
@@ -321,14 +344,10 @@ export class AccountReportFilters extends Component {
         return Boolean(this.controller.cachedUserGroups.analytic_accounting) && (Boolean(this.controller.filters.show_analytic_groupby) || Boolean(this.controller.filters.show_analytic_plan_groupby));
     }
 
-    get hasCodesFilter() {
-        return Boolean(this.controller.cachedFilterOptions.sales_report_taxes?.operation_category?.goods);
-    }
-
     isExtraOptionFilterShown(option) {
         let data = this.filterExtraOptionsData[option];
         return (
-            option in this.controller.cachedFilterOptions &&
+            option in this.controller.cachedFilterOptions() &&
             option in this.filterExtraOptionsData &&
             data.show !== false &&
             (data.group === undefined || this.controller.cachedUserGroups[data.group])
@@ -346,28 +365,43 @@ export class AccountReportFilters extends Component {
     }
 
     get isBudgetSelected() {
-        return this.controller.cachedFilterOptions.budgets?.some((budget) => {
+        return this.controller.cachedFilterOptions().budgets?.some((budget) => {
             return budget.selected;
         });
     }
 
+    updateReportLineComparison(resId) {
+        const lines = this.controller.data()?.lines || [];
+        const baseLine = lines.find((line) => line.columns[0].report_line_id === resId);
+
+        if (baseLine) {
+            this.filterClicked({
+                optionKey: 'comparison',
+                optionValue: {...this.controller.cachedFilterOptions().comparison, filter: 'report_line', base_report_line: {id: resId, name: baseLine.name}},
+                reload: true,
+            });
+        }
+        else {
+            this.filterClicked({optionKey: 'comparison.filter', optionValue: 'no_comparison', reload: true});
+        }
+    }
+
     //------------------------------------------------------------------------------------------------------------------
-    // Dates
+    // Date filter
     //------------------------------------------------------------------------------------------------------------------
-    // Getters
+
     dateFrom(optionKey) {
-        return DateTime.fromISO(this.controller.cachedFilterOptions[optionKey].date_from);
+        return parseDate(this.controller.cachedFilterOptions()[optionKey].date_from, {tz: "UTC"});
     }
 
     dateTo(optionKey) {
-        return DateTime.fromISO(this.controller.cachedFilterOptions[optionKey].date_to);
+        return parseDate(this.controller.cachedFilterOptions()[optionKey].date_to, {tz: "UTC"});
     }
 
-    // Setters
-    setDate(optionKey, type, date) {
+    setCustomComparisonDate(type, date) {
         if (date) {
-            this.controller.cachedFilterOptions[optionKey][`date_${type}`] = date;
-            this.applyFilters(optionKey);
+            this.controller.cachedFilterOptions().comparison[`date_${type}`] = typeof date === "string" ? date : date.toISODate();
+            this.applyFilters('comparison');
         }
         else {
             this.dialog.add(WarningDialog, {
@@ -377,291 +411,18 @@ export class AccountReportFilters extends Component {
         }
     }
 
-    setDateFrom(optionKey, dateFrom) {
-        this.setDate(optionKey, 'from', dateFrom);
-    }
-
-    setDateTo(optionKey, dateTo) {
-        this.setDate(optionKey, 'to', dateTo);
-    }
-
-    dateFilters(mode) {
-        switch (mode) {
-            case "single":
-                return [
-                    {
-                        name: _t("End of Month"),
-                        period: "month",
-                        mode: this.dateFilter.editing === "month" ? "edit" : "view",
-                    },
-                    {
-                        name: _t("End of Quarter"),
-                        period: "quarter",
-                        mode: this.dateFilter.editing === "quarter" ? "edit" : "view",
-                    },
-                    {
-                        name: _t("End of Year"),
-                        period: "year",
-                        mode: this.dateFilter.editing === "year" ? "edit" : "view",
-                    },
-                ];
-            case "range":
-                return [
-                    {
-                        name: _t("Month"),
-                        period: "month",
-                        mode: this.dateFilter.editing === "month" ? "edit" : "view",
-                    },
-                    {
-                        name: _t("Quarter"),
-                        period: "quarter",
-                        mode: this.dateFilter.editing === "quarter" ? "edit" : "view",
-                    },
-                    {
-                        name: _t("Year"),
-                        period: "year",
-                        mode: this.dateFilter.editing === "year" ? "edit" : "view",
-                    },
-                ];
-            default:
-                throw new Error(`Invalid mode in dateFilters(): ${mode}`);
-        }
-    }
-
-    initDateFilters() {
-        const filters = {
-            month: 0,
-            quarter: 0,
-            year: 0,
-            return_period: 0,
-            editing: false,
-        };
-
-        const specifier = this.controller.cachedFilterOptions.date.filter.split('_')[0];
-        const periodType = this.controller.cachedFilterOptions.date.period_type;
-        // In case the period is fiscalyear it will be computed exactly like a year period.
-        const period = periodType === "fiscalyear" ? "year" : periodType;
-        // Set the filter value based on the specifier.
-        if (Object.prototype.hasOwnProperty.call(filters, period)) {
-            filters[period] = this.controller.cachedFilterOptions.date.period || (specifier === 'previous' ? -1 : specifier === 'next' ? 1 : 0);
-        }
-
-        return filters;
-    }
-
-    getDateFilter(periodType) {
-        if (this.dateFilter[periodType] > 0) {
-            return `next_${periodType}`;
-        } else if (this.dateFilter[periodType] === 0) {
-            return `this_${periodType}`;
-        } else if (this.dateFilter[periodType] < 0) {
-            return `previous_${periodType}`;
-        } else {
-            return periodType;
-        }
-    }
-
-    selectDateFilter(periodType, reload = false) {
-        if (this.isPeriodSelected(periodType)) {
-            return;
-        }
-        this.dateFilter.editing = false;
-        const offsetPeriod = Object.prototype.hasOwnProperty.call(this.dateFilter, periodType);
-        this.filterClicked({
-            optionKey: "date.filter",
-            optionValue: this.getDateFilter(periodType),
-            reload: !offsetPeriod && reload,
-        });
-        if (offsetPeriod) {
-            this.filterClicked({
-                optionKey: "date.period",
-                optionValue: this.dateFilter[periodType],
-                reload: reload,
-            });
-        }
-    }
-
-    editDateFilter(periodType, inputField) {
-        inputField?.select();
-        this.dateFilter.editing = periodType;
-    }
-
-    saveDateFilter(periodType, inputField) {
-        if (!this.dateFilter.editing) {
-            return;
-        }
-        const enteredValue = inputField?.value;
-        let dateFilterOffset = false;
-        if (periodType === "month") {
-            dateFilterOffset = this._parseMonthOffset(enteredValue);
-        } else if (periodType === "quarter") {
-            dateFilterOffset = this._parseQuarterOffset(enteredValue);
-        } else if (periodType === "year") {
-            dateFilterOffset = this._parseYearOffset(enteredValue);
-        } else if (periodType === "return_period") {
-            dateFilterOffset = this._parseReturnPeriodOffset(enteredValue);
-        }
-        if (dateFilterOffset !== false) {
-            dateFilterOffset -= this.dateFilter[periodType];
-            this._changePeriod(periodType, dateFilterOffset);
-        }
-        inputField?.setSelectionRange(enteredValue.length, enteredValue.length);
-        this.dateFilter.editing = false;
-    }
-
-    _parseMonthOffset(input) {
-        try {
-            const monthTo = parseDate(input.trim(), { format: "MMMM yyyy" });
-            if (!monthTo.isValid) {
-                return false;
-            }
-            const compareDate = DateTime.now().startOf("month");
-            return monthTo.startOf("month").diff(compareDate, "months").months;
-        } catch {
-            return false;
-        }
-    }
-
-    _parseQuarterOffset(input) {
-        try {
-            const quarterTo = parseDate(input.split("-").pop().trim(), { format: "MMM yyyy" });
-            if (!quarterTo.isValid) {
-                return false;
-            }
-            const compareDate = DateTime.now().startOf("quarter");
-            return quarterTo.startOf("quarter").diff(compareDate, "quarters").quarters;
-        } catch {
-            return false;
-        }
-    }
-
-    _parseYearOffset(input) {
-        try {
-            const yearTo = parseDate(input, { format: "yyyy" });
-            if (!yearTo.isValid) {
-                return false;
-            }
-            const compareDate = DateTime.now().startOf("year");
-            return yearTo.startOf("year").diff(compareDate, "years").years;
-        } catch {
-            return false;
-        }
-    }
-
-    _parseReturnPeriodOffset(input) {
-        try {
-            const dateTo = parseDate(input.split("-").pop().trim());
-            if (!dateTo.isValid) {
-                return false;
-            }
-            const periodicitySettings = this.controller.cachedFilterOptions.return_periodicity;
-            const [, compareTo] = this._computeReturnPeriodDates(periodicitySettings, DateTime.now());
-            const [, taxPeriodTo] = this._computeReturnPeriodDates(periodicitySettings, dateTo);
-            return (
-                taxPeriodTo.startOf("month").diff(compareTo.startOf("month"), "months").months /
-                periodicitySettings.months_per_period
-            );
-        } catch {
-            return false;
-        }
-    }
-
-    selectPreviousPeriod(periodType) {
-        this._changePeriod(periodType, -1);
-    }
-
-    selectNextPeriod(periodType) {
-        this._changePeriod(periodType, 1);
-    }
-
-    _changePeriod(periodType, increment) {
-        this.dateFilter[periodType] = this.dateFilter[periodType] + increment;
-
-        this.controller.updateOption("date.filter", this.getDateFilter(periodType));
-        this.controller.updateOption("date.period", this.dateFilter[periodType]);
-
-        this.applyFilters("date.period");
-    }
-
-    isPeriodSelected(periodType) {
-        return this.controller.cachedFilterOptions.date.filter.endsWith(periodType)
-    }
-
-    get shouldDisplayReturnPeriod() {
-        const periodicitySettings = this.controller.cachedFilterOptions.return_periodicity;
-        if (periodicitySettings) {
-            return periodicitySettings.start_day !== 1 || periodicitySettings.start_month !== 1 || ![1, 3, 12].includes(periodicitySettings.months_per_period);
-        }
-
-        return false;
-    }
-
-    displayPeriod(periodType) {
-        const dateTo = DateTime.now();
-
-        if (periodType === "return_period" && !this.controller.cachedFilterOptions.return_periodicity)
-            periodType = "month";
-
-        switch (periodType) {
-            case "month":
-                return this._displayMonth(dateTo);
-            case "quarter":
-                return this._displayQuarter(dateTo);
-            case "year":
-                return this._displayYear(dateTo);
-            case "return_period":
-                return this._displayReturnPeriod(dateTo);
-            default:
-                throw new Error(`Invalid period type in displayPeriod(): ${ periodType }`);
-        }
-    }
-
-    _displayMonth(dateTo) {
-        return dateTo.plus({ months: this.dateFilter.month }).toFormat("MMMM yyyy");
-    }
-
-    _displayQuarter(dateTo) {
-        const quarterMonths = {
-            1: { 'start': 1, 'end': 3 },
-            2: { 'start': 4, 'end': 6 },
-            3: { 'start': 7, 'end': 9 },
-            4: { 'start': 10, 'end': 12 },
-        }
-
-        dateTo = dateTo.plus({ months: this.dateFilter.quarter * 3 });
-
-        const quarterDateFrom = DateTime.utc(dateTo.year, quarterMonths[dateTo.quarter]['start'], 1)
-        const quarterDateTo = DateTime.utc(dateTo.year, quarterMonths[dateTo.quarter]['end'], 1)
-
-        return `${ formatDate(quarterDateFrom, {format: "MMM"}) } - ${ formatDate(quarterDateTo, {format: "MMM yyyy"}) }`;
-    }
-
-    _displayYear(dateTo) {
-        return dateTo.plus({ years: this.dateFilter.year }).toFormat("yyyy");
-    }
-
-    _displayReturnPeriod(dateTo) {
-        const periodicitySettings = this.controller.cachedFilterOptions.return_periodicity;
-        const targetDateInPeriod = dateTo.plus({months: periodicitySettings.months_per_period * this.dateFilter['return_period']})
-        const [start, end] = this._computeReturnPeriodDates(periodicitySettings, targetDateInPeriod);
-        return formatDate(start) + ' - ' + formatDate(end);
-    }
-
-    _computeReturnPeriodDates(periodicitySettings, dateInsideTargettesPeriod) {
+    computePeriodRange(date, startDay, startMonth, monthsPerPeriod) {
         /**
-         * This function need to stay consitent with the one inside account_return_type from module account_reports.
+         * This function needs to stay consistent with the one inside account_return_type from module account_reports.
          * function_name = _get_period_boundaries
          */
-        const startMonth = periodicitySettings.start_month;
-        const startDay = periodicitySettings.start_day
-        const monthsPerPeriod = periodicitySettings.months_per_period;
-        const aligned_date = dateInsideTargettesPeriod.minus({days: startDay - 1})
-        let year = aligned_date.year;
-        const monthOffset = aligned_date.month - startMonth;
+        const alignedDate = date.minus({days: startDay - 1})
+        let year = alignedDate.year;
+        const monthOffset = alignedDate.month - startMonth;
 
         let periodNumber = Math.floor(monthOffset / monthsPerPeriod) + 1;
 
-        if (dateInsideTargettesPeriod < DateTime.now().set({year: year, month: startMonth, day: startDay})) {
+        if (date < DateTime.utc(year, startMonth, startDay)) {
             year -= 1;
             periodNumber = Math.floor((12 + monthOffset) / monthsPerPeriod) + 1;
         }
@@ -669,8 +430,341 @@ export class AccountReportFilters extends Component {
         let deltaMonth = periodNumber * monthsPerPeriod;
 
         const endDate = DateTime.utc(year, startMonth, 1).plus({ months: deltaMonth, days: startDay-2})
-        const startDate = DateTime.utc(year, startMonth, 1).plus({ months: deltaMonth-monthsPerPeriod }).set({ day: startDay})
+        const startDate = DateTime.utc(year, startMonth, 1).plus({ months: deltaMonth - monthsPerPeriod }).set({ day: startDay})
         return [startDate, endDate];
+    }
+
+    get dateOptions() {
+        return this.controller.cachedFilterOptions().date;
+    }
+
+    get dateFilterState() {
+        return this.state.dateFilter;
+    }
+
+    get isRangeMode() {
+        return this.controller.cachedFilterOptions().filter_date.range_mode;
+    }
+
+    get selectedPeriodType() {
+        // Returns the selected filter. Fallback is more prioritized if it is visible.
+        if (this.dateOptions.fallback_from && this.isFilterVisible(this.dateOptions.fallback_from)) {
+            return this.dateOptions.fallback_from;
+        }
+
+        return this.dateOptions.period_type;
+    }
+
+    get dateFilterConfiguration() {
+        return this.controller.cachedFilterOptions().filter_date;
+    }
+
+    getDateFilterByPeriodType(periodType) {
+        return this.dateFilterConfiguration.filters[periodType];
+    }
+
+    get selectedDateFilter() {
+        if (this.selectedPeriodType === 'custom') {
+            return {
+                'key': 'custom',
+            }
+        }
+        return this.getDateFilterByPeriodType(this.selectedPeriodType);
+    }
+
+    get availableDateFiltersSorted() {
+        return Object.values(this.dateFilterConfiguration.filters).sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
+    }
+
+    isFilterVisible(periodType) {
+        return this.getDateFilterByPeriodType(periodType)?.always_shown || !this.getDateFilterByPeriodType(periodType)?.fallback;
+    }
+
+    isFilterDateSelected(periodType) {
+        // Return true if the period type is the one currently used from the options.
+        return this.selectedPeriodType === periodType;
+    }
+
+    initDateFilterState() {
+        /** Creates the state object used to track current selected dates for each period type
+         * Recomputed when the report_id is changed */
+        const today = DateTime.utc().startOf("day");
+        const dateTo = this.dateTo('date');
+        const referenceDate = dateTo ?? today;
+
+        let dateFrom = this.dateFrom('date');
+        const selectedFilter = this.selectedDateFilter;
+
+        if (!dateFrom && this.dateFilterConfiguration.range_mode) {
+            dateFrom = this.computePeriodRange(referenceDate, selectedFilter.start_day, selectedFilter.start_month, selectedFilter.months_per_period)[0];
+        }
+
+        const newDateFilterState = {
+            editing: false,
+            reportId: this.controller.cachedFilterOptions().report_id,
+        };
+
+        for (const filter of this.availableDateFiltersSorted) {
+            const filterName = filter.key
+
+            if (filterName === 'today') {
+                newDateFilterState.today = [false, today];
+                continue;
+            }
+
+            // Selected filter stays aligned with the report's date_to.
+            // Other filters fall back to today when today falls in range, this_year reports
+            // have date_to at fiscal year-end, so month/quarter would otherwise default to
+            // the last month/quarter of the year instead of the current one.
+            let filterReferenceDate;
+            if (this.isFilterDateSelected(filter.key)) {
+                filterReferenceDate = referenceDate;
+            } else {
+                const todayInPeriod = !dateTo || (dateTo >= today && (!dateFrom || dateFrom <= today));
+                filterReferenceDate = todayInPeriod ? today : referenceDate;
+            }
+
+            let range = this.findCustomRangeForDate(filter, filterReferenceDate)
+                || this.computePeriodRange(filterReferenceDate, filter.start_day, filter.start_month, filter.months_per_period);
+
+            if (!this.isRangeMode) {
+                range[0] = false;
+            }
+
+            newDateFilterState[filterName] = range;
+        }
+
+        if (!newDateFilterState.custom) {
+            newDateFilterState['custom'] = [dateFrom, dateTo];
+        }
+
+        return newDateFilterState;
+    }
+
+    getDateDescription() {
+        return this.controller.cachedFilterOptions().date.string;
+    }
+
+    getFilterDateDisplay(filter) {
+        const [dateFrom, dateTo, customLabel] = this.dateFilterState[filter.key];
+
+        if (customLabel) return customLabel;
+        if (filter.key === "today") return filter.label;
+
+        const format = (d, fmt) => formatDate(d, fmt ? { format: fmt } : undefined);
+
+        if (this.isRangeMode) {
+            const isFullMonth = dateFrom.ts === dateFrom.startOf("month").ts && dateTo.ts === dateTo.endOf("month").startOf("day").ts;
+            if (isFullMonth) {
+                const isFullYear = isFullMonth && dateFrom.year === dateTo.year && dateFrom.month === 1 && dateTo.month === 12;
+                if (isFullYear) return format(dateTo, "yyyy");
+                const isSameMonth = dateFrom.month === dateTo.month && dateFrom.year === dateTo.year;
+                return isSameMonth ? format(dateTo, "MMMM yyyy") : `${format(dateFrom, "MMM yyyy")} - ${format(dateTo, "MMM yyyy")}`;
+            }
+            return `${format(dateFrom)} - ${format(dateTo)}`
+        }
+
+        else {
+            const periodType = filter.fallback || filter.key;
+            const isEndOfMonth = dateTo.ts === dateTo.endOf("month").startOf("day").ts;
+            if (isEndOfMonth && periodType === 'month') return format(dateTo, "MMMM yyyy");
+            if (periodType === 'quarter') {
+                const dateFormat = isEndOfMonth ? "MMM yyyy" : undefined;
+                const dateFrom = this.getPeriodDates(dateTo, filter)[0];
+                return `${format(dateFrom, dateFormat)} - ${format(dateTo, dateFormat)}`;
+            }
+
+            const isEndOfYear = dateTo.ts === dateTo.endOf("year").startOf("day").ts;
+            if (isEndOfYear && periodType === 'year') return format(dateTo, "yyyy");
+
+            return format(dateTo);
+        }
+    }
+
+    selectDateFilter(periodType) {
+        if (this.isFilterDateSelected(periodType)) {
+            this.dateFilterState.editing = periodType;
+            return;
+        }
+
+        const customName = this.dateFilterState[periodType].length === 3 ? this.dateFilterState[periodType][2] : undefined;
+        this.applyNewPeriod(periodType, this.dateFilterState[periodType][0], this.dateFilterState[periodType][1], customName);
+    }
+
+    selectNewPeriod(filter, side) {
+        let [dateFrom, dateTo] = this.dateFilterState[filter.key];
+        const direction = Math.sign(side);
+
+        if (!this.isRangeMode && direction === -1) {
+            [dateFrom, dateTo] = this.getPeriodDates(dateTo, filter);
+        }
+
+        const reference = direction === 1 ? dateTo : dateFrom;
+        const newPeriodDate = reference.plus({days: direction})
+        const customRange = this.findCustomRangeForDate(filter, newPeriodDate);
+        if (customRange) {
+            this.applyNewPeriod(filter.key, customRange[0], customRange[1], customRange[2]);
+            return;
+        }
+
+        let [newDateFrom, newDateTo] = this.computePeriodRange(newPeriodDate, filter.start_day, filter.start_month, filter.months_per_period);
+        this.applyNewPeriod(filter.key, newDateFrom, newDateTo);
+    }
+
+    getPeriodDates(date, filter) {
+        //Same utility function as the python one. it computes the period from a single date taking into account custom ranges.
+        let periodType = filter.key;
+        if (['today', 'custom'].includes(periodType)) {
+            periodType = 'year';
+        }
+
+        filter = this.getDateFilterByPeriodType(periodType);
+
+        const customRanges = this.findCustomRangeForDate(filter, date);
+        if (customRanges) {
+            return customRanges.slice(0, 2);
+        }
+
+        return this.computePeriodRange(date, filter.start_day, filter.start_month, filter.months_per_period);
+    }
+
+    findCustomRangeForDate(filter, date) {
+        const customRanges  = filter.custom_ranges;
+
+        if (!customRanges)
+            return false;
+
+        for (let [customRangeStart, customRangeEnd, customRangeName] of customRanges) {
+            // Specify UTC as these are from odoo Database.
+            customRangeStart = parseDate(customRangeStart, {tz: "UTC"});
+            customRangeEnd = parseDate(customRangeEnd, {tz: "UTC"});
+
+            if (date >= customRangeStart && date <= customRangeEnd) {
+                return [customRangeStart, customRangeEnd, customRangeName];
+            }
+        }
+
+        return false;
+    }
+
+    writeDate(filter, inputElement) {
+        const inputText = inputElement?.value;
+        if (!inputText || this.dateFilterState.editing !== filter.key) return;
+
+        this.dateFilterState.editing = false;
+
+        // Checks if the input text matches a custom range
+        if (filter.custom_ranges) {
+            const result = filter.custom_ranges.find((range) => range[2] === inputText);
+            const tzOptions = { zone: "UTC", setZone: true };
+            if (result) {
+                this.applyNewPeriod(filter.key, DateTime.fromISO(result[0], tzOptions), DateTime.fromISO(result[1], tzOptions), result[2]);
+                return;
+            }
+        }
+
+        try {
+            const [dateFrom, dateTo] = this.parseDateInput(filter, inputText);
+            this.applyNewPeriod(filter.key, dateFrom, dateTo);
+        }
+        catch (error) {
+            if (error.name !== "ConversionError") {
+                throw error;
+            }
+        }
+    }
+
+    parseDateInput(filter, input) {
+        // Dates are parsed as UTC because parsing them as local then converting them is error prone and weird
+        const rawDateText = input.split("-").pop().trim();
+        const tzOptions = { tz: "UTC" };
+        let dateTo = undefined;
+
+        if (rawDateText) {
+            const formats = [
+                "LLL yyyy",
+                "LLLL yyyy",
+                "yyyy",
+                undefined,  //Full format
+            ]
+
+            let index = 0;
+            while(!dateTo && index < formats.length) {
+                try {
+                    dateTo = parseDate(rawDateText, {...tzOptions, format: formats[index++]})
+                }
+                catch(error) {
+                    if (error.name !== "ConversionError" || index >= formats.length) {
+                        // ConversionError means it couldn't parse the input text, so we avoid throwing a traceback.
+                        // We do nothing as the input field will automatically revert to the original input text.
+                        throw error;
+                    }
+                }
+            }
+        }
+
+        return this.computePeriodRange(dateTo, filter.start_day, filter.start_month, filter.months_per_period);
+    }
+
+    setCustomDateFrom(dateFrom) {
+        this.dateFilterState['custom'][0] = dateFrom;
+        this.changeDateOptions('custom', dateFrom, null);
+    }
+
+    setCustomDateTo(dateTo) {
+        this.dateFilterState['custom'][1] = dateTo;
+        this.changeDateOptions('custom', null, dateTo);
+    }
+
+    get customDateFrom() {
+        return this.dateFilterState['custom'][0];
+    }
+
+    get customDateTo() {
+        return this.dateFilterState['custom'][1];
+    }
+
+    applyNewPeriod(periodType, dateFrom, dateTo, customName) {
+        this.dateFilterState[periodType] = customName ? [dateFrom, dateTo, customName] : [dateFrom, dateTo];
+        let fallbackFrom = null;
+        if (periodType !== "custom") {
+            this.dateFilterState["custom"] = this.isRangeMode ? [dateFrom, dateTo] : [false, dateTo];
+
+            const filter = this.getDateFilterByPeriodType(periodType);
+            if (filter.fallback) {
+                fallbackFrom = periodType;
+                periodType = filter.fallback;
+            }
+        }
+
+        // When changing the period of the date filter, unselect the 'Open On' filter by default.
+        this.filterClicked({ optionKey: 'unreconciled', optionValue: false})
+
+        this.changeDateOptions(periodType, this.isRangeMode ? dateFrom : false, dateTo, fallbackFrom)
+    }
+
+    changeDateOptions(periodType, dateFrom, dateTo, fallbackFrom) {
+        if (dateFrom && typeof dateFrom !== "string") {
+            dateFrom = dateFrom.toISODate();
+        }
+
+        if (dateTo && typeof dateTo !== "string") {
+            dateTo = dateTo.toISODate();
+        }
+
+        const newDateOptions = {
+            ...this.dateOptions,
+            period_type: periodType ?? this.selectedPeriodType,
+            date_from: dateFrom ?? this.dateOptions.date_from,
+            date_to: dateTo ?? this.dateOptions.date_to,
+            fallback_from: fallbackFrom,
+        };
+
+        this.filterClicked({
+            optionKey: 'date',
+            optionValue: newDateOptions,
+            reload: true,
+        });
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -680,7 +774,7 @@ export class AccountReportFilters extends Component {
         const numberPeriods = ev.target.value;
 
         if (numberPeriods >= 1)
-            this.controller.cachedFilterOptions.comparison.number_period = parseInt(numberPeriods);
+            this.controller.cachedFilterOptions().comparison.number_period = parseInt(numberPeriods);
         else
             this.dialog.add(WarningDialog, {
                 title: _t("Odoo Warning"),
@@ -694,10 +788,23 @@ export class AccountReportFilters extends Component {
     getMultiRecordSelectorProps(resModel, optionKey) {
         return {
             resModel,
-            resIds: this.controller.cachedFilterOptions[optionKey],
+            resIds: this.controller.cachedFilterOptions()[optionKey],
             update: (resIds) => {
                 this.filterClicked({ optionKey: optionKey, optionValue: resIds, reload: true});
             },
+        };
+    }
+
+    get reportLineComparisonProps() {
+        const { report_id } = this.controller.options();
+        const comparison = this.controller.cachedFilterOptions()?.comparison || {};
+        const resId = comparison.filter === 'report_line' ? comparison.base_report_line?.id || false : false;
+        return {
+            resModel: "account.report.line",
+            domain: [["report_id", "=", report_id], ['expression_ids', '!=', false]],
+            resId,
+            update: (resId) => this.updateReportLineComparison(resId),
+            fieldString: _t("Report Lines"),
         };
     }
 
@@ -705,81 +812,84 @@ export class AccountReportFilters extends Component {
     // Rounding unit
     //------------------------------------------------------------------------------------------------------------------
     roundingUnitName(roundingUnit) {
-        return _t("In %s", this.controller.cachedFilterOptions["rounding_unit_names"][roundingUnit][0]);
+        return _t("In %s", this.controller.cachedFilterOptions().rounding_unit_names[roundingUnit]);
     }
 
     //------------------------------------------------------------------------------------------------------------------
     // Generic filters
     //------------------------------------------------------------------------------------------------------------------
-    async filterClicked({ optionKey, optionValue = undefined, reload = false}) {
+    filterClicked({ optionKey, optionValue = undefined, reload = false}) {
         if (optionValue !== undefined) {
-            await this.controller.updateOption(optionKey, optionValue);
+            this.controller.updateOption(optionKey, optionValue);
         } else {
-            await this.controller.toggleOption(optionKey);
+            this.controller.toggleOption(optionKey);
         }
 
         if (reload) {
-            await this.applyFilters(optionKey);
+            this.applyFilters(optionKey);
         }
     }
 
-    async applyFilters(optionKey = null, delay = 500) {
+    applyFilters(optionKey = null, delay = 500) {
         // We only call the reload after the delay is finished, to avoid doing 5 calls if you want to click on 5 journals
         if (this.timeout) {
             clearTimeout(this.timeout);
         }
 
-        this.controller.incrementCallNumber();
+        const cacheKey = this.controller.getCacheKey(this.controller.cachedFilterOptions().sections_source_id,  this.controller.cachedFilterOptions().report_id);
+        this.controller.loadingCallNumberByCacheKey[cacheKey] += 1;
 
-        this.timeout = setTimeout(async () => {
+        this.timeout = setTimeout(() => {
             if (status(this) !== "destroyed")
-                await this.controller.reload(optionKey, this.controller.cachedFilterOptions);
+                this.controller.reload(optionKey, this.controller.cachedFilterOptions());
         }, delay);
     }
 
     //------------------------------------------------------------------------------------------------------------------
     // Custom filters
     //------------------------------------------------------------------------------------------------------------------
+
+    get companyName2Journals() {
+        const mapping = this.controller.cachedFilterOptions().journals.reduce((map, journal) => {
+            const companyName = journal.company_name;
+            map[companyName] ??= [];
+            map[companyName].push(journal);
+
+            return map;
+        }, {})
+
+        return mapping;
+    }
+
+    selectGroup(group) {
+        const wasSelected = group.selected;
+        this._toggleRelatedJournals(group)
+        this.controller.cachedFilterOptions().__journal_group_action = {
+            action: wasSelected ? "remove" : "add",
+            id: group.id,
+        };
+        // Toggle the selected status after the action is set
+        group.selected = !wasSelected;
+        this.applyFilters("journal_groups")
+    }
+
     selectJournal(journal) {
-        if (journal.model === "account.journal.group") {
-            const wasSelected = journal.selected;
-            this.ToggleSelectedJournal(journal);
-            this.controller.cachedFilterOptions.__journal_group_action = {
-                action: wasSelected ? "remove" : "add",
-                id: parseInt(journal.id),
-            };
-            // Toggle the selected status after the action is set
-            journal.selected = !wasSelected;
-        } else {
-            journal.selected = !journal.selected;
-        }
+        journal.selected = !journal.selected;
         this.applyFilters("journals");
     }
 
-    ToggleSelectedJournal(selectedJournal) {
-        if (selectedJournal.selected) {
-            this.controller.cachedFilterOptions.journals.forEach((journal) => {
-                journal.selected = false;
-            });
-        } else {
-            this.controller.cachedFilterOptions.journals.forEach((journal) => {
-                journal.selected = selectedJournal.journals.includes(journal.id) && journal.model === "account.journal";
-            });
-        }
+    _toggleRelatedJournals(selectedGroup) {
+        this.controller.cachedFilterOptions().journals.forEach((journal) => {
+            if (selectedGroup.journals.includes(journal.id)) {
+                journal.selected = !journal.selected;
+            }
+        })
     }
 
-    unfoldCompanyJournals(selectedCompany) {
-        let inSelectedCompanySection = false;
-        for (const journal of this.controller.cachedFilterOptions.journals) {
-            if (journal.id === "divider" && journal.model === "res.company") {
-                if (journal.name === selectedCompany.name) {
-                    journal.unfolded = !journal.unfolded;
-                    inSelectedCompanySection = true;
-                } else if (inSelectedCompanySection) {
-                    break;  // Reached another company divider, exit the loop
-                }
-            }
-            if (inSelectedCompanySection && journal.model === "account.journal") {
+    unfoldCompanyJournals(selectedCompanyName) {
+        for (const journal of this.controller.cachedFilterOptions().journals) {
+            if (journal.company_name === selectedCompanyName) {
+                journal.unfolded = !journal.unfolded;
                 journal.visible = !journal.visible;
             }
         }
@@ -787,21 +897,16 @@ export class AccountReportFilters extends Component {
 
     async filterVariant(reportId) {
         this.controller.saveSessionOptions({
-            ...this.controller.cachedFilterOptions,
+            ...this.controller.cachedFilterOptions(),
             selected_variant_id: reportId,
             sections_source_id: reportId,
         });
-        const cacheKey = this.controller.getCacheKey(reportId, reportId);
-        // if the variant hasn't been loaded yet, set up the call number
-        if (!(cacheKey in this.controller.loadingCallNumberByCacheKey)) {
-            this.controller.incrementCallNumber(cacheKey);
-        }
         await this.controller.displayReport(reportId);
     }
 
     async filterTaxUnit(taxUnit) {
         await this.filterClicked({ optionKey: "tax_unit", optionValue: taxUnit.id});
-        this.controller.saveSessionOptions(this.controller.cachedFilterOptions);
+        this.controller.saveSessionOptions(this.controller.cachedFilterOptions());
 
         // force the company to those impacted by the tax units, the reload will be force by this function
         user.activateCompanies(taxUnit.company_ids);
@@ -811,37 +916,66 @@ export class AccountReportFilters extends Component {
         // Avoid calling the database when this filter is toggled; as the exact same lines would be returned; just reassign visibility.
         await this.controller.toggleOption("hide_0_lines", false);
 
-        this.controller.saveSessionOptions(this.controller.cachedFilterOptions);
-        this.controller.setLineVisibility(this.controller.lines);
+        this.controller.saveSessionOptions(this.controller.cachedFilterOptions());
+        this.controller.setLineVisibility(this.controller.data() ? this.controller.lines : []);
+        this.controller.invalidateVisibleLines();  // since setLineVisibility update the stored lines
     }
 
     async toggleHorizontalSplit() {
         await this.controller.toggleOption("horizontal_split", false);
-        this.controller.saveSessionOptions(this.controller.cachedFilterOptions);
+        this.controller.saveSessionOptions(this.controller.cachedFilterOptions());
+        this.controller.invalidateVisibleLines();  // invalidate line heights (since horizontal split show/hide some lines)
     }
 
     async filterRoundingUnit(rounding) {
         await this.controller.updateOption('rounding_unit', rounding, false);
 
-        this.controller.saveSessionOptions(this.controller.cachedFilterOptions);
+        this.controller.saveSessionOptions(this.controller.cachedFilterOptions());
 
-        this.controller.lines = await this.controller.orm.call(
+        const minimalLines = this.controller.lines.map(line => ({
+            unfolded: line.unfolded,
+            columns: line.columns.map(column => ({
+                no_format: column.no_format,
+                figure_type: column.figure_type,
+                format_params: column.format_params,
+                is_zero: column.is_zero,
+                blank_if_zero: column.blank_if_zero,
+            })),
+            column_percent_comparison_data: line.column_percent_comparison_data,
+        }));
+
+        const minimalFormattedLines = await this.orm.call(
             "account.report",
             "dispatch_report_action",
             [
-                this.controller.cachedFilterOptions.report_id,
-                this.controller.cachedFilterOptions,
+                this.controller.cachedFilterOptions().report_id,
+                this.controller.cachedFilterOptions(),
                 "format_column_values_from_client",
-                this.controller.lines,
+                minimalLines,
             ],
             {
                 context: this.controller.context,
             }
         );
+
+        for (let i=0; i < this.controller.lines.length; i++) {
+            const line = this.controller.lines[i];
+            const new_line = minimalFormattedLines[i];
+            for (let j=0; j < line.columns.length; j++) {
+                line.columns[j].name = new_line.columns[j].name;
+            }
+            if (line.horizontal_group_total_data && new_line.horizontal_group_total_data) {
+                line.horizontal_group_total_data.name = new_line.horizontal_group_total_data.name;
+            }
+            if (line.column_percent_comparison_data && new_line.column_percent_comparison_data) {
+                line.column_percent_comparison_data.name = new_line.column_percent_comparison_data.name;
+            }
+        }
+        this.controller.invalidateVisibleLines();
     }
 
     async selectHorizontalGroup(horizontalGroupId) {
-        if (horizontalGroupId === this.controller.cachedFilterOptions.selected_horizontal_group_id) {
+        if (horizontalGroupId === this.controller.cachedFilterOptions().selected_horizontal_group_id) {
             return;
         }
         await this.filterClicked({ optionKey: "selected_horizontal_group_id", optionValue: horizontalGroupId, reload: true});
@@ -866,7 +1000,7 @@ export class AccountReportFilters extends Component {
         ]);
         this.budgetName.value = "";
         this.budgetName.invalid = false;
-        const cachedFilterOptions = this.controller.cachedFilterOptions;
+        const cachedFilterOptions = this.controller.cachedFilterOptions();
         this.controller.reload("budgets", {
             ...cachedFilterOptions,
             budgets: [
@@ -877,3 +1011,5 @@ export class AccountReportFilters extends Component {
         });
     }
 }
+
+registry.category("account_reports.default_components").add("AccountReportFilters", AccountReportFilters);

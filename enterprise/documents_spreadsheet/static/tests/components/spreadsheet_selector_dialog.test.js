@@ -9,7 +9,7 @@ import { click, dblclick, press, queryAllTexts } from "@odoo/hoot-dom";
 import { advanceTime, animationFrame } from "@odoo/hoot-mock";
 import { prepareWebClientForSpreadsheet } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
 import { SpreadsheetSelectorDialog } from "@spreadsheet_edition/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog";
-import { contains, mountWithCleanup } from "@web/../tests/web_test_helpers";
+import { assignDialogTestEnv, contains, mountWithCleanup } from "@web/../tests/web_test_helpers";
 import { registry } from "@web/core/registry";
 
 defineDocumentSpreadsheetModels();
@@ -51,6 +51,7 @@ function getDefaultProps() {
         name: "Pipeline",
         actionOptions: {},
         close: () => {},
+        context: {},
     };
 }
 
@@ -66,21 +67,16 @@ function getDefaultProps() {
  */
 async function mountSpreadsheetSelectorDialog(config = {}) {
     await prepareWebClientForSpreadsheet();
-    const env = await makeDocumentsSpreadsheetMockEnv({
+    assignDialogTestEnv();
+    await makeDocumentsSpreadsheetMockEnv({
         serverData: config.serverData || serverData,
         mockRPC: config.mockRPC,
     });
-    //@ts-ignore
-    env.dialogData = {
-        isActive: true,
-        close: () => {},
-    };
     const props = {
         ...getDefaultProps(),
         ...(config.props || {}),
     };
-    await mountWithCleanup(SpreadsheetSelectorDialog, { env, props });
-    return { env };
+    await mountWithCleanup(SpreadsheetSelectorDialog, { props });
 }
 
 test("Display only spreadsheet and a blank spreadsheet", async () => {
@@ -356,4 +352,25 @@ test("Can navigate through spreadsheets with arrow keys", async () => {
     expect(defaultSheet).toHaveClass("o-spreadsheet-grid-selected", {
         message: "Blank spreadsheet should be selected",
     });
+});
+
+test("Thumbnails are correctly displayed", async () => {
+    const thumbnailBase64 = "thisIsABase64String";
+    serverData.models["documents.document"].records = [
+        {
+            id: 1,
+            name: "My spreadsheet",
+            spreadsheet_data: "{}",
+            folder_id: 1,
+            handler: "spreadsheet",
+            is_favorited: false,
+            display_thumbnail: thumbnailBase64,
+        },
+    ];
+
+    await mountSpreadsheetSelectorDialog();
+    expect(".o-spreadsheet-grid:not(.o-blank-spreadsheet-grid) img").toHaveAttribute(
+        "data-src", // tests render img in data-src rather than src
+        `data:image/jpeg;charset=utf-8;base64,${thumbnailBase64}`
+    );
 });

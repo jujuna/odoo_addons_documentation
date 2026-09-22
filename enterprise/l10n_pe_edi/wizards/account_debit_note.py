@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import fields, models
+from odoo.addons.l10n_pe_edi.models.account_move import DEBIT_REASON
 
 
 class AccountDebitNote(models.TransientModel):
     _inherit = 'account.debit.note'
 
     l10n_pe_edi_charge_reason = fields.Selection(
-        selection=[
-            ('01', 'Default interest'),
-            ('02', 'Increase in value'),
-            ('03', 'Penalties / other concepts'),
-            ('11', 'Adjustments of export operations'),
-            ('12', 'Adjustments affecting the IVAP'),
-        ],
+        selection=DEBIT_REASON,
         string="Debit Reason",
         default='01',
         help="It contains all possible values for the refund reason according to Catalog No. 10")

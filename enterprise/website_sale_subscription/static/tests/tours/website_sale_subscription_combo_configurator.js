@@ -5,7 +5,6 @@ import * as wsTourUtils from '@website_sale/js/tours/tour_utils';
 registry
     .category('web_tour.tours')
     .add('website_sale_subscription_combo_configurator', {
-        url: '/shop?search=Combo product',
         steps: () => [
             ...wsTourUtils.addToCart({ productName: "Combo product", search: false, expectUnloadPage: true }),
             // Assert that the subscription price and plan is correct.

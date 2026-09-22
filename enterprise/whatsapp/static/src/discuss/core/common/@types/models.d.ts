@@ -1,6 +1,9 @@
 declare module "models" {
-    export interface Thread {
-        whatsapp_partner_id: Persona,
-        whatsappMember: ChannelMember,
+    export interface DiscussChannel {
+        whatsapp_partner_id: ResPartner;
+        whatsappMember: ChannelMember;
+    }
+    export interface Message {
+        whatsappStatus: string|undefined;
     }
 }

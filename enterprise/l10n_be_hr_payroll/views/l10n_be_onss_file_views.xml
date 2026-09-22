@@ -16,6 +16,7 @@
                         <group string="File Information">
                             <field name="form_creation_date" invisible="not form_creation_date"/>
                             <field name="form_creation_hour" invisible="not form_creation_hour"/>
+                            <field name="reference" invisible="not reference"/>
                             <field name="file_type"/>
                             <field name="declaration_type"/>
                             <field name="expeditor_number"/>
@@ -65,6 +66,7 @@
                 <filter name="unlinked_file" string="Unlinked Files" domain="[('employee_id', '=', False), ('onss_declaration_id', '=', False)]"/>
                 <group>
                     <filter name="group_by_onss_declaration_id" string="Declaration" domain="[]" context="{'group_by': 'onss_declaration_id'}"/>
+                    <filter name="group_by_onss_declaration_type" string="Declaration Type" domain="[]" context="{'group_by': 'declaration_type'}"/>
                 </group>
             </search>
         </field>

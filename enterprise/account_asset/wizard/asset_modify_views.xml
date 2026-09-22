@@ -6,7 +6,7 @@
         <field name="model">asset.modify</field>
         <field name="arch" type="xml">
             <form string="Modify Asset">
-                <field name="asset_id" invisible="1"/>
+                <field name="asset_variant_id" invisible="1"/>
                 <field name="gain_value" invisible="1"/>
                 <field name="select_invoice_line_id" invisible="1"/>
                 <field name="gain_or_loss" invisible="1"/>
@@ -18,9 +18,16 @@
                     <group>
                         <field name="date"/>
 
-                        <label for="method_number" invisible="modify_action not in ('modify', 'resume')"/>
-                        <div class="o_row" invisible="modify_action not in ('modify', 'resume')">
-                            <field name="method_number" required="1"/>
+                        <field name="new_account_asset_id"
+                               invisible="modify_action != 'activate_depreciation'"
+                               required="modify_action == 'activate_depreciation'"/>
+
+                        <label for="method_number" invisible="modify_action not in ('modify', 'resume') or not show_duration or method_mode != 'duration'"/>
+                        <label for="method_rate" invisible="modify_action not in ('modify', 'resume') or not show_duration or method_mode != 'rate'"/>
+                        <div class="o_row" invisible="modify_action not in ('modify', 'resume') or not show_duration">
+                            <field name="method_number" required="1" options="{'hide_trailing_zeros': true}" invisible="method_mode != 'duration'"/>
+                            <field name="method_rate" widget="percentage" required="1" invisible="method_mode != 'rate'"/>
+                            <span invisible="method_mode != 'rate'"> per</span>
                             <field name="method_period" required="1" nolabel="1"/>
                         </div>
 
@@ -92,8 +99,13 @@
                             class="btn-primary"
                             data-hotkey="t"
                             invisible="modify_action != 'dispose'" />
-                    <button string="Cancel"
-                            class="btn-secondary"
+                    <button name="activate_depreciation"
+                            string="Activate"
+                            type="object"
+                            class="btn-primary"
+                            data-hotkey="a"
+                            invisible="modify_action != 'activate_depreciation'" />
+                    <button class="btn-secondary"
                             special="cancel"
                             data-hotkey="x"/>
                 </footer>

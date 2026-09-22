@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
@@ -7,11 +6,14 @@
     'category': 'Supply Chain/Internet of Things (IoT)',
     'summary': 'Quality steps and IoT devices',
     'description': """
-This module provides the link between quality steps and IoT devices. 
+Base module for quality checks/points using IoT devices.
+This module is required for IoT integrations in both Manufacturing
+and Quality Control apps.
 """,
     'depends': ['iot', 'quality'],
     'data': [
-        'views/iot_views.xml',
+        'views/iot_device_views.xml',
+        'views/quality_views.xml',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',

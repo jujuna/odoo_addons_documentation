@@ -58,7 +58,7 @@ class l10nChAccidentInsuranceGroup(models.Model):
     def _get_default_laa_line_ids(self):
         vals = [
             (0, 0, {
-                'date_from': fields.Date.today().replace(month=1, day=1),
+                'date_from': fields.Date.context_today(self).replace(month=1, day=1),
                 'threshold': 148200,
                 'occupational_male_rate': 0,
                 'non_occupational_male_rate': 0,

@@ -15,6 +15,7 @@ class TestL10nClExportsDte(TestL10nClEdiCommon):
         - 110:
             - An exportation invoice
     """
+    _test_user_groups = None  # FIXME list needed groups
 
     @freeze_time('2019-10-22T20:23:27', tz_offset=3)
     @patch('odoo.addons.certificate.models.certificate.CertificateCertificate._compute_is_valid', _is_valid_certificate)
@@ -28,14 +29,13 @@ class TestL10nClExportsDte(TestL10nClEdiCommon):
             'phone': '+1 555-555-5555',
             'company_id': self.company_data['company'].id,
             'email': 'admin@yourcompany.example.com',
-            'l10n_latam_identification_type_id': self.env.ref('l10n_latam_base.it_pass').id,
             'l10n_cl_sii_taxpayer_type': '4',
             'vat': '123456789',
         })
         currency_usd = self.env.ref('base.USD')
         currency_usd.active = True
         self.env['res.currency.rate'].create({
-            'name': '2019-10-22',
+            'name': '2019-10-21',
             'company_id': self.company_data['company'].id,
             'currency_id': currency_usd.id,
             'rate': 0.0013})

@@ -18,7 +18,7 @@
                             <field name="billing_street" required="1"/>
                             <field name="billing_street2" />
                             <field name="billing_city" required="1" options="{'no_create': True, 'no_create_edit': True}"/>
-                            <field name="billing_state_id" required="company_country_id.code == 'US'"
+                            <field name="billing_state_id" required="company_country_code == 'US'"
                                    options="{'no_create': True, 'no_create_edit': True}"/>
                             <field name="billing_zip" required="1"/>
                             <field name="billing_country_id" required="1"/>
@@ -26,7 +26,7 @@
                     </group>
                     <footer>
                         <button name="action_save_cardholder" class="btn btn-primary" type="object">Save</button>
-                        <button string="Cancel" special="cancel" data-hotkey="x"/>
+                        <button special="cancel" data-hotkey="x"/>
                     </footer>
                 </form>
             </field>

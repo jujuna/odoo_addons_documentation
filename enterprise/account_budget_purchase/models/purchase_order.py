@@ -4,7 +4,7 @@ from odoo import fields, models, api
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
-    is_above_budget = fields.Boolean('Is Above Budget', compute='_compute_above_budget')
+    is_above_budget = fields.Boolean('Is Above Budget', compute='_compute_above_budget', compute_sudo=True)
     is_analytic = fields.Boolean('Is Analytic', compute='_compute_is_analytic')
 
     @api.depends('order_line.analytic_distribution')
@@ -12,13 +12,22 @@ class PurchaseOrder(models.Model):
         for order in self:
             order.is_analytic = any(order.order_line.mapped('analytic_distribution'))
 
-    @api.depends('order_line.budget_line_ids', 'order_line.price_unit', 'order_line.product_qty', 'order_line.qty_invoiced', 'state')
+    @api.depends(
+        'order_line.budget_line_ids',
+        'order_line.non_deductible_tax',
+        'order_line.price_unit',
+        'order_line.product_qty',
+        'order_line.qty_invoiced',
+        'state',
+    )
     def _compute_above_budget(self):
         for order in self:
-            uncommitted_amount = sum(
-                line.price_unit * (line.product_qty - line.qty_invoiced)
-                for line in order.order_line if line.budget_line_ids
-            ) if order.state not in ('purchase', 'done') else 0
+            uncommitted_amount = 0.0
+            if order.state not in ('purchase', 'done'):
+                for line in order.order_line.filtered(lambda l: l.budget_line_ids):
+                    uncommitted_qty = (line.product_qty - line.qty_invoiced)
+                    uncommitted_amount += line.price_unit * uncommitted_qty
+                    uncommitted_amount += line.non_deductible_tax * uncommitted_qty / line.product_qty if line.product_qty else 0.0
             order.is_above_budget = any(
                 budget.committed_amount + uncommitted_amount > budget.budget_amount
                 for budget in order.order_line.mapped('budget_line_ids')

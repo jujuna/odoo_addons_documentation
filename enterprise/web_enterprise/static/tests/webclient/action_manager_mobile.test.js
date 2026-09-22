@@ -164,10 +164,13 @@ test("view switcher button should be displayed in dropdown on mobile screens", a
     expect(".o_control_panel .o_cp_switch_buttons .o_switch_view.o_kanban").toHaveCount(0);
     expect(".o_control_panel .o_cp_switch_buttons button.o_switch_view").toHaveCount(0);
 
-    expect(".o_control_panel .o_cp_switch_buttons > button > i").toHaveClass("oi-view-kanban");
+    expect(".o_control_panel .o_cp_switch_buttons > button > i").toHaveAttribute(
+        "data-icon",
+        "oi_view-kanban"
+    );
     await click(".o_control_panel .o_cp_switch_buttons > button");
     await animationFrame();
 
-    expect(".dropdown-item:has(.oi-view-kanban)").toHaveClass("selected");
-    expect(".dropdown-item:has(.oi-view-list)").not.toHaveClass("selected");
+    expect(".dropdown-item:has([data-icon='oi_view-kanban'])").toHaveClass("selected");
+    expect(".dropdown-item:has([data-icon='reorder'])").not.toHaveClass("selected");
 });

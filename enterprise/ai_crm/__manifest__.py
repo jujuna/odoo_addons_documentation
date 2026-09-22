@@ -5,13 +5,12 @@
     "summary": "Automatically create leads.",
     "description": "Automatically create leads.",
     "author": "Odoo S.A.",
-    "version": "1.0",
     "category": "Hidden",
     "license": "OEEL-1",
-    "depends": ["ai_app", "crm"],
+    "depends": ["ai", "crm"],
     "auto_install": True,
     "data": [
         "data/ir_actions_server_tools.xml",
-        "data/ai_topic.xml",
+        "data/ai_skill.xml",
     ],
 }

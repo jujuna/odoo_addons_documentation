@@ -2,15 +2,16 @@ import {
     addBuilderOption,
     addBuilderAction,
     setupHTMLBuilder,
+    getSnippetStructure,
 } from "@html_builder/../tests/helpers";
 import { BuilderAction } from "@html_builder/core/builder_action";
+import { ClassAction } from "@html_builder/core/core_builder_action_plugin";
 import { Operation } from "@html_builder/core/operation";
-import { BaseOptionComponent } from "@html_builder/core/utils";
 import { HistoryPlugin } from "@html_editor/core/history_plugin";
-import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { advanceTime, Deferred, delay, hover, press, tick } from "@odoo/hoot-dom";
+import { animationFrame, beforeEach, describe, expect, test } from "@odoo/hoot";
+import { advanceTime, delay, hover, press, tick } from "@odoo/hoot-dom";
 import { xml } from "@odoo/owl";
-import { contains, patchWithCleanup } from "@web/../tests/web_test_helpers";
+import { contains, getService, patchWithCleanup } from "@web/../tests/web_test_helpers";
 
 describe.current.tags("desktop");
 
@@ -120,29 +121,46 @@ test("handle 3 concurrent cancellable operations (without delay)", async () => {
 });
 
 describe("Block editable", () => {
+    test("Loading screen uses the extra preview document when available", () => {
+        const editableDocument = document.implementation.createHTMLDocument();
+        const previewDocument = document.implementation.createHTMLDocument();
+        let extraPreviewDocument = previewDocument;
+        const operation = new Operation(editableDocument, () => extraPreviewDocument);
+
+        let removeLoadingElement = operation.addLoadingElement(false);
+        expect(previewDocument.querySelectorAll(".o_loading_screen")).toHaveCount(1);
+        expect(editableDocument.querySelectorAll(".o_loading_screen")).toHaveCount(0);
+
+        removeLoadingElement();
+        extraPreviewDocument = null;
+        removeLoadingElement = operation.addLoadingElement(false);
+        expect(previewDocument.querySelectorAll(".o_loading_screen")).toHaveCount(0);
+        expect(editableDocument.querySelectorAll(".o_loading_screen")).toHaveCount(1);
+
+        removeLoadingElement();
+        expect(editableDocument.querySelectorAll(".o_loading_screen")).toHaveCount(0);
+    });
+
     test("Doing an operation should block the editable during its execution", async () => {
-        const customActionDef = new Deferred();
+        const customActionDef = Promise.withResolvers();
         addBuilderAction({
             customAction: class extends BuilderAction {
                 static id = "customAction";
                 load() {
-                    return customActionDef;
+                    return customActionDef.promise;
                 }
                 apply({ editingElement }) {
                     editingElement.classList.add("custom-action");
                 }
             },
         });
-        addBuilderOption(
-            class extends BaseOptionComponent {
-                static selector = ".test-options-target";
-                static template = xml`<BuilderButton action="'customAction'"/>`;
-            }
-        );
+        addBuilderOption({
+            selector: ".test-options-target",
+            template: xml`<BuilderButton action="'customAction'"/>`,
+        });
         await setupHTMLBuilder(`<div class="test-options-target">TEST</div>`, {
             loadIframeBundles: true,
         });
-
         await contains(":iframe .test-options-target").click();
         await contains("[data-action-id='customAction']").click();
         expect(":iframe .o_loading_screen:not(.o_we_ui_loading)").toHaveCount(1);
@@ -154,6 +172,49 @@ describe("Block editable", () => {
         await tick();
         expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(0);
         expect(":iframe .test-options-target").toHaveClass("custom-action");
+    });
+
+    test("Loading screen hides when ui is blocked", async () => {
+        const customActionDef = Promise.withResolvers();
+        addBuilderAction({
+            customAction: class extends BuilderAction {
+                static id = "customAction";
+                load() {
+                    return customActionDef.promise;
+                }
+                apply({ editingElement }) {
+                    editingElement.classList.add("custom-action");
+                }
+            },
+        });
+        addBuilderOption({
+            selector: ".test-options-target",
+            template: xml`<BuilderButton action="'customAction'"/>`,
+        });
+        await setupHTMLBuilder(`<div class="test-options-target">TEST</div>`, {
+            loadIframeBundles: true,
+        });
+        await contains(":iframe .test-options-target").click();
+        await contains("[data-action-id='customAction']").click();
+        expect(":iframe .o_loading_screen:not(.o_we_ui_loading)").toHaveCount(1);
+        await advanceTime(50); // cancelTime=50 trigger by the preview
+        await advanceTime(500); // setTimeout in addLoadingElement
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(1);
+        const ui = getService("ui");
+        ui.block();
+
+        await animationFrame();
+        expect(".o_blockUI").toHaveCount(1);
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveClass("d-none");
+
+        ui.unblock();
+        await animationFrame();
+        expect(".o_blockUI").toHaveCount(0);
+        expect(":iframe .o_loading_screen.o_we_ui_loading").not.toHaveClass("d-none");
+
+        customActionDef.resolve();
+        await tick();
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(0);
     });
 });
 
@@ -191,19 +252,17 @@ describe("Async operations", () => {
                 }
             },
         });
-        addBuilderOption(
-            class extends BaseOptionComponent {
-                static selector = ".test-options-target";
-                static template = xml`
-                    <BuilderRow label.translate="Type">
-                        <BuilderSelect>
-                            <BuilderSelectItem action="'customAction'" actionValue="'first'">first</BuilderSelectItem>
-                            <BuilderSelectItem action="'customAction2'" actionValue="'second'">second</BuilderSelectItem>
-                        </BuilderSelect>
-                    </BuilderRow>
-                `;
-            }
-        );
+        addBuilderOption({
+            selector: ".test-options-target",
+            template: xml`
+                <BuilderRow label.translate="Type">
+                    <BuilderSelect>
+                        <BuilderSelectItem action="'customAction'" actionValue="'first'">first</BuilderSelectItem>
+                        <BuilderSelectItem action="'customAction2'" actionValue="'second'">second</BuilderSelectItem>
+                    </BuilderSelect>
+                </BuilderRow>
+            `,
+        });
 
         await setupHTMLBuilder(`<div class="test-options-target">TEST</div>`);
         await contains(":iframe .test-options-target").click();
@@ -239,14 +298,14 @@ describe("Async operations", () => {
                 }
             },
         });
-        addBuilderOption(
-            class extends BaseOptionComponent {
-                static selector = ".test-options-target";
-                static template = xml`<BuilderRow>
+        addBuilderOption({
+            selector: ".test-options-target",
+            template: xml`
+                <BuilderRow>
                     <BuilderColorPicker enabledTabs="['solid']" styleAction="'background-color'" action="'customAction'"/>
-                </BuilderRow>`;
-            }
-        );
+                </BuilderRow>
+            `,
+        });
 
         await setupHTMLBuilder(`<div class="test-options-target">TEST</div>`);
         await contains(":iframe .test-options-target").click();
@@ -278,14 +337,13 @@ describe("Operation that will fail", () => {
         addBuilderAction({
             TestAction,
         });
-        addBuilderOption(
-            class extends BaseOptionComponent {
-                static selector = ".test-options-target";
-                static template = xml`
-                    <BuilderButton action="'testAction'"/>
-                    <BuilderButton classAction="'test'"/>`;
-            }
-        );
+        addBuilderOption({
+            selector: ".test-options-target",
+            template: xml`
+                <BuilderButton action="'testAction'"/>
+                <BuilderButton classAction="'test'"/>
+            `,
+        });
         await setupHTMLBuilder(`<div class="test-options-target">b</div>`);
         await contains(":iframe .test-options-target").click();
         await contains("[data-action-id='testAction']").hover();
@@ -308,14 +366,13 @@ describe("Operation that will fail", () => {
         addBuilderAction({
             TestAction,
         });
-        addBuilderOption(
-            class extends BaseOptionComponent {
-                static selector = ".test-options-target";
-                static template = xml`
-                    <BuilderButton action="'testAction'"/>
-                    <BuilderButton classAction="'test'"/>`;
-            }
-        );
+        addBuilderOption({
+            selector: ".test-options-target",
+            template: xml`
+                <BuilderButton action="'testAction'"/>
+                <BuilderButton classAction="'test'"/>
+            `,
+        });
         await setupHTMLBuilder(`<div class="test-options-target">b</div>`);
         await contains(":iframe .test-options-target").click();
         await contains("[data-action-id='testAction']").click();
@@ -325,5 +382,418 @@ describe("Operation that will fail", () => {
         );
         // preview + commit
         expect.verifyErrors(["This action should crash", "This action should crash"]);
+    });
+});
+
+const UPDATED_SNIPPET = {
+    snippet_structure: [
+        getSnippetStructure({
+            name: "Title",
+            groupName: "a",
+            content: `
+                <section class="s_title" data-snippet="s_title" data-vcss="001" data-name="Title">
+                    <h1>Title</h1>
+                </section>`,
+        }),
+    ],
+};
+
+describe("Operations failing on outdated snippets", () => {
+    test("Error in apply() on outdated snippet shows warning notification", async () => {
+        expect.errors(1);
+        class TestAction extends BuilderAction {
+            static id = "testAction";
+            apply({ editingElement }) {
+                editingElement.classList.add("fail");
+                throw new Error("Error on apply");
+            }
+        }
+        addBuilderAction({
+            TestAction,
+        });
+        addBuilderOption({
+            selector: ".s_title",
+            template: xml`<BuilderButton action="'testAction'"/>`,
+        });
+        await setupHTMLBuilder(
+            `<section class="s_title" data-snippet="s_title" data-name="Title">
+                <h1>Old</h1>
+            </section>
+            <section class="s_title" data-snippet="s_title" data-vcss="001" data-name="Title">
+                <h1>New</h1>
+            </section>`,
+            {
+                snippets: UPDATED_SNIPPET,
+            }
+        );
+
+        // Interacting with an outdated snippet. We test that only one
+        // notification is displayed (the one triggered by the hover), while the
+        // error triggered by the click does not result in a second notification
+        // because one is already open.
+        await contains(":iframe .s_title h1:contains('Old')").click();
+        await contains("[data-action-id='testAction']").hover();
+        await animationFrame();
+        await contains("[data-action-id='testAction']").click();
+        expect(".o_notification .o_notification_bar.bg-warning").toHaveCount(1);
+        expect(".o_notification_content").toHaveText(
+            "This snippet is outdated. It might cause/have caused problems during the editing. Please drag the new version from the snippet panel to update it."
+        );
+        expect.verifyErrors([]);
+
+        // Close the notification and try to interact with an up-to-date snippet
+        await contains(`.o_notification_close`).click();
+        await contains(":iframe .s_title h1:contains('New')").click();
+        await contains("[data-action-id='testAction']").hover();
+        await animationFrame();
+        expect(".o_notification").toHaveCount(0);
+        expect.verifyErrors(["Error on apply"]);
+    });
+
+    test("Error in load() on outdated snippet shows warning notification", async () => {
+        expect.errors(1);
+        class TestAction extends BuilderAction {
+            static id = "testAction";
+            load() {
+                throw new Error("Error on load");
+            }
+            apply({ editingElement }) {
+                editingElement.classList.add("success");
+            }
+        }
+        addBuilderAction({
+            TestAction,
+        });
+        addBuilderOption({
+            selector: ".s_title",
+            template: xml`<BuilderButton action="'testAction'"/>`,
+        });
+        await setupHTMLBuilder(
+            `<section class="s_title" data-snippet="s_title" data-name="Title">
+                <h1>Old</h1>
+            </section>
+            <section class="s_title" data-snippet="s_title" data-vcss="001" data-name="Title">
+                <h1>New</h1>
+            </section>`,
+            {
+                snippets: UPDATED_SNIPPET,
+            }
+        );
+
+        // Interacting with an outdated snippet. We test that only one
+        // notification is displayed (the one triggered by the hover), while the
+        // error triggered by the click does not result in a second notification
+        // because one is already open.
+        await contains(":iframe .s_title h1:contains('Old')").click();
+        await contains("[data-action-id='testAction']").hover();
+        await animationFrame();
+        await contains("[data-action-id='testAction']").click();
+        expect(".o_notification .o_notification_bar.bg-warning").toHaveCount(1);
+        expect(".o_notification_content").toHaveText(
+            "This snippet is outdated. It might cause/have caused problems during the editing. Please drag the new version from the snippet panel to update it."
+        );
+        expect.verifyErrors([]);
+
+        // Close the notification and try to interact with an up-to-date snippet
+        await contains(`.o_notification_close`).click();
+        await contains(":iframe .s_title h1:contains('New')").click();
+        await contains("[data-action-id='testAction']").hover();
+        await animationFrame();
+        expect(".o_notification").toHaveCount(0);
+        expect.verifyErrors(["Error on load"]);
+    });
+
+    test("Error in clean() on outdated snippet shows warning notification", async () => {
+        expect.errors(1);
+        class TestAction extends BuilderAction {
+            static id = "testAction";
+            isApplied({ editingElement }) {
+                return editingElement.classList.contains("applied");
+            }
+            clean() {
+                throw new Error("Error on clean");
+            }
+            apply({ editingElement }) {
+                editingElement.classList.add("applied");
+            }
+        }
+        addBuilderAction({
+            TestAction,
+        });
+        addBuilderOption({
+            selector: ".s_title",
+            template: xml`<BuilderButton action="'testAction'"/>`,
+        });
+        await setupHTMLBuilder(
+            `<section class="s_title applied" data-snippet="s_title" data-name="Title">
+                <h1>Old</h1>
+            </section>
+            <section class="s_title applied" data-snippet="s_title" data-vcss="001" data-name="Title">
+                <h1>New</h1>
+            </section>`,
+            {
+                snippets: UPDATED_SNIPPET,
+            }
+        );
+
+        // Interacting with an outdated snippet. We test that only one
+        // notification is displayed (the one triggered by the hover), while the
+        // error triggered by the click does not result in a second notification
+        // because one is already open.
+        await contains(":iframe .s_title h1:contains('Old')").click();
+        await contains("[data-action-id='testAction']").hover();
+        await animationFrame();
+        await contains("[data-action-id='testAction']").click();
+        expect(".o_notification .o_notification_bar.bg-warning").toHaveCount(1);
+        expect(".o_notification_content").toHaveText(
+            "This snippet is outdated. It might cause/have caused problems during the editing. Please drag the new version from the snippet panel to update it."
+        );
+        expect.verifyErrors([]);
+
+        // Close the notification and try to interact with an up-to-date snippet
+        await contains(`.o_notification_close`).click();
+        await contains(":iframe .s_title h1:contains('New')").click();
+        await contains("[data-action-id='testAction']").hover();
+        await animationFrame();
+        expect(".o_notification").toHaveCount(0);
+        expect.verifyErrors(["Error on clean"]);
+    });
+
+    test("Error in getValue() on outdated snippet shows warning notification", async () => {
+        class TestAction extends BuilderAction {
+            static id = "testAction";
+            getValue() {
+                throw new Error("getValue should crash");
+            }
+        }
+        addBuilderAction({
+            TestAction,
+        });
+        addBuilderOption({
+            selector: ".s_title",
+            template: xml`<BuilderNumberInput action="'testAction'"/>`,
+        });
+
+        await setupHTMLBuilder(
+            `<section class="s_title applied" data-snippet="s_title" data-name="Title">
+                <h1>Old</h1>
+            </section>`,
+            {
+                snippets: UPDATED_SNIPPET,
+            }
+        );
+
+        // Interacting with an outdated snippet. Notification is shown
+        await contains(":iframe .s_title h1:contains('Old')").click();
+        expect(".o_notification .o_notification_bar.bg-warning").toHaveCount(1);
+        expect(".o_notification_content").toHaveText(
+            "This snippet is outdated. It might cause/have caused problems during the editing. Please drag the new version from the snippet panel to update it."
+        );
+        expect.verifyErrors([]);
+    });
+
+    test("Error in isApplied() on outdated snippet shows warning notification", async () => {
+        class TestAction extends BuilderAction {
+            static id = "testAction";
+            isApplied() {
+                throw new Error("isApplied should crash");
+            }
+        }
+        addBuilderAction({
+            TestAction,
+        });
+        addBuilderOption({
+            selector: ".s_title",
+            template: xml`<BuilderButton action="'testAction'"/>`,
+        });
+
+        await setupHTMLBuilder(
+            `<section class="s_title applied" data-snippet="s_title" data-name="Title">
+                <h1>Old</h1>
+            </section>`,
+            {
+                snippets: UPDATED_SNIPPET,
+            }
+        );
+
+        // Interacting with an outdated snippet. Notification is shown
+        await contains(":iframe .s_title h1:contains('Old')").click();
+        expect(".o_notification .o_notification_bar.bg-warning").toHaveCount(1);
+        expect(".o_notification_content").toHaveText(
+            "This snippet is outdated. It might cause/have caused problems during the editing. Please drag the new version from the snippet panel to update it."
+        );
+        expect.verifyErrors([]);
+    });
+
+    test("Error in clean() via cleanSelectedItem on outdated snippet shows warning notification", async () => {
+        expect.errors(1);
+        class TestAction extends ClassAction {
+            static id = "testAction";
+            clean({ editingElement }) {
+                throw new Error("Clean via cleanSelectedItem should crash");
+            }
+        }
+        addBuilderAction({
+            TestAction,
+        });
+        addBuilderOption({
+            selector: ".s_title",
+            template: xml`
+                <BuilderButtonGroup action="'testAction'">
+                    <BuilderButton actionParam="'class1'">1</BuilderButton>
+                    <BuilderButton actionParam="'class2'">2</BuilderButton>
+                </BuilderButtonGroup>`,
+        });
+
+        await setupHTMLBuilder(
+            `<section class="s_title class1" data-snippet="s_title" data-name="Title">
+                <h1>Old</h1>
+            </section>
+            <section class="s_title class1" data-snippet="s_title" data-vcss="001" data-name="Title">
+                <h1>New</h1>
+            </section>`,
+            {
+                snippets: UPDATED_SNIPPET,
+            }
+        );
+
+        // Interacting with an outdated snippet. Notification is shown
+        await contains(":iframe .s_title h1:contains('Old')").click();
+        await contains("[data-action-param='class2']").hover();
+        await animationFrame();
+        expect(".o_notification .o_notification_bar.bg-warning").toHaveCount(1);
+        expect(".o_notification_content").toHaveText(
+            "This snippet is outdated. It might cause/have caused problems during the editing. Please drag the new version from the snippet panel to update it."
+        );
+
+        // Close the notification and try to interact with an up-to-date snippet
+        await contains(`.o_notification_close`).click();
+        await contains(":iframe .s_title h1:contains('New')").click();
+        await contains("[data-action-param='class2']").hover();
+        expect.verifyErrors(["Clean via cleanSelectedItem should crash"]);
+    });
+
+    test("A single outdated snippet warning notification should be displayed per time", async () => {
+        class TestAction extends BuilderAction {
+            static id = "testAction";
+            isApplied() {
+                throw new Error("isApplied should crash");
+            }
+            apply() {
+                throw new Error("apply should crash");
+            }
+        }
+        addBuilderAction({
+            TestAction,
+        });
+        addBuilderOption({
+            selector: ".s_title",
+            template: xml`<BuilderButton action="'testAction'">A</BuilderButton>`,
+        });
+
+        await setupHTMLBuilder(
+            `<section class="s_title" data-snippet="s_title" data-name="Title">
+                <h1>Title</h1>
+            </section>`,
+            {
+                snippets: UPDATED_SNIPPET,
+            }
+        );
+
+        await contains(":iframe .s_title").click();
+        await contains("[data-action-id='testAction']").click();
+        expect(".o_notification .o_notification_bar.bg-warning").toHaveCount(1);
+        expect(".o_notification_content").toHaveText(
+            "This snippet is outdated. It might cause/have caused problems during the editing. Please drag the new version from the snippet panel to update it."
+        );
+    });
+});
+
+describe("Multiple blocks", () => {
+    test("Loading screen should disappear after the last block is removed (two blocks with loading effect)", async () => {
+        const { getEditor } = await setupHTMLBuilder(
+            `<div class="test-options-target">TEST</div>`,
+            {
+                loadIframeBundles: true,
+            }
+        );
+        const editor = getEditor();
+
+        const removeFirst = editor.shared.operation.addLoadingElement(true, 0, false);
+        await animationFrame();
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(1);
+
+        const removeSecond = editor.shared.operation.addLoadingElement(true, 0, false);
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(1);
+        await animationFrame();
+
+        removeFirst();
+        await animationFrame();
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(1);
+
+        removeSecond();
+        await animationFrame();
+        expect(":iframe .o_loading_screen").toHaveCount(0);
+    });
+
+    test("Loading screen should disappear after the last block is removed (one block with loading effect and one without)", async () => {
+        const { getEditor } = await setupHTMLBuilder(
+            `<div class="test-options-target">TEST</div>`,
+            {
+                loadIframeBundles: true,
+            }
+        );
+        const editor = getEditor();
+
+        const removeFirst = editor.shared.operation.addLoadingElement(true, 0, false);
+        await animationFrame();
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(1);
+
+        const removeSecond = editor.shared.operation.addLoadingElement(false, 0, false);
+        await animationFrame();
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(1);
+
+        removeFirst();
+        await animationFrame();
+        expect(":iframe .o_loading_screen").toHaveCount(1);
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(0);
+
+        removeSecond();
+        await animationFrame();
+        expect(":iframe .o_loading_screen").toHaveCount(0);
+    });
+
+    test("Multiple blocks with waiting times", async () => {
+        const { getEditor } = await setupHTMLBuilder(
+            `<div class="test-options-target">TEST</div>`,
+            {
+                loadIframeBundles: true,
+            }
+        );
+        const editor = getEditor();
+
+        const removeFirst = editor.shared.operation.addLoadingElement(true, 100, false);
+        await animationFrame();
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(0);
+        expect(":iframe .o_loading_screen").toHaveCount(1);
+
+        const removeSecond = editor.shared.operation.addLoadingElement(true, 500, false);
+        await animationFrame();
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(0);
+        expect(":iframe .o_loading_screen").toHaveCount(1);
+
+        await advanceTime(200);
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(1);
+
+        removeFirst();
+        await animationFrame();
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(0);
+
+        await advanceTime(400);
+        expect(":iframe .o_loading_screen.o_we_ui_loading").toHaveCount(1);
+
+        removeSecond();
+        await animationFrame();
+        expect(":iframe .o_loading_screen").toHaveCount(0);
     });
 });

@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//group/group" position="after">
                     <group>
-                        <field name="folder_id" widget="documents_folder_many2one"/>
+                        <field name="folder_id" context="{'default_type': 'folder'}"/>
                         <field name="tag_ids" widget="many2many_tags"/>
                     </group>
                 </xpath>

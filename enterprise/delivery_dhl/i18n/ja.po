@@ -7,21 +7,22 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-16 05:26+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-09-18 00:33+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "delivery_dhl/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -218,6 +219,11 @@ msgid "DHL EU -> International"
 msgstr "DHL EU -> 国際"
 
 #. module: delivery_dhl
+#: model:ir.module.module,shortdesc:base.module_delivery_dhl
+msgid "DHL Express Shipping (Legacy)"
+msgstr ""
+
+#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "DHLのパスワード"
@@ -231,8 +237,7 @@ msgstr "DHLプロダクト"
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid "DHL Site ID is missing, please modify your delivery method settings."
-msgstr ""
-"DHLのサイトIDが欠落している、あなたの配信方法の設定を変更してください。"
+msgstr "DHLのサイトIDが欠落している、あなたの配信方法の設定を変更してください。"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_SiteID
@@ -274,6 +279,11 @@ msgstr "DHLのパスワードが欠落しています、配送方法の設定を
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
 msgid "DHLxw Package Type"
 msgstr "DHLxwパッケージタイプ"
+
+#. module: delivery_dhl
+#: model:ir.model,name:delivery_dhl.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "配送方法"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
@@ -436,8 +446,8 @@ msgid ""
 "Please define an incoterm in the associated sale order or set a default "
 "incoterm for the company in the accounting's settings."
 msgstr ""
-"関連する販売オーダでインコタームを定義するか、会計の設定で会社のデフォルトイ"
-"ンコタームを設定して下さい。"
+"関連する販売オーダでインコタームを定義するか、会計の設定で会社の"
+"デフォルトインコタームを設定して下さい。"
 
 #. module: delivery_dhl
 #. odoo-python
@@ -492,11 +502,6 @@ msgid "Shipment created into DHL <br/> <b>Tracking Number: </b>%s"
 msgstr "DHLでの発送が作成されました。 <br/> <b>追跡番号: </b>%s"
 
 #. module: delivery_dhl
-#: model:ir.model,name:delivery_dhl.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "配送方法"
-
-#. module: delivery_dhl
 #: model:ir.model,name:delivery_dhl.model_stock_package_type
 msgid "Stock package type"
 msgstr "在庫梱包タイプ"
@@ -537,8 +542,8 @@ msgid ""
 "        More info on https://xmlportal.dhl.com/"
 msgstr ""
 "DHLのカスタムデータは、jsonファイル内のように構成されています。\n"
-"        以下が3つの可能なキーです。: 'rate', 'ship', 'return'、これらにカスタ"
-"ムデータを追加することができます。\n"
+"        以下が3つの可能なキーです。: 'rate', 'ship', 'return'、これらに"
+"カスタムデータを追加することができます。\n"
 "        詳しくは https://xmlportal.dhl.com/"
 
 #. module: delivery_dhl
@@ -559,8 +564,16 @@ msgid ""
 "There is no price available for this shipping, you should rather try with "
 "the DHL product %s"
 msgstr ""
-"この配送のために利用可能な価格がありません。DHLプロダクト%sを試してみて下さ"
-"い。"
+"この配送のために利用可能な価格がありません。DHLプロダクト%sを試してみて下さい"
+"。"
+
+#. module: delivery_dhl
+#: model:ir.module.module,description:base.module_delivery_dhl
+msgid ""
+"This is the legacy integration with DHL Express that is no longer "
+"supported.         Please install the new \"DHL Express Shipping\" module "
+"and uninstall this one as soon as possible."
+msgstr ""
 
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_product_code__u
@@ -608,12 +621,3 @@ msgstr "Z - デスティネーション料金"
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_label_image_format__zpl2
 msgid "ZPL2"
 msgstr "ZPL2"
-
-#~ msgid "DHL"
-#~ msgstr "DHL"
-
-#~ msgid "DHL Package Type"
-#~ msgstr "DHLパッケージタイプ"
-
-#~ msgid "DHL Shipping Methods"
-#~ msgstr "DHL配送方法"

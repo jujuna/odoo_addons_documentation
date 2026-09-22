@@ -7,8 +7,7 @@ import { doMenuAction } from "@spreadsheet/../tests/helpers/ui";
 import { contains, onRpc, patchWithCleanup } from "@web/../tests/web_test_helpers";
 import { browser } from "@web/core/browser/browser";
 import { registry } from "@web/core/registry";
-import { Deferred } from "@web/core/utils/concurrency";
-import { actionService } from "@web/webclient/actions/action_service";
+import { actionService } from "@web/webclient/actions/action_plugin";
 import {
     defineSpreadsheetDashboardEditionModels,
     getDashboardBasicServerData,
@@ -88,10 +87,11 @@ test("share dashboard from control panel", async function () {
         },
     });
     onRpc("spreadsheet.dashboard.share", "action_get_share_url", async ({ args }) => {
-        await def;
+        await def.promise;
         expect.step("dashboard_shared");
         const [shareVals] = args;
-        const excel = JSON.parse(JSON.stringify(model.exportXLSX().files));
+        const exportXLSX = await model.exportXLSX();
+        const excel = JSON.parse(JSON.stringify(exportXLSX.files));
         expect(shareVals).toEqual({
             spreadsheet_data: JSON.stringify(model.exportData()),
             dashboard_id: spreadsheetId,
@@ -99,20 +99,20 @@ test("share dashboard from control panel", async function () {
         });
         return "localhost:8069/share/url/132465";
     });
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     const { model } = await createDashboardEditAction({
         serverData,
         spreadsheetId,
     });
     expect(".spreadsheet_share_dropdown").toHaveCount(0);
-    await contains("i.fa-share-alt").click();
+    await contains("i[data-icon='share']").click();
     expect(".spreadsheet_share_dropdown .o_loading_state").toHaveText("Generating sharing link");
     def.resolve();
     await animationFrame();
     expect(".spreadsheet_share_dropdown .o_loading_state").toHaveCount(0);
     expect.verifySteps(["dashboard_shared", "share url copied"]);
-    expect(".o_field_CopyClipboardChar").toHaveText("localhost:8069/share/url/132465");
-    await contains(".fa-clipboard").click();
+    expect("div:has(> .o_clipboard_button").toHaveText("localhost:8069/share/url/132465");
+    await contains("[data-icon='assignment']").click();
     expect.verifySteps(["share url copied"]);
 });
 
@@ -135,7 +135,7 @@ test("unpublish dashboard from control panel", async function () {
         data: {},
         revisions: [],
         name: "Dashboard",
-        isReadonly: false,
+        has_write_access: true,
         is_published: true,
     }));
     onRpc("spreadsheet.dashboard", "write", ({ args }) => {

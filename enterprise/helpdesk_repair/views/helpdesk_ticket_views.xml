@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
         <field name="arch" type="xml">
             <button name="action_open_helpdesk_ticket" position="before">
-                <button class="oe_stat_button" name="action_view_repairs" icon="fa-wrench" type="object" invisible="repairs_count == 0" groups="stock.group_stock_user">
+                <button class="oe_stat_button" name="action_view_repairs" icon="build" type="object" invisible="repairs_count == 0" groups="stock.group_stock_user">
                     <field name="repairs_count" string="Repairs" widget="statinfo"/>
                 </button>
             </button>

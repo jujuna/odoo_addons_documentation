@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
 {
     'name': 'Website Appointments',
-    'version': '1.0',
     'category': 'Services/Appointment',
     'sequence': 215,
     'website': 'https://www.odoo.com/app/appointments',
@@ -24,16 +22,17 @@ Allow clients to Schedule Appointments through your Website
         'views/appointment_templates_registration.xml',
         'views/appointment_templates_validation.xml',
         'views/website_pages_views.xml',
+        'views/website_appointment_visitor_views.xml',
         'views/snippets/s_appointments.xml',
+        'views/snippets/s_appointments_carousel.xml',
         'views/snippets/s_appointments_preview_data.xml',
+        'views/snippets/s_appointments_carousel_preview_data.xml',
         'views/snippets/s_online_appointment.xml',
-        'security/calendar_security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
     'demo': [
         'data/appointment_demo.xml',
     ],
-    'installable': True,
     'auto_install': ['appointment', 'website_enterprise'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

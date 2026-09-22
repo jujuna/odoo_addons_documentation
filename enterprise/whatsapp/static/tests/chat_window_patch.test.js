@@ -1,5 +1,12 @@
 import { describe, test } from "@odoo/hoot";
-import { click, contains, start, startServer } from "@mail/../tests/mail_test_helpers";
+import {
+    click,
+    contains,
+    openMessagingMenu,
+    start,
+    startServer,
+    MENU_ACTIVE_IDS,
+} from "@mail/../tests/mail_test_helpers";
 import { Command, serverState } from "@web/../tests/web_test_helpers";
 import { defineWhatsAppModels } from "@whatsapp/../tests/whatsapp_test_helpers";
 
@@ -19,7 +26,7 @@ test("WhatsApp channel chat windows should have whatsapp icon", async () => {
         whatsapp_partner_id: partnerId,
     });
     await start();
-    await click(".o_menu_systray i[aria-label='Messages']");
+    await openMessagingMenu(MENU_ACTIVE_IDS.WHATSAPP);
     await click(".o-mail-NotificationItem");
-    await contains(".o-mail-ChatWindow-header .fa-whatsapp");
+    await contains(".o-mail-ChatWindow-header [data-icon='oi_whatsapp']");
 });

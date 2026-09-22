@@ -14,15 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 18:49+0000\n"
-"PO-Revision-Date: 2025-10-08 18:49+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 04:03+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"sale_purchase_inter_company_rules/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order__auto_generated
@@ -47,9 +49,8 @@ msgstr ""
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_res_company
-#, fuzzy
-msgid "Companies"
-msgstr "Kompaniyalar"
+msgid "Company"
+msgstr ""
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_res_config_settings
@@ -70,10 +71,13 @@ msgid "Create Sales Orders"
 msgstr "Sotish buyurtmalarini yaratish"
 
 #. module: sale_purchase_inter_company_rules
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_account_move__display_name
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order__display_name
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order_line__display_name
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_company__display_name
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order__display_name
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order_line__display_name
 #, fuzzy
 msgid "Display Name"
 msgstr "Ko‘rsatiladigan nom"
@@ -86,68 +90,84 @@ msgid "Generate Purchase Orders"
 msgstr "Xarid buyurtmalarini yaratish"
 
 #. module: sale_purchase_inter_company_rules
-#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.view_company_inter_change_inherit_form
-#, fuzzy
-msgid "Generate Purchases Orders"
-msgstr "Xarid buyurtmalarini yaratish"
-
-#. module: sale_purchase_inter_company_rules
-#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.view_company_inter_change_inherit_form
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_company__intercompany_generate_sales_orders
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_config_settings__intercompany_generate_sales_orders
 #, fuzzy
 msgid "Generate Sales Orders"
 msgstr "Sotish buyurtmalarini yaratish"
 
 #. module: sale_purchase_inter_company_rules
-#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_company__intercompany_generate_sales_orders
-#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_config_settings__intercompany_generate_sales_orders
-#, fuzzy
-msgid "Generate Sales order"
-msgstr "Sotish buyurtmasini yaratish"
-
-#. module: sale_purchase_inter_company_rules
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_account_move__id
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order__id
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order_line__id
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_company__id
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_res_config_settings__id
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order__id
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order_line__id
 #, fuzzy
 msgid "ID"
 msgstr "ID"
 
 #. module: sale_purchase_inter_company_rules
-#. odoo-python
-#: code:addons/sale_purchase_inter_company_rules/models/purchase_order.py:0
-#, fuzzy
+#: model:ir.model.fields,help:sale_purchase_inter_company_rules.field_res_company__intercompany_generate_sales_orders
+#: model:ir.model.fields,help:sale_purchase_inter_company_rules.field_res_config_settings__intercompany_generate_sales_orders
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.res_config_settings_view_form
 msgid ""
-"Inter company user of company %(name)s doesn't have enough access rights"
+"If another company confirms a Purchase Order with this company, a Sales "
+"Order will be created with the chosen warehouse based on the contact address "
+"for the delivery of goods."
 msgstr ""
-"%(name)s kompaniyasining kompaniyalararo foydalanuvchisi yetarli kirish "
-"huquqlariga ega emas"
 
 #. module: sale_purchase_inter_company_rules
-#. odoo-python
-#: code:addons/sale_purchase_inter_company_rules/models/sale_order.py:0
-#, fuzzy
-msgid "Inter company user of company %s doesn't have enough access rights"
+#: model:ir.model.fields,help:sale_purchase_inter_company_rules.field_res_company__intercompany_generate_purchase_orders
+#: model:ir.model.fields,help:sale_purchase_inter_company_rules.field_res_config_settings__intercompany_generate_purchase_orders
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.res_config_settings_view_form
+msgid ""
+"If another company confirms a Sales Order with this company, a Purchase "
+"Order will be created with the chosen warehouse based on the contact address "
+"for the receipt of goods."
 msgstr ""
-"%s kompaniyasining kompaniyalararo foydalanuvchisi yetarli kirish "
-"huquqlariga ega emas"
 
 #. module: sale_purchase_inter_company_rules
-#. odoo-python
-#: code:addons/sale_purchase_inter_company_rules/models/purchase_order.py:0
-#, fuzzy
-msgid "Provide at least one user for inter company relation for %(name)s"
+#: model:ir.module.module,shortdesc:base.module_sale_purchase_inter_company_rules
+msgid "Inter Company Module for Sale/Purchase Orders and Invoices"
 msgstr ""
-"%(name)s uchun kompaniyalararo munosabat uchun kamida bitta foydalanuvchi "
-"taqdim eting"
 
 #. module: sale_purchase_inter_company_rules
-#. odoo-python
-#: code:addons/sale_purchase_inter_company_rules/models/sale_order.py:0
-#, fuzzy
-msgid "Provide one user for intercompany relation for %(name)s "
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order_line__auto_purchase_order_line_id
+msgid "Intercompany Purchase Order Line"
 msgstr ""
-"%(name)s uchun kompaniyalararo aloqa uchun bitta foydalanuvchi taqdim eting"
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.module.module,summary:base.module_sale_purchase_inter_company_rules
+msgid "Intercompany SO/PO/INV rules"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_purchase_order_line__auto_sale_order_line_id
+msgid "Intercompany Sale Order Line"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.model,name:sale_purchase_inter_company_rules.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.module.module,description:base.module_sale_purchase_inter_company_rules
+msgid ""
+"Module for synchronization of Documents between several companies. For "
+"example, this allow you to have a Sales Order created automatically when a "
+"Purchase Order is validated with another company of the system as vendor, "
+"and inversely.\n"
+"\n"
+"   Supported documents are SO, PO.\n"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "Note"
+msgstr ""
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_purchase_order
@@ -156,10 +176,25 @@ msgid "Purchase Order"
 msgstr "Xarid buyurtmasi"
 
 #. module: sale_purchase_inter_company_rules
+#: model:ir.model,name:sale_purchase_inter_company_rules.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
 #: model:ir.model,name:sale_purchase_inter_company_rules.model_sale_order
 #, fuzzy
 msgid "Sales Order"
 msgstr "Sotish buyurtmasi"
+
+#. module: sale_purchase_inter_company_rules
+#: model:ir.model,name:sale_purchase_inter_company_rules.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "Section"
+msgstr ""
 
 #. module: sale_purchase_inter_company_rules
 #: model:ir.model.fields,field_description:sale_purchase_inter_company_rules.field_sale_order__auto_purchase_order_id
@@ -172,6 +207,42 @@ msgstr "Manba xarid buyurtmasi"
 #, fuzzy
 msgid "Source Sales Order"
 msgstr "Manba sotish buyurtmasi"
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "Subsection"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "The following value(s) have been added from the linked Purchase Order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.added_lines_interco_so_po
+msgid "The following value(s) have been added from the linked Sales Order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.updated_vals_interco_so_po
+msgid ""
+"The following value(s) have been updated from the linked Purchase Order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.updated_vals_interco_so_po
+msgid "The following value(s) have been updated from the linked Sales Order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.cancelled_interco_so_po
+msgid "The related purchase order:"
+msgstr ""
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.cancelled_interco_so_po
+msgid "The related sale order:"
+msgstr ""
 
 #. module: sale_purchase_inter_company_rules
 #. odoo-python
@@ -190,3 +261,41 @@ msgstr ""
 "qilganligi sababli, XB dan SB yarata olmaysiz. SB valyutasi kompaniya "
 "hamkorining narxlar ro‘yxatidan olinadi.  (SB valyutasi: %(so_currency)s, "
 "Narxlar ro‘yxati: %(pricelist)s, Hamkor: %(partner)s (ID: %(id)s))"
+
+#. module: sale_purchase_inter_company_rules
+#: model_terms:ir.ui.view,arch_db:sale_purchase_inter_company_rules.cancelled_interco_so_po
+msgid "has been cancelled."
+msgstr ""
+
+#, fuzzy
+#~ msgid "Generate Purchases Orders"
+#~ msgstr "Xarid buyurtmalarini yaratish"
+
+#, fuzzy
+#~ msgid "Generate Sales order"
+#~ msgstr "Sotish buyurtmasini yaratish"
+
+#, fuzzy
+#~ msgid ""
+#~ "Inter company user of company %(name)s doesn't have enough access rights"
+#~ msgstr ""
+#~ "%(name)s kompaniyasining kompaniyalararo foydalanuvchisi yetarli kirish "
+#~ "huquqlariga ega emas"
+
+#, fuzzy
+#~ msgid "Inter company user of company %s doesn't have enough access rights"
+#~ msgstr ""
+#~ "%s kompaniyasining kompaniyalararo foydalanuvchisi yetarli kirish "
+#~ "huquqlariga ega emas"
+
+#, fuzzy
+#~ msgid "Provide at least one user for inter company relation for %(name)s"
+#~ msgstr ""
+#~ "%(name)s uchun kompaniyalararo munosabat uchun kamida bitta foydalanuvchi "
+#~ "taqdim eting"
+
+#, fuzzy
+#~ msgid "Provide one user for intercompany relation for %(name)s "
+#~ msgstr ""
+#~ "%(name)s uchun kompaniyalararo aloqa uchun bitta foydalanuvchi taqdim "
+#~ "eting"

@@ -1,4 +1,4 @@
-import { Component, markup, xml } from "@odoo/owl";
+import { Component, markup, t, useProps, xml } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { patch } from "@web/core/utils/patch";
 import { stepUtils } from "@web_tour/tour_utils";
@@ -118,7 +118,12 @@ const fileCommandSteps = [{ // open the command bar
     run: 'click',
 },
 {
-    trigger: '.o-FileViewer-view:iframe body:contains(Content)',
+    trigger: '.o-FileViewer-view',
+    run: function () {
+        if (!this.anchor.src.includes('/mail/attachment/render_text/')) {
+            console.error("Iframe is not using the render_text route");
+        }
+    },
 },
 {
     trigger: '.o-FileViewer-headerButton[aria-label="Close"]',
@@ -135,15 +140,8 @@ const fileCommandSteps = [{ // open the command bar
         this.anchor.dispatchEvent(new Event("blur"));
     },
 }, {
-    trigger: "span.o_file_name",
-    run: function () {
-        // specifically test that there is no zeroWidthSpace character in the
-        // name that would be added by the editor
-        const currentName = this.anchor.textContent;
-        if (currentName !== "Renamed") {
-            throw new Error(`The new file name was expected to be: "Renamed", but the actual value is: "${currentName}"`);
-        }
-    }
+    content: "The new file name is expected to be 'Renamed'",
+    trigger: "span.o_file_name:text(Renamed)",
 }];
 
 // COMMAND: /index
@@ -265,16 +263,19 @@ let unpatchVideoSelector;
 
 class MockedVideoIframe extends Component {
     static template = xml`
-        <div class="o_video_iframe_src" t-out="props.src" />
+        <div class="o_video_iframe_src" t-out="this.props.src" />
     `;
-    static props = ["src"];
+
+    props = useProps({
+        src: t.any(),
+    });
 }
 
 const videoCommandSteps = [{ // patch the components
     trigger: "body",
     run: () => {
         unpatchVideoEmbed = patch(EmbeddedVideoComponent, {
-            template: xml`<div class="o_video_iframe_src" t-out="url" />`
+            template: xml`<div class="o_video_iframe_src" t-out="this.embedUrl" />`
         });
         unpatchVideoSelector = patch(VideoSelector.components, {
             ...VideoSelector.components,
@@ -283,13 +284,14 @@ const videoCommandSteps = [{ // patch the components
     },
 }, { // open the command bar
     trigger: ".odoo-editor-editable > p",
-    run: function () {
+    async run() {
+        await new Promise((r) => setTimeout(r, 500));
         openPowerbox(this.anchor);
     },
 }, { // click on the /media command
     trigger: '.o-we-command-name:contains("Media")',
     run: "click",
-}, { // open the Videos tab 
+}, { // open the Videos tab
     trigger: '.modal-body .nav-link:contains("Videos")',
     run: "click",
 }, {
@@ -298,14 +300,14 @@ const videoCommandSteps = [{ // patch the components
     run: `edit https://www.youtube.com/watch?v=${YoutubeVideoId}`,
 }, {
     content: "Wait for preview to appear",
-    trigger: `.o_video_iframe_src:contains("//www.youtube.com/embed/${YoutubeVideoId}?rel=0&autoplay=0")`,
+    trigger: `.o_video_iframe_src:contains("//www.youtube.com/embed/${YoutubeVideoId}?enablejsapi=1&rel=0")`,
 }, {
     content: "Confirm selection",
-    trigger: '.modal-footer button:contains("Add")',
+    trigger: '.modal-footer button:not([disabled]):contains("Add")',
     run: "click",
 },
 {
-    trigger: `[data-embedded="video"] .o_video_iframe_src:contains("https://www.youtube.com/embed/${YoutubeVideoId}?rel=0&autoplay=0")`,
+    trigger: `[data-embedded="video"] .o_video_iframe_src:contains("https://www.youtube.com/embed/${YoutubeVideoId}?enablejsapi=1&rel=0")`,
 },
 { // wait for the block to appear in the editor
     trigger: '[data-embedded="video"]',
@@ -596,16 +598,16 @@ const articleCommandComposerSteps = [{ // open the chatter
 }, ...appendArticleLink(`${composeBody}`, 'EditorCommandsArticle'), { // wait for the block to appear in the editor
     trigger: `${composeBody} .o_knowledge_article_link:contains("EditorCommandsArticle")`,
 }, ...appendArticleLink(`${composeBody}`, 'LinkedArticle', `.o_knowledge_article_link:contains("EditorCommandsArticle")`), { // wait for the block to appear in the editor, after the previous one
-    trigger: `${composeBody} .odoo-editor-editable a:nth-child(2).o_knowledge_article_link:contains("LinkedArticle")[contenteditable="false"]`,
+    trigger: `${composeBody} .odoo-editor-editable a:nth-child(2).o_knowledge_article_link:contains("LinkedArticle")[contenteditable="true"]`,
 }, { // verify that the first block is still there and contenteditable=false
-    trigger: `${composeBody} .odoo-editor-editable a:nth-child(1).o_knowledge_article_link:contains("EditorCommandsArticle")[contenteditable="false"]`,
+    trigger: `${composeBody} .odoo-editor-editable a:nth-child(1).o_knowledge_article_link:contains("EditorCommandsArticle")[contenteditable="true"]`,
 }, { // send the message
     trigger: '.o_mail_send',
     run: "click",
 }, {
-    trigger: '.o_widget_knowledge_chatter_panel .o-mail-Thread .o-mail-Message-body a:nth-child(1).o_knowledge_article_link:contains("EditorCommandsArticle")',
+    trigger: '.o_widget_knowledge_side_panel .o-mail-Thread .o-mail-Message-body a:nth-child(1).o_knowledge_article_link:contains("EditorCommandsArticle")',
 }, {
-    trigger: '.o_widget_knowledge_chatter_panel .o-mail-Thread .o-mail-Message-body a:nth-child(2).o_knowledge_article_link:contains("LinkedArticle")',
+    trigger: '.o_widget_knowledge_side_panel .o-mail-Thread .o-mail-Message-body a:nth-child(2).o_knowledge_article_link:contains("LinkedArticle")',
 }, { // close the chatter
     trigger: '.btn-chatter',
     run: 'click',
@@ -614,7 +616,7 @@ const articleCommandComposerSteps = [{ // open the chatter
 // MISC: Article command usage
 
 const articleCommandUsageSteps = [{ // wait for the block to appear in the editor
-    trigger: '.o_knowledge_article_link:contains("LinkedArticle")',
+    trigger: 'a:contains("LinkedArticle")',
     run: 'click',
 }, { // check that the view switched to the corresponding article
     trigger: '.o_knowledge_header:has(.o_hierarchy_article_name input:value("LinkedArticle"))',
@@ -646,6 +648,9 @@ const clipboardUsageSteps = [{ // open the chatter
 }, { // open the contact record of the follower
     trigger: '.o-mail-Follower-details:contains(HelloWorldPartner)',
     run: 'click',
+}, {
+    trigger: '.o_avatar_card:contains(HelloWorldPartner) button:contains(View Profile)',
+    run: 'click',
 }, { // verify that the partner form view is fully loaded
     trigger: '.o_breadcrumb .o_last_breadcrumb_item.active:contains(HelloWorldPartner)',
 }, { // return to the knowledge article by going back from the breadcrumbs
@@ -663,6 +668,9 @@ const clipboardUsageSteps = [{ // open the chatter
     run: 'click',
 }, { // open the contact record of the follower
     trigger: '.o-mail-Follower-details:contains(HelloWorldPartner)',
+    run: 'click',
+}, {
+    trigger: '.o_avatar_card:contains(HelloWorldPartner) button:contains(View Profile)',
     run: 'click',
 }, { // verify that the partner form view is fully loaded
     trigger: '.o_breadcrumb .o_last_breadcrumb_item.active:contains(HelloWorldPartner)',
@@ -682,7 +690,6 @@ const clipboardUsageSteps = [{ // open the chatter
 }];
 
 registry.category("web_tour.tours").add('knowledge_article_commands_tour', {
-    url: '/odoo',
     steps: () => [stepUtils.showAppsMenuItem(), {
     // open the Knowledge App
     trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',

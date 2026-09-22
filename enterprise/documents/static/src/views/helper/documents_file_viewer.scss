@@ -4,7 +4,8 @@
 }
 
 .o-DocumentsFileViewer-main-with-chatter {
-    width: calc(100vw - (#{$o-mail-Chatter-minWidth}  + 20px)) !important;
+    // Aside + its `me-3` gutter + a matching gap on this side.
+    width: calc(100vw - #{$o-mail-Chatter-minWidth} - 20px - #{map-get($spacers, 3) * 2}) !important;
 }
 
 .o-DocumentsFileViewer-main-without-chatter {

@@ -13,7 +13,6 @@ import {
     contains,
     defineActions,
     patchWithCleanup,
-    toggleMenu,
     toggleMenuItem,
 } from "@web/../tests/web_test_helpers";
 import { user } from "@web/core/user";
@@ -28,22 +27,34 @@ test("simple chart insertion", async () => {
     expect(model.getters.getChartIds(sheetId).length).toBe(1);
 });
 
+test("stacked bar charts are inserted with total line enabled", async () => {
+    const { model } = await createSpreadsheetFromGraphView();
+    const sheetId = model.getters.getActiveSheetId();
+    const [chartId] = model.getters.getChartIds(sheetId);
+    const definition = model.getters.getChartDefinition(chartId);
+
+    expect(definition.type).toBe("bar");
+    expect(definition.stacked).toBe(true);
+    expect(definition.showTotalLine).toBe(true);
+});
+
 test("The chart mode is the selected one", async () => {
     const { model } = await createSpreadsheetFromGraphView({
         actions: async (target) => {
-            await contains(".fa-pie-chart").click();
+            await contains("[data-icon='pie_chart']").click();
         },
     });
     const sheetId = model.getters.getActiveSheetId();
     expect(model.getters.getChartIds(sheetId).length).toBe(1);
     const chartId = model.getters.getChartIds(sheetId)[0];
-    expect(model.getters.getChart(chartId).type).toBe("odoo_pie");
+    expect(model.getters.getChartDefinition(chartId).type).toBe("pie");
+    expect(model.getters.getChartDefinition(chartId).dataSource.type).toBe("odoo");
 });
 
 test("Line charts are inserted as stacked area charts with data markers", async (assert) => {
     const { model } = await createSpreadsheetFromGraphView({
         actions: async (target) => {
-            await contains(".fa-line-chart").click();
+            await contains("[data-icon='show_chart']").click();
         },
     });
     const sheetId = model.getters.getActiveSheetId();
@@ -57,25 +68,25 @@ test("Line charts are inserted as stacked area charts with data markers", async 
 test("The chart order is the selected one when selecting desc", async () => {
     const { model } = await createSpreadsheetFromGraphView({
         actions: async (target) => {
-            await contains(".fa-sort-amount-desc").click();
+            await contains("[data-icon='south']").click();
         },
     });
     const sheetId = model.getters.getActiveSheetId();
     expect(model.getters.getChartIds(sheetId).length).toBe(1);
     const chartId = model.getters.getChartIds(sheetId)[0];
-    expect(model.getters.getChart(chartId).metaData.order).toBe("DESC");
+    expect(model.getters.getChartDefinition(chartId).dataSource.metaData.order).toBe("DESC");
 });
 
 test("The chart order is the selected one when selecting asc", async () => {
     const { model } = await createSpreadsheetFromGraphView({
         actions: async (target) => {
-            await contains(".fa-sort-amount-asc").click();
+            await contains("[data-icon='north']").click();
         },
     });
     const sheetId = model.getters.getActiveSheetId();
     expect(model.getters.getChartIds(sheetId).length).toBe(1);
     const chartId = model.getters.getChartIds(sheetId)[0];
-    expect(model.getters.getChart(chartId).metaData.order).toBe("ASC");
+    expect(model.getters.getChartDefinition(chartId).dataSource.metaData.order).toBe("ASC");
 });
 
 test("graph order is not saved in spreadsheet context", async () => {
@@ -86,13 +97,13 @@ test("graph order is not saved in spreadsheet context", async () => {
     const { model } = await createSpreadsheetFromGraphView({
         additionalContext: context,
         actions: async (target) => {
-            await contains(".fa-sort-amount-desc").click();
+            await contains("[data-icon='south']").click();
         },
     });
     const sheetId = model.getters.getActiveSheetId();
     const chartId = model.getters.getChartIds(sheetId)[0];
-    expect(model.getters.getChart(chartId).metaData.order).toBe("DESC");
-    expect(model.exportData().sheets[0].figures[0].data.searchParams.context).toEqual(
+    expect(model.getters.getChartDefinition(chartId).dataSource.metaData.order).toBe("DESC");
+    expect(model.exportData().sheets[0].figures[0].data.dataSource.searchParams.context).toEqual(
         {
             graph_mode: "bar",
         },
@@ -108,14 +119,14 @@ test("graph measure is not saved in spreadsheet context", async () => {
     const { model } = await createSpreadsheetFromGraphView({
         additionalContext: context,
         actions: async () => {
-            await toggleMenu("Measures");
+            await contains(`.o_report_measures`).click();
             await toggleMenuItem("Foo");
         },
     });
     const sheetId = model.getters.getActiveSheetId();
     const chartId = model.getters.getChartIds(sheetId)[0];
-    expect(model.getters.getChart(chartId).metaData.measure).toBe("foo");
-    expect(model.exportData().sheets[0].figures[0].data.searchParams.context).toEqual(
+    expect(model.getters.getChartDefinition(chartId).dataSource.metaData.measure).toBe("foo");
+    expect(model.exportData().sheets[0].figures[0].data.dataSource.searchParams.context).toEqual(
         {
             graph_mode: "bar",
         },
@@ -142,7 +153,7 @@ test("can insert chart from action with evaluated context", async function () {
     });
     const sheetId = model.getters.getActiveSheetId();
     const chartId = model.getters.getChartIds(sheetId)[0];
-    expect(model.getters.getChart(chartId).actionXmlId).toBe(actionXmlId);
+    expect(model.getters.getChartDefinition(chartId).dataSource.actionXmlId).toBe(actionXmlId);
 });
 
 test("Chart name can be changed from the dialog", async () => {
@@ -162,7 +173,7 @@ test("Chart name can be changed from the dialog", async () => {
     const model = getSpreadsheetActionModel(spreadsheetAction);
     const sheetId = model.getters.getActiveSheetId();
     const chartId = model.getters.getChartIds(sheetId)[0];
-    expect(model.getters.getChart(chartId).title.text).toBe("New name");
+    expect(model.getters.getChartDefinition(chartId).title.text).toBe("New name");
 });
 
 test("graph with a contextual domain", async () => {
@@ -195,9 +206,9 @@ test("graph with a contextual domain", async () => {
     const sheetId = model.getters.getActiveSheetId();
     const chartId = model.getters.getChartIds(sheetId)[0];
 
-    const chart = model.getters.getChartDefinition(chartId);
-    expect(chart.searchParams.domain).toBe('[("foo", "=", uid)]');
-    expect(model.exportData().sheets[0].figures[0].data.searchParams.domain).toEqual(
+    const definition = model.getters.getChartDefinition(chartId);
+    expect(definition.dataSource.searchParams.domain).toBe('[("foo", "=", uid)]');
+    expect(model.exportData().sheets[0].figures[0].data.dataSource.searchParams.domain).toEqual(
         '[("foo", "=", uid)]',
         { message: "domain is exported with the dynamic value" }
     );
@@ -218,5 +229,5 @@ test("'cumulated_start' is fetched from the graph view", async () => {
     const sheetId = model.getters.getActiveSheetId();
     const chartIds = model.getters.getChartIds(sheetId);
     expect(chartIds.length).toBe(1);
-    expect(model.getters.getChart(chartIds[0]).metaData.cumulatedStart).toBe(true);
+    expect(model.getters.getChartDefinition(chartIds[0]).dataSource.cumulatedStart).toBe(true);
 });

@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 from lxml import etree
 
 from odoo.addons.hr_payroll_account_iso20022.tests.test_payroll_sepa import TestPayrollSEPACreditTransferCommon
@@ -13,7 +12,7 @@ class TestPayrollSEPANewCreditTransferXmlValidity(TestPayrollSEPACreditTransferC
     @test_xsd(path='account_sepa/schemas/pain.001.001.09.xsd')
     def test_hr_payroll_account_iso20022_09(self):
         self.bank_journal.sepa_pain_version = 'pain.001.001.09'
-        self.payslip_run.generate_payslips(employee_ids=[self.hr_employee_john.id])
+        self.payslip_run._generate_payslips()
         self.payslip_run.action_validate()
         # make the SEPA payment.
         file = self.env['hr.payroll.payment.report.wizard'].create({
@@ -25,7 +24,7 @@ class TestPayrollSEPANewCreditTransferXmlValidity(TestPayrollSEPACreditTransferC
 
         self.assertTrue(file, 'SEPA payment has not been created!')
 
-        sct_doc = etree.fromstring(base64.b64decode(file))
+        sct_doc = etree.fromstring(file)
 
         namespaces = {'ns': 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.09'}
         uetr_text = sct_doc.findtext('.//ns:CdtTrfTxInf/ns:PmtId/ns:UETR', namespaces=namespaces)

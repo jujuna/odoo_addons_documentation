@@ -1,9 +1,7 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Italy - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Italy
 ============================
@@ -21,12 +19,11 @@ Accounting reports for Italy
         'data/xml_export/tax_monthly_report_vat.xml',
         'data/xml_export/tax_report_export_template.xml',
         'views/account_return_views.xml',
-        'security/ir.model.access.csv',
         'views/journal_report_templates.xml',
         'wizard/monthly_tax_report_xml_export_view.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': ['l10n_it', 'account_reports'],
-    'installable': True,
     'author': 'Odoo S.A.',
     'assets': {
         'account_reports.assets_pdf_export': [

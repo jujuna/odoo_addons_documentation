@@ -5,18 +5,14 @@
     'description': """
 Generate XML payment orders as recommended by the SEPA and ISO20022 norms.
     """,
-    'version': '1.0',
-    'depends': ['account_batch_payment', 'base_iban'],
+    'depends': ['account_batch_payment'],
     'data': [
         'data/account_payment_method.xml',
-        'views/account_journal_dashboard_view.xml',
         'views/account_journal_views.xml',
         'views/res_config_settings_views.xml',
         'views/account_batch_payment_views.xml',
         'views/account_payment_views.xml',
-        'views/res_company_views.xml',
-        'views/res_partner_views.xml',
-        'views/account_bank_statement_line_views.xml',
+        'views/res_bank_views.xml',
     ],
     'post_init_hook': 'init_initiating_party_names',
     'author': 'Odoo S.A.',

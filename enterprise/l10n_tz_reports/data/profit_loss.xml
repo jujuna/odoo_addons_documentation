@@ -4,6 +4,7 @@
         <field name="name">Profit and loss</field>
         <field name="name@sw">Faida na hasara</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
         <field name="country_id" ref="base.tz"/>
@@ -34,8 +35,6 @@
                         <field name="name">Revenue</field>
                         <field name="name@sw">Mapato</field>
                         <field name="code">tz_revenue</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_revenue_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -48,8 +47,6 @@
                         <field name="name">Other income</field>
                         <field name="name@sw">Kipato kingine</field>
                         <field name="code">tz_other_income</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_other_income_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -62,8 +59,6 @@
                         <field name="name">Change in inventories</field>
                         <field name="name@sw">Badilisha katika orodha</field>
                         <field name="code">tz_change_inventories</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_change_inventories_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -76,8 +71,6 @@
                         <field name="name">Costs of material</field>
                         <field name="name@sw">Gharama za nyenzo</field>
                         <field name="code">tz_costs_material</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_cost_material_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -90,8 +83,6 @@
                         <field name="name">Employee benefits expense</field>
                         <field name="name@sw">Gharama ya faida ya mfanyakazi</field>
                         <field name="code">tz_employee_expense</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_employee_expense_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -104,8 +95,6 @@
                         <field name="name">Change in fair value of investment property</field>
                         <field name="name@sw">Mabadiliko ya thamani ya haki ya mali ya uwekezaji</field>
                         <field name="code">tz_change_fair_value_investment</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_change_fair_value_investment_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -118,8 +107,6 @@
                         <field name="name">Depreciation, amortisation and impairment of non-financial assets</field>
                         <field name="name@sw">Kushuka kwa thamani, upunguzaji wa madeni na uharibifu wa mali zisizo za kifedha</field>
                         <field name="code">tz_depreciation</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_depreciation_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -132,8 +119,6 @@
                         <field name="name">Impairment losses of financial assets</field>
                         <field name="name@sw">Uharibifu wa hasara za mali za kifedha</field>
                         <field name="code">tz_impairment_losses</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_impairment_losses_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -146,8 +131,6 @@
                         <field name="name">Other expenses</field>
                         <field name="name@sw">Gharama zingine</field>
                         <field name="code">tz_other_expenses</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_other_expenses_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -175,8 +158,6 @@
                         <field name="name">Share of profit from equity accounted investments</field>
                         <field name="name@sw">Sehemu ya faida kutoka kwa uwekezaji uliohesabiwa kwa hisa</field>
                         <field name="code">tz_share_profit_equity</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_share_profit_equity_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -189,8 +170,6 @@
                         <field name="name">Finance costs</field>
                         <field name="name@sw">Gharama za fedha</field>
                         <field name="code">tz_finance_costs</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_finance_costs_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -203,8 +182,6 @@
                         <field name="name">Finance income</field>
                         <field name="name@sw">Mapato ya fedha</field>
                         <field name="code">tz_finance_income</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_finance_income_expr" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -217,8 +194,6 @@
                         <field name="name">Other financial items</field>
                         <field name="name@sw">Vitu vingine vya kifedha</field>
                         <field name="code">tz_other_finance</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_tz_other_financial_items_expr" model="account.report.expression">
                                 <field name="label">balance</field>

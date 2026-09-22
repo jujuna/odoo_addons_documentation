@@ -7,16 +7,15 @@
                     <div class="page">
                         <h2 class="text-center"><strong>Payment Advice</strong></h2>
                         <p class="text-end my-0"> Made on <span t-out="time.strftime('%d-%m-%Y')"/></p>
-                        <p class="text-end my-0"> Payment date <span t-out="o.l10n_in_effective_from.strftime('%d-%m-%Y')"/></p>
+                        <p class="text-end my-0"> Payment date <span t-out="o.effective_date.strftime('%d-%m-%Y')"/></p>
                         <p class="m-0">To,</p>
                         <p>The Manager,</p>
                         <p><strong><span t-out="o.l10n_in_company_bank_id.bank_name"/></strong></p>
                         <p>Dear Sir/Madam,</p>
                         <p class="text-center text-decoration-underline">
-                            <strong>Payment Advice from 
-                                <span t-out="o.company_id.name"/>
+                            <strong>Payment Advice 
                                 <t t-if="o.l10n_in_neft">with NEFT</t>
-                                <t t-else="">with Cheque No. 
+                                <t t-elif="o.l10n_in_by_cheque">with Cheque No. 
                                     <span t-if="o.l10n_in_cheque_number" t-out="o.l10n_in_cheque_number"/>
                                     <span t-else="">XXXXXXXX</span>
                                     <span t-if="o.l10n_in_cheque_date">
@@ -29,7 +28,7 @@
                     <p class="text-start">
                         <span>
                             Please initiate a payroll transfer from account number
-                            <span t-if="o.l10n_in_company_bank_id" t-out="o.l10n_in_company_bank_id.acc_number"/>
+                            <span t-if="o.l10n_in_company_bank_id" t-out="o.l10n_in_company_bank_id.account_number"/>
                             <span t-else="">XXXXXXXXX</span>
                             to the below mentioned account numbers towards employees salaries:
                         </span>

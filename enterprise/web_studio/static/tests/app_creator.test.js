@@ -36,7 +36,7 @@ test("app creator: standard flow with model creation", async () => {
         return true;
     });
 
-    onRpc("ir.attachment", "read", () => [{ datas: sampleIconUrl }]);
+    onRpc("ir.attachment", "read", () => [{ raw: sampleIconUrl }]);
 
     onRpc("/web/binary/upload_attachment", () => {
         expect.step("upload_attachment");
@@ -62,7 +62,7 @@ test("app creator: standard flow with model creation", async () => {
     expect(".o_web_studio_app_creator_name").toHaveCount(1);
     expect(".o_web_studio_icon_creator .o_web_studio_selectors").toHaveCount(1);
     expect(".o_app_icon").toHaveStyle({ backgroundColor: "rgb(255, 255, 255)" });
-    expect(".o_app_icon .fa-home").toHaveStyle({ color: "rgb(0, 206, 179)" });
+    expect(".o_app_icon [data-icon='home']").toHaveStyle({ color: "rgb(0, 206, 179)" });
 
     await contains(".o_web_studio_selector_background > button").click();
 
@@ -72,11 +72,11 @@ test("app creator: standard flow with model creation", async () => {
 
     expect(".o_select_menu_menu").toHaveCount(1);
 
-    await contains(".o_web_studio_selector_icon > button").click();
+    await contains(".o_web_studio_selector_icon").click();
 
-    await contains(".o_select_menu_item .fa-heart").click();
+    await contains(".font-icons-icon:not(.oi-filled)[data-icon='favorite']").click();
 
-    expect(".o_app_icon .fa-heart").toHaveCount(1);
+    expect(".o_app_icon [data-icon='favorite']").toHaveCount(1);
 
     const res = await globals.fetch.call(window, "data:image/png;base64," + sampleIconUrl);
     const blob = await res.blob();

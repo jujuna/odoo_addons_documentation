@@ -10,7 +10,6 @@ export class DocumentsTopbarShareButton extends Component {
     static components = {
         SpreadsheetShareButton,
     };
-    static props = {};
 }
 
 const isActiveDocument = (env) => env.isArchived && !env.isArchived();
@@ -28,6 +27,7 @@ registries.topbarMenuRegistry.addChild("share", ["file"], {
     isVisible: (env) =>
         isActiveDocument(env) && (env.onShareSpreadsheet || env.onFreezeAndShareSpreadsheet),
     icon: "o-spreadsheet-Icon.SHARE",
+    isEnabledOnLockedSheet: true,
 });
 
 registries.topbarMenuRegistry.addChild("share_share", ["file", "share"], {
@@ -35,6 +35,7 @@ registries.topbarMenuRegistry.addChild("share_share", ["file", "share"], {
     sequence: 10,
     isVisible: (env) => isActiveDocument(env) && env.onShareSpreadsheet,
     execute: (env) => env.onShareSpreadsheet(),
+    isEnabledOnLockedSheet: true,
 });
 
 registries.topbarMenuRegistry.addChild("freeze_and_share", ["file", "share"], {
@@ -43,4 +44,5 @@ registries.topbarMenuRegistry.addChild("freeze_and_share", ["file", "share"], {
     isVisible: (env) =>
         isActiveDocument(env) && env.onFreezeAndShareSpreadsheet && !isFrozenSpreadsheet(env),
     execute: (env) => env.onFreezeAndShareSpreadsheet(),
+    isEnabledOnLockedSheet: true,
 });

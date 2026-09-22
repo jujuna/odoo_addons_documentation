@@ -1,6 +1,6 @@
 import { _t } from "@web/core/l10n/translation";
 
-import { AccountReport } from "@account_reports/components/account_report/account_report";
+import { AccountReportController } from "@account_reports/components/account_report/controller";
 import { AccountReportFilters } from "@account_reports/components/account_report/filters/filters";
 
 export class FiscalFleetFilters extends AccountReportFilters {
@@ -14,4 +14,4 @@ export class FiscalFleetFilters extends AccountReportFilters {
     }
 }
 
-AccountReport.registerCustomComponent(FiscalFleetFilters);
+AccountReportController.registerCustomComponent(FiscalFleetFilters);

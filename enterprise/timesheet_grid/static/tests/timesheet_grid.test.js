@@ -1,13 +1,25 @@
-import { beforeEach, expect, test } from "@odoo/hoot";
-import { click, queryAll, queryAllTexts, queryFirst } from "@odoo/hoot-dom";
-import { animationFrame, mockDate } from "@odoo/hoot-mock";
+import {
+    animationFrame,
+    beforeEach,
+    click,
+    expect,
+    mockDate,
+    queryAll,
+    queryAllAttributes,
+    queryAllTexts,
+    queryFirst,
+    test,
+} from "@odoo/hoot";
 import {
     getService,
     mountView,
     mountWithCleanup,
     onRpc,
+    patchWithCleanup,
     removeFacet,
 } from "@web/../tests/web_test_helpers";
+import { location } from "@web/core/browser/browser";
+import { user } from "@web/core/user";
 import { WebClient } from "@web/webclient/webclient";
 
 import { patchSession } from "@hr_timesheet/../tests/hr_timesheet_models";
@@ -16,23 +28,30 @@ import { defineTimesheetModels, HRTimesheet } from "./hr_timesheet_models";
 defineTimesheetModels();
 beforeEach(patchSession);
 
+/** Name of the task of each row of the grid, without the indication of the remaining time. */
+function gridRowTaskNames() {
+    return queryAllTexts(".o_grid_row_title").map((title) => title.split("\n")[0]);
+}
+
 function checkSectionsColsOverAndDownTime() {
-    expect(queryAllTexts(".o_grid_section.text-warning")).toEqual(["25:00", "10:00"], {
-        message: "Mario has overtime (25h00 > 8h00) and (10h00 > 8h00)",
+    expect(
+        ["25h", "10h", "5h 30m", "0h"].every((v) =>
+            queryAllTexts(".o_grid_section.text-success").includes(v)
+        )
+    ).toBe(true, {
+        message:
+            "Mario has overtime (25h00 > 8h00) and (10h00 > 8h00), and Yoshi (5h30 = 5h30) and Toad (0h00 = 0h00) are in time",
     });
-    expect(".o_grid_section.o_grid_row_total.text-bg-warning").toHaveCount(1, {
-        message: "Mario has overtime (35h00 > 16h00)",
+    expect(".o_grid_section.o_grid_row_total.text-bg-success").toHaveCount(3, {
+        message:
+            "Mario has overtime (35h00 > 16h00) and Yoshi (5h30 = 5h30) and Toad (0h00 = 0h00) are in time.",
     });
 
-    expect(queryAllTexts(".o_grid_section.text-danger")).toEqual(["2:30", "0:00"], {
+    expect(queryAllTexts(".o_grid_section.text-danger")).toEqual(["2h 30m", "0h"], {
         message: "Luigi has downtime (2h30 < 8h00) and (0h00 < 8h00)",
     });
     expect(".o_grid_section.o_grid_row_total.text-bg-danger").toHaveCount(1, {
         message: "Luigi has downtime (2h30 < 12h00)",
-    });
-
-    expect(".o_grid_section.o_grid_row_total.text-bg-success").toHaveCount(2, {
-        message: "Yoshi (5h30 = 5h30) and Toad (0h00 = 0h00) are in time.",
     });
 }
 
@@ -52,7 +71,7 @@ test("hr.timesheet (grid): no groupby", async () => {
         message: "There should be 6 rows",
     });
 
-    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3:30", "25:00"]);
+    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3h 30m", "25h"]);
 });
 
 test("hr.timesheet (grid): groupby employee", async () => {
@@ -69,7 +88,7 @@ test("hr.timesheet (grid): groupby employee", async () => {
         message: "There should be 4 rows",
     });
 
-    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3:30", "25:00"]);
+    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3h 30m", "25h"]);
 });
 
 test("hr.timesheet (grid): groupby employee > task", async () => {
@@ -92,7 +111,7 @@ test("hr.timesheet (grid): groupby employee > task", async () => {
         message: "There should be 11 widgets",
     });
 
-    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3:30", "25:00"]);
+    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3h 30m", "25h"]);
 });
 
 test("hr.timesheet (grid): groupby task > employee", async () => {
@@ -117,7 +136,7 @@ test("hr.timesheet (grid): groupby task > employee", async () => {
     expect(".o_grid_component").toHaveCount(12, {
         message: "There should be 12 widgets",
     });
-    expect(".o_grid_row.text-danger").toHaveText("-3:30");
+    expect(".o_grid_row.text-danger").toHaveText("-3h 30m");
 });
 
 test("hr.timesheet (grid): employee section - no groupby", async () => {
@@ -159,7 +178,7 @@ test("hr.timesheet (grid): employee section - no groupby", async () => {
     });
 
     checkSectionsColsOverAndDownTime();
-    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3:30", "25:00"]);
+    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3h 30m", "25h"]);
 });
 
 test("hr.timesheet (grid): employee section - groupby employee", async () => {
@@ -190,7 +209,7 @@ test("hr.timesheet (grid): employee section - groupby employee", async () => {
         message: "4 rows should be rendered in the grid view",
     });
 
-    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3:30", "25:00"]);
+    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3h 30m", "25h"]);
 });
 
 test("hr.timesheet (grid): employee section - groupby employee > task", async () => {
@@ -239,7 +258,7 @@ test("hr.timesheet (grid): employee section - groupby employee > task", async ()
     });
 
     checkSectionsColsOverAndDownTime();
-    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3:30", "25:00"]);
+    expect(queryAllTexts(".o_grid_row.text-danger")).toEqual(["-3h 30m", "25h"]);
 });
 
 test("hr.timesheet (grid): employee section - groupby task > employee", async () => {
@@ -274,7 +293,7 @@ test("hr.timesheet (grid): employee section - groupby task > employee", async ()
     expect(".o_grid_row_title").toHaveCount(6, {
         message: "6 rows should be rendered in the grid view",
     });
-    expect(".o_grid_row.text-danger").toHaveText("-3:30");
+    expect(".o_grid_row.text-danger").toHaveText("-3h 30m");
 });
 
 test("hr.timesheet (grid): avatar widget shouldn't display overtime if period includes today", async () => {
@@ -331,11 +350,11 @@ test("hr.timesheet (grid): avatar widget should display hours in gray if all the
             sectionWithoutOvertimeTextContents.push(node.textContent);
         }
     }
-    expect(sectionWithDangerOvertimeTextContents).toEqual(["Mario-198:00", "Toad-1.00"], {
+    expect(sectionWithDangerOvertimeTextContents).toEqual(["Mario-198h", "Toad-1.00"], {
         message:
             "Mario and Toad have not done all his working hours (the overtime indication for Toad is formatted in float since uom is Days and not hours)",
     });
-    expect(sectionWithSuccessOvertimeTextContents).toEqual(["Yoshi+04:00"], {
+    expect(sectionWithSuccessOvertimeTextContents).toEqual(["Yoshi+4h"], {
         message: "Yoshi should have done his working hours and even more",
     });
     expect(sectionWithoutOvertimeTextContents).toEqual(["Luigi"], {
@@ -350,12 +369,12 @@ test("hr.timesheet (grid): when in Next week date should be first working day", 
         groupBy: [],
     });
 
-    await click(".o_grid_navigation_buttons > div > button > span.oi-arrow-right");
+    await click(".o_grid_navigation_buttons > div > button > span[data-icon='east']");
     await animationFrame();
     await click(".o_control_panel_main_buttons .o_grid_button_add");
     await animationFrame();
     expect(".modal").toHaveCount(1);
-    expect(".modal .o_field_widget[name=date] button").toHaveValue("01/30/2017")
+    expect(".modal .o_field_widget[name=date] button").toHaveValue("01/30/2017");
 });
 
 test("hr.timesheet (grid): when in Previous week date should be first working day", async () => {
@@ -365,7 +384,7 @@ test("hr.timesheet (grid): when in Previous week date should be first working da
         groupBy: [],
     });
 
-    await click(".o_grid_navigation_buttons > div > button > span.oi-arrow-left");
+    await click(".o_grid_navigation_buttons > div > button > span[data-icon='west']");
     await animationFrame();
     await click(".o_control_panel_main_buttons .o_grid_button_add");
     await animationFrame();
@@ -405,8 +424,8 @@ test("test timesheet grid when grouped by employees shows color code on timeshee
     await getService("action").doAction({
         res_model: "account.analytic.line",
         type: "ir.actions.act_window",
-        views: [[ false, "grid" ]],
-        context: { group_by: [ "employee_id"] },
+        views: [[false, "grid"]],
+        context: { group_by: ["employee_id"] },
     });
     /**
      * Working periods of all employees in the test
@@ -430,34 +449,226 @@ test("test timesheet grid when grouped by employees shows color code on timeshee
      * ╚═══════╩════════════════╩═════════════════════════╩══════════════════╩══════════════════════╩═════════════════════╝
      *
      **/
-    expect(".o_grid_row .o_grid_cell_readonly span:contains(2:30)").toHaveClass("text-danger", {
-        message: "The cell text should be red as that employee has working period of 8 hours but has timesheet of 2.5 hours",
+    expect(".o_grid_row .o_grid_cell_readonly span:contains(2h 30m)").toHaveClass("text-danger", {
+        message:
+            "The cell text should be red as that employee has working period of 8 hours but has timesheet of 2.5 hours",
     });
-    expect(".o_grid_row .o_grid_cell_readonly span:contains(-3:30)").toHaveClass("text-900", {
-        message: "The cell text should be normal as that employee has no working period of 8 hours but has timesheet of 2.5 hours",
+    expect(".o_grid_row .o_grid_cell_readonly span:contains(-3h 30m)").toHaveClass("text-900", {
+        message:
+            "The cell text should be normal as that employee has no working period of 8 hours but has timesheet of 2.5 hours",
     });
-    expect(".o_grid_row .o_grid_cell_readonly span:contains(25:00)").toHaveClass("text-warning", {
-        message: "The cell text should be orange as that employee has working period of 8 hours but has timesheet of 25 hours",
+    expect(".o_grid_row .o_grid_cell_readonly span:contains(25h)").toHaveClass("text-success", {
+        message:
+            "The cell text should be green as that employee has working period of 8 hours but has timesheet of 25 hours",
     });
-    expect(".o_grid_row .o_grid_cell_readonly span:contains(10:00)").toHaveClass("text-warning", {
-        message: "The cell text should be orange as that employee has working period of 8 hours but has timesheet of 10 hours",
+    expect(".o_grid_row .o_grid_cell_readonly span:contains(10h)").toHaveClass("text-success", {
+        message:
+            "The cell text should be green as that employee has working period of 8 hours but has timesheet of 10 hours",
     });
-    expect(".o_grid_row .o_grid_cell_readonly span:contains(4:00)").toHaveClass("text-900", {
-        message: "The cell text should be normal as that employee has no working period but has timesheet of 4 hours",
+    expect(".o_grid_row .o_grid_cell_readonly span:contains(4h)").toHaveClass("text-900", {
+        message:
+            "The cell text should be normal as that employee has no working period but has timesheet of 4 hours",
     });
-    expect(".o_grid_row .o_grid_cell_readonly span:contains(5:30)").toHaveClass("text-success", {
-        message: "The cell text should be normal as that employee has working period of 5.5 and has timesheet of 5.5 hours",
+    expect(".o_grid_row .o_grid_cell_readonly span:contains(5h 30m)").toHaveClass("text-success", {
+        message:
+            "The cell text should be normal as that employee has working period of 5.5 and has timesheet of 5.5 hours",
     });
-    expect(queryFirst(".o_grid_row.o_grid_row_total span:contains(-1:00)").closest(".o_grid_row")).toHaveClass("text-bg-danger", {
-        message: "The total cell should be red as that employee has working period of 8 and has timesheet of -1 hours",
+    expect(
+        queryFirst(".o_grid_row.o_grid_row_total span:contains(-1h)").closest(".o_grid_row")
+    ).toHaveClass("text-bg-danger", {
+        message:
+            "The total cell should be red as that employee has working period of 8 and has timesheet of -1 hours",
     });
-    expect(queryFirst(".o_grid_row.o_grid_row_total span:contains(35:00)").closest(".o_grid_row")).toHaveClass("text-bg-warning", {
-        message: "The total cell should be orange as that employee has working period of 16 and has timesheet of 35 hours",
+    expect(
+        queryFirst(".o_grid_row.o_grid_row_total span:contains(35h)").closest(".o_grid_row")
+    ).toHaveClass("text-bg-success", {
+        message:
+            "The total cell should be green as that employee has working period of 16 and has timesheet of 35 hours",
     });
-    expect(queryFirst(".o_grid_row.o_grid_row_total span:contains(4:00)").closest(".o_grid_row")).toHaveClass("text-bg-success", {
-        message: "The total cell should be green as that employee has no working period and has timesheet of 4 hours",
+    expect(
+        queryFirst(".o_grid_row.o_grid_row_total span:contains(4h)").closest(".o_grid_row")
+    ).toHaveClass("text-bg-success", {
+        message:
+            "The total cell should be green as that employee has no working period and has timesheet of 4 hours",
     });
-    expect(queryFirst(".o_grid_row.o_grid_row_total span:contains(5:30)").closest(".o_grid_row")).toHaveClass("text-bg-success", {
-        message: "The total cell should be green as that employee has working period of 5.5 and has timesheet of 5.5 hours",
+    expect(
+        queryFirst(".o_grid_row.o_grid_row_total span:contains(5h 30m)").closest(".o_grid_row")
+    ).toHaveClass("text-bg-success", {
+        message:
+            "The total cell should be green as that employee has working period of 5.5 and has timesheet of 5.5 hours",
     });
+});
+
+test("Grid view: reminder_interval=months should set scale to Month", async () => {
+    patchWithCleanup(location, {
+        origin: location.origin,
+        search: "?reminder_interval=months",
+    });
+
+    await mountView({
+        type: "grid",
+        resModel: "account.analytic.line",
+    });
+    expect(".scale_button_selection").toHaveText("Month", {
+        message: "Expected Month mode when reminder_interval=months",
+    });
+});
+
+test("Grid view: reminder_interval=weeks should set scale to Week", async () => {
+    patchWithCleanup(location, {
+        origin: location.origin,
+        search: "?reminder_interval=weeks",
+    });
+
+    await mountView({
+        type: "grid",
+        resModel: "account.analytic.line",
+    });
+    expect(".scale_button_selection").toHaveText("Week", {
+        message: "Expected Month mode when reminder_interval=weeks",
+    });
+});
+
+test("hr.timesheet (grid): should display public employee avatars", async () => {
+    patchWithCleanup(user, {
+        hasGroup: () => false,
+    });
+    const publicEmployeeIds = [
+        ...new Set(HRTimesheet._records.map((timesheet) => timesheet.employee_id)),
+    ];
+
+    await mountView({
+        type: "grid",
+        resModel: "account.analytic.line",
+        groupBy: ["employee_id"],
+    });
+    expect(queryAllAttributes(".o_m2o_avatar > img", "data-src").sort()).toEqual(
+        publicEmployeeIds
+            .map((employeeId) => `/web/image/hr.employee.public/${employeeId}/avatar_128`)
+            .sort()
+    );
+});
+
+test("hr.timesheet (grid): the rows are sorted alphabetically", async () => {
+    await mountView({
+        type: "grid",
+        resModel: "account.analytic.line",
+        groupBy: ["employee_id"],
+    });
+
+    expect(queryAllTexts(".o_grid_row_title")).toEqual(["Luigi", "Mario", "Toad", "Yoshi"], {
+        message: "The rows should be sorted on the name of the employee",
+    });
+});
+
+test("hr.timesheet (grid): the rows are sorted alphabetically, empty ones first", async () => {
+    await mountView({
+        type: "grid",
+        resModel: "account.analytic.line",
+        groupBy: ["task_id"],
+    });
+
+    expect(queryAllTexts(".o_grid_row_title")).toEqual([
+        "None",
+        "Another BS task",
+        "BS task",
+        "yet another task",
+    ]);
+});
+
+test("hr.timesheet (grid): the To Validate view opens on the previous period", async () => {
+    await mountView({
+        type: "grid",
+        resModel: "account.analytic.line",
+        groupBy: ["employee_id"],
+        arch: `
+            <grid js_class="timesheet_to_validate_grid">
+                <field name="employee_id" type="row" widget="timesheet_many2one_avatar_employee"/>
+                <field name="date" type="col">
+                    <range name="week" string="Week" span="week" step="day"/>
+                    <range name="month" string="Month" span="month" step="day"/>
+                </field>
+                <field name="unit_amount" type="measure" widget="float_time"/>
+            </grid>
+        `,
+    });
+
+    // today is mocked to 2017-01-25, so the grid should display the week before it
+    const columns = queryAllTexts(
+        ".o_grid_column_title:not(.o_grid_navigation_wrap, .o_grid_row_total)"
+    );
+    expect(columns).toHaveLength(7);
+    expect(columns.some((column) => column.includes("Jan 18"))).toBe(true, {
+        message: "The previous week should be displayed",
+    });
+    expect(columns.some((column) => column.includes("Jan 25"))).toBe(false, {
+        message: "The current week should not be displayed",
+    });
+});
+
+test("hr.timesheet (grid): empty rows are added for the entries of the previous period", async () => {
+    // 'Another BS task' has only been timesheeted the week before the one displayed
+    HRTimesheet._records = [
+        {
+            id: 1,
+            name: "this week",
+            project_id: 1,
+            task_id: 1,
+            employee_id: 1,
+            date: "2017-01-25",
+            unit_amount: 2,
+        },
+        {
+            id: 2,
+            name: "last week",
+            project_id: 2,
+            task_id: 2,
+            employee_id: 1,
+            date: "2017-01-18",
+            unit_amount: 3,
+        },
+    ];
+
+    await mountView({
+        type: "grid",
+        resModel: "account.analytic.line",
+        groupBy: ["task_id"],
+        context: { group_expand: true },
+    });
+
+    expect(gridRowTaskNames()).toEqual(["BS task", "Another BS task"], {
+        message:
+            "An empty row should be added for the task timesheeted during the previous period, to ease the encoding",
+    });
+});
+
+test("hr.timesheet (grid): no empty row is added when group_expand is not set", async () => {
+    HRTimesheet._records = [
+        {
+            id: 1,
+            name: "this week",
+            project_id: 1,
+            task_id: 1,
+            employee_id: 1,
+            date: "2017-01-25",
+            unit_amount: 2,
+        },
+        {
+            id: 2,
+            name: "last week",
+            project_id: 2,
+            task_id: 2,
+            employee_id: 1,
+            date: "2017-01-18",
+            unit_amount: 3,
+        },
+    ];
+
+    await mountView({
+        type: "grid",
+        resModel: "account.analytic.line",
+        groupBy: ["task_id"],
+    });
+
+    expect(gridRowTaskNames()).toEqual(["BS task"]);
 });

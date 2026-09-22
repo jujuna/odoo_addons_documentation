@@ -4,5 +4,4 @@ import { SidebarPropertiesToolbox } from "@web_studio/client_action/view_editor/
 export class OTdLabelProperties extends Component {
     static template = "web_studio.ViewEditor.InteractiveEditorProperties.OTdLabelProperties";
     static components = { SidebarPropertiesToolbox };
-    static props = ["node"];
 }

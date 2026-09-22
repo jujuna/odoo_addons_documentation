@@ -1,8 +1,7 @@
 import { registry } from "@web/core/registry";
-import { changeOptionInPopover } from "@website/js/tours/tour_utils";
+import { changeOptionInPopover, unfoldOptionsGroup } from "@website/js/tours/tour_utils";
 
 registry.category("web_tour.tours").add("website_studio_listing_and_page", {
-    url: "/odoo/action-studio?debug=1&mode=home_menu",
     steps: () => [
         {
             trigger: "a.o_menuitem:contains('StudioApp')",
@@ -43,13 +42,13 @@ registry.category("web_tour.tours").add("website_studio_listing_and_page", {
             run: "click",
         },
         {
-            trigger: ".o_kanban_view .o_kanban_renderer .o_kanban_record div[data-section='title']:contains('MyCustom Name')",
+            trigger:
+                ".o_kanban_view .o_kanban_renderer .o_kanban_record div[data-section='title']:contains('MyCustom Name')",
         },
     ],
 });
 
 registry.category("web_tour.tours").add("website_studio_listing_without_page", {
-    url: "/odoo/action-studio?debug=1&mode=home_menu",
     steps: () => [
         {
             trigger: "a.o_menuitem:contains('StudioApp')",
@@ -95,7 +94,8 @@ registry.category("web_tour.tours").add("website_studio_listing_without_page", {
             run: "click",
         },
         {
-            trigger: ".o_kanban_view .o_kanban_renderer .o_kanban_record div[data-section='title']:contains('MyCustom Name')",
+            trigger:
+                ".o_kanban_view .o_kanban_renderer .o_kanban_record div[data-section='title']:contains('MyCustom Name')",
         },
     ],
 });
@@ -113,24 +113,26 @@ registry.category("web_tour.tours").add("website_studio_website_form", {
             trigger: ":iframe .odoo-editor-editable .s_website_form h2",
             run: "click",
         },
+        ...unfoldOptionsGroup("Form"),
         ...changeOptionInPopover("Form", "Action", "More models"),
         {
-            trigger: ".modal .o_list_view"
+            trigger: ".modal .o_list_view",
         },
         {
             trigger: ".modal .o_searchview_input",
-            run: "edit x_test_model"
+            run: "edit x_test_model",
         },
         {
             trigger: ".o_searchview_autocomplete .o-dropdown-item.focus",
-            run: "press Enter"
+            run: "press Enter",
         },
         {
             trigger: ".modal .o_data_row:contains(x_test_model) .o_data_cell",
             run: "click",
         },
         {
-            trigger: "body:not(:has(.modal)) div[data-action-id='studioToggleFormAccess'] input:checked",
+            trigger:
+                "body:not(:has(.modal)) div[data-action-id='studioToggleFormAccess'] input:checked",
         },
         {
             trigger: ":iframe form[data-model_name='x_test_model']",
@@ -140,7 +142,8 @@ registry.category("web_tour.tours").add("website_studio_website_form", {
             run: "click",
         },
         {
-            trigger: ".o_website_preview:not(.editor_enable) :iframe form[data-model_name='x_test_model']",
+            trigger:
+                ".o_website_preview:not(.editor_enable) :iframe form[data-model_name='x_test_model']",
         },
-    ]
+    ],
 });

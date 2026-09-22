@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from odoo.tools.zeep.wsse.username import UsernameToken
 
 
 class ResCompany(models.Model):
@@ -44,3 +45,37 @@ class ResCompany(models.Model):
                     [('company_id', '=', company.id), ('is_valid', '=', True)], limit=1)
             else:
                 company.l10n_pe_edi_certificate_id = False
+
+    def _l10n_pe_edi_get_credentials(self, sunat_wsdl=None):
+        """Return ESP credentials (WSDL endpoint, WS-Security token, fault NS)
+        based on the company's electronic service provider.
+
+        Estela credentials are document-type independent. SUNAT requires a WSDL
+        that varies by document (invoice, retention, CDR query) so the caller
+        must pass the relevant ``sunat_wsdl`` for its scenario.
+        """
+        self.ensure_one()
+        company_sudo = self.sudo()
+        if self.l10n_pe_edi_provider == 'digiflow':
+            if self.l10n_pe_edi_test_env:
+                return {
+                    'fault_ns': 's',
+                    'wsdl': 'https://ose-test.com/ol-ti-itcpe/',
+                    'token': UsernameToken('20557912879MODDATOS', 'moddatos'),
+                }
+            return {
+                'fault_ns': 's',
+                'wsdl': 'https://ose.pe/ol-ti-itcpe/billService',
+                'token': UsernameToken(
+                    company_sudo.l10n_pe_edi_provider_username,
+                    company_sudo.l10n_pe_edi_provider_password,
+                ),
+            }
+        if self.l10n_pe_edi_test_env:
+            token = UsernameToken('MODDATOS', 'MODDATOS')
+        else:
+            token = UsernameToken(
+                company_sudo.l10n_pe_edi_provider_username,
+                company_sudo.l10n_pe_edi_provider_password,
+            )
+        return {'fault_ns': 'soap-env', 'wsdl': sunat_wsdl, 'token': token}

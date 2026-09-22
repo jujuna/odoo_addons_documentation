@@ -1,8 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("portal_download_signed_document", {
-    url: "/my",
-
     steps: () => [
         {
             content: "Click on signature requests.",
@@ -18,7 +16,7 @@ registry.category("web_tour.tours").add("portal_download_signed_document", {
         },
         {
             content: "Click on Download button.",
-            trigger: "a[title=Download]",
+            trigger: "a:contains(Download)",
             run: "click",
         },
         {

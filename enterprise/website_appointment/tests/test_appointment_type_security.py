@@ -8,10 +8,11 @@ from odoo.tools import mute_logger
 
 
 @tagged('security')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WebsiteAppointmentTypeSecurityTest(TestAppointmentTypeSecurity):
 
     @users('public_user')
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_website_appointment_type_website_published_access(self):
         """  Public users should have read access on every 'website_published' appointment types. """
         self._prepare_types_with_user()

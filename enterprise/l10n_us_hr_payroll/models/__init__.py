@@ -10,4 +10,5 @@ from . import l10n_us_941
 from . import l10n_us_w2
 from . import l10n_us_worker_compensation
 from . import hr_leave_allocation
-from . import hr_leave_type
+from . import hr_work_entry_type
+from . import hr_payroll_warning

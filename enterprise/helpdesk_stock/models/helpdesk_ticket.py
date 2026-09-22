@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import itertools
@@ -9,26 +8,13 @@ from odoo.tools import groupby
 class HelpdeskTicket(models.Model):
     _inherit = 'helpdesk.ticket'
 
-    product_id = fields.Many2one('product.product', string='Product', tracking=True,
-        check_company=True,
-        groups="stock.group_stock_user",
-        domain="[('sale_ok', '=', True), ('id', 'in', suitable_product_ids)]",
-        help="Product this ticket is about. If selected, only the sales orders, deliveries and invoices including this product will be visible.")
-    suitable_product_ids = fields.Many2many(
-        'product.product',
-        compute='_compute_suitable_product_ids',
-        export_string_translation=False,
-        groups="stock.group_stock_user",
-    )
-    has_partner_picking = fields.Boolean(compute='_compute_suitable_product_ids')
-    tracking = fields.Selection(related='product_id.tracking')
-    lot_id = fields.Many2one('stock.lot', string='Lot/Serial Number', domain="[('product_id', '=', product_id)]", tracking=True)
+    has_partner_picking = fields.Boolean(compute='_compute_has_partner_picking', groups="stock.group_stock_user")
     pickings_count = fields.Integer('Return Orders Count', compute="_compute_pickings_count")
     picking_ids = fields.Many2many('stock.picking', string="Return Orders", copy=False)
     replacement_count = fields.Integer(compute='_compute_replacement_count', export_string_translation=False)
 
     @api.depends('partner_id')
-    def _compute_suitable_product_ids(self):
+    def _compute_has_partner_picking(self):
         """
         Computes the suitable products for the given tickets based on the associated
         partner's sales orders and outgoing deliveries.
@@ -45,7 +31,6 @@ class HelpdeskTicket(models.Model):
             tickets = self.env['helpdesk.ticket'].browse(ticket.id for ticket in tickets_list)
             suitable_partner_ids = suitable_partners_ids_by_commercial_partner_id.get(commercial_partner.id)
             if not suitable_partner_ids:
-                tickets.suitable_product_ids = False
                 tickets.has_partner_picking = False
                 continue
             sale_data = self.env['sale.order.line']._read_group([
@@ -76,14 +61,7 @@ class HelpdeskTicket(models.Model):
                     for partner, picking_ids in picking_data:
                         product_lists = [move_lines[pick] for pick in picking_ids if pick in move_lines]
                         outgoing_product[partner.id] = list(itertools.chain(*product_lists))
-            product_ids = {item for partner_id in suitable_partner_ids for item in order_data.get(partner_id, []) + outgoing_product.get(partner_id, [])}
-            tickets.suitable_product_ids = [fields.Command.set(product_ids)]
-            tickets.has_partner_picking = any((partner_id in outgoing_product) for partner_id in suitable_partner_ids)
-
-    @api.onchange('suitable_product_ids')
-    def onchange_product_id(self):
-        if self.product_id not in self.suitable_product_ids:
-            self.product_id = False
+            tickets.has_partner_picking = any((partner_id in outgoing_product) or (partner_id in order_data) for partner_id in suitable_partner_ids)
 
     @api.depends('picking_ids')
     def _compute_replacement_count(self):
@@ -112,11 +90,17 @@ class HelpdeskTicket(models.Model):
         show_product_id_records.display_extra_info = True
         super(HelpdeskTicket, self - show_product_id_records)._compute_display_extra_info()
 
-    def write(self, vals):
-        res = super().write(vals)
-        if 'suitable_product_ids' in vals:
-            self.filtered(lambda t: t.product_id not in t.suitable_product_ids).product_id = False
-        return res
+    def copy_data(self, default=None):
+        has_stock_access = self.env.user.has_group('stock.group_stock_user')
+        if not has_stock_access:
+            if default is None:
+                default = {}
+            default['product_id'] = False
+        vals_list = super().copy_data(default=default)
+        if not has_stock_access:
+            for vals in vals_list:
+                del vals['product_id']
+        return vals_list
 
     def action_view_pickings(self):
         self.ensure_one()

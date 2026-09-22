@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Denmark - Accounting Reports',
-    'version': '1.0',
     'author': 'Odoo House ApS',
     'website': 'https://odoohouse.dk',
     'category': 'Accounting/Localizations/Reporting',
@@ -25,11 +23,11 @@ Accounting reports for Denmark
         'data/saft_report.xml',
         'data/documents_file_data.xml',
         'views/account_journal_dashboard.xml',
-        'security/ir.model.access.csv',
         'wizard/ec_sales_list_submission_wizard.xml',
         'data/tax_report.xml',
         'views/template_rsu.xml',
         'wizard/tax_report_wizard.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': [
         'l10n_dk',

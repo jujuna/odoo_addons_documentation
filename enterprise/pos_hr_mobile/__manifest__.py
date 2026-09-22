@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'POS Barcode in Mobile',
     'category': 'Human Resources/Barcode',
     'summary': 'POS Barcode scan in Mobile',
-    'version': '1.0',
     'description': """ """,
     'depends': ['pos_hr', 'web_mobile'],
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

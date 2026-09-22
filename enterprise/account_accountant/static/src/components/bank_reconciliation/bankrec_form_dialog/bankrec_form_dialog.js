@@ -9,7 +9,7 @@ export class BankRecFormDialog extends FormViewDialog {
     setup() {
         super.setup();
         Object.assign(this.viewProps, {
-            buttonTemplate: 'accountant.BankRecFormDialog.buttons',
+            buttonDialogTemplate: "accountant.BankRecFormDialog.buttons",
         });
     }
 }
@@ -20,10 +20,10 @@ export class BankRecEditLineFormController extends FormController {
         this.isReviewed = this.props.context.is_reviewed;
         onWillStart(async () => {
             this.userCanReview = await user.hasGroup("account.group_account_user");
-        })
+        });
     }
 
-    async toReviewButtonClicked (params = {}) {
+    async toReviewButtonClicked(params = {}) {
         await this.orm.call("account.move", "set_moves_checked", [
             this.model.root.data.move_id.id,
             false,

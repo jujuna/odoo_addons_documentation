@@ -1,16 +1,18 @@
+import { render } from "@web/owl2/utils";
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
 import { waitFor } from "@odoo/hoot-dom";
-import { stores } from "@odoo/o-spreadsheet";
+import { stores, owlPlugins } from "@odoo/o-spreadsheet";
 import { mountSpreadsheet } from "@spreadsheet/../tests/helpers/ui";
 import { addGlobalFilterWithoutReload, updatePivot } from "@spreadsheet/../tests/helpers/commands";
 import { defineSpreadsheetModels } from "@spreadsheet/../tests/helpers/data";
 import { THIS_YEAR_GLOBAL_FILTER } from "@spreadsheet/../tests/helpers/global_filter";
 import { contains, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
 
-import { Component, onMounted, onWillUnmount, xml } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, providePlugins, t, useProps, xml } from "@odoo/owl";
 import { createSpreadsheetWithPivot } from "@spreadsheet/../tests/helpers/pivot";
 import { createModelWithDataSource } from "@spreadsheet/../tests/helpers/model";
 import { GlobalFiltersSidePanel } from "@spreadsheet_edition/bundle/global_filters/global_filters_side_panel";
+import { editSelectComponent } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
 
 const { useStoreProvider, ModelStore } = stores;
 
@@ -33,19 +35,24 @@ const FILTER_CREATION_SELECTORS = {
 };
 
 class Parent extends Component {
-    static template = xml`<GlobalFiltersSidePanel/>`;
+    static template = xml`<div class="o-spreadsheet"><GlobalFiltersSidePanel/></div>`;
     static components = { GlobalFiltersSidePanel };
-    static props = {
-        model: Object,
-    };
+
+    props = useProps({
+        model: t.object(),
+    });
 
     setup() {
+        providePlugins([owlPlugins.PopoverContainerPlugin], {
+            getPopoverContainerRect: () =>
+                getFixture().querySelector(".o-spreadsheet").getBoundingClientRect(),
+        });
         const stores = useStoreProvider();
         stores.inject(ModelStore, this.props.model);
 
         onMounted(() => {
-            this.props.model.on("update", this, () => this.render(true));
-            stores.on("store-updated", this, this.render.bind(this, true));
+            this.props.model.on("update", this, () => render(this, true));
+            stores.on("store-updated", this, () => render(this, true));
         });
         onWillUnmount(() => {
             this.props.model.off("update", this);
@@ -91,23 +98,26 @@ test("Simple display", async function () {
 });
 
 test("Display with an existing 'Date' global filter", async function () {
-    const { model, env } = await createSpreadsheetWithPivot();
+    const { model } = await createSpreadsheetWithPivot();
+    await mountSpreadsheet(model);
     const label = "This year";
     addGlobalFilterWithoutReload(model, {
         id: "42",
         type: "date",
         label,
     });
-    env.replaceSidePanel = (panel, currentPanel, props) => expect.step(props.id);
-    await replaceSidePanel(model, env);
+
+    await contains(".o_topbar_filter_icon").click();
+    await waitFor(".o_spreadsheet_global_filters_side_panel");
     const sections = target.querySelectorAll(".o_spreadsheet_global_filters_side_panel .o-section");
     expect(sections.length).toBe(2);
     const labelElement = sections[0].querySelector(".o_side_panel_filter_label");
     expect(labelElement).toHaveText(label);
 
-    expect.verifySteps([]);
-    await contains(labelElement).click();
-    expect.verifySteps(["42"]);
+    await contains(sections[0].querySelector(".o-button-icon")).click();
+    await contains(".o-menu-item[title='Edit']").click();
+    await waitFor(".o_spreadsheet_filter_editor_side_panel");
+    expect(".o_spreadsheet_filter_editor_side_panel .o_global_filter_label").toHaveValue(label);
 });
 
 test("Create a new boolean global filter", async function () {
@@ -202,6 +212,173 @@ test("Can reorder filters with drag & drop", async function () {
     filters = model.getters.getGlobalFilters();
     expect(filters[0].id).toBe(id_2);
     expect(filters[1].id).toBe(id_1);
+});
+
+test("Changing a global filter value applies immediately from side panel", async () => {
+    const { model, env } = await createSpreadsheetWithPivot();
+    addGlobalFilterWithoutReload(model, {
+        id: "date_filter",
+        type: "date",
+        label: "My Date",
+    });
+    await openSidePanel(model, env);
+    expect(model.getters.getGlobalFilterValue("date_filter")).toEqual(undefined);
+
+    await contains(".o_spreadsheet_global_filters_side_panel input").click();
+    await contains(".o-dropdown-item[data-id='today']").click();
+    expect(model.getters.getGlobalFilterValue("date_filter")).toEqual({
+        type: "relative",
+        period: "today",
+    });
+});
+
+test("Changing a global filter by deleting the value does not crash", async () => {
+    const { model, env } = await createSpreadsheetWithPivot();
+    addGlobalFilterWithoutReload(model, {
+        id: "date_filter",
+        type: "date",
+        label: "My Date",
+        defaultValue: "today",
+    });
+    await openSidePanel(model, env);
+    expect(model.getters.getGlobalFilterValue("date_filter")).toEqual({
+        type: "relative",
+        period: "today",
+    });
+    await contains(".pivot_filter_section [data-icon='close']").click();
+    expect(model.getters.getGlobalFilterValue("date_filter")).toEqual(undefined);
+});
+
+test("Changing operator updates global filter value immediately", async () => {
+    const { model, env } = await createSpreadsheetWithPivot();
+    addGlobalFilterWithoutReload(model, {
+        id: "numeric_filter",
+        type: "numeric",
+        label: "Amount",
+        defaultValue: { operator: "=", targetValue: 10 },
+    });
+    await openSidePanel(model, env);
+    expect(model.getters.getGlobalFilterValue("numeric_filter")).toEqual({
+        operator: "=",
+        targetValue: 10,
+    });
+
+    await editSelectComponent(".o_spreadsheet_global_filters_side_panel .o-select", ">");
+    expect(model.getters.getGlobalFilterValue("numeric_filter")).toEqual({
+        operator: ">",
+        targetValue: 10,
+    });
+});
+
+test("Boolean global filter dispatches value when selecting set or not set", async () => {
+    const { model, env } = await createSpreadsheetWithPivot();
+    addGlobalFilterWithoutReload(model, {
+        id: "boolean_filter",
+        type: "boolean",
+        label: "Active",
+    });
+    await openSidePanel(model, env);
+    expect(model.getters.getGlobalFilterValue("boolean_filter")).toBe(undefined);
+
+    await editSelectComponent(".o_spreadsheet_global_filters_side_panel .o-select", "set");
+    expect(model.getters.getGlobalFilterValue("boolean_filter")).toEqual({
+        operator: "set",
+    });
+
+    await editSelectComponent(".o_spreadsheet_global_filters_side_panel .o-select", "not set");
+    expect(model.getters.getGlobalFilterValue("boolean_filter")).toEqual({
+        operator: "not set",
+    });
+});
+
+test("Changing operator without value updates local state but not the global filter", async () => {
+    const { model, env } = await createSpreadsheetWithPivot();
+    addGlobalFilterWithoutReload(model, {
+        id: "numeric_filter",
+        type: "numeric",
+        label: "Amount",
+    });
+    await openSidePanel(model, env);
+    expect(model.getters.getGlobalFilterValue("numeric_filter")).toBe(undefined);
+
+    expect(".o_spreadsheet_global_filters_side_panel .o-select").toHaveText("is equal to");
+
+    await editSelectComponent(".o_spreadsheet_global_filters_side_panel .o-select", ">");
+    expect(".o_spreadsheet_global_filters_side_panel .o-select").toHaveText("greater than");
+    expect(model.getters.getGlobalFilterValue("numeric_filter")).toBe(undefined);
+});
+
+test("Clearing a global filter clears the model value", async () => {
+    const { model, env } = await createSpreadsheetWithPivot();
+    addGlobalFilterWithoutReload(model, {
+        id: "text_filter",
+        type: "text",
+        label: "Name",
+        defaultValue: { operator: "ilike", strings: ["foo"] },
+    });
+    await openSidePanel(model, env);
+    expect(model.getters.getGlobalFilterValue("text_filter")).toEqual({
+        operator: "ilike",
+        strings: ["foo"],
+    });
+
+    await contains(".o_spreadsheet_global_filters_side_panel [data-icon='close']").click();
+    expect(model.getters.getGlobalFilterValue("text_filter")).toEqual(undefined);
+});
+
+test("Clearing the global filter value keeps the default value visible in the edit panel", async () => {
+    const { model } = await createSpreadsheetWithPivot();
+    await mountSpreadsheet(model);
+    addGlobalFilterWithoutReload(model, {
+        id: "text_filter",
+        type: "text",
+        label: "Name",
+        defaultValue: { operator: "in", strings: ["foo"] },
+    });
+    await contains(".o_topbar_filter_icon").click();
+    await waitFor(".o_spreadsheet_global_filters_side_panel");
+    await contains(".o_spreadsheet_global_filters_side_panel [data-icon='close']").click();
+
+    await contains(".o_spreadsheet_global_filters_side_panel .o-button-icon").click();
+    await contains(".o-menu-item[title='Edit']").click();
+    await waitFor(".o_spreadsheet_filter_editor_side_panel");
+    expect(".o_spreadsheet_filter_editor_side_panel .o-select").toHaveText("is in");
+    expect(".o_tag_badge_text").toHaveText("foo");
+});
+
+describe("Global filter cog menu", () => {
+    const FILTER_PANEL_SECTION = ".o_spreadsheet_global_filters_side_panel .o-section";
+    const COG_BUTTON = `${FILTER_PANEL_SECTION} .o-button-icon`;
+
+    async function setupSpreadsheetWithGlobalFilter() {
+        const { model } = await createSpreadsheetWithPivot();
+        await mountSpreadsheet(model);
+        addGlobalFilterWithoutReload(model, {
+            id: "42",
+            type: "date",
+            label: "My filter",
+        });
+        await contains(".o_topbar_filter_icon").click();
+        return model;
+    }
+
+    test("Edit action opens the editor panel", async function () {
+        await setupSpreadsheetWithGlobalFilter();
+        await contains(target.querySelector(COG_BUTTON)).click();
+        await contains(".o-menu-item[title='Edit']").click();
+        expect(".o-sidePanel .o_spreadsheet_filter_editor_side_panel").toHaveCount(1);
+    });
+
+    test("Delete action removes the global filter", async function () {
+        const model = await setupSpreadsheetWithGlobalFilter();
+        expect(model.getters.getGlobalFilter("42")).not.toBe(undefined);
+        expect(target.querySelectorAll(FILTER_PANEL_SECTION)).toHaveLength(2);
+
+        await contains(target.querySelector(COG_BUTTON)).click();
+        await contains(".o-menu-item[title='Delete']").click();
+        expect(model.getters.getGlobalFilter("42")).toBe(undefined);
+        expect(target.querySelectorAll(FILTER_PANEL_SECTION)).toHaveLength(1);
+    });
 });
 
 describe("integration", () => {

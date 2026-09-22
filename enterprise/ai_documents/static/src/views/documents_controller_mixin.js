@@ -1,3 +1,4 @@
+import { STATIC_COG_GROUP_ACTION_BASE } from "@documents/views/cog_menu/documents_cog_menu_group";
 import { _t } from "@web/core/l10n/translation";
 
 export const AiDocumentsControllerMixin = () => ({
@@ -22,10 +23,10 @@ export const AiDocumentsControllerMixin = () => ({
                 isAvailable: () =>
                     this.env.searchModel.getSelectedFolder()?.ai_has_sort_prompt &&
                     this.aiSortableDocuments().length,
-                sequence: 55,
+                sequence: 0,
                 description: _t("Sort With AI"),
                 callback: async () => this.onClickAutoSort(),
-                groupNumber: 1,
+                groupNumber: STATIC_COG_GROUP_ACTION_BASE,
             },
         };
     },

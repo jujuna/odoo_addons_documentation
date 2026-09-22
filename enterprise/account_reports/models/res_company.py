@@ -5,6 +5,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
+from odoo.fields import Domain
 from ..models.account_return import PERIODS
 
 
@@ -17,6 +18,14 @@ class ResCompany(models.Model):
         help='When ticked, totals and subtotals appear below the sections of the report.',
         readonly=False)
 
+    account_reports_negative_format = fields.Selection(
+        selection=[
+            ('parentheses', '(100)'),
+            ('minus_before', '-100'),
+        ],
+        default='minus_before',
+        string='Negative amount display',
+    )
     account_return_periodicity = fields.Selection(
         selection=PERIODS,
         string="Delay units",
@@ -28,7 +37,6 @@ class ResCompany(models.Model):
     account_tax_return_journal_id = fields.Many2one(
         comodel_name='account.journal',
         string='Journal',
-        inverse='_inverse_account_tax_return_journal_id',
         domain=[('type', '=', 'general')],
         check_company=True,
     )
@@ -52,8 +60,51 @@ class ResCompany(models.Model):
         for company in self:
             company.totals_below_sections = company.anglo_saxon_accounting
 
-    def _inverse_account_tax_return_journal_id(self):
-        self.account_tax_return_journal_id.show_on_dashboard = True
+    def _inverse_vat_disabled(self):
+        super()._inverse_vat_disabled()
+
+        for company in self.filtered(lambda c: c.vat_disabled_available):
+            company.account_tax_return_journal_id.show_on_dashboard = not (company.account_opening_date and company.vat_disabled)
+            company._toggle_account_reports_on_vat_disabled()
+            company._toggle_account_return_types_on_vat_disabled()
+
+    def _toggle_account_reports_on_vat_disabled(self, reports=None):
+        self.ensure_one()
+        vat_reports = self._get_vat_enabled_account_reports()
+        reports_to_toggle = vat_reports if reports is None else reports & vat_reports
+        if reports_to_toggle:
+            reports_to_toggle.with_company(self).active_selection = 'False' if self.vat_disabled else 'True'
+
+    def _toggle_account_return_types_on_vat_disabled(self, return_types=None):
+        self.ensure_one()
+        vat_returns = self._get_vat_enabled_account_return_types()
+        returns_to_toggle = vat_returns if return_types is None else return_types & vat_returns
+        if returns_to_toggle:
+            returns_to_toggle.with_company(self).active_selection = 'False' if self.vat_disabled else 'True'
+
+    def _get_vat_enabled_account_reports(self):
+        """
+        Returns the tax reports that needs to be toggled (activate / deactivate ) when VAT is enabled / disabled.
+        """
+        self.ensure_one()
+        ec_sales_report = self.env.ref('account_reports.generic_ec_sales_report', raise_if_not_found=False) or self.env['account.report']
+        generic_tax_report = self.env.ref('account.generic_tax_report', raise_if_not_found=False) or self.env['account.report']
+        vat_reports = ec_sales_report | generic_tax_report
+        if not vat_reports:
+            return self.env['account.report']
+        return self.env['account.report'].with_context(active_test=False).search([
+            '|',
+                ('root_report_id', 'in', vat_reports.ids),
+                ('id', 'in', vat_reports.ids),
+        ])
+
+    def _get_vat_enabled_account_return_types(self):
+        """
+        Returns the return types that needs to be toggled (activate / deactivate ) when VAT is enabled / disabled.
+        This function is a hook that needs to be overridden in localisation modules.
+        """
+        self.ensure_one()
+        return self.env['account.return.type']
 
     def _get_countries_allowing_tax_representative(self):
         """ Returns a set containing the country codes of the countries for which
@@ -76,14 +127,13 @@ class ResCompany(models.Model):
                     ('type', '=', 'general'),
                 ], limit=1)
             if not closing_journal:
-                closing_journal = self.env['account.journal'].sudo().create([{
-                    'name': self.env._('Tax Returns'),
-                    'code': 'TAX',
-                    'type': 'general',
-                    'company_id': self.id,
-                    'currency_id': self.currency_id.id,
-                    'show_on_dashboard': True,
-                }])
+                # Try reloading the chart template data to create the tax return journal with translations.
+                ChartTemplate = self.env['account.chart.template'].with_company(self)
+                ChartTemplate._load_data({
+                    'account.journal': ChartTemplate._get_account_reports_journal(self.chart_template),
+                    'res.company': ChartTemplate._get_account_reports_res_company(self.chart_template),
+                })
+                closing_journal = ChartTemplate.ref('tax_returns')
             self.account_tax_return_journal_id = closing_journal
         return self.account_tax_return_journal_id
 
@@ -100,7 +150,7 @@ class ResCompany(models.Model):
         ])
         return_types._set_default_values(companies)
 
-        self.env['account.return.type']._generate_or_refresh_all_returns(companies.root_id)
+        self.env['account.return.type'].sudo()._generate_or_refresh_all_returns(companies.root_id)
         return companies
 
     def write(self, vals):
@@ -112,11 +162,35 @@ class ResCompany(models.Model):
             self.env['account.return.type'].with_context(
                 # 2 years to make sure we cover all cases, such as yearly returns with a deadline of more than 1 year.
                 forced_date_from=self.account_opening_date - relativedelta(years=2),
-                forced_date_to=datetime.date.today() + relativedelta(years=1),
+                forced_date_to=datetime.date.today(),
             )._generate_or_refresh_all_returns(roots_to_recompute)
 
         elif set(vals) & {'account_return_periodicity', 'account_return_reminder_day', 'child_ids', 'parent_id'} and self.account_opening_date:
             self.env['account.return.type']._generate_or_refresh_all_returns(roots_to_recompute)
+
+        if any(lock_date_field in vals for lock_date_field in ('fiscalyear_lock_date', 'hard_lock_date', 'tax_lock_date')):
+            self.env.ref('account_reports.ir_cron_garbage_collect_snapshots')._trigger()
+
+        # Skip returns whose deadline is determined by the return type's 'deadline_days_delay',
+        # because changes to the company's 'account_return_reminder_day' do not affect their computed deadline.
+        if 'account_return_reminder_day' in vals:
+            domain = Domain.FALSE
+
+            for company in self:
+                return_types = self.env['account.return.type'].with_company(company).search([
+                    ('deadline_days_delay', '=', 0),
+                ])
+                if return_types:
+                    domain |= Domain([
+                        ('company_id', '=', company.id),
+                        ('is_completed', '=', False),
+                        ('type_id', 'in', return_types.ids),
+                    ])
+
+            if domain:
+                account_returns = self.env['account.return'].search(domain)
+                if account_returns:
+                    account_returns._compute_deadline()
 
         return res
 

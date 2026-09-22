@@ -45,11 +45,9 @@
             id="contract_start" position="after">
             <div id="contract_start_ae">
                 <strong class="me-2">
-                    <span t-if="eos">First Contract Date:</span>
-                    <span t-else="">Contract Start Date:</span>
+                    <span>Entry Date:</span>
                 </strong>
-                <span t-if="eos" t-field="o.employee_id.contract_date_start" />
-                <span t-else="" t-field="o.employee_id.version_id.date_start" />
+                <span t-out="o.version_id.employee_id._get_first_contract_date()"/>
             </div>
         </div>
 
@@ -57,9 +55,9 @@
             <attribute name="class" separator=" " add="d-none" />
         </div> 
         <div id="contract_type" position="after">
-            <div id="contract_end_ae" t-if="o.employee_id.version_id.date_end">
+            <div id="contract_end_ae" t-if="o.version_id.date_end">
                 <strong class="me-2">Contract End Date:</strong>
-                <span t-field="o.employee_id.version_id.date_end" />
+                <span t-field="o.employee_id.date_end" />
             </div>
         </div>
 
@@ -73,7 +71,7 @@
                     <span t-else="">Working Schedule:</span>
                 </strong>
                 <span t-if="eos" t-out="round(o.employee_id._l10n_ae_get_worked_years(), 2)"/>
-                <span t-else="" t-field="o.employee_id.version_id.hours_per_week" />
+                <span t-else="" t-field="o.employee_id.version_id.resource_calendar_id.hours_per_week" />
             </div>
             <div>
                 <strong t-if="eos" class="me-2">
@@ -83,19 +81,15 @@
             </div>
         </div>
 
-        <td id="worked_days_amount" position="attributes">
-            <attribute name="class" separator=" " add="d-none" />
-        </td>
-        <td id="worked_days_amount" position="after">
-            <td />
-        </td>
+        <th id="work_days_header_amount" position="replace"/>
+        <td id="worked_days_amount" position="replace"/>
+        <td id="worked_days_total_amount" position="replace"/>
     </template>
 
     <template id="report_payslip_ae_lang">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-set="o" t-value="o.with_context(lang=o.employee_id.lang or o.env.lang)"/>
-                <t t-call="l10n_ae_hr_payroll.report_payslip_ae" t-lang="o.env.lang"/>
+                <t t-call="l10n_ae_hr_payroll.report_payslip_ae"/>
             </t>
         </t>
     </template>

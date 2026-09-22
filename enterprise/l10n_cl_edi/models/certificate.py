@@ -1,4 +1,3 @@
-import base64
 from cryptography import x509
 
 from odoo import models, fields, api
@@ -24,9 +23,9 @@ class CertificateCertificate(models.Model):
     def _compute_subject_serial_number(self):
         ''' Compute the subject serial number when it is not manually input by the user. '''
         for certificate in self:
-            pem_certificate = certificate.with_context(bin_size=False).pem_certificate
+            pem_certificate = certificate.pem_certificate
             if not certificate.subject_serial_number and pem_certificate:
-                cert = x509.load_pem_x509_certificate(base64.b64decode(pem_certificate))
+                cert = x509.load_pem_x509_certificate(pem_certificate.content)
                 subject_serial_number = cert.subject.get_attributes_for_oid(x509.oid.NameOID.SERIAL_NUMBER)
                 if subject_serial_number:
                     certificate.subject_serial_number = subject_serial_number[0].value

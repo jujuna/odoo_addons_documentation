@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
@@ -16,7 +15,6 @@
     'data': [
         'views/event_track_views.xml'
     ],
-    'installable': True,
     'auto_install': True,
     'post_init_hook': 'post_init',
     'author': 'Odoo S.A.',

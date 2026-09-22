@@ -1,5 +1,8 @@
-import { ConnectionLostError } from "@web/core/network/rpc";
+import { ConnectionLostError, rpc } from "@web/core/network/rpc";
 import { ClientDisconnectedError } from "@odoo/o-spreadsheet";
+import { debounce } from "@web/core/utils/timing";
+
+const DEBOUNCE_TIME = 200;
 
 /**
  * This class implements the `TransportService` interface defined
@@ -25,7 +28,6 @@ export class SpreadsheetCollaborativeChannel {
      */
     constructor(env, resModel, resId, shareId, accessToken) {
         this.env = env;
-        this.orm = env.services.orm.silent;
         this.resId = resId;
         this.resModel = resModel;
         this.shareId = shareId;
@@ -46,6 +48,7 @@ export class SpreadsheetCollaborativeChannel {
                 this._handleNotification(payload);
             }
         });
+        this._debouncedSendMessage = debounce(this._sendMessage.bind(this), DEBOUNCE_TIME);
     }
 
     /**
@@ -69,13 +72,25 @@ export class SpreadsheetCollaborativeChannel {
      * @param {Object} message
      */
     async sendMessage(message) {
+        if (message.type === "CLIENT_MOVED" || message.type === "CLIENT_JOINED") {
+            return this._debouncedSendMessage(message);
+        } else {
+            return this._sendMessage(message);
+        }
+    }
+
+    async _sendMessage(message) {
         let isAccepted = false;
         try {
-            isAccepted = await this.orm.call(this.resModel, "dispatch_spreadsheet_message", [
-                this.resId,
-                message,
-                this.accessToken,
-            ]);
+            const result = await rpc(
+                `/spreadsheet/${this.resModel}/${this.resId}/dispatch`,
+                {
+                    message,
+                    access_token: this.accessToken,
+                },
+                { silent: true }
+            );
+            isAccepted = result?.accepted;
         } catch (e) {
             if (e instanceof ConnectionLostError) {
                 throw new ClientDisconnectedError("", { cause: e });
@@ -92,6 +107,7 @@ export class SpreadsheetCollaborativeChannel {
      * Stop listening new messages
      */
     leave() {
+        this._debouncedSendMessage.cancel();
         this._listener = undefined;
     }
 
@@ -119,8 +135,8 @@ export class SpreadsheetCollaborativeChannel {
         // but the server will actually push to channel [{dbname},  {resModel}, {resId}]
         // The user can listen to this channel only if he has the required read access.
         const channel = `spreadsheet_collaborative_session:${this.resModel}:${this.resId}`;
-        if (this.shareId && this.accessToken) {
-            return `${channel}:${this.shareId}:${this.accessToken}`;
+        if (this.accessToken) {
+            return `${channel}:${this.shareId ?? 0}:${this.accessToken}`;
         }
         return channel;
     }

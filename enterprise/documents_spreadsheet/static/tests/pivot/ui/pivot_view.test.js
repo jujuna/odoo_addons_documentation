@@ -14,8 +14,8 @@ import { SpreadsheetAction } from "@documents_spreadsheet/bundle/actions/spreads
 import { beforeEach, expect, getFixture, test } from "@odoo/hoot";
 import { pointerDown } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
-import { Model, constants, helpers } from "@odoo/o-spreadsheet";
-import { selectCell, setCellContent } from "@spreadsheet/../tests/helpers/commands";
+import { Model, constants, helpers, stores } from "@odoo/o-spreadsheet";
+import { createSheet, selectCell, setCellContent } from "@spreadsheet/../tests/helpers/commands";
 import { Partner, Product, ResUsers } from "@spreadsheet/../tests/helpers/data";
 import {
     getCellContent,
@@ -45,33 +45,36 @@ import { user } from "@web/core/user";
 import { WebClient } from "@web/webclient/webclient";
 
 const { sanitizeSheetName, toCartesian, toZone } = helpers;
+const { ViewportsStore } = stores;
 
 defineDocumentSpreadsheetModels();
 defineDocumentSpreadsheetTestAction();
 
-const { PIVOT_TABLE_CONFIG } = constants;
+const { PIVOT_STATIC_TABLE_CONFIG, PIVOT_INSERT_TABLE_STYLE_ID } = constants;
 
 beforeEach(() => {
     ResUsers._records = getDocumentBasicData().models["res.users"].records;
 });
 
-function getGridIconEventPosition(model, xc) {
+function getGridIconEventPosition(env, xc) {
+    const viewStore = env.getStore(ViewportsStore);
     const position = toCartesian(xc);
-    const sheetId = model.getters.getActiveSheetId();
-    const icon = model.getters.getCellIcons({ sheetId, ...position })[0];
+    const sheetId = env.model.getters.getActiveSheetId();
+    const icon = env.model.getters.getCellIcons({ sheetId, ...position })[0];
     if (!icon) {
         throw new Error(`No icon inside cell ${xc}`);
     }
     const gridPosition = getFixture().querySelector(".o-grid-overlay").getBoundingClientRect();
-    const gridOffset = model.getters.getGridOffset();
-    const rect = model.getters.getCellIconRect(icon, model.getters.getRect(toZone(xc)));
+    const gridOffset = viewStore.gridOffset;
+    const cellRect = viewStore.viewports.getRect(sheetId, toZone(xc));
+    const rect = env.model.getters.getCellIconRect(icon, cellRect);
     const x = rect.x + rect.width / 2 - gridOffset.x + gridPosition.x;
     const y = rect.y + rect.height / 2 - gridOffset.y + +gridPosition.y;
     return { x, y };
 }
 
-async function clickGridIcon(model, xc) {
-    const { x, y } = getGridIconEventPosition(model, xc);
+async function clickGridIcon(env, xc) {
+    const { x, y } = getGridIconEventPosition(env, xc);
     await pointerDown(".o-grid-overlay", { position: { x, y } });
 }
 
@@ -271,6 +274,7 @@ test("groupby date field without interval defaults to month", async () => {
         rows: [{ fieldName: "date", granularity: "month" }],
         name: "Partners by Foo",
         type: "ODOO",
+        style: { tableStyleId: PIVOT_INSERT_TABLE_STYLE_ID },
     });
     expect(getCellContent(model, "A3")).toBe('=PIVOT.HEADER(1,"date:month",DATE(2016,4,1))');
     expect(getCellContent(model, "A4")).toBe('=PIVOT.HEADER(1,"date:month",DATE(2016,10,1))');
@@ -332,6 +336,7 @@ test("groupby date field on row gives correct name", async () => {
         rows: [{ fieldName: "date", granularity: "month" }],
         name: "Partners by Date",
         type: "ODOO",
+        style: { tableStyleId: PIVOT_INSERT_TABLE_STYLE_ID },
     });
 });
 
@@ -601,7 +606,7 @@ test("Can save a pivot in existing spreadsheet", async () => {
 
 test("Add pivot sheet at the end of existing sheets", async () => {
     const model = new Model();
-    model.dispatch("CREATE_SHEET", { sheetId: "42", position: 1, name: "My Sheet" });
+    createSheet(model, { sheetId: "42", position: 1, name: "My Sheet" });
     const models = getBasicData();
     models["documents.document"].records = [
         {
@@ -679,7 +684,7 @@ test("Add pivot in spreadsheet with already the same sheet name", async () => {
     expect(".o-sheet").toHaveCount(2, { message: "it should have a second sheet" });
     const sheets = fixture.querySelectorAll(".o-sheet");
     expect(sheets[0]).toHaveText("Partners by Foo (Pivot #1)");
-    expect(sheets[1]).toHaveText("Sheet1");
+    expect(sheets[1]).toHaveText("Partners by Foo (Pivot #1) (1)");
 });
 
 test("pivot with a domain", async () => {
@@ -1253,7 +1258,7 @@ test("Inserted pivot is inserted with a table", async function () {
     expect(tables.length).toBe(1);
     expect(tables[0].range.zone).toEqual(pivotZone);
     expect(tables[0].type).toBe("static");
-    expect(tables[0].config).toEqual({ ...PIVOT_TABLE_CONFIG, numberOfHeaders: 1 });
+    expect(tables[0].config).toEqual({ ...PIVOT_STATIC_TABLE_CONFIG, numberOfHeaders: 1 });
 });
 
 test("The table has the correct number of headers when inserting a pivot", async function () {
@@ -1283,7 +1288,7 @@ test("The table has the correct number of headers when inserting a pivot", async
 });
 
 test("Can collapse pivot header group", async function () {
-    const { model } = await createSpreadsheetFromPivotView({
+    const { model, env } = await createSpreadsheetFromPivotView({
         serverData: {
             models: getBasicData(),
             views: {
@@ -1300,7 +1305,7 @@ test("Can collapse pivot header group", async function () {
     selectCell(model, "A20");
     await animationFrame();
     setCellContent(model, "A20", "=PIVOT(1)");
-    await clickGridIcon(model, "B20");
+    await clickGridIcon(env, "B20");
 
     const [pivotId] = model.getters.getPivotIds();
     const definition = model.getters.getPivotCoreDefinition(pivotId);
@@ -1316,4 +1321,28 @@ test("Can collapse pivot header group", async function () {
         ["",                                "Probability",  "Probability"],
         ["Total",                           131,            131],
     ]);
+});
+
+test("when inserting a pivot in spreadsheet with a monetary measure, the aggregator is sum_currency", async () => {
+    const { model } = await createSpreadsheetFromPivotView({
+        serverData: {
+            models: getBasicData(),
+            views: {
+                "partner,false,pivot": /* xml */ `
+                            <pivot>
+                                <field name="pognon" type="measure"/>
+                                <field name="probability" type="col"/>
+                            </pivot>`,
+                "partner,false,search": /* xml */ `<search/>`,
+            },
+        },
+    });
+
+    const [pivotId] = model.getters.getPivotIds();
+    const definition = model.getters.getPivotCoreDefinition(pivotId);
+    expect(definition.measures[0]).toEqual({
+        id: "pognon:sum_currency",
+        fieldName: "pognon",
+        aggregator: "sum_currency",
+    });
 });

@@ -1,5 +1,6 @@
-import { onWillUnmount, status, useComponent, useEffect, useEnv } from "@odoo/owl";
+import { onMounted, onWillUnmount, useScope } from "@odoo/owl";
 import { getEndOfLocalWeek, getStartOfLocalWeek } from "@web/core/l10n/dates";
+import { localization } from "@web/core/l10n/localization";
 import { makePopover, usePopover } from "@web/core/popover/popover_hook";
 import { makeDraggableHook } from "@web/core/utils/draggable_hook_builder_owl";
 import { useService } from "@web/core/utils/hooks";
@@ -50,7 +51,7 @@ export function dateAddFixedOffset(date, plusParams) {
 }
 
 export function diffColumn(col1, col2, unit) {
-    return col2.diff(col1, unit).values[`${unit}s`];
+    return Math.round(col2.diff(col1, unit).values[`${unit}s`]);
 }
 
 export function localStartOf(date, unit) {
@@ -177,7 +178,7 @@ export function getClosestCell(ctx, rowId) {
         const selector = rowId
             ? `.o_gantt_cells .o_gantt_cell:not(.o_drag_hover)[data-row-id='${CSS.escape(rowId)}']`
             : `.o_gantt_cells .o_gantt_cell:not(.o_drag_hover)`;
-        cell = getClosest(ref.el.querySelectorAll(selector), pointer);
+        cell = getClosest(ref().querySelectorAll(selector), pointer);
         part = getHoveredCellPart(cell, pointer.x, scale.cellPart, rtl);
     }
     return { cell, part };
@@ -196,7 +197,7 @@ export function useMultiHover({ ref, selector, exception, related, className }) 
      * @param {HTMLElement} el
      */
     const findSiblings = (el) =>
-        ref.el.querySelectorAll(
+        ref().querySelectorAll(
             related
                 .map((attr) => `[${attr}='${el.getAttribute(attr).replace(/'/g, "\\'")}']`)
                 .join("")
@@ -227,27 +228,30 @@ export function useMultiHover({ ref, selector, exception, related, className }) 
     const classList = className.split(/\s+/g);
     const classedEls = new Set();
 
-    useEffect(
-        (...targets) => {
-            if (targets.length) {
-                for (const target of targets) {
-                    target.addEventListener("pointerenter", onPointerEnter);
-                    target.addEventListener("pointerleave", onPointerLeave);
-                }
-                return () => {
-                    for (const el of classedEls) {
-                        el.classList.remove(...classList);
-                    }
-                    classedEls.clear();
-                    for (const target of targets) {
-                        target.removeEventListener("pointerenter", onPointerEnter);
-                        target.removeEventListener("pointerleave", onPointerLeave);
-                    }
-                };
-            }
-        },
-        () => [...ref.el.querySelectorAll(selector)]
-    );
+    const handlePointerOver = (ev) => {
+        const entered = ev.target.closest(selector);
+        if (entered && ev.relatedTarget?.closest(selector) !== entered) {
+            onPointerEnter({ target: entered });
+        }
+    };
+    const handlePointerOut = (ev) => {
+        const left = ev.target.closest(selector);
+        if (left && ev.relatedTarget?.closest(selector) !== left) {
+            onPointerLeave({ target: left });
+        }
+    };
+    onMounted(() => {
+        ref().addEventListener("pointerover", handlePointerOver);
+        ref().addEventListener("pointerout", handlePointerOut);
+    });
+    onWillUnmount(() => {
+        for (const el of classedEls) {
+            el.classList.remove(...classList);
+        }
+        classedEls.clear();
+        ref().removeEventListener("pointerover", handlePointerOver);
+        ref().removeEventListener("pointerout", handlePointerOut);
+    });
 }
 
 const NB_GANTT_RECORD_COLORS = 12;
@@ -346,21 +350,18 @@ export const useGanttConnectorDraggable = makeDraggableHook({
     name: "useGanttConnectorDraggable",
     acceptedParams: {
         parentWrapper: [String],
+        getRowHeaderWidth: [Function],
     },
     onComputeParams({ ctx, params }) {
         ctx.parentWrapper = params.parentWrapper;
+        ctx.getRowHeaderWidth = params.getRowHeaderWidth;
         ctx.followCursor = false;
     },
-    onDragStart: ({ ctx, addStyle }) => {
+    onDragStart: ({ ctx }) => {
         const { current } = ctx;
         const parent = current.element.closest(ctx.parentWrapper);
         if (!parent) {
             return;
-        }
-        for (const otherParent of ctx.ref.el.querySelectorAll(ctx.parentWrapper)) {
-            if (otherParent !== parent) {
-                addStyle(otherParent, { pointerEvents: "auto" });
-            }
         }
         return { sourcePill: parent, ...current.connectorCenter };
     },
@@ -378,8 +379,10 @@ export const useGanttConnectorDraggable = makeDraggableHook({
         }
         return { target: targetParent };
     },
-    onWillStartDrag: ({ ctx }) => {
+    onWillStartDrag: ({ ctx, addClass }) => {
         ctx.current.connectorCenter = getElementCenter(ctx.current.element);
+        ctx.edgeScrolling.offsets = { offsetLeft: ctx.getRowHeaderWidth() };
+        addClass(ctx.ref(), "pe-auto");
         return {};
     },
 });
@@ -409,29 +412,31 @@ export const useGanttDraggable = makeDraggableHook({
     acceptedParams: {
         cells: [String, Function],
         cellDragClassName: [String, Function],
-        ghostClassName: [String, Function],
+        enableEdgeScrolling: [Function],
         hoveredCell: [Object],
+        scrollRef: [Function],
         addStickyCoordinates: [Function],
+        getRowHeaderWidth: [Function],
         rtl: [Boolean, Function],
         scale: [Object, Function],
         getBadgesInitialDates: [Function],
     },
     onComputeParams({ ctx, params }) {
         ctx.cellSelector = params.cells;
-        ctx.ghostClassName = params.ghostClassName;
         ctx.cellDragClassName = params.cellDragClassName;
         ctx.hoveredCell = params.hoveredCell;
+        ctx.scrollRef = params.scrollRef;
         ctx.addStickyCoordinates = params.addStickyCoordinates;
+        ctx.getRowHeaderWidth = params.getRowHeaderWidth;
+        ctx.preventDrag = () => !ctx.hoveredCell.el;
         ctx.scale = params.scale;
         ctx.getBadgesInitialDates = params.getBadgesInitialDates;
         ctx.rtl = params.rtl;
+        ctx.enableEdgeScrolling = params.enableEdgeScrolling;
     },
     onDragStart({ ctx }) {
-        const { current, ghostClassName } = ctx;
+        const { current } = ctx;
         current.element.before(current.placeHolder);
-        if (ghostClassName) {
-            current.placeHolder.classList.add(ghostClassName);
-        }
         return { pill: current.element };
     },
     onDrag({ ctx, addStyle }) {
@@ -480,15 +485,13 @@ export const useGanttDraggable = makeDraggableHook({
             }
         } else {
             current.cell.col = null;
+            current.cellGhost.remove();
+            return {};
         }
 
-        // Attach or remove cell ghost
+        // Attach cell ghost
         if (isDifferentCell) {
-            if (cell) {
-                cell.after(current.cellGhost);
-            } else {
-                current.cellGhost.remove();
-            }
+            cell.after(current.cellGhost);
         }
         const { cellTime, time } = scale;
         const { start, stop } = getBadgesInitialDates();
@@ -501,7 +504,12 @@ export const useGanttDraggable = makeDraggableHook({
         return { pill: ctx.current.element };
     },
     onDrop({ ctx }) {
-        const { cellSrc, cell, element, initialCol } = ctx.current;
+        const { current, pointer } = ctx;
+        const { cellSrc, cell, element, initialCol } = current;
+        const dropTarget = document.elementFromPoint(pointer.x, pointer.y);
+        if (dropTarget && dropTarget.closest(".o_gantt_unschedule_zone")) {
+            return { unschedule: true, pill: element };
+        }
         if (cell.col !== null) {
             return {
                 pill: element,
@@ -511,11 +519,13 @@ export const useGanttDraggable = makeDraggableHook({
             };
         }
     },
-    onWillStartDrag({ ctx, addCleanup, addClass }) {
-        const { current } = ctx;
+    onWillStartDrag({ ctx, addCleanup, addClass, addStyle, removeClass }) {
+        ctx.edgeScrolling.enabled = ctx.enableEdgeScrolling();
+        const { current, ref } = ctx;
         const { el: cell, part } = ctx.hoveredCell;
 
         current.placeHolder = current.element.cloneNode(true);
+        addStyle(current.placeHolder, { opacity: 0.5 });
         current.cellGhost = document.createElement("div");
         current.cellGhost.className = ctx.cellDragClassName;
         current.cell = { el: null, index: null, part: 0 };
@@ -546,12 +556,151 @@ export const useGanttDraggable = makeDraggableHook({
         current.maxGridColumnStart = highestGridCol - pillSpan;
         current.gridColumnOffset = pGridColumnStart - cGridColumnStart;
         current.pillSpan = pillSpan;
+        ctx.edgeScrolling.offsets = { offsetLeft: ctx.getRowHeaderWidth() };
+        ctx.edgeScrolling.scrollingElement = ctx.scrollRef();
 
-        addClass(ctx.ref.el, "pe-auto");
+        const pillId = current.element.dataset.pillId;
+        current.pillBuffer = ref().querySelector(`.o_gantt_pill_buffer[data-pill-id="${pillId}"`);
+        if (current.pillBuffer) {
+            addClass(current.pillBuffer, "d-none");
+        }
+
+        addClass(ref(), "pe-auto");
         addCleanup(() => {
             current.placeHolder.remove();
             current.cellGhost.remove();
+            if (current.pillBuffer) {
+                removeClass(current.pillBuffer, "d-none");
+            }
         });
+        return { addCleanup };
+    },
+});
+
+export const useGanttSchedulable = makeDraggableHook({
+    name: "useGanttSchedulable",
+    acceptedParams: {
+        cells: [String, Function],
+        cellDragClassName: [String, Function],
+        hoveredCell: [Object],
+        addStickyCoordinates: [Function],
+        rtl: [Boolean, Function],
+        scale: [Object, Function],
+    },
+    onComputeParams({ ctx, params }) {
+        ctx.cellSelector = params.cells;
+        ctx.cellDragClassName = params.cellDragClassName;
+        ctx.hoveredCell = params.hoveredCell;
+        ctx.addStickyCoordinates = params.addStickyCoordinates;
+        ctx.scale = params.scale;
+        ctx.rtl = params.rtl;
+    },
+    onDragStart({ ctx }) {
+        const { current } = ctx;
+        current.element.before(current.placeHolder);
+        return {};
+    },
+    onDrag({ ctx, addStyle }) {
+        const { cellSelector, current, hoveredCell } = ctx;
+        let { el: cell, part } = hoveredCell;
+        if (cell && !cell.matches(cellSelector)) {
+            cell = null; // Not a cell
+        }
+        if (cell && cell.classList.contains("o_gantt_cell_folded")) {
+            return;
+        }
+        if (!current.cell.el) {
+            if (cell) {
+                current.cellGhost = document.createElement("div");
+                current.cellGhost.className = ctx.cellDragClassName;
+            } else {
+                return {};
+            }
+        } else if (!cell) {
+            current.cell.el = null;
+            current.cell.part = -1;
+            current.cellGhost.remove();
+            current.cell.col = null;
+            return {};
+        }
+
+        const isDifferentCell = cell !== current.cell.el;
+        const isDifferentPart = part !== current.cell.part;
+
+        current.cell.el = cell;
+        current.cell.part = part;
+
+        // Recompute cell style if in a different cell
+        const { defaultPillSpan } = ctx;
+        if (isDifferentCell) {
+            const style = getComputedStyle(cell);
+            current.cell.gridRow = style.getPropertyValue("grid-row");
+            current.cell.gridColumnStart = getColumnStart(style) + current.gridColumnOffset;
+        }
+        // Assign new grid coordinates if in different cell or different cell part
+        if (isDifferentCell || isDifferentPart) {
+            const { gridRow, gridColumnStart: start } = current.cell;
+            const gridColumnStart = clamp(start + part, 1, current.maxGridColumnStart);
+            const gridColumnEnd = gridColumnStart + defaultPillSpan;
+
+            addStyle(current.cellGhost, {
+                gridRow,
+                gridColumn: `c${gridColumnStart} / c${gridColumnEnd}`,
+            });
+            const [gridRowStart, gridRowEnd] = /r(\d+) \/ r(\d+)/g.exec(gridRow).slice(1);
+            ctx.addStickyCoordinates([gridRowStart, gridRowEnd], [gridColumnStart, gridColumnEnd]);
+            current.cell.col = gridColumnStart;
+        }
+
+        // Attach cell ghost
+        if (isDifferentCell) {
+            cell.after(current.cellGhost);
+        }
+        return {
+            cellGhost: current.cellGhost,
+            startCol: current.cell.col,
+            endCol: current.cell.col + defaultPillSpan,
+        };
+    },
+    onDragEnd() {
+        return {};
+    },
+    onDrop({ ctx }) {
+        const { current, defaultPillSpan } = ctx;
+        const { cell, resId } = current;
+        if (cell.el) {
+            return {
+                resId,
+                startCol: cell.col,
+                endCol: cell.col + defaultPillSpan,
+                rowId: cell.el.dataset.rowId,
+            };
+        }
+    },
+    onWillStartDrag({ ctx, addCleanup, addClass, addStyle, getRect }) {
+        const { current } = ctx;
+        current.cell = { el: null, part: -1 };
+        ctx.defaultPillSpan = ctx.scale.cellPart;
+        current.gridColumnOffset = -Math.round(ctx.defaultPillSpan / 2) + 1;
+        const gridStyle = getComputedStyle(ctx.ref().querySelector(".o_gantt_cells"));
+        const gridTemplateColumns = gridStyle.getPropertyValue("grid-template-columns");
+        current.placeHolder = current.element.cloneNode(true);
+
+        let highestGridCol;
+        for (const e of gridTemplateColumns.split(/\s+/).reverse()) {
+            const res = /\[c(\d+)\]/g.exec(e);
+            if (res) {
+                highestGridCol = +res[1];
+                break;
+            }
+        }
+        current.resId = Number(current.element.dataset.resId);
+        current.maxGridColumnStart = highestGridCol - ctx.scale.cellPart;
+        addCleanup(() => {
+            current.cellGhost?.remove();
+            current.placeHolder.remove();
+        });
+        addClass(ctx.ref(), "pe-auto");
         return {};
     },
 });
@@ -568,7 +717,7 @@ export const useGanttUndraggable = makeDraggableHook({
         const { x, y, width, height } = getRect(ctx.current.element);
         ctx.current.container = document.createElement("div");
 
-        addClass(ctx.ref.el, "pe-auto");
+        addClass(ctx.ref(), "pe-auto");
         addStyle(ctx.current.container, {
             position: "fixed",
             left: `${x}px`,
@@ -594,6 +743,7 @@ export const useGanttResizable = makeDraggableHook({
         cells: [String, Function],
         scale: [Object, Function],
         getBadgesInitialDates: [Function],
+        getRowHeaderWidth: [Function],
         showHandles: [Function],
     },
     onComputeParams({ ctx, params, addCleanup, addEffectCleanup, getRect }) {
@@ -636,9 +786,10 @@ export const useGanttResizable = makeDraggableHook({
         ctx.hoveredCell = params.hoveredCell;
         ctx.scale = params.scale;
         ctx.getBadgesInitialDates = params.getBadgesInitialDates;
+        ctx.getRowHeaderWidth = params.getRowHeaderWidth;
         ctx.rtl = params.rtl;
 
-        for (const el of ctx.ref.el.querySelectorAll(params.elements)) {
+        for (const el of ctx.ref().querySelectorAll(params.elements)) {
             el.addEventListener("pointerenter", onElementPointerEnter);
             el.addEventListener("pointerleave", onElementPointerLeave);
             addEffectCleanup(() => {
@@ -663,7 +814,8 @@ export const useGanttResizable = makeDraggableHook({
     },
     onDragStart({ ctx, addStyle }) {
         addStyle(ctx.current.pill, { zIndex: 15 });
-        return { pill: ctx.current.pill };
+        const mode = ctx.cursor === "w-resize" ? "left_resize" : "right_resize";
+        return { pill: ctx.current.pill, mode };
     },
     onDrag({ ctx, addStyle, getRect }) {
         const { getBadgesInitialDates, current, scale, pointer, rtl } = ctx;
@@ -731,8 +883,8 @@ export const useGanttResizable = makeDraggableHook({
         const direction = current.isStart ? "start" : "end";
         return { pill: current.pill, diff: current.lastDiff, direction };
     },
-    onWillStartDrag({ ctx, addClass }) {
-        const { current, hoveredCell, pillSelector } = ctx;
+    onWillStartDrag({ ctx, addClass, addCleanup, removeClass }) {
+        const { current, hoveredCell, pillSelector, ref } = ctx;
 
         const pill = ctx.current.element.closest(pillSelector);
         current.pill = pill;
@@ -748,8 +900,20 @@ export const useGanttResizable = makeDraggableHook({
         ctx.cursor = getComputedStyle(current.element).cursor;
 
         current.isStart = current.element.classList.contains(HANDLE_CLASS_START);
+        ctx.edgeScrolling.offsets = { offsetLeft: ctx.getRowHeaderWidth() };
 
-        addClass(ctx.ref.el, "pe-auto");
+        const pillId = current.pill.dataset.pillId;
+        current.pillBuffer = ref().querySelector(`.o_gantt_pill_buffer[data-pill-id="${pillId}"`);
+        if (current.pillBuffer) {
+            addClass(current.pillBuffer, "d-none");
+        }
+
+        addClass(ref(), "pe-auto");
+        addCleanup(() => {
+            if (current.pillBuffer) {
+                removeClass(current.pillBuffer, "d-none");
+            }
+        });
         return {};
     },
 });
@@ -798,6 +962,7 @@ export const useGanttSelectable = makeDraggableHook({
         hasMultiCreate: [Boolean, Function],
         rtl: [Boolean, Function],
         scale: [Object, Function],
+        getRowHeaderWidth: [Function],
     },
     onComputeParams({ ctx, params }) {
         ctx.followCursor = false;
@@ -805,6 +970,7 @@ export const useGanttSelectable = makeDraggableHook({
         ctx.hasMultiCreate = params.hasMultiCreate;
         ctx.rtl = params.rtl;
         ctx.scale = params.scale;
+        ctx.getRowHeaderWidth = params.getRowHeaderWidth;
     },
     onWillStartDrag({ addClass, ctx }) {
         const { current, hoveredCell, ref } = ctx;
@@ -813,7 +979,8 @@ export const useGanttSelectable = makeDraggableHook({
         current.initialCellBounds = cellBounds;
         current.cellBounds = cellBounds;
         current.rowId = ctx.hasMultiCreate ? null : cell.dataset.rowId;
-        addClass(ref.el, "pe-auto");
+        ctx.edgeScrolling.offsets = { offsetLeft: ctx.getRowHeaderWidth() };
+        addClass(ref(), "pe-auto");
         addClass(cell, "pe-auto");
         return getResult(current);
     },
@@ -850,16 +1017,16 @@ export const useGanttSelectable = makeDraggableHook({
  * Same as usePopover, but replaces the popover by a dialog when display size is small.
  *
  * @param {typeof import("@odoo/owl").Component} component
- * @param {import("@web/core/popover/popover_service").PopoverServiceAddOptions} [options]
+ * @param {import("@web/core/popover/popover_plugin").PopoverOptionSchema} [options]
  * @returns {import("@web/core/popover/popover_hook").PopoverHookReturnType}
  */
 export function useGanttResponsivePopover(dialogTitle, component, options = {}) {
     const dialogService = useService("dialog");
-    const env = useEnv();
-    const owner = useComponent();
+    const uiService = useService("ui");
+    const scope = useScope();
     const popover = usePopover(component, options);
     const onClose = () => {
-        if (status(owner) !== "destroyed") {
+        if (scope.status !== 3 /* destroyed */) {
             options.onClose?.();
         }
     };
@@ -867,7 +1034,7 @@ export function useGanttResponsivePopover(dialogTitle, component, options = {}) 
     const popoverInDialog = makePopover(dialogAddFn, GanttPopoverInDialog, { onClose });
     const ganttReponsivePopover = {
         open: (target, props) => {
-            if (env.isSmall) {
+            if (uiService.isSmall) {
                 popoverInDialog.open(target, {
                     component: component,
                     componentProps: props,
@@ -888,3 +1055,5 @@ export function useGanttResponsivePopover(dialogTitle, component, options = {}) 
     onWillUnmount(ganttReponsivePopover.close);
     return ganttReponsivePopover;
 }
+
+export const rtl = () => localization.direction === "rtl";

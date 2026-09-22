@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'PoS Preparation Display Restaurant',
-    'version': '1.0.0',
     'category': 'Sales/Point of Sale',
     'sequence': 7,
     'summary': 'Display Orders for Preparation stage.',
@@ -10,11 +8,11 @@
     'data': [
         'views/preparation_display_view.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'assets': {
         'pos_preparation_display.assets': [
             'pos_restaurant_preparation_display/static/src/app/**/*',
+            'pos_restaurant/static/src/app/utils/printer/generate_printer_data.js',
         ],
         'point_of_sale._assets_pos': [
             'pos_restaurant_preparation_display/static/src/override/**/*.js',
@@ -25,8 +23,16 @@
         'pos_preparation_display.assets_tour_tests': [
             'pos_restaurant_preparation_display/static/tests/tours/preparation_display/**/*',
         ],
+        'web.assets_unit_tests': [
+            'pos_restaurant_preparation_display/static/tests/unit/**/*',
+        ],
     },
     'post_init_hook': '_pos_restaurant_preparation_display_post_init',
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'other_files': [
+        # files loaded from hooks
+        'data/main_restaurant_preparation_display_data.xml',
+        'data/pos_restaurant_preparation_display_demo.xml',
+    ],
 }

@@ -1,8 +1,8 @@
-/** @odoo-module */
+import { Component, proxy, useProps } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { registry } from "@web/core/registry";
-import { Component, useState } from "@odoo/owl";
+import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
 export class EnviaServiceSelectionWidget extends Component {
     static template = "delivery_envia.EnviaServiceWidget";
@@ -10,13 +10,12 @@ export class EnviaServiceSelectionWidget extends Component {
         Dropdown,
         DropdownItem,
     };
-    static props = {
-        "*": true,
-    };
+
+    props = useProps(standardWidgetProps);
 
     setup() {
         this.all_services = this.props.record.data.available_services;
-        this.available_carriers = [... new Set(this.all_services.map(item => item.carrier_name))];
+        this.available_carriers = [...new Set(this.all_services.map((item) => item.carrier_name))];
 
         this.code = this.props.record.data.selected_service_code;
         this.carrier = this.props.record.data.selected_carrier_code;
@@ -30,14 +29,14 @@ export class EnviaServiceSelectionWidget extends Component {
             });
         }
 
-        this.state = useState({
-            'code': this.code,
-            'carrier': this.carrier,
+        this.state = proxy({
+            code: this.code,
+            carrier: this.carrier,
         });
     }
 
     get activeService() {
-        let service = this.availableServices.find(service => service.name === this.state.code);
+        let service = this.availableServices.find((service) => service.name === this.state.code);
         if (service === undefined) {
             service = this.availableServices[0];
         }
@@ -49,7 +48,9 @@ export class EnviaServiceSelectionWidget extends Component {
     }
 
     get activeCarrier() {
-        return this.available_carriers.find((carrier) => carrier == this.state.carrier).toUpperCase();
+        return this.available_carriers
+            .find((carrier) => carrier == this.state.carrier)
+            .toUpperCase();
     }
 
     _onCarrierSelected(carrier) {

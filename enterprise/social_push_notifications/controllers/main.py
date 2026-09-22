@@ -1,94 +1,74 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import requests
+import json
 
-from odoo import http, _, tools
+from odoo import http
 from odoo.http import request
+from odoo.tools import file_open
 
 
 class SocialPushNotificationsController(http.Controller):
-    @http.route('/social_push_notifications/fetch_push_configuration', type='jsonrpc', auth='public', website=True)
-    def fetch_push_configuration(self):
-        """ Fetches the firebase push configuration for the current website (if any). """
-        current_website = request.website
-        if not current_website or not current_website.firebase_enable_push_notifications:
-            return {}
+    @http.route('/social_push_notifications/service_worker.js', type='http', auth='public', methods=['GET'], readonly=True)
+    def social_push_get_service_worker(self):
+        path = 'social_push_notifications/static/src/service_worker.js'
+        with file_open(path) as f:
+            body = f.read()
+        return request.make_response(body, [
+            ('Content-Type', 'text/javascript'),
+            ('Service-Worker-Allowed', '/')
+        ])
 
-        title = current_website.notification_request_title or _("Want to discover new versions?")
-        body = current_website.notification_request_body or _("Enable push notifications to be notified about new features.")
-        delay = current_website.notification_request_delay or 3
+    @http.route('/social_push_notifications/get_vapid_public_key', type='jsonrpc', auth='public', website=True)
+    def social_push_get_vapid_public_key(self):
+        """ Fetches the server public VAPID key. """
+        vapid_public_key, _vapid_private_key = request.env['ir.config_parameter'].sudo()._get_vapid_keys()
+        return vapid_public_key
 
-        if current_website.notification_request_icon:
-            icon = '/web/image/website/%s/notification_request_icon/48x48' % current_website.id
-        else:
-            icon = '/mail/static/src/img/odoobot_transparent.png'
+    @http.route('/social_push_notifications/get_notification_request_config', type='http', auth='public', website=True, sitemap=False)
+    def social_push_get_notification_request_config(self):
+        """ Fetches the notification request config for the current website (if any). """
+        config = {}
+        if self.env.website.notification_request_title:
+            config['title'] = self.env.website.notification_request_title
+        if self.env.website.notification_request_body:
+            config['body'] = self.env.website.notification_request_body
+        if self.env.website.notification_request_delay:
+            config['delay'] = self.env.website.notification_request_delay
+        if self.env.website.notification_request_icon:
+            config['icon'] = '/web/image/website/%s/notification_request_icon/48x48' % self.env.website.id
 
-        if not current_website.firebase_use_own_account \
-           and (not current_website.firebase_project_id or
-           not current_website.firebase_web_api_key or
-           not current_website.firebase_web_app_id or
-           not current_website.firebase_push_certificate_key or
-           not current_website.firebase_sender_id):
-            self._register_iap_firebase_info(current_website)
+        return request.make_json_response(config, headers=[
+            ('Cache-Control', f'public, max-age={60 * 60 * 24 * 7}')  # cache for 7 days
+        ])
 
-        return {
-            'notification_request_title': title,
-            'notification_request_body': body,
-            'notification_request_delay': delay,
-            'notification_request_icon': icon,
-            'firebase_project_id': current_website.firebase_project_id,
-            'firebase_web_api_key': current_website.firebase_web_api_key,
-            'firebase_web_app_id': current_website.firebase_web_app_id,
-            'firebase_push_certificate_key': current_website.firebase_push_certificate_key,
-            'firebase_sender_id': current_website.firebase_sender_id
+    @http.route('/social_push_notifications/save_push_subscription', type='jsonrpc', auth='public', website=True)
+    def social_push_save_push_subscription(self, endpoint, keys):
+        visitor_sudo = request.env['ir.http']._get_visitor_from_request(force_create=True)
+        push_subscription = request.env['website.visitor.push.subscription'].sudo().search([
+            ('endpoint', '=', endpoint)], limit=1)
+        push_subscription_values = {
+            'keys': json.dumps(keys),
+            'website_visitor_id': visitor_sudo.id
         }
-
-    def _register_iap_firebase_info(self, current_website):
-        social_iap_endpoint = request.env['ir.config_parameter'].sudo().get_param(
-            'social.social_iap_endpoint',
-            request.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
-        )
-        result = requests.get(tools.urls.urljoin(social_iap_endpoint, 'iap/social_push_notifications/get_firebase_info'),
-            params={
-                'db_uuid': request.env['ir.config_parameter'].sudo().get_param('database.uuid')
-            },
-            timeout=5
-        )
-
-        if result.status_code == 200:
-            result_json = result.json()
-            current_website.sudo().write({
-                'firebase_project_id': result_json['firebase_project_id'],
-                'firebase_web_api_key': result_json['firebase_web_api_key'],
-                'firebase_web_app_id': result_json['firebase_web_app_id'],
-                'firebase_push_certificate_key': result_json['firebase_push_certificate_key'],
-                'firebase_sender_id': result_json['firebase_sender_id'],
+        if push_subscription:
+            push_subscription.write(push_subscription_values)
+        else:
+            push_subscription.create({
+                **push_subscription_values,
+                'endpoint': endpoint
             })
 
-    @http.route('/social_push_notifications/register', type='jsonrpc', auth='public', website=True)
-    def register(self, token):
-        """ Store the firebase token on the website visitor.
-        If the visitor does not exists yet, create one and return the signed website.visitor id
-        to store it in cookie.
-
-        Will also clean the token from other visitors if necessary. """
-
-        res = {}
-
-        Visitor = request.env['website.visitor'].sudo()
-        visitor_sudo = Visitor._get_visitor_from_request(force_create=True)
-        visitor_sudo._register_push_subscription(token)
-
-        return res
-
-    @http.route('/social_push_notifications/unregister', type='jsonrpc', auth='public')
-    def unregister(self, token):
-        if token:
-            visitor_sudo = request.env['website.visitor'].sudo()._get_visitor_from_request()
-            subscription_sudo = visitor_sudo.push_subscription_ids.filtered(lambda subscription:
-                subscription.push_token == token)
-            subscription_sudo.unlink()
+    @http.route('/social_push_notifications/is_push_subscription_registered', type='jsonrpc', auth='public', website=True)
+    def social_push_is_push_subscription_registered(self, endpoint, keys):
+        visitor_sudo = request.env['ir.http']._get_visitor_from_request()
+        if not visitor_sudo:
+            return False
+        return request.env['website.visitor.push.subscription'].sudo().search_count([
+            ('endpoint', '=', endpoint),
+            ('keys', '=', json.dumps(keys)),
+            ('website_visitor_id', '=', visitor_sudo.id),
+        ], limit=1) > 0
 
     @http.route('/social_push_notifications/social_post/<int:post_id>/push_notification_image', type='http', auth='public')
     def social_push_get_notification_image(self, post_id):

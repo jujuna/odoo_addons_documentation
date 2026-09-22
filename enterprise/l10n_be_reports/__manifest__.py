@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -11,6 +10,7 @@ Accounting reports for Belgium
     'depends': [
         'l10n_be',
         'account_reports',
+        'certificate',
     ],
     'data': [
         'views/annual_statement_views.xml',
@@ -21,9 +21,15 @@ Accounting reports for Belgium
         'views/l10n_be_vendor_partner_views.xml',
         'views/res_partner_views.xml',
         'views/res_company_views.xml',
+        'views/res_config_settings_views.xml',
         'views/account_return_views.xml',
         'views/account_audit_views.xml',
+        'views/account_move_views.xml',
+        'views/account_journal_views.xml',
+        'views/account_return_check_views.xml',
+        'views/isoc_prepayment_pay_form.xml',
         'wizard/vat_pay_wizard.xml',
+        'data/cron.xml',
         'data/profit_and_loss_comp_a.xml',
         'data/profit_and_loss_comp_f.xml',
         'data/profit_and_loss_asso_a.xml',
@@ -44,26 +50,23 @@ Accounting reports for Belgium
         'data/l10n_be.company.type.csv',
         'data/mail_templates.xml',
         'data/xbrl_templates/l10n_be_xbrl_template.xml',
+        'data/xbrl_templates/l10n_be_xbrl_template_disclosure.xml',
         'data/xbrl_templates/l10n_be_xbrl_template_acap.xml',
         'data/xbrl_templates/l10n_be_xbrl_template_fcap.xml',
         'data/xbrl_templates/l10n_be_xbrl_template_acon.xml',
         'data/xbrl_templates/l10n_be_xbrl_template_fcon.xml',
         'data/xbrl_templates/l10n_be_xbrl_template_asso_a.xml',
         'data/xbrl_templates/l10n_be_xbrl_template_asso_f.xml',
-        'security/ir.model.access.csv',
-        'security/account_325_security_rules.xml',
         'report/l10n_be_281_50_pdf_templates.xml',
         'report/l10n_be_281_50_xml_templates.xml',
         'report/l10n_be_325_pdf_templates.xml',
-        'wizard/isoc_prepayment_pay_wizard.xml',
         'wizard/annual_corporate_tax_submission_wizard.xml',
         'wizard/vat_listing_submission_wizard.xml',
         'wizard/ec_sales_list_submission_wizard.xml',
-        'wizard/vat_return_lock_wizard.xml',
         'wizard/xbrl_export_wizard_view.xml',
         'data/account_return_check_template.xml',
+        'security/ir.access.csv',
     ],
-    'installable': True,
     'post_init_hook': '_l10n_be_reports_post_init',
     'auto_install': ['l10n_be', 'account_reports'],
     'website': 'https://www.odoo.com/app/accounting',
@@ -73,5 +76,14 @@ Accounting reports for Belgium
         'web.assets_backend': [
             'l10n_be_reports/static/src/components/**/*',
         ],
+    },
+    'demo': [
+        'demo/demo_company.xml',
+    ],
+    'external_dependencies': {
+        'python': ['pyjwt'],
+        'apt': {
+            'pyjwt': 'python3-jwt',
+        },
     },
 }

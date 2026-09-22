@@ -30,6 +30,7 @@ const calendarMountParams = {
         <calendar
             date_start="planned_date_start"
             date_stop="date_deadline"
+            schedule="1"
             event_open_popup="1"
             mode="month"
             js_class="project_task_calendar"
@@ -42,18 +43,20 @@ const calendarMountParams = {
 test("Drag and drop task to schedule in month scale", async () => {
     let expectedDate = null;
 
-    onRpc("project.task", "search_read", ({ method }) => {
-        expect.step(method);
+    onRpc("project.task", "search_read", () => {
+        expect.step("search_read");
     });
-    onRpc("project.task", "web_search_read", ({ method }) => {
+    onRpc("project.task", "web_search_read", () => {
         expect.step("fetch tasks to schedule");
     });
     onRpc("project.task", "plan_task_in_calendar", ({ args }) => {
         const [taskIds, vals] = args;
         expect(taskIds).toEqual([1]);
+        const dateStart = expectedDate.set({ hours: 7 });
         const dateDeadline = expectedDate.set({ hours: 19 });
         expect(vals).toEqual({
             date_deadline: serializeDateTime(dateDeadline),
+            planned_date_start: serializeDateTime(dateStart),
         });
         expect.step("plan task");
     });
@@ -61,14 +64,20 @@ test("Drag and drop task to schedule in month scale", async () => {
         ...calendarMountParams,
         context: { default_project_id: 1 },
     });
-    expect(".o_task_to_plan_draggable").toHaveCount(2);
-    const { drop, moveTo } = await contains(".o_task_to_plan_draggable:first").drag();
+    expect(".o_event_to_schedule_draggable").toHaveCount(3);
+    const { drop, moveTo } = await contains(".o_event_to_schedule_draggable:first").drag();
     const dateCell = queryFirst(".fc-day.fc-day-today.fc-daygrid-day");
     expectedDate = luxon.DateTime.fromISO(dateCell.dataset.date);
     await moveTo(dateCell);
-    expect(dateCell).toHaveClass("o-highlight");
+    expect(queryFirst(".fc-highlight", { root: dateCell })).toHaveCount(1);
     await drop();
-    expect.verifySteps(["search_read", "fetch tasks to schedule", "plan task", "search_read"]);
-    expect(".o_task_to_plan_draggable").toHaveCount(1);
-    expect(".o_task_to_plan_draggable").toHaveText("Regular task 2");
+    expect.verifySteps([
+        "fetch tasks to schedule",
+        "search_read",
+        "plan task",
+        "fetch tasks to schedule",
+        "search_read",
+    ]);
+    expect(".o_event_to_schedule_draggable").toHaveCount(2);
+    expect(".o_event_to_schedule_draggable:first").toHaveText("Regular task 2");
 });

@@ -14,6 +14,8 @@ from itertools import zip_longest
 @tagged('post_install', '-at_install')
 class TestAccountMove(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -206,6 +208,27 @@ class TestAccountMove(AccountTestInvoicingCommon):
         # The date has been changed to the first valid date.
         self.assertEqual(copy_move.date, copy_move.company_id.fiscalyear_lock_date + relativedelta(days=1))
 
+    def test_batch_reset_to_draft_partial_success(self):
+        locked_move = self.init_invoice('out_invoice', invoice_date='2016-01-01', post=True, amounts=[100.0], taxes=self.tax_sale_a)
+        resettable_move = self.init_invoice('out_invoice', invoice_date='2026-01-01', post=True, amounts=[200.0], taxes=self.tax_sale_a)
+
+        self.company.fiscalyear_lock_date = '2020-01-01'
+
+        action = (locked_move | resettable_move).action_reset_selected_to_draft()
+
+        self.assertEqual(locked_move.state, 'posted')
+        self.assertEqual(resettable_move.state, 'draft')
+        self.assertEqual(action['type'], 'ir.actions.client')
+        self.assertEqual(action['tag'], 'soft_reload')
+
+    def test_batch_reset_to_draft_all_failed(self):
+        locked_move = self.init_invoice('out_invoice', invoice_date='2016-01-01', post=True, amounts=[100.0], taxes=self.tax_sale_a)
+
+        self.company.fiscalyear_lock_date = '2020-01-01'
+
+        with self.assertRaises(UserError):
+            locked_move.action_reset_selected_to_draft()
+
     def test_misc_fiscalyear_lock_date_2(self):
         self.test_move.action_post()
 
@@ -312,11 +335,27 @@ class TestAccountMove(AccountTestInvoicingCommon):
     def test_modify_posted_move_readonly_fields(self):
         self.test_move.action_post()
 
-        readonly_fields = ('invoice_line_ids', 'line_ids', 'invoice_date', 'date', 'partner_id',
-                           'invoice_payment_term_id', 'currency_id', 'fiscal_position_id', 'invoice_cash_rounding_id')
-        for field in readonly_fields:
-            with self.assertRaisesRegex(UserError, "You cannot modify the following readonly fields on a posted move"):
-                self.test_move.write({field: False})
+        readonly_fields = {
+            'invoice_line_ids': False,
+            'line_ids': False,
+            'invoice_date': '4321-11-11',
+            'date': '4321-11-11',
+            'partner_id': 42424242,
+            'invoice_payment_term_id': 42424242,
+            'currency_id': 42424242,
+            'fiscal_position_id': 42424242,
+            'invoice_cash_rounding_id': 42424242,
+        }
+        for fname, value in readonly_fields.items():
+            with self.assertRaisesRegex(UserError, "You cannot modify the following readonly fields on the posted move %s" % self.test_move.name):
+                self.test_move.write({fname: value})
+        for fname in readonly_fields:
+            if fname.endswith('_ids'):
+                continue  # x2m are always raising
+            elif fname.endswith('_id'):
+                self.test_move.write({fname: self.test_move[fname].id})
+            else:
+                self.test_move.write({fname: self.test_move[fname]})
 
     def test_misc_move_onchange(self):
         ''' Test the behavior on onchanges for account.move having 'entry' as type. '''
@@ -616,7 +655,6 @@ class TestAccountMove(AccountTestInvoicingCommon):
             'name': 'TAX_WAIT',
             'code': 'TWAIT',
             'account_type': 'liability_current',
-            'reconcile': True,
         })
         tax_final_account = self.env['account.account'].create({
             'name': 'TAX_TO_DEDUCT',
@@ -754,20 +792,13 @@ class TestAccountMove(AccountTestInvoicingCommon):
         # unreconcile
         debit_aml = move.line_ids.filtered('debit')
         debit_aml.remove_move_reconcile()
-        # check caba move reverse is same as caba move with only debit/credit inverted
-        reversed_caba_move = self.env['account.move'].search([('reversed_entry_id', '=', caba_move.id)])
-        for value in expected_values:
-            value.update({
-                'debit': value['credit'],
-                'credit': value['debit'],
-            })
-        self.assertRecordValues(reversed_caba_move.line_ids, expected_values)
-        self.assertEqual(reversed_caba_move.state, 'posted')
+        # unlocked caba moves should get deleted upon unreconciliation
+        self.assertFalse(caba_move.exists())
 
     def _get_cache_count(self, model_name='account.move', field_name='name'):
         model = self.env[model_name]
         field = model._fields[field_name]
-        return len(self.env.cache.get_records(model, field))
+        return len(field._get_cache(self.env))
 
     def test_cache_invalidation(self):
         self.env.invalidate_all()
@@ -883,7 +914,6 @@ class TestAccountMove(AccountTestInvoicingCommon):
         taxes should see their tax lines use the final tax account, not the transition account.
         """
         tax_account = self.company_data['default_account_tax_sale']
-        tax_account.reconcile = True
 
         caba_tax = self.env['account.tax'].create({
             'name': "CABA",
@@ -1026,7 +1056,7 @@ class TestAccountMove(AccountTestInvoicingCommon):
         self.test_move.button_draft()  # move has posted_before == True
         self.assertEqual(self.test_move.journal_id, self.company_data['default_journal_misc'])
         self.assertEqual(self.test_move.name, 'MISC/2016/01/0001')
-        with self.assertRaisesRegex(UserError, 'You cannot edit the journal of an account move if it has been posted once, unless the name is removed or set to "/". This might create a gap in the sequence.'):
+        with self.assertRaisesRegex(UserError, 'You cannot edit the journal of a journal entry if it has been posted once, unless the name is removed or set to "/". This might create a gap in the sequence.'):
             self.test_move.write({'journal_id': False})
         # Once move name in draft is changed to '/', changing the journal is allowed
         self.test_move.name = '/'
@@ -1049,7 +1079,7 @@ class TestAccountMove(AccountTestInvoicingCommon):
         test_move_2 = self.test_move.copy({'name': 'TEST/2016/01/0002', 'date': '2016-01-01'})
         self.assertEqual(test_move_2.sequence_number, 2)
         self.assertEqual(test_move_2.journal_id, self.company_data['default_journal_misc'])
-        with self.assertRaisesRegex(UserError, 'You cannot edit the journal of an account move with a sequence number assigned, unless the name is removed or set to "/". This might create a gap in the sequence.'):
+        with self.assertRaisesRegex(UserError, 'You cannot edit the journal of a journal entry with a sequence number assigned, unless the name is removed or set to "/". This might create a gap in the sequence.'):
             test_move_2.write({'journal_id': False})
         # Once move name in draft is changed to '/', changing the journal is allowed
         test_move_2.write({'name': False, 'journal_id': journal.id})
@@ -1105,17 +1135,17 @@ class TestAccountMove(AccountTestInvoicingCommon):
         })
         honest_move.action_post()
 
-        with self.assertRaisesRegex(UserError, 'not balanced'), contextlib.closing(self.env.cr.savepoint()):
+        with self.assertRaisesRegex(UserError, 'not balanced'):
             self.env['account.move'].create({'line_ids': [Command.set(honest_move.line_ids[0].ids)]})
 
-        with self.assertRaisesRegex(UserError, 'not balanced'), contextlib.closing(self.env.cr.savepoint()):
+        with self.assertRaisesRegex(UserError, 'not balanced'):
             self.env['account.move'].create({'line_ids': [Command.link(honest_move.line_ids[0].id)]})
 
         stealer_move = self.env['account.move'].create({})
-        with self.assertRaisesRegex(UserError, 'not balanced'), contextlib.closing(self.env.cr.savepoint()):
+        with self.assertRaisesRegex(UserError, 'not balanced'):
             stealer_move.write({'line_ids': [Command.set(honest_move.line_ids[0].ids)]})
 
-        with self.assertRaisesRegex(UserError, 'not balanced'), contextlib.closing(self.env.cr.savepoint()):
+        with self.assertRaisesRegex(UserError, 'not balanced'):
             stealer_move.write({'line_ids': [Command.link(honest_move.line_ids[0].id)]})
 
     def test_validate_move_wizard_with_auto_post_entry(self):
@@ -1128,39 +1158,62 @@ class TestAccountMove(AccountTestInvoicingCommon):
         self.assertTrue(self.test_move.state == 'posted')
 
     def test_cumulated_balance(self):
-        move = self.env['account.move'].create({
-            'line_ids': [Command.create({
-                'balance': 100,
-                'account_id': self.company_data['default_account_receivable'].id,
-            }), Command.create({
-                'balance': 100,
-                'account_id': self.company_data['default_account_tax_sale'].id,
-            }), Command.create({
-                'balance': -200,
-                'account_id': self.company_data['default_account_revenue'].id,
-            })]
-        })
+        receivable_account = self.copy_account(self.company_data['default_account_receivable'])
+        tax_account = self.copy_account(self.company_data['default_account_tax_sale'])
+        revenue_account = self.copy_account(self.company_data['default_account_revenue'])
 
-        for order, expected in [
-            ('balance DESC', [
-                (100, 0),
-                (100, -100),
-                (-200, -200),
-            ]),
-            ('balance ASC', [
-                (-200, 0),
-                (100, 200),
-                (100, 100),
-            ]),
+        for receivable_amount, tax_amount, revenue_amount, date in [
+            (115.0, 15.0, -130.0, '2024-01-15'),
+            (180.0, 20.0, -200.0, '2024-05-20'),
+            (245.0, 45.0, -290.0, '2025-07-10'),
         ]:
-            read_results = self.env['account.move.line'].search_read(
-                domain=[('move_id', '=', move.id)],
-                fields=['balance', 'cumulated_balance'],
-                order=order,
-            )
-            for (balance, cumulated_balance), read_result in zip(expected, read_results):
-                self.assertAlmostEqual(balance, read_result['balance'])
-                self.assertAlmostEqual(cumulated_balance, read_result['cumulated_balance'])
+            self.env['account.move'].create({
+                'date': date,
+                'line_ids': [Command.create({
+                    'balance': receivable_amount,
+                    'account_id': receivable_account.id,
+                }), Command.create({
+                    'balance': tax_amount,
+                    'account_id': tax_account.id,
+                }), Command.create({
+                    'balance': revenue_amount,
+                    'account_id': revenue_account.id,
+                })]
+            })
+
+        expected = [
+            # The cumulated balance should sum the balances of all previous moves during the period.
+            ('2024-01-01', 1, receivable_account, [115.0, 295.0]),
+            ('2024-01-01', 1, tax_account, [15.0, 35.0]),
+            ('2024-01-01', 1, revenue_account, [-130.0, -330.0]),
+
+            # Accounts that don't include their intinal balance should reset to 0, other should keep their balance.
+            ('2025-01-01', 1, receivable_account, [540.0]),
+            ('2025-01-01', 1, tax_account, [80.0]),
+            ('2025-01-01', 1, revenue_account, [-290.0]),
+
+            # If we start partitaly in the fiscal year, accounts should calculate over the entire fiscal year.
+            ('2024-05-01', 1, receivable_account, [295.0]),
+            ('2024-05-01', 1, tax_account, [35.0]),
+            ('2024-05-01', 1, revenue_account, [-330.0]),
+
+            # If we search_fetch over multiples fiscal year, if the result include move lines from different fiscal
+            # years and the account shouldn't include it's initial balance, the balance should still reset.
+            ('2024-01-01', 2, receivable_account, [115.0, 295.0, 540.0]),
+            ('2024-01-01', 2, tax_account, [15.0, 35.0, 80.0]),
+            ('2024-01-01', 2, revenue_account, [-130.0, -330.0, -290.0]),
+        ]
+
+        for date_from, years, account, excepted_amounts in expected:
+            date_from = fields.Date.from_string(date_from)
+            move_lines = self.env['account.move.line'].search_fetch(domain=[
+                ('account_id', '=', account.id),
+                ('date', '>=', date_from),
+                ('date', '<=', date_from + relativedelta(years=years)),
+            ], field_names=['cumulated_balance'])
+            self.assertEqual(len(move_lines), len(excepted_amounts))
+            for line, expected_amount in zip(reversed(move_lines), excepted_amounts):
+                self.assertEqual(line.cumulated_balance, expected_amount)
 
     def test_move_line_rounding(self):
         """Whatever arguments we give to the creation of an account move,
@@ -1345,3 +1398,133 @@ class TestAccountMove(AccountTestInvoicingCommon):
         })
         self.env.flush_all()
         self.assertEqual(fields_recomputed, [])
+
+    def test_post_invoice_fails_with_account_and_journal_company_inconsistency(self):
+        """
+        Ensure that an invoice cannot be posted when at least one line account
+        belongs to a different company than the journal.
+
+        The test verifies that:
+        - Using a journal from a branch company (child of the account's company) is allowed
+        - Using a journal from an unrelated company correctly raises a UserError
+        - Using a shared account between two companies works as expected
+        """
+        account = self.company_data['default_account_revenue']
+        move = self.env['account.move'].create({
+            'line_ids': [
+                Command.create({'name': 'debit_line', 'debit': 100.0, 'account_id': account.id}),
+                Command.create({'name': 'credit_line', 'credit': 100.0, 'account_id': account.id}),
+            ]
+        })
+
+        # Ensure branch company aren't considered as inconsistency
+        company_branch = self.env['res.company'].create({
+            'name': 'Company Branch',
+            'parent_id': self.env.company.id,
+        })
+        journal_branch = self.env['account.journal'].create({
+            'name': 'Company Branch Journal',
+            'type': 'general',
+            'code': 'CBrJ',
+            'company_id': company_branch.id,
+        })
+        move.write({'company_id': company_branch.id, 'journal_id': journal_branch.id})
+        move.action_post()
+        move.button_draft()
+
+        # Ensure posting fails when the account's company is different than the journal's company
+        company_b = self.env['res.company'].create({'name': 'Company B'})
+        journal_b = self.env['account.journal'].create({
+            'name': 'Company B Journal',
+            'type': 'general',
+            'code': 'CBJ',
+            'company_id': company_b.id,
+        })
+        move.write({'name': '/', 'company_id': company_b.id, 'journal_id': journal_b.id})
+        with self.assertRaisesRegex(UserError, rf"The entry is using accounts \({account.display_name}\) from a different company\."):
+            move.action_post()
+
+        # Ensure posting works for accounts shared between the two companies
+        shared_account = self.env['account.account'].create([{
+            'name': 'Shared Account',
+            'company_ids': [Command.set((self.env.company | company_b).ids)],
+            'code_mapping_ids': [
+                Command.create({'company_id': self.env.company.id, 'code': '180001'}),
+                Command.create({'company_id': company_b.id, 'code': '180001'}),
+            ],
+        }])
+        move.line_ids.account_id = shared_account
+        move.action_post()
+
+    def test_journal_entry_analytic_distribution_search_is_set(self):
+        """ Verify searching on analytic_distribution with 'is set', 'is not set'."""
+        analytic_plan = self.env['account.analytic.plan'].create({'name': 'Plan'})
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': "Test Account",
+            'plan_id': analytic_plan.id,
+        })
+        self.assertFalse(self.env['account.move.line'].search([('analytic_distribution', '!=', False)]))
+        self.test_move.line_ids[0]['analytic_distribution'] = {str(analytic_account.id): 100}
+        self.assertEqual(
+            self.env['account.move.line'].search([('analytic_distribution', '!=', False)]),
+            self.test_move.line_ids[0],
+            ""
+        )
+
+    def test_modify_zero_line_in_locked_period(self):
+        """
+        Ensure that zero-amount lines in a locked period cannot be modified or reset to draft, but can be safely unlinked.
+        """
+        posted_move = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2024-01-01',
+            'line_ids': [
+                Command.create({
+                    'name': 'zero line 1',
+                    'account_id': self.company_data['default_account_revenue'].id,
+                }),
+                Command.create({
+                    'name': 'zero line 2',
+                    'account_id': self.company_data['default_account_expense'].id,
+                }),
+            ]
+        })
+        posted_move.action_post()
+
+        posted_move.company_id.sudo().write({
+            'fiscalyear_lock_date': '2025-01-01',
+        })
+
+        with self.assertRaisesRegex(UserError, "You cannot add/modify entries prior to and inclusive of"), self.cr.savepoint():
+            posted_move.line_ids[0].write({'account_id': self.company_data['default_account_expense'].id})
+
+        posted_move.line_ids.unlink()
+
+        self.assertFalse(posted_move.line_ids, "The zero-amount lines should have been successfully deleted.")
+
+    def test_invoice_line_name_uses_invoice_partner_language(self):
+        """Test that when an invoice is created for an invoice contact (that has a different language with
+        respect to its parent contact) also the name of the product in the invoice is in the correct language."""
+        self.env['res.lang']._activate_lang('fr_FR')
+        self.partner_a.lang = 'en_US'
+
+        invoice_contact = self.env['res.partner'].create({
+            'name': 'Invoice Contact',
+            'type': 'invoice',
+            'parent_id': self.partner_a.id,
+            'lang': 'fr_FR',
+        })
+
+        self.product_a.update_field_translations('description_sale', {
+            'en_US': 'Water Bottle',
+            'fr_FR': 'Bouteille d\'eau',
+        })
+
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': invoice_contact.id,
+            'invoice_line_ids': [Command.create({'product_id': self.product_a.id})],
+        })
+
+        line = invoice.invoice_line_ids.filtered(lambda l: l.product_id == self.product_a)[:1]
+        self.assertEqual(line.label, "product_a\nBouteille d'eau")

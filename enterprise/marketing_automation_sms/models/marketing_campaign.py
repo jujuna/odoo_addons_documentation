@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from ast import literal_eval
 from odoo import api, fields, models
 
 
@@ -36,3 +37,14 @@ class MarketingCampaign(models.Model):
             'create': False,
         })
         return action
+
+    def action_create_step(self, step_type):
+        if step_type == 'sms':
+            action = self.env['ir.actions.act_window']._for_xml_id('marketing_automation.marketing_activity_open_marketing_activity_form_view')
+            action['context'] = {
+                **literal_eval(action['context'] or '{}'),
+                'default_activity_type': 'sms',
+                'default_campaign_id': self.id,
+            }
+            return action
+        return super().action_create_step(step_type)

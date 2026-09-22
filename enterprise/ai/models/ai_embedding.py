@@ -2,18 +2,18 @@
 import logging
 from collections import defaultdict
 
-from odoo import api, fields, models, _
 from requests.exceptions import RequestException
+
+from odoo import api, fields, models, modules
+from odoo.exceptions import RedirectWarning, UserError
 from odoo.tools import SQL
-from odoo.exceptions import UserError
 
 from odoo.addons.ai.orm.field_vector import Vector
-from odoo.addons.ai.utils.llm_api_service import LLMApiService
-from odoo.addons.ai.utils.llm_providers import (
-    EMBEDDING_MODELS_SELECTION,
-    get_embedding_config,
-    get_provider_for_embedding_model,
-)
+from odoo.addons.ai.utils.ai_utils import call_odoo_ai
+from odoo.addons.iap import InsufficientCreditError
+
+MAX_BATCH_SIZE = 100
+MAX_TOKENS = 10000
 
 _logger = logging.getLogger(__name__)
 
@@ -21,139 +21,114 @@ _logger = logging.getLogger(__name__)
 class AIEmbedding(models.Model):
     _name = 'ai.embedding'
     _description = "Attachment Chunks Embedding"
+    _explanation = "Stores vector embeddings for document chunks. Used to perform semantic searches to find relevant context for user queries."
     _order = 'sequence'
 
-    attachment_id = fields.Many2one(
-        'ir.attachment',
-        string="Attachment",
+    res_id = fields.Many2oneReference(
+        string="The ID of a linked record.",
+        model_field="res_model",
         required=True,
-        ondelete='cascade'
+        index=True,
     )
-    checksum = fields.Char(related='attachment_id.checksum')
+    res_model = fields.Char(string="The model of a linked record", required=True)
     sequence = fields.Integer(string="Sequence", default=10)
     content = fields.Text(string="Chunk Content", required=True)
-    embedding_model = fields.Selection(selection=EMBEDDING_MODELS_SELECTION, string="Embedding Model", required=True)
+    embedding_model = fields.Char(string="Embedding Model")
     has_embedding_generation_failed = fields.Boolean(string="Has Embedding Generation Failed", default=False)
+    embedding_error = fields.Char(string="Embedding error")
     embedding_vector = Vector(size=1536)
-    _embedding_vector_idx = models.Index("USING ivfflat (embedding_vector vector_cosine_ops)")
+    _embedding_vector_idx = models.Index("USING hnsw (embedding_vector vector_cosine_ops)")
 
     @api.model
-    def _get_dimensions(self):
-        return self._fields['embedding_vector'].size
-
-    @api.model
-    def _get_similar_chunks(self, query_embedding, sources, embedding_model, top_n=5):
-        active_sources = sources.filtered(lambda s: s.is_active)
-        if not active_sources:
-            return self
-
-        attachment_ids = active_sources.mapped('attachment_id').ids
-        target_checksums = self.env['ir.attachment'].browse(attachment_ids).mapped('checksum')
-        # Execute the SQL query to find similar embeddings of the same sources' attachments checksum
-        return self.browse(id_ for id_, *_ in self.env.execute_query(SQL(
-                '''
+    def _get_similar_chunks(self, query_embedding, target_per_model, embedding_model, top_n=5):
+        if not target_per_model:
+            return None
+        target_filter = SQL(" OR ").join(
+            SQL("(res_model = %s AND res_id IN %s)", model, tuple(target.ids))
+            for model, target in target_per_model.items()
+        )
+        return self.browse(
+            id_
+            for id_, *_ in self.env.execute_query(
+                SQL(
+                    """
                     SELECT
-                        ai_embedding.id,
+                        id,
                         1 - (embedding_vector <=> %s::vector) AS similarity
                     FROM ai_embedding
-                    INNER JOIN ir_attachment ON ir_attachment.id = ai_embedding.attachment_id
-                    WHERE ir_attachment.checksum = ANY(%s) AND ai_embedding.embedding_model = %s
+                    WHERE embedding_vector IS NOT NULL
+                    AND embedding_model = %s
+                    AND %s
+                    AND (1 - (embedding_vector <=> %s::vector)) >= 0.9
                     ORDER BY similarity DESC
                     LIMIT %s;
-                ''',
-                query_embedding, target_checksums, embedding_model, top_n)
+                """,
+                    query_embedding,
+                    embedding_model,
+                    target_filter,
+                    query_embedding,
+                    top_n,
+                ),
+            )
+        )
+
+    @api.model
+    def _get_similar_documents(self, query_model, target_models, embedding_model: str, max_distance: float | None = None, limit: int = 100):
+        if not query_model or not target_models:
+            return self.env[query_model._name]
+
+        return self.env[query_model._name].browse(
+            id_
+            for id_, *_ in self.env.execute_query(
+                SQL(
+                    """
+                    WITH min_per_chunk AS (
+                        SELECT q.id as query_chunk, q.res_id as query_id, d.res_id as document_id, MIN(q.embedding_vector <=> d.embedding_vector) AS distance
+                        FROM ai_embedding q
+                        JOIN ai_embedding d on d.res_model = q.res_model AND d.res_id != q.res_id AND d.embedding_model = q.embedding_model
+                        WHERE q.res_id = %s AND q.res_model = %s AND q.embedding_model = %s AND d.res_id in %s
+                        GROUP BY q.id, d.res_id
+                        ORDER BY d.res_id
+                    ), similar_documents AS (
+                        SELECT document_id, AVG(distance) AS avg_distance
+                        FROM min_per_chunk
+                        GROUP BY document_id
+                        HAVING AVG(distance) < %s
+                    )
+                    SELECT r.id
+                    FROM %s r
+                    JOIN similar_documents s ON s.document_id = r.id
+                    ORDER BY s.avg_distance ASC
+                    LIMIT %s;
+                """,
+                    query_model.id,
+                    query_model._name,
+                    embedding_model,
+                    tuple(target_models.ids),
+                    max_distance,
+                    SQL.identifier(self.env[query_model._name]._table),
+                    limit,
+                ),
             )
         )
 
     @api.model
     def _cron_generate_embedding(self, batch_size=100):
         """
-        Generate embeddings for sources, handling multiple embedding models per source.
+        Generate embedding vectors for content.
         """
-        # Check for sources that need to be chunked and create embedding chunks
-        self._create_embedding_chunks()
-
         # Check for all the embedding vectors to be generated
         missing_embeddings = self.search([
             ("embedding_vector", "=", False),
-            ("has_embedding_generation_failed", "=", False)
+            ("has_embedding_generation_failed", "=", False),
+            ("embedding_model", "!=", False),
         ])
 
         if not missing_embeddings:
-            return False
-        missing_embeddings_batch = missing_embeddings[:batch_size]
+            self.env["ir.cron"]._commit_progress(remaining=0)
+            return None
 
-        # Group by embedding model to batch similar requests
-        embeddings_by_model = defaultdict(list)
-        for embedding in missing_embeddings_batch:
-            model = embedding.embedding_model
-            embeddings_by_model[model].append(embedding)
-
-        staged_sources = self.env['ai.agent.source'].search([
-            ('attachment_id.checksum', 'in', missing_embeddings_batch.mapped('checksum'))
-        ])
-        _logger.info("Starting embedding update - missing %s embeddings.", len(missing_embeddings_batch))
-        self.env['ir.cron']._commit_progress(remaining=len(missing_embeddings_batch))
-        failed_embeddings = self.env[self._name]
-
-        # Process each model group separately
-        for model, embeddings in embeddings_by_model.items():
-            provider = get_provider_for_embedding_model(self.env, model)
-            # Create batches respecting provider limits
-            batches = self._create_batches(embeddings, provider)
-            _logger.info(
-                "Processing %s embeddings for model %s in %s batches",
-                len(embeddings), model, len(batches)
-            )
-
-            for batch_idx, batch in enumerate(batches):
-                try:
-                    _logger.info(
-                        "Processing batch %s/%s with %s embeddings for model %s",
-                        batch_idx + 1, len(batches), len(batch), model
-                    )
-
-                    # Prepare batch input
-                    batch_content = [emb.content for emb in batch]
-                    # Get embeddings for the entire batch
-                    llm_service = LLMApiService(env=self.env, provider=provider)
-                    response = llm_service.get_embedding(
-                        input=batch_content,
-                        dimensions=self._get_dimensions(),
-                        model=model,
-                    )
-                    # Update each embedding record with its corresponding vector
-                    for idx, embedding in enumerate(batch):
-                        try:
-                            embedding.embedding_vector = response['data'][idx]['embedding']
-                        except KeyError as e:
-                            _logger.error(
-                                "Failed to extract embedding for record %s: %s",
-                                embedding.id, str(e)
-                            )
-                            failed_embeddings |= embedding
-
-                    # Commit progress for this batch
-                    if not self.env['ir.cron']._commit_progress(len(batch)):
-                        break
-
-                except (RequestException, UserError, AttributeError) as e:
-                    _logger.error(
-                        "Failed to process batch %s/%s for model %s: %s",
-                        batch_idx + 1, len(batches), model, str(e)
-                    )
-                    # Mark all embeddings in failed batch as failed
-                    failed_embeddings |= self.env[self._name].concat(*batch)
-                    continue
-
-        if failed_embeddings:
-            failed_embeddings.write({'has_embedding_generation_failed': True})
-            self.env['ir.cron']._commit_progress(len(failed_embeddings))
-
-        # Handle the status of sources
-        for source in staged_sources:
-            embedding_model = source.agent_id._get_embedding_model()
-            source._update_source_status(embedding_model)
+        self._generate_embeddings(missing_embeddings[:batch_size])
 
         if len(missing_embeddings) > batch_size:
             # we still have unfinished embeddings to generate: run the CRON again
@@ -162,34 +137,100 @@ class AIEmbedding(models.Model):
 
         return False
 
-    def _create_embedding_chunks(self):
-        """
-        Create embedding chunks for sources that are processing and have an attachment
-        and that don't have any embedding chunks yet
-        """
-        sources_to_process = self.env['ai.agent.source'].search([
-            ('status', '=', 'processing'),
-            ('attachment_id', '!=', False),
-        ])
-        if sources_to_process:
-            existing_embeddings_grouped = self._read_group(
-                domain=[],
-                groupby=['checksum', 'embedding_model'],
+    def _generate_embeddings(self, missing_embedding_records):
+        """Generate vectors for a batch of embedding records, grouped by model."""
+        embeddings_by_model = defaultdict(list)
+        for embedding in missing_embedding_records:
+            embeddings_by_model[embedding.embedding_model].append(embedding)
+
+        _logger.info("Starting embedding update - missing %s embeddings.", len(missing_embedding_records))
+        self.env['ir.cron']._commit_progress(remaining=len(missing_embedding_records))
+        failed_embeddings = self.env[self._name]
+        iap_credit_error_embeddings = self.env[self._name]
+
+        # Process each model group separately
+        for model, embeddings in embeddings_by_model.items():
+            batches = self._create_batches(embeddings)
+            _logger.info(
+                "Processing %s embeddings in %s batches",
+                len(embeddings), len(batches),
             )
-            existing_checksum_model_pairs = [(checksum, embedding_model) for checksum, embedding_model in existing_embeddings_grouped]
-            for source in sources_to_process:
-                embedding_model = source.agent_id._get_embedding_model()
-                if (source.attachment_id.checksum, embedding_model) not in existing_checksum_model_pairs:
-                    _logger.info("Creating embedding chunks for source %s", source.name)
-                    content = source.attachment_id._get_attachment_content()
-                    if not content:
-                        source.write({
-                            'status': 'failed',
-                            'error_details': _("Invalid attachment. Failed to extract content."),
-                        })
-                        continue
-                    source.attachment_id._setup_attachment_chunks(embedding_model, content)
-                    existing_checksum_model_pairs.append((source.attachment_id.checksum, embedding_model))
+
+            for batch_idx, batch in enumerate(batches):
+                try:
+                    _logger.info(
+                        "Processing batch %s/%s with %s embeddings",
+                        batch_idx + 1, len(batches), len(batch),
+                    )
+
+                    embedding_titles = {}
+                    ids_per_model = defaultdict(set)
+                    for idx, emb in enumerate(batch):
+                        ids_per_model[emb.res_model].add(emb.res_id)
+
+                    for res_model, res_ids in ids_per_model.items():
+                        if res_model not in self.env:
+                            continue
+                        records = (
+                            self.env[res_model]
+                            .with_context(active_test=False)
+                            .search([("id", "in", res_ids)])
+                        )
+                        embedding_titles |= {(res_model, record.id): record.display_name for record in records}
+
+                    # Get embeddings for the entire batch
+                    response = self._get_embeddings(
+                        input=[{'title': embedding_titles.get((emb.res_model, emb.res_id)), 'content': emb.content} for emb in batch],
+                        model=model,
+                        mode="document",
+                    )
+                    vectors = response['embeddings']
+
+                    # Update each embedding record with its corresponding vector
+                    for idx, embedding in enumerate(batch):
+                        try:
+                            embedding.embedding_vector = vectors[idx]
+                        except KeyError as e:
+                            _logger.error(
+                                "Failed to extract embedding for record %s: %s",
+                                embedding.id, e,
+                            )
+                            failed_embeddings |= embedding
+
+                    # Commit progress for this batch
+                    if not self.env['ir.cron']._commit_progress(len(batch)):
+                        break
+
+                except (RedirectWarning, RequestException, UserError, AttributeError) as e:
+                    _logger.error(
+                        "Failed to process batch %s/%s: %s",
+                        batch_idx + 1, len(batches), e,
+                    )
+                    # Mark all embeddings in failed batch as failed
+                    failed_embeddings |= batch
+                except InsufficientCreditError:
+                    for remaining_batch in batch[batch_idx:]:
+                        iap_credit_error_embeddings |= remaining_batch
+                    continue  # The next requests will also fail with an IAP credit error, so it can be skipped
+
+        all_failed_embeddings = failed_embeddings | iap_credit_error_embeddings
+        if all_failed_embeddings:
+            all_failed_embeddings.has_embedding_generation_failed = True
+            if iap_credit_error_embeddings:
+                iap_credit_error_embeddings.embedding_error = "iap_credit_error"
+            self.env["ir.cron"]._commit_progress(len(all_failed_embeddings))
+
+    @api.ormcache()
+    def _get_default_embedding_model(self):
+        if modules.module.current_test:
+            return 'dummy'
+        return call_odoo_ai(self.env, "1/get_default_embedding_model", {}, add_iap_token=False)
+
+    @api.ormcache()
+    def _get_supported_embedding_models(self):
+        if modules.module.current_test:
+            return 'dummy'
+        return call_odoo_ai(self.env, "1/get_supported_embedding_models", {}, add_iap_token=False)
 
     def _estimate_tokens(self, text):
         """Estimate token count based on text length.
@@ -201,33 +242,28 @@ class AIEmbedding(models.Model):
         """
         return len(text) // 4 if text else 0
 
-    def _create_batches(self, embeddings, provider):
+    def _create_batches(self, embeddings):
         """
-        Group embeddings into batches respecting provider limits.
+        Group embeddings into batches
         :param embeddings: List of embeddings to group into batches
         :type embeddings: list[AIEmbedding]
-        :param provider: Provider to use for embedding generation
-        :type provider: str
         :return: List of batches
         :rtype: list[list[AIEmbedding]]
         """
-        config = get_embedding_config(self.env, provider)
-        max_batch_size = config['max_batch_size']
-        max_tokens = config['max_tokens_per_request']
 
         batches = []
-        current_batch = []
+        current_batch = self.env[self._name]
         current_batch_tokens = 0
 
         for embedding in embeddings:
             content_tokens = self._estimate_tokens(embedding.content)
-            if (len(current_batch) >= max_batch_size) or \
-                (current_batch_tokens + content_tokens > max_tokens):
+            if (len(current_batch) >= MAX_BATCH_SIZE) or \
+                (current_batch_tokens + content_tokens > MAX_TOKENS):
                 batches.append(current_batch)
-                current_batch = []
+                current_batch = self.env[self._name]
                 current_batch_tokens = 0
 
-            current_batch.append(embedding)
+            current_batch |= embedding
             current_batch_tokens += content_tokens
 
         if current_batch:
@@ -235,33 +271,35 @@ class AIEmbedding(models.Model):
 
         return batches
 
-    def _get_indexed_embedding_models_by_checksum(self, checksum):
-        """
-        Get indexed embedding models by checksum.
-        :param checksum: checksum of the attachment
-        :type checksum: str
-        :return: list of indexed embedding models of the input checksum
-        :rtype: list of str
-        """
-        embeddings_by_model = self._read_group(
-            domain=[('checksum', '=', checksum)],
-            groupby=['embedding_model'],
-        )
-        indexed_embedding_models = [embedding_model[0] for embedding_model in embeddings_by_model]
-        return indexed_embedding_models
+    @api.model
+    def _get_embeddings(self, input, model, mode):
+        params = {
+            'input': input,
+            'model': model,
+            'mode': mode,
+        }
+        return call_odoo_ai(self.env, "1/get_embeddings", params)
 
-    @api.autovacuum
-    def _gc_embeddings(self):
-        """
-        Autovacuum: Cleanup embedding chunks not associated with any agent's attachments.
-        """
-        all_agents = self.env['ai.agent'].with_context(active_test=False).search([])
-        used_attachment_ids = all_agents.mapped('sources_ids').mapped('attachment_id')
-        used_checksums = used_attachment_ids.mapped('checksum')
-        unused_chunks = self.search([
-            ('checksum', 'not in', used_checksums),
-        ])
-        if unused_chunks:
-            chunk_count = len(unused_chunks)
-            _logger.info("Autovacuum: Cleaning up %s unused embedding chunks", chunk_count)
-            unused_chunks.unlink()
+    def _cron_update_deprecated_embedding_models(self, batch_size: int = 100_000):
+        supported_embedding_models = self._get_supported_embedding_models()
+
+        deprecated_domain = [('embedding_model', 'not in', supported_embedding_models)]
+        embeddings_to_update_count = self.env["ai.embedding"].search_count(deprecated_domain)
+        embeddings_to_update = self.env["ai.embedding"].search(
+            deprecated_domain, limit=batch_size,
+        )
+        self.env['ir.cron']._commit_progress(remaining=embeddings_to_update_count)
+
+        default_embedding_model = self._get_default_embedding_model()
+        embeddings_to_update.write({
+            "embedding_model": default_embedding_model,
+            "embedding_vector": None,
+            "has_embedding_generation_failed": False,
+            "embedding_error": False,
+        })
+
+        agents_to_update = self.env['ai.agent'].search([('embedding_model', 'not in', supported_embedding_models)])
+        agents_to_update.embedding_model = default_embedding_model
+
+        self.env.ref('ai.ir_cron_generate_embedding')._trigger()
+        self.env["ir.cron"]._commit_progress(len(embeddings_to_update))

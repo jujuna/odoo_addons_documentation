@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import unicodedata
 import uuid
@@ -6,7 +5,7 @@ import re
 
 import xml.etree.ElementTree as ET
 
-from odoo import api, fields, models, _, Command
+from odoo import api, models, _, Command
 from odoo.exceptions import ValidationError
 
 OPTIONS_WL = [
@@ -60,9 +59,10 @@ class Base(models.AbstractModel):
         ])
         if data:
             data.write({})  # force a write to set the 'studio' and 'noupdate' flags to True
+            return data
         else:
             module = self.env['ir.module.module'].get_studio_module()
-            IrModelData.create({
+            return IrModelData.create({
                 'name': '%s_%s' % (sanitize_for_xmlid(name or 'False'), uuid.uuid4()),
                 'model': self._name,
                 'res_id': self.id,
@@ -79,26 +79,6 @@ class Base(models.AbstractModel):
 class IrModel(models.Model):
     _name = 'ir.model'
     _inherit = ['studio.mixin', 'ir.model']
-
-    abstract = fields.Boolean(compute='_compute_abstract',
-                              store=False,
-                              help="Whether this model is abstract",
-                              search='_search_abstract')
-
-    def _compute_abstract(self):
-        for record in self:
-            model = self.env.get(record.model)
-            record.abstract = model is not None and model._abstract
-
-    def _search_abstract(self, operator, value):
-        if operator != 'in':
-            return NotImplemented
-        abstract_models = [
-            model._name
-            for model in self.env.values()
-            if model._abstract
-        ]
-        return [('model', 'in', abstract_models)]
 
     @api.model
     def studio_model_create(self, name, options=()):
@@ -324,10 +304,11 @@ class IrModel(models.Model):
 
     def _post_create_option_use_company(self, _model):
         # generate default for each company (note: also done when creating a new company)
-        self.env['ir.rule'].create({
+        self.env['ir.access'].create({
             'name': '%s - Multi-Company' % self.name,
             'model_id': self.id,
-            'domain_force': "['|', ('x_studio_company_id', '=', False), ('x_studio_company_id', 'in', company_ids)]"
+            'operation': 'crud',
+            'domain': "['|', ('x_studio_company_id', '=', False), ('x_studio_company_id', 'in', company_ids)]"
         })
         for company in self.env['res.company'].sudo().search([]):
             self.env['ir.default'].set(self.model, 'x_studio_company_id', company.id, company_id=company.id)
@@ -459,7 +440,6 @@ class IrModel(models.Model):
                 'copied': True,
             }),
         ])
-        model_vals['order'] = 'id asc'
         return stage_model_vals
 
     def _post_create_option_use_stages(self, stage_model):
@@ -508,28 +488,26 @@ class IrModel(models.Model):
         return tag_model_vals
 
     def _setup_access_rights(self):
-        for model in self:
-            # Give all access to the created model to Employees by default, except deletion. All access to System
-            # Note: a better solution may be to create groups at the app creation but the model is created
-            # before the app and for other models we need to have info about the app.
-            self.env['ir.model.access'].create({
-                'name': model.name + ' group_system',
+        # Give all access to the created model to Employees by default, except deletion. All access to System
+        # Note: a better solution may be to create groups at the app creation but the model is created
+        # before the app and for other models we need to have info about the app.
+        self.env['ir.access'].create([
+            {
+                'name': f'{model.name} group_system',
                 'model_id': model.id,
                 'group_id': self.env.ref('base.group_system').id,
-                'perm_read': True,
-                'perm_write': True,
-                'perm_create': True,
-                'perm_unlink': True,
-            })
-            self.env['ir.model.access'].create({
-                'name': model.name + ' group_user',
+                'operation': 'crud',
+            }
+            for model in self
+        ] + [
+            {
+                'name': f'{model.name} group_user',
                 'model_id': model.id,
                 'group_id': self.env.ref('base.group_user').id,
-                'perm_read': True,
-                'perm_write': True,
-                'perm_create': True,
-                'perm_unlink': False,
-            })
+                'operation': 'cru',
+            }
+            for model in self
+        ])
         return True
 
     def _get_default_view(self, view_type, view_id=False, create=True):
@@ -595,13 +573,52 @@ class IrModel(models.Model):
     @api.model
     def studio_model_infos(self, model_name):
         irModel = self._get(model_name)
+        Model = self.env[model_name]
         res = irModel.read(["id", "name", "state", "is_mail_thread", "is_mail_activity", "model"])[0]
         domain = []
         if model_name == "account.move":
             domain = [["move_type", "!=", "entry"]]
-        res["record_ids"] = self.env[model_name].search(domain, limit=10).ids
-        res["domain"] = domain
+        record_ids = []
+        if not Model._abstract:
+            record_ids = Model.search(domain, limit=10).ids
+        res.update({
+            "record_ids": record_ids,
+            "domain": domain,
+            "abstract": Model._abstract,
+            "transient": Model._transient,
+            "sql_view": not Model._auto,
+        })
         return res
+
+    @api.model
+    def _quick_create_model(self, model_values, parent_field_type=None):
+        model_name = model_values.pop("model")
+        model_name = model_name if model_name.startswith("x_") else "x_" + model_name
+
+        create_values = {
+            'model': model_name,
+            'name': model_values.pop("display_name", None) or model_values.pop("name", None) or model_name,
+            **model_values,
+        }
+        if parent_field_type == "many2one":
+            create_values["field_id"] = [
+                Command.create({
+                    'field_description': _('Name'),
+                    'name': "x_name",  # must be defined to have correct display_name (via _rec_name)
+                    'ttype': 'char',
+                    'translate': "standard",
+                }),
+                Command.create({
+                    'field_description': _('Sequence'),
+                    'name': "x_studio_sequence",
+                    'ttype': 'integer',
+                }),
+            ]
+            create_values["order"] = 'x_studio_sequence asc, id asc'
+        model = self.create(create_values)
+        model._setup_access_rights()
+        self.env["ir.ui.view"].with_context(list_editable="bottom").auto_list_view(model.model)
+        return model
 
 
 class IrModelFields(models.Model):
@@ -637,7 +654,7 @@ class IrModelFields(models.Model):
         trying to add another relation - not the same one. We need to create another
         relation table.
         """
-        result = super()._custom_many2many_names(model_name, comodel_name)[0]
+        result = self._custom_many2many_names(model_name, comodel_name)[0]
         # check if there's already a m2m field from model_name to comodel_name;
         # if yes, check the relation table and add a sequence to it - we want to
         # be able to mirror these fields on the other side in the same order
@@ -672,12 +689,12 @@ class IrModelFields(models.Model):
                 field = model._fields.get(part)
                 if field:
                     fields.append(field)
-                    model_name = field.comodel_name
+                    model_name = field.comodel_name if field.relational else None
             if field is None:
                 return []
         return fields
 
 
-class IrModelAccess(models.Model):
-    _name = 'ir.model.access'
-    _inherit = ['studio.mixin', 'ir.model.access']
+class IrAccess(models.Model):
+    _name = 'ir.access'
+    _inherit = ['studio.mixin', 'ir.access']

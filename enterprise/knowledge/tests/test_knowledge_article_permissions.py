@@ -8,6 +8,7 @@ from odoo.tools import mute_logger
 
 
 @tagged('knowledge_acl')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticlePermissions(KnowledgeArticlePermissionsCase):
 
     @users('employee')
@@ -49,7 +50,7 @@ class TestKnowledgeArticlePermissions(KnowledgeArticlePermissionsCase):
             self.assertEqual(article.internal_permission, exp_internal_permission,
                              f'Permission: wrong inherit computation for {article.name}: {article.internal_permission} instead of {exp_internal_permission}')
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     def test_article_permissions_inheritance_desync(self):
         """ Test desynchronize (and therefore member propagation that should be
         stopped). """
@@ -71,7 +72,7 @@ class TestKnowledgeArticlePermissions(KnowledgeArticlePermissionsCase):
         self.assertFalse(article_desync.user_has_write_access)
         self.assertFalse(article_desync.user_has_access, 'Permissions: member rights should not be fetch on parents')
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_permissions_inheritance_employee(self):
         article_roots = self.article_roots.with_env(self.env)
@@ -121,7 +122,7 @@ class TestKnowledgeArticlePermissions(KnowledgeArticlePermissionsCase):
         with self.assertRaises(exceptions.AccessError):
             article_none.name
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('portal_test')
     def test_article_permissions_inheritance_portal(self):
         article_roots = self.article_roots.with_env(self.env)
@@ -148,6 +149,7 @@ class TestKnowledgeArticlePermissions(KnowledgeArticlePermissionsCase):
 
 
 @tagged('knowledge_internals', 'knowledge_management')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class KnowledgeArticlePermissionsInitialValues(KnowledgeArticlePermissionsCase):
     """ Test initial values or our test data once so that other tests do not have
     to do it. """
@@ -188,9 +190,10 @@ class KnowledgeArticlePermissionsInitialValues(KnowledgeArticlePermissionsCase):
 
 
 @tagged('knowledge_acl')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticlePermissionsTools(KnowledgeArticlePermissionsCase):
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_downgrade_internal_permission_none(self):
         writable_as1 = self.article_write_contents[2].with_env(self.env)
@@ -252,7 +255,7 @@ class TestKnowledgeArticlePermissionsTools(KnowledgeArticlePermissionsCase):
             self.assertEqual(child.inherited_permission, 'read', 'Permission: lowering permission should lower the permission of the children')
             self.assertEqual(child.inherited_permission_parent_id, writable_as1, 'Permission: lowering permission should make the children inherit the permission from this article')
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('employee')
     def test_remove_member_inherited_rights(self):
         """ Remove a member from a child inheriting rights: will desync """
@@ -299,7 +302,7 @@ class TestKnowledgeArticlePermissionsTools(KnowledgeArticlePermissionsCase):
         self.assertFalse(writable.is_desynchronized)
         self.assertMembers(writable, False, {})
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('employee')
     def test_remove_member_leave_article(self):
         """ You can remove your member if its permission level is the same as the linked article"""
@@ -313,7 +316,7 @@ class TestKnowledgeArticlePermissionsTools(KnowledgeArticlePermissionsCase):
         readable_root.remove_member(user_member_id.id)
         self.assertMembers(readable_root, 'read', {self.partner_employee_manager: 'write'})
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('employee')
     def test_remove_member_leave_shared_article(self):
         # Can remove self if no write access only if does not gain higher access rights while doing so.
@@ -398,7 +401,7 @@ class TestKnowledgeArticlePermissionsTools(KnowledgeArticlePermissionsCase):
                 child._get_article_member_permissions()[child.id],
                 'Share Panel: when adding a member on a parent of a desynced article, the member should not be added on the children of the desynced article')
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_update_internal_permission_escalation(self):
         """ Check no privilege escalation is possible """
@@ -417,7 +420,7 @@ class TestKnowledgeArticlePermissionsTools(KnowledgeArticlePermissionsCase):
                                msg='Permission: do not allow privilege escalation'):
             readonly.set_internal_permission('write')
 
-    @mute_logger('odoo.addons.base.models.ir_rule', 'odoo.models.unlink')
+    @mute_logger('odoo.addons.base.models.ir_access', 'odoo.models.unlink')
     @users('employee')
     def test_update_permissions_rights(self):
         """ Check no privilege escalation is possible """
@@ -452,6 +455,7 @@ class TestKnowledgeArticlePermissionsTools(KnowledgeArticlePermissionsCase):
 
 
 @tagged('knowledge_acl', 'knowledge_portal')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticlePortal(KnowledgeArticlePermissionsCase):
     """ Portal users should have limited usage, they can read/write depending on permissions but can't:
      - Modify the article hierarchy (move an article from a parent to another)
@@ -674,6 +678,7 @@ class TestKnowledgeArticlePortal(KnowledgeArticlePermissionsCase):
 
 
 @tagged('knowledge_acl')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleSearch(KnowledgeArticlePermissionsCase):
 
     @users('admin')

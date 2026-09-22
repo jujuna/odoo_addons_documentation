@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~14.5+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-12-16 15:22+0000\n"
-"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
-"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 02:37+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-master/"
 "quality_mrp/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -22,15 +22,22 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: quality_mrp
+#: model:ir.module.module,description:base.module_quality_mrp
+msgid ""
+"\n"
+"Adds workcenters to Quality Control\n"
+msgstr ""
 
 #. module: quality_mrp
 #. odoo-python
 #: code:addons/quality_mrp/models/quality.py:0
 msgid "%(product_name)s is not in Production Order %(production_name)s"
 msgstr ""
-"%(product_name)s no se encuentra en la orden de producción %"
-"(production_name)s"
+"%(product_name)s no se encuentra en la orden de producción %(production_name)"
+"s"
 
 #. module: quality_mrp
 #: model_terms:ir.ui.view,arch_db:quality_mrp.mrp_production_view_form_inherit_quality
@@ -90,7 +97,13 @@ msgid "ID"
 msgstr "ID"
 
 #. module: quality_mrp
+#: model:ir.module.module,shortdesc:base.module_quality_mrp
+msgid "MRP features for Quality Control"
+msgstr ""
+
+#. module: quality_mrp
 #: model:ir.model,name:quality_mrp.model_mrp_production
+#: model_terms:ir.ui.view,arch_db:quality_mrp.quality_alert_view_form_inherit_mrp
 msgid "Manufacturing Order"
 msgstr "Orden de fabricación"
 
@@ -106,6 +119,7 @@ msgid "Production Order"
 msgstr "Orden de producción"
 
 #. module: quality_mrp
+#: model:ir.actions.server,name:quality_mrp.mrp_production_action_create_quality_alert
 #: model:ir.model,name:quality_mrp.model_quality_alert
 #: model_terms:ir.ui.view,arch_db:quality_mrp.mrp_production_view_form_inherit_quality
 msgid "Quality Alert"
@@ -142,6 +156,11 @@ msgstr "Controles de calidad"
 #: model:ir.model,name:quality_mrp.model_quality_point
 msgid "Quality Control Point"
 msgstr "Punto de control de calidad"
+
+#. module: quality_mrp
+#: model:ir.module.module,summary:base.module_quality_mrp
+msgid "Quality Management with MRP"
+msgstr ""
 
 #. module: quality_mrp
 #: model:ir.model,name:quality_mrp.model_stock_move

@@ -24,14 +24,13 @@ class SurveySurvey(models.Model):
                 'users_can_go_back': True,
             })
 
-    @api.depends('survey_type')
     @api.depends_context('uid')
     def _compute_allowed_survey_types(self):
         super()._compute_allowed_survey_types()
         if self.env.user.has_group('hr_appraisal.group_hr_appraisal_user') or \
                 self.env.user.has_group('survey.group_survey_user'):
             for survey in self:
-                survey.allowed_survey_types = (survey.allowed_survey_types or []) + ['appraisal']
+                survey.allowed_survey_types = [*(survey.allowed_survey_types or []), 'appraisal']
 
     @api.depends('survey_type', 'user_input_ids', 'user_input_ids.appraisal_id', 'user_input_ids.appraisal_id.manager_ids')
     def _compute_appraisal_manager_user_ids(self):
@@ -124,12 +123,10 @@ class SurveyUser_Input(models.Model):
             raise ValidationError(self.env._("You can't select multiple feedback templates."))
         appraisal_id = self.appraisal_id
         set_emails = set(self.partner_id.mapped('email'))
-        if appraisal_id.employee_feedback_ids:
-            employee_ids = appraisal_id.employee_feedback_ids.filtered(
-                lambda e: e.work_email in set_emails or\
-                    e.user_id.partner_id.email in set_emails).ids
+        if appraisal_id.partner_feedback_ids:
+            partner_ids = appraisal_id.partner_feedback_ids.filtered(lambda e: e.email in set_emails).ids
         else:
-            employee_ids = []
+            partner_ids = []
         return {
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
@@ -138,7 +135,7 @@ class SurveyUser_Input(models.Model):
             'name': self.env._('Ask Feedback'),
             'context': {
                 'default_appraisal_id': appraisal_id.id,
-                'default_employee_ids': employee_ids,
+                'default_partner_ids': partner_ids,
                 'default_survey_template_id': self.survey_id.id
             }
         }

@@ -7,8 +7,8 @@
             <field name="inherit_id" ref="helpdesk_account.view_account_move_reversal_inherit_helpdesk_account"/>
             <field name="arch" type="xml">
                 <field name="helpdesk_sale_order_id" position="after">
-                    <field name="product_id"  options="{'no_create': True, 'no_create_edit': True}" domain="[('id', 'in', suitable_product_ids)]"/>
-                    <field name="lot_id" invisible="tracking in ['none', False]"/>
+                    <field name="product_id"  options="{'no_create': True, 'no_create_edit': True}" domain="[('id', 'in', suitable_product_ids)]" groups="stock.group_stock_user"/>
+                    <field name="lot_id" invisible="not tracking"/>
                     <field name="tracking" invisible="1"/>
                     <field name="suitable_product_ids" invisible="1"/>
                 </field>

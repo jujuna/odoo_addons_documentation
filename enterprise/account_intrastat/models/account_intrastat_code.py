@@ -45,7 +45,7 @@ class AccountIntrastatCode(models.Model):
     _description = 'Intrastat Code'
     _translate = False
     _order = "code"
-    _rec_names_search = ['code', 'name', 'description']
+    _rec_names_search = ('code', 'name', 'description')
 
     name = fields.Char(string='Name')
     code = fields.Char(string='Code', required=True)

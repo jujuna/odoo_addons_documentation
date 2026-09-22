@@ -7,8 +7,8 @@ class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
     @api.model
-    def _generate_all_returns(self, country_code, main_company, tax_unit=None):
-        rslt = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit)
+    def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
+        rslt = super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)
         if not main_company.is_northern_irish():
             return rslt
 
@@ -23,8 +23,6 @@ class AccountReturnType(models.Model):
             'date': {
                 'date_from': fields.Date.to_string(date_from),
                 'date_to': fields.Date.to_string(date_to),
-                'filter': 'custom',
-                'mode': 'range',
             },
             'selected_variant_id': return_type.report_id.id,
             'sections_source_id': return_type.report_id.id,
@@ -35,9 +33,12 @@ class AccountReturnType(models.Model):
             ],
         }
 
+        expressions = report.line_ids.expression_ids
+        formulas_dict = expressions.grouped('formula')
+
         # Does arrival entries (imports) exceed the threshold of £500,000?
         arrival_options = report.get_options(previous_options=options)
-        amount = report_handler._report_custom_engine_intrastat(None, arrival_options, None, None, None)['value']
+        amount = report_handler._report_engine_intrastat(arrival_options, expressions[0].date_scope, formulas_dict, None)[expressions]['value']
         if amount >= 500_000:
             return_type._try_create_return_for_period(date_from, main_company, tax_unit)
             return rslt
@@ -46,7 +47,7 @@ class AccountReturnType(models.Model):
         options['intrastat_type'][0]['selected'] = False
         options['intrastat_type'][1]['selected'] = True
         dispatch_options = report.get_options(previous_options=options)
-        amount = report_handler._report_custom_engine_intrastat(None, dispatch_options, None, None, None)['value']
+        amount = report_handler._report_engine_intrastat(dispatch_options, expressions[0].date_scope, formulas_dict, None)[expressions]['value']
         if amount >= 250_000:
             return_type._try_create_return_for_period(date_from, main_company, tax_unit)
 

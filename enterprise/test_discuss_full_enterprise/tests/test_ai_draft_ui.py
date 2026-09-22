@@ -1,14 +1,10 @@
 from odoo import Command
+from odoo.addons.ai.tests.common import mock_iap_results, TestAICommon
 from odoo.tests import tagged, HttpCase
-from unittest.mock import patch
 
 
 @tagged('post_install', '-at_install')
-class TestAIDraftUI(HttpCase):
-    def _dummy_ai_submit_to_model(self, prompt, chat_history=None, extra_system_context=""):
-        # ensure that record data is sent with the user message
-        self.assertIn("The following JSON contains all of the record's details:", extra_system_context)
-        return ["This is dummy ai response"]
+class TestAIDraftUI(HttpCase, TestAICommon):
 
     @classmethod
     def setUpClass(cls):
@@ -35,16 +31,30 @@ class TestAIDraftUI(HttpCase):
         cls.env['ai.composer'].create({
             'name': 'agent composer',
             'interface_key': 'chatter_ai_button',
-            'focused_models': [cls.env['ir.model']._get_id('chatbot.script')],
-            'available_prompts': [Command.create({
+            'focused_model_id': cls.env['ir.model']._get_id('chatbot.script'),
+            'available_prompt_ids': [Command.create({
                 'name': 'chatbot prompt button',
             })],
         })
 
+    def mock_api_responses(self):
+        def response_generator():
+            while True:
+                yield self.mock_text_response("This is dummy ai response")
+        return mock_iap_results(self.env, response_generator())
+
     def test_ai_draft_chatter_button(self):
-        with patch.object(self.env.registry['ai.agent'], '_generate_response', self._dummy_ai_submit_to_model):
+        with self.mock_api_responses():
             self.start_tour("/odoo", 'test_ai_draft_chatter_button', login='admin')
 
     def test_ai_draft_html_field(self):
-        with patch.object(self.env.registry['ai.agent'], '_generate_response', self._dummy_ai_submit_to_model):
+        with self.mock_api_responses():
             self.start_tour("/odoo", 'test_ai_draft_html_field', login='admin')
+
+    def test_close_ai_chat_window(self):
+        with self.mock_api_responses():
+            self.start_tour("/odoo", 'test_close_ai_chat_window', login='admin')
+
+    def test_ai_systray_button_fullscreen(self):
+        with self.mock_api_responses():
+            self.start_tour("/odoo/discuss", "test_ai_systray_discuss_fullscreen", login="admin")

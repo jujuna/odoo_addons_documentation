@@ -10,16 +10,12 @@ from odoo.addons.portal.controllers.portal import CustomerPortal
 
 
 class PortalEquity(CustomerPortal):
-    def _prepare_home_portal_values(self, counters):
-        values = super()._prepare_home_portal_values(counters)
-        if 'transaction_count' in counters:
+
+    def _prepare_portal_counter_values(self, counter):
+        if counter == 'transaction_count':
             holder_id = self._get_user_partner_id()
-            values['transaction_count'] = (
-                request.env['equity.transaction'].search_count(self._get_transactions_domain(holder_id), limit=1)
-                if holder_id and request.env['equity.transaction'].has_access('read') else
-                0
-            )
-        return values
+            return 'equity.transaction', self._get_transactions_domain(holder_id), 'sudo'
+        return super()._prepare_portal_counter_values(counter)
 
     def _get_user_partner_id(self, access_token=None, default_to_request_partner=True):
         partner_id, token = None, None
@@ -32,7 +28,7 @@ class PortalEquity(CustomerPortal):
             consteq(partner.equity_access_token, token)
         ):
             return int(partner_id)
-        elif default_to_request_partner and request.env['equity.transaction'].has_access('read'):
+        elif default_to_request_partner:
             return request.env.user.partner_id.id
         return False
 
@@ -214,7 +210,7 @@ class PortalEquity(CustomerPortal):
                         'id': ubo.holder_id.id,
                         'name': ubo.holder_id.name,
                         'country_id': ubo.holder_id.country_id.id,
-                        'ubo_birth_date': fields.Date.to_string(ubo.holder_id.ubo_birth_date),
+                        'birth_date': fields.Date.to_string(ubo.holder_id.birth_date),
                         'ubo_national_identifier': ubo.holder_id.ubo_national_identifier,
                         'ubo_pep': ubo.holder_id.ubo_pep,
                     },

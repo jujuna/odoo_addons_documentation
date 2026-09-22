@@ -7,6 +7,7 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TestAccountAutoReconcileWizard(AccountTestInvoicingCommon):
     """ Tests the account automatic reconciliation and its wizard. """
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):

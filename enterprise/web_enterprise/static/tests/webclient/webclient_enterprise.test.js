@@ -1,32 +1,28 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
 import { click, keyDown, queryAll, queryFirst } from "@odoo/hoot-dom";
-import { animationFrame, Deferred, mockMatchMedia } from "@odoo/hoot-mock";
-import { Component, onMounted, xml } from "@odoo/owl";
+import { animationFrame } from "@odoo/hoot-mock";
+import { Component, onMounted, useProps, xml } from "@odoo/owl";
 import {
-    clearRegistry,
     contains,
     defineActions,
     defineMenus,
     defineModels,
     fields,
-    getMockEnv,
+    isSmall,
     getService,
     models,
-    mountWithCleanup,
     mountWebClient,
     onRpc,
     patchWithCleanup,
     serverState,
     stepAllNetworkCalls,
 } from "@web/../tests/web_test_helpers";
-import { browser } from "@web/core/browser/browser";
+import { location, browser } from "@web/core/browser/browser";
 import { router } from "@web/core/browser/router";
 import { registry } from "@web/core/registry";
 import { config as transitionConfig } from "@web/core/transition";
 import { user } from "@web/core/user";
 import { redirect } from "@web/core/utils/urls";
-import { UserMenu } from "@web/webclient/user_menu/user_menu";
-import { shareUrlMenuItem } from "@web_enterprise/webclient/share_url/share_url";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 
 const actionRegistry = registry.category("actions");
@@ -35,7 +31,7 @@ async function goToHomeMenu() {
     await click(".o_menu_toggle");
     await animationFrame();
 
-    if (getMockEnv().isSmall) {
+    if (isSmall()) {
         await click(queryFirst(".o_sidebar_topbar a.btn-primary", { root: document.body }));
         await animationFrame();
     }
@@ -156,10 +152,10 @@ defineModels([Partner]);
 class TestClientAction extends Component {
     static template = xml`
         <div class="test_client_action">
-            ClientAction_<t t-esc="props.action.params?.description"/>
+            ClientAction_<t t-out="this.props.action.params?.description"/>
         </div>
     `;
-    static props = ["*"];
+    props = useProps();
 
     setup() {
         onMounted(() => {
@@ -178,7 +174,7 @@ beforeEach(() => {
 // Those tests rely on hidden view to be in CSS: display: none
 describe("basic flow with home menu", () => {
     stepAllNetworkCalls();
-    onRpc("partner", "get_formview_action", () => ({
+    onRpc("partner", "get_record_default_action", () => ({
         type: "ir.actions.act_window",
         res_model: "partner",
         view_type: "form",
@@ -255,7 +251,7 @@ describe("basic flow with home menu", () => {
         await contains('.o_field_widget[name="parent_id"] .o_external_button', {
             visible: false,
         }).click();
-        expect.verifySteps(["get_formview_action", "get_views", "web_read"]);
+        expect.verifySteps(["get_record_default_action", "get_views", "web_read"]);
         expect(".o_form_view").toHaveCount(1);
         expect(".o_breadcrumb .active").toHaveText("Second record");
         // The third one is the active one
@@ -280,7 +276,7 @@ describe("basic flow with home menu", () => {
         await contains('.o_field_widget[name="parent_id"] .o_external_button', {
             visible: false,
         }).click();
-        expect.verifySteps(["get_formview_action", "get_views", "web_read"]);
+        expect.verifySteps(["get_record_default_action", "get_views", "web_read"]);
         await goToHomeMenu();
         expect.verifySteps([]);
         expect(".o_menu_toggle").toHaveClass("o_menu_toggle_back");
@@ -307,7 +303,7 @@ describe("basic flow with home menu", () => {
         await contains('.o_field_widget[name="parent_id"] .o_external_button', {
             visible: false,
         }).click();
-        expect.verifySteps(["get_formview_action", "get_views", "web_read"]);
+        expect.verifySteps(["get_record_default_action", "get_views", "web_read"]);
         await contains(".o_menu_toggle").click();
 
         // can't click again too soon because of the mutex in home_menu
@@ -368,9 +364,8 @@ test("fast clicking on restore (implementation detail)", async () => {
 
     class DelayedClientAction extends Component {
         static template = xml`<div class='delayed_client_action'>
-            <button t-on-click="resolve">RESOLVE</button>
+            <button t-on-click="this.resolve">RESOLVE</button>
         </div>`;
-        static props = ["*"];
         setup() {
             onMounted(() => {
                 if (doVeryFastClick) {
@@ -493,7 +488,7 @@ test("debug manager resets to global items when home menu is displayed", async (
 });
 
 test("url state is well handled when going in and out of the HomeMenu", async () => {
-    patchWithCleanup(browser.location, {
+    patchWithCleanup(location, {
         origin: "http://example.com",
     });
     redirect("/odoo");
@@ -521,10 +516,9 @@ test("url state is well handled when going in and out of the HomeMenu", async ()
         ],
     });
     expect(browser.history.length).toBe(2);
-    expect(browser.location.href).toBe("http://example.com/odoo/action-1002");
+    expect(location.href).toBe("http://example.com/odoo/action-1002");
 
     await goToHomeMenu();
-    await animationFrame();
     expect(router.current).toEqual(
         {
             action: "menu",
@@ -545,7 +539,7 @@ test("url state is well handled when going in and out of the HomeMenu", async ()
         }
     );
     expect(browser.history.length).toBe(3);
-    expect(browser.location.href).toBe("http://example.com/odoo", {
+    expect(location.href).toBe("http://example.com/odoo", {
         message:
             "despite the actionStack being in the router state, the url shouldn't have any path",
     });
@@ -565,7 +559,7 @@ test("url state is well handled when going in and out of the HomeMenu", async ()
         { message: "clicking another app creates a new action stack (ie empties the breadcrumb)" }
     );
     expect(browser.history.length).toBe(4);
-    expect(browser.location.href).toBe("http://example.com/odoo/action-1001");
+    expect(location.href).toBe("http://example.com/odoo/action-1001");
 
     browser.history.back();
     await animationFrame();
@@ -582,14 +576,13 @@ test("url state is well handled when going in and out of the HomeMenu", async ()
                     displayName: "Home",
                 },
             ],
-            globalState: {},
         },
         { message: "actionStack was restored" }
     );
     expect(browser.history.length).toBe(4, {
         message: "the previous history entry still exists (available with forward button)",
     });
-    expect(browser.location.href).toBe("http://example.com/odoo");
+    expect(location.href).toBe("http://example.com/odoo");
 
     await contains(".o_menu_toggle").click();
     await animationFrame();
@@ -603,7 +596,7 @@ test("url state is well handled when going in and out of the HomeMenu", async ()
         ],
     });
     expect(browser.history.length).toBe(4);
-    expect(browser.location.href).toBe("http://example.com/odoo/action-1002");
+    expect(location.href).toBe("http://example.com/odoo/action-1002");
 });
 
 test.tags("desktop");
@@ -710,31 +703,6 @@ test("Apps are reordered at startup based on session's user settings", async () 
     expect(apps[1]).toHaveText("App1", { message: "second displayed app is App1" });
 });
 
-test.tags("desktop");
-test("Share URL item is present in the user menu when running as PWA", async () => {
-    mockMatchMedia({ ["display-mode"]: "standalone" });
-    clearRegistry(registry.category("user_menuitems"));
-    registry.category("user_menuitems").add("share_url", shareUrlMenuItem);
-
-    await mountWithCleanup(UserMenu);
-    await contains(".o_user_menu button").click();
-
-    expect(".o-dropdown--menu .dropdown-item").toHaveCount(1);
-    expect(".o-dropdown--menu .dropdown-item").toHaveText("Share");
-});
-
-test.tags("desktop");
-test("Share URL item is not present in the user menu when not running as PWA", async () => {
-    mockMatchMedia({ ["display-mode"]: "browser" });
-    clearRegistry(registry.category("user_menuitems"));
-    registry.category("user_menuitems").add("share_url", shareUrlMenuItem);
-
-    await mountWithCleanup(UserMenu);
-    await contains(".o_user_menu button").click();
-
-    expect(".o-dropdown--menu .dropdown-item").not.toHaveCount();
-});
-
 test("Navigate to an application from the HomeMenu should generate only one pushState", async () => {
     patchWithCleanup(history, {
         pushState(state, title, url) {
@@ -764,10 +732,11 @@ test("Navigate to an application from the HomeMenu should generate only one push
     expect.verifySteps(["/odoo", "/odoo/action-1002", "/odoo", "/odoo/action-1001", "/odoo"]);
 });
 
+test.tags("desktop");
 test("display studio icon when studio module is not installed", async () => {
     await mountWebClient({ WebClient: WebClientEnterprise });
 
-    expect(`.o_menu_systray .o_nav_entry i`).toHaveClass("oi oi-studio");
+    expect(`.o_menu_systray .o_nav_entry i`).toHaveAttribute("data-icon", "oi_studio");
     await contains(".o_menu_systray .o_nav_entry").click();
     expect(`.modal-content`).toHaveCount(1);
     expect(queryFirst(".modal-header").textContent).toBe(
@@ -787,8 +756,8 @@ test.tags("desktop");
 test("Should not crash when opening an app via palette and immediately entering input in the palette search", async () => {
     await mountWebClient({ WebClient: WebClientEnterprise });
 
-    const def = new Deferred();
-    onRpc("web_search_read", () => def);
+    const def = Promise.withResolvers();
+    onRpc("web_search_read", () => def.promise);
     await keyDown("a");
     await animationFrame();
     await keyDown("Enter");

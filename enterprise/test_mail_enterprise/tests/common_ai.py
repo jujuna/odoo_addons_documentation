@@ -1,29 +1,20 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 from contextlib import contextmanager
 from unittest.mock import patch
 
+from odoo.addons.ai.tests.common import TestAICommon
 from odoo.addons.test_mail.tests.test_mail_composer import TestMailComposer
 
 
-class MailCommonAI(TestMailComposer):
+class MailCommonAI(TestMailComposer, TestAICommon):
     def _wrap_prompt(self, content):
         return f"""<div class="o_editor_prompt"><div class="o_editor_prompt_content">{content}</div></div>"""
 
     @contextmanager
     def _patch_agent_generate_response(self, response=None, body_html=None):
         """Patch the _generate_response method of the AI agent to control its output."""
-
-        def _generate_response_patch(*args, **kwargs):
-            if isinstance(response, Exception):
-                raise response
-            return response
-
-        with patch.object(
-            self.env.registry["ai.agent"],
-            "_generate_response",
-            side_effect=_generate_response_patch,
-        ):
+        mocked_response = [self.mock_text_response(r) for r in response or []]
+        with self.mock_completion_request(mocked_response):
             if body_html:
                 self.template.body_html = body_html
             yield

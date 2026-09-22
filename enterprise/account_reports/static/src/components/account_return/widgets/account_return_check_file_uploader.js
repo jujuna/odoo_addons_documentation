@@ -1,8 +1,8 @@
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
-import { Component } from "@odoo/owl";
+import { Component, usePlugin, useProps } from "@odoo/owl";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { FileUploader } from "@web/views/fields/file_handler";
+import { ORM } from "@web/core/orm_plugin";
 
 class CustomAccountReturnFileUploaderComponent extends FileUploader {
     static template = "account_reports.CustomAccountReturnFileUploaderComponent"
@@ -13,21 +13,16 @@ class AccountReturnCheckFileUploader extends Component {
     static components = {
         FileUploader: CustomAccountReturnFileUploaderComponent
     };
-    static props = {
-        ...standardWidgetProps,
-    };
+    props = useProps(standardWidgetProps);
 
-    setup() {
-        super.setup();
-        this.orm = useService("orm");
-        this.attachmentIds = [];
-    }
+    orm = usePlugin(ORM);
+    attachmentIds = [];
 
     async onFileUploaded(file) {
         const att_data = {
             name: file.name,
             mimetype: file.type,
-            datas: file.data,
+            raw: file.data,
             res_model: this.props.record.resModel,
             res_id: this.props.record.resId,
         };
@@ -46,8 +41,6 @@ class AccountReturnCheckFileUploader extends Component {
     }
 
     async onClick(event) {
-        console.log("uploader")
-        console.log(event.target);
         event.stopPropagation();
     }
 }

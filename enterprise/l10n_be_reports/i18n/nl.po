@@ -8,23 +8,58 @@
 # Jolien De Paepe, 2023
 # Dylan Kiss, 2023
 # Guido Leenders, 2023
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # Bren Driesen <brdri@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:05+0000\n"
-"PO-Revision-Date: 2026-01-24 10:39+0000\n"
+"POT-Creation-Date: 2026-09-18 18:18+0000\n"
+"PO-Revision-Date: 2026-09-18 04:58+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19-l10n/"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
 "l10n_be_reports/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/controllers/main.py:0
+msgid ""
+"\n"
+"                        Access error: Only the accounting firm can submit "
+"the VAT return to Intervat via the API.\n"
+"                        To submit it yourself, download the XML file and "
+"upload it on Intervat.\n"
+"                        If you no longer have an accounting firm, remove it "
+"from the Intervat setting to enable API submission.\n"
+"                    "
+msgstr ""
+"\n"
+"                        Toegangsprobleem: Alleen het accountantskantoor kan "
+"de btw-aangifte via de API indienen bij Intervat.\n"
+"Om deze zelf in te dienen, download je het XML-bestand en upload je het op "
+"Intervat.\n"
+"Als je geen accountantskantoor meer hebt, verwijder je dit uit de Intervat-"
+"instellingen om API-indiening mogelijk te maken.\n"
+"                    "
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/controllers/main.py:0
+msgid ""
+"\n"
+"                        Access error: You do not have permission to give "
+"consent for company %s. If you are an accounting firm,\n"
+"                        make sure the Accounting firm field is set in the "
+"Intervat settings. Otherwise, only the client can submit the VAT return "
+"through API.\n"
+"                    "
+msgstr ""
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -49,6 +84,67 @@ msgid ""
 "                    </ol>\n"
 "                "
 msgstr ""
+"\n"
+"                    <p> \n"
+"                        Zodra je boekjaar is afgesloten, is het tijd om na "
+"te denken over de vennootschapsbelasting.<br/>\n"
+"                        Hier volgt de belangrijkste informatie in 4 "
+"eenvoudige stappen:\n"
+"                   </p>\n"
+"                    <ol> \n"
+"                       <li> Jaareinde = het aftellen begint. Je hebt 7 "
+"maanden de tijd om je aangifte vennootschapsbelasting in te dienen via <a "
+"href=\"https://finances.belgium.be/fr/E-services/biztax\" "
+"target=\"new\">Biztax</a>.</li>\n"
+"                        <li>Je winst wordt belast tegen 20% of 25%, "
+"afhankelijk van de status van je bedrijf en de hoogte van de winst.</li>\n"
+"                        <li>Eventuele voorafbetalingen die je hebt gedaan, "
+"worden automatisch in mindering gebracht op het totale verschuldigde "
+"belastingbedrag.</li>\n"
+"                        <li>Te veel betaald? Je krijgt een terugbetaling. Te "
+"weinig betaald? Je moet het verschil bijbetalen (en mogelijk een toeslag).</"
+"li>\n"
+"                    </ol>\n"
+"                "
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/controllers/main.py:0
+msgid ""
+"\n"
+"                    SPF Finances authorization denied.\n"
+"                    Initial consent requires an official mandate.\n"
+"                    Please ask a user with the appropriate rights to perform "
+"the first connection for this client.\n"
+"                    Access will then be unlocked.\n"
+"                "
+msgstr ""
+"\n"
+"                    FOD Financiën-autorisatie geweigerd.\n"
+"                    Voor de eerste toestemming is een officieel mandaat "
+"vereist.\n"
+"                    Vraag een gebruiker met de juiste rechten om de eerste "
+"verbinding voor deze client tot stand te brengen.\n"
+"                    De toegang wordt dan ontgrendeld.\n"
+"                "
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_res_company__l10n_be_intervat_mode
+#: model:ir.model.fields,help:l10n_be_reports.field_res_config_settings__l10n_be_intervat_mode
+msgid ""
+"\n"
+"            - Production: Connected to the Intervat API in production mode\n"
+"            - Test: Connected to the Intervat API in test mode\n"
+"            - Disabled: Disconnected from the Intervat server\n"
+"        "
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.module.module,description:base.module_l10n_be_reports
+msgid ""
+"\n"
+"Accounting reports for Belgium\n"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_281_50_pdf
@@ -69,12 +165,7 @@ msgstr "is uitbetaald, vermeld dan hier het bedrag dat werkelijk in"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/res_partner.py:0
 msgid ", phone"
-msgstr ""
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_281_50_pdf
-msgid "0.00"
-msgstr "0.00"
+msgstr ", telefoon"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
@@ -95,71 +186,6 @@ msgstr "2. Naam (of benaming) en adres van de schuldeiser van de inkomsten:"
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
 msgid "2. Phone number:"
 msgstr "2. Telefoonnummer:"
-
-#. module: l10n_be_reports
-#: model:ir.model.fields.selection,name:l10n_be_reports.selection__res_company__l10n_be_isoc_corporate_tax_rate__20
-msgid "20 %"
-msgstr "20 %"
-
-#. module: l10n_be_reports
-#: model:ir.model.fields.selection,name:l10n_be_reports.selection__res_company__l10n_be_isoc_corporate_tax_rate__25
-msgid "25 %"
-msgstr "25 %"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.10"
-msgstr "281.10"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.11"
-msgstr "281.11"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.12"
-msgstr "281.12"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.13"
-msgstr "281.13"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.14"
-msgstr "281.14"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.15"
-msgstr "281.15"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.16"
-msgstr "281.16"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.17"
-msgstr "281.17"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.18"
-msgstr "281.18"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.20"
-msgstr "281.20"
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
-msgid "281.30"
-msgstr "281.30"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_281_50_view_form
@@ -210,7 +236,7 @@ msgstr "Opgave 325 Wizard"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_325_view_tree
 msgid "325 Forms"
-msgstr ""
+msgstr "Opgaven 325"
 
 #. module: l10n_be_reports
 #: model:ir.actions.report,name:l10n_be_reports.action_report_325_form_pdf
@@ -344,30 +370,47 @@ msgstr ""
 "        "
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_config_settings_view_form
+msgid ""
+"<i title=\"Close connection\" role=\"img\" aria-label=\"Close connection\" "
+"class=\"oi oi-fw\" data-icon=\"logout\"/>"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
 msgid "<span class=\"col-lg-4 o_light_label\">Prepayment</span>"
-msgstr ""
+msgstr "<span class=\"col-lg-4 o_light_label\">Voorafbetaling</span>"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid "<span>Download the VAT statement</span><br/>"
-msgstr ""
+msgstr "<span>Download de btw-aangifte</span><br/>"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.ec_sales_list_submission_wizard_form
 msgid ""
 "<span>Download your EC Sales List to submit along your VAT report</span><br/>"
 msgstr ""
+"<span>Download je IC-opgave om samen met je btw-aangifte in te dienen</"
+"span><br/>"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_listing_submission_wizard_form
 msgid "<span>Download your client listing</span><br/>"
-msgstr ""
+msgstr "<span>Download je klantenlijst</span><br/>"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_payment_details_table
 msgid "<strong>Scan me with your banking app.</strong>"
 msgstr "<strong>Scan mij met je bank-app.</strong>"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid ""
+"A validation rule failed. Intervat may reject your VAT report. Open the "
+"report to view the warning."
+msgstr ""
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
@@ -385,16 +428,25 @@ msgid "Account Chart Template"
 msgstr "Rekeningschema"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__partner_id
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__partner_id
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_payment_details_table
 msgid "Account Holder"
 msgstr "Rekeninghouder"
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__account_representative_id
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_config_settings_view_form
+msgid "Accounting Firm"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_account_return
 msgid "Accounting Return"
 msgstr "Btw-aangifte"
+
+#. module: l10n_be_reports
+#: model:ir.model,name:l10n_be_reports.model_account_return_check
+msgid "Accounting Return Check"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_account_return_type
@@ -432,17 +484,17 @@ msgid "Activity Type"
 msgstr "Soort activiteit"
 
 #. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_lock_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid "Actual Use Incoming Transactions"
-msgstr ""
+msgstr "Werkelijk gebruik Inkomende transacties"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__prorata_at_0
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__prorata_at_0
 msgid "Actual Use at 0%"
 msgstr "Feitelijk gebruik bij 0%"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__prorata_at_100
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__prorata_at_100
 msgid "Actual Use at 100%"
 msgstr "Feitelijk gebruik bij 100%"
 
@@ -499,14 +551,20 @@ msgid "Amount"
 msgstr "Bedrag"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__amount_to_pay
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__amount_to_get
+msgid "Amount To Get"
+msgstr "Te ontvangen bedrag"
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__amount_to_pay
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__amount_to_pay
 msgid "Amount To Pay"
 msgstr "Te betalen bedrag"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__currency_id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__currency_id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__currency_id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__amount_to_get_currency_id
 msgid "Amount To Pay Currency"
 msgstr "Valuta van te betalen bedrag"
 
@@ -516,6 +574,8 @@ msgid ""
 "Amount paid during the reference year and the preceding year related to the "
 "total remuneration"
 msgstr ""
+"Bedrag betaald tijdens het referentiejaar en het voorgaande jaar in verband "
+"met de totale vergoeding"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_payment_details_table
@@ -526,10 +586,20 @@ msgstr "Te betalen bedrag"
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__sportsman_remuneration
 msgid "Amount within total remuneration related to sportsman remuneration"
 msgstr ""
+"Bedrag binnen de totale vergoeding dat betrekking heeft op de vergoeding van "
+"sportbeoefenaars"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__trainer_remuneration
 msgid "Amount within total remuneration related to trainer remuneration"
+msgstr ""
+"Bedrag binnen de totale vergoeding dat betrekking heeft op de vergoeding van "
+"trainers"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "An error has occurred when trying to verify your subscription."
 msgstr ""
 
 #. module: l10n_be_reports
@@ -542,30 +612,23 @@ msgstr "Jaarrekening"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_general_ledger.py:0
 msgid "Annual Balance Report"
-msgstr ""
+msgstr "Jaarlijks balansrapport"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_annual_statement_report_handler
 msgid "Annual Statement Custom Handler"
-msgstr ""
-
-#. module: l10n_be_reports
-#: model:ir.ui.menu,name:l10n_be_reports.menu_action_account_report_annual_statements
-msgid "Annual Statements"
-msgstr "Jaarrekeningen"
+msgstr "Aangepaste handler voor jaarrekening"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_payroll_director_benefit_in_kind
 msgid ""
-"Are all benefits in kind (BIK) accounted for for the director (cell phone, "
+"Are all benefits in kind (BIK) accounted for the director (cell phone, "
 "internet, PC, car, etc.)?\n"
-"\n"
 "As with the previous check, this is to ensure that all benefits in kind for "
 "the director are properly accounted for and declared."
 msgstr ""
 "Zijn alle voordelen van alle aard (VAA) voor de bedrijfsleider geboekt (gsm, "
 "internet, laptop, auto, enz.)?\n"
-"\n"
 "Net als bij de vorige controle dient dit om te verzekeren dat alle voordelen "
 "van alle aard voor de bedrijfsleider correct zijn geboekt en aangegeven."
 
@@ -573,7 +636,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_rc_investment_deduction
 msgid ""
 "Are certain assets eligible for the investment deduction?\n"
-"\n"
 "The investment deduction allows for a tax reduction for new purchases. It is "
 "necessary to verify that only eligible assets are included in this "
 "calculation."
@@ -589,7 +651,6 @@ msgstr ""
 msgid ""
 "Are the capital and formation expenses, like notary fees, recorded "
 "correctly?\n"
-"\n"
 "Formation expenses, such as notary fees, must be recorded as an asset on the "
 "balance sheet and amortized over time. Capital, however, represents owner's "
 "equity and should be recorded on the liability side."
@@ -606,7 +667,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_fixed_assets_depreciation_rate
 msgid ""
 "Are the depreciation rates and rules in line with tax requirements?\n"
-"\n"
 "Depreciation is the allocation of the cost of an asset over several years. "
 "It is important that the depreciation period used complies with Belgian tax "
 "rules so that it is not rejected in the event of an audit."
@@ -623,7 +683,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_sales_bad_debts
 msgid ""
 "Are there any doubtful debtors to record and provision for?\n"
-"\n"
 "A debtor is \"doubtful\" if there is reason to believe that they will not "
 "pay. This situation must be recorded in the accounts to reflect the "
 "financial reality of the business."
@@ -640,7 +699,6 @@ msgstr ""
 msgid ""
 "Are there any expenses to be included in the fiscal year (expenses paid in "
 "the next fiscal year)?\n"
-"\n"
 "You need to check if the company has paid for expenses (e.g. an annual "
 "insurance policy) that concern the next fiscal year. These expenses must be "
 "allocated correctly."
@@ -657,7 +715,6 @@ msgstr ""
 msgid ""
 "Are there any foreign currency accounts that need to be revalued at the end "
 "of the fiscal year?\n"
-"\n"
 "If the company has foreign currency accounts, the amounts must be adjusted "
 "to reflect the exchange rate at the end of the fiscal year."
 msgstr ""
@@ -672,7 +729,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_inventory_value_reduction_on_old_stock
 msgid ""
 "Are there any inventory write-downs to be recorded (old stock)?\n"
-"\n"
 "If goods in stock have lost value (are obsolete or damaged), this must be "
 "reflected in the accounts by means of a write-down, which is often tax "
 "deductible."
@@ -688,7 +744,6 @@ msgstr ""
 msgid ""
 "Are there any investments that need to be removed because they no longer "
 "exist or are obsolete?\n"
-"\n"
 "If an asset is no longer used or is out of service, it must be removed from "
 "the company's assets. This check is used to identify these assets and record "
 "them correctly."
@@ -717,7 +772,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_payroll_social_secretariat_concordance
 msgid ""
 "Are your salaries identical to those reported by the payroll office?\n"
-"\n"
 "It is essential that the salaries recorded match the declarations made by "
 "the payroll office. This helps to avoid errors and the risk of audits by the "
 "National Social Security Office (NSSO) or the tax authorities."
@@ -730,7 +784,7 @@ msgstr ""
 "door de RSZ of de fiscus te vermijden."
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__ask_restitution
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__ask_restitution
 msgid "Ask Restitution"
 msgstr "Vraag teruggave"
 
@@ -752,7 +806,6 @@ msgstr "Aantal bijlagen"
 
 #. module: l10n_be_reports
 #. odoo-python
-#: code:addons/l10n_be_reports/models/account_sales_report.py:0
 #: code:addons/l10n_be_reports/models/partner_vat_listing.py:0
 msgid "Audit"
 msgstr "Audit"
@@ -768,29 +821,42 @@ msgid "Audit Accounts (BE)"
 msgstr "Auditrekeningen (BE)"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/controllers/main.py:0
+msgid "Authentication Error: \n"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/controllers/main.py:0
+msgid "Authentication Failed"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_bce_number
 msgid "BCE number"
 msgstr "Ondernemingsnummer"
 
 #. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_lock_wizard_form
-msgid "Bank"
-msgstr "Bank"
+#: model:ir.actions.act_window,name:l10n_be_reports.action_account_journal_bank_reconciliation
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.view_bank_journals_list
+msgid "Bank Journals"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_company_region
 msgid "Belgian Company Region"
-msgstr ""
+msgstr "Belgisch bedrijf Regio"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_company_type
 msgid "Belgian Company Type"
-msgstr ""
+msgstr "Belgisch bedrijf Type"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_ec_sales_report_handler
 msgid "Belgian EC Sales Report Custom Handler"
-msgstr ""
+msgstr "Aangepaste handler Belgische IC-opgave"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_annual_corporate_tax_submission_wizard
@@ -799,18 +865,18 @@ msgid "Belgian Periodic VAT Report Export Wizard"
 msgstr "Wizard Belgische periodieke btw-rapporten exporteren"
 
 #. module: l10n_be_reports
-#: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_vat_return_lock_wizard
-msgid "Belgian Periodic VAT Report Lock Wizard"
-msgstr ""
-
-#. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_tax_report_handler
 msgid "Belgian Tax Report Custom Handler"
-msgstr ""
+msgstr "Aangepaste handler voor belgische btw-aangifte"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_xbrl_export_wizard
 msgid "Belgian XBRL Export Wizard"
+msgstr "Belgische XBRL-exportwizard"
+
+#. module: l10n_be_reports
+#: model:ir.module.module,shortdesc:base.module_l10n_be_reports
+msgid "Belgium - Accounting Reports"
 msgstr ""
 
 #. module: l10n_be_reports
@@ -828,6 +894,11 @@ msgstr "Annuleren"
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_50_divider_pdf
 msgid "Carry over from the previous divider"
 msgstr "Overgebracht van het vorige tussenblad"
+
+#. module: l10n_be_reports
+#: model:ir.model,name:l10n_be_reports.model_certificate_certificate
+msgid "Certificate"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_partner__citizen_identification
@@ -851,6 +922,27 @@ msgid "City of the partner when the form was created"
 msgstr "Gemeente van de partner toen de fiche werd aangemaakt"
 
 #. module: l10n_be_reports
+#: model:ir.model.fields.selection,name:l10n_be_reports.selection__l10n_be_reports_vat_return_submission_wizard__client_nihil__yes
+msgid "Claim Exception (Nihil)."
+msgstr ""
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
+msgid "Click here"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_journal.py:0
+msgid "Client"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__client_nihil
+msgid "Client Nihil"
+msgstr "Klant Nihil"
+
+#. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.pdf_export_filters
 msgid "Client nihil:"
 msgstr "Klant nihil:"
@@ -872,7 +964,7 @@ msgid "Commissions"
 msgstr "Commissies"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__communication
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__communication
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__communication
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_payment_details_table
 msgid "Communication"
@@ -880,13 +972,9 @@ msgstr "Communicatie"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_res_company
-msgid "Companies"
-msgstr "Bedrijven"
-
-#. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__company_id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325_wizard__company_id
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__company_id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__company_id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__company_id
 msgid "Company"
 msgstr "Bedrijf"
@@ -894,7 +982,7 @@ msgstr "Bedrijf"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_region_id
 msgid "Company Region"
-msgstr ""
+msgstr "Bedrijf Regio"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_company_type_id
@@ -914,6 +1002,11 @@ msgid "Company: %s"
 msgstr "Bedrijf: %s"
 
 #. module: l10n_be_reports
+#: model:ir.model,name:l10n_be_reports.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_res_partner
 msgid "Contact"
 msgstr "Contact"
@@ -924,10 +1017,10 @@ msgid "Copyrights"
 msgstr "Auteursrechten"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__corporate_tax_rate
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__corporate_tax_rate
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_isoc_corporate_tax_rate
 msgid "Corporate Tax Rate"
-msgstr ""
+msgstr "Vennootschapsbelasting"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__country_id
@@ -967,12 +1060,12 @@ msgstr "Een klant aanmaken"
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_annual_corporate_tax_submission_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_ec_sales_list_submission_wizard__create_uid
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__create_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_listing_submission_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__create_uid
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_xbrl_export_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__create_uid
 msgid "Created by"
 msgstr "Aangemaakt door"
 
@@ -984,12 +1077,12 @@ msgstr "Aangemaakt door"
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_annual_corporate_tax_submission_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_ec_sales_list_submission_wizard__create_date
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__create_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_listing_submission_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__create_date
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_xbrl_export_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__create_date
 msgid "Created on"
 msgstr "Aangemaakt op"
 
@@ -1015,9 +1108,15 @@ msgid "DESIGNATION OF THE FORMS"
 msgstr "BENAMING VAN DE FICHES"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_journal.py:0
+msgid "Daily Cash Receipts"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_xbrl_export_wizard__last_deed_date
 msgid "Date of last deed"
-msgstr ""
+msgstr "Datum van laatste akte"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__debtor_id
@@ -1081,13 +1180,18 @@ msgid "Debtor is Natural Person"
 msgstr "Schuldenaar is een natuurlijk persoon"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__prorata
+#: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_oe_year_end_expense_accruals
+msgid "Deferred expense report"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__prorata
 msgid "Definitive Prorata"
 msgstr "Definitieve Prorata"
 
 #. module: l10n_be_reports
 #. odoo-python
-#: code:addons/l10n_be_reports/wizard/vat_return_lock_wizard.py:0
+#: code:addons/l10n_be_reports/wizard/vat_report_export.py:0
 msgid "Definitive prorata must be an integer between 1 and 100"
 msgstr "Definitieve pro rata moet een geheel getal zijn tussen 1 en 100"
 
@@ -1111,7 +1215,6 @@ msgstr "Afschrijvingsschema ↔ Proefbalans"
 msgid ""
 "Did the company pay interest to an affiliated company (verification of "
 "market rate)?\n"
-"\n"
 "This check is similar to the previous one, but concerns loans between "
 "affiliated companies. It is necessary to ensure that the interest rates "
 "comply with market rates to avoid tax issues."
@@ -1128,7 +1231,6 @@ msgstr ""
 msgid ""
 "Did the company receive interest from an affiliated company (verification of "
 "market rate)?\n"
-"\n"
 "If the company lends money to another affiliated company, it must charge "
 "market-rate interest in order to avoid a tax adjustment."
 msgstr ""
@@ -1143,7 +1245,6 @@ msgstr ""
 msgid ""
 "Did you check with the next fiscal year whether all amounts were correctly "
 "allocated?\n"
-"\n"
 "This is a check to ensure that expenses and income for one fiscal year have "
 "not been mistakenly transferred to the next fiscal year, or vice versa."
 msgstr ""
@@ -1158,7 +1259,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_fixed_assets_investments
 msgid ""
 "Did you correctly create every investment in Odoo?\n"
-"\n"
 "Every durable asset purchased by the company (machinery, furniture, etc.) "
 "must be recorded as an investment. This check verifies that these assets are "
 "being tracked correctly for depreciation purposes."
@@ -1186,18 +1286,20 @@ msgid "Director's Meal Vouchers: Recording"
 msgstr "Maaltijdcheques bedrijfsleider: boeking"
 
 #. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_lock_wizard_form
-msgid "Discard"
-msgstr "Negeren"
+#: model:ir.model.fields.selection,name:l10n_be_reports.selection__res_company__l10n_be_intervat_mode__disabled
+msgid "Disabled"
+msgstr "Uitgeschakeld"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_chart_template__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_general_ledger_report_handler__display_name
+#: model:ir.model.fields,field_description:l10n_be_reports.field_account_journal__display_name
+#: model:ir.model.fields,field_description:l10n_be_reports.field_account_move__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_return__display_name
+#: model:ir.model.fields,field_description:l10n_be_reports.field_account_return_check__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_return_type__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_annual_statement_report_handler__display_name
+#: model:ir.model.fields,field_description:l10n_be_reports.field_certificate_certificate__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_region__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_type__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_ec_sales_report_handler__display_name
@@ -1207,19 +1309,20 @@ msgstr "Negeren"
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_partner_vat_handler__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_annual_corporate_tax_submission_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_ec_sales_list_submission_wizard__display_name
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_listing_submission_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__display_name
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_xbrl_export_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_tax_report_handler__display_name
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_mail_activity_type__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_qr_code_payment_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_report_l10n_be_reports_report_281_50_pdf__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_report_l10n_be_reports_report_281_50_xml__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_report_l10n_be_reports_report_325_pdf__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_partner__display_name
 msgid "Display Name"
 msgstr "Schermnaam"
@@ -1235,16 +1338,9 @@ msgid "Divider N°"
 msgstr "Tussenblad nr."
 
 #. module: l10n_be_reports
-#. odoo-javascript
-#: code:addons/l10n_be_reports/static/src/components/tax_report/warnings.xml:0
-msgid "Do not forget to submit the"
-msgstr "Vergeet niet om de"
-
-#. module: l10n_be_reports
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_payroll_28120
 msgid ""
 "Do the salaries match and correspond to tax form 281.20?\n"
-"\n"
 "Tax form 281.20 summarizes the remuneration of directors. This check ensures "
 "that the salaries recorded correspond to those declared to the tax "
 "authorities."
@@ -1260,7 +1356,6 @@ msgstr ""
 msgid ""
 "Do you have a complete file for each vehicle (motorbike/car/commercial "
 "vehicle)?\n"
-"\n"
 "Vehicle expenses are subject to specific deductibility rules in Belgium. A "
 "complete file is necessary to correctly calculate depreciation and "
 "deductible expenses based on CO₂ emissions."
@@ -1276,7 +1371,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_rc_memo
 msgid ""
 "Do you have all the information for your personal income tax declaration?\n"
-"\n"
 "Make sure you have your essential personal information (family situation, "
 "income, etc.) complete and up to date to ensure an accurate personal tax "
 "declaration."
@@ -1286,6 +1380,11 @@ msgstr ""
 "Zorg dat je essentiële persoonlijke informatie (gezinssituatie, inkomen, "
 "etc.) volledig en up-to-date is om een correcte persoonlijke "
 "belastingaangifte te garanderen."
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__is_recovered
+msgid "Does this payment recover previous recoverable amounts"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_sales_bad_debts
@@ -1323,7 +1422,7 @@ msgstr "Concept"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_payment_details_table
 msgid "Due By"
-msgstr ""
+msgstr "Te betalen voor"
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -1340,24 +1439,12 @@ msgstr "Nederlands"
 #: model:account.return.type,name:l10n_be_reports.be_ec_sales_list_return_type
 #: model:ir.model.fields.selection,name:l10n_be_reports.selection__mail_activity_type__category__ec_sales_list
 msgid "EC Sales List"
-msgstr "IC-opgave"
-
-#. module: l10n_be_reports
-#. odoo-python
-#: code:addons/l10n_be_reports/models/account_sales_report.py:0
-msgid "EC Sales List Audit"
-msgstr "Btw-opgave van de intracommunautaire handelingen"
+msgstr "ICP-aangifte"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_ec_sales_list_submission_wizard
 msgid "EC Sales List Submission Wizard"
-msgstr ""
-
-#. module: l10n_be_reports
-#. odoo-javascript
-#: code:addons/l10n_be_reports/static/src/components/tax_report/warnings.xml:0
-msgid "EC Sales list report"
-msgstr "Btw-opgave van de intracommunautaire handelingen"
+msgstr "Wizard voor het indienen van IC-opgaven"
 
 #. module: l10n_be_reports
 #. odoo-javascript
@@ -1366,8 +1453,6 @@ msgid ""
 "EC Sales taxes report total does not match Tax Report lines 44 + 46L + 46T - "
 "48s44 - 48s46L - 48s46T."
 msgstr ""
-"Het totaal van de intracommunautaire listing komt niet overeen met lijnen 44 "
-"+ 46L + 46T - 48s44 - 48s46L - 48s46T op de btw-aangifte."
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -1385,14 +1470,21 @@ msgid "Enterprise N°:"
 msgstr "Ondernemingsnummer:"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "Error while contacting IAP."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "Error while generating the certificate."
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__exposed_expenses
 msgid "Exposed expenses"
 msgstr "Uitgegeven kosten"
-
-#. module: l10n_be_reports
-#: model:ir.model,name:l10n_be_reports.model_account_general_ledger_report_handler
-msgid "FEC Report Custom Handler"
-msgstr ""
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
@@ -1420,6 +1512,17 @@ msgid "Fees"
 msgstr "Vergoedingen"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.account_return_kanban_view
+msgid "Fetch from Intervat"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/controllers/main.py:0
+msgid "Fetching Error: \n"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_tf_final_cash_transaction_balance
 msgid "Final Cash Reconciliation"
 msgstr "Definitieve kasafstemming"
@@ -1437,7 +1540,7 @@ msgstr "Financiële opbrengsten met een bijzonder belastingstelsel"
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__partner_first_name
 msgid "Firstname of the partner when the form was created"
-msgstr ""
+msgstr "Voornaam van de partner toen het formulier werd aangemaakt"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__message_follower_ids
@@ -1554,6 +1657,12 @@ msgid "Go to company configuration"
 msgstr "Ga naar bedrijfsconfiguratie"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_sales_report.py:0
+msgid "Goods"
+msgstr "Goederen"
+
+#. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_sales_purchase_sales_margin_consistency
 msgid "Gross Margin Consistency"
 msgstr "Consistentie van de brutomarge"
@@ -1569,7 +1678,6 @@ msgstr "Heeft een bericht"
 msgid ""
 "Has the company paid interest on the director's current account "
 "(verification of the market rate)?\n"
-"\n"
 "If a director has lent money to their company (account 489), they can "
 "receive interest. It is important to check that the interest rate is not too "
 "high, otherwise it could be reclassified for tax purposes."
@@ -1586,7 +1694,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_inventory_recording
 msgid ""
 "Has the inventory been recorded?\n"
-"\n"
 "Inventory (stock of goods) is an important asset that must be valued and "
 "recorded at the end of the fiscal year to determine the company's exact "
 "results."
@@ -1601,7 +1708,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_state_provison_for_corporate_tax
 msgid ""
 "Have you accrued for the corporate tax?\n"
-"\n"
 "At the end of the fiscal year, you must estimate the taxes that the company "
 "will have to pay on its profits and set aside provisions to accurately "
 "reflect its financial situation."
@@ -1616,7 +1722,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_other_prorating_expenses_income
 msgid ""
 "Have you calculated the prorated expenses/income?\n"
-"\n"
 "This check ensures that revenues and expenses are allocated to the correct "
 "fiscal year, in line with the accrual principle. In Belgium, prorating is "
 "required to present an accurate picture of the company's financial position "
@@ -1634,7 +1739,6 @@ msgstr ""
 msgid ""
 "Have you checked open customer accounts (abnormal balances, pending "
 "payments, etc.)?\n"
-"\n"
 "This is to ensure that the money owed to the company by customers is "
 "correctly recorded and tracked. Abnormal balances may indicate a billing or "
 "collection issue."
@@ -1651,7 +1755,6 @@ msgstr ""
 msgid ""
 "Have you checked that the balance of provisions is correct and that the uses "
 "of the account are justified?\n"
-"\n"
 "This check is used to verify that all of the company's provisions are "
 "correctly justified and calculated, and that they correspond to actual risks "
 "or expenses."
@@ -1668,7 +1771,6 @@ msgstr ""
 msgid ""
 "Have you checked the VAT current account against the latest account "
 "statement and accounting records?\n"
-"\n"
 "The VAT account must match the payments and refunds made to the tax "
 "authorities. This check ensures that there are no discrepancies and allows "
 "you to verify your tax returns."
@@ -1685,7 +1787,6 @@ msgstr ""
 msgid ""
 "Have you checked the accounting to ensure that VAT rules are being applied "
 "correctly?\n"
-"\n"
 "This involves verifying that VAT rules (rates, deductibility, etc.) are "
 "being applied correctly to all transactions. Errors can lead to tax "
 "adjustments."
@@ -1702,7 +1803,6 @@ msgstr ""
 msgid ""
 "Have you checked the end-of-period bank balances against the account "
 "statements and the accounting records?\n"
-"\n"
 "It is essential that the balance of the bank accounts in the accounting "
 "records corresponds exactly to the balance of the account statements on the "
 "closing date."
@@ -1718,7 +1818,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_fixed_assets_depreciaton_schedule_against_trial_balance
 msgid ""
 "Have you checked the investment table against the trial balance?\n"
-"\n"
 "The list of investments must match the totals of the asset accounts in the "
 "trial balance. This check ensures that there are no omissions."
 msgstr ""
@@ -1733,7 +1832,6 @@ msgstr ""
 msgid ""
 "Have you checked the margin on purchases compared to sales? Is it "
 "consistent?\n"
-"\n"
 "This check ensures that the company's margin rate is realistic and "
 "consistent with the industry, which can avoid questions in the event of an "
 "audit."
@@ -1749,7 +1847,6 @@ msgstr ""
 msgid ""
 "Have you checked the short-term and long-term accounts and the interest "
 "recorded with the liabilities?\n"
-"\n"
 "This check ensures that liabilities and associated interest are correctly "
 "recorded and classified as short-term or long-term."
 msgstr ""
@@ -1764,7 +1861,6 @@ msgstr ""
 msgid ""
 "Have you checked whether there is any benefit in kind (BIK) to be calculated "
 "and whether the transactions in the current account have been justified?\n"
-"\n"
 "BIK is a benefit granted by the company to its director (company car, cell "
 "phone, etc.) which is taxable. It is important to ensure that all benefits "
 "are properly declared and that the director's current account is justified."
@@ -1782,7 +1878,6 @@ msgstr ""
 msgid ""
 "Have you checked your advance tax payments against the annual statement from "
 "the FPS Finance?\n"
-"\n"
 "The tax authorities send out a statement of advance tax payments. This check "
 "ensures that the amounts recorded match those declared by the authorities."
 msgstr ""
@@ -1798,7 +1893,6 @@ msgstr ""
 msgid ""
 "Have you considered deferring your advance tax payments (no later than the "
 "last quarter)?\n"
-"\n"
 "Advance tax payments allow you to reduce or avoid tax surcharges. This check "
 "reminds you to verify that you have made your advance payments and to ensure "
 "that they have been correctly taken into account."
@@ -1814,7 +1908,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_other_turnover_against_vat_concordance
 msgid ""
 "Have you matched your sales figures with your VAT figures?\n"
-"\n"
 "You must ensure that the sales figures declared to the VAT authorities are "
 "the same as those recorded in the company's books."
 msgstr ""
@@ -1829,7 +1922,6 @@ msgstr ""
 msgid ""
 "Have you posted the entries related to the amendment of the articles of "
 "association to ensure that the accounts are up to date?\n"
-"\n"
 "If the company has amended its articles of association (change of purpose, "
 "name, etc.), it is crucial that these changes are reflected in the company's "
 "accounts and legal documentation."
@@ -1846,7 +1938,6 @@ msgstr ""
 msgid ""
 "Have you prepared form 270 MLH for rents paid (including those paid by the "
 "director) and checked if reclassification is needed?\n"
-"\n"
 "This check is crucial for the tax return, as it allows to verify whether "
 "part of the rent paid to the director should be reclassified as taxable "
 "income."
@@ -1864,7 +1955,6 @@ msgstr ""
 msgid ""
 "Have you reclassified accounts 453 and 454, which would be included in "
 "current liabilities?\n"
-"\n"
 "Tax and social security liabilities must be reclassified as current "
 "liabilities if they are due within the year, which is crucial for balance "
 "sheet analysis."
@@ -1881,7 +1971,6 @@ msgstr ""
 msgid ""
 "Have you reclassified the long term liabilities accounts to short term "
 "liabilities?\n"
-"\n"
 "This check verifies that long-term liabilities due within the year are moved "
 "to short-term liabilities."
 msgstr ""
@@ -1895,7 +1984,6 @@ msgstr ""
 msgid ""
 "Have you reconciled accounts 453, 454, and 455 to ensure that the accounts "
 "are settled or correctly justified?\n"
-"\n"
 "Confirm that all advances, down payments, salaries, and social charges have "
 "been properly recorded, settled, or justified (e.g. salary deductions, "
 "reimbursements, social security liabilities)."
@@ -1911,7 +1999,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_fixed_assets_depreciation_recording_completeness
 msgid ""
 "Have you recorded depreciations up to the end of the period?\n"
-"\n"
 "You must ensure that depreciation of assets has been calculated and recorded "
 "up to the balance sheet date."
 msgstr ""
@@ -1924,7 +2011,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_tf_final_cash_transaction_balance
 msgid ""
 "Have you recorded the latest cash transactions? Is the balance correct?\n"
-"\n"
 "You must ensure that all cash transactions have been recorded up to the "
 "closing date and that the cash balance is correct."
 msgstr ""
@@ -1937,7 +2023,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_payroll_director_meal_vouchers
 msgid ""
 "Have you recorded the portion of meal vouchers payable by the director?\n"
-"\n"
 "The company and the employee (or director) share the cost of meal vouchers. "
 "You must ensure that the allocation and recording are correct for tax "
 "purposes."
@@ -1954,7 +2039,6 @@ msgstr ""
 msgid ""
 "Have you reviewed doubtful amounts receivable? Has an appropriate provision "
 "for doubtful amounts been established or reversed?\n"
-"\n"
 "This ensures that overdue or risky client balances are evaluated regularly, "
 "and that provisions for potential losses are accurately reflected in the "
 "accounts based on updated payment status."
@@ -1972,7 +2056,6 @@ msgstr ""
 msgid ""
 "Have you set aside provisions for holiday pay for hourly and salaried "
 "employees?\n"
-"\n"
 "Holiday pay is an expense for the company. The amount must be set aside at "
 "the end of the fiscal year to anticipate payments for the next year."
 msgstr ""
@@ -1987,7 +2070,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_payroll_13_month
 msgid ""
 "Have you set aside provisions for the 13th month, if applicable?\n"
-"\n"
 "If the 13th month is mandatory, provisions must be set aside at the end of "
 "the fiscal year to accurately reflect the year's expenses."
 msgstr ""
@@ -1998,13 +2080,13 @@ msgstr ""
 "voorziening worden aangelegd om de kosten van dat jaar correct weer te geven."
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__submit_more
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__submit_more
 msgid "I want to submit more than 5 specific prorata"
 msgstr "Ik wil meer dan 5 specifieke pro rata's indienen"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__acc_number
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__acc_number
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__account_number
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__account_number
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_payment_details_table
 msgid "IBAN"
 msgstr "IBAN"
@@ -2012,9 +2094,13 @@ msgstr "IBAN"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_chart_template__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_general_ledger_report_handler__id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_account_journal__id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_account_move__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_return__id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_account_return_check__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_account_return_type__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_annual_statement_report_handler__id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_certificate_certificate__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_region__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_type__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_ec_sales_report_handler__id
@@ -2024,19 +2110,20 @@ msgstr "IBAN"
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_partner_vat_handler__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_annual_corporate_tax_submission_wizard__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_ec_sales_list_submission_wizard__id
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_listing_submission_wizard__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__id
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_xbrl_export_wizard__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_tax_report_handler__id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_mail_activity_type__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_qr_code_payment_wizard__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_report_l10n_be_reports_report_281_50_pdf__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_report_l10n_be_reports_report_281_50_xml__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_report_l10n_be_reports_report_325_pdf__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_res_partner__id
 msgid "ID"
 msgstr "ID"
@@ -2069,7 +2156,6 @@ msgstr "indien aangevinkt hebben sommige leveringen een fout."
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_rc_correct_rec_of_financial_prod
 msgid ""
 "If financial income exists, have you recorded it correctly?\n"
-"\n"
 "Once financial income has been identified, you must ensure that it is "
 "recorded in the correct accounts in order to comply with accounting and tax "
 "standards."
@@ -2080,7 +2166,7 @@ msgstr ""
 "geboekt om te voldoen aan boekhoudkundige en fiscale normen."
 
 #. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_lock_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid ""
 "If the field '% Special pro rata deduction' is filled, one of the fields "
 "'Special pro rata' must be filled"
@@ -2093,7 +2179,6 @@ msgstr ""
 msgid ""
 "If there is an IPS, is the amount paid tax deductible and related to the "
 "director's salary?\n"
-"\n"
 "An IPS (Individual Pension Scheme) is a life insurance policy for directors. "
 "It is important to ensure that the premiums paid are tax deductible, which "
 "depends on the director's salary."
@@ -2110,7 +2195,6 @@ msgstr ""
 msgid ""
 "If you have claimed copyright royalties, have you checked all your "
 "declarations and deductibility?\n"
-"\n"
 "Copyright income is subject to a specific tax regime. It is essential to "
 "ensure that this income is correctly declared and that deductibility is "
 "properly applied."
@@ -2127,7 +2211,6 @@ msgstr ""
 msgid ""
 "If you have purchased goods, have you checked whether an inventory has been "
 "carried out to calculate the margin?\n"
-"\n"
 "This check ensures that the stock of goods has been correctly valued in "
 "order to calculate the gross margin and the cost of goods sold."
 msgstr ""
@@ -2138,13 +2221,28 @@ msgstr ""
 "de brutomarge en de kostprijs van de verkochte goederen te kunnen berekenen."
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid ""
+"If you just submitted your declaration, you might need to wait until "
+"tomorrow to fetch the documents. You can still retrieve them from the "
+"Intervat Portal."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "Impossible to check the response signature."
+msgstr ""
+
+#. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
 msgid ""
 "In Belgium, companies that have been operating for 3 years or more are "
 "required to pay their \n"
 "                                corporate tax in 4 installments throughout "
 "the year. For newer companies, this is not mandatory, but it is still "
-"recommanded.<br/>\n"
+"recommended.<br/>\n"
 "                                <br/>\n"
 "                                You estimate your annual profit, we then "
 "divide the total corporate tax amount into 4 equal installments."
@@ -2186,9 +2284,59 @@ msgstr "Interesten op rekening-courant van de bedrijfsleider"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.ec_sales_list_submission_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_config_settings_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_listing_submission_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid "Intervat"
+msgstr "Intervat"
+
+#. module: l10n_be_reports
+#: model:ir.actions.server,name:l10n_be_reports.cron_intervat_refresh_token_ir_actions_server
+msgid "Intervat (BE): Update refresh token"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_client_id
+msgid "Intervat Client ID"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_certificate_id
+msgid "Intervat JWT Certificate"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_private_key
+msgid "Intervat Private Key"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_mode
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__l10n_be_intervat_mode
+msgid "Intervat Server Mode"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__l10n_be_intervat_ecb
+msgid "Intervat VAT number"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "Intervat Validation"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_config_settings.py:0
+msgid "Intervat connection closed."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "Intervat is not activated. You can activate it in the settings."
 msgstr ""
 
 #. module: l10n_be_reports
@@ -2220,7 +2368,7 @@ msgstr "Investeringen"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "Invoices Without Country"
-msgstr ""
+msgstr "Facturen zonder land"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__message_is_follower
@@ -2229,7 +2377,6 @@ msgid "Is Follower"
 msgstr "Is een volger"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__is_recoverable
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__is_recoverable
 msgid "Is Recoverable"
 msgstr "Is terugvorderbaar"
@@ -2239,7 +2386,6 @@ msgstr "Is terugvorderbaar"
 msgid ""
 "Is the investment grant justified and have you used the account according to "
 "the legislation in force?\n"
-"\n"
 "Grants received are financial aid. Their justification must be checked and "
 "they must be recorded in the correct account to comply with legal and fiscal "
 "obligations."
@@ -2262,7 +2408,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_tf_suspense_account
 msgid ""
 "Is the suspense account empty?\n"
-"\n"
 "This temporary account should only hold amounts pending clarification. "
 "Ensure it's empty or that any balances are justified and promptly "
 "reclassified to the correct account."
@@ -2279,7 +2424,6 @@ msgstr ""
 msgid ""
 "Is there a negative bank account balance that should be transferred at "
 "closing?\n"
-"\n"
 "A negative bank balance may indicate an overdraft. You must ensure that this "
 "balance is correctly recorded as a debt on the closing date."
 msgstr ""
@@ -2294,7 +2438,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_rc_financial_prod_with_sp_tax_regime
 msgid ""
 "Is there any financial income that benefits from a specific tax regime?\n"
-"\n"
 "This could include capital gains on shares or dividends. Some types of "
 "income benefit from special tax treatment, which should be checked in order "
 "to optimize your tax return."
@@ -2311,7 +2454,6 @@ msgstr ""
 msgid ""
 "Is there any income to be recognized for the fiscal year (income still to be "
 "invoiced)?\n"
-"\n"
 "This check verifies whether the company has provided a service or sold goods "
 "before the end of the fiscal year but has not yet sent the invoice. The "
 "income must be recognized for the current fiscal year."
@@ -2329,7 +2471,6 @@ msgstr ""
 msgid ""
 "Is there any rent in this account that could be reclassified as remuneration "
 "for the excess portion?\n"
-"\n"
 "If a director rents property to their company, part of the rent may be "
 "considered taxable remuneration if it exceeds a certain amount. This check "
 "verifies whether this rule is being followed."
@@ -2343,9 +2484,76 @@ msgstr ""
 "wordt gevolgd."
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_account_return__l10n_be_isoc_payment_form_id
+msgid "Isoc form"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_job_position
 msgid "Job position"
 msgstr "Beroep"
+
+#. module: l10n_be_reports
+#: model:ir.model,name:l10n_be_reports.model_account_journal
+msgid "Journal"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model,name:l10n_be_reports.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_access_token
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__l10n_be_intervat_access_token
+msgid "L10N Be Intervat Access Token"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_code_challenge
+msgid "L10N Be Intervat Code Challenge"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_code_verifier
+msgid "L10N Be Intervat Code Verifier"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_certificate_certificate__l10n_be_intervat_jwk_kid
+msgid "L10N Be Intervat Jwk Kid"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_certificate_certificate__l10n_be_intervat_jwk_token
+msgid "L10N Be Intervat Jwk Token"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_last_call_date
+msgid "L10N Be Intervat Last Call Date"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_refresh_token
+msgid "L10N Be Intervat Refresh Token"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_company__l10n_be_intervat_show_settings
+#: model:ir.model.fields,field_description:l10n_be_reports.field_res_config_settings__l10n_be_intervat_show_settings
+msgid "L10N Be Intervat Show Settings"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_account_return__l10n_be_isoc_mute_buttons
+msgid "L10N Be Isoc Mute Buttons"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_account_return__l10n_be_submission_error
+msgid "L10N Be Submission Error"
+msgstr "L10N Be Indienfout"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_region__write_uid
@@ -2355,12 +2563,12 @@ msgstr "Beroep"
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_annual_corporate_tax_submission_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_ec_sales_list_submission_wizard__write_uid
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__write_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_listing_submission_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__write_uid
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_xbrl_export_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__write_uid
 msgid "Last Updated by"
 msgstr "Laatst bijgewerkt door"
 
@@ -2372,12 +2580,12 @@ msgstr "Laatst bijgewerkt door"
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_annual_corporate_tax_submission_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_ec_sales_list_submission_wizard__write_date
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__write_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_listing_submission_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__write_date
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_xbrl_export_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__write_date
 msgid "Last Updated on"
 msgstr "Laatst bijgewerkt op"
 
@@ -2422,13 +2630,6 @@ msgid "List of 281.50 forms for this partner"
 msgstr "Lijst van fiches 281.50 voor deze partner"
 
 #. module: l10n_be_reports
-#. odoo-python
-#: code:addons/l10n_be_reports/models/account_return.py:0
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_lock_wizard_form
-msgid "Lock"
-msgstr "Vergrendelen"
-
-#. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.ec_sales_list_submission_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_listing_submission_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
@@ -2436,7 +2637,7 @@ msgid "Log in to"
 msgstr "Log in op"
 
 #. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.account_return_kanban_view
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
 msgid "Mark Paid"
 msgstr "Markeer als betaald"
@@ -2444,7 +2645,7 @@ msgstr "Markeer als betaald"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
 msgid "Mark as Recovered"
-msgstr ""
+msgstr "Markeren als Teruggevorderd"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__message_has_error
@@ -2518,10 +2719,16 @@ msgid "Negative Bank Balance Reclassification"
 msgstr "Herkwalificatie van negatief banksaldo"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_report.py:0
+msgid "Negative amounts not allowed"
+msgstr ""
+
+#. module: l10n_be_reports
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/account_325_form_tree/account_325_form_tree.xml:0
 msgid "New"
-msgstr "Nieuw"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_other_verify_next_year_allocations
@@ -2539,6 +2746,21 @@ msgstr ""
 "transactie met een 281.50 tag eerst."
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
+msgid ""
+"No B2B customer exceeded 250.00€ in sales this year.  You can skip the "
+"annual listing."
+msgstr ""
+"Geen enkele B2B-klant heeft dit jaar een verkoop van meer dan € 250,00 "
+"behaald. Je kunt de jaarlijkse klantenlisting overslaan."
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_report.py:0
+msgid "No VAT declaration found for this period."
+msgstr ""
+
+#. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_sales_report.py:0
 #: code:addons/l10n_be_reports/models/partner_vat_listing.py:0
@@ -2549,7 +2771,7 @@ msgstr "Geen btw-nummer geassocieerd met je bedrijf."
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "No customer without country"
-msgstr ""
+msgstr "Geen klant zonder land"
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -2582,6 +2804,11 @@ msgstr "Geen telefoonnummer geassocieerd met het bedrijf."
 #: code:addons/l10n_be_reports/models/account_sales_report.py:0
 msgid "No vat number defined for %s."
 msgstr "Geen btw-nummer gedefinieerd voor %s."
+
+#. module: l10n_be_reports
+#: model:ir.model.fields.selection,name:l10n_be_reports.selection__l10n_be_reports_vat_return_submission_wizard__ask_restitution__no
+msgid "No, deduce in next statement"
+msgstr "Nee, aftrekken in volgende aangifte"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__message_needaction_counter
@@ -2631,11 +2858,19 @@ msgstr ""
 
 #. module: l10n_be_reports
 #. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "Only an accountant can perform this action."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid ""
 "Only include customers with total annual taxable sales exceeding 250€ "
 "(excluding VAT) or a credit note."
 msgstr ""
+"Neem alleen klanten op met een totale belastbare verkoop van meer dan € 250 "
+"(exclusief btw) voor het hele jaar of een creditfactuur."
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -2656,6 +2891,16 @@ msgstr "Open"
 #: model:ir.ui.menu,name:l10n_be_reports.menu_action_open_325_tree_view
 msgid "Open 325 forms"
 msgstr "Opgaven 325 openen"
+
+#. module: l10n_be_reports
+#: model:ir.actions.server,name:l10n_be_reports.action_open_journal_report_tax_journal_items
+msgid "Open Journal Report Tax Journal Items"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.view_bank_journals_list
+msgid "Open Reconciliation Report"
+msgstr "Open het afletteringsrapport"
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -2687,11 +2932,13 @@ msgstr "Betaald bedrag"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__partner_id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__partner_id
 msgid "Partner"
 msgstr "Partner"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__partner_bank_id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__partner_bank_id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__partner_bank_id
 msgid "Partner Bank"
 msgstr "Bank van partner"
@@ -2699,7 +2946,7 @@ msgstr "Bank van partner"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_first_name
 msgid "Partner Firstname"
-msgstr ""
+msgstr "Voornaam partner"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_name
@@ -2711,17 +2958,17 @@ msgstr "Relatienaam"
 #: model:ir.actions.client,name:l10n_be_reports.action_account_report_partner_vat_listing
 #: model:ir.ui.menu,name:l10n_be_reports.menu_action_account_report_l10n_be_partner_vat_listing
 msgid "Partner VAT Listing"
-msgstr "Jaarlijkse lijst van de btw-belastingplichtige afnemers"
+msgstr "Jaarlijkse btw-klantenlisting"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_partner_vat_handler
 msgid "Partner VAT Listing Custom Handler"
-msgstr ""
+msgstr "Aangepaste handler partner btw-listing"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields.selection,name:l10n_be_reports.selection__mail_activity_type__category__partner_vat_listing_report
 msgid "Partner VAT Listing Report"
-msgstr ""
+msgstr "Partner Btw-listing-rapport"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__partner_id
@@ -2737,17 +2984,22 @@ msgstr "Partner met ontbrekende informatie"
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/partner_vat_listing/warnings.xml:0
 msgid "Partners sharing the same VAT number"
-msgstr "Partners die hetzelfde BTW-nummer delen"
+msgstr ""
 
 #. module: l10n_be_reports
-#: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_isoc_prepayment_pay_wizard
+#: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_isoc_prepayment_pay_form
 msgid "Payment instructions for ISOC prepayment"
-msgstr ""
+msgstr "Betalingsinstructies voor voorafbetaling vennootschapsbelasting"
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_vat_pay_wizard
 msgid "Payment instructions for VAT"
 msgstr "Betalingsinstructies voor btw"
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__pdf_ref
+msgid "Pdf Ref"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_rc_memo
@@ -2766,7 +3018,7 @@ msgstr ""
 
 #. module: l10n_be_reports
 #. odoo-python
-#: code:addons/l10n_be_reports/wizard/vat_return_lock_wizard.py:0
+#: code:addons/l10n_be_reports/wizard/vat_report_export.py:0
 msgid "Please enter a valid pro rata year (after 2000)"
 msgstr "Voer een geldig pro rata jaar in (na 2000)"
 
@@ -2778,9 +3030,25 @@ msgid ""
 msgstr "Vul de bedrijfsgegevens in vóór het genereren van het XBRL-bestand: %s"
 
 #. module: l10n_be_reports
+#: model:ir.model,name:l10n_be_reports.model_account_general_ledger_report_handler
+msgid "Polish JPK KR PD Custom Handler"
+msgstr "Aangepaste handler voor Poolse KPK KR PD"
+
+#. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
 msgid "Postal code and city"
 msgstr "Postnr. en gemeente"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_journal.py:0
+msgid "Private"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields.selection,name:l10n_be_reports.selection__res_company__l10n_be_intervat_mode__prod
+msgid "Production"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_281_50_pdf
@@ -2788,10 +3056,10 @@ msgid "Profession:"
 msgstr "Beroep:"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__profit_estimate
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__profit_estimate
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
 msgid "Profit Estimate"
-msgstr ""
+msgstr "Winstraming"
 
 #. module: l10n_be_reports
 #: model:ir.actions.client,name:l10n_be_reports.action_account_report_be_pl_asso_a
@@ -2802,13 +3070,12 @@ msgid "Profit and Loss"
 msgstr "Winst en Verlies"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__is_prorata_necessary
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_lock_wizard_form
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__is_prorata_necessary
 msgid "Prorata"
 msgstr "Pro rata"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__prorata_year
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__prorata_year
 msgid "Prorata Year"
 msgstr "Pro rata Jaar"
 
@@ -2816,6 +3083,12 @@ msgstr "Pro rata Jaar"
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_other_prorating_expenses_income
 msgid "Prorated Income and Expenses"
 msgstr "Pro rata opbrengsten en kosten"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_journal.py:0
+msgid "Provider"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_oe_provision_balance
@@ -2843,7 +3116,7 @@ msgid "Provision for Liquidation Reserve"
 msgstr "Voorziening voor liquidatiereserve"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__qr_code
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__qr_code
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__qr_code
 msgid "Qr Code"
 msgstr "QR-code"
@@ -2878,6 +3151,11 @@ msgid "Reclassification of Social and Tax Debts"
 msgstr "Herclassificatie van sociale en fiscale schulden"
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__rectification_declaration_id
+msgid "Rectification Declaration"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__reference_year
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325_wizard__reference_year
 msgid "Reference Year"
@@ -2909,6 +3187,11 @@ msgid "Represents a 325 form"
 msgstr "Stelt een opgave 325 voor"
 
 #. module: l10n_be_reports
+#: model:ir.model,name:l10n_be_reports.model_l10n_be_vat_declaration
+msgid "Represents a declaration sent through the Intervat API"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.account_return_kanban_view
 msgid "Reset"
 msgstr "Resetten"
@@ -2916,11 +3199,11 @@ msgstr "Resetten"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_annual_corporate_tax_submission_wizard__return_id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_ec_sales_list_submission_wizard__return_id
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_wizard__return_id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__return_id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_listing_submission_wizard__return_id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__return_id
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__return_id
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__return_id
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__return_id
 msgid "Return"
 msgstr "Retour"
 
@@ -2928,7 +3211,7 @@ msgstr "Retour"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "Review invoices having a customer with no country specified."
-msgstr ""
+msgstr "Controleer facturen met klanten zonder opgegeven land."
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_sales_bad_debts_provision
@@ -2970,7 +3253,7 @@ msgstr "Afstemming lonen ↔ sociaal secretatiaat"
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_return.py:0
 msgid "Sales above 250€"
-msgstr ""
+msgstr "Verkoop boven € 250"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_other_turnover_against_vat_concordance
@@ -2978,17 +3261,27 @@ msgid "Sales ↔ VAT Reconciliation"
 msgstr "Afstemming verkoop ↔ btw"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/isoc_prepayment_pay_form.py:0
+msgid "Scan me with your banking app."
+msgstr ""
+
+#. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.ec_sales_list_submission_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_listing_submission_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid "Select Intervat &gt; Dashboard"
-msgstr ""
+msgstr "Selecteer Intervat &gt; Dashboard"
 
 #. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
 msgid "Send"
 msgstr "Verzenden"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.account_return_kanban_view
+msgid "Send Email"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:ir.model.fields.selection,name:l10n_be_reports.selection__l10n_be_form_325__sending_type__1
@@ -3048,10 +3341,37 @@ msgid "Sending type"
 msgstr "Verzendtype"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_config_settings_view_form
+msgid "Server Mode"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_sales_report.py:0
+msgid "Services"
+msgstr "Diensten"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "Set Intervat mode"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/isoc_prepayment_pay_form.py:0
+msgid "Set your company data"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__should_display_client_nihil
+msgid "Should Display Client Nihil"
+msgstr "Moet Klant Nihil weergeven"
+
+#. module: l10n_be_reports
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_equity_capital_notary_fees_allocation_to_legal_reserve
 msgid ""
 "Should you allocate an amount to the legal reserve?\n"
-"\n"
 "Belgian law requires companies to allocate part of their profits to the "
 "legal reserve until it reaches a certain amount. This check verifies whether "
 "this obligation has been fulfilled."
@@ -3067,7 +3387,6 @@ msgstr ""
 msgid ""
 "Should you distribute a dividend of at least €833 to get a €249.90 "
 "withholding tax refund on your personal income tax?\n"
-"\n"
 "In Belgium, it is possible to recover part of the withholding tax (tax on "
 "dividends). This check is a reminder to optimize your tax situation by "
 "distributing dividends."
@@ -3083,7 +3402,6 @@ msgstr ""
 #: model:account.return.check.template,description:l10n_be_reports.account_return_check_template_be_equity_capital_notary_fees_provision_for_liquidation_reserve
 msgid ""
 "Should you set aside a liquidation reserve from the profit?\n"
-"\n"
 "A liquidation reserve is a portion of the profit set aside to be taxed at a "
 "reduced rate in the event of future liquidation. It is an attractive tax "
 "option worth considering."
@@ -3095,9 +3413,25 @@ msgstr ""
 "Het is een interessante fiscale optie om te overwegen."
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__show_prorata
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__show_ask_restitution
+msgid "Show Ask Restitution"
+msgstr "'Terugbetaling vragen' weergeven"
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__show_prorata
 msgid "Show Prorata"
 msgstr "Prorata tonen"
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__show_vat_balance
+msgid "Show Vat Balance"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_isoc_prepayment_pay_form__show_warning_missing_vat_number
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__show_warning_missing_vat_number
+msgid "Show Warning Missing Vat Number"
+msgstr ""
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -3120,32 +3454,32 @@ msgstr ""
 "nationaal nummer."
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__special_prorata_1
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__special_prorata_1
 msgid "Special Prorata 1"
 msgstr "Speciaal Prorata 1"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__special_prorata_2
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__special_prorata_2
 msgid "Special Prorata 2"
 msgstr "Speciaal Prorata 2"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__special_prorata_3
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__special_prorata_3
 msgid "Special Prorata 3"
 msgstr "Speciaal Prorata 3"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__special_prorata_4
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__special_prorata_4
 msgid "Special Prorata 4"
 msgstr "Speciaal Prorata 4"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__special_prorata_5
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__special_prorata_5
 msgid "Special Prorata 5"
 msgstr "Speciaal Prorata 5"
 
 #. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_lock_wizard__special_prorata_deduction
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_return_submission_wizard__special_prorata_deduction
 msgid "Special Prorata Deduction %"
 msgstr "Speciale pro rata aftrek %"
 
@@ -3156,14 +3490,22 @@ msgid "Specify"
 msgstr "Preciseren"
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_res_config_settings__account_representative_id
+msgid ""
+"Specify an Accounting Firm that will act as a representative when exporting "
+"reports."
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__sportsman_remuneration
 msgid "Sportsman remuneration"
-msgstr ""
+msgstr "Vergoeding sportbeoefenaar"
 
 #. module: l10n_be_reports
 #: model:ir.model.constraint,message:l10n_be_reports.constraint_l10n_be_company_region_start_end_constraint
 msgid "Start zip code must be less than or equal to end zip code."
 msgstr ""
+"De startpostcode moet kleiner zijn dan of gelijk zijn aan de eindpostcode."
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__state
@@ -3182,9 +3524,37 @@ msgid "Street and n°"
 msgstr "Straat en nr."
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "Submission Error"
+msgstr "Fout bij het indienen"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/controllers/main.py:0
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "Submission Error: \n"
+msgstr ""
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
+msgid "Submission Instructions"
+msgstr "Instructies voor indienen"
+
+#. module: l10n_be_reports
+#: model:ir.model.fields.selection,name:l10n_be_reports.selection__l10n_be_reports_vat_return_submission_wizard__client_nihil__no
+msgid "Submit a Partner VAT listing later."
+msgstr "Dien later een btw-klantenlisting in."
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_config_settings_view_form
+msgid "Submit and fetch your VAT returns via Intervat using the API."
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__total_remuneration
 msgid "Sum of commissions, fees, atn and expenses"
-msgstr ""
+msgstr "Som van commissies, vergoedingen, VAA en onkosten"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_tf_suspense_account
@@ -3202,16 +3572,33 @@ msgid "TOTALS"
 msgstr "TOTALEN"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "Tax codes & deductibility"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_res_partner__form_file
 #: model:ir.model.fields,help:l10n_be_reports.field_res_users__form_file
 msgid "Technical field to store all forms file."
 msgstr "Technisch veld om alle formulieren in op te slaan."
 
 #. module: l10n_be_reports
+#: model:ir.model.fields.selection,name:l10n_be_reports.selection__res_company__l10n_be_intervat_mode__test
+msgid "Test"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__is_test
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325_wizard__is_test
 msgid "Test Form"
 msgstr "Testformulier"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
+msgid "The"
+msgstr ""
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -3224,13 +3611,24 @@ msgstr ""
 "opnieuw."
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
+msgid "The VAT balance is"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_325_wizard__sender_id
 msgid "The company responsible for sending the form."
 msgstr "Het bedrijf verantwoordelijk voor het verzenden van het formulier."
 
 #. module: l10n_be_reports
+#. odoo-javascript
+#: code:addons/l10n_be_reports/static/src/components/tax_report/warnings.xml:0
+msgid "The following controls failed:"
+msgstr ""
+
+#. module: l10n_be_reports
 #. odoo-python
-#: code:addons/l10n_be_reports/wizard/vat_return_lock_wizard.py:0
+#: code:addons/l10n_be_reports/wizard/vat_report_export.py:0
 msgid ""
 "The percentage of uses and special pro rata must have values between 0 and "
 "100"
@@ -3252,18 +3650,30 @@ msgid ""
 msgstr "Regio van het bedrijf (voor export jaarverslag)"
 
 #. module: l10n_be_reports
-#. odoo-javascript
-#: code:addons/l10n_be_reports/static/src/components/tax_report/warnings.xml:0
-msgid ""
-"The report contains negative amounts. This is normally not allowed and could "
-"cause the tax authorities to reject it."
+#. odoo-python
+#: code:addons/l10n_be_reports/models/annual_statement_custom_handler.py:0
+msgid "The report used for XBRL export should have a 'balance' column."
+msgstr ""
+"Het rapport dat wordt gebruikt voor XBRL-export moet een kolom 'saldo' "
+"bevatten."
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "The signature of the JWT is not matching."
 msgstr ""
 
 #. module: l10n_be_reports
 #. odoo-python
-#: code:addons/l10n_be_reports/wizard/vat_return_lock_wizard.py:0
+#: code:addons/l10n_be_reports/wizard/vat_report_export.py:0
 msgid "The sum of the prorata uses must be 100%"
 msgstr "De som van het pro rata gebruik moet 100% zijn"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "The token is not valid yet."
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_res_company__l10n_be_company_type_id
@@ -3275,7 +3685,6 @@ msgstr "Bedrijfstype (voor export jaarverslag)"
 msgid ""
 "Theoretically, it is rare to encounter a currency discrepancy. Shouldn't it "
 "be justified?\n"
-"\n"
 "If a currency discrepancy arises, it must be justified in order to be "
 "accounted for correctly."
 msgstr ""
@@ -3293,6 +3702,9 @@ msgid ""
 "following partners should be accessible by their paired company: %"
 "(inconsistencies)s"
 msgstr ""
+"Er zijn enkele inconsistenties in de koppeling tussen partner en bedrijf. De "
+"volgende partners moeten toegankelijk zijn voor het bedrijf waarmee ze zijn "
+"gekoppeld: %(inconsistencies)s"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_res_partner__citizen_identification
@@ -3311,6 +3723,8 @@ msgid ""
 "This feature seems to be as exclusive as Belgian chocolates. You must be "
 "logged in to a Belgian company to use it."
 msgstr ""
+"Deze functie is net zo exclusief als Belgische chocolade. Je moet ingelogd "
+"zijn bij een Belgisch bedrijf om er gebruik van te kunnen maken."
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_325__sending_type
@@ -3353,7 +3767,7 @@ msgstr "Totaal"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__trainer_remuneration
 msgid "Trainer remuneration"
-msgstr ""
+msgstr "Vergoeding trainers"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__treatment_type
@@ -3363,11 +3777,17 @@ msgid "Treatment Type"
 msgstr "Type behandeling"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_sales_report.py:0
+msgid "Triangular"
+msgstr "ABC"
+
+#. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.ec_sales_list_submission_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_listing_submission_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid "Upload the XML file on the right panel and click \"Continue\""
-msgstr ""
+msgstr "Upload het XML-bestand in het rechterpaneel en klik op 'Doorgaan'"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__user_id
@@ -3392,15 +3812,16 @@ msgstr "Naleving van btw-vrijstelling"
 #. module: l10n_be_reports
 #: model:account.return.type,name:l10n_be_reports.be_vat_listing_return_type
 msgid "VAT Listing"
-msgstr ""
+msgstr "Btw-listing"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/partner_vat_listing.py:0
 msgid "VAT Listing Audit"
-msgstr "Audit van de jaarlijkse lijst van de btw-belastingplichtige afnemers"
+msgstr "Audit Jaarlijkse btw-klantenlisting"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_config_settings_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_partner_view_search
 msgid "VAT Number"
 msgstr "BTW-nummer"
@@ -3412,9 +3833,21 @@ msgid "VAT Payment"
 msgstr "BTW-betaling"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid "VAT Report (BE)"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_rc_vat_rules
 msgid "VAT Rule Compliance"
 msgstr "Naleving van de btw-regels"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
+msgid "VAT number is missing; no payment communication can be created."
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:mail.template,name:l10n_be_reports.email_template_vat_payment_instructions
@@ -3422,29 +3855,42 @@ msgid "VAT payment"
 msgstr "Btw-betaling"
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid ""
+"VAT return of period %(date_from)s -> %(date_to)s has been sent with the "
+"following references"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:mail.template,subject:l10n_be_reports.email_template_vat_payment_instructions
 msgid "VAT return payment instructions"
-msgstr ""
+msgstr "Betaalinstructies btw-aangifte"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.ec_sales_list_submission_wizard_form
 msgid "Validate the EC Sales List"
-msgstr ""
+msgstr "Valideer de IC-opgave"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid "Validate the VAT return"
-msgstr ""
+msgstr "Valideer de btw-aangifte"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_listing_submission_wizard_form
 msgid "Validate the client listing"
+msgstr "Valideer de klantenlijst"
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_reports_vat_pay_wizard__vat_balance
+msgid "Vat Balance"
 msgstr ""
 
 #. module: l10n_be_reports
 #: model:ir.model,name:l10n_be_reports.model_l10n_be_reports_vat_listing_submission_wizard
 msgid "Vat Listing Submission Wizard"
-msgstr ""
+msgstr "Wizard voor het indienen van btw-listing"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_fixed_assets_vehicles
@@ -3453,22 +3899,19 @@ msgstr "Voertuigen"
 
 #. module: l10n_be_reports
 #. odoo-python
-#: code:addons/l10n_be_reports/models/account_sales_report.py:0
+#: code:addons/l10n_be_reports/models/account_return.py:0
+msgid ""
+"Vendor bills with restricted deductions (cars, restaurants, gifts, etc.) "
+"should use a tax that splits the amount correctly, sending the deductible "
+"portion to the VAT Recoverable grid. Also check that all tax codes set on "
+"your invoices and bills are correct."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
 #: code:addons/l10n_be_reports/models/partner_vat_listing.py:0
 msgid "View Partner"
 msgstr "Bekijk relatie"
-
-#. module: l10n_be_reports
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__website_message_ids
-#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_325__website_message_ids
-msgid "Website Messages"
-msgstr "Websiteberichten"
-
-#. module: l10n_be_reports
-#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__website_message_ids
-#: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_325__website_message_ids
-msgid "Website communication history"
-msgstr "Website communicatiegeschiedenis"
 
 #. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_inventory_value_reduction_on_old_stock
@@ -3479,18 +3922,18 @@ msgstr "Afschrijvingen van oude voorraad"
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_region__xbrl_code
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_type__xbrl_code
 msgid "XBRL Code"
-msgstr ""
+msgstr "XBRL-code"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/annual_statement_custom_handler.py:0
 msgid "XBRL Export"
-msgstr ""
+msgstr "XBRL-export"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_export_wizard_form
 msgid "XBRL Export for Belgium"
-msgstr ""
+msgstr "XBRL-export voor België"
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -3508,20 +3951,30 @@ msgid "XML"
 msgstr "XML"
 
 #. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__xml_ref
+msgid "Xml Ref"
+msgstr ""
+
+#. module: l10n_be_reports
 #: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_tf_bank_balance_reco_with_stmt
 msgid "Year-End Bank Reconciliation"
 msgstr "Bankafstemming op jaareinde"
 
 #. module: l10n_be_reports
-#: model:account.return.check.template,name:l10n_be_reports.account_return_check_template_be_oe_year_end_expense_accruals
-msgid "Year-End Expense Accruals"
-msgstr "Over te dragen kosten op jaareinde"
+#: model:ir.model.fields.selection,name:l10n_be_reports.selection__l10n_be_reports_vat_return_submission_wizard__ask_restitution__yes
+msgid "Yes, I want to be reimbursed (risk of control)"
+msgstr "Ja, ik wil een vergoeding ontvangen (risico op controle)"
 
 #. module: l10n_be_reports
 #. odoo-python
 #: code:addons/l10n_be_reports/models/account_325_form.py:0
 msgid "You already generated 281.50 forms for this 325 form."
 msgstr "Je hebt al fiches 281.50 gegenereerd voor deze opgave 325."
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,help:l10n_be_reports.field_res_config_settings__l10n_be_intervat_ecb
+msgid "You can use '/' to indicate that the customer has no Tax ID."
+msgstr ""
 
 #. module: l10n_be_reports
 #. odoo-python
@@ -3540,10 +3993,60 @@ msgstr ""
 "Je kan geen referentiejaar in de toekomst of voor het huidige jaar gebruiken."
 
 #. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "You do not have an Odoo Enterprise subscription."
+msgstr ""
+
+#. module: l10n_be_reports
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/partner_vat_listing/warnings.xml:0
 msgid "You have"
-msgstr "Je hebt"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "You reached the call limit. Please try again in a moment."
+msgstr "Je hebt de oproeplimiet bereikt. Probeer het zo meteen opnieuw."
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid ""
+"Your authentication with Intervat was incomplete. Please authenticate again "
+"and make sure you grant consent to both of the following"
+msgstr ""
+"Je authenticatie bij Intervat was onvolledig. Voer de authenticatie opnieuw "
+"uit en zorg ervoor dat je toestemming verleent voor beide volgende punten"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "Your database UUID does not exist."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "Your database is not used for a production environment."
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/res_company.py:0
+msgid "Your database is not yet activated."
+msgstr ""
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
+msgid "Your statement is negative. Do you want to ask a restitution of"
+msgstr "Je aangifte is negatief. Wil je een terugbetaling vragen van"
+
+#. module: l10n_be_reports
+#: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_vat_declaration__declaration_file
+msgid "ZIP File"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_form_281_50__partner_zip
@@ -3553,22 +4056,48 @@ msgstr "Postcode"
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_region__zip_end
 msgid "Zip Code End"
-msgstr ""
+msgstr "Einde postcode"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,field_description:l10n_be_reports.field_l10n_be_company_region__zip_start
 msgid "Zip Code Start"
-msgstr ""
+msgstr "Begin postcode"
 
 #. module: l10n_be_reports
 #: model:ir.model.constraint,message:l10n_be_reports.constraint_l10n_be_company_region_overlap_constraint
 msgid "Zip code overlaps with other records"
-msgstr ""
+msgstr "Postcode overlapt met andere records"
 
 #. module: l10n_be_reports
 #: model:ir.model.fields,help:l10n_be_reports.field_l10n_be_form_281_50__partner_zip
 msgid "Zip of the partner when the form was created"
 msgstr "Postcode van de partner toen de fiche werd opgemaakt"
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_report.py:0
+msgid ""
+"[44] < ([00] + [01] + [02] + [03] + [45] + [46] + [47] + [48] + [49]) * 200 "
+"if [44] > 99,999"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_report.py:0
+msgid "[55] > 0 if [86] > 0 or [88] > 0"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_report.py:0
+msgid "[56] + [57] > 0 if [87] > 0"
+msgstr ""
+
+#. module: l10n_be_reports
+#. odoo-python
+#: code:addons/l10n_be_reports/models/account_report.py:0
+msgid "[88] < ([81] + [82] + [83] + [84]) * 100 if [88] > 99,999"
+msgstr ""
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_281_50_pdf
@@ -3606,172 +4135,175 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "bas:m1"
-msgstr ""
+msgstr "bas:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp_full
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m10"
-msgstr ""
+msgstr "bas:m10"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m11"
-msgstr ""
+msgstr "bas:m11"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "bas:m112"
-msgstr ""
+msgstr "bas:m112"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_abbr
 msgid "bas:m118"
-msgstr ""
+msgstr "bas:m118"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_abbr
 msgid "bas:m119"
-msgstr ""
+msgstr "bas:m119"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m12"
-msgstr ""
+msgstr "bas:m12"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_abbr
 msgid "bas:m120"
-msgstr ""
+msgstr "bas:m120"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_asso
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_asso
 msgid "bas:m124"
-msgstr ""
+msgstr "bas:m124"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_a
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_f
 msgid "bas:m125"
-msgstr ""
+msgstr "bas:m125"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m13"
-msgstr ""
+msgstr "bas:m13"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m14"
-msgstr ""
+msgstr "bas:m14"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m15"
-msgstr ""
+msgstr "bas:m15"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m16"
-msgstr ""
+msgstr "bas:m16"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m17"
-msgstr ""
+msgstr "bas:m17"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m18"
-msgstr ""
+msgstr "bas:m18"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_depreciation_on_formation_expense_intangible_tangible_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_tangible_assets
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bas:m2"
-msgstr ""
+msgstr "bas:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_abbr
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m20"
-msgstr ""
+msgstr "bas:m20"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m21"
-msgstr ""
+msgstr "bas:m21"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp_full
 msgid "bas:m22"
-msgstr ""
+msgstr "bas:m22"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp_full_all_abbr
 msgid "bas:m23"
-msgstr ""
+msgstr "bas:m23"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m24"
-msgstr ""
+msgstr "bas:m24"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m25"
-msgstr ""
+msgstr "bas:m25"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "bas:m26"
-msgstr ""
+msgstr "bas:m26"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "bas:m27"
-msgstr ""
+msgstr "bas:m27"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "bas:m28"
-msgstr ""
+msgstr "bas:m28"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "bas:m29"
-msgstr ""
+msgstr "bas:m29"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m3"
-msgstr ""
+msgstr "bas:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "bas:m30"
-msgstr ""
+msgstr "bas:m30"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "bas:m31"
-msgstr ""
+msgstr "bas:m31"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "bas:m32"
-msgstr ""
+msgstr "bas:m32"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "bas:m37"
-msgstr ""
+msgstr "bas:m37"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
@@ -3779,238 +4311,271 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp_full
 msgid "bas:m38"
-msgstr ""
+msgstr "bas:m38"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
 msgid "bas:m39"
-msgstr ""
+msgstr "bas:m39"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m4"
-msgstr ""
+msgstr "bas:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
 msgid "bas:m40"
-msgstr ""
+msgstr "bas:m40"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
 msgid "bas:m41"
-msgstr ""
+msgstr "bas:m41"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_asso
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 msgid "bas:m42"
-msgstr ""
+msgstr "bas:m42"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_previous_period_balance_sheet_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp_full
 msgid "bas:m43"
-msgstr ""
+msgstr "bas:m43"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "bas:m44"
-msgstr ""
+msgstr "bas:m44"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m45"
-msgstr ""
+msgstr "bas:m45"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 msgid "bas:m46"
-msgstr ""
+msgstr "bas:m46"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m47"
-msgstr ""
+msgstr "bas:m47"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_asso
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "bas:m48"
-msgstr ""
+msgstr "bas:m48"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "bas:m49"
-msgstr ""
+msgstr "bas:m49"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m5"
-msgstr ""
+msgstr "bas:m5"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_payable_more_than_one_year
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_abbr
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m50"
-msgstr ""
+msgstr "bas:m50"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m51"
-msgstr ""
+msgstr "bas:m51"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bas:m52"
-msgstr ""
+msgstr "bas:m52"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_abbr
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bas:m53"
-msgstr ""
+msgstr "bas:m53"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bas:m54"
-msgstr ""
+msgstr "bas:m54"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bas:m55"
-msgstr ""
+msgstr "bas:m55"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bas:m56"
-msgstr ""
+msgstr "bas:m56"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bas:m57"
-msgstr ""
+msgstr "bas:m57"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bas:m58"
-msgstr ""
+msgstr "bas:m58"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "bas:m59"
-msgstr ""
+msgstr "bas:m59"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m6"
-msgstr ""
+msgstr "bas:m6"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bas:m60"
-msgstr ""
+msgstr "bas:m60"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "bas:m61"
-msgstr ""
+msgstr "bas:m61"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "bas:m62"
-msgstr ""
+msgstr "bas:m62"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "bas:m63"
-msgstr ""
+msgstr "bas:m63"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "bas:m7"
-msgstr ""
+msgstr "bas:m7"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
+msgid "bas:m70"
+msgstr "bas:m70"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "bas:m73"
-msgstr ""
+msgstr "bas:m73"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m8"
-msgstr ""
+msgstr "bas:m8"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "bas:m9"
-msgstr ""
+msgstr "bas:m9"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_depreciation_on_formation_expense_intangible_tangible_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_tangible_assets
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "bkd:m1"
-msgstr ""
+msgstr "bkd:m1"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "bkd:m2"
-msgstr ""
+msgstr "bkd:m2"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_tangible_assets
+msgid "bkd:m4"
+msgstr "bkd:m4"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_tangible_assets
+msgid "bkd:m5"
+msgstr "bkd:m5"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
+msgid "bkd:m6"
+msgstr "bkd:m6"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "bnf:m1"
-msgstr ""
+msgstr "bnf:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "bnf:m2"
-msgstr ""
+msgstr "bnf:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "bnf:m3"
-msgstr ""
+msgstr "bnf:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "bnf:m4"
-msgstr ""
+msgstr "bnf:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "bnf:m5"
+msgstr "bnf:m5"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
+msgid "company"
 msgstr ""
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "ctc:m1"
-msgstr ""
+msgstr "ctc:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "ctc:m2"
-msgstr ""
+msgstr "ctc:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "ctc:m4"
-msgstr ""
+msgstr "ctc:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "ctc:m6"
-msgstr ""
+msgstr "ctc:m6"
 
 #. module: l10n_be_reports
 #. odoo-javascript
@@ -4019,58 +4584,61 @@ msgid ""
 "customers with a turnover of more than 250€ or one or more credit notes in "
 "the selected period who are not included in the report. Click"
 msgstr ""
-"klanten met een omzet van meer dan € 250 of één of meer creditnota's in de "
-"geselecteerde periode die niet in het rapport zijn opgenomen. Klik"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "cvt:m1"
-msgstr ""
+msgstr "cvt:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "cvt:m2"
-msgstr ""
+msgstr "cvt:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "cvt:m3"
-msgstr ""
+msgstr "cvt:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "dcl:m2"
-msgstr ""
+msgstr "dcl:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "dcl:m39"
-msgstr ""
+msgstr "dcl:m39"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "dgl:m1"
-msgstr ""
+msgstr "dgl:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "dgl:m2"
-msgstr ""
+msgstr "dgl:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "dgl:m3"
-msgstr ""
+msgstr "dgl:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "dgl:m4"
-msgstr ""
+msgstr "dgl:m4"
 
 #. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.res_partner_view_form_inherit
-msgid "e.g. 123455 555 6"
-msgstr "bijv. 123455 555 6"
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
+msgid "due by the State?"
+msgstr "door de staat verschuldigd?"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
+msgid "due to prior VAT credit."
+msgstr ""
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.form_325_wizard_view_form
@@ -4080,22 +4648,22 @@ msgstr "bijv. 2018"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "epc:m1"
-msgstr ""
+msgstr "epc:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "epc:m2"
-msgstr ""
+msgstr "epc:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "epc:m3"
-msgstr ""
+msgstr "epc:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "epc:m4"
-msgstr ""
+msgstr "epc:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_325_pdf
@@ -4105,12 +4673,12 @@ msgstr "opgemaakt door:"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "evt:m1"
-msgstr ""
+msgstr "evt:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "evt:m2"
-msgstr ""
+msgstr "evt:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_281_50_pdf
@@ -4137,16 +4705,6 @@ msgstr ""
 "sportbeoefenaars:"
 
 #. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_acap
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_acon
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_a
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_f
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_fcap
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_fcon
-msgid "false"
-msgstr "onwaar"
-
-#. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.report_281_50_pdf
 msgid ""
 "g) If the amount indicated in item e above does not coincide with\n"
@@ -4158,17 +4716,17 @@ msgstr ""
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "gdr:m1"
-msgstr ""
+msgstr "gdr:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "gdr:m2"
-msgstr ""
+msgstr "gdr:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "gdr:m3"
-msgstr ""
+msgstr "gdr:m3"
 
 #. module: l10n_be_reports
 #. odoo-javascript
@@ -4179,93 +4737,91 @@ msgstr "hier"
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "hrs:m1"
-msgstr ""
+msgstr "hrs:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "hrs:m2"
-msgstr ""
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_acap
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_acon
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_a
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_f
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_fcap
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_fcon
-msgid "iso4217:EUR"
-msgstr "iso4217:EUR"
+msgstr "hrs:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "mdp:m1"
-msgstr ""
+msgstr "mdp:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "mdp:m19"
-msgstr ""
+msgstr "mdp:m19"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "mdp:m2"
-msgstr ""
+msgstr "mdp:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "mdp:m20"
-msgstr ""
+msgstr "mdp:m20"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "mdp:m21"
-msgstr ""
+msgstr "mdp:m21"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "mdp:m3"
-msgstr ""
+msgstr "mdp:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp_full
 msgid "mdp:m4"
-msgstr ""
+msgstr "mdp:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_asso
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "mdp:m5"
-msgstr ""
+msgstr "mdp:m5"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_depreciation_on_formation_expense_intangible_tangible_assets
+msgid "mdp:m6"
+msgstr "mdp:m6"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "mmt:m1"
-msgstr ""
+msgstr "mmt:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "mmt:m2"
-msgstr ""
+msgstr "mmt:m2"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_depreciation_on_formation_expense_intangible_tangible_assets
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "ntr:m1"
-msgstr ""
+msgstr "ntr:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_abbr
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_a
 msgid "ntr:m17"
-msgstr ""
+msgstr "ntr:m17"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_depreciation_on_formation_expense_intangible_tangible_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_tangible_assets
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "ntr:m2"
-msgstr ""
+msgstr "ntr:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_abbr
@@ -4275,7 +4831,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "ntr:m3"
-msgstr ""
+msgstr "ntr:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_asso
@@ -4284,34 +4840,35 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp_full
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_con
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_previous_period_balance_sheet_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp_full
 msgid "ntr:m4"
-msgstr ""
+msgstr "ntr:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "ntr:m5"
-msgstr ""
+msgstr "ntr:m5"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_f
 msgid "ntr:m6"
-msgstr ""
+msgstr "ntr:m6"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "ntr:m7"
-msgstr ""
+msgstr "ntr:m7"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "ntr:m9"
-msgstr ""
+msgstr "ntr:m9"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
@@ -4319,12 +4876,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp_full_all_abbr
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "part:m1"
-msgstr ""
+msgstr "part:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "part:m2"
-msgstr ""
+msgstr "part:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_abbr
@@ -4334,8 +4891,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_con
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_previous_period_balance_sheet_comp
 msgid "part:m3"
-msgstr ""
+msgstr "part:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_abbr
@@ -4344,7 +4902,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_a
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_f
 msgid "part:m4"
-msgstr ""
+msgstr "part:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_asso
@@ -4352,39 +4910,51 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp_full
 msgid "part:m5"
-msgstr ""
+msgstr "part:m5"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_depreciation_on_formation_expense_intangible_tangible_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_payable_more_than_one_year
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_tangible_assets
+msgid "part:m6"
+msgstr "part:m6"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "part:m8"
-msgstr ""
+msgstr "part:m8"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_payment_details_table
 msgid "payment qr"
-msgstr ""
+msgstr "QR-code voor betaling"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "pfc:m1"
-msgstr ""
+msgstr "pfc:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "pfc:m2"
-msgstr ""
+msgstr "pfc:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "pfc:m3"
-msgstr ""
+msgstr "pfc:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "pfc:m4"
-msgstr ""
+msgstr "pfc:m4"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_depreciation_on_formation_expense_intangible_tangible_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_payable_more_than_one_year
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_tangible_assets
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_abbr
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_asso
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
@@ -4405,317 +4975,330 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_a
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_f
 msgid "prd:m1"
-msgstr ""
+msgstr "prd:m1"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_previous_period_balance_sheet_comp
+msgid "prd:m2"
+msgstr "prd:m2"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "psn:m1"
-msgstr ""
-
-#. module: l10n_be_reports
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_acap
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_acon
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_a
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_asso_f
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_fcap
-#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_template_fcon
-msgid "pure"
-msgstr ""
+msgstr "psn:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_company_info
 msgid "qlt:m1"
-msgstr ""
+msgstr "qlt:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "qlt:m3"
-msgstr ""
+msgstr "qlt:m3"
 
 #. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_financial_assets
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "rls:m1"
-msgstr ""
+msgstr "rls:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "rls:m2"
-msgstr ""
+msgstr "rls:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "rsn:m1"
-msgstr ""
+msgstr "rsn:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 msgid "rsn:m2"
-msgstr ""
+msgstr "rsn:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 msgid "rsn:m3"
-msgstr ""
+msgstr "rsn:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 msgid "rsn:m4"
-msgstr ""
+msgstr "rsn:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_abbr
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "rst:m1"
-msgstr ""
+msgstr "rst:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "rst:m2"
-msgstr ""
+msgstr "rst:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "rst:m3"
-msgstr ""
+msgstr "rst:m3"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_payable_more_than_one_year
+msgid "rst:m7"
+msgstr "rst:m7"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.exp_disclosure_payable_more_than_one_year
+msgid "rst:m8"
+msgstr "rst:m8"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 msgid "spec:m1"
-msgstr ""
+msgstr "spec:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "spec:m10"
-msgstr ""
+msgstr "spec:m10"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "spec:m11"
-msgstr ""
+msgstr "spec:m11"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "spec:m12"
-msgstr ""
+msgstr "spec:m12"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "spec:m13"
-msgstr ""
+msgstr "spec:m13"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "spec:m14"
-msgstr ""
+msgstr "spec:m14"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "spec:m15"
-msgstr ""
+msgstr "spec:m15"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "spec:m16"
-msgstr ""
+msgstr "spec:m16"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "spec:m17"
-msgstr ""
+msgstr "spec:m17"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "spec:m2"
-msgstr ""
+msgstr "spec:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "spec:m3"
-msgstr ""
+msgstr "spec:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "spec:m4"
-msgstr ""
+msgstr "spec:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_abbr
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "spec:m5"
-msgstr ""
+msgstr "spec:m5"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "spec:m6"
-msgstr ""
+msgstr "spec:m6"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "spec:m7"
-msgstr ""
+msgstr "spec:m7"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "spec:m8"
-msgstr ""
+msgstr "spec:m8"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "spec:m84"
-msgstr ""
+msgstr "spec:m84"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "spec:m9"
-msgstr ""
+msgstr "spec:m9"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_abbr
 msgid "spec:m94"
-msgstr ""
+msgstr "spec:m94"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "spu:m1"
-msgstr ""
+msgstr "spu:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "spu:m2"
-msgstr ""
+msgstr "spu:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_asso
 msgid "spu:m21"
-msgstr ""
+msgstr "spu:m21"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "spu:m3"
-msgstr ""
+msgstr "spu:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "spu:m4"
-msgstr ""
+msgstr "spu:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "spu:m5"
-msgstr ""
+msgstr "spu:m5"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "spu:m6"
-msgstr ""
+msgstr "spu:m6"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 msgid "spu:m7"
-msgstr ""
+msgstr "spu:m7"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "sts:m1"
-msgstr ""
+msgstr "sts:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "sts:m10"
-msgstr ""
+msgstr "sts:m10"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "sts:m11"
-msgstr ""
+msgstr "sts:m11"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "sts:m12"
-msgstr ""
+msgstr "sts:m12"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "sts:m2"
-msgstr ""
+msgstr "sts:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
 msgid "sts:m3"
-msgstr ""
+msgstr "sts:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
 msgid "sts:m4"
-msgstr ""
+msgstr "sts:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_con
 msgid "sts:m5"
-msgstr ""
+msgstr "sts:m5"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_previous_period_balance_sheet_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "sts:m6"
-msgstr ""
+msgstr "sts:m6"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_con
 msgid "sts:m7"
-msgstr ""
+msgstr "sts:m7"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "sts:m8"
-msgstr ""
+msgstr "sts:m8"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "sts:m9"
-msgstr ""
+msgstr "sts:m9"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
 msgid "this quarter"
-msgstr ""
+msgstr "dit kwartaal"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.isoc_prepayment_pay_wizard_form
 msgid "this year"
+msgstr "dit jaar"
+
+#. module: l10n_be_reports
+#: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_pay_wizard_form
+msgid "to pay this amount."
 msgstr ""
 
 #. module: l10n_be_reports
 #. odoo-javascript
 #: code:addons/l10n_be_reports/static/src/components/partner_vat_listing/warnings.xml:0
 msgid "to see the list."
-msgstr "om de lijst te bekijken."
+msgstr ""
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_comp_full
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_comp
 msgid "typ:m1"
-msgstr ""
+msgstr "typ:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "typ:m16"
-msgstr ""
+msgstr "typ:m16"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_cap
@@ -4723,58 +5306,58 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "typ:m2"
-msgstr ""
+msgstr "typ:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "typ:m3"
-msgstr ""
+msgstr "typ:m3"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "typ:m31"
-msgstr ""
+msgstr "typ:m31"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "typ:m4"
-msgstr ""
+msgstr "typ:m4"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "typ:m5"
-msgstr ""
+msgstr "typ:m5"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_balance_sheet_full
 msgid "typ:m6"
-msgstr ""
+msgstr "typ:m6"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 msgid "typ:m7"
-msgstr ""
+msgstr "typ:m7"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_abbr
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_common
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "typ:m8"
-msgstr ""
+msgstr "typ:m8"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_profit_and_loss_full
 msgid "typ:m9"
-msgstr ""
+msgstr "typ:m9"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.ec_sales_list_submission_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_listing_submission_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.vat_return_submission_wizard_form
 msgid "using Itsme or your card reader"
-msgstr ""
+msgstr "met Itsme of kaartlezer"
 
 #. module: l10n_be_reports
 #. odoo-javascript
@@ -4785,23 +5368,54 @@ msgstr ""
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "wkr:m1"
-msgstr ""
+msgstr "wkr:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "wrg:m1"
-msgstr ""
+msgstr "wrg:m1"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "wrg:m2"
-msgstr ""
+msgstr "wrg:m2"
 
 #. module: l10n_be_reports
 #: model_terms:ir.ui.view,arch_db:l10n_be_reports.xbrl_social_balance_sheet
 msgid "wrg:m3"
-msgstr ""
+msgstr "wrg:m3"
 
-#, fuzzy
-#~ msgid "The following controls failed:"
-#~ msgstr "Sommige controles zijn mislukt"
+#~ msgid ""
+#~ "In Belgium, companies that have been operating for 3 years or more are "
+#~ "required to pay their \n"
+#~ "                                corporate tax in 4 installments "
+#~ "throughout the year. For newer companies, this is not mandatory, but it "
+#~ "is still recommanded.<br/>\n"
+#~ "                                <br/>\n"
+#~ "                                You estimate your annual profit, we then "
+#~ "divide the total corporate tax amount into 4 equal installments."
+#~ msgstr ""
+#~ "In België zijn bedrijven die al 3 jaar of langer actief zijn verplicht om "
+#~ "hun vennootschapsbelasting in 4 termijnen gedurende het jaar te betalen. "
+#~ "Voor nieuwere bedrijven is dit niet verplicht, maar het wordt wel "
+#~ "aanbevolen.<br/><br/> Je maakt een schatting van je jaarlijkse winst, "
+#~ "waarna wij het totale bedrag aan vennootschapsbelasting in 4 gelijke "
+#~ "termijnen verdelen."
+
+#~ msgid "Bank"
+#~ msgstr "Bank"
+
+#~ msgid "Belgian Periodic VAT Report Lock Wizard"
+#~ msgstr "Wizard voor Belgische periodieke btw-aangifte"
+
+#~ msgid "Lock"
+#~ msgstr "Vergrendelen"
+
+#~ msgid "Website Messages"
+#~ msgstr "Websiteberichten"
+
+#~ msgid "Website communication history"
+#~ msgstr "Website communicatiegeschiedenis"
+
+#~ msgid "e.g. 123455 555 6"
+#~ msgstr "bijv. 123455 555 6"

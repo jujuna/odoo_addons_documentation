@@ -54,11 +54,11 @@ class TestPlanning(TestCommonSalePlanning):
             'start_datetime': datetime(2025, 1, 22, 0, 0, 0),
             'end_datetime': datetime(2025, 1, 22, 12, 0, 0),
             'sale_line_id': sol.id,
-            'resource_id': self.employee_wout.resource_id.id,
+            'resource_ids': self.employee_wout.resource_id.ids,
         }, {
             'start_datetime': datetime(2025, 1, 22, 12, 0, 0),
             'end_datetime': datetime(2025, 1, 22, 17, 0, 0),
-            'resource_id': self.employee_wout.resource_id.id,
+            'resource_ids': self.employee_wout.resource_id.ids,
         }])
 
         report_values = self.env['planning.analysis.report']._read_group(

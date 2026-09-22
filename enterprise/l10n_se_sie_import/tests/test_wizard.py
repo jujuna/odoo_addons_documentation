@@ -1,15 +1,15 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from base64 import b64encode
-
 from odoo.exceptions import UserError
 from odoo.tests import tagged
-from odoo.tools import file_open, float_is_zero
+from odoo.tools import float_is_zero
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
 @tagged('-at_install', 'post_install_l10n', 'post_install')
 class AccountTestSIEImport(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('se')
     def setUpClass(cls):
@@ -22,21 +22,19 @@ class AccountTestSIEImport(AccountTestInvoicingCommon):
         })
 
         cls.currency = cls.env.ref('base.SEK')
-        cls.company_registry = '555555-5555'
+        cls.se_org_number = '555555-5555'
 
         cls.bad_currency = cls.env['res.currency'].create({'name': 'BAD', 'symbol': 'X'})
-        cls.bad_company_registry = '6666666-6666'
+        cls.bad_se_org_number = '556036-0793'
 
         cls.company.update({
             'currency_id': cls.currency.id,
-            'company_registry': cls.company_registry,
         })
+        cls.company.partner_id.additional_identifiers = {'SE_EN': cls.se_org_number}
 
-        with file_open('l10n_se_sie_import/tests/data/Sample.sie') as f:
-            cls.sie_filedata = b64encode(f.read().encode())
+        cls.sie_filedata = cls.file_read('l10n_se_sie_import/tests/data/Sample.sie')
 
-        with file_open('l10n_se_sie_import/tests/data/SampleEntry.sie') as f:
-            cls.sie_entry_filedata = b64encode(f.read().encode())
+        cls.sie_entry_filedata = cls.file_read('l10n_se_sie_import/tests/data/SampleEntry.sie')
 
         # Accounts codes that should be present after import of the Sample.sie file
         cls.reference_accounts = {
@@ -96,12 +94,14 @@ class AccountTestSIEImport(AccountTestInvoicingCommon):
         })
 
         # Test UserError if company registry is incorrect
-        self.company.update({'company_registry': self.bad_company_registry, 'currency_id': self.currency.id})
+        self.company.partner_id.additional_identifiers = {'SE_EN': self.bad_se_org_number}
+        self.company.currency_id = self.currency
         with self.assertRaises(UserError):
             wizard.action_import_sie()
 
         # Test UserError if company currency is incorrect
-        self.company.update({'company_registry': self.company_registry, 'currency_id': self.bad_currency.id})
+        self.company.partner_id.additional_identifiers = {'SE_EN': self.se_org_number}
+        self.company.currency_id = self.bad_currency
         with self.assertRaises(UserError):
             wizard.action_import_sie()
 
@@ -233,11 +233,11 @@ class AccountTestSIEImport(AccountTestInvoicingCommon):
         ])
 
         document_names = documents.sorted('name').mapped('name')
-        file_document_names = tuple(sorted((doc['name'] for doc in file_documents)))
+        file_document_names = tuple(sorted(doc['name'] for doc in file_documents))
         self.assertSequenceEqual(file_document_names, document_names, 'ir.attachment documents names mismatch file')
 
-        document_content = documents.sorted('datas').mapped('datas')
-        file_document_content = tuple(sorted((doc['content'] for doc in file_documents)))
+        document_content = tuple(sorted(d.raw.to_base64().encode() for d in documents))
+        file_document_content = tuple(sorted(doc['content'] for doc in file_documents))
         self.assertSequenceEqual(file_document_content, document_content, 'ir.attachment documents content mismatch file')
 
     def test_sie_import_consistency(self):
@@ -340,11 +340,11 @@ class AccountTestSIEImport(AccountTestInvoicingCommon):
         ])
 
         document_names = documents.sorted('name').mapped('name')
-        file_document_names = tuple(sorted((doc['name'] for doc in file_documents)))
+        file_document_names = tuple(sorted(doc['name'] for doc in file_documents))
         self.assertSequenceEqual(file_document_names, document_names, 'ir.attachment documents names mismatch file')
 
-        document_content = documents.sorted('datas').mapped('datas')
-        file_document_content = tuple(sorted((doc['content'] for doc in file_documents)))
+        document_content = tuple(sorted(d.raw.to_base64().encode() for d in documents))
+        file_document_content = tuple(sorted(doc['content'] for doc in file_documents))
         self.assertSequenceEqual(file_document_content, document_content, 'ir.attachment documents content mismatch file')
 
     def test_sie_combination(self):

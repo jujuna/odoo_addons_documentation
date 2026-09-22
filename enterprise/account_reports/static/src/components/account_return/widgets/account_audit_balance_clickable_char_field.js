@@ -1,21 +1,19 @@
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
-import { useService } from "@web/core/utils/hooks";
-import { CharField, charField } from "@web/views/fields/char/char_field";
+import { CharField, charField, charFieldProps } from "@web/views/fields/char/char_field";
 import { exprToBoolean } from "@web/core/utils/strings";
+import { t, usePlugin, useProps } from "@odoo/owl";
+import { ActionPlugin } from "@web/webclient/actions/action_plugin";
 
 export class AccountAuditClickableCharField extends CharField {
     static template = "account_reports.AccountAuditClickableCharField";
 
-    static props = {
-        ...CharField.props,
-        onclick: { type: String },
-    };
+    props = useProps({
+        ...charFieldProps,
+        onclick: t.string(),
+    });
 
-    setup() {
-        super.setup();
-        this.actionService = useService("action");
-    }
+    actionPlugin = usePlugin(ActionPlugin);
 
     async onClickField() {
         const test = {
@@ -25,7 +23,7 @@ export class AccountAuditClickableCharField extends CharField {
             type: "object",
             resId: this.props.record.resId,
         };
-        this.actionService.doActionButton(test);
+        this.actionPlugin.doActionButton(test);
     }
 }
 

@@ -5,7 +5,6 @@
                    "compatible with the FedEx REST API available at https://developer.fedex.com/. It is no longer"
                    "compatible with the older FedEx SOAP APIs (which have their own credentials).",
     'category': 'Shipping Connectors',
-    'version': '1.0',
     'application': True,
     'depends': ['stock_delivery', 'mail'],
     'data': [

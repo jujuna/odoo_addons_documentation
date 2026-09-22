@@ -1,11 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from collections import defaultdict
-from datetime import datetime, time, timedelta
-from pytz import timezone, UTC
+from datetime import datetime, time, timedelta, UTC
+from zoneinfo import ZoneInfo
 
 from odoo import api, fields, models, _
-from odoo.tools import float_round
+from odoo.tools import SQL, float_round
 from odoo.tools.date_utils import sum_intervals
 from odoo.exceptions import UserError
 
@@ -47,7 +47,7 @@ class HrEmployee(models.Model):
         for employee in self:
             previous_manager = employee._origin.parent_id.user_id
             manager = employee.parent_id.user_id
-            if manager and manager.has_group('hr_timesheet.group_hr_timesheet_approver') and (employee.timesheet_manager_id == previous_manager or not employee.timesheet_manager_id):
+            if manager and manager.has_group('hr_timesheet.group_hr_timesheet_approver') and employee.timesheet_manager_id and employee.timesheet_manager_id == previous_manager:
                 employee.timesheet_manager_id = manager
             elif not employee.timesheet_manager_id:
                 employee.timesheet_manager_id = False
@@ -87,7 +87,7 @@ class HrEmployee(models.Model):
         result = defaultdict(dict)
         # Change the type of the date from string to Date
         date_start_date = fields.Date.from_string(date_start)
-        date_stop_date = min(fields.Date.from_string(date_stop), fields.Date.today())
+        date_stop_date = min(fields.Date.from_string(date_stop), fields.Date.context_today(self))
 
         # Compute the difference between the starting and ending date
         delta = date_stop_date - date_start_date
@@ -97,27 +97,24 @@ class HrEmployee(models.Model):
         if not tz and len(mapped_tz := self.resource_id.mapped('tz')) == 1:
             tz = mapped_tz[0]
         tz = tz or 'UTC'
-        datetime_min = timezone(tz).localize(datetime.combine(date_start_date, time.min)).astimezone(UTC)
-        datetime_max = timezone(tz).localize(datetime.combine(date_stop_date, time.max)).astimezone(UTC)
+        datetime_min = datetime.combine(date_start_date, time.min, tzinfo=ZoneInfo(tz)).astimezone(UTC)
+        datetime_max = datetime.combine(date_stop_date, time.max, tzinfo=ZoneInfo(tz)).astimezone(UTC)
         # Collect the number of hours that an employee should work according to their schedule without counting timeoff
         resource_work_intervals, dummy = self.resource_id._get_valid_work_intervals(datetime_min, datetime_max, compute_leaves=False)
 
         for employee in self:
             working_hours = resource_work_intervals[employee.resource_id.id]
-            calendar = employee.resource_calendar_id
-            if not calendar:
+            if employee.sudo()._is_fully_flexible(date_start_date):
                 # the employee without any resource calendar is supposed to work h24
                 continue
             is_flexible_hours = False
             hours_per_day = HOURS_PER_DAY
-            if calendar.flexible_hours:
+            if employee.sudo()._is_flexible(date_start_date):
                 is_flexible_hours = True
-                if not calendar:
-                    calendar = employee.company_id.resource_calendar_id
-                full_time_required_hours = calendar.full_time_required_hours
+                full_time_required_hours = employee.resource_calendar_id.hours_per_week
                 if full_time_required_hours and delta.days > 0:
                    result[employee.id]['full_time_required_hours'] = round(full_time_required_hours / 7 * (delta.days + 1), 2)
-                hours_per_day = calendar.hours_per_day or HOURS_PER_DAY
+                hours_per_day = employee.resource_calendar_id.hours_per_day
             for day_count in range(delta.days + 1):
                 date = date_start_date + timedelta(days=day_count)
                 if is_flexible_hours:
@@ -135,13 +132,13 @@ class HrEmployee(models.Model):
     def get_daily_working_hours(self, date_start, date_stop):
         return self._count_daily_working_hours(date_start, date_stop)
 
-    def _get_timesheets_and_working_hours_query(self):
-        return """
+    def _get_timesheets_and_working_hours_query(self, employee_ids, from_date, to_date):
+        return SQL("""
             SELECT aal.employee_id as employee_id, COALESCE(SUM(aal.unit_amount), 0) as worked_hours
             FROM account_analytic_line aal
             WHERE aal.employee_id IN %s AND date >= %s AND date <= %s AND project_id IS NOT NULL
             GROUP BY aal.employee_id
-        """
+        """, tuple(employee_ids), from_date, to_date)
 
     def get_timesheet_and_working_hours_for_employees(self, date_start, date_stop):
         """
@@ -159,7 +156,8 @@ class HrEmployee(models.Model):
                     the number of worked units by the employees
         """
         result = {}
-        uom = str(self.env.company.timesheet_encode_uom_id.name).lower()
+        uom = self.env.company.timesheet_encode_uom_id
+        day_uom = self.env.ref('uom.product_uom_day')
         hours_per_day_per_employee = {}
         employees_work_days_data = {}
 
@@ -170,22 +168,23 @@ class HrEmployee(models.Model):
             units_to_work = sum_intervals(employees_work_days_data[employee.resource_id.id])
 
             # Adjustments if we work with a different unit of measure
-            if uom == 'days':
-                calendar = employee.resource_calendar_id or employee.company_id.resource_calendar_id
-                hours_per_day_per_employee[employee.id] = calendar.hours_per_day
+            if uom == day_uom:
+                calendar = employee.version_id.resource_calendar_id
+                # a fully flexible employee's own calendar has no hours_per_day, fall backback to the company
+                hours_per_day_per_employee[employee.id] = calendar.hours_per_day or employee.company_id.resource_calendar_id.hours_per_day
                 units_to_work = units_to_work / hours_per_day_per_employee[employee.id]
-                rounding = len(str(self.env.company.timesheet_encode_uom_id.rounding).split('.')[1])
-                units_to_work = round(units_to_work, rounding)
-            result[employee.id] = {'units_to_work': units_to_work, 'uom': uom, 'worked_hours': 0.0}
+                digits = self.env['decimal.precision'].precision_get('Product Unit')
+                units_to_work = round(units_to_work, digits)
+            result[employee.id] = {'units_to_work': units_to_work, 'uom': 'days' if uom == day_uom else 'hours', 'worked_hours': 0.0}
 
-        query = self._get_timesheets_and_working_hours_query()
-        self.env.cr.execute(query, (tuple(self.ids), date_start, date_stop))
-        for data_row in self.env.cr.dictfetchall():
+        query = self._get_timesheets_and_working_hours_query(self.ids, date_start, date_stop)
+        rows = self.env.execute_query_dict(query)
+        for data_row in rows:
             worked_hours = data_row['worked_hours']
-            if uom == 'days':
+            if uom == day_uom:
                 worked_hours /= hours_per_day_per_employee[data_row['employee_id']]
-                rounding = len(str(self.env.company.timesheet_encode_uom_id.rounding).split('.')[1])
-                worked_hours = round(worked_hours, rounding)
+                digits = self.env['decimal.precision'].precision_get('Product Unit')
+                worked_hours = round(worked_hours, digits)
             result[data_row['employee_id']]['worked_hours'] = worked_hours
 
         return result

@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from contextlib import contextmanager
-from freezegun import freeze_time
-from unittest.mock import patch
 
 from odoo.addons.mail.tests.common import MockEmail
 from odoo.tests.common import TransactionCase
@@ -16,17 +13,17 @@ class HelpdeskCommon(TransactionCase, MockEmail):
         super(HelpdeskCommon, cls).setUpClass()
         cls._init_mail_gateway()
         cls.env.user.tz = 'Europe/Brussels'
-        cls.env['resource.calendar'].search([]).write({'tz': 'Europe/Brussels'})
 
         # we create a helpdesk user and a manager
-        Users = cls.env['res.users'].with_context(tracking_disable=True)
-        cls.main_company_id = cls.env.user.company_id.id
+        Users = cls.env['res.users']
+        cls.main_company = cls.env.user.company_id
+        cls.main_company.tz = 'Europe/Brussels'
         cls.partner = cls.env['res.partner'].create({
             'name': 'Customer Credee'
         })
 
         cls.helpdesk_manager = Users.create({
-            'company_id': cls.main_company_id,
+            'company_id': cls.main_company.id,
             'name': 'Helpdesk Manager',
             'login': 'hm',
             'email': 'hm@example.com',
@@ -35,7 +32,7 @@ class HelpdeskCommon(TransactionCase, MockEmail):
             'tz': 'Europe/Brussels',
         })
         cls.helpdesk_user = Users.create({
-            'company_id': cls.main_company_id,
+            'company_id': cls.main_company.id,
             'name': 'Helpdesk User',
             'login': 'hu',
             'email': 'hu@example.com',
@@ -43,11 +40,19 @@ class HelpdeskCommon(TransactionCase, MockEmail):
             'tz': 'Europe/Brussels',
         })
         cls.helpdesk_portal = Users.create({
-            'company_id': cls.main_company_id,
+            'company_id': cls.main_company.id,
             'name': 'Helpdesk Portal',
             'login': 'hp',
             'email': 'hp@example.com',
             'group_ids': [(6, 0, [cls.env.ref('base.group_portal').id])],
+            'tz': 'Europe/Brussels',
+        })
+        cls.internal_user = Users.create({
+            'company_id': cls.main_company.id,
+            'name': 'Helpdesk Base User',
+            'login': 'hb',
+            'email': 'hb@example.com',
+            'group_ids': [(6, 0, [cls.env.ref('base.group_user').id])],
             'tz': 'Europe/Brussels',
         })
         # the manager defines a team for our tests (the .sudo() at the end is to avoid potential uid problems)
@@ -80,7 +85,7 @@ class HelpdeskCommon(TransactionCase, MockEmail):
 
     @contextmanager
     def _ticket_patch_now(self, datetime):
-        with freeze_time(datetime), patch.object(self.env.cr, 'now', lambda: datetime):
+        with self.mock_datetime_and_now(datetime):
             yield
             self.env.flush_all()
 

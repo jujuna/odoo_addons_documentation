@@ -16,6 +16,7 @@ import {
     keyDown,
     keyUp,
     manuallyDispatchProgrammaticEvent,
+    middleClick,
     pointerDown,
     press,
     queryOne,
@@ -205,6 +206,13 @@ export function contains(target, options) {
             await callClick(dblclick, nodePromise, options);
         },
         /**
+         * @param {PointerOptions & KeyModifierOptions} [options]
+         */
+        middleClick: async (options) => {
+            consumeContains();
+            await callClick(middleClick, nodePromise, options);
+        },
+        /**
          * @param {DragAndDropOptions} [options]
          * @returns {Promise<DragHelpers>}
          */
@@ -237,7 +245,6 @@ export function contains(target, options) {
             consumeContains();
 
             await cancelCurrentDragSequence?.();
-            cancelCurrentDragSequence = cancelWithDelay;
 
             const { cancel, drop, moveTo } = await drag(nodePromise, options);
             const helpersWithDelay = {
@@ -245,6 +252,8 @@ export function contains(target, options) {
                 drop: dropWithDelay,
                 moveTo: moveToWithDelay,
             };
+
+            cancelCurrentDragSequence = cancelWithDelay;
 
             await waitForTouchDelay(options?.pointerDownDuration);
 

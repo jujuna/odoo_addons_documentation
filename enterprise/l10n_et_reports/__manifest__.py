@@ -1,6 +1,5 @@
 {
     'name': 'Ethiopia - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Ethiopia
 ============================================

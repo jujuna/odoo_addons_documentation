@@ -9,17 +9,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-13 21:59+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:29+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "frontdesk/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: frontdesk
 #. odoo-python
@@ -29,9 +29,10 @@ msgstr " - マネジャー: %(manager_name)s"
 
 #. module: frontdesk
 #. odoo-python
-#: code:addons/frontdesk/models/frontdesk_visitor.py:0
-msgid "%(name)s just checked-in. Requested Drink: %(drink)s."
-msgstr "%(name)sがチェックインしました。リクエストされたドリンク：%(drink)s。"
+#: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
+msgid ""
+"%(host_names)s must have a valid Email to be informed about visitor arrival."
+msgstr "%(host_names)s 訪問者の到着通知を受けるには、有効なメールアドレスが必要です。"
 
 #. module: frontdesk
 #. odoo-python
@@ -47,12 +48,6 @@ msgstr "%(station)s チェックイン: %(visitor)s  %(host)sに会う"
 
 #. module: frontdesk
 #. odoo-python
-#: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
-msgid "%s (copy)"
-msgstr "%s (コピー)"
-
-#. module: frontdesk
-#. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%s just checked-in."
 msgstr "%sがチェックインしました。"
@@ -63,50 +58,34 @@ msgid "'Badge - %s' % (object.name).replace('/', '')"
 msgstr "'バッジ - %s' % (object.name).replace('/', '')"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid ""
-")\n"
-"                        will be notified via email/SMS only, as they are not "
-"available on Discuss."
-msgstr ""
-")\n"
-"                        は、ディスカス上では利用できないため、メールまたは "
-"SMS のみで通知されます。"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid ",<br/>I hope this message finds you well. This is to inform you that"
-msgstr ""
-"、<br/>お世話になっております。以下の件につきましてご連絡申し上げます。"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid ""
-".\n"
-"                    <br/>Please let us know if you would like us to direct "
-"them to a meeting room or if you require any further assistance.\n"
-"                    <br/>After a successful meeting with the visitor, please "
-"proceed to check out their login."
-msgstr ""
-".\n"
-"                    <br/>会議室へのご案内やその他サポートが必要な場合はお知ら"
-"せください。\n"
-"                    <br/>訪問者とのミーティングが完了したら、ログインの確認に"
-"お進みください。"
-
-#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "22 Oct 24 14:20:10"
 msgstr "2024年10月22日 14:20:10"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_check_out
+#: model:mail.template,body_html:frontdesk.frontdesk_visitor_mail_template
 msgid ""
-"<i class=\"fa fa-check-circle fa-3x d-block mb-3 text-success\"/>\n"
-"                    The visitor has been successfully <br/> checked out"
+"<div>\n"
+"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
+"know you'll be there shortly.\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 msgstr ""
-"<i class=\"fa fa-check-circle fa-3x d-block mb-3 text-success\"/>\n"
-"                    訪問者は正常に <br/> チェックアウトされました"
+"<div>\n"
+"                    <p><t t-if=\"ctx.get('host_name')\"><t t-out=\"ctx.get"
+"('host_name')\"/>様、 </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">様(所属:<t t-out=\"object.company\"/>)</t>が<t t-"
+"out=\"object.station_id.name\"/>でお待ちです。まもなく到着する旨をご連絡くだ"
+"さい。\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: frontdesk
 #: model_terms:web_tour.tour,rainbow_man_message:frontdesk.frontdesk_tour
@@ -123,21 +102,24 @@ msgid "<strong>Visiting:</strong>"
 msgstr "<strong>訪問:</strong>"
 
 #. module: frontdesk
+#: model:ir.module.module,description:base.module_frontdesk
+msgid ""
+"A comprehensive front desk management system that enables guests to "
+"effortlessly check in and out while ensuring seamless notifications for "
+"hosts."
+msgstr ""
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_needaction
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_needaction
 msgid "Action Needed"
 msgstr "要アクション"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__active
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__active
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__active
 msgid "Active"
-msgstr "アクティブ"
-
-#. module: frontdesk
-#: model:ir.actions.client,name:frontdesk.frontdesk_visitor_action_configure_properties_field
-msgid "Add Properties"
-msgstr "プロパティを追加"
+msgstr "有効"
 
 #. module: frontdesk
 #: model:res.groups,name:frontdesk.frontdesk_group_administrator
@@ -151,11 +133,6 @@ msgid "All"
 msgstr "すべて"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "All Employees"
-msgstr "すべての従業員"
-
-#. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.js:0
 msgid "All departments"
@@ -163,17 +140,10 @@ msgstr "全部門"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Allow visitor to select a drink during registration"
-msgstr "登録時にドリンクを選択できるようにします"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Allows the visitor to pick the host of the meeting from the list"
 msgstr "訪問者はリストから会議のホストを選ぶことができます。"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_search
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
@@ -182,20 +152,20 @@ msgid "Archived"
 msgstr "アーカイブ済"
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/quick_check_in/quick_check_in.xml:0
-msgid "Are you one of these people?"
-msgstr "あなたもその一人ですか？"
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_attachment_count
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_attachment_count
 msgid "Attachment Count"
 msgstr "添付数"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__authenticate_guest
-msgid "Authenticate Guest"
-msgstr "ゲストを認証"
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__auto_checkout_hours
+msgid "Auto-Checkout"
+msgstr "自動チェックアウト"
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__auto_checkout_time
+msgid "Auto-Checkout Time"
+msgstr "自動チェックアウト時間"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -205,15 +175,16 @@ msgid "Back"
 msgstr "戻る"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "Best regards,<br/>"
-msgstr "よろしくお願いいたします。<br/>"
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Browse All Hosts"
+msgstr "すべてのホストを表示"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
-msgid "Browse All Hosts"
-msgstr "すべてのホストを表示"
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Browse Hosts"
+msgstr "ホスト一覧"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
@@ -221,18 +192,14 @@ msgid "By Responsible"
 msgstr "担当者ごと"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "Cancel"
-msgstr "キャンセル"
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_visitor__state__canceled
-msgid "Cancelled"
-msgstr "キャンセル済"
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Change Host"
+msgstr "ホストを変更"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__check_in
 msgid "Check In"
 msgstr "チェックイン"
@@ -243,19 +210,7 @@ msgid "Check Out"
 msgstr "チェックアウト"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "Check Out Visitor"
-msgstr "訪問者をチェックアウト"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
-msgid "Check in"
-msgstr "チェックイン"
-
-#. module: frontdesk
+#: model:ir.actions.server,name:frontdesk.action_mass_checkout
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
 msgid "Check out"
@@ -293,8 +248,13 @@ msgid "Checkout"
 msgstr "チェックアウト"
 
 #. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Choose how hosts are notified when a guest arrives."
+msgstr "ゲストが到着した際、ホストへの通知方法を設定してください。"
+
+#. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Choose who you would like to visit"
 msgstr "訪問したい担当者をお選びください"
 
@@ -302,11 +262,13 @@ msgstr "訪問したい担当者をお選びください"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_check_out
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Close"
 msgstr "閉じる"
 
 #. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__company_id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company_id
 msgid "Company"
@@ -320,31 +282,29 @@ msgid "Company Logo"
 msgstr "会社ロゴ"
 
 #. module: frontdesk
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_config
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid ""
+"Concise summary displayed immediately to the user for quick transparency."
+msgstr "迅速な透明性確保のため、ユーザへ即座に表示される簡潔な要約。"
+
+#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
 msgid "Configuration"
 msgstr "設定"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Configure Drinks"
-msgstr "飲物を設定"
-
-#. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Continue"
 msgstr "続行"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__create_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__create_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__create_uid
 msgid "Created by"
 msgstr "作成者"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__create_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__create_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__create_date
 msgid "Created on"
@@ -361,11 +321,6 @@ msgid "Date"
 msgstr "日付"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "Dear"
-msgstr "Dear"
-
-#. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "Dear %(visitor_name)s,"
@@ -377,70 +332,10 @@ msgid "Description"
 msgstr "説明"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__display_name
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__display_name
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__display_name
 msgid "Display Name"
 msgstr "表示名"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "Do you want something to drink?"
-msgstr "何かお飲み物はいかがですか？"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_ids
-msgid "Drink"
-msgstr "飲物"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__drink_image
-msgid "Drink Image"
-msgstr "飲物画像"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-msgid "Drink Name"
-msgstr "飲物名"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__served
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
-msgid "Drink Served"
-msgstr "飲物が提供されました"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/drink_page/drink_page.xml:0
-msgid "Drink image"
-msgstr "飲物画像"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-msgid "Drink to Serve"
-msgstr "提供する飲物"
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_drink
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_drinks_report
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__drink_ids
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_drinks_config
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_report_drinks
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_report_view_graph
-msgid "Drinks"
-msgstr "飲み物"
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_open_drink_to_serve_visitor
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_to_serve
-msgid "Drinks to Serve"
-msgstr "提供する飲物"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-msgid "Drinks to serve"
-msgstr "提供する飲物"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__duration
@@ -448,15 +343,24 @@ msgid "Duration"
 msgstr "期間"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "E.g. What's your Name"
-msgstr "例:お名前を教えて下さい。"
+#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_visitor
+#: model_terms:ir.actions.act_window,help:frontdesk.action_open_guest_on_site_visitor
+#: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
+msgid "Efficiently track and manage all visitor information."
+msgstr "すべての訪問者情報を効率的に追跡・管理します。"
 
 #. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_email
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__email
 msgid "Email"
 msgstr "メール"
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__mail_template_id
+msgid "Email Template"
+msgstr "メールテンプレート"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -470,11 +374,13 @@ msgid "Favorite"
 msgstr "お気に入り"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_follower_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_follower_ids
 msgid "Followers"
 msgstr "フォロワー"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_partner_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "フォロワー (取引先)"
@@ -482,16 +388,17 @@ msgstr "フォロワー (取引先)"
 #. module: frontdesk
 #: model:ir.actions.client,name:frontdesk.frontdesk_action_install_kiosk_pwa
 #: model:ir.model,name:frontdesk.model_frontdesk_frontdesk
+#: model:ir.module.module,shortdesc:base.module_frontdesk
 #: model:ir.ui.menu,name:frontdesk.frontdesk_menu_root
 #: model:res.groups.privilege,name:frontdesk.res_groups_privilege_frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Frontdesk"
-msgstr "受付"
+msgstr "フロントデスク"
 
 #. module: frontdesk
-#: model:ir.model,name:frontdesk.model_frontdesk_drink
-msgid "Frontdesk Drink"
-msgstr "受付飲物"
+#: model:mail.template,name:frontdesk.frontdesk_visitor_mail_template
+msgid "Frontdesk Email Template"
+msgstr "フロントデスクメールテンプレート"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__name
@@ -499,20 +406,34 @@ msgid "Frontdesk Name"
 msgstr "受付名"
 
 #. module: frontdesk
-#: model:sms.template,name:frontdesk.frontdesk_sms_template
-msgid "Frontdesk SMS Template"
-msgstr "受付SMSテンプレート"
+#: model:ir.model,name:frontdesk.model_frontdesk_visitor
+msgid "Frontdesk Visitor"
+msgstr "フロントデスク来訪者"
 
 #. module: frontdesk
-#: model:ir.model,name:frontdesk.model_frontdesk_visitor
-msgid "Frontdesk Visitors"
-msgstr "受付訪問者"
+#: model:ir.actions.server,name:frontdesk.cron_auto_checkout_visitors_ir_actions_server
+msgid "Frontdesk: Auto-Checkout Visitors"
+msgstr "フロントデスク: 来訪者の自動チェックアウト"
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid ""
+"Full legal disclosure covering storage, rights, and contact info (accessible "
+"via click)."
+msgstr ""
+"データ保管、権利、および問い合わせ先を網羅した法的開示文書(クリックして"
+"アクセス可能)。"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
 msgid "Go back"
 msgstr "戻る"
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__authenticate_guest
+msgid "Guest Details"
+msgstr "ゲスト詳細"
 
 #. module: frontdesk
 #: model:ir.actions.act_window,name:frontdesk.action_open_guest_on_site_visitor
@@ -525,22 +446,10 @@ msgid "Guests On Site"
 msgstr "現地ゲスト"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__has_message
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__has_message
 msgid "Has Message"
 msgstr "メッセージあり"
-
-#. module: frontdesk
-#: model:sms.template,body:frontdesk.frontdesk_sms_template
-msgid ""
-"Hello, Your visitor {{ object.name }} {{ '(%s)' % object.phone if "
-"object.phone else '' }} {{ '(%s)' % object.company if object.company else "
-"'' }} wants to meet you at {{ object.station_id.name }}. Please let them "
-"know you'll be there shortly."
-msgstr ""
-"訪問者{{ object.name }} {{ '(%s)' % object.phone if object.phone else '' }} "
-"{{ '(%s)' % object.company if object.company else '' }} が "
-"{{ object.station_id.name }}であなたとのミーティングを希望しています。まもな"
-"く伺うことを伝えましょう。"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
@@ -551,7 +460,7 @@ msgstr "Henry"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/js/tours/frontdesk.js:0
 msgid "Here, you'll see list of all the visitors."
-msgstr "ここでは、全ての訪問者のリストが表示されます。"
+msgstr "ここでは、すべての訪問者のリストが表示されます。"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
@@ -562,13 +471,19 @@ msgstr "ホスト"
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Host Avatar"
 msgstr "ホストアバター"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__host_ids
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__host_id
 msgid "Host Name"
 msgstr "ホスト名"
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Host Notifications"
+msgstr "ホストへの通知"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__host_selection
@@ -577,28 +492,25 @@ msgstr "ホスト選択"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__host_ids
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__station_host_ids
 msgid "Hosts"
 msgstr "ホスト"
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/drink_page/drink_page.xml:0
-msgid "How can we delight you?"
-msgstr "お好みのものを選択してください。"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__id
 msgid "ID"
 msgstr "ID"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_needaction
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "チェックした場合は、新しいメッセージに注意が必要です。"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_error
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_sms_error
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_has_error
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
@@ -615,11 +527,22 @@ msgid "Install"
 msgstr "インストール"
 
 #. module: frontdesk
+#. odoo-python
+#: code:addons/frontdesk/controllers/main.py:0
+msgid ""
+"Invalid domain. Allowed filters are: department_id with '=' and display_name "
+"with 'ilike'."
+msgstr ""
+"無効なドメインです。許可されているフィルタは、'=' を含む department_id およ"
+"び 'ilike' を含む display_name です。"
+
+#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__is_favorite
 msgid "Is Favorite"
 msgstr "お気に入り"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_is_follower
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_is_follower
 msgid "Is Follower"
 msgstr "フォロー中"
@@ -628,11 +551,6 @@ msgstr "フォロー中"
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Karen"
 msgstr "Karen"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-msgid "Kiosk"
-msgstr "キオスク"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__kiosk_url
@@ -652,14 +570,12 @@ msgid "Last Check-In: %s minutes ago"
 msgstr "最終チェックイン: %s分前"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__write_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__write_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__write_uid
 msgid "Last Updated by"
 msgstr "最終更新者"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__write_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__write_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__write_date
 msgid "Last Updated on"
@@ -697,17 +613,13 @@ msgid "MY PVT LTD"
 msgstr "MY PVT LTD"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "Message"
-msgstr "メッセージ"
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_error
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_has_error
 msgid "Message Delivery error"
 msgstr "メッセージ配信エラー"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_ids
 msgid "Messages"
 msgstr "メッセージ"
@@ -718,59 +630,33 @@ msgid "My Station"
 msgstr "自分の窓口"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__name
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__name
 msgid "Name"
 msgstr "名称"
 
 #. module: frontdesk
-#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_drink
-msgid "No drinks to offer to visitors. Let's add one!"
-msgstr "訪問者に提供する飲み物がありません。追加しましょう!"
+#: model:res.groups.privilege,placeholder:frontdesk.res_groups_privilege_frontdesk
+msgid "No"
+msgstr ""
 
 #. module: frontdesk
 #: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_frontdesk
-#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_frontdesk_tree
 msgid "No stations found. Let's create one!"
 msgstr "ステーションが見つかりません。作成しましょう!"
 
 #. module: frontdesk
 #: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_drink_to_serve_visitor
 #: model_terms:ir.actions.act_window,help:frontdesk.action_open_guest_on_site_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_planned_visitor
 #: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
 msgid "No visitors yet. Let's add one!"
 msgstr "まだ訪問者がいません。作成しましょう!"
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "No, thank you"
-msgstr "いいえ、結構です"
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_company__none
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__none
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__none
-msgid "None"
-msgstr "なし"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/drink_page/drink_page.xml:0
-msgid "Nothing, thanks."
-msgstr "結構です。ありがとうございます。"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_warning
-msgid "Notify Warning"
-msgstr "警告通知"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_sms
-msgid "Notify by SMS"
-msgstr "SMSで通知"
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Notify by Email"
+msgstr "メールで通知"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_discuss
@@ -783,43 +669,28 @@ msgid "Notify by email"
 msgstr "Eメールで通知"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Notify the host on guest arrival"
-msgstr "ゲスト到着時にホストに通知"
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_needaction_counter
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_needaction_counter
 msgid "Number of Actions"
 msgstr "アクション数"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_error_counter
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_has_error_counter
 msgid "Number of errors"
 msgstr "エラー数"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_needaction_counter
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "対応が必要なメッセージ数"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_error_counter
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "配信エラーが発生されたメッセージ数"
-
-#. module: frontdesk
-#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_drink_to_serve_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_guest_on_site_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_planned_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
-msgid "Odoo helps you to track all information related to your visitors."
-msgstr "Odooは訪問者に関する全ての情報を追跡するのに役立ちます。"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_offer
-msgid "Offer Drinks"
-msgstr "飲物を提供"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
@@ -837,57 +708,17 @@ msgid "Open Kiosk"
 msgstr "キオスクを開ける"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Open host chat window when guest arrives"
-msgstr "ゲスト到着時にホストチャットを開く"
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_company__optional
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__optional
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__optional
-msgid "Optional"
-msgstr "オプション"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Options"
-msgstr "オプション"
-
-#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_company
 msgid "Organization"
 msgstr "組織"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__pending
-msgid "Pending"
-msgstr "保留"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__notify_user_ids
-msgid "People to Notify"
-msgstr "通知する人"
-
-#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_phone
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__phone
 msgid "Phone"
 msgstr "電話"
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_open_planned_visitor
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_visitor__state__planned
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-msgid "Planned"
-msgstr "予定済"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/end_page/end_page.xml:0
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "Please have a seat."
-msgstr "少々お待ちください。"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_qr_expired
@@ -905,11 +736,16 @@ msgid "Print Visitor Badge"
 msgstr "訪問者バッジを印刷"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__visitor_properties
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
-msgid "Properties"
-msgstr "属性"
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__privacy_notice
+msgid "Privacy Notice"
+msgstr "プライバシー通知"
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__privacy_notice_details
+msgid "Privacy Notice Details"
+msgstr "プライバシー通知詳細"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -923,32 +759,27 @@ msgid "QR Code Expired."
 msgstr "QRコードの期限が切れました"
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/quick_check_in/quick_check_in.xml:0
-msgid "Quick Check In"
-msgstr "クイックチェックイン"
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__rating_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__rating_ids
 msgid "Ratings"
 msgstr "評価"
 
 #. module: frontdesk
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_report
-msgid "Reporting"
-msgstr "レポーティング"
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Read More"
+msgstr "続きを読む"
+
+#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Read more"
+msgstr "続きを読む"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Request additional information upon registering"
 msgstr "登録時に追加情報を要求します"
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_company__required
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__required
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__required
-msgid "Required"
-msgstr "必須"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
@@ -962,10 +793,8 @@ msgstr "担当者"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__responsible_ids
-msgid ""
-"Responsibles are people who will welcome the client and handle their drinks, "
-"etc."
-msgstr "担当者は、顧客をお迎えし、飲み物などの管理・提供を行います。"
+msgid "Responsibles are notified if no host is selected."
+msgstr "ホストが選択されていない場合は、担当者に通知されます。"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__host_selection
@@ -973,14 +802,10 @@ msgid "Restrict the hosts available from the client to choose from."
 msgstr "顧客が選択可能なホストを制限します。"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_sms_error
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "SMS送信エラー"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__sms_template_id
-msgid "SMS Template"
-msgstr "SMSテンプレート"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1001,8 +826,13 @@ msgstr "セキュリティトークン"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Select Host"
+msgstr "ホストを選択"
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Select Hosts"
 msgstr "ホストを選択"
 
 #. module: frontdesk
@@ -1012,42 +842,24 @@ msgid "Select or create a station on the fly from where the visitor arrived."
 msgstr "訪問者が到着した場所から、その場でステーションを選択または作成します。"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Select the color of the Desk"
-msgstr "デスクの色を選ぶ"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
-msgid "Selected host:"
-msgstr "選択されたホスト:"
-
-#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__self_check_in
 msgid "Self Check-In"
 msgstr "セルフチェックイン"
 
 #. module: frontdesk
+#: model:mail.template,description:frontdesk.frontdesk_visitor_mail_template
+msgid "Sent to hosts on guest arrival"
+msgstr "ゲスト到着時にホストに送付"
+
+#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Send an SMS to the host on guest arrival"
-msgstr "ゲスト到着時にホストにSMSを送信"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__sequence
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-msgid "Sequence"
-msgstr "シーケンス"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "Set as Planned"
-msgstr "計画済として設定"
+msgid "Settings"
+msgstr "管理設定"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Show a QR code on the welcome screen to check-in from mobile"
-msgstr ""
-"ウェルカムスクリーンにQRコードを表示し、モバイルからのチェックインを促します"
+msgstr "ウェルカムスクリーンにQRコードを表示し、モバイルからのチェックインを促します"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__self_check_in
@@ -1062,11 +874,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Side Message"
 msgstr "サイドメッセージ"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Some employees ("
-msgstr "一部の従業員（"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__station_id
@@ -1086,17 +893,9 @@ msgstr "窓口訪問者"
 
 #. module: frontdesk
 #: model:ir.actions.act_window,name:frontdesk.action_frontdesk_frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_frontdesk_tree
 #: model:ir.ui.menu,name:frontdesk.frontdesk_menu_stations
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_stations_config
 msgid "Stations"
 msgstr "窓口"
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_station_report
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-msgid "Statistics"
-msgstr "統計"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__state
@@ -1117,14 +916,19 @@ msgid "Thanks for your understanding."
 msgstr "ご理解のほど、よろしくお願いいたします。"
 
 #. module: frontdesk
+#: model:ir.model.constraint,message:frontdesk.constraint_frontdesk_frontdesk_check_auto_checkout_positive
+msgid "The Auto-Checkout value should be positive."
+msgstr "「自動チェックアウト」の値は正の値にしてください。"
+
+#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__theme
 msgid "Theme"
 msgstr "テーマ"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-msgid "Today"
-msgstr "今日"
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__image
+msgid "This image will be used as the kiosk background."
+msgstr "この画像はキオスクの背景として使用されます。"
 
 #. module: frontdesk
 #: model:res.groups,name:frontdesk.frontdesk_group_user
@@ -1143,17 +947,24 @@ msgid "Visitor Company"
 msgstr "訪問者会社"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__visitor_properties_definition
-msgid "Visitor Properties"
-msgstr "訪問者プロパティ"
+#: model:ir.module.module,summary:base.module_frontdesk
+msgid "Visitor management system"
+msgstr ""
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid ""
+"Visitor sessions expire automatically after the predefined duration. Leave "
+"to 0 to disable."
+msgstr ""
+"訪問者のセッションは、あらかじめ定義された受講時間が経過すると自動的に終了し"
+"ます。無効にする場合は、0 に設定してください。"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
 #: model:ir.actions.act_window,name:frontdesk.action_frontdesk_visitor
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_visitors_report
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__visitor_ids
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_report_visitors
 #: model:ir.ui.menu,name:frontdesk.frontdesk_menu_visitors
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_station_report_view_graph
@@ -1170,16 +981,6 @@ msgid ""
 "We regret to inform you that the following %(host_status)s currently "
 "unavailable:"
 msgstr "以下の %(host_status)s は現在利用できません。"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__website_message_ids
-msgid "Website Messages"
-msgstr "ウェブサイトメッセージ"
-
-#. module: frontdesk
-#: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__website_message_ids
-msgid "Website communication history"
-msgstr "ウェブサイト通信履歴"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1205,20 +1006,14 @@ msgid "Write message..."
 msgstr "メッセージを書く..."
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "Yes, please"
-msgstr "はい、お願いします。"
-
-#. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid ""
 "You can contact the host's manager or frontdesk responsible for further "
 "assistance."
 msgstr ""
-"詳細な対応が必要な場合は、ホストのマネジャーまたは受付担当者にご連絡くださ"
-"い。"
+"詳細な対応が必要な場合は、ホストのマネジャーまたは受付担当者にご連絡ください"
+"。"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1228,39 +1023,14 @@ msgstr "ご登録が完了しました"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Company"
-msgstr "会社"
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Your Information"
+msgstr "お客様の情報"
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Email"
-msgstr "Eメール"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Name"
-msgstr "お名前"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Phone Number"
-msgstr "電話番号"
-
-#. module: frontdesk
-#. odoo-python
-#: code:addons/frontdesk/models/frontdesk_visitor.py:0
-msgid "Your Visitor %(name)s Requested To Meet You"
-msgstr "訪問者 %(name)s があなたとの面会を要請しました"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/end_page/end_page.xml:0
-msgid "Your drink is on the way."
-msgstr "お飲み物をお持ちします。"
+#: model:mail.template,subject:frontdesk.frontdesk_visitor_mail_template
+msgid "Your Visitor {{ object.name }} Requested To Meet You"
+msgstr "訪問者 {{ object.name }} あなたとの面会を要請しました"
 
 #. module: frontdesk
 #. odoo-python
@@ -1269,41 +1039,23 @@ msgid "Your host isn't available"
 msgstr "ホストは現在対応できません"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid ""
-"and is here for their scheduled meeting with you.\n"
-"                    They are currently waiting in the"
-msgstr ""
-"また、面会のためにお越しです。\n"
-"                    現在、以下にてお待ちです:"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-msgid "e.g. Coca-Cola"
-msgstr "例: コカコーラ"
-
-#. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
 msgid "e.g. John Doe"
 msgstr "例: 鈴木 一郎"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "e.g. My Company"
 msgstr "例: 自社"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "e.g. john@company.com"
 msgstr "例: john@company.com"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "has arrived from"
-msgstr "以下よりお越しです:"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1324,13 +1076,241 @@ msgid "hosts are"
 msgstr "ホストは"
 
 #. module: frontdesk
-#. odoo-python
-#: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
-msgid "station_id.id"
-msgstr "station_id.id"
-
-#. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
 msgid "will get back to you."
-msgstr "がすぐに折り返しご連絡いたします"
+msgstr "折り返しご連絡いたします。"
+
+#~ msgid ""
+#~ "%(host_names)s must have a valid Phone to be informed about visitor "
+#~ "arrival."
+#~ msgstr ""
+#~ "%(host_names)sに訪問者の到着を通知するには、有効な電話番号が必要です。"
+
+#~ msgid "Cancelled"
+#~ msgstr "キャンセル済"
+
+#~ msgid "Frontdesk SMS Template"
+#~ msgstr "受付SMSテンプレート"
+
+#~ msgid ""
+#~ "Hello, Your visitor {{ object.name }} {{ '(%s)' % object.phone if "
+#~ "object.phone else '' }} {{ '(%s)' % object.company if object.company else "
+#~ "'' }} wants to meet you at {{ object.station_id.name }}. Please let them "
+#~ "know you'll be there shortly."
+#~ msgstr ""
+#~ "訪問者{{ object.name }} {{ '(%s)' % object.phone if object.phone else "
+#~ "'' }} {{ '(%s)' % object.company if object.company else '' }} が "
+#~ "{{ object.station_id.name }}であなたとのミーティングを希望しています。まも"
+#~ "なく伺うことを伝えましょう。"
+
+#~ msgid "Notify by SMS"
+#~ msgstr "SMSで通知"
+
+#~ msgid "SMS Template"
+#~ msgstr "SMSテンプレート"
+
+#~ msgid "Website Messages"
+#~ msgstr "ウェブサイトメッセージ"
+
+#~ msgid "Website communication history"
+#~ msgstr "ウェブサイト通信履歴"
+
+#~ msgid ""
+#~ "<i class=\"fa fa-check-circle fa-3x d-block mb-3 text-success\"/>\n"
+#~ "                    The visitor has been successfully <br/> checked out"
+#~ msgstr ""
+#~ "<i class=\"fa fa-check-circle fa-3x d-block mb-3 text-success\"/>\n"
+#~ "                    訪問者は正常に <br/> チェックアウトされました"
+
+#~ msgid "%(name)s just checked-in. Requested Drink: %(drink)s."
+#~ msgstr ""
+#~ "%(name)sがチェックインしました。リクエストされたドリンク：%(drink)s。"
+
+#~ msgid ",<br/>I hope this message finds you well. This is to inform you that"
+#~ msgstr ""
+#~ "、<br/>お世話になっております。以下の件につきましてご連絡申し上げます。"
+
+#~ msgid ""
+#~ ".\n"
+#~ "                    <br/>Please let us know if you would like us to "
+#~ "direct them to a meeting room or if you require any further assistance.\n"
+#~ "                    <br/>After a successful meeting with the visitor, "
+#~ "please proceed to check out their login."
+#~ msgstr ""
+#~ ".\n"
+#~ "                    <br/>会議室へのご案内やその他サポートが必要な場合はお"
+#~ "知らせください。\n"
+#~ "                    <br/>訪問者とのミーティングが完了したら、ログインの確"
+#~ "認にお進みください。"
+
+#~ msgid "Add Properties"
+#~ msgstr "プロパティを追加"
+
+#~ msgid "All Employees"
+#~ msgstr "すべての従業員"
+
+#~ msgid "Allow visitor to select a drink during registration"
+#~ msgstr "登録時にドリンクを選択できるようにします"
+
+#~ msgid "Are you one of these people?"
+#~ msgstr "あなたもその一人ですか？"
+
+#~ msgid "Authenticate Guest"
+#~ msgstr "ゲストを認証"
+
+#~ msgid "Best regards,<br/>"
+#~ msgstr "よろしくお願いいたします。<br/>"
+
+#~ msgid "Cancel"
+#~ msgstr "キャンセル"
+
+#~ msgid "Check Out Visitor"
+#~ msgstr "訪問者をチェックアウト"
+
+#~ msgid "Check in"
+#~ msgstr "チェックイン"
+
+#~ msgid "Configure Drinks"
+#~ msgstr "飲物を設定"
+
+#~ msgid "Dear"
+#~ msgstr "Dear"
+
+#~ msgid "Do you want something to drink?"
+#~ msgstr "何かお飲み物はいかがですか？"
+
+#~ msgid "Drink"
+#~ msgstr "飲物"
+
+#~ msgid "Drink Image"
+#~ msgstr "飲物画像"
+
+#~ msgid "Drink Name"
+#~ msgstr "飲物名"
+
+#~ msgid "Drink Served"
+#~ msgstr "飲物が提供されました"
+
+#~ msgid "Drink image"
+#~ msgstr "飲物画像"
+
+#~ msgid "Drink to Serve"
+#~ msgstr "提供する飲物"
+
+#~ msgid "Drinks"
+#~ msgstr "飲み物"
+
+#~ msgid "Drinks to Serve"
+#~ msgstr "提供する飲物"
+
+#~ msgid "Drinks to serve"
+#~ msgstr "提供する飲物"
+
+#~ msgid "E.g. What's your Name"
+#~ msgstr "例:お名前を教えて下さい。"
+
+#~ msgid "Frontdesk Drink"
+#~ msgstr "受付飲物"
+
+#~ msgid "How can we delight you?"
+#~ msgstr "お好みのものを選択してください。"
+
+#~ msgid "Kiosk"
+#~ msgstr "キオスク"
+
+#~ msgid "Message"
+#~ msgstr "メッセージ"
+
+#~ msgid "No drinks consumed yet!"
+#~ msgstr "まだドリンクの消費はありません。"
+
+#~ msgid "No drinks to offer to visitors. Let's add one!"
+#~ msgstr "訪問者に提供する飲み物がありません。追加しましょう!"
+
+#~ msgid "No visitor records found!"
+#~ msgstr "訪問者記録が見つかりませんでした!"
+
+#~ msgid "No, thank you"
+#~ msgstr "いいえ、結構です"
+
+#~ msgid "None"
+#~ msgstr "なし"
+
+#~ msgid "Nothing, thanks."
+#~ msgstr "結構です。ありがとうございます。"
+
+#~ msgid "Offer Drinks"
+#~ msgstr "飲物を提供"
+
+#~ msgid "Optional"
+#~ msgstr "オプション"
+
+#~ msgid "Options"
+#~ msgstr "オプション"
+
+#~ msgid "Pending"
+#~ msgstr "保留"
+
+#~ msgid "People to Notify"
+#~ msgstr "通知する人"
+
+#~ msgid "Planned"
+#~ msgstr "予定済"
+
+#~ msgid "Properties"
+#~ msgstr "属性"
+
+#~ msgid "Quick Check In"
+#~ msgstr "クイックチェックイン"
+
+#~ msgid "Reporting"
+#~ msgstr "レポーティング"
+
+#~ msgid "Required"
+#~ msgstr "必須"
+
+#~ msgid ""
+#~ "Responsibles are people who will welcome the client and handle their "
+#~ "drinks, etc."
+#~ msgstr "担当者は、顧客をお迎えし、飲み物などの管理・提供を行います。"
+
+#~ msgid "Select the color of the Desk"
+#~ msgstr "デスクの色を選ぶ"
+
+#~ msgid "Send an SMS to the host on guest arrival"
+#~ msgstr "ゲスト到着時にホストにSMSを送信"
+
+#~ msgid "Sequence"
+#~ msgstr "シーケンス"
+
+#~ msgid "Set as Planned"
+#~ msgstr "計画済として設定"
+
+#~ msgid "Statistics"
+#~ msgstr "統計"
+
+#~ msgid "Visitor Properties"
+#~ msgstr "訪問者プロパティ"
+
+#~ msgid "Yes, please"
+#~ msgstr "はい、お願いします。"
+
+#~ msgid "Your Visitor %(name)s Requested To Meet You"
+#~ msgstr "訪問者 %(name)s があなたとの面会を要請しました"
+
+#~ msgid ""
+#~ "and is here for their scheduled meeting with you.\n"
+#~ "                    They are currently waiting in the"
+#~ msgstr ""
+#~ "また、面会のためにお越しです。\n"
+#~ "                    現在、以下にてお待ちです:"
+
+#~ msgid "e.g. Coca-Cola"
+#~ msgstr "例: コカコーラ"
+
+#~ msgid "has arrived from"
+#~ msgstr "以下よりお越しです:"
+
+#~ msgid "station_id.id"
+#~ msgstr "station_id.id"

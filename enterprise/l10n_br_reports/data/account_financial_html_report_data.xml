@@ -4,6 +4,7 @@
         <field name="name">Balance Sheet</field>
         <field name="name@pt">Balanço patrimonial</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
@@ -36,48 +37,36 @@
                                 <field name="name">Bank and Cash accounts</field>
                                 <field name="name@pt">Contas de caixa e banco</field>
                                 <field name="code">BR_DI</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.01.01</field>
                             </record>
                             <record id="account_financial_report_creditos" model="account.report.line">
                                 <field name="name">Credits</field>
                                 <field name="name@pt">Créditos</field>
                                 <field name="code">BR_CRE</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.01.02</field>
                             </record>
                             <record id="account_financial_report_estoques" model="account.report.line">
                                 <field name="name">Stocks</field>
                                 <field name="name@pt">Estoques</field>
                                 <field name="code">BR_EST</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.01.03</field>
                             </record>
                             <record id="account_financial_report_despesas" model="account.report.line">
                                 <field name="name">Expenditure in the following year</field>
                                 <field name="name@pt">Despesas do exercício seguinte</field>
                                 <field name="code">BR_DES</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.01.05</field>
                             </record>
                             <record id="account_financial_report_bio_assets" model="account.report.line">
                                 <field name="name">Current biological assets</field>
                                 <field name="name@pt">Ativos biológicos circulantes</field>
                                 <field name="code">BR_BIO</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.01.10</field>
                             </record>
                             <record id="account_financial_report_noncurrent_assets_for_sale" model="account.report.line">
                                 <field name="name">Non-current assets held for sale</field>
                                 <field name="name@pt">Ativos não circulantes mantidos para venda</field>
                                 <field name="code">BR_NCFS</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.01.11</field>
                             </record>
                         </field>
@@ -86,47 +75,37 @@
                         <field name="name">Non-current assets</field>
                         <field name="name@pt">Ativos não circulantes</field>
                         <field name="code">BR_PNCA</field>
-                        <field name="foldable" eval="True"/>
+                        <field name="foldability">foldable</field>
                         <field name="aggregation_formula">BR_RLP.balance + BR_INV.balance + BR_IMOB.balance + BR_INT.balance + BR_DIF.balance</field>
                         <field name="children_ids">
                             <record id="account_financial_report_long_term" model="account.report.line">
                                 <field name="name">Long-term assets</field>
                                 <field name="name@pt">Ativos realizáveis a longo prazo</field>
                                 <field name="code">BR_RLP</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.02.01</field>
                             </record>
                             <record id="account_financial_report_investments" model="account.report.line">
                                 <field name="name">Investments</field>
                                 <field name="name@pt">Investimentos</field>
                                 <field name="code">BR_INV</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.02.02</field>
                             </record>
                             <record id="account_financial_report_immobilized" model="account.report.line">
                                 <field name="name">Fixed Assets</field>
                                 <field name="name@pt">Ativos fixos</field>
                                 <field name="code">BR_IMOB</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.02.03</field>
                             </record>
                             <record id="account_financial_report_intangible" model="account.report.line">
                                 <field name="name">Intangible Assets</field>
                                 <field name="name@pt">Ativos intangíveis</field>
                                 <field name="code">BR_INT</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.02.05</field>
                             </record>
                             <record id="account_financial_report_diferido" model="account.report.line">
                                 <field name="name">Deferred</field>
                                 <field name="name@pt">Diferido</field>
                                 <field name="code">BR_DIF</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">1.02.06</field>
                             </record>
                         </field>
@@ -152,8 +131,6 @@
                         <field name="name">Current year profit</field>
                         <field name="name@pt">Lucro do ano atual</field>
                         <field name="code">BR_LUCRO</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_current_revenue_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -180,8 +157,6 @@
                                 <field name="name">Current Liabilities</field>
                                 <field name="name@pt">Passivos circulantes</field>
                                 <field name="code">BR_CL1</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_current_liabilities1_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -197,7 +172,7 @@
                         <field name="name">Non-current liabilities</field>
                         <field name="name@pt">Passivos não circulantes</field>
                         <field name="code">BR_NC</field>
-                        <field name="foldable" eval="True"/>
+                        <field name="foldability">foldable</field>
                         <field name="expression_ids">
                             <record id="account_financial_report_non_current_liabilities0_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -211,8 +186,6 @@
                                 <field name="name">Long-term liabilities</field>
                                 <field name="name@pt">Passivos realizáveis a longo prazo</field>
                                 <field name="code">BR_LP</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_non_current_liabilities1_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -234,32 +207,24 @@
                                 <field name="name">Equity capital</field>
                                 <field name="name@pt">Capital social</field>
                                 <field name="code">BR_CAPITAL_SOCIAL</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-2.03.01</field>
                             </record>
                             <record id="account_financial_retained_earnings0" model="account.report.line">
                                 <field name="name">Reserves</field>
                                 <field name="name@pt">Reservas</field>
                                 <field name="code">BR_RESERVAS</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-2.03.02</field>
                             </record>
                             <record id="account_financial_ajustes" model="account.report.line">
                                 <field name="name">Equity valuation adjustments</field>
                                 <field name="name@pt">Ajustes de avaliação patrimonial</field>
                                 <field name="code">BR_AJ</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-2.03.03</field>
                             </record>
                             <record id="account_financial_outras_contas" model="account.report.line">
                                 <field name="name">Other equity accounts</field>
                                 <field name="name@pt">Outras contas do patrimônio líquido</field>
                                 <field name="code">BR_OC</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-2.03.04</field>
                             </record>
                         </field>
@@ -270,9 +235,7 @@
                 <field name="name">Off-balance sheet accounts</field>
                 <field name="name@pt">Contas fora do balanço</field>
                 <field name="code">BR_OS</field>
-                <field name="groupby">account_id</field>
                 <field name="hide_if_zero" eval="1"/>
-                <field name="foldable" eval="True"/>
                 <field name="domain_formula">-sum([('account_id.account_type', '=', 'off_balance')])</field>
                 <field name="horizontal_split_side">right</field>
                 <field name="hierarchy_level">0</field>
@@ -283,6 +246,7 @@
         <field name="name">Profit and Loss Statement</field>
         <field name="name@pt">Demonstração de lucros e perdas</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
         <field name="filter_analytic_groupby" eval="True"/>
@@ -325,8 +289,6 @@
                                 <field name="name">Operating profit</field>
                                 <field name="name@pt">Lucro operacional</field>
                                 <field name="code">BR_ROAG</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_resultado_ag_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -339,8 +301,6 @@
                                 <field name="name">Shares</field>
                                 <field name="name@pt">Participações</field>
                                 <field name="code">BR_PART_AG</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_participacoes_ag_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -356,8 +316,6 @@
                         <field name="name">Provision for CSLL and IRPJ</field>
                         <field name="name@pt">Provisão para CSLL e IRPJ</field>
                         <field name="code">BR_CSLL_IRPJ</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_csll_irpj_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -383,8 +341,6 @@
                                 <field name="name">Operating profit - rural activity</field>
                                 <field name="name@pt">Lucro operacional (atividade rural)</field>
                                 <field name="code">BR_ROAR</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_resultado_ar_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -397,8 +353,6 @@
                                 <field name="name">Shares</field>
                                 <field name="name@pt">Participações</field>
                                 <field name="code">BR_PART_AR</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_participacoes_ar_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -414,8 +368,6 @@
                         <field name="name">Provision for CSLL - rural activity</field>
                         <field name="name@pt">Provisão para CSLL (atividade rural)</field>
                         <field name="code">BR_CSLL_AR</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_csll_ar_balance" model="account.report.expression">
                                 <field name="label">balance</field>

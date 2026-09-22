@@ -8,12 +8,14 @@ from odoo.tests import tagged
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
 
-def patched_generate_all_returns(account_return_type, country_code, main_company, tax_unit=None):
+def patched_generate_all_returns(account_return_type, country_code, main_company, tax_unit=None, return_types=None):
     TestIntrastatReturn.return_type._try_create_returns_for_fiscal_year(main_company, tax_unit)
 
 
 @tagged('post_install', '-at_install')
 class TestIntrastatReturn(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -90,13 +92,11 @@ class TestIntrastatReturn(TestAccountReportsCommon):
         private_individuals = self.env['res.partner'].create([
             {
                 'name': 'Private Individual with VAT',
-                'is_company': False,
                 'country_id': self.env.ref('base.us').id,
                 'vat': 'US123456789',
             },
             {
                 'name': 'Private Individual without VAT',
-                'is_company': False,
                 'country_id': self.env.ref('base.us').id,
                 'vat': '/',
             }

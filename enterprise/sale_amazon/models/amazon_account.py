@@ -9,97 +9,99 @@ import dateutil.parser
 from markupsafe import Markup
 from werkzeug.urls import url_encode
 
-from odoo import _, api, exceptions, fields, models, modules
+from odoo import api, fields, models, modules
 from odoo.exceptions import UserError, ValidationError
-from odoo.service.model import PG_CONCURRENCY_EXCEPTIONS_TO_RETRY as CONCURRENCY_ERRORS
+from odoo.sql_db import PG_CONCURRENCY_EXCEPTIONS_TO_RETRY as CONCURRENCY_ERRORS
 from odoo.tools import urls
 
 from odoo.addons.sale_amazon import const
 from odoo.addons.sale_amazon import utils as amazon_utils
 from odoo.addons.sale_amazon.controllers.onboarding import compute_oauth_signature
 
-
 _logger = logging.getLogger(__name__)
 
 
 class AmazonAccount(models.Model):
-    _name = 'amazon.account'
+    _name = "amazon.account"
     _description = "Amazon Account"
     _check_company_auto = True
 
     name = fields.Char(
         string="Name",
         help="The user-defined name of the account.",
-        compute='_compute_name',
+        compute="_compute_name",
         store=True,
         readonly=False,
         required=True,
     )
     company_id = fields.Many2one(
         string="Company",
-        comodel_name='res.company',
+        comodel_name="res.company",
         default=lambda self: self.env.company,
         required=True,
         readonly=True,
     )
     offer_ids = fields.One2many(
-        string="Offers", comodel_name='amazon.offer', inverse_name='account_id', bypass_search_access=True
+        string="Offers",
+        comodel_name="amazon.offer",
+        inverse_name="account_id",
+        bypass_search_access=True,
     )
     base_marketplace_id = fields.Many2one(
         string="Home Marketplace",
         help="The home marketplace of this account; used for authentication only.",
-        comodel_name='amazon.marketplace',
+        comodel_name="amazon.marketplace",
         required=True,
     )
     available_marketplace_ids = fields.Many2many(
         string="Available Marketplaces",
         help="The marketplaces this account has access to.",
-        comodel_name='amazon.marketplace',
-        relation='amazon_account_marketplace_rel',
+        comodel_name="amazon.marketplace",
+        relation="amazon_account_marketplace_rel",
         copy=False,
     )
     active_marketplace_ids = fields.Many2many(
         string="Marketplaces",
         help="The marketplaces this account sells on.",
-        comodel_name='amazon.marketplace',
-        relation='amazon_account_active_marketplace_rel',
+        comodel_name="amazon.marketplace",
+        relation="amazon_account_active_marketplace_rel",
         domain='[("id", "in", available_marketplace_ids)]',
         copy=False,
     )
     default_product_ids = fields.Many2many(
         string="Default Products",
-        comodel_name='product.product',
-        compute='_compute_default_product_ids',
-        context={'active_test': False},
+        comodel_name="product.product",
+        compute="_compute_default_product_ids",
+        context={"active_test": False},
     )
     user_id = fields.Many2one(
         string="Salesperson",
-        comodel_name='res.users',
+        comodel_name="res.users",
         default=lambda self: self.env.user,
         check_company=True,
     )
     team_id = fields.Many2one(
         string="Sales Team",
         help="The Sales Team assigned to Amazon orders for reporting",
-        comodel_name='crm.team',
+        comodel_name="crm.team",
         check_company=True,
     )
     location_id = fields.Many2one(
         string="FBA Stock Location",
         help="The location of the stock managed by Amazon under the Amazon Fulfillment program.",
-        comodel_name='stock.location',
+        comodel_name="stock.location",
         domain='[("usage", "=", "internal")]',
         check_company=True,
     )
     synchronize_inventory = fields.Boolean(
         string="FBM Stock",
         help="Whether the available quantities of FBM products linked to this account are"
-             " synchronized with Amazon.",
+        " synchronized with Amazon.",
         default=True,
     )
     last_orders_sync = fields.Datetime(
         help="The last synchronization date for orders placed on this account. Orders whose status"
-             " has not changed since this date will not be created nor updated in Odoo.",
+        " has not changed since this date will not be created nor updated in Odoo.",
         default=fields.Datetime.now,
         required=True,
     )
@@ -127,7 +129,7 @@ class AmazonAccount(models.Model):
     access_token_expiry = fields.Datetime(
         string="LWA Access Token Expiry",
         help="The moment at which the token becomes invalid.",
-        default='1970-01-01',
+        default="1970-01-01",
         store=False,
     )
     restricted_data_token = fields.Char(
@@ -138,155 +140,166 @@ class AmazonAccount(models.Model):
     restricted_data_token_expiry = fields.Datetime(
         string="Restricted Data Token Expiry",
         help="The moment at which the Restricted Data Token becomes invalid.",
-        default='1970-01-01',
+        default="1970-01-01",
         store=False,
     )
 
     # Display fields.
     state = fields.Selection(
         string="State",
-        selection=[('disconnected', "Disconnected"), ('connected', "Connected")],
-        compute='_compute_state',
+        selection=[("disconnected", "Disconnected"), ("connected", "Connected")],
+        compute="_compute_state",
     )
-    offer_count = fields.Integer(compute='_compute_offer_count')
-    order_count = fields.Integer(compute='_compute_order_count')
+    offer_count = fields.Integer(compute="_compute_offer_count")
+    order_count = fields.Integer(compute="_compute_order_count")
 
-    #=== COMPUTE METHODS ===#
+    # === COMPUTE METHODS === #
 
-    @api.depends('base_marketplace_id')
+    @api.depends("base_marketplace_id")
     def _compute_name(self):
         for account in self:
             if account.base_marketplace_id:
                 account.name = account.base_marketplace_id.name
 
     def _compute_default_product_ids(self):
-        ProductProduct = self.env['product.product']
-        default_product = (
-            self.env.ref('sale_amazon.default_product', raise_if_not_found=False)
-            or ProductProduct._restore_data_product("Amazon Sales", 'consu', 'default_product')
-        )
-        shipping_product = (
-            self.env.ref('sale_amazon.shipping_product', raise_if_not_found=False)
-            or ProductProduct._restore_data_product("Amazon Shipping", 'consu', 'shipping_product')
-        )
+        ProductProduct = self.env["product.product"]
+        default_product = self.env.ref(
+            "sale_amazon.default_product", raise_if_not_found=False
+        ) or ProductProduct._restore_data_product("Amazon Sales", "consu", "default_product")
+        shipping_product = self.env.ref(
+            "sale_amazon.shipping_product", raise_if_not_found=False
+        ) or ProductProduct._restore_data_product("Amazon Shipping", "consu", "shipping_product")
         for account in self:
             account.default_product_ids = default_product + shipping_product
 
-    @api.depends('refresh_token')
+    @api.depends("refresh_token")
     def _compute_state(self):
         for account in self:
-            account.state = 'connected' if account.refresh_token else 'disconnected'
+            account.state = "connected" if account.refresh_token else "disconnected"
 
     def _compute_offer_count(self):
-        offers_data = self.env['amazon.offer']._read_group(
-            [('account_id', 'in', self.ids)], ['account_id'], ['__count']
+        offers_data = self.env["amazon.offer"]._read_group(
+            [("account_id", "in", self.ids)], ["account_id"], ["__count"]
         )
         accounts_data = {account.id: count for account, count in offers_data}
         for account in self:
             account.offer_count = accounts_data.get(account.id, 0)
 
     def _compute_order_count(self):
-        orders_per_offer = self.env['sale.order.line']._read_group(
-            [('amazon_offer_id.account_id', 'in', self.ids)],
-            groupby=['amazon_offer_id'],
-            aggregates=['order_id:recordset'],
+        orders_per_offer = self.env["sale.order.line"]._read_group(
+            [("amazon_offer_id.account_id", "in", self.ids)],
+            groupby=["amazon_offer_id"],
+            aggregates=["order_id:recordset"],
         )
-        orders_per_account = defaultdict(lambda: self.env['sale.order'])
+        orders_per_account = defaultdict(lambda: self.env["sale.order"])
         for offer, orders in orders_per_offer:
             orders_per_account[offer.account_id] += orders
         for account in self:
             account.order_count = len(orders_per_account.get(account, []))
 
-    #=== ONCHANGE METHODS ===#
+    # === ONCHANGE METHODS === #
 
-    @api.onchange('last_orders_sync')
+    @api.onchange("last_orders_sync")
     def _onchange_last_orders_sync(self):
-        """ Display a warning about the possible consequences of modifying the last orders sync. """
+        """Display a warning about the possible consequences of modifying the last orders sync."""
         self.ensure_one()
         if self._origin.id:
             return {
-                'warning': {
-                    'title': _("Warning"),
-                    'message': _("If the date is set in the past, orders placed on this Amazon "
-                                 "Account before the first synchronization of the module might be "
-                                 "synchronized with Odoo.\n"
-                                 "If the date is set in the future, orders placed on this Amazon "
-                                 "Account between the previous and the new date will not be "
-                                 "synchronized with Odoo.")
+                "warning": {
+                    "title": self.env._("Warning"),
+                    "message": self.env._(
+                        "If the date is set in the past, orders placed on this Amazon "
+                        "Account before the first synchronization of the module might be "
+                        "synchronized with Odoo.\n"
+                        "If the date is set in the future, orders placed on this Amazon "
+                        "Account between the previous and the new date will not be "
+                        "synchronized with Odoo."
+                    ),
                 }
             }
 
-    #=== CONSTRAINT METHODS ===#
+    # === CONSTRAINT METHODS ===#
 
-    @api.constrains('active_marketplace_ids')
+    @api.constrains("active_marketplace_ids")
     def _check_actives_subset_of_availables(self):
         for account in self:
             if account.active_marketplace_ids.filtered(
-                    lambda m: m.id not in account.available_marketplace_ids.ids):
-                raise exceptions.ValidationError(_("Only available marketplaces can be selected"))
+                lambda m: m.id not in account.available_marketplace_ids.ids
+            ):
+                raise ValidationError(account.env._("Only available marketplaces can be selected"))
 
-    #=== CRUD METHODS ===#
+    # === CRUD METHODS === #
 
     @api.model_create_multi
     def create(self, vals_list):
-        amazon_accounts_rg = self._read_group([], ['team_id', 'location_id'])
+        amazon_accounts_rg = self._read_group([], ["team_id", "location_id"])
         amazon_teams_ids = [team.id for team, __ in amazon_accounts_rg]
         amazon_locations_ids = [location.id for __, location in amazon_accounts_rg]
         for vals in vals_list:
             # Find or create the location of the Amazon warehouse to be associated with this account
-            location = self.env['stock.location'].search([
-                *self.env['stock.location']._check_company_domain(vals.get('company_id')),
-                ('id', 'in', amazon_locations_ids),
-            ], limit=1)
+            location = self.env["stock.location"].search(
+                [
+                    *self.env["stock.location"]._check_company_domain(vals.get("company_id")),
+                    ("id", "in", amazon_locations_ids),
+                ],
+                limit=1,
+            )
             if not location:
-                parent_location_data = self.env['stock.warehouse'].search_read(
-                    [*self.env['stock.warehouse']._check_company_domain(vals.get('company_id'))],
-                    ['view_location_id'],
+                parent_location_data = self.env["stock.warehouse"].search_read(
+                    [*self.env["stock.warehouse"]._check_company_domain(vals.get("company_id"))],
+                    ["view_location_id"],
                     limit=1,
                 )
-                location = self.env['stock.location'].create({
-                    'name': 'Amazon',
-                    'usage': 'internal',
-                    'location_id': parent_location_data[0]['view_location_id'][0] if parent_location_data else False,
-                    'company_id': vals.get('company_id'),
+                location = self.env["stock.location"].create({
+                    "name": "Amazon",
+                    "usage": "internal",
+                    "location_id": parent_location_data[0]["view_location_id"][0]
+                    if parent_location_data
+                    else False,
+                    "company_id": vals.get("company_id"),
                 })
-            vals.update({'location_id': location.id})
+            vals.update({"location_id": location.id})
 
             # Find or create the sales team to be associated with this account
-            team = self.env['crm.team'].search([
-                *self.env['crm.team']._check_company_domain(vals.get('company_id')),
-                ('id', 'in', amazon_teams_ids),
-            ], limit=1)
+            team = self.env["crm.team"].search(
+                [
+                    *self.env["crm.team"]._check_company_domain(vals.get("company_id")),
+                    ("id", "in", amazon_teams_ids),
+                ],
+                limit=1,
+            )
             if not team:
-                team = self.env['crm.team'].create({
-                    'name': 'Amazon',
-                    'company_id': vals.get('company_id'),
+                team = self.env["crm.team"].create({
+                    "name": "Amazon",
+                    "company_id": vals.get("company_id"),
                 })
-            vals.update({'team_id': team.id})
+            vals.update({"team_id": team.id})
 
         return super().create(vals_list)
 
     @api.ondelete(at_uninstall=False)
     def _unlink_except_linked_to_so(self):
-        has_linked_so_line = self.env['sale.order.line'].search(
-            [('amazon_offer_id.account_id', 'in', self.ids)], limit=1
+        has_linked_so_line = self.env["sale.order.line"].search(
+            [("amazon_offer_id.account_id", "in", self.ids)], limit=1
         )
         if has_linked_so_line:
-            raise UserError(_(
-                "You cannot delete an account that is linked to sale orders. Please archive it"
-                " instead."
-            ))
+            raise UserError(
+                self.env._(
+                    "You cannot delete an account that is linked to sale orders. Please archive it"
+                    " instead."
+                )
+            )
 
-    #=== ACTION METHODS ===#
+    # === ACTION METHODS === #
 
     def action_archive(self):
-        """ Override to disconnect the Amazon account before archiving it. """
+        """Override to disconnect the Amazon account before archiving it."""
         for account in self:
             account.action_reset_refresh_token()
         return super().action_archive()
 
     def action_redirect_to_oauth_url(self):
-        """ Build the OAuth redirect URL and redirect the user to it.
+        """Build the OAuth redirect URL and redirect the user to it.
 
         See step 1 of https://developer-docs.amazon.com/sp-api/docs/website-authorization-workflow.
 
@@ -298,25 +311,22 @@ class AmazonAccount(models.Model):
         self.ensure_one()
 
         base_seller_central_url = self.base_marketplace_id.seller_central_url
-        oauth_url = urls.urljoin(base_seller_central_url, '/apps/authorize/consent')
+        oauth_url = urls.urljoin(base_seller_central_url, "/apps/authorize/consent")
         base_database_url = self.get_base_url()
         metadata = {
-            'account_id': self.id,
-            'return_url': urls.urljoin(base_database_url, 'amazon/return'),
-            'signature': compute_oauth_signature(self.id),
+            "account_id": self.id,
+            "return_url": urls.urljoin(base_database_url, "amazon/return"),
+            "signature": compute_oauth_signature(self.id),
         }  # The metadata included in the redirect URL after authorizing the app on Amazon.
-        oauth_url_params = {
-            'application_id': const.APP_ID,
-            'state': json.dumps(metadata),
-        }
+        oauth_url_params = {"application_id": const.APP_ID, "state": json.dumps(metadata)}
         return {
-            'type': 'ir.actions.act_url',
-            'url': f'{oauth_url}?{url_encode(oauth_url_params)}',
-            'target': 'self',
+            "type": "ir.actions.act_url",
+            "url": f"{oauth_url}?{url_encode(oauth_url_params)}",
+            "target": "self",
         }
 
     def action_reset_refresh_token(self):
-        """ Reset the refresh token of the account.
+        """Reset the refresh token of the account.
 
         Note: self.ensure_one()
 
@@ -327,7 +337,7 @@ class AmazonAccount(models.Model):
         self.refresh_token = None
 
     def action_update_available_marketplaces(self):
-        """ Update available marketplaces and assign new ones to the account.
+        """Update available marketplaces and assign new ones to the account.
 
         :return: A rainbow-man action to inform the user about the successful update.
         :rtype: dict
@@ -335,47 +345,50 @@ class AmazonAccount(models.Model):
         for account in self:
             available_marketplaces = account._get_available_marketplaces()
             new_marketplaces = available_marketplaces - account.available_marketplace_ids
-            account.write({'available_marketplace_ids': [(6, 0, available_marketplaces.ids)]})
+            account.write({"available_marketplace_ids": [(6, 0, available_marketplaces.ids)]})
             # Remove active marketplace that are no longer available
             account.active_marketplace_ids &= account.available_marketplace_ids
             account.active_marketplace_ids += new_marketplaces
         return {
-            'effect': {
-                'type': 'rainbow_man',
-                'message': _("Successfully updated the marketplaces available to this account!"),
+            "effect": {
+                "type": "rainbow_man",
+                "message": self.env._(
+                    "Successfully updated the marketplaces available to this account!"
+                ),
             }
         }
 
     def action_view_offers(self):
         self.ensure_one()
         return {
-            'type': 'ir.actions.act_window',
-            'name': _('Offers'),
-            'res_model': 'amazon.offer',
-            'view_mode': 'list',
-            'domain': [('account_id', '=', self.id)],
-            'context': {'default_account_id': self.id},
+            "type": "ir.actions.act_window",
+            "name": self.env._("Offers"),
+            "res_model": "amazon.offer",
+            "view_mode": "list",
+            "domain": [("account_id", "=", self.id)],
+            "context": {"default_account_id": self.id},
         }
 
     def action_view_orders(self):
         self.ensure_one()
-        order_lines = self.env['sale.order.line'].search(
-            [('amazon_offer_id', '!=', False), ('amazon_offer_id.account_id', '=', self.id)]
-        )
+        order_lines = self.env["sale.order.line"].search([
+            ("amazon_offer_id", "!=", False),
+            ("amazon_offer_id.account_id", "=", self.id),
+        ])
         return {
-            'type': 'ir.actions.act_window',
-            'name': _('Orders'),
-            'res_model': 'sale.order',
-            'view_mode': 'list,form',
-            'domain': [('id', 'in', order_lines.order_id.ids)],
-            'context': {'create': False},
+            "type": "ir.actions.act_window",
+            "name": self.env._("Orders"),
+            "res_model": "sale.order",
+            "view_mode": "list,form",
+            "domain": [("id", "in", order_lines.order_id.ids)],
+            "context": {"create": False},
         }
 
     def action_sync_orders(self):
         self._sync_orders()
 
     def action_sync_pickings(self):
-        self.env['stock.picking']._sync_pickings(tuple(self.ids))
+        self.env["stock.picking"]._sync_pickings(tuple(self.ids))
 
     def action_sync_inventory(self):
         self._sync_inventory()
@@ -386,17 +399,17 @@ class AmazonAccount(models.Model):
     def action_recover_order(self):
         self.ensure_one()
         return {
-            'name': _("Recover Order"),
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'res_model': 'amazon.recover.order.wizard',
-            'target': 'new',
+            "name": self.env._("Recover Order"),
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            "res_model": "amazon.recover.order.wizard",
+            "target": "new",
         }
 
-    #=== BUSINESS METHODS ===#
+    # === BUSINESS METHODS === #
 
     def _get_available_marketplaces(self):
-        """ Fetch the API refs of the available marketplaces and return the corresponding recordset.
+        """Fetch the API refs of the available marketplaces and return the corresponding recordset.
 
         Note: self.ensure_one()
 
@@ -409,27 +422,30 @@ class AmazonAccount(models.Model):
         amazon_utils.ensure_account_is_set_up(self, require_marketplaces=False)
         try:
             response_content = amazon_utils.make_sp_api_request(
-                self, 'getMarketplaceParticipations'
+                self, "getMarketplaceParticipations"
             )
-        except amazon_utils.AmazonRateLimitError:
+        except amazon_utils.AmazonRateLimitError as exc:
             _logger.info(
                 "Rate limit reached while updating available marketplaces for Amazon account with "
-                "id %s.", self.id
+                "id %s.",
+                self.id,
             )
-            raise UserError(_(
-                "You reached the maximum number of requests for this operation; please try again "
-                "later."
-            ))
+            raise UserError(
+                self.env._(
+                    "You reached the maximum number of requests for this operation; please try"
+                    " again later."
+                )
+            ) from exc
         else:
             available_marketplace_api_refs = [
-                marketplace['marketplace']['id'] for marketplace in response_content['payload']
+                marketplace["marketplace"]["id"] for marketplace in response_content["payload"]
             ]
-            return self.env['amazon.marketplace'].search(
-                [('api_ref', 'in', available_marketplace_api_refs)]
-            )
+            return self.env["amazon.marketplace"].search([
+                ("api_ref", "in", available_marketplace_api_refs)
+            ])
 
     def _sync_orders(self, auto_commit=True):
-        """ Synchronize the accounts' sales orders that were recently updated on Amazon.
+        """Synchronize the accounts' sales orders that were recently updated on Amazon.
 
         If called on an empty recordset, the orders of all active accounts are synchronized instead.
 
@@ -441,19 +457,21 @@ class AmazonAccount(models.Model):
         """
         accounts = self or self.search([])
         for account in accounts:
-            account = account[0]  # Avoid pre-fetching after each cache invalidation.
+            account = account.with_prefetch()  # Avoid pre-fetching after each cache invalidation.
             amazon_utils.ensure_account_is_set_up(account)
 
             # The last synchronization date of the account is used as the lower limit on the orders'
             # last status update date. The upper limit is determined by the API and returned with
             # the request response, then saved on the account if the synchronization goes through.
+            sync_start = fields.Datetime.now()
             last_updated_after = account.last_orders_sync  # Lower limit for pulling orders.
             status_update_upper_limit = None  # Upper limit of synchronized orders.
 
             # Pull all recently updated orders and save the progress during synchronization.
             payload = {
-                'LastUpdatedAfter': last_updated_after.isoformat(sep='T'),
-                'MarketplaceIds': ','.join(account.active_marketplace_ids.mapped('api_ref')),
+                "lastUpdatedAfter": last_updated_after.isoformat(sep="T") + "Z",
+                "marketplaceIds": ",".join(account.active_marketplace_ids.mapped("api_ref")),
+                "includedData": ("BUYER,RECIPIENT,FULFILLMENT,PROCEEDS,PROMOTION"),
             }
             try:
                 # Orders are pulled in batches of up to 100 orders. If more can be synchronized, the
@@ -462,12 +480,11 @@ class AmazonAccount(models.Model):
                 while has_next_page:
                     # Pull the next batch of orders data.
                     orders_batch_data, has_next_page = amazon_utils.pull_batch_data(
-                        account, 'getOrders', payload
+                        account, "searchOrders", payload
                     )
-                    orders_data = orders_batch_data['Orders']
-                    status_update_upper_limit = dateutil.parser.parse(
-                        orders_batch_data['LastUpdatedBefore']
-                    )
+                    orders_data = orders_batch_data["orders"]
+                    if last_updated_before := orders_batch_data.get("lastUpdatedBefore"):
+                        status_update_upper_limit = dateutil.parser.parse(last_updated_before)
 
                     # Process the batch one order data at a time.
                     for order_data in orders_data:
@@ -483,37 +500,38 @@ class AmazonAccount(models.Model):
                             if modules.module.current_test:
                                 # we are executing during testing, do not try to rollback
                                 raise
-                            amazon_order_ref = order_data['AmazonOrderId']
+                            amazon_order_ref = order_data["orderId"]
                             if isinstance(error, CONCURRENCY_ERRORS):
                                 _logger.info(
                                     "A concurrency error occurred while processing the order data "
                                     "with amazon_order_ref %s for Amazon account with id %s. "
                                     "Discarding the error to trigger the retry mechanism.",
-                                    amazon_order_ref, account.id
+                                    amazon_order_ref,
+                                    account.id,
                                 )
                                 # Let the error bubble up so that either the request can be retried
                                 # up to 5 times or the cron job rollbacks the cursor and reschedules
                                 # itself later, depending on which of the two called this method.
                                 raise
-                            else:
-                                _logger.warning(
-                                    "A business error occurred while processing the order data "
-                                    "with amazon_order_ref %s for Amazon account with id %s. "
-                                    "Skipping the order data and moving to the next order.",
-                                    amazon_order_ref, account.id,
-                                    exc_info=True
-                                )
-                                # Dismiss business errors to allow the synchronization to skip the
-                                # problematic orders and require synchronizing them manually.
-                                self.env.cr.rollback()
-                                account._handle_sync_failure(
-                                    flow='order_sync', amazon_order_ref=amazon_order_ref
-                                )
-                                continue  # Skip these order data and resume with the next ones.
+                            _logger.warning(
+                                "A business error occurred while processing the order data "
+                                "with amazon_order_ref %s for Amazon account with id %s. "
+                                "Skipping the order data and moving to the next order.",
+                                amazon_order_ref,
+                                account.id,
+                                exc_info=True,
+                            )
+                            # Dismiss business errors to allow the synchronization to skip the
+                            # problematic orders and require synchronizing them manually.
+                            self.env.cr.rollback()
+                            account._handle_sync_failure(
+                                flow="order_sync", amazon_order_ref=amazon_order_ref
+                            )
+                            continue  # Skip these order data and resume with the next ones.
 
                         # The synchronization of this order went through, use its last status update
                         # as a backup and set it to be the last synchronization date of the account.
-                        last_order_update = dateutil.parser.parse(order_data['LastUpdateDate'])
+                        last_order_update = dateutil.parser.parse(order_data["lastUpdatedTime"])
                         account.last_orders_sync = last_order_update.replace(tzinfo=None)
                         if auto_commit:
                             with amazon_utils.preserve_credentials(account):
@@ -521,16 +539,21 @@ class AmazonAccount(models.Model):
             except amazon_utils.AmazonRateLimitError as error:
                 _logger.info(
                     "Rate limit reached while synchronizing sales orders for Amazon account with "
-                    "id %s. Operation: %s", account.id, error.operation
+                    "id %s. Operation: %s",
+                    account.id,
+                    error.operation,
                 )
                 continue  # The remaining orders will be pulled later when the cron runs again.
 
             # There are no more orders to pull and the synchronization went through. Set the API
             # upper limit on order status update to be the last synchronization date of the account.
-            account.last_orders_sync = status_update_upper_limit.replace(tzinfo=None)
+            if status_update_upper_limit:
+                account.last_orders_sync = status_update_upper_limit.replace(tzinfo=None)
+            else:
+                account.last_orders_sync = sync_start
 
     def _sync_order_by_reference(self, amazon_order_ref):
-        """ Synchronize an order based on its Amazon order reference.
+        """Synchronize an order based on its Amazon order reference.
 
         Note: `self.ensure_one()`
 
@@ -543,40 +566,44 @@ class AmazonAccount(models.Model):
         """
         self.ensure_one()
         amazon_utils.ensure_account_is_set_up(self)
-
+        payload = {"includedData": ("BUYER,RECIPIENT,FULFILLMENT,PROCEEDS,PROMOTION")}
         order_data = amazon_utils.make_sp_api_request(
-            self, 'getOrder', path_parameter=amazon_order_ref
-        )['payload']
+            self, "getOrder", path_parameter=amazon_order_ref, payload=payload
+        )["order"]
         if not order_data:  # Order not found by Amazon
-            raise UserError(_("The provided reference does not match any Amazon order."))
-        if order_data['MarketplaceId'] not in self.active_marketplace_ids.mapped('api_ref'):
-            raise UserError(_("The order was not found on this account's marketplaces."))
+            raise UserError(self.env._("The provided reference does not match any Amazon order."))
+        if order_data["salesChannel"].get(
+            "marketplaceId"
+        ) not in self.active_marketplace_ids.mapped("api_ref"):
+            raise UserError(self.env._("The order was not found on this account's marketplaces."))
 
         order = self._process_order_data(order_data)
         if not order:
-            amazon_status = order_data['OrderStatus']
-            fulfillment_channel = order_data['FulfillmentChannel']
-            raise ValidationError(_(
-                "The Amazon order with reference %(ref)s was not recovered because its status"
-                " (%(status)s) is not eligible for synchronization for its fulfillment channel"
-                " (%(channel)s).",
-                ref=amazon_order_ref,
-                status=amazon_status,
-                channel=fulfillment_channel,
-            ))
+            amazon_status = order_data["fulfillment"]["fulfillmentStatus"]
+            fulfillment_channel = order_data["fulfillment"]["fulfilledBy"]
+            raise ValidationError(
+                self.env._(
+                    "The Amazon order with reference %(ref)s was not recovered because its status"
+                    " (%(status)s) is not eligible for synchronization for its fulfillment channel"
+                    " (%(channel)s).",
+                    ref=amazon_order_ref,
+                    status=amazon_status,
+                    channel=fulfillment_channel,
+                )
+            )
         return {
-            'name': order.display_name,
-            'type': 'ir.actions.act_window',
-            'res_model': 'sale.order',
-            'view_mode': 'form',
-            'res_id': order.id,
+            "name": order.display_name,
+            "type": "ir.actions.act_window",
+            "res_model": "sale.order",
+            "view_mode": "form",
+            "res_id": order.id,
         }
 
     def _process_order_data(self, order_data):
-        """ Process the provided order data and return the matching sales order, if any.
+        """Process the provided order data and return the matching sales order, if any.
 
         If no matching sales order is found, a new one is created if it is in a 'synchronizable'
-        status: 'Shipped' or 'Unshipped', if it is respectively an FBA or an FBA order. If the
+        status: 'SHIPPED' or 'UNSHIPPED', if it is respectively an FBA or an FBM order. If the
         matching sales order already exists and the Amazon order was canceled, the sales order is
         also canceled. If the matching sales order already exists and the order data confirm that a
         FBM order got shipped, we update the shipping status when it's needed.
@@ -590,43 +617,53 @@ class AmazonAccount(models.Model):
         self.ensure_one()
 
         # Search for the sales order based on its Amazon order reference.
-        amazon_order_ref = order_data['AmazonOrderId']
+        amazon_order_ref = order_data["orderId"]
         if not isinstance(amazon_order_ref, str):
             raise TypeError(f"Invalid AmazonOrderId, should be a string: {amazon_order_ref!r}")
-        order = self.env['sale.order'].search(
-            [('amazon_order_ref', '=', amazon_order_ref)], limit=1
+        order = self.env["sale.order"].search(
+            [("amazon_order_ref", "=", amazon_order_ref)], limit=1
         )
-        amazon_status = order_data['OrderStatus']
-        fulfillment_channel = order_data['FulfillmentChannel']
+        fulfillment_data = order_data["fulfillment"]
+        amazon_status = fulfillment_data["fulfillmentStatus"]
+        fulfillment_channel = fulfillment_data.get("fulfilledBy")
         if not order:  # No sales order was found with the given Amazon order reference.
-            if amazon_status in const.STATUS_TO_SYNCHRONIZE[fulfillment_channel]:
+            if (
+                fulfillment_channel
+                and amazon_status in const.STATUS_TO_SYNCHRONIZE[fulfillment_channel]
+            ):
                 # Create the sales order and generate stock moves depending on the Amazon channel.
                 order = self._create_order_from_data(order_data)
-                if order.amazon_channel == 'fba':
+                if order.amazon_channel == "fba":
                     self._generate_stock_moves(order)
-                elif order.amazon_channel == 'fbm':
-                    order.with_context(mail_notrack=True).action_lock()
+                elif order.amazon_channel == "fbm":
+                    order.action_lock()
                 _logger.info(
                     "Created a new sales order with amazon_order_ref %(ref)s for Amazon account"
-                    " with id %(id)s.", {'ref': amazon_order_ref, 'id': self.id}
+                    " with id %(id)s.",
+                    {"ref": amazon_order_ref, "id": self.id},
                 )
             else:
                 _logger.info(
                     "Ignored Amazon order with reference %(ref)s and status %(status)s for Amazon"
                     " account with id %(account_id)s.",
-                    {'ref': amazon_order_ref, 'status': amazon_status, 'account_id': self.id},
+                    {"ref": amazon_order_ref, "status": amazon_status, "account_id": self.id},
                 )
         else:  # The sales order already exists.
             unsynced_pickings = order.picking_ids.filtered(
-                lambda picking: picking.amazon_sync_status != 'done' and picking.state != 'cancel'
+                lambda picking: picking.amazon_sync_status != "done" and picking.state != "cancel"
             )  # Consider any "unsynced" status so that we synchronize updates made from Amazon.
-            if amazon_status == 'Canceled' and order.state != 'cancel':
+            if amazon_status == "CANCELLED" and order.state != "cancel":
                 order._action_cancel()
                 _logger.info(
                     "Cancelled sales order with amazon_order_ref %(ref)s for Amazon account with id"
-                    " %(id)s.", {'ref': amazon_order_ref, 'id': self.id}
+                    " %(id)s.",
+                    {"ref": amazon_order_ref, "id": self.id},
                 )
-            elif amazon_status == 'Shipped' and fulfillment_channel == 'MFN' and unsynced_pickings:
+            elif (
+                amazon_status == "SHIPPED"
+                and fulfillment_channel == "MERCHANT"
+                and unsynced_pickings
+            ):
                 # This can happen in 3 cases:
                 # 1. The processing of the feed of a batch of pickings failed on Amazon side in a
                 # way that we couldn't tell which picking are faulty. In that case, all pickings of
@@ -635,21 +672,22 @@ class AmazonAccount(models.Model):
                 # 2. The shipping was arranged directly from Amazon's backend.
                 # 3. The user uses a delivery method that contacted Amazon to send the picking
                 # information before we did.
-                unsynced_pickings.amazon_sync_status = 'done'
+                unsynced_pickings.amazon_sync_status = "done"
                 _logger.info(
                     "Forced the picking synchronization status to 'done' for sales order with"
                     " Amazon order reference %(ref)s and Amazon account with id %(id)s.",
-                    {'ref': amazon_order_ref, 'id': self.id},
+                    {"ref": amazon_order_ref, "id": self.id},
                 )
             else:
                 _logger.info(
                     "Ignored already synchronized sales order with amazon_order_ref %(ref)s for"
-                    " Amazon account with id %(id)s.", {'ref': amazon_order_ref, 'id': self.id}
+                    " Amazon account with id %(id)s.",
+                    {"ref": amazon_order_ref, "id": self.id},
                 )
         return order
 
     def _create_order_from_data(self, order_data):
-        """ Create a new sales order based on the provided order data.
+        """Create a new sales order based on the provided order data.
 
         Note: self.ensure_one()
 
@@ -659,70 +697,86 @@ class AmazonAccount(models.Model):
         """
         self.ensure_one()
         order_vals = self._prepare_order_values(order_data)
-        return self.env['sale.order'].with_context(
-            mail_create_nosubscribe=True
-        ).with_company(self.company_id).create(order_vals)
+        return (
+            self
+            .env["sale.order"]
+            .with_context(mail_create_nosubscribe=True)
+            .with_company(self.company_id)
+            .create(order_vals)
+        )
 
     def _prepare_order_values(self, order_data):
         # Prepare the order line values.
-        shipping_code = order_data.get('ShipServiceLevel')
+        shipping_code = order_data["fulfillment"].get("fulfillmentServiceLevel")
         shipping_product = self._find_matching_product(
-            shipping_code, 'shipping_product', 'Shipping', 'service'
+            shipping_code, "shipping_product", "Shipping", "service"
         )
-        amazon_order_ref = order_data['AmazonOrderId']
-        currency_code = order_data.get('OrderTotal', {}).get('CurrencyCode')
-        if currency_code:
-            currency = self.env['res.currency'].with_context(active_test=False).search(
-                [('name', '=', currency_code)], limit=1
+        amazon_order_ref = order_data["orderId"]
+        currency_code = order_data["proceeds"].get("grandTotal", {}).get("currencyCode")
+
+        if currency_code:  # Not included in replacement order data
+            currency = (
+                self
+                .env["res.currency"]
+                .with_context(active_test=False)
+                .search([("name", "=", currency_code)], limit=1)
             )
-        elif order_data.get('IsReplacementOrder') == 'true':
-            replaced_order = self.env['sale.order'].search(
-                [('amazon_order_ref', '=', order_data['ReplacedOrderId'])], limit=1
+        elif replaced_order_data := order_data.get("associatedOrders"):  # It is a replacement order
+            replaced_order_ref = replaced_order_data[0].get("orderId")
+            replaced_order = self.env["sale.order"].search(
+                [("amazon_order_ref", "=", replaced_order_ref)], limit=1
             )
             currency = replaced_order.currency_id
         else:
-            raise ValidationError(_(
-                "The Amazon order with reference %(ref)s was not recovered because its currency"
-                " was missing from the Amazon order data.",
-                ref=amazon_order_ref,
-            ))
+            raise ValidationError(
+                self.env._(
+                    "The Amazon order with reference %(ref)s was not recovered because its currency"
+                    " was missing from the Amazon order data.",
+                    ref=amazon_order_ref,
+                )
+            )
         contact_partner, delivery_partner = self._find_or_create_partners_from_data(order_data)
-        fiscal_position = self.env['account.fiscal.position'].with_company(
-            self.company_id
-        )._get_fiscal_position(contact_partner, delivery_partner)
+        fiscal_position = (
+            self
+            .env["account.fiscal.position"]
+            .with_company(self.company_id)
+            ._get_fiscal_position(contact_partner, delivery_partner)
+        )
         order_lines_values = self._prepare_order_lines_values(
             order_data, currency, fiscal_position, shipping_product
         )
 
-        fulfillment_channel = order_data['FulfillmentChannel']
-        purchase_date = dateutil.parser.parse(order_data['PurchaseDate']).replace(tzinfo=None)
+        fulfillment_channel = order_data["fulfillment"].get("fulfilledBy")
+        purchase_date = dateutil.parser.parse(order_data.get("createdTime")).replace(tzinfo=None)
+
         order_vals = {
-            'origin': f"Amazon Order {amazon_order_ref}",
-            'state': 'sale',
+            "origin": f"Amazon Order {amazon_order_ref}",
+            "reference": amazon_order_ref,
+            "state": "sale",
             # The order is first created unlocked and later locked to trigger the creation of a
             # stock picking if fulfilled by merchant.
-            'locked': fulfillment_channel == 'AFN',
-            'date_order': purchase_date,
-            'partner_id': contact_partner.id,
-            'pricelist_id': self._find_or_create_pricelist(currency).id,
-            'order_line': [(0, 0, order_line_values) for order_line_values in order_lines_values],
-            'invoice_status': 'no',
-            'partner_shipping_id': delivery_partner.id,
-            'require_signature': False,
-            'require_payment': False,
-            'fiscal_position_id': fiscal_position.id,
-            'company_id': self.company_id.id,
-            'user_id': self.user_id.id,
-            'team_id': self.team_id.id,
-            'amazon_order_ref': amazon_order_ref,
-            'amazon_channel': 'fba' if fulfillment_channel == 'AFN' else 'fbm',
+            "locked": fulfillment_channel == "AMAZON",
+            "date_order": purchase_date,
+            "partner_id": contact_partner.id,
+            "pricelist_id": self._find_or_create_pricelist(currency).id,
+            "order_line": [(0, 0, order_line_values) for order_line_values in order_lines_values],
+            "invoice_status": "no",
+            "partner_shipping_id": delivery_partner.id,
+            "require_signature": False,
+            "prepayment_percent": 0,
+            "fiscal_position_id": fiscal_position.id,
+            "company_id": self.company_id.id,
+            "user_id": self.user_id.id,
+            "team_id": self.team_id.id,
+            "amazon_order_ref": amazon_order_ref,
+            "amazon_channel": "fba" if fulfillment_channel == "AMAZON" else "fbm",
         }
-        if fulfillment_channel == 'AFN' and self.location_id.warehouse_id:
-            order_vals['warehouse_id'] = self.location_id.warehouse_id.id
+        if fulfillment_channel == "AMAZON" and self.location_id.warehouse_id:
+            order_vals["warehouse_id"] = self.location_id.warehouse_id.id
         return order_vals
 
     def _find_or_create_partners_from_data(self, order_data):
-        """ Find or create the contact and delivery partners based on the provided order data.
+        """Find or create the contact and delivery partners based on the provided order data.
 
         Note: self.ensure_one()
 
@@ -733,39 +787,49 @@ class AmazonAccount(models.Model):
         """
         self.ensure_one()
 
-        amazon_order_ref = order_data['AmazonOrderId']
-        anonymized_email = order_data['BuyerInfo'].get('BuyerEmail', '')
-        buyer_name = order_data['BuyerInfo'].get('BuyerName', '')
-        fulfillment_channel = order_data['FulfillmentChannel']
-        shipping_address_info = order_data.get('ShippingAddress', {})
-        shipping_address_name = shipping_address_info.get('Name', '')
-        street = shipping_address_info.get('AddressLine1', '')
-        address_line2 = shipping_address_info.get('AddressLine2', '')
-        address_line3 = shipping_address_info.get('AddressLine3', '')
-        street2 = "%s %s" % (address_line2, address_line3) if address_line2 or address_line3 \
-            else None
-        zip_code = shipping_address_info.get('PostalCode', '')
-        city = shipping_address_info.get('City', '')
-        country_code = shipping_address_info.get('CountryCode', '')
-        state_code = shipping_address_info.get('StateOrRegion', '')
-        phone = shipping_address_info.get('Phone', '')
-        is_company = shipping_address_info.get('AddressType') == 'Commercial'
-        country = self.env['res.country'].search([('code', '=', country_code)], limit=1)
-        state = self.env['res.country.state'].search([
-            ('country_id', '=', country.id),
-            '|', ('code', '=ilike', state_code), ('name', '=ilike', state_code),
-        ], limit=1)
+        amazon_order_ref = order_data["orderId"]
+        buyer_info = order_data.get("buyer", {})
+        anonymized_email = buyer_info.get("buyerEmail", "")
+        buyer_name = buyer_info.get("buyerName", "")
+        fulfillment_channel = order_data.get("fulfillment", {}).get("fulfilledBy")
+        shipping_address_info = order_data.get("recipient", {}).get("deliveryAddress", {})
+        shipping_address_name = shipping_address_info.get("name", "")
+        street = shipping_address_info.get("addressLine1", "")
+        address_line2 = shipping_address_info.get("addressLine2", "")
+        address_line3 = shipping_address_info.get("addressLine3", "")
+        street2 = ("%s %s" % (address_line2, address_line3)).strip() or None
+        zip_code = shipping_address_info.get("postalCode", "")
+        city = shipping_address_info.get("city", "")
+        country_code = shipping_address_info.get("countryCode", "")
+        state_code = shipping_address_info.get("stateOrRegion", "")
+        phone = shipping_address_info.get("phone", "")
+        country = self.env["res.country"].search([("code", "=", country_code)], limit=1)
+        state = self.env["res.country.state"].search(
+            [
+                ("country_id", "=", country.id),
+                "|",
+                ("code", "=ilike", state_code),
+                ("name", "=ilike", state_code),
+            ],
+            limit=1,
+        )
+
+        # German addresses on Amazon are swapped, where AddressLine1 == company/building name, and
+        # AddressLine2 == street.
+        if country.code == "DE" and street2:
+            street, street2 = street2, street
+
         partner_vals = {
-            'street': street,
-            'street2': street2,
-            'zip': zip_code,
-            'city': city,
-            'country_id': country.id,
-            'state_id': state.id,
-            'phone': phone,
-            'customer_rank': 1,
-            'company_id': self.company_id.id,
-            'email': anonymized_email,
+            "street": street,
+            "street2": street2,
+            "zip": zip_code,
+            "city": city,
+            "country_id": country.id,
+            "state_id": state.id,
+            "phone": phone,
+            "customer_rank": 1,
+            "company_id": self.company_id.id,
+            "email": anonymized_email,
         }
 
         # The contact partner is searched based on all the personal information and only if the
@@ -775,60 +839,72 @@ class AmazonAccount(models.Model):
         # preferred over updating the personal information with new values because it allows using
         # the correct contact details when invoicing the customer for an earlier order, should there
         # be a change in the personal information.
-        contact = self.env['res.partner'].search([
-            *self.env['res.partner']._check_company_domain(self.company_id),
-            ('type', '=', 'contact'),
-            ('name', '=', buyer_name),
-            ('email', '=', anonymized_email),
-        ], limit=1) if anonymized_email else None  # Don't match random partners.
+        contact = (
+            self.env["res.partner"].search(
+                [
+                    *self.env["res.partner"]._check_company_domain(self.company_id),
+                    ("type", "=", "contact"),
+                    ("name", "=", buyer_name),
+                    ("email", "=", anonymized_email),
+                ],
+                limit=1,
+            )
+            if anonymized_email
+            else None
+        )  # Don't match random partners.
         if not contact:
             contact_name = buyer_name or f"Amazon Customer # {amazon_order_ref}"
-            contact = self.env['res.partner'].with_context(tracking_disable=True).create({
-                'name': contact_name,
-                'is_company': is_company,
-                **partner_vals,
-            })
-            if not contact.state_id and state_code and fulfillment_channel == 'MFN':
+            contact = self.env["res.partner"].create({"name": contact_name, **partner_vals})
+            if not contact.state_id and state_code and fulfillment_channel == "MERCHANT":
                 contact._amazon_create_activity_set_state(self.user_id.id, state_code)
 
         # The contact partner acts as delivery partner if the address is strictly equal to that of
         # the contact partner. If not, a delivery partner is created.
-        delivery = contact if (
-            contact.name == shipping_address_name
-            and contact.street == street
-            and (not contact.street2 or contact.street2 == street2)
-            and contact.zip == zip_code
-            and contact.city == city
-            and contact.country_id.id == country.id
-            and contact.state_id.id == state.id
-        ) else None
+        delivery = (
+            contact
+            if (
+                contact.name == shipping_address_name
+                and contact.street == street
+                and (not contact.street2 or contact.street2 == street2)
+                and contact.zip == zip_code
+                and contact.city == city
+                and contact.country_id.id == country.id
+                and contact.state_id.id == state.id
+            )
+            else None
+        )
         if not delivery:
-            delivery = self.env['res.partner'].search([
-                *self.env['res.partner']._check_company_domain(self.company_id),
-                ('parent_id', '=', contact.id),
-                ('type', '=', 'delivery'),
-                ('name', '=', shipping_address_name),
-                ('street', '=', street),
-                '|', ('street2', '=', False), ('street2', '=', street2),
-                ('zip', '=', zip_code),
-                ('city', '=', city),
-                ('country_id', '=', country.id),
-                ('state_id', '=', state.id),
-            ], limit=1)
+            delivery = self.env["res.partner"].search(
+                [
+                    *self.env["res.partner"]._check_company_domain(self.company_id),
+                    ("parent_id", "=", contact.id),
+                    ("type", "=", "delivery"),
+                    ("name", "=", shipping_address_name),
+                    ("street", "=", street),
+                    "|",
+                    ("street2", "=", False),
+                    ("street2", "=", street2),
+                    ("zip", "=", zip_code),
+                    ("city", "=", city),
+                    ("country_id", "=", country.id),
+                    ("state_id", "=", state.id),
+                ],
+                limit=1,
+            )
         if not delivery:
-            delivery = self.env['res.partner'].with_context(tracking_disable=True).create({
-                'name': shipping_address_name,
-                'type': 'delivery',
-                'parent_id': contact.id,
+            delivery = self.env["res.partner"].create({
+                "name": shipping_address_name,
+                "type": "delivery",
+                "parent_id": contact.id,
                 **partner_vals,
             })
-            if not delivery.state_id and state_code and fulfillment_channel == 'MFN':
+            if not delivery.state_id and state_code and fulfillment_channel == "MERCHANT":
                 delivery._amazon_create_activity_set_state(self.user_id.id, state_code)
 
         return contact, delivery
 
     def _prepare_order_lines_values(self, order_data, currency, fiscal_pos, shipping_product):
-        """ Prepare the values for the order lines to create based on Amazon data.
+        """Prepare the values for the order lines to create based on Amazon data.
 
         Note: self.ensure_one()
 
@@ -841,38 +917,27 @@ class AmazonAccount(models.Model):
         :return: The order lines values.
         :rtype: dict
         """
-        def pull_items_data(amazon_order_ref_):
-            """ Pull all item data for the order to synchronize.
-
-            :param str amazon_order_ref_: The Amazon reference of the order to synchronize.
-            :return: The items data.
-            :rtype: list
-            """
-            items_data_ = []
-            # Order items are pulled in batches. If more order items than those returned can be
-            # synchronized, the request results are paginated and the next page holds another batch.
-            has_next_page_ = True
-            while has_next_page_:
-                # Pull the next batch of order items.
-                items_batch_data_, has_next_page_ = amazon_utils.pull_batch_data(
-                    self, 'getOrderItems', {}, path_parameter=amazon_order_ref_
-                )
-                items_data_ += items_batch_data_['OrderItems']
-            return items_data_
-
         self.ensure_one()
 
-        amazon_order_ref = order_data['AmazonOrderId']
-        marketplace_api_ref = order_data['MarketplaceId']
-        order_fulfillment_channel = order_data['FulfillmentChannel'] == 'MFN' and 'fbm' or 'fba'
-        order_last_update = dateutil.parser.parse(order_data['LastUpdateDate'], ignoretz=True)
+        def get_financial_amount(target_type, target_subtype=None):
+            breakdown = next((b for b in breakdowns if b.get("type") == target_type), {})
+            if not target_subtype:
+                return float(breakdown.get("subtotal", {}).get("amount", "0.0"))
+            details = breakdown.get("detailedBreakdowns", [])
+            detail = next((d for d in details if d.get("subtype") == target_subtype), {})
+            return float(detail.get("value", {}).get("amount", "0.0"))
 
-        items_data = pull_items_data(amazon_order_ref)
+        order_fulfillment_channel = (
+            "fba" if order_data["fulfillment"].get("fulfilledBy") == "AMAZON" else "fbm"
+        )
+        marketplace_api_ref = order_data["salesChannel"].get("marketplaceId")
+        order_last_update = dateutil.parser.parse(order_data["lastUpdatedTime"], ignoretz=True)
 
         order_lines_values = []
-        for item_data in items_data:
+        for item_data in order_data["orderItems"]:
             # Prepare the values for the product line.
-            sku = item_data['SellerSKU']
+            product_info = item_data["product"]
+            sku = product_info.get("sellerSku", "")
             marketplace = self.active_marketplace_ids.filtered(
                 lambda m: m.api_ref == marketplace_api_ref
             )
@@ -881,169 +946,184 @@ class AmazonAccount(models.Model):
                 offer.amazon_channel != order_fulfillment_channel
                 and self.last_orders_sync <= order_last_update
             ):
+                # The fulfillment channel of the offer was changed in Amazon, but due to a problem
+                # of ghost listings from Amazon side, we can't trust the order either.
+
                 # When an offer goes from FBM to FBA, we need to reset the FBM stock to avoid a
                 # known problem of ghost listings on Amazon side.
                 if (
-                    offer.amazon_channel == 'fbm' and offer.sync_stock
-                    and order_fulfillment_channel == 'fba'
+                    offer.amazon_channel == "fbm"
+                    and offer.sync_stock
+                    and order_fulfillment_channel == "fba"
                 ):
-                    offer.amazon_sync_status = 'reset'
+                    offer.amazon_sync_status = "reset"
                     _logger.info(
                         "Amazon fulfillment channel switch detected (FBM -> FBA). Scheduled an"
                         " inventory reset for offer: %s.",
                         offer.sku,
                     )
-                # Resetting the offer channel will force the inventory feed to update the channel
-                # using a trustworthy source `searchListingsItems` as even the order cannot be
-                # trusted.
                 offer.amazon_channel = False
-            product_taxes = offer.product_id.taxes_id.filtered_domain(
-                [*self.env['account.tax']._check_company_domain(self.company_id)]
-            )
-            main_condition = item_data.get('ConditionId')
-            sub_condition = item_data.get('ConditionSubtypeId')
-            if not main_condition or main_condition.lower() == 'new':
-                description = "[%s] %s" % (sku, item_data['Title'])
+
+            product_taxes = offer.product_id.taxes_id.filtered_domain([
+                *self.env["account.tax"]._check_company_domain(self.company_id)
+            ])
+            condition_info = product_info.get("condition", {})
+            main_condition = condition_info.get("conditionType")
+            sub_condition = condition_info.get("conditionSubtype")
+            item_title = product_info.get("title", self.env._("Missing product name"))
+            if not main_condition or main_condition.lower() == "new":
+                description = "[%s] %s" % (sku, item_title)
             else:
-                item_title = item_data['Title']
-                description = _(
+                description = self.env._(
                     "[%(sku)s] %(item_title)s\nCondition: %(main_condition)s - %(sub_condition)s",
                     sku=sku,
                     item_title=item_title,
                     main_condition=main_condition,
                     sub_condition=sub_condition,
                 )
-            sales_price = float(item_data.get('ItemPrice', {}).get('Amount', 0.0))
-            tax_amount = float(item_data.get('ItemTax', {}).get('Amount', 0.0))
-            original_subtotal = sales_price - tax_amount \
-                if marketplace.tax_included else sales_price
+
+            # Discount tax computation
+            breakdowns = item_data["proceeds"].get("breakdowns", [])
+            promo_discount = get_financial_amount("DISCOUNT", "ITEM")
+            ship_discount = get_financial_amount("DISCOUNT", "SHIPPING")
+            total_discount = get_financial_amount("DISCOUNT")
+            total_discount_tax = get_financial_amount("TAX", "DISCOUNT")
+            promo_disc_tax = 0.0
+            ship_disc_tax = 0.0
+            if total_discount:
+                promo_disc_tax = total_discount_tax * (promo_discount / total_discount)
+                ship_disc_tax = total_discount_tax * (ship_discount / total_discount)
+
+            sales_price = get_financial_amount("ITEM")
+            tax_amount = get_financial_amount("TAX", "ITEM")
             taxes = fiscal_pos.map_tax(product_taxes) if fiscal_pos else product_taxes
             subtotal = self._recompute_subtotal(
-                original_subtotal, tax_amount, taxes, currency, fiscal_pos
+                sales_price, tax_amount, taxes, currency, fiscal_pos
             )
-            promo_discount = float(item_data.get('PromotionDiscount', {}).get('Amount', '0'))
-            promo_disc_tax = float(item_data.get('PromotionDiscountTax', {}).get('Amount', '0'))
-            original_promo_discount_subtotal = promo_discount - promo_disc_tax \
-                if marketplace.tax_included else promo_discount
             promo_discount_subtotal = self._recompute_subtotal(
-                original_promo_discount_subtotal, promo_disc_tax, taxes, currency, fiscal_pos
+                promo_discount, promo_disc_tax, taxes, currency, fiscal_pos
             )
-            amazon_item_ref = item_data['OrderItemId']
-            order_lines_values.append(self._convert_to_order_line_values(
-                item_data=item_data,
-                product_id=offer.product_id.id,
-                description=description,
-                subtotal=subtotal,
-                tax_ids=taxes.ids,
-                quantity=item_data['QuantityOrdered'],
-                discount=promo_discount_subtotal,
-                amazon_item_ref=amazon_item_ref,
-                amazon_offer_id=offer.id,
-            ))
-
-            # Prepare the values for the gift wrap line.
-            if item_data.get('IsGift', 'false') == 'true':
-                item_gift_info = item_data.get('BuyerInfo', {})
-                gift_wrap_code = item_gift_info.get('GiftWrapLevel')
-                gift_wrap_price = float(item_gift_info.get('GiftWrapPrice', {}).get('Amount', '0'))
-                if gift_wrap_code and gift_wrap_price != 0:
-                    gift_wrap_product = self._find_matching_product(
-                        gift_wrap_code, 'default_product', 'Amazon Sales', 'consu'
-                    )
-                    gift_wrap_product_taxes = gift_wrap_product.taxes_id.filtered_domain(
-                        [*self.env['account.tax']._check_company_domain(self.company_id)]
-                    )
-                    gift_wrap_taxes = fiscal_pos.map_tax(gift_wrap_product_taxes) \
-                        if fiscal_pos else gift_wrap_product_taxes
-                    gift_wrap_tax_amount = float(
-                        item_gift_info.get('GiftWrapTax', {}).get('Amount', '0')
-                    )
-                    original_gift_wrap_subtotal = gift_wrap_price - gift_wrap_tax_amount \
-                        if marketplace.tax_included else gift_wrap_price
-                    gift_wrap_subtotal = self._recompute_subtotal(
-                        original_gift_wrap_subtotal,
-                        gift_wrap_tax_amount,
-                        gift_wrap_taxes,
-                        currency,
-                        fiscal_pos,
-                    )
-                    order_lines_values.append(self._convert_to_order_line_values(
-                        item_data=item_data,
-                        product_id=gift_wrap_product.id,
-                        description=_(
-                            "[%(gift_wrap_code)s] Gift Wrapping Charges for %(product)s",
-                            gift_wrap_code=gift_wrap_code, product=offer.product_id.name,
-                        ),
-                        subtotal=gift_wrap_subtotal,
-                        tax_ids=gift_wrap_taxes.ids,
-                    ))
-                gift_message = item_gift_info.get('GiftMessageText')
-                if gift_message:
-                    order_lines_values.append(self._convert_to_order_line_values(
-                        item_data=item_data,
-                        description=_("Gift message:\n%s", gift_message),
-                        display_type='line_note',
-                    ))
-
-            # Prepare the values for the delivery charges.
-            shipping_code = order_data.get('ShipServiceLevel')
-            shipping_price = float(item_data.get('ShippingPrice', {}).get('Amount', '0'))
-            if shipping_code and shipping_price != 0:
-                shipping_product_taxes = shipping_product.taxes_id.filtered_domain(
-                    [*self.env['account.tax']._check_company_domain(self.company_id)]
-                )
-                shipping_taxes = fiscal_pos.map_tax(shipping_product_taxes) if fiscal_pos \
-                    else shipping_product_taxes
-                shipping_tax_amount = float(item_data.get('ShippingTax', {}).get('Amount', '0'))
-                origin_ship_subtotal = shipping_price - shipping_tax_amount \
-                    if marketplace.tax_included else shipping_price
-                shipping_subtotal = self._recompute_subtotal(
-                    origin_ship_subtotal, shipping_tax_amount, shipping_taxes, currency, fiscal_pos
-                )
-                ship_discount = float(item_data.get('ShippingDiscount', {}).get('Amount', '0'))
-                ship_disc_tax = float(item_data.get('ShippingDiscountTax', {}).get('Amount', '0'))
-                origin_ship_disc_subtotal = ship_discount - ship_disc_tax \
-                    if marketplace.tax_included else ship_discount
-                ship_discount_subtotal = self._recompute_subtotal(
-                    origin_ship_disc_subtotal, ship_disc_tax, shipping_taxes, currency, fiscal_pos
-                )
-                order_lines_values.append(self._convert_to_order_line_values(
+            amazon_item_ref = item_data["orderItemId"]
+            order_lines_values.append(
+                self._convert_to_order_line_values(
                     item_data=item_data,
-                    product_id=shipping_product.id,
-                    description=_(
-                        "[%(shipping_code)s] Delivery Charges for %(product)s",
-                        shipping_code=shipping_code, product=offer.product_id.name,
-                    ),
-                    subtotal=shipping_subtotal,
-                    tax_ids=shipping_taxes.ids,
-                    discount=ship_discount_subtotal,
-                ))
+                    product_id=offer.product_id.id,
+                    description=description,
+                    subtotal=subtotal,
+                    tax_ids=taxes.ids,
+                    quantity=item_data["quantityOrdered"],
+                    discount=promo_discount_subtotal,
+                    amazon_item_ref=amazon_item_ref,
+                    amazon_offer_id=offer.id,
+                )
+            )
+
+            if gift_option := item_data["fulfillment"].get("packing", {}).get("giftOption", {}):
+                gift_wrap_code = gift_option.get("giftWrapLevel")
+                gift_wrap_price = get_financial_amount("GIFT_WRAP")
+                if gift_wrap_code and gift_wrap_price:
+                    gift_wrap_product = self._find_matching_product(
+                        gift_wrap_code, "default_product", "Amazon Sales", "consu"
+                    )
+                    gift_wrap_product_taxes = gift_wrap_product.taxes_id.filtered_domain([
+                        *self.env["account.tax"]._check_company_domain(self.company_id)
+                    ])
+                    gift_wrap_taxes = (
+                        fiscal_pos.map_tax(gift_wrap_product_taxes)
+                        if fiscal_pos
+                        else gift_wrap_product_taxes
+                    )
+                    gift_wrap_taxes = (
+                        fiscal_pos.map_tax(gift_wrap_product_taxes)
+                        if fiscal_pos
+                        else gift_wrap_product_taxes
+                    )
+                    gift_wrap_tax_amount = get_financial_amount("TAX", "GIFT_WRAP")
+                    gift_wrap_subtotal = self._recompute_subtotal(
+                        gift_wrap_price, gift_wrap_tax_amount, gift_wrap_taxes, currency, fiscal_pos
+                    )
+                    order_lines_values.append(
+                        self._convert_to_order_line_values(
+                            item_data=item_data,
+                            product_id=gift_wrap_product.id,
+                            description=self.env._(
+                                "[%(gift_wrap_code)s] Gift Wrapping Charges for %(product)s",
+                                gift_wrap_code=gift_wrap_code,
+                                product=offer.product_id.name,
+                            ),
+                            subtotal=gift_wrap_subtotal,
+                            tax_ids=gift_wrap_taxes.ids,
+                        )
+                    )
+                gift_message = gift_option.get("giftMessage")
+                if gift_message:
+                    order_lines_values.append(
+                        self._convert_to_order_line_values(
+                            item_data=item_data,
+                            description=self.env._("Gift message:\n%s", gift_message),
+                            display_type="line_note",
+                        )
+                    )
+
+            # Shipping computation
+            shipping_code = order_data["fulfillment"].get("fulfillmentServiceLevel")
+            shipping_price = get_financial_amount("SHIPPING")
+            if shipping_price:
+                shipping_product_taxes = shipping_product.taxes_id.filtered_domain([
+                    *self.env["account.tax"]._check_company_domain(self.company_id)
+                ])
+                shipping_taxes = (
+                    fiscal_pos.map_tax(shipping_product_taxes)
+                    if fiscal_pos
+                    else shipping_product_taxes
+                )
+                shipping_tax_amount = get_financial_amount("TAX", "SHIPPING")
+                shipping_subtotal = self._recompute_subtotal(
+                    shipping_price, shipping_tax_amount, shipping_taxes, currency, fiscal_pos
+                )
+                ship_discount_subtotal = self._recompute_subtotal(
+                    ship_discount, ship_disc_tax, shipping_taxes, currency, fiscal_pos
+                )
+                order_lines_values.append(
+                    self._convert_to_order_line_values(
+                        item_data=item_data,
+                        product_id=shipping_product.id,
+                        description=self.env._(
+                            "[%(shipping_code)s] Delivery Charges for %(product)s",
+                            shipping_code=shipping_code,
+                            product=offer.product_id.name,
+                        ),
+                        subtotal=shipping_subtotal,
+                        tax_ids=shipping_taxes.ids,
+                        discount=ship_discount_subtotal,
+                    )
+                )
 
         return order_lines_values
 
     def _convert_to_order_line_values(self, **kwargs):
-        """ Convert and complete a dict of values to comply with fields of `sale.order.line`.
+        """Convert and complete a dict of values to comply with fields of `sale.order.line`.
 
         :param dict kwargs: The values to convert and complete.
         :return: The completed values.
         :rtype: dict
         """
-        subtotal = kwargs.get('subtotal', 0)
-        quantity = kwargs.get('quantity', 1)
+        subtotal = kwargs.get("subtotal", 0)
+        quantity = kwargs.get("quantity", 1)
         return {
-            'name': kwargs.get('description', ''),
-            'product_id': kwargs.get('product_id'),
-            'price_unit': subtotal / quantity if quantity else 0,
-            'tax_ids': [(6, 0, kwargs.get('tax_ids', []))],
-            'product_uom_qty': quantity,
-            'discount': (kwargs.get('discount', 0) / subtotal) * 100 if subtotal else 0,
-            'display_type': kwargs.get('display_type', False),
-            'amazon_item_ref': kwargs.get('amazon_item_ref'),
-            'amazon_offer_id': kwargs.get('amazon_offer_id'),
+            "name": kwargs.get("description", ""),
+            "product_id": kwargs.get("product_id"),
+            "price_unit": subtotal / quantity if quantity else 0,
+            "tax_ids": [(6, 0, kwargs.get("tax_ids", []))],
+            "product_uom_qty": quantity,
+            "discount": (kwargs.get("discount", 0) / subtotal) * 100 if subtotal else 0,
+            "display_type": kwargs.get("display_type", False),
+            "amazon_item_ref": kwargs.get("amazon_item_ref"),
+            "amazon_offer_id": kwargs.get("amazon_offer_id"),
         }
 
     def _find_or_create_offer(self, sku, marketplace):
-        """ Find or create the amazon offer based on the SKU and marketplace.
+        """Find or create the amazon offer based on the SKU and marketplace.
 
         Note: self.ensure_one()
 
@@ -1057,29 +1137,29 @@ class AmazonAccount(models.Model):
 
         offer = self.offer_ids.filtered(lambda o: o.sku == sku)
         if not offer:
-            offer = self.env['amazon.offer'].with_context(tracking_disable=True).create({
-                'account_id': self.id,
-                'marketplace_id': marketplace.id,
-                'product_id': self._find_matching_product(
-                    sku, 'default_product', 'Amazon Sales', 'consu'
+            offer = self.env["amazon.offer"].create({
+                "account_id": self.id,
+                "marketplace_id": marketplace.id,
+                "product_id": self._find_matching_product(
+                    sku, "default_product", "Amazon Sales", "consu"
                 ).id,
-                'sku': sku,
-                'amazon_feed_ref': '{}',
+                "sku": sku,
+                "amazon_feed_ref": "{}",
             })
         # If the offer has been linked with the default product, search if another product has now
         # been assigned the current SKU as internal reference and update the offer if so.
         # This trades off a bit of performance in exchange for a more expected behavior for the
         # matching of products if one was assigned the right SKU after that the offer was created.
-        elif 'sale_amazon.default_product' in offer.product_id._get_external_ids().get(
+        elif "sale_amazon.default_product" in offer.product_id._get_external_ids().get(
             offer.product_id.id, []
         ):
-            product = self._find_matching_product(sku, '', '', '', fallback=False)
+            product = self._find_matching_product(sku, "", "", "", fallback=False)
             if product:
                 offer.product_id = product.id
         return offer
 
     def _find_or_create_pricelist(self, currency):
-        """ Find or create the pricelist based on the currency.
+        """Find or create the pricelist based on the currency.
 
         Note: self.ensure_one()
 
@@ -1088,23 +1168,31 @@ class AmazonAccount(models.Model):
         :rtype: record or `product.pricelist`
         """
         self.ensure_one()
-        pricelist = self.env['product.pricelist'].with_context(active_test=False).search([
-            *self.env['product.pricelist']._check_company_domain(self.company_id),
-            ('currency_id', '=', currency.id),
-        ], limit=1)
+        pricelist = (
+            self
+            .env["product.pricelist"]
+            .with_context(active_test=False)
+            .search(
+                [
+                    *self.env["product.pricelist"]._check_company_domain(self.company_id),
+                    ("currency_id", "=", currency.id),
+                ],
+                limit=1,
+            )
+        )
         if not pricelist:
-            pricelist = self.env['product.pricelist'].with_context(tracking_disable=True).create({
-                'name': 'Amazon Pricelist %s' % currency.name,
-                'company_id': self.company_id.id,
-                'active': False,
-                'currency_id': currency.id,
+            pricelist = self.env["product.pricelist"].create({
+                "name": "Amazon Pricelist %s" % currency.name,
+                "company_id": self.company_id.id,
+                "active": False,
+                "currency_id": currency.id,
             })
         return pricelist
 
     def _find_matching_product(
         self, internal_reference, default_xmlid, default_name, default_type, fallback=True
     ):
-        """ Find the matching product for a given internal reference.
+        """Find the matching product for a given internal reference.
 
         If no product is found for the given internal reference, we fall back on the default
         product. If the default product was deleted, we restore it.
@@ -1121,20 +1209,23 @@ class AmazonAccount(models.Model):
         :rtype: record of `product.product`
         """
         self.ensure_one()
-        product = self.env['product.product'].search([
-            *self.env['product.product']._check_company_domain(self.company_id),
-            ('default_code', '=', internal_reference),
-        ], limit=1)
+        product = self.env["product.product"].search(
+            [
+                *self.env["product.product"]._check_company_domain(self.company_id),
+                ("default_code", "=", internal_reference),
+            ],
+            limit=1,
+        )
         if not product and fallback:  # Fallback to the default product
-            product = self.env.ref('sale_amazon.%s' % default_xmlid, raise_if_not_found=False)
+            product = self.env.ref("sale_amazon.%s" % default_xmlid, raise_if_not_found=False)
         if not product and fallback:  # Restore the default product if it was deleted
-            product = self.env['product.product']._restore_data_product(
+            product = self.env["product.product"]._restore_data_product(
                 default_name, default_type, default_xmlid
             )
         return product
 
     def _recompute_subtotal(self, subtotal, tax_amount, taxes, currency, _fiscal_pos=None):
-        """ Recompute the subtotal from the tax amount and the taxes.
+        """Recompute the subtotal from the tax amount and the taxes.
 
         As it is not always possible to find the right tax record for a tax rate computed from the
         tax amount because of rounding errors or because of multiple taxes for a given rate, the
@@ -1160,41 +1251,41 @@ class AmazonAccount(models.Model):
         taxes_res = taxes.with_context(force_price_include=True).compute_all(
             total, currency=currency
         )
-        subtotal = taxes_res['total_excluded']
-        for tax_res in taxes_res['taxes']:
-            tax = self.env['account.tax'].browse(tax_res['id'])
+        subtotal = taxes_res["total_excluded"]
+        for tax_res in taxes_res["taxes"]:
+            tax = self.env["account.tax"].browse(tax_res["id"])
             if tax.price_include:
-                subtotal += tax_res['amount']
+                subtotal += tax_res["amount"]
         return subtotal
 
     def _generate_stock_moves(self, order):
-        """ Generate a stock move for each product of the provided sales order.
+        """Generate a stock move for each product of the provided sales order.
 
         :param recordset order: The sales order to generate the stock moves for, as a `sale.order`
                                 record.
         :return: The generated stock moves.
         :rtype: recordset of `stock.move`
         """
-        customers_location = self.env.ref('stock.stock_location_customers')
+        customers_location = self.env.ref("stock.stock_location_customers")
         for order_line in order.order_line.filtered(
-            lambda l: l.product_id.type != 'service' and not l.display_type
+            lambda line: line.product_id.type != "service" and not line.display_type
         ):
-            stock_move = self.env['stock.move'].create({
-                'company_id': self.company_id.id,
-                'product_id': order_line.product_id.id,
-                'product_uom_qty': order_line.product_uom_qty,
-                'product_uom': order_line.product_uom_id.id,
-                'location_id': self.location_id.id,
-                'location_dest_id': customers_location.id,
-                'state': 'confirmed',
-                'sale_line_id': order_line.id,
+            stock_move = self.env["stock.move"].create({
+                "company_id": self.company_id.id,
+                "product_id": order_line.product_id.id,
+                "product_uom_qty": order_line.product_uom_qty,
+                "uom_id": order_line.product_uom_id.id,
+                "location_id": self.location_id.id,
+                "location_dest_id": customers_location.id,
+                "state": "confirmed",
+                "sale_line_id": order_line.id,
             })
             stock_move._set_quantity_done(order_line.product_uom_qty)
             stock_move.picked = True  # To also change move lines created in `_set_quantity_done`
             stock_move._action_done()
 
     def _sync_inventory(self):
-        """ Synchronize the inventory availability of products sold on Amazon.
+        """Synchronize the inventory availability of products sold on Amazon.
 
         If called on an empty recordset, the products of all active accounts with inventory
         synchronization are synchronized instead.
@@ -1204,12 +1295,12 @@ class AmazonAccount(models.Model):
         :return: None
         """
         self = self or self.search([])
-        accounts = self.filtered('synchronize_inventory')
+        accounts = self.filtered("synchronize_inventory")
         if not accounts:
             return
 
         def to_sync(offer_):
-            return offer_.sync_stock or offer_.amazon_sync_status == 'reset'
+            return offer_.sync_stock or offer_.amazon_sync_status == "reset"
 
         # Cache `free_qty` of all products to avoid recomputing it for each offer.
         accounts.offer_ids.filtered(to_sync).product_id._compute_quantities()
@@ -1222,10 +1313,10 @@ class AmazonAccount(models.Model):
         # As Amazon needs some time to process the feed, we trigger the cron to check the status of
         # the feed after 10 minutes.
         next_call = fields.Datetime.now() + timedelta(minutes=10)
-        self.env.ref('sale_amazon.ir_cron_sync_amazon_feeds')._trigger(at=next_call)
+        self.env.ref("sale_amazon.ir_cron_sync_amazon_feeds")._trigger(at=next_call)
 
     def _sync_feeds(self):
-        """ Synchronize the status of the accounts' feeds that were sent to Amazon.
+        """Synchronize the status of the accounts' feeds that were sent to Amazon.
 
         If called on an empty recordset, the feeds of all active account are synchronized instead.
 
@@ -1240,34 +1331,34 @@ class AmazonAccount(models.Model):
 
         # Select accounts with offers or pickings requiring synchronization.
         accounts_with_offers = self.filtered(
-            lambda a: any(o.amazon_sync_status == 'processing' for o in a.offer_ids)
+            lambda a: any(o.amazon_sync_status == "processing" for o in a.offer_ids)
         )
-        pickings_by_account = self.env['stock.picking']._get_pickings_by_account(
-            'processing', tuple(self.ids)
+        pickings_by_account = self.env["stock.picking"]._get_pickings_by_account(
+            "processing", tuple(self.ids)
         )
 
         # Syn feeds status.
         for account in accounts_with_offers:
             amazon_utils.ensure_account_is_set_up(account)
-            offers = account.offer_ids.filtered(lambda o: o.amazon_sync_status == 'processing')
-            account._pull_feeds_status(offers, 'inventory_sync')
+            offers = account.offer_ids.filtered(lambda o: o.amazon_sync_status == "processing")
+            account._pull_feeds_status(offers, "inventory_sync")
         for account, pickings in pickings_by_account.items():
             amazon_utils.ensure_account_is_set_up(account)
-            account._pull_feeds_status(pickings, 'picking_sync')
+            account._pull_feeds_status(pickings, "picking_sync")
 
         # Re-schedule the cron if not all the offers and pickings reached a final status.
         any_processing_feed = any(
-            offer.amazon_sync_status == 'processing' for offer in accounts_with_offers.offer_ids
+            offer.amazon_sync_status == "processing" for offer in accounts_with_offers.offer_ids
         ) or any(
-            account_pickings.filtered(lambda p: p.amazon_sync_status == 'processing')
+            account_pickings.filtered(lambda p: p.amazon_sync_status == "processing")
             for account_pickings in pickings_by_account.values()
         )
         if any_processing_feed:
             next_call = fields.Datetime.now() + timedelta(minutes=10)
-            self.env.ref('sale_amazon.ir_cron_sync_amazon_feeds')._trigger(at=next_call)
+            self.env.ref("sale_amazon.ir_cron_sync_amazon_feeds")._trigger(at=next_call)
 
     def _pull_feeds_status(self, records, flow):
-        """ Pull the status of the feeds corresponding to the provided recordset.
+        """Pull the status of the feeds corresponding to the provided recordset.
 
         Note: `self.ensure_one()`
 
@@ -1279,42 +1370,45 @@ class AmazonAccount(models.Model):
         """
         self.ensure_one()
 
-        if flow == 'inventory_sync':
+        if flow == "inventory_sync":
             feed_data_by_offer = records._get_feed_data()
             records_by_feed_ref = records.grouped(
-                lambda o: feed_data_by_offer.get(o, {}).get('amazon_feed_ref')
+                lambda o: feed_data_by_offer.get(o, {}).get("amazon_feed_ref")
             )
-        elif flow == 'picking_sync':
-            records_by_feed_ref = records.grouped('amazon_feed_ref')
+        elif flow == "picking_sync":
+            records_by_feed_ref = records.grouped("amazon_feed_ref")
         else:
             return
 
         def parse_json_report_document(report_):
             errors_ = {}
-            for result in report_['issues']:
-                if result['severity'] == 'ERROR':
-                    errors_.setdefault(result.get('messageId'), []).append(
-                        build_error_message(result['code'], result['message'])
+            for result in report_["issues"]:
+                if result["severity"] == "ERROR":
+                    errors_.setdefault(result.get("messageId"), []).append(
+                        build_error_message(result["code"], result["message"])
                     )
             return errors_
 
         def parse_xml_report_document(report_):
             errors_ = {}
-            for result_ in report_.find('Message/ProcessingReport').iter('Result'):
-                if result_.find('ResultCode').text != 'Error':
+            for result_ in report_.find("Message/ProcessingReport").iter("Result"):
+                if result_.find("ResultCode").text != "Error":
                     continue
                 # We can identify failed pickings.
-                if (order_ := result_.find('AdditionalInfo/AmazonOrderID')) is not None:
+                if (order_ := result_.find("AdditionalInfo/AmazonOrderID")) is not None:
                     order_ref_ = order_.text
                 else:  # Amazon doesn't specify which order (and thus picking) failed.
                     order_ref_ = None
-                errors_.setdefault(order_ref_, []).append(build_error_message(
-                    result_.find('ResultMessageCode').text, result_.find('ResultDescription').text,
-                ))
+                errors_.setdefault(order_ref_, []).append(
+                    build_error_message(
+                        result_.find("ResultMessageCode").text,
+                        result_.find("ResultDescription").text,
+                    )
+                )
             return errors_
 
         def build_error_message(code, message):
-            return _("Error (%(code)s): %(message)s", code=code, message=message)
+            return self.env._("Error (%(code)s): %(message)s", code=code, message=message)
 
         errors_by_record = {}
         for feed_ref, feed_records in records_by_feed_ref.items():
@@ -1323,16 +1417,16 @@ class AmazonAccount(models.Model):
                     "Failed to load the feed reference for the records with IDs"
                     " %(feed_record_ids)r. Skipping the synchronization attempt only for these IDs."
                     " The next synchronization will be attempted later.",
-                    {'feed_record_ids': feed_records.ids},
+                    {"feed_record_ids": feed_records.ids},
                 )
                 continue
             # Pull the status and result document reference for the current feed.
-            feed_data = amazon_utils.make_sp_api_request(self, 'getFeed', path_parameter=feed_ref)
-            feed_status = feed_data['processingStatus']
-            report_document_ref = feed_data.get('resultFeedDocumentId')
+            feed_data = amazon_utils.make_sp_api_request(self, "getFeed", path_parameter=feed_ref)
+            feed_status = feed_data["processingStatus"]
+            report_document_ref = feed_data.get("resultFeedDocumentId")
 
             # Update the records according to their feed status.
-            if feed_status == 'DONE':  # The feed was fully processed.
+            if feed_status == "DONE":  # The feed was fully processed.
                 try:
                     report = amazon_utils.get_feed_document(self, report_document_ref)
                 except amazon_utils.AmazonRateLimitError:
@@ -1341,97 +1435,110 @@ class AmazonAccount(models.Model):
                     _logger.exception(
                         "A business error occurred while processing feed %(feed_ref)s for Amazon"
                         " account with id %(account_id)s. Skipping the feed and moving to the next"
-                        " one.", {'feed_ref': feed_ref, 'account_id': self.id}
+                        " one.",
+                        {"feed_ref": feed_ref, "account_id": self.id},
                     )
                 else:
-                    if flow == 'inventory_sync':
+                    if flow == "inventory_sync":
                         report_errors = parse_json_report_document(report)
-                        message_key = lambda o: feed_data_by_offer[o].get('messageId')
+
+                        def message_key(o):
+                            return feed_data_by_offer[o].get("messageId")
+
                     else:
                         report_errors = parse_xml_report_document(report)
-                        message_key = lambda p: p.sale_id.amazon_order_ref
+
+                        def message_key(p):
+                            return p.sale_id.amazon_order_ref
 
                     if not report_errors:
-                        feed_records.amazon_sync_status = 'done'
+                        feed_records.amazon_sync_status = "done"
                         _logger.info(
                             "Synchronized feed %(feed_ref)s for Amazon account with id"
-                            " %(account_id)s.", {'feed_ref': feed_ref, 'account_id': self.id}
+                            " %(account_id)s.",
+                            {"feed_ref": feed_ref, "account_id": self.id},
                         )
                         continue
 
                     # Iterate over the processing results and flag failed records.
-                    error_records = feed_records.filtered(
-                        lambda r: message_key(r) in report_errors
-                    )
-                    error_records.amazon_sync_status = 'error'
+                    error_records = feed_records.filtered(lambda r: message_key(r) in report_errors)
+                    error_records.amazon_sync_status = "error"
                     for record in error_records:
                         # Using a set to combine duplicates created by Amazon with every retry.
                         errors_by_record.setdefault(record, set()).update(
                             report_errors[message_key(record)]
                         )
                     unprocessed_records = feed_records.filtered(
-                        lambda p: p.amazon_sync_status == 'processing'
+                        lambda p: p.amazon_sync_status == "processing"
                     )  # The sync order might have run before, avoid changing back done records.
 
                     # Failed to link some messages, consider unprocessed records as failed
                     if None in report_errors:
-                        unprocessed_records.amazon_sync_status = 'error'
+                        unprocessed_records.amazon_sync_status = "error"
                         for record in unprocessed_records:
                             errors_by_record.setdefault(record, set()).update(report_errors[None])
                     else:  # All errors were identified, the remaining records succeeded.
-                        unprocessed_records.amazon_sync_status = 'done'
+                        unprocessed_records.amazon_sync_status = "done"
                     _logger.info(
                         "Found errors while synchronizing feed %(feed_ref)s for Amazon account with"
-                        " id %(account_id)s.", {'feed_ref': feed_ref, 'account_id': self.id}
+                        " id %(account_id)s.",
+                        {"feed_ref": feed_ref, "account_id": self.id},
                     )
 
-            elif feed_status in ['IN_QUEUE', 'IN_PROGRESS']:  # The feed has not yet been processed.
+            elif feed_status in ["IN_QUEUE", "IN_PROGRESS"]:  # The feed has not yet been processed.
                 _logger.info(
                     "Ignoring in progress feed %(feed_ref)s for Amazon account with id"
-                    " %(account_id)s.", {'feed_ref': feed_ref, 'account_id': self.id}
+                    " %(account_id)s.",
+                    {"feed_ref": feed_ref, "account_id": self.id},
                 )
 
-            elif feed_status == 'CANCELLED':  # The feed has been canceled before being processed.
-                feed_records.amazon_sync_status = 'pending'
-                if flow == 'inventory_sync':
+            elif feed_status == "CANCELLED":  # The feed has been canceled before being processed.
+                feed_records.amazon_sync_status = "pending"
+                if flow == "inventory_sync":
                     _logger.info(
                         "Re-scheduling a synchronization of inventory for offers of cancelled"
                         " feed %(feed_ref)s for Amazon account with id %(account_id)s.",
-                        {'feed_ref': feed_ref, 'account_id': self.id},
+                        {"feed_ref": feed_ref, "account_id": self.id},
                     )
-                elif flow == 'picking_sync':
+                elif flow == "picking_sync":
                     _logger.info(
-                        "Re-scheduling a synchronization for pickings of cancelled feed %(feed_ref)s"
-                        " for Amazon account with id %(account_id)s.",
-                        {'feed_ref': feed_ref, 'account_id': self.id},
+                        "Re-scheduling a synchronization for pickings of cancelled feed"
+                        " %(feed_ref)s for Amazon account with id %(account_id)s.",
+                        {"feed_ref": feed_ref, "account_id": self.id},
                     )
 
-            elif feed_status == 'FATAL':  # The feed failed with no further information.
+            elif feed_status == "FATAL":  # The feed failed with no further information.
                 for record in feed_records:
                     errors_by_record.setdefault(record, set()).add(None)
-                feed_records.amazon_sync_status = 'error'
+                feed_records.amazon_sync_status = "error"
 
         if errors_by_record:
             error_messages = []
             for r, errors in errors_by_record.items():
                 for error in errors:
-                    if error and flow == 'picking_sync':
-                        r.message_post(body=Markup("%s<br/>%s") % (
-                            _("The synchronization with Amazon failed. Amazon gave us this "
-                              "information about the problem:"),
-                            error,
-                        ))
-                    if flow == 'inventory_sync':
-                        error_messages.append({'sku': r.sku, 'message': error})
-                    elif flow == 'picking_sync':
-                        error_messages.append(
-                            {'order_ref': r.sale_id.amazon_order_ref, 'message': error}
+                    if error and flow == "picking_sync":
+                        r.message_post(
+                            body=Markup("%s<br/>%s")
+                            % (
+                                self.env._(
+                                    "The synchronization with Amazon failed. Amazon gave us this "
+                                    "information about the problem:"
+                                ),
+                                error,
+                            )
                         )
+                    if flow == "inventory_sync":
+                        error_messages.append({"sku": r.sku, "message": error})
+                    elif flow == "picking_sync":
+                        error_messages.append({
+                            "order_ref": r.sale_id.amazon_order_ref,
+                            "message": error,
+                        })
 
             self._handle_sync_failure(flow=flow, error_messages=error_messages)
 
     def _handle_sync_failure(self, flow, amazon_order_ref=False, error_messages=False):
-        """ Send a mail to the responsible persons to report a synchronization failure.
+        """Send a mail to the responsible persons to report a synchronization failure.
 
         :param str flow: The flow for which the failure mail is requested. Supported flows are:
                         `order_sync`, `inventory_sync`, and `picking_sync`.
@@ -1442,41 +1549,45 @@ class AmazonAccount(models.Model):
                                            Required for the `picking_sync` flow.
         :return: None
         """
-        if flow == 'order_sync':
+        if flow == "order_sync":
             _logger.exception(
                 "Failed to synchronize order with amazon reference %(ref)s for amazon.account with "
                 "id %(account_id)s (seller id %(seller_id)s).",
-                {'ref': amazon_order_ref, 'account_id': self.id, 'seller_id': self.seller_key},
+                {"ref": amazon_order_ref, "account_id": self.id, "seller_id": self.seller_key},
             )
-            mail_template_id = 'sale_amazon.order_sync_failure'
-        elif flow == 'inventory_sync':
+            mail_template_id = "sale_amazon.order_sync_failure"
+        elif flow == "inventory_sync":
             _logger.exception(
                 "Failed to synchronize the inventory for offers in amazon.account with id "
                 "%(account_id)s (seller id %(seller_id)s).",
-                {'account_id': self.id, 'seller_id': self.seller_key}
+                {"account_id": self.id, "seller_id": self.seller_key},
             )
-            mail_template_id = 'sale_amazon.inventory_sync_failure'
+            mail_template_id = "sale_amazon.inventory_sync_failure"
         else:  # flow == 'picking_sync':
             _logger.exception(
                 "Failed to synchronize pickings for amazon.account with id %(account_id)s "
-                "(seller id %(seller_id)s).", {'account_id': self.id, 'seller_id': self.seller_key}
+                "(seller id %(seller_id)s).",
+                {"account_id": self.id, "seller_id": self.seller_key},
             )
-            mail_template_id = 'sale_amazon.picking_sync_failure'
+            mail_template_id = "sale_amazon.picking_sync_failure"
 
         mail_template = self.env.ref(mail_template_id, raise_if_not_found=False)
         if not mail_template:
             _logger.warning("The mail template with xmlid %s has been deleted.", mail_template_id)
         else:
-            responsible_emails = {user.email for user in filter(
-                None, (self.user_id, self.env.ref('base.user_admin', raise_if_not_found=False))
-            )}
-            mail_template.with_context(**{
-                'email_to': ','.join(responsible_emails),
-                'amazon_order_ref': amazon_order_ref,
-                'error_messages': error_messages,
-                'amazon_account': self.name,
-            }).send_mail(self.env.user.id)
+            responsible_emails = {
+                user.email
+                for user in filter(
+                    None, (self.user_id, self.env.ref("base.user_admin", raise_if_not_found=False))
+                )
+            }
+            mail_template.with_context(
+                email_to=",".join(responsible_emails),
+                amazon_order_ref=amazon_order_ref,
+                error_messages=error_messages,
+                amazon_account=self.name,
+            ).send_mail(self.env.user.id)
             _logger.info(
                 "Sent synchronization failure notification email to %s",
-                ', '.join(responsible_emails)
+                ", ".join(responsible_emails),
             )

@@ -18,4 +18,9 @@ from . import sign_item_role
 from . import sign_log
 from . import ir_http
 from . import sign_document
-from . import sign_completed_document
+from . import sign_request_document
+from . import ir_actions_server
+from . import mail_activity
+from . import mail_activity_plan_template
+
+from . import res_groups

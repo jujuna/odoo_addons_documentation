@@ -13,3 +13,12 @@ class AccountChartTemplate(models.AbstractModel):
                 'deferred_revenue_account_id': 'uae_account_212000',
             }
         }
+
+    @template('ae', 'account.return.type')
+    def _get_ae_account_return_type(self):
+        return {
+            'l10n_ae_reports.ae_tax_return_type': {
+                'tax_payable_account_id': 'uae_account_230200',
+                'tax_receivable_account_id': 'uae_account_151000',
+            },
+        }

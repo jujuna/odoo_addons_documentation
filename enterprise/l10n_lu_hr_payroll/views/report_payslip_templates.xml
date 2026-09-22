@@ -19,8 +19,7 @@
 <template id="report_payslip_lux_lang">
     <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
-            <t t-set="o" t-value="o.with_context(lang=o.employee_id.lang or o.env.lang)"/>
-            <t t-call="l10n_lu_hr_payroll.report_payslip_lux" t-lang="o.env.lang"/>
+            <t t-call="l10n_lu_hr_payroll.report_payslip_lux"/>
         </t>
     </t>
 </template>
@@ -32,8 +31,7 @@
 <template id="report_payslip_lux_lang_gratification">
     <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
-            <t t-set="o" t-value="o.with_context(lang=o.employee_id.lang or o.env.lang)"/>
-            <t t-call="l10n_lu_hr_payroll.report_payslip_lux_gratification" t-lang="o.env.lang"/>
+            <t t-call="l10n_lu_hr_payroll.report_payslip_lux_gratification"/>
         </t>
     </t>
 </template>

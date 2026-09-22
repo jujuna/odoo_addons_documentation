@@ -1,9 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 import math
 
 from odoo import fields, models, _
 from odoo.exceptions import ValidationError
+from odoo.tools import BinaryBytes
 
 
 class AccountBatchPayment(models.Model):
@@ -11,11 +11,11 @@ class AccountBatchPayment(models.Model):
 
     def _validate_bank_for_nacha(self, payment):
         bank = payment.partner_bank_id
-        if not bank.clearing_number:
+        if not bank._get_clearing_number('US'):
             raise ValidationError(
                 self.env._(
                     "Please set the %(clearing_number_label)s on the %(account)s bank account for %(partner)s.",
-                    clearing_number_label=_("ABA Routing Number") if bank.show_aba_routing else _("Clearing Number"),
+                    clearing_number_label=bank.clearing_label_id.name,
                     account=bank.display_name,
                     partner=payment.partner_id.display_name,
                 )
@@ -100,12 +100,12 @@ class AccountBatchPayment(models.Model):
         return "".join((
             "6",  # Record Type Code
             ("37" if is_offset else "32") if bank.l10n_us_bank_account_type == 'savings' else ("27" if is_offset else "22"),  # Transaction Code
-            f"{bank.clearing_number[:-1]:8.8}",  # RDFI Routing Transit Number
-            f"{bank.clearing_number[-1]:1.1}",  # Check Digit
-            f"{bank.acc_number:17.17}",  # DFI Account Number
+            f"{bank._get_clearing_number('US')[:-1]:8.8}",  # RDFI Routing Transit Number
+            f"{bank._get_clearing_number('US')[-1]:1.1}",  # Check Digit
+            f"{bank.account_number:17.17}",  # DFI Account Number
             f"{self._get_total_cents(payment):010d}",  # Amount
-            f"{payment.partner_id.vat or '':15.15}",  # Individual Identification Number (optional)
-            f"{'OFFSET' if is_offset else payment.partner_id.name:22.22}",  # Individual Name
+            f"{payment.commercial_partner_id.vat or '':15.15}",  # Individual Identification Number (optional)
+            f"{'OFFSET' if is_offset else (bank.holder_name or payment.partner_id.name):22.22}",  # Individual Name
             "  ",  # Discretionary Data Field
             "0",  # Addenda Record Indicator
             f"{self.journal_id.nacha_origination_dfi_identification:8.8}",  # Trace Number (80-87)
@@ -118,7 +118,7 @@ class AccountBatchPayment(models.Model):
         return int(aba_routing[:-1][-8:])
 
     def _calculate_aba_hash_for_payments(self, payments):
-        hashes = sum(self._calculate_aba_hash(payment.partner_bank_id.clearing_number) for payment in payments)
+        hashes = sum(self._calculate_aba_hash(payment.partner_bank_id._get_clearing_number('US')) for payment in payments)
         return str(hashes)[-10:]  # take the rightmost 10 characters
 
     def _generate_nacha_batch_control_record(self, payments, offset_payment, batch_nr):
@@ -220,7 +220,7 @@ class AccountBatchPayment(models.Model):
             data = self._generate_nacha_file()
             date = fields.Datetime.today().strftime("%m-%d-%Y")  # US date format
             return {
-                "file": base64.encodebytes(data.encode()),
+                "file": BinaryBytes(data.encode()),
                 "filename": f"NACHA-{self.journal_id.code}-{date}.txt",
             }
         else:

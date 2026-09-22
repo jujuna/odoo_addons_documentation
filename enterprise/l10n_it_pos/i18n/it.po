@@ -3,22 +3,22 @@
 # * l10n_it_pos
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:07+0000\n"
-"PO-Revision-Date: 2025-11-19 16:32+0000\n"
-"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19-l10n/"
+"POT-Creation-Date: 2026-09-11 18:13+0000\n"
+"PO-Revision-Date: 2026-09-18 05:03+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
 "l10n_it_pos/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: l10n_it_pos
 #. odoo-javascript
@@ -53,14 +53,21 @@ msgstr ""
 "6 = sconto pagamento"
 
 #. module: l10n_it_pos
-#: model:ir.model,name:l10n_it_pos.model_res_config_settings
-msgid "Config Settings"
-msgstr "Impostazioni di configurazione"
+#. odoo-python
+#: code:addons/l10n_it_pos/models/pos_printer.py:0
+msgid "A fiscal printer cannot be set to preparation type."
+msgstr ""
+"Una stampante fiscale non può essere impostata sul tipo di preparazione."
 
 #. module: l10n_it_pos
-#: model_terms:ir.ui.view,arch_db:l10n_it_pos.res_config_settings_view_form
-msgid "Connect cash drawer to the Italian Fiscal Printer"
-msgstr "Collega il registratore di cassa alla stampante fiscale italiana"
+#. odoo-javascript
+#: code:addons/l10n_it_pos/static/src/app/fiscal_printer/epson_fiscal_printer.js:0
+msgid ""
+"Could not connect to the fiscal printer. Please check the printer is powered "
+"on and connected to the network."
+msgstr ""
+"Impossibile connettersi alla stampante fiscale. Verifica che la stampante "
+"sia accesa e collegata alla rete."
 
 #. module: l10n_it_pos
 #: model:ir.model.fields,field_description:l10n_it_pos.field_account_move__display_name
@@ -69,7 +76,7 @@ msgstr "Collega il registratore di cassa alla stampante fiscale italiana"
 #: model:ir.model.fields,field_description:l10n_it_pos.field_pos_order__display_name
 #: model:ir.model.fields,field_description:l10n_it_pos.field_pos_order_line__display_name
 #: model:ir.model.fields,field_description:l10n_it_pos.field_pos_payment_method__display_name
-#: model:ir.model.fields,field_description:l10n_it_pos.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:l10n_it_pos.field_pos_printer__display_name
 msgid "Display Name"
 msgstr "Nome visualizzato"
 
@@ -79,22 +86,16 @@ msgid "ETA tax codes mixin"
 msgstr "Mixin codici fiscali ETA"
 
 #. module: l10n_it_pos
-#: model:ir.model.fields,field_description:l10n_it_pos.field_pos_config__it_fiscal_cash_drawer
-#: model:ir.model.fields,field_description:l10n_it_pos.field_res_config_settings__pos_it_fiscal_cash_drawer
-msgid "Fiscal Printer Cash Drawer"
-msgstr "Registratore di cassa stampante fiscale"
+#. odoo-javascript
+#: code:addons/l10n_it_pos/static/src/app/fiscal_printer/epson_fiscal_printer.js:0
+msgid "Fiscal Printer Connection Error"
+msgstr "Errore di connessione alla stampante fiscale"
 
 #. module: l10n_it_pos
 #. odoo-javascript
-#: code:addons/l10n_it_pos/static/src/app/fiscal_printer/epson_fiscal_printer_service.js:0
+#: code:addons/l10n_it_pos/static/src/app/fiscal_printer/epson_fiscal_printer.js:0
 msgid "Fiscal Printer Error"
 msgstr "Errore stampante fiscale"
-
-#. module: l10n_it_pos
-#: model:ir.model.fields,field_description:l10n_it_pos.field_pos_config__it_fiscal_printer_ip
-#: model:ir.model.fields,field_description:l10n_it_pos.field_res_config_settings__pos_it_fiscal_printer_ip
-msgid "Fiscal Printer IP"
-msgstr "IP stampante fiscale"
 
 #. module: l10n_it_pos
 #: model:ir.model.fields,field_description:l10n_it_pos.field_pos_order__it_fiscal_receipt_date
@@ -113,19 +114,30 @@ msgstr "Numero ricevuta fiscale"
 #: model:ir.model.fields,field_description:l10n_it_pos.field_pos_order__id
 #: model:ir.model.fields,field_description:l10n_it_pos.field_pos_order_line__id
 #: model:ir.model.fields,field_description:l10n_it_pos.field_pos_payment_method__id
-#: model:ir.model.fields,field_description:l10n_it_pos.field_res_config_settings__id
+#: model:ir.model.fields,field_description:l10n_it_pos.field_pos_printer__id
 msgid "ID"
 msgstr "ID"
 
 #. module: l10n_it_pos
-#: model_terms:ir.ui.view,arch_db:l10n_it_pos.res_config_settings_view_form
-msgid "Italian Fiscal Printer Cash Drawer"
-msgstr "Registratore di cassa stampante fiscale italiana"
+#: model:ir.module.module,description:base.module_l10n_it_pos
+msgid "Integration of Odoo PoS with the Italian Fiscal Printer"
+msgstr ""
 
 #. module: l10n_it_pos
-#: model_terms:ir.ui.view,arch_db:l10n_it_pos.res_config_settings_view_form
-msgid "Italian Fiscal Printer IP address"
-msgstr "Indirizzo IP stampante fiscale italiana"
+#. odoo-javascript
+#: code:addons/l10n_it_pos/static/src/app/overrides/select_default_printer_popup.js:0
+msgid "Invalid Printer Selection"
+msgstr "Selezione stampante non valida"
+
+#. module: l10n_it_pos
+#: model:ir.model.fields.selection,name:l10n_it_pos.selection__pos_printer__printer_type__it_fiscal_printer
+msgid "Italian Fiscal Printer"
+msgstr "Stampante fiscale italiana"
+
+#. module: l10n_it_pos
+#: model:ir.module.module,shortdesc:base.module_l10n_it_pos
+msgid "Italy - Point of Sale"
+msgstr ""
 
 #. module: l10n_it_pos
 #: model:ir.model,name:l10n_it_pos.model_account_move
@@ -154,19 +166,24 @@ msgid "Point of Sale Configuration"
 msgstr "Configurazione punto vendita"
 
 #. module: l10n_it_pos
-#: model:ir.model,name:l10n_it_pos.model_pos_order_line
-msgid "Point of Sale Order Lines"
-msgstr "Righe ordine del punto vendita"
+#: model:ir.model,name:l10n_it_pos.model_pos_order
+msgid "Point of Sale Order"
+msgstr "Ordine Punto vendita"
 
 #. module: l10n_it_pos
-#: model:ir.model,name:l10n_it_pos.model_pos_order
-msgid "Point of Sale Orders"
-msgstr "Ordini punto vendita"
+#: model:ir.model,name:l10n_it_pos.model_pos_order_line
+msgid "Point of Sale Order Line"
+msgstr "Riga ordine Punto vendita"
 
 #. module: l10n_it_pos
 #: model:ir.model,name:l10n_it_pos.model_pos_payment_method
-msgid "Point of Sale Payment Methods"
-msgstr "Metodi di pagamento punto vendita"
+msgid "Point of Sale Payment Method"
+msgstr "Metodo di pagamento Punto vendita"
+
+#. module: l10n_it_pos
+#: model:ir.model,name:l10n_it_pos.model_pos_printer
+msgid "Point of Sale Printer"
+msgstr "Stampante Punto vendita"
 
 #. module: l10n_it_pos
 #. odoo-javascript
@@ -175,13 +192,19 @@ msgid "Powered by Odoo"
 msgstr "Powered by Odoo"
 
 #. module: l10n_it_pos
-#: model_terms:ir.ui.view,arch_db:l10n_it_pos.res_config_settings_view_form
-msgid "Print receipts through the Italian Fiscal Printer"
-msgstr "Stampa ricevute con la stampante fiscale italiana"
+#. odoo-python
+#: code:addons/l10n_it_pos/models/pos_printer.py:0
+msgid "Printer IP Address cannot be empty."
+msgstr "L'indirizzo IP della stampante EPSON non può essere vuoto."
+
+#. module: l10n_it_pos
+#: model:ir.model.fields,field_description:l10n_it_pos.field_pos_printer__printer_type
+msgid "Printer Type"
+msgstr "Tipo stampante"
 
 #. module: l10n_it_pos
 #. odoo-javascript
-#: code:addons/l10n_it_pos/static/src/app/overrides/navbar/navbar.xml:0
+#: code:addons/l10n_it_pos/static/src/app/overrides/navbar/navbar.js:0
 msgid "RT Status"
 msgstr "Stato RT"
 
@@ -192,17 +215,22 @@ msgid "Rounding"
 msgstr "Arrotondamento"
 
 #. module: l10n_it_pos
-#: model:ir.model.fields,field_description:l10n_it_pos.field_pos_config__it_fiscal_printer_https
-#: model:ir.model.fields,field_description:l10n_it_pos.field_res_config_settings__pos_it_fiscal_printer_https
-msgid "Use HTTPS"
-msgstr "Usa HTTPS"
+#. odoo-javascript
+#: code:addons/l10n_it_pos/static/src/app/documents/fiscal_document/body/body.js:0
+msgid "Subtotal: "
+msgstr "Totale parziale:"
+
+#. module: l10n_it_pos
+#. odoo-javascript
+#: code:addons/l10n_it_pos/static/src/app/overrides/select_default_printer_popup.js:0
+msgid ""
+"When a fiscal printer is available among the receipt printers, the default "
+"printer must be a fiscal printer."
+msgstr ""
+"Quando tra le stampanti per scontrini è disponibile una stampante fiscale, "
+"la stampante predefinita deve essere una stampante fiscale."
 
 #. module: l10n_it_pos
 #: model:ir.model.fields,field_description:l10n_it_pos.field_pos_order__it_z_rep_number
 msgid "Z-Rep Number"
 msgstr "Numero Z-Rep"
-
-#. module: l10n_it_pos
-#: model_terms:ir.ui.view,arch_db:l10n_it_pos.res_config_settings_view_form
-msgid "e.g. 10.100.71.64"
-msgstr "ad es. 10.100.71.64"

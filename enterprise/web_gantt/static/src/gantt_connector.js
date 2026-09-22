@@ -1,4 +1,6 @@
-import { Component, onWillRender, useEffect, useRef } from "@odoo/owl";
+import { onWillRender, useLayoutEffect } from "@web/owl2/utils";
+import { Component, useProps, signal, t } from "@odoo/owl";
+import { rtl } from "./gantt_helpers";
 
 /**
  * @typedef {"error" | "warning"} ConnectorAlert
@@ -33,9 +35,13 @@ import { Component, onWillRender, useEffect, useRef } from "@odoo/owl";
  * @return {{ stroke: string, hoveredStroke: string }} the css colors.
  */
 export function getStrokeAndHoveredStrokeColor(r, g, b) {
+    const dr = Math.round(r * 0.9);
+    const dg = Math.round(g * 0.9);
+    const db = Math.round(b * 0.9);
     return {
         color: `rgba(${r},${g},${b},0.5)`,
         highlightedColor: `rgba(${r},${g},${b},1)`,
+        hoveredHighlightedColor: `rgba(${dr},${dg},${db},1)`,
     };
 }
 
@@ -48,45 +54,36 @@ export const COLORS = {
 
 /** @extends {Component<{ reactive: ConnectorProps }, any>} */
 export class GanttConnector extends Component {
-    static props = {
-        reactive: {
-            type: Object,
-            shape: {
-                id: String,
-                alert: {
-                    type: [{ value: "error" }, { value: "warning" }, { value: null }],
-                    optional: true,
-                },
-                highlighted: { type: Boolean, optional: true },
-                displayButtons: { type: Boolean, optional: true },
-                sourcePoint: [
-                    { value: null },
-                    Function,
-                    { type: Object, shape: { left: Number, top: Number } },
-                ],
-                targetPoint: [
-                    { value: null },
-                    Function,
-                    { type: Object, shape: { left: Number, top: Number } },
-                ],
-                dashed: { type: Boolean, optional: true },
-            },
-        },
-        onRemoveButtonClick: { type: Function, optional: true },
-        onConnectorHover: { type: Function },
-    };
-    static defaultProps = {
-        highlighted: false,
-        displayButtons: false,
-    };
+    props = useProps({
+        reactive: t.object({
+            id: t.string(),
+            alert: t.or([t.literal("error"), t.literal("warning"), t.literal(null)]).optional(),
+            highlighted: t.boolean().optional(),
+            displayButtons: t.boolean().optional(),
+            sourcePoint: t.or([
+                t.literal(null),
+                t.function(),
+                t.object({ left: t.number(), top: t.number() }),
+            ]),
+            targetPoint: t.or([
+                t.literal(null),
+                t.function(),
+                t.object({ left: t.number(), top: t.number() }),
+            ]),
+            dashed: t.boolean().optional(),
+        }),
+        onRemoveButtonClick: t.function().optional(),
+        onConnectorHover: t.function(),
+    });
     static template = "web_gantt.GanttConnector";
 
-    rootRef = useRef("root");
+    rootRef = signal.ref();
     style = {
         hoverEaseWidth: 10,
-        slackness: 0.9,
         stroke: { width: 2 },
         outlineStroke: { width: 1 },
+        // Radius for rounded corners in connector paths. Affects curve smoothness between source and target points.
+        cornerRadius: 8,
     };
 
     get alert() {
@@ -124,26 +121,20 @@ export class GanttConnector extends Component {
     setup() {
         onWillRender(this.onWillRender);
 
-        useEffect(
+        useLayoutEffect(
             (el, sourceLeft, sourceTop, targetLeft, targetTop) => {
                 if (!el) {
                     return;
                 }
-                const { sourceControlPoint, targetControlPoint, removeButtonPosition } =
-                    this.getPathInfo(
-                        { left: sourceLeft, top: sourceTop },
-                        { left: targetLeft, top: targetTop },
-                        this.style.slackness
-                    );
+                const { removeButtonPosition } = this.getRemoveButtonInfo(
+                    { left: sourceLeft, top: sourceTop },
+                    { left: targetLeft, top: targetTop }
+                );
 
-                const drawingCommands = [
-                    `M`,
-                    `${sourceLeft},${sourceTop}`,
-                    `C`,
-                    `${sourceControlPoint.left},${sourceControlPoint.top}`,
-                    `${targetControlPoint.left},${targetControlPoint.top}`,
-                    `${targetLeft},${targetTop}`,
-                ].join(" ");
+                const drawingCommands = this.createOrthogonalPath(
+                    { left: sourceLeft, top: sourceTop },
+                    { left: targetLeft, top: targetTop }
+                );
 
                 const paths = el.querySelectorAll(
                     ".o_connector_stroke, .o_connector_stroke_hover_ease"
@@ -162,28 +153,6 @@ export class GanttConnector extends Component {
         );
     }
 
-    /**
-     * Refreshes the connector properties from the props.
-     *
-     * @param {ConnectorProps} props
-     */
-    computeStyle({ alert, highlighted }) {
-        const key = highlighted ? "highlightedColor" : "color";
-        const strokeType = alert || "default";
-        this.style = {
-            hoverEaseWidth: 10,
-            slackness: 0.9,
-            stroke: {
-                color: COLORS[strokeType][key],
-                width: 2,
-            },
-            outlineStroke: {
-                color: COLORS.outline[key],
-                width: 1,
-            },
-        };
-    }
-
     getEffectDependencies() {
         let sourcePoint = this.sourcePoint || { left: 0, top: 0 };
         if (typeof sourcePoint === "function") {
@@ -193,10 +162,10 @@ export class GanttConnector extends Component {
         if (typeof targetPoint === "function") {
             targetPoint = targetPoint();
         }
-        const { x, y } = this.rootRef.el?.getBoundingClientRect() || { x: 0, y: 0 };
+        const { x, y } = this.rootRef()?.getBoundingClientRect() || { x: 0, y: 0 };
 
         return [
-            this.rootRef.el,
+            this.rootRef(),
             sourcePoint.left - x,
             sourcePoint.top - y,
             targetPoint.left - x,
@@ -206,65 +175,115 @@ export class GanttConnector extends Component {
     }
 
     /**
-     * Returns the linear interpolation for a point to be found somewhere on the line startingPoint, endingPoint.
-     *
-     * @param {Point} startingPoint
-     * @param {Point} endingPoint
-     * @param {number} lambda
-     * @returns {Point}
-     */
-    getLinearInterpolation(startingPoint, endingPoint, lambda = 0.5) {
-        return {
-            left: lambda * startingPoint.left + (1 - lambda) * endingPoint.left,
-            top: lambda * startingPoint.top + (1 - lambda) * endingPoint.top,
-        };
-    }
-
-    /**
-     * Returns the parameters of both the single Bezier curve as well as is decomposition into two beziers curves
-     * (which allows to get the middle position of the single Bezier curve) for the provided source, target and
-     * slackness (0 being a straight line).
+     * Creates an orthogonal path with small curves at corners.
      *
      * @param {Point} sourcePoint
      * @param {Point} targetPoint
-     * @param {number} slackness [0, 1]
-     * @returns {PathInfo}
+     * @returns {string} SVG path commands
      */
-    getPathInfo(sourcePoint, targetPoint, slackness) {
-        // If the source is on the left of the target, we need to invert the control points.
+    createOrthogonalPath(sourcePoint, targetPoint) {
         const xDelta = targetPoint.left - sourcePoint.left;
         const yDelta = targetPoint.top - sourcePoint.top;
-        const directionFactor = Math.sign(xDelta);
 
-        // What follows can be seen as magic numbers. And those are indeed such numbers as they have been determined
-        // by observing their shape while creating short and long connectors. These seems to allow keeping the same
-        // kind of shape amongst short and long connectors.
-        const xInc = 100 + (Math.abs(xDelta) * slackness) / 10;
-        const yInc =
-            Math.abs(yDelta) < 16 && directionFactor === -1 ? 15 - 0.001 * xDelta * slackness : 0;
+        // LTR: 1 (Right is forward). RTL: -1 (Left is forward).
+        const flowDir = rtl() ? -1 : 1;
 
-        const b = {
-            left: sourcePoint.left + xInc,
-            top: sourcePoint.top + yInc,
-        };
+        const logicalXDelta = xDelta * flowDir;
 
-        // Prevent having the air pin effect when in creation and having target on the left of the source
-        const c = {
-            left: targetPoint.left + (this.isNew && directionFactor === -1 ? xInc : -xInc),
-            top: targetPoint.top + yInc,
-        };
+        const dirY = Math.sign(yDelta) || 1;
 
-        const e = this.getLinearInterpolation(sourcePoint, b);
-        const f = this.getLinearInterpolation(b, c);
-        const g = this.getLinearInterpolation(c, targetPoint);
-        const h = this.getLinearInterpolation(e, f);
-        const i = this.getLinearInterpolation(f, g);
-        const j = this.getLinearInterpolation(h, i);
+        const curvedElbow = (start, corner, end) => [
+            `L ${start.left},${start.top}`,
+            `Q ${corner.left},${corner.top} ${end.left},${end.top}`,
+        ];
+
+        //=========================================
+        // BACKWARD / WRAP-AROUND ROUTING
+        //=========================================
+        if (Math.abs(logicalXDelta) < this.style.cornerRadius || logicalXDelta < 0) {
+            // Multipliers ensure wrap-around loops out to the correct sides
+            const exitBuffer = 30 * flowDir;
+            const wrapRadiusX = Math.min(this.style.cornerRadius, Math.abs(yDelta) / 2) * flowDir;
+            const wrapRadiusY = Math.min(this.style.cornerRadius, Math.abs(yDelta) / 2) * dirY;
+
+            const midY = sourcePoint.top + yDelta / 2;
+
+            return [
+                `M ${sourcePoint.left},${sourcePoint.top}`,
+
+                ...curvedElbow(
+                    { left: sourcePoint.left + exitBuffer - wrapRadiusX, top: sourcePoint.top },
+                    { left: sourcePoint.left + exitBuffer, top: sourcePoint.top },
+                    { left: sourcePoint.left + exitBuffer, top: sourcePoint.top + wrapRadiusY }
+                ),
+
+                ...curvedElbow(
+                    { left: sourcePoint.left + exitBuffer, top: midY - wrapRadiusY },
+                    { left: sourcePoint.left + exitBuffer, top: midY },
+                    { left: sourcePoint.left + exitBuffer - wrapRadiusX, top: midY }
+                ),
+
+                ...curvedElbow(
+                    { left: targetPoint.left - exitBuffer + wrapRadiusX, top: midY },
+                    { left: targetPoint.left - exitBuffer, top: midY },
+                    { left: targetPoint.left - exitBuffer, top: midY + wrapRadiusY }
+                ),
+
+                ...curvedElbow(
+                    { left: targetPoint.left - exitBuffer, top: targetPoint.top - wrapRadiusY },
+                    { left: targetPoint.left - exitBuffer, top: targetPoint.top },
+                    { left: targetPoint.left - exitBuffer + wrapRadiusX, top: targetPoint.top }
+                ),
+
+                `L ${targetPoint.left},${targetPoint.top}`,
+            ].join(" ");
+        }
+
+        //==========================================
+        // STANDARD FORWARD ROUTING
+        //==========================================
+        const midX = sourcePoint.left + xDelta / 2;
+
+        const radiusX = Math.min(this.style.cornerRadius, Math.abs(xDelta) / 2) * flowDir;
+        const radiusY = Math.min(this.style.cornerRadius, Math.abs(yDelta) / 2) * dirY;
+
+        return [
+            `M ${sourcePoint.left},${sourcePoint.top}`,
+
+            ...curvedElbow(
+                { left: midX - radiusX, top: sourcePoint.top },
+                { left: midX, top: sourcePoint.top },
+                { left: midX, top: sourcePoint.top + radiusY }
+            ),
+
+            ...curvedElbow(
+                { left: midX, top: targetPoint.top - radiusY },
+                { left: midX, top: targetPoint.top },
+                { left: midX + radiusX, top: targetPoint.top }
+            ),
+
+            `L ${targetPoint.left},${targetPoint.top}`,
+        ].join(" ");
+    }
+
+    /**
+     * Returns the control points and remove button position for connector path.
+     *
+     * @param {Point} sourcePoint
+     * @param {Point} targetPoint
+     * @returns {PathInfo}
+     */
+    getRemoveButtonInfo(sourcePoint, targetPoint) {
+        const xDelta = targetPoint.left - sourcePoint.left;
+        const yDelta = targetPoint.top - sourcePoint.top;
+
+        const cornerX = sourcePoint.left + xDelta / 2;
+        const cornerY = sourcePoint.top + yDelta / 2;
 
         return {
-            sourceControlPoint: b,
-            targetControlPoint: c,
-            removeButtonPosition: j,
+            sourceControlPoint: { left: cornerX, top: sourcePoint.top },
+            targetControlPoint: { left: cornerX, top: targetPoint.top },
+            removeButtonPosition: { left: cornerX, top: cornerY },
         };
     }
 
@@ -282,7 +301,7 @@ export class GanttConnector extends Component {
         const key = this.highlighted ? "highlightedColor" : "color";
         this.style.outlineStroke.color = COLORS.outline[key];
         if (this.props.onConnectorHover() && this.highlighted) {
-            this.style.stroke.color = 'rgba(52, 152, 219,1)';
+            this.style.stroke.color = COLORS[this.alert || "default"].hoveredHighlightedColor;
         } else {
             this.style.stroke.color = COLORS[this.alert || "default"][key];
         }

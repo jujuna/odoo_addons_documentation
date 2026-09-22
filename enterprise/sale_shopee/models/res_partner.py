@@ -4,6 +4,6 @@ from odoo import fields, models
 
 
 class ResPartner(models.Model):
-    _inherit = 'res.partner'
+    _inherit = "res.partner"
 
-    shopee_buyer_identifier = fields.Integer("Shopee Buyer ID")
+    shopee_buyer_identifier = fields.Char("Shopee Buyer ID")

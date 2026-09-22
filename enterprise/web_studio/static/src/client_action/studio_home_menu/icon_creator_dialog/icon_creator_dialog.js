@@ -4,21 +4,22 @@ import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { IconCreator } from "@web_studio/client_action/icon_creator/icon_creator";
 
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 
 export class IconCreatorDialog extends Component {
-    static props = {
-        editedAppData: Object,
-        appId: Number,
-        close: Function,
-    };
-    static template = "web_studio.IconCreatorDialog";
     static components = { Dialog, IconCreator };
+    static template = "web_studio.IconCreatorDialog";
+
+    props = useProps({
+        editedAppData: t.object(),
+        appId: t.number(),
+        close: t.function(),
+    });
 
     setup() {
         this.menus = useService("menu");
         this.initialAppData = { ...this.props.editedAppData };
-        this.editedAppData = useState(this.props.editedAppData);
+        this.editedAppData = proxy(this.props.editedAppData);
     }
 
     /**
@@ -42,18 +43,18 @@ export class IconCreatorDialog extends Component {
             if (this.editedAppData.type === "base64") {
                 iconValue = this.editedAppData.uploaded_attachment_id;
             } else {
-                const { iconClass, color, backgroundColor } = this.editedAppData;
-                iconValue = [iconClass, color, backgroundColor];
+                const { icon, color, backgroundColor } = this.editedAppData;
+                iconValue = [icon, color, backgroundColor];
             }
         } else if (this.editedAppData.type === "custom_icon") {
             // custom icon changed
-            const { iconClass, color, backgroundColor } = this.editedAppData;
+            const { icon, color, backgroundColor } = this.editedAppData;
             if (
-                this.initialAppData.iconClass !== iconClass ||
+                this.initialAppData.icon !== icon ||
                 this.initialAppData.color !== color ||
                 this.initialAppData.backgroundColor !== backgroundColor
             ) {
-                iconValue = [iconClass, color, backgroundColor];
+                iconValue = [icon, color, backgroundColor];
             }
         } else if (this.editedAppData.uploaded_attachment_id) {
             // new attachment

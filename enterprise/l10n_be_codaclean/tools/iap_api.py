@@ -1,7 +1,9 @@
 import logging
 
+from requests import RequestException
+
 from odoo import _, modules, release
-from odoo.exceptions import AccessError, ValidationError
+from odoo.exceptions import ValidationError
 from odoo.tools import exception_to_unicode
 
 from odoo.addons.iap.tools import iap_tools
@@ -12,7 +14,7 @@ _DEFAULT_ENDPOINT = "https://l10n-be-codaclean.api.odoo.com"
 
 
 def get_contact_url(env, route=None):
-    endpoint = env["ir.config_parameter"].sudo().get_param("l10n_be_codaclean.iap_endpoint", _DEFAULT_ENDPOINT).strip()
+    endpoint = (env["ir.config_parameter"].sudo().get_str("l10n_be_codaclean.iap_endpoint") or _DEFAULT_ENDPOINT).strip()
     suffix = f"/api/l10n_be_codaclean/1/{route}" if route else ""
     return f'{endpoint.removesuffix("/")}{suffix}'
 
@@ -37,14 +39,14 @@ def contact(env, action, params, timeout=15):
         raise ValidationError(_('Test mode'))
     params = {
         **params,
-        'db_uuid': env['ir.config_parameter'].sudo().get_param('database.uuid'),
+        'db_uuid': env['ir.config_parameter'].sudo().get_str('database.uuid'),
         'db_version': release.version,
         'db_lang': env.lang,
     }
     url = get_contact_url(env, action)
     try:
         result = iap_tools.iap_jsonrpc(url, params=params, timeout=timeout)
-    except AccessError as e:
+    except RequestException as e:
         result = {
             'error': {
                 'type': 'jsonrpc',

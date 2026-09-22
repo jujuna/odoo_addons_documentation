@@ -71,11 +71,10 @@
         <field name="name">helpdesk.sla.report.analysis.search</field>
         <field name="model">helpdesk.sla.report.analysis</field>
         <field name="mode">primary</field>
-        <field name="inherit_id" ref="helpdesk_tickets_view_search_base"/>
+        <field name="inherit_id" ref="helpdesk_ticket_report_analysis_view_search"/>
         <field name="priority">20</field>
         <field name="arch" type="xml">
-            <search position="attributes"/>
-            <xpath expr="//filter[@name='sla_ids']" position="after">
+            <xpath expr="//group//filter[@name='sla_deadline']" position="before">
                 <filter string="SLA Status" name="sla_status" context="{'group_by': 'sla_status'}" groups="helpdesk.group_use_sla"/>
             </xpath>
         </field>

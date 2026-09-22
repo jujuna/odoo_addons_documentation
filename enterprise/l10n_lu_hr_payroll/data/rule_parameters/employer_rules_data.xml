@@ -7,14 +7,20 @@
         <field name="country_id" ref="base.lu"/>
     </record>
     <record id="rule_parameter_accident_insurance_rate_2023" model="hr.rule.parameter.value">
-        <field name="parameter_value">0.75</field>
+        <field name="parameter_value">0.0075</field>
         <field name="rule_parameter_id" ref="rule_parameter_accident_insurance_rate"/>
         <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
     </record>
     <record id="rule_parameter_accident_insurance_rate_2024" model="hr.rule.parameter.value">
-        <field name="parameter_value">0.7</field>
+        <field name="parameter_value">0.007</field>
         <field name="rule_parameter_id" ref="rule_parameter_accident_insurance_rate"/>
         <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+    </record>
+    <record id="rule_parameter_accident_insurance_rate_2026" model="hr.rule.parameter.value">
+        <!-- Source: https://ccss.public.lu/en/parametres-sociaux.html -->
+        <field name="parameter_value">0.65</field>
+        <field name="rule_parameter_id" ref="rule_parameter_accident_insurance_rate"/>
+        <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
 
     <!-- Source: https://mde.public.lu/fr/affiliation-financement/financement.html -->
@@ -24,13 +30,18 @@
         <field name="country_id" ref="base.lu"/>
     </record>
     <record id="rule_parameter_mutuality_rates_2023" model="hr.rule.parameter.value">
-        <field name="parameter_value">(0.72, 1.22, 1.76, 2.84)</field>
+        <field name="parameter_value">(0.0072, 0.0122, 0.0176, 0.0284)</field>
         <field name="rule_parameter_id" ref="rule_parameter_mutuality_rates"/>
         <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
     </record>
     <record id="rule_parameter_mutuality_rates_2024" model="hr.rule.parameter.value">
-        <field name="parameter_value">(0.01, 0.01, 0.42, 1.36)</field>
+        <field name="parameter_value">(0.0001, 0.0001, 0.0042, 0.0136)</field>
         <field name="rule_parameter_id" ref="rule_parameter_mutuality_rates"/>
         <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
+    </record>
+    <record id="rule_parameter_mutuality_rates_2026" model="hr.rule.parameter.value">
+        <field name="parameter_value">(0.23, 0.95, 1.56, 2.66)</field>
+        <field name="rule_parameter_id" ref="rule_parameter_mutuality_rates"/>
+        <field name="date_from" eval="datetime(2026, 1, 1).date()"/>
     </record>
 </odoo>

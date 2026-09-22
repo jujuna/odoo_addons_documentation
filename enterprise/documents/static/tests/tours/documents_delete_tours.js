@@ -52,7 +52,7 @@ registry.category("web_tour.tours").add("document_delete_tour", {
             run: "click",
         },
         {
-            trigger: ".o_menu_item:contains('Move to Trash')",
+            trigger: ".o_menu_item:contains('Trash')",
             run: "click",
         },
         {
@@ -81,7 +81,7 @@ registry.category("web_tour.tours").add("document_delete_tour", {
             run: "click",
         },
         {
-            trigger: ".o_menu_item:contains('Move to Trash')",
+            trigger: ".o_menu_item:contains('Trash')",
             run: "click",
         },
         {
@@ -143,8 +143,8 @@ registry.category("web_tour.tours").add("document_default_access_view", {
             content: "Check that Chouchou is selected.",
         },
         {
-            trigger: '.o_search_panel_category_value header.active:contains("All")',
-            content: "Check that we are in the All folder.",
+            trigger: '.o_search_panel_category_value header.active:contains("Trash")',
+            content: "Check that we are in the Trash.",
         },
     ],
 });

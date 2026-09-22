@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+from collections.abc import Mapping
 from datetime import date, datetime
 import json as json_
 import re
 
 import markupsafe
+from .binary import BinaryValue
 from .func import lazy
-from .misc import ReadonlyDict
 
 JSON_SCRIPTSAFE_MAPPER = {
     '&': r'\u0026',
@@ -66,10 +66,32 @@ def json_default(obj):
         return fields.Date.to_string(obj)
     if isinstance(obj, lazy):
         return obj._value
-    if isinstance(obj, ReadonlyDict):
+    if isinstance(obj, Mapping):
         return dict(obj)
     if isinstance(obj, bytes):
         return obj.decode()
+    if isinstance(obj, BinaryValue):
+        return obj.content.decode()
     if isinstance(obj, fields.Domain):
         return list(obj)
+    if (as_dict_func := getattr(obj, 'as_dict', None)) and callable(as_dict_func):
+        return as_dict_func()
     return str(obj)
+
+
+def stringify_keys(obj):
+    """Recursively convert mapping keys to strings.
+
+    Webhook sample payloads may contain mappings with non-string keys,
+    such as ``frozendict`` instances. Since ``json.dumps`` requires
+    JSON-compatible mapping keys, such payloads must be normalized before
+    serialization.
+    """
+
+    if isinstance(obj, Mapping):
+        return {
+            str(k): stringify_keys(v)
+            for k, v in obj.items()
+        }
+
+    return obj

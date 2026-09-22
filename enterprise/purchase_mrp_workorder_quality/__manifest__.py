@@ -1,10 +1,8 @@
 
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Full Traceability Report Demo Data',
-    'version': '1.0',
     'category': 'Supply Chain/Manufacturing',
     'sequence': 50,
     'summary': 'Full Traceability Report Demo Data',

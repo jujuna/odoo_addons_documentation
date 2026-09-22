@@ -1,6 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models
+from dateutil.relativedelta import relativedelta
+
+from odoo import api, models
 
 
 class HrPayslip(models.Model):
@@ -35,4 +37,48 @@ class HrPayslip(models.Model):
         return super()._get_data_files_to_update() + [(
             'l10n_eg_hr_payroll', [
                 'data/hr_rule_parameter_data.xml',
+                'data/hr_salary_rule_data.xml',
             ])]
+
+    def _get_eg_ytd_values(self):
+        self.ensure_one()
+        last_payslips = self.env['hr.payslip'].search([
+            ('employee_id', '=', self.employee_id.id),
+            ('struct_id', '=', self.struct_id.id),
+            ('state', 'in', ['validated', 'paid']),
+            ('date_from', '>=', self.date_from + relativedelta(month=1, day=1)),
+            ('date_to', '<=', self.date_to)
+        ])
+        line_values = last_payslips._get_line_values(['GROSS', 'TOTTB'], compute_sum=True)
+        return {
+            'GROSS': line_values['GROSS']['sum']['total'],
+            'TOTTB': line_values['TOTTB']['sum']['total'],
+        }
+
+    def action_open_eg_tax_adjustment_wizard(self):
+        self.ensure_one()
+        if self.struct_id.code != 'EGMONTHLY' or self.state != 'draft':
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'danger',
+                    'message': self.env._('This option only works for draft paysilps with Egypt: Monthly Pay structure.')
+                }
+            }
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self.env._('End of year Tax Adjustment'),
+            'res_model': 'l10n.eg.ytd.tax.adjustment.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+        }
+
+    @api.model
+    def _issues_dependencies(self):
+        return super()._issues_dependencies() + [
+            'employee_id.identification_id',
+            'employee_id.passport_id',
+            'employee_id.l10n_eg_ssn',
+            'employee_id.job_title',
+        ]

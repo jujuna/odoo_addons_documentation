@@ -182,7 +182,7 @@ class AccountFiscalCategoriesFleetReportHandler(models.AbstractModel):
 
         return parent_line_id if parent else line_id
 
-    def _report_expand_unfoldable_line_category_line(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_category_line(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         # OVERRIDES account_fiscal_categories.
 
         primary_fields = ['category_id', 'vehicle_id']
@@ -209,14 +209,14 @@ class AccountFiscalCategoriesFleetReportHandler(models.AbstractModel):
                 current = self._filter_current(current, secondary_fields)
                 line = self._get_account_line(options, result, current, level)
 
-            if line.get('unfoldable'):
+            if line.unfoldable:
                 unfoldable_lines.append(line)
             else:
                 lines.append(line)
 
-        return {'lines': lines + unfoldable_lines}
+        return lines + unfoldable_lines
 
-    def _report_expand_unfoldable_line_account_line(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_account_line(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         # OVERRIDES account_fiscal_categories.
 
         primary_fields = ['category_id', 'vehicle_id', 'account_id', 'fleet_rate']
@@ -242,9 +242,9 @@ class AccountFiscalCategoriesFleetReportHandler(models.AbstractModel):
             account_id = self._get_single_value(base_line_values, 'account_id')
             lines.append(self._get_rate_line(options, result, current, level, account_id))
 
-        return {'lines': lines}
+        return lines
 
-    def _report_expand_unfoldable_line_vehicle_line(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_vehicle_line(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         results = self._get_query_results(options, line_dict_id, ['category_id', 'vehicle_id', 'account_id'])
         lines = []
 
@@ -260,19 +260,17 @@ class AccountFiscalCategoriesFleetReportHandler(models.AbstractModel):
             else:
                 lines.append(self._get_account_line(options, result, current, level))
 
-        return {'lines': lines}
+        return lines
 
     def _fiscal_get_vehicle_line(self, options, values, current, level):
         base_line_values = next(iter(values.values()))
-        return {
-            **self._get_base_line(options, current, level),
-            'name': base_line_values['vehicle_name'][0],
-            'columns': self._get_column_values(options, values),
-            'level': level,
-            'unfoldable': True,
-            'caret_options': False,
-            'expand_function': '_report_expand_unfoldable_line_vehicle_line',
-        }
+        line = self._get_base_line(options, current, level)
+        line.name = base_line_values['vehicle_name'][0]
+        line.columns = self._get_column_values(options, values)
+        line.level = level
+        line.unfoldable = True
+        line.expand_function = '_report_expand_unfoldable_line_vehicle_line'
+        return line
 
     def _get_current_rate(self, values):
         # OVERRIDES account_fiscal_categories.

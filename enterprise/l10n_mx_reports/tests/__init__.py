@@ -3,3 +3,4 @@
 
 from . import test_diot
 from . import test_trial_balance
+from . import test_xml_polizas

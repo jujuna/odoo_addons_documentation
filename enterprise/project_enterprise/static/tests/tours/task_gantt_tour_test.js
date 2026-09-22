@@ -33,7 +33,7 @@ patch(registry.category("web_tour.tours").get("project_test_tour"), {
             run: "click",
         },
         {
-            trigger: ".o_gantt_progress_bar.o_gantt_group_danger",
+            trigger: ".o_gantt_progress_bar .bg-danger",
             content: "See user progress bar",
         })
         return originalSteps;

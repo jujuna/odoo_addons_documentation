@@ -2,9 +2,7 @@
 
 {
     'name': 'Netherlands - Payroll with Accounting',
-    'author': 'Odoo',
-    'version': '1.0',
-    'countries': ['nl'],
+    'author': 'Odoo S.A.',
     'category': 'Human Resources',
     'description': """
 Accounting Data for Netherlands Payroll Rules
@@ -19,5 +17,5 @@ Accounting Data for Netherlands Payroll Rules
         'data/l10n_nl_hr_payroll_account_demo.xml',
     ],
     'license': 'OEEL-1',
-    'auto_install': True,
+    'auto_install': ['l10n_nl_hr_payroll', 'hr_payroll_account'],
 }

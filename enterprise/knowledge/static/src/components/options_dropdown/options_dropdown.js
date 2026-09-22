@@ -1,36 +1,34 @@
 import { HistoryDialog } from "@html_editor/components/history_dialog/history_dialog";
 import { READONLY_MAIN_EMBEDDINGS } from "@html_editor/others/embedded_components/embedding_sets";
-import { useOpenChat } from "@mail/core/web/open_chat_hook";
 import MoveArticleDialog from "@knowledge/components/move_article_dialog/move_article_dialog";
 import { KNOWLEDGE_READONLY_EMBEDDINGS } from "@knowledge/editor/embedded_components/embedding_sets";
 import { getRandomIcon } from "@knowledge/js/knowledge_utils";
 import { browser } from "@web/core/browser/browser";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
+import { CheckboxItem } from "@web/core/dropdown/checkbox_item";
 import { formatDateTime } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, proxy, t, useProps } from "@odoo/owl";
 
 export class OptionsDropdown extends Component {
-    static components = { Dropdown, DropdownItem };
+    static components = { Dropdown, DropdownItem, CheckboxItem };
     static template = "knowledge.OptionsDropdown";
-    static props = {
-        record: { type: Object },
-    };
+    props = useProps({
+        record: t.object(),
+    });
 
     setup() {
         this.dialog = useService("dialog");
         this.notification = useService("notification");
         this.orm = useService("orm");
-        this.openChat = useOpenChat("res.users");
+        this.store = useService("mail.store");
         this.formatDateTime = formatDateTime;
-        this.commentsState = useState(this.env.commentsState);
-        this.chatterPanelState = useState(this.env.chatterPanelState);
-        this.propertiesPanelState = useState(this.env.propertiesPanelState);
+        this.panelState = proxy(this.env.panelState);
         onWillStart(async () => {
             this.isInternalUser = await user.hasGroup("base.group_user");
             this.canCreateArticle = await user.checkAccessRight("knowledge.article", "create");
@@ -109,11 +107,11 @@ export class OptionsDropdown extends Component {
     }
 
     onCreatorClick() {
-        this.openChat(this.data.create_uid.id);
+        this.store.openChat({ userId: this.data.create_uid.id });
     }
 
     onLastEditorClick() {
-        this.openChat(this.data.last_edition_uid.id);
+        this.store.openChat({ userId: this.data.last_edition_uid.id });
     }
 
     async openHistory() {

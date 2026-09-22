@@ -4,12 +4,13 @@
 
 from odoo.addons.account_reports.tests.account_sales_report_common import AccountSalesReportCommon
 from odoo.tests import tagged
-from odoo.tools.misc import NON_BREAKING_SPACE
 from freezegun import freeze_time
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class GermanySalesReportTest(AccountSalesReportCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @AccountSalesReportCommon.setup_chart_template('de_skr03')
@@ -29,7 +30,7 @@ class GermanySalesReportTest(AccountSalesReportCommon):
         ]
 
     @freeze_time('2019-12-31')
-    def test_ec_sales_report(self):
+    def test_de_ec_sales_report(self):
         l_tax = self.env['account.tax'].with_context(active_test=False).search([
             ('name', '=', '0% EU D'),
             ('company_id', '=', self.company_data['company'].id)
@@ -51,7 +52,7 @@ class GermanySalesReportTest(AccountSalesReportCommon):
             (self.partner_b, s_tax, 700),
         ])
         report = self.env.ref('l10n_de_reports.german_ec_sales_report')
-        options = report.get_options({'date': {'mode': 'range', 'filter': 'this_month'}})
+        options = report.get_options({'date': {'default_opening_date': 'this_month'}})
         lines = report._get_lines(options)
         self.assertLinesValues(
             lines,
@@ -59,12 +60,12 @@ class GermanySalesReportTest(AccountSalesReportCommon):
             #   Partner                country code,            VAT Number,             Tax   Amount
             [   0,                     1,                       2,                       3,    4],
             [
-                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'L',  f'600.00{NON_BREAKING_SPACE}€'),
-                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'D',  f'500.00{NON_BREAKING_SPACE}€'),
-                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'S',  f'700.00{NON_BREAKING_SPACE}€'),
-                (self.partner_b.name,  self.partner_b.vat[:2],  self.partner_b.vat[2:],  'D',  f'500.00{NON_BREAKING_SPACE}€'),
-                (self.partner_b.name,  self.partner_b.vat[:2],  self.partner_b.vat[2:],  'S',  f'700.00{NON_BREAKING_SPACE}€'),
-                ('Total',              '',                      '',                      '',   f'3,000.00{NON_BREAKING_SPACE}€'),
+                ('EC Sales Report',    '',                      '',                      '',   3000.0),
+                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'L',   600.0),
+                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'S',   700.0),
+                (self.partner_a.name,  self.partner_a.vat[:2],  self.partner_a.vat[2:],  'D',   500.0),
+                (self.partner_b.name,  self.partner_b.vat[:2],  self.partner_b.vat[2:],  'S',   700.0),
+                (self.partner_b.name,  self.partner_b.vat[:2],  self.partner_b.vat[2:],  'D',   500.0),
             ],
             options,
         )
@@ -85,5 +86,5 @@ class GermanySalesReportTest(AccountSalesReportCommon):
             (self.partner_a, l_tax, 234.5),
         ])
         report = self.env.ref('l10n_de_reports.german_ec_sales_report')
-        options = report.get_options({'date': {'mode': 'range', 'filter': 'this_month'}})
+        options = report.get_options({'date': {'default_opening_date': 'this_month'}})
         self.assertEqual(self._get_report_from_csv(report, options)[0].get('Betrag (Euro)'), '235', 'Amount should be integer')

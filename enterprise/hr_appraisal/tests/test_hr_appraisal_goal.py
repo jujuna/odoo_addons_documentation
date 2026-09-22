@@ -46,7 +46,6 @@ class TestHrAppraisalGoal(HttpCase):
             {'uid': self.user_without_hr_right.id}
         ))
         goal_form.name = "My goal"
-        goal_form.employee_ids = self.employee_subordinate
         goal_form.save()
 
     def test_appraisal_goal_autocompletion(self):

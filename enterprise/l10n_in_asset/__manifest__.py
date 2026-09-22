@@ -1,6 +1,5 @@
 {
     'name': 'India - Accounting Assets',
-    'version': '1.0',
     'description': """
 Accounting Asset for India
 ==========================
@@ -15,7 +14,6 @@ Accounting Asset for India
         'views/account_modify_views.xml',
     ],
     'auto_install': ['l10n_in', 'account_asset'],
-    'installable': True,
     "author": "Odoo S.A.",
     'license': 'OEEL-1',
 }

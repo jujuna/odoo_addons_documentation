@@ -1,10 +1,10 @@
 import { expect, test } from "@odoo/hoot";
 import { animationFrame, mockTimeZone } from "@odoo/hoot-mock";
-import { helpers, registries } from "@odoo/o-spreadsheet";
+import { helpers, registries, stores } from "@odoo/o-spreadsheet";
 import { defineTestSpreadsheetEditionModels } from "@test_spreadsheet_edition/../tests/helpers/data";
 import { createSpreadsheetTestAction } from "@test_spreadsheet_edition/../tests/helpers/helpers";
 import { contains, mockService } from "@web/../tests/web_test_helpers";
-import { getSpreadsheetActionModel } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
+import { getSpreadsheetActionModel, getSpreadsheetActionEnv } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
 import { waitForDataLoaded } from "@spreadsheet/helpers/model";
 
 defineTestSpreadsheetEditionModels();
@@ -12,8 +12,28 @@ defineTestSpreadsheetEditionModels();
 const { topbarMenuRegistry } = registries;
 
 const revisionSelector = ".o-version-history-wrapper .o-version-history-item";
-const panelSelector=".o-version-history";
-const uuidGenerator = new helpers.UuidGenerator();
+const panelSelector = ".o-version-history";
+const { UuidGenerator } = helpers
+const { ViewportsStore } = stores;
+
+const default_currency = {
+    id: 1,
+    name: "Euro",
+    symbol: "€",
+    position: "after",
+    decimalPlaces: 2,
+};
+
+const MOCK_SERVER_RETURN = {
+    data: {},
+    name: "test",
+    metadata: {
+        current_fiscal_year_start: "2025-10-01",
+        current_fiscal_year_end: "2026-09-30",
+        default_currency,
+    },
+    revisions: [],
+};
 
 function createRevision(revisions, type, payload) {
     const len = revisions.length;
@@ -21,7 +41,7 @@ function createRevision(revisions, type, payload) {
         type === "REMOTE_REVISION"
             ? [
                   {
-                      sheetId: uuidGenerator.smallUuid(),
+                      sheetId: UuidGenerator.smallUuid(),
                       position: 0,
                       name: `sheet ${len + 2}`,
                       type: "CREATE_SHEET",
@@ -32,7 +52,7 @@ function createRevision(revisions, type, payload) {
         id: len + 1,
         name: `revision ${len + 1}`,
         serverRevisionId: revisions.at(-1)?.nextRevisionId || "START_REVISION",
-        nextRevisionId: uuidGenerator.smallUuid(),
+        nextRevisionId: UuidGenerator.smallUuid(),
         version: "1",
         timestamp: "2023-09-09 13:00:00",
         user: [2, "Superman"],
@@ -43,8 +63,8 @@ function createRevision(revisions, type, payload) {
 }
 
 /**
- * 
- * @param {SpreadsheetAction} action 
+ *
+ * @param {SpreadsheetAction} action
  * @returns {Model}
  */
 function actionModel(action) {
@@ -58,7 +78,7 @@ test("Open history version from the menu", async function () {
             expect.step(action);
         },
     });
-    expect(".o_navbar").toHaveCount(1)
+    expect(".o_navbar").toHaveCount(1);
     const file = topbarMenuRegistry.getAll().find((item) => item.id === "file");
     const showHistory = file.children.find((item) => item.id === "version_history");
     await showHistory.execute(env);
@@ -80,6 +100,7 @@ test("load from the origin value", async function () {
             if (args.method === "get_spreadsheet_history") {
                 expect.step(`fromSnapshot-${args.args[1]}`);
             }
+            return MOCK_SERVER_RETURN;
         },
     });
     expect.verifySteps(["fromSnapshot-false"]);
@@ -91,6 +112,7 @@ test("load action from snapshot", async function () {
             if (args.method === "get_spreadsheet_history") {
                 expect.step(`fromSnapshot-${args.args[1]}`);
             }
+            return MOCK_SERVER_RETURN;
         },
         fromSnapshot: true,
     });
@@ -103,8 +125,7 @@ test("load from snapshot when missing revisions", async function () {
             if (args.method === "get_spreadsheet_history") {
                 expect.step(`fromSnapshot-${args.args[1]}`);
                 return {
-                    data: {},
-                    name: "test",
+                    ...MOCK_SERVER_RETURN,
                     revisions: [
                         createRevision([], "REMOTE_REVISION", {
                             serverRevisionId: "wrong revision id",
@@ -154,11 +175,7 @@ test("Side panel content", async function () {
                         user: [3, "Supergirl"],
                     })
                 );
-                return {
-                    data: {},
-                    name: "test",
-                    revisions,
-                };
+                return { ...MOCK_SERVER_RETURN, revisions };
             }
         },
     });
@@ -212,11 +229,7 @@ test("Clicking on initial state resets the data without any revisions", async fu
                 const revisions = [];
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
-                return {
-                    data: {},
-                    name: "test",
-                    revisions,
-                };
+                return { ...MOCK_SERVER_RETURN, revisions };
             }
         },
     });
@@ -233,11 +246,7 @@ test("Side panel click loads the old version", async function () {
                 const revisions = [];
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
-                return {
-                    data: {},
-                    name: "test",
-                    revisions,
-                };
+                return { ...MOCK_SERVER_RETURN, revisions };
             }
         },
     });
@@ -255,11 +264,7 @@ test("Side panel arrow keys navigates in the history", async function () {
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
-                return {
-                    data: {},
-                    name: "test",
-                    revisions,
-                };
+                return { ...MOCK_SERVER_RETURN, revisions };
             }
         },
     });
@@ -283,16 +288,14 @@ test("Load more revisions", async function () {
                 for (let i = 0; i < 75; i++) {
                     revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                 }
-                return {
-                    data: {},
-                    name: "test",
-                    revisions,
-                };
+                return { ...MOCK_SERVER_RETURN, revisions };
             }
         },
     });
     expect(revisionSelector).toHaveCount(50, { message: "the first 50 revisions are loaded" });
-    const loadMore = document.querySelector(".o-version-history-wrapper .o-version-history-load-more");
+    const loadMore = document.querySelector(
+        ".o-version-history-wrapper .o-version-history-load-more"
+    );
     expect(loadMore).not.toBe(null, { message: "Load more button is visible" });
     await contains(loadMore).click();
     expect(revisionSelector).toHaveCount(76, {
@@ -304,7 +307,7 @@ test("Side panel > make copy", async function () {
     await createSpreadsheetTestAction("action_open_spreadsheet_history", {
         mockRPC: async function (route, args) {
             switch (args.method) {
-                case "get_spreadsheet_history":
+                case "get_spreadsheet_history": {
                     const revisions = [];
                     revisions.push(
                         createRevision(revisions, "REMOTE_REVISION", {
@@ -313,11 +316,8 @@ test("Side panel > make copy", async function () {
                         })
                     );
                     revisions.push(createRevision(revisions, "REMOTE_REVISION"));
-                    return {
-                        data: {},
-                        name: "test",
-                        revisions,
-                    };
+                    return { ...MOCK_SERVER_RETURN, revisions };
+                }
                 case "fork_history":
                     expect(args.kwargs.revision_id).toBe(999);
                     expect(args.kwargs.spreadsheet_snapshot.revisionId).toBe("I clicked o");
@@ -346,8 +346,7 @@ test("Side panel > rename revision", async function () {
         mockRPC: async function (route, args) {
             if (args.method === "get_spreadsheet_history") {
                 return {
-                    data: {},
-                    name: "test",
+                    ...MOCK_SERVER_RETURN,
                     revisions: [createRevision([], "REMOTE_REVISION")],
                 };
             }
@@ -372,8 +371,7 @@ test("First revision should not be editable", async function () {
         mockRPC: async function (route, args) {
             if (args.method === "get_spreadsheet_history") {
                 return {
-                    data: {},
-                    name: "test",
+                    ...MOCK_SERVER_RETURN,
                     revisions: [createRevision([], "REMOTE_REVISION")],
                 };
             }
@@ -392,15 +390,12 @@ test("Side panel > restore revision and confirm", async function () {
     await createSpreadsheetTestAction("action_open_spreadsheet_history", {
         mockRPC: async function (route, args) {
             switch (args.method) {
-                case "get_spreadsheet_history":
+                case "get_spreadsheet_history": {
                     const revisions = [];
                     revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                     revisions.push(createRevision(revisions, "REMOTE_REVISION"));
-                    return {
-                        data: {},
-                        name: "test",
-                        revisions,
-                    };
+                    return { ...MOCK_SERVER_RETURN, revisions };
+                }
                 case "restore_spreadsheet_version":
                     expect.step("restored");
                     expect(args.kwargs.revision_id).toBe(1);
@@ -426,15 +421,12 @@ test("Side panel > restore revision and cancel", async function () {
     await createSpreadsheetTestAction("action_open_spreadsheet_history", {
         mockRPC: async function (route, args) {
             switch (args.method) {
-                case "get_spreadsheet_history":
+                case "get_spreadsheet_history": {
                     const revisions = [];
                     revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                     revisions.push(createRevision(revisions, "REMOTE_REVISION"));
-                    return {
-                        data: {},
-                        name: "test",
-                        revisions,
-                    };
+                    return { ...MOCK_SERVER_RETURN, revisions };
+                }
                 case "restore_spreadsheet_version":
                     throw new Error("should not be called");
                 default:
@@ -454,15 +446,12 @@ test("Side panel > restore revision but copy instead", async function () {
     await createSpreadsheetTestAction("action_open_spreadsheet_history", {
         mockRPC: async function (route, args) {
             switch (args.method) {
-                case "get_spreadsheet_history":
+                case "get_spreadsheet_history": {
                     const revisions = [];
                     revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                     revisions.push(createRevision(revisions, "REMOTE_REVISION"));
-                    return {
-                        data: {},
-                        name: "test",
-                        revisions,
-                    };
+                    return { ...MOCK_SERVER_RETURN, revisions };
+                }
                 case "fork_history":
                     expect.step("forking");
                     // placeholder return
@@ -490,8 +479,7 @@ test("closing side panel rolls back to parent action", async function () {
         mockRPC: async function (route, args) {
             if (args.method === "get_spreadsheet_history") {
                 return {
-                    data: {},
-                    name: "test",
+                    ...MOCK_SERVER_RETURN,
                     revisions: [createRevision([], "REMOTE_REVISION")],
                 };
             }
@@ -511,14 +499,13 @@ test("closing side panel rolls back to parent action", async function () {
     expect.verifySteps(["editAction-spreadsheet.test"]);
 });
 
-
 test("Undo/redo revisions are rolled back", async function () {
     const { action } = await createSpreadsheetTestAction("action_open_spreadsheet_history", {
         mockRPC: async function (route, args) {
             if (args.method === "get_spreadsheet_history") {
                 const revisions = [];
                 revisions.push(
-                    createRevision(revisions, "REMOTE_REVISION", { name: "Create sheet" }),
+                    createRevision(revisions, "REMOTE_REVISION", { name: "Create sheet" })
                 );
                 const originalRevId = revisions.at(-1).nextRevisionId;
                 revisions.push(
@@ -526,16 +513,16 @@ test("Undo/redo revisions are rolled back", async function () {
                         name: "Undo sheet creation",
                         commands: undefined,
                         undoneRevisionId: originalRevId,
-                    }),
+                    })
                 );
                 revisions.push(
                     createRevision(revisions, "REVISION_REDONE", {
                         name: "Redo sheet creation",
                         commands: undefined,
                         redoneRevisionId: originalRevId,
-                    }),
+                    })
                 );
-                return { data: {}, name: "test", revisions };
+                return { ...MOCK_SERVER_RETURN, revisions };
             }
         },
     });
@@ -557,7 +544,7 @@ test("Datasources are re-evaluated if their domain is altered", async function (
             if (args.method === "get_spreadsheet_history") {
                 const revisions = [];
                 revisions.push(
-                    createRevision(revisions, "REMOTE_REVISION", { name: "Create sheet" }),
+                    createRevision(revisions, "REMOTE_REVISION", { name: "Create sheet" })
                 );
                 revisions.push(
                     createRevision(revisions, "REMOTE_REVISION", {
@@ -569,9 +556,10 @@ test("Datasources are re-evaluated if their domain is altered", async function (
                                 type: "UPDATE_ODOO_LIST_DOMAIN",
                             },
                         ],
-                    }),
+                    })
                 );
                 return {
+                    ...MOCK_SERVER_RETURN,
                     data: {
                         version: 16,
                         sheets: [
@@ -579,7 +567,7 @@ test("Datasources are re-evaluated if their domain is altered", async function (
                                 id: "sh1",
                                 name: "Sheet 1",
                                 cells: {
-                                    A1: { content: '=ODOO.LIST(1,1,"name")' },
+                                    A1: { content: '=ODOO.LIST.VALUE(1,1,"name")' },
                                 },
                             },
                         ],
@@ -596,7 +584,6 @@ test("Datasources are re-evaluated if their domain is altered", async function (
                             },
                         },
                     },
-                    name: "test",
                     revisions,
                 };
             }
@@ -633,18 +620,19 @@ test("Selection and scroll are preserved when switching revision", async functio
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
-                return { data: {}, name: "test", revisions };
+                return { ...MOCK_SERVER_RETURN, revisions };
             }
         },
     });
     let model = actionModel(action);
+    let viewStore = getSpreadsheetActionEnv(action).getStore(ViewportsStore);
     const sheetIds = model.getters.getSheetIds();
     model.dispatch("ACTIVATE_SHEET", {
         sheetIdFrom: model.getters.getActiveSheetId(),
         sheetIdTo: sheetIds[2],
     });
     model.selection.selectCell(5, 5);
-    model.dispatch("SET_VIEWPORT_OFFSET", { offsetX: 30, offsetY: 30 });
+    viewStore.setViewportOffset({ offsetX: 30, offsetY: 30 });
     await animationFrame();
 
     // rollback to the before last revision. i.e. undo a CREATE_SHEET in the first spot
@@ -653,20 +641,31 @@ test("Selection and scroll are preserved when switching revision", async functio
     await animationFrame();
     await animationFrame();
     model = actionModel(action);
+    viewStore = getSpreadsheetActionEnv(action).getStore(ViewportsStore);
 
     expect(model.getters.getActivePosition()).toEqual({ sheetId: sheetIds[2], row: 5, col: 5 });
-    expect(model.getters.getActiveSheetScrollInfo()).toEqual({ scrollX: 30, scrollY: 30 });
+    expect(viewStore.activeSheetScrollInfo).toEqual({ scrollX: 30, scrollY: 30 });
 });
 
+test("Fiscal year getters work in version history action", async function () {
+    const { action } = await createSpreadsheetTestAction("action_open_spreadsheet_history", {
+        mockRPC: async function (route, args) {
+            if (args.method === "get_spreadsheet_history") {
+                return MOCK_SERVER_RETURN;
+            }
+        },
+    });
+
+    const model = actionModel(action);
+    expect(model.getters.getCurrentFiscalYearStart().toISODate()).toEqual(
+        MOCK_SERVER_RETURN.metadata.current_fiscal_year_start
+    );
+    expect(model.getters.getCurrentFiscalYearEnd().toISODate()).toEqual(
+        MOCK_SERVER_RETURN.metadata.current_fiscal_year_end
+    );
+});
 
 test("Default currency is provided to the model", async function () {
-    const default_currency = {
-        id: 1,
-        name: "Euro",
-        symbol: "€",
-        position: "after",
-        decimalPlaces: 2,
-    };
     const { action } = await createSpreadsheetTestAction("action_open_spreadsheet_history", {
         mockRPC: async function (route, args) {
             if (args.method === "get_spreadsheet_history") {
@@ -674,7 +673,7 @@ test("Default currency is provided to the model", async function () {
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
                 revisions.push(createRevision(revisions, "REMOTE_REVISION"));
-                return { data: {}, name: "test", revisions, default_currency };
+                return { ...MOCK_SERVER_RETURN, revisions };
             }
             if (args.method === "get_company_currency_for_spreadsheet") {
                 expect.step("get_default_currency");

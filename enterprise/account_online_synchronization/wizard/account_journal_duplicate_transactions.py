@@ -32,8 +32,9 @@ class AccountDuplicateTransactionWizard(models.TransientModel):
 
     @api.depends('journal_id', 'date')
     def _compute_transaction_ids(self):
+        today = fields.Date.context_today(self)
         for wizard in self:
-            ids_groups = wizard.journal_id._get_duplicate_transactions(wizard.date or fields.Date.today()) if wizard.journal_id else []
+            ids_groups = wizard.journal_id._get_duplicate_transactions(wizard.date or today) if wizard.journal_id else []
             first_ids_in_group = []
             flat_ids = []
             check_set = set()
@@ -49,11 +50,13 @@ class AccountDuplicateTransactionWizard(models.TransientModel):
 
     @api.depends('journal_id', 'date')
     def _compute_provider_duplicate_ids(self):
+        today = fields.Date.context_today(self)
         for wizard in self:
-            wizard.provider_duplicate_ids = [Command.set(wizard.journal_id._get_provider_duplicate_transactions(wizard.date or fields.Date.today()) if wizard.journal_id else [])]
+            wizard.provider_duplicate_ids = [Command.set(wizard.journal_id._get_provider_duplicate_transactions(wizard.date or today) if wizard.journal_id else [])]
 
     @api.depends('journal_id')
     def _compute_date(self):
+        today = fields.Date.context_today(self)
         for wizard in self:
             if wizard.date:
                 continue
@@ -69,4 +72,4 @@ class AccountDuplicateTransactionWizard(models.TransientModel):
                 )
                 wizard.date = bsl[0]['date']
             else:
-                wizard.date = fields.Datetime.today()
+                wizard.date = today

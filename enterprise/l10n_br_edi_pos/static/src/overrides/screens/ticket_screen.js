@@ -6,12 +6,12 @@ patch(TicketScreen.prototype, {
     showBrazilianEDIStatus() {
         return this.pos.config.l10n_br_is_nfce && this.state.filter === "SYNCED";
     },
-    getBrazilianEDIStatus() {
-        switch (this.order.l10n_br_last_avatax_status) {
+    getBrazilianEDIStatus(order) {
+        switch (order.l10n_br_last_avatax_status) {
             case "accepted":
                 return _t("Accepted");
             case "error":
-                return _t("Error");
+                return _t("Oh snap !");
             default:
                 return "";
         }

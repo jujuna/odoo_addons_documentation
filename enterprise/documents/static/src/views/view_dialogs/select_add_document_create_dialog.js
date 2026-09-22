@@ -1,25 +1,52 @@
 import { _t } from "@web/core/l10n/translation";
 import { omit } from "@web/core/utils/objects";
 
+import { session } from "@web/session";
 import { useService } from "@web/core/utils/hooks";
-import { SelectCreateDialog } from "@web/views/view_dialogs/select_create_dialog";
+import {
+    SelectCreateDialog,
+    selectCreateDialogProps,
+} from "@web/views/view_dialogs/select_create_dialog";
+import { useProps, proxy, signal, t, useSubEnv } from "@odoo/owl";
+
+export const selectAddDocumentCreateDialogProps = {
+    ...selectCreateDialogProps,
+    chatterParams: t.object(),
+    resModel: t.string(),
+    title: t.string(),
+    domain: t.array().optional(),
+    context: t.object().optional(),
+};
 
 export class SelectAddDocumentCreateDialog extends SelectCreateDialog {
     static template = "documents.SelectAddDocumentCreateDialog";
-    static props = {
-        ...SelectCreateDialog.props,
-        chatterParams: { type: Object },
-        resModel: { type: String },
-        title: { type: String },
-        domain: { type: Array, optional: true },
-        context: { type: Object, optional: true },
-    };
+    props = useProps(selectAddDocumentCreateDialogProps);
+
+    viewRef = signal.ref();
 
     setup() {
         super.setup();
         this.orm = useService("orm");
         this.store = useService("mail.store");
         this.notification = useService("notification");
+        this.viewState = proxy({
+            type: "kanban",
+        });
+        const { viewState } = this;
+        useSubEnv({
+            config: {
+                ...this.env.config,
+                viewSwitcherEntries: ["kanban", "list"].map((type) => ({
+                    type,
+                    name: session.view_info[type].display_name,
+                    icon: session.view_info[type].icon,
+                    get active() {
+                        return viewState.type === type;
+                    },
+                })),
+                switchView: (type) => this.switchView(type),
+            },
+        });
 
         const { thread = {}, model, resId } = this.props.chatterParams || this.props;
         this.model = thread.model ?? model;
@@ -27,13 +54,29 @@ export class SelectAddDocumentCreateDialog extends SelectCreateDialog {
     }
 
     get viewProps() {
-        // We force list view to be used in the dialog (even for smaller screens)
         const baseProps = super.viewProps;
+        const { type, folderId } = this.viewState;
+        const initFolderId = isNaN(folderId) ? folderId || false : Number(folderId);
+        if (this.viewContext?.documents_init_folder_id !== initFolderId) {
+            this.viewContext = {
+                ...baseProps.context,
+                documents_init_folder_id: initFolderId,
+            };
+        }
         return {
             ...omit(baseProps, "forceGlobalClick", "display"),
-            type: "list",
+            type,
+            context: this.viewContext,
             allowSelectors: true,
+            ...(type === "kanban" ? { forceGlobalClick: true } : {}),
         };
+    }
+
+    switchView(type) {
+        this.viewState.folderId = this.viewRef()
+            ?.querySelector(".o_search_panel_category_value_header.active")
+            ?.closest("[data-value-id]")?.dataset.valueId;
+        this.viewState.type = type;
     }
 
     get addDocumentsAttachmentMethod() {
@@ -80,7 +123,8 @@ export class SelectAddDocumentCreateDialog extends SelectCreateDialog {
             const shareLinks = response
                 .map(({ display_name, access_url }) => `${display_name}: ${access_url}`)
                 .join("\n");
-            this.props.chatterParams.composer.composerText += `\n${shareLinks}`;
+            const prefix = this.props.chatterParams.composer.composerText ? "\n" : "";
+            this.props.chatterParams.composer.composerText += `${prefix}${shareLinks}`;
         }
         this.notification.add(_t("Link(s) pasted!"), { type: "success" });
         this.props.close();
@@ -113,10 +157,20 @@ export class SelectAddDocumentCreateDialog extends SelectCreateDialog {
         const composer = this.props.chatterParams?.composer || thread.composer;
 
         const attachmentIds = [];
-        for (const { name, ...attachmentRecord } of processedAttachments) {
-            const extension = name.slice(Math.max(0, name.lastIndexOf(".") + 1));
-            composer.attachments.push({ name, extension, ...attachmentRecord });
-            attachmentIds.push(attachmentRecord.id);
+        for (const attachmentRecord of processedAttachments) {
+            // Pick what the composer shows, as the media info is built for the media dialog.
+            const { checksum, id, mimetype, name, type, url } = attachmentRecord;
+            composer.attachments.push({
+                checksum,
+                extension: name.slice(Math.max(0, name.lastIndexOf(".") + 1)),
+                has_thumbnail: false,
+                id,
+                mimetype,
+                name,
+                type,
+                url,
+            });
+            attachmentIds.push(id);
         }
         this.props.chatterParams.saveRecordHandler?.(attachmentIds);
         this.props.close();
@@ -135,9 +189,27 @@ export class SelectAddDocumentCreateDialog extends SelectCreateDialog {
      * @param {Number} currentChatterRecordId - ID of the current chatter record.
      */
     addToThread(currentModel, currentChatterRecordId) {
-        return this.store.Thread.insert({
+        return this.store["mail.thread"].insert({
             model: currentModel,
             id: currentChatterRecordId,
         });
     }
+}
+
+export function getAddDocumentDialogProps() {
+    return {
+        resModel: "documents.document",
+        title: _t("Search: Documents"),
+        noCreate: true,
+        domain: [
+            ["type", "=", "binary"],
+            ["shortcut_document_id", "=", false],
+        ],
+        context: {
+            list_view_ref: "documents.documents_view_list_add_documents_attachment",
+            kanban_view_ref: "documents.documents_view_kanban_add_documents_attachment",
+            documents_search_panel_no_trash: true,
+            documents_view_secondary: true,
+        },
+    };
 }

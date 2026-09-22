@@ -3,12 +3,11 @@ import { patch } from "@web/core/utils/patch";
 
 patch(OpeningControlPopup.prototype, {
     async confirm() {
-        const { iotId, identifier } = this.pos.hardwareProxy.deviceControllers.display || {};
-        if (this.pos.config.iface_display_id && iotId && identifier) {
-            this.pos.iotHttp.action(iotId, identifier, {
-                action: "open",
-                access_token: this.pos.config.access_token,
-                pos_id: this.pos.config.id,
+        if (this.pos.config.iot_display_id) {
+            const { iot_id, identifier } = this.pos.config.iot_display_id;
+            this.pos.iotHttp.action(iot_id, identifier, {
+                action: "update_url",
+                url: this.pos.customerDisplayUrl,
             });
         }
         await super.confirm(...arguments);

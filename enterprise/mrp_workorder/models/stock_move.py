@@ -22,41 +22,14 @@ class StockMove(models.Model):
             else:
                 record.worksheet_document = None
 
-    @api.depends('workorder_id')
-    def _compute_manual_consumption(self):
-        super()._compute_manual_consumption()
-        for move in self:
-            if move.product_id in move.workorder_id.check_ids.component_id and \
-            move.product_id not in move.raw_material_production_id.workorder_ids.check_ids.component_id:
-                move.manual_consumption = True
-
-    def _should_bypass_set_qty_producing(self):
-        production = self.raw_material_production_id or self.production_id
-        if production and ((self.product_id in production.workorder_ids.quality_point_ids.component_id) or self.operation_id):
-            return True
-        return super()._should_bypass_set_qty_producing()
-
-    def _action_assign(self, force_qty=False):
-        res = super()._action_assign(force_qty=force_qty)
-        for workorder in self.raw_material_production_id.workorder_ids:
-            for check in workorder.check_ids:
-                if check.test_type not in ('register_consumed_materials', 'register_byproducts'):
-                    continue
-                check.write(workorder._defaults_from_move(check.move_id))
-        return res
-
     @api.ondelete(at_uninstall=False)
     def _unlink_quality_check(self):
         self.env['quality.check'].search([('move_id', 'in', self.ids)]).unlink()
 
-    def action_add_from_catalog_raw(self):
-        mo = self.env['mrp.production'].browse(self.env.context.get('order_id'))
-        return mo.with_context(child_field='move_raw_ids', from_shop_floor=self.env.context.get('from_shop_floor')).action_add_from_catalog()
-
     def action_pass(self, keep_hidden_lines=False):
         if not keep_hidden_lines:
             for record in self:
-                if record.has_tracking != 'none' and not record.picking_type_id.prefill_shop_floor_lots:
+                if record.has_tracking in ['lot', 'serial'] and not record.picking_type_id.prefill_shop_floor_lots:
                     # Remove any reserved smls that are hidden
                     record.move_line_ids.filtered(lambda ml: not ml.picked).unlink()
         for check in self.check_id:
@@ -73,7 +46,7 @@ class StockMove(models.Model):
 
     def get_quant_from_barcode(self, barcode):
         self.ensure_one()
-        if self.product_id.tracking == 'none':
+        if self.product_id.tracking not in ['lot', 'serial']:
             return False
         lot_id = self.env['stock.lot'].search([('name', '=', barcode), ('product_id', '=', self.product_id.id)], limit=1)
         if not lot_id:
@@ -86,19 +59,19 @@ class StockMove(models.Model):
                 'product_id': self.product_id.id,
                 'location_id': self.warehouse_id.lot_stock_id.id
             }]).id
-        return self.env['stock.quant'].search([('lot_id', '=', lot_id.id)], limit=1).id
+        return self.env['stock.quant'].search([('lot_id', '=', lot_id.id), ('location_id', 'child_of', self.location_id.id)], limit=1).id
 
     def _visible_quantity(self):
         self.ensure_one()
         if self.env.context.get('hide_unpicked'):
             return sum(
-                sml.product_uom_id._compute_quantity(sml.quantity, self.product_uom, rounding_method='HALF-UP')
+                sml.uom_id._compute_quantity(sml.quantity, self.uom_id, rounding_method='HALF-UP')
                 for sml in self.move_line_ids_picked
             )
         return super()._visible_quantity()
 
     def _add_from_quant(self, quant):
-        hide_unpicked = self.product_id.tracking != 'none' and not self.picking_type_prefill_shop_floor_lots
+        hide_unpicked = self.product_id.tracking in ['lot', 'serial'] and not self.picking_type_prefill_shop_floor_lots
         if hide_unpicked:
             move_line = next((sml for sml in self.move_line_ids if sml._takes_from_quant(quant) and not sml.picked), False)
             if move_line:  # Quant already has hidden sml -> make visible
@@ -111,7 +84,7 @@ class StockMove(models.Model):
             qty_to_take = 1
         move_line = next((sml for sml in self.move_line_ids if sml._takes_from_quant(quant)), False)
         if move_line:  # Quant already has visible sml -> increase existing sml's quantity
-            move_line.quantity += self.product_id.uom_id._compute_quantity(qty_to_take, self.product_uom)
+            move_line.quantity += self.product_id.uom_id._compute_quantity(qty_to_take, self.uom_id)
         else:  # No sml exists for quant -> make new sml
             move_line_vals = self._prepare_move_line_vals(
                 quantity=qty_to_take,
@@ -121,11 +94,21 @@ class StockMove(models.Model):
     def action_add_from_quant(self, quant_id):
         self._add_from_quant(self.env['stock.quant'].browse(quant_id))
 
-        if self.product_id.tracking != 'none' and not self.picking_type_prefill_shop_floor_lots:
+        if self.product_id.tracking in ['lot', 'serial'] and (not self.picking_type_prefill_shop_floor_lots or self in self.production_id.move_byproduct_ids):
             self.move_line_ids.filtered(lambda ml: not ml.picked).unlink()
 
         if self.check_id:
             self.check_id.action_next()
+
+    def _update_catalog_quantity(self, quantity, uom, *, from_shop_floor=False, **kwargs) -> float:
+        res = super()._update_catalog_quantity(
+            quantity, uom, from_shop_floor=from_shop_floor, **kwargs
+        )
+
+        if from_shop_floor:
+            self.quantity = quantity
+
+        return res
 
 
 class StockMoveLine(models.Model):

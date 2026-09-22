@@ -1,11 +1,15 @@
-.o_widget_knowledge_chatter_panel {
-    &:empty {
-        display: none,
+.o_widget_knowledge_side_panel {
+    .o_FormRenderer_chatterContainer {
+        li.nav-item {
+            display: none;
+        }
     }
-    li.nav-item {
-        display: none;
+
+    .o-mail-Chatter {
+        margin-top: -#{map-get($spacers, 2)};
     }
-    @include media-breakpoint-up(lg) {
-        min-width: 400px;
+
+    .o-mail-Chatter-top, .o-mail-Chatter-content {
+        padding: 0;
     }
 }

@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-10 13:16+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 01:15+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-master/"
 "account_iso20022/sl/>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -26,13 +26,38 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_iso20022
+#: model:ir.module.module,description:base.module_account_iso20022
+msgid ""
+"\n"
+"Generate XML payment orders as recommended by the SEPA and ISO20022 norms.\n"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "A bank account is not defined."
 msgstr "Bančni račun ni opredeljen."
+
+#. module: account_iso20022
+#: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__is_third_party
+#: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__is_third_party
+msgid "Account owned by someone else than the employee"
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "All payments in the batch must share the same SEPA pain version."
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "All payments in the batch must share the same payment method line."
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_batch_payment__iso20022_batch_booking
@@ -42,14 +67,20 @@ msgid ""
 msgstr ""
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03_austrian_004
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03_austrian_004
 msgid "Austrian"
 msgstr "avstrijski"
 
 #. module: account_iso20022
-#: model:ir.model,name:account_iso20022.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Postavka bančnega izpiska"
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__available_iso20022_priority
+msgid "Available Iso20022 Priority"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model,name:account_iso20022.model_res_partner_bank
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__bank_account_id
+msgid "Bank Account"
+msgstr ""
 
 #. module: account_iso20022
 #: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
@@ -68,8 +99,8 @@ msgstr "Nosilec bremena"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_company
-msgid "Companies"
-msgstr "Podjetja"
+msgid "Company"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_config_settings
@@ -115,14 +146,15 @@ msgid "Default Priority"
 msgstr "Privzeta prioriteta"
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__display_name
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_partner__display_name
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__display_name
 msgid "Display Name"
 msgstr "Prikazani naziv"
 
@@ -135,10 +167,10 @@ msgstr ""
 "%s nimajo države v svojem naslovu."
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__end_to_end_uuid
-#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__end_to_end_uuid
-msgid "End to End ID"
-msgstr "ID od konca do konca"
+#: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__third_party_beneficiary_id
+#: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__third_party_beneficiary_id
+msgid "Entity managing the third-party account"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -149,7 +181,12 @@ msgstr ""
 "Subjekt, ki dodeli identifikacijo (npr. KBE-BCO ali Finanzamt Muenchen IV)."
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03_de
+#: model:ir.module.module,summary:base.module_account_iso20022
+msgid "Export payments as SEPA Credit Transfer or ISO20022 files"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03_de
 msgid "German"
 msgstr "Nemščina"
 
@@ -176,14 +213,15 @@ msgid "Has Sepa Ct Payment Method"
 msgstr "Ima način plačila Sepa Ct"
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__id
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_partner__id
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__id
 msgid "ID"
 msgstr "ID"
 
@@ -206,8 +244,19 @@ msgstr "Identifikacija"
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_id
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_orgid_id
-msgid "Identification assigned by an institution (eg. VAT number)."
-msgstr "Identifikacija, ki jo dodeli institucija (npr. številka za DDV)."
+msgid "Identification assigned by an institution (eg. Tax ID)."
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "Invalid Partners"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__invalid_sct_partners_ids
+msgid "Invalid Sct Partners"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__payment_method_is_iso20022
@@ -215,6 +264,11 @@ msgstr "Identifikacija, ki jo dodeli institucija (npr. številka za DDV)."
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__is_iso20022
 msgid "Is Iso20022"
 msgstr "Je Iso20022"
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__is_sepa_ct_payment_method
+msgid "Is Sepa Ct Payment Method"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -248,6 +302,12 @@ msgid "NORM - Normal"
 msgstr "NORM - Normalno"
 
 #. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__partner_name
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__partner_name
+msgid "Name"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_initiating_party_name
 msgid ""
 "Name of the Creditor Reference Party. Usage Rule: Limited to 70 characters "
@@ -273,24 +333,19 @@ msgid "Partner %s has not bank account defined."
 msgstr "Partner %s nima opredeljenega bančnega računa."
 
 #. module: account_iso20022
-#: model:ir.model,name:account_iso20022.model_account_payment_method
-msgid "Payment Methods"
-msgstr "Načini plačila"
-
-#. module: account_iso20022
-#: model_terms:ir.ui.view,arch_db:account_iso20022.account_journal_dashboard_kanban_view_inherited
-msgid "Payment to send via SEPA"
-msgstr "Plačilo za pošiljanje prek SEPA"
-
-#. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_account_payment
-msgid "Payments"
-msgstr "Plačila"
+msgid "Payment"
+msgstr ""
 
 #. module: account_iso20022
-#: model_terms:ir.ui.view,arch_db:account_iso20022.account_journal_dashboard_kanban_view_inherited
-msgid "Payments to send via SEPA"
-msgstr "Plačila za pošiljanje prek SEPA"
+#: model:ir.model,name:account_iso20022.model_account_payment_method
+msgid "Payment Method"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model,name:account_iso20022.model_account_payment_method_line
+msgid "Payment Method Line"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -309,21 +364,25 @@ msgid "SCT Batch Booking"
 msgstr "SCT Paketna rezervacija"
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_account_payment_search_inherit_account_sepa_pain_09
+msgid "SEPA / ISO20022"
+msgstr ""
+
+#. module: account_iso20022
 #: model:account.payment.method,name:account_iso20022.account_payment_method_sepa_ct
 msgid "SEPA Credit Transfer"
 msgstr "SEPA nakazilo"
+
+#. module: account_iso20022
+#: model:ir.module.module,shortdesc:base.module_account_iso20022
+msgid "SEPA Credit Transfer / ISO20022"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_journal_dashboard.py:0
 msgid "SEPA Credit Transfers to Send"
 msgstr "Kreditna nakazila SEPA za pošiljanje"
-
-#. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_journal__sepa_pain_version
-#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
-msgid "SEPA XML Format"
-msgstr "SEPA XML Format"
 
 #. module: account_iso20022
 #. odoo-python
@@ -341,8 +400,8 @@ msgstr ""
 "valuti."
 
 #. module: account_iso20022
-#: model:ir.model.fields,help:account_iso20022.field_account_journal__sepa_pain_version
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__sepa_pain_version
+#: model:ir.model.fields,help:account_iso20022.field_account_payment_method_line__sepa_pain_version
 msgid ""
 "SEPA version to use to generate Credit Transfer XML files from this journal"
 msgstr ""
@@ -372,16 +431,6 @@ msgstr "Souporaba"
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Some payments are above the maximum amount allowed."
 msgstr "Nekatera plačila presegajo najvišji dovoljeni znesek."
-
-#. module: account_iso20022
-#. odoo-python
-#: code:addons/account_iso20022/models/account_journal_sepa_ct.py:0
-msgid ""
-"Some payments are missing a value for 'UETR', required for the SEPA "
-"Pain.001.001.09 format."
-msgstr ""
-"Pri nekaterih plačilih manjka vrednost za »UETR«, ki je potrebna za format "
-"SEPA Pain.001.001.09."
 
 #. module: account_iso20022
 #. odoo-python
@@ -440,20 +489,6 @@ msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
-#: code:addons/account_iso20022/models/res_partner.py:0
-msgid ""
-"The LEI number must contain 20 characters and match the following "
-"structure:\n"
-"- 18 alphanumeric characters with capital letters\n"
-"- 2 digits in the end\n"
-msgstr ""
-"Identifikator pravne osebe (IPO) mora vsebovati 20 znakov in ustrezati "
-"naslednji strukturi:\n"
-"- 18 alfanumeričnih znakov z velikimi črkami\n"
-"- 2 števki na koncu\n"
-
-#. module: account_iso20022
-#. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
 "The Name Identification and Issuer details are required to proceed. Please "
@@ -474,6 +509,11 @@ msgstr ""
 "Za uporabo funkcij SEPA je potreben veljaven račun IBAN."
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "The country or city of"
+msgstr ""
+
+#. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
@@ -492,6 +532,18 @@ msgid ""
 msgstr ""
 "Dnevnik '%s' za plačilo prek SEPA potrebuje pravilen IBAN račun. Najprej ga "
 "konfigurirajte."
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__is_third_party
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__is_third_party
+msgid "Third-Party Account"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__third_party_beneficiary_id
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__third_party_beneficiary_id
+msgid "Third-Party Beneficiary"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -522,12 +574,6 @@ msgid "URGP - Critical urgency"
 msgstr "Nujno - Nujna nujnost"
 
 #. module: account_iso20022
-#: model:ir.model.fields,help:account_iso20022.field_account_bank_statement_line__end_to_end_uuid
-#: model:ir.model.fields,help:account_iso20022.field_account_payment__end_to_end_uuid
-msgid "Unique end-to-end assigned by the initiating party"
-msgstr ""
-
-#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__iso20022_uetr
 msgid "Unique end-to-end transaction reference"
 msgstr "Edinstvena referenca transakcije od začetka do konca"
@@ -555,10 +601,21 @@ msgstr ""
 "Omejeno na 70 znakov."
 
 #. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__sepa_pain_version
+msgid "XML Version"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_initiating_party_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__iso20022_initiating_party_name
 msgid "Your Company Name"
 msgstr "Naziv vašega podjetja"
+
+#. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "is not set, which could cause the file to be refused by the bank."
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -567,12 +624,12 @@ msgid "is_sent"
 msgstr "je_poslano"
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03
 msgid "pain.001.001.03"
 msgstr "pain.001.001.03"
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_09
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_09
 msgid "pain.001.001.09"
 msgstr "pain.001.001.09"
 
@@ -589,6 +646,11 @@ msgid "state"
 msgstr "država"
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "these partners"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_journal__iso20022_default_priority
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__iso20022_priority
 msgid ""
@@ -602,18 +664,8 @@ msgstr ""
 "• NUJNO: Kritično, zahteva takojšnjo obdelavo.\n"
 "• SVDA: Plačila morajo biti poravnana isti dan kot oddaja."
 
-#~ msgid "Generic"
-#~ msgstr "Splošno"
+#~ msgid "SEPA XML Format"
+#~ msgstr "SEPA XML Format"
 
-#~ msgid "Register Payment"
-#~ msgstr "Zabeleži plačilo"
-
-#~ msgid "Request batch booking from the bank for the related bank statements."
-#~ msgstr "Od banke zahtevajte paketno rezervacijo za povezane bančne izpiske."
-
-#~ msgid ""
-#~ "Some payments are not made on an IBAN recipient account. This batch might "
-#~ "not be accepted by certain banks because of that."
-#~ msgstr ""
-#~ "Nekatera plačila niso pripravljena na račun prejemnika IBAN. Nekatere "
-#~ "banke zaradi tega, paketa morda ne bodo sprejele."
+#~ msgid "Identification assigned by an institution (eg. VAT number)."
+#~ msgstr "Identifikacija, ki jo dodeli institucija (npr. številka za DDV)."

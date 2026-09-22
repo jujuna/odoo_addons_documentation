@@ -5,7 +5,6 @@
         <field name="name">Tax Report (Mod 347)</field>
         <field name="name@es">Informe de impuestos (Mod 347)</field>
         <field name="sequence">347</field>
-        <field name="filter_analytic" eval="False"/>
         <field name="filter_date_range" eval="True"/>
         <field name="filter_period_comparison" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
@@ -34,14 +33,13 @@
                         <field name="name">Total number of persons and entities</field>
                         <field name="name@es">Número total de personas y entitades</field>
                         <field name="code">aeat_mod_347_statistics_operations_count</field>
-                        <field name="groupby">partner_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="sequence" eval="2"/>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="mod_347_statistics_operations_count_balance" model="account.report.expression">
                                 <field name="label">balance</field>
                                 <field name="engine">custom</field>
-                                <field name="formula">_report_custom_engine_threshold_all_operations</field>
+                                <field name="formula">_report_engine_threshold_all_operations</field>
                                 <field name="subformula">count_rows</field>
                                 <field name="figure_type">integer</field>
                                 <field name="auditable" eval="True"/>
@@ -60,7 +58,7 @@
                     <record id="mod_347_operations_title_balance" model="account.report.expression">
                         <field name="label">balance</field>
                         <field name="engine">aggregation</field>
-                        <field name="formula">aeat_mod_347_operations_insurance_bought.balance + aeat_mod_347_operations_regular_sold.balance + aeat_mod_347_operations_regular_bought.balance</field>
+                        <field name="formula">aeat_mod_347_operations_insurance_bought.balance + aeat_mod_347_operations_insurance_sold.balance + aeat_mod_347_operations_regular_sold.balance + aeat_mod_347_operations_regular_bought.balance</field>
                     </record>
                 </field>
                 <field name="children_ids">
@@ -71,18 +69,33 @@
                         <field name="sequence" eval="9"/>
                         <field name="children_ids">
                             <record id="mod_347_operations_insurance_bought" model="account.report.line">
-                                <field name="name">B - Sales of goods and services greater than 3.005,06 €</field>
-                                <field name="name@es">B - Entregas de bienes y prestaciones de servicios superiores a 3 005,06 €</field>
+                                <field name="name">A - Purchases of goods and services greater than 3,005.06 €</field>
+                                <field name="name@es">A - Adquisiciones de bienes y servicios superiores a 3 005,06 €</field>
                                 <field name="code">aeat_mod_347_operations_insurance_bought</field>
                                 <field name="groupby">partner_id</field>
                                 <field name="sequence" eval="10"/>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="mod_347_operations_insurance_bought_balance" model="account.report.expression">
                                         <field name="label">balance</field>
                                         <field name="engine">custom</field>
-                                        <field name="formula">_report_custom_engine_threshold_insurance_bought</field>
+                                        <field name="formula">_report_engine_threshold_insurance_bought</field>
                                         <field name="subformula">-sum</field>
+                                        <field name="auditable" eval="True"/>
+                                    </record>
+                                </field>
+                            </record>
+                            <record id="mod_347_operations_insurance_sold" model="account.report.line">
+                                <field name="name">B - Sales of goods and services greater than 3,005.06 €</field>
+                                <field name="name@es">B - Entregas de bienes y prestaciones de servicios superiores a 3 005,06 €</field>
+                                <field name="code">aeat_mod_347_operations_insurance_sold</field>
+                                <field name="groupby">partner_id</field>
+                                <field name="sequence" eval="10"/>
+                                <field name="expression_ids">
+                                    <record id="mod_347_operations_insurance_sold_balance" model="account.report.expression">
+                                        <field name="label">balance</field>
+                                        <field name="engine">custom</field>
+                                        <field name="formula">_report_engine_threshold_insurance_sold</field>
+                                        <field name="subformula">sum</field>
                                         <field name="auditable" eval="True"/>
                                     </record>
                                 </field>
@@ -96,34 +109,32 @@
                         <field name="sequence" eval="11"/>
                         <field name="children_ids">
                             <record id="mod_347_operations_regular_bought" model="account.report.line">
-                                <field name="name">A - Purchases of goods and services greater than 3.005,06 €</field>
+                                <field name="name">A - Purchases of goods and services greater than 3,005.06 €</field>
                                 <field name="name@es">A - Adquisiciones de bienes y servicios superiores a 3 005,06 €</field>
                                 <field name="code">aeat_mod_347_operations_regular_bought</field>
                                 <field name="groupby">partner_id</field>
                                 <field name="sequence" eval="12"/>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="mod_347_operations_regular_bought_balance" model="account.report.expression">
                                         <field name="label">balance</field>
                                         <field name="engine">custom</field>
-                                        <field name="formula">_report_custom_engine_threshold_regular_bought</field>
+                                        <field name="formula">_report_engine_threshold_regular_bought</field>
                                         <field name="subformula">-sum</field>
                                         <field name="auditable" eval="True"/>
                                     </record>
                                 </field>
                             </record>
                             <record id="mod_347_operations_regular_sold" model="account.report.line">
-                                <field name="name">B - Sales of goods and services greater than 3.005,06 €</field>
+                                <field name="name">B - Sales of goods and services greater than 3,005.06 €</field>
                                 <field name="name@es">B - Entregas de bienes y prestaciones de servicios superiores a 3 005,06 €</field>
                                 <field name="code">aeat_mod_347_operations_regular_sold</field>
                                 <field name="groupby">partner_id</field>
                                 <field name="sequence" eval="13"/>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="mod_347_operations_regular_sold_balance" model="account.report.expression">
                                         <field name="label">balance</field>
                                         <field name="engine">custom</field>
-                                        <field name="formula">_report_custom_engine_threshold_regular_sold</field>
+                                        <field name="formula">_report_engine_threshold_regular_sold</field>
                                         <field name="subformula">sum</field>
                                         <field name="auditable" eval="True"/>
                                     </record>

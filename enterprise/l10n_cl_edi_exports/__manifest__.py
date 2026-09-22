@@ -3,7 +3,6 @@
 {
     "name": """Electronic Exports of Goods for Chile""",
     'countries': ['cl'],
-    'version': '1.0',
     'category': 'Accounting/Localizations/EDI',
     'description': '''
 Even when the quantity of packages is apparently only inherent to stock application, we need a field for this
@@ -23,9 +22,8 @@ complex logic.
             'views/l10n_cl_customs_port_view.xml',
             'views/report_invoice.xml',
             'template/dte_template.xml',
-            'security/ir.model.access.csv',
             'data/account_incoterm_data.xml',
             'data/l10n_cl.customs_port.csv',
+        'security/ir.access.csv',
     ],
-    'installable': True,
 }

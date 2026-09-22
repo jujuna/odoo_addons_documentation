@@ -5,81 +5,69 @@ import { stepUtils } from "@web_tour/tour_utils";
 import { markup } from "@odoo/owl";
 
 registry.category("web_tour.tours").add("timesheet_tour", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
             trigger: '.o_app[data-menu-xmlid="hr_timesheet.timesheet_menu_root"]',
             content: markup(
-                _t("Track the <b>time spent</b> on your projects. <i>It starts here.</i>")
+                _t(
+                    "<b>Start managing your timesheets</b> <br/> <i>Everything you track begins here.</i>"
+                )
             ),
             tooltipPosition: "bottom",
             run: "click",
         },
         {
-            trigger: ".btn_start_timer",
-            content: markup(_t("Launch the <b>timer</b> to start a new activity.")),
+            trigger:
+                ".o_grid_view .o_grid_row:not(.o_grid_section).o_grid_cell_today, .o_grid_component_timesheet_uom",
+            content: markup(
+                _t(
+                    "<b>Add time in the Grid view</b> <br/> <i>Click a cell to enter hours. Press Tab or Enter to navigate easily.</i>"
+                )
+            ),
             tooltipPosition: "bottom",
             run: "click",
         },
         {
-            trigger: "div[name=name] input",
+            id: "open_timesheet_systray",
+            trigger: "div.o_menu_systray button.o-dropdown i[data-icon='play_circle']",
             content: markup(
                 _t(
-                    "Describe your activity <i>(e.g. sent an e-mail, meeting with the customer...)</i>."
+                    "<b>Use the timer to track your activities</b> <br/> <i>Start the timer, then log a timesheet when your activity ends. It restarts automatically for the next task.</i>"
+                )
+            ),
+            tooltipPosition: "bottom",
+            run: "click",
+        },
+        {
+            trigger: "div[name=description_field]",
+            content: markup(
+                _t(
+                    '<b>Add a description</b> <br/> <i>Briefly summarize your activity, e.g., "Metting with the customer."</i>'
                 )
             ),
             tooltipPosition: "bottom",
             run: "edit My Activity",
         },
         {
-            trigger: "div[name=project_id] .o_field_many2one_selection",
-            content: markup(_t("Select the <b>project</b> on which you are working.")),
-            tooltipPosition: "right",
-            run: "click",
-        },
-        {
-            trigger: ".o_stop_timer_button",
+            trigger: "div[name=project_field]",
             content: markup(
                 _t(
-                    "Stop the <b>timer</b> when you are done. <i>Tip: hit <b>[Enter]</b> in the description to automatically log your activity.</i>"
-                )
-            ),
-            tooltipPosition: "bottom",
-            run: "click",
-        },
-        {
-            trigger: ".btn_timer_line",
-            content: markup(
-                _t(
-                    "Launch the <b>timer</b> for this project by pressing the <b>[a] key</b>. Easily switch from one project to another by using those keys. <i>Tip: you can also directly add 15 minutes to this project by hitting the <b>shift + [A] keys</b>.</i>"
+                    "<b>Select a project</b> <br/> <i>Choose the relevant project, such as a customer or team project.</i>"
                 )
             ),
             tooltipPosition: "right",
             run: "click",
         },
         {
-            trigger:
-                ".o_grid_view .o_grid_row:not(.o_grid_section).o_grid_cell_today, .o_grid_component_timesheet_uom",
-            content: _t("Click on the cell to set the number of hours you spent on this project."),
-            tooltipPosition: "bottom",
-            run: "click",
-        },
-        {
-            trigger: ".o_grid_view .o_grid_cell",
-            content: _t("Click on the cell to set the number of hours you spent on this project."),
-            tooltipPosition: "bottom",
-            run: "click",
-        },
-        {
-            trigger: ".o_grid_view .o_grid_cell",
+            trigger: "button[name=save_btn]",
             content: markup(
                 _t(
-                    "Set the number of hours you spent on this project (e.g. 1:30 or 1.5). <i>Tip: use the tab keys to easily navigate from one cell to another.</i>"
+                    "<b>Create the timesheet</b> <br/> <i>Once saved, the timer automatically restarts for your next activity.</i>"
                 )
             ),
-            tooltipPosition: "bottom",
-            run: "edit 1:30",
+            tooltipPosition: "right",
+            run: "click",
         },
     ],
 });

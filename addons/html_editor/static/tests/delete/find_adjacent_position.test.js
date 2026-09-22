@@ -105,12 +105,15 @@ describe("findAdjacentPosition method", () => {
             test("Should find position before filebox", async () => {
                 const content = `<div>\ufeff<span contenteditable="false" class="o_file_box"></span>\ufeff[]</div>`;
                 const { editor, el } = await setupEditor(content, {
-                    config: { Plugins: [...CORE_PLUGINS, FilePlugin] },
+                    config: {
+                        basePlugins: CORE_PLUGINS,
+                        includePlugins: [FilePlugin],
+                    },
                 });
                 const [node, offset] = findAdjacentPosition(editor, "backward");
                 setSelection({ anchorNode: node, anchorOffset: offset });
                 expect(getContent(el)).toBe(
-                    `<div class="o-paragraph">\ufeff[]<span contenteditable="false" class="o_file_box"></span>\ufeff<br></div>`
+                    `<div class="o-paragraph">\ufeff[]<span contenteditable="false" class="o_file_box"></span>\ufeff</div>`
                 );
             });
         });

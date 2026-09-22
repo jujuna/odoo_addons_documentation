@@ -3,26 +3,30 @@ import {
     Many2ManyTagsField,
     many2ManyTagsField,
 } from "@web/views/fields/many2many_tags/many2many_tags_field";
-import { Many2XAutocomplete } from "@web/views/fields/relational_utils";
+import { Many2XAutocomplete, many2XAutocompleteProps } from "@web/views/fields/relational_utils";
 import { deserializeDateTime } from "@web/core/l10n/dates";
+import { useProps, t } from "@odoo/owl";
 
 export class FieldMany2ManyTagsResourceMany2XAutocomplete extends Many2XAutocomplete {
     static template = "pos_restaurant_appointment.FieldMany2ManyTagsResourceMany2XAutocomplete";
     static components = {
         ...Many2XAutocomplete.components,
     };
-    static props = {
-        ...Many2XAutocomplete.props,
-        event_start_time: { type: Object, optional: true },
-        event_end_time: { type: Object, optional: true },
-    };
+    props = useProps({
+        ...many2XAutocompleteProps,
+        event_start_time: t.or([t.object(), t.boolean()]).optional(),
+        event_end_time: t.or([t.object(), t.boolean()]).optional(),
+    });
 
     getPeopleCount(record) {
         if (record.is_used) {
-            const localStartTime = deserializeDateTime(record.is_used.event_start);
-            const localEndTime = deserializeDateTime(record.is_used.event_stop);
             const eventStart = this.props.event_start_time;
             const eventEnd = this.props.event_end_time;
+            if (!eventStart || !eventEnd) {
+                return "";
+            }
+            const localStartTime = deserializeDateTime(record.is_used.event_start);
+            const localEndTime = deserializeDateTime(record.is_used.event_stop);
             return localStartTime < eventEnd && localEndTime > eventStart
                 ? record.is_used.capacity
                 : "";

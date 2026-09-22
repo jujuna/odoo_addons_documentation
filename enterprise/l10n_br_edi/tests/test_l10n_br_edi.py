@@ -13,15 +13,19 @@ from odoo.addons.l10n_br_edi.tests.data_invoice_1 import (
     invoice_1_submit_fail_response,
     invoice_1_cancel_success_response,
     invoice_1_correct_success_response,
-    invoice_1_correct_fail_response, invoice_1_cancel_fail_response,
+    invoice_1_cancel_fail_response,
+    invoice_1_submit_fail_response_302,
 )
 from .mocked_successful_status_response import RESPONSE as SUCCESSFUL_STATUS_RESPONSE
-from odoo.exceptions import UserError, ValidationError, AccessError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import tagged
+from odoo import Command
 
 
 @tagged("post_install_l10n", "post_install", "-at_install")
 class TestL10nBREDICommon(TestAccountMoveSendCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('br')
     def setUpClass(cls):
@@ -52,6 +56,7 @@ class TestL10nBREDICommon(TestAccountMoveSendCommon):
                 "state_id": cls.env.ref("base.state_br_rj").id,
                 "zip": "20071-001",
                 "vat": "51494569013170",
+                "country_id": cls.env.ref("base.br").id,
             }
         )
 
@@ -104,6 +109,8 @@ class TestL10nBREDICommon(TestAccountMoveSendCommon):
             return move
 
         cls.invoice = create_move({"move_type": "out_invoice"})
+        cls.invoice_a = create_move({"move_type": "out_invoice"})
+        cls.invoice_b = create_move({"move_type": "out_invoice"})
         cls.bill = create_move({"move_type": "in_invoice", "l10n_latam_document_number": "1"})
 
     @classmethod
@@ -132,6 +139,8 @@ class TestL10nBREDICommon(TestAccountMoveSendCommon):
 
 @tagged("post_install_l10n", "post_install", "-at_install")
 class TestL10nBREDI(TestL10nBREDICommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_l10n_br_edi_generate_and_send_single_wizard(self):
         single_wizard = self.env['account.move.send.wizard'].create({'move_id': self.invoice.id})
@@ -164,12 +173,12 @@ class TestL10nBREDI(TestL10nBREDICommon):
 
         self.assertEqual(self.invoice.l10n_br_last_edi_status, "accepted", "The EDI document should be accepted.")
         self.assertEqual(
-            self.invoice.invoice_pdf_report_file.decode(),
+            self.invoice.invoice_pdf_report_file.to_base64(),
             invoice_1_submit_success_response["pdf"]["base64"],
             "PDF data should have been saved on the EDI document.",
         )
         self.assertEqual(
-            self.invoice.l10n_br_edi_xml_attachment_id.datas.decode(),
+            self.invoice.l10n_br_edi_xml_attachment_id.raw.to_base64(),
             invoice_1_submit_success_response["xml"]["base64"],
             "XML data should have been saved on the EDI document.",
         )
@@ -178,14 +187,18 @@ class TestL10nBREDI(TestL10nBREDICommon):
             invoice_1_submit_success_response["key"],
             "The access key should have been saved.",
         )
-        self.assertFalse(self.invoice.l10n_br_edi_avatax_data, "Saved Avatax tax data should have been removed.")
 
     def test_invoice_1_fail(self):
         single_wizard = self.env['account.move.send.wizard'].create({'move_id': self.invoice.id})
         with self.with_patched_account_move(
             "_l10n_br_iap_request", invoice_1_submit_fail_response
-        ), self.assertRaisesRegex(UserError, re.escape(invoice_1_submit_fail_response["error"]["message"])):
-            single_wizard.action_send_and_print()
+        ):
+            # We don't want to use assertRaisesRegex because we don't want to rollback (simulate the commit)
+            try:
+                single_wizard.action_send_and_print()
+                self.fail("Should raise a UserError before")
+            except UserError as e:
+                self.assertIn(invoice_1_submit_fail_response["error"]["message"], str(e))
 
         self.assertEqual(self.invoice.l10n_br_last_edi_status, "error", "The EDI document should be in error.")
         self.assertFalse(
@@ -197,6 +210,13 @@ class TestL10nBREDI(TestL10nBREDICommon):
             "There should be no XML data on the EDI document.",
         )
         self.assertTrue(self.invoice.l10n_br_edi_avatax_data, "Saved Avatax tax data should have been kept.")
+
+    def test_invoice_1_fail_without_explicit_error(self):
+        single_wizard = self.env['account.move.send.wizard'].create({'move_id': self.invoice.id})
+        with self.with_patched_account_move(
+            "_l10n_br_iap_request", invoice_1_submit_fail_response_302
+        ), self.assertRaisesRegex(UserError, re.escape(invoice_1_submit_fail_response_302["status"]["desc"])):
+            single_wizard.action_send_and_print()
 
     def test_invoice_1_iap_errors(self):
         """Test that we properly catch errors from IAP. We should never raise, because it would break the asynchronous
@@ -210,7 +230,7 @@ class TestL10nBREDI(TestL10nBREDICommon):
             ), self.assertRaisesRegex(UserError, "Errors when submitting the e-invoice:"):
                 yield
         single_wizard = self.env['account.move.send.wizard'].create({'move_id': self.invoice.id})
-        for Exc in (UserError, AccessError, InsufficientCreditError):
+        for Exc in (UserError, InsufficientCreditError):
             with wrap_iap(Exc("test")):
                 try:
                     single_wizard.action_send_and_print()
@@ -282,14 +302,10 @@ class TestL10nBREDI(TestL10nBREDICommon):
 
     def test_update_correction_error(self):
         # This will fail because the reason must be >=15 characters according to Avalara.
-        wizard = self.env["l10n_br_edi.invoice.update"].create(
-            {"move_id": self.invoice.id, "mode": "correct", "reason": "Too short."}
-        )
-
-        with self.with_patched_account_move(
-            "_l10n_br_iap_correct_invoice_goods", invoice_1_correct_fail_response
-        ), self.assertRaisesRegex(ValidationError, re.escape(invoice_1_correct_fail_response["status"]["desc"])):
-            wizard.action_submit()
+        with self.assertRaisesRegex(ValidationError, "at least 15 characters"):
+            self.env["l10n_br_edi.invoice.update"].create(
+                {"move_id": self.invoice.id, "mode": "correct", "reason": "Too short."}
+            )
 
     def test_new_invoice_attachments(self):
         """Test that newly set invoice PDFs or XMLs are reflected in the fields."""
@@ -344,9 +360,84 @@ class TestL10nBREDI(TestL10nBREDICommon):
         self.assertEqual(payload["lines"][0]["cfop"], 6107, "Should be the standard CFOP set on the invoice.")
         self.assertEqual(payload["lines"][1]["cfop"], 6108, "Should be the overridden CFOP set on the operation type on the line.")
 
+    def test_compute_l10n_br_tax_details(self):
+        """ Verify the tax details on amls are correctly computed"""
+        line = self.invoice.invoice_line_ids[0]
+        self.assertEqual(
+            line.l10n_br_tax_details,
+            "ICMS Incl. - 12% - R$ 35.4 - CST 00 - BC R$ 295 \n",
+            "Should be formatted with the correct values"
+        )
+
+        # cst is optional in the response, let's remove it to test
+        data = self.invoice.l10n_br_edi_avatax_data
+        for line_data in data["lines"]:
+            for detail in line_data["taxDetails"]:
+                detail.pop("cst", None)
+        self.invoice.l10n_br_edi_avatax_data = data
+
+        self.assertEqual(
+            line.l10n_br_tax_details,
+            "ICMS Incl. - 12% - R$ 35.4 - BC R$ 295 \n",
+        )
+
+    def test_l10n_br_edi_download_xml_in_batch(self):
+        invoices = (self.invoice | self.invoice_a | self.invoice_b)
+        # None of the invoices are send, we shouldn't have any files
+        legal_documents_before_sending = []
+        for invoice in invoices:
+            legal_documents_before_sending.extend(invoice._get_invoice_legal_documents('nfe') or [])
+        self.assertEqual(len(legal_documents_before_sending), 0)
+        # Now we will send the 3 invoices, so we should have 1 file per invoice
+        legal_documents_after_sending = []
+        for invoice in invoices:
+            invoice._l10n_br_edi_attachments_from_response(invoice_1_submit_success_response)
+            invoice.l10n_br_last_edi_status = 'accepted'
+            legal_documents_after_sending.extend(invoice._get_invoice_legal_documents('nfe') or [])
+        self.assertEqual([doc['filename'] for doc in legal_documents_after_sending], ['NFe 00000001_edi.xml', 'NFe 00000002_edi.xml', 'NFe 00000003_edi.xml'])
+
+    def test_override_the_cst_code_and_benefit_code(self):
+        # tax_name → cst, benefit, tax record
+        tax_data = {
+            'icms': {'cst': '41', 'benefit': '123'},
+            'cofins': {'cst': '51', 'benefit': '456'},
+            'ipi': {'cst': '61', 'benefit': '789'},
+        }
+        for name, values in tax_data.items():
+            values['tax'] = self.env['account.tax'].create({
+                'name': name.upper(),
+                'amount_type': 'percent',
+                'amount': 5.0,
+                'l10n_br_avatax_code': name,
+            })
+        operation_type = self.env['l10n_br.operation.type'].create({
+            'name': 'Test OP Type',
+            'technical_name': 'test_op_type',
+            'operation_tax_override_ids': [
+                Command.create({
+                    'tax_id': values['tax'].id,
+                    'cst_code': values['cst'],
+                    'benefit_code': values['benefit'],
+                })
+                for values in tax_data.values()
+            ]
+        })
+
+        move = self.invoice
+        move.l10n_br_goods_operation_type_id = operation_type
+        payload = move._l10n_br_prepare_invoice_payload()
+
+        for tax_detail in payload['lines'][0]['taxDetails']:
+            values = tax_data.get(tax_detail['taxType'])
+            if values:
+                self.assertEqual(tax_detail['cst'], values['cst'])
+                self.assertEqual(tax_detail['exemptionCode'], values['benefit'])
+
 
 @tagged("post_install_l10n", "post_install", "-at_install")
 class TestL10nBREDIServices(TestL10nBREDICommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_l10n_br_edi_informative_taxes(self):
         rio_city = self.env.ref("l10n_br.city_br_002")
@@ -369,13 +460,18 @@ class TestL10nBREDIServices(TestL10nBREDICommon):
         with self.with_patched_account_move("_l10n_br_iap_request", invoice_1_submit_success_response):
             single_wizard.action_send_and_print()
 
-        informative_taxes = """Informative taxes:.*\
-subtotalTaxable: 435, tax: 0, taxType: cofins.*\
-subtotalTaxable: 435, tax: 0, taxType: pis.*\
-subtotalTaxable: 435, tax: 58.51, taxType: aproxtribFed.*\
-subtotalTaxable: 435, tax: 82.65, taxType: aproxtribState.*\
-subtotalTaxable: 435, tax: 0, taxType: ipi"""
-        self.assertRegex(self.invoice.message_ids[-2].body, informative_taxes)
+        informative_taxes_re = re.compile(
+            r"Informative taxes:.*"
+            r"subtotalTaxable: 435, tax: 0, taxType: cofins.*"
+            r"subtotalTaxable: 435, tax: 0, taxType: pis.*"
+            r"subtotalTaxable: 435, tax: 58.51, taxType: aproxtribFed.*"
+            r"subtotalTaxable: 435, tax: 82.65, taxType: aproxtribState.*"
+            r"subtotalTaxable: 435, tax: 0, taxType: ipi"
+        )
+        self.assertTrue(any(
+            informative_taxes_re.search(str(message.body))
+            for message in self.invoice.message_ids
+        ), "Informative taxes message not found in chatter.")
 
     def test_l10n_br_edi_service_status_successful(self):
         self.assertFalse(self.invoice.invoice_pdf_report_id, "PDF should not yet be generated.")

@@ -21,7 +21,7 @@ class SaleOrder(models.Model):
         for so in self:
             if so.commercial_partner_id.grade_id != so.assigned_grade_id:
                 continue
-            partner_id = so.commercial_partner_id
+            partner_id = so.commercial_partner_id.sudo()
             partner_id.grade_id = False
             if partner_id.specific_property_product_pricelist == so.assigned_grade_id.default_pricelist_id:
                 partner_id.specific_property_product_pricelist = False

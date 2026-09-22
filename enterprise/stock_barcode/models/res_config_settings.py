@@ -14,16 +14,27 @@ class ResConfigSettings(models.TransientModel):
     barcode_max_time_between_keys_in_ms = fields.Integer(
         "Max time between each key",
         help="Maximum delay between each key in ms (100 ms by default)",
-        default=100,
+        default=150,
         config_parameter="barcode.max_time_between_keys_in_ms",
     )
     barcode_rfid_batch_time = fields.Integer(
-        "RFID Timer", config_parameter="stock_barcode.barcode_rfid_batch_time"
+        "RFID Timer", config_parameter="stock_barcode.barcode_rfid_batch_time",
+        default=1000,
     )
     barcode_separator_regex = fields.Char(
         "Multiscan Separator", config_parameter="stock_barcode.barcode_separator_regex",
+        default='.^',
         help="This regex is used in the Barcode application to separate individual barcodes when "
         "an aggregate barcode (i.e. single barcode consisting of multiple barcode encodings) is scanned.")
+
+    _check_barcode_max_time_between_keys_in_ms = models.Constraint(
+        'CHECK(barcode_max_time_between_keys_in_ms > 0)',
+        "The maximum time between each key should be positive.",
+    )
+    _check_barcode_rfid_batch_time = models.Constraint(
+        'CHECK(barcode_rfid_batch_time > 0)',
+        "The RFID timer should be positive.",
+    )
 
     @api.depends('company_id')
     def _compute_show_barcode_nomenclature(self):

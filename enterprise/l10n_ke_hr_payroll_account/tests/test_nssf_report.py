@@ -10,6 +10,8 @@ from odoo.tests import tagged
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestNSSFReport(TestPayslipValidationCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestPayslipValidationCommon.setup_country('ke')
     def setUpClass(cls):
@@ -18,7 +20,8 @@ class TestNSSFReport(TestPayslipValidationCommon):
             country=cls.env.ref('base.ke'),
             structure=cls.env.ref('l10n_ke_hr_payroll.hr_payroll_structure_ken_employee_salary'),
             structure_type=cls.env.ref('l10n_ke_hr_payroll.structure_type_employee_ken'),
-            contract_fields={
+            resource_calendar=cls.env.ref('l10n_ke_hr_payroll.resource_calendar_std_40h'),
+            version_fields={
                 'date_version': '2025-01-01',
                 'contract_date_start': '2025-01-01',
                 'wage': 100000.0,
@@ -29,6 +32,7 @@ class TestNSSFReport(TestPayslipValidationCommon):
 
     def create_nssf_report(self):
         payslip = self._generate_payslip(date(2025, 1, 1), date(2025, 1, 31))
+        self.employee.write({'review_state': '1_reviewed'})
         payslip.action_payslip_done()
         return self.env['l10n.ke.hr.payroll.nssf.report.wizard'].with_company(self.company).create({
             'company_id': self.company.id,

@@ -82,33 +82,7 @@
         <field name="company_ids" eval="[(4, ref('base.demo_company_lu'))]"/>
         <field name="company_id" ref="base.demo_company_lu"/>
         <field name="group_ids" eval="[(6,0,[ref('base.group_user')])]"/>
-        <field name="image_1920" type="base64" file="l10n_lu_hr_payroll/static/img/hr_employe_frida_poirish.jpg"/>
-    </record>
-
-    <record id="lu_res_bank_advanzia" model="res.bank">
-        <field name="name">Advanzia Bank</field>
-        <field name="bic">ADVZLULLXXX</field>
-        <field name="street">Advanzia Bank Street</field>
-        <field name="city">Luxembourg</field>
-        <field name="zip">1307</field>
-        <field name="country" ref="base.lu"/>
-        <field name="phone">999 247 988</field>
-    </record>
-    <record id="lu_res_bank_advanzia" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_lu_hr_payroll.lu_res_bank_advanzia')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="lu_res_bank_bil" model="res.bank">
-        <field name="name">Banque Internationale A Luxembourg</field>
-        <field name="bic">BILLLULLXXX</field>
-        <field name="street">Banque Internationale A Luxembourg Rd</field>
-        <field name="city">Bertrange</field>
-        <field name="zip">2190</field>
-        <field name="country" ref="base.lu"/>
-        <field name="phone">999 402 892</field>
-    </record>
-    <record id="lu_res_bank_bil" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_lu_hr_payroll.lu_res_bank_bil')).name.replace(' ', '.').lower() + '@example.com'"/>
+        <field name="image_1920" type="bytes" file="l10n_lu_hr_payroll/static/img/hr_employe_frida_poirish.jpg"/>
     </record>
 
     <record id="res_partner_frida_work_address" model="res.partner">
@@ -121,35 +95,47 @@
     </record>
 
     <record id="res_partner_bank_account_tom" model="res.partner.bank">
-        <field name="acc_number">LU120010004357286191</field>
+        <field name="account_number">LU120010004357286191</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_lu_hr_payroll.lu_res_bank_advanzia"/>
+        <field name="bank_name">Advanzia Bank</field>
+        <field name="bank_bic">ADVZLULLXXX</field>
+        <field name="street">Advanzia Bank Street</field>
+        <field name="city">Luxembourg</field>
+        <field name="zip">1307</field>
+        <field name="country_id" ref="base.lu"/>
         <field name="partner_id" ref="l10n_lu_hr_payroll.res_partner_tom"/>
         <field name="company_id" ref="base.demo_company_lu"/>
-        <field name="currency_id" ref="base.EUR"/>
     </record>
 
     <record id="res_partner_bank_account_frida" model="res.partner.bank">
-        <field name="acc_number">LU030103599935698356</field>
+        <field name="account_number">LU030103599935698356</field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_lu_hr_payroll.lu_res_bank_bil"/>
+        <field name="bank_name">Banque Internationale A Luxembourg</field>
+        <field name="bank_bic">BILLLULLXXX</field>
+        <field name="street">Banque Internationale A Luxembourg Rd</field>
+        <field name="city">Bertrange</field>
+        <field name="zip">2190</field>
+        <field name="country_id" ref="base.lu"/>
         <field name="partner_id" ref="l10n_lu_hr_payroll.res_partner_frida"/>
         <field name="company_id" ref="base.demo_company_lu"/>
-        <field name="currency_id" ref="base.EUR"/>
     </record>
 
     <record id="res_partner_bank_account_simone" model="res.partner.bank">
-        <field name="acc_number">LU990019400644750000 </field>
+        <field name="account_number">LU990019400644750000 </field>
         <field name="allow_out_payment" eval="True"/>
-        <field name="bank_id" ref="l10n_lu_hr_payroll.lu_res_bank_bil"/>
+        <field name="bank_name">Banque Internationale A Luxembourg</field>
+        <field name="bank_bic">BILLLULLXXX</field>
+        <field name="street">Banque Internationale A Luxembourg Rd</field>
+        <field name="city">Bertrange</field>
+        <field name="zip">2190</field>
+        <field name="country_id" ref="base.lu"/>
         <field name="partner_id" ref="l10n_lu_hr_payroll.res_partner_simone"/>
         <field name="company_id" ref="base.demo_company_lu"/>
-        <field name="currency_id" ref="base.EUR"/>
     </record>
 
     <record id="hr_employee_tom" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_tom')).name"/>
-        <field name="image_1920" type="base64" file="l10n_lu_hr_payroll/static/img/hr_employee_tom_schmit.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_lu_hr_payroll/static/img/hr_employee_tom_schmit.jpg"/>
         <field name="work_phone">999 197 093</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_tom')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_lu_hr_payroll.res_partner_tom"/>
@@ -173,7 +159,6 @@
         <field name="emergency_phone">999 196 908</field>
         <field name="certificate">master</field>
         <field name="study_field">Mechanical Engineering</field>
-        <field name="study_school">University of Luxembourg</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_lu_hr_payroll.res_partner_bank_account_tom'))]"/>
         <field name="l10n_lu_deduction_fd_daily">8.58</field>
@@ -193,13 +178,14 @@
         <field name="l10n_lu_bik_vehicle">500</field>
         <field name="l10n_lu_bik_vehicle_vat_included">False</field>
         <field name="l10n_lu_meal_voucher_amount">2.8</field>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <record id="hr_employee_frida" model="hr.employee">
         <field name="address_id" ref="l10n_lu_hr_payroll.res_partner_frida_work_address"/>
         <field name="name" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_frida')).name"/>
         <field name="job_title">Software Developer</field>
-        <field name="image_1920" type="base64" file="l10n_lu_hr_payroll/static/img/hr_employe_frida_poirish.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_lu_hr_payroll/static/img/hr_employe_frida_poirish.jpg"/>
         <field name="work_phone">999 197 094</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_frida')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="parent_id" ref="l10n_lu_hr_payroll.hr_employee_tom"/>
@@ -224,7 +210,6 @@
         <field name="emergency_phone">999 891 348</field>
         <field name="certificate">graduate</field>
         <field name="study_field">Computer Programming</field>
-        <field name="study_school">University of Luxembourg</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_lu_hr_payroll.res_partner_bank_account_frida'))]"/>
         <field name="l10n_lu_deduction_fd_daily">8.58</field>
@@ -244,6 +229,7 @@
         <field name="contract_date_start" eval="DateTime.today() + relativedelta(years=-2, month=1, day=1)"/>
         <field name="contract_date_end" eval="DateTime.today() + relativedelta(day=1, days=-1)"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_lu').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 
     <function name="create_version" model="hr.employee">
@@ -259,7 +245,7 @@
 
     <record id="hr_employee_simone" model="hr.employee">
         <field name="name" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_simone')).name"/>
-        <field name="image_1920" type="base64" file="l10n_lu_hr_payroll/static/img/hr_employee_simon_jambon.jpg"/>
+        <field name="image_1920" type="bytes" file="l10n_lu_hr_payroll/static/img/hr_employee_simon_jambon.jpg"/>
         <field name="work_phone">999 197 095</field>
         <field name="work_email" model="res.partner" eval="obj(ref('l10n_lu_hr_payroll.res_partner_simone')).name.replace(' ', '.').lower() + '@example.com'"/>
         <field name="work_contact_id" ref="l10n_lu_hr_payroll.res_partner_simone"/>
@@ -283,7 +269,6 @@
         <field name="emergency_phone">999 980 937</field>
         <field name="certificate">other</field>
         <field name="study_field">Chef</field>
-        <field name="study_school">EHTL</field>
         <field name="marital">single</field>
         <field name="bank_account_ids" eval="[(4, ref('l10n_lu_hr_payroll.res_partner_bank_account_simone'))]"/>
         <field name="l10n_lu_tax_id_number">35135122</field>
@@ -297,5 +282,6 @@
         <field name="date_version" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-1))"/>
         <field name="contract_date_start" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-1))"/>
         <field name="resource_calendar_id" model="resource.calendar" eval="obj().search([('company_id', '=', obj().env.ref('base.demo_company_lu').id)], limit=1)"/>
+        <field name="employee_type_id" ref="hr.contract_type_employee"/>
     </record>
 </odoo>

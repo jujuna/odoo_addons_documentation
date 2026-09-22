@@ -4,21 +4,22 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:48+0000\n"
-"PO-Revision-Date: 2025-11-08 20:17+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:58+0000\n"
+"PO-Revision-Date: 2026-09-17 23:15+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
 "spreadsheet_edition/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -28,22 +29,15 @@ msgstr "%(field name)s โดย %(order)s"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/list_init_callback.js:0
-msgid "%(list_name)s (List #%(list_id)s)"
-msgstr ""
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/version_history_action.js:0
 msgid "%(name)s (restored from %(timestamp)s)"
 msgstr "%(name)s (เรียกคืนจาก %(timestamp)s)"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/pivot_init_callback.js:0
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/plugins/pivot_odoo_insertion.js:0
 msgid "%(pivot_name)s (Pivot #%(pivot_id)s)"
-msgstr ""
+msgstr "%(pivot_name)s (Pivot #%(pivot_id)s)"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -60,8 +54,14 @@ msgstr "%(pivot_title)s โดย %(group_by)s (%(granularity)s)"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
-msgid "%s (copy)"
-msgstr "%s (สำเนา)"
+msgid "%(record_count)s records"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
+msgid "%(record_count)s+ records"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -104,7 +104,7 @@ msgstr "เปิดใช้งาน"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/odoo_pivot_layout_configurator/odoo_pivot_layout_configurator.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/components/sidepanel_model_field_selector/sidepanel_model_field_selector.xml:0
 msgid "Add"
 msgstr "เพิ่ม"
 
@@ -117,15 +117,27 @@ msgstr "เพิ่มความคิดเห็น..."
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
+msgid "Add calculated column"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/comments/index.js:0
 msgid "All Comments"
 msgstr "ความคิดเห็นทั้งหมด"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.js:0
 msgid "All sheets"
 msgstr "แผ่นงานทั้งหมด"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/components/sidepanel_model_field_selector/sidepanel_model_field_selector.js:0
+msgid "Already present in the source"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -135,7 +147,8 @@ msgstr "คุณแน่ใจหรือไม่ว่าต้องกา
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.js:0
 msgid "Ascending"
 msgstr "จากน้อยไปมาก"
 
@@ -145,7 +158,8 @@ msgstr "จากน้อยไปมาก"
 msgid ""
 "At least one data source has an invalid model. Please delete it before "
 "editing this global filter."
-msgstr "แหล่งข้อมูลอย่างน้อยหนึ่งแหล่งมีโมเดลที่ไม่ถูกต้อง โปรดลบออกก่อนแก้ไขตัวกรองสากลนี้"
+msgstr ""
+"แหล่งข้อมูลอย่างน้อยหนึ่งแหล่งมีโมเดลที่ไม่ถูกต้อง โปรดลบออกก่อนแก้ไขตัวกรองสากลนี้"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__message_attachment_count
@@ -178,21 +192,24 @@ msgstr "สเปรดชีตเปล่า"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/actions/input_dialog/input_dialog.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/global_filter_footer/global_filter_footer.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/ir_menu_selector/ir_menu_selector.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/new_pivot_side_panel/new_pivot_side_panel.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
-msgid "Cancel"
-msgstr "ยกเลิก"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.js:0
 msgid ""
 "Changing the pivot definition requires to reload the data. It may take some "
 "time."
-msgstr "การเปลี่ยนคำจำกัดความของ Pivot จำเป็นต้องโหลดข้อมูลซ้ำ ซึ่งอาจต้องใช้เวลาพอสมควร"
+msgstr ""
+"การเปลี่ยนคำจำกัดความของ Pivot จำเป็นต้องโหลดข้อมูลซ้ำ ซึ่งอาจต้องใช้เวลาพอสมควร"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Charts"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_item/global_filter_item.xml:0
+msgid "Clear"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -209,7 +226,7 @@ msgstr "การแก้ไขสเปรดชีตร่วมกัน"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
 msgid "Columns"
-msgstr "คอลัมน์"
+msgstr ""
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__commands
@@ -268,6 +285,12 @@ msgstr "Uuid ฉบับแก้ไขปัจจุบัน"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/link_datasource/odoo_link_selector.js:0
+msgid "Data source"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_side_panel.xml:0
 msgid "Date"
 msgstr "วันที่"
@@ -286,6 +309,12 @@ msgstr "วันที่ของปี"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/link_datasource/odoo_link_selector.js:0
+msgid "Default menu"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/boolean_filter_editor_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/date_filter_editor_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/numeric_filter_editor_side_panel.xml:0
@@ -300,6 +329,12 @@ msgstr "ค่าเริ่มต้น"
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.js:0
 msgid "Defer updates"
 msgstr "เลื่อนการอัปเดต"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_item/global_filter_item.js:0
+msgid "Delete"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -321,7 +356,8 @@ msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.js:0
 msgid "Descending"
 msgstr "จากมากไปน้อย"
 
@@ -338,6 +374,12 @@ msgstr ""
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/input_dialog/input_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/global_filter_footer/global_filter_footer.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/ir_menu_selector/ir_menu_selector.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/new_list_sidepanel/new_list_sidepanel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/new_pivot_side_panel/new_pivot_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Discard"
 msgstr "ละทิ้ง"
 
@@ -354,6 +396,12 @@ msgstr "แสดงชื่อ"
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard_share__display_thumbnail
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_mixin__display_thumbnail
 msgid "Display Thumbnail"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Documention"
 msgstr ""
 
 #. module: spreadsheet_edition
@@ -383,10 +431,16 @@ msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_item/global_filter_item.js:0
+msgid "Edit"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/components/side_panel_domain/side_panel_domain.xml:0
 msgid "Edit domain"
-msgstr "แก้ไขโดเมน"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -457,12 +511,6 @@ msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/filter_component.xml:0
-msgid "Global Filters"
-msgstr ""
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/components/collaborative_status/collaborative_status.js:0
 msgid "Go to %(userName)s"
 msgstr ""
@@ -483,6 +531,12 @@ msgstr "มีข้อความ"
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/version_history_action.js:0
 msgid "Heads up!"
 msgstr "แจ้งล่วงหน้า!"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Help"
+msgstr ""
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_ir_websocket__id
@@ -540,14 +594,11 @@ msgstr "แทรกความเห็น"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
-#: code:addons/spreadsheet_edition/static/src/assets/graph_view/graph_view.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/pivot.xml:0
 msgid "Insert in Spreadsheet"
 msgstr "แทรกในสเปรดชีต"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/assets/kanban/kanban_controller.js:0
 #: code:addons/spreadsheet_edition/static/src/assets/list_view/list_controller.js:0
 msgid "Insert in spreadsheet"
 msgstr "แทรกในสเปรดชีต"
@@ -556,7 +607,7 @@ msgstr "แทรกในสเปรดชีต"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/list_view/insert_list_spreadsheet_menu.xml:0
 msgid "Insert list in spreadsheet"
-msgstr "แทรกรายการในสเปรดชีต"
+msgstr ""
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__message_is_follower
@@ -598,13 +649,7 @@ msgstr "อัปเดตครั้งล่าสุดเมื่อ"
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.xml:0
 msgid "Last updated at"
-msgstr "อัปเดตล่าสุดเมื่อ"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/ir_ui_menu/index.js:0
-msgid "Link an Odoo menu"
-msgstr "ลิงก์เมนู Odoo"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -618,7 +663,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/insert_action_link_menu/insert_action_link_menu.xml:0
 msgid "Link menu in spreadsheet"
-msgstr "เมนูลิงก์ในสเปรดชีต"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -628,14 +673,20 @@ msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/odoo_menu/chart_panel.xml:0
-msgid "Link to Odoo menu"
-msgstr "ลิงก์ไปยังเมนู Odoo"
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/link_datasource/chart_panel.xml:0
+msgid "Link to Odoo"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/related_filters/related_filters.xml:0
 msgid "Link to the filter"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "List"
 msgstr ""
 
 #. module: spreadsheet_edition
@@ -648,15 +699,13 @@ msgstr "รายการ #%s"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
 msgid "List Name"
-msgstr "รายชื่อ"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
-msgid ""
-"List duplicated. Use the \"Re-insert list\" menu item to insert it in a "
-"sheet."
-msgstr "รายการซ้ำกัน ใช้รายการเมนู \"แทรกรายการใหม่\" เพื่อแทรกลงในแผ่นงาน"
+msgid "List duplicated."
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -674,7 +723,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "Load More"
-msgstr "โหลดเพิ่มเติม"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/plugins/list_autofill_plugin.js:0
+msgid "Loading..."
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -687,17 +742,17 @@ msgstr "ทำสำเนา"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Make a copy instead"
-msgstr "ให้ทำสำเนาแทน"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/filter_editor_side_panel.xml:0
 msgid "Match this filter to a field for each data source"
-msgstr "จับคู่ตัวกรองนี้กับฟิลด์สำหรับแต่ละแหล่งข้อมูล"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/related_filters_section/related_fitlers_section.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/related_filters_section/related_filters_section.js:0
 msgid "Matching %(matching)s / %(total)s filters"
 msgstr ""
 
@@ -740,6 +795,7 @@ msgstr "Pivot ที่ขาดหายไป #%s"
 #: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/selection_filter_editor_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/new_list_sidepanel/new_list_sidepanel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/new_pivot_side_panel/new_pivot_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.xml:0
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__res_model
@@ -784,13 +840,25 @@ msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+msgid "New Odoo list"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
+msgid "New calculated column"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.js:0
 msgid "Next"
 msgstr "ถัดไป"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.js:0
 msgid "No offset"
 msgstr ""
 
@@ -799,6 +867,12 @@ msgstr ""
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_grid/spreadsheet_selector_grid.xml:0
 msgid "No preview"
 msgstr "ไม่มีการดูตัวอย่าง"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+msgid "No sorting"
+msgstr ""
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__message_needaction_counter
@@ -838,6 +912,12 @@ msgstr ""
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/version_history_action.js:0
 msgid "Odoo Spreadsheet"
 msgstr "สเปรดชีต Odoo"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Odoo list"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -883,7 +963,6 @@ msgstr ""
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/pivot_view/pivot_view.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/odoo_pivot_layout_configurator/odoo_pivot_layout_configurator.js:0
 msgid "Pivot contains duplicate groupbys"
 msgstr "Pivot มี groupbys ที่ซ้ำกัน"
 
@@ -914,15 +993,9 @@ msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.js:0
 msgid "Previous"
 msgstr "ก่อนหน้า"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
-msgid "Print"
-msgstr "พิมพ์"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -937,9 +1010,21 @@ msgid "Quarter & Year"
 msgstr "ไตรมาส & ปี"
 
 #. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Quick access"
+msgstr ""
+
+#. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__rating_ids
 msgid "Ratings"
 msgstr "การให้คะแนน"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Re-insert dynamic list"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -950,7 +1035,6 @@ msgstr "แทรกการสรุปแบบไดนามิกอีก
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/abstract_spreadsheet_action.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "Re-insert list"
 msgstr "แทรกรายการอีกครั้ง"
 
@@ -958,6 +1042,12 @@ msgstr "แทรกรายการอีกครั้ง"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "Re-insert pivot cell"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Re-insert static list"
 msgstr ""
 
 #. module: spreadsheet_edition
@@ -987,7 +1077,7 @@ msgstr "รหัสบันทึก"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.xml:0
 msgid "Records"
-msgstr "บันทึก"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1084,6 +1174,7 @@ msgstr "ข้อผิดพลาดในการส่ง SMS"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/global_filter_footer/global_filter_footer.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/new_list_sidepanel/new_list_sidepanel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/new_pivot_side_panel/new_pivot_side_panel.xml:0
 msgid "Save"
 msgstr "บันทึก"
@@ -1096,15 +1187,15 @@ msgstr "บันทึกเป็นเทมเพลต"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_navbar/spreadsheet_navbar.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_sync_status/spreadsheet_sync_status.xml:0
 msgid "Saved"
-msgstr "บันทึกแล้ว"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_navbar/spreadsheet_navbar.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_sync_status/spreadsheet_sync_status.xml:0
 msgid "Saving"
-msgstr "บันทึก"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1123,6 +1214,12 @@ msgstr "ดูคุณสมบัติของรายการ"
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/index.js:0
 msgid "See version history"
 msgstr "ดูประวัติเวอร์ชัน"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/link_datasource/chart_panel.xml:0
+msgid "Select a data source..."
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1168,17 +1265,36 @@ msgstr "ภาพรวม"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
-msgid "Sorting"
-msgstr "การเรียงลำดับ"
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+msgid "Sort list"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
+msgid "Sorting"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/assets/graph_view/graph_view.xml:0
+#: code:addons/spreadsheet_edition/static/src/assets/kanban/kanban_controller.js:0
 #: code:addons/spreadsheet_edition/static/src/assets/spreadsheet_cog_menu/spreadsheet_cog_menu.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_navbar/spreadsheet_navbar.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/pivot.xml:0
+#: model:ir.module.module,description:base.module_spreadsheet_edition
+#: model:ir.module.module,shortdesc:base.module_spreadsheet_edition
+#: model:ir.module.module,summary:base.module_spreadsheet_edition
 #: model:ir.ui.menu,name:spreadsheet_edition.menu_technical_spreadsheet
 msgid "Spreadsheet"
 msgstr "สเปรดชีต"
+
+#. module: spreadsheet_edition
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard_share__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_mixin__spreadsheet_image_ids
+msgid "Spreadsheet Image"
+msgstr ""
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard__spreadsheet_revision_ids
@@ -1222,7 +1338,8 @@ msgstr "ข้อความ"
 msgid ""
 "The history of your spreadsheet is corrupted and you are likely missing "
 "recent revisions. This feature cannot be used."
-msgstr "ประวัติสเปรดชีตของคุณเสียหาย และคุณอาจพลาดการแก้ไขล่าสุด ไม่สามารถใช้ฟีเจอร์นี้ได้"
+msgstr ""
+"ประวัติสเปรดชีตของคุณเสียหาย และคุณอาจพลาดการแก้ไขล่าสุด ไม่สามารถใช้ฟีเจอร์นี้ได้"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1240,8 +1357,8 @@ msgid ""
 "The model (%(model)s) of this list is not valid (it may have been renamed/"
 "deleted). Please re-insert a new list."
 msgstr ""
-"โมเดล (%(model)s) ของรายการนี้ไม่ถูกต้อง (อาจถูกเปลี่ยนชื่อ/ลบไปแล้ว) "
-"โปรดแทรกรายการใหม่อีกครั้ง"
+"โมเดล (%(model)s) ของรายการนี้ไม่ถูกต้อง (อาจถูกเปลี่ยนชื่อ/ลบไปแล้ว) โปรดแทรกรายการใหม่อี"
+"กครั้ง"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1250,8 +1367,8 @@ msgid ""
 "The model (%(model)s) of this pivot is not valid (it may have been renamed/"
 "deleted). Please re-insert a new pivot."
 msgstr ""
-"โมเดล (%(model)s) ของไพวอทนี้ไม่ถูกต้อง (อาจมีการเปลี่ยนชื่อ/ลบทิ้ง) "
-"โปรดแทรกไพวอทใหม่อีกครั้ง"
+"โมเดล (%(model)s) ของไพวอทนี้ไม่ถูกต้อง (อาจมีการเปลี่ยนชื่อ/ลบทิ้ง) โปรดแทรกไพวอทใหม่อีกครั้"
+"ง"
 
 #. module: spreadsheet_edition
 #. odoo-python
@@ -1259,7 +1376,8 @@ msgstr ""
 msgid ""
 "The operation could not be applied because of a concurrent update. Please "
 "try again."
-msgstr "ไม่สามารถใช้การดำเนินการได้เนื่องจากมีการอัปเดตพร้อมกัน กรุณาลองอีกครั้ง"
+msgstr ""
+"ไม่สามารถใช้การดำเนินการได้เนื่องจากมีการอัปเดตพร้อมกัน กรุณาลองอีกครั้ง"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1278,7 +1396,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "There are no prior revisions for this spreadsheet."
-msgstr "ไม่มีการแก้ไขก่อนหน้านี้สำหรับสเปรดชีตนี้"
+msgstr ""
 
 #. module: spreadsheet_edition
 #: model:ir.model.constraint,message:spreadsheet_edition.constraint_spreadsheet_revision_initial_unique
@@ -1288,7 +1406,6 @@ msgstr "สามารถแก้ไขเบื้องต้นได้เ
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/icons.xml:0
 msgid "This list is not used"
 msgstr "รายการนี้ไม่ได้ใช้งาน"
 
@@ -1300,7 +1417,7 @@ msgstr "Pivot นี้ไม่ได้ใช้งาน"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.js:0
 msgid "This sheet"
 msgstr "แผ่นนี้"
 
@@ -1312,8 +1429,26 @@ msgstr "รวม"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
+msgid "Translate headers"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/plugins/pivot_autofill_plugin.js:0
+msgid "Unknown"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/related_filters/related_filters.xml:0
 msgid "Unlink from the filter"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/index.js:0
+msgid "Unused lists"
 msgstr ""
 
 #. module: spreadsheet_edition
@@ -1327,16 +1462,6 @@ msgstr "ประวัติเวอร์ชัน"
 #: code:addons/spreadsheet_edition/models/spreadsheet_mixin.py:0
 msgid "Version restored"
 msgstr "กู้คืนเวอร์ชันแล้ว"
-
-#. module: spreadsheet_edition
-#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__website_message_ids
-msgid "Website Messages"
-msgstr "ข้อความเว็บไซต์"
-
-#. module: spreadsheet_edition
-#: model:ir.model.fields,help:spreadsheet_edition.field_spreadsheet_cell_thread__website_message_ids
-msgid "Website communication history"
-msgstr "ประวัติการสื่อสารของเว็บไซต์"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1360,12 +1485,32 @@ msgstr "ปี"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Yes, restore"
-msgstr "ใช่ เรียกคืน"
+msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_side_panel.xml:0
 msgid "Yes/No"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-python
+#: code:addons/spreadsheet_edition/models/spreadsheet_mixin.py:0
+msgid "You can only undo or redo your own revisions."
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/filter_editor_store.js:0
+msgid ""
+"You cannot change the operator without a value. If default value is not "
+"needed, select the first operator."
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-python
+#: code:addons/spreadsheet_edition/models/spreadsheet_mixin.py:0
+msgid "You don't have the access rights to perform this operation."
 msgstr ""
 
 #. module: spreadsheet_edition
@@ -1386,5 +1531,8 @@ msgstr "ไม่เคย"
 msgid "websocket message handling"
 msgstr "การจัดการข้อความของ websocket"
 
-#~ msgid "Models"
-#~ msgstr "โมเดล"
+msgid "Website Messages"
+msgstr "ข้อความเว็บไซต์"
+
+msgid "Website communication history"
+msgstr "ประวัติการสื่อสารของเว็บไซต์"

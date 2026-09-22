@@ -13,7 +13,7 @@ class IrAttachment(models.Model):
         """
         super().register_as_main_attachment(force=force)
 
-        move_attachments = self.filtered(lambda a: a.res_model == "account.move")
+        move_attachments = self.filtered(lambda a: a.res_model == "account.move" and a.res_id)
         for move in self.env["account.move"].browse(move_attachments.mapped("res_id")):
             if move._needs_auto_extract():
                 move._send_batch_for_digitization()

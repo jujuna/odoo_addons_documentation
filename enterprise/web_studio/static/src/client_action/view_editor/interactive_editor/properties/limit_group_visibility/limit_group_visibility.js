@@ -1,4 +1,5 @@
-import { Component, onWillRender } from "@odoo/owl";
+import { Component, computed, t, useProps } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 import { useEditNodeAttributes } from "@web_studio/client_action/view_editor/view_editor_model";
 import { MultiRecordSelector } from "@web/core/record_selectors/multi_record_selector";
 
@@ -7,32 +8,40 @@ export class LimitGroupVisibility extends Component {
     static components = {
         MultiRecordSelector,
     };
-    static props = {
-        node: { type: Object },
-    };
+    props = useProps({
+        node: t.object(),
+    });
+
+    groupsData = computed(() => {
+        const groups = JSON.parse(this.props.node.attrs.studio_groups || "[]");
+        const allowGroups = [];
+        const forbidGroups = [];
+        const currentGroups = [];
+        for (const group of groups) {
+            const groupId = group.id;
+            currentGroups.push(groupId);
+            if (group.forbid) {
+                forbidGroups.push(groupId);
+            } else {
+                allowGroups.push(groupId);
+            }
+        }
+
+        return {
+            allowGroups,
+            forbidGroups,
+            currentGroups,
+        };
+    });
 
     setup() {
         this.editNodeAttributes = useEditNodeAttributes();
-        onWillRender(() => {
-            const groups = JSON.parse(this.props.node.attrs.studio_groups || "[]");
-            this.allowGroups = [];
-            this.forbidGroups = [];
-            this.currentGroups = [];
-            for (const group of groups) {
-                const groupId = group.id;
-                this.currentGroups.push(groupId);
-                if (group.forbid) {
-                    this.forbidGroups.push(groupId);
-                } else {
-                    this.allowGroups.push(groupId);
-                }
-            }
-        })
     }
 
     handleNodeGroupsChange(allow, forbid) {
-        allow = new Set(allow || this.allowGroups);
-        forbid = new Set(forbid || this.forbidGroups);
+        const { allowGroups, forbidGroups } = this.groupsData();
+        allow = new Set(allow || allowGroups);
+        forbid = new Set(forbid || forbidGroups);
         if (!allow.isDisjointFrom(forbid)) {
             throw new Error("Cannot allow and forbid at the same time");
         }
@@ -41,7 +50,7 @@ export class LimitGroupVisibility extends Component {
             resIds.push(g);
         }
         for (const g of forbid) {
-            resIds.push(`!${g}`)
+            resIds.push(`!${g}`);
         }
         return this.editNodeAttributes({ groups: resIds });
     }
@@ -51,19 +60,23 @@ export class LimitGroupVisibility extends Component {
     }
 
     get allowGroupsProps() {
+        const { allowGroups, currentGroups } = this.groupsData();
         return {
             resModel: "res.groups",
-            domain: [["id", "not in", this.currentGroups]],
-            resIds: this.allowGroups,
+            fieldString: _t("Access Groups"),
+            domain: [["id", "not in", currentGroups]],
+            resIds: allowGroups,
             update: (resIds) => this.handleNodeGroupsChange(resIds, null),
         };
     }
 
     get forbidGroupsProps() {
+        const { forbidGroups, currentGroups } = this.groupsData();
         return {
             resModel: "res.groups",
-            domain: [["id", "not in", this.currentGroups]],
-            resIds: this.forbidGroups,
+            fieldString: _t("Access Groups"),
+            domain: [["id", "not in", currentGroups]],
+            resIds: forbidGroups,
             update: (resIds) => this.handleNodeGroupsChange(null, resIds),
         };
     }

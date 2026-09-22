@@ -26,7 +26,7 @@ class CalendarAlarm(models.Model):
         compute='_compute_mail_template_id', readonly=False, store=True,
         help="Template used to render mail reminder content.")
     body = fields.Text("Additional Message", help="Additional message that would be sent with the notification for the reminder")
-    notify_responsible = fields.Boolean("Notify Responsible", default=False)
+    notify_responsible = fields.Boolean("Notify Responsible", help="When activated, the event organizer will also receive this reminder.", default=False)
 
     @api.depends('interval', 'duration')
     def _compute_duration_minutes(self):
@@ -71,7 +71,7 @@ class CalendarAlarm(models.Model):
         display_interval = self._interval_selection.get(self.interval, '')
         display_alarm_type = {
             key: value for key, value in self._fields['alarm_type']._description_selection(self.env)
-        }[self.alarm_type]
+        }.get(self.alarm_type, '')
         self.name = "%s - %s %s" % (display_alarm_type, self.duration, display_interval)
         if self.notify_responsible:
             self.name += " - " + _("Notify Responsible")

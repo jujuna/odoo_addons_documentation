@@ -2,7 +2,6 @@
 
 {
     'name': 'Lithuanian Intrastat Declaration',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
         Generates Intrastat XML report for declaration.
@@ -13,8 +12,8 @@
         'data/account_return_data.xml',
         'data/intrastat_export.xml',
         'data/code_region_data.xml',
-        'security/ir.model.access.csv',
         'wizard/intrastat_goods_submission_wizard.xml',
+        'security/ir.access.csv',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',

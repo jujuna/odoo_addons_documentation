@@ -3,11 +3,18 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
 
-from odoo import api, models, _
+from odoo import api, fields, models, _
 
 
 class MarketingCampaign(models.Model):
     _inherit = 'marketing.campaign'
+
+    enroll_action_type = fields.Selection(selection_add=[('product_cart', 'Product in Cart'), ('product_bought', 'Product Bought')])
+    product_ids = fields.Many2many('product.product')
+
+    @property
+    def _ENROLL_ACTION_FIELDS_TO_RESET(self):
+        return super()._ENROLL_ACTION_FIELDS_TO_RESET | {'product_ids'}
 
     @api.model
     def get_campaign_templates_info(self):
@@ -19,19 +26,16 @@ class MarketingCampaign(models.Model):
                     'anniversary': {
                         'title': _('Anniversary Discount'),
                         'description': _('Celebrate contacts that registered one year ago.'),
-                        'icon': '/marketing_automation_website_sale/static/img/campaign_icons/cake.svg',
                         'function': '_get_marketing_template_anniversary',
                     },
                     'purchase_followup': {
                         'title': _('Purchase Follow-up'),
                         'description': _('Send an email to customers that bought a specific product after their purchase.'),
-                        'icon': '/marketing_automation_website_sale/static/img/campaign_icons/cart.svg',
                         'function': '_get_marketing_template_purchase_followup',
                     },
                     'repeat_customer': {
                         'title': _('Create Repeat Customers'),
                         'description': _('Turn one-time visitors into repeat buyers.'),
-                        'icon': '/marketing_automation_website_sale/static/img/campaign_icons/star.svg',
                         'function': '_get_marketing_template_repeat_customer',
                     },
                 },
@@ -58,7 +62,8 @@ class MarketingCampaign(models.Model):
         ]
 
         campaign = self.env['marketing.campaign'].create({
-            'domain': repr(domain),
+            'enroll_type': 'domain',
+            'enroll_domain': repr(domain),
             'model_id': self.env['ir.model']._get_id('res.partner'),
             'name': _('Anniversary Discount'),
         })
@@ -98,7 +103,7 @@ class MarketingCampaign(models.Model):
         })
         self.env['marketing.activity'].create({
             'activity_domain': '[]',
-            'activity_type': 'email',
+            'activity_type': 'mail',
             'campaign_id': campaign.id,
             'interval_type': 'days',
             'interval_number': 0,
@@ -122,8 +127,9 @@ class MarketingCampaign(models.Model):
     def _get_marketing_template_purchase_followup(self):
         campaign = self.env['marketing.campaign'].create({
             'name': _('Recent Purchase Follow-up'),
+            'enroll_type': 'domain',
             'model_id': self.env['ir.model']._get_id('sale.order'),
-            'domain': repr([('state', '=', 'sale'), ('team_id.website_ids', '!=', False)]),
+            'enroll_domain': repr([('state', '=', 'sale'), ('team_id.website_ids', '!=', False)]),
         })
         followup_mailing_template = self.env.ref(
             'marketing_automation_website_sale.mailing_purchase_followup_arch',
@@ -145,7 +151,7 @@ class MarketingCampaign(models.Model):
         })
         self.env['marketing.activity'].create({
             'trigger_type': 'begin',
-            'activity_type': 'email',
+            'activity_type': 'mail',
             'interval_type': 'days',
             'mass_mailing_id': followup_mailing.id,
             'interval_number': 7,
@@ -158,7 +164,8 @@ class MarketingCampaign(models.Model):
         campaign = self.env['marketing.campaign'].create({
             'name': _('Create Repeat Customers'),
             'model_id': self.env['ir.model']._get_id('sale.order'),
-            'domain': repr([
+            'enroll_type': 'domain',
+            'enroll_domain': repr([
                 ('state', '=', 'sale'),
                 ('team_id.website_ids', '!=', False),
                 ('amount_untaxed', '>=', 100),
@@ -194,7 +201,7 @@ class MarketingCampaign(models.Model):
         })
         self.env['marketing.activity'].create({
             'trigger_type': 'begin',
-            'activity_type': 'email',
+            'activity_type': 'mail',
             'interval_type': 'days',
             'mass_mailing_id': purchase_mailing.id,
             'interval_number': 0,
@@ -203,7 +210,7 @@ class MarketingCampaign(models.Model):
             'child_ids': [
                 (0, 0, {
                     'trigger_type': 'mail_open',
-                    'activity_type': 'email',
+                    'activity_type': 'mail',
                     'interval_type': 'weeks',
                     'mass_mailing_id': arrivals_mailing.id,
                     'interval_number': 1,

@@ -18,7 +18,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 'sequence': 50,
                 'action': 'export_file',
                 'action_param': 'l10n_lu_export_saft_to_xml',
-                'file_export_type': _('XML')
+                'file_export_type': _('XML'),
+                'branch_allowed': True,
             })
 
     @api.model
@@ -33,6 +34,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
         def _get_product_vals_list(values, encountered_product_ids):
             product_template_name = self.env['product.template']._field_to_sql('product_template', 'name')
+            product_category_name = self.env['product.category']._field_to_sql('product_category', 'name')
             uom_name = self.env['uom.uom']._field_to_sql('uom', 'name')
             base_uom_name = self.env['uom.uom']._field_to_sql('base_uom', 'name')
             self.env.cr.execute(SQL(
@@ -43,7 +45,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                     %(product_template_name)s             AS name,
                     product.product_tmpl_id,
                     product.default_code,
-                    product_category.name               AS product_category,
+                    %(product_category_name)s           AS product_category,
                     %(uom_name)s                        AS standard_uom,
                     TRUNC(CAST(uom.factor AS NUMERIC), 8)                AS uom_ratio,
                     CASE
@@ -59,6 +61,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 ORDER BY default_code
                 ''',
                 product_template_name=product_template_name,
+                product_category_name=product_category_name,
                 uom_name=uom_name,
                 base_uom_name=base_uom_name,
                 encountered_product_ids=tuple(encountered_product_ids)
@@ -70,7 +73,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             for product_code, grouped_products in groupby(product_vals_list, key=lambda product: product['default_code']):
                 product_list = list(grouped_products)
                 if not product_code:
-                    empty_product_ids.add(product_list[0]['id'])
+                    empty_product_ids.update(product_list_item['id'] for product_list_item in product_list)
                 elif len(product_list) > 1:
                     for product in product_list:
                         duplicate_product_ids.add(product['id'])
@@ -121,20 +124,28 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                 'total_invoice_untaxed_balance': 0.0,
                 'total_invoice_tax_balance': 0.0,
             })
+            tax_factors = dict()
 
             for line_vals in move_vals['line_vals_list']:
-                if line_vals['tax_line_id']:
-                    move_vals['tax_detail_vals_list'].append({
-                        'currency_id': line_vals['currency_id'],
-                        'tax_id': line_vals['tax_line_id'],
-                        'tax_name': line_vals['tax_name'],
-                        'tax_amount': line_vals['tax_amount'],
-                        'tax_base_amount': line_vals['tax_base_amount'],
-                        'tax_amount_type': line_vals['tax_amount_type'],
-                        'amount': line_vals['balance'],
-                        'amount_currency': line_vals['amount_currency'],
-                        'rate': line_vals['rate'],
-                    })
+                if (tax_id := line_vals['tax_line_id']):
+                    # Each tax should appear only once in the tax table
+                    if tax_id not in tax_factors:
+                        tax_factors[tax_id] = {
+                            'currency_id': line_vals['currency_id'],
+                            'currency_code': line_vals['currency_code'],
+                            'tax_id': line_vals['tax_line_id'],
+                            'tax_name': line_vals['tax_name'],
+                            'tax_amount': line_vals['tax_amount'],
+                            'tax_base_amount': line_vals['tax_base_amount'],
+                            'tax_amount_type': line_vals['tax_amount_type'],
+                            'amount': line_vals['balance'],
+                            'amount_currency': line_vals['amount_currency'],
+                            'rate': line_vals['rate'],
+                        }
+                    # only sum amounts if same sign as first repartition line
+                    elif line_vals['balance'] * tax_factors[tax_id]['amount'] > 0:
+                        tax_factors[tax_id]['amount'] += line_vals['balance']
+                        tax_factors[tax_id]['amount_currency'] += line_vals['amount_currency']
                     move_vals['total_invoice_tax_balance'] -= line_vals['balance']
                 elif not line_vals['account_type'] in ('asset_receivable', 'liability_payable') and line_vals['display_type'] == 'product':
                     move_vals['total_invoice_untaxed_balance'] -= line_vals['balance']
@@ -150,6 +161,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                         encountered_product_uom_ids.add(line_vals['product_uom_id'])
                     move_vals['invoice_line_vals_list'].append(line_vals)
 
+            move_vals['tax_detail_vals_list'] = list(tax_factors.values())
             res['invoice_vals_list'].append(move_vals)
             move_vals['total_invoice_balance'] = move_vals['total_invoice_untaxed_balance'] + move_vals['total_invoice_tax_balance']
 

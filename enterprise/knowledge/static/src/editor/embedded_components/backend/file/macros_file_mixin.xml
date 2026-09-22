@@ -2,17 +2,18 @@
 <templates>
     <t t-name="knowledge.MacrosFileButtons">
         <EmbeddedComponentToolbarButton
-            hidden="!targetRecordInfo?.canAttachFiles"
-            icon="'fa-paperclip'"
+            hidden="!this.targetRecordInfo?.canAttachFiles"
+            icon="'attach_file'"
             label.translate="Attach"
-            onClick.bind="onClickUseAsAttachment"
+            onClick.bind="this.onClickUseAsAttachment"
             title.translate="Use as Attachment"
         />
         <EmbeddedComponentToolbarButton
-            hidden="!targetRecordInfo?.canPostMessages"
-            icon="'fa-envelope'"
+            hidden="!this.targetRecordInfo?.canPostMessages"
+            icon="'mail'"
+            iconClass="'oi-filled'"
             label.translate="Send"
-            onClick.bind="onClickAttachToMessage"
+            onClick.bind="this.onClickAttachToMessage"
             title.translate="Send as Message"
         />
     </t>

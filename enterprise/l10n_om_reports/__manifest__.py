@@ -2,7 +2,6 @@
 
 {
     'name': 'Oman - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'author': 'Odoo S.A.',
     'description': """
@@ -17,7 +16,6 @@ Activates:
         'account_reports',
     ],
     'auto_install': True,
-    'installable': True,
     'data': [
         'data/account_report_data.xml',
     ],

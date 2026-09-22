@@ -10,6 +10,7 @@ from odoo.tools import mute_logger
 
 
 @tagged('knowledge_internals')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestKnowledgeArticleConstraints(KnowledgeCommon):
     """ This test suite has the responsibility to test the different constraints
     defined on the `knowledge.article`, `knowledge.article.member` and
@@ -133,7 +134,7 @@ class TestKnowledgeArticleConstraints(KnowledgeCommon):
                 'parent_id': article_children[1].id
             })
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_create(self):
         """ Testing the helper to create articles with right values. """
@@ -141,6 +142,11 @@ class TestKnowledgeArticleConstraints(KnowledgeCommon):
         readonly_article = self.article_shared.with_env(self.env)
 
         _title = 'Fthagn, private'
+        next_sequence = 1 + self.env['knowledge.article'].sudo().search_read(
+            domain=[('parent_id', '=', False)],
+            fields=['sequence'],
+            order='sequence desc',
+            limit=1)[0]['sequence']
         private = self.env['knowledge.article'].create({
             'article_member_ids': [
                 (0, 0, {'partner_id': self.env.user.partner_id.id,
@@ -153,7 +159,7 @@ class TestKnowledgeArticleConstraints(KnowledgeCommon):
         self.assertMembers(private, 'none', {self.env.user.partner_id: 'write'})
         self.assertEqual(private.category, 'private')
         self.assertFalse(private.parent_id)
-        self.assertEqual(private.sequence, 23)
+        self.assertEqual(private.sequence, next_sequence)
 
         _title = 'Fthagn, with parent (workspace)'
         children = self.env['knowledge.article'].create([
@@ -232,7 +238,7 @@ class TestKnowledgeArticleConstraints(KnowledgeCommon):
                                msg='Cannot move an article that has no member on it'):
             no_member_article.move_to(category='shared')
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_parent_constraints_create(self):
         """ Checking various article constraints linked to parents """
@@ -264,7 +270,7 @@ class TestKnowledgeArticleConstraints(KnowledgeCommon):
                 'parent_id': article_as2.id,
             })
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_parent_constraints_write(self):
         """ Checking the article parent constraints. """
@@ -308,7 +314,7 @@ class TestKnowledgeArticleConstraints(KnowledgeCommon):
         self.assertEqual(article_child2_as2.sequence, 1)
         self.assertEqual(article_child1.sequence, 2)
 
-    @mute_logger('odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_article_private_management(self):
         """ Checking the article private management. """

@@ -69,3 +69,21 @@ def wa_phone_format(record, fname=False, number=False, country=None,
                 zeros = '0' * parsed.number_of_leading_zeros
         return f'{parsed.country_code}' + zeros + f'{parsed.national_number}'
     return formatted
+
+
+def wa_phone_format_for_blacklist(number):
+    """ Convert a WhatsApp number to a format compatible with the phone blacklist.
+
+    :param str number: WhatsApp formatted number
+    :return str: blacklist compatible number
+    """
+
+    if not number:
+        return False
+
+    # If already starts with '+', it's already E164-ish (or at least explicitly international)
+    if str(number).startswith('+'):
+        return number
+
+    # WhatsApp numbers are CountryCode + NationalNumber, prepending '+' makes it E164
+    return f'+{number}'

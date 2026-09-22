@@ -1,44 +1,97 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-import datetime
+import json
 import random
+import requests
 
+from datetime import timedelta
+from freezegun import freeze_time
 from unittest.mock import patch
 
 from odoo import fields
+from odoo.tests import tagged
+
 from odoo.addons.base.tests.test_ir_cron import CronMixinCase
+from odoo.addons.mail.tools.jwt import generate_vapid_keys
 from odoo.addons.social.tests.common import SocialCase
-from odoo.addons.social.models.social_post import SocialPost
-from odoo.addons.social_push_notifications.models.social_account import SocialAccount
 
 
-class SocialPushNotificationsCase(SocialCase, CronMixinCase):
+class PushNotificationCatcher:
+    """ Test helper that intercepts and records outgoing POST requests
+        made via the `requests` library for push notifications. """
+    def __init__(self):
+        self.captured_outgoing_post_requests = []
+        self.patch = None
+
+    def __enter__(self):
+        def on_outgoing_post_request(url, **kwargs):
+            self.captured_outgoing_post_requests.append({
+                **kwargs,
+                'url': url
+            })
+            response = requests.Response()
+            response.status_code = 201
+            return response
+        self.patch = patch('requests.sessions.Session.post', side_effect=on_outgoing_post_request)
+        self.patch.__enter__()
+        return self.captured_outgoing_post_requests
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.patch:
+            self.patch.__exit__(exc_type, exc_val, exc_tb)
+        return False
+
+
+class SocialPushNotificationsCommon(CronMixinCase):
     @classmethod
     def setUpClass(cls):
-        super(SocialPushNotificationsCase, cls).setUpClass()
+        super().setUpClass()
 
         cls.website_1 = cls.env['website'].create({
             'name': 'Website 1 WITHOUT push notifications',
             'domain': 'website1.example.com',
-            'firebase_enable_push_notifications': False,
+            'enable_push_notifications': False,
         })
         cls.website_2 = cls.env['website'].create({
             'name': 'Website 2 WITH push notifications',
             'domain': 'website2.example.com',
-            'firebase_enable_push_notifications': True,
-            'firebase_use_own_account': True,
-            'firebase_admin_key_file': base64.b64encode(b'{}')
+            'enable_push_notifications': True
         })
         cls.website_3 = cls.env['website'].create({
             'name': 'Website 3 WITH push notifications',
             'domain': 'website3.example.com',
-            'firebase_enable_push_notifications': True,
-            'firebase_use_own_account': True,
-            'firebase_admin_key_file': base64.b64encode(b'{}')
+            'enable_push_notifications': True,
         })
         cls.websites = cls.website_1 | cls.website_2 | cls.website_3
+
+        # Generate VAPID keys for the tests:
+        vapid_private_key, vapid_public_key = generate_vapid_keys()
+        cls.env['ir.config_parameter'].set_str('social_push_notifications.vapid_public_key', vapid_public_key)
+        cls.env['ir.config_parameter'].set_str('social_push_notifications.vapid_private_key', vapid_private_key)
+
+        cls.visitors = cls.env['website.visitor'].create([{
+            'access_token': '%032x' % random.randrange(16**32),
+            'push_subscription_ids': [(0, 0, {
+                'endpoint': f'https://fcm.googleapis.com/fcm/send/fake_token_{i}',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                }),
+            })] if i != 0 else False,
+            'website_id': cls.websites[i].id if i != 3 else False,
+        } for i in range(0, 4)])
+
+    def capture_push_notifications(self):
+        """ Captures the POST requests sent by the server for push notifications. """
+        return PushNotificationCatcher()
+
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
+class SocialPushNotificationsCase(SocialPushNotificationsCommon, SocialCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
 
         cls.social_accounts = cls.env['social.account'].search(
             [('website_id', 'in', cls.websites.ids)]
@@ -49,87 +102,165 @@ class SocialPushNotificationsCase(SocialCase, CronMixinCase):
             'account_ids': [(6, 0, cls.social_accounts.filtered(lambda a: a.website_id.id != cls.website_3.id).ids)],
         })
 
-    def test_post(self):
-        """ Test a full flow of posting social_push_notifications.
-        We trigger the send method of the post and check that it does all the way to the Firebase
-        sending calls. """
+    @freeze_time('2025-02-25')
+    def test_send_push_notifications(self):
+        cron = self.env.ref('social.ir_cron_post_scheduled')
 
-        # Create some visitors with or without push_token in different timezone (or no timezone)
-        timezones = ['Europe/Brussels', 'America/New_York', 'Asia/Vladivostok', False]
-        Visitor = self.env['website.visitor']
-        visitor_vals = []
-        for i in range(0, 4):
-            visitor_vals.append({
-                'name': timezones[i] or 'Visitor',
-                'timezone': timezones[i],
-                'access_token': '%032x' % random.randrange(16**32),
-                'push_subscription_ids': [(0, 0, {'push_token': 'fake_token_%s' % i})] if i != 0 else False,
-                'website_id': self.websites[i].id if i != 3 else False,
-            })
-        self.visitors = Visitor.create(visitor_vals)
-        self.social_post.create_uid.write({'tz': timezones[0]})
+        with self.capture_push_notifications() as captured_outgoing_post_requests, \
+             self.capture_triggers('social.ir_cron_post_scheduled') as captured_triggers:
 
-        # Since mocking a decorated method doesn't work, we unset the constrains
-        # before creating the post and re-apply them after.
-        check_scheduled_date_constrains = SocialPost._check_scheduled_date._constrains
-        SocialPost._check_scheduled_date._constrains = tuple()
+            # Check the initial conditions:
+            self.assertEqual(self.social_post.state, 'draft')
+            self.assertFalse(self.social_post.scheduled_date)
+            self.assertFalse(self.social_post.live_post_ids)
+            self.assertFalse(captured_triggers.records)
+            self.assertFalse(captured_outgoing_post_requests)
 
-        scheduled_date = fields.Datetime.now() - datetime.timedelta(minutes=1)
-        with self.capture_triggers('social.ir_cron_post_scheduled') as captured_triggers:
+            # Click on the "Post" button:
+            self.social_post.action_post_now()
+
+            # When clicking on the "Post" button, it must create the live posts
+            # and the cron trigger to send the push notifications. No notification
+            # should be sent.
+
+            self.assertEqual(self.social_post.state, 'posting')
+            self.assertFalse(self.social_post.scheduled_date)
+            self.assertEqual(self.social_post.live_post_ids.mapped('state'), ['ready', 'ready'])
+            self.assertEqual(len(captured_triggers.records), 1)
+            self.assertEqual(captured_triggers.records.cron_id, cron)
+            self.assertEqual(captured_triggers.records.call_at, fields.Datetime.now())
+            self.assertFalse(captured_outgoing_post_requests)
+
+            # Trigger the cron job sending the push notifications:
+            with self.enter_registry_test_mode():
+                cron.method_direct_trigger()
+
+            # Check the new status of the posts:
+            self.assertEqual(self.social_post.state, 'posted')
+            self.assertEqual(self.social_post.live_post_ids.mapped('state'), ['posted', 'posted'])
+
+            # Check that the notifications have been sent:
+            target_visitors = self.env['website.visitor'].search([
+                ('has_push_notifications', '=', True),
+                ('website_id', 'in', self.social_post.live_post_ids.account_id.website_id.ids)
+            ])
+
+            self.assertEqual(len(target_visitors), 1)
+            self.assertEqual(len(captured_outgoing_post_requests), 1)
+            self.assertEqual(target_visitors.push_subscription_ids.endpoint, captured_outgoing_post_requests[0]['url'])
+
+    @freeze_time('2025-02-22')
+    def test_send_push_notifications_with_visitor_domain(self):
+        cron = self.env.ref('social.ir_cron_post_scheduled')
+        visitor = self.env['website.visitor'].create({
+            'access_token': '%032x' % random.randrange(16**32),
+            'push_subscription_ids': [(0, 0, {
+                'endpoint': f'https://fcm.googleapis.com/fcm/send/fake_token_{len(self.visitors)}',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                }),
+            })],
+            'website_id': self.website_2.id,
+        })
+
+        with self.capture_push_notifications() as captured_outgoing_post_requests, \
+             self.capture_triggers('social.ir_cron_post_scheduled') as captured_triggers:
+
+            scheduled_date = fields.Datetime.now() + timedelta(days=10)
             self.social_post.write({
-                'use_visitor_timezone': True,
-                'post_method': 'scheduled',
-                'scheduled_date': scheduled_date
+                'scheduled_date': scheduled_date,
+                'visitor_domain': [('id', '=', visitor.id)]
             })
 
-        SocialPost._check_scheduled_date._constrains = check_scheduled_date_constrains
+            # When clicking on the "Scheduled" button, it should create the CRON trigger
+            self.social_post.action_add_to_queue()
+            self.assertEqual(len(captured_triggers.records), 1)
 
-        # when scheduling, a CRON trigger is created to match the scheduled_date
-        self.assertEqual(len(captured_triggers.records), 1)
-        captured_trigger = captured_triggers.records[0]
-        self.assertEqual(captured_trigger.call_at, scheduled_date)
-        self.assertEqual(captured_trigger.cron_id, self.env.ref('social.ir_cron_post_scheduled'))
+            self.assertEqual(self.social_post.state, 'scheduled')
+            self.assertFalse(self.social_post.live_post_ids)
+            self.assertFalse(captured_outgoing_post_requests)
 
-        self.assertEqual(self.social_post.state, 'draft')
+            # When triggering the cron job, it must not create the live posts
+            # yet, as the scheduled date has not been reached.
 
-        with self.capture_triggers('social.ir_cron_post_scheduled') as captured_triggers:
-            self.social_post._action_post()  # begin the post process
+            with self.enter_registry_test_mode():
+                cron.method_direct_trigger()
 
-        # as the post_method is 'scheduled', a CRON trigger should not be created, we already have one
-        self.assertEqual(len(captured_triggers.records), 0)
+            self.assertEqual(self.social_post.state, 'scheduled')
+            self.assertFalse(self.social_post.live_post_ids)
+            self.assertFalse(captured_outgoing_post_requests)
 
-        # check that live posts are correctly created
-        live_posts = self.env['social.live.post'].search([('post_id', '=', self.social_post.id)])
-        self.assertEqual(len(live_posts), 2)
+            # When the cron job is triggered and the scheduled date is reached,
+            # it must create the live posts and send the push notifications:
 
-        self.assertTrue(all(live_post.state == 'ready' for live_post in live_posts))
-        self.assertEqual(self.social_post.state, 'posting')
+            with self.enter_registry_test_mode(), freeze_time(self.social_post.scheduled_date):
+                cron.method_direct_trigger()
 
-        def _firebase_send_message_from_configuration(_this, _data, visitors):
-            website = visitors.website_id
-            push_enabled = website.firebase_enable_push_notifications
-            # Ensure that only visitors from the website with push notifications enabled
-            # and linked to the social account are notified
-            self.assertEqual(len(visitors), 1 if push_enabled else 0)
-            if visitors:
-                self.assertEqual(visitors.website_id, self.website_2)
-            return visitors.mapped('push_subscription_ids.push_token'), []
+            self.assertEqual(self.social_post.state, 'posted')
+            self.assertEqual(self.social_post.live_post_ids.mapped('state'), ['posted', 'posted'])
+            self.assertEqual(len(captured_outgoing_post_requests), 1)
+            self.assertEqual(captured_outgoing_post_requests[0]['url'], visitor.push_subscription_ids.endpoint)
 
-        with patch.object(SocialAccount, '_firebase_send_message_from_configuration',
-             _firebase_send_message_from_configuration):
-            live_posts._post_push_notifications()
+    @freeze_time('2025-11-12')
+    def test_send_push_notifications_in_batch(self):
+        self.env['ir.config_parameter'].set_str('social_push_notifications.batch_size', 1)
+        self.env['website.visitor'].search([]).unlink()
+        self.env['website.visitor'].create([{
+            'access_token': '%032x' % random.randrange(16**32),
+            'push_subscription_ids': [(0, 0, {
+                'endpoint': f'https://fcm.googleapis.com/fcm/send/fake_token_{k}',
+                'keys': json.dumps({
+                    'p256dh': 'BE0m0ndx5urJmF0-bjA88yNPt8xNmUPVt5VAC48mbxv8HV6_s4xCjqyl_pydKCwd3ToR-514KepBKfcCt2YWDlU',
+                    'auth': 'zqUqxk5qwjRbnHMmf4yS7w'
+                }),
+            })],
+            'website_id': self.website_2.id,
+        } for k in range(10)])
 
-        self.assertFalse(all(live_post.state == 'posted' for live_post in live_posts))
-        self.assertEqual(self.social_post.state, 'posting')
+        self.social_post.write({
+            'account_ids': [(6, 0, self.social_accounts.filtered(
+                lambda a: a.website_id.id == self.website_2.id).ids)]})
 
-        # simulate that everyone can receive the push notif (because their time >= time of the one who created the post)
-        self.visitors.write({'timezone': self.env.user.tz})
+        cron = self.env.ref('social.ir_cron_post_scheduled')
+        with self.capture_push_notifications() as captured_outgoing_post_requests:
+            # Click on the "Post" button:
+            self.social_post.action_post_now()
 
-        with patch.object(SocialAccount, '_firebase_send_message_from_configuration',
-             _firebase_send_message_from_configuration):
-            live_posts._post_push_notifications()
+            # When clicking on the "Post" button, it must create the live posts
+            # and the cron trigger to send the push notifications. No notification
+            # should be sent.
 
-        self._checkPostedStatus(True)
+            self.assertEqual(len(self.social_post.live_post_ids), 1)
+            self.assertEqual(self.social_post.live_post_ids.state, 'ready')
+            self.assertFalse(captured_outgoing_post_requests)
+
+            all_push_subscriptions = self.env['website.visitor.push.subscription'].search([], order='id')
+            self.assertEqual(len(all_push_subscriptions), 10)
+
+            # Trigger the cron job sending the push notifications:
+            with self.enter_registry_test_mode():
+                cron.method_direct_trigger()
+
+            # Check that the notifications has been sent:
+            self.assertEqual(self.social_post.state, 'posted')
+            self.assertEqual(self.social_post.live_post_ids.state, 'posted')
+            self.assertEqual(self.social_post.live_post_ids.last_push_subscription_id, all_push_subscriptions[-1].id)
+            self.assertEqual(len(captured_outgoing_post_requests), 10)
+            self.assertEqual(
+                all_push_subscriptions.mapped('endpoint'),
+                [post_request['url'] for post_request in captured_outgoing_post_requests])
+
+            captured_outgoing_post_requests.clear()
+
+            # Re-trigger the cron job to check that it does nothing:
+            with self.enter_registry_test_mode():
+                cron.method_direct_trigger()
+
+            self.assertEqual(self.social_post.state, 'posted')
+            self.assertEqual(self.social_post.live_post_ids.state, 'posted')
+            self.assertEqual(self.social_post.live_post_ids.last_push_subscription_id, all_push_subscriptions[-1].id)
+            self.assertFalse(captured_outgoing_post_requests)
 
     @classmethod
     def _get_social_media(cls):

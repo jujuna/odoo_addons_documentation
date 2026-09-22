@@ -1,14 +1,15 @@
 import { EsgGraphDashboard } from "@esg/components/esg_dashboard/esg_graph_dashboard/esg_graph_dashboard";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
 export class EsgHrSexParityBox extends Component {
     static template = "esg_hr.SexParityBox";
     static components = { EsgGraphDashboard };
-    static props = {
-        data: Object,
-    };
+
+    props = useProps({
+        data: t.object(),
+    });
 
     setup() {
         this.actionService = useService("action");

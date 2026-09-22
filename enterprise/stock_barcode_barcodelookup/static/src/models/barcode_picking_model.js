@@ -9,7 +9,10 @@ patch(BarcodePickingModel.prototype, {
         }
         return false;
     },
+
     _mustScanProductFirst(barcodeData) {
-        return super._mustScanProductFirst(barcodeData) && !this.isValidForBarcodeLookup;
+        // if there is no match, and barcodelookup enabled, then allow to create a new product
+        const { match } = barcodeData;
+        return super._mustScanProductFirst(barcodeData) && (match || !this.isValidForBarcodeLookup);
     },
 });

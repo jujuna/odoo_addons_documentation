@@ -4,3 +4,5 @@ from . import sign_send_request
 from . import sign_request_share
 from . import sign_send_request_signer
 from . import sign_template_preview
+from . import certificate_wizard
+from . import mail_activity_schedule

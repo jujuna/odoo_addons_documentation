@@ -4,24 +4,32 @@ import {
     getBasicData,
     getBasicServerData,
 } from "@documents_spreadsheet/../tests/helpers/data";
+import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
 import { createSpreadsheet } from "@documents_spreadsheet/../tests/helpers/spreadsheet_test_utils";
-import { describe, expect, getFixture, test } from "@odoo/hoot";
-import { dblclick } from "@odoo/hoot-dom";
-import { animationFrame } from "@odoo/hoot-mock";
+import {
+    animationFrame,
+    dblclick,
+    describe,
+    expect,
+    getFixture,
+    queryAll,
+    test,
+    waitFor,
+} from "@odoo/hoot";
 import * as spreadsheet from "@odoo/o-spreadsheet";
+import { insertChartInSpreadsheet } from "@spreadsheet/../tests/helpers/chart";
 import { selectCell, setCellContent, setSelection } from "@spreadsheet/../tests/helpers/commands";
 import { getCell, getCellValue } from "@spreadsheet/../tests/helpers/getters";
-import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
 import { doMenuAction } from "@spreadsheet/../tests/helpers/ui";
 import { prepareWebClientForSpreadsheet } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
 import {
     contains,
     getService,
     mountWithCleanup,
-    patchWithCleanup,
     onRpc,
-    mockService,
+    patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
+import { location } from "@web/core/browser/browser";
 import { downloadFile } from "@web/core/network/download";
 import { WebClient } from "@web/webclient/webclient";
 
@@ -84,19 +92,17 @@ test("open spreadsheet with deprecated `active_id` params", async function () {
     expect.verifySteps(["spreadsheet-loaded"]);
 });
 
-test("should redirect to home menu when spreadsheet is not found", async function () {
-    onRpc("/spreadsheet/data/documents.document/2", () => {
-        expect.step("try-open-spreadsheet");
-        return new Response("{}", { status: 404 });
-    });
-    mockService("action", {
-        doAction(actionRequest) {
-            if (actionRequest === "menu") {
-                expect.step("redirect-to-home-menu");
-            } else {
-                return super.doAction(...arguments);
-            }
-        },
+test("open spreadsheet adds document access token to the URL", async function () {
+    await prepareWebClientForSpreadsheet();
+    onRpc("/spreadsheet/data/documents.document/2", () => ({
+        access_token: "spreadsheetAccessTokeno2",
+        data: {},
+        has_write_access: true,
+        name: "My spreadsheet",
+        revisions: [],
+    }));
+    await makeDocumentsSpreadsheetMockEnv({
+        serverData: { models: getBasicData() },
     });
     await mountWithCleanup(WebClient);
     await getService("action").doAction({
@@ -106,32 +112,40 @@ test("should redirect to home menu when spreadsheet is not found", async functio
             spreadsheet_id: 2,
         },
     });
-    expect.verifySteps(["try-open-spreadsheet", "redirect-to-home-menu"]);
+    expect(location.pathname).toBe("/odoo/spreadsheet/spreadsheetAccessTokeno2");
 });
 
-test("should redirect to home menu when spreadsheet access is denied", async function () {
-    onRpc("/spreadsheet/data/documents.document/2", () => {
-        expect.step("try-open-spreadsheet");
-        return new Response("{}", { status: 403 });
+test("spreadsheet name remains editable when action is restored from token URL", async function () {
+    await prepareWebClientForSpreadsheet();
+    onRpc("documents.document", "write", ({ args }) => {
+        expect(args).toEqual([[2], { name: "Renamed spreadsheet" }]);
+        expect.step("name-written");
+        return true;
     });
-    mockService("action", {
-        doAction(actionRequest) {
-            if (actionRequest === "menu") {
-                expect.step("redirect-to-home-menu");
-            } else {
-                return super.doAction(...arguments);
-            }
-        },
+    onRpc("/spreadsheet/data/documents.document/2", () => ({
+        access_token: "spreadsheetAccessTokeno2",
+        data: {},
+        has_write_access: true,
+        name: "My spreadsheet",
+        revisions: [],
+        writable_rec_name_field: "name",
+    }));
+    await makeDocumentsSpreadsheetMockEnv({
+        serverData: { models: getBasicData() },
     });
     await mountWithCleanup(WebClient);
     await getService("action").doAction({
         type: "ir.actions.client",
         tag: "action_open_spreadsheet",
         params: {
-            spreadsheet_id: 2,
+            // The router restores these parameters from a tokenized spreadsheet URL.
+            resId: 2,
+            access_token: "spreadsheetAccessTokeno2",
         },
     });
-    expect.verifySteps(["try-open-spreadsheet", "redirect-to-home-menu"]);
+    expect(".o_navbar .o_sp_name input").not.toHaveAttribute("disabled");
+    await contains(".o_navbar .o_sp_name input").edit("Renamed spreadsheet");
+    expect.verifySteps(["name-written"]);
 });
 
 test("breadcrumb is rendered the navbar", async function () {
@@ -177,7 +191,6 @@ test("Can open a spreadsheet in readonly", async function () {
         data: {},
         name: "name",
         revisions: [],
-        isReadonly: true,
     }));
     const { model } = await createSpreadsheet();
     expect(model.getters.isReadonly()).toBe(true);
@@ -188,6 +201,7 @@ test("format menu with default currency", async function () {
         data: {},
         name: "name",
         revisions: [],
+        has_write_access: true,
         default_currency: {
             code: "θdoo",
             symbol: "θ",
@@ -256,6 +270,22 @@ test("ask confirmation when merging", async function () {
     await contains(".o-menu-item-button[title='Merge cells']").click();
     await contains(".o_dialog .btn-primary").click(); // confirm
     expect(model.getters.isSingleCellOrMerge(sheetId, toZone("A1:A2"))).toBe(true);
+});
+
+test("Cancel callback of askConfirmation is called when using the cancel button", async function () {
+    const { env } = await createSpreadsheet();
+    env.askConfirmation(
+        "Dialog title",
+        () => {},
+        () => {
+            expect.step("cancel callback");
+        }
+    );
+    await animationFrame();
+    expect(".o_dialog .btn-primary").toHaveText("Yes");
+    expect(".o_dialog .btn-secondary").toHaveText("No");
+    await contains(".o_dialog .btn-secondary").click();
+    expect.verifySteps(["cancel callback"]);
 });
 
 test("Grid has still the focus after a dialog", async function () {
@@ -356,9 +386,10 @@ test("Odoo locales are displayed in setting side panel", async function () {
     await animationFrame();
 
     const loadedLocales = [];
-    const options = document.querySelectorAll(".o-settings-panel select option");
+    await contains(".o-settings-panel .o-select").click();
+    const options = queryAll(".o-spreadsheet .o-select-option");
     for (const option of options) {
-        loadedLocales.push(option.value);
+        loadedLocales.push(option.dataset.id);
     }
 
     expect(loadedLocales).toEqual(["en_US", "fr_FR", "od_OO"]);
@@ -379,4 +410,32 @@ test("sheetName should not be left empty", async function () {
 
     await contains(".modal-dialog .btn-primary").click();
     expect(".o-sheet-name-editable").toHaveCount(1);
+});
+
+test("Frozen spreadsheet should restrict copy", async function () {
+    onRpc("/spreadsheet/data/documents.document/*", () => ({
+        data: {},
+        name: "name",
+        revisions: [],
+        handler: "frozen_spreadsheet",
+        isReadonly: false,
+    }));
+    const { model } = await createSpreadsheet();
+    expect(model.canDispatch("COPY", {}).isSuccessful).toBe(false);
+});
+
+test("datasource links redirect towards the correct views", async function () {
+    const { model } = await createSpreadsheet();
+    const dataSourceCoreId = insertChartInSpreadsheet(model, "line");
+    const chartId = model.getters.getChartIds(model.getters.getActiveSheetId())[0];
+    model.dispatch("UPDATE_ODOO_LINK_TO_CHART", {
+        chartId,
+        odooLink: { type: "dataSource", dataSourceType: "chart", dataSourceCoreId },
+    });
+
+    await contains(".o-chart-menu-item[data-id='chartOdooLink']", { visible: false }).click();
+    await animationFrame();
+    await waitFor(".o_graph_renderer");
+    expect(".o_graph_renderer").toHaveCount(1);
+    expect(getService("action").currentController.view.type).toBe("graph");
 });

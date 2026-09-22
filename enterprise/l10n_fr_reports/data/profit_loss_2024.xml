@@ -5,6 +5,9 @@
         <field name="name">Profit and loss account (2024)</field>
         <field name="name@fr">Compte de résultats (2024)</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="availability_condition">coa</field>
+        <field name="chart_template">fr_comp</field>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="country_id" ref="base.fr"/>
@@ -35,8 +38,6 @@
                         <field name="name">Sales of goods</field>
                         <field name="name@fr">Ventes de marchandises</field>
                         <field name="code">i_1_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp1_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -49,8 +50,6 @@
                         <field name="name">Production sold (goods and services)</field>
                         <field name="name@fr">Production vendue (biens et service)</field>
                         <field name="code">i_2_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp2_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -63,8 +62,6 @@
                         <field name="name">Stored production</field>
                         <field name="name@fr">Production Stockée</field>
                         <field name="code">i_3_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp3_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -77,8 +74,6 @@
                         <field name="name">Capitalized production</field>
                         <field name="name@fr">Production immobilisée</field>
                         <field name="code">i_4_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp4_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -91,8 +86,6 @@
                         <field name="name">Operating subsidies</field>
                         <field name="name@fr">Subventions d'exploitation</field>
                         <field name="code">i_5_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp5_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -105,8 +98,6 @@
                         <field name="name">Reversals of provisions (and depreciation), expense transfers</field>
                         <field name="name@fr">Reprises sur provisions (et amortissements), transfert de charges</field>
                         <field name="code">i_6_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp6_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -119,8 +110,6 @@
                         <field name="name">Other products</field>
                         <field name="name@fr">Autres produits</field>
                         <field name="code">i_7_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp7_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -140,7 +129,7 @@
                     <record id="account_financial_report_line_01_fr_cdr_char_exp_balance_2024" model="account.report.expression">
                         <field name="label">balance</field>
                         <field name="engine">aggregation</field>
-                        <field name="formula">ii_1_2024.balance + ii_2_2024.balance + ii_3_2024.balance + ii_4_2024.balance + ii_5_2024.balance + ii_6_2024.balance + ii_7_2024.balance + ii_8_2024.balance + ii_9_2024.balance + ii_10_2024.balance + ii_11_2024.balance + ii_12_2024.balance</field>
+                        <field name="formula">ii_1_2024.balance + ii_2_2024.balance + ii_3_2024.balance + ii_4_2024.balance + ii_5_2024.balance + ii_6_2024.balance + ii_7_2024.balance + ii_8_2024.balance + ii_9_2024.balance + ii_10_2024.balance + ii_11_2024.balance + ii_12_2024.balance + ii_13_2024.balance</field>
                         <field name="green_on_positive" eval="False"/>
                     </record>
                 </field>
@@ -149,8 +138,6 @@
                         <field name="name">Purchases of goods</field>
                         <field name="name@fr">Achats de marchandise</field>
                         <field name="code">ii_1_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc1_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -164,8 +151,6 @@
                         <field name="name">Change in inventories (goods)</field>
                         <field name="name@fr">Variation de stocks (marchandises)</field>
                         <field name="code">ii_2_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc2_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -179,8 +164,6 @@
                         <field name="name">Purchases of raw materials and other supplies</field>
                         <field name="name@fr">Achats de matières premières et autres approvisionnements</field>
                         <field name="code">ii_3_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc3_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -194,8 +177,6 @@
                         <field name="name">Changes in inventories (raw materials and supplies)</field>
                         <field name="name@fr">Variations de stocks (matières premières et approvisionnements)</field>
                         <field name="code">ii_4_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc4_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -209,13 +190,11 @@
                         <field name="name">Other purchases and external charges</field>
                         <field name="name@fr">Autres achats et charges externes</field>
                         <field name="code">ii_5_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc5_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
                                 <field name="engine">account_codes</field>
-                                <field name="formula">604 + 605 + 606 + 6090 + 6093 + 6094 + 6095 + 6096 + 6098 + 6099 + 61 + 62 + 650 + 651 + 652 + 653 + 654 + 656 + 657 + 658 + 659</field>
+                                <field name="formula">604 + 605 + 606 + 6090 + 6093 + 6094 + 6095 + 6096 + 6098 + 6099 + 61 + 62</field>
                                 <field name="green_on_positive" eval="False"/>
                             </record>
                         </field>
@@ -224,8 +203,6 @@
                         <field name="name">Taxes and duties</field>
                         <field name="name@fr">Impôts et taxes</field>
                         <field name="code">ii_6_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc8_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -239,8 +216,6 @@
                         <field name="name">Wages and salaries</field>
                         <field name="name@fr">Salaires et traitements</field>
                         <field name="code">ii_7_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc9_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -254,8 +229,6 @@
                         <field name="name">Social security charges</field>
                         <field name="name@fr">Charges sociales</field>
                         <field name="code">ii_8_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc10_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -269,8 +242,6 @@
                         <field name="name">Depreciation and provisions on fixed assets: depreciation allowances</field>
                         <field name="name@fr">Dotations aux amortissements et aux provisions sur immobilisations : dotations aux amortissements</field>
                         <field name="code">ii_9_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc11_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -284,8 +255,6 @@
                         <field name="name">Depreciation and provisions on fixed assets: provisions</field>
                         <field name="name@fr">Dotations aux amortissements et aux provisions sur immobilisations : dotations aux provisions</field>
                         <field name="code">ii_10_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc12_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -299,8 +268,6 @@
                         <field name="name">Depreciation and provisions on current assets: provisions</field>
                         <field name="name@fr">Dotations aux amortissements et aux provisions sur actif circulant : dotations aux provisions</field>
                         <field name="code">ii_11_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc13_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -314,13 +281,23 @@
                         <field name="name">Depreciation, amortisation and provisions for liabilities and charges: provisions</field>
                         <field name="name@fr">Dotations aux amortissements et aux provisions pour risques et charges: dotations aux provisions</field>
                         <field name="code">ii_12_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc14_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
                                 <field name="engine">account_codes</field>
                                 <field name="formula">6815</field>
+                                <field name="green_on_positive" eval="False"/>
+                            </record>
+                        </field>
+                    </record>
+                    <record id="account_financial_report_line_fr_cdrc16_2024" model="account.report.line">
+                        <field name="name">Other expenses</field>
+                        <field name="code">ii_13_2024</field>
+                        <field name="expression_ids">
+                            <record id="account_financial_report_line_fr_cdrc16_balance_2024" model="account.report.expression">
+                                <field name="label">balance</field>
+                                <field name="engine">account_codes</field>
+                                <field name="formula">650 + 651 + 652 + 653 + 654 + 656 + 657 + 658 + 659</field>
                                 <field name="green_on_positive" eval="False"/>
                             </record>
                         </field>
@@ -348,8 +325,6 @@
                         <field name="name">Profit allocated or loss transferred (III)</field>
                         <field name="name@fr">Bénéfice attribué ou perte de transférée (III)</field>
                         <field name="code">III_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp8_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -362,8 +337,6 @@
                         <field name="name">Losses incurred or profit transferred (IV)</field>
                         <field name="name@fr">Pertes supportée ou bénéfice transféré (IV)</field>
                         <field name="code">IV_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="p_n_l_pertes_supportee_ou_benefice_transfere_iv_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -392,8 +365,6 @@
                         <field name="name">Of participations</field>
                         <field name="name@fr">De participations</field>
                         <field name="code">v_1_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp9_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -406,8 +377,6 @@
                         <field name="name">Other securities and receivables in fixed assets</field>
                         <field name="name@fr">D'autres valeurs mobilières et créances de l'actif immobilisé</field>
                         <field name="code">v_2_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp10_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -420,8 +389,6 @@
                         <field name="name">Other interest and similar income</field>
                         <field name="name@fr">Autres intérêts et produits assimilés</field>
                         <field name="code">v_3_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp11_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -434,8 +401,6 @@
                         <field name="name">Reversals of provisions and expense transfers</field>
                         <field name="name@fr">Reprises sur provisions et transferts de charges</field>
                         <field name="code">v_4_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp12_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -448,8 +413,6 @@
                         <field name="name">Positive exchange rate differences</field>
                         <field name="name@fr">Différences positives de change</field>
                         <field name="code">v_5_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp13_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -462,8 +425,6 @@
                         <field name="name">Net income from sales of marketable securities</field>
                         <field name="name@fr">Produits nets sur cessions de valeurs mobilières de placement</field>
                         <field name="code">v_6_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp14_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -492,8 +453,6 @@
                         <field name="name">Depreciation and provisions</field>
                         <field name="name@fr">Dotations aux amortissements et provisions</field>
                         <field name="code">vi_1_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc17_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -507,8 +466,6 @@
                         <field name="name">Sundry expenses</field>
                         <field name="name@fr">Charges diverses</field>
                         <field name="code">vi_2_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc15_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -522,8 +479,6 @@
                         <field name="name">Interest and similar charges</field>
                         <field name="name@fr">Intérêts et charges assimilées</field>
                         <field name="code">vi_3_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc18_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -537,8 +492,6 @@
                         <field name="name">Negative exchange rate differences</field>
                         <field name="name@fr">Différences négatives de change</field>
                         <field name="code">vi_4_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc19_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -552,8 +505,6 @@
                         <field name="name">Net expenses on disposals of investment property</field>
                         <field name="name@fr">Charges nettes sur cessions de valeurs immobilières de placement</field>
                         <field name="code">vi_5_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc20_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -606,8 +557,6 @@
                         <field name="name">On management operations</field>
                         <field name="name@fr">Sur opérations de gestion</field>
                         <field name="code">vii_1_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp15_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -620,8 +569,6 @@
                         <field name="name">Extraordinary income</field>
                         <field name="name@fr">Produits exceptionnels</field>
                         <field name="code">vii_2_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="p_n_l_produits_exceptionnels_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -634,8 +581,6 @@
                         <field name="name">On trust transactions</field>
                         <field name="name@fr">Sur opérations liées à la fiducie</field>
                         <field name="code">vii_5_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="p_n_l_produits_fiducie_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -648,8 +593,6 @@
                         <field name="name">On capital transactions</field>
                         <field name="name@fr">Sur opérations au capital</field>
                         <field name="code">vii_3_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp16_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -662,8 +605,6 @@
                         <field name="name">Reversals of provisions and expense transfers</field>
                         <field name="name@fr">Reprises sur provisions et transferts de charges</field>
                         <field name="code">vii_4_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrp17_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -676,7 +617,7 @@
             </record>
             <record id="account_financial_report_line_01_fr_cdr_char_exc_2024" model="account.report.line">
                 <field name="name">Exceptional expenses (VIII)</field>
-                <field name="name@fr">Charges exceptionnels (VIII)</field>
+                <field name="name@fr">Charges exceptionnelles (VIII)</field>
                 <field name="code">VIII_2024</field>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
@@ -692,8 +633,6 @@
                         <field name="name">On management operations</field>
                         <field name="name@fr">Sur opérations de gestion</field>
                         <field name="code">viii_1_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc21_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -707,8 +646,6 @@
                         <field name="name">On trust transactions</field>
                         <field name="name@fr">Sur opérations liées à la fiducie</field>
                         <field name="code">viii_4_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="p_n_l_charges_fiducie_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -722,8 +659,6 @@
                         <field name="name">On capital transactions</field>
                         <field name="name@fr">Sur opérations au capital</field>
                         <field name="code">viii_2_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc22_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -737,8 +672,6 @@
                         <field name="name">Depreciation and provisions</field>
                         <field name="name@fr">Dotations aux amortissements et provisions</field>
                         <field name="code">viii_3_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_fr_cdrc23_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -766,8 +699,6 @@
                         <field name="name">Employee profit-sharing (IX)</field>
                         <field name="name@fr">Participation des salariés aux résultats de l'entreprise (IX)</field>
                         <field name="code">IX_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_01_fr_cdr24_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -781,8 +712,6 @@
                         <field name="name">Income tax (X)</field>
                         <field name="name@fr">Impôts sur les bénéfices (X)</field>
                         <field name="code">X_2024</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_line_01_fr_cdr25_balance_2024" model="account.report.expression">
                                 <field name="label">balance</field>

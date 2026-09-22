@@ -1,5 +1,8 @@
 import { describe, test, expect } from "@odoo/hoot";
+import { mockDate } from "@odoo/hoot-mock";
 import { definePosPrepDisplayModels } from "@pos_enterprise/../tests/unit/data/generate_model_definitions";
+
+const { DateTime } = luxon;
 import {
     setupPosPrepDisplayEnv,
     createPrepDisplayTicket,
@@ -11,7 +14,7 @@ import { mountWithCleanup } from "@web/../tests/web_test_helpers";
 definePosPrepDisplayModels();
 
 describe("changeOrderlineStatus", () => {
-    test("should toggle todo state for single orderline", async () => {
+    test("should toggle todo preparation line for single orderline", async () => {
         const store = await setupPosPrepDisplayEnv();
         await createPrepDisplayTicket(store);
         const orders = store.filteredOrders;
@@ -50,7 +53,7 @@ test("should mark order as done", async () => {
     const orders = store.filteredOrders;
     const comp = await mountWithCleanup(Order, { props: { order: orders[0] } });
     await comp.doneOrder();
-    expect(comp.props.order.states.length).toBeGreaterThan(0);
+    expect(comp.props.order.prepLines.length).toBeGreaterThan(0);
 });
 
 describe("orderlines", () => {
@@ -81,4 +84,37 @@ test("pdisNotes", async () => {
     const orders = store.filteredOrders;
     const comp = await mountWithCleanup(Order, { props: { order: orders[0] } });
     expect(comp.pdisNotes).toEqual([{ text: "Wait", colorIndex: 3 }]);
+});
+
+describe("presetDate", () => {
+    test("returns 'Today' when preset_time is today", async () => {
+        mockDate("2026-06-08 10:00:00");
+        const store = await setupPosPrepDisplayEnv();
+        await createPrepDisplayTicket(store);
+        const orders = store.filteredOrders;
+        const comp = await mountWithCleanup(Order, { props: { order: orders[0] } });
+        comp.order.pos_order_id.preset_time = DateTime.now();
+        expect(comp.presetDate).toBe("Today");
+    });
+
+    test("returns 'Tomorrow' when preset_time is tomorrow", async () => {
+        mockDate("2026-06-08 10:00:00");
+        const store = await setupPosPrepDisplayEnv();
+        await createPrepDisplayTicket(store);
+        const orders = store.filteredOrders;
+        const comp = await mountWithCleanup(Order, { props: { order: orders[0] } });
+        comp.order.pos_order_id.preset_time = DateTime.now().plus({ days: 1 });
+        expect(comp.presetDate).toBe("Tomorrow");
+    });
+
+    test("returns formatted date when preset_time is further in the future", async () => {
+        mockDate("2026-06-08 10:00:00");
+        const store = await setupPosPrepDisplayEnv();
+        await createPrepDisplayTicket(store);
+        const orders = store.filteredOrders;
+        const comp = await mountWithCleanup(Order, { props: { order: orders[0] } });
+        comp.order.pos_order_id.preset_time = DateTime.now().plus({ days: 5 });
+        expect(comp.presetDate).not.toBe("Today");
+        expect(comp.presetDate).not.toBe("Tomorrow");
+    });
 });

@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-08 20:03+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-17 23:40+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-master/"
 "delivery_iot/sl/>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -19,33 +19,20 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_iot
-#: model:ir.actions.report,print_report_name:delivery_iot.action_report_shipping_docs
-#: model:ir.actions.report,print_report_name:delivery_iot.action_report_shipping_labels
-msgid "'Empty Report - Used for assigning IoT printer'"
-msgstr "»Prazno poročilo – uporablja se za dodelitev tiskalnika IoT«"
-
-#. module: delivery_iot
-#: model:ir.model.fields,field_description:delivery_iot.field_stock_picking_type__auto_print_carrier_labels
-msgid "Auto Print Carrier Labels"
-msgstr "Samodejno tiskanje nalepk za nosilce"
-
-#. module: delivery_iot
-#: model:ir.model.fields,field_description:delivery_iot.field_stock_picking_type__auto_print_export_documents
-msgid "Auto Print Export Documents"
-msgstr "Samodejno tiskanje izvoznih dokumentov"
+#: model:ir.module.module,description:base.module_delivery_iot
+msgid ""
+"\n"
+"Allows using IoT devices, such as scales and printers, for delivery "
+"operations.\n"
+msgstr ""
 
 #. module: delivery_iot
 #: model:ir.model.fields,field_description:delivery_iot.field_stock_put_in_pack__available_scale_ids
 msgid "Available Scale"
 msgstr ""
-
-#. module: delivery_iot
-#: model_terms:ir.ui.view,arch_db:delivery_iot.view_picking_type_form_inherit
-msgid "Carrier Labels"
-msgstr "Oznake nosilcev"
 
 #. module: delivery_iot
 #: model:ir.model.fields,help:delivery_iot.field_stock_picking_type__iot_scale_ids
@@ -62,23 +49,17 @@ msgid "Connect Scale"
 msgstr "Povežite tehtnico"
 
 #. module: delivery_iot
+#. odoo-javascript
+#: code:addons/delivery_iot/static/src/field_many2one_iot_scale.js:0
+msgid "Could not get measurement from device"
+msgstr ""
+
+#. module: delivery_iot
 #: model:ir.model.fields,field_description:delivery_iot.field_iot_device__display_name
-#: model:ir.model.fields,field_description:delivery_iot.field_ir_actions_report__display_name
-#: model:ir.model.fields,field_description:delivery_iot.field_stock_picking__display_name
 #: model:ir.model.fields,field_description:delivery_iot.field_stock_picking_type__display_name
 #: model:ir.model.fields,field_description:delivery_iot.field_stock_put_in_pack__display_name
 msgid "Display Name"
 msgstr "Prikazani naziv"
-
-#. module: delivery_iot
-#: model:ir.model.fields,field_description:delivery_iot.field_stock_put_in_pack__iot_ip
-msgid "Domain Address"
-msgstr "Naslov domene"
-
-#. module: delivery_iot
-#: model_terms:ir.ui.view,arch_db:delivery_iot.view_picking_type_form_inherit
-msgid "Export Documents"
-msgstr "Izvozni dokumenti"
 
 #. module: delivery_iot
 #: model_terms:ir.ui.view,arch_db:delivery_iot.view_picking_type_form_inherit
@@ -87,8 +68,6 @@ msgstr "Kako povezati tehtnice?"
 
 #. module: delivery_iot
 #: model:ir.model.fields,field_description:delivery_iot.field_iot_device__id
-#: model:ir.model.fields,field_description:delivery_iot.field_ir_actions_report__id
-#: model:ir.model.fields,field_description:delivery_iot.field_stock_picking__id
 #: model:ir.model.fields,field_description:delivery_iot.field_stock_picking_type__id
 #: model:ir.model.fields,field_description:delivery_iot.field_stock_put_in_pack__id
 msgid "ID"
@@ -100,33 +79,9 @@ msgid "IOT Device"
 msgstr "IOT Naprava"
 
 #. module: delivery_iot
-#: model:ir.model.fields,field_description:delivery_iot.field_stock_put_in_pack__iot_device_identifier
+#: model:ir.model.fields,field_description:delivery_iot.field_stock_put_in_pack__device_identifier
 msgid "Identifier"
 msgstr "Identifikator"
-
-#. module: delivery_iot
-#: model:ir.model.fields,help:delivery_iot.field_stock_picking_type__auto_print_carrier_labels
-msgid ""
-"If this checkbox is ticked, Odoo will automatically print the carrier labels "
-"of the picking when they are created. Note this requires a printer to be "
-"assigned to this report."
-msgstr ""
-"Če je to potrditveno polje označeno, bo Odoo samodejno natisnil nalepke "
-"prevoznikov za komisioniranje, ko bodo ustvarjene. Upoštevajte, da je za to "
-"potrebno dodeliti tiskalnik za to poročilo."
-
-#. module: delivery_iot
-#: model:ir.model.fields,help:delivery_iot.field_stock_picking_type__auto_print_export_documents
-msgid ""
-"If this checkbox is ticked, Odoo will automatically print the export "
-"documents of the picking when they are created. Availability of export "
-"documents depends on the carrier and the destination. Note this requires a "
-"printer to be assigned to this report. "
-msgstr ""
-"Če je to potrditveno polje označeno, bo Odoo samodejno natisnil izvozne "
-"dokumente komisioniranja, ko bodo ustvarjeni. Razpoložljivost izvoznih "
-"dokumentov je odvisna od prevoznika in namembnega kraja. Upoštevajte, da je "
-"za to poročilo potreben tiskalnik. "
 
 #. module: delivery_iot
 #: model_terms:ir.ui.view,arch_db:delivery_iot.view_picking_type_form_inherit
@@ -143,27 +98,24 @@ msgstr ""
 "                            <br/>"
 
 #. module: delivery_iot
+#: model:ir.model.fields,field_description:delivery_iot.field_stock_put_in_pack__iot_id
+msgid "IoT Box"
+msgstr ""
+
+#. module: delivery_iot
+#: model:ir.module.module,shortdesc:base.module_delivery_iot
+msgid "IoT for Delivery"
+msgstr ""
+
+#. module: delivery_iot
 #: model_terms:ir.ui.view,arch_db:delivery_iot.iot_device_view_form_inherit
 msgid "Linked Operation Types"
 msgstr "Linked Operation Typesboste izvedeli operacijo »Vstavi v paket«."
 
 #. module: delivery_iot
-#: model:ir.model.fields,field_description:delivery_iot.field_stock_put_in_pack__manual_measurement
-msgid "Manual Measurement"
-msgstr "Ročno merjenje"
-
-#. module: delivery_iot
-#: model:ir.model.fields,help:delivery_iot.field_stock_put_in_pack__manual_measurement
-msgid "Manually read the measurement from the device"
-msgstr "Ročno odčitajte meritev z naprave"
-
-#. module: delivery_iot
-#. odoo-python
-#: code:addons/delivery_iot/models/ir_action_report.py:0
-msgid ""
-"One of the printer used to print the document has been removed.\n"
-"To reset printers, go to the Inventory App, Configuration tab, \"Reset "
-"Linked Printers\" and retry the operation."
+#. odoo-javascript
+#: code:addons/delivery_iot/static/src/field_many2one_iot_scale.js:0
+msgid "No IoT device configured."
 msgstr ""
 
 #. module: delivery_iot
@@ -185,22 +137,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/delivery_iot/static/src/field_many2one_iot_scale.xml:0
 msgid "Read weight"
-msgstr "Odčitajte težo"
-
-#. module: delivery_iot
-#: model:ir.model,name:delivery_iot.model_ir_actions_report
-msgid "Report Action"
-msgstr "Ukrep poročila"
-
-#. module: delivery_iot
-#: model:ir.ui.menu,name:delivery_iot.iot_cached_printers_section
-msgid "Reporting"
-msgstr "Poročanje"
-
-#. module: delivery_iot
-#: model:ir.ui.menu,name:delivery_iot.iot_cached_printers_action
-msgid "Reset Linked Printers"
-msgstr "Ponastavi povezane tiskalnike"
+msgstr ""
 
 #. module: delivery_iot
 #: model:ir.model.fields,field_description:delivery_iot.field_stock_put_in_pack__iot_device_id
@@ -214,16 +151,59 @@ msgid "Scales"
 msgstr "Tehtnice"
 
 #. module: delivery_iot
-#: model:ir.actions.report,name:delivery_iot.action_report_shipping_docs
+#: model:ir.module.module,summary:base.module_delivery_iot
+msgid "Use IoT devices in delivery operations"
+msgstr ""
+
+msgid "'Empty Report - Used for assigning IoT printer'"
+msgstr "»Prazno poročilo – uporablja se za dodelitev tiskalnika IoT«"
+
+msgid "Auto Print Carrier Labels"
+msgstr "Samodejno tiskanje nalepk za nosilce"
+
+msgid "Auto Print Export Documents"
+msgstr "Samodejno tiskanje izvoznih dokumentov"
+
+msgid "Carrier Labels"
+msgstr "Oznake nosilcev"
+
+msgid "Export Documents"
+msgstr "Izvozni dokumenti"
+
+msgid ""
+"If this checkbox is ticked, Odoo will automatically print the carrier labels "
+"of the picking when they are created. Note this requires a printer to be "
+"assigned to this report."
+msgstr ""
+"Če je to potrditveno polje označeno, bo Odoo samodejno natisnil nalepke "
+"prevoznikov za komisioniranje, ko bodo ustvarjene. Upoštevajte, da je za to "
+"potrebno dodeliti tiskalnik za to poročilo."
+
+msgid ""
+"If this checkbox is ticked, Odoo will automatically print the export "
+"documents of the picking when they are created. Availability of export "
+"documents depends on the carrier and the destination. Note this requires a "
+"printer to be assigned to this report. "
+msgstr ""
+"Če je to potrditveno polje označeno, bo Odoo samodejno natisnil izvozne "
+"dokumente komisioniranja, ko bodo ustvarjeni. Razpoložljivost izvoznih "
+"dokumentov je odvisna od prevoznika in namembnega kraja. Upoštevajte, da je "
+"za to poročilo potreben tiskalnik. "
+
+msgid "Report Action"
+msgstr "Ukrep poročila"
+
+msgid "Reporting"
+msgstr "Poročanje"
+
+msgid "Reset Linked Printers"
+msgstr "Ponastavi povezane tiskalnike"
+
 msgid "Shipping Documents"
 msgstr "Odpremni dokumenti"
 
-#. module: delivery_iot
-#: model:ir.actions.report,name:delivery_iot.action_report_shipping_labels
 msgid "Shipping Labels"
 msgstr "Etikete za pošiljanje"
 
-#. module: delivery_iot
-#: model:ir.model,name:delivery_iot.model_stock_picking
 msgid "Transfer"
 msgstr "Prenos"

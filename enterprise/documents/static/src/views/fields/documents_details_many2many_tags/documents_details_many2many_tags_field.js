@@ -1,4 +1,8 @@
-import { Many2ManyTagsField } from "@web/views/fields/many2many_tags/many2many_tags_field";
+import {
+    Many2ManyTagsField,
+    many2ManyTagsFieldProps,
+} from "@web/views/fields/many2many_tags/many2many_tags_field";
+import { useProps, t } from "@odoo/owl";
 
 /**
  * @override update, quickCreate (also called with create&Edit), and deleteTag
@@ -7,10 +11,11 @@ import { Many2ManyTagsField } from "@web/views/fields/many2many_tags/many2many_t
  * in "preview" mode or focused only.
  */
 export class DocumentsDetailsMany2ManyTagsField extends Many2ManyTagsField {
-    static props = {
-        ...Many2ManyTagsField.props,
-        readonlyPlaceholder: { ...Many2ManyTagsField.props.placeholder },
-    };
+    props = useProps({
+        ...many2ManyTagsFieldProps,
+        // same schema as many2ManyTagsFieldProps.placeholder
+        readonlyPlaceholder: t.string().optional(),
+    });
     static template = "documents.DocumentsDetailsPanelMany2ManyTagsField";
 
     setup() {

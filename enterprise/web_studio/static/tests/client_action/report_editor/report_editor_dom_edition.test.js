@@ -1,20 +1,13 @@
 import { setupEditor } from "@html_editor/../tests/_helpers/editor";
-import { getContent } from "@html_editor/../tests/_helpers/selection";
+import { getContent, setSelection } from "@html_editor/../tests/_helpers/selection";
 import { insertText } from "@html_editor/../tests/_helpers/user_actions";
 import { before, describe, expect, test } from "@odoo/hoot";
-import {
-    hover,
-    manuallyDispatchProgrammaticEvent,
-    press,
-    queryAll,
-    queryFirst,
-    queryOne,
-} from "@odoo/hoot-dom";
-import { animationFrame } from "@odoo/hoot-mock";
 import { contains, defineModels, fields, models } from "@web/../tests/web_test_helpers";
 import { registry } from "@web/core/registry";
+import { hover, queryAll, queryFirst, queryOne, waitFor } from "@odoo/hoot-dom";
+import { animationFrame } from "@odoo/hoot-mock";
 
-import { getReportEditorPlugins } from "@web_studio/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin";
+import { REPORT_EDITOR_PLUGINS } from "@web_studio/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin";
 
 describe.current.tags("desktop");
 
@@ -50,9 +43,8 @@ before(() => {
 function getEditorOptions() {
     return {
         config: {
-            Plugins: getReportEditorPlugins(),
-            classList: ["odoo-editor-qweb"],
-            reportResModel: "some.model",
+            basePlugins: REPORT_EDITOR_PLUGINS,
+            dynamicResModel: "some.model",
         },
         props: {
             iframe: true,
@@ -248,6 +240,44 @@ ${"                    "}
         </q-table>`);
 });
 
+test("remove last column does not crash", async () => {
+    const { editor } = await setupEditor(
+        `<div style="width: 100px; margin-top: 50px; margin-left: 50px;">
+        <q-table>
+            <q-thead>
+                <q-tr>
+                    <q-th>HEAD1</q-th>
+                </q-tr>
+            </q-thead>
+            <q-tbody>
+                <q-tr>
+                    <q-td>1[]</q-td>
+                </q-tr>
+            </q-tbody>
+        </q-table></div>`,
+        getEditorOptions()
+    );
+
+    await hover(queryFirst(":iframe q-th"));
+    await contains(".o-overlay-container .o-we-table-menu").click();
+    await contains(".o-dropdown-item:contains(Delete)").click();
+
+    const el = editor.getElContent();
+    expect(getContent(el.firstElementChild)).toBe(`
+        <q-table>
+            <q-thead>
+                <q-tr>
+${"                    "}
+                </q-tr>
+            </q-thead>
+            <q-tbody>
+                <q-tr>
+${"                    "}
+                </q-tr>
+            </q-tbody>
+        </q-table>`);
+});
+
 test("remove column colspan", async () => {
     const { editor, el } = await setupEditor(
         `<div style="width: 100px; margin-top: 50px; margin-left: 50px;">
@@ -279,6 +309,7 @@ test("remove column colspan", async () => {
         getEditorOptions()
     );
 
+    await setSelection({ anchorNode: queryFirst(":iframe q-td"), anchorOffset: 1 });
     expect(getContent(el.querySelector("div"))).toBe(`
         <q-table class="oe_unbreakable" style="--q-table-col-count: 3;">
             <q-thead class="oe_unbreakable">
@@ -436,67 +467,12 @@ test("push and remove readable expression as text node", async () => {
     expect(getContent(el)).toBe(
         `<div class="o-paragraph">a<span t-field="doc.field" data-oe-expression-readable="human > expr" data-oe-protected="true" contenteditable="false">human > expr</span></div>`
     );
-
     expect(getContent(editor.getElContent())).toBe(
         '<div>a<span t-field="doc.field" data-oe-expression-readable="human > expr"></span></div>'
     );
 });
 
-test("select all t-field", async () => {
-    const { el } = await setupEditor(
-        `<div>a<span t-field="doc.field" data-oe-expression-readable="human > expr"></span></div>`,
-        getEditorOptions()
-    );
-    await contains(":iframe span[t-field]").click();
-    expect(getContent(el)).toBe(
-        `<div class="o-paragraph">a[<span t-field="doc.field" data-oe-expression-readable="human > expr" data-oe-protected="true" contenteditable="false">human > expr</span>]</div>`
-    );
-});
-
-test("copy t-field", async () => {
-    const options = getEditorOptions();
-    // Disable iframe for now: seems that hoot.press doesn't properly handle it.
-    options.props.iframe = false;
-
-    const { editor, el } = await setupEditor(
-        `<div>a<span t-field="doc.field" data-oe-expression-readable="human ... expr"></span></div>`,
-        options
-    );
-    await contains("span[t-field]").click();
-    const clipboardData = new DataTransfer();
-    await press(["ctrl", "c"], { dataTransfer: clipboardData });
-    expect(clipboardData.getData("application/vnd.odoo.odoo-editor")).toBe(
-        `<div><span t-field="doc.field" data-oe-expression-readable="human ... expr" data-oe-protected="true" contenteditable="false"></span></div>`
-    );
-
-    editor.shared.selection.setSelection({ anchorNode: queryOne(".odoo-editor-editable div") });
-    await manuallyDispatchProgrammaticEvent(el, "paste", { clipboardData });
-
-    expect(getContent(el)).toBe(
-        `<div class="o-paragraph"><span contenteditable="false" data-oe-protected="true" data-oe-expression-readable="human ... expr" t-field="doc.field">human ... expr</span>[]a<span t-field="doc.field" data-oe-expression-readable="human ... expr" data-oe-protected="true" contenteditable="false">human ... expr</span></div>`
-    );
-});
-
-test("disable formatting stuff on t-att-class and t-att-style (and their format counterparts", async () => {
-    await setupEditor(
-        `<div>a<span t-field="doc.field" data-oe-expression-readable="human > expr" t-att-class="expr_class"></span></div>`,
-        getEditorOptions()
-    );
-    await contains(":iframe span[t-field]").click();
-    await contains(".o-we-toolbar [name=expand_toolbar]").click();
-    const allDisabled = queryAll(".o-we-toolbar button:disabled");
-    expect(allDisabled.map((el) => el.title)).toEqual([
-        "Select font style",
-        "Select font size",
-        "Toggle bold",
-        "Toggle italic",
-        "Toggle underline",
-        "Apply Font Color",
-        "Add a link",
-    ]);
-});
-
-test("add t-field", async () => {
+test("field base path from oe-context", async () => {
     const oeContext = JSON.stringify({
         docs: {
             model: "some.model",
@@ -509,27 +485,29 @@ test("add t-field", async () => {
     });
 
     const { editor, el } = await setupEditor(
-        `<div oe-context='${oeContext}' ws-view-id="1" t-foreach="docs" t-as="doc">[hop hop]</div>`,
+        `<div oe-context='${oeContext}' ws-view-id="1" t-foreach="docs" t-as="doc">hop hop</div>`,
         getEditorOptions()
     );
+    await setSelection({
+        anchorNode: queryFirst(":iframe .odoo-editor-editable div"),
+        anchorOffset: 0,
+        focusOffset: 1,
+    });
     await insertText(editor, "/");
-    await contains(".o-we-powerbox .o-we-command-name:text(Field)").click();
-
-    await contains(
-        ".o-web-studio-report-dynamic-placeholder-popover .o_model_field_selector_value"
-    ).click();
+    await contains(".o-we-powerbox .o-we-command-name:contains(/^Field$/)").click();
+    await contains(".o-dynamic-field-popover .o_model_field_selector_value").click();
     await contains(".o_model_field_selector_popover_page li[data-name='field'] button").click();
-    expect(
-        ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']"
-    ).toHaveValue("My little field");
+    await contains(".o-dynamic-field-popover button.btn-primary").click();
 
-    await contains(".o-web-studio-report-dynamic-placeholder-popover button.btn-primary").click();
+    // Expect "doc.field" instead of "object.field"
     expect(getContent(el.querySelector("div"))).toBe(
-        '<span data-oe-expression-readable="My little field" data-oe-demo="My little field" t-field="doc.field" data-oe-protected="true" contenteditable="false">My little field</span>[]'
+        '<span data-oe-expression-readable="My little field" t-field="doc.field" data-oe-demo="My little field" data-oe-protected="true" contenteditable="false">My little field</span>[]'
     );
 });
 
-test("edit t-field and back", async () => {
+test("auto focus hintable", async () => {
+    // a hintable is something matched by any hint registered in the plugins resources
+    // that is a descendant of .page
     const oeContext = JSON.stringify({
         doc: {
             model: "some.model",
@@ -537,38 +515,90 @@ test("edit t-field and back", async () => {
         },
     });
 
-    const { editor, el } = await setupEditor(
-        `<div oe-context='${oeContext}' ws-view-id="1">a<span t-field="doc.field" data-oe-expression-readable="human > expr" data-oe-demo="demo brol"></span></div>`,
+    const { el } = await setupEditor(
+        `<div class="page" oe-context='${oeContext}' ws-view-id="1"><div class="oe_structure"></div></div>`,
         getEditorOptions()
     );
-    expect(getContent(el)).toBe(
-        `<div oe-context='${oeContext}' ws-view-id="1" class="o-paragraph">a<span t-field="doc.field" data-oe-expression-readable="human > expr" data-oe-demo="demo brol" data-oe-protected="true" contenteditable="false">demo brol</span></div>`
-    );
-
-    await contains(":iframe span[t-field]").click();
-    await contains(".o-we-toolbar button[name='editDynamicField']").click();
-    await contains(
-        ".o-web-studio-report-dynamic-placeholder-popover .o_model_field_selector_value"
-    ).click();
-    await contains(
-        ".o_model_field_selector_popover_page li[data-name='display_name'] button"
-    ).click();
-    await contains(
-        ".o-web-studio-report-dynamic-placeholder-popover input[name='label_value']"
-    ).edit("edited", { confirm: false });
-    await contains(".o-web-studio-report-dynamic-placeholder-popover button.btn-primary").click();
-
-    expect(getContent(el)).toBe(
-        `<div oe-context='${oeContext}' ws-view-id="1" class="o-paragraph o_dirty">a[<span t-field="doc.display_name" data-oe-expression-readable="Display name" data-oe-demo="edited" data-oe-protected="true" contenteditable="false">edited</span>]</div>`
-    );
-
-    expect(getContent(editor.getElContent())).toBe(
-        `<div oe-context='${oeContext}' ws-view-id="1" class="o_dirty">a<span t-field="doc.display_name" data-oe-expression-readable="Display name" data-oe-demo="edited"></span></div>`
-    );
-
-    editor.shared.history.undo();
     await animationFrame();
+
+    expect(document.activeElement).toBe(queryOne("iframe"));
     expect(getContent(el)).toBe(
-        `<div oe-context='${oeContext}' ws-view-id="1" class="o-paragraph o_dirty">[]a<span t-field="doc.field" data-oe-expression-readable="human > expr" data-oe-demo="demo brol" data-oe-protected="true" contenteditable="false">demo brol</span></div>`
+        `<p data-selection-placeholder=""><br></p><div class="page" oe-context='${oeContext}' ws-view-id="1"><div class="oe_structure o-paragraph o-we-hint" o-we-hint-text='Type "/" for commands'>[]<br></div></div><p data-selection-placeholder=""><br></p>`
     );
+});
+
+test("/fields supported types", async () => {
+    class Dummy0 extends models.Model {}
+    class Dummy extends models.Model {
+        properties = fields.Properties({ definition_record: "", definition_record_field: "" });
+        dummy_name = fields.Text();
+        m2o = fields.Many2one({ relation: Dummy0._name });
+        o2m = fields.One2many({ relation: Dummy0._name });
+        bool = fields.Boolean();
+    }
+    defineModels([Dummy, Dummy0]);
+    const oeContext = JSON.stringify({
+        doc: {
+            model: Dummy._name,
+            name: "Some Model",
+            in_foreach: true,
+        },
+    });
+
+    const { editor } = await setupEditor(
+        `<div class="page" oe-context='${oeContext}' ws-view-id="1"><div class="oe_structure">[]</div></div>`,
+        getEditorOptions()
+    );
+    await animationFrame();
+    await insertText(editor, "/");
+    await contains(".o-we-command:contains(Field)").click();
+
+    await contains(".o_model_field_selector_value").click();
+    await waitFor(".o_model_field_selector_popover");
+    expect(
+        queryAll(".o_model_field_selector_popover_page .o_model_field_selector_popover_item").map(
+            (e) => e.textContent
+        )
+    ).toEqual(["Created on", "Display name", "Dummy name", "Id", "Last Modified on", "M2o", "O2m"]);
+});
+
+test("theme colors are not available", async () => {
+    await setupEditor(`<div><span>some [text]</span></div>`, getEditorOptions());
+    await contains(".o-we-toolbar .o-select-color-foreground").click();
+    await contains(".solid-tab").click();
+    expect(".o_colorpicker_section").toHaveInnerHTML("");
+});
+
+test("prevent selection placeholders in between header article footer", async () => {
+    const { el } = await setupEditor(
+        `
+        <div class="header"><div /></div>
+        <div class="article"><div /></div>
+        <div class="footer"><div /></div>`,
+        getEditorOptions()
+    );
+    expect(getContent(el)).toBe(`
+        <div class="header"><div class="o-paragraph o-we-hint" o-we-hint-text='Type "/" for commands'>[]<br></div></div>
+        <div class="article"><div class="o-paragraph"><br></div></div>
+        <div class="footer"><div class="o-paragraph"><br></div></div>`);
+});
+
+test("do not add selection placeholder directly in article if report document exists", async () => {
+    const { el } = await setupEditor(
+        `<main>
+            <t t-name="web.some_layout" ws-view-id="42">
+                <div class="article">
+                    <t ws-view-id="1" ws-call-key="1" ws-call-group-key="1">
+                        <div />
+                    </t>
+                </div>
+            </t>
+        </main>`,
+        getEditorOptions()
+    );
+    const article = el.querySelector(".article");
+    const reportDocument = article.querySelector("[ws-view-id='1']");
+
+    expect(article.children[0]).toBe(reportDocument);
+    expect(reportDocument.querySelector(".o-paragraph")).not.toBe(null);
 });

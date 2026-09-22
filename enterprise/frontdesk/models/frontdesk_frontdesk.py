@@ -1,84 +1,79 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import uuid
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from odoo import models, fields, api, tools, _
+from odoo.exceptions import ValidationError
+from odoo.tools import single_email_re
 from odoo.tools.urls import urljoin as url_join
-
-ASK_FIELDS_SELECTION = [
-    ("required", "Required"),
-    ("optional", "Optional"),
-    ("none", "None"),
-]
-
-PLANNED_VISITOR_TIME = 45
 
 
 class FrontdeskFrontdesk(models.Model):
     _name = 'frontdesk.frontdesk'
     _description = 'Frontdesk'
+    _inherit = ['mail.thread', 'hr.mixin']
     _order = 'is_favorite desc'
 
     name = fields.Char('Frontdesk Name', required=True)
     responsible_ids = fields.Many2many(
         'res.users',
         string='Responsibles',
-        required=True, help="Responsibles are people who will welcome the client and handle their drinks, etc."
+        required=True, help="Responsibles are notified if no host is selected."
     )
-    host_ids = fields.Many2many(
-        'hr.employee',
-        string='Hosts',
-        domain="[('company_id', '=', company_id), '|', ('work_email', '!=', False), ('work_phone', '!=', False)]"
-    )
+    host_ids = fields.Many2many('hr.employee', string='Hosts', check_company=True)
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
     theme = fields.Selection(selection=[("light", "Light"), ("dark", "Dark")], default='light')
-    image = fields.Image("Image")
+    image = fields.Image("Image", help="This image will be used as the kiosk background.")
     host_selection = fields.Boolean(
         'Host Selection',
         groups='frontdesk.frontdesk_group_user',
         help="Restrict the hosts available from the client to choose from."
     )
-    authenticate_guest = fields.Boolean('Authenticate Guest', default=True, groups='frontdesk.frontdesk_group_user')
-    ask_phone = fields.Selection(string='Phone', selection=ASK_FIELDS_SELECTION, default='required', required=True)
-    ask_company = fields.Selection(string='Organization', selection=ASK_FIELDS_SELECTION, default='optional', required=True)
-    ask_email = fields.Selection(string='Email', selection=ASK_FIELDS_SELECTION, default='none', required=True)
+    authenticate_guest = fields.Boolean('Guest Details', default=True, groups='frontdesk.frontdesk_group_user')
+    ask_phone = fields.Boolean(string='Phone', default=True)
+    ask_company = fields.Boolean(string='Organization', default=False)
+    ask_email = fields.Boolean(string='Email', default=False)
     notify_email = fields.Boolean('Notify by email', groups='frontdesk.frontdesk_group_user')
-    notify_sms = fields.Boolean('Notify by SMS', groups='frontdesk.frontdesk_group_user')
-    sms_template_id = fields.Many2one(
-        'sms.template',
-        string='SMS Template',
-        domain="[('model', '=', 'frontdesk.frontdesk')]",
-        default=lambda self: self.env.ref('frontdesk.frontdesk_sms_template', raise_if_not_found=False)
+    mail_template_id = fields.Many2one(
+        'mail.template',
+        string='Email Template',
+        domain="[('model', '=', 'frontdesk.visitor')]",
+        default=lambda self: self.env.ref('frontdesk.frontdesk_visitor_mail_template', raise_if_not_found=False),
+        ondelete='restrict',
     )
     self_check_in = fields.Boolean('Self Check-In', groups='frontdesk.frontdesk_group_user',
         help='Shows a QR code in the interface, for guests to check in from their mobile phone.'
     )
-    drink_offer = fields.Boolean('Offer Drinks', groups='frontdesk.frontdesk_group_user')
-    drink_ids = fields.Many2many('frontdesk.drink')
+    auto_checkout_hours = fields.Float(string="Auto-Checkout")
     notify_discuss = fields.Boolean('Notify by discuss', default=True, groups='frontdesk.frontdesk_group_user')
     description = fields.Html(groups='frontdesk.frontdesk_group_user')
     visitor_ids = fields.One2many('frontdesk.visitor', 'station_id', string='Visitors')
     guest_on_site = fields.Integer('Guests On Site', compute='_compute_dashboard_data')
-    pending = fields.Integer('Pending', compute='_compute_dashboard_data')
-    drink_to_serve = fields.Integer('Drinks to Serve', compute='_compute_dashboard_data')
     latest_check_in = fields.Char(compute='_compute_dashboard_data')
-    visitor_properties_definition = fields.PropertiesDefinition('Visitor Properties')
     access_token = fields.Char("Security Token", default=lambda self: str(uuid.uuid4()), required=True, copy=False, readonly=True)
     kiosk_url = fields.Char('Kiosk URL', compute='_compute_kiosk_url', groups='frontdesk.frontdesk_group_user')
     is_favorite = fields.Boolean()
+    privacy_notice = fields.Text()
+    privacy_notice_details = fields.Text()
     active = fields.Boolean(default=True)
-    notify_warning = fields.Char(compute="_compute_notify_warning")
 
-    @api.depends('host_ids.user_id', 'host_ids.work_email', 'host_ids.work_phone')
-    def _compute_notify_warning(self):
+    _check_auto_checkout_positive = models.Constraint(
+        'CHECK(auto_checkout_hours >= 0.0)',
+        "The Auto-Checkout value should be positive.",
+    )
+
+    @api.constrains('host_ids', 'notify_email')
+    def _check_valid_hosts(self):
         for frontdesk in self:
-            fallback_hosts = frontdesk.host_ids.filtered(
-                lambda host: not host.user_id and bool(host.work_email or host.work_phone)
-            )
-            frontdesk.notify_warning = ', '.join(fallback_hosts.mapped('name'))
+            if frontdesk.notify_email and (invalid_hosts := frontdesk.host_ids.filtered(
+                lambda host: not (host.work_email and single_email_re.match(host.work_email))
+            )):
+                raise ValidationError(self.env._(
+                        "%(host_names)s must have a valid Email to be informed about visitor arrival.",
+                        host_names=", ".join(invalid_hosts.mapped('name')),
+                ))
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
@@ -89,26 +84,17 @@ class FrontdeskFrontdesk(models.Model):
                 public_user.company_ids = [(4, self.company_id.id)]
 
     def _compute_dashboard_data(self):
-        """ This method computes the number of guests currently on site, the number of pending visitors, the number
-        of drinks to serve, and the time of the latest check-in. """
+        """ This method computes the number of guests currently on site and the time of the latest check-in. """
         visitor_data = self.env['frontdesk.visitor']._read_group([
-                ('state', 'in', ('checked_in', 'planned')),
-                ('station_id', 'in', self.ids),
-            ], ['station_id', 'state'], ['__count'])
-        checked_in_mapped = {station.id: count for station, state, count in visitor_data if state == 'checked_in'}
-        planned_mapped = {station.id: count for station, state, count in visitor_data if state == 'planned'}
-        drinks_data = self.env['frontdesk.visitor']._read_group([
-                ('drink_ids', '!=', False), ('served', '=', False), ('state', '!=', 'canceled'),
+                ('state', '=', 'checked_in'),
                 ('station_id', 'in', self.ids),
             ], ['station_id'], ['__count'])
-        drinks_data_mapped = {station.id: count for station, count in drinks_data}
+        checked_in_mapped = {station.id: count for station, count in visitor_data}
         for frontdesk in self:
-            guest_on_site = pending = drink_to_serve = 0
+            guest_on_site = 0
             latest_check_in = False
             if frontdesk.visitor_ids:
                 guest_on_site = checked_in_mapped.get(frontdesk.id, 0)
-                pending = planned_mapped.get(frontdesk.id, 0)
-                drink_to_serve = drinks_data_mapped.get(frontdesk.id, 0)
                 last_visitors = frontdesk.visitor_ids.filtered(lambda v: v.state == 'checked_in')
                 latest_check_in_time = last_visitors and last_visitors[-1].check_in
                 if latest_check_in_time:
@@ -118,8 +104,6 @@ class FrontdeskFrontdesk(models.Model):
                         else _("Last Check-In: %s hours ago", time_diff)
             frontdesk.update({
                 'guest_on_site': guest_on_site,
-                'pending': pending,
-                'drink_to_serve': drink_to_serve,
                 'latest_check_in': latest_check_in,
             })
 
@@ -127,12 +111,6 @@ class FrontdeskFrontdesk(models.Model):
     def _compute_kiosk_url(self):
         for frontdesk in self:
             frontdesk.kiosk_url = url_join(self.env['frontdesk.frontdesk'].get_base_url(), '/kiosk/%s/%s' % (frontdesk.id, frontdesk.access_token))
-
-    def copy_data(self, default=None):
-        vals_list = super().copy_data(default=default)
-        if default and 'name' in default:
-            return vals_list
-        return [dict(vals, name=self.env._("%s (copy)", front_desk.name)) for front_desk, vals in zip(self, vals_list)]
 
     def action_open_kiosk(self):
         self.ensure_one()
@@ -157,9 +135,9 @@ class FrontdeskFrontdesk(models.Model):
             'res_model': 'frontdesk.visitor',
             'view_mode': 'list,form,kanban,graph,pivot,calendar,gantt',
             'context': {
-                "search_default_state_is_planned": 1,
                 "search_default_state_is_checked_in": 1,
-                "search_default_today": 1
+                "search_default_check_in": "today",
+                "default_station_id": self.id,
             },
             'domain': [('station_id.id', '=', self.id)],
         }
@@ -168,8 +146,9 @@ class FrontdeskFrontdesk(models.Model):
         return self.kiosk_url
 
     def _get_frontdesk_field(self):
-        return ['description', 'host_selection', 'drink_offer', 'self_check_in', 'theme',
-          'drink_ids', 'ask_email', 'ask_phone', 'ask_company', 'authenticate_guest']
+        return ['id', 'name', 'description', 'host_selection', 'self_check_in', 'theme',
+          'ask_email', 'ask_phone', 'ask_company', 'authenticate_guest', 'privacy_notice',
+          'privacy_notice_details']
 
     def _get_frontdesk_data(self):
         """ Returns the data to the frontend. """
@@ -179,23 +158,8 @@ class FrontdeskFrontdesk(models.Model):
             'langs': [{'code': lang[0], 'name': lang[1]} for lang in self.env['res.lang'].get_installed()],
             'station': self.search_read([('id', '=', self.id)], self._get_frontdesk_field()),
         }
-        if self.drink_offer:
-            data['drinks'] = self.env['frontdesk.drink'].search_read([('id', 'in', self.drink_ids.ids)], ['name'])
+        data['station'][0]['has_image'] = bool(self.image)
         return data
-
-    def _get_planned_visitors(self):
-        """ Returns the planned visitors for quick sign in to the frontend. """
-        time_min = datetime.now() - timedelta(minutes=PLANNED_VISITOR_TIME)
-        time_max = datetime.now() + timedelta(minutes=PLANNED_VISITOR_TIME)
-        visitors = self.env['frontdesk.visitor'].sudo().search_read(
-                [('check_in', '>=', time_min), ('check_in', '<=', time_max), ('state', '=', 'planned'), ('station_id.id', '=', self.id)],
-                ['name', 'company', 'message', 'host_ids'])
-        if visitors:
-            return [{
-                **visitor,
-                'host_ids': [{'id': host.id, 'name': host.name} for host in self.env['hr.employee'].browse(visitor['host_ids'])]
-            } for visitor in visitors]
-        return []
 
     def _get_tmp_code(self):
         self.ensure_one()

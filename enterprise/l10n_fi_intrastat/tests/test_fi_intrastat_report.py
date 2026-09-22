@@ -10,6 +10,8 @@ from odoo.addons.account_reports.tests.account_sales_report_common import Accoun
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestFIIntrastatExport(AccountSalesReportCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountSalesReportCommon.setup_country('fi')
     def setUpClass(cls):
@@ -20,7 +22,6 @@ class TestFIIntrastatExport(AccountSalesReportCommon):
 
         # Create representative partner for agent VAT
         cls.representative = cls.env['res.partner'].create({
-            'company_type': 'company',
             'name': 'Finnish Accounting Firm',
             'street': 'Tilitoimisto Street 123',
             'city': 'Helsinki',

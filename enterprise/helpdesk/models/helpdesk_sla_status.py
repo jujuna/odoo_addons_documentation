@@ -52,7 +52,12 @@ class HelpdeskSlaStatus(models.Model):
             sla_hours = status.sla_id.time % avg_hour
 
             if status.sla_id.exclude_stage_ids:
-                sla_hours += status._get_freezed_hours(working_calendar)
+                tracking = status.ticket_id.duration_stage_tracking or {}
+                freezed_minutes = sum(
+                    tracking.get(str(stage.id), 0)
+                    for stage in status.sla_id.exclude_stage_ids
+                )
+                sla_hours += freezed_minutes / 60
 
             # Except if ticket creation time is later than the end time of the working day
             deadline_for_working_cal = working_calendar.plan_hours(0, deadline)
@@ -112,25 +117,3 @@ class HelpdeskSlaStatus(models.Model):
                 status.exceeded_hours = duration_data['hours'] * factor
             else:
                 status.exceeded_hours = False
-
-    def _get_freezed_hours(self, working_calendar):
-        self.ensure_one()
-        hours_freezed = 0
-
-        field_stage = self.env['ir.model.fields']._get(self.ticket_id._name, "stage_id")
-        freeze_stages = self.sla_id.exclude_stage_ids.ids
-        tracking_lines = self.ticket_id.message_ids.tracking_value_ids.filtered(lambda tv: tv.field_id == field_stage).sorted(key="create_date")
-
-        if not tracking_lines:
-            return 0
-
-        old_time = self.ticket_id.create_date
-        for tracking_line in tracking_lines:
-            if tracking_line.old_value_integer in freeze_stages:
-                # We must use get_work_hours_count to compute real waiting hours (as the deadline computation is also based on calendar)
-                hours_freezed += working_calendar.get_work_hours_count(old_time, tracking_line.create_date)
-            old_time = tracking_line.create_date
-        if tracking_lines[-1].new_value_integer in freeze_stages:
-            # the last tracking line is not yet created
-            hours_freezed += working_calendar.get_work_hours_count(old_time, fields.Datetime.now())
-        return hours_freezed

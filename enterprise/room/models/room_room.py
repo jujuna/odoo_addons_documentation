@@ -17,7 +17,7 @@ class RoomRoom(models.Model):
     name = fields.Char(string="Room Name", required=True, tracking=2)
     active = fields.Boolean("Active", default=True)
     description = fields.Html(string="Amenities", translate=html_translate)
-    office_id = fields.Many2one("room.office", string="Office", required=True, tracking=3)
+    office_id = fields.Many2one("room.office", string="Office", required=True, index=True, tracking=3)
     room_properties = fields.Properties("Properties", definition="office_id.room_properties_definition")
     company_id = fields.Many2one(related="office_id.company_id", string="Company", store=True)
     room_booking_ids = fields.One2many("room.booking", "room_id", string="Bookings")
@@ -57,11 +57,11 @@ class RoomRoom(models.Model):
         for room in self:
             room.is_available = room.id not in booked_rooms
 
-    @api.depends("is_available", "room_booking_ids")
+    @api.depends("room_booking_ids")
     def _compute_next_booking_start(self):
         now = fields.Datetime.now()
         next_booking_start_by_room = dict(self.env["room.booking"]._read_group(
-            [("start_datetime", ">", now), ("room_id", "in", self.filtered('is_available').ids)],
+            [("start_datetime", ">", now), ("room_id", "in", self.ids)],
             ["room_id"],
             ["start_datetime:min"],
         ))

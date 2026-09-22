@@ -4,13 +4,14 @@ from freezegun import freeze_time
 
 
 from odoo import Command
-from odoo.tests.common import HttpCase, new_test_user
+from odoo.tests.common import tagged, HttpCase, new_test_user
 from .test_common import TestQualityCommon
 from odoo.addons.spreadsheet_edition.tests.spreadsheet_test_case import (
     SpreadsheetTestCase,
 )
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestQualitySpreadsheet(TestQualityCommon, SpreadsheetTestCase, HttpCase):
 
     def test_create_spreadsheet_template(self):
@@ -40,7 +41,7 @@ class TestQualitySpreadsheet(TestQualityCommon, SpreadsheetTestCase, HttpCase):
         self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 1,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': picking.id,
             'location_id': self.location_id,
             'location_dest_id': self.location_dest_id
@@ -62,13 +63,51 @@ class TestQualitySpreadsheet(TestQualityCommon, SpreadsheetTestCase, HttpCase):
         check.unlink()
         self.assertFalse(spreadsheet.exists())
 
+    def test_get_selector_spreadsheet_models(self):
+        # Remove existing templates to test the no-template case.
+        self.env['quality.spreadsheet.template'].search([]).unlink()
+        user = new_test_user(self.env, login='Raoul')
+        template = self.env['quality.spreadsheet.template'].create({'name': 'Quality template'})
+
+        result = self.env['spreadsheet.mixin'].with_user(user).get_selector_spreadsheet_models()
+        self.assertFalse(any(r['model'] == 'quality.spreadsheet.template' for r in result))
+
+        user.group_ids |= self.env.ref('quality.group_quality_manager')
+        result = self.env['spreadsheet.mixin'].with_user(user).get_selector_spreadsheet_models()
+        self.assertTrue(any(r['model'] == 'quality.spreadsheet.template' for r in result))
+
+        template.unlink()
+        result = self.env['spreadsheet.mixin'].with_user(user).get_selector_spreadsheet_models()
+        self.assertFalse(any(r['model'] == 'quality.spreadsheet.template' for r in result))
+
+    def test_session_info_can_insert_in_spreadsheet(self):
+        # Remove existing templates to test the no-template case.
+        self.env['quality.spreadsheet.template'].search([]).unlink()
+        user_password = 'password'
+        user = new_test_user(self.env, login='RaoulSession', password=user_password)
+        template = self.env['quality.spreadsheet.template'].create({'name': 'Quality template'})
+
+        self.authenticate(user.login, user_password)
+        session_info = self.make_jsonrpc_request('/web/session/get_session_info')
+        self.assertFalse(session_info['can_insert_in_spreadsheet'])
+
+        user.group_ids |= self.env.ref('quality.group_quality_manager')
+        self.authenticate(user.login, user_password)
+        session_info = self.make_jsonrpc_request('/web/session/get_session_info')
+        self.assertTrue(session_info['can_insert_in_spreadsheet'])
+
+        template.unlink()
+        self.authenticate(user.login, user_password)
+        session_info = self.make_jsonrpc_request('/web/session/get_session_info')
+        self.assertFalse(session_info['can_insert_in_spreadsheet'])
+
     def test_delete_history_after_inactivity(self):
         with freeze_time('2018-01-01'):
             spreadsheet = self.env['quality.check.spreadsheet'].create({
                 'name': 'My spreadsheet',
                 'check_cell': 'A1',
             })
-            spreadsheet.dispatch_spreadsheet_message(
+            spreadsheet._dispatch_spreadsheet_message(
                 self.new_revision_data(spreadsheet)
             )
             snapshot = {'revisionId': 'next-revision'}

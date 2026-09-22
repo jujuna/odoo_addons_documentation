@@ -1,5 +1,11 @@
 import { describe, expect, test } from "@odoo/hoot";
-import { contains, mountWithCleanup, mockService, onRpc } from "@web/../tests/web_test_helpers";
+import {
+    assignDialogTestEnv,
+    contains,
+    mountWithCleanup,
+    mockService,
+    onRpc,
+} from "@web/../tests/web_test_helpers";
 import { makeSpreadsheetMockEnv } from "@spreadsheet/../tests/helpers/model";
 import { SpreadsheetSelectorDialog } from "@spreadsheet_edition/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog";
 import { defineSpreadsheetDashboardEditionModels } from "@spreadsheet_dashboard_edition/../tests/helpers/test_data";
@@ -13,18 +19,17 @@ function getDefaultProps() {
         name: "Pipeline",
         actionOptions: {},
         close: () => {},
+        context: {},
     };
 }
 
 async function mountSpreadsheetSelectorDialog(config = {}) {
-    const env = await makeSpreadsheetMockEnv({
+    assignDialogTestEnv();
+    await makeSpreadsheetMockEnv({
         mockRPC: config.mockRPC,
     });
-    // @ts-ignore
-    env.dialogData = { isActive: true, close: () => {} };
     const props = { ...getDefaultProps(), ...(config.props || {}) };
-    await mountWithCleanup(SpreadsheetSelectorDialog, { env, props });
-    return { env };
+    await mountWithCleanup(SpreadsheetSelectorDialog, { props });
 }
 
 onRpc("spreadsheet.mixin", "get_selector_spreadsheet_models", () => [

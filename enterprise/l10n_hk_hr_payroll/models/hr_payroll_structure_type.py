@@ -9,5 +9,11 @@ class HrPayrollStructureType(models.Model):
 
     def _get_selection_schedule_pay(self):
         if self.env.company.country_code == 'HK':
-            return [('monthly', 'Monthly')]
+            return [
+                ('monthly', self.env._('month')),
+                ('semi-monthly', self.env._('half-month')),
+                ('bi-weekly', self.env._('2 weeks')),
+                ('weekly', self.env._('week')),
+                ('daily', self.env._('day')),
+            ]
         return super()._get_selection_schedule_pay()

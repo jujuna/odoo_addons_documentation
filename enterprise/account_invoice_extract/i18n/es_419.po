@@ -3,22 +3,28 @@
 # * account_invoice_extract
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
+# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-08 02:40+0000\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:15+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/account_invoice_extract/es_419/>\n"
+"odoo-master/account_invoice_extract/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_invoice_extract
+#: model:ir.module.module,shortdesc:base.module_account_invoice_extract
+msgid "Account Invoice Extract"
+msgstr "Extracto de la factura de la cuenta"
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__message_needaction
@@ -54,8 +60,8 @@ msgstr "Puede mostrar el botón de envío de OCR"
 
 #. module: account_invoice_extract
 #: model:ir.model,name:account_invoice_extract.model_res_company
-msgid "Companies"
-msgstr "Empresas"
+msgid "Company"
+msgstr "Empresa"
 
 #. module: account_invoice_extract
 #: model:ir.model,name:account_invoice_extract.model_res_config_settings
@@ -70,8 +76,8 @@ msgstr "Contacto"
 #. module: account_invoice_extract
 #. odoo-python
 #: code:addons/account_invoice_extract/models/account_invoice.py:0
-msgid "Couldn't reload AI data."
-msgstr "No se pudieron volver a cargar los datos de IA."
+msgid "Couldn't reload data."
+msgstr "No se pudieron volver a cargar los datos."
 
 #. module: account_invoice_extract
 #. odoo-javascript
@@ -153,12 +159,6 @@ msgid "Extract Detected Layout Id"
 msgstr "Extraer el ID del diseño detectado"
 
 #. module: account_invoice_extract
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_bank_statement_line__extract_partner_name
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_partner_name
-msgid "Extract Detected Partner Name"
-msgstr "Extraer el nombre del contacto detectado"
-
-#. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_bank_statement_line__extract_prefill_data
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_prefill_data
 msgid "Extract Prefill Data"
@@ -168,6 +168,13 @@ msgstr "Extraer datos para el relleno automático"
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_state_processed
 msgid "Extract State Processed"
 msgstr "Estado del extracto procesado"
+
+#. module: account_invoice_extract
+#: model:ir.module.module,summary:base.module_account_invoice_extract
+msgid "Extract data from invoice scans to fill them automatically"
+msgstr ""
+"Extrae información de las facturas escaneadas para completarlas de forma "
+"automática"
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_state
@@ -311,11 +318,6 @@ msgid "Ratings"
 msgstr "Calificaciones"
 
 #. module: account_invoice_extract
-#: model_terms:ir.ui.view,arch_db:account_invoice_extract.view_move_form_inherit_ocr
-msgid "Reload AI Data"
-msgstr "Recargar datos de IA"
-
-#. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Error en el envío del SMS"
@@ -342,17 +344,19 @@ msgid "Vendor Bills"
 msgstr "Facturas de proveedores"
 
 #. module: account_invoice_extract
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__website_message_ids
-msgid "Website Messages"
-msgstr "Mensajes del sitio web"
-
-#. module: account_invoice_extract
-#: model:ir.model.fields,help:account_invoice_extract.field_account_move__website_message_ids
-msgid "Website communication history"
-msgstr "Historial de comunicación del sitio web"
-
-#. module: account_invoice_extract
 #. odoo-python
 #: code:addons/account_invoice_extract/models/account_invoice.py:0
 msgid "You cannot send a expense that is not in draft state!"
 msgstr "No puedes enviar un gasto que no esté en estado de borrador."
+
+msgid "Website Messages"
+msgstr "Mensajes del sitio web"
+
+msgid "Website communication history"
+msgstr "Historial de comunicación del sitio web"
+
+msgid "Couldn't reload AI data."
+msgstr "No se pudieron volver a cargar los datos de IA."
+
+msgid "Reload AI Data"
+msgstr "Recargar datos de IA"

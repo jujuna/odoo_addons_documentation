@@ -6,7 +6,7 @@
             <label for="o_sdd_iban" class="form-label">IBAN</label>
             <div class="input-group">
                 <div class="input-group-text">
-                    <i class="fa fa-fw fa-bank"/>
+                    <i class="oi oi-fw" data-icon="account_balance"/>
                 </div>
                 <input id="o_sdd_iban"
                        type="text"
@@ -15,14 +15,6 @@
                 />
             </div>
         </div>
-    </template>
-
-    <template id="sepa_state_header" inherit_id="payment_custom.custom_state_header">
-        <xpath expr="//div[@id='o_payment_status_message_details']" position="inside">
-            <div t-if="tx.provider_id.sudo().custom_mode == 'sepa_direct_debit'">
-                <strong>Amount: </strong><span t-out="tx.amount"/> €
-            </div>
-        </xpath>
     </template>
 
 </odoo>

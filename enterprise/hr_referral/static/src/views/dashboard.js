@@ -1,40 +1,38 @@
 import { _t } from "@web/core/l10n/translation";
-import { registry } from '@web/core/registry';
+import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, useEffect, useState, useRef } from "@odoo/owl";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { Component, onWillStart, proxy, signal, useListener, usePlugin, useProps } from "@odoo/owl";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 import { user } from "@web/core/user";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 export class HrReferralWelcome extends Component {
     static template = "hr_referral.Welcome";
-    static props = { ...standardActionServiceProps };
+    props = useProps(standardActionServiceProps);
     static path = "referrals";
+    static displayName = _t("Dashboard");
+
+    debugMode = usePlugin(DebugModePlugin);
+
+    reachedEnd = signal(false);
+    carouselRef = signal.ref();
+    dashboardData = proxy({});
 
     setup() {
         super.setup();
 
         this.actionService = useService("action");
-        this.orm = useService('orm');
+        this.orm = useService("orm");
 
-        this.dashboardData = useState({});
-
-        this.isDebug = odoo.debug;
-
-        this.state = useState({ reachedEnd: false });
-        this.carouselRef = useRef("carousel");
-        useEffect((el) => {
-            el && el.addEventListener('slide.bs.carousel', this.onNextSlide.bind(this));
-
-            return () => {
-                el && el.removeEventListener('slide.bs.carousel', this.onNextSlide.bind(this));
-            }
-        }, () => [this.carouselRef.el]);
-
+        // Currently owl3 doesn't auto bind in useListener, but when it does remove .bind below
+        useListener(this.carouselRef, "slide.bs.carousel", this.onNextSlide.bind(this));
         onWillStart(async () => {
-            Object.assign(this.dashboardData, await this.orm.call(
-                'hr.applicant',
-                'retrieve_referral_welcome_screen'
-            ));
+            Object.assign(
+                this.dashboardData,
+                await this.orm.call("hr.applicant", "retrieve_referral_welcome_screen", [8], {
+                    context: this.props.action.context,
+                })
+            );
             this.dashboardData.company_id = user.activeCompany.id;
         });
     }
@@ -43,7 +41,7 @@ export class HrReferralWelcome extends Component {
     // Handlers
     //--------------------------------------------------------------------------
     onNextSlide(e) {
-        this.state.reachedEnd = e.to == this.onboardingLength - 1;
+        this.reachedEnd.set(e.to == this.onboardingLength - 1);
     }
 
     get onboardingLength() {

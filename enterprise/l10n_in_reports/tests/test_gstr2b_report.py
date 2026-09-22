@@ -11,6 +11,8 @@ _logger = logging.getLogger(__name__)
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestReports(L10nInTestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -66,7 +68,7 @@ class TestReports(L10nInTestAccountReportsCommon):
             ref='BILL/NO_TAX',
             post=False,
         )
-        cls.bill_with_no_tax.line_ids.tax_ids.unlink()
+        cls.bill_with_no_tax.invoice_line_ids.tax_ids = False
         cls.bill_with_no_tax.action_post()
         account_return_type = cls.env.ref('l10n_in_reports.in_gstr2b_return_type')
         start_date, end_date = account_return_type._get_period_boundaries(cls.default_company, cls.test_date)
@@ -84,7 +86,7 @@ class TestReports(L10nInTestAccountReportsCommon):
         self.report.l10n_in_gstr2b_json_ids = self.env['ir.attachment'].create({
             'name': 'gstr2b.json',
             'mimetype': 'application/json',
-            'raw': json.dumps(gstr2b_json),
+            'raw': json.dumps(gstr2b_json).encode(),
         })
         self.report.gstr2b_match_data()
 
@@ -146,7 +148,7 @@ class TestReports(L10nInTestAccountReportsCommon):
         self.report.l10n_in_gstr2b_json_ids = self.env['ir.attachment'].create({
             'name': 'gstr2b.json',
             'mimetype': 'application/json',
-            'raw': json.dumps(gstr2b_late_reconciliation_data),
+            'raw': json.dumps(gstr2b_late_reconciliation_data).encode(),
         })
         self.report.gstr2b_match_data()
 
@@ -175,7 +177,7 @@ class TestReports(L10nInTestAccountReportsCommon):
         self.report.l10n_in_gstr2b_json_ids = self.env['ir.attachment'].create({
             'name': 'gstr2b.json',
             'mimetype': 'application/json',
-            'raw': json.dumps(gstr2b_reconciliation_different_partner),
+            'raw': json.dumps(gstr2b_reconciliation_different_partner).encode(),
         })
 
         self.report.gstr2b_match_data()
@@ -192,7 +194,7 @@ class TestReports(L10nInTestAccountReportsCommon):
         self.report.l10n_in_gstr2b_json_ids = self.env['ir.attachment'].create({
             'name': 'gstr2b.json',
             'mimetype': 'application/json',
-            'raw': json.dumps(gstr2b_draft_bill_response),
+            'raw': json.dumps(gstr2b_draft_bill_response).encode(),
         })
         self.report.gstr2b_match_data()
         self.assertEqual(self.fully_matched_bill.l10n_in_gstr2b_reconciliation_status, "partially_matched")
@@ -202,3 +204,27 @@ class TestReports(L10nInTestAccountReportsCommon):
         self.assertEqual(self.fully_matched_bill.l10n_in_gstr2b_reconciliation_status, "pending")
         self.assertEqual(self.fully_matched_bill.l10n_in_account_return_id.id, False)
         self.assertEqual(self.fully_matched_bill.l10n_in_exception, False)
+
+    def test_gstr2b_foreign_currency_bill(self):
+        """ Test GSTR-2B matching for a bill in foreign currency """
+
+        usd_currency = self.env.ref('base.USD')
+        self.env['res.currency.rate'].create({
+            'name': "2023-05-20",
+            'rate': 0.0125,
+            'currency_id': usd_currency.id,
+            'company_id': self.company_data['company'].id,
+        })
+        foreign_bill = self._init_inv(move_type='in_invoice', ref='FC-INV/001', taxes=self.comp_igst_18, partner=self.partner_b, invoice_date=self.test_date, line_vals={'price_unit': 100})
+        foreign_bill.button_draft()
+        foreign_bill.currency_id = usd_currency.id
+        foreign_bill.action_post()
+
+        gstr2b_foreign_currency = self._read_mock_json('gstr2b_foreign_currency.json')
+        self.report.l10n_in_gstr2b_json_ids = self.env['ir.attachment'].create({
+            'name': 'gstr2b_foreign.json',
+            'mimetype': 'application/json',
+            'raw': json.dumps(gstr2b_foreign_currency).encode(),
+        })
+        self.report.gstr2b_match_data()
+        self.assertEqual(foreign_bill.l10n_in_gstr2b_reconciliation_status, "matched")

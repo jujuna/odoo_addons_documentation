@@ -8,3 +8,4 @@ from . import test_payslip_batch_payments
 from . import test_single_touch_payroll
 from . import test_account_return
 from . import test_payment_report
+from . import test_l10n_au_payslip_ytd

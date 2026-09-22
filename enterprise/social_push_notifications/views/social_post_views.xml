@@ -6,11 +6,6 @@
             <field name="model">social.post</field>
             <field name="inherit_id" ref="social.social_post_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='push_notification_image']" position="after">
-                    <field name="use_visitor_timezone"
-                        string="Local Time"
-                        invisible="not has_push_notifications_account or post_method == 'now'"/>
-                </xpath>
                 <xpath expr="//div[@name='notification_request_parameters']" position="attributes">
                     <attribute name="invisible" add="state in ['posting', 'posted']" separator="or"/>
                 </xpath>
@@ -26,6 +21,33 @@
                 <xpath expr="//field[@name='visitor_domain']" position="attributes">
                     <attribute name="invisible" add="state in ['posting', 'posted']" separator="or"/>
                 </xpath>
+                <xpath expr="//group[@name='social_post_global']//field[@name='push_notification_title']" position="attributes">
+                    <attribute name="readonly">state != 'draft'</attribute>
+                </xpath>
+                <xpath expr="//group[@name='social_post_global']//field[@name='push_notification_target_url']" position="attributes">
+                    <attribute name="readonly">state != 'draft'</attribute>
+                </xpath>
+                <xpath expr="//group[@name='social_post_global']//field[@name='push_notification_image']" position="attributes">
+                    <attribute name="readonly">state != 'draft'</attribute>
+                </xpath>
+                <xpath expr="//group[@name='social_post_global']//field[@name='visitor_domain']" position="attributes">
+                    <attribute name="readonly">state != 'draft'</attribute>
+                </xpath>
+                <xpath expr="//page[@name='push_notifications_content']//field[@name='push_notification_title']" position="attributes">
+                    <attribute name="readonly">state != 'draft'</attribute>
+                </xpath>
+                <xpath expr="//page[@name='push_notifications_content']//field[@name='push_notification_message']" position="attributes">
+                    <attribute name="readonly">state != 'draft'</attribute>
+                </xpath>
+                <xpath expr="//page[@name='push_notifications_content']//field[@name='push_notification_target_url']" position="attributes">
+                    <attribute name="readonly">state != 'draft'</attribute>
+                </xpath>
+                <xpath expr="//page[@name='push_notifications_content']//field[@name='push_notification_image']" position="attributes">
+                    <attribute name="readonly">state != 'draft'</attribute>
+                </xpath>
+                <xpath expr="//page[@name='push_notifications_content']//field[@name='visitor_domain']" position="attributes">
+                    <attribute name="readonly">state != 'draft'</attribute>
+                </xpath>
                 <xpath expr="//group[@name='live_posts']//div[hasclass('o_live_post_content')]//field[@name='message']" position="before">
                     <field name="push_notification_title"
                         class="fw-bold"
@@ -38,8 +60,12 @@
                 </xpath>
                 <xpath expr="//group[@name='live_posts']//field[@name='image_ids']" position="after">
                     <field name="push_notification_image"
-                        invisible="media_type != 'push_notifications'"
+                        invisible="not push_notification_image or media_type != 'push_notifications'"
                         class="oe_avatar" widget="image"/>
+                </xpath>
+                <xpath expr="//page[@name='push_notifications_content']//field[@name='push_notification_title']" position="before">
+                    <field name="push_notifications_scheduled_date" string="Post On" placeholder="Immediately"
+                        readonly="state != 'draft'"/>
                 </xpath>
             </field>
         </record>

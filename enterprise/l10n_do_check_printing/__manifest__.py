@@ -1,6 +1,5 @@
 {
     'name': 'Dominican Republic - Checks Layout',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Check',
     'summary': 'Print Dominican Republic Checks',
     'description': """
@@ -19,7 +18,6 @@ Three layouts copied from the US check printing module, adjusted for DO
         'report/print_check.xml',
         'report/print_check_templates.xml',
     ],
-    'installable': True,
     'auto_install': ['l10n_do'],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

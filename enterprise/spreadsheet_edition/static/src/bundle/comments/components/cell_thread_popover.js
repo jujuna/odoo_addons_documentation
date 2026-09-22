@@ -1,10 +1,11 @@
-import { Component, useState, onWillUpdateProps, useChildSubEnv } from "@odoo/owl";
-import { useService } from "@web/core/utils/hooks";
 import { Thread } from "@mail/core/common/thread";
+import { stores } from "@odoo/o-spreadsheet";
+import { Component, proxy, t, useEffect, useProps } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+import { useSubEnv } from "@web/owl2/utils";
+import { CommentsStore } from "../comments_store";
 import { CellThread } from "./cell_thread";
 import { SpreadsheetCommentComposer } from "./spreadsheet_comment_composer";
-import { CommentsStore } from "../comments_store";
-import { stores } from "@odoo/o-spreadsheet";
 
 const { useStore } = stores;
 
@@ -12,30 +13,24 @@ export class CellThreadPopover extends Component {
     static template = "spreadsheet_edition.CellThreadPopover";
     static components = { Thread, CellThread, SpreadsheetCommentComposer };
 
-    static props = {
-        threadId: {
-            optional: true,
-            type: Number,
-        },
-        onClosed: {
-            optional: true,
-            type: Function,
-        },
-        isInteractive: Boolean,
-        position: Object,
-    };
+    props = useProps({
+        threadId: t.number().optional(),
+        onClosed: t.function().optional(),
+        isInteractive: t.boolean(),
+        position: t.object(),
+        focus: t.boolean().optional(false),
+    });
 
-    static defaultProps = { focus: false };
     static threadModel = "spreadsheet.cell.thread";
 
     setup() {
-        useChildSubEnv({
+        useSubEnv({
             inChatWindow: true,
         });
 
         /** @type {import("models").Store} */
         this.mailStore = useService("mail.store");
-        this.state = useState({
+        this.state = proxy({
             /** @type {import("models").Thread} */
             thread: undefined,
             isValid: true,
@@ -44,8 +39,8 @@ export class CellThreadPopover extends Component {
 
         this.commentsStore = useStore(CommentsStore);
 
-        onWillUpdateProps((nextProps) => {
-            this.loadThread(nextProps.threadId);
+        useEffect(() => {
+            this.loadThread(this.props.threadId);
         });
     }
 
@@ -60,7 +55,7 @@ export class CellThreadPopover extends Component {
     }
 
     loadThread(threadId) {
-        this.state.thread = this.mailStore.Thread.insert({
+        this.state.thread = this.mailStore["mail.thread"].insert({
             model: CellThreadPopover.threadModel,
             id: threadId,
         });

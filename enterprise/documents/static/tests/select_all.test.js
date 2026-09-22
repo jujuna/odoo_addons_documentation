@@ -2,6 +2,7 @@ import {
     contains,
     defineModels,
     onRpc,
+    mockService,
     mountWithCleanup,
     getService,
     defineActions,
@@ -21,7 +22,9 @@ import { getEnrichedSearchArch } from "./helpers/views/search";
 const commonSelectAllSteps = async () => {
     // Select Folder 1
     await contains(`.o_has_treeEntry .o_toggle_fold`).click();
-    await contains(`.o_search_panel_label[data-tooltip="Folder 1"] div`).click();
+    await contains(
+        `.o_search_panel_label[data-tooltip="Folder 1"] .o_search_panel_label_btn`
+    ).click();
 
     // reduce limit to 2
     await contains(".o_pager_value").click();
@@ -101,9 +104,9 @@ test("Selected all records from current page are copied correctly", async functi
     await commonSelectAllSteps();
 
     await contains(actionSelector).click();
-    await contains(".o_menu_item.dropdown-item .fa-copy").click();
+    await contains(".o_menu_item.dropdown-item:contains('Duplicate')").click();
     await contains(
-        `.modal-content > .modal-body .o_search_panel_label[data-tooltip="Folder 1"] div`
+        `.modal-content > .modal-body .o_search_panel_label[data-tooltip="Folder 1"] .o_search_panel_label_btn`
     ).click();
     await contains(
         ".modal-content > .modal-footer > .o_widget_documents_operation_confirmation button"
@@ -145,7 +148,7 @@ test("Selected all records from current page are deleted correctly", async funct
     await mountWithCleanup(WebClient);
     await getService("action").doAction(action1.id);
 
-    await contains(`.o_search_panel_label[data-tooltip="Trash"] div`).click();
+    await contains(`.o_search_panel_label[data-tooltip="Trash"] .o_search_panel_label_btn`).click();
 
     await contains(".o_pager_value").click();
     await contains("input.o_pager_value").edit("1-2");
@@ -157,7 +160,7 @@ test("Selected all records from current page are deleted correctly", async funct
     await contains(".o_select_domain").click();
     expect(`.o_selection_box`).toHaveText("All 3 selected");
     await contains(actionSelector).click();
-    await contains(".o_menu_item.dropdown-item .fa-trash").click();
+    await contains(".o_menu_item.dropdown-item [data-icon='delete'].oi-filled").click();
 
     await contains(".modal-content > .modal-footer > .btn-primary").click();
     expect.verifySteps(["Document deleted"]);
@@ -180,11 +183,11 @@ test("Selected all records from current page are archived/restore correctly", as
     await commonSelectAllSteps();
     await contains(actionSelector).click();
 
-    await contains(".o_menu_item.dropdown-item .fa-trash").click();
+    await contains(".o_menu_item.dropdown-item [data-icon='delete'].oi-filled").click();
     await contains(".modal-content > .modal-footer > .btn-primary").click();
     expect.verifySteps(["Document archived"]);
 
-    await contains(`.o_search_panel_label[data-tooltip="Trash"] div`).click();
+    await contains(`.o_search_panel_label[data-tooltip="Trash"] .o_search_panel_label_btn`).click();
     await contains(`thead .o_list_record_selector input`).click();
     expect(`.o_selection_box .o_select_domain`).toHaveCount(1);
     expect(`.o_selection_box`).toHaveText("2\nselected\n Select all 3");
@@ -192,6 +195,23 @@ test("Selected all records from current page are archived/restore correctly", as
     await contains(".o_select_domain").click();
     expect(`.o_selection_box`).toHaveText("All 3 selected");
     await contains(actionSelector).click();
-    await contains(".o_menu_item.dropdown-item .fa-history").click();
+    await contains(".o_menu_item.dropdown-item [data-icon='history']").click();
     expect.verifySteps(["Document restored"]);
+});
+
+test("Open share correctly with all records selected", async function () {
+    const serverData = prepareSelectAllActionDataViews();
+    mockService("document.document", {
+        openSharingDialog: (documentIds) => {
+            expect(documentIds).toEqual([2, 3, 4]);
+            expect.step("open_share");
+        },
+    });
+    await makeDocumentsMockEnv({ serverData });
+    await mountWithCleanup(WebClient);
+    await getService("action").doAction(action1.id);
+
+    await commonSelectAllSteps();
+    await contains(".o_control_panel_actions button:contains('Share')").click();
+    expect.verifySteps(["open_share"]);
 });

@@ -23,16 +23,16 @@ patch(QtyAtDatePopover.prototype, {
 });
 
 patch(QtyAtDateWidget.prototype, {
-    updateCalcData() {
+    updateCalcData(calcData) {
         const { data } = this.props.record;
         if (!data.product_id) {
             return;
         }
         if (!data.is_rental || !data.return_date || !data.start_date) {
-            return super.updateCalcData();
+            return super.updateCalcData(calcData);
         }
-        this.calcData.stock_end_date = formatDateTime(data.return_date, { format: localization.dateFormat });
-        this.calcData.stock_start_date = formatDateTime(data.start_date, { format: localization.dateFormat });
+        calcData.stock_end_date = formatDateTime(data.return_date, { format: localization.dateFormat });
+        calcData.stock_start_date = formatDateTime(data.start_date, { format: localization.dateFormat });
     },
 });
 

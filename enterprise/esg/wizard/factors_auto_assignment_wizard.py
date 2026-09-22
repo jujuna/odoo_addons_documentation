@@ -30,8 +30,8 @@ class FactorsAutoAssignmentWizard(models.TransientModel):
         move_lines = self.env['account.move.line'].with_context(auto_generate_esg_assignation_rule=False).search(domain)
         updated_amls.update(-id for id in move_lines._assign_factors_to_move_lines(factors=emission_factors))
 
-        if self.env.context.get('from_list_view'):
-            # Only redirect to the list of updated emissions when coming from the Emission Factor list view.
+        if not self.env.context.get('from_form_view'):
+            # Only redirect to the list of updated emissions when not coming from the Emission Factor form view.
             return {
                 'name': self.env._("Updated Emissions"),
                 'type': 'ir.actions.act_window',

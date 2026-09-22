@@ -6,25 +6,38 @@
 # Martin Trigaux, 2022
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 05:26+0000\n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 03:21+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Ukrainian <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Ukrainian <https://translate.odoo.com/projects/odoo-master/"
 "delivery_bpost/uk/>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
-"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
-"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
-"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 "
+"? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > "
+"14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % "
+"100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_bpost
+#: model:ir.module.module,description:base.module_delivery_bpost
+msgid ""
+"\n"
+"Send your shippings through bpost and track them online\n"
+"=======================================================\n"
+"\n"
+"Companies located in Belgium can take advantage of shipping with the\n"
+"local Post company.\n"
+"\n"
+"See: https://www.bpost.be/portal/goHome\n"
+msgstr ""
 
 #. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_label_stock_type__a4
@@ -119,6 +132,11 @@ msgid "DOCUMENTS"
 msgstr "ДОКУМЕНТИ"
 
 #. module: delivery_bpost
+#: model:ir.model,name:delivery_bpost.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
+
+#. module: delivery_bpost
 #: model:ir.model.fields,field_description:delivery_bpost.field_delivery_carrier__bpost_saturday
 msgid "Delivery on Saturday"
 msgstr "Доставка в суботу"
@@ -138,6 +156,11 @@ msgstr "Назва для відображення"
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_delivery_nature__domestic
 msgid "Domestic"
 msgstr "Вітчизняний"
+
+#. module: delivery_bpost
+#: model_terms:ir.ui.view,arch_db:delivery_bpost.bpost_shipping_request
+msgid "EUR"
+msgstr ""
 
 #. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_shipment_type__gift
@@ -208,6 +231,22 @@ msgid "Please provide at least one item to ship."
 msgstr "Будь ласка, надішліть щонайменше один товар для доставки."
 
 #. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing a Country of Origin, which is required for "
+"international shipping."
+msgstr ""
+
+#. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing an HS Code, which is required for international "
+"shipping."
+msgstr ""
+
+#. module: delivery_bpost
 #: model:ir.model.fields,field_description:delivery_bpost.field_delivery_carrier__delivery_type
 msgid "Provider"
 msgstr "Провайдер"
@@ -252,11 +291,6 @@ msgid "Shipment created into bpost"
 msgstr "Доставка, створена в bpost"
 
 #. module: delivery_bpost
-#: model:ir.model,name:delivery_bpost.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Методи доставки"
-
-#. module: delivery_bpost
 #: model:ir.model,name:delivery_bpost.model_stock_package_type
 msgid "Stock package type"
 msgstr "Тип складської упаковки"
@@ -275,8 +309,8 @@ msgid ""
 "field(s):  \n"
 " %s)"
 msgstr ""
-"Адреса вашої компанії/складу є неповною або неправильною (відсутнє "
-"поле(я):  \n"
+"Адреса вашої компанії/складу є неповною або неправильною (відсутнє поле(я):  "
+"\n"
 " %s)"
 
 #. module: delivery_bpost
@@ -409,10 +443,9 @@ msgstr ""
 "ласка, змініть метод доставки на адресу Вітчизняний bpost."
 
 #. module: delivery_bpost
-#: model_terms:ir.ui.view,arch_db:delivery_bpost.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_bpost.res_config_settings_view_form_stock
-msgid "bpost Shipping Methods"
-msgstr "Методи доставки bpost"
+#: model:ir.module.module,shortdesc:base.module_delivery_bpost
+msgid "bpost Shipping"
+msgstr ""
 
 #. module: delivery_bpost
 #. odoo-python

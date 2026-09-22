@@ -1,21 +1,22 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
 
 export class InputDialog extends Component {
     static components = { Dialog };
-    static props = {
-        close: Function, // injected by the dialog service
-        body: String,
-        inputType: { type: String, optional: true },
-        inputValue: { type: [String, Number], optional: true },
-        confirm: { type: Function, optional: true },
-        title: { type: String, optional: true },
-    };
     static template = "spreadsheet_edition.InputDialog";
 
+    props = useProps({
+        close: t.function(), // injected by the dialog service
+        body: t.string(),
+        inputType: t.string().optional(),
+        inputValue: t.or([t.string(), t.number()]).optional(),
+        confirm: t.function().optional(),
+        title: t.string().optional(),
+    });
+
     setup() {
-        this.state = useState({
+        this.state = proxy({
             inputValue: this.props.inputValue,
             error: "",
         });

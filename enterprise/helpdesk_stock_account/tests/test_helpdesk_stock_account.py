@@ -13,7 +13,7 @@ class TestHelpdeskStockAccount(HelpdeskCommon):
         # give the test team ability to return and refund products
         cls.test_team.use_product_returns = True
         cls.test_team.use_credit_notes = True
-        cls.journal_id = cls.env['account.journal'].search([('type', '=', 'sale'), ('company_id', '=', cls.main_company_id)], limit=1).id
+        cls.journal_id = cls.env['account.journal'].search([('type', '=', 'sale'), ('company_id', '=', cls.main_company.id)], limit=1).id
         cls.product = cls.env['product.product'].create({
             'name': 'Test product',
             'is_storable': True,
@@ -97,6 +97,7 @@ class TestHelpdeskStockAccount(HelpdeskCommon):
         downpayment.create_invoices()
         payment = self.env['sale.advance.payment.inv'].with_context(context).create({})
         payment.create_invoices()
+        sale_order.invoice_ids._post()
         self.return_product(sale_order, 2)  # return 2 products
         refund_moves = self.refund_product(sale_order.invoice_ids)  # create a refund for the invoice
         product_line = refund_moves[0].invoice_line_ids[0]
@@ -116,12 +117,13 @@ class TestHelpdeskStockAccount(HelpdeskCommon):
         return self.env['account.move'].browse(res.get('res_id') or res['domain'][0][2])
 
     def return_product(self, sale_order, qty):
-        stock_picking_return = self.env['stock.return.picking'].create({
+        stock_picking_return = self.env['stock.return.picking.helpdesk'].create({
             'picking_id': sale_order.picking_ids.id,
         })
-        stock_picking_return.product_return_moves.quantity = qty
-        return_picking = stock_picking_return._create_return()
-        return_picking.move_ids.quantity = qty
+        return_picking = stock_picking_return.picking_id._create_return()
+        return_picking.move_ids.product_uom_qty = qty
+        return_picking.action_confirm()
+        return_picking.action_assign()
         return_picking.button_validate()
         Form(self.env['stock.backorder.confirmation'].with_context({
             'button_validate_picking_ids': [return_picking.id],
@@ -181,3 +183,33 @@ class TestHelpdeskStockAccount(HelpdeskCommon):
         })
         credit_note.refund_moves()
         self.assertEqual(credit_note.new_move_ids.invoice_line_ids.product_id, self.product)
+
+    def test_refund_with_product_as_helpdesk_user(self):
+        """ Ensure a non-stock user can create a refund from a helpdesk ticket."""
+        product = self.env['product.product'].create({
+            'name': 'Test Product',
+            'type': 'service',
+        })
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'order_line': [
+                Command.create({
+                    'product_id': product.id,
+                    'product_uom_qty': 5,
+                }),
+            ],
+        })
+        sale_order.action_confirm()
+        sale_order._create_invoices()
+        sale_order.invoice_ids.action_post()
+        self.ticket.write({
+            'sale_order_id': sale_order.id,
+        })
+        self.helpdesk_user.write({'group_ids': [Command.link(self.env.ref('account.group_account_invoice').id)]})
+        credit_note_form = Form(self.env['account.move.reversal'].with_user(self.helpdesk_user).with_context({'default_helpdesk_ticket_id': self.ticket.id}),
+            view=self.env.ref('helpdesk_account.view_account_move_reversal_inherit_helpdesk_account')
+        )
+        credit_note = credit_note_form.save()  # Should not raise AccessError
+        res = credit_note.reverse_moves()
+        refund = self.env['account.move'].browse(res['res_id'])
+        self.assertTrue(refund)

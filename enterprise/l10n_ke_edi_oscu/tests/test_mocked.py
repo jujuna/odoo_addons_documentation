@@ -9,6 +9,8 @@ from odoo.addons.l10n_ke_edi_oscu.tests.test_live import TestKeEdi
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestKeEdiMocked(TestKeEdi):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestKeEdi.setup_country('ke')
     def setUpClass(cls):

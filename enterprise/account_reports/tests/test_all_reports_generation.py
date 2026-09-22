@@ -5,11 +5,15 @@ import json
 from collections import defaultdict
 from unittest.mock import patch
 
-from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.tests.common import tagged
+
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestAllReportsGeneration(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -46,18 +50,26 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
         l10n_bd_corporate_tax_liability = self.env['account.account'].search([('account_type', '=', 'liability_current')], limit=1)
         l10n_ae_liability_account = self.env['account.account'].search([('account_type', '=', 'liability_current')], limit=1)
         l10n_cz_reports_tax_office = self.env.ref('l10n_cz.tax_office_1', raise_if_not_found=False)
-        l10n_ar_activity_default = self.env.ref('l10n_ar_reports_simple.activity_620100', raise_if_not_found=False)
+        l10n_ar_activity_default = self.env.ref('l10n_ar.activity_620100', raise_if_not_found=False)
         company_test_values = {
-            'LU': {'vat': 'LU12345613'},
-            'BR': {'vat': '01234567891251'},
+            'AE': {'l10n_ae_tax_report_liabilities_account': l10n_ae_liability_account, 'l10n_ae_tax_report_expenses_account': l10n_ae_liability_account, 'l10n_ae_tax_report_asset_account': l10n_ae_liability_account},
             'AR': {'vat': '30714295698', 'l10n_ar_arca_activity_id': l10n_ar_activity_default and l10n_ar_activity_default.id},
             'AU': {'vat': '11225459588', 'street': 'Arrow Street', 'zip': '1348', 'city': 'Starling City', 'state_id': self.env.ref('base.state_au_1').id},
-            'DE': {'vat': 'DE123456788', 'l10n_de_stnr': '151/815/08156', 'state_id': self.env.ref('base.state_de_th').id},
-            'NO': {'vat': 'NO123456785', 'l10n_no_bronnoysund_number': '987654325'},
-            'PL': {'l10n_pl_reports_tax_office_id': l10n_pl_reports_tax_office and l10n_pl_reports_tax_office.id},
             'BD': {'l10n_bd_corporate_tax_liability': l10n_bd_corporate_tax_liability, 'l10n_bd_corporate_tax_expense': l10n_bd_corporate_tax_liability},
-            'AE': {'l10n_ae_tax_report_liabilities_account': l10n_ae_liability_account, 'l10n_ae_tax_report_expenses_account': l10n_ae_liability_account, 'l10n_ae_tax_report_asset_account': l10n_ae_liability_account},
-            'CZ': {'l10n_cz_tax_office_id': l10n_cz_reports_tax_office and l10n_cz_reports_tax_office.id}
+            'BR': {'vat': '01234567891251'},
+            'CZ': {'l10n_cz_tax_office_id': l10n_cz_reports_tax_office and l10n_cz_reports_tax_office.id},
+            'DE': {'vat': 'DE123456788', 'l10n_de_stnr': '151/815/08156', 'state_id': self.env.ref('base.state_de_th').id},
+            'DK': {'additional_identifiers': {'DK_CVR': '58403288'}},
+            'EE': {'additional_identifiers': {'EE_EN': '12345678'}},
+            'FI': {'additional_identifiers': {'FI_EN': '8763054-9'}},
+            'FR': {'street': 'Arrow Street', 'zip': '1348', 'city': 'Starling City'},
+            'LU': {'vat': 'LU12345613'},
+            'NO': {'vat': 'NO123456785', 'l10n_no_bronnoysund_number': '987654325'},
+            'PL': {
+                'vat': 'PL1234567883',
+                'l10n_pl_reports_tax_office_id': l10n_pl_reports_tax_office and l10n_pl_reports_tax_office.id,
+            },
+            'SK': {'zip': '010 01', 'city': 'Žilina', 'income_tax_id': '9999999999', 'l10n_sk_nace_code': '01110'},
         }
 
         # ecdf_prefix and matr_number only exist in enterprise
@@ -67,14 +79,11 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
                 'matr_number': '1111111111111',
             })
 
-        partner_test_values = {
-            'AR': {'l10n_latam_identification_type_id': (self.env.ref('l10n_ar.it_cuit', raise_if_not_found=False) or {'id': None})['id']},
-        }
-
         # Some root reports are made for just one country and require test fields to be set the right way to generate their exports properly.
         # Since they are root reports and are always available, they normally have no country set; we assign one here (only for the ones requiring it)
         reports_forced_countries = [
             ('AU', 'l10n_au_reports.tpar_report'),
+            ('FR', 'l10n_fr_reports.fiscal_declaration'),
         ]
         for country_code, report_ref in reports_forced_countries:
             country = self.env['res.country'].search([('code', '=', country_code)], limit=1)
@@ -90,11 +99,8 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
                     'vat': "VAT123456789",
                     'email': "dummy@email.com",
                     'phone': "01234567890",
-                    'company_registry': '42',
                     **company_test_values.get(report.country_id.code, {}),
                 })
-
-                self.env.company.partner_id.write(partner_test_values.get(report.country_id.code, {}))
 
                 options = report.get_options({'selected_variant_id': report.id, '_running_export_test': True})
 
@@ -102,7 +108,7 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
                     self.assertNotEqual(options['report_id'], report.id, "Composite reports should always reroute.")
 
                 for option_button in options['buttons']:
-                    if option_button['name'] in ('PDF', 'Download Excel'):  # keep "Copy to Documents" and other actions
+                    if option_button['name'] in ('Print', 'Download Excel'):  # keep "Copy to Documents" and other actions
                         # TODO remove me
                         # This test seems to have some trouble on runbot. It is running for way longer than
                         # locally. Freeze is coming, explanation are missing... Sorry 😟
@@ -138,11 +144,6 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
                 for field_name in company_test_values.get(report.country_id.code, {}).keys()
             })
 
-            self.env.company.partner_id.write({
-                field_name: None
-                for field_name in partner_test_values.get(report.country_id.code, {}).keys()
-            })
-
     def test_custom_engines_related_groupby(self):
         blacklist_xmlids = [
             'account_reports.account_financial_report_executivesummary_avdebt0_ndays',
@@ -154,6 +155,7 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
         custom_engine_expressions = self.env['account.report.expression'].search([
             ('engine', '=', 'custom'),
             ('id', 'not in', tuple(self.env['ir.model.data']._xmlid_to_res_id(xmlid) for xmlid in blacklist_xmlids)),
+            ('report_line_id.children_ids', '=', False),
         ])
 
         expressions_per_engine = defaultdict(lambda: self.env['account.report.expression'])
@@ -162,12 +164,14 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
 
         for (report, _formula), expressions in expressions_per_engine.items():
             with self.subTest(report=report.name):
-                options = report.get_options({})
+                options = report.get_options({'no_report_reroute': True})
 
                 # Remove aggregations and external value expressions from those report lines, so that we always can set a groupby on the line
                 (expressions.report_line_id.expression_ids.filtered(lambda x: x.engine in ('aggregation', 'external'))).unlink()
+                # Set foldability to always unfolded for the lines to be unfolded by default
+                expressions.report_line_id.foldability = 'always_unfolded'
 
                 expressions.report_line_id.user_groupby = 'account_code' # account_code is a  non-stored related field on aml
                 self.env.flush_all()
                 report._compute_expression_totals_for_each_column_group(expressions, options, groupby_to_expand='account_code')
-                # This computation fill fail if the custom engine forgot to handle such groupby, typically via a call to _field_to_sql
+                # This computation will fail if the custom engine forgot to handle such groupby, typically via a call to _field_to_sql

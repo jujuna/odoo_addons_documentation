@@ -10,5 +10,6 @@ from . import test_ma_internals
 from . import test_marketing_automation_sms
 from . import test_performance
 from . import test_marketing_automation_test
+from . import test_marketing_campaign_webhook
 from . import test_utm
 from . import test_whatsapp_message

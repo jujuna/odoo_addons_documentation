@@ -1,21 +1,28 @@
-import { user } from "@web/core/user";
-import { useBackButton } from "@web_mobile/js/core/hooks";
-import { accountMethodsForMobile } from "@web_mobile/js/core/mixins";
-import { methods as mobileNativeMethods } from "@web_mobile/js/services/core";
-import { Popover } from "@web/core/popover/popover";
+import {
+    animationFrame,
+    expect,
+    getFixture,
+    manuallyDispatchProgrammaticEvent,
+    mockUserAgent,
+    test,
+} from "@odoo/hoot";
+import { Component, useProps, signal, types as t, xml } from "@odoo/owl";
 import {
     clickSave,
     contains,
     defineModels,
+    destroyApp,
     fields,
     models,
     mountView,
     mountWithCleanup,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
-import { animationFrame } from "@odoo/hoot-mock";
-import { destroy, getFixture, expect, test } from "@odoo/hoot";
-import { Component, useState, xml } from "@odoo/owl";
+import { Popover } from "@web/core/popover/popover";
+import { user } from "@web/core/user";
+import { useBackButton } from "@web/core/utils/hooks";
+import { accountMethodsForMobile } from "@web_mobile/js/core/mixins";
+import { methods as mobileNativeMethods } from "@web_mobile/js/services/core";
 
 const MY_IMAGE =
     "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
@@ -29,7 +36,9 @@ class Users extends models.Model {
 
 defineModels([Users]);
 
+test.tags("mobile");
 test("component should receive a backbutton event", async () => {
+    mockUserAgent("android");
     patchWithCleanup(mobileNativeMethods, {
         overrideBackButton({ enabled }) {
             expect.step(`overrideBackButton: ${enabled}`);
@@ -38,26 +47,27 @@ test("component should receive a backbutton event", async () => {
 
     class DummyComponent extends Component {
         static template = xml`<div/>`;
-        static props = ["*"];
 
         setup() {
-            useBackButton(this._onBackButton);
+            useBackButton(this.onBack.bind(this));
         }
 
-        _onBackButton(ev) {
+        onBack(ev) {
             expect.step(`${ev.type} event`);
         }
     }
 
-    const dummy = await mountWithCleanup(DummyComponent);
+    await mountWithCleanup(DummyComponent);
     // simulate 'backbutton' event triggered by the app
     document.dispatchEvent(new Event("backbutton"));
     expect.verifySteps(["overrideBackButton: true", "backbutton event"]);
-    destroy(dummy);
+    destroyApp();
     expect.verifySteps(["overrideBackButton: false"]);
 });
 
+test.tags("mobile");
 test("multiple components should receive backbutton events in the right order", async () => {
+    mockUserAgent("android");
     patchWithCleanup(mobileNativeMethods, {
         overrideBackButton({ enabled }) {
             expect.step(`overrideBackButton: ${enabled}`);
@@ -65,30 +75,49 @@ test("multiple components should receive backbutton events in the right order", 
     });
 
     class DummyComponent extends Component {
-        static template = xml`<div/>`;
-        static props = ["*"];
+        static template = xml`<div t-out="this.props.name" />`;
+
+        props = useProps({ name: t.string() });
+
         setup() {
-            useBackButton(this._onBackButton);
+            useBackButton(this.onBack.bind(this));
         }
 
-        _onBackButton(ev) {
+        onBack(ev) {
             expect.step(`${this.props.name}: ${ev.type} event`);
-            // unmounting is not supported anymore
-            // A real business case equivalent to this is to have a Parent component
-            // doing a foreach on some reactive object which contains the list of dummy components
-            // and calling a callback props.onBackButton right here that removes the element from the list
-            destroy(this);
+            dummies().delete(this.props.name);
         }
     }
 
-    await mountWithCleanup(DummyComponent, { props: { name: "dummy1" } });
-    await mountWithCleanup(DummyComponent, { props: { name: "dummy2" } });
-    await mountWithCleanup(DummyComponent, { props: { name: "dummy3" } });
+    class Parent extends Component {
+        static components = { DummyComponent };
+        static template = xml`
+            <t t-foreach="this.dummies()" t-as="name" t-key="name">
+                <DummyComponent name="name" />
+            </t>
+        `;
+
+        dummies = dummies;
+    }
+
+    const dummies = signal.Set(new Set());
+
+    await mountWithCleanup(Parent);
+    // Need to be added 1 by 1 because Owl mounts siblings from last to first
+    dummies().add("dummy1");
+    await animationFrame();
+    dummies().add("dummy2");
+    await animationFrame();
+    dummies().add("dummy3");
+    await animationFrame();
 
     // simulate 'backbutton' events triggered by the app
-    document.dispatchEvent(new Event("backbutton"));
-    document.dispatchEvent(new Event("backbutton"));
-    document.dispatchEvent(new Event("backbutton"));
+    await manuallyDispatchProgrammaticEvent(document, "backbutton");
+    await animationFrame();
+    await manuallyDispatchProgrammaticEvent(document, "backbutton");
+    await animationFrame();
+    await manuallyDispatchProgrammaticEvent(document, "backbutton");
+    await animationFrame();
 
     expect.verifySteps([
         "overrideBackButton: true",
@@ -99,7 +128,9 @@ test("multiple components should receive backbutton events in the right order", 
     ]);
 });
 
+test.tags("mobile");
 test("component should receive a backbutton event: custom activation", async () => {
+    mockUserAgent("android");
     patchWithCleanup(mobileNativeMethods, {
         overrideBackButton({ enabled }) {
             expect.step(`overrideBackButton: ${enabled}`);
@@ -107,32 +138,25 @@ test("component should receive a backbutton event: custom activation", async () 
     });
 
     class DummyComponent extends Component {
-        static template = xml`<button class="dummy" t-esc="state.show" t-on-click="toggle"/>`;
-        static props = ["*"];
+        static template = xml`<button class="dummy" t-out="this.show()" t-on-click="this.toggle" />`;
+
+        props = useProps({ show: t.boolean() });
+        show = signal(this.props.show);
+
         setup() {
-            this._backButtonHandler = useBackButton(
-                this._onBackButton,
-                this.shouldActivateBackButton.bind(this)
-            );
-            this.state = useState({
-                show: this.props.show,
-            });
+            useBackButton(this.onBack.bind(this), this.show);
+        }
+
+        onBack(ev) {
+            expect.step(`${ev.type} event`);
         }
 
         toggle() {
-            this.state.show = !this.state.show;
-        }
-
-        shouldActivateBackButton() {
-            return this.state.show;
-        }
-
-        _onBackButton(ev) {
-            expect.step(`${ev.type} event`);
+            this.show.set(!this.show());
         }
     }
 
-    const dummy = await mountWithCleanup(DummyComponent, { props: { show: false } });
+    await mountWithCleanup(DummyComponent, { props: { show: false } });
     // shouldn't have enabled back button mount
     expect.verifySteps([]);
     await contains(".dummy").click();
@@ -145,20 +169,22 @@ test("component should receive a backbutton event: custom activation", async () 
         "backbutton event",
         "overrideBackButton: false",
     ]);
-    destroy(dummy);
+    destroyApp();
 
     // enabled at mount
-    const dummy2 = await mountWithCleanup(DummyComponent, { props: { show: true } });
+    await mountWithCleanup(DummyComponent, { props: { show: true } });
     // shouldn't have enabled back button at mount
     expect.verifySteps(["overrideBackButton: true"]);
     // simulate 'backbutton' event triggered by the app
     document.dispatchEvent(new Event("backbutton"));
-    destroy(dummy2);
+    destroyApp();
     // should have disabled the back-button override during unmount
     expect.verifySteps(["backbutton event", "overrideBackButton: false"]);
 });
 
+test.tags("mobile");
 test("popover is closable with backbutton event", async () => {
+    mockUserAgent("android");
     patchWithCleanup(mobileNativeMethods, {
         overrideBackButton({ enabled }) {
             expect.step(`overrideBackButton: ${enabled}`);
@@ -166,14 +192,13 @@ test("popover is closable with backbutton event", async () => {
     });
     class Comp extends Component {
         static template = xml`<div id="comp">in popover</div>`;
-        static props = ["*"];
     }
-    const pop = await mountWithCleanup(Popover, {
+    await mountWithCleanup(Popover, {
         props: {
             target: getFixture(),
             position: "bottom",
             component: Comp,
-            close: () => destroy(pop),
+            close: () => destroyApp(),
         },
     });
     await animationFrame();

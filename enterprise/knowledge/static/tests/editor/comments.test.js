@@ -4,7 +4,6 @@ import { setupEditor } from "@html_editor/../tests/_helpers/editor";
 import { unformat } from "@html_editor/../tests/_helpers/format";
 import { getContent } from "@html_editor/../tests/_helpers/selection";
 import { execCommand } from "@html_editor/../tests/_helpers/userCommands";
-import { MAIN_PLUGINS } from "@html_editor/plugin_sets";
 import { Wysiwyg } from "@html_editor/wysiwyg";
 import { mockKnowledgeCommentsService } from "@knowledge/../tests/knowledge_test_helpers";
 import { KnowledgeCommentsPlugin } from "@knowledge/editor/plugins/comments_plugin/comments_plugin";
@@ -14,7 +13,7 @@ import { registry } from "@web/core/registry";
 
 function getCommentsConfig() {
     return {
-        Plugins: [...MAIN_PLUGINS, KnowledgeCommentsPlugin],
+        includePlugins: [KnowledgeCommentsPlugin],
         onLayoutGeometryChange: () => {},
     };
 }

@@ -2,12 +2,11 @@
 
 {
     'name': 'Nigeria - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Accounting Reports for Nigeria
     """,
-    'author': 'Odoo SA',
+    'author': 'Odoo S.A.',
     'depends': [
         'l10n_ng',
         'account_reports',
@@ -16,7 +15,6 @@ Accounting Reports for Nigeria
         'data/account_return_data.xml',
         'data/tax_report.xml',
     ],
-    'installable': True,
     'auto_install': [
         'l10n_ng',
         'account_reports',

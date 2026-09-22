@@ -12,8 +12,8 @@ from odoo import models, fields, release, _
 from odoo.exceptions import RedirectWarning, UserError
 from odoo.modules.registry import Registry
 from odoo.sql_db import BaseCursor
-from odoo.tools import get_lang, SQL
-from odoo.tools.misc import street_split
+from odoo.tools import format_date, SQL
+from odoo.tools.business_data import street_split
 
 
 class AccountGeneralLedgerReportHandler(models.AbstractModel):
@@ -44,16 +44,14 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         # Create options for initial balance
         opening_balance_options = options.copy()
         new_date_to = fields.Date.from_string(opening_balance_options['date']['date_from']) - timedelta(days=1)
-        opening_balance_options['date'] = self.env['account.report']._get_dates_period(None, new_date_to, 'single')
+        opening_balance_options['date'] = self.env['account.report']._build_date_dict(options, new_date_to, new_date_to)
 
         query = report._get_report_query(
             opening_balance_options,
             'from_beginning',
             domain=[('account_id.include_initial_balance', '=', True)],
         )
-        account_alias = query.left_join(lhs_alias='account_move_line', lhs_column='account_id', rhs_table='account_account', rhs_column='id', link='account_id')
-        account_id = SQL.identifier(account_alias, 'id')
-        account_code = self.env['account.account']._field_to_sql(account_alias, 'code', query)
+        account = query.table._sudo().account_id
         return SQL(
             """
             SELECT %(account_id)s AS account_id,
@@ -65,8 +63,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
              WHERE %(search_condition)s
           GROUP BY %(account_id)s, account_code
             """,
-            account_id=account_id,
-            account_code=account_code,
+            account_id=account.id,
+            account_code=account.code,
             table_references=query.from_clause,
             search_condition=query.where_clause,
         )
@@ -80,7 +78,6 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                       partner.name AS partner_name,
                       partner.commercial_company_name AS partner_commercial_company_name,
                       partner.commercial_partner_id AS partner_commercial_partner_id,
-                      partner.is_company AS partner_is_company,
                       partner.phone AS partner_phone,
                       partner.email AS partner_email,
                       partner.website AS partner_website,
@@ -97,14 +94,13 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                       country.code AS partner_country_code,
                       state.name AS partner_state_name,
                       res_partner_bank.id AS partner_bank_id,
-                      res_partner_bank.sanitized_acc_number AS partner_sanitized_acc_number,
-                      res_bank.bic AS partner_bic,
+                      res_partner_bank.sanitized_account_number AS partner_sanitized_acc_number,
+                      res_partner_bank.bank_bic AS partner_bic,
                       contact.name AS partner_contact_name
                  FROM res_partner partner
             LEFT JOIN res_country country ON partner.country_id = country.id
             LEFT JOIN res_country_state state ON partner.state_id = state.id
             LEFT JOIN res_partner_bank ON res_partner_bank.partner_id = partner.id
-            LEFT JOIN res_bank ON res_partner_bank.bank_id = res_bank.id
     LEFT JOIN LATERAL (
                             SELECT contact.name
                               FROM res_partner contact
@@ -143,10 +139,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
     def _l10n_nl_reports_get_transaction_values_query(self, options):
         report = self.env['account.report'].browse(options['report_id'])
         query = report._get_report_query(options, 'strict_range')
-        account_alias = query.join(lhs_alias='account_move_line', lhs_column='account_id', rhs_table='account_account', rhs_column='id', link='account_id')
+        account_t = query.table._sudo()._join('account_id', kind='JOIN')
         journal_name = self.env['account.journal']._field_to_sql('journal', 'name')
-        account_id = SQL.identifier(account_alias, 'id')
-        account_code = self.env['account.account']._field_to_sql(account_alias, 'code', query)
         product_name = self.env['product.template']._field_to_sql('product_template', 'name')
         return SQL(
             """
@@ -193,8 +187,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
           ORDER BY account_move_line.journal_id, account_move_line.id
             """,
             journal_name=journal_name,
-            account_id=account_id,
-            account_code=account_code,
+            account_id=account_t.id,
+            account_code=account_t.code,
             product_name=product_name,
             table_references=query.from_clause,
             search_condition=query.where_clause,
@@ -271,7 +265,7 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             period_to = fields.Date.to_string(period_to.date())
             periods.append(Period(
                 number=self._l10n_nl_reports_compute_period_number(period_from),
-                name=period.strftime('%B') + ' ' + date_from[0:4],
+                name=format_date(self.env, period, date_format='MMMM Y'),
                 date_from=period_from,
                 date_to=period_to
             ))
@@ -281,8 +275,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         sum_debit = 0
         sum_credit = 0
         opening_balance_query = self._l10n_nl_reports_get_opening_balance_query(options)
-        self.env.cr.execute(opening_balance_query)
-        for query_res in self.env.cr.dictfetchall():
+        rows = self.env.execute_query_dict(opening_balance_query)
+        for query_res in rows:
             lines_count += query_res['lines_count']
             sum_debit += query_res['sum_debit']
             sum_credit += query_res['sum_credit']
@@ -296,8 +290,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
             })
 
         config_values_query = self._l10n_nl_reports_get_config_values_query(options)
-        self.env.cr.execute(config_values_query)
-        moves_count, moves_debit, moves_credit, account_ids, tax_ids = self.env.cr.fetchone()
+        rows = self.env.execute_query(config_values_query)
+        moves_count, moves_debit, moves_credit, account_ids, tax_ids = rows[0]
 
         header_values = {
             # The XAF XSD only supports 2 decimal places.
@@ -323,9 +317,8 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
 
         # Aggregate partners' values
         partner_values_query = self._l10n_nl_reports_get_partner_values_query(options)
-        self.env.cr.execute(partner_values_query)
-        partner_values = self.env.cr.dictfetchall()
-        for row in partner_values:
+        rows = self.env.execute_query_dict(partner_values_query)
+        for row in rows:
             street_detail = street_split(row['partner_street'])
             header_values['partner_data'].append({
                 'partner_id': row['partner_id'],
@@ -334,7 +327,6 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
                                     or row['partner_commercial_company_name']
                                     or str(row['partner_commercial_partner_id'])
                                     or ('id: ' + str(row['partner_id'])))[:50],
-                'partner_is_company': row['partner_is_company'],
                 'partner_phone': row['partner_phone'] and row['partner_phone'][:30],
                 'partner_email': row['partner_email'],
                 'partner_website': row['partner_website'],
@@ -414,10 +406,11 @@ class AccountGeneralLedgerReportHandler(models.AbstractModel):
         assert isinstance(self.env.cr, BaseCursor)
         with Registry(self.env.cr.dbname).cursor() as cr:
             self = self.with_env(self.env(cr=cr))
-            batch_size = int(self.env['ir.config_parameter'].sudo().get_param('l10n_nl_reports.general_ledger_batch_size', 10**4))
+            batch_size = self.env['ir.config_parameter'].sudo().get_int('l10n_nl_reports.general_ledger_batch_size') or 10**4
             # System parameter to allow users to set docRef length (default 999 as per spec) for compatibility with other software
-            docref_length = int(self.env['ir.config_parameter'].sudo().get_param('l10n_nl_reports.docref_max_length', 999))
+            docref_length = self.env['ir.config_parameter'].sudo().get_int('l10n_nl_reports.docref_max_length', 999)
             transaction_values_query = self._l10n_nl_reports_get_transaction_values_query(options)
+            assert isinstance(transaction_values_query, SQL)
             self.env.cr.execute(transaction_values_query)
 
             journal_id, move_id = None, None

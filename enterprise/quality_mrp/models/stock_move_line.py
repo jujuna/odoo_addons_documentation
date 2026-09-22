@@ -6,12 +6,6 @@ from odoo import models
 class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
-    def write(self, vals):
-        res = super().write(vals)
-        if vals.get('lot_id') and self.sudo().check_ids:
-            self.check_ids.filtered(lambda qc: qc.test_type in ('register_consumed_materials', 'register_byproducts')).lot_ids = vals['lot_id']
-        return res
-
     def _get_check_values(self, quality_point):
         vals = super(StockMoveLine, self)._get_check_values(quality_point)
         vals.update({'production_id': self.move_id.production_id.id or self.move_id.raw_material_production_id.id})

@@ -8,7 +8,10 @@
         'data/activation_mail_template.xml',
         'data/success_mail_template.xml',
         'views/account_batch_payment_views.xml',
+        'views/account_journal_dashboard_view.xml',
+        'views/account_payment_views.xml',
         'views/account_online_link_views.xml',
+        'wizard/account_payment_register_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -17,5 +20,6 @@
     },
     'auto_install': True,
     'author': 'Odoo S.A.',
-    'license': 'LGPL-3',
+    'license': 'OEEL-1',
+    'post_init_hook': '_post_init_hook',
 }

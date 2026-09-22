@@ -1,9 +1,9 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class ViewEditorSnackbar extends Component {
     static template = "web_studio.ViewEditor.Snackbar";
-    static props = {
-        operations: Object,
-        saveIndicator: Object,
-    };
+    props = useProps({
+        operations: t.object(),
+        saveIndicator: t.object(),
+    });
 }

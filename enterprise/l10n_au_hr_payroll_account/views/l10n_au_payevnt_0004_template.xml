@@ -4,54 +4,54 @@
                 <!-- <Record_Delimiter DocumentID="1.1" DocumentType="PARENT" DocumentName="PAYEVNT" RelatedDocumentID=""/> -->
                 <tns:PAYEVNT xsi:schemaLocation="http://www.sbr.gov.au/ato/payevnt ato.payevnt.0004.2020.01.00.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://www.sbr.gov.au/ato/payevnt">
                     <tns:Rp>
-                        <tns:SoftwareInformationBusinessManagementSystemId t-esc="employer['SoftwareInformationBusinessManagementSystemId']"/>
-                        <tns:AustralianBusinessNumberId t-esc="employer['AustralianBusinessNumberId']"/>
-                        <tns:WithholdingPayerNumberId t-esc="employer['WithholdingPayerNumberId']" t-if="employer['WithholdingPayerNumberId']"/>
-                        <tns:OrganisationDetailsOrganisationBranchC t-esc="employer['OrganisationDetailsOrganisationBranchC']"/>
-                        <tns:PreviousSoftwareInformationBusinessManagementSystemId t-esc="employer['PreviousSoftwareInformationBusinessManagementSystemId']"/>
+                        <tns:SoftwareInformationBusinessManagementSystemId t-out="employer['SoftwareInformationBusinessManagementSystemId']"/>
+                        <tns:AustralianBusinessNumberId t-out="employer['AustralianBusinessNumberId']"/>
+                        <tns:WithholdingPayerNumberId t-out="employer['WithholdingPayerNumberId']" t-if="employer['WithholdingPayerNumberId']"/>
+                        <tns:OrganisationDetailsOrganisationBranchC t-out="employer['OrganisationDetailsOrganisationBranchC']"/>
+                        <tns:PreviousSoftwareInformationBusinessManagementSystemId t-out="employer['PreviousSoftwareInformationBusinessManagementSystemId']"/>
                         <tns:OrganisationName>
-                            <tns:DetailsOrganisationalNameT t-esc="employer['DetailsOrganisationalNameT']"/>
-                            <tns:PersonUnstructuredNameFullNameT t-esc="employer['PersonUnstructuredNameFullNameT']"/>
+                            <tns:DetailsOrganisationalNameT t-out="employer['DetailsOrganisationalNameT']"/>
+                            <tns:PersonUnstructuredNameFullNameT t-out="employer['PersonUnstructuredNameFullNameT']"/>
                         </tns:OrganisationName>
                         <tns:ElectronicContact t-if="employer['ElectronicMailAddressT']">
-                            <tns:ElectronicMailAddressT t-esc="employer['ElectronicMailAddressT']"/>
-                            <tns:TelephoneMinimalN t-esc="employer['TelephoneMinimalN']"/>
+                            <tns:ElectronicMailAddressT t-out="employer['ElectronicMailAddressT']"/>
+                            <tns:TelephoneMinimalN t-out="employer['TelephoneMinimalN']"/>
                         </tns:ElectronicContact>
                         <tns:AddressDetailsPostal t-if="employer['PostcodeT'] and employer['CountryC']">
-                            <tns:PostcodeT t-esc="employer['PostcodeT']"/>
-                            <tns:CountryC t-esc="employer['CountryC']"/>
+                            <tns:PostcodeT t-out="employer['PostcodeT']"/>
+                            <tns:CountryC t-out="employer['CountryC']"/>
                         </tns:AddressDetailsPostal>
                         <tns:Payroll>
-                            <tns:PaymentRecordTransactionD t-esc="employer['PaymentRecordTransactionD']"/>
-                            <tns:InteractionRecordCt t-esc="employer['InteractionRecordCt']"/>
-                            <tns:MessageTimestampGenerationDt t-esc="employer['MessageTimestampGenerationDt']"/>
-                            <tns:InteractionTransactionId t-esc="employer['InteractionTransactionId']"/>
-                            <tns:AmendmentI t-esc="employer['AmendmentI']"/>
+                            <tns:PaymentRecordTransactionD t-out="employer['PaymentRecordTransactionD']"/>
+                            <tns:InteractionRecordCt t-out="employer['InteractionRecordCt']"/>
+                            <tns:MessageTimestampGenerationDt t-out="employer['MessageTimestampGenerationDt']"/>
+                            <tns:InteractionTransactionId t-out="employer['InteractionTransactionId']"/>
+                            <tns:AmendmentI t-out="employer['AmendmentI']"/>
                             <tns:IncomeTaxAndRemuneration t-if="stp_id.payevent_type != 'update'">
-                                <tns:PayAsYouGoWithholdingTaxWithheldA t-esc="employer['PayAsYouGoWithholdingTaxWithheldA']"/>
-                                <tns:TotalGrossPaymentsWithholdingA t-esc="employer['TotalGrossPaymentsWithholdingA']"/>
-                                <tns:ChildSupportGarnisheeA t-esc="employer['ChildSupportGarnisheeA']"/>
-                                <tns:ChildSupportWithholdingA t-esc="employer['ChildSupportWithholdingA']"/>
+                                <tns:PayAsYouGoWithholdingTaxWithheldA t-out="employer['PayAsYouGoWithholdingTaxWithheldA']"/>
+                                <tns:TotalGrossPaymentsWithholdingA t-out="employer['TotalGrossPaymentsWithholdingA']"/>
+                                <tns:ChildSupportGarnisheeA t-out="employer['ChildSupportGarnisheeA']"/>
+                                <tns:ChildSupportWithholdingA t-out="employer['ChildSupportWithholdingA']"/>
                             </tns:IncomeTaxAndRemuneration>
                         </tns:Payroll>
                         <tns:Declaration>
-                            <tns:SignatoryIdentifierT t-esc="employer['SignatoryIdentifierT']"/>
-                            <tns:SignatureD t-esc="employer['SignatureD']"/>
-                            <tns:StatementAcceptedI t-esc="employer['StatementAcceptedI']"/>
+                            <tns:SignatoryIdentifierT t-out="employer['SignatoryIdentifierT']"/>
+                            <tns:SignatureD t-out="employer['SignatureD']"/>
+                            <tns:StatementAcceptedI t-out="employer['StatementAcceptedI']"/>
                         </tns:Declaration>
                     </tns:Rp>
                     <tns:Int t-if="intermediary">
-                        <tns:AustralianBusinessNumberId t-esc="intermediary['AustralianBusinessNumberId']"/>
-                        <tns:TaxAgentNumberId t-esc="intermediary['TaxAgentNumberId']"/>
-                        <tns:PersonUnstructuredNameFullNameT t-esc="intermediary['PersonUnstructuredNameFullNameT']"/>
+                        <tns:AustralianBusinessNumberId t-out="intermediary['AustralianBusinessNumberId']"/>
+                        <tns:TaxAgentNumberId t-out="intermediary['TaxAgentNumberId']"/>
+                        <tns:PersonUnstructuredNameFullNameT t-out="intermediary['PersonUnstructuredNameFullNameT']"/>
                         <tns:ElectronicContact>
-                            <tns:ElectronicMailAddressT t-esc="intermediary['ElectronicMailAddressT']"/>
-                            <tns:TelephoneMinimalN t-esc="intermediary['TelephoneMinimalN']"/>
+                            <tns:ElectronicMailAddressT t-out="intermediary['ElectronicMailAddressT']"/>
+                            <tns:TelephoneMinimalN t-out="intermediary['TelephoneMinimalN']"/>
                         </tns:ElectronicContact>
                         <tns:Declaration>
-                            <tns:SignatoryIdentifierT t-esc="intermediary['SignatoryIdentifierT']"/>
-                            <tns:SignatureD t-esc="intermediary['SignatureD']"/>
-                            <tns:StatementAcceptedI t-esc="intermediary['StatementAcceptedI']"/>
+                            <tns:SignatoryIdentifierT t-out="intermediary['SignatoryIdentifierT']"/>
+                            <tns:SignatureD t-out="intermediary['SignatureD']"/>
+                            <tns:StatementAcceptedI t-out="intermediary['StatementAcceptedI']"/>
                         </tns:Declaration>
                     </tns:Int>
                 </tns:PAYEVNT>
@@ -60,91 +60,91 @@
             <tns:PAYEVNTEMP	xsi:schemaLocation="http://www.sbr.gov.au/ato/payevntemp ato.payevntemp.0004.2020.01.00.xsd" xmlns:tns="http://www.sbr.gov.au/ato/payevntemp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                 <tns:Payee>
                     <tns:Identifiers>
-                        <tns:TaxFileNumberId t-if="employee['TaxFileNumberId']" t-esc="employee['TaxFileNumberId']"/>
-                        <tns:AustralianBusinessNumberId t-if="employee['AustralianBusinessNumberId']" t-esc="employee['AustralianBusinessNumberId']"/>
-                        <tns:EmploymentPayrollNumberId t-esc="employee['EmploymentPayrollNumberId']"/>
-                        <tns:PreviousPayrollIDEmploymentPayrollNumberId t-esc="employee['PreviousPayrollIDEmploymentPayrollNumberId']"/>
+                        <tns:TaxFileNumberId t-if="employee['TaxFileNumberId']" t-out="employee['TaxFileNumberId']"/>
+                        <tns:AustralianBusinessNumberId t-if="employee['AustralianBusinessNumberId']" t-out="employee['AustralianBusinessNumberId']"/>
+                        <tns:EmploymentPayrollNumberId t-out="employee['EmploymentPayrollNumberId']"/>
+                        <tns:PreviousPayrollIDEmploymentPayrollNumberId t-out="employee['PreviousPayrollIDEmploymentPayrollNumberId']"/>
                     </tns:Identifiers>
                     <tns:PersonNameDetails>
-                        <tns:FamilyNameT t-esc="employee['FamilyNameT']"/>
-                        <tns:GivenNameT t-if="employee['GivenNameT']" t-esc="employee['GivenNameT']"/>
-                        <tns:OtherGivenNameT t-if="employee['OtherGivenNameT']" t-esc="employee['OtherGivenNameT']"/>
+                        <tns:FamilyNameT t-out="employee['FamilyNameT']"/>
+                        <tns:GivenNameT t-if="employee['GivenNameT']" t-out="employee['GivenNameT']"/>
+                        <tns:OtherGivenNameT t-if="employee['OtherGivenNameT']" t-out="employee['OtherGivenNameT']"/>
                     </tns:PersonNameDetails>
                     <tns:PersonDemographicDetailsBirth>
-                        <tns:Dm t-esc="employee['Dm']"/>
-                        <tns:M t-esc="employee['M']"/>
-                        <tns:Y t-esc="employee['Y']"/>
+                        <tns:Dm t-out="employee['Dm']"/>
+                        <tns:M t-out="employee['M']"/>
+                        <tns:Y t-out="employee['Y']"/>
                     </tns:PersonDemographicDetailsBirth>
                     <tns:AddressDetails>
-                        <tns:Line1T t-esc="employee['Line1T']"/>
-                        <tns:Line2T t-esc="employee['Line2T']"/>
-                        <tns:LocalityNameT t-esc="employee['LocalityNameT']"/>
-                        <tns:StateOrTerritoryC t-esc="employee['StateOrTerritoryC']"/>
-                        <tns:PostcodeT t-esc="employee['PostcodeT']"/>
-                        <tns:CountryC t-esc="employee['CountryC']"/>
+                        <tns:Line1T t-out="employee['Line1T']"/>
+                        <tns:Line2T t-out="employee['Line2T']"/>
+                        <tns:LocalityNameT t-out="employee['LocalityNameT']"/>
+                        <tns:StateOrTerritoryC t-out="employee['StateOrTerritoryC']"/>
+                        <tns:PostcodeT t-out="employee['PostcodeT']"/>
+                        <tns:CountryC t-out="employee['CountryC']"/>
                     </tns:AddressDetails>
                     <tns:ElectronicContact>
-                        <tns:ElectronicMailAddressT t-esc="employee['ElectronicMailAddressT']"/>
-                        <tns:TelephoneMinimalN t-esc="employee['TelephoneMinimalN']"/>
+                        <tns:ElectronicMailAddressT t-out="employee['ElectronicMailAddressT']"/>
+                        <tns:TelephoneMinimalN t-out="employee['TelephoneMinimalN']"/>
                     </tns:ElectronicContact>
                     <tns:EmployerConditions>
-                        <tns:EmploymentStartD t-esc="employee['EmploymentStartD']"/>
-                        <tns:EmploymentEndD t-esc="employee['EmploymentEndD']"/>
-                        <tns:PaymentBasisC t-esc="employee['PaymentBasisC']"/>
-                        <tns:CessationTypeC t-esc="employee['CessationTypeC']"/>
-                        <tns:TaxTreatmentC t-esc="employee['TaxTreatmentC']"/>
-                        <tns:TaxOffsetClaimTotalA t-esc="employee['TaxOffsetClaimTotalA']"/>
+                        <tns:EmploymentStartD t-out="employee['EmploymentStartD']"/>
+                        <tns:EmploymentEndD t-out="employee['EmploymentEndD']"/>
+                        <tns:PaymentBasisC t-out="employee['PaymentBasisC']"/>
+                        <tns:CessationTypeC t-out="employee['CessationTypeC']"/>
+                        <tns:TaxTreatmentC t-out="employee['TaxTreatmentC']"/>
+                        <tns:TaxOffsetClaimTotalA t-out="employee['TaxOffsetClaimTotalA']"/>
                     </tns:EmployerConditions>
                     <tns:PayrollPeriod>
-                        <tns:StartD t-esc="employee['StartD']"/>
-                        <tns:EndD t-esc="employee['EndD']"/>
+                        <tns:StartD t-out="employee['StartD']"/>
+                        <tns:EndD t-out="employee['EndD']"/>
                         <tns:RemunerationPayrollEventFinalI t-out="employee['RemunerationPayrollEventFinalI']"/>
                         <tns:RemunerationCollection>
                         <t t-foreach="employee['Remuneration']" t-as="Remuneration">
                             <tns:Remuneration>
-                                <tns:IncomeStreamTypeC t-esc="Remuneration['IncomeStreamTypeC']"/>
-                                <tns:AddressDetailsCountryC t-esc="Remuneration['AddressDetailsCountryC']"/>
-                                <tns:IncomeTaxPayAsYouGoWithholdingTaxWithheldA t-esc="Remuneration['IncomeTaxPayAsYouGoWithholdingTaxWithheldA']"/>
-                                <tns:IncomeTaxForeignWithholdingA t-if="Remuneration['IncomeTaxForeignWithholdingA']" t-esc="Remuneration['IncomeTaxForeignWithholdingA']"/>
+                                <tns:IncomeStreamTypeC t-out="Remuneration['IncomeStreamTypeC']"/>
+                                <tns:AddressDetailsCountryC t-out="Remuneration['AddressDetailsCountryC']"/>
+                                <tns:IncomeTaxPayAsYouGoWithholdingTaxWithheldA t-out="Remuneration['IncomeTaxPayAsYouGoWithholdingTaxWithheldA']"/>
+                                <tns:IncomeTaxForeignWithholdingA t-if="Remuneration['IncomeTaxForeignWithholdingA']" t-out="Remuneration['IncomeTaxForeignWithholdingA']"/>
                                 <tns:IndividualNonBusinessExemptForeignEmploymentIncomeA
                                     t-if="Remuneration['IndividualNonBusinessExemptForeignEmploymentIncomeA']"
-                                    t-esc="Remuneration['IndividualNonBusinessExemptForeignEmploymentIncomeA']"/>
-                                <tns:GrossA t-esc="Remuneration['GrossA']"/>
+                                    t-out="Remuneration['IndividualNonBusinessExemptForeignEmploymentIncomeA']"/>
+                                <tns:GrossA t-out="Remuneration['GrossA']"/>
                                 <tns:PaidLeaveCollection t-if="Remuneration['PaidLeaveCollection']">
                                 <t t-foreach="Remuneration['PaidLeaveCollection']" t-as="leave">
                                     <tns:PaidLeave>
-                                        <tns:TypeC t-esc="leave['TypeC']"/>
-                                        <tns:PaymentA t-esc="leave['PaymentA']"/>
+                                        <tns:TypeC t-out="leave['TypeC']"/>
+                                        <tns:PaymentA t-out="leave['PaymentA']"/>
                                     </tns:PaidLeave>
                                 </t>
                                 </tns:PaidLeaveCollection>
                                 <tns:AllowanceCollection t-if="Remuneration['AllowanceCollection']">
                                 <t t-foreach="Remuneration['AllowanceCollection']" t-as="Allowance">
                                     <tns:Allowance>
-                                        <tns:TypeC t-esc="Allowance['TypeC']"/>
-                                        <tns:OtherAllowanceTypeDe t-esc="Allowance['OtherAllowanceTypeDe']" t-if="Allowance['OtherAllowanceTypeDe']"/>
-                                        <tns:EmploymentAllowancesA t-esc="Allowance['EmploymentAllowancesA']"/>
+                                        <tns:TypeC t-out="Allowance['TypeC']"/>
+                                        <tns:OtherAllowanceTypeDe t-out="Allowance['OtherAllowanceTypeDe']" t-if="Allowance['OtherAllowanceTypeDe']"/>
+                                        <tns:EmploymentAllowancesA t-out="Allowance['EmploymentAllowancesA']"/>
                                     </tns:Allowance>
                                 </t>
                                 </tns:AllowanceCollection>
-                                <tns:OvertimePaymentA t-if="Remuneration['OvertimePaymentA']" t-esc="Remuneration['OvertimePaymentA']"/>
-                                <tns:GrossBonusesAndCommissionsA t-if="Remuneration['GrossBonusesAndCommissionsA']" t-esc="Remuneration['GrossBonusesAndCommissionsA']"/>
-                                <tns:GrossDirectorsFeesA t-esc="Remuneration['GrossDirectorsFeesA']" t-if="Remuneration['GrossDirectorsFeesA']"/>
-                                <tns:IndividualNonBusinessCommunityDevelopmentEmploymentProjectA t-esc="Remuneration['IndividualNonBusinessCommunityDevelopmentEmploymentProjectA']"/>
+                                <tns:OvertimePaymentA t-if="Remuneration['OvertimePaymentA']" t-out="Remuneration['OvertimePaymentA']"/>
+                                <tns:GrossBonusesAndCommissionsA t-if="Remuneration['GrossBonusesAndCommissionsA']" t-out="Remuneration['GrossBonusesAndCommissionsA']"/>
+                                <tns:GrossDirectorsFeesA t-out="Remuneration['GrossDirectorsFeesA']" t-if="Remuneration['GrossDirectorsFeesA']"/>
+                                <tns:IndividualNonBusinessCommunityDevelopmentEmploymentProjectA t-out="Remuneration['IndividualNonBusinessCommunityDevelopmentEmploymentProjectA']"/>
                                 <tns:SalarySacrificeCollection t-if="Remuneration['SalarySacrificeCollection']">
                                 <t t-foreach="Remuneration['SalarySacrificeCollection']" t-as="Sacrifice">
                                     <tns:SalarySacrifice>
-                                        <tns:TypeC t-esc="Sacrifice['TypeC']"/>
-                                        <tns:PaymentA t-esc="Sacrifice['PaymentA']"/>
+                                        <tns:TypeC t-out="Sacrifice['TypeC']"/>
+                                        <tns:PaymentA t-out="Sacrifice['PaymentA']"/>
                                     </tns:SalarySacrifice>
                                 </t>
                                 </tns:SalarySacrificeCollection>
                                 <tns:LumpSumCollection t-if="Remuneration['LumpSumCollection']">
                                 <t t-foreach="Remuneration['LumpSumCollection']" t-as="LumpSum">
                                     <tns:LumpSum>
-                                        <tns:TypeC t-esc="LumpSum['TypeC']"/>
-                                        <tns:FinancialY t-esc="LumpSum['FinancialY']" t-if="'FinancialY' in LumpSum"/>
-                                        <tns:PaymentsA t-esc="LumpSum['PaymentsA']"/>
+                                        <tns:TypeC t-out="LumpSum['TypeC']"/>
+                                        <tns:FinancialY t-out="LumpSum['FinancialY']" t-if="'FinancialY' in LumpSum"/>
+                                        <tns:PaymentsA t-out="LumpSum['PaymentsA']"/>
                                     </tns:LumpSum>
                                 </t>
                                 </tns:LumpSumCollection>
@@ -152,11 +152,11 @@
                                 <tns:EmploymentTerminationPaymentCollection t-if="Remuneration['EmploymentTerminationPaymentCollection']">
                                 <t t-foreach="Remuneration['EmploymentTerminationPaymentCollection']" t-as="Termination">
                                     <tns:EmploymentTerminationPayment>
-                                        <tns:IncomeTaxPayAsYouGoWithholdingTypeC t-esc="Termination['IncomeTaxPayAsYouGoWithholdingTypeC']"/>
-                                        <tns:IncomeD t-esc="Termination['IncomeD']"/>
-                                        <tns:IncomeTaxFreeA t-esc="Termination['IncomeTaxFreeA']"/>
-                                        <tns:IncomeTaxableA t-esc="Termination['IncomeTaxableA']"/>
-                                        <tns:IncomePayAsYouGoWithholdingA t-esc="Termination['IncomePayAsYouGoWithholdingA']"/>
+                                        <tns:IncomeTaxPayAsYouGoWithholdingTypeC t-out="Termination['IncomeTaxPayAsYouGoWithholdingTypeC']"/>
+                                        <tns:IncomeD t-out="Termination['IncomeD']"/>
+                                        <tns:IncomeTaxFreeA t-out="Termination['IncomeTaxFreeA']"/>
+                                        <tns:IncomeTaxableA t-out="Termination['IncomeTaxableA']"/>
+                                        <tns:IncomePayAsYouGoWithholdingA t-out="Termination['IncomePayAsYouGoWithholdingA']"/>
                                     </tns:EmploymentTerminationPayment>
                                 </t>
                                 </tns:EmploymentTerminationPaymentCollection>
@@ -166,8 +166,8 @@
                         <tns:DeductionCollection t-if="employee['Deduction']">
                             <t t-foreach="employee['Deduction']" t-as="deduction">
                                 <tns:Deduction>
-                                    <tns:RemunerationTypeC t-esc="deduction['RemunerationTypeC']"/>
-                                    <tns:RemunerationA t-esc="deduction['RemunerationA']"/>
+                                    <tns:RemunerationTypeC t-out="deduction['RemunerationTypeC']"/>
+                                    <tns:RemunerationA t-out="deduction['RemunerationA']"/>
                                 </tns:Deduction>
                             </t>
                         </tns:DeductionCollection>
@@ -175,8 +175,8 @@
                         <tns:SuperannuationContributionCollection t-if="employee['SuperannuationContributionCollection']">
                             <t t-foreach="employee['SuperannuationContributionCollection']" t-as="super">
                                 <tns:SuperannuationContribution>
-                                    <tns:EntitlementTypeC t-esc="super['EntitlementTypeC']"/>
-                                    <tns:EmployerContributionsYearToDateA t-esc="super['EmployerContributionsYearToDateA']"/>
+                                    <tns:EntitlementTypeC t-out="super['EntitlementTypeC']"/>
+                                    <tns:EmployerContributionsYearToDateA t-out="super['EmployerContributionsYearToDateA']"/>
                                 </tns:SuperannuationContribution>
                             </t>
                         </tns:SuperannuationContributionCollection>
@@ -184,8 +184,8 @@
                         <tns:IncomeFringeBenefitsReportableCollection t-if="employee['IncomeFringeBenefitsReportableCollection']">
                             <t t-foreach="employee['IncomeFringeBenefitsReportableCollection']" t-as="benefit">
                                 <tns:IncomeFringeBenefitsReportable>
-                                    <tns:FringeBenefitsReportableExemptionC t-esc="benefit['FringeBenefitsReportableExemptionC']"/>
-                                    <tns:A t-esc="benefit['A']"/>
+                                    <tns:FringeBenefitsReportableExemptionC t-out="benefit['FringeBenefitsReportableExemptionC']"/>
+                                    <tns:A t-out="benefit['A']"/>
                                 </tns:IncomeFringeBenefitsReportable>
                             </t>
                         </tns:IncomeFringeBenefitsReportableCollection>

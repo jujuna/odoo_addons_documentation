@@ -1,16 +1,17 @@
 {
     'name': 'Kenya - Point of Sale',
-    'version': '1.0',
     'countries': ['ke'],
     'category': 'Accounting/Localizations/EDI',
     'depends': [
         'l10n_ke_edi_oscu_stock',
-        'point_of_sale',
+        'pos_stock',
     ],
     'data': [
         'views/account_move_views.xml',
         'views/pos_order.xml',
         'views/product_views.xml',
+        'views/res_partner_views.xml',
+        'receipt/pos_order_receipt.xml',
     ],
     'demo': [
         'demo/demo_product.xml',
@@ -26,9 +27,11 @@
             'l10n_ke_edi_oscu_pos/static/src/overrides/views/*.js',
             'l10n_ke_edi_oscu_pos/static/src/overrides/views/*.xml',
         ],
+        'web.assets_tests': [
+            'l10n_ke_edi_oscu_pos/static/tests/**/*',
+        ],
     },
     'post_init_hook': 'set_update_stock_real_time',
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

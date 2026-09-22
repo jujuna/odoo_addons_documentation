@@ -7,17 +7,18 @@ registries.topbarMenuRegistry.addChild("version_history", ["file"], {
     isVisible: (env) => env.showHistory,
     execute: (env) => env.showHistory(),
     icon: "o-spreadsheet-Icon.VERSION_HISTORY",
+    isEnabledOnLockedSheet: true,
 });
 
 registries.topbarMenuRegistry.addChild("clear_history", ["file"], {
     name: _t("Snapshot"),
     sequence: 100,
     separator: true,
-    isVisible: (env) => env.debug,
+    isVisible: () => odoo.debug,
     execute: (env) => {
         env.model.session.snapshot(env.model.exportData());
-        env.model.garbageCollectExternalResources();
         window.location.reload();
     },
     icon: "o-spreadsheet-Icon.CAMERA",
+    isEnabledOnLockedSheet: true,
 });

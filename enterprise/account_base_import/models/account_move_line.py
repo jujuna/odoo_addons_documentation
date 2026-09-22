@@ -55,15 +55,17 @@ class AccountMoveLine(models.Model):
             for journal in journal_codes:
                 journal_codes_ids[journal["code"]] = journal["id"]
 
+            journal_code_size = self.env['account.journal']._fields['code'].size
             journal_ids = self.env["account.journal"]._load_records([
                 {
                     "values": (
-                        {"id": journal_codes_ids[journal_name[:5]]}
-                        if journal_name[:5] in journal_codes_ids
+                        {"id": journal_codes_ids[journal_code]}
+                        if journal_code in journal_codes_ids
                         else {"name": journal_name}
                     )
                 }
                 for journal_name in journal_data
+                if (journal_code := journal_name[:journal_code_size])
             ])
             _sequence_override(journal_ids, r"^(?P<prefix1>.*?)(?P<seq>\d{0,9})(?P<suffix>\D*?)$")
             self.env["account.move"].load(["journal_id", "name", "date"], account_move_data)
@@ -76,4 +78,4 @@ class AccountMoveLine(models.Model):
                 for row in data:
                     row[matching_index] = row[matching_index] and f"I{row[matching_index]}"
 
-        return super().load(fields, data)
+        return super(AccountMoveLine, self.with_context(skip_account_deprecation_check=True)).load(fields, data)

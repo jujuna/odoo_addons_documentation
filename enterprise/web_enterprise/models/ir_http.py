@@ -44,14 +44,18 @@ class IrHttp(models.AbstractModel):
         result['support_url'] = "https://www.odoo.com/help"
         if warn_enterprise:
             result['warning'] = warn_enterprise
-            result['expiration_date'] = ICP.get_param('database.expiration_date')
-            result['expiration_reason'] = ICP.get_param('database.expiration_reason')
-            if ICP.get_param('sysadmin.message'):
+            result['expiration_date'] = ICP.get_str('database.expiration_date')
+            result['expiration_reason'] = ICP.get_str('database.expiration_reason')
+            if ICP.get_str('sysadmin.message'):
                 try:
-                    sysadmin_message = json.loads(ICP.get_param('sysadmin.message'))
+                    sysadmin_message = json.loads(ICP.get_str('sysadmin.message'))
                     if 'message' in sysadmin_message:
                         sysadmin_message['message'] = html_sanitize(sysadmin_message['message'], sanitize_tags=False)
                     result['sysadmin_message'] = sysadmin_message
                 except Exception:
                     _logger.exception('Failed to load sysadmin.message in ir.config_parameter')
+
+        if self.env.user._is_internal():
+            result['map_box_token'] = ICP.get_str('web_enterprise.token_map_box')
+
         return result

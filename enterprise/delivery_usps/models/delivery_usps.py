@@ -123,7 +123,7 @@ class DeliveryCarrier(models.Model):
         else:
             quote_currency = self.env['res.currency'].search([('name', '=', 'USD')], limit=1)
             price = quote_currency._convert(
-              quotes['price'], order.currency_id, order.company_id, order.date_order or fields.Date.today())
+              quotes['price'], order.currency_id, order.company_id, order.date_order)
 
         return {'success': True,
                 'price': price,
@@ -155,7 +155,7 @@ class DeliveryCarrier(models.Model):
             else:
                 quote_currency = self.env['res.currency'].search([('name', '=', "USD")], limit=1)
                 price = quote_currency._convert(
-                  booking['price'], currency_order, company, order.date_order or fields.Date.today())
+                  booking['price'], currency_order, company, order.date_order)
 
             carrier_tracking_ref = booking['tracking_number']
 

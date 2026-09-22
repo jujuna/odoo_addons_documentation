@@ -2,7 +2,6 @@
 
 {
     "name": "AI Documents Account",
-    "version": "1.0",
     "category": "Hidden",
     "summary": "AI Documents Account",
     "demo": [

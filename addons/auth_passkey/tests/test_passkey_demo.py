@@ -9,8 +9,10 @@ from odoo.tests import tagged
 from odoo.tools import SQL, mute_logger
 
 from odoo.addons.base.tests.common import HttpCaseWithUserDemo
+from ..mobile_utils import _get_app_sha256_cert_fingerprints
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class PasskeyTest(HttpCaseWithUserDemo):
     @classmethod
     def setUpClass(self):
@@ -130,6 +132,47 @@ class PasskeyTest(HttpCaseWithUserDemo):
                     }
                 },
             },
+            "test-android": {
+                "user": self.admin_user,
+                "supports_sign_count": False,
+                "credential_identifier": "t_i1_F91Wg-FpFzae96DZ7wziguF_cLR4CAW96C8YeY",
+                "public_key": "pQECAyYgASFYIMJQcfCY2QEb2WlZdY4I5xiC5qWmuo0zkxIrf4vYLPBHIlggsq2k9b53CRzIk0u3FMTCKid8fDVF0_KXZ7qa7eOZdo0",
+                "host": "http://localhost:8069",
+                "android_origin": "android:apk-key-hash:1nMgAsotAcn9_JRzWtBzzyw2ECkfS_ddkcIdN7IY6JE",
+                "registration": {
+                    "id": "t_i1_F91Wg-FpFzae96DZ7wziguF_cLR4CAW96C8YeY",
+                    "rawId": "t_i1_F91Wg-FpFzae96DZ7wziguF_cLR4CAW96C8YeY",
+                    "response": {
+                        "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAAAAAAAAAAAAAAAAAAAAAAAAAILf4tfxfdVoPhaRc2nveg2e8M4oLhf3C0eAgFvegvGHmpQECAyYgASFYIMJQcfCY2QEb2WlZdY4I5xiC5qWmuo0zkxIrf4vYLPBHIlggsq2k9b53CRzIk0u3FMTCKid8fDVF0_KXZ7qa7eOZdo0",
+                        "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoicGs5eWhUQWhUQzNvS0dSUzdXd3g5aDExa0VXZlo3WWREZFNNRmNkbWE2U3RRZTJ1TlNaQTVCQWNvX18zeUFWYVpiT3ZsdWlNTFR5aHZzY0hQZzdxZHciLCJvcmlnaW4iOiJhbmRyb2lkOmFway1rZXktaGFzaDoxbk1nQXNvdEFjbjlfSlJ6V3RCenp5dzJFQ2tmU19kZGtjSWRON0lZNkpFIiwiY3Jvc3NPcmlnaW4iOmZhbHNlLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJhbmRyb2lkOmFway1rZXktaGFzaDoxbk1nQXNvdEFjbjlfSlJ6V3RCenp5dzJFQ2tmU19kZGtjSWRON0lZNkpFIn0",
+                        "transports": [
+                            "internal"
+                        ],
+                        "publicKeyAlgorithm": -7,
+                        "publicKey": "pQECAyYgASFYIMJQcfCY2QEb2WlZdY4I5xiC5qWmuo0zkxIrf4vYLPBHIlggsq2k9b53CRzIk0u3FMTCKid8fDVF0_KXZ7qa7eOZdo0",
+                        "authenticatorData": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAAAAAAAAAAAAAAAAAAAAAAAAAILf4tfxfdVoPhaRc2nveg2e8M4oLhf3C0eAgFvegvGHmpQECAyYgASFYIMJQcfCY2QEb2WlZdY4I5xiC5qWmuo0zkxIrf4vYLPBHIlggsq2k9b53CRzIk0u3FMTCKid8fDVF0_KXZ7qa7eOZdo0"
+                    },
+                    "type": "public-key",
+                    "clientExtensionResults": {},
+                    "authenticatorAttachment": "platform"
+                },
+                "auth": {
+                    "challenge": "ocotP-82vkwm--GGtcdO7X0rtelYvW2RgTlwlQDWeerAhj38erGico6ChaXWrgpX-kR1r-DBmf_7EK6VgSk-Jg",
+                    "response": {
+                        "id": "t_i1_F91Wg-FpFzae96DZ7wziguF_cLR4CAW96C8YeY",
+                        "rawId": "t_i1_F91Wg-FpFzae96DZ7wziguF_cLR4CAW96C8YeY",
+                        "response": {
+                            "authenticatorData": "SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFAAAAAA",
+                            "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoib2NvdFAtODJ2a3dtLS1HR3RjZE83WDBydGVsWXZXMlJnVGx3bFFEV2VlckFoajM4ZXJHaWNvNkNoYVhXcmdwWC1rUjFyLURCbWZfN0VLNlZnU2stSmciLCJvcmlnaW4iOiJhbmRyb2lkOmFway1rZXktaGFzaDoxbk1nQXNvdEFjbjlfSlJ6V3RCenp5dzJFQ2tmU19kZGtjSWRON0lZNkpFIiwiY3Jvc3NPcmlnaW4iOmZhbHNlLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJhbmRyb2lkOmFway1rZXktaGFzaDoxbk1nQXNvdEFjbjlfSlJ6V3RCenp5dzJFQ2tmU19kZGtjSWRON0lZNkpFIn0",
+                            "signature": "MEUCIGG5zk-BGwbCropY-HOy-1EE7u3ZvQmvD3oBGZjCB5tOAiEA00krBZFIJSjIN8DOHgIwRTPur0b5xTBtzAEG2Fr0kJM",
+                            "userHandle": "Mg"
+                        },
+                        "type": "public-key",
+                        "clientExtensionResults": {},
+                        "authenticatorAttachment": "platform"
+                    }
+                }
+            },
         }
 
         for key, values in self.passkeys.items():
@@ -183,7 +226,7 @@ class PasskeyTest(HttpCaseWithUserDemo):
         passkey = self.passkeys['test-yubikey']
         registration = passkey['registration']
         webauthn_challenge, webauthn_response = registration['challenge'], registration['response']
-        self.env['ir.config_parameter'].sudo().set_param('web.base.url', passkey['host'])
+        self.env['ir.config_parameter'].sudo().set_str('web.base.url', passkey['host'])
         with self.patch_start_registration(webauthn_challenge):
             # Remove existing user passkeys so the check identity ask for a password authentication by default.
             # To mimic the behavior when a user has no passkeys set yet.
@@ -214,11 +257,11 @@ class PasskeyTest(HttpCaseWithUserDemo):
             self.assertEqual(self.admin_user.auth_passkey_key_ids.sign_count, 0)
 
     def test_authentication(self):
-        for key in ['test-yubikey', 'test-yubikey-nano', 'test-keepassxc']:
+        for key in ['test-yubikey', 'test-yubikey-nano', 'test-keepassxc', 'test-android']:
             passkey = self.passkeys[key]
             auth = passkey['auth']
             webauthn_challenge, webauthn_response = auth['challenge'], auth['response']
-            self.env['ir.config_parameter'].sudo().set_param('web.base.url', passkey['host'])
+            self.env['ir.config_parameter'].sudo().set_str('web.base.url', passkey['host'])
             sign_count = passkey['passkey'].sign_count
 
             with self.patch_start_auth(webauthn_challenge):
@@ -266,11 +309,11 @@ class PasskeyTest(HttpCaseWithUserDemo):
                 self.assertEqual(error, 'Cannot find a challenge for this session')
 
     def test_check_identity(self):
-        for key in ['test-yubikey', 'test-yubikey-nano', 'test-keepassxc']:
+        for key in ['test-yubikey', 'test-yubikey-nano', 'test-keepassxc', 'test-android']:
             passkey = self.passkeys[key]
             user, auth = passkey['user'], passkey['auth']
             webauthn_challenge, webauthn_response = auth['challenge'], auth['response']
-            self.env['ir.config_parameter'].sudo().set_param('web.base.url', passkey['host'])
+            self.env['ir.config_parameter'].sudo().set_str('web.base.url', passkey['host'])
             sign_count = passkey['passkey'].sign_count
 
             with self.patch_start_auth(webauthn_challenge):
@@ -378,7 +421,7 @@ class PasskeyTest(HttpCaseWithUserDemo):
         """
         passkey = self.passkeys['test-user-verification']
         webauthn_challenge, webauthn_response = passkey['auth']['challenge'], passkey['auth']['response']
-        self.env['ir.config_parameter'].sudo().set_param('web.base.url', passkey['host'])
+        self.env['ir.config_parameter'].sudo().set_str('web.base.url', passkey['host'])
 
         with self.patch_start_auth(webauthn_challenge):
             csrf_token = etree.fromstring(
@@ -442,17 +485,36 @@ class PasskeyTest(HttpCaseWithUserDemo):
             # Login successful, redirected to /odoo
             self.assertTrue(response.url.endswith('/odoo'))
 
+    def test_android_digital_asset_links(self):
+        response = self.url_open('/.well-known/assetlinks.json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"], "application/json")
+        data = response.json()
+        self.assertGreater(len(data), 0, "Should a least have one entry")
+        for index, (package_name, fingerprints) in enumerate(_get_app_sha256_cert_fingerprints()):
+            # Two relations required for PassKey to work on Android
+            self.assertEqual(data[index]["relation"], [
+                "delegate_permission/common.handle_all_urls",
+                "delegate_permission/common.get_login_creds",
+            ])
+            # Data for our official Android App
+            self.assertEqual(data[index]["target"], {
+                'namespace': 'android_app',
+                'package_name': package_name,
+                'sha256_cert_fingerprints': fingerprints,
+            })
+
 
 @tagged('post_install', '-at_install')
 class PasskeyTestTours(PasskeyTest):
     def test_passkey_login(self):
-        self.env['ir.config_parameter'].sudo().set_param('web.base.url', self.passkeys['test-keepassxc']['host'])
+        self.env['ir.config_parameter'].sudo().set_str('web.base.url', self.passkeys['test-keepassxc']['host'])
         with self.patch_start_auth(self.passkeys['test-keepassxc']['auth']['challenge']):
             self.start_tour("/web/login?debug=tests", 'passkeys_tour_login')
 
     def test_passkey_backend(self):
         # All these tests rely on each other but had to be split up to patch different methods.
-        self.env['ir.config_parameter'].sudo().set_param('web.base.url', self.passkeys['test-yubikey']['host'])
+        self.env['ir.config_parameter'].sudo().set_str('web.base.url', self.passkeys['test-yubikey']['host'])
         self.admin_user.tz = 'UTC'  # workaround to fix timezone not being set so you are unable to click any buttons on the profile page
         self.admin_user.auth_passkey_key_ids.unlink()
         with self.patch_start_registration(self.passkeys['test-yubikey']['registration']['challenge']):

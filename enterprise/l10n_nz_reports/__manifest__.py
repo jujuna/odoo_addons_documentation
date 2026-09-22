@@ -1,6 +1,5 @@
 {
     'name': 'New Zealand - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for New Zealand
 ============================================

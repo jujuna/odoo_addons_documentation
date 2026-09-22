@@ -9,8 +9,6 @@ Keeps track of loans, and creates corresponding journal entries.
     'sequence': 32,
     'depends': ['account_asset', 'base_import'],
     'data': [
-        'security/account_loans_security.xml',
-        'security/ir.model.access.csv',
 
         'wizard/account_loan_close_wizard.xml',
         'wizard/account_loan_compute_wizard.xml',
@@ -21,17 +19,23 @@ Keeps track of loans, and creates corresponding journal entries.
         'views/account_move_views.xml',
 
         'data/account_return_check_template.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/account_loans_demo.xml',
     ],
+    'other_files': [
+        'demo/files/loan_amortization_demo.csv',
+    ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'auto_install': True,
-    'post_init_hook': '_account_loans_post_init',
     'assets': {
         'web.assets_backend': [
             'account_loans/static/src/**/*',
+        ],
+        'web.assets_unit_tests': [
+            'account_loans/static/tests/*',
         ],
     }
 }

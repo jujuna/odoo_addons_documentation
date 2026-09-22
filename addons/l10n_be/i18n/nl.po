@@ -7,21 +7,67 @@
 # Lukas Van Cauter <cvl@odoo.com>, 2023
 # Martin Trigaux, 2023
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2026.
+# Bren Driesen <brdri@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.3alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:04+0000\n"
-"PO-Revision-Date: 2025-11-17 03:09+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19-l10n/"
-"l10n_be/nl/>\n"
+"POT-Creation-Date: 2026-08-28 18:17+0000\n"
+"PO-Revision-Date: 2026-08-31 13:59+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-s19-4/l10n_be/"
+"nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: l10n_be
+#: model:ir.module.module,description:base.module_l10n_be
+msgid ""
+"\n"
+"This is the base module to manage the accounting chart for Belgium in Odoo.\n"
+"==============================================================================\n"
+"\n"
+"After installing this module, the Configuration wizard for accounting is "
+"launched.\n"
+"    * We have the account templates which can be helpful to generate Charts "
+"of Accounts.\n"
+"    * On that particular wizard, you will be asked to pass the name of the "
+"company,\n"
+"      the chart template to follow, the no. of digits to generate, the code "
+"for your\n"
+"      account and bank account, currency to create journals.\n"
+"\n"
+"Thus, the pure copy of Chart Template is generated.\n"
+"\n"
+"Wizards provided by this module:\n"
+"--------------------------------\n"
+"    * Partner VAT Intra: Enlist the partners with their related VAT and "
+"invoiced\n"
+"      amounts. Prepares an XML file format.\n"
+"\n"
+"        **Path to access:** Invoicing/Reporting/Legal Reports/Belgium "
+"Statements/Partner VAT Intra\n"
+"    * Periodical VAT Declaration: Prepares an XML file for Vat Declaration "
+"of\n"
+"      the Main company of the User currently Logged in.\n"
+"\n"
+"        **Path to access:** Invoicing/Reporting/Legal Reports/Belgium "
+"Statements/Periodical VAT Declaration\n"
+"    * Annual Listing Of VAT-Subjected Customers: Prepares an XML file for "
+"Vat\n"
+"      Declaration of the Main company of the User currently Logged in Based "
+"on\n"
+"      Fiscal year.\n"
+"\n"
+"        **Path to access:** Invoicing/Reporting/Legal Reports/Belgium "
+"Statements/Annual Listing Of VAT-Subjected Customers\n"
+"\n"
+msgstr ""
 
 #. module: l10n_be
 #: model:ir.model,name:l10n_be.model_account_chart_template
@@ -51,6 +97,11 @@ msgid "Belgium (+++000/2024/00182+++)"
 msgstr "België (+++000/2024/00182+++)"
 
 #. module: l10n_be
+#: model:ir.module.module,shortdesc:base.module_l10n_be
+msgid "Belgium - Accounting"
+msgstr ""
+
+#. module: l10n_be
 #: model:ir.model.fields,field_description:l10n_be.field_account_journal__invoice_reference_model
 msgid "Communication Standard"
 msgstr "Communicatiestandaard"
@@ -62,35 +113,23 @@ msgid "Companies"
 msgstr "Vennootschappen"
 
 #. module: l10n_be
-#: model:ir.model,name:l10n_be.model_res_partner
-msgid "Contact"
-msgstr "Contact"
-
-#. module: l10n_be
-#: model:ir.model,website_form_label:l10n_be.model_res_partner
-msgid "Create a Customer"
-msgstr "Een klant aanmaken"
-
-#. module: l10n_be
 #: model:ir.model.fields,field_description:l10n_be.field_account_chart_template__display_name
 #: model:ir.model.fields,field_description:l10n_be.field_account_journal__display_name
 #: model:ir.model.fields,field_description:l10n_be.field_account_move__display_name
 #: model:ir.model.fields,field_description:l10n_be.field_account_tax__display_name
-#: model:ir.model.fields,field_description:l10n_be.field_res_partner__display_name
 msgid "Display Name"
 msgstr "Schermnaam"
 
 #. module: l10n_be
 #: model:ir.model,name:l10n_be.model_account_tax
 msgid "ETA tax codes mixin"
-msgstr ""
+msgstr "Mixin ETA-belastingcodes"
 
 #. module: l10n_be
 #: model:ir.model.fields,field_description:l10n_be.field_account_chart_template__id
 #: model:ir.model.fields,field_description:l10n_be.field_account_journal__id
 #: model:ir.model.fields,field_description:l10n_be.field_account_move__id
 #: model:ir.model.fields,field_description:l10n_be.field_account_tax__id
-#: model:ir.model.fields,field_description:l10n_be.field_res_partner__id
 msgid "ID"
 msgstr "ID"
 
@@ -112,17 +151,12 @@ msgstr "Boeking"
 #. module: l10n_be
 #: model:ir.model.fields.selection,name:l10n_be.selection__account_tax__tax_scope__merch
 msgid "Merchandise"
-msgstr "Goederen"
-
-#. module: l10n_be
-#: model:ir.model.fields,help:l10n_be.field_account_tax__tax_scope
-msgid "Restrict the use of taxes to a type of product."
-msgstr "Het gebruik van belastingen tot een type product beperken."
+msgstr "Handelsgoederen"
 
 #. module: l10n_be
 #: model:ir.model.fields,field_description:l10n_be.field_account_tax__tax_scope
 msgid "Tax Scope"
-msgstr "Dragwijdte belasting"
+msgstr "Btw over"
 
 #. module: l10n_be
 #: model:ir.model.fields,help:l10n_be.field_account_journal__invoice_reference_model
@@ -132,3 +166,9 @@ msgid ""
 msgstr ""
 "Je kan verschillende modellen kiezen voor elk type referentie. De standaard "
 "is de Odoo-referentie."
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Create a Customer"
+msgstr "Een klant aanmaken"

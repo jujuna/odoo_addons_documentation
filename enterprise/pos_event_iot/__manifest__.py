@@ -5,7 +5,6 @@
 Bridge module for PoS/Event/IoT. Used to print with IoT upon selling an event ticket.
 """,
     'category': 'Marketing/Events',
-    'version': '1.0',
     'depends': ['iot', 'pos_event'],
     'assets': {
         'point_of_sale._assets_pos': [

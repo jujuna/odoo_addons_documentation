@@ -8,12 +8,5 @@
             <attribute name="class">o_wappointment_wrap h-100 overflow-x-hidden</attribute>
         </xpath>
         <xpath expr="//t[@t-set='o_portal_fullwidth_alert']" position="replace"/>
-        <xpath expr="//t[@t-call='appointment.appointment_progress_bar']" position="before">
-           <a t-if="len(available_appointments) != 1"
-                class="text-truncate"
-                t-attf-href="/appointment?#{keep_query('filter_appointment_type_ids', 'filter_staff_user_ids', 'invite_token')}">
-                <i class="fa fa-long-arrow-left me-2"/>All Appointments
-            </a>
-        </xpath>
     </template>
 </odoo>

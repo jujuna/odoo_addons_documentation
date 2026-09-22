@@ -5,7 +5,7 @@ from odoo import models, fields, api
 class L10n_BrNcmCode(models.Model):
     _name = 'l10n_br.ncm.code'
     _description = "NCM Code"
-    _rec_names_search = ["code", "name"]
+    _rec_names_search = ("code", "name")
 
     code = fields.Char("Code", required=True)
     name = fields.Char("Name", required=True)
@@ -20,6 +20,10 @@ class L10n_BrNcmCode(models.Model):
         string="CNAE Code",
         help="Brazil: Use this field to indicate the CNAE code related to the service being provided. This field is used in "
         "municipalities that require CNAE identification per service to validate the NFS-e.",
+    )
+    is_service = fields.Boolean(
+        string="Is Service",
+        help="Brazil: When set, this code is a service code (LC116), otherwise it is a goods code (NCM).",
     )
 
     _name_uniq = models.Constraint(

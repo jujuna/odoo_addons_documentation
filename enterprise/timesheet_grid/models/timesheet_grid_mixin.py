@@ -16,7 +16,7 @@ class TimesheetGridMixin(models.AbstractModel):
         company = self.env.company
         uom = company.timesheet_encode_uom_id
         day_uom = self.env.ref('uom.product_uom_day')
-        rounding = len(str(format(company.timesheet_encode_uom_id.rounding, 'f')).split('.')[1].split('1')[0]) + 1
+        rounding = self.env['decimal.precision'].precision_get('Product Unit')
         hours_per_day = company.resource_calendar_id.hours_per_day
 
         def convert_hours_to_company_uom(hours):
@@ -28,11 +28,10 @@ class TimesheetGridMixin(models.AbstractModel):
         )
 
         records_per_id = {key: {} for key in self.ids}
-        uom_name = uom.name.lower()
         for record in records:
             records_per_id[record['id']] = {
                 'allocated_hours': convert_hours_to_company_uom(record[self.get_allocated_hours_field()]),
-                'uom': uom_name,
+                'uom': 'days' if uom == day_uom else 'hours',
                 'worked_hours': convert_hours_to_company_uom(sum(record[field] for field in self.get_worked_hours_fields())),
             }
         return records_per_id

@@ -5,5 +5,6 @@ from . import documents_document
 from . import documents_tag
 from . import ir_attachment
 from . import project_project
+from . import project_task
 from . import res_company
 from . import res_config_settings

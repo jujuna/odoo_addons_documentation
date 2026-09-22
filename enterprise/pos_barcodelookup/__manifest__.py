@@ -1,6 +1,5 @@
 {
     'name': 'POS - Barcode Lookup',
-    'version': '1.0',
     'category': 'Sales/Point of Sale',
     'summary': 'This module enables product creation by scanning barcodes with a camera, utilizing the Barcode Lookup API Key.',
     'depends': ['point_of_sale', 'product_barcodelookup'],
@@ -16,7 +15,6 @@
             'pos_barcodelookup/static/tests/**/*',
         ],
     },
-    'installable': True,
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

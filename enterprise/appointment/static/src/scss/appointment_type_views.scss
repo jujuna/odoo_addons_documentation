@@ -1,23 +1,27 @@
-/*                      Backend Helper
- **********************************************************/
-.o_appointment_helper {
-    .o_appointment_helper_templates {
-        pointer-events: auto;
-    }
-    .o_nocontent_help {
-        margin-top: 10vh;
-    }
-}
-
 /*                 Backend Template Cards
  **********************************************************/
 .o_appointment_template_picker, .o_appointment_helper {
     .o_appointment_template_card {
-        min-height: 15vh;
-
         &:hover {
-            background: var(--AppointmentTemplate-background-hover, #{$o-gray-200});
+            background: var(--AppointmentTemplateCard-background--hover, #{$o-gray-200});
         }
+
+        &:focus-visible {
+            box-shadow: 0 0 0 #{$btn-focus-width} RGBA(#{$btn-link-focus-shadow-rgb}, .5);
+            outline: none;
+        }
+    }
+}
+
+.o_nocontent_help:has(.o_activity_not_found) {
+    max-width: unset;
+
+    @include media-breakpoint-up(sm) {
+        max-width: 90%;
+    }
+
+    @include media-breakpoint-up(lg) {
+        max-width: 80%;
     }
 }
 
@@ -33,7 +37,7 @@
                 min-width: 380px;
             }
         }
-        .row:not(.o_appointment_helper_templates):not(.o_appointment_template_card) > div {
+        .row:not(.o_appointment_helper_templates):not(.o_appointment_template_card) > div:where(:not(.o_widget_web_ribbon)) {
             flex: 1 1 100% !important;
             max-width: 100% !important;
             margin: 5px 0 !important;
@@ -52,50 +56,46 @@
             }
             &.o_appointment_kanban_buttons {
                 margin-top: 16px !important;
-                .o_widget_appointment_quick_share_button {
-                    margin-left: 0px !important;
-                }
             }
         }
     }
 
     &.o_kanban_ungrouped {
-        // ungrouped layout as list re-used form survey_survey
-        padding: 0;
-        margin-top: -0.25rem;
-
         .o_kanban_record {
-            width: 100%;
-            margin: 0px;
-            .o_appointment_kanban_card {
-                margin: 0;
-                border-top: 0 !important;
-            }
+            min-height: auto;
         }
         .o_m2m_avatar {
-            width: 32px;
-            height: 32px;
+            --Avatar-size: 1.75rem;
         }
         .o_m2m_avatar_empty {
-            width: 20px;
-            height: 20px;
             margin-top: auto;
             margin-bottom: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             font-size: var(--Tag-font-size, #{$font-size-sm});
             background-color: lightgray;
         }
-        .o_field_many2many_avatar_user .o_m2m_avatar_empty {
-            margin-top: 0;
+        .o_appointment_kanban_buttons {
+            justify-content: flex-end;
+        }
+        .o_widget_web_ribbon {
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .o_appointment_kanban_card {
+            container-type: inline-size;
+
+            @container (max-width: 500px) or ((min-width: 751px) and (max-width: 1260px)) {
+                .o_appointment_kanban_button_name {
+                    display: none !important;
+                }
+                .o_appointment_kanban_button_icon {
+                    display: inline-block !important;
+                }
+            }
         }
     }
     // Ungrouped specific
     .o_appointment_kanban_card > div.row {
-        @include media-breakpoint-up(sm) {
-            margin-right: 4rem;
-        }
         min-height: 4rem;
         .o_widget_web_ribbon {
             position: absolute;
@@ -143,6 +143,10 @@
 
         }
     }
+
+    .o_appointment_counter {
+        font-variant-numeric: tabular-nums;
+    }
 }
 
 /*                      Form View
@@ -152,7 +156,7 @@
         width: 2.4em!important;
     }
 
-    button.fa-long-arrow-right {
+    button[data-icon="east"] {
         pointer-events: none;
     }
 }
@@ -161,11 +165,10 @@
     border-color: $o-input-border-required;
 }
 
-.o_appointment_booking_gantt_view {
-    .o_view_nocontent {
-        top: 200px !important;
-    }
-    .o_nocontent_help {
-        @include gradient-radial($white, rgba($white, 0.2));
-    }
+/*                      List View
+ **********************************************************/
+
+.o_appointment_list_location:empty:before {
+    font-family: "Material Symbols Outlined";
+    content: "videocam_f";
 }

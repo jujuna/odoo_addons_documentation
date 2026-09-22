@@ -18,7 +18,9 @@
         <field name="arch" type="xml">
             <header position="inside">
                 <button name="button_l10n_br_edi" type="object" string="Send NFC-e"
-                        invisible="not l10n_br_is_avatax or refunded_order_id or state == 'draft' or l10n_br_last_avatax_status == 'accepted'"/>
+                        invisible="not l10n_br_is_avatax or refunded_order_id or state == 'draft' or l10n_br_last_avatax_status in ['accepted', 'cancelled']"/>
+                <button name="button_l10n_br_edi_pos_cancel_nfce" type="object" string="Cancel NFC-e" groups="account.group_account_user"
+                        invisible="not l10n_br_is_avatax or refunded_order_id or state == 'draft' or l10n_br_last_avatax_status != 'accepted' or not l10n_br_access_key"/>
             </header>
             <button name="action_pos_order_invoice" position="attributes">
                 <attribute name="invisible" add="(l10n_br_is_avatax and not refunded_order_id)" separator=" or "/>
@@ -26,7 +28,7 @@
             <xpath expr="//sheet" position="before">
                 <div class="alert alert-warning" role="alert"
                      invisible="not l10n_br_avatax_error">
-                    <div class="p-0 m-0"><i class="fa fa-warning" role="img" title="EDI (Brazil)"/>
+                    <div class="p-0 m-0"><i class="oi" data-icon="warning" role="img" title="EDI (Brazil)"/>
                         <span class="mx-1">E-invoicing (Brazil)</span>
                     </div>
                     <field name="l10n_br_avatax_error"/>

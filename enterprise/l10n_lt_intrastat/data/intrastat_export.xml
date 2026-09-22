@@ -6,24 +6,12 @@
             <Envelope>
                 <envelopeId t-out="envelopeId"/>
                 <t t-call="l10n_lt_intrastat.DateTime"/>
-                <t t-call="l10n_lt_intrastat.Party">
-                    <t t-set="type" t-value="'PSI'"/>
-                    <t t-set="role" t-value="'sender'"/>
-                </t>
-                <t t-call="l10n_lt_intrastat.Party">
-                    <t t-set="type" t-value="'CC'"/>
-                    <t t-set="role" t-value="'receiver'"/>
-                </t>
+                <t t-call="l10n_lt_intrastat.Party" type.f="PSI" role.f="sender"/>
+                <t t-call="l10n_lt_intrastat.Party" type.f="CC" role.f="receiver"/>
                 <testIndicator t-if="is_test">true</testIndicator>
                 <softwareUsed t-out="version"/>
-                <t t-call="l10n_lt_intrastat.Declaration">
-                    <t t-set="reception" t-value="True"/>
-                    <t t-set="items" t-value="in_vals"/>
-                </t>
-                <t t-call="l10n_lt_intrastat.Declaration">
-                    <t t-set="reception" t-value="False"/>
-                    <t t-set="items" t-value="out_vals"/>
-                </t>
+                <t t-call="l10n_lt_intrastat.Declaration" reception="True" items="in_vals"/>
+                <t t-call="l10n_lt_intrastat.Declaration" reception="False" items="out_vals"/>
                 <numberOfDeclarations t-out="number_of_declarations"/>
             </Envelope>
         </INSTAT>

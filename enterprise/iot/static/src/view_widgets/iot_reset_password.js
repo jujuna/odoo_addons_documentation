@@ -2,43 +2,40 @@ import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 
 export class IoTResetPassword extends Component {
     static template = `iot.HeaderButton`;
-    static props = {
+    props = useProps({
         ...standardWidgetProps,
-        btn_name: { type: String },
-        btn_class: { type: String },
-    };
+        btn_name: t.string(),
+        btn_class: t.string(),
+    });
 
     setup() {
         super.setup();
-        this.longpolling = useService("iot_longpolling");
+        this.iotHttp = useService("iot_http");
         this.notification = useService("notification");
     }
 
-    get ip() {
-        return this.props.record.data.ip;
-    }
-
-    get name() {
-        return this.props.record.data.name;
-    }
-
     async onClick() {
-        try {
-            const response = await this.longpolling.action(this.ip, null, null, false, "/iot_drivers/generate_password");
-            if (!response?.result?.password) {
-                return this.doWarnFail();
-            }
-            this.notification.add(response.result.password, {
-                type: "info",
-                title: _t("New SSH password for %s", this.name),
-            });
-        } catch (error) {
-            console.error(error);
-        }
+        const { identifier, name } = this.props.record.data;
+        this.iotHttp.websocket.onMessage(
+            identifier,
+            identifier,
+            (result) => {
+                this.notification.add(_t("%s new password: %s", name, result.result?.password), {
+                    type: "info",
+                });
+            },
+            this.doWarnFail.bind(this)
+        );
+        this.iotHttp.websocket.sendMessage(
+            identifier,
+            { action: "reset_password" },
+            null,
+            "reset_password"
+        );
     }
 
     doWarnFail() {
@@ -48,11 +45,9 @@ export class IoTResetPassword extends Component {
 
 export const ioTResetPassword = {
     component: IoTResetPassword,
-    extractProps: ({ attrs }) => {
-        return {
-            btn_name: attrs.btn_name,
-            btn_class: attrs.btn_class,
-        };
-    },
+    extractProps: ({ attrs }) => ({
+        btn_name: attrs.btn_name,
+        btn_class: attrs.btn_class,
+    }),
 };
 registry.category("view_widgets").add("iot_reset_password", ioTResetPassword);

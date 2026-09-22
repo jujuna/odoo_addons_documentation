@@ -106,7 +106,7 @@
                         t-att-data-parent-id="line.get('parent_id')"
                         t-att-colspan="line.get('colspan', '1')"
                     >
-                        <span class="acc_rep_line_name" t-att-title="line.get('title_hover')">
+                        <span class="acc_rep_line_name">
                             <t t-out="line.get('name')">Table Value</t>
                         </span>
                     </td>
@@ -126,15 +126,14 @@
         </template>
 
         <template id="report_followup_print_all">
-            <t t-call="web.html_container">
-                <t t-set="company" t-value="docs.env.company"/>
+            <t t-call="web.html_container" company="docs.env.company">
                 <div class="oe_structure"></div>
                 <t t-foreach="docs" t-as="doc"> <!-- each doc is a 'res.partner', called doc for the 'web.external_layout' template -->
-                    <t t-call="web.external_layout">
-                        <t t-set="fallback_address" t-value="doc.browse(doc.address_get(['invoice'])['invoice']) or doc"/>
+                    <t t-call="web.external_layout"
+                        fallback_address="doc.browse(doc.address_get(['invoice'])['invoice']) or doc">
                         <t t-call-assets="account_followup.assets_followup_report" t-autoprefix="true"/>
                         <div class="page">
-                            <span t-out="doc.get_followup_html(options)">Follow-up details</span>
+                            <span t-out="doc.get_followup_html(options)">Reminder details</span>
                         </div>
                     </t>
                     <div class="oe_structure"></div>
@@ -144,14 +143,12 @@
         </template>
 
         <record id="action_report_followup" model="ir.actions.report">
-            <field name="name">Print Follow-up Letter</field>
+            <field name="name">Print Reminder Letter</field>
             <field name="model">res.partner</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">account_followup.report_followup_print_all</field>
-            <field name="report_file">account_followup.report_followup_print_all</field>
-            <field name="print_report_name">'Follow-up ' + object.display_name</field>
+            <field name="print_report_name">'Reminder ' + object.display_name</field>
         </record>
 
-        <function model="ir.default" name="set" eval="('res.partner', 'followup_next_action_date', False)"/>
     </data>
 </odoo>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <template id="jpk_export_monthly_template">
-        <JPK xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/" t-attf-xmlns="#{xmlns}">
+        <JPK xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/" t-attf-xmlns="#{xmlns}">
             <Naglowek>
-                <KodFormularza kodSystemowy="JPK_V7M (2)" wersjaSchemy="1-0E">JPK_VAT</KodFormularza>
-                <WariantFormularza t-out="2"/>
+                <KodFormularza kodSystemowy="JPK_V7M (3)" wersjaSchemy="1-0E">JPK_VAT</KodFormularza>
+                <WariantFormularza t-out="3"/>
                 <DataWytworzeniaJPK t-out="date_now"/>
                 <NazwaSystemu>Odoo</NazwaSystemu>
                 <CelZlozenia poz="P_7" t-out="2 if options.get('l10n_pl_is_amendment') else 1"/>
@@ -13,7 +13,7 @@
                 <Miesiac t-out="date_month"/>
             </Naglowek>
             <Podmiot1 rola="Podatnik">
-                <OsobaFizyczna t-if="not company.partner_id.is_company">
+                <OsobaFizyczna t-if="not options.get('partner_is_company')">
                     <!-- OsobaFizyczna (Natural person) and OsobaNiefizyczna (Non-natural person)
                         share some tag names, but these are defined in different namespaces.
                         Hence the specific etd namespace.
@@ -28,7 +28,7 @@
                     <Email t-else="" t-out=""/>
                     <Telefon t-if="company.phone" t-out="company.phone"/>
                 </OsobaFizyczna>
-                <OsobaNiefizyczna t-if="company.partner_id.is_company">
+                <OsobaNiefizyczna t-if="options.get('partner_is_company')">
                     <NIP t-if="company.vat[:2].isdecimal()" t-out="company.vat.replace(' ', '')"/>
                     <NIP t-else="" t-out="company.vat[2:].replace(' ', '')"/>
                     <PelnaNazwa t-out="company.display_name"/>
@@ -39,9 +39,9 @@
             </Podmiot1>
             <Deklaracja t-if="agg_values">
                 <Naglowek>
-                    <KodFormularzaDekl kodSystemowy="VAT-7 (22)" kodPodatku="VAT" rodzajZobowiazania="Z"
+                    <KodFormularzaDekl kodSystemowy="VAT-7 (23)" kodPodatku="VAT" rodzajZobowiazania="Z"
                                        wersjaSchemy="1-0E">VAT-7</KodFormularzaDekl>
-                    <WariantFormularzaDekl>22</WariantFormularzaDekl>
+                    <WariantFormularzaDekl>23</WariantFormularzaDekl>
                 </Naglowek>
                 <PozycjeSzczegolowe>
                     <P_10 t-if="agg_values.get('10')" t-out="float_repr(agg_values.get('10'), 0)"/>
@@ -127,6 +127,10 @@
                     <DowodSprzedazy t-out="i.get('move_name')"/>
                     <DataWystawienia t-out="i.get('invoice_date')"/>
                     <DataSprzedazy t-if="i.get('sale_date') and i.get('move_type') in ('out_invoice','out_refund')" t-out="i.get('sale_date')"/>
+                    <NrKSeF t-if="i.get('ksef_reference') not in ('OFF', 'BFK', 'DI')" t-out="i.get('ksef_reference')"/>
+                    <OFF t-elif="i.get('ksef_reference') == 'OFF'" t-out="1"/>
+                    <BFK t-elif="i.get('ksef_reference') == 'BFK'" t-out="1"/>
+                    <DI t-elif="i.get('ksef_reference') == 'DI'" t-out="1"/>
                     <TypDokumentu t-if="i.get('pos_session_id')" t-out="'RO'"/>
                     <TypDokumentu t-elif="i.get('move_type') == 'entry'" t-out="'WEW'"/>
                     <TypDokumentu t-elif="i.get('pos_order_id')" t-out="'FP'"/> <!-- to change everywhere to not include tax -->
@@ -200,14 +204,18 @@
                 </SprzedazCtrl>
                 <ZakupWiersz t-foreach="input_tax_moves" t-as="b">
                     <LpZakupu t-out="b_index+1"/>
-                    <KodKrajuNadaniaTIN t-if="b.get('vat')" t-out="b.get('vat')[:2].isdecimal() and b.get('vat')[:2] or b.get('country_code')"/>
+                    <KodKrajuNadaniaTIN t-if="b.get('vat')" t-out="not b.get('vat')[:2].isdecimal() and b.get('vat')[:2] or b.get('country_code')"/>
                     <NrDostawcy t-if="b.get('vat')" t-out="not b.get('vat')[:2].isdecimal() and b.get('vat')[2:].replace(' ', '') or b.get('vat').replace(' ', '')"/>
                     <NrDostawcy t-else="" t-out="'BRAK'"/>
                     <NazwaDostawcy t-if="b.get('partner_complete_name')" t-out="b.get('partner_complete_name')"/>
                     <NazwaDostawcy t-else="" t-out="'BRAK'"/>
-                    <DowodZakupu t-out="b.get('move_name')"/>
+                    <DowodZakupu t-out="b.get('reference') or b.get('move_name')"/>
                     <DataZakupu t-out="b.get('move_date')"/>
                     <DataWplywu t-if="b.get('create_date') != b.get('move_date')" t-out="b.get('create_date')"/>
+                    <NrKSeF t-if="b.get('ksef_reference') not in ('OFF', 'BFK', 'DI')" t-out="b.get('ksef_reference')"/>
+                    <OFF t-elif="b.get('ksef_reference') == 'OFF'" t-out="1"/>
+                    <BFK t-elif="b.get('ksef_reference') == 'BFK'" t-out="1"/>
+                    <DI t-elif="b.get('ksef_reference') == 'DI'" t-out="1"/>
                     <DokumentZakupu t-if="b.get('move_type') == 'entry'" t-out="'WEW'"/> <!--
                     Did not do 'MK' as we need to know when the supplier is using cash basis accounting
                     Did not do VAT_RR, as we need to provide a way to generate this type of invoice, (for example, it should be written on it that it is a VAT RR invoice => buying agricultural products) -->
@@ -237,15 +245,116 @@
         <!-- This template is used when returning quarterly the jpk -->
 
                 <xpath expr="//*[local-name()='JPK']/*[local-name()='Naglowek']/*[local-name()='KodFormularza']" position="replace">
-                    <KodFormularza kodSystemowy="JPK_V7K (2)" wersjaSchemy="1-0E">JPK_VAT</KodFormularza>
+                    <KodFormularza kodSystemowy="JPK_V7K (3)" wersjaSchemy="1-0E">JPK_VAT</KodFormularza>
                 </xpath>
                 <xpath expr="//*[local-name()='JPK']/*[local-name()='Deklaracja']/*[local-name()='Naglowek']" position="replace">
                     <Naglowek>
-                    <KodFormularzaDekl kodSystemowy="VAT-7K (16)" kodPodatku="VAT" rodzajZobowiazania="Z"
+                    <KodFormularzaDekl kodSystemowy="VAT-7K (17)" kodPodatku="VAT" rodzajZobowiazania="Z"
                                        wersjaSchemy="1-0E">VAT-7K</KodFormularzaDekl>
-                    <WariantFormularzaDekl>16</WariantFormularzaDekl>
+                    <WariantFormularzaDekl>17</WariantFormularzaDekl>
                     <Kwartal t-out="int(date_month)//3"/>
                 </Naglowek>
                 </xpath>
     </template>
+
+    <template id="jpk_kr_pd_template">
+        <JPK xmlns="http://jpk.mf.gov.pl/wzor/2024/09/04/09041/" xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/">
+            <Naglowek>
+                <KodFormularza kodSystemowy="JPK_KR_PD (1)" wersjaSchemy="1-1">JPK_KR_PD</KodFormularza>
+                <WariantFormularza>1</WariantFormularza>
+                <CelZlozenia>1</CelZlozenia>
+                <DataWytworzeniaJPK t-out="date_now"/>
+                <DataOd t-out="date_from"/>
+                <DataDo t-out="date_to"/>
+                <RokDataOd t-out="date_start"/>
+                <RokDataDo t-out="date_end"/>
+                <DomyslnyKodWaluty t-out="company.get('currency_name')"/>
+                <KodUrzedu t-out="company.get('tax_office')"/>
+            </Naglowek>
+            <Podmiot1>
+                <IdentyfikatorPodmiotu>
+                    <etd:NIP t-out="company.get('nip')"/>
+                    <etd:PelnaNazwa t-out="company.get('display_name')"/>
+                </IdentyfikatorPodmiotu>
+                <Adres>
+                    <AdresPol>
+                        <etd:KodKraju t-out="company.get('country_code')" />
+                        <etd:Wojewodztwo t-out="company.get('state_name')"/>
+                        <etd:Powiat t-out="company.get('city')"/>
+                        <etd:Gmina t-out="company.get('city')"/>
+                        <etd:NrDomu t-out="company.get('building_nr')"/>
+                        <etd:Miejscowosc t-out="company.get('city')"/>
+                        <etd:KodPocztowy t-out="company.get('zip')"/>
+                    </AdresPol>
+                </Adres>
+            </Podmiot1>
+            <Kontrahent t-foreach="partners" t-as="p">
+                <T_1 t-out="p.get('name')"/>
+                <T_2 t-out="p.get('country_code')"/>
+                <T_3 t-out="p.get('vat')"/>
+            </Kontrahent>
+            <ZOiS>
+                <ZOiS7 t-foreach="account_lines" t-as="line">
+                    <S_1 t-out="line.get('account_code')"/>
+                    <S_2 t-out="line.get('account_name')"/>
+                    <S_3 t-out="line.get('parent_account_code')"/>
+                    <S_4 t-out="line.get('initial_debit')"/>
+                    <S_5 t-out="line.get('initial_credit')"/>
+                    <S_6 t-out="line.get('turnover_debit')"/>
+                    <S_7 t-out="line.get('turnover_credit')"/>
+                    <S_8 t-out="line.get('cum_turnover_debit')"/>
+                    <S_9 t-out="line.get('cum_turnover_credit')"/>
+                    <S_10 t-out="line.get('closing_debit')"/>
+                    <S_11 t-out="line.get('closing_credit')"/>
+                    <S_12_1 t-out="line.get('bs_tag')"/>
+                </ZOiS7>
+            </ZOiS>
+            <Dziennik t-foreach="moves" t-as="m">
+                <D_1 t-out="m.get('name')"/>
+                <D_2 t-out="m.get('journal_name')"/>
+                <D_3 t-out="m.get('partner_name')"/>
+                <D_4 t-out="m.get('ref')"/>
+                <D_5 t-out="m.get('journal_code')"/>
+                <D_6 t-out="m.get('invoice_date')"/>
+                <D_7 t-out="m.get('date')"/>
+                <D_8 t-out="m.get('create_date')"/>
+                <D_9>System</D_9>
+                <D_10 t-out="m.get('description_of_operation')"/>
+                <D_11 t-out="m.get('amount_total')"/>
+                <KontoZapis t-foreach="m.get('lines')" t-as="aml">
+                    <Z_1 t-out="aml_index+1"/>
+                    <Z_2 t-out="aml.get('name')"/>
+                    <Z_3 t-out="aml.get('account_code')"/>
+                    <t t-if="aml.get('is_debit')">
+                        <Z_4 t-out="aml.get('debit')"/>
+                        <Z_5 t-out="aml.get('debit_currency')"/>
+                        <Z_6 t-out="aml.get('currency')"/>
+                    </t>
+                    <t t-else="">
+                        <Z_7 t-out="aml.get('credit')"/>
+                        <Z_8 t-out="aml.get('credit_currency')"/>
+                        <Z_9 t-out="aml.get('currency')"/>
+                    </t>
+                </KontoZapis>
+            </Dziennik>
+            <Ctrl>
+                <C_1 t-out="totals.get('moves_count')"/>
+                <C_2 t-out="totals.get('total_balance')"/>
+                <C_3 t-out="totals.get('move_lines_count')"/>
+                <C_4 t-out="totals.get('total_debit')"/>
+                <C_5 t-out="totals.get('total_credit')"/>
+            </Ctrl>
+            <RPD>
+                <K_1 t-out="tax_totals.get('K_1')"/>
+                <K_2 t-out="tax_totals.get('K_2')"/>
+                <K_3 t-out="tax_totals.get('K_3')"/>
+                <K_4 t-out="tax_totals.get('K_4')"/>
+                <K_5 t-out="tax_totals.get('K_5')"/>
+                <K_6 t-out="tax_totals.get('K_6')"/>
+                <K_7 t-out="tax_totals.get('K_7')"/>
+                <K_8 t-out="tax_totals.get('K_8')"/>
+            </RPD>
+        </JPK>
+    </template>
+
 </odoo>

@@ -10,9 +10,22 @@ patch(SearchBar.prototype, {
      */
     render(res) {
         if (res && this.searchType === 'appointments' && res.parts.website_url) {
-            res.results.forEach(result => {
-                result.website_url = `${result.website_url}${location.search}`;
-            })
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(res.results, "text/html");
+            const search = location.search;
+
+            doc.querySelectorAll("a.o_search_result_link").forEach((a) => {
+                const href = a.getAttribute("href");
+                if (!href) {
+                    return;
+                }
+                const newUrl = href.includes("?")
+                    ? `${href}&${search.slice(1)}`
+                    : `${href}${search}`;
+                a.setAttribute("href", newUrl);
+            });
+
+            res.results = doc.body.innerHTML;
         }
         super.render(...arguments);
     },

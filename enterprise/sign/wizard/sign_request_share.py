@@ -1,6 +1,4 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from dateutil.relativedelta import relativedelta
-
 from odoo import _, api, Command, fields, models
 from odoo.exceptions import ValidationError
 
@@ -32,7 +30,8 @@ class SignRequestShare(models.TransientModel):
                             'request_item_ids': [Command.create({'role_id': template_id.sign_item_ids.responsible_id.id or self.env.ref('sign.sign_item_role_default').id})],
                             'reference': "%s" % (template_id.name),
                             'state': 'shared',
-                            'validity': fields.Date.today() + relativedelta(days=template_id.signature_request_validity) if template_id.signature_request_validity else None
+                            'send_channel': 'shared',
+                            'validity': False
                         }).id
 
                     vals['is_shared'] = True
@@ -65,8 +64,9 @@ class SignRequestShare(models.TransientModel):
 
     @api.constrains('validity')
     def _check_validity_not_passed(self):
+        today = fields.Date.context_today(self)
         for record in self:
-            if record.validity and record.validity < fields.Date.today():
+            if record.validity and record.validity < today:
                 raise ValidationError(_(
                     "The sign request validity cannot be set in the past."
                 ))

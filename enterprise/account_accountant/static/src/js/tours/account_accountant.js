@@ -30,7 +30,6 @@
 
 
     registry.category("web_tour.tours").add('account_accountant_tour', {
-            url: "/odoo",
             steps: () => [
             ...accountTourSteps.goToAccountMenu().map(step => ({
                 ...step,

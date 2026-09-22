@@ -15,23 +15,25 @@ class TestSubscriptionPaymentsAccount(AccountPaymentCommon, TestSubscriptionComm
 
     # Inheriting on AccountPaymentCommon is necessary because it patches _get_payment_method_information
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_invoice_consolidation(self):
         with patch('odoo.addons.sale_subscription.models.sale_order.SaleOrder._do_payment', wraps=self._mock_subscription_do_payment):
-            self.env['ir.config_parameter'].set_param('sale_subscription.invoice_consolidation', True)
+            self.env['ir.config_parameter'].set_bool('sale_subscription.invoice_consolidation', True)
             bank_journal = self.company_data['default_journal_bank']
             new_provider = self.dummy_provider.copy({
                 'name': 'New provider',
                 'journal_id': bank_journal.id,
                 'code': 'none',
-                'state': 'test',
             })
+            new_payment_method = new_provider.payment_method_ids[:1]
             self.dummy_provider.unlink()
             new_provider.journal_id = bank_journal.id
             test_payment_token = self.env['payment.token'].create({
                 'payment_details': 'Test',
                 'partner_id': self.subscription.partner_id.id,
                 'provider_id': new_provider.id,
-                'payment_method_id': self.payment_method_id,
+                'payment_method_id': new_payment_method.id,
                 'provider_ref': 'test'
             })
 
@@ -45,16 +47,17 @@ class TestSubscriptionPaymentsAccount(AccountPaymentCommon, TestSubscriptionComm
             sub2 = self.subscription.copy({'payment_token_id': test_payment_token.id, 'user_id': other_user.id})  # tokens have copy=False property
             with freeze_time("2023-02-01"):
                 # add a subscription intended to be removed from the recordset to make sure we don't invoice it.
-                sub3 = self.subscription.copy({'payment_token_id': test_payment_token.id, 'end_date': datetime.today().date()})
+                sub3 = self.subscription.copy({'payment_token_id': test_payment_token.id})
                 (sub2 | self.subscription | sub3).action_confirm()
+                sub3.end_date = datetime.today().date()
                 # enable tracking to test _message_auto_subscribe_followers with multiple user_id
-                self.env['sale.order'].with_context(test_provider=new_provider, tracking_disable=False)._create_recurring_invoice()
+                self.env['sale.order'].with_context(test_provider=new_provider)._create_recurring_invoice()
                 self.assertEqual(self.subscription.invoice_ids, sub2.invoice_ids)
                 invoice = sub2.invoice_ids
                 invoice.journal_id.type = 'bank'
                 self.assertEqual(self.subscription.invoice_ids.invoice_line_ids.mapped('quantity'),
                                 self.subscription.order_line.mapped('product_uom_qty') + sub2.order_line.mapped('product_uom_qty'))
                 tx = self.env['payment.transaction'].search([('invoice_ids', 'in', invoice.ids)])
-                tx._set_done()
-                tx._create_payment()
+                self._update_transaction(tx, state='done')
+                tx.with_context(payment_safe_write=True)._create_payment()
                 self.assertTrue(invoice.payment_state in ['in_payment', 'paid'])

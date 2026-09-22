@@ -5,24 +5,36 @@
 # Translators:
 # Uros Kalajdzic <ukalajdzic@gmail.com>, 2022
 # Martin Trigaux, 2022
-# Dragan Vukosavljevic <dragan.vukosavljevic@gmail.com>, 2022
+# Dragan Vukosavljevic <dragan.vukosavljevic@gmail.com>, 2022, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.5alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-16 18:00+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 03:06+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Serbian (Latin script) <https://translate.odoo.com/projects/"
-"odoo-19/website_helpdesk_forum/sr_Latn/>\n"
+"odoo-master/website_helpdesk_forum/sr_Latn/>\n"
 "Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: website_helpdesk_forum
+#: model:ir.module.module,description:base.module_website_helpdesk_forum
+msgid ""
+"\n"
+"Website Forum integration for the helpdesk module\n"
+"=================================================\n"
+"\n"
+"    Allow your teams to have related forums to answer customer questions.\n"
+"    Transform tickets into questions on the forum with a single click.\n"
+"\n"
+msgstr ""
 
 #. module: website_helpdesk_forum
 #: model_terms:ir.ui.view,arch_db:website_helpdesk_forum.search_result
@@ -31,20 +43,24 @@ msgstr ", autora"
 
 #. module: website_helpdesk_forum
 #: model_terms:ir.ui.view,arch_db:website_helpdesk_forum.search_result
-msgid "<i class=\"fa fa-fw fa-2x fa-comments\" title=\"Forum Post\"/>"
-msgstr "<i class=\"fa fa-fw fa-2x fa-comments\" title=\"Forum Post\"/>"
+msgid ""
+"<i class=\"oi oi-fw oi-2x oi-filled\" data-icon=\"forum\" title=\"Forum "
+"Post\"/>"
+msgstr ""
+"<i class=\"oi oi-fw oi-2x oi-filled\" data-icon=\"forum\" title=\"Forum "
+"Post\"/>"
 
 #. module: website_helpdesk_forum
 #: model_terms:ir.ui.view,arch_db:website_helpdesk_forum.question_dropdown
 msgid ""
-"<i class=\"fa fa-life-ring fa-fw\"/>\n"
+"<i class=\"oi oi-fw\" data-icon=\"support\"/>\n"
 "                    Create Ticket"
 msgstr ""
 
 #. module: website_helpdesk_forum
 #: model_terms:ir.ui.view,arch_db:website_helpdesk_forum.question_dropdown
 msgid ""
-"<i class=\"fa fa-life-ring fa-fw\"/>\n"
+"<i class=\"oi oi-fw\" data-icon=\"support\"/>\n"
 "                    View Ticket"
 msgstr ""
 
@@ -137,7 +153,6 @@ msgstr "Opis"
 #. module: website_helpdesk_forum
 #. odoo-javascript
 #: code:addons/website_helpdesk_forum/static/src/components/create_ticket_dialog/create_ticket_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:website_helpdesk_forum.helpdesk_ticket_select_forum_wizard_view_form
 msgid "Discard"
 msgstr "Poništi"
 
@@ -169,9 +184,8 @@ msgstr ""
 #. module: website_helpdesk_forum
 #. odoo-python
 #: code:addons/website_helpdesk_forum/wizards/helpdesk_ticket_select_forum.py:0
-#, fuzzy
 msgid "Forum Post Created"
-msgstr "Forum Postovi"
+msgstr "Forum Post je kreiran"
 
 #. module: website_helpdesk_forum
 #. odoo-python
@@ -184,6 +198,11 @@ msgstr "Forum Postovi"
 #: model:ir.model.fields,field_description:website_helpdesk_forum.field_helpdesk_team__website_forum_ids
 msgid "Forums"
 msgstr "Forumi"
+
+#. module: website_helpdesk_forum
+#: model:ir.module.module,summary:base.module_website_helpdesk_forum
+msgid "Help Center for helpdesk based on Odoo Forum"
+msgstr ""
 
 #. module: website_helpdesk_forum
 #. odoo-python
@@ -220,6 +239,11 @@ msgstr "Zahtev za pomoć"
 #: code:addons/website_helpdesk_forum/static/src/components/create_ticket_dialog/create_ticket_dialog.js:0
 msgid ""
 "Helpdesk ticket %(ticket)s has been successfully created for this forum post."
+msgstr ""
+
+#. module: website_helpdesk_forum
+#: model:ir.module.module,shortdesc:base.module_website_helpdesk_forum
+msgid "Helpdesk: Help Center"
 msgstr ""
 
 #. module: website_helpdesk_forum
@@ -323,16 +347,5 @@ msgstr ""
 
 #. module: website_helpdesk_forum
 #: model_terms:ir.ui.view,arch_db:website_helpdesk_forum.search_result
-#, fuzzy
 msgid "• 0 Answer"
-msgstr "Odgovori"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-3x rounded bg-secondary m-3 fa-comments fa-3x rounded bg-"
-#~ "secondary m-3\">​</i>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-3x rounded bg-secondary m-3 fa-comments fa-3x rounded bg-"
-#~ "secondary m-3\">​</i>"
-
-#~ msgid "Ticket"
-#~ msgstr "Ulaznica"
+msgstr "• 0 Odgovor"

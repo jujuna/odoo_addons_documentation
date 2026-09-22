@@ -9,16 +9,16 @@
                 <button name="action_create_new_post"
                         type="object"
                         class="oe_highlight order-2"
-                        string="Add Post"
+                        string="New Post"
                         groups="social.group_social_user"/>
             </xpath>
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                 <button name="action_redirect_to_social_media_posts"
-                    type="object" class="oe_stat_button order-10" icon="fa-newspaper-o"
+                    type="object" class="oe_stat_button" icon="newspaper"
                     invisible="social_posts_count == 0" groups="social.group_social_user">
                     <field name="social_posts_count" widget="statinfo" string="Posts"/>
                 </button>
-                <button icon="fa-thumbs-up" disabled="disabled"
+                <button icon="thumb_up" icon_class="oi-filled" disabled="disabled"
                     invisible="social_engagement == 0" groups="social.group_social_user">
                     <field name="social_engagement" widget="statinfo" string="Engagement"/>
                 </button>
@@ -52,8 +52,8 @@
         <field name="inherit_id" ref="utm.utm_campaign_view_kanban"/>
         <field name="arch" type="xml">
             <xpath expr="//ul[@id='o_utm_actions']">
-                <a name="action_redirect_to_social_media_posts" type="object"
-                    t-attf-class="pe-2 #{record.social_posts_count.raw_value === 0 ? 'text-muted' : ''}" groups="social.group_social_user">
+                <a name="action_redirect_to_social_media_posts" type="object" class="pe-2"
+                    t-if="record.social_posts_count.raw_value !== 0" groups="social.group_social_user">
                     <field name="social_posts_count"/> Posts
                 </a>
             </xpath>

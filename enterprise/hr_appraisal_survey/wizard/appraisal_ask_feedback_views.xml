@@ -21,12 +21,16 @@
                             </group>
                         </group>
                         <group>
-                            <field name="employee_ids"
-                                    options="{'no_create': 1, 'no_quick_create': 1}"
-                                    widget="many2many_avatar_employee"
-                                    placeholder="Add employees..."
-                                    context="{'show_email': True}"
-                                    domain="[('company_id', 'in', allowed_company_ids)]"/>
+                            <field name="partner_ids"
+                                options="{'no_create': 1, 'no_quick_create': 1}"
+                                widget="many2many_tags_email"
+                                placeholder="Add feedback recipients..."
+                                context="{
+                                    'search_view_ref': 'hr.res_partner_view_search',
+                                    'search_default_employees': 1,
+                                    'list_view_ref': 'hr_appraisal_survey.appraisal_view_partner_tree',
+                                }"
+                            />
                             <field name="subject" placeholder="Subject..."/>
                         </group>
                         <div>
@@ -36,7 +40,7 @@
 
                     <footer>
                         <button string="Send" name="action_send" type="object" class="btn-primary" data-hotkey="q"/>
-                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                        <button class="btn-secondary" special="cancel" data-hotkey="x"/>
                     </footer>
                 </form>
             </field>
@@ -49,6 +53,20 @@
             <field name="view_id" ref="appraisal_ask_feedback_view_form"/>
             <field name="target">new</field>
             
+        </record>
+
+        <record id="appraisal_view_partner_tree" model="ir.ui.view">
+            <field name="name">appraisal.ask.feedback.res.partner.list</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="avatar_128" widget="image" options="{'size': [24, 24], 'img_class': 'o_avatar rounded'}" width="30" nolabel="1"/>
+                    <field name="complete_name" string="Name"/>
+                    <field name="email"/>
+                    <field name="phone" class="o_force_ltr" optional="hide"/>
+                    <field name="country_id" optional="hide"/>
+                </list>
+            </field>
         </record>
     </data>
 </odoo>

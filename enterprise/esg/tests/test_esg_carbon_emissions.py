@@ -12,6 +12,8 @@ from odoo.addons.esg.tests.esg_common import TestEsgCommon
 
 class TestEsgCarbonEmission(TestEsgCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_physical_method_other_emission_value(self):
         other_emission = self.env['esg.other.emission'].create({
             'name': 'Package Delivery',
@@ -20,12 +22,12 @@ class TestEsgCarbonEmission(TestEsgCommon):
             'uom_id': self.env.ref('uom.product_uom_mile').id,
             'quantity': 100,
         })
-        self.assertEqual(other_emission.esg_emissions_value, 6.214)  # 100 (emission quantity) * 0.1 (factor value) * 0.6214 (km->mile conversion) = 6.214 kgCO2e
-        self.assertEqual(other_emission.esg_uncertainty_absolute_value, 2.1749)  # 6.214 (emission value) * 0.35 (factor uncertainty) = 2.1749 kgCO2e
+        self.assertAlmostEqual(other_emission.esg_emissions_value, 16.0934)  # 100 (emission quantity) * 0.1 (factor value) * 1.60934 (mile->km conversion) = 16.0934 kgCO2e
+        self.assertAlmostEqual(other_emission.esg_uncertainty_absolute_value, 5.6327)  # 16.0934 (emission value) * 0.35 (factor uncertainty) = 5.6327 kgCO2e
         # Change quantity
         other_emission.quantity = 200
-        self.assertEqual(other_emission.esg_emissions_value, 12.428)  # 200 (emission quantity) * 0.1 (factor value) * 0.6214 (km->mile conversion) = 12.428 kgCO2e
-        self.assertEqual(other_emission.esg_uncertainty_absolute_value, 4.3498)  # 12.428 (emission value) * 0.35 (factor uncertainty) = 2.1749 kgCO2e
+        self.assertAlmostEqual(other_emission.esg_emissions_value, 32.1869)  # 200 (emission quantity) * 0.1 (factor value) * 1.60934 (mile->km conversion) = 32.1869 kgCO2e
+        self.assertAlmostEqual(other_emission.esg_uncertainty_absolute_value, 11.2654)  # 32.1869 (emission value) * 0.35 (factor uncertainty) = 11.2654 kgCO2e
 
     def test_monetary_method_other_emission_value(self):
         other_emission = self.env['esg.other.emission'].create({
@@ -40,7 +42,21 @@ class TestEsgCarbonEmission(TestEsgCommon):
         # Change quantity
         other_emission.quantity = 300
         self.assertEqual(other_emission.esg_emissions_value, 3)  # 300 (emission quantity) * 0.01 (factor value) * 1.0 (EUR->EUR conversion) = 3 kgCO2e
-        self.assertEqual(other_emission.esg_uncertainty_absolute_value, 0.75)  # 3 (emission value) * 0.35 (factor uncertainty) = 0.75 kgCO2e
+        self.assertEqual(other_emission.esg_uncertainty_absolute_value, 0.75)  # 3 (emission value) * 0.25 (factor uncertainty) = 0.75 kgCO2e
+
+        other_emission_foreign_currency = self.env['esg.other.emission'].create({
+            'name': 'Office Electricity',
+            'date': '2024-12-01',
+            'esg_emission_factor_id': self.emission_factor_electricity_consumption.id,
+            'currency_id': self.env.ref('base.USD').id,
+            'quantity': 150,
+        })
+        self.assertEqual(other_emission_foreign_currency.esg_emissions_value, 3)  # 150 (emission quantity) * 0.01 (factor value) * 2.0 (USD->EUR conversion) = 3 kgCO2e
+        self.assertEqual(other_emission_foreign_currency.esg_uncertainty_absolute_value, 0.75)  # 3 (emission value) * 0.25 (factor uncertainty) = 0.75 kgCO2e
+        # Change quantity
+        other_emission_foreign_currency.quantity = 300
+        self.assertEqual(other_emission_foreign_currency.esg_emissions_value, 6)  # 300 (emission quantity) * 0.01 (factor value) * 2.0 (USD->EUR conversion) = 6 kgCO2e
+        self.assertEqual(other_emission_foreign_currency.esg_uncertainty_absolute_value, 1.5)  # 6 (emission value) * 0.25 (factor uncertainty) = 1.5 kgCO2e
 
     def test_physical_method_account_move_line_emission_value(self):
         bill_line = self.env['account.move.line'].create({
@@ -92,13 +108,12 @@ class TestEsgCarbonEmission(TestEsgCommon):
                     'esg_emission_factor_id': self.emission_factor_foreign_electricity_consumption.id,
                     'account_id': account.id,
                 })
-                conversion_rate = self.emission_factor_foreign_electricity_consumption.currency_id._convert(1, bill_line.currency_id, date=bill_line.date)
-                self.assertEqual(bill_line.esg_emissions_value * conversion_rate, 5.0 if esg_usable else 0)  # 100.0 (aml price) * 0.05 (factor value) * (USD->EUR conversion) = 5 * (USD->EUR conversion) kgCO2e
-                self.assertEqual(bill_line.esg_uncertainty_absolute_value, 2.25 if esg_usable else 0)  # 5.0 (emission value) * 0.45 (factor uncertainty) = 2.25 kgCO2e
+                self.assertEqual(bill_line.esg_emissions_value, 2.5 if esg_usable else 0)  # 100.0 (aml price) * 0.05 (factor value) * 0.5 (EUR->USD conversion) = 2.5 kgCO2e
+                self.assertEqual(bill_line.esg_uncertainty_absolute_value, 1.125 if esg_usable else 0)  # 2.5 (emission value) * 0.45 (factor uncertainty) = 1.125 kgCO2e
                 # Change price
                 bill_line.price_unit = 200.0
-                self.assertEqual(bill_line.esg_emissions_value * conversion_rate, 10.0 if esg_usable else 0)  # 200.0 (aml price) * 0.05 (factor value) * (USD->EUR conversion) = 10 * (USD->EUR conversion) kgCO2e
-                self.assertEqual(bill_line.esg_uncertainty_absolute_value, 4.5 if esg_usable else 0)  # 10.0 (emission value) * 0.45 (factor uncertainty) = 4.5 kgCO2e
+                self.assertEqual(bill_line.esg_emissions_value, 5.0 if esg_usable else 0)  # 200.0 (aml price) * 0.05 (factor value) * 0.5 (EUR->USD conversion) = 5 kgCO2e
+                self.assertEqual(bill_line.esg_uncertainty_absolute_value, 2.25 if esg_usable else 0)  # 5.0 (emission value) * 0.45 (factor uncertainty) = 2.25 kgCO2e
 
     def test_compute_method_other_emission(self):
         other_emission = self.env['esg.other.emission'].create({
@@ -277,6 +292,34 @@ class TestEsgCarbonEmission(TestEsgCommon):
                         self.emission_factor_computers_production if esg_usable else self.env['esg.emission.factor'],
                         'The assignation rule 1 matches the most important criteria (product > partner > account), so it should be used to assign this emission factor to the move line',
                     )
+
+    def test_auto_assign_factor_to_account_move_line_case_4(self):
+        # Assignation rule based on product category (1)
+        self.env['esg.assignation.line'].create({
+            'product_category_id': self.product.categ_id.id,
+            'esg_emission_factor_id': self.emission_factor_electricity_consumption.id,
+        })
+        for account, esg_usable in self.accounts_to_esg_usable.items():
+            if not esg_usable:
+                continue
+            # Test with all usable account types.
+            with self.subTest(account=account, esg_usable=esg_usable):
+                # Another assignation rule based on partner and account (2)
+                self.env['esg.assignation.line'].create({
+                    'partner_id': self.partner_a.id,
+                    'account_id': account.id,
+                    'esg_emission_factor_id': self.emission_factor_delivery_transportation.id,
+                })
+                bill_line = self.env['account.move.line'].create({
+                    'move_id': self.bill_1.id,
+                    'product_id': self.product.id,
+                    'account_id': account.id,
+                })
+                self.assertEqual(
+                    bill_line.esg_emission_factor_id,
+                    self.emission_factor_electricity_consumption,
+                    'The assignation rule 1 matches the most important criteria (product category > partner > account), so it should be used to assign this emission factor to the move line',
+                )
 
     def test_auto_assign_factor_to_account_move_line_change_product(self):
         # Assignation rule 1 and 2
@@ -534,6 +577,8 @@ class TestEsgCarbonEmission(TestEsgCommon):
         self.assertEqual(rule2.account_id, self.expense_account)
 
     def test_auto_generate_assignation_rules_when_partner_in_common(self):
+        self.assertEqual(self.product_a.categ_id, self.product_b.categ_id)
+        product_category = self.product_a.categ_id
         assignation_rules_domain = [
             ('esg_emission_factor_id', '=', self.emission_factor_delivery_transportation.id),
         ]
@@ -551,6 +596,26 @@ class TestEsgCarbonEmission(TestEsgCommon):
         self.assertEqual(rule.partner_id, self.partner_a)
         self.assertFalse(rule.product_id)
         self.assertFalse(rule.account_id)
+
+        product_c = self._create_product(categ_id=False)
+        self.assertFalse(product_c.categ_id)
+        self.env['account.move.line'].create({
+            'move_id': self.bill_1.id,
+            'product_id': product_c.id,
+            'account_id': self.asset_fixed_account.id,
+            'esg_emission_factor_id': self.emission_factor_delivery_transportation.id,
+        })
+
+        assignation_rules = self.env['esg.assignation.line'].search(assignation_rules_domain)
+        self.assertEqual(len(assignation_rules), 2, "2 rules should have been created")
+        rule1, rule2 = assignation_rules
+        self.assertEqual(assignation_rules.esg_emission_factor_id, self.emission_factor_delivery_transportation)
+        self.assertFalse(assignation_rules.product_id)
+        self.assertFalse(assignation_rules.account_id)
+        self.assertEqual(rule1.partner_id, self.partner_a)
+        self.assertEqual(rule1.product_category_id, product_category)
+        self.assertEqual(rule2.partner_id, self.partner_a)
+        self.assertFalse(rule2.product_category_id)
 
     def test_auto_generate_assignation_rules_when_product_in_common(self):
         partner_c = self.env['res.partner'].create({'name': 'Partner C'})
@@ -573,6 +638,8 @@ class TestEsgCarbonEmission(TestEsgCommon):
         self.assertFalse(rule.account_id)
 
     def test_auto_generate_assignation_rules_when_account_in_common(self):
+        self.assertEqual(self.product_a.categ_id, self.product_b.categ_id)
+        product_category = self.product_a.categ_id
         partner_c = self.env['res.partner'].create({'name': 'Partner C'})
         self.bill_1.copy({'line_ids': [Command.create({'product_id': self.product_b.id, 'account_id': self.expense_account.id, 'esg_emission_factor_id': self.emission_factor_delivery_transportation.id})], 'partner_id': self.partner_b.id})
         self.bill_1.copy({'line_ids': [Command.create({'product_id': self.product_a.id, 'account_id': self.expense_account.id, 'esg_emission_factor_id': self.emission_factor_delivery_transportation.id})], 'partner_id': partner_c.id})
@@ -582,7 +649,6 @@ class TestEsgCarbonEmission(TestEsgCommon):
         self.assertFalse(self.env['esg.assignation.line'].search(assignation_rules_domain), "No rule should exist for the emission factors selected for the test.")
         self.env['account.move.line'].create([
             {'move_id': self.bill_1.id, 'product_id': self.product_a.id, 'account_id': self.expense_account.id, 'esg_emission_factor_id': self.emission_factor_delivery_transportation.id},
-            {'move_id': self.bill_1.id, 'product_id': self.product_b.id, 'account_id': self.expense_account.id, 'esg_emission_factor_id': self.emission_factor_delivery_transportation.id},
         ])
         assignation_rules = self.env['esg.assignation.line'].search(assignation_rules_domain)
         self.assertEqual(len(assignation_rules), 1, "1 rule should have been created")
@@ -591,6 +657,53 @@ class TestEsgCarbonEmission(TestEsgCommon):
         self.assertFalse(rule.partner_id)
         self.assertFalse(rule.product_id)
         self.assertEqual(rule.account_id, self.expense_account)
+        self.assertEqual(rule.product_category_id, product_category)
+
+        partner_d = self.env['res.partner'].create({'name': 'Partner D'})
+        product_c = self._create_product(categ_id=False)
+        bill_2 = self.bill_1.copy({
+            'partner_id': partner_d.id,
+            'line_ids': [],
+        })
+        self.env['account.move.line'].create([{
+            'move_id': bill_2.id,
+            'product_id': product_c.id,
+            'account_id': self.expense_account.id,
+            'esg_emission_factor_id': self.emission_factor_delivery_transportation.id,
+        }])
+        assignation_rules = self.env['esg.assignation.line'].search(assignation_rules_domain)
+        self.assertEqual(len(assignation_rules), 2, "2 rules should have been created")
+        rule1, rule2 = assignation_rules
+        self.assertEqual(assignation_rules.esg_emission_factor_id, self.emission_factor_delivery_transportation)
+        self.assertFalse(assignation_rules.product_id)
+        self.assertFalse(assignation_rules.partner_id)
+        self.assertEqual(rule1.account_id, self.expense_account)
+        self.assertEqual(rule1.product_category_id, product_category)
+        self.assertEqual(rule2.account_id, self.expense_account)
+        self.assertFalse(rule2.product_category_id)
+
+    def test_auto_generate_assignation_rules_when_product_category_in_common(self):
+        self.assertEqual(self.product_a.categ_id, self.product_b.categ_id)
+        product_category = self.product_a.categ_id
+        partner_c = self.env['res.partner'].create({'name': 'Partner C'})
+        self.bill_1.copy({'line_ids': [Command.create({'product_id': self.product_b.id, 'account_id': self.expense_account.id, 'esg_emission_factor_id': self.emission_factor_delivery_transportation.id})], 'partner_id': self.partner_b.id})
+        self.bill_1.copy({'line_ids': [Command.create({'product_id': self.product_a.id, 'account_id': self.expense_direct_cost_account.id, 'esg_emission_factor_id': self.emission_factor_delivery_transportation.id})], 'partner_id': partner_c.id})
+        assignation_rules_domain = [
+            ('esg_emission_factor_id', 'in', (self.emission_factor_delivery_transportation + self.emission_factor_computers_production).ids)
+        ]
+        self.assertFalse(self.env['esg.assignation.line'].search(assignation_rules_domain), "No rule should exist for the emission factors selected for the test.")
+        self.env['account.move.line'].create([
+            {'move_id': self.bill_1.id, 'product_id': self.product_a.id, 'account_id': self.expense_other_account.id, 'esg_emission_factor_id': self.emission_factor_delivery_transportation.id},
+            {'move_id': self.bill_1.id, 'product_id': self.product_b.id, 'account_id': self.asset_fixed_account.id, 'esg_emission_factor_id': self.emission_factor_delivery_transportation.id},
+        ])
+        assignation_rules = self.env['esg.assignation.line'].search(assignation_rules_domain)
+        self.assertEqual(len(assignation_rules), 1, "1 rule should have been created")
+        rule = assignation_rules
+        self.assertEqual(rule.esg_emission_factor_id, self.emission_factor_delivery_transportation)
+        self.assertFalse(rule.partner_id)
+        self.assertFalse(rule.product_id)
+        self.assertFalse(rule.account_id)
+        self.assertEqual(rule.product_category_id, product_category)
 
     def test_no_auto_generate_assignation_rules_on_copy(self):
         assignation_rules_domain = [

@@ -39,12 +39,16 @@ class L10n_AuStpEmp(models.Model):
                     }
                 )
                 continue
-            # Reverse the finalisation flag if the STP is not draft
+            # By default, we only consider payslips that have not been finalised.
             finalisation = False
             if emp.stp_id.is_finalisation:
                 finalisation = emp.stp_id.state != "draft"
             elif emp.stp_id.is_unfinalisation:
                 finalisation = emp.stp_id.state == "draft"
+            elif emp.stp_id.state == "sent":
+                # For non finalisation events,
+                # we consider all payslips between the time period if the STP has been sent.
+                finalisation = None
 
             payslip_ids, ytd_balance_ids = emp.employee_id._get_fiscal_year_data(
                 emp.stp_id.start_date, emp.stp_id.end_date, finalised=finalisation)
@@ -60,7 +64,7 @@ class L10n_AuStpEmp(models.Model):
                 elif emp.stp_id.is_unfinalisation:
                     raise ValidationError(_("There is no data to unfinalise for employee %s for the selected Fiscal year.", emp.employee_id.name))
                 else:
-                    raise ValidationError(_("This employee has no payslips for the Current."))
+                    raise ValidationError(_("This employee has no payslips for the selected fiscal year."))
 
             last_payslip = emp.payslip_ids.sorted("date_from", reverse=True)[:1]
             fields_to_compute = [
@@ -81,5 +85,5 @@ class L10n_AuStpEmp(models.Model):
             super_liability = ytd_vals["slip_lines"]["SUPER"]["SUPER"] + ytd_vals["fields"]["l10n_au_extra_compulsory_super"]
             super_contribution = ytd_vals["slip_lines"]["SALARY.SACRIFICE"]["SUPER.CONTRIBUTION"] - ytd_vals["fields"]["l10n_au_extra_compulsory_super"]
             emp.ytd_super = super_contribution + super_liability
-            emp.ytd_rfba = sum(item[1]['amount'] for item in filter(lambda item: item[1]["code"] == 'FBT' and item[1]["payroll_code"] == "T", input_vals.items()))
-            emp.ytd_rfbae = sum(item[1]['amount'] for item in filter(lambda item: item[1]["code"] == 'FBT' and item[1]["payroll_code"] == "X", input_vals.items()))
+            emp.ytd_rfba = sum(item[1]['amount'] for item in filter(lambda item: item[1]["code"].startswith("FBT") and item[1]["payroll_code"] == "T", input_vals.items()))
+            emp.ytd_rfbae = sum(item[1]['amount'] for item in filter(lambda item: item[1]["code"].startswith("FBT") and item[1]["payroll_code"] == "X", input_vals.items()))

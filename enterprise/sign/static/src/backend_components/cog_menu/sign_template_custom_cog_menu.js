@@ -1,4 +1,4 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, onMounted, proxy, t, useProps } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { useService } from "@web/core/utils/hooks";
@@ -7,33 +7,52 @@ import { SignTemplateAccessRights } from "../sign_template/sign_template_access_
 export class SignTemplateCustomCogMenu extends Component {
     static template = "sign.SignTemplateCustomCogMenu";
     static components = { Dropdown, DropdownItem };
-    static props = {
-        signTemplate: { type: Object },
-        hasSignRequests: { type: Boolean },
-        manageTemplateAccess: { type: Boolean },
-        onTemplateSaveClick: { type: Function },
-        documentId: { type: Number },
-        onEditTemplate: { type: Function },
-    };
+
+    props = useProps({
+        signTemplate: t.object(),
+        hasSignRequests: t.boolean(),
+        manageTemplateAccess: t.boolean(),
+        onTemplateSaveClick: t.function(),
+        documentId: t.number(),
+        onEditTemplate: t.function(),
+    });
 
     setup() {
         this.action = useService("action");
         this.notification = useService("notification");
         this.orm = useService("orm");
         this.dialogService = useService("dialog");
-        this.state = useState({
+        this.state = proxy({
             properties: false,
+        });
+
+        onMounted(async () => {
+            await this.setTemplateDisplayName();
         });
     }
 
-    onTemplatePropertiesClick() {
-        this.action.doAction({
-            name: "Edit Template Form",
-            type: "ir.actions.act_window",
-            res_model: "sign.template",
-            res_id: this.props.signTemplate.id,
-            views: [[false, "form"]],
+    async onTemplatePropertiesClick() {
+        const action = await this.action.loadAction("sign.action_sign_template_cog_menu");
+        action.res_id = this.props.signTemplate.id;
+        this.action.doAction(action, {
+            onClose: async () => {
+                await this.setTemplateDisplayName();
+            },
         });
+    }
+
+    async setTemplateDisplayName() {
+        if (!this.props.signTemplate) {
+            return;
+        }
+
+        // Fetch updated name
+        const template = await this.orm.read(
+            "sign.template",
+            [this.props.signTemplate.id],
+            ["name"]
+        );
+        this.env.config.setDisplayName(template[0].name);
     }
 
     get showEditButton() {
@@ -54,6 +73,6 @@ export class SignTemplateCustomCogMenu extends Component {
             name: "action_template_preview",
             resIds: [this.props.signTemplate.id],
             args: JSON.stringify([this.props.documentId]),
-        })
+        });
     }
 }

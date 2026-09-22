@@ -19,7 +19,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="button_mrp_workcenter" type="object" class="oe_stat_button"
-                    icon="fa-cogs" invisible="not workcenter_id" groups="mrp.group_mrp_routings">
+                    icon="settings_applications" invisible="not workcenter_id" groups="mrp.group_mrp_routings">
                     <div class="o_stat_info">
                         <span class="o_stat_text">Work Center</span>
                     </div>
@@ -65,22 +65,21 @@
             <xpath expr="//field[@name='maintenance_type']" position="after">
                 <field name="production_company_id" invisible="1"/>
                 <field name="workorder_id" invisible="1"/>
-                <field name="production_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="production_id" invisible="not production_id" options="{'no_create': True, 'no_open': True}" groups="base.group_user_regular"/>
                 <field name="workorder_id" invisible="not production_id" options="{'no_create': True, 'no_open': True}" domain="[('production_id', '=', production_id)]" groups="mrp.group_mrp_routings"/>
-                <!-- <field name="repair_id"/> -->
             </xpath>
             <xpath expr="//chatter" position="after">
                 <div invisible="not context.get('discard_on_footer_button', False)">
                     <footer class="oe_edit_only">
                         <button special="save" data-hotkey="q" string="Save" class="oe_highlight"/>
-                        <button string="Discard" special="cancel" data-hotkey="x"/>
+                        <button special="cancel" data-hotkey="x"/>
                     </footer>
                 </div>
             </xpath>
             <field name="equipment_id" position="attributes">
                 <attribute name="domain">['|', (not workorder_id and 1 or 0, '=', 1), '|', ('workcenter_id', '=', False), ('workcenter_id.order_ids', 'in', workorder_id)]</attribute>
             </field>
-            <xpath expr="//field[@name='priority']" position="before">
+            <xpath expr="//group/field[@name='company_id']" position="before">
                 <label for="block_workcenter" invisible="maintenance_for == 'equipment'"/>
                 <div class="d-inline-flex" invisible="maintenance_for == 'equipment'">
                     <field name="block_workcenter" nolabel="1" class="ms-0" style="width: fit-content;"/>
@@ -90,26 +89,28 @@
         </field>
     </record>
 
-    <record id="maintenance_request_view_form_inherit_mrp_workorder" model="ir.ui.view">
-        <field name="name">maintenance.request.view.form.inherit.mrp.tablet</field>
-        <field name="model">maintenance.request</field>
-        <field name="inherit_id" ref="mrp_maintenance.maintenance_request_view_form_inherit_mrp"/>
-        <field name="mode">primary</field>
-        <field name="arch" type="xml">
-            <xpath expr="//form" position="attributes">
-                <attribute name="js_class">maintenance_request_form</attribute>
-            </xpath>
-        </field>
-    </record>
-
     <record id="maintenance_request_view_search_inherit_mrp" model="ir.ui.view">
-        <field name="name">maintenence.request.view.search.inherit.mrp</field>
+        <field name="name">maintenance.request.view.search.inherit.mrp</field>
         <field name="model">maintenance.request</field>
         <field name="inherit_id" ref="maintenance.hr_equipment_request_view_search"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='maintenance_team_id']" position="after">
                 <field name="production_id" string="Operation" filter_domain="['|', ('production_id', 'ilike', self), ('workorder_id', 'ilike', self)]"/>
                 <field name="workcenter_id" string="Workcenter" filter_domain="[('workcenter_id', 'ilike', self)]"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter name="groupby_workcenter_id" string="Workcenter" context="{'group_by': 'workcenter_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="maintenance_request_view_card_inherit_mrp" model="ir.ui.view">
+        <field name="name">maintenance.request.view.card.inherit.mrp</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_card"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='schedule_date']" position="before">
+                <field name="workcenter_id"/>
             </xpath>
         </field>
     </record>
@@ -119,9 +120,9 @@
         <field name="model">maintenance.request</field>
         <field name="inherit_id" ref="maintenance.hr_equipment_request_view_kanban"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='schedule_date']" position="before">
-                <field name="workcenter_id"/>
-            </xpath>
+            <kanban position="attributes">
+                <attribute name="card">%(maintenance_request_view_card_inherit_mrp)d</attribute>
+            </kanban>
         </field>
     </record>
 
@@ -133,6 +134,25 @@
             <field name="repeat_interval" position="after">
                 <field name="recurring_leaves_count" type="measure" invisible="1"/>
             </field>
+        </field>
+    </record>
+
+    <record id="maintenance_request_view_gantt_workcenter" model="ir.ui.view">
+        <field name="name">maintenance.request.view.gantt.workcenter</field>
+        <field name="model">maintenance.request</field>
+        <field name="arch" type="xml">
+            <gantt date_stop="schedule_end" date_start="schedule_date" string="Maintenance Requests"
+                create="1" plan="0"
+                display_unavailability="1"
+                color="workcenter_id"
+                default_scale="month"
+                total_row="1"
+                precision="{'day': 'hour:full', 'week': 'day:full', 'month': 'day:full', 'year': 'day:full'}"
+                form_view_id="maintenance_request_view_form_inherit_mrp">
+                <field name="schedule_date"/>
+                <field name="workcenter_id"/>
+                <popover card_id="%(maintenance_request_view_card_inherit_mrp)d"/>
+            </gantt>
         </field>
     </record>
 
@@ -158,6 +178,35 @@
         </field>
     </record>
 
+    <!-- Override do add domain and context key -->
+    <record id="maintenance_enterprise.maintenance_request_action_view_gantt_equipment" model="ir.actions.act_window">
+        <field name="domain">[('maintenance_for', '=', 'equipment')]</field>
+        <field name="context">{
+            'search_default_todo': True,
+            'search_default_groupby_equipment_id': True,
+            'default_maintenance_for': 'equipment',
+        }</field>
+    </record>
+
+    <record id="maintenance_request_action_view_gantt_workcenter" model="ir.actions.act_window">
+        <field name="name">Planning by Workcenter</field>
+        <field name="res_model">maintenance.request</field>
+        <field name="path">maintenance-requests-planning-by-workcenter</field>
+        <field name="domain">[('maintenance_for', '=', 'workcenter')]</field>
+        <field name="view_mode">gantt,form,kanban,list,pivot,graph,calendar,activity</field>
+        <field name="view_id" ref="mrp_maintenance.maintenance_request_view_gantt_workcenter"/>
+        <field name="context">{
+            'search_default_todo': True,
+            'search_default_groupby_workcenter_id': True,
+            'default_maintenance_for': 'workcenter',
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Start by adding a new workcenter to use workcenter planning
+            </p>
+        </field>
+    </record>
+
     <menuitem
         id="maintenance.menu_equipment_form"
         name="Equipment"
@@ -175,5 +224,12 @@
         parent="maintenance.menu_equipment_form"
         action="maintenance.hr_equipment_action"
         sequence="2"/>
+    <menuitem
+        id="maintenance_request_menu_planning_by_workcenter"
+        name="Planning by Workcenter"
+        parent="maintenance.menu_m_request"
+        action="maintenance_request_action_view_gantt_workcenter"
+        groups="mrp.group_mrp_routings"
+        sequence="3"/>
 
 </odoo>

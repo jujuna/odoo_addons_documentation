@@ -1,0 +1,20 @@
+<templates>
+    <t t-name="marketing_automation_loyalty.CampaignFlowView" t-inherit="marketing_automation.CampaignFlowView" t-inherit-mode="extension">
+        <xpath expr="//t[@t-elif=&quot;activity.data.activity_type === &apos;mail&apos;&quot;]" position="after">
+            <t t-if="activity.data.activity_type === 'coupon'">
+                <t t-set="position" t-value="this.getActivityPositionOnScreen(activity)"/>
+                <div class="o-editor-node d-flex flex-column align-self-center flex-shrink-0 bg-light rounded border p-3"
+                    t-att-style="this.getCSSTransform(position.x, position.y)"
+                    t-on-pointerdown="(e) => this.addPointerListenerOnMarketingActivity(activity, e)">
+                    <div class="d-flex align-items-center">
+                        <i class="oi oi-2x mb-auto p-2 bg-300 rounded" data-icon="percent" title="Coupon icon"/>
+                        <div class="d-flex flex-column ps-1 lh-sm">
+                            <span class="fs-2 fw-bold">Coupon</span>
+                            <span class="text-break w-100 small" t-out="activity.data.description"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </t>
+</templates>

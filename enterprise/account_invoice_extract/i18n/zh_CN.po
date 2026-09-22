@@ -8,23 +8,28 @@
 # Jeffery CHEN <jeffery9@gmail.com>, 2022
 # Emily Jia <eji@odoo.com>, 2023
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-08 19:31+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:16+0000\n"
+"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/account_invoice_extract/zh_Hans/>\n"
+"projects/odoo-master/account_invoice_extract/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_invoice_extract
+#: model:ir.module.module,shortdesc:base.module_account_invoice_extract
+msgid "Account Invoice Extract"
+msgstr ""
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__message_needaction
@@ -60,7 +65,7 @@ msgstr "可以显示OCR发送按钮"
 
 #. module: account_invoice_extract
 #: model:ir.model,name:account_invoice_extract.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr "公司"
 
 #. module: account_invoice_extract
@@ -76,8 +81,8 @@ msgstr "联系人"
 #. module: account_invoice_extract
 #. odoo-python
 #: code:addons/account_invoice_extract/models/account_invoice.py:0
-msgid "Couldn't reload AI data."
-msgstr "无法重新加载人工智能（AI）数据。"
+msgid "Couldn't reload data."
+msgstr "无法重新加载数据。"
 
 #. module: account_invoice_extract
 #. odoo-javascript
@@ -159,12 +164,6 @@ msgid "Extract Detected Layout Id"
 msgstr "提取检测到的布局ID"
 
 #. module: account_invoice_extract
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_bank_statement_line__extract_partner_name
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_partner_name
-msgid "Extract Detected Partner Name"
-msgstr "提取检测到的合作伙伴名称"
-
-#. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_bank_statement_line__extract_prefill_data
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_prefill_data
 msgid "Extract Prefill Data"
@@ -174,6 +173,11 @@ msgstr "提取预填数据"
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_state_processed
 msgid "Extract State Processed"
 msgstr "提取已处理的状态"
+
+#. module: account_invoice_extract
+#: model:ir.module.module,summary:base.module_account_invoice_extract
+msgid "Extract data from invoice scans to fill them automatically"
+msgstr ""
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_state
@@ -188,12 +192,12 @@ msgstr "提取状态"
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extracted_dates
 msgid "Extracted Dates"
-msgstr ""
+msgstr "提取日期"
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extracted_numbers
 msgid "Extracted Numbers"
-msgstr ""
+msgstr "提取数字"
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extracted_words
@@ -317,11 +321,6 @@ msgid "Ratings"
 msgstr "评分"
 
 #. module: account_invoice_extract
-#: model_terms:ir.ui.view,arch_db:account_invoice_extract.view_move_form_inherit_ocr
-msgid "Reload AI Data"
-msgstr "重新加载人工智能（AI）数据"
-
-#. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "短信发送错误"
@@ -340,7 +339,7 @@ msgstr "各税项一个发票行"
 #. module: account_invoice_extract
 #: model:ir.model.constraint,message:account_invoice_extract.constraint_res_partner_ocr_name_uniq
 msgid "The OCR can't create multiple partners with the same name."
-msgstr ""
+msgstr "OCR 无法创建多个同名合作伙伴。"
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_res_config_settings__extract_in_invoice_digitalization_mode
@@ -348,93 +347,19 @@ msgid "Vendor Bills"
 msgstr "供应商账单"
 
 #. module: account_invoice_extract
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__website_message_ids
-msgid "Website Messages"
-msgstr "网站消息"
-
-#. module: account_invoice_extract
-#: model:ir.model.fields,help:account_invoice_extract.field_account_move__website_message_ids
-msgid "Website communication history"
-msgstr "网站通信记录"
-
-#. module: account_invoice_extract
 #. odoo-python
 #: code:addons/account_invoice_extract/models/account_invoice.py:0
 msgid "You cannot send a expense that is not in draft state!"
 msgstr "您不能发送不在草稿状态的费用!"
 
-#~ msgid ""
-#~ "All fields will be automated by Artificial Intelligence, it might take 5 "
-#~ "seconds."
-#~ msgstr "所有字段都将通过人工智能实现自动化，可能需要 5 秒。"
+msgid "Website Messages"
+msgstr "网站消息"
 
-#~ msgid "Bill is being Digitized"
-#~ msgstr "账单正在被数字化"
+msgid "Website communication history"
+msgstr "网站通信记录"
 
-#~ msgid "Created by"
-#~ msgstr "创建人"
+msgid "Couldn't reload AI data."
+msgstr "无法重新加载人工智能（AI）数据。"
 
-#~ msgid "Created on"
-#~ msgstr "创建时间"
-
-#~ msgid "Extract Word"
-#~ msgstr "提取Word"
-
-#~ msgid "Extracted words from invoice scan"
-#~ msgstr "从结算单扫描中提取的单词"
-
-#~ msgid "Field"
-#~ msgstr "字段"
-
-#~ msgid "Invoice"
-#~ msgstr "结算单"
-
-#~ msgid "Invoice OCR: Parse Invoices"
-#~ msgstr "结算单 OCR：解析结算单"
-
-#~ msgid "Last Updated by"
-#~ msgstr "最后更新人"
-
-#~ msgid "Last Updated on"
-#~ msgstr "最后更新时间"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "需要操作的消息的数量"
-
-#~ msgid "Ocr Selected"
-#~ msgstr "已选择"
-
-#~ msgid "Send For Digitization"
-#~ msgstr "发送以进行数字化"
-
-#~ msgid ""
-#~ "The data extraction is not finished yet. The extraction usually takes "
-#~ "between 5 and 10 seconds."
-#~ msgstr "数据提取尚未完成。提取通常需要5到10秒。"
-
-#~ msgid "User Selected"
-#~ msgstr "用户选择"
-
-#~ msgid "Word Box Angle"
-#~ msgstr "字符框角度"
-
-#~ msgid "Word Box Height"
-#~ msgstr "字符框高度"
-
-#~ msgid "Word Box Midx"
-#~ msgstr "字符框Midx"
-
-#~ msgid "Word Box Midy"
-#~ msgstr "字符框Midy"
-
-#~ msgid "Word Box Width"
-#~ msgstr "字符框宽度"
-
-#~ msgid "Word Page"
-#~ msgstr "页面"
-
-#~ msgid "Word Text"
-#~ msgstr "字符文本"
-
-#~ msgid "You don't have enough credit to extract data from your invoice."
-#~ msgstr "您没有足够的信用从你的结算单中提取数据。"
+msgid "Reload AI Data"
+msgstr "重新加载人工智能（AI）数据"

@@ -9,6 +9,8 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install')
 class TestAgedReceivableReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -131,7 +133,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
     def test_aged_receivable_unfold_1_whole_report(self):
         """ Test unfolding a line when rendering the whole report. """
-        options = self._generate_options(self.report, fields.Date.from_string('2017-02-01'), fields.Date.from_string('2017-02-01'))
+        options = self._generate_options(self.report, '2017-02-01', '2017-02-01')
         partner_a_line_id = self.report._get_generic_line_id('res.partner', self.partner_a.id, parent_line_id=self.parent_line_id, markup={'groupby': 'partner_id'})
         options['unfolded_lines'] = [partner_a_line_id]
 
@@ -143,7 +145,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         report_lines = self.report._get_lines(options)
 
-        sorted_report_lines = self.report.sort_lines(report_lines, options)
+        sorted_report_lines = self.report._sort_lines(report_lines, options)
         self.assertLinesValues(
             # pylint: disable=C0326
             sorted_report_lines,
@@ -175,7 +177,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         self.assertLinesValues(
             # pylint: disable=C0326
-            self.report.sort_lines(sorted_report_lines, options),
+            self.report._sort_lines(sorted_report_lines, options),
             #   Name                    Not Due On      1 - 30     31 - 60     61 - 90    91 - 120       Older       Total
             [   0,                               3,          4,          5,          6,          7,          8,          9],
             [
@@ -204,7 +206,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         self.assertLinesValues(
             # pylint: disable=C0326
-            self.report.sort_lines(sorted_report_lines, options),
+            self.report._sort_lines(sorted_report_lines, options),
             #   Name                    Not Due On      1 - 30     31 - 60      61 - 90    91 - 120       Older       Total
             [   0,                               3,          4,          5,           6,          7,          8,          9],
             [
@@ -239,7 +241,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         self.assertLinesValues(
             # pylint: disable=C0326
-            self.report.sort_lines(report_lines, options),
+            self.report._sort_lines(report_lines, options),
             #   Name                   Not Due On      1 - 30     31 - 60     61 - 90    91 - 120       Older        Total
             [   0,                              3,          4,          5,          6,          7,          8,           9],
             [
@@ -278,7 +280,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
         report_lines = self.report._get_lines(options)
         self.assertLinesValues(
             # pylint: disable=C0326
-            self.report.sort_lines(report_lines, options),
+            self.report._sort_lines(report_lines, options),
             #   Name                   Not Due On      1 - 30     31 - 60     61 - 90    91 - 120       Older        Total
             [   0,                              3,          4,          5,          6,          7,          8,           9],
             [
@@ -311,7 +313,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
         })
         misc_move.action_post()
 
-        options = self._generate_options(self.report, fields.Date.from_string('2017-03-01'), fields.Date.from_string('2017-04-01'))
+        options = self._generate_options(self.report, '2017-03-01', '2017-04-01')
         self.env.company.totals_below_sections = False
 
         self.assertLinesValues(
@@ -330,7 +332,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
     def test_aged_receivable_filter_partners(self):
         """ Test the filter on top allowing to filter on res.partner. """
-        options = self._generate_options(self.report, fields.Date.from_string('2017-02-01'), fields.Date.from_string('2017-02-01'))
+        options = self._generate_options(self.report, '2017-02-01', '2017-02-01')
         options['partner_ids'] = self.partner_a.ids
         self.env.company.totals_below_sections = False
 
@@ -348,7 +350,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
     def test_aged_receivable_filter_partner_categories(self):
         """ Test the filter on top allowing to filter on res.partner.category. """
-        options = self._generate_options(self.report, fields.Date.from_string('2017-02-01'), fields.Date.from_string('2017-02-01'))
+        options = self._generate_options(self.report, '2017-02-01', '2017-02-01')
         options['partner_categories'] = self.partner_category_a.ids
         self.env.company.totals_below_sections = False
 
@@ -367,7 +369,8 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
     def test_aged_receivable_reconciliation_date(self):
         """ Check the values at a date before some reconciliations are done. """
-        options = self._generate_options(self.report, fields.Date.from_string('2016-10-31'), fields.Date.from_string('2016-10-31'))
+        options = self._generate_options(self.report, '2016-10-31', '2016-10-31')
+        options['recon_date'] = {'date_to': '2016-10-31'}
         self.env.company.totals_below_sections = False
 
         self.assertLinesValues(
@@ -385,8 +388,8 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
     # TODO: move these tests into a generic report test class
     def test_aged_receivable_sort_lines_by_date(self):
-        """ Test the sort_lines function using date as sort key. """
-        options = self._generate_options(self.report, fields.Date.from_string('2017-02-01'), fields.Date.from_string('2017-02-01'))
+        """ Test the _sort_lines function using date as sort key. """
+        options = self._generate_options(self.report, '2017-02-01', '2017-02-01')
         partner_a_line_id = self.report._get_generic_line_id('res.partner', self.partner_a.id, parent_line_id=self.parent_line_id, markup={'groupby': 'partner_id'})
         partner_b_line_id = self.report._get_generic_line_id('res.partner', self.partner_b.id, parent_line_id=self.parent_line_id, markup={'groupby': 'partner_id'})
         options['unfolded_lines'] = [partner_a_line_id, partner_b_line_id]
@@ -401,7 +404,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         self.assertLinesValues(
             # pylint: disable=C0326
-            self.report.sort_lines(report_lines, options),
+            self.report._sort_lines(report_lines, options),
             #   Name                    Invoice Date  Not Due On      1 - 30     31 - 60     61 - 90    91 - 120       Older        Total
             [   0,                                 1,          3,          4,          5,          6,          7,          8,           9],
             [
@@ -439,7 +442,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         self.assertLinesValues(
             # pylint: disable=C0326
-            self.report.sort_lines(report_lines, options),
+            self.report._sort_lines(report_lines, options),
             #   Name                     Not Due On      1 - 30     31 - 60     61 - 90    91 - 120       Older        Total
             [   0,                                3,          4,          5,          6,          7,          8,           9],
             [
@@ -470,8 +473,8 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
         )
 
     def test_aged_receivable_sort_lines_by_numeric_value(self):
-        """ Test the sort_lines function using float as sort key. """
-        options = self._generate_options(self.report, fields.Date.from_string('2017-02-01'), fields.Date.from_string('2017-02-01'))
+        """ Test the _sort_lines function using float as sort key. """
+        options = self._generate_options(self.report, '2017-02-01', '2017-02-01')
         partner_a_line_id = self.report._get_generic_line_id('res.partner', self.partner_a.id, parent_line_id=self.parent_line_id, markup={'groupby': 'partner_id'})
         partner_b_line_id = self.report._get_generic_line_id('res.partner', self.partner_b.id, parent_line_id=self.parent_line_id, markup={'groupby': 'partner_id'})
         options['unfolded_lines'] = [partner_a_line_id, partner_b_line_id]
@@ -486,7 +489,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         self.assertLinesValues(
             # pylint: disable=C0326
-            self.report.sort_lines(report_lines, options),
+            self.report._sort_lines(report_lines, options),
             #   Name                    Not Due On      1 - 30     31 - 60     61 - 90    91 - 120       Older        Total
             [   0,                               3,          4,          5,          6,          7,          8,           9],
             [
@@ -524,7 +527,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         self.assertLinesValues(
             # pylint: disable=C0326
-            self.report.sort_lines(report_lines, options),
+            self.report._sort_lines(report_lines, options),
             #   Name                 Not Due On      1 - 30     31 - 60     61 - 90    91 - 120       Older       Total
             [   0,                            3,          4,          5,          6,          7,          8,          9],
             [
@@ -556,6 +559,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
     def test_aged_receivable_zero_balanced_without_reconciliation(self):
         options = self._generate_options(self.report, '2010-01-01', '2010-01-01', default_options={'unfold_all': True})
+        options['recon_date'] = {'date_to': '2010-01-01'}
         invoice = self.env['account.move'].create({
             'move_type': 'out_invoice',
             'partner_id': self.partner_a.id,
@@ -658,109 +662,6 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
             options,
         )
 
-    def test_aged_receivable_prefix_groups(self):
-        partner_names = [
-            'A',
-            'A partner',
-            'A nice partner',
-            'A new partner',
-            'An original partner',
-            'Another partner',
-            'Anonymous partner',
-            'Annoyed partner',
-            'Brave partner',
-        ]
-
-        test_date = '2010-12-13'
-        invoices_map = {}
-        for name in partner_names:
-            partner = self.env['res.partner'].create({'name': name})
-            invoice = self.init_invoice('out_invoice', partner=partner, invoice_date=test_date, amounts=[42.0], taxes=[], post=True)
-            invoices_map[name] = self.env['account.move.line']._format_aml_name(invoice.payment_reference, False, invoice.name)
-
-        # Without prefix groups
-        options = self._generate_options(self.report, test_date, test_date)
-
-        self.assertLinesValues(
-            self.report._get_lines(options),
-            #   Name                 Not Due On      1 - 30     31 - 60     61 - 90    91 - 120       Older        Total
-            [   0,                            3,          4,          5,          6,          7,          8,           9],
-            [
-                ('Aged Receivable',       378.0,        0.0,        0.0,        0.0,        0.0,        0.0,       378.0),
-                ('A',                      42.0,        0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('A new partner',          42.0,        0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('A nice partner',         42.0,        0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('A partner',              42.0,        0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('An original partner',    42.0,        0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Annoyed partner',        42.0,        0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Anonymous partner',      42.0,        0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Another partner',        42.0,        0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Brave partner',          42.0,        0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Total Aged Receivable', 378.0,        0.0,        0.0,        0.0,        0.0,        0.0,       378.0),
-            ],
-            options,
-        )
-
-        # With prefix groups
-        self.report.prefix_groups_threshold = 3
-        options = self._generate_options(self.report, test_date, test_date, default_options={'unfold_all': True})
-
-        self.assertLinesValues(
-            self.report._get_lines(options),
-            #   Name                            Not Due On    1 - 30     31 - 60     61 - 90    91 - 120       Older        Total
-            [   0,                                       3,        4,          5,          6,          7,          8,           9],
-            [
-                ('Aged Receivable',                  378.0,      0.0,        0.0,        0.0,        0.0,        0.0,       378.0),
-                ('A (8 lines)',                      336.0,      0.0,        0.0,        0.0,        0.0,        0.0,       336.0),
-                ('A',                                 42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                (invoices_map['A'],                   42.0,      0.0,        0.0,        0.0,        0.0,        0.0,          ''),
-                ('Total A',                           42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('A[ ] (3 lines)',                   126.0,      0.0,        0.0,        0.0,        0.0,        0.0,       126.0),
-                ('A N (2 lines)',                     84.0,      0.0,        0.0,        0.0,        0.0,        0.0,        84.0),
-                ('A new partner',                     42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                (invoices_map['A new partner'],       42.0,      0.0,        0.0,        0.0,        0.0,        0.0,          ''),
-                ('Total A new partner',               42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('A nice partner',                    42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                (invoices_map['A nice partner'],      42.0,      0.0,        0.0,        0.0,        0.0,        0.0,          ''),
-                ('Total A nice partner',              42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Total A N (2 lines)',               84.0,      0.0,        0.0,        0.0,        0.0,        0.0,        84.0),
-                ('A P (1 line)',                      42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('A partner',                         42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                (invoices_map['A partner'],           42.0,      0.0,        0.0,        0.0,        0.0,        0.0,          ''),
-                ('Total A partner',                   42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Total A P (1 line)',                42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Total A[ ] (3 lines)',             126.0,      0.0,        0.0,        0.0,        0.0,        0.0,       126.0),
-                ('AN (4 lines)',                     168.0,      0.0,        0.0,        0.0,        0.0,        0.0,       168.0),
-                ('AN[ ] (1 line)',                    42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('An original partner',               42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                (invoices_map['An original partner'], 42.0,      0.0,        0.0,        0.0,        0.0,        0.0,          ''),
-                ('Total An original partner',         42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Total AN[ ] (1 line)',              42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('ANN (1 line)',                      42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Annoyed partner',                   42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                (invoices_map['Annoyed partner'],     42.0,      0.0,        0.0,        0.0,        0.0,        0.0,          ''),
-                ('Total Annoyed partner',             42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Total ANN (1 line)',                42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('ANO (2 lines)',                     84.0,      0.0,        0.0,        0.0,        0.0,        0.0,        84.0),
-                ('Anonymous partner',                 42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                (invoices_map['Anonymous partner'],   42.0,      0.0,        0.0,        0.0,        0.0,        0.0,          ''),
-                ('Total Anonymous partner',           42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Another partner',                   42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                (invoices_map['Another partner'],     42.0,      0.0,        0.0,        0.0,        0.0,        0.0,          ''),
-                ('Total Another partner',             42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Total ANO (2 lines)',               84.0,      0.0,        0.0,        0.0,        0.0,        0.0,        84.0),
-                ('Total AN (4 lines)',               168.0,      0.0,        0.0,        0.0,        0.0,        0.0,       168.0),
-                ('Total A (8 lines)',                336.0,      0.0,        0.0,        0.0,        0.0,        0.0,       336.0),
-                ('B (1 line)',                        42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Brave partner',                     42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                (invoices_map['Brave partner'],       42.0,      0.0,        0.0,        0.0,        0.0,        0.0,          ''),
-                ('Total Brave partner',               42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Total B (1 line)',                  42.0,      0.0,        0.0,        0.0,        0.0,        0.0,        42.0),
-                ('Total Aged Receivable',            378.0,      0.0,        0.0,        0.0,        0.0,        0.0,       378.0),
-            ],
-            options,
-        )
-
     def test_aged_receivable_partial_reconcile_currency(self):
         """ Check that 'Amount Currency' column values are displayed and computed correctly. """
         foreign_partner = self.env['res.partner'].create({'name': 'foreign_partner'})
@@ -796,6 +697,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
         line_id = self.report._get_generic_line_id('res.partner', foreign_partner.id, markup={'groupby': 'partner_id'}, parent_line_id=self.parent_line_id)
         options = self._generate_options(self.report, '2023-01-01', '2023-05-01')
         options['unfolded_lines'] = [line_id]
+        options['recon_date'] = {'date_to': '2023-05-01'}
 
         self.assertLinesValues(
             # pylint: disable=C0326
@@ -836,7 +738,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         # With the default interval of 30
         self.assertLinesValues(
-            self.report.sort_lines(initial_report_lines, options),
+            self.report._sort_lines(initial_report_lines, options),
             #   Name                  Not Due On      1 - 30      31 - 60      62 - 90    91 - 120       Older      Total
             [   0,                             3,          4,           5,           6,          7,          8,         9],
             [
@@ -853,7 +755,7 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
 
         # With the interval of 60
         self.assertLinesValues(
-            self.report.sort_lines(report_lines, options),
+            self.report._sort_lines(report_lines, options),
             #   Name                  Not Due On      1 - 60    61 - 120   121 - 180   181 - 240       Older        Total
             [   0,                             3,          4,          5,          6,          7,          8,           9],
             [
@@ -863,4 +765,31 @@ class TestAgedReceivableReport(TestAccountReportsCommon):
                 ('Total Aged Receivable',  150.0,      300.0,     1350.0,         0.0,       0.0,      150.0,      1950.0),
             ],
             options
+        )
+
+    def test_aged_receivable_horizontal_groups(self):
+        horizontal_group = self.env['account.report.horizontal.group'].create({
+            'name': 'Horizontal Group total',
+            'rule_ids': [
+                Command.create({
+                    'field_name': 'company_id',
+                    'domain': f"[('id', 'in', {(self.company_data['company'] + self.company_data_2['company']).ids})]",
+                }),
+            ],
+            'report_ids': self.report
+        })
+        options = self._generate_options(self.report, '2017-03-01', '2017-04-01', default_options={'selected_horizontal_group_id': horizontal_group.id})
+        self.env.company.totals_below_sections = False
+
+        self.assertLinesValues(
+            # pylint: disable=C0326
+            self.report._get_lines(options),
+            #   Name                 At Date      1 - 30     31 - 60     61 - 90    91 - 120       Older        Total      At Date      1 - 30     31 - 60     61 - 90    91 - 120       Older        Total
+            [   0,                         3,          4,          5,          6,          7,          8,           9,          12,         13,         14,         15,         16,         17,          18],
+            [
+            ('Aged Receivable',          0.0,        0.0,      100.0,      100.0,      100.0,     1000.0,      1300.0,         0.0,        0.0,       50.0,       50.0,       50.0,      500.0,       650.0),
+                ('partner_a',            0.0,        0.0,      100.0,      100.0,      100.0,     1000.0,      1300.0,         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,         0.0),
+                ('partner_b',            0.0,        0.0,        0.0,        0.0,        0.0,        0.0,         0.0,         0.0,        0.0,       50.0,       50.0,       50.0,      500.0,       650.0),
+            ],
+            options,
         )

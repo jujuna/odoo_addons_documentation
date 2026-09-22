@@ -8,8 +8,8 @@
                 <sheet>
                     <group>
                         <field name="uom" invisible="1"/>
-                        <field name="version_id"/>
-                        <field name="input_type_id" options="{'no_open': True, 'no_create': True}"/>
+                        <field name="version_id" invisible="1"/>
+                        <field name="salary_rule_id" options="{'no_open': True, 'no_create': True}"/>
                         <label for="amount" string="Amount"/>
                         <div class="o_row">
                             <field name="amount" class="o_hr_narrow_field" nolabel="1"/>
@@ -34,14 +34,14 @@
                 string="One-Time Wages Calendar"
                 date_start="date_start"
                 form_view_id="%(view_l10n_ch_hr_contract_wage_form_calendar)d"
-                color="input_type_id"
+                color="salary_rule_id"
                 event_open_popup="true"
                 quick_create="0"
                 mode="year"
             >
-                <field name="input_type_id" filters="1" invisible="1" color="id"/>
+                <field name="salary_rule_id" filters="1" invisible="1" color="id"/>
                 <field name="description"/>
-                <field name="version_id"/>
+                <field name="version_id" invisible="1"/>
                 <field name="amount"/>
             </calendar>
         </field>
@@ -53,7 +53,7 @@
         <field name="arch" type="xml">
             <list expand="1" create="0" editable="bottom" open_form_view="False" string="Monthly Recurring Wages"
                   default_order="type desc">
-                <field name="input_type_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="salary_rule_id" options="{'no_create': True, 'no_open': True}"/>
                 <field name="amount"/>
                 <field name="uom"/>
                 <field name="date_start"/>

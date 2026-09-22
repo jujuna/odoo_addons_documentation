@@ -1,6 +1,5 @@
 {
     'name': 'Democratic Republic of the Congo - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Democratic Republic of the Congo
 =======================================================

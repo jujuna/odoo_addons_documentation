@@ -1,4 +1,3 @@
-import base64
 import stdnum.uy
 import unicodedata
 import logging
@@ -12,13 +11,29 @@ from odoo.exceptions import ValidationError, UserError
 from odoo.tools import float_repr, float_round, cleanup_xml_node, format_amount, html2plaintext
 from odoo.tools.misc import formatLang
 
+from odoo.addons.l10n_uy_edi.models.res_partner import UY_RUT_DGI_CODE
+
 _logger = logging.getLogger(__name__)
 
 
 def format_float(amount, digits=2, valid_zero=None):
-    if not amount and not valid_zero:
+    if amount is None or (not amount and not valid_zero):
         return None
     return float_repr(float_round(amount, digits), digits)
+
+
+# B4 IndFact: the DGI indicator of a line, by the rate of its VAT tax
+VAT_RATE_TO_INDICATOR = {
+    0.0: 1,   # 1: Exento de IVA
+    10.0: 2,  # 2: Gravado a Tasa Mínima
+    22.0: 3,  # 3: Gravado a Tasa Básica
+}
+
+# Currencies of the DGI table: a partial ISO 4217 plus the Uruguayan index units
+UY_EDI_CURRENCIES = (
+    "ARS", "BRL", "CAD", "CLP", "CNY", "COP", "EUR", "JPY", "MXN", "PEN", "PYG", "USD", "UYI", "UYR",
+    "UYU", "VEF",
+)
 
 
 class AccountMove(models.Model):
@@ -41,6 +56,7 @@ class AccountMove(models.Model):
             ("3", "Reviewable Price"),
             ("4", "Own goods to customs exclaves"),
             ("90", "General Regime - exportation of services"),
+            ("91", "Export under Mandate"),
             ("99", "Other transactions"),
         ],
         help="This field is used in the XML to create an Export e-Invoice",
@@ -142,7 +158,7 @@ class AccountMove(models.Model):
         lacks a valid latam document number (only provided by DGI after processing). To avoid this, resetting the
         invoice to draft clears the invoice name, allowing users to fix any errors without triggering the validation
         """
-        super().button_draft()
+        res = super().button_draft()
         self.filtered(
             lambda x: x.country_code == "UY" and
             x.journal_id.l10n_uy_edi_type == "electronic" and
@@ -151,6 +167,7 @@ class AccountMove(models.Model):
                 x.l10n_uy_edi_document_id.state not in ["received", "accepted", "rejected"]
             )
         ).name = False
+        return res
 
     def _is_manual_document_number(self):
         # EXTEND l10n_latam_invoice_document
@@ -239,6 +256,7 @@ class AccountMove(models.Model):
             self.l10n_uy_edi_cfe_transport_route = "8"
 
         return {
+            "TipoCFE": int(self.l10n_latam_document_type_id.code),  # A2
             "FchEmis": fields.Date.to_string(self.date),  # A5
             "MntBruto":  # A10 - Tax Included
                 1 if self.line_ids.tax_ids.filtered(lambda x: x.l10n_uy_tax_category == "vat" and x.price_include)
@@ -272,21 +290,22 @@ class AccountMove(models.Model):
         """ XML Section A (Encabezado / Receptor) """
         self.ensure_one()
         receptor_required = self.l10n_uy_edi_document_id._cfe_needs_partner_info(self)
+        doc_number = self.commercial_partner_id._get_preferred_legal_entity_identifier_vals().get('value', '')
 
         # If we do not have the necessary receiver information, but the receiver information is not required,
         # we will not send it.
-        if not self.partner_id.vat and not receptor_required:
+        if not doc_number and not receptor_required:
             return {}
 
-        doc_type = self.partner_id._l10n_uy_edi_get_doc_type()
+        doc_type = self.partner_id._l10n_uy_edi_get_dgi_code()
 
         # If we have the information available about the receiver, we send it no matter the case
         # (this is what Uruware does)
         return {
             "TipoDocRecep": doc_type or None,  # A60
             "CodPaisRecep": self.partner_id.country_id.code or ("UY" if doc_type in [2, 3] else "99"),  # A61
-            "DocRecep": self.commercial_partner_id.vat if doc_type in [1, 2, 3] else None,  # A62
-            "DocRecepExt": self.commercial_partner_id.vat if doc_type not in [1, 2, 3] else None,  # A62.1
+            "DocRecep": doc_number if doc_type in [1, 2, 3] else None,  # A62
+            "DocRecepExt": doc_number if doc_type not in [1, 2, 3] else None,  # A62.1
             "RznSocRecep": self.commercial_partner_id.name[:150] or None,  # A63
             "DirRecep": self.partner_id._l10n_uy_edi_get_fiscal_address() or None,  # A64
             "CiudadRecep": self.partner_id.city and self.partner_id.city[:30] or None,  # A65
@@ -312,7 +331,9 @@ class AccountMove(models.Model):
         k = 1
         for base_line in tax_details['base_lines']:
             line = base_line['record']
-            if line.price_unit < 0:
+            # Negative lines are reported as global discounts/surcharges (section D)
+            # Non-billable lines could be negative and must be reported as regular detail lines
+            if line.price_unit < 0 and not line.product_id.l10n_uy_edi_is_non_billable:
                 continue
 
             tax_info = tax_details['tax_details_per_record'][line]['tax_details'].values()
@@ -329,10 +350,11 @@ class AccountMove(models.Model):
                 "DscItem": item_description if item_description else None,  # B8
                 "Cantidad": abs(line.quantity) if invoice_ind == 7 else line.quantity,  # B9
                 "UniMed": line.product_uom_id.name[:4] if line.product_uom_id else "N/A",  # B10
-                "PrecioUnitario": line.price_unit,  # B11
+                # DGI requires a positive unit price; non-billable lines may carry a negative price
+                "PrecioUnitario": abs(line.price_unit),  # B11
                 "DescuentoPct": line.discount,  # B12
                 "DescuentoMonto":  # B13
-                (abs(line.quantity) * line.price_unit - (line.price_total if tax_included else line.price_subtotal))
+                (abs(line.quantity) * abs(line.price_unit) - abs(line.price_total if tax_included else line.price_subtotal))
                 if line.discount else None,
                 "MontoItem": abs(line.price_total) if tax_included else abs(line.price_subtotal),  # B24
             }
@@ -360,12 +382,14 @@ class AccountMove(models.Model):
             neto[key] = neto.get(key, 0) + tax_dict['base_amount_currency']
             base[key] = base.get(key, 0) + tax_dict['tax_amount_currency']
         nf_amount = sum(
-            self.invoice_line_ids.filtered(lambda x: x.move_id._is_downpayment() or x.quantity < 0).mapped('price_subtotal')
+            self.invoice_line_ids.filtered(
+                lambda x: x.move_id._is_downpayment() or x.quantity < 0 or x.product_id.l10n_uy_edi_is_non_billable
+            ).mapped('price_subtotal')
         )
         res = {
             "TpoMoneda": currency_name,  # A110
             "TpoCambio": None if currency_name == "UYU" else self._l10n_uy_edi_get_used_rate(),  # A111
-            "MntExpoyAsim": self.amount_total if expo_doc else None,  # A113
+            "MntExpoyAsim": self.amount_total - nf_amount if expo_doc else None,  # A113
             "MntNoGrv": neto[0.0] if not expo_doc else None,  # A112
             "MntNetoIvaTasaMin": neto[10.0] if not expo_doc else None,  # A116
             "IVATasaMin": 10 if not expo_doc and neto[10.0] or self._is_downpayment() else None,  # A119
@@ -376,7 +400,11 @@ class AccountMove(models.Model):
             "MntIVATasaBasica": base[22.0] if not expo_doc else None,  # A122
             "MntIVAOtra": base.get('reduced_tax'),  # A123
             "MntTotal": self.amount_total - nf_amount if nf_amount else self.amount_total,  # A124
-            "CantLinDet": len(self.invoice_line_ids.filtered(lambda x: x.display_type == "product" and x.price_unit >= 0 or x.move_id._is_downpayment())),  # A126
+            "CantLinDet": len(self.invoice_line_ids.filtered(
+                lambda x: (x.display_type == "product" and x.price_unit >= 0)
+                    or x.move_id._is_downpayment()
+                    or x.product_id.l10n_uy_edi_is_non_billable)
+            ),  # A126
             "MontoNF": nf_amount or None,
             "MntPagar": self.amount_total,  # A130
         }
@@ -389,19 +417,21 @@ class AccountMove(models.Model):
         :return:  list of the prepare data of each line we are going to inform for the CFE """
         self.ensure_one()
         res = []
-        for k, line in enumerate(self.invoice_line_ids.filtered(lambda line: line.price_unit < 0), 1):
-
+        discount_base_lines = [
+            bl for bl in tax_details['base_lines']
+            if bl['record'].price_unit < 0 and not bl['record'].product_id.l10n_uy_edi_is_non_billable
+        ]
+        for k, base_line in enumerate(discount_base_lines, 1):
+            line = base_line['record']
             invoice_ind = self._get_invoice_indicator(line, tax_details)
-
             res.append({
                 "NroLinDR": k,  # D1
                 "TpoMovDR": "D",  # D2
                 "TpoDR": 1,  # D3
-                "GlosaDR": line.name[:50] if line.name else _('Discount'),  # D5
-                "ValorDR": abs(line.price_unit),  # D6
+                "GlosaDR": line.label[:100] if line.label else _('Discount'),  # D5
+                "ValorDR": abs(base_line['tax_details']['raw_total_excluded_currency']),  # D6
                 "IndFactDR": invoice_ind,  # D7
             })
-
         return res
 
     def _l10n_uy_edi_cfe_F_reference(self):
@@ -416,25 +446,26 @@ class AccountMove(models.Model):
                     "TpoDocRef": int(related_cfe.l10n_latam_document_type_id.code),  # F3
                     "Serie": cfe_serie,  # F4
                     "NroCFERef": cfe_number,  # F5
+                    "FechaCFEref": related_cfe.invoice_date,  # F7
+                    "MntCFEref": related_cfe.amount_total,  # F8
+                    "TpoMonedaRef": related_cfe.currency_id.name,  # F9
+                    "TpoCambioRef": related_cfe._l10n_uy_edi_get_used_rate(),  # F10
                 })
         return res
 
     def _get_invoice_indicator(self, line, tax_details):
         # B4 IndFact
-        if self._l10n_uy_edi_is_expo_cfe():
+        if line.product_id.l10n_uy_edi_is_non_billable:
+            invoice_ind = 7 if line.price_subtotal < 0.0 else 6
+        elif self._l10n_uy_edi_is_expo_cfe():
             invoice_ind = 10  # Exportación y asimiladas
         elif self._is_downpayment():
             invoice_ind = 6
         elif line.quantity < 0:
             invoice_ind = 7  # Discount
         else:
-            ind_code = {
-                0.0: 1,   # 1: Exento de IVA
-                10.0: 2,  # 2: Gravado a Tasa Mínima
-                22.0: 3,  # 3: Gravado a Tasa Básica
-            }
             # IMPORTANT: By the moment, this is working for one VAT tax per move lines
-            invoice_ind = ind_code.get(line.tax_ids.amount, 4)  # 4: Otra Tasa IVA
+            invoice_ind = VAT_RATE_TO_INDICATOR.get(line.tax_ids.amount, 4)  # 4: Otra Tasa IVA
 
         tax_included = set(line.tax_ids.mapped("price_include"))
 
@@ -476,15 +507,9 @@ class AccountMove(models.Model):
             errors.append(_("Problem with Receiver identification number: %(exp_msg)s", exp_msg=str(exp)))
 
         # Check currency configuration works to be able to report to DGI
-        uy_edi_currencies = [
-            # partial iso 4217
-            "ARS", "BRL", "CAD", "CLP", "CNY", "COP", "EUR", "JPY", "MXN", "PYG", "PEN", "USD", "UYU", "VEF",
-            # other_currencies
-            "UYI", "UYR",
-        ]
-        currency_names = self.currency_id.mapped("name") + self.company_id.currency_id.mapped("name")
+        currency_names = (self.currency_id | self.company_id.currency_id).mapped("name")
         for currency_name in currency_names:
-            if currency_name not in uy_edi_currencies:
+            if currency_name not in UY_EDI_CURRENCIES:
                 errors.append(_("The currency does not exist on DGI currencies table %s", currency_name))
 
         # Rates Configuration
@@ -543,6 +568,9 @@ class AccountMove(models.Model):
         # All lines should have a VAT tax -
         for line in lines.filtered(lambda x: not x.move_id._is_downpayment() and x.quantity > 0):
             errors += edi_model._check_field_size("B8_DscItem", self._l10n_uy_edi_get_line_nom_and_desc(line)[1], 1000)
+            # Non-billable products are allowed without taxes.
+            if line.product_id.l10n_uy_edi_is_non_billable:
+                continue
             # We check that there is one and o nly one vat tax per line
             vat_taxes = line.tax_ids.filtered(lambda x: x.l10n_uy_tax_category == "vat")
             if len(vat_taxes) != 1:
@@ -560,6 +588,16 @@ class AccountMove(models.Model):
                         move_id=line.move_id.id,
                     ))
 
+        for line in lines.filtered(
+            lambda l: l.product_id.l10n_uy_edi_is_non_billable
+            and l.tax_ids.filtered(lambda t: t.country_code == "UY")
+        ):
+            errors.append(self.env._(
+                "A non-billable product cannot have taxes. Please remove the taxes from "
+                "line '%(line_name)s' to continue.",
+                line_name=line.display_name,
+            ))
+
         # Check the type of vat taxes used (all included or not included)
         taxes = self.line_ids.tax_ids.filtered(lambda t: t.l10n_uy_tax_category == "vat")
         tax_included = set(taxes.mapped("price_include"))
@@ -574,18 +612,44 @@ class AccountMove(models.Model):
         if deduct_dp_lines.filtered(lambda l: l.tax_ids):
             errors.append(_("Downpayment lines should not have any taxes, please remove then to continue"))
 
-        # Discount line have regular lines that match with the same tax
-        total_field = 'price_total' if tax_included else 'price_subtotal'
-        discount_lines = (self.invoice_line_ids - deduct_dp_lines).filtered(lambda l: l[total_field] < 0.0)
-        for dline in discount_lines:
-            discount_tax = dline.tax_ids
-            if not self.line_ids.filtered(lambda l: l.id != dline.id).\
-               tax_ids.filtered(lambda t: t.id == discount_tax.id):
-                errors.append(_('Discount with Tax %s can only exist if match with regular line with same tax',
-                                discount_tax.name))
+        # Discount lines must always be associated to another line sharing the same taxes.
+        if self.is_invoice():
+            AccountTax = self.env['account.tax']
+            base_lines, _tax_lines = self._get_rounded_base_and_tax_lines()
+            # Downpayment deduction lines are not discount lines — exclude them from this validation.
+            check_base_lines = [bl for bl in base_lines if bl['record'] not in deduct_dp_lines and not bl['record'].product_id.l10n_uy_edi_is_non_billable]
+            for base_line in check_base_lines:
+                has_taxes = base_line['tax_ids']
+                is_neg_qty = base_line['quantity'] < 0
+                if (
+                    base_line['tax_details']['raw_total_excluded_currency'] < 0
+                    and has_taxes
+                    and not is_neg_qty
+                ):
+                    base_line['special_type'] = 'global_discount'
+
+            # Return of merchandise: negative lines reduce quantity instead of being added as a discount.
+            check_base_lines = AccountTax._dispatch_return_of_merchandise_lines(check_base_lines, self.company_id)
+            AccountTax._squash_return_of_merchandise_lines(check_base_lines, self.company_id)
+
+            # Global discount: spread the discount equally across the matching lines.
+            check_base_lines = AccountTax._dispatch_global_discount_lines(check_base_lines, self.company_id)
+            AccountTax._squash_global_discount_lines(check_base_lines, self.company_id)
+
+            remaining_negative_lines = [
+                bl for bl in check_base_lines
+                if bl['tax_details']['raw_total_excluded_currency'] < 0
+            ]
+            for bl in remaining_negative_lines:
+                errors.append(_(
+                    "Discount line '%(line_name)s' must be associated to another line having the same taxes (%(tax_names)s).",
+                    line_name=bl['record'].name,
+                    tax_names=', '.join(bl['record'].tax_ids.mapped('name')),
+                ))
 
         # Do not let negative quantities, only can be done if line is a donwpayment deduct
-        negative_lines = self.line_ids.filtered(lambda l: l.quantity < 0 and not l._get_downpayment_lines())
+        negative_lines = self.line_ids.filtered(
+            lambda l: l.quantity < 0 and not l._get_downpayment_lines())
         if negative_lines:
             errors.append(_("You cannot create lines with negative quantities (except for down payments deducts)."))
 
@@ -611,25 +675,22 @@ class AccountMove(models.Model):
 
         cond_e_fact_expo = self._l10n_uy_edi_is_expo_cfe()
         receptor_required = edi_model._cfe_needs_partner_info(self)
-        doc_type = self.partner_id._l10n_uy_edi_get_doc_type()
+        doc_type = self.partner_id._l10n_uy_edi_get_dgi_code()
         min_amount = edi_model._get_minimum_legal_amount(self.company_id, self.date)
 
         if min_amount == 1.0:
             errors.append(_("You need to have UYI rate before validating invoices"))
 
-        if not doc_type:
-            errors.append(_("%(dtype)s is not an Uruguayan Identification Type or "
-                            "a Generic one (VAT, Passport, or Foreign ID). You need to select a valid ID to be able "
-                            "to invoice", dtype=self.partner_id.l10n_latam_identification_type_id.name))
-
         # Validations to have all the receiver data if the receiver is required
-        if receptor_required:
-            if not self.partner_id.l10n_latam_identification_type_id:
-                errors.append(_("The partner of the CFE needs to have an Identification Type"))
+        if receptor_required and not doc_type:
+            errors.append(self.env._(
+                "The partner of the CFE needs to have a valid Uruguayan identification."
+            ))
 
         if cond_e_fact_expo or cond_e_fact or (cond_e_ticket and receptor_required):
+            doc_number = self.commercial_partner_id._get_preferred_legal_entity_identifier_vals().get('value')
             if not all([self.partner_id.street, self.partner_id.city, self.partner_id.state_id,
-                        self.partner_id.country_id, self.partner_id.vat]):
+                        self.partner_id.country_id, doc_number]):
                 msg = _("You need to fill in the receiver details: address, city, province, country and ID number")
                 if cond_e_ticket:
                     msg += _(
@@ -694,8 +755,8 @@ class AccountMove(models.Model):
         """ return string with the addenda """
         addenda = self.l10n_uy_edi_document_id._get_legends("addenda", self)
         if self.narration:
-            term_and_conditions = html2plaintext(self.narration)
-            addenda = addenda + "\n\n" + term_and_conditions if addenda else term_and_conditions
+            term_and_conditions = html2plaintext(self.narration).strip()
+            addenda = addenda + "\n" + term_and_conditions if addenda else term_and_conditions
         return self._l10n_uy_edi_clean_non_ascii_chars(addenda)
 
     def _l10n_uy_edi_clean_non_ascii_chars(self, text):
@@ -745,7 +806,7 @@ class AccountMove(models.Model):
         """ Call endpoint to get PDF file from Uruware (Standard Representation)
         return: dictionary with {"errors": str(): "pdf_file"attachment object } """
         res = {}
-        if "out" not in self.move_type or self.journal_id.l10n_uy_edi_type != "electronic":
+        if not self.is_sale_document() or self.journal_id.l10n_uy_edi_type != "electronic":
             return {"errors": _("Only can get the legal representation of the CFE for customer electronic invoices")}
 
         result = self.l10n_uy_edi_document_id._get_pdf()
@@ -757,7 +818,7 @@ class AccountMove(models.Model):
                 "res_field": "invoice_pdf_report_file",
                 "name": (self.name or _("INV")).replace("/", "_") + ".pdf",
                 "type": "binary",
-                "datas": file_content,
+                "raw": file_content,
             })
             res["pdf_file"] = pdf_file
 
@@ -773,7 +834,7 @@ class AccountMove(models.Model):
             "res_id": edi_doc.id,
             "name": edi_doc._get_xml_attachment_name(),
             "type": "binary",
-            "datas": base64.b64encode(self._l10n_uy_edi_get_xml_content().encode()),
+            "raw": self._l10n_uy_edi_get_xml_content(),
         })
         edi_doc.invalidate_recordset(["attachment_id", "attachment_file"])
         return xml_file
@@ -783,8 +844,8 @@ class AccountMove(models.Model):
         UYU = self.env.ref("base.UYU")
         res = 0.0
         if self.currency_id != UYU:
-            res = self.currency_id._convert(
-                1.0, UYU, self.company_id, self.date or fields.Date.today(), round=False)
+            res = 1 / self.invoice_currency_rate if self.company_id.currency_id == UYU else\
+                self.currency_id._convert(1.0, UYU, self.company_id, self.date, round=False)
         return res
 
     def _l10n_uy_edi_get_xml_content(self):
@@ -813,7 +874,7 @@ class AccountMove(models.Model):
             "referencia_lines": self._l10n_uy_edi_cfe_F_reference(),
             "format_float": format_float,
         })
-        return etree.tostring(cleanup_xml_node(cfe)).decode()
+        return etree.tostring(cleanup_xml_node(cfe))
 
     def _l10n_uy_edi_is_expo_cfe(self):
         """ True of False if the CFE is an Export type """
@@ -830,7 +891,8 @@ class AccountMove(models.Model):
             "TipoCfe": int(self.l10n_latam_document_type_id.code),
             "HoraReq": edi_doc.request_datetime.strftime("%H%M%S"),
             "FechaReq": edi_doc.request_datetime.date().strftime("%Y%m%d"),
-            "CfeXmlOTexto": xml_content}
+            "CfeXmlOTexto": xml_content.decode(),
+        }
 
         if addenda := self._l10n_uy_edi_get_addenda():
             req_data["Adenda"] = addenda
@@ -851,7 +913,9 @@ class AccountMove(models.Model):
                 msg = _("This CFE has been generated in DEMO Mode. It is considered as accepted and it won\"t be sent to DGI.")
             else:
                 request_data = move._l10n_uy_edi_prepare_req_data()
-                result = edi_doc._send_dgi(request_data)
+                result = edi_doc._send_dgi(
+                    request_data, terminal_code=move.journal_id.l10n_uy_edi_ucfe_terminal_code,
+                )
                 edi_doc._update_cfe_state(result)
 
                 response = result.get("response")
@@ -895,9 +959,9 @@ class AccountMove(models.Model):
                 "res_id": edi_doc.id,
                 "name": edi_doc._get_xml_attachment_name(),
                 "type": "binary",
-                "datas": base64.b64encode(
+                "raw": (
                     xml_content.encode() if self.l10n_uy_edi_cfe_state in ["received", "accepted"]
-                    else self._l10n_uy_edi_get_xml_content().encode()
+                    else self._l10n_uy_edi_get_xml_content()
                 ),
             })
 
@@ -930,9 +994,11 @@ class AccountMove(models.Model):
             m.state == 'draft' and
             not m.posted_before and
             m.journal_id.l10n_uy_edi_type == 'electronic' and
-            m.partner_id.l10n_latam_identification_type_id == self.env.ref('l10n_uy.it_rut') and
+            m.partner_id and m.partner_id._l10n_uy_edi_get_dgi_code() == UY_RUT_DGI_CODE and
             not m.debit_origin_id):
-            uy_einvoices.l10n_latam_document_type_id = self.env.ref('l10n_uy.dc_e_inv')
+            refunds = uy_einvoices.filtered(lambda m: m.move_type == 'out_refund')
+            refunds.l10n_latam_document_type_id = self.env.ref('l10n_uy.dc_cn_e_inv')
+            (uy_einvoices - refunds).l10n_latam_document_type_id = self.env.ref('l10n_uy.dc_e_inv')
         super(AccountMove, self - uy_einvoices)._compute_l10n_latam_document_type()
 
     def _get_import_file_type(self, file_data):
@@ -989,8 +1055,11 @@ class AccountMove(models.Model):
         created by 'UY: Create vendor bills (sync from Uruware)' cron. """
         self.ensure_one()
         latam_document = self._l10n_uy_edi_get_cfe_document_type(xml_tree)
-        if not latam_document or latam_document.code in ['124', '181', '182', '224', '281', '282']:
+        is_cobranza = xml_tree.findtext('.//{*}IndCobPropia')
+        if not latam_document or latam_document.code in ['124', '181', '182', '224', '281', '282'] or is_cobranza:
             latam_document_name = latam_document.name if latam_document else xml_tree.findtext('.//{*}TipoCFE') or xml_tree.findtext('.//{*}TipoCfe') or 'undefined'
+            if is_cobranza:
+                latam_document_name += " (Cobranza)"
             msg = _("For now it is not possible to create %(latam_document_name)s documents",
                     latam_document_name=latam_document_name)
             self.message_post(body=msg)
@@ -1019,7 +1088,7 @@ class AccountMove(models.Model):
                 "res_id": self.l10n_uy_edi_document_id.id,
                 "res_field": "attachment_file",
                 "type": "binary",
-                "datas": base64.b64encode(etree.tostring(xml_tree))})
+                "raw": etree.tostring(xml_tree)})
         self.partner_id = self.l10n_uy_edi_document_id._get_partner_from_xml(xml_tree, partner_vat_RUC)
         self.move_type = latam_document._l10n_uy_edi_get_move_type()
         self.l10n_latam_document_type_id = latam_document

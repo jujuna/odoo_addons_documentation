@@ -16,3 +16,11 @@ class Website(models.Model):
         links = super().configurator_get_footer_links()
         links.append({'text': _("Help"), 'href': '/help'})
         return links
+
+    def _search_get_details(self, search_type, order, options):
+        if search_type == 'knowledge_and_forum':
+            return (
+                self._search_get_details('knowledge', order, options)
+                + self._search_get_details('forums', order, options)
+            )
+        return super()._search_get_details(search_type, order, options)

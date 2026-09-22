@@ -1,6 +1,5 @@
 {
     'name': 'Equity',
-    'version': '1.0',
     'sequence': 31,
     'category': 'Accounting/Accounting',
     'summary': "Manage securities, transactions, and cap tables.",
@@ -9,19 +8,21 @@
     'data': [
         'data/mail_activity_type_data.xml',
         'data/mail_templates.xml',
+        'data/mail_templates_email_layouts.xml',
+        'data/portal_entry_data.xml',
         'security/equity_security.xml',
-        'security/ir.model.access.csv',
         'views/equity_reporting_views.xml',
         'views/equity_security_class_views.xml',
         'views/equity_valuation_views.xml',
         'views/equity_transaction_views.xml',
         'views/equity_ubo_report.xml',
         'views/equity_ubo_views.xml',
-        'views/mail_compose_message_views.xml',
         'views/res_partner_views.xml',
         'views/equity_menuitem.xml',
         'views/equity_portal_templates.xml',
         'views/equity_ubo_portal_templates.xml',
+        'wizard/equity_mail_compose_message_views.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/demo_equity_security_class.xml',
@@ -29,7 +30,6 @@
         'demo/demo_equity_ubo.xml',
         'demo/demo_equity_valuation.xml',
     ],
-    'installable': True,
     'application': True,
     'assets': {
         'web.assets_backend': [
@@ -47,12 +47,9 @@
             'web/static/src/views/fields/formatters.js',
             'web/static/src/core/l10n/dates.js',
         ],
-        'web._assets_core': [
-            'equity/static/src/scss/security_class_ids_dropdown_menu.scss',
-        ],
         'web.assets_tests': [
             'equity/static/tests/tours/**/*',
         ],
     },
-    'license': 'LGPL-3',
+    'license': 'OEEL-1',
 }

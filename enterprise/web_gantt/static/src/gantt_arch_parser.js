@@ -1,4 +1,4 @@
-import { getLocalYearAndWeek, today } from "@web/core/l10n/dates";
+import { formatLocalWeekRange } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
 import { evaluateExpr } from "@web/core/py_js/py";
 import { omit } from "@web/core/utils/objects";
@@ -30,11 +30,11 @@ const SCALES = {
 
         // determines column groups
         unit: "day",
-        groupHeaderFormatter: (date) => date.toFormat("DDD"),
+        groupHeaderFormatter: (date) => date.toFormat("DDDD"),
         groupHeaderTitle: (date) => date.toFormat("DDDD"),
     },
     week: {
-        cellPrecisions: { full: 24, half: 12 },
+        cellPrecisions: { full: 24, half: 12, quarter: 6 },
         defaultPrecision: "half",
         time: "hour",
         unitDescription: _t("hours"),
@@ -45,11 +45,11 @@ const SCALES = {
         colHeaderTitle: (date) => date.toFormat("DDDD"),
 
         unit: "week",
-        groupHeaderFormatter: formatLocalWeekYear,
-        groupHeaderTitle: formatLocalWeekYear,
+        groupHeaderFormatter: formatLocalWeekRange,
+        groupHeaderTitle: formatLocalWeekRange,
     },
     month: {
-        cellPrecisions: { full: 24, half: 12 },
+        cellPrecisions: { full: 24, half: 12, quarter: 6 },
         defaultPrecision: "half",
         time: "hour",
         unitDescription: _t("hours"),
@@ -60,8 +60,10 @@ const SCALES = {
         colHeaderTitle: (date) => date.toFormat("DDDD"),
 
         unit: "month",
-        groupHeaderFormatter: (date, env) => date.toFormat(env.isSmall ? "MMM yyyy" : "MMMM yyyy"),
-        groupHeaderTitle: (date, env) => date.toFormat(env.isSmall ? "MMM yyyy" : "MMMM yyyy"),
+        groupHeaderFormatter: (date, env) =>
+            date.toFormat(env.services.ui.isSmall ? "MMM yyyy" : "MMMM yyyy"),
+        groupHeaderTitle: (date, env) =>
+            date.toFormat(env.services.ui.isSmall ? "MMM yyyy" : "MMMM yyyy"),
     },
     year: {
         cellPrecisions: { full: 1 },
@@ -71,8 +73,9 @@ const SCALES = {
 
         interval: "month",
         minimalColumnWidth: 100,
-        colHeaderFormatter: (date, env) => date.toFormat(env.isSmall ? "MMM" : "MMMM"),
-        colHeaderTitle: (date, env) => date.toFormat(env.isSmall ? "MMM yyyy" : "MMMM yyyy"),
+        colHeaderFormatter: (date, env) => date.toFormat(env.services.ui.isSmall ? "MMM" : "MMMM"),
+        colHeaderTitle: (date, env) =>
+            date.toFormat(env.services.ui.isSmall ? "MMM yyyy" : "MMMM yyyy"),
 
         unit: "year",
         groupHeaderFormatter: (date) => date.toFormat("yyyy"),
@@ -84,26 +87,6 @@ const RESCHEDULE_METHODS = {
     consumeBuffer: "Auto-Reschedule (Use Buffer)",
     maintainBuffer: "Auto-Reschedule (Keep Buffer)",
 };
-
-/**
- * Formats a date to a special datetime string, in the user's locale settings.
- * It contains the week number, its period and the year if it is different from the current's
- *
- * @param {Date|luxon.DateTime} date
- * @returns {string}
- */
-function formatLocalWeekYear(date) {
-    const { year, week, startDate } = getLocalYearAndWeek(date);
-    let result = _t(`Week %(week)s, %(startDate)s - %(endDate)s`, {
-        week,
-        startDate: startDate.toLocaleString({ month: "short", day: "numeric" }),
-        endDate: startDate.plus({ days: 6 }).toLocaleString({ month: "short", day: "numeric" }),
-    });
-    if (today().year !== year) {
-        result += ` ${year}`;
-    }
-    return result;
-}
 
 function getPreferedScaleId(scaleId, scales) {
     // we assume that scales is not empty
@@ -155,11 +138,7 @@ export class GanttArchParser {
     parse(arch) {
         let infoFromRootNode;
         const decorationFields = [];
-        const popoverArchParams = {
-            displayGenericButtons: true,
-            bodyTemplate: null,
-            footerTemplate: null,
-        };
+        let popoverNode;
 
         visitXML(arch, (node) => {
             switch (node.tagName) {
@@ -168,42 +147,12 @@ export class GanttArchParser {
                     break;
                 }
                 case "field": {
-                    const fieldName = node.getAttribute("name");
-                    decorationFields.push(fieldName);
+                    decorationFields.push(node.getAttribute("name"));
                     break;
                 }
-                case "templates": {
-                    const body = node.querySelector("[t-name=gantt-popover]") || null;
-                    if (body) {
-                        popoverArchParams.bodyTemplate = body.cloneNode(true);
-                        popoverArchParams.bodyTemplate.removeAttribute("t-name");
-                        const footer = popoverArchParams.bodyTemplate.querySelector("footer");
-                        if (footer) {
-                            popoverArchParams.displayGenericButtons = false;
-                            footer.remove();
-                            const footerTemplate = new Document().createElement("t");
-                            footerTemplate.append(...footer.children);
-                            popoverArchParams.footerTemplate = footerTemplate;
-                            const replace = footer.getAttribute("replace");
-                            if (replace && !exprToBoolean(replace)) {
-                                popoverArchParams.displayGenericButtons = true;
-                            }
-                        }
-                        let hasRemainingChild = false;
-                        for (const child of popoverArchParams.bodyTemplate.childNodes) {
-                            if (child.nodeType === 8) {
-                                continue;
-                            }
-                            if (child.nodeType === 3 && !child.data.trim()) {
-                                continue;
-                            }
-                            hasRemainingChild = true;
-                            break;
-                        }
-                        if (!hasRemainingChild) {
-                            delete popoverArchParams.bodyTemplate;
-                        }
-                    }
+                case "popover": {
+                    popoverNode = node;
+                    return false;
                 }
             }
         });
@@ -211,7 +160,7 @@ export class GanttArchParser {
         return {
             ...infoFromRootNode,
             decorationFields,
-            popoverArchParams,
+            popoverNode,
         };
     }
 }
@@ -225,21 +174,6 @@ function getInfoFromRootNode(rootNode) {
     const { create: canCreate, delete: canDelete, edit: canEdit } = getActiveActions(rootNode);
     const canCellCreate = exprToBoolean(attrs.cell_create, true) && canCreate;
     const canPlan = exprToBoolean(attrs.plan, true) && canEdit;
-
-    let consolidationMaxField;
-    let consolidationMaxValue;
-    const consolidationMax = attrs.consolidation_max ? evaluateExpr(attrs.consolidation_max) : {};
-    if (Object.keys(consolidationMax).length > 0) {
-        consolidationMaxField = Object.keys(consolidationMax)[0];
-        consolidationMaxValue = consolidationMax[consolidationMaxField];
-    }
-
-    const consolidationParams = {
-        excludeField: attrs.consolidation_exclude,
-        field: attrs.consolidation,
-        maxField: consolidationMaxField,
-        maxValue: consolidationMaxValue,
-    };
 
     const dependencyField = attrs.dependency_field || null;
     const dependencyEnabled = !!dependencyField;
@@ -326,14 +260,16 @@ function getInfoFromRootNode(rootNode) {
     }
 
     return {
+        bufferStartField: attrs.buffer_start,
+        bufferStopField: attrs.buffer_stop,
         canCellCreate,
         canCreate,
         canDelete,
         canEdit,
         canPlan,
+        canSchedule: exprToBoolean(attrs.schedule, false),
         colorField: attrs.color,
         computePillDisplayName: !!attrs.pill_label,
-        consolidationParams,
         createAction: attrs.on_create || null,
         dateStartField: attrs.date_start,
         dateStopField: attrs.date_stop,
@@ -346,7 +282,6 @@ function getInfoFromRootNode(rootNode) {
         displayTotalRow: exprToBoolean(attrs.total_row),
         displayUnavailability: exprToBoolean(attrs.display_unavailability),
         formViewId: attrs.form_view_id ? parseInt(attrs.form_view_id, 10) : false,
-        kanbanViewId: attrs.kanban_view_id ? evaluateExpr(attrs.kanban_view_id) : null,
         multiCreateView: attrs.multi_create_view || null,
         pagerLimit: attrs.groups_limit ? parseInt(attrs.groups_limit, 10) : null,
         pillDecorations,

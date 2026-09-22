@@ -7,15 +7,17 @@ from json import dumps
 from odoo import Command
 from odoo.exceptions import AccessError, ValidationError
 from odoo.addons.http_routing.tests.common import MockRequest
+from odoo.addons.mail.tests.common import MockEmail
 from odoo.tests import tagged
 from odoo.tools import formataddr
 from .sign_controller_common import TestSignControllerCommon
 
 @tagged('post_install', '-at_install')
-class TestSignController(TestSignControllerCommon):
+class TestSignController(TestSignControllerCommon, MockEmail):
     # test float auto_field display
     def test_sign_controller_float(self):
         sign_request = self.create_sign_request_no_item(signer=self.partner_1, cc_partners=self.partner_4)
+        self.partner_1.partner_latitude = 45.154515254521
         text_type = self.env['sign.item.type'].search([('name', '=', 'Text')])
         # the partner_latitude expects 7 zeros of decimal precision
         text_type.auto_field = 'partner_latitude'
@@ -25,7 +27,8 @@ class TestSignController(TestSignControllerCommon):
             values = self.SignController.get_document_qweb_context(sign_request.id, token=token_a)
             sign_type = next(filter(lambda sign_type: sign_type["name"] == "Text", values.get("rendering_context")["sign_item_types"]))
             latitude = sign_type["auto_value"]
-            self.assertEqual(latitude, 0)
+            #  floats are rounded
+            self.assertEqual(latitude, 45.15)
 
     # test auto_field with wrong partner field
     def test_sign_controller_dummy_fields(self):
@@ -54,6 +57,24 @@ class TestSignController(TestSignControllerCommon):
             sign_type = next(filter(lambda sign_type: sign_type["name"] == "Text", values.get("rendering_context")["sign_item_types"]))
             country = sign_type["auto_value"]
             self.assertEqual(country, "Belgium")
+        # test falsy value
+        self.env.ref('base.be').phone_code = 0
+        text_type.auto_field = 'company_id.country_id.phone_code'
+        sign_request2 = self.create_sign_request_no_item(signer=self.partner_1, cc_partners=self.partner_4)
+        token_b = self.env["sign.request.item"].search([('sign_request_id', '=', sign_request2.id)]).access_token
+        with MockRequest(sign_request.env):
+            values = self.SignController.get_document_qweb_context(sign_request2.id, token=token_b)
+            sign_type = next(filter(lambda sign_type: sign_type["name"] == "Text", values.get("rendering_context")["sign_item_types"]))
+            phone_code = sign_type["auto_value"]
+            self.assertTrue(phone_code == 0)
+        text_type.auto_field = 'company_id.country_id.address_view_id.technical_usage'
+        sign_request2 = self.create_sign_request_no_item(signer=self.partner_1, cc_partners=self.partner_4)
+        token_b = self.env["sign.request.item"].search([('sign_request_id', '=', sign_request2.id)]).access_token
+        with MockRequest(sign_request.env):
+            values = self.SignController.get_document_qweb_context(sign_request2.id, token=token_b)
+            sign_type = next(filter(lambda sign_type: sign_type["name"] == "Text", values.get("rendering_context")["sign_item_types"]))
+            technical_usage = sign_type["auto_value"]
+            self.assertEqual(technical_usage, "")
 
     def test_sign_request_requires_auth_when_credits_are_available(self):
         sign_request = self.create_sign_request_1_role_sms_auth(self.partner_1, self.env['res.partner'])
@@ -275,14 +296,15 @@ class TestSignController(TestSignControllerCommon):
         # Create two sign requests. The second one will be returned as 'the next' to be signed.
         self.sign_request = self.create_sign_request_1_role(self.partner_1, self.env['res.partner'])
         self.next_sign_request = self.create_sign_request_1_role(self.partner_1, self.env['res.partner'])
+        self.sign_request_item = self.sign_request.request_item_ids[0]
 
         self.authenticate(None, None)  # Ensure the current user for the request is public
         response = self._json_url_open(
             '/sign/sign_request_items',
             {
                 'request_id': self.sign_request.id,
-                'token': self.sign_request.access_token,
-                'sign_item_id': self.sign_request.request_item_ids[0].id,
+                'token': self.sign_request_item.access_token,
+                'sign_item_id': self.sign_request_item.id,
             }
         )
         self.assertEqual(response.status_code, 200, f"Expected 200 OK, got {response.status_code}")
@@ -301,11 +323,52 @@ class TestSignController(TestSignControllerCommon):
             "The 'next' sign request item must be able to be accessed through the public route."
         )
 
+    def test_get_sign_request_respect_to_order(self):
+        """ Test that the thank you dialog only shows documents where it's the user's turn to sign. """
+        ordered_request = self.env['sign.request'].create({
+            'template_id': self.template_2_roles.id,
+            'reference': self.template_2_roles.display_name,
+            'request_item_ids': [Command.create({
+                'partner_id': self.partner_2.id,
+                'role_id': self.role_signer_1.id,
+                'mail_sent_order': 1,
+            }), Command.create({
+                'partner_id': self.partner_1.id,
+                'role_id': self.role_signer_2.id,
+                'mail_sent_order': 2,
+            })],
+        })
+
+        sign_request_1 = self.create_sign_request_1_role(self.partner_1, self.env['res.partner'])
+        sign_request_2 = self.create_sign_request_1_role(self.partner_1, self.env['res.partner'])
+        ordered_request_item = ordered_request.request_item_ids[1]
+        sign_request_item_1 = sign_request_1.request_item_ids[0]
+        sign_request_item_2 = sign_request_2.request_item_ids[0]
+
+        self.authenticate(None, None)
+        response = self._json_url_open(
+            '/sign/sign_request_items',
+            {
+                'request_id': sign_request_2.id,
+                'token': sign_request_item_2.access_token,
+                'sign_item_id': sign_request_item_2.id
+            }
+        )
+        response_json = response.json()
+        result = response_json['result']
+        result_ids = [item['id'] for item in result]
+        self.assertIn(sign_request_item_1.id, result_ids,
+            "Document where it's the user's turn should appear in the thankyou dialog"
+        )
+        self.assertNotIn(ordered_request_item.id, result_ids,
+            "Document where it's not the user's turn should not appear in the thankyou dialog"
+        )
+
     def test_sign_request_local(self):
         # Make sure the stored signature of an user can't be used by another user locally
         # make sure the log user_id is correct
         # user_1 is linked to partner1
-        self.user_1.sign_signature = b'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYGAAAAAEAAH2FzhVAAAAAElFTkSuQmCC'
+        self.user_1.sign_signature = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYGAAAAAEAAH2FzhVAAAAAElFTkSuQmCC'
         sign_request = self.create_sign_request_1_role(self.partner_1, self.env['res.partner'])
         sign_request_item = sign_request.request_item_ids[0]
         res = sign_request_item.with_user(self.user_2)._get_user_signature(signature_type='sign_signature')
@@ -327,3 +390,77 @@ class TestSignController(TestSignControllerCommon):
         self.assertEqual(create_log.user_id, self.env.user, "The sign request is created by current user")
         self.assertEqual(signature_log.create_uid, self.user_1, "the signature is created by the signing user")
         self.assertEqual(signature_log.user_id, self.user_2, "the signature log user_id is the logged in user")
+
+    def test_delegate_signer_controller(self):
+        sign_request = self.create_sign_request_1_role(self.partner_1, self.env['res.partner'])
+        request_item = sign_request.request_item_ids[0]
+        # Make the role change_authorized to True to allow delegation
+        request_item.role_id.change_authorized = True
+
+        delegate_name = "Delegate User"
+        delegate_email = "delegate.user@example.com"
+
+        self.authenticate(None, None)
+        with self.mock_mail_gateway():
+            result = self._json_url_open(
+                    '/sign/delegate_signing/',
+                    data={
+                        'sign_request_id': sign_request.id,
+                        'request_item_id': request_item.id,
+                        'request_item_token': request_item.access_token,
+                        'delegate_name': delegate_name,
+                        'delegate_email': delegate_email,
+                    }
+                ).json()['result']
+            self.assertTrue(result, "Delegation should be successful")
+            self.assertEqual(request_item.partner_id.email, delegate_email, "The request item's partner should be updated to the delegate's email")
+            self.assertEqual(request_item.partner_id.name, delegate_name, "The request item's partner should be updated to the delegate's name")
+
+            self.assertEqual(len(self._new_mails), 1, "One email should be sent to the delegate")
+            self.assertSentEmail('"OdooBot" <odoobot@example.com>', request_item.partner_id)
+
+    def test_download_partially_signed_document(self):
+        sign_request = self.create_sign_request_2_roles(
+            signer_1=self.partner_1, signer_2=self.partner_2, cc_partners=self.partner_4)
+        signer_1 = sign_request.request_item_ids.filtered(lambda item: item.role_id == self.role_signer_1)
+        signer_1.sign(self.signer_1_sign_values_2_roles)
+        document = sign_request.template_id.document_ids
+        url = '/sign/download/%s/%s/%%s/%s' % (sign_request.id, sign_request.access_token, document.id)
+
+        self.authenticate("user_1", "user_1")
+        partial = self.url_open(url % 'partial').content
+        origin = self.url_open(url % 'origin').content
+        sign_request.invalidate_recordset()
+        self.assertEqual(origin, bytes(document.attachment_id.raw))
+        self.assertTrue(partial.startswith(origin) and partial != origin)
+        self.assertEqual(sign_request.request_document_ids.applied_item_ids, signer_1)
+
+        # a user without the sign group has no business downloading the values of the signers
+        self.authenticate("user_5", "user_5")
+        self.assertEqual(self.url_open(url % 'partial').status_code, 404)
+
+    def test_sign_completed_redirection(self):
+        """ Test that internal users are redirected to the backend when a sign request is completed. """
+        sign_request = self.create_sign_request_1_role(self.partner_1, self.env['res.partner'])
+        sign_request_item = sign_request.request_item_ids[0]
+        sign_vals = self.create_sign_values(sign_request.template_id.sign_item_ids, sign_request_item.role_id.id)
+        sign_request_item._sign(sign_vals)
+        url = '/sign/document/%s/%s' % (sign_request.id, sign_request_item.access_token)
+
+        # Test redirection for a logged-in user with a sign.group_sign_user
+        self.authenticate("user_1", "user_1")
+        response = self.url_open(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(f'/odoo/sign.request/{sign_request.id}/action-sign.Document' in response.url)
+
+        # Test no redirection for a public user
+        self.authenticate(None, None)
+        response = self.url_open(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse('/odoo/sign.request/' in response.url)
+
+        # Test no redirection for an internal user without sign.group_sign_user
+        self.authenticate("user_5", "user_5")
+        response = self.url_open(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse('/odoo/sign.request/' in response.url)

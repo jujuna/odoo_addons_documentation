@@ -1,22 +1,36 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { click, leave, queryAll, queryAllTexts, queryFirst, queryOne } from "@odoo/hoot-dom";
-import { animationFrame, mockDate, runAllTimers } from "@odoo/hoot-mock";
-import { contains, defineParams, onRpc } from "@web/../tests/web_test_helpers";
+import {
+    click,
+    drag,
+    leave,
+    queryAll,
+    queryAllTexts,
+    queryFirst,
+    queryOne,
+    scroll,
+    waitFor,
+} from "@odoo/hoot-dom";
+import { advanceFrame, animationFrame, mockDate, runAllTimers } from "@odoo/hoot-mock";
+import { contains, defineParams, onRpc, patchWithCleanup } from "@web/../tests/web_test_helpers";
 import { Tasks, defineGanttModels } from "./gantt_mock_models";
 import {
     SELECTORS,
     clickCell,
     dragPill,
+    dragToSchedule,
     getCell,
     getCellColorProperties,
     getGridContent,
     getPill,
+    getPillBuffer,
     getPillWrapper,
     hoverGridCell,
+    hoverPillCell,
     mountGanttView,
     resizePill,
     setCellParts,
 } from "./web_gantt_test_helpers";
+import { Domain } from "@web/core/domain";
 
 describe.current.tags("desktop");
 
@@ -73,9 +87,9 @@ test("edit attribute", async () => {
                 {
                     title: "Task 5",
                     level: 0,
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
+                    colSpan: "Out of bounds (1)  -> 04 (1/2) December 2018",
                 },
-                { title: "Task 1", level: 1, colSpan: "01 December 2018 -> Out of bounds (63) " },
+                { title: "Task 1", level: 1, colSpan: "Out of bounds (1)  -> 31 December 2018" },
                 {
                     title: "Task 2",
                     level: 0,
@@ -91,12 +105,14 @@ test("edit attribute", async () => {
                     level: 2,
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
                 },
-                { title: "Task 3", level: 0, colSpan: "27 December 2018 -> Out of bounds (68) " },
+                { title: "Task 3", level: 0, colSpan: "27 December 2018 -> 03 (1/2) January 2019" },
             ],
         },
     ]);
 
     await contains(getPill("Task 1")).click();
+    await runAllTimers();
+    await waitFor(".o_popover");
     expect(`.o_popover button.btn-primary`).toHaveText(/view/i);
     await contains(`.o_popover button.btn-primary`).click();
     expect(".modal .o_form_readonly").toHaveCount(1);
@@ -115,9 +131,9 @@ test("total_row attribute", async () => {
                 {
                     title: "Task 5",
                     level: 0,
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
+                    colSpan: "Out of bounds (1)  -> 04 (1/2) December 2018",
                 },
-                { title: "Task 1", level: 1, colSpan: "01 December 2018 -> Out of bounds (63) " },
+                { title: "Task 1", level: 1, colSpan: "Out of bounds (1)  -> 31 December 2018" },
                 {
                     title: "Task 2",
                     level: 0,
@@ -133,14 +149,14 @@ test("total_row attribute", async () => {
                     level: 2,
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
                 },
-                { title: "Task 3", level: 0, colSpan: "27 December 2018 -> Out of bounds (68) " },
+                { title: "Task 3", level: 0, colSpan: "27 December 2018 -> 03 (1/2) January 2019" },
             ],
         },
         {
             isTotalRow: true,
             pills: [
                 {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
+                    colSpan: "Out of bounds (1)  -> 04 (1/2) December 2018",
                     level: 0,
                     title: "2",
                 },
@@ -175,9 +191,14 @@ test("total_row attribute", async () => {
                     title: "1",
                 },
                 {
-                    colSpan: "27 December 2018 -> Out of bounds (63) ",
+                    colSpan: "27 December 2018 -> 31 December 2018",
                     level: 0,
                     title: "2",
+                },
+                {
+                    colSpan: "01 January 2019 -> 03 (1/2) January 2019",
+                    level: 0,
+                    title: "1",
                 },
             ],
         },
@@ -201,7 +222,7 @@ test("default_range omitted, scales provided", async () => {
     });
     const { columnHeaders, range } = getGridContent();
     expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(columnHeaders).toHaveLength(9);
+    expect(columnHeaders).toHaveLength(10);
 
     await contains(SELECTORS.scaleSelectorToggler).click();
     await animationFrame();
@@ -220,7 +241,7 @@ test("scales attribute", async () => {
     });
     const { columnHeaders, range } = getGridContent();
     expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(columnHeaders).toHaveLength(29);
+    expect(columnHeaders).toHaveLength(32);
 
     await contains(SELECTORS.scaleSelectorToggler).click();
     await animationFrame();
@@ -263,7 +284,7 @@ test("precision attribute ('day': 'hour:quarter')", async () => {
     expect.verifySteps([[[7], { stop: "2018-12-20 18:44:59" }]]);
 
     const { moveTo, drop } = await dragPill("Task 7");
-    await moveTo({ columnHeader: "12pm", groupHeader: "December 20, 2018", part: 4 });
+    await moveTo({ columnHeader: "12pm", groupHeader: "Thursday, December 20, 2018", part: 4 });
     expect(SELECTORS.startBadge).toHaveText("12:45 PM");
     expect(SELECTORS.stopBadge).toHaveText("6:59 PM");
     expect(SELECTORS.startBadge).toHaveClass("text-danger");
@@ -315,7 +336,7 @@ test("progress attribute", async () => {
         arch: `<gantt string="Tasks" date_start="start" date_stop="stop" progress="progress"/>`,
         groupBy: ["project_id"],
     });
-    expect(`${SELECTORS.pill} .o_gantt_progress`).toHaveCount(4);
+    expect(`${SELECTORS.pill} .o_gantt_progress`).toHaveCount(3);
     expect(
         queryAll(SELECTORS.pill).map((el) => ({
             text: el.innerText,
@@ -326,7 +347,6 @@ test("progress attribute", async () => {
         { text: "Task 2", progress: "30%" },
         { text: "Task 4", progress: null },
         { text: "Task 3", progress: "60%" },
-        { text: "Task 5", progress: "100%" },
         { text: "Task 7", progress: "80%" },
     ]);
 });
@@ -371,176 +391,6 @@ test("decoration attribute with date", async () => {
     expect(getPill("Task 3")).not.toHaveClass("decoration-danger");
     expect(getPill("Task 4")).not.toHaveClass("decoration-danger");
     expect(getPill("Task 7")).not.toHaveClass("decoration-danger");
-});
-
-test("consolidation feature", async () => {
-    await mountGanttView({
-        resModel: "tasks",
-        arch: `
-            <gantt
-                date_start="start"
-                date_stop="stop"
-                consolidation="progress"
-                consolidation_max="{'user_id': 100}"
-                consolidation_exclude="exclude"
-                progress="progress"
-            />
-        `,
-        groupBy: ["user_id", "project_id", "stage"],
-    });
-
-    const { rows } = getGridContent();
-    expect(rows).toHaveLength(18);
-    expect(rows.filter((r) => r.isGroup)).toHaveLength(12);
-    expect(".o_gantt_row_headers").toHaveCount(1);
-
-    // Check grouped rows
-    expect(rows[0].isGroup).toBe(true);
-    expect(rows[0].title).toBe("User 1");
-    expect(rows[9].isGroup).toBe(true);
-    expect(rows[9].title).toBe("User 2");
-
-    // Consolidation
-    // 0 over the size of Task 5 (Task 5 is 100 but is excluded!) then 0 over the rest of Task 1, cut by Task 4 which has progress 0
-    expect(rows[0].pills).toEqual([
-        { colSpan: "01 December 2018 -> 04 (1/2) December 2018", title: "0" },
-        { colSpan: "04 (1/2) December 2018 -> 19 December 2018", title: "0" },
-        { colSpan: "20 December 2018 -> 20 (1/2) December 2018", title: "0" },
-        { colSpan: "20 (1/2) December 2018 -> Out of bounds (63) ", title: "0" },
-    ]);
-
-    // 30 over Task 2 until Task 7 then 110 (Task 2 (30) + Task 7 (80)) then 30 again until end of task 2 then 60 over Task 3
-    expect(rows[9].pills).toEqual([
-        { colSpan: "17 (1/2) December 2018 -> 20 (1/2) December 2018", title: "30" },
-        { colSpan: "20 (1/2) December 2018 -> 20 December 2018", title: "110" },
-        { colSpan: "21 December 2018 -> 22 (1/2) December 2018", title: "30" },
-        { colSpan: "27 December 2018 -> Out of bounds (68) ", title: "60" },
-    ]);
-
-    const withStatus = [];
-    for (const el of queryAll(".o_gantt_consolidated_pill")) {
-        if (el.classList.contains("bg-success") || el.classList.contains("bg-danger")) {
-            withStatus.push({
-                title: el.title,
-                danger: el.classList.contains("border-danger"),
-            });
-        }
-    }
-
-    expect(withStatus).toEqual([
-        { title: "0", danger: false },
-        { title: "0", danger: false },
-        { title: "0", danger: false },
-        { title: "0", danger: false },
-        { title: "30", danger: false },
-        { title: "110", danger: true },
-        { title: "30", danger: false },
-        { title: "60", danger: false },
-    ]);
-});
-
-test("consolidation feature (single level)", async () => {
-    Tasks._views.form = `
-        <form>
-            <field name="name"/>
-            <field name="start"/>
-            <field name="stop"/>
-            <field name="project_id"/>
-        </form>
-    `;
-    await mountGanttView({
-        resModel: "tasks",
-        arch: `<gantt date_start="start" date_stop="stop" consolidation="progress" consolidation_max="{'user_id': 100}" consolidation_exclude="exclude"/>`,
-        groupBy: ["user_id"],
-    });
-
-    const { rows, range } = getGridContent();
-    expect(range).toBe("12/01/2018 -> 02/28/2019");
-    expect(SELECTORS.expandButton).toHaveCount(0);
-    expect(SELECTORS.collapseButton).toHaveCount(1);
-    expect(rows).toEqual([
-        {
-            isGroup: true,
-            pills: [
-                { colSpan: "01 December 2018 -> 04 (1/2) December 2018", title: "0" },
-                {
-                    colSpan: "04 (1/2) December 2018 -> 19 December 2018",
-                    title: "0",
-                },
-                {
-                    colSpan: "20 December 2018 -> 20 (1/2) December 2018",
-                    title: "0",
-                },
-                {
-                    colSpan: "20 (1/2) December 2018 -> Out of bounds (63) ",
-                    title: "0",
-                },
-            ],
-            title: "User 1",
-        },
-        {
-            pills: [
-                {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
-                {
-                    colSpan: "01 December 2018 -> Out of bounds (63) ",
-                    level: 1,
-                    title: "Task 1",
-                },
-                {
-                    colSpan: "20 December 2018 -> 20 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 4",
-                },
-            ],
-            title: "",
-        },
-        {
-            isGroup: true,
-            pills: [
-                {
-                    colSpan: "17 (1/2) December 2018 -> 20 (1/2) December 2018",
-                    title: "30",
-                },
-                {
-                    colSpan: "20 (1/2) December 2018 -> 20 December 2018",
-                    title: "110",
-                },
-                {
-                    colSpan: "21 December 2018 -> 22 (1/2) December 2018",
-                    title: "30",
-                },
-                {
-                    colSpan: "27 December 2018 -> Out of bounds (68) ",
-                    title: "60",
-                },
-            ],
-            title: "User 2",
-        },
-        {
-            pills: [
-                {
-                    colSpan: "17 (1/2) December 2018 -> 22 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 2",
-                },
-                {
-                    colSpan: "20 (1/2) December 2018 -> 20 December 2018",
-                    level: 1,
-                    title: "Task 7",
-                },
-                {
-                    colSpan: "27 December 2018 -> Out of bounds (68) ",
-                    level: 0,
-                    title: "Task 3",
-                },
-            ],
-            title: "",
-        },
-    ]);
 });
 
 test("color attribute", async () => {
@@ -634,32 +484,32 @@ test("Today style of group rows", async () => {
     await contains(".o_gantt_header_folded").click();
 
     // Normal group cell: open
-    let cell4 = getCell("Wednesday 19", "Week 51, Dec 16 - Dec 22");
+    let cell4 = getCell("Wednesday 19", "Week 51, Dec 16 - Dec 22", "User 1");
     expect(cell4).not.toHaveClass("o_gantt_today");
     expect(cell4).toHaveClass("o_group_open");
     expect(cell4).toHaveStyle({
-        backgroundImage: "linear-gradient(rgb(249, 250, 251), rgb(234, 237, 241))",
+        backgroundImage: "linear-gradient(rgb(248, 249, 250), rgb(233, 236, 239))",
     });
 
     // Today group cell: open
-    let cell5 = getCell("Thursday 20", "Week 51, Dec 16 - Dec 22");
+    let cell5 = getCell("Thursday 20", "Week 51, Dec 16 - Dec 22", "User 1");
     expect(cell5).toHaveClass("o_gantt_today");
     expect(cell5).toHaveClass("o_group_open");
     expect(cell5).toHaveStyle({
-        backgroundImage: "linear-gradient(rgb(249, 250, 251), rgb(234, 237, 241))",
+        backgroundImage: "linear-gradient(rgb(248, 249, 250), rgb(233, 236, 239))",
     });
-    await contains(SELECTORS.group).click(); // fold group
+    await contains(`${SELECTORS.rowHeader}${SELECTORS.group}:eq(1)`).click(); // fold group ("User 1", after the "Undefined Assign To" group)
     await leave();
     // Normal group cell: closed
-    cell4 = getCell("Wednesday 19", "Week 51, Dec 16 - Dec 22");
+    cell4 = getCell("Wednesday 19", "Week 51, Dec 16 - Dec 22", "User 1");
     expect(cell4).not.toHaveClass("o_gantt_today");
     expect(cell4).not.toHaveClass("o_group_open");
     expect(cell4).toHaveStyle({
-        backgroundImage: "linear-gradient(rgb(234, 237, 241), rgb(249, 250, 251))",
+        backgroundImage: "linear-gradient(rgb(233, 236, 239), rgb(248, 249, 250))",
     });
 
     // Today group cell: closed
-    cell5 = getCell("Thursday 20", "Week 51, Dec 16 - Dec 22");
+    cell5 = getCell("Thursday 20", "Week 51, Dec 16 - Dec 22", "User 1");
     expect(cell5).toHaveClass("o_gantt_today");
     expect(cell5).not.toHaveClass("o_group_open");
     expect(cell5).toHaveStyle({ backgroundImage: "none" });
@@ -680,9 +530,9 @@ test("style without unavailabilities", async () => {
     expect.verifySteps(["get_gantt_data"]);
     const cell5 = getCell("05", "December 2018");
     expect(cell5).toHaveClass("o_gantt_today");
-    expect(cell5).toHaveAttribute("style", "grid-column:c9/c11;grid-row:r1/r5;");
+    expect(cell5).toHaveAttribute("style", "grid-area: r1 / c9 / r5 / c11;");
     const cell6 = getCell("06", "December 2018");
-    expect(cell6).toHaveAttribute("style", "grid-column:c11/c13;grid-row:r1/r5;");
+    expect(cell6).toHaveAttribute("style", "grid-area: r1 / c11 / r5 / c13;");
 });
 
 test(`Unavailabilities ("month": "day:half")`, async () => {
@@ -762,8 +612,8 @@ test(`Unavailabilities ("day": "hours:quarter")`, async () => {
         resModel: "tasks",
         arch: `<gantt date_start="start" date_stop="stop" display_unavailability="1" default_range="day" precision="{'day': 'hours:quarter'}"/>`,
     });
-    await contains(".o_content").scroll({ left: 0 });
-    expect(getCellColorProperties("9am", "December 19, 2018")).toEqual([
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
+    expect(getCellColorProperties("9am", "Wednesday, December 19, 2018")).toEqual([
         "--Gantt__Day-background-color",
         "--Gantt__DayOff-background-color",
         "--Gantt__DayOff-background-color",
@@ -771,7 +621,7 @@ test(`Unavailabilities ("day": "hours:quarter")`, async () => {
         "--Gantt__Day-background-color",
         "--Gantt__Day-background-color",
     ]);
-    expect(getCellColorProperties("11am", "December 19, 2018")).toEqual([
+    expect(getCellColorProperties("11am", "Wednesday, December 19, 2018")).toEqual([
         "--Gantt__Day-background-color",
         "--Gantt__Day-background-color",
         "--Gantt__Day-background-color",
@@ -779,10 +629,10 @@ test(`Unavailabilities ("day": "hours:quarter")`, async () => {
         "--Gantt__Day-background-color",
         "--Gantt__DayOff-background-color",
     ]);
-    expect(getCellColorProperties("12pm", "December 19, 2018")).toEqual([
+    expect(getCellColorProperties("12pm", "Wednesday, December 19, 2018")).toEqual([
         "--Gantt__DayOff-background-color",
     ]);
-    expect(getCellColorProperties("1pm", "December 19, 2018")).toEqual([
+    expect(getCellColorProperties("1pm", "Wednesday, December 19, 2018")).toEqual([
         "--Gantt__DayOff-background-color",
         "--Gantt__Day-background-color",
         "--Gantt__Day-background-color",
@@ -790,7 +640,7 @@ test(`Unavailabilities ("day": "hours:quarter")`, async () => {
         "--Gantt__Day-background-color",
         "--Gantt__Day-background-color",
     ]);
-    expect(getCellColorProperties("9pm", "December 19, 2018")).toEqual([
+    expect(getCellColorProperties("9pm", "Wednesday, December 19, 2018")).toEqual([
         "--Gantt__Day-background-color",
         "--Gantt__DayOff-background-color",
         "--Gantt__DayOff-background-color",
@@ -831,19 +681,19 @@ test(`Fold unavailabilities ("day": "hours:quarter")`, async () => {
         resModel: "tasks",
         arch: `<gantt date_start="start" date_stop="stop" display_unavailability="1" scales="day" default_range="day" precision="{'day': 'hours:quarter'}"/>`,
     });
-    await contains(".o_content").scroll({ left: 0 });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
     const { columnHeaders, groupHeaders } = getGridContent({ setTitleAttrOnHeaders: true });
     expect(columnHeaders).toHaveLength(28);
     expect(groupHeaders).toEqual(
         [
             {
                 range: [1, 97],
-                title: "December 19, 2018",
+                title: "Wednesday, December 19, 2018",
                 titleAttr: "Wednesday, December 19, 2018",
             },
             {
                 range: [97, 193],
-                title: "December 20, 2018",
+                title: "Thursday, December 20, 2018",
                 titleAttr: "Thursday, December 20, 2018",
             },
             {
@@ -884,7 +734,7 @@ test(`Fold unavailabilities ("day": "hours:quarter")`, async () => {
         { range: [165, 169], title: "5pm", titleAttr: "Thursday, December 20, 2018, 5:00 PM" },
         { range: [169, 289], title: "", titleAttr: "" },
     ]);
-    expect(".o_gantt_header_cell .fa-caret-left:visible").toHaveCount(3);
+    expect(".o_gantt_header_cell [data-icon='arrow_left']:visible").toHaveCount(3);
     expect(queryFirst(".o_gantt_cell").offsetWidth).toBe(36, {
         message: "Folded cells have a fixed width of 36px",
     });
@@ -933,6 +783,7 @@ test(`Fold unavailabilities ("week": "day:half")`, async () => {
         },
     ]);
     expect(columnHeaders).toEqual([
+        { range: [9, 11], title: "Thursday 13", titleAttr: "Thursday, December 13, 2018" },
         { range: [11, 13], title: "Friday 14", titleAttr: "Friday, December 14, 2018" },
         { range: [13, 17], title: "", titleAttr: "" },
         { range: [17, 19], title: "Monday 17", titleAttr: "Monday, December 17, 2018" },
@@ -943,9 +794,54 @@ test(`Fold unavailabilities ("week": "day:half")`, async () => {
         { range: [27, 29], title: "Saturday 22", titleAttr: "Saturday, December 22, 2018" },
         { range: [29, 31], title: "Sunday 23", titleAttr: "Sunday, December 23, 2018" },
         { range: [31, 33], title: "Monday 24", titleAttr: "Monday, December 24, 2018" },
-        { range: [33, 35], title: "Tuesday 25", titleAttr: "Tuesday, December 25, 2018" },
     ]);
-    expect(".o_gantt_header_cell .fa-caret-left:visible").toHaveCount(2);
+    expect(".o_gantt_header_cell [data-icon='arrow_left']:visible").toHaveCount(2);
+});
+
+test(`Fold unavailabilities when grouped, with records in the "Undefined" row`, async () => {
+    Tasks._records = [
+        { ...Tasks._records[3], resource_ids: [1] }, // id: 4
+        { ...Tasks._records[6], resource_ids: [] }, // id: 7, lands in the "Undefined Resources" row
+    ];
+    const unavailabilities = [
+        // in utc
+        {
+            start: "2018-12-14 16:00:00",
+            stop: "2018-12-17 07:00:00",
+        },
+        {
+            start: "2018-12-18 16:15:00",
+            stop: "2018-12-20 08:00:00",
+        },
+    ];
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
+        result.unavailabilities.resource_ids = { 1: unavailabilities };
+        return result;
+    });
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop" display_unavailability="1" default_range="week" scales="week" precision="{'week': 'day:half'}"/>`,
+        groupBy: ["resource_ids"],
+    });
+    const { columnHeaders, rows } = getGridContent();
+    expect(rows.map((r) => r.title)).toEqual(["Undefined Resources", "Resource 1"]);
+    // The "Undefined Resources" row has no unavailability of its own: it must
+    // not prevent the columns unavailable for every real resource from folding.
+    expect(columnHeaders.map((c) => c.title)).toEqual([
+        "Thursday 13",
+        "Friday 14",
+        "",
+        "Monday 17",
+        "Tuesday 18",
+        "",
+        "Thursday 20",
+        "Friday 21",
+        "Saturday 22",
+        "Sunday 23",
+        "Monday 24",
+    ]);
+    expect(".o_gantt_header_cell [data-icon='arrow_left']:visible").toHaveCount(2);
 });
 
 test(`Fold unavailabilities ("month": "day:half")`, async () => {
@@ -971,7 +867,7 @@ test(`Fold unavailabilities ("month": "day:half")`, async () => {
         resModel: "tasks",
         arch: `<gantt date_start="start" date_stop="stop" display_unavailability="1" default_range="month" scales="month" precision="{'month': 'day:half'}"/>`,
     });
-    await contains(".o_content").scroll({ left: 0 });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
     const { columnHeaders, groupHeaders } = getGridContent({ setTitleAttrOnHeaders: true });
     expect(columnHeaders).toHaveLength(30);
     expect(groupHeaders).toEqual([
@@ -1018,7 +914,7 @@ test(`Fold unavailabilities ("month": "day:half")`, async () => {
         { range: [75, 77], title: "08", titleAttr: "Saturday, December 8, 2018" },
         { range: [77, 79], title: "09", titleAttr: "Sunday, December 9, 2018" },
     ]);
-    expect(".o_gantt_header_cell .fa-caret-left:visible").toHaveCount(2);
+    expect(".o_gantt_header_cell [data-icon='arrow_left']:visible").toHaveCount(2);
     const cell1 = queryFirst(".o_gantt_cell");
     const cell2 = queryOne(".o_gantt_cell:eq(1)");
     expect(Math.abs(cell1.clientWidth - cell2.clientWidth)).toBeLessThan(4, {
@@ -1055,8 +951,8 @@ test(`Fold unavailabilities with multiple rows`, async () => {
     });
     const { columnHeaders, groupHeaders } = getGridContent();
     expect(groupHeaders).toEqual([
-        { range: [1, 97], title: "December 19, 2018" },
-        { range: [97, 193], title: "December 20, 2018" },
+        { range: [1, 97], title: "Wednesday, December 19, 2018" },
+        { range: [97, 193], title: "Thursday, December 20, 2018" },
         { range: [193, 289], title: "" },
     ]);
     expect(columnHeaders).toEqual([
@@ -1127,7 +1023,7 @@ test(`Partial fold/unfold in gantt`, async () => {
         arch: `<gantt date_start="start" date_stop="stop" display_unavailability="1" default_range="day" scales="day" precision="{'day': 'hours:quarter'}"/>`,
     });
     setCellParts(4);
-    await contains(".o_content").scroll({ left: 0 });
+    await contains(".o_gantt_scroll_container").scroll({ left: 0 });
     let { columnHeaders, rows } = getGridContent();
     expect(columnHeaders).toHaveLength(28);
     expect(columnHeaders[11]).toEqual({
@@ -1136,7 +1032,7 @@ test(`Partial fold/unfold in gantt`, async () => {
     });
     expect(rows[0].pills[0]).toEqual({
         title: "Task 4",
-        colSpan: "3am (2/4) December 20, 2018 -> 7am (2/4) December 20, 2018",
+        colSpan: "3am (2/4) Thursday, December 20, 2018 -> 7am (2/4) Thursday, December 20, 2018",
         level: 0,
     });
     await contains(".o_gantt_cell:eq(11)").click();
@@ -1168,7 +1064,7 @@ test(`Partial fold/unfold in gantt`, async () => {
         title: "",
     });
     const { drop } = await dragPill("Task 4");
-    await drop({ columnHeader: "5pm", groupHeader: "December 19, 2018", part: 4 });
+    await drop({ columnHeader: "5pm", groupHeader: "Wednesday, December 19, 2018", part: 4 });
     ({ columnHeaders, rows } = getGridContent());
     expect(columnHeaders).toHaveLength(39);
     expect(columnHeaders[18]).toEqual({
@@ -1181,7 +1077,7 @@ test(`Partial fold/unfold in gantt`, async () => {
     });
     expect(rows[0].pills[0]).toEqual({
         title: "Task 4",
-        colSpan: "5pm (3/4) December 19, 2018 -> 9pm (3/4) December 19, 2018",
+        colSpan: "5pm (3/4) Wednesday, December 19, 2018 -> 9pm (3/4) Wednesday, December 19, 2018",
         level: 0,
     });
     await resizePill(getPillWrapper("Task 4"), "end", +1); // wrong but we don't want to rewrite helpers for this
@@ -1193,7 +1089,7 @@ test(`Partial fold/unfold in gantt`, async () => {
     });
     expect(rows[0].pills[0]).toEqual({
         title: "Task 4",
-        colSpan: "5pm (3/4) December 19, 2018 -> 3am December 20, 2018",
+        colSpan: "5pm (3/4) Wednesday, December 19, 2018 -> 3am Thursday, December 20, 2018",
         level: 0,
     });
 });
@@ -1227,8 +1123,8 @@ test(`Full unavailabilities period`, async () => {
     await contains(SELECTORS.cell).click();
     const { columnHeaders, groupHeaders } = getGridContent();
     expect(groupHeaders).toEqual([
-        { range: [1, 97], title: "December 19, 2018" },
-        { range: [97, 193], title: "December 20, 2018" },
+        { range: [1, 97], title: "Wednesday, December 19, 2018" },
+        { range: [97, 193], title: "Thursday, December 20, 2018" },
     ]);
     expect(columnHeaders).toEqual([
         { range: [1, 5], title: "12am" },
@@ -1283,15 +1179,13 @@ test("default_group_by attribute", async () => {
     const { rows } = getGridContent();
     expect(rows).toEqual([
         {
+            title: "Undefined Assign To",
+        },
+        {
             title: "User 1",
             pills: [
                 {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
-                {
-                    colSpan: "01 December 2018 -> Out of bounds (63) ",
+                    colSpan: "Out of bounds (1)  -> 31 December 2018",
                     level: 1,
                     title: "Task 1",
                 },
@@ -1316,7 +1210,7 @@ test("default_group_by attribute", async () => {
                     title: "Task 7",
                 },
                 {
-                    colSpan: "27 December 2018 -> Out of bounds (68) ",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
                     level: 0,
                     title: "Task 3",
                 },
@@ -1337,10 +1231,13 @@ test("default_group_by attribute with groupBy", async () => {
     const { rows } = getGridContent();
     expect(rows).toEqual([
         {
+            title: "Undefined Project",
+        },
+        {
             title: "Project 1",
             pills: [
                 {
-                    colSpan: "01 December 2018 -> Out of bounds (63) ",
+                    colSpan: "Out of bounds (1)  -> 31 December 2018",
                     level: 0,
                     title: "Task 1",
                 },
@@ -1355,7 +1252,7 @@ test("default_group_by attribute with groupBy", async () => {
                     title: "Task 4",
                 },
                 {
-                    colSpan: "27 December 2018 -> Out of bounds (68) ",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
                     level: 1,
                     title: "Task 3",
                 },
@@ -1364,11 +1261,6 @@ test("default_group_by attribute with groupBy", async () => {
         {
             title: "Project 2",
             pills: [
-                {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
                 {
                     colSpan: "20 (1/2) December 2018 -> 20 December 2018",
                     level: 0,
@@ -1390,15 +1282,18 @@ test("default_group_by attribute with 2 fields", async () => {
     const { rows } = getGridContent();
     expect(rows).toEqual([
         {
+            isGroup: true,
+            title: "Undefined Assign To",
+        },
+        {
+            title: "Undefined Project",
+        },
+        {
             title: "User 1",
             isGroup: true,
             pills: [
                 {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    title: "2",
-                },
-                {
-                    colSpan: "04 (1/2) December 2018 -> 19 December 2018",
+                    colSpan: "Out of bounds (8)  -> 19 December 2018",
                     title: "1",
                 },
                 {
@@ -1406,7 +1301,7 @@ test("default_group_by attribute with 2 fields", async () => {
                     title: "2",
                 },
                 {
-                    colSpan: "20 (1/2) December 2018 -> Out of bounds (63) ",
+                    colSpan: "20 (1/2) December 2018 -> 31 December 2018",
                     title: "1",
                 },
             ],
@@ -1415,7 +1310,7 @@ test("default_group_by attribute with 2 fields", async () => {
             title: "Project 1",
             pills: [
                 {
-                    colSpan: "01 December 2018 -> Out of bounds (63) ",
+                    colSpan: "Out of bounds (1)  -> 31 December 2018",
                     level: 0,
                     title: "Task 1",
                 },
@@ -1427,13 +1322,6 @@ test("default_group_by attribute with 2 fields", async () => {
             ],
         },
         {
-            pills: [
-                {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
-                    level: 0,
-                    title: "Task 5",
-                },
-            ],
             title: "Project 2",
         },
         {
@@ -1453,7 +1341,7 @@ test("default_group_by attribute with 2 fields", async () => {
                     title: "1",
                 },
                 {
-                    colSpan: "27 December 2018 -> Out of bounds (68) ",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
                     title: "1",
                 },
             ],
@@ -1467,7 +1355,7 @@ test("default_group_by attribute with 2 fields", async () => {
                     title: "Task 2",
                 },
                 {
-                    colSpan: "27 December 2018 -> Out of bounds (68) ",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
                     level: 0,
                     title: "Task 3",
                 },
@@ -1501,54 +1389,6 @@ test("default_range attribute", async () => {
     expect(firstRangeMenuItem).toHaveText("Day");
 });
 
-test("consolidation and unavailabilities", async () => {
-    const unavailabilities = [
-        {
-            start: "2018-12-18 10:00:00",
-            stop: "2018-12-20 14:00:00",
-        },
-    ];
-    onRpc("get_gantt_data", ({ parent, kwargs }) => {
-        expect.step("get_gantt_data");
-        const result = parent();
-        expect(kwargs.unavailability_fields).toEqual(["user_id"]);
-        result.unavailabilities.user_id = { 1: unavailabilities };
-        return result;
-    });
-    await mountGanttView({
-        resModel: "tasks",
-        arch: `
-            <gantt
-                date_start="start"
-                date_stop="stop"
-                consolidation="progress"
-                consolidation_max="{'user_id': 100}"
-                consolidation_exclude="exclude"
-                display_unavailability="1"
-            />
-        `,
-        groupBy: ["user_id"],
-    });
-    expect.verifySteps(["get_gantt_data"]);
-    // Normal day / unavailability
-    expect(getCellColorProperties("18", "December 2018", "", { num: 2 })).toEqual([
-        "--Gantt__Day-background-color",
-        "--Gantt__DayOff-background-color",
-    ]);
-
-    // Full unavailability
-    expect(getCellColorProperties("19", "December 2018", "", { num: 2 })).toEqual([
-        "--Gantt__DayOff-background-color",
-    ]);
-
-    // Unavailability / today
-    expect(getCell("20", "December 2018")).toHaveClass("o_gantt_today");
-    expect(getCellColorProperties("20", "December 2018", "", { num: 2 })).toEqual([
-        "--Gantt__DayOff-background-color",
-        "--Gantt__DayOffToday-background-color",
-    ]);
-});
-
 test("default_range not in scales", async () => {
     await mountGanttView({
         resModel: "tasks",
@@ -1567,93 +1407,9 @@ test("default_range not in scales", async () => {
     ]);
 });
 
-test("kanban_view_id attribute", async () => {
-    Tasks._views["kanban,42"] = `
-        <kanban>
-            <templates>
-                <t t-name="card">
-                    Allocated Hours: <field name="allocated_hours"/>
-                </t>
-            </templates>
-        </kanban>
-    `;
-    await mountGanttView({
-        resModel: "tasks",
-        arch: `<gantt date_start="start" date_stop="stop" kanban_view_id="42"/>`,
-    });
-    expect(`.o_popover`).toHaveCount(0);
-    await contains(SELECTORS.pill).click();
-    expect(`.o_popover`).toHaveCount(1);
-    expect(`.o_popover .popover-header`).toHaveCount(0);
-    await contains(`.o_popover .popover-footer i.fa.fa-close`).click();
-    expect(`.o_popover`).toHaveCount(0);
-});
-
-test("template in arch get favors vs kanban_view_id attribute", async () => {
-    Tasks._views["kanban,42"] = `
-        <kanban>
-            <templates>
-                <t t-name="card">
-                    Allocated Hours: <field name="allocated_hours"/>
-                </t>
-            </templates>
-        </kanban>
-    `;
-    await mountGanttView({
-        resModel: "tasks",
-        arch: `
-            <gantt date_start="start" date_stop="stop" kanban_view_id="42">
-                <templates>
-                    <t t-name="gantt-popover">
-                        <div t-esc="display_name"/>
-                    </t>
-                </templates>
-            </gantt>
-        `,
-    });
-    expect(`.o_popover`).toHaveCount(0);
-    await contains(SELECTORS.pill).click();
-    expect(`.o_popover`).toHaveCount(1);
-    expect(`.o_popover .popover-body .o_kanban_record`).toHaveCount(0);
-    expect(`.o_popover .popover-header`).toHaveText("Task 5");
-    expect(`.o_popover .popover-body div`).toHaveText("Task 5");
-    expect(`.o_popover .popover-footer i.fa.fa-close`).toHaveCount(0);
-    await contains(`.o_popover .popover-header i.fa.fa-close`).click();
-    expect(`.o_popover`).toHaveCount(0);
-});
-
-test("if kanban_view_id attribute is not set, kanban view id is retrieved from config", async () => {
-    Tasks._views.kanban = `
-        <kanban>
-            <templates>
-                <t t-name="card">
-                    Allocated Hours: <field name="allocated_hours"/>
-                </t>
-            </templates>
-        </kanban>
-    `;
-    await mountGanttView({
-        resModel: "tasks",
-        arch: `<gantt date_start="start" date_stop="stop"/>`,
-        config: {
-            views: [
-                [false, "kanban"],
-                [false, "gantt"],
-            ],
-        },
-    });
-    expect(`.o_popover`).toHaveCount(0);
-    await contains(SELECTORS.pill).click();
-    expect(`.o_popover`).toHaveCount(1);
-    expect(`.o_popover .popover-header`).toHaveCount(0);
-    expect(`.o_popover .popover-body .o_kanban_record`).toHaveText("Allocated Hours:\n0.00");
-    await contains(`.o_popover .popover-footer i.fa.fa-close`).click();
-    expect(`.o_popover`).toHaveCount(0);
-});
-
-test("verifies context-driven text visibility in Kanban view", async () => {
-    Tasks._views.kanban = `
-        <kanban>
+test("verifies context-driven text visibility in card", async () => {
+    Tasks._views["card,23"] = `
+        <card>
             <templates>
                 <t t-name="card">
                     Allocated Hours: <field name="allocated_hours"/>
@@ -1661,22 +1417,415 @@ test("verifies context-driven text visibility in Kanban view", async () => {
                     <div invisible="context.get('isTaskNameHidden')">Test 5</div>
                 </t>
             </templates>
-        </kanban>
+        </card>
     `;
 
     await mountGanttView({
         resModel: "tasks",
-        arch: `<gantt date_start="start" date_stop="stop"/>`,
-        config: {
-            views: [
-                [false, "kanban"],
-                [false, "gantt"],
-            ],
-        },
+        arch: `<gantt date_start="start" date_stop="stop"><popover card_id="23"/></gantt>`,
         context: { isTaskNameHidden: true, isProjectNameHidden: false },
     });
     await contains(SELECTORS.pill).click();
-    expect(`.o_popover .popover-body .o_kanban_record`).toHaveText(
-        "Allocated Hours:\n0.00\nProject A"
-    );
+    await runAllTimers();
+    await waitFor(`.o_popover`);
+    expect(`.o_popover .o_popover_body`).toHaveText("Allocated Hours:\n0.00\nProject A");
+});
+
+test("side panel to schedule", async () => {
+    Tasks._records[0].start = false;
+    Tasks._records[0].stop = false;
+    onRpc(({ method }) => {
+        expect.step(method);
+    });
+    onRpc("write", ({ args, kwargs }) => {
+        expect(args).toEqual([
+            [1],
+            {
+                project_id: 1,
+                start: "2018-12-13 23:00:00",
+                stop: "2018-12-14 23:00:00",
+            },
+        ]);
+        expect(kwargs.context.from_custom_context).toBe(true);
+    });
+    onRpc("web_search_read", ({ kwargs }) => {
+        expect(kwargs.domain).toEqual(["&", ["start", "=", false], ["stop", "=", false]]);
+        expect(kwargs.limit).toBe(20);
+        expect(kwargs.specification).toEqual({ display_name: {} });
+    });
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" schedule="1"/>`,
+        groupBy: ["project_id"],
+        context: { from_custom_context: true },
+    });
+    let { range, viewTitle, columnHeaders, rows } = getGridContent();
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
+    expect(viewTitle).toBe("Tasks");
+    expect(columnHeaders).toHaveLength(33);
+    expect(rows).toEqual([
+        {
+            title: "Undefined Project",
+        },
+        {
+            title: "Project 1",
+            pills: [
+                {
+                    title: "Task 2",
+                    colSpan: "17 (1/2) December 2018 -> 22 (1/2) December 2018",
+                    level: 0,
+                },
+                {
+                    title: "Task 4",
+                    colSpan: "20 December 2018 -> 20 (1/2) December 2018",
+                    level: 1,
+                },
+                {
+                    title: "Task 3",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
+                    level: 0,
+                },
+            ],
+        },
+        {
+            title: "Project 2",
+            pills: [
+                {
+                    title: "Task 7",
+                    colSpan: "20 (1/2) December 2018 -> 20 December 2018",
+                    level: 0,
+                },
+            ],
+        },
+    ]);
+    expect(SELECTORS.sidePanel).toHaveCount(1);
+    expect(SELECTORS.sidePanel).toHaveText("1 to schedule\nTask 1");
+    expect.verifySteps(["get_views", "get_gantt_data", "web_search_read"]);
+    const { moveTo, drop } = await dragToSchedule("Task 1");
+    await moveTo({ columnHeader: "14", groupHeader: "December 2018", row: "Project 1" });
+    expect(SELECTORS.startBadge).toHaveText("12/14/2018, 12:00 AM");
+    expect(SELECTORS.stopBadge).toHaveText("12/15/2018, 12:00 AM");
+    await drop();
+    expect.verifySteps(["write", "get_gantt_data", "web_search_read"]);
+    ({ range, viewTitle, columnHeaders, rows } = getGridContent());
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
+    expect(viewTitle).toBe("Tasks");
+    expect(columnHeaders).toHaveLength(33);
+    expect(rows).toEqual([
+        {
+            title: "Undefined Project",
+        },
+        {
+            title: "Project 1",
+            pills: [
+                {
+                    title: "Task 1",
+                    colSpan: "14 December 2018 -> 14 December 2018",
+                    level: 0,
+                },
+                {
+                    title: "Task 2",
+                    colSpan: "17 (1/2) December 2018 -> 22 (1/2) December 2018",
+                    level: 0,
+                },
+                {
+                    title: "Task 4",
+                    colSpan: "20 December 2018 -> 20 (1/2) December 2018",
+                    level: 1,
+                },
+                {
+                    title: "Task 3",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
+                    level: 0,
+                },
+            ],
+        },
+        {
+            title: "Project 2",
+            pills: [
+                {
+                    title: "Task 7",
+                    colSpan: "20 (1/2) December 2018 -> 20 December 2018",
+                    level: 0,
+                },
+            ],
+        },
+    ]);
+    expect(SELECTORS.sidePanel).toHaveText("Nothing to schedule");
+});
+
+test("side panel: event can be dragged and scheduled by its name", async () => {
+    Tasks._records[0].start = false;
+    Tasks._records[0].stop = false;
+
+    onRpc("write", ({ args }) => {
+        expect.step("write");
+        expect(args[0]).toEqual([1]);
+    });
+
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" schedule="1"/>`,
+        groupBy: ["project_id"],
+    });
+
+    expect(SELECTORS.sidePanel).toHaveText("1 to schedule\nTask 1");
+
+    // Drag by clicking the event NAME (span).
+    const nameEl = queryFirst(`${SELECTORS.eventToSchedule}:contains(Task 1) span`);
+    const dragActions = await contains(nameEl).drag();
+    const cell = await hoverGridCell("14", "December 2018", "Project 1");
+    await dragActions.moveTo(cell, { position: { x: 1 }, relative: true });
+    await dragActions.drop();
+
+    expect.verifySteps(["write"]);
+    expect(SELECTORS.sidePanel).toHaveText("Nothing to schedule");
+});
+
+test("side panel to unschedule", async () => {
+    Tasks._records[0].start = false;
+    Tasks._records[0].stop = false;
+    onRpc(({ method }) => {
+        expect.step(method);
+    });
+    onRpc("write", ({ args, kwargs }) => {
+        expect(args).toEqual([
+            [2],
+            {
+                start: false,
+                stop: false,
+            },
+        ]);
+        expect(kwargs.context.from_custom_context).toBe(true);
+    });
+    onRpc("web_search_read", ({ kwargs }) => {
+        expect(kwargs.domain).toEqual(["&", ["start", "=", false], ["stop", "=", false]]);
+        expect(kwargs.limit).toBe(20);
+        expect(kwargs.specification).toEqual({ display_name: {} });
+    });
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" schedule="1"/>`,
+        groupBy: ["project_id"],
+        context: { from_custom_context: true },
+    });
+    let { range, viewTitle, columnHeaders, rows } = getGridContent();
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
+    expect(viewTitle).toBe("Tasks");
+    expect(columnHeaders).toHaveLength(33);
+    expect(rows).toEqual([
+        {
+            title: "Undefined Project",
+        },
+        {
+            title: "Project 1",
+            pills: [
+                {
+                    title: "Task 2",
+                    colSpan: "17 (1/2) December 2018 -> 22 (1/2) December 2018",
+                    level: 0,
+                },
+                {
+                    title: "Task 4",
+                    colSpan: "20 December 2018 -> 20 (1/2) December 2018",
+                    level: 1,
+                },
+                {
+                    title: "Task 3",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
+                    level: 0,
+                },
+            ],
+        },
+        {
+            title: "Project 2",
+            pills: [
+                {
+                    title: "Task 7",
+                    colSpan: "20 (1/2) December 2018 -> 20 December 2018",
+                    level: 0,
+                },
+            ],
+        },
+    ]);
+    expect(SELECTORS.sidePanel).toHaveCount(1);
+    expect(SELECTORS.sidePanel).toHaveText("1 to schedule\nTask 1");
+    expect.verifySteps(["get_views", "get_gantt_data", "web_search_read"]);
+    const { moveTo, drop } = await dragPill("Task 2");
+    await animationFrame();
+    expect(SELECTORS.unscheduleZone).toHaveCount(1);
+    expect(SELECTORS.unscheduleZone).toHaveText("Drop here to unschedule");
+    await moveTo({ unschedule: true });
+    await drop();
+    expect.verifySteps(["write", "get_gantt_data", "web_search_read"]);
+    ({ range, viewTitle, columnHeaders, rows } = getGridContent());
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
+    expect(viewTitle).toBe("Tasks");
+    expect(columnHeaders).toHaveLength(33);
+    expect(rows).toEqual([
+        {
+            title: "Undefined Project",
+        },
+        {
+            title: "Project 1",
+            pills: [
+                {
+                    title: "Task 4",
+                    colSpan: "20 December 2018 -> 20 (1/2) December 2018",
+                    level: 0,
+                },
+                {
+                    title: "Task 3",
+                    colSpan: "27 December 2018 -> 03 (1/2) January 2019",
+                    level: 0,
+                },
+            ],
+        },
+        {
+            title: "Project 2",
+            pills: [
+                {
+                    title: "Task 7",
+                    colSpan: "20 (1/2) December 2018 -> 20 December 2018",
+                    level: 0,
+                },
+            ],
+        },
+    ]);
+    expect(SELECTORS.sidePanel).toHaveText("2 to schedule\nTask 1\nTask 2");
+});
+
+test("gantt sidepanel can be collapsed/expanded", async () => {
+    patchWithCleanup(localStorage, {
+        setItem(key, value) {
+            if (key.startsWith("gantt_sidepanel_expanded")) {
+                expect.step(["setItem", key, value]);
+            }
+            super.setItem(...arguments);
+        },
+    });
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" schedule="1"/>`,
+        groupBy: ["project_id"],
+    });
+    expect(SELECTORS.sidePanel).toHaveText("Nothing to schedule");
+    expect(SELECTORS.sidePanel).toHaveCount(1);
+    await contains(SELECTORS.sideBarToggler).click();
+    expect(SELECTORS.sidePanel).toHaveCount(0);
+    expect(SELECTORS.sideBarController).toHaveText("Nothing to schedule");
+    expect.verifySteps([["setItem", "gantt_sidepanel_expanded,-1,false", false]]);
+    await contains(SELECTORS.sideBarToggler).click();
+    expect(SELECTORS.sidePanel).toHaveText("Nothing to schedule");
+    expect(SELECTORS.sidePanel).toHaveCount(1);
+    expect.verifySteps([["setItem", "gantt_sidepanel_expanded,-1,false", true]]);
+});
+
+test("gantt sidepanel can be collapsed by default if it was set in local storage beforehand", async () => {
+    localStorage.setItem("gantt_sidepanel_expanded,-1,false", false);
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" schedule="1"/>`,
+        groupBy: ["project_id"],
+    });
+    expect(SELECTORS.sidePanel).toHaveCount(0);
+    expect(SELECTORS.sideBarController).toHaveText("Nothing to schedule");
+});
+
+test("gantt sidepanel can be resized", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" schedule="1"/>`,
+        groupBy: ["project_id"],
+    });
+    const sidePanel = queryFirst(SELECTORS.sidePanel);
+    const resizeHandle = queryFirst(".o_gantt_sidepanel_resize");
+    const originalWidth = sidePanel.offsetWidth;
+
+    const { drop } = await drag(resizeHandle);
+    await drop(resizeHandle, { position: { x: 500 } });
+    expect(sidePanel.offsetWidth).toBeGreaterThan(originalWidth);
+});
+
+test("edge scrolling is disabled while side panel is expanded", async () => {
+    /**
+     * @param {string} selector
+     * @param {{ x?: number; y?: number }} position
+     * @param {() => any} callback
+     */
+    const dragAndExpect = async (selector, position, callback) => {
+        const { drop, moveTo } = await contains(selector).drag();
+        await moveTo({ position });
+        // Wait for the edge scrolling to scroll to the end
+        await advanceFrame(50);
+        callback();
+        await drop();
+    };
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" schedule="1"/>`,
+        groupBy: ["user_id", "project_id", "stage"],
+    });
+    await scroll(".o_gantt_scroll_container", { left: 300 });
+    let pill = getPillWrapper("Task 2");
+    await hoverPillCell(pill);
+    await dragAndExpect(pill, { x: 0 }, () => {
+        expect(".o_gantt_scroll_container").toHaveProperty("scrollLeft", 300, {
+            message: "Should have stayed still because side panel is expanded",
+        });
+    });
+    await contains(SELECTORS.sideBarToggler).click();
+    pill = getPillWrapper("Task 2");
+    await hoverPillCell(pill);
+    await dragAndExpect(pill, { x: 0 }, () => {
+        expect(".o_gantt_scroll_container").toHaveProperty("scrollLeft", 0, {
+            message: "Should have reached 0 since side panel is collapsed",
+        });
+    });
+});
+
+test("gantt side panel hidden by default in sample mode", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" schedule="1" sample="1"/>`,
+        groupBy: ["project_id"],
+        domain: Domain.FALSE.toList(),
+    });
+    expect(".o_view_nocontent").toHaveCount(1);
+    expect(SELECTORS.sidePanel).toHaveCount(0, {
+        message: "The side panel should be hidden in sample mode",
+    });
+});
+
+test("buffer attributes", async () => {
+    Tasks._records[1].buffer_start = 40.0;
+    Tasks._records[1].buffer_stop = 8.0;
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" buffer_start="buffer_start" buffer_stop="buffer_stop"/>`,
+        groupBy: ["project_id"],
+    });
+    expect(getPillWrapper("Task 2")).toHaveStyle({ gridColumn: "c34 / c44", gridRow: "r4 / r5" });
+    expect(getPillBuffer("Task 2")).toHaveStyle({ gridColumn: "c31 / c45", gridRow: "r4 / r5" });
+});
+
+test("pill buffers disappear on pill drag/resize", async () => {
+    Tasks._records[1].buffer_start = 40.0;
+    Tasks._records[1].buffer_stop = 8.0;
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt string="Tasks" date_start="start" date_stop="stop" buffer_start="buffer_start" buffer_stop="buffer_stop"/>`,
+        groupBy: ["project_id"],
+    });
+    const pillBuffer = getPillBuffer("Task 2");
+    expect(pillBuffer).toBeVisible();
+    const { moveTo, drop } = await dragPill("Task 2");
+    await moveTo({ columnHeader: "16", groupHeader: "December 2018" });
+    expect(pillBuffer).not.toBeVisible();
+    await drop();
+    expect(getPillBuffer("Task 2")).toBeVisible();
+    const dropHandle = await resizePill(getPillWrapper("Task 2"), "end", 2, false);
+    expect(getPillBuffer("Task 2")).not.toBeVisible();
+    await dropHandle();
+    expect(getPillBuffer("Task 2")).toBeVisible();
 });

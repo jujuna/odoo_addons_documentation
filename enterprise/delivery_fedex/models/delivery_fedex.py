@@ -247,7 +247,7 @@ class DeliveryCarrier(models.Model):
                 srm.customs_value(_convert_curr_iso_fdx(order_currency.name), total_commodities_amount, "NON_DOCUMENTS")
                 srm.duties_payment(order.warehouse_id.partner_id, superself.fedex_account_number, superself.fedex_duty_payment)
 
-                send_etd = superself.env['ir.config_parameter'].get_param("delivery_fedex.send_etd")
+                send_etd = superself.env['ir.config_parameter'].get_bool("delivery_fedex.send_etd")
                 srm.commercial_invoice(self.fedex_document_stock_type, send_etd)
 
             package_count = len(picking.move_line_ids.result_package_id) or 1
@@ -459,7 +459,7 @@ class DeliveryCarrier(models.Model):
         fdx_currency = _convert_curr_iso_fdx(company.currency_id.name)
         if fdx_currency in req_price:
             return company.currency_id._convert(
-                req_price[fdx_currency], order_currency, company, order.date_order or fields.Date.today())
+                req_price[fdx_currency], order_currency, company, order.date_order)
         # finally, attempt to find active currency in the database
         currency_codes = list(req_price.keys())
         # note, fedex sometimes return the currency as ISO instead of using their own code
@@ -471,7 +471,7 @@ class DeliveryCarrier(models.Model):
         for fdx_currency in req_price:
             if fdx_currency in currency_by_name:
                 return currency_by_name[fdx_currency]._convert(
-                    req_price[fdx_currency], order_currency, company, order.date_order or fields.Date.today())
+                    req_price[fdx_currency], order_currency, company, order.date_order)
         _logger.info("No known currency has not been found in FedEx response")
         return 0.0
 

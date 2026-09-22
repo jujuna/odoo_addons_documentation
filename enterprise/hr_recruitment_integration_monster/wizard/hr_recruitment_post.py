@@ -11,8 +11,6 @@ class HrRecruitmentPostJobWizard(models.TransientModel):
 
     def _prepare_monster_data(self):
         def convert_hours_to_monster_id():
-            if self.job_id.schedule_id.flexible_hours:
-                return 6
             hours = self.job_id.schedule_id.hours_per_week
             if hours < 10:
                 return 1
@@ -46,7 +44,7 @@ class HrRecruitmentPostJobWizard(models.TransientModel):
                 },
                 'JobBody': self.post_html,
                 'Contact': {
-                    'Name': self.job_id.user_id.name,
+                    'Name': self.job_id.recruiter_id.name,
                     'CompanyName': self.job_id.company_id.name,
                     'Address': {
                         'StreetAddress': self.job_id.company_id.street,
@@ -119,9 +117,9 @@ class HrRecruitmentPostJobWizard(models.TransientModel):
                 'monsterId': convert_status_to_monster_id(),
             }
 
-        if self.job_id.contract_type_id and self.job_id.contract_type_id.monster_id:
+        if 'contract_template_id' in self.job_id._fields and self.job_id.contract_template_id and self.job_id.contract_template_id.monster_id:
             data['JobInformation']['JobType'] = {
-                'monsterId': self.job_id.contract_type_id.monster_id,
+                'monsterId': self.job_id.contract_template_id.monster_id,
             }
 
         if self.job_id.salary_min and self.job_id.salary_max \

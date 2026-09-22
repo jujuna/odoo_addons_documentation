@@ -1,18 +1,52 @@
 import { _t } from "@web/core/l10n/translation";
-import { registries, stores } from "@odoo/o-spreadsheet";
-import { REINSERT_LIST_CHILDREN } from "../list/list_actions";
+import { registries, stores, helpers } from "@odoo/o-spreadsheet";
+import {
+    REINSERT_DYNAMIC_LIST_CHILDREN,
+    REINSERT_STATIC_LIST_CHILDREN,
+} from "../list/list_actions";
 import {
     REINSERT_DYNAMIC_PIVOT_CHILDREN,
     REINSERT_STATIC_PIVOT_CHILDREN,
     REINSERT_PIVOT_CELL_CHILDREN,
 } from "../pivot/pivot_actions";
 import { getListHighlights } from "../list/list_highlight_helpers";
+import { documentationUrl } from "@web/core/utils/urls";
 const { topbarMenuRegistry } = registries;
 const { HighlightStore } = stores;
+const { UuidGenerator } = helpers;
 
 //--------------------------------------------------------------------------
 // Spreadsheet context menu items
 //--------------------------------------------------------------------------
+
+topbarMenuRegistry.add("help", {
+    name: _t("Help"),
+    sequence: 1000,
+    isReadonlyAllowed: true,
+});
+
+topbarMenuRegistry.addChild("documentation", ["help"], {
+    name: _t("Documention"),
+    sequence: 1,
+    execute: (env) => {
+        window.open(documentationUrl("/applications/productivity/spreadsheet/get_started.html"));
+    },
+    icon: "o-spreadsheet-Icon.QUESTION_CIRCLE",
+    isEnabledOnLockedSheet: true,
+    isReadonlyAllowed: true,
+});
+
+topbarMenuRegistry.addChild("command_palette", ["help"], {
+    name: _t("Quick access"),
+    sequence: 10,
+    execute: (env) => {
+        env.openPalette();
+    },
+    icon: "o-spreadsheet-Icon.KEYBOARD",
+    description: "Ctrl+K",
+    isReadonlyAllowed: true,
+    isEnabledOnLockedSheet: true,
+});
 
 topbarMenuRegistry.addChild("new_sheet", ["file"], {
     name: _t("New"),
@@ -20,6 +54,7 @@ topbarMenuRegistry.addChild("new_sheet", ["file"], {
     isVisible: (env) => env.newSpreadsheet,
     execute: (env) => env.newSpreadsheet(),
     icon: "o-spreadsheet-Icon.NEW",
+    isEnabledOnLockedSheet: true,
 });
 
 topbarMenuRegistry.addChild("make_copy", ["file"], {
@@ -29,6 +64,7 @@ topbarMenuRegistry.addChild("make_copy", ["file"], {
     execute: (env) => env.makeCopy(),
     separator: true,
     icon: "o-spreadsheet-Icon.COPY_FILE",
+    isEnabledOnLockedSheet: true,
 });
 
 topbarMenuRegistry.addChild("download", ["file"], {
@@ -38,81 +74,90 @@ topbarMenuRegistry.addChild("download", ["file"], {
     execute: (env) => env.download(),
     isReadonlyAllowed: true,
     icon: "o-spreadsheet-Icon.DOWNLOAD",
+    isEnabledOnLockedSheet: true,
 });
 
 topbarMenuRegistry.addChild("download_as_json", ["file"], {
     name: _t("Download as JSON"),
     sequence: 50,
-    isVisible: (env) => env.debug && env.downloadAsJson,
+    isVisible: (env) => odoo.debug && env.downloadAsJson,
     execute: (env) => env.downloadAsJson(),
     isReadonlyAllowed: true,
     icon: "o-spreadsheet-Icon.DOWNLOAD_AS_JSON",
-});
-
-topbarMenuRegistry.addChild("print", ["file"], {
-    name: _t("Print"),
-    sequence: 60,
-    separator: true,
-    isVisible: (env) => env.print,
-    execute: (env) => env.print(),
-    icon: "o-spreadsheet-Icon.PRINT",
+    isEnabledOnLockedSheet: true,
 });
 
 topbarMenuRegistry.addChild("save_as_template", ["file"], {
     name: _t("Save as template"),
     sequence: 70,
-    isVisible: (env) => env.saveAsTemplate,
+    isVisible: (env) => env.saveAsTemplate && env.canSaveAsTemplate(),
     execute: (env) => env.saveAsTemplate(),
     icon: "o-spreadsheet-Icon.SAVE",
+    isEnabledOnLockedSheet: true,
 });
 
-topbarMenuRegistry.addChild("list_data_sources", ["data"], (env) => {
-    const sequence = 53;
-    const numberOfLists = env.model.getters.getListIds().length;
-    return env.model.getters.getListIds().map((listId, index) => {
-        const highlightProvider = {
-            get highlights() {
-                return getListHighlights(env.model.getters, listId);
-            },
-        };
-        return {
-            id: `item_list_${listId}`,
-            name: env.model.getters.getListDisplayName(listId),
-            sequence: sequence + index / numberOfLists,
-            isReadonlyAllowed: true,
-            execute: (env) => {
-                env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
-            },
-            onStartHover: (env) => env.getStore(HighlightStore).register(highlightProvider),
-            onStopHover: (env) => env.getStore(HighlightStore).unRegister(highlightProvider),
-            icon: "o-spreadsheet-Icon.ODOO_LIST",
-            separator: index === env.model.getters.getListIds().length - 1,
-            secondaryIcon: (env) =>
-                env.model.getters.isListUnused(listId)
-                    ? "o-spreadsheet-Icon.UNUSED_LIST_WARNING"
-                    : undefined,
-            isVisible: (env) => !env.isSmall,
-        };
-    });
-});
-
-topbarMenuRegistry.addChild("chart_data_sources", ["data"], (env) => {
-    const sequence = 56;
-    const numberOfCharts = env.model.getters.getOdooChartIds().length;
-    return env.model.getters.getOdooChartIds().map((chartId, index) => ({
-        id: `item_chart_${chartId}`,
-        name: env.model.getters.getOdooChartDisplayName(chartId),
-        sequence: sequence + index / numberOfCharts,
-        execute: (env) => {
-            env.model.dispatch("SELECT_FIGURE", {
-                figureId: env.model.getters.getFigureIdFromChartId(chartId),
+topbarMenuRegistry.addChild("list_data_sources", ["data"], {
+    name: _t("List"),
+    sequence: 53,
+    icon: "o-spreadsheet-Icon.ODOO_LIST",
+    children: [
+        (env) => {
+            const { getters } = env.model;
+            return getters.getListIds().map((listId, sequence) => {
+                const highlightProvider = {
+                    get highlights() {
+                        return getListHighlights(env, listId);
+                    },
+                };
+                return {
+                    id: `item_list_${listId}`,
+                    name: getters.getListDisplayName(listId),
+                    sequence,
+                    isReadonlyAllowed: true,
+                    execute: () => env.openSidePanel("LIST_PROPERTIES_PANEL", { listId }),
+                    onStartHover: () => env.getStore(HighlightStore).register(highlightProvider),
+                    onStopHover: () => env.getStore(HighlightStore).unRegister(highlightProvider),
+                    isVisible: () => !env.isSmall,
+                    isEnabledOnLockedSheet: true,
+                };
             });
-            env.openSidePanel("ChartPanel");
         },
-        icon: "o-spreadsheet-Icon.INSERT_CHART",
-        separator: index === env.model.getters.getOdooChartIds().length - 1,
-        isVisible: (env) => !env.isSmall,
-    }));
+    ],
+});
+
+topbarMenuRegistry.addChild("chart_data_sources", ["data"], {
+    name: _t("Charts"),
+    sequence: 56,
+    icon: "o-spreadsheet-Icon.INSERT_CHART",
+    separator: true,
+    children: [
+        (env) => {
+            const { getters } = env.model;
+            return getters.getOdooChartIds().map((chartId, sequence) => ({
+                id: `item_chart_${chartId}`,
+                name: getters.getOdooChartDisplayName(chartId),
+                sequence,
+                execute: () => {
+                    const activeSheetId = getters.getActiveSheetId();
+                    const sheetId = getters.getChart(chartId).sheetId;
+                    env.model.dispatch("ACTIVATE_SHEET", {
+                        sheetIdFrom: activeSheetId,
+                        sheetIdTo: sheetId,
+                    });
+                    env.model.dispatch("SELECT_FIGURE", {
+                        figureId: getters.getFigureIdFromChartId(chartId),
+                    });
+                    env.openSidePanel("ChartPanel");
+                },
+                isVisible: () => !env.isSmall,
+                isEnabled: () => {
+                    const sheetId = getters.getChart(chartId).sheetId;
+                    return !getters.isSheetLocked(sheetId);
+                },
+                isEnabledOnLockedSheet: true,
+            }));
+        },
+    ],
 });
 
 topbarMenuRegistry.addChild("refresh_data_sources", ["data"], {
@@ -122,6 +167,7 @@ topbarMenuRegistry.addChild("refresh_data_sources", ["data"], {
     execute: (env) => {
         env.model.dispatch("REFRESH_ALL_DATA_SOURCES");
     },
+    isEnabledOnLockedSheet: true,
     separator: true,
     icon: "o-spreadsheet-Icon.REFRESH_DATA",
 });
@@ -155,11 +201,23 @@ const reinsertPivotCell = {
     icon: "o-spreadsheet-Icon.INSERT_PIVOT",
 };
 
-const reInsertListMenu = {
-    id: "reinsert_list",
-    name: _t("Re-insert list"),
+const reInsertStaticListMenu = {
+    id: "reinsert_static_list",
+    name: _t("Re-insert static list"),
     sequence: 74,
-    children: [REINSERT_LIST_CHILDREN],
+    children: [REINSERT_STATIC_LIST_CHILDREN],
+    isVisible: (env) =>
+        env.model.getters
+            .getListIds()
+            .some((id) => env.model.getters.getListDataSource(id).isModelValid()),
+    icon: "o-spreadsheet-Icon.INSERT_LIST",
+};
+
+const reInsertDynamicListMenu = {
+    id: "reinsert_dynamic_list",
+    name: _t("Re-insert dynamic list"),
+    sequence: 74,
+    children: [REINSERT_DYNAMIC_LIST_CHILDREN],
     isVisible: (env) =>
         env.model.getters
             .getListIds()
@@ -176,8 +234,8 @@ const insertPivotMenu = {
             name: _t("From range"),
             sequence: 1,
             execute: (env) => {
-                const pivotId = env.model.uuidGenerator.smallUuid();
-                const newSheetId = env.model.uuidGenerator.smallUuid();
+                const pivotId = UuidGenerator.smallUuid();
+                const newSheetId = UuidGenerator.smallUuid();
                 const result = env.model.dispatch("INSERT_NEW_PIVOT", { pivotId, newSheetId });
                 if (result.isSuccessful) {
                     env.openSidePanel("PivotSidePanel", { pivotId });
@@ -197,8 +255,20 @@ const insertPivotMenu = {
     isVisible: (env) => !env.isSmall,
 };
 
-topbarMenuRegistry.addChild("reinsert_list", ["data"], reInsertListMenu);
+const insertListMenu = {
+    name: _t("Odoo list"),
+    sequence: 54,
+    execute: (env) => {
+        env.openSidePanel("NewOdooListSidePanel");
+    },
+    icon: "o-spreadsheet-Icon.ODOO_LIST",
+    isVisible: (env) => !env.isSmall,
+};
+
+topbarMenuRegistry.addChild("reinsert_static_list", ["data"], reInsertStaticListMenu);
+topbarMenuRegistry.addChild("reinsert_dynamic_list", ["data"], reInsertDynamicListMenu);
 topbarMenuRegistry.replaceChild("reinsert_dynamic_pivot", ["data"], reinsertDynamicPivotMenu);
 topbarMenuRegistry.replaceChild("reinsert_static_pivot", ["data"], reinsertStaticPivotMenu);
 topbarMenuRegistry.replaceChild("insert_pivot", ["insert"], insertPivotMenu);
 topbarMenuRegistry.addChild("reinsert_pivot_cell", ["data"], reinsertPivotCell);
+topbarMenuRegistry.addChild("insert_list", ["insert"], insertListMenu);

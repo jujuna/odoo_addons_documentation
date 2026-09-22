@@ -1,11 +1,10 @@
 import { patch } from "@web/core/utils/patch";
 import { _t } from "@web/core/l10n/translation";
-import { renderToElement } from "@web/core/utils/render";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { Navbar } from "@point_of_sale/app/components/navbar/navbar";
+import { BurgerMenuDialog } from "@point_of_sale/app/components/navbar/navbar";
 import { DateSelectionPopup } from "@l10n_at_pos/app/components/popup/date_selection_popup/date_selection_popup";
 
-patch(Navbar.prototype, {
+patch(BurgerMenuDialog.prototype, {
     setup() {
         super.setup(...arguments);
         this.mapNames = {
@@ -30,8 +29,10 @@ patch(Navbar.prototype, {
                     "fetch_fiskaly_closing_receipt_data",
                     [[this.pos.session.config_id.id], payload.selectedDate, payload.period]
                 );
-                if (res[0] && this.pos.hardwareProxy) {
+
+                if (res["data"].length && this.pos.ticketPrinter.defaultPrinter) {
                     // prepare title based on selection
+                    const data = res["data"][0];
                     const date = new Date(`${payload.selectedDate}-01`);
                     const monthName = date.toLocaleString("default", { month: "long" });
                     const year = date.getFullYear();
@@ -40,28 +41,34 @@ patch(Navbar.prototype, {
                     // prepare qrImage data
                     const codeWriter = new window.ZXing.BrowserQRCodeSvgWriter();
                     const qr_code_svg = new XMLSerializer().serializeToString(
-                        codeWriter.write(res[0]["qr_code_data"], 150, 150)
+                        codeWriter.write(data["qr_code_data"], 150, 150)
                     );
                     const qrImage = "data:image/svg+xml;base64," + window.btoa(qr_code_svg);
 
-                    const receipt = renderToElement("l10n_at_pos.ClosingReceipts", {
-                        config: this.pos.session.config_id,
-                        heading: title,
-                        data: res[0],
-                        qrImage: qrImage,
-                        raw_data: res[0]["schema"]["raw"],
-                        mappedName: this.mapNames,
-                    });
-                    const { successful, message } =
-                        await this.pos.hardwareProxy.printer.printReceipt(receipt);
-                    if (!successful) {
-                        this.dialog.add(AlertDialog, { title: message.title, body: message.body });
-                    }
+                    const receipt = await this.pos.ticketPrinter.generateIframe(
+                        "l10n_at_pos.ClosingReceipts",
+                        {
+                            config: this.pos.session.config_id,
+                            heading: title,
+                            data: data,
+                            qrImage: qrImage,
+                            raw_data: data["schema"]["raw"],
+                            mappedName: this.mapNames,
+                        }
+                    );
+                    await this.pos.ticketPrinter.printWithFallback({ iframe: receipt });
                 } else {
-                    const msg = this.pos.hardwareProxy?.printer
-                        ? _t("Fetched data is empty")
-                        : _t("No printer found");
-                    this.dialog.add(AlertDialog, { title: _t("Printing Error"), body: msg });
+                    if (res["message"] !== "success") {
+                        return this.dialog.add(AlertDialog, {
+                            title: _t("No data found!"),
+                            body: res["message"],
+                        });
+                    }
+                    // Message success means we got the data still here only means no printer connected
+                    this.dialog.add(AlertDialog, {
+                        title: _t("Printing Error"),
+                        body: _t("No printer connected to print the receipt"),
+                    });
                 }
             },
         });

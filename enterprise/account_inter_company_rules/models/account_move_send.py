@@ -1,4 +1,4 @@
-from odoo import models
+from odoo import SUPERUSER_ID, models
 
 
 class AccountMoveSend(models.AbstractModel):
@@ -30,7 +30,7 @@ class AccountMoveSend(models.AbstractModel):
                 continue
 
             ico_move.message_main_attachment_id = self.env['ir.attachment']\
-                .with_user(ico_move.company_id.intercompany_user_id.id).with_company(ico_move.company_id.id).create({
+                .with_user(SUPERUSER_ID).with_company(ico_move.company_id.id).create({
                     'name': f'{original_move.name}.pdf',
                     'type': 'binary',
                     'mimetype': 'application/pdf',

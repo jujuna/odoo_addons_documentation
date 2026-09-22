@@ -53,10 +53,9 @@ Differences between Electronic Boletas and Electronic Invoicing Workflows
 For detailed guidance, refer to the [SII Guide](https://www.sii.cl/factura_electronica/factura_mercado/Instructivo_Emision_Boleta_Elect.pdf).
 
     """,
-    'website': 'http://www.bmya.cl',
+    'website': 'https://www.bmya.cl',
     'depends': [
         'l10n_cl',
-        'account_edi',
         'account_debit_note',
         'certificate',
     ],
@@ -88,14 +87,13 @@ For detailed guidance, refer to the [SII Guide](https://www.sii.cl/factura_elect
         'data/cron.xml',
         'data/l10n_cl.company.activities.csv',
         'data/sequence.xml',
-        'security/ir.model.access.csv',
-        'security/l10n_cl_edi_security.xml',
+        'data/product_data.xml',
+        'security/ir.access.csv',
     ],
     'demo': [
         'demo/partner_demo.xml',
         'demo/edi_demo.xml',
     ],
-    'installable': True,
     'auto_install': ['l10n_cl'],
     'license': 'OEEL-1',
 }

@@ -18,16 +18,9 @@ class AccountJournal(models.Model):
             raise ValidationError(_("This journal is associated with a payment method. You cannot modify its type"))
 
     def _check_no_active_payments(self):
-        hanging_journal_entries = self.env['pos.payment'].sudo().search(
-        [
-            ('payment_method_id', 'in', self.pos_payment_method_ids.ids),
-            ('session_id.state', '=', 'opened')
-        ], limit=1)
-        if(hanging_journal_entries):
-            raise ValidationError(_("This journal is associated with payment method %(payment_method)s that is being used by order %(pos_order)s in the active pos session %(pos_session)s",
-                payment_method=hanging_journal_entries.payment_method_id.name,
-                pos_order=hanging_journal_entries.pos_order_id.name,
-                pos_session=hanging_journal_entries.session_id.name))
+        linked_payment_methods = self.env['pos.payment.method'].sudo().search([('journal_id', 'in', self.ids)], limit=1)
+        if linked_payment_methods:
+            raise ValidationError(_("You can not archive this journal because it is set on the following payment method : %s.", linked_payment_methods.name))
 
     @api.ondelete(at_uninstall=False)
     def _unlink_journal_except_with_active_payments(self):
@@ -45,23 +38,31 @@ class AccountJournal(models.Model):
         return super().action_archive()
 
     def _get_journal_inbound_outstanding_payment_accounts(self):
-        res = super()._get_journal_inbound_outstanding_payment_accounts()
-        account_ids = set(res.ids)
-        for payment_method in self.sudo().pos_payment_method_ids:
-            account_ids.add(payment_method.outstanding_account_id.id)
-        return self.env['account.account'].browse(account_ids)
+        return (
+            super()._get_journal_inbound_outstanding_payment_accounts()
+            | self.sudo().pos_payment_method_ids.outstanding_account_id.with_env(self.env)
+        )
 
     @api.model
     def _ensure_company_account_journal(self):
+        return self._ensure_pos_journal('POSS', _('Point of Sale'))
+
+    @api.model
+    def _ensure_company_closing_journal(self):
+        return self._ensure_pos_journal('POSC', _('Point of Sale Closing'))
+
+    @api.model
+    def _ensure_pos_journal(self, code, name):
         journal = self.search([
-            ('code', '=', 'POSS'),
+            ('code', '=', code),
+            ('type', '=', 'sale'),
             ('company_id', '=', self.env.company.id),
         ], limit=1)
         if not journal:
             journal = self.create({
-                'name': _('Point of Sale'),
-                'code': 'POSS',
-                'type': 'general',
+                'name': name,
+                'code': code,
+                'type': 'sale',
                 'company_id': self.env.company.id,
             })
         return journal

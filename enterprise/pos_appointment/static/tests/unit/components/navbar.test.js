@@ -8,12 +8,10 @@ definePosModels();
 
 test("mainButton", async () => {
     const store = await setupPosEnv();
-    store.router.state = {
-        current: "ActionScreen",
-        params: {
-            actionName: "manage-booking",
-        },
-    };
+    store.router.currentScreen.set("ActionScreen");
+    store.router.currentScreenParams.set({
+        actionName: "manage-booking",
+    });
     const navbar = await mountWithCleanup(Navbar, store.env);
     expect(navbar.mainButton).toBe("booking");
 });

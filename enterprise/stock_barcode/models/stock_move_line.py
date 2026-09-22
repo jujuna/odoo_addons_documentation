@@ -9,9 +9,10 @@ class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
 
     product_barcode = fields.Char(related='product_id.barcode')
+    product_category_name = fields.Char(related='product_category_id.complete_name')
     formatted_product_barcode = fields.Char(compute="_compute_product_barcode")
     location_processed = fields.Boolean()
-    dummy_id = fields.Char(compute='_compute_dummy_id', inverse='_inverse_dummy_id')
+    dummy_id = fields.Char(store=False)
     parent_location_id = fields.Many2one('stock.location', compute='_compute_parent_location_id')
     parent_location_dest_id = fields.Many2one('stock.location', compute='_compute_parent_location_id')
     product_stock_quant_ids = fields.One2many('stock.quant', compute='_compute_product_stock_quant_ids')
@@ -24,6 +25,7 @@ class StockMoveLine(models.Model):
     electronic_product_code = fields.Char(compute='_compute_electronic_product_code')
     packaging_uom_id = fields.Many2one('uom.uom', related='move_id.packaging_uom_id', string='Packaging Unit of Measure')
     packaging_uom_qty = fields.Float(related='move_id.packaging_uom_qty', string='Packaging Quantity')
+    picking_id = fields.Many2one(domain=lambda self: self._domain_picking_id())
     outermost_result_package_id = fields.Many2one('stock.package', compute="_compute_outermost_result_package_id", inverse="_inverse_outermost_result_package_id")
 
     @api.depends('result_package_id')
@@ -61,9 +63,6 @@ class StockMoveLine(models.Model):
         for line in self:
             line.product_stock_quant_ids = quant_ids.get(line.product_id, self.env['stock.quant'])
 
-    def _compute_dummy_id(self):
-        self.dummy_id = ''
-
     def _compute_qty_done(self):
         for line in self:
             line.qty_done = line.quantity if line.picked else 0
@@ -72,9 +71,6 @@ class StockMoveLine(models.Model):
     def _compute_product_barcode(self):
         for line in self:
             line.formatted_product_barcode = f'[{line.product_barcode}]' if line.product_barcode else _('No Barcode')
-
-    def _inverse_dummy_id(self):
-        pass
 
     def _inverse_outermost_result_package_id(self):
         def fetch_before_outermost(package):
@@ -127,7 +123,7 @@ class StockMoveLine(models.Model):
             'qty_done',
             'quantity',
             'display_name',
-            'product_uom_id',
+            'uom_id',
             'product_barcode',
             'owner_id',
             'lot_id',
@@ -136,6 +132,7 @@ class StockMoveLine(models.Model):
             'result_package_id',
             'dummy_id',
             'picked',
+            'picking_id',
             'move_id',
             'outermost_result_package_id',
             'packaging_uom_id',
@@ -154,16 +151,19 @@ class StockMoveLine(models.Model):
             if not re.match(r"^\d+$", product_id.barcode):  # length and check digit do not matter
                 move_line_ids.electronic_product_code = self.env._("Error: The product barcode is not a valid Global Trade Item Number, we can't generate an Electronic Product Code for it.")
                 continue
-            if product_id.tracking == 'none':
+            if product_id.tracking not in ['lot', 'serial']:
                 alphanumeric_tracking = False
                 start_number = int(epc_sequence.next_by_id())
                 tracking_number_list = [i for i in range(start_number, start_number + len(move_line_ids), 1)]
                 epc_sequence.write({'number_next_actual': start_number + len(move_line_ids)})
             else:
-                tracking_number_list = [m.lot_id.name if m.lot_id else m.lot_name for m in move_line_ids if m.lot_id or m.lot_name]
-                if len(tracking_number_list) == 0:
-                    move_line_ids.electronic_product_code = self.env._("Error: We can't generate an Electronic Product Code for a tracked product without a tracking number.")
+                untracked_move_lines = move_line_ids.filtered(lambda m: not m.lot_id and not m.lot_name)
+                if untracked_move_lines:
+                    untracked_move_lines.electronic_product_code = self.env._("Error: We can't generate an Electronic Product Code for a tracked product without a tracking number.")
+                    move_line_ids -= untracked_move_lines
+                if not move_line_ids:
                     continue
+                tracking_number_list = [m.lot_id.name if m.lot_id else m.lot_name for m in move_line_ids]
                 alphanumeric_tracking = any(re.search(r'[^\d]', tracking_number) for tracking_number in tracking_number_list)
             # NOTE: In the future, obtain the filter & company prefix length rather than providing them explicitly
             gtin = product_id.barcode
@@ -183,6 +183,12 @@ class StockMoveLine(models.Model):
                 tracking_number = tracking_number_list[i]
                 move_line_ids[i].electronic_product_code = scheme.encode_partial(field_name, tracking_number)
 
+    def action_print_reservation_report(self):
+        self.ensure_one()
+        if linked_picking_with_reservation := self.move_id.move_dest_ids.picking_id:
+            return linked_picking_with_reservation.do_print_picking()
+        return False
+
     def _check_destinations(self):
         res = super()._check_destinations()
         from_barcode = self.env.context.get('barcode_view')
@@ -190,7 +196,11 @@ class StockMoveLine(models.Model):
             res['context'] = {**res.get('context', {}), 'barcode_view': True}
         return res
 
-    def _should_display_put_in_pack_wizard(self, package_id, package_type_id, package_name, from_package_wizard):
-        if self.env.context.get('barcode_view'):
-            return False
-        return super()._should_display_put_in_pack_wizard(package_id, package_type_id, package_name, from_package_wizard)
+    def _domain_picking_id(self):
+        # Add a domain on `picking_id` only if we come from a batch.
+        batch_id = self.env.context.get('default_batch_id')
+        if batch_id:
+            return [
+                ('state', 'in', ['assigned', 'confirmed', 'waiting']),
+                ('batch_id', '=', batch_id)
+            ]

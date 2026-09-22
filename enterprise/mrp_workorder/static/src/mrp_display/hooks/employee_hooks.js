@@ -1,21 +1,21 @@
+import { proxy } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
-import { browser } from "@web/core/browser/browser";
+import { location } from "@web/core/browser/browser";
 import { PinPopup } from "@mrp_workorder/components/pin_popup";
 import { DialogWrapper } from "@mrp_workorder/components/dialog_wrapper";
-import { useState } from "@odoo/owl";
 
 export function useConnectedEmployee(controllerType, context, actionService, dialogService) {
     const orm = useService("orm");
     const notification = useService("notification");
     const dialog = useService("dialog");
-    const imageBaseURL = `${browser.location.origin}/web/image?model=hr.employee&field=avatar_128&id=`;
-    const employees = useState({
+    const imageBaseURL = `${location.origin}/web/image?model=hr.employee&field=avatar_128&id=`;
+    const employees = proxy({
         connected: [],
         all: [],
         admin: {},
     });
-    const popup = useState({
+    const popup = proxy({
         PinPopup: {
             isShown: false,
         },

@@ -35,6 +35,12 @@ class MrpBom(models.Model):
         MrpEco = self.env['mrp.eco']
         for new_bom in self:
             new_bom.write({'active': True})
+            if not new_bom.previous_bom_id:
+                continue
+            previous_bom_product_tmpl = new_bom.previous_bom_id.product_id.product_tmpl_id or new_bom.previous_bom_id.product_tmpl_id
+            new_bom_product_tmpl = new_bom.product_id.product_tmpl_id or new_bom.product_tmpl_id
+            if previous_bom_product_tmpl != new_bom_product_tmpl:
+                continue
             # Move eco's into rebase state which is in progress state.
             ecos = MrpEco.search(['|',
                     ('bom_id', '=', new_bom.previous_bom_id.id),
@@ -57,7 +63,12 @@ class MrpBom(models.Model):
         self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id("mrp_plm.mrp_eco_action_main")
         previous_boms = self._get_previous_boms()
-        action['domain'] = ['&', ('bom_id', 'in', list(previous_boms.keys())), ('type', '=', 'bom')]
+        relevant_bom_ids = [
+            bom_id
+            for bom_id, current_bom_set in previous_boms.items()
+            if self.id in current_bom_set
+        ]
+        action['domain'] = [('bom_id', 'in', relevant_bom_ids)]
         action['context'] = {
             'default_bom_id': self.id,
             'default_product_tmpl_id': self.product_tmpl_id.id,
@@ -102,13 +113,16 @@ class MrpBom(models.Model):
 class MrpBomLine(models.Model):
     _inherit = 'mrp.bom.line'
 
+    bom_version = fields.Integer(related='bom_id.version', string="Bom Version", readonly=False)
+    product_version = fields.Integer(related='bom_id.product_tmpl_id.version', string="Product Version", readonly=False)
+
     def _prepare_rebase_line(self, eco, change_type, product_id, uom_id, operation_id=None, new_qty=0):
         self.ensure_one()
         return {
             'change_type': change_type,
             'product_id': product_id,
             'rebase_id': eco.id,
-            'old_uom_id': self.product_uom_id.id,
+            'old_uom_id': self.uom_id.id,
             'new_uom_id': uom_id,
             'old_operation_id': self.operation_id.id,
             'new_operation_id': operation_id,
@@ -145,12 +159,11 @@ class MrpBomLine(models.Model):
         for line in self:
             ecos = MrpEco.sudo().search([
                 ('bom_id', '=', line.bom_id.id), ('state', 'in', ('progress', 'rebase')),
-                ('type', 'in', ('bom', 'both'))
             ])
             if ecos:
                 # Latest bom line (product, uom, operation_id, product_qty)
                 product_id = vals.get('product_id', line.product_id.id)
-                uom_id = vals.get('product_uom_id', line.product_uom_id.id)
+                uom_id = vals.get('uom_id', line.uom_id.id)
                 operation_id = vals.get('operation_id', line.operation_id.id)
                 product_qty = vals.get('product_qty', line.product_qty)
                 line._create_or_update_rebase_line(ecos, operation, product_id, uom_id, operation_id, product_qty)
@@ -181,7 +194,7 @@ class MrpBomLine(models.Model):
         if not self:
             return tuple()
         self.ensure_one()
-        return tuple([self.product_id] + self.bom_product_template_attribute_value_ids.ids) + self.operation_id._get_sync_values()
+        return tuple([self.product_id] + self.bom_product_template_attribute_value_ids.ids)
 
 
 class MrpBomByproduct(models.Model):
@@ -191,4 +204,4 @@ class MrpBomByproduct(models.Model):
         if not self:
             return tuple()
         self.ensure_one()
-        return tuple([self.product_id] + self.bom_product_template_attribute_value_ids.ids) + self.operation_id._get_sync_values()
+        return tuple([self.product_id] + self.bom_product_template_attribute_value_ids.ids)

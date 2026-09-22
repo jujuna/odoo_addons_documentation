@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from odoo import Command, _, models
 from odoo.exceptions import RedirectWarning, UserError
-from odoo.addons.base.models.res_bank import sanitize_account_number
+from odoo.addons.base.models.res_partner_bank import sanitize_account_number
 
 
 class AccountJournal(models.Model):
@@ -13,8 +13,8 @@ class AccountJournal(models.Model):
         """
         return []
 
-    def __get_bank_statements_available_sources(self):
-        rslt = super(AccountJournal, self).__get_bank_statements_available_sources()
+    def _get_bank_statements_available_sources(self):
+        rslt = super()._get_bank_statements_available_sources()
         formats_list = self._get_bank_statements_available_import_formats()
         if formats_list:
             formats_list.sort()
@@ -47,8 +47,12 @@ class AccountJournal(models.Model):
                 # using values extracted from the.statement when self is a recordset but there are
                 # statements for multiple accounts
                 journal_for_data = len(iban_bank_statement_data) == 1 and self or self.env['account.journal']
-                attachment_ignored_qty = 0
-                for currency_code, account_number, stmts_vals in iban_bank_statement_data:
+                attachment_ignored_duplicate_qty = 0
+                attachment_ignored_zero_amount_qty = 0
+                for currency_code, account_number, *stmts_vals in iban_bank_statement_data:
+                    # In stms_vals we could have an extension number in the first position of the array, since we don't
+                    # need it for the import, we will just ignore it.
+                    stmts_vals = stmts_vals[-1]
                     try:
                         # Check raw data
                         self._check_parsed_data(stmts_vals, account_number)
@@ -61,8 +65,9 @@ class AccountJournal(models.Model):
                         # Prepare statement data to be used for bank statements creation
                         stmts_vals = self._complete_bank_statement_vals(stmts_vals, journal, account_number, attachment)
                         # Create the bank statements
-                        statement_ids, ignored_qty = self._create_bank_statements(stmts_vals)
-                        attachment_ignored_qty += ignored_qty
+                        statement_ids, ignored_duplicate_qty, ignored_zero_amount_qty = self._create_bank_statements(stmts_vals)
+                        attachment_ignored_duplicate_qty += ignored_duplicate_qty
+                        attachment_ignored_zero_amount_qty += ignored_zero_amount_qty
                         statement_ids_all.extend(statement_ids)
 
                         # Now that the import worked out, set it as the bank_statements_source of the journal
@@ -74,11 +79,17 @@ class AccountJournal(models.Model):
 
                     except (UserError, RedirectWarning) as e:
                         errors[attachment.name].append(e.args[0])
-                if attachment_ignored_qty:
-                    notifications_all[attachment.name] = (
-                        _("%d transactions had already been imported and were ignored.", attachment_ignored_qty)
-                        if attachment_ignored_qty > 1
+                if attachment_ignored_duplicate_qty:
+                    notifications_all.setdefault(attachment.name, []).append(
+                        _("%d transactions had already been imported and were ignored.", attachment_ignored_duplicate_qty)
+                        if attachment_ignored_duplicate_qty > 1
                         else _("1 transaction had already been imported and was ignored.")
+                    )
+                if attachment_ignored_zero_amount_qty:
+                    notifications_all.setdefault(attachment.name, []).append(
+                        _("%d transactions had a zero amount and were ignored.", attachment_ignored_zero_amount_qty)
+                        if attachment_ignored_zero_amount_qty > 1
+                        else _("1 transaction had a zero amount and was ignored.")
                     )
             except (UserError, RedirectWarning) as e:
                 errors[attachment.name].append(e.args[0])
@@ -159,7 +170,7 @@ class AccountJournal(models.Model):
 
     def _statement_import_check_bank_account(self, account_number):
         # Needed for CH to accommodate for non-unique account numbers
-        sanitized_acc_number = self.bank_account_id.sanitized_acc_number.split(" ")[0]
+        sanitized_acc_number = self.bank_account_id.sanitized_account_number.split(" ")[0]
         # Needed for BNP France
         if len(sanitized_acc_number) == 27 and len(account_number) == 11 and sanitized_acc_number[:2].upper() == "FR":
             return sanitized_acc_number[14:-2] == account_number
@@ -186,22 +197,36 @@ class AccountJournal(models.Model):
                 currency = False
 
         journal = self
+
+        if journal:
+            # Currency Match
+            journal_currency = journal.currency_id or journal.company_id.currency_id
+            currency_match = currency is None or journal_currency == (currency or company_currency)
+
+            # If check fails, 'self' is the wrong journal for this file
+            if not currency_match:
+                journal = self.env['account.journal']
+
         if account_number:
             # No bank account on the journal : create one from the account number of the statement
             if journal and not journal.bank_account_id:
                 journal.set_bank_account(account_number)
             # No journal passed to the wizard : try to find one using the account number of the statement
             elif not journal:
-                journal = self.search([('bank_account_id.sanitized_acc_number', '=', sanitized_account_number)])
+                domain = [
+                    ('bank_account_id.sanitized_account_number', '=', sanitized_account_number),
+                    ('currency_id', '=', currency.id if currency else False),
+                ]
+                journal = self.search(domain, limit=1)
                 if not journal:
                     # Sometimes the bank returns only part of the full account number (e.g. local account number instead of full IBAN)
-                    partial_match = self.search([('bank_account_id.sanitized_acc_number', 'ilike', sanitized_account_number)])
+                    partial_match = self.search([('bank_account_id.sanitized_account_number', 'ilike', sanitized_account_number)])
                     if len(partial_match) == 1:
                         journal = partial_match
             # Already a bank account on the journal : check it's the same as on the statement
             else:
                 if not self._statement_import_check_bank_account(sanitized_account_number):
-                    raise UserError(_('The account of this statement (%(account)s) is not the same as the journal (%(journal)s).', account=account_number, journal=journal.bank_account_id.acc_number))
+                    raise UserError(_('The account of this statement (%(account)s) is not the same as the journal (%(journal)s).', account=account_number, journal=journal.bank_account_id.account_number))
 
         # If importing into an existing journal, its currency must be the same as the bank statement
         if journal:
@@ -240,12 +265,12 @@ class AccountJournal(models.Model):
                     if identifying_string:
                         if line_vals.get('partner_id'):
                             partner_bank = self.env['res.partner.bank'].search([
-                                ('acc_number', '=', identifying_string),
+                                ('account_number', '=', identifying_string),
                                 ('partner_id', '=', line_vals['partner_id'])
                             ])
                         else:
                             partner_bank = self.env['res.partner.bank'].search([
-                                ('acc_number', '=', identifying_string),
+                                ('account_number', '=', identifying_string),
                                 ('company_id', 'in', (False, journal.company_id.id))
                             ])
                         # If multiple partners share the same account number, do not try to guess and just avoid setting it
@@ -262,19 +287,21 @@ class AccountJournal(models.Model):
         # Filter out already imported transactions and create statements
         statement_ids = []
         statement_line_ids = []
-        ignored_qty = 0
+        ignored_duplicate_lines_count = 0
+        ignored_zero_amount_lines_count = 0
         for st_vals in stmts_vals:
             filtered_st_lines = []
             for line_vals in st_vals['transactions']:
-                if (line_vals['amount'] != 0
-                   and ('unique_import_id' not in line_vals
-                   or not line_vals['unique_import_id']
-                   or not bool(BankStatementLine.sudo().search([('unique_import_id', '=', line_vals['unique_import_id'])], limit=1)))):
-                    filtered_st_lines.append(line_vals)
-                else:
-                    ignored_qty += 1
+                if line_vals['amount'] == 0:
+                    ignored_zero_amount_lines_count += 1
+                elif ('unique_import_id' in line_vals
+                   and line_vals['unique_import_id']
+                   and bool(BankStatementLine.sudo().search([('unique_import_id', '=', line_vals['unique_import_id'])], limit=1))):
+                    ignored_duplicate_lines_count += 1
                     if st_vals.get('balance_start') is not None:
                         st_vals['balance_start'] += float(line_vals['amount'])
+                else:
+                    filtered_st_lines.append(line_vals)
 
             if len(filtered_st_lines) > 0:
                 # Remove values that won't be used to create records
@@ -291,6 +318,11 @@ class AccountJournal(models.Model):
                 statement_line_ids.extend(statement.line_ids.ids)
 
         if len(statement_line_ids) == 0 and raise_no_imported_file:
-            raise UserError(_('You already have imported that file.'))
+            if ignored_zero_amount_lines_count and not ignored_duplicate_lines_count:
+                raise UserError(_('This file only contains transactions with a zero amount. There is nothing to import.'))
+            elif ignored_zero_amount_lines_count and ignored_duplicate_lines_count:
+                raise UserError(_('All transactions in this file either have a zero amount or have already been imported. There is nothing to import.'))
+            else:  # if not ignored_zero_amount_lines_count and ignored_duplicate_lines_count
+                raise UserError(_('You already have imported that file.'))
 
-        return statement_ids, ignored_qty
+        return statement_ids, ignored_duplicate_lines_count, ignored_zero_amount_lines_count

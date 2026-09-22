@@ -1,6 +1,5 @@
 {
     'name': 'Central African Republic - Accounting Reports',
-    'version': '1.0',
     'description': """
 Accounting reports for Central African Republic
 ===============================================

@@ -8,7 +8,7 @@ from odoo.addons.website_helpdesk.controllers.main import WebsiteHelpdesk
 class WebsiteHelpdeskForum(WebsiteHelpdesk):
 
     def _format_search_results(self, search_type, records, options):
-        if search_type != 'forum_posts_only':
+        if search_type != 'forum_post':
             return super()._format_search_results(search_type, records, options)
 
         questions = records.mapped('parent_id') | records.filtered(lambda s: not s.parent_id)
@@ -17,5 +17,5 @@ class WebsiteHelpdeskForum(WebsiteHelpdesk):
             'record': question,
             'score': question.views + question.vote_count + question.favourite_count,
             'url': '/forum/%s/%s' % (request.env['ir.http']._slug(question.forum_id), request.env['ir.http']._slug(question)),
-            'icon': 'fa-comments',
+            'icon': 'forum',
         } for question in questions]

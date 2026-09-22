@@ -10,14 +10,10 @@ class PosPrepStage(models.Model):
     name = fields.Char("Name", required=True)
     color = fields.Char("Color")
     alert_timer = fields.Integer(string="Alert timer (min)", help="Timer after which the order will be highlighted")
-    prep_display_id = fields.Many2one('pos.prep.display', string="Preparation display", ondelete='cascade', index='btree_not_null')
+    prep_display_ids = fields.Many2many('pos.prep.display', string="Preparation displays")
     sequence = fields.Integer("Sequence")
 
     @api.model
     def _load_pos_preparation_data_domain(self, data):
-        stage_ids = data['pos.prep.display'][0]['stage_ids']
+        stage_ids = data['pos.prep.display'].stage_ids.ids
         return [('id', 'in', stage_ids)]
-
-    def is_stage_position(self, position):
-        stage_ids = self.prep_display_id.stage_ids
-        return len(stage_ids) >= abs(position) and self.id == stage_ids[position].id

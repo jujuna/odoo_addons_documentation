@@ -1,14 +1,14 @@
 import {
-    changeOption,
     clickOnSave,
     insertSnippet,
     registerWebsitePreviewTour,
+    changeImageShape,
+    openPowerbox,
 } from "@website/js/tours/tour_utils";
 
 registerWebsitePreviewTour(
     "website_media_dialog_undraw",
     {
-        url: "/",
         edition: true,
     },
     () => [
@@ -43,7 +43,6 @@ registerWebsitePreviewTour(
 registerWebsitePreviewTour(
     "website_media_dialog_external_library",
     {
-        url: "/",
         edition: true,
     },
     () => [
@@ -123,7 +122,6 @@ registerWebsitePreviewTour(
 registerWebsitePreviewTour(
     "website_media_dialog_icons",
     {
-        url: "/",
         edition: true,
     },
     () => [
@@ -133,21 +131,21 @@ registerWebsitePreviewTour(
         }),
         {
             content: "Open MediaDialog from a snippet icon",
-            trigger: ":iframe .s_social_media .fa-instagram",
+            trigger: ":iframe .s_social_media [data-icon='oi_instagram']",
             run: "dblclick",
         },
         {
             content: "Pick the same icon",
-            trigger: ".o_select_media_dialog .o_we_attachment_selected.fa-instagram",
+            trigger: ".o_select_media_dialog .o_we_attachment_selected[data-icon='oi_instagram']",
             run: "click",
         },
         {
             content: "Check if the icon remains the same",
-            trigger: ":iframe .s_social_media .fa-instagram",
+            trigger: ":iframe .s_social_media [data-icon='oi_instagram']",
         },
         {
             content: "Open MediaDialog again",
-            trigger: ":iframe .s_social_media .fa-instagram",
+            trigger: ":iframe .s_social_media [data-icon='oi_instagram']",
             run: "dblclick",
         },
         {
@@ -157,7 +155,7 @@ registerWebsitePreviewTour(
         },
         {
             content: "Check if the icon remains the same",
-            trigger: ":iframe .s_social_media .fa-instagram",
+            trigger: ":iframe .s_social_media [data-icon='oi_instagram']",
         },
         ...clickOnSave(),
     ]
@@ -166,7 +164,6 @@ registerWebsitePreviewTour(
 registerWebsitePreviewTour(
     "website_media_dialog_image_shape",
     {
-        url: "/",
         edition: true,
     },
     () => [
@@ -180,12 +177,7 @@ registerWebsitePreviewTour(
             trigger: ":iframe .s_text_image img:not(:visible), :iframe .s_text_image img",
             run: "click",
         },
-        changeOption("Image", "[data-label='Shape'] .dropdown-toggle"),
-        {
-            content: "Click on the first image shape",
-            trigger: "[data-action-id='setImageShape']",
-            run: "click",
-        },
+        ...changeImageShape(),
         {
             content: "Open MediaDialog from an image",
             trigger: ".btn-success[data-action-id='replaceMedia']",
@@ -193,18 +185,19 @@ registerWebsitePreviewTour(
         },
         {
             content: "Click on the 'Icons' tab",
-            trigger: '.o_select_media_dialog .o_notebook_headers .nav-item a:contains("Icons")',
+            trigger:
+                '.o_select_media_dialog .o_notebook_headers .nav-item button:contains("Icons")',
             run: "click",
         },
         {
             content: "Select an icon",
             trigger:
-                ".o_select_media_dialog:has(.nav-link.active:contains('Icons')) .tab-content span.fa-heart",
+                ".o_select_media_dialog:has(.nav-link.active:contains('Icons')) .tab-content span[data-icon='favorite']",
             run: "click",
         },
         {
             content: "Checks that the icon doesn't have a shape",
-            trigger: ":iframe .s_text_image .fa-heart:not([data-shape])",
+            trigger: ":iframe .s_text_image [data-icon='favorite']:not([data-shape])",
         },
     ]
 );
@@ -212,7 +205,45 @@ registerWebsitePreviewTour(
 registerWebsitePreviewTour(
     "website_media_dialog_insert_media",
     {
-        url: "/",
+        edition: true,
+    },
+    () => [
+        ...insertSnippet({
+            id: "s_text_block",
+            name: "Text",
+            groupName: "Text",
+        }),
+        {
+            content: "Click on the first paragraph",
+            trigger: ":iframe .s_text_block p",
+            run: "editor test",
+        },
+        openPowerbox(":iframe .s_text_block p:last-child"),
+        {
+            content: "Click on the media item from powerbox",
+            trigger: "div.o-we-command-name:contains('Media')",
+            run: "click",
+        },
+        {
+            content: "Click on the 'Icons' tab",
+            trigger: ".o_select_media_dialog button.nav-link:contains('Icons')",
+            run: "click",
+        },
+        {
+            content: "Click on the first icon",
+            trigger: ".o_select_media_dialog .font-icons-icon",
+            run: "click",
+        },
+        {
+            content: "Verify that the icon was inserted",
+            trigger: ":iframe .s_text_block p > span.oi",
+        },
+    ]
+);
+
+registerWebsitePreviewTour(
+    "website_media_dialog_insert_file",
+    {
         edition: true,
     },
     () => [
@@ -246,18 +277,84 @@ registerWebsitePreviewTour(
             run: "click",
         },
         {
-            content: "Click on the 'Icons' tab",
-            trigger: ".o_select_media_dialog a.nav-link:contains('Icons')",
+            content: "Click on the 'Documents' tab",
+            trigger: ".o_select_media_dialog button.nav-link:contains('Documents')",
             run: "click",
         },
         {
-            content: "Click on the first icon",
-            trigger: ".o_select_media_dialog .font-icons-icon",
+            content: "Click on the first document",
+            trigger: ".o_select_media_dialog .o_existing_attachment_cell .o_button_area",
             run: "click",
         },
         {
-            content: "Verify that the icon was inserted",
-            trigger: ":iframe .s_text_block p > span.fa",
+            content:
+                "Verify that the document was inserted and reopen the media dialog with a double click",
+            trigger: ":iframe .s_text_block p > .o_file_box",
+            run: "dblclick",
+        },
+        {
+            content: "Verify that the dialog opened on the Documents tab",
+            trigger: ".o_select_media_dialog button.nav-link.active:contains('Documents')",
+        },
+    ]
+);
+
+registerWebsitePreviewTour(
+    "website_replace_remove_image",
+    {
+        edition: true,
+    },
+    () => [
+        ...insertSnippet({
+            id: "s_text_image",
+            name: "Text - Image",
+            groupName: "Content",
+        }),
+        {
+            content: "Open the media dialog from the snippet",
+            trigger: ":iframe .s_text_image img",
+            run: "dblclick",
+        },
+        {
+            content: "Click on the toolbar's 'Add URL' button",
+            trigger: ".o_upload_media_url_button",
+            run: "click",
+        },
+        {
+            content: "Edit input field value",
+            trigger: ".o_we_url_input",
+            run: "edit website/static/src/img/backgrounds/city.jpg",
+        },
+        {
+            content: "Click on the toolbar's 'Add URL' button",
+            trigger: ".o_upload_media_url_button",
+            run: "click",
+        },
+        {
+            content: "Open the media dialog from the snippet",
+            trigger: ":iframe .s_text_image img",
+            run: "dblclick",
+        },
+        {
+            content: "Click on remove attachment",
+            trigger: ".o_we_attachment_selected [data-icon='delete'].oi-filled:not(:visible)",
+            run: "click",
+        },
+        {
+            content: "Confirm the removal of the attachment",
+            trigger: ".btn:contains('Delete')",
+            run: "click",
+        },
+        {
+            content: "Click 'Discard' to close the media dialog",
+            trigger: ".modal:not(.o_inactive_modal) .o_select_media_dialog .btn:contains(Discard)",
+            run: "click",
+        },
+        ...clickOnSave(),
+        {
+            content: "Ensure the image is replaced with a placeholder thumbnail",
+            trigger:
+                ":iframe .s_text_image img[src='/html_editor/static/src/img/placeholder_thumbnail.png']",
         },
     ]
 );

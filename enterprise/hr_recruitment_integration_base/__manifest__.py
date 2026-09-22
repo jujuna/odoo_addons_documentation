@@ -2,7 +2,6 @@
 
 {
     'name': 'Recruitment Integration Base',
-    'version': '1.0',
     'category': 'Human Resources/Recruitment/Integration',
     'description': """
 Base module for recruitment integration.
@@ -14,12 +13,12 @@ api from different job boards like indeed, monster, linkedin, etc.
         'hr_recruitment',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'data/ir_cron_data.xml',
         'views/hr_job_post_views.xml',
         'views/hr_job_views.xml',
         'views/hr_recruitment_platform_views.xml',
         'wizard/hr_recruitment_post_views.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.assets_backend': [

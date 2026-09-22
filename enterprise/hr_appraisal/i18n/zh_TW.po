@@ -6,36 +6,58 @@
 # Wil Odoo, 2025
 # Tony Ng, 2025
 #
-# "Tony Ng (ngto)" <ngto@odoo.com>, 2025.
+# "Tony Ng (ngto)" <ngto@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 17:51+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 01:20+0000\n"
+"Last-Translator: \"Tony Ng (ngto)\" <ngto@odoo.com>\n"
 "Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
-"projects/odoo-19/hr_appraisal/zh_Hant/>\n"
+"projects/odoo-master/hr_appraisal/zh_Hant/>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_appraisal
+#: model:ir.module.module,description:base.module_hr_appraisal
+msgid ""
+"\n"
+"Periodical Employees appraisal\n"
+"==============================\n"
+"\n"
+"By using this application you can maintain the motivational process by doing "
+"periodical appraisals of your employees performance. The regular assessment "
+"of human resources can benefit your people as well your organization.\n"
+"\n"
+"An appraisal plan can be assigned to each employee. These plans define the "
+"frequency and the way you manage your periodic personal appraisal.\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Ability to create employee's appraisal(s).\n"
+"* An appraisal can be created by an employee's manager or automatically "
+"based on schedule which is defined in the employee form.\n"
+"* The appraisal is done according to a plan in which various surveys can be "
+"created. Each survey can be answered by a particular level in the employees "
+"hierarchy. The final review and appraisal is done by the manager.\n"
+"* Manager, colleague, collaborator, and employee himself/herself receives "
+"email to perform a periodical appraisal.\n"
+"* Every Appraisal Form filled by employees, colleague, collaborator, can be "
+"viewed in a PDF form.\n"
+"* Meeting Requests are created manually according to employees appraisals.\n"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "%(user)s decided, as %(role)s, to publish the employee's feedback"
 msgstr "%(user)s（身為 %(role)s 職能角色）已決定發佈員工的回應意見"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal_goal.py:0
-#: code:addons/hr_appraisal/models/hr_appraisal_template.py:0
-msgid "%s (copy)"
-msgstr "%s (副本)"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -62,61 +84,13 @@ msgstr ""
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid ". Then, share it with appraisers."
-msgstr ""
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__100
-msgid "100%"
-msgstr "100%"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__025
-msgid "25%"
-msgstr "25%"
+msgstr "。之後，分享給評核人。"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_config_settings__module_hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "360 Feedback"
-msgstr "回饋"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__050
-msgid "50%"
-msgstr "50%"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__075
-msgid "75%"
-msgstr "75%"
-
-#. module: hr_appraisal
-#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
-msgid ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        An appraisal of <t t-"
-"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
-"                        <br/><br/>\n"
-"                        Please schedule an appraisal date together.\n"
-"                        <br/><br/>\n"
-"                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; text-"
-"align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-"style=\"background-color: {{object.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\">\n"
-"                                    View Appraisal\n"
-"                                </a>\n"
-"                            </p>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
+msgstr "360 回應"
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_request_from_employee
@@ -129,10 +103,10 @@ msgid ""
 "                        <br/>\n"
 "                        <t t-out=\"ctx.get('author_name', '')\">Addison "
 "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-"\">addison.olson28@example.com</t>) wishes an appraisal.\n"
+"\">addison.olson28@example.com</t>) has requested an appraisal.\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
 "                            <div style=\"margin: 16px 0px 16px 0px; padding: "
-"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
+"8px 16px 8px 16px; background-color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">Annual "
 "appraisal.</t>\n"
 "                            </div>\n"
@@ -140,7 +114,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            <p style=\"margin: 16px 0px 16px 0px; padding: "
 "8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
 "padding: 8px 16px 8px 16px; text-decoration: none; color: "
@@ -154,6 +128,38 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        親愛的 <t t-out=\"ctx.get('employee_to_name')\">員工"
+"</t>：\n"
+"                        <br/>\n"
+"                        <t t-out=\"ctx.get('author_name', '')\">Addison "
+"Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
+"\">addison.olson28@example.com</t>) 想邀請你進行評核。\n"
+"                        <t t-if=\"ctx.get('user_body')\">\n"
+"                            <div style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; background-color: #8A9A8A\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">周年評核。"
+"</t>\n"
+"                            </div>\n"
+"                        </t>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; text-align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\" margin: auto; background-color: "
+"{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
+"padding: 8px 16px 8px 16px; text-decoration: none; color: "
+"{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
+"radius: 5px;\">\n"
+"                                    查看評核\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_reminder
@@ -170,7 +176,8 @@ msgid ""
 "\">[deadline]</t>.\n"
 "                        <br/>\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div class=\"my-3 py-2 px-3 bg-secondary\">\n"
+"                            <div class=\"my-3 py-2 px-3\" style=\"background-"
+"color: #8A9A8A\">\n"
 "                                <t t-out=\"ctx.get('user_body')\">[Optional "
 "comment]</t>\n"
 "                            </div>\n"
@@ -178,7 +185,7 @@ msgid ""
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
 "                            You can access your appraisal form here:\n"
 "                            <p class=\"text-center my-3 py-2 px-3\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" t-attf-"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
 "style=\" margin: auto; background-color: "
 "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
 "8px 16px; text-decoration: none; color: "
@@ -198,6 +205,97 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        <t t-out=\"ctx.get('employee_to_name')\">[員工]</t> "
+"你好！\n"
+"                        <br/>\n"
+"                        小提醒：你下次工作表現及績效評估，將與 <t t-"
+"out=\"ctx.get('manager_names')\">[評核人]</t> 進行，\n"
+"                        並已安排在 <t t-out=\"ctx.get('date_close')\">[期"
+"限]</t> 舉行。\n"
+"                        <br/>\n"
+"                        <t t-if=\"ctx.get('user_body')\">\n"
+"                            <div class=\"my-3 py-2 px-3\" style=\"background-"
+"color: #8A9A8A\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">[可選填備"
+"註]</t>\n"
+"                            </div>\n"
+"                        </t>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            你可透過以下連結，查看你的評核表格：\n"
+"                            <p class=\"text-center my-3 py-2 px-3\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\" margin: auto; background-color: "
+"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
+"8px 16px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
+"\">\n"
+"                                    查看評估\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                        如有任何疑問，或需要改期，歡迎聯絡我們。\n"
+"                        <br/>\n"
+"                        <br/>\n"
+"                        <t t-out=\"ctx.get('author_signature')\"/>\n"
+"                        <br/>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
+
+#. module: hr_appraisal
+#: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        The appraisal for <t t-"
+"out=\"ctx.get('employee_to_name')\">employee</t> has been confirmed.\n"
+"                        <br/><br/>\n"
+"                        Please proceed with the appraisal discussion based "
+"on the scheduled date.\n"
+"                        <br/><br/>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\"background-color: {{object.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
+"\">\n"
+"                                    View Appraisal\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        已確認將為 <t t-out=\"ctx.get('employee_to_name')\">"
+"員工</t> 進行評核。\n"
+"                        <br/><br/>\n"
+"                        請按照預定日期，進行表現評核的討論。\n"
+"                        <br/><br/>\n"
+"                        <t t-if=\"ctx.get('recipient_users')\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-attf-href=\"ctx.get('url')\" t-attf-"
+"style=\"background-color: {{object.company_id.email_secondary_color or "
+"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
+"\">\n"
+"                                    查看評核\n"
+"                                </a>\n"
+"                            </p>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -350,6 +448,13 @@ msgstr "<span class=\"o_stat_text\">評核</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
+msgid ""
+"<span class=\"o_stat_text\">Appraisals</span>\n"
+"                        <span class=\"o_stat_value\">New</span>"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "<span class=\"o_stat_text\">Goals</span>"
 msgstr "<span class=\"o_stat_text\">目標</span>"
@@ -367,6 +472,9 @@ msgid ""
 "                                            <strong class=\"text-success\" "
 "invisible=\"not employee_feedback_published\">Shared to Appraisers</strong>"
 msgstr ""
+"<span invisible=\"employee_feedback_published\">已分享至評核人</span>\n"
+"                                            <strong class=\"text-success\" "
+"invisible=\"not employee_feedback_published\">已分享至評核人</strong>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -505,7 +613,7 @@ msgstr ""
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
 msgid "<strong>360 feedback :</strong>"
-msgstr "<strong>360 度回應：</strong>"
+msgstr "<strong>360 回應：</strong>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
@@ -889,6 +997,7 @@ msgstr "啟用"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_root
 msgid "Activities"
 msgstr "活動"
 
@@ -904,6 +1013,13 @@ msgid "Activity Exception Decoration"
 msgstr "活動異常圖示"
 
 #. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_plans_ids
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_plans_ids
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_plans
+msgid "Activity Plans"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__activity_state
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_state
 msgid "Activity State"
@@ -914,6 +1030,19 @@ msgstr "活動狀態"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
 msgid "Activity Type Icon"
 msgstr "活動類型圖示"
+
+#. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_type_action_config_appraisal
+#: model:ir.ui.menu,name:hr_appraisal.menu_appraisal_activity_type
+msgid "Activity Types"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid ""
+"Activity plans are used to assign a list of activities in just a few clicks\n"
+"                (e.g. \"Mid-Year Review\", \"Annual Appraisal\", ...)"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -952,24 +1081,15 @@ msgid "All companies"
 msgstr "所有公司"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-msgid ""
-"Allow to create appraisals in batches:\n"
-"- By Employee: for specific employees\n"
-"- By Company: all employees of the specified company\n"
-"- By Department: all employees of the specified department\n"
-"- By Employee Tag: all employees of the specific employee group category"
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Already Processed"
 msgstr ""
-"允許大批建立評核：\n"
-"- 按員工：針對特定員工\n"
-"- 按公司：指定公司的所有員工\n"
-"- 按部門：指定部門的所有員工\n"
-"- 按員工標籤：指定員工群組類別的所有員工"
 
 #. module: hr_appraisal
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_reminder
 msgid "An appraisal reminder sent manually to the employee by the manager"
-msgstr ""
+msgstr "由經理手動發送給員工的表現評核提醒"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -980,7 +1100,6 @@ msgstr "有另一項關於相同對象的評核，已在進行中。"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__appraisal_ids
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__appraisal_id
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_activity
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_tree
@@ -999,10 +1118,8 @@ msgid "Appraisal Assessment Note"
 msgstr "評核評估備註"
 
 #. module: hr_appraisal
-#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 msgid "Appraisal Campaign"
 msgstr "評核計劃"
@@ -1049,8 +1166,8 @@ msgstr "評核目標"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_appraisal_goal_tag
-msgid "Appraisal Goal Tags"
-msgstr "評核目標標籤"
+msgid "Appraisal Goal Tag"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1064,6 +1181,11 @@ msgid "Appraisal Plan Posted"
 msgstr "已發佈評核計劃"
 
 #. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Appraisal Plans"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__appraisal_properties_definition
 msgid "Appraisal Properties"
 msgstr "評核屬性"
@@ -1071,13 +1193,19 @@ msgstr "評核屬性"
 #. module: hr_appraisal
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_reminder
 msgid "Appraisal Reminder"
-msgstr ""
+msgstr "評核提醒"
 
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Appraisal Request"
 msgstr "評核請求"
+
+#. module: hr_appraisal
+#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
+msgid ""
+"Appraisal Request from {{ hasattr(object, 'name') and object.name or '' }}"
+msgstr "{{ hasattr(object, 'name') and object.name or '' }} 提出評核請求"
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_config_templates_action
@@ -1134,6 +1262,14 @@ msgid "Appraisal to start"
 msgstr "評估開始"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_employee_departure.py:0
+msgid ""
+"Appraisal's managers have been updated due to the end of collaboration with "
+"an employee."
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.actions.server,name:hr_appraisal.ir_cron_scheduler_appraisal_ir_actions_server
 msgid "Appraisal: Run employee appraisal"
 msgstr "評核：進行員工評核"
@@ -1143,13 +1279,13 @@ msgstr "評核：進行員工評核"
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.js:0
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_action_multiple_appraisals
 #: model:ir.actions.act_window,name:hr_appraisal.open_view_hr_appraisal_tree
+#: model:ir.module.module,shortdesc:base.module_hr_appraisal
 #: model:ir.ui.menu,name:hr_appraisal.menu_hr_appraisal_root
 #: model:ir.ui.menu,name:hr_appraisal.menu_open_view_hr_appraisal_tree
 #: model:res.groups.privilege,name:hr_appraisal.res_groups_privilege_appraisals
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_graph
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_pivot
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_department_view_kanban
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_departure_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 msgid "Appraisals"
 msgstr "評價"
@@ -1180,7 +1316,7 @@ msgstr "以下員工沒有經理，系統將不會為其建立評核：%(employe
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Appraisers"
-msgstr ""
+msgstr "評核人"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1192,6 +1328,11 @@ msgstr "已封存"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "Ask to fill a survey to other employees"
 msgstr "要求其他員工填寫調查"
+
+#. module: hr_appraisal
+#: model:ir.module.module,summary:base.module_hr_appraisal
+msgid "Assess your employees"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__assessment_note_ids
@@ -1247,26 +1388,6 @@ msgid "Body content is the same as the template"
 msgstr "正文內容與範本相同"
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__company
-msgid "By Company"
-msgstr "由公司"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__department
-msgid "By Department"
-msgstr "部門"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__employee
-msgid "By Employee"
-msgstr "按員工"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_campaign_wizard__mode__category
-msgid "By Employee Tag"
-msgstr "按員工標籤"
-
-#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "Bye-bye, record!"
@@ -1294,13 +1415,14 @@ msgid "Can See Manager Publish"
 msgstr "可見經理發佈"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.request_appraisal_view_form
-msgid "Cancel"
-msgstr "取消"
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__children_progression
+msgid "Children Progression"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Close"
 msgstr "關閉"
@@ -1318,10 +1440,6 @@ msgstr "顏色"
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_res_company
-msgid "Companies"
-msgstr "公司"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__company_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__company_id
@@ -1347,6 +1465,7 @@ msgid "Configuration"
 msgstr "配置"
 
 #. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_confirm_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Confirm"
 msgstr "確認"
@@ -1367,7 +1486,12 @@ msgstr "內容"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
 msgid "Continue"
-msgstr "繼續"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.actions.act_window,help:hr_appraisal.mail_activity_plan_action_appraisal
+msgid "Create a Appraisal Activity Plan"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_company__duration_first_appraisal
@@ -1470,16 +1594,6 @@ msgid "Delete"
 msgstr "刪除"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-msgid "Delete Future Appraisals"
-msgstr "刪除未來評核"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_departure_wizard__delete_appraisal
-msgid "Delete all appraisal after contract end date."
-msgstr "刪除在合約結束日期之後的所有評核。"
-
-#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "Delete with children"
@@ -1488,7 +1602,6 @@ msgstr ""
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_department
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__department_id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__department_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__department_ids
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1506,11 +1619,6 @@ msgid "Departments"
 msgstr "部門"
 
 #. module: hr_appraisal
-#: model:ir.model,name:hr_appraisal.model_hr_departure_wizard
-msgid "Departure Wizard"
-msgstr "離職作業"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__description
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_template_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
@@ -1520,7 +1628,6 @@ msgstr "說明"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/hr_employee_selection_list/hr_employee_selection_list_view.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_campaign_wizard_view_form
 msgid "Discard"
 msgstr "捨棄"
 
@@ -1532,8 +1639,8 @@ msgstr "捨棄"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__display_name
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__display_name
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__display_name
@@ -1560,9 +1667,14 @@ msgid "Draft"
 msgstr "草稿"
 
 #. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Edit Feedback"
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_mail_template
-msgid "Email Templates"
-msgstr "電郵範本"
+msgid "Email Template"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_employee
@@ -1590,6 +1702,11 @@ msgid "Employee Autocomplete"
 msgstr "員工自動完成"
 
 #. module: hr_appraisal
+#: model:ir.model,name:hr_appraisal.model_hr_employee_departure
+msgid "Employee Departure"
+msgstr "員工離職"
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_feedback
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__appraisal_employee_feedback_template
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -1607,11 +1724,6 @@ msgid "Employee Feedback Template"
 msgstr "員工回應範本"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__category_id
-msgid "Employee Tag"
-msgstr "員工標籤"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_user_id
 msgid "Employee User"
 msgstr "員工使用者"
@@ -1622,6 +1734,8 @@ msgid "Employee to review"
 msgstr ""
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Employee's Feedback"
 msgstr "員工的回應"
@@ -1650,6 +1764,16 @@ msgstr "評分表"
 #: code:addons/hr_appraisal/models/res_company.py:0
 msgid "Exceeds expectations"
 msgstr "超越期望"
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Employee's Feedback"
+msgstr ""
+
+#. module: hr_appraisal
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
+msgid "Expand Manager's Feedback"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_external
@@ -1689,12 +1813,6 @@ msgstr "關注人"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "關注人（業務夥伴）"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesome 圖示，例如，fa-task"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -1754,17 +1872,17 @@ msgstr "目標範本庫"
 #. module: hr_appraisal
 #: model:mail.template,name:hr_appraisal.mail_template_appraisal_request_from_employee
 msgid "HR: Appraisal Request By Employee"
-msgstr ""
+msgstr "人力資源：員工要求進行表現評核"
 
 #. module: hr_appraisal
 #: model:mail.template,name:hr_appraisal.mail_template_appraisal_reminder
 msgid "HR: Appraisal reminder"
-msgstr ""
+msgstr "人力資源：評核提醒"
 
 #. module: hr_appraisal
 #: model:mail.template,name:hr_appraisal.mail_template_appraisal_confirm
 msgid "HR: General Appraisal Confirmation"
-msgstr ""
+msgstr "人力資源：一般評核確認"
 
 #. module: hr_appraisal
 #: model:hr.appraisal.goal.tag,name:hr_appraisal.hr_appraisal_goal_tag_hardskills
@@ -1805,8 +1923,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__id
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_departure_wizard__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__id
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_departure__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_mail_template__id
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__id
@@ -2006,7 +2124,7 @@ msgstr "載入評核情境"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "Load sample data"
-msgstr "載入範例資料"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -2054,6 +2172,8 @@ msgid "Manager Feedback Template"
 msgstr "經理回應範本"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Manager's Feedback"
 msgstr "經理的回應"
@@ -2066,10 +2186,17 @@ msgstr "經理"
 #. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/goal_helper_static_actions/goal_helper_static_actions.js:0
+#: model:ir.actions.server,name:hr_appraisal.action_mark_appraisal_as_done
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Mark as Done"
 msgstr "標記為完成"
+
+#. module: hr_appraisal
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__activity_type_icon
+#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr "Material 符號圖示，例如：檢查清單"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2088,17 +2215,6 @@ msgstr "訊息遞送錯誤"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__message_ids
 msgid "Messages"
 msgstr "訊息"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__mode
-msgid "Mode"
-msgstr "模式"
-
-#. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/components/cog_menu/multiple_appraisals_cog_menu.xml:0
-msgid "Multiple Appraisals"
-msgstr "多次評核"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_search
@@ -2194,16 +2310,15 @@ msgid "Next Appraisal Date"
 msgstr "下次評核日期"
 
 #. module: hr_appraisal
+#: model:res.groups.privilege,placeholder:hr_appraisal.res_groups_privilege_appraisals
+msgid "No"
+msgstr ""
+
+#. module: hr_appraisal
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
 msgid "No Appraisals found!"
-msgstr "找不到評核。"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "No employees have the tag %(category_name)s"
-msgstr "沒有員工有下列標籤：%(category_name)s"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -2216,12 +2331,6 @@ msgstr ""
 #: code:addons/hr_appraisal/static/src/components/goal_template_delete_confirmation_dialog/goal_template_delete_confirmation_dialog.js:0
 msgid "No, keep it"
 msgstr "不，保留它"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid "Note"
-msgstr "備註"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__number_of_completed_sibling_goals
@@ -2350,14 +2459,6 @@ msgstr "與你的同事一起計劃評核，收集意見和討論。"
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid ""
-"Please set a final rating to validate these appraisals:\n"
-"- %s"
-msgstr ""
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Previous Appraisals"
 msgstr "之前的評核"
 
@@ -2365,7 +2466,7 @@ msgstr "之前的評核"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/component/print_menu.xml:0
 msgid "Print"
-msgstr "列印"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__note
@@ -2384,7 +2485,8 @@ msgid "Programming"
 msgstr "程式編寫"
 
 #. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression_display
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 msgid "Progress"
 msgstr "專案進度"
 
@@ -2392,6 +2494,11 @@ msgstr "專案進度"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_kanban
 msgid "Progress:"
 msgstr "進度："
+
+#. module: hr_appraisal
+#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__progression
+msgid "Progression"
+msgstr ""
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__appraisal_properties
@@ -2446,7 +2553,7 @@ msgstr "用於管理資源存取權限的使用者名"
 
 #. module: hr_appraisal
 #. odoo-javascript
-#: code:addons/hr_appraisal/static/src/fields/appraisal_remaining_days.js:0
+#: code:addons/hr_appraisal/static/src/fields/appraisal_relative_date.js:0
 msgid "Remaining Days"
 msgstr "剩餘天數"
 
@@ -2467,13 +2574,7 @@ msgstr "報告"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_public_view_form
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
 msgid "Request Appraisal"
-msgstr "要求評核"
-
-#. module: hr_appraisal
-#: model:ir.actions.server,name:hr_appraisal.action_create_multi_appraisals
-msgid "Request Appraisals"
 msgstr "要求評核"
 
 #. module: hr_appraisal
@@ -2482,6 +2583,13 @@ msgid "Request an Appraisal"
 msgstr "要求評核"
 
 #. module: hr_appraisal
+#. odoo-javascript
+#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
+msgid "Request an Appraisal with your manager to assess your work."
+msgstr ""
+
+#. module: hr_appraisal
+#: model:ir.actions.server,name:hr_appraisal.action_appraisal_reset
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Reset"
 msgstr "重設"
@@ -2515,12 +2623,6 @@ msgid "Schedule"
 msgstr "預約"
 
 #. module: hr_appraisal
-#. odoo-javascript
-#: code:addons/hr_appraisal/static/src/views/helper/appraisal_helper_view/appraisal_helper_view.xml:0
-msgid "Schedule Appraisals"
-msgstr "安排評核"
-
-#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Schedule Meeting"
 msgstr ""
@@ -2539,7 +2641,7 @@ msgstr "搜尋評核"
 #. odoo-javascript
 #: code:addons/hr_appraisal/static/src/views/list/goal_template_library_list/goal_template_library_list_view.xml:0
 msgid "Select"
-msgstr "選取"
+msgstr ""
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2558,6 +2660,11 @@ msgid "Send"
 msgstr "發送"
 
 #. module: hr_appraisal
+#: model:ir.actions.act_window,name:hr_appraisal.action_appraisal_send_by_email
+msgid "Send By Email"
+msgstr ""
+
+#. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Send by email"
 msgstr "以信件形式發送"
@@ -2572,7 +2679,7 @@ msgstr "評估確認後，自動發送給員工和經理"
 #: model:mail.template,description:hr_appraisal.mail_template_appraisal_request_from_employee
 msgid ""
 "Sent manually to the manager by the employee who wants to do an appraisal"
-msgstr ""
+msgstr "由想進行評估的員工手動發送給經理"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_note__sequence
@@ -2627,6 +2734,12 @@ msgid "Soft Skills"
 msgstr "軟技能"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "Some appraisals were already in another state and were skipped."
+msgstr ""
+
+#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__state
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__last_appraisal_state
 msgid "Status"
@@ -2641,10 +2754,10 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
-"根據活動的狀態 \n"
-" 逾期：已經超過截止日期 \n"
-" 現今：活動日期是當天 \n"
-" 計劃：未來活動。"
+"根據活動設定的狀態：\n"
+"逾期：截止日期已過。\n"
+"今天：活動日期是今天。\n"
+"已規劃：將於未來進行的活動。"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
@@ -2695,7 +2808,7 @@ msgstr "標籤"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid "Template"
-msgstr "範本文字"
+msgstr "範本"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2716,12 +2829,6 @@ msgstr "由於你的評估計劃，無需任何新的人工評估，新的評估
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
-msgid "The \"Manager Feedback Published\" cannot be changed by an employee."
-msgstr "員工不可更改「已發佈經理回應」。"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "The appraisal's status has been set to Done by %s"
 msgstr "評核的狀態已設為：已由 %s 完成"
 
@@ -2733,23 +2840,11 @@ msgid ""
 msgstr ""
 
 #. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "The company %(company_name)s doesn't have employees"
-msgstr "公司 %(company_name)s 沒有員工"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_employee__next_appraisal_date
 msgid ""
 "The date of the next appraisal is computed by the appraisal plan's dates "
 "(first appraisal + periodicity)."
 msgstr "下次評估日期是根據評估計劃的日期（首次評估 + 周期）計算。"
-
-#. module: hr_appraisal
-#. odoo-python
-#: code:addons/hr_appraisal/wizard/hr_appraisal_campaign_wizard.py:0
-msgid "The department %(department_name)s doesn't have employees"
-msgstr "部門「%(department_name)s」沒有員工"
 
 #. module: hr_appraisal
 #: model:ir.model.constraint,message:hr_appraisal.constraint_res_company_positif_number_months
@@ -2855,13 +2950,29 @@ msgstr "未完成目標數量"
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"field: %(inaccessible_field)s"
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid ""
+"Unfortunately you don't have access to modify the value of the following "
+"fields: %(inaccessible_fields)s"
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid "Unpublished"
 msgstr "未公開"
 
 #. module: hr_appraisal
-#: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_search
-msgid "Upcoming Appraisals"
-msgstr "即將要進行的評核"
+#: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_feedback_popup
+msgid "Update"
+msgstr ""
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
@@ -2909,6 +3020,8 @@ msgid "Waiting Feedback from Employee/Managers"
 msgstr "正等待員工/經理回應"
 
 #. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_campaign_wizard__warning
 msgid "Warning"
 msgstr "警告"
@@ -2918,18 +3031,6 @@ msgstr "警告"
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
 msgid "Weaknesses"
 msgstr "弱項"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-msgid "Website Messages"
-msgstr "網站資訊"
-
-#. module: hr_appraisal
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__website_message_ids
-#: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal_goal__website_message_ids
-msgid "Website communication history"
-msgstr "網站溝通記錄"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -2992,6 +3093,12 @@ msgstr "不可刪除身份為目標經理的員工。請改為將其封存。"
 msgid ""
 "You cannot duplicate at the same time a goal and one of its children.\n"
 "Duplicating a goal will also duplicate its children."
+msgstr ""
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/models/hr_appraisal.py:0
+msgid "You cannot modify a finished appraisal."
 msgstr ""
 
 #. module: hr_appraisal
@@ -3060,598 +3167,12 @@ msgid "once published"
 msgstr "一經發佈"
 
 #. module: hr_appraisal
-#: model:mail.template,subject:hr_appraisal.mail_template_appraisal_request_from_employee
-msgid ""
-"{{ hasattr(object, 'name') and object.name or '' }} requests an Appraisal"
-msgstr "{{ hasattr(object, 'name') and object.name or '' }} 提出評估請求"
-
-#. module: hr_appraisal
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_confirm
 msgid "{{ object.employee_id.name }}: Appraisal Confirmed"
 msgstr "{{ object.employee_id.name }}：評核已確認"
 
-#~ msgid ""
-#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
-#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-#~ "\">\n"
-#~ "                        An appraisal of <t t-"
-#~ "out=\"ctx.get('employee_to_name', 'employee')\">employee</t> has been "
-#~ "confirmed.\n"
-#~ "                        <br/><br/>\n"
-#~ "                        Please schedule an appraisal date together.\n"
-#~ "                        <br/><br/>\n"
-#~ "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-#~ "                            <p style=\"margin: 16px 0px 16px 0px; text-"
-#~ "align: center;\">\n"
-#~ "                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
-#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
-#~ "5px;\">\n"
-#~ "                                    View Appraisal\n"
-#~ "                                </a>\n"
-#~ "                            </p>\n"
-#~ "                        </t>\n"
-#~ "                    </p>\n"
-#~ "                </div>\n"
-#~ "            "
-#~ msgstr ""
-#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
-#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-#~ "\">\n"
-#~ "                        已確認將為 <t t-out=\"ctx.get('employee_to_name', "
-#~ "'employee')\">員工</t> 進行評核。\n"
-#~ "                        <br/><br/>\n"
-#~ "                        請一起安排評核日期。\n"
-#~ "                        <br/><br/>\n"
-#~ "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-#~ "                            <p style=\"margin: 16px 0px 16px 0px; text-"
-#~ "align: center;\">\n"
-#~ "                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-#~ "style=\"background-color: {{object.company_id.email_secondary_color or "
-#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
-#~ "5px;\">\n"
-#~ "                                    查看評核\n"
-#~ "                                </a>\n"
-#~ "                            </p>\n"
-#~ "                        </t>\n"
-#~ "                    </p>\n"
-#~ "                </div>\n"
-#~ "            "
-
-#~ msgid ""
-#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
-#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-#~ "\">\n"
-#~ "                        Dear <t t-out=\"ctx.get('employee_to_name', "
-#~ "'employee')\">employee</t>,\n"
-#~ "                        <br/>\n"
-#~ "                        <t t-out=\"ctx.get('author_name', '')\">Addison "
-#~ "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-#~ "\">addison.olson28@example.com</t>) wishes an appraisal.\n"
-#~ "                        <t t-if=\"ctx.get('user_body')\">\n"
-#~ "                            <div style=\"margin: 16px 0px 16px 0px; "
-#~ "padding: 8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-#~ "                                <t t-out=\"ctx.get('user_body')\">Annual "
-#~ "appraisal.</t>\n"
-#~ "                            </div>\n"
-#~ "                        </t>\n"
-#~ "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-#~ "                            <p style=\"margin: 16px 0px 16px 0px; "
-#~ "padding: 8px 16px 8px 16px; text-align: center;\">\n"
-#~ "                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-#~ "style=\" margin: auto; background-color: "
-#~ "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
-#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
-#~ "{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; "
-#~ "border-radius: 5px;\">\n"
-#~ "                                    View Appraisal\n"
-#~ "                                </a>\n"
-#~ "                            </p>\n"
-#~ "                        </t>\n"
-#~ "                    </p>\n"
-#~ "                </div>\n"
-#~ "            "
-#~ msgstr ""
-#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
-#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-#~ "\">\n"
-#~ "                        親愛的 <t t-out=\"ctx.get('employee_to_name', '員"
-#~ "工')\">員工</t>：\n"
-#~ "                        <br/>\n"
-#~ "                        <t t-out=\"ctx.get('author_name', '')\">Addison "
-#~ "Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
-#~ "\">addison.olson28@example.com</t>) 想邀請你進行評核。\n"
-#~ "                        <t t-if=\"ctx.get('user_body')\">\n"
-#~ "                            <div style=\"margin: 16px 0px 16px 0px; "
-#~ "padding: 8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-#~ "                                <t t-out=\"ctx.get('user_body')\">周年評"
-#~ "核。</t>\n"
-#~ "                            </div>\n"
-#~ "                        </t>\n"
-#~ "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-#~ "                            <p style=\"margin: 16px 0px 16px 0px; "
-#~ "padding: 8px 16px 8px 16px; text-align: center;\">\n"
-#~ "                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-#~ "style=\" margin: auto; background-color: "
-#~ "{{object.employee_id.company_id.email_secondary_color or '#875A7B'}}; "
-#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
-#~ "{{object.employee_id.company_id.email_primary_color or '#FFFFFF'}}; "
-#~ "border-radius: 5px;\">\n"
-#~ "                                    查看評核\n"
-#~ "                                </a>\n"
-#~ "                            </p>\n"
-#~ "                        </t>\n"
-#~ "                    </p>\n"
-#~ "                </div>\n"
-#~ "            "
-
-#~ msgid ""
-#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
-#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-#~ "\">\n"
-#~ "                        Dear <t t-out=\"ctx.get('employee_to_name', "
-#~ "'employee')\">employee</t>,\n"
-#~ "                        <br/>\n"
-#~ "                        An appraisal has been requested by <t t-"
-#~ "out=\"ctx.get('author_name', '')\">Addison Olson</t>\n"
-#~ "                        <br/>\n"
-#~ "                        (<t t-out=\"ctx.get('author_mail', '')"
-#~ "\">addison.olson28@example.com</t>).\n"
-#~ "                        <t t-if=\"ctx.get('user_body')\">\n"
-#~ "                            <div style=\"margin: 16px 0px 16px 0px; "
-#~ "padding: 8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-#~ "                                <t t-out=\"ctx.get('user_body')\">Annual "
-#~ "appraisal.</t>\n"
-#~ "                            </div>\n"
-#~ "                        </t>\n"
-#~ "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-#~ "                            <p style=\"margin: 16px 0px 16px 0px; "
-#~ "padding: 8px 16px 8px 16px; text-align: center;\">\n"
-#~ "                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-#~ "style=\" margin: auto; background-color: "
-#~ "{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px "
-#~ "16px 8px 16px; text-decoration: none; color: "
-#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
-#~ "5px;\">\n"
-#~ "                                    View Appraisal\n"
-#~ "                                </a>\n"
-#~ "                            </p>\n"
-#~ "                        </t>\n"
-#~ "                        <br/>\n"
-#~ "                    </p>\n"
-#~ "                </div>\n"
-#~ "            "
-#~ msgstr ""
-#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
-#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-#~ "\">\n"
-#~ "                        親愛的 <t t-out=\"ctx.get('employee_to_name', '員"
-#~ "工')\">員工</t>：\n"
-#~ "                        <br/>\n"
-#~ "                        你已被要求參加評核。提出人： <t t-"
-#~ "out=\"ctx.get('author_name', '')\">Addison Olson</t>\n"
-#~ "                        <br/>\n"
-#~ "                        (<t t-out=\"ctx.get('author_mail', '')"
-#~ "\">addison.olson28@example.com</t>)\n"
-#~ "                        <t t-if=\"ctx.get('user_body')\">\n"
-#~ "                            <div style=\"margin: 16px 0px 16px 0px; "
-#~ "padding: 8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-#~ "                                <t t-out=\"ctx.get('user_body')\">周年評"
-#~ "核。</t>\n"
-#~ "                            </div>\n"
-#~ "                        </t>\n"
-#~ "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-#~ "                            <p style=\"margin: 16px 0px 16px 0px; "
-#~ "padding: 8px 16px 8px 16px; text-align: center;\">\n"
-#~ "                                <a t-att-href=\"ctx.get('url')\" t-attf-"
-#~ "style=\" margin: auto; background-color:#: "
-#~ "{{object.company_id.email_secondary_color or '#875A7B;'}}; padding: 8px "
-#~ "16px 8px 16px; text-decoration: none; color: #fff;"
-#~ "{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: "
-#~ "5px;\">\n"
-#~ "                                    查看評核\n"
-#~ "                                </a>\n"
-#~ "                            </p>\n"
-#~ "                        </t>\n"
-#~ "                        <br/>\n"
-#~ "                    </p>\n"
-#~ "                </div>\n"
-#~ "            "
-
-#~ msgid ""
-#~ "<em>\n"
-#~ "                        Describe something that made you proud, a piece "
-#~ "of work positive for\n"
-#~ "                        the company.\n"
-#~ "                    </em>"
-#~ msgstr ""
-#~ "<span>\n"
-#~ "                        描述一下讓你感到自豪的事情，一項對公司\n"
-#~ "                        有正面影響的貢獻。\n"
-#~ "                    </span>"
-
-#~ msgid ""
-#~ "<em>\n"
-#~ "                        Did you face new difficulties? Did you confront "
-#~ "yourself to new\n"
-#~ "                        obstacles?\n"
-#~ "                    </em>"
-#~ msgstr ""
-#~ "<span>\n"
-#~ "                        有遇到新的困難嗎？你有沒有克服新的\n"
-#~ "                        障礙？\n"
-#~ "                    </span>"
-
-#~ msgid ""
-#~ "<em>\n"
-#~ "                        Every job has strong points, what are, in your "
-#~ "opinion, the tasks that\n"
-#~ "                        you enjoy the most/the least?\n"
-#~ "                    </em>"
-#~ msgstr ""
-#~ "<span>\n"
-#~ "                        每項工作都有其優點，你認為你最喜歡 / 最不喜歡\n"
-#~ "                        的任務是甚麼？\n"
-#~ "                    </span>"
-
-#~ msgid ""
-#~ "<em>\n"
-#~ "                        From a manager point of view, how could you help "
-#~ "the employee to\n"
-#~ "                        overcome their weaknesses?\n"
-#~ "                    </em>"
-#~ msgstr ""
-#~ "<span>\n"
-#~ "                        從管理者的角度去看，你可以如何幫助員工\n"
-#~ "                        克服弱項？\n"
-#~ "                    </span>"
-
-#~ msgid ""
-#~ "<em>\n"
-#~ "                        How can the company help you with your need and "
-#~ "objectives in order\n"
-#~ "                        for you to reach your goals and look for the best "
-#~ "collaboration.\n"
-#~ "                    </em>"
-#~ msgstr ""
-#~ "<span>\n"
-#~ "                        公司可以如何幫助你滿足你的需求及目的，以讓\n"
-#~ "                        你達成目標，並尋求最佳的合作方式？\n"
-#~ "                    </span>"
-
-#~ msgid ""
-#~ "<em>\n"
-#~ "                        How do you see the employee in the future, do "
-#~ "your vision follow the\n"
-#~ "                        employee's desire?\n"
-#~ "                    </em>"
-#~ msgstr ""
-#~ "<span>\n"
-#~ "                        你認為員工未來會如何發展？你的願景是否符合\n"
-#~ "                        員工的意願？\n"
-#~ "                    </span>"
-
-#~ msgid ""
-#~ "<em>\n"
-#~ "                        Some achievements comforting you in their "
-#~ "strengths to face job's\n"
-#~ "                        issues.\n"
-#~ "                    </em>"
-#~ msgstr ""
-#~ "<em>\n"
-#~ "                        一些讓你感到安慰、肯定他們有能力面對工作問題\n"
-#~ "                        的成就。\n"
-#~ "                    </em>"
-
-#~ msgid ""
-#~ "<em>Culture/Behavior:</em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-1\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-#~ msgstr ""
-#~ "文化 / 行為：<em></em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-1\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-
-#~ msgid "<em>Do you need rapid answer to the current situation?</em>"
-#~ msgstr "<span>目前情況是否需要快速回答？</span>"
-
-#~ msgid "<em>Give an example of long-term objective (&gt; 6 months)</em>"
-#~ msgstr "<span>舉一個長期目標的例子（多於 6 個月）</span>"
-
-#~ msgid "<em>Give an example of short-term objective (&lt; 6 months)</em>"
-#~ msgstr "<span>舉一個短期目標的例子（少於 6 個月）</span>"
-
-#~ msgid ""
-#~ "<em>Internal Communication:</em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-2\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-#~ msgstr ""
-#~ "內部溝通：<em></em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-2\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-
-#~ msgid ""
-#~ "<em>Job's content:</em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-3\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-#~ msgstr ""
-#~ "工作內容：<em></em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-3\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-
-#~ msgid "<em>Pro-activity</em>"
-#~ msgstr "<span>主動性</span>"
-
-#~ msgid ""
-#~ "<em>Remuneration:</em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-5\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-#~ msgstr ""
-#~ "薪酬：<em></em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-5\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-
-#~ msgid "<em>Stress Resistance</em>"
-#~ msgstr "<span>抗壓能力</span>"
-
-#~ msgid ""
-#~ "<em>Work organization:</em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-4\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-#~ msgstr ""
-#~ "工作組織：<em></em>\n"
-#~ "                        <span class=\"o_stars o_five_stars\" "
-#~ "id=\"checkId-4\">\n"
-#~ "                            <i class=\"fa fa-star-o\"></i><i class=\"fa "
-#~ "fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></"
-#~ "i><i class=\"fa fa-star-o\"></i>\n"
-#~ "                        </span>"
-
-#~ msgid ""
-#~ "<span class=\"o_stat_text\" invisible=\"last_appraisal_state == "
-#~ "'3_done'\">\n"
-#~ "                            Ongoing\n"
-#~ "                        </span>\n"
-#~ "                        <span class=\"o_stat_text\" "
-#~ "invisible=\"last_appraisal_state != '3_done'\">\n"
-#~ "                            Latest\n"
-#~ "                        </span>\n"
-#~ "                        <span class=\"o_stat_text\">\n"
-#~ "                            Appraisal\n"
-#~ "                        </span>"
-#~ msgstr ""
-#~ "<span class=\"o_stat_text\" invisible=\"last_appraisal_state == "
-#~ "'3_done'\">\n"
-#~ "                            進行中\n"
-#~ "                        </span>\n"
-#~ "                        <span class=\"o_stat_text\" "
-#~ "invisible=\"last_appraisal_state != '3_done'\">\n"
-#~ "                            最新\n"
-#~ "                        </span>\n"
-#~ "                        <span class=\"o_stat_text\">\n"
-#~ "                            評核\n"
-#~ "                        </span>"
-
-#~ msgid ""
-#~ "<span invisible=\"not is_manager or (next_appraisal_date or not "
-#~ "ongoing_appraisal_count)\">\n"
-#~ "                    Ongoing\n"
-#~ "                </span>"
-#~ msgstr ""
-#~ "<span invisible=\"not is_manager or (next_appraisal_date or not "
-#~ "ongoing_appraisal_count)\">\n"
-#~ "                    持續進行\n"
-#~ "                </span>"
-
-#~ msgid "Appraisal Requested"
-#~ msgstr "已提出評估請求"
-
-#~ msgid "Appraisal Sent"
-#~ msgstr "鑑定已發送"
-
-#~ msgid "Appraisal Statistics"
-#~ msgstr "評估統計"
-
-#~ msgid "Basic Employee"
-#~ msgstr "一般員工"
-
-#~ msgid "Closing date of the previous appraisal"
-#~ msgstr "上次評核的關閉日期"
-
-#~ msgid "Create Date"
-#~ msgstr "建立日期"
-
-#~ msgid "Create a new employee"
-#~ msgstr "建立一位新員工"
-
-#~ msgid "Created By"
-#~ msgstr "建立人"
-
-#~ msgid "Created On"
-#~ msgstr "建立於"
-
-#~ msgid "Deadline Date"
-#~ msgstr "截止日期"
-
-#~ msgid "Default Template"
-#~ msgstr "預設模板"
-
-#~ msgid "Employee Name"
-#~ msgstr "員工姓名"
-
-#~ msgid "Extended Filters..."
-#~ msgstr "擴展篩選..."
-
-#~ msgid "Final Interview Date"
-#~ msgstr "最終面試日期"
-
-#~ msgid "Goal"
-#~ msgstr "目標"
-
-#~ msgid "Group By"
-#~ msgstr "分組依據"
-
-#~ msgid "Group by..."
-#~ msgstr "分組依據⋯"
-
-#~ msgid "HR: Appraisal Confirmation"
-#~ msgstr "人力資源：評估確認"
-
-#~ msgid "HR: Employee Appraisal Request"
-#~ msgstr "人力資源：員工評估請求"
-
-#~ msgid "HR: Manager appraisal request"
-#~ msgstr "人力資源：經理評估請求"
-
-#~ msgid "Has Department Manager Access"
-#~ msgstr "擁有部門經理存取權限"
-
-#~ msgid "How do I feel about my own..."
-#~ msgstr "我如何評價自己⋯"
-
-#~ msgid "How do I feel about the company..."
-#~ msgstr "我如何評價公司⋯"
-
-#~ msgid "In progress Evaluations"
-#~ msgstr "進行中的評估"
-
-#~ msgid "Interview"
-#~ msgstr "面試"
-
-#~ msgid "Last Appraisal Date"
-#~ msgstr "上次評核日期"
-
-#~ msgid ""
-#~ "Long term (&gt; 6 months) career discussion, where does the employee\n"
-#~ "                    wants to go, how to help them reach this path?"
-#~ msgstr ""
-#~ "長期（多於 6 個月）的職業討論：員工想達成甚麼？\n"
-#~ "                    如何幫助他們達成這個目標？"
-
-#~ msgid "Manager Users"
-#~ msgstr "經理使用者"
-
-#~ msgid "Not Visible to Employee"
-#~ msgstr "不向員工顯示"
-
-#~ msgid "Not Visible to Manager"
-#~ msgstr "不向經理顯示"
-
-#~ msgid ""
-#~ "Optional translation language (ISO code) to select when sending out an "
-#~ "email. If not set, the english version will be used. This should usually "
-#~ "be a placeholder expression that provides the appropriate language, e.g. "
-#~ "{{ object.partner_id.lang }}."
-#~ msgstr ""
-#~ "發送電子郵件時要選擇的可選翻譯語言（ISO 代碼）。如果未設置，將使用英文版"
-#~ "本。這通常應該是提供適當語言的佔位符表達式，例如"
-#~ "{{ object.partner_id.lang }}。"
-
-#~ msgid "People I Manage"
-#~ msgstr "人員 | 管理"
-
-#~ msgid "Previous Appraisal Date"
-#~ msgstr "上次評核日期"
-
-#~ msgid ""
-#~ "Sent manually to the employee by the manager who wants to do an appraisal"
-#~ msgstr "由想進行評估的經理手動發送給員工"
-
-#~ msgid "Sent manually to the manager by the employee who wants an appraisal"
-#~ msgstr "由想進行評估的員工手動發送給經理"
-
-#~ msgid "Set default appraisal template"
-#~ msgstr "設定預設評核範本"
-
-#~ msgid "The date of the last appraisal"
-#~ msgstr "上次評核日期"
-
-#~ msgid "To Start"
-#~ msgstr "待開始"
-
-#~ msgid "To create an appraisal, you need at least 2 employees"
-#~ msgstr "若要建立評核，你需要有最少 2 名員工"
-
-#~ msgid "Try the backend and reporting:"
-#~ msgstr "試試使用後端及報告："
-
-#~ msgid "Visible & Editable by Manager"
-#~ msgstr "經理可見及可編輯"
-
-#~ msgid "Visible to Employee"
-#~ msgstr "向員工顯示"
-
-#~ msgid "Visible to Manager"
-#~ msgstr "向經理顯示"
-
-#~ msgid "What are my best achievement(s) since my last appraisal?"
-#~ msgstr "上次評核後，我的最大成就是甚麼？"
-
-#~ msgid ""
-#~ "What are my short and long-term goals with the company, and for my\n"
-#~ "                    career?"
-#~ msgstr ""
-#~ "我在公司及個人職業生涯中，短期和長期的目標\n"
-#~ "                    是甚麼？"
-
-#~ msgid ""
-#~ "What has been the most challenging aspect of my work this past year and\n"
-#~ "                    why?"
-#~ msgstr ""
-#~ "過去一年工作中，我遇到的最大挑戰是甚麼？\n"
-#~ "                    原因是？"
-
-#~ msgid "What would I need to improve my work?"
-#~ msgstr "我需要些甚麼去改進工作？"
-
-#~ msgid ""
-#~ "When the Appraisals plan is saved, it will overwrite all Next Appraisal "
-#~ "Dates for employees without ongoing appraisals."
-#~ msgstr "儲存評核計劃時，將會覆寫未有持續評核的所有員工的下次評核日期。"
-
-#~ msgid "Which parts of my job do I most / least enjoy?"
-#~ msgstr "我最喜歡 / 最不喜歡工作的哪些部份？"
-
-#~ msgid "You cannot delete appraisal which is not in draft state"
-#~ msgstr "你不可刪除並非處於草稿狀態的評核"
-
-#~ msgid "or"
-#~ msgstr "或"
+#~ msgid "Website Messages"
+#~ msgstr "網站資訊"
+
+#~ msgid "Website communication history"
+#~ msgstr "網站溝通記錄"

@@ -2,9 +2,9 @@
 import re
 
 from odoo import models, fields, api, _
-from odoo.addons.mail.tools.mail_validation import mail_validate
 from odoo.exceptions import ValidationError
 from odoo.tools import float_repr
+from odoo.tools.mail import email_normalize
 
 
 class ResPartnerBank(models.Model):
@@ -31,16 +31,23 @@ class ResPartnerBank(models.Model):
             if bank.proxy_type not in ("email", "mobile", "br_cpf_cnpj", "br_random"):
                 raise ValidationError(
                     _(
-                        "The proxy type must be Email Address, Mobile Number, CPF/CNPJ (BR) or Random Key (BR) for Pix code generation."
+                        "The account identifier type must be Email Address, Mobile Number, CPF/CNPJ (BR) or Random Key (BR) for Pix code generation."
                     )
                 )
 
             value = bank.proxy_value
-            if bank.proxy_type == "email" and not mail_validate(value):
+            if bank.proxy_type == "email" and not email_normalize(value):
                 raise ValidationError(_("%s is not a valid email.", value))
 
+            ResPartner = self.env['res.partner']
             if bank.proxy_type == "br_cpf_cnpj" and (
-                not self.partner_id.check_vat_br(value) or any(not char.isdecimal() for char in value)
+                not value
+                or not (
+                    ResPartner._validate_identifier('BR_CN', value)['valid']
+                    # the CNPJ is a tax number, it is only checked when validation is asked for
+                    or ResPartner._validate_identifier('BR_TIN', value, validation='setnull')['valid']
+                )
+                or not value.isalnum()
             ):
                 raise ValidationError(_("%s is not a valid CPF or CNPJ (don't include periods or dashes).", value))
 
@@ -53,13 +60,17 @@ class ResPartnerBank(models.Model):
                 )
 
             regex = r"%(char)s{8}-%(char)s{4}-%(char)s{4}-%(char)s{4}-%(char)s{12}" % {"char": "[a-fA-F0-9]"}
-            if bank.proxy_type == "br_random" and not re.fullmatch(regex, bank.proxy_value):
+            if bank.proxy_type == "br_random" and (not value or not re.fullmatch(regex, value)):
                 raise ValidationError(
                     _(
                         "The random key %s is invalid, the format looks like this: 71d6c6e1-64ea-4a11-9560-a10870c40ca2",
                         value,
                     )
                 )
+
+    @api.model
+    def _get_emv_qr_code_names(self):
+        return {**super()._get_emv_qr_code_names(), 'BR': _("Pix QR Code")}
 
     @api.depends('country_code')
     def _compute_country_proxy_keys(self):
@@ -88,7 +99,7 @@ class ResPartnerBank(models.Model):
         res = super()._get_qr_code_vals_list(*args, **kwargs)
         if self.country_code == "BR":
             res[5] = (res[5][0], float_repr(res[5][1], 2) if res[5][1] else None)  # amount
-            res[7] = (res[7][0], res[7][1].upper())  # merchant_name
+            res[7] = (res[7][0], re.sub(r"[^a-zA-Z0-9 ]", "", res[7][1]).upper())  # merchant_name
             res[8] = (res[8][0], res[8][1].upper())  # merchant_city
             if not res[9][1]:
                 res[9] = (res[9][0], self._get_additional_data_field("***"))  # default comment if none is set
@@ -124,7 +135,7 @@ class ResPartnerBank(models.Model):
             and self.proxy_type not in ("email", "mobile", "br_cpf_cnpj", "br_random")
         ):
             return _(
-                "To generate a Pix code the proxy type for %s must be Email Address, Mobile Number, CPF/CNPJ (BR) or Random Key (BR).",
+                "To generate a Pix code the account identifier type for %s must be Email Address, Mobile Number, CPF/CNPJ (BR) or Random Key (BR).",
                 self.display_name,
             )
 

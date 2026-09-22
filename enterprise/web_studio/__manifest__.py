@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': "Studio",
@@ -18,13 +17,10 @@ Note: Only the admin user is allowed to make those customizations.
 """,
     'category': 'Customizations/Studio',
     'sequence': 75,
-    'version': '1.0',
     'depends': [
         'base_automation',
         'base_import_module',
         'mail',
-        'web',
-        'web_enterprise',
         'html_editor',
         'web_map',
         'web_gantt',
@@ -44,8 +40,7 @@ Note: Only the admin user is allowed to make those customizations.
         'data/mail_templates.xml',
         'data/web_tour_tour.xml',
         'wizard/base_module_uninstall_view.xml',
-        'security/ir.model.access.csv',
-        'security/studio_security.xml',
+        'security/ir.access.csv',
     ],
     'application': True,
     'author': 'Odoo S.A.',
@@ -75,6 +70,7 @@ Note: Only the admin user is allowed to make those customizations.
             ('include', 'web_studio.studio_assets_minimal'),
         ],
         'web_studio.studio_assets_minimal': [
+            'html_editor/static/src/main/media/media_dialog/icon_selector.js',
             'web_studio/static/src/client_action/**/*.js',
             'web_studio/static/src/views/kanban_report/**/*.js',
             ('remove', 'web_studio/static/src/client_action/studio_action_loader.js'),
@@ -87,7 +83,6 @@ Note: Only the admin user is allowed to make those customizations.
             'web/static/lib/bootstrap/scss/_variables-dark.scss',
             'web/static/lib/bootstrap/scss/_maps.scss',
             'web_studio/static/src/client_action/variables.scss',
-            'web_studio/static/src/client_action/mixins.scss',
             'web_studio/static/src/client_action/**/*.scss',
             ("remove", "web_studio/static/src/client_action/report_editor/report_iframe.scss"),
             'web_studio/static/src/views/kanban_report/**/*.scss',
@@ -109,10 +104,7 @@ Note: Only the admin user is allowed to make those customizations.
             "web/static/src/webclient/actions/reports/report.scss",
             'web_studio/static/src/client_action/report_editor/report_iframe.scss',
             'web_studio/static/src/client_action/report_editor/qweb_table_plugin.scss',
-        ],
-        'web.qunit_suite_tests': [
-            # File to remove once all the legacy tests have been converted
-            'web_studio/static/tests/legacy/disable_patch.js',
+            'html_editor/static/src/main/selection_placeholder_plugin.scss',
         ],
         'web.assets_unit_tests': [
             ('include', 'web_studio.studio_assets_minimal'),

@@ -128,10 +128,11 @@ class L10n_LuGenerateTaxReport(models.TransientModel):
             if form.get(field) and not child_exists:
                 form.pop(field, None)
 
+        val_163, val_164, val_165 = [form.get(index, {}).get('value', 0) for index in ('163', '164', '165')]
         if form.get('163') and form.get('165') and not form.get('164'):
-            form['164'] = {'value': form.get('163') - form.get('165'), 'field_type': 'float'}
+            form['164'] = {'value': val_163 - val_165, 'field_type': 'float'}
         elif form.get('163') and form.get('164') and not form.get('165'):
-            form['165'] = {'value': form.get('163') - form.get('164'), 'field_type': 'float'}
+            form['165'] = {'value': val_163 - val_164, 'field_type': 'float'}
 
         if not form['361']['value']:
             form['361'] = form['414']
@@ -205,7 +206,7 @@ class L10n_LuGenerateTaxReport(models.TransientModel):
         form['field_values'] = {k: v for k, v in form['field_values'].items() if k in YEARLY_SIMPLIFIED_FIELDS}
 
     def _get_account_code(self, ln):
-        model, active_id = self.env['account.report']._get_model_info_from_id(ln['id'])
+        model, active_id = self.env['account.report']._get_model_info_from_id(ln.id)
         if model == 'account.account':
             account_code = self.env['account.account'].browse(active_id).code
             return account_code

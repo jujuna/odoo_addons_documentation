@@ -2,12 +2,14 @@ import { unique } from "@web/core/utils/arrays";
 import { exprToBoolean } from "@web/core/utils/strings";
 import { visitXML } from "@web/core/utils/xml";
 import { stringToOrderBy } from "@web/search/utils/order_by";
+import { getActiveActions } from "@web/views/utils";
 
 export class MapArchParser {
     parse(arch) {
         const archInfo = {
             fieldNames: [],
-            fieldNamesMarkerPopup: [],
+            popoverNode: undefined,
+            popoverFieldNodes: [], // temporarily kept for backward compatibility
         };
 
         visitXML(arch, (node) => {
@@ -16,32 +18,34 @@ export class MapArchParser {
                     this.visitMap(node, archInfo);
                     break;
                 case "field":
-                    this.visitField(node, archInfo);
+                    archInfo.fieldNames.push(node.getAttribute("name"));
+                    archInfo.popoverFieldNodes.push({
+                        fieldName: node.getAttribute("name"),
+                        string: node.getAttribute("string"),
+                    });
                     break;
+                case "popover": {
+                    archInfo.popoverNode = node;
+                    return false;
+                }
             }
         });
 
         archInfo.fieldNames = unique(archInfo.fieldNames);
-        archInfo.fieldNamesMarkerPopup = unique(archInfo.fieldNamesMarkerPopup);
 
         return archInfo;
     }
 
     visitMap(node, archInfo) {
+        archInfo.activeActions = getActiveActions(node);
         archInfo.resPartnerField = node.getAttribute("res_partner");
         archInfo.fieldNames.push(archInfo.resPartnerField);
 
         if (node.hasAttribute("limit")) {
             archInfo.limit = parseInt(node.getAttribute("limit"), 10);
         }
-        if (node.hasAttribute("panel_title")) {
-            archInfo.panelTitle = node.getAttribute("panel_title");
-        }
         if (node.hasAttribute("routing")) {
-            archInfo.routing = exprToBoolean(node.getAttribute("routing"));
-        }
-        if (node.hasAttribute("hide_title")) {
-            archInfo.hideTitle = exprToBoolean(node.getAttribute("hide_title"));
+            archInfo.routing = node.getAttribute("routing");
         }
         if (node.hasAttribute("hide_address")) {
             archInfo.hideAddress = exprToBoolean(node.getAttribute("hide_address"));
@@ -55,15 +59,5 @@ export class MapArchParser {
         if (node.hasAttribute("default_order")) {
             archInfo.defaultOrder = stringToOrderBy(node.getAttribute("default_order") || null);
         }
-        if (node.hasAttribute("allow_resequence")) {
-            archInfo.allowResequence = exprToBoolean(node.getAttribute("allow_resequence"));
-        }
-    }
-    visitField(node, params) {
-        params.fieldNames.push(node.getAttribute("name"));
-        params.fieldNamesMarkerPopup.push({
-            fieldName: node.getAttribute("name"),
-            string: node.getAttribute("string"),
-        });
     }
 }

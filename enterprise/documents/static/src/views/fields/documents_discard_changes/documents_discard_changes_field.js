@@ -1,10 +1,10 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class DocumentsDiscardChangesField extends Component {
     static template = "documents.DocumentsDiscardChangesField";
-    static props = { ...standardFieldProps };
+    props = useProps(standardFieldProps);
 
     async discard() {
         this.props.record.model.root.discard();

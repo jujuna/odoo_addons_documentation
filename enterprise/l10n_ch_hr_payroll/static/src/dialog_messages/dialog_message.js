@@ -1,5 +1,6 @@
 /** @odoo-module **/
-import { X2ManyField, x2ManyField } from "@web/views/fields/x2many/x2many_field";
+import { t, useProps } from "@odoo/owl";
+import { X2ManyField, x2ManyField, x2ManyFieldProps } from "@web/views/fields/x2many/x2many_field";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 import { CharField } from "@web/views/fields/char/char_field";
@@ -13,10 +14,10 @@ import { RadioField } from "@web/views/fields/radio/radio_field";
 
 export class DialogMessagesRenderer extends X2ManyField {
     static template = "dialog_messages_renderer_template";
-    static props = {
-        ...X2ManyField.props,
-        context: { type: Object, optional: true },
-    }
+    props = useProps({
+        ...x2ManyFieldProps,
+        context: t.object().optional(),
+    });
     static components = {
         CharField,
         RadioField,

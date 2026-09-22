@@ -4,7 +4,8 @@
         <field name="model">pos.prep.display</field>
         <field name="inherit_id" ref="pos_enterprise.preparation_display_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='stages']" position="after">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
                 <page string="Communication">
                     <div class="o_setting_box">
                         <div class="o_setting_left_pane mt-2">
@@ -47,6 +48,7 @@
                         </div>
                     </div>
                 </page>
+                </notebook>
             </xpath>
         </field>
     </record>

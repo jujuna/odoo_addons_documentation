@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import _, fields, models
@@ -25,6 +24,7 @@ class AddIotBox(models.TransientModel):
     iot_box_to_connect = fields.Many2one("iot.discovered.box")
     serial_number = fields.Char(string='Serial Number')
     pairing_code = fields.Char(string='Pairing Code')
+    token = fields.Char(string='IoT Box token')
 
     offline_pairing_token = fields.Char(
         "Token", default=lambda self: self._compute_pairing_token(), readonly=True, store=False
@@ -49,9 +49,9 @@ class AddIotBox(models.TransientModel):
                     'params': {
                         'pairing_code': self.pairing_code,
                         'database_url': self.get_base_url(),
-                        'token': self.env['iot.box']._default_token(),
-                        'db_uuid': icp_sudo.get_param('database.uuid'),
-                        'enterprise_code': icp_sudo.get_param('database.enterprise_code'),
+                        'token': self.token,
+                        'db_uuid': icp_sudo.get_str('database.uuid'),
+                        'enterprise_code': icp_sudo.get_str('database.enterprise_code'),
                     },
                 },
                 timeout=5
@@ -115,6 +115,11 @@ class AddIotBox(models.TransientModel):
         else:
             name = _('IoT Box found. Connecting...')
 
+        self.env['iot.box'].sudo().create([{
+            'name': f'Connecting {self.pairing_code}...',
+            'token': self.token,
+        }])
+
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'add.iot.box',
@@ -177,6 +182,10 @@ class AddIotBox(models.TransientModel):
             return self._start_stage()
 
         self.stage = 'pair_offline'
+        self.env['iot.box'].sudo().create([{
+            'name': 'Connecting offline...',
+            'token': self.token,
+        }])
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'add.iot.box',
@@ -188,10 +197,9 @@ class AddIotBox(models.TransientModel):
 
     def _compute_pairing_token(self):
         icp_sudo = self.env['ir.config_parameter'].sudo()
-        token = self.env['iot.box']._default_token()
         url = self.get_base_url()
-        db_uuid = icp_sudo.get_param('database.uuid', default='')
+        db_uuid = icp_sudo.get_str('database.uuid')
         db_name = self.env.cr.dbname
-        enterprise_code = icp_sudo.get_param('database.enterprise_code', default='')
+        enterprise_code = icp_sudo.get_str('database.enterprise_code')
 
-        return f"{url}?token={token}&db_uuid={db_uuid}&enterprise_code={enterprise_code}&db_name={db_name}"
+        return f"{url}?token={self.token}&db_uuid={db_uuid}&enterprise_code={enterprise_code}&db_name={db_name}"

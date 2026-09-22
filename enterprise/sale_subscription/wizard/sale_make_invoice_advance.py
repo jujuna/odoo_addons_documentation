@@ -11,7 +11,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
 
     @api.depends('sale_order_ids')
     def _compute_postpaid_warning_message(self):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         self.postpaid_warning_message = False
         for wiz in self:
             if not wiz.sale_order_ids:
@@ -33,7 +33,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
                         product_list = []
                         for line in order.order_line:
                             if line._is_postpaid_line():
-                                product_list.append(line.product_id.display_name)
+                                product_list.append(line.product_id.display_name or line.name)
                         rendering_values.update({
                             'next_invoice_date': format_date(self.env, order.next_invoice_date),
                              "product_list": product_list,

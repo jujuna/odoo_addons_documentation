@@ -107,7 +107,7 @@ class ResCompany(models.Model):
         url = f'{default_endpoint}/api/l10n_ch_swissdec/1/{route}'
 
         params = {
-            'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+            'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
             **kwargs
         }
         report_language = self.l10n_ch_transmission_language if self.l10n_ch_transmission_language else 'de'
@@ -124,13 +124,22 @@ class ResCompany(models.Model):
             params['company_name'] = company_name
             params["language"] = report_language
 
+        is_neutralized = self.env['ir.config_parameter'].sudo().get_bool('database.is_neutralized')
+        if route in ['declare_salary',
+                     'get_status_from_declare_salary',
+                     'get_result_from_declare_salary',
+                     'get_dialog',
+                     'reply_dialog',
+                     'create_eiv_file'] and is_neutralized:
+            raise ValidationError(_("This feature is only allowed in production environments."))
+
         if route in ['generate_tax_accounting_report']:
             params['from_person'] = kwargs.get('from_person', 1)
             params['to_person'] = kwargs.get('to_person', 1)
             if 'split_files' in kwargs:
                 params['split_files'] = kwargs.get('split_files')
 
-        response = iap_jsonrpc(url, params=params, timeout=120)
+        response = iap_jsonrpc(url, params=params, timeout=120, raise_user_error=True)
         result = response.get('result')
 
         if result and result.get('result') == 'success':

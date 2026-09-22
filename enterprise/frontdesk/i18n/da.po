@@ -4,51 +4,47 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-12 13:03+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/frontdesk/"
-"da/>\n"
+"POT-Creation-Date: 2026-09-11 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:28+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
+"frontdesk/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid " - Manager: %(manager_name)s"
-msgstr ""
+msgstr " - Leder: %(manager_name)s"
 
 #. module: frontdesk
 #. odoo-python
-#: code:addons/frontdesk/models/frontdesk_visitor.py:0
-msgid "%(name)s just checked-in. Requested Drink: %(drink)s."
+#: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
+msgid ""
+"%(host_names)s must have a valid Email to be informed about visitor arrival."
 msgstr ""
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s"
-msgstr ""
+msgstr "%(station)s Indtjekning: %(visitor)s"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s to meet %(host)s"
-msgstr ""
-
-#. module: frontdesk
-#. odoo-python
-#: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
-msgid "%s (copy)"
-msgstr "%s (kopi)"
+msgstr "%(station)s Indtjekning: %(visitor)s for at møde %(host)s"
 
 #. module: frontdesk
 #. odoo-python
@@ -62,38 +58,23 @@ msgid "'Badge - %s' % (object.name).replace('/', '')"
 msgstr "'Badge - %s' % (object.name).replace('/', '')"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid ""
-")\n"
-"                        will be notified via email/SMS only, as they are not "
-"available on Discuss."
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid ",<br/>I hope this message finds you well. This is to inform you that"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid ""
-".\n"
-"                    <br/>Please let us know if you would like us to direct "
-"them to a meeting room or if you require any further assistance.\n"
-"                    <br/>After a successful meeting with the visitor, please "
-"proceed to check out their login."
-msgstr ""
-
-#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "22 Oct 24 14:20:10"
-msgstr ""
+msgstr "22. oktober 24 14:20:10"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_check_out
+#: model:mail.template,body_html:frontdesk.frontdesk_visitor_mail_template
 msgid ""
-"<i class=\"fa fa-check-circle fa-3x d-block mb-3 text-success\"/>\n"
-"                    The visitor has been successfully <br/> checked out"
+"<div>\n"
+"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
+"know you'll be there shortly.\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 msgstr ""
 
 #. module: frontdesk
@@ -102,28 +83,33 @@ msgid ""
 "<span><b>Congratulations!!!</b> You have created your first visitor.\n"
 "        </span>"
 msgstr ""
+"<span><b>Tillykke!!!</b> Du har oprettet din første gæst.\n"
+"        </span>"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "<strong>Visiting:</strong>"
+msgstr "<strong>Besøg:</strong>"
+
+#. module: frontdesk
+#: model:ir.module.module,description:base.module_frontdesk
+msgid ""
+"A comprehensive front desk management system that enables guests to "
+"effortlessly check in and out while ensuring seamless notifications for "
+"hosts."
 msgstr ""
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_needaction
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_needaction
 msgid "Action Needed"
 msgstr "Handling påkrævet"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__active
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__active
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__active
 msgid "Active"
 msgstr "Aktiv"
-
-#. module: frontdesk
-#: model:ir.actions.client,name:frontdesk.frontdesk_visitor_action_configure_properties_field
-msgid "Add Properties"
-msgstr "Tilføj Egenskaber"
 
 #. module: frontdesk
 #: model:res.groups,name:frontdesk.frontdesk_group_administrator
@@ -134,12 +120,7 @@ msgstr "Administrator"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
 msgid "All"
-msgstr "Alle"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "All Employees"
-msgstr "Alle medarbejdere"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
@@ -149,17 +130,10 @@ msgstr "Alle afdelinger"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Allow visitor to select a drink during registration"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Allows the visitor to pick the host of the meeting from the list"
-msgstr ""
+msgstr "Giv besøgende mulighed for at vælge mødelederen fra listen"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_search
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
@@ -168,19 +142,19 @@ msgid "Archived"
 msgstr "Arkiveret"
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/quick_check_in/quick_check_in.xml:0
-msgid "Are you one of these people?"
-msgstr ""
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_attachment_count
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_attachment_count
 msgid "Attachment Count"
 msgstr "Antal vedhæftninger"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__authenticate_guest
-msgid "Authenticate Guest"
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__auto_checkout_hours
+msgid "Auto-Checkout"
+msgstr ""
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__auto_checkout_time
+msgid "Auto-Checkout Time"
 msgstr ""
 
 #. module: frontdesk
@@ -191,57 +165,42 @@ msgid "Back"
 msgstr "Tilbage"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "Best regards,<br/>"
-msgstr ""
-
-#. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Browse All Hosts"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
-msgid "By Responsible"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "Cancel"
-msgstr "Annullér"
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_visitor__state__canceled
-msgid "Cancelled"
-msgstr "Annulleret"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__check_in
-msgid "Check In"
-msgstr "Tjek-ind"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__check_out
-msgid "Check Out"
-msgstr "Tjek-ud"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "Check Out Visitor"
 msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
-msgid "Check in"
-msgstr "Tjek ind"
+msgid "Browse Hosts"
+msgstr ""
 
 #. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
+msgid "By Responsible"
+msgstr "Af ansvarlig"
+
+#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Change Host"
+msgstr ""
+
+#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__check_in
+msgid "Check In"
+msgstr "Indtjekning"
+
+#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__check_out
+msgid "Check Out"
+msgstr "Udtjekning"
+
+#. module: frontdesk
+#: model:ir.actions.server,name:frontdesk.action_mass_checkout
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
 msgid "Check out"
@@ -250,12 +209,12 @@ msgstr "Tjek ud"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
 msgid "CheckIn"
-msgstr ""
+msgstr "Indtjekning"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
 msgid "CheckIn Station"
-msgstr ""
+msgstr "Indtjekningsskranke"
 
 #. module: frontdesk
 #: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_visitor__state__checked_in
@@ -266,12 +225,12 @@ msgstr "Tjekket ind"
 #. module: frontdesk
 #: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_visitor__state__checked_out
 msgid "Checked-Out"
-msgstr ""
+msgstr "Tjekket ud"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
 msgid "Checked-out"
-msgstr ""
+msgstr "Tjekket ud"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
@@ -279,8 +238,13 @@ msgid "Checkout"
 msgstr "Gå til kassen"
 
 #. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Choose how hosts are notified when a guest arrives."
+msgstr ""
+
+#. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Choose who you would like to visit"
 msgstr ""
 
@@ -288,11 +252,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_check_out
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Close"
 msgstr "Luk"
 
 #. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__company_id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company_id
 msgid "Company"
@@ -306,31 +272,29 @@ msgid "Company Logo"
 msgstr "Virksomhedslogo"
 
 #. module: frontdesk
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_config
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid ""
+"Concise summary displayed immediately to the user for quick transparency."
+msgstr ""
+
+#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
 msgid "Configuration"
 msgstr "Konfiguration"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Configure Drinks"
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Continue"
 msgstr ""
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
-msgid "Continue"
-msgstr "Fortsæt"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__create_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__create_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__create_uid
 msgid "Created by"
 msgstr "Oprettet af"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__create_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__create_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__create_date
 msgid "Created on"
@@ -347,15 +311,10 @@ msgid "Date"
 msgstr "Dato"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "Dear"
-msgstr "Kære"
-
-#. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "Dear %(visitor_name)s,"
-msgstr ""
+msgstr "Kære %(visitor_name)s"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__description
@@ -363,70 +322,10 @@ msgid "Description"
 msgstr "Beskrivelse"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__display_name
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__display_name
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__display_name
 msgid "Display Name"
-msgstr "Vis navn"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "Do you want something to drink?"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_ids
-msgid "Drink"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__drink_image
-msgid "Drink Image"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-msgid "Drink Name"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__served
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
-msgid "Drink Served"
-msgstr ""
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/drink_page/drink_page.xml:0
-msgid "Drink image"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-msgid "Drink to Serve"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_drink
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_drinks_report
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__drink_ids
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_drinks_config
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_report_drinks
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_report_view_graph
-msgid "Drinks"
-msgstr "Drinks"
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_open_drink_to_serve_visitor
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_to_serve
-msgid "Drinks to Serve"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-msgid "Drinks to serve"
-msgstr ""
+msgstr "Visningsnavn"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__duration
@@ -434,21 +333,30 @@ msgid "Duration"
 msgstr "Varighed"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "E.g. What's your Name"
+#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_visitor
+#: model_terms:ir.actions.act_window,help:frontdesk.action_open_guest_on_site_visitor
+#: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
+msgid "Efficiently track and manage all visitor information."
 msgstr ""
 
 #. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_email
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__email
 msgid "Email"
 msgstr "E-mail"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__mail_template_id
+msgid "Email Template"
+msgstr ""
+
+#. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/js/tours/frontdesk.js:0
 msgid "Enter the visitor's name."
-msgstr ""
+msgstr "Indtast gæstens navn."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
@@ -456,11 +364,13 @@ msgid "Favorite"
 msgstr "Favorit"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_follower_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_follower_ids
 msgid "Followers"
 msgstr "Følgere"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_partner_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Følgere (partnere)"
@@ -468,6 +378,7 @@ msgstr "Følgere (partnere)"
 #. module: frontdesk
 #: model:ir.actions.client,name:frontdesk.frontdesk_action_install_kiosk_pwa
 #: model:ir.model,name:frontdesk.model_frontdesk_frontdesk
+#: model:ir.module.module,shortdesc:base.module_frontdesk
 #: model:ir.ui.menu,name:frontdesk.frontdesk_menu_root
 #: model:res.groups.privilege,name:frontdesk.res_groups_privilege_frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
@@ -475,23 +386,30 @@ msgid "Frontdesk"
 msgstr "Reception"
 
 #. module: frontdesk
-#: model:ir.model,name:frontdesk.model_frontdesk_drink
-msgid "Frontdesk Drink"
+#: model:mail.template,name:frontdesk.frontdesk_visitor_mail_template
+msgid "Frontdesk Email Template"
 msgstr ""
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__name
 msgid "Frontdesk Name"
-msgstr ""
-
-#. module: frontdesk
-#: model:sms.template,name:frontdesk.frontdesk_sms_template
-msgid "Frontdesk SMS Template"
-msgstr ""
+msgstr "Navn på receptionsskranke"
 
 #. module: frontdesk
 #: model:ir.model,name:frontdesk.model_frontdesk_visitor
-msgid "Frontdesk Visitors"
+msgid "Frontdesk Visitor"
+msgstr ""
+
+#. module: frontdesk
+#: model:ir.actions.server,name:frontdesk.cron_auto_checkout_visitors_ir_actions_server
+msgid "Frontdesk: Auto-Checkout Visitors"
+msgstr ""
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid ""
+"Full legal disclosure covering storage, rights, and contact info (accessible "
+"via click)."
 msgstr ""
 
 #. module: frontdesk
@@ -501,86 +419,86 @@ msgid "Go back"
 msgstr "Gå tilbage"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__authenticate_guest
+msgid "Guest Details"
+msgstr ""
+
+#. module: frontdesk
 #: model:ir.actions.act_window,name:frontdesk.action_open_guest_on_site_visitor
 msgid "Guest On Site"
-msgstr ""
+msgstr "Gæst på stedet"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__guest_on_site
 msgid "Guests On Site"
-msgstr ""
+msgstr "Gæster på stedet"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__has_message
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__has_message
 msgid "Has Message"
 msgstr "Har besked"
 
 #. module: frontdesk
-#: model:sms.template,body:frontdesk.frontdesk_sms_template
-msgid ""
-"Hello, Your visitor {{ object.name }} {{ '(%s)' % object.phone if "
-"object.phone else '' }} {{ '(%s)' % object.company if object.company else "
-"'' }} wants to meet you at {{ object.station_id.name }}. Please let them "
-"know you'll be there shortly."
-msgstr ""
-
-#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Henry"
-msgstr ""
+msgstr "Henry"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/js/tours/frontdesk.js:0
 msgid "Here, you'll see list of all the visitors."
-msgstr ""
+msgstr "Her er en liste over alle gæsterne."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
 msgid "Host"
-msgstr ""
+msgstr "Vært"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/host_page/host_manual_selection.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Host Avatar"
 msgstr ""
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__host_ids
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__host_id
 msgid "Host Name"
+msgstr "Værtsnavn"
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Host Notifications"
 msgstr ""
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__host_selection
 msgid "Host Selection"
-msgstr ""
+msgstr "Værtsvalg"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__host_ids
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__station_host_ids
 msgid "Hosts"
 msgstr ""
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/drink_page/drink_page.xml:0
-msgid "How can we delight you?"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__id
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__id
 msgid "ID"
 msgstr "ID"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_needaction
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "Hvis dette felt er markeret, kræver nye beskeder din opmærksomhed."
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_error
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_sms_error
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_has_error
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
@@ -595,7 +513,15 @@ msgstr "Billede"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
 msgid "Install"
-msgstr "Installer"
+msgstr "Installér"
+
+#. module: frontdesk
+#. odoo-python
+#: code:addons/frontdesk/controllers/main.py:0
+msgid ""
+"Invalid domain. Allowed filters are: department_id with '=' and display_name "
+"with 'ilike'."
+msgstr ""
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__is_favorite
@@ -603,6 +529,7 @@ msgid "Is Favorite"
 msgstr "Er favorit"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_is_follower
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_is_follower
 msgid "Is Follower"
 msgstr "Er følger"
@@ -610,39 +537,32 @@ msgstr "Er følger"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Karen"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-msgid "Kiosk"
-msgstr "Kiosk"
+msgstr "Karen"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__kiosk_url
 msgid "Kiosk URL"
-msgstr ""
+msgstr "Kiosk-URL"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
 msgid "Last Check-In: %s hours ago"
-msgstr ""
+msgstr "Sidste indtjekning: for %s timer siden"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
 msgid "Last Check-In: %s minutes ago"
-msgstr ""
+msgstr "Sidste indtjekning: for %s minutter siden"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__write_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__write_uid
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__write_uid
 msgid "Last Updated by"
 msgstr "Sidst opdateret af"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__write_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__write_date
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__write_date
 msgid "Last Updated on"
@@ -651,13 +571,13 @@ msgstr "Sidst opdateret den"
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__latest_check_in
 msgid "Latest Check In"
-msgstr ""
+msgstr "Sidste indtjekning"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/js/tours/frontdesk.js:0
 msgid "Let's add a new visitor."
-msgstr ""
+msgstr "Lad os tilføje en ny gæst."
 
 #. module: frontdesk
 #: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__theme__light
@@ -671,24 +591,22 @@ msgid ""
 "Looking for a better way to manage your visitors? \n"
 " It begins right here."
 msgstr ""
+"Leder du efter en smartere måde at administrere dine besøgende på?\n"
+" Det starter her."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "MY PVT LTD"
-msgstr ""
+msgstr "MIT PVT LTD"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "Message"
-msgstr "Besked"
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_error
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_has_error
 msgid "Message Delivery error"
 msgstr "Besked ved leveringsfejl"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_ids
 msgid "Messages"
 msgstr "Beskeder"
@@ -696,111 +614,70 @@ msgstr "Beskeder"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
 msgid "My Station"
-msgstr ""
+msgstr "Min skranke"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__name
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__name
 msgid "Name"
 msgstr "Navn"
 
 #. module: frontdesk
-#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_drink
-msgid "No drinks to offer to visitors. Let's add one!"
+#: model:res.groups.privilege,placeholder:frontdesk.res_groups_privilege_frontdesk
+msgid "No"
 msgstr ""
 
 #. module: frontdesk
 #: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_frontdesk
-#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_frontdesk_tree
 msgid "No stations found. Let's create one!"
-msgstr ""
+msgstr "Ingen skranke fundet. Lad os oprette en!"
 
 #. module: frontdesk
 #: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_drink_to_serve_visitor
 #: model_terms:ir.actions.act_window,help:frontdesk.action_open_guest_on_site_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_planned_visitor
 #: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
 msgid "No visitors yet. Let's add one!"
-msgstr ""
+msgstr "Ingen gæster endnu. Lad os tilføje en!"
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "No, thank you"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_company__none
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__none
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__none
-msgid "None"
-msgstr "Ingen"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/drink_page/drink_page.xml:0
-msgid "Nothing, thanks."
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_warning
-msgid "Notify Warning"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_sms
-msgid "Notify by SMS"
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Notify by Email"
 msgstr ""
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_discuss
 msgid "Notify by discuss"
-msgstr ""
+msgstr "Giv besked via Dialogappen"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__notify_email
 msgid "Notify by email"
-msgstr ""
+msgstr "Giv besked via e-mail"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Notify the host on guest arrival"
-msgstr ""
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_needaction_counter
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_needaction_counter
 msgid "Number of Actions"
 msgstr "Antal handlinger"
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_error_counter
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_has_error_counter
 msgid "Number of errors"
 msgstr "Antal fejl"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_needaction_counter
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "Antal meddelelser, der kræver handling"
 
 #. module: frontdesk
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__message_has_error_counter
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Antal beskeder med leveringsfejl"
-
-#. module: frontdesk
-#: model_terms:ir.actions.act_window,help:frontdesk.action_frontdesk_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_drink_to_serve_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_guest_on_site_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_planned_visitor
-#: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
-msgid "Odoo helps you to track all information related to your visitors."
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_offer
-msgid "Offer Drinks"
-msgstr ""
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
@@ -810,29 +687,12 @@ msgstr "På stedet"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
 msgid "Open Desk"
-msgstr ""
+msgstr "Åbn skranke"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Open Kiosk"
-msgstr "Åben Kiosk"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Open host chat window when guest arrives"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_company__optional
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__optional
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__optional
-msgid "Optional"
-msgstr "Valgfri"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Options"
-msgstr "Valgmuligheder"
+msgstr "Åbn kiosk"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_company
@@ -840,40 +700,17 @@ msgid "Organization"
 msgstr "Virksomhed"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__pending
-msgid "Pending"
-msgstr "Afventer"
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__notify_user_ids
-msgid "People to Notify"
-msgstr ""
-
-#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__ask_phone
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__phone
 msgid "Phone"
 msgstr "Telefon"
 
 #. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_open_planned_visitor
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_visitor__state__planned
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-msgid "Planned"
-msgstr "Planlagt"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/end_page/end_page.xml:0
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "Please have a seat."
-msgstr ""
-
-#. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_qr_expired
 msgid "Please rescan it."
-msgstr ""
+msgstr "Scan venligst igen."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
@@ -883,53 +720,53 @@ msgstr "Udskriv badge"
 #. module: frontdesk
 #: model:ir.actions.report,name:frontdesk.frontdesk_visitor_print_badge
 msgid "Print Visitor Badge"
+msgstr "Udskriv gæstebadge"
+
+#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__privacy_notice
+msgid "Privacy Notice"
 msgstr ""
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__visitor_properties
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_tree
-msgid "Properties"
-msgstr "Egenskaber"
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__privacy_notice_details
+msgid "Privacy Notice Details"
+msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "QR Code"
-msgstr "QR Kode"
+msgstr "QR-kode"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_qr_expired
 msgid "QR Code Expired."
-msgstr ""
+msgstr "QR-kode udløbet."
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/quick_check_in/quick_check_in.xml:0
-msgid "Quick Check In"
-msgstr ""
-
-#. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__rating_ids
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__rating_ids
 msgid "Ratings"
 msgstr "Bedømmelser"
 
 #. module: frontdesk
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_report
-msgid "Reporting"
-msgstr "Rapportering"
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Read More"
+msgstr ""
+
+#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Read more"
+msgstr ""
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Request additional information upon registering"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_company__required
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__required
-#: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__required
-msgid "Required"
-msgstr "Obligatorisk"
+msgstr "Anmod om yderligere oplysninger under registreringen"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
@@ -939,13 +776,11 @@ msgstr "Ansvarlig"
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__responsible_ids
 msgid "Responsibles"
-msgstr ""
+msgstr "Ansvarlige"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__responsible_ids
-msgid ""
-"Responsibles are people who will welcome the client and handle their drinks, "
-"etc."
+msgid "Responsibles are notified if no host is selected."
 msgstr ""
 
 #. module: frontdesk
@@ -954,20 +789,16 @@ msgid "Restrict the hosts available from the client to choose from."
 msgstr ""
 
 #. module: frontdesk
+#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__message_has_sms_error
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Fejl ved SMS-levering"
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__sms_template_id
-msgid "SMS Template"
-msgstr "SMS skabelon"
-
-#. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/js/tours/frontdesk.js:0
 msgid "Save the visitor."
-msgstr ""
+msgstr "Gem gæsten."
 
 #. module: frontdesk
 #. odoo-javascript
@@ -982,52 +813,42 @@ msgstr "Sikkerhedstoken"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "Select Host"
+msgstr ""
+
+#. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid "Select Hosts"
 msgstr ""
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/js/tours/frontdesk.js:0
 msgid "Select or create a station on the fly from where the visitor arrived."
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Select the color of the Desk"
-msgstr ""
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/host_page/host_page.xml:0
-msgid "Selected host:"
-msgstr ""
+msgstr "Vælg den skranke, besøgende er kommet fra, eller opret en ny."
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__self_check_in
 msgid "Self Check-In"
+msgstr "Selvindtjekning"
+
+#. module: frontdesk
+#: model:mail.template,description:frontdesk.frontdesk_visitor_mail_template
+msgid "Sent to hosts on guest arrival"
 msgstr ""
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Send an SMS to the host on guest arrival"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__sequence
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-msgid "Sequence"
-msgstr "Sekvens"
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
-msgid "Set as Planned"
+msgid "Settings"
 msgstr ""
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Show a QR code on the welcome screen to check-in from mobile"
 msgstr ""
+"Vis en QR-kode på velkomstskærmen, så gæsten kan logge ind med sin "
+"mobiltelefon"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__self_check_in
@@ -1035,46 +856,35 @@ msgid ""
 "Shows a QR code in the interface, for guests to check in from their mobile "
 "phone."
 msgstr ""
+"Vis en QR-kode på brugergrænsefladen, så gæster kan logge ind med deres "
+"mobiltelefon."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Side Message"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
-msgid "Some employees ("
-msgstr ""
+msgstr "Sidebesked"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__station_id
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
 msgid "Station"
-msgstr ""
+msgstr "Skranke"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
 msgid "Station Name"
-msgstr ""
+msgstr "Navn på skranke"
 
 #. module: frontdesk
 #: model:ir.actions.act_window,name:frontdesk.action_open_station_visitor
 msgid "Station Visitors"
-msgstr ""
+msgstr "Gæster ved skranken"
 
 #. module: frontdesk
 #: model:ir.actions.act_window,name:frontdesk.action_frontdesk_frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_frontdesk_tree
 #: model:ir.ui.menu,name:frontdesk.frontdesk_menu_stations
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_stations_config
 msgid "Stations"
-msgstr ""
-
-#. module: frontdesk
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_station_report
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
-msgid "Statistics"
-msgstr "Statistik"
+msgstr "Skranker"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__state
@@ -1086,12 +896,17 @@ msgstr "Status"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "Thank you for registering!"
-msgstr ""
+msgstr "Tak for din tilmelding!"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "Thanks for your understanding."
+msgstr "Tak for din forståelse."
+
+#. module: frontdesk
+#: model:ir.model.constraint,message:frontdesk.constraint_frontdesk_frontdesk_check_auto_checkout_positive
+msgid "The Auto-Checkout value should be positive."
 msgstr ""
 
 #. module: frontdesk
@@ -1100,9 +915,9 @@ msgid "Theme"
 msgstr "Tema"
 
 #. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
-msgid "Today"
-msgstr "I dag"
+#: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__image
+msgid "This image will be used as the kiosk background."
+msgstr ""
 
 #. module: frontdesk
 #: model:res.groups,name:frontdesk.frontdesk_group_user
@@ -1113,25 +928,30 @@ msgstr "Bruger"
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Visitor"
-msgstr "Besøgende"
+msgstr "Gæster"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company
 msgid "Visitor Company"
+msgstr "Gæstens virksomhed"
+
+#. module: frontdesk
+#: model:ir.module.module,summary:base.module_frontdesk
+msgid "Visitor management system"
 msgstr ""
 
 #. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__visitor_properties_definition
-msgid "Visitor Properties"
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
+msgid ""
+"Visitor sessions expire automatically after the predefined duration. Leave "
+"to 0 to disable."
 msgstr ""
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
 #: model:ir.actions.act_window,name:frontdesk.action_frontdesk_visitor
-#: model:ir.actions.act_window,name:frontdesk.action_frontdesk_visitors_report
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__visitor_ids
-#: model:ir.ui.menu,name:frontdesk.frontdesk_menu_report_visitors
 #: model:ir.ui.menu,name:frontdesk.frontdesk_menu_visitors
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_station_report_view_graph
@@ -1139,7 +959,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_graph
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_pivot
 msgid "Visitors"
-msgstr "Besøgende"
+msgstr "Gæster"
 
 #. module: frontdesk
 #. odoo-python
@@ -1148,16 +968,8 @@ msgid ""
 "We regret to inform you that the following %(host_status)s currently "
 "unavailable:"
 msgstr ""
-
-#. module: frontdesk
-#: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__website_message_ids
-msgid "Website Messages"
-msgstr "Beskeder fra hjemmesiden"
-
-#. module: frontdesk
-#: model:ir.model.fields,help:frontdesk.field_frontdesk_visitor__website_message_ids
-msgid "Website communication history"
-msgstr "Hjemmesidens kommunikationshistorik"
+"Vi beklager at måtte meddele, at følgende %(host_status)s i øjeblikket ikke "
+"er tilgængelige:"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1169,24 +981,18 @@ msgstr "Velkommen til"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/navbar/navbar.xml:0
 msgid "Who are you visiting?"
-msgstr ""
+msgstr "Hvem besøger du?"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/navbar/navbar.xml:0
 msgid "Who are you?"
-msgstr ""
+msgstr "Hvem er du?"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Write message..."
-msgstr ""
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/register_page/register_page.xml:0
-msgid "Yes, please"
-msgstr ""
+msgstr "Skriv besked ..."
 
 #. module: frontdesk
 #. odoo-python
@@ -1194,117 +1000,136 @@ msgstr ""
 msgid ""
 "You can contact the host's manager or frontdesk responsible for further "
 "assistance."
-msgstr ""
+msgstr "For yderligere hjælp kan du kontakte værtens leder eller receptionen."
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
 msgid "You have been registered!"
+msgstr "Du er blevet tilmeldt!"
+
+#. module: frontdesk
+#. odoo-javascript
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+msgid "Your Information"
 msgstr ""
 
 #. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Company"
-msgstr "Din virksomhed"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Email"
-msgstr "Din e-mail"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Name"
-msgstr "Dit navn"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
-msgid "Your Phone Number"
-msgstr "Dit telefonnummer"
-
-#. module: frontdesk
-#. odoo-python
-#: code:addons/frontdesk/models/frontdesk_visitor.py:0
-msgid "Your Visitor %(name)s Requested To Meet You"
-msgstr ""
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/end_page/end_page.xml:0
-msgid "Your drink is on the way."
+#: model:mail.template,subject:frontdesk.frontdesk_visitor_mail_template
+msgid "Your Visitor {{ object.name }} Requested To Meet You"
 msgstr ""
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "Your host isn't available"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid ""
-"and is here for their scheduled meeting with you.\n"
-"                    They are currently waiting in the"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_drink_view_form
-msgid "e.g. Coca-Cola"
-msgstr ""
+msgstr "Din vært er ikke tilgængelig"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
 msgid "e.g. John Doe"
 msgstr "f.eks. John Doe"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "e.g. My Company"
 msgstr "f.eks. Min Virksomhed"
 
 #. module: frontdesk
 #. odoo-javascript
-#: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
+#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
 msgid "e.g. john@company.com"
-msgstr ""
-
-#. module: frontdesk
-#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_mail_template
-msgid "has arrived from"
-msgstr ""
+msgstr "f.eks. john@company.com"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
-msgstr ""
+msgstr "har fået besked."
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "host is"
-msgstr ""
+msgstr "vært er"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "hosts are"
-msgstr ""
-
-#. module: frontdesk
-#. odoo-python
-#: code:addons/frontdesk/models/frontdesk_frontdesk.py:0
-msgid "station_id.id"
-msgstr ""
+msgstr "værter er"
 
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/register_page/register_page.xml:0
 msgid "will get back to you."
-msgstr ""
+msgstr "vender tilbage til dig."
+
+#~ msgid "Cancelled"
+#~ msgstr "Annulleret"
+
+#~ msgid "SMS Template"
+#~ msgstr "SMS skabelon"
+
+#~ msgid "Website Messages"
+#~ msgstr "Beskeder fra hjemmesiden"
+
+#~ msgid "Website communication history"
+#~ msgstr "Hjemmesidens kommunikationshistorik"
+
+#~ msgid "Add Properties"
+#~ msgstr "Tilføj Egenskaber"
+
+#~ msgid "All Employees"
+#~ msgstr "Alle medarbejdere"
+
+#~ msgid "Cancel"
+#~ msgstr "Annullér"
+
+#~ msgid "Check in"
+#~ msgstr "Tjek ind"
+
+#~ msgid "Dear"
+#~ msgstr "Kære"
+
+#~ msgid "Drinks"
+#~ msgstr "Drinks"
+
+#~ msgid "Kiosk"
+#~ msgstr "Kiosk"
+
+#~ msgid "Message"
+#~ msgstr "Besked"
+
+#~ msgid "None"
+#~ msgstr "Ingen"
+
+#~ msgid "Optional"
+#~ msgstr "Valgfri"
+
+#~ msgid "Options"
+#~ msgstr "Valgmuligheder"
+
+#~ msgid "Pending"
+#~ msgstr "Afventer"
+
+#~ msgid "Planned"
+#~ msgstr "Planlagt"
+
+#~ msgid "Properties"
+#~ msgstr "Egenskaber"
+
+#~ msgid "Reporting"
+#~ msgstr "Rapportering"
+
+#~ msgid "Required"
+#~ msgstr "Obligatorisk"
+
+#~ msgid "Sequence"
+#~ msgstr "Sekvens"
+
+#~ msgid "Statistics"
+#~ msgstr "Statistik"

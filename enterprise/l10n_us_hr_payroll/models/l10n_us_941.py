@@ -1,6 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import csv
 import io
 
@@ -8,7 +7,7 @@ from datetime import date
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.tools import date_utils
+from odoo.tools import BinaryBytes, date_utils
 
 
 class L10nUsForm941(models.Model):
@@ -37,13 +36,13 @@ class L10nUsForm941(models.Model):
         ("monthly", "Monthly"),
         ("semiweekly", "Semiweekly (Schedule B)"),
     ], required=True, string="Deposit Schedule and Tax Liability", help="This determines your required tax deposit schedule based on your business's employment tax liability amount.")
-    year = fields.Char(required=True, default=lambda self: fields.Date.today().year, string="Tax Year")
+    year = fields.Char(required=True, default=lambda self: fields.Date.context_today(self).year, string="Tax Year")
     quarter = fields.Selection([
         ('1', 'Q1 (Jan-Mar)'),
         ('2', 'Q2 (Apr-Jun)'),
         ('3', 'Q3 (Jul-Sep)'),
         ('4', 'Q4 (Oct-Dec)'),
-    ], required=True, default=lambda self: str(date_utils.get_quarter_number(fields.Date.today())), string="Quarter")
+    ], required=True, default=lambda self: str(date_utils.get_quarter_number(fields.Date.context_today(self))), string="Quarter")
     company_id = fields.Many2one(
         'res.company',
         default=lambda self: self.env.company,
@@ -57,7 +56,6 @@ class L10nUsForm941(models.Model):
         readonly=False,
         domain="[('id', 'in', allowed_payslip_ids)]")
     csv_file = fields.Binary("CSV file", readonly=True)
-    csv_filename = fields.Char()
 
     @api.depends('year', 'quarter')
     def _compute_display_name(self):
@@ -224,8 +222,8 @@ class L10nUsForm941(models.Model):
             "",
             dict(self._fields['irs_payment_option']._description_selection(self.env)).get(self.irs_payment_option),
             dict(bank_account._fields['l10n_us_bank_account_type']._description_selection(self.env)).get(bank_account.l10n_us_bank_account_type),
-            bank_account.acc_number,
-            bank_account.clearing_number,
+            bank_account.account_number,
+            bank_account._get_clearing_number('US'),
             company.phone,
             dict(self._fields['tax_liability']._description_selection(self.env)).get(self.tax_liability),
             month_to_tax_liability.get(0),
@@ -243,5 +241,4 @@ class L10nUsForm941(models.Model):
         ]
         writer.writerow([col or "" for col in row])  # never write Falsy, should be ok to make 0 blank
 
-        self.csv_file = base64.b64encode(output.getvalue().encode())
-        self.csv_filename = f"form_941_{self.year}_{self.quarter}.csv"
+        self.csv_file = BinaryBytes(output.getvalue().encode(), filename=f"form_941_{self.year}_{self.quarter}.csv")

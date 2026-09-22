@@ -1,29 +1,33 @@
-import { useRef, onWillRender } from "@odoo/owl";
+import { computed, toRaw, usePlugin } from "@odoo/owl";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { WarningDialog } from "@web/core/errors/error_dialogs";
 import { _t } from "@web/core/l10n/translation";
-import { useService } from "@web/core/utils/hooks";
 import { useNestedSortable } from "@web/core/utils/nested_sortable";
 import { registry } from "@web/core/registry";
 import { ListRenderer } from "@web/views/list/list_renderer";
 import { X2ManyField, x2ManyField } from "@web/views/fields/x2many/x2many_field";
 import { useOpenX2ManyRecord, useX2ManyCrud } from "@web/views/fields/relational_utils";
+import { DialogPlugin } from "@web/core/dialog/dialog_plugin";
+import { ORM } from "@web/core/orm_plugin";
 
 export class AccountReportListRenderer extends ListRenderer {
     static template = "account_reports.AccountReportList";
 
-    setup() {
-        this.dialog = useService("dialog");
-        this.orm = useService("orm");
+    computedAllColumns = computed(() =>
+        this.processAllColumn(this.props.archInfo.columns, this.props.list)
+    );
+    editedRecord = computed(() => this.props.list.editedRecord);
+    
+    dialog = usePlugin(DialogPlugin);
+    orm = usePlugin(ORM);
 
+    setup() {
         // From ListRenderer
         // We can't really use `super.setup()` because it expects to be used on a html table.
-        this.allColumns = this.processAllColumn(this.props.archInfo.columns, this.props.list);
         this.keyOptionalFields = `optional_fields,${this.createViewKey()}`;
-        this.optionalActiveFields = this.computeOptionalActiveFields();
-        this.columns = this.getActiveColumns();
+        Object.assign(this.optionalActiveFields, this.computeOptionalActiveFields())
 
-        this.props.list._config.orderBy = [
+        toRaw(this.props.list._config).orderBy = [
             {
                 "name": "sequence",
                 "asc": true
@@ -35,7 +39,7 @@ export class AccountReportListRenderer extends ListRenderer {
         ]
 
         useNestedSortable({
-            ref: useRef("root"),
+            ref: this.rootRef,
             elements: "li.draggable",
             nest: true,
             nestInterval: 10,
@@ -43,11 +47,14 @@ export class AccountReportListRenderer extends ListRenderer {
             onDragEnd: () => this.onDragEnd(),
             onDrop: (ctx) => this.onDrop(ctx),
         });
+    }
 
-        onWillRender(() => {
-            this.allColumns = this.processAllColumn(this.props.archInfo.columns, this.props.list);
-            this.columns = this.getActiveColumns();
-        });
+    get allColumns() {
+        return this.computedAllColumns();
+    }
+
+    get columns() {
+        return this.getActiveColumns();
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -158,6 +165,9 @@ export class AccountReportListRenderer extends ListRenderer {
         }
 
         await this.props.list.records[currentRecordIndex].update({'parent_id': parent});
+        if (parentRecordIndex && this.props.list.records[parentRecordIndex].data.foldability !== 'always_unfolded') {
+            await this.props.list.records[parentRecordIndex].update({'foldability': 'always_unfolded'});
+        }
     }
 
     async setRecordHierarchy(currentElement, parentElement) {

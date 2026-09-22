@@ -1,162 +1,168 @@
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/services/pos_store";
+import { makeAwaitable } from "@point_of_sale/app/utils/make_awaitable_dialog";
+import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
-import { SelectionPopup } from "@point_of_sale/app/components/popups/selection_popup/selection_popup";
+import { user } from "@web/core/user";
 
 patch(PosStore.prototype, {
     async setup() {
         await super.setup(...arguments);
         this.setAllTotalDueOfPartners(this.models["res.partner"].getAll());
+
+        this.dummyProductForSettleStuff = this.models["product.template"].create({
+            id: "dummy_product_for_settle_stuff",
+            display_name: "Dummy Product for Settle Invoice",
+            taxes_id: [],
+        });
+        this.models["product.product"].create({
+            id: "dummy_product_for_settle_stuff_variant",
+            product_tmpl_id: this.dummyProductForSettleStuff,
+            display_name: "Dummy Product for Settle Invoice",
+            name: "Dummy Product for Settle Invoice",
+            taxes_id: [],
+        });
     },
-    getPartnerCredit(partner) {
-        const order = this.getOrder();
-        const partnerInfos = {
-            totalDue: 0,
-            posOrdersAmountDue: 0,
-            invoicesAmountDue: 0,
-            totalWithCart: order ? this.currency.round(order.priceIncl) : 0,
-            creditLimit: 0,
-            useLimit: false,
-            overDue: false,
-        };
-
-        if (!partner) {
-            return partnerInfos;
-        }
-        if (partner.parent_name) {
-            const parent = this.models["res.partner"].find((p) => p.name === partner.parent_name);
-            if (parent) {
-                partner = parent;
-            }
-        }
-
-        partnerInfos.totalDue = this.currency.round(partner.total_due);
-        partnerInfos.posOrdersAmountDue = this.currency.round(partner.pos_orders_amount_due);
-        partnerInfos.invoicesAmountDue = this.currency.round(partner.invoices_amount_due);
-        partnerInfos.remainingDue = this.currency.round(
-            partnerInfos.totalDue - partnerInfos.posOrdersAmountDue - partnerInfos.invoicesAmountDue
-        );
-        partnerInfos.totalWithCart += partner.total_due || 0;
-        partnerInfos.creditLimit = partner.credit_limit || 0;
-        partnerInfos.overDue = partnerInfos.totalWithCart > partnerInfos.creditLimit;
-        partnerInfos.useLimit =
-            this.company.account_use_credit_limit &&
-            partner.credit_limit > 0 &&
-            partnerInfos.overDue;
-
-        return partnerInfos;
+    get settleFields() {
+        return ["total_due", "total_invoiced"];
     },
     async refreshTotalDueOfPartner(partner) {
-        const res = await this.data.callRelated("res.partner", "get_total_due", [
-            partner.id,
-            this.config.id,
-        ]);
+        const readOnlyG = await user.hasGroup("account.group_account_readonly");
+        const invoiceG = await user.hasGroup("account.group_account_invoice");
+        if (!readOnlyG && !invoiceG) {
+            return [];
+        }
+
+        const res = await this.data.read("res.partner", [partner.id], this.settleFields);
         this.deviceSync.dispatch({ "res.partner": [partner] });
-        const updatePartner = res["res.partner"][0];
+        const updatePartner = res[0];
         if (partner.parent_name) {
             const parent = this.models["res.partner"].find((p) => p.name === partner.parent_name);
             if (parent) {
                 partner = parent;
             }
         }
-        partner.total_due = updatePartner.total_due;
-        partner.pos_orders_amount_due = updatePartner.pos_orders_amount_due;
-        partner.invoices_amount_due = updatePartner.invoices_amount_due;
         return [updatePartner];
     },
     async setAllTotalDueOfPartners(partners) {
-        const partners_total_due = await this.data.call("res.partner", "get_all_total_due", [
-            partners.map((p) => p.id),
-            this.config.id,
-        ]);
-        for (const partner of partners) {
-            const updatedPartnerRecord = partners_total_due.find(
-                (p) => p["res.partner"][0].id == [partner.id]
-            );
-            if (!updatedPartnerRecord) {
-                // the partner has been deleted from the server
-                partner.delete();
-                continue;
-            }
-            const updatedPartner = updatedPartnerRecord["res.partner"][0];
-            partner.total_due = updatedPartner.total_due;
-            partner.pos_orders_amount_due = updatedPartner.pos_orders_amount_due;
-            partner.invoices_amount_due = updatedPartner.invoices_amount_due;
+        const readOnlyG = await user.hasGroup("account.group_account_readonly");
+        const invoiceG = await user.hasGroup("account.group_account_invoice");
+        if (!readOnlyG && !invoiceG) {
+            return;
         }
-        return [partners];
+
+        await this.data.read(
+            "res.partner",
+            partners.map((p) => p.commercial_partner_id?.id || p.id),
+            this.settleFields
+        );
     },
-    async onClickSettleDue(orderIds, partnerId, commercialPartnerId) {
-        const orders = await this.data.loadServerOrders([["id", "in", orderIds]]);
-        const currentOrder = this.getOrder();
-        currentOrder.commercialPartnerId = commercialPartnerId;
-        currentOrder.setPartner(partnerId);
-        for (const order of orders) {
-            await this.addLineToCurrentOrder({
-                price_unit: order.customer_due_total,
-                qty: 1,
-                taxes_id: [],
-                product_tmpl_id: this.config.settle_due_product_id,
-                settled_order_id: order,
+    async selectPartner() {
+        const order = this.getOrder();
+        if (order?.uiState?.settlingInvoice) {
+            await makeAwaitable(this.dialog, AlertDialog, {
+                title: _t("Action not allowed"),
+                body: _t("You cannot change the customer while settling invoices."),
             });
+            return;
         }
+        return await super.selectPartner(...arguments);
+    },
+    async deleteOrderAndGoToDefaultScreen(order) {
+        const newOrder = this.createOrderIfNeeded();
+        this.selectedOrderUuid = newOrder.uuid;
+        const next = this.defaultPage;
+        this.router.navigate(next.page, next.params);
+        await this.refreshTotalDueOfPartner(order.partner_id);
+        await this.deleteOrders([order]);
+    },
+    async onClickBackButton() {
+        const order = this.getOrder();
+        const settleActions = order?.uiState?.settlingInvoice || order?.uiState?.depositMoney;
+
+        if (this.router.currentScreen() === "PaymentScreen" && settleActions) {
+            const result = await makeAwaitable(this.dialog, AlertDialog, {
+                title: _t("Cancel Settlement"),
+                body: _t("Are you sure you want to cancel the settlement process?"),
+            });
+
+            if (result) {
+                return await this.deleteOrderAndGoToDefaultScreen(order);
+            }
+
+            return false;
+        }
+
+        return super.onClickBackButton(...arguments);
     },
     async onClickSettleInvoices(invoiceIds, partnerId, commercialPartnerId) {
         const invoices = await this.data.read("account.move", invoiceIds);
-        const currentOrder = this.getOrder();
+        const currentOrder = this.getEmptyOrder();
+        this.selectedOrderUuid = currentOrder.uuid;
+
         currentOrder.setPartner(partnerId);
         currentOrder.commercialPartnerId = commercialPartnerId;
+        currentOrder.uiState.settlingInvoice = true;
+        currentOrder.uiState.settledInvoiceIds = invoiceIds;
+
         for (const invoice of invoices) {
+            const sign = invoice.move_type === "out_refund" ? -1 : 1;
             await this.addLineToCurrentOrder({
-                price_unit: invoice.pos_amount_unsettled,
-                qty: 1,
+                qty: 1 * sign,
+                price_unit: invoice.amount_residual,
                 taxes_id: [],
-                product_tmpl_id: this.config.settle_invoice_product_id,
-                settled_invoice_id: invoice,
+                product_tmpl_id: this.dummyProductForSettleStuff,
             });
         }
+        this.navigate("PaymentScreen", { orderUuid: currentOrder.uuid });
     },
-    async depositMoney(partner, amount = 0) {
-        const paymentMethods = this.config.payment_method_ids.filter(
-            (method) => method.type != "pay_later"
+    async onClickDepositMoney(amount, partnerId, commercialPartnerId) {
+        const paymentMethod = this.config.paymentMethods.find(
+            (method) => method.type !== "pay_later"
         );
-        const selectionList = paymentMethods.map((paymentMethod) => ({
-            id: paymentMethod.id,
-            label: paymentMethod.name,
-            item: paymentMethod,
-        }));
-        this.dialog.add(SelectionPopup, {
-            title: _t("Select the payment method to deposit money"),
-            list: selectionList,
-            getPayload: async (selectedPaymentMethod) => {
-                // Reuse an empty order that has no partner or has partner equal to the selected partner.
-                let newOrder;
-                const emptyOrder = this.getOpenOrders().find(
-                    (order) =>
-                        order.lines.length === 0 &&
-                        order.payment_ids.length === 0 &&
-                        (!order.partner || order.partner.id === partner.id)
-                );
-                if (emptyOrder) {
-                    newOrder = emptyOrder;
-                    // Set the empty order as the current order.
-                    this.setOrder(newOrder);
-                } else {
-                    newOrder = this.addNewOrder();
-                }
-                const result = newOrder.addPaymentline(selectedPaymentMethod);
-                if (!result.status) {
-                    return false;
-                }
 
-                newOrder.is_settling_account = true;
-                result.data.setAmount(amount);
-                newOrder.setPartner(partner);
-                newOrder.is_settling_account = true;
-                this.navigate("PaymentScreen", {
-                    orderUuid: this.selectedOrderUuid,
-                    isDepositOrder: true,
-                });
-            },
+        if (!paymentMethod) {
+            return false;
+        }
+
+        const currentOrder = this.getEmptyOrder();
+        currentOrder.setPartner(partnerId);
+        currentOrder.commercialPartnerId = commercialPartnerId;
+        currentOrder.uiState.depositMoney = true;
+        currentOrder.uiState.is_settling_account = true;
+
+        await this.addLineToCurrentOrder({
+            qty: 1,
+            price_unit: amount,
+            taxes_id: [],
+            product_tmpl_id: this.dummyProductForSettleStuff,
         });
+
+        const { status, data: paymentLine } = currentOrder.addPaymentline(paymentMethod);
+        if (!status) {
+            return false;
+        }
+
+        paymentLine.setAmount(amount);
+        this.navigate("PaymentScreen", {
+            orderUuid: this.selectedOrderUuid,
+        });
+
+        return true;
+    },
+    async postSyncAllOrders(orders) {
+        const paylaterPayments = orders
+            .flatMap((order) => order.payment_ids)
+            .filter((line) => line.payment_method_id?.type === "pay_later");
+
+        if (paylaterPayments.length) {
+            const partners = orders.map((order) => order.partner_id).filter(Boolean);
+            await this.setAllTotalDueOfPartners(partners);
+        }
+
+        return await super.postSyncAllOrders(orders);
+    },
+    shouldSelectPreset(order) {
+        return !order.uiState.is_settling_account && super.shouldSelectPreset(order);
     },
 });

@@ -38,11 +38,15 @@ patch(FormOptionPlugin.prototype, {
             // Do not try to load if form was never initialized.
             return models;
         }
-        const currentModel = appliedModel || getModelName(formEl);
+        const currentModel = getModelName(formEl);
+        const studioModels = [];
         if (currentModel && !models.find((m) => m.model === currentModel)) {
-            return [...models, this.studioModelsCache.get(currentModel)];
+            studioModels.push(this.studioModelsCache.get(currentModel));
         }
-        return models;
+        if (appliedModel && appliedModel !== currentModel && !models.find((m) => m.model === appliedModel)) {
+            studioModels.push(this.studioModelsCache.get(appliedModel));
+        }
+        return [...models, ...studioModels];
     },
     async fetchModels(formEl) {
         const formModels = await super.fetchModels(formEl);
@@ -98,7 +102,7 @@ export class StudioFormOptionPlugin extends Plugin {
             StudioMoreModelsAction,
             StudioToggleFormAccessAction,
         },
-        save_handlers: [
+        on_ready_to_save_document_handlers: [
             async () => {
                 for (const formEl of this.editable.querySelectorAll(".s_website_form form")) {
                     const models = this.dependencies.websiteFormOption.getModelsCache(formEl);
@@ -110,7 +114,7 @@ export class StudioFormOptionPlugin extends Plugin {
                         await this.saveFormAccess(activeForm);
                     }
                 }
-            }
+            },
         ],
     };
     selectModel() {
@@ -123,12 +127,16 @@ export class StudioFormOptionPlugin extends Plugin {
                     multiSelect: false,
                     resModel: "ir.model",
                     context: {
-                        "list_view_ref": "website_studio.select_simple_ir_model",
+                        list_view_ref: "website_studio.select_simple_ir_model",
                     },
                     domain: ["&", ["abstract", "=", false], ["transient", "=", false]],
                     onSelected: async (resIds) => {
                         const resId = resIds[0];
-                        const res = await this.services.orm.searchRead("ir.model", [['id', '=', resId]], ['model']);
+                        const res = await this.services.orm.searchRead(
+                            "ir.model",
+                            [["id", "=", resId]],
+                            ["model"]
+                        );
                         const modelName = res[0].model;
                         await this.dependencies.websiteFormOption.studioPreloadModel(modelName);
                         return resolve(modelName);
@@ -202,7 +210,8 @@ export class StudioMoreModelsAction extends BuilderAction {
         appliedModel = model.model;
         const getAction = this.dependencies.builderActions.getAction;
         const selectLoadResult = await getAction("selectAction").load({
-            ...spec, value: model.id
+            ...spec,
+            value: model.id,
         });
         appliedModel = undefined;
         return { model, selectLoadResult };
@@ -225,7 +234,7 @@ export class StudioMoreModelsAction extends BuilderAction {
 
 export class StudioToggleFormAccessAction extends BuilderAction {
     static id = "studioToggleFormAccess";
-    static dependencies = ["history", "websiteFormOption", "studioFormOption"];
+    static dependencies = ["domObserver", "websiteFormOption", "studioFormOption"];
     setup() {
         this.preview = false;
     }
@@ -249,14 +258,14 @@ export class StudioToggleFormAccessAction extends BuilderAction {
     }
     async apply({ editingElement: formEl }) {
         await this.setValue(formEl, true);
-        this.dependencies.history.addCustomMutation({
+        this.dependencies.domObserver.stageCustomMutation({
             apply: () => this.setValue(formEl, true),
             revert: () => this.setValue(formEl, false),
         });
     }
     async clean({ editingElement: formEl }) {
         await this.setValue(formEl, false);
-        this.dependencies.history.addCustomMutation({
+        this.dependencies.domObserver.stageCustomMutation({
             apply: () => this.setValue(formEl, false),
             revert: () => this.setValue(formEl, true),
         });

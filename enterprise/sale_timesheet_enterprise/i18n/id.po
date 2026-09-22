@@ -7,23 +7,38 @@
 # Abe Manyo, 2023
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Abe Manyo (abem)" <abem@odoo.com>, 2025.
+# "Abe Manyo (abem)" <abem@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-11-16 17:58+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:56+0000\n"
+"PO-Revision-Date: 2026-09-18 01:24+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-master/"
 "sale_timesheet_enterprise/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_timesheet_enterprise
+#: model:ir.module.module,description:base.module_sale_timesheet_enterprise
+msgid ""
+"\n"
+"When invoicing timesheets, allows invoicing either all timesheets\n"
+"linked to an SO, or only the validated timesheets\n"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.timesheet_kanban_view_inherit_sale_timesheet_enterprise
+msgid ""
+"#{record.is_billable_select.raw_value =='true' ? 'Billable' : 'Non-billable'}"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #. odoo-javascript
@@ -33,68 +48,68 @@ msgstr "%(billableTime)s / %(billable_time_target)s (%(billingRate)s%)"
 
 #. module: sale_timesheet_enterprise
 #. odoo-javascript
-#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_leaderboard/timesheet_leaderboard.js:0
-msgid "%(currentBillableTimeText)s / %(currentTargetTotalTimeText)s "
-msgstr "%(currentBillableTimeText)s / %(currentTargetTotalTimeText)s "
-
-#. module: sale_timesheet_enterprise
-#. odoo-javascript
 #: code:addons/sale_timesheet_enterprise/static/src/views/timesheet_analysis_pivot/timesheet_analysis_pivot_model.js:0
 msgid "%(employee_name)s (%(target)sh / month)"
 msgstr "%(employee_name)s (%(target)sj / bulan)"
 
 #. module: sale_timesheet_enterprise
 #. odoo-javascript
-#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_leaderboard/timesheet_leaderboard.js:0
-msgid "%(percentage)s%"
-msgstr "%(percentage)s%"
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_kpi_leaderboard_header/timesheet_kpi_leaderboard_header.js:0
+msgid "%(uom)s billable"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #. odoo-javascript
-#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_leaderboard/timesheet_leaderboard.js:0
-msgid "(%(percentage)s%)"
-msgstr "(%(percentage)s%)"
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_kpi_leaderboard_header/timesheet_kpi_leaderboard_header.js:0
+msgid ""
+"%(uom)s billable in %(month)s\n"
+"Click to filter"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_kpi_leaderboard_header/timesheet_kpi_leaderboard_header.js:0
+msgid "%(uom)s worked"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_kpi_leaderboard_header/timesheet_kpi_leaderboard_header.js:0
+msgid "%(uom)s worked in %(month)s"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_kanban
 msgid ""
-"<i class=\"fa fa-fw me-2 fa-birthday-cake text-primary\" title=\"Birthday\"/>"
+"<i class=\"oi oi-fw me-2 text-primary\" data-icon=\"cake\" "
+"title=\"Birthday\"/>"
 msgstr ""
-"<i class=\"fa fa-fw me-2 fa-birthday-cake text-primary\" title=\"Ulang "
+"<i class=\"oi oi-fw me-2 text-primary\" data-icon=\"cake\" title=\"Ulang "
 "Tahun\"/>"
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_kanban
-msgid "<i class=\"fa fa-fw me-2 fa-envelope text-primary\" title=\"Email\"/>"
-msgstr "<i class=\"fa fa-fw me-2 fa-envelope text-primary\" title=\"Email\"/>"
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-2 text-primary\" data-icon=\"mail\" "
+"title=\"Email\"/>"
+msgstr ""
+"<i class=\"oi oi-fw oi-filled me-2 text-primary\" data-icon=\"mail\" "
+"title=\"Email\"/>"
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_kanban
-msgid "<i class=\"fa fa-fw me-2 fa-phone text-primary\" title=\"Phone\"/>"
-msgstr "<i class=\"fa fa-fw me-2 fa-phone text-primary\" title=\"Telepon\"/>"
+msgid ""
+"<i class=\"oi oi-fw oi-filled me-2 text-primary\" data-icon=\"phone\" "
+"title=\"Phone\"/>"
+msgstr ""
+"<i class=\"oi oi-fw oi-filled me-2 text-primary\" data-icon=\"phone\" "
+"title=\"Telepon\"/>"
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_form
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_employee_form
 msgid "<span class=\"m-14 w-100\">per month</span>"
 msgstr "<span class=\"m-14 w-100\">per bulan</span>"
-
-#. module: sale_timesheet_enterprise
-#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.sale_timesheet_enterprise_advance_payment_inv_timesheet_view_form
-msgid ""
-"<span>\n"
-"                            Some employees currently have active timers for "
-"the timesheets you are trying to invoice.\n"
-"                            Creating the invoice will automatically stop "
-"these timers.\n"
-"                        </span>"
-msgstr ""
-"<span>\n"
-"                            Beberapa karyawan saat ini memiliki timer aktif "
-"untuk timesheet yang Anda sedang coba fakturkan.\n"
-"                            Membuat faktur akan secara otomatis menghentikan "
-"timer tersebut.\n"
-"                        </span>"
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__active
@@ -149,48 +164,71 @@ msgid "Average"
 msgstr "Rata-rata"
 
 #. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/aw_timesheet/aw_timesheet.xml:0
+#: code:addons/sale_timesheet_enterprise/static/src/components/aw_timesheet/frequency_viewer/frequency_viewer.js:0
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_inline_form/timesheet_inline_form.xml:0
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_timer_inline_form/timesheet_timer_inline_form.xml:0
+#: model:ir.model.fields.selection,name:sale_timesheet_enterprise.selection__account_analytic_line__is_billable_select__true
+#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.quick_create_account_analytic_line_form
+msgid "Billable"
+msgstr "Billable"
+
+#. module: sale_timesheet_enterprise
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_employee__billable_time_target
+#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_form
+msgid "Billable Target"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#: model:ir.ui.menu,name:sale_timesheet_enterprise.hr_timesheet_menu_employee_configuration
+msgid "Billable Time"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_res_config_settings__timesheet_show_leaderboard
+msgid "Billable Time Leaderboard"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_employee_public__billable_time_target
 msgid "Billable Time Target"
 msgstr "Target Waktu yang Dapat Ditagih"
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_res_config_settings__timesheet_show_rates
-msgid "Billing Rate Indicators"
-msgstr "Indikator Tarif Billing"
+msgid "Billable Time Targets"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #. odoo-javascript
 #: code:addons/sale_timesheet_enterprise/static/src/views/timesheet_leaderboard_dialog/timesheet_leaderboard_dialog.js:0
-#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_res_config_settings__timesheet_show_leaderboard
 msgid "Billing Rate Leaderboard"
 msgstr "Leaderboard Tarif Tagihan"
 
 #. module: sale_timesheet_enterprise
-#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_employee__billable_time_target
-#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_form
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_timesheets_analysis_report__billing_target
+msgid "Billing Target"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_timesheets_analysis_report__billing_time_target
 msgid "Billing Time Target"
 msgstr "Tujuan Tagihan Waktu"
 
 #. module: sale_timesheet_enterprise
-#: model:ir.ui.menu,name:sale_timesheet_enterprise.hr_timesheet_menu_employee
-#: model:ir.ui.menu,name:sale_timesheet_enterprise.hr_timesheet_menu_employee_billable_time_target
-msgid "Billing Time Targets"
-msgstr "Target Tagihan Waktu"
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_kpi_leaderboard_header/timesheet_kpi_leaderboard_header.js:0
+msgid "Billing rate"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #. odoo-javascript
-#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_leaderboard/timesheet_leaderboard.xml:0
-msgid "Billing:"
-msgstr "Tagihan:"
-
-#. module: sale_timesheet_enterprise
-#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.res_config_settings_view_form
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_kpi_leaderboard_header/timesheet_kpi_leaderboard_header.js:0
 msgid ""
-"Boost productivity and competitiveness by displaying a leaderboard based on "
-"the billing rates."
+"Billing rate in %(month)s (%(billableTime)s / %(billableTimeTarget)s %(uom)s "
+"billable)"
 msgstr ""
-"Dorong produktivitas dan persaingan dengan menampilkan leaderboard "
-"berdasarkan tarif tagihan."
 
 #. module: sale_timesheet_enterprise
 #: model:hr.timesheet.tip,name:sale_timesheet_enterprise.timesheet_tip_15
@@ -200,6 +238,12 @@ msgid ""
 msgstr ""
 "Dengan memiliki timesheet yang jelas, Anda mendemonstrasikan dedikasi Anda "
 "dan membantu membangun kepercayaan—upaya Anda betul-betul berharga!"
+
+#. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/employee_chat/employee_chat.xml:0
+msgid "Chat"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #. odoo-javascript
@@ -214,10 +258,6 @@ msgstr "Mentor"
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model,name:sale_timesheet_enterprise.model_res_company
-msgid "Companies"
-msgstr "Perusahaan"
-
-#. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__company_id
 msgid "Company"
 msgstr "Perusahaan"
@@ -228,9 +268,15 @@ msgid "Config Settings"
 msgstr "Pengaturan Konfigurasi"
 
 #. module: sale_timesheet_enterprise
-#: model:ir.ui.menu,name:sale_timesheet_enterprise.hr_timesheet_menu_configuration_settings
-msgid "Configuration"
-msgstr "Konfigurasi"
+#: model:ir.module.module,summary:base.module_sale_timesheet_enterprise
+msgid "Configure timesheet invoicing"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#. odoo-python
+#: code:addons/sale_timesheet_enterprise/models/account_analytic_line.py:0
+msgid "Configuring Sales Order"
+msgstr "Mengonfigurasi Pesanan Penjualan"
 
 #. module: sale_timesheet_enterprise
 #: model:hr.timesheet.tip,name:sale_timesheet_enterprise.timesheet_tip_9
@@ -263,11 +309,6 @@ msgid "Created on"
 msgstr "Dibuat pada"
 
 #. module: sale_timesheet_enterprise
-#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.timesheet_view_grid_by_invoice_type
-msgid "Day"
-msgstr "Hari"
-
-#. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__department_id
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_filter
 msgid "Department"
@@ -286,24 +327,47 @@ msgstr ""
 "dan task terkait"
 
 #. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/employee_overtime_indication/employee_overtime_indication.js:0
+msgid ""
+"Difference between the number of billable days recorded in %(month)s (%"
+"(worked_hours)s) and the billing time target of the employee (%"
+"(allocated_hours)s)"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/employee_overtime_indication/employee_overtime_indication.js:0
+msgid ""
+"Difference between the number of billable hours recorded in %(month)s (%"
+"(worked_hours)s) and the billing time target of the employee (%"
+"(allocated_hours)s)"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__child_ids
 msgid "Direct subordinates"
 msgstr "Bawahan langsung"
 
 #. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/employee_chat/employee_chat.xml:0
+msgid "Discuss"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_account_analytic_line__display_name
-#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_account_move__display_name
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__display_name
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_timesheet_tip__display_name
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_ir_ui_menu__display_name
-#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_project_project__display_name
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_project_task__display_name
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_res_company__display_name
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_res_config_settings__display_name
-#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_sale_advance_payment_inv__display_name
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_sale_order_line__display_name
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_timesheets_analysis_report__display_name
 msgid "Display Name"
 msgstr "Nama Tampilan"
 
@@ -320,6 +384,11 @@ msgid ""
 msgstr ""
 "Jangan ragu apakah sesuatu “harus dihitung”—bila Anda menghabiskan waktu, "
 "maka hal tersebut akan termasuk di timesheet Anda."
+
+#. module: sale_timesheet_enterprise
+#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_analytic_lines_service_search
+msgid "Draft"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_tree
@@ -349,6 +418,12 @@ msgid "Employee Name"
 msgstr "Nama Karyawan"
 
 #. module: sale_timesheet_enterprise
+#: model:ir.ui.menu,name:sale_timesheet_enterprise.hr_timesheet_menu_employee
+#: model:ir.ui.menu,name:sale_timesheet_enterprise.hr_timesheet_menu_employee_billable_time_target
+msgid "Employee Targets"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_kanban
 msgid "Employee's Name"
 msgstr "Nama Karyawan"
@@ -359,6 +434,11 @@ msgstr "Nama Karyawan"
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_filter
 msgid "Employees"
 msgstr "Karyawan"
+
+#. module: sale_timesheet_enterprise
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_account_analytic_line__has_available_so
+msgid "Has Available So"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__hr_icon_display
@@ -372,18 +452,17 @@ msgstr "Status Kehadiran HR"
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_account_analytic_line__id
-#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_account_move_line__id
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_account_move__id
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__id
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_employee__id
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_timesheet_tip__id
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_ir_ui_menu__id
-#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_project_project__id
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_project_task__id
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_res_company__id
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_res_config_settings__id
-#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_sale_advance_payment_inv__id
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_sale_order_line__id
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_timesheets_analysis_report__id
 msgid "ID"
 msgstr "ID"
 
@@ -416,12 +495,22 @@ msgid "Invoicing Policy"
 msgstr "Kebijakan Penagihan"
 
 #. module: sale_timesheet_enterprise
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_account_analytic_line__is_billable
+msgid "Is Billable"
+msgstr "Apakah Dapat Ditagih"
+
+#. module: sale_timesheet_enterprise
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_account_analytic_line__is_billable_select
+msgid "Is Billable Select"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
 #: model:hr.timesheet.tip,name:sale_timesheet_enterprise.timesheet_tip_3
 msgid ""
 "It's part of the job to search for information. These hours should also be "
 "billable."
 msgstr ""
-"Bagian dari pekerjaan untuk mencari informasi. Jam-jam ini seharusnya juga "
+"Bagian dari pekerjaan untuk mencari informasi. Jam ini seharusnya juga "
 "ditagih."
 
 #. module: sale_timesheet_enterprise
@@ -432,9 +521,9 @@ msgid "Job Position"
 msgstr "Jabatan Kerja"
 
 #. module: sale_timesheet_enterprise
-#: model:ir.model,name:sale_timesheet_enterprise.model_account_move_line
-msgid "Journal Item"
-msgstr "Item Jurnal"
+#: model:ir.model,name:sale_timesheet_enterprise.model_account_move
+msgid "Journal Entry"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__write_uid
@@ -468,8 +557,8 @@ msgstr "Manajer"
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__member_of_department
-msgid "Member of department"
-msgstr "Anggota departemen"
+msgid "Member of Department"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model,name:sale_timesheet_enterprise.model_ir_ui_menu
@@ -482,20 +571,21 @@ msgid "Mobile Phone"
 msgstr "Telepon Mobile"
 
 #. module: sale_timesheet_enterprise
-#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.timesheet_view_grid_by_invoice_type
-msgid "Month"
-msgstr "Bulan"
-
-#. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__billable_time_target
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.sale_timesheet_employee_list_inherit
-msgid "Monthly Billing Time Target"
-msgstr "Target Tagihan Waktu Bulanan"
+msgid "Monthly Billable Target"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.actions.act_window,help:sale_timesheet_enterprise.hr_timesheet_tip_action
 msgid "Motivate employees to fill timesheets with these tips."
 msgstr "Motivasikan karyawan untuk mengisi timesheet dengan tip-tip berikut."
+
+#. module: sale_timesheet_enterprise
+#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.res_config_settings_view_form
+msgid ""
+"Motivate employees with a shared leaderboard based on their billable time."
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_filter
@@ -519,15 +609,38 @@ msgid "Newly Hired"
 msgstr "Baru Direkrut"
 
 #. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "No description"
+msgstr "Tidak ada deskripsi"
+
+#. module: sale_timesheet_enterprise
 #: model_terms:ir.actions.act_window,help:sale_timesheet_enterprise.action_open_edit_billable_time_target
 #: model_terms:ir.actions.act_window,help:sale_timesheet_enterprise.action_open_view_employee
 msgid "No employees found"
 msgstr "Tidak ada karyawan yang ditemukan"
 
 #. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "No time recorded."
+msgstr ""
+
+#. module: sale_timesheet_enterprise
 #: model_terms:ir.actions.act_window,help:sale_timesheet_enterprise.hr_timesheet_tip_action
 msgid "No tips found. Let's create one!"
 msgstr "Tidak ada tip yang ditemukan. Ayo buat satu!"
+
+#. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "Non-Billable"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#: model:ir.model.fields.selection,name:sale_timesheet_enterprise.selection__account_analytic_line__is_billable_select__false
+msgid "Non-billable"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_form
@@ -559,11 +672,6 @@ msgid "Progress"
 msgstr "Kemajuan"
 
 #. module: sale_timesheet_enterprise
-#: model:ir.model,name:sale_timesheet_enterprise.model_project_project
-msgid "Project"
-msgstr "Project"
-
-#. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__birthday_public_display_string
 msgid "Public Date of Birth"
 msgstr "Tanggal Lahir Publik"
@@ -576,19 +684,8 @@ msgstr "Karyawan Publik"
 #. module: sale_timesheet_enterprise
 #. odoo-javascript
 #: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_leaderboard/timesheet_leaderboard.xml:0
-msgid "Record timesheets to determine your billing rate!"
-msgstr "Catat timesheet untuk menentukan tarif tagihan Anda!"
-
-#. module: sale_timesheet_enterprise
-#. odoo-javascript
-#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_leaderboard/timesheet_leaderboard.xml:0
 msgid "Record timesheets to earn your rank!"
-msgstr "Catat timesheet untuk mendapatkan peringkat Anda!"
-
-#. module: sale_timesheet_enterprise
-#: model:ir.model,name:sale_timesheet_enterprise.model_sale_advance_payment_inv
-msgid "Sales Advance Payment Invoice"
-msgstr "Faktur Pembayaran Penjualan di Muka"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model,name:sale_timesheet_enterprise.model_sale_order_line
@@ -596,13 +693,22 @@ msgid "Sales Order Line"
 msgstr "Baris Pesanan Penjualan"
 
 #. module: sale_timesheet_enterprise
+#: model:ir.module.module,shortdesc:base.module_sale_timesheet_enterprise
+msgid "Sales Timesheet: Invoicing"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/aw_timesheet/aw_timesheet.xml:0
+msgid "Save"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.res_config_settings_view_form
 msgid ""
-"Set a billable time target for your employees. If their current rate falls "
-"below their target, it will be highlighted in red."
+"Set a billable time target for each employee. Their billable time is "
+"highlighted when they fall below their target."
 msgstr ""
-"Tetapkan target tarif billing untuk karyawan Anda. Bila tarif saat ini jatuh "
-"di bawah target mereka, akan di-highlight merah."
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.actions.act_window,help:sale_timesheet_enterprise.action_open_edit_billable_time_target
@@ -614,8 +720,8 @@ msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.res_config_settings_view_form
-msgid "Set employee billing time targets"
-msgstr "Tetapkan target tagihan waktu"
+msgid "Set employee targets"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_hr_employee_public__show_billable_time_target
@@ -648,6 +754,11 @@ msgstr "Tunjukkan indikator billing pada tampilan Timesheet Saya"
 #: model:ir.model.fields,help:sale_timesheet_enterprise.field_res_config_settings__timesheet_show_leaderboard
 msgid "Show the leaderboard on My Timesheets view"
 msgstr "Tunjukkan leaderboard pada tampilan Timesheet Saya"
+
+#. module: sale_timesheet_enterprise
+#: model:ir.model.fields,help:sale_timesheet_enterprise.field_account_analytic_line__has_available_so
+msgid "Simulates if checking 'is_billable' will actually attach an SO line."
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model:hr.timesheet.tip,name:sale_timesheet_enterprise.timesheet_tip_13
@@ -684,7 +795,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sale_timesheet_enterprise/static/src/views/timesheet_leaderboard_dialog/timesheet_leaderboard_dialog.xml:0
 msgid "This month"
-msgstr "Bulan ini"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.project_sharing_inherit_project_task_view_form
@@ -695,7 +806,6 @@ msgstr "Waktu Tersisa"
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.project_sharing_inherit_project_task_view_form
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.project_sharing_inherit_project_task_view_tree
-#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.timesheet_view_grid_by_invoice_type
 msgid "Time Spent"
 msgstr "Waktu yang digunakan"
 
@@ -744,13 +854,15 @@ msgid "Timesheet Show Rates"
 msgstr "Timesheet Show Rates"
 
 #. module: sale_timesheet_enterprise
-#. odoo-javascript
-#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_leaderboard/timesheet_leaderboard.xml:0
-#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.timesheet_view_grid_by_invoice_type
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_form
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_employee_form
 msgid "Timesheets"
 msgstr "Tabel Waktu"
+
+#. module: sale_timesheet_enterprise
+#: model:ir.model,name:sale_timesheet_enterprise.model_timesheets_analysis_report
+msgid "Timesheets Analysis Report"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_res_config_settings__invoiced_timesheet
@@ -848,14 +960,20 @@ msgid "User"
 msgstr "User"
 
 #. module: sale_timesheet_enterprise
+#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_analytic_lines_service_search
+msgid "Validated"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
 #: model:ir.model.fields.selection,name:sale_timesheet_enterprise.selection__res_config_settings__invoiced_timesheet__approved
 msgid "Validated timesheets only"
 msgstr "Hanya timesheet yang divalidasi"
 
 #. module: sale_timesheet_enterprise
-#: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.timesheet_view_grid_by_invoice_type
-msgid "Week"
-msgstr "Pekan"
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_kpi_leaderboard_header/timesheet_kpi_leaderboard_header.xml:0
+msgid "Want to track your"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model:hr.timesheet.tip,name:sale_timesheet_enterprise.timesheet_tip_14
@@ -865,15 +983,6 @@ msgid ""
 msgstr ""
 "Saat Anda membagikan pengetahuan Anda dengan klien atau rekan tim, waktu "
 "tersebut juga berharga. Pastikan Anda melacaknya dengan tepat."
-
-#. module: sale_timesheet_enterprise
-#: model:ir.model.fields,help:sale_timesheet_enterprise.field_edit_billable_time_target__member_of_department
-msgid ""
-"Whether the employee is a member of the active user's department or one of "
-"it's child department."
-msgstr ""
-"Apakah karyawan merupakan anggota dari departemen user yang aktif atau salah "
-"satu anak departemennya."
 
 #. module: sale_timesheet_enterprise
 #: model:ir.model.fields,help:sale_timesheet_enterprise.field_res_config_settings__invoiced_timesheet
@@ -916,6 +1025,11 @@ msgid "Work Location Name"
 msgstr "Nama Lokasi Kerja"
 
 #. module: sale_timesheet_enterprise
+#: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__work_location_type
+msgid "Work Location Type"
+msgstr ""
+
+#. module: sale_timesheet_enterprise
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__work_phone
 msgid "Work Phone"
 msgstr "Telepon Kantor"
@@ -924,6 +1038,12 @@ msgstr "Telepon Kantor"
 #: model:ir.model.fields,field_description:sale_timesheet_enterprise.field_edit_billable_time_target__resource_calendar_id
 msgid "Working Hours"
 msgstr "Jam Kerja"
+
+#. module: sale_timesheet_enterprise
+#. odoo-javascript
+#: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_kpi_leaderboard_header/timesheet_kpi_leaderboard_header.xml:0
+msgid "activities automatically?"
+msgstr ""
 
 #. module: sale_timesheet_enterprise
 #: model_terms:ir.ui.view,arch_db:sale_timesheet_enterprise.view_edit_billable_time_target_update_form
@@ -940,15 +1060,3 @@ msgstr "contoh Buat kebiasaan untuk mencatat timesheet setiap hari."
 #: code:addons/sale_timesheet_enterprise/static/src/components/timesheet_leaderboard/timesheet_leaderboard.xml:0
 msgid "o_timesheet_leaderboard_confetti"
 msgstr "o_timesheet_leaderboard_confetti"
-
-#~ msgid "Analytic Account"
-#~ msgstr "Akun Analitik"
-
-#~ msgid "Hours Spent"
-#~ msgstr "Jam penundaan"
-
-#~ msgid "Remaining Hours"
-#~ msgstr "Jam tersisa"
-
-#~ msgid "Total Hours"
-#~ msgstr "Total jam"

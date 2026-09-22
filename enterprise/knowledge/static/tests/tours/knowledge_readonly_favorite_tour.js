@@ -14,11 +14,11 @@ registry.category("web_tour.tours").add("knowledge_readonly_favorite_tour", {
         {
             // Make sure we are on the readonly article 1, that is not favorited, and
             // click on the toggle favorite button.
-            trigger: ".o_knowledge_toggle_favorite:has(.fa-star-o)",
+            trigger: ".o_knowledge_toggle_favorite:has([data-icon='star'])",
             run: "click",
         },
         {
-            trigger: ".o_knowledge_toggle_favorite:has(.fa-star)",
+            trigger: ".o_knowledge_toggle_favorite:has([data-icon='star'].oi-filled)",
         },
         {
             // Check that the article has been added to the favorites
@@ -35,7 +35,7 @@ registry.category("web_tour.tours").add("knowledge_readonly_favorite_tour", {
         {
             // Make sure we are on the readonly article 1, that is not favorited, and
             // click on the toggle favorite button.
-            trigger: ".o_knowledge_toggle_favorite:has(.fa-star-o)",
+            trigger: ".o_knowledge_toggle_favorite:has([data-icon='star'])",
             run: "click",
         },
         {

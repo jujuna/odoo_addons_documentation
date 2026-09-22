@@ -34,7 +34,7 @@
             <field name="order_line" position="after">
                 <field name="referrer_id"/>
             </field>
-            <group position="inside">
+            <group>
                 <filter string="Referrer" name="referrer_id" context="{'group_by': 'referrer_id'}"/>
             </group>
         </field>
@@ -45,7 +45,7 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_account_invoice_filter"/>
         <field name="arch" type="xml">
-            <group position="inside">
+            <group>
                  <filter string="Referrer" name="referrer_id" context="{'group_by':'referrer_id'}"/>
             </group>
         </field>

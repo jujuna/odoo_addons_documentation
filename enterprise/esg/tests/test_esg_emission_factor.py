@@ -5,6 +5,8 @@ from odoo.addons.esg.tests.esg_common import TestEsgCommon
 
 class TestEsgEmissionFactor(TestEsgCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_gas_lines_emissions_value(self):
         self.assertEqual(self.computers_production_gas_lines[0].esg_emissions_value, 89.75)  # co2 line value = 89.75 (quantity) * 1 (GWP) = 89.75
         self.assertEqual(self.computers_production_gas_lines[1].esg_emissions_value, 0.56)  # ch4 line value = 0.02 (quantity) * 28 (GWP) = 0.56

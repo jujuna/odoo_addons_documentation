@@ -5,7 +5,6 @@ import logging
 import odoo.modules.db
 
 from . import models
-from . import report
 
 _logger = logging.getLogger(__name__)
 

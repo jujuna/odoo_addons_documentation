@@ -9,7 +9,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
         this.lineModel = this.resModel;
         this.validateMessage = _t("The inventory count has been updated");
         this.validateMethod = "action_validate";
-        this.deleteLineMethod = this.validateMethod;
+        this.deleteLineMethod = "action_remove_quant_in_barcode";
     }
 
     async _validate() {
@@ -59,7 +59,10 @@ export default class BarcodeQuantModel extends BarcodeModel {
         }
         // Checks if there are not counted serial numbers in the same location than counted quants.
         const countedSerialNumbers = this.groupedLines.filter(
-            (gl) => gl.lines && gl.inventory_quantity_set && gl.product_id.tracking === "serial"
+            (gl) =>
+                gl.lines &&
+                gl.inventory_quantity_set &&
+                ["lot", "serial"].includes(gl.product_id.tracking)
         );
         const notCountedSiblingSerialNumbers = [];
         for (const groupedLine of countedSerialNumbers) {
@@ -93,7 +96,9 @@ export default class BarcodeQuantModel extends BarcodeModel {
     async _apply(context = {}) {
         await this.save();
         const quantIds = this.pageLines.map((quant) => quant.id);
-        const action = await this.orm.call("stock.quant", "action_validate", [quantIds], {context});
+        const action = await this.orm.call("stock.quant", "action_validate", [quantIds], {
+            context,
+        });
         const notifyAndGoAhead = (res) => {
             if (res && res.special) {
                 // Do nothing if come from a discarded wizard.
@@ -125,7 +130,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
             scanProduct: {
                 class: "scan_product",
                 message: _t("Scan a product"),
-                icon: "tags",
+                icon: "sell",
             },
             scanLot: {
                 class: "scan_lot",
@@ -150,11 +155,11 @@ export default class BarcodeQuantModel extends BarcodeModel {
             const { tracking } = line.product_id;
             const trackingNumber = this.getlotName(line);
             if (this._lineIsNotComplete(line)) {
-                if (tracking !== "none") {
+                if (["lot", "serial"].includes(tracking)) {
                     return tracking === "lot" ? messages.scanLot : messages.scanSerial;
                 }
                 return messages.scanProduct;
-            } else if (tracking !== "none" && !trackingNumber) {
+            } else if (["lot", "serial"].includes(tracking) && !trackingNumber) {
                 // Line's quantity is fulfilled but still waiting a tracking number.
                 return tracking === "lot" ? messages.scanLot : messages.scanSerial;
             } else {
@@ -180,7 +185,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
                 return {
                     class: "scan_src",
                     message: _t("Scan a location"),
-                    icon: "sign-out",
+                    icon: "logout",
                 };
             }
             return {
@@ -247,7 +252,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
     }
 
     lineCanBeDeleted(line) {
-        return line.inventory_quantity_set && this.getQtyDone(line) === 0;
+        return !line.has_count_requested && !line.inventory_quantity && line.inventory_quantity_set;
     }
 
     lineIsFaulty(line) {
@@ -327,6 +332,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
             default_inventory_quantity: 1,
             default_user_id: this.userId,
             inventory_mode: true,
+            barcode_view: true,
             display_default_code: false,
             hide_qty_to_count: !this.showQuantityCount,
         };
@@ -369,7 +375,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
         const location_id = this.location.id;
         const { lot_id, lot_name, owner_id, package_id } = params.fieldsParams;
         let quants = [];
-        if (!params.fieldsParams.packaging || product.tracking === "none") {
+        if (!params.fieldsParams.packaging || !product.tracking) {
             if (!lot_id && !lot_name && !package_id && !owner_id) {
                 quants = await this.cache.getQuants(product, location_id);
             } else {
@@ -379,7 +385,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
         }
         if (
             quants.length === 1 &&
-            (product.tracking === "none" ||
+            (!["lot", "serial"].includes(product.tracking) ||
                 params.fieldsParams.lot_name ||
                 params.fieldsParams.lot_id)
         ) {
@@ -435,7 +441,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
         args.owner && (params.owner_id = args.owner);
         args.package && (params.package_id = args.package);
         args.product && (params.product_id = args.product);
-        args.product && args.product.uom_id && (params.product_uom_id = args.product.uom_id);
+        args.product && args.product.uom_id && (params.uom_id = args.product.uom_id);
         args.packaging && (params.packaging = args.packaging);
         return params;
     }
@@ -445,6 +451,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
         Object.assign(defaultValues, {
             inventory_date: new Date().toISOString().slice(0, 10),
             inventory_quantity: 0,
+            has_count_requested: false,
             quantity: (fieldsParams && fieldsParams.quantity) || 0,
             user_id: this.userId,
         });
@@ -601,7 +608,8 @@ export default class BarcodeQuantModel extends BarcodeModel {
         // For each quants, creates or increments a barcode line.
         for (const quant of quants) {
             const product = this.cache.getRecord("product.product", quant.product_id);
-            const searchLineParams = Object.assign({}, barcodeData, { product });
+            const quantPackage = this.cache.getRecord("stock.package", quant.package_id);
+            const searchLineParams = Object.assign({}, barcodeData, { product, quantPackage });
             const currentLine = this._findLine(searchLineParams);
             if (currentLine) {
                 // Updates an existing line.
@@ -609,7 +617,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
                     quantity: quant.quantity,
                     lotName: barcodeData.lotName,
                     lot: barcodeData.lot,
-                    package: recPackage,
+                    package: quant.package_id,
                     owner: barcodeData.owner,
                 });
                 await this.updateLine(currentLine, fieldsParams);
@@ -681,7 +689,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
         }
         if (args.inventory_quantity) {
             if (args.uom) {
-                const lineUOM = line.product_uom_id;
+                const lineUOM = line.uom_id;
                 if (args.uom.factor !== lineUOM.factor) {
                     // Convert the scanned qty into the product UoM.
                     const factor = args.uom.factor / lineUOM.factor;
@@ -725,7 +733,10 @@ export default class BarcodeQuantModel extends BarcodeModel {
     }
 
     _canOverrideTrackingNumber(line, newLotName) {
-        return super._canOverrideTrackingNumber(...arguments) && (!line.id || line.lot_id);
+        return (
+            super._canOverrideTrackingNumber(...arguments) &&
+            (!line.id || line.lot_id || !newLotName)
+        );
     }
 
     _createLinesState() {
@@ -744,7 +755,7 @@ export default class BarcodeQuantModel extends BarcodeModel {
             quant.dummy_id = quant.dummy_id && Number(quant.dummy_id);
             quant.virtual_id = quant.dummy_id || previousVirtualId || this._uniqueVirtualId;
             quant.product_id = this.cache.getRecord("product.product", quant.product_id);
-            quant.product_uom_id = this.cache.getRecord("uom.uom", quant.product_uom_id);
+            quant.uom_id = this.cache.getRecord("uom.uom", quant.uom_id);
             quant.location_id = this.cache.getRecord("stock.location", quant.location_id);
             quant.lot_id = quant.lot_id && this.cache.getRecord("stock.lot", quant.lot_id);
             quant.package_id =

@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:04+0000\n"
-"PO-Revision-Date: 2025-12-30 19:04+0000\n"
+"POT-Creation-Date: 2026-09-18 18:18+0000\n"
+"PO-Revision-Date: 2026-09-18 18:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,20 +16,27 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: l10n_be_codaclean
-#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.account_journal_dashboard_inherit_l10n_be_codaclean
 msgid ""
-"<i class=\"fa fa-check text-success\" invisible=\"not l10n_be_codaclean_is_connected\"/>\n"
-"                            <span class=\"text-success\" invisible=\"not l10n_be_codaclean_is_connected\">Connected</span>\n"
-"\n"
-"                            <i class=\"fa fa-exclamation-triangle text-warning\" invisible=\"l10n_be_codaclean_is_connected\"/>\n"
-"                            <span class=\"text-warning\" invisible=\"l10n_be_codaclean_is_connected\">Not connected</span>"
+"<i class=\"oi me4\" data-icon=\"warning\"/>\n"
+"                                CodaClean disconnected"
 msgstr ""
 
 #. module: l10n_be_codaclean
 #: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.account_journal_dashboard_inherit_l10n_be_codaclean
 msgid ""
-"<i class=\"fa fa-exclamation-triangle me4\"/>\n"
+"<i class=\"oi me4\" data-icon=\"warning\"/>\n"
 "                                Codaclean disconnected"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.res_config_settings_view_form
+msgid ""
+"<i class=\"oi text-success\" data-icon=\"check\" invisible=\"not l10n_be_codaclean_is_connected\"/>\n"
+"                            <span class=\"text-success\" invisible=\"not l10n_be_codaclean_is_connected\">Connected</span>\n"
+"\n"
+"                            <i class=\"oi text-warning\" data-icon=\"warning\" invisible=\"l10n_be_codaclean_is_connected\"/>\n"
+"                            <span class=\"text-warning\" invisible=\"l10n_be_codaclean_is_connected\">Not connected</span>"
 msgstr ""
 
 #. module: l10n_be_codaclean
@@ -37,7 +44,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.res_config_settings_view_form
 msgid ""
 "<i title=\"Update status\" role=\"img\" aria-label=\"Update status\" "
-"class=\"fa fa-fw fa-refresh\"/>"
+"class=\"oi oi-fw\" data-icon=\"refresh\"/>"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#: model:ir.actions.server,name:l10n_be_codaclean.codaclean_sync_soda_cron_ir_actions_server
+msgid "Accounting: Sync CODB Files from Codaclean"
 msgstr ""
 
 #. module: l10n_be_codaclean
@@ -81,6 +93,11 @@ msgid ""
 msgstr ""
 
 #. module: l10n_be_codaclean
+#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.res_config_settings_view_form
+msgid "CODB Settings"
+msgstr ""
+
+#. module: l10n_be_codaclean
 #: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.connection_wizard_view
 msgid "Change Credentials"
 msgstr ""
@@ -91,8 +108,13 @@ msgid "Close"
 msgstr ""
 
 #. module: l10n_be_codaclean
-#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.res_config_settings_view_form
+#: model:ir.module.module,shortdesc:base.module_l10n_be_codaclean
 msgid "Codaclean"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.res_config_settings_view_form
+msgid "Codaclean & CODB"
 msgstr ""
 
 #. module: l10n_be_codaclean
@@ -140,10 +162,6 @@ msgstr ""
 
 #. module: l10n_be_codaclean
 #: model:ir.model,name:l10n_be_codaclean.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: l10n_be_codaclean
 #: model:ir.model.fields,field_description:l10n_be_codaclean.field_l10n_be_codaclean_connection_wizard__company_id
 msgid "Company"
 msgstr ""
@@ -156,6 +174,11 @@ msgstr ""
 #. module: l10n_be_codaclean
 #: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.connection_wizard_view
 msgid "Connect"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#: model:ir.module.module,description:base.module_l10n_be_codaclean
+msgid "Connect to Codaclean and automatically import CODA statements."
 msgstr ""
 
 #. module: l10n_be_codaclean
@@ -188,6 +211,11 @@ msgid "Display Name"
 msgstr ""
 
 #. module: l10n_be_codaclean
+#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.account_journal_dashboard_inherit_l10n_be_codaclean
+msgid "Drafts to Validate"
+msgstr ""
+
+#. module: l10n_be_codaclean
 #: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.connection_wizard_view
 msgid "Enter your credentials to set up your Codaclean connection"
 msgstr ""
@@ -196,6 +224,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_codaclean/models/res_config_settings.py:0
 msgid "Error"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.account_journal_dashboard_inherit_l10n_be_codaclean
+msgid "Fetch from CodaClean"
 msgstr ""
 
 #. module: l10n_be_codaclean
@@ -228,8 +261,19 @@ msgid "ID"
 msgstr ""
 
 #. module: l10n_be_codaclean
+#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.res_config_settings_view_form
+msgid "Import CODB's in"
+msgstr ""
+
+#. module: l10n_be_codaclean
 #: model:ir.model,name:l10n_be_codaclean.model_account_journal
 msgid "Journal"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#: model:ir.model.fields,field_description:l10n_be_codaclean.field_res_company__l10n_be_codaclean_soda_journal
+#: model:ir.model.fields,field_description:l10n_be_codaclean.field_res_config_settings__l10n_be_codaclean_soda_journal
+msgid "Journal in which codaclean CODB's will be imported"
 msgstr ""
 
 #. module: l10n_be_codaclean
@@ -257,7 +301,36 @@ msgstr ""
 #. module: l10n_be_codaclean
 #. odoo-python
 #: code:addons/l10n_be_codaclean/models/account_journal.py:0
+msgid "No CODB imported"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#. odoo-python
+#: code:addons/l10n_be_codaclean/models/account_journal.py:0
+msgid "No new CODB is available for import."
+msgstr ""
+
+#. module: l10n_be_codaclean
+#. odoo-python
+#: code:addons/l10n_be_codaclean/models/account_journal.py:0
 msgid "Not connected to Codaclean. Please check your configuration."
+msgstr ""
+
+#. module: l10n_be_codaclean
+#: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.res_config_settings_view_form
+msgid "Open CODB Mapping"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#. odoo-python
+#: code:addons/l10n_be_codaclean/models/account_journal.py:0
+msgid "Original CodaClean CODB.xml"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#. odoo-python
+#: code:addons/l10n_be_codaclean/models/account_journal.py:0
+msgid "Original CodaClean Payroll Statement.pdf"
 msgstr ""
 
 #. module: l10n_be_codaclean
@@ -274,10 +347,10 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.connection_wizard_view
 msgid ""
 "Status\n"
-"                <i class=\"fa fa-check text-success\" invisible=\"not codaclean_is_connected\"/>\n"
+"                <i class=\"oi text-success\" data-icon=\"check\" invisible=\"not codaclean_is_connected\"/>\n"
 "                <span class=\"text-success\" invisible=\"not codaclean_is_connected\">Connected</span>\n"
 "\n"
-"                <i class=\"fa fa-exclamation-triangle text-warning\" invisible=\"codaclean_is_connected\"/>\n"
+"                <i class=\"oi text-warning\" data-icon=\"warning\" invisible=\"codaclean_is_connected\"/>\n"
 "                <span class=\"text-warning\" invisible=\"codaclean_is_connected\">Not connected</span>"
 msgstr ""
 
@@ -291,6 +364,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_be_codaclean/tools/iap_api.py:0
 msgid "Test mode"
+msgstr ""
+
+#. module: l10n_be_codaclean
+#. odoo-python
+#: code:addons/l10n_be_codaclean/models/res_company.py:0
+msgid "The company VAT/ID number is not valid."
 msgstr ""
 
 #. module: l10n_be_codaclean
@@ -315,5 +394,5 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_be_codaclean.connection_wizard_view
 msgid ""
 "by clicking here\n"
-"                        <i class=\"fa fa-external-link\" aria-hidden=\"true\"/>"
+"                        <i class=\"oi\" data-icon=\"open_in_new\" aria-hidden=\"true\"/>"
 msgstr ""

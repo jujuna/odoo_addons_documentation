@@ -1,14 +1,15 @@
-import base64
+import io
+import psycopg2
+
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
-import io
-import json
 
-from odoo import Command, fields, http
-from odoo.addons.mail.tests.common import MailCommon
-from odoo.tests import Form, RecordCapturer, HttpCase
+from odoo import Command, fields
+from odoo.tests import Form, HttpCase, RecordCapturer, tagged
 from odoo.tools import mute_logger
+
+from odoo.addons.mail.tests.common import MailCommon
 
 
 class TestDocumentRequest(MailCommon, HttpCase):
@@ -58,6 +59,7 @@ class TestDocumentRequest(MailCommon, HttpCase):
             })
             document = wizard.request_document()
 
+        self.assertEqual(document.type, 'request')
         self.assertEqual(document.requestee_partner_id, self.doc_partner_1)
         self.assertEqual(document.request_activity_id.user_id, self.doc_user, "Activity assigned to the requestee")
         self.assertEqual(document.owner_id, self.user_employee, "Owner of the document is the requester")
@@ -73,6 +75,9 @@ class TestDocumentRequest(MailCommon, HttpCase):
         self.assertEqual(access_doc_employee.role, 'edit')
         self.assertFalse(access_doc_employee.expiration_date)
 
+        shortcut = document.action_create_shortcut()
+        self.assertEqual(shortcut.type, 'request')
+
         # Updating the activity deadline, update the access expiration
         with self.with_user(self.user_employee.login):
             document.request_activity_id.date_deadline = fields.Date.today() + relativedelta(days=5)
@@ -85,15 +90,19 @@ class TestDocumentRequest(MailCommon, HttpCase):
         with self.with_user(self.user_employee.login):
             document.write({
                 'name': 'requested_file.txt',
-                'datas': base64.b64encode(b'Test'),
+                'raw': b'Test',
                 'mimetype': 'text/plain',
             })
+        self.assertEqual(document.type, 'binary', 'The type should have changed to binary')
         self.assertFalse(document.request_activity_id)
         self.assertFalse(document.requestee_partner_id)
         self.assertEqual(document.access_via_link, 'none')
         self.assertEqual(access_doc_employee.role, 'edit')
         self.assertEqual(access_doc_partner_1.role, 'edit')
         self.assertEqual(access_doc_partner_1.expiration_date, new_expiration_date)
+
+        # check the values in the shortcut
+        self.assertEqual(shortcut.type, 'binary')
 
     def test_request_document_from_partner_without_user(self):
         with self.mock_mail_gateway(), self.with_user(self.user_employee.login):
@@ -107,6 +116,7 @@ class TestDocumentRequest(MailCommon, HttpCase):
             })
             document = wizard.request_document()
 
+        self.assertEqual(document.type, 'request')
         self.assertEqual(document.requestee_partner_id, self.doc_partner_2)
         self.assertEqual(document.request_activity_id.user_id, self.user_employee, "Activity assigned to the requester because the requestee has no user")
         self.assertEqual(document.owner_id, self.user_employee, "Owner of the document is the requester")
@@ -130,12 +140,13 @@ class TestDocumentRequest(MailCommon, HttpCase):
         with self.with_user(self.user_employee.login):
             document.write({
                 'name': 'requested_file.txt',
-                'datas': base64.b64encode(b'Test'),
+                'raw': b'Test',
                 'mimetype': 'text/plain',
             })
         self.assertFalse(document.request_activity_id)
         self.assertFalse(document.requestee_partner_id)
         self.assertEqual(document.access_via_link, 'view')
+        self.assertEqual(document.type, 'binary')
 
     @mute_logger('odoo.addons.mail.models.mail_mail')
     def test_send_message_with_attachment_on_doc_request(self):
@@ -147,6 +158,8 @@ class TestDocumentRequest(MailCommon, HttpCase):
         })
         with self.mock_mail_gateway():
             document = wizard.request_document()
+
+        self.assertEqual(document.type, 'request')
         self.assertFalse(document.attachment_id)
 
         form = Form(self.env['mail.compose.message'].with_context({
@@ -158,7 +171,7 @@ class TestDocumentRequest(MailCommon, HttpCase):
         form.subject = 'Example of document required'
         # Simulate file upload on the composed message
         form.attachment_ids = self.env['ir.attachment'].create({
-            'datas': base64.b64encode(b'My attachment'),
+            'raw': b'My attachment',
             'name': 'doc.txt',
             'res_model': 'mail.compose.message',
             'res_id': form._record.id,
@@ -170,6 +183,7 @@ class TestDocumentRequest(MailCommon, HttpCase):
 
         self.assertEqual(len(message), 1)
         self.assertFalse(document.attachment_id, 'The document remains a request')
+        self.assertEqual(document.type, 'request')
         self.assertEqual(message.body, '<p>Hello</p>')
         self.assertEqual(message.partner_ids, self.doc_partner_1)
         self.assertEqual(message.subject, 'Example of document required')
@@ -184,6 +198,8 @@ class TestDocumentRequest(MailCommon, HttpCase):
         with self.mock_mail_gateway():
             document = wizard.request_document()
 
+        self.assertFalse(document.attachment_id)
+        self.assertEqual(document.type, 'request')
         self.assertEqual(document.request_activity_id.user_id, self.doc_user, "Activity assigned to the requestee")
         self.assertEqual(document.owner_id, self.user_employee, "Owner of the document is the requester")
         document.action_update_access_rights(partners={self.user_admin.partner_id: ('edit', False)})
@@ -197,7 +213,7 @@ class TestDocumentRequest(MailCommon, HttpCase):
                     "activity_id": document.activity_ids.id,
                     "thread_id": document.id,
                     "thread_model": "documents.document",
-                    "csrf_token": http.Request.csrf_token(self),
+                    "csrf_token": self.csrf_token(),
                 },
             )
         self.assertEqual(response.status_code, 200)
@@ -208,6 +224,38 @@ class TestDocumentRequest(MailCommon, HttpCase):
         data_attachment_id = data_attachment[0].get("id")
         self.assertTrue(data_attachment_id, "We should have the id of the attachment upload inside the response.")
         self.assertEqual(data_attachment_id, response_content.get("data", {}).get("attachment_id"))
-        document.activity_ids.action_feedback(attachment_ids=[data_attachment_id])
+
+        self.assertFalse(document.attachment_id)
+        self.assertEqual(document.type, 'request')
+        with self.mock_mail_app():
+            document.activity_ids.with_user(self.user_admin).action_feedback(attachment_ids=[data_attachment_id])
         self.assertEqual(document.attachment_id.id, data_attachment_id,
                          "Attachment should be linked to document only once.")
+        self.assertTrue(document.attachment_id)
+        self.assertEqual(document.type, 'binary')
+        # Activity done + document uploaded message
+        self.assertEqual(len(self._new_msgs), 2)
+        # Check that the notification message has been posted to the document
+        self.assertMessageFields(
+            self._new_msgs[0],
+            {
+                'author_id': self.browse_ref('base.partner_root'),
+                'body_content':  f'{self.user_admin.name} has uploaded the requested document',
+                'message_type': 'notification',
+                'subtype_id': self.browse_ref('mail.mt_note'),
+            }
+        )
+
+    @mute_logger("odoo.sql_db", "odoo.addons.documents.models.documents_document")
+    def test_request_constraints(self):
+        document = self.env["documents.document"].create({"type": "binary", "raw": "test"})
+        self.assertTrue(document.exists())
+        with self.assertRaises(psycopg2.errors.CheckViolation):
+            self.env["documents.document"].create({"type": "binary"})
+
+        # Check that we can create a shortcut and make a copy
+        self.assertTrue(document.action_create_shortcut().exists())
+        self.assertTrue(document.copy().exists())
+
+        request = self.env["documents.document"].create({"type": "request"})
+        self.assertTrue(request.exists())

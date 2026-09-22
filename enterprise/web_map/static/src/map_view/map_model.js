@@ -1,11 +1,13 @@
 import { _t } from "@web/core/l10n/translation";
-import { Model } from "@web/model/model";
-import { session } from "@web/session";
-import { resequence } from "@web/model/relational_model/utils";
+import { addPropertyFieldDefs, Model } from "@web/model/model";
 import { browser } from "@web/core/browser/browser";
 import { formatDateTime, parseDate, parseDateTime } from "@web/core/l10n/dates";
 import { KeepLast } from "@web/core/utils/concurrency";
+import { deepEqual } from "@web/core/utils/objects";
 import { orderByToString } from "@web/search/utils/order_by";
+import { user } from "@web/core/user";
+import { signal } from "@odoo/owl";
+import { Geolocation } from "@web_enterprise/core/utils/geolocation";
 
 const DATE_GROUP_FORMATS = {
     year: "yyyy",
@@ -16,123 +18,145 @@ const DATE_GROUP_FORMATS = {
 };
 
 export class MapModel extends Model {
-    setup(params, { notification, http }) {
+    setup(params, { notification }) {
         this.notification = notification;
-        this.http = http;
 
-        this.metaData = {
-            ...params,
-            mapBoxToken: session.map_box_token || "",
-        };
+        const { closedGroupIds, expandUnlocated, ...metaData } = params;
+        this.metaData = metaData;
+
+        this.userPositionStorageKey = `map_user_position,${this.env.config.viewId},${this.env.config.actionId}`;
+        const storedUserPosition = browser.localStorage.getItem(this.userPositionStorageKey);
+        const parsedUserPosition = storedUserPosition && JSON.parse(storedUserPosition);
+        // The browser location isn't cached: only the fact that it should be
+        // looked up again is, since coordinates can quickly become stale.
+        const cachedUserPosition = parsedUserPosition?.useBrowserLocation
+            ? undefined
+            : parsedUserPosition;
 
         this.data = {
             count: 0,
             fetchingCoordinates: false,
             groupByKey: false,
             isGrouped: false,
-            numberOfLocatedRecords: 0,
             partners: {},
-            partnerToCache: [],
             recordGroups: [],
             records: [],
-            routes: [],
-            routingError: null,
+            routes: {},
             shouldUpdatePosition: true,
-            useMapBoxAPI: !!this.metaData.mapBoxToken,
+            ...(cachedUserPosition && { userPosition: cachedUserPosition }),
         };
 
-        this.coordinateFetchingTimeoutHandle = undefined;
-        this.shouldFetchCoordinates = false;
+        this.closedGroupIds = signal(new Set(closedGroupIds));
+        this.expandUnlocated = signal(expandUnlocated || false);
         this.keepLast = new KeepLast();
+        this.geolocation = new Geolocation();
     }
+
+    /**
+     * State to persist across an unmount/remount of the same action (e.g.
+     * switching to another view and back).
+     */
+    get exportedState() {
+        return {
+            ...this.metaData,
+            closedGroupIds: [...this.closedGroupIds()],
+            expandUnlocated: this.expandUnlocated(),
+        };
+    }
+
     /**
      * @param {any} params
      * @returns {Promise<void>}
      */
     async load(params) {
-        if (this.coordinateFetchingTimeoutHandle !== undefined) {
-            this.stopFetchingCoordinates();
-        }
+        this.geolocation.stopFetchingCoordinates();
+
         const metaData = {
             ...this.metaData,
             ...params,
         };
-
-        // remove the properties fields from the group by
-        metaData.groupBy = (metaData.groupBy || []).filter((groupBy) => {
-            // properties fields are in the form `[propert_field_name].[property_entry_key]`
-            const [fieldName] = groupBy.split(".");
-            const field = metaData.fields[fieldName];
-            return field?.type !== "properties";
-        });
-
+        if (params.groupBy) {
+            await addPropertyFieldDefs(
+                this.orm,
+                metaData.resModel,
+                params.context,
+                metaData.fields,
+                params.groupBy
+            );
+        }
         this.data = await this._fetchData(metaData);
+        if (!deepEqual(this.metaData.groupBy, metaData.groupBy)) {
+            // The closed groups of the previous groupBy are meaningless for the
+            // new one: start over from the groups closed by default.
+            this.closedGroupIds.set(this._getDefaultClosedGroupIds(this.data));
+        }
         this.metaData = metaData;
 
         this.notify();
     }
-    /**
-     * Tells the model to stop fetching coordinates.
-     * In OSM mode, the model starts to fetch coordinates once every second after the
-     * model has loaded.
-     * This fetching has to be done every second if we don't want to be banned from OSM.
-     * There are typically two cases when we need to stop fetching:
-     * - when component is about to be unmounted because the request is bound to
-     *   the component and it will crash if we do so.
-     * - when calling the `load` method as it will start fetching new coordinates.
-     */
-    stopFetchingCoordinates() {
-        browser.clearTimeout(this.coordinateFetchingTimeoutHandle);
-        this.coordinateFetchingTimeoutHandle = undefined;
-        this.shouldFetchCoordinates = false;
+
+    toggleGroup(groupId) {
+        const closedIds = new Set(this.closedGroupIds());
+        if (closedIds.has(groupId)) {
+            closedIds.delete(groupId);
+        } else {
+            closedIds.add(groupId);
+        }
+        this.closedGroupIds.set(closedIds);
     }
 
-    get canResequence() {
-        return (
-            this.metaData.defaultOrder &&
-            !this.metaData.fields[this.metaData.defaultOrder[0].name].readonly &&
-            this.metaData.fields[this.metaData.defaultOrder[0].name].type === "integer" &&
-            this.metaData.allowResequence &&
-            !this.metaData.groupBy?.length
-        );
+    toggleUnlocated() {
+        this.expandUnlocated.set(!this.expandUnlocated());
     }
 
-    /**
-     * Resequence the records in `this.data.records` such that the record with the id
-     * `movedRecordId` is moved after the record with the id `targetRecordId`
-     * @param {Number} movedRecordId
-     * @param {Number} targetRecordId
-     */
-    async resequence(movedId, targetId) {
-        const fieldName = this.metaData.defaultOrder[0].name;
-        const asc = this.metaData.defaultOrder[0].asc;
-        const resequenceProm = resequence({
-            records: this.data.records,
-            resModel: this.metaData.resModel,
-            movedId,
-            targetId,
-            fieldName,
-            asc,
-            context: this.metaData.context,
-            orm: this.orm,
-        });
-        // the resequence method modifies this.data.records before the resequence backend call
-        // we need to notify after the synchronous record change
-        this.notify();
-        const resequencedRecords = await resequenceProm;
-        if (resequencedRecords.length) {
-            for (const resequencedRecord of resequencedRecords) {
-                const record = this.data.records.find((r) => r.id === resequencedRecord.id);
-                record[fieldName] = resequencedRecord[fieldName];
-            }
-            await this._updatePartnerCoordinate(this.metaData, this.data);
-            this.notify();
+    async updateUserPosition(location) {
+        const { latitude: prevLat, longitude: prevLong } = this.data.userPosition;
+        if (!location) {
+            await this._setUserPosition();
+            this._saveUserPosition({ useBrowserLocation: true });
+        } else {
+            this.data.userPosition.address = location.address;
+            this.data.userPosition.latitude = location.latitude;
+            this.data.userPosition.longitude = location.longitude;
+            this._saveUserPosition(this.data.userPosition);
+        }
+        if (this._shouldUpdateRoutes(prevLat, prevLong)) {
+            this.data.routes = await this._fetchRoutes();
+            this._notifyFetchedCoordinate(this.data);
         }
     }
 
     //----------------------------------------------------------------------
     // Protected
     //----------------------------------------------------------------------
+
+    /**
+     * Ids of the groups that are folded by default. Only used when the closed
+     * groups state is (re)initialized, so that it never overrides the groups
+     * the user folded or unfolded.
+     *
+     * @protected
+     * @param {any} data
+     * @returns {Set<string>}
+     */
+    _getDefaultClosedGroupIds(data) {
+        return new Set();
+    }
+
+    /**
+     * Determines whether the routes should be recomputed after changing the
+     * current user's position.
+     *
+     * @protected
+     */
+    _shouldUpdateRoutes(prevLat, prevLong) {
+        const { latitude, longitude } = this.data.userPosition;
+        return (
+            this.metaData.routing &&
+            this.geolocation.useMapBoxAPI &&
+            (latitude !== prevLat || longitude !== prevLong)
+        );
+    }
 
     /**
      * Adds the corresponding partner to a record.
@@ -146,31 +170,7 @@ export class MapModel extends Model {
             } else {
                 record.partner = data.partners[record[metaData.resPartnerField].id];
             }
-            data.numberOfLocatedRecords++;
         }
-    }
-
-    /**
-     * The partner's coordinates should be between -90 <= latitude <= 90 and -180 <= longitude <= 180.
-     *
-     * @protected
-     * @param {Object} partner
-     * @param {number} partner.partner_latitude latitude of the partner
-     * @param {number} partner.partner_longitude longitude of the partner
-     * @returns {boolean}
-     */
-    _checkCoordinatesValidity(partner) {
-        if (
-            partner.partner_latitude &&
-            partner.partner_longitude &&
-            partner.partner_latitude >= -90 &&
-            partner.partner_latitude <= 90 &&
-            partner.partner_longitude >= -180 &&
-            partner.partner_longitude <= 180
-        ) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -189,22 +189,20 @@ export class MapModel extends Model {
             fetchingCoordinates: false,
             groupByKey: metaData.groupBy.length ? metaData.groupBy[0] : false,
             isGrouped: metaData.groupBy.length > 0,
-            numberOfLocatedRecords: 0,
             partners: {},
-            partnerToCache: [],
             recordGroups: [],
             records: [],
-            routes: [],
-            routingError: null,
+            routes: {},
             shouldUpdatePosition: true,
-            useMapBoxAPI: !!metaData.mapBoxToken,
+            unlocatedRecords: [],
         };
 
         //case of empty map
         if (!metaData.resPartnerField) {
             data.recordGroups = [];
             data.records = [];
-            data.routes = [];
+            data.routes = {};
+            await this._fetchUserPosition(data);
             return this.keepLast.add(Promise.resolve(data));
         }
         const results = await this.keepLast.add(this._fetchRecordData(metaData, data));
@@ -229,7 +227,8 @@ export class MapModel extends Model {
         data.records = results.records;
         data.count = results.length;
         if (data.isGrouped) {
-            data.recordGroups = await this._getRecordGroups(metaData, data);
+            data.allRecordGroups = await this._getRecordGroups(metaData, data);
+            data.recordGroups = data.allRecordGroups;
         } else {
             data.recordGroups = [];
         }
@@ -248,14 +247,21 @@ export class MapModel extends Model {
                 }
             }
         }
+        await this._fetchUserPosition(data);
         this._addPartnerToRecord(metaData, data);
-        await this._updatePartnerCoordinate(metaData, data);
+        this._filterUnlocatedRecords(data);
+        this._fetchGeolocationAndRoutes(metaData, data);
+
         return data;
+    }
+
+    _getRecordDomain(metaData) {
+        return metaData.domain;
     }
 
     _getRecordSpecification(metaData, data) {
         const fieldNames = data.groupByKey
-            ? metaData.fieldNames.concat(data.groupByKey.split(":")[0])
+            ? metaData.fieldNames.concat(data.groupByKey.split(":")[0].split(".")[0])
             : metaData.fieldNames;
         const specification = {};
         const fieldsToAdd = {
@@ -286,8 +292,9 @@ export class MapModel extends Model {
      * @returns {Promise}
      */
     _fetchRecordData(metaData, data) {
+        const domain = this._getRecordDomain(metaData);
         const specification = this._getRecordSpecification(metaData, data);
-        return this.orm.webSearchRead(metaData.resModel, metaData.domain, {
+        return this.orm.webSearchRead(metaData.resModel, domain, {
             specification,
             limit: metaData.limit,
             offset: metaData.offset,
@@ -296,80 +303,146 @@ export class MapModel extends Model {
         });
     }
 
-    /**
-     * This function convert the addresses to coordinates using the mapbox API.
-     *
-     * @protected
-     * @param {Object} record this object contains the record fetched from the database.
-     * @returns {Promise} result.query contains the query the the api received
-     *      result.features contains results in descendant order of relevance
-     */
-    _fetchCoordinatesFromAddressMB(metaData, data, record) {
-        const address = encodeURIComponent(record.contact_address_complete);
-        const token = metaData.mapBoxToken;
-        const encodedUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${token}&cachebuster=1552314159970&autocomplete=true`;
-        return this.http.get(encodedUrl);
+    _getGroupSourcePosition(data, groupByKey, groupId) {
+        return data.userPosition;
+    }
+
+    _getGroupDestinationPosition(data, groupByKey, groupId) {
+        return data.userPosition;
     }
 
     /**
-     * This function convert the addresses to coordinates using the openStreetMap api.
+     * Determines the origin address (i.e., starting position) for Google Maps routing.
+     * If not provided, the current user's location is used instead (default from the API).
      *
-     * @protected
-     * @param {Object} record this object contains the record fetched from the database.
-     * @returns {Promise} result is an array that contains the result in descendant order of relevance
-     *      result[i].lat is the latitude of the converted address
-     *      result[i].lon is the longitude of the converted address
-     *      result[i].importance is a number that the relevance of the result the closer the number is to one the best it is.
+     * @param {Number|false} groupId id of the record group, or false if not the view is not grouped
+     * @returns {string} address
      */
-    _fetchCoordinatesFromAddressOSM(metaData, data, record) {
-        const address = encodeURIComponent(record.contact_address_complete.replace("/", " "));
-        const encodedUrl = `https://nominatim.openstreetmap.org/search?q=${address}&format=jsonv2`;
-        return this.http.get(encodedUrl);
+    _getGroupOriginAddress(groupId) {
+        return "";
+    }
+
+    async _fetchRoutes(metaData = this.metaData, data = this.data) {
+        const hasGeolocation = (p) => p && p.partner_latitude && p.partner_longitude;
+        const toCoordinates = (p) => ({
+            latitude: p.partner_latitude,
+            longitude: p.partner_longitude,
+        });
+
+        const groupByKey = data.groupByKey;
+        const groups = data.isGrouped ? Object.entries(data.recordGroups) : [["_", data]];
+        const promises = groups.map(async ([groupId, group]) => {
+            const coords = group.records
+                .filter(({ partner }) => hasGeolocation(partner))
+                .map(({ partner }) => toCoordinates(partner));
+            const source = this._getGroupSourcePosition(data, groupByKey, groupId);
+            if (source && source.latitude && source.longitude) {
+                coords.unshift(source);
+            }
+            const destination = this._getGroupDestinationPosition(data, groupByKey, groupId);
+            if (destination && destination.latitude && destination.longitude) {
+                coords.push(destination);
+            }
+            const route = await this.geolocation.fetchRoute(coords, metaData.routing);
+            return { groupId, route };
+        });
+
+        return Promise.all(promises).then((results) => {
+            const routesMap = {};
+            for (const result of results) {
+                if (result) {
+                    routesMap[result.groupId] = result.route;
+                }
+            }
+            return routesMap;
+        });
     }
 
     /**
-     * Fetch the route from the mapbox api.
+     * Helper to update the user position data, falls back to the company's position
      *
-     * @protected
-     * @returns {Promise}
-     *      results.geometry.legs[i] contains one leg (i.e: the trip between two markers).
-     *      results.geometry.legs[i].steps contains the sets of coordinates to follow to reach a point from an other.
-     *      results.geometry.legs[i].distance: the distance in meters to reach the destination
-     *      results.geometry.legs[i].duration the duration of the leg
-     *      results.geometry.coordinates contains the sets of coordinates to go from the first to the last marker without the notion of waypoint
+     * @returns {Promise<{lat: number, lon: number} | null>}
      */
-    _fetchRoute(metaData, data) {
-        const coordinatesParam = data.records
-            .filter(
-                (record) =>
-                    record.partner &&
-                    record.partner.partner_latitude &&
-                    record.partner.partner_longitude
-            )
-            .map(({ partner }) => `${partner.partner_longitude},${partner.partner_latitude}`);
-        const address = encodeURIComponent(coordinatesParam.join(";"));
-        const token = metaData.mapBoxToken;
-        const encodedUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${address}?access_token=${token}&steps=true&geometries=geojson`;
-        return this.http.get(encodedUrl);
+    async _fetchUserPosition(data) {
+        if (this.data.userPosition?.latitude && this.data.userPosition?.longitude) {
+            data.userPosition = this.data.userPosition;
+            return;
+        }
+        data.userPosition = {};
+        const permission = await navigator.permissions.query({ name: "geolocation" });
+        if (permission.state === "granted") {
+            await this._setUserPosition(data);
+            this._saveUserPosition({ useBrowserLocation: true });
+            return;
+        }
+        const results = await this.orm
+            .cache({ type: "disk" })
+            .webRead("res.company", [user.activeCompany.id], {
+                specification: {
+                    partner_id: {
+                        fields: {
+                            contact_address_complete: {},
+                            partner_latitude: {},
+                            partner_longitude: {},
+                        },
+                    },
+                },
+            });
+        const company = results[0]?.partner_id;
+        if (!company) {
+            return;
+        }
+        await this.geolocation.geolocatePartners(company);
+        if (!company.partner_latitude || !company.partner_longitude) {
+            return;
+        }
+        data.userPosition.address = company.contact_address_complete;
+        data.userPosition.latitude = company.partner_latitude;
+        data.userPosition.longitude = company.partner_longitude;
+        this._saveUserPosition(data.userPosition);
     }
 
     /**
-     * Converts a MapBox error message into a custom translatable one.
-     *
      * @protected
-     * @param {string} message
      */
-    _getErrorMessage(message) {
-        const ERROR_MESSAGES = {
-            "Too many coordinates; maximum number of coordinates is 25": _t(
-                "Too many routing points (maximum 25)"
-            ),
-            "Route exceeds maximum distance limitation": _t(
-                "Some routing points are too far apart"
-            ),
-            "Too Many Requests": _t("Too many requests, try again in a few minutes"),
-        };
-        return ERROR_MESSAGES[message];
+    _saveUserPosition(userPosition) {
+        browser.localStorage.setItem(this.userPositionStorageKey, JSON.stringify(userPosition));
+    }
+
+    async _setUserPosition(data) {
+        data = data || this.data;
+        return new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    data.userPosition.address = "";
+                    data.userPosition.longitude = pos.coords.longitude;
+                    data.userPosition.latitude = pos.coords.latitude;
+                    resolve(true);
+                },
+                async () => {
+                    try {
+                        const permission = await navigator.permissions.query({
+                            name: "geolocation",
+                        });
+                        if (permission.state === "denied") {
+                            this.notification.add(_t("Location permission required"), {
+                                type: "info",
+                            });
+                        } else {
+                            this.notification.add(_t("Unable to get user's location"), {
+                                type: "warning",
+                            });
+                        }
+                    } catch {
+                        this.notification.add(_t("Unable to get user's location"), {
+                            type: "warning",
+                        });
+                    } finally {
+                        resolve(false);
+                    }
+                }
+            );
+        });
     }
 
     /**
@@ -378,6 +451,7 @@ export class MapModel extends Model {
      */
     async _getRecordGroups(metaData, data) {
         const [fieldName, subGroup] = data.groupByKey.split(":");
+        const groupedByProperty = metaData.fields[fieldName.split(".")[0]]?.type === "properties";
         const fieldType = metaData.fields[fieldName].type;
         const unsetName = metaData.fields[fieldName].falsy_value_label || _t("None");
         const groups = {};
@@ -391,12 +465,16 @@ export class MapModel extends Model {
             groups[id].records.push(record);
         }
         for (const record of data.records) {
-            const value = record[fieldName];
+            const value = groupedByProperty
+                ? record[fieldName.split(".")[0]].find((o) => o.name === fieldName.split(".")[1])
+                      .value ?? []
+                : record[fieldName];
             let id, name;
             if (["one2many", "many2many"].includes(fieldType)) {
                 if (value.length) {
                     for (const r of value) {
-                        addToGroup(r.id, r.display_name, record);
+                        // x2m properties are represented as lists
+                        addToGroup(r.id ?? r[0], r.display_name ?? r[1], record);
                     }
                 } else {
                     id = name = unsetName;
@@ -416,8 +494,8 @@ export class MapModel extends Model {
                     );
                     id = name = selected ? selected[1] : value;
                 } else if (fieldType === "many2one" && value) {
-                    id = value.id;
-                    name = value.display_name;
+                    id = value.id ?? value[0];
+                    name = value.display_name ?? value[1];
                 } else {
                     id = value;
                     name = value;
@@ -432,253 +510,95 @@ export class MapModel extends Model {
     }
 
     /**
-     * Handles the case where the selected api is MapBox.
-     * Iterates on all the partners and fetches their coordinates when they're not set.
-     *
-     * @protected
-     * @return {Promise} if there's more than 2 located records and the routing option is activated it returns a promise that fetches the route
-     *      resultResult is an object that contains the computed route
-     *      or if either of these conditions are not respected it returns an empty promise
-     */
-    _maxBoxAPI(metaData, data) {
-        const promises = [];
-        for (const partner of Object.values(data.partners)) {
-            if (
-                partner.contact_address_complete &&
-                (!partner.partner_latitude || !partner.partner_longitude)
-            ) {
-                promises.push(
-                    this._fetchCoordinatesFromAddressMB(metaData, data, partner).then(
-                        (coordinates) => {
-                            if (coordinates.features.length) {
-                                partner.partner_longitude = parseFloat(
-                                    coordinates.features[0].geometry.coordinates[0]
-                                );
-                                partner.partner_latitude = parseFloat(
-                                    coordinates.features[0].geometry.coordinates[1]
-                                );
-                                data.partnerToCache.push(partner);
-                            }
-                        }
-                    )
-                );
-            } else if (!this._checkCoordinatesValidity(partner)) {
-                partner.partner_latitude = undefined;
-                partner.partner_longitude = undefined;
-            }
-        }
-        return Promise.all(promises).then(() => {
-            data.routes = [];
-            if (data.numberOfLocatedRecords > 1 && metaData.routing && !data.groupByKey) {
-                return this._fetchRoute(metaData, data).then((routeResult) => {
-                    if (routeResult.routes) {
-                        data.routes = routeResult.routes;
-                    } else {
-                        data.routingError = this._getErrorMessage(routeResult.message);
-                    }
-                });
-            } else {
-                return Promise.resolve();
-            }
-        });
-    }
-
-    /**
-     * Handles the displaying of error message according to the error.
-     *
-     * @protected
-     * @param {Object} err contains the error returned by the requests
-     * @param {number} err.status contains the status_code of the failed http request
-     */
-    _mapBoxErrorHandling(metaData, data, err) {
-        switch (err.status) {
-            case 401:
-                this.notification.add(
-                    _t(
-                        "The view has switched to another provider but functionalities will be limited"
-                    ),
-                    {
-                        title: _t("Token invalid"),
-                        type: "danger",
-                    }
-                );
-                break;
-            case 403:
-                this.notification.add(
-                    _t(
-                        "The view has switched to another provider but functionalities will be limited"
-                    ),
-                    {
-                        title: _t("Unauthorized connection"),
-                        type: "danger",
-                    }
-                );
-                break;
-            case 422: // Max. addresses reached
-            case 429: // Max. requests reached
-                data.routingError = this._getErrorMessage(err.responseJSON.message);
-                break;
-            case 500:
-                this.notification.add(
-                    _t(
-                        "The view has switched to another provider but functionalities will be limited"
-                    ),
-                    {
-                        title: _t("MapBox servers unreachable"),
-                        type: "danger",
-                    }
-                );
-        }
-    }
-
-    /**
      * Notifies the fetched coordinates to server and controller.
      *
      * @protected
      */
-    _notifyFetchedCoordinate(metaData, data) {
-        this._writeCoordinatesUsers(metaData, data);
+    _notifyFetchedCoordinate(data) {
         data.shouldUpdatePosition = false;
         this.notify();
     }
 
-    /**
-     * Calls (without awaiting) _openStreetMapAPIAsync with a delay of 1000ms
-     * to not get banned from openstreetmap's server.
-     *
-     * Tests should patch this function to wait for coords to be fetched.
-     *
-     * @see _openStreetMapAPIAsync
-     * @protected
-     * @return {Promise}
-     */
-    _openStreetMapAPI(metaData, data) {
-        this._openStreetMapAPIAsync(metaData, data);
-        return Promise.resolve();
-    }
-    /**
-     * Handles the case where the selected api is open street map.
-     * Iterates on all the partners and fetches their coordinates when they're not set.
-     *
-     * @protected
-     * @returns {Promise}
-     */
-    _openStreetMapAPIAsync(metaData, data) {
-        // Group partners by address to reduce address list
-        const addressPartnerMap = new Map();
-        for (const partner of Object.values(data.partners)) {
-            if (
-                partner.contact_address_complete &&
-                (!partner.partner_latitude || !partner.partner_longitude)
-            ) {
-                if (!addressPartnerMap.has(partner.contact_address_complete)) {
-                    addressPartnerMap.set(partner.contact_address_complete, []);
-                }
-                addressPartnerMap.get(partner.contact_address_complete).push(partner);
-                partner.fetchingCoordinate = true;
-            } else if (!this._checkCoordinatesValidity(partner)) {
-                partner.partner_latitude = undefined;
-                partner.partner_longitude = undefined;
-            }
+    async _fetchGeolocationAndRoutes(metaData, data) {
+        await this._fetchPartnersGeolocation(metaData, data);
+        if (this.geolocation.useMapBoxAPI && metaData.routing) {
+            data.routes = await this._fetchRoutes(metaData, data);
+            this._notifyFetchedCoordinate(data);
         }
+    }
 
-        // `fetchingCoordinates` is used to display the "fetching banner"
-        // We need to check if there are coordinates to fetch before reload the
-        // view to prevent flickering
-        data.fetchingCoordinates = addressPartnerMap.size > 0;
-        this.shouldFetchCoordinates = true;
-        const fetch = async () => {
-            const partnersList = Array.from(addressPartnerMap.values());
-            for (let i = 0; i < partnersList.length; i++) {
-                await new Promise((resolve) => {
-                    this.coordinateFetchingTimeoutHandle = browser.setTimeout(
-                        resolve,
-                        this.constructor.COORDINATE_FETCH_DELAY
-                    );
-                });
-                if (!this.shouldFetchCoordinates) {
-                    return;
-                }
-                const partners = partnersList[i];
-                try {
-                    const coordinates = await this._fetchCoordinatesFromAddressOSM(
-                        metaData,
-                        data,
-                        partners[0]
-                    );
-                    if (!this.shouldFetchCoordinates) {
-                        return;
-                    }
-                    if (coordinates.length) {
-                        for (const partner of partners) {
-                            partner.partner_longitude = parseFloat(coordinates[0].lon);
-                            partner.partner_latitude = parseFloat(coordinates[0].lat);
-                            data.partnerToCache.push(partner);
-                        }
-                    }
-                    for (const partner of partners) {
-                        partner.fetchingCoordinate = false;
-                    }
-                    data.fetchingCoordinates = i < partnersList.length - 1;
-                    this._notifyFetchedCoordinate(metaData, data);
-                } catch {
-                    for (const partner of Object.values(data.partners)) {
-                        partner.fetchingCoordinate = false;
-                    }
-                    data.fetchingCoordinates = false;
-                    this.shouldFetchCoordinates = false;
-                    this.notification.add(
-                        _t("OpenStreetMap's request limit exceeded, try again later."),
-                        { type: "danger" }
-                    );
-                    this.notify();
-                }
-            }
+    async _fetchPartnersGeolocation(metaData, data) {
+        data.fetchingCoordinates = true;
+        await this.geolocation.geolocatePartners(Object.values(data.partners), () => {
+            this._filterUnlocatedRecords(data);
+            this._notifyFetchedCoordinate(data);
+        });
+        data.fetchingCoordinates = false;
+        // Notify to remove the locating ribbon
+        this.notify();
+    }
+
+    _filterUnlocatedRecords(data) {
+        const hasCoordinates = (r) => {
+            const latitude = r.partner && r.partner.partner_latitude;
+            const longitude = r.partner && r.partner.partner_longitude;
+            return latitude && longitude;
         };
-        return fetch();
+        data.unlocatedRecords = data.records.filter((r) => !hasCoordinates(r));
+        if (data.isGrouped) {
+            data.recordGroups = {};
+            for (const [key, group] of Object.entries(data.allRecordGroups)) {
+                const records = group.records.filter(hasCoordinates);
+                if (records.length) {
+                    data.recordGroups[key] = { ...group, records };
+                }
+            }
+        }
     }
 
     /**
-     * if the token is set it uses the mapBoxApi to fetch address and route
-     * if not is uses the openstreetmap api to fetch the address.
+     * Opens googlemaps in a new tab using specified records as waypoints
      *
-     * @protected
-     * @returns {Promise}
+     * @param { Number | false} groupId which groupId of records to add to url (if false, adds all records)
+     * @returns {string}
      */
-    async _updatePartnerCoordinate(metaData, data) {
-        if (data.useMapBoxAPI) {
-            return this.keepLast
-                .add(this._maxBoxAPI(metaData, data))
-                .then(() => {
-                    this._writeCoordinatesUsers(metaData, data);
-                })
-                .catch((err) => {
-                    this._mapBoxErrorHandling(metaData, data, err);
-                    data.useMapBoxAPI = false;
-                    return this._openStreetMapAPI(metaData, data);
-                });
-        } else {
-            return this._openStreetMapAPI(metaData, data).then(() => {
-                this._writeCoordinatesUsers(metaData, data);
-            });
+    googleMapUrl(groupId = false) {
+        let url = "https://www.google.com/maps/dir/?api=1";
+
+        let records = this.data.records;
+        if (groupId) {
+            records = this.data.recordGroups[groupId].records;
+        } else if (this.data.isGrouped) {
+            records = Object.entries(this.data.recordGroups)
+                .filter(([id]) => !this.closedGroupIds().has(id))
+                .flatMap(([id, group]) => group.records);
         }
-    }
-    /**
-     * Writes partner_longitude and partner_latitude of the res.partner model.
-     *
-     * @protected
-     * @return {Promise}
-     */
-    async _writeCoordinatesUsers(metaData, data) {
-        const partners = data.partnerToCache;
-        data.partnerToCache = [];
-        if (partners.length) {
-            await this.orm.call("res.partner", "update_latitude_longitude", [partners], {
-                context: metaData.context,
-            });
+        if (records.length) {
+            const allAddresses = records.filter(
+                ({ partner }) => partner && partner.contact_address_complete
+            );
+
+            const uniqueAddresses = allAddresses.reduce((addrs, { partner }) => {
+                const addr = encodeURIComponent(partner.contact_address_complete);
+                if (!addrs.includes(addr)) {
+                    addrs.push(addr);
+                }
+                return addrs;
+            }, []);
+
+            const originAddress = encodeURIComponent(this._getGroupOriginAddress(groupId));
+            if (originAddress) {
+                url += `&origin=${originAddress}`;
+            }
+            if (uniqueAddresses.length && this.metaData.routing) {
+                url += `&destination=${uniqueAddresses.pop()}`;
+            }
+            if (uniqueAddresses.length) {
+                url += `&waypoints=${uniqueAddresses.join("|")}`;
+            }
         }
+        browser.open(url, "_blank");
     }
 }
 
-MapModel.services = ["notification", "http"];
-MapModel.COORDINATE_FETCH_DELAY = 1000;
+MapModel.services = ["notification"];

@@ -4,24 +4,22 @@
 <!--    Upload from form view-->
     <t t-name="account_accountant.NewLoan">
         <FileUploader
-            acceptedFileExtensions="props.acceptedFileExtensions"
+            acceptedFileExtensions="this.props.acceptedFileExtensions"
             fileUploadClass="'new_loan'"
             multiUpload="false"
-            onUploaded.bind="onFileUploaded"
+            onUploaded.bind="this.onFileUploaded"
         >
             <t t-set-slot="toggler">
-                <span groups="account.group_account_invoice">
-                    <button class="btn btn-primary">
-                        Upload
-                    </button>
-                </span>
+                <button class="btn btn-primary o_new_loan_upload">
+                    Upload
+                </button>
             </t>
-            <t t-slot="default"/>
+            <t t-call-slot="default"/>
         </FileUploader>
-        <span class="ms-1" groups="account.group_account_invoice">
+        <span class="ms-1">
             <button
-                class="btn btn-secondary"
-                t-on-click="openComputeWizard"
+                class="btn btn-secondary o_new_loan_compute"
+                t-on-click="this.openComputeWizard"
             >
                 Compute
             </button>

@@ -1,18 +1,19 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { useService } from "@web/core/utils/hooks";
 
 export class ExportAuditReportToPDFDialog extends Component {
     static template = "accountant_knowledge.ExportAuditReportToPDFDialog";
     static components = { Dialog };
-    static props = {
-        record: Object,
-        close: Function,
-    };
+
+    props = useProps({
+        record: t.object(),
+        close: t.function(),
+    });
 
     setup() {
         this.action = useService("action");
-        this.state = useState({
+        this.state = proxy({
             includePdfFiles: true,
             includeChildArticles: true,
         });
@@ -20,10 +21,15 @@ export class ExportAuditReportToPDFDialog extends Component {
 
     async exportAuditReportToPDF() {
         this.props.close();
-        await this.action.doAction({
-            type: "ir.actions.act_url",
-            target: "download",
-            url: `/knowledge_accountant/article/${this.props.record.resId}/audit_report?include_pdf_files=${this.state.includePdfFiles}&include_child_articles=${this.state.includeChildArticles}`,
+        await this.action.doActionButton({
+            type: "object",
+            resModel: "knowledge.article",
+            resId: this.props.record.resId,
+            name: "action_export_audit_report_to_pdf",
+            context: {
+                include_pdf_files: Number(this.state.includePdfFiles),
+                include_child_articles: Number(this.state.includeChildArticles),
+            },
         });
     }
 }

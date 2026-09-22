@@ -1,45 +1,20 @@
-import { loadBundle } from "@web/core/assets";
+import { useChart } from "@web/core/utils/chart_hook";
 import { registry } from "@web/core/registry";
 import { getColor } from "@web/core/colors/colors";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
-import { Component, onWillStart, useEffect, useRef } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { cookie } from "@web/core/browser/cookie";
 
 export class CommissionGraphField extends Component {
     static template = "sale_commission.GraphField";
-    static props = {
-        ...standardFieldProps,
-    };
 
-    setup() {
-        this.chart = null;
-        this.canvasRef = useRef("canvas");
+    props = useProps(standardFieldProps);
+
+    chart = useChart(() => {
         this.data = JSON.parse(this.props.record.data[this.props.name]);
-
-        onWillStart(async () => await loadBundle("web.chartjs_lib"));
-
-        useEffect(() => {
-            this.renderChart();
-            return () => {
-                if (this.chart) {
-                    this.chart.destroy();
-                }
-            };
-        });
-    }
-
-    /**
-     * Instantiates a Chart (Chart.js lib) to render the graph according to
-     * the current config.
-     */
-    renderChart() {
-        if (this.chart) {
-            this.chart.destroy();
-        }
-        this.data = JSON.parse(this.props.record.data[this.props.name]);
-        this.chart = new Chart(this.canvasRef.el, this.getLineChartConfig());
-    }
+        return this.getLineChartConfig();
+    });
 
     /**
      * Find the greatest common divisor of two number (Euclidean algorithm)
@@ -50,8 +25,12 @@ export class CommissionGraphField extends Component {
     GCD(a, b) {
         a = Math.abs(a);
         b = Math.abs(b);
-        if (a < b) return this.GCD(b, a);
-        if (b == 0) return a;
+        if (a < b) {
+            return this.GCD(b, a);
+        }
+        if (b == 0) {
+            return a;
+        }
         return this.GCD(b, a % b);
     }
 
@@ -61,9 +40,9 @@ export class CommissionGraphField extends Component {
         });
 
         let gcd = 0;
-        this.data.values.forEach(v => {
+        this.data.values.forEach((v) => {
             gcd = this.GCD(v.x, gcd);
-        })
+        });
 
         const color10 = getColor(3, cookie.get("color_scheme"), "odoo");
         const currency = this.data.currency;
@@ -92,21 +71,21 @@ export class CommissionGraphField extends Component {
                 },
                 scales: {
                     x: {
-                        type: 'linear',
+                        type: "linear",
                         ticks: {
                             stepSize: gcd,
-                            callback: function(value, index, ticks) {
-                                return value + '%'
-                            }
-                        }
+                            callback: function (value, index, ticks) {
+                                return value + "%";
+                            },
+                        },
                     },
                     y: {
-                        type: 'linear',
+                        type: "linear",
                         ticks: {
-                            callback: function(value, index, ticks) {
-                                return value + currency
-                            }
-                        }
+                            callback: function (value, index, ticks) {
+                                return value + currency;
+                            },
+                        },
                     },
                 },
                 elements: {

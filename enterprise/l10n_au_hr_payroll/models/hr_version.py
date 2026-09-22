@@ -51,7 +51,7 @@ class HrVersion(models.Model):
         required=True,
         groups="hr_payroll.group_hr_payroll_user",
         help="TFN Declaration status of the employee. All options except 'Declaration not completed...' will be treated as TFN provided.",
-        tracking=True,
+        tracking=1,
         )
     l10n_au_tfn = fields.Char(
         string="Tax File Number",
@@ -59,25 +59,25 @@ class HrVersion(models.Model):
         readonly=False,
         store=True,
         groups="hr_payroll.group_hr_payroll_user",
-        tracking=True,
+        tracking=1,
         )
     l10n_au_nat_3093_amount = fields.Float(
         string="Annual Tax Offset",
         groups="hr_payroll.group_hr_payroll_user",
-        help="Amount of tax offset the employee entered in his NAT3093 withholding declaration, 0 if the employee did not present a declaration",
-        tracking=True,
+        help="Amount provided by the employee in their declaration form NAT 3093 to reduce their overall tax liability.",
+        tracking=1,
         )
     l10n_au_extra_pay = fields.Boolean(
         string="Withhold for Extra Pay",
         groups="hr_payroll.group_hr_payroll_user",
         help="Whether the employee wants additional withholding in case of 53 weekly pays or 27 fortnightly pays in a year",
-        tracking=True,
+        tracking=1,
         )
     l10n_au_training_loan = fields.Boolean(
         string="HELP / STSL",
         groups="hr_payroll.group_hr_payroll_user",
         help="Whether the employee is a Study Training Support Loan (STSL) recipient",
-        tracking=True,
+        tracking=1,
         )
     l10n_au_medicare_exemption = fields.Selection(
         selection=[
@@ -88,7 +88,8 @@ class HrVersion(models.Model):
         default="X",
         required=True,
         groups="hr_payroll.group_hr_payroll_user",
-        tracking=True,
+        tracking=1,
+        help="An exemption from the standard 2% Medicare Levy, which may be either full or half."
         )
     l10n_au_medicare_surcharge = fields.Selection(
         selection=[
@@ -100,7 +101,8 @@ class HrVersion(models.Model):
         default="X",
         groups="hr_payroll.group_hr_payroll_user",
         required=True,
-        tracking=True,
+        tracking=1,
+        help="Additional percentage amount charged on top of the regular 2% Medicare Levy."
         )
     l10n_au_medicare_reduction = fields.Selection(
         selection=[
@@ -124,24 +126,26 @@ class HrVersion(models.Model):
         required=True,
         default="X",
         groups="hr_payroll.group_hr_payroll_user",
-        help="Medicare levy reduction, dependent on marital status and number of children",
-        tracking=True,
+        help="Reduction in the regular 2% Medicare levy, based on the employee's marital status and number of dependent children",
+        tracking=1,
         )
     l10n_au_tax_free_threshold = fields.Boolean(
         string="Tax-free Threshold",
         groups="hr_payroll.group_hr_payroll_user",
-        tracking=True,
+        tracking=1,
         )
     l10n_au_child_support_deduction = fields.Float(
         string="Child Support Deduction",
         groups="hr_payroll.group_hr_payroll_user",
         help="Amount that has to be deducted every pay period, subject to Protected Earnings Amount (PEA)",
-        tracking=True,
+        tracking=1,
         )
     l10n_au_child_support_garnishee_amount = fields.Float(
         string="Child Support Garnishee Amount %",
         groups="hr_payroll.group_hr_payroll_user",
-        tracking=True,
+        tracking=1,
+        help="Percentage amount to be deducted each pay period under Section 72A – Protected Earnings Amount (PEA) does not apply.",
+        digits="Payroll Rate",
         )
     l10n_au_employment_basis_code = fields.Selection(
         selection=[
@@ -156,7 +160,7 @@ class HrVersion(models.Model):
         default="F",
         required=True,
         groups="hr_payroll.group_hr_payroll_user",
-        tracking=True
+        tracking=1
     )
     l10n_au_tax_treatment_category = fields.Selection(
         selection=[
@@ -174,7 +178,7 @@ class HrVersion(models.Model):
         required=True,
         string="Tax Treatment Category",
         groups="hr_payroll.group_hr_payroll_user",
-        tracking=True,
+        tracking=1,
         )
     l10n_au_income_stream_type = fields.Selection(
         selection=INCOME_STREAM_TYPES,
@@ -183,35 +187,36 @@ class HrVersion(models.Model):
         precompute=True,
         store=True, readonly=False, required=True,
         groups="hr_payroll.group_hr_payroll_user",
-        tracking=True,
+        help="Income Types for STP Phase 2 Reporting.",
+        tracking=1,
         )
     l10n_au_tax_treatment_option_actor = fields.Selection(
         selection=[
             ("D", "Daily Performer"),
             ("P", "Promotional Activity")
-        ], string="Actor Option", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_au_less_than_3_performance = fields.Boolean(string="Less than 3 Performances", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+        ], string="Actor Option", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_au_less_than_3_performance = fields.Boolean(string="Less than 3 Performances", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_au_tax_treatment_option_voluntary = fields.Selection(
         selection=[
             ("C", "Commissioner's Instalment Rate"),
             ("O", "Other Rate"),
-        ], string="Voluntary Agreement Option", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+        ], string="Voluntary Agreement Option", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_au_tax_treatment_option_seniors = fields.Selection(
         selection=[
             ("S", "Single"),
             ("M", "Married"),
             ("I", "Illness-separated"),
-        ], string="Seniors Option", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+        ], string="Seniors Option", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_au_comissioners_installment_rate = fields.Float(
-        string="Commissioner's Instalment Rate", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+        string="Commissioner's Instalment Rate", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_au_tax_treatment_code = fields.Char(
         string="Tax Code", store=True,
         compute="_compute_l10n_au_tax_treatment_code",
         groups="hr_payroll.group_hr_payroll_user",
-        tracking=True,
+        tracking=1,
     )
     l10n_au_work_country_id = fields.Many2one(
-        "res.country", string="Country", help="Country where the work is performed", groups="hr_payroll.group_hr_payroll_user", tracking=True
+        "res.country", string="Country", help="Country where the work is performed", groups="hr_payroll.group_hr_payroll_user", tracking=1
     )
     l10n_au_withholding_variation = fields.Selection(
         selection=[
@@ -223,17 +228,22 @@ class HrVersion(models.Model):
         default="none",
         groups="hr_payroll.group_hr_payroll_user",
         required=True,
-        help="Employee has a custom withholding rate.",
-        tracking=True,
+        help="The percentage of the employee's pay (including salary and any unused annual leave) that will be withheld for tax.",
+        tracking=1,
     )
-    l10n_au_withholding_variation_amount = fields.Float(string="Withholding Variation Rate", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    l10n_au_withholding_variation_amount = fields.Float(string="Withholding Variation Rate", groups="hr_payroll.group_hr_payroll_user", tracking=1, digits="Payroll Rate")
     l10n_au_additional_withholding_amount = fields.Monetary(
         string="Additional Withholding Amount",
         groups="hr_payroll.group_hr_payroll_user",
-        help="Additional amount will be withheld from the employee's salary after PAYG withholding. (Schedule 14)",
-        tracking=True,
+        help="Additional amount that will be withheld from the employee's salary after PAYG withholding (Schedule 14).",
+        tracking=1,
         )
-    l10n_au_casual_loading = fields.Float(string="Casual Loading", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    l10n_au_casual_loading = fields.Float(
+        string="Casual Loading",
+        groups="hr_payroll.group_hr_payroll_user",
+        help="An extra percentage added to a casual employee's hourly base pay to compensate for not receiving leave entitlements.",
+        tracking=1
+    )
     l10n_au_pay_day = fields.Selection(
         selection=[
             ("0", "Monday"),
@@ -243,23 +253,23 @@ class HrVersion(models.Model):
             ("4", "Friday"),
             ("5", "Saturday"),
             ("6", "Sunday")],
-        string="Regular Pay Day", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_au_eligible_for_leave_loading = fields.Boolean(string="Eligible for Leave Loading", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+        string="Regular Pay Day", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_au_eligible_for_leave_loading = fields.Boolean(string="Eligible for Leave Loading", groups="hr_payroll.group_hr_payroll_user", tracking=1)
     l10n_au_leave_loading = fields.Selection(
         selection=[
             ("regular", "Regular"),
             ("once", "Lump Sum")],
         string="Leave Loading", groups="hr_payroll.group_hr_payroll_user",
         help="How leave loading, if any, is to be paid. If Lump Sum is selected, leave loading will not be added to regular payslips automatically",
-        tracking=True,
+        tracking=1,
         )
-    l10n_au_leave_loading_leave_types = fields.Many2many(
-        "hr.leave.type",
+    l10n_au_leave_loading_work_entry_types = fields.Many2many(
+        "hr.work.entry.type",
         string="Leave Types for Leave Loading", groups="hr_payroll.group_hr_payroll_user",
         help="Leave Types that should be taken into account for leave loading, both regular and lump sum.",
-        tracking=True,
+        tracking=1,
         )
-    l10n_au_leave_loading_rate = fields.Float(string="Leave Loading Rate (%)", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    l10n_au_leave_loading_rate = fields.Float(string="Leave Loading Rate (%)", groups="hr_payroll.group_hr_payroll_user", tracking=1, digits="Payroll Rate")
     l10n_au_cessation_type_code = fields.Selection(
         CESSATION_TYPE_CODE,
         string="Cessation Type", groups="hr_payroll.group_hr_payroll_user",
@@ -272,20 +282,24 @@ class HrVersion(models.Model):
             "C": the natural conclusion of a limited employment relationship due to contract/engagement duration or task completion, seasonal work completion, or to cease casuals that are no longer required.
             "T": the administrative arrangements performed to transfer employees across payroll systems, move them temporarily to another employer (machinery of government for public servants), transfer of business, move them to outsourcing arrangements or other such technical activities.
         """,
-        tracking=True,
+        tracking=1,
         )
-    l10n_au_performances_per_week = fields.Integer(string="Performances per week", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_au_workplace_giving = fields.Float(string="Workplace Giving Employee", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_au_workplace_giving_employer = fields.Float(string="Salary Sacrificed Workplace Giving", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_au_salary_sacrifice_superannuation = fields.Float(string="Salary Sacrifice Superannuation", groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    l10n_au_salary_sacrifice_other = fields.Float(string="Salary Sacrifice Other Benefits", groups="hr_payroll.group_hr_payroll_user", tracking=True)
+    l10n_au_performances_per_week = fields.Integer(string="Performances per week", groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    l10n_au_workplace_giving = fields.Float(string="Workplace Giving Employee", groups="hr_payroll.group_hr_payroll_user",
+        help="The amount taken out of an employee's base salary before tax is applied.", tracking=1)
+    l10n_au_workplace_giving_employer = fields.Float(string="Salary Sacrificed Workplace Giving", groups="hr_payroll.group_hr_payroll_user",
+        help="A pre-tax donation an employee chooses to make directly from their salary to a registered charity or deductible gift recipient.", tracking=1)
+    l10n_au_salary_sacrifice_superannuation = fields.Float(string="Salary Sacrifice Superannuation", groups="hr_payroll.group_hr_payroll_user",
+        help="Extra super contributions taken from an employee's pre-tax salary each pay period.", tracking=1)
+    l10n_au_salary_sacrifice_other = fields.Float(string="Salary Sacrifice Other Benefits", groups="hr_payroll.group_hr_payroll_user",
+        help="Pre-tax amounts set aside for salary packaging benefits other than superannuation (e.g. car, laptop, or other approved items).", tracking=1)
     l10n_au_extra_negotiated_super = fields.Float(string="Extra Negotiated Super %", groups="hr_payroll.group_hr_payroll_user",
-        help="This is an additional Super Contribution negotiated by the employee. Paid by employer. (RESC)", tracking=True)
+        help="This is an additional Super Contribution negotiated by the employee. Paid by employer. (RESC)", tracking=1, digits="Payroll Rate")
     l10n_au_extra_compulsory_super = fields.Float(string="Extra Compulsory Super %", groups="hr_payroll.group_hr_payroll_user",
-        help="This is an additional Compulsory Super Contribution required by the fund or territory law. (Not RESC)", tracking=True)
-    l10n_au_yearly_wage = fields.Monetary(string="Yearly Wage", compute="_compute_yearly_wage", inverse="_inverse_yearly_wages", readonly=False, store=True, groups="hr_payroll.group_hr_payroll_user", tracking=True)
-    wage = fields.Monetary(compute="_compute_wage", readonly=False, store=True, tracking=True)
-    hourly_wage = fields.Monetary(compute="_compute_hourly_wage", readonly=False, store=True, tracking=True)
+        help="This is an additional Compulsory Super Contribution required by the fund or territory law. (Not RESC)", tracking=1)
+    l10n_au_yearly_wage = fields.Monetary(string="Yearly Wage", compute="_compute_yearly_wage", inverse="_inverse_yearly_wages", readonly=False, store=True, groups="hr_payroll.group_hr_payroll_user", tracking=1)
+    wage = fields.Monetary(compute="_compute_wage", readonly=False, store=True, tracking=1)
+    hourly_wage = fields.Float("Casual", compute="_compute_hourly_wage", readonly=False, store=True, tracking=1)
 
     _l10n_au_casual_loading_span = models.Constraint(
         'CHECK(l10n_au_casual_loading >= 0 AND l10n_au_casual_loading <= 1)',
@@ -302,6 +316,10 @@ class HrVersion(models.Model):
     _l10n_au_child_support_garnishee_amount_span = models.Constraint(
         'CHECK(l10n_au_child_support_garnishee_amount >= 0 AND l10n_au_child_support_garnishee_amount <= 1)',
         "Child Support Garnishee is a percentage and should have a value between 0 and 100.",
+    )
+    _l10n_au_check_yearly_wage_positive = models.Constraint(
+        'CHECK(l10n_au_yearly_wage >= 0)',
+        'The yearly wage must be a positive value.',
     )
 
     @api.constrains('employee_id', 'schedule_pay')
@@ -447,7 +465,9 @@ class HrVersion(models.Model):
         "company_id.l10n_au_registered_for_whm")
     def _compute_l10n_au_tax_treatment_code(self):
         for rec in self:
-            code = rec.l10n_au_tax_treatment_category  # First character
+            if not (code := rec.l10n_au_tax_treatment_category):  # First character
+                rec.l10n_au_tax_treatment_code = False
+                continue
             code += rec._get_second_code()  # Second Character
             # Third Character
             if rec.l10n_au_tax_treatment_category in ["R", "S", "F"] and rec.l10n_au_employment_basis_code != "D" and rec.l10n_au_training_loan:
@@ -538,7 +558,7 @@ class HrVersion(models.Model):
     def _compute_wage(self):
         Payslip = self.env['hr.payslip']
         for version in self:
-            if version.country_code != "AU" or version.wage_type != "hourly":
+            if version.country_code != "AU" or version.wage_type != "hourly" or not version.schedule_pay:
                 continue
             daily_wage = version.hourly_wage * version.resource_calendar_id.hours_per_day
             version.wage = Payslip._l10n_au_convert_amount(daily_wage, "daily", version.schedule_pay)
@@ -547,9 +567,12 @@ class HrVersion(models.Model):
     def _compute_hourly_wage(self):
         Payslip = self.env['hr.payslip']
         for version in self:
-            if version.country_code != "AU" or version.wage_type == "hourly":
+            if version.country_code != "AU" or version.wage_type == "hourly" or not version.schedule_pay:
                 continue
             hours_per_day = version.resource_calendar_id.hours_per_day
+            if not hours_per_day:
+                version.hourly_wage = 0.0
+                continue
             daily_wage = Payslip._l10n_au_convert_amount(version.wage, version.schedule_pay, "daily")
             version.hourly_wage = daily_wage / hours_per_day
 
@@ -557,7 +580,7 @@ class HrVersion(models.Model):
     def _compute_yearly_wage(self):
         Payslip = self.env['hr.payslip']
         for version in self:
-            if version.country_code != "AU":
+            if version.country_code != "AU" or not version.schedule_pay:
                 continue
             hours_per_day = version.resource_calendar_id.hours_per_day
             if version.wage_type == "hourly":
@@ -570,6 +593,9 @@ class HrVersion(models.Model):
             return
         hours_per_day = self.resource_calendar_id.hours_per_day
         self.wage = self.env['hr.payslip']._l10n_au_convert_amount(self.l10n_au_yearly_wage, "annually", self.schedule_pay)
+        if not hours_per_day:
+            self.hourly_wage = 0.0
+            return
         self.hourly_wage = self.env['hr.payslip']._l10n_au_convert_amount(self.l10n_au_yearly_wage, "annually", "daily") / hours_per_day
 
     def get_hourly_wages(self):
@@ -614,7 +640,7 @@ class HrVersion(models.Model):
                 "l10n_au_extra_compulsory_super",
                 "l10n_au_extra_negotiated_super",
                 "l10n_au_leave_loading",
-                "l10n_au_leave_loading_leave_types",
+                "l10n_au_leave_loading_work_entry_types",
                 "l10n_au_leave_loading_rate",
                 "l10n_au_pay_day",
                 "l10n_au_performances_per_week",

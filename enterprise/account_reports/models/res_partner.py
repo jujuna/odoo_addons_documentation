@@ -9,7 +9,7 @@ class ResPartner(models.Model):
 
     account_represented_company_ids = fields.One2many('res.company', 'account_representative_id')
 
-    def _get_followup_responsible(self, multiple_responsible=False):
+    def _get_followup_responsible(self, multiple_responsible=False, *, followup_line=None):
         return self.env.user
 
     def open_customer_statement(self):
@@ -50,7 +50,7 @@ class ResPartner(models.Model):
             return super()._compute_display_name()
         for partner in self:
             res = ""
-            if partner.vat:
+            if partner.has_vat:
                 res += f" {partner.vat},"
             if partner.country_id:
                 res += f" {partner.country_id.code},"
@@ -71,9 +71,11 @@ class ResPartner(models.Model):
                 'all_entries': False,
             })
         attachment_file = report.export_to_pdf(options)
+
+        file_name = report.get_default_partner_report_filename(self, options)
         return self.env['ir.attachment'].create([
             {
-                'name': f"{self.name} - {attachment_file['file_name']}",
+                'name': file_name,
                 'res_model': self._name,
                 'res_id': self.id,
                 'type': 'binary',
@@ -92,10 +94,9 @@ class ResPartner(models.Model):
         ])
         # Update commercial partner of all duplicates
         duplicated_partners.write({
-            'is_company': False,
             'parent_id': main_partner.id,
             'type': 'invoice',
         })
-        duplicated_partners_vat = self.env.context.get('duplicated_partners_vat', [])
-        remaining_vats = [pvat for pvat in duplicated_partners_vat if pvat != main_partner.vat]
-        return self.env['account.ec.sales.report.handler']._get_duplicated_vat_partners(remaining_vats)
+        duplicate_partners_vat = self.env.context.get('duplicate_partners_vat', [])
+        remaining_vats = [pvat for pvat in duplicate_partners_vat if pvat != main_partner.vat]
+        return self.env['account.ec.sales.report.handler.common']._get_duplicate_vat_partners(remaining_vats)

@@ -4,11 +4,12 @@
         <field name="name">VoIP Provider List View</field>
         <field name="model">voip.provider</field>
         <field name="arch" type="xml">
-            <list string="VoIP Providers" editable="bottom">
+            <list string="VoIP Providers" editable="bottom" duplicate="false">
                 <field name="name"/>
                 <field name="ws_server" required="mode == 'prod'"/>
                 <field name="pbx_ip" required="mode == 'prod'"/>
                 <field name="mode"/>
+                <field name="cloud_storage_provider" column_invisible="True"/>
                 <field name="recording_policy" string="Call Recording"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" placeholder="Visible to all"/>
             </list>
@@ -19,7 +20,7 @@
         <field name="name">voip.provider.view.form</field>
         <field name="model">voip.provider</field>
         <field name="arch" type="xml">
-            <form>
+            <form duplicate="false">
                 <sheet>
                     <group>
                         <group>
@@ -29,6 +30,7 @@
                         <group>
                             <field name="ws_server" required="mode == 'prod'"/>
                             <field name="pbx_ip" required="mode == 'prod'"/>
+                            <field name="voicemail_code" placeholder="e.g., *98"/>
                         </group>
                     </group>
                     <div class="o_setting_box">
@@ -40,6 +42,10 @@
                             <p class="text-muted">
                                 Record VoIP calls. An indicator is displayed during calls. There is no vocal announcement by default.
                             </p>
+                            <div invisible="cloud_storage_provider" class="text-danger mt-1">
+                                <i class="oi" data-icon="warning" role="img" aria-label="Warning" title="Warning"/> 
+                                Cloud storage is not configured. Call recording is disabled.
+                            </div>
                             <field name="recording_policy_option" widget="radio" readonly="not recording_enabled"/>
                         </div>
                     </div>
@@ -54,8 +60,14 @@
         <field name="view_mode">list,form</field>
         <field name="view_id" ref="voip_provider_tree_view"/>
         <field name="help" type="html">
-            <p class="o_view_nocontent_voip_provider">Ready to Start Calling?</p>
-            <p>Connect Odoo to your VoIP service by adding a provider.</p>
+            <div>
+                <div class="position-relative mb-3">
+                    <span class="o_view_nocontent_voip_bg_shape o_view_nocontent_voip_provider_bg position-absolute bg-primary"/>
+                    <img class="position-relative mw-100" src="/voip/static/src/img/voip_provider.svg" alt="Ready to Start Calling?"/>
+                </div>
+                <h2>Ready to Start Calling?</h2>
+                <p>Connect Odoo to your VoIP service by adding a provider.</p>
+            </div>
         </field>
     </record>
 
@@ -63,5 +75,6 @@
         name="VoIP Providers"
         parent="phone_validation.phone_menu_main"
         sequence="4"
+        groups="voip.group_voip_admin"
         action="action_voip_provider_view"/>
 </odoo>

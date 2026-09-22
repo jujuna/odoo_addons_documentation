@@ -1,10 +1,11 @@
-import base64
 import re
+import requests
 
 from collections import OrderedDict
 from odoo import api, models, Command
 from markupsafe import Markup
 from odoo.addons.product_barcodelookup.tools import barcode_lookup_service
+from odoo.tools import BinaryBytes
 from odoo.tools.barcode import check_barcode_encoding
 
 BARCODE_UOM_REGEX = r'^((?P<uom_val>(\d*\.?\d+))([\s?]*)(?P<unit>(([a-zA-Z]*))))$'
@@ -16,7 +17,7 @@ class ProductTemplate(models.Model):
     @api.onchange('barcode')
     def _onchange_barcode(self):
         for product in self:
-            if self.env.user.has_group('base.group_system') and product.barcode and len(product.barcode) > 7:
+            if self.env.user.has_group('product.group_product_manager') and product.barcode and len(product.barcode) > 7:
                 barcode_lookup_data = self.barcode_lookup(product.barcode)
                 product._update_product_by_barcodelookup(product, barcode_lookup_data)
 
@@ -46,11 +47,11 @@ class ProductTemplate(models.Model):
         if not product.image_1920 and (images := product_data.get('images')):
             for image in images:
                 img_response = barcode_lookup_service.barcode_lookup_request(image)
-                if isinstance(img_response, dict):
-                    # Response is not 200 when fetching the image so we just ignore it.
-                    continue
 
-                if img_response:
+                if (
+                    img_response.status_code == requests.codes.ok
+                    and 'image/' in img_response.headers.get('Content-Type', '')
+                ):
                     self._set_lookup_image(product, img_response)
 
         # Weight
@@ -206,20 +207,27 @@ class ProductTemplate(models.Model):
             return False
         params = {'barcode': barcode, 'key': api_key}
         response = barcode_lookup_service.barcode_lookup_request('https://api.barcodelookup.com/v3/products', params)
-        return response.json() if not isinstance(response, dict) else response
+        return response.json() if response else {}
 
     @api.model_create_multi
     def create(self, vals_list):
         products = super().create(vals_list)
-        for product in products:
-            if 'is_published' in product and not self.env.context.get('website_published') and product.public_categ_ids:
+        for product, vals in zip(products, vals_list):
+            if 'is_published' in product and 'is_published' not in vals and not self.env.context.get('website_published') and product.public_categ_ids:
                 product.is_published = True
             if 'available_in_pos' in product and not self.env.context.get('can_be_sold') and product.sudo().pos_categ_ids:
                 product.available_in_pos = True
         return products
 
+    def copy_data(self, default=None):
+        vals_list = super().copy_data(default)
+        if 'is_published' in self:
+            for vals in vals_list:
+                vals['is_published'] = False
+        return vals_list
+
     def _set_lookup_image(self, product, img):
-        image = base64.b64encode(img.content)
+        image = BinaryBytes(img.content)
         if not product.image_1920:
             product.image_1920 = image
             return True

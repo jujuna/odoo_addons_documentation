@@ -1,21 +1,23 @@
 import { registry } from "@web/core/registry";
 import { Interaction } from "@web/public/interaction";
-import { serializeDateTime, deserializeDateTime } from "@web/core/l10n/dates";
+import { deserializeDateTime } from "@web/core/l10n/dates";
 import { rpc } from "@web/core/network/rpc";
 import { user } from "@web/core/user";
+import { range } from "@web/core/utils/numbers";
+import { _t } from "@web/core/l10n/translation";
+
 const { DateTime } = luxon;
 
 export class appointmentSlotSelect extends Interaction {
     static selector = ".o_appointment_info";
     dynamicContent = {
+        _root: {
+            "t-att-class": () => ({
+                "o_appointment_info_loading": this.isLoadingSlots,
+            }),
+        },
         "select[name='timezone']": {
-            "t-on-change": this.onRefresh,
-        },
-        "select[id='selectAppointmentResource']": {
-            "t-on-change": this.onRefresh,
-        },
-        "select[id='selectStaffUser']": {
-            "t-on-change": this.onRefresh,
+            "t-on-change": this.onChangeTimezone,
         },
         "select[id='resourceCapacity']": {
             "t-on-change": this.onRefresh,
@@ -23,17 +25,48 @@ export class appointmentSlotSelect extends Interaction {
         ".o_js_calendar_navigate": {
             "t-on-click": this.onCalendarNavigate,
         },
-        ".o_slot_button": {
+        ".o_appointment_calendar": {
+            "t-att-class": () => ({
+                "o_appointment_calendar_dropdown_closed": !this.dateDropdownIsOpen,
+            })
+        },
+        ".o_appointment_entity_card": {
+            "t-on-click": this.onClickEntityCard,
+            "t-att-class": (el) => ({
+                "o_appointment_entity_card_selected active text-primary": el === this.selectedEntityEl,
+            }),
+        },
+        ".o_appointment_entity_card_selection": {
+            "t-att-class": () => ({
+                "d-none": !this.entityDropdownIsOpen,
+            })
+        },
+        ".o_slot_day": {
             "t-on-click": this.onClickDaySlot,
+            "t-att-class": (el) => ({
+                "active text-primary": el === this.selectedDateEl,
+            }),
         },
         ".o_slot_hours": {
             "t-on-click": this.onClickHoursSlot,
+            "t-att-class": (el) => ({
+                "active text-primary": el === this.selectedSlotEl,
+            })
+        },
+        "button[name='entityDropdownBtn']": {
+            "t-on-click": this.onClickEntityDropdownBtn,
+        },
+        "button[name='dateDropdownBtn']": {
+            "t-on-click": this.onClickDateDropdownBtn,
+            "t-out": () => this.dateDropdownBtnContent,
+            "t-att-title": () => this.dateDropdownBtnContent,
+            "t-att-disabled": () => !this.isLoadingSlots && !this.firstDayEl,
         },
         "button[name='submitSlotInfoSelected']": {
             "t-on-click": this.onClickConfirmSlot,
-        },
-        ".o_appointment_show_calendar": {
-            "t-on-click": this.onClickShowCalendar,
+            "t-att-class": () => ({
+                "d-none": this.isLoadingSlots || !this.selectedSlotEl || (this.confirmOnEntity && !this.selectedEntityEl),
+            }),
         },
         "#next_available_slot": {
             "t-on-click": this.selectFirstAvailableMonth,
@@ -41,30 +74,136 @@ export class appointmentSlotSelect extends Interaction {
         ".o_appointment_close_upcoming_appointment_alert": {
             "t-on-close.bs.alert": this.onClickCloseUpcomingAppointmentAlert,
         },
+        ".o_appointment_timezone_selection": {
+            "t-att-class": () => ({
+                "d-none": this.isLoadingSlots || !this.firstDayEl,
+            }),
+        }
     };
 
     setup() {
         this.slotsListEl = this.el.querySelector("#slotsList");
         this.resourceSelectionEl = this.el.querySelector("#resourceSelection");
-        this.firstEl = this.el.querySelector(".o_slot_button");
+        this.firstDayEl = this.el.querySelector(".o_slot_day");
+
+        // Appointment Data
+        this.appointmentTypeId = this.el.querySelector("input[name='appointment_type_id']").value;
+        this.appointmentTypeSlug = this.el.querySelector("input[name='appointment_type_slug']").value;
+        this.categorySlotScheduling = this.el.querySelector("input[name='category_slot_scheduling']").value;
+        this.isAppointmentActive = this.el.querySelector("input[name='active']").value;
+        this.isAutoAssign = this.el.querySelector("input[name='is_auto_assign']").value;
+        this.isDateFirst = this.el.querySelector("input[name='is_date_first']").value;
+        this.isReschedule = this.el.querySelector("input[name='is_reschedule']").value;
+        this.scheduleBasedOn = this.el.querySelector("input[name='schedule_based_on']").value;
+        this.showAvatars = this.el.querySelector("input[name='show_avatars']").value;
+
+        // Invite data
+        this.appointmentsCount = parseInt(this.el.querySelector("input[name='appointments_count']").value);
+        this.filterAppointmentTypeIds = this.el.querySelector("input[name='filter_appointment_type_ids']").value;
+        this.filterResourceIds = this.el.querySelector("input[name='filter_resource_ids']").value;
+        this.filterUserIds = this.el.querySelector("input[name='filter_staff_user_ids']").value;
+        this.inviteToken = this.el.querySelector("input[name='invite_token']").value;
+
+        // Entity (resource or user) and capacity
+        this.askedCapacity = this.el.querySelector("input[name='asked_capacity']").value;
+        this.entityDropdownIsOpen = false;
+        this.selectedEntityEl = undefined;
+        this.resourceSelectedId = this.el.querySelector("input[name='resource_selected_id']").value;
+        this.useAnyEntity = this.el.querySelector("input[name='use_any_entity']").value;
+        this.userSelectedId = this.el.querySelector("input[name='user_selected_id']").value;
+
+        // Date & slot
+        this.selectedDateEl = undefined;
+        this.selectedSlotEl = undefined;
+
+        // TZ
+        this.selectedTimezone = this.el.querySelector("input[name='initial_timezone']").value;
+
+        // Calendar dropdown and rendering
+        this.dateDropdownBtnContent = '-';
+        this.dateDropdownIsOpen = false;
+        this.formattedDays = JSON.parse(this.el.querySelector("input[name='formatted_days']").value || '[]');
+
+        // Loading
+        this.isLoadingSlots = true;
+        this.noValidEntities = false;
+
+        // Confirmation logic
+        this.confirmOnEntity = !this.isAutoAssign && this.isDateFirst;
+        this.confirmOnHours = this.isAutoAssign || !this.isDateFirst;
     }
 
     willStart() {
         (async () => {
-            await this.initSlots();
-            this.removeLoadingSpinner();
-            this.firstEl?.click();
+            const initialData = await rpc(
+                `/appointment/${this.appointmentTypeId}/get_availability_data`,
+                {
+                    asked_capacity: this.askedCapacity,
+                    invite_token: this.inviteToken,
+                    is_first_loading: true,
+                    filter_appointment_type_ids: this.filterAppointmentTypeIds,
+                    filter_staff_user_ids: this.filterUserIds,
+                    filter_resource_ids: this.filterResourceIds,
+                    resource_selected_id: this.resourceSelectedId,
+                    staff_user_id: this.userSelectedId,
+                    timezone: this.selectedTimezone,
+                    use_any_entity: this.useAnyEntity,
+                }
+            );
+
+            if (Object.keys(initialData).length === 0) {
+                this.noValidEntities = true;
+                this.isLoadingSlots = false;
+                await this.updateSlotAvailability(0);
+                return;
+            }
+
+            const { max_possible_capacity, initial_capacity, initial_selected_entity_id } = initialData;
+            this.maxPossibleCapacity = max_possible_capacity;
+            if (initial_selected_entity_id) {
+                this.selectedEntityEl = this.el.querySelector(
+                    `.o_appointment_entity_card[data-entity-id="${initial_selected_entity_id}"]`)
+            } else {
+                this.selectedEntityEl = this.el.querySelector(
+                    '.o_appointment_entity_card[data-use-any-entity="1"]')
+            }
+            this.updateEntityDropdown();
+
+            this.renderCalendar(initialData);
+            this._updateResourceCapacityOptions(initial_capacity);
+
+            this.firstDayEl?.click();
+            this.isLoadingSlots = false;
+            await this.updateSlotAvailability(initial_capacity);
+
+            // Display the calendar when no other dropdown is present
+            if (
+                this.firstDayEl
+                && !this.el.querySelector("select[name='resourceCapacity']")
+                && !this.el.querySelector("button[name='entityDropdownBtn']")
+            ) {
+                this.dateDropdownIsOpen = true;
+                this.updateContent();
+            }
         })();
     }
 
+    start() {
+        // Add listener on the page restoration from the bfcache.
+        const boundOnNavigationBack = this._onNavigationBack.bind(this);
+        this.addListener(window, "pageshow", boundOnNavigationBack);
+    }
+
     /**
-     * Initializes variables and design
-     * - slotsListEl: the block containing the availabilities
-     * - resourceSelectionEl: resources or users selection for time_resource mode
-     * - firstEl: the first day containing a slot
+     * Re-enable the page when the page is restored from the bfcache.
+     *
+     * @param {PageTransitionEvent} event - The pageshow event.
+     * @private
      */
-    async initSlots() {
-        await this.updateSlotAvailability();
+    _onNavigationBack(event) {
+        if (event.persisted) {
+            this.el.classList.remove("o_appointment_disable");
+        }
     }
 
     /**
@@ -72,16 +211,16 @@ export class appointmentSlotSelect extends Interaction {
      * click on the first date where a slot is available.
      */
     selectFirstAvailableMonth() {
-        const firstMonthEl = this.firstEl.closest(".o_appointment_month");
+        const firstMonthEl = this.firstDayEl.closest(".o_appointment_month");
         const currentMonthEl = document.querySelector(".o_appointment_month:not(.d-none)");
         currentMonthEl.classList.add("d-none");
-        currentMonthEl
-            .querySelectorAll("table")
-            .forEach((table) => table.classList.remove("d-none"));
+        currentMonthEl.querySelector("table").classList.remove("d-none");
         currentMonthEl.querySelector(".o_appointment_no_slot_month_helper").remove();
         firstMonthEl.classList.remove("d-none");
         this.slotsListEl.replaceChildren();
-        this.firstEl.click();
+        this.selectDaySlot(this.firstDayEl, false);
+        this.dateDropdownIsOpen = true;
+        this.entityDropdownIsOpen = false;
     }
 
     /**
@@ -90,37 +229,40 @@ export class appointmentSlotSelect extends Interaction {
      * - monthEl: the month div to which we append the helper.
      */
     renderNoAvailabilityForMonth(monthEl) {
-        const firstAvailabilityDate = this.firstEl.getAttribute("id");
-        const staffUserEl = this.el.querySelector("#slots_form select[name='staff_user_id']");
-        const staffUserNameSelectedOption = staffUserEl?.options[staffUserEl.selectedIndex];
-        const staffUserName = staffUserNameSelectedOption?.textContent;
+        const firstAvailabilityDate = this.firstDayEl.getAttribute("id");
         monthEl.querySelectorAll("table").forEach((tableEl) => tableEl.classList.add("d-none"));
+        monthEl.querySelector(".o_appointment_month_loader").classList.add("d-none");
 
         this.renderAt("Appointment.appointment_info_no_slot_month", {
-            firstAvailabilityDate: DateTime.fromISO(firstAvailabilityDate).toFormat("cccc dd MMMM yyyy"),
-            staffUserName: staffUserName,
+            firstAvailabilityDate: DateTime.fromISO(firstAvailabilityDate).toLocaleString({
+                day: "numeric",
+                weekday: "long",
+                month: "long",
+                year: "numeric",
+            }),
+            selectedEntityName: this.selectedEntityEl?.dataset?.entityName,
         }, monthEl);
+
+        this.dateDropdownIsOpen = true;
+        this.entityDropdownIsOpen = false;
+        this.dateDropdownBtnContent = '-';
     }
 
-    _updateResourceCapacityOptions() {
+    _updateResourceCapacityOptions(initialCapacity) {
         const capacitySelect = document.querySelector("select[name='resourceCapacity']");
-        const resourceId = document.querySelector("#slots_form select[name='resource_id']")?.value;
-
-        if (resourceId && capacitySelect?.value) {
-            const max_resource_capacity = parseInt(
-                document.querySelector("input[name='max_resource_capacity']")?.value || 0
-            );
-            const max_default_capacity = parseInt(
-                document.querySelector("input[name='max_capacity']").value
-            );
+        if ((this.isAutoAssign || this.isDateFirst || this.selectedEntityEl) && !!capacitySelect) {
             const previousCapacitySelected = parseInt(capacitySelect.value);
-            const max_capacity = max_resource_capacity || max_default_capacity;
+            const targetCapacity = initialCapacity || previousCapacitySelected;
             capacitySelect.replaceChildren();
             this.renderAt(
                 "appointment.resources_capacity_options",
                 {
-                    asked_capacity: previousCapacitySelected <= max_capacity ? previousCapacitySelected : false,
-                    max_capacity: max_capacity,
+                    asked_capacity: targetCapacity && (targetCapacity <= this.maxPossibleCapacity)
+                        ? targetCapacity
+                        : false,
+                    max_capacity: this.maxPossibleCapacity,
+                    noAvailability: !this.firstDayEl,
+                    range,
                 },
                 capacitySelect
             );
@@ -128,51 +270,51 @@ export class appointmentSlotSelect extends Interaction {
     }
 
     /**
-     * Checks whether any slot is available in the calendar.
-     * If there isn't, adds an explicative message in the slot list, and hides the appointment details,
-     * and make design width adjustment to have the helper message centered to the whole width.
-     * In case, there is no slots based on capacity chosen then the details and calendar are not hidden.
-     * If the appointment is missconfigured (missing user or missing availabilities),
-     * display an explicative message. The calendar is then not displayed.
-     * If there is an upcoming appointment booked, display a information before the the calendar
-     *
+     * Handle unavailability messages if needed, except for appointment_info_no_slot_month.
+     * If capacity is managed, suggest changing party size if no slot and currently > 1.
+     * Also handle missing configuration and upcoming appointment alert messages
+     * - targetCapacity: integer, capacity selected by user before loading / refreshing
      */
-    async updateSlotAvailability() {
-        if (!this.firstEl) { // No slot available
-            if (!this.el.querySelector("select[name='resourceCapacity']")) {
-                this.el
-                    .querySelectorAll("#slots_availabilities")
-                    .forEach((slotEl) => slotEl.replaceChildren());
-                this.el.querySelector(".o_appointment_timezone_selection")?.classList.add("d-none");
-
-                const staffUserEl = this.el.querySelector(
-                    "#slots_form select[name='staff_user_id']"
-                );
-                const staffUserNameSelectedOption = staffUserEl?.options[staffUserEl.selectedIndex];
-                const staffUserName = staffUserNameSelectedOption?.textContent;
-                const hideSelectDropdown = !!this.el.querySelector(
-                    "input[name='hide_select_dropdown']"
-                ).value;
-                this.el.querySelector(".o_appointment_no_slot_overall_helper").replaceChildren();
+    async updateSlotAvailability(targetCapacity) {
+        const noCapacityEl = this.el.querySelector(".o_appointment_no_capacity");
+        if (!this.firstDayEl) { // No slot available
+            const resourceCapacityEl = this.el.querySelector("select[name='resourceCapacity']");
+            if (!resourceCapacityEl) {
+                const noSlotOverallEl = this.el.querySelector(".o_appointment_no_slot_overall_helper");
+                noSlotOverallEl.replaceChildren();
+                this.el.querySelector("#calendar_wrapper")?.replaceChildren();
                 this.renderAt("Appointment.appointment_info_no_slot", {
-                    active: this.el.querySelector("input[name='active']").value,
-                    appointmentsCount: parseInt(this.el.querySelector("#slotsList").dataset.appointmentsCount),
-                    staffUserName: hideSelectDropdown ? staffUserName : false,
-                }, this.el.querySelector(".o_appointment_no_slot_overall_helper"));
+                    active: this.isAppointmentActive,
+                    appointmentsCount: this.appointmentsCount,
+                    selectedEntityName: this.selectedEntityEl?.dataset?.entityName,
+                }, noSlotOverallEl);
 
             } else {
-                this.el.querySelector(".o_appointment_no_capacity")?.replaceChildren();
-                this.renderAt("Appointment.appointment_info_no_capacity", {}, this.el.querySelector(".o_appointment_no_capacity"));
+                noCapacityEl?.replaceChildren();
+                // When capacity is 0 ('-' option), the current entity selection has no
+                // availability for previous asked capacity. If target capacity is 1, the selected
+                // entity has no availability at all. We can display the appropriate helper message
+                if ((targetCapacity || 1) === 1) {
+                    this.renderAt("Appointment.appointment_info_no_slot", {
+                        active: this.isAppointmentActive,
+                        appointmentsCount: this.appointmentsCount,
+                        selectedEntityName: this.selectedEntityEl?.dataset?.entityName,
+                    }, noCapacityEl);
+                } else {
+                    this.renderAt("Appointment.appointment_info_no_capacity", {}, noCapacityEl);
+                }
+                // As no date is available, we force the calendar to be hidden.
+                this.dateDropdownIsOpen = false;
             }
         } else {
-            this.el.querySelector(".o_appointment_timezone_selection")?.classList.remove("d-none");
-            this.el.querySelector(".o_appointment_no_capacity")?.replaceChildren();
+            noCapacityEl?.replaceChildren();
         }
+
         this.el.querySelector(".o_appointment_missing_configuration")?.classList.remove("d-none");
         // Check upcoming appointments
         const allAppointmentsToken = JSON.parse(localStorage.getItem("appointment.upcoming_events_access_token")) || [];
         const ignoreUpcomingEventUntil = localStorage.getItem("appointment.upcoming_events_ignore_until");
-        if (!this.el.querySelector(".o_appointment_cancelled") &&
+        if (!this.el.querySelector('.o_appointment_reschedule') &&
             !this.el.querySelector('.o_appointment_forced_staff_user_assigned') &&
             (!ignoreUpcomingEventUntil || deserializeDateTime(ignoreUpcomingEventUntil) < DateTime.utc()) &&
             (allAppointmentsToken.length !== 0 || user.userId !== false)
@@ -185,10 +327,9 @@ export class appointmentSlotSelect extends Interaction {
             this.protectSyncAfterAsync(() => {
                 if (upcomingAppointmentData) {
                     if (!localStorage.getItem('appointment.hide_upcoming_appointment_alert')){
-                        const timezone = this.el.querySelector(".o_appointment_info_main").dataset.timezone;
                         const upcomingFormattedStart = deserializeDateTime(
                             upcomingAppointmentData.next_upcoming_appointment.start
-                        ).setZone(timezone).toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
+                        ).setZone(this.selectedTimezone).toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
                         
                         this.el.querySelector(".o_appointment_upcoming_appointment_alert").replaceChildren(); 
                         this.renderAt("Appointment.appointment_info_upcoming_appointment", {
@@ -212,7 +353,7 @@ export class appointmentSlotSelect extends Interaction {
     /**
      * Navigate between the months available in the calendar displayed
      */
-    onCalendarNavigate(ev) {
+    async onCalendarNavigate(ev) {
         const parentEl = this.el.querySelector(".o_appointment_month:not(.d-none)");
         let monthID = parseInt(parentEl.getAttribute("id").split("-")[1]);
         monthID += ev.currentTarget.getAttribute("id") === "nextCal" ? 1 : -1;
@@ -221,60 +362,80 @@ export class appointmentSlotSelect extends Interaction {
             .querySelectorAll(".o_appointment_no_slot_month_helper")
             .forEach((element) => element.remove());
         parentEl.classList.add("d-none");
-        const monthEl = this.el.querySelector(`div#month-${monthID}`);
+        let monthEl = this.el.querySelector(`div#month-${monthID}`);
         monthEl.classList.remove("d-none");
-        this.el.querySelector(".active")?.classList.remove("active");
+        this.selectedDateEl = undefined;
+        this.selectedSlotEl = undefined;
+        this.dateDropdownBtnContent = '-';
         this.slotsListEl.replaceChildren();
         this.resourceSelectionEl?.replaceChildren();
 
-        if (this.firstEl) {
-            // If there is at least one slot available, check if it is in the current month.
-            if (!monthEl.querySelector(".o_day")) {
-                this.renderNoAvailabilityForMonth(monthEl);
-            }
+        const monthTableEl = monthEl.querySelector("table");
+        const monthLoaderEl = monthEl.querySelector(".o_appointment_month_loader");
+        monthTableEl.classList.add("d-none");
+        if (monthLoaderEl) {
+            monthLoaderEl.classList.remove("d-none");
         }
+        await this.onRefresh();
+        this.dateDropdownIsOpen = true;
+        this.entityDropdownIsOpen = false;
     }
 
-    /**
-     * Display the list of slots available for the date selected
-     */
-    onClickDaySlot(ev) {
-        this.el
-            .querySelectorAll(".o_slot_selected")
-            .forEach((slot) => slot.classList.remove("o_slot_selected", "active"));
-        ev.currentTarget.classList.add("o_slot_selected", "active");
+    async onChangeTimezone(ev) {
+        this.selectedTimezone = ev.currentTarget.value;
+        await this.onRefresh();
+    }
 
-        // Do not display slots until user has actively selected the capacity
-        const resourceCapacityEl = this.el.querySelector("select[name='resourceCapacity']");
-        const resourceCapacitySelectedOption =
-            resourceCapacityEl?.options[resourceCapacityEl.selectedIndex];
-        if (
-            resourceCapacitySelectedOption &&
-            resourceCapacitySelectedOption.dataset.placeholderOption
-        ) {
+    onClickDateDropdownBtn() {
+        this.dateDropdownIsOpen = !this.dateDropdownIsOpen;
+        this.entityDropdownIsOpen = this.entityDropdownIsOpen && !this.dateDropdownIsOpen;
+    }
+
+    onClickDaySlot(ev) {
+        this.selectDaySlot(ev.currentTarget);
+    }
+
+    selectDaySlot(daySlotEl, closeDropdown = true){
+        if (daySlotEl === this.selectedDateEl) {
             return;
         }
-        const slotDate = ev.currentTarget.dataset.slotDate;
-        const slots = JSON.parse(ev.currentTarget.dataset.availableSlots);
-        const scheduleBasedOn = this.el.querySelector("input[name='schedule_based_on']").value;
-        const selectAppointmentResourceEl = this.el.querySelector(
-            "select[id='selectAppointmentResource']"
-        );
+        this.selectedDateEl = daySlotEl;
+
+        const slotDate = daySlotEl.dataset.slotDate;
+        const daySlotClasses = [...daySlotEl.classList];
+
+        if (daySlotClasses.includes("o_today")) {
+            this.dateDropdownBtnContent = _t("Today");
+        } else if (daySlotClasses.includes("o_tomorrow")) {
+            this.dateDropdownBtnContent = _t("Tomorrow");
+        } else {
+            this.dateDropdownBtnContent = DateTime.fromISO(slotDate).toLocaleString({
+                day: "numeric",
+                weekday: "long",
+                month: "long",
+            });
+        }
+
+        const slots = JSON.parse(this.selectedDateEl.dataset.availableSlots);
         const resourceId =
-            (selectAppointmentResourceEl && selectAppointmentResourceEl.value) ||
-            this.el.querySelector("input[name='resource_selected_id']").value;
+            this.scheduleBasedOn === "resources" && !this.isAutoAssign && !this.isDateFirst
+            ? parseInt(this.selectedEntityEl?.dataset?.entityId)
+            : undefined;
         const resourceCapacity = this.el.querySelector("select[name='resourceCapacity']")?.value;
         let commonUrlParams = new URLSearchParams(window.location.search);
-        // If for instance the chosen slot is already taken, then an error is thrown and the
-        // user is brought back to the calendar view. In order to keep the selected user, the
-        // url will contain the previously selected staff_user_id (-> preselected in the dropdown
-        // if there is one). If one changes the staff_user in the dropdown, we do not want the
-        // previous one to interfere, hence we delete it. The one linked to the slot is used.
-        // The same is true for duration and date_time used in form rendering.
-        commonUrlParams.delete("staff_user_id");
-        commonUrlParams.delete("resource_selected_id");
-        commonUrlParams.delete("duration");
-        commonUrlParams.delete("date_time");
+        // Clear url parameters. If for instance the slot is not available anymore on details submission,
+        // the user would be brought back to this screen with previously selected values. We do not want
+        // them to interfere, hence we clear them here.
+        [
+            "allday",
+            "available_resource_ids",
+            "date_time",
+            "duration",
+            "resource_selected_id",
+            "staff_user_id",
+            "use_any_entity"
+        ].forEach((urlParam) => commonUrlParams.delete(urlParam));
+
         if (resourceCapacity) {
             commonUrlParams.set("asked_capacity", encodeURIComponent(resourceCapacity));
         }
@@ -284,220 +445,300 @@ export class appointmentSlotSelect extends Interaction {
 
         this.slotsListEl.replaceChildren();
         this.renderAt("appointment.slots_list", {
+            categorySlotScheduling: this.categorySlotScheduling,
             commonUrlParams: commonUrlParams,
-            scheduleBasedOn: scheduleBasedOn,
-            slotDate: DateTime.fromISO(slotDate).toFormat("cccc dd MMMM yyyy"),
+            scheduleBasedOn: this.scheduleBasedOn,
+            slotDate: DateTime.fromISO(slotDate).toLocaleString({
+                day: "numeric",
+                weekday: "long",
+                month: "long",
+                year: "numeric",
+            }),
             slots: slots,
             getAvailableResources: (slot) => {
-                return scheduleBasedOn === "resources"
+                return this.scheduleBasedOn === "resources"
                     ? JSON.stringify(slot["available_resources"])
                     : false;
             },
             getAvailableUsers: (slot) => {
-                return scheduleBasedOn === "users"
+                return this.scheduleBasedOn === "users"
                     ? JSON.stringify(slot["available_staff_users"])
                     : false;
             },
         }, this.slotsListEl);
+        this.slotsListEl = this.el.querySelector("#slotsList");
         this.resourceSelectionEl?.classList.add("d-none");
+
+        // Reset selections
+        if (this.isDateFirst) {
+            this.selectedEntityEl = undefined;
+        }
+        this.selectedSlotEl = undefined;
+
+        // Select first available slot
+        const firstAvailableSlotEl = this.slotsListEl?.querySelector(".o_slot_hours");
+        if (!!firstAvailableSlotEl) {
+            this.selectHoursSlot(firstAvailableSlotEl, false);
+        }
+
+        if (closeDropdown) {
+            this.dateDropdownIsOpen = false;
+        }
+    }
+
+    async onClickEntityCard(ev) {
+        if (ev.currentTarget === this.selectedEntityEl) {
+            return;
+        }
+        this.selectedEntityEl = ev.currentTarget;
+
+        if (!this.isDateFirst) {
+            this.updateEntityDropdown();
+            await this.onRefresh();
+            this.entityDropdownIsOpen = false;
+        } else if (!this.isReschedule && this.confirmOnEntity) {
+            this.confirmSlotSelection();
+        }
+    }
+
+    onClickEntityDropdownBtn() {
+        this.entityDropdownIsOpen = !this.entityDropdownIsOpen;
+        this.dateDropdownIsOpen = this.dateDropdownIsOpen && !this.entityDropdownIsOpen;
     }
 
     onClickHoursSlot(ev) {
-        this.el
-            .querySelector(".o_slot_hours.o_slot_hours_selected")
-            ?.classList.remove("o_slot_hours_selected", "active");
-        ev.currentTarget.classList.add("o_slot_hours_selected", "active");
+        this.selectHoursSlot(ev.currentTarget);
+    }
 
-        // If not in 'manual + date first' we directly go to the url for the slot
-        // In the case we are in 'manual + date first', we don't want to open the link as we want to select a resource
-        // before confirming the slot.
-        const isAutoAssign = this.el.querySelector("input[name='is_auto_assign']").value;
-        const isDateFirst = this.el.querySelector("input[name='is_date_first']").value;
-        const scheduleBasedOn = this.el.querySelector("input[name='schedule_based_on']").value;
-        if (isAutoAssign || !isDateFirst) {
-            const appointmentTypeID = this.el.querySelector(
-                "input[name='appointment_type_id']"
-            ).value;
-            const urlParameters = decodeURIComponent(
-                this.el.querySelector(".o_slot_hours_selected").dataset.urlParameters
-            );
-            const url = new URL(
-                `/appointment/${encodeURIComponent(appointmentTypeID)}/info?${urlParameters}`,
-                location.origin);
-            document.location = encodeURI(url.href);
+    selectHoursSlot(hoursSlotEl, confirmSlotSelection = true) {
+        if (hoursSlotEl === this.selectedSlotEl) {
+            return;
+        }
+        this.selectedSlotEl = hoursSlotEl;
+
+        // No additional selection needed
+        if (this.confirmOnHours) {
+            if (!this.isReschedule && confirmSlotSelection) {
+                this.confirmSlotSelection();
+            }
             return;
         }
 
-        const availableResources = ev.currentTarget.dataset.availableResources
-            ? JSON.parse(ev.currentTarget.dataset.availableResources)
+        // Update the resource list for manual selection
+        const availableResources = hoursSlotEl.dataset.availableResources
+            ? JSON.parse(hoursSlotEl.dataset.availableResources)
             : undefined;
-        const availableStaffUsers = ev.currentTarget.dataset.availableStaffUsers
-            ? JSON.parse(ev.currentTarget.dataset.availableStaffUsers)
+        const availableStaffUsers = hoursSlotEl.dataset.availableStaffUsers
+            ? JSON.parse(hoursSlotEl.dataset.availableStaffUsers)
             : undefined;
-        const previousResourceIdSelected = this.el.querySelector(
-            "select[name='resource_id']"
-        )?.value;
-        this.resourceSelectionEl.replaceChildren();
+        const availableEntities = this.scheduleBasedOn === 'resources'
+            ? availableResources
+            : availableStaffUsers;
+
+        this.resourceSelectionEl?.replaceChildren();
         this.renderAt("appointment.resources_list", {
-            availableResources,
-            availableStaffUsers,
-            scheduleBasedOn,
+            appointmentTypeId: this.appointmentTypeId,
+            availableEntities,
+            scheduleBasedOn: this.scheduleBasedOn,
+            showAvatars: this.showAvatars,
         }, this.resourceSelectionEl);
-        const availableEntity =
-            scheduleBasedOn === "resources" ? availableResources : availableStaffUsers;
-        const resourceIdEl = this.el.querySelector("select[name='resource_id']");
-        if (availableEntity.length === 1) {
-            resourceIdEl.setAttribute("disabled", true);
-        }
-        if (
-            previousResourceIdSelected &&
-            this.el.querySelector(
-                `select[name='resource_id'] > option[value='${previousResourceIdSelected}']`
-            )
-        ) {
-            resourceIdEl.value = previousResourceIdSelected;
+
+        if (this.isDateFirst && !this.isAutoAssign) {
+            this.selectedEntityEl = this.el.querySelector(".o_appointment_entity_card");
         }
         this.resourceSelectionEl.classList.remove("d-none");
     }
 
     onClickConfirmSlot(ev) {
-        const appointmentTypeID = this.el.querySelector("input[name='appointment_type_id']").value;
-        const resourceId = parseInt(this.el.querySelector("select[name='resource_id']").value);
-        const scheduleBasedOn = this.el.querySelector("input[name='schedule_based_on']").value;
+        if (this.isReschedule) {
+            this.confirmRescheduleSelection();
+        } else {
+            this.confirmSlotSelection();
+        }
+    }
+
+    confirmSlotSelection() {
+        this.el.classList.add("o_appointment_disable");
+        const entityId = this.selectedEntityEl?.dataset?.entityId;
         const urlParameters = decodeURIComponent(
-            this.el.querySelector(".o_slot_hours_selected").dataset.urlParameters
+            this.selectedSlotEl?.dataset?.urlParameters
         );
         const url = new URL(
-            `/appointment/${encodeURIComponent(appointmentTypeID)}/info?${urlParameters}`,
+            `/appointment/${encodeURIComponent(this.appointmentTypeSlug)}/info?${urlParameters}`,
             location.origin);
-        const isAutoAssign = this.el.querySelector("input[name='is_auto_assign']").value;
-        const isDateFirst = this.el.querySelector("input[name='is_date_first']").value;
-        if (scheduleBasedOn === "resources") {
+
+        if (this.isAutoAssign || !this.isDateFirst) {
+            if (!this.isAutoAssign && !entityId) {
+                url.searchParams.set("use_any_entity", 1);
+            }
+        } else if (this.scheduleBasedOn === "resources") {
             const resourceCapacity =
                 parseInt(this.el.querySelector("select[name='resourceCapacity']")?.value) || 1;
-            const resourceSelected = this.el.querySelector(".o_resources_list").selectedOptions[0];
             let resourceIds = JSON.parse(url.searchParams.get("available_resource_ids"));
             if (
-                isDateFirst && !isAutoAssign &&
-                parseInt(resourceSelected.dataset.resourceCapacity) >= resourceCapacity
+                this.isDateFirst && !this.isAutoAssign &&
+                !!this.selectedEntityEl &&
+                parseInt(this.selectedEntityEl?.dataset?.resourceCapacity) >= resourceCapacity
             ) {
-                resourceIds = [resourceId];
+                resourceIds = [parseInt(entityId)];
             }
-            url.searchParams.set("resource_selected_id", encodeURIComponent(resourceId));
+            url.searchParams.set("resource_selected_id", encodeURIComponent(entityId));
             url.searchParams.set("available_resource_ids", JSON.stringify(resourceIds));
             url.searchParams.set("asked_capacity", encodeURIComponent(resourceCapacity));
         } else {
-            url.searchParams.set("staff_user_id", encodeURIComponent(resourceId));
+            url.searchParams.set("staff_user_id", encodeURIComponent(entityId));
         }
-        document.location = encodeURI(url.href);
+        document.location = url.href;
     }
 
-    onClickShowCalendar(ev) {  
-        this.el.querySelector('.o_appointment_no_slot_overall_helper').textContent = "";
-        this.el.querySelector('div.o_appointment_calendar').classList.remove('d-none');
-        this.el.querySelector('div.o_appointment_calendar_form').classList.remove('d-none');
-        localStorage.setItem("appointment.upcoming_events_ignore_until",
-            serializeDateTime(DateTime.utc().plus({ days: 1 })));
+    confirmRescheduleSelection() {
+        const formEl = this.el.querySelector("#reschedule_form");
+        const entityId = this.selectedEntityEl?.dataset?.entityId || '';
+        const urlParameters = decodeURIComponent(this.selectedSlotEl?.dataset?.urlParameters);
+        const searchParams = new URLSearchParams(urlParameters);
+        const rescheduleVals = {
+            datetime_str: searchParams.get("date_time"),
+            duration_str: searchParams.get("duration"),
+            allday: searchParams.get("allday") || 0,
+            asked_capacity: searchParams.get("asked_capacity") || 1,
+        };
+
+        if (this.scheduleBasedOn === "resources") {
+            const resourceCapacity =
+                parseInt(this.el.querySelector("select[name='resourceCapacity']")?.value) || 1;
+            let resourceIds = JSON.parse(searchParams.get("available_resource_ids"));
+            if (
+                this.selectedEntityEl &&
+                this.isDateFirst &&
+                !this.isAutoAssign &&
+                parseInt(this.selectedEntityEl.dataset.resourceCapacity) >= resourceCapacity
+            ) {
+                resourceIds = [parseInt(entityId)];
+            }
+            rescheduleVals.resource_selected_id = entityId;
+            rescheduleVals.available_resource_ids = JSON.stringify(resourceIds);
+            rescheduleVals.asked_capacity = resourceCapacity;
+        } else {
+            rescheduleVals.staff_user_id = entityId || searchParams.get("staff_user_id");
+        }
+        for (const [name, value] of Object.entries(rescheduleVals)) {
+            const input = formEl.querySelector(`input[name="${name}"]`);
+            if (input) {
+                input.value = value;
+            }
+        }
+        formEl.submit();
     }
 
     /**
      * Refresh the slots info when the user modifies the timezone or the selected user.
      */
     async onRefresh(ev) {
-        if (this.el.querySelector("#slots_availabilities")) {
-            const daySlotSelected =
-                this.el.querySelector(".o_slot_selected") &&
-                this.el.querySelector(".o_slot_selected").dataset.slotDate;
-            const appointmentTypeID = this.el.querySelector(
-                "input[name='appointment_type_id']"
-            ).value;
-            const filterAppointmentTypeIds = this.el.querySelector(
-                "input[name='filter_appointment_type_ids']"
-            ).value;
-            const filterUserIds = this.el.querySelector(
-                "input[name='filter_staff_user_ids']"
-            ).value;
-            const inviteToken = this.el.querySelector("input[name='invite_token']").value;
-            const previousMonthName = this.el.querySelector(
-                ".o_appointment_month:not(.d-none) .o_appointment_month_name"
-            )?.textContent;
-            const staffUserID = this.el.querySelector(
-                "#slots_form select[name='staff_user_id']"
-            )?.value;
-            const resourceID =
-                this.el.querySelector("select[id='selectAppointmentResource']")?.value ||
-                this.el.querySelector("input[name='resource_selected_id']")?.value;
-            const filterResourceIds = this.el.querySelector(
-                "input[name='filter_resource_ids']"
-            ).value;
-            const timezone = this.el.querySelector("select[name='timezone']")?.value;
+        if (this.noValidEntities) {
+            return;
+        }
+
+        this.isLoadingSlots = true;
+        this.updateContent();
+        const calendarEl = this.el.querySelector("#calendar_wrapper");
+        if (calendarEl) {
+            const daySlotSelected = this.selectedDateEl?.dataset.slotDate;
+            const visibleMonth = this.el.querySelector(".o_appointment_month:not(.d-none)");
             const resourceCapacity =
                 (this.el.querySelector("select[name='resourceCapacity']") &&
                     parseInt(this.el.querySelector("select[name='resourceCapacity']").value)) ||
                 1;
             this.el.querySelector(".o_appointment_no_slot_overall_helper").replaceChildren();
-            this.slotsListEl.replaceChildren();
-            this.el
-                .querySelectorAll("#calendar, .o_appointment_timezone_selection")
-                .forEach((el) => {
-                    el.classList.add("o_appointment_disable_calendar");
-                });
+            this.slotsListEl?.replaceChildren();
+            this.selectedDateEl = undefined;
+            this.selectedSlotEl = undefined;
             this.resourceSelectionEl?.replaceChildren();
-            const resourceCapacityEl = this.el.querySelector("select[name='resourceCapacity']");
-            const resourceCapacitySelectedOption =
-                resourceCapacityEl?.options[resourceCapacityEl.selectedIndex];
-            if (
-                daySlotSelected &&
-                !(
-                    resourceCapacitySelectedOption &&
-                    resourceCapacitySelectedOption.dataset.placeholderOption
-                )
-            ) {
-                this.el
-                    .querySelector(".o_appointment_slot_list_loading")
-                    .classList.remove("d-none");
+            if (this.isDateFirst) {
+                this.selectedEntityEl = undefined;
             }
-            const updatedAppointmentCalendarHtml = await rpc(
-                `/appointment/${appointmentTypeID}/update_available_slots`,
+            const staffUserID =
+                this.scheduleBasedOn === 'users' && !this.isAutoAssign && !this.isDateFirst
+                ? parseInt(this.selectedEntityEl?.dataset?.entityId)
+                : undefined;
+            const resourceID =
+                this.scheduleBasedOn === 'resources' && !this.isAutoAssign && !this.isDateFirst
+                ? parseInt(this.selectedEntityEl?.dataset?.entityId)
+                : undefined;
+            const updatedData = await rpc(
+                `/appointment/${this.appointmentTypeId}/get_availability_data`,
                 {
                     asked_capacity: resourceCapacity,
-                    invite_token: inviteToken,
-                    filter_appointment_type_ids: filterAppointmentTypeIds,
-                    filter_staff_user_ids: filterUserIds,
-                    filter_resource_ids: filterResourceIds,
-                    month_before_update: previousMonthName,
+                    asked_month: !!visibleMonth ? [
+                        parseInt(visibleMonth.dataset.monthNumber),
+                        parseInt(visibleMonth.dataset.yearNumber),
+                    ] : undefined,
+                    invite_token: this.inviteToken,
+                    filter_appointment_type_ids: this.filterAppointmentTypeIds,
+                    filter_staff_user_ids: this.filterUserIds,
+                    filter_resource_ids: this.filterResourceIds,
+                    month_before_update: visibleMonth?.dataset.monthName,
                     resource_selected_id: resourceID,
                     staff_user_id: staffUserID,
-                    timezone: timezone,
+                    timezone: this.selectedTimezone,
                 }
             );
-            if (updatedAppointmentCalendarHtml) {
-                this.el.querySelector("#slots_availabilities").outerHTML = updatedAppointmentCalendarHtml;
-                this.initSlots();
+            if (updatedData) {
+                const { max_possible_capacity } = updatedData;
+                this.maxPossibleCapacity = max_possible_capacity;
+                this.renderCalendar(updatedData);
+
+                this.dateDropdownBtnContent = '-';
+
                 this._updateResourceCapacityOptions();
-                // If possible, we keep the current month, and display the helper if it has no availability.
+                await this.updateSlotAvailability(resourceCapacity);
+
+                // If possible, we kept the current month. We display the helper if it has no availability.
                 const displayedMonthEl = this.el.querySelector(".o_appointment_month:not(.d-none)");
-                if (!!this.firstEl && !displayedMonthEl.querySelector(".o_day")) {
+                const firstDayInMonthEl = displayedMonthEl?.querySelector(".o_slot_day");
+                if (!!this.firstDayEl && !firstDayInMonthEl) {
                     this.renderNoAvailabilityForMonth(displayedMonthEl);
                 }
-                this.removeLoadingSpinner();
-                // Select previous selected date (in displayed month) if possible.
-                const selectedDayEl = displayedMonthEl?.querySelector(`div[data-slot-date="${daySlotSelected}"]`);
-                selectedDayEl && this.onClickDaySlot({ currentTarget: selectedDayEl });
+
+                // Select previous selected date if possible, or first available date.
+                const previousDayEl = displayedMonthEl?.querySelector(`div[data-slot-date="${daySlotSelected}"]`);
+                if (firstDayInMonthEl) {
+                    this.selectDaySlot(previousDayEl || firstDayInMonthEl, false);
+                }
             }
         }
+        this.isLoadingSlots = false;
     }
 
-    /**
-     * Remove the loading spinners when no longer useful
-     */
-    removeLoadingSpinner() {
-        this.el.querySelector(".o_appointment_slots_loading")?.remove();
-        this.el.querySelector(".o_appointment_slot_list_loading")?.classList.add("d-none");
-        this.el.querySelector("#slots_availabilities")?.classList.remove("d-none");
-        this.el.querySelectorAll("#calendar, .o_appointment_timezone_selection").forEach((el) => {
-            el.classList.remove("o_appointment_disable_calendar");
-        });
+    renderCalendar(calendarData) {
+        const calendarEl = this.el.querySelector("#calendar_wrapper");
+        calendarEl.replaceChildren();
+        this.renderAt("appointment.calendar_wrapper", {
+            ...calendarData,
+            formattedDays: this.formattedDays,
+            isAppointmentActive: this.isAppointmentActive,
+            stringifySlots: (slots) => JSON.stringify(slots),
+            todayLabel: _t("Today"),
+        }, calendarEl);
+
+        // New first day
+        this.firstDayEl = this.el.querySelector(".o_slot_day");
+    }
+
+    updateEntityDropdown() {
+        const entityDropdownBtnEl = this.el.querySelector("button[name='entityDropdownBtn']")
+        if (!entityDropdownBtnEl) {
+            return;
+        }
+
+        entityDropdownBtnEl.replaceChildren();
+        this.renderAt("appointment.entity_dropdown_button_card", {
+            appointmentTypeId: this.appointmentTypeId,
+            entityId: this.selectedEntityEl?.dataset?.entityId,
+            entityName: this.selectedEntityEl?.dataset?.entityName,
+            scheduleBasedOn: this.scheduleBasedOn,
+            showAvatars: this.showAvatars,
+            useAnyEntity: this.selectedEntityEl?.dataset?.useAnyEntity,
+        }, entityDropdownBtnEl)
     }
 
     onClickCloseUpcomingAppointmentAlert() {

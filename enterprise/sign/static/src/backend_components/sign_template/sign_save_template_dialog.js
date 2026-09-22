@@ -1,18 +1,18 @@
-import { Component, useState, onWillUpdateProps } from "@odoo/owl";
+import { Component, onWillUpdateProps, proxy, t, useProps } from "@odoo/owl";
 
 export class SignSaveTemplateDialog extends Component {
     static template = "sign.SignSaveTemplateDialog";
-    static components = {};
-    static props = {
-        isShown: { type: Boolean },
-        documentUsedTimesCounter: { type: Number },
-        onTemplateSaveClick: { type: Function },
-    };
+
+    props = useProps({
+        isShown: t.boolean(),
+        documentUsedTimesCounter: t.number(),
+        onTemplateSaveClick: t.function(),
+    });
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             isShown: this.props.isShown,
-        })
+        });
 
         onWillUpdateProps((nextProps) => {
             this.props = nextProps;

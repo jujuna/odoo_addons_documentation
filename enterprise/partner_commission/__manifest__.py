@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Resellers Commissions For Subscription',
     'category': 'Sales/Commissions',
     'summary': 'Configure resellers commissions on subscription sale',
-    'version': '1.0',
     'description': """
 This module allows to configure commissions for resellers.
     """,
@@ -16,7 +14,6 @@ This module allows to configure commissions for resellers.
     'data': [
         'data/data.xml',
         'security/purchase_security.xml',
-        'security/ir.model.access.csv',
         'views/account_move_views.xml',
         'views/commission_views.xml',
         'views/purchase_order_views.xml',
@@ -26,6 +23,7 @@ This module allows to configure commissions for resellers.
         'report/sale_order_log_report_view.xml',
         'report/sale_subscription_report_view.xml',
         'report/sale_report_view.xml',
+        'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

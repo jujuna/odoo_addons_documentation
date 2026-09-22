@@ -9,29 +9,43 @@
 # Martin Trigaux, 2022
 # Lucas Holm, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Kira Petersen François (peti)" <peti@odoo.com>, 2025.
+# "Kira Petersen François (peti)" <peti@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.5alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 05:25+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Danish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 01:47+0000\n"
+"Last-Translator: \"Kira Petersen François (peti)\" <peti@odoo.com>\n"
+"Language-Team: Danish <https://translate.odoo.com/projects/odoo-master/"
 "crm_helpdesk/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: crm_helpdesk
+#: model:ir.module.module,description:base.module_crm_helpdesk
+msgid ""
+"\n"
+"Convert business inquiries that have ended up in the Helpdesk pipeline by "
+"mistake,\n"
+"or generate a ticket from a business inquiry\n"
+msgstr ""
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
 msgid "An archived ticket cannot be converted into a lead."
-msgstr "En arkiveret supportbillet kan ikke omdannes til et kundeemne."
+msgstr "En arkiveret supportsag kan ikke omdannes til et lead."
+
+#. module: crm_helpdesk
+#: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__team_id
+msgid "Assign to"
+msgstr "Tildel"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__convert_to
@@ -42,45 +56,50 @@ msgstr "Konverteringshandling"
 #: model:ir.model,name:crm_helpdesk.model_helpdesk_ticket_to_lead
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
 msgid "Convert Ticket to Lead"
-msgstr "Konvertér supportbillet til kundeemne"
+msgstr "Konvertér supportsag til lead"
+
+#. module: crm_helpdesk
+#: model:ir.module.module,summary:base.module_crm_helpdesk
+msgid "Convert Tickets from/to Leads"
+msgstr ""
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/models/helpdesk_ticket.py:0
+#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__lead
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_view_form_inherited
 msgid "Convert to Lead"
-msgstr "Konvertér til kundeemne"
+msgstr "Konvertér til leads"
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/models/helpdesk_ticket.py:0
+#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__opportunity
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_view_form_inherited
 msgid "Convert to Opportunity"
 msgstr "Konvertér til salgsmulighed"
+
+#. module: crm_helpdesk
+#: model:ir.actions.server,name:crm_helpdesk.action_server_convert_ticket_to_lead_or_opportunity
+msgid "Convert to Opportunity/Lead"
+msgstr "Konvertér til salgsmulighed/lead"
 
 #. module: crm_helpdesk
 #: model:ir.actions.act_window,name:crm_helpdesk.crm_lead_convert2ticket_action
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_view_form
 msgid "Convert to Ticket"
-msgstr "Omdan til supportbillet"
-
-#. module: crm_helpdesk
-#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__convert
-msgid "Convert to opportunity"
-msgstr "Konvertér til salgsmulighed"
+msgstr "Konvertér til supportsag"
 
 #. module: crm_helpdesk
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
 msgid "Create Ticket"
-msgstr "Opret supportbillet"
+msgstr "Opret supportsag"
 
 #. module: crm_helpdesk
 #: model:ir.model,website_form_label:crm_helpdesk.model_helpdesk_ticket
 msgid "Create a Ticket"
-msgstr "Opret en supportbillet"
+msgstr "Opret en supportsag"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__action__create
@@ -107,22 +126,16 @@ msgid "Customer"
 msgstr "Kunde"
 
 #. module: crm_helpdesk
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-msgid "Discard"
-msgstr "Kassér"
-
-#. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__display_name
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket__display_name
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__display_name
 msgid "Display Name"
-msgstr "Vis navn"
+msgstr "Visningsnavn"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__action__nothing
 msgid "Do not link to a customer"
-msgstr "Link ikke til en kunde"
+msgstr "Knyt ikke til en kunde"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__force_assignment
@@ -130,9 +143,14 @@ msgid "Force assignment"
 msgstr "Fremtving tildeling"
 
 #. module: crm_helpdesk
+#: model:ir.module.module,shortdesc:base.module_crm_helpdesk
+msgid "Helpdesk - CRM"
+msgstr ""
+
+#. module: crm_helpdesk
 #: model:ir.model,name:crm_helpdesk.model_helpdesk_ticket
 msgid "Helpdesk Ticket"
-msgstr "Kundeservice-supportbillet"
+msgstr "Kundeservicesag"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__id
@@ -148,7 +166,7 @@ msgid ""
 "already set."
 msgstr ""
 "Hvis dette felt er markeret, tvinges sælgeren til at blive opdateret, når "
-"salgsmuligheder opdateres, selvom disse allerede er indstillet."
+"salgsmuligheder opdateres, selv om disse allerede er indstillet."
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__write_uid
@@ -165,30 +183,30 @@ msgstr "Sidst opdateret den"
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__lead_id
 msgid "Lead"
-msgstr "Emne"
+msgstr "Lead"
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/crm_lead_convert2ticket.py:0
 msgid "Lead Converted"
-msgstr "Kundeemne konverteret"
+msgstr "Lead konverteret"
 
 #. module: crm_helpdesk
 #: model:ir.model,name:crm_helpdesk.model_crm_lead_convert2ticket
 msgid "Lead convert to Ticket"
-msgstr "Omdan kundeemne til supportbillet"
+msgstr "Konvertér lead til supportsag"
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/crm_lead_convert2ticket.py:0
 msgid "Lead converted into ticket %s"
-msgstr "Kundeemne konverteret til supportbillet %s"
+msgstr "Lead konverteret til supportsag %s"
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
 msgid "Lead created"
-msgstr "Kundeemne oprettet"
+msgstr "Lead oprettet"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__action__exist
@@ -218,32 +236,37 @@ msgid "Salesperson"
 msgstr "Sælger"
 
 #. module: crm_helpdesk
-#: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__team_id
-msgid "Team"
-msgstr "Team"
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
+msgid "Select a Customer"
+msgstr "Vælg en kunde"
+
+#. module: crm_helpdesk
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
+msgid "Select a Helpdesk Team"
+msgstr "Vælg et kundeserviceteam"
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
 msgid "This lead has been created from ticket: %s"
-msgstr "Kundeemnet er blevet oprettet ud fra en supportbillet: %s"
+msgstr "Leadt er blevet oprettet ud fra en supportsag: %s"
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
 msgid "This opportunity has been created from ticket: %s"
-msgstr "Salgsmuligheden er blevet oprettet ud fra en supportbillet: %s"
+msgstr "Salgsmuligheden er blevet oprettet ud fra en supportsag: %s"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__ticket_id
 msgid "Ticket"
-msgstr "Supportbillet"
+msgstr "Supportsag"
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
 msgid "Ticket Converted"
-msgstr "Supportbillet konverteret"
+msgstr "Supportsag konverteret"
 
 #. module: crm_helpdesk
 #. odoo-python
@@ -251,11 +274,5 @@ msgstr "Supportbillet konverteret"
 msgid "Ticket Created"
 msgstr "Supportsag oprettet"
 
-#~ msgid "Convert"
-#~ msgstr "Konverter"
-
-#~ msgid "Ticket Type"
-#~ msgstr "Sagstype"
-
-#~ msgid "Ticket created"
-#~ msgstr "Sag oprettet"
+msgid "Convert to opportunity"
+msgstr "Konvertér til salgsmulighed"

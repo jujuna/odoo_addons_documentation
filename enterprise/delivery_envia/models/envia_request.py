@@ -6,6 +6,7 @@ import requests
 
 
 from datetime import datetime
+from lxml import etree
 from markupsafe import Markup
 from textwrap import shorten
 from urllib.parse import urlencode, quote
@@ -15,6 +16,8 @@ from odoo.tools.float_utils import float_round
 from odoo.tools import format_list
 
 _logger = logging.getLogger(__name__)
+
+ACCESS_KEY_RE = re.compile(r"(?:NFe)?(\d{22}(\d{3})(\d{9})\d{10})")
 
 SANDBOX_URL = "https://api-test.envia.com/"
 SANDBOX_QUERY_URL = "https://queries-test.envia.com/"
@@ -31,9 +34,9 @@ STATE_CODE_MAP_ENVIA = {
     ('AR', 'G'): 'SE', ('AR', 'H'): 'CC', ('AR', 'J'): 'SJ', ('AR', 'K'): 'CT', ('AR', 'L'): 'LP', ('AR', 'M'): 'MZ',
     ('AR', 'N'): 'MN', ('AR', 'P'): 'FM', ('AR', 'Q'): 'NQ', ('AR', 'R'): 'RN', ('AR', 'S'): 'SF', ('AR', 'T'): 'TM',
     ('AR', 'U'): 'CH', ('AR', 'V'): 'TF', ('AR', 'W'): 'CN', ('AR', 'X'): 'CB', ('AR', 'Y'): 'JY', ('AR', 'Z'): 'SC',
-    ('CA', 'YT'): 'YK', ('CL', '01'): 'TA', ('CL', '02'): 'AN', ('CL', '03'): 'AT', ('CL', '04'): 'CO', ('CL', '05'): 'VS',
-    ('CL', '06'): 'LI', ('CL', '07'): 'ML', ('CL', '08'): 'BI', ('CL', '09'): 'AR', ('CL', '10'): 'LL', ('CL', '11'): 'AI',
-    ('CL', '12'): 'MA', ('CL', '13'): 'RM', ('CL', '14'): 'LR', ('CL', '15'): 'AP', ('CL', '16'): 'NB', ('ES', 'ME'): 'ML',
+    ('CA', 'YT'): 'YK', ('CL', 'CL-TA'): 'TA', ('CL', 'CL-AN'): 'AN', ('CL', 'CL-AT'): 'AT', ('CL', 'CL-CO'): 'CO', ('CL', 'CL-VS'): 'VS',
+    ('CL', 'CL-LI'): 'LI', ('CL', 'CL-ML'): 'ML', ('CL', 'CL-BI'): 'BI', ('CL', 'CL-AR'): 'AR', ('CL', 'CL-LL'): 'LL', ('CL', 'CL-AI'): 'AI',
+    ('CL', 'CL-MA'): 'MA', ('CL', 'CL-RM'): 'RM', ('CL', 'CL-LR'): 'LR', ('CL', 'CL-AP'): 'AP', ('CL', 'CL-NB'): 'NB', ('ES', 'ME'): 'ML',
     ('GT', 'GUA'): 'GU', ('GT', 'QUE'): 'QZ', ('IN', 'CG'): 'CT', ('IN', 'TS'): 'TG', ('IN', 'UK'): 'UT', ('MX', 'AGU'): 'AGS',
     ('MX', 'DUR'): 'DGO', ('MX', 'GUA'): 'GTO', ('MX', 'HID'): 'HGO', ('MX', 'QUE'): 'QRO', ('PE', '01'): 'AMA', ('PE', '02'): 'ANC',
     ('PE', '03'): 'APU', ('PE', '04'): 'ARE', ('PE', '05'): 'AYA', ('PE', '06'): 'CAJ', ('PE', '07'): 'CAL', ('PE', '08'): 'CUS',
@@ -156,7 +159,6 @@ class Envia:
                 'amount': 1,
                 'type': package_type,
                 'declaredValue': package['value'],
-                'insurance': package['insurance'],
                 'weight': package['weight'],
                 'weightUnit': 'KG',
                 'lengthUnit': 'CM',
@@ -164,6 +166,13 @@ class Envia:
                 'additionalServices': []
             }
             pack['additionalServices'].extend(self._envia_format_services(shipper, package_type))
+            if package['insurance']:
+                pack['additionalServices'].append({
+                    "service": "envia_insurance",
+                    "data": {
+                        "amount": str(package['insurance']),
+                    },
+                })
 
             packages.append(pack)
 
@@ -301,6 +310,7 @@ class Envia:
                 'description': shorten(commodity.product_id.name, ENVIA_CONTENT_LENGTH_LIMIT, placeholder="..."),
                 'quantity': commodity.qty,
                 'price': unit_price_in_currency,
+                'weight': self.carrier._envia_convert_weight(commodity.product_id.weight),
             }
             if commodity.product_id.hs_code:
                 # Pass international information if it's necessary
@@ -339,13 +349,11 @@ class Envia:
         # Store the total price of all items in this package as a insurance value
         sum_price = sum(original_prices)
         declared_value = self._convert_currency(sum_price, picking=picking, from_envia=False)
-        insurance_value = float_round(declared_value * self.carrier.shipping_insurance / 100, 2)
         parcel = {
             'type': package_type,
             'name': package.name,
             'content': contents,
             'amount': 1,
-            'insurance': insurance_value,
             'declaredValue': declared_value,
             'lengthUnit': "CM",
             'weightUnit': "KG",
@@ -353,6 +361,14 @@ class Envia:
             'dimensions': dimensions,
             'additionalServices': []
         }
+
+        if insurance_value := float_round(declared_value * self.carrier.shipping_insurance / 100, 2):
+            parcel['additionalServices'].append({
+                "service": "envia_insurance",
+                "data": {
+                    "amount": str(insurance_value),
+                },
+            })
 
         parcel['additionalServices'].extend(self._envia_format_services(origin, package_type))
 
@@ -383,6 +399,9 @@ class Envia:
                     })
                 parcel['bolComplement'] = complementData
 
+        if xml_data := self._l10n_br_build_xmldata(package):
+            parcel['xmlData'] = [xml_data]
+
         return parcel
 
     def _get_shipping_params(self, picking):
@@ -391,7 +410,7 @@ class Envia:
         envia_service = self.carrier.envia_service_code
 
         picking_data = {}
-        ship_from = picking.picking_type_id.warehouse_id.partner_id or picking.warehouse_id.company_id.partner_id
+        ship_from = picking._envia_get_origin_partner()
 
         bad_products = picking.move_line_ids.product_id.filtered(lambda prod: not prod.weight and prod.type == 'consu').mapped('name')
         if bad_products:
@@ -532,6 +551,39 @@ class Envia:
                 invalid_trackings.append(tracking_number)
         return invalid_trackings
 
+    def _l10n_br_build_xmldata(self, package):
+        picking = package.picking_id
+
+        if not picking._envia_needs_l10n_br_edi():
+            return {}
+
+        needs_nfe, invoice = picking._l10n_br_get_origin_invoice(package.name)
+        if not needs_nfe:
+            return {}
+
+        if not invoice:
+            raise ValidationError(picking.env._(
+                "Shipping from Brazil requires an authorized NF-e on the label, set the Related "
+                "Invoice on %(picking_name)s or link its packages on the invoice.",
+                picking_name=picking.name,
+            ))
+
+        key, number, serie = "", invoice.l10n_latam_document_number, invoice.journal_id.l10n_br_invoice_serial
+        # the access key is fixed at authorization time, unlike the move name and the journal serie
+        if match := ACCESS_KEY_RE.fullmatch(invoice.l10n_br_access_key or ""):
+            key, serie, number = match[1], str(int(match[2])), str(int(match[3]))
+        # only the authorized XML carries the emission instant, a date field gives no time to send
+        xml = invoice.l10n_br_edi_xml_attachment_file.content
+        emission_date = etree.fromstring(xml).findtext(".//{*}ide/{*}dhEmi") if xml else None
+
+        return {
+            'documentType': 'nfe',
+            'nfeKey': key,
+            'nfeNumber': number,
+            'nfeSerie': serie,
+            'nfeDate': emission_date,
+        }
+
     def _get_envia_state_code(self, partner):
         """ Envia requires the state code to be sent for the partner,
         however, the codes they use are slightly different then
@@ -615,6 +667,13 @@ class Envia:
             base_code = str(partner.city_id.l10n_co_edi_code)
             return base_code
 
+        if partner.country_id == partner.env.ref("base.co") and partner.zip:
+            country_code = quote(partner.country_id.code)
+            zipcode = quote(partner.zip)
+            geolocate_data = self._make_api_request(f'zipcode/{country_code}/{zipcode}', geolocate=True)
+            if isinstance(geolocate_data, list) and geolocate_data:
+                return geolocate_data[0].get('info', {}).get('stat_8digit') or partner.zip
+
         if not (partner.zip or partner.city_id.zipcode):
             zipcode = self._geolocate_zip(partner)
             if not zipcode:
@@ -676,7 +735,7 @@ class Envia:
         address_dict = {
             'name': partner.name,
             'country': partner.country_id.code,
-            'company': partner.commercial_company_name or '',
+            'company': partner.parent_name or '',
             'number': partner.street_number or partner.street2 or '',
             'street': self._get_envia_street(partner),
             'email': partner.email,
@@ -712,8 +771,12 @@ class Envia:
             raise ValidationError(partner.env._('Missing Fields:\n%s', msg))
 
         if partner.country_id == partner.env.ref('base.co'):
-            # Colombia requires their city field to be the postal code not the city name.
-            zipcode = address_dict['postalCode'].rjust(5, '0').ljust(8, '0')
+            # Colombia requires their city field to be the municipality code,
+            # not the city name. Keep the l10n_co_edi path as-is, otherwise rely
+            # on Envia geocodes to avoid fabricating codes from the raw ZIP.
+            zipcode = address_dict['postalCode']
+            if len(zipcode) in [4, 5]:
+                zipcode = zipcode.rjust(5, '0').ljust(8, '0')
             address_dict['city'] = address_dict['postalCode'] = zipcode
 
         return address_dict

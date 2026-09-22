@@ -5,7 +5,7 @@ import { serializeDateTime } from "@web/core/l10n/dates";
 const GROUPBY_COMBINATIONS = [
     "sale_line_id",
     "sale_line_id,department_id",
-    "sale_line_id,resource_id",
+    "sale_line_id,resource_ids",
     "sale_line_id,role_id",
 ];
 
@@ -16,7 +16,11 @@ patch(PlanningGanttModel.prototype, {
         if (groupBySO && groupBy.length === 0) {
             groupBy.push("sale_line_id");
         }
-        return super.load({ ...searchParams, groupBy });
+        return super.load({
+            ...searchParams,
+            groupBy,
+            context: { ...searchParams.context, sale_show_commercial_partner: true }
+        });
     },
     addSpecialKeys(context) {
         const { focusDate, startDate, stopDate, scale } = this.metaData;

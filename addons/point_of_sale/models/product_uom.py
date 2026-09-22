@@ -1,4 +1,3 @@
-
 from odoo import api, models
 
 
@@ -9,3 +8,7 @@ class ProductUom(models.Model):
     @api.model
     def _load_pos_data_fields(self, config):
         return ['id', 'barcode', 'product_id', 'uom_id']
+
+    @api.model
+    def _load_pos_data_domain(self, data):
+        return [('product_id', 'in', data['product.product'].ids)]

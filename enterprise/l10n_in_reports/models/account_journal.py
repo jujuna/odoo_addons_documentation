@@ -47,7 +47,7 @@ class AccountJournal(models.Model):
         if not gstr2b_return_type:
             return
 
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
 
         # Previous month return
         prev_return = _find_return(

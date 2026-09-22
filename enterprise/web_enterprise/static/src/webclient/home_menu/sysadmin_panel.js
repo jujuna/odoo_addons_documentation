@@ -3,7 +3,6 @@ import { Component } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class SysAdminPanel extends Component {
-    static props = {};
     static template = "web_enterprise.SysAdminPanel";
 
     setup() {

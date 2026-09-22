@@ -1,15 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, _
-from odoo.exceptions import UserError
+from odoo import models
 
 
 class PosConfig(models.Model):
     _inherit = 'pos.config'
-
-    it_fiscal_printer_https = fields.Boolean(string='Use HTTPS')
-    it_fiscal_printer_ip = fields.Char(string='Fiscal Printer IP')
-    it_fiscal_cash_drawer = fields.Boolean(string='Fiscal Printer Cash Drawer')
 
     def _create_journal_and_payment_methods(self, cash_ref=None, cash_journal_vals=None):
         journal, pm_ids = super()._create_journal_and_payment_methods(cash_ref, cash_journal_vals)

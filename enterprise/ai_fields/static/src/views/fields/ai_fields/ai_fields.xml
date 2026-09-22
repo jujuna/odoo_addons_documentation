@@ -3,14 +3,14 @@
 
     <t t-name="ai_fields.ComputeAiFieldBtn">
         <button class="btn btn-light flex-shrink-0 align-self-start p-0 me-2"
-            t-on-click="onAiClick"
+            t-on-click="this.onAiClick"
             title="Refresh value">
             <img src="/ai/static/description/icon.png" width="20" alt="ai icon"/>
         </button>
     </t>
 
     <t t-name="ai_fields.AiBooleanField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <t t-call="web.BooleanField"/>
         </div>
@@ -18,7 +18,7 @@
     </t>
 
     <t t-name="ai_fields.AiCharField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <t t-call="web.CharField"/>
         </div>
@@ -26,7 +26,7 @@
     </t>
 
     <t t-name="ai_fields.AiDateTimeField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <div class="flex-grow-1">
                 <t t-call="web.DateTimeField"/>
@@ -38,7 +38,7 @@
     </t>
 
     <t t-name="ai_fields.AiFloatField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <t t-call="web.FloatField"/>
         </div>
@@ -46,7 +46,7 @@
     </t>
 
     <t t-name="ai_fields.AiHtmlField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <div class="flex-grow-1">
                 <t t-call="html_editor.HtmlField"/>
@@ -56,7 +56,7 @@
     </t>
 
     <t t-name="ai_fields.AiIntegerField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <t t-call="web.IntegerField"/>
         </div>
@@ -64,7 +64,7 @@
     </t>
 
     <t t-name="ai_fields.AiMany2ManyTagsAvatarField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <t t-call="web.Many2ManyTagsAvatarField"/>
         </div>
@@ -72,7 +72,7 @@
     </t>
 
     <t t-name="ai_fields.AiMany2ManyTagsField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <t t-call="web.Many2ManyTagsField"/>
         </div>
@@ -80,7 +80,7 @@
     </t>
 
     <t t-name="ai_fields.AiMany2OneAvatarField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <div class="flex-grow-1">
                 <t t-call="web.Many2OneAvatarField"/>
@@ -90,7 +90,7 @@
     </t>
 
     <t t-name="ai_fields.AiMany2OneField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <div class="flex-grow-1">
                 <t t-call="web.Many2OneField"/>
@@ -100,7 +100,7 @@
     </t>
 
     <t t-name="ai_fields.AiMonetaryField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <t t-call="web.MonetaryField"/>
         </div>
@@ -109,7 +109,7 @@
 
     <t t-inherit="web.PropertiesField" t-inherit-mode="extension">
         <xpath expr="//PropertyValue" position="replace">
-            <div t-if="!props.readonly and propertyConfiguration.ai and propertyConfiguration.system_prompt"
+            <div t-if="!this.props.readonly and propertyConfiguration.ai and propertyConfiguration.system_prompt"
                 class="d-flex">
                 <button class="btn btn-light d-flex flex-shrink-0 align-self-baseline p-0 m-0 me-2"
                     t-on-click="() => this.onAiClick(propertyConfiguration.name)"
@@ -123,7 +123,7 @@
     </t>
 
     <t t-name="ai_fields.AiSelectionField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <t t-call="web.SelectionField"/>
         </div>
@@ -131,7 +131,7 @@
     </t>
 
     <t t-name="ai_fields.AiTextField">
-        <div t-if="!props.readonly and isAiComputed" class="d-inline-flex w-100">
+        <div t-if="!this.props.readonly and this.isAiComputed" class="d-inline-flex w-100">
             <t t-call="ai_fields.ComputeAiFieldBtn"/>
             <div class="flex-grow-1">
                 <t t-call="web.TextField"/>

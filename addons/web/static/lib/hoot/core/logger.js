@@ -203,23 +203,14 @@ class Logger {
         if (!this.canLog("tests")) {
             return;
         }
-        const { fullName, lastResults } = test;
-        $log(
-            ...styledArguments([
-                `Test ${stringify(fullName)} passed (assertions:`,
-                lastResults.counts.assertion || 0,
-                `/ time:`,
-                lastResults.duration,
-                `ms)`,
-            ])
-        );
+        $log(...styledArguments([`Running test ${stringify(test.fullName)}`]));
     }
     /**
      * @param {[label: string, color: string]} prefix
      * @param {...any} args
      */
     logTestEvent(prefix, ...args) {
-        $log(...styledArguments(args, ...prefix));
+        $trace(...styledArguments(args, ...prefix));
     }
     /**
      * @param {...any} args

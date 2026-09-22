@@ -10,6 +10,8 @@ from .common import TestL10nAUPayrollAPICommon
 
 @tagged("post_install_l10n", "post_install", "-at_install", "l10n_au_hr_payroll")
 class TestPayrollOnboardingAPI(L10nPayrollAccountCommon, TestL10nAUPayrollAPICommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -28,7 +30,7 @@ class TestPayrollOnboardingAPI(L10nPayrollAccountCommon, TestL10nAUPayrollAPICom
                 'l10n_au_branch_code': '100',
         })
 
-        cls.env['ir.config_parameter'].sudo().set_param('l10n_au_payroll_iap.test_endpoint', 'http://127.0.0.1:8070')
+        cls.env['ir.config_parameter'].sudo().set_str('l10n_au_payroll_iap.test_endpoint', 'http://127.0.0.1:8070')
         cls.proxy_user = cls.env['account_edi_proxy_client.user']._register_proxy_user(cls.company, 'l10n_au_payroll', 'demo')
         cls.proxy_user.edi_mode = 'test'
         assert cls.company.l10n_au_payroll_mode == 'test'
@@ -78,7 +80,7 @@ class TestPayrollOnboardingAPI(L10nPayrollAccountCommon, TestL10nAUPayrollAPICom
         # Bank details
         self.assertEqual(wizard.stage, "bank")
         with self.assertRaises(RedirectWarning):
-            self.company_bank_account.aba_bsb = False
+            self.company_bank_account.clearing_number = False
             wizard.journal_id = self.bank_journal
             action_next(wizard)
         wizard.journal_id = self.bank_journal

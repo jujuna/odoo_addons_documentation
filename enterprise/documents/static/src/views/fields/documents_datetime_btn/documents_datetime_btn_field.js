@@ -1,18 +1,22 @@
 import { useDateTimePicker } from "@web/core/datetime/datetime_picker_hook";
 import { deserializeDateTime, today } from "@web/core/l10n/dates";
 import { user } from "@web/core/user";
-import { Component } from "@odoo/owl";
+import { Component, signal, t, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class DocumentsDatetimeBtnField extends Component {
     static template = "documents.DocumentsDatetimeBtnField";
-    static props = {
+
+    props = useProps({
         ...standardFieldProps,
-        label: { type: String, optional: true },
-        btnClasses: { type: String, optional: true },
-        icon: { type: String, optional: true },
-    };
+        label: t.string().optional(),
+        btnClasses: t.string().optional(),
+        icon: t.string().optional(),
+        iconClass: t.string().optional(),
+    });
+
+    datetimePickerTargetRef = signal.ref();
 
     setup() {
         const pickerProps = {
@@ -25,7 +29,7 @@ export class DocumentsDatetimeBtnField extends Component {
                 : today(),
         };
         this.dateTimePicker = useDateTimePicker({
-            target: "datetime-btn",
+            target: this.datetimePickerTargetRef,
             onApply: (date) => {
                 this.props.record.update({ [this.props.name]: date });
             },
@@ -43,6 +47,7 @@ export const documentsDatetimeBtnField = {
         btnClasses: options.btn_classes,
         label: string,
         icon: options.icon,
+        iconClass: options.icon_class,
     }),
 };
 

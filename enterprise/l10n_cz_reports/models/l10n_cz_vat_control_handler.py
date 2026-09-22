@@ -2,7 +2,9 @@ from lxml import etree
 
 from odoo import models, release, _
 from odoo.tools import SQL
+from odoo.tools.business_data import split_vat
 from odoo.tools.float_utils import float_repr
+
 from odoo.addons.l10n_cz_reports.models import l10n_cz_reports_utils as cz_utils
 
 
@@ -33,12 +35,12 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
     # CUSTOM ENGINES
     ####################################################
 
-    def _report_custom_engine_control_statement_A1(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_control_statement_A1(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ Part A1 consists of reverse charge transactions, which fall under the tax with tag VAT 25 """
         domain = [('tax_tag_ids', 'in', self._get_tag_ids_from_report_lines(['l10n_cz_vat_declaration_line_27']))]
-        return self._report_custom_engine_control_statement(options, current_groupby, next_groupby, offset, limit, domain, 'a1')
+        return self._common_report_engine_control_statement(formulas_dict, options, current_groupby, domain, 'a1')
 
-    def _report_custom_engine_control_statement_A2(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_control_statement_A2(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ Part A2 consists of received taxable supplies, including transactions with taxes with tag VAT 3, 4, 5, 6, 9, 12 and 13 """
         xmlids = [
             'l10n_cz_vat_declaration_line_6',
@@ -50,50 +52,50 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
             'l10n_cz_vat_declaration_line_20',
         ]
         domain = [('tax_tag_ids', 'in', self._get_tag_ids_from_report_lines(xmlids))]
-        return self._report_custom_engine_control_statement(options, current_groupby, next_groupby, offset, limit, domain, 'a2')
+        return self._common_report_engine_control_statement(formulas_dict, options, current_groupby, domain, 'a2')
 
-    def _report_custom_engine_control_statement_A3(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_control_statement_A3(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ Part A3 covers transactions under the special regime of investment gold """
         gold_tax = self.env.ref(f'account.{self.env.company.root_id.id}_l10n_cz_investment_gold', raise_if_not_found=False)
         domain = [('tax_ids', 'in', gold_tax.ids if gold_tax else [0])]
-        return self._report_custom_engine_control_statement(options, current_groupby, next_groupby, offset, limit, domain, 'a3')
+        return self._common_report_engine_control_statement(formulas_dict, options, current_groupby, domain, 'a3')
 
-    def _report_custom_engine_control_statement_A4(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_control_statement_A4(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """
             Part A4 consists of realized taxable supplies in the amount above CZK 10,000, including transactions with
             taxes with tag VAT 1 (basic tax rate) and VAT 2 (reduced tax rate).
         """
         domain = [('tax_tag_ids', 'in', self._get_tag_ids_from_report_lines(['l10n_cz_vat_declaration_line_3', 'l10n_cz_vat_declaration_line_4']))]
-        return self._report_custom_engine_control_statement(options, current_groupby, next_groupby, offset, limit, domain, 'a4')
+        return self._common_report_engine_control_statement(formulas_dict, options, current_groupby, domain, 'a4')
 
-    def _report_custom_engine_control_statement_A5(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_control_statement_A5(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """
             Part A5 consists of a single line with summary information about realized taxable supplies in the amount
             below CZK 10,000. Includes transactions with taxes with tag VAT 1 (basic tax rate) and VAT 2 (reduced tax)
         """
         domain = [('tax_tag_ids', 'in', self._get_tag_ids_from_report_lines(['l10n_cz_vat_declaration_line_3', 'l10n_cz_vat_declaration_line_4']))]
-        return self._report_custom_engine_control_statement(options, current_groupby, next_groupby, offset, limit, domain, 'a5')
+        return self._common_report_engine_control_statement(formulas_dict, options, current_groupby, domain, 'a5')
 
-    def _report_custom_engine_control_statement_B1(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_control_statement_B1(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ Part B1 refers to reverse tax charges, the transactions with tax tag VAT 10 (basic tax) and VAT 11 (reduced tax) """
         domain = [('tax_tag_ids', 'in', self._get_tag_ids_from_report_lines(['l10n_cz_vat_declaration_line_16', 'l10n_cz_vat_declaration_line_17']))]
-        return self._report_custom_engine_control_statement(options, current_groupby, next_groupby, offset, limit, domain, 'b1')
+        return self._common_report_engine_control_statement(formulas_dict, options, current_groupby, domain, 'b1')
 
-    def _report_custom_engine_control_statement_B2(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_control_statement_B2(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """
             Part B2 consists of received taxable supplies in the amount above CZK 10,000 and for which the recipient
             claims VAT deduction (tax tags VAT 40 and VAT 41).
         """
         domain = [('tax_tag_ids', 'in', self._get_tag_ids_from_report_lines(['l10n_cz_vat_declaration_line_39', 'l10n_cz_vat_declaration_line_40']))]
-        return self._report_custom_engine_control_statement(options, current_groupby, next_groupby, offset, limit, domain, 'b2')
+        return self._common_report_engine_control_statement(formulas_dict, options, current_groupby, domain, 'b2')
 
-    def _report_custom_engine_control_statement_B3(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_control_statement_B3(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """
             Part B3 is a single line with summary information about received taxable supplies in the amount
             above CZK 10,000 and for which the recipient claims VAT deduction (tax tags VAT 40 and VAT 41).
         """
         domain = [('tax_tag_ids', 'in', self._get_tag_ids_from_report_lines(['l10n_cz_vat_declaration_line_39', 'l10n_cz_vat_declaration_line_40']))]
-        return self._report_custom_engine_control_statement(options, current_groupby, next_groupby, offset, limit, domain, 'b3')
+        return self._common_report_engine_control_statement(formulas_dict, options, current_groupby, domain, 'b3')
 
     def _result_dict_control_statement(self, country_code=None, vat_number=None, journal_entry=None, taxable_supply_date=None, tax_base_1=0, tax_1=0, tax_base_2=0, tax_2=0, supplies_code=None, has_sublines=False):
         return {
@@ -109,7 +111,7 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
             'has_sublines': has_sublines,
         }
 
-    def _report_custom_engine_control_statement(self, options, current_groupby, next_groupby, offset=0, limit=None, domain=None, code=None):
+    def _common_report_engine_control_statement(self, formulas_dict, options, current_groupby, domain=None, code=None):
         """
             Builds the result list containing lines of the report in the form of tuples of grouping keys (move id or
             code of supply) and dictionaries.
@@ -120,7 +122,6 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
 
             :param options:             The report options.
             :param current_groupby:     The groupby to evaluate.
-            :param next_groupby:        Full groupby string that will have to be evaluated next for these expressions.
             :param where:               Where clause for a particular part of the report.
             :param code:                Code of the subsection, one of 'a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2' or 'b3'.
             :return:                    A list of tuples containing the report lines.
@@ -174,15 +175,17 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
                 tax_1=tax_1,
                 tax_base_2=tax_base_2,
                 tax_2=tax_2,
+                has_sublines=True,
             )
 
         report = self.env['account.report'].browse(options['report_id'])
-        report._check_groupby_fields((next_groupby.split(',') if next_groupby else []) + ([current_groupby] if current_groupby else []))
+        if current_groupby:
+            report._check_groupby_fields([current_groupby])
         query = report._get_report_query(options, 'strict_range', domain=domain)
         tax_group_12 = self.env.ref(f'account.{self.env.company.root_id.id}_tax_group_vat_12', raise_if_not_found=False)
 
         select_clauses = []
-        search_condition_remaining = ''
+        search_condition_remaining = []
         # According to the report part, additional select, where and groupby clauses are set.
         groupby_clauses = []
         if code not in {'a5', 'b3'}:  # All codes except aggregated ones require information on individual moves.
@@ -192,29 +195,27 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
                 account_move_line__move_id.taxable_supply_date AS taxable_supply_date,
                 account_move_line__move_id.name AS move_name,
                 account_move_line__move_id.move_type AS move_type,
-                account_move_line__move_id.ref AS ref
+                account_move_line__move_id.ref AS ref,
             """))
             groupby_clauses.append(SQL('partner.vat, account_move_line__move_id.name, account_move_line__move_id.taxable_supply_date, country.code, account_move_line__move_id.move_type, account_move_line__move_id.ref'))
         else:
-            search_condition_remaining += " AND (ABS(account_move_line__move_id.amount_total_signed) <= 10000 OR partner.vat IS NULL OR partner.vat = '/' OR account_move_line__move_id.l10n_cz_scheme_code IN ('1', '2'))"
+            search_condition_remaining.append(SQL(" AND (ABS(account_move_line__move_id.amount_total_signed) <= 10000 OR partner.vat IS NULL OR partner.vat = '/' OR country.code != 'CZ' OR account_move_line__move_id.l10n_cz_scheme_code IN ('1', '2'))"))
 
         if code in {'a1', 'b1'}:  # A1 and B1 have reverse charges codes.
-            select_clauses.append(SQL('account_move_line.l10n_cz_supplies_code AS supplies_code'))
+            select_clauses.append(SQL('account_move_line.l10n_cz_supplies_code AS supplies_code,'))
             groupby_clauses.append(SQL('account_move_line.l10n_cz_supplies_code'))
 
         if code in {'a4', 'b2'}:
-            search_condition_remaining += " AND ABS(account_move_line__move_id.amount_total_signed) > 10000 AND partner.vat IS NOT NULL AND partner.vat != '/' AND account_move_line__move_id.l10n_cz_scheme_code NOT IN ('1', '2')"
+            search_condition_remaining.append(SQL(" AND ABS(account_move_line__move_id.amount_total_signed) > 10000 AND partner.vat IS NOT NULL AND partner.vat != '/' AND (country IS NULL OR country.code = 'CZ') AND account_move_line__move_id.l10n_cz_scheme_code NOT IN ('1', '2')"))
             if code == 'a4':  # A4 might include special regime transactions.
-                select_clauses.append(SQL('account_move_line__move_id.l10n_cz_scheme_code AS supplies_code'))
+                select_clauses.append(SQL('account_move_line__move_id.l10n_cz_scheme_code AS supplies_code,'))
                 groupby_clauses.append(SQL('account_move_line__move_id.l10n_cz_scheme_code'))
 
         groupby_field_sql = self.env['account.move.line']._field_to_sql('account_move_line', current_groupby, query) if current_groupby else SQL()
         if groupby_field_sql:
             groupby_clauses.append(groupby_field_sql)
 
-        tail_query = report._get_engine_query_tail(offset, limit)
-        tag_rel_alias = query.left_join(query.table, 'id', 'account_account_tag_account_move_line_rel', 'account_move_line_id', 'tag_rel')
-        tag_alias = query.left_join(tag_rel_alias, 'account_account_tag_id', 'account_account_tag', 'id', 'tag')
+        tag_t = query.table._sudo()._join('tax_tag_ids')
         sqL_query = SQL(
             """
                 SELECT
@@ -247,23 +248,21 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
 
                 %(groupby_clause)s
                 %(orderby_clause)s
-                %(tail_query)s
             """,
             select_from_groupby=SQL('%s AS grouping_key,', groupby_field_sql) if groupby_field_sql else SQL(''),
-            select_clause=SQL("%s,", SQL(", ").join(select_clauses)) if select_clauses else SQL(),
+            select_clause=SQL().join(select_clauses),
             tax_group_12=tax_group_12.id if tax_group_12 else 0,
-            balance_negate=self.env['account.account.tag']._field_to_sql(tag_alias, 'balance_negate', query),
+            balance_negate=tag_t.balance_negate,
             table_references=query.from_clause,
             search_condition=query.where_clause,
-            search_condition_remaining=SQL(search_condition_remaining),
+            search_condition_remaining=SQL().join(search_condition_remaining),
             groupby_clause=SQL("GROUP BY %s", SQL(", ").join(groupby_clauses)) if groupby_clauses else SQL(),
             orderby_clause=SQL("ORDER BY %s", SQL(", ").join(groupby_clauses)) if groupby_clauses else SQL(),
-            tail_query=SQL(tail_query),
         )
         query_res_lines = self.env.execute_query_dict(sqL_query)
 
         if not current_groupby:
-            return build_result_dict(query_res_lines)
+            return {next(iter(formulas_dict.values())): build_result_dict(query_res_lines)}
         else:
             result = []
             all_res_per_grouping_key = {}
@@ -274,7 +273,7 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
             for grouping_key, query_res_lines in all_res_per_grouping_key.items():
                 result.append((grouping_key, build_result_dict(query_res_lines)))
 
-            return result
+            return {next(iter(formulas_dict.values())): result}
 
     ####################################################
     # EXPORT
@@ -287,12 +286,12 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
         """
         def get_column_values_from_line(report_line):
             line_values = {}
-            for col in report_line['columns']:
-                if col['figure_type'] == 'monetary' and col['no_format']:
-                    value = float_repr(currency.round(col['no_format']), currency.decimal_places)
+            for col in report_line.columns:
+                if col.figure_type == 'monetary' and col.no_format:
+                    value = float_repr(currency.round(col.no_format), currency.decimal_places)
                 else:
-                    value = col['no_format']
-                line_values[col['expression_label']] = value
+                    value = col.no_format
+                line_values[col.expression_label] = value
             return line_values
 
         report = self.env['account.report'].browse(options['report_id'])
@@ -306,16 +305,16 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
         for line in report._get_lines({**options, 'unfold_all': True, 'export_mode': 'file'}):
             # Loop through all report lines, getting the highest level sublines of parts A1-A4, B1 and B2,
             # or the summary lines of part A5, B3 and C-lines.
-            models = report._get_res_ids_from_line_id(line['id'], ['account.move', 'account.report.line'])
-            if code := line.get('code'):
+            models = report._get_res_ids_from_line_id(line.id, ['account.move', 'account.report.line'])
+            if code := line.code:
                 line_name = f'line_{code}'
                 values[line_name] = []
                 report_line_to_code_dict[models['account.report.line']] = line_name
-                if not line['groupby']:  # include lines which sum totals, (A5, B3, C-lines) and skip headings
+                if not line.groupby:  # include lines which sum totals, (A5, B3, C-lines) and skip headings
                     line_values = get_column_values_from_line(line)
                     values[line_name].append(line_values)
             # skip intermediary groupings in A1 and B1 (move level information is not needed, only at the supplies code level)
-            elif 'account.move' in models and not line['groupby']:
+            elif 'account.move' in models and not line.groupby:
                 line_name = report_line_to_code_dict[models['account.report.line']]
                 line_values = get_column_values_from_line(line)
                 values[line_name].append(line_values)
@@ -327,8 +326,8 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
 
         data = {
             'odoo_version': release.version,
-            'veta_d': cz_utils.get_veta_d_vals(report, options),
-            'veta_p': cz_utils.get_veta_p_vals(sender_company),
+            'veta_d': cz_utils.get_veta_d_vals(report, options, sender_company),
+            'veta_p': cz_utils.get_veta_p_vals(report, sender_company, self.env.user.partner_id),
             **values,
         }
         xml_content = self.env['ir.qweb']._render('l10n_cz_reports.control_statement_export_template', values=data)
@@ -361,7 +360,7 @@ class CzechVATControlReportCustomHandler(models.AbstractModel):
             return '', ''
         eu_country_codes = cz_utils.get_eu_country_codes(self.env, options)
         if vat_number[0].isalpha():  # else, use passed country_code and vat_number
-            country_code, vat_number = self.env['res.partner']._split_vat(vat_number)
+            country_code, vat_number = split_vat(vat_number)
         if country_code in eu_country_codes:
             return vat_number, country_code
         return '', ''

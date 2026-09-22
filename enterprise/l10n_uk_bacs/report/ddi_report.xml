@@ -22,7 +22,6 @@
             <field name="model">bacs.ddi</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">l10n_uk_bacs.ddi_form_report</field>
-            <field name="report_file">l10n_uk_bacs.ddi_form_report</field>
             <field name="attachment_use">True</field>
             <field name="binding_model_id" ref="model_bacs_ddi"/>
             <field name="binding_type">report</field>
@@ -57,11 +56,11 @@
                         <div class="border border-dark mb-1 field-min-height"></div>
                         <div>Bank/Building Society account number</div>
                         <div class="border border-dark mb-2 py-2 ps-2">
-                            <t t-out="o.partner_bank_id.sanitized_acc_number[14:]"/>
+                            <t t-out="o.partner_bank_id.sanitized_account_number[14:]"/>
                         </div>
                         <div>Branch Sort Code</div>
                         <div class="border border-dark mb-2 py-2 ps-2">
-                            <t t-out="o.partner_bank_id.sanitized_acc_number[8:14]"/>
+                            <t t-out="o.partner_bank_id.sanitized_account_number[8:14]"/>
                         </div>
                         <div>Name and full postal address of your Bank or Building Society</div>
                         <div class="border border-dark mb-1 px-1 pt-1 field-min-height">

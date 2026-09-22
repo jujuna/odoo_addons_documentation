@@ -2,7 +2,6 @@
 
 {
     'name': 'Sign emSigner',
-    'version': '1.0',
     'category': 'Sales/Sign',
     'summary': "Sign documents with emSigner",
     'description': "Add support for emSigner identification when signing documents (Indian only)",
@@ -25,7 +24,7 @@
             'sign_emsigner/static/src/dialogs**/*',
         ],
     },
-    'installable': True,
+    'iap_paid_service': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

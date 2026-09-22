@@ -134,12 +134,39 @@ registry
         ],
     });
 
-registry.category("web_tour.tours").add("test_process_confirmed_mo", {
+registry.category("web_tour.tours").add("test_barcode_production_lot_replace_on_scan", {
     steps: () => [
+        // Register an existing lot for the finished product.
+        { trigger: ".o_barcode_client_action", run: "scan EXIST_LOT" },
         {
-            trigger: 'div[name="o_kanban_record_title"]:contains("Manufacturing")',
-            run: "click",
+            trigger: '.o_header .o_line_lot_name:contains("EXIST_LOT")',
+            run: () => helper.assertLineQty(0, "1/2"),
         },
+        // Scanning a different (new) lot replaces the registered one without
+        // incrementing the produced quantity.
+        { trigger: ".o_barcode_client_action", run: "scan NEW_LOT" },
+        {
+            trigger: '.o_header .o_line_lot_name:contains("NEW_LOT")',
+            run: () => {
+                helper.assertLineQty(0, "1/2");
+                helper.assertLineLot(0, "NEW_LOT");
+            },
+        },
+        // Scanning the same lot again increments the produced quantity.
+        { trigger: ".o_barcode_client_action", run: "scan NEW_LOT" },
+        {
+            trigger: ".o_header.o_header_completed",
+            run: () => {
+                helper.assertLineQty(0, "2/2");
+                helper.assertLineLot(0, "NEW_LOT");
+            },
+        },
+        ...stepUtils.validateBarcodeOperation(undefined, ".o_notification_bar.bg-success"),
+    ],
+});
+
+registry.category("web_tour.tours").add("test_barcode_production_process", {
+    steps: () => [
         {
             trigger: '.o_kanban_record:contains("Final Product")',
             run: "click",
@@ -148,34 +175,16 @@ registry.category("web_tour.tours").add("test_process_confirmed_mo", {
             trigger: '.o_barcode_line_title:contains("Compo 01")',
         },
         {
-            trigger: '.o_header .o_barcode_line_title:contains("Final Product")',
+            trigger:
+                '.o_header:has(.o_barcode_line_title:contains("Final Product")) button[name="produceButton"]',
             run: "click",
         },
-        {
-            trigger: 'button[name="produceButton"]',
-            run: "click",
-        },
-        {
-            trigger: ".o_line_completed",
-        },
-        {
-            trigger: '.o_header_completed .qty-done:contains("1")',
-            run: "click",
-        },
-        {
-            trigger: 'div[data-barcode="compo01"] .qty-done:contains("2")',
-            run: "click",
-        },
-        {
-            trigger: ".o_scan_message.o_scan_validate",
-        },
-        {
-            trigger: ".o_validate_page",
-            run: "click",
-        },
-        {
-            trigger: ".o_notification_bar.bg-success",
-        },
+        { trigger: '.o_header_completed .qty-done:contains("1")' },
+        { trigger: '.o_line_completed[data-barcode="compo01"] .qty-done:contains("2")' },
+        ...stepUtils.validateBarcodeOperation(
+            ".o_scan_message.o_scan_validate",
+            ".o_stock_barcode_list_kanban_view"
+        ),
     ],
 });
 
@@ -237,10 +246,6 @@ registry.category("web_tour.tours").add("test_barcode_production_create_bom", {
     steps: () => [
         // Creates a new production from the Barcode App.
         {
-            trigger: "article.o_barcode_picking_type:contains('Manufacturing')",
-            run: "click",
-        },
-        {
             trigger: ".o-kanban-button-new",
             run: "click",
         },
@@ -254,10 +259,7 @@ registry.category("web_tour.tours").add("test_barcode_production_create_bom", {
         ...validateBomCreationSteps,
         // Close the previous notification to ensure that the next
         // validateBomCreationSteps does not finish prematurely because of it.
-        {
-            trigger: ".o_notification_close.btn-close",
-            run: "click",
-        },
+        ...stepUtils.checkNotificationMessage("The manufacturing order has been validated"),
         // Creates a new production from the "Add product" form from Barcode App.
         {
             trigger: ".o-kanban-button-new",
@@ -305,7 +307,15 @@ registry.category("web_tour.tours").add("test_scrap_done_mo", {
             run: "click",
         },
         {
-            trigger: "button[name*=action_validate]:contains(Scrap)",
+            content: "Set the quantity",
+            trigger: "div[name='quantity'] input:value(0)",
+            run: function ({ anchor }) {
+                anchor.value = "1";
+                anchor.dispatchEvent(new InputEvent("input", { bubbles: true }));
+            },
+        },
+        {
+            trigger: "button[name*=action_scrap]:contains(Scrap)",
             run: "click",
         },
         {
@@ -378,7 +388,14 @@ registry.category("web_tour.tours").add("test_barcode_production_create", {
                 helper.assertLineQty(headerLine, "2/1");
             },
         },
-        ...stepUtils.validateBarcodeOperation(".o_scan_message.o_scan_validate"),
+        { trigger: "body:not(:has(.modal))" },
+        { trigger: ".o_scan_message.o_scan_validate", run: "scan OBTVALI" },
+        {
+            trigger:
+                ".o_data_cell[name='product_expected_qty_uom']:contains('4.00') + .o_data_cell[name='product_consumed_qty_uom']:contains('2.00')",
+        },
+        { trigger: "button[name='action_confirm']", run: "click" },
+        { trigger: ".o_notification_bar.bg-success" },
     ],
 });
 
@@ -475,18 +492,16 @@ registry.category("web_tour.tours").add("test_barcode_production_create_tracked_
             run: "click",
         },
         {
-            trigger: ".o_add_byproduct",
+            trigger: '.o_add_line:contains("Add By-Product")',
             run: function () {
                 const viewByProductsBtn = document.querySelectorAll(".o_by_products");
-                const addLineBtn = document.querySelectorAll(".o_add_line");
                 const produceBtn = document.querySelectorAll(".o_validate_page");
                 helper.assert(viewByProductsBtn.length, 0, "By product buttons must be hidden");
-                helper.assert(addLineBtn.length, 0, "Add line button must be hidden");
                 helper.assert(produceBtn.length, 0, "Produce button must be hidden");
             },
         },
         {
-            trigger: ".o_add_byproduct",
+            trigger: ".o_add_line",
             run: "click",
         },
         {
@@ -518,7 +533,7 @@ registry.category("web_tour.tours").add("test_barcode_production_create_tracked_
             run: "click",
         },
         {
-            trigger: ".o_save_byproduct",
+            trigger: ".o_exit",
             run: "click",
         },
         {
@@ -603,6 +618,63 @@ registry.category("web_tour.tours").add("test_barcode_production_generate_serial
             run: () => {
                 helper.assertLineLot(0, "0000134, 0000135, 0000136, …, 0000143");
             },
+        },
+        ...stepUtils.validateBarcodeOperation(),
+        // Fourth MO: produce 3 products by scanning an existing serial, then a
+        // brand-new typed one (exercises the lot_name-creation branch), then a
+        // third serial. Verifies that re-scanning an already-registered serial is
+        // rejected, and that the third scan is still counted once two serials are
+        // already registered (the header line keeps exposing a lot, so the
+        // quantity is not reset to zero).
+        { trigger: ".o_stock_barcode_main_menu", run: "scan MO/TEST/4" },
+        { trigger: ".o_add_lot.btn-primary", run: "scan SN_X1" },
+        { trigger: '.o_header .qty-done:contains("1")', run: "scan SN_X1" },
+        {
+            trigger: ".o_notification:has(.bg-danger):contains('SN_X1 is already used')",
+        },
+        { trigger: '.o_header .qty-done:contains("1")', run: "scan SN_NEW1" },
+        { trigger: '.o_header .qty-done:contains("2")', run: "scan SN_X2" },
+        {
+            trigger: ".o_header_completed",
+            run: () => {
+                helper.assertLineLot(0, "SN_X1, SN_NEW1, SN_X2");
+            },
+        },
+        ...stepUtils.validateBarcodeOperation(),
+    ],
+});
+
+registry.category("web_tour.tours").add("test_barcode_byproduct_generate_serial_numbers", {
+    steps: () => [
+        {
+            trigger: ".o_stock_barcode_main_menu",
+            run: "scan MO/TEST/BYPRODUCTSN",
+        },
+        {
+            trigger: ".o_by_products",
+            run: "click",
+        },
+        {
+            trigger: ".o_toggle_sublines",
+            run: "click",
+        },
+        {
+            trigger: '.o_barcode_line:nth-child(1) button[name="generateLotButton"]',
+            run: "click",
+        },
+        {
+            trigger: '.o_barcode_line:nth-child(1) .o_line_lot_name:contains("0000100")',
+        },
+        {
+            trigger: '.o_barcode_line:nth-child(2) button[name="generateLotButton"]',
+            run: "click",
+        },
+        {
+            trigger: '.o_barcode_line:nth-child(2) .o_line_lot_name:contains("0000101")',
+        },
+        {
+            trigger: ".o_exit",
+            run: "click",
         },
         ...stepUtils.validateBarcodeOperation(),
     ],
@@ -840,7 +912,7 @@ registry.category("web_tour.tours").add("test_barcode_production_component_no_st
             run: function () {
                 helper.assert(helper.getLines().length, 2);
                 const componentLine = helper.getLine({ barcode: "compo01" });
-                helper.assertLineQty(componentLine, "2");
+                helper.assertLineQty(componentLine, "2/2");
             },
         },
         {
@@ -928,10 +1000,6 @@ registry.category("web_tour.tours").add("test_barcode_production_add_scrap", {
     steps: () => [
         // Creates a new production from the Barcode App.
         {
-            trigger: "div[name='o_kanban_record_title']:contains('Manufacturing')",
-            run: "click",
-        },
-        {
             trigger: ".o-kanban-button-new",
             run: "click",
         },
@@ -971,7 +1039,19 @@ registry.category("web_tour.tours").add("test_barcode_production_add_scrap", {
             run: "click",
         },
         {
-            trigger: 'button[name="action_validate"]',
+            content: "Ensure Compo 01 was actually selected",
+            trigger: "div[name='product_id'] .o_external_button",
+        },
+        {
+            content: "Set the quantity",
+            trigger: "div[name='quantity'] input:value(0)",
+            run: function ({ anchor }) {
+                anchor.value = "1";
+                anchor.dispatchEvent(new InputEvent("input", { bubbles: true }));
+            },
+        },
+        {
+            trigger: 'button[name="action_scrap"]',
             run: "click",
             // Alternatively, we may have triggered this by scanning OBTVALI (once focus is not on an editable input tag !)
             // However, there's still a bug such that OBTVALI will also validate the MO in addition to the scrap form...
@@ -1039,7 +1119,7 @@ registry.category("web_tour.tours").add("test_barcode_production_add_byproduct",
             },
         },
         { trigger: ".o_discard", run: "click" },
-        { trigger: ".o_add_byproduct" },
+        { trigger: ".o_exit" },
         // Try (unsuccesfully) to add the final product as a byproduct through scan
         {
             trigger: ".o_barcode_client_action",
@@ -1085,9 +1165,12 @@ registry.category("web_tour.tours").add("test_barcode_production_add_byproduct",
         { trigger: ".dropdown-item:contains('byprod_lot_001')", run: "click" },
         { trigger: ".o-autocomplete input:last-child" },
         { trigger: ".o_save", run: "click" },
+        {
+            trigger: ".o_barcode_line",
+        },
         // Validate by-products and then validate the manufacturing operation.
         {
-            trigger: ".o_save_byproduct",
+            trigger: ".o_exit",
             run: "click",
         },
         ...stepUtils.validateBarcodeOperation(
@@ -1193,7 +1276,7 @@ registry.category("web_tour.tours").add("test_barcode_production_component_diffe
         {
             trigger: ".o_header_completed",
             run: () => {
-                helper.assertLineQty(1, "1 kg");
+                helper.assertLineQty(1, "1/1 kg");
             },
         },
     ],
@@ -1357,7 +1440,7 @@ registry.category("web_tour.tours").add("test_always_backorder_mo", {
     steps: () => [
         { trigger: "div[name='o_kanban_record_title']:contains(Manufacturing)", run: "click" },
         { trigger: ".o_kanban_record:contains(Final Product)", run: "click" },
-        { trigger: ".o_barcode_line.o_header .fa-pencil", run: "click" },
+        { trigger: ".o_barcode_line.o_header [data-icon='edit']", run: "click" },
         { trigger: ".o_digipad_increment", run: "click" },
         { trigger: ".btn.o_save", run: "click" },
         { trigger: ".o_validate_page", run: "click" },
@@ -1386,6 +1469,39 @@ registry.category("web_tour.tours").add("test_backorder_partial_completion_save_
     ],
 });
 
+registry
+    .category("web_tour.tours")
+    .add("test_backorder_partial_completion_preserves_reserved_qty_on_exit", {
+        steps: () => [
+            { trigger: ".o_stock_barcode_main_menu", run: "scan TBPCSNS mo" },
+            {
+                trigger:
+                    '.o_barcode_line:has(.o_barcode_line_title .o_product_label:contains("Final Product")) .o_add_quantity',
+                run: "click",
+            },
+            {
+                trigger:
+                    '.o_barcode_line:has(.o_barcode_line_title .o_product_label:contains("Compo 01")) .o_edit',
+                run: "click",
+            },
+            { trigger: "input", run: "clear" },
+            { trigger: "input", run: "edit 1" },
+            { trigger: ".o_save", run: "click" },
+            { trigger: ".o_barcode_line" },
+
+            { trigger: ".o_exit", run: "click" },
+            { trigger: ".o_stock_barcode_main_menu", run: "scan TBPCSNS mo" },
+            {
+                trigger:
+                    '.o_barcode_line:has(.o_barcode_line_title .o_product_label:contains("Compo 01")) :contains("1/1")',
+            },
+            {
+                trigger:
+                    '.o_barcode_line:has(.o_barcode_line_title .o_product_label:contains("Compo 01")) :contains("0/5")',
+            },
+        ],
+    });
+
 registry.category("web_tour.tours").add("test_barcode_mo_creation_in_mo2", {
     steps: () => [
         { trigger: "button.o_button_operations", run: "click" },
@@ -1403,6 +1519,7 @@ registry.category("web_tour.tours").add("test_barcode_mo_creation_in_mo2", {
         { trigger: "button.o_validate_page:enabled", run: "click" },
         { trigger: ".o_notification_bar.bg-success" },
         { trigger: ".o_notification .o_notification_close", run: "click" },
+        { trigger: ".breadcrumb .breadcrumb-item .dropdown-toggle", run: "click" },
         { trigger: "a[href='/odoo/barcode']", run: "click" },
         // Create a new MO by scanning the operation's barcode.
         { trigger: ".o_stock_barcode_main_menu", run: "scan MO2_BARCODE" },
@@ -1446,6 +1563,96 @@ registry.category("web_tour.tours").add("test_setting_barcode_mrp_allow_extra_pr
     ],
 });
 
+registry.category("web_tour.tours").add("test_barcode_production_settings", {
+    steps: () => [
+        // First MO: no restrictions.
+        { trigger: ".o_stock_barcode_main_menu", run: "scan MO1" },
+        {
+            content: "Since quick validation is enabled, the validate button should be active",
+            trigger: "button.o_validate_page:not(:disabled)",
+        },
+        {
+            content: "Barcode lines' buttons should be clickable",
+            trigger: ".o_barcode_line[data-barcode='compo01']",
+            run: () => {
+                // Avoid index 0 to skip the first line (MO product's line).
+                const barcodeLines = helper.getLines({ index: [1, 2] });
+                for (const line of barcodeLines) {
+                    const editButton = line.querySelector("button.o_edit");
+                    const completeButton = line.querySelector("button.o_add_remaining_quantity");
+                    helper.assert(Boolean(editButton.attributes.disabled), false);
+                    helper.assert(Boolean(completeButton.attributes.disabled), false);
+                }
+            },
+        },
+        {
+            content: "Click on the produce button: component lines should be updated",
+            trigger: "button[name='produceButton']",
+            run: "click",
+        },
+        {
+            content: "Display tracked component's sublines",
+            trigger: "button.o_line_button.o_toggle_sublines",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_line .o_sublines .o_barcode_line",
+            run: () => {
+                const subLines = helper.getSublines();
+                helper.assertLineLot(subLines[0], "sn-001");
+                helper.assertLineLot(subLines[1], "sn-002");
+            },
+        },
+        ...stepUtils.validateBarcodeOperation(),
+
+        // Second MO: can't update not-scanned product.
+        { trigger: ".o_stock_barcode_main_menu", run: "scan MO2" },
+        {
+            content: "Since quick validation isn't enabled, the validate button should be disabled",
+            trigger: "button.o_validate_page:disabled",
+        },
+        {
+            content: "Click on the produce button: component lines should not be updated",
+            trigger: "button[name='produceButton']",
+            run: "click",
+        },
+        {
+            content: "Barcode lines' buttons should be disabled",
+            trigger: ".o_barcode_line.o_header .qty-done.text-success",
+            run: () => {
+                // Avoid index 0 to skip the first line (MO product's line).
+                const [lineCompo, lineCompoSN] = helper.getLines({ index: [1, 2] });
+                helper.assertLineProduct(lineCompo, "Compo 01");
+                helper.assertLineQty(lineCompo, "0/2");
+                helper.assertLineProduct(lineCompoSN, "Compo Serial");
+                helper.assertLineQty(lineCompoSN, "0/2");
+                for (const line of [lineCompo, lineCompoSN]) {
+                    const editButton = line.querySelector("button.o_edit");
+                    const completeButton = line.querySelector("button.o_add_remaining_quantity");
+                    helper.assert(Boolean(editButton.attributes.disabled), true);
+                    helper.assert(Boolean(completeButton.attributes.disabled), true);
+                }
+            },
+        },
+        // Compo 01 buttons should become clickable once the product was scanned.
+        { trigger: ".o_barcode_line[data-barcode='compo01'] button.o_edit:disabled" },
+        { trigger: "body", run: "scan compo01" },
+        { trigger: "[data-barcode='compo01'].o_selected button.o_edit:not(:disabled)" },
+        {
+            trigger: "[data-barcode='compo01'].o_selected button.o_add_remaining_quantity",
+            run: "click",
+        },
+        // Compo Serial buttons should become clickable only once a SN was scanned.
+        { trigger: ".o_barcode_line[data-barcode='compo_sn'] button.o_edit:disabled" },
+        { trigger: "body", run: "scan compo_sn" },
+        { trigger: "[data-barcode='compo_sn'].o_selected button.o_edit:disabled" },
+        { trigger: "body", run: "scan sn-003" },
+        { trigger: "[data-barcode='compo_sn'].o_selected button.o_edit:not(:disabled)" },
+        { trigger: "body", run: "scan sn-004" },
+        ...stepUtils.validateBarcodeOperation(".o_line_button.o_toggle_sublines"),
+    ],
+});
+
 registry.category("web_tour.tours").add("test_no_split_uncompleted_done_move", {
     steps: () => [
         { trigger: ".o_stock_barcode_main_menu", run: "scan TBPCSNS mo" },
@@ -1453,20 +1660,23 @@ registry.category("web_tour.tours").add("test_no_split_uncompleted_done_move", {
             trigger: '.o_barcode_line:has(.o_barcode_line_title:text("Final Product")) .o_edit',
             run: "click",
         },
-        { trigger: "input", run: "clear" },
-        { trigger: "input", run: "edit 1" },
+        { trigger: "div[name='qty_producing'] input", run: "clear" },
+        { trigger: "div[name='qty_producing'] input", run: "edit 1" },
         { trigger: ".o_save", run: "click" },
-        { trigger: ".o_barcode_line" },
-        { trigger: '.o_barcode_line:has(.o_barcode_line_title:text("Compo 01")) .o_edit' },
         {
-            trigger: '.o_barcode_line:has(.o_barcode_line_title:text("Compo 01")) .o_edit',
+            trigger: ".o_barcode_line[data-barcode='compo01'].o_line_completed",
             run: "click",
         },
-        { trigger: "input", run: "clear" },
-        { trigger: "input", run: "edit 1" },
+        {
+            trigger: ".o_barcode_line[data-barcode='compo01'].o_line_completed.o_selected .o_edit",
+            run: "click",
+        },
+        { trigger: "div[name='quantity'] input", run: "clear" },
+        { trigger: "div[name='quantity'] input", run: "edit 1" },
         { trigger: ".o_save", run: "click" },
         { trigger: ".o_barcode_line" },
         { trigger: ".o_validate_page", run: "click" },
+        { trigger: "button[name='action_confirm']", run: "click" },
         { trigger: ".o_notification_bar.bg-success" },
     ],
 });
@@ -1604,7 +1814,6 @@ registry.category("web_tour.tours").add("test_not_allowing_component_lot_creatio
         {
             content: "The scan should not have worked",
             trigger: ".o_notification_bar.bg-danger",
-            run() {},
         },
         {
             trigger: ".o_barcode_line:contains(productserial1)",
@@ -1708,11 +1917,37 @@ registry.category("web_tour.tours").add("test_mo_barcode_byproduct_destination_l
     ],
 });
 
-registry.category("web_tour.tours").add("test_select_mo_component_line_scan_package_type", {
+registry.category("web_tour.tours").add("test_put_in_pack_basic_flow", {
     steps: () => [
-        { trigger: ".o_barcode_client_action", run: "scan compo01" },
-        { trigger: ".o_selected:contains('Compo')", run: "scan 000555555555555555555555" },
-        ...stepUtils.validateBarcodeOperation(".o_notification_bar.bg-danger"),
+        { trigger: ".o_barcode_client_action", run: "scan final" },
+        {
+            trigger: '.o_barcode_line:contains("Compo 01") .qty-done:contains(1)',
+            run: "click",
+        },
+        { trigger: '.o_selected:contains("Compo 01")', run: "scan 000555555555555555555555" },
+        // Ensure No split for component move lines
+        {
+            trigger: ".o_header .result-package",
+            run: () => {
+                helper.assertLineProduct(1, "Compo 01");
+                helper.assertLineQty(1, "1/2");
+            },
+        },
+        { trigger: ".o_barcode_client_action", run: "scan final" },
+        {
+            trigger: "button.o_by_products",
+            run: "click",
+        },
+        // For by-product move lines we can split normally.
+        { trigger: ".o_barcode_client_action", run: "scan 000555555555555555555555" },
+        {
+            trigger: ".o_line_completed .result-package",
+            run: () => {
+                helper.assertLineProduct(1, "By Product");
+                helper.assertLineQty(1, "2/2");
+            },
+        },
+        ...stepUtils.validateBarcodeOperation(),
     ],
 });
 
@@ -1723,10 +1958,10 @@ registry.category("web_tour.tours").add("test_create_all_transfers_for_3_step_ma
         { trigger: "button.o_add_line", run: "click" },
         { trigger: "input#product_id_0", run: "edit Final" },
         { trigger: ".ui-autocomplete a:contains('Final Product')", run: "click" },
-        { trigger: "div[name=product_id] .o_external_button", run() {} },
+        { trigger: "div[name=product_id] .o_external_button" },
         { trigger: "button.o_save", run: "click" },
         { trigger: "button.o_validate_page:enabled", run: "click" },
-        { trigger: ".o_notification_bar.bg-success", run() {} },
+        { trigger: ".o_notification_bar.bg-success" },
     ],
 });
 
@@ -1759,10 +1994,6 @@ registry.category("web_tour.tours").add("test_quant_selection_mrp", {
             run: function () {
                 helper.assertFormLocationSrc("WH/Stock");
                 helper.assertFormQuantity("1");
-                helper.assert(
-                    document.querySelector("div[name='result_package_id'] input").value,
-                    ""
-                );
                 helper.assertKanbanRecordsCount(2);
             },
         },
@@ -1781,10 +2012,6 @@ registry.category("web_tour.tours").add("test_quant_selection_mrp", {
             run: function () {
                 helper.assertFormLocationSrc("WH/Stock");
                 helper.assertFormQuantity("1");
-                helper.assert(
-                    document.querySelector("div[name='result_package_id'] input").value,
-                    ""
-                );
                 helper.assertKanbanRecordsCount(2);
             },
         },
@@ -1805,10 +2032,6 @@ registry.category("web_tour.tours").add("test_quant_selection_mrp", {
                 helper.assertFormLocationSrc("WH/Stock");
                 helper.assertFormQuantity("2");
                 helper.assert(document.querySelector("div[name='lot_id'] input").value, "");
-                helper.assert(
-                    document.querySelector("div[name='result_package_id'] input").value,
-                    ""
-                );
                 helper.assertKanbanRecordsCount(2);
             },
         },
@@ -1827,10 +2050,6 @@ registry.category("web_tour.tours").add("test_quant_selection_mrp", {
                 helper.assertFormLocationSrc("WH/Stock/Section 1");
                 helper.assertFormQuantity("2");
                 helper.assert(document.querySelector("div[name='lot_id'] input").value, "lot2");
-                helper.assert(
-                    document.querySelector("div[name='result_package_id'] input").value,
-                    ""
-                );
                 helper.assertKanbanRecordsCount(2);
             },
         },
@@ -1877,9 +2096,100 @@ registry.category("web_tour.tours").add("test_picking_product_with_kit_and_compo
 registry.category("web_tour.tours").add("test_gs1_qty_final_product", {
     steps: () => [
         { trigger: ".o_barcode_client_action", run: "scan 01000000826558533000000002" },
-        { trigger: ".o_barcode_line:contains('Compo 01') .qty-done:contains(4)", run(){} },
+        { trigger: ".o_barcode_line:contains('Compo 01') .qty-done:contains(4)" },
         { trigger: ".o_barcode_client_action", run: "scan 01000000826558533000000002" },
-        { trigger: ".o_barcode_line:contains('Compo 01') .qty-done:contains(8)", run(){} },
+        { trigger: ".o_barcode_line:contains('Compo 01') .qty-done:contains(8)" },
         ...stepUtils.validateBarcodeOperation(),
+    ],
+});
+
+registry.category("web_tour.tours").add("test_barcode_production_create_bom_with_different_uom", {
+    steps: () => [
+        {
+            trigger: "button.o-kanban-button-new",
+            run: "click",
+        },
+        {
+            trigger: "button.o_add_line",
+            run: "click",
+        },
+        {
+            trigger: "input#product_id_0",
+            run: "edit Final",
+        },
+        {
+            trigger: ".ui-autocomplete a:contains('Final Product')",
+            run: "click",
+        },
+        {
+            trigger: "button.o_save",
+            run: "click",
+        },
+        {
+            trigger: "button[name='produceButton']",
+            run: "click",
+        },
+        {
+            trigger: "button.o_validate_page",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_line.o_header_completed",
+            run: function () {
+                helper.assertLinesCount(3);
+                const [finalLine, compo01Line, compo02Line] = helper.getLines();
+                helper.assertLineProduct(finalLine, "Final Product");
+                helper.assertLineQty(finalLine, "1.2/1.2 Days");
+                helper.assertLineProduct(compo01Line, "Compo 01");
+                helper.assertLineQty(compo01Line, "3.4/3.4 kg");
+                helper.assertLineProduct(compo02Line, "Compo 02");
+                helper.assertLineQty(compo02Line, "5.6/5.6 m");
+            },
+        },
+        {
+            trigger: ".o_notification_bar.bg-success",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_barcode_production_disabled_uoms", {
+    steps: () => [
+        {
+            trigger: ".o_order_already_done",
+        },
+        {
+            trigger: ".o_barcode_line.o_header",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineQty(0, "1.2/1.2");
+            },
+        },
+        {
+            trigger: "button.o_exit",
+            run: "click",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_scan_mo_split_barcode", {
+    steps: () => [
+        { trigger: ".o_button_operations", run: "click" },
+        {
+            trigger: "div[name=o_kanban_record_title]:contains(Manufacturing)",
+            run: "click",
+        },
+        { trigger: ".o_kanban_record:contains(Extra-MO)", run: "scan Lovely-MO-split" },
+        { trigger: ".o_searchview_facet:contains('Lovely-MO-split')" },
+        {
+            trigger: ".o_kanban_renderer:not(:has(.o_kanban_record:contains(Extra-MO)))",
+            run: () => {
+                const searchResult = document.querySelectorAll("article.o_kanban_record");
+                helper.assert(
+                    searchResult.length,
+                    3,
+                    "Only the 3 splits of Lovely-MO-split are expected to be found."
+                );
+            },
+        },
     ],
 });

@@ -203,17 +203,6 @@
         <field name="sequence">15</field>
     </record>
 
-    <record id="hr_contract_salary_personal_info_disabled_children_bool" model="hr.contract.salary.personal.info">
-        <field name="name">Disabled Children</field>
-        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'disabled_children_bool')])"/>
-        <field name="applies_on">version_personal</field>
-        <field name="display_type">checkbox</field>
-        <field name="impacts_net_salary" eval="True"/>
-        <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_family"/>
-        <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
-        <field name="sequence">80</field>
-    </record>
-
     <record id="hr_contract_salary_personal_info_disabled_children_number" model="hr.contract.salary.personal.info">
         <field name="name">Number of Disabled Children</field>
         <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'disabled_children_number')])"/>
@@ -223,19 +212,7 @@
         <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_family"/>
         <field name="placeholder">0</field>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
-        <field name="parent_id" ref="hr_contract_salary_personal_info_disabled_children_bool"/>
         <field name="sequence">90</field>
-    </record>
-
-    <record id="hr_contract_salary_personal_info_other_dependent_people" model="hr.contract.salary.personal.info">
-        <field name="name">Other Dependent People</field>
-        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'other_dependent_people')])"/>
-        <field name="applies_on">version_personal</field>
-        <field name="display_type">checkbox</field>
-        <field name="impacts_net_salary" eval="True"/>
-        <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_family"/>
-        <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
-        <field name="sequence">100</field>
     </record>
 
     <record id="hr_contract_salary_personal_info_other_senior_dependent" model="hr.contract.salary.personal.info">
@@ -248,22 +225,7 @@
         <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_family"/>
         <field name="placeholder">0</field>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
-        <field name="parent_id" ref="hr_contract_salary_personal_info_other_dependent_people"/>
         <field name="sequence">110</field>
-    </record>
-
-    <record id="hr_contract_salary_personal_info_other_disabled_senior_dependent" model="hr.contract.salary.personal.info">
-        <field name="name">Disabled seniors</field>
-        <field name="helper">&gt;= 66 years old</field>
-        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'other_disabled_senior_dependent')])"/>
-        <field name="applies_on">version_personal</field>
-        <field name="display_type">integer</field>
-        <field name="impacts_net_salary" eval="True"/>
-        <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_family"/>
-        <field name="placeholder">0</field>
-        <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
-        <field name="parent_id" ref="hr_contract_salary_personal_info_other_dependent_people"/>
-        <field name="sequence">120</field>
     </record>
 
     <record id="hr_contract_salary_personal_info_other_juniors_dependent" model="hr.contract.salary.personal.info">
@@ -276,7 +238,6 @@
         <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_family"/>
         <field name="placeholder">0</field>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
-        <field name="parent_id" ref="hr_contract_salary_personal_info_other_dependent_people"/>
         <field name="sequence">130</field>
     </record>
 
@@ -290,7 +251,6 @@
         <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_family"/>
         <field name="placeholder">0</field>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
-        <field name="parent_id" ref="hr_contract_salary_personal_info_other_dependent_people"/>
         <field name="sequence">140</field>
     </record>
 
@@ -312,21 +272,42 @@
     </record>
 
     <record id="hr_contract_salary_personal_info_seniority" model="hr.contract.salary.personal.info">
-        <field name="name">Seniority at Hiring</field>
+        <field name="name">Seniority at Hiring (years)</field>
         <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.employee'), ('name', '=', 'l10n_be_scale_seniority')])"/>
         <field name="display_type">integer</field>
         <field name="applies_on">employee</field>
         <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_certificate"/>
+        <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
+    </record>
+
+    <record id="hr_contract_salary_personal_info_seniority_months" model="hr.contract.salary.personal.info">
+        <field name="name">Seniority at Hiring (months)</field>
+        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'hr.employee'), ('name', '=', 'l10n_be_scale_seniority_months')])"/>
+        <field name="display_type">integer</field>
+        <field name="applies_on">employee</field>
+        <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_certificate"/>
+        <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
     </record>
 
     <record id="hr_contract_salary_personal_info_account_holder_name" model="hr.contract.salary.personal.info">
         <field name="name">Account Holder Name</field>
-        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'res.partner.bank'), ('name', '=', 'acc_holder_name')])"/>
+        <field name="res_field_id" model="ir.model.fields" eval="obj().search([('model', '=', 'res.partner.bank'), ('name', '=', 'holder_name')])"/>
         <field name="applies_on">bank_account</field>
         <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_contact"/>
         <field name="is_required" eval="True"/>
         <field name="sequence">300</field>
         <field name="structure_type_id" ref="hr.structure_type_employee_cp200"/>
+    </record>
+    <record id="hr_contract_salary_personal_info_niss" model="hr.contract.salary.personal.info">
+        <field name="name">NISS</field>
+        <field name="info_type_id" ref="hr_contract_salary.hr_contract_salary_personal_info_type_general"/>
+        <field name="res_field_id" model="ir.model.fields" 
+            eval="obj().search([('model', '=', 'hr.version'), ('name', '=', 'niss')])"/>
+            
+        <field name="placeholder">Leave empty if unknown</field>
+        <field name="applies_on">version_personal</field>
+        <field name="is_required" eval="False"/>
+        <field name="helper">(format: xx.xx.xx-xxx.xx)</field>
     </record>
     </data>
 </odoo>

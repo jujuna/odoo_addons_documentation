@@ -1,9 +1,8 @@
-import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
+import { useService } from "@web/core/utils/hooks";
+import { useEnv } from "@web/owl2/utils";
 
-import { reactive, useComponent, useEnv, toRaw, onMounted, onWillDestroy } from "@odoo/owl";
-import { useRecordObserver } from "@web/model/relational_model/utils";
-import { Deferred } from "@web/core/utils/concurrency";
+import { onMounted, onWillDestroy, proxy, toRaw, useEffect, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 
 /**
@@ -20,7 +19,7 @@ function batched(callback, synchronize = () => Promise.resolve()) {
     return (...args) => {
         if (!map.has(callId)) {
             const argsList = [args];
-            const prom = new Deferred();
+            const prom = Promise.withResolvers();
             map.set(callId, { argsList, prom });
             synchronize().then(() => {
                 const currentCallId = callId++;
@@ -29,11 +28,11 @@ function batched(callback, synchronize = () => Promise.resolve()) {
                     .catch(prom.reject)
                     .finally(() => map.delete(currentCallId));
             });
-            return prom;
+            return prom.promise;
         } else {
             const { prom, argsList } = map.get(callId);
             argsList.push(args);
-            return prom;
+            return prom.promise;
         }
     };
 }
@@ -56,9 +55,7 @@ export const getApprovalSpecBatchedService = {
                     continue;
                 }
                 approvals[key] = Object.fromEntries(
-                    tupleList.map(([tuple, value]) => {
-                        return [buildApprovalKey(...tuple), value];
-                    })
+                    tupleList.map(([tuple, value]) => [buildApprovalKey(...tuple), value])
                 );
             }
 
@@ -84,7 +81,7 @@ function getMissingApprovals(entries, rules) {
 
 class StudioApproval {
     constructor({ getApprovalSpecBatched, model }) {
-        this._data = reactive({});
+        this._data = proxy({});
         this.model = model;
         this.rules = {};
 
@@ -129,6 +126,15 @@ class StudioApproval {
 
     get inStudio() {
         return this.studio;
+    }
+
+    hasParent(ruleId) {
+        return this.rules[ruleId].parent_id;
+    }
+
+    isAppovalBlockedByParentRule() {
+        const state = this._getState();
+        return (state.rules || []).some((_id) => this.hasParent(_id));
     }
 
     displayNotification(data) {
@@ -235,7 +241,8 @@ export function useApproval({ getRecord, method, action }) {
     const protectedOrm = useService("orm");
     const unprotectedOrm = useEnv().services.orm;
     const notification = useService("notification");
-    const record = getRecord(useComponent().props);
+    const props = useProps();
+    const record = getRecord(props);
     const model = toRaw(record.model);
     const getApprovalSpecBatched = useEnv().services["web_studio.get_approval_spec_batched"];
     let approvalModelCache = approvalMap.get(model);
@@ -273,9 +280,7 @@ export function useApproval({ getRecord, method, action }) {
         notification,
     };
 
-    const approval = reactive(
-        Object.assign(Object.create(approvalModelCache.approval), specialize)
-    );
+    const approval = proxy(Object.assign(Object.create(approvalModelCache.approval), specialize));
 
     approvalModelCache.onRecordSaved.set(toRaw(approval), () => {
         if (!approval.resId && record.resId) {
@@ -286,9 +291,9 @@ export function useApproval({ getRecord, method, action }) {
     });
     onWillDestroy(() => approvalModelCache.onRecordSaved.delete(toRaw(approval)));
 
-    useRecordObserver((record) => {
-        approval.resId = record.resId;
-        approval.resModel = record.resModel;
+    useEffect(() => {
+        approval.resId = props.record.resId;
+        approval.resModel = props.record.resModel;
     });
 
     onMounted(() => {

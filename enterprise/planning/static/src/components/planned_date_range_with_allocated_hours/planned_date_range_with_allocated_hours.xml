@@ -2,10 +2,10 @@
 <templates xml:space="preserve">
 
     <t t-name="planning.PlannedDateRangeWithAllocatedHours" t-inherit="web.DateTimeField" t-inherit-mode="primary">
-        <xpath expr="//div[@t-ref='root']" position="inside">
+        <xpath expr="//div[@t-ref='this.rootRef']" position="inside">
             <span class="text-muted ms-2 fw-normal">
-                <t t-if="props.record.data.allocated_hours and props.readonly">
-                    (<t t-out="allocatedHoursFormatted"/>)
+                <t t-if="this.props.record.data.allocated_hours and this.props.readonly">
+                    (<t t-out="this.allocatedHoursFormatted"/>)
                 </t>
             </span>
         </xpath>

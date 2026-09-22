@@ -2,10 +2,12 @@
 import os
 
 from freezegun import freeze_time
+from lxml import etree
 from unittest.mock import patch
 
 from odoo import Command
-from odoo.tools import misc
+from odoo.addons.l10n_cl_edi.models.account_move import XML_NAMESPACES
+from odoo.tools import file_open, misc
 from odoo.tests import tagged
 from .common import TestL10nClEdiCommon, _check_with_xsd_patch, _is_valid_certificate
 
@@ -28,6 +30,7 @@ class TestL10nClDte(TestL10nClEdiCommon):
         - 110:
             - An exportation invoice for services
     """
+    _test_user_groups = None  # FIXME list needed groups
 
     @patch('odoo.addons.l10n_cl_edi.models.l10n_cl_edi_util.L10n_ClEdiUtil._get_cl_current_strftime')
     def test_l10n_cl_dte_39(self, get_cl_current_strftime):
@@ -387,7 +390,7 @@ class TestL10nClDte(TestL10nClEdiCommon):
         currency_usd = self.env.ref('base.USD')
         currency_usd.active = True
         self.env['res.currency.rate'].create({
-            'name': '2022-11-24',
+            'name': '2022-11-23',
             'company_id': self.company_data['company'].id,
             'currency_id': currency_usd.id,
             'rate': 0.001069187097})
@@ -644,3 +647,104 @@ class TestL10nClDte(TestL10nClEdiCommon):
         another_copied_invoice = invoice.copy()
         another_copied_invoice.action_post()
         self.assertEqual(another_copied_invoice.name, 'FAC 000002')
+
+    def test_l10n_cl_import_invoice_sale(self):
+        """ Test to make sure drag and dropping xml file into the Sales journal
+            will create a partner from the Receptor data defined in the xml
+        """
+        with file_open('l10n_cl_edi/tests/expected_dtes/dte_33.xml', 'rb') as file:
+            dte_content = file.read()
+            dte_33_attachment_id = self.env['ir.attachment'].create({
+                'name': 'dte_33_attachment.xml',
+                'mimetype': 'text/xml',
+                'raw': dte_content,
+                'res_model': 'account.move'
+            })
+            dte_33_xml_tree = etree.fromstring(dte_content)
+        res_id = self.sale_journal.create_document_from_attachment([dte_33_attachment_id.id])['res_id']
+        invoice = self.env['account.move'].browse(res_id)
+        partner_vat = dte_33_xml_tree.findtext('.//ns0:RUTRecep', namespaces=XML_NAMESPACES)
+        self.assertEqual(invoice.partner_id.vat, partner_vat, 'Partner should be customer from Receptor tag in XML.')
+
+    def test_l10n_cl_import_invoice_purchase(self):
+        """ Test to make sure drag and dropping xml file into the Purchase journal
+            will create a partner from the Remisor data defined in the xml
+        """
+        with file_open('l10n_cl_edi/tests/fetchmail_dtes/incoming_supplier_dte.xml', 'rb') as file:
+            content = file.read()
+            incoming_supplier_dte_attachment_id = self.env['ir.attachment'].create({
+                'name': 'incoming_supplier_dte_attachment.xml',
+                'mimetype': 'text/xml',
+                'raw': content,
+                'res_model': 'account.move'
+            })
+            incoming_supplier_dte_xml_tree = etree.fromstring(content)
+        res_id = self.purchase_journal.create_document_from_attachment([incoming_supplier_dte_attachment_id.id])['res_id']
+        bill = self.env['account.move'].browse(res_id)
+        partner_vat = incoming_supplier_dte_xml_tree.findtext('.//ns0:RUTEmisor', namespaces=XML_NAMESPACES)
+        self.assertEqual(bill.partner_id.vat, partner_vat, 'Partner should be the vendor from Emisor tag in XML.')
+
+    def test_l10n_cl_import_credit_note_sale(self):
+        """ Test to make sure drag and dropping credit note XML file into the Sale journal
+            will have the correct move_type of 'out_refund'
+        """
+        with file_open('l10n_cl_edi/tests/fetchmail_dtes/outgoing_credit_note_61.xml', 'rb') as file:
+            content = file.read()
+            outgoing_credit_note_61_attachment_id = self.env['ir.attachment'].create({
+                'name': 'outgoing_credit_note_61_attachment.xml',
+                'mimetype': 'text/xml',
+                'raw': content,
+                'res_model': 'account.move'
+            })
+        res_id = self.sale_journal.create_document_from_attachment([outgoing_credit_note_61_attachment_id.id])['res_id']
+        credit_note = self.env['account.move'].browse(res_id)
+        self.assertEqual(credit_note.move_type, 'out_refund', 'The move type should be a customer credit note.')
+
+    def test_l10n_cl_import_credit_note_purchase(self):
+        """ Test to make sure drag and dropping credit note XML file into the Purchase journal
+            will have the correct move_type of 'in_refund'
+        """
+        with file_open('l10n_cl_edi/tests/fetchmail_dtes/incoming_credit_note_61.xml', 'rb') as file:
+            content = file.read()
+            incoming_credit_note_61_attachment_id = self.env['ir.attachment'].create({
+                'name': 'incoming_credit_note_61_attachment.xml',
+                'mimetype': 'text/xml',
+                'raw': content,
+                'res_model': 'account.move'
+            })
+        res_id = self.purchase_journal.create_document_from_attachment([incoming_credit_note_61_attachment_id.id])['res_id']
+        credit_note = self.env['account.move'].browse(res_id)
+        self.assertEqual(credit_note.move_type, 'in_refund', 'The move type should be a vendor credit note.')
+
+    def test_vendor_bill_46_send_to_sii(self):
+        """display_send_button must be True and the Send & Print wizard must not raise
+        a constraint error for a posted vendor bill (doc type 46) with not_sent status."""
+        tax_19 = self.env['account.tax'].search([
+            ('name', '=', '19% VAT'),
+            ('type_tax_use', '=', 'purchase'),
+            ('company_id', '=', self.company_data['company'].id),
+        ], limit=1)
+        bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.partner_sii.id,
+            'invoice_date': '2019-10-23',
+            'currency_id': self.env.ref('base.CLP').id,
+            'journal_id': self.purchase_journal.id,
+            'l10n_latam_document_type_id': self.caf_46.l10n_latam_document_type_id.id,
+            'company_id': self.company_data['company'].id,
+            'invoice_line_ids': [Command.create({
+                'name': 'Test product',
+                'product_id': self.product_a.id,
+                'quantity': 1,
+                'price_unit': 10000.0,
+                'tax_ids': [Command.set(tax_19.ids)],
+            })],
+        })
+        bill.action_post()
+
+        self.assertEqual(bill.l10n_cl_dte_status, 'not_sent')
+        self.assertTrue(bill.display_send_button, 'Send button should be visible on a not_sent vendor bill')
+        self.env['account.move.send.wizard'].with_context(
+            active_model='account.move',
+            active_ids=bill.ids,
+        ).create({'move_id': bill.id})

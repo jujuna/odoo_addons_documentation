@@ -1,7 +1,8 @@
 import { _t } from "@web/core/l10n/translation";
-import { x2ManyCommands } from "@web/core/orm_service";
+import { x2ManyCommands } from "@web/core/orm_plugin";
 import { patch } from "@web/core/utils/patch";
 import { Record } from "@web/model/relational_model/record";
+import { parseServerValue } from "@web/model/relational_model/utils";
 import { markup } from "@odoo/owl";
 
 const notificationTitles = [
@@ -42,7 +43,7 @@ patch(Record.prototype, {
                 this._getChanges(),
             ]);
         } catch (e) {
-            if (e.exceptionName === "odoo.addons.ai_fields.tools.UnresolvedQuery") {
+            if (e.exceptionName === "odoo.addons.ai.utils.ai_fields_tools.UnresolvedQuery") {
                 this.model.notification.add(e.data.message, {
                     autocloseDelay: 7000,
                     title: `🤖 ${getRandomToasterTitle()}`,
@@ -53,14 +54,7 @@ patch(Record.prototype, {
                 throw e;
             }
         }
-        // allows to use the "SET" command
-        if (field.type === "many2many") {
-            await this._update({ [fieldName]: value });
-            return;
-        }
-        await this._update(
-            this._parseServerValues({ [fieldName]: value }, { currentValues: this.data }),
-        );
+        await this._update({ [fieldName]: parseServerValue(field, value) });
     },
 
     async _computeAiProperty(fullName) {
@@ -76,7 +70,7 @@ patch(Record.prototype, {
                 this._getChanges(),
             ]);
         } catch (e) {
-            if (e.exceptionName === "odoo.addons.ai_fields.tools.UnresolvedQuery") {
+            if (e.exceptionName === "odoo.addons.ai.utils.ai_fields_tools.UnresolvedQuery") {
                 this.model.notification.add(e.data.message, {
                     autocloseDelay: 7000,
                     title: `🤖 ${getRandomToasterTitle()}`,

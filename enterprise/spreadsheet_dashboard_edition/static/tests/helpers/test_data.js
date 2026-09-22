@@ -7,6 +7,7 @@ import {
 import {
     SpreadsheetDashboard as SpreadsheetDashboardCommunity,
     SpreadsheetDashboardGroup,
+    SpreadsheetDashboardFavoriteFilters,
 } from "@spreadsheet_dashboard/../tests/helpers/data";
 
 export class SpreadsheetDashboard extends SpreadsheetDashboardCommunity {
@@ -30,7 +31,11 @@ export class SpreadsheetDashboard extends SpreadsheetDashboardCommunity {
 }
 
 export function defineSpreadsheetDashboardEditionModels() {
-    const SpreadsheetDashboardModels = [SpreadsheetDashboard, SpreadsheetDashboardGroup];
+    const SpreadsheetDashboardModels = [
+        SpreadsheetDashboard,
+        SpreadsheetDashboardGroup,
+        SpreadsheetDashboardFavoriteFilters,
+    ];
     Object.assign(SpreadsheetModels, SpreadsheetDashboardModels);
     defineSpreadsheetModels();
 }

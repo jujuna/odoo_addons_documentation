@@ -2,11 +2,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 from odoo import Command, fields
-from odoo.tests import Form, TransactionCase
+from odoo.tests import tagged, Form, TransactionCase, freeze_time
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSalePurchaseStockFlow(TransactionCase):
 
     @classmethod
@@ -25,7 +27,7 @@ class TestSalePurchaseStockFlow(TransactionCase):
         cls.mto_product = cls.env['product.product'].create({
             'name': 'SuperProduct',
             'is_storable': True,
-            'route_ids': [(6, 0, (cls.mto_route + cls.buy_route).ids)],
+            'route_ids': [Command.set([cls.mto_route.id])],
             'seller_ids': [(0, 0, {
                 'partner_id': cls.vendor.id,
             })],
@@ -33,7 +35,7 @@ class TestSalePurchaseStockFlow(TransactionCase):
         cls.mto_product_without_seller = cls.env['product.product'].create({
             'name': 'SuperProduct',
             'is_storable': True,
-            'route_ids': [Command.set((cls.mto_route + cls.buy_route).ids)],
+            'route_ids': [Command.set([cls.buy_route.id])],
         })
         cls.warehouse = cls.env['stock.warehouse'].create({
             'name': 'Other Warehouse',
@@ -88,7 +90,7 @@ class TestSalePurchaseStockFlow(TransactionCase):
             'product_id': sm.product_id.id,
             'quantity': 12,
             'company_id': sm.company_id.id,
-            'product_uom_id': sm.product_uom.id,
+            'uom_id': sm.uom_id.id,
             'picking_id': delivery.id,
         })]
         delivery.button_validate()
@@ -274,12 +276,24 @@ class TestSalePurchaseStockFlow(TransactionCase):
         ])
         so.action_cancel()
         self.assertEqual(delivery.state, 'cancel')
+        po = so.stock_reference_ids.purchase_ids
+        self.assertRecordValues(po, [{'state': 'draft'}])
+        self.assertRegex(po.activity_ids.note, fr"Exception\(s\) occurred on the sale order\(s\)[\s\S]*{so.name}[\s\S]*Manual actions may be needed")
+        # Cancel the associated PO and reset to draft to see if it is properly re-considered
+        po.button_cancel()
+        po.button_draft()
+
+        # Reset the SO to draft and re-confirm
         so.action_draft()
         so.action_confirm()
         new_delivery = so.picking_ids - delivery
         self.assertEqual(len(new_delivery), 1)
         self.assertRecordValues(new_delivery.move_ids, [
             {'product_id': self.mto_product.id, 'product_uom_qty': 2.0},
+        ])
+        self.assertEqual(po, so.stock_reference_ids.purchase_ids)
+        self.assertRecordValues(po.order_line, [
+            {'product_id': self.mto_product.id, 'product_uom_qty': 4.0},
         ])
         with Form(so) as so_form:
             with so_form.order_line.edit(0) as line:
@@ -288,12 +302,15 @@ class TestSalePurchaseStockFlow(TransactionCase):
         self.assertRecordValues(new_delivery.move_ids, [
             {'product_id': self.mto_product.id, 'product_uom_qty': 1.0},
         ])
+        self.assertRecordValues(po.order_line, [
+            {'product_id': self.mto_product.id, 'product_uom_qty': 3.0},
+        ])
 
     def test_two_step_delivery_forecast_after_first_picking(self):
         """ When a product is moved with 2-step delivery, the first of the two pickings associated
         with that delivery (upon completion) should have the actual physical location to which the
         product was delivered as its destination in `report.stock.quantity`: prior, irrespective of
-        the move's state, it would have its location_dest_id and location_final_id coalesced. This
+        the move's state, it would have its location_dest_id and forecasted_location_id coalesced. This
         meant that the location that the StockMove had actually moved product to was not
         necessarily the destination location reflected in the generated report row, which lead to
         an incorrect forecast.
@@ -304,7 +321,7 @@ class TestSalePurchaseStockFlow(TransactionCase):
         in_move = self.env['stock.move'].create({
             'product_id': product.id,
             'product_uom_qty': 2,
-            'product_uom': product.uom_id.id,
+            'uom_id': product.uom_id.id,
             'location_id': self.env.ref('stock.stock_location_suppliers').id,
             'location_dest_id': wh.lot_stock_id.id,
             'picking_type_id': self.env.ref('stock.picking_type_in').id,
@@ -407,12 +424,12 @@ class TestSalePurchaseStockFlow(TransactionCase):
             'uom_id': self.env.ref('uom.product_uom_unit').id,
             'seller_ids': [Command.create({
                 'partner_id': self.vendor.id,
-                'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+                'uom_id': self.env.ref('uom.product_uom_unit').id,
                 'price': 1,
             }),
             Command.create({
                 'partner_id': self.vendor.id,
-                'product_uom_id': self.env.ref('uom.product_uom_pack_6').id,
+                'uom_id': self.env.ref('uom.product_uom_pack_6').id,
                 'min_qty': 2,
                 'price': 5,
             })],
@@ -428,7 +445,7 @@ class TestSalePurchaseStockFlow(TransactionCase):
         })
         so.action_confirm()
         po = so._get_purchase_orders()
-        self.assertEqual(po.order_line.product_uom_id, self.env.ref('uom.product_uom_unit'))
+        self.assertEqual(po.order_line.uom_id, self.env.ref('uom.product_uom_unit'))
         self.assertEqual(po.order_line.product_qty, 10)
         self.assertEqual(po.order_line.price_unit, 1)
         po.button_cancel()
@@ -443,9 +460,42 @@ class TestSalePurchaseStockFlow(TransactionCase):
         })
         so.action_confirm()
         po = so._get_purchase_orders()
-        self.assertEqual(po.order_line.product_uom_id, self.env.ref('uom.product_uom_pack_6'))
+        self.assertEqual(po.order_line.uom_id, self.env.ref('uom.product_uom_pack_6'))
         self.assertEqual(po.order_line.product_qty, 2.5)
         self.assertEqual(po.order_line.price_unit, 5)
+
+    def test_mto_cancel_multi_steps_confirmed_purchase(self):
+        '''
+        In multi step reception, after purchase confirmation, test that when the
+        reception gets cancelled, the delivery (to the client) can be made from
+        stock.
+        '''
+        two_step_wh = self.warehouse
+        three_step_wh = self.env.ref('stock.warehouse0')
+        two_step_wh.reception_steps = 'two_steps'
+        three_step_wh.reception_steps = 'three_steps'
+        sale_orders = self.env['sale.order']
+        for wh in (two_step_wh, three_step_wh):
+            self.env['stock.quant']._update_available_quantity(self.mto_product, wh.lot_stock_id, 10)
+            sale_orders |= self.env['sale.order'].create([{
+                'partner_id': self.customer.id,
+                'order_line': [Command.create({
+                    'product_id': self.mto_product.id,
+                    'product_uom_qty': 1,
+                })],
+                'warehouse_id': wh.id,
+            }])
+        sale_orders.action_confirm()
+        self.assertListEqual(sale_orders.picking_ids.mapped('state'), ['waiting', 'waiting'])
+        self.assertListEqual(sale_orders.picking_ids.move_ids.mapped('procure_method'), ['make_to_order', 'make_to_order'])
+        purchase_orders = sale_orders._get_purchase_orders()
+        purchase_orders.button_confirm()
+        self.assertListEqual(sale_orders.picking_ids.move_ids.move_orig_ids.ids, purchase_orders.picking_ids.move_ids.ids)
+        purchase_orders.picking_ids.action_cancel()
+        self.assertListEqual(sale_orders.picking_ids.mapped('state'), ['confirmed', 'confirmed'])
+        self.assertFalse(sale_orders.picking_ids.move_ids.move_orig_ids)
+        sale_orders.picking_ids.action_assign()
+        self.assertListEqual(sale_orders.picking_ids.move_ids.mapped('quantity'), [1.0, 1.0])
 
     def test_fifo_multiple_simultaneous_purchases_and_sales(self):
         """ Make sure that when validating the receipt of multiple PO at the same time, the move value is
@@ -499,39 +549,112 @@ class TestSalePurchaseStockFlow(TransactionCase):
         deliveries.button_validate()
 
         self.assertRecordValues(deliveries.move_ids, [
-            {'sale_line_id': so1.order_line.id, 'value': 10.0},
-            {'sale_line_id': so2.order_line.id, 'value': 20.0},
+            {'sale_line_id': so1.order_line.id, 'value': -10.0},
+            {'sale_line_id': so2.order_line.id, 'value': -20.0},
         ])
 
-    def test_mto_cancel_multi_steps_confirmed_purchase(self):
-        '''
-        In multi step reception, after purchase confirmation, test that when the
-        reception gets cancelled, the delivery (to the client) can be made from
-        stock.
-        '''
-        two_step_wh = self.warehouse
-        three_step_wh = self.env.ref('stock.warehouse0')
-        two_step_wh.reception_steps = 'two_steps'
-        three_step_wh.reception_steps = 'three_steps'
-        sale_orders = self.env['sale.order']
-        for wh in (two_step_wh, three_step_wh):
-            self.env['stock.quant']._update_available_quantity(self.mto_product, wh.lot_stock_id, 10)
-            sale_orders |= self.env['sale.order'].create([{
+    def test_mto_sale_order_propagates_analytic_distribution_to_purchase_line(self):
+        """Ensure that the analytic distribution defined on a Sale Order line
+        with an MTO + Buy product is propagated to the generated Purchase Order line.
+        """
+        default_plan = self.env['account.analytic.plan'].create({
+            'name': 'Default',
+        })
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': 'Test Analytic Account',
+            'plan_id': default_plan.id,
+        })
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'order_line': [Command.create({
+                'product_id': self.mto_product.id,
+                'product_uom_qty': 1,
+                'analytic_distribution': {str(analytic_account.id): 100},
+            })],
+        })
+        sale_order.action_confirm()
+        purchase_order = sale_order._get_purchase_orders()
+        self.assertEqual(purchase_order.order_line.analytic_distribution, {str(analytic_account.id): 100})
+
+    def test_product_monthly_demand(self):
+        """
+        Test monthly demand is counted once in a multi-step delivery flow.
+        """
+        self.warehouse.delivery_steps = 'pick_pack_ship'
+        with freeze_time(fields.Datetime.now() - relativedelta(days=1)):
+            so = self.env['sale.order'].create({
                 'partner_id': self.customer.id,
+                'warehouse_id': self.warehouse.id,
                 'order_line': [Command.create({
                     'product_id': self.mto_product.id,
-                    'product_uom_qty': 1,
+                    'product_uom_qty': 10,
                 })],
-                'warehouse_id': wh.id,
-            }])
-        sale_orders.action_confirm()
-        self.assertListEqual(sale_orders.picking_ids.mapped('state'), ['waiting', 'waiting'])
-        self.assertListEqual(sale_orders.picking_ids.move_ids.mapped('procure_method'), ['make_to_order', 'make_to_order'])
-        purchase_orders = sale_orders._get_purchase_orders()
-        purchase_orders.button_confirm()
-        self.assertListEqual(sale_orders.picking_ids.move_ids.move_orig_ids.ids, purchase_orders.picking_ids.move_ids.ids)
-        purchase_orders.picking_ids.action_cancel()
-        self.assertListEqual(sale_orders.picking_ids.mapped('state'), ['confirmed', 'confirmed'])
-        self.assertFalse(sale_orders.picking_ids.move_ids.move_orig_ids)
-        sale_orders.picking_ids.action_assign()
-        self.assertListEqual(sale_orders.picking_ids.move_ids.mapped('quantity'), [1.0, 1.0])
+            })
+            so.action_confirm()
+            so.picking_ids[0].move_ids.quantity = 10
+            so.picking_ids[0].button_validate()
+            so.picking_ids[1].move_ids.quantity = 10
+            so.picking_ids[1].button_validate()
+            so.picking_ids[2].move_ids.quantity = 10
+            so.picking_ids[2].button_validate()
+        self.assertEqual(self.mto_product.monthly_demand, 10.0)
+
+    def test_reordering_rule_not_merged_into_so_po(self):
+        """ With group_rfq='default' (On Order), a reordering rule procurement
+        must not merge into a PO that was created for a specific sale order. """
+        self.assertEqual(self.mto_product.seller_ids.partner_id.group_rfq, 'default')
+        so = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'order_line': [Command.create({
+                'product_id': self.mto_product.id,
+                'product_uom_qty': 5,
+                'price_unit': 10,
+            })],
+        })
+        so.action_confirm()
+
+        po_from_so = self.env['purchase.order'].search([('partner_id', '=', self.vendor.id)])
+        self.assertEqual(len(po_from_so), 1, 'One PO should be created from the sale order')
+        self.assertTrue(po_from_so.reference_ids, 'PO from sale order must carry reference_ids')
+
+        # Trigger reordering rule for the same product, no reference involved
+        orderpoint = self.env['stock.warehouse.orderpoint'].create({
+            'product_id': self.mto_product.id,
+            'product_min_qty': 5,
+            'product_max_qty': 10,
+            'trigger': 'manual',
+        })
+        orderpoint.action_replenish()
+        all_pos = self.env['purchase.order'].search([('partner_id', '=', self.vendor.id)])
+        self.assertEqual(len(all_pos), 2, 'Reordering rule must create a separate PO, not merge into the sale order PO')
+        po_from_rr = all_pos - po_from_so
+        self.assertFalse(po_from_rr.reference_ids, 'Reordering rule PO should have no reference_ids')
+
+    def test_mto_po_double_quantity_update(self):
+        """
+        Confirm an SO for an MTO + Buy product. Increase and then decrease the quantity on the PO.
+        The quantity of the receipt should be adapted accodingly.
+        """
+        so = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'order_line': [
+                Command.create({
+                    'name': self.mto_product.name,
+                    'product_id': self.mto_product.id,
+                    'product_uom_qty': 1,
+                    'product_uom_id': self.mto_product.uom_id.id,
+                    'price_unit': 10,
+                }),
+            ],
+        })
+        so.action_confirm()
+        delivery = so.picking_ids
+        self.assertRecordValues(delivery.move_ids, [
+            {'product_id': self.mto_product.id, 'product_uom_qty': 1.0},
+        ])
+        po = so._get_purchase_orders()
+        po.button_confirm()
+        po.order_line.product_qty = 10.0
+        self.assertEqual(po.picking_ids.move_ids.quantity, 10.0)
+        po.order_line.product_qty = 5.0
+        self.assertEqual(po.picking_ids.move_ids.quantity, 5.0)

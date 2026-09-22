@@ -24,7 +24,7 @@ class AccountPaymentRegister(models.TransientModel):
 
         # Create a batche if payment register is created from hr.payslip.run
         if self.env.context.get("hr_payroll_payment_register_batch"):
-            payments = self.env['account.payment'].concat(*[rec['payment'] for rec in to_process])
+            payments = self.env['account.payment'].concat(rec['payment'] for rec in to_process)
             payslip_batch = self.env['hr.payslip.run'].browse(self.env.context.get("hr_payroll_payment_register_batch"))
 
             if not payments:
@@ -38,8 +38,8 @@ class AccountPaymentRegister(models.TransientModel):
                 'name': f"Payroll Payments ({payslip_batch.name})",
                 'l10n_au_is_payroll_payment': True,
             })
-            payment_batch.validate_batch()
             payslip_batch.l10n_au_payment_batch_id = payment_batch
+            payment_batch.validate_batch()
             payslip_batch.message_post(body=_("Batch payment for %(amount)s done at %(batch)s", amount=payment_batch.currency_id.format(
                 abs(payment_batch.amount)), batch=payment_batch._get_html_link()))
             payslip_batch.write({'state': '03_paid'})

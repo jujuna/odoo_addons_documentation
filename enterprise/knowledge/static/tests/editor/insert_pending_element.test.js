@@ -1,7 +1,6 @@
 import { setupEditor } from "@html_editor/../tests/_helpers/editor";
 import { getContent } from "@html_editor/../tests/_helpers/selection";
 import { Editor } from "@html_editor/editor";
-import { MAIN_PLUGINS } from "@html_editor/plugin_sets";
 import { InsertPendingElementPlugin } from "@knowledge/editor/plugins/insert_pending_element_plugin/insert_pending_element_plugin";
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { before, test, expect } from "@odoo/hoot";
@@ -9,7 +8,7 @@ import { patchWithCleanup } from "@web/../tests/web_test_helpers";
 
 function getConfig() {
     return {
-        Plugins: [...MAIN_PLUGINS, InsertPendingElementPlugin],
+        includePlugins: [InsertPendingElementPlugin],
     };
 }
 

@@ -1,15 +1,10 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import json
-
-from datetime import datetime, timedelta
 from werkzeug.urls import url_encode
 
-from odoo import http
 from odoo.addons.appointment.tests.common import AppointmentCommon
 from odoo.addons.mail.tests.common import MailCommon
-from odoo.tests import common, tagged, users
+from odoo.tests import common, tagged
 
 
 @tagged('appointment_ui', 'post_install', '-at_install')
@@ -44,7 +39,7 @@ class AppointmentCrmUITest(AppointmentCommon, MailCommon, common.HttpCase):
         self.assertTrue(phone_question)
         data = {
             "allday": 0,
-            "csrf_token": http.Request.csrf_token(self),
+            "csrf_token": self.csrf_token(),
             "datetime_str": date_str,
             "duration_str": "1.0",
             "name": "12345",
@@ -63,40 +58,3 @@ class AppointmentCrmUITest(AppointmentCommon, MailCommon, common.HttpCase):
         self.assertTrue(lead.partner_id != partner and lead.partner_id.email == partner.email)
         attendee_partners = apt.meeting_ids.attendee_ids.mapped("partner_id")
         self.assertTrue(len(attendee_partners) == 2 and lead.partner_id in attendee_partners)
-
-    @users('apt_manager')
-    def test_route_create_custom_with_context(self):
-        self.authenticate(self.env.user.login, self.env.user.login)
-        now = datetime.now()
-        unique_slots = [{
-            'start': (now + timedelta(hours=1)).replace(microsecond=0).isoformat(' '),
-            'end': (now + timedelta(hours=2)).replace(microsecond=0).isoformat(' '),
-            'allday': False,
-        }, {
-            'start': (now + timedelta(days=2)).replace(microsecond=0).isoformat(' '),
-            'end': (now + timedelta(days=3)).replace(microsecond=0).isoformat(' '),
-            'allday': True,
-        }]
-        lead = self.env['crm.lead'].sudo().create({'name': 'Test Lead'})
-        request = self.url_open(
-            "/appointment/appointment_type/create_custom",
-            data=json.dumps({
-                'params': {
-                    'slots': unique_slots,
-                    'context': {
-                        'default_is_auto_assign': True,
-                        'default_opportunity_id': lead.id,
-                    },
-                }
-            }),
-            headers={"Content-Type": "application/json"},
-        ).json()
-        result = request.get('result', dict())
-        self.assertTrue(result.get('appointment_type_id'), 'The request returns the id of the custom appointment type')
-
-        appointment_type = self.env['appointment.type'].browse(result['appointment_type_id'])
-        # The default_is_auto_assign should be ignored as the field is not whitelisted
-        self.assertFalse(appointment_type.is_auto_assign)
-        # The default_opportunity_id should be propagated as the field is whitelisted
-        appointment_invite = self.env['appointment.invite'].search([('appointment_type_ids', 'in', appointment_type.ids)])
-        self.assertEqual(appointment_invite.opportunity_id, lead)

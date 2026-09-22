@@ -44,7 +44,7 @@ class ResPartner(models.Model):
             return data_list
         for partner in self.filtered('opportunity_count'):
             data_list[partner.id].append(
-                {'iconClass': 'fa-star', 'value': partner.opportunity_count, 'label': _('Opportunities'), 'tagClass': 'o_tag_color_8'}
+                {'icon': 'star', 'iconClass': 'oi-filled', 'value': partner.opportunity_count, 'label': _('Opportunities')}
             )
         return data_list
 
@@ -54,9 +54,8 @@ class ResPartner(models.Model):
             'search_default_filter_won': 1,
             'search_default_filter_ongoing': 1,
             'search_default_filter_lost': 1,
-            'active_test': False,
         }
         # we want the list view first
         action['views'] = sorted(action['views'], key=lambda view: view[1] != 'list')
-        action['domain'] = self._get_contact_opportunities_domain()
+        action['domain'] = [('active', 'in', [True, False])] + self._get_contact_opportunities_domain()
         return action

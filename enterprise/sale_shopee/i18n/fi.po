@@ -3,22 +3,44 @@
 # * sale_shopee
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Saara Hakanen <sahak@odoo.com>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-12-30 13:00+0000\n"
+"POT-Creation-Date: 2026-09-04 18:03+0000\n"
+"PO-Revision-Date: 2026-09-18 02:44+0000\n"
 "Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "sale_shopee/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_shopee
+#: model:ir.module.module,description:base.module_sale_shopee
+msgid ""
+"\n"
+"Import your Shopee orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and shops\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(item_id or model_id in\n"
+"  Shopee)\n"
+"* Support for both Fulfillment by Shopee (FBS), Fulfillment by Merchant "
+"(FBM) and Fulfilled by Cross\n"
+"  Border Seller (Hybrid):\n"
+"* FBS: Importing the completed orders\n"
+"* FBM/Hybrid: Delivery information is fetched from Shopee, track and "
+"synchronize the stock level to\n"
+"  Shopee\n"
+msgstr ""
 
 #. module: sale_shopee
 #: model:mail.template,body_html:sale_shopee.order_sync_failure
@@ -48,26 +70,25 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"                <p>Shopee-tilauksen, jonka viite on <t t-"
-"out=\"ctx.get('shopee_order_ref') or ''\">REF</t>, synkronoinnissa tapahtui "
-"virhe ja sitä ei suoritettu loppuun.</p>\n"
-"                <p>Jollei tilausta peruuteta Shopee:ssa, synkronointia ei "
-"yritetä uudelleen.</p>\n"
-"                <p>Uuden synkronoinnin varaamiseksi tee seuraavat "
-"toimenpiteet:\n"
+"                <p>Shopee-tilauksen synkronointi viitteellä <t t-"
+"out=\"ctx.get('shopee_order_ref') or ''\">REF</t> epäonnistui ja jäi "
+"kesken.</p>\n"
+"                <p>Ellei tilausta peruuteta Lazadassa, muita "
+"synkronointiyrityksiä ei tehdä.</p>\n"
+"                <p>Voit ajoittaa uuden synkronointiyrityksen seuraavasti:\n"
 "                    </p><ol>\n"
-"                        <li>Siirry Ohjelmistokehittäjien työkaluihin.</li>\n"
-"                        <li>Avaa sen Shopee-myymälän lomake, josta tilaus "
+"                        <li>Siirry kehittäjätyökaluihin.</li>\n"
+"                        <li>Avaa Shopee-myymälän lomake, jossa tilaus "
 "tehtiin.</li>\n"
 "                        <li>Navigoi Tilauksen seuranta -välilehteen.</li>\n"
-"                        <li>Aseta päivämäärä kohtaan <em>Viimeisin tilausten "
-"synkronoinnin päivämäärä</em>, joka ei kuitenkaan ole ennen viimeisintä "
-"tilauksen tilapäivitystä.</li>\n"
-"                        <li>Tallenna muutokset ja klikkaa <em>SYNC ORDERS</"
-"em> -painiketta.</li>\n"
+"                        <li>Määritä <em>Viimeinen tilauksen "
+"synkronointipäivä</em> joka on ennen tilauksen viimeisintä tilapäivitystä.</"
+"li>\n"
+"                        <li>Tallenna muutokset ja klikkaa <em>SYNKRONOI "
+"TILAUKSET</em> -painiketta.</li>\n"
 "                    </ol>\n"
 "                \n"
-"                <p>Jos ongelma yhä jatkuu, ota yhteyttä <a href=\"https://"
+"                <p>Jos ongelma jatkuu, ota yhteyttä <a href=\"https://"
 "www.odoo.com/help/\">Odoo-tukipalveluun</a>.</p>\n"
 "            </div>\n"
 "        "
@@ -189,11 +210,11 @@ msgstr ""
 "                }\n"
 "            </style>\n"
 "            <body><div>\n"
-"                <p>Shopee-lähetystarrojen synkronoinnissa tapahtui virhe, "
+"                <p>Shopee-lähetysetikettien synkronoinnissa tapahtui virhe, "
 "eikä sitä suoritettu loppuun.</p>\n"
-"                <p>Ole hyvä ja korjaa ongelma ennen, kuin yrität synkronoida "
-"varastopoiminnat uudelleen manuaalisesti. Muita synkronointeja ei yritetä.</"
-"p>\n"
+"                <p>Ole hyvä ja korjaa ongelma ennen kuin kokeilet uudelleen "
+"varastopoimintojen manuaalista synkronointia, sillä muita synkronointeja ei "
+"yritetä.</p>\n"
 "                <p>Tässä Shopeen lähettämät virhetiedot: </p>\n"
 "                <table class=\"shopee_table\">\n"
 "                    <thead>\n"
@@ -211,7 +232,7 @@ msgstr ""
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
 "                                <t t-else=\"\">Tuntematon virhe tapahtui "
-"Shopee-synkronoinnin aikana.\n"
+"Shopee-synkronisaation aikana.\n"
 "                                    Valitettavasti sinun täytyy tarkistaa "
 "tilauksen tila manuaalisesti nähdäksesi, onko se oikein vai ei.\n"
 "                                    Jos ongelma jatkuu, ota yhteyttä <a "
@@ -321,9 +342,10 @@ msgstr ""
 "            <body><div>\n"
 "                <p>Shopee-myymälän inventaarion synkronoinnissa, jonka viite "
 "on \n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></"
-"b>,\n"
-"                    tapahtui virheitä, eikä sitä suoritettu loppuun.</p>\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></b>"
+",\n"
+"                    tapahtui joitakin virheitä, eikä sitä suoritettu "
+"loppuun.</p>\n"
 "                <p>Tässä Shopeen lähettämät virhetiedot: </p>\n"
 "                <table class=\"shopee_table\">\n"
 "                    <thead>\n"
@@ -335,13 +357,13 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></"
-"th>\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></th>"
+"\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
-"                                <t t-else=\"\">Shopee-synkronoinnin aikana "
-"tapahtui tuntematon virhe.\n"
+"                                <t t-else=\"\">Tuntematon virhe tapahtui "
+"Shopee-synkronisaation aikana.\n"
 "                                    Valitettavasti sinun täytyy tarkistaa "
 "tilauksen tila manuaalisesti nähdäksesi, onko se oikein vai ei.\n"
 "                                    Jos ongelma jatkuu, ota yhteyttä <a "
@@ -386,14 +408,14 @@ msgstr ""
 "palauttamaa expires_in -arvoa."
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
+msgid "Account"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Account Name"
 msgstr "Tilin nimi"
-
-#. module: sale_shopee
-#: model:ir.ui.menu,name:sale_shopee.accounts_menu
-msgid "Accounts"
-msgstr "Tilit"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__active
@@ -473,7 +495,13 @@ msgid "Authorization Remaining Days"
 msgstr "Valtuutuksen jäljellä oleva voimassaoloaika"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Authorize New Shop"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "Authorize Shop"
 msgstr "Valtuuta myymälä"
 
@@ -482,11 +510,6 @@ msgstr "Valtuuta myymälä"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Bundle Deal"
 msgstr "Pakettitarjous"
-
-#. module: sale_shopee
-#: model_terms:ir.ui.view,arch_db:sale_shopee.quick_create_account_form
-msgid "Cancel"
-msgstr "Peruuta"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__cancelled
@@ -533,6 +556,11 @@ msgid "Create Shopee Accounts"
 msgstr "Luo Shopee-tilejä"
 
 #. module: sale_shopee
+#: model:ir.model,name:sale_shopee.model_shopee_shop_create
+msgid "Create Shopee Shop Wizard"
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model,website_form_label:sale_shopee.model_res_partner
 msgid "Create a Customer"
 msgstr "Luo asiakas"
@@ -541,6 +569,7 @@ msgstr "Luo asiakas"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_uid
 msgid "Created by"
 msgstr "Luonut"
 
@@ -548,6 +577,7 @@ msgstr "Luonut"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_date
 msgid "Created on"
 msgstr "Luotu"
 
@@ -578,6 +608,7 @@ msgstr "Oletusmyyjä"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__display_name
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__display_name
 msgid "Display Name"
@@ -683,6 +714,7 @@ msgstr "Täytetty Shopeen toimesta"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__id
 msgid "ID"
@@ -700,8 +732,8 @@ msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
 msgstr ""
-"Jos myyntitilaus on lukittu, et voi enää muuttaa sitä. Voit silti vielä "
-"laskuttaa ja toimittaa tälle myyntitilaukselle."
+"Jos myynti on lukittu, et voi enää muokata sitä. Voit kuitenkin edelleen "
+"laskuttaa tai toimittaa."
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_account__company_ids
@@ -709,10 +741,15 @@ msgid "If this field is empty, all companies will be allowed."
 msgstr "Jos kenttä on tyhjä, kaikki yrityksen sallitaan."
 
 #. module: sale_shopee
+#: model:ir.module.module,summary:base.module_sale_shopee
+msgid "Import Shopee orders and sync deliveries"
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_shop__status__inactive
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_search
 msgid "Inactive"
-msgstr "Passiivinen"
+msgstr "Epäaktiivinen"
 
 #. module: sale_shopee
 #: model:ir.model.constraint,message:sale_shopee.constraint_shopee_item_unique_shopee_item_and_model_identifiers
@@ -749,6 +786,7 @@ msgstr "Viimeisin synkronointipäivä"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_uid
 msgid "Last Updated by"
 msgstr "Viimeksi päivittänyt"
 
@@ -756,6 +794,7 @@ msgstr "Viimeksi päivittänyt"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_date
 msgid "Last Updated on"
 msgstr "Viimeksi päivitetty"
 
@@ -763,6 +802,11 @@ msgstr "Viimeksi päivitetty"
 #: model_terms:ir.ui.view,arch_db:sale_shopee.view_order_form
 msgid "Lock"
 msgstr "Lukitse"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Manage Accounts"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__name
@@ -777,8 +821,19 @@ msgstr "Tilauksen toimitus täytyy järjestää uudelleen Shopeessa"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_list
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_list
 msgid "New"
 msgstr "Uusi"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "New Account"
+msgstr ""
+
+#. module: sale_shopee
+#: model:ir.actions.act_window,name:sale_shopee.shopee_shop_create_wizard_action
+msgid "New Shop"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__not_available
@@ -789,6 +844,12 @@ msgstr "Ei saatavilla"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__order_count
 msgid "Order Count"
 msgstr "Tilausmäärä"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Order Discount"
+msgstr "Tilauksen alennus"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
@@ -831,6 +892,16 @@ msgstr "Tuotteen tarjous"
 #: model:ir.model,name:sale_shopee.model_product_product
 msgid "Product Variant"
 msgstr "Tuotevariantti"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid ""
+"Promotion: %(promotion_type)s - id: %(promotion_id)d\n"
+"Original price: %(price)s"
+msgstr ""
+"Tarjous: %(promotion_type)s - tunnus: %(promotion_id)d\n"
+"Alkuperäinen hinta: %(price)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__ready
@@ -899,6 +970,13 @@ msgid "Save And Authorize"
 msgstr "Tallenna ja vahvista"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid ""
+"Select the Shopee account on which to authorize the new shop, or register "
+"another account."
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__confirmed
 msgid "Shipment Arranged"
 msgstr "Toimitus on järjestetty"
@@ -923,6 +1001,12 @@ msgstr "Toimitettu Shopeen kautta"
 #: code:addons/sale_shopee/models/stock_picking.py:0
 msgid "Shipping Label Not Ready"
 msgstr "Lähetysetiketti ei ole vielä valmis"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Shipping: %(carrier)s"
+msgstr "Toimitus: %(carrier)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__shop_id
@@ -971,14 +1055,9 @@ msgid "Shopee"
 msgstr "Shopee"
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_account.py:0
-msgid "Shopee API Account - %(partner_id)s"
-msgstr "Shopee API-tili – %(partner_id)s"
-
-#. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_shopee_account
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__account_id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__account_id
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shopee Account"
 msgstr "Shopee-tili"
@@ -999,6 +1078,11 @@ msgstr "Shopee-määrän säätö"
 #: model:ir.model.fields,field_description:sale_shopee.field_res_users__shopee_buyer_identifier
 msgid "Shopee Buyer ID"
 msgstr "Shopee-ostajan tunnus"
+
+#. module: sale_shopee
+#: model:ir.module.module,shortdesc:base.module_sale_shopee
+msgid "Shopee Connector"
+msgstr ""
 
 #. module: sale_shopee
 #. odoo-python
@@ -1031,7 +1115,6 @@ msgstr "Shopee-tuotetunnus"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 #: model:ir.actions.act_window,name:sale_shopee.sale_shopee_item_action
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__shopee_item_ids
-#: model:ir.ui.menu,name:sale_shopee.items_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_item_view_list
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Shopee Items"
@@ -1059,6 +1142,11 @@ msgstr "Shopee-tilaus %(order)s osoitteessa mock_shopee_shop"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Shopee Order %(shopee_order_ref)s at %(shop_name)s"
 msgstr "Shopee-tilaus %(shopee_order_ref)s myymälässä %(shop_name)s"
+
+#. module: sale_shopee
+#: model:product.template,name:sale_shopee.default_discount_product_product_template
+msgid "Shopee Order Discount"
+msgstr "Shopee-tilauksen alennus"
 
 #. module: sale_shopee
 #. odoo-python
@@ -1205,6 +1293,7 @@ msgstr "Shopee: synkronoi lähetysetiketit"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_account.py:0
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__shop_ids
+#: model:ir.ui.menu,name:sale_shopee.shops_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shops"
 msgstr "Myymälät"
@@ -1227,7 +1316,7 @@ msgstr "Tallennettu"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Sync Inventory"
-msgstr "Synkronoi varasto"
+msgstr "Synkronoi varastointi"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
@@ -1276,6 +1365,11 @@ msgstr ""
 "API-päätepiste, jota käytetään Shopee API -kutsuihin. Tuotanto- ja "
 "testipäätepisteet. Valitse se päätepiste, joka on maantieteellisesti "
 "lähimpänä kohdemarkkinoitasi."
+
+#. module: sale_shopee
+#: model:ir.model.fields,help:sale_shopee.field_shopee_shop_create__account_id
+msgid "The Shopee account on which the new shop is authorized."
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_sale_order__shopee_shop_id
@@ -1440,22 +1534,6 @@ msgid "You are not allowed to access this page."
 msgstr "Sinulla ei ole pääsyoikeutta tälle sivulle."
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid "[%(sku)s] %(product_name)s"
-msgstr "[%(sku)s] %(product_name)s"
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid ""
-"[%(sku)s] %(product_title)s\n"
-"Promotion: %(promotion_type)s - id: %(promotion_id)d"
-msgstr ""
-"[%(sku)s] %(product_title)s\n"
-"Tarjous: %(promotion_type)s - tunnus: %(promotion_id)d"
-
-#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "e.g. American Market"
 msgstr "esim. Amerikan markkinat"
@@ -1469,7 +1547,7 @@ msgstr "esim. indonesialainen kauppa"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_account.py:0
 msgid "id"
-msgstr "tunniste"
+msgstr "tunnus"
 
 #. module: sale_shopee
 #. odoo-python

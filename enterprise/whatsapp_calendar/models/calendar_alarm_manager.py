@@ -1,4 +1,6 @@
-from odoo import api, models
+from markupsafe import Markup
+
+from odoo import _, api, models
 
 
 class AlarmManager(models.AbstractModel):
@@ -30,5 +32,8 @@ class AlarmManager(models.AbstractModel):
                     'res_model': attendees._name,
                     'wa_template_id': alarm.wa_template_id.id
                 })._send_whatsapp_template(force_send_by_cron=True)
+
+                log_message = _('The %s reminder was sent', Markup('<i>%s</i>') % alarm.name)
+                attendees.event_id._message_log_batch(bodies={event.id: log_message for event in attendees.event_id})
 
             events._setup_event_recurrent_alarms(events_by_alarm)

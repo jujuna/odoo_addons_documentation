@@ -1,14 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from dateutil.relativedelta import relativedelta
-import datetime
 import logging
 
 from odoo import api, fields, models
 
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 from odoo.tools import convert
-from odoo.tools.misc import format_date
+from odoo.tools.misc import clean_context, format_date
 
 _logger = logging.getLogger(__name__)
 
@@ -52,9 +51,10 @@ class HrAppraisal(models.Model):
 
     date_close = fields.Date(
         string='Appraisal Date', help='Closing date of the current appraisal', required=True, index=True,
-        default=lambda self: datetime.date.today() + relativedelta(months=+1))
-    next_appraisal_date = fields.Date(related="employee_id.next_appraisal_date",
-        help='Date where the new appraisal will be automatically created', readonly=False)
+        default=lambda self: fields.Date.context_today(self) + relativedelta(months=+1))
+    next_appraisal_date = fields.Date(
+        string='Next Appraisal Date', help='Date where the new appraisal will be automatically created',
+        compute='_compute_next_appraisal_date', inverse='_inverse_next_appraisal_date', readonly=False)
     state = fields.Selection(
         [('1_new', 'Draft'),
          ('2_pending', 'Ongoing'),
@@ -64,10 +64,16 @@ class HrAppraisal(models.Model):
     manager_ids = fields.Many2many(
         'hr.employee', 'appraisal_manager_rel', 'hr_appraisal_id',
         default=lambda self: self.env.user.employee_id,
+        bypass_search_access=True,
         context={'active_test': False},
-        domain="[('id', '!=', employee_id), ('active', '=', 'True'), '|', ('company_id', '=', False), ('company_id', 'in', allowed_company_ids)]")
+        domain="[('id', '!=', employee_id), ('active', '=', True), '|', ('company_id', '=', False), ('company_id', 'in', allowed_company_ids)]")
     is_manager = fields.Boolean(compute='_compute_user_manager_rights')
-    employee_autocomplete_ids = fields.Many2many('hr.employee', compute='_compute_employee_autocomplete', compute_sudo=True)
+    employee_autocomplete_ids = fields.Many2many(
+        "hr.employee",
+        compute="_compute_employee_autocomplete",
+        compute_sudo=True,
+        bypass_search_access=True,
+    )
     waiting_feedback = fields.Boolean(
         string="Waiting Feedback from Employee/Managers", compute='_compute_waiting_feedback')
     employee_feedback = fields.Html(compute='_compute_employee_feedback', store=True, readonly=False, groups="hr_appraisal.group_hr_appraisal_user")
@@ -76,9 +82,9 @@ class HrAppraisal(models.Model):
     manager_feedback = fields.Html(compute='_compute_manager_feedback', store=True, readonly=False, groups="hr_appraisal.group_hr_appraisal_user")
     accessible_manager_feedback = fields.Html(compute='_compute_accessible_manager_feedback', inverse="_inverse_accessible_manager_feedback")
     show_manager_feedback_full = fields.Boolean(compute='_compute_show_manager_feedback_full')
-    employee_feedback_published = fields.Boolean(string="Employee Feedback Published", default=True, tracking=True,
+    employee_feedback_published = fields.Boolean(string="Employee Feedback Published", default=False, tracking=True,
         help="If greened, the manager will be able to see and edit your feedback. Otherwise, your feedback is blurred and visible only to you.")
-    manager_feedback_published = fields.Boolean(string="Manager Feedback Published", default=True, tracking=True,
+    manager_feedback_published = fields.Boolean(string="Manager Feedback Published", default=False, tracking=True,
         help="If greened, the employee will be able to see your feedback. Otherwise, your feedback is blurred and visible only to you.")
     can_see_employee_publish = fields.Boolean(compute='_compute_buttons_display')
     can_see_manager_publish = fields.Boolean(compute='_compute_buttons_display')
@@ -87,6 +93,93 @@ class HrAppraisal(models.Model):
     appraisal_plan_posted = fields.Boolean()
     appraisal_properties = fields.Properties("Properties", definition="department_id.appraisal_properties_definition", precompute=False)
     duplicate_appraisal_id = fields.Many2one('hr.appraisal', compute='_compute_duplicate_appraisal_id', export_string_translation=False, store=False)
+
+    def _read_manager_only_fields(self):
+        """
+        :return: A set of restricted field names.
+        :rtype: set[str]
+        """
+        return {
+            "assessment_note",
+            "note",
+        }
+
+    def _write_manager_only_fields(self):
+        """
+        :return: A set of restricted field names.
+        :rtype: set[str]
+        """
+        return {
+            "assessment_note",
+            "manager_feedback_published",
+            "note",
+            "state",
+        }
+
+    def _check_create_access(self, vals, manager_only_fieldset):
+        """
+        :param vals: A value dictionary for the newly created record.
+        :type vals: dict
+        :param manager_only_fieldset: A set of restricted field names.
+        :type manager_only_fieldset: set[str]
+        :raises AccessError: If a non-manager creates an appraisal with restricted fields set to non-whitelisted values.
+        """
+        if self.env.su:
+            return
+        if self.is_manager and self.employee_id not in self.env.user.employee_ids:
+            return
+
+        restricted_fields = manager_only_fieldset & set(vals.keys())
+        restricted_fields_defaults = self.with_context(clean_context(self.env.context)).default_get(restricted_fields)
+        for field in restricted_fields:
+            if restricted_fields_defaults.get(field, False) != vals.get(field, False):
+                raise AccessError(
+                    self.env._(
+                        "Unfortunately you don't have access to modify the value of the following field: %(inaccessible_field)s",
+                        inaccessible_field=self._fields[field].get_description(self.env)["string"],
+                    ),
+                )
+
+    def _check_write_access(self, vals):
+        """
+        :param vals: The values dictionary passed to the write method.
+        :type vals: dict
+        :raises AccessError: If a non-manager writes non-whitelisted values to restricted fields.
+        """
+        if self.env.su:
+            return
+
+        # Limit changes to an appraisal after marking it done
+        if any(a.state == "3_done" for a in self) and vals.get('state') != '2_pending':
+            raise AccessError(self.env._("You cannot modify a finished appraisal."))
+
+        # Limit changes to an appraisal depending on who is making the change
+        manager_only_fields = vals.keys() & self._write_manager_only_fields()
+        has_manager_write_access = all(
+            bool(appraisal.is_manager and appraisal.employee_id not in self.env.user.employee_ids) for appraisal in self
+        )
+        if manager_only_fields and not has_manager_write_access:
+            raise AccessError(
+                self.env._(
+                    "Unfortunately you don't have access to modify the value of the following fields: %(inaccessible_fields)s",
+                    inaccessible_fields=", ".join(
+                        self._fields[field].get_description(self.env)["string"] for field in manager_only_fields
+                    ),
+                ),
+            )
+
+    @api.depends('employee_id')
+    def _compute_next_appraisal_date(self):
+        for appraisal in self:
+            emp = appraisal.employee_id.sudo()
+            if emp.next_appraisal_date:
+                appraisal.next_appraisal_date = max(emp.next_appraisal_date, fields.Date.today())
+
+    def _inverse_next_appraisal_date(self):
+        for appraisal in self:
+            emp = appraisal.employee_id.sudo()
+            if appraisal.next_appraisal_date:
+                emp.next_appraisal_date = max(appraisal.next_appraisal_date, fields.Date.today())
 
     @api.depends('employee_id', 'manager_ids')
     def _compute_duplicate_appraisal_id(self):
@@ -134,8 +227,7 @@ class HrAppraisal(models.Model):
         for appraisal in self:
             user_employee_in_appraisal_manager = bool(set(user_employees.ids) & set(appraisal.manager_ids.ids))
             # Appraisal manager can edit feedback in draft state
-            appraisal.can_see_employee_publish = appraisal.employee_id in user_employees or \
-                (user_employee_in_appraisal_manager and appraisal.state == '1_new')
+            appraisal.can_see_employee_publish = appraisal.employee_id in user_employees
             appraisal.can_see_manager_publish = user_employee_in_appraisal_manager
         for appraisal in self - new_appraisals:
             if is_manager and not appraisal.can_see_employee_publish and not appraisal.can_see_manager_publish:
@@ -150,9 +242,10 @@ class HrAppraisal(models.Model):
     @api.depends('manager_ids', 'employee_id', 'employee_id.parent_id')
     def _compute_user_manager_rights(self):
         for appraisal in self:
+            employees = self.env['hr.employee'].search([('id', 'child_of', self.env.user.employee_id.ids)])
             appraisal.is_manager =\
                 self.env.user.has_group('hr_appraisal.group_hr_appraisal_user')\
-                or self.env.user.employee_ids in (appraisal.manager_ids | appraisal.employee_id.parent_id)
+                or bool(appraisal.employee_id.id in employees.ids)
 
     @api.depends_context('uid')
     @api.depends('employee_id', 'employee_feedback_published')
@@ -194,12 +287,33 @@ class HrAppraisal(models.Model):
 
     @api.depends('department_id', 'company_id')
     def _compute_appraisal_template(self):
-        all_department_template_ids = self.env['hr.appraisal.template'].search(
-            [('department_ids', '=', False), ('company_id', 'in', self.company_id.ids + [False])])
+        all_appraisal_template_ids = self.env['hr.appraisal.template'].search(
+            [('company_id', 'in', self.company_id.ids + [False])])
         for appraisal in self:
-            appraisal.appraisal_template_id = appraisal.appraisal_template_id or \
-                appraisal.department_id.appraisal_template_ids[:1] or \
-                all_department_template_ids.filtered(lambda t: t.company_id.id in [appraisal.company_id.id, False])[:1]
+            current_template = appraisal.appraisal_template_id
+            # Also keep a compatible generic template once the appraisal exists,
+            # as it may then be a deliberate choice rather than the initial default.
+            is_selected_generic_template = (
+                appraisal._origin.id
+                and current_template
+                and not current_template.department_ids
+                and current_template.company_id.id in [appraisal.company_id.id, False]
+            )
+            if is_selected_generic_template:
+                appraisal.appraisal_template_id = current_template
+            elif appraisal.employee_id and not appraisal.appraisal_template_id:
+                appraisal.appraisal_template_id = next(
+                    (
+                        template
+                        for template in all_appraisal_template_ids
+                        if template.company_id.id in [appraisal.company_id.id, False]
+                        and (
+                            not template.department_ids
+                            or appraisal.department_id in template.department_ids
+                        )
+                    ),
+                    self.env['hr.appraisal.template'],
+                )
 
     @api.depends('employee_feedback_published', 'manager_feedback_published')
     def _compute_waiting_feedback(self):
@@ -285,7 +399,9 @@ class HrAppraisal(models.Model):
     def create(self, vals_list):
         appraisals = super().create(vals_list)
         appraisals_to_send = self.env['hr.appraisal']
+        manager_only_fieldset = self._write_manager_only_fields()
         for appraisal, vals in zip(appraisals, vals_list):
+            appraisal._check_create_access(vals, manager_only_fieldset)
             if vals.get('state') and vals['state'] == '2_pending':
                 appraisals_to_send |= appraisal
             if vals.get('state') and vals['state'] == '1_new':
@@ -310,7 +426,7 @@ class HrAppraisal(models.Model):
             if appraisal.can_see_employee_publish:
                 appraisal.sudo().employee_feedback = appraisal.accessible_employee_feedback
             else:
-                raise UserError(self.env._('The employee feedback cannot be changed by managers.'))
+                raise AccessError(self.env._('The employee feedback cannot be changed by managers.'))
 
     @api.depends('manager_feedback', 'can_see_manager_publish', 'manager_feedback_published')
     def _compute_accessible_manager_feedback(self):
@@ -325,7 +441,7 @@ class HrAppraisal(models.Model):
             if appraisal.can_see_manager_publish:
                 appraisal.sudo().manager_feedback = appraisal.accessible_manager_feedback
             else:
-                raise UserError(self.env._('The manager feedback cannot be changed by an employee.'))
+                raise AccessError(self.env._('The manager feedback cannot be changed by an employee.'))
 
     def _get_appraisal_template(self, template):
         self.ensure_one()
@@ -348,8 +464,7 @@ class HrAppraisal(models.Model):
         return result
 
     def write(self, vals):
-        if 'manager_feedback_published' in vals and not all(a.can_see_manager_publish for a in self):
-            raise UserError(self.env._('The "Manager Feedback Published" cannot be changed by an employee.'))
+        self._check_write_access(vals)
 
         force_published = self.env['hr.appraisal']
         if vals.get('employee_feedback_published'):
@@ -374,12 +489,13 @@ class HrAppraisal(models.Model):
                 self._appraisal_plan_post()
                 if self.env.user.partner_id.email_formatted:
                     body = self.env._("The appraisal's status has been set to Done by %s", self.env.user.name)
-                    self.message_notify(
-                        body=body,
-                        subject=self.env._("Your Appraisal has been completed"),
-                        partner_ids=appraisal.message_partner_ids.ids,
-                    )
-                    self.message_post(body=body)
+                    for appraisal in self:
+                        appraisal.message_notify(
+                            body=body,
+                            subject=self.env._("Your Appraisal has been completed"),
+                            partner_ids=appraisal.message_partner_ids.ids,
+                        )
+                        appraisal.message_post(body=body)
         result = super().write(vals)
         if force_published:
             for appraisal in force_published:
@@ -411,7 +527,7 @@ class HrAppraisal(models.Model):
                 appraisal.appraisal_plan_posted = True
 
     def _generate_activities(self):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         for appraisal in self:
             employee = appraisal.employee_id
             managers = appraisal.manager_ids
@@ -450,24 +566,27 @@ class HrAppraisal(models.Model):
             raise UserError(self.env._("Oops! You can only delete draft appraisals."))
 
     def read(self, fields=None, load='_classic_read'):
-        fields_set = set(fields) if fields is not None else set()
-        check_feedback = fields_set & {'manager_feedback', 'employee_feedback'}
-        check_notes = fields_set & {'note', 'assessment_note'}
+        fields = fields or []
+        check_feedback = set(fields) & {"manager_feedback", "employee_feedback"}
+        check_notes = set(fields) & self._read_manager_only_fields()
         if check_feedback:
             fields = fields + ['can_see_employee_publish', 'can_see_manager_publish', 'employee_feedback_published', 'manager_feedback_published']
         if check_notes:
             fields = fields + ['employee_id']
         records = super().read(fields, load)
-        if check_notes:
-            for appraisal in records:
-                if appraisal['employee_id'] == self.env.user.employee_id.id:
-                    appraisal['note'] = self.env._('Note')
-                    appraisal['assessment_note'] = False
+        for appraisal in records:
+            employee_id = appraisal.get("employee_id")
+            if isinstance(employee_id, (list, tuple)):
+                # For some reason employee_id is a tuple if this method is called through JSON2
+                employee_id = employee_id[0]
+            if employee_id in self.env.user.employee_ids.ids:
+                for field in appraisal.keys() & self._read_manager_only_fields():
+                    appraisal[field] = False
         return records
 
     def action_calendar_event(self):
         self.ensure_one()
-        partners = self.manager_ids.mapped('related_partner_id') | self.employee_id.related_partner_id | self.env.user.partner_id
+        partners = self.manager_ids.work_contact_id | self.employee_id.work_contact_id | self.env.user.partner_id
         action = self.env["ir.actions.actions"]._for_xml_id("calendar.action_calendar_event")
         action['context'] = {
             'default_partner_ids': partners.ids,
@@ -479,28 +598,66 @@ class HrAppraisal(models.Model):
         action['domain'] = [('partner_ids', 'in', partners.ids)]
         return action
 
+    def _notification(self, title, message, msg_type, next_action):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': title,
+                'message': message,
+                'type': msg_type,
+                'next': next_action,
+            }
+        }
+
     def action_confirm(self):
-        self.state = '2_pending'
+        appraisals_to_confirm = self.filtered(lambda r: r.state == '1_new')
+        appraisals_to_confirm.write({'state': '2_pending'})
+
+        if len(self) == 1:
+            return
+
+        next_action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+
+        if self - appraisals_to_confirm:
+            next_action = self._notification(
+                self.env._('Already Processed'),
+                self.env._(
+                    'Some appraisals were already in another state and were skipped.'
+                ),
+                'warning',
+                next_action,
+            )
+
+        return next_action
 
     def action_done(self):
-        appraisals_with_rating = self.filtered('assessment_note')
-        appraisals_with_rating.state = '3_done'
-        if self - appraisals_with_rating:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': 'Required:',
-                    'message': self.env._('Please set a final rating to validate these appraisals:\n- %s',
-                                    '\n- '.join((self - appraisals_with_rating).mapped('display_name'))),
-                    'type': 'danger',
-                    'sticky': True
-                }
-            }
+        self.state = '3_done'
 
     def action_back(self):
-        self.state = '1_new'
-        self.assessment_note = False
+        appraisals_to_reset = self.filtered(lambda r: r.state == '2_pending')
+
+        if appraisals_to_reset:
+            appraisals_to_reset.write({
+                'state': '1_new',
+                'assessment_note': False,
+            })
+        if len(self) == 1:
+            return
+
+        action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+
+        if self - appraisals_to_reset:
+            action = self._notification(
+                self.env._('Warning'),
+                self.env._(
+                    'Some appraisals were already in another state and were skipped.'
+                ),
+                'warning',
+                action,
+            )
+
+        return action
 
     def action_reopen(self):
         self.state = '2_pending'
@@ -510,13 +667,14 @@ class HrAppraisal(models.Model):
         return {
             'name': self.env._('Previous Appraisals'),
             'res_model': 'hr.appraisal',
-            'view_mode': 'list,kanban,form,gantt,calendar,activity',
-            'views': [(view_id, 'list'), (False, 'kanban'), (False, 'form'), (False, 'gantt'), (False, 'calendar'), (False, 'activity')],
-            'domain': [('employee_id', '=', self.employee_id.ids)],
+            'view_mode': 'kanban,list,form,gantt,calendar,activity',
+            'views': [(False, 'kanban'), (view_id, 'list'), (False, 'form'), (False, 'gantt'), (False, 'calendar'), (False, 'activity')],
+            'domain': [('employee_id', 'in', self.employee_id.ids)],
             'type': 'ir.actions.act_window',
             'target': 'current',
             'context': {
                 'search_default_groupby_date_close': True,
+                'hide_campaign_button': True,
             }
         }
 
@@ -567,8 +725,23 @@ class HrAppraisal(models.Model):
             'target': 'new',
         }
 
-    @api.model
-    def has_demo_data(self):
+    def action_open_feedback_popup(self):
+        self.ensure_one()
+        feedback_type = self.env.context.get('feedback_type', 'employee')
+        view_title = self.env._("Employee's Feedback") if feedback_type == 'employee' else self.env._("Manager's Feedback")
+
+        return {
+            'name': view_title,
+            'type': 'ir.actions.act_window',
+            'res_model': 'hr.appraisal',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'view_id': self.env.ref('hr_appraisal.view_hr_appraisal_feedback_popup').id,
+            'target': 'new',
+            'context': dict(self.env.context),
+        }
+
+    def _has_demo_data(self):
         if not self.env.user.has_group("hr_appraisal.group_hr_appraisal_user"):
             return True
         # This record only exists if the scenario has been already launched
@@ -582,7 +755,7 @@ class HrAppraisal(models.Model):
         ]))
 
     def _load_demo_data(self):
-        if self.has_demo_data():
+        if self._has_demo_data():
             return
         env_sudo = self.sudo().with_context({}).env
         env_sudo['hr.employee']._load_scenario()

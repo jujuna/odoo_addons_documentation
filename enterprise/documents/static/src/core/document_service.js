@@ -1,20 +1,29 @@
-import { AccessRightsUpdateConfirmationDialog } from "@documents/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog";
-import { Document } from "./document_model";
 import { DocumentsManageVersions } from "@documents/components/documents_manage_versions_panel/documents_manage_versions_panel";
-import { EventBus, markup, reactive } from "@odoo/owl";
-import { browser } from "@web/core/browser/browser";
-import { download } from "@web/core/network/download";
+import { DocumentOrganizePopover } from "@documents/core/web/document_organize_popover";
+import { AccessRightsUpdateConfirmationDialog } from "@documents/owl/components/access_update_confirmation_dialog/access_update_confirmation_dialog";
+import { effect, EventBus, markup, proxy, signal } from "@odoo/owl";
+import { location, browser } from "@web/core/browser/browser";
 import { parseSearchQuery, router } from "@web/core/browser/router";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { serializeDate } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
-import { registry } from "@web/core/registry";
+import { download } from "@web/core/network/download";
 import { rpc } from "@web/core/network/rpc";
+import { registry } from "@web/core/registry";
+import { SIZES } from "@web/core/ui/ui_utils";
 import { user } from "@web/core/user";
+import { memoize } from "@web/core/utils/functions";
 import { debounce } from "@web/core/utils/timing";
 import { session } from "@web/session";
 import { formatFloat } from "@web/views/fields/formatters";
-import { memoize } from "@web/core/utils/functions";
+import { Document } from "./document_model";
+
+/**
+ * @typedef {{
+ *  getMenuProps: () => Record<string, any>;
+ *  getTopBarActions: () => Record<string, any>;
+ * }} SelectionActions
+ */
 
 const { DateTime } = luxon;
 
@@ -28,9 +37,10 @@ const getDeletionDelay = memoize((_null, orm) =>
 
 export class DocumentService {
     documentList;
+    /** @type {import("@odoo/owl").Signal<SelectionActions[]>} */
+    selectionActions = signal.Array([]);
 
-    constructor(env, services) {
-        this.env = env;
+    constructor(services) {
         /** @type {import("@mail/core/common/store_service").Store} */
         this.store = services["mail.store"];
         this.orm = services["orm"];
@@ -39,6 +49,8 @@ export class DocumentService {
         this.dialog = services["dialog"];
         this.fileUpload = services["file_upload"];
         this.busService = services["bus_service"];
+        this.ui = services["ui"];
+        this.popover = services["popover"];
         this.logAccess = debounce(this._logAccess, 1000, false);
         this.currentFolderAccessToken = null;
         this.bus = new EventBus();
@@ -49,19 +61,20 @@ export class DocumentService {
         this.multiCompany = false;
         this.hasFolderEditorAccess = false;
         // Init data
-        const urlSearch = parseSearchQuery(browser.location.search);
+        const urlSearch = parseSearchQuery(location.search);
         const { documents_init } = session;
         const openPreview =
             Boolean(urlSearch.documents_init_open_preview) || documents_init?.open_preview;
         const documentId =
             Number(urlSearch.documents_init_document_id) || documents_init?.document_id;
         this.documentIdToRestoreOnce = documentId;
-        const userFolderId = urlSearch.documents_init_user_folder_id;
+        const userFolderId =
+            urlSearch.documents_init_user_folder_id || documents_init?.user_folder_id;
         this._initData = { documentId, userFolderId, openPreview };
         if (userFolderId) {
             browser.localStorage.setItem("searchpanel_documents_document", userFolderId);
         }
-        this.getSelectionActions = null;
+        this.deepSearchItemId = null;
     }
 
     /**
@@ -72,6 +85,27 @@ export class DocumentService {
         const res = this.documentIdToRestoreOnce;
         this.documentIdToRestoreOnce = undefined;
         return res;
+    }
+
+    getSelectionActions() {
+        return this.selectionActions().at(-1) || null;
+    }
+
+    /**
+     * @param {SelectionActions} actions
+     */
+    registerSelectionActions(actions) {
+        this.selectionActions().push(actions);
+    }
+
+    /**
+     * @param {SelectionActions} actions
+     */
+    unregisterSelectionActions(actions) {
+        const index = this.selectionActions().indexOf(actions);
+        if (index >= 0) {
+            this.selectionActions().splice(index, 1);
+        }
     }
 
     async start() {
@@ -92,17 +126,19 @@ export class DocumentService {
             this.userIsInternal ||
             (await this.orm.call("documents.operation", "get_any_editor_destination")).length > 0;
         const initialState =
-            this.userIsInternal && JSON.parse(localStorage.getItem("documentsChatterVisible"));
-        this.rightPanelReactive = reactive(
-            {
-                visible: initialState,
-                focusedRecord: null,
-                previewedDocument: null,
-            },
-            () => {
-                localStorage.setItem("documentsChatterVisible", this.rightPanelReactive.visible);
-            }
-        );
+            this.canShowRightPanel &&
+            this.userIsInternal &&
+            JSON.parse(localStorage.getItem("documentsChatterVisible"));
+        this.state = proxy({
+            focusedRecord: null,
+            previewedDocument: null,
+            rightPanelVisible: initialState,
+            shouldFocusSearchBar: false,
+        });
+        const disposeEffect = effect(() => {
+            localStorage.setItem("documentsChatterVisible", this.state.rightPanelVisible);
+        });
+        registry.category("services").addEventListener("CLEANUP", disposeEffect, { once: true });
     }
 
     /**
@@ -142,7 +178,7 @@ export class DocumentService {
         } else {
             // Document was renamed
             if ("attachment" in data && data.name !== document.name) {
-                document.attachment = this.store.Attachment.insert(data.attachment);
+                document.attachment = this.store["ir.attachment"].insert(data.attachment);
             }
         }
         // return reactive version
@@ -216,20 +252,25 @@ export class DocumentService {
         return folder && typeof folder.id === "number";
     }
 
-    async openDialogRename(documentId) {
+    openDocumentFormDialog({ documentId, context = {} }) {
         return new Promise((resolve) => {
             this.action.doAction(
                 {
-                    name: _t("Rename"),
+                    name: documentId ? _t("Rename") : _t("Add Folder"),
                     type: "ir.actions.act_window",
                     res_model: "documents.document",
                     res_id: documentId,
                     views: [[false, "form"]],
                     target: "new",
                     context: {
-                        active_id: documentId,
+                        ...context,
                         dialog_size: "medium",
-                        form_view_ref: "documents.document_view_form_rename",
+                        ...(documentId
+                            ? {
+                                  active_id: documentId,
+                                  form_view_ref: "documents.document_view_form_rename",
+                              }
+                            : {}),
                     },
                 },
                 {
@@ -238,6 +279,16 @@ export class DocumentService {
                     },
                 }
             );
+        });
+    }
+
+    openDialogCreate(currentFolder) {
+        return this.openDocumentFormDialog({
+            context: {
+                default_type: "folder",
+                default_user_folder_id: currentFolder ? currentFolder.toString() : "MY",
+                ...(currentFolder === "COMPANY" ? { default_access_internal: "edit" } : {}),
+            },
         });
     }
 
@@ -302,6 +353,84 @@ export class DocumentService {
         );
     }
 
+    /**
+     * @param {import("models").Attachment} attachment
+     */
+    canAddAttachmentToDocuments(attachment) {
+        return (
+            attachment instanceof this.store["ir.attachment"] &&
+            this.userIsDocumentUser &&
+            !attachment.composer &&
+            !attachment.uploading
+        );
+    }
+
+    /**
+     * @param {import("models").Attachment} attachment
+     * @returns {Promise<string|null>}
+     */
+    async createDocumentFromAttachment(attachment) {
+        const res = await this.orm.call("ir.attachment", "create_document", [attachment.id]);
+        this.store.insert(res);
+        if (!attachment.linked_document_id) {
+            this.notification.add(_t("Document couldn't be created."), {
+                title: _t("Error"),
+                type: "danger",
+            });
+            return null;
+        }
+        const destination = attachment.linked_document_id.folder_id?.display_name || _t("My Drive");
+        this.notification.add(_t("Document created in %(destination)s!", { destination }), {
+            title: _t("Done"),
+            type: "success",
+        });
+        return destination;
+    }
+
+    /** @param {import("models").Attachment} attachment */
+    async organizeAttachmentDocument(attachment) {
+        const document = attachment.linked_document_id;
+        const destination = document.user_folder_id === "SHARED" ? "MY" : document.user_folder_id;
+        const display_name =
+            destination === "MY"
+                ? _t("My Drive")
+                : destination === "COMPANY"
+                ? _t("Company")
+                : document.folder_id.display_name;
+        await this.openOperationDialog({
+            documents: [document],
+            attachmentId: attachment.id,
+            operation: document.user_can_move ? "move" : "copy",
+            context: {
+                default_destination: destination,
+                default_display_name: display_name,
+            },
+            onClose: () => this.reload(),
+        });
+    }
+
+    /**
+     * If mixin-inheriting AND no document -> create mixin-inheriting document
+     * If not mixin-inheriting AND no document -> create document in My Drive
+     * If mixin-inheriting AND document exists -> move mixin-inheriting document (organize)
+     * If not mixin-inheriting AND document exists -> move document (organize)
+     * @param {import("models").Attachment} attachment
+     * @param {Event?} ev
+     */
+    async onClickAddAttachmentToDocuments(attachment, ev) {
+        if (attachment.linked_document_id) {
+            return this.organizeAttachmentDocument(attachment);
+        }
+        const destination = await this.createDocumentFromAttachment(attachment);
+        if (ev && destination) {
+            this.popover.add(ev.target, DocumentOrganizePopover, {
+                attachment,
+                destination,
+                onOrganizeClick: () => this.organizeAttachmentDocument(attachment),
+            });
+        }
+    }
+
     async moveToTrash(documentIds) {
         const deletionDelay = await getDeletionDelay(null, this.orm);
         const confirmed = await new Promise((resolve) => {
@@ -312,7 +441,6 @@ export class DocumentService {
                     { deletion_delay: deletionDelay }
                 ),
                 confirmLabel: _t("Move to trash"),
-                cancelLabel: _t("Discard"),
                 confirm: async () => resolve(true),
                 cancel: () => resolve(false),
             };
@@ -415,10 +543,11 @@ export class DocumentService {
         });
     }
 
-    async toggleFavorite(document) {
-        await this.orm.write("documents.document", [document.id], {
-            is_favorited: !document.is_favorited,
-        });
+    async toggleFavorites(documentIds, reload = true) {
+        await this.orm.call("documents.document", "toggle_favorited", [documentIds]);
+        if (reload) {
+            this.reload();
+        }
     }
 
     get initData() {
@@ -457,7 +586,7 @@ export class DocumentService {
                 forceInspected ||
                 record.selected ||
                 record.isContainer ||
-                this.rightPanelReactive.previewedDocument?.record.id === record.id
+                this.state.previewedDocument?.record.id === record.id
             ) {
                 accessToken = record.data.access_token;
             }
@@ -511,7 +640,7 @@ export class DocumentService {
     }
 
     get focusedRecord() {
-        return this.rightPanelReactive.focusedRecord;
+        return this.state.focusedRecord;
     }
 
     /**
@@ -522,7 +651,7 @@ export class DocumentService {
      */
     focusRecord(record, forceSelected) {
         if (this.focusedRecord !== record) {
-            this.rightPanelReactive.focusedRecord = record;
+            this.state.focusedRecord = record;
             this.updateDocumentURL(null, record ? [record] : null, forceSelected);
             if (record) {
                 this.logAccess(record.data.access_token);
@@ -530,30 +659,27 @@ export class DocumentService {
         }
     }
 
-    toggleRightPanelVisibility() {
-        this.rightPanelReactive.visible = !this.rightPanelReactive.visible;
+    get canShowRightPanel() {
+        return this.ui.size >= SIZES.LG;
+    }
 
-        if (this.rightPanelReactive.visible) {
+    toggleRightPanelVisibility() {
+        if (!this.canShowRightPanel) {
+            return;
+        }
+        this.state.rightPanelVisible = !this.state.rightPanelVisible;
+
+        if (this.state.rightPanelVisible) {
             this.observer = new MutationObserver(() => {
                 const chatterContainer = document.querySelector(".o-mail-Thread");
-                if (chatterContainer && this.env.isSmall) {
+                if (chatterContainer && this.ui.isSmall) {
                     chatterContainer.scrollIntoView({ behavior: "smooth" });
                     this.observer.disconnect();
                     return;
                 }
                 const view = this.action.currentController?.props.type;
-                if (chatterContainer && ["kanban", "list"].includes(view)) {
-                    const selectedRecordClass =
-                        view === "kanban"
-                            ? ".o_kanban_record.o_record_selected"
-                            : ".o_data_row.o_data_row_selected";
-                    const selectedRecords = document.querySelectorAll(selectedRecordClass);
-                    if (selectedRecords?.length > 0) {
-                        selectedRecords[0].scrollIntoView({
-                            behavior: "instant",
-                            block: view === "kanban" ? "start" : "center",
-                        });
-                    }
+                if (chatterContainer && view === "kanban") {
+                    this.scrollToFirstSelectedRecord(".o_kanban_record.o_record_selected");
                     this.observer.disconnect();
                 }
             });
@@ -567,11 +693,26 @@ export class DocumentService {
     }
 
     /**
+     * Scroll to the first selected record in the documents view.
+     * @param {string} selectedRecordSelector CSS selector of the selected record.
+     * @param {string} [block] Scroll alignment option
+     */
+    scrollToFirstSelectedRecord(selectedRecordSelector, block = "start") {
+        const firstSelectedRecord = document.querySelector(selectedRecordSelector);
+        if (firstSelectedRecord) {
+            firstSelectedRecord.scrollIntoView({
+                behavior: "instant",
+                block,
+            });
+        }
+    }
+
+    /**
      * Set the previewed document and send an event to notify the change.
      */
     setPreviewedDocument(document) {
-        this.rightPanelReactive.previewedDocument = document;
-        if (document) {
+        this.state.previewedDocument = document;
+        if (document && !this.documentList?.isSecondary) {
             this.focusRecord(document.record);
         }
     }
@@ -601,8 +742,10 @@ export class DocumentService {
                                 JSON.stringify(context.allowed_company_ids)
                             );
                         }
-                        if (context.document_id) {
-                            formData.append("document_id", context.document_id);
+                        for (const key of ["document_id", "active_model"]) {
+                            if (context[key]) {
+                                formData.append(key, context[key]);
+                            }
                         }
                     }
                 },
@@ -629,9 +772,11 @@ export const documentService = {
         "mail.store",
         "notification",
         "orm",
+        "popover",
+        "ui",
     ],
-    async start(env, services) {
-        const service = new DocumentService(env, services);
+    async start(_, services) {
+        const service = new DocumentService(services);
         await service.start();
         return service;
     },

@@ -26,7 +26,7 @@ registry.category("web_tour.tours").add("test_web_studio.test_disable_approvals_
             trigger: ".o_web_studio_sidebar_approval .o_studio_sidebar_approval_rule",
         },
         {
-            trigger: ".o_web_studio_sidebar_approval button i.oi-view-kanban",
+            trigger: ".o_web_studio_sidebar_approval button i[data-icon='oi_view-kanban']",
             run: "click",
         },
         {

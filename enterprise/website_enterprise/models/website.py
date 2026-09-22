@@ -8,4 +8,4 @@ class Website(models.Model):
 
     @api.model
     def is_website_generator_available(self):
-        return self.env['ir.config_parameter'].sudo().get_param('website_generator.enable', False)
+        return self.env['ir.config_parameter'].sudo().get_bool('website_generator.enable')

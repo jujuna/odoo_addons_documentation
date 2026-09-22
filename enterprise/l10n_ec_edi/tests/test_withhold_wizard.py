@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from datetime import datetime, UTC
 
 from freezegun import freeze_time
+
 from odoo import Command
 from odoo.exceptions import ValidationError
 from odoo.tests import tagged, Form
-from pytz import timezone
-from datetime import datetime
 
 from .common import TestEcEdiCommon
 
@@ -15,6 +15,8 @@ from .common import TestEcEdiCommon
 class TestEcEdiWithholdWizard(TestEcEdiCommon):
 
     # ===== TEST METHODS =====
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_out_withhold_basic_computes(self):
         wizard, out_invoice = self.get_wizard_and_invoice()
@@ -354,7 +356,7 @@ class TestEcEdiWithholdWizard(TestEcEdiCommon):
         - tax supports of wizard are a subset of the invoice's tax supports
         - Edit the withholding amount manually.
         """
-        self.frozen_today = datetime(year=2024, month=4, day=24, hour=0, minute=0, second=0, tzinfo=timezone('utc'))
+        self.frozen_today = datetime(year=2024, month=4, day=24, hour=0, minute=0, second=0, tzinfo=UTC)
         # Create bill and withhold wizard
         wizard, purchase_invoice = self.get_wizard_and_invoice(invoice_args={
             'partner_id': self.partner_b.id,

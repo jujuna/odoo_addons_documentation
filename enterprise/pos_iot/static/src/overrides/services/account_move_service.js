@@ -1,26 +1,28 @@
 import { patch } from "@web/core/utils/patch";
 import { accountMoveService, AccountMoveService } from "@account/services/account_move_service";
-import { getSelectedPrintersForReport } from "@iot/iot_report_action";
 import { uuidv4 } from "@point_of_sale/utils";
 
 patch(AccountMoveService.prototype, {
     setup(env, services) {
         super.setup(...arguments);
         this.iotHttp = services.iot_http;
+        this.printersCache = services.report_printers_cache;
     },
 
     async downloadPdf(accountMoveId) {
         const [invoiceReport] = await this.orm.searchRead(
             "ir.actions.report",
             [["report_name", "=", "account.report_invoice_with_payments"]],
-            ["id", "device_ids"]
+            ["id", "printer_ids"]
         );
-        if (!invoiceReport?.device_ids?.length) {
+        if (!invoiceReport?.printer_ids?.filter((p) => p.type === "iot").length) {
             return super.downloadPdf(...arguments);
         }
 
-        const selectedPrinters = await getSelectedPrintersForReport(invoiceReport.id, this.env);
-        if (!selectedPrinters) {
+        const printerSettings = await this.printersCache.getPrinterSettingsForReport(
+            invoiceReport.id
+        );
+        if (!printerSettings?.selectedPrinters) {
             return super.downloadPdf(...arguments);
         }
 
@@ -35,13 +37,10 @@ patch(AccountMoveService.prototype, {
         );
         const base64String = btoa(pdfByteString);
 
-        const printerDevices = await this.orm.read("iot.device", selectedPrinters, [
-            "iot_id",
-            "identifier",
-        ]);
-        for (const printerDevice of printerDevices) {
+        for (const printerDevice of printerSettings.selectedPrinters) {
             await this.iotHttp.action(printerDevice.iot_id, printerDevice.identifier, {
                 document: base64String,
+                duplex: printerSettings.duplex,
                 print_id: uuidv4(),
             });
         }
@@ -49,5 +48,5 @@ patch(AccountMoveService.prototype, {
 });
 
 patch(accountMoveService, {
-    dependencies: [...accountMoveService.dependencies, "iot_http"],
+    dependencies: [...accountMoveService.dependencies, "report_printers_cache", "iot_http"],
 });

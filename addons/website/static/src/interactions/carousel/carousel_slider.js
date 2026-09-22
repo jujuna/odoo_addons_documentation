@@ -1,7 +1,11 @@
+import { usePlugin } from "@odoo/owl";
 import { Interaction } from "@web/public/interaction";
-import { getActiveHotkey } from "@web/core/hotkeys/hotkey_service";
+import { browser } from "@web/core/browser/browser";
+import { getActiveHotkey } from "@web/core/hotkeys/hotkey_utils";
+import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { onceAllImagesLoaded } from "@website/utils/images";
+import { BootstrapInstance } from "@web/core/utils/bootstrap_plugin";
 
 export class CarouselSlider extends Interaction {
     static selector = ".carousel";
@@ -9,6 +13,20 @@ export class CarouselSlider extends Interaction {
         _root: {
             "t-on-slide.bs.carousel": this.onSlideCarousel,
             "t-on-slid.bs.carousel": this.onSlidCarousel,
+            "t-on-focusin": () => window.Carousel.getInstance(this.el)?.pause(),
+            "t-on-focusout": this.resumeCarouselCycling,
+            "t-on-keydown": (ev) => {
+                const hotkey = getActiveHotkey(ev);
+                if (/input|textarea/i.test(ev.target.tagName)) {
+                    return;
+                }
+                if (["home", "end"].includes(hotkey)) {
+                    const childToFocus = hotkey === "home" ? ":first-child" : ":last-child";
+                    ev.preventDefault();
+                    this.el.querySelector(`.carousel-indicators > ${childToFocus}`).click();
+                }
+            },
+            "t-att-data-bs-ride": this.handleBsRide,
         },
         img: {
             "t-on-load": this.computeMaxHeight,
@@ -20,6 +38,7 @@ export class CarouselSlider extends Interaction {
             "t-att-style": () => ({
                 "min-height": this.maxHeight ? `${this.maxHeight}px` : "",
             }),
+            "t-att-role": () => (this.areIndicatorsVisible ? "tabpanel" : "group"),
         },
         ".slide-link": { "t-att-class": () => ({ "d-none": !this.showClickableSlideLinks }) },
         ".carousel-indicators button, .carousel-indicators li": {
@@ -34,34 +53,61 @@ export class CarouselSlider extends Interaction {
                     this.prefetchImages([toLoadEl]);
                 }
             },
+            "t-att-tabindex": (el) => (el.classList.contains("active") ? undefined : "-1"),
+        },
+        ".o_carousel_pause": {
+            "t-on-click": this.onPauseBtnClick,
+            "t-att-title": () => (this.isPausedByUser ? _t("Play slides") : _t("Pause slides")),
+        },
+        ".o_carousel_pause_icon": {
+            "t-att-data-icon": () => (this.isPausedByUser ? "play_arrow" : "pause"),
+        },
+        ".o_carousel_pause .visually-hidden": {
+            "t-out": () => (this.isPausedByUser ? _t("Play slides") : _t("Pause slides")),
         },
     };
     carouselOptions = undefined;
     showClickableSlideLinks = true;
 
     setup() {
+        this.bootstrap = usePlugin(BootstrapInstance);
         this.maxHeight = undefined;
         this.carouselInnerEl = this.el.querySelector(".carousel-inner");
         if (this.carouselInnerEl) {
             this.carouselItemEls = [...this.carouselInnerEl.querySelectorAll(".carousel-item")];
         }
+        const carouselIndicatorsEl = this.el.querySelector(".carousel-indicators");
+        this.areIndicatorsVisible =
+            carouselIndicatorsEl &&
+            getComputedStyle(this.el.querySelector(".carousel-indicators")).display !== "none";
+        this.carouselIndicatorEls = this.el.querySelectorAll(
+            ".carousel-indicators > :is(button, li)"
+        );
 
         this.hasInterval = ![undefined, "false", "0"].includes(this.el.dataset.bsInterval);
         if (!["true", "carousel", "false"].includes(this.el.dataset.bsRide)) {
             this.el.dataset.bsRide = this.hasInterval ? "carousel" : "false";
         }
         if (this.el.dataset.bsRide === "false") {
-            window.Carousel.getOrCreateInstance(this.el, { ride: false, pause: true });
+            this.bootstrap.getOrCreateInstance(window.Carousel, this.el, {
+                ride: false,
+                pause: true,
+            });
         } else if (!this.hasInterval) {
-            this.el.dataset.bsInterval = "1000";
+            this.el.dataset.bsInterval = "5000";
         }
+
+        this.isPausedByUser = this.el.dataset.bsRide === "false";
     }
 
     start() {
         this.computeMaxHeight();
         this.updateContent();
-        const carouselBS = window.Carousel.getOrCreateInstance(this.el, this.carouselOptions);
-        this.registerCleanup(() => carouselBS.dispose());
+        // Not cached on `this`: another owner of the same element (e.g.
+        // CarouselBootstrapUpgradeFix) may force-recreate the instance later,
+        // which would leave a cached reference stale. Always re-fetch it
+        // fresh from `this.bootstrap` right before use instead.
+        this.bootstrap.getOrCreateInstance(window.Carousel, this.el, this.carouselOptions);
 
         const itemWidth = getComputedStyle(this.el).getPropertyValue(
             "--o-carousel-item-width-percentage"
@@ -93,7 +139,10 @@ export class CarouselSlider extends Interaction {
         for (const itemEl of this.el.querySelectorAll(".carousel-item")) {
             const isActive = itemEl.classList.contains("active");
             itemEl.classList.add("active");
-            const height = itemEl.getBoundingClientRect().height;
+            // We must use "offsetHeight" instead of "getBoundingClientRect()"
+            // otherwise it is not correct in the snippet dialog because of
+            // the "transform: scale" on "o_snippets_preview_row" elements.
+            const height = itemEl.offsetHeight;
             if (height > this.maxHeight || this.maxHeight === undefined) {
                 this.maxHeight = height;
             }
@@ -114,13 +163,33 @@ export class CarouselSlider extends Interaction {
             // If images are loading, prevent the slide transition. It will
             // slide once the next images are loaded.
             ev.preventDefault();
-            onceAllImagesLoaded(this.carouselInnerEl).then(() => {
-                window.Carousel.getOrCreateInstance(this.el).to(ev.to);
+            this.waitFor(onceAllImagesLoaded(this.carouselInnerEl)).then(() => {
+                this.bootstrap
+                    .getOrCreateInstance(window.Carousel, this.el, this.carouselOptions)
+                    .to(ev.to);
             });
             return;
         }
         if (this.options.scrollMode === "single") {
             this.onSlideSingleScroll(ev);
+        }
+        this.focusNextIndicator(ev.to);
+    }
+
+    /**
+     * @param {number} nextItemIndex
+     */
+    focusNextIndicator(nextItemIndex) {
+        const nextActiveIndicatorEl = this.carouselIndicatorEls.item(nextItemIndex);
+        // If before the slide, the focused element was another indicator, move
+        // the focus to the newly active indicator.
+        if (
+            this.el.contains(document.activeElement) &&
+            document.activeElement.matches(
+                `.carousel-indicators > :is(button, li):not([data-bs-slide-to="${nextItemIndex}"])`
+            )
+        ) {
+            nextActiveIndicatorEl.focus();
         }
     }
 
@@ -131,6 +200,18 @@ export class CarouselSlider extends Interaction {
      * @param {Event} ev The Bootstrap Carousel slid event.
      */
     onSlidCarousel(ev) {
+        if (this.el.querySelector(".carousel-indicators button")) {
+            // For indicators, aria-selected with role=tab is a better default
+            // than Bootstrap's aria-current.
+            this.el
+                .querySelector(".carousel-indicators button[aria-selected='true']")
+                .setAttribute("aria-selected", "false");
+            const activeIndicatorEl = this.el.querySelector(".carousel-indicators button.active");
+            // Somehow `activeIndicatorEl` is sometimes null in edit mode.
+            activeIndicatorEl?.setAttribute("aria-selected", "true");
+            activeIndicatorEl?.removeAttribute("aria-current");
+        }
+
         if (this.options.scrollMode === "single") {
             this.onSlidSingleScroll(ev);
         }
@@ -146,7 +227,9 @@ export class CarouselSlider extends Interaction {
     onSlideSingleScroll(ev) {
         // We need to keep the active element at the beginning of the carousel-items elements
         // This allows to have a smooth transition when the carousel is sliding
-        if (ev.direction === "right") {
+        const isRTL = !!ev.currentTarget.closest(".o_rtl, [dir='rtl']");
+        const targetDirection = isRTL ? "left" : "right";
+        if (ev.direction === targetDirection) {
             const carouselItemsEls = Array.from(
                 this.carouselInnerEl.querySelectorAll(".carousel-item")
             );
@@ -165,10 +248,63 @@ export class CarouselSlider extends Interaction {
         // element at the beginning of the carousel-items list in the DOM. So
         // when animation is done, we move the first item (which is not active
         // anymore) to the end.
-        if (ev.direction === "left") {
+        const isRTL = !!ev.currentTarget.closest(".o_rtl, [dir='rtl']");
+        const targetDirection = isRTL ? "right" : "left";
+        if (ev.direction === targetDirection) {
             const carouselItemsEls = this.carouselInnerEl.querySelectorAll(".carousel-item");
             this.carouselInnerEl.appendChild(carouselItemsEls[0]);
         }
+    }
+
+    onPauseBtnClick() {
+        this.bootstrap.disposeBootstrapInstance(window.Carousel.getInstance(this.el), {
+            force: true,
+        });
+        if (!this.isPausedByUser) {
+            this.bootstrap.getOrCreateInstance(window.Carousel, this.el, {
+                pause: true,
+                ride: false,
+            });
+        } else {
+            this.bootstrap
+                .getOrCreateInstance(window.Carousel, this.el, this.carouselOptions)
+                .cycle();
+        }
+        this.isPausedByUser = !this.isPausedByUser;
+    }
+
+    /**
+     * If the carousel should auto-slide and it has been paused, resume it.
+     */
+    resumeCarouselCycling() {
+        if (!this.isPausedByUser && ["true", "carousel"].includes(this.el.dataset.bsRide)) {
+            this.bootstrap
+                .getOrCreateInstance(window.Carousel, this.el, this.carouselOptions)
+                .cycle();
+        }
+    }
+
+    /**
+     * Alters `data-bs-ride` if the user prefers reduced motion.
+     *
+     * @returns {'false'|Symbol} - "false" if prefers reduced motion, initial
+     * value otherwise
+     */
+    handleBsRide() {
+        if (browser.matchMedia(`(prefers-reduced-motion: reduce)`).matches) {
+            // Only recreate the Bootstrap carousel the 1st time.
+            if (this.el.dataset.bsRide !== "false") {
+                this.bootstrap.disposeBootstrapInstance(window.Carousel.getInstance(this.el), {
+                    force: true,
+                });
+                this.bootstrap.getOrCreateInstance(window.Carousel, this.el, {
+                    ride: false,
+                    pause: true,
+                });
+            }
+            return "false";
+        }
+        return Interaction.INITIAL_VALUE;
     }
 
     /**

@@ -5,7 +5,7 @@ from odoo import api, fields, models
 class L10n_ClCompanyActivities(models.Model):
     _name = 'l10n_cl.company.activities'
     _description = 'SII Company Economical Activities'
-    _rec_names_search = ['name', 'code']
+    _rec_names_search = ('name', 'code')
 
     code = fields.Char('Activity Code', required=True)
     name = fields.Char('Complete Name', required=True)

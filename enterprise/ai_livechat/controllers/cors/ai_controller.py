@@ -1,23 +1,51 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.http import route
-from odoo.addons.ai.controllers.main import AIController
-from odoo.addons.im_livechat.tools.misc import force_guest_env
+from odoo.addons.ai_livechat.controllers.ai_livechat_thread import AILivechatThreadController
 
 
-class CorsLivechatController(AIController):
+class CorsLivechatController(AILivechatThreadController):
 
-    @route(["/ai/cors/generate_response"], type="jsonrpc", auth="public", cors="*")
-    def cors_generate_response(self, guest_token, mail_message_id, channel_id):
-        force_guest_env(guest_token)
-        self.generate_response(mail_message_id, channel_id)
+    @route(
+        "/ai/cors/start_session_advance",
+        type="jsonrpc",
+        methods=["POST"],
+        auth="force_guest",
+        save_session=False,
+        cors="*",
+    )
+    def cors_start_session_advance(
+        self, guest_token, channel_id, mail_message_id,
+        current_view_info=None, ai_session_config=None, ai_session_identifier=None, debug=False,
+    ):
+        return self.start_session_advance(
+            channel_id,
+            mail_message_id,
+            current_view_info=current_view_info,
+            ai_session_config=ai_session_config,
+            ai_session_identifier=ai_session_identifier,
+            debug=debug,
+        )
 
-    @route(["/ai/cors/post_error_message"], type="jsonrpc", auth="public", cors="*")
-    def cors_post_error_message(self, guest_token, error_message, channel_id):
-        force_guest_env(guest_token)
-        self.post_error_message(error_message, channel_id)
-
-    @route("/ai/cors/close_ai_chat", type="jsonrpc", auth="public", cors="*")
-    def cors_close_ai_chat(self, guest_token, channel_id):
-        force_guest_env(guest_token)
-        self.close_ai_chat(channel_id)
+    @route(
+        "/ai/cors/resume_pending_interaction",
+        type="jsonrpc",
+        methods=["POST"],
+        auth="force_guest",
+        save_session=False,
+        cors="*",
+    )
+    def cors_resume_pending_interaction(
+        self, guest_token, channel_id, session_id, resume_token,
+        response, current_view_info=None, ai_session_config=None, ai_session_identifier=None, debug=False,
+    ):
+        return self.resume_pending_interaction(
+            channel_id,
+            session_id,
+            resume_token,
+            response=response,
+            current_view_info=current_view_info,
+            ai_session_config=ai_session_config,
+            ai_session_identifier=ai_session_identifier,
+            debug=debug,
+        )

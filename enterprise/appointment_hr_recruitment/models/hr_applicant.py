@@ -5,7 +5,7 @@ import uuid
 from odoo import api, fields, models
 from odoo.http import request
 
-from odoo.addons.appointment.controllers.calendar_view import AppointmentCalendarView
+from odoo.addons.appointment_hr_recruitment.controllers.calendar_view import AppointmentHrRecruitmentCalendarView
 
 
 class Applicant(models.Model):
@@ -28,7 +28,24 @@ class Applicant(models.Model):
         if not request:
             return ''
 
-        return AppointmentCalendarView._appointment_type_search_create_anytime(
-            context={**self.env.context, 'applicant_code': self.interview_invite_code},
-            user=self.user_id,
+        # Skip during installation to avoid registry mismatch between request.env and the new registry
+        if self.env.context.get('install_mode'):
+            return ''
+
+        return AppointmentHrRecruitmentCalendarView._appointment_type_search_create_anytime(
+            user=self.recruiter_id.user_id,
+            applicant_code=self.interview_invite_code
         )['invite_url']
+
+    def write(self, vals):
+        res = super().write(vals)
+        stage_id = vals.get('stage_id', False)
+        stage = self.env['hr.recruitment.stage'].browse(stage_id) if stage_id else self.env['hr.recruitment.stage']
+        if vals.get('active') is False or (stage and stage.hired_stage):
+            meetings_to_archive = self.env['calendar.event'].search([
+                ('applicant_id', 'in', self.ids),
+                ('start', '>=', fields.Datetime.now()),
+                ('active', '=', True)
+            ])
+            meetings_to_archive.action_archive()
+        return res

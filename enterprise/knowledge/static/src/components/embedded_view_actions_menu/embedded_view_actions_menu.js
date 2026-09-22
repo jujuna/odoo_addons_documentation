@@ -6,7 +6,6 @@ import { Component } from "@odoo/owl";
 const cogMenuRegistry = registry.category("cogMenu");
 
 export class EmbeddedViewActionsMenu extends Component {
-    static props = {};
     static template = "knowledge.EmbeddedViewActionsMenu";
     static components = { Dropdown, DropdownItem };
 

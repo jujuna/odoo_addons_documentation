@@ -11,11 +11,11 @@
             <page name="groups" position="after">
                 <page name="ai" string="AI" invisible="ttype in ('binary', 'one2many', 'reference')">
                     <group>
-                        <field name="ai" readonly="state == 'base'"/>
+                        <field name="ai" readonly="not supports_ai"/>
                         <field name="model" invisible="1"/> <!-- Used by the `ai_prompt` widget -->
                         <field name="system_prompt"
                             invisible="not ai"
-                            readonly="state == 'base'"
+                            placeholder="Describe how to compute this field, or type '/' for commands..."
                             widget="ai_prompt"
                             options="{
                                 'model_reference_field': 'model',
@@ -35,11 +35,11 @@
             <page name="groups" position="after">
                 <page name="ai" string="AI" invisible="ttype in ('binary', 'one2many', 'reference')">
                     <group>
-                        <field name="ai" readonly="state == 'base'"/>
+                        <field name="ai" readonly="not supports_ai"/>
                         <field name="model" invisible="1"/> <!-- Used by the `ai_prompt` widget -->
                         <field name="system_prompt"
                             invisible="not ai"
-                            readonly="state == 'base'"
+                            placeholder="Describe how to compute this field, or type '/' for commands..."
                             widget="ai_prompt"
                             options="{
                                 'model_reference_field': 'model',

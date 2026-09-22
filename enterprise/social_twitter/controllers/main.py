@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import json
 
 import logging
@@ -11,6 +9,7 @@ from odoo import http, _
 from odoo.addons.social.controllers.main import SocialController, SocialValidationException
 from odoo.exceptions import UserError
 from odoo.http import request
+from odoo.tools import BinaryBytes
 from odoo.tools.urls import urljoin as url_join
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -36,7 +35,7 @@ class SocialTwitterController(SocialController):
                                       {'error_message': _('X did not provide a valid access token.')})
 
             if iap_twitter_consumer_key:
-                request.env['ir.config_parameter'].sudo().set_param('social.twitter_consumer_key', iap_twitter_consumer_key)
+                request.env['ir.config_parameter'].sudo().set_str('social.twitter_consumer_key', iap_twitter_consumer_key)
 
             media = request.env['social.media'].search([('media_type', '=', 'twitter')], limit=1)
 
@@ -48,7 +47,7 @@ class SocialTwitterController(SocialController):
                 return request.render('social.social_http_error_view',
                                       {'error_message': str(e)})
 
-        return request.redirect('/odoo/action-social.action_social_stream_post')
+        return request.render('social.social_http_authentication_done')
 
     # ========================================================
     # COMMENTS / LIKES
@@ -79,7 +78,7 @@ class SocialTwitterController(SocialController):
         files = request.httprequest.files.getlist('attachment')
         attachment = files and files[0]
         try:
-            return json.dumps(stream_post._twitter_comment_add(stream, comment_id, message, attachment))
+            return json.dumps(stream_post._twitter_comment_add(stream.account_id, stream_post.twitter_tweet_id, comment_id, message, attachment))
         except Exception as e:
             return json.dumps({'error': str(e)})
 
@@ -99,7 +98,10 @@ class SocialTwitterController(SocialController):
         if not stream.exists() or stream.media_id.media_type != 'twitter':
             raise Forbidden()
 
-        return request.env['social.stream.post']._twitter_tweet_like(stream, tweet_id, like)
+        request.env['social.stream.post']._twitter_tweet_like(stream, tweet_id, like)
+        posts = request.env['social.stream.post'].search([('twitter_tweet_id', '=', tweet_id)])
+        posts._twitter_update_likes(like)
+        return True
 
     @http.route('/social_twitter/<int:stream_id>/retweet', type='jsonrpc', auth='user')
     def social_twitter_do_retweet(self, stream_id, tweet_id):
@@ -172,7 +174,7 @@ class SocialTwitterController(SocialController):
     # ========================================================
 
     def _twitter_create_accounts(self, oauth_token, oauth_verifier, media):
-        twitter_consumer_key = request.env['ir.config_parameter'].sudo().get_param('social.twitter_consumer_key')
+        twitter_consumer_key = request.env['ir.config_parameter'].sudo().get_str('social.twitter_consumer_key')
 
         twitter_access_token_url = url_join(request.env['social.media']._TWITTER_ENDPOINT, "oauth/access_token")
         response = requests.post(twitter_access_token_url,
@@ -188,7 +190,7 @@ class SocialTwitterController(SocialController):
             message = _('X did not provide a valid access token or it may have expired.')
             documentation_link = 'https://help.twitter.com/en/forms/account-access'
             documentation_link_label = _('Read More about X Accounts')
-            documentation_link_icon_class = 'fa fa-twitter'
+            documentation_link_icon_class = 'oi_x'
             raise SocialValidationException(message, documentation_link, documentation_link_label, documentation_link_icon_class)
 
         response_values = {
@@ -196,22 +198,22 @@ class SocialTwitterController(SocialController):
             for response_value in response.text.split('&')
         }
 
-        existing_account = request.env['social.account'].sudo().with_context(active_test=False).search([
+        account = self.env['social.account'].sudo().with_context(active_test=False).search([
             ('media_id', '=', media.id),
             ('twitter_user_id', '=', response_values['user_id'])
         ])
 
-        error_message = existing_account._get_multi_company_error_message()
+        error_message = account._get_multi_company_error_message()
         if error_message:
             raise SocialValidationException(error_message)
 
-        if existing_account:
-            existing_account.write({
+        if account:
+            account.sudo().write({
                 'active': True,
                 'is_media_disconnected': False,
                 'social_account_handle': response_values['screen_name'],
                 'twitter_oauth_token': response_values['oauth_token'],
-                'twitter_oauth_token_secret': response_values['oauth_token_secret']
+                'twitter_oauth_token_secret': response_values['oauth_token_secret'],
             })
         else:
             twitter_account_information = self._twitter_get_account_information(
@@ -220,14 +222,14 @@ class SocialTwitterController(SocialController):
                 response_values['oauth_token_secret'],
             )
 
-            request.env['social.account'].create({
+            account = self.env['social.account'].sudo().create({
                 'media_id': media.id,
                 'name': twitter_account_information['name'],
                 'twitter_user_id': response_values['user_id'],
                 'social_account_handle': response_values['screen_name'],
                 'twitter_oauth_token': response_values['oauth_token'],
                 'twitter_oauth_token_secret': response_values['oauth_token_secret'],
-                'image': base64.b64encode(requests.get(twitter_account_information['profile_image_url'], timeout=10).content)
+                'image': BinaryBytes(requests.get(twitter_account_information['profile_image_url'], timeout=10).content)  # FIXME check response status
             })
 
     def _twitter_get_account_information(self, media, oauth_token, oauth_token_secret):

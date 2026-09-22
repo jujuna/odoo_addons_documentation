@@ -12,7 +12,6 @@ class ResConfigSettings(models.TransientModel):
     use_anglo_saxon = fields.Boolean(string='Anglo-Saxon Accounting', related='company_id.anglo_saxon_accounting', readonly=False)
     invoicing_switch_threshold = fields.Date(string="Invoicing Switch Threshold", related='company_id.invoicing_switch_threshold', readonly=False)
     group_fiscal_year = fields.Boolean(string='Fiscal Years', implied_group='account_accountant.group_fiscal_year')
-    predict_bill_product = fields.Boolean(string="Predict Bill Product", related='company_id.predict_bill_product', readonly=False)
 
     sign_invoice = fields.Boolean(string='Authorized Signatory on invoice', related='company_id.sign_invoice', readonly=False)
     signing_user = fields.Many2one(
@@ -37,6 +36,7 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
         related='company_id.deferred_expense_account_id',
     )
+    deferred_expense_account_active = fields.Boolean(related='deferred_expense_account_id.active', string="Deferred Expense Account Active")
     generate_deferred_expense_entries_method = fields.Selection(
         related='company_id.generate_deferred_expense_entries_method',
         readonly=False, required=True,
@@ -46,6 +46,11 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.deferred_expense_amount_computation_method',
         readonly=False, required=True,
         help='Method used to compute the amount of deferred entries',
+    )
+    deferred_expense_periodicity = fields.Selection(
+        related='company_id.deferred_expense_periodicity',
+        readonly=False, required=True,
+        help='Periodicity to post deferred entries',
     )
 
     # Deferred revenue management
@@ -61,6 +66,7 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
         related='company_id.deferred_revenue_account_id',
     )
+    deferred_revenue_account_active = fields.Boolean(related='deferred_revenue_account_id.active', string="Deferred Revenue Account Active")
     generate_deferred_revenue_entries_method = fields.Selection(
         related='company_id.generate_deferred_revenue_entries_method',
         readonly=False, required=True,
@@ -71,8 +77,30 @@ class ResConfigSettings(models.TransientModel):
         readonly=False, required=True,
         help='Method used to compute the amount of deferred entries',
     )
+    deferred_revenue_periodicity = fields.Selection(
+        related='company_id.deferred_revenue_periodicity',
+        readonly=False, required=True,
+        help='Periodicity to post deferred entries',
+    )
 
-    module_account_auto_transfer = fields.Boolean(string="Enable Auto Transfer")
+    module_account_transfer = fields.Boolean(string="Enable Auto Transfer")
+
+    valuation_method = fields.Selection(
+        related="company_id.inventory_valuation", required=True,
+        string="Inventory Valuation", readonly=False)
+    cost_method = fields.Selection(
+        related="company_id.cost_method", required=True,
+        string="Inventory Cost Method", readonly=False)
+    inventory_period = fields.Selection(
+        related='company_id.inventory_period', required=True,
+        string="Inventory Period", readonly=False)
+    stock_valuation_account_id = fields.Many2one(
+        'account.account', "Stock Valuation Account", readonly=False,
+        related='company_id.account_stock_valuation_id', check_company=True)
+    stock_valuation_account_active = fields.Boolean(related='stock_valuation_account_id.active', string="Stock Valuation Account Active")
+    stock_journal_id = fields.Many2one(
+        'account.journal', "Stock Journal", readonly=False,
+        related='company_id.account_stock_journal_id', check_company=True)
 
     @api.depends('sign_invoice')
     def _compute_module_sign_status(self):

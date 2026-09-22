@@ -107,7 +107,7 @@ class KnowledgeCommon(MailCommon):
 
     def _create_cover(self):
         pixel = 'R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs='
-        attachment = self.env['ir.attachment'].create({'name': 'pixel', 'datas': pixel, 'res_model': 'knowledge.cover', 'res_id': 0})
+        attachment = self.env['ir.attachment'].create({'name': 'pixel', 'raw': pixel, 'res_model': 'knowledge.cover', 'res_id': 0})
         return self.env['knowledge.cover'].create({'attachment_id': attachment.id})
 
 

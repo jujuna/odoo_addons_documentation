@@ -1,11 +1,13 @@
 from odoo import Command
+
+from odoo.addons.l10n_mx_edi.tests.common import TestMxEdiCommon
 from odoo.tests import tagged
 
-from odoo.addons.l10n_mx_edi.tests.common import TestMxEdiCommon, EXTERNAL_MODE
 
-
-@tagged('post_install_l10n', 'post_install', '-at_install', *(['-standard', 'external'] if EXTERNAL_MODE else []))
+@tagged('post_install_l10n', 'post_install', '-at_install', *TestMxEdiCommon.extra_tags)
 class TestCFDIInvoiceSale(TestMxEdiCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -14,8 +16,8 @@ class TestCFDIInvoiceSale(TestMxEdiCommon):
 
     def test_global_discount(self):
         product1 = self.product
-        product2 = self._create_product()
-        product3 = self._create_product()
+        product2 = self._create_product_mx()
+        product3 = self._create_product_mx()
 
         to_test = list(range(10, 16))
         with self.mx_external_setup(self.frozen_today):

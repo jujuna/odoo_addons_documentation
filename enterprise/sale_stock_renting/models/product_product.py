@@ -1,9 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import timedelta
-from odoo import _, api, models
+
+from odoo import api, models
 from odoo.fields import Domain
-from odoo.tools import float_is_zero
 
 
 class ProductProduct(models.Model):
@@ -12,27 +12,24 @@ class ProductProduct(models.Model):
     def _compute_show_qty_status_button(self):
         super()._compute_show_qty_status_button()
         for product in self:
-            if product.rent_ok and not product.sale_ok:
+            if product.rent_periodicity and not product.sale_ok:
                 product.show_forecasted_qty_status_button = False
 
-    @api.depends('type', 'rent_ok', 'qty_available', 'qty_in_rent')
-    @api.depends_context('in_rental_schedule', 'allowed_company_ids')
+    @api.depends('type', 'rent_periodicity', 'qty_available', 'qty_in_rent')
+    @api.depends_context("display_renting_stock_quantity", "allowed_company_ids")
     def _compute_display_name(self):
         """Override to include the quantity in stock in the rental schedule view."""
         super()._compute_display_name()
-        if self.env.context.get('in_rental_schedule'):
+        if self.env.context.get("display_renting_stock_quantity"):
             storable_rental_products = self.filtered(
-                lambda product: product.rent_ok and product.is_storable
+                lambda product: product.rent_periodicity and product.is_storable
             )
             if not storable_rental_products:
                 return
 
             # Rental/Stock qties only have to be computed on the current date to know the current
             # total qty (in stock + in rental)
-            ctxt = {
-                'from_date': self.env.cr.now(),
-                'to_date': self.env.cr.now(),
-            }
+            ctxt = {'from_date': self.env.cr.now(), 'to_date': self.env.cr.now()}
 
             # Generate new display_name results
             for product in storable_rental_products.with_context(**ctxt):
@@ -41,24 +38,37 @@ class ProductProduct(models.Model):
                     # Display as integer if float has no decimal value
                     total_qty = int(total_qty)
                 if total_qty in (0, 1):
-                    product.display_name = _(
-                        "%(product)s (%(qty)s item)",
-                        product=product.display_name,
-                        qty=total_qty,
+                    product.display_name = product.env._(
+                        "%(product)s (%(qty)s item)", product=product.display_name, qty=total_qty
                     )
                 else:
-                    product.display_name = _(
-                        "%(product)s (%(qty)s items)",
-                        product=product.display_name,
-                        qty=total_qty,
+                    product.display_name = product.env._(
+                        "%(product)s (%(qty)s items)", product=product.display_name, qty=total_qty
                     )
 
+    @api.depends_context('warehouse_id')
+    def _compute_qty_in_rent(self):
+        return super()._compute_qty_in_rent()
+
     def _get_domain_locations_new(self, location_ids):
-        domain_quant, domain_move_in_loc, domain_move_out_loc = super()._get_domain_locations_new(location_ids)
+        (
+            domain_quant,
+            domain_move_in_loc,
+            domain_move_out_loc,
+            domain_move_in_loc_done,
+            domain_move_out_loc_done,
+        ) = super()._get_domain_locations_new(location_ids)
         if self.env.context.get('ignore_rental_returns'):
             rental_loc_ids = self.env.companies.rental_loc_id.ids
             domain_move_in_loc &= Domain('location_id', 'not in', rental_loc_ids)
-        return domain_quant, domain_move_in_loc, domain_move_out_loc
+            domain_move_in_loc_done &= Domain('location_id', 'not in', rental_loc_ids)
+        return (
+            domain_quant,
+            domain_move_in_loc,
+            domain_move_out_loc,
+            domain_move_in_loc_done,
+            domain_move_out_loc_done,
+        )
 
     def _get_qty_in_rent_domain(self):
         """Allow precising the warehouse_id to get qty currently in rent."""
@@ -67,11 +77,10 @@ class ProductProduct(models.Model):
             return super()._get_qty_in_rent_domain() + [
                 ('order_id.warehouse_id', '=', warehouse_id)
             ]
-        else:
-            return super()._get_qty_in_rent_domain()
+        return super()._get_qty_in_rent_domain()
 
     def _get_unavailable_qty(self, from_date, to_date=None, **kwargs):
-        """ Return the max quantity of self (unique) unavailable between from_date and to_date.
+        """Return the max quantity of self (unique) unavailable between from_date and to_date.
 
         Early pickups and returns are taken into account.
         :param datetime from_date:
@@ -100,23 +109,26 @@ class ProductProduct(models.Model):
     ):
         self.ensure_one()
 
-        domain = [
-            ('is_rental', '=', True),
-            ('product_id', '=', self.id),
-            ('state', '=', 'sale'),
-        ]
+        domain = self.with_context(warehouse_id=warehouse_id)._get_qty_in_rent_domain()
 
         if ignored_soline_id:
             domain += [('id', '!=', ignored_soline_id)]
 
-        if warehouse_id:
-            domain += [('order_id.warehouse_id', '=', warehouse_id)]
-
         include_bounds = to_date == from_date
         domain += [
-            ('return_date', '>=' if include_bounds and not kwargs.get('rental_pivot_date') else '>', from_date),
-            '|', ('reservation_begin', '<=' if include_bounds else '<', to_date - timedelta(hours=self.preparation_time if kwargs.get('rental_pivot_date') else 0)),
-                 ('qty_delivered', '>', 0),
+            (
+                'return_date',
+                '>=' if include_bounds and not kwargs.get('rental_pivot_date') else '>',
+                from_date,
+            ),
+            '|',
+            (
+                'reservation_begin',
+                '<=' if include_bounds else '<',
+                to_date
+                - timedelta(hours=self.preparation_time if kwargs.get('rental_pivot_date') else 0),
+            ),
+            ('qty_delivered', '>', 0),
         ]
 
         return self.env['sale.order.line'].search(domain)
@@ -133,15 +145,17 @@ class ProductProduct(models.Model):
         active_lines = self._get_active_rental_lines(
             from_date=pivot_date, to_date=pivot_date, **kwargs
         )
-        active_lines = active_lines.filtered(lambda line:
-            line.rental_status in ('pickup', 'return')
+        active_lines = active_lines.filtered(
+            lambda line: (
+                line.rental_status in ('pickup', 'return')
                 and (
                     not line.order_id.has_pickable_lines
                     or (
-                        float_is_zero(line.qty_delivered, precision_rounding=line.product_uom_id.rounding)
+                        line.product_uom_id.is_zero(line.qty_delivered)
                         and self.env.user.has_group('sale_stock_renting.group_rental_stock_picking')
                     )
                 )
+            )
         )
         return sum(active_lines.mapped('product_uom_qty'))
 
@@ -151,9 +165,9 @@ class ProductProduct(models.Model):
 
     def _get_unavailable_lots(self, from_date, to_date=None, **kwargs):
         to_date = to_date or from_date
-        return self._get_active_rental_lines(
-            from_date, to_date, **kwargs
-        ).mapped('unavailable_lot_ids')
+        return self._get_active_rental_lines(from_date, to_date, **kwargs).mapped(
+            'unavailable_lot_ids'
+        )
 
     def action_view_rentals(self):
         """Override of `sale_renting` to change the default groupby of the

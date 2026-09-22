@@ -1,12 +1,19 @@
 import { serializeDateTime } from "@web/core/l10n/dates";
-import { GanttModel, parseServerValues } from "@web_gantt/gantt_model";
+import { parseServerValues } from "@web_gantt/gantt_model";
 import { Domain } from "@web/core/domain";
 import {localStartOf} from "@web_gantt/gantt_helpers";
+import { hrGanttView } from "@hr_gantt/hr_gantt_view";
 
-export class AttendanceGanttModel extends GanttModel {
+export class AttendanceGanttModel extends hrGanttView.Model {
     //-------------------------------------------------------------------------
     // Protected
     //-------------------------------------------------------------------------
+    static services = [...hrGanttView.Model.services, "ui"];
+
+    setup(params, services) {
+        super.setup(...arguments);
+        this.ui = services.ui;
+    }
 
     /**
      * @override
@@ -33,20 +40,6 @@ export class AttendanceGanttModel extends GanttModel {
         }
     }
 
-    async _fetchData(metaData) {
-        const startDate = metaData.globalStart.toISODate();
-        let activeDomain = [];
-        if (!this.searchParams.domain.some((index) => Array.isArray(index) && index[0] == "employee_id.active")){
-            activeDomain.push(["employee_id.active", "=", true]);
-        }
-        const context = {
-            gantt_start_date: startDate,
-            user_domain: this.searchParams.domain,
-            active_domain: activeDomain
-        };
-        await super._fetchData(metaData, context);
-    }
-
     _parseServerData(metaData, records) {
         const { dateStartField, dateStopField, fields } = metaData;
         /** @type {Record<string, any>[]} */
@@ -63,9 +56,49 @@ export class AttendanceGanttModel extends GanttModel {
         return parsedRecords;
     }
 
+    /**
+     * @override
+     */
+    _processGanttData(metaData, data, ganttData) {
+        super._processGanttData(metaData, data, ganttData);
+        data.employeesWithoutContractIds = ganttData.employees_without_contract_ids || [];
+    }
+
     getRangeFromDate(rangeId, date) {
         const startDate = localStartOf(date, rangeId);
         const stopDate = startDate.plus({ [rangeId]: 1 }).minus({ day: 1 });
         return { focusDate: date, startDate, stopDate, rangeId };
+    }
+
+    /**
+     * @override
+     */
+    getDialogContext(){
+        const context = super.getDialogContext(...arguments);
+        context['scale'] = this.metaData.scale.id;
+        return context;
+    }
+
+    /**
+     * @override
+     */
+    _processProgressBar(progressBar, warning) {
+        const processedProgressBar = super._processProgressBar(...arguments);
+        const { ratio } = processedProgressBar;
+        processedProgressBar.available_formatted = `${processedProgressBar.value_formatted} / ${processedProgressBar.max_value_formatted}`;
+        let extraString = "";
+        if (ratio > 100) {
+            extraString = `+${this._formatTime(progressBar.value - progressBar.max_value)}`;
+        } else if (ratio < 100 && ratio > 0) {
+            extraString = `${this._formatTime(progressBar.max_value - progressBar.value)} left`;
+        }
+        if (this.ui.size < 5) {
+            processedProgressBar.available_formatted = extraString
+                ? extraString
+                : processedProgressBar.value_formatted;
+        } else if (extraString) {
+            processedProgressBar.available_formatted += ` (${extraString})`;
+        }
+        return processedProgressBar;
     }
 }

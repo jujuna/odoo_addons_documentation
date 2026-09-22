@@ -1,11 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 from odoo.tools.float_utils import float_round, float_compare
 from odoo.addons.mrp_account.tests.common import TestBomPriceCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestBomPrice(TestBomPriceCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

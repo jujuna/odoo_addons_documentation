@@ -37,7 +37,7 @@
                 </div>
                 <div id="employee_bank_account">
                     <strong class="me-2">Bank Account No:</strong>
-                    <span t-field="o.employee_id.primary_bank_account_id.acc_number"/>
+                    <span t-field="o.employee_id.primary_bank_account_id.account_number"/>
                 </div>
             </td>
         </td>
@@ -45,7 +45,7 @@
             <td id="other_infos">
                 <div id="pay_period">
                     <strong class="me-2">Pay Period:</strong>
-                    <span t-if="o.date_from &lt; o.employee_id.contract_date_start" t-field="o.employee_id.contract_date_start"/>
+                    <span t-if="o.employee_id.contract_date_start and o.date_from &lt; o.employee_id.contract_date_start" t-field="o.employee_id.contract_date_start"/>
                     <span t-else="" t-field="o.date_from"/>
                     -
                     <span t-if="o.employee_id.contract_date_end and o.date_to &gt; o.employee_id.contract_date_end" t-field="o.employee_id.contract_date_end"/>
@@ -53,15 +53,15 @@
                 </div>
                 <div id="computed_on">
                     <strong class="me-2">Pay Date:</strong>
-                    <span t-field="o.compute_date"/>
+                    <span t-out="o.paid_date if o.paid_date else o.compute_date" t-options="{'widget': 'date'}"/>
                 </div>
                 <div id="working_schedule">
                     <strong class="me-2">Working Schedule:</strong>
                     <t t-if="o.wage_type == 'monthly'">
-                        <span t-out="int(o._get_l10n_in_company_working_time())"/> Days
+                        <span t-out="int(o._get_l10n_in_employee_working_time())"/> Days
                     </t>
                     <t t-else="">
-                        <span t-out="o._get_l10n_in_company_working_time(return_hours=True)"/> Hours
+                        <span t-out="o._get_l10n_in_employee_working_time(return_hours=True)"/> Hours
                     </t>
                 </div>
             </td>
@@ -77,8 +77,7 @@
     <template id="report_payslip_in_lang">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-set="o" t-value="o.with_context(lang=o.employee_id.lang or o.env.lang)"/>
-                <t t-call="l10n_in_hr_payroll.report_payslip_in_alt" t-lang="o.env.lang"/>
+                <t t-call="l10n_in_hr_payroll.report_payslip_in_alt"/>
             </t>
         </t>
     </template>

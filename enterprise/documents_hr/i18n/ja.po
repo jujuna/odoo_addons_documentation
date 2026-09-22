@@ -3,28 +3,30 @@
 # * documents_hr
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Junko Augias (juau)" <juau@odoo.com>, 2025.
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-18 05:40+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 02:05+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "documents_hr/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
-msgstr "<i class=\"fa fa-download fa-fw\"/>ファイルをダウンロード"
+#: model:ir.module.module,description:base.module_documents_hr
+msgid ""
+"\n"
+"Easily access your documents from your employee profile.\n"
+msgstr ""
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
@@ -35,6 +37,11 @@ msgstr "<span class=\"o_form_label\">デフォルトタグ</span>"
 #: model:documents.tag,name:documents_hr.documents_tag_absences
 msgid "Absences"
 msgstr "不在"
+
+#. module: documents_hr
+#: model:ir.module.module,summary:base.module_documents_hr
+msgid "Access documents from the employee profile"
+msgstr ""
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
@@ -66,7 +73,7 @@ msgstr ""
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_res_company
-msgid "Companies"
+msgid "Company"
 msgstr "会社"
 
 #. module: documents_hr
@@ -75,8 +82,6 @@ msgid "Config Settings"
 msgstr "構成設定"
 
 #. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
 #: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_contracts_tags
 msgid "Contracts"
 msgstr "契約"
@@ -89,7 +94,6 @@ msgstr "契約 (人事)"
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_documents_document__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_documents_redirect__display_name
-#: model:ir.model.fields,field_description:documents_hr.field_documents_tag__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_version__display_name
@@ -104,36 +108,26 @@ msgid "Document"
 msgstr "ドキュメント"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__document_count
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__document_count
-msgid "Document Count"
-msgstr "ドキュメント数"
-
-#. module: documents_hr
 #: model:ir.model,name:documents_hr.model_documents_redirect
 msgid "Document Redirect"
 msgstr "ドキュメントリダイレクト"
 
 #. module: documents_hr
+#: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__document_count
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_public_view_form
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_view_form
 msgid "Documents"
 msgstr "ドキュメント"
 
 #. module: documents_hr
+#: model:ir.module.module,shortdesc:base.module_documents_hr
+msgid "Documents - HR"
+msgstr ""
+
+#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_contracts_tags
 msgid "Documents Hr Contracts Tags"
 msgstr "ドキュメント時間契約タグ"
-
-#. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_settings
-msgid "Documents Hr Settings"
-msgstr "ドキュメント人事設定"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "Download file"
-msgstr "ファイルをダウンロード"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_employee
@@ -176,9 +170,29 @@ msgid "Employees Subfolders"
 msgstr "従業員サブフォルダ"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__hr_employee_contract_folder_id
-msgid "HR Employee Contract Folder"
-msgstr "人事 従業員契約書フォルダ"
+#: model:ir.model.fields,help:documents_hr.field_res_company__documents_hr_group_id
+#: model:ir.model.fields,help:documents_hr.field_res_config_settings__documents_hr_group_id
+msgid ""
+"Group given editor access on the employees folders created from now on. "
+"Changing it does not affect the existing folders."
+msgstr ""
+
+#. module: documents_hr
+#. odoo-python
+#: code:addons/documents_hr/models/res_company.py:0
+msgid "HR (%(company_name)s)"
+msgstr ""
+
+#. module: documents_hr
+#: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
+msgid "HR Access Group"
+msgstr ""
+
+#. module: documents_hr
+#: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_group_id
+#: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_group_id
+msgid "HR Documents Default Group"
+msgstr ""
 
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__hr_employee_folder_id
@@ -186,14 +200,8 @@ msgid "HR Employee Folder"
 msgstr "HR従業員フォルダ"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_settings
-msgid "Human Resources"
-msgstr "人事"
-
-#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_documents_document__id
 #: model:ir.model.fields,field_description:documents_hr.field_documents_redirect__id
-#: model:ir.model.fields,field_description:documents_hr.field_documents_tag__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_version__id
@@ -205,13 +213,8 @@ msgstr "ID"
 #. module: documents_hr
 #. odoo-python
 #: code:addons/documents_hr/models/documents_document.py:0
-msgid "Impossible to delete employee folder or employee 'Contract' folder"
-msgstr "従業員フォルダや従業員の「契約」フォルダを削除できません"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "My documents"
-msgstr "自分のドキュメント"
+msgid "Impossible to delete an employee folder"
+msgstr ""
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_employee_public
@@ -219,19 +222,10 @@ msgid "Public Employee"
 msgstr "公開従業員"
 
 #. module: documents_hr
-#: model:documents.tag,name:documents_hr.document_tag_signature_request
-msgid "Signature Request"
-msgstr "署名依頼"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "Size:"
-msgstr "サイズ:"
-
-#. module: documents_hr
-#: model:ir.model,name:documents_hr.model_documents_tag
-msgid "Tag"
-msgstr "タグ"
+#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__document_count
+#: model:ir.model.fields,field_description:documents_hr.field_hr_version__document_count
+msgid "Related Document Count"
+msgstr "関連ドキュメント数"
 
 #. module: documents_hr
 #. odoo-python
@@ -239,31 +233,46 @@ msgstr "タグ"
 msgid "You cannot access the employee's folder."
 msgstr "従業員のフォルダにはアクセスできません。"
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/documents_tag.py:0
-msgid ""
-"You cannot delete this tag as it is used to link employee contracts and "
-"signatures."
-msgstr ""
-"このタグは、従業員の契約および署名にリンクするために使用されているため、削除"
-"することはできません。"
+#~ msgid "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download file"
+#~ msgstr ""
+#~ "<i class=\"oi oi-fw\" data-icon=\"download\"/>ファイルをダウンロード"
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
-msgid ""
-"You must configure the HR Employee folder in document settings to use "
-"Document's features."
-msgstr ""
-"ドキュメントの機能を使用するには、ドキュメント設定で人事 従業員フォルダを設定"
-"する必要があります。"
+#~ msgid "Document Count"
+#~ msgstr "ドキュメント数"
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
-msgid ""
-"You must have a contact linked to the employee in order to use Document's "
-"features."
-msgstr ""
-"ドキュメントの機能を使用するには、従業員にリンクされた連絡先が必要です。"
+#~ msgid "Documents Hr Settings"
+#~ msgstr "ドキュメント人事設定"
+
+#~ msgid "Download file"
+#~ msgstr "ファイルをダウンロード"
+
+#~ msgid "HR Employee Contract Folder"
+#~ msgstr "人事 従業員契約書フォルダ"
+
+#~ msgid "Human Resources"
+#~ msgstr "人事"
+
+#~ msgid "Impossible to delete employee folder or employee 'Contract' folder"
+#~ msgstr "従業員フォルダや従業員の「契約」フォルダを削除できません"
+
+#~ msgid "My documents"
+#~ msgstr "自分のドキュメント"
+
+#~ msgid "Payroll"
+#~ msgstr "給与計算"
+
+#~ msgid "Size:"
+#~ msgstr "サイズ:"
+
+#~ msgid ""
+#~ "You must configure the HR Employee folder in document settings to use "
+#~ "Document's features."
+#~ msgstr ""
+#~ "ドキュメントの機能を使用するには、ドキュメント設定で人事 従業員フォルダを"
+#~ "設定する必要があります。"
+
+#~ msgid ""
+#~ "You must have a contact linked to the employee in order to use Document's "
+#~ "features."
+#~ msgstr ""
+#~ "ドキュメントの機能を使用するには、従業員にリンクされた連絡先が必要です。"

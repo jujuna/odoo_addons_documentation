@@ -76,7 +76,7 @@ class TestMarketingAutomationSms(TestMACommon):
             'name': 'Archive records',
             'state': 'code',
         })
-        cls.act1_1 = cls._create_activity(
+        cls.act1_1_1 = cls._create_activity(
             cls.campaign,
             action=cls.act1_1_sact,
             parent_id=cls.act1.id,
@@ -101,7 +101,7 @@ class TestMarketingAutomationSms(TestMACommon):
 
         # update campaign
         act1 = self.act1.with_user(self.env.user)
-        _act1_1 = self.act1_1.with_user(self.env.user)
+        _act1_1 = self.act1_1_1.with_user(self.env.user)
         campaign = self.campaign.with_user(self.env.user)
 
         # CAMPAIGN START
@@ -110,7 +110,7 @@ class TestMarketingAutomationSms(TestMACommon):
         # User starts and syncs its campaign
         with self.mock_datetime_and_now(self.date_reference):
             campaign.action_start_campaign()
-            campaign.sync_participants()
+            campaign._synchronize_participants()
 
         # All records not containing Test_00 should be added as participants
         self.assertEqual(campaign.running_participant_count, len(test_records))
@@ -145,7 +145,7 @@ class TestMarketingAutomationSms(TestMACommon):
 
         with self.mock_datetime_and_now(data_reference_start), \
              self.mockSMSGateway(), self.mock_sms_twilio_send():
-            campaign.execute_activities()
+            campaign._execute_activities()
             self.env.flush_all()
             with self.registry.cursor() as cr:
                 self.env(cr=cr)['sms.sms'].sudo()._process_queue()
@@ -154,11 +154,29 @@ class TestMarketingAutomationSms(TestMACommon):
         # SMS are sent one call at a time
         self.assertEqual(self._sms_twilio_send_mock.call_count, 8)
 
-        # simulate ack reception from twilio
-        sms_batch = self._new_sms.filtered(
-            lambda sms: sms.mailing_trace_ids.res_id in test_records_1_ok.ids,
+        # simulate ack reception from twilio, except some of them who fail
+        sms_sent_batch = self._new_sms.filtered(
+            lambda sms: sms.mailing_trace_ids.res_id in test_records_1_ok[3:].ids,
         )
-        self.simulate_sms_twilio_status(sms_batch, self.user_marketing_automation.company_id)
+        sms_undelivered_batch = self._new_sms.filtered(
+            lambda sms: sms.mailing_trace_ids.res_id in test_records_1_ok[0:2].ids,
+        )
+        sms_blocked_batch = self._new_sms.filtered(
+            lambda sms: sms.mailing_trace_ids.res_id in test_records_1_ok[2].ids,
+        )
+        with self.mock_datetime_and_now(data_reference_start + relativedelta(hours=3)):
+            self.simulate_sms_twilio_status(
+                sms_sent_batch, self.user_marketing_automation.company_id,
+                sms_status='delivered',
+            )
+            self.simulate_sms_twilio_status(
+                sms_undelivered_batch, self.user_marketing_automation.company_id,
+                sms_status='undelivered', error_code=30005, error_message="Unknown destination handset",
+            )
+            self.simulate_sms_twilio_status(
+                sms_blocked_batch, self.user_marketing_automation.company_id,
+                sms_status='failed', error_code=30002, error_message="Account suspended",
+            )
 
         self.assertMarketAutoTraces(
             [{
@@ -166,7 +184,35 @@ class TestMarketingAutomationSms(TestMACommon):
                     'schedule_date': data_reference_start,
                     'state_msg': False,
                 },
-                'records': test_records_1_ok,
+                'records': test_records_1_ok[0:2],
+                'sms_values': {  # note that bounce did not update the sms.sms itself, only the trace / tracker
+                    'failure_type': False,
+                    'state': 'pending',
+                },
+                'status': 'processed',
+                'trace_failure_reason': "Unknown destination handset",
+                'trace_failure_type': 'sms_invalid_destination',
+                'trace_status': 'bounce',
+            }, {
+                'fields_values': {
+                    'schedule_date': data_reference_start + relativedelta(hours=3),  # updated with set_failed time
+                    'state_msg': 'SMS failed',
+                },
+                'records': test_records_1_ok[2],
+                'sms_values': {  # note that error did not update the sms.sms itself, only the trace / tracker
+                    'failure_type': False,
+                    'state': 'pending',
+                },
+                'status': 'error',
+                'trace_failure_reason': "Account suspended",
+                'trace_failure_type': 'sms_expired',
+                'trace_status': 'error',
+            }, {
+                'fields_values': {
+                    'schedule_date': data_reference_start,
+                    'state_msg': False,
+                },
+                'records': test_records_1_ok[3:],
                 'status': 'processed',
                 'trace_status': 'sent',
             }, {
@@ -199,8 +245,7 @@ class TestMarketingAutomationSms(TestMACommon):
                 },
                 'records': (test_records_1_ko - self.test_records_failure_wrong - self.test_records_failure_dupe),
                 'status': 'canceled',
-                # TDE checkme
-                'trace_failure_type': 'mail_email_missing',
+                'trace_failure_type': 'sms_number_missing',
                 'trace_status': 'cancel',
             }],
             act1,

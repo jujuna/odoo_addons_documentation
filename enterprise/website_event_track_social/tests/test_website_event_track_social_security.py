@@ -5,9 +5,10 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import fields
 from odoo.addons.website_event.tests.common import TestEventOnlineCommon
-from odoo.tests.common import users
+from odoo.tests.common import tagged, users
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestTrackPushSecurity(TestEventOnlineCommon):
 
     @users('user_eventmanager')

@@ -1,11 +1,11 @@
-import { markup } from "@odoo/owl";
+import { htmlEscape, markup } from "@odoo/owl";
 
 import {
     SocialPostFormatterMixinBase,
     SocialPostFormatterRegex,
 } from "@social/js/social_post_formatter_mixin";
 
-import { htmlReplace } from "@web/core/utils/html";
+import { htmlReplace, htmlReplaceAll } from "@web/core/utils/html";
 import { patch } from "@web/core/utils/patch";
 
 /*
@@ -20,11 +20,10 @@ patch(SocialPostFormatterMixinBase, {
             value = htmlReplace(
                 value,
                 SocialPostFormatterRegex.REGEX_HASHTAG,
-                (_, before, hashtag) => {
-                    // markup: the regex safely captures `before` and `hashtag`
-                    before = markup(before);
+                (_, hashtag) => {
+                    // markup: the regex safely captures `hashtag`
                     hashtag = markup(hashtag);
-                    return markup`${before}<a href='https://twitter.com/hashtag/${encodeURIComponent(
+                    return markup`<a href='https://twitter.com/hashtag/${encodeURIComponent(
                         hashtag
                     )}?src=hash' target='_blank'>#${hashtag}</a>`;
                 }
@@ -34,8 +33,23 @@ patch(SocialPostFormatterMixinBase, {
                 name = markup(name);
                 return markup`<a href='https://twitter.com/${encodeURIComponent(
                     name
-                )}' target='_blank'>@${name}</a>`;
+                )}' class="o_social_comment_mention" target='_blank'>@${name}</a>`;
             });
+        } else if (this._getMediaType() === "twitter_preview") {
+            const mentions =
+                JSON.parse(this.props.record.data.social_post_mentions || "{}")["twitter"] || {};
+            value = htmlReplaceAll(
+                value,
+                SocialPostFormatterRegex.REGEX_AT,
+                (originalValue, userName) => {
+                    if (!mentions[userName]) {
+                        return originalValue;
+                    }
+                    return markup`<a href='https://twitter.com/${htmlEscape(
+                        userName
+                    )}' target='_blank'>${htmlEscape(userName)}</a>`;
+                }
+            );
         }
         return value;
     },

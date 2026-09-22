@@ -22,16 +22,26 @@
                         <field name="l10n_eg_other_allowances" class="o_hr_narrow_field"/>
                         <span>/ month</span>
                     </div>
+                </group>
 
-                    <separator string="Annual Leave Provision"/>
-                    <label for="l10n_eg_total_leave_days" string="Number of Leave"/>
+                <group string="Annual Leave Provision" invisible="country_code != 'EG'">
+                    <label for="l10n_eg_total_leave_days" string="Eligibility"/>
                     <div class="o_row" name="l10n_eg_total_leave_days">
                         <field name="l10n_eg_total_leave_days" class="o_hr_narrow_field"/>
-                        <span>days</span>
+                        <span>Days / Year</span>
                     </div>
+                </group>
 
-                    <separator string="Social Insurance Reference"/>
-                    <field name="l10n_eg_social_insurance_reference" class="o_hr_narrow_field"/>
+                <group string="Social Insurance" invisible="country_code != 'EG'">
+                    <label for="l10n_eg_social_insurance_reference" string="Reference Amount"/>
+                    <div class="o_row" name="l10n_eg_total_leave_days">
+                        <field name="l10n_eg_social_insurance_reference" class="o_hr_narrow_field"/>
+                        <span>/ month</span>
+                    </div>
+                </group>
+
+                <group string="End of Service" invisible="country_code != 'EG'">
+                    <field name="l10n_eg_eligible_for_eos"/>
                 </group>
             </group>
         </field>

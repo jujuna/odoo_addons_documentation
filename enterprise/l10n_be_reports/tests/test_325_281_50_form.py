@@ -9,6 +9,8 @@ from odoo.tests import tagged, freeze_time
 @freeze_time('2022-03-01')
 class TestResPartner28150(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('be')
     def setUpClass(cls):
@@ -24,7 +26,6 @@ class TestResPartner28150(AccountTestInvoicingCommon):
             'city': 'La Louvière',
             'country_id': cls.env.ref('base.be').id,
             'vat': 'BE0475646428',
-            'is_company': True,
             'category_id': [Command.link(cls.env.ref('l10n_be_reports.res_partner_tag_281_50').id)]
         })
         cls.partner_b.write({
@@ -35,7 +36,6 @@ class TestResPartner28150(AccountTestInvoicingCommon):
             'city': 'Chaumont-Gistoux',
             'country_id': cls.env.ref('base.be').id,
             'vat': 'BE0807677428',
-            'is_company': True,
             'category_id': [Command.link(cls.env.ref('l10n_be_reports.res_partner_tag_281_50').id)]
         })
         cls.partner_c = cls.env['res.partner'].create({
@@ -45,7 +45,7 @@ class TestResPartner28150(AccountTestInvoicingCommon):
             'zip': '1326',
             'city': 'Chauvemont-Bobtoux',
             'country_id': cls.env.ref('base.be').id,
-            'is_company': False,
+            'function': 'UI/UX Designer',
             'citizen_identification': '91103044444',
             'category_id': [Command.link(cls.env.ref('l10n_be_reports.res_partner_tag_281_50').id)]
         })
@@ -648,7 +648,6 @@ class TestResPartner28150(AccountTestInvoicingCommon):
     def test_325_50_invoicing_and_paying_subpartner_should_impact_commercial_partner(self):
         parent_partner = self.env['res.partner'].create({
             'name': 'parent partner',
-            'is_company': True,
             'street': "Rue des Bourlottes 9",
             'zip': "1367",
             'city': "Ramillies",
@@ -658,7 +657,6 @@ class TestResPartner28150(AccountTestInvoicingCommon):
         })
         child_partner = self.env['res.partner'].create({
             'name': 'child partner',
-            'is_company': False,
             'street': "Rue du doudou",
             'street2': "3",
             'zip': "7000",
@@ -688,7 +686,6 @@ class TestResPartner28150(AccountTestInvoicingCommon):
         """
         parent_partner = self.env['res.partner'].create({
             'name': 'parent partner',
-            'is_company': True,
             'street': "Rue des Bourlottes 9",
             'zip': "1367",
             'city': "Ramillies",
@@ -698,7 +695,6 @@ class TestResPartner28150(AccountTestInvoicingCommon):
         })
         child_partner = self.env['res.partner'].create({
             'name': 'child partner',
-            'is_company': False,
             'street': "Rue du doudou",
             'street2': "3",
             'zip': "7000",
@@ -845,7 +841,7 @@ class TestResPartner28150(AccountTestInvoicingCommon):
         }])
 
     def test_281_50_should_know_partner_is_natural_person(self):
-        self.partner_a.write({'is_company': False})
+        self.partner_a.write({'vat': 'NA'})
         form_325 = self.create_325_form(ref_year=2000)
         self.assertRecordValues(form_325.form_281_50_ids, [
                 {

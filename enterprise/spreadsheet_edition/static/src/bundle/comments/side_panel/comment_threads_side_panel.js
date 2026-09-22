@@ -1,4 +1,4 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { CellThread } from "../components/cell_thread";
 import { helpers, stores, components } from "@odoo/o-spreadsheet";
 import { CommentsStore } from "../comments_store";
@@ -6,18 +6,21 @@ import { _t } from "@web/core/l10n/translation";
 
 const { toXC, createActions } = helpers;
 const { useStore } = stores;
-const { MenuPopover, Section } = components;
+const { MenuPopover, Section, Select } = components;
 
 export class CommentThreadsSidePanel extends Component {
     static template = "spreadsheet_edition.CommentThreadsSidePanel";
-    static props = { onCloseSidePanel: Function };
-    static components = { CellThread, MenuPopover, Section };
+    static components = { CellThread, MenuPopover, Section, Select };
+
+    props = useProps({
+        onCloseSidePanel: t.function(),
+    });
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             mode: "allSheets",
         });
-        this.menuState = useState({
+        this.menuState = proxy({
             isOpen: false,
             position: null,
             threadId: undefined,
@@ -80,6 +83,7 @@ export class CommentThreadsSidePanel extends Component {
                     });
                     this.commentsStore.openCommentThread(this.menuState.threadId);
                 },
+                isEnabledOnLockedSheet: true,
             },
         ]);
     }
@@ -95,5 +99,12 @@ export class CommentThreadsSidePanel extends Component {
         this.menuState.isOpen = false;
         this.menuState.position = null;
         this.menuState.threadId = undefined;
+    }
+
+    get filterOptions() {
+        return [
+            { value: "allSheets", label: _t("All sheets") },
+            { value: "activeSheet", label: _t("This sheet") },
+        ];
     }
 }

@@ -3,7 +3,7 @@
 import re
 from stdnum import luhn
 
-from odoo import api, models, _
+from odoo import api, fields, models
 
 PLUSGIRO_ACCOUNT_NUMBER_RE = re.compile(r'^\d{1,7}-\d$')
 BANKGIRO_ACCOUNT_NUMBER_RE = re.compile(r'^\d{3,5}-\d{2,5}$')
@@ -13,13 +13,10 @@ NOT_DIGIT_RE = re.compile(r'\D')
 class ResPartnerBank(models.Model):
     _inherit = "res.partner.bank"
 
-    @api.model
-    def _get_supported_account_types(self):
-        rslt = super()._get_supported_account_types()
-        rslt.extend([('plusgiro', _('Plusgiro')), ('bankgiro', _('Bankgiro')), ('bban_se', _('Swedish BBAN'))])
-        return rslt
+    account_type = fields.Selection(selection_add=[('plusgiro', 'Plusgiro'), ('bankgiro', 'Bankgiro'), ('bban_se', 'Swedish BBAN')])
 
-    def retrieve_acc_type(self, acc_number):
+    @api.model
+    def retrieve_account_type(self, acc_number):
         if acc_number:
             if self._se_validate_plusgiro(acc_number):
                 return 'plusgiro'
@@ -27,7 +24,7 @@ class ResPartnerBank(models.Model):
                 return 'bankgiro'
             elif self._se_validate_bban(acc_number):
                 return 'bban_se'
-        return super().retrieve_acc_type(acc_number)
+        return super().retrieve_account_type(acc_number)
 
     def _se_validate_plusgiro(self, acc_number):
         """Validate PlusGiro number: format XXXXXXX-C (2-8 digits total), dash at end, Luhn checksum."""
@@ -87,6 +84,6 @@ class ResPartnerBank(models.Model):
         return False
 
     def _se_get_bban_from_iban(self):
-        cleaned_acc_number = self.sanitized_acc_number[4:]
+        cleaned_acc_number = self.sanitized_account_number[4:]
         clearing_number = 5 if cleaned_acc_number[0] == '8' else 4
         return cleaned_acc_number[clearing_number:].lstrip('0'), cleaned_acc_number[:clearing_number]

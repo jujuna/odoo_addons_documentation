@@ -8,46 +8,57 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2026-01-23 18:04+0000\n"
-"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
-"Language-Team: Polish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 02:13+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
 "website_knowledge/pl/>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && "
-"(n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.14.3\n"
-
-#. module: website_knowledge
-#: model_terms:ir.ui.view,arch_db:website_knowledge.article_public_content
-msgid "<i class=\"oi oi-lg oi-panel-right\" title=\"Show Sidebar\"/>"
-msgstr ""
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: website_knowledge
 #. odoo-javascript
 #: code:addons/website_knowledge/static/src/backend/components/permission_panel/permission_panel.xml:0
 msgid "Article link copied"
-msgstr ""
+msgstr "Skopiowano link do artykułu"
 
 #. module: website_knowledge
 #. odoo-javascript
 #: code:addons/website_knowledge/static/src/backend/components/permission_panel/permission_panel.xml:0
 msgid "Article not Published"
-msgstr ""
+msgstr "Artykuł nieopublikowany"
 
 #. module: website_knowledge
 #. odoo-javascript
 #: code:addons/website_knowledge/static/src/backend/components/permission_panel/permission_panel.xml:0
 msgid "Article shared to web"
-msgstr ""
+msgstr "Artykuł udostępniony na stronie"
+
+#. module: website_knowledge
+#. odoo-python
+#: code:addons/website_knowledge/models/knowledge_article.py:0
+msgid "Articles"
+msgstr "Artykuły"
+
+#. module: website_knowledge
+#: model:ir.model.fields,field_description:website_knowledge.field_knowledge_article__publish_on
+msgid "Auto publish on"
+msgstr "Opublikuj automatycznie"
+
+#. module: website_knowledge
+#: model:ir.model.fields,help:website_knowledge.field_knowledge_article__publish_on
+msgid "Automatically publish the page on the chosen date and time."
+msgstr "Opublikuj stronę automatycznie we wybranej dacie i godzinie."
 
 #. module: website_knowledge
 #: model:ir.model.fields,field_description:website_knowledge.field_knowledge_article__can_publish
 msgid "Can Publish"
-msgstr "Można publikować"
+msgstr "Może publikować"
 
 #. module: website_knowledge
 #. odoo-javascript
@@ -65,7 +76,7 @@ msgstr "Nazwa wyświetlana"
 #. odoo-javascript
 #: code:addons/website_knowledge/static/src/frontend/sidebar/knowledge_public_sidebar.xml:0
 msgid "Hide Sidebar"
-msgstr ""
+msgstr "Ukryj pasek boczny"
 
 #. module: website_knowledge
 #: model:ir.model.fields,field_description:website_knowledge.field_knowledge_article__id
@@ -83,13 +94,18 @@ msgstr "Opublikowane"
 #. module: website_knowledge
 #: model:ir.model,name:website_knowledge.model_knowledge_article
 msgid "Knowledge Article"
-msgstr "Artykuł Wiedzy"
+msgstr "Artykuł Bazy wiedzy"
 
 #. module: website_knowledge
-#. odoo-javascript
-#: code:addons/website_knowledge/static/src/plugins/searchbar_option.xml:0
-msgid "Knowledge articles"
+#: model:ir.module.module,shortdesc:base.module_website_knowledge
+msgid "Knowledge Website"
 msgstr ""
+
+#. module: website_knowledge
+#. odoo-python
+#: code:addons/website_knowledge/models/website.py:0
+msgid "Knowledge articles"
+msgstr "Artykuły bazy wiedzy"
 
 #. module: website_knowledge
 #. odoo-javascript
@@ -107,18 +123,28 @@ msgstr "Nie ma tu żadnych artykułów"
 #. odoo-javascript
 #: code:addons/website_knowledge/static/src/backend/components/permission_panel/permission_panel.xml:0
 msgid "Only specific people can access"
-msgstr ""
+msgstr "Tylko konkretne osoby mają dostęp"
 
 #. module: website_knowledge
 #: model:ir.actions.server,name:website_knowledge.knowledge_action_publish_articles
 msgid "Publish Articles"
-msgstr ""
+msgstr "Opublikuj artykuły"
 
 #. module: website_knowledge
 #. odoo-javascript
 #: code:addons/website_knowledge/static/src/backend/components/permission_panel/permission_panel.xml:0
 msgid "Publish this article and its sub-articles"
+msgstr "Opublikuj ten artykuł i jego artykuły podrzędne"
+
+#. module: website_knowledge
+#: model:ir.module.module,summary:base.module_website_knowledge
+msgid "Publish your articles"
 msgstr ""
+
+#. module: website_knowledge
+#: model:ir.model.fields,field_description:website_knowledge.field_knowledge_article__published_date
+msgid "Published date"
+msgstr "Data opublikowania"
 
 #. module: website_knowledge
 #. odoo-javascript
@@ -130,7 +156,7 @@ msgstr "Szukaj"
 #. odoo-javascript
 #: code:addons/website_knowledge/static/src/frontend/sidebar/knowledge_public_sidebar.xml:0
 msgid "Search for an article or a keyword"
-msgstr ""
+msgstr "Wyszukaj artykuł lub słowo kluczowe"
 
 #. module: website_knowledge
 #. odoo-javascript
@@ -140,13 +166,13 @@ msgstr "Udostępnij w sieci"
 
 #. module: website_knowledge
 #: model_terms:ir.ui.view,arch_db:website_knowledge.article_public_content
-msgid "Sign in"
-msgstr "Zaloguj się"
+msgid "Show Sidebar"
+msgstr ""
 
 #. module: website_knowledge
-#: model:ir.model.fields,field_description:website_knowledge.field_knowledge_article__summary
-msgid "Summary"
-msgstr "Podsumowanie"
+#: model_terms:ir.ui.view,arch_db:website_knowledge.article_public_content
+msgid "Sign in"
+msgstr "Zaloguj się"
 
 #. module: website_knowledge
 #: model:ir.model.fields,help:website_knowledge.field_knowledge_article__website_absolute_url
@@ -164,7 +190,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website_knowledge/static/src/backend/components/permission_panel/permission_panel.xml:0
 msgid "This article and its sub-articles are public"
-msgstr ""
+msgstr "Ten artykuł i jego artykuły podrzędne są publiczne"
 
 #. module: website_knowledge
 #. odoo-javascript
@@ -175,7 +201,7 @@ msgstr "Widok jest dostępny tylko dla użytkowników wewnętrznych"
 #. module: website_knowledge
 #: model:ir.actions.server,name:website_knowledge.knowledge_action_unpublish_articles
 msgid "Unpublish Articles"
-msgstr ""
+msgstr "Wycofaj artykuły"
 
 #. module: website_knowledge
 #. odoo-javascript

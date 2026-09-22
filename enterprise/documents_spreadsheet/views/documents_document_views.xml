@@ -18,7 +18,7 @@
                 <attribute name="t-attf-class" separator=" " add="#{(isSpreadsheet) ? 'o_document_spreadsheet' : ''}"/>
                 <attribute name="t-attf-class" separator=" " add="#{(isXlsx) ? 'o_document_xlsx' : ''}"/>
             </xpath>
-            <xpath expr="//div[@name='document_preview']/*[contains(@t-elif, 'isTextualDocument')]" position="before">
+            <xpath expr="//div[@name='document_preview']/*[contains(@t-elif, 'thumbnailUrl')]" position="before">
                 <div t-elif="isSpreadsheet" class="o_attachment_image o_documents_image">
                     <t t-set="hasThumbnail" t-value="!!(record.spreadsheet_thumbnail_checksum.raw_value)"/>
                     <t t-set="unique" t-value="record.spreadsheet_thumbnail_checksum.raw_value.slice(-8)"/>

@@ -39,8 +39,8 @@
                                     <field name="credential_key" column_invisible="1"/>
                                     <field name="credential_password" column_invisible="1"/>
                                     <field name="result_state" column_invisible="1"/>
-                                    <button string="Completion" class="btn btn-info" icon="fa-pencil" name="action_open_completion_url" type="object" invisible="success_state != 'CompletionAndResult' or result_state == 'Success'"/>
-                                    <button string="Dialog" class="btn btn-info" icon="fa-envelope" name="action_get_dialog_and_open_result" type="object" invisible="success_state != 'DialogAndResult'"/>
+                                    <button string="Completion" class="btn btn-info" icon="edit" icon_class="oi-filled" name="action_open_completion_url" type="object" invisible="success_state != 'CompletionAndResult' or result_state == 'Success'"/>
+                                    <button string="Dialog" class="btn btn-info" icon="mail" icon_class="oi-filled" name="action_get_dialog_and_open_result" type="object" invisible="success_state != 'DialogAndResult'"/>
                                     <button string="Get Result" name="action_get_result_from_declare_salary" type="object" class="btn-primary" invisible="not credential_key or not credential_password or result_state == 'Success'"/>
                                     <button string="Details" name="action_open_swissdec_job_result" type="object" class="btn btn-secondary" invisible="general_state == 'waiting'"/>
                                 </list>

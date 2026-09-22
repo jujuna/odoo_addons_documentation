@@ -7,7 +7,7 @@ from odoo.tools.sql import drop_view_if_exists, SQL
 class PlanningAttendanceAnalysisReport(models.Model):
     _name = 'planning.attendance.analysis.report'
 
-    _description = "Planning / Attendance Analysis"
+    _description = "Planning & Attendance Analysis"
     _auto = False
     _rec_name = "entry_date"
     _order = "entry_date desc"
@@ -16,12 +16,13 @@ class PlanningAttendanceAnalysisReport(models.Model):
     employee_id = fields.Many2one("hr.employee", string="Employee", readonly=True)
     department_id = fields.Many2one("hr.department", string="Department", readonly=True)
     company_id = fields.Many2one("res.company", string="Company", readonly=True)
+    currency_id = fields.Many2one(related="company_id.currency_id", string="Currency", readonly=True)
     effective_hours = fields.Float("Attendance Time", readonly=True)
     planned_hours = fields.Float("Planned Time", readonly=True)
-    time_difference = fields.Float("Time Difference", readonly=True)
-    effective_costs = fields.Float("Attendance Cost", readonly=True)
-    planned_costs = fields.Float("Planned Cost", readonly=True)
-    cost_difference = fields.Float("Cost Difference", readonly=True)
+    time_difference = fields.Float("Time Variance(Planned - Actual)", readonly=True)
+    effective_costs = fields.Monetary("Attendance Cost", readonly=True)
+    planned_costs = fields.Monetary("Planned Cost", readonly=True)
+    cost_difference = fields.Monetary("Cost Difference", readonly=True)
 
     def init(self):
         query = """
@@ -55,21 +56,24 @@ class PlanningAttendanceAnalysisReport(models.Model):
                 UNION ALL
                    SELECT S.id AS id,
                           d::date AS entry_date,
-                          S.employee_id AS employee_id,
+                          E.id AS employee_id,
                           V.department_id AS department_id,
                           S.company_id AS company_id,
                           E.hourly_cost AS hourly_cost,
                           0.0 AS worked_hours,
-                          S.allocated_hours AS allocated_hours
+                          (S.allocated_hours / NULLIF((S.end_datetime::date - S.start_datetime::date + 1), 0)) AS allocated_hours
                      FROM generate_series(
                             (SELECT min(start_datetime) FROM planning_slot)::date,
                             CURRENT_DATE,
                             '1 day'::interval
                           ) d
                 LEFT JOIN planning_slot S
-                    ON d::date >= S.start_datetime::date
-                    AND d::date <= S.end_datetime::date
-                LEFT JOIN hr_employee E ON E.id = S.employee_id
+                       ON d::date >= S.start_datetime::date
+                      AND d::date <= S.end_datetime::date
+                LEFT JOIN planning_slot_resource_resource_rel R
+                       ON R.planning_slot_id = S.id
+                LEFT JOIN hr_employee E
+                       ON E.resource_id = R.resource_resource_id
                 LEFT JOIN (
                     SELECT DISTINCT ON (employee_id) *
                     FROM hr_version

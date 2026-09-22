@@ -10,7 +10,7 @@ class SaleCommissionPlanTargetCommission(models.Model):
 
     plan_id = fields.Many2one('sale.commission.plan', ondelete='cascade', index='btree_not_null')
 
-    target_rate = fields.Float("Target completion (%)", default=1, required=True)
+    target_rate = fields.Float("Target completion (%)", default=1, required=True, digits=(16, 8))
     amount_rate = fields.Float("OTC %", help='On Target Commission rate')
     amount = fields.Monetary("Commission", default=0, required=True, currency_field='currency_id')
     currency_id = fields.Many2one('res.currency', related='plan_id.currency_id')

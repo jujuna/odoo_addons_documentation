@@ -3,29 +3,35 @@ import { StreamPostCommentListLinkedin } from './stream_post_comment_list';
 import { StreamPostCommentsReplyLinkedin } from './stream_post_comments_reply';
 import { LINKEDIN_HASHTAG_REGEX } from "./social_post_formatter_mixin";
 
-import { onWillStart, useState } from "@odoo/owl";
+import { onWillStart, proxy, t, useProps } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
 import { user } from "@web/core/user";
 
 
 export class StreamPostCommentsLinkedin extends StreamPostComments {
+    linkedinProps = useProps({
+        currentUserUrn: t.any(),
+        offset: t.any(),
+        postAuthorImage: t.any(),
+        summary: t.any(),
+    });
 
     setup() {
         super.setup();
 
         this.commentsCount = this.props.commentsCount;
         this.totalLoadedComments = this.props.comments.length;
-        this.state.showLoadMoreComments = this.totalLoadedComments < this.props.summary.total_count;
-        this.offset = this.props.offset;
+        this.state.showLoadMoreComments = this.totalLoadedComments < this.linkedinProps.summary.total_count;
+        this.offset = this.linkedinProps.offset;
 
         this.mediaSpecificProps = Object.assign(this.mediaSpecificProps, {
             accountId: this.props.accountId,
             accountName: '',
-            postAuthorImage: this.props.postAuthorImage,
-            currentUserUrn: this.props.currentUserUrn,
+            postAuthorImage: this.linkedinProps.postAuthorImage,
+            currentUserUrn: this.linkedinProps.currentUserUrn,
         });
 
-        this.aclState = useState({
+        this.aclState = proxy({
             isDeletable: false,
             isEditable: false,
         });
@@ -46,7 +52,7 @@ export class StreamPostCommentsLinkedin extends StreamPostComments {
         });
 
         this.totalLoadedComments += nextComments.comments.length;
-        if (this.totalLoadedComments >= this.props.summary.total_count) {
+        if (this.totalLoadedComments >= this.linkedinProps.summary.total_count) {
             this.state.showLoadMoreComments = false;
         }
         this.comments.push(...nextComments.comments);

@@ -10,21 +10,18 @@
 - Track timesheet for a task from a ticket
     """,
     'data': [
-        'security/ir.model.access.csv',
         'security/helpdesk_timesheet_security.xml',
         'views/helpdesk_team_views.xml',
         'views/helpdesk_ticket_views.xml',
         'views/project_project_views.xml',
-        'views/hr_timesheet_views.xml',
+        'views/account_analytic_line_views.xml',
         'report/helpdesk_sla_report_analysis_views.xml',
         'report/helpdesk_ticket_report_analysis_views.xml',
         'report/report_timesheet_templates.xml',
         'report/timesheets_analysis_report_views.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
-        'web.assets_tests': [
-            'helpdesk_timesheet/static/tests/tours/**',
-        ],
         'web.assets_backend': [
             'helpdesk_timesheet/static/src/**/*',
             ('remove', 'helpdesk_timesheet/static/src/views/**'),

@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, models, fields, Command, _
-from odoo.addons.resource.models.utils import filter_domain_leaf
+from odoo import api, models, fields, Command
+from odoo.addons.resource.models.utils import filter_map_domain
 from odoo.fields import Domain
 
 
@@ -14,7 +14,7 @@ class PlanningSend(models.TransientModel):
     def default_get(self, fields):
         res = super().default_get(fields)
         if 'slot_ids' in res and 'employee_ids' in fields:
-            employees = self.env['planning.slot'].browse(res['slot_ids'][0][2]).employee_id
+            employees = self.env['planning.slot'].browse(res['slot_ids'][0][2]).employee_ids
             res['employee_ids'] = [Command.set(employees.sudo().sorted('name').ids)]
         return res
 
@@ -42,8 +42,13 @@ class PlanningSend(models.TransientModel):
         if not active_domain:
             return datetime_domain
 
+        def _map_condition(condition):
+            if condition.field_expr in ['start_datetime', 'end_datetime']:
+                return None
+            return condition
+
         # Remove conditions with 'start_datetime' or 'end_datetime' where the value is not False,
-        cleaned_active_domain = filter_domain_leaf(active_domain, lambda field: field not in ['start_datetime', 'end_datetime'])
+        cleaned_active_domain = filter_map_domain(active_domain, _map_condition)
 
         # Combine domains: cleaned active_domain + our datetime
         return Domain.AND([cleaned_active_domain, datetime_domain])
@@ -51,8 +56,8 @@ class PlanningSend(models.TransientModel):
     @api.depends('start_datetime', 'end_datetime')
     def _compute_slots_data(self):
         for wiz in self:
-            wiz.slot_ids = self.env['planning.slot'].with_user(self.env.user).search(self._get_slot_domain(), order='employee_id')
-            wiz.employee_ids = wiz.slot_ids.filtered(lambda s: s.resource_type == 'user').mapped('employee_id')
+            wiz.slot_ids = self.env['planning.slot'].with_user(self.env.user).search(self._get_slot_domain())
+            wiz.employee_ids = wiz.slot_ids.employee_ids
 
     def _inverse_employee_ids(self):
         for wiz in self:
@@ -84,7 +89,7 @@ class PlanningSend(models.TransientModel):
     def action_check_emails(self):
         if self.employees_no_email and self.employee_ids.has_access('write'):
             return {
-                'name': _('No Email Address for Some Employees'),
+                'name': self.env._('No Email Address for Some Employees'),
                 'view_mode': 'form',
                 'res_model': 'planning.send',
                 'views': [(self.env.ref('planning.employee_no_email_list_wizard').id, 'form')],
@@ -94,19 +99,23 @@ class PlanningSend(models.TransientModel):
             }
         return self.action_send()
 
+    def _get_employees_missing_val(self):
+        return self.employees_no_email
+
     def action_send(self):
-        employees = self.employee_ids - self.employees_no_email
+        employees_no_email = self.sudo()._get_employees_missing_val()
+        employees = self.sudo().employee_ids - employees_no_email
         if self.include_unassigned:
-            slot_to_send = self.slot_ids.filtered(lambda s: not s.employee_id or s.employee_id in employees)
+            slot_to_send = self.sudo().slot_ids.filtered(lambda s: not s.resource_ids or any(emp in employees for emp in s.employee_ids))
         else:
-            slot_to_send = self.slot_ids.filtered(lambda s: s.employee_id in employees)
+            slot_to_send = self.sudo().slot_ids.filtered(lambda s: any(emp in employees for emp in s.employee_ids))
         if not slot_to_send:
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
                     'type': 'danger',
-                    'message': _("The shifts have already been published, or there are no shifts to publish."),
+                    'message': self.env._("The shifts have already been published, or there are no shifts to publish."),
                 }
             }
 
@@ -114,9 +123,9 @@ class PlanningSend(models.TransientModel):
         planning.is_planning_preview = False
         planning.include_unassigned = self.include_unassigned
 
-        slot_employees = slot_to_send.mapped('employee_id')
-        open_slots = slot_to_send.filtered(lambda s: not s.employee_id and not s.is_past)
-        employees_to_send = self.env['hr.employee']
+        slot_employees = slot_to_send.employee_ids
+        open_slots = slot_to_send.filtered(lambda s: not s.resource_ids and not s.is_past)
+        employees_to_send = self.sudo().env['hr.employee']
         for employee in employees:
             if employee in slot_employees:
                 employees_to_send |= employee
@@ -126,11 +135,11 @@ class PlanningSend(models.TransientModel):
                         employees_to_send |= employee
         res = planning._send_planning(slots=slot_to_send, message=self.note, employees=employees_to_send)
         if res:
-            if self.employees_no_email:
-                message = _("Shifts published — employees without a work email were skipped")
+            if employees_no_email:
+                message = self.env._("Shifts published — employees without a work email were skipped")
                 notification_type = "info"
             else:
-                message = _("Schedule sent to your employees")
+                message = self.env._("Schedule sent to your employees")
                 notification_type = "success"
             return {
                 'type': 'ir.actions.client',

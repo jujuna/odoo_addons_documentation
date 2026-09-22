@@ -1,47 +1,63 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models
+from datetime import UTC
+from zoneinfo import ZoneInfo
+
+from odoo import fields, models
+from odoo.fields import Domain
 
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
-    def get_overtime_data_by_employee(self):
-        """
-        Provide a summary of an employee's overtime.
-        A compensable overtime is an overtime that can be cumulated to be used
-        as time off.
-        Extra hours and overtime is used interchangably.
-        """
-        # Make so that at least all employees are present in return value
-        overtime_data = {}
-        for employee_id in self.ids:
-            overtime_data[employee_id] = {
-                "compensable_overtime": 0,
-                "not_compensable_overtime": 0,
-                "unspent_compensable_overtime": 0,
-            }
+    def _get_calendar_attendance_domain(self):
+        return Domain.AND([
+            super()._get_calendar_attendance_domain(),
+            Domain.OR([
+                Domain("work_entry_type_id", "=", False),
+                Domain("work_entry_type_id.count_as", "!=", "absence")
+            ]),
+        ])
 
-        unspent_overtime = self.env[
-            'hr.leave'
-        ]._get_deductible_employee_overtime(self)
-        for employee in unspent_overtime:
-            overtime_data[employee.id]['unspent_compensable_overtime'] += max(
-                0, unspent_overtime[employee]
-            )
+    def _compute_hours_last_month(self):
+        super()._compute_hours_last_month()
+        now = fields.Datetime.now()
+        now_utc = now.replace(tzinfo=UTC)
+        for timezone, employees in self.grouped('tz').items():
+            tz = ZoneInfo(timezone or 'UTC')
+            now_tz = now_utc.astimezone(tz)
+            start_tz = now_tz.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            start_naive = start_tz.astimezone(UTC).replace(tzinfo=None)
+            end_naive = now_tz.astimezone(UTC).replace(tzinfo=None)
 
-        all_overtimes = self.env['hr.attendance.overtime.line']._read_group(
+            overtime_by_employee = dict(self.env['hr.attendance']._read_group(
+                domain=[
+                    ('time_rule_id', '!=', False),
+                    ('employee_id', 'in', employees.ids),
+                    ('check_in', '<', end_naive),
+                    ('check_out', '>', start_naive),
+                ],
+                groupby=['employee_id'],
+                aggregates=['worked_hours:sum'],
+            ))
+            for employee in employees:
+                employee.hours_last_month_overtime = round(
+                    overtime_by_employee.get(employee, 0.0), 2
+                )
+
+    def get_attendance_data_by_employee(self, date_start, date_stop):
+        attendance_data = super().get_attendance_data_by_employee(date_start, date_stop)
+
+        overtime_atts = self.env['hr.attendance']._read_group(
             domain=[
+                ('time_rule_id', '!=', False),
                 ('employee_id', 'in', self.ids),
+                ('check_in', '<', date_stop),
+                ('check_out', '>', date_start),
             ],
-            groupby=["employee_id", "compensable_as_leave"],
-            aggregates=["duration:sum"],
+            groupby=['employee_id'],
+            aggregates=['worked_hours:sum'],
         )
-        for employee, is_compensable, amount in all_overtimes:
-            overtime_type = (
-                'compensable_overtime'
-                if is_compensable
-                else 'not_compensable_overtime'
-            )
-            overtime_data[employee.id][overtime_type] += amount
+        for employee, overtime_hours in overtime_atts:
+            attendance_data[employee.id]['overtime_hours'] = overtime_hours
 
-        return overtime_data
+        return attendance_data

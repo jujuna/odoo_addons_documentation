@@ -1,49 +1,49 @@
-import { Component, useEffect, useState } from "@odoo/owl";
+import { Component, computed, t, useProps } from "@odoo/owl";
+import { SIZES } from "@web/core/ui/ui_utils";
 import { useService } from "@web/core/utils/hooks";
 import { ActionMenus } from "@web/search/action_menus/action_menus";
-import { SIZES } from "@web/core/ui/ui_service";
 
 export class DocumentsAction extends Component {
     static template = "documents.DocumentsAction";
     static components = {
         ActionMenus,
     };
-    static props = {
-        targetRecords: Array,
-        folderId: [String, Number, Boolean],
-        isPreview: { type: Boolean, optional: true },
-    };
+
+    props = useProps({
+        targetRecords: t.array(t.object()),
+        folderId: t.or([t.string(), t.number(), t.literal(false)]),
+        isPreview: t.boolean().optional(),
+    });
+
+    actionMenuProps = computed(() => {
+        const selectionActions = this.documentService.getSelectionActions();
+        if (!selectionActions || !this.props.isPreview) {
+            return null;
+        }
+        const props = selectionActions.getMenuProps();
+        props.items.action = props.items.action.filter(this.isPreviewAction.bind(this));
+        return props;
+    });
+    topBarActions = computed(() => {
+        const selectionActions = this.documentService.getSelectionActions();
+        if (!selectionActions) {
+            return [];
+        }
+        const actions = selectionActions.getTopBarActions();
+        const values =
+            this.props.folderId === "TRASH" && actions.download
+                ? [actions.download]
+                : Object.values(actions);
+        return values
+            .filter((action) => action.isAvailable?.() ?? true)
+            .sort((a, b) => a.groupNumber - b.groupNumber || (a.sequence || 0) - (b.sequence || 0));
+    });
+
+    visibleTopbarActions = computed(() => (this.uiService.size >= SIZES.XL ? 3 : 2));
 
     setup() {
         this.documentService = useService("document.document");
-        this.state = useState({
-            topbarActions: [],
-            actionMenuProps: null,
-        });
-        this.ui = useState(useService("ui"));
-        useEffect(() => {
-            if (this.documentService.getSelectionActions) {
-                const selectionActions = this.documentService.getSelectionActions();
-                this.state.topbarActions = Object.values(this.documentService.getSelectionActions().getTopbarActions()).sort((a, b) => b.groupNumber - a.groupNumber)
-                if (this.props.isPreview) {
-                    const actionMenuProps = selectionActions.getMenuProps();
-                    actionMenuProps.items.action = actionMenuProps.items.action.filter(
-                        this.isPreviewAction
-                    );
-                    this.state.actionMenuProps = actionMenuProps;
-                }
-            }
-        }, () => [this.props.targetRecords, this.ui.isSmall]);
-    }
-
-    get topbarActions() {
-        return this.state.topbarActions.filter(
-            (action) => !action.isAvailable || action.isAvailable()
-        );
-    }
-
-    get visibleTopbarActions() {
-        return this.ui.size >= SIZES.XL ? 3 : 2;
+        this.uiService = useService("ui");
     }
 
     isPreviewAction(action) {

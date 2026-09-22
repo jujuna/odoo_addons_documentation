@@ -1,4 +1,5 @@
 import { registry } from "@web/core/registry";
+import { deliverAIResults, setupAIResults } from "@ai/../tests/tours/ai_tour_helpers";
 import { stepUtils } from "@web_tour/tour_utils";
 
 registry.category("web_tour.tours").add("test_ai_draft_chatter_button", {
@@ -27,6 +28,7 @@ registry.category("web_tour.tours").add("test_ai_draft_chatter_button", {
             trigger: "button img.ai-systray-icon",
             run: "click",
         },
+        setupAIResults(),
         {
             content: "Check that the second prompt button is correct",
             trigger: "div.o-mail-Thread button:contains('Write a followup answer')",
@@ -40,6 +42,7 @@ registry.category("web_tour.tours").add("test_ai_draft_chatter_button", {
             content: "Check that the default message is shown",
             trigger: ".o-mail-Message-body:contains('Summarize the chatter conversation')",
         },
+        deliverAIResults(),
         {
             content: "Check that the AI gives a reply",
             trigger: ".o-mail-Message-body:has(p:contains('This is dummy ai response'))",
@@ -98,7 +101,8 @@ registry.category("web_tour.tours").add("test_ai_draft_chatter_button", {
         },
         {
             content: "The default recipients should be set in the composer dialog",
-            trigger: ".o_mail_composer_form_view div[name='partner_ids'] .badge[title='Freddy']",
+            trigger:
+                ".o_mail_composer_form_view div[name='partner_ids'] .badge[data-tooltip='freddy@example.com']",
         },
         {
             content: "Close the composer dialog",
@@ -134,7 +138,7 @@ registry.category("web_tour.tours").add("test_ai_draft_chatter_button", {
         },
         {
             content: "Close chat",
-            trigger: ".o-mail-ChatWindow-header .oi-close",
+            trigger: ".o-mail-ChatWindow-header [data-icon='close_small']",
             run: "click",
         },
         ...stepUtils.toggleHomeMenu(),
@@ -172,6 +176,7 @@ registry.category("web_tour.tours").add("test_ai_draft_chatter_button", {
             trigger: ".o-mail-Thread button:contains('chatbot prompt button')",
             run: "click",
         },
+        deliverAIResults(),
         {
             trigger: ".o-mail-Message:contains('This is dummy ai response')",
             run: "hover",
@@ -190,7 +195,7 @@ registry.category("web_tour.tours").add("test_ai_draft_chatter_button", {
                 ".o-mail-Message:contains('This is dummy ai response'):not(:has(button[name='log-note-direct']))",
         },
         {
-            trigger: ".o-mail-ChatWindow-header .oi-close",
+            trigger: ".o-mail-ChatWindow-header [data-icon='close_small']",
             run: "click",
         },
         ...stepUtils.toggleHomeMenu(),
@@ -231,6 +236,7 @@ registry.category("web_tour.tours").add("test_ai_draft_chatter_button", {
             trigger: ".o-mail-Composer-quickActions button[name='send-message']",
             run: "click",
         },
+        deliverAIResults(),
         {
             trigger: ".o-mail-Message:contains('This is dummy ai response')",
             run: "hover",
@@ -275,13 +281,14 @@ registry.category("web_tour.tours").add("test_ai_draft_html_field", {
         },
         {
             content: "Click on the ai powerbutton item",
-            trigger: ".power_button.ai-logo-icon",
+            trigger: ".power_button[data-icon='o_ai_icon']",
             run: "click",
         },
         {
             content: "Check that the chat window appears",
             trigger: ".o-mail-ChatWindow.o-isAiComposer",
         },
+        setupAIResults(),
         {
             content: "Write a message for the AI",
             trigger: "textarea.o-mail-Composer-input",
@@ -292,6 +299,7 @@ registry.category("web_tour.tours").add("test_ai_draft_html_field", {
             trigger: "button[name='send-message']",
             run: "click",
         },
+        deliverAIResults(),
         {
             content: "Check that the AI gives a reply",
             trigger: ".o-mail-Message-body:has(p:contains('This is dummy ai response'))",
@@ -335,6 +343,73 @@ registry.category("web_tour.tours").add("test_ai_draft_html_field", {
         {
             content: "Check the the AI response was actually inserted in the HTML field ",
             trigger: ".note-editable:has(div:contains('This is dummy ai response'))",
+        },
+        ...stepUtils.discardForm(),
+    ],
+});
+
+registry.category("web_tour.tours").add("test_close_ai_chat_window", {
+    steps: () => [
+        stepUtils.showAppsMenuItem(),
+        // open AI chat from systray
+        {
+            trigger: ".ai-systray-icon",
+            run: "click",
+        },
+        {
+            trigger: ".o-mail-ChatWindow",
+        },
+        // check no crash on close AI chat window
+        {
+            trigger: ".o-mail-ChatWindow button[title*='Close Chat Window']",
+            run: "click",
+        },
+        {
+            trigger: ".o-mail-ChatHub:not(:visible):not(:has(.o-mail-ChatWindow))",
+        },
+        // open again to be safe
+        {
+            trigger: ".ai-systray-icon",
+            run: "click",
+        },
+        {
+            trigger: ".o-mail-ChatWindow",
+        },
+        {
+            trigger: ".o-mail-ChatWindow button[title*='Close Chat Window']",
+            run: "click",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_ai_systray_discuss_fullscreen", {
+    steps: () => [
+        stepUtils.showAppsMenuItem(),
+        {
+            content: "Wait for Discuss to load in fullscreen",
+            trigger: ".o-mail-Discuss",
+        },
+        {
+            content: "Click on the AI systray button",
+            trigger: ".ai-systray-icon",
+            run: "click",
+        },
+        {
+            content: "Verify that AI chat thread is opened in Discuss fullscreen",
+            trigger: ".o-mail-DiscussContent .o-mail-Thread",
+        },
+        {
+            content: "Verify the name of the AI agent opened from the systray",
+            trigger: ".o-mail-DiscussContent-threadName[title='Odoo AI']",
+        },
+        {
+            content: "Navigate away from Discuss to trigger the chat window",
+            trigger: ".o_main_navbar .o_menu_toggle",
+            run: "click",
+        },
+        {
+            content: "Verify that the AI chat window is opened after leaving Discuss",
+            trigger: ".o-mail-ChatWindow",
         },
     ],
 });

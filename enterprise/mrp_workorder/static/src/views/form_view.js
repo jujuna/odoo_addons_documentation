@@ -3,15 +3,15 @@ import { useViewButtons } from "@web/views/view_button/view_button_hook";
 import { useBus } from "@web/core/utils/hooks";
 
 import { formView } from "@web/views/form/form_view";
-import { FormController } from "@web/views/form/form_controller";
-import { useRef } from "@odoo/owl";
+import { FormController, formControllerProps } from "@web/views/form/form_controller";
+import { useProps, t } from "@odoo/owl";
 
 export class WorkorderFormController extends FormController {
-    static props = {
-        ...FormController.props,
-        workorderBus: Object,
-        onRecordChanged: { optional: true, type: Function },
-    };
+    props = useProps({
+        ...formControllerProps,
+        workorderBus: t.object(),
+        onRecordChanged: t.function().optional(),
+    });
 
     setup() {
         super.setup();
@@ -28,7 +28,6 @@ export class WorkorderFormController extends FormController {
                 ev.detail.resolve();
             }
         });
-        const rootRef = useRef("root");
         // before executing button action
         const beforeExecuteAction = async (params) => {
             params.context = {
@@ -55,7 +54,7 @@ export class WorkorderFormController extends FormController {
         };
         // after executing button action
         const reload = () => this.workorderBus.trigger("refresh");
-        useViewButtons(rootRef, { beforeExecuteAction, reload });
+        useViewButtons(this.rootRef, { beforeExecuteAction, reload });
 
         if (this.props.onRecordChanged) {
             const load = this.model.load.bind(this.model);

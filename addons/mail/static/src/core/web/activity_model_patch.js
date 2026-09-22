@@ -2,11 +2,17 @@ import { Activity } from "@mail/core/common/activity_model";
 import { formatDate, formatDateTime } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
 
+import { isEmptyBlock } from "@html_editor/utils/dom_info";
+
+import { createElementWithContent } from "@web/core/utils/html";
 import { patch } from "@web/core/utils/patch";
 
 patch(Activity.prototype, {
     setup() {
         super.setup(...arguments);
+        this.isNoteEmpty = this.computed(
+            () => !this.note || isEmptyBlock(createElementWithContent("div", this.note))
+        );
     },
     get dateDeadlineFormatted() {
         return formatDate(this.date_deadline);
@@ -31,7 +37,7 @@ patch(Activity.prototype, {
                     context: {
                         default_res_model: this.res_model,
                         default_res_id: this.res_id,
-                        dialog_size: "large",
+                        dialog_size: "medium",
                     },
                 },
                 {
@@ -51,7 +57,7 @@ patch(Activity.prototype, {
             payload: { id: this.res_id, model: this.res_model },
         });
     },
-    /** @returns {Promise<import("@web/webclient/actions/action_service").ActionDescription>} */
+    /** @returns {Promise<import("@web/webclient/actions/action_plugin").ActionDescription>} */
     async markAsDoneAndScheduleNext() {
         const action = await this.store.env.services.orm.call(
             "mail.activity",
@@ -59,16 +65,19 @@ patch(Activity.prototype, {
             [[this.id]],
             { feedback: this.feedback }
         );
-        this.activityBroadcastChannel?.postMessage({
+        this.store.activityBroadcastChannel?.postMessage({
             type: "RELOAD_CHATTER",
             payload: { id: this.res_id, model: this.res_model },
         });
         return action;
     },
     remove({ broadcast = true } = {}) {
+        if (!this.exists()) {
+            return;
+        }
         this.delete();
         if (broadcast) {
-            this.activityBroadcastChannel?.postMessage({
+            this.store.activityBroadcastChannel?.postMessage({
                 type: "DELETE",
                 payload: { id: this.id },
             });

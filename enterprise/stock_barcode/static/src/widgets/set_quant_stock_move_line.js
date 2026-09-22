@@ -1,12 +1,12 @@
 import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
 import { X2ManyField, x2ManyField } from "@web/views/fields/x2many/x2many_field";
-import { onWillStart, onWillUpdateProps, useState, useEffect } from "@odoo/owl";
+import { onWillStart, proxy, useEffect } from "@odoo/owl";
 
 export class StockBarcodeQuantOne2ManyField extends X2ManyField {
     setup() {
         super.setup();
-        this.state = useState({ selectedQuantId: null });
+        this.state = proxy({ selectedQuantId: null });
         this.moveLineData = this.props.record.data;
         this.quantRecords = this.moveLineData.product_stock_quant_ids.records;
 
@@ -21,16 +21,12 @@ export class StockBarcodeQuantOne2ManyField extends X2ManyField {
                     (await user.hasGroup("stock.group_tracking_lot")) ||
                     (await user.hasGroup("stock.group_tracking_owner"));
             }
-
-            this._findMatchingQuant();
         });
 
-        onWillUpdateProps(() => this._findMatchingQuant());
-
-        useEffect(
-            () => this._highlightSelectedQuant(),
-            () => [this.state.selectedQuantId]
-        );
+        useEffect(() => {
+            this._findMatchingQuant();
+            this._highlightSelectedQuant();
+        });
     }
 
     async openRecord(record) {

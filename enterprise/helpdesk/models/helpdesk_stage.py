@@ -15,7 +15,7 @@ class HelpdeskStage(models.Model):
             return [(4, team_id, 0)]
 
     active = fields.Boolean(default=True)
-    name = fields.Char(required=True, translate=True)
+    name = fields.Char("Stage Name", required=True, translate=True)
     description = fields.Text(translate=True)
     sequence = fields.Integer(export_string_translation=False, default=10)
     fold = fields.Boolean(
@@ -39,7 +39,14 @@ class HelpdeskStage(models.Model):
     legend_normal = fields.Char(
         'Grey Kanban Label', default=lambda s: s.env._('In Progress'), translate=True, required=True)
     ticket_count = fields.Integer(compute='_compute_ticket_count', export_string_translation=False)
-    color = fields.Integer(string='Color', export_string_translation=False)
+
+    rating_active = fields.Boolean('Ask for Ratings')
+    rating_template_id = fields.Many2one(
+        'mail.template',
+        string='Rating Email',
+        domain="[('model', '=', 'helpdesk.ticket')]",
+        help="Email template used to send rating requests for helpdesk tickets.",
+    )
 
     def _compute_ticket_count(self):
         res = self.env['helpdesk.ticket']._read_group(

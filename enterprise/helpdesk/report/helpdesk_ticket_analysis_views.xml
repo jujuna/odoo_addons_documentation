@@ -95,7 +95,7 @@
                 <field name="partner_id" optional="show"/>
                 <field name="priority" optional="show" widget="priority"/>
                 <field name="stage_id" optional="show" readonly="1"/>
-                <field name="sla_deadline" optional="show" widget="remaining_days"/>
+                <field name="sla_deadline" optional="show" widget="relative_date"/>
                 <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1" column_invisible="context.get('default_team_id', False)"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="1" column_invisible="not context.get('default_team_id', False)"/>
             </list>
@@ -178,7 +178,30 @@
         <field name="inherit_id" ref="helpdesk_tickets_view_search_base"/>
         <field name="priority">20</field>
         <field name="arch" type="xml">
-            <search position="attributes"/>
+            <field name="tag_ids" position="after">
+                <xpath expr="//field[@name='team_id']" position="move"/>
+                <xpath expr="//field[@name='stage_id']" position="move"/>
+            </field>
+            <xpath expr="//filter[@name='creation_date']" position="before">
+                <filter string="Rating">
+                    <filter name="rating_satisfied" string="Happy" domain="[('rating_avg', '&gt;', 3.66)]"/>
+                    <filter name="rating_okay" string="Neutral" domain="[('rating_avg', '&lt;', 3.66), ('rating_avg', '&gt;=', 2.33)]"/>
+                    <filter name="dissatisfied" string="Unhappy" domain="[('rating_avg', '&lt;', 2.33), ('rating_last_value', '!=', 0.0)]"/>
+                </filter>
+                <separator/>
+            </xpath>
+            <xpath expr="//group//filter[@name='assignee']" position="before">
+                <filter string="Create Date" name="created_by" context="{'group_by': 'create_date'}"/>
+            </xpath>
+            <xpath expr="//group//filter[@name='priority']" position="before">
+                <xpath expr="//group//filter[@name='team']" position="move"/>
+            </xpath>
+            <xpath expr="//group//filter[@name='sla_deadline']" position="before">
+                <filter string="SLA" name="sla_ids" context="{'group_by': 'sla_ids'}" groups="helpdesk.group_use_sla"/>
+            </xpath>
+            <xpath expr="//group//filter[@name='stage']" position="before">
+                <filter string="Customer" name="partner" context="{'group_by': 'partner_id'}"/>
+            </xpath>
         </field>
     </record>
 

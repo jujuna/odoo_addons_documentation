@@ -8,6 +8,14 @@ from odoo.addons.mrp.tests.common import TestMrpCommon
 @tagged('post_install', '-at_install')
 class TestMrpRepairFlow(TestMrpCommon):
 
+    _test_user_groups = (
+        'product.group_product_manager',  # FIXME: use base.group_user
+        'stock.group_stock_manager',  # subject: repair orders & routes (repair.order needs stock user)
+        'mrp.group_mrp_manager',  # subject: manufacturing/BoM linked to repairs
+    )
+
+    _test_user_name = 'Test Product Manager'
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -21,16 +29,14 @@ class TestMrpRepairFlow(TestMrpCommon):
         Validates that a repair order triggers a manufacturing order with correct product
         and quantity, and ensures proper linking via the procurement group.
         """
-        mto_route = self.env.ref('stock.route_warehouse0_mto')
+        mto_route = self.route_mto
         mto_route.active = True
-        manufacturing_route = self.env['stock.rule'].search([('action', '=', 'manufacture')]).route_id
         rule = mto_route.rule_ids.filtered(lambda r: r.picking_type_id.code == 'repair_operation')
         rule.procure_method = 'make_to_order'
 
         product = self.product_2
-        product.write({
-            'route_ids': [Command.set([mto_route.id, manufacturing_route.id])],
-        })
+        product.route_ids = [Command.link(mto_route.id)]
+        self.env['mrp.bom'].create({'product_tmpl_id': product.product_tmpl_id.id})
 
         repair = self.env['repair.order'].create([
             {

@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import re
+
 from odoo import models, fields, tools, _
 from odoo.exceptions import RedirectWarning, ValidationError
+from odoo.tools import BinaryBytes
+from odoo.tools.business_data import split_vat
 
 
 class L10n_LuGenerateXml(models.TransientModel):
@@ -51,10 +52,8 @@ class L10n_LuGenerateXml(models.TransientModel):
         report = self.env['account.report'].browse(report_gen_options.get('report_id'))
         options = report.get_options({**report_gen_options, 'export_mode': 'file'})
         filename = self.env['l10n_lu.report.handler'].get_report_filename(options)
-        agent_vat = agent.vat if agent else self._get_export_vat()
-        company_vat = self._get_export_vat()
-        agent_vat = agent_vat[2:] if agent_vat and agent_vat.startswith("LU") else agent_vat
-        company_vat = company_vat[2:] if company_vat and company_vat.startswith("LU") else company_vat
+        agent_vat = split_vat(agent.vat if agent else self._get_export_vat(), default_country_code='LU')[1]
+        company_vat = split_vat(self._get_export_vat(), default_country_code='LU')[1]
         language = self.env.context.get('lang', '').split('_')[0].upper()
         language = language in ('EN', 'FR', 'DE') and language or 'EN'
         if report_gen_options:
@@ -65,7 +64,7 @@ class L10n_LuGenerateXml(models.TransientModel):
             'interface': 'MODL5',
             'agent_vat': agent_vat or "NE",
             'agent_matr_number': agent.l10n_lu_agent_matr_number or company.matr_number or "NE",
-            'agent_rcs_number': agent.l10n_lu_agent_rcs_number or company.company_registry or "NE",
+            'agent_rcs_number': (agent.l10n_lu_agent_rcs_number if agent else company.partner_id._get_additional_identifier('LU_EN')) or "NE",
             'declarations': []
         }
         # The Matr. Number is required
@@ -93,7 +92,7 @@ class L10n_LuGenerateXml(models.TransientModel):
         declaration_template_values = {
             'vat_number': company_vat or "NE",
             'matr_number': company.matr_number or "NE",
-            'rcs_number': company.company_registry or "NE",
+            'rcs_number': company.partner_id._get_additional_identifier('LU_EN') or "NE",
         }
         declarations_data = self._lu_get_declarations(declaration_template_values)
         self._save_xml_report(declarations_data, lu_template_values, filename)
@@ -127,7 +126,7 @@ class L10n_LuGenerateXml(models.TransientModel):
         content = "\n".join(re.split(r'\n\s*\n', rendered_content))
         self.env['l10n_lu.report.handler']._validate_ecdf_prefix()
         vals = {
-            'report_data': base64.b64encode(bytes("<?xml version='1.0' encoding='UTF-8'?>" + content, 'utf-8')),
+            'report_data': BinaryBytes(("<?xml version='1.0' encoding='UTF-8'?>" + content).encode('utf-8')),
             'filename': filename + '.xml'
         }
         if lu_annual_report:

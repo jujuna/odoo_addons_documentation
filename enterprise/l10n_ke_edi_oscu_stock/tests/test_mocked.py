@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from freezegun import freeze_time
-from unittest import skip
 
 from odoo import Command
 from odoo.exceptions import UserError
@@ -11,12 +10,14 @@ from odoo.addons.l10n_ke_edi_oscu_stock.tests.test_live import TestKeEdiStock
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestKeEdiStockMocked(TestKeEdiStock):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestKeEdiStock.setup_country('ke')
     def setUpClass(cls):
         cls.startClassPatcher(freeze_time('2024-04-15'))
         super().setUpClass()
-        cls.env['ir.config_parameter'].sudo().set_param('l10n_ke.start_stock_date', '2024-04-14')
+        cls.env['ir.config_parameter'].sudo().set_str('l10n_ke.start_stock_date', '2024-04-14')
 
     # === Valid flows === #
 
@@ -51,7 +52,6 @@ class TestKeEdiStockMocked(TestKeEdiStock):
         ]):
             self._test_send_invoiced_stock_moves()
 
-    @skip('Temporary to fast merge new valuation')
     def test_confirm_vendor_bill(self):
         with self.patch_session([
             ('selectTrnsPurchaseSalesList', 'get_purchases', 'get_purchases_2'),
@@ -126,7 +126,7 @@ class TestKeEdiStockMocked(TestKeEdiStock):
                 'location_dest_id': self.customer_location.id,
                 'product_id': self.product_a.id,
                 'product_uom_qty': 1,
-                'product_uom': self.product_a.uom_id.id,
+                'uom_id': self.product_a.uom_id.id,
                 'description_picking': self.product_a.name,
             })]
         })

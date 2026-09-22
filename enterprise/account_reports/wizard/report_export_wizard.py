@@ -1,12 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, models, fields, _
-from odoo.exceptions import UserError
-
-import json
 import base64
+import json
 import types
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
+
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class Account_ReportsExportWizard(models.TransientModel):
@@ -90,10 +90,14 @@ class Account_ReportsExportWizardFormat(models.TransientModel):
 
             # We use the options from the action, as the action may have added or modified
             # stuff into them (see l10n_es_reports, with BOE wizard)
-            file_content = base64.encodebytes(export_result['file_content']) if isinstance(export_result['file_content'], bytes) else export_result['file_content']
-            # We need to unpack the content in case of a generator
-            if isinstance(file_content, types.GeneratorType):
-                file_content = base64.encodebytes(b''.join(file_content))
+            file_content = export_result['file_content']
+            if isinstance(file_content, str):
+                file_content = file_content.encode()
+            elif isinstance(file_content, types.GeneratorType):
+                file_content = b''.join(file_content)
+            else:
+                # just to validate that we have bytes
+                file_content = bytes(file_content)
             file_name = f"{self.export_wizard_id.doc_name or self.export_wizard_id.report_id.name}.{export_result['file_type']}"
             mimetype = self.export_wizard_id.report_id.get_export_mime_type(export_result['file_type'])
 
@@ -103,7 +107,7 @@ class Account_ReportsExportWizardFormat(models.TransientModel):
             model_id = int(query_params['id'][0])
             wizard = self.env[model].browse(model_id)
             file_name = wizard[query_params['filename_field'][0]]
-            file_content = wizard[query_params['field'][0]]
+            file_content = base64.b64decode(wizard[query_params['field'][0]])
             mimetype = self.env['account.report'].get_export_mime_type(file_name.split('.')[-1])
 
         else:
@@ -116,7 +120,7 @@ class Account_ReportsExportWizardFormat(models.TransientModel):
         return {
             'name': file_name,
             'company_id': self.env.company.id,
-            'datas': file_content,
+            'raw': file_content,
             'mimetype': mimetype,
             'description': json.dumps(log_options_dict)
         }

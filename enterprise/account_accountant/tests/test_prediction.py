@@ -8,11 +8,11 @@ from odoo.tests import Form, tagged
 @tagged('post_install', '-at_install')
 class TestBillsPrediction(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-
-        cls.company.predict_bill_product = True
 
         cls.test_partners = cls.env['res.partner'].create([{'name': 'test partner %s' % i} for i in range(7)])
 
@@ -71,11 +71,11 @@ class TestBillsPrediction(AccountTestInvoicingCommon):
 
     def test_account_prediction_flow(self):
         default_account = self.company_data['default_journal_purchase'].default_account_id
-        self._create_bill(self.test_partners[0], "Maintenance and repair", self.test_accounts[0])
+        self._create_bill(self.test_partners[0], "Maintenance and repair", default_account, account_to_set=self.test_accounts[0])
         self._create_bill(self.test_partners[5], "Subsidies obtained", default_account, account_to_set=self.test_accounts[1])
         self._create_bill(self.test_partners[6], "Prepare subsidies file", default_account, account_to_set=self.test_accounts[1])
         self._create_bill(self.test_partners[6], "Prepare subsidies file", self.test_accounts[1])
-        self._create_bill(self.test_partners[1], "Contributions January", self.test_accounts[2])
+        self._create_bill(self.test_partners[1], "Contributions January", default_account, account_to_set=self.test_accounts[2])
         self._create_bill(self.test_partners[2], "Coca-cola", default_account, account_to_set=self.test_accounts[4])
         self._create_bill(self.test_partners[1], "Contribution February", self.test_accounts[2])
         self._create_bill(self.test_partners[3], "Electricity Bruxelles", default_account, account_to_set=self.test_accounts[3])
@@ -98,25 +98,26 @@ class TestBillsPrediction(AccountTestInvoicingCommon):
         self._create_bill(self.test_partners[0], "Drinks", default_account, account_to_set=self.test_accounts[0])
 
         # There is only one prior account for the partner, we take that one
-        self._create_bill(self.test_partners[0], "Desert", self.test_accounts[0], account_to_set=self.test_accounts[1])
+        self._create_bill(self.test_partners[0], "Dessert", self.test_accounts[0], account_to_set=self.test_accounts[1])
 
         # We find something close enough, take that one
         self._create_bill(self.test_partners[0], "Drinks too", self.test_accounts[0])
 
         # There is no clear preference for any account (both previous accounts have the same rank)
         # don't make any prediction and let the default behavior fill the account
-        invoice = self._create_bill(self.test_partners[0], "Main course", default_account)
-        invoice.button_draft()
+        invoice = self._create_bill(self.test_partners[0], "Main course", self.test_accounts[0], post=False)
 
         with Form(invoice) as move_form:
             with move_form.invoice_line_ids.edit(0) as line_form:
-                # There isn't any account clearly better than the manually set one, we keep the current one
+                # We changed the account before in the same form, do not override it
                 line_form.account_id = self.test_accounts[2]
-                line_form.name = "Apple"
+                line_form.name = "Second dessert"
                 self.assertEqual(line_form.account_id, self.test_accounts[2])
 
-                # There is an account that looks clearly better, use it
-                line_form.name = "Second desert"
+        with Form(invoice) as move_form:
+            with move_form.invoice_line_ids.edit(0) as line_form:
+                # We didn't change the account before in the same form, override it
+                line_form.name = "Third dessert"
                 self.assertEqual(line_form.account_id, self.test_accounts[1])
 
     def test_account_prediction_with_product(self):
@@ -151,23 +152,6 @@ class TestBillsPrediction(AccountTestInvoicingCommon):
         invoice = invoice_form.save()
         invoice.action_post()
 
-        self.product_a.supplier_taxes_id = [Command.set(self.tax_purchase_b.ids)]
-
-        invoice_form = Form(self.env['account.move'].with_context(default_move_type='in_invoice'))
-        invoice_form.partner_id = self.test_partners[0]
-        invoice_form.invoice_date = self.frozen_today
-        with invoice_form.invoice_line_ids.new() as invoice_line_form:
-            invoice_line_form.name = 'product_a'
-        invoice = invoice_form.save()
-
-        self.assertRecordValues(invoice.invoice_line_ids, [{
-            'quantity': 1.0,
-            'price_unit': 800.0,
-            'price_subtotal': 800.0,
-            'balance': 800.0,
-            'tax_ids': self.tax_purchase_b.ids,
-        }])
-
         # In case a unit price is already set we do not update the unit price
         invoice_form = Form(self.env['account.move'].with_context(default_move_type='in_invoice'))
         invoice_form.partner_id = self.test_partners[0]
@@ -182,15 +166,20 @@ class TestBillsPrediction(AccountTestInvoicingCommon):
             'price_unit': 42.0,
             'price_subtotal': 42.0,
             'balance': 42.0,
-            'tax_ids': self.tax_purchase_b.ids,
+            'tax_ids': self.tax_purchase_a.ids,
         }])
 
         # In case a tax is already set we do not update the taxes
-        invoice_form = Form(self.env['account.move'].with_context(default_move_type='in_invoice'))
+        invoice = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': self.test_partners[0].id,
+            'line_ids': [Command.create({'name': 'something else'})]
+        })
+        invoice_form = Form(invoice)
         invoice_form.partner_id = self.test_partners[0]
         invoice_form.invoice_date = self.frozen_today
-        with invoice_form.invoice_line_ids.new() as invoice_line_form:
-            invoice_line_form.tax_ids = self.tax_purchase_a
+        with invoice_form.invoice_line_ids.edit(0) as invoice_line_form:
+            invoice_line_form.tax_ids = self.tax_purchase_b
             invoice_line_form.name = 'product_a'
         invoice = invoice_form.save()
 
@@ -199,19 +188,19 @@ class TestBillsPrediction(AccountTestInvoicingCommon):
             'price_unit': 800.0,
             'price_subtotal': 800.0,
             'balance': 800.0,
-            'tax_ids': self.tax_purchase_a.ids,
+            'tax_ids': self.tax_purchase_b.ids,
         }])
 
-    def test_deductible_amount_prediction(self):
+    def test_deductible_percentage_prediction(self):
         default_account = self.company_data['default_journal_purchase'].default_account_id
         bill_1 = self.env['account.move'].create({
             'move_type': 'in_invoice',
             'invoice_date': fields.Date.today(),
             'partner_id': self.test_partners[0].id,
             'line_ids': [
-                Command.create({'name': "Laptop", 'deductible_amount': 80.0, 'account_id': default_account.id, 'quantity': 1, 'price_unit': 100.0}),
-                Command.create({'name': "T-shirt", 'deductible_amount': 50.0, 'account_id': default_account.id, 'quantity': 1, 'price_unit': 100.0}),
-                Command.create({'name': "T-shirt", 'deductible_amount': 60.0, 'account_id': default_account.id, 'quantity': 1, 'price_unit': 100.0}),
+                Command.create({'name': "Laptop", 'deductible_percentage': 0.8, 'account_id': default_account.id, 'quantity': 1, 'price_unit': 100.0}),
+                Command.create({'name': "T-shirt", 'deductible_percentage': 0.5, 'account_id': default_account.id, 'quantity': 1, 'price_unit': 100.0}),
+                Command.create({'name': "T-shirt", 'deductible_percentage': 0.6, 'account_id': default_account.id, 'quantity': 1, 'price_unit': 100.0}),
             ],
         })
         bill_1.action_post()
@@ -224,11 +213,11 @@ class TestBillsPrediction(AccountTestInvoicingCommon):
                 invoice_line_form.name = label
         bill_2 = bill_form.save()
         self.assertRecordValues(bill_2.invoice_line_ids, [
-            {'name': 'Laptop', 'deductible_amount': 80.0},
-            {'name': 'Laptops', 'deductible_amount': 80.0},
-            {'name': 'Laptopp', 'deductible_amount': 100.0},
-            {'name': 'T-shirt', 'deductible_amount': 100.0},
-            {'name': 'Mobile', 'deductible_amount': 100.0},
+            {'name': 'Laptop', 'deductible_percentage': 0.8},
+            {'name': 'Laptops', 'deductible_percentage': 0.8},
+            {'name': 'Laptopp', 'deductible_percentage': 0.6},
+            {'name': 'T-shirt', 'deductible_percentage': 0.6},
+            {'name': 'Mobile', 'deductible_percentage': 0.6},
         ])
 
         # Don't predict if the user is not having group `account.group_partial_purchase_deductibility`
@@ -241,6 +230,30 @@ class TestBillsPrediction(AccountTestInvoicingCommon):
                 invoice_line_form.name = label
         bill_3 = bill_form.save()
         self.assertRecordValues(bill_3.invoice_line_ids, [
-            {'name': 'Laptop', 'deductible_amount': 100.0},
-            {'name': 'Laptops', 'deductible_amount': 100.0},
+            {'name': 'Laptop', 'deductible_percentage': 1.0},
+            {'name': 'Laptops', 'deductible_percentage': 1.0},
         ])
+
+    def test_onchange_account_conflict(self):
+        self.test_accounts[4].tax_ids = self.tax_purchase_a
+        bill_1 = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'invoice_date': fields.Date.today(),
+            'partner_id': self.test_partners[0].id,
+            'line_ids': [
+                Command.create({
+                    'name': "Electricity january",
+                    'account_id': self.test_accounts[4].id,
+                    'tax_ids': self.tax_purchase_b.ids,
+                }),
+            ],
+        })
+        bill_1.action_post()
+
+        with Form(self.env['account.move'].with_context(default_move_type='in_invoice')) as invoice_form:
+            invoice_form.partner_id = self.test_partners[0]
+            invoice_form.invoice_date = self.frozen_today
+            with invoice_form.invoice_line_ids.new() as invoice_line_form:
+                invoice_line_form.name = "electricity february"
+        bill = invoice_form.save()
+        self.assertEqual(bill.line_ids.tax_ids, self.tax_purchase_b)

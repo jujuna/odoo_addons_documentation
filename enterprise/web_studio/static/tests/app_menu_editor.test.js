@@ -20,7 +20,7 @@ test("edit menu behavior", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     expect(".o-web-studio-appmenu-editor").toHaveCount(0);
     await contains(".o_web_edit_menu").click();
@@ -31,7 +31,7 @@ test("edit menu dialog rendering", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     await contains(".o_web_edit_menu").click();
 
@@ -62,7 +62,7 @@ test("edit menu dialog: create menu", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     await contains(".o_web_edit_menu").click();
 
@@ -120,7 +120,7 @@ test("drag/drop to reorganize menus", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     await contains(".o_web_edit_menu").click();
 
@@ -152,7 +152,7 @@ test("edit/delete menus", async () => {
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     await contains(".o_web_edit_menu").click();
     expect(".o-web-studio-interactive-list-item-label").toHaveCount(3);

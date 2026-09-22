@@ -1,5 +1,4 @@
 from odoo import api, models, Command, _
-from odoo.addons.iap.tools import iap_tools
 
 OCR_VERSION = 100
 
@@ -28,11 +27,13 @@ class AccountBankStatement(models.Model):
         user_infos['journal_type'] = self.journal_id.type
         return user_infos
 
-    def _contact_iap_extract(self, pathinfo, params):
-        params['version'] = OCR_VERSION
-        params['account_token'] = self._get_iap_account().sudo().account_token
-        endpoint = self.env['ir.config_parameter'].sudo().get_param('iap_extract_endpoint', 'https://extract.api.odoo.com')
-        return iap_tools.iap_jsonrpc(endpoint + '/api/extract/bank_statement/1/' + pathinfo, params=params)
+    @api.model
+    def _get_ocr_api_version(self):
+        return OCR_VERSION
+
+    @api.model
+    def _get_api_route(self):
+        return 'api/extract/bank_statement/2'
 
     def _fill_document_with_results(self, ocr_results):
         self.ensure_one()

@@ -98,7 +98,6 @@ class AppointmentInvite(models.Model):
 
     base_book_url = fields.Char('Base Link URL', compute="_compute_base_book_url")
     book_url = fields.Char('Link URL', compute='_compute_book_url')
-    book_url_params = fields.Char('Link URL params', compute='_compute_book_url_params')
     redirect_url = fields.Char('Redirect URL', compute='_compute_redirect_url')
 
     # Put active_test to False because we always want to be able to check all appointment types from an invitation.
@@ -263,15 +262,7 @@ class AppointmentInvite(models.Model):
         for invite in self:
             invite.suggested_staff_user_count = len(invite.suggested_staff_user_ids)
 
-    def _get_url_params(self):
-        return {}
-
-    def _compute_book_url_params(self):
-        params = self._get_url_params()
-        for invite in self:
-            invite.book_url_params = f'?{url_encode(params)}' if params else ''
-
-    @api.depends('base_book_url', 'short_code', 'book_url_params')
+    @api.depends('base_book_url', 'short_code')
     def _compute_book_url(self):
         """
         Compute a short link linked to an appointment invitation.
@@ -282,9 +273,6 @@ class AppointmentInvite(models.Model):
                 invite.book_url = url_join(invite.base_book_url, invite.short_code) if invite.short_code else False
             except ValueError:
                 invite.book_url = False
-
-            if invite.book_url_params and invite.book_url:
-                invite.book_url += invite.book_url_params
 
     @api.depends('appointment_type_ids', 'staff_user_ids', 'resource_ids')
     def _compute_redirect_url(self):
@@ -300,7 +288,7 @@ class AppointmentInvite(models.Model):
         """
         for invite in self:
             if len(invite.appointment_type_ids) == 1:
-                base_redirect_url = url_join("/appointment/", str(invite.appointment_type_ids.id))
+                base_redirect_url = f'/appointment/{self.env['ir.http']._slug(invite.appointment_type_ids)}'
             else:
                 base_redirect_url = '/appointment'
 
@@ -399,7 +387,7 @@ class AppointmentInvite(models.Model):
 
     def _find_identical_config(self, appointment_type_ids, resources_choice, short_code=False):
         domain = Domain([
-            ('appointment_type_ids', '=', appointment_type_ids),
+            ('appointment_type_ids', 'in', appointment_type_ids),
             ('resources_choice', '=', resources_choice),
         ])
         if short_code:

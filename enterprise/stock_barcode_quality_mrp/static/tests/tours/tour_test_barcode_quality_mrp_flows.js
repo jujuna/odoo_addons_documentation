@@ -27,7 +27,6 @@ registry.category("web_tour.tours").add("test_final_product_quality_check_mrp_ba
         {
             content: "check that the qty_producing was set",
             trigger: ".o_barcode_line.o_header_completed",
-            run() {},
         },
         {
             trigger: "button:contains(Quality Checks)",
@@ -43,7 +42,6 @@ registry.category("web_tour.tours").add("test_final_product_quality_check_mrp_ba
         },
         {
             trigger: ".o_notification_bar.bg-success",
-            run() {},
         },
     ],
 });

@@ -17,7 +17,7 @@ class WebsiteHelpdeskKnowledge(WebsiteHelpdesk):
             'template': 'website_helpdesk_knowledge.search_result',
             'record': article,
             'url': article.website_url,
-            'icon': 'fa-book',
+            'icon': 'book',
         } for article in records]
 
     def _get_knowledge_base_values(self, team):

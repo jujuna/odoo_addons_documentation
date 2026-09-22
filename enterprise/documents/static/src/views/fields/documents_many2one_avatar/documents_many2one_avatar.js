@@ -1,12 +1,12 @@
 import { Avatar } from "@mail/views/web/fields/avatar/avatar";
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { user } from "@web/core/user";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class DocumentsMany2OneAvatarField extends Component {
     static template = "documents.DocumentsMany2OneAvatarField";
-    static props = { ...standardFieldProps };
+    props = useProps(standardFieldProps);
     static components = {
         Avatar,
     };

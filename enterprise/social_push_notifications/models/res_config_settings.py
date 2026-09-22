@@ -7,14 +7,7 @@ from odoo import models, fields
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    firebase_enable_push_notifications = fields.Boolean('Enable Web Push Notifications', readonly=False, related='website_id.firebase_enable_push_notifications')
-    firebase_use_own_account = fields.Boolean('Use your own Firebase account', readonly=False, related='website_id.firebase_use_own_account')
-    firebase_project_id = fields.Char('Firebase Project ID', readonly=False, related='website_id.firebase_project_id')
-    firebase_web_api_key = fields.Char('Firebase Web API Key', readonly=False, related='website_id.firebase_web_api_key')
-    firebase_web_app_id = fields.Char('Firebase Web App ID', readonly=False, related='website_id.firebase_web_app_id')
-    firebase_push_certificate_key = fields.Char('Firebase Push Certificate Key', readonly=False, related='website_id.firebase_push_certificate_key')
-    firebase_sender_id = fields.Char('Firebase Sender ID', readonly=False, related='website_id.firebase_sender_id')
-    firebase_admin_key_file = fields.Binary('Firebase Admin Key File', readonly=False, related='website_id.firebase_admin_key_file')
+    enable_push_notifications = fields.Boolean('Enable Web Push Notifications', readonly=False, related='website_id.enable_push_notifications')
 
     notification_request_title = fields.Char('Notification Request Title', readonly=False, related='website_id.notification_request_title')
     notification_request_body = fields.Text('Notification Request Text', readonly=False, related='website_id.notification_request_body')

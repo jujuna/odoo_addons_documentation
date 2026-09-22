@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 {
     'name': "Documents",
 
-    'summary': "Collect, organize and share documents.",
+    'summary': "Collect, organize and share documents.",
 
     'description': """
 App to upload and manage your documents.
@@ -14,15 +13,15 @@ App to upload and manage your documents.
     'application': True,
     'website': 'https://www.odoo.com/app/documents',
 
-    # any module necessary for this one to work correctly
-    'depends': ['base', 'mail', 'portal', 'web_enterprise', 'attachment_indexation', 'digest'],
+    'depends': ['base', 'mail_enterprise', 'portal', 'web_enterprise', 'attachment_indexation', 'digest'],
 
     # always loaded
     'data': [
         'security/security.xml',
-        'security/ir.model.access.csv',
+        'views/documents_templates_chatter_message.xml',
         'data/digest_data.xml',
         'data/mail_template_data.xml',
+        'data/mail_templates.xml',
         'data/mail_activity_type_data.xml',
         'data/documents_tag_data.xml',
         'data/documents_document_data.xml',
@@ -31,6 +30,7 @@ App to upload and manage your documents.
         'data/ir_config_parameter_data.xml',
         'data/ir_cron_data.xml',
         'data/documents_tour.xml',
+        'data/portal_entry_data.xml',
         'views/res_config_settings_views.xml',
         'views/res_partner_views.xml',
         'views/documents_access_views.xml',
@@ -41,9 +41,9 @@ App to upload and manage your documents.
         'views/mail_activity_plan_views.xml',
         'views/mail_alias_views.xml',
         'views/documents_menu_views.xml',
+        'views/documents_templates_email.xml',
         'views/documents_templates_portal.xml',
         'views/documents_templates_share.xml',
-        'views/documents_templates_thumbnails.xml',
         'views/ir_actions_views.xml',
         'views/mail_compose_message_views.xml',
         'views/mail_scheduled_message_views.xml',
@@ -51,6 +51,7 @@ App to upload and manage your documents.
         'wizard/documents_operation_views.xml',
         'wizard/documents_request_wizard_views.xml',
         'wizard/documents_sharing_views.xml',
+        'security/ir.access.csv',
     ],
 
     'demo': [
@@ -58,14 +59,16 @@ App to upload and manage your documents.
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'kpi_providers': [
+        'models.kpi_provider:get_kpi_summary',
+    ],
     'assets': {
         'web.assets_backend': [
             'documents/static/src/scss/documents_views.scss',
             'documents/static/src/scss/documents_kanban_view.scss',
-            'documents/static/src/attachments/**/*',
+            'documents/static/src/core/common/**/*',
             'documents/static/src/core/**/*',
             'documents/static/src/js/**/*',
-            'documents/static/src/mail/**/*',
             'documents/static/src/owl/**/*',
             'documents/static/src/utils.js',
             'documents/static/src/views/**/*',
@@ -85,6 +88,9 @@ App to upload and manage your documents.
         "web.dark_mode_variables": [
             ('before', 'documents/static/src/scss/documents.variables.scss', 'documents/static/src/scss/documents.variables.dark.scss'),
         ],
+        'documents.assets_email': [
+            'documents/static/src/scss/documents_email_assets.scss',
+        ],
         'documents.public_page_assets': [
             ('include', 'web._assets_helpers'),
             ('include', 'web._assets_backend_helpers'),
@@ -101,11 +107,20 @@ App to upload and manage your documents.
             'documents/static/src/portal_webclient/**/*',
             'web/static/src/start.js',
         ],
+        'im_livechat.assets_embed_core': [
+            'documents/static/src/core/common/**/*',
+        ],
+        'mail.assets_public': [
+            'documents/static/src/core/common/**/*',
+        ],
+        "portal.assets_chatter_helpers": [
+            'documents/static/src/core/common/**/*',
+        ],
         'web.assets_tests': [
             'documents/static/tests/tours/*',
         ],
         'web.assets_unit_tests': [
             'documents/static/tests/**/*',
         ],
-    }
+    },
 }

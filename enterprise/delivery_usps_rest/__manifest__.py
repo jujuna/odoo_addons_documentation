@@ -5,7 +5,6 @@
                    "compatible with the new USPS REST API available at https://developers.usps.com/.",
     'category': 'Shipping Connectors',
     'sequence': 305,
-    'version': '1.0',
     'application': True,
     'depends': ['stock_delivery', 'mail'],
     'data': [

@@ -1,4 +1,4 @@
-import { Component, reactive, useExternalListener, useState } from "@odoo/owl";
+import { Component, proxy, signal, t, useListener, useProps } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
 import { user } from "@web/core/user";
 import { useAutofocus, useService } from "@web/core/utils/hooks";
@@ -20,7 +20,7 @@ class AppCreatorState {
             appName: () => !!this.data.appName,
             menu: (_this) => _this.menuCreatorModel.isValid,
         };
-        this.menuCreatorModel = reactive(new MenuCreatorModel());
+        this.menuCreatorModel = proxy(new MenuCreatorModel());
 
         this.data = {
             appName: "",
@@ -41,9 +41,7 @@ class AppCreatorState {
             },
             model: {
                 previous: "app",
-                next: (data) => {
-                    return data.menu.modelChoice === "new" ? "model_configuration" : "";
-                },
+                next: (data) => (data.menu.modelChoice === "new" ? "model_configuration" : ""),
                 fields: ["menu"],
             },
             model_configuration: {
@@ -114,21 +112,24 @@ class AppCreatorState {
     }
 
     get _stepInvalidFields() {
-        return (this._currentStep.fields || []).filter((fName) => {
-            return !this.fieldsValidators[fName](this);
-        });
+        return (this._currentStep.fields || []).filter(
+            (fName) => !this.fieldsValidators[fName](this)
+        );
     }
 }
 
 export class AppCreator extends Component {
     static template = "web_studio.AppCreator";
     static components = { IconCreator, ModelConfigurator, MenuCreator };
-    static props = {
-        onNewAppCreated: { type: Function },
-    };
+
+    props = useProps({
+        onNewAppCreated: t.function(),
+    });
+
+    autofocusRef = signal.ref();
 
     setup() {
-        this.state = useState(
+        this.state = proxy(
             new AppCreatorState({
                 onFinished: this.createNewApp.bind(this),
             })
@@ -136,8 +137,8 @@ export class AppCreator extends Component {
 
         this.uiService = useService("ui");
 
-        useAutofocus();
-        useExternalListener(window, "keydown", this.onKeydown);
+        useAutofocus({ ref: this.autofocusRef });
+        useListener(window, "keydown", this.onKeydown.bind(this));
     }
 
     /**
@@ -151,7 +152,7 @@ export class AppCreator extends Component {
         const iconValue =
             iconData.type === "custom_icon"
                 ? // custom icon data
-                  [iconData.iconClass, iconData.color, iconData.backgroundColor]
+                  [iconData.icon, iconData.color, iconData.backgroundColor]
                 : // attachment
                   iconData.uploaded_attachment_id;
 

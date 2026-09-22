@@ -3,18 +3,19 @@
 import base64
 import io
 import json
+import lzma
 import uuid
-from werkzeug.urls import url_join
 
 from odoo import _, http
 from odoo.tools import consteq
 from odoo.http import request
 from odoo.exceptions import ValidationError
+from odoo.tools import BinaryBytes
 from odoo.tools.pdf import PdfFileReader, PdfReadError
+from odoo.tools.pdf.signature import IncrementalPdfMerge
 
-from odoo.addons.iap import jsonrpc
+from odoo.addons.iap.tools import iap_tools
 from odoo.addons.sign.controllers.main import Sign as SignController
-from odoo.addons.sign_emsigner.utils import compress_pdf_base64, decompress_pdf_base64
 from odoo.addons.sign_emsigner.const import IAP_DEFAULT_DOMAIN
 
 IAP_SERVICE_NAME = 'emsigner_proxy'
@@ -46,7 +47,7 @@ class SignEmsigner(SignController):
         try:
             pdf_file_data = io.BytesIO(document_id.attachment_id.raw)
             pdf_file_reader = PdfFileReader(pdf_file_data, strict=False)
-            pdf_file_reader.getNumPages()
+            len(pdf_file_reader.pages)
         except (ValueError, PdfReadError) as e:
             raise ValidationError(self.env._("ERROR: Invalid PDF file! %s") % str(e))
 
@@ -117,30 +118,40 @@ class SignEmsigner(SignController):
                 'frame_has_hash': bool(frame_data.get('frameHash'))
             }
 
-        final_log_hash = sign_request._get_final_signature_log_hash()
-        output = document_id.render_document_with_items(
-            signed_values=signed_values,
-            values_dict=True,
-            final_log_hash=final_log_hash
-        )
-        to_sign_data = output.getvalue()
-        output.close()
-
         # Generate a unique reference number
         reference_number = uuid.uuid4().hex
+
+        overlay_pdf_raw, overlay_regions = document_id.render_document_with_items(
+            signed_values=signed_values,
+            values_dict=True,
+        )
+        incremental_pdf_merger = IncrementalPdfMerge(bytes(document_id.attachment_id.raw))
+        incremental_pdf_merger.merge_pdf_regions_as_annotations(
+            PdfFileReader(overlay_pdf_raw, strict=False), overlay_regions, f"sign_values_{reference_number[:6]}")
+
+        final_log_hash = sign_request._get_final_signature_log_hash()
+        if final_log_hash:
+            log_hash_pdf_raw, log_hash_regions = document_id._render_log_hash_overlay(final_log_hash)
+            overlay_pdf = PdfFileReader(log_hash_pdf_raw, strict=False)
+            incremental_pdf_merger = IncrementalPdfMerge(incremental_pdf_merger.get_output_stream_value())
+            incremental_pdf_merger.merge_pdf_regions_as_annotations(
+                overlay_pdf, log_hash_regions, annotations_title="final_signature_hash")
+
+        to_sign_data = incremental_pdf_merger.get_output_stream_value()
 
         # Get the signature position on the pdf page
         signature_position = self._get_signature_fields_position(document_id, request_item_sudo)
         page_numbers = ",".join(str(item['page']) for item in signature_position)
+        # Offset (+8 left, -35 height) to prevent emSigner certificate from overlapping Odoo signature by placing it slightly below.
         page_coordinates_with_page = ";".join([
-            f"{item['page']},{item['left'] + 8},{item['top'] - (item['top'] - item['height'])},{item['width']},{item['height'] - 20}"
+            f"{item['page']},{item['left'] + 8},{item['top'] - (item['top'] - item['height'])},{item['width']},{item['height'] - 35}"
             for item in signature_position
         ])
 
         # Check if the file is large and needs compression
         is_file_large = self._is_file_large(file_size=document_id.attachment_id.file_size)
         if is_file_large:
-            to_sign_data = compress_pdf_base64(to_sign_data)
+            to_sign_data = lzma.compress(to_sign_data, format=lzma.FORMAT_ALONE)
 
         # Prepare the dynamic content for the emsigner
         dyamic_content = [
@@ -178,6 +189,7 @@ class SignEmsigner(SignController):
             "AuthenticationMode": 1,
             "Reason": f"Digitally Signed by {request_item_sudo.partner_id.email}",
             "DynamicContent": dyamic_content_data.decode('utf-8'),
+            'eMudhraV2SignatureType': 1,
         }
 
     def _validate_auth_method(self, request_item_sudo, **kwargs):
@@ -188,9 +200,8 @@ class SignEmsigner(SignController):
                     'success': False,
                     'message': _("emSigner IAP service could not be found.")
                 }
-            endpoint = request.env['ir.config_parameter'].sudo().get_param(
-                'sign_emsigner.iap_endpoint', IAP_DEFAULT_DOMAIN
-            )
+            endpoint = request.env['ir.config_parameter'].sudo().get_str(
+                'sign_emsigner.iap_endpoint') or IAP_DEFAULT_DOMAIN
             emsigner_credits = request.env['iap.account'].sudo().get_credits(IAP_SERVICE_NAME)
             # If no credits are available, still allow signing without emsigner auth method
             if emsigner_credits < 1:
@@ -202,10 +213,10 @@ class SignEmsigner(SignController):
                 'signature_data': self._get_emsigner_params(request_item_sudo, **kwargs),
                 'account_token': account.sudo().account_token,  # FOR IAP CREDIT
                 'emsigner_state': '%s.%s' % (request_item_sudo.sign_request_id.id, request_item_sudo.access_token),
-                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+                'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid'),
                 'url': account.get_base_url(),
             }
-            response = jsonrpc(url_join(endpoint, '/api/emsigner/1/sign_identity_request'), params=params)
+            response = iap_tools.iap_jsonrpc(f'{endpoint}/api/emsigner/1/sign_identity_request', params=params, raise_user_error=True)
             return response
         return super()._validate_auth_method(request_item_sudo, **kwargs)
 
@@ -265,15 +276,20 @@ class SignEmsigner(SignController):
                 self.env._("Emsigner only supports signing a single document at a time.")
             )
 
-        # Check if file is large and needs decompression
-        file_size = document_id.attachment_id.file_size
-        if self._is_file_large(file_size=file_size):
-            decrypted_data = decompress_pdf_base64(decrypted_data)
+        file_content = document_id.raw
+        if decrypted_data:
+            signed_pdf = base64.b64decode(decrypted_data)
 
-        sign_request.completed_document_ids = request.env['sign.completed.document'].sudo().create({
+            # Check if file is large and needs decompression
+            if self._is_file_large(file_size=file_content.size):
+                signed_pdf = lzma.decompress(signed_pdf, format=lzma.FORMAT_ALONE)
+
+            file_content = BinaryBytes(signed_pdf)
+        sign_request.request_document_ids = request.env['sign.request.document'].sudo().create({
             'sign_request_id': sign_request.id,
-            'file': decrypted_data.encode() or sign_request.template_id.document_ids.datas,
-            'document_id': sign_request.template_id.document_ids.id,
+            'file': file_content,
+            'document_id': document_id.id,
+            'state': 'completed',
         })
 
         request_item._write_emsigner_data(reference_number, transaction_number, return_status)

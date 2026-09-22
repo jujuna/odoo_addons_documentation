@@ -4,9 +4,8 @@
     'name': 'Kenya - Payroll',
     'countries': ['ke'],
     'category': 'Human Resources/Payroll',
-    'depends': ['hr_payroll', 'hr_work_entry_holidays', 'hr_payroll_holidays'],
+    'depends': ['hr_payroll', 'hr_holidays'],
     'auto_install': True,
-    'version': '1.0',
     'description': """
 Kenyan Payroll Rules.
 =====================
@@ -19,17 +18,15 @@ Kenyan Payroll Rules.
     * Integrated with Leaves Management
     """,
     'data': [
-        'security/ir.model.access.csv',
-        'security/l10n_ke_hr_payroll_security.xml',
         'data/report_paperformat_data.xml',
         'data/resource_calendar_data.xml',
         'data/hr_salary_rule_category_data.xml',
         'data/hr_payroll_structure_type_data.xml',
+        'data/hr_work_entry_type_data.xml',
         'wizards/l10n_ke_hr_payroll_nssf_report_wizard_views.xml',
         'wizards/l10n_ke_hr_payroll_shif_report_wizard_views.xml',
         'views/hr_payroll_report.xml',
         'data/hr_payroll_structure_data.xml',
-        'data/hr_payslip_input_type_data.xml',
         'data/hr_rule_parameters_data.xml',
         'data/hr_salary_rule_data.xml',
         'views/hr_contract_template_views.xml',
@@ -39,6 +36,7 @@ Kenyan Payroll Rules.
         'views/res_company_views.xml',
         'views/l10n_ke_hr_payroll_menus.xml',
         'report/l10n_ke_tax_reduction_card_templates.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.report_assets_common': [
@@ -50,4 +48,5 @@ Kenyan Payroll Rules.
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'post_init_hook': '_l10n_ke_hr_payroll_post_install',
 }

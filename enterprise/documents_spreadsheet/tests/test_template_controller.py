@@ -1,5 +1,5 @@
 
-from odoo.tests.common import HttpCase
+from odoo.tests.common import tagged, HttpCase
 
 from .common import SpreadsheetTestCommon
 
@@ -25,7 +25,7 @@ class TestSpreadsheetTemplateController(SpreadsheetTestCommon, HttpCase):
         user = self.spreadsheet_user
         self.authenticate(user.login, user.password)
         commands = self.new_revision_data(template)
-        template.dispatch_spreadsheet_message(commands)
+        template._dispatch_spreadsheet_message(commands)
         del commands['clientId']
         response = self.url_open('/spreadsheet/data/spreadsheet.template/%s' % template.id)
         self.assertEqual(response.json()['data'], {})
@@ -55,7 +55,7 @@ class TestSpreadsheetTemplateController(SpreadsheetTestCommon, HttpCase):
         template = self.env['spreadsheet.template'].create({
             'name': 'Template name',
         })
-        template.dispatch_spreadsheet_message(self.new_revision_data(template))
+        template._dispatch_spreadsheet_message(self.new_revision_data(template))
         action = template.with_user(user).action_create_spreadsheet()
         spreadsheet_id = action['params']['spreadsheet_id']
         response = self.url_open('/spreadsheet/data/documents.document/%s' % spreadsheet_id)

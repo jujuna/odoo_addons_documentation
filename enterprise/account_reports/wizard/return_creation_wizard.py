@@ -41,20 +41,22 @@ class AccountReturnCreationWizard(models.TransientModel):
     show_warning_wrong_dates = fields.Boolean(compute='_compute_warnings')
     show_warning_existing_return = fields.Boolean(compute='_compute_warnings')
     show_warning_overlap = fields.Boolean(compute='_compute_warnings')
-
-    regulatory_compliance = fields.Boolean(string="Regulatory compliance", default=True)
-    treasury_financing = fields.Boolean(string="Treasury and financing", default=True)
-    purchases = fields.Boolean(string="Purchases", default=True)
-    operating_expenses = fields.Boolean(string="Operating expenses", default=True)
-    sales = fields.Boolean(string="Sales", default=True)
-    inventory = fields.Boolean(string="Inventory", default=True)
-    fixed_assets = fields.Boolean(string="Fixed assets", default=True)
-    payroll = fields.Boolean(string="Payroll", default=True)
-    government = fields.Boolean(string="Government", default=True)
-    equity = fields.Boolean(string="Equity", default=True)
-    other = fields.Boolean(string="Others", default=True)
-
     is_create_disabled = fields.Boolean(compute='_compute_is_create_disabled')
+    cycle_ids = fields.Many2many(
+        comodel_name='account.return.audit.cycle',
+        string="Cycles",
+        compute='_compute_cycle_ids',
+        store=True,
+        readonly=False,
+    )
+
+    @api.depends('category')
+    def _compute_cycle_ids(self):
+        for wizard in self:
+            if wizard.category == 'audit':
+                wizard.cycle_ids = self.env['account.return.audit.cycle'].search([])
+            else:
+                wizard.cycle_ids = False
 
     @api.depends('available_return_type_ids')
     def _compute_return_type_id(self):
@@ -120,16 +122,16 @@ class AccountReturnCreationWizard(models.TransientModel):
 
     @api.depends('date_from', 'date_to', 'return_type_id')
     def _compute_warnings(self):
-        returns_companies_map = {
-            (date_from, date_to, tuple(type_id.ids)): returns.mapped('company_ids')
-            for date_from, date_to, type_id, returns in self.env['account.return']._read_group(
-                domain=[],
-                groupby=['date_from:day', 'date_to:day', 'type_id'],
-                aggregates=['id:recordset'],
-            )
-        }
-
         for wizard in self:
+            returns_companies_map = {
+                (date_from, date_to, tuple(type_ids.ids)): returns.mapped('company_ids')
+                for date_from, date_to, type_ids, returns in self.env['account.return']._read_group(
+                    domain=[('company_ids', 'in', wizard.company_id.id)],
+                    groupby=['date_from:day', 'date_to:day', 'type_id'],
+                    aggregates=['id:recordset'],
+                )
+            }
+
             wizard.show_warning_wrong_dates = False
             wizard.show_warning_existing_return = False
             wizard.show_warning_overlap = False
@@ -187,21 +189,7 @@ class AccountReturnCreationWizard(models.TransientModel):
             manually_created=True,
             force_periodicity_violation=self.env.context.get('force_periodicity_violation', self.category == 'audit'),
         )._try_create_returns_for_fiscal_year(company, tax_unit, allow_duplicates=not self.show_warning_existing_return, bypass_period_check=True)
-        returns_created.skipped_check_cycles = ','.join(
-            v for k, v in {
-                'regulatory_compliance': 'regulatory_compliance',
-                'treasury_financing': 'treasury_financing',
-                'purchases': 'purchases',
-                'operating_expenses': 'operating_expenses',
-                'sales': 'sales',
-                'inventory': 'inventory',
-                'fixed_assets': 'fixed_assets',
-                'payroll': 'payroll',
-                'government': 'state',
-                'equity': 'equity',
-                'other': 'other',
-             }.items() if not self[k]
-        )
+        returns_created.cycle_ids = self.cycle_ids
         returns_created.refresh_checks()
         if len(returns_created) == 1:
             action = returns_created[0].action_open_account_return() if self.category == 'account_return' else returns_created[0].action_open_audit_return()

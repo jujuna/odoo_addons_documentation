@@ -1,6 +1,3 @@
-import base64
-from lxml import etree
-
 from odoo import Command
 from odoo.addons.l10n_account_edi_ubl_cii_tests.tests.common import TestUBLCommon
 from odoo.addons.account.tests.test_account_move_send import TestAccountMoveSendCommon
@@ -9,6 +6,8 @@ from odoo.tests import tagged
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestUBLCommon.setup_country("be")
@@ -25,7 +24,7 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
             'city': "Ramillies",
             'vat': 'BE0202239951',
             'country_id': cls.env.ref('base.be').id,
-            'bank_ids': [(0, 0, {'acc_number': 'BE15001559627230'})],
+            'bank_ids': [(0, 0, {'account_number': 'BE15001559627230', 'allow_out_payment': True})],
             'ref': 'ref_partner_1',
             'invoice_edi_format': 'ubl_bis3',
         })
@@ -38,7 +37,7 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
             'city': "Ramillies",
             'vat': 'BE0477472701',
             'country_id': cls.env.ref('base.be').id,
-            'bank_ids': [(0, 0, {'acc_number': 'BE90735788866632'})],
+            'bank_ids': [(0, 0, {'account_number': 'BE90735788866632', 'allow_out_payment': True})],
             'ref': 'ref_partner_2',
             'invoice_edi_format': 'ubl_bis3',
         })
@@ -58,6 +57,7 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
             'type_tax_use': 'sale',
             'country_id': cls.env.ref('base.be').id,
             'sequence': 10,
+            'ubl_cii_tax_category_code': 'S',
         })
 
         cls.tax_15 = cls.env['account.tax'].create({
@@ -82,6 +82,7 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
             'amount': 6,
             'type_tax_use': 'sale',
             'country_id': cls.env.ref('base.be').id,
+            'ubl_cii_tax_category_code': 'S',
         })
 
         cls.tax_0 = cls.env['account.tax'].create({
@@ -90,6 +91,12 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
             'amount': 0,
             'type_tax_use': 'sale',
             'country_id': cls.env.ref('base.be').id,
+            'ubl_cii_tax_category_code': 'E',
+        })
+
+        cls.env['res.partner.bank'].sudo().create({
+            'account_number': 'BE15001559627230',
+            'partner_id': cls.company_data['company'].partner_id.id,
         })
 
         cls.pay_term = cls.env['account.payment.term'].create({
@@ -287,8 +294,9 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
         and imported in the xml file
         """
         acc_bank = self.env['res.partner.bank'].create({
-            'acc_number': 'BE15001559627231',
+            'account_number': 'BE15001559627231',
             'partner_id': self.company_data['company'].partner_id.id,
+            'allow_out_payment': True,
         })
 
         invoice = self._generate_move(
@@ -312,7 +320,7 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
         attachment = invoice.ubl_cii_xml_id
         self.assertTrue(attachment)
 
-        xml_content = base64.b64decode(attachment.with_context(bin_size=False).datas)
+        xml_content = attachment.raw.content
         xml_etree = self.get_xml_tree_from_string(xml_content)
 
         self.assertEqual(
@@ -329,6 +337,7 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
 
         # Import:
         created_bill = self.env['account.move'].create({'move_type': 'in_invoice'})
+        self.env['res.partner'].search([('vat', '=', 'BE0246697724'), ('id', '!=', self.company_data['company'].id)]).vat = False  # clean demo company to avoid picking it as a partner
         created_bill.message_post(attachment_ids=[attachment.id])
         self.assertTrue(created_bill)
 
@@ -351,6 +360,10 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
         self._assert_imported_invoice_from_file(filename='bis3_out_invoice_no_prices.xml', **kwargs)
 
     def test_import_invoice_xml_open_peppol_examples(self):
+        self.env['res.partner.bank'].sudo().create({
+            'account_number': 'IBAN32423940',
+            'partner_id': self.company_data['company'].partner_id.id,
+        })
         # Source: https://github.com/OpenPEPPOL/peppol-bis-invoice-3/tree/master/rules/examples
         subfolder = 'tests/test_files/from_peppol-bis-invoice-3_doc'
         # source: Allowance-example.xml
@@ -360,7 +373,7 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
             invoice_vals={
                 'amount_total': 7125,
                 'amount_tax': 1225,
-                'invoice_lines': [{'price_subtotal': x} for x in (200, -200, 3999, 1, 1000, 899, 1)],
+                'invoice_lines': [{'price_subtotal': x} for x in (200, -200, 4000, 1000, 900)],
             },
         )
         # source: base-creditnote-correction.xml
@@ -385,6 +398,16 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
                 'invoice_lines': [{'price_subtotal': x} for x in (25, 2800, -1500)],
             },
         )
+        # source: base-creditnote-correction.xml with ignored LineExtensionAmount
+        self._assert_imported_invoice_from_file(
+            subfolder=subfolder,
+            filename='bis3_invoice_ignore_lineextensionamount.xml',
+            invoice_vals={
+                'amount_total': 1000,
+                'amount_tax': 0,
+                'invoice_lines': [{'price_subtotal': 1000}],
+            }
+        )
         # source: vat-category-E.xml
         self._assert_imported_invoice_from_file(
             subfolder=subfolder,
@@ -393,7 +416,7 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
                 'currency_id': self.env.ref('base.GBP').id,
                 'amount_total': 1200,
                 'amount_tax': 0,
-                'invoice_lines': [{'price_subtotal': 1200}],
+                'invoice_lines': [{'price_subtotal': 1200.0}],
             },
         )
 
@@ -504,11 +527,11 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
                         'discount': 0,
                         'tax_ids': tax.ids,
                     } for (price_unit, tax) in [
-                        (-4, self.tax_6),
-                        (-48, tax_21),
-                        (52, self.tax_0),
-                        (200, self.tax_6),
-                        (2400, tax_21),
+                        (52.0, self.tax_0),
+                        (-4.0, self.tax_6),
+                        (-48.0, tax_21),
+                        (200.0, self.tax_6),
+                        (2400.0, tax_21),
                     ]
                 ]
             },
@@ -565,7 +588,7 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
         self.assertEqual(len(invoice_attachments), 2)
 
         # Send again.
-        wizard = self.create_send_and_print(invoice, sending_methods=['manual'])
+        wizard = self.create_send_and_print(invoice, no_invoice_reminder=True, sending_methods=['manual'])
         self.assertRecordValues(wizard, [{
             'sending_methods': ['manual'],
             'invoice_edi_format': 'ubl_bis3',
@@ -603,8 +626,8 @@ class TestUBLBE(TestUBLCommon, TestAccountMoveSendCommon):
             filename='bis3_out_invoice_quantity_and_or_unit_price_zero.xml',
             move_type='out_invoice',
             invoice_vals={
-                'amount_total': 3630,
-                'amount_tax': 630,
+                'amount_total': 3630.0,
+                'amount_tax': 630.0,
                 'currency_id': self.other_currency.id,
                 'invoice_lines': [
                     {

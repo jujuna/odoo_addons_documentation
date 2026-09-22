@@ -2,12 +2,11 @@
 
 {
     'name': 'Estonia - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Accounting Reports for Estonia
     """,
-    'author': 'Odoo SA',
+    'author': 'Odoo S.A.',
     'depends': [
         'l10n_ee',
         'account_reports',
@@ -24,12 +23,11 @@ Accounting Reports for Estonia
         'data/kmd_inf/kmd_inf_report_part_b.xml',
         'data/kmd_inf/kmd_inf_report.xml',
         'data/account_return_data.xml',
-        'security/ir.model.access.csv',
         'wizard/ec_sales_list_submission_wizard.xml',
         'wizard/kmd_inf_return_wizard.xml',
         'wizard/tax_return_type_wizard.xml',
+        'security/ir.access.csv',
     ],
-    'installable': True,
     'auto_install': [
         'l10n_ee',
         'account_reports',

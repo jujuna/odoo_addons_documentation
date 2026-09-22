@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group[field[@name='department_ids']]" position="after">
                 <group>
-                    <field name="survey_template_ids" widget="many2many_tags" placeholder="Every template allowed"  options="{'color_field': 'color'}"/>
+                    <field name="survey_template_ids" widget="many2many_tags" placeholder="Every template allowed"  options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                 </group>
             </xpath>
         </field>
@@ -18,7 +18,7 @@
         <field name="inherit_id" ref="hr_appraisal.hr_appraisal_template_view_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='department_ids']" position="after">
-                <field name="survey_template_ids" widget="many2many_tags" optional="hide" options="{'color_field': 'color'}"/>
+                <field name="survey_template_ids" widget="many2many_tags" optional="hide" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
             </xpath>
         </field>
     </record>

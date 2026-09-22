@@ -12,6 +12,7 @@ from odoo.tests.common import TransactionCase, tagged
 from odoo.tools.zeep.exceptions import Fault
 
 @tagged('-standard', 'external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMonsterIntegration(TransactionCase):
 
     @classmethod
@@ -179,6 +180,7 @@ class TestMonsterIntegration(TransactionCase):
 
 
 @tagged('standard', '-external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMockupMonsterIntegration(TestMonsterIntegration):
 
     @contextmanager

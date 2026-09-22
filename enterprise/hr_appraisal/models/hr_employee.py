@@ -26,7 +26,7 @@ class HrEmployee(models.Model):
         'hr.appraisal.goal', 'hr_appraisal_goal_hr_employee_rel', 'hr_employee_id',
         string="Goals", groups="hr.group_hr_user")
     parent_user_id = fields.Many2one(related='parent_id.user_id', string="Parent User")
-    last_appraisal_id = fields.Many2one('hr.appraisal')
+    last_appraisal_id = fields.Many2one('hr.appraisal', index='btree_not_null')
     last_appraisal_state = fields.Selection(related='last_appraisal_id.state')
 
     def _get_appraisal_plan_starting_date(self):
@@ -34,12 +34,16 @@ class HrEmployee(models.Model):
         return self.contract_date_start or self.date_version
 
     def action_send_appraisal_request(self):
+        context = dict(self.env.context)
+        context.update({
+            'default_employee_id': self.id,
+        })
         return {
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
             'res_model': 'hr.appraisal',
             'name': 'Appraisal Request',
-            'context': self.env.context,
+            'context': context,
         }
 
     def action_open_last_appraisal(self):
@@ -80,7 +84,7 @@ class HrEmployee(models.Model):
 
     @api.constrains('next_appraisal_date')
     def _check_next_appraisal_date(self):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         if not self.env.context.get('install_mode') and any(employee.next_appraisal_date and employee.next_appraisal_date < today for employee in self):
             raise ValidationError(self.env._("You cannot set 'Next Appraisal Date' in the past."))
 
@@ -88,9 +92,9 @@ class HrEmployee(models.Model):
         for rec in self:
             rec.related_partner_id = rec.user_id.partner_id or rec.work_contact_id
 
-    @api.depends('appraisal_ids')
+    @api.depends('appraisal_ids', 'appraisal_ids.active')
     def _compute_appraisal_count(self):
-        read_group_result = self.env['hr.appraisal'].with_context(active_test=False)._read_group([('employee_id', 'in', self.ids)], ['employee_id'], ['__count'])
+        read_group_result = self.env['hr.appraisal']._read_group([('employee_id', 'in', self.ids)], ['employee_id'], ['__count'])
         result = {employee.id: count for employee, count in read_group_result}
         for employee in self:
             employee.appraisal_count = result.get(employee.id, 0)
@@ -117,24 +121,25 @@ class HrEmployee(models.Model):
     @api.depends('ongoing_appraisal_count', 'company_id.appraisal_plan', 'company_id.duration_after_recruitment', 'company_id.duration_first_appraisal', 'company_id.duration_next_appraisal')
     def _compute_next_appraisal_date(self):
         self.filtered('ongoing_appraisal_count').next_appraisal_date = False
-        employees_without_appraisal = self.filtered(lambda e: e.ongoing_appraisal_count == 0 and e.company_id.appraisal_plan)
+        employees_without_appraisal = self.filtered(lambda e: e.ongoing_appraisal_count == 0 and e.company_id.appraisal_plan and e.active)
         dates = employees_without_appraisal._upcoming_appraisal_creation_date()
         for employee in employees_without_appraisal:
             employee.next_appraisal_date = dates[employee.id]
 
     @api.depends('appraisal_ids.state', 'appraisal_ids.date_close')
     def _compute_last_ongoing_appraisal_date(self):
+        today = fields.Date.context_today(self)
         for employee in self:
             ongoing_appraisals = employee.appraisal_ids.filtered(lambda appraisal: appraisal.state in ['1_new', '2_pending'])
             if ongoing_appraisals:
                 employee.last_ongoing_appraisal_date = max(ongoing_appraisals.mapped('date_close'))
-                employee.is_last_appraisal_late = employee.last_ongoing_appraisal_date < fields.Date.today()
+                employee.is_last_appraisal_late = employee.last_ongoing_appraisal_date < today
             else:
                 employee.last_ongoing_appraisal_date = False
                 employee.is_last_appraisal_late = False
 
     def _upcoming_appraisal_creation_date(self):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         dates = {}
         for employee in self:
             if employee.appraisal_count == 0:
@@ -174,6 +179,11 @@ class HrEmployee(models.Model):
             }
         # Reuse the action in hr.appraisal to open the employee's previous appraisals
         return self.appraisal_ids[:1].action_open_employee_appraisals()
+
+    def action_archive(self):
+        res = super().action_archive()
+        self.next_appraisal_date = False
+        return res
 
     @api.ondelete(at_uninstall=False)
     def _unlink_expect_goal_manager(self):

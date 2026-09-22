@@ -123,7 +123,7 @@ test("share a spreadsheet", async () => {
     await contains(".o_kanban_record:contains(My spreadsheet) .o_record_selector").click({
         ctrlKey: true,
     });
-    await contains("button:contains(Share)").click();
+    await contains(".o_control_panel_actions button:contains(Share)").click();
     expect.verifySteps(["open_share"]);
 });
 
@@ -146,7 +146,8 @@ test("Freeze&Share a spreadsheet", async () => {
         serverData,
         mockRPC: async function (route, args) {
             if (args.method === "action_freeze_and_copy") {
-                const excel = JSON.parse(JSON.stringify(model.exportXLSX().files));
+                const exportXLSX = await model.exportXLSX();
+                const excel = JSON.parse(JSON.stringify(exportXLSX.files));
 
                 expect(args.args[0]).toEqual(spreadsheetId);
                 expect(args.args[1]).toEqual(JSON.stringify(model.exportData()));
@@ -183,6 +184,7 @@ test("Freeze&Share a spreadsheet with an odoo list", async function () {
         data: model.exportData(),
         revisions: [],
     }));
+    onRpc("/spreadsheet/log", () => ({}));
     await makeDocumentsSpreadsheetMockEnv({
         serverData,
         mockRPC: async function (route, args) {
@@ -205,129 +207,79 @@ test("Freeze&Share a spreadsheet with an odoo list", async function () {
     expect.verifySteps(["open_share"]);
 });
 
-test("open xlsx converts to o-spreadsheet, clone it and opens the spreadsheet", async () => {
-    const spreadsheetId = 10;
-    const spreadsheetCopyId = 99;
+test("cannot manage versions of a spreadsheet", async function () {
     const serverData = getTestServerData();
     serverData.models["ir.attachment"] = { records: [{ id: 1 }] };
+    const spreadsheet = serverData.models["documents.document"].records[1];
+    spreadsheet.attachment_id = 1;
+
+    await makeDocumentsSpreadsheetMockEnv({ serverData });
+    await mountView({
+        type: "kanban",
+        resModel: "documents.document",
+        arch: basicDocumentKanbanArch,
+        actionMenus: { action: [], print: [] },
+        searchViewArch: getEnrichedSearchArch(),
+    });
+
+    await contains(".o_kanban_record:contains(My spreadsheet) .o_record_selector").click();
+    await contains(".o_control_panel_actions button:contains(Actions)").click();
+    expect(".o-dropdown-item:contains(Manage Versions)").toHaveCount(0);
+});
+
+test("open xlsx converts to o-spreadsheet, clone it and opens the spreadsheet", async () => {
+    const spreadsheetId = 10;
+    const serverData = getTestServerData();
+    serverData.models["ir.attachment"] = { records: [{ id: 1, mimetype: XLSX_MIME_TYPES[0] }] };
     serverData.models["documents.document"].records.push({
         id: spreadsheetId,
         name: "My excel file",
-        mimetype: XLSX_MIME_TYPES[0],
         thumbnail_status: "present",
         type: "binary",
         attachment_id: 1, // Necessary to not be considered as a request
     });
-    await makeDocumentsSpreadsheetMockEnv({
-        serverData,
-        mockRPC: async (route, args) => {
-            if (args.method === "import_to_spreadsheet") {
-                expect.step("spreadsheet_cloned");
-                expect(args.model).toBe("documents.document");
-                expect(args.args).toEqual([spreadsheetId]);
-                return spreadsheetCopyId;
-            }
-        },
-    });
+    await makeDocumentsSpreadsheetMockEnv({ serverData });
     await mountView({
         type: "kanban",
         resModel: "documents.document",
         arch: basicDocumentKanbanArch,
         searchViewArch: getEnrichedSearchArch(),
     });
-    mockActionService((action) => {
-        expect.step(action.tag);
-        expect(action.params.spreadsheet_id).toEqual(spreadsheetCopyId);
+    mockActionService((action, options) => {
+        expect.step(action);
+        expect(options.additionalContext.default_document_id).toEqual(spreadsheetId);
     });
     await contains(".o_kanban_record:contains('My excel file') .o_kanban_image_wrapper").click();
 
-    // confirm conversion to o-spreadsheet
-    await contains(".modal-content .btn.btn-primary").click();
-    expect.verifySteps(["spreadsheet_cloned", "action_open_spreadsheet"]);
-});
-
-test("open WPS-marked xlsx converts to o-spreadsheet, clone it and opens the spreadsheet", async () => {
-    const spreadsheetId = 10;
-    const spreadsheetCopyId = 99;
-    const serverData = getTestServerData();
-    serverData.models["ir.attachment"] = { records: [{ id: 1 }] };
-    serverData.models["documents.document"].records.push({
-        id: spreadsheetId,
-        folder_id: 1,
-        name: "My excel file",
-        mimetype: XLSX_MIME_TYPES[1],
-        thumbnail_status: "present",
-        type: "binary",
-        attachment_id: 1, // Necessary to not be considered as a request
-    });
-    await makeDocumentsSpreadsheetMockEnv({
-        serverData,
-        mockRPC: async (route, args) => {
-            if (args.method === "import_to_spreadsheet") {
-                expect.step("spreadsheet_cloned");
-                expect(args.model).toBe("documents.document");
-                expect(args.args).toEqual([spreadsheetId]);
-                return spreadsheetCopyId;
-            }
-        },
-    });
-    await mountView({
-        type: "kanban",
-        resModel: "documents.document",
-        arch: basicDocumentKanbanArch,
-        searchViewArch: getEnrichedSearchArch(),
-    });
-    mockActionService((action) => {
-        expect.step(action.tag);
-        expect(action.params.spreadsheet_id).toEqual(spreadsheetCopyId);
-    });
-    await contains(".o_kanban_record:contains('My excel file') .oe_kanban_previewer").click();
-
-    // confirm conversion to o-spreadsheet
-    await contains(".modal-content .btn.btn-primary").click();
-    expect.verifySteps(["spreadsheet_cloned", "action_open_spreadsheet"]);
+    expect.verifySteps(["documents_spreadsheet.import_to_spreadsheet_action"]);
 });
 
 test("open csv converts to o-spreadsheet, clone it and opens the spreadsheet", async () => {
     const spreadsheetId = 1;
-    const spreadsheetCopyId = 99;
     const serverData = getTestServerData();
-    serverData.models["ir.attachment"] = { records: [{ id: 1 }] };
+    serverData.models["ir.attachment"] = { records: [{ id: 1, mimetype: "text/csv" }] };
     serverData.models["documents.document"].records = [
         {
             id: spreadsheetId,
             name: "My CSV file",
-            mimetype: "text/csv",
             thumbnail_status: "present",
             attachment_id: 1, // Necessary to not be considered as a request
         },
     ];
-    await makeDocumentsSpreadsheetMockEnv({
-        serverData,
-        mockRPC: async (route, args) => {
-            if (args.method === "import_to_spreadsheet") {
-                expect.step("spreadsheet_cloned");
-                expect(args.model).toBe("documents.document");
-                expect(args.args).toEqual([spreadsheetId]);
-                return spreadsheetCopyId;
-            }
-        },
-    });
+    await makeDocumentsSpreadsheetMockEnv({ serverData });
     await mountView({
         type: "kanban",
         resModel: "documents.document",
         arch: basicDocumentKanbanArch,
         searchViewArch: getEnrichedSearchArch(),
     });
-    mockActionService((action) => {
-        expect.step(action.tag);
-        expect(action.params.spreadsheet_id).toEqual(spreadsheetCopyId);
+    mockActionService((action, options) => {
+        expect.step(action);
+        expect(options.additionalContext.default_document_id).toEqual(spreadsheetId);
     });
-    await contains(".o_kanban_image_wrapper").click();
+    await contains(".o_kanban_record:contains('My CSV file') .o_kanban_image_wrapper").click();
 
-    // confirm conversion to o-spreadsheet
-    await contains(".modal-content .btn.btn-primary").click();
-    expect.verifySteps(["spreadsheet_cloned", "action_open_spreadsheet"]);
+    expect.verifySteps(["documents_spreadsheet.import_to_spreadsheet_action"]);
 });
 
 test("download a frozen spreadsheet document while selecting requested document", async () => {
@@ -347,7 +299,7 @@ test("download a frozen spreadsheet document while selecting requested document"
         {
             name: "Request",
             folder_id: false,
-            type: "binary",
+            type: "request",
             access_token: "accessTokenRequest",
         },
     ];
@@ -377,7 +329,7 @@ test("download a frozen spreadsheet document while selecting requested document"
 test("can open spreadsheet while multiple documents are selected along with it", async () => {
     const serverData = getTestServerData();
     serverData.models["ir.attachment"] = {
-        records: [{ id: 1 }, { id: 2 }, { id: 3 }],
+        records: [{ id: 1 }, { id: 2, mimetype: "image/png" }, { id: 3, mimetype: "image/png" }],
     };
     serverData.models["documents.document"].records = [
         { id: 1, name: "demo-folder", type: "folder" },
@@ -391,13 +343,11 @@ test("can open spreadsheet while multiple documents are selected along with it",
         },
         {
             folder_id: 1,
-            mimetype: "image/png",
             name: "test-image-1",
             attachment_id: 2,
         },
         {
             folder_id: 1,
-            mimetype: "image/png",
             name: "test-image-2",
             attachment_id: 3,
         },
@@ -429,8 +379,8 @@ test("spreadsheet should be skipped while toggling the preview in the FileViewer
     serverData.models["ir.attachment"] = {
         records: [
             { id: 2, name: "dogsFTW" },
-            { id: 3, name: "pug" },
-            { id: 4, name: "chihuahua" },
+            { id: 3, mimetype: "image/png", name: "pug" },
+            { id: 4, mimetype: "image/png", name: "chihuahua" },
         ],
     };
     serverData.models["documents.document"].records = [
@@ -448,7 +398,6 @@ test("spreadsheet should be skipped while toggling the preview in the FileViewer
         {
             id: 3,
             folder_id: 1,
-            mimetype: "image/png",
             name: "pug",
             access_token: "accessTokenpug",
             attachment_id: 3,
@@ -456,7 +405,6 @@ test("spreadsheet should be skipped while toggling the preview in the FileViewer
         {
             id: 4,
             folder_id: 1,
-            mimetype: "image/png",
             name: "chihuahua",
             access_token: "accessTokenchihuahua",
             attachment_id: 4,
@@ -485,6 +433,7 @@ test("Cannot download spreadsheets", async () => {
             folder_id: 1,
             id: 2,
             name: "Request",
+            type: "request",
         },
         {
             attachment_id: 1,
@@ -498,6 +447,12 @@ test("Cannot download spreadsheets", async () => {
             handler: "spreadsheet",
             id: 4,
             name: "Spreadsheet",
+        },
+        {
+            folder_id: 1,
+            type: "url",
+            id: 5,
+            name: "Hurle",
         },
     ]);
     const serverData = {
@@ -540,6 +495,12 @@ test("Cannot download spreadsheets", async () => {
     // Button should remain even if some records are not downloadable
     await contains(`.o_kanban_record:contains('Spreadsheet')`).click({ ctrlKey: true });
     await waitFor(".o_control_panel_actions:contains('Download')");
+    // Adding file to the selection should still show a download action
+    await contains(`.o_kanban_record:contains('Hurle')`).click({ ctrlKey: true });
+    await waitFor(".o_control_panel_actions:contains('Download')");
+    // De-selecting folder should hide the download action
+    await contains(`.o_kanban_record:contains(${folder1Name})`).click({ ctrlKey: true });
+    await waitForNone(".o_control_panel_actions:contains('Download')");
 });
 
 test("Share button is hidden for spreadsheet in Trash", async () => {
@@ -566,11 +527,10 @@ test("Share button is hidden for spreadsheet in Trash", async () => {
 test("Restoring trashed XLSX without folder should not set localStorage variable to undefined", async () => {
     const spreadsheetId = 77;
     const serverData = getTestServerData();
-    serverData.models["ir.attachment"] = { records: [{ id: 1 }] };
+    serverData.models["ir.attachment"] = { records: [{ id: 1, mimetype: XLSX_MIME_TYPES[0] }] };
     serverData.models["documents.document"].records.push({
         id: spreadsheetId,
         name: "Trashed XLSX File",
-        mimetype: XLSX_MIME_TYPES[0],
         type: "binary",
         active: false,
         attachment_id: 1,

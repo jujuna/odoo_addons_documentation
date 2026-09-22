@@ -6,13 +6,17 @@ class DocumentsLink_To_Record_Wizard(models.TransientModel):
     _description = "Documents Link to Record"
 
     def _get_model_domain(self):
-        models = self.env['ir.model.access']._get_allowed_models() - {'documents.document'}
-        return [('model', 'in', list(models)), ('is_mail_thread', '=', 'True')]
+        models = [
+            model._name
+            for model in self.env.values()
+            if model._name != 'documents.document' and model.has_access('read')
+        ]
+        return [('model', 'in', models), ('is_mail_thread', '=', True)]
 
     @api.model
     def _selection_target_model(self):
         return [(model.model, model.name)
-                for model in self.env['ir.model'].sudo().search([('model', '!=', 'documents.document'), ('is_mail_thread', '=', 'True')])]
+                for model in self.env['ir.model'].sudo().search([('model', '!=', 'documents.document'), ('is_mail_thread', '=', True)])]
 
     document_ids = fields.Many2many('documents.document', string='Documents', readonly=True)
     model_id = fields.Many2one('ir.model', string='Model', domain=_get_model_domain)
@@ -22,7 +26,7 @@ class DocumentsLink_To_Record_Wizard(models.TransientModel):
 
     @api.depends_context('uid')
     def _compute_accessible_model_ids(self):
-        model_ids = self.env['ir.model'].sudo().search([('model', '!=', 'documents.document'), ('is_mail_thread', '=', 'True')])
+        model_ids = self.env['ir.model'].sudo().search([('model', '!=', 'documents.document'), ('is_mail_thread', '=', True)])
         model_ids = model_ids.filtered(lambda m: self.env[m.model].has_access('write'))
         for link_to in self:
             link_to.accessible_model_ids = model_ids.ids

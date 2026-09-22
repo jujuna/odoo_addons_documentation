@@ -1,3 +1,4 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { Dialog } from "@web/core/dialog/dialog";
 import { SearchBar } from "@web/search/search_bar/search_bar";
 import { Pager } from "@web/core/pager/pager";
@@ -10,17 +11,17 @@ import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { getDefaultConfig } from "@web/views/view";
 import { _t } from "@web/core/l10n/translation";
 
-import { Component, useState, useSubEnv, useChildSubEnv, onWillStart, useEffect } from "@odoo/owl";
+import { Component, onWillStart, useProps, proxy, signal, t } from "@odoo/owl";
 
 export class TemplateDialog extends Component {
     static components = { Dialog, SearchBar, Pager, SpreadsheetSelectorGrid };
     static template = "documents_spreadsheet.TemplateDialog";
-    static props = {
-        context: Object,
-        folderId: { type: [String, Number], optional: true },
-        close: Function, // prop added by the Dialog service
-        folders: Array,
-    };
+    props = useProps({
+        context: t.object(),
+        folderId: t.or([t.string(), t.number()]).optional(),
+        close: t.function(), // prop added by the Dialog service
+        folders: t.array(),
+    });
     setup() {
         this.orm = useService("orm");
         this.viewService = useService("view");
@@ -34,7 +35,7 @@ export class TemplateDialog extends Component {
 
         this.dialogTitle = _t("Create a Spreadsheet or select a Template");
         this.limit = 9;
-        this.state = useState({
+        this.state = proxy({
             isOpen: true,
             templates: [],
             templatesCount: 0,
@@ -42,6 +43,7 @@ export class TemplateDialog extends Component {
             offset: 0,
             isCreating: false,
         });
+        this.folderId = signal(null);
         useSubEnv({
             config: {
                 ...getDefaultConfig(),
@@ -52,10 +54,13 @@ export class TemplateDialog extends Component {
             orm: this.orm,
             view: useService("view"),
         });
-        useChildSubEnv({
+        useSubEnv({
             searchModel: this.model,
         });
-        useBus(this.model, "update", () => this._fetchTemplates());
+        useBus(this.model, "update", () => {
+            this.state.offset = 0;
+            this._fetchTemplates(0);
+        });
         this.keepLast = new KeepLast();
         this.folderOptions = [
             // id false cannot be used by the template select option so we use 0 instead.
@@ -66,7 +71,7 @@ export class TemplateDialog extends Component {
             })),
         ];
         onWillStart(async () => {
-            this.folderId = this.folderOptions[0].id;
+            this.folderId.set(this.folderOptions[0].id);
             const views = await this.viewService.loadViews({
                 resModel: "spreadsheet.template",
                 context: this.props.context,
@@ -83,13 +88,6 @@ export class TemplateDialog extends Component {
             });
             await this._fetchTemplates();
         });
-
-        useEffect(
-            () => {
-                this.state.offset = 0;
-            },
-            () => [this.model.searchDomain]
-        );
     }
 
     /**
@@ -141,7 +139,7 @@ export class TemplateDialog extends Component {
             ? typeof this.props.folderId === "number"
                 ? this.props.folderId
                 : false
-            : this.folderId || false; // convert 0 into false
+            : this.folderId() || false; // convert 0 into false
         if (templateId) {
             return this.orm.call(
                 "spreadsheet.template",

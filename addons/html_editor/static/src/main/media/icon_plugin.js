@@ -3,11 +3,20 @@ import { Plugin } from "../../plugin";
 import { _t } from "@web/core/l10n/translation";
 import { MediaDialog } from "./media_dialog/media_dialog";
 import { isHtmlContentSupported } from "@html_editor/core/selection_plugin";
-import { ICON_SELECTOR, isElement } from "@html_editor/utils/dom_info";
+import {
+    ICON_SELECTOR,
+    ICON_SIZE_CLASS_REGEX,
+    getIconType,
+    isElement,
+    isIconElement,
+    isTextNode,
+    isZwnbsp,
+} from "@html_editor/utils/dom_info";
+import { closestElement } from "@html_editor/utils/dom_traversal";
 
 export class IconPlugin extends Plugin {
     static id = "icon";
-    static dependencies = ["history", "selection", "dialog"];
+    static dependencies = ["history", "selection", "color", "dialog"];
     toolbarNamespace = "icon";
     /** @type {import("plugins").EditorResources} */
     resources = {
@@ -45,7 +54,7 @@ export class IconPlugin extends Plugin {
             {
                 id: "toggleSpinIcon",
                 description: _t("Toggle icon spin"),
-                icon: "fa-play",
+                icon: "play_arrow",
                 run: this.toggleSpinIcon.bind(this),
                 isAvailable: isHtmlContentSupported,
             },
@@ -58,16 +67,11 @@ export class IconPlugin extends Plugin {
         ],
         toolbar_namespace_providers: [
             (targetedNodes) => {
-                if (
-                    targetedNodes.length &&
-                    targetedNodes.every(
-                        // All nodes should be icons, its ZWS child or its ancestors
-                        (node) =>
-                            node.classList?.contains("fa") ||
-                            node.parentElement.classList.contains("fa") ||
-                            (node.querySelector?.(".fa") && node.isContentEditable !== false)
-                    )
-                ) {
+                if (!targetedNodes.length) {
+                    return;
+                }
+                const textNodes = targetedNodes.filter(isTextNode);
+                if (textNodes.every(isZwnbsp) && targetedNodes.some(isIconElement)) {
                     return this.toolbarNamespace;
                 }
             },
@@ -123,9 +127,22 @@ export class IconPlugin extends Plugin {
                 id: "icon_replace",
                 groupId: "icon_replace",
                 commandId: "replaceIcon",
-                text: _t("Replace"),
+                icon: "image",
             },
         ],
+        would_feff_be_legit_predicates: (node) => {
+            if (
+                (node.previousSibling && isIconElement(closestElement(node.previousSibling))) ||
+                (node.nextSibling && isIconElement(closestElement(node.nextSibling)))
+            ) {
+                return true;
+            }
+        },
+        /** Providers */
+        selected_background_color_providers: withSequence(
+            5,
+            this.computeBackgroundColorForIcon.bind(this)
+        ),
     };
 
     getTargetedIcon() {
@@ -138,15 +155,16 @@ export class IconPlugin extends Plugin {
         if (!targetedIcon) {
             return;
         }
-        for (const classString of targetedIcon.classList) {
-            if (classString.match(/^fa-[2-5]x$/)) {
+        for (const classString of [...targetedIcon.classList]) {
+            if (ICON_SIZE_CLASS_REGEX.test(classString)) {
                 targetedIcon.classList.remove(classString);
             }
         }
-        if (size !== "1") {
-            targetedIcon.classList.add(`fa-${size}x`);
+        const iconType = getIconType(targetedIcon);
+        if (size !== "1" && iconType) {
+            targetedIcon.classList.add(`${iconType}-${size}x`);
         }
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
     }
 
     toggleSpinIcon() {
@@ -154,21 +172,22 @@ export class IconPlugin extends Plugin {
         if (!selectedIcon) {
             return;
         }
-        selectedIcon.classList.toggle("fa-spin");
-        this.dependencies.history.addStep();
+        selectedIcon.classList.toggle("oi-spin");
+        this.dependencies.history.commit();
     }
 
     hasIconSize(size) {
         const selectedIcon = this.getTargetedIcon();
         if (!selectedIcon) {
-            return;
+            return false;
         }
         if (size === "1") {
             return ![...selectedIcon.classList].some((classString) =>
-                classString.match(/^fa-[2-5]x$/)
+                ICON_SIZE_CLASS_REGEX.test(classString)
             );
         }
-        return selectedIcon.classList.contains(`fa-${size}x`);
+        const iconType = getIconType(selectedIcon);
+        return !!(iconType && selectedIcon.classList.contains(`${iconType}-${size}x`));
     }
 
     hasSpinIcon() {
@@ -176,7 +195,9 @@ export class IconPlugin extends Plugin {
         if (!selectedIcon) {
             return;
         }
-        return selectedIcon.classList.contains("fa-spin");
+        return (
+            selectedIcon.classList.contains("oi-spin") || selectedIcon.classList.contains("fa-spin")
+        );
     }
 
     openIconDialog() {
@@ -188,6 +209,7 @@ export class IconPlugin extends Plugin {
             visibleTabs: ["ICONS"],
             media: selectedIcon,
             save: (el) => this.onSaveIcon(el, selectedIcon),
+            document: this.document,
         });
     }
 
@@ -195,6 +217,20 @@ export class IconPlugin extends Plugin {
         for (const attribute of icon.attributes) {
             prevIcon.setAttribute(attribute.nodeName, attribute.nodeValue);
         }
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
+    }
+
+    computeBackgroundColorForIcon() {
+        const nodes = this.dependencies.selection
+            .getTargetedNodes()
+            .filter((node) => node.classList?.contains("oi"));
+        if (nodes.length === 0) {
+            return;
+        }
+        const el = closestElement(nodes[0], "font");
+        if (!el) {
+            return;
+        }
+        return this.dependencies.color.getElementColors(el).backgroundColor;
     }
 }

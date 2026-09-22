@@ -14,15 +14,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-08 18:45+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 01:15+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"account_iso20022/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_iso20022
+#: model:ir.module.module,description:base.module_account_iso20022
+msgid ""
+"\n"
+"Generate XML payment orders as recommended by the SEPA and ISO20022 norms.\n"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -30,6 +39,24 @@ msgstr ""
 #, fuzzy
 msgid "A bank account is not defined."
 msgstr "Bank hisobi aniqlanmagan."
+
+#. module: account_iso20022
+#: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__is_third_party
+#: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__is_third_party
+msgid "Account owned by someone else than the employee"
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "All payments in the batch must share the same SEPA pain version."
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "All payments in the batch must share the same payment method line."
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_batch_payment__iso20022_batch_booking
@@ -42,16 +69,21 @@ msgstr ""
 "birlashtirish so‘ralsin."
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03_austrian_004
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03_austrian_004
 #, fuzzy
 msgid "Austrian"
 msgstr "Avstriyacha"
 
 #. module: account_iso20022
-#: model:ir.model,name:account_iso20022.model_account_bank_statement_line
-#, fuzzy
-msgid "Bank Statement Line"
-msgstr "Bank ko‘chirmasi satri"
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__available_iso20022_priority
+msgid "Available Iso20022 Priority"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model,name:account_iso20022.model_res_partner_bank
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__bank_account_id
+msgid "Bank Account"
+msgstr ""
 
 #. module: account_iso20022
 #: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
@@ -73,9 +105,8 @@ msgstr "To‘lov xarajati ko‘taruvchisi"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_company
-#, fuzzy
-msgid "Companies"
-msgstr "Kompaniyalar"
+msgid "Company"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_config_settings
@@ -129,14 +160,15 @@ msgid "Default Priority"
 msgstr "Standart ustuvorlik"
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__display_name
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_partner__display_name
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__display_name
 #, fuzzy
 msgid "Display Name"
 msgstr "Ko‘rsatiladigan nom"
@@ -149,11 +181,10 @@ msgid "Employee %s has no country in their address."
 msgstr "%s xodimning manzilida mamlakat ko‘rsatilmagan."
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__end_to_end_uuid
-#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__end_to_end_uuid
-#, fuzzy
-msgid "End to End ID"
-msgstr "Boshdanoxirgacha ID"
+#: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__third_party_beneficiary_id
+#: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__third_party_beneficiary_id
+msgid "Entity managing the third-party account"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -166,7 +197,12 @@ msgstr ""
 "Muenchen IV)."
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03_de
+#: model:ir.module.module,summary:base.module_account_iso20022
+msgid "Export payments as SEPA Credit Transfer or ISO20022 files"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03_de
 #, fuzzy
 msgid "German"
 msgstr "Nemischa"
@@ -198,14 +234,15 @@ msgid "Has Sepa Ct Payment Method"
 msgstr "Sepa Ct to‘lov usuliga ega"
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__id
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_partner__id
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__id
 #, fuzzy
 msgid "ID"
 msgstr "ID"
@@ -232,9 +269,19 @@ msgstr "Identifikatsiya"
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_id
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_orgid_id
-#, fuzzy
-msgid "Identification assigned by an institution (eg. VAT number)."
-msgstr "Muassasa tomonidan berilgan identifikatsiya (masalan, QQS raqami)."
+msgid "Identification assigned by an institution (eg. Tax ID)."
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "Invalid Partners"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__invalid_sct_partners_ids
+msgid "Invalid Sct Partners"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__payment_method_is_iso20022
@@ -243,6 +290,11 @@ msgstr "Muassasa tomonidan berilgan identifikatsiya (masalan, QQS raqami)."
 #, fuzzy
 msgid "Is Iso20022"
 msgstr "Iso20022 hisoblanadi"
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__is_sepa_ct_payment_method
+msgid "Is Sepa Ct Payment Method"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -281,6 +333,12 @@ msgid "NORM - Normal"
 msgstr "NORM - Normal"
 
 #. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__partner_name
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__partner_name
+msgid "Name"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_initiating_party_name
 #, fuzzy
 msgid ""
@@ -312,28 +370,19 @@ msgid "Partner %s has not bank account defined."
 msgstr "%s hamkorning bank hisobi belgilanmagan."
 
 #. module: account_iso20022
-#: model:ir.model,name:account_iso20022.model_account_payment_method
-#, fuzzy
-msgid "Payment Methods"
-msgstr "To‘lov usullari"
-
-#. module: account_iso20022
-#: model_terms:ir.ui.view,arch_db:account_iso20022.account_journal_dashboard_kanban_view_inherited
-#, fuzzy
-msgid "Payment to send via SEPA"
-msgstr "SEPA orqali yuborish uchun to‘lov"
-
-#. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_account_payment
-#, fuzzy
-msgid "Payments"
-msgstr "To‘lovlar"
+msgid "Payment"
+msgstr ""
 
 #. module: account_iso20022
-#: model_terms:ir.ui.view,arch_db:account_iso20022.account_journal_dashboard_kanban_view_inherited
-#, fuzzy
-msgid "Payments to send via SEPA"
-msgstr "SEPA orqali yuborish uchun to‘lovlar"
+#: model:ir.model,name:account_iso20022.model_account_payment_method
+msgid "Payment Method"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model,name:account_iso20022.model_account_payment_method_line
+msgid "Payment Method Line"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -355,10 +404,20 @@ msgid "SCT Batch Booking"
 msgstr "SCT to‘plamli bron qilish"
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_account_payment_search_inherit_account_sepa_pain_09
+msgid "SEPA / ISO20022"
+msgstr ""
+
+#. module: account_iso20022
 #: model:account.payment.method,name:account_iso20022.account_payment_method_sepa_ct
 #, fuzzy
 msgid "SEPA Credit Transfer"
 msgstr "SEPA kredit o‘tkazmasi"
+
+#. module: account_iso20022
+#: model:ir.module.module,shortdesc:base.module_account_iso20022
+msgid "SEPA Credit Transfer / ISO20022"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -366,13 +425,6 @@ msgstr "SEPA kredit o‘tkazmasi"
 #, fuzzy
 msgid "SEPA Credit Transfers to Send"
 msgstr "SEPA kredit o‘tkazmalarini yuborish"
-
-#. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_journal__sepa_pain_version
-#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
-#, fuzzy
-msgid "SEPA XML Format"
-msgstr "SEPA XML formati"
 
 #. module: account_iso20022
 #. odoo-python
@@ -392,8 +444,8 @@ msgstr ""
 "valyutadan foydalanmoqda."
 
 #. module: account_iso20022
-#: model:ir.model.fields,help:account_iso20022.field_account_journal__sepa_pain_version
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__sepa_pain_version
+#: model:ir.model.fields,help:account_iso20022.field_account_payment_method_line__sepa_pain_version
 #, fuzzy
 msgid ""
 "SEPA version to use to generate Credit Transfer XML files from this journal"
@@ -428,17 +480,6 @@ msgstr "Taqsimlangan"
 #, fuzzy
 msgid "Some payments are above the maximum amount allowed."
 msgstr "Ba'zi to‘lovlar ruxsat etilgan maksimal miqdordan oshib ketgan."
-
-#. module: account_iso20022
-#. odoo-python
-#: code:addons/account_iso20022/models/account_journal_sepa_ct.py:0
-#, fuzzy
-msgid ""
-"Some payments are missing a value for 'UETR', required for the SEPA "
-"Pain.001.001.09 format."
-msgstr ""
-"Ba'zi to‘lovlarda SEPA Pain.001.001.09 formati uchun zarur bo‘lgan 'UETR' "
-"qiymati mavjud emas."
 
 #. module: account_iso20022
 #. odoo-python
@@ -502,19 +543,6 @@ msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
-#: code:addons/account_iso20022/models/res_partner.py:0
-#, fuzzy
-msgid ""
-"The LEI number must contain 20 characters and match the following "
-"structure:\n"
-"- 18 alphanumeric characters with capital letters\n"
-"- 2 digits in the end\n"
-msgstr ""
-"LEI raqami 20 ta belgidan iborat bo‘lishi va quyidagi tuzilishga mos kelishi "
-"kerak: - Bosh harflar bilan 18 ta harf-raqamli belgi - oxirida 2 ta raqam"
-
-#. module: account_iso20022
-#. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 #, fuzzy
 msgid ""
@@ -537,6 +565,11 @@ msgstr ""
 "xizmatlaridan foydalanish uchun to‘g‘ri IBAN hisobi zarur."
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "The country or city of"
+msgstr ""
+
+#. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 #, fuzzy
@@ -557,6 +590,18 @@ msgid ""
 msgstr ""
 "'%s' jurnali SEPA orqali to‘lov amalga oshirish uchun to‘g‘ri IBAN hisobini "
 "talab qiladi. Iltimos, avval uni sozlang."
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__is_third_party
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__is_third_party
+msgid "Third-Party Account"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__third_party_beneficiary_id
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__third_party_beneficiary_id
+msgid "Third-Party Beneficiary"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -592,15 +637,6 @@ msgid "URGP - Critical urgency"
 msgstr "URGP - Yuqori darajada shoshilinch"
 
 #. module: account_iso20022
-#: model:ir.model.fields,help:account_iso20022.field_account_bank_statement_line__end_to_end_uuid
-#: model:ir.model.fields,help:account_iso20022.field_account_payment__end_to_end_uuid
-#, fuzzy
-msgid "Unique end-to-end assigned by the initiating party"
-msgstr ""
-"Boshlang‘ich tomon tomonidan belgilangan noyob boshidan-oxirigacha "
-"identifikator"
-
-#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__iso20022_uetr
 #, fuzzy
 msgid "Unique end-to-end transaction reference"
@@ -634,11 +670,22 @@ msgstr ""
 "belgi bilan cheklangan."
 
 #. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__sepa_pain_version
+msgid "XML Version"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_initiating_party_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__iso20022_initiating_party_name
 #, fuzzy
 msgid "Your Company Name"
 msgstr "Kompaniyangiz nomi"
+
+#. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "is not set, which could cause the file to be refused by the bank."
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -648,13 +695,13 @@ msgid "is_sent"
 msgstr "yuborildi"
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03
 #, fuzzy
 msgid "pain.001.001.03"
 msgstr "pain.001.001.03"
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_09
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_09
 #, fuzzy
 msgid "pain.001.001.09"
 msgstr "pain.001.001.09"
@@ -674,6 +721,11 @@ msgid "state"
 msgstr "holat"
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "these partners"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_journal__iso20022_default_priority
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__iso20022_priority
 #, fuzzy
@@ -686,3 +738,11 @@ msgstr ""
 "• NORM: Standart ishlov berish vaqti. • HIGH: Yuqori ustuvorlikdagi to‘lov. "
 "• URGP: O‘ta muhim, darhol ishlov berishni talab qiladi. • SVDA: To‘lovlar "
 "topshirilgan kunning o‘zida amalga oshirilishi shart."
+
+#, fuzzy
+#~ msgid "SEPA XML Format"
+#~ msgstr "SEPA XML formati"
+
+#, fuzzy
+#~ msgid "Identification assigned by an institution (eg. VAT number)."
+#~ msgstr "Muassasa tomonidan berilgan identifikatsiya (masalan, QQS raqami)."

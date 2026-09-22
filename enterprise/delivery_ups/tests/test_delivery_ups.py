@@ -10,6 +10,7 @@ from odoo.tools import file_open
 
 
 @tagged('-standard', 'external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDeliveryUPS(TransactionCase):
 
     def setUp(self):
@@ -178,7 +179,7 @@ class TestDeliveryUPS(TransactionCase):
 
         order1_vals = {
                     'product_id': self.iPadMini.id,
-                    'product_uom': self.uom_unit.id,
+                    'uom_id': self.uom_unit.id,
                     'product_uom_qty': 1.0,
                     'location_id': self.stock_location.id,
                     'location_dest_id': self.customer_location.id}
@@ -275,12 +276,12 @@ class TestDeliveryUPS(TransactionCase):
         self.assertEqual(pick02.carrier_tracking_ref, out02.carrier_tracking_ref)
 
 
-@functools.lru_cache(maxsize=1)
+@functools.cache
 def get_rate_request():
     with file_open('delivery_ups/tests/rate_request.xml', 'rb') as rate_file:
         return rate_file.read()
 
-@functools.lru_cache(maxsize=1)
+@functools.cache
 def get_shipment_request():
     # Reconstruct the original shipment request here, we had extracted the
     # various base64 payloads into decidated files to access their content.
@@ -295,14 +296,15 @@ def get_shipment_request():
             .replace(b'<!-- PLACEHOLDER INVOICE -->', b64encode(invoice_file.read()))
         )
 
-@functools.lru_cache(maxsize=1)
+@functools.cache
 def get_void_shipment_request():
     with file_open('delivery_ups/tests/void_shipment_request.xml', 'rb') as void_shipment_file:
         return void_shipment_file.read()
 
 
-@tagged('standard', '-external')
 class TestMockDeliveryUPS(TestDeliveryUPS):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @contextmanager
     def patch_ups_requests(self):

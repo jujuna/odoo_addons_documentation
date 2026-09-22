@@ -44,18 +44,14 @@
 
     <record id="l10n_ch_laa_insurance_line_rate_demo" model="l10n.ch.accident.insurance.line.rate">
         <field name="date_from">2025-01-01</field>
-    </record>
-
-    <record id="l10n_ch_laa_insurance_line_demo" model="l10n.ch.accident.insurance.line">
-        <field name="solution_type">A</field>
-        <field name="solution_number">1</field>
-        <field name="rate_ids" eval="[(4, ref('l10n_ch_laa_insurance_line_rate_demo'))]"/>
+        <field name="occupational_male_rate">1</field>
+        <field name="non_occupational_male_rate">1</field>
     </record>
 
     <record id="l10n_ch_laa_group_demo" model="l10n.ch.accident.group">
         <field name="name">LAA Group A</field>
         <field name="group_unit">A</field>
-        <field name="line_ids" eval="[(4, ref('l10n_ch_laa_insurance_line_demo'))]"/>
+        <field name="line_ids" eval="[(4, ref('l10n_ch_laa_insurance_line_rate_demo'))]"/>
     </record>
    
 
@@ -192,27 +188,15 @@
         <field name="company_id" ref="base.demo_company_ch"/>
     </record>
 
-    <record id="ch_res_bank_sb" model="res.bank">
-        <field name="name">Swiss Bank</field>
-        <field name="bic">SBHHCHMMXXX</field>
+    <record id="res_partner_bank_employee_mark" model="res.partner.bank">
+        <field name="account_number">CH930076201162</field>
+        <field name="bank_name">Swiss Bank</field>
+        <field name="bank_bic">SBHHCHMMXXX</field>
         <field name="street">Bahnhofstrasse 7</field>
         <field name="city">Zurich</field>
         <field name="zip">8001</field>
-        <field name="state" ref="base.state_ch_zh"/>
-        <field name="country" ref="base.ch"/>
-        <field name="phone">41 44 123 4567</field>
-    </record>
-    <record id="ch_res_bank_sb" model="res.bank">
-        <field name="email" model="res.bank" eval="obj(ref('l10n_ch_hr_payroll.ch_res_bank_sb')).name.replace(' ', '.').lower() + '@example.com'"/>
-    </record>
-
-    <record id="res_partner_bank_employee_mark" model="res.partner.bank">
-        <field name="acc_type">iban</field>
-        <field name="acc_number">CH930076201162</field>
-        <field name="bank_id" ref="ch_res_bank_sb"/>
         <field name="partner_id" ref="l10n_ch_hr_payroll.res_partner_employee_mark"/>
         <field name="company_id" ref="base.demo_company_ch"/>
-        <field name="currency_id" ref="base.CHF"/>
         <field name="allow_out_payment">True</field>
     </record>
 
@@ -240,7 +224,7 @@
         <field name="registration_number">1341</field>
         <field name="lang">en_US</field>
         <field name="contract_date_start">2025-01-01</field>
-        <field name="contract_type_id" ref="l10n_ch_hr_payroll.l10n_ch_contract_type_indefiniteSalaryMth"/>
+        <field name="employee_type_id" ref="l10n_ch_hr_payroll.l10n_ch_contract_type_indefiniteSalaryMth"/>
         <field name="l10n_ch_has_monthly" eval="True"/>
         <field name="wage">15000</field>
         <field name="l10n_ch_thirteen_month" eval="True"/>
@@ -260,14 +244,14 @@
 
     <record id="contract_wage_WT_1034_mark" model="l10n.ch.hr.contract.wage">
         <field name="version_id" model="hr.version" search="[('employee_id', '=', ref('employee_mark_frank'))]"/>
-        <field name="input_type_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_input_WT_1034"/>
+        <field name="salary_rule_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_1034"/>
         <field name="uom">currency</field>
         <field name="amount">400</field>
     </record>
 
     <record id="contract_wage_WT_5400_mark" model="l10n.ch.hr.contract.wage">
         <field name="version_id" model="hr.version" search="[('employee_id', '=', ref('employee_mark_frank'))]"/>
-        <field name="input_type_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_input_WT_5400"/>
+        <field name="salary_rule_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_rule_5400"/>
         <field name="description">LPCFam</field>
         <field name="uom">percentage</field>
         <field name="amount">1</field>
@@ -275,7 +259,7 @@
 
     <record id="contract_wage_WT_7400_mark" model="l10n.ch.hr.contract.wage">
         <field name="version_id" model="hr.version" search="[('employee_id', '=', ref('employee_mark_frank'))]"/>
-        <field name="input_type_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_input_WT_7400"/>
+        <field name="salary_rule_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_rule_7400"/>
         <field name="description">LPCFam Employer</field>
         <field name="uom">percentage</field>
         <field name="amount">1</field>
@@ -283,20 +267,19 @@
 
     <record id="contract_wage_WT_1910_mark" model="l10n.ch.hr.contract.wage">
         <field name="version_id" model="hr.version" search="[('employee_id', '=', ref('employee_mark_frank'))]"/>
-        <field name="input_type_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_input_WT_1910"/>
+        <field name="salary_rule_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_1910"/>
         <field name="uom">currency</field>
         <field name="amount">400</field>
     </record>
 
     <record id="contract_wage_WT_5080_mark" model="l10n.ch.hr.contract.wage">
         <field name="version_id" model="hr.version" search="[('employee_id', '=', ref('employee_mark_frank'))]"/>
-        <field name="input_type_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_input_WT_5080"/>
+        <field name="salary_rule_id" ref="l10n_ch_hr_payroll.l10n_ch_elm_rule_5080"/>
         <field name="uom">currency</field>
         <field name="amount">400</field>
     </record>
 
     <record id="hr_payslip_demo_mark_january_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - January 2025"</field>
         <field name="date_from" eval="time.strftime('2025-01-01')"/>
         <field name="date_to" eval="time.strftime('2025-01-31')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -304,7 +287,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_february_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - February 2025"</field>
         <field name="date_from" eval="time.strftime('2025-02-01')"/>
         <field name="date_to" eval="time.strftime('2025-02-28')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -312,7 +294,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_march_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - March 2025"</field>
         <field name="date_from" eval="time.strftime('2025-03-01')"/>
         <field name="date_to" eval="time.strftime('2025-03-31')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -320,7 +301,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_april_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - April 2025"</field>
         <field name="date_from" eval="time.strftime('2025-04-01')"/>
         <field name="date_to" eval="time.strftime('2025-04-30')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -328,7 +308,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_may_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - May 2025"</field>
         <field name="date_from" eval="time.strftime('2025-05-01')"/>
         <field name="date_to" eval="time.strftime('2025-05-31')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -336,7 +315,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_june_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - June 2025"</field>
         <field name="date_from" eval="time.strftime('2025-06-01')"/>
         <field name="date_to" eval="time.strftime('2025-06-30')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -344,7 +322,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_july_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - July 2025"</field>
         <field name="date_from" eval="time.strftime('2025-07-01')"/>
         <field name="date_to" eval="time.strftime('2025-07-31')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -352,7 +329,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_august_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - August 2025"</field>
         <field name="date_from" eval="time.strftime('2025-08-01')"/>
         <field name="date_to" eval="time.strftime('2025-08-31')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -360,7 +336,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_september_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - September 2025"</field>
         <field name="date_from" eval="time.strftime('2025-09-01')"/>
         <field name="date_to" eval="time.strftime('2025-09-30')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -368,7 +343,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_october_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - October 2025"</field>
         <field name="date_from" eval="time.strftime('2025-10-01')"/>
         <field name="date_to" eval="time.strftime('2025-10-31')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -376,7 +350,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_november_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - November 2025"</field>
         <field name="date_from" eval="time.strftime('2025-11-01')"/>
         <field name="date_to" eval="time.strftime('2025-11-30')"/>
         <field name="employee_id" ref="employee_mark_frank"/>
@@ -384,7 +357,6 @@
     </record>
 
     <record id="hr_payslip_demo_mark_december_2025" model="hr.payslip">
-        <field name="name">Mark Frank (mark) - December 2025"</field>
         <field name="date_from" eval="time.strftime('2025-12-01')"/>
         <field name="date_to" eval="time.strftime('2025-12-31')"/>
         <field name="employee_id" ref="employee_mark_frank"/>

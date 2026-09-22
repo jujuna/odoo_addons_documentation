@@ -4,7 +4,7 @@ import { redirect } from "@web/core/utils/urls";
 export const salaryConfigTourStart = () => [
     {
         content: "Open company menu drop-down",
-        trigger: ".o_menu_systray .o_switch_company_menu button.dropdown-toggle",
+        trigger: ".o_menu_systray .o_switch_company_menu",
         run: "click",
     },
     {
@@ -16,12 +16,17 @@ export const salaryConfigTourStart = () => [
     },
     {
         trigger:
-            ".o_menu_systray .o_switch_company_menu button.dropdown-toggle span:contains('Rambo Company - TEST')",
+            ".o_menu_systray .o_switch_company_menu span:contains('Rambo Company - TEST')",
     },
     {
         content: "Open Employees app",
         trigger: ".o_app[data-menu-xmlid='hr.menu_hr_root']",
         run: 'click',
+    },
+    {
+        content: "Open Management menu",
+        trigger: '[data-menu-xmlid="hr.menu_hr_employee_payroll"]',
+        run: "click",
     },
     {
         content: "Open an Employee Profile",
@@ -30,6 +35,16 @@ export const salaryConfigTourStart = () => [
     },
     {
         trigger: ".o_statusbar_buttons",
+    },
+    {
+        content: "If there are too many smart buttons, open the More dropdown to avoid missing the Generate Offer button",
+        trigger: ".o_control_panel_main",
+        run: function (actions) {
+            const more_smart_button = this.anchor.querySelectorAll('.o_button_more');
+            if (more_smart_button.length!=0) {
+                actions.click(".o_button_more");
+            }
+        },
     },
     {
         content: "Generate Offer",
@@ -75,7 +90,7 @@ export const salaryConfigTourPersonalInfo = () => [
         content: "Birthdate",
         trigger: 'input[name="birthday"]',
         run() {
-            this.anchor.value = "2017-09-01";
+            this.anchor.value = "1997-09-01";
         },
     },
     {
@@ -87,8 +102,8 @@ export const salaryConfigTourPersonalInfo = () => [
     },
     {
         content: "National Identification Number",
-        trigger: 'input[name="identification_id"]',
-        run: "edit 11.11.11-111.11",
+        trigger: 'input[name="identification_id"], input[name="niss"]',
+        run: "edit 97.09.01-250.74",
     },
     {
         content: "Street",
@@ -147,24 +162,14 @@ export const salaryConfigTourPersonalInfo = () => [
         run: "selectByLabel Master",
     },
     {
-        content: "School",
-        trigger: 'input[name="study_school"]',
-        run: "edit UCL",
-    },
-    {
         content: "School Level",
         trigger: 'input[name="study_field"]',
         run: "edit Civil Engineering, Applied Mathematics",
     },
     {
         content: "Bank Account",
-        trigger: 'input[name="acc_number"]',
+        trigger: 'input[name="account_number"]',
         run: "edit BE10 3631 0709 4104",
-    },
-    {
-        content: "Private License Plate",
-        trigger: 'input[name="private_car_plate"]',
-        run: "edit 1-ABC-123",
     },
     {
         content: "Emergency Contact",
@@ -220,7 +225,7 @@ export const salaryConfigTourSubmitAndSign = () => [
     {
         content: "Type Date",
         trigger: ":iframe input.o_sign_sign_item_default:eq(1)",
-        run: "edit 17/09/2018",
+        run: "edit 09/17/2018",
     },
     {
         content: "Validate and Sign",
@@ -242,23 +247,19 @@ export const salaryConfigTourCheckPersonalInfo = () => [
 ];
 
 registry.category("web_tour.tours").add("hr_contract_salary_employee_flow_tour", {
-    url: "/odoo",
-    wait_for: Promise.resolve(odoo.__TipTemplateDef),
     steps: () => [
         ...salaryConfigTourStart(),
         ...salaryConfigTourCheckPersonalInfo(),
         ...salaryConfigTourPersonalInfo(),
         ...salaryConfigTourSubmitAndSign(),
-    ]
+    ],
 });
 
 registry.category("web_tour.tours").add("hr_contract_salary_employee_flow_tour_counter_sign", {
-    url: "/odoo",
-    wait_for: Promise.resolve(odoo.__TipTemplateDef),
     steps: () => [
         {
             content: "Open company menu drop-down",
-            trigger: ".o_menu_systray .o_switch_company_menu button.dropdown-toggle",
+            trigger: ".o_menu_systray .o_switch_company_menu",
             run: "click",
         },
         {

@@ -1,9 +1,10 @@
-import { useSubEnv } from "@odoo/owl";
+import { t } from "@odoo/owl";
 import { rpcBus } from "@web/core/network/rpc";
-import { UPDATE_METHODS } from "@web/core/orm_service";
+import { UPDATE_METHODS } from "@web/core/orm_plugin";
 import { registry } from "@web/core/registry";
 import { patch } from "@web/core/utils/patch";
-import { ViewButton } from "@web/views/view_button/view_button";
+import { ViewButton, viewButtonProps } from "@web/views/view_button/view_button";
+import { useViewButtonHandler } from "@web/views/view_button/view_button_hook";
 import { useApproval } from "@web_studio/approval/approval_hook";
 import { StudioApproval } from "@web_studio/approval/studio_approval";
 
@@ -34,16 +35,14 @@ patch(ViewButton.prototype, {
                 method,
             });
 
-            const onClickViewButton = this.env.onClickViewButton;
-            useSubEnv({
-                onClickViewButton: (params) => {
-                    if (params.clickParams.type === "action") {
-                        // if the button is an action then we check the approval client side
-                        params.beforeExecute = this.checkBeforeExecute.bind(this);
-                    }
-                    onClickViewButton(params);
-                },
-            });
+            const onClickViewButton = useViewButtonHandler();
+            this.handleViewButton = (params) => {
+                if (params.clickParams.type === "action") {
+                    // if the button is an action then we check the approval client side
+                    params.beforeExecute = this.checkBeforeExecute.bind(this);
+                }
+                onClickViewButton(params);
+            };
         }
     },
 
@@ -66,5 +65,5 @@ patch(ViewButton.prototype, {
     },
 });
 
-ViewButton.props.push("studioApproval?");
+viewButtonProps.studioApproval = t.any().optional();
 ViewButton.components = Object.assign(ViewButton.components || {}, { StudioApproval });

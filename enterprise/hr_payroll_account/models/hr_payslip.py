@@ -1,39 +1,30 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from collections import defaultdict
-from markupsafe import Markup
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_compare, float_is_zero, plaintext2html
+from odoo.tools import float_compare, float_is_zero
 
 
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
-    date = fields.Date('Date Account',
-        help="Keep empty to use the period of the validation(Payslip) date.")
+    date = fields.Date('Accounting Date',
+        help="Keep empty to use the period of the validation(Payslip) date.", compute="_compute_date", store=True, readonly=False)
     journal_id = fields.Many2one('account.journal', 'Salary Journal', related="struct_id.journal_id", check_company=True)
     move_id = fields.Many2one('account.move', 'Accounting Entry', readonly=True, copy=False, index='btree_not_null')
     move_state = fields.Selection(related='move_id.state', string='Move State', export_string_translation=False)
     batch_payroll_move_lines = fields.Boolean(related='company_id.batch_payroll_move_lines')
 
+    @api.depends('paid_date', 'done_date')
+    def _compute_date(self):
+        for slip in self:
+            slip.date = slip.create_date if slip.is_refund_payslip else slip.done_date if slip.is_correction_payslip else fields.Date.end_of(slip.date_to, 'month')
+
     @api.model
     def _issues_dependencies(self):
         return super()._issues_dependencies() + ['struct_id.journal_id']
-
-    def _get_warnings_by_slip(self):
-        warnings_by_slip = super()._get_warnings_by_slip()
-        for slip in self.filtered(
-            lambda slip: slip.state in ['draft', 'validated'] and slip.struct_id and not slip.journal_id
-        ):
-            warnings_by_slip[slip].append({
-                'message': _("Account Journal not configured on Structure"),
-                'action_text': _("Structure"),
-                'action': slip.struct_id._get_records_action(target='new'),
-                'level': 'warning',
-            })
-        return warnings_by_slip
 
     def action_payslip_cancel(self):
         moves = self.mapped('move_id')
@@ -51,7 +42,7 @@ class HrPayslip(models.Model):
         self.filtered('journal_id')._action_create_account_move()
         return res
 
-    def _action_create_account_move(self):
+    def _get_account_move_vals(self):
         precision = self.env['decimal.precision'].precision_get('Payroll')
 
         all_payslips = self
@@ -60,10 +51,13 @@ class HrPayslip(models.Model):
             if run._are_payslips_ready():
                 all_payslips |= run.slip_ids
 
-        # A payslip need to have a validated state and not an accounting move.
-        payslips_to_post = all_payslips.filtered(lambda slip: slip.state == 'validated' and not slip.move_id and slip.struct_id.journal_id)
+        # A payslip needs to have either a validated state and not an accounting move or a draft state and the Anonymize flag set on the company.
+        payslips_to_post = all_payslips.filtered(lambda slip: ((slip.state == 'validated' and not slip.move_id)
+                                                            or (slip.state == 'draft' and self.company_id.batch_payroll_move_lines))
+                                                            and slip.struct_id.journal_id)
 
-
+        # Force the prefetch to avoid infinite loop
+        payslips_to_post = payslips_to_post.with_prefetch()
         # Map all payslips by structure journal and pay slips month.
         # Case 1: Batch all the payslips together -> {'journal_id': {'month': slips}}
         # Case 2: Generate account move separately -> [{'journal_id': {'month': slip}}]
@@ -85,6 +79,7 @@ class HrPayslip(models.Model):
             for journal_id in slip_mapped_data:  # For each journal_id.
                 for slip_date in slip_mapped_data[journal_id]:  # For each month.
                     line_ids = []
+                    line_index = defaultdict(list)
                     debit_sum = 0.0
                     credit_sum = 0.0
                     date = slip_date
@@ -96,9 +91,7 @@ class HrPayslip(models.Model):
                     }
 
                     for slip in slip_mapped_data[journal_id][slip_date]:
-                        move_dict['narration'] += plaintext2html(f'{slip.id or ""} - {slip.employee_id.name or ""}')
-                        move_dict['narration'] += Markup('<br/>')
-                        slip_lines = slip._prepare_slip_lines(date, line_ids)
+                        slip_lines = slip._prepare_slip_lines(date, line_ids, line_index)
                         line_ids.extend(slip_lines)
 
                     for line_id in line_ids: # Get the debit and credit sum.
@@ -115,6 +108,11 @@ class HrPayslip(models.Model):
                     move_dict['line_ids'] = [(0, 0, line_vals) for line_vals in line_ids]
                     account_move_vals.append(move_dict)
                     slips_date_tuples.append((slip_mapped_data[journal_id][slip_date], date))
+
+        return account_move_vals, slips_date_tuples
+
+    def _action_create_account_move(self):
+        account_move_vals, slips_date_tuples = self._get_account_move_vals()
         moves = self._create_account_move(account_move_vals)
         for move, (slips, date) in zip(moves, slips_date_tuples):
             slips.write({'move_id': move.id, 'date': date})
@@ -130,9 +128,9 @@ class HrPayslip(models.Model):
             partner = line.partner_id
         line_vals = []
         if not batch_lines and line.salary_rule_id.employee_move_line and self.employee_id.has_multiple_bank_accounts:
-            debit_allocations = self.compute_salary_allocations(debit)
-            credit_allocations = self.compute_salary_allocations(credit)
-            for ba in self.employee_id.bank_account_ids:
+            debit_allocations = self._compute_salary_allocations(debit)
+            credit_allocations = self._compute_salary_allocations(credit)
+            for ba in self.employee_id.bank_account_ids | self.salary_attachment_ids.beneficiary_bank_account_id:
                 subdebit = debit_allocations.get(str(ba.id), 0)
                 subcredit = credit_allocations.get(str(ba.id), 0)
                 line_vals.append({
@@ -163,60 +161,100 @@ class HrPayslip(models.Model):
             'tax_ids': [(4, tax_id) for tax_id in account.tax_ids.ids],
         }]
 
-    def _prepare_slip_lines(self, date, line_ids):
+    def _prepare_slip_lines(self, date, line_ids, line_index=None):
         self.ensure_one()
         precision = self.env['decimal.precision'].precision_get('Payroll')
-        new_lines = []
-        for line in self.line_ids.filtered(lambda line: line.category_id):
+        batch_lines = self.company_id.batch_payroll_move_lines
+        is_storno_credit_note = self.company_id.account_storno and self.credit_note
+
+        def get_line_grouping_key(name, account_id, distribution):
+            if isinstance(distribution, dict):
+                distribution = tuple(sorted(distribution.items()))
+
+            return name, account_id, distribution
+
+        def get_accounting_amount(line):
             amount = line.total
-            if line.code == 'NET': # Check if the line is the 'Net Salary'.
-                for tmp_line in self.line_ids.filtered(lambda line: line.category_id):
-                    if tmp_line.salary_rule_id.not_computed_in_net: # Check if the rule must be computed in the 'Net Salary' or not.
-                        if amount > 0:
-                            amount -= abs(tmp_line.total)
-                        elif amount < 0:
-                            amount += abs(tmp_line.total)
+            if line.code != 'NET':
+                return amount
+
+            # Excluded rules are posted independently, so remove them from NET.
+            excluded_amount = sum(
+                abs(other_line.total)
+                for other_line in self.line_ids
+                if other_line.salary_rule_id.not_computed_in_net
+            )
+            if amount > 0:
+                amount -= excluded_amount
+            elif amount < 0:
+                amount += excluded_amount
+            return amount
+
+        def get_debit_credit(balance):
+            if is_storno_credit_note:
+                return min(balance, 0.0), min(-balance, 0.0)
+            return max(balance, 0.0), max(-balance, 0.0)
+
+        def get_indexed_line(indexed_lines, line, account_id, debit, credit):
+            return next((
+                line_vals
+                for line_vals in indexed_lines
+                if (
+                       (line_vals['debit'] > 0 >= credit)
+                       or (line_vals['credit'] > 0 >= debit)
+                   )
+                   and self._check_debit_credit_tags(line_vals, line, account_id)
+            ), False)
+
+        if line_index is None:
+            line_index = defaultdict(list)
+            for line_vals in line_ids:
+                if line_vals['debit'] > 0 or line_vals['credit'] > 0:
+                    key = get_line_grouping_key(
+                        line_vals['name'],
+                        line_vals['account_id'],
+                        line_vals['analytic_distribution'],
+                    )
+                    line_index[key].append(line_vals)
+
+        new_lines = []
+        for line in self.line_ids:
+            amount = get_accounting_amount(line)
             if float_is_zero(amount, precision_digits=precision):
                 continue
-            debit_account = line.salary_rule_id.account_debit
-            credit_account = line.salary_rule_id.account_credit
-            merge_amounts = self.company_id.batch_payroll_move_lines or not line.salary_rule_id.employee_move_line
 
-            if debit_account.id:    # If the rule has a debit account.
-                if self.company_id.account_storno and self.credit_note:
-                    debit = amount if amount < 0.0 else 0.0
-                    credit = -amount if amount > 0.0 else 0.0
-                else:
-                    debit = amount if amount > 0.0 else 0.0
-                    credit = -amount if amount < 0.0 else 0.0
+            merge_amounts = batch_lines or not line.salary_rule_id.employee_move_line
+            line_name = line.name if line.salary_rule_id.split_move_lines else line.salary_rule_id.name
+            distribution = line.salary_rule_id.analytic_distribution or line.slip_id.version_id.analytic_distribution
 
-                debit_line = merge_amounts and next(self._get_existing_lines(
-                    line_ids + new_lines, line, debit_account.id, debit, credit), False)
+            for account, balance in (
+                (line.salary_rule_id.account_debit, amount),
+                (line.salary_rule_id.account_credit, -amount),
+            ):
+                if not account:
+                    continue
 
-                if not debit_line:
-                    debit_lines = self._prepare_line_values(line, debit_account, date, debit, credit)
-                    new_lines.extend(debit_lines)
-                else:
-                    debit_line['debit'] += debit
-                    debit_line['credit'] += credit
+                debit, credit = get_debit_credit(balance)
+                grouping_key = get_line_grouping_key(line_name, account.id, distribution)
+                indexed_line = merge_amounts and get_indexed_line(
+                    line_index[grouping_key], line, account.id, debit, credit,
+                )
 
-            if credit_account.id:   # If the rule has a credit account.
-                if self.company_id.account_storno and self.credit_note:
-                    debit = -amount if amount > 0.0 else 0.0
-                    credit = amount if amount < 0.0 else 0.0
-                else:
-                    debit = -amount if amount < 0.0 else 0.0
-                    credit = amount if amount > 0.0 else 0.0
+                if indexed_line:
+                    indexed_line['debit'] += debit
+                    indexed_line['credit'] += credit
+                    if indexed_line['debit'] <= 0 and indexed_line['credit'] <= 0:
+                        line_index[grouping_key].remove(indexed_line)
+                    continue
 
-                credit_line = merge_amounts and next(self._get_existing_lines(
-                    line_ids + new_lines, line, credit_account.id, debit, credit), False)
+                prepared_lines = self._prepare_line_values(line, account, date, debit, credit)
+                new_lines.extend(prepared_lines)
+                line_index[grouping_key].extend(
+                    line_vals
+                    for line_vals in prepared_lines
+                    if line_vals['debit'] > 0 or line_vals['credit'] > 0
+                )
 
-                if not credit_line:
-                    credit_lines = self._prepare_line_values(line, credit_account, date, debit, credit)
-                    new_lines.extend(credit_lines)
-                else:
-                    credit_line['debit'] += debit
-                    credit_line['credit'] += credit
         return new_lines
 
     def _prepare_adjust_line(self, line_ids, adjust_type, debit_sum, credit_sum, date):
@@ -251,49 +289,21 @@ class HrPayslip(models.Model):
             or sorted(line_vals['tax_tag_ids']) == sorted(line.credit_tag_ids.ids)
         )
 
-    def _get_existing_lines(self, line_ids, line, account_id, debit, credit):
-        existing_lines = (
-            line_id for line_id in line_ids if
-            line_id['name'] == (line.name if line.salary_rule_id.split_move_lines else line.salary_rule_id.name)
-            and line_id['account_id'] == account_id
-            and ((line_id['debit'] > 0 and credit <= 0) or (line_id['credit'] > 0 and debit <= 0))
-            and (
-                    (
-                        not line_id['analytic_distribution'] and
-                        not line.salary_rule_id.analytic_distribution and
-                        not line.slip_id.version_id.analytic_distribution
-                    )
-                    or line_id['analytic_distribution'] and any(acc_id in line_id['analytic_distribution'] for acc_id in line.salary_rule_id.distribution_analytic_account_ids)
-                    or line_id['analytic_distribution'] and any(acc_id in line_id['analytic_distribution'] for acc_id in line.slip_id.version_id.distribution_analytic_account_ids)
+    # TODO master: remove this method no longer used
+    def _check_partially_matching_accounts(self, line_id, line):
+        keys = line_id['analytic_distribution']
+        unravelled_keys = []
+        for key in keys:
+            ids = key.split(',')
+            unravelled_keys += ids
 
-                )
-            and self._check_debit_credit_tags(line_id, line, account_id)
-        )
-        return existing_lines
+        result = any(str(acc_id.id) in unravelled_keys for acc_id in line.salary_rule_id.distribution_analytic_account_ids) \
+            or any(str(acc_id.id) in unravelled_keys for acc_id in line.slip_id.version_id.distribution_analytic_account_ids)
+
+        return result
 
     def _create_account_move(self, values):
         return self.env['account.move'].sudo().create(values)
-
-    def action_register_payment(self):
-        ''' Open the account.payment.register wizard to pay the selected journal entries.
-        :return: An action opening the account.payment.register wizard.
-        '''
-        if any(state == 'paid' for state in self.mapped('state')):
-            raise UserError(self.env._("You can only register payments for unpaid documents."))
-        if not self.struct_id.rule_ids.filtered(lambda r: r.code == "NET").account_credit.reconcile:
-            raise UserError(self.env._('The credit account on the NET salary rule is not reconciliable'))
-        bank_accounts = self.employee_id.sudo().bank_account_ids
-        if any(not bank.allow_out_payment for bank in bank_accounts):
-            raise UserError(self.env._('An employee bank account is untrusted'))
-        if any(m.state != 'posted' for m in self.move_id):
-            raise UserError(self.env._("You can only register payment for posted journal entries."))
-        return self.move_id.line_ids.action_register_payment(
-            ctx={
-                "default_partner_id": self.employee_id.work_contact_id.id,
-                "default_partner_bank_id": self.employee_id.primary_bank_account_id.id,
-                "default_company_id": self.company_id.id,
-                "payment_consider_partner": True,
-            })
 
     def action_open_move(self):
         return {

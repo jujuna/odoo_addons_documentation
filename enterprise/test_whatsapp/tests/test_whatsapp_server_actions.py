@@ -5,6 +5,7 @@ from odoo.tests import tagged, users
 
 
 @tagged('ir_actions')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppServerAction(WhatsAppFullCase):
 
     @classmethod

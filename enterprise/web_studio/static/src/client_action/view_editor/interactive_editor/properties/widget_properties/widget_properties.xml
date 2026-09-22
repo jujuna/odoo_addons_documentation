@@ -3,12 +3,12 @@
 <t t-name="web_studio.ViewEditor.InteractiveEditorProperties.Widget">
     <ViewStructureProperties>
         <ClassAttribute
-            value="props.node.attrs.class"
-            onChange.bind="onChangeAttribute"
+            value="this.props.node.attrs.class"
+            onChange.bind="this.onChangeAttribute"
         />
         <TypeWidgetProperties
-            node="props.node"
-            onChangeAttribute.bind="onChangeAttribute"
+            node="this.props.node"
+            onChangeAttribute.bind="this.onChangeAttribute"
         />
     </ViewStructureProperties>
 </t>

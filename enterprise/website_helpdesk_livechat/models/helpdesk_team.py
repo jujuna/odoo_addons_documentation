@@ -25,13 +25,18 @@ class HelpdeskTeam(models.Model):
         return check_methods
 
     def _check_use_website_helpdesk_livechat_feature_enabled(self, check_user_has_group=False):
-        """ Check if the use_website_helpdesk_livechat feature is enabled
+        """
+        Check if the website helpdesk livechat feature is enabled.
 
-            Check if the user can see at least one helpdesk team with `use_website_helpdesk_livechat=True`
-            and if the user has the `group_use_website_helpdesk_livechat` group (only done if the `check_user_has_group` parameter is True)
+        The feature is enabled if the user can see at least one helpdesk team with
+        ``use_website_helpdesk_livechat=True``. Optionally, if ``check_user_has_group``
+        is ``True``, the user must also belong to the
+        ``im_livechat.im_livechat_group_user`` group.
 
-            :param check_user_has_group: If True, then check if the user has the `group_use_website_helpdesk_livechat`
-            :return True if the feature is enabled otherwise False.
+        :param bool check_user_has_group: If ``True``, also check that the user
+            belongs to the ``im_livechat.im_livechat_group_user`` group.
+        :returns: ``True`` if the feature is enabled, otherwise ``False``.
+        :rtype: bool
         """
         user_has_group = self.env.user.has_group('im_livechat.im_livechat_group_user') if check_user_has_group else True
         return user_has_group and self.env['helpdesk.team'].search([('use_website_helpdesk_livechat', '=', True)], limit=1)

@@ -7,6 +7,7 @@
         <field name="inherit_id" ref="hr_payroll.hr_salary_attachment_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" postion="inside">
+                <!-- this needs to be updated in future when other inputs is removed and salary inputs works with salary adjustments-->
                 <button name="action_create_loan_payslip" type="object" string="Create Loan Payslip"
                         invisible="state != 'open' or other_input_type_code != 'LOAN_DEDUCTION' or payslip_count"/>
             </xpath>

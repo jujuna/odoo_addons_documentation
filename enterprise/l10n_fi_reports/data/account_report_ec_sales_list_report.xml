@@ -19,6 +19,7 @@
         <field name="name@fi">EC-myyntiluettelo</field>
         <field name="country_id" ref="base.fi"/>
         <field name="root_report_id" ref="account_reports.generic_ec_sales_report"/>
+        <field name="groupby">partner_id</field>
         <field name="load_more_limit" eval="80"/>
         <field name="search_bar" eval="True"/>
         <field name="filter_journals" eval="True"/>
@@ -58,6 +59,51 @@
                 <field name="expression_label">triangular</field>
                 <field name="figure_type">monetary</field>
                 <field name="sortable" eval="True"/>
+            </record>
+        </field>
+        <field name="line_ids">
+            <record id="finland_ec_sales_report_line" model="account.report.line">
+                <field name="name">EC Sales List</field>
+                <field name="name@fi">EC-myyntiluettelo</field>
+                <field name="code">FI_EC</field>
+                <field name="foldability">always_unfolded</field>
+                <field name="expression_ids">
+                    <record id="finland_ec_sales_report_country_code_line" model="account.report.expression">
+                        <field name="label">country_code</field>
+                        <field name="engine">custom</field>
+                        <field name="auditable">True</field>
+                        <field name="formula">_report_engine_ec_sales_report</field>
+                        <field name="subformula">country_code</field>
+                    </record>
+                    <record id="finland_ec_sales_report_vat_number_line" model="account.report.expression">
+                        <field name="label">vat_number</field>
+                        <field name="engine">custom</field>
+                        <field name="auditable">True</field>
+                        <field name="formula">_report_engine_ec_sales_report</field>
+                        <field name="subformula">vat_number</field>
+                    </record>
+                    <record id="finland_ec_sales_report_goods_line" model="account.report.expression">
+                        <field name="label">goods</field>
+                        <field name="engine">custom</field>
+                        <field name="auditable">True</field>
+                        <field name="formula">_report_engine_ec_sales_report</field>
+                        <field name="subformula">goods</field>
+                    </record>
+                    <record id="finland_ec_sales_report_services_line" model="account.report.expression">
+                        <field name="label">services</field>
+                        <field name="engine">custom</field>
+                        <field name="auditable">True</field>
+                        <field name="formula">_report_engine_ec_sales_report</field>
+                        <field name="subformula">services</field>
+                    </record>
+                    <record id="finland_ec_sales_report_triangular_line" model="account.report.expression">
+                        <field name="label">triangular</field>
+                        <field name="engine">custom</field>
+                        <field name="auditable">True</field>
+                        <field name="formula">_report_engine_ec_sales_report</field>
+                        <field name="subformula">triangular</field>
+                    </record>
+                </field>
             </record>
         </field>
     </record>

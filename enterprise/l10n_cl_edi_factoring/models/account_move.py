@@ -1,5 +1,4 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 import logging
 from contextlib import suppress
 from lxml import etree, html
@@ -96,7 +95,7 @@ class AccountMove(models.Model):
             'dvCompany': self._l10n_cl_format_vat(self.company_id.vat)[-1],
             'archivo': (
                 self.l10n_cl_aec_attachment_id.name,
-                base64.b64decode(self.l10n_cl_aec_attachment_file),
+                self.l10n_cl_aec_attachment_file.content,
                 'application/xml'),
         }
         response = self._send_xml_to_sii(

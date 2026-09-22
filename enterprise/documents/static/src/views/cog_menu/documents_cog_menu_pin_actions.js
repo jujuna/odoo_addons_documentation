@@ -1,36 +1,21 @@
-import { Component, useState } from "@odoo/owl";
+import { proxy } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
+import { Dropdown } from "@web/core/dropdown/dropdown";
 import { useService } from "@web/core/utils/hooks";
 import { debounce } from "@web/core/utils/timing";
 import { STATIC_COG_GROUP_ACTION_PIN } from "./documents_cog_menu_group";
-import { Dropdown } from "@web/core/dropdown/dropdown";
-import { _t } from "@web/core/l10n/translation";
+import { FolderAction } from "@documents/views/action/folder_action";
 
-export class DocumentCogMenuPinAction extends Component {
+export class DocumentsCogMenuPinAction extends FolderAction {
     static template = "documents.DocumentCogMenuPinAction";
     static components = { Dropdown };
-    static props = {};
-
-    static isVisible({ config, searchModel, services }, isVisibleAdditional = false) {
-        if (!(config && searchModel && searchModel.resModel === "documents.document" && services)) {
-            return false;
-        }
-        const folder = searchModel?.getSelectedFolder();
-        const documentService = services["document.document"];
-        return (
-            folder &&
-            documentService &&
-            ["kanban", "list"].includes(config.viewType) &&
-            (!isVisibleAdditional ||
-                isVisibleAdditional({ folder, config, searchModel, documentService }))
-        );
-    }
 
     setup() {
         this.action = useService("action");
         this.documentService = useService("document.document");
         this.notification = useService("notification");
 
-        this.documentsState = useState({ actions: [], isLoading: true });
+        this.documentsState = proxy({ actions: [], isLoading: true });
         this._reloadSearchModel = debounce(() => {
             this.env.searchModel._reloadSearchModel(true);
         }, 1500);
@@ -64,12 +49,13 @@ export class DocumentCogMenuPinAction extends Component {
     }
 }
 
-export const documentCogMenuPinAction = {
-    Component: DocumentCogMenuPinAction,
+/** @type folderAction */
+export const documentsCogMenuPinAction = {
+    Component: DocumentsCogMenuPinAction,
     groupNumber: STATIC_COG_GROUP_ACTION_PIN,
     isDisplayed: (env) =>
         env.model.documentService.userIsDocumentUser &&
-        DocumentCogMenuPinAction.isVisible(env, ({ folder, documentService }) =>
+        FolderAction.isVisible(env, undefined, ({ folder, documentService }) =>
             documentService.isEditable(folder)
-        )
+        ),
 };

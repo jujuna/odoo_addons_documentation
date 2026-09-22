@@ -1,14 +1,19 @@
-# -*- coding: utf-8 -*-
-from . import account_move
-from . import account_move_line
-from . import product_product
-from . import product_template
-from . import res_company
-from . import res_config_settings
-from . import sale_order
-from . import sale_order_line
-from . import stock_lot
-from . import stock_move
-from . import stock_orderpoint
-from . import stock_picking
-from . import stock_warehouse
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+from . import (
+    account_move,
+    account_move_line,
+    product_product,
+    product_template,
+    res_company,
+    res_config_settings,
+    sale_order,
+    sale_order_line,
+    stock_lot,
+    stock_move,
+    stock_orderpoint,
+    stock_picking,
+    stock_warehouse,
+)
+
+from . import res_groups

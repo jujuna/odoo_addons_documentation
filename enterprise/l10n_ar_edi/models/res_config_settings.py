@@ -3,6 +3,8 @@ import re
 from odoo import _, fields, models
 from odoo.exceptions import UserError, RedirectWarning
 
+from odoo.addons.l10n_ar.tools.partner_identifiers import AR_CUIT_AFIP_CODE
+
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
@@ -17,9 +19,8 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.l10n_ar_payment_foreign_currency",
         readonly=False,
         inverse="_inverse_l10n_ar_payment_foreign_currency")
-    l10n_ar_show_withholding_legend = fields.Boolean(
-        related='company_id.l10n_ar_show_withholding_legend',
-        string='Show Withholding Legend',
+    l10n_ar_invoice_pdf_legend = fields.Selection(
+        related="company_id.l10n_ar_invoice_pdf_legend",
         readonly=False,
     )
 
@@ -29,7 +30,7 @@ class ResConfigSettings(models.TransientModel):
             raise UserError(_('The company city must be defined before this action'))
         if not self.company_id.partner_id.country_id:
             raise UserError(_('The company country must be defined before this action'))
-        if not self.company_id.partner_id.l10n_ar_vat:
+        if self.company_id.partner_id.l10n_ar_afip_code != AR_CUIT_AFIP_CODE or not self.company_id.partner_id.vat:
             raise UserError(_('The company CUIT must be defined before this action'))
 
         if not self.l10n_ar_afip_ws_key_id:
@@ -83,5 +84,5 @@ class ResConfigSettings(models.TransientModel):
 
     def _inverse_l10n_ar_payment_foreign_currency(self):
         for record in self:
-            self.env['ir.config_parameter'].sudo().set_param(
+            self.env['ir.config_parameter'].sudo().set_str(
                 f"l10n_ar_edi.{record.company_id.id}_foreign_currency_payment", record.l10n_ar_payment_foreign_currency)

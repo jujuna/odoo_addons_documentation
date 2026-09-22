@@ -1,11 +1,16 @@
-import { _t } from "@web/core/l10n/translation";
 import { DataCleaningCommonListController } from "@data_recycle/views/data_cleaning_common_list";
-import { registry } from '@web/core/registry';
-import { listView } from '@web/views/list/list_view';
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
+import { registry } from '@web/core/registry';
 import { useService } from "@web/core/utils/hooks";
-import { useSubEnv } from "@odoo/owl";
-import { session } from "@web/session";
+import { onMounted, onPatched } from "@odoo/owl";
+import { ListRenderer } from '@web/views/list/list_renderer';
+import { listView } from '@web/views/list/list_view';
+import {
+    provideViewButtonHandler,
+    useViewButtonHandler,
+} from "@web/views/view_button/view_button_hook";
+import { DataMergeGroupConfigMenu } from "./data_merge_group_config_menu";
 
 export class DataMergeListModel extends listView.Model {}
 export class DataMergeListRecord extends DataMergeListModel.Record {
@@ -26,31 +31,72 @@ export class DataMergeListController extends DataCleaningCommonListController {
         this.dialog = useService("dialog");
         this.actionService = useService("action");
         this.notificationService = useService("notification");
-        const onClickViewButton = this.env.onClickViewButton;
+        const onClickViewButton = useViewButtonHandler();
 
-        useSubEnv({
-            onClickViewButton: (params) => {
-                const paramsName = params.clickParams.name;
-                const ResParams = params.getResParams();
-                const groupId = ResParams.resId;
-                const groupRecords = this.getGroupRecords(groupId);
-                const recordIds = this.getRecordIDS(groupRecords);
-                const action = (paramsName === 'merge_records' ? 'merge_records' : 'discard_records');
+        const refreshButtonsVisibility = () => {
+            const selectedRecords = this.model.root.selection;
 
-                if (action === 'merge_records') {
-                    this.dialog.add(ConfirmationDialog, {
-                        body: _t("Are you sure that you want to merge these records?"),
-                        confirm: async () => {
-                            await this.doActionMergeDiscard(action, groupId, recordIds);
-                        },
-                        cancel: () => {},
-                    });
-                } else if (action === 'discard_records') {
-                    this.doActionMergeDiscard(action, groupId, recordIds);
-                } else {
-                    onClickViewButton(params);
-                }
-            },
+            // Check the active state of selected records
+            const allInactive = selectedRecords.every(r => r.data.is_discarded === true);
+            const allActive = selectedRecords.every(r => r.data.is_discarded === false);
+
+            // Helper function to toggle the 'd-none' class
+            const toggleBtnVisibility = (selector, shouldShow) => {
+                const btn = document.querySelector(selector);
+                if (btn) btn.classList.toggle('d-none', !shouldShow);
+            };
+
+            toggleBtnVisibility('button[name="action_validate_merge"]', allActive);
+            toggleBtnVisibility('button[name="action_discard_selected_records"]', allActive);
+            toggleBtnVisibility('button[name="action_undiscard_selected_records"]', allInactive);
+        };
+        onMounted(refreshButtonsVisibility);
+        onPatched(refreshButtonsVisibility);
+
+        provideViewButtonHandler((params) => {
+            const paramsName = params.clickParams.name;
+            const ResParams = params.getResParams();
+            const groupId = ResParams.resId;
+            const groupRecords = this.getGroupRecords(groupId);
+            const recordIds = this.getRecordIDS(groupRecords);
+            const action = (paramsName === 'merge_records' ? 'merge_records' : 'discard_records');
+
+            if (paramsName === 'action_validate_merge') {
+                this.dialog.add(ConfirmationDialog, {
+                    title: _t("Merge Records"),
+                    body: _t("Are you sure you want to merge these records in their respective groups? Like cream swirling into coffee, once done there is no way back."),
+                    confirmLabel: _t("Merge all"),
+                    confirm: async () => {
+                        try {
+                            await onClickViewButton(params);
+                            this.showMergeNotification();
+                            await this.model.load();
+                        } catch (error) {
+                            console.warn("Merge operation failed or timed out:", error);
+                            this.notificationService.add(
+                                _t("The connection timed out. Please try merging fewer records at once."),
+                                { type: "warning", sticky: true }
+                            );
+                        }
+
+                    },
+                    cancel: () => {},
+                });
+            } else if (paramsName === 'merge_records') {
+                this.dialog.add(ConfirmationDialog, {
+                    title: _t("Merge Records"),
+                    body: _t("Are you sure you want to merge these records? Like cream swirling into coffee, once done there is no way back."),
+                    confirmLabel: _t("Merge"),
+                    confirm: async () => {
+                        await this.doActionMergeDiscard(paramsName, groupId, recordIds);
+                    },
+                    cancel: () => {},
+                });
+            } else if (paramsName === 'discard_records') {
+                this.doActionMergeDiscard(action, groupId, recordIds);
+            } else {
+                onClickViewButton(params);
+            }
         });
     }
 
@@ -83,44 +129,6 @@ export class DataMergeListController extends DataCleaningCommonListController {
      */
     async _callAction(action, groupId, recordIds) {
         return this.orm.call('data_merge.group', action, [groupId, recordIds]);
-    }
-
-    /**
-     * Merge all the selected records
-     */
-    async onValidateClick(ev) {
-        const records = this.model.root.selection;
-        let group_ids = {};
-        if (this.model.root.isDomainSelected) {
-            const groups = await this.orm.formattedReadGroup(
-                this.props.resModel,
-                this.props.domain,
-                this.props.groupBy,
-                ["id:array_agg"],
-                {
-                    limit: session.active_ids_limit,
-                    context: this.props.context,
-                },
-            );
-            group_ids = Object.fromEntries(groups.map((g) => [g.group_id[0], g["id:array_agg"]]));
-        } else {
-            records.forEach(function (record) {
-                const group_id = parseInt(record.data.group_id.id);
-                const ids = group_ids[group_id] || [];
-                ids.push(parseInt(record.resId));
-                group_ids[group_id] = ids;
-            });
-        }
-
-        this.dialog.add(ConfirmationDialog, {
-            body: _t("Are you sure that you want to merge the selected records in their respective group?"),
-            confirm: async () => {
-                await this.orm.call('data_merge.group', 'merge_multiple_records', [group_ids]);
-                this.showMergeNotification();
-                await this.model.load();
-            },
-            cancel: () => {},
-        });
     }
 
     async doActionMergeDiscard(action, groupId, recordIds) {
@@ -156,10 +164,53 @@ export class DataMergeListController extends DataCleaningCommonListController {
     }
 };
 
+/**
+ * Customize GroupConfigMenu for Data Merge.
+ * Highlights the master record row when hovering the "Merge" button
+ */
+export class DataMergeListRenderer extends ListRenderer {
+    static groupRowTemplate = "DataMergeListRenderer.GroupRow"
+
+    static components = {
+        ...ListRenderer.components,
+        GroupConfigMenu: DataMergeGroupConfigMenu,
+    };
+    setup() {
+        super.setup();
+        this.highlightedRow = null;
+    }
+
+    /**
+     * When hovering on the merge button inside a group row:
+     * Find the master record of the group
+     * Highlight its corresponding row in the list
+     */
+    onGroupRowMouseEnter(ev, group) {
+        const btn = ev.target.closest("button");
+        if (!btn || btn.name !== "merge_records") {
+            return;
+        }
+        const master = group.list.records.find(r => r.data.is_master);
+        if (!master) return
+        const row = this.tableRef().querySelector(
+            `tr.o_data_row[data-id="${master.id}"]`
+        );
+        row?.classList.add("table-active");
+        this.highlightedRow = row
+    }
+
+    // Remove highlight when mouse leaves the merge button
+    onGroupRowMouseLeave() {
+        if (this.highlightedRow) {
+            this.highlightedRow.classList.remove("table-active");
+            this.highlightedRow = null;
+        }
+    }
+}
+
 registry.category('views').add('data_merge_list', {
     ...listView,
     Controller: DataMergeListController,
+    Renderer: DataMergeListRenderer,
     Model: DataMergeListModel,
-    buttonTemplate: 'DataMergeListView.buttons',
 });
-

@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:05+0000\n"
-"PO-Revision-Date: 2025-12-30 19:05+0000\n"
+"POT-Creation-Date: 2026-08-28 18:18+0000\n"
+"PO-Revision-Date: 2026-08-28 18:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -38,37 +38,109 @@ msgid "%s must have a city selected in the list of Brazil's cities."
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__for_merchandise
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__for_merchandise
+msgid "00 - Merchandise for Resale"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__feedstock
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__feedstock
+msgid "01 - Raw Material"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__packaging
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__packaging
+msgid "02 - Packaging"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__product_in_process
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__product_in_process
+msgid "03 - Product in Process"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__for_product
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__for_product
+msgid "04 - Finished Product"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__subproduct
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__subproduct
+msgid "05 - Byproduct"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__intermediate_product
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__intermediate_product
+msgid "06 - Intermediate Product"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__material_for_usage_and_consumption
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__material_for_usage_and_consumption
+msgid "07 - Material for Use and Consumption"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__fixed_assets
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__fixed_assets
+msgid "08 - Fixed Assets"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__service
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__service
+msgid "09 - Service"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__other_inputs
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__other_inputs
+msgid "10 - Other Inputs"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_sped_type__no_restriction
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__no_restriction
+msgid "99 - Others"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Create a new account\" role=\"img\" aria-label=\"Create a new account\" class=\"fa fa-plug fa-fw\"/>\n"
+"<i title=\"Create a new account\" role=\"img\" aria-label=\"Create a new account\" class=\"oi oi-fw\" data-icon=\"power\"/>\n"
 "                                        Create a new account"
 msgstr ""
 
 #. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Create account\" role=\"img\" aria-label=\"Create account\" class=\"fa fa-plug fa-fw\"/>\n"
+"<i title=\"Create account\" role=\"img\" aria-label=\"Create account\" class=\"oi oi-fw\" data-icon=\"power\"/>\n"
 "                                        Create account"
 msgstr ""
 
 #. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Show logs\" role=\"img\" aria-label=\"Show logs\" class=\"fa fa-file-text-o\"/>\n"
+"<i title=\"Show logs\" role=\"img\" aria-label=\"Show logs\" class=\"oi\" data-icon=\"article\"/>\n"
 "                                    Show logs"
 msgstr ""
 
 #. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Start logging for 30 minutes\" role=\"img\" aria-label=\"Start logging for 30 minutes\" class=\"fa fa-file-text-o\"/>\n"
+"<i title=\"Start logging for 30 minutes\" role=\"img\" aria-label=\"Start logging for 30 minutes\" class=\"oi\" data-icon=\"article\"/>\n"
 "                                    Start logging for 30 minutes"
 msgstr ""
 
 #. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Test connection\" role=\"img\" aria-label=\"Test connection\" class=\"fa fa-plug fa-fw\"/>\n"
+"<i title=\"Test connection\" role=\"img\" aria-label=\"Test connection\" class=\"oi oi-fw\" data-icon=\"power\"/>\n"
 "                                    Test connection"
 msgstr ""
 
@@ -127,8 +199,15 @@ msgid "Added Taxes Consumable Product"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_product_product__l10n_br_transport_cost_type
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_product_template__l10n_br_transport_cost_type
+msgid "Additional Cost Type"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_external_tax_mixin__l10n_br_use_type__agricultural_production
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_move__l10n_br_use_type__agricultural_production
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_use_type__agricultural_production
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__pos_order__l10n_br_use_type__agricultural_production
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_use_type__agricultural_production
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__sale_order__l10n_br_use_type__agricultural_production
@@ -136,6 +215,37 @@ msgid "Agricultural production"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_appropriate_icms_credit
+msgid "Appropriate ICMS Credit"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_appropriate_ipi_credit
+msgid "Appropriate IPI Credit"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_appropriate_piscofins_credit
+msgid "Appropriate PIS/COFINS Credit"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__armedforces
+msgid "Armed Forces"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__auctioneer
+msgid "Auctioneer"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__audiovisualindustry
+msgid "Audiovisual Industry"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:iap.service,name:l10n_br_avatax.iap_service_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid "AvaTax Brazil"
 msgstr ""
@@ -188,9 +298,8 @@ msgid "Avalara portal"
 msgstr ""
 
 #. module: l10n_br_avatax
-#. odoo-python
-#: code:addons/l10n_br_avatax/models/account_external_tax_mixin.py:0
-msgid "Avatax Brazil doesn't support negative lines."
+#: model:ir.module.module,shortdesc:base.module_l10n_br_avatax
+msgid "Avatax Brazil"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -212,8 +321,20 @@ msgid "Avatax requires at least one non-transport line."
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__bondedwarehouse
+msgid "Bonded Warehouse"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.view_product_template_form
 msgid "Brazil Accounting"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.account_move_form_inherit
+msgid ""
+"Brazil: City or location from which the goods are shipped. Used for "
+"exportation NF-e."
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -233,6 +354,29 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_br_avatax.field_product_product__l10n_br_sped_type
 #: model:ir.model.fields,help:l10n_br_avatax.field_product_template__l10n_br_sped_type
 msgid "Brazil: Fiscal product type according to SPED list table"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_sped_type
+msgid ""
+"Brazil: Fiscal product type according to SPED list table. If left empty, the"
+" value configured on each product is used."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_recipient_is_icmsst_substitute
+msgid ""
+"Brazil: Force the entity to play or not a tax collector role for ICMS-ST Substitute.\n"
+"        - Default: ICMS ST is not Applicable.\n"
+"        - Yes: Entity is ICMS ST Substitute.\n"
+"        - No: Entity is not ICMS ST Substitute."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_is_icmsst_substitute
+msgid ""
+"Brazil: ICMS substitute flag that identifies the wholesaler, retailer, "
+"distributor roles."
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -269,6 +413,32 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_appropriate_icms_credit
+msgid ""
+"Brazil: Informs that this item will have rights to appropriate ICMS credit."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_appropriate_ipi_credit
+msgid ""
+"Brazil: Informs that this item will have rights to appropriate IPI credit."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_manufacturer_industry_equivalent
+msgid ""
+"Brazil: Item is merchandise but will be considered as a product. And the "
+"issuer will be considered as an Industry."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_not_subject_to_icmsst
+msgid ""
+"Brazil: Item is not subject to ICMS ST, even though it has CEST, example, "
+"fixed assets, used products like cars."
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields,help:l10n_br_avatax.field_res_partner__l10n_br_activity_sector
 #: model:ir.model.fields,help:l10n_br_avatax.field_res_users__l10n_br_activity_sector
 msgid "Brazil: List of main Activity Sectors of the contact"
@@ -283,9 +453,24 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_br_avatax.field_product_product__l10n_br_source_origin
 #: model:ir.model.fields,help:l10n_br_avatax.field_product_template__l10n_br_source_origin
 msgid ""
-"Brazil: Product Source of Origin indicates if the product has a foreing or "
-"national origin with different variations and characteristics dependin on "
+"Brazil: Product Source of Origin indicates if the product has a foreign or "
+"national origin with different variations and characteristics depending on "
 "the product use case"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_source_origin
+msgid ""
+"Brazil: Product Source of Origin indicates if the product has a foreign or "
+"national origin with different variations and characteristics depending on "
+"the product use case. If left empty, the value configured on each product is"
+" used."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_appropriate_piscofins_credit
+msgid ""
+"Brazil: Subject to appropriate PIS/COFINS credit, when it is non-cumulative."
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -318,6 +503,21 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_recipient_manufacturer_industry_equivalent
+msgid ""
+"Brazil: This attribute is used only on Inbound Scenarios, and when active, "
+"the item is considered the own Production of the Entity (Example: Vendor)."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_res_config_settings__l10n_br_icms_rate
+#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
+msgid ""
+"Brazil: Use only when ICMS credit applies. The rate may vary based on "
+"revenue, tax annex, and specific transaction rules."
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_ncm_code__ex
 msgid ""
 "Brazil: Use this field to indicate an 'EX Citation' which identifies exceptions to Avalara’s standard fiscal rules.\n"
@@ -342,9 +542,31 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_account_move_line__l10n_br_item_number
+msgid ""
+"Brazil: Used for B2B control process, it references the number of this item "
+"within the purchase order"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_ncm_code__is_service
+msgid ""
+"Brazil: When set, this code is a service code (LC116), otherwise it is a "
+"goods code (NCM)."
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields,help:l10n_br_avatax.field_product_product__l10n_br_use_type
 #: model:ir.model.fields,help:l10n_br_avatax.field_product_template__l10n_br_use_type
 msgid "Brazil: indicate what is the usage purpose for this product"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_use_type
+msgid ""
+"Brazil: indicate what is the usage purpose for this product. If left empty, "
+"the value configured in the document is used, and if empty on the document, "
+"the value configured on each product is used."
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -356,12 +578,30 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_account_bank_statement_line__l10n_br_edi_avatax_data
+#: model:ir.model.fields,help:l10n_br_avatax.field_account_external_tax_mixin__l10n_br_edi_avatax_data
+#: model:ir.model.fields,help:l10n_br_avatax.field_account_move__l10n_br_edi_avatax_data
+#: model:ir.model.fields,help:l10n_br_avatax.field_pos_order__l10n_br_edi_avatax_data
+#: model:ir.model.fields,help:l10n_br_avatax.field_sale_order__l10n_br_edi_avatax_data
+msgid ""
+"Brazil: technical field that remembers the last tax summary returned by "
+"Avatax."
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields,help:l10n_br_avatax.field_account_bank_statement_line__l10n_br_cnae_code_id
 #: model:ir.model.fields,help:l10n_br_avatax.field_account_external_tax_mixin__l10n_br_cnae_code_id
 #: model:ir.model.fields,help:l10n_br_avatax.field_account_move__l10n_br_cnae_code_id
 #: model:ir.model.fields,help:l10n_br_avatax.field_pos_order__l10n_br_cnae_code_id
 #: model:ir.model.fields,help:l10n_br_avatax.field_sale_order__l10n_br_cnae_code_id
 msgid "Brazil: the company's CNAE code for tax calculation and EDI."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_account_bank_statement_line__l10n_br_shipping_state_id
+#: model:ir.model.fields,help:l10n_br_avatax.field_account_move__l10n_br_shipping_state_id
+msgid ""
+"Brazil: the state from which the products will be shipped internationally."
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -389,6 +629,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_br_avatax/models/account_external_tax_mixin.py:0
 msgid "Brazilian Real is required to calculate taxes with Avatax."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__broadcastingindustry
+msgid "Broadcasting Industry"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -460,11 +705,12 @@ msgid "Code must be unique!"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model,name:l10n_br_avatax.model_res_company
-msgid "Companies"
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__commerce
+msgid "Commerce"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model,name:l10n_br_avatax.model_res_company
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_service_code__company_id
 msgid "Company"
 msgstr ""
@@ -485,6 +731,11 @@ msgid "Configure your company to work with AvaTax"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__construction
+msgid "Construction"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model,name:l10n_br_avatax.model_res_partner
 msgid "Contact"
 msgstr ""
@@ -499,6 +750,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_br_avatax/models/res_config_settings.py:0
 msgid "Continue Configurations"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__coops
+msgid "Coops"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -536,6 +792,11 @@ msgid "Credits"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_recipient_is_icmsst_substitute__default
+msgid "Default"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_chart_template__display_name
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_external_tax_mixin__display_name
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_fiscal_position__display_name
@@ -555,6 +816,16 @@ msgid "Display Name"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__distributioncenter
+msgid "Distribution Center"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__distributor
+msgid "Distributor"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model,name:l10n_br_avatax.model_account_tax
 msgid "ETA tax codes mixin"
 msgstr ""
@@ -565,8 +836,28 @@ msgid "EX"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__electricitydistributor
+msgid "Electricity Distributor"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__energygeneration
+msgid "Energy Generation"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid "Environment"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_recipient_manufacturer_industry_equivalent
+msgid "Equivalent To Manufacturer Or Industry"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__estimatedprofit
+msgid "Estimated Profit"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -576,8 +867,23 @@ msgid "Exempt"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__feedstock
-msgid "Feedstock"
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__extractor
+msgid "Extractor"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__farmcoop
+msgid "Farm Coop"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__filmindustry
+msgid "Film Industry"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__finalconsumer
+msgid "Final Consumer"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -593,8 +899,8 @@ msgstr ""
 #. module: l10n_br_avatax
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_external_tax_mixin__l10n_br_use_type__fixed_assets
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_move__l10n_br_use_type__fixed_assets
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_use_type__fixed_assets
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__pos_order__l10n_br_use_type__fixed_assets
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__fixed_assets
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_use_type__fixed_assets
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__sale_order__l10n_br_use_type__fixed_assets
 msgid "Fixed assets"
@@ -609,16 +915,7 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__for_merchandise
-msgid "For merchandise"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__for_product
-msgid "For product"
-msgstr ""
-
-#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_source_origin__2
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_source_origin__2
 msgid ""
 "Foreign goods - Acquired in the internal market (inside Brazil), except "
@@ -626,6 +923,7 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_source_origin__7
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_source_origin__7
 msgid ""
 "Foreign goods - Acquired inside Brazil, without a National Equivalent as "
@@ -633,6 +931,7 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_source_origin__6
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_source_origin__6
 msgid ""
 "Foreign goods - Directly imported by Seller, without a National Equivalent "
@@ -640,6 +939,7 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_source_origin__1
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_source_origin__1
 msgid "Foreign goods - Imported directly by seller, except those in code 6"
 msgstr ""
@@ -648,6 +948,16 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_transport_cost_type__freight
 #: model:product.template,name:l10n_br_avatax.freight_transport_product_product_template
 msgid "Freight"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__fueldistributor
+msgid "Fuel Distributor"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__generalwarehouse
+msgid "General Warehouse"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -663,12 +973,24 @@ msgid "Go to the configuration panel"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.l10n_br_ncm_code_view_search
+msgid "Goods (NCM)"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_bank_statement_line__l10n_br_goods_operation_type_id
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_external_tax_mixin__l10n_br_goods_operation_type_id
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_move__l10n_br_goods_operation_type_id
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_pos_order__l10n_br_goods_operation_type_id
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_sale_order__l10n_br_goods_operation_type_id
 msgid "Goods Operation Type"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_res_company__l10n_br_icms_rate
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_res_config_settings__l10n_br_icms_rate
+#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
+msgid "ICMS Simplified Credit Rate"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -708,14 +1030,32 @@ msgid "ISS Simplified Rate"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_transport_cost_type__insurance
-#: model:product.template,name:l10n_br_avatax.insurance_transport_product_product_template
-msgid "Insurance"
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__importer
+msgid "Importer"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__intermediate_product
-msgid "Intermediate product"
+#. odoo-python
+#: code:addons/l10n_br_avatax/models/account_move.py:0
+msgid ""
+"Incoterm Location is required to calculate taxes with Avatax for export of "
+"goods."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__individual
+msgid "Individual"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__industry
+msgid "Industry"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_transport_cost_type__insurance
+#: model:product.template,name:l10n_br_avatax.insurance_transport_product_product_template
+msgid "Insurance"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -728,12 +1068,42 @@ msgid "Is Brazilian Avatax"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_manufacturer_industry_equivalent
+msgid "Is Industry"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_ncm_code__is_service
+msgid "Is Service"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_bank_statement_line__l10n_br_is_service_transaction
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_external_tax_mixin__l10n_br_is_service_transaction
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_move__l10n_br_is_service_transaction
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_pos_order__l10n_br_is_service_transaction
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_sale_order__l10n_br_is_service_transaction
 msgid "Is Service Transaction"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_is_icmsst_substitute
+msgid "Issuer Is ICMS ST Substitute"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.l10n_br_operation_type_form
+msgid "Issuer Options"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__itaipubinacional
+msgid "Itaipu Binacional"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_account_move_line__l10n_br_item_number
+msgid "Item Number"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -769,6 +1139,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_product_product__l10n_br_company_city_id
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_product_template__l10n_br_company_city_id
 msgid "L10N Br Company City"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_account_bank_statement_line__l10n_br_edi_avatax_data
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_account_external_tax_mixin__l10n_br_edi_avatax_data
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_account_move__l10n_br_edi_avatax_data
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_pos_order__l10n_br_edi_avatax_data
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_sale_order__l10n_br_edi_avatax_data
+msgid "L10N Br Edi Avatax Data"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -811,8 +1190,13 @@ msgid "Main CNAE code registered with the government."
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__material_for_usage_and_consumption
-msgid "Material for usage and consumption"
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__maritimeservice
+msgid "Maritime Service"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__mealsupplier
+msgid "Meal Supplier"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -828,14 +1212,14 @@ msgid "Mixin to manage common parts of external tax calculation"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model,name:l10n_br_avatax.model_l10n_br_ncm_code
-msgid "NCM Code"
+#: model:ir.actions.act_window,name:l10n_br_avatax.l10n_br_ncm_code_action
+#: model:ir.ui.menu,name:l10n_br_avatax.ncm_codes_menu
+msgid "NCM / LC Codes"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.actions.act_window,name:l10n_br_avatax.l10n_br_ncm_code_action
-#: model:ir.ui.menu,name:l10n_br_avatax.ncm_codes_menu
-msgid "NCM Codes"
+#: model:ir.model,name:l10n_br_avatax.model_l10n_br_ncm_code
+msgid "NCM Code"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -846,6 +1230,7 @@ msgid "Name"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_source_origin__3
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_source_origin__3
 msgid ""
 "National goods - Merchandise or goods with imported content above 40% and "
@@ -853,12 +1238,14 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_source_origin__8
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_source_origin__8
 msgid ""
 "National goods - Merchandise or goods with imported content above 70% (pt)"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_source_origin__5
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_source_origin__5
 msgid ""
 "National goods - Merchandise or goods with imported content equal or below "
@@ -866,11 +1253,13 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_source_origin__0
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_source_origin__0
 msgid "National goods - except those treated in codes 3,4, 5 and 8"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_source_origin__4
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_source_origin__4
 msgid ""
 "National goods from production following 'standard basic processes' as "
@@ -884,13 +1273,28 @@ msgid "Neighborhood"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__no_restriction
-msgid "No restriction"
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_recipient_is_icmsst_substitute__no
+msgid "No"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__nonprofitentity
+msgid "Non Profit Entity"
 msgstr ""
 
 #. module: l10n_br_avatax
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_taxpayer__non
 msgid "Non-Taxpayer"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__notapplicable
+msgid "Not Applicable"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_issuer_not_subject_to_icmsst
+msgid "Not Subjected To ICMS ST"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -902,6 +1306,7 @@ msgstr ""
 #. module: l10n_br_avatax
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_external_tax_mixin__l10n_br_use_type__notapplicable
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_move__l10n_br_use_type__notapplicable
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_use_type__notapplicable
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__pos_order__l10n_br_use_type__notapplicable
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_use_type__notapplicable
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__sale_order__l10n_br_use_type__notapplicable
@@ -947,11 +1352,6 @@ msgid "Other costs"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__other_inputs
-msgid "Other inputs"
-msgstr ""
-
-#. module: l10n_br_avatax
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_move_line__l10n_br_goods_operation_type_id
 msgid "Override Operation Type"
 msgstr ""
@@ -963,8 +1363,14 @@ msgid "PIS Details"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__packaging
-msgid "Packaging"
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_account_bank_statement_line__l10n_br_partner_country_code
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_account_move__l10n_br_partner_country_code
+msgid "Partner Country Code"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__pharmadistributor
+msgid "Pharma Distributor"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -997,13 +1403,13 @@ msgid "Product"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model,name:l10n_br_avatax.model_product_product
-msgid "Product Variant"
+#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.l10n_br_operation_type_form
+msgid "Product Options"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__product_in_process
-msgid "Product in process"
+#: model:ir.model,name:l10n_br_avatax.model_product_product
+msgid "Product Variant"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -1014,6 +1420,7 @@ msgstr ""
 #. module: l10n_br_avatax
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_external_tax_mixin__l10n_br_use_type__production
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_move__l10n_br_use_type__production
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_use_type__production
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__pos_order__l10n_br_use_type__production
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_use_type__production
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_company__l10n_br_avalara_environment__production
@@ -1028,9 +1435,15 @@ msgid "Products"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__publicagency
+msgid "Public Agency"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_bank_statement_line__l10n_br_use_type
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_external_tax_mixin__l10n_br_use_type
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_account_move__l10n_br_use_type
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_use_type
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_pos_order__l10n_br_use_type
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_product_product__l10n_br_use_type
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_product_template__l10n_br_use_type
@@ -1039,13 +1452,34 @@ msgid "Purpose of Use"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__realprofit
+msgid "Real Profit"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_recipient_is_icmsst_substitute
+msgid "Recipient Is ICMS ST Substitute"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.l10n_br_operation_type_form
+msgid "Recipient Options"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:product.template,name:l10n_br_avatax.regular_consumable_product_product_template
 msgid "Regular Consumable Product"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__religiousestablishment
+msgid "Religious Establishment"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_external_tax_mixin__l10n_br_use_type__resale
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_move__l10n_br_use_type__resale
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_use_type__resale
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__pos_order__l10n_br_use_type__resale
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_use_type__resale
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__sale_order__l10n_br_use_type__resale
@@ -1053,6 +1487,17 @@ msgid "Resale"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__retail
+msgid "Retail"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__ruralproducer
+msgid "Rural Producer"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_sped_type
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_product_product__l10n_br_sped_type
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_product_template__l10n_br_sped_type
 msgid "SPED Fiscal Product Type"
@@ -1069,6 +1514,11 @@ msgid "Sanitized Code"
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__securitypublicagency
+msgid "Security Public Agency"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid "See"
 msgstr ""
@@ -1082,7 +1532,7 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__service
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__service
 msgid "Service"
 msgstr ""
 
@@ -1114,6 +1564,11 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.l10n_br_ncm_code_view_search
+msgid "Services (LC)"
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid ""
 "Set up to calculate taxes and issue electronic invoices with Avalara AvaTax "
@@ -1126,12 +1581,36 @@ msgid "Set up your AvaTax account"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields,field_description:l10n_br_avatax.field_res_company__l10n_br_icms_rate
-#: model:ir.model.fields,field_description:l10n_br_avatax.field_res_config_settings__l10n_br_icms_rate
-msgid "Simplified Regime ICMS Rate"
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_account_bank_statement_line__l10n_br_shipping_state_id
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_account_move__l10n_br_shipping_state_id
+msgid "Shipping State"
 msgstr ""
 
 #. module: l10n_br_avatax
+#. odoo-python
+#: code:addons/l10n_br_avatax/models/account_move.py:0
+msgid ""
+"Shipping State is required to calculate taxes with Avatax for export of "
+"goods."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__simplified
+msgid "Simplified"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__simplifiedentrepreneur
+msgid "Simplified Entrepreneur"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__simplifiedovergrossthreshold
+msgid "Simplified over Gross Threshold"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_l10n_br_operation_type__l10n_br_source_origin
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_product_product__l10n_br_source_origin
 #: model:ir.model.fields,field_description:l10n_br_avatax.field_product_template__l10n_br_source_origin
 msgid "Source of Origin"
@@ -1143,13 +1622,13 @@ msgid "Steps to configure tax calculation & electronic invoicing"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_partner_view_list
-msgid "Street Name"
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__stockwarehouse
+msgid "Stock Warehouse"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_sped_type__subproduct
-msgid "Subproduct"
+#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_partner_view_list
+msgid "Street Name"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -1251,6 +1730,11 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__telco
+msgid "Telco"
+msgstr ""
+
+#. module: l10n_br_avatax
 #. odoo-python
 #: code:addons/l10n_br_avatax/models/res_config_settings.py:0
 msgid ""
@@ -1264,6 +1748,14 @@ msgstr ""
 msgid ""
 "The Avatax portal email is used to create an Avalara account from Odoo. "
 "Complete the account setup in the"
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields,help:l10n_br_avatax.field_account_bank_statement_line__l10n_br_partner_country_code
+#: model:ir.model.fields,help:l10n_br_avatax.field_account_move__l10n_br_partner_country_code
+msgid ""
+"The ISO country code in two chars. \n"
+"You can use this field for quick search."
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -1284,6 +1776,12 @@ msgid "The company for which this code applies."
 msgstr ""
 
 #. module: l10n_br_avatax
+#. odoo-python
+#: code:addons/l10n_br_avatax/models/account_external_tax_mixin.py:0
+msgid "The document amount must be positive."
+msgstr ""
+
+#. module: l10n_br_avatax
 #: model:ir.model.fields,help:l10n_br_avatax.field_l10n_br_operation_type__technical_name
 msgid ""
 "The name that will be sent as operationType to the Brazilian Avatax API."
@@ -1300,9 +1798,11 @@ msgid "This combination of name and code already exists."
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields,help:l10n_br_avatax.field_res_config_settings__l10n_br_icms_rate
-#: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
-msgid "This only applies if you are a simplified tax regime company."
+#: model:ir.model.fields,help:l10n_br_avatax.field_account_move_line__l10n_br_order_number
+msgid ""
+"This field can be used to enter the customer internal purchase number. It "
+"creates a tracking register that links the Seller's NF-e number with the "
+"real Buyer's Purchase Order Number."
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -1317,14 +1817,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_br_avatax/models/account_move.py:0
 msgid ""
-"To avoid tax miscalculations make sure to set up %(fields)s on the following:\n"
+"To avoid tax miscalculations make sure to set up %(fields)s on an operation type or on the following:\n"
 "%(products)s"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields,field_description:l10n_br_avatax.field_product_product__l10n_br_transport_cost_type
-#: model:ir.model.fields,field_description:l10n_br_avatax.field_product_template__l10n_br_transport_cost_type
-msgid "Transport Cost Type"
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__transporter
+msgid "Transporter"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -1335,6 +1834,7 @@ msgstr ""
 #. module: l10n_br_avatax
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_external_tax_mixin__l10n_br_use_type__use_or_consumption
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__account_move__l10n_br_use_type__use_or_consumption
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_use_type__use_or_consumption
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__pos_order__l10n_br_use_type__use_or_consumption
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__product_template__l10n_br_use_type__use_or_consumption
 #: model:ir.model.fields.selection,name:l10n_br_avatax.selection__sale_order__l10n_br_use_type__use_or_consumption
@@ -1346,6 +1846,11 @@ msgstr ""
 msgid ""
 "Use this only when you already created an Avalara account in another Odoo "
 "database or company and wish to reuse it."
+msgstr ""
+
+#. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__variable
+msgid "Variable"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -1387,6 +1892,11 @@ msgid ""
 msgstr ""
 
 #. module: l10n_br_avatax
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__waterdistributor
+msgid "Water Distributor"
+msgstr ""
+
+#. module: l10n_br_avatax
 #. odoo-python
 #: code:addons/l10n_br_avatax/models/account_external_tax_mixin.py:0
 msgid "What:"
@@ -1399,88 +1909,13 @@ msgid "Where:"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__armedforces
-msgid "armedForces"
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__wholesale
+msgid "Wholesale"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__auctioneer
-msgid "auctioneer"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__audiovisualindustry
-msgid "audiovisualIndustry"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__bondedwarehouse
-msgid "bondedWarehouse"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__broadcastingindustry
-msgid "broadcastingIndustry"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__commerce
-msgid "commerce"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__construction
-msgid "construction"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__coops
-msgid "coops"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__distributioncenter
-msgid "distributionCenter"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__distributor
-msgid "distributor"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__electricitydistributor
-msgid "electricityDistributor"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__energygeneration
-msgid "energyGeneration"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__estimatedprofit
-msgid "estimatedProfit"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__extractor
-msgid "extractor"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__farmcoop
-msgid "farmCoop"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__filmindustry
-msgid "filmIndustry"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__finalconsumer
-msgid "finalConsumer"
+#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__l10n_br_operation_type__l10n_br_recipient_is_icmsst_substitute__yes
+msgid "Yes"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -1489,90 +1924,9 @@ msgid "for detailed setup instructions and the onboarding process."
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__fueldistributor
-msgid "fuelDistributor"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__generalwarehouse
-msgid "generalWarehouse"
-msgstr ""
-
-#. module: l10n_br_avatax
 #. odoo-python
 #: code:addons/l10n_br_avatax/models/product_product.py:0
-#: code:addons/l10n_br_avatax/models/res_partner.py:0
 msgid "id"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__importer
-msgid "importer"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__individual
-msgid "individual"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__industry
-msgid "industry"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__itaipubinacional
-msgid "itaipubiNacional"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__maritimeservice
-msgid "maritimeService"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__mealsupplier
-msgid "mealSupplier"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__nonprofitentity
-msgid "nonProfitEntity"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__notapplicable
-msgid "notApplicable"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__pharmadistributor
-msgid "pharmaDistributor"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__publicagency
-msgid "publicAgency"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__realprofit
-msgid "realProfit"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__religiousestablishment
-msgid "religiousEstablishment"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__retail
-msgid "retail"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__ruralproducer
-msgid "ruralProducer"
 msgstr ""
 
 #. module: l10n_br_avatax
@@ -1581,61 +1935,11 @@ msgid "sandbox Avalara portal"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__securitypublicagency
-msgid "securityPublicAgency"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__service
-msgid "service"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__simplified
-msgid "simplified"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__simplifiedentrepreneur
-msgid "simplifiedEntrepreneur"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__simplifiedovergrossthreshold
-msgid "simplifiedOverGrossthreshold"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__stockwarehouse
-msgid "stockWarehouse"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__telco
-msgid "telco"
-msgstr ""
-
-#. module: l10n_br_avatax
 #: model_terms:ir.ui.view,arch_db:l10n_br_avatax.res_config_settings_view_form
 msgid "the Odoo documentation"
 msgstr ""
 
 #. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__transporter
-msgid "transporter"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_tax_regime__variable
-msgid "variable"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__waterdistributor
-msgid "waterDistributor"
-msgstr ""
-
-#. module: l10n_br_avatax
-#: model:ir.model.fields.selection,name:l10n_br_avatax.selection__res_partner__l10n_br_activity_sector__wholesale
-msgid "wholesale"
+#: model:ir.model.fields,field_description:l10n_br_avatax.field_account_move_line__l10n_br_order_number
+msgid "xPed Number"
 msgstr ""

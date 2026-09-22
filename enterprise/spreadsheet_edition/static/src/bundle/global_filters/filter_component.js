@@ -1,24 +1,24 @@
 import * as spreadsheet from "@odoo/o-spreadsheet";
 
-import { Component, onWillStart, onWillUnmount } from "@odoo/owl";
+import { Component, onWillStart, onWillUnmount, t, useProps } from "@odoo/owl";
 import { getFacetInfo } from "@spreadsheet/global_filters/helpers";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { useService } from "@web/core/utils/hooks";
-import { FilterValuesList } from "@spreadsheet/global_filters/components/filter_values_list/filter_values_list";
 import { Dialog } from "@web/core/dialog/dialog";
 
 const { Menu } = spreadsheet;
 
 class FiltersTooltip extends Component {
     static template = "spreadsheet_edition.FiltersTooltip";
-    static props = {
-        model: Object,
-        onMouseLeave: Function,
-        onMouseEnter: Function,
-        onClick: Function,
-        close: { optional: true, type: Function },
-    };
     static components = { Dialog };
+
+    props = useProps({
+        model: t.object(),
+        onMouseLeave: t.function(),
+        onMouseEnter: t.function(),
+        onClick: t.function(),
+        close: t.function().optional(),
+    });
 
     setup() {
         this.facets = [];
@@ -35,24 +35,13 @@ class FiltersTooltip extends Component {
 
     async getFacetFor(filter) {
         const filterValues = this.props.model.getters.getGlobalFilterValue(filter.id);
-        return getFacetInfo(this.env, filter, filterValues);
+        return getFacetInfo(this.env, filter, filterValues, this.props.model.getters);
     }
-}
-
-export class FilterValuesDialog extends Component {
-    static template = "spreadsheet_edition.FilterValuesDialog";
-    static components = { FilterValuesList, Dialog };
-    static props = {
-        close: Function,
-        model: Object,
-        openFiltersEditor: { type: Function, optional: true },
-    };
 }
 
 export class FilterComponent extends Component {
     static template = "spreadsheet_edition.FilterComponent";
     static components = { Menu };
-    static props = {};
 
     setup() {
         this.popover = usePopover(FiltersTooltip, { position: "bottom" });
@@ -65,22 +54,8 @@ export class FilterComponent extends Component {
         });
     }
 
-    onClickButton() {
-        if (this.env.model.getters.getGlobalFilters().length) {
-            this.openDialog();
-        } else {
-            this.env.toggleSidePanel("GLOBAL_FILTERS_SIDE_PANEL");
-        }
-    }
-
-    openDialog() {
-        const close = this.dialog.add(FilterValuesDialog, {
-            model: this.env.model,
-            openFiltersEditor: () => {
-                this.env.toggleSidePanel("GLOBAL_FILTERS_SIDE_PANEL");
-                close();
-            },
-        });
+    toggleSidePanel() {
+        this.env.toggleSidePanel("GLOBAL_FILTERS_SIDE_PANEL");
     }
 
     get activeFilter() {
@@ -93,7 +68,7 @@ export class FilterComponent extends Component {
                 model: this.env.model,
                 onMouseEnter: () => clearTimeout(this.timeoutId),
                 onMouseLeave: this.closePopover.bind(this),
-                onClick: this.openDialog.bind(this),
+                onClick: this.toggleSidePanel.bind(this),
             });
         }
     }

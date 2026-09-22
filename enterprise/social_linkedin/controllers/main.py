@@ -7,6 +7,7 @@ import requests
 from odoo import http, _
 from odoo.addons.social.controllers.main import SocialController
 from odoo.addons.social.controllers.main import SocialValidationException
+from odoo.tools import consteq
 from odoo.exceptions import UserError
 from odoo.http import request
 
@@ -18,7 +19,7 @@ class SocialLinkedinController(SocialController):
         We can receive
         - code directly from LinkedIn
         - access_token from IAP
-        - state from LinkedIn/IAP, the state avoid the CSRF attack
+        - state from LinkedIn/IAP, the state avoids the CSRF attack
         """
         if not request.env.user.has_group('social.group_social_manager'):
             return request.render('social.social_http_error_view',
@@ -31,7 +32,10 @@ class SocialLinkedinController(SocialController):
 
             media = request.env.ref('social_linkedin.social_media_linkedin')
 
-            if media.csrf_token != state:
+            csrf_token, link_personal = state.split('-')
+            link_personal = int(link_personal)
+
+            if not consteq(media._get_csrf_token(), csrf_token):
                 return request.render('social.social_http_error_view',
                                       {'error_message': _('There was a authentication issue during your request.')})
 
@@ -39,13 +43,13 @@ class SocialLinkedinController(SocialController):
                 if not access_token:
                     access_token = self._linkedin_get_access_token(code, media)
 
-                request.env['social.account']._create_linkedin_accounts(access_token, media)
+                request.env['social.account']._create_linkedin_accounts(access_token, media, link_personal=link_personal)
 
             # Both _get_linkedin_access_token and _create_linkedin_accounts may raise a SocialValidationException
             except SocialValidationException as e:
                 return request.render('social.social_http_error_view', {'error_message': e.get_message(), 'documentation_data': e.get_documentation_data()})
 
-        return request.redirect('/odoo/action-social.action_social_stream_post')
+        return request.render('social.social_http_authentication_done')
 
     # ========================================================
     # COMMENTS / LIKES
@@ -62,7 +66,9 @@ class SocialLinkedinController(SocialController):
         if files and files[0]:
             attachment = files[0].read()
         try:
-            result = stream_post._linkedin_comment_add(message, comment_id, attachment)
+            result = stream_post._linkedin_comment_add(
+                stream_post.account_id, stream_post.linkedin_post_urn,
+                message, comment_id, attachment)
         except UserError as e:
             result = {'error': str(e)}
         return json.dumps(result)
@@ -112,8 +118,8 @@ class SocialLinkedinController(SocialController):
         :return: the access token
         """
         linkedin_url = 'https://www.linkedin.com/oauth/v2/accessToken'
-        linkedin_app_id = request.env['ir.config_parameter'].sudo().get_param('social.linkedin_app_id')
-        linkedin_client_secret = request.env['ir.config_parameter'].sudo().get_param('social.linkedin_client_secret')
+        linkedin_app_id = request.env['ir.config_parameter'].sudo().get_str('social.linkedin_app_id')
+        linkedin_client_secret = request.env['ir.config_parameter'].sudo().get_str('social.linkedin_client_secret')
 
         params = {
             'grant_type': 'authorization_code',

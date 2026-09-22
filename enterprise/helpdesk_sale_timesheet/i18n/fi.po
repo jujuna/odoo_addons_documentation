@@ -12,21 +12,29 @@
 # Ossi Mantylahti <ossi.mantylahti@obs-solutions.fi>, 2023
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-16 17:47+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 00:34+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "helpdesk_sale_timesheet/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.module.module,description:base.module_helpdesk_sale_timesheet
+msgid ""
+"\n"
+"Bill timesheets logged on helpdesk tickets.\n"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:helpdesk.sla,name:helpdesk_sale_timesheet.helpdesk_sla_4
@@ -35,27 +43,27 @@ msgstr "4 tuntia, ennen kuin tulee olla valmis"
 
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
+msgid "<span class=\"o_stat_text\">Sales Order</span>"
+msgstr "<span class=\"o_stat_text\">Myyntitilaus</span>"
+
+#. module: helpdesk_sale_timesheet
+#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
 msgid ""
-"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"The sales "
+"<span class=\"oi text-warning\" data-icon=\"warning\" title=\"The sales "
 "order associated with this ticket has been cancelled. We recommend either "
 "updating the sales order item or cancelling this ticket in alignment with "
 "the cancellation of the sales order.\" invisible=\"sale_order_state != "
 "'cancel'\"/>"
 msgstr ""
-"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"Tähän "
+"<span class=\"oi text-warning\" data-icon=\"warning\" title=\"Tähän "
 "tukipyyntöön liittyvä myyntitilaus on peruttu. Myyntitilaus on joko "
 "päivitettävä tai tämä tukipyyntö on peruttava.\" "
 "invisible=\"sale_order_state != 'cancel'\"/>"
 
 #. module: helpdesk_sale_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
-msgid "<span class=\"o_stat_text\">Sales Order</span>"
-msgstr "<span class=\"o_stat_text\">Myyntitilaus</span>"
-
-#. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_account_analytic_line
 msgid "Analytic Line"
-msgstr "Analyyttinen rivi"
+msgstr "Laskentakohderivi"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_sale_order_line__color
@@ -71,6 +79,11 @@ msgstr "Muunna Asiakaspalvelun tukipyynnöt tehtäviksi"
 #: model:ir.model,name:helpdesk_sale_timesheet.model_project_task_convert_wizard
 msgid "Convert Project Tasks to Tickets"
 msgstr "Muunna projektin tehtävät tukipyynnöiksi"
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.actions.server,name:helpdesk_sale_timesheet.helpdesk_ticket_action_create_invoice
+msgid "Create Invoice"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,website_form_label:helpdesk_sale_timesheet.model_helpdesk_ticket
@@ -108,8 +121,8 @@ msgstr "Työntekijä"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_helpdesk_sla
-msgid "Helpdesk SLA Policies"
-msgstr "Asiakaspalvelun SLA-käytännöt"
+msgid "Helpdesk SLA Policy"
+msgstr "Asiakaspalvelun SLA-käytäntö"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_helpdesk_team
@@ -148,6 +161,28 @@ msgid "No Ticket"
 msgstr "Ei tukipyyntöä"
 
 #. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because none of the selected tickets are billable."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because none of the selected tickets have sale orders "
+"ready to be invoiced."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/models/helpdesk_ticket.py:0
+msgid ""
+"No invoice was created because some of the selected tickets are not billable."
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.tickets_followup_timesheet
 msgid "Non-billable"
@@ -159,14 +194,9 @@ msgid "Not Billed"
 msgstr "Ei laskutettu"
 
 #. module: helpdesk_sale_timesheet
-#: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_sla_view_form_inherit_sale_timesheet
-msgid "OR"
-msgstr "TAI"
-
-#. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_team__project_id
 msgid "Project"
-msgstr "Projektit"
+msgstr "Projekti"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,help:helpdesk_sale_timesheet.field_helpdesk_team__project_id
@@ -176,6 +206,11 @@ msgid ""
 msgstr ""
 "Projekti, johon tämän asiakaspalvelutiimin tukipyyntöjen työaikakirjaukset "
 "liitetään."
+
+#. module: helpdesk_sale_timesheet
+#: model:ir.module.module,summary:base.module_helpdesk_sale_timesheet
+msgid "Project, Helpdesk, Timesheet and Sale Orders"
+msgstr ""
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_ticket__sale_order_id
@@ -253,6 +288,11 @@ msgid "Search in Ticket"
 msgstr "Etsi tukipyynnöstä"
 
 #. module: helpdesk_sale_timesheet
+#: model:ir.module.module,shortdesc:base.module_helpdesk_sale_timesheet
+msgid "Sell Helpdesk Timesheet"
+msgstr ""
+
+#. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla__product_ids
 msgid "Services"
 msgstr "Palvelut"
@@ -291,6 +331,7 @@ msgid "Tickets"
 msgstr "Tukipyynnöt"
 
 #. module: helpdesk_sale_timesheet
+#: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_account_analytic_line__has_billable_helpdesk_team
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla__use_helpdesk_sale_timesheet
 msgid "Time Billing"
 msgstr "Ajan laskutus"
@@ -319,7 +360,7 @@ msgstr "Työaikakirjaukset"
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.tickets_followup_timesheet
 msgid "Total Time Spent:"
-msgstr "Käytetty aika yhteensä"
+msgstr "Käytetty aika yhteensä:"
 
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.portal_helpdesk_ticket_timesheet
@@ -341,73 +382,3 @@ msgstr ""
 #: code:addons/helpdesk_sale_timesheet/models/sale_order.py:0
 msgid "[Helpdesk] %(ticket_name)s"
 msgstr "[Asiakaspalvelu] %(ticket_name)s"
-
-#~ msgid "Analytic Account"
-#~ msgstr "Kustannuspaikka"
-
-#~ msgid "Days"
-#~ msgstr "Päivää"
-
-#~ msgid "Days Spent"
-#~ msgstr "Käytetyt päivät"
-
-#~ msgid "Days:"
-#~ msgstr "Päiviä:"
-
-#~ msgid "Display Sol"
-#~ msgstr "Näytä myyntitilauksen rivi"
-
-#~ msgid "Helpdesk"
-#~ msgstr "Asiakaspalvelu"
-
-#~ msgid "Hours"
-#~ msgstr "Tunnit"
-
-#~ msgid "Hours Spent"
-#~ msgstr "Käytetyt tunnit"
-
-#~ msgid "Hours:"
-#~ msgstr "Tunnit:"
-
-#~ msgid "Product"
-#~ msgstr "Tuote"
-
-#~ msgid "Project's sale order"
-#~ msgstr "Projektin myyntitilaus"
-
-#~ msgid "Remaining Days on SO"
-#~ msgstr "Jäljellä olevat päivät myyntitilauksessa"
-
-#~ msgid "Remaining Days on SO:"
-#~ msgstr "Jäljellä olevat päivät myyntitilauksessa:"
-
-#~ msgid "Remaining Hours Available"
-#~ msgstr "Jäljellä olevat tunnit saatavilla"
-
-#~ msgid "Remaining Hours on SO:"
-#~ msgstr "Jäljellä olevat tunnit myyntitilauksella:"
-
-#~ msgid "SLA Policy"
-#~ msgstr "SLA-politiikka"
-
-#~ msgid ""
-#~ "SLA Policy that will automatically apply to the tickets linked to a sales "
-#~ "order item containing this service."
-#~ msgstr ""
-#~ "SLA-käytäntö, jota sovelletaan automaattisesti tukipyyntöihin, jotka on "
-#~ "liitetty tätä palvelua sisältävään myyntitilauksen kohteeseen."
-
-#~ msgid "Sales Order Items"
-#~ msgstr "Myyntitilauksen nimikkeet"
-
-#~ msgid "Sales order to which the project is linked."
-#~ msgstr "Myyntitilaus, johon projekti liittyy."
-
-#~ msgid "Spent"
-#~ msgstr "Käytetty"
-
-#~ msgid "Tickets in Overtime"
-#~ msgstr "Liput yliajalla"
-
-#~ msgid "Total"
-#~ msgstr "Yhteensä"

@@ -8,9 +8,10 @@ from odoo.tools import mute_logger
 
 
 @tagged('knowledge_acl')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestWKnowledgeSecurity(KnowledgeCommonWData):
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('user_public')
     def test_models_as_public(self):
         """ Test publish flag giving read access to articles """
@@ -31,7 +32,7 @@ class TestWKnowledgeSecurity(KnowledgeCommonWData):
         with self.assertRaises(exceptions.AccessError, msg='ACLs: No stage access to public'):
             self.env['knowledge.article.stage'].search([])
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('portal_test')
     def test_models_as_portal(self):
         """ Test publish flag giving read access to articles """
@@ -53,7 +54,7 @@ class TestWKnowledgeSecurity(KnowledgeCommonWData):
         article_shared.invalidate_model(['is_user_favorite'])
         self.assertTrue(article_shared.is_user_favorite)
 
-    @mute_logger('odoo.addons.base.models.ir_model', 'odoo.addons.base.models.ir_rule')
+    @mute_logger('odoo.addons.base.models.ir_access')
     @users('employee')
     def test_models_as_user(self):
         """ Test publish flag giving read access to articles """

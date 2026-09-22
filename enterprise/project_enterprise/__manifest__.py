@@ -7,10 +7,8 @@
 Bridge module for project and enterprise
     """,
     'category': 'Services/Project',
-    'version': '1.0',
-    'depends': ['project', 'web_map', 'web_gantt', 'web_enterprise'],
+    'depends': ['project', 'web_map', 'web_gantt'],
     'data': [
-        'security/ir.model.access.csv',
         'views/res_config_settings_views.xml',
         'views/project_task_views.xml',
         'views/project_views.xml',
@@ -18,6 +16,8 @@ Bridge module for project and enterprise
         'views/project_sharing_views.xml',
         'views/project_portal_project_task_templates.xml',
         'data/project_data.xml',
+        'report/tasks_report_templates.xml',
+        'report/tasks_report_views.xml',
     ],
     'demo': ['data/project_demo.xml'],
     'auto_install': True,
@@ -27,7 +27,6 @@ Bridge module for project and enterprise
         'web.assets_backend': [
             'project_enterprise/static/src/views/project_highlight_tasks.js',
             'project_enterprise/static/src/views/highlight_project_task_search_model.js',
-            'project_enterprise/static/src/components/**/*',
             'project_enterprise/static/src/views/project_task_calendar/**',
             'project_enterprise/static/src/views/project_task_tree/**',
             'project_enterprise/static/src/views/project_task_kanban/**',
@@ -57,6 +56,7 @@ Bridge module for project and enterprise
             'web_enterprise/static/src/webclient/**/*.scss',
 
             'web_enterprise/static/src/core/**/*',
+            'web_enterprise/static/src/views/card/*',
             'web_enterprise/static/src/views/kanban/*',
             'web_enterprise/static/src/views/list/*',
             'web_enterprise/static/src/webclient/settings_form_view/*',
@@ -67,6 +67,7 @@ Bridge module for project and enterprise
             ('remove', 'project/static/src/project_sharing/main.js'),
             ('remove', 'web_enterprise/static/src/views/list/list_controller.dark.scss'),
             ('remove', 'web_enterprise/static/src/core/tags_list/tags_list.dark.scss'),
+            ('remove', 'web_enterprise/static/src/core/notebook/notebook.dark.scss'),
             'web_gantt/static/src/**/*',
             'project_enterprise/static/src/project_sharing/**/*',
             'project_enterprise/static/src/views/view_dialogs/**',

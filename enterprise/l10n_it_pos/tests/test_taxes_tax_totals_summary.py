@@ -7,11 +7,21 @@ from odoo.tests import tagged
 @tagged('post_install', '-at_install', 'post_install_l10n')
 class TestTaxesTaxTotalsSummaryL10nItPos(TestTaxCommonPOS, TestTaxesTaxTotalsSummary):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('it')
     def setUpClass(cls):
         super().setUpClass()
-        cls.main_pos_config.it_fiscal_printer_ip = "0.0.0.0"
+        cls.it_printer = cls.env['pos.printer'].create({
+            'name': 'Printer',
+            'printer_type': 'it_fiscal_printer',
+            'printer_ip': '0.0.0.0',
+            'use_type': 'receipt',
+        })
+        cls.main_pos_config.write({
+            'receipt_printer_ids': [(4, cls.it_printer.id)],
+        })
 
     def _jsonify_document_line(self, document, index, line):
         # EXTENDS 'account'

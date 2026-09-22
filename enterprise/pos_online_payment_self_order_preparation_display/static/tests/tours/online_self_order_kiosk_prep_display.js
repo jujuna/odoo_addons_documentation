@@ -7,7 +7,16 @@ registry.category("web_tour.tours").add("test_ensure_online_self_order_prep_disp
         Utils.clickBtn("Order Now"),
         ProductPage.clickProduct("Coca-Cola"),
         Utils.clickBtn("Checkout"),
-        Utils.clickBtn("Pay"),
+        {
+            content: "Click pay button",
+            trigger: ".btn:contains('Pay')",
+            run: "click",
+            expectUnloadPage: true,
+        },
+        {
+            content: "Wait for payment portal page to load",
+            trigger: 'button[name="o_payment_submit_button"]:not(:disabled)',
+        },
     ],
 });
 

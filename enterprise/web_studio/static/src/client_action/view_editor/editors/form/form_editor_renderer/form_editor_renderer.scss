@@ -1,5 +1,8 @@
 .o_studio {
     .o_web_studio_editor_manager .o_web_studio_view_renderer .o_web_studio_form_view_editor {
+        --ws-hook-nearest-padding: 0px;
+        --ws-hook-separator-border: 1px dashed rgba($o-brand-primary, 0.5);
+
         $-web-studio-form-edition-gap: 10px;
         flex-flow: column nowrap;
 
@@ -18,6 +21,10 @@
             &.o-web-studio-ghost-hovered, &.o-web-studio-ghost-hovered + .o-web-studio-element-ghost {
                 cursor: pointer;
                 outline: 1px dashed $o-brand-primary;
+            }
+            &:has(.o_web_studio_hook-highlight) {
+                cursor: unset;
+                outline: unset;
             }
 
             // CLICK HANDLING
@@ -86,6 +93,28 @@
                 height: 90px;
             }
         }
+
+        .o_web_studio_statusbar_hook {
+            --ws-statusbar-hook-padding: 4px;
+            padding: var(--ws-statusbar-hook-padding);
+            border: var(--ws-hook-border);
+
+            &.o_web_studio_hook-highlight:not(.o_web_studio_nearest_hook)  {
+                --ws-hook-border: var(--ws-hook-highlight-border);
+                &:after { content: none !important;}
+            }
+
+            .o_web_studio_hook_overlay {
+                height: calc(100% - var(--ws-statusbar-hook-padding));
+                width: calc(100% - var(--ws-statusbar-hook-padding));
+            }
+
+            .o_arrow_button {
+                width: 100px;
+                height: 33px;
+            }
+        }
+
         .o_statusbar_status {
             > .o_arrow_button {
                 // make the buttons look inactive in Studio
@@ -98,15 +127,13 @@
 
         &.o_web_studio_form_view_editor {
             .o_web_studio_hook {
-                :first-child {
-                    line-height: 0px;
-                }
                 td, th {
                     padding: 0;
                 }
                 > td {
                     padding: 0;
                 }
+                border: none;
                 span.o_web_studio_hook_separator {
                     display: block;
                     position: relative;
@@ -114,22 +141,30 @@
                     transition: all 0.2s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0s;
                 }
             }
-            .o_web_studio_hook.o_web_studio_nearest_hook {
+
+            .o_web_studio_nearest_hook {
+                --ws-hook-nearest-border: 2px dashed #{rgba($o-brand-primary, 0.5)};
+                --ws-hook-border: var(--ws-hook-nearest-border);
                 cursor: pointer !important;
                 outline: none;
+                border: none;
                 span.o_web_studio_hook_separator {
                     background-color: rgba($o-brand-primary, 0.02);
-                    border: 1px dashed rgba($o-brand-primary, 0.5);
-                    padding: 20px;
+                    border: var(--ws-hook-nearest-border);
+                    margin: 4px 0;
+                }
+                span.o_web_studio_page_hook_separator {
+                    background-color: rgba($o-brand-primary, 0.02);
+                    border: var(--ws-hook-nearest-border);
+                    padding-right: 20px;
+                    padding-left: 20px;
                     margin: 4px 0;
                 }
             }
-            .o_inner_group {
-                transition: border-color 0.5s;
+            .o_group, .o_inner_group {
                 padding: $-web-studio-form-edition-gap*0.5;
-                border-collapse: separate;
-                border: $-web-studio-form-edition-gap*0.5 solid rgba($o-brand-primary, 0.1);
-
+            }
+            .o_inner_group {
                 tr:not(.o_web_studio_hovered) td > *:not(.o_horizontal_separator) {
                     opacity: 0.5;
                 }
@@ -145,11 +180,6 @@
                     }
                 }
             }
-            // drag&drop
-            td.ui-draggable-helper-ready {
-                // border doesn't work because of border-collapse
-                outline: 2px solid $o-brand-primary;
-            }
         }
         .o_field_image img {
             max-width: 100%;
@@ -162,6 +192,18 @@
 
         .o_notebook li {
             margin-right: 3px;
+
+            &.o_dragged {
+                background-color: $o-view-background-color;
+            }
+        }
+        .o_notebook:has(.o_dragged) .nav-tabs .nav-link:not(.active):hover {
+            background-color: var(--Notebook__link-background-color, #{$o-gray-100});
+        }
+        .o_notebook .nav-link {
+            &:focus-visible, &.active:focus-visible {
+                box-shadow: none !important;
+            }
         }
         .o_web_studio_add_chatter {
             position: relative;
@@ -213,10 +255,17 @@
         }
         .o-form-buttonbox {
             .oe_stat_button {
+                .o_stat_info .o_row {
+                    display: flex;
+                }
                 .o_button_icon {
                     color: #7C7BAD;
                 }
             }
+        }
+
+        .o_inner_group:not(:has(.o_cell)) .o_horizontal_separator {
+            display: block;
         }
     }
 }
@@ -243,14 +292,5 @@ table.o_web_studio_new_elements {
 .o_web_studio_new_button_dialog {
     > div {
         margin-top: 16px;
-    }
-    .o_web_studio_icon_selector {
-        display: inline-block;
-        padding: 3px;
-        font-size: medium;
-
-        &.o_selected {
-            outline: 1px solid $o-brand-primary;
-        }
     }
 }

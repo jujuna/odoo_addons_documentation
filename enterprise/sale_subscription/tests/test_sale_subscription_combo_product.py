@@ -6,6 +6,8 @@ from odoo.tests import HttpCase, tagged
 
 @tagged('post_install', '-at_install')
 class TestSaleSubscriptionComboProduct(TestSubscriptionCommon, HttpCase):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_create_invoice_with_combo_product(self):
         """ Test that a subscription with a combo product generates the correct invoice. """
         combo = self.env['product.combo'].create({
@@ -43,6 +45,10 @@ class TestSaleSubscriptionComboProduct(TestSubscriptionCommon, HttpCase):
         self.assertEqual(len(invoice.invoice_line_ids), 2)
 
         self.assertEqual(invoice.invoice_line_ids[0].display_type, 'line_section')
-        self.assertTrue(invoice.invoice_line_ids[0].name.startswith(combo_product.name))
+        self.assertTrue(
+            invoice.invoice_line_ids[0].label.startswith(combo_product.name)
+        )
         self.assertEqual(invoice.invoice_line_ids[1].display_type, 'product')
-        self.assertTrue(invoice.invoice_line_ids[1].name.startswith(self.product.name))
+        self.assertTrue(
+            invoice.invoice_line_ids[1].label.startswith(self.product.name)
+        )

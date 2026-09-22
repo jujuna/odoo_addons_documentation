@@ -4,16 +4,9 @@ import { hootPosModels } from "@point_of_sale/../tests/unit/data/generate_model_
 import { PosPrepStage } from "./pos_prep_stage.data";
 import { PosPrepOrder } from "./pos_prep_order.data";
 import { PosPrepLine } from "./pos_prep_line.data";
-import { PosPrepState } from "./pos_prep_state.data";
 
 export const definePosPrepDisplayModels = () => {
-    const hootPosPrepDisplayModels = [
-        ...hootPosModels,
-        PosPrepStage,
-        PosPrepOrder,
-        PosPrepLine,
-        PosPrepState,
-    ];
+    const hootPosPrepDisplayModels = [...hootPosModels, PosPrepStage, PosPrepOrder, PosPrepLine];
     const posModelNames = hootPosPrepDisplayModels.map(
         (modelClass) => modelClass.prototype.constructor._name
     );

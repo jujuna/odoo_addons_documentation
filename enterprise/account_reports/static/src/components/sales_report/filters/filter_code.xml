@@ -3,16 +3,16 @@
     <t t-name="account_reports.SalesReportFilterCode">
         <Dropdown>
             <button class="btn btn-secondary">
-                <i class="fa fa-filter me-1"/> Codes: <t t-esc="selectedEcTaxName"/>
+                <i class="oi oi-filled me-1" data-icon="filter_alt"/> Codes: <t t-out="this.selectedECSaleType"/>
             </button>
 
             <t t-set-slot="content">
-                <t t-foreach="controller.cachedFilterOptions.ec_tax_filter_selection" t-as="ecTax" t-key="ecTax_index">
+                <t t-foreach="this.controller.cachedFilterOptions().filter_sale_type_selection" t-as="saleType" t-key="saleType_index">
                     <DropdownItem
-                        class="{ 'selected':  ecTax.selected }"
-                        onSelected="() => this.filterClicked({ optionKey: 'ec_tax_filter_selection.'+ ecTax_index + '.selected', reload: true})"
+                        class="{ 'selected':  saleType.selected }"
+                        onSelected="() => this.filterClicked({ optionKey: 'filter_sale_type_selection.'+ saleType_index + '.selected', reload: true})"
                         closingMode="'none'"
-                        t-out="ecTax.name"
+                        t-out="saleType.name"
                     />
                 </t>
             </t>

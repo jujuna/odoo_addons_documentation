@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 19.5a1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:46+0000\n"
-"PO-Revision-Date: 2025-12-30 18:46+0000\n"
+"POT-Creation-Date: 2026-08-28 17:56+0000\n"
+"PO-Revision-Date: 2026-08-28 17:56+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,21 +16,43 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: project_enterprise
+#: model:ir.module.module,description:base.module_project_enterprise
+msgid ""
+"\n"
+"Bridge module for project and enterprise\n"
+msgstr ""
+
+#. module: project_enterprise
+#. odoo-python
+#: code:addons/project_enterprise/models/project_task.py:0
+msgid "%(month)s %(year)s"
+msgstr ""
+
+#. module: project_enterprise
 #. odoo-python
 #: code:addons/project_enterprise/models/project_task.py:0
 msgid "%(partner)s has %(amount)s tasks at the same time."
 msgstr ""
 
 #. module: project_enterprise
-#: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form
-msgid ""
-"<i class=\"fa fa-exclamation-circle me-2\" role=\"img\" title=\"Dependency "
-"warning\"/>"
+#. odoo-python
+#: code:addons/project_enterprise/models/project_task.py:0
+msgid "%(users)s has %(task_count)s tasks at the same time."
+msgstr ""
+
+#. module: project_enterprise
+#: model:ir.actions.report,print_report_name:project_enterprise.report_tasks
+msgid "'Tasks'"
 msgstr ""
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form
-msgid "<i class=\"fa fa-random me-2\" role=\"img\" title=\"Planning overlap\"/>"
+msgid "<i class=\"oi me-2\" data-icon=\"error\" role=\"img\" title=\"Dependency warning\"/>"
+msgstr ""
+
+#. module: project_enterprise
+#: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form
+msgid "<i class=\"oi me-2\" data-icon=\"shuffle\" role=\"img\" title=\"Planning overlap\"/>"
 msgstr ""
 
 #. module: project_enterprise
@@ -49,6 +71,11 @@ msgid "Allocated Time"
 msgstr ""
 
 #. module: project_enterprise
+#: model:ir.model.fields,field_description:project_enterprise.field_res_users__task_ids
+msgid "Assigned Tasks"
+msgstr ""
+
+#. module: project_enterprise
 #: model:ir.model.fields,field_description:project_enterprise.field_project_task__user_ids
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_map_view
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_map_view_no_title
@@ -62,8 +89,13 @@ msgid "Auto Plan"
 msgstr ""
 
 #. module: project_enterprise
+#: model:ir.module.module,summary:base.module_project_enterprise
+msgid "Bridge module for project and enterprise"
+msgstr ""
+
+#. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form
-msgid "Check it out <i class=\"oi oi-chevron-right ms-2\"/>"
+msgid "Check it out <i class=\"oi ms-2\" data-icon=\"chevron_forward\"/>"
 msgstr ""
 
 #. module: project_enterprise
@@ -81,12 +113,6 @@ msgstr ""
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_map_view
 msgid "Date"
-msgstr ""
-
-#. module: project_enterprise
-#: model_terms:ir.ui.view,arch_db:project_enterprise.project_sharing_project_task_view_form_inherited_in_gantt
-#: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form_in_gantt
-msgid "Discard"
 msgstr ""
 
 #. module: project_enterprise
@@ -120,6 +146,13 @@ msgid "Milestone"
 msgstr ""
 
 #. module: project_enterprise
+#. odoo-javascript
+#: code:addons/project_enterprise/static/src/views/project_task_calendar/project_task_calendar_controller.js:0
+#: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_controller.js:0
+msgid "No tasks to print"
+msgstr ""
+
+#. module: project_enterprise
 #. odoo-python
 #: code:addons/project_enterprise/models/project_task.py:0
 msgid ""
@@ -141,6 +174,8 @@ msgid "Planned Date Start"
 msgstr ""
 
 #. module: project_enterprise
+#. odoo-python
+#: code:addons/project_enterprise/models/project_task.py:0
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_project_view_gantt
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_gantt
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_gantt_inherited_project_sharing_task
@@ -148,10 +183,22 @@ msgid "Planning"
 msgstr ""
 
 #. module: project_enterprise
+#. odoo-javascript
+#: code:addons/project_enterprise/static/src/views/project_task_calendar/project_task_calendar_controller.js:0
+#: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_controller.js:0
+msgid "Print"
+msgstr ""
+
+#. module: project_enterprise
 #: model:ir.model,name:project_enterprise.model_project_project
 #: model:ir.model.fields,field_description:project_enterprise.field_project_task__project_id
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_map_view
 msgid "Project"
+msgstr ""
+
+#. module: project_enterprise
+#: model:ir.module.module,shortdesc:base.module_project_enterprise
+msgid "Project Enterprise"
 msgstr ""
 
 #. module: project_enterprise
@@ -247,6 +294,11 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/project_enterprise/static/src/views/task_gantt/task_gantt_renderer.js:0
 msgid "Task rescheduled"
+msgstr ""
+
+#. module: project_enterprise
+#: model:ir.actions.report,name:project_enterprise.report_tasks
+msgid "Tasks"
 msgstr ""
 
 #. module: project_enterprise

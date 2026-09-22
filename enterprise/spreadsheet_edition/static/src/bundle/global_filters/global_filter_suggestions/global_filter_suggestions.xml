@@ -2,11 +2,11 @@
 <templates>
 
     <t t-name="spreadsheet_edition.GlobalFilterSuggestions">
-        <Section t-if="suggestions.length" title.translate="Suggestions">
+        <Section t-if="this.suggestions.length" title.translate="Suggestions">
             <div class="o_filter_buttons_wrap grid global-filter-suggestions">
-                <t t-foreach="suggestions" t-as="suggestion" t-key="suggestion.modelName">
+                <t t-foreach="this.suggestions" t-as="suggestion" t-key="suggestion.modelName">
                     <button class="o-button" t-on-click="() => this.onSuggestionClick(suggestion)">
-                        <t t-esc="suggestion.label"/>
+                        <t t-out="suggestion.label"/>
                     </button>
                 </t>
             </div>

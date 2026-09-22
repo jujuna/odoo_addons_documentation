@@ -3,13 +3,11 @@ import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { getFormattedValue } from "@web/views/utils";
 import { useService } from "@web/core/utils/hooks";
 
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 
 export class ConflictingEmissionIdsField extends Component {
     static template = "esg_hr_fleet.ConflictingEmissionIdsField";
-    static props = {
-        ...standardFieldProps,
-    };
+    props = useProps(standardFieldProps);
 
     setup() {
         this.actionService = useService("action");
@@ -31,8 +29,8 @@ export class ConflictingEmissionIdsField extends Component {
         this.actionService.doActionButton({
             type: "object",
             resId: this.props.record.resId,
-            name: "action_see_conflicting_emissions",
-            resModel: "employee.commuting.emissions.wizard",
+            name: "action_show_conflicting_emissions",
+            resModel: "esg.other.emission",
         });
     }
 }

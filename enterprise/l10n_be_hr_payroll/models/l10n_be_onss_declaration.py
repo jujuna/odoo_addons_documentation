@@ -1,15 +1,35 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import logging
 
-from io import BytesIO
+from datetime import date
 
 from odoo.addons.l10n_be_hr_payroll.models.utils import xml_str_to_dict, open_sftp_connection
 from odoo.exceptions import UserError
+from odoo.tools import date_utils
 from odoo import api, fields, models, _
+from odoo.tools import BinaryBytes
 
 _logger = logging.getLogger(__name__)
+
+
+ONSS_DECLARATION_TYPES = (
+    'DMFA',
+    'DMFAREQ',
+    'DMFAUPD',
+    'FLXWAGE',
+    'WECH001',
+    'WECH002',
+    'WECH003',
+    'WECH004',
+    'WECH005',
+    'WECH006',
+    'WECH007',
+    'WECH008',
+    'WECH009',
+    'WECH010',
+    'WECH011',
+)
 
 
 class L10nBeOnssDeclaration(models.Model):
@@ -17,8 +37,19 @@ class L10nBeOnssDeclaration(models.Model):
     _description = 'ONSS Declaration'
 
     name = fields.Char(compute='_compute_name', store=True)
-    dmfa_id = fields.Many2one('l10n_be.dmfa', required=True, index=True)
-    company_id = fields.Many2one('res.company', related="dmfa_id.company_id", store=True)
+    batch_declaration_id = fields.Reference(string="Declaration",
+        selection=[
+            ('l10n_be.dmfa', 'DMFA'),
+            ('l10n.be.drs', 'DRS'),
+            ('l10n.be.flexi.at.work', 'Flexi@Work'),
+        ], required=True)
+    company_id = fields.Many2one('res.company', compute="_compute_company_id", store=True)
+
+    @api.depends('batch_declaration_id')
+    def _compute_company_id(self):
+        for declaration in self:
+            declaration.company_id = declaration.batch_declaration_id.company_id if declaration.batch_declaration_id else False
+
     environment = fields.Selection(
         selection=[
             ('R', 'Production'),
@@ -28,7 +59,6 @@ class L10nBeOnssDeclaration(models.Model):
         required=True)
     state = fields.Selection(
         selection=[
-            ('draft', 'Draft'),
             ('posted', 'Posted'),
             ('received', 'Received'),
             ('notified', 'Notified'),
@@ -36,15 +66,15 @@ class L10nBeOnssDeclaration(models.Model):
             ('other', 'Other'),
         ],
         required=True,
-        default='draft')
+        default='posted')
     onss_file_ids = fields.One2many('l10n.be.onss.file', 'onss_declaration_id')
     onss_file_count = fields.Integer(compute='_compute_onss_file_count')
     error_message = fields.Text()
 
-    @api.depends('dmfa_id')
+    @api.depends('batch_declaration_id')
     def _compute_name(self):
         for declaration in self:
-            declaration.name = f"{declaration.id}: {declaration.dmfa_id.name}"
+            declaration.name = declaration.batch_declaration_id.xml_filename if declaration.batch_declaration_id else False
 
     @api.depends('onss_file_ids')
     def _compute_onss_file_count(self):
@@ -65,9 +95,7 @@ class L10nBeOnssDeclaration(models.Model):
         _logger.info("User %s starting ONSS SFTP connection for company %s",
                      self.env.user.login, self.env.company.name)
 
-    @api.model
     def action_test_sftp_connection(self):
-        self.ensure_one()
         self._check_access_sftp_connection()
         with open_sftp_connection(self.env.company.sudo().onss_sftp_private_key, self.env.company.sudo().onss_technical_user_name) as sftp:
             # List files in home directory
@@ -88,42 +116,46 @@ class L10nBeOnssDeclaration(models.Model):
         }
 
     def action_post(self):
-        self.ensure_one()
+        errors = []
+        for batch_declaration in self.mapped('batch_declaration_id'):
+            if declaration_errors := batch_declaration._pre_submit_checks():
+                errors.append(self.env._("Declaration %(name)s: %(errors)s", name=batch_declaration.name, errors='\n\t- '.join(declaration_errors)))
+        if errors:
+            raise UserError(self.env._("Cannot post declaration(s) due to the following errors:\n\n%(errors)s", errors='\n'.join(errors)))
+
         self._check_access_sftp_connection()
         with open_sftp_connection(self.env.company.sudo().onss_sftp_private_key, self.env.company.sudo().onss_technical_user_name) as sftp:
-            if self.environment == "R":
-                target_folder = "IN"
-            elif self.environment == "T":
-                target_folder = "INTEST"
-            else:
-                target_folder = "INTEST-S"
+            for declaration in self:
+                if declaration.environment == "R":
+                    target_folder = "IN"
+                elif declaration.environment == "T":
+                    target_folder = "INTEST"
+                else:
+                    target_folder = "INTEST-S"
 
-            for file in self.onss_file_ids:
-                # Considered safe by construction, and will be rejected by ONSS server
-                # if format / location is invalid
-                remote_path = f'/{target_folder}/{file.name}'
+                for file in declaration.onss_file_ids:
+                    # Considered safe by construction, and will be rejected by ONSS server
+                    # if format / location is invalid
+                    remote_path = f'/{target_folder}/{file.name}'
 
-                file_data = base64.b64decode(file.file)
+                    with file.file.open() as stream:
+                        sftp.putfo(stream, remote_path)
+                    _logger.info("File %s uploaded to %s", file.name, remote_path)
 
-                file_stream = BytesIO(file_data)
-                sftp.putfo(file_stream, remote_path)
-                _logger.info("File %s uploaded to %s", file.name, remote_path)
+                declaration.state = 'posted'
+                declaration.batch_declaration_id.message_post(body=_(
+                    'The %(declaration)s (id=%(declaration_id)s) has been posted by %(user)s to ONSS portal',
+                    declaration=declaration._get_html_link(_('declaration')),
+                    declaration_id=declaration.id,
+                    user=self.env.user.name))
+                _logger.info(self.env._("Declaration posted successfully to %(folder)s", folder=target_folder))
 
-        self.state = 'posted'
-        self.dmfa_id.message_post(body=_(
-            'The %(declaration)s (id=%(declaration_id)s) has been posted by %(user)s to ONSS portal',
-            declaration=self._get_html_link(_('declaration')),
-            declaration_id=self.id,
-            user=self.env.user.name))
-
-        success_msg = _("Declaration posted successfully to %(folder)s", folder=target_folder)
-        _logger.info(success_msg)
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'type': 'success',
-                'message': success_msg,
+                'message': self.env._("Declaration(s) posted successfully"),
                 'next': {
                     'type': 'ir.actions.client',
                     'tag': 'soft_reload',
@@ -142,14 +174,16 @@ class L10nBeOnssDeclaration(models.Model):
         reception_result = data_dict['ACRF']['Form']['ReceptionResult']
         if reception_result['ResultCode'] == '0':
             onss_declaration.state = 'error'
-            error_code = reception_result['ErrorID']
-            onss_declaration.error_message = f"{error_code}\n{self._get_error_label(error_code.split('-')[-1])}"
-            onss_declaration.dmfa_id.message_post(body=_(
+            error_codes = reception_result.get('ErrorID', [])
+            if not isinstance(error_codes, list):
+                error_codes = [error_codes]
+            onss_declaration.error_message = ', '.join(f"{error_code}\n{self._get_error_label(error_code.split('-')[-1])}" for error_code in error_codes)
+            onss_declaration.batch_declaration_id.message_post(body=_(
                 'The %(declaration)s (id=%(declaration_id)s) has been received as invalid by the ONSS',
                 declaration=onss_declaration._get_html_link(_('declaration')),
                 declaration_id=onss_declaration.id))
         else:
-            onss_declaration.dmfa_id.message_post(body=_(
+            onss_declaration.batch_declaration_id.message_post(body=_(
                 'The %(declaration)s (id=%(declaration_id)s) has been received as valid by the ONSS',
                 declaration=onss_declaration._get_html_link(_('declaration')),
                 declaration_id=onss_declaration.id))
@@ -162,7 +196,7 @@ class L10nBeOnssDeclaration(models.Model):
         notification_type = form['HandledOriginalForm']['Identification']
         onss_declaration = self.env['l10n.be.onss.declaration']
         employee = self.env['hr.employee']
-        if notification_type == "DMFA":
+        if notification_type in ONSS_DECLARATION_TYPES:
             if 'FileReference' in form:
                 reference_name = form['FileReference']['FileName']
                 onss_declaration = self.env['l10n.be.onss.file'].search(
@@ -172,26 +206,31 @@ class L10nBeOnssDeclaration(models.Model):
                 onss_declaration = self.env['l10n.be.onss.file'].search([
                     ('form_creation_date', '=', form['HandledOriginalForm']['FormCreationDate']),
                     ('form_creation_hour', '=', form['HandledOriginalForm']['FormCreationHour']),
-                ], limit=1).onss_declaration_id
+                ], limit=1, order="id DESC").onss_declaration_id
             if not onss_declaration:
                 return onss_declaration, employee
             reception_result = form['HandlingResult']
             error_message = []
             if reception_result['ResultCode'] in ['0', '2', '3']:
                 onss_declaration.state = 'error'
-                onss_declaration.dmfa_id.message_post(body=_(
+                onss_declaration.batch_declaration_id.message_post(body=_(
                     'The %(declaration)s (id=%(declaration_id)s) has been notified as invalid by the ONSS',
                     declaration=onss_declaration._get_html_link(_('declaration')),
                     declaration_id=onss_declaration.id))
+                onss_declaration.batch_declaration_id.state = 'refused'
+                onss_declaration.batch_declaration_id.name = form['HandledReference']['ReferenceNbr']
                 diagnosis_code = reception_result.get('Diagnosis', '3')
                 error_message.append(self._get_diagnosis_label(diagnosis_code))
             else:
                 onss_declaration.state = 'notified'
-                onss_declaration.dmfa_id.message_post(body=_(
+                onss_declaration.batch_declaration_id.message_post(body=_(
                     'The %(declaration)s (id=%(declaration_id)s) has been notified as valid by the ONSS',
                     declaration=onss_declaration._get_html_link(_('declaration')),
                     declaration_id=onss_declaration.id))
-            anomalies = reception_result.get('AnomalyReport', {})
+                onss_declaration.batch_declaration_id.state = 'pending'
+                onss_declaration.batch_declaration_id.name = form['HandledReference']['ReferenceNbr']
+
+            anomalies = reception_result.get('AnomalyReport', [])
             if isinstance(anomalies, dict):
                 anomalies = [anomalies]
             anomalies_count = len(anomalies)
@@ -199,6 +238,8 @@ class L10nBeOnssDeclaration(models.Model):
             employee_by_niss = {}
             for anomaly in anomalies:
                 count += 1
+                if 'ErrorID' not in anomaly:
+                    continue
                 error_code = anomaly['ErrorID']
                 error_message += [
                     _("Anomaly (%(count)s/%(total)s) - Code: %(error_code)s", count=count, total=anomalies_count, error_code=error_code),
@@ -250,19 +291,26 @@ class L10nBeOnssDeclaration(models.Model):
                 if employee:
                     error_message = []
                     if form['HandlingResult'].get('ResultCode') in ['0', '2', '3']:
-                        anomaly = form['HandlingResult']['AnomalyReport']
-                        error_code = anomaly['ErrorID']
-                        error_message += [
-                            error_code,
-                            self._get_error_label(error_code.split('-')[-1]),
-                            _('- Anomaly Class: %s', self._get_anomaly_class_label(anomaly.get('AnomalyClass'))),
-                            '\n',
-                        ]
+                        anomalies = form['HandlingResult'].get('AnomalyReport', [])
+                        if isinstance(anomalies, dict):
+                            anomalies = [anomalies]
+                        for anomaly in anomalies:
+                            error_code = anomaly['ErrorID']
+                            error_message += [
+                                error_code,
+                                self._get_error_label(error_code.split('-')[-1]),
+                                _('- Anomaly Class: %s', self._get_anomaly_class_label(anomaly.get('AnomalyClass'))),
+                                '\n',
+                            ]
                         employee.message_post(body=_(
                             'The DIMONA declaration has been notified as invalid by the ONSS:\n%(error_message)s',
                             error_message='\n'.join(error_message)))
                     else:
-                        dimona_data = form['HandlingResult']['ImpactReport']['DimonaImpactReport']['DimonaPeriodAfter']
+                        dimona_data = form['HandlingResult']['ImpactReport']['DimonaImpactReport'].get('DimonaPeriodAfter', {})
+                        anomaly_report = form['HandlingResult'].get('AnomalyReport', False)
+                        if anomaly_report and (anomaly_report.get('ErrorID', '').endswith('510') or anomaly_report.get('ErrorID', '').endswith('460')):
+                            for version in employee.mapped('version_ids').filtered(lambda v: v.is_flexi() and v.contract_date_start == dimona_data.get('StartingDate') and v.contract_date_end == dimona_data.get('EndingDate') and (v.date_start != v.date_end or v.date_start == dimona_data.get('StartingDate') and v.date_end == dimona_data.get('EndingDate'))):
+                                version.l10n_be_refused_flexijob = True
                         employee.message_post(
                             body=_(
                                 "DIMONA declaration opened (Starting %(start)s, Ending %(end)s)",
@@ -283,6 +331,136 @@ class L10nBeOnssDeclaration(models.Model):
                                     end=application_form[dimona_type].get('EndingDate', _('Unknown'))
                                 ))
         return onss_declaration, employee
+
+    def _ensure_list(self, data):
+        if not data:
+            return []
+        if not isinstance(data, list):
+            return [data]
+        return data
+
+    def _sync_consultation_data(self, consultation_data):
+        if not consultation_data:
+            return
+        quarter = consultation_data['Quarter']
+        year = int(quarter[:4])
+        month = int(quarter[4:5]) * 3
+        quarter_start, quarter_end = date_utils.get_quarter(date(year, month, 1))
+        consultation_results = {}
+        natural_person_variables = {}
+        for natural_person_consultation in self._ensure_list(consultation_data.get('NaturalPersonConsult')):
+            for worker_record_consultation in self._ensure_list(natural_person_consultation.get('WorkerRecordConsult')):
+                consultation_state = {
+                    'deductions': [],
+                    'contributions': [],
+                    'occupations': [],
+                    'student_contributions': [],
+                    'update_action': 9,
+                }
+                for occupation_consultation in self._ensure_list(worker_record_consultation.get('OccupationConsultation')):
+                    occupation_dict = {
+                        'ActivityCode': occupation_consultation.get('ActivityCode'),
+                        'TenthOrTwelfth': occupation_consultation.get('TenthOrTwelfth'),
+                        'apprenticeship': occupation_consultation.get('Apprenticeship'),
+                        'commission': occupation_consultation.get('JointCommissionNbr'),
+                        'is_parttime': occupation_consultation.get('ContractType'),
+                        'days_per_week': occupation_consultation.get('WorkingDaysSystem'),
+                        'employment_promotion': occupation_consultation.get('EmploymentPromotion'),
+                        'flying_staff_class': occupation_consultation.get('FlyingStaffClass'),
+                        'days_justification': occupation_consultation.get('DaysJustification'),
+                        'position_code': occupation_consultation.get('PositionCode'),
+                        'ref_mean_working_hours': occupation_consultation.get('RefMeanWorkingHours'),
+                        'remun_method': occupation_consultation.get('RemunMethod'),
+                        'contract_id': occupation_consultation.get('OccupationUserReference'),
+                        'version_number': occupation_consultation.get('OccupationVersionNbr'),
+                        'retired': occupation_consultation.get('Retired'),
+                        'mean_working_hours': occupation_consultation.get('MeanWorkingHours'),
+                        'date_start': occupation_consultation.get('OccupationStartingDate'),
+                        'date_end': occupation_consultation.get('OccupationEndingDate'),
+                        'remunerations': [],
+                        'occupation_deductions': [],
+                    }
+                    for remun_action in self._ensure_list(occupation_consultation.get('RemunAction')):
+                        occupation_dict['remunerations'].append({
+                            'sequence': remun_action.get('RemunSequenceNbr'),
+                            'code': remun_action.get('RemunCode'),
+                            'frequency': remun_action.get('BonusPaymentFrequency'),
+                            'amount': remun_action.get('RemunAmount'),
+                            'percentage_paid': remun_action.get('PercentagePaid'),
+                        })
+                    for deduction_action in self._ensure_list(occupation_consultation.get('OccupationDeductionAction')):
+                        occupation_dict['occupation_deductions'].append({
+                            'deduction_code': deduction_action.get('DeductionCode'),
+                            'deduction_calculation_basis': deduction_action.get('DeductionCalculationBasis'),
+                            'deduction_amount': deduction_action.get('DeductionAmount'),
+                            'deduction_right_starting_date': deduction_action.get('DeductionRightStartingDate'),
+                            'management_cost_nbr_months': deduction_action.get('ManagementCostNbrMonths'),
+                            'replaced_inss': deduction_action.get('ReplacedINSS'),
+                            'applicant_inss': deduction_action.get('ApplicantINSS'),
+                            'certificate_origin': deduction_action.get('CertificateOrigin'),
+                        })
+                    consultation_state['occupations'].append(occupation_dict)
+                for worker_contribution in self._ensure_list(worker_record_consultation.get('WorkerContributionAction')):
+                    contribution_dict = {
+                        'worker_code': worker_contribution.get('ContributionWorkerCode'),
+                        'contribution_type': worker_contribution.get('ContributionType'),
+                        'amount': worker_contribution.get('ContributionAmount'),
+                        'calculation_basis': worker_contribution.get('ContributionCalculationBasis'),
+                        'first_hiring_date': worker_contribution.get('FirstHiringDate')
+                    }
+                    consultation_state['contributions'].append(contribution_dict)
+                for worker_deduction in self._ensure_list(worker_record_consultation.get('WorkerDeductionAction')):
+                    deduction_dict = {
+                        'code': worker_deduction.get('DeductionCode'),
+                        'deduction_calculation_basis': worker_deduction.get('DeductionCalculationBasis'),
+                        'deduction_amount': worker_deduction.get('DeductionAmount'),
+                        'deduction_right_starting_date': worker_deduction.get('DeductionRightStartingDate'),
+                        'applicant_inss': worker_deduction.get('ApplicantINSS'),
+                        'certificate_origin': worker_deduction.get('CertificateOrigin'),
+                    }
+                    consultation_state['deductions'].append(deduction_dict)
+                for student_contribution in self._ensure_list(worker_record_consultation.get('StudentContributionAction')):
+                    student_contribution_dict = {
+                        'student_remun_amount': student_contribution.get('StudentRemunAmount'),
+                        'student_contribution_amount': student_contribution.get('StudentContributionAmount'),
+                        'student_nbr_days': student_contribution.get('StudentNbrDays'),
+                        'student_hours_nbr': student_contribution.get('StudentHoursNbr'),
+                        'local_unit_id': student_contribution.get('LocalUnitID'),
+                    }
+                    consultation_state['student_contributions'].append(student_contribution_dict)
+                consultation_results[natural_person_consultation['INSS']] = {"state": consultation_state, 'worker_code': worker_record_consultation['WorkerCode']}
+                natural_person_variables[natural_person_consultation['INSS']] = {
+                    'natural_person_pid': natural_person_consultation.get('NaturalPersonPID'),
+                    'decl_natural_person_pid': natural_person_consultation.get('DeclNaturalPersonPID'),
+                    'version_number': natural_person_consultation.get('DeclNaturalPersonVersionNbr'),
+                    'worker_record_version_number': worker_record_consultation.get('WorkerRecordVersionNbr'),
+                }
+        existing_natural_person_states = self.env['l10n_be.dmfa.natural_person.state'].search([
+            ('niss', 'in', consultation_results.keys()),
+            ('quarter_start', '=', quarter_start),
+            ('quarter_end', '=', quarter_end),
+        ])
+        states_by_niss = {state.niss: state for state in existing_natural_person_states}
+        for niss, consultation_result in consultation_results.items():
+            if niss in states_by_niss:
+                states_by_niss[niss].validate_changes(consultation_result['state'], consultation_result['worker_code'], from_consultation=True)
+            else:
+                employee = self.env['hr.employee'].with_context(active_test=False).search([('niss', '=', niss)], limit=1)
+                if employee:
+                    new_state = self.env['l10n_be.dmfa.natural_person.state'].create({
+                        'employee_id': employee.id,
+                        'niss': niss,
+                        'quarter_start': quarter_start,
+                        'quarter_end': quarter_end,
+                        'worker_record_data': consultation_state,
+                    })
+                    states_by_niss[niss] = new_state
+            states_by_niss[niss].natural_person_pid = natural_person_variables[niss]['natural_person_pid']
+            states_by_niss[niss].decl_natural_person_pid = natural_person_variables[niss]['decl_natural_person_pid']
+            states_by_niss[niss].version_number = natural_person_variables[niss]['version_number']
+            states_by_niss[niss].worker_record_version_number = natural_person_variables[niss]['worker_record_version_number']
+            for occupation in self._ensure_list(consultation_result['state']['occupations']):
+                states_by_niss[niss].update_occupation_version(occupation['contract_id'], occupation['version_number'])
 
     @api.model
     def _analyse_idflux_file(self, data_dict):
@@ -307,11 +485,167 @@ class L10nBeOnssDeclaration(models.Model):
         return onss_declaration, employee
 
     @api.model
+    def _analyse_dmfa_consultation_answer_file(self, data_dict):
+        form = data_dict['DmfAConsultationAnswer']['Form']
+        employee = self.env['hr.employee']
+        onss_declaration = self.env['l10n.be.onss.file'].search([
+            ('form_creation_date', '=', form['HandledOriginalForm']['FormCreationDate']),
+            ('form_creation_hour', '=', form['HandledOriginalForm']['FormCreationHour']),
+        ], limit=1).onss_declaration_id
+        if not onss_declaration:
+            return onss_declaration, employee
+        code_research = form.get('EmployerDeclarationConsult', {}).get('ResultCodeResearch')
+        if code_research:
+            if code_research == '0':
+                onss_declaration.state = 'notified'
+                onss_declaration.batch_declaration_id.message_post(body=_(
+                    'The %(declaration)s (id=%(declaration_id)s) has been notified as valid by the ONSS',
+                    declaration=onss_declaration._get_html_link(_('consultation request')),
+                    declaration_id=onss_declaration.id))
+                onss_declaration.batch_declaration_id.state = 'pending'
+            else:
+                onss_declaration.state = 'error'
+                onss_declaration.batch_declaration_id.message_post(body=_(
+                    'The %(declaration)s (id=%(declaration_id)s) has been notified as invalid by the ONSS',
+                    declaration=onss_declaration._get_html_link(_('consultation request')),
+                    declaration_id=onss_declaration.id))
+                onss_declaration.batch_declaration_id.state = 'refused'
+                onss_declaration.batch_declaration_id.error_message = self._get_code_research_label(code_research)
+        try:
+            self._sync_consultation_data(form['EmployerDeclarationConsult'])
+        except Exception as e:  # noqa: BLE001
+            _logger.error("Error occurred while syncing consultation data: %s", e)
+        return onss_declaration, employee
+
+    @api.model
+    def _analyse_dmfa_update_notification_file(self, data_dict):
+        form = data_dict['DmfAUpdateNotification']['Form']
+        employee = self.env['hr.employee']
+        onss_declaration = self.env['l10n.be.onss.declaration']
+        quarter_info = form.get('EmployerDeclarationUpdateNotif', {}).get('Quarter')
+        if not quarter_info:
+            return onss_declaration, employee
+        year = quarter_info[0:4]
+        quarter = quarter_info[-1]
+        dmfa = self.env['l10n_be.dmfa'].search([
+            ('year', '=', year),
+            ('quarter', '=', quarter),
+            ('declaration_method', '=', 'batch'),
+            ('declaration_type', '=', 'original')
+        ])
+        onss_declaration = dmfa.onss_declaration_ids.filtered(lambda d: d.state == 'notified')
+        if not onss_declaration:
+            return onss_declaration, employee
+        onss_declaration.batch_declaration_id.message_post(body=_(
+            'The %(declaration)s (id=%(declaration_id)s) has been modified',
+            declaration=onss_declaration._get_html_link(_('declaration')),
+            declaration_id=onss_declaration.id))
+        return onss_declaration, employee
+
+    @api.model
+    def _analyse_dmpi_file(self, data_dict):
+        form = data_dict['DmfAPID']['Form']
+        references = form['Reference']
+        onss_declaration = self.env['l10n.be.onss.declaration']
+        employee = self.env['hr.employee']
+        if not isinstance(references, list):
+            references = [references]
+        submitted_declaration = self.env['l10n_be.dmfa']
+        for ref in references:
+            if ref['ReferenceOrigin'] == '1':
+                submitted_declaration = submitted_declaration.search([('name', '=', ref['ReferenceNbr'])])
+        if not submitted_declaration:
+            _logger.warning(_("No matching DMFA declaration found for reference number %s", ref['ReferenceNbr']))
+            return onss_declaration, employee
+        submitted_declaration.payslip_ids.write({'l10n_be_is_dmfa_reported': True})
+        declaration_updates = form['IDEmployerDeclaration']
+        submitted_declaration.company_pid = declaration_updates['EmployerDeclarationPID'].zfill(11)
+        natural_person_updates = declaration_updates['IDNaturalPerson']
+        if not isinstance(natural_person_updates, list):
+            natural_person_updates = [natural_person_updates]
+        for natural_person_update in natural_person_updates:
+            if natural_person_update.get('NaturalPersonPID'):
+                natural_person_state = self.env['l10n_be.dmfa.natural_person.state'].search([
+                    ('niss', '=', natural_person_update['INSS']),
+                    ('quarter_start', '=', submitted_declaration.quarter_start),
+                    ('quarter_end', '=', submitted_declaration.quarter_end),
+                ], limit=1)
+                if not natural_person_state:
+                    natural_person_state = self.env['l10n_be.dmfa.natural_person.state'].create({
+                        'niss': natural_person_update['INSS'],
+                        'quarter_start': submitted_declaration.quarter_start,
+                        'quarter_end': submitted_declaration.quarter_end,
+                    })
+                natural_person_state.natural_person_pid = natural_person_update['NaturalPersonPID']
+                natural_person_state.decl_natural_person_pid = natural_person_update['DeclNaturalPersonPID']
+                natural_person_state.version_number = natural_person_update['DeclNaturalPersonVersionNbr']
+                natural_person_state.worker_record_version_number = natural_person_update['IDWorkerRecord']['WorkerRecordVersionNbr']
+                occupation_updates = natural_person_update['IDWorkerRecord'].get('IDOccupation')
+                if not occupation_updates:
+                    continue
+                if not isinstance(occupation_updates, list):
+                    occupation_updates = [occupation_updates]
+                for occupation_update in occupation_updates:
+                    natural_person_state.update_occupation_version(occupation_update['OccupationUserReference'], occupation_update['OccupationVersionNbr'])
+        onss_declaration = submitted_declaration.onss_declaration_ids.filtered(lambda d: d.state == 'notified')
+        if not onss_declaration:
+            return onss_declaration, employee
+        onss_declaration.batch_declaration_id.message_post(body=_(
+            'The %(declaration)s (id=%(declaration_id)s) has been modified',
+            declaration=onss_declaration._get_html_link(_('declaration')),
+            declaration_id=onss_declaration.id))
+        return onss_declaration, employee
+
+    @api.model
+    def _process_incoming_onss_files(self, incoming_files):
+        onss_file_vals = []
+        for filename, content in incoming_files:
+            onss_declaration = self.env['l10n.be.onss.declaration']
+            employee = self.env['hr.employee']
+            data_dict = {}
+            try:
+                # Determine ONSS Declaration
+                xml_str = content.decode()
+                data_dict = xml_str_to_dict(xml_str)
+            except Exception as e:  # noqa: BLE001
+                _logger.info("Unabled to deduct ONSS declaration for non xml file %s: %s", filename, e)
+            if 'ACRF' in data_dict:
+                onss_declaration = self._analyse_acrf_file(data_dict)
+            elif 'NOTIFICATION' in data_dict:
+                onss_declaration, employee = self._analyse_notification_file(data_dict)
+            elif 'IDFLUX' in data_dict:
+                onss_declaration, employee = self._analyse_idflux_file(data_dict)
+            elif 'DmfAConsultationAnswer' in data_dict:
+                onss_declaration, employee = self._analyse_dmfa_consultation_answer_file(data_dict)
+            elif 'DmfAUpdateNotification' in data_dict:
+                onss_declaration, employee = self._analyse_dmfa_update_notification_file(data_dict)
+            elif 'DmfAPID' in data_dict:
+                onss_declaration, employee = self._analyse_dmpi_file(data_dict)
+
+            onss_file_vals.append({
+                'name': filename,
+                'file': BinaryBytes(content),
+                'onss_declaration_id': onss_declaration.id,
+                'employee_id': employee.id,
+            })
+        onss_files = self.env['l10n.be.onss.file'].create(onss_file_vals)
+        for onss_file in onss_files:
+            if onss_file.onss_declaration_id:
+                continue
+            _logger.info(onss_file.name)
+            matching_file = self.env['l10n.be.onss.file'].search([
+                ('name', 'like', '.'.join(onss_file.name.split('.')[1:])),
+                ('onss_declaration_id', '!=', False),
+            ], limit=1)
+            onss_file.onss_declaration_id = matching_file.onss_declaration_id
+        return onss_files
+
+    @api.model
     def _fetch_files(self):
         self._check_access_sftp_connection()
         with open_sftp_connection(self.env.company.sudo().onss_sftp_private_key, self.env.company.sudo().onss_technical_user_name) as sftp:
             target_folders = ['OUT', 'OUTTEST', 'OUTTEST-S']
-            onss_file_vals = []
+            incoming_files = []
 
             for folder in target_folders:
                 try:
@@ -332,39 +666,8 @@ class L10nBeOnssDeclaration(models.Model):
                         continue
                     remote_path = f"{folder}/{filename}"
                     with sftp.file(remote_path, mode='rb') as remote_file:
-                        content = remote_file.read()
-                        onss_declaration = self.env['l10n.be.onss.declaration']
-                        employee = self.env['hr.employee']
-                        data_dict = {}
-                        try:
-                            # Determine ONSS Declaration
-                            xml_str = content.decode()
-                            data_dict = xml_str_to_dict(xml_str)
-                        except Exception as e:  # noqa: BLE001
-                            _logger.info("Unabled to deduct ONSS declaration for non xml file %s: %s", filename, e)
-                            pass
-                        if 'ACRF' in data_dict:
-                            onss_declaration = self._analyse_acrf_file(data_dict)
-                        elif 'NOTIFICATION' in data_dict:
-                            onss_declaration, employee = self._analyse_notification_file(data_dict)
-                        elif 'IDFLUX' in data_dict:
-                            onss_declaration, employee = self._analyse_idflux_file(data_dict)
-
-                        onss_file_vals.append({
-                            'name': filename,
-                            'file': base64.b64encode(content).decode('utf-8'),
-                            'onss_declaration_id': onss_declaration.id,
-                            'employee_id': employee.id,
-                        })
-        onss_files = self.env['l10n.be.onss.file'].create(onss_file_vals)
-        for onss_file in onss_files:
-            if onss_file.onss_declaration_id:
-                continue
-            matching_file = self.env['l10n.be.onss.file'].search([
-                ('name', 'like', '.'.join(onss_file.name.split('.')[1:])),
-                ('onss_declaration_id', '!=', False),
-            ], limit=1)
-            onss_file.onss_declaration_id = matching_file.onss_declaration_id
+                        incoming_files.append((filename, remote_file.read()))
+        onss_files = self._process_incoming_onss_files(incoming_files)
         success_msg = _("ONSS Files fetched successfully (%s new imported files)", len(onss_files))
         _logger.info(success_msg)
         return {
@@ -904,8 +1207,24 @@ class L10nBeOnssDeclaration(models.Model):
             "B": self.env._("Blocking anomaly"),
             "P": self.env._("Percentage-based anomaly"),
             "NP": self.env._("Non-percentage-based anomaly"),
+            "NB": self.env._("Non-blocking anomaly not rejecting the declaration"),
             "D": self.env._("Anomaly related to deduction rights verification"),
             "W": self.env._("Warning"),
             "I": self.env._("Investigation"),
         }
         return error_messages.get(code, self.env._('Unknown Anomaly Class Label'))
+
+    def action_download_onss_xml(self):
+        self.ensure_one()
+        return self.batch_declaration_id.action_download_declaration_file()
+
+    def _get_code_research_label(self, code):
+        error_messages = {
+            "0": self.env._("No anomaly"),
+            "1": self.env._("No result for this query"),
+            "2": self.env._("This data has been canceled"),
+            "3": self.env._("This data was not found in the required declaration"),
+            "4": self.env._("This natural person could not be identified by Sigedis"),
+            "5": self.env._("Too many results for this query"),
+        }
+        return error_messages.get(code, self.env._('Unknown Code Research Label'))

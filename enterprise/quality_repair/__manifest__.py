@@ -2,7 +2,6 @@
 
 {
     'name': 'Repair features for Quality Control',
-    'version': '1.0',
     'category': 'Supply Chain/Quality',
     'sequence': 50,
     'summary': 'Quality Management with Repair',

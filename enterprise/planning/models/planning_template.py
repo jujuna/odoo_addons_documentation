@@ -12,7 +12,7 @@ class PlanningSlotTemplate(models.Model):
     _name = 'planning.slot.template'
     _description = "Shift Template"
     _order = "sequence"
-    _rec_names_search = ['name', 'role_id']
+    _rec_names_search = ('name', 'role_id')
 
     active = fields.Boolean('Active', default=True)
     name = fields.Char('Hours', compute="_compute_name", store=True)
@@ -21,6 +21,7 @@ class PlanningSlotTemplate(models.Model):
     start_time = fields.Float('Planned Hours', aggregator=None, default_export_compatible=True, default=8.0)
     end_time = fields.Float('End Hour', aggregator=None, default_export_compatible=True, default=17.0)
     duration_days = fields.Integer('Duration Days', default=1, aggregator=None, default_export_compatible=True)
+    company_id = fields.Many2one('res.company', compute='_compute_company_id', store=True, readonly=False)
 
     _check_start_time_lower_than_24 = models.Constraint(
         'CHECK(start_time < 24)',
@@ -39,14 +40,14 @@ class PlanningSlotTemplate(models.Model):
     def _check_start_and_end_times(self):
         for template in self:
             if template.end_time < template.start_time and template.duration_days <= 1:
-                raise ValidationError(_('The start hour cannot be before the end hour for a one-day shift template.'))
+                raise ValidationError(_('The start hour cannot be after the end hour for a one-day shift template.'))
 
     @api.depends('start_time', 'end_time')
     def _compute_name(self):
         for shift_template in self:
             shift_template.name = shift_template._get_name()
 
-    @api.depends('name', 'duration_days', 'role_id')
+    @api.depends(lambda self: self._get_display_name_fields())
     def _compute_display_name(self):
         for shift_template in self:
             display_name = [shift_template._get_name(time_condensed=True)]
@@ -54,7 +55,18 @@ class PlanningSlotTemplate(models.Model):
                 display_name.append(_('(%s days span)', shift_template.duration_days))
             if shift_template.role_id:
                 display_name.append(shift_template.role_id.name)
-            shift_template.display_name = ' '.join(display_name)
+            display_name = ' '.join(display_name)
+            extra_names = [
+                shift_template._fields[fname].convert_to_display_name(shift_template[fname], shift_template)[:50]  # limit to 50 characters
+                for fname in shift_template._get_extra_name_fields()[:4]  # limit to 4 extra fields
+            ]
+            if extra_names:
+                display_name = f"{display_name} [{' - '.join(extra_names)}]"
+            shift_template.display_name = display_name
+
+    def _compute_company_id(self):
+        for template in self:
+            template.company_id = template._get_company_id()
 
     @api.model
     def formatted_read_group(self, domain, groupby=(), aggregates=(), having=(), offset=0, limit=None, order=None) -> list[dict]:
@@ -65,6 +77,9 @@ class PlanningSlotTemplate(models.Model):
             if 'end_time' in data:
                 data['end_time'] = float_to_time(data['end_time']).strftime('%H:%M')
         return res
+
+    def _get_company_id(self):
+        return self.env['res.company']
 
     def _get_name(self, time_condensed=False):
         if not (0 <= self.start_time < 24 and 0 <= self.end_time < 24):
@@ -93,3 +108,9 @@ class PlanningSlotTemplate(models.Model):
             start_time_formatted,
             end_time_formatted,
         )
+
+    def _get_display_name_fields(self):
+        return ['name', 'duration_days', 'role_id']
+
+    def _get_extra_name_fields(self):
+        return []

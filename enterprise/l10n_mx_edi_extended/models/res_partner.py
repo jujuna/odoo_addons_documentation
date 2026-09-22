@@ -1,5 +1,3 @@
-# coding: utf-8
-
 from odoo import api, fields, models, _
 
 
@@ -28,19 +26,21 @@ class ResPartner(models.Model):
         string="CURP", size=18,
         help="In Mexico, the Single Code of Population Registration (CURP) is a unique alphanumeric code of 18 "
              "characters used to officially identify both residents and Mexican citizens throughout the country.")
-    l10n_mx_edi_external_trade = fields.Boolean(
-        'Need external trade?', help='check this box to add by default '
-        'the external trade complement in invoices for this customer.')
     l10n_mx_edi_external_trade_type = fields.Selection(
         selection=[
-            ('02', 'Definitive'),
-            ('03', 'Temporary'),
+            ("01", "Does not apply"),
+            ("02", "Definitive"),
+            ("03", "Temporary"),
+            ("04", "Definitive without alienation"),
         ],
-        string='External Trade',
-        help="Mexico: Indicates whether the partner is foreign and if an External Trade complement is required."
-             "01 - Not Set: No Complement."
-             "02 - Definitive: Adds the External Trade complement to CFDI."
-             "03 - Temporal: Used when exporting goods for a temporary period.",
+        string="External Trade",
+        help="Mexico: Indicates whether the partner is foreign and if an External Trade complement is required.\n"
+             "01 - Does not apply: No Complement.\n"
+             "02 - Definitive: Adds the External Trade complement to CFDI.\n"
+             "03 - Temporal: Used when exporting goods for a temporary period.\n"
+             "04 - Definitive without alienation: Adds the External Trade complement to CFDI if the invoice total is 0.",
+        required=True,
+        default="01",
     )
 
     @api.depends('l10n_mx_edi_locality_id')

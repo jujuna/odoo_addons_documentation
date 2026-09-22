@@ -2,16 +2,12 @@
 
 import { AbstractFilterEditorSidePanel } from "./filter_editor_side_panel";
 import { FilterEditorFieldMatching } from "./filter_editor_field_matching";
-import { TextFilterValue } from "@spreadsheet/global_filters/components/filter_text_value/filter_text_value";
-
-import { components } from "@odoo/o-spreadsheet";
 import { ModelSelector } from "@web/core/model_selector/model_selector";
 import { ModelFieldSelector } from "@web/core/model_field_selector/model_field_selector";
-import { SelectionFilterValue } from "@spreadsheet/global_filters/components/selection_filter_value/selection_filter_value";
-import { onWillStart } from "@odoo/owl";
+import { onWillStart, usePlugin, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
-
-const { SelectionInput } = components;
+import { GlobalFilterInput } from "../global_filter_input/global_filter_input";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 /**
  * This is the side panel to define/edit a global filter of type "selection".
@@ -21,16 +17,28 @@ export class SelectionFilterEditorSidePanel extends AbstractFilterEditorSidePane
     static components = {
         ...AbstractFilterEditorSidePanel.components,
         FilterEditorFieldMatching,
+        GlobalFilterInput,
         ModelSelector,
         ModelFieldSelector,
-        TextFilterValue,
-        SelectionInput,
-        SelectionFilterValue,
     };
+
+    debugMode = usePlugin(DebugModePlugin);
+
+    selectionProps = useProps({
+        model: t.string().optional(),
+    });
 
     setup() {
         super.setup();
-
+        if (this.selectionProps.model) {
+            this.store.onSelectionModelSelected({
+                technical: this.selectionProps.model,
+                label: this.props.label,
+            });
+        }
+        if (this.props.field) {
+            this.store.onSelectionFieldSelected(this.props.field.name, this.props.field);
+        }
         this.orm = useService("orm");
         onWillStart(async () => {
             if (!this.store.filter.resModel) {
@@ -46,10 +54,6 @@ export class SelectionFilterEditorSidePanel extends AbstractFilterEditorSidePane
 
     get type() {
         return "selection";
-    }
-
-    updateSelectionDefaultValue(selectionValues) {
-        super.updateDefaultValue({ selectionValues, operator: "in" });
     }
 
     filterSelectionsFields(field) {

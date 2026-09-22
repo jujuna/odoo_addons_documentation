@@ -2,24 +2,12 @@
     .o_knowledge_comment_box {
         max-width: 400px;
         .o_knowledge_comment_background {
-            display: flex;
             &:not(.o_knowledge_comment_small_ui) {
-                background-color: $o-gray-100;
+                background-color: $o-view-background-color;
             }
             &.o_knowledge_comment_small_ui > img {
-                width: 40px;
-                height: 40px;
-            }
-            .o_knowledge_comment_container {
-                display: flex;
-                flex-grow: 1;
-                flex-direction: column;
-                overflow: hidden;
-            }
-        }
-        &.o_focused_thread {
-            .o_knowledge_comment_background:not(.o_knowledge_comment_small_ui) {
-                background-color: $o-gray-200;
+                width: $spacer * 2;
+                height: $spacer * 2;
             }
         }
     }
@@ -31,25 +19,8 @@
     }
     .o_knowledge_comment_box {
         .o_knowledge_comment_background {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            background-color: $o-gray-100;
-            .o_knowledge_comment_anchor {
-                > div {
-                    border-left: 2px solid darkgoldenrod;
-                }
-            }
-            .o_knowledge_comment_container {
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-                width: 100%;
-            }
-        }
-        &.o_focused_thread {
-            .o_knowledge_comment_background {
-                background-color: $o-gray-200;
+            .o_knowledge_comment_anchor > div {
+                border-left: $border-width * 3 solid #75a7f9;
             }
         }
     }
@@ -59,23 +30,22 @@
     .o_knowledge_comment_box {
         .o_knowledge_comment_background {
             max-height: 50vh;
-            transition: background-color .2s ease-in-out;
-            .o_knowledge_sticky_composer {
-                background-color: $o-gray-200;
-            }
+            animation: o-knowledge-comment-fade-in .2s ease-in-out;
             .o-mail-Message-avatarContainer {
                 background-color: transparent !important;
-                .o-mail-Message-avatar {
-                    width: 40px;
-                    height: 40px;
-                }
             }
         }
-        &.o_focused_thread {
-            &:not(.commenting) {
-                cursor: pointer;
-            }
-        }
+    }
+}
+
+.o_knowledge_comments_panel:has(.o_focused_thread) {
+    .card {
+        opacity: 0.6;
+        transition: $transition-fade;
+    }
+
+    .card:has(.o_focused_thread) {
+        opacity: 1;
     }
 }
 
@@ -84,33 +54,35 @@
 }
 
 .o_knowledge_comments_popover {
+    width: 100%;
+    overflow: hidden;
     max-height: 50vh !important;
     max-width: Min(400px, 80vw) !important;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    .o_knowledge_comment_scrollable {
-        background-color: $o-gray-100;
-    }
-    .o_knowledge_sticky_composer {
-        background-color: $o-gray-100;
-    }
 }
 
 .o_knowledge_comment_container, .o_knowledge_comments_popover {
-    .o_knowledge_comment_scrollable {
-        flex-grow: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
     .o_knowledge_sticky_composer {
-        position: sticky;
-        bottom: 0;
         z-index: 1000;
     }
     .o-mail-AttachmentCard {
         grid-column-start: span 12 !important;
         grid-column-end: auto !important;
+    }
+
+    .o-mail-Thread {
+        padding-bottom: 0 !important;
+    }
+
+    .o-mail-Thread-content {
+        gap: map-get($spacers, 2);
+    }
+}
+
+@keyframes o-knowledge-comment-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
     }
 }

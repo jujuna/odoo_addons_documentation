@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo import fields
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import tagged
-from odoo.tools import file_open
 
 
 @tagged('post_install', '-at_install')
 class TestAccountBankStatementImportCSV(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     def _import_file(self, csv_file_path, csv_fields=False):
         # Create a bank account and journal corresponding to the CSV file (same currency and account number)
@@ -16,17 +16,16 @@ class TestAccountBankStatementImportCSV(AccountTestInvoicingCommon):
             'name': 'Bank 123456',
             'code': 'BNK67',
             'type': 'bank',
-            'bank_acc_number': '123456',
+            'bank_account_number': '123456',
             'currency_id': self.env.ref("base.USD").id,
         })
 
         # Use an import wizard to process the file
-        with file_open(csv_file_path, 'rb') as csv_file:
-            action = bank_journal.create_document_from_attachment(self.env['ir.attachment'].create({
-                'mimetype': 'text/csv',
-                'name': 'test_csv.csv',
-                'raw': csv_file.read(),
-            }).ids)
+        action = bank_journal.create_document_from_attachment(self.env['ir.attachment'].create({
+            'mimetype': 'text/csv',
+            'name': 'test_csv.csv',
+            'raw': self.file_read(csv_file_path),
+        }).ids)
         import_wizard = self.env['base_import.import'].browse(
             action['params']['context']['wizard_id']
         ).with_context(action['params']['context'])

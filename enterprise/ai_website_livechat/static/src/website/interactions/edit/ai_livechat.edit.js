@@ -19,9 +19,7 @@ export class AILivechatEdit extends Interaction {
         return this.el.dataset.livechatChannelId;
     }
     get fallbackButtonActive() {
-        return !this.livechatAvailable &&
-        this.el.dataset.hasFallbackButton === "true" &&
-        Boolean(this.el.dataset.fallbackButtonURL);
+        return this.el.dataset.hasFallbackButton === "true";
     }
 }
 

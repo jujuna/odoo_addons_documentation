@@ -25,13 +25,18 @@ function isUnremovableColumn(node, root) {
 function columnIsAvailable(numberOfColumns) {
     return (selection) => {
         const row = closestElement(selection.anchorNode, ".o_text_columns .row");
-        return !(row && row.childElementCount === numberOfColumns);
+        return row
+            ? row.childElementCount !== numberOfColumns
+            : closestBlock(selection.anchorNode)?.parentNode?.isContentEditable;
     };
 }
 
 export class ColumnPlugin extends Plugin {
     static id = "column";
     static dependencies = ["baseContainer", "selection", "history", "dom"];
+    static defaultConfig = {
+        allowTextColumnResize: true,
+    };
     /** @type {import("plugins").EditorResources} */
     resources = {
         user_commands: [
@@ -39,7 +44,7 @@ export class ColumnPlugin extends Plugin {
                 id: "columnize",
                 title: _t("Columnize"),
                 description: _t("Convert into columns"),
-                icon: "fa-columns",
+                icon: "view_column",
                 run: this.columnize.bind(this),
                 isAvailable: isHtmlContentSupported,
             },
@@ -86,9 +91,28 @@ export class ColumnPlugin extends Plugin {
                 text: _t("Empty column"),
             },
         ],
-        unremovable_node_predicates: isUnremovableColumn,
-        power_buttons_visibility_predicates: ({ anchorNode }) =>
-            !closestElement(anchorNode, ".o_text_columns"),
+        /** Resizing Parameters */
+        ...(this.config.allowTextColumnResize && {
+            resizing_parameters: [
+                {
+                    resizableElementsSelector: "div[class^='col-']",
+                    parentContainerSelector: ".o_text_columns .row",
+                    allowedEdges: ["left", "right"],
+                    minSize: 44,
+                    hoverClass: "o_resize_handle",
+                },
+            ],
+        }),
+        is_node_removable_predicates: (node, root) => {
+            if (isUnremovableColumn(node, root)) {
+                return false;
+            }
+        },
+        should_show_power_buttons_predicates: ({ anchorNode }) => {
+            if (closestElement(anchorNode, ".o_text_columns")) {
+                return false;
+            }
+        },
         move_node_whitelist_selectors: ".o_text_columns",
         move_node_blacklist_selectors: ".o_text_columns *",
         hint_targets_providers: (selectionData) => {
@@ -122,10 +146,48 @@ export class ColumnPlugin extends Plugin {
                 this.removeColumns(anchor);
             }
         } else if (numberOfColumns) {
+            const li = closestElement(anchor, "li");
+            if (li) {
+                this.createColumnsFromList(anchor, li, numberOfColumns);
+                return;
+            }
             this.createColumns(anchor, numberOfColumns);
         }
+
         this.dependencies.selection.setSelection(selectionToRestore);
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
+    }
+
+    createColumnsFromList(anchor, li, numberOfColumns) {
+        const currentList = li.closest("ol, ul");
+        let listBeforeBlock = currentList;
+        if (li.nextElementSibling) {
+            const nextLi = li.nextElementSibling;
+            const newList = currentList.cloneNode(false);
+            nextLi.parentNode.after(newList);
+            while (nextLi.nextSibling) {
+                newList.append(nextLi.nextSibling);
+            }
+            newList.prepend(nextLi);
+            listBeforeBlock = newList.previousElementSibling;
+        }
+
+        const { container, columns } = this.buildColumnsContainer(anchor, numberOfColumns);
+        for (const column of columns) {
+            column.append(this.createEmptyParagraph());
+        }
+        listBeforeBlock.after(this.createEmptyParagraph());
+
+        this.dependencies.selection.setSelection({
+            anchorNode: listBeforeBlock.nextElementSibling,
+            anchorOffset: 0,
+        });
+        this.dependencies.dom.insert(container);
+        this.dependencies.selection.setSelection({
+            anchorNode: columns[0].firstElementChild,
+            anchorOffset: 0,
+        });
+        this.dependencies.history.commit();
     }
 
     removeColumns(anchor) {
@@ -143,7 +205,17 @@ export class ColumnPlugin extends Plugin {
         }
     }
 
-    createColumns(anchor, numberOfColumns) {
+    createColumns(anchor, numberOfColumns, addParagraphAfter) {
+        const { container, columns } = this.buildColumnsContainer(anchor, numberOfColumns);
+        const block = closestBlock(anchor);
+        columns.shift().append(block);
+        for (const column of columns) {
+            column.append(this.createEmptyParagraph());
+        }
+        this.dependencies.dom.insert(container);
+    }
+
+    buildColumnsContainer(anchor, numberOfColumns) {
         const container = this.document.createElement("div");
         if (!closestElement(anchor, ".container")) {
             container.classList.add("container");
@@ -152,8 +224,6 @@ export class ColumnPlugin extends Plugin {
         const row = this.document.createElement("div");
         row.classList.add("row");
         container.append(row);
-        const block = closestBlock(anchor);
-        // resetOuids(block);
         const columnSize = Math.floor(12 / numberOfColumns);
         const columns = [];
         for (let i = 0; i < numberOfColumns; i++) {
@@ -162,13 +232,12 @@ export class ColumnPlugin extends Plugin {
             row.append(column);
             columns.push(column);
         }
-        columns.shift().append(block);
-        for (const column of columns) {
-            const baseContainer = this.dependencies.baseContainer.createBaseContainer();
-            baseContainer.append(this.document.createElement("br"));
-            column.append(baseContainer);
-        }
-        this.dependencies.dom.insert(container);
+        return { container, columns };
+    }
+
+    createEmptyParagraph() {
+        const baseContainer = this.dependencies.baseContainer.createBaseContainer();
+        return baseContainer;
     }
 
     changeColumnsNumber(anchor, numberOfColumns) {
@@ -192,7 +261,6 @@ export class ColumnPlugin extends Plugin {
                 const column = this.document.createElement("div");
                 column.classList.add(`col-${columnSize}`, "o-contenteditable-true");
                 const baseContainer = this.dependencies.baseContainer.createBaseContainer();
-                baseContainer.append(this.document.createElement("br"));
                 column.append(baseContainer);
                 lastColumn.after(column);
                 lastColumn = column;

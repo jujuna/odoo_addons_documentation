@@ -17,7 +17,8 @@
         <field name="inherit_id" ref="helpdesk.helpdesk_stage_view_form"/>
         <field name="arch" type="xml">
             <field name="template_id" position="after">
-                <field name="sms_template_id" context="{'default_model': 'helpdesk.ticket'}" options="{'no_quick_create': True}"/>
+                <field name="sms_template_id" placeholder="No text message"
+                    context="{'default_model': 'helpdesk.ticket'}" options="{'no_quick_create': True}"/>
             </field>
         </field>
     </record>

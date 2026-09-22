@@ -2,38 +2,38 @@
 <templates xml:space="preserve">
 
     <t t-name="mrp_workorder.DocumentViewer">
-        <t t-if="type === 'pdf'">
-            <div class="o_tablet_document" t-ref="pdf_viewer">
+        <t t-if="this.type === 'pdf'">
+            <div class="o_tablet_document" t-ref="this.pdfViewerRef">
                 <iframe class="o_pdfview_iframe"
                     alt="PDF file"
-                    t-att-src="urlPdf"
-                    t-att-name="props.resField"
-                    t-on-error.stop="onLoadFailed"
+                    t-att-src="this.urlPdf"
+                    t-att-name="this.props.resField"
+                    t-on-error.stop="this.onLoadFailed"
                 />
             </div>
         </t>
-        <t t-elif="type === 'google_slide'">
-            <div class="o_tablet_document" t-ref="slide_viewer">
-            <t t-set="url" t-value="urlSlide"/>
+        <t t-elif="this.type === 'google_slide'">
+            <div class="o_tablet_document" t-ref="this.slideViewerRef">
+            <t t-set="url" t-value="this.urlSlide"/>
             <t t-if="url">
                 <iframe class="o_embed_iframe w-100"
                     alt="Slides viewer"
                     t-att-src="url"
-                    t-att-name="props.resField"
-                    t-on-error.stop="onLoadFailed"
+                    t-att-name="this.props.resField"
+                    t-on-error.stop="this.onLoadFailed"
                 />
             </t>
             </div>
         </t>
-        <t t-elif="type !== false">
+        <t t-elif="this.type !== false">
             <div class="o_tablet_document">
                 <img
                     loading="lazy"
                     class="img img-fluid"
                     alt="Binary file"
-                    t-att-src="urlImage"
-                    t-att-name="props.resField"
-                    t-on-error.stop="onLoadFailed"
+                    t-att-src="this.urlImage"
+                    t-att-name="this.props.resField"
+                    t-on-error.stop="this.onLoadFailed"
                 />
             </div>
         </t>

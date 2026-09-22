@@ -1,9 +1,10 @@
+import { render } from "@web/owl2/utils";
 import { useService } from "@web/core/utils/hooks";
 import { fuzzyTest } from "@web/core/utils/search";
 
 import { DocumentsSearchPanel } from "@documents/views/search/documents_search_panel";
 
-import { Component, onWillStart, useRef, useState } from "@odoo/owl";
+import { Component, onWillStart, proxy, signal, t, useProps } from "@odoo/owl";
 
 /**
  * This class is used to merge the required parts of the search model and search panel
@@ -13,20 +14,24 @@ export class DocumentsSearchPanelUserFolderId extends Component {
     static excludedValues = ["RECENT", "TRASH"];
     static template = "documents.SearchPanelUserFolderId";
     static subTemplates = {
-        category: "documents.SearchPanel.Category",
+        category: "documents.SearchPanel.Category.Operations",
     };
     static rootIcons = DocumentsSearchPanel.rootIcons;
-    static props = {
-        value: { type: String, optional: false },
-        onChange: { type: Function, optional: false },
-        ulClass: { type: String, optional: true },
-    };
+    props = useProps({
+        value: t.string(),
+        onChange: t.function(),
+        ulClass: t.string().optional(),
+    });
+
+    searchInputRef = signal.ref();
+
     setup() {
         this.orm = useService("orm");
+        this.uiService = useService("ui");
         const activeValueId = isNaN(this.props.value)
             ? this.props.value
             : parseInt(this.props.value);
-        this.state = useState({
+        this.state = proxy({
             // 1 is section/category Id as there is only one, but we use a template that needs this.
             active: { 1: activeValueId },
             expanded: { 1: {} },
@@ -34,7 +39,8 @@ export class DocumentsSearchPanelUserFolderId extends Component {
         this.category = {
             activeValueId,
             description: "Folders",
-            icon: "fa-folder",
+            icon: "folder",
+            iconClass: "oi-filled",
             id: 1,
             rootIds: [false],
             values: new Map([
@@ -51,7 +57,6 @@ export class DocumentsSearchPanelUserFolderId extends Component {
             ]),
         };
         this._treeValues = [];
-        this.inputRef = useRef("searchInput");
 
         onWillStart(async () => {
             const result = await this.orm.call(
@@ -94,15 +99,22 @@ export class DocumentsSearchPanelUserFolderId extends Component {
         categoryState[value.id] = !categoryState[value.id];
     }
 
+    onFoldKeyDown(ev, category, value) {
+        if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            this.toggleFold(category, value);
+        }
+    }
+
     onFilterChange(ev) {
         const query = ev.target.value;
         this._createCategoryTree({ values: this._treeValues, query });
-        this.render(true);
+        render(this);
     }
 
     onClickClear() {
-        this.inputRef.el.value = "";
-        this.inputRef.el.dispatchEvent(new CustomEvent("change", { detail: { value: "" } }));
+        this.searchInputRef().value = "";
+        this.searchInputRef().dispatchEvent(new CustomEvent("change", { detail: { value: "" } }));
     }
 
     /**
@@ -113,6 +125,12 @@ export class DocumentsSearchPanelUserFolderId extends Component {
      * @param { Number } initialValue expand to this id
      */
     _createCategoryTree({ values, query, initialValue }) {
+        // Match ids to construct the tree
+        for (const value of values) {
+            if (!isNaN(value.user_folder_id)) {
+                value.user_folder_id = Number(value.user_folder_id);
+            }
+        }
         const category = this.category;
         const lowercaseQuery = query?.toLowerCase();
         const newCategoryValues = new Map();

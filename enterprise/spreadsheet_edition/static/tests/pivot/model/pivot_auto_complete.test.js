@@ -41,7 +41,7 @@ test("PIVOT.VALUE.* autocomplete pivot id", async function () {
             ],
             { message: `autocomplete proposals for ${func}` }
         );
-        composer.insertAutoCompleteValue(proposals[0].text);
+        composer.insertAutoCompleteValue(proposals[0]);
         await animationFrame();
         expect(composer.currentContent).toBe(`=${func}(1`);
         expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
@@ -94,7 +94,7 @@ test("PIVOT.VALUE measure", async function () {
             text: '"__count"',
         },
     ]);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     await animationFrame();
     expect(composer.currentContent).toBe('=PIVOT.VALUE(1,"probability:avg"');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
@@ -156,7 +156,7 @@ test("PIVOT.VALUE group with a single col group", async function () {
             text: '"#product_id"',
         },
     ]);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     expect(composer.currentContent).toBe('=PIVOT.VALUE(1,"probability","product_id"');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
 });
@@ -202,7 +202,7 @@ test("PIVOT.VALUE group with a single row group", async function () {
             text: '"#product_id"',
         },
     ]);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     await animationFrame();
     expect(composer.currentContent).toBe('=PIVOT.VALUE(1,"probability","product_id"');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
@@ -234,7 +234,7 @@ test("ODOO.VALUE group with a single date grouped by day", async function () {
             text: '"#date:day"',
         },
     ]);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     await animationFrame();
     expect(composer.currentContent).toBe('=PIVOT.VALUE(1,"probability","date:day"');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
@@ -389,7 +389,7 @@ test("PIVOT.VALUE autocomplete relational field for group value", async function
             text: "41",
         },
     ]);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     await animationFrame();
     expect(composer.currentContent).toBe('=PIVOT.VALUE(1,"probability","product_id",37');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
@@ -432,7 +432,7 @@ test("PIVOT.VALUE autocomplete date field for group value", async function () {
             text: '"12/2016"',
         },
     ]);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     await animationFrame();
     expect(composer.currentContent).toBe('=PIVOT.VALUE(1,"probability","date:month","04/2016"');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
@@ -475,7 +475,7 @@ test("PIVOT.VALUE autocomplete date field with no specified granularity for grou
             text: '"12/2016"',
         },
     ]);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     await animationFrame();
     expect(composer.currentContent).toBe('=PIVOT.VALUE(1,"probability","date:month","04/2016"');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
@@ -554,7 +554,7 @@ test("PIVOT.HEADER first field", async function () {
     await animationFrame();
     const proposals = composer.autoCompleteProposals;
     expect(proposals.map((p) => p.text)).toEqual(['"product_id"', '"#product_id"']);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     await animationFrame();
     expect(composer.currentContent).toBe('=PIVOT.HEADER(1,"product_id"');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
@@ -573,7 +573,7 @@ test("PIVOT.HEADER search field", async function () {
     await animationFrame();
     const proposals = composer.autoCompleteProposals;
     expect(proposals.map((p) => p.text)).toEqual(['"product_id"', '"#product_id"']);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     await animationFrame();
     expect(composer.currentContent).toBe('=PIVOT.HEADER(1,"product_id"');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });
@@ -592,7 +592,7 @@ test("PIVOT.HEADER group value", async function () {
     await animationFrame();
     const proposals = composer.autoCompleteProposals;
     expect(proposals.map((p) => p.text)).toEqual(["37", "41"]);
-    composer.insertAutoCompleteValue(proposals[0].text);
+    composer.insertAutoCompleteValue(proposals[0]);
     await animationFrame();
     expect(composer.currentContent).toBe('=PIVOT.HEADER(1,"product_id",37');
     expect(composer.isAutoCompleteDisplayed).toBe(false, { message: "autocomplete closed" });

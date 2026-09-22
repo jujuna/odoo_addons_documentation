@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from stdnum.be import vat
 
-from odoo import _, Command, fields, models
+from odoo import _, Command, api, fields, models
 from odoo.exceptions import AccessError, RedirectWarning
 
 
@@ -11,7 +11,10 @@ class ResPartner(models.Model):
 
     citizen_identification = fields.Char(
         string="Citizen Identification",
-        help="This code corresponds to the personal identification number for the tax authorities.")
+        help="This code corresponds to the personal identification number for the tax authorities.",
+        compute='_compute_citizen_identification',
+        inverse='_inverse_citizen_identification',
+    )
     form_file = fields.Binary(readonly=True, help="Technical field to store all forms file.")
     forms_281_50 = fields.One2many(
         comodel_name='l10n_be.form.281.50',
@@ -20,6 +23,15 @@ class ResPartner(models.Model):
         copy=False,
         help="List of 281.50 forms for this partner"
     )
+
+    @api.depends('additional_identifiers')
+    def _compute_citizen_identification(self):
+        for partner in self:
+            partner.citizen_identification = partner._get_additional_identifier('BE_CN')
+
+    def _inverse_citizen_identification(self):
+        for partner in self:
+            partner._set_additional_identifier('BE_CN', partner.citizen_identification)
 
     def write(self, vals):
         tag_281_50 = self.env.ref('l10n_be_reports.res_partner_tag_281_50', raise_if_not_found=False)
@@ -33,7 +45,7 @@ class ResPartner(models.Model):
             raise AccessError(_("Only users with the access group '%s' can unset the 281.50 category on partners.", group_name))
         return super().write(vals)
 
-    def _formated_address(self):
+    def _get_formatted_address(self):
         self.ensure_one()
         return f"{self.street}{(', ' + self.street2) if self.street2 else ''}"
 

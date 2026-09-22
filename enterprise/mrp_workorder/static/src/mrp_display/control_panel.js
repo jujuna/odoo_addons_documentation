@@ -1,25 +1,27 @@
-import { Component, useState, onMounted, useRef } from "@odoo/owl";
+import { Component, onMounted, proxy, signal, t, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class ControlPanelButtons extends Component {
     static template = "mrp_workorder.ControlPanelButtons";
-    static props = {
-        activeWorkcenter: [Boolean, Number],
-        productionCount: Number,
-        selectWorkcenter: Function,
-        toggleWorkcenter: Function,
-        workcenters: Array,
-        workorders: Array,
-        relevantCount: Number,
-        adminWorkorders: Array,
-        hideNewWorkcenterButton: Boolean,
-    };
+
+    props = useProps({
+        activeWorkcenter: t.or([t.boolean(), t.number()]),
+        productionCount: t.number(),
+        selectWorkcenter: t.function(),
+        toggleWorkcenter: t.function(),
+        workcenters: t.array(),
+        workorders: t.array(),
+        relevantCount: t.number(),
+        adminWorkorders: t.array(),
+        hideNewWorkcenterButton: t.boolean(),
+    });
+
+    workcentersContainerRef = signal.ref();
+    workcentersRef = signal.ref();
+    workcenterDropdownMenuRef = signal.ref();
 
     setup() {
-        this.state = useState({ workCenterOverflow: false });
-        this.workcentersContainer = useRef("workcentersContainer");
-        this.workcenters = useRef("workcenters");
-        this.workcenterDropdownMenu = useRef("workcenterDropdownMenu");
+        this.state = proxy({ workCenterOverflow: false });
         this.ui = useService("ui");
         onMounted(() => {
             //TODO CLPI / SVS - Set active class on dropdown-toggle if
@@ -36,8 +38,8 @@ export class ControlPanelButtons extends Component {
         const workcenterButtons = {};
         let productionCount = this.props.productionCount;
         let adminCount = 0;
-        for (const { id, display_name } of this.props.workcenters) {
-            workcenterButtons[id] = { count: 0, name: display_name };
+        for (const { id, display_name, working_state } of this.props.workcenters) {
+            workcenterButtons[id] = { count: 0, name: display_name, working_state: working_state };
         }
         for (const workorder of this.props.workorders) {
             if (workorder.data.state === "cancel") {
@@ -70,12 +72,12 @@ export class ControlPanelButtons extends Component {
     moveWorkcenterButtons() {
         // Move workcenters in a dropdown-menu to avoid overflow
         const workcenterButtons = [];
-        if (this.workcentersContainer.el.offsetWidth < this.workcenters.el.offsetWidth) {
+        if (this.workcentersContainerRef().offsetWidth < this.workcentersRef().offsetWidth) {
             this.state.workCenterOverflow = true;
         }
-        while (this.workcentersContainer.el.offsetWidth < this.workcenters.el.offsetWidth) {
+        while (this.workcentersContainerRef().offsetWidth < this.workcentersRef().offsetWidth) {
             const lastWorkCenterBtn = [
-                ...this.workcenters.el.querySelectorAll(".o_work_center_btn"),
+                ...this.workcentersRef().querySelectorAll(".o_work_center_btn"),
             ].at(-1);
             workcenterButtons.unshift(lastWorkCenterBtn);
             lastWorkCenterBtn.remove();
@@ -83,9 +85,9 @@ export class ControlPanelButtons extends Component {
         workcenterButtons.forEach((button) => {
             button.classList.add("dropdown-item", "justify-content-between", "py-2");
             button.classList.remove("p-2", "btn", "btn-light");
-            this.workcenterDropdownMenu.el.insertBefore(
+            this.workcenterDropdownMenuRef().insertBefore(
                 button,
-                this.workcenterDropdownMenu.el.querySelector(".o_work_center_add")
+                this.workcenterDropdownMenuRef().querySelector(".o_work_center_add")
             );
         });
     }

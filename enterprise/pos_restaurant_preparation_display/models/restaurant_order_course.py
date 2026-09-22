@@ -6,4 +6,4 @@ class RestaurantOrderCourse(models.Model):
 
     @api.model
     def _load_pos_preparation_data_fields(self):
-        return ['fired', 'fired_date']
+        return ['name', 'fired', 'fired_date', 'index', 'uuid']

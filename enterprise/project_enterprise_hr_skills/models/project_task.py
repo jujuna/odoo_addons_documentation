@@ -1,8 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import models
+from odoo.fields import Domain
 
-from odoo.addons.resource.models.utils import filter_domain_leaf
+from odoo.addons.resource.models.utils import filter_map_domain
 
 
 class ProjectTask(models.Model):
@@ -10,7 +11,13 @@ class ProjectTask(models.Model):
 
     def _get_additional_users(self, domain):
         users = super()._get_additional_users(domain)
-        skill_search_domain = filter_domain_leaf(domain, lambda field: field == 'user_skill_ids', field_name_mapping={'user_skill_ids': 'name', 'name': 'dummy'})
+
+        def _map_condition(condition):
+            if condition.field_expr == 'user_skill_ids':
+                return Domain('name', condition.operator, condition.value)
+            return None
+
+        skill_search_domain = filter_map_domain(domain, _map_condition)
         if not skill_search_domain:
             return users
         skill_ids = self.env['hr.skill']._search(skill_search_domain)

@@ -1,10 +1,9 @@
 import { Plugin } from "@html_editor/plugin";
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
-import { OnlineAppointmentOption } from "./online_appointment_option";
 import { BuilderAction } from "@html_builder/core/builder_action";
 
-class OnlineAppointmentOptionPlugin extends Plugin {
+export class OnlineAppointmentOptionPlugin extends Plugin {
     static id = "OnlineAppointmentOption";
     static shared = [
         "setDatasetProperty",
@@ -23,8 +22,7 @@ class OnlineAppointmentOptionPlugin extends Plugin {
             SetAppTypesAction,
             SetStaffUsersAction,
         },
-        builder_options: [OnlineAppointmentOption],
-        so_content_addition_selector: [".s_online_appointment"],
+        so_content_addition_selectors: [".s_online_appointment"],
     };
 
     async fetchAppointmentTypes() {

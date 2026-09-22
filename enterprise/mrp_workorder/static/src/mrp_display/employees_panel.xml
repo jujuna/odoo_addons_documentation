@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="mrp_workorder.MrpDisplayEmployeesPanel_content">
-        <ul t-if="props.employees.connected.length" class="list-group h-100 overflow-y-auto">
-            <li t-foreach="props.employees.connected" t-as="employee" t-key="employee.id"
+        <ul t-if="this.props.employees.connected.length" class="list-group h-100 overflow-y-auto">
+            <li t-foreach="this.props.employees.connected" t-as="employee" t-key="employee.id"
                 class="list-group-item d-flex gap-2 py-2 cursor-pointer border-end-0 border-top-0"
-                t-on-click="() => props.setSessionOwner(employee.id,pin)"
-                t-att-class="{'o_admin_user': employee.id === props.employees.admin.id}">
-                <img t-attf-src="/web/image/hr.employee/{{employee.id}}/avatar_128"
+                t-on-click="() => this.props.setSessionOwner(employee.id,this.pin)"
+                t-att-class="{'o_admin_user': employee.id === this.props.employees.admin.id}">
+                <img t-attf-src="/web/image/hr.employee.public/{{employee.id}}/avatar_128"
                     class="o_avatar rounded-circle"
-                    t-att-class="{'opacity-50': !employee.workcenters.length and employee.id !== props.employees.admin.id}"/>
+                    t-att-class="{'opacity-50': !employee.workcenters.length and employee.id !== this.props.employees.admin.id}"/>
                 <div class="d-flex flex-column flex-grow-1 gap-1 overflow-auto">
                     <div class="d-flex justify-content-between align-items-center gap-2">
                         <span class="fw-bold text-truncate"
-                         t-att-class="{'opacity-50': !employee.workcenters.length and employee.id !== props.employees.admin.id}" t-esc="employee.name"/>
+                         t-att-class="{'opacity-50': !employee.workcenters.length and employee.id !== this.props.employees.admin.id}" t-out="employee.name"/>
                     </div>
                     <div t-foreach="employee.workcenters" t-as="wc" t-key="wc.id" class="d-flex justify-content-between">
-                        <span t-attf-class="o_tag o_tag_color_{{wc.id % 11}} badge rounded" t-esc="wc.name"/>
-                        <span class="o_tabular_nums fw-bold text-action" t-esc="Math.round(wc.duration) + '\''"/>
+                        <span t-attf-class="o_tag o_tag_color_{{wc.id % 11}} badge rounded" t-out="wc.name"/>
+                        <span class="o_tabular_nums fw-bold text-action" t-out="Math.round(wc.duration) + '\''"/>
                     </div>
                     <div t-if="!employee.workcenters.length" class="d-flex justify-content-between">
                         <span class="text-muted">
-                            <t t-if="employee.last_active &amp;&amp; employee.id !== props.employees.admin.id">
-                                Last seen <RelativeTime datetime="makeDate(employee.last_active)"/>
+                            <t t-if="employee.last_active &amp;&amp; employee.id !== this.props.employees.admin.id">
+                                Last seen <RelativeTime datetime="this.makeDate(employee.last_active)"/>
                             </t>
                             <t t-else="">Inactive</t>
                         </span>
@@ -30,18 +30,18 @@
             </li>
         </ul>
         <div t-else="" class="d-flex justify-content-center align-items-center h-100">
-            <span class="text-muted">No operators connected</span>
+            <span class="text-muted text-center">No operators connected.<br/>You must log in to process work orders.</span>
         </div>
     </t>
 
     <t t-name="mrp_workorder.MrpDisplayEmployeesPanel">
-        <div t-if="!ui.isSmall"
+        <div t-if="!this.ui.isSmall"
              class="o_search_panel o_mrp_employees_panel d-flex flex-column border-end h-100 bg-view"
-             t-att-class="env.searchModel.searchPanelInfo.className" t-ref="root">
+             t-att-class="this.env.searchModel.searchPanelInfo.className">
             <t t-call="mrp_workorder.MrpDisplayEmployeesPanel_content"/>
             <div class="p-3 w-100">
                 <button class="o_edit_operators btn btn-secondary w-100"
-                t-on-click="props.popupAddEmployee">
+                t-on-click="this.props.popupAddEmployee">
                 Edit Operators
             </button>
             </div>
@@ -53,9 +53,9 @@
                     data-bs-toggle="offcanvas"
                     data-bs-target="#o_employees_panel"
                     aria-controls="o_employees_panel">
-                <t t-if="props.employees.admin.name">
-                    <img class="o_avatar rounded-circle me-2" t-att-src="props.employees.admin.path"/>
-                    <span class="text-truncate" t-out="props.employees.admin.name"/>
+                <t t-if="this.props.employees.admin.name">
+                    <img class="o_avatar rounded-circle me-2" t-att-src="this.props.employees.admin.path"/>
+                    <span class="text-truncate" t-out="this.props.employees.admin.name"/>
                 </t>
                 <t t-else="">
                     <span>Choose Operator</span>
@@ -73,7 +73,7 @@
                 </div>
                 <div class="offcanvas-footer m-3 border-top">
                     <button class="btn btn-secondary w-100"
-                    t-on-click="props.popupAddEmployee">
+                    t-on-click="this.props.popupAddEmployee">
                         Edit Operators
                     </button>
                 </div>

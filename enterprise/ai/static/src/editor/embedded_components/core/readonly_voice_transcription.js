@@ -1,34 +1,37 @@
 import {
     getEditableDescendants,
-    getEmbeddedProps,
     useEditableDescendants,
 } from "@html_editor/others/embedded_component_utils";
-import { Component, onMounted, onWillStart, useState } from "@odoo/owl";
+import { Component, onMounted, onWillStart, proxy } from "@odoo/owl";
+import { isMobileOS } from "@web/core/browser/feature_detection";
+import { Dropdown } from "@web/core/dropdown/dropdown";
+import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 
 export class ReadonlyVoiceTranscription extends Component {
     static template = "ai.ReadonlyVoiceTranscription";
-    static components = {};
-    static props = {
-        host: { type: Object },
-    };
+    static components = { Dropdown, DropdownItem };
 
     setup() {
-        this.descendants = useEditableDescendants(this.props.host);
+        const { descendants, refs } = useEditableDescendants();
+        this.descendants = descendants;
+        this.descendantRefs = refs;
+        this.isMobileOS = isMobileOS();
         this.supportedLanguages = [];
-        this.state = useState({
-            isOpened: true,
+        this.state = proxy({
             currentTab: "notes",
+            isOpened: true,
+            hasSummary: this.descendants.summaryContent.textContent.trim() !== "",
         });
 
         onWillStart(() => {
-            if (this.props.hasSummary) {
+            if (this.state.hasSummary) {
                 this.state.currentTab = "summary";
             }
         });
 
         onMounted(() => {
-            const firstRecordingDate = this.props.host.querySelector("#transcript-content b");
-            this.state.firstRecordingDate = firstRecordingDate?.textContent ?? "";
+            this.state.firstRecordingDate =
+                this.descendants.transcriptContent.querySelector("b")?.innerText;
         });
     }
 
@@ -41,5 +44,5 @@ export const aiReadonlyVoiceTranscriptionEmbeddedComponent = {
     name: "voice-transcription",
     Component: ReadonlyVoiceTranscription,
     getEditableDescendants,
-    getProps: (host) => ({ host, ...getEmbeddedProps(host) }),
+    getProps: (host) => ({ host }),
 };

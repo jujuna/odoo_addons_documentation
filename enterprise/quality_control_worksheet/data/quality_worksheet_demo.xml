@@ -5,37 +5,15 @@
         <record id="quality_control_worksheet_template1" model="worksheet.template">
             <field name="name">Quality Issues</field>
             <field name="res_model">quality.check</field>
+            <field name="worksheet_properties_definition" eval="[{
+                'name': '0f02376c83bba4fa', 'type': 'date', 'string': 'Date', 'default': False }, {
+                'name': 'e3a3fd0e73cd8a9b', 'type': 'many2one', 'domain': False, 'string': 'Product', 'comodel': 'product.product', 'default': False }, {
+                'name': 'e5aeb07b32159f00', 'type': 'many2one', 'domain': False, 'string': 'Responsible', 'comodel': 'res.users', 'default': False }, {
+                'name': '5a8811e7e40dd85c', 'type': 'selection', 'string': 'Wood Texture', 'default': False,
+                    'selection': [['6e6b1b6e7134d7da', 'Rough'], ['77d7db700831fc6f', 'Smooth']] }, {
+                'name': '565f7639dc2d9f3e', 'type': 'selection', 'string': 'Length', 'default': '',
+                    'selection': [['0fc3937dcd70e00f', '1.80m ~ 1.85m'], ['58eb1e6ee7cc635c', '1.86m ~ 1.90m'], ['0e557e02ba5804b1', '1.91m ~ 2.00m']]
+            }]"/>
         </record>
-
-        <function model="worksheet.template" name="_create_demo_data_quality"/>
-
-        <record id="quality_control_worksheet_template1_form_view" model="ir.ui.view">
-            <field name="name">quality.worksheet.template1.form.view</field>
-            <field name="model" model="ir.model" eval="obj().env.ref('quality_control_worksheet.quality_control_worksheet_template1').model_id.model"/>
-            <field name="arch" type="xml">
-                <form create="false" js_class="worksheet_validation">
-                    <sheet>
-                        <group invisible="context.get('studio') or context.get('default_x_quality_check_id')">
-                            <group>
-                                <field name="x_quality_check_id"/>
-                            </group>
-                        </group>
-                        <group>
-                            <group>
-                                <field name="x_product"/>
-                                <field name="x_texture" widget="radio"/>
-                                <field name="x_length" widget="radio"/>
-                            </group>
-                            <group>
-                                <field name="x_date"/>
-                                <field name="x_responsible"/>
-                            </group>
-                        </group>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-
-        <function model="worksheet.template" name="_generate_qweb_report_template" eval="[[ref('quality_control_worksheet_template1')]]"/>
     </data>
 </odoo>

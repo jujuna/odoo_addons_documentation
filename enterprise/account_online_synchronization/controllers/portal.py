@@ -30,7 +30,7 @@ class OnlineSynchronizationPortal(CustomerPortal):
 
         values.update({
             'bank': journal_sudo.bank_account_id.bank_name or journal_sudo.account_online_account_id.name,
-            'bank_account': journal_sudo.bank_account_id.acc_number,
+            'bank_account': journal_sudo.bank_account_id.account_number,
             'journal': journal_sudo.name,
             'latest_balance_formatted': formatted_balance,
             'latest_balance': balance,

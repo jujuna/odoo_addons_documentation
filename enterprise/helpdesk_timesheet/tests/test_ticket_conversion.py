@@ -1,10 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 from odoo.addons.helpdesk.tests.common import HelpdeskCommon
 from odoo.addons.project.tests.test_project_base import TestProjectCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestTicketConversion(TestProjectCommon, HelpdeskCommon):
 
     @classmethod

@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("databases_tour", {
-    url: "/odoo",
     steps: () => [
         {
             content: 'open databases app',
@@ -25,7 +24,7 @@ registry.category("web_tour.tours").add("databases_tour", {
         },
         {
             content: 'open the database tab',
-            trigger: 'a[role="tab"][name="database"]',
+            trigger: 'button[role="tab"][name="database"]',
             run: 'click',
         },
         {
@@ -41,12 +40,16 @@ registry.category("web_tour.tours").add("databases_tour", {
         {
             content: 'set the database URL',
             trigger: '.o_field_widget[name="database_url"] input',
-            run: 'edit http://my.database.tld',
+            run: 'edit my.database.tld',
         },
         {
             content: 'set the database name',
             trigger: '.o_field_widget[name="database_name"] input',
             run: 'edit my-database',
+        },
+        {
+            content: 'check that the URL has been prefixed with the https scheme',
+            trigger: '.o_field_widget[name="database_url"] input:value("https://my.database.tld")',
         },
         {
             content: 'set the database API login',
@@ -99,7 +102,7 @@ registry.category("web_tour.tours").add("databases_tour", {
         },
         {
             content: 'there is the database tab (back on the project settings)',
-            trigger: 'a[role="tab"][name="database"]',
+            trigger: 'button[role="tab"][name="database"]',
         },
         {
             content: 'open the New dropdown',
@@ -137,6 +140,10 @@ registry.category("web_tour.tours").add("databases_tour", {
             run: 'edit other-database',
         },
         {
+            content: 'check that the URL has not been prefixed with the https scheme',
+            trigger: '.o_field_widget[name="database_url"] input:value("http://other.database.tld")',
+        },
+        {
             content: 'set the database API login',
             trigger: '.modal-body .o_field_widget[name="database_api_login"] input',
             run: 'edit admin@database.tld',
@@ -163,8 +170,56 @@ registry.category("web_tour.tours").add("databases_tour", {
         },
         {
             content: 'open the database tab',
-            trigger: 'a[role="tab"][name="database"]',
+            trigger: 'button[role="tab"][name="database"]',
             run: 'click',
+        },
+        {
+            content: 'open the invite users wizard',
+            trigger: 'button[name="action_invite_users"]',
+            run: 'click',
+        },
+        {
+            content: 'open the users dropdown',
+            trigger: '.modal-body .o_field_widget[name="user_ids"] input',
+            run: 'click',
+        },
+        {
+            content: 'add user Joel Barish',
+            trigger: '.modal-body .ui-menu-item:contains("Joel Barish")',
+            run: 'click',
+        },
+        {
+            content: 'confirm invitation',
+            trigger: '.modal-footer button[name="action_invite_users"]',
+            run: 'click',
+        },
+        {
+            content: 'check confirmation message',
+            trigger: '.modal-body:contains("These users were successfully invited to 1 databases.")',
+        },
+        {
+            content: 'close the modal',
+            trigger: '.modal-footer button[special="cancel"]',
+            run: 'click',
+        },
+        {
+            content: 'go back to the list',
+            trigger: 'ol.breadcrumb a[href="/odoo/databases"]',
+            run: 'click',
+        },
+        {
+            content: 'search for Joel in the search bar',
+            trigger: '.o_searchview_input',
+            run: 'edit barish',
+        },
+        {
+            content: 'search for databases by user',
+            trigger: '.o_searchview_autocomplete a:contains(Search Database Users for: barish)',
+            run: 'click',
+        },
+        {
+            content: 'check that there is only one result',
+            trigger: '.o_pager_counter:contains("1-1 / 1")',
         },
     ],
 });

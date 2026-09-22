@@ -104,6 +104,34 @@ export function getBoxesData() {
                 width: 0.09,
                 height: 0.027,
             }),
+            createBoxData({
+                text: "Fourth",
+                midX: 0.08,
+                midY: 0.57,
+                width: 0.152,
+                height: 0.027,
+            }),
+            createBoxData({
+                text: "line",
+                midX: 0.21,
+                midY: 0.57,
+                width: 0.09,
+                height: 0.027,
+            }),
+            createBoxData({
+                text: "Fifth",
+                midX: 0.06,
+                midY: 0.63,
+                width: 0.105,
+                height: 0.03,
+            }),
+            createBoxData({
+                text: "line",
+                midX: 0.17,
+                midY: 0.63,
+                width: 0.09,
+                height: 0.027,
+            }),
         ],
     };
     const numberBoxes = {
@@ -150,6 +178,20 @@ export function getBoxesData() {
                 width: 0.124,
                 height: 0.027,
             }),
+            createBoxData({
+                text: 168.21,
+                midX: 0.91,
+                midY: 0.57,
+                width: 0.152,
+                height: 0.027,
+            }),
+            createBoxData({
+                text: 0.57,
+                midX: 0.94,
+                midY: 0.63,
+                width: 0.095,
+                height: 0.027,
+            }),
         ],
     };
     const dateBoxes = {
@@ -186,6 +228,20 @@ export function getBoxesData() {
                 text: "2020-01-13",
                 midX: 0.6,
                 midY: 0.51,
+                width: 0.257,
+                height: 0.027,
+            }),
+            createBoxData({
+                text: "2020-01-14",
+                midX: 0.6,
+                midY: 0.57,
+                width: 0.257,
+                height: 0.027,
+            }),
+            createBoxData({
+                text: "2020-01-15",
+                midX: 0.6,
+                midY: 0.63,
                 width: 0.257,
                 height: 0.027,
             }),

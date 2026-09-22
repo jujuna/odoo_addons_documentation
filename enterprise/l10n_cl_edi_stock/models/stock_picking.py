@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import base64
 import io
 import logging
@@ -75,8 +74,8 @@ class StockPicking(models.Model):
             Status of sending the DTE to the partner:
             - Not sent: the DTE has not been sent to the partner but it has sent to SII.
             - Sent: The DTE has been sent to the partner.""")
-    l10n_cl_sii_send_file = fields.Many2one('ir.attachment', string='SII Send file', copy=False)
-    l10n_cl_dte_file = fields.Many2one('ir.attachment', string='DTE file', copy=False)
+    l10n_cl_sii_send_file = fields.Many2one('ir.attachment', string='SII Send file', copy=False, index='btree_not_null')
+    l10n_cl_dte_file = fields.Many2one('ir.attachment', string='DTE file', copy=False, index='btree_not_null')
     l10n_cl_sii_send_ident = fields.Text(string='SII Send Identification(Track ID)', copy=False, tracking=True)
     l10n_cl_reference_ids = fields.One2many(comodel_name='l10n_cl.edi.reference', inverse_name='picking_id', string='Reference Records')
 
@@ -94,17 +93,32 @@ class StockPicking(models.Model):
             record.l10n_cl_dte_status = 'cancelled'
         return super().action_cancel()
 
+    def _l10n_cl_get_folio_owner(self):
+        """The company whose folio counter this guide uses, which is the one holding the ranges it draws on."""
+        self.ensure_one()
+        cafs = self.company_id._l10n_cl_get_cafs(self.l10n_latam_document_type_id)
+        return cafs.company_id or self.company_id
+
     def _create_new_sequence(self):
+        owner = self._l10n_cl_get_folio_owner()
         return self.env['ir.sequence'].sudo().create({
-            'name': 'Stock Picking CAF Sequence',
+            'name': 'Delivery Guide Folios - %s' % owner.name,
             'code': 'l10n_cl_edi_stock.stock_picking_caf_sequence',
             'padding': 6,
-            'company_id': self.company_id.id,
-            'number_next': int(self.l10n_latam_document_number) + 1
+            'implementation': 'no_gap',
+            'company_id': owner.id,
+            'number_next': int(self.l10n_latam_document_number) + 1,
         })
 
     def _get_next_document_number(self):
-        return self.env['ir.sequence'].next_by_code('l10n_cl_edi_stock.stock_picking_caf_sequence')
+        sequence = self.env['ir.sequence'].sudo().search([
+            ('code', '=', 'l10n_cl_edi_stock.stock_picking_caf_sequence'),
+            ('company_id', '=', self._l10n_cl_get_folio_owner().id)], limit=1)
+        caf = self.company_id._l10n_cl_get_active_caf(self.l10n_latam_document_type_id)
+        if caf and sequence.number_next_actual < caf.start_nb:
+            # a spent range leaves the counter behind the next one, which opens at its start
+            sequence.number_next_actual = caf.start_nb
+        return sequence.next_by_id()
 
     def _create_backorder_picking(self):
         # EXTENDS 'stock'
@@ -128,7 +142,7 @@ class StockPicking(models.Model):
         self._l10n_cl_create_delivery_guide_validation()
 
         if not self.env['ir.sequence'].search_count([('code', '=', 'l10n_cl_edi_stock.stock_picking_caf_sequence'),
-                                                ('company_id', '=', self.company_id.id)], limit=1):
+                                                ('company_id', '=', self._l10n_cl_get_folio_owner().id)], limit=1):
             self.l10n_cl_draft_status = True
             return True
         if not self.l10n_latam_document_number:
@@ -141,11 +155,14 @@ class StockPicking(models.Model):
             'name': 'SII_{}'.format(file_name),
             'res_id': self.id,
             'res_model': self._name,
-            'datas': base64.b64encode(dte_signed.encode('ISO-8859-1', 'replace')),
+            'raw': dte_signed.encode('ISO-8859-1', 'replace'),
             'type': 'binary',
         })
         self.l10n_cl_sii_send_file = attachment.id
         self.message_post(body=msg_demo, attachment_ids=attachment.ids)
+        # spent only once the guide is out, as its DTE is stamped while the range is in use
+        self.company_id._l10n_cl_get_active_caf(self.l10n_latam_document_type_id).filtered(
+            lambda caf: caf.final_nb <= int(self.l10n_latam_document_number)).action_spend()
         return self.print_delivery_guide_pdf()
 
     def _compute_l10n_cl_is_return(self):
@@ -162,13 +179,16 @@ class StockPicking(models.Model):
     def print_delivery_guide_pdf(self):
         return self.env.ref('l10n_cl_edi_stock.action_delivery_guide_report_pdf').report_action(self)
 
+    def print_delivery_guide_yield_pdf(self):
+        return self.env.ref('l10n_cl_edi_stock.action_delivery_guide_yield_report_pdf').report_action(self)
+
     def l10n_cl_confirm_draft_delivery_guide(self):
         for record in self:
             if not self.env['ir.sequence'].search_count([('code', '=', 'l10n_cl_edi_stock.stock_picking_caf_sequence'),
-                                                   ('company_id', '=', self.company_id.id)], limit=1):
+                                                   ('company_id', '=', record._l10n_cl_get_folio_owner().id)], limit=1):
                 if not record.l10n_latam_document_number:
                     raise UserError(_('You need to specify a Document Number'))
-                self._create_new_sequence()
+                record._create_new_sequence()
             record.create_delivery_guide()
             record.l10n_cl_draft_status = False
 
@@ -187,7 +207,7 @@ class StockPicking(models.Model):
             'res_model': self._name,
             'res_id': self.id,
             'type': 'binary',
-            'datas': base64.b64encode(signed_dte.encode('ISO-8859-1', 'replace'))
+            'raw': signed_dte.encode('ISO-8859-1', 'replace')
         })
         self.l10n_cl_dte_file = dte_attachment.id
 
@@ -203,6 +223,9 @@ class StockPicking(models.Model):
             raise UserError(_(
                 'There are no activity codes configured in your company. This is mandatory for electronic '
                 'delivery guide. Please go to your company and set the correct activity codes (www.sii.cl - Mi SII)'))
+        if len(self.company_id.l10n_cl_company_activity_ids) > 4:
+            raise UserError(self.env._(
+                'The maximum amount of Activities Names is 4. Please go to your company and select only 4 or less options.'))
         if not self.company_id.l10n_cl_sii_regional_office:
             raise UserError(_(
                 'There is no SII Regional Office configured in your company. This is mandatory for electronic '
@@ -213,7 +236,7 @@ class StockPicking(models.Model):
                 'There is no city configured in your partner company. This is mandatory for electronic'
                 'delivery guide. Please go to your partner company and set the city.'
             ))
-        if not self.company_id.l10n_cl_activity_description:
+        if not self.company_id._l10n_cl_get_root_company().l10n_cl_activity_description:
             raise UserError(_(
                 'Your company has not an activity description configured. This is mandatory for electronic '
                 'delivery guide. Please go to your company and set the correct one (www.sii.cl - Mi SII)'))
@@ -227,10 +250,7 @@ class StockPicking(models.Model):
                 'There is no address configured in your customer record. '
                 'This is mandatory for electronic delivery guide for this type of document. '
                 'Please go to the partner record and set the address'))
-        caf_file = self.env['l10n_cl.dte.caf'].sudo().search([
-            ('company_id', '=', self.company_id.id), ('status', '=', 'in_use'),
-            ('l10n_latam_document_type_id', '=', self.l10n_latam_document_type_id.id)])
-        if not caf_file:
+        if not self.company_id._l10n_cl_get_active_caf(self.l10n_latam_document_type_id):
             raise UserError(_('CAF file for the document type %s not found. Please, upload a caf file before to '
                               'create the delivery guide', self.l10n_latam_document_type_id.code))
 
@@ -279,13 +299,16 @@ class StockPicking(models.Model):
         move_retentions = self.env['account.tax']
         for move in self.move_ids.filtered(lambda x: x.quantity > 0):
             sale_line = move.sale_line_id
-            if guide_price == "product" or not sale_line:
+            # Kit components link to the kit's sale line, price them from their own
+            # product to avoid a cross-category UoM conversion
+            move_guide_price = "product" if sale_line and move.product_id != sale_line.product_id else guide_price
+            if move_guide_price == "product" or not sale_line:
                 taxes = move.product_id.taxes_id.filtered(lambda t: t.company_id == self.company_id)
                 price = move.product_id.lst_price
                 qty = move.quantity
-            elif guide_price == "sale_order":
+            elif move_guide_price == "sale_order":
                 taxes = sale_line.tax_ids
-                qty = move.product_uom._compute_quantity(move.quantity, sale_line.product_uom_id)
+                qty = move.uom_id._compute_quantity(move.quantity, sale_line.product_uom_id)
                 price = sale_line.price_unit * (1 - (sale_line.discount or 0.0) / 100.0)
 
             tax_res = taxes.compute_all(
@@ -324,7 +347,7 @@ class StockPicking(models.Model):
                 "wh_taxes": move_retentions,
                 "exempt": not taxes and tax_res['total_excluded'] != 0.0,
             }
-            if guide_price == "sale_order" and sale_line.discount:
+            if move_guide_price == "sale_order" and sale_line.discount:
                 tax_res_disc = taxes.compute_all(
                     sale_line.price_unit,
                     currency=self.company_id.currency_id,
@@ -437,7 +460,7 @@ class StockPicking(models.Model):
             'dd': dd,
             'frmt': self.env['certificate.key']._sign_with_key(
                 re.sub(b'\n\\s*', b'', dd.encode('ISO-8859-1', 'replace')),
-                base64.b64encode(caf_file.findtext('RSASK').encode('utf-8')),
+                caf_file.findtext('RSASK').encode('utf-8'),
                 hashing_algorithm='sha1',
                 formatting='base64',
             ).decode(),
@@ -459,7 +482,7 @@ class StockPicking(models.Model):
         image = pdf417gen.render_image(bc, padding=15, scale=1)
         image.save(barcode_file, 'PNG')
         data = barcode_file.getvalue()
-        return base64.b64encode(data)
+        return base64.b64encode(data).decode()
 
     def _get_dte_template(self):
         return self.env.ref('l10n_cl_edi_stock.dte_template')
@@ -485,7 +508,7 @@ class StockPicking(models.Model):
         dte = Markup(dte.replace('<?xml version="1.0" encoding="ISO-8859-1" ?>', ''))
         dte_rendered = self.env['ir.qweb']._render('l10n_cl_edi.envio_dte', {
             'move': self, # Only needed for the name of the document type
-            'RutEmisor': self._l10n_cl_format_vat(self.company_id.vat),
+            'RutEmisor': self._l10n_cl_format_vat(self.company_id._l10n_cl_get_root_company().vat),
             'RutEnvia': digital_signature_sudo.subject_serial_number,
             'RutReceptor': receiver_rut,
             'FchResol': self.company_id.l10n_cl_dte_resolution_date,
@@ -510,7 +533,7 @@ class StockPicking(models.Model):
             'res_model': self._name,
             'res_id': self.id,
             'type': 'binary',
-            'datas': base64.b64encode(dte_signed.encode('ISO-8859-1', 'replace'))
+            'raw': dte_signed.encode('ISO-8859-1', 'replace')
         })
         self.message_post(
             body=_('Partner DTE has been generated'),
@@ -548,14 +571,15 @@ class StockPicking(models.Model):
                                      'it won\'t be sent to SII.'))
             self.l10n_cl_dte_status = 'accepted'
             return None
+        root_vat = self._l10n_cl_format_vat(self.company_id._l10n_cl_get_root_company().vat)
         params = {
             'rutSender': digital_signature_sudo.subject_serial_number[:-2],
             'dvSender': digital_signature_sudo.subject_serial_number[-1],
-            'rutCompany': self._l10n_cl_format_vat(self.company_id.vat)[:-2],
-            'dvCompany': self._l10n_cl_format_vat(self.company_id.vat)[-1],
+            'rutCompany': root_vat[:-2],
+            'dvCompany': root_vat[-1],
             'archivo': (
                 self.l10n_cl_sii_send_file.name,
-                base64.b64decode(self.l10n_cl_sii_send_file.datas),
+                self.l10n_cl_sii_send_file.raw.content,
                 'application/xml'),
         }
         response = self._send_xml_to_sii(
@@ -591,7 +615,7 @@ class StockPicking(models.Model):
         response = self._get_send_status(
             self.company_id.l10n_cl_dte_service_provider,
             self.l10n_cl_sii_send_ident,
-            self._l10n_cl_format_vat(self.company_id.vat),
+            self._l10n_cl_format_vat(self.company_id._l10n_cl_get_root_company().vat),
             digital_signature_sudo)
         if not response:
             self.l10n_cl_dte_status = 'ask_for_status'

@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 
-import pytz
-
 from math import ceil
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
+
 from freezegun import freeze_time
-from psycopg2 import IntegrityError
 
 from odoo import Command
 from odoo.tests import Form, tagged
 from odoo.exceptions import UserError
-from odoo.tools import mute_logger, float_compare
+from odoo.tools import float_compare
 
 from .common import TestCommonSalePlanning
 
@@ -19,6 +17,8 @@ from .common import TestCommonSalePlanning
 class TestSalePlanning(TestCommonSalePlanning):
 
     def test_planning_slot_form(self):
+        if self.env['ir.module.module']._get("planning_field_service_sale_timesheet").state == 'installed':
+            self.skipTest('This test will fail if planning_field_service_sale_timesheet is installed since the partner is required on the form view in order to make the sale line visible.')
         slot_form = Form(self.env['planning.slot'])
         slot_form.sale_line_id = self.plannable_sol
         slot = slot_form.save()
@@ -26,13 +26,6 @@ class TestSalePlanning(TestCommonSalePlanning):
         self.assertEqual(slot.sale_line_id, self.plannable_sol, 'Plannable services should have type \'service\'.')
         self.assertFalse(not slot.start_datetime, 'Salable slot created from gantt have default date')
         self.assertFalse(not slot.end_datetime, 'Salable slot created from gantt have default date')
-
-    def test_planning_slot_not_salable(self):
-        with self.assertRaises(IntegrityError), mute_logger('odoo.sql_db'):
-            self.env['planning.slot'].create({
-                'start_datetime': False,
-                'end_datetime': False,
-            })
 
     def test_planning_sol_confirmation(self):
         so_form = Form(self.env['sale.order'])
@@ -53,7 +46,7 @@ class TestSalePlanning(TestCommonSalePlanning):
         slot = so.order_line.planning_slot_ids
         self.assertFalse(slot.start_datetime, 'Slot start datetime should be unset.')
         self.assertFalse(slot.end_datetime, 'Slot end datetime should be unset.')
-        self.assertFalse(slot.employee_id, 'Slot should be unassigned.')
+        self.assertFalse(slot.employee_ids, 'Slot should be unassigned.')
         self.assertEqual(float_compare(slot.allocated_hours, 50.0, precision_digits=2), 0, 'Slot should have 50.0 hours "allocated"')
         self.assertEqual(float_compare(slot.allocated_percentage, 100.0, precision_digits=2), 0, 'Slot should have 100%% allocated percentage')
 
@@ -101,7 +94,7 @@ class TestSalePlanning(TestCommonSalePlanning):
         with freeze_time('2021-07-26'):
             Slot.auto_plan_ids(view_domain=[('start_datetime', '=', '2021-07-25 00:00:00'), ('end_datetime', '=', '2021-07-31 23:59:59')])
         slot = so.order_line.planning_slot_ids.filtered('start_datetime')
-        self.assertEqual(slot.employee_id, self.employee_wout, 'Planning should be assigned to the employee with sol\'s product role as default role')
+        self.assertEqual(slot.employee_ids, self.employee_wout, 'Planning should be assigned to the employee with sol\'s product role as default role')
 
     def test_planning_plan_order_roles(self):
         so_form = Form(self.env['sale.order'])
@@ -122,7 +115,32 @@ class TestSalePlanning(TestCommonSalePlanning):
         with freeze_time('2021-07-26'):
             Slot.auto_plan_ids(view_domain=[('start_datetime', '=', '2021-07-25 00:00:00'), ('end_datetime', '=', '2021-07-31 23:59:59')])
         slot = so.order_line.planning_slot_ids.filtered('start_datetime')
-        self.assertEqual(slot.employee_id, self.employee_wout, 'Planning should be assigned to the employee with one of its role equal to sol\'s product role')
+        self.assertEqual(slot.employee_ids, self.employee_wout, 'Planning should be assigned to the employee with one of its role equal to sol\'s product role')
+
+    def test_planning_plan_order_does_not_plan_in_the_past(self):
+        so_form = Form(self.env['sale.order'])
+        so_form.partner_id = self.planning_partner
+        with so_form.order_line.new() as sol_form:
+            sol_form.product_id = self.plannable_product
+            sol_form.product_uom_qty = 50
+        so = so_form.save()
+        so.action_confirm()
+        self.employee_wout.write({'default_planning_role_id': self.planning_role_junior.id})
+        Slot = self.env['planning.slot'].with_context(
+            default_start_datetime='2021-07-26 00:00:00',
+            default_end_datetime='2021-08-01 23:59:59',
+            scale='week',
+            focus_date='2021-07-26 00:00:00',
+            planning_gantt_active_sale_order_id=so.id,
+        )
+        with freeze_time('2021-07-26 14:00:00'):
+            Slot.auto_plan_ids(view_domain=[('start_datetime', '=', '2021-07-26 00:00:00'), ('end_datetime', '=', '2021-08-01 23:59:59')])
+        slots = so.order_line.planning_slot_ids.filtered('start_datetime')
+        self.assertTrue(slots, 'Wout has the correct default role: the order should have been planned.')
+        self.assertEqual(
+            min(slots.mapped('start_datetime')), datetime(2021, 7, 26, 14, 0),
+            'The order should be planned from the moment auto-plan was launched, not from the start of that day.',
+        )
 
     def test_planning_undo_plan_order(self):
         so_form = Form(self.env['sale.order'])
@@ -177,7 +195,7 @@ class TestSalePlanning(TestCommonSalePlanning):
         slots = so.order_line.planning_slot_ids.filtered('start_datetime')
         self.assertEqual(len(slots), 2, 'It should exists two slots')
         for slot in slots:
-            self.assertEqual(slot.employee_id, self.employee_wout, 'Planning should be assigned to the employee previously assigned to the slot')
+            self.assertEqual(slot.employee_ids, self.employee_wout, 'Planning should be assigned to the employee previously assigned to the slot')
 
         # Ensure no one is assigned once again since employee_wout is already planned this week
         with freeze_time('2021-07-26'):
@@ -188,7 +206,7 @@ class TestSalePlanning(TestCommonSalePlanning):
         slots = so.order_line.planning_slot_ids.filtered('start_datetime')
         self.assertEqual(len(slots), 2, 'It should exists two slots')
         for slot in slots:
-            self.assertEqual(slot.employee_id, self.employee_wout, 'Planning should be assigned to the employee previously assigned to the slot')
+            self.assertEqual(slot.employee_ids, self.employee_wout, 'Planning should be assigned to the employee previously assigned to the slot')
 
     def test_planning_plan_slot(self):
         so_form = Form(self.env['sale.order'])
@@ -205,14 +223,14 @@ class TestSalePlanning(TestCommonSalePlanning):
             scale='week',
             focus_date='2021-07-29 00:00:00',
             planning_gantt_active_sale_order_id=so.id,
-        ).write({
+        ).assign_slot({
             'start_datetime': '2021-07-27 06:00:00',
             'end_datetime': '2021-07-27 15:00:00',
-            'resource_id': self.employee_wout.resource_id.id,
+            'resource_ids': self.employee_wout.resource_id.ids,
         })
         planned_slot_1 = so.order_line.planning_slot_ids.filtered('start_datetime')
         self.assertEqual(1, len(planned_slot_1), 'There should be only 1 allocated slot.')
-        self.assertEqual(self.employee_wout, planned_slot_1.employee_id, 'Planning should be assigned to the employee with one of its role equal to sol\'s product role')
+        self.assertEqual(self.employee_wout, planned_slot_1.employee_ids, 'Planning should be assigned to the employee with one of its role equal to sol\'s product role')
         self.assertEqual('2021-07-27 06:00:00', str(planned_slot_1.start_datetime), 'Planning slot should take the start datetime induced by the magnifying glass in gantt')
         self.assertEqual('2021-07-30 15:00:00', str(planned_slot_1.end_datetime), 'Planning slot should last for all the week, until friday afternoon.')
         self.assertEqual(32.0, planned_slot_1.allocated_hours, 'Planning slot should have 32 allocated hours.')
@@ -227,16 +245,16 @@ class TestSalePlanning(TestCommonSalePlanning):
             scale='week',
             focus_date='2021-08-02 00:00:00',
             planning_gantt_active_sale_order_id=so.id,
-        ).write({
+        ).assign_slot({
             'start_datetime': '2021-08-02 06:00:00',
             'end_datetime': '2021-08-02 15:00:00',
-            'resource_id': self.employee_wout.resource_id.id,
+            'resource_ids': self.employee_wout.resource_id.ids,
         })
 
         slots = so.order_line.planning_slot_ids.filtered('start_datetime')
         for slot in slots:
             if slot != planned_slot_1:
-                self.assertEqual(slot.employee_id, self.employee_wout, 'Planning should be assigned to the employee with one of its role equal to sol\'s product role')
+                self.assertEqual(slot.employee_ids, self.employee_wout, 'Planning should be assigned to the employee with one of its role equal to sol\'s product role')
                 self.assertEqual('2021-08-02 06:00:00', str(slot.start_datetime), 'Planning slot should take the start datetime induced by the magnifying glass in gantt. (Janice has NYC Timezone)')
                 self.assertEqual('2021-08-04 08:00:00', str(slot.end_datetime), 'Planning slot should last for all the week, until friday afternoon. (Janice has NYC Timezone)')
                 self.assertEqual(18.0, slot.allocated_hours, 'Planning slot should have 18 allocated hours.')
@@ -337,7 +355,7 @@ class TestSalePlanning(TestCommonSalePlanning):
         PlanningSlot = self.env['planning.slot']
         slot_to_plan = PlanningSlot.search([('start_datetime', '=', False), ('sale_line_id', '=', sol.id)])
         self.assertEqual(len(slot_to_plan), 1)
-        start = datetime(2019, 6, 25, 8, 0, tzinfo=pytz.utc)
+        start = datetime(2019, 6, 25, 8, 0, tzinfo=UTC)
         slot = PlanningSlot.create({
             'start_datetime': start.replace(tzinfo=None),
             'end_datetime': (start + timedelta(hours=5)).replace(tzinfo=None),
@@ -399,7 +417,7 @@ class TestSalePlanning(TestCommonSalePlanning):
             slot.auto_plan_ids(view_domain=[('start_datetime', '=', '2021-08-01 00:00:00'), ('end_datetime', '=', '2021-08-07 23:59:59')])
 
         # Assert that planning hours to plan on the sale order are still correct after auto-planning, even after cancellation
-        unplanned_shift = self.env['planning.slot'].search([('sale_order_id', 'in', so.ids), '|', ('start_datetime', '=', False), ('resource_id', '=', False)])
+        unplanned_shift = self.env['planning.slot'].search([('sale_order_id', 'in', so.ids), '|', ('start_datetime', '=', False), ('resource_ids', '=', False)])
         self.assertFalse(unplanned_shift.exists())
 
     def test_compute_allocated_hours(self):
@@ -416,7 +434,7 @@ class TestSalePlanning(TestCommonSalePlanning):
             'start_datetime': "2021-07-29 08:00:00",
             'end_datetime': "2021-07-29 12:00:00",
             'sale_line_id': self.plannable_sol.id,
-            'employee_id': self.employee_joseph.id,
+            'resource_ids': self.employee_joseph.resource_id.ids,
             'role_id': self.planning_role_junior.id,
         })
         self.assertEqual(self.plannable_sol.planning_hours_to_plan, 10.0, 'There are no hours to plan before SO confirmation.')
@@ -446,7 +464,7 @@ class TestSalePlanning(TestCommonSalePlanning):
         ).write({
             'start_datetime': '2019-06-03 08:00:00',
             'end_datetime': '2019-06-03 09:00:00',
-            'resource_id': self.employee_wout.resource_id.id,
+            'resource_ids': self.employee_wout.resource_id.ids,
         })
         employee_max = self.env['hr.employee'].create({'name': 'Max'})
         so2.order_line.planning_slot_ids.with_context(
@@ -458,7 +476,7 @@ class TestSalePlanning(TestCommonSalePlanning):
         ).write({
             'start_datetime': '2019-06-04 08:00:00',
             'end_datetime': '2019-06-04 09:00:00',
-            'resource_id': employee_max.resource_id.id,
+            'resource_ids': employee_max.resource_id.ids,
         })
         with freeze_time('2019-06-05'):
             self.env['planning.slot'].with_context(
@@ -469,7 +487,7 @@ class TestSalePlanning(TestCommonSalePlanning):
                 planning_gantt_active_sale_order_id=so3.id,
             ).auto_plan_ids(view_domain=[('start_datetime', '=', '2019-06-03 00:00:00'), ('end_datetime', '=', '2019-06-09 23:59:59')])
         self.assertEqual(
-            so3.order_line.planning_slot_ids.resource_id,
+            so3.order_line.planning_slot_ids.resource_ids,
             employee_max.resource_id,
             "The shift to plan of SO3 should be linked to the resource of SO2's shift because their SOL have "
             "the same product, their customer is the same, and the shift's deadline is the closest from the current date."
@@ -508,3 +526,97 @@ class TestSalePlanning(TestCommonSalePlanning):
             slot.end_datetime == slot.start_datetime + timedelta(hours=1)
             for i, slot in enumerate(slots)
         ), "The date should be updated for all the slots.")
+
+    def test_compute_planning_hours_fields(self):
+        """
+        Test Steps:
+        1. Create a sol containing a product with planning_enabled = False
+        2. Check the planning_hours fields are equal to 0 for that SOL
+        3. Check SOL with product planning_enabled = True has planning_hours_to_plan correctly computed
+        4. Add a planning slot to the SOL and check planning_hours_to_plan is updated and planning_hours_planned correctly computed
+        """
+        service_product = self.env['product.product'].create({
+            'name': 'Service Product',
+            'type': 'service',
+            'planning_enabled': False,
+        })
+        sol = self.env['sale.order.line'].create({
+            'order_id': self.plannable_so.id,
+            'product_id': service_product.id,
+            'product_uom_qty': 1,
+        })
+        self.assertEqual(sol.planning_hours_to_plan, 0, "Planning hours to plan should be 0 for a non-plannable product.")
+        self.assertEqual(sol.planning_hours_planned, 0, "Planning hours planned should be 0 for a non-plannable product.")
+        self.assertEqual(self.plannable_sol.planning_hours_to_plan, 0, "Planning hours to plan should be 1 for a plannable product.")
+        self.assertEqual(self.plannable_sol.planning_hours_planned, 0, "Planning hours planned should be 0 for a plannable product with no slots.")
+        self.plannable_so.action_confirm()
+        self.assertEqual(sol.planning_hours_to_plan, 0, "Planning hours to plan should be 0 for a non-plannable product.")
+        self.assertEqual(sol.planning_hours_planned, 0, "Planning hours planned should be 0 for a non-plannable product.")
+        self.assertEqual(self.plannable_sol.planning_hours_to_plan, 10, "Planning hours to plan should be 0 after confirming the SO.")
+        self.assertEqual(self.plannable_sol.planning_hours_planned, 0, "Planning hours planned should be 0 after confirming the SO.")
+        start_datetime = datetime(2020, 11, 22, 8)
+        end_datetime = start_datetime + timedelta(hours=8)
+        slots = self.env['planning.slot'].create([
+            {
+                'sale_line_id': self.plannable_sol.id,
+                'start_datetime': start_datetime,
+                'end_datetime': end_datetime,
+                'resource_ids': self.resource_joseph.ids,
+                'state': '2_published',
+            },
+            {
+                'sale_line_id': sol.id,
+                'start_datetime': start_datetime,
+                'end_datetime': end_datetime,
+                'resource_ids': self.resource_bert.ids,
+                'state': '2_published',
+            },
+        ])
+        slots.allocated_hours = 5  # manually force allocated_hours for this test
+        (sol + self.plannable_sol).invalidate_recordset(['planning_slot_ids'])
+        self.assertEqual(self.plannable_sol.planning_hours_to_plan, 10, "Planning hours to plan should be 10 after adding a slot.")
+        self.assertEqual(self.plannable_sol.planning_hours_planned, 5, "Planning hours planned should be 5 after adding a slot.")
+        self.assertEqual(sol.planning_hours_to_plan, 0, "Planning hours to plan should be 1 since a planning sol is linked to that SOL.")
+        self.assertEqual(sol.planning_hours_planned, 5, "Planning hours planned should be 5 since a planning sol is linked to that SOL.")
+
+    def test_planning_slot_description_from_sol(self):
+        so_no_desc, so_with_description, so_with_different_name = self.env['sale.order'].create([
+            {
+                'partner_id': self.planning_partner.id,
+                'order_line': [Command.create({
+                    'product_id': self.plannable_product.id,
+                    'product_uom_qty': 10,
+                })],
+            },
+            {
+                'partner_id': self.planning_partner.id,
+                'order_line': [Command.create({
+                    'product_id': self.plannable_product.id,
+                    'name': "Custom Field Service Note",
+                    'product_uom_qty': 10,
+                })],
+            },
+            {
+                'partner_id': self.planning_partner.id,
+                'order_line': [Command.create({
+                    'product_id': self.plannable_product.id,
+                    'name': "Direct Custom Service Instructions",
+                    'product_uom_qty': 10,
+                })],
+            },
+        ])
+        (so_no_desc | so_with_description | so_with_different_name).action_confirm()
+        self.assertFalse(
+            so_no_desc.order_line.planning_slot_ids.name,
+            "Slot description should be False when SOL description only contains the product display name."
+        )
+        self.assertEqual(
+            so_with_description.order_line.planning_slot_ids.name,
+            "Custom Field Service Note",
+            "The product display name header should be stripped from the slot description."
+        )
+        self.assertEqual(
+            so_with_different_name.order_line.planning_slot_ids.name,
+            "Direct Custom Service Instructions",
+            "The full description should remain intact when the first line does not match the product display name."
+        )

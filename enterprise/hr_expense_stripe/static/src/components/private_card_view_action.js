@@ -1,22 +1,28 @@
 /* global Stripe */
-
-import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
-import { _t } from "@web/core/l10n/translation";
-import { Component, useState, useEffect, onWillStart, useRef } from "@odoo/owl";
+import { Component, onWillStart, proxy, signal, t, useProps } from "@odoo/owl";
+import { cookie } from "@web/core/browser/cookie";
 import { Dialog } from "@web/core/dialog/dialog";
 import { WarningDialog } from "@web/core/errors/error_dialogs";
+import { _t } from "@web/core/l10n/translation";
+import { registry } from "@web/core/registry";
+import { useService } from "@web/core/utils/hooks";
+import { useLayoutEffect } from "@web/owl2/utils";
 import { InputVerificationCode } from "./verification_code_input";
-import { cookie } from "@web/core/browser/cookie";
 
 class PrivateCardViewDialog extends Component {
     static template = "hr_expense_stripe.privateCardViewDialog";
     static components = { Dialog, InputVerificationCode };
 
-    static props = {
-        action: Object,
-        close: Function
-    };
+    props = useProps({
+        action: t.object(),
+        close: t.function(),
+    });
+
+    numberPlaceholderRef = signal.ref();
+    cvcPlaceholderRef = signal.ref();
+    numberCopyPlaceholderRef = signal.ref();
+    cvcCopyPlaceholderRef = signal.ref();
+    pinPlaceholderRef = signal.ref();
 
     setup() {
         this.card_id = this.props.action.params.res_id;
@@ -27,17 +33,11 @@ class PrivateCardViewDialog extends Component {
         this.orm = useService("orm");
         this.notification = useService("notification");
 
-        this.numberPlaceholder = useRef("numberPlaceholder");
-        this.cvcPlaceholder = useRef("cvcPlaceholder");
-        this.numberCopyPlaceholder = useRef("numberCopyPlaceholder");
-        this.cvcCopyPlaceholder = useRef("cvcCopyPlaceholder");
-        this.pinPlaceholder = useRef("pinPlaceholder");
-
-        this.state = useState({
+        this.state = proxy({
             ephemeralKey: undefined,
             nonce: undefined,
             session: undefined,
-            phone_number_last3: _t("(Fetching...)"),
+            message: _t("Enter the code we sent to the cardholder's phone or email: Fetching ..."),
             card: {
                 name: _t("Cardholder Name"),
                 number: "**** **** **** 1234",
@@ -50,7 +50,7 @@ class PrivateCardViewDialog extends Component {
 
         this.close = this.props.close;
 
-        useEffect(
+        useLayoutEffect(
             (ephemeralKey) => {
                 if (ephemeralKey)
                     this.buildStripeIframes();
@@ -122,7 +122,7 @@ class PrivateCardViewDialog extends Component {
 
         // Small Fix as sometimes when we click on the numbers it calls focus which is not available for issuing elements
         cardNumberElement.focus = () => {};
-        cardNumberElement.mount(this.numberPlaceholder.el);
+        cardNumberElement.mount(this.numberPlaceholderRef());
 
         let cardCvcElement = elements.create(
             "issuingCardCvcDisplay",
@@ -142,29 +142,27 @@ class PrivateCardViewDialog extends Component {
         );
         // Small Fix as sometimes when we click on the numbers it calls focus which is not available for issuing elements
         cardCvcElement.focus = () => {};
-        cardCvcElement.mount(this.cvcPlaceholder.el);
+        cardCvcElement.mount(this.cvcPlaceholderRef());
 
-        if (this.state.card.card_type === "physical") {
-            let cardPinElement = elements.create(
-                "issuingCardPinDisplay",
-                {
-                    issuingCard: this.stripe_id,
-                    nonce: this.state.nonce,
-                    ephemeralKeySecret: this.state.ephemeralKey,
-                    style: {
-                        base: {
-                            color: cookie.get("color_scheme") === "dark" ? '#fff' : '#000',
-                            fontWeight: 400,
-                            fontSize: '14px',
-                            alignSelf: 'center'
-                        },
-                    }
+        let cardPinElement = elements.create(
+            "issuingCardPinDisplay",
+            {
+                issuingCard: this.stripe_id,
+                nonce: this.state.nonce,
+                ephemeralKeySecret: this.state.ephemeralKey,
+                style: {
+                    base: {
+                        color: cookie.get("color_scheme") === "dark" ? '#fff' : '#000',
+                        fontWeight: 400,
+                        fontSize: '14px',
+                        alignSelf: 'center'
+                    },
                 }
-            );
-            // Small Fix as sometimes when we click on the numbers it calls focus which is not available for issuing elements
-            cardPinElement.focus = () => {};
-            cardPinElement.mount(this.pinPlaceholder.el);
-        }
+            }
+        );
+        // Small Fix as sometimes when we click on the numbers it calls focus which is not available for issuing elements
+        cardPinElement.focus = () => {};
+        cardPinElement.mount(this.pinPlaceholderRef());
 
         //Copy buttons
         let cardNumberCopyElement = elements.create(
@@ -178,7 +176,7 @@ class PrivateCardViewDialog extends Component {
                 }
             }
         );
-        cardNumberCopyElement.mount(this.numberCopyPlaceholder.el);
+        cardNumberCopyElement.mount(this.numberCopyPlaceholderRef());
         cardNumberCopyElement.on('click', () => {
             this.notification.add(_t("Card number copied to the clipboard."), {
                 type: "info",
@@ -196,7 +194,7 @@ class PrivateCardViewDialog extends Component {
                 }
             }
         );
-        cardCvcCopyElement.mount(this.cvcCopyPlaceholder.el);
+        cardCvcCopyElement.mount(this.cvcCopyPlaceholderRef());
         cardCvcCopyElement.on('click', () => {
             this.notification.add(_t("Card cvc copied to the clipboard."), {
                 type: "info",
@@ -208,7 +206,17 @@ class PrivateCardViewDialog extends Component {
     async send2FARequest() {
         const phoneResult = await this.ormCardCall("action_send_iap_2fa_code");
         this.state.session = phoneResult.session_id;
-        this.state.phone_number_last3 = phoneResult.phone_number_last3;
+        if (phoneResult.phone_number_last3) {
+            this.state.message = _t(
+                "Enter the code we sent to the cardholder's phone number ending in %(phone)s.",
+                { phone: phoneResult.phone_number_last3 },
+            );
+        } else if (phoneResult.sanitized_email) {
+            this.state.message = _t(
+                "Enter the code we sent to the cardholder's email %(email)s.",
+                { email: phoneResult.sanitized_email },
+            );
+        }
     }
 
     async requestEphemeralKey(code) {
@@ -257,12 +265,11 @@ class PrivateCardViewDialog extends Component {
 }
 
 export function PrivateCardViewAction(env, action) {
+    const dialog = useService("dialog");
     return new Promise((resolve) => {
-        env.services.dialog.add(
+        dialog.add(
             PrivateCardViewDialog,
-            {
-                action
-            },
+            { action },
             {
                 onClose: () => {
                     resolve({ type: "ir.actions.act_window_close" });

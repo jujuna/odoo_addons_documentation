@@ -9,11 +9,16 @@
                 <setting string="Annual Leave Time-off Type" invisible="company_country_code != 'EG'">
                     <div class="content-group">
                         <div class="row mt16 ms-2">
-                            <label string="Time-off Type" for="l10n_eg_annual_leave_type_id"
+                            <label string="Time-off Type" for="l10n_eg_annual_work_entry_type_id"
                                 class="col-md-6 p-0 m-0 o_light_label"/>
-                            <field name="l10n_eg_annual_leave_type_id" class="col-lg-6 p-0"/>
+                            <field name="l10n_eg_annual_work_entry_type_id" class="col-lg-6 p-0"/>
                         </div>
                     </div>
+                </setting>
+            </xpath>
+            <xpath expr="//block[@name='employees_setting_container']" position="inside">
+                <setting string="Company NOSI Code" help="The Company registeration code with National Organization for Social Insurance NOSI" invisible="company_country_code != 'EG'">
+                    <field name="l10n_eg_nosi_code" class="col-lg-6 p-0 o_ligh_label"/>
                 </setting>
             </xpath>
         </field>

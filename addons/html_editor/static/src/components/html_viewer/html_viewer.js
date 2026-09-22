@@ -1,48 +1,53 @@
+import { HtmlUpgradeManager } from "@html_editor/html_migrations/html_upgrade_manager";
+import { mountComponent } from "@html_editor/others/embedded_component_utils";
+import { TableOfContentManager } from "@html_editor/others/embedded_components/core/table_of_content/table_of_content_manager";
+import { fillHtmlTransferData } from "@html_editor/utils/clipboard";
+import { fixInvalidHTML, instanceofMarkup } from "@html_editor/utils/sanitize";
 import {
     Component,
     markup,
     onMounted,
     onWillStart,
     onWillUnmount,
-    onWillUpdateProps,
+    proxy,
+    signal,
+    status,
+    t,
+    untrack,
+    useApp,
     useEffect,
-    useRef,
-    useState,
+    useProps,
 } from "@odoo/owl";
 import { getBundle } from "@web/core/assets";
+import { location } from "@web/core/browser/browser";
 import { memoize } from "@web/core/utils/functions";
-import { fillHtmlTransferData } from "@html_editor/utils/clipboard";
-import { fixInvalidHTML, instanceofMarkup } from "@html_editor/utils/sanitize";
-import { HtmlUpgradeManager } from "@html_editor/html_migrations/html_upgrade_manager";
-import { TableOfContentManager } from "@html_editor/others/embedded_components/core/table_of_content/table_of_content_manager";
-import { getDeepestPosition } from "@html_editor/utils/dom_info";
-import { scrollAndHighlightHeading } from "@html_editor/utils/url";
+import { useLayoutEffect } from "@web/owl2/utils";
 
 export class HtmlViewer extends Component {
     static template = "html_editor.HtmlViewer";
-    static props = {
-        config: { type: Object },
-        migrateHTML: { type: Boolean, optional: true },
-    };
-    static defaultProps = {
-        migrateHTML: true,
-    };
+
+    app = useApp();
+    iframeRef = signal.ref();
+    readonlyElementRef = signal.ref();
+    props = useProps({
+        config: t.object(),
+        migrateHTML: t.boolean().optional(true),
+    });
 
     setup() {
         this._cleanups = [];
         this.htmlUpgradeManager = new HtmlUpgradeManager();
-        this.iframeRef = useRef("iframe");
 
-        this.state = useState({
+        this.state = proxy({
             iframeVisible: false,
             value: this.formatValue(this.props.config.value),
         });
         this.components = new Set();
 
-        onWillUpdateProps((newProps) => {
-            const newValue = this.formatValue(newProps.config.value);
+        useEffect(() => {
+            const newValue = this.formatValue(this.props.config.value);
             if (newValue.toString() !== this.state.value.toString()) {
-                this.state.value = this.formatValue(newProps.config.value);
+                this.state.value = newValue;
                 if (this.props.config.embeddedComponents) {
                     this.destroyComponents();
                 }
@@ -58,25 +63,21 @@ export class HtmlViewer extends Component {
 
         if (this.showIframe) {
             onMounted(() => {
+                const iframe = this.iframeRef();
                 const onLoadIframe = () => this.onLoadIframe(this.state.value);
-                this.iframeRef.el.addEventListener("load", onLoadIframe, { once: true });
+                iframe.addEventListener("load", onLoadIframe, { once: true });
                 // Force the iframe to call the `load` event. Without this line, the
                 // event 'load' might never trigger.
-                this.iframeRef.el.after(this.iframeRef.el);
+                iframe.after(iframe);
             });
         } else {
-            this.readonlyElementRef = useRef("readonlyContent");
-            useEffect(
+            useLayoutEffect(
                 () => {
-                    this.processReadonlyContent(this.readonlyElementRef.el);
+                    this.processReadonlyContent(this.readonlyElementRef());
                 },
-                () => [this.props.config.value.toString(), this.readonlyElementRef?.el]
+                () => [this.props.config.value.toString(), untrack(this.readonlyElementRef)]
             );
         }
-
-        onMounted(() => {
-            scrollAndHighlightHeading(this.readonlyElementRef?.el || this.iframeRef?.el);
-        });
 
         if (this.props.config.cssAssetId) {
             onWillStart(async () => {
@@ -93,13 +94,13 @@ export class HtmlViewer extends Component {
                 }
                 return result;
             });
-            useEffect(
+            useLayoutEffect(
                 () => {
-                    if (this.readonlyElementRef?.el) {
+                    if (this.readonlyElementRef()) {
                         this.mountComponents();
                     }
                 },
-                () => [this.props.config.value.toString(), this.readonlyElementRef?.el]
+                () => [this.props.config.value.toString(), untrack(this.readonlyElementRef)]
             );
             this.tocManager = new TableOfContentManager(this.readonlyElementRef);
         }
@@ -152,19 +153,7 @@ export class HtmlViewer extends Component {
     onCopy(ev) {
         ev.preventDefault();
         const selection = ev.target.ownerDocument.defaultView.getSelection();
-        const [deepAnchorNode, deepAnchorOffset] = getDeepestPosition(
-            selection.anchorNode,
-            selection.anchorOffset
-        );
-        const [deepFocusNode, deepFocusOffset] = getDeepestPosition(
-            selection.focusNode,
-            selection.focusOffset
-        );
-
-        const range = new Range();
-        range.setStart(deepAnchorNode, deepAnchorOffset);
-        range.setEnd(deepFocusNode, deepFocusOffset);
-        const clonedContents = range.cloneContents();
+        const clonedContents = selection.getRangeAt(0).cloneContents();
         fillHtmlTransferData(ev, "clipboardData", clonedContents, {
             textContent: selection.toString(),
         });
@@ -184,10 +173,17 @@ export class HtmlViewer extends Component {
     }
 
     /**
-     * Ensure all links are opened in a new tab.
+     * Retarget links to open in a new tab.
+     * When inside an iframe, all links are retargeted.
+     * Otherwise, only external links (different origin) are retargeted.
      */
     retargetLinks(container) {
-        for (const link of container.querySelectorAll("a")) {
+        const isInsideIframe = container.ownerDocument !== document;
+        const retargetSelector = isInsideIframe
+            ? "a"
+            : `a:not([href^="${location.origin}"]):not([href^="/"])`;
+
+        for (const link of container.querySelectorAll(retargetSelector)) {
             this.retargetLink(link);
         }
     }
@@ -198,7 +194,7 @@ export class HtmlViewer extends Component {
     }
 
     updateIframeContent(content) {
-        const contentWindow = this.iframeRef.el.contentWindow;
+        const contentWindow = this.iframeRef().contentWindow;
         const iframeTarget = this.props.config.hasFullHtml
             ? contentWindow.document.documentElement
             : contentWindow.document.querySelector("#iframe_target");
@@ -207,7 +203,7 @@ export class HtmlViewer extends Component {
     }
 
     onLoadIframe(value) {
-        const contentWindow = this.iframeRef.el.contentWindow;
+        const contentWindow = this.iframeRef().contentWindow;
         if (!this.props.config.hasFullHtml) {
             contentWindow.document.open("text/html", "replace").write(
                 `<!DOCTYPE html><html>
@@ -301,23 +297,16 @@ export class HtmlViewer extends Component {
             env,
             props,
         });
-        const root = this.__owl__.app.createRoot(Component, {
-            props,
-            env,
+        const { root, mountPromise } = mountComponent(this.app, Component, host, props, env, {
+            onBeforeComplete: () => {
+                if (status(this) === "destroyed") {
+                    return false;
+                }
+            },
         });
-        const promise = root.mount(host);
         // Don't show mounting errors as they will happen often when the host
         // is disconnected from the DOM because of a patch
-        promise.catch();
-        // Patch mount fiber to hook into the exact call stack where root is
-        // mounted (but before). This will remove host children synchronously
-        // just before adding the root rendered html.
-        const fiber = root.node.fiber;
-        const fiberComplete = fiber.complete;
-        fiber.complete = function () {
-            host.replaceChildren();
-            fiberComplete.call(this);
-        };
+        mountPromise.catch();
         const info = {
             root,
             host,
@@ -326,7 +315,7 @@ export class HtmlViewer extends Component {
     }
 
     mountComponents() {
-        this.forEachEmbeddedComponentHost(this.readonlyElementRef.el, (host, embedding) => {
+        this.forEachEmbeddedComponentHost(this.readonlyElementRef(), (host, embedding) => {
             this.mountComponent(host, embedding);
         });
     }

@@ -7,29 +7,32 @@
 # Jolien De Paepe, 2023
 # Martin Trigaux, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:49+0000\n"
-"PO-Revision-Date: 2025-10-23 08:07+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/web_gantt/"
-"fr/>\n"
+"POT-Creation-Date: 2026-08-28 17:58+0000\n"
+"PO-Revision-Date: 2026-09-18 00:47+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
+"web_gantt/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%(hour)sh%(minute)s"
-msgstr "%(hour)sh%(minute)s"
+#: model:ir.module.module,description:base.module_web_gantt
+msgid ""
+"\n"
+"Odoo Web Gantt chart view.\n"
+"=============================\n"
+"\n"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -39,9 +42,10 @@ msgstr "%s ne peut pas être planifié dans le passé"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%sh"
-msgstr "%sh"
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "%s to schedule"
+msgstr "%s à planifier"
 
 #. module: web_gantt
 #: model:ir.model,name:web_gantt.model_ir_actions_act_window_view
@@ -50,12 +54,14 @@ msgstr "Vue de la fenêtre d'action"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "Activer le mode dense"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "Activer le mode clairsemé"
@@ -109,7 +115,13 @@ msgstr "Nom d'affichage"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Drop here to unschedule"
+msgstr "Déposer ici pour retirer de la planification"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Edit"
 msgstr "Modifier"
 
@@ -152,10 +164,8 @@ msgstr "Vue de Gantt"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt child can only be field or template, got %s"
+msgid "Gantt child can only be field or popover, got %s"
 msgstr ""
-"Une ligne enfant Gantt peut seulement être un champ ou un modèle, vous avez "
-"%s"
 
 #. module: web_gantt
 #. odoo-python
@@ -180,6 +190,18 @@ msgstr ""
 "'dependency_field' est défini"
 
 #. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover can contain only one templates tag"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover child can only be field or template, got %s"
+msgstr ""
+
+#. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_scale_selector.js:0
 msgid "Gantt start date"
@@ -194,8 +216,8 @@ msgstr "Date de fin Gantt"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt view can contain only one templates tag"
-msgstr "La vue Gantt peut uniquement contenir une étiquette de modèles"
+msgid "Gantt view can contain only one popover tag"
+msgstr ""
 
 #. module: web_gantt
 #: model:ir.model.fields,field_description:web_gantt.field_ir_actions_act_window_view__id
@@ -214,6 +236,14 @@ msgstr "Impossible de planifier dans le passé."
 #: code:addons/web_gantt/models/models.py:0
 msgid "Insufficient fields for Gantt View!"
 msgstr "Champs insuffisants pour la vue Gantt !"
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid ""
+"Invalid attributes (%(invalid_attributes)s) in gantt popover. Attributes "
+"must be in (%(valid_attributes)s)"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -251,15 +281,15 @@ msgstr "Méthode de replanification invalide %s"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Month"
-msgstr "Mois"
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Load More"
+msgstr "Charger plus"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
-msgid "Name"
-msgstr "Nom"
+#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
+msgid "Month"
+msgstr "Mois"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -272,6 +302,13 @@ msgstr "Nouveau"
 #: code:addons/web_gantt/static/src/gantt_controller.js:0
 msgid "No, keep it"
 msgstr "Non, laissez comme ça"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "Nothing to schedule"
+msgstr "Rien à planifier"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -324,7 +361,13 @@ msgstr "Élément replanifié"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Show dependencies"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Start"
 msgstr "Commencer"
 
@@ -336,7 +379,7 @@ msgstr "La date de début ne peut pas être postérieure à la date de fin"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Stop"
 msgstr "Arrêter"
 
@@ -361,6 +404,12 @@ msgstr "Aujourd'hui"
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Toggle Side Panel"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Toolbar menu"
 msgstr "Menu barre d'outils"
 
@@ -378,7 +427,7 @@ msgstr "%s indéfini"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 #: model:ir.model,name:web_gantt.model_ir_ui_view
 msgid "View"
 msgstr "Vue"
@@ -390,16 +439,15 @@ msgid "View Type"
 msgstr "Type de vue"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week"
-msgstr "Semaine"
+#: model:ir.module.module,shortdesc:base.module_web_gantt
+msgid "Web Gantt"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week %(week)s, %(startDate)s - %(endDate)s"
-msgstr "Semaine %(week)s, %(startDate)s - %(endDate)s"
+msgid "Week"
+msgstr "Semaine"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -425,49 +473,5 @@ msgstr "minutes"
 msgid "months"
 msgstr "mois"
 
-#~ msgid "From"
-#~ msgstr "Du"
-
-#~ msgid "From: %(from_date)s to: %(to_date)s"
-#~ msgstr "Du : %(from_date)s au : %(to_date)s"
-
-#~ msgid "to"
-#~ msgstr "au"
-
-#~ msgid "Are you sure to delete this record?"
-#~ msgstr "Êtes-vous sûr de vouloir supprimer cet enregistrement ?"
-
-#~ msgid "Grouping by date is not supported"
-#~ msgstr "Le regroupement par date n'est pas pris en charge."
-
-#~ msgid "Invalid attributes (%s) in gantt view. Attributes must be in (%s)"
-#~ msgstr ""
-#~ "Des attributs invalides (%s) dans la vue Gantt. Les attributs doivent "
-#~ "être en (%s)"
-
-#~ msgid "Next"
-#~ msgstr "Suivant"
-
-#~ msgid "Plan existing"
-#~ msgstr "Planifier existant"
-
-#~ msgid "Previous"
-#~ msgstr "Précedent"
-
-#~ msgid ""
-#~ "Records that are in the past cannot be automatically rescheduled. They "
-#~ "should be manually rescheduled instead."
-#~ msgstr ""
-#~ "Les enregistrements passés ne peuvent pas être automatiquement "
-#~ "reprogrammés. Ils doivent être reprogrammés manuellement."
-
-#~ msgid "You cannot reschedule %s towards %s."
-#~ msgstr "Vous ne pouvez pas repousser %s à %s."
-
-#~ msgid ""
-#~ "You cannot reschedule tasks that do not follow a direct dependency path. "
-#~ "Only the first task has been automatically rescheduled."
-#~ msgstr ""
-#~ "Vous ne pouvez pas reprogrammer des tâches qui ne suivent pas une "
-#~ "trajectoire de dépendance directe. Seule la première tâche a été "
-#~ "automatiquement reprogrammée."
+msgid "Name"
+msgstr "Nom"

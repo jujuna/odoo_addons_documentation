@@ -1,6 +1,5 @@
 {
     'name': 'Event Test (all modules)',
-    'version': '1.0',
     'category': 'Hidden/Tests',
     'description': """
 This module will test the main event flows of Odoo, both frontend and backend.
@@ -13,5 +12,5 @@ automatic lead generation, full Online support, sms and whatsapp support, ...
         'whatsapp_event',
     ],
     'author': 'Odoo S.A.',
-    'license': 'LGPL-3',
+    'license': 'OEEL-1',
 }

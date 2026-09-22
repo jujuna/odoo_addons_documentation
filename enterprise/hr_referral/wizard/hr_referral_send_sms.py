@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.exceptions import AccessError
 
 
@@ -32,8 +32,8 @@ class HrReferralSendSms(models.TransientModel):
     def _compute_body_plaintext(self):
         for wizard in self:
             if not wizard.body_plaintext:
-                wizard.body_plaintext = _(
-                    'Hello! There is an amazing job offer for %(job_name)s in my company!'
+                wizard.body_plaintext = self.env._(
+                    'Hello! There is an amazing job opportunity for %(job_name)s in my company!'
                     ' It will be a fit for you %(referral_url)s',
                     job_name=wizard.job_id.name,
                     referral_url=wizard.url,
@@ -41,7 +41,7 @@ class HrReferralSendSms(models.TransientModel):
 
     def send_sms_referral(self):
         if not self.env.user.has_group('hr_referral.group_hr_recruitment_referral_user'):
-            raise AccessError(_('You do not have the required access rights to send SMS.'))
+            raise AccessError(self.env._('You do not have the required access rights to send SMS.'))
 
         self.env['sms.sms'].create([{
             'number': wizard.recipient,

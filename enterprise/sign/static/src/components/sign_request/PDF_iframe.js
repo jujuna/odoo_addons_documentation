@@ -2,7 +2,7 @@ import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { renderToString } from "@web/core/utils/render";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { normalizePosition, isVisible } from "./utils";
+import { getSignItemFontSize, normalizePosition, isVisible } from "./utils";
 
 export class PDFIframe {
     /**
@@ -21,10 +21,7 @@ export class PDFIframe {
         this.cleanupFns = [];
 
         this.readonly = props.readonly;
-        this.signItemTypesById = this.props.signItemTypes.reduce((obj, type) => {
-            obj[type.id] = type;
-            return obj;
-        }, {});
+        this.updateSignItemTypes();
         this.selectionOptionsById = this.props.signItemOptions.reduce((obj, option) => {
             obj[option.id] = option;
             return obj;
@@ -33,6 +30,13 @@ export class PDFIframe {
         if (this.root) {
             this.waitForPagesToLoad();
         }
+    }
+
+    updateSignItemTypes() {
+        this.signItemTypesById = this.props.signItemTypes.reduce((obj, type) => {
+            obj[type.id] = type;
+            return obj;
+        }, {});
     }
 
     waitForPagesToLoad() {
@@ -61,10 +65,13 @@ export class PDFIframe {
             this.renderSignItems();
             this.postRender();
 
+            if (!this.root.defaultView) {
+                return;
+            }
             const { eventBus } = this.root.defaultView.PDFViewerApplication;
-            eventBus.on("pagerendered",  (ev) => this.refreshSignItems(ev.pageNumber));
-            eventBus.on("scalechange",   ()  => this.updateFontSize());
-            eventBus.on("rotationchanging",() => this.updateFontSize());
+            eventBus.on("pagerendered", (ev) => this.refreshSignItems(ev.pageNumber));
+            eventBus.on("scalechange", () => this.updateFontSize());
+            eventBus.on("rotationchanging", () => this.updateFontSize());
 
             // We need to refresh just one more time after we assign the eventbus on the pageredered
             // as the page could have rendered before we assigned the bus
@@ -74,7 +81,9 @@ export class PDFIframe {
 
     refreshSignItemsForPage(page) {
         const pageContainer = this.getPageContainer(page);
-        if (!pageContainer) return;
+        if (!pageContainer) {
+            return;
+        }
 
         for (const id in this.signItems[page]) {
             const signItem = this.signItems[page][id].el;
@@ -98,30 +107,12 @@ export class PDFIframe {
 
     async loadCustomCSS() {
         const assets = await rpc("/sign/render_assets_pdf_iframe", {
-            args: [{ debug: this.env.debug }],
+            args: [{ debug: odoo.debug }],
         });
         this.root.querySelector("head").insertAdjacentHTML("beforeend", assets);
     }
 
     clearNativePDFViewerButtons() {
-        const selectors = [
-            "#pageRotateCw",
-            "#pageRotateCcw",
-            "#openFile",
-            "#presentationMode",
-            "#viewBookmark",
-            "#printButton",
-            "#downloadButton",
-            "#secondaryOpenFile",
-            "#secondaryPresentationMode",
-            "#secondaryViewBookmark",
-            "#secondaryPrint",
-            "#secondaryDownload",
-        ];
-        const elements = this.root.querySelectorAll(selectors.join(", "));
-        elements.forEach((element) => {
-            element.style.display = "none";
-        });
         this.root.querySelector("#lastPage").nextElementSibling.style.display = "none";
         // prevent password from being autocompleted in search input
         this.root.querySelector("#findInput").value = "";
@@ -208,7 +199,7 @@ export class PDFIframe {
     renderSignItem(signItemData, target) {
         const signItemElement = renderToString("sign.signItem", this.getContext(signItemData));
         target.insertAdjacentHTML("beforeend", signItemElement);
-        const signItem = target.lastChild;
+        const signItem = target.lastElementChild;
         signItem.classList.add("d-none");
         signItem.setAttribute("tabindex", "0");
         this.enableCustom({ el: signItem, data: signItemData });
@@ -240,12 +231,21 @@ export class PDFIframe {
             (responsible > 0 && responsible !== this.currentRole) ||
             !!signItem.value;
         const isCurrentRole = this.currentRole === parseInt(responsible);
-        const placeholder =
+        let placeholder =
             signItem.placeholder ||
             (isCurrentRole && signItem.name) ||
             (this.readonly && `${signItem.name}\n${signItem.responsible_name}`) ||
             "";
+
         const constant = signItem.constant ?? false;
+        const hidePlaceholder =
+            constant && (signItem.value !== undefined) & (signItem.value === "");
+        if (hidePlaceholder) {
+            // Keep the placeholder until a value is available for the field.
+            // If the available value is empty, show it as empty instead of the placeholder.
+            placeholder = "";
+        }
+
         return Object.assign(signItem, {
             constant: constant,
             readonly: signItem.readonly ?? readonly,
@@ -256,7 +256,7 @@ export class PDFIframe {
             placeholder: placeholder,
             classes: `
                 ${isCurrentRole ? "o_sign_sign_item_default" : ""}
-                ${signItem.constant ? "o_sign_sign_item_constant": ""}
+                ${signItem.constant ? "o_sign_sign_item_constant" : ""}
                 ${signItem.required && isCurrentRole ? "o_sign_sign_item_required" : ""}
                 ${readonly && isCurrentRole ? "o_readonly_mode" : ""}
                 ${this.readonly ? "o_sign_sign_item_pdfview" : ""}`,
@@ -269,8 +269,7 @@ export class PDFIframe {
     refreshSignItems(page = false) {
         if (page) {
             this.refreshSignItemsForPage(page);
-        }
-        else {
+        } else {
             for (const page in this.signItems) {
                 this.refreshSignItemsForPage(page);
             }
@@ -283,10 +282,6 @@ export class PDFIframe {
     preRender() {
         const viewerContainer = this.root.querySelector("#viewerContainer");
         viewerContainer.style.visibility = "visible";
-    }
-
-    get normalSize() {
-        return this.root.querySelector(".page").clientHeight * 0.015;
     }
 
     /**
@@ -306,26 +301,15 @@ export class PDFIframe {
      * @param {SignItem}
      */
     updateSignItemFontSize({ el, data }) {
-        const largerTypes = ["signature", "initial", "textarea", "selection", "stamp"];
-        const size = largerTypes.includes(data.type)
-            ? this.normalSize
-            : parseFloat(el.clientHeight);
-        el.style.fontSize = `${size * 0.8}px`;
+        const pageHeight = this.root.querySelector(".page").clientHeight;
+        el.style.fontSize = `${getSignItemFontSize(
+            data.type,
+            parseFloat(el.clientHeight),
+            pageHeight
+        )}px`;
     }
 
-    async rotatePDF(e) {
-        const button = e.target;
-        button.setAttribute("disabled", "");
-        const result = await this.props.rotatePDF();
-        if (result) {
-            this.root.querySelector("#pageRotateCw").click();
-            button.removeAttribute("disabled");
-            this.refreshSignItems();
-        }
-    }
-
-    postRender() {
-    }
+    postRender() {}
 
     /**
      * Creates rendering context for the sign item based on the sign item type
@@ -334,10 +318,10 @@ export class PDFIframe {
      */
     createSignItemDataFromType({ itemTypeId, roleId, roleName }) {
         const type = this.signItemTypesById[itemTypeId];
-        const alignment = this.getAlignmentByItemType(type.item_type);
+        const alignment = this.getAlignmentByItemType(type.item_type, type.alignment);
         return {
-            constant: false,
-            required: true,
+            constant: type.constant,
+            required: type.required,
             editMode: true,
             readonly: true,
             updated: true,
@@ -357,7 +341,7 @@ export class PDFIframe {
                 height: ${type.default_height * 100}%;
                 text-align: ${alignment};
             `,
-            type_id: [type.id],
+            type_id: type.id,
             icon: type.icon || "",
             document_id: this.documentId,
             just_dropped: true,
@@ -369,10 +353,11 @@ export class PDFIframe {
      * @param {String} type: sign item type.
      * @returns {String}: alignment for the sign item.
      */
-    getAlignmentByItemType(type) {
-        if (type == "radio")
+    getAlignmentByItemType(type, alignment = "left") {
+        if (type == "radio") {
             return "center";
-        return "left";
+        }
+        return alignment;
     }
 
     /**

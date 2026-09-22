@@ -56,7 +56,7 @@ class PurchaseOrder(models.Model):
 
         for line in self.order_line.filtered(lambda line: line.product_id in quantities):
             quantities[line.product_id]['purchase_quantity'] += line.product_uom_qty
-            quantities[line.product_id]['received_quantity'] += line.product_uom_id._compute_quantity(
+            quantities[line.product_id]['received_quantity'] += line.uom_id._compute_quantity(
                 line.qty_received, line.product_id.uom_id,
             )
 

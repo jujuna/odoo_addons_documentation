@@ -8,10 +8,8 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet/notebook/page[@name='main_page']//field[@name='original_value']" position="before">
                 <field name="l10n_ro_saft_account_asset_category_id" invisible="country_code != 'RO'"/>
-            </xpath>
-            <xpath expr="//sheet/notebook/page[@name='main_page']//field[@name='method_period']" position="after">
                 <field name='l10n_ro_saft_account_asset_category_warning' invisible="True"/>
-                <span class="fa fa-exclamation-triangle" style="color: orange;"
+                <span class="oi" data-icon="warning" style="color: orange;"
                       title="The depreciation duration is outside the boundaries delimited by the asset category"
                       invisible="not l10n_ro_saft_account_asset_category_warning"/>
             </xpath>

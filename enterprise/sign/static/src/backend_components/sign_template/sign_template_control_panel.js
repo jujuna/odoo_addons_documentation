@@ -1,35 +1,39 @@
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { ControlPanel } from "@web/search/control_panel/control_panel";
 import { multiFileUpload } from "@sign/backend_components/multi_file_upload";
-import { SignStatusIndicator } from "@sign/backend_components/sign_status_indicator/sign_status_indicator";
+import { FormStatusIndicator } from "@web/views/form/form_status_indicator/form_status_indicator";
 import { SignTemplateCustomCogMenu } from "../cog_menu/sign_template_custom_cog_menu";
-import { SignTemplateHeaderTags } from "./sign_template_header_tags";
+import { SignHeaderTags } from "./sign_header_tags";
 
 export class SignTemplateControlPanel extends Component {
     static template = "sign.SignTemplateControlPanel";
     static components = {
         ControlPanel,
-        SignStatusIndicator,
+        SignStatusIndicator: FormStatusIndicator,
         SignTemplateCustomCogMenu,
-        SignTemplateHeaderTags,
+        SignHeaderTags,
     };
-    static props = {
-        responsibleCount: { type: Number },
-        hasSignRequests: { type: Boolean },
-        actionType: { type: String },
-        signTemplate: { type: Object },
-        goBackToKanban: { type: Function },
-        signStatus: { type: Object },
-        manageTemplateAccess: { type: Boolean },
-        onTemplateSaveClick: { type: Function },
-        hasSignersWithoutItems: { type: Boolean },
-        documentId: { type: Number },
-        onEditTemplate: { type: Function },
-        referenceDoc: { optional: true, type: String },
-        activityId: { optional: true, type: Number },
-    };
+
+    props = useProps({
+        responsibleCount: t.number(),
+        hasSignRequests: t.boolean(),
+        actionType: t.string(),
+        signTemplate: t.object(),
+        goBackToKanban: t.function(),
+        signStatus: t.object(),
+        manageTemplateAccess: t.boolean(),
+        onTemplateSaveClick: t.function(),
+        hasSignersWithoutItems: t.boolean(),
+        documentId: t.number(),
+        onEditTemplate: t.function(),
+        referenceDoc: t.string().optional(),
+        activityId: t.number().optional(),
+        noDefaultSigner: t.boolean().optional(),
+        logRequestActivity: t.boolean().optional(),
+        defaultActivityTypeId: t.number().optional(),
+    });
 
     setup() {
         this.controlPanelDisplay = {};
@@ -51,9 +55,12 @@ export class SignTemplateControlPanel extends Component {
 
     get templateHeaderTagsProps() {
         return {
-            signTemplate: this.props.signTemplate,
-            hasSignRequests: this.props.hasSignRequests,
-        }
+            resModel: "sign.template",
+            resId: this.props.signTemplate.id,
+            fieldsInfo: {
+                tag_ids: { type: "many2many", relation: "sign.template.tag", string: "Tags" },
+            },
+        };
     }
 
     get showShareButton() {
@@ -65,15 +72,18 @@ export class SignTemplateControlPanel extends Component {
         return this.action.doActionButton({
             type: "object",
             resModel: "sign.template",
-            name:"open_sign_send_dialog",
+            name: "open_sign_send_dialog",
             resIds: [this.props.signTemplate.id],
             context: {
                 sign_directly_without_mail: false,
+                no_default_signer: this.props.noDefaultSigner ?? true,
                 show_email: true,
                 has_signers_without_items: this.props.hasSignersWithoutItems,
                 default_reference_doc: this.props.referenceDoc,
                 default_activity_id: this.props.activityId,
-                default_model: 'sign.template',
+                default_log_request_activity: this.props.logRequestActivity,
+                default_activity_type_id: this.props.defaultActivityTypeId,
+                default_model: "sign.template",
                 default_res_ids: [this.props.signTemplate.id],
             },
         });
@@ -90,13 +100,15 @@ export class SignTemplateControlPanel extends Component {
         return this.action.doActionButton({
             type: "object",
             resModel: "sign.template",
-            name:"open_sign_send_dialog",
+            name: "open_sign_send_dialog",
             resIds: [this.props.signTemplate.id],
             context: {
                 sign_directly_without_mail: true,
                 has_signers_without_items: this.props.hasSignersWithoutItems,
                 default_reference_doc: this.props.referenceDoc,
                 default_activity_id: this.props.activityId,
+                default_log_request_activity: this.props.logRequestActivity,
+                default_activity_type_id: this.props.defaultActivityTypeId,
             },
         });
     }
@@ -125,5 +137,4 @@ export class SignTemplateControlPanel extends Component {
             },
         });
     }
-
 }

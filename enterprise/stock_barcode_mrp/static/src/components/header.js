@@ -1,12 +1,17 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 
 export default class HeaderComponent extends Component {
-    static props = ["displayUOM", "openDetails", "line"];
     static template = "stock_barcode_mrp.HeaderComponent";
 
-    setup() {
-        this.line = this.props.line;
+    props = useProps({
+        displayUOM: t.any(),
+        openDetails: t.any(),
+        line: t.any(),
+    });
+
+    get line() {
+        return this.props.line;
     }
 
     get displayGenerateSerialButton() {
@@ -38,7 +43,7 @@ export default class HeaderComponent extends Component {
     }
 
     get isTracked() {
-        return this.order.product_id.tracking !== "none";
+        return ["lot", "serial"].includes(this.order.product_id.tracking);
     }
 
     get lotName() {
@@ -72,5 +77,32 @@ export default class HeaderComponent extends Component {
 
     get isSelected() {
         return true;
+    }
+
+    get productionPackageLabels() {
+        const moveLineIds = this.order.finished_move_line_ids;
+        const byProductLineIds = this.order.move_byproduct_line_ids;
+        const finalProductLineIds = moveLineIds
+            .filter((id) => !byProductLineIds.includes(id))
+            .sort((id1, id2) => id1 - id2);
+        const packageLabels = [];
+        let hasPackage = false;
+        for (const id of finalProductLineIds) {
+            const moveLine = this.env.model.cache.getRecord("stock.move.line", id, false);
+            const packageId = moveLine?.result_package_id;
+            if (!packageId) {
+                packageLabels.push(_t("No Package"));
+                continue;
+            }
+            const resultPackage = this.env.model.cache.getRecord("stock.package", packageId, false);
+            if (resultPackage) {
+                packageLabels.push(resultPackage.dest_complete_name);
+                hasPackage = true;
+            }
+        }
+        if (!hasPackage) {
+            return [];
+        }
+        return packageLabels;
     }
 }

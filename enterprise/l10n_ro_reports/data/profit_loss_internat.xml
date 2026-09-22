@@ -4,6 +4,7 @@
         <field name="name">Code 20 - Situation of incomes and expenses (international)</field>
         <field name="name@ro">Cod 20 - Situația veniturilor și cheltuielilor (international)</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
         <field name="country_id" ref="base.ro"/>
@@ -28,36 +29,28 @@
                         <field name="name">Production sales | 02</field>
                         <field name="name@ro">Producția vândută | 02</field>
                         <field name="code">RO_PNL_internat_01_02</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-701 - 68151 - 705 - 708 - 704 - 702 - 703 - 706</field>
                     </record>
                     <record id="account_financial_report_ro_pnl_internat_01_03" model="account.report.line">
                         <field name="name">Income from sale of goods | 03</field>
                         <field name="name@ro">Venituri din vânzarea mărfurilor | 03</field>
                         <field name="code">RO_PNL_internat_01_03</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-707 - 68152</field>
                     </record>
                     <record id="account_financial_report_ro_pnl_internat_01_04" model="account.report.line">
                         <field name="name">Commercial discounts granted | 04</field>
                         <field name="name@ro">Reduceri comerciale acordate | 04</field>
                         <field name="code">RO_PNL_internat_01_04</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">709</field>
                     </record>
                     <record id="account_financial_report_ro_pnl_internat_01_05" model="account.report.line">
                         <field name="name">Income from operating subsidies related to net turnover | 05</field>
                         <field name="name@ro">Venituri din subvenții de exploatare aferente cifrei de afaceri nete | 05</field>
                         <field name="code">RO_PNL_internat_01_05</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-7411</field>
                     </record>
                 </field>
@@ -122,18 +115,14 @@
                         <field name="name">Income from the production of intangible and tangible non-current assets | 09</field>
                         <field name="name@ro">Venituri din producția de imobilizări necorporale și corporale | 09</field>
                         <field name="code">RO_PNL_internat_03_09</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-722 - 721</field>
                     </record>
                     <record id="account_financial_report_ro_pnl_internat_03_10" model="account.report.line">
                         <field name="name">Income from the production of real estate investments | 10</field>
                         <field name="name@ro">Venituri din producția de investiții imobiliare | 10</field>
                         <field name="code">RO_PNL_internat_03_10</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-725</field>
                     </record>
                 </field>
@@ -144,40 +133,30 @@
                 </field>
                 <field name="name@ro">4. Venituri din activele imobilizate (sau grupurile destinate cedării) deținute în vederea vânzării | 11</field>
                 <field name="code">RO_PNL_internat_04_11</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-753</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_05_12" model="account.report.line">
                 <field name="name">5. Revenues from revaluation of non-current assets | 12</field>
                 <field name="name@ro">5. Venituri din reevaluarea imobilizărilor corporale | 12</field>
                 <field name="code">RO_PNL_internat_05_12</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-755</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_06_13" model="account.report.line">
                 <field name="name">6. Real estate investment income | 13</field>
                 <field name="name@ro">6. Venituri din investiții imobiliare | 13</field>
                 <field name="code">RO_PNL_internat_06_13</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-756</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_07_14" model="account.report.line">
                 <field name="name">7. Income from biological assets and agricultural products | 14</field>
                 <field name="name@ro">7. Venituri din active biologice și produse agricole | 14</field>
                 <field name="code">RO_PNL_internat_07_14</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-757</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_08_15" model="account.report.line">
                 <field name="name">8. Income from operating grants | 15</field>
                 <field name="name@ro">8. Venituri din subvenții de exploatare | 15</field>
                 <field name="code">RO_PNL_internat_08_15</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-741\(7410,7411,7418)</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_09_16" model="account.report.line">
@@ -190,18 +169,14 @@
                         <field name="name">- income from investment grants | 17</field>
                         <field name="name@ro">- venituri din subvenții pentru investiții | 17</field>
                         <field name="code">RO_PNL_internat_09_17</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-7584</field>
                     </record>
                     <record id="account_financial_report_ro_pnl_internat_09_18" model="account.report.line">
                         <field name="name">- earnings from purchases on advantageous terms | 18</field>
                         <field name="name@ro">- câștiguri din cumpărări în condiții avantajoase | 18</field>
                         <field name="code">RO_PNL_internat_09_18</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-7587</field>
                     </record>
                 </field>
@@ -217,7 +192,7 @@
                 <field name="name">10. a) Expenditures on raw materials and consumables | 20</field>
                 <field name="name@ro">10. a) Cheltuieli cu materiile prime și materialele consumabile | 20</field>
                 <field name="code">RO_PNL_internat_10_20</field>
-                <field name="foldable" eval="True"/>
+                <field name="foldability">foldable</field>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="expression_ids">
                     <record id="account_financial_report_ro_pnl_internat_10_20_balance" model="account.report.expression">
@@ -232,9 +207,7 @@
                         <field name="name">Other material expenses | 21</field>
                         <field name="name@ro">Alte cheltuieli materiale | 21</field>
                         <field name="code">RO_PNL_internat_10_21</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_10_21_balance" model="account.report.expression">
@@ -251,9 +224,7 @@
                 <field name="name">b) Other external expenses (with energy and water) | 22</field>
                 <field name="name@ro">b) Alte cheltuieli externe (cu energie și apă) | 22</field>
                 <field name="code">RO_PNL_internat_10_22</field>
-                <field name="groupby">account_id</field>
                 <field name="hierarchy_level" eval="1"/>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="expression_ids">
                     <record id="account_financial_report_ro_pnl_internat_10_22_balance" model="account.report.expression">
@@ -268,9 +239,7 @@
                 <field name="name">c) Expenditure on goods | 23</field>
                 <field name="name@ro">c) Cheltuieli privind mărfurile | 23</field>
                 <field name="code">RO_PNL_internat_10_23</field>
-                <field name="groupby">account_id</field>
                 <field name="hierarchy_level" eval="1"/>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="expression_ids">
                     <record id="account_financial_report_ro_pnl_internat_10_23_balance" model="account.report.expression">
@@ -285,9 +254,7 @@
                 <field name="name">Trade discounts received | 24</field>
                 <field name="name@ro">Reduceri comerciale primite | 24</field>
                 <field name="code">RO_PNL_internat_10_24</field>
-                <field name="groupby">account_id</field>
                 <field name="hierarchy_level" eval="1"/>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-609</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_11_25" model="account.report.line">
@@ -308,9 +275,7 @@
                         <field name="name">a) Salaries and allowances | 26</field>
                         <field name="name@ro">a) Salarii și indemnizații | 26</field>
                         <field name="code">RO_PNL_internat_11_26</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_11_26_balance" model="account.report.expression">
@@ -325,9 +290,7 @@
                         <field name="name">b) Expenses regarding insurance and social protection | 27</field>
                         <field name="name@ro">b) Cheltuieli privind asigurările și protecția socială | 27</field>
                         <field name="code">RO_PNL_internat_11_27</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="1"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_11_27_balance" model="account.report.expression">
@@ -350,9 +313,7 @@
                         <field name="name">a. 1) Depreciation and amortization expenses | 29</field>
                         <field name="name@ro">a. 1) Cheltuieli cu amortizările și ajustările pentru depreciere | 29</field>
                         <field name="code">RO_PNL_internat_12_29</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_12_29_balance" model="account.report.expression">
@@ -367,9 +328,7 @@
                         <field name="name">. 2) Depreciation expenses related to the rights to use the leased assets | 30</field>
                         <field name="name@ro">a.2) Cheltuieli cu amortizarea activelor aferente drepturilor de utilizare a activelor luate în leasing | 30</field>
                         <field name="code">RO_PNL_internat_12_30</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_12_30_balance" model="account.report.expression">
@@ -384,9 +343,7 @@
                         <field name="name">a. 3) Incomes | 31</field>
                         <field name="name@ro">a. 3) Venituri | 31</field>
                         <field name="code">RO_PNL_internat_12_31</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-7816 - 7818 - 7813</field>
                     </record>
                     <record id="account_financial_report_ro_pnl_internat_12_32" model="account.report.line">
@@ -400,9 +357,7 @@
                                 <field name="name">b. 1) Expenses | 33</field>
                                 <field name="name@ro">b. 1) Cheltuieli | 33</field>
                                 <field name="code">RO_PNL_internat_12_33</field>
-                                <field name="groupby">account_id</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_ro_pnl_internat_12_33_balance" model="account.report.expression">
@@ -417,9 +372,7 @@
                                 <field name="name">b. 2) Incomes | 34</field>
                                 <field name="name@ro">b. 2) Venituri | 34</field>
                                 <field name="code">RO_PNL_internat_12_34</field>
-                                <field name="groupby">account_id</field>
                                 <field name="hierarchy_level" eval="3"/>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-7814 - 754 - 7818</field>
                             </record>
                         </field>
@@ -446,9 +399,7 @@
                         <field name="name">13.1 Expenditure on external benefits | 36</field>
                         <field name="name@ro">13.1 Cheltuieli privind prestațiile externe | 36</field>
                         <field name="code">RO_PNL_internat_13_36</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_36_balance" model="account.report.expression">
@@ -466,9 +417,7 @@
                         </field>
                         <field name="name@ro">13.2. Cheltuieli cu alte impozite, taxe și vărsăminte asimilate; cheltuieli reprezentând transferuri și contribuții datorate în baza unor acte normative speciale | 37</field>
                         <field name="code">RO_PNL_internat_13_37</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_37_balance" model="account.report.expression">
@@ -483,9 +432,7 @@
                         <field name="name">13.3 Expenditure on environmental protection | 38</field>
                         <field name="name@ro">13.3. Cheltuieli cu protecția mediului înconjurător | 38</field>
                         <field name="code">RO_PNL_internat_13_38</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_38_balance" model="account.report.expression">
@@ -502,9 +449,7 @@
                         </field>
                         <field name="name@ro">13.4 Cheltuieli legate de activele imobilizate (sau grupurile destinate cedării) deținute în vederea vânzării | 39</field>
                         <field name="code">RO_PNL_internat_13_39</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_39_balance" model="account.report.expression">
@@ -519,9 +464,7 @@
                         <field name="name">13.5 Expenditures from revaluation of non-current assets | 40</field>
                         <field name="name@ro">13.5. Cheltuieli din reevaluarea imobilizărilor | 40</field>
                         <field name="code">RO_PNL_internat_13_40</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_40_balance" model="account.report.expression">
@@ -536,9 +479,7 @@
                         <field name="name">13.6 Real estate investment expenses | 41</field>
                         <field name="name@ro">13.6. Cheltuieli privind investițiile imobiliare | 41</field>
                         <field name="code">RO_PNL_internat_13_41</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_41_balance" model="account.report.expression">
@@ -553,9 +494,7 @@
                         <field name="name">13.7 Expenditures on biological assets | 42</field>
                         <field name="name@ro">13.7. Cheltuieli privind activele biologice| 42</field>
                         <field name="code">RO_PNL_internat_13_42</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_42_balance" model="account.report.expression">
@@ -570,9 +509,7 @@
                         <field name="name">13.8 Disaster and other similar expenses | 43</field>
                         <field name="name@ro">13.8. Cheltuieli privind calamitățile și alte evenimente similare | 43</field>
                         <field name="code">RO_PNL_internat_13_43</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_43_balance" model="account.report.expression">
@@ -587,9 +524,7 @@
                         <field name="name">13.9 Other expenses | 44</field>
                         <field name="name@ro">13.9. Alte cheltuieli | 44</field>
                         <field name="code">RO_PNL_internat_13_44</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_44_balance" model="account.report.expression">
@@ -611,9 +546,7 @@
                         <field name="name">- Costs | 46</field>
                         <field name="name@ro">- Cheltuieli | 46</field>
                         <field name="code">RO_PNL_internat_13_46</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_13_46_balance" model="account.report.expression">
@@ -628,9 +561,7 @@
                         <field name="name">- Incomes | 47</field>
                         <field name="name@ro">- Venituri | 47</field>
                         <field name="code">RO_PNL_internat_13_47</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-7812</field>
                     </record>
                 </field>
@@ -686,64 +617,50 @@
                 <field name="name">14. Income from shares held in subsidiaries | 51</field>
                 <field name="name@ro">14. Venituri din acțiuni deținute la filiale| 51</field>
                 <field name="code">RO_PNL_internat_14_51</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-7611</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_15_52" model="account.report.line">
                 <field name="name">15. Income from shares held in associated entities | 52</field>
                 <field name="name@ro">15. Venituri din acțiuni deținute la entități asociate | 52</field>
                 <field name="code">RO_PNL_internat_15_52</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-7612</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_16_53" model="account.report.line">
                 <field name="name">16. Income from shares held by associates and jointly controlled entities | 53</field>
                 <field name="name@ro">16. Venituri din acțiuni deținute la entități asociate și entități controlate în comun | 53</field>
                 <field name="code">RO_PNL_internat_16_53</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-7613</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_17_54" model="account.report.line">
                 <field name="name">17. Income from securities operations and other financial instruments | 54</field>
                 <field name="name@ro">17. Venituri din operațiuni cu titluri și alte instrumente financiare | 54</field>
                 <field name="code">RO_PNL_internat_17_54</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-762</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_18_55" model="account.report.line">
                 <field name="name">18. Revenue from derivative transactions | 55</field>
                 <field name="name@ro">18. Venituri din operațiuni cu instrumente derivate | 55</field>
                 <field name="code">RO_PNL_internat_18_55</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-763</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_19_56" model="account.report.line">
                 <field name="name">19. Income from exchange rate differences | 56</field>
                 <field name="name@ro">19. Venituri din diferențe de curs valutar | 56</field>
                 <field name="code">RO_PNL_internat_19_56</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-765</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_20_57" model="account.report.line">
                 <field name="name">20. Interest income | 57</field>
                 <field name="name@ro">20. Venituri din dobânzi | 57</field>
                 <field name="code">RO_PNL_internat_20_57</field>
-                <field name="foldable" eval="True"/>
+                <field name="foldability">foldable</field>
                 <field name="account_codes_formula">-766</field>
                 <field name="children_ids">
                     <record id="account_financial_report_ro_pnl_internat_20_58" model="account.report.line">
                         <field name="name">- of which, the income obtained from the entities in the group | 58</field>
                         <field name="name@ro">- din care, veniturile obținute de la entitățile din grup | 58</field>
                         <field name="code">RO_PNL_internat_20_58</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-766</field>
                     </record>
                 </field>
@@ -752,32 +669,24 @@
                 <field name="name">21. Income from operating subsidies for the debt due | 59</field>
                 <field name="name@ro">21. Venituri din subvenții de exploatare pentru dobânda datorată | 59</field>
                 <field name="code">RO_PNL_internat_21_59</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-7418</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_22_60" model="account.report.line">
                 <field name="name">22. Income from short-term financial investments | 60</field>
                 <field name="name@ro">22. Venituri din investiții financiare pe termen scurt | 60</field>
                 <field name="code">RO_PNL_internat_22_60</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-7617</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_23_61" model="account.report.line">
                 <field name="name">23. Income from deferred collection over normal credit terms | 61</field>
                 <field name="name@ro">23. Venituri din amânarea încasării peste termenele normale de creditare | 61</field>
                 <field name="code">RO_PNL_internat_23_61</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-7681</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_24_62" model="account.report.line">
                 <field name="name">24. Other incomes | 62</field>
                 <field name="name@ro">24. Alte venituri financiare | 62</field>
                 <field name="code">RO_PNL_internat_24_62</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-7680 - 7688 - 7615 - 767 - 764</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_00_63" model="account.report.line">
@@ -799,9 +708,7 @@
                         <field name="name">- Costs | 65</field>
                         <field name="name@ro">- Cheltuieli | 65</field>
                         <field name="code">RO_PNL_internat_25_65</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula" eval="False"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_ro_pnl_internat_25_65_balance" model="account.report.expression">
@@ -816,9 +723,7 @@
                         <field name="name">- Incomes | 66</field>
                         <field name="name@ro">- Venituri | 66</field>
                         <field name="code">RO_PNL_internat_25_66</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">-786</field>
                     </record>
                 </field>
@@ -829,32 +734,26 @@
                 </field>
                 <field name="name@ro">26. Cheltuieli privind operațiunile cu titluri și alte instrumente financiare | 67</field>
                 <field name="code">RO_PNL_internat_26_67</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">661</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_27_68" model="account.report.line">
                 <field name="name">27. Costs of derivative transactions | 68</field>
                 <field name="name@ro">27. Cheltuieli privind operațiunile cu instrumente derivate | 68</field>
                 <field name="code">RO_PNL_internat_27_68</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">662</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_28_69" model="account.report.line">
                 <field name="name">28. Interest charges | 69</field>
                 <field name="name@ro">28. Cheltuieli privind dobânzile | 69</field>
                 <field name="code">RO_PNL_internat_28_69</field>
-                <field name="foldable" eval="True"/>
+                <field name="foldability">foldable</field>
                 <field name="account_codes_formula">666</field>
                 <field name="children_ids">
                     <record id="account_financial_report_ro_pnl_internat_28_70" model="account.report.line">
                         <field name="name">- of which, charges in relation group companies | 70</field>
                         <field name="name@ro">- din care, cheltuielile în relația cu entitățile din grup | 70</field>
                         <field name="code">RO_PNL_internat_28_70</field>
-                        <field name="groupby">account_id</field>
                         <field name="hierarchy_level" eval="3"/>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">666</field>
                     </record>
                 </field>
@@ -863,24 +762,18 @@
                 <field name="name">29. Payments with deferred payment over normal credit terms | 71</field>
                 <field name="name@ro">29. Cheltuieli cu amânarea plății peste termenele normale de creditare | 71</field>
                 <field name="code">RO_PNL_internat_29_71</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">6681</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_30_72" model="account.report.line">
                 <field name="name">30. Interest costs on leasing contracts | 72</field>
                 <field name="name@ro">30. Cheltuieli privind dobânzile aferente contractelor de leasing | 72</field>
                 <field name="code">RO_PNL_internat_30_72</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">6685</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_31_73" model="account.report.line">
                 <field name="name">31. Other financial expenses | 73</field>
                 <field name="name@ro">31. Alte cheltuieli financiare | 73</field>
                 <field name="code">RO_PNL_internat_31_73</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">665 + 664 + 667 + 6688 + 663 + 660 + 668</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_00_74" model="account.report.line">
@@ -989,8 +882,6 @@
                 <field name="name">32. Current profit tax | 81</field>
                 <field name="name@ro">32. Impozitul pe profit curent | 81</field>
                 <field name="code">RO_PNL_internat_32_81</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="expression_ids">
                     <record id="account_financial_report_ro_pnl_internat_32_81_balance" model="account.report.expression">
@@ -1005,32 +896,24 @@
                 <field name="name">33. Deferred income tax | 82</field>
                 <field name="name@ro">33. Impozitul pe profit amânat | 82</field>
                 <field name="code">RO_PNL_internat_33_82</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">692</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_34_83" model="account.report.line">
                 <field name="name">34. Deferred income tax revenue | 83</field>
                 <field name="name@ro">34. Venituri din impozitul pe profit amânat | 83</field>
                 <field name="code">RO_PNL_internat_34_83</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-792</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_35_84" model="account.report.line">
                 <field name="name">35. Income tax expenses, caused by uncertainties related to tax treatment | 84</field>
                 <field name="name@ro">35. Cheltuieli cu impozitul pe profit, determinate de incertitudinile legate de tratamente fiscale | 84</field>
                 <field name="code">RO_PNL_internat_35_84</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">693</field>
             </record>
             <record id="account_financial_report_ro_pnl_internat_36_85" model="account.report.line">
                 <field name="name">36. Activity-specific taxes | 85</field>
                 <field name="name@ro">36. Impozitul specific unor activităț i | 85</field>
                 <field name="code">RO_PNL_internat_36_85</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="expression_ids">
                     <record id="account_financial_report_ro_pnl_internat_36_85_balance" model="account.report.expression">
@@ -1045,8 +928,6 @@
                 <field name="name">37. Other taxes not shown in the above items | 86</field>
                 <field name="name@ro">37. Alte impozite neprezentate la elementele de mai sus | 86</field>
                 <field name="code">RO_PNL_internat_37_86</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula" eval="False"/>
                 <field name="expression_ids">
                     <record id="account_financial_report_ro_pnl_internat_37_86_balance" model="account.report.expression">

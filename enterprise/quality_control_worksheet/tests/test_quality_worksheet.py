@@ -13,6 +13,9 @@ class TestQualityWorksheet(HttpCase, TestQualityCommon):
         cls.worksheet_template = cls.env['worksheet.template'].create({
             'name': 'Quality worksheet',
             'res_model': 'quality.check',
+            'worksheet_properties_definition': [{
+                'name': 'cfed639df1c4106e', 'type': 'boolean', 'string': 'Valid worksheet', 'default': False
+            }]
         })
         cls.receipt_type = cls.env.ref('stock.picking_type_in')
         cls.stock_location = cls.env.ref('stock.stock_location_stock')
@@ -29,7 +32,7 @@ class TestQualityWorksheet(HttpCase, TestQualityCommon):
             'test_type_id': self.env.ref('quality_control_worksheet.test_type_worksheet').id,
             'worksheet_template_id': self.worksheet_template.id,
             'picking_type_ids': [Command.link(self.receipt_type.id)],
-            'worksheet_success_conditions': "[('x_passed', '=', True)]",
+            'worksheet_success_conditions': "[('worksheet_properties.cfed639df1c4106e', '!=', False)]",
             'failure_location_ids': [Command.link(self.failure_location.id)]
         })
 

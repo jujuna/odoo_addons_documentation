@@ -30,10 +30,10 @@ class CarbonReportHandler(models.AbstractModel):
             }
         }
 
-    def _report_custom_engine_carbon_report(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_carbon_report(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         report = self.env['account.report'].browse(options['report_id'])
-        report._check_groupby_fields((next_groupby.split(',') if next_groupby else []) + ([current_groupby] if current_groupby else []))
-
+        if current_groupby:
+            report._check_groupby_fields([current_groupby])
         query = report._get_report_query(options, date_scope)
 
         groupby_sql = ''
@@ -121,7 +121,6 @@ class CarbonReportHandler(models.AbstractModel):
                 %(search_condition)s
                 %(group_by_groupby_sql)s
                 %(order_by_sql)s
-                %(query_tail)s
             """,
             filtered_gas_select=SQL("%s, ", filtered_gas_select) if filtered_gas_select else SQL(),
             select_groupby_sql=SQL(', %s AS grouping_key', groupby_sql) if groupby_sql else SQL(),
@@ -132,7 +131,6 @@ class CarbonReportHandler(models.AbstractModel):
             search_condition=query.where_clause,
             group_by_groupby_sql=SQL('GROUP BY %s', groupby_sql) if groupby_sql else SQL(),
             order_by_sql=SQL(' ORDER BY %s', groupby_sql) if groupby_sql else SQL(),
-            query_tail=report._get_engine_query_tail(offset, limit),
         )
 
         self.env.cr.execute(report_sql)
@@ -140,7 +138,9 @@ class CarbonReportHandler(models.AbstractModel):
 
         gas_labels = [gas_opt['code'] for gas_opt in options['carbon_report_selected_gas']] + ['co2e']
         if not current_groupby:
-            return {gas_label: query_res_lines[0][gas_label] for gas_label in gas_labels}
+            return {
+                next(iter(formulas_dict.values())): {'has_sublines': True, **{gas_label: query_res_lines[0][gas_label] for gas_label in gas_labels}},
+            }
         elif current_groupby == 'carbon_report_source_hierarchy':
             source_parents = {
                 source.id: source.parent_id.id or None
@@ -164,36 +164,34 @@ class CarbonReportHandler(models.AbstractModel):
                     if source_id != query_res['grouping_key']:
                         sources_with_sublines.add(source_id)
 
-            return [
+            return {next(iter(formulas_dict.values())): [
                 (source_id, {**source_totals, 'has_sublines': source_id in sources_with_sublines})
                 for source_id, source_totals in totals_including_child_sources.items()
-            ]
+            ]}
         else:
-            return [
+            return {next(iter(formulas_dict.values())): [
                 (query_res['grouping_key'], {**{gas_label: query_res[gas_label] for gas_label in gas_labels}, 'has_sublines': True})
                 for query_res in query_res_lines
-            ]
+            ]}
 
-    def _custom_groupby_line_completer(self, report, options, line_dict, current_groupby):
+    def _custom_groupby_line_completer(self, report, options, line_data, current_groupby):
         if current_groupby == 'carbon_report_source_hierarchy':
-            if line_dict.get('unfoldable'):
-                esg_source_id = report._get_model_info_from_id(line_dict['id'])[1]
+            if line_data.unfoldable:
+                esg_source_id = report._get_model_info_from_id(line_data.id)[1]
                 esg_source = self.env['esg.emission.source'].browse(esg_source_id)
 
                 if esg_source.child_ids:
-                    line_dict.update({
-                        'groupby': f"carbon_report_source_hierarchy,{line_dict['groupby']}",
-                        'expand_function': '_report_expand_unfoldable_line_with_groupby_emission_source',
-                    })
-            elif line_dict.get('groupby'):
+                    line_data.groupby = f"carbon_report_source_hierarchy,{line_data.groupby}"
+                    line_data.expand_function = '_report_expand_unfoldable_line_with_groupby_emission_source'
+            elif line_data.groupby:
                 # This will happen when has_sublines gives a falsy value in the custom engine.
                 # In this case, if there is still a level of grouping, we stop the hierarchy cycling.
                 # We then need to make the line unfoldable again, to allow proceeding to this next groupby level.
-                line_dict['unfoldable'] = True
+                line_data.unfoldable = True
 
         if current_groupby in ('carbon_report_source_scope', 'carbon_report_source_hierarchy', 'esg_emission_factor_id'):
-            for col_dict in filter(lambda x: x['expression_label'] == 'co2e', line_dict['columns']):
-                col_dict['auditable'] = True
+            for col_dict in filter(lambda x: x.expression_label == 'co2e', line_data.columns):
+                col_dict.auditable = True
 
     def _get_custom_groupby_map(self):
         def carbon_report_source_hierarchy_label_builder(grouping_keys):
@@ -222,7 +220,7 @@ class CarbonReportHandler(models.AbstractModel):
             },
         }
 
-    def _report_expand_unfoldable_line_with_groupby_emission_source(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_with_groupby_emission_source(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         # esg.emission_source model defines a recursive hierarchy of records. This custom groupby behaves differently
         # than the traditional groupby used by reports, in that it will not always correspond to a single level of lines.
         # To handle that, we use this custom expand function, which uses a specific context key to limit the next unfolding, and restores
@@ -237,9 +235,8 @@ class CarbonReportHandler(models.AbstractModel):
             line_dict_id,
             groupby,
             options,
-            progress,
-            offset,
             unfold_all_batch_data=unfold_all_batch_data,
+            limit_to_load=limit_to_load,
         )
 
     def action_audit_cell(self, options, params):

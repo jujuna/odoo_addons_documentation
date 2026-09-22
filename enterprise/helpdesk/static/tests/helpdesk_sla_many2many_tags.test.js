@@ -10,7 +10,7 @@ defineHelpdeskModels();
 const formViewArch = `
     <form>
         <field name="name" />
-        <field name="sla_status_ids"  widget="helpdesk_sla_many2many_tags" options="{ 'color_field': 'color' }"/>
+        <field name="sla_status_ids"  widget="helpdesk_sla_many2many_tags" options="{ 'color_field': 'color', 'on_tag_click': 'edit_color' }"/>
     </form>
 `;
 
@@ -21,8 +21,10 @@ test("sla tags icon is rendered according to status and o_field_many2many_tags_a
         resId: 1,
         arch: formViewArch,
     });
-    expect(".o_field_tags .badge:first-of-type > i:first-child.fa-times-circle").toHaveCount(1);
-    expect(".o_field_tags .badge:nth-of-type(2) > i:first-child.fa-check-circle").toHaveCount(1);
+    expect(".o_field_tags .badge:first-of-type > i:first-child[data-icon='cancel']").toHaveCount(1);
+    expect(
+        ".o_field_tags .badge:nth-of-type(2) > i:first-child[data-icon='check_circle']"
+    ).toHaveCount(1);
     expect(".o_field_tags .badge:nth-of-type(3) > i:first-child").toHaveCount(1);
 });
 

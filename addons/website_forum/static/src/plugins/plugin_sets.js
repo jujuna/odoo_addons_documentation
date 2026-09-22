@@ -1,12 +1,10 @@
 import { MAIN_PLUGINS } from "@html_editor/plugin_sets";
-import { ForumFontPlugin } from "./font_plugin";
-import { ForumHistoryPlugin } from "./history_plugin";
+import { ForumFontTypePlugin } from "./font_type_plugin";
 
-const removedPlugins = new Set(["colorUi", "iconColor"]);
+const removedPlugins = new Set(["colorUi", "file", "iconColor", "tableBorder", "powerButtons", "fontFamily", "fontSize"]);
 
 const customPlugins = {
-    font: ForumFontPlugin,
-    history: ForumHistoryPlugin,
+    fontType: ForumFontTypePlugin,
 };
 
 export const FULL_EDIT_PLUGINS = MAIN_PLUGINS.filter((P) => !removedPlugins.has(P.id)).map(

@@ -8,9 +8,8 @@ class StockPutInPack(models.TransientModel):
 
     available_scale_ids = fields.Many2many('iot.device', compute='_compute_available_scale_ids')
     iot_device_id = fields.Many2one('iot.device', "Scale", compute='_compute_iot_device_id', store=True, readonly=False)
-    iot_device_identifier = fields.Char(related='iot_device_id.identifier')
-    iot_ip = fields.Char(related='iot_device_id.iot_ip')
-    manual_measurement = fields.Boolean(related='iot_device_id.manual_measurement')
+    device_identifier = fields.Char(related='iot_device_id.identifier')
+    iot_id = fields.Many2one(related='iot_device_id.iot_id')
 
     @api.depends('move_line_ids', 'package_ids')
     def _compute_available_scale_ids(self):

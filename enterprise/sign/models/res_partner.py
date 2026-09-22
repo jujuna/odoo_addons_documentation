@@ -9,24 +9,26 @@ class ResPartner(models.Model):
     signature_count = fields.Integer(compute='_compute_signature_count', string="# Signatures")
 
     def _compute_signature_count(self):
-        signature_data = self.env['sign.request.item'].sudo()._read_group([('partner_id', 'in', self.ids), ('state', 'in', ['sent', 'completed'])], ['partner_id'], ['__count'])
-        signature_data_mapped = {partner.id: count for partner, count in signature_data}
-        for partner in self:
-            partner.signature_count = signature_data_mapped.get(partner.id, 0)
+        self.signature_count = 0
+        signature_data = self.env['sign.request.item'].sudo()._read_group([('partner_id', 'child_of', self.ids), ('state', 'in', ['sent', 'completed'])], ['partner_id'], ['__count'])
+        self_ids = set(self.ids)
+        for partner, count in signature_data:
+            while partner:
+                if partner.id in self_ids:
+                    partner.signature_count += count
+                partner = partner.with_context(prefetch_fields=False).parent_id
 
     def open_signatures(self):
         self.ensure_one()
-        request_ids = self.env['sign.request.item'].search([('partner_id', '=', self.id)]).mapped('sign_request_id')
+        request_ids = self.env['sign.request.item'].search([('partner_id', 'child_of', self.ids)]).mapped('sign_request_id')
         return {
             'type': 'ir.actions.act_window',
             'name': _('Signature(s)'),
-            'view_mode': 'kanban,list,form',
+            'view_mode': 'list,kanban,form',
             'res_model': 'sign.request',
             'domain': [('id', 'in', request_ids.ids)],
             'context': {
                 'search_default_reference': self.name,
-                'search_default_signed': 1,
-                'search_default_in_progress': 1,
             },
         }
 

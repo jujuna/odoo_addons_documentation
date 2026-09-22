@@ -7,7 +7,10 @@ from odoo.tests import tagged
 @tagged('post_install', 'post_install_l10n', '-at_install', *TestArEdiCommon.extra_tags)
 class TestArEdiWsfex(TestArEdiCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
+    @TestArEdiCommon.setup_afip_ws('wsfex')
     def setUpClass(cls):
         super().setUpClass()
         cls.subfolder = "wsfex"
@@ -85,3 +88,28 @@ class TestArEdiWsfex(TestArEdiCommon):
     def test_ar_edi_wsfex_payment_foreign_currency(self):
         """ Payment in Foreign Currency  """
         self._test_payment_foreign_currency()
+
+    def test_ar_edi_wsfex_pro_qty_decimal_precision(self):
+        """ Pro_qty must report the quantity with the decimal precision configured in the
+        database ('Product Unit'), capped at the 6 decimals WSFEX accepts, instead of always
+        truncating to 2.
+
+        A quantity of 0.042 reported as 0.04 makes ARCA reject the invoice with error 1815
+        (the item total no longer matches unit price x quantity - discount).
+        """
+        uom_precision = self.env.ref('uom.decimal_product_uom')
+        for digits, quantity, expected in (
+                (3, 0.042, '0.042'),
+                (2, 0.042, '0.04'),
+                (8, 0.1234567, '0.123457'),  # capped at 6 decimals
+        ):
+            with self.subTest(digits=digits), self.cr.savepoint() as sp:
+                uom_precision.digits = digits
+                invoice = self._create_invoice_ar(invoice_line_ids=[self._prepare_invoice_line(
+                    product_id=self.product_iva_21, price_unit=100.0, quantity=quantity,
+                )])
+                base_lines, _tax_lines = invoice._get_rounded_base_and_tax_lines()
+                details = invoice._get_line_details(base_lines=base_lines)
+                self.assertEqual(len(details), 1)
+                self.assertEqual(details[0]['Pro_qty'], expected)
+                sp.close()  # Rollback to ensure all subtests start in the same situation

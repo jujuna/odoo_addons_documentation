@@ -1,4 +1,4 @@
-import { Component, onWillStart } from "@odoo/owl";
+import { Component, onWillStart, t, useProps } from "@odoo/owl";
 import { parseHTML } from "@html_editor/utils/html";
 import { ArticleTemplatePickerDialog } from "@knowledge/components/article_template_picker_dialog/article_template_picker_dialog";
 import { ItemCalendarPropsDialog } from "@knowledge/components/item_calendar_props_dialog/item_calendar_props_dialog";
@@ -11,11 +11,12 @@ import { HtmlUpgradeManager } from "@html_editor/html_migrations/html_upgrade_ma
 
 export class WysiwygArticleHelper extends Component {
     static template = "knowledge.WysiwygArticleHelper";
-    static props = {
-        editor: { type: Object },
-        isVisible: { type: Boolean },
-        record: { type: Object },
-    };
+
+    props = useProps({
+        editor: t.object(),
+        isVisible: t.boolean(),
+        record: t.object(),
+    });
 
     setup() {
         this.actionService = useService("action");
@@ -33,7 +34,7 @@ export class WysiwygArticleHelper extends Component {
         newBody = this.props.editor.shared.sanitize.sanitize(newBody);
         this.props.editor.editable.replaceChildren(newBody);
         this.props.editor.shared.selection.setCursorEnd(this.props.editor.editable);
-        this.props.editor.shared.history.addStep();
+        this.props.editor.shared.history.commit();
     }
 
     async onLoadTemplateBtnClick() {
@@ -135,7 +136,7 @@ export class WysiwygArticleHelper extends Component {
                 });
                 this.props.editor.editable.replaceChildren(...fragment.children);
                 this.props.editor.shared.selection.setCursorEnd(this.props.editor.editable);
-                this.props.editor.shared.history.addStep();
+                this.props.editor.shared.history.commit();
                 this.props.record.update({ name: title });
             },
         });
@@ -172,7 +173,7 @@ export class WysiwygArticleHelper extends Component {
                 });
                 this.props.editor.editable.replaceChildren(...fragment.children);
                 this.props.editor.shared.selection.setCursorEnd(this.props.editor.editable);
-                this.props.editor.shared.history.addStep();
+                this.props.editor.shared.history.commit();
                 this.props.record.update({ name: title });
             },
         });
@@ -205,7 +206,7 @@ export class WysiwygArticleHelper extends Component {
                 });
                 this.props.editor.editable.replaceChildren(...fragment.children);
                 this.props.editor.shared.selection.setCursorEnd(this.props.editor.editable);
-                this.props.editor.shared.history.addStep();
+                this.props.editor.shared.history.commit();
                 this.props.record.update({ name: title });
             },
         });

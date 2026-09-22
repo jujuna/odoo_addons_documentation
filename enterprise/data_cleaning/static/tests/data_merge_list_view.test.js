@@ -14,6 +14,7 @@ class DataMergeRecord extends models.Model {
 
     name = fields.Char();
     group_id = fields.Many2one({ relation: "data_merge.group" });
+    is_discarded = fields.Boolean();
 
     _records = [
         {
@@ -61,25 +62,31 @@ defineMailModels();
 
 test.tags("desktop");
 test("merge multiple records uses the domain selection", async () => {
-    onRpc("data_merge.group", "merge_multiple_records", ({ args }) => {
+    onRpc("data_merge.record", "action_validate_merge", ({ args }) => {
         expect.step("merge_multiple_records");
-        expect(args[0]).toEqual({
-            1: [1, 2],
-            2: [3, 4],
-        });
+        expect(args[0]).toEqual([1, 2, 3, 4]);
         return true;
     });
     await mountView({
         resModel: "data_merge.record",
         type: "list",
-        arch: '<list expand="true" js_class="data_merge_list"><field name="name"/></list>',
+        arch: `
+            <list expand="true" js_class="data_merge_list">
+                <header>
+                    <button name="action_validate_merge" type="object" string="Merge"/>
+                </header>
+                <field name="is_discarded" column_invisible="True" />
+                <field name="group_id" column_invisible="True" />
+                <field name="name"/>
+            </list>
+        `,
         groupBy: ["group_id"],
     });
 
     await contains(".o_group_header:first-child").click(); // fold the first group
     await contains("thead .o_list_record_selector").click();
     await contains(".o_selection_box .o_select_domain").click();
-    await contains(".btn-primary.o_data_merge_merge_button").click();
+    await contains('button[name="action_validate_merge"]').click();
     await contains(".modal-dialog button.btn-primary").click();
 
     expect.verifySteps(["merge_multiple_records"]);

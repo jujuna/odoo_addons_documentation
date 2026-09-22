@@ -7,32 +7,27 @@
 # Larissa Manderfeld, 2023
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025.
+# "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-10-22 14:02+0000\n"
-"Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
-"Language-Team: German <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 02:23+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: German <https://translate.odoo.com/projects/odoo-master/"
 "hr_payroll_account_iso20022/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__journal_id
 msgid "Bank Journal"
 msgstr "Bankjournal"
-
-#. module: hr_payroll_account_iso20022
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payslip_view_form
-msgid "Create Payment Report"
-msgstr "Zahlungsbericht erstellen"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_employee__display_name
@@ -48,24 +43,14 @@ msgid "Employee"
 msgstr "Mitarbeiter"
 
 #. module: hr_payroll_account_iso20022
-#: model:hr.payroll.dashboard.warning,name:hr_payroll_account_iso20022.hr_payroll_dashboard_warning_employee_invalid_bank_account
-msgid "Employees With Invalid IBAN Bank Accounts"
-msgstr "Mitarbeiter mit ungültigen IBAN-Bankkonten"
-
-#. module: hr_payroll_account_iso20022
-#: model:hr.payroll.dashboard.warning,name:hr_payroll_account_iso20022.hr_payroll_dashboard_warning_employee_no_country
-msgid "Employees Without Any Country"
-msgstr "Mitarbeiter ohne Land"
-
-#. module: hr_payroll_account_iso20022
-#: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__export_format
-msgid "Export Format"
-msgstr "Exportformat"
-
-#. module: hr_payroll_account_iso20022
 #: model:ir.model,name:hr_payroll_account_iso20022.model_hr_payroll_payment_report_wizard
 msgid "HR Payroll Payment Report Wizard"
 msgstr "Assistent für Zahlungsberichte von Personalabrechnungen"
+
+#. module: hr_payroll_account_iso20022
+#: model:ir.model.fields.selection,name:hr_payroll_account_iso20022.selection__hr_payroll_payment_report_wizard__sepa_priority__high
+msgid "High"
+msgstr "Hoch"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_employee__id
@@ -76,16 +61,43 @@ msgid "ID"
 msgstr "ID"
 
 #. module: hr_payroll_account_iso20022
-#. odoo-javascript
-#: code:addons/hr_payroll_account_iso20022/static/src/components/payrun_card/payrun_card.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payslip_run_view_kanban
+#: model:ir.model.fields,help:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__sepa_priority
+msgid ""
+"Instant payments will be directly proceeded by the bank but implies "
+"additional fees."
+msgstr ""
+"Sofortzahlungen werden direkt von der Bank abgewickelt, es fallen jedoch "
+"zusätzliche Gebühren an."
+
+#. module: hr_payroll_account_iso20022
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payrun_payslip_kanban_card_view
 msgid "Mark as Paid"
 msgstr "Als bezahlt markieren"
 
 #. module: hr_payroll_account_iso20022
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payslip_view_form
-msgid "Mark as paid"
-msgstr "Als bezahlt markieren"
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payroll_payment_report_view_form
+msgid "Method"
+msgstr "Methode"
+
+#. module: hr_payroll_account_iso20022
+#: model:hr.payroll.warning,name:hr_payroll_account_iso20022.hr_payroll_warning_employee_no_country
+msgid "Missing country on employee address"
+msgstr "Fehlendes Land in der Adresse des Mitarbeiters"
+
+#. module: hr_payroll_account_iso20022
+#. odoo-python
+#: code:addons/hr_payroll_account_iso20022/wizard/hr_payroll_payment_report_wizard.py:0
+msgid ""
+"No payment method found. Check the outgoing payment methods linked to the "
+"journal '%s'."
+msgstr ""
+"Es wurde keine Zahlungsmethode gefunden. Überprüfen Sie die mit dem Journal "
+"„%s“ verknüpften Zahlungsmethoden."
+
+#. module: hr_payroll_account_iso20022
+#: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payrun_payslip_kanban_card_view
+msgid "Pay"
+msgstr "Bezahlen"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model,name:hr_payroll_account_iso20022.model_hr_payslip_run
@@ -98,16 +110,34 @@ msgid "Pay Slip"
 msgstr "Vergütungsabrechnung"
 
 #. module: hr_payroll_account_iso20022
-#. odoo-javascript
-#: code:addons/hr_payroll_account_iso20022/static/src/components/payrun_card/payrun_card.xml:0
-#: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.hr_payslip_run_view_kanban
-msgid "Payment Report"
-msgstr "Zahlungsbericht"
+#: model:ir.module.module,summary:base.module_hr_payroll_account_iso20022
+msgid "Pay your employees with SEPA payment."
+msgstr ""
 
 #. module: hr_payroll_account_iso20022
-#: model:ir.model.fields.selection,name:hr_payroll_account_iso20022.selection__hr_payroll_payment_report_wizard__export_format__sepa
-msgid "SEPA"
-msgstr "SEPA"
+#: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__payment_method_line_id
+msgid "Payment Method Line"
+msgstr "Zahlungsmethodenzeile"
+
+#. module: hr_payroll_account_iso20022
+#: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__sepa_priority
+msgid "Priority"
+msgstr "Priorität"
+
+#. module: hr_payroll_account_iso20022
+#: model:hr.payroll.warning,button_name:hr_payroll_account_iso20022.hr_payroll_warning_employee_no_country
+msgid "Review Employees"
+msgstr "Mitarbeiter prüfen"
+
+#. module: hr_payroll_account_iso20022
+#: model:ir.model.fields.selection,name:hr_payroll_account_iso20022.selection__hr_payroll_payment_report_wizard__sepa_priority__sct
+msgid "SCT (Instant Credit Transfer)"
+msgstr "SCT (Sofortüberweisung)"
+
+#. module: hr_payroll_account_iso20022
+#: model:ir.module.module,shortdesc:base.module_hr_payroll_account_iso20022
+msgid "SEPA Payments for Payroll"
+msgstr ""
 
 #. module: hr_payroll_account_iso20022
 #. odoo-python
@@ -123,9 +153,9 @@ msgid "Some employees (%s) don't have a work contact."
 msgstr "Einige Mitarbeiter (%s) haben keinen Arbeitskontakt."
 
 #. module: hr_payroll_account_iso20022
-#: model:ir.model.fields.selection,name:hr_payroll_account_iso20022.selection__hr_payroll_payment_report_wizard__export_format__iso20022_ch
-msgid "Swiss ISO20022"
-msgstr "Schweizerisch: ISO20022"
+#: model:ir.model.fields.selection,name:hr_payroll_account_iso20022.selection__hr_payroll_payment_report_wizard__sepa_priority__std
+msgid "Standard"
+msgstr "Standard"
 
 #. module: hr_payroll_account_iso20022
 #. odoo-python
@@ -144,6 +174,15 @@ msgid "The payment date cannot be in the past."
 msgstr "Das Zahlungsdatum darf nicht in der Vergangenheit liegen."
 
 #. module: hr_payroll_account_iso20022
+#: model:ir.model.fields,help:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__payment_method_line_id
+msgid ""
+"The payment method to use for this payment report. It will determine the XML "
+"format to use."
+msgstr ""
+"Die für diesen Zahlungsbericht zu verwendende Zahlungsmethode. Sie bestimmt "
+"das zu verwendende XML-Format."
+
+#. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_payslip__iso20022_uetr
 msgid "UETR"
 msgstr "UETR"
@@ -152,81 +191,3 @@ msgstr "UETR"
 #: model:ir.model.fields,help:hr_payroll_account_iso20022.field_hr_payslip__iso20022_uetr
 msgid "Unique end-to-end transaction reference"
 msgstr "Eindeutige Zahlungsreferenz (UETR)"
-
-#~ msgid "Cancel"
-#~ msgstr "Abbrechen"
-
-#~ msgid "Confirm"
-#~ msgstr "Bestätigen"
-
-#~ msgid "Created by"
-#~ msgstr "Erstellt von"
-
-#~ msgid "Created on"
-#~ msgstr "Erstellt am"
-
-#~ msgid "Employees With Invalid Bank Accounts"
-#~ msgstr "Mitarbeiter mit ungültigen Bankkonten"
-
-#~ msgid "Export file related to this payslip"
-#~ msgstr "Datei für diese Gehaltsabrechnung exportieren"
-
-#~ msgid "Exported File"
-#~ msgstr "Exportierte Datei"
-
-#~ msgid "Exported SEPA .xml file"
-#~ msgstr "Exportierte SEPA .xml Datei"
-
-#~ msgid "Exported SEPA .xml file name"
-#~ msgstr "Exportierte SEPA .xml Datei Name"
-
-#~ msgid "File Name"
-#~ msgstr "Dateiname"
-
-#~ msgid "File name"
-#~ msgstr "Dateiname"
-
-#~ msgid "Generation Date"
-#~ msgstr "Erstellungsdatum"
-
-#~ msgid "HR Payslip Run SEPA Wizard"
-#~ msgstr "HR-Lohnzettel-Lauf SEPA-Assistent"
-
-#~ msgid "HR Payslip SEPA Wizard"
-#~ msgstr "HR Gehaltsabrechnung SEPA-Assistent"
-
-#~ msgid ""
-#~ "Invalid bank account for the following employees:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Ungültiges Bankkonto für die folgenden Mitarbeiter:\n"
-#~ "%s"
-
-#~ msgid "Last Updated by"
-#~ msgstr "Zuletzt aktualisiert durch"
-
-#~ msgid "Last Updated on"
-#~ msgstr "Zuletzt aktualisiert am"
-
-#~ msgid "Name of the export file generated for this payslip"
-#~ msgstr "Name der für diese Gehaltsabrechnung erstellten Exportdatei"
-
-#~ msgid "Payslip Batches"
-#~ msgstr "Lohnzettel Stapel"
-
-#~ msgid "SEPA File"
-#~ msgstr "SEPA-Datei"
-
-#~ msgid "Select a bank journal."
-#~ msgstr "Wählen Sie ein Bankjournal aus."
-
-#~ msgid "Some employees (%s) don't have a bank account."
-#~ msgstr "Einige Mitarbeiter (%s) haben kein Bankkonto."
-
-#~ msgid "Some employees (%s) don't have a private address."
-#~ msgstr "Einige Mitarbeiter (%s) haben keine Privatadresse."
-
-#~ msgid "Some employees (%s) don't have a valid name on the private address."
-#~ msgstr ""
-#~ "Einige Mitarbeiter (%s) haben keinen gültigen Namen für ihre "
-#~ "Privatadresse."

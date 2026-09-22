@@ -1,4 +1,4 @@
-import { Component, toRaw, useState } from "@odoo/owl";
+import { Component, toRaw, proxy, t, useProps } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
@@ -8,14 +8,15 @@ import { formatPercentage } from "@web/views/fields/formatters";
 export class HolderEditDialog extends Component {
     static template = "equity.HolderEditDialog";
     static components = { Dialog, FileUploader };
-    static props = {
-        isNew: { type: Boolean },
-        ubo: { type: Object },
-        addUbo: { type: Function },
-        close: { type: Function },
-        allCountries: { type: Object },
-        equityUboSettings: { type: Object },
-    };
+
+    props = useProps({
+        isNew: t.boolean(),
+        ubo: t.object(),
+        addUbo: t.function(),
+        close: t.function(),
+        allCountries: t.object(),
+        equityUboSettings: t.object(),
+    });
 
     setup() {
         this.notification = useService("notification");
@@ -24,7 +25,7 @@ export class HolderEditDialog extends Component {
         this.activateRole = this.props.equityUboSettings.activate_role;
         this.authRepRoles = this.props.equityUboSettings.auth_rep_roles;
 
-        this.state = useState({
+        this.state = proxy({
             ubo: this.props.ubo,
             newUbo: structuredClone(toRaw(this.props.ubo)),
         });
@@ -103,7 +104,7 @@ export class HolderEditDialog extends Component {
         if (!this.state.newUbo.start_date) {
             errors.push(_t("Control Start Date is mandatory"));
         }
-        if (!this.state.newUbo.holder_id.ubo_birth_date && !this.state.newUbo.holder_id.ubo_national_identifier) {
+        if (!this.state.newUbo.holder_id.birth_date && !this.state.newUbo.holder_id.ubo_national_identifier) {
             errors.push(_t("You must provide either the date of birth, or the ID number"));
         }
         if (this.invalidPercentages) {

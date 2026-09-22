@@ -2,7 +2,7 @@ import re
 
 from odoo import _, api, models
 from odoo.tools.float_utils import float_round
-from odoo.addons.base_iban.models.res_partner_bank import get_iban_part
+from odoo.tools.bank_account_number import get_iban_part
 
 
 def spaced_join(*args):
@@ -33,17 +33,17 @@ class AccountPayment(models.Model):
 
     def _l10n_it_riba_check(self):
         errors = []
-        partner2bank_accounts = self.env['res.partner.bank'].search([('partner_id', 'in', self.partner_id.ids)]).grouped('partner_id')
+        partner2bank_accounts = self.env['res.partner.bank'].search([('partner_id', 'in', self.commercial_partner_id.ids)]).grouped('partner_id')
         for payment in self:
-            partner_bank_account = partner2bank_accounts.get(payment.partner_id, self.env['res.partner.bank'])[:1]
+            partner_bank_account = partner2bank_accounts.get(payment.commercial_partner_id, self.env['res.partner.bank'])[:1]
             if not partner_bank_account:
-                errors.append(_("Partner '%s' has no bank account.", payment.partner_id.display_name))
-            elif (not partner_bank_account.acc_number or partner_bank_account.acc_type != 'iban'):
-                errors.append(_("The bank account associated with the partner '%s' has no IBAN.", payment.partner_id.name))
-            elif partner_bank_account.acc_number[:2] != 'IT':
-                errors.append(_("Only bank accounts with an Italian IBAN are allowed to use Ri.Ba. payments"))
-            if not fiscal_code(payment.partner_id):
-                errors.append(_("Partner '%s' must have a Codice Fiscale", payment.partner_id.name))
+                errors.append(_("Partner '%s' has no bank account.", payment.commercial_partner_id.display_name))
+            elif (not partner_bank_account.account_number or partner_bank_account.account_type != 'iban'):
+                errors.append(_("The bank account associated with the partner '%s' has no IBAN.", payment.commercial_partner_id.name))
+            elif partner_bank_account.account_number[:2] not in ['IT', 'SM']:
+                errors.append(_("Only bank accounts with an Italian or San Marino IBAN are allowed to use Ri.Ba. payments"))
+            if not fiscal_code(payment.commercial_partner_id):
+                errors.append(_("Partner '%s' must have a Codice Fiscale", payment.commercial_partner_id.name))
             if payment.currency_id.name != 'EUR':
                 errors.append(_("Only EUR can be used as currency in Ri.Ba. payments, not %s", payment.currency_id.name))
         return errors
@@ -56,13 +56,13 @@ class AccountPayment(models.Model):
     def _get_method_codes_needing_bank_account(self):
         return (super()._get_method_codes_needing_bank_account() or []) + ['riba']
 
-    def _l10n_it_riba_get_values(self, creditor, creditor_bank, creditor_bank_account):
+    def _l10n_it_riba_get_values(self, creditor, creditor_bank_account):
         records = []
-        partner2bank_accounts = self.env['res.partner.bank'].search([('partner_id', 'in', self.partner_id.ids)]).grouped('partner_id')
+        partner2bank_accounts = self.env['res.partner.bank'].search([('partner_id', 'in', self.commercial_partner_id.ids)]).grouped('partner_id')
         for section_number, payment in enumerate(self, 1):
-            partner = payment.partner_id
+            partner = payment.commercial_partner_id
             company_partner = payment.company_id.partner_id
-            debitor_bank_account = partner2bank_accounts.get(payment.partner_id, self.env['res.partner.bank'])[:1]
+            debitor_bank_account = partner2bank_accounts.get(partner, self.env['res.partner.bank'])[:1]
             rounded_amount = payment.currency_id.round(payment.amount)
             reconciled_invoices = payment.reconciled_invoice_ids
             records += [
@@ -71,11 +71,11 @@ class AccountPayment(models.Model):
                     'section_number': section_number,
                     'payment_date': payment.date,
                     'amount': int(float_round(rounded_amount * 100, 0)),
-                    'creditor_abi': get_iban_part(creditor_bank_account.acc_number, "bank"),
-                    'creditor_cab': get_iban_part(creditor_bank_account.acc_number, "branch"),
-                    'creditor_ccn': get_iban_part(creditor_bank_account.acc_number, "account"),
-                    'debitor_abi': get_iban_part(debitor_bank_account.acc_number, "bank"),
-                    'debitor_cab': get_iban_part(debitor_bank_account.acc_number, "branch"),
+                    'creditor_abi': get_iban_part(creditor_bank_account.account_number, "bank"),
+                    'creditor_cab': get_iban_part(creditor_bank_account.account_number, "branch"),
+                    'creditor_ccn': get_iban_part(creditor_bank_account.account_number, "account"),
+                    'debitor_abi': get_iban_part(debitor_bank_account.account_number, "bank"),
+                    'debitor_cab': get_iban_part(debitor_bank_account.account_number, "branch"),
                     'creditor_sia_code': payment.company_id.l10n_it_sia_code,
                     'debitor_code': partner.ref or partner.name,
                 }, {
@@ -97,7 +97,7 @@ class AccountPayment(models.Model):
                     'debitor_zip': partner.zip,
                     'debitor_city': partner.city,
                     'debitor_state': partner.state_id.code,
-                    'debitor_bank_name': accents_to_apostrophes(debitor_bank_account.bank_id.display_name),
+                    'debitor_bank_name': accents_to_apostrophes(debitor_bank_account.bank_name),
                 }, {
                     'record_type': '50',  # Creditor address
                     'section_number': section_number,

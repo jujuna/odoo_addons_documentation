@@ -1,9 +1,10 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class NewContentRefreshBanner extends Component {
     static template = "social.NewContentRefreshBanner";
-    static props = [
-        "refreshRequired",
-        "onClickRefresh",
-    ];
+
+    props = useProps({
+        refreshRequired: t.any(),
+        onClickRefresh: t.any(),
+    });
 }

@@ -6,6 +6,11 @@ from odoo.tools import convert
 class PosConfig(models.Model):
     _inherit = 'pos.config'
 
+    @api.model
+    def _load_pos_preparation_data_fields(self):
+        res = super()._load_pos_preparation_data_fields()
+        return res + ['use_course_allocation']
+
     def _init_preparation_display_data(self):
         main_company = self.env.ref('base.main_company', raise_if_not_found=False)
         is_main_company = main_company and self.env.company.id == main_company.id

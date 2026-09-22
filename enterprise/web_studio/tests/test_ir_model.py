@@ -14,18 +14,20 @@ from odoo.addons.web_studio.models.ir_model import OPTIONS_WL
 from odoo.exceptions import ValidationError
 from odoo import Command
 
+
+@tagged('at_install', '-post_install')
 class TestStudioIrModel(TransactionCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # The test mode is necessary in this case.  After each test, we call
-        # registry.reset_changes(), which opens a new cursor to retrieve custom
+        # The test mode is necessary in this case.  After each test, we change
+        # and reset the registry, which opens a new cursor to retrieve custom
         # models and fields.  A regular cursor would correspond to the state of
         # the database before setUpClass(), which is not correct.  Instead, a
         # test cursor will correspond to the state of the database of cls.cr at
         # that point, i.e., before the call to setUp().
-        cls.registry_enter_test_mode_cls()
+        cls.enterClassContext(cls.registry_test_mode())
         cls.partner_elon = cls.env['res.partner'].create({
             'name': 'Elon Tusk',  # 🐗
             'email': 'elon@spacex.com',
@@ -45,8 +47,8 @@ class TestStudioIrModel(TransactionCase):
         )
 
     def setUp(self):
-        self.addCleanup(self.registry.reset_changes)
         super().setUp()
+        self.env.transaction.will_change_registry()
 
     def test_00_model_creation(self):
         """Test that a model gets created with the selected options."""
@@ -87,6 +89,7 @@ class TestStudioIrModel(TransactionCase):
                 'name': 'Elon Tusk',
                 'email': 'elon@spacex.com',
                 'create_values': {},
+                'recipient_type': 'to',
             },
             mail_suggested_recipients[0],
             'custom partner field should be suggested in mail communications',
@@ -94,6 +97,23 @@ class TestStudioIrModel(TransactionCase):
         sms_suggested_recipients = bfr._mail_get_partner_fields(introspect_fields=False)
         self.assertIn('x_studio_partner_id', sms_suggested_recipients,
                       'custom partner field should be included in sms communications')
+
+        self.assertTrue(model.is_mail_activity)
+        # resist to field name changes across versions
+        self.assertTrue("activity_user_id" in self.env[model.model]._fields)
+        got_views = self.env[model.model].get_views([(False, "search")])
+        search_view = etree.fromstring(got_views["views"]["search"]["arch"])
+
+        expected_filters = {
+            'activities_overdue': "[('my_activity_date_deadline', '<', 'today')]",
+            'activities_today': "[('my_activity_date_deadline', '=', 'today')]",
+            'activities_upcoming_all': "[('my_activity_date_deadline', '>', 'today')]",
+            'filter_activities_my': "[['activity_user_id', '=', uid]]"
+        }
+
+        for filter_name, expected_domain in expected_filters.items():
+            filter_element = search_view.xpath(f"//filter[@name='{filter_name}']")[0]
+            self.assertEqual(filter_element.get("domain"), expected_domain)
 
     def test_02_model_option_active(self):
         """Test that the `active` behaviour is set up correctly."""
@@ -118,7 +138,8 @@ class TestStudioIrModel(TransactionCase):
         self.assertEqual(default, 10, 'the default value for the x_studio_sequence field should be 10')
         list_view = self.env["ir.ui.view"].search([("model", "=", model.model), ("type", "=", "list")], limit=1)
         tree = etree.fromstring(list_view.get_combined_arch())
-        self.assertEqual(tree.attrib['default_order'], 'x_studio_sequence asc,id desc')
+        self.assertEqual(tree.get('default_order'), None)
+        self.assertEqual(model.order, "x_studio_sequence asc, id asc")
 
     def test_04_model_option_responsible(self):
         """Test that the `responsible` behaviour is set up correctly."""
@@ -149,9 +170,9 @@ class TestStudioIrModel(TransactionCase):
         self.assertEqual(len(extra_models), 0, 'no extra model should have been created')
         fields = self.env[model.model]._fields
         self.assertIn('x_studio_company_id', fields, 'a custom company field should be set up')
-        mc_rule = self.env['ir.rule'].search([
+        mc_rule = self.env['ir.access'].search([
             ('model_id', '=', model.id),
-            ('domain_force', 'like', 'x_studio_company_id')
+            ('domain', 'like', 'x_studio_company_id')
         ])
         self.assertEqual(len(mc_rule), 1, 'there should be a multi-company rule for the model')
         comp_field = self.env['ir.model.fields'].search([('name', '=', 'x_studio_company_id'), ('model_id', '=', model.id)])
@@ -240,6 +261,7 @@ class TestStudioIrModel(TransactionCase):
         kanban_view = self.env["ir.ui.view"].search([("model", "=", model.model), ("type", "=", "kanban")], limit=1)
         tree = etree.fromstring(list_view.get_combined_arch())
         self.assertEqual(tree.attrib['default_order'], 'x_studio_priority desc,id desc')
+        self.assertEqual(model.order, "id")
         tree = etree.fromstring(kanban_view.get_combined_arch())
         self.assertEqual(tree.attrib['default_order'], 'x_studio_priority desc,id desc')
 
@@ -263,22 +285,22 @@ class TestStudioIrModel(TransactionCase):
         """Test that ACLs are created for a custom model."""
         model_options = []
         (model, _) = self.env['ir.model'].studio_model_create('Rockets', options=model_options)
-        acl_admin = self.env['ir.model.access'].search([
+        acl_admin = self.env['ir.access'].search([
             ('model_id', '=', model.id),
             ('group_id', '=', self.env.ref('base.group_system').id)
         ])
-        self.assertTrue(acl_admin.perm_read, 'admin should have read access on custom models')
-        self.assertTrue(acl_admin.perm_write, 'admin should have write access on custom models')
-        self.assertTrue(acl_admin.perm_create, 'admin should have create access on custom models')
-        self.assertTrue(acl_admin.perm_unlink, 'admin should have unlink access on custom models')
-        acl_user = self.env['ir.model.access'].search([
+        self.assertTrue(acl_admin.for_read, 'admin should have read access on custom models')
+        self.assertTrue(acl_admin.for_write, 'admin should have write access on custom models')
+        self.assertTrue(acl_admin.for_create, 'admin should have create access on custom models')
+        self.assertTrue(acl_admin.for_unlink, 'admin should have unlink access on custom models')
+        acl_user = self.env['ir.access'].search([
             ('model_id', '=', model.id),
             ('group_id', '=', self.env.ref('base.group_user').id)
         ])
-        self.assertTrue(acl_user.perm_read, 'user should have read access on custom models')
-        self.assertTrue(acl_user.perm_write, 'user should have write access on custom models')
-        self.assertTrue(acl_user.perm_create, 'user should have create access on custom models')
-        self.assertFalse(acl_user.perm_unlink, 'user should not have unlink access on custom models')
+        self.assertTrue(acl_user.for_read, 'user should have read access on custom models')
+        self.assertTrue(acl_user.for_write, 'user should have write access on custom models')
+        self.assertTrue(acl_user.for_create, 'user should have create access on custom models')
+        self.assertFalse(acl_user.for_unlink, 'user should not have unlink access on custom models')
 
     def test_16_next_relation(self):
         """Check that creating the same m2m will result in a new relation table."""
@@ -387,22 +409,22 @@ class TestStudioIrModel(TransactionCase):
         """Test that ACLs are created for a custom model using name create."""
 
         model_id, name = self.env['ir.model'].with_context(studio=True).name_create('X_Rockets')
-        acl_admin = self.env['ir.model.access'].search([
+        acl_admin = self.env['ir.access'].search([
             ('model_id', '=', model_id),
             ('group_id', '=', self.env.ref('base.group_system').id)
         ])
-        self.assertTrue(acl_admin.perm_read, 'admin should have read access on custom models')
-        self.assertTrue(acl_admin.perm_write, 'admin should have write access on custom models')
-        self.assertTrue(acl_admin.perm_create, 'admin should have create access on custom models')
-        self.assertTrue(acl_admin.perm_unlink, 'admin should have unlink access on custom models')
-        acl_user = self.env['ir.model.access'].search([
+        self.assertTrue(acl_admin.for_read, 'admin should have read access on custom models')
+        self.assertTrue(acl_admin.for_write, 'admin should have write access on custom models')
+        self.assertTrue(acl_admin.for_create, 'admin should have create access on custom models')
+        self.assertTrue(acl_admin.for_unlink, 'admin should have unlink access on custom models')
+        acl_user = self.env['ir.access'].search([
             ('model_id', '=', model_id),
             ('group_id', '=', self.env.ref('base.group_user').id)
         ])
-        self.assertTrue(acl_user.perm_read, 'user should have read access on custom models')
-        self.assertTrue(acl_user.perm_write, 'user should have write access on custom models')
-        self.assertTrue(acl_user.perm_create, 'user should have create access on custom models')
-        self.assertFalse(acl_user.perm_unlink, 'user should not have unlink access on custom models')
+        self.assertTrue(acl_user.for_read, 'user should have read access on custom models')
+        self.assertTrue(acl_user.for_write, 'user should have write access on custom models')
+        self.assertTrue(acl_user.for_create, 'user should have create access on custom models')
+        self.assertFalse(acl_user.for_unlink, 'user should not have unlink access on custom models')
 
     def test_20_prevent_double_underscore(self):
         IrModelFields = self.env["ir.model.fields"]
@@ -461,9 +483,10 @@ class TestStudioIrModel(TransactionCase):
         list_view = self.env["ir.ui.view"].search([("model", "=", model.model), ("type", "=", "list")], limit=1)
         kanban_view = self.env["ir.ui.view"].search([("model", "=", model.model), ("type", "=", "kanban")], limit=1)
         tree = etree.fromstring(list_view.get_combined_arch())
-        self.assertEqual(tree.attrib['default_order'], 'x_studio_priority desc,x_studio_sequence asc,id desc')
+        self.assertEqual(model.order, "x_studio_sequence asc, id asc")
+        self.assertEqual(tree.get('default_order'), None)
         tree = etree.fromstring(kanban_view.get_combined_arch())
-        self.assertEqual(tree.attrib['default_order'], 'x_studio_priority desc,x_studio_sequence asc,id desc')
+        self.assertEqual(tree.get('default_order'), None)
         sequence_field = tree.xpath("//field[@name='x_studio_sequence']")[0]
         self.assertEqual(sequence_field.attrib, {'name': 'x_studio_sequence', 'widget': 'handle', 'invisible': '1'})
 
@@ -560,7 +583,7 @@ class TestStudioIrModelHardcoded(TransactionCase):
             "stock",
             "survey",
             "uom",
-            "web_map",
+            "web_enterprise",
             "web_studio",
             "website",
             "website_sale",
@@ -651,3 +674,24 @@ class TestStudioIrModelHardcoded(TransactionCase):
             ]
             for field in required_fields:
                 self.assertIn(field, fields, f"required field {field} is not exported for model {model}")
+
+    def test_model_info_route(self):
+        IrModel = self.env["ir.model"]
+
+        def get_studio_model_infos(keys, model_name):
+            infos = IrModel.studio_model_infos(model_name)
+            return [infos[key] for key in keys]
+
+        keys_to_test = ("abstract", "transient", "sql_view")
+        self.assertEqual(
+            get_studio_model_infos(keys_to_test, "res.device"),
+            [False, False, True]
+        )
+        self.assertEqual(
+            get_studio_model_infos(keys_to_test, "mail.activity.mixin"),
+            [True, False, True]
+        )
+        self.assertEqual(
+            get_studio_model_infos(keys_to_test, "base.partner.merge.automatic.wizard"),
+            [False, True, False]
+        )

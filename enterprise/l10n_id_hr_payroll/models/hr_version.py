@@ -6,7 +6,7 @@ from odoo import api, fields, models
 class HrVersion(models.Model):
     _inherit = "hr.version"
 
-    l10n_id_bpjs_jkk = fields.Float(string="BPJS JKK", groups="hr.group_hr_user", tracking=True)
+    l10n_id_bpjs_jkk = fields.Float(string="BPJS JKK", groups="hr_payroll.group_hr_payroll_user", tracking=1, digits="Payroll Rate")
     l10n_id_kode_ptkp = fields.Selection(
         selection=[
             ('tk0', "TK/0"),
@@ -20,9 +20,19 @@ class HrVersion(models.Model):
         string="PTKP Code",
         default="tk0",
         required=True,
-        groups="hr.group_hr_user",
-        tracking=True,
+        groups="hr_payroll.group_hr_payroll_user",
+        tracking=1,
         help="Employee's tax category that depends on their marital status and number of children")
+    l10n_id_fixed_allowance = fields.Monetary(string="Indonesian Fixed Allowance", groups="hr_payroll.group_hr_payroll_user")
+    l10n_id_payroll_type = fields.Selection(
+        selection=[
+            ("gross", "Gross"),
+            ("gross_up", "Gross Up")],
+        string="Payroll Type",
+        default="gross",
+        required=True,
+        groups="hr_payroll.group_hr_payroll_user",
+        )
 
     @api.model
     def _get_whitelist_fields_from_template(self):

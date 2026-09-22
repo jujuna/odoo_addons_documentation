@@ -13,17 +13,49 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2026-01-02 11:37+0000\n"
-"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 04:15+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
 "account_followup/ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_followup
+#: model:ir.module.module,description:base.module_account_followup
+msgid ""
+"\n"
+"Module to automate letters for unpaid invoices, with multi-level recalls.\n"
+"=========================================================================\n"
+"\n"
+"You can define your multiple levels of recall through the invoicing "
+"settings:\n"
+"-----------------------------------------------------------------------------\n"
+"    Configuration / Settings / Customer Invoices / Automatic Invoice "
+"Reminders\n"
+"\n"
+"Features:\n"
+"---------\n"
+"    - Automatic multi-level reminders based on overdue duration.\n"
+"    - Send & Print integration:\n"
+"        If Send & Print is executed again on an overdue invoice, the system\n"
+"        automatically switches to the appropriate reminder template and "
+"attaches\n"
+"        the follow-up report.\n"
+"    - Batch reminders:\n"
+"        Users can select multiple invoices from the list view and send "
+"reminders\n"
+"        to multiple customers at once using the 'Send Reminders' action.\n"
+msgstr ""
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
+msgid "\"Automatic Invoice Reminders\" is currently disabled."
+msgstr ""
 
 #. module: account_followup
 #. odoo-python
@@ -34,43 +66,922 @@ msgstr "%(company)s 결제 알림 - %(partner)s"
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_followup.py:0
-msgid "%(delay)s days (copy of %(name)s)"
-msgstr "%(delay)s 일 (%(name)s의 사본)"
+msgid "%(display_delay)s days %(reminder_timing)s"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.actions.report,print_report_name:account_followup.action_report_followup
-msgid "'Follow-up ' + object.display_name"
-msgstr "'Follow-up ' + object.display_name"
+msgid "'Reminder ' + object.display_name"
+msgstr ""
 
 #. module: account_followup
-#: model:account_followup.followup.line,name:account_followup.demo_followup_line1
-msgid "15 Days"
-msgstr "15일"
+#: model:mail.template,body_html:account_followup.mail_template_invoice_payment_kind_reminder
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear\n"
+"                        <t t-if=\"object.partner_id.parent_id\">\n"
+"                            <t t-if=\"object.partner_id.name\">\n"
+"                                <t t-out=\"object.partner_id.name\">Brandon "
+"Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure "
+"Interior</t>),\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"object.partner_id.parent_id.name "
+"or ''\">Azure Interior</t>,\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or "
+"''\">Brandon Freeman</t>,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        This is a kind reminder that invoice\n"
+"                        <t t-if=\"object.name\">\n"
+"                            <span style=\"font-weight:bold;\" t-"
+"out=\"object.name or ''\">INV/2021/05/0005</span>\n"
+"                        </t>\n"
+"                        <t t-if=\"object.invoice_origin\">\n"
+"                            (with reference: <t t-"
+"out=\"object.invoice_origin or ''\">SUB003</t>)\n"
+"                        </t>\n"
+"                        amounting in <span style=\"font-weight:bold;\" t-"
+"out=\"format_amount(object.amount_residual, object.currency_id) or ''\">$ "
+"143,750.00</span>\n"
+"                        from <t t-out=\"object.company_id.name or "
+"''\">YourCompany</t> is now overdue.\n"
+"                        <br/><br/>\n"
+"                        Please remit payment at your earliest convenience\n"
+"                        <t t-if=\"object.payment_reference\">\n"
+"                            using the following communication for your "
+"payment: <strong t-out=\"object.payment_reference or ''\">INV/2021/05/0005</"
+"strong>\n"
+"                            <t t-if=\"object.partner_bank_id\">\n"
+"                                on the account <strong t-"
+"out=\"object.partner_bank_id.account_number\"/>\n"
+"                            </t>.\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        </p><p t-"
+"if=\"object.partner_id._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/%s' % object.id\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Pay now</a>\n"
+"                        </p>\n"
+"                        You will find a copy of the original invoice "
+"attached to this email.\n"
+"                        <br/>\n"
+"                        If you have already sent the payment, please "
+"disregard this notice. If you have any questions or concerns, please don't "
+"hesitate to reply to this email.\n"
+"                        <br/><br/>\n"
+"                        Thank you,\n"
+"                        <t t-if=\"not "
+"is_html_empty(object.invoice_user_id.signature)\">\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"/><t t-out=\"object.invoice_user_id.signature or ''\">Mitchell "
+"Admin</t></div>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        안녕하세요\n"
+"                        <t t-if=\"object.partner_id.parent_id\">\n"
+"                            <t t-if=\"object.partner_id.name\">\n"
+"                                <t t-out=\"object.partner_id.name\">Brandon "
+"Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure "
+"Interior</t>) 고객님,\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"object.partner_id.parent_id.name "
+"or ''\">Azure Interior</t> 고객님,\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or ''\">"
+"Brandon Freeman</t> 고객님,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        다음 청구서 관련되어 다시 안내해 드립니다:\n"
+"                        <t t-if=\"object.name\">\n"
+"                            <span style=\"font-weight:bold;\" t-"
+"out=\"object.name or ''\">INV/2021/05/0005</span>\n"
+"                        </t>\n"
+"                        <t t-if=\"object.invoice_origin\">\n"
+"                            (참조 번호: <t t-out=\"object.invoice_origin or "
+"''\">SUB003</t>)\n"
+"                        </t>\n"
+"                        금액: <span style=\"font-weight:bold;\" t-"
+"out=\"format_amount(object.amount_residual, object.currency_id) or ''\">$ "
+"143,750.00</span>\n"
+"                        발행: <t t-out=\"object.company_id.name or ''\">"
+"YourCompany</t> 해당 청구서가 아직 미납 중입니다.\n"
+"                        <br/><br/>\n"
+"                        빠른 시일 내에 납부를 부탁드립니다.\n"
+"                        <t t-if=\"object.payment_reference\">\n"
+"                            결제 관련 정보는 다음과 같습니다: <strong t-"
+"out=\"object.payment_reference or ''\">INV/2021/05/0005</strong>\n"
+"                            <t t-if=\"object.partner_bank_id\">\n"
+"                                계좌 번호: <strong t-"
+"out=\"object.partner_bank_id.account_number\"/>\n"
+"                            </t>.\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object.partner_id._show_pay_now_button"
+"()\">\n"
+"                            <a t-att-href=\"'/my/invoices/%s' % object.id\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">지금 결제하기</a>\n"
+"                        </p>\n"
+"                        청구서 원본은 첨부 파일을 확인하세요.\n"
+"                        <br/>\n"
+"                        이미 납부를 완료한 경우, 본 이메일은 무시하시면 "
+"됩니다. 문의 사항이 있을 경우에는 언제든지 본 이메일에 답신해 주시면 바로 "
+"도와드리겠습니다.\n"
+"                        <br/><br/>\n"
+"                        감사합니다,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object.invoice_user_id.signature)\">\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"/><t t-out=\"object.invoice_user_id.signature or ''\">Mitchell "
+"Admin</t></div>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
-msgid "2023-09-06"
-msgstr "2023-09-06"
+#: model:mail.template,body_html:account_followup.mail_template_invoice_payment_last_reminder
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear\n"
+"                        <t t-if=\"object.partner_id.parent_id\">\n"
+"                            <t t-if=\"object.partner_id.name\">\n"
+"                                <t t-out=\"object.partner_id.name\">Brandon "
+"Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure "
+"Interior</t>),\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"object.partner_id.parent_id.name "
+"or ''\">Azure Interior</t>,\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or "
+"''\">Brandon Freeman</t>,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        This is our third and final reminder regarding the "
+"outstanding payment for invoice\n"
+"                        <t t-if=\"object.name\">\n"
+"                            <span style=\"font-weight:bold;\" t-"
+"out=\"object.name or ''\">INV/2021/05/0005</span>\n"
+"                        </t>\n"
+"                        <t t-if=\"object.invoice_origin\">\n"
+"                            (with reference: <t t-"
+"out=\"object.invoice_origin or ''\">SUB003</t>)\n"
+"                        </t>\n"
+"                        which is now\n"
+"                        <t t-if=\"object.invoice_date_due and "
+"object.invoice_date_due &lt; datetime.date.today()\">\n"
+"                            <t t-out=\"(datetime.date.today() - "
+"object.invoice_date_due).days\"/> days\n"
+"                        </t>\n"
+"                        overdue.\n"
+"                        The total amount outstanding is <span style=\"font-"
+"weight:bold;\" t-out=\"format_amount(object.amount_residual, "
+"object.currency_id) or ''\">$ 143,750.00</span>.\n"
+"                        We have sent previous reminders but have not yet "
+"received payment or a response.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-"
+"if=\"object.partner_id._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/%s' % object.id\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Pay now</a>\n"
+"                        </p>\n"
+"                        Please be advised that your account is now "
+"considered delinquent. We urge you to make payment immediately to settle "
+"this balance. The original invoice is attached.\n"
+"                        <br/><br/>\n"
+"                        Please contact us to either confirm your payment or "
+"discuss this matter. If we do not receive payment or a response by within 10 "
+"days we will be forced to review the status of your account.\n"
+"                        <br/><br/>\n"
+"                        We hope to resolve this amicably.\n"
+"                        <br/><br/>\n"
+"                        Sincerely,\n"
+"                        <t t-if=\"not "
+"is_html_empty(object.invoice_user_id.signature)\">\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"/><t t-out=\"object.invoice_user_id.signature or ''\">Mitchell "
+"Admin</t></div>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        안녕하세요\n"
+"                        <t t-if=\"object.partner_id.parent_id\">\n"
+"                            <t t-if=\"object.partner_id.name\">\n"
+"                                <t t-out=\"object.partner_id.name\">Brandon "
+"Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure "
+"Interior</t>) 고객님,\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"object.partner_id.parent_id.name "
+"or ''\">Azure Interior</t> 고객님,\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or ''\">"
+"Brandon Freeman</t> 고객님,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        청구서 미납 금액과 관련하여 마지막으로 세 번째 안내 "
+"메일을 드립니다. 청구서:\n"
+"                        <t t-if=\"object.name\">\n"
+"                            <span style=\"font-weight:bold;\" t-"
+"out=\"object.name or ''\">INV/2021/05/0005</span>\n"
+"                        </t>\n"
+"                        <t t-if=\"object.invoice_origin\">\n"
+"                            (참조 번호: <t t-out=\"object.invoice_origin or "
+"''\">SUB003</t>)\n"
+"                        </t>\n"
+"                        는 현재\n"
+"                        <t t-if=\"object.invoice_date_due and "
+"object.invoice_date_due &lt; datetime.date.today()\">\n"
+"                            <t t-out=\"(datetime.date.today() - "
+"object.invoice_date_due).days\"/> 일\n"
+"                        </t>\n"
+"                        연체 중입니다.\n"
+"                        미납 금액은 <span style=\"font-weight:bold;\" t-"
+"out=\"format_amount(object.amount_residual, object.currency_id) or ''\">$ "
+"143,750.00</span>입니다.\n"
+"                        이전에 안내 메일을 드린 바 있으나 아직까지 미납 "
+"상태로 확인되고 있습니다.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object.partner_id._show_pay_now_button"
+"()\">\n"
+"                            <a t-att-href=\"'/my/invoices/%s' % object.id\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">지금 결제하기</a>\n"
+"                        </p>\n"
+"                        고객님의 계정은 현재 연체 상태임을 알려드립니다. "
+"미납 금액을 정산하시려면 즉시 결제를 부탁드리며, 첨부의 원본 청구서를 "
+"참조하시기 바랍니다.\n"
+"                        <br/><br/>\n"
+"                        결제 여부를 확인하시거나 청구서 관련 문의가 있을 "
+"경우 언제든지 연락 주시기 바랍니다. 10일 이내에 결제하시거나 답변이 없을 "
+"경우에는, 부득이하게 고객님의 계정이 중지될 수 있음을 양지하시기 바랍니다..\n"
+"                        <br/><br/>\n"
+"                        빠른 납부를 부탁드립니다.\n"
+"                        <br/><br/>\n"
+"                        감사합니다.\n"
+"                        <t t-if=\"not is_html_empty"
+"(object.invoice_user_id.signature)\">\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"/><t t-out=\"object.invoice_user_id.signature or ''\">Mitchell "
+"Admin</t></div>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
-#: model:account_followup.followup.line,name:account_followup.demo_followup_line2
-msgid "30 Days"
-msgstr "30일"
+#: model:mail.template,body_html:account_followup.mail_template_invoice_payment_second_reminder
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear\n"
+"                        <t t-if=\"object.partner_id.parent_id\">\n"
+"                            <t t-if=\"object.partner_id.name\">\n"
+"                                <t t-out=\"object.partner_id.name\">Brandon "
+"Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure "
+"Interior</t>),\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"object.partner_id.parent_id.name "
+"or ''\">Azure Interior</t>,\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or "
+"''\">Brandon Freeman</t>,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        We are writing to follow up on our previous email "
+"regarding invoice\n"
+"                        <t t-if=\"object.name\">\n"
+"                            <span style=\"font-weight:bold;\" t-"
+"out=\"object.name or ''\">INV/2021/05/0005</span>\n"
+"                        </t>\n"
+"                        <t t-if=\"object.invoice_origin\">\n"
+"                            (with reference: <t t-"
+"out=\"object.invoice_origin or ''\">SUB003</t>)\n"
+"                        </t>\n"
+"                        amounting in <span style=\"font-weight:bold;\" t-"
+"out=\"format_amount(object.amount_residual, object.currency_id) or ''\">$ "
+"143,750.00</span>\n"
+"                        from <t t-out=\"object.company_id.name or "
+"''\">YourCompany</t>. Our records indicate that this invoice remain unpaid. "
+"Please find the invoice\n"
+"                        attached again for your reference.\n"
+"                        <br/><br/>\n"
+"                        Please remit payment\n"
+"                        <t t-if=\"object.payment_reference\">\n"
+"                            using the following communication for your "
+"payment: <strong t-out=\"object.payment_reference or ''\">INV/2021/05/0005</"
+"strong>\n"
+"                            <t t-if=\"object.partner_bank_id\">\n"
+"                                on the account <strong t-"
+"out=\"object.partner_bank_id.account_number\"/>\n"
+"                            </t>.\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        </p><p t-"
+"if=\"object.partner_id._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/%s' % object.id\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Pay now</a>\n"
+"                        </p>\n"
+"                        We would appreciate it if you could let us know the "
+"status of this payment. If payment has already been made,\n"
+"                        please let us know the date and method so we can "
+"trace it.\n"
+"                        <br/>\n"
+"                        If you are facing any issues with this payment, "
+"please contact us immediately so we can assist you.\n"
+"                        <br/><br/>\n"
+"                        Your prompt attention to this matter is greatly "
+"appreciated.\n"
+"                        <br/><br/>\n"
+"                        Best regards,\n"
+"                        <t t-if=\"not "
+"is_html_empty(object.invoice_user_id.signature)\">\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"/><t t-out=\"object.invoice_user_id.signature or ''\">Mitchell "
+"Admin</t></div>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        안녕하세요\n"
+"                        <t t-if=\"object.partner_id.parent_id\">\n"
+"                            <t t-if=\"object.partner_id.name\">\n"
+"                                <t t-out=\"object.partner_id.name\">Brandon "
+"Freeman</t> (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure "
+"Interior</t>) 고객님,\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"object.partner_id.parent_id.name "
+"or ''\">Azure Interior</t> 고객님,\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object.partner_id.name or ''\">"
+"Brandon Freeman</t> 고객님,\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        다음의 청구서와 관련하여 이전에 안내드린 내용을 "
+"확인해 드리고자 합니다:\n"
+"                        <t t-if=\"object.name\">\n"
+"                            <span style=\"font-weight:bold;\" t-"
+"out=\"object.name or ''\">INV/2021/05/0005</span>\n"
+"                        </t>\n"
+"                        <t t-if=\"object.invoice_origin\">\n"
+"                            (참조 번호: <t t-out=\"object.invoice_origin or "
+"''\">SUB003</t>)\n"
+"                        </t>\n"
+"                        금액: <span style=\"font-weight:bold;\" t-"
+"out=\"format_amount(object.amount_residual, object.currency_id) or ''\">$ "
+"143,750.00</span>\n"
+"                        발신자: <t t-out=\"object.company_id.name or ''\">"
+"YourCompany</t>. 해당 청구서 금액이 아직 결제되지 않았습니다. 본 이메일에 "
+"첨부드린\n"
+"                        내용을 다시 확인 부탁드립니다.\n"
+"                        <br/><br/>\n"
+"                        청구 금액을 납부 시 다음 내용을 참조하여 납부해 "
+"주세요.\n"
+"                        <t t-if=\"object.payment_reference\">\n"
+"                            청구서: <strong t-out=\"object.payment_reference "
+"or ''\">INV/2021/05/0005</strong>\n"
+"                            <t t-if=\"object.partner_bank_id\">\n"
+"                                계좌 번호 <strong t-"
+"out=\"object.partner_bank_id.account_number\"/>\n"
+"                            </t>.\n"
+"                        </t>\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object.partner_id._show_pay_now_button"
+"()\">\n"
+"                            <a t-att-href=\"'/my/invoices/%s' % object.id\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">지금 결제하기</a>\n"
+"                        </p>\n"
+"                        결제 진행 상황을 확인해 주시면 감사하겠습니다. 이미 "
+"납부하신 경우,\n"
+"                        저희 쪽에서 확인할 수 있도록 결제일 및 결제 수단을 "
+"알려주시기 바랍니다.\n"
+"                        <br/>\n"
+"                        결제 시 문제가 발행할 경우, 언제든지 저희에게 "
+"연락주시면 바로 도와 드리겠습니다.\n"
+"                        <br/><br/>\n"
+"                        빠른 납부를 부탁드립니다.\n"
+"                        <br/><br/>\n"
+"                        감사합니다.\n"
+"                        <t t-if=\"not is_html_empty"
+"(object.invoice_user_id.signature)\">\n"
+"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+"quote=\"1\"/><t t-out=\"object.invoice_user_id.signature or ''\">Mitchell "
+"Admin</t></div>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
-#: model:account_followup.followup.line,name:account_followup.demo_followup_line3
-msgid "40 Days"
-msgstr "40일"
+#: model:mail.template,body_html:account_followup.mail_template_partner_payment_kind_reminder
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>,\n"
+"                        <br/><br/>\n"
+"                        This is a kind reminder that we have not yet "
+"received payment for your recent invoices.\n"
+"                        <br/>\n"
+"                        Currently, your account with <t t-"
+"out=\"object.company_id.name or ''\">YourCompany</t> has an overdue balance "
+"of\n"
+"                        <b>\n"
+"                            <t t-if=\"ctx.get('amount_due')\">\n"
+"                                <t t-"
+"out=\"format_amount(ctx.get('amount_due'), object.currency_id) or ''\">$ "
+"143,750.00</t>\n"
+"                            </t>\n"
+"                            <t t-"
+"elif=\"object.followup_single_currency_id\">\n"
+"                                <t t-"
+"out=\"format_amount(object.total_overdue_currency_followup, "
+"object.followup_single_currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-"
+"out=\"format_amount(object.total_overdue_followup, object.currency_id) or "
+"''\"/>\n"
+"                            </t>\n"
+"                        </b>.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Pay now</a>\n"
+"                        </p>\n"
+"                        You will find the report of your overdue invoices "
+"attached to this email.\n"
+"                        <br/>\n"
+"                        If you've already sent the payment, please disregard "
+"this notice. If you have any questions or concerns, please don't hesitate to "
+"reply to this email.\n"
+"                        <br/><br/>\n"
+"                        Thank you,\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        안녕하세요\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>"
+"님,\n"
+"                        <br/><br/>\n"
+"                        최근에 안내해 드린 청구서 미납 건과 관련하여 다시 "
+"안내드립니다.\n"
+"                        <br/>\n"
+"                        현재 <t t-out=\"object.company_id.name or ''\">"
+"YourCompany</t> 회사 청구서가 미납 중이며, 미납액은\n"
+"                        <b>\n"
+"                            <t t-if=\"ctx.get('amount_due')\">\n"
+"                                <t t-out=\"format_amount(ctx.get"
+"('amount_due'), object.currency_id) or ''\">$ 143,750.00</t>입니다.\n"
+"                            </t>\n"
+"                            <t t-elif=\"object.followup_single_currency_id\">"
+"\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_currency_followup, object.followup_single_currency_id) "
+"or ''\"/>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_followup, object.currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                        </b>.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">지금 결제하기</a>\n"
+"                        </p>\n"
+"                        연체 청구서 관련 자료는 이메일의 첨부 자료를 "
+"참고하세요.\n"
+"                        <br/>\n"
+"                        이미 납부를 완료한 경우에는 이 이메일은 무시하시면 "
+"됩니다. 문의 사항이나 궁금한 점이 있을 경우에는 언제든지 본 이메일에 "
+"회신하여 연락 주시기 바랍니다.\n"
+"                        <br/><br/>\n"
+"                        감사합니다.\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
-#: model:account_followup.followup.line,name:account_followup.demo_followup_line4
-msgid "50 Days"
-msgstr "50일"
+#: model:mail.template,body_html:account_followup.mail_template_payment_reminder_before_due
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>,\n"
+"                        <br/><br/>\n"
+"                        This is a kind reminder that you have outstanding "
+"invoices with a total amount of\n"
+"                        <b>\n"
+"                            <t t-if=\"object.followup_single_currency_id\">\n"
+"                                <t t-"
+"out=\"format_amount(object.total_due_currency_followup, "
+"object.followup_single_currency_id) or ''\">$ 143,750.00</t>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-"
+"out=\"format_amount(object.total_due_followup, object.currency_id) or ''\"/"
+">\n"
+"                            </t>\n"
+"                        </b>\n"
+"                        from <t t-out=\"object.company_id.name or "
+"''\">YourCompany</t> which will be due in the coming days.\n"
+"                        <br/><br/>\n"
+"                        We wanted to send this over just to help you keep "
+"your accounts up to date.\n"
+"                        <br/>\n"
+"                        If you've already sent the payment, please feel free "
+"to ignore this email and thank you!\n"
+"                        <br/>\n"
+"                        You will find a copy of the original invoices "
+"attached to this email.\n"
+"                        <br/><br/>\n"
+"                        Best Regards,\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        안녕하세요\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>"
+"님,\n"
+"                        <br/><br/>\n"
+"                        다음 청구 금액이 미납 중임을 알려 드립니다:\n"
+"                        <b>\n"
+"                            <t t-if=\"object.followup_single_currency_id\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_due_currency_followup, object.followup_single_currency_id) or "
+"''\">$ 143,750.00</t>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_due_followup, object.currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                        </b>\n"
+"                        발행 회사는 <t t-out=\"object.company_id.name or "
+"''\">YourCompany</t> 회사이며, 곧 납부 마감일임을 안내드립니다.\n"
+"                        <br/><br/>\n"
+"                        고객님의 계정을 항상 최신 업데이트하려면 반드시 "
+"결제를 완료해 주시기 바랍니다.\n"
+"                        <br/>\n"
+"                        이미 납부하신 경우에는 본 이메일을 무시해 주세요. "
+"감사합니다!\n"
+"                        <br/>\n"
+"                        청구서 원본은 본 이메일에 첨부드리니 참조하시기 "
+"바랍니다.\n"
+"                        <br/><br/>\n"
+"                        Best Regards,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
-#: model:account_followup.followup.line,name:account_followup.demo_followup_line5
-msgid "60 Days"
-msgstr "60일"
+#: model:mail.template,body_html:account_followup.mail_template_partner_payment_last_reminder
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>,\n"
+"                        <br/><br/>\n"
+"                        This is our third and final reminder regarding the "
+"outstanding payments for your overdue invoices amounting in \n"
+"                        <b>\n"
+"                            <t t-if=\"ctx.get('amount_due')\">\n"
+"                                <t t-"
+"out=\"format_amount(ctx.get('amount_due'), object.currency_id) or ''\">$ "
+"143,750.00</t>\n"
+"                            </t>\n"
+"                            <t t-"
+"elif=\"object.followup_single_currency_id\">\n"
+"                                <t t-"
+"out=\"format_amount(object.total_overdue_currency_followup, "
+"object.followup_single_currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-"
+"out=\"format_amount(object.total_overdue_followup, object.currency_id) or "
+"''\"/>\n"
+"                            </t>\n"
+"                        </b>. We have sent previous reminders but have not "
+"yet received payment or a response.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Pay now</a>\n"
+"                        </p>\n"
+"                        Please be advised that your account is now "
+"considered delinquent. We urge you to make payment immediately to settle "
+"this balance.\n"
+"                        <br/><br/>\n"
+"                        <b>Please contact us</b> to either confirm your "
+"payment or discuss this matter. If we do not receive payment or a response "
+"by within 10 days we will be forced to review the status of your account.\n"
+"                        <br/><br/>\n"
+"                        We hope to resolve this amicably.\n"
+"                        <br/><br/>\n"
+"                        Best regards,\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        안녕하세요\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t> "
+"고객,\n"
+"                        <br/><br/>\n"
+"                        다음의 청구서 미납 금액과 관련하여 마지막으로 세 "
+"번째 안내 메일을 드립니다: \n"
+"                        <b>\n"
+"                            <t t-if=\"ctx.get('amount_due')\">\n"
+"                                <t t-out=\"format_amount(ctx.get"
+"('amount_due'), object.currency_id) or ''\">$ 143,750.00</t>\n"
+"                            </t>\n"
+"                            <t t-elif=\"object.followup_single_currency_id\">"
+"\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_currency_followup, object.followup_single_currency_id) "
+"or ''\"/>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_followup, object.currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                        </b>. 이전에 안내 메일을 드린 바 있으나 아직까지 "
+"미납 상태로 확인되고 있습니다.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">지금 결제하기</a>\n"
+"                        </p>\n"
+"                        고객님의 계정은 현재 연체 상태임을 알려 드립니다. "
+"미납 금액을 정산할 수 있도록 즉시 결제를 부탁드립니다.\n"
+"                        <br/><br/>\n"
+"                        <b>언제든지 저희 쪽으로 문의주시면</b> 결제 여부를 "
+"확인하거나 자세히 안내 드리겠습니다. 10일 이내에 결제 또는 응답이 없을 경우, "
+"부득이하게 고객님의 계정이 중지될 수 있음을 양지하시기 바랍니다.\n"
+"                        <br/><br/>\n"
+"                        빠른 납부를 부탁드립니다.\n"
+"                        <br/><br/>\n"
+"                        감사합니다.\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
+
+#. module: account_followup
+#: model:mail.template,body_html:account_followup.mail_template_partner_payment_second_reminder
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>,\n"
+"                        <br/><br/>\n"
+"                        We are writing to follow up on our previous email "
+"regarding the overdue invoices amounting in\n"
+"                        <b>\n"
+"                            <t t-if=\"ctx.get('amount_due')\">\n"
+"                                <t t-"
+"out=\"format_amount(ctx.get('amount_due'), object.currency_id) or ''\">$ "
+"143,750.00</t>\n"
+"                            </t>\n"
+"                            <t t-"
+"elif=\"object.followup_single_currency_id\">\n"
+"                                <t t-"
+"out=\"format_amount(object.total_overdue_currency_followup, "
+"object.followup_single_currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-"
+"out=\"format_amount(object.total_overdue_followup, object.currency_id) or "
+"''\"/>\n"
+"                            </t>\n"
+"                        </b>. Our records indicate that these invoices "
+"remain unpaid. Please find attached the report again for your reference.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">Pay now</a>\n"
+"                        </p>\n"
+"                        We would appreciate it if you could let us know the "
+"status of these payments. If payment has already been made, please let us "
+"know the date and method so we can trace it.\n"
+"                        <br/>\n"
+"                        If you are facing any issues with these payments, "
+"please contact us immediately so we can assist you.\n"
+"                        Thank you!\n"
+"                        <br/><br/>\n"
+"                        Your prompt attention to this matter is greatly "
+"appreciated.\n"
+"                        <br/><br/>\n"
+"                        Best regards,\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">"
+"\n"
+"                        안녕하세요\n"
+"                        <t t-out=\"object.name or ''\">Brandon Freeman</t>"
+"님,\n"
+"                        <br/><br/>\n"
+"                        이전에 이메일 드린 바와 같이 미납 청구서에 대해 다시 "
+"안내드립니다. 현재 연체 중인 금액은 다음과 같습니다:\n"
+"                        <b>\n"
+"                            <t t-if=\"ctx.get('amount_due')\">\n"
+"                                <t t-out=\"format_amount(ctx.get"
+"('amount_due'), object.currency_id) or ''\">$ 143,750.00</t>\n"
+"                            </t>\n"
+"                            <t t-elif=\"object.followup_single_currency_id\">"
+"\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_currency_followup, object.followup_single_currency_id) "
+"or ''\"/>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <t t-out=\"format_amount"
+"(object.total_overdue_followup, object.currency_id) or ''\"/>\n"
+"                            </t>\n"
+"                        </b>. 해당 청구서가 아직 납부되지 않은 상태입니다. "
+"참고하실 수 있도록 관련 문서를 첨부 드리오니 확인을 부탁드립니다.\n"
+"                        <br/><br/>\n"
+"                        </p><p t-if=\"object._show_pay_now_button()\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
+"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
+"solid #875A7B; border-radius:3px\">지금 결제하기</a>\n"
+"                        </p>\n"
+"                        저희 쪽에 결제 여부를 알려주시면 감사하겠습니다. "
+"이미 납부하신 경우에는 확인을 위해 결제일과 결제 수단을 알려주시기 "
+"바랍니다.\n"
+"                        <br/>\n"
+"                        결제와 관련하여 문제가 있으신 경우, 연락 주시면 즉시 "
+"도와드리겠습니다.\n"
+"                        감사합니다!\n"
+"                        <br/><br/>\n"
+"                        빠른 응답과 조치에 진심으로 감사드립니다.\n"
+"                        <br/><br/>\n"
+"                        Best regards,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\">\n"
+"                            Mitchell Admin\n"
+"                            </t>\n"
+"                        </t>\n"
+"                    \n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.demo_followup_email_template_4
@@ -115,15 +1026,15 @@ msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p>\n"
 "                        <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">안녕하세요, <t t-out=\"object.name or ''\"/"
-"> (<t t-out=\"object.commercial_partner_id.name or ''\"/>)님.</t>\n"
+"object.commercial_partner_id.id\">안녕하세요, <t t-out=\"object.name or "
+"''\"/> (<t t-out=\"object.commercial_partner_id.name or ''\"/>)님.</t>\n"
 "                        <t t-else=\"\">안녕하세요, <t t-out=\"object.name or "
 "''\"/>님.</t>\n"
 "                        <br/>\n"
-"                        몇 차례의 알림에도 불구하고 귀하의 계정이 아직 미결"
-"제 상태로 남아 있습니다.\n"
-"                        8일 이내에 전액을 결제하지 않으면 별도의 통지 없이 채"
-"권 회수를 위한 법적 조치가 시작됩니다.\n"
+"                        몇 차례의 알림에도 불구하고 귀하의 계정이 아직 "
+"미결제 상태로 남아 있습니다.\n"
+"                        8일 이내에 전액을 결제하지 않으면 별도의 통지 없이 "
+"채권 회수를 위한 법적 조치가 시작됩니다.\n"
 "                        해당 조치가 필요하지 않기를 바라며, 납부 기한에 대한 "
 "세부 사항은 하기 내용을 참고해 주시기 바랍니다.\n"
 "                        이 문제와 관련하여 궁금한 점이 있으면 언제든지 저희 "
@@ -131,200 +1042,18 @@ msgstr ""
 "                        <br/>\n"
 "                        감사합니다.\n"
 "                        <br/>\n"
-"                        <t t-if=\"not "
-"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
 "                            <br/>\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().signature\"/>\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
 "                            <br/>\n"
 "                            --\n"
 "                            <br/>\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().name\"/>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-
-#. module: account_followup
-#: model:mail.template,body_html:account_followup.demo_followup_email_template_2
-msgid ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p>\n"
-"                        <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
-"</t>\n"
-"                        <br/>\n"
-"                        We are disappointed to see that despite sending a "
-"reminder, that your account is now seriously overdue.\n"
-"                        <br/>\n"
-"                        It is essential that immediate payment is made, "
-"otherwise we will have to consider placing a stop on your account which "
-"means that we will no longer be able to supply your company with (goods/"
-"services). Please, take appropriate measures in order to carry out this "
-"payment in the next 8 days.\n"
-"                        <br/>\n"
-"                        If there is a problem with paying invoice that we "
-"are not aware of, do not hesitate to contact our accounting department, so "
-"that we can resolve the matter quickly.\n"
-"                        <br/>\n"
-"                        Details of due payments is printed below.\n"
-"                        <br/>\n"
-"                        Best Regards,\n"
-"                        <t t-if=\"not "
-"is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br/>\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().signature\"/>\n"
-"                        </t>\n"
-"                        <t t-else=\"\">\n"
-"                            <br/>\n"
-"                            --\n"
-"                            <br/>\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().name\"/>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p>\n"
-"                        <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">안녕하세요,<t t-out=\"object.name or ''\"/"
-"> (<t t-out=\"object.commercial_partner_id.name or ''\"/>)님.</t>\n"
-"                        <t t-else=\"\">안녕하세요, <t t-out=\"object.name or "
-"''\"/>님.</t>\n"
-"                        <br/>\n"
-"                        이미 알림을 통해 안내드렸음에도 불구하고, 고객님 계정"
-"에 대한 연체가 지속되고 있음을 확인하였습니다.\n"
-"                        <br/>\n"
-"                        즉시 결제를 요청드리며, 결제가 이루어지지 않을 경우 "
-"더이상 고객님의 회사에 (상품/서비스)를 제공해드릴 수 없게 됩니다. 8일 이내에 "
-"결제를 완납하실 수 있도록 조치를 취해주시기 바랍니다.\n"
-"                        <br/>\n"
-"                        당사가 인지하지 못한 청구서 결제 관련 문제가 있는 경"
-"우, 문제를 신속하게 해결할 수 있도록 저희 회계팀으로 연락주시기 바랍니다.\n"
-"                        <br/>\n"
-"                        납부 기한에 대한 자세한 내용은 아래의 내용을 참고해 "
-"주세요.\n"
-"                        <br/>\n"
-"                        감사합니다.\n"
-"                        <t t-if=\"not "
-"is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br/>\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().signature\"/>\n"
-"                        </t>\n"
-"                        <t t-else=\"\">\n"
-"                            <br/>\n"
-"                            --\n"
-"                            <br/>\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().name\"/>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-
-#. module: account_followup
-#: model:mail.template,body_html:account_followup.email_template_followup_1
-msgid ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p>\n"
-"                        <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
-"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
-"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
-"</t>\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        We would like to inform you that your account shows "
-"an outstanding balance of <b><t t-"
-"out=\"format_amount(object.total_overdue_followup, object.currency_id) or "
-"''\"/></b>.\n"
-"                        We kindly ask that you settle this amount within the "
-"next <b>8 days</b>.\n"
-"                    </p>\n"
-"                    <p t-if=\"object._show_pay_now_button()\">\n"
-"                        <a t-att-href=\"'/my/invoices/overdue'\" "
-"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
-"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
-"solid #875A7B; border-radius:3px\">Pay now</a>\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        If payment has already been made, please disregard "
-"this notice.\n"
-"                        For any questions or if you need assistance, feel "
-"free to contact our accounting department.\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        We appreciate your cooperation in resolving this "
-"matter.\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        Sincerely,\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        <t t-if=\"not "
-"is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().signature\"/>\n"
-"                        </t>\n"
-"                        <t t-else=\"\">\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().name\"/>\n"
-"                        </t>\n"
-"                    </p>\n"
-"                </div>\n"
-"            "
-msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p>\n"
-"                        <t t-if=\"object.id != "
-"object.commercial_partner_id.id\">안녕하세요, <t t-out=\"object.name or ''\"/"
-"> (<t t-out=\"object.commercial_partner_id.name or ''\"/>)님.</t>\n"
-"                        <t t-else=\"\">안녕하세요, <t t-out=\"object.name or "
-"''\"/>님.</t>\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        귀하의 <b><t t-"
-"out=\"format_amount(object.total_overdue_followup, object.currency_id) or "
-"''\"/>계정에 결제되지 않은 잔액이 있음을 알려드립니다</b>.\n"
-"                        해당 금액을 <b>8일</b> 이내에 결제해 주시기 바랍니"
-"다.\n"
-"                    </p>\n"
-"                    <p t-if=\"object._show_pay_now_button()\">\n"
-"                        <a t-att-href=\"'/my/invoices/overdue'\" "
-"style=\"padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: "
-"none !important; font-weight: 400; background-color: #875A7B; border: 0px "
-"solid #875A7B; border-radius:3px\">지금 결제하기</a>\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        이미 결제를 완료하셨다면 이 메시지는 무시해 주시기 바"
-"랍니다.\n"
-"                        문의 사항이 있으시거나 도움이 필요하시면 저희 회계팀"
-"에 문의하여 주십시오.\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        협조해 주셔서 감사합니다.\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        감사합니다.\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        <t t-if=\"not "
-"is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().signature\"/>\n"
-"                        </t>\n"
-"                        <t t-else=\"\">\n"
-"                            <t t-"
-"out=\"object._get_followup_responsible().name\"/>\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
@@ -332,8 +1061,17 @@ msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_partner_view_form
-msgid "<span class=\"o_stat_text\">Due</span>"
-msgstr "<span class=\"o_stat_text\">기한</span>"
+msgid ""
+"<span class=\"o_stat_text\" invisible=\"total_all_due &gt;= 0\">Payable</"
+"span>\n"
+"                            <span class=\"o_stat_text\" "
+"invisible=\"total_all_due &lt; 0\">Receivable</span>"
+msgstr ""
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
+msgid "<strong class=\"text-muted\">To: </strong>"
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -345,15 +1083,6 @@ msgstr ""
 "<strong>\n"
 "                                보류 중인 청구서\n"
 "                            </strong>"
-
-#. module: account_followup
-#: model:ir.model.constraint,message:account_followup.constraint_account_followup_followup_line_uniq_name
-msgid ""
-"A follow-up action name must be unique. This name is already set to another "
-"action."
-msgstr ""
-"후속 작업 이름은 고유하게 지정해야 합니다. 이 이름은 이미 다른 작업으로 설정"
-"되어 있습니다."
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__account_manager
@@ -392,42 +1121,55 @@ msgid "Add a note"
 msgstr "메모 추가"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Add contacts to notify..."
-msgstr "알림을 보낼 연락처 추가"
-
-#. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__additional_follower_ids
-msgid "Add followers"
-msgstr "팔로워 추가"
-
-#. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
 msgid "Address"
 msgstr "주소"
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__join_invoices
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__join_invoices
-msgid "Attach Invoices"
-msgstr "청구서 첨부"
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__alerts
+msgid "Alerts"
+msgstr ""
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__attachment_ids
-msgid "Attachment"
-msgstr "첨부 파일"
-
-#. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__auto_execute
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__automatic
-#: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_line_filter
 msgid "Automatic"
-msgstr "자동"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_company__automatic_invoice_reminder
+#: model:ir.model.fields,field_description:account_followup.field_res_config_settings__automatic_invoice_reminder
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__automatic_invoice_reminder
+#: model:ir.model.fields,field_description:account_followup.field_res_users__automatic_invoice_reminder
+msgid "Automatic Invoice Reminders"
+msgstr ""
+
+#. module: account_followup
+#. odoo-python
+#: code:addons/account_followup/models/res_config_settings.py:0
+msgid "Automatic invoices reminders"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__preview_body
+msgid "Body Preview"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__body_has_template_value
 msgid "Body content is the same as the template"
 msgstr "본문 내용은 서식과 동일합니다"
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_mail_compose_message__cached_followup_attachment_id
+msgid "Cached Followup Report"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,help:account_followup.field_mail_compose_message__cached_followup_attachment_id
+msgid ""
+"Caches the generated followup report to prevent recalculation when switching "
+"templates."
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__can_edit_body
@@ -437,7 +1179,22 @@ msgstr "본문 편집 가능"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Cancel"
-msgstr "취소"
+msgstr ""
+
+#. module: account_followup
+#. odoo-python
+#: code:addons/account_followup/wizard/followup_manual_reminder.py:0
+msgid "Check Partner(s) Email(s)"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,help:account_followup.field_res_partner__followup_reminder_type
+#: model:ir.model.fields,help:account_followup.field_res_users__followup_reminder_type
+msgid ""
+"Choose how Reminders reminders are processed for this partner.\n"
+"                'Manual' pauses all automatic reminders and level updates "
+"for this partner."
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.missing_information_view_form
@@ -445,25 +1202,20 @@ msgid "Close"
 msgstr "닫기"
 
 #. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
-msgid "Communication"
-msgstr "연락"
-
-#. module: account_followup
+#: model:ir.model,name:account_followup.model_res_company
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__company_id
 msgid "Company"
 msgstr "회사"
 
 #. module: account_followup
+#: model:ir.model,name:account_followup.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: account_followup
 #: model:ir.model,name:account_followup.model_res_partner
 msgid "Contact"
 msgstr "연락처"
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Content Template"
-msgstr "콘텐츠 서식"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__body
@@ -500,20 +1252,17 @@ msgid "Customers Statement"
 msgstr "고객 명세서"
 
 #. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
-msgid "Date"
-msgstr "날짜"
+#: model:ir.model.fields,help:account_followup.field_account_bank_statement_line__last_reminder
+#: model:ir.model.fields,help:account_followup.field_account_move__last_reminder
+#: model:ir.model.fields,help:account_followup.field_res_partner__last_reminder
+#: model:ir.model.fields,help:account_followup.field_res_users__last_reminder
+msgid "Date when reminder was last sent via email."
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
 msgid "Date:"
 msgstr "날짜:"
-
-#. module: account_followup
-#: model:ir.model.constraint,message:account_followup.constraint_account_followup_followup_line_days_uniq
-msgid "Days of the follow-up lines must be different per company"
-msgstr "후속 항목의 날짜는 회사마다 다르게 지정해야 합니다."
 
 #. module: account_followup
 #. odoo-python
@@ -535,12 +1284,12 @@ msgstr ""
 "안녕하세요 %s님,\n"
 "\n"
 "\n"
-"본 이메일을 통해 고객님의 계정에 미납 금액이 있음을 알려드립니다. 일부 착오"
-"로 인해 다음과 같은 미납 잔액을 확인하였습니다. 8일 이내에 결제를 완료해 주시"
-"기를 정중히 요청드립니다.\n"
+"본 이메일을 통해 고객님의 계정에 미납 금액이 있음을 알려드립니다. 일부 "
+"착오로 인해 다음과 같은 미납 잔액을 확인하였습니다. 8일 이내에 결제를 완료해 "
+"주시기를 정중히 요청드립니다.\n"
 "\n"
-"이미 결제를 완료하신 경우에는 이 메시지는 무시하셔도 됩니다. 궁금한 점이 있으"
-"면 언제든 저희 회계팀으로 연락주시기 바랍니다.\n"
+"이미 결제를 완료하신 경우에는 이 메시지는 무시하셔도 됩니다. 궁금한 점이 "
+"있으면 언제든 저희 회계팀으로 연락주시기 바랍니다.\n"
 "\n"
 "감사합니다.\n"
 "\n"
@@ -552,23 +1301,26 @@ msgid ""
 "Dear client, we kindly remind you that you still have unpaid invoices. "
 "Please check them and take appropriate action. %s"
 msgstr ""
-"안녕하세요 고객님, 고객님께서 아직 미납하신 청구서가 있음을 알려드립니다. 확"
-"인 후 결제를 부탁드립니다.%s"
+"안녕하세요 고객님, 아직 미납 중인 청구서가 있음을 알려드립니다. 확인 후 "
+"결제를 부탁드립니다.%s"
 
 #. module: account_followup
 #: model_terms:ir.actions.act_window,help:account_followup.action_account_followup_line_definition_form
-msgid "Define follow-up levels and their related actions"
-msgstr "후속조치 수준 및 관련 작업 정의"
+msgid "Define reminders and their related actions"
+msgstr ""
+
+#. module: account_followup
+#. odoo-python
+#: code:addons/account_followup/models/account_followup.py:0
+msgid ""
+"Delay must be a positive value. To send a reminder before the invoice due "
+"date, set the Reminder Timing to \"Before\" and enter a positive delay."
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
 msgid "Demo Ref"
 msgstr "데모 참조"
-
-#. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__name
-msgid "Description"
-msgstr "설명"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_followup_followup_line__activity_default_responsible_type
@@ -588,48 +1340,40 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__display_name
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_missing_information_wizard__display_name
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_report__display_name
+#: model:ir.model.fields,field_description:account_followup.field_account_move__display_name
 #: model:ir.model.fields,field_description:account_followup.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:account_followup.field_account_move_send_wizard__display_name
 #: model:ir.model.fields,field_description:account_followup.field_ir_actions_report__display_name
+#: model:ir.model.fields,field_description:account_followup.field_ir_cron__display_name
+#: model:ir.model.fields,field_description:account_followup.field_mail_compose_message__display_name
+#: model:ir.model.fields,field_description:account_followup.field_mail_template__display_name
+#: model:ir.model.fields,field_description:account_followup.field_res_company__display_name
+#: model:ir.model.fields,field_description:account_followup.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__display_name
 msgid "Display Name"
 msgstr "표시명"
 
 #. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
-msgid "Due Date"
-msgstr "마감 기한"
-
-#. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__delay
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__display_delay
 msgid "Due Days"
 msgstr "만료일까지 남은 날짜"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__send_email
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__email
 msgid "Email"
 msgstr "이메일"
 
 #. module: account_followup
+#: model:ir.model,name:account_followup.model_mail_template
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Email Recipients"
-msgstr "이메일 수신자"
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Email Subject"
-msgstr "이메일 제목"
-
-#. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "Email Template"
 msgstr "이메일 템플릿"
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__email_recipient_ids
-msgid "Extra Recipients"
-msgstr "추가 수신자"
+#: model:ir.model,name:account_followup.model_mail_compose_message
+msgid "Email composition wizard"
+msgstr ""
 
 #. module: account_followup
 #. odoo-python
@@ -643,33 +1387,9 @@ msgid "Follow-up Criteria"
 msgstr "후속조치 기준"
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_move_line__followup_line_id
-#: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_line_id
-#: model:ir.model.fields,field_description:account_followup.field_res_users__followup_line_id
-msgid "Follow-up Level"
-msgstr "후속조치 수준"
-
-#. module: account_followup
-#: model:ir.actions.act_window,name:account_followup.action_account_followup_line_definition_form
-#: model:ir.ui.menu,name:account_followup.account_followup_menu
-msgid "Follow-up Levels"
-msgstr "후속조치 수준"
-
-#. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_report
 msgid "Follow-up Report"
 msgstr "후속 조치 보고서"
-
-#. module: account_followup
-#: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__followup
-msgid "Follow-up Responsible"
-msgstr "후속 조치 담당자"
-
-#. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_status
-#: model:ir.model.fields,field_description:account_followup.field_res_users__followup_status
-msgid "Follow-up Status"
-msgstr "후속 조치 상태"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
@@ -678,15 +1398,15 @@ msgid "Follow-up Steps"
 msgstr "후속조치 단계"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.report_followup_print_all
-msgid "Follow-up details"
-msgstr "세부 후속 조치"
+#: model:ir.model.fields,field_description:account_followup.field_account_move_line__followup_overdue
+msgid "Followup Overdue"
+msgstr "후속 조치 지연"
 
 #. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
-msgid "Follow-up letter generated"
-msgstr "후속조치 안내문 생성"
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_single_currency_id
+#: model:ir.model.fields,field_description:account_followup.field_res_users__followup_single_currency_id
+msgid "Followup Single Currency"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_missing_information_wizard
@@ -711,6 +1431,12 @@ msgid "Fourth reminder followup"
 msgstr "네번째 알림 후속조치"
 
 #. module: account_followup
+#. odoo-python
+#: code:addons/account_followup/models/ir_cron.py:0
+msgid "Go to Settings"
+msgstr ""
+
+#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__has_moves
 #: model:ir.model.fields,field_description:account_followup.field_res_users__has_moves
 msgid "Has Moves"
@@ -721,31 +1447,36 @@ msgstr "이동 내역 있음"
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__id
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_missing_information_wizard__id
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_report__id
+#: model:ir.model.fields,field_description:account_followup.field_account_move__id
 #: model:ir.model.fields,field_description:account_followup.field_account_move_line__id
+#: model:ir.model.fields,field_description:account_followup.field_account_move_send_wizard__id
 #: model:ir.model.fields,field_description:account_followup.field_ir_actions_report__id
+#: model:ir.model.fields,field_description:account_followup.field_ir_cron__id
+#: model:ir.model.fields,field_description:account_followup.field_mail_compose_message__id
+#: model:ir.model.fields,field_description:account_followup.field_mail_template__id
+#: model:ir.model.fields,field_description:account_followup.field_res_company__id
+#: model:ir.model.fields,field_description:account_followup.field_res_config_settings__id
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__id
 msgid "ID"
 msgstr "ID"
 
 #. module: account_followup
-#: model:ir.model.fields,help:account_followup.field_account_followup_followup_line__additional_follower_ids
+#: model:ir.model.fields,help:account_followup.field_account_followup_followup_line__reminder_timing
 msgid ""
-"If set, those users will be added as followers on the partner and receive "
-"notifications about any email reply made by the partner on the reminder "
-"email."
+"Indicates whether the reminder should be sent before or after the invoice "
+"due date."
 msgstr ""
-"이 옵션을 설정하면 해당 사용자가 파트너의 팔로워로 추가되며 파트너가 보낸 모"
-"든 이메일 회신에 대한 알림을 받게 됩니다."
-
-#. module: account_followup
-#: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_status__in_need_of_action
-msgid "In need of action"
-msgstr "작업 필요"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Invoice Follow-ups"
-msgstr "청구서 후속 조치"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.actions.act_window,name:account_followup.action_account_followup_line_definition_form
+#: model:ir.ui.menu,name:account_followup.account_followup_menu
+msgid "Invoice Reminders"
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -758,26 +1489,45 @@ msgid "Is Editor"
 msgstr "편집자입니다"
 
 #. module: account_followup
+#: model:ir.model,name:account_followup.model_account_move
+msgid "Journal Entry"
+msgstr ""
+
+#. module: account_followup
 #: model:ir.model,name:account_followup.model_account_move_line
 msgid "Journal Item"
 msgstr "전표 항목"
 
 #. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/res_partner.py:0
-#: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
-msgid "Journal Items"
-msgstr "전표 항목"
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Kind reminder!"
-msgstr "잊지 않으시도록 알림 안내를 드립니다!"
+#: model:mail.template,name:account_followup.mail_template_invoice_payment_kind_reminder
+#: model:mail.template,name:account_followup.mail_template_partner_payment_kind_reminder
+msgid "Kind Reminder"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__lang
 msgid "Language"
 msgstr "사용 언어"
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_account_bank_statement_line__last_auto_reminder
+#: model:ir.model.fields,field_description:account_followup.field_account_move__last_auto_reminder
+msgid "Last Automatic Reminder"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_account_bank_statement_line__last_reminder
+#: model:ir.model.fields,field_description:account_followup.field_account_move__last_reminder
+#: model:mail.template,name:account_followup.mail_template_invoice_payment_last_reminder
+#: model:mail.template,name:account_followup.mail_template_partner_payment_last_reminder
+msgid "Last Reminder"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__last_reminder
+#: model:ir.model.fields,field_description:account_followup.field_res_users__last_reminder
+msgid "Last Reminder Date"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__write_uid
@@ -794,21 +1544,20 @@ msgid "Last Updated on"
 msgstr "최근 갱신 일자"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Letter/Email Content"
-msgstr "우편/이메일 본문"
-
-#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__mail_template_id
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__template_id
 msgid "Mail Template"
 msgstr "메일 서식"
 
 #. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.res_config_settings_view_form
+msgid "Manage your automatic reminders"
+msgstr ""
+
+#. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__manual
-#: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_line_filter
 msgid "Manual"
-msgstr "수동"
+msgstr ""
 
 #. module: account_followup
 #. odoo-python
@@ -818,38 +1567,26 @@ msgid "Missing information"
 msgstr "누락된 정보"
 
 #. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__move_ids
+msgid "Move"
+msgstr ""
+
+#. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.line_template
 msgid "Name"
 msgstr "이름"
 
 #. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/res_partner.py:0
-msgid "Next Reminder Date set to %s"
-msgstr "다음 알림 날짜가 %s로 설정됨"
-
-#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_next_action_date
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_next_action_date
-msgid "Next reminder"
-msgstr "다음 알림"
-
-#. module: account_followup
-#: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_status__no_action_needed
-msgid "No action needed"
-msgstr "필요한 작업 없음"
+msgid "Next Reminder"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_res_partner__followup_next_action_date
 #: model:ir.model.fields,help:account_followup.field_res_users__followup_next_action_date
-msgid ""
-"No follow-up action will be taken before this date.\n"
-"                Sending a reminder will set this date depending on the "
-"levels configuration, and you can change it manually."
+msgid "No Reminder action will be taken before this date."
 msgstr ""
-"이 날짜 이전에는 후속 조치가 취해지지 않습니다.\n"
-"                알림을 보내면 레벨 설정에 따라 이 날짜가 설정되지만, 필요한 "
-"경우 수동으로 수정할 수 있습니다."
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_note
@@ -862,6 +1599,11 @@ msgid "Notification"
 msgstr "알림"
 
 #. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
+msgid "Open settings"
+msgstr ""
+
+#. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_followup_manual_reminder__lang
 msgid ""
 "Optional translation language (ISO code) to select when sending out an "
@@ -869,61 +1611,46 @@ msgid ""
 "usually be a placeholder expression that provides the appropriate language, "
 "e.g. {{ object.partner_id.lang }}."
 msgstr ""
+"이메일 전송 시 번역할 언어 (ISO 코드)를 선택할 수 있습니다. 선택하지 않을 "
+"경우, 기본 파트너의 사용 언어가 기본 언어로 적용됩니다. 알맞은 언어로 "
+"표시되는 자리표지자가 나타나며, 예를 들어 {{ object.partner_id.lang }} 와 "
+"같이 나타납니다."
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
-msgid "Options"
-msgstr "옵션"
-
-#. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
 #: model:ir.model.fields,field_description:account_followup.field_account_move_line__invoice_origin
 msgid "Origin"
 msgstr "최초 문서"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
-msgid "Overdue Customer Invoices"
-msgstr "연체된 고객 청구서"
-
-#. module: account_followup
 #. odoo-python
-#: code:addons/account_followup/models/res_partner.py:0
-msgid "Overdue Invoices"
-msgstr "연체된 청구서"
+#: code:addons/account_followup/wizard/followup_manual_reminder.py:0
+msgid "Partner(s) should have an email address."
+msgstr ""
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__partner_id
-msgid "Partner"
-msgstr "협력사"
+#: model:ir.module.module,shortdesc:base.module_account_followup
+msgid "Payment Follow-up Management"
+msgstr ""
 
 #. module: account_followup
-#: model:mail.template,name:account_followup.email_template_followup_1
-msgid "Payment Reminder"
-msgstr "결제 알림"
+#: model:mail.template,name:account_followup.mail_template_payment_reminder_before_due
+msgid "Payment Reminder before due date"
+msgstr ""
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__print
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Print"
-msgstr "인쇄"
+msgid "Preview, the content will be adapted per client"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.actions.report,name:account_followup.action_report_followup
-msgid "Print Follow-up Letter"
-msgstr "후속조치 서신 인쇄"
+msgid "Print Reminder Letter"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.actions.server,name:account_followup.action_account_reports_customer_statements_do_followup
-msgid "Process Follow-ups"
-msgstr "프로세스 후속 조치"
-
-#. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
-msgid "Reference"
-msgstr "참조"
+msgid "Process Automatic Reminders"
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
@@ -931,10 +1658,32 @@ msgid "Remind"
 msgstr "미리 알림"
 
 #. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_account_move_line__followup_line_id
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_line_id
+#: model:ir.model.fields,field_description:account_followup.field_res_users__followup_line_id
+msgid "Reminder Level"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__followup
+msgid "Reminder Responsible"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__reminder_timing
+msgid "Reminder Timing"
+msgstr ""
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.report_followup_print_all
+msgid "Reminder details"
+msgstr ""
+
+#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_reminder_type
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_reminder_type
 msgid "Reminders"
-msgstr "미리 알림"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__render_model
@@ -947,11 +1696,6 @@ msgid "Report Action"
 msgstr "보고서 작업"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
-msgid "Requires Follow-up"
-msgstr "후속 조치 필요"
-
-#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_default_responsible_type
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_responsible_id
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_responsible_id
@@ -960,7 +1704,6 @@ msgstr "담당자"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__send_sms
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "SMS"
 msgstr "SMS"
 
@@ -975,59 +1718,92 @@ msgid "Schedule Activity"
 msgstr "활동 계획표"
 
 #. module: account_followup
+#: model:ir.model,name:account_followup.model_ir_cron
+msgid "Scheduled Action"
+msgstr ""
+
+#. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_line_filter
 msgid "Search Follow-up"
 msgstr "후속 조치 검색"
 
 #. module: account_followup
-#: model:mail.template,name:account_followup.demo_followup_email_template_2
-msgid "Second reminder followup"
-msgstr "두번째 알림 후속조치"
+#: model:mail.template,name:account_followup.mail_template_invoice_payment_second_reminder
+#: model:mail.template,name:account_followup.mail_template_partner_payment_second_reminder
+msgid "Second Reminder"
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-#: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Send"
 msgstr "보내기"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Send & Print"
-msgstr "전송 및 인쇄"
+#: model:ir.model,name:account_followup.model_account_move_send_wizard
+msgid "Send Invoice Wizard"
+msgstr ""
 
 #. module: account_followup
-#: model:ir.actions.act_window,name:account_followup.manual_reminder_action
-msgid "Send and Print"
-msgstr "전송 및 인쇄"
+#: model_terms:ir.ui.view,arch_db:account_followup.view_out_invoice_tree_reminder_inherit
+msgid "Send Reminder"
+msgstr ""
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__show_print_button
-msgid "Show Print Button"
-msgstr "인쇄 버튼 표시"
+#. odoo-python
+#: code:addons/account_followup/models/account_move.py:0
+msgid "Send Reminders"
+msgstr ""
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__show_send_button
-msgid "Show Send Button"
-msgstr "전송 버튼 표시"
+#: model:mail.template,description:account_followup.mail_template_partner_payment_kind_reminder
+msgid ""
+"Send a kind payment reminder to customers with their invoices in attachment"
+msgstr ""
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__sms
-msgid "Sms"
-msgstr "SMS"
+#: model:mail.template,description:account_followup.mail_template_invoice_payment_kind_reminder
+msgid "Send a kind reminder to customers with their invoices in attachment"
+msgstr ""
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__sms_body
-msgid "Sms Body"
-msgstr "SMS 본문"
+#: model:mail.template,description:account_followup.mail_template_partner_payment_last_reminder
+msgid ""
+"Send a last payment reminder to customers with their invoices in attachment"
+msgstr ""
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Sms Content"
-msgstr "SMS 내용"
+#: model:mail.template,description:account_followup.mail_template_invoice_payment_last_reminder
+msgid "Send a last reminder to customers with their invoices in attachment"
+msgstr ""
+
+#. module: account_followup
+#: model:mail.template,description:account_followup.mail_template_payment_reminder_before_due
+msgid "Send a payment reminder before the due date to customer"
+msgstr ""
+
+#. module: account_followup
+#: model:mail.template,description:account_followup.mail_template_partner_payment_second_reminder
+msgid ""
+"Send a second payment reminder to customers with their invoices in attachment"
+msgstr ""
+
+#. module: account_followup
+#: model:mail.template,description:account_followup.mail_template_invoice_payment_second_reminder
+msgid "Send a second reminder to customers with their invoices in attachment"
+msgstr ""
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.res_config_settings_view_form
+msgid "Send reminders for invoices and customer statement"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__delay
+msgid "Signed Delay"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__sms_template_id
-#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__sms_template_id
 msgid "Sms Template"
 msgstr "SMS 서식"
 
@@ -1035,6 +1811,11 @@ msgstr "SMS 서식"
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__subject
 msgid "Subject"
 msgstr "제목"
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__preview_subject
+msgid "Subject Preview"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_summary
@@ -1057,22 +1838,32 @@ msgid "The document(s) that generated the invoice."
 msgstr "청구서 생성 문서"
 
 #. module: account_followup
-#: model:ir.model.fields,help:account_followup.field_account_followup_followup_line__delay
+#: model:ir.model.fields,help:account_followup.field_account_followup_followup_line__display_delay
 msgid ""
-"The number of days after the due date of the invoice to wait before sending "
-"the reminder. Can be negative if you want to send the reminder before the "
-"invoice due date."
+"The number of days after or before the due date of the invoice to wait "
+"before sending the reminder."
 msgstr ""
-"청구서 마감일 후 알림 전송 대기 날짜입니다. 음수값으로 지정하면 마감일 전에 "
-"알림을 보낼 수 있습니다."
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_res_partner__followup_responsible_id
 #: model:ir.model.fields,help:account_followup.field_res_users__followup_responsible_id
 msgid ""
-"The responsible assigned to manual followup activities, if defined in the "
+"The responsible assigned to manual reminder activities, if defined in the "
 "level."
-msgstr "수동 후속 조치 담당자입니다. 각 단계에 지정된 경우 표시됩니다."
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.constraint,message:account_followup.constraint_account_followup_followup_line_days_uniq
+msgid "There can only be one reminder level with a given delay (per company)"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,help:account_followup.field_account_bank_statement_line__last_auto_reminder
+#: model:ir.model.fields,help:account_followup.field_account_move__last_auto_reminder
+msgid ""
+"This field helps with automatic reminder sending date calculations when the "
+"reminder is belated"
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_tree_view
@@ -1086,26 +1877,46 @@ msgid "Total All Due"
 msgstr "결제 예정액 총계"
 
 #. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_due_abs
+#: model:ir.model.fields,field_description:account_followup.field_res_users__total_all_due_abs
+msgid "Total All Due Abs"
+msgstr ""
+
+#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_overdue
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_all_overdue
 msgid "Total All Overdue"
 msgstr "결제 예정액 총계"
 
 #. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_due
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_due
 msgid "Total Due"
 msgstr "결제 예정액 합계"
 
 #. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__total_due_currency_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_users__total_due_currency_followup
+msgid "Total Due Currency Followup"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__total_due_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_users__total_due_followup
+msgid "Total Due Followup"
+msgstr ""
+
+#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_overdue
 msgid "Total Overdue"
 msgstr "연체된 금액 합계"
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue_currency_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_users__total_overdue_currency_followup
+msgid "Total Overdue Currency Followup"
+msgstr ""
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_overdue_followup
@@ -1114,22 +1925,16 @@ msgid "Total Overdue Followup"
 msgstr "조치가 필요한 총 연체 금액"
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_res_partner__unpaid_invoice_ids
-#: model:ir.model.fields,field_description:account_followup.field_res_users__unpaid_invoice_ids
-msgid "Unpaid Invoice"
-msgstr "미결제 청구서"
-
-#. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_res_partner__unpaid_invoices_count
-#: model:ir.model.fields,field_description:account_followup.field_res_users__unpaid_invoices_count
-msgid "Unpaid Invoices Count"
-msgstr "미결제 청구서 수"
-
-#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__unreconciled_aml_ids
 #: model:ir.model.fields,field_description:account_followup.field_res_users__unreconciled_aml_ids
 msgid "Unreconciled Aml"
 msgstr "미조정된 Aml"
+
+#. module: account_followup
+#. odoo-python
+#: code:addons/account_followup/wizard/followup_manual_reminder.py:0
+msgid "View Partner(s)"
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.missing_information_view_form
@@ -1141,23 +1946,12 @@ msgstr "파트너 보기"
 msgid ""
 "We were not able to process some of the automated follow-up actions due to "
 "missing information on the partners."
-msgstr ""
-"협력사에 대한 정보가 누락되어 일부 자동화된 후속 조치를 처리할 수 없었습니다."
-
-#. module: account_followup
-#: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_status__with_overdue_invoices
-msgid "With overdue invoices"
-msgstr "연체된 청구서 포함"
+msgstr "협력사에 대한 정보가 누락되어 일부 자동화된 후속 조치를 처리할 수 없었습니다."
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_manual_reminder
 msgid "Wizard for sending manual reminders to clients"
 msgstr "고객에게 직접 알림 발송 마법사"
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
-msgid "Write your message here..."
-msgstr "여기에 메시지를 작성하십시오."
 
 #. module: account_followup
 #. odoo-python
@@ -1181,19 +1975,34 @@ msgstr ""
 
 #. module: account_followup
 #. odoo-python
-#: code:addons/account_followup/models/res_partner.py:0
-msgid "commercial_partner_id"
-msgstr "commercial_partner_id"
+#: code:addons/account_followup/models/ir_cron.py:0
+msgid ""
+"You cannot activate this action because 'Automatic Invoice Reminders' are "
+"disabled."
+msgstr ""
+
+#. module: account_followup
+#. odoo-python
+#: code:addons/account_followup/models/mail_template.py:0
+msgid ""
+"You cannot delete this mail template, it is used in the invoice reminder "
+"sending flow."
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__after
+msgid "after"
+msgstr ""
+
+#. module: account_followup
+#: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__reminder_timing__before
+msgid "before"
+msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
-msgid "days after due date"
-msgstr "일 (마감일 경과 후)"
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
-msgid "e.g. First Reminder Email"
-msgstr "예: 첫 번째 알림용 이메일"
+msgid "days"
+msgstr ""
 
 #. module: account_followup
 #. odoo-python
@@ -1202,113 +2011,45 @@ msgid "payment reminder"
 msgstr "결제 알림"
 
 #. module: account_followup
-#: model:mail.template,subject:account_followup.demo_followup_email_template_2
+#: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
+msgid "to enable them."
+msgstr ""
+
+#. module: account_followup
+#: model:mail.template,subject:account_followup.mail_template_partner_payment_kind_reminder
+#: model:mail.template,subject:account_followup.mail_template_partner_payment_last_reminder
+#: model:mail.template,subject:account_followup.mail_template_partner_payment_second_reminder
+#: model:mail.template,subject:account_followup.mail_template_payment_reminder_before_due
+msgid ""
+"{{ (object.company_id or "
+"object._get_followup_responsible().company_id).name }} Payment Reminder"
+msgstr ""
+
+#. module: account_followup
 #: model:mail.template,subject:account_followup.demo_followup_email_template_4
-#: model:mail.template,subject:account_followup.email_template_followup_1
 msgid ""
 "{{ (object.company_id or "
 "object._get_followup_responsible().company_id).name }} Payment Reminder - "
-"{{ object.commercial_company_name }}"
+"{{ object.parent_name }}"
 msgstr ""
-"{{ (object.company_id or "
-"object._get_followup_responsible().company_id).name }} 결제 알림 - "
-"{{ object.commercial_company_name }}"
 
-#~ msgid "%s (copy)"
-#~ msgstr "%s (사본)"
+#. module: account_followup
+#: model:mail.template,subject:account_followup.mail_template_invoice_payment_kind_reminder
+msgid ""
+"{{ object.company_id.name }} Kind Reminder (Ref {{ object.name or 'n/a' }})"
+msgstr ""
 
-#~ msgid "%s Payment Reminder - %s"
-#~ msgstr "%s 결제 알림 - %s"
+#. module: account_followup
+#: model:mail.template,subject:account_followup.mail_template_invoice_payment_last_reminder
+msgid ""
+"{{ object.company_id.name }} Last Reminder (Ref {{ object.name or 'n/a' }})"
+msgstr ""
 
-#~ msgid "Address Type"
-#~ msgstr "주소 유형"
+#. module: account_followup
+#: model:mail.template,subject:account_followup.mail_template_invoice_payment_second_reminder
+msgid ""
+"{{ object.company_id.name }} Second Reminder (Ref {{ object.name or 'n/a' }})"
+msgstr ""
 
-#~ msgid "Assigned to me"
-#~ msgstr "나에게 배정"
-
-#~ msgid "Country"
-#~ msgstr "국가"
-
-#~ msgid ""
-#~ "Date where the next action should be taken for a receivable item. "
-#~ "Usually, automatically set when sending reminders through the customer "
-#~ "statement."
-#~ msgstr ""
-#~ "미수 항목에 대해 다음으로 조치를 취할 날짜입니다. 일반적으로 고객 명세서"
-#~ "를 통해 미리 알림이 발송되면 자동 설정됩니다."
-
-#~ msgid "Exclude from Follow-ups"
-#~ msgstr "후속조치에서 제외"
-
-#~ msgid "Follow up"
-#~ msgstr "후속조치"
-
-#~ msgid "Follow-up %s - %s"
-#~ msgstr "후속조치 %s - %s"
-
-#~ msgid "Follow-up Address"
-#~ msgstr "후속조치 주소"
-
-#~ msgid "Follow-up Reports"
-#~ msgstr "후속 조치 보고서"
-
-#~ msgid "Follow-up Reports Tree View"
-#~ msgstr "후속 조치 보고서 트리 보기"
-
-#~ msgid "Follow-up reports"
-#~ msgstr "후속 조치 보고서"
-
-#~ msgid "Group By"
-#~ msgstr "그룹별"
-
-#~ msgid "Invoice No."
-#~ msgstr "청구서 번호"
-
-#~ msgid "Invoice/Bill Date"
-#~ msgstr "청구서/공급업체 청구서 발행일"
-
-#~ msgid "Invoices"
-#~ msgstr "청구서"
-
-#~ msgid "Latest Follow-up"
-#~ msgstr "최근 후속 조치"
-
-#~ msgid "Next Action Date"
-#~ msgstr "다음 조치 날짜"
-
-#~ msgid "No follow-up to send!"
-#~ msgstr "발송할 후속 조치가 없습니다!"
-
-#~ msgid ""
-#~ "Optional translation language (ISO code) to select when sending out an "
-#~ "email. If not set, the english version will be used. This should usually "
-#~ "be a placeholder expression that provides the appropriate language, e.g. "
-#~ "{{ object.partner_id.lang }}."
-#~ msgstr ""
-#~ "이메일 전송 시 번역할 언어 (ISO code)를 선택할 수 있습니다. 설정하지 않을 "
-#~ "경우, 영어가 기본 언어로 사용됩니다. 적절한 언어를 선택할 수 있도록 다음"
-#~ "과 같은 예시용 메시지를 사용합니다. {{ object.partner_id.lang }}."
-
-#~ msgid "Overdue Payments for %s"
-#~ msgstr "%s에 대한 연체 금액"
-
-#~ msgid "Process Automatic Follow-ups"
-#~ msgstr "자동 후속조치 처리"
-
-#~ msgid "Reconcile"
-#~ msgstr "조정"
-
-#~ msgid "Residual Amount"
-#~ msgstr "잔존 가치"
-
-#~ msgid "Send Email"
-#~ msgstr "이메일 보내기"
-
-#~ msgid "Send SMS Message"
-#~ msgstr "SMS 메시지 전송"
-
-#~ msgid "Total Amount"
-#~ msgstr "합계 금액"
-
-#~ msgid "[Draft]"
-#~ msgstr "[초안]"
+#~ msgid "Days of the follow-up lines must be different per company"
+#~ msgstr "후속 항목의 날짜는 회사마다 다르게 지정해야 합니다."

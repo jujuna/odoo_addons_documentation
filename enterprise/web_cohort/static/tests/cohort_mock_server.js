@@ -113,9 +113,9 @@ onRpc("get_cohort_data", function getCohortData({ kwargs, model }) {
             if (kwargs.mode === "churn") {
                 percentage = 1 - percentage;
             }
+            columnsAvg[column]["percentage"] += 100 * percentage * value;
+            columnsAvg[column]["count"] += value;
             percentage = Number((100 * percentage).toFixed(1));
-            columnsAvg[column]["percentage"] += percentage;
-            columnsAvg[column]["count"] += 1;
             columns.push({
                 value: remainingValue,
                 churn_value: churnValue,

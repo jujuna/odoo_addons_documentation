@@ -1,4 +1,10 @@
-import { contains, defineModels, mountView, onRpc, serverState } from "@web/../tests/web_test_helpers";
+import {
+    contains,
+    defineModels,
+    mountView,
+    onRpc,
+    serverState,
+} from "@web/../tests/web_test_helpers";
 import { omit } from "@web/core/utils/objects";
 
 import { describe, expect, test } from "@odoo/hoot";
@@ -21,10 +27,10 @@ const archWithTags = basicDocumentsKanbanArch.replace(
     '<field name="name"/>',
     /* xml */ `
         <field name="name"/>
-        <field name="tag_ids" class="d-block text-wrap" widget="many2many_tags" options="{'color_field': 'color'}"/>
+        <field name="tag_ids" class="d-block text-wrap" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
         <field name="alias_domain_id"/>
         <field name="alias_name"/>
-        <field name="alias_tag_ids" class="d-block text-wrap" widget="many2many_tags" options="{'color_field': 'color'}"/>
+        <field name="alias_tag_ids" class="d-block text-wrap" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
         <field name="create_activity_type_id"/>
         <field name="mail_alias_domain_count"/>
     `
@@ -40,8 +46,6 @@ const dp = (selector) => `.o_documents_details_panel ${selector}`;
 const binaryTestedValues = { tag_ids: [1, 2], owner_id: serverState.userId };
 const folderTestedValues = {
     alias_id: 1,
-    alias_domain_id: 1,
-    alias_name: "alias",
     alias_tag_ids: [1, 2],
     mail_alias_domain_count: 2,
     owner_id: serverState.userId,
@@ -56,8 +60,6 @@ defineModels(DocumentsModels);
 onRpc("ir.model", "display_name_for", ({ args }) =>
     args[0].map((model) => ({ model, display_name: model }))
 );
-onRpc("/documents/touch/<access_token>", () => ({}));
-
 test("Details panel rendering for editors", async () => {
     const serverData = getDocumentsTestServerModelsData([
         makeDocumentRecordData(2, "Testing tags", { folder_id: 1, ...binaryTestedValues }),
@@ -66,7 +68,7 @@ test("Details panel rendering for editors", async () => {
     await makeDocumentsMockEnv({ serverData });
     await mountDocumentsKanbanView({ arch: archWithTags });
     await contains(".o_kanban_record:contains('Testing tags')").click();
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     await animationFrame();
     expect(dp(".o_documents_details_panel_name input")).toHaveCount(1);
     expect(dp(".o_documents_details_panel_name input")).toHaveValue("Testing tags");
@@ -106,7 +108,7 @@ test("Details panel rendering for viewers - m2o/m2m values", async () => {
     await makeDocumentsMockEnv({ serverData });
     await mountDocumentsKanbanView({ arch: archWithTags });
     await contains(".o_kanban_record:contains('Testing tags')").click();
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     await animationFrame();
 
     await waitFor(dp(".o_documents_details_panel_name span:contains('Testing Tags')"));
@@ -137,7 +139,7 @@ test("Details panel rendering for viewers - m2o/m2m pseudo-placeholders", async 
     await makeDocumentsMockEnv({ serverData });
     await mountDocumentsKanbanView({ arch: archWithTags });
     await contains(".o_kanban_record:contains('Testing tags')").click();
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     await animationFrame();
 
     await waitFor(dp(".o_documents_details_panel_name span:contains('Testing Tags')"));
@@ -160,7 +162,7 @@ test("Details panel required document name", async () => {
     ]);
     await makeDocumentsMockEnv({ serverData });
     await mountDocumentsKanbanView({ arch: archWithTags });
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     for (const documentName of [
         "Folder 1", // Container
         "Testing folder",
@@ -189,7 +191,7 @@ test("Details panel root folder placeholders", async () => {
     ]);
     await makeDocumentsMockEnv({ serverData });
     await mountDocumentsKanbanView({ arch: archWithTags });
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     // Edit mode
     for (const [documentName, rootPlaceholder] of [
         ["In COMPANY", "Company"],
@@ -200,7 +202,7 @@ test("Details panel root folder placeholders", async () => {
         await animationFrame();
         expect(dp(".o_documents_details_panel_name input")).toHaveCount(1);
         expect(dp(".o_documents_details_panel_name input")).toHaveValue(documentName);
-        expect(dp(".fa-folder + .o_field_many2one input")).toHaveAttribute(
+        expect(dp("[data-icon='folder'].oi-filled + .o_field_many2one input")).toHaveAttribute(
             "placeholder",
             rootPlaceholder,
             { message: "Document should have correct root folder placeholder (editors)." }
@@ -211,10 +213,13 @@ test("Details panel root folder placeholders", async () => {
     await animationFrame();
     expect(dp(".o_documents_details_panel_name span")).toHaveCount(1);
     expect(dp(".o_documents_details_panel_name span")).toHaveText("In COMPANY (readonly)");
-    expect(dp(".fa-folder + .o_field_many2one .o_documents_details_panel_placeholder")).toHaveText(
-        "Company",
-        { message: "Document should have correct root folder placeholder (viewers)." }
-    );
+    expect(
+        dp(
+            "[data-icon='folder'].oi-filled + .o_field_many2one .o_documents_details_panel_placeholder"
+        )
+    ).toHaveText("Company", {
+        message: "Document should have correct root folder placeholder (viewers).",
+    });
 });
 
 test("Details panel should be updated when clearing a selection", async function () {
@@ -223,7 +228,7 @@ test("Details panel should be updated when clearing a selection", async function
     ]);
     await makeDocumentsMockEnv({ serverData });
     await mountDocumentsKanbanView({ arch: archWithTags });
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     for (const documentName of ["Folder 1", "Test file"]) {
         await contains(`.o_kanban_record:contains('${documentName}')`).click();
         await animationFrame();
@@ -239,7 +244,7 @@ test("Details panel should be updated when clearing a selection", async function
 test("Details panel changes to folders are immediately saved and visible in the app", async function () {
     await makeDocumentsMockEnv({ serverData: getDocumentsTestServerModelsData() });
     await mountDocumentsKanbanView({ arch: archWithTags });
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     await contains(
         "li.o_search_panel_category_value:contains('COMPANY') button.o_toggle_fold"
     ).click();
@@ -288,7 +293,7 @@ test("All models should be displayed in the details panel", async function () {
     await makeDocumentsMockEnv({ serverData });
     await mountDocumentsKanbanView({ arch: archWithTags });
     await contains(".o_kanban_record:contains('Test Request')").click();
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     await animationFrame();
 
     await contains(dp("input[placeholder='No linked model']")).click();
@@ -316,9 +321,9 @@ test("Details panel rendering", async function () {
         searchViewArch: getEnrichedSearchArch(),
     });
     await contains(`.o_data_row td[name="id"]:contains(2)`).click();
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     expect(dp(".o_documents_details_panel_name input")).toHaveValue("Testing container");
-    expect(dp(".fa-envelope + div .o_field_char input")).toHaveValue("alias");
+    expect(dp("[data-icon='mail'].oi-filled + div .o_field_char input")).toHaveValue("alias");
 });
 
 test("Add from document from log a note", async () => {
@@ -345,12 +350,12 @@ test("Add from document from log a note", async () => {
         makeDocumentRecordData(2, "Folder 2", { type: "folder" }),
         makeDocumentRecordData(11, "File 1", {
             attachment_id: 101,
-            user_folder_id: "1",
+            folder_id: 1,
             type: "binary",
         }),
         makeDocumentRecordData(12, "File 2", {
             attachment_id: 102,
-            user_folder_id: "2",
+            folder_id: 2,
             type: "binary",
         }),
     ]);
@@ -358,28 +363,82 @@ test("Add from document from log a note", async () => {
         { id: 101, name: "File 1", mimetype: "text/plain" },
         { id: 102, name: "File 2", mimetype: "text/plain" },
     ];
+    DocumentsModels.DocumentsDocument._views = {
+        "kanban,documents.documents_view_kanban_add_documents_attachment":
+            basicDocumentsKanbanArch.replace(
+                'js_class="documents_kanban"',
+                'js_class="documents_kanban_secondary"'
+            ),
+    };
     await makeDocumentsMockEnv({ serverData });
     await mountDocumentsKanbanView({ arch: archWithTags });
 
     await contains(".o_kanban_record:contains('File 1')").click();
-    await contains(".o_control_panel_navigation .fa-info-circle").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
     await waitFor(".o_document_chatter_container button.o-mail-Chatter-logNote:not(:disabled)");
 
     await contains(".o_document_chatter_container button.o-mail-Chatter-logNote").click();
     await contains(".o_document_chatter_container button[title='Add from Documents']").click();
+    await expect(".o_select_create_dialog_content .o_kanban_renderer").toHaveCount(1);
     await contains(
-        ".o_select_create_dialog_content .o_search_panel_label_title:contains('Company')"
+        ".o_select_create_dialog_content .o_search_panel_label:contains('Company') .o_toggle_fold"
     ).click();
     await contains(
         ".o_select_create_dialog_content .o_search_panel_label_title:contains('Folder 2')"
     ).click();
     // As defining a list view interferes with the view behind the modal, we select "File 2" as only child of Folder 2.
-    await contains(".o_select_create_dialog_content .o_data_row .o-checkbox input").click();
-    await contains(".o_select_create_dialog_content button:contains('Add from Documents')").click();
+    await contains(".o_select_create_dialog_content .o_kanban_record:contains('File 2')").click();
+    await contains(
+        ".o_select_create_dialog_content button:contains('Add as attachment(s)')"
+    ).click();
 
     // The attachment has been added in the composer.
     expect(".o-mail-Composer .o-mail-Attachment-hoverImageText:contains('File 2')").toHaveCount(1);
     // But the attachment is not linked to the thread.
     expect(".o-mail-Chatter-topbar .o-mail-Chatter-attachFiles:contains('1')").toHaveCount(0);
     await expect.waitForSteps(["add_documents_attachment"]);
+});
+
+test("Access warning should be displayed when linked_model field changes", async function () {
+    const serverData = getDocumentsTestServerModelsData([
+        makeDocumentRecordData(2, "Test Request", { folder_id: 1 }),
+    ]);
+    await makeDocumentsMockEnv({ serverData });
+    await mountDocumentsKanbanView();
+    await contains(".o_kanban_record:contains('Test Request')").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
+    await contains(dp("input[placeholder='No linked model']")).click();
+    await contains(".o-autocomplete--dropdown-item.ui-menu-item").click();
+    expect(".o_notification_content").toHaveText(
+        "Caution. Anyone with access to the linked record will be able to access the attachment."
+    );
+});
+
+test("Details panel reset to current folder when a page is turned", async function () {
+    const serverData = getDocumentsTestServerModelsData(
+        Array.from({ length: 42 }, (_, i) =>
+            makeDocumentRecordData(i + 2, `Test Document ${i + 1}`, {
+                folder_id: 1,
+                file_size: 500,
+            })
+        )
+    );
+    await makeDocumentsMockEnv({ serverData });
+    await mountDocumentsKanbanView({ arch: archWithTags });
+    await contains(".o_kanban_record:contains('Folder 1')").click();
+    await contains(".o_control_panel_navigation [data-icon='info']").click();
+    await expect("div.o_field_widget.o_documents_details_panel_name > input").toHaveValue(
+        "Folder 1"
+    );
+    await contains(".o_kanban_record:contains('Test Document 1')").click();
+    await expect("div.o_field_widget.o_documents_details_panel_name > input").toHaveValue(
+        "Test Document 1"
+    );
+    await contains(".o_pager_next").click();
+    await expect("div.o_field_widget.o_documents_details_panel_name > input").toHaveValue(
+        "Folder 1"
+    );
+    await expect(
+        "div.o_documents_details_panel.o_documents_details_panel_folder > div > div.text-nowrap.ms-2"
+    ).toHaveText(/~20kB/);
 });

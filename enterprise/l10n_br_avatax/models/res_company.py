@@ -17,7 +17,7 @@ class ResCompany(models.Model):
         required=True,
         default='sandbox',
     )
-    l10n_br_icms_rate = fields.Float(string='Simplified Regime ICMS Rate')
+    l10n_br_icms_rate = fields.Float(string='ICMS Simplified Credit Rate')
     l10n_br_cnae_code_id = fields.Many2one(
         "l10n_br.cnae.code",
         string="CNAE Code",

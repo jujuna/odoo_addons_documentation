@@ -6,15 +6,14 @@
 # Martin Trigaux, 2022
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2026-01-06 10:37+0000\n"
-"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 23:32+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
 "account_transfer/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +21,16 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_transfer
+#: model:ir.module.module,description:base.module_account_transfer
+msgid ""
+"\n"
+"Account Transfers\n"
+"===========================\n"
+"A helper model for managing transfers between accounts.\n"
+msgstr ""
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -61,6 +69,11 @@ msgstr "نموذج تحويل الحساب "
 #: model:ir.model,name:account_transfer.model_account_transfer_model_line
 msgid "Account Transfer Model Line"
 msgstr "بند نموذج تحويل الحساب "
+
+#. module: account_transfer
+#: model:ir.module.module,shortdesc:base.module_account_transfer
+msgid "Account Transfers"
+msgstr ""
 
 #. module: account_transfer
 #: model:ir.actions.server,name:account_transfer.ir_cron_auto_transfer_ir_actions_server
@@ -198,6 +211,13 @@ msgstr "المُعرف"
 #. module: account_transfer
 #. odoo-python
 #: code:addons/account_transfer/demo/account_demo.py:0
+#: model:account.journal.group,name:account_transfer.ifrs_group
+msgid "IFRS"
+msgstr ""
+
+#. module: account_transfer
+#. odoo-python
+#: code:addons/account_transfer/demo/account_demo.py:0
 msgid "IFRS Transfers"
 msgstr ""
 
@@ -296,8 +316,7 @@ msgstr "بالمئة "
 msgid ""
 "Percentage of the sum of lines from the origin accounts will be transferred "
 "to the destination account"
-msgstr ""
-"سوف يتم تحويل نسبة من مجموع البنود من الحسابات الأصلية إلى حساب الوجهة "
+msgstr "سوف يتم تحويل نسبة من مجموع البنود من الحسابات الأصلية إلى حساب الوجهة "
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -310,8 +329,6 @@ msgid ""
 "Puts the transfer model in a state in which it will automatically recompute "
 "its draft entries' values every day."
 msgstr ""
-"يضع نموذج التحويل في حالة يتم فيها إعادة حساب قيم مسودات القيود تلقائيًا كل "
-"يوم."
 
 #. module: account_transfer
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
@@ -319,8 +336,6 @@ msgid ""
 "Puts the transfer model in a state in which it will not automatically "
 "recompute its draft entries' values every day."
 msgstr ""
-"يضع نموذج التحويل في حالة لا يقوم فيها تلقائيًا بإعادة حساب قيم مسودات القيود "
-"كل يوم."
 
 #. module: account_transfer
 #: model:ir.model.fields.selection,name:account_transfer.selection__account_transfer_model__frequency__quarter
@@ -405,8 +420,6 @@ msgid ""
 "You cannot delete a transfer model that has draft moves attached ('%s'). "
 "Please delete them before deleting this transfer."
 msgstr ""
-"لا يمكنك حذف نموذج تحويل يحتوي على مسودات حركة تم إرفاقها (\"%s\"). يرجى "
-"حذفها قبل حذف هذا التحويل."
 
 #. module: account_transfer
 #. odoo-python
@@ -430,88 +443,3 @@ msgstr "مثال: التحويل الشهري للنفقات "
 #: model_terms:ir.ui.view,arch_db:account_transfer.view_transfer_model_form
 msgid "forever"
 msgstr "للأبد"
-
-#~ msgid "Activate"
-#~ msgstr "تفعيل"
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these analytic accounts to the destination account"
-#~ msgstr ""
-#~ "يقوم بإضافة شرط لتحويل مجموع البنود من الحسابات الأصلية التي تطابق تلك "
-#~ "الحسابات التحليلية إلى الحساب الهدف فقط "
-
-#~ msgid ""
-#~ "Adds a condition to only transfer the sum of the lines from the origin "
-#~ "accounts that match these partners to the destination account"
-#~ msgstr ""
-#~ "يقوم بإضافة شرط لتحويل مجموع البنود من الحسابات الأصلية التي تطابق هؤلاء "
-#~ "الشركاء إلى الحساب الهدف فقط "
-
-#~ msgid "Analytic Filter"
-#~ msgstr "عامل تصفية تحليلي "
-
-#~ msgid "Automated Transfer"
-#~ msgstr "التحويل التلقائي "
-
-#~ msgid "Automatic Transfer (%s%% from account %s)"
-#~ msgstr "التحويل التلقائي (%s%% من الحساب %s)"
-
-#~ msgid "Automatic Transfer (-%s%%)"
-#~ msgstr "التحويل التلقائي (-%s%%)"
-
-#~ msgid ""
-#~ "Automatic Transfer (entries with analytic account(s): %s and partner(s): "
-#~ "%s)"
-#~ msgstr ""
-#~ "التحويل التلقائي (القيود التي بها حساب (حسابات) تحليلية: %s والشريك "
-#~ "(الشركاء): %s)"
-
-#~ msgid "Automatic Transfer (entries with analytic account(s): %s)"
-#~ msgstr "التحويل التلقائي (القيود التي بها حساب (حسابات) تحليلية: %s)"
-
-#~ msgid "Automatic Transfer (entries with partner(s): %s)"
-#~ msgstr "التحويل التلقائي (القيود التي بها شريك (شركاء): %s) "
-
-#~ msgid ""
-#~ "Automatic Transfer (from account %s with analytic account(s): %s and "
-#~ "partner(s): %s)"
-#~ msgstr ""
-#~ "التحويل التلقائي (من الحساب %s مع الحساب (الحسابات) التحليلية: %s والشريك "
-#~ "(الشركاء): %s) "
-
-#~ msgid "Automatic Transfer (from account %s with analytic account(s): %s)"
-#~ msgstr "التحويل التلقائي (من الحساب %s مع الحساب (الحسابات) التحليلية: %s)"
-
-#~ msgid "Automatic Transfer (from account %s with partner(s): %s)"
-#~ msgstr "التحويل التلقائي (من الحساب %s مع الشريك (الشركاء): %s)"
-
-#~ msgid "Automatic Transfer (to account %s)"
-#~ msgstr "التحويل التلقائي (للحساب %s)"
-
-#~ msgid "Automatic Transfers"
-#~ msgstr "التحويلات التلقائية "
-
-#~ msgid "Partner Filter"
-#~ msgstr "عامل تصفية الشريك "
-
-#~ msgid "Percent (%)"
-#~ msgstr "النسبة (%)"
-
-#~ msgid "Percent Is Readonly"
-#~ msgstr "النسبة للقراءة فقط "
-
-#~ msgid "Running"
-#~ msgstr "جاري"
-
-#~ msgid "The analytic filter %s is duplicated"
-#~ msgstr "تم إنشاء نسخة مطابقة من عامل التصفية التحليلي %s "
-
-#~ msgid ""
-#~ "The partner filter %s in combination with the analytic filter %s is "
-#~ "duplicated"
-#~ msgstr ""
-#~ "تم إنشاء نسخة مطابقة لعامل تصفية الشريك %s وجمعه مع الحساب التحليلي %s "
-
-#~ msgid "The partner filter %s is duplicated"
-#~ msgstr "تم إنشاء نسخة مطابقة لعامل تصفية الشريك %s "

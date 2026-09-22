@@ -82,7 +82,6 @@ registry.category("web_tour.tours").add("spreadsheet_create_empty_sheet", {
         {
             trigger: ".o_action_manager:not(:has(.o_spreadsheet_action))",
             content: "Wait for the spreadsheet to be properly unloaded",
-            run() {},
         },
     ],
 });
@@ -132,6 +131,11 @@ registry.category("web_tour.tours").add("spreadsheet_create_list_view", {
             run: "click",
         },
         {
+            trigger: ".o-menu-item[data-name='list_data_sources']",
+            content: "Open List submenu",
+            run: "click",
+        },
+        {
             trigger: ".o-menu-item[data-name='item_list_1']",
             content: "Open List Side Panel",
             run: "click",
@@ -144,7 +148,6 @@ registry.category("web_tour.tours").add("spreadsheet_create_list_view", {
         {
             trigger: ".o_action_manager:not(:has(.o_spreadsheet_action))",
             content: "Wait for the spreadsheet to be properly unloaded",
-            run() {},
         },
     ],
 });

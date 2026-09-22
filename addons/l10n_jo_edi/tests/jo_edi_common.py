@@ -4,6 +4,8 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
 class JoEdiCommon(AccountTestInvoicingCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('jo')
     def setUpClass(cls):
@@ -49,10 +51,10 @@ class JoEdiCommon(AccountTestInvoicingCommon):
             'country_id': cls.env.ref('base.jo').id,
             'state_id': cls.env.ref('base.state_jo_az').id,
             'phone': '+962 795-5585-949',
-            'company_type': 'company',
         })
 
         # The rate of 1 USD = 2 JOD is meant to simplify tests
+        cls.jod = cls.env.ref('base.JOD')
         cls.usd = cls.env.ref('base.USD')
         cls.setup_currency_rate(cls.usd, 0.5)
 

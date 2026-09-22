@@ -7,11 +7,10 @@ from odoo.tools import file_open
 
 SCALE_FILES = [
     'l10n_eu_iot_scale_cert/controllers/checksum.py',
-    'l10n_eu_iot_scale_cert/static/src/pos_overrides/components/scale_screen/certified_scale_service.js',
-    'l10n_eu_iot_scale_cert/static/src/pos_overrides/components/scale_screen/certified_scale_screen.js',
-    'l10n_eu_iot_scale_cert/static/src/pos_overrides/components/scale_screen/certified_scale_screen.xml',
-    'l10n_eu_iot_scale_cert/static/src/pos_overrides/components/order_receipt/certified_order_receipt.xml',
-    'l10n_eu_iot_scale_cert/static/src/pos_overrides/components/orderline/certified_orderline.xml',
+    'l10n_eu_iot_scale_cert/static/src/app/components/certified_scale_screen/certified_scale_screen.js',
+    'l10n_eu_iot_scale_cert/static/src/app/components/certified_scale_screen/certified_scale_screen.xml',
+    'l10n_eu_iot_scale_cert/receipt/pos_order_receipt.xml',
+    'l10n_eu_iot_scale_cert/static/src/pos_overrides/components/orderline/certified_orderline.js',
     'iot_drivers/iot_handlers/drivers/serial_scale_driver.py',
 ]
 

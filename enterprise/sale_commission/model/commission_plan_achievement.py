@@ -11,10 +11,11 @@ class SaleCommissionPlanAchievement(models.Model):
     plan_id = fields.Many2one('sale.commission.plan', required=True, ondelete='cascade', index=True)
 
     type = fields.Selection([
-        ('amount_invoiced', "Amount Invoiced"),
         ('amount_sold', "Amount Sold"),
-        ('qty_invoiced', "Quantity Invoiced"),
+        ('amount_invoiced', "Amount Invoiced"),
+        ('amount_paid', "Amount Paid in Full"),
         ('qty_sold', "Quantity Sold"),
+        ('qty_invoiced', "Quantity Invoiced"),
     ], index=True, required=True)
 
     product_id = fields.Many2one('product.product', "Product")

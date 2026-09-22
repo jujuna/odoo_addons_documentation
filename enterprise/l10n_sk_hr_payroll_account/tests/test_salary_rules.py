@@ -9,20 +9,28 @@ from odoo.addons.hr_payroll_account.tests.common import TestPayslipValidationCom
 @tagged('post_install', 'post_install_l10n', '-at_install', 'payslips_validation')
 class TestPayslipValidation(TestPayslipValidationCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @TestPayslipValidationCommon.setup_country('sk')
     def setUpClass(cls):
         super().setUpClass()
         cls.env.user.group_ids |= cls.env.ref('hr_payroll.group_hr_payroll_manager')
+        cls.resource_calendar = cls.env['resource.calendar'].create({
+            'name': 'SK Calendar',
+            'company_id': cls.env.company.id,
+            'full_time_required_hours': 40,
+        })
         cls._setup_common(
             country=cls.env.ref('base.sk'),
             structure=cls.env.ref('l10n_sk_hr_payroll.hr_payroll_structure_sk_employee_salary'),
             structure_type=cls.env.ref('l10n_sk_hr_payroll.structure_type_employee_sk'),
-            contract_fields={
+            version_fields={
                 'wage': 1100.0,
                 'l10n_sk_meal_voucher_employee': 8.0,
                 'l10n_sk_meal_voucher_employer': 12.0,
-            }
+            },
+            resource_calendar=cls.resource_calendar,
         )
 
     def test_payslip_1(self):

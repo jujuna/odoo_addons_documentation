@@ -5,14 +5,15 @@
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-16 17:47+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-04 18:11+0000\n"
+"PO-Revision-Date: 2026-09-18 02:11+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "hr_appraisal_skills/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,24 +22,37 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_appraisal_skills
+#: model:ir.module.module,description:base.module_hr_appraisal_skills
+msgid ""
+"\n"
+"This module makes it possible to manage employee skills during an appraisal "
+"process.\n"
+msgstr ""
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_goal_template_view_hierarchy
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_goal_view_hierarchy
 msgid "<span invisible=\"not current_goal_skill_ids\">Skills:</span>"
-msgstr ""
+msgstr "<span invisible=\"not current_goal_skill_ids\">Навыки:</span>"
 
 #. module: hr_appraisal_skills
 #. odoo-javascript
 #: code:addons/hr_appraisal_skills/static/src/js/appraisal_skills_one2many.xml:0
 msgid "Add new skills"
-msgstr "Добавить новые навыки"
+msgstr ""
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__appraisal_id
 msgid "Appraisal"
 msgstr "Оценка"
+
+#. module: hr_appraisal_skills
+#: model:ir.module.module,shortdesc:base.module_hr_appraisal_skills
+msgid "Appraisal - Skills"
+msgstr ""
 
 #. module: hr_appraisal_skills
 #: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_goal
@@ -47,14 +61,18 @@ msgstr "Цель оценки"
 
 #. module: hr_appraisal_skills
 #: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_skill
-msgid "Appraisal Skills"
+msgid "Appraisal Skill"
 msgstr ""
 
 #. module: hr_appraisal_skills
-#: model:ir.actions.act_window,name:hr_appraisal_skills.hr_appraisal_skill_report_action
-#: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_skill_report
-msgid "Appraisal Skills Report"
-msgstr "Отчет по оценке навыков"
+#: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_skill_evolution_report
+msgid "Appraisal Skill Evolution Report"
+msgstr ""
+
+#. module: hr_appraisal_skills
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__level_progress_average
+msgid "Average Progress (%)"
+msgstr ""
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_goal_skill_view_form
@@ -63,9 +81,15 @@ msgid "Category"
 msgstr "Категория"
 
 #. module: hr_appraisal_skills
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__certificate_file
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__certificate_file
+msgid "Certificate"
+msgstr ""
+
+#. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.view_hr_appraisal_form
 msgid "Challenge your skills to a target"
-msgstr ""
+msgstr "Сравните свои навыки с целевым уровнем"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__color
@@ -74,15 +98,9 @@ msgid "Color"
 msgstr "Цвет"
 
 #. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__company_id
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__company_id
 msgid "Company"
 msgstr "Компания"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__create_date
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "Create Date"
-msgstr "Дата создания"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__create_uid
@@ -104,36 +122,27 @@ msgstr "Текущий"
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal__current_appraisal_skill_ids
 msgid "Current Appraisal Skill"
-msgstr ""
+msgstr "Текущий навык в аттестации"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal__current_goal_skill_ids
 msgid "Current Goal Skill"
-msgstr ""
+msgstr "Текущий целевой навык"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__goals_completion_percentage
 msgid "Current Goals"
+msgstr "Текущие цели"
+
+#. module: hr_appraisal_skills
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__date
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
+msgid "Date"
 msgstr ""
 
 #. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__current_skill_level_id
-msgid "Current Level"
-msgstr "Текущий уровень"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__current_level_progress
-msgid "Current Progress"
-msgstr "Текущий прогресс"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields.selection,name:hr_appraisal_skills.selection__hr_appraisal_skill_report__evolution__decline
-msgid "Decline"
-msgstr "Отклонить"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__department_id
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__department_id
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
 msgid "Department"
 msgstr "Отдел"
 
@@ -142,7 +151,7 @@ msgstr "Отдел"
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal__display_name
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__display_name
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__display_name
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__display_name
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__display_name
 msgid "Display Name"
 msgstr "Отображаемое имя"
 
@@ -154,8 +163,8 @@ msgstr "Отображение предупреждающего сообщени
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__employee_id
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__employee_id
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__employee_id
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
 msgid "Employee"
 msgstr "Сотрудник"
 
@@ -163,17 +172,6 @@ msgstr "Сотрудник"
 #: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal
 msgid "Employee Appraisal"
 msgstr "Оценка сотрудника"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__evolution
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "Evolution"
-msgstr "Эволюция"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__evolution_sequence
-msgid "Evolution Sequence"
-msgstr "Последовательность эволюции"
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_goal_template_view_form
@@ -191,34 +189,22 @@ msgstr "Цель"
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal__id
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__id
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__id
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__id
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__id
 msgid "ID"
 msgstr "ID"
 
 #. module: hr_appraisal_skills
-#: model:ir.model.fields.selection,name:hr_appraisal_skills.selection__hr_appraisal_skill_report__evolution__improvement
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "Improvement"
-msgstr "Улучшение"
-
-#. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__target_job_skill_progress
 msgid "Job Target"
-msgstr ""
+msgstr "Целевая должность"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.constraint,message:hr_appraisal_skills.constraint_hr_appraisal_skill_target_job_skill_progress_range
 msgid "Job Target Score should be between 0 and 1"
-msgstr ""
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields.selection,name:hr_appraisal_skills.selection__hr_appraisal_skill_report__evolution__just_added
-msgid "Just added"
-msgstr "Только что добавлено"
+msgstr "Целевой балл вакансии должен находиться в диапазоне от 0 до 1"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__justification
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__justification
 msgid "Justification"
 msgstr "Обоснование"
 
@@ -238,38 +224,23 @@ msgstr "Дата последнего обновления:"
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__levels_count
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__levels_count
 msgid "Levels Count"
+msgstr "Количество уровней"
+
+#. module: hr_appraisal_skills
+#: model:ir.module.module,summary:base.module_hr_appraisal_skills
+msgid "Manage skills of your employees during an appraisal process"
 msgstr ""
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__manager_ids
-msgid "Manager"
-msgstr "Менеджер"
-
-#. module: hr_appraisal_skills
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "No Change"
-msgstr "Без изменений"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__number_of_recommended_goals
 msgid "Number Of Recommended Goals"
-msgstr ""
+msgstr "Количество рекомендуемых целей"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,help:hr_appraisal_skills.field_hr_appraisal_goal_skill__levels_count
 #: model:ir.model.fields,help:hr_appraisal_skills.field_hr_appraisal_skill__levels_count
 msgid "Number of levels linked to this skill type"
-msgstr ""
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__previous_skill_level_id
-msgid "Previous Level"
-msgstr "Предыдущий уровень"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__previous_level_progress
-msgid "Previous Progress"
-msgstr "Предыдущий прогресс"
+msgstr "Количество уровней, связанных с этим типом навыка"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__previous_skill_level_id
@@ -281,11 +252,6 @@ msgstr "Предыдущий уровень навыка"
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__level_progress
 msgid "Progress"
 msgstr "Прогресс"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__progress_evolution
-msgid "Progress Evolution"
-msgstr "Динамика прогресса"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,help:hr_appraisal_skills.field_hr_appraisal_goal_skill__level_progress
@@ -301,35 +267,27 @@ msgstr "Прогресс должен быть числом от 0 до 100."
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.view_hr_appraisal_form
 msgid "Recommend Goals"
-msgstr ""
+msgstr "Рекомендовать цели"
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_goal_template_view_tree
 msgid "Recommended for"
-msgstr ""
-
-#. module: hr_appraisal_skills
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "Regression"
-msgstr "Регресс"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields.selection,name:hr_appraisal_skills.selection__hr_appraisal_skill_report__evolution__same
-msgid "Same"
-msgstr "Без изменений"
+msgstr "Рекомендуется для"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__skill_id
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__skill_id
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__skill_id
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__skill_id
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
 msgid "Skill"
 msgstr "Навык"
 
 #. module: hr_appraisal_skills
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_graph
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_pivot
-msgid "Skill Analysis"
-msgstr "Анализ навыков"
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_graph
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_list
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_pivot
+msgid "Skill Evolution"
+msgstr ""
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__skill_level_id
@@ -340,8 +298,8 @@ msgstr "Уровень навыка"
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__skill_type_id
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__skill_type_id
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__skill_type_id
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__skill_type_id
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
 msgid "Skill Type"
 msgstr "Тип навыка"
 
@@ -359,8 +317,9 @@ msgid "Skills"
 msgstr "Навыки"
 
 #. module: hr_appraisal_skills
-#: model:ir.ui.menu,name:hr_appraisal_skills.menu_appraisal_skills_report
-#: model_terms:ir.actions.act_window,help:hr_appraisal_skills.hr_appraisal_skill_report_action
+#: model:ir.actions.act_window,name:hr_appraisal_skills.hr_appraisal_skill_evolution_report_action
+#: model:ir.ui.menu,name:hr_appraisal_skills.menu_skills_evolution
+#: model_terms:ir.actions.act_window,help:hr_appraisal_skills.hr_appraisal_skill_evolution_report_action
 msgid "Skills Evolution"
 msgstr "Эволюция навыков"
 
@@ -372,17 +331,17 @@ msgstr "Типы навыков"
 #. module: hr_appraisal_skills
 #: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_goal_skill
 msgid "Skills for goal positions"
-msgstr ""
+msgstr "Навыки для целевых позиций"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal__target_job_id
 msgid "Target Job"
-msgstr ""
+msgstr "Целевая вакансия"
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skills_view_form
 msgid "The end date must be after the start date."
-msgstr ""
+msgstr "Дата окончания должна быть позже даты начала."
 
 #. module: hr_appraisal_skills
 #. odoo-python
@@ -394,11 +353,18 @@ msgstr "Уровень навыка %(level)s не действителен дл
 #: model:ir.model.fields,help:hr_appraisal_skills.field_hr_appraisal_goal__current_goal_skill_ids
 msgid "This goal will be recommended to reach the level of those skills."
 msgstr ""
+"Эта цель будет рекомендована для достижения необходимого уровня данных "
+"навыков."
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skills_view_form
 msgid "To"
 msgstr "Кому"
+
+#. module: hr_appraisal_skills
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__level_progress_count
+msgid "Total Assessed"
+msgstr ""
 
 #. module: hr_appraisal_skills
 #. odoo-python
@@ -425,12 +391,10 @@ msgid "Validity Stop"
 msgstr "Остановка действия"
 
 #. module: hr_appraisal_skills
-#: model_terms:ir.actions.act_window,help:hr_appraisal_skills.hr_appraisal_skill_report_action
+#: model_terms:ir.actions.act_window,help:hr_appraisal_skills.hr_appraisal_skill_evolution_report_action
 msgid ""
-"View the evolution of employee's skill between the two latest appraisals."
+"View the evolution of employee's skill between the two latest appraisals"
 msgstr ""
-"Посмотреть изменения в уровне навыков сотрудника между двумя последними "
-"оценками."
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.appraisal_skills_update_template
@@ -446,47 +410,14 @@ msgstr "был удален."
 #: model:ir.model.fields,help:hr_appraisal_skills.field_hr_appraisal_goal_skill__is_certification
 #: model:ir.model.fields,help:hr_appraisal_skills.field_hr_appraisal_skill__is_certification
 msgid "if checked the skill type become a certification type"
-msgstr ""
+msgstr "если отмечено, тип навыка становится типом сертификации"
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skills_view_form
 msgid "indefinite"
-msgstr ""
+msgstr "неопределенный"
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.view_hr_appraisal_form
 msgid "infinite"
-msgstr ""
-
-#~ msgid "If skills are missing, they can be created by an HR officer."
-#~ msgstr ""
-#~ "Если навыки не отображаются, их может добавить сотрудник отдела кадров."
-
-#~ msgid "You can add skills from our library to the employee profile."
-#~ msgstr "Вы можете добавить навыки из библиотеки в профиль сотрудника."
-
-#~ msgid ""
-#~ "<span class=\"o_appraisal_overlay\" invisible=\"state != 'new'\">\n"
-#~ "                            Skills tab will be active once the appraisal "
-#~ "is confirmed.\n"
-#~ "                        </span>"
-#~ msgstr ""
-#~ "<span class=\"o_appraisal_overlay\" invisible=\"state != 'new'\">\n"
-#~ "                            Вкладка \"Навыки\" станет активной после "
-#~ "подтверждения оценки.\n"
-#~ "                        </span>"
-
-#~ msgid "Appraisal skills appear only for marked appraisals."
-#~ msgstr "Оценочные навыки появляются только для отмеченных оценок."
-
-#~ msgid "Employee Name"
-#~ msgstr "Имя сотрудника"
-
-#~ msgid "Employee Skill"
-#~ msgstr "Навык сотрудника"
-
-#~ msgid "Employee Skills"
-#~ msgstr "Навыки сотрудника"
-
-#~ msgid "Two levels for the same skill is not allowed"
-#~ msgstr "Нельзя указывать два уровня для одного и того же навыка"
+msgstr "бессрочный"

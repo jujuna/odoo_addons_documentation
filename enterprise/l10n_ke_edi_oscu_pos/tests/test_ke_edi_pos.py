@@ -8,6 +8,9 @@ from odoo.fields import Command
 @tagged('post_install', '-at_install', 'post_install_l10n')
 class TestGenericKE(TestGenericLocalization):
 
+    _pos_partner_pos_form_fields = ['l10n_ke_branch_code']
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('ke')
     def setUpClass(cls):
@@ -39,4 +42,6 @@ class TestGenericKE(TestGenericLocalization):
 
     @patch('odoo.addons.l10n_ke_edi_oscu_pos.models.pos_order.PosOrder.post_order_to_etims', return_value={})
     def test_generic_localization(self, mock_post_order_to_etims):
-        super().test_generic_localization()
+        order, html = super().test_generic_localization()
+        self.assertTrue(order.company_id.l10n_ke_oscu_serial_number in html)
+        self.assertTrue("Internal Data:" in html)

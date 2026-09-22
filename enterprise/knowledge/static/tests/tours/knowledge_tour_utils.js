@@ -85,12 +85,6 @@ function getOffset(element) {
  */
 export const dragAndDropArticle = (source, target) => {
     const elementOffset = getOffset(source);
-    const targetOffset = getOffset(target);
-    // If the target is under the element, the cursor needs to be in the upper
-    // part of the target to trigger the move. If it is above, the cursor needs
-    // to be in the bottom part.
-    const targetY =
-        targetOffset.top + (targetOffset.top > elementOffset.top ? target.offsetHeight - 1 : 0);
 
     const element = source.closest("li");
     element.dispatchEvent(
@@ -114,6 +108,12 @@ export const dragAndDropArticle = (source, target) => {
 
     // Timeouts because sidebar onMove is debounced
     setTimeout(() => {
+        const targetOffset = getOffset(target);
+        const targetY = target.closest(".o_knowledge_sidebar_trash")
+            ? targetOffset.top + target.offsetHeight / 2
+            : targetOffset.top +
+              (targetOffset.top > elementOffset.top ? target.offsetHeight - 1 : 0);
+
         target.dispatchEvent(
             new PointerEvent("pointermove", {
                 bubbles: true,
@@ -144,9 +144,9 @@ export const dragAndDropArticle = (source, target) => {
  * as its last element, and the link will be inserted at the position at index
  * offset in the paragraph).
  *
- * @param {string} htmlFieldContainerSelector jquery selector for the container
+ * @param {string} htmlFieldContainerSelector selector for the container
  * @param {string} articleName name of the article to insert a link for
- * @param {integer} previousSiblingSelector jquery selector for the previous sibling of the article link
+ * @param {string} [previousSiblingSelector] selector for the previous sibling of the article link
  * @returns {Array} tour steps
  */
 export function appendArticleLink(htmlFieldContainerSelector, articleName, previousSiblingSelector = "") {
@@ -160,7 +160,7 @@ export function appendArticleLink(htmlFieldContainerSelector, articleName, previ
             }
         },
     }, { // click on the /article command
-        trigger: '.o-we-powerbox .o-we-command .o-we-command-img.fa-newspaper-o',
+        trigger: '.o-we-powerbox .o-we-command .o-we-command-img[data-icon="newspaper"]',
         run: 'click',
     }, {
         trigger: ".o_article_search_input input",
@@ -238,8 +238,16 @@ export function openPowerbox(paragraph, previousSibling) {
     const sel = document.getSelection();
     sel.removeAllRanges();
     const range = document.createRange();
-    range.setStart(paragraph, offset);
-    range.setEnd(paragraph, offset);
+
+    // Insert "/" text node into the DOM at the target position so that
+    // search_powerbox_plugin.onInput can find it via its DOM-based check.
+    const slash = document.createTextNode("/");
+    const refChild = paragraph.childNodes[offset] ?? null;
+    paragraph.insertBefore(slash, refChild);
+
+    // Place caret after the inserted "/".
+    range.setStart(slash, 1);
+    range.collapse(true);
     sel.addRange(range);
     paragraph.dispatchEvent(
         new InputEvent("input", {
@@ -251,8 +259,7 @@ export function openPowerbox(paragraph, previousSibling) {
 }
 
 export class WithoutLazyLoading extends Component {
-    static template = xml`<t t-slot="default"/>`;
-    static props = ["*"];
+    static template = xml`<t t-call-slot="default"/>`;
 }
 
 export function embeddedViewPatchFunctions() {
@@ -267,5 +274,41 @@ export function embeddedViewPatchFunctions() {
         after: () => {
             unpatchEmbeddedView();
         },
+    };
+}
+
+export function checkTree(tree) {
+    const trigger_tree = [".o_knowledge_tree"];
+
+    function walk(children) {
+        children.forEach((node, index) => {
+            trigger_tree.push(
+                `:has( ul > li:eq(${index}).o_article:has( .o_article_name:text(${node.label}) )`
+            );
+
+            if (node.children) {
+                walk(node.children);
+            }
+
+            trigger_tree.push(` )`);
+        });
+    }
+
+    for (const key in tree) {
+        const section = tree[key];
+        trigger_tree.push(
+            `:has( section[data-section="${key}"]:has( .o_section_header_label:text(${section.label}) )`
+        );
+
+        if (section.children) {
+            walk(section.children, 0);
+        }
+
+        trigger_tree.push(` )`);
+    }
+
+    return {
+        content: "Check tree structure",
+        trigger: trigger_tree.join(""),
     };
 }

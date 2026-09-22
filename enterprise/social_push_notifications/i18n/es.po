@@ -6,23 +6,23 @@
 # Martin Trigaux, 2022
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 18:49+0000\n"
-"PO-Revision-Date: 2025-12-06 09:55+0000\n"
-"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
-"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-18 00:54+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-master/"
 "social_push_notifications/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == 0)"
-" ? 1 : 2);\n"
-"X-Generator: Weblate 5.14.3\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
@@ -37,19 +37,29 @@ msgstr "Todas las publicaciones relacionadas en las redes sociales"
 
 #. module: social_push_notifications
 #. odoo-javascript
-#: code:addons/social_push_notifications/static/src/xml/social_push_notifications_templates.xml:0
+#: code:addons/social_push_notifications/static/src/components/push_notification_request/push_notification_request.xml:0
 msgid "Allow"
 msgstr "Permitir"
 
 #. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "App ID"
-msgstr "ID de la aplicación"
+#: model:ir.model.constraint,message:social_push_notifications.constraint_website_visitor_push_subscription_unique_endpoint
+msgid "An endpoint cannot be assigned multiple times."
+msgstr ""
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
 msgid "Body"
 msgstr "Contenido"
+
+#. module: social_push_notifications
+#: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor_push_subscription__endpoint
+msgid "Browser endpoint"
+msgstr ""
+
+#. module: social_push_notifications
+#: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor_push_subscription__keys
+msgid "Browser keys"
+msgstr ""
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_res_config_settings
@@ -68,11 +78,12 @@ msgstr "Retraso"
 
 #. module: social_push_notifications
 #. odoo-javascript
-#: code:addons/social_push_notifications/static/src/xml/social_push_notifications_templates.xml:0
+#: code:addons/social_push_notifications/static/src/components/push_notification_request/push_notification_request.xml:0
 msgid "Deny"
 msgstr "Rechazar"
 
 #. module: social_push_notifications
+#: model:ir.model.fields,field_description:social_push_notifications.field_ir_config_parameter__display_name
 #: model:ir.model.fields,field_description:social_push_notifications.field_ir_http__display_name
 #: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_account__display_name
@@ -81,6 +92,7 @@ msgstr "Rechazar"
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_post__display_name
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_post_template__display_name
 #: model:ir.model.fields,field_description:social_push_notifications.field_utm_campaign__display_name
+#: model:ir.model.fields,field_description:social_push_notifications.field_utm_mixin__display_name
 #: model:ir.model.fields,field_description:social_push_notifications.field_website__display_name
 #: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor__display_name
 #: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor_push_subscription__display_name
@@ -100,68 +112,24 @@ msgid "Domain to send push notifications to visitors."
 msgstr "Dominio desde el cual se envían notificaciones push a los visitantes."
 
 #. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__firebase_enable_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_website__firebase_enable_push_notifications
+#: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__enable_push_notifications
+#: model:ir.model.fields,field_description:social_push_notifications.field_website__enable_push_notifications
 msgid "Enable Web Push Notifications"
 msgstr "Habilitar las notificaciones push del sitio web"
 
 #. module: social_push_notifications
-#. odoo-python
-#: code:addons/social_push_notifications/controllers/main.py:0
+#. odoo-javascript
+#: code:addons/social_push_notifications/static/src/components/push_notification_request/push_notification_request.xml:0
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
 msgid "Enable push notifications to be notified about new features."
 msgstr ""
 "Habilite las notificaciones push para recibir avisos sobre nuevas funciones."
 
 #. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__firebase_admin_key_file
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_account__firebase_admin_key_file
-#: model:ir.model.fields,field_description:social_push_notifications.field_website__firebase_admin_key_file
-msgid "Firebase Admin Key File"
-msgstr "Archivo de la clave de administrador de Firebase"
-
-#. module: social_push_notifications
-#. odoo-python
-#: code:addons/social_push_notifications/models/social_account.py:0
-msgid "Firebase Admin Key File is missing from the configuration."
+#. odoo-javascript
+#: code:addons/social_push_notifications/static/src/interactions/push_notification_request_interaction.js:0
+msgid "Failed to enable push notifications"
 msgstr ""
-"Falta el archivo de la clave de administrador de Firebase en la "
-"configuración."
-
-#. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__firebase_project_id
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_account__firebase_project_id
-#: model:ir.model.fields,field_description:social_push_notifications.field_website__firebase_project_id
-msgid "Firebase Project ID"
-msgstr "ID de proyecto de Firebase"
-
-#. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__firebase_push_certificate_key
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_account__firebase_push_certificate_key
-#: model:ir.model.fields,field_description:social_push_notifications.field_website__firebase_push_certificate_key
-msgid "Firebase Push Certificate Key"
-msgstr "Clave del certificado push de Firebase"
-
-#. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__firebase_sender_id
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_account__firebase_sender_id
-#: model:ir.model.fields,field_description:social_push_notifications.field_website__firebase_sender_id
-msgid "Firebase Sender ID"
-msgstr "ID del emisor de Firebase"
-
-#. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__firebase_web_api_key
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_account__firebase_web_api_key
-#: model:ir.model.fields,field_description:social_push_notifications.field_website__firebase_web_api_key
-msgid "Firebase Web API Key"
-msgstr "Clave de API web de Firebase"
-
-#. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__firebase_web_app_id
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_account__firebase_web_app_id
-#: model:ir.model.fields,field_description:social_push_notifications.field_website__firebase_web_app_id
-msgid "Firebase Web App ID"
-msgstr "ID de la aplicación web Firebase"
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.push_notifications_preview
@@ -180,6 +148,7 @@ msgid "Has Push Notifications Account"
 msgstr "Tiene una cuenta con notificaciones Push"
 
 #. module: social_push_notifications
+#: model:ir.model.fields,field_description:social_push_notifications.field_ir_config_parameter__id
 #: model:ir.model.fields,field_description:social_push_notifications.field_ir_http__id
 #: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__id
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_account__id
@@ -188,6 +157,7 @@ msgstr "Tiene una cuenta con notificaciones Push"
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_post__id
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_post_template__id
 #: model:ir.model.fields,field_description:social_push_notifications.field_utm_campaign__id
+#: model:ir.model.fields,field_description:social_push_notifications.field_utm_mixin__id
 #: model:ir.model.fields,field_description:social_push_notifications.field_website__id
 #: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor__id
 #: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor_push_subscription__id
@@ -205,14 +175,41 @@ msgid "Icon Image"
 msgstr "Imagen del icono"
 
 #. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "Key File"
-msgstr "Archivo clave"
+#: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_view_form
+msgid "Immediately"
+msgstr ""
 
 #. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_view_form
-msgid "Local Time"
-msgstr "Hora local"
+#. odoo-javascript
+#: code:addons/social_push_notifications/static/src/interactions/push_notification_request_interaction.js:0
+msgid ""
+"It looks like notifications are blocked by your browser. To stay updated, "
+"please enable them in your browser settings!"
+msgstr ""
+
+#. module: social_push_notifications
+#. odoo-javascript
+#: code:addons/social_push_notifications/static/src/interactions/push_notification_request_interaction.js:0
+msgid ""
+"It looks like notifications aren't enabled in your browser. To stay updated, "
+"please enable them in your browser settings!"
+msgstr ""
+
+#. module: social_push_notifications
+#: model:ir.model.fields,help:social_push_notifications.field_website_visitor_push_subscription__keys
+msgid ""
+"It refer to browser keys used by the notification: \n"
+"- p256dh: It's the subscription public key generated by the browser. The "
+"browser will \n"
+"          keep the private key secret and use it for decrypting the payload\n"
+"- auth: The auth value should be treated as a secret and not shared outside "
+"of Odoo"
+msgstr ""
+
+#. module: social_push_notifications
+#: model:ir.model.fields,field_description:social_push_notifications.field_social_live_post__last_push_subscription_id
+msgid "Last Push Subscription"
+msgstr ""
 
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_media__media_type
@@ -232,6 +229,11 @@ msgid "New Message"
 msgstr "Nuevo mensaje"
 
 #. module: social_push_notifications
+#: model_terms:ir.ui.view,arch_db:social_push_notifications.utm_campaign_view_form
+msgid "New Push"
+msgstr ""
+
+#. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__notification_request_delay
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_account__notification_request_delay
 #: model:ir.model.fields,field_description:social_push_notifications.field_website__notification_request_delay
@@ -240,7 +242,7 @@ msgstr "Retraso de solicitud de notificación (segundos)"
 
 #. module: social_push_notifications
 #. odoo-javascript
-#: code:addons/social_push_notifications/static/src/xml/social_push_notifications_templates.xml:0
+#: code:addons/social_push_notifications/static/src/components/push_notification_request/push_notification_request.xml:0
 #: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__notification_request_icon
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_account__notification_request_icon
 #: model:ir.model.fields,field_description:social_push_notifications.field_website__notification_request_icon
@@ -285,19 +287,20 @@ msgid "Please specify a Notification Message."
 msgstr "Especifique un mensaje de notificación."
 
 #. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "Project ID"
-msgstr "ID del proyecto"
+#: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_view_form
+msgid "Post On"
+msgstr ""
+
+#. module: social_push_notifications
+#. odoo-javascript
+#: code:addons/social_push_notifications/static/src/views/widgets/push_notification_request_preview/push_notification_request_preview_button.xml:0
+msgid "Preview"
+msgstr ""
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.website_visitor_view_kanban
 msgid "Push"
 msgstr "Push"
-
-#. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "Push Certificate Key ID"
-msgstr "ID de la notificación push de la clave del certificado"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,field_description:social_push_notifications.field_social_live_post__push_notification_image
@@ -361,9 +364,9 @@ msgid "Push Notifications Preview"
 msgstr "Vista previa de las notificaciones push"
 
 #. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_website_visitor_push_subscription__push_token
-msgid "Push Subscription"
-msgstr "Suscripción push"
+#: model:ir.model.fields,field_description:social_push_notifications.field_social_post__push_notifications_scheduled_date
+msgid "Push Notifications Scheduled for"
+msgstr ""
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_website_visitor_push_subscription
@@ -383,21 +386,6 @@ msgid "Push Target URL"
 msgstr "URL de destino push"
 
 #. module: social_push_notifications
-#: model:ir.model.constraint,message:social_push_notifications.constraint_website_visitor_push_subscription_push_token_uniq
-msgid "Push token can't be duplicated!"
-msgstr "No se puede duplicar el token push."
-
-#. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_live_post__reached_visitor_ids
-msgid "Reached Visitors"
-msgstr "Visitantes recibidos"
-
-#. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.utm_campaign_view_form
-msgid "Send Push"
-msgstr "Enviar notificación push"
-
-#. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.website_visitor_view_form
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.website_visitor_view_tree
 msgid "Send Push Notification"
@@ -409,15 +397,10 @@ msgid "Send Push Notifications"
 msgstr "Enviar notificaciones push"
 
 #. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_post__use_visitor_timezone
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_post_template__use_visitor_timezone
-msgid "Send at Visitors' Timezone"
-msgstr "Enviar en la zona horaria del visitante"
-
-#. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "Sender ID"
-msgstr "ID del remitente"
+#: model:ir.module.module,description:base.module_social_push_notifications
+#: model:ir.module.module,summary:base.module_social_push_notifications
+msgid "Send push notifications to your web visitors"
+msgstr ""
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_social_account
@@ -445,10 +428,20 @@ msgid "Social Post Template"
 msgstr "Plantilla de publicación en redes sociales"
 
 #. module: social_push_notifications
+#: model:ir.module.module,shortdesc:base.module_social_push_notifications
+msgid "Social Push Notifications"
+msgstr ""
+
+#. module: social_push_notifications
 #. odoo-python
 #: code:addons/social_push_notifications/models/website_visitor.py:0
 msgid "Some selected visitors do not allow push notifications."
 msgstr "Algunos visitantes no aceptan las notificaciones push."
+
+#. module: social_push_notifications
+#: model:ir.model,name:social_push_notifications.model_ir_config_parameter
+msgid "System Parameter"
+msgstr ""
 
 #. module: social_push_notifications
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.social_post_template_view_form
@@ -462,10 +455,8 @@ msgstr "Ya existe una configuración para este sitio web."
 
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_social_account__website_id
-msgid "This firebase configuration will only be used for the specified website"
+msgid "This configuration will only be used for the specified website"
 msgstr ""
-"Esta configuración de firebase se utilizará únicamente para el sitio web "
-"especificado"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_social_live_post__push_notification_image
@@ -485,18 +476,9 @@ msgid "UTM Campaign"
 msgstr "Campaña UTM"
 
 #. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "Use your own Firebase Account for this website's push notifications"
+#: model:ir.model,name:social_push_notifications.model_utm_mixin
+msgid "UTM Mixin"
 msgstr ""
-"Use su propia cuenta de Firebase para las notificaciones push de este sitio "
-"web"
-
-#. module: social_push_notifications
-#: model:ir.model.fields,field_description:social_push_notifications.field_res_config_settings__firebase_use_own_account
-#: model:ir.model.fields,field_description:social_push_notifications.field_social_account__firebase_use_own_account
-#: model:ir.model.fields,field_description:social_push_notifications.field_website__firebase_use_own_account
-msgid "Use your own Firebase account"
-msgstr "Utilice su propia cuenta de Firebase"
 
 #. module: social_push_notifications
 #: model:ir.model.fields,help:social_push_notifications.field_social_media__media_type
@@ -514,21 +496,11 @@ msgid "Visitor Domain"
 msgstr "Dominio del visitante"
 
 #. module: social_push_notifications
-#: model:ir.ui.menu,name:social_push_notifications.social_visitor
-msgid "Visitors"
-msgstr "Visitantes"
-
-#. module: social_push_notifications
-#. odoo-python
-#: code:addons/social_push_notifications/controllers/main.py:0
+#. odoo-javascript
+#: code:addons/social_push_notifications/static/src/components/push_notification_request/push_notification_request.xml:0
 #: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
 msgid "Want to discover new versions?"
 msgstr "¿Quiere conocer nuevas versiones?"
-
-#. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "Web API Key"
-msgstr "Clave API de web"
 
 #. module: social_push_notifications
 #: model:ir.model,name:social_push_notifications.model_website
@@ -548,64 +520,5 @@ msgstr "Visitante del sitio web"
 msgid "You can't delete a Push Notification account."
 msgstr "No se puede eliminar una cuenta de notificaciones push."
 
-#. module: social_push_notifications
-#. odoo-python
-#: code:addons/social_push_notifications/models/social_account.py:0
-msgid ""
-"You have to install \"google_auth>=1.18.0\" to be able to send push "
-"notifications."
-msgstr ""
-"Debe instalar \"google_auth>=1.18.0\" para poder enviar notificaciones push."
-
-#. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "e.g. \"1:280765099157:web:7c7b7d7b7d7b7d7b7d7b7d\""
-msgstr "p. ej. “1:280765099157:web:7c7b7d7b7d7b7d7b7d7b7d”"
-
-#. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "e.g. \"280765099157\""
-msgstr "p. ej. \"280765099157\""
-
-#. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "e.g. \"BIzbSyXhhsFHEgphW55CSg5cV7h7c_S-AuTMKc9\""
-msgstr "p. ej. \"BIzbSyXhhsFHEgphW55CSg5cV7h7c_S-AuTMKc9\""
-
-#. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "e.g. \"CCSc77KP_LX8dTAogFakOoJ_VqNP15u0-43psDJe__a9B...\""
-msgstr "p. ej. \"CCSc77KP_LX8dTAogFakOoJ_VqNP15u0-43psDJe__a9B...\""
-
-#. module: social_push_notifications
-#: model_terms:ir.ui.view,arch_db:social_push_notifications.res_config_settings_view_form
-msgid "e.g. \"my-project-id\""
-msgstr "p. ej. \"my-project-id\""
-
-#. module: social_push_notifications
-#: model:ir.model.fields,help:social_push_notifications.field_social_post__use_visitor_timezone
-#: model:ir.model.fields,help:social_push_notifications.field_social_post_template__use_visitor_timezone
-msgid ""
-"e.g: If you post at 15:00 your time, all visitors will receive the post at "
-"15:00 their time."
-msgstr ""
-"p. ej. si publica a las 15:00 de su hora local, todos los visitantes "
-"recibirán el mensaje a las 15:00 de su hora."
-
-#~ msgid "Display Push Notifications Attributes"
-#~ msgstr "Mostrar los atributos de las notificaciones push"
-
-#~ msgid ""
-#~ "Send push notifications and configure this website's notifications "
-#~ "permission request"
-#~ msgstr ""
-#~ "Envíe notificaciones push y configure la solicitud de permiso de "
-#~ "notificaciones de este sitio web"
-
-#~ msgid ""
-#~ "Used to make comparisons when we need to restrict some features to a "
-#~ "specific media ('facebook', 'twitter', ...)."
-#~ msgstr ""
-#~ "Se utiliza para hacer comparaciones cuando necesitamos restringir algunas "
-#~ "características para una red social específica ('facebook', "
-#~ "'twitter', ...)."
+#~ msgid "Visitors"
+#~ msgstr "Visitantes"

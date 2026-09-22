@@ -6,7 +6,7 @@
         <t t-if="warningParams.count > 1"> transaction partners</t>
         <t t-else=""> transaction partner</t>
          with eligible invoices in the selected period who are not included in the report due to a missing tax number or missing country. Click
-        <a t-on-click="(ev) => controller.reportAction(ev, 'action_warning_partners', warningParams)">here</a>
+        <a t-on-click="(ev) => this.controller.reportAction(ev, 'action_warning_partners', warningParams)">here</a>
         to see the list.
     </t>
 </templates>

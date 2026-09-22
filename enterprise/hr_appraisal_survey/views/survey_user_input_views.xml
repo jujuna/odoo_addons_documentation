@@ -7,10 +7,10 @@
             <list create="0">
                 <header>
                     <button string="See results" name="action_open_appraisal_survey_results" class="btn-primary" type="object" display="always"/>
-                    <button string="Resend all" name="action_ask_feedback" icon="fa-repeat" type="object"/>
+                    <button string="Resend all" name="action_ask_feedback" icon="redo" type="object"/>
                     <button string="Ask Feedback" name="%(hr_appraisal_survey.appraisal_ask_feedback_action)d" type="action" display="always"/>
                 </header>
-                <field name="partner_id" string="Employee"/>
+                <field name="partner_id" string="Partner"/>
                 <field name="state" widget="badge"
                     decoration-success="state == 'done'"
                     decoration-info="state == 'new'"
@@ -18,8 +18,8 @@
                 />
                 <field name="deadline"/>
                 <field name="survey_id"/>
-                <button class="oe_stat_button" string="See Answers" invisible="state != 'done'" name="action_open_survey_inputs" icon="fa-external-link" type="object"/>
-                <button class="oe_stat_button" string="Resend" invisible="state == 'done'" name="action_ask_feedback" icon="fa-check-square-o" type="object"/>
+                <button class="oe_stat_button" string="See Answers" invisible="state != 'done'" name="action_open_survey_inputs" icon="open_in_new" type="object"/>
+                <button class="oe_stat_button" string="Resend" invisible="state == 'done'" name="action_ask_feedback" icon="check_box" type="object"/>
             </list>
         </field>
     </record>

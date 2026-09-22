@@ -7,7 +7,7 @@ class AccountJournal(models.Model):
 
     def _is_attachment_ocrizable(self, attachment):
         """ Checks if the attachment is in OCRizable formats such as PDF and images."""
-        return (attachment.raw or b'').strip().startswith(b'%PDF') or attachment.mimetype in ['image/png', 'image/jpeg']
+        return attachment.mimetype in ['image/png', 'image/jpeg'] or (attachment.raw.content[:4] == b'%PDF')
 
     def _check_attachments_ocrizable(self, attachments):
         all_attachments_ocrizable = True

@@ -1,7 +1,3 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from . import cart
-from . import combo_configurator
-from . import main
-from . import product_configurator
-from . import variant
+from . import cart, combo_configurator, main, product_configurator, variant

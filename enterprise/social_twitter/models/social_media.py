@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import dateutil.parser
 import base64
 import contextlib
 import hmac
@@ -10,13 +8,12 @@ import requests
 import uuid
 import time
 import xml.etree.ElementTree as XmlElementTree
-from html import unescape
 
 from werkzeug.urls import url_quote
 
-from odoo import models, fields, api, _
+from odoo import models, fields, _
 from odoo.addons.iap.tools import iap_tools
-from odoo.exceptions import UserError, AccessError
+from odoo.exceptions import UserError
 from odoo.tools.urls import urljoin as url_join
 
 
@@ -41,8 +38,8 @@ class SocialMedia(models.Model):
         if self.media_type != 'twitter':
             return super()._action_add_account()
 
-        twitter_consumer_key = self.env['ir.config_parameter'].sudo().get_param('social.twitter_consumer_key')
-        twitter_consumer_secret_key = self.env['ir.config_parameter'].sudo().get_param('social.twitter_consumer_secret_key')
+        twitter_consumer_key = self.env['ir.config_parameter'].sudo().get_str('social.twitter_consumer_key')
+        twitter_consumer_secret_key = self.env['ir.config_parameter'].sudo().get_str('social.twitter_consumer_secret_key')
         if twitter_consumer_key and twitter_consumer_secret_key:
             return self._add_twitter_accounts_from_configuration()
         return self._add_twitter_accounts_from_iap()
@@ -52,7 +49,7 @@ class SocialMedia(models.Model):
 
         headers = self._get_twitter_oauth_header(
             twitter_oauth_url,
-            headers={'oauth_callback': url_join(self.get_base_url(), "social_twitter/callback")}
+            headers={'oauth_callback': url_join(self.get_base_url(), '/social/twitter/start_auth_process')}
         )
         response = requests.post(twitter_oauth_url, headers=headers, timeout=5)
         if response.status_code != 200:
@@ -64,24 +61,16 @@ class SocialMedia(models.Model):
         }
 
         twitter_authorize_url = url_join(self._TWITTER_ENDPOINT, 'oauth/authorize')
-
-        return {
-            'name': 'Add Account',
-            'type': 'ir.actions.act_url',
-            'url': f'{twitter_authorize_url}?oauth_token={response_values["oauth_token"]}',
-            'target': 'self'
-        }
+        return f'{twitter_authorize_url}?oauth_token={response_values["oauth_token"]}'
 
     def _add_twitter_accounts_from_iap(self):
-        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_param(
-            'social.social_iap_endpoint',
-            self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
-        )
+        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_str(
+            'social.social_iap_endpoint') or self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
 
         iap_add_accounts_url = requests.get(url_join(social_iap_endpoint, 'api/social/twitter/1/add_accounts'),
             params={
-                'returning_url': url_join(self.get_base_url(), 'social_twitter/callback'),
-                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+                'returning_url': url_join(self.get_base_url(), '/social/twitter/start_auth_process'),
+                'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid')
             },
             timeout=5
         ).text
@@ -94,11 +83,7 @@ class SocialMedia(models.Model):
         if iap_add_accounts_url == 'wrong_configuration':
             raise UserError(_("The url that this service requested returned an error. Please contact the author of the app."))
 
-        return {
-            'type': 'ir.actions.act_url',
-            'url': iap_add_accounts_url,
-            'target': 'self'
-        }
+        return iap_add_accounts_url
 
     def _extract_error_message(self, response):
         """ This method tries to extract the error code of the response.
@@ -118,7 +103,7 @@ class SocialMedia(models.Model):
         """ Twitter needs parameters to contain a 'oauth_signature'.
         This signature requires that all the headers and params are encoded inside it. """
 
-        twitter_consumer_key = self.env['ir.config_parameter'].sudo().get_param('social.twitter_consumer_key')
+        twitter_consumer_key = self.env['ir.config_parameter'].sudo().get_str('social.twitter_consumer_key')
         header_params = {
             'oauth_nonce': uuid.uuid4(),
             'oauth_consumer_key': twitter_consumer_key,
@@ -147,7 +132,7 @@ class SocialMedia(models.Model):
 
         self.ensure_one()
 
-        twitter_consumer_secret_key = self.env['ir.config_parameter'].sudo().get_param('social.twitter_consumer_secret_key')
+        twitter_consumer_secret_key = self.env['ir.config_parameter'].sudo().get_str('social.twitter_consumer_secret_key')
         if twitter_consumer_secret_key:
             return self._get_twitter_oauth_signature_from_configuration(method, url, params, twitter_consumer_secret_key, oauth_token_secret)
         return self._get_twitter_oauth_signature_from_iap(method, url, params, oauth_token_secret)
@@ -172,59 +157,11 @@ class SocialMedia(models.Model):
             'url': url,
             'params': params,
             'oauth_token_secret': oauth_token_secret,
-            'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+            'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid')
         }
-        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_param(
-            'social.social_iap_endpoint',
-            self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
-        )
+        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_str(
+            'social.social_iap_endpoint') or self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
         try:
             return iap_tools.iap_jsonrpc(url_join(social_iap_endpoint, 'api/social/twitter/1/get_signature'), params=json_params)
-        except AccessError:
+        except requests.RequestException:
             return None
-
-    @api.model
-    def _format_tweet(self, tweet):
-        """ Formats a tweet returned by the Twitter API to a dict that will be interpreted by our frontend. """
-        if 'created_at' in tweet:
-            created_date = fields.Datetime.from_string(
-                dateutil.parser.parse(tweet.get('created_at')).strftime('%Y-%m-%d %H:%M:%S'))
-        else:
-            created_date = fields.Datetime.now()
-
-        in_reply_to_tweet_id = next((referenced['id'] for referenced in tweet.get('referenced_tweets', []) if referenced['type'] == 'replied_to'), None)
-        formatted_tweet = {
-            'id': tweet.get('id'),
-            'message': unescape(tweet.get('text', '')),
-            'from': {
-                'id': tweet.get('author_id'),
-                'name': tweet.get('author', {}).get('name'),
-                'screen_name': tweet.get('author', {}).get('username'),
-                'profile_image_url': tweet.get('author', {}).get('profile_image_url'),
-            },
-            'created_time': tweet.get('created_at'),
-            'formatted_created_time': self.env['social.stream.post']._format_published_date(
-                fields.Datetime.from_string(created_date)),
-            'user_likes': False,
-            'likes': {
-                'summary': {
-                    'total_count': tweet.get('public_metrics', {}).get('like_count', 0),
-                },
-            },
-            'comments': {'data': []},
-            'in_reply_to_tweet_id': in_reply_to_tweet_id,
-        }
-
-        attached_medias = tweet.get('medias')
-        if attached_medias:
-            if attached_medias[0].get('type') == 'photo':
-                formatted_tweet['attachment'] = {
-                    'type': 'photo',
-                    'media': {
-                        'image': {
-                            'src': attached_medias[0].get('url'),
-                        }
-                    }
-                }
-
-        return formatted_tweet

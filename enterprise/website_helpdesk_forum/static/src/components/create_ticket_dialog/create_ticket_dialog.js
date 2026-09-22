@@ -2,20 +2,22 @@ import { rpc } from "@web/core/network/rpc";
 import { _t } from "@web/core/l10n/translation";
 import { Dialog } from "@web/core/dialog/dialog";
 import { useService } from "@web/core/utils/hooks";
-import { Component, useState, onWillStart, markup, useRef } from "@odoo/owl";
+import { Component, onWillStart, markup, proxy, signal, t, useProps } from "@odoo/owl";
 
 export class CreateTicketDialog extends Component {
     static template = "website_helpdesk_forum.CreateTicketDialog";
     static components = { Dialog };
-    static props = {
-        forumId: { type: Number, optional: false },
-        postId: { type: Number, optional: false },
-        close: { type: Function, optional: true },
-    };
+
+    props = useProps({
+        forumId: t.number(),
+        postId: t.number(),
+        close: t.function().optional(),
+    });
+
+    inputTextRef = signal.ref();
 
     setup() {
-        this.state = useState({});
-        this.inputText = useRef("inputText");
+        this.state = proxy({});
         this.notification = useService("notification");
         this.orm = useService("orm");
 
@@ -29,7 +31,7 @@ export class CreateTicketDialog extends Component {
     }
 
     _createTicket() {
-        return this.orm.call('forum.forum', 'create_ticket', [
+        return this.orm.call("forum.forum", "create_ticket", [
             this.props.forumId,
             this.props.postId,
             this.state.data,
@@ -37,8 +39,8 @@ export class CreateTicketDialog extends Component {
     }
 
     _checkInputIsValid() {
-        const isValid = this.inputText.el.value.trim().length;
-        this.inputText.el.classList.toggle('is-invalid', !isValid);
+        const isValid = this.inputTextRef().value.trim().length;
+        this.inputTextRef().classList.toggle("is-invalid", !isValid);
         return isValid;
     }
 
@@ -60,7 +62,7 @@ export class CreateTicketDialog extends Component {
             return;
         }
         const response = await this._createTicket();
-        window.open(response.url, '_blank');
+        window.open(response.url, "_blank");
         this.props.close();
     }
 }

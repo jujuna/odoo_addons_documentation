@@ -1,15 +1,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from contextlib import contextmanager
-from markupsafe import Markup
 from unittest.mock import patch
 
 from odoo.exceptions import RedirectWarning, UserError
 from odoo.fields import Date
 from odoo.tests.common import TransactionCase, tagged
+from odoo.tools import html_sanitize
 from odoo.tools.zeep.exceptions import Fault
 
 @tagged('-standard', 'external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestWebsiteMonsterIntegration(TransactionCase):
 
     @classmethod
@@ -38,7 +39,7 @@ class TestWebsiteMonsterIntegration(TransactionCase):
         cls.job1 = cls.env['hr.job'].create({
             'name': 'Test job 1',
             'address_id': cls.partner.id,
-            'website_description': 'This is a very cool job, you will like it!',
+            'description': 'This is a very cool job, you will like it!',
             'is_published': True
         })
 
@@ -122,7 +123,7 @@ class TestWebsiteMonsterIntegration(TransactionCase):
             'campaign_start_date': self.today,
         })
         wiz_job_post.action_post_job()
-        self.assertEqual(wiz_job_post.post_html, Markup("<p>{content}</p>").format(content=self.job1.website_description))
+        self.assertEqual(wiz_job_post.post_html, html_sanitize(self.job1._get_plain_text_description()))
 
     def test_generate_post_warning(self):
         wiz_job_post = self.env['hr.recruitment.post.job.wizard'].with_context({'active_model': 'hr.job', 'active_id': self.job1.id}).create({
@@ -148,6 +149,7 @@ class TestWebsiteMonsterIntegration(TransactionCase):
 
 
 @tagged('standard', '-external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMockupWebsiteMonsterIntegration(TestWebsiteMonsterIntegration):
 
     @contextmanager

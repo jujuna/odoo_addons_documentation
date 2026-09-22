@@ -8,3 +8,4 @@ from . import hr_payslip_line
 from . import ir_ui_menu
 from . import res_company
 from . import l10n_ke_tax_deduction_card
+from . import hr_work_entry_type

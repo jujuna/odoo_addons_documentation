@@ -1,11 +1,4 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-import re
-
-from odoo import _, api, fields, models
-from odoo.exceptions import UserError
-
-LEI_REGEX = '[A-Z0-9]{18,18}[0-9]{2,2}'
+from odoo import api, fields, models
 
 
 class ResPartner(models.Model):
@@ -15,12 +8,15 @@ class ResPartner(models.Model):
     iso20022_lei = fields.Char(
         string='LEI',
         help='Legal Entity Identifier',
+        compute='_compute_iso20022_lei',
+        inverse='_inverse_iso20022_lei',
     )
 
-    @api.constrains('iso20022_lei')
-    def _check_iso20022_lei(self):
+    @api.depends('additional_identifiers')
+    def _compute_iso20022_lei(self):
         for partner in self:
-            if partner.iso20022_lei and not re.match(LEI_REGEX, partner.iso20022_lei):
-                raise UserError(_("The LEI number must contain 20 characters and match the following structure:\n"
-                                  "- 18 alphanumeric characters with capital letters\n"
-                                  "- 2 digits in the end\n"))
+            partner.iso20022_lei = partner._get_additional_identifier('LEI')
+
+    def _inverse_iso20022_lei(self):
+        for partner in self:
+            partner._set_additional_identifier('LEI', partner.iso20022_lei)

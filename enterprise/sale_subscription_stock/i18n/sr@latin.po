@@ -7,18 +7,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-11-16 18:10+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:57+0000\n"
+"PO-Revision-Date: 2026-09-18 00:53+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Serbian (Latin script) <https://translate.odoo.com/projects/"
-"odoo-19/sale_subscription_stock/sr_Latn/>\n"
+"odoo-master/sale_subscription_stock/sr_Latn/>\n"
 "Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_subscription_stock
 #. odoo-python
@@ -27,6 +27,11 @@ msgid ""
 "A system error prevented the automatic creation of delivery orders for this "
 "subscription. To ensure your delivery is processed, please trigger it "
 "manually by using the \"Subscription: Generate delivery\" action."
+msgstr ""
+
+#. module: sale_subscription_stock
+#: model:ir.module.module,summary:base.module_sale_subscription_stock
+msgid "Allow to create recurring order on storable product"
 msgstr ""
 
 #. module: sale_subscription_stock
@@ -51,7 +56,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_sale_order_line__display_name
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_forecasted_product_product__display_name
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_picking__display_name
-#: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_return_picking_line__display_name
 msgid "Display Name"
 msgstr "Naziv za prikaz"
 
@@ -61,11 +65,15 @@ msgid "Display Recurring Stock Delivery Warning"
 msgstr ""
 
 #. module: sale_subscription_stock
+#: model:ir.actions.server,name:sale_subscription_stock.action_compute_price_bom_product
+msgid "Generate delivery"
+msgstr ""
+
+#. module: sale_subscription_stock
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_sale_order__id
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_sale_order_line__id
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_forecasted_product_product__id
 #: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_picking__id
-#: model:ir.model.fields,field_description:sale_subscription_stock.field_stock_return_picking_line__id
 msgid "ID"
 msgstr "ID"
 
@@ -76,21 +84,24 @@ msgid "New picking has been confirmed"
 msgstr ""
 
 #. module: sale_subscription_stock
-#: model_terms:ir.ui.view,arch_db:sale_subscription_stock.product_template_form_view
-msgid ""
-"Recurring order with this product will be invoiced at the beginning of the "
-"period."
+#: model:ir.module.module,shortdesc:base.module_sale_subscription_stock
+msgid "Sale Subscriptions Stock"
 msgstr ""
 
 #. module: sale_subscription_stock
-#: model_terms:ir.ui.view,arch_db:sale_subscription_stock.product_template_form_view
+#: model:ir.module.module,description:base.module_sale_subscription_stock
 msgid ""
-"Recurring order with this product will be invoiced at the end of the period."
-msgstr ""
-
-#. module: sale_subscription_stock
-#: model:ir.model,name:sale_subscription_stock.model_stock_return_picking_line
-msgid "Return Picking Line"
+"Sale Subscriptions Stock\n"
+"\n"
+"Sale Subscription Stock is a bridge module between sale_subscription and\n"
+"sale_stock. The purpose of this module is to allow the user to create\n"
+"subscription sale order with storable product which will result in\n"
+"recurring delivery order and invoicing of those products.\n"
+"Features:\n"
+"- Allow the creation of recurring storable product\n"
+"- Automaticaly create delivery order for the recurring storable product\n"
+"- Invoice delivered recurring product at the end of invoicing period\n"
+"- Report planned delivery for active subscriptions\n"
 msgstr ""
 
 #. module: sale_subscription_stock
@@ -106,11 +117,6 @@ msgstr "Linija porudžbenice"
 #. module: sale_subscription_stock
 #: model:ir.model,name:sale_subscription_stock.model_stock_forecasted_product_product
 msgid "Stock Replenishment Report"
-msgstr ""
-
-#. module: sale_subscription_stock
-#: model:ir.actions.server,name:sale_subscription_stock.action_compute_price_bom_product
-msgid "Subscription: Generate delivery"
 msgstr ""
 
 #. module: sale_subscription_stock

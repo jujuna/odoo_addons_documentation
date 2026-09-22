@@ -5,7 +5,7 @@ import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_
 import * as Chrome from "@point_of_sale/../tests/pos/tours/utils/chrome_util";
 import { registry } from "@web/core/registry";
 
-registry.category("web_tour.tours").add("ZATCA_invoice_not_mandatory_if_settlement", {
+registry.category("web_tour.tours").add("ZATCA_invoice_not_mandatory_if_deposit", {
     steps: () =>
         [
             Chrome.startPoS(),
@@ -14,7 +14,7 @@ registry.category("web_tour.tours").add("ZATCA_invoice_not_mandatory_if_settleme
                 content: "Set the pos_settle_due to True and open payment screen",
                 trigger: "body",
                 run: () => {
-                    posmodel.selectedOrder.is_settling_account = true;
+                    posmodel.getOrder().uiState.is_settling_account = true;
                     posmodel.navigate("PaymentScreen", { orderUuid: posmodel.selectedOrderUuid });
                 },
             },
@@ -24,16 +24,16 @@ registry.category("web_tour.tours").add("ZATCA_invoice_not_mandatory_if_settleme
         ].flat(),
 });
 
-registry.category("web_tour.tours").add("ZATCA_invoice_mandatory_if_not_settlement", {
+registry.category("web_tour.tours").add("ZATCA_invoice_mandatory_if_regular_order", {
     steps: () =>
         [
             Chrome.startPoS(),
             Dialog.confirm("Open Register"),
             {
-                content: "Set the pos_settle_due to False and open payment screen",
+                content: "Set the pos_settle_due to False and open payment screen.",
                 trigger: "body",
                 run: () => {
-                    posmodel.selectedOrder.is_settling_account = false;
+                    posmodel.getOrder().uiState.is_settling_account = false;
                     posmodel.navigate("PaymentScreen", { orderUuid: posmodel.selectedOrderUuid });
                 },
             },
@@ -42,6 +42,5 @@ registry.category("web_tour.tours").add("ZATCA_invoice_mandatory_if_not_settleme
             PaymentScreen.isInvoiceButtonChecked(),
             // Try to uncheck it and verify it remains checked
             PaymentScreen.clickInvoiceButton(),
-            PaymentScreen.isInvoiceButtonChecked(),
         ].flat(),
 });

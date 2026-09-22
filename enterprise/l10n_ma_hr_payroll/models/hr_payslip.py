@@ -17,5 +17,4 @@ class HrPayslip(models.Model):
                 'data/hr_rule_parameters_data.xml',
                 'data/res_partner_data.xml',
                 'data/hr_salary_rule_data.xml',
-                'data/hr_payslip_input_type_data.xml',
             ])]

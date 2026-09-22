@@ -27,7 +27,7 @@ class CrmLeadConvert2ticket(models.TransientModel):
         default=lambda self: self.env.context.get('active_id', None),
     )
     partner_id = fields.Many2one('res.partner', 'Customer')
-    team_id = fields.Many2one('helpdesk.team', string='Team', required=True)
+    team_id = fields.Many2one('helpdesk.team', string='Assign to', required=True)
 
     def action_lead_to_helpdesk_ticket(self):
         self.ensure_one()
@@ -60,12 +60,13 @@ class CrmLeadConvert2ticket(models.TransientModel):
 
         # create and add a specific creation message
         ticket_sudo = self.env['helpdesk.ticket'].with_context(
-            mail_create_nosubscribe=True, mail_create_nolog=True
+            mail_create_nosubscribe=True, mail_create_nolog=True,
+            helpdesk_partner_sync=False,
         ).sudo().create(vals)
         ticket_sudo.message_post_with_source(
             'mail.message_origin_link',
             render_values={'self': ticket_sudo, 'origin': lead},
-            subtype_xmlid='mail.mt_note',
+            subtype_xmlid='helpdesk.mt_ticket_new',
         )
 
         # move the mail thread

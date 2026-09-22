@@ -53,12 +53,6 @@ class HrEmployee(models.Model):
         if self.id == request.session.get(SESSION_OWNER):
             request.session[SESSION_OWNER] = False
 
-    def _get_employee_fields_for_tablet(self):
-        return [
-            'id',
-            'name',
-        ]
-
     def _connect_employee(self):
         """
             This function sets the employee that is connecting (or that is already connected)
@@ -130,7 +124,7 @@ class HrEmployee(models.Model):
             return request.session.get(EMPLOYEES_CONNECTED, [])
         else:
             # Test cases
-            return [self.env.user.employee_id.id]
+            return self.env.user.employee_id.ids
 
     def set_employees_connected(self):
         new_employees = self
@@ -143,7 +137,7 @@ class HrEmployee(models.Model):
             return request.session.get(SESSION_OWNER, [])
         else:
             # Test cases
-            return [self.env.user.employee_id.id]
+            return self.env.user.employee_id.ids
 
     def login_user_employee(self):
         if self.get_session_owner():

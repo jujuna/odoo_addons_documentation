@@ -6,7 +6,7 @@ patch(PosOrder.prototype, {
         return this.payment_ids.some((paymentLine) => {
             if (
                 paymentLine.payment_status &&
-                paymentLine.payment_method_id.use_payment_terminal === "tyro"
+                paymentLine.payment_method_id.payment_provider === "tyro"
             ) {
                 return ["waitingCard", "waitingCancel"].includes(paymentLine.payment_status);
             } else {

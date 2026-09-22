@@ -1,27 +1,19 @@
+import { useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 
-import { GridCell, standardGridCellProps } from "@web_grid/components/grid_cell";
-import { FloatFactorGridCell } from "@web_grid/components/float_factor_grid_cell";
-import { FloatToggleGridCell } from "@web_grid/components/float_toggle_grid_cell";
-import { FloatTimeGridCell } from "@web_grid/components/float_time_grid_cell";
+import { GridCell } from "@web_grid/components/grid_cell";
+import { standardGridCellProps } from "@web_grid/hooks/grid_cell_hook";
 
 import { TimesheetUOM } from "@hr_timesheet/components/timesheet_uom/timesheet_uom";
 
 export class GridTimesheetUOM extends TimesheetUOM {
-    static props = {
-        ...standardGridCellProps,
-    };
-    static defaultProps = {
-        readonly: true,
-        editMode: false,
-    };
+    props = useProps(standardGridCellProps);
 
-    static components = { GridCell, FloatFactorGridCell, FloatToggleGridCell, FloatTimeGridCell };
-
-    get timesheetComponent() {
-        return registry.category("grid_components").get(this.timesheetUOMService.timesheetWidget, {
-            component: GridCell,
-            formatter: this.timesheetUOMService.formatter,
-        }).component;
+    /**
+     * @override
+     */
+    getTimesheetComponent(fieldName) {
+        return registry.category("grid_components").get(fieldName, { component: GridCell })
+            .component;
     }
 }

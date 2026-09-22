@@ -10,4 +10,4 @@ class MrpRoutingWorkcenter(models.Model):
         if not self:
             return tuple()
         self.ensure_one()
-        return tuple([self.name, self.workcenter_id] + self.bom_product_template_attribute_value_ids.ids)
+        return tuple([self.name] + self.bom_product_template_attribute_value_ids.ids)

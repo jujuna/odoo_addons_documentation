@@ -1,7 +1,6 @@
 {
     'name': 'Account Bank Statement Extract',
     'category': 'Accounting/Accounting',
-    'version': '1.0',
     'depends': ['accountant', 'account_bank_statement_import', 'iap_extract', 'account_extract'],
     'summary': 'Extract data from bank statement scans to fill them automatically',
     'data': [

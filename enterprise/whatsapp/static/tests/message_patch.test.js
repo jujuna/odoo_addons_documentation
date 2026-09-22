@@ -1,3 +1,4 @@
+import { waitUntilSubscribe } from "@bus/../tests/bus_test_helpers";
 import {
     click,
     contains,
@@ -6,7 +7,7 @@ import {
     start,
     startServer,
 } from "@mail/../tests/mail_test_helpers";
-import { mailDataHelpers } from "@mail/../tests/mock_server/mail_mock_server";
+import { Store } from "@mail/../tests/mock_server/store";
 
 import { describe, test } from "@odoo/hoot";
 import { serializeDateTime } from "@web/core/l10n/dates";
@@ -69,7 +70,7 @@ test("WhatsApp error message should be showed with a message header and a whatsa
     await start();
     await openDiscuss(channelId);
     await contains(".o-mail-Message-header", { count: 2 });
-    await contains(".o-mail-Message-header span.fa-whatsapp.text-danger");
+    await contains(".o-mail-Message-header span[data-icon='oi_whatsapp'].text-danger");
 });
 
 test("Clicking on link to WhatsApp Channel in Related Document opens channel in chatwindow", async () => {
@@ -102,6 +103,7 @@ test("Allow SeenIndicators in WhatsApp Channels", async () => {
             Command.create({ partner_id: serverState.partnerId }),
             Command.create({ partner_id: partnerId2 }),
         ],
+        whatsapp_partner_id: partnerId2,
     });
     const messageId = pyEnv["mail.message"].create({
         author_id: serverState.partnerId,
@@ -111,26 +113,24 @@ test("Allow SeenIndicators in WhatsApp Channels", async () => {
         message_type: "whatsapp_message",
     });
     const memberIds = pyEnv["discuss.channel.member"].search([["channel_id", "=", channelId]]);
-    pyEnv["discuss.channel.member"].write(memberIds, {
-        fetched_message_id: messageId,
-        seen_message_id: false,
-    });
-    await start();
+    pyEnv["discuss.channel.member"].write(memberIds, { seen_message_id: false });
+    await Promise.all([waitUntilSubscribe(`discuss.channel_${channelId}`), start()]);
     await openDiscuss(channelId);
-    await contains(".o-mail-MessageSeenIndicator[title='Sent']");
-    await contains(".o-mail-MessageSeenIndicator .fa-check", { count: 1 });
-
+    await contains(".o-mail-Message");
+    await contains(".o-mail-MessageSeenIndicator [data-icon='check']", { count: 0 });
     const [channel] = pyEnv["discuss.channel"].search_read([["id", "=", channelId]]);
     // Simulate received channel seen notification
     pyEnv["bus.bus"]._sendone(
         channel,
         "mail.record/insert",
-        new mailDataHelpers.Store(pyEnv["discuss.channel.member"].browse(memberIds[1]), {
-            seen_message_id: messageId,
-        }).get_result()
+        new Store()
+            .add(pyEnv["discuss.channel.member"].browse(memberIds[1]), (res) =>
+                res.attr("seen_message_id", messageId)
+            )
+            .as_dict()
     );
-    await contains(".o-mail-MessageSeenIndicator .fa-check", { count: 2 });
-    await contains(".o-mail-MessageSeenIndicator[title='Seen by WhatsApp User']");
+    await contains(".o-mail-Thread .o-mail-MessageSeenIndicator [data-icon='check']", { count: 2 });
+    await contains(".o-mail-Thread .o-mail-MessageSeenIndicator[title='Seen by WhatsApp User']");
 });
 
 test("No SeenIndicators if message has whatsapp error", async () => {
@@ -158,13 +158,10 @@ test("No SeenIndicators if message has whatsapp error", async () => {
         state: "error",
     });
     const memberIds = pyEnv["discuss.channel.member"].search([["channel_id", "=", channelId]]);
-    pyEnv["discuss.channel.member"].write(memberIds, {
-        fetched_message_id: messageId,
-        seen_message_id: false,
-    });
+    pyEnv["discuss.channel.member"].write(memberIds, { seen_message_id: messageId });
     await start();
     await openDiscuss(channelId);
-    await contains(".o-mail-Message .fa.fa-whatsapp.text-danger");
+    await contains(".o-mail-Message [data-icon='oi_whatsapp'].text-danger");
     await contains(".o-mail-MessageSeenIndicator", { count: 0 });
 });
 
@@ -182,7 +179,7 @@ test("whatsapp template messages should have whatsapp icon in message header", a
     });
     await start();
     await openDiscuss(channelId);
-    await contains(".o-mail-Message-header span.fa-whatsapp");
+    await contains(".o-mail-Message-header span[data-icon='oi_whatsapp']");
 });
 
 test("No Reply button if thread is expired", async () => {

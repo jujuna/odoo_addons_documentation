@@ -17,7 +17,7 @@ test("Check progress bar values", async () => {
             name: "Blop",
             planned_date_begin: "2020-06-14 08:00:00",
             date_deadline: "2020-06-24 08:00:00",
-            progress: 50.0,
+            progress: 0.5,
             project_id: 1,
         },
         {
@@ -32,7 +32,7 @@ test("Check progress bar values", async () => {
         resModel: "project.task",
         arch: `<gantt js_class="task_gantt" date_start="planned_date_begin" date_stop="date_deadline" progress="progress"/>`,
     });
-    await contains(".o_content").scroll({ left: 400 });
+    await contains(".o_gantt_scroll_container").scroll({ left: 400 });
     const [firstPillFirstSpan, secondPillFirstSpan] = queryAll(".o_gantt_pill span:first-child");
     expect(firstPillFirstSpan).not.toHaveClass("o_gantt_progress");
     expect(secondPillFirstSpan).toHaveClass("o_gantt_progress");

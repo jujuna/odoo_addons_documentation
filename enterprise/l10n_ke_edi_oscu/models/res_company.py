@@ -7,7 +7,6 @@ import json
 from json.decoder import JSONDecodeError
 from markupsafe import Markup
 import contextlib
-from datetime import datetime
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, UserError, RedirectWarning
@@ -81,9 +80,10 @@ class ResCompany(models.Model):
         compute_sudo=True,
     )
 
-    l10n_ke_oscu_last_fetch_purchase_date = fields.Datetime(default=datetime(2018, 1, 1))
+    l10n_ke_oscu_last_fetch_purchase_date = fields.Datetime()
 
     # === Computes === #
+
     @api.depends('l10n_ke_oscu_cmc_key', 'l10n_ke_branch_code', 'l10n_ke_server_mode')
     def _compute_l10n_ke_oscu_is_active(self):
         for company in self:
@@ -247,7 +247,7 @@ class ResCompany(models.Model):
         """ Fetch all the products we've saved on eTIMS.
             We don't use this method, but must have it to demonstrate we are able to query their API.
         """
-        last_request_date = self.env['ir.config_parameter'].get_param('l10n_ke_edi_oscu.last_fetch_items_request_date', '20180101000000')
+        last_request_date = self.env['ir.config_parameter'].get_str('l10n_ke_edi_oscu.last_fetch_items_request_date') or '20180101000000'
         content = {'lastReqDt': last_request_date}
         error, data, _dummy = self._l10n_ke_call_etims('selectItemList', content)
         if error:

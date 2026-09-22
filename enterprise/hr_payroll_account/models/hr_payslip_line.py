@@ -21,6 +21,16 @@ class HrPayslipLine(models.Model):
         compute="_compute_credit_tags",
     )
 
+    salary_rule_account_credit = fields.Many2one('account.account',
+                                                string="Credit Account",
+                                                related='salary_rule_id.account_credit',
+                                                readonly=True)
+
+    salary_rule_account_debit = fields.Many2one('account.account',
+                                                string="Debit Account",
+                                                related='salary_rule_id.account_debit',
+                                                readonly=True)
+
     @api.depends('salary_rule_id')
     def _compute_debit_tags(self):
         # To be overridden for specific localisation cases

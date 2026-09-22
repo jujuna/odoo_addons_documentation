@@ -1,7 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': "Sale order spreadsheet",
-    'version': '1.0',
     'category': 'Sales/Sales',
     'description': 'Link a spreadsheet to a quotation templates and access your calculator from a Sale Order.',
     'depends': ['spreadsheet_edition', 'sale_management'],
@@ -9,11 +8,10 @@
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'data': [
-        'security/ir.model.access.csv',
-        'security/security.xml',
         'views/sale_order_template_views.xml',
         'views/sale_order_views.xml',
         'views/sale_order_spreadsheet_views.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'spreadsheet.o_spreadsheet': [

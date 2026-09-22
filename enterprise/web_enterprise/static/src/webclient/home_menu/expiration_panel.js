@@ -1,7 +1,7 @@
 import { useService } from "@web/core/utils/hooks";
 import { Transition } from "@web/core/transition";
 import { _t } from "@web/core/l10n/translation";
-import { Component, useState, useRef } from "@odoo/owl";
+import { Component, proxy, signal } from "@odoo/owl";
 
 const { DateTime } = luxon;
 
@@ -15,17 +15,16 @@ const { DateTime } = luxon;
  */
 export class ExpirationPanel extends Component {
     static template = "DatabaseExpirationPanel";
-    static props = {};
     static components = { Transition };
+
+    inputRef = signal.ref();
 
     setup() {
         this.subscription = useService("enterprise_subscription");
 
-        this.state = useState({
+        this.state = proxy({
             displayRegisterForm: false,
         });
-
-        this.inputRef = useRef("input");
     }
 
     get buttonText() {
@@ -81,7 +80,7 @@ export class ExpirationPanel extends Component {
     }
 
     async onCodeSubmit() {
-        const enterpriseCode = this.inputRef.el.value;
+        const enterpriseCode = this.inputRef().value;
         if (!enterpriseCode) {
             return;
         }

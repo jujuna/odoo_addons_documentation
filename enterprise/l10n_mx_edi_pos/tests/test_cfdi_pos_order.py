@@ -1,14 +1,23 @@
+from datetime import timedelta
+
 from .common import TestMxEdiPosCommon
 
-from odoo import Command, http
-from odoo.addons.l10n_mx_edi.tests.common import EXTERNAL_MODE
+from odoo import Command, fields
 from odoo.addons.point_of_sale.tests.test_frontend import TestPointOfSaleHttpCommon
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import tagged
 
 
-@tagged('post_install_l10n', 'post_install', '-at_install', *(['-standard', 'external'] if EXTERNAL_MODE else []))
+@tagged('post_install_l10n', 'post_install', '-at_install', *TestMxEdiPosCommon.extra_tags)
 class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
+
+    _test_user_groups = (
+        'point_of_sale.group_pos_user',
+        'account.group_account_invoice',  # Needed for invoice creation
+        'base.group_system',  # Needed for some configurations
+    )
+
+    _test_user_name = 'Test Pos User'
 
     def test_global_invoice_negative_lines_zero_total(self):
         """ Test a pos order completely refunded by the negative lines. """
@@ -23,10 +32,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 })
 
             with self.with_mocked_pac_sign_success():
-                self.env['l10n_mx_edi.global_invoice.create'] \
-                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context']) \
-                    .create({})\
-                    .action_create_global_invoice()
+                self._create_orders_global_invoice(order)
             self.assertRecordValues(order, [{'l10n_mx_edi_cfdi_state': 'global_sent'}])
             self.assertRecordValues(order.l10n_mx_edi_document_ids, [{
                 'pos_order_ids': order.ids,
@@ -48,10 +54,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 })
 
             with self.with_mocked_pac_sign_success():
-                self.env['l10n_mx_edi.global_invoice.create'] \
-                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context']) \
-                    .create({})\
-                    .action_create_global_invoice()
+                self._create_orders_global_invoice(order)
             self._assert_global_invoice_cfdi_from_orders(order, 'test_global_invoice_zero_line')
             self.assertRecordValues(order.l10n_mx_edi_document_ids, [{
                 'pos_order_ids': order.ids,
@@ -61,7 +64,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
     def test_global_invoice_negative_lines_orphan_negative_line(self):
         """ Test a global invoice containing a pos order having a negative line that failed to be distributed. """
         product1 = self.product
-        product2 = self._create_product(taxes_id=[])
+        product2 = self._create_product_mx(taxes_id=[])
 
         with self.mx_external_setup(self.frozen_today):
             with self.with_pos_session():
@@ -74,10 +77,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 })
 
             with self.with_mocked_pac_sign_success():
-                self.env['l10n_mx_edi.global_invoice.create'] \
-                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context']) \
-                    .create({})\
-                    .action_create_global_invoice()
+                self._create_orders_global_invoice(order)
             self.assertRecordValues(order.l10n_mx_edi_document_ids, [{
                 'pos_order_ids': order.ids,
                 'state': 'ginvoice_sent_failed',
@@ -110,10 +110,8 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             orders = refund
             with self.with_mocked_pac_sign_success():
                 # Calling the global invoice on the order will include the refund automatically.
-                self.env['l10n_mx_edi.global_invoice.create']\
-                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context'])\
-                    .create({})\
-                    .action_create_global_invoice()
+                self._create_orders_global_invoice(order)
+
             self._assert_global_invoice_cfdi_from_orders(orders, 'test_global_invoice_including_complex_partial_refund_chain_1')
 
             self.assertRecordValues(orders.l10n_mx_edi_document_ids, [{
@@ -124,6 +122,9 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             # New refund after the global invoice.
             with self.with_pos_session(), self.with_mocked_pac_sign_success():
                 refund2 = self._create_order({
+                    'pos_order_ui_args': {
+                        'is_refund': True,
+                    },
                     'pos_order_lines_ui_args': [
                         {
                             'product': self.product,
@@ -139,13 +140,12 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             order.partner_id = self.customer
             with self.with_pos_session(), self.with_mocked_pac_sign_success():
                 order.action_pos_order_invoice()
-            self._assert_order_cfdi(order, 'test_global_invoice_including_complex_partial_refund_chain_3')
+            documents = order.l10n_mx_edi_document_ids.sorted()
+            self._assert_document_cfdi(documents[1], 'test_global_invoice_including_complex_partial_refund_chain_3', subfolder='global_invoice_refund')
 
             # You can't make a global invoice since the order is invoiced.
             with self.assertRaises(UserError):
-                self.env['l10n_mx_edi.global_invoice.create'] \
-                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context']) \
-                    .create({})
+                self._create_orders_global_invoice(order)
 
             # Sign it.
             invoice = order.account_move
@@ -155,9 +155,13 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 .action_send_and_print()
             self.assertRecordValues(invoice, [{'l10n_mx_edi_cfdi_state': 'sent'}])
 
-            # Nothing changed on the order.
-            self.assertRecordValues(order, [{'l10n_mx_edi_cfdi_state': 'global_sent'}])
+            # Verify order state changes to 'sent' after signing the invoice
+            self.assertRecordValues(order, [{'l10n_mx_edi_cfdi_state': 'sent'}])
             self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
+                {
+                    'pos_order_ids': order.ids,
+                    'state': 'invoice_sent',
+                },
                 {
                     'pos_order_ids': order.ids,
                     'state': 'invoice_sent',
@@ -171,7 +175,8 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             refund.partner_id = self.customer
             with self.with_pos_session(), self.with_mocked_pac_sign_success():
                 refund[1].action_pos_order_invoice()
-            self._assert_order_cfdi(refund[1], 'test_global_invoice_including_complex_partial_refund_chain_4')
+            documents = refund.l10n_mx_edi_document_ids.sorted()
+            self._assert_document_cfdi(documents[1], 'test_global_invoice_including_complex_partial_refund_chain_4', subfolder='global_invoice_refund')
 
     def test_global_invoice_including_full_refund(self):
         with self.mx_external_setup(self.frozen_today):
@@ -183,6 +188,9 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                     'payments': [(self.bank_pm1, 11600.0)],
                 })
                 refund = self._create_order({
+                    'pos_order_ui_args': {
+                        'is_refund': True,
+                    },
                     'pos_order_lines_ui_args': [
                         {
                             'product': self.product,
@@ -195,10 +203,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
 
             orders = refund
             with self.with_mocked_pac_sign_success():
-                self.env['l10n_mx_edi.global_invoice.create']\
-                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context'])\
-                    .create({})\
-                    .action_create_global_invoice()
+                self._create_orders_global_invoice(order)
 
             self.assertRecordValues(orders.l10n_mx_edi_document_ids, [{
                 'pos_order_ids': orders.ids,
@@ -217,10 +222,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 })
 
             with self.with_mocked_pac_sign_success():
-                self.env['l10n_mx_edi.global_invoice.create']\
-                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context'])\
-                    .create({})\
-                    .action_create_global_invoice()
+                self._create_orders_global_invoice(order)
 
             self.assertRecordValues(order.l10n_mx_edi_document_ids, [{
                 'pos_order_ids': order.ids,
@@ -229,6 +231,9 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
 
             with self.with_pos_session(), self.with_mocked_pac_sign_success():
                 refund = self._create_order({
+                    'pos_order_ui_args': {
+                        'is_refund': True,
+                    },
                     'pos_order_lines_ui_args': [
                         {
                             'product': self.product,
@@ -245,6 +250,57 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 'state': 'invoice_sent',
             }])
 
+            gi_document = order.l10n_mx_edi_document_ids.filtered(lambda d: d.state == 'ginvoice_sent')
+            with self.with_mocked_pac_cancel_success():
+                self.env['l10n_mx_edi.invoice.cancel']\
+                    .with_context(gi_document.action_request_cancel()['context'])\
+                    .create({'cancellation_reason': '02'})\
+                    .action_cancel_invoice()
+            self.assertRecordValues(refund, [{'l10n_mx_edi_cfdi_state': False}])
+
+            with self.with_mocked_pac_sign_success():
+                self.env['l10n_mx_edi.global_invoice.create']\
+                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context'])\
+                    .create({})\
+                    .action_create_global_invoice()
+            self.assertRecordValues(order + refund, [
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+            ])
+
+            # Create a second refund against the new global invoice, then simulate the SAT
+            # cron picking up a manual SAT-portal cancellation of that GI. The cascade must
+            # also cover this entry path, not only the Odoo cancellation wizard.
+            with self.with_pos_session(), self.with_mocked_pac_sign_success():
+                refund2 = self._create_order({
+                    'pos_order_lines_ui_args': [
+                        {
+                            'product': self.product,
+                            'quantity': -2.0,
+                            'refunded_orderline_id': order.lines[0].id,
+                        },
+                    ],
+                    'payments': [(self.bank_pm1, -2320.0)],
+                })[1]
+            self.assertRecordValues(refund2, [{'l10n_mx_edi_cfdi_state': 'sent'}])
+
+            gi_document = order.l10n_mx_edi_document_ids\
+                .filtered(lambda d: d.state == 'ginvoice_sent' and d.sat_state != 'skip')
+            with self.with_mocked_pac_cancel_success():
+                gi_document._update_document_sat_state('cancelled')
+            self.assertRecordValues(refund2, [{'l10n_mx_edi_cfdi_state': False}])
+
+            with self.with_mocked_pac_sign_success():
+                self.env['l10n_mx_edi.global_invoice.create']\
+                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context'])\
+                    .create({})\
+                    .action_create_global_invoice()
+            self.assertRecordValues(order + refund + refund2, [
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+            ])
+
     def test_global_invoice_documents(self):
         with self.mx_external_setup(self.frozen_today), self.with_pos_session() as _session:
             order1 = self._create_order({
@@ -258,7 +314,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             orders = order1 + order2
 
             with self.with_mocked_pac_sign_error():
-                orders._l10n_mx_edi_cfdi_global_invoice_try_send()
+                self._create_orders_global_invoice(orders)
             self.assertRecordValues(orders.l10n_mx_edi_document_ids, [
                 {
                     'pos_order_ids': orders.ids,
@@ -271,7 +327,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
 
             # Successfully create the global invoice.
             with self.with_mocked_pac_sign_success():
-                orders._l10n_mx_edi_cfdi_global_invoice_try_send()
+                self._create_orders_global_invoice(orders)
             sent_doc_values = {
                 'pos_order_ids': orders.ids,
                 'message': False,
@@ -288,9 +344,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             }] * 2)
 
             with self.with_mocked_sat_call(lambda _x: 'valid'):
-                self.env['l10n_mx_edi.document']._fetch_and_update_sat_status(
-                    extra_domain=[('id', '=', orders.l10n_mx_edi_document_ids.id)]
-                )
+                orders[0].l10n_mx_edi_cfdi_try_sat()
             sent_doc_values['sat_state'] = 'valid'
             self.assertRecordValues(orders.l10n_mx_edi_document_ids, [sent_doc_values])
 
@@ -298,9 +352,10 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
         usd = self.env.ref('base.USD')
         usd.rate_ids = [Command.create({
             'rate': 1 / 17.0398,
-            'name': self.frozen_today,
+            'name': self.frozen_today - timedelta(days=1),
         })]
-        usd_journal = self.env['account.journal'].create({
+        # Only allowed for accounting admins
+        usd_journal = self.env['account.journal'].sudo().create({
             'name': 'Test POS Journal',
             'type': 'sale',
             'code': 'TPOS',
@@ -323,7 +378,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             })
 
             with self.with_mocked_pac_sign_success():
-                order._l10n_mx_edi_cfdi_global_invoice_try_send()
+                self._create_orders_global_invoice(order)
             self._assert_global_invoice_cfdi_from_orders(order, "test_global_invoice_from_order_foreign_currency")
 
     def test_invoiced_order_then_refund(self):
@@ -342,13 +397,9 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
 
             # You are no longer able to create a global invoice for it.
             with self.assertRaises(UserError):
-                self.env['l10n_mx_edi.global_invoice.create'] \
-                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context'])\
-                    .create({})
+                self._create_orders_global_invoice(order)
             with self.assertRaises(UserError):
-                self.env['l10n_mx_edi.global_invoice.create'] \
-                    .with_context(invoice.l10n_mx_edi_action_create_global_invoice()['context'])\
-                    .create({})
+                self._create_invoices_global_invoice(invoice)
 
             with self.with_pos_session() as _session, self.with_mocked_pac_sign_success():
                 # Invoice the refund order, then sign it.
@@ -369,9 +420,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
 
             # You can't make a global invoice for it.
             with self.assertRaises(UserError):
-                self.env['l10n_mx_edi.global_invoice.create'] \
-                    .with_context(refund.l10n_mx_edi_action_create_global_invoice()['context'])\
-                    .create({})
+                self._create_invoices_global_invoice(refund)
 
             # Create the CFDI and sign it.
             with self.with_mocked_pac_sign_success():
@@ -398,10 +447,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             order.l10n_mx_edi_cfdi_to_public = True  # needed to create a global invoice for this order
 
             with self.with_mocked_pac_sign_success():
-                self.env['l10n_mx_edi.global_invoice.create'] \
-                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context'])\
-                    .create({}) \
-                    .action_create_global_invoice()
+                self._create_orders_global_invoice(order)
 
             ginvoice_doc_values = {
                 'pos_order_ids': order.ids,
@@ -435,60 +481,78 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
 
             invoice_doc_values = {
                 'pos_order_ids': order.ids,
+                'state': 'invoice_sent',
+                'sat_state': 'not_defined',
+                'attachment_uuid': invoice.l10n_mx_edi_cfdi_uuid,
+                'attachment_origin': False,
+                'cancellation_reason': False,
+                'retry_button_needed': False,
+                'cancel_button_needed': True,
+            }
+            refund_doc_values = {
+                'pos_order_ids': order.ids,
                 'state': 'invoice_sent_failed',
                 'sat_state': False,
                 'attachment_uuid': False,
-                'attachment_origin': f'01|{order.l10n_mx_edi_cfdi_uuid}',
+                'attachment_origin': f"01|{ginvoice_doc_values['attachment_uuid']}",
                 'cancellation_reason': False,
                 'retry_button_needed': True,
                 'cancel_button_needed': False,
             }
             self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
                 invoice_doc_values,
+                refund_doc_values,
                 ginvoice_doc_values,
             ])
 
             # Retry the global refund.
             with self.with_mocked_pac_sign_success():
-                order.l10n_mx_edi_document_ids.sorted()[0].action_retry()
-            invoice_doc_values.update({
+                order.l10n_mx_edi_document_ids.sorted()[1].action_retry()
+            refund_doc_values.update({
                 'state': 'invoice_sent',
                 'sat_state': 'not_defined',
-                'attachment_uuid': order.l10n_mx_edi_document_ids.sorted()[0].attachment_uuid,
+                'attachment_uuid': order.l10n_mx_edi_document_ids.sorted()[1].attachment_uuid,
                 'attachment_origin': f"01|{ginvoice_doc_values['attachment_uuid']}",
                 'cancellation_reason': False,
                 'retry_button_needed': False,
                 'cancel_button_needed': True,
             })
-            self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
+            documents = order.l10n_mx_edi_document_ids.sorted()
+            self.assertRecordValues(documents, [
                 invoice_doc_values,
+                refund_doc_values,
                 ginvoice_doc_values,
             ])
             self.assertRecordValues(order, [{
-                'l10n_mx_edi_cfdi_state': 'global_sent',
-                'l10n_mx_edi_cfdi_uuid': ginvoice_doc_values['attachment_uuid'],
+                'l10n_mx_edi_cfdi_state': 'sent',
+                'l10n_mx_edi_cfdi_uuid': invoice_doc_values['attachment_uuid'],
             }])
-            self._assert_order_cfdi(order, 'test_global_invoiced_order_then_invoiced_then_refund_then_cancel_it')
+
+            # 2 documents have been generated. One for the global invoice, one for the refund.
+            # Let's check the refund of the global invoice.
+            self._assert_document_cfdi(documents[1], 'test_global_invoiced_order_then_invoiced_then_refund_then_cancel_it', subfolder='global_invoice_refund')
 
             # Sat.
             with self.with_mocked_sat_call(lambda _x: 'valid'):
                 order.l10n_mx_edi_cfdi_try_sat()
             invoice_doc_values['sat_state'] = 'valid'
+            refund_doc_values['sat_state'] = 'valid'
             ginvoice_doc_values['sat_state'] = 'valid'
             self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
                 invoice_doc_values,
+                refund_doc_values,
                 ginvoice_doc_values,
             ])
 
             # Try to cancel.
             with self.with_mocked_pac_cancel_error():
-                order.l10n_mx_edi_document_ids.sorted()[0].action_cancel()
+                order.l10n_mx_edi_document_ids.sorted()[1].action_cancel()
             invoice_cancel_doc_values = {
                 'pos_order_ids': order.ids,
                 'state': 'invoice_cancel_failed',
                 'sat_state': False,
-                'attachment_uuid': invoice_doc_values['attachment_uuid'],
-                'attachment_origin': f'01|{order.l10n_mx_edi_cfdi_uuid}',
+                'attachment_uuid': refund_doc_values['attachment_uuid'],
+                'attachment_origin': f"01|{ginvoice_doc_values['attachment_uuid']}",
                 'cancellation_reason': '02',
                 'retry_button_needed': True,
                 'cancel_button_needed': False,
@@ -496,6 +560,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
                 invoice_cancel_doc_values,
                 invoice_doc_values,
+                refund_doc_values,
                 ginvoice_doc_values,
             ])
 
@@ -505,8 +570,8 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             invoice_cancel_doc_values.update({
                 'state': 'invoice_cancel',
                 'sat_state': 'not_defined',
-                'attachment_uuid': invoice_doc_values['attachment_uuid'],
-                'attachment_origin': f'01|{order.l10n_mx_edi_cfdi_uuid}',
+                'attachment_uuid': refund_doc_values['attachment_uuid'],
+                'attachment_origin': f"01|{ginvoice_doc_values['attachment_uuid']}",
                 'cancellation_reason': '02',
                 'retry_button_needed': False,
                 'cancel_button_needed': False,
@@ -514,18 +579,21 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
                 invoice_cancel_doc_values,
                 invoice_doc_values,
+                refund_doc_values,
                 ginvoice_doc_values,
             ])
 
             # Sat.
             with self.with_mocked_sat_call(lambda _x: 'cancelled'):
                 order.l10n_mx_edi_cfdi_try_sat()
-            invoice_cancel_doc_values['sat_state'] = 'cancelled'
             invoice_doc_values['sat_state'] = 'cancelled'
+            invoice_cancel_doc_values['sat_state'] = 'cancelled'
+            refund_doc_values['sat_state'] = 'cancelled'
             ginvoice_doc_values['sat_state'] = 'cancelled'
             self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
                 invoice_cancel_doc_values,
                 invoice_doc_values,
+                refund_doc_values,
                 ginvoice_doc_values,
             ])
 
@@ -607,6 +675,9 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                     self.assertRecordValues(invoice, [{'l10n_mx_edi_cfdi_state': 'sent'}])
 
                 refund = self._create_order({
+                    'pos_order_ui_args': {
+                        'is_refund': True,
+                    },
                     'pos_order_lines_ui_args': [
                         {
                             'product': self.product,
@@ -673,7 +744,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 'access_token': pos_order.access_token,
                 'name': 'individual',
                 'email': "test@test.com",
-                'company_name': 'company',
+                'parent_name': 'company',
                 'street': "Test street",
                 'city': "Test City",
                 'zipcode': '12345',
@@ -683,7 +754,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 'vat': 'XAXX010101000',
                 'invoice_l10n_mx_edi_usage': 'D10',
                 'partner_l10n_mx_edi_fiscal_regime': '624',
-                'csrf_token': http.Request.csrf_token(self),
+                'csrf_token': self.csrf_token(),
             }
             with self.with_mocked_pac_sign_success():
                 self.url_open(f'/pos/ticket/validate?access_token={pos_order.access_token}', data=get_invoice_data)
@@ -696,7 +767,8 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
         """
         # set another payment method than payment_method_transferencia, which is the default value for payment
         payment_method_electronico = self.env.ref('l10n_mx_edi.payment_method_monedero_electronico')
-        self.bank_pm1.l10n_mx_edi_payment_method_id = payment_method_electronico
+        # Only allowed for pos admins
+        self.bank_pm1.sudo().l10n_mx_edi_payment_method_id = payment_method_electronico
 
         with self.mx_external_setup(self.frozen_today), self.with_pos_session() as session:
             self._create_order({
@@ -720,15 +792,15 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
         invoice = self.env['account.move'].browse(order.action_pos_order_invoice()['res_id'])
         reversal_move = self.env['account.move'].search([('reversed_pos_order_id', '=', order.id)])
 
-        self.assertRecordValues(invoice.line_ids, [
+        self.assertRecordValues(invoice.line_ids.sorted(key=lambda line: (line.balance, line.account_id)), [
             {'balance': -1000.0, 'account_id': self.env.company.l10n_mx_income_re_invoicing_account_id.id},
             {'balance': -160.0, 'account_id': self.company_data['default_tax_sale'].cash_basis_transition_account_id.id},
             {'balance': 1160.0, 'account_id': self.company_data['default_account_receivable'].id},
         ])
-        self.assertRecordValues(reversal_move.line_ids, [
-            {'balance': 160.0, 'account_id': self.company_data['default_tax_sale'].cash_basis_transition_account_id.id},
+        self.assertRecordValues(reversal_move.line_ids.sorted(key=lambda line: (line.balance, line.account_id)), [
+            {'balance': -1160.0, 'account_id': self.company_data['default_account_receivable'].id},
+            {'balance': 160.0, 'account_id': self.company_data['default_account_tax_sale'].id},
             {'balance': 1000.0, 'account_id': self.env.company.l10n_mx_income_re_invoicing_account_id.id},
-            {'balance': -1160.0, 'account_id': self.bank_pm1.receivable_account_id.id},
         ])
 
     def test_consolidated_billing_pos_orders(self):
@@ -779,6 +851,161 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             {
                 'l10n_mx_edi_cfdi_to_public': False,
                 'l10n_mx_edi_usage': 'G01',
-                'l10n_mx_edi_payment_method_id': 1,
+                'l10n_mx_edi_payment_method_id': self.bank_pm1.l10n_mx_edi_payment_method_id.id,
             }
         ])
+
+    def test_cfdi_credit_note_pos_reversal_entry_with_order_and_refund(self):
+        """Test that the reversal entry of a non-refund order has linked the credit note's
+        related documents and set its CFDI UUID.
+        """
+        with self.mx_external_setup(self.frozen_today):
+            with self.with_pos_session(), self.with_mocked_pac_sign_success():
+                order = self._create_order({
+                    'pos_order_lines_ui_args': [
+                        (self.product, 1.0),
+                    ],
+                    'payments': [(self.bank_pm1, 1160)],
+                })
+
+                # Global invoice order.
+                self._create_orders_global_invoice(order)
+
+            order.partner_id = self.partner_mx
+
+            # Create invoice to generate reversion entry and corresponding credit note on order
+            with self.with_mocked_pac_sign_success():
+                order.action_pos_order_invoice()
+
+            # Order should be fully invoiced and globally signed and the global invoice and credit note document should be created and signed
+            self.assertRecordValues(order, [
+                {'invoice_status': 'invoiced', 'l10n_mx_edi_cfdi_state': 'sent'}
+            ])
+            self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
+                {'state': 'invoice_sent'},
+                {'state': 'invoice_sent'},
+                {'state': 'ginvoice_sent'}
+            ])
+
+            reversal_move = self.env['account.move'].search([('reversed_pos_order_id', '=', order.id)])
+
+            cfdi_credit_note = order.l10n_mx_edi_document_ids.sorted()[1]
+            # Ensure that a reversion exists and has the credit note linked and its uuid
+            self.assertRecordValues(reversal_move, [
+                {
+                    'l10n_mx_edi_cfdi_uuid': cfdi_credit_note.attachment_uuid,
+                    'l10n_mx_edi_document_ids': cfdi_credit_note.ids,
+                    'l10n_mx_edi_cfdi_state': 'sent',
+                    'l10n_mx_edi_cfdi_attachment_id':  cfdi_credit_note.attachment_id.id,
+                }
+            ])
+
+            with self.with_mocked_pac_cancel_success():
+                cfdi_credit_note.action_cancel()
+
+            # Other documents created should also be on the reversal entry
+            self.assertRecordValues(reversal_move, [
+                {
+                    'l10n_mx_edi_cfdi_uuid': cfdi_credit_note.attachment_uuid,
+                    'l10n_mx_edi_document_ids': (cfdi_credit_note | order.l10n_mx_edi_document_ids.sorted()[0]).ids,
+                    'l10n_mx_edi_cfdi_state': 'cancel',
+                    'l10n_mx_edi_cfdi_attachment_id':  cfdi_credit_note.attachment_id.id
+                }
+            ])
+
+            # A refund can also be created even if the refunded order was initially invoiced
+            with self.with_pos_session(), self.with_mocked_pac_sign_success():
+                refund = self._create_order({
+                    'pos_order_ui_args': {
+                        'is_refund': True,
+                    },
+                    'pos_order_lines_ui_args': [
+                        {
+                            'product': self.product,
+                            'quantity': -1.0,
+                            'refunded_orderline_id': order.lines[0].id,
+                        },
+                    ],
+                    'payments': [(self.bank_pm1, -1160.0)],
+                })[1]
+
+            self.assertTrue(refund.l10n_mx_edi_cfdi_state == 'sent', "Automatic CFDI Credit Note should have been created.")
+            refund.partner_id = self.partner_mx
+
+            with self.with_mocked_pac_sign_success():
+                refund.action_pos_order_invoice()
+
+            # Reversal entry of refund shouldn't contain the document of this refund since they are opposite operations
+            refund_reversal_move = self.env['account.move'].search([('reversed_pos_order_id', '=', refund.id)])
+            self.assertRecordValues(refund_reversal_move, [
+                {
+                    'l10n_mx_edi_cfdi_uuid': False,
+                    'l10n_mx_edi_document_ids': [],
+                    'l10n_mx_edi_cfdi_state': False,
+                    'l10n_mx_edi_cfdi_attachment_id': False,
+                }
+            ])
+
+    def test_global_invoice_auto_refund_no_duplicate_on_invoice_retry(self):
+        """ Test auto-refund CFDI is not duplicated when retrying invoice creation. """
+        with self.mx_external_setup(self.frozen_today):
+            with self.with_pos_session():
+                order = self._create_order({
+                    'pos_order_lines_ui_args': [(self.product, 1)],
+                    'payments': [(self.bank_pm1, 1160.0)],
+                })
+
+            with self.with_mocked_pac_sign_success():
+                self._create_orders_global_invoice(order)
+
+            self.assertRecordValues(order, [{'l10n_mx_edi_cfdi_state': 'global_sent'}])
+            order.partner_id = self.partner_mx
+
+            # Manually create auto-refund to simulate scenario where invoice creation fails after auto-refund sent.
+            with self.with_mocked_pac_sign_success():
+                order._l10n_mx_edi_cfdi_invoice_try_send()
+
+            self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
+                {'state': 'invoice_sent'},  # Auto-refund
+                {'state': 'ginvoice_sent'}
+            ])
+
+            # Retry invoicing, should not create duplicate auto-refund.
+            with self.with_pos_session(), self.with_mocked_pac_sign_success():
+                order.action_pos_order_invoice()
+
+            self.assertRecordValues(order, [{'l10n_mx_edi_cfdi_state': 'sent'}])
+            self.assertRecordValues(order.l10n_mx_edi_document_ids.sorted(), [
+                {'state': 'invoice_sent'},  # Invoice CFDI
+                {'state': 'invoice_sent'},  # Auto-refund
+                {'state': 'ginvoice_sent'}
+            ])
+
+    def test_global_invoice_with_cancelled_and_paid_refund(self):
+        """
+        Test that a canceled refund is ignored while a paid refund
+        of the same order is still distributed in the global invoice.
+        """
+        with self.mx_external_setup(self.frozen_today), self.with_pos_session():
+            order = self._create_order({
+                'pos_order_lines_ui_args': [
+                    (self.product, 1.0),
+                ],
+                'payments': [(self.bank_pm1, 1160)],
+            })
+            canceled_refund = self.env['pos.order'].browse(order.refund()['res_id'])
+            canceled_refund.cancel_order_from_pos()
+            paid_refund = self._create_order({
+                'pos_order_lines_ui_args': [
+                    {
+                        'product': self.product,
+                        'quantity': -1.0,
+                        'refunded_orderline_id': order.lines[0].id,
+                    },
+                ],
+                'payments': [(self.bank_pm1, -1160)],
+            })[1]
+            with self.with_mocked_pac_sign_success():
+                order._l10n_mx_edi_cfdi_global_invoice_try_send(fields.Date.to_date('2025-01-01'))
+            self.assertEqual(canceled_refund.l10n_mx_edi_cfdi_state, False)
+            self.assertEqual(paid_refund.l10n_mx_edi_cfdi_state, 'global_sent')

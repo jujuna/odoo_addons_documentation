@@ -2,12 +2,11 @@ import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
 
 registry.category("web_tour.tours").add("hr_payroll_form_view_date_input_tour", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
             content: "Open Payroll app",
-            trigger: '.o_app[data-menu-xmlid="hr_work_entry_enterprise.menu_hr_payroll_root"]',
+            trigger: '.o_app[data-menu-xmlid="hr_payroll.menu_hr_payroll_root"]',
             run: "click",
         },
         {
@@ -41,13 +40,17 @@ registry.category("web_tour.tours").add("hr_payroll_form_view_date_input_tour", 
             run: "click",
         },
         {
+            content: "Wait the popover is shown",
+            trigger: "body:has(.o_popover .o_datetime_picker)",
+        },
+        {
             content: "Clear end date",
             trigger: "#date_to_0",
             run: "clear",
         },
         {
             content: "Click outside",
-            trigger: ".o_employee_avatar",
+            trigger: ".o_form_sheet",
             run: "click",
         },
         ...stepUtils.discardForm(),

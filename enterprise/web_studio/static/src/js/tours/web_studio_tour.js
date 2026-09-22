@@ -4,7 +4,6 @@ import { markup } from "@odoo/owl";
 import utils from "@web_studio/utils";
 
 registry.category("web_tour.tours").add("web_studio_new_app_tour", {
-    url: "/odoo/action-studio?mode=home_menu",
     steps: () => [
         {
             trigger: ".o_web_studio_new_app",
@@ -26,7 +25,7 @@ registry.category("web_tour.tours").add("web_studio_new_app_tour", {
             run: "edit " + utils.randomString(6),
         },
         {
-            trigger: ".o_web_studio_selectors .o_web_studio_selector_icon > button",
+            trigger: ".o_web_studio_selectors .o_web_studio_selector_icon",
             content: _t("Now, customize your icon. Make it yours."),
             tooltipPosition: "top",
             run: "click",
@@ -71,7 +70,6 @@ registry.category("web_tour.tours").add("web_studio_new_app_tour", {
             ),
             tooltipPosition: "bottom",
             run: "drag_and_drop .o_web_studio_form_view_editor .o_inner_group",
-            timeout: 60000 /* previous step reloads registry, etc. - could take a long time */,
         },
         {
             trigger: ".o_web_studio_form_view_editor .o_wrap_label label",
@@ -99,9 +97,6 @@ registry.category("web_tour.tours").add("web_studio_new_app_tour", {
                 _t("Good job! To add more <b>fields</b>, come back to the <i>Add tab</i>.")
             ),
             tooltipPosition: "bottom",
-            // the rename operation (/web_studio/rename_field + /web_studio/edit_view)
-            // takes a while and sometimes reaches the default 10s timeout
-            timeout: 20000,
             run: "click",
         },
         {
@@ -141,7 +136,7 @@ registry.category("web_tour.tours").add("web_studio_new_app_tour", {
             run: "click",
         },
         {
-            trigger: ".o_field_char.o_required_modifier > input",
+            trigger: ".o_field_char.o_required_modifier input",
             tooltipPosition: "bottom",
             run: "edit Test",
         },

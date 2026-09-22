@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 from odoo.tools import float_round, format_duration, float_compare, float_is_zero
 
 
@@ -14,7 +15,12 @@ class SaleOrderLine(models.Model):
 
     @api.depends('product_uom_id', 'product_uom_qty', 'state')
     def _compute_planning_hours_to_plan(self):
-        sol_planning = self.filtered_domain([('state', 'not in', ['draft', 'sent'])])
+        sol_planning = self.filtered_domain([
+            ('state', 'not in', ['draft', 'sent']),
+            '|',
+            ('product_id.planning_enabled', '=', True),
+            ('planning_slot_ids', '!=', False),
+        ])
         if sol_planning:
             # For every confirmed SO service lines, the qty are transformed into hours
             uom_hour = self.env.ref('uom.product_uom_hour')
@@ -33,15 +39,17 @@ class SaleOrderLine(models.Model):
     @api.depends('planning_slot_ids.allocated_hours', 'state')
     def _compute_planning_hours_planned(self):
         PlanningSlot = self.env['planning.slot']
-        sol_planning = self.filtered_domain([('state', 'not in', ['draft', 'sent'])])
+        sol_planning = self.filtered_domain([
+            ('state', 'not in', ['draft', 'sent']),
+            '|',
+            ('product_id.planning_enabled', '=', True),
+            ('planning_slot_ids', '!=', False),
+        ])
 
         # For every confirmed SO service lines, the allocated hours on planned slots are summed
         group_data = PlanningSlot.with_context(sale_planning_prevent_recompute=True)._read_group([
             ('sale_line_id', 'in', sol_planning.ids),
             ('start_datetime', '!=', False),
-            '|',
-                ('resource_id', '=', False),
-                ('resource_type', 'in', ['user', 'material']),
         ], ['sale_line_id'], ['allocated_hours:sum'])
         mapped_data = {sale_line.id: allocated_hours_sum for sale_line, allocated_hours_sum in group_data}
         for line in self:
@@ -70,7 +78,7 @@ class SaleOrderLine(models.Model):
         return res
 
     @api.depends('product_id', 'planning_hours_to_plan', 'planning_hours_planned')
-    @api.depends_context('with_planning_remaining_hours')
+    @api.depends_context('with_planning_remaining_hours', 'formatted_display_name')
     def _compute_display_name(self):
         super()._compute_display_name()
         if not self.env.context.get('with_planning_remaining_hours'):
@@ -80,22 +88,23 @@ class SaleOrderLine(models.Model):
             name = line.display_name
             if line.product_id.planning_enabled:
                 remaining_hours = line.planning_hours_to_plan - line.planning_hours_planned
-                name = f'{name} ({format_duration(remaining_hours)} {remaining})'
+                if self.env.context.get('formatted_display_name'):
+                    name = f'{name} \t --({format_duration(remaining_hours)} {remaining})--'
+                else:
+                    name = f'{name} ({remaining_hours} {remaining})'
             line.display_name = name
 
     # -----------------------------------------------------------------
     # Business methods
     # -----------------------------------------------------------------
 
-    def _post_process_planning_sale_line(self, ids_to_exclude=None):
+    def _post_process_planning_sale_line(self):
         """
             This method ensures unscheduled slot attached to a sale order line
             has the right allocated_hours and is unique
 
             This method is mandatory due to cyclic dependencies between planning.slot
             and sale.order.line models.
-
-            :param ids_to_exclude: the ids of the slots already being recomputed/written.
         """
         sol_planning = self.filtered('product_id.planning_enabled')
         if sol_planning:
@@ -105,6 +114,8 @@ class SaleOrderLine(models.Model):
             ])
             sol_with_unscheduled_slot = set()
             slots_to_unlink = self.env['planning.slot']
+            from_scheduling = 'from_slot_scheduling' in self.env.context and self.env.context.get('from_slot_scheduling')
+            from_unscheduling = 'from_slot_unscheduling' in self.env.context and self.env.context.get('from_slot_unscheduling')
             for slot in unscheduled_slots:
                 if slot.sale_line_id.id in sol_with_unscheduled_slot:
                     # This slot has to be unlinked as an other exists for the
@@ -113,7 +124,13 @@ class SaleOrderLine(models.Model):
                     # => if there are 2 unscheduled slots for a sol,
                     # ==> then the first is written and triggers a recompute on the second
                     # ==> then the second is written and triggers a recompute on the first
-                    slots_to_unlink |= slot
+                    if from_unscheduling:
+                        slots_to_unlink |= slot
+                    elif not from_scheduling:
+                        raise ValidationError(self.env._(
+                            'This shift was automatically generated from a Sales Order and cannot be unscheduled this way. '
+                            'To unschedule it, move it back to "To Schedule" from the Gantt or Calendar view, or remove its link to the Sales Order first.',
+                        ))
                 else:
                     sol_with_unscheduled_slot.add(slot.sale_line_id.id)
                     if float_is_zero(slot.allocated_hours, precision_digits=2):
@@ -124,9 +141,12 @@ class SaleOrderLine(models.Model):
         """
             For SO service lines with slot generation, create the planning slot.
         """
+        if not self.env.context.get('generate_planning_slot', True):
+            return
         vals_list_per_sol = self.filtered(lambda sol: sol._should_generate_planning_slot())._planning_slot_vals_list_per_sol()
         vals_list = [vals for vals_list in vals_list_per_sol.values() for vals in vals_list]
-        self.env['planning.slot'].create(vals_list)
+        if vals_list:
+            self.env['planning.slot'].create(vals_list)
 
     def _should_generate_planning_slot(self):
         return (
@@ -145,6 +165,7 @@ class SaleOrderLine(models.Model):
 
     def _planning_slot_values(self):
         return {
+            'name': self.name,
             'start_datetime': False,
             'end_datetime': False,
             'role_id': self.product_id.planning_role_id.id,

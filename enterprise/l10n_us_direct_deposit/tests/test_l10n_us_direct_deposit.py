@@ -15,6 +15,8 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 @freeze_time("2020-12-01 03:45:00")
 class TestWiseDirectDeposit(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @contextmanager
     def _with_mocked_wise_request(self, expected_communications):
         """Checks that we send the right requests and returns corresponding mocked responses. Heavily inspired by
@@ -88,7 +90,8 @@ class TestWiseDirectDeposit(AccountTestInvoicingCommon):
         # This bank account will already appear in wise.
         cls.bank_partner_a = cls.env["res.partner.bank"].create({
             "partner_id": cls.partner_a.id,
-            "acc_number": "987654321",
+            "account_number": "987654321",
+            "clearing_label_id": cls.env.ref("base.clearing_label_us").id,
             "clearing_number": "123456789",
             "l10n_us_bank_account_type": "savings",
             "wise_account_type": "aba",
@@ -102,7 +105,8 @@ class TestWiseDirectDeposit(AccountTestInvoicingCommon):
         cls.bank_partner_b = cls.env["res.partner.bank"].create({
             "partner_id": cls.partner_b.id,
             "allow_out_payment": True,
-            "acc_number": "123456780",
+            "account_number": "123456780",
+            "clearing_label_id": cls.env.ref("base.clearing_label_us").id,
             "clearing_number": "987654321",
             "wise_account_type": "fedwire_local",
         })
@@ -168,7 +172,7 @@ class TestWiseDirectDeposit(AccountTestInvoicingCommon):
             ('/v3/profiles/01234567/batch-groups/1', 'complete_batch_request', 'complete_batch_response'),  # create a transfer for partner_b
         ]):
             redirect_action = self.batch.validate_batch()
-            self.assertEqual(redirect_action, {'type': 'ir.actions.act_url', 'url': 'https://sandbox.transferwise.tech/transactions/batch/1'})
+            self.assertEqual(redirect_action, {'type': 'ir.actions.act_url', 'url': 'https://wise-sandbox.com/transactions/batch/1'})
 
     def test_wise_batch_validity_errors(self):
         """This implementation currently only supports USD currency, all others should be blocked."""

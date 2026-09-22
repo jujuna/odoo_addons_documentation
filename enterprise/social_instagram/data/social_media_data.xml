@@ -5,7 +5,9 @@
             <field name="name">Instagram</field>
             <field name="media_type">instagram</field>
             <field name="media_description">Manage your Instagram Business account and schedule posts</field>
-            <field name="image" type="base64" file="social_instagram/static/src/img/instagram.svg"/>
+            <field name="max_post_length">2200</field>
+            <field name="image" type="bytes" file="social_instagram/static/src/img/instagram.svg"/>
+            <field name="has_livechat" eval="True"/>
         </record>
 
         <record id="stream_type_instagram_posts" model="social.stream.type">

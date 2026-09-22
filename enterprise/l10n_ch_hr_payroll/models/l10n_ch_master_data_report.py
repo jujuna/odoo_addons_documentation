@@ -1,6 +1,5 @@
-from odoo import models, fields
-
-import base64
+from odoo import api, models, fields
+from odoo.tools import BinaryBytes
 
 
 class L10nChMasterDataReport(models.Model):
@@ -8,7 +7,7 @@ class L10nChMasterDataReport(models.Model):
     _description = 'Swiss Master Data Report'
 
     company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env.company, required=True)
-    year = fields.Integer(required=True, default=lambda self: fields.Date.today().year)
+    year = fields.Integer(required=True, default=lambda self: fields.Date.context_today(self).year)
     month = fields.Selection([
         ('1', 'January'),
         ('2', 'February'),
@@ -22,13 +21,20 @@ class L10nChMasterDataReport(models.Model):
         ('10', 'October'),
         ('11', 'November'),
         ('12', 'December'),
-    ], required=True, default=lambda self: str((fields.Date.today()).month))
+    ], required=True, default=lambda self: str((fields.Date.context_today(self)).month))
 
     master_report_pdf_file = fields.Binary('Master Report', readonly=True, attachment=False)
-    master_report_pdf_filename = fields.Char()
 
     wage_type_pdf_file = fields.Binary('Wage Type Report', readonly=True, attachment=False)
-    wage_type_pdf_filename = fields.Char()
+
+    @api.depends('year', 'month')
+    def _compute_display_name(self):
+        for report in self:
+            if report.year and report.month:
+                month_name = dict(report._fields['month']._description_selection(report.env)).get(report.month, '')
+                report.display_name = f"{month_name} {report.year}"
+            else:
+                report.display_name = ""
 
     def action_generate_pdf(self):
         company = self.company_id
@@ -56,7 +62,7 @@ class L10nChMasterDataReport(models.Model):
                 'source_tax_institutions': source_tax_institutions,
             },
             'year': self.year,
-            'month': self.month
+            'month': self.month,
         }
 
         wage_type_data = {
@@ -65,6 +71,7 @@ class L10nChMasterDataReport(models.Model):
                 'salary_rules': salary_rules
             },
             'year': self.year,
+            'month': self.month,
         }
 
         filename = 'master_data_%s-%s.pdf' % (self.year, self.month.zfill(2))
@@ -72,13 +79,11 @@ class L10nChMasterDataReport(models.Model):
             self.env.ref('l10n_ch_hr_payroll.action_l10n_ch_company_master_data_report'),
             res_ids=self.ids, data=master_report_data)
 
-        self.master_report_pdf_filename = filename
-        self.master_report_pdf_file = base64.encodebytes(master_report)
+        self.master_report_pdf_file = BinaryBytes(master_report, filename=filename)
 
         filename = 'wage_types_%s-%s.pdf' % (self.year, self.month.zfill(2))
         wage_type_report, _ = self.env["ir.actions.report"].sudo()._render_qweb_pdf(
             self.env.ref('l10n_ch_hr_payroll.action_l10n_ch_company_wage_type_report'),
             res_ids=self.ids, data=wage_type_data)
 
-        self.wage_type_pdf_filename = filename
-        self.wage_type_pdf_file = base64.encodebytes(wage_type_report)
+        self.wage_type_pdf_file = BinaryBytes(wage_type_report, filename=filename)

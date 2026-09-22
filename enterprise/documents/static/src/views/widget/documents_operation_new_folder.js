@@ -5,14 +5,12 @@ import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { useService } from "@web/core/utils/hooks";
 
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { DESTINATION_MAX_LENGTH, truncate } from "@documents/views/widget/utils";
 
 export class DocumentsOperationNewFolder extends Component {
     static template = "documents.DocumentsOperationNewFolder";
-    static props = {
-        ...standardWidgetProps,
-    };
+    props = useProps(standardWidgetProps);
 
     setup() {
         super.setup();

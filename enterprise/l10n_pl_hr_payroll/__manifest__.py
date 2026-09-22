@@ -1,13 +1,11 @@
-# -*- coding:utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Poland - Payroll',
     'countries': ['pl'],
     'category': 'Human Resources/Payroll',
-    'depends': ['hr_payroll', 'hr_work_entry_holidays', 'hr_payroll_holidays'],
+    'depends': ['hr_payroll', 'hr_holidays'],
     'auto_install': ['hr_payroll'],
-    'version': '1.0',
     'description': """
 Polish Payroll Rules.
 =========================
@@ -23,6 +21,7 @@ Polish Payroll Rules.
     'data': [
         'data/hr_salary_rule_category_data.xml',
         'data/hr_payroll_structure_type_data.xml',
+        'data/hr_work_entry_type_data.xml',
         'views/hr_payroll_report.xml',
         'data/hr_payroll_structure_data.xml',
         'data/hr_rule_parameters_data.xml',
@@ -34,4 +33,5 @@ Polish Payroll Rules.
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
+    'post_init_hook': '_l10n_pl_hr_payroll_post_install',
 }

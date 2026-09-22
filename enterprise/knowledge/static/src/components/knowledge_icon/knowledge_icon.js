@@ -5,27 +5,33 @@ import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 import { getRandomIcon } from "@knowledge/js/knowledge_utils";
 
-import { Component, useRef } from "@odoo/owl";
+import { Component, signal, t, useProps, xml } from "@odoo/owl";
 
 export default class KnowledgeIcon extends Component {
     static template = "knowledge.KnowledgeIcon";
-    static props = {
-        record: Object,
-        readonly: Boolean,
-        iconClasses: {type: String, optional: true},
-        allowRandomIconSelection: {type: Boolean, optional: true},
-        autoSave: {type: Boolean, optional: true},
-        fallbackDefaultIcon: { type: Boolean, optional: true },
-    };
+
+    props = useProps({
+        record: t.object(),
+        readonly: t.boolean(),
+        iconClasses: t.string().optional(),
+        allowRandomIconSelection: t.boolean().optional(),
+        autoSave: t.boolean().optional(),
+        fallbackDefaultIcon: t.boolean().optional(),
+    });
+
+    iconRef = signal.ref();
 
     setup() {
         super.setup();
-        this.iconRef = useRef("icon");
         this.emojiPicker = useEmojiPicker(this.iconRef, { hasRemoveFeature: true, onSelect: this.updateIcon.bind(this) });
     }
 
     get icon() {
-        return this.props.record.data.icon || (this.props.fallbackDefaultIcon && "📄");
+        return this.props.record.data.icon;
+    }
+
+    get useFallbackFaIcon() {
+        return !this.props.record.data.icon && this.props.fallbackDefaultIcon;
     }
 
     async selectRandomIcon() {
@@ -41,18 +47,21 @@ export default class KnowledgeIcon extends Component {
 }
 
 class KnowledgeIconField extends KnowledgeIcon {
-    static props = {
+    static template = xml`<KnowledgeIcon t-props="this.props"/>`;
+    static components = { KnowledgeIcon };
+
+    props = useProps({
         ...standardFieldProps,
-        allowRandomIconSelection: Boolean,
-        autoSave: Boolean,
-    };
+        allowRandomIconSelection: t.boolean(),
+        autoSave: t.boolean(),
+    });
 }
 
 registry.category("fields").add("knowledge_icon", {
     component: KnowledgeIconField,
     extractProps({ attrs, viewType }, dynamicInfo) {
         return {
-            autoSave: viewType === "kanban",
+            autoSave: viewType === "card",
             readonly: dynamicInfo.readonly,
             allowRandomIconSelection: exprToBoolean(attrs.allow_random_icon_selection),
         };

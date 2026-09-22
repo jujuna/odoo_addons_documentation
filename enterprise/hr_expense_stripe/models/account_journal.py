@@ -1,5 +1,5 @@
-from odoo import _, api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo import _, fields, models
+from odoo.exceptions import UserError
 
 from odoo.addons.hr_expense_stripe.utils import make_request_stripe_proxy
 
@@ -29,19 +29,13 @@ class AccountJournal(models.Model):
         compute_sudo=True,
     )
 
-    @api.constrains('bank_statements_source')
-    def check_stripe_currency_existance(self):
-        for journal in self:
-            if not journal.company_id.stripe_currency_id and journal.bank_statements_source == 'stripe_issuing':
-                raise ValidationError(_("Stripe issuing is not supported for your localization"))
-
     def _compute_nb_stripe_card(self):
         for journal in self:
             journal.nb_stripe_card = len(journal.stripe_card_ids)
 
-    def __get_bank_statements_available_sources(self):
+    def _get_bank_statements_available_sources(self):
         # EXTEND account to add the "Stripe issuing" source, which only serves to setup the journal dashboard elements
-        rslt = super().__get_bank_statements_available_sources()
+        rslt = super()._get_bank_statements_available_sources()
         rslt.append(('stripe_issuing', _("Stripe Issuing")))
         return rslt
 
@@ -53,9 +47,11 @@ class AccountJournal(models.Model):
         for journal_id, journal_data in dashboard_data.items():
             if journal_id in company_stripe_journal_ids:
                 journal = self.browse(journal_id).with_prefetch(prefetch_ids)
+                currency = journal.stripe_currency_id or journal.currency_id or journal.company_id.currency_id
+                # company currency as a fallback, no account can be created for this company in this case
                 journal_data.update({
                     'stripe_issuing_activated': journal.company_id.stripe_issuing_activated,
-                    'stripe_issuing_balance': journal.stripe_currency_id.format(journal.stripe_issuing_balance),
+                    'stripe_issuing_balance': currency.format(journal.stripe_issuing_balance),
                 })
 
     def action_open_stripe_issuing_cards(self):
@@ -66,12 +62,12 @@ class AccountJournal(models.Model):
         self.ensure_one()
         self.env['hr.expense.stripe.topup.wizard'].check_access('create')
 
-        if 'EU' in (self.company_id.country_id.country_group_codes or []):
-            stripe_country = 'eu'
-        elif self.company_id.country_id.code == 'US':
+        if self.company_id.country_id.code == 'US':
             stripe_country = 'us'
         elif self.company_id.country_id.code == 'GB':
             stripe_country = 'gb'
+        elif 'EU' in (self.company_id.country_id.country_group_codes or []) or self.company_id.sudo().stripe_currency_id.name == 'EUR':
+            stripe_country = 'eu'
         else:
             raise UserError(_("Stripe Issuing is not available in your country."))
 

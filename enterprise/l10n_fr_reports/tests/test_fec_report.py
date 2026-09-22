@@ -12,8 +12,10 @@ from odoo import fields, Command
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestAccountFrFec(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
-    @AccountTestInvoicingCommon.setup_country('fr')
+    @AccountTestInvoicingCommon.setup_country('fr_comp')
     def setUpClass(cls):
         super().setUpClass()
 
@@ -72,13 +74,13 @@ class TestAccountFrFec(AccountTestInvoicingCommon):
             "JournalCode|JournalLib|EcritureNum|EcritureDate|CompteNum|CompteLib|CompAuxNum|CompAuxLib|PieceRef|PieceDate|EcritureLib|Debit|Credit|EcritureLet|DateLet|ValidDate|Montantdevise|Idevise\r\n"
             "INV|Sales|INV/2021/00001|20210502|701000|Sales of finished products|||-|20210502|Hello Darkness|0,00| 000000000001437,12|||20210502|-000000000001437,12|EUR\r\n"
             "INV|Sales|INV/2021/00001|20210502|701000|Sales of finished products|||-|20210502|my old friend|0,00| 000000000001676,64|||20210502|-000000000001676,64|EUR\r\n"
-            "INV|Sales|INV/2021/00001|20210502|701000|Sales of finished products|||-|20210502|/|0,00| 000000000003353,28|||20210502|-000000000003353,28|EUR\r\n"
+            "INV|Sales|INV/2021/00001|20210502|701000|Sales of finished products|||-|20210502|INV/2021/00001|0,00| 000000000003353,28|||20210502|-000000000003353,28|EUR\r\n"
             "INV|Sales|INV/2021/00001|20210502|445710|VAT collected|||-|20210502|TVA 20,0%|0,00| 000000000001293,41|||20210502|-000000000001293,41|EUR\r\n"
             f"INV|Sales|INV/2021/00001|20210502|411100|Customers - Sales of goods or services|{cls.partner_a.id}|partner_a|-|20210502|INV/2021/00001| 000000000007760,45|0,00|||20210502| 000000000007760,45|EUR"
         )
 
     def test_generate_fec_sanitize_pieceref(self):
-        generated_content = self.env['l10n_fr.fec.export.wizard'].browse(self.wizard.id).generate_fec()['file_content'].decode()
+        generated_content = b''.join(self.env['l10n_fr.fec.export.wizard'].browse(self.wizard.id).with_context(fec_test_mode=True).generate_fec()['file_content']).decode()
         self.assertEqual(self.expected_report, generated_content)
 
     def test_generate_fec_exclude_journals(self):
@@ -100,14 +102,14 @@ class TestAccountFrFec(AccountTestInvoicingCommon):
             ]
         }).action_post()
 
-        generated_content = self.env['l10n_fr.fec.export.wizard'].browse(self.wizard.id).generate_fec()['file_content'].decode()
+        generated_content = b''.join(self.env['l10n_fr.fec.export.wizard'].browse(self.wizard.id).with_context(fec_test_mode=True).generate_fec()['file_content']).decode()
         expected_content = self.expected_report + (
             "\r\n"
-            "MISC|Miscellaneous Operations|MISC/2021/05/0001|20210502|400000|Suppliers and related accounts|||-|20210502|/| 000000000000500,00|0,00|||20210502| 000000000000500,00|EUR\r\n"
-            "MISC|Miscellaneous Operations|MISC/2021/05/0001|20210502|411100|Customers - Sales of goods or services|||-|20210502|/|0,00| 000000000000500,00|||20210502|-000000000000500,00|EUR"
+            "MISC|Miscellaneous Operations|MISC/2021/05/0001|20210502|400000|Suppliers and related accounts|||-|20210502|MISC/2021/05/0001| 000000000000500,00|0,00|||20210502| 000000000000500,00|EUR\r\n"
+            "MISC|Miscellaneous Operations|MISC/2021/05/0001|20210502|411100|Customers - Sales of goods or services|||-|20210502|MISC/2021/05/0001|0,00| 000000000000500,00|||20210502|-000000000000500,00|EUR"
         )
         self.assertEqual(expected_content, generated_content)
 
         self.wizard.excluded_journal_ids = journal
-        generated_content = self.env['l10n_fr.fec.export.wizard'].browse(self.wizard.id).generate_fec()['file_content'].decode()
+        generated_content = b''.join(self.env['l10n_fr.fec.export.wizard'].browse(self.wizard.id).with_context(fec_test_mode=True).generate_fec()['file_content']).decode()
         self.assertEqual(self.expected_report, generated_content)

@@ -6,22 +6,36 @@
 # Martin Trigaux, 2022
 # Jeffery CHEN <jeffery9@gmail.com>, 2022
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 05:26+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 03:21+0000\n"
+"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/delivery_bpost/zh_Hans/>\n"
+"projects/odoo-master/delivery_bpost/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_bpost
+#: model:ir.module.module,description:base.module_delivery_bpost
+msgid ""
+"\n"
+"Send your shippings through bpost and track them online\n"
+"=======================================================\n"
+"\n"
+"Companies located in Belgium can take advantage of shipping with the\n"
+"local Post company.\n"
+"\n"
+"See: https://www.bpost.be/portal/goHome\n"
+msgstr ""
 
 #. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_label_stock_type__a4
@@ -116,6 +130,11 @@ msgid "DOCUMENTS"
 msgstr "文档"
 
 #. module: delivery_bpost
+#: model:ir.model,name:delivery_bpost.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "送货方式"
+
+#. module: delivery_bpost
 #: model:ir.model.fields,field_description:delivery_bpost.field_delivery_carrier__bpost_saturday
 msgid "Delivery on Saturday"
 msgstr "周六发货"
@@ -135,6 +154,12 @@ msgstr "显示名称"
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_delivery_nature__domestic
 msgid "Domestic"
 msgstr "国内的"
+
+#. module: delivery_bpost
+#: model_terms:ir.ui.view,arch_db:delivery_bpost.bpost_shipping_request
+#, fuzzy
+msgid "EUR"
+msgstr "欧元"
 
 #. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_shipment_type__gift
@@ -205,6 +230,22 @@ msgid "Please provide at least one item to ship."
 msgstr "请提供至少一件要运送的物品。"
 
 #. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing a Country of Origin, which is required for "
+"international shipping."
+msgstr "产品 [%s] 缺少原产国/地信息，而这是国际运输的必填项。"
+
+#. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing an HS Code, which is required for international "
+"shipping."
+msgstr "产品 [%s] 缺少 HS 编码，这是国际运输的必备信息。"
+
+#. module: delivery_bpost
 #: model:ir.model.fields,field_description:delivery_bpost.field_delivery_carrier__delivery_type
 msgid "Provider"
 msgstr "物流商"
@@ -247,11 +288,6 @@ msgstr "运输#%s已取消"
 #: code:addons/delivery_bpost/models/delivery_bpost.py:0
 msgid "Shipment created into bpost"
 msgstr "在 bpost 中创建快件"
-
-#. module: delivery_bpost
-#: model:ir.model,name:delivery_bpost.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "送货方式"
 
 #. module: delivery_bpost
 #: model:ir.model,name:delivery_bpost.model_stock_package_type
@@ -395,10 +431,9 @@ msgid ""
 msgstr "Bpost国际仅用于在比利时境外运输。请更改运输方式为Bpost国内。"
 
 #. module: delivery_bpost
-#: model_terms:ir.ui.view,arch_db:delivery_bpost.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_bpost.res_config_settings_view_form_stock
-msgid "bpost Shipping Methods"
-msgstr "比利时邮政运输方式"
+#: model:ir.module.module,shortdesc:base.module_delivery_bpost
+msgid "bpost Shipping"
+msgstr ""
 
 #. module: delivery_bpost
 #. odoo-python

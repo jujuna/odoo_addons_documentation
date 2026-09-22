@@ -1,6 +1,6 @@
-import { Component } from "@odoo/owl";
-import { usePos } from "@point_of_sale/app/hooks/pos_hook";
+import { Component, useProps, t } from "@odoo/owl";
 import { PrintRecMessage } from "@l10n_it_pos/app/fiscal_printer/commands";
+import { PosOrder } from "@point_of_sale/app/models/pos_order";
 
 export class Header extends Component {
     static template = "l10n_it_pos.FiscalDocumentHeader";
@@ -9,15 +9,11 @@ export class Header extends Component {
         PrintRecMessage,
     };
 
-    static props = {
-        order: {
-            type: Object,
-            optional: true, // To keep backward compatibility
-        },
-    };
+    props = useProps({
+        order: t.instanceOf(PosOrder),
+    });
 
     setup() {
-        this.pos = usePos();
-        this.order = this.props.order || this.pos.getOrder();
+        this.order = this.props.order;
     }
 }

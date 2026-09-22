@@ -1,22 +1,11 @@
 import { Plugin } from "@html_editor/plugin";
 import { registry } from "@web/core/registry";
-import { _t } from '@web/core/l10n/translation';
 import { Cache } from "@web/core/utils/cache";
 import { BuilderAction } from "@html_builder/core/builder_action";
-import { BaseOptionComponent } from "@html_builder/core/utils";
 
-export class AppointmentTypeOption extends BaseOptionComponent {
-    static template = "website_appointment.AppointmentTypeOption";
-    static selector = "main:has(.o_wappointment_type_options)";
-    static editableOnly = false;
-    static title = _t("Appointment Type");
-    static groups = ["website.group_website_designer"];
-}
-
-class AppointmentTypeOptionPlugin extends Plugin {
+export class AppointmentTypeOptionPlugin extends Plugin {
     static id = "AppointmentTypeOption";
     resources = {
-        builder_options: AppointmentTypeOption,
         builder_actions: {
             AppointmentTypeShowAvatarsAction,
             AppointmentTypeShowAllowGuestsAction,
@@ -27,15 +16,13 @@ class AppointmentTypeOptionPlugin extends Plugin {
 }
 
 export class BaseAppointmentAction extends BuilderAction {
-    
     setup(fieldName, applyValue, clearValue) {
         this.fieldName = fieldName;
         this.applyValue = applyValue;
         this.clearValue = clearValue;
-        this.isReload = true;
+        this.reload = {};
         this.appointmentTypeId = Number(this.document.documentElement.querySelector(".o_wappointment_type_options")?.dataset.appointmentTypeId);
         this.appointmentTypeCache = new Cache(this._fetchAppointmentType.bind(this), JSON.stringify);
-        
     }
     async _fetchAppointmentType() {
         return (await this.services.orm.read(

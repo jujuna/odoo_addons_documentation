@@ -69,6 +69,6 @@ class MrpBom(models.Model):
                 'name': 'KRA ' + self.display_name + '.json',
                 'res_model': 'mrp.bom',
                 'res_id': self.id,
-                'raw': "\n".join(json.dumps(p, indent=4) for p in contents),
+                'raw': "\n".join(json.dumps(p, indent=4) for p in contents).encode(),
                 })
         self.message_post(body=_("BoM successfully sent to KRA"))

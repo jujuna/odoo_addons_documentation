@@ -13,7 +13,7 @@ class L10n_AuHrInputDetails(models.Model):
         readonly=True,
         ondelete="cascade",
     )
-    input_type_id = fields.Many2one(related="input_id.input_type_id", string="Input Type")
+    salary_rule_id = fields.Many2one(related="input_id.salary_rule_id", string="Salary Rule")
     name = fields.Char(
         string="Description",
         compute="_compute_name"
@@ -22,7 +22,7 @@ class L10n_AuHrInputDetails(models.Model):
 
     # For Inputs that require the number of days or distance
     code = fields.Char(related="input_id.code", string="Code")
-    input_uom = fields.Selection(depends=["input_id.input_type_id"], related="input_id.input_type_id.l10n_au_input_uom")
+    input_uom = fields.Selection(depends=["input_id.salary_rule_id"], related="input_id.salary_rule_id.l10n_au_input_uom")
     quantity = fields.Float(string="Quantity", inverse="_update_amount")
 
     # For backpayments
@@ -47,13 +47,13 @@ class L10n_AuHrInputDetails(models.Model):
     @api.ondelete(at_uninstall=False)
     def _prevent_delete(self):
         """Prevent deletion if the input line is not deleted"""
-        if self.input_id.input_type_id.l10n_au_requires_details and self.input_id.l10n_au_treatment == "backpay":
+        if self.input_id.salary_rule_id.l10n_au_requires_details and self.input_id.l10n_au_treatment == "backpay":
             raise ValidationError(_("You cannot delete input details that are linked to an existing payslip input."))
 
-    @api.depends("input_id.input_type_id", "input_id.name")
+    @api.depends("input_id.salary_rule_id", "input_id.name")
     def _compute_name(self):
         for record in self:
-            record.name = f"{record.input_id.name} ({record.input_id.input_type_id.name})" if record.input_id.name else record.input_id.input_type_id.name
+            record.name = f"{record.input_id.name} ({record.input_id.salary_rule_id.name})" if record.input_id.name else record.input_id.salary_rule_id.name
 
     @api.depends("input_id.l10n_au_treatment")
     def _compute_is_backpayment(self):
@@ -61,10 +61,10 @@ class L10n_AuHrInputDetails(models.Model):
         for record in self:
             record.is_backpayment = record.input_id.l10n_au_treatment == "backpay"
 
-    @api.depends("input_id.input_type_id", "input_id.amount")
+    @api.depends("input_id.salary_rule_id", "input_id.amount")
     def _compute_rate(self):
         for record in self:
-            if record.code != "ALW.CPK":
+            if not record.code.startswith("ALW.CPK"):
                 record.rate = False
             else:
                 if record.input_id.amount and record.quantity:
@@ -74,7 +74,7 @@ class L10n_AuHrInputDetails(models.Model):
 
     def _update_amount(self):
         """ Update the amount of the input based on the quantity and rate."""
-        for record in self.filtered(lambda r: r.code == "ALW.CPK"):
+        for record in self.filtered(lambda r: r.code.startswith('ALW.CPK')):
             record.input_id.amount = record.quantity * record.rate
 
     @api.onchange("input_uom", "quantity")
@@ -84,7 +84,7 @@ class L10n_AuHrInputDetails(models.Model):
 
     def _check_input_details(self):
         for record in self:
-            if record.code == "ALW.CPK":
+            if record.code.startswith('ALW.CPK'):
                 if record.quantity < 0:
                     raise ValidationError(_("Cents Per Kilometre Allowances require the Number of kilometres on the input details."))
                 min_claimable_rate = record.payslip_id._rule_parameter("l10n_au_allowance_cpk")["claimable"]
@@ -93,9 +93,9 @@ class L10n_AuHrInputDetails(models.Model):
                         "Cents Per Kilometre Allowance amount must be greater than or equal to the minimum rate of %.2f for the current pay period.",
                         min_claimable_rate
                     ))
-            elif record.code == "ALW.DTA" and not (record.city_id and record.quantity):
+            elif record.code.startswith('ALW.DTA') and not (record.city_id and record.quantity):
                 raise ValidationError(_("Domestic Travel Allowance requires a City and Number of days to be set."))
-            elif record.code == "ALW.OTA":
+            elif record.code.startswith('ALW.OTA'):
                 if record.country_id.code != "AU" or not record.quantity:
                     raise ValidationError(_("Overseas Travel Allowance requires an overseas Country and Number of days to be set."))
                 country_group = record.payslip_id._rule_parameter("l10n_au_country_groups").get(record.country_id.code, False)

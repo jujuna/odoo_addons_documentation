@@ -1,14 +1,15 @@
 import { Dialog } from "@web/core/dialog/dialog";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class ApplyQuantDialog extends Component {
     static components = { Dialog };
-    static props = {
-        onApply: Function,
-        onApplyAll: Function,
-        close: Function,
-    };
     static template = "stock_barcode.ApplyQuantDialog";
+
+    props = useProps({
+        onApply: t.function([]),
+        onApplyAll: t.function([]),
+        close: t.function([]),
+    });
 
     onApply() {
         this.props.onApply();

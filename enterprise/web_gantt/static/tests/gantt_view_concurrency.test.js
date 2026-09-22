@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { Deferred, animationFrame, mockDate } from "@odoo/hoot-mock";
+import { animationFrame, mockDate } from "@odoo/hoot-mock";
 import { click } from "@odoo/hoot-dom";
 import { onPatched } from "@odoo/owl";
 import {
@@ -43,25 +43,25 @@ test("concurrent range switches return in inverse order", async () => {
 
     let firstReloadProm = null;
     let reloadProm = null;
-    onRpc("get_gantt_data", () => reloadProm);
+    onRpc("get_gantt_data", () => reloadProm?.promise);
     await mountGanttView({
         resModel: "tasks",
         arch: `<gantt date_start="start" date_stop="stop"/>`,
     });
 
     let content = getGridContent();
-    expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["December 2018"]);
+    expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["December 2018", "January 2019"]);
     expect(content.range).toBe("12/01/2018 -> 02/28/2019");
     expect(model.data.records).toHaveLength(6);
 
     // switch to 'week' range (this rpc will be delayed)
-    firstReloadProm = new Deferred();
+    firstReloadProm = Promise.withResolvers();
     reloadProm = firstReloadProm;
     await selectRange("Week");
     await ganttControlsChanges();
 
     content = getGridContent();
-    expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["December 2018"]);
+    expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["December 2018", "January 2019"]);
     expect(content.range).toBe("Week");
     expect(model.data.records).toHaveLength(6);
 
@@ -69,10 +69,10 @@ test("concurrent range switches return in inverse order", async () => {
     reloadProm = null;
     await selectRange("Year");
     await ganttControlsChanges();
-    expect.verifySteps(["patched", "patched"]);
+    expect.verifySteps(["patched", "patched", "patched"]);
 
     content = getGridContent();
-    expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["2017", "2018", "2019"]);
+    expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["2018", "2019"]);
     expect(content.range).toBe("Year");
     expect(model.data.records).toHaveLength(7);
 
@@ -80,7 +80,7 @@ test("concurrent range switches return in inverse order", async () => {
     await animationFrame();
 
     content = getGridContent();
-    expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["2017", "2018", "2019"]);
+    expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["2018", "2019"]);
     expect(content.range).toBe("Year");
     expect(model.data.records).toHaveLength(7);
     expect.verifySteps([]);
@@ -113,7 +113,7 @@ test("concurrent range switches return with gantt unavailabilities", async () =>
     onRpc("get_gantt_data", async ({ parent }) => {
         const result = parent();
         result.unavailabilities.__default = { false: unavailabilities.shift() };
-        await reloadProm;
+        await reloadProm?.promise;
         return result;
     });
     await mountGanttView({
@@ -123,7 +123,7 @@ test("concurrent range switches return with gantt unavailabilities", async () =>
 
     let content = getGridContent();
     expect(content.range).toBe("12/01/2018 -> 02/28/2019");
-    expect(content.groupHeaders.map((h) => h.title)).toEqual(["December 2018"]);
+    expect(content.groupHeaders.map((h) => h.title)).toEqual(["December 2018", "January 2019"]);
     expect(model.data.records).toHaveLength(6);
     expect(getCellColorProperties("08", "December 2018")).toEqual([]);
     expect(getCellColorProperties("11", "December 2018")).toEqual([
@@ -131,14 +131,14 @@ test("concurrent range switches return with gantt unavailabilities", async () =>
     ]);
 
     // switch to 'week' range (this rpc will be delayed)
-    firstReloadProm = new Deferred();
+    firstReloadProm = Promise.withResolvers();
     reloadProm = firstReloadProm;
     await selectRange("Week");
     await ganttControlsChanges();
 
     content = getGridContent();
     expect(content.range).toBe("Week");
-    expect(content.groupHeaders.map((h) => h.title)).toEqual(["December 2018"]);
+    expect(content.groupHeaders.map((h) => h.title)).toEqual(["December 2018", "January 2019"]);
     expect(model.data.records).toHaveLength(6);
     expect(getCellColorProperties("08", "December 2018")).toEqual([]);
     expect(getCellColorProperties("11", "December 2018")).toEqual([
@@ -149,11 +149,11 @@ test("concurrent range switches return with gantt unavailabilities", async () =>
     reloadProm = null;
     await selectRange("Year");
     await ganttControlsChanges();
-    expect.verifySteps(["patched", "patched"]);
+    expect.verifySteps(["patched", "patched", "patched"]);
 
     content = getGridContent();
     expect(content.range).toBe("Year");
-    expect(content.groupHeaders.map((h) => h.title)).toEqual(["2017", "2018", "2019"]);
+    expect(content.groupHeaders.map((h) => h.title)).toEqual(["2018", "2019"]);
     expect(model.data.records).toHaveLength(7);
     expect(getCellColorProperties("August", "2018")).toEqual(["--Gantt__DayOff-background-color"]);
     expect(getCellColorProperties("November", "2018")).toEqual([]);
@@ -163,7 +163,7 @@ test("concurrent range switches return with gantt unavailabilities", async () =>
 
     content = getGridContent();
     expect(content.range).toBe("Year");
-    expect(content.groupHeaders.map((h) => h.title)).toEqual(["2017", "2018", "2019"]);
+    expect(content.groupHeaders.map((h) => h.title)).toEqual(["2018", "2019"]);
     expect(model.data.records).toHaveLength(7);
     expect(getCellColorProperties("August", "2018")).toEqual(["--Gantt__DayOff-background-color"]);
     expect(getCellColorProperties("November", "2018")).toEqual([]);
@@ -173,7 +173,7 @@ test("concurrent range switches return with gantt unavailabilities", async () =>
 test("concurrent range selections", async () => {
     let reloadProm = null;
     let firstReloadProm = null;
-    onRpc("get_gantt_data", () => reloadProm);
+    onRpc("get_gantt_data", () => reloadProm?.promise);
     await mountGanttView({
         resModel: "tasks",
         arch: `<gantt date_start="start" date_stop="stop"/>`,
@@ -181,7 +181,7 @@ test("concurrent range selections", async () => {
 
     expect(getGridContent().range).toBe("12/01/2018 -> 02/28/2019");
 
-    reloadProm = new Deferred();
+    reloadProm = Promise.withResolvers();
     firstReloadProm = reloadProm;
     await selectCustomRange({ startDate: "2019-01-01", stopDate: "2019-02-28" });
     reloadProm = null;
@@ -192,11 +192,11 @@ test("concurrent range selections", async () => {
 
 test("concurrent pill resize and groupBy change", async () => {
     let awaitWriteDef = false;
-    const writeDef = new Deferred();
+    const writeDef = Promise.withResolvers();
     onRpc(({ args, method }) => {
         expect.step([method, args]);
         if (method === "write" && awaitWriteDef) {
-            return writeDef;
+            return writeDef.promise;
         }
     });
     await mountGanttView({
@@ -217,7 +217,7 @@ test("concurrent pill resize and groupBy change", async () => {
         {
             pills: [
                 {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
+                    colSpan: "Out of bounds (1)  -> 04 (1/2) December 2018",
                     level: 0,
                     title: "Task 5",
                 },
@@ -241,6 +241,9 @@ test("concurrent pill resize and groupBy change", async () => {
     expect.verifySteps([["get_gantt_data", []]]);
     expect(getGridContent().rows).toEqual([
         {
+            title: "Undefined Project",
+        },
+        {
             pills: [
                 {
                     colSpan: "17 (1/2) December 2018 -> 22 (1/2) December 2018",
@@ -253,7 +256,7 @@ test("concurrent pill resize and groupBy change", async () => {
         {
             pills: [
                 {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
+                    colSpan: "Out of bounds (1)  -> 04 (1/2) December 2018",
                     level: 0,
                     title: "Task 5",
                 },
@@ -267,6 +270,9 @@ test("concurrent pill resize and groupBy change", async () => {
     expect.verifySteps([["get_gantt_data", []]]);
     expect(getGridContent().rows).toEqual([
         {
+            title: "Undefined Project",
+        },
+        {
             pills: [
                 {
                     colSpan: "17 (1/2) December 2018 -> 21 (1/2) December 2018",
@@ -279,7 +285,7 @@ test("concurrent pill resize and groupBy change", async () => {
         {
             pills: [
                 {
-                    colSpan: "01 December 2018 -> 04 (1/2) December 2018",
+                    colSpan: "Out of bounds (1)  -> 04 (1/2) December 2018",
                     level: 0,
                     title: "Task 5",
                 },
@@ -291,11 +297,11 @@ test("concurrent pill resize and groupBy change", async () => {
 
 test("concurrent pill resizes return in inverse order", async () => {
     let awaitWriteDef = false;
-    const writeDef = new Deferred();
+    const writeDef = Promise.withResolvers();
     onRpc(({ args, method }) => {
         expect.step([method, args]);
         if (method === "write" && awaitWriteDef) {
-            return writeDef;
+            return writeDef.promise;
         }
     });
     await mountGanttView({
@@ -336,8 +342,8 @@ test("concurrent pill resizes and open, dialog show updated number", async () =>
         `,
     };
 
-    const def = new Deferred();
-    onRpc("write", () => def);
+    const def = Promise.withResolvers();
+    onRpc("write", () => def.promise);
     await mountGanttView({
         resModel: "tasks",
         arch: `<gantt date_start="start" date_stop="stop"/>`,
@@ -354,7 +360,7 @@ test("concurrent pill resizes and open, dialog show updated number", async () =>
 
 test("concurrent display mode change and fetch", async () => {
     let def;
-    onRpc("get_gantt_data", () => def);
+    onRpc("get_gantt_data", () => def?.promise);
     await mountGanttView({
         resModel: "tasks",
         arch: `<gantt date_start="start" date_stop="stop"/>`,
@@ -366,7 +372,7 @@ test("concurrent display mode change and fetch", async () => {
     const initialRows = [
         {
             pills: [
-                { title: "Task 1", level: 0, colSpan: "01 December 2018 -> Out of bounds (63) " },
+                { title: "Task 1", level: 0, colSpan: "Out of bounds (1)  -> 31 December 2018" },
                 {
                     title: "Task 2",
                     level: 1,
@@ -377,7 +383,7 @@ test("concurrent display mode change and fetch", async () => {
     ];
     expect(content.rows).toEqual(initialRows);
 
-    def = new Deferred();
+    def = Promise.withResolvers();
     await selectCustomRange({ startDate: "2018-12-01", stopDate: "2019-06-15" });
     content = getGridContent();
     expect(content.range).toBe("12/01/2018 -> 06/15/2019");
@@ -391,7 +397,7 @@ test("concurrent display mode change and fetch", async () => {
         {
             pills: [
                 {
-                    colSpan: "01 December 2018 -> Out of bounds (63) ",
+                    colSpan: "Out of bounds (1)  -> 31 December 2018",
                     level: 0,
                     title: "Task 1",
                 },
@@ -418,7 +424,7 @@ test("concurrent display mode change and fetch", async () => {
         {
             pills: [
                 {
-                    colSpan: "01 December 2018 -> Out of bounds (63) ",
+                    colSpan: "Out of bounds (1)  -> 31 December 2018",
                     level: 0,
                     title: "Task 1",
                 },

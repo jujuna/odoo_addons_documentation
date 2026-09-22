@@ -2,7 +2,6 @@
 {
     'name': 'United States - Direct Deposit',
     'countries': ['us'],
-    'version': '1.0',
     'author': 'Odoo S.A.',
     'category': 'Accounting/Payment',
     'summary': 'Pay Vendors via Wise',
@@ -13,7 +12,7 @@ can be initiated digitally from within Odoo and redirect to be completed within 
     """,
     'depends': [
         'account_batch_payment',
-        'l10n_us',
+        'l10n_us_account',
     ],
     'data': [
         "data/l10n_us_direct_deposit_data.xml",
@@ -21,6 +20,5 @@ can be initiated digitally from within Odoo and redirect to be completed within 
         "views/res_config_settings_views.xml",
         "views/res_partner_bank_views.xml",
     ],
-    'installable': True,
     'license': 'OEEL-1',
 }

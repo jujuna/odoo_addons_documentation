@@ -2,12 +2,11 @@ import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
 
 registry.category("web_tour.tours").add("hr_payroll_view_header_buttons_tour", {
-    url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
             content: "Open Payroll app",
-            trigger: '.o_app[data-menu-xmlid="hr_work_entry_enterprise.menu_hr_payroll_root"]',
+            trigger: '.o_app[data-menu-xmlid="hr_payroll.menu_hr_payroll_root"]',
             run: "click",
         },
         {
@@ -50,17 +49,17 @@ registry.category("web_tour.tours").add("hr_payroll_view_header_buttons_tour", {
             run: "check",
         },
         {
-            content: "Check header buttons and click on confirm",
-            trigger: ".o_selection_container:has(button[name='action_payslip_done'])",
+            content: "Check header buttons and click on validate",
+            trigger: ".o_selection_container:has(button[name='action_validate'])",
             run: (actions) => {
                 if (
                     actions.anchor.querySelector(
                         ".o_selection_container > button[name='action_print_payslip']"
                     )
                 ) {
-                    return actions.click("button[name='action_payslip_done']");
+                    return actions.click("button[name='action_validate']");
                 } else {
-                    throw new Error("Confirm and Print buttons should be displayed");
+                    throw new Error("Validate and Print buttons should be displayed");
                 }
             },
         },

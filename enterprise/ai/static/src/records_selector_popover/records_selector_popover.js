@@ -1,20 +1,21 @@
 import { MultiRecordSelector } from "@web/core/record_selectors/multi_record_selector";
 
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 
 export class RecordsSelectorPopover extends Component {
     static components = { MultiRecordSelector };
     static template = "ai.RecordsSelectorPopover";
-    static props = {
-        resModel: { type: String },
-        close: { type: Function },
-        domain: { type: Array, optional: true },
-        validate: { type: Function },
-        resIds: { type: Array, optional: true },
-    };
+
+    props = useProps({
+        resModel: t.string(),
+        close: t.function(),
+        domain: t.array().optional(),
+        validate: t.function(),
+        resIds: t.array().optional(),
+    });
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             resIds: this.props.resIds || [],
         });
     }

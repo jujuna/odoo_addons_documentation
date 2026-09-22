@@ -11,20 +11,43 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-16 17:58+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Ukrainian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 00:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Ukrainian <https://translate.odoo.com/projects/odoo-master/"
 "sale_amazon/uk/>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
-"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
-"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
-"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 "
+"? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > "
+"14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % "
+"100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_amazon
+#: model:ir.module.module,description:base.module_sale_amazon
+msgid ""
+"\n"
+"Import your Amazon orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and marketplaces.\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(SKU in Amazon).\n"
+"* Deliveries confirmed in Odoo are synchronized in Amazon.\n"
+"* Support for both Fulfilment by Amazon (FBA) and Fulfilment by Merchant "
+"(FBM):\n"
+"    * FBA: A stock location and stock moves allow to monitor your stock in "
+"Amazon Fulfilment\n"
+"      Centers.\n"
+"    * FBM: Delivery notifications are sent to Amazon for each confirmed "
+"picking (partial delivery\n"
+"      friendly).\n"
+msgstr ""
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
@@ -243,6 +266,11 @@ msgid "Amazon Accounts"
 msgstr "Облікові записи Amazon"
 
 #. module: sale_amazon
+#: model:ir.module.module,shortdesc:base.module_sale_amazon
+msgid "Amazon Connector"
+msgstr ""
+
+#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__amazon_feed_ref
 #: model:ir.model.fields,field_description:sale_amazon.field_stock_picking__amazon_feed_ref
 msgid "Amazon Feed Reference"
@@ -336,28 +364,6 @@ msgid ""
 "sure the following information are set on '%(location_name)s' (%"
 "(location)s): street, country and country code."
 msgstr ""
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"Since the current carrier doesn't automatically provide a tracking "
-"reference, you need to set one manually."
-msgstr ""
-"Amazon вимагає, щоб референс відстеження надавався з кожною доставкою. "
-"Оскільки поточний оператор не надає автоматично референс відстеження, вам "
-"потрібно встановити його вручну."
-
-#. module: sale_amazon
-#. odoo-python
-#: code:addons/sale_amazon/models/stock_picking.py:0
-msgid ""
-"Amazon requires that a tracking reference is provided with each delivery. "
-"You need to assign a carrier to this delivery."
-msgstr ""
-"Amazon вимагає, щоби посилання на відстеження надавалося з кожною доставкою. "
-"Вам потрібно призначити перевізника для цієї доставки."
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -536,11 +542,6 @@ msgid "Back to my account"
 msgstr "Повернутися у мій обліковий запис"
 
 #. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.quick_create_account_form
-msgid "Cancel"
-msgstr "Скасувати"
-
-#. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__company_id
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__company_id
 msgid "Company"
@@ -629,11 +630,6 @@ msgstr "Повноваження"
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Default Products"
 msgstr "Товари за замовчуванням"
-
-#. module: sale_amazon
-#: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
-msgid "Discard"
-msgstr "Відмінити"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
@@ -804,6 +800,11 @@ msgstr ""
 "одно зможете зарахувати рахунок або зробити доставку."
 
 #. module: sale_amazon
+#: model:ir.module.module,summary:base.module_sale_amazon
+msgid "Import Amazon orders and sync deliveries"
+msgstr ""
+
+#. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
 msgid "In Processing by Amazon"
 msgstr "В обробці Amazon"
@@ -876,6 +877,12 @@ msgstr "Ринок"
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__active_marketplace_ids
 msgid "Marketplaces"
 msgstr "Маркетплейси"
+
+#. module: sale_amazon
+#. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Missing product name"
+msgstr ""
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__name
@@ -1211,8 +1218,8 @@ msgstr "Одиниця утримання на складі."
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_channel
 msgid ""
-"The channel will be updated with the incomming orders or during the next "
-"stock synchronization."
+"The channel will be updated with the incomming orders or, if left empty, "
+"during the next stock synchronization."
 msgstr ""
 
 #. module: sale_amazon
@@ -1523,182 +1530,3 @@ msgstr "напр., Американський ринок"
 #: code:addons/sale_amazon/models/amazon_account.py:0
 msgid "id"
 msgstr "id"
-
-#~ msgid ""
-#~ "<div>\n"
-#~ "            <p>The synchronization of the Amazon order with reference <t "
-#~ "t-out=\"ctx.get('amazon_order_ref') or ''\">REF</t> encountered an error "
-#~ "and was not completed.</p>\n"
-#~ "            <p>Unless the order is canceled in SellerCentral, no other "
-#~ "synchronization will be attempted.</p>\n"
-#~ "            <p>To schedule a new synchronization attempt, proceed as "
-#~ "follows:\n"
-#~ "                <ol>\n"
-#~ "                    <li>Enter the Developer Tools.</li>\n"
-#~ "                    <li>Open the form of the Amazon Account on which the "
-#~ "order was placed.</li>\n"
-#~ "                    <li>Navigate to the Order Follow-up tab.</li>\n"
-#~ "                    <li>Set a date for <em>Last Orders Sync</em> that is "
-#~ "anterior to the last status update of the order.</li>\n"
-#~ "                    <li>Save the changes and click on the <em>SYNC "
-#~ "ORDERS</em> button.</li>\n"
-#~ "                </ol>\n"
-#~ "            </p>\n"
-#~ "            <p>If the problem persists, contact <a href=\"https://"
-#~ "www.odoo.com/help/\">Odoo support</a>.</p>\n"
-#~ "        </div>\n"
-#~ "        "
-#~ msgstr ""
-#~ "<div>\n"
-#~ "            <p>Cинхронізація замовлення Amazon з референсом <t t-"
-#~ "out=\"ctx.get('amazon_order_ref') or ''\">REF</t> виникликала помилку та "
-#~ "не була завершена.</p>\n"
-#~ "            <p>Якщо замовлення не скасовано в SellerCentral, інші спроби "
-#~ "синхронізації не будуть.</p>\n"
-#~ "            <p>Щоб запланувати нову спробу синхронізації, виконайте "
-#~ "наступні дії:\n"
-#~ "                <ol>\n"
-#~ "                    <li>Включіть інструменти розробника.</li>\n"
-#~ "                    <li>Відкрийте форму облікового запису Amazon, на "
-#~ "якому було розміщено замовлення.</li>\n"
-#~ "                    <li>Перейдіть до вкладки Подальше виконання "
-#~ "замовлення.</li>\n"
-#~ "                    <li>Встановіть дату <em>останньої синхронізації "
-#~ "замовлень</em> тобто до останнього оновлення статусу замовлення.</li>\n"
-#~ "                    <li>Збережіть зміни та натисніть кнопку "
-#~ "<em>СИНХРОНІЗУВАТИ ЗАМОВЛЕННЯ</em>.</li>\n"
-#~ "                </ol>\n"
-#~ "            </p>\n"
-#~ "            <p>Якщо проблема не зникне, зверніться до <a href=\"https://"
-#~ "www.odoo.com/help/\">Служби підтримки Odoo</a>.</p>\n"
-#~ "        </div>\n"
-#~ "        "
-
-#~ msgid "AWS Access Key"
-#~ msgstr "AWS Access Key"
-
-#~ msgid "AWS Secret Key"
-#~ msgstr "Ключ доступу AWS"
-
-#~ msgid "AWS Session Token"
-#~ msgstr "Токен сесії AWS"
-
-#~ msgid ""
-#~ "After validation of the credentials, the marketplaces\n"
-#~ "                                                to which this account has "
-#~ "access will be\n"
-#~ "                                                synchronized and "
-#~ "automatically made available."
-#~ msgstr ""
-#~ "Після перевірки облікових даних, ринки,\n"
-#~ "до яких має доступ цей обліковий запис, будуть\n"
-#~ " синхронізовані та автоматично доступні."
-
-#~ msgid "Amazon Email"
-#~ msgstr "Email Amazon"
-
-#~ msgid "Error code: %s; description: %s"
-#~ msgstr "Код помилки: %s; опис: %s"
-
-#~ msgid ""
-#~ "If this account gained access to new "
-#~ "marketplaces,                                         synchronize and add "
-#~ "them to the current sync marketplaces"
-#~ msgstr ""
-#~ "Якщо цей обліковий запис отримав доступ до нових маркетплейсів, "
-#~ "синхронізуйте та додайте їх до поточних маркетплейсів синхронізації"
-
-#~ msgid "Inactive"
-#~ msgstr "Неактивний"
-
-#~ msgid "Is Follow Up Displayed"
-#~ msgstr "Нагадування відображається"
-
-#~ msgid "Link with Amazon"
-#~ msgstr "Підлкючіться до Amazon"
-
-#~ msgid "Order Follow-up"
-#~ msgstr "Нагадування замовлення"
-
-#~ msgid "SKU"
-#~ msgstr "SKU"
-
-#~ msgid "SKU must be unique for a given account and marketplace."
-#~ msgstr ""
-#~ "SKU повинен бути унікальним для наданого облікового запису та "
-#~ "маркетплейсу."
-
-#~ msgid ""
-#~ "Select the marketplace on which your seller account\n"
-#~ "                                                was originally created."
-#~ msgstr ""
-#~ "Оберіть маркетплейс, на якому було створено\n"
-#~ "                                                ваш обліковий запис "
-#~ "продавця."
-
-#~ msgid "Sign-up Marketplace"
-#~ msgstr "Реєстрація маркетплейсу"
-
-#~ msgid "Stock Location"
-#~ msgstr "Розташування запасів"
-
-#~ msgid "Sync Marketplaces"
-#~ msgstr "Синхронізувати маркетплейси"
-
-#~ msgid ""
-#~ "The communication with the API failed.\n"
-#~ "Error code: %s; description: %s"
-#~ msgstr ""
-#~ "Зв'язок з API не вдався.\n"
-#~ "Код помилки: %s; опис: %s"
-
-#~ msgid "The moment at which the AWS credentials become invalid."
-#~ msgstr "Момент, коли облікові дані AWS стають недійсними."
-
-#~ msgid ""
-#~ "The original sign-up marketplace of this account. Used for authentication "
-#~ "only."
-#~ msgstr ""
-#~ "Оригінальний вхід у маркетплейс цього облікового запису. Використовується "
-#~ "лише для аутентифікації."
-
-#~ msgid "The short-lived key used to identify the assumed ARN role on AWS."
-#~ msgstr ""
-#~ "Короткочасний ключ, який використовується для визначення передбачуваної "
-#~ "ролі ARN в AWS."
-
-#~ msgid ""
-#~ "The short-lived key used to verify the access to the assumed ARN role on "
-#~ "AWS."
-#~ msgstr ""
-#~ "Короткочасний ключ, який використовується для перевірки доступу до "
-#~ "передбачуваної ролі ARN в AWS."
-
-#~ msgid ""
-#~ "The short-lived token used to query the SP-API with the assumed ARN role "
-#~ "on AWS."
-#~ msgstr ""
-#~ "Короткочасний токен, який використовується для запиту SP-API із "
-#~ "передбачуваною роллю ARN в AWS."
-
-#~ msgid "Unlink account"
-#~ msgstr "Від'єднати обліковий запис"
-
-#~ msgid "Update Available Marketplaces"
-#~ msgstr "Оновіть доступні маркетплейси"
-
-#~ msgid "Your Amazon account is linked with Odoo."
-#~ msgstr "Ваш обліковий запис Amazon пов’язано з Odoo."
-
-#~ msgid ""
-#~ "[%s] %s\n"
-#~ "Condition: %s - %s"
-#~ msgstr ""
-#~ "[%s] %s\n"
-#~ "Умова: %s - %s"
-
-#~ msgid "[%s] Delivery Charges for %s"
-#~ msgstr "[%s] Плата за доставку %s"
-
-#~ msgid "[%s] Gift Wrapping Charges for %s"
-#~ msgstr "[%s] Плата за упаковку подарунків %s"

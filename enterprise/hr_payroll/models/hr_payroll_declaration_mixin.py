@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
 import logging
 
 from datetime import datetime
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.tools import BinaryBytes
 
 _logger = logging.getLogger(__name__)
 
@@ -81,7 +80,7 @@ class HrPayrollDeclarationMixin(models.AbstractModel):
         for employee, filename, data in files:
             line = self.line_ids.filtered(lambda l: l.employee_id == employee)
             line.write({
-                'pdf_file': base64.encodebytes(data),
+                'pdf_file': BinaryBytes(data),
                 'pdf_filename': filename,
             })
 

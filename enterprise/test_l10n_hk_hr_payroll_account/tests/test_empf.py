@@ -3,6 +3,9 @@ import csv
 import io
 from datetime import date
 
+from freezegun import freeze_time
+
+from odoo.exceptions import UserError
 from odoo.fields import Command
 from odoo.tests import tagged
 
@@ -11,6 +14,8 @@ from .common import TestL10NHkHrPayrollAccountCommon
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestEmpf(TestL10NHkHrPayrollAccountCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -291,33 +296,32 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
             },
         )
         # Terminate the employee
-        departure_notice = self.env["hr.departure.wizard"].create({
-            "employee_ids": [Command.link(employee.id)],
-            "departure_reason_id": self.env.ref('l10n_hk_hr_payroll_empf.hr_departure_reason_contract_end').id,
-            "departure_date": date(2021, 12, 14),
+        departure_notice = self.env["hr.employee.departure"].create({
+            "employee_id": employee.id,
+            "departure_reason_id": self.env.ref('l10n_hk_hr_payroll.hr_departure_reason_contract_end').id,
+            "dismissal_date": date(2025, 12, 14),
             "departure_description": "",
-            "set_date_end": True,
         })
-        departure_notice.with_context(toggle_active=True).action_register_departure()
+        departure_notice.action_register()
         # Register a long service pay for the employee (requires a previous month slip for the calculation)
         payslip = self._generate_payslip(
-            date(2021, 11, 1),
-            date(2021, 11, 30),
+            date(2025, 11, 1),
+            date(2025, 11, 30),
             struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_employee_salary").id,
             employee_id=employee.id,
             version_id=employee.version_id.id,
         )
         payslip.action_validate()
         payslip = self._generate_payslip(
-            date(2021, 12, 1),
-            date(2021, 12, 31),
-            struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_long_service_payment").id,
+            date(2025, 12, 1),
+            date(2025, 12, 31),
+            struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_employee_salary").id,
             employee_id=employee.id,
             version_id=employee.version_id.id,
         )
         payslip.action_validate()
 
-        report = self._create_payrun_and_report(date(2021, 12, 1), date(2021, 12, 31))
+        report = self._create_empf_report(date(2025, 12, 1), date(2025, 12, 31))
         report.action_generate_report()
         csv_report = self._get_csv_reports_per_type(report, 'contributions')
         reader = csv.reader(io.StringIO(csv_report.raw.decode()), delimiter=",")
@@ -325,10 +329,10 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
         self.assertListEqual(
             lines,
             [[
-                "MT00298", "123456789012", "MLY", "", "20211201", "20211231", "", "REE", "HKID", "G9088333", "20110102", "T",  # General info
-                "", "", "20211201", "20211231", "", "", "", "5000.0", "", "250.0", "", "", "", "", "", "", "250.0",  # Contribution info
+                "MT00298", "123456789012", "MLY", "", "20251201", "20251231", "", "REE", "HKID", "G9088333", "20110102", "T",  # General info
+                "", "", "20251201", "20251231", "", "", "", "5000.0", "", "250.0", "", "", "", "", "", "", "250.0",  # Contribution info
                 "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",  # New member info
-                "20211214", "CONTRACT_END", "L"  # Termination info
+                "20251214", "CONTRACT_END", "L"  # Termination info
             ]]
         )
 
@@ -372,15 +376,22 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
             'amount': 200,
         })
         # Terminate the employee
-        departure_notice = self.env["hr.departure.wizard"].create({
-            "employee_ids": [Command.link(employee.id)],
+        departure_notice = self.env["hr.employee.departure"].create({
+            "employee_id": employee.id,
             "departure_reason_id": self.env.ref('hr.departure_resigned').id,
-            "departure_date": date(2021, 12, 16),
+            "dismissal_date": date(2021, 12, 16),
             "departure_description": "",
-            "set_date_end": True,
         })
-        departure_notice.with_context(toggle_active=True).action_register_departure()
-        report = self._create_payrun_and_report(date(2021, 12, 1), date(2021, 12, 31))
+        departure_notice.action_register()
+        payslip = self._generate_payslip(
+            date(2021, 12, 1),
+            date(2021, 12, 31),
+            struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_employee_salary").id,
+            employee_id=employee.id,
+            version_id=employee.version_id.id,
+        )
+        payslip.action_validate()
+        report = self._create_empf_report(date(2021, 12, 1), date(2021, 12, 31))
 
         report.action_generate_report()
         csv_report = self._get_csv_reports_per_type(report, 'contributions')
@@ -390,7 +401,7 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
             lines,
             [[
                 "MT00298", "123456789012", "MLY", "", "20211201", "20211231", "", "REE", "HKID", "Z6833676", "20110102", "T",  # General info
-                "", "", "20211201", "20211231", "", "", "", "11000.0", "", "550.0", "550.0", "200.0", "200.0", "", "", "", "1500.0",  # Contribution info
+                "", "", "20211201", "20211231", "", "", "", "11000.0", "", "550.0", "550.0", "103.23", "103.23", "", "", "", "1306.46",  # Contribution info
                 "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",  # New member info
                 "20211216", "RESIGN", ""  # Termination info
             ]]
@@ -427,7 +438,7 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
             'employee_id': employee.id,
             'request_date_from': date(2021, 12, 1),
             'request_date_to': date(2021, 12, 31),
-            'holiday_status_id': self.env.ref('hr_holidays.l10n_hk_leave_type_unpaid_leave').id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.hk_work_entry_type_unpaid_leave').id,
         })
         leave.action_approve()
 
@@ -751,42 +762,42 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
                 "sex": "female",
             },
         )
-        # Terminate the employee
-        departure_notice = self.env["hr.departure.wizard"].create({
-            "employee_ids": [Command.link(employee.id)],
-            "departure_reason_id": self.env.ref('hr.departure_retired').id,
-            "departure_date": date(2021, 12, 1),
-            "departure_description": "",
-            "set_date_end": True,
-        })
-        departure_notice.with_context(toggle_active=True).action_register_departure()
         leave = self.env['hr.leave'].sudo().create({
             'employee_id': employee.id,
-            'request_date_from': date(2021, 12, 1),
-            'request_date_to': date(2021, 12, 1),
-            'holiday_status_id': self.env.ref('hr_holidays.l10n_hk_leave_type_unpaid_leave').id,
+            'request_date_from': date(2025, 12, 1),
+            'request_date_to': date(2025, 12, 1),
+            'work_entry_type_id': self.env.ref('hr_work_entry.hk_work_entry_type_unpaid_leave').id,
         })
         leave.action_approve()
 
+        # Terminate the employee
+        departure_notice = self.env["hr.employee.departure"].create({
+            "employee_id": employee.id,
+            "departure_reason_id": self.env.ref('hr.departure_retired').id,
+            "dismissal_date": date(2025, 12, 1),
+            "departure_description": "",
+        })
+        departure_notice.action_register()
+
         # Register a long service pay for the employee (requires a previous month slip for the calculation)
         payslip = self._generate_payslip(
-            date(2021, 11, 1),
-            date(2021, 11, 30),
+            date(2025, 11, 1),
+            date(2025, 11, 30),
             struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_employee_salary").id,
             employee_id=employee.id,
             version_id=employee.version_id.id,
         )
         payslip.action_validate()
         payslip = self._generate_payslip(
-            date(2021, 12, 1),
-            date(2021, 12, 31),
-            struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_long_service_payment").id,
+            date(2025, 12, 1),
+            date(2025, 12, 31),
+            struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_employee_salary").id,
             employee_id=employee.id,
             version_id=employee.version_id.id,
         )
         payslip.action_validate()
 
-        report = self._create_payrun_and_report(date(2021, 12, 1), date(2021, 12, 31))
+        report = self._create_empf_report(date(2025, 12, 1), date(2025, 12, 31))
         terminated_employee_lines = report.contribution_line_ids.filtered(
             lambda line: line.status == "T" and not line.total_contributions
         )
@@ -800,10 +811,10 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
         self.assertListEqual(
             lines,
             [[
-                "MT00298", "123456789012", "MLY", "", "20211201", "20211231", "", "REE", "HKID", "H9644190", "20161013", "T",  # General info
+                "MT00298", "123456789012", "MLY", "", "20251201", "20251231", "", "REE", "HKID", "H9644190", "20161013", "T",  # General info
                 "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",  # Contribution info
                 "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",  # New member info
-                "20211201", "RETIRE", "L"  # Termination info
+                "20251201", "RETIRE", "L"  # Termination info
             ]]
         )
 
@@ -879,33 +890,33 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
             },
         )
         # Terminate the employee
-        departure_notice = self.env["hr.departure.wizard"].create({
-            "employee_ids": [Command.link(employee.id)],
-            "departure_reason_id": self.env.ref('l10n_hk_hr_payroll_empf.hr_departure_reason_redundancy').id,
-            "departure_date": date(2021, 12, 18),
+        departure_notice = self.env["hr.employee.departure"].create({
+            "employee_id": employee.id,
+            "departure_reason_id": self.env.ref('l10n_hk_hr_payroll.hr_departure_reason_redundancy').id,
+            "dismissal_date": date(2025, 12, 18),
             "departure_description": "",
-            "set_date_end": True,
         })
-        departure_notice.with_context(toggle_active=True).action_register_departure()
+        departure_notice.action_register()
 
         # Register a severance pay for the employee (requires a previous month slip for the calculation)
         payslip = self._generate_payslip(
-            date(2021, 11, 1),
-            date(2021, 11, 30),
+            date(2025, 11, 1),
+            date(2025, 11, 30),
             struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_employee_salary").id,
             employee_id=employee.id,
             version_id=employee.version_id.id,
         )
         payslip.action_validate()
         payslip = self._generate_payslip(
-            date(2021, 12, 1),
-            date(2021, 12, 31),
-            struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_severance_payment").id,
+            date(2025, 12, 1),
+            date(2025, 12, 31),
+            struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_employee_salary").id,
             employee_id=employee.id,
             version_id=employee.version_id.id,
         )
         payslip.action_validate()
-        report = self._create_payrun_and_report(date(2021, 12, 1), date(2021, 12, 31))
+
+        report = self._create_empf_report(date(2025, 12, 1), date(2025, 12, 31))
 
         report.action_generate_report()
         csv_report = self._get_csv_reports_per_type(report, 'contributions')
@@ -914,10 +925,10 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
         self.assertListEqual(
             lines,
             [[
-                "MT00298", "123456789012", "MLY", "", "20211201", "20211231", "", "REE", "HKID", "H8977285", "20170714", "T",  # General info
-                "", "", "20211201", "20211231", "", "", "", "9700.01", "", "485.0", "485.0", "", "", "", "", "", "970.0",  # Contribution info
+                "MT00298", "123456789012", "MLY", "", "20251201", "20251231", "", "REE", "HKID", "H8977285", "20170714", "T",  # General info
+                "", "", "20251201", "20251231", "", "", "", "9700.01", "", "485.0", "485.0", "", "", "", "", "", "970.0",  # Contribution info
                 "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",  # New member info
-                "20211218", "REDUNDANCY", "S"  # Termination info
+                "20251218", "REDUNDANCY", "S"  # Termination info
             ]]
         )
 
@@ -950,15 +961,22 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
             },
         )
         # Terminate the employee
-        departure_notice = self.env["hr.departure.wizard"].create({
-            "employee_ids": [Command.link(employee.id)],
-            "departure_reason_id": self.env.ref('l10n_hk_hr_payroll_empf.hr_departure_reason_redundancy').id,
-            "departure_date": date(2021, 12, 18),
+        departure_notice = self.env["hr.employee.departure"].create({
+            "employee_id": employee.id,
+            "departure_reason_id": self.env.ref('l10n_hk_hr_payroll.hr_departure_reason_redundancy').id,
+            "dismissal_date": date(2021, 12, 18),
             "departure_description": "",
-            "set_date_end": True,
         })
-        departure_notice.with_context(toggle_active=True).action_register_departure()
-        report = self._create_payrun_and_report(date(2021, 12, 1), date(2021, 12, 31))
+        departure_notice.action_register()
+        payslip = self._generate_payslip(
+            date(2021, 12, 1),
+            date(2021, 12, 31),
+            struct_id=self.env.ref("l10n_hk_hr_payroll.hr_payroll_structure_cap57_employee_salary").id,
+            employee_id=employee.id,
+            version_id=employee.version_id.id,
+        )
+        payslip.action_validate()
+        report = self._create_empf_report(date(2021, 12, 1), date(2021, 12, 31))
 
         report.action_generate_report()
         csv_report = self._get_csv_reports_per_type(report, 'contributions')
@@ -1174,42 +1192,79 @@ class TestEmpf(TestL10NHkHrPayrollAccountCommon):
             'ermc': 1010.0,
         }])
 
-    def _create_payrun_and_report(self, date_start, date_end, validate_report=True):
-        payslip_run = self.env['hr.payslip.run'].create({
-            'name': "Test Payslip Run",
-            'date_start': date_start,
-            'date_end': date_end,
-            'structure_id': self.env.ref('l10n_hk_hr_payroll.hr_payroll_structure_cap57_employee_salary').id,
-            'l10n_hk_payroll_scheme_id': self.mpf_scheme.id,
-        })
-        payslip_run.generate_payslips(payslip_run._get_valid_version_ids())
-        payslip_run.action_validate()
-
-        report = payslip_run.l10n_hk_payroll_empf_report_id
-        if validate_report:
-            report.action_validate()
-        return report
-
-    def _get_csv_reports_per_type(self, report, report_type=None):
+    @freeze_time('2021-12-30')
+    def test_under_18_with_vc(self):
         """
-        Helper to get csv for each type of report for the given report.
-        Optionally, the report type can be provided if only this specific type is tested, in which case we return the
-        attachment corresponding to this type right away.
+        An employee younger than 18 with voluntary contribution is reported.
         """
-        existing_csv_reports = self.env["ir.attachment"].search(
-            [
-                ("res_id", "=", report.id),
-                ("res_model", "=", "l10n_hk.empf.contribution.report"),
-            ]
+        period_start = date(2021, 12, 1)
+        period_end = date(2021, 12, 31)
+        employee = self._setup_employee(
+            country=self.env.ref("base.hk"),
+            structure_type=self.env.ref("l10n_hk_hr_payroll.structure_type_employee_cap57"),
+            resource_calendar=self.resource_calendar,
+            contract_fields={
+                "date_version": period_start,
+                "contract_date_start": period_start,
+                "wage": 20000.0,
+                "l10n_hk_mpf_scheme_id": self.mpf_scheme.id,
+                "l10n_hk_mpf_contribution_start": "immediate",
+                "l10n_hk_mpf_registration_status": "registered",
+                "l10n_hk_member_class_id": self.member_class.id,
+                "l10n_hk_mpf_scheme_join_date": period_start,
+                "l10n_hk_mpf_exempt": True,
+                "identification_id": "Z683365A",
+            },
+            employee_fields={
+                "private_phone": "98651234",
+                "private_email": "suzanchan@webdoc.com",
+                "birthday": date(2004, 12, 31),
+                "l10n_hk_surname": "Chan",
+                "l10n_hk_given_name": "Suzan",
+                "sex": "female",
+            },
         )
-        csv_reports_per_type = {
-           'new_employees': None,
-           'contributions': None,
-           'terminated_employees': None,
-        }
-        for csv_report in existing_csv_reports:
-            for label in csv_reports_per_type:
-                if label in csv_report.name:
-                    csv_reports_per_type[label] = csv_report
+        employee.l10n_hk_member_class_ct_eevc_id.unlink()
+        employee.l10n_hk_member_class_ct_ervc_id.write({
+            'contribution_option': 'fixed',
+            'amount': 1000,
+        })
 
-        return csv_reports_per_type[report_type] if report_type else csv_reports_per_type
+        report = self._create_payrun_and_report(period_start, period_end, validate_report=False)
+        report.action_generate_report()
+        csv_report = self._get_csv_reports_per_type(report, 'contributions')
+        reader = csv.reader(io.StringIO(csv_report.raw.decode()), delimiter=",")
+        lines = list(reader)
+        self.assertListEqual(
+            lines,
+            [[
+                "MT00298", "123456789012", "MLY", "", "20211201", "20211231", "", "REE", "HKID", "Z683365A", "20211201", "E",  # General info
+                "", "", "20211201", "20211231", "", "", "", "20000.0", "", "", "", "1000.0", "", "", "", "", "1000.0",  # Contribution info
+                "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",  # New member info
+                "", "", "",  # Termination info
+            ]],
+        )
+
+    def test_display_errors_on_contribution_line_when_employee_missing(self):
+        """Test that checks display errors when contribution line does not have an employee set."""
+        report = self.env['l10n_hk.empf.contribution.report'].create({
+            'contribution_period_start': date(2021, 12, 1),
+            'contribution_period_end': date(2021, 12, 31),
+            'scheme_id': self.mpf_scheme.id,
+            'contribution_line_ids': [Command.create({
+                'status': 'N',
+                'contribution_start_date': date(2021, 12, 1),
+                'contribution_end_date': date(2021, 12, 31),
+            })],
+        })
+
+        action = report.action_validate()
+        self.assertEqual(action['params']['title'], 'Validation Failed')
+
+        line = report.contribution_line_ids[0]
+        self.assertFalse(line.version_id)
+        with self.assertRaises(UserError) as err:
+            line.action_display_errors()
+        self.assertEqual(
+            err.exception.args[0], "You must have an Employee or Payslip set on every line of the report."
+        )

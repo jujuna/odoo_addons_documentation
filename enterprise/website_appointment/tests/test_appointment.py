@@ -14,6 +14,7 @@ from odoo.tests import users, tagged
 from unittest.mock import patch
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WebsiteAppointmentTest(AppointmentCommon, MockVisitor):
 
     @classmethod
@@ -201,11 +202,76 @@ class WebsiteAppointmentTest(AppointmentCommon, MockVisitor):
         self.assertIn("localhost:8069/", event_1.videocall_redirection)
         self.assertIn("127.0.0.1:8069/", event_2.videocall_redirection)
 
+    @users('admin')
+    def test_get_base_url_multi_company_multi_website(self):
+        """Check retrieved base url matches the website of the appointment type."""
+        self.env.user.email = 'mitchell.admin@example.com'
+        company_1 = self.env.company
+        company_2 = self.env['res.company'].create({
+            'country_id': self.env.ref('base.ca').id,
+            'currency_id': self.env.ref('base.CAD').id,
+            'email': 'company_2@test.example.com',
+            'name': 'Company 2',
+        })
+
+        website_1 = company_1.website_id
+        website_1.domain = 'http://localhost:8069'
+        self.env['ir.config_parameter'].sudo().set_str('web.base.url', website_1.domain)
+        website_2 = self.env['website'].create({
+            'name': 'Website Company 2',
+            'company_id': company_2.id,
+            'domain': 'http://127.0.0.1:8069',
+        })
+
+        appointment_1, appointment_2 = self.env['appointment.type'].create([
+            {
+                'name': 'Apt Website 1',
+                'staff_user_ids': self.staff_user_bxls,
+                'event_videocall_source': 'discuss',
+                'website_id': website_1.id,
+            },
+            {
+                'name': 'Apt Website 2',
+                'staff_user_ids': self.staff_user_bxls,
+                'event_videocall_source': 'discuss',
+                'website_id': website_2.id,
+            },
+        ])
+
+        customer_1, customer_2 = self.env['res.partner'].create([
+            {'name': 'Customer 1', 'email': 'customer1@test.com'},
+            {'name': 'Customer 2', 'email': 'customer2@test.com'},
+        ])
+
+        with self.mock_mail_gateway():
+            event_1, event_2 = self.env['calendar.event'].create([
+                {
+                    'name': 'Event 1',
+                    'start': datetime(2027, 11, 23, 8, 0),
+                    'stop':  datetime(2027, 11, 23, 9, 0),
+                    'appointment_type_id': appointment_1.id,
+                    'partner_ids': [Command.link(customer_1.id)],
+                }, {
+                    'name': 'Event 2',
+                    'start': datetime(2027, 11, 23, 8, 0),
+                    'stop':  datetime(2027, 11, 23, 9, 0),
+                    'appointment_type_id': appointment_2.id,
+                    'partner_ids': [Command.link(customer_2.id)],
+                },
+            ]).with_user(self.apt_user)
+
+        mail_1 = self.assertMailMail(customer_1, 'sent', author=event_1.partner_id)
+        self.assertIn("localhost:8069/", mail_1.body_html)
+        self.assertNotIn("127.0.0.1:8069/", mail_1.body_html)
+        mail_2 = self.assertMailMail(customer_2, 'sent', author=event_2.partner_id)
+        self.assertIn("127.0.0.1:8069/", mail_2.body_html)
+        self.assertNotIn("localhost:8069/", mail_2.body_html)
+
     def test_find_customer_country_from_visitor(self):
         self.env.user.tz = "Europe/Brussels"
         belgium = self.env.ref('base.be')
         usa = self.env.ref('base.us')
-        current_website = self.env['website'].get_current_website()
+        current_website = self.env.website
         appointments_belgium, appointment_usa = self.env['appointment.type'].create([
             {
                 'name': 'Appointment for Belgium',
@@ -271,7 +337,7 @@ class WebsiteAppointmentTest(AppointmentCommon, MockVisitor):
                     'name': 'Visitor',
                     f'question_{phone_question.id}': '+1 555-555-5555',
                     'staff_user_id': self.staff_user_bxls.id,
-                } | ({'csrf_token': http.Request.csrf_token(self)} if with_csrf else {})
+                } | ({'csrf_token': self.csrf_token()} if with_csrf else {})
 
                 for datetime_str in ['2022-02-14 10:00:00', '2022-02-15 10:00:00']:
                     event_values['datetime_str'] = datetime_str
@@ -308,7 +374,7 @@ class WebsiteAppointmentTest(AppointmentCommon, MockVisitor):
         # Logged partner is matched
         self.authenticate('apt_manager', 'apt_manager')
         values |= {
-            'csrf_token': http.Request.csrf_token(self),
+            'csrf_token': self.csrf_token(),
             'email': self.apt_manager.partner_id.email,
             'datetime_str': '2022-02-14 11:00:00',
         }
@@ -372,7 +438,7 @@ class WebsiteAppointmentTest(AppointmentCommon, MockVisitor):
         self.assertFalse(self.apt_manager.partner_id.phone)
         self.authenticate('apt_manager', 'apt_manager')
         values |= {
-            'csrf_token': http.Request.csrf_token(self),
+            'csrf_token': self.csrf_token(),
             'email': self.apt_manager.partner_id.email,
             'datetime_str': '2022-02-14 12:00:00',
         }

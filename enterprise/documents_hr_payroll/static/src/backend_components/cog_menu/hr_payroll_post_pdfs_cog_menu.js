@@ -9,7 +9,6 @@ const cogMenuRegistry = registry.category("cogMenu");
 export class PostPdfsCogMenu extends Component {
     static template = "hr_payroll.PostPdfsCogMenu";
     static components = {DropdownItem};
-    static props = {};
 
     setup() {
         this.action = useService("action");

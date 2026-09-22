@@ -6,13 +6,11 @@ This module enables the generation of Zengin-compliant files to send to your ban
 push a set of payments.
     """,
     'category': 'Accounting/Localizations/EDI',
-    'version': '1.0',
     'depends': ['l10n_jp', 'account_batch_payment', 'account_bank_statement_import'],
     'data': [
         'data/account_payment_method_data.xml',
         'views/account_batch_payment_views.xml',
         'views/account_journal_views.xml',
-        'views/res_bank_views.xml',
         'views/res_partner_bank_views.xml',
     ],
     'author': 'Odoo S.A.',

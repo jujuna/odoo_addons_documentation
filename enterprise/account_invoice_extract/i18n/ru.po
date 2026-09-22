@@ -5,14 +5,15 @@
 # Translators:
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-08 19:31+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:51+0000\n"
+"PO-Revision-Date: 2026-09-18 04:16+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-master/"
 "account_invoice_extract/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,12 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_invoice_extract
+#: model:ir.module.module,shortdesc:base.module_account_invoice_extract
+msgid "Account Invoice Extract"
+msgstr ""
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__message_needaction
@@ -42,7 +48,7 @@ msgstr "Количество вложений"
 #. odoo-python
 #: code:addons/account_invoice_extract/models/account_invoice.py:0
 msgid "Automatic OCR does not apply to this document."
-msgstr ""
+msgstr "OCR не применяется к этому документу."
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_bank_statement_line__extract_can_show_banners
@@ -57,8 +63,8 @@ msgstr "Можно показать кнопку отправки ocr"
 
 #. module: account_invoice_extract
 #: model:ir.model,name:account_invoice_extract.model_res_company
-msgid "Companies"
-msgstr "Компании"
+msgid "Company"
+msgstr ""
 
 #. module: account_invoice_extract
 #: model:ir.model,name:account_invoice_extract.model_res_config_settings
@@ -73,8 +79,8 @@ msgstr "Контакты"
 #. module: account_invoice_extract
 #. odoo-python
 #: code:addons/account_invoice_extract/models/account_invoice.py:0
-msgid "Couldn't reload AI data."
-msgstr "Не удалось перезагрузить данные ИИ."
+msgid "Couldn't reload data."
+msgstr ""
 
 #. module: account_invoice_extract
 #. odoo-javascript
@@ -156,12 +162,6 @@ msgid "Extract Detected Layout Id"
 msgstr "Извлечение обнаруженного идентификатора макета"
 
 #. module: account_invoice_extract
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_bank_statement_line__extract_partner_name
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_partner_name
-msgid "Extract Detected Partner Name"
-msgstr "Извлечение обнаруженного имени партнера"
-
-#. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_bank_statement_line__extract_prefill_data
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_prefill_data
 msgid "Extract Prefill Data"
@@ -171,6 +171,11 @@ msgstr "Извлечь данные для автозаполнения"
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_state_processed
 msgid "Extract State Processed"
 msgstr "Состояние извлечения Обработано"
+
+#. module: account_invoice_extract
+#: model:ir.module.module,summary:base.module_account_invoice_extract
+msgid "Extract data from invoice scans to fill them automatically"
+msgstr ""
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extract_state
@@ -185,17 +190,17 @@ msgstr "Состояние экстракта"
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extracted_dates
 msgid "Extracted Dates"
-msgstr ""
+msgstr "Извлеченные даты"
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extracted_numbers
 msgid "Extracted Numbers"
-msgstr ""
+msgstr "Извлеченные числа"
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__extracted_words
 msgid "Extracted Words"
-msgstr ""
+msgstr "Извлеченные слова"
 
 #. module: account_invoice_extract
 #: model_terms:ir.ui.view,arch_db:account_invoice_extract.view_move_form_inherit_ocr
@@ -257,7 +262,7 @@ msgstr "OCR счетов-фактур: проверка счетов-факту�
 #: model:ir.model.fields,field_description:account_invoice_extract.field_res_partner__is_created_by_ocr
 #: model:ir.model.fields,field_description:account_invoice_extract.field_res_users__is_created_by_ocr
 msgid "Is Created By Ocr"
-msgstr ""
+msgstr "Создано с помощью OCR"
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__message_is_follower
@@ -315,11 +320,6 @@ msgid "Ratings"
 msgstr "Рейтинги"
 
 #. module: account_invoice_extract
-#: model_terms:ir.ui.view,arch_db:account_invoice_extract.view_move_form_inherit_ocr
-msgid "Reload AI Data"
-msgstr "Перезагрузка данных искусственного интеллекта"
-
-#. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "Ошибка доставки SMS"
@@ -338,22 +338,12 @@ msgstr "Одна строка счета-фактуры для каждого н
 #. module: account_invoice_extract
 #: model:ir.model.constraint,message:account_invoice_extract.constraint_res_partner_ocr_name_uniq
 msgid "The OCR can't create multiple partners with the same name."
-msgstr ""
+msgstr "OCR не может создать несколько контрагентов с одинаковым наименованием."
 
 #. module: account_invoice_extract
 #: model:ir.model.fields,field_description:account_invoice_extract.field_res_config_settings__extract_in_invoice_digitalization_mode
 msgid "Vendor Bills"
 msgstr "Счета поставщиков"
-
-#. module: account_invoice_extract
-#: model:ir.model.fields,field_description:account_invoice_extract.field_account_move__website_message_ids
-msgid "Website Messages"
-msgstr "Веб-сайт сообщения"
-
-#. module: account_invoice_extract
-#: model:ir.model.fields,help:account_invoice_extract.field_account_move__website_message_ids
-msgid "Website communication history"
-msgstr "История общений с сайта"
 
 #. module: account_invoice_extract
 #. odoo-python
@@ -362,91 +352,14 @@ msgid "You cannot send a expense that is not in draft state!"
 msgstr ""
 "Вы не можете отправить расход, который не находится в состоянии черновика!"
 
-#~ msgid ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Buy credits"
-#~ msgstr ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Купить кредиты"
+msgid "Website Messages"
+msgstr "Веб-сайт сообщения"
 
-#~ msgid ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Refresh"
-#~ msgstr ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Обновить"
+msgid "Website communication history"
+msgstr "История общений с сайта"
 
-#~ msgid ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Retry"
-#~ msgstr ""
-#~ "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
-#~ "                        Повторная попытка"
+msgid "Couldn't reload AI data."
+msgstr "Не удалось перезагрузить данные ИИ."
 
-#~ msgid ""
-#~ "All fields will be automated by Artificial Intelligence, it might take 5 "
-#~ "seconds."
-#~ msgstr ""
-#~ "Все поля будут автоматизированы искусственным интеллектом, это может "
-#~ "занять 5 секунд."
-
-#~ msgid "Created by"
-#~ msgstr "Создано:"
-
-#~ msgid "Created on"
-#~ msgstr "Дата создания:"
-
-#~ msgid "Extract Word"
-#~ msgstr "Извлечение Word"
-
-#~ msgid "Extracted words from invoice scan"
-#~ msgstr "Изъятые слова из скана счета"
-
-#~ msgid "Field"
-#~ msgstr "Поле"
-
-#~ msgid "Invoice"
-#~ msgstr "Счет"
-
-#~ msgid "Last Updated by"
-#~ msgstr "Последнее обновление:"
-
-#~ msgid "Last Updated on"
-#~ msgstr "Дата последнего обновления:"
-
-#~ msgid "Ocr Selected"
-#~ msgstr "Ocr Selected"
-
-#~ msgid ""
-#~ "The data extraction is not finished yet. The extraction usually takes "
-#~ "between 5 and 10 seconds."
-#~ msgstr ""
-#~ "Извлечение данных еще не завершено. Обычно извлечение занимает от 5 до 10 "
-#~ "секунд."
-
-#~ msgid "User Selected"
-#~ msgstr "Выбранный пользователем"
-
-#~ msgid "Word Box Angle"
-#~ msgstr "Угол наклона коробки для слов"
-
-#~ msgid "Word Box Height"
-#~ msgstr "Высота блока слов"
-
-#~ msgid "Word Box Midx"
-#~ msgstr "Коробка для слов Midx"
-
-#~ msgid "Word Box Midy"
-#~ msgstr "Коробка со словами Миди"
-
-#~ msgid "Word Box Width"
-#~ msgstr "Ширина поля для слов"
-
-#~ msgid "Word Page"
-#~ msgstr "Слово Страница"
-
-#~ msgid "Word Text"
-#~ msgstr "Текст слова"
-
-#~ msgid "You don't have enough credit to extract data from your invoice."
-#~ msgstr "У вас недостаточно кредита, чтобы извлечь данные из счета-фактуры."
+msgid "Reload AI Data"
+msgstr "Перезагрузка данных искусственного интеллекта"

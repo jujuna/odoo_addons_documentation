@@ -10,6 +10,8 @@ from freezegun import freeze_time
 @tagged('post_install', '-at_install')
 class POSTestTaxReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -95,23 +97,19 @@ class POSTestTaxReport(TestAccountReportsCommon):
         })
 
         cls.company_data['default_journal_cash'].pos_payment_method_ids.unlink()
-        cls.pos_payment_method = cls.env['pos.payment.method'].create({
-            'name': 'POS test payment method',
-            'receivable_account_id': cls.company_data['default_account_receivable'].id,
-            'journal_id': cls.company_data['default_journal_cash'].id,
-        })
-
-        # Add the payment method to the pos_config
-        cls.pos_config.write({'payment_method_ids': [(4, cls.pos_payment_method.id, 0)]})
+        cls.pos_payment_method = cls.pos_config.payment_method_ids.filtered(
+            lambda pm: pm.type == 'cash'
+        )
 
     def _create_and_pay_pos_order(self, qty, price_unit):
         tax_amount = (self.pos_tax.amount / 100) * qty * price_unit # Only possible because the tax is 'percent' and price excluded. Don't do this at home !
         rounded_total = self.company_data['company'].currency_id.round(tax_amount + price_unit * qty)
-
+        is_refund = qty < 0
         order = self.env['pos.order'].create({
             'company_id': self.company_data['company'].id,
             'partner_id': self.partner_a.id,
             'session_id': self.pos_config.current_session_id.id,
+            'is_refund': is_refund,
             'lines': [(0, 0, {
                 'name': "OL/0001",
                 'product_id': self.pos_product.id,
@@ -125,7 +123,6 @@ class POSTestTaxReport(TestAccountReportsCommon):
             'amount_tax': self.company_data['company'].currency_id.round(tax_amount),
             'amount_paid': 0,
             'amount_return': 0,
-            'last_order_preparation_change': '{}'
         })
 
         # Pay the order
@@ -153,7 +150,6 @@ class POSTestTaxReport(TestAccountReportsCommon):
             'name': 'POS caba transition tax account',
             'code': 'POSCaba',
             'account_type': 'asset_current',
-            'reconcile': True,
         })
         self.pos_tax.write({
             'tax_exigibility': 'on_payment',
@@ -162,9 +158,13 @@ class POSTestTaxReport(TestAccountReportsCommon):
 
         self._check_tax_report_content()
 
-        closing_move = self.pos_config.session_ids.move_id
-        self.assertTrue(closing_move.always_tax_exigible)
-        self.assertFalse(caba_transition_account in closing_move.line_ids.account_id)
+        session = self.pos_config.session_ids
+        sale_move = session.sale_move_ids
+        refund_move = session.refund_move_ids
+        self.assertTrue(sale_move)
+        self.assertTrue(refund_move)
+        self.assertFalse(caba_transition_account in sale_move.line_ids.account_id)
+        self.assertFalse(caba_transition_account in refund_move.line_ids.account_id)
 
     @freeze_time("2020-01-01")
     def _check_tax_report_content(self):
@@ -172,7 +172,7 @@ class POSTestTaxReport(TestAccountReportsCommon):
         self.pos_config.open_ui()
         self._create_and_pay_pos_order(1, 30)
         self._create_and_pay_pos_order(-1, 40)
-        self.pos_config.current_session_id.action_pos_session_closing_control()
+        self.pos_config.current_session_id.close_session_from_ui()
 
         self.env.flush_all()
         report_opt = self._generate_options(self.tax_report, today, today)

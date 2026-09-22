@@ -1,9 +1,10 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { registry } from "@web/core/registry";
 import { useService, useBus } from "@web/core/utils/hooks";
 import { BomOverviewControlPanel } from "../bom_overview_control_panel/mrp_bom_overview_control_panel";
 import { BomOverviewTable } from "../bom_overview_table/mrp_bom_overview_table";
-import { Component, EventBus, onWillStart, useSubEnv, useState } from "@odoo/owl";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { Component, EventBus, onWillStart, proxy, useProps } from "@odoo/owl";
+import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 
 export class BomOverviewComponent extends Component {
     static template = "mrp.BomOverviewComponent";
@@ -11,7 +12,7 @@ export class BomOverviewComponent extends Component {
         BomOverviewControlPanel,
         BomOverviewTable,
     };
-    static props = { ...standardActionServiceProps };
+    props = useProps(standardActionServiceProps);
     setup() {
         this.orm = useService("orm");
         this.context = this.props.action.context;
@@ -23,7 +24,7 @@ export class BomOverviewComponent extends Component {
         this.uomName = "";
         this.unfoldedIds = new Set();
 
-        this.state = useState({
+        this.state = proxy({
             showOptions: {
                 mode: this.props.action.context.mode || 'overview',
                 uom: false,
@@ -71,7 +72,7 @@ export class BomOverviewComponent extends Component {
         this.variants = bomData["variants"];
         this.showVariants = bomData["is_variant_applied"];
         if (this.showVariants) {
-            this.state.currentVariantId ||= Object.keys(this.variants)[0];
+            this.state.currentVariantId ||= this.state.bomData.product_id;
         }
         this.state.precision = bomData["precision"];
         this.state.foldable = bomData["lines"]["foldable"];
@@ -145,7 +146,6 @@ export class BomOverviewComponent extends Component {
             type: "ir.actions.report",
             report_type: "qweb-pdf",
             report_name: this.getReportName(printAll),
-            report_file: "mrp.report_bom_structure",
         });
     }
 
@@ -161,8 +161,10 @@ export class BomOverviewComponent extends Component {
         let reportName = "mrp.report_bom_structure?docids=" + this.activeId +
                          "&mode=" + this.state.showOptions.mode +
                          "&quantity=" + (this.state.bomQuantity || 1) +
-                         "&unfolded_ids=" + JSON.stringify(Array.from(this.unfoldedIds)) +
-                         "&warehouse_id=" + (this.state.currentWarehouse ? this.state.currentWarehouse.id : false);
+                         "&unfolded_ids=" + JSON.stringify(Array.from(this.unfoldedIds));
+        if (this.state.currentWarehouse) {
+            reportName += "&warehouse_id=" + this.state.currentWarehouse.id;
+        }
         if (printAll) {
             reportName += "&all_variants=1";
         } else if (this.showVariants && this.state.currentVariantId) {

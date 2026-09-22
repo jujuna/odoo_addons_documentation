@@ -7,9 +7,9 @@ class AccountReturnType(models.Model):
     _inherit = 'account.return.type'
 
     @api.model
-    def _generate_all_returns(self, country_code, main_company, tax_unit=None):
+    def _generate_all_returns(self, country_code, main_company, tax_unit=None, return_types=None):
         if country_code != 'DK':
-            return super()._generate_all_returns(country_code, main_company, tax_unit)
+            return super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)
 
         intrastat_return_type = self.env.ref('l10n_dk_intrastat.dk_intrastat_goods_return_type')
         expressions = (
@@ -26,18 +26,16 @@ class AccountReturnType(models.Model):
             'date': {
                 'date_from': fields.Date.to_string(instrastat_date_from),
                 'date_to': fields.Date.to_string(instrastat_date_to),
-                'filter': 'custom',
-                'mode': 'range',
             },
             'selected_variant_id': intrastat_return_type.report_id.id,
             'sections_source_id': intrastat_return_type.report_id.id,
             'tax_unit': 'company_only' if not tax_unit else tax_unit.id,
         }
         company_ids = self.env['account.return'].sudo()._get_company_ids(main_company, tax_unit, intrastat_return_type.report_id)
-        options = intrastat_return_type.report_id.with_context(allowed_company_ids=company_ids.ids).get_options(previous_options=options)
+        options = intrastat_return_type.report_id.sudo().with_context(allowed_company_ids=company_ids.ids).get_options(previous_options=options)
 
         balance = 0
-        expression_totals_per_col_group = self.env.ref('l10n_dk_reports.dk_tax_return_type').report_id._compute_expression_totals_for_each_column_group(
+        expression_totals_per_col_group = self.env.ref('l10n_dk_reports.dk_tax_return_type').sudo().report_id._compute_expression_totals_for_each_column_group(
             expressions,
             options,
             warnings={}
@@ -51,4 +49,4 @@ class AccountReturnType(models.Model):
             months_offset = intrastat_return_type._get_periodicity_months_delay(main_company)
             intrastat_return_type._try_create_return_for_period(today - relativedelta(months=months_offset), main_company, tax_unit)
 
-        return super()._generate_all_returns(country_code, main_company, tax_unit)
+        return super()._generate_all_returns(country_code, main_company, tax_unit=tax_unit, return_types=return_types)

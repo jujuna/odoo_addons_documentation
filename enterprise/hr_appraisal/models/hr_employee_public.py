@@ -48,10 +48,14 @@ class HrEmployeePublic(models.Model):
             }
 
     def action_send_appraisal_request(self):
+        context = dict(self.env.context)
+        context.update({
+            'default_employee_id': self.id,
+        })
         return {
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
             'res_model': 'hr.appraisal',
             'name': 'Appraisal Request',
-            'context': self.env.context,
+            'context': context,
         }

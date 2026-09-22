@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-10-23 13:59+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Italian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:50+0000\n"
+"PO-Revision-Date: 2026-09-17 23:48+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-master/"
 "marketing_automation_sms/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -22,17 +22,14 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid "\" <strong>bounced</strong>,"
-msgstr "\" <strong>non viene recapitato</strong>,"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid "\" gets clicked,"
-msgstr "\" viene cliccato,"
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.js:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.js:0
+msgid "\"%(sms)s\" bounced"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_campaign__mailing_sms_count
@@ -40,47 +37,11 @@ msgid "# SMS Mailings"
 msgstr "N. invii SMS"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "<i class=\"fa fa-exclamation-circle\"/> Bounced after"
-msgstr "<i class=\"fa fa-exclamation-circle\"/> Non recapitato dopo"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "<i class=\"fa fa-hand-pointer-o\"/> Clicked after"
-msgstr "<i class=\"fa fa-hand-pointer-o\"/> Con clic dopo"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "<i class=\"fa fa-hand-pointer-o\"/> Not clicked within"
-msgstr "<i class=\"fa fa-hand-pointer-o\"/> Senza clic entro"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "<i class=\"fa fa-pie-chart\"/> Details"
-msgstr "<i class=\"fa fa-pie-chart\"/> Dettagli"
-
-#. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
+#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form_mailing
 msgid ""
-"<i data-trigger-type=\"sms_click\" class=\"fa fa-hand-pointer-o "
-"o_ma_text_processed o_add_child_activity text-success\" title=\"Clicked\" "
-"role=\"img\" aria-label=\"Clicked\"/>\n"
-"                    <i data-trigger-type=\"sms_not_click\" class=\"fa fa-"
-"hand-pointer-o o_ma_text_rejected o_add_child_activity text-danger\" "
-"title=\"Not Clicked\" role=\"img\" aria-label=\"Not Clicked\"/>\n"
-"                    <i data-trigger-type=\"sms_bounce\" class=\"fa fa fa-"
-"exclamation-circle o_ma_text_rejected o_add_child_activity text-danger\" "
-"title=\"Bounced\" role=\"img\" aria-label=\"Bounced\"/>"
+"<i class=\"oi oi-2x mb-auto p-2 bg-300 rounded\" data-icon=\"forum\" "
+"title=\"SMS icon\"/>"
 msgstr ""
-"<i data-trigger-type=\"sms_click\" class=\"fa fa-hand-pointer-o "
-"o_ma_text_processed o_add_child_activity text-success\" title=\"Clicked\" "
-"role=\"img\" aria-label=\"Clicked\"/>\n"
-"                    <i data-trigger-type=\"sms_not_click\" class=\"fa fa-"
-"hand-pointer-o o_ma_text_rejected o_add_child_activity text-danger\" "
-"title=\"Not Clicked\" role=\"img\" aria-label=\"Not Clicked\"/>\n"
-"                    <i data-trigger-type=\"sms_bounce\" class=\"fa fa fa-"
-"exclamation-circle o_ma_text_rejected o_add_child_activity text-danger\" "
-"title=\"Bounced\" role=\"img\" aria-label=\"Bounced\"/>"
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__activity_type
@@ -88,9 +49,30 @@ msgid "Activity Type"
 msgstr "Tipo di attività"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "Clicked"
-msgstr "Con clic"
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Cancel"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.js:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.js:0
+msgid "Clicked in \"%(sms)s\""
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+msgid "Clicks"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.js:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.js:0
+msgid "Didn't click in \"%(sms)s\""
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_mailing_mailing__display_name
@@ -99,9 +81,15 @@ msgstr "Con clic"
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_campaign__display_name
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_trace__display_name
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_sms_composer__display_name
-#: model:ir.model.fields,field_description:marketing_automation_sms.field_sms_tracker__display_name
 msgid "Display Name"
 msgstr "Nome visualizzato"
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Email icon"
+msgstr ""
 
 #. module: marketing_automation_sms
 #. odoo-python
@@ -110,20 +98,25 @@ msgid "Exception in SMS Marketing: %s"
 msgstr "Eccezione in marketing SMS: %s"
 
 #. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Failed on"
+msgstr ""
+
+#. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_mailing_mailing__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_mailing_trace__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_campaign__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_trace__id
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_sms_composer__id
-#: model:ir.model.fields,field_description:marketing_automation_sms.field_sms_tracker__id
 msgid "ID"
 msgstr "ID"
 
 #. module: marketing_automation_sms
-#: model:ir.model,name:marketing_automation_sms.model_sms_tracker
-msgid "Link SMS to mailing/sms tracking models"
-msgstr "Collega l'SMS ai modelli di tracciamento mailing/sms"
+#: model:ir.module.module,summary:base.module_marketing_automation_sms
+msgid "Integrate SMS Marketing in marketing campaigns"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_mailing_trace
@@ -154,7 +147,7 @@ msgstr "Campagna di marketing"
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_marketing_trace
 msgid "Marketing Trace"
-msgstr "Monitoraggio marketing"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_mailing_mailing
@@ -162,39 +155,49 @@ msgid "Mass Mailing"
 msgstr "Invio massivo e-mail"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "Opened"
-msgstr "Aperto"
-
-#. module: marketing_automation_sms
 #. odoo-python
-#: code:addons/marketing_automation_sms/models/marketing_trace.py:0
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
 msgid "Parent activity SMS bounced"
 msgstr "SMS non recapitato attività primaria"
 
 #. module: marketing_automation_sms
 #. odoo-python
-#: code:addons/marketing_automation_sms/models/marketing_trace.py:0
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
 msgid "Parent activity SMS clicked"
 msgstr "SMS con clic attività primaria"
 
 #. module: marketing_automation_sms
+#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form
+#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form_mailing
+msgid "Pick or Create a Template..."
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Run"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
 #: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__activity_type__sms
 #: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__mass_mailing_id_mailing_type__sms
 #: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__trigger_category__sms
+#: model:ir.model.fields.selection,name:marketing_automation_sms.selection__marketing_activity__trigger_category_ui__sms
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_tree
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_participant_view_form
 msgid "SMS"
 msgstr "SMS"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
-msgid "SMS Sent"
-msgstr "SMS inviato"
+#: model:ir.module.module,shortdesc:base.module_marketing_automation_sms
+msgid "SMS Marketing in Marketing Automation"
+msgstr ""
 
 #. module: marketing_automation_sms
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form
+#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_view_form_mailing
 msgid "SMS Template"
 msgstr "Modello SMS"
 
@@ -227,12 +230,34 @@ msgid "SMS: not clicked"
 msgstr "l'SMS: senza clic"
 
 #. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Scheduled on"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#. odoo-python
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
+#: code:addons/marketing_automation_sms/static/src/components/add_step_button/add_step_button.xml:0
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
+msgid "Send SMS"
+msgstr ""
+
+#. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_sms_composer
 msgid "Send SMS Wizard"
 msgstr "Procedura invio SMS"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
+#. odoo-python
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
+msgid "Send SMS: %(mailing_subject)s"
+msgstr ""
+
+#. module: marketing_automation_sms
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_flow_view/campaign_flow_view.xml:0
 msgid "Sent"
 msgstr "Inviato"
 
@@ -252,44 +277,99 @@ msgid "Trigger Category"
 msgstr "Categoria attivazione"
 
 #. module: marketing_automation_sms
+#: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__trigger_category_ui
+msgid "Trigger Category Ui"
+msgstr ""
+
+#. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__trigger_type
 msgid "Trigger Type"
 msgstr "Tipo di attivazione"
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid "after the <strong>SMS text message</strong> sent by the Activity \""
+#. odoo-javascript
+#: code:addons/marketing_automation_sms/static/src/components/campaign_trace_flow_view/campaign_trace_flow_view.xml:0
+msgid "Triggered on"
 msgstr ""
-"dopo che <strong>il messaggio di testo SMS</strong> è stato inviato "
-"dall'attività \""
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid ""
-"after the Participant <strong>clicked</strong>,<br/>on any link included in "
-"the <strong>SMS text message</strong> sent by the Activity \""
+#. odoo-python
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
+msgid "sms_click"
 msgstr ""
-"dopo che il partecipante <strong>ha fatto clic</strong>,<br/>su qualsiasi "
-"link incluso nel <strong>messaggio di testo SMS</strong> inviato "
-"dall'attività \""
 
 #. module: marketing_automation_sms
-#: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
-msgid ""
-"if no link included in the <strong>SMS text message</strong> sent by the "
-"Activity \""
+#. odoo-python
+#: code:addons/marketing_automation_sms/models/marketing_activity.py:0
+msgid "sms_not_click"
 msgstr ""
-"se nessun link è incluso nel <strong>messaggio di testo SMS</strong> inviato "
-"dall'attività \""
 
-#~ msgid "Bounced"
-#~ msgstr "Non recapitate"
+#~ msgid "\" <strong>bounced</strong>,"
+#~ msgstr "\" <strong>non viene recapitato</strong>,"
 
-#~ msgid "SMS Content"
-#~ msgstr "Contenuto SMS"
+#~ msgid "\" gets clicked,"
+#~ msgstr "\" viene cliccato,"
 
-#~ msgid "SMS Options"
-#~ msgstr "Opzioni SMS"
+#~ msgid "<i class=\"oi\" data-icon=\"error\"/> Bounced after"
+#~ msgstr "<i class=\"oi\" data-icon=\"error\"/> Non recapitato dopo"
 
-#~ msgid "SMS canceled"
-#~ msgstr "SMS annullata"
+#~ msgid "<i class=\"oi\" data-icon=\"pan_tool_alt\"/> Clicked after"
+#~ msgstr "<i class=\"oi\" data-icon=\"pan_tool_alt\"/> Con clic dopo"
+
+#~ msgid "<i class=\"oi\" data-icon=\"pan_tool_alt\"/> Not clicked within"
+#~ msgstr "<i class=\"oi\" data-icon=\"pan_tool_alt\"/> Senza clic entro"
+
+#~ msgid "<i class=\"oi\" data-icon=\"pie_chart\"/> Details"
+#~ msgstr "<i class=\"oi\" data-icon=\"pie_chart\"/> Dettagli"
+
+#~ msgid ""
+#~ "<i data-trigger-type=\"sms_click\" class=\"oi o_ma_text_processed "
+#~ "o_add_child_activity text-success\" data-icon=\"pan_tool_alt\" "
+#~ "title=\"Clicked\" role=\"img\" aria-label=\"Clicked\"/>\n"
+#~ "                    <i data-trigger-type=\"sms_not_click\" class=\"oi "
+#~ "o_ma_text_rejected o_add_child_activity text-danger\" data-"
+#~ "icon=\"pan_tool_alt\" title=\"Not Clicked\" role=\"img\" aria-label=\"Not "
+#~ "Clicked\"/>\n"
+#~ "                    <i data-trigger-type=\"sms_bounce\" class=\"oi "
+#~ "o_ma_text_rejected o_add_child_activity text-danger\" data-icon=\"error\" "
+#~ "title=\"Bounced\" role=\"img\" aria-label=\"Bounced\"/>"
+#~ msgstr ""
+#~ "<i data-trigger-type=\"sms_click\" class=\"oi o_ma_text_processed "
+#~ "o_add_child_activity text-success\" data-icon=\"pan_tool_alt\" "
+#~ "title=\"Clicked\" role=\"img\" aria-label=\"Clicked\"/>\n"
+#~ "                    <i data-trigger-type=\"sms_not_click\" class=\"oi "
+#~ "o_ma_text_rejected o_add_child_activity text-danger\" data-"
+#~ "icon=\"pan_tool_alt\" title=\"Not Clicked\" role=\"img\" aria-label=\"Not "
+#~ "Clicked\"/>\n"
+#~ "                    <i data-trigger-type=\"sms_bounce\" class=\"oi "
+#~ "o_ma_text_rejected o_add_child_activity text-danger\" data-icon=\"error\" "
+#~ "title=\"Bounced\" role=\"img\" aria-label=\"Bounced\"/>"
+
+#~ msgid "Clicked"
+#~ msgstr "Con clic"
+
+#~ msgid "Opened"
+#~ msgstr "Aperto"
+
+#~ msgid "SMS Sent"
+#~ msgstr "SMS inviato"
+
+#~ msgid "after the <strong>SMS text message</strong> sent by the Activity \""
+#~ msgstr ""
+#~ "dopo che <strong>il messaggio di testo SMS</strong> è stato inviato "
+#~ "dall'attività \""
+
+#~ msgid ""
+#~ "after the Participant <strong>clicked</strong>,<br/>on any link included "
+#~ "in the <strong>SMS text message</strong> sent by the Activity \""
+#~ msgstr ""
+#~ "dopo che il partecipante <strong>ha fatto clic</strong>,<br/>su qualsiasi "
+#~ "link incluso nel <strong>messaggio di testo SMS</strong> inviato "
+#~ "dall'attività \""
+
+#~ msgid ""
+#~ "if no link included in the <strong>SMS text message</strong> sent by the "
+#~ "Activity \""
+#~ msgstr ""
+#~ "se nessun link è incluso nel <strong>messaggio di testo SMS</strong> "
+#~ "inviato dall'attività \""

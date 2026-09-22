@@ -17,34 +17,25 @@ class TestPayrollSeasonal(TestPayrollCommon):
             'name': "Test Calendar : 38 Hours/Week",
             'company_id': cls.australian_company.id,
             'hours_per_day': 8,
-            'tz': "Australia/Sydney",
-            'two_weeks_calendar': False,
             'hours_per_week': 40.0,
             'full_time_required_hours': 40.0,
             'attendance_ids': [(5, 0, 0)] + [(0, 0, {
-                'name': "Attendance",
                 'dayofweek': dayofweek,
                 'hour_from': hour_from,
                 'hour_to': hour_to,
-                'day_period': day_period,
-                'work_entry_type_id': cls.env.ref('hr_work_entry.work_entry_type_attendance').id
+                'work_entry_type_id': cls.env.ref('hr_work_entry.au_work_entry_type_attendance').id
 
-            }) for dayofweek, hour_from, hour_to, day_period in [
-                ("0", 8.0, 12.0, "morning"),
-                ("0", 12.0, 13.0, "lunch"),
-                ("0", 13.0, 17, "afternoon"),
-                ("1", 8.0, 12.0, "morning"),
-                ("1", 12.0, 13.0, "lunch"),
-                ("1", 13.0, 17, "afternoon"),
-                ("2", 8.0, 12.0, "morning"),
-                ("2", 12.0, 13.0, "lunch"),
-                ("2", 13.0, 17, "afternoon"),
-                ("3", 8.0, 12.0, "morning"),
-                ("3", 12.0, 13.0, "lunch"),
-                ("3", 13.0, 17, "afternoon"),
-                ("4", 8.0, 12.0, "morning"),
-                ("4", 12.0, 13.0, "lunch"),
-                ("4", 13.0, 17, "afternoon"),
+            }) for dayofweek, hour_from, hour_to in [
+                ("0", 8.0, 12.0),
+                ("0", 13.0, 17),
+                ("1", 8.0, 12.0),
+                ("1", 13.0, 17),
+                ("2", 8.0, 12.0),
+                ("2", 13.0, 17),
+                ("3", 8.0, 12.0),
+                ("3", 13.0, 17),
+                ("4", 8.0, 12.0),
+                ("4", 13.0, 17),
             ]],
         }])
 
@@ -74,7 +65,7 @@ class TestPayrollSeasonal(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 5, 40, 1130.40),
+                (self.work_entry_types['002.00'].id, 5, 40, 1130.40),
             ],
             expected_lines=[
                 # (code, total)
@@ -116,7 +107,7 @@ class TestPayrollSeasonal(TestPayrollCommon):
             contract,
             expected_worked_days=[
                 # (work_entry_type_id.id, number_of_day, number_of_hours, amount)
-                (self.work_entry_types['WORK100'].id, 23, 174.8, 5000),
+                (self.work_entry_types['002.00'].id, 23, 174.8, 5000),
             ],
             expected_lines=[
                 # (code, total)

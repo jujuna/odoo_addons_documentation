@@ -5,7 +5,6 @@ import { stepUtils } from "@web_tour/tour_utils";
 import { accountTourSteps } from "@account/js/tours/account";
 
 registry.category("web_tour.tours").add("account_accountant_journal_items_export", {
-    url: "/web",
     steps: () => [
         stepUtils.showAppsMenuItem(),
         ...accountTourSteps.goToAccountMenu("Open the accounting module"),
@@ -27,12 +26,12 @@ registry.category("web_tour.tours").add("account_accountant_journal_items_export
         },
         {
             content: "Open export dialog",
-            trigger: 'i.fa-cog',
+            trigger: 'i[data-icon="more_vert"]',
             run: "click",
         },
         {
             content: "Open export dialog",
-            trigger: 'i.fa-upload',
+            trigger: 'i[data-icon="upload"]',
             run: "click",
         },
         {

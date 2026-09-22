@@ -7,6 +7,8 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     l10n_cl_dte_email = fields.Char('DTE Email', related='company_id.l10n_cl_dte_email', readonly=False)
+    l10n_cl_internal_identifier = fields.Char(
+        'Internal Identifier', related='company_id.l10n_cl_internal_identifier', readonly=False)
     l10n_cl_dte_service_provider = fields.Selection(related='company_id.l10n_cl_dte_service_provider', readonly=False,
         help='Please select your company service provider for DTE service.')
     l10n_cl_dte_resolution_number = fields.Char(

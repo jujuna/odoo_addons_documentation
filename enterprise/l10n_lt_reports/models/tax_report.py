@@ -60,10 +60,10 @@ class LithuanianTaxReportHandler(models.AbstractModel):
                account_move_line__move_id.date,
                res_partner.id AS partner_id,
                res_partner.vat as partner_vat,
-               res_partner.company_registry as registration_number,
+               res_partner.additional_identifiers->>'LT_JAK' as registration_number,
                res_country.code as country_code,
                res_partner.name AS partner_name,
-               res_partner.company_registry AS partner_registration_number,
+               res_partner.additional_identifiers->>'LT_JAK' AS partner_registration_number,
                account_move_line__move_id.invoice_date,
                account_move_line__move_id.move_type,
                reversed_move.invoice_date AS reversed_move_invoice_date,
@@ -94,7 +94,7 @@ class LithuanianTaxReportHandler(models.AbstractModel):
     @api.model
     def export_tax_report_to_xml(self, options):
         """ Generates the iSAF XML file """
-        if not self.env.company.vat:
+        if not self.env.company.has_vat:
             action = self.env.ref('base.action_res_company_form')
             raise RedirectWarning(_('Please define the VAT on your company.'), action.id, _('Company Settings'))
 
@@ -114,7 +114,7 @@ class LithuanianTaxReportHandler(models.AbstractModel):
         values = {
             'file_version': 'iSAF1.2',
             'today_str': fields.Datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            'registration_number': self.env.company.company_registry,
+            'registration_number': self.env.company.partner_id._get_additional_identifier('LT_JAK'),
             'date_from': options['date']['date_from'],
             'date_to': options['date']['date_to'],
             'float_repr': float_repr,

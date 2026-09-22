@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Employees in Gantt',
     'category': 'Human Resources/Employees',
     'summary': 'Employees in Gantt',
-    'version': '1.0',
     'description': """ """,
     'depends': ['hr', 'web_gantt'],
     'auto_install': True,

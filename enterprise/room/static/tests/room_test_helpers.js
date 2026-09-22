@@ -5,7 +5,6 @@ import {
     defineModels,
     getMockEnv,
     logout,
-    makeMockEnv,
     makeMockServer,
     mountWithCleanup,
     webModels,
@@ -35,7 +34,6 @@ export class RoomBookingViewTest extends RoomBookingView {
  * }>}
  */
 export async function mountRoomBookingView(useBus) {
-    let env;
     let notifyView;
     if (useBus) {
         const { env: pyEnv } = await makeMockServer();
@@ -53,14 +51,12 @@ export async function mountRoomBookingView(useBus) {
             await busSubscriptionPromise;
             pyEnv["bus.bus"]._sendone("room_booking#room_test", notificationType, bookings);
             await runAllTimers();
-            await waitNotifications([env, notificationType, bookings]);
+            await waitNotifications([getMockEnv(), notificationType, bookings]);
             await animationFrame();
         };
     }
     prepareRegistry();
-    env = getMockEnv() || (await makeMockEnv());
     await mountWithCleanup(RoomBookingViewTest, {
-        env,
         props: {
             id: 1,
             description: "<p class='text-danger o_test_description'>Room's description</p>",
@@ -70,7 +66,7 @@ export async function mountRoomBookingView(useBus) {
             bookedBgColor: "#FF0000",
         },
     });
-    return { env, notifyView };
+    return { notifyView };
 }
 
 function prepareRegistry() {
@@ -81,7 +77,6 @@ function prepareRegistry() {
         "bus_service",
         "bus.parameters",
         "multi_tab",
-        "legacy_multi_tab",
         "worker_service",
         "title",
         "orm",
@@ -101,6 +96,7 @@ function prepareRegistry() {
         "ui",
         "effect",
         "pwa",
+        "offline",
     ];
     Object.keys(serviceRegistry.content).forEach((e) => {
         if (!REQUIRED_SERVICES.includes(e)) {

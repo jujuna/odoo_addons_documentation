@@ -9,6 +9,8 @@ from odoo.tests import tagged
 
 @tagged('post_install', '-at_install')
 class TestTaxReportCarryover(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -85,6 +87,8 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
         cls.tax_return_type = cls.env['account.return.type'].create({
             'name': "The Return of the King",
             'report_id': cls.report.id,
+            'tax_payable_account_id': cls.company_data['default_tax_account_payable'].id,
+            'tax_receivable_account_id': cls.company_data['default_tax_account_receivable'].id,
         })
 
     def test_tax_report_carry_over(self):
@@ -118,7 +122,7 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
             'date_to': '2021-12-31',
         })
         with self.allow_pdf_render():
-            tax_return.action_validate()
+            tax_return.action_submit()
 
         # There should be an external value of -1000.0
         external_value = self.env['account.report.external.value'].search([('company_id', '=', self.company_1.id)])
@@ -141,7 +145,7 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
         )
 
         # There should be a carryover pop-up of value -1000.0
-        info_popup_data = json.loads(lines[0]['columns'][0]['info_popup_data'])
+        info_popup_data = json.loads(lines[0].columns[0].info_popup_data)
         self.assertEqual(info_popup_data['carryover'], '-1,000.00')
 
         # The carry over should be applied on the next period
@@ -159,7 +163,7 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
             options,
         )
 
-        info_popup_data = json.loads(lines[0]['columns'][0]['info_popup_data'])
+        info_popup_data = json.loads(lines[0].columns[0].info_popup_data)
         self.assertEqual(info_popup_data['carryover'], '-1,000.00')
         self.assertEqual(info_popup_data['applied_carryover'], '-1,000.00')
 
@@ -228,7 +232,7 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
             'date_to': '2021-12-31',
         })
         with self.allow_pdf_render():
-            tax_return.action_validate()
+            tax_return.action_submit()
 
         self.assertTrue(all(move.state == 'posted' for move in tax_return.closing_move_ids))
         self.assertEqual(len(tax_return.closing_move_ids), 2, "There should be one closing per company in the tax unit")
@@ -268,7 +272,7 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
         )
 
         # There should be no carryover pop-up
-        self.assertTrue('info_popup_data' not in lines_tax_unit[0]['columns'][0].keys())
+        self.assertFalse(lines_tax_unit[0].columns[0].info_popup_data)
 
         # COMPANY 1 REPORT (current period)
         # ==============================================================================================================
@@ -288,7 +292,7 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
         )
 
         # There should be a carryover pop-up
-        info_popup_data = json.loads(lines_company_1[0]['columns'][0]['info_popup_data'])
+        info_popup_data = json.loads(lines_company_1[0].columns[0].info_popup_data)
         self.assertEqual(info_popup_data['carryover'], '-1,000.00')
 
         # COMPANY 2 REPORT (current period)
@@ -309,7 +313,7 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
         )
 
         # There should be no carryover pop-up
-        self.assertTrue('info_popup_data' not in lines_company_2[0]['columns'][0].keys())
+        self.assertFalse(lines_company_2[0].columns[0].info_popup_data)
 
         # TAX UNIT REPORT (next period)
         # ==============================================================================================================
@@ -327,7 +331,7 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
         )
 
         # There should be no carryover pop-up
-        self.assertTrue('info_popup_data' not in lines_tax_unit[0]['columns'][0].keys())
+        self.assertFalse(lines_tax_unit[0].columns[0].info_popup_data)
 
         # COMPANY 1 REPORT (next period)
         # ==============================================================================================================
@@ -345,7 +349,7 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
             options,
         )
 
-        self.assertTrue('info_popup_data' not in lines_company_1[0]['columns'][0].keys())
+        self.assertFalse(lines_company_1[0].columns[0].info_popup_data)
 
         # COMPANY 2 REPORT (next period)
         # ==============================================================================================================
@@ -363,4 +367,4 @@ class TestTaxReportCarryover(TestAccountReportsCommon):
         )
 
         # There should be no carryover pop-up
-        self.assertTrue('info_popup_data' not in lines_company_2[0]['columns'][0].keys())
+        self.assertFalse(lines_company_2[0].columns[0].info_popup_data)

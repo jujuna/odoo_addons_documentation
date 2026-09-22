@@ -11,6 +11,8 @@ from odoo import fields, Command
 @tagged('post_install', '-at_install')
 class TestIntrastatReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -119,60 +121,52 @@ class TestIntrastatReport(TestAccountReportsCommon):
         })
 
     @classmethod
-    def _create_invoices(cls, code_type=None):
-        moves = cls.env['account.move'].create([
-            {
-                'move_type': 'out_invoice',
-                'partner_id': cls.partner_a.id,
-                'invoice_date': '2022-01-01',
-                'intrastat_country_id': cls.env.ref('base.nl').id,
-                'invoice_line_ids': [
-                    Command.create({
-                        'name': 'line_1',
-                        'product_id': cls.product_1.id,
-                        'intrastat_transaction_id': cls.intrastat_codes[code_type].id if code_type else None,
-                        'product_uom_id': cls.env.ref('uom.product_uom_unit').id,
-                        'quantity': 1.0,
-                        'account_id': cls.company_data['default_account_revenue'].id,
-                        'price_unit': 80.0,
-                        'tax_ids': [],
-                    }),
-                    Command.create({
-                        'name': 'line_2',
-                        'product_id': cls.product_2.id,
-                        'intrastat_transaction_id': cls.intrastat_codes[code_type].id if code_type else None,
-                        'product_uom_id': cls.env.ref('uom.product_uom_unit').id,
-                        'quantity': 2.0,
-                        'account_id': cls.company_data['default_account_revenue'].id,
-                        'price_unit': 120.0,
-                        'tax_ids': [],
-                    }),
-                ],
-            },
-            {
-                'move_type': 'in_invoice',
-                'partner_id': cls.partner_a.id,
-                'invoice_date': '2022-01-01',
-                'intrastat_country_id': cls.env.ref('base.nl').id,
-                'invoice_line_ids': [
-                    Command.create({
-                        'name': 'line_3',
-                        'product_id': cls.product_3.id,
-                        'intrastat_transaction_id': cls.intrastat_codes[code_type].id if code_type else None,
-                        'product_uom_id': cls.env.ref('uom.product_uom_unit').id,
-                        'quantity': 1.0,
-                        'account_id': cls.company_data['default_account_expense'].id,
-                        'price_unit': 950.0,
-                        'tax_ids': [],
-                    }),
-                ],
-            },
-        ])
-        moves.action_post()
+    @freeze_time('2022-01-01')
+    def _create_invoice_intrastat(cls, code_type=None):
+        cls._create_invoice(
+            intrastat_country_id=cls.env.ref('base.nl').id,
+            invoice_line_ids=[
+                cls._prepare_invoice_line(
+                    name='line_1',
+                    product_id=cls.product_1,
+                    intrastat_transaction_id=cls.intrastat_codes[code_type].id if code_type else None,
+                    product_uom_id=cls.env.ref('uom.product_uom_unit').id,
+                    quantity=1.0,
+                    account_id=cls.company_data['default_account_revenue'].id,
+                    price_unit=80.0,
+                ),
+                cls._prepare_invoice_line(
+                    name='line_2',
+                    product_id=cls.product_2.id,
+                    intrastat_transaction_id=cls.intrastat_codes[code_type].id if code_type else None,
+                    product_uom_id=cls.env.ref('uom.product_uom_unit').id,
+                    quantity=2.0,
+                    account_id=cls.company_data['default_account_revenue'].id,
+                    price_unit=120.0,
+                ),
+            ],
+            post=True,
+        )
+        cls._create_invoice(
+            move_type='in_invoice',
+            intrastat_country_id=cls.env.ref('base.nl').id,
+            invoice_line_ids=[
+                cls._prepare_invoice_line(
+                    name='line_3',
+                    product_id=cls.product_3.id,
+                    intrastat_transaction_id=cls.intrastat_codes[code_type].id if code_type else None,
+                    product_uom_id=cls.env.ref('uom.product_uom_unit').id,
+                    quantity=1.0,
+                    account_id=cls.company_data['default_account_expense'].id,
+                    price_unit=950.0,
+                ),
+            ],
+            post=True,
+        )
 
     @freeze_time('2022-02-01')
     def test_intrastat_report_values(self):
-        self._create_invoices(code_type='transaction')
+        self._create_invoice_intrastat(code_type='transaction')
         options = self._generate_options(self.report, '2022-01-01', '2022-01-31')
         lines = self.report._get_lines(options)
         self.assertLinesValues(
@@ -370,7 +364,7 @@ class TestIntrastatReport(TestAccountReportsCommon):
             in "Dispatch" report lines and outbound move types
             in "Arrival" report lines.
         """
-        self._create_invoices('transaction')
+        self._create_invoice_intrastat('transaction')
         options = self._generate_options(self.report, '2022-01-01', '2022-01-31', default_options={'unfold_all': True})
 
         self.assertLinesValues(
@@ -469,7 +463,7 @@ class TestIntrastatReport(TestAccountReportsCommon):
         options = self._generate_options(self.report, '2022-01-01', '2022-01-31', default_options={'unfold_all': True})
         lines = self.report._get_lines(options)
 
-        existing_ids = [line['id'] for line in lines]
+        existing_ids = [line.id for line in lines]
         unique_ids = set(existing_ids)
         self.assertEqual(len(existing_ids), len(unique_ids), f"We should have {len(existing_ids)} different IDs because we don't have exact same lines.")
 
@@ -1247,48 +1241,29 @@ class TestIntrastatReport(TestAccountReportsCommon):
                 ('Intrastat',                                 210.0),
                 ('Dispatch - BE0477472701 - 22042176 - BE',   210.0),
                 ('INV/2022/00003',                             50.0),
-                ('Load more...',                                 '')
+                ('2 more',                                    160.0)
             ],
             options,
         )
 
-        load_more_1 = self.report.get_expanded_lines(
+        load_more_lines = self.report.get_expanded_lines(
             options,
-            lines[1]['id'],
-            lines[3]['groupby'],
-            lines[3]['expand_function'],
-            lines[3]['progress'],
-            lines[3]['offset'],
+            lines[1].id,
+            lines[3].groupby,
+            lines[3].expand_function,
             None,
+            None,
+            ignore_load_more=True,
         )
 
         self.assertLinesValues(
-            load_more_1,
+            load_more_lines,
             # 0/name,                                            12/value
             [0,                                                  12],
             [
+                ('INV/2022/00003',                             50.0),
                 ('INV/2022/00002',                             80.0),
-                ('Load more...',                                 '')
-            ],
-            options,
-        )
-
-        load_more_2 = self.report.get_expanded_lines(
-            options,
-            lines[1]['id'],
-            load_more_1[1]['groupby'],
-            load_more_1[1]['expand_function'],
-            load_more_1[1]['progress'],
-            load_more_1[1]['offset'],
-            None,
-        )
-
-        self.assertLinesValues(
-            load_more_2,
-            # 0/name,                                            12/value
-            [0,                                                  12],
-            [
-                ('INV/2022/00001',                             80.0)
+                ('INV/2022/00001',                             80.0),
             ],
             options,
         )
@@ -1330,10 +1305,27 @@ class TestIntrastatReport(TestAccountReportsCommon):
         credit_note = self.env['account.move'].browse(action['res_id'])
         self.assertEqual(credit_note.line_ids.intrastat_transaction_id, self.intrastat_codes['transaction'])
 
+    def test_intrastat_preserved_on_autocomplete(self):
+        """Ensure intrastat_transaction_id is set correctly when using autocomplete (invoice_vendor_bill_id)"""
+        bill = self._create_invoice(
+            move_type='in_invoice',
+            invoice_line_ids=[self._prepare_invoice_line(
+                product_id=self.product_1,
+                intrastat_transaction_id=self.intrastat_codes['transaction'].id,
+            )]
+        )
+        new_bill = self.env['account.move'].create({'move_type': 'in_invoice', 'partner_id': bill.partner_id.id})
+        new_bill.invoice_vendor_bill_id = bill
+        new_bill._onchange_invoice_vendor_bill()
+        self.assertEqual(
+            bill.invoice_line_ids[0].intrastat_transaction_id,
+            new_bill.invoice_line_ids[0].intrastat_transaction_id,
+        )
+
     @freeze_time('2022-02-01')
     def test_weight_decimal_separator_depending_on_language(self):
         self.product_3.weight = 1230.5
-        self._create_invoices(code_type='transaction')
+        self._create_invoice_intrastat(code_type='transaction')
         options = self._generate_options(self.report, '2022-01-01', '2022-01-31', {'intrastat_grouped': True})
         self.assertLinesValues(
             # pylint: disable=C0326

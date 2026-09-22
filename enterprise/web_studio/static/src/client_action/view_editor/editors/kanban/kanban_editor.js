@@ -8,7 +8,7 @@ import { KanbanEditorRenderer } from "@web_studio/client_action/view_editor/edit
 import { makeModelErrorResilient } from "@web_studio/client_action/view_editor/editors/utils";
 import { KanbanEditorSidebar } from "./kanban_editor_sidebar/kanban_editor_sidebar";
 import { getStudioNoFetchFields, useModelConfigFetchInvisible } from "../utils";
-import { KANBAN_CARD_ATTRIBUTE } from "@web/views/kanban/kanban_arch_parser";
+import { CARD_ATTRIBUTE } from "@web/views/card/card_arch_parser";
 
 function parseStudioGroups(node) {
     if (node.hasAttribute("studio_groups")) {
@@ -97,6 +97,16 @@ class KanbanEditorController extends kanbanView.Controller {
         params.groupsLimit = 1;
         return params;
     }
+
+    // FIXME owl3: without this option, the editor is updated via onWillUpdateProps, but if
+    // we don't wait for the load, we end up with a model containing no record (OneRecordModel
+    // doesn't have time to do its magic before the component is re-rendered => crash)
+    get modelOptions() {
+        return {
+            ...super.modelOptions,
+            blockingWillUpdateProps: true,
+        };
+    }
 }
 
 function isValidKanbanHook({ hook, element }) {
@@ -147,13 +157,13 @@ async function addKanbanViewStructure(structure) {
         }
         case "ribbon": {
             const cardTemplate = this.viewEditorModel.xmlDoc.querySelector(
-                `[t-name="${KANBAN_CARD_ATTRIBUTE}"]`
+                `[t-name="${CARD_ATTRIBUTE}"]`
             );
             let ribbonTarget;
             if (cardTemplate.children.length) {
-                ribbonTarget = [`//kanban//t[@t-name="${KANBAN_CARD_ATTRIBUTE}"]/*[1]`, "before"];
+                ribbonTarget = [`//kanban//t[@t-name="${CARD_ATTRIBUTE}"]/*[1]`, "before"];
             } else {
-                ribbonTarget = [`//kanban//t[@t-name="${KANBAN_CARD_ATTRIBUTE}"]`, "inside"];
+                ribbonTarget = [`//kanban//t[@t-name="${CARD_ATTRIBUTE}"]`, "inside"];
             }
             return {
                 node: {
@@ -185,12 +195,12 @@ async function addKanbanViewStructure(structure) {
 }
 
 function prepareForKanbanDrag({ element, ref }) {
-    const hooksToStylize = [...ref.el.querySelectorAll(".o_web_studio_hook")].filter((e) =>
+    const hooksToStylize = [...ref().querySelectorAll(".o_web_studio_hook")].filter((e) =>
         e.dataset.structures?.split(",").includes(element.dataset.structure)
     );
     hooksToStylize.forEach((e) => e.classList.add("o_web_studio_hook_visible"));
     return () => {
-        ref.el
+        ref()
             .querySelectorAll(".o_web_studio_hook_visible")
             .forEach((el) => el.classList.remove("o_web_studio_hook_visible"));
     };

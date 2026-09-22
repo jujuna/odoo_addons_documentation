@@ -20,3 +20,14 @@ class ResConfigSettings(models.TransientModel):
         string="Tax Rounding Profit Account",
         help="Account used for profits from rounding the lines of French tax reports",
     )
+    l10n_fr_rof_type = fields.Integer(
+        related='company_id.l10n_fr_rof_type',
+        readonly=False,
+        string="VAT ROF",
+        help="Tax obligation reference",
+    )
+    l10n_fr_fiscal_regime = fields.Selection(
+        related='company_id.l10n_fr_fiscal_regime',
+        readonly=False,
+        required=True,
+    )

@@ -12,13 +12,16 @@ from odoo.addons.point_of_sale.tests.test_frontend import TestPointOfSaleHttpCom
 
 @tagged('post_install', '-at_install')
 class TestPoSRental(TestPointOfSaleHttpCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_rental_with_lots(self):
         """ Test rental product with lots """
         self.tracked_product_id = self.env['product.product'].create({
             'name': 'Test2',
             'uom_id': self.env.ref('uom.product_uom_unit').id,
             'available_in_pos': True,
-            'rent_ok': True,
+            'sale_ok': True,
+            'rent_periodicity': 'days',
             'is_storable': True,
             'tracking': 'serial',
         })
@@ -44,7 +47,7 @@ class TestPoSRental(TestPointOfSaleHttpCommon):
             'city': 'city',
             'country_id': self.env.ref('base.be').id, })
 
-        self.sale_order_id = self.env['sale.order'].with_context(in_rental_app=True).sudo().create({
+        self.sale_order_id = self.env['sale.order'].sudo().create({
             'partner_id': self.cust1.id,
             'partner_invoice_id': self.cust1.id,
             'partner_shipping_id': self.cust1.id,
@@ -69,7 +72,7 @@ class TestPoSRental(TestPointOfSaleHttpCommon):
         })
         self.main_pos_config.with_user(self.pos_user).open_ui()
         self.start_pos_tour("OrderLotsRentalTour", login="pos_user")
-        self.main_pos_config.current_session_id.action_pos_session_closing_control()
+        self.main_pos_config.current_session_id.close_session_from_ui()
         self.assertEqual(self.sale_order_id.order_line.pickedup_lot_ids.name, '123456789')
 
     def test_rental_qty_delivered(self):
@@ -84,7 +87,8 @@ class TestPoSRental(TestPointOfSaleHttpCommon):
         self.test_product = self.env['product.product'].create({
             'name': 'Test Rental',
             'available_in_pos': True,
-            'rent_ok': True,
+            'sale_ok': True,
+            'rent_periodicity': 'hours',
             'is_storable': True,
         })
 
@@ -122,7 +126,6 @@ class TestPoSRental(TestPointOfSaleHttpCommon):
         })
 
         self.main_pos_config.with_user(self.pos_user).open_ui()
-        self.order_line.update({'is_rental': True})
         pos_order = {'amount_paid': 20,
            'amount_return': 0,
            'amount_tax': 0,
@@ -181,7 +184,8 @@ class TestPoSRental(TestPointOfSaleHttpCommon):
         """ Test rental product qty delivered when processed in PoS when rental picking is disabled """
         test_product = self.env['product.product'].create({
             'name': 'Rental',
-            'rent_ok': True,
+            'sale_ok': True,
+            'rent_periodicity': 'days',
             'is_storable': True,
         })
 
@@ -194,7 +198,6 @@ class TestPoSRental(TestPointOfSaleHttpCommon):
             'order_line': [Command.create({
                 'product_id': test_product.id,
                 'product_uom_qty': 1.0,
-                'is_rental': True,
             })],
         })
 

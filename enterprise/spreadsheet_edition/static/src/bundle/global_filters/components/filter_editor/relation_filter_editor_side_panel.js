@@ -7,8 +7,9 @@ import { useService } from "@web/core/utils/hooks";
 import { MultiRecordSelector } from "@web/core/record_selectors/multi_record_selector";
 import { components } from "@odoo/o-spreadsheet";
 
-import { useState, onWillStart } from "@odoo/owl";
+import { onWillStart, proxy, t, useProps } from "@odoo/owl";
 import { SidePanelDomain } from "../../../components/side_panel_domain/side_panel_domain";
+import { GlobalFilterInput } from "../global_filter_input/global_filter_input";
 
 const { ValidationMessages } = components;
 
@@ -25,24 +26,23 @@ export class RelationFilterEditorSidePanel extends AbstractFilterEditorSidePanel
     static components = {
         ...AbstractFilterEditorSidePanel.components,
         ModelSelector,
+        GlobalFilterInput,
         MultiRecordSelector,
         FilterEditorFieldMatching,
         SidePanelDomain,
         ValidationMessages,
     };
-    static props = {
-        ...AbstractFilterEditorSidePanel.props,
-        modelName: { type: String, optional: true },
-        modelDisplayName: { type: String, optional: true },
-    };
+    relationProps = useProps({
+        model: t.string().optional(),
+    });
     setup() {
         super.setup();
 
-        this.state = useState({
+        this.store.selectRelatedModel(this.relationProps.model, this.props.label);
+        this.state = proxy({
             domainRestriction: this.store.filter.domainOfAllowedValues?.length > 0,
         });
 
-        this.nameService = useService("name");
         this.orm = useService("orm");
         onWillStart(this.onWillStart);
     }
@@ -74,28 +74,6 @@ export class RelationFilterEditorSidePanel extends AbstractFilterEditorSidePanel
         this.store.updateRelationModelLabel(label);
         if (!this.store.filter.label) {
             this.store.update({ label });
-        }
-    }
-
-    /**
-     * @param {Number[]} resIds
-     */
-    async onValuesSelected(resIds) {
-        const displayNames = await this.nameService.loadDisplayNames(
-            this.store.filter.modelName,
-            resIds
-        );
-        if (!resIds.length) {
-            // force clear, even automatic default values
-            this.store.update({ defaultValue: undefined });
-        } else {
-            this.store.update({
-                defaultValue: {
-                    operator: this.store.filter.defaultValue?.operator ?? "in",
-                    ids: resIds,
-                },
-                displayNames: Object.values(displayNames),
-            });
         }
     }
 

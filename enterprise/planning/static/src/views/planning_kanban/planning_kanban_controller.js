@@ -1,7 +1,7 @@
+import { proxy } from "@odoo/owl";
 import { AddressRecurrencyConfirmationDialog } from "@planning/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog";
 import { KanbanController } from "@web/views/kanban/kanban_controller";
 import { useService } from "@web/core/utils/hooks";
-import { useState } from "@odoo/owl";
 import { usePlanningRecurringDeleteAction } from "../planning_hooks";
 
 export class PlanningKanbanController extends KanbanController {
@@ -9,7 +9,7 @@ export class PlanningKanbanController extends KanbanController {
         super.setup();
         this.dialogService = useService("dialog");
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             recurrenceUpdate: "this",
         });
         this.planningRecurrenceDeletion = usePlanningRecurringDeleteAction();

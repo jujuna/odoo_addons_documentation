@@ -1,13 +1,17 @@
 from lxml import etree
 
 from odoo import Command
-from odoo.addons.account.tests.common import AccountTestInvoicingCommon
-from odoo.tests import tagged
+from odoo.tests import freeze_time, tagged
 from odoo.tools import misc
+from odoo.addons.l10n_gr_edi import utils
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
+@freeze_time('2024-01-01')
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestMyDATAInvoice(AccountTestInvoicingCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @AccountTestInvoicingCommon.setup_country('gr')
@@ -33,6 +37,9 @@ class TestMyDATAInvoice(AccountTestInvoicingCommon):
         cls.tax_24 = cls.env.ref("account.%s_l10n_gr_tax_s24_G" % cls.env.company.id)
         cls.tax_13 = cls.env.ref("account.%s_l10n_gr_tax_s13_G" % cls.env.company.id)
         cls.tax_0 = cls.env.ref("account.%s_l10n_gr_tax_s0_exempt" % cls.env.company.id)
+        cls.tax_4 = cls.env.ref("account.%s_l10n_gr_tax_s4_S" % cls.env.company.id)
+        cls.tax_4_article_31 = cls.env.ref("account.%s_l10n_gr_tax_s4_S_art31" % cls.env.company.id)
+        cls.tax_3_article_31 = cls.env.ref("account.%s_l10n_gr_tax_s3_S_art31" % cls.env.company.id)
 
     def _create_mydata_invoice(
             self,
@@ -115,7 +122,7 @@ class TestMyDATAInvoice(AccountTestInvoicingCommon):
             xml_template = 'l10n_gr_edi.mydata_invoice'
             xml_vals = invoice._l10n_gr_edi_get_invoices_xml_vals()
 
-        xml_content = self.env['account.move']._l10n_gr_edi_generate_xml_content(xml_template, xml_vals)
+        xml_content = self.env['l10n_gr_edi.document']._l10n_gr_edi_generate_xml_content(xml_template, xml_vals)
         xml_etree = self.get_xml_tree_from_string(xml_content)
 
         expected_file_full_path = misc.file_path(f'{self.test_module}/tests/test_files/{expected_file_path}')
@@ -139,7 +146,7 @@ class TestMyDATAInvoice(AccountTestInvoicingCommon):
     ####################################################################################################
 
     def test_mydata_available_inv_type_values(self):
-        invoice = self._create_mydata_invoice(inv_type='1.1', cls_category='', cls_type='')
+        invoice = self._create_mydata_invoice(inv_type='1.1', cls_category=False, cls_type=False)
         self.assertRecordValues(invoice, [{
             'l10n_gr_edi_available_inv_type': '1.1,1.2,1.3,1.4,1.5,1.6,2.1,2.2,2.3,2.4,3.1,3.2,5.1,5.2,'
                                               '6.1,6.2,7.1,8.1,8.2,11.1,11.2,11.3,11.4,11.5,17.3,17.4',
@@ -182,9 +189,37 @@ class TestMyDATAInvoice(AccountTestInvoicingCommon):
         ])
         self.assert_mydata_xml_tree(invoice, expected_file_path='from_odoo/mydata_invoice.xml')
 
+    def test_mydata_article_31_vat_categories(self):
+        invoice = self._create_mydata_invoice(
+            paid=False,
+            invoice_line_ids=[
+                Command.create({
+                    'product_id': self.product_a.id,
+                    'tax_ids': [Command.set(self.tax_4.ids)],
+                    'l10n_gr_edi_cls_category': 'category1_1',
+                    'l10n_gr_edi_cls_type': 'E3_561_001',
+                }),
+                Command.create({
+                    'product_id': self.product_a.id,
+                    'tax_ids': [Command.set(self.tax_4_article_31.ids)],
+                    'l10n_gr_edi_cls_category': 'category1_1',
+                    'l10n_gr_edi_cls_type': 'E3_561_001',
+                }),
+                Command.create({
+                    'product_id': self.product_a.id,
+                    'tax_ids': [Command.set(self.tax_3_article_31.ids)],
+                    'l10n_gr_edi_cls_category': 'category1_1',
+                    'l10n_gr_edi_cls_type': 'E3_561_001',
+                }),
+            ],
+        )
+
+        details = invoice._l10n_gr_edi_get_invoices_xml_vals()['invoice_values_list'][0]['details']
+        self.assertEqual([detail['vat_category'] for detail in details], [6, 10, 9])
+
     def test_mydata_send_multi_invoices(self):
         invoice_1 = self._create_mydata_invoice(inv_type='2.1', cls_category='category1_3', cls_type='E3_561_002')
-        invoice_2 = self._create_mydata_invoice(inv_type='11.1', cls_category='category1_95', cls_type='')
+        invoice_2 = self._create_mydata_invoice(inv_type='11.1', cls_category='category1_95', cls_type=False)
         self.assert_mydata_xml_tree(invoice_1 + invoice_2, expected_file_path='from_odoo/mydata_multi_invoices.xml')
 
     def test_mydata_send_bill_cls_expense(self):
@@ -212,12 +247,12 @@ class TestMyDATAInvoice(AccountTestInvoicingCommon):
         self.assert_mydata_error(invoice, 'Missing myDATA Invoice Type.')
 
         # No classification category
-        invoice = self._create_mydata_invoice(cls_category='')
+        invoice = self._create_mydata_invoice(cls_category=False)
         invoice.l10n_gr_edi_try_send_invoices()
         self.assert_mydata_error(invoice, 'Missing myDATA classification category on line 1.')
 
         # No classification type, and inv_type + cls_category combination doesn't allow empty cls_type
-        invoice = self._create_mydata_invoice(cls_type='')
+        invoice = self._create_mydata_invoice(cls_type=False)
         invoice.l10n_gr_edi_try_send_invoices()
         self.assert_mydata_error(invoice, 'Missing myDATA classification type on line 1.')
 
@@ -225,8 +260,8 @@ class TestMyDATAInvoice(AccountTestInvoicingCommon):
         """Allow no cls_type on some combinations with available cls_type"""
         allowed_inv_type_category = (('1.1', 'category1_95'), ('3.2', 'category1_95'), ('5.1', 'category1_95'))
         for inv_type, category in allowed_inv_type_category:
-            invoice = self._create_mydata_invoice(inv_type=inv_type, cls_category=category, cls_type='')
-            self.assertFalse(invoice._l10n_gr_edi_get_pre_error_string())
+            invoice = self._create_mydata_invoice(inv_type=inv_type, cls_category=category, cls_type=False)
+            self.assertFalse(utils.get_pre_error_string(invoice._l10n_gr_edi_get_pre_error_dict()))
 
     def test_l10n_gr_edi_try_send_invoices_invalid_tax_amount(self):
         """ Invalid tax amount should raises error. """
@@ -238,7 +273,7 @@ class TestMyDATAInvoice(AccountTestInvoicingCommon):
         }])
         invoice = self._create_mydata_invoice(tax_ids=[Command.set(invalid_tax.ids)])
         invoice.l10n_gr_edi_try_send_invoices()
-        self.assert_mydata_error(invoice, 'Invalid tax amount for line 1. The valid values are 24, 13, 6, 17, 9, 4, 0.')
+        self.assert_mydata_error(invoice, 'Invalid tax amount for line 1. The valid values are 24, 13, 6, 17, 9, 4, 3, 0.')
 
     def test_l10n_gr_edi_try_send_invoices_invalid_tax_multi(self):
         """ Multiple tax should raises error. """

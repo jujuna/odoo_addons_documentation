@@ -12,30 +12,30 @@ LARGE_AMOUNTS = [10000, 15000, 25000]
 @tagged('post_install', '-at_install')
 class TestAccountBankStatementImportCamt(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_camt_file_import(self):
         bank_journal = self.env['account.journal'].create({
             'name': 'Bank 123456',
             'code': 'BNK67',
             'type': 'bank',
-            'bank_acc_number': '123456',
+            'bank_account_number': '123456',
             'currency_id': self.env.ref('base.USD').id,
         })
 
         partner_norbert = self.env['res.partner'].create({
             'name': 'Norbert Brant',
-            'is_company': True,
         })
-        bank_norbert = self.env['res.bank'].create({'name': 'test'})
 
         self.env['res.partner.bank'].create({
-            'acc_number': 'BE93999574162167',
+            'account_number': 'BE93999574162167',
             'partner_id': partner_norbert.id,
-            'bank_id': bank_norbert.id,
+            'bank_name': 'test',
         })
         self.env['res.partner.bank'].create({
-            'acc_number': '10987654323',
+            'account_number': '10987654323',
             'partner_id': self.partner_a.id,
-            'bank_id': bank_norbert.id,
+            'bank_name': 'test',
         })
 
         # Get CAMT file content
@@ -185,8 +185,8 @@ class TestAccountBankStatementImportCamt(AccountTestInvoicingCommon):
         # file (same currency and account number)
         BankAccount = self.env['res.partner.bank']
         partner = self.env.user.company_id.partner_id
-        bank_account = BankAccount.search([('acc_number', '=', '112233'), ('partner_id', '=', partner.id)]) \
-                       or BankAccount.create({'acc_number': '112233', 'partner_id': partner.id})
+        bank_account = BankAccount.search([('account_number', '=', '112233'), ('partner_id', '=', partner.id)]) \
+                       or BankAccount.create({'account_number': '112233', 'partner_id': partner.id})
         bank_journal = self.env['account.journal'].create(
             {
                 'name': "Bank 112233 %s" % currency.name,
@@ -278,7 +278,7 @@ class TestAccountBankStatementImportCamt(AccountTestInvoicingCommon):
             'name': "Bank BE86 6635 9439 7150",
             'code': 'BNK69',
             'type': 'bank',
-            'bank_acc_number': 'BE86 6635 9439 7150',
+            'bank_account_number': 'BE86 6635 9439 7150',
             'currency_id': self.env.ref('base.USD').id,
         })
 
@@ -395,7 +395,7 @@ class TestAccountBankStatementImportCamt(AccountTestInvoicingCommon):
             'name': 'Bank 123456',
             'code': 'BNK67',
             'type': 'bank',
-            'bank_acc_number': '112233',
+            'bank_account_number': '112233',
             'currency_id': self.env.ref('base.USD').id,
         })
 

@@ -1,13 +1,12 @@
 import { STATIC_COG_GROUP_ACTION_PIN } from "./documents_cog_menu_group";
-import { DocumentsCogMenuItem } from "./documents_cog_menu_item";
+import { FolderAction } from "@documents/views/action/folder_action";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 
-export class DocumentsCogMenuItemAutomations extends DocumentsCogMenuItem {
+export class DocumentsCogMenuItemAutomations extends FolderAction {
     setup() {
-        this.icon = "fa-cog";
-        this.label = _t("Automations");
         super.setup();
+        this.label = _t("Automations");
         this.orm = useService("orm");
         this.dialog = useService("dialog");
     }
@@ -20,12 +19,13 @@ export class DocumentsCogMenuItemAutomations extends DocumentsCogMenuItem {
     }
 }
 
+/** @type folderAction */
 export const documentsCogMenuItemAutomations = {
     Component: DocumentsCogMenuItemAutomations,
     groupNumber: STATIC_COG_GROUP_ACTION_PIN,
-    isDisplayed: (env) =>
+    isDisplayed: (env, target) =>
         env.model.documentService.userIsDocumentUser &&
-        DocumentsCogMenuItem.isVisible(env, ({ folder, documentService }) =>
+        FolderAction.isVisible(env, target, ({ folder, documentService }) =>
             documentService.isEditable(folder)
         ),
 };

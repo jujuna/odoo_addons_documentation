@@ -1,8 +1,8 @@
+import { useSubEnv } from "@web/owl2/utils";
 import { registry } from "@web/core/registry";
 
 import { AbstractSpreadsheetAction } from "@spreadsheet_edition/bundle/actions/abstract_spreadsheet_action";
 
-import { useSubEnv } from "@odoo/owl";
 import { useSpreadsheetQualityControlExtension } from "../quality_spreadsheet_extension";
 
 export class QualitySpreadsheetTemplateAction extends AbstractSpreadsheetAction {

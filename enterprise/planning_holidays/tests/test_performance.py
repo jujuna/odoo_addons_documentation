@@ -3,9 +3,12 @@
 
 from datetime import datetime
 
+from odoo.tests import tagged
+
 from .test_common import TestCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestPerformance(TestCommon):
     def test_performance_recompute_shifts_in_leave_periods(self):
         """ Test performance of _recompute_shifts_in_leave_periods method
@@ -29,22 +32,22 @@ class TestPerformance(TestCommon):
         } for i in range(5)])
 
         slot_vals_list = [{
-            'employee_id': self.employee_bert.id,
+            'resource_ids': self.employee_bert.resource_id.ids,
             'start_datetime': datetime(2020, 4, 30, 8, 0),
             'end_datetime': datetime(2020, 4, 30, 17, 0),
         }]
         slot_vals_list += [{
-            'employee_id': self.employee_bert.id,
+            'resource_ids': self.employee_bert.resource_id.ids,
             'start_datetime': datetime(2020, 5, i, 8, 0),
             'end_datetime': datetime(2020, 5, i, 12, 0),
         } for i in range(1, 31)]
         slot_vals_list += [{
-            'employee_id': self.employee_bert.id,
+            'resource_ids': self.employee_bert.resource_id.ids,
             'start_datetime': datetime(2020, 5, i, 13, 0),
             'end_datetime': datetime(2020, 5, i, 17, 0),
         } for i in range(1, 31)]
         self.env['planning.slot'].create(slot_vals_list)
         resource_calendar_leaves = leaves + public_holiday
         self.assertEqual(len(resource_calendar_leaves), 6)
-        with self.assertQueryCount(__system__=1):
+        with self.assertQueryCount(__system__=18):
             resource_calendar_leaves._recompute_shifts_in_leave_periods()

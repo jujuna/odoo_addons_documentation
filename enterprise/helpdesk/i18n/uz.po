@@ -14,15 +14,44 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-08 18:43+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-11 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:33+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"helpdesk/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: helpdesk
+#: model:ir.module.module,description:base.module_helpdesk
+msgid ""
+"\n"
+"Helpdesk - Ticket Management App\n"
+"================================\n"
+"\n"
+"Features:\n"
+"\n"
+"    - Process tickets through different stages to solve them.\n"
+"    - Add priorities, types, descriptions and tags to define your tickets.\n"
+"    - Use the chatter to communicate additional information and ping co-"
+"workers on tickets.\n"
+"    - Enjoy the use of an adapted dashboard, and an easy-to-use kanban view "
+"to handle your tickets.\n"
+"    - Make an in-depth analysis of your tickets through the pivot view in "
+"the reports menu.\n"
+"    - Create a team and define its members, use an automatic assignment "
+"method if you wish.\n"
+"    - Use a mail alias to automatically create tickets and communicate with "
+"your customers.\n"
+"    - Add Service Level Agreement deadlines automatically to your tickets.\n"
+"    - Get customer feedback by using ratings.\n"
+"    - Install additional features easily using your team form view.\n"
+"\n"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__answered_customer_message_count
@@ -62,21 +91,6 @@ msgid "%(partner_name)s's Tickets"
 msgstr "%(partner_name)s ning chiptalari"
 
 #. module: helpdesk
-#. odoo-python
-#: code:addons/helpdesk/models/helpdesk_sla.py:0
-#: code:addons/helpdesk/models/helpdesk_team.py:0
-#: code:addons/helpdesk/models/helpdesk_ticket.py:0
-#, fuzzy
-msgid "%s (copy)"
-msgstr "%s (nusxa)"
-
-#. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_form
-#, fuzzy
-msgid "(any of these tags)"
-msgstr "(ushbu teglarning istalgan biri)"
-
-#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.ticket_invitation_follower
 #, fuzzy
 msgid ""
@@ -103,13 +117,6 @@ msgid "8 hours to finish"
 msgstr "Yakunlash uchun 8 soat"
 
 #. module: helpdesk
-#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
-#, fuzzy
-msgid "<b class=\"tip_title\">Tip: Create tickets from incoming emails</b>"
-msgstr ""
-"<b class=\"tip_title\">Maslahat: Kiruvchi xatlardan chiptalar yarating</b>"
-
-#. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
 #, fuzzy
@@ -128,18 +135,69 @@ msgstr ""
 "@<b>belgilardan</b> foydalaning."
 
 #. module: helpdesk
+#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
+msgid "<b>Tip: Create tickets from incoming emails</b>"
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_4
+msgid "<b>Tip: Don't let stalled tickets slip under the radar</b>"
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_3
+msgid "<b>Tip: Filter your tickets with one click</b>"
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_1
+msgid "<b>Tip: Identify bottlenecks at a glance</b>"
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_2
+msgid "<b>Tip: Team-Specific Fields</b>"
+msgstr ""
+
+#. module: helpdesk
+#: model:mail.template,body_html:helpdesk.auto_close_reminder_email_template
+msgid ""
+"<div>\n"
+"                Hello <t t-out=\"object.sudo().partner_id.name\"/>,<br/><br/"
+">\n"
+"                We noticed there hasn’t been any activity on your support "
+"ticket\n"
+"                <t t-if=\"object.team_id.privacy_visibility == 'portal'\">\n"
+"                    <a t-att-href=\"object.get_portal_url()\">#<t t-"
+"out=\"object.id\"/> (<t t-out=\"object.name\"/>)</a>\n"
+"                </t>\n"
+"                <t t-else=\"\">\n"
+"                    <strong>#<t t-out=\"object.id\"/> (<t t-"
+"out=\"object.name\"/>)</strong>\n"
+"                </t>\n"
+"                for a while.<br/><br/>\n"
+"                If your issue has been resolved, no action is needed - the "
+"ticket will automatically close in <t t-"
+"out=\"object.team_id.auto_close_reminder_delay\"/> days.<br/><br/>\n"
+"                If you still need help, simply reply to this email and we "
+"will keep your ticket open.<br/><br/>\n"
+"                <t t-out=\"object.company_id.name\"/> Support Team\n"
+"            </div>\n"
+"        "
+msgstr ""
+
+#. module: helpdesk
 #: model:mail.template,body_html:helpdesk.solved_ticket_request_email_template
-#, fuzzy
 msgid ""
 "<div>\n"
 "        Dear <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">Madam/"
 "Sir</t>,<br/><br/>\n"
 "        We would like to inform you that we have closed your ticket "
-"(reference <t t-out=\"object.id or ''\">15</t>). \n"
+"(reference <t t-out=\"object.ticket_ref or ''\">15</t>).\n"
 "        We trust that the services provided have met your expectations and "
 "that you have found a satisfactory resolution to your issue.<br/><br/>\n"
 "        However, if you have any further questions or comments, please do "
-"not hesitate to reply to this email to re-open your ticket. \n"
+"not hesitate to reply to this email to re-open your ticket.\n"
 "        Our team is always here to help you and we will be happy to assist "
 "you with any further concerns you may have.<br/><br/>\n"
 "        Thank you for choosing our services and for your cooperation "
@@ -150,19 +208,6 @@ msgid ""
 "    </div>\n"
 "        "
 msgstr ""
-"<div> Hurmatli <t t-out=\"object.sudo().partner_id.name or 'Xonim/"
-"Janob'\">Xonim/Janob</t>,<br/><br/> Sizning chiptangiz (<t t-out=\"object.id "
-"or ''\">15</t> raqamli) yopilganligi haqida xabar bermoqchimiz. Ko‘rsatilgan "
-"xizmatlar kutganingizga mos kelgan va muammoingiz qoniqarli hal etilgan deb "
-"umid qilamiz.<br/><br/> Agar sizda qo‘shimcha savollar yoki fikr-mulohazalar "
-"bo‘lsa, chiptangizni qayta ochish uchun ushbu xatga bemalol javob "
-"berishingiz mumkin.     Jamoamiz doimo sizga yordam berishga tayyor va har "
-"qanday qo‘shimcha muammolaringizni hal qilishda mamnuniyat bilan "
-"ko‘maklashadi.<br/><br/> Xizmatlarimizni tanlaganingiz va ushbu jarayon "
-"davomida hamkorlik qilganingiz uchun tashakkur. Biz sizning ishonchingizni "
-"qadrlaymiz va xizmat ko‘rsatish imkoniyati uchun minnatdormiz.<br/><br/> "
-"Hurmat bilan,<br/><br/> <t t-out=\"object.team_id.name or "
-"'Helpdesk'\">Helpdesk</t> jamoasi. </div>"
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.rating_ticket_request_email_template
@@ -249,9 +294,9 @@ msgstr ""
 "\"/> <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/> <table "
 "border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
 "margin:0;\"> <tbody> <tr><td valign=\"top\" style=\"font-size: 14px;\"> <t t-"
-"if=\"partner.name\"> Assalomu alaykum, <t t-out=\"partner.name or "
-"''\">Brandon Freeman</t>,<br/><br/> </t> <t t-else=\"\"> Assalomu alaykum,"
-"<br/> </t> Iltimos, \"<strong t-out=\"object.name or ''\">Stol oyoqlari "
+"if=\"partner.name\"> Assalomu alaykum, <t t-out=\"partner.name or ''\">"
+"Brandon Freeman</t>,<br/><br/> </t> <t t-else=\"\"> Assalomu alaykum,<br/> </"
+"t> Iltimos, \"<strong t-out=\"object.name or ''\">Stol oyoqlari "
 "muvozanatsiz</strong>\" nomli murojaat bo‘yicha ko‘rsatilgan xizmatlarimizni "
 "baholash uchun bir daqiqa vaqt ajrating. <t t-"
 "if=\"object._rating_get_operator().name\"> Bu murojaat <strong t-"
@@ -273,13 +318,13 @@ msgstr ""
 "href=\"/rate/{{ access_token }}/1\" t-att-class=\"'pe-none' if "
 "object._rating_get_operator() else ''\"> <img alt=\"Xafa\" src=\"/rating/"
 "static/src/img/rating_1.png\" title=\"Xafa\"/> </a> </td> </tr> </table> </"
-"td></tr> </table> </td></tr> <tr><td valign=\"top\" style=\"font-size: 14px;"
-"\"> Fikr-mulohazalaringiz uchun tashakkur. Bu bizga doimiy ravishda "
+"td></tr> </table> </td></tr> <tr><td valign=\"top\" style=\"font-size: "
+"14px;\"> Fikr-mulohazalaringiz uchun tashakkur. Bu bizga doimiy ravishda "
 "yaxshilanishimizga yordam beradi. <br/><br/><span style=\"margin: 0px 0px "
 "0px 0px; font-size: 12px; opacity: 0.5; color: #454748;\">Ushbu mijoz "
-"so‘rovnomasi sizning murojaatingiz <b t-out=\"object.stage_id.name or "
-"''\">Jarayonda</b> bosqichiga o‘tkazilganligi sababli yuborildi.</span> </"
-"td></tr> </tbody> </table> </div>"
+"so‘rovnomasi sizning murojaatingiz <b t-out=\"object.stage_id.name or ''\">"
+"Jarayonda</b> bosqichiga o‘tkazilganligi sababli yuborildi.</span> </td></"
+"tr> </tbody> </table> </div>"
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.new_ticket_request_email_template
@@ -316,47 +361,47 @@ msgid ""
 "    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
 "        <t t-if=\"hasattr(object.team_id, 'website_id') and "
 "object.team_id.use_website_helpdesk_form\">\n"
-"            <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size: 13px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain "
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain "
 "or '', object.get_portal_url())\" target=\"_blank\">View Ticket</a>\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
-"            <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size:13px;\" t-att-href=\"object.get_portal_url()\" "
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"object.get_portal_url()\" "
 "target=\"_blank\">View Ticket</a>\n"
 "        </t>\n"
 "        <t t-if=\"hasattr(object.team_id, 'website_id') and "
 "object.team_id.allow_portal_ticket_closing\">\n"
-"            <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size:13px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % "
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % "
 "(object.team_id.website_id.domain or '', object.id, object.access_token)\" "
 "target=\"_blank\">Close Ticket</a>\n"
 "        </t>\n"
 "        <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
-"            <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size:13px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, "
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, "
 "object.access_token)\" target=\"_blank\">Close Ticket</a>\n"
 "        </t>\n"
 "        <t t-if=\"object.team_id.use_website_helpdesk_forum or "
 "object.team_id.use_website_helpdesk_knowledge or "
 "object.team_id.use_website_helpdesk_slides\">\n"
-"            <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size:13px;\" t-att-href=\"object.team_id.feature_form_url\" "
+"            <a class=\"btn btn-fill-primary\" t-attf-style=\"background-"
+"color: {{object.company_id.email_secondary_color or 'rgb(113, 75, 103)'}}; "
+"padding: 5px 10px; text-decoration: none; color: "
+"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 4px; "
+"font-size: 14px;\" t-att-href=\"object.team_id.feature_form_url\" "
 "target=\"_blank\">Visit Help Center</a>\n"
 "        </t><br/><br/>\n"
 "    </div>\n"
@@ -366,13 +411,13 @@ msgid ""
 "</div>\n"
 "        "
 msgstr ""
-"<div> Hurmatli <t t-out=\"object.sudo().partner_id.name "
-"orobject.sudo().partner_name or'Xonim/Janob'\">Xonim/Janob</t>,<br/><br/>\n"
+"<div> Hurmatli <t t-out=\"object.sudo().partner_id.name orobject.sudo()"
+".partner_name or'Xonim/Janob'\">Xonim/Janob</t>,<br/><br/>\n"
 "\n"
 "Sizning <t t-if=\"hasattr(object.team_id, 'website_id') va "
 "object.get_portal_url()\">\n"
-"    <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/"
-"{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">Stol "
+"    <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/{{ "
+"object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">Stol "
 "oyoqlari notekis</a>\n"
 "</t> so‘rovingiz qabul qilindi va <t t-out=\"object.team_id.name or ''\">VIP "
 "xizmat ko‘rsatish</t> jamoamiz tomonidan ko‘rib chiqilmoqda.<br/><br/>\n"
@@ -380,13 +425,13 @@ msgstr ""
 "Sizning chiptangiz raqami: <strong><t t-out=\"object.ticket_ref or ''\">15</"
 "t></strong>.<br/><br/>\n"
 "\n"
-"Qo‘shimcha ma'lumot berish uchun, shunchaki ushbu xatga javob qaytaring.<br/"
-"><br/>\n"
+"Qo‘shimcha ma'lumot berish uchun, shunchaki ushbu xatga javob qaytaring.<br/>"
+"<br/>\n"
 "\n"
 "<t t-if=\"object.team_id.show_knowledge_base\">\n"
-"    Bizning <a t-attf-href=\"{{ object.team_id.get_knowledge_base_url() }}"
-"\">Yordam markazimiz</a>ga tashrif buyurishdan tortinmang. U yerda "
-"savolingizga javob topishingiz mumkin.<br/><br/>\n"
+"    Bizning <a t-attf-href=\"{{ object.team_id.get_knowledge_base_url() }}\">"
+"Yordam markazimiz</a>ga tashrif buyurishdan tortinmang. U yerda savolingizga "
+"javob topishingiz mumkin.<br/><br/>\n"
 "</t>\n"
 "\n"
 "<t t-if=\"object.team_id.allow_portal_ticket_closing\">\n"
@@ -397,46 +442,46 @@ msgstr ""
 "<div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
 "    <t t-if=\"hasattr(object.team_id, 'website_id') and "
 "object.team_id.use_website_helpdesk_form\">\n"
-"        <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"        <a t-attf-style=\"background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
+"8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size: 13px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain "
 "or '', object.get_portal_url())\" target=\"_blank\">Chiptani ko‘rish</a>\n"
 "    </t>\n"
 "    <t t-else=\"\">\n"
-"        <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
-"font-size:13px;\" t-att-href=\"object.get_portal_url()\" "
-"target=\"_blank\">Chiptani ko‘rish</a>\n"
+"        <a t-attf-style=\"background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
+"8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"font-size:13px;\" t-att-href=\"object.get_portal_url()\" target=\"_blank\">"
+"Chiptani ko‘rish</a>\n"
 "    </t>\n"
 "    <t t-if=\"hasattr(object.team_id, 'website_id') and "
 "object.team_id.allow_portal_ticket_closing\">\n"
-"        <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"        <a t-attf-style=\"background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
+"8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % "
 "(object.team_id.website_id.domain or '', object.id, object.access_token)\" "
 "target=\"_blank\">Chiptani yopish</a>\n"
 "    </t>\n"
 "    <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
-"        <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"        <a t-attf-style=\"background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
+"8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, "
 "object.access_token)\" target=\"_blank\">Chiptani yopish</a>\n"
 "    </t>\n"
 "    <t t-if=\"object.team_id.use_website_helpdesk_forum or "
 "object.team_id.use_website_helpdesk_knowledge or "
 "object.team_id.use_website_helpdesk_slides\">\n"
-"        <a t-attf-style=\"background-color: "
-"{{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
-"8px 16px; text-decoration: none; color: "
-"{{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
+"        <a t-attf-style=\"background-color: {"
+"{object.company_id.email_secondary_color or '#875A7B'}}; padding: 8px 16px "
+"8px 16px; text-decoration: none; color: {"
+"{object.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px; "
 "font-size:13px;\" t-att-href=\"object.team_id.feature_form_url\" "
 "target=\"_blank\">Yordam markaziga tashrif buyurish</a>\n"
 "    </t><br/><br/>\n"
@@ -448,76 +493,67 @@ msgstr ""
 "</div> "
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-envelope-o\" title=\"Domain alias\" role=\"img\" aria-"
-"label=\"Domain alias\"/>&amp;nbsp;"
-msgstr ""
-"<i class=\"fa fa-envelope-o\" title=\"Domain alias\" role=\"img\" aria-"
-"label=\"Domain alias\"/>"
-
-#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
-#, fuzzy
-msgid ""
-"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" "
-"invisible=\"rating_avg &lt; 3.66\" title=\"Happy\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-meh-o text-"
-"warning\" invisible=\"rating_avg &lt; 2.33 or rating_avg &gt;= 3.66\" "
-"title=\"Neutral\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-frown-o "
-"text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Unhappy\"/>"
+msgid "<i class=\"oi me-2\" data-icon=\"east\"/> Set an Alias Domain"
 msgstr ""
-"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" "
-"invisible=\"rating_avg &lt; 3.66\" title=\"Xursand\"/> <i class=\"fa fa-fw "
-"o_button_icon fa-meh-o text-warning\" invisible=\"rating_avg &lt; 2.33 or "
-"rating_avg &gt;= 3.66\" title=\"Befarq\"/> <i class=\"fa fa-fw o_button_icon "
-"fa-frown-o text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Xafa\"/>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-lg fa-clock-o me-2 mt-1\" aria-label=\"Sla Deadline\" "
-"title=\"Sla Deadline\"/>"
+"<i class=\"oi oi-fw o_button_icon text-success\" data-"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg &lt; 3.66\" "
+"title=\"Happy\"/>\n"
+"                            <i class=\"oi oi-fw o_button_icon text-warning\" "
+"data-icon=\"sentiment_neutral\" invisible=\"rating_avg &lt; 2.33 or "
+"rating_avg &gt;= 3.66\" title=\"Neutral\"/>\n"
+"                            <i class=\"oi oi-fw o_button_icon text-danger\" "
+"data-icon=\"sentiment_dissatisfied\" invisible=\"rating_avg &gt;= 2.33\" "
+"title=\"Unhappy\"/>"
 msgstr ""
-"<i class=\"fa fa-lg fa-clock-o me-2 mt-1\" aria-label=\"Sla muddati\" "
-"title=\"Sla muddati\"/>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-lightbulb-o\" role=\"img\"/><span class=\"ms-2\">To use an "
-"email alias, the first step is to configure an Alias Domain. You can achieve "
-"this by navigating to the General Settings and configuring the corresponding "
-"field.</span>"
+"<i class=\"oi oi-fw o_button_icon text-success\" data-"
+"icon=\"sentiment_satisfied\" invisible=\"rating_avg &lt; 3.66\" "
+"title=\"Happy\"/>\n"
+"                            <i class=\"oi oi-fw o_button_icon text-warning\" "
+"data-icon=\"sentiment_neutral\" invisible=\"rating_avg &lt; 2.33 or "
+"rating_avg &gt;= 3.66\" title=\"Neutral\"/>\n"
+"                            <i class=\"oi oi-fw o_button_icon text-danger\" "
+"data-icon=\"sentiment_sad\" invisible=\"rating_avg &gt;= 2.33\" "
+"title=\"Unhappy\"/>"
 msgstr ""
-"<i class=\"fa fa-lightbulb-o\" role=\"img\"/><span class=\"ms-2\">Elektron "
-"pochta taxallusidan foydalanish uchun avval taxallus domenini sozlash kerak. "
-"Buning uchun Umumiy sozlamalar bo‘limiga o‘tib, tegishli maydonni "
-"to‘ldirishingiz lozim.</span>"
+
+#. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
+msgid ""
+"<i class=\"oi oi-lg me-2 mt-1\" data-icon=\"schedule\" aria-label=\"Sla "
+"Deadline\" title=\"Sla Deadline\"/>"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-lightbulb-o\"/>\n"
+"<i class=\"oi\" data-icon=\"lightbulb\" role=\"img\"/><span "
+"class=\"ms-2\">To use an email alias, the first step is to configure an "
+"Alias Domain. You can achieve this by navigating to the General Settings and "
+"configuring the corresponding field.</span>"
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
+msgid ""
+"<i class=\"oi\" data-icon=\"lightbulb\"/>\n"
 "                                    <span class=\"ms-2\">A rating request "
-"will automatically be sent by email to the customer when their ticket "
-"reaches the corresponding stage with the email template set.</span>"
+"will be automatically sent to customers by email when their ticket reaches a "
+"stage where ratings are enabled.</span>"
 msgstr ""
-"<i class=\"fa fa-lightbulb-o\"/> <span class=\"ms-2\">Mijozning murojaat "
-"chiptasi belgilangan bosqichga yetganda, unga avtomatik tarzda elektron "
-"pochta orqali baholash so‘rovi yuboriladi.</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#, fuzzy
 msgid ""
-"<i class=\"fa fa-lightbulb-o\"/>\n"
+"<i class=\"oi\" data-icon=\"lightbulb\"/>\n"
 "                                <span class=\"ms-2\">\n"
 "                                    Type <b>/ticket</b> to create tickets<br/"
 ">\n"
@@ -525,27 +561,23 @@ msgid ""
 "tickets<br/>\n"
 "                                </span>"
 msgstr ""
-"<i class=\"fa fa-lightbulb-o\"/> <span class=\"ms-2\"> Murojaat chiptasi "
-"yaratish uchun <b>/ticket</b> deb yozing<br/> Murojaat chiptalarini qidirish "
-"uchun <b>/search_tickets</b> deb yozing<br/> </span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#, fuzzy
-msgid "<i class=\"fa fa-lightbulb-o\"/>&amp;nbsp;"
-msgstr "<i class=\"fa fa-lightbulb-o\"/>"
+msgid "<i class=\"oi\" data-icon=\"lightbulb\"/>&amp;nbsp;"
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
+msgid ""
+"<i class=\"oi\" data-icon=\"mail\" title=\"Domain alias\" role=\"img\" aria-"
+"label=\"Domain alias\"/>&amp;nbsp;"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#, fuzzy
-msgid "<i class=\"fa fa-warning\"/>&amp;nbsp;"
-msgstr "<i class=\"fa fa-warning\"/>"
-
-#. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#, fuzzy
-msgid "<i class=\"oi oi-arrow-right\"/> Set an Alias Domain"
-msgstr "<i class=\"oi oi-arrow-right\"/> Taxallus domenini o‘rnating"
+msgid "<i class=\"oi\" data-icon=\"warning\"/>&amp;nbsp;"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -570,18 +602,6 @@ msgstr "<small>#</small>"
 #, fuzzy
 msgid "<small>Stage:</small>"
 msgstr "<small>Bosqich:</small>"
-
-#. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
-#, fuzzy
-msgid ""
-"<span class=\"fa fa-exclamation-triangle text-warning oe_edit_only\" "
-"title=\"By saving this change, the customer phone number will also be "
-"updated.\" invisible=\"not is_partner_phone_update\"/>"
-msgstr ""
-"<span class=\"fa fa-exclamation-triangle text-warning oe_edit_only\" "
-"title=\"Ushbu o‘zgarishni saqlash orqali mijozning telefon raqami ham "
-"yangilanadi.\" invisible=\"not is_partner_phone_update\"/>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_activity
@@ -629,6 +649,14 @@ msgid "<span class=\"o_stat_text\">Rating</span>"
 msgstr "<span class=\"o_stat_text\">Reyting</span>"
 
 #. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
+msgid ""
+"<span class=\"oi text-warning oe_edit_only\" data-icon=\"warning\" "
+"title=\"By saving this change, the customer phone number will also be "
+"updated.\" invisible=\"not is_partner_phone_update\"/>"
+msgstr ""
+
+#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
 #, fuzzy
 msgid "<span class=\"text-muted text-nowrap\">Failed</span>"
@@ -657,6 +685,11 @@ msgstr "<span class=\"text-muted text-nowrap\">Shoshilinch</span>"
 #, fuzzy
 msgid "<span><b>Followers </b></span>"
 msgstr "<span><b>Kuzatuvchilar</b></span>"
+
+#. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
+msgid "<span>@</span>"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -700,9 +733,19 @@ msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
+msgid "<span>days before closure</span>"
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #, fuzzy
 msgid "<span>days of inactivity</span>"
 msgstr "<span>faoliyatsiz kunlar</span>"
+
+#. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
+msgid "<span>days</span>"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -732,6 +775,11 @@ msgid "<strong>Alias </strong>"
 msgstr "<strong>Taxallus</strong>"
 
 #. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
+msgid "<strong>Send</strong>"
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_defaults
 #, fuzzy
 msgid ""
@@ -758,12 +806,6 @@ msgstr "Xuddi shu nomdagi teg allaqachon mavjud."
 #, fuzzy
 msgid "About Team"
 msgstr "Guruh haqida"
-
-#. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#, fuzzy
-msgid "Accept Emails From"
-msgstr "Quyidagi manzildan xatlarni qabul qilish"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__access_warning
@@ -800,6 +842,11 @@ msgstr "Faoliyatlar"
 #, fuzzy
 msgid "Activity Exception Decoration"
 msgstr "Faoliyat istisnosi bezagi"
+
+#. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_plans_ids
+msgid "Activity Plans"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_state
@@ -848,6 +895,13 @@ msgid "Add details about this ticket..."
 msgstr "Ushbu chipta haqida batafsil ma'lumot qo‘shing..."
 
 #. module: helpdesk
+#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_2
+msgid ""
+"Add team-specific property fields to tickets to better customize your "
+"helpdesk management process."
+msgstr ""
+
+#. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
 #, fuzzy
@@ -878,6 +932,7 @@ msgstr "Sotuvdan keyingi xizmat"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__alias_id
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #, fuzzy
 msgid "Alias"
 msgstr "Taxallus"
@@ -982,7 +1037,6 @@ msgstr "Arxivlash bosqichlari"
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis_closed
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "Archived"
 msgstr "Arxivlangan"
@@ -998,6 +1052,11 @@ msgstr "Davom etishni xohlaysizmi?"
 #, fuzzy
 msgid "Are you sure you want to delete these stages?"
 msgstr "Ushbu bosqichlarni o‘chirishni istaysizmi?"
+
+#. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rating_active
+msgid "Ask for Ratings"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.action_helpdesk_tag_assignment
@@ -1072,9 +1131,13 @@ msgstr "Ilova soni"
 
 #. module: helpdesk
 #: model:res.groups,name:helpdesk.group_auto_assignment
-#, fuzzy
-msgid "Auto Assigment"
-msgstr "Avtomatik tayinlash"
+msgid "Auto Assignment"
+msgstr ""
+
+#. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_close_ticket_reminder
+msgid "Auto-Close Reminder"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -1212,6 +1275,18 @@ msgid "Campaign"
 msgstr "Kampaniya"
 
 #. module: helpdesk
+#: model:res.groups,comment:helpdesk.group_helpdesk_manager
+msgid ""
+"Can manage helpdesk teams and stages, with access to reporting and "
+"configuration."
+msgstr ""
+
+#. module: helpdesk
+#: model:res.groups,comment:helpdesk.group_helpdesk_user
+msgid "Can manage tickets in helpdesk teams they have access to."
+msgstr ""
+
+#. module: helpdesk
 #: model:helpdesk.stage,name:helpdesk.stage_cancelled
 #, fuzzy
 msgid "Cancelled"
@@ -1239,6 +1314,20 @@ msgstr ""
 #, fuzzy
 msgid "Channels"
 msgstr "Kanallar"
+
+#. module: helpdesk
+#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_1
+msgid ""
+"Check the stage tracker on tickets to quickly spot bottlenecks in your "
+"helpdesk workflow."
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_3
+msgid ""
+"Click the Kanban progress bar to quickly filter tickets by status within the "
+"current stage."
+msgstr ""
 
 #. module: helpdesk
 #. odoo-javascript
@@ -1360,12 +1449,6 @@ msgid "Commercial Entity"
 msgstr "Tijorat tashkiloti"
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
-#, fuzzy
-msgid "Communication history"
-msgstr "Muloqot tarixi"
-
-#. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_website_helpdesk_forum
 #, fuzzy
 msgid "Community Forum"
@@ -1373,11 +1456,6 @@ msgstr "Jamiyat forumi"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_res_company
-#, fuzzy
-msgid "Companies"
-msgstr "Kompaniyalar"
-
-#. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__company_id
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__company_id
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__company_id
@@ -1385,7 +1463,6 @@ msgstr "Kompaniyalar"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__company_id
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_search
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_search
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "Company"
 msgstr "Kompaniya"
@@ -1442,7 +1519,7 @@ msgid "Coupons"
 msgstr "Kuponlar"
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_report_analysis_view_search
 #, fuzzy
 msgid "Create Date"
 msgstr "Yaratilgan sana"
@@ -1547,7 +1624,7 @@ msgstr "Moslashtirilgan qaytarilgan xabar"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__partner_id
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__partner_id
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__partner_id
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_report_analysis_view_search
 #, fuzzy
 msgid "Customer"
 msgstr "Mijoz"
@@ -1593,17 +1670,11 @@ msgstr "Mijoz portali URL manzili"
 
 #. module: helpdesk
 #: model:ir.actions.act_window,name:helpdesk.rating_rating_action_helpdesk
-#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_rating
 #: model:ir.ui.menu,name:helpdesk.helpdesk_ticket_report_menu_ratings
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #, fuzzy
 msgid "Customer Ratings"
 msgstr "Mijozlar reytingi"
-
-#. module: helpdesk
-#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__partner_ids
-#, fuzzy
-msgid "Customers"
-msgstr "Mijozlar"
 
 #. module: helpdesk
 #. odoo-python
@@ -1723,9 +1794,6 @@ msgstr "Qisqacha mazmun"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
-#: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_confirmation_wizard
-#: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
-#: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_unarchive_wizard
 #, fuzzy
 msgid "Discard"
 msgstr "Bekor qilish"
@@ -1749,7 +1817,6 @@ msgstr "Chiptalarni teglar asosida taqsimlash"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__display_name
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__display_name
 #: model:ir.model.fields,field_description:helpdesk.field_ir_module_module__display_name
-#: model:ir.model.fields,field_description:helpdesk.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:helpdesk.field_mail_message__display_name
 #: model:ir.model.fields,field_description:helpdesk.field_portal_share__display_name
 #: model:ir.model.fields,field_description:helpdesk.field_rating_rating__display_name
@@ -1761,13 +1828,19 @@ msgid "Display Name"
 msgstr "Ko‘rsatiladigan nom"
 
 #. module: helpdesk
-#. odoo-python
-#: code:addons/helpdesk/models/digest.py:0
-#, fuzzy
-msgid "Do not have access, skip this data for user's digest email"
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
+msgid "Domain"
 msgstr ""
-"Kirish ruxsati yo‘q, foydalanuvchining qisqacha ma'lumotlari uchun bu "
-"ma'lumotlarni o‘tkazib yuborish"
+
+#. module: helpdesk
+#: model:ir.model.fields,help:helpdesk.field_helpdesk_sla__criteria_domain
+msgid "Domain to filter the tickets to which this SLA policy will be applied."
+msgstr ""
+
+#. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__duration_stage_tracking
+msgid "Duration Stage Tracking"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_team__assign_method__balanced
@@ -1791,6 +1864,7 @@ msgstr "Elektron pochta taxallusi"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__template_id
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__reminder_email_template_id
 #, fuzzy
 msgid "Email Template"
 msgstr "Elektron pochta andozasi"
@@ -1812,30 +1886,27 @@ msgstr ""
 "umumiy manzildan (Tizim parametrlarida belgilanganidek) yuboriladi."
 
 #. module: helpdesk
-#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__email_cc
-#, fuzzy
-msgid "Email cc"
-msgstr "Nusxa oluvchi elektron pochta"
-
-#. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_domain
 #, fuzzy
 msgid "Email domain e.g. 'example.com' in 'odoo@example.com'"
 msgstr "Elektron pochta domeni, masalan: 'odoo@example.com' da 'example.com'"
 
 #. module: helpdesk
-#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
-#, fuzzy
-msgid "Emails sent to"
-msgstr "Yuborilgan elektron pochta xabarlari"
+#: model:ir.model.fields,help:helpdesk.field_helpdesk_team__reminder_email_template_id
+msgid "Email template used for the auto-close reminder."
+msgstr ""
+
+#. module: helpdesk
+#: model:ir.model.fields,help:helpdesk.field_helpdesk_stage__rating_template_id
+msgid "Email template used to send rating requests for helpdesk tickets."
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
-#, fuzzy
-msgid "Emails sent to a Helpdesk Team alias generate tickets in your pipeline."
+msgid ""
+"Emails sent to your Helpdesk Team's email address automatically create "
+"tickets in your pipeline."
 msgstr ""
-"Yordam xizmati jamoasi taxallusiga yuborilgan xatlar sizning tizimingizda "
-"chiptalar yaratadi."
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.rating_ticket_request_email_template
@@ -1874,6 +1945,7 @@ msgstr "Qo‘shimcha ma'lumot"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_status__status__failed
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "Failed"
 msgstr "Muvaffaqiyatsiz"
@@ -1918,6 +1990,11 @@ msgid "First assignment date"
 msgstr "Birinchi tayinlash sanasi"
 
 #. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
+msgid "Fold by Default"
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__fold
 #, fuzzy
 msgid "Folded"
@@ -1930,7 +2007,7 @@ msgid "Follow All Team's Tickets"
 msgstr "Barcha jamoa chiptalarini kuzatish"
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.portal_my_home_helpdesk_ticket
+#: model:portal.entry,description:helpdesk.portal_helpdesk_ticket_entry
 #, fuzzy
 msgid "Follow all your helpdesk tickets"
 msgstr "Barcha yordam xizmati chiptalaringizni kuzatib boring"
@@ -1954,12 +2031,6 @@ msgstr "Kuzatuvchilar"
 #, fuzzy
 msgid "Followers (Partners)"
 msgstr "Kuzatuvchilar (Hamkorlar)"
-
-#. module: helpdesk
-#: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__activity_type_icon
-#, fuzzy
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font Awesome belgisi, masalan: fa-tasks"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis_closed
@@ -2061,7 +2132,7 @@ msgid "Grey Kanban Label"
 msgstr "Kulrang kanban yorlig‘i"
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_report_analysis_view_search
 #: model_terms:ir.ui.view,arch_db:helpdesk.team_rating_progress_data
 #, fuzzy
 msgid "Happy"
@@ -2106,6 +2177,7 @@ msgid "Help Center"
 msgstr "Yordam markazi"
 
 #. module: helpdesk
+#: model:ir.module.module,shortdesc:base.module_helpdesk
 #: model:ir.ui.menu,name:helpdesk.menu_helpdesk_root
 #: model:res.groups.privilege,name:helpdesk.res_groups_privilege_helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.digest_digest_view_form
@@ -2121,9 +2193,8 @@ msgstr "Texnik yordam xizmati umumiy ko‘rinishi"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_sla
-#, fuzzy
-msgid "Helpdesk SLA Policies"
-msgstr "Texnik yordam xizmati SLA siyosatlari"
+msgid "Helpdesk SLA Policy"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_stage
@@ -2138,16 +2209,15 @@ msgid "Helpdesk Stage Delete Wizard"
 msgstr "Texnik yordam xizmati bosqichini o‘chirish yordamchisi"
 
 #. module: helpdesk
+#: model:ir.model,name:helpdesk.model_helpdesk_tag
+msgid "Helpdesk Tag"
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model,name:helpdesk.model_helpdesk_tag_assignment
 #, fuzzy
 msgid "Helpdesk Tag Assignment"
 msgstr "Texnik yordam xizmati teg tayinlash"
-
-#. module: helpdesk
-#: model:ir.model,name:helpdesk.model_helpdesk_tag
-#, fuzzy
-msgid "Helpdesk Tags"
-msgstr "Texnik yordam xizmati teglari"
 
 #. module: helpdesk
 #. odoo-python
@@ -2205,6 +2275,11 @@ msgid "Helpdesk Tickets"
 msgstr "Texnik yordam xizmati murojaatlari"
 
 #. module: helpdesk
+#: model:mail.template,name:helpdesk.auto_close_reminder_email_template
+msgid "Helpdesk: Auto-Close Reminder"
+msgstr ""
+
+#. module: helpdesk
 #: model:mail.template,name:helpdesk.solved_ticket_request_email_template
 #, fuzzy
 msgid "Helpdesk: Ticket Closed"
@@ -2223,15 +2298,17 @@ msgid "Helpdesk: Ticket Received"
 msgstr "Texnik yordam xizmati: Murojaat qabul qilindi"
 
 #. module: helpdesk
-#. odoo-javascript
-#: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
-#, fuzzy
-msgid "High Priority"
-msgstr "Yuqori ustuvorlik"
+msgid "High"
+msgstr ""
 
 #. module: helpdesk
-#: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla__priority__2
+#. odoo-javascript
+#: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
+msgid "High Priority"
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__priority__2
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket__priority__2
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket_report_analysis__priority__2
@@ -2279,7 +2356,6 @@ msgstr "Birinchi javobgacha bo‘lgan soatlar"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__id
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__id
 #: model:ir.model.fields,field_description:helpdesk.field_ir_module_module__id
-#: model:ir.model.fields,field_description:helpdesk.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:helpdesk.field_mail_message__id
 #: model:ir.model.fields,field_description:helpdesk.field_portal_share__id
 #: model:ir.model.fields,field_description:helpdesk.field_rating_rating__id
@@ -2355,6 +2431,7 @@ msgstr ""
 #: model:helpdesk.stage,legend_normal:helpdesk.stage_on_hold
 #: model:helpdesk.stage,legend_normal:helpdesk.stage_solved
 #: model:helpdesk.stage,name:helpdesk.stage_in_progress
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
 #, fuzzy
 msgid "In Progress"
@@ -2377,6 +2454,11 @@ msgstr "Jarayonda"
 #, fuzzy
 msgid "Inactive Period(days)"
 msgstr "Nofaol davr (kunlar)"
+
+#. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_close_reminder_delay
+msgid "Inactive delay period(days)"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_team__privacy_visibility__invited_internal
@@ -2573,12 +2655,10 @@ msgstr "Mahalliy qismga asoslangan kiruvchi aniqlash"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
-#, fuzzy
-msgid "Low Priority"
-msgstr "Past ustuvorlik"
+msgid "Low"
+msgstr ""
 
 #. module: helpdesk
-#: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla__priority__0
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__priority__0
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket__priority__0
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket_report_analysis__priority__0
@@ -2610,6 +2690,11 @@ msgstr ""
 "ta'minlang.<br>"
 
 #. module: helpdesk
+#: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_sla__time
 #, fuzzy
 msgid ""
@@ -2631,30 +2716,18 @@ msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__medium_id
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "Medium"
 msgstr "O‘rta"
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
-#, fuzzy
-msgid "Medium Priority"
-msgstr "O‘rta ustuvorlik"
-
-#. module: helpdesk
-#: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla__priority__1
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__priority__1
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket__priority__1
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket_report_analysis__priority__1
 #, fuzzy
 msgid "Medium priority"
 msgstr "O‘rta ustuvorlik"
-
-#. module: helpdesk
-#: model:ir.model,name:helpdesk.model_ir_ui_menu
-#, fuzzy
-msgid "Menu"
-msgstr "Menyu"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_mail_message
@@ -2743,7 +2816,6 @@ msgstr "Chiptalarim"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__name
-#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__name
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_tag__name
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_tree
@@ -2754,7 +2826,7 @@ msgid "Name"
 msgstr "Nomi"
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_report_analysis_view_search
 #: model_terms:ir.ui.view,arch_db:helpdesk.team_rating_progress_data
 #, fuzzy
 msgid "Neutral"
@@ -2817,6 +2889,11 @@ msgid "Next Activity Type"
 msgstr "Keyingi faoliyat turi"
 
 #. module: helpdesk
+#: model:res.groups.privilege,placeholder:helpdesk.res_groups_privilege_helpdesk
+msgid "No"
+msgstr ""
+
+#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
 #, fuzzy
 msgid "No Customer"
@@ -2851,6 +2928,11 @@ msgstr "Faoliyat turlari topilmadi. Keling, birini yarataylik!"
 #, fuzzy
 msgid "No data yet!"
 msgstr "Hali ma'lumot yo‘q!"
+
+#. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
+msgid "No email"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_stage_action
@@ -3155,6 +3237,11 @@ msgid "Period of inactivity after which tickets will be automatically closed."
 msgstr "Murojaatnomalar avtomatik yopiladigan faolsizlik davri."
 
 #. module: helpdesk
+#: model:ir.model.fields,help:helpdesk.field_helpdesk_team__auto_close_reminder_delay
+msgid "Period of inactivity before the reminder is sent."
+msgstr ""
+
+#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
 #, fuzzy
 msgid "Phone"
@@ -3237,7 +3324,6 @@ msgid "Preview"
 msgstr "Ko‘rib chiqish"
 
 #. module: helpdesk
-#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__priority
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__priority
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
@@ -3252,7 +3338,15 @@ msgid "Properties"
 msgstr "Xususiyatlar"
 
 #. module: helpdesk
+#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_4
+msgid ""
+"Quickly identify tickets that have been stuck in the same stage for too long "
+"instead of progressing."
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model,name:helpdesk.model_rating_rating
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_report_analysis_view_search
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_tree
 #, fuzzy
 msgid "Rating"
@@ -3274,6 +3368,11 @@ msgstr "Baholash (1-5)"
 #, fuzzy
 msgid "Rating Avg Text"
 msgstr "O‘rtacha baholash matni"
+
+#. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__rating_template_id
+msgid "Rating Email"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__rating_last_feedback
@@ -3397,8 +3496,13 @@ msgstr "Pulni qaytarish"
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #, fuzzy
 msgid "Reimburse customers with a voucher code for future purchases"
+msgstr "Mijozlarga kelgusi xaridlar uchun kupon kodi bilan kompensatsiya qiling"
+
+#. module: helpdesk
+#: model:mail.template,description:helpdesk.auto_close_reminder_email_template
+msgid ""
+"Reminder sent to customers before their ticket is closed due to inactivity"
 msgstr ""
-"Mijozlarga kelgusi xaridlar uchun kupon kodi bilan kompensatsiya qiling"
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_repair
@@ -3474,8 +3578,13 @@ msgid "Rotting"
 msgstr "Chirish"
 
 #. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
+msgid "Rotting in"
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__sla_id
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_report_analysis_view_search
 #, fuzzy
 msgid "SLA"
 msgstr "SLA"
@@ -3492,7 +3601,6 @@ msgstr "SLA muddati"
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__sla_status__failed
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis_closed
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "SLA Failed"
 msgstr "SLA bajarilmadi"
@@ -3502,25 +3610,12 @@ msgstr "SLA bajarilmadi"
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_sla_action_main
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_sla
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__use_sla
-#: model:ir.model.fields,field_description:helpdesk.field_res_partner__sla_ids
-#: model:ir.model.fields,field_description:helpdesk.field_res_users__sla_ids
 #: model:ir.ui.menu,name:helpdesk.helpdesk_sla_menu_main
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_tree
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #, fuzzy
 msgid "SLA Policies"
 msgstr "SLA siyosatlari"
-
-#. module: helpdesk
-#: model:ir.model.fields,help:helpdesk.field_res_partner__sla_ids
-#: model:ir.model.fields,help:helpdesk.field_res_users__sla_ids
-#, fuzzy
-msgid ""
-"SLA Policies that will automatically apply to the tickets submitted by this "
-"customer."
-msgstr ""
-"Ushbu mijoz tomonidan yuborilgan chiptalarga avtomatik ravishda "
-"qo‘llaniladigan SLA siyosatlari"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_form
@@ -3545,6 +3640,7 @@ msgstr "SLA bosqichi"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__sla_status_ids
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__sla_status_ids
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_report_analysis_view_search
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "SLA Status"
 msgstr "SLA holati"
@@ -3578,7 +3674,6 @@ msgstr "SLA holati muvaffaqiyatli"
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__sla_status__reached
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "SLA Success"
 msgstr "SLA muvaffaqiyati"
@@ -3586,14 +3681,12 @@ msgstr "SLA muvaffaqiyati"
 #. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
-#, fuzzy
 msgid "SLA Success Rate"
-msgstr "SLA muvaffaqiyat darajasi"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__sla_status__ongoing
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "SLA in Progress"
 msgstr "SLA jarayonda"
@@ -3651,16 +3744,14 @@ msgstr "Tayinlangan shaxsda qidirish"
 #. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/controllers/portal.py:0
-#, fuzzy
-msgid "Search in Customer"
-msgstr "Mijozda qidirish"
+msgid "Search in Description"
+msgstr ""
 
 #. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/controllers/portal.py:0
-#, fuzzy
-msgid "Search in Helpdesk Team"
-msgstr "Yordam xizmati jamoasida qidirish"
+msgid "Search in Messages"
+msgstr ""
 
 #. module: helpdesk
 #. odoo-python
@@ -3703,6 +3794,13 @@ msgstr "Elektron xat yuborish"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
+msgid ""
+"Send an automatic reminder email to customers before their ticket is closed "
+"due to inactivity"
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #, fuzzy
 msgid "Send broken products for repair"
 msgstr "Buzilgan mahsulotlarni ta'mirlash uchun yuboring"
@@ -3738,9 +3836,8 @@ msgstr "Xizmat"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#, fuzzy
-msgid "Set an Email Template on Stages"
-msgstr "Bosqichlarda elektron xat andozasini o‘rnatish"
+msgid "Set Up Ratings on Stages"
+msgstr ""
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.solved_ticket_request_email_template
@@ -3775,12 +3872,6 @@ msgstr ""
 "Taqdimot va videolarni ulashing, ularni kurslarga joylashtiring. Mijozlarga "
 "yordam markazida savollariga javob topish uchun elektron ta'lim "
 "kurslaringizni qidirishga ruxsat bering."
-
-#. module: helpdesk
-#: model:res.groups,name:helpdesk.group_use_rating
-#, fuzzy
-msgid "Show Customer Ratings"
-msgstr "Mijozlar baholarini ko‘rsatish"
 
 #. module: helpdesk
 #: model:res.groups,name:helpdesk.group_use_sla
@@ -3834,6 +3925,11 @@ msgid "Stage Changed"
 msgstr "Bosqich o‘zgartirildi"
 
 #. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__name
+msgid "Stage Name"
+msgstr ""
+
+#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 #, fuzzy
 msgid "Stage Search"
@@ -3868,7 +3964,6 @@ msgstr ""
 #: code:addons/helpdesk/controllers/portal.py:0
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__sla_status
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_status__status
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "Status"
 msgstr "Holat"
@@ -3902,6 +3997,11 @@ msgid "Subject"
 msgstr "Mavzu"
 
 #. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
+msgid "Success"
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_ticket_action_7days_success
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__success_rate
 #, fuzzy
@@ -3929,13 +4029,11 @@ msgstr "Teg"
 
 #. module: helpdesk
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_tag_action
-#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__tag_ids
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__tag_ids
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__tag_ids
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__tag_ids
 #: model:ir.ui.menu,name:helpdesk.helpdesk_tag_menu
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tag_view_form
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 #, fuzzy
 msgid "Tags"
 msgstr "Teglar"
@@ -3991,6 +4089,14 @@ msgstr "Andozalar"
 
 #. module: helpdesk
 #. odoo-python
+#: code:addons/helpdesk/models/helpdesk_team.py:0
+msgid ""
+"The auto-close period must be longer than the reminder email delay. Please "
+"set a higher inactivity period or a shorter reminder delay."
+msgstr ""
+
+#. module: helpdesk
+#. odoo-python
 #: code:addons/helpdesk/models/helpdesk_ticket.py:0
 #, fuzzy
 msgid "The customer cannot belong to a different company than the ticket."
@@ -4035,24 +4141,14 @@ msgstr "Bu bosqichlarda sarflangan vaqt SLA hisobida inobatga olinmaydi."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
-#, fuzzy
-msgid "There are currently no Ticket for your account."
-msgstr "Hisobingizda hozircha chiptalar mavjud emas."
+msgid "There are currently no Tickets for your account."
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.ticket_creation
 #, fuzzy
 msgid "This"
 msgstr "Bu"
-
-#. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_form
-#, fuzzy
-msgid ""
-"This SLA Policy will apply to tickets matching ALL of the following criteria:"
-msgstr ""
-"Ushbu SLA siyosati quyidagi mezonlarning BARCHASIGA mos keladigan "
-"chiptalarga nisbatan qo‘llaniladi:"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__campaign_id
@@ -4158,9 +4254,10 @@ msgstr "Chipta yopildi"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.solved_ticket_request_email_template
-#, fuzzy
-msgid "Ticket Closed - Reference {{ object.id if object.id else 15 }}"
-msgstr "Chipta yopildi - Havola {{ object.id if object.id else 15 }}"
+msgid ""
+"Ticket Closed - Reference {{ object.ticket_ref if object.ticket_ref else "
+"15 }}"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__ticket_count
@@ -4249,10 +4346,12 @@ msgstr "Chipta yaratildi"
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_ticket_action_sla
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_ticket_action_team
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_ticket_action_unassigned
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__criteria_domain
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__ticket_ids
 #: model:ir.model.fields,field_description:helpdesk.field_res_partner__ticket_count
 #: model:ir.model.fields,field_description:helpdesk.field_res_users__ticket_count
 #: model:ir.ui.menu,name:helpdesk.helpdesk_ticket_menu_main
+#: model:portal.entry,name:helpdesk.portal_helpdesk_ticket_entry
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_form
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -4261,7 +4360,6 @@ msgstr "Chipta yaratildi"
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_list_analysis
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_tree
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
-#: model_terms:ir.ui.view,arch_db:helpdesk.portal_my_home_helpdesk_ticket
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_my_home_menu_helpdesk
 #, fuzzy
 msgid "Tickets"
@@ -4332,6 +4430,26 @@ msgid "Tip: Create tickets from incoming emails"
 msgstr "Maslahat: Kiruvchi xatlardan chiptalar yarating"
 
 #. module: helpdesk
+#: model:digest.tip,name:helpdesk.digest_tip_helpdesk_4
+msgid "Tip: Don't let stalled tickets slip under the radar"
+msgstr ""
+
+#. module: helpdesk
+#: model:digest.tip,name:helpdesk.digest_tip_helpdesk_3
+msgid "Tip: Filter your tickets with one click"
+msgstr ""
+
+#. module: helpdesk
+#: model:digest.tip,name:helpdesk.digest_tip_helpdesk_1
+msgid "Tip: Identify bottlenecks at a glance"
+msgstr ""
+
+#. module: helpdesk
+#: model:digest.tip,name:helpdesk.digest_tip_helpdesk_2
+msgid "Tip: Team-Specific Fields"
+msgstr ""
+
+#. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_my_ticket_action_no_create
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_action_main_my
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_action_main_tree
@@ -4351,7 +4469,6 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
-#: model_terms:ir.ui.view,arch_db:helpdesk.rating_rating_view_search_inherit_helpdesk
 #, fuzzy
 msgid "Today"
 msgstr "Bugun"
@@ -4407,6 +4524,11 @@ msgid "Track the time spent on tickets"
 msgstr "Chiptalarga sarflangan vaqtni kuzating"
 
 #. module: helpdesk
+#: model:ir.module.module,summary:base.module_helpdesk
+msgid "Track, prioritize, and solve customer tickets"
+msgstr ""
+
+#. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 #, fuzzy
@@ -4418,6 +4540,16 @@ msgstr "Ikki yulduz, maksimal uchta"
 #, fuzzy
 msgid "Type of the exception activity on record."
 msgstr "Yozuvdagi istisno faoliyat turi."
+
+#. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__utm_reference
+msgid "UTM Reference"
+msgstr ""
+
+#. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
+msgid "Unanswered"
+msgstr ""
 
 #. module: helpdesk
 #. odoo-python
@@ -4444,7 +4576,7 @@ msgid "Unassigned Tickets"
 msgstr "Tayinlanmagan chiptalar"
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_report_analysis_view_search
 #: model_terms:ir.ui.view,arch_db:helpdesk.team_rating_progress_data
 #, fuzzy
 msgid "Unhappy"
@@ -4458,15 +4590,8 @@ msgid "Unhappy face"
 msgstr "Norozi yuz"
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
-#, fuzzy
-msgid "Unread Messages"
-msgstr "O‘qilmagan xabarlar"
-
-#. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
-#: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla__priority__3
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__priority__3
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket__priority__3
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket_report_analysis__priority__3
@@ -4603,19 +4728,6 @@ msgid "Website Form"
 msgstr "Veb-sayt shakli"
 
 #. module: helpdesk
-#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__website_message_ids
-#, fuzzy
-msgid "Website Messages"
-msgstr "Veb-sayt xabarlari"
-
-#. module: helpdesk
-#: model:ir.model.fields,help:helpdesk.field_helpdesk_team__website_message_ids
-#: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__website_message_ids
-#, fuzzy
-msgid "Website communication history"
-msgstr "Veb-sayt aloqa tarixi"
-
-#. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__time
 #, fuzzy
 msgid "Within"
@@ -4679,6 +4791,11 @@ msgstr ""
 "Ushbu bosqichlardagi barcha murojaatlarni arxivdan chiqarishni xohlaysizmi?"
 
 #. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_twitter
+msgid "X"
+msgstr ""
+
+#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
 #, fuzzy
 msgid ""
@@ -4724,23 +4841,15 @@ msgid "You completed all your tickets on time."
 msgstr "Barcha murojaatlaringizni o‘z vaqtida yakunladingiz."
 
 #. module: helpdesk
-#. odoo-python
-#: code:addons/helpdesk/models/helpdesk_ticket.py:0
-#, fuzzy
-msgid "You have been invited to follow %s"
-msgstr "Siz %sni kuzatishga taklif qilindingiz"
-
-#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.ticket_invitation_follower
 #, fuzzy
 msgid "You have been invited to follow Ticket Document :"
 msgstr "Siz murojaatning hujjatini kuzatishga taklif qilindingiz:"
 
 #. module: helpdesk
-#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
-#, fuzzy
-msgid "alias"
-msgstr "taxallus"
+#: model:mail.template,subject:helpdesk.auto_close_reminder_email_template
+msgid "Your support ticket will be closed soon"
+msgstr ""
 
 #. module: helpdesk
 #. odoo-python
@@ -4775,22 +4884,26 @@ msgid "e.g. Product arrived damaged"
 msgstr "masalan, Mahsulot shikastlangan holda yetib keldi"
 
 #. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_stage_view_form
+msgid "e.g. Qualification"
+msgstr ""
+
+#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #, fuzzy
 msgid "e.g. mycompany.com"
 msgstr "masalan, mycompany.com"
 
 #. module: helpdesk
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
+msgid "e.g. support"
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_website_helpdesk_slides
 #, fuzzy
 msgid "eLearning"
 msgstr "Elektron ta'lim"
-
-#. module: helpdesk
-#: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
-#, fuzzy
-msgid "generate tickets in your pipeline."
-msgstr "pipelineingizda chiptalar yarating."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.ticket_creation
@@ -4832,8 +4945,8 @@ msgid ""
 "{{ object.company_id.name or object.user_id.company_id.name or "
 "'Helpdesk' }}: Service Rating Request"
 msgstr ""
-"{{ object.company_id.name or object.user_id.company_id.name or "
-"'Helpdesk' }}: Xizmat baholash so‘rovi"
+"{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk' }}"
+": Xizmat baholash so‘rovi"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.new_ticket_request_email_template
@@ -4847,3 +4960,35 @@ msgstr "{{ object.name }}"
 #, fuzzy
 msgid "👤 Unassigned"
 msgstr "👤 Tayinlanmagan"
+
+#, fuzzy
+#~ msgid "Auto Assigment"
+#~ msgstr "Avtomatik tayinlash"
+
+#, fuzzy
+#~ msgid "Unread Messages"
+#~ msgstr "O‘qilmagan xabarlar"
+
+#, fuzzy
+#~ msgid "Search in Customer"
+#~ msgstr "Mijozda qidirish"
+
+#, fuzzy
+#~ msgid "Search in Helpdesk Team"
+#~ msgstr "Yordam xizmati jamoasida qidirish"
+
+#, fuzzy
+#~ msgid "There are currently no Ticket for your account."
+#~ msgstr "Hisobingizda hozircha chiptalar mavjud emas."
+
+#, fuzzy
+#~ msgid "Website Messages"
+#~ msgstr "Veb-sayt xabarlari"
+
+#, fuzzy
+#~ msgid "Website communication history"
+#~ msgstr "Veb-sayt aloqa tarixi"
+
+#, fuzzy
+#~ msgid "Communication history"
+#~ msgstr "Muloqot tarixi"

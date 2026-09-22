@@ -43,8 +43,6 @@
                 <field name="payment_date" type="col"/>
                 <field name="commission" type="measure"/>
                 <field name="achieved" type="measure"/>
-                <field name="forecast" type="measure"/>
-                <field name="achieved_rate" type="measure"/>
                 <field name="target_amount" type="measure"/>
             </pivot>
         </field>
@@ -61,8 +59,11 @@
                 <filter string="My Commissions" name="my"
                             domain="[('user_id', '=', uid)]"/>
                 <separator/>
+                <filter string="Approved" name="filter_approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Done" name="filter_done" domain="[('state', '=', 'done')]"/>
+                <separator/>
                 <filter string="Active Plans" name="active_plans"
-                        domain="[('plan_id.date_from', '&lt;', 'today'), ('plan_id.date_to', '&gt;', 'today')]"/>
+                        domain="[('state', '=', 'approved'), ('plan_id.date_from', '&lt;', 'today'), ('plan_id.date_to', '&gt;', 'today')]"/>
                 <separator/>
                 <filter string="Period" name="filter_date_to" date="date_to"/>
                 <separator/>
@@ -112,20 +113,4 @@
         </field>
     </record>
 
-    <record id="sale_commission_action_my_report" model="ir.actions.act_window">
-        <field name="name">My Commissions</field>
-        <field name="res_model">sale.commission.report</field>
-        <field name="view_mode">list,graph,pivot</field>
-        <field name="context">{'commission_user_ids': uid, 'search_default_active_plans': 1, 'search_default_last_quarter': 1, 'search_default_this_quarter': 1}</field>
-        <field name="domain">[('user_id', '=', uid)]</field>
-        <field name="search_view_id" ref="sale_commission_report_view_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_neutral_face">
-                Unfortunately, there are no commissions for you
-            </p>
-            <p>
-                Ensure you are assigned to a commission plan and have made sales that qualify for commissions
-            </p>
-        </field>
-    </record>
 </odoo>

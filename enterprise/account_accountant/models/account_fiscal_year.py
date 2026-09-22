@@ -23,7 +23,7 @@ class AccountFiscalYear(models.Model):
     def _check_dates(self):
         '''
         Check interleaving between fiscal years.
-        There are 3 cases to consider:
+        Cases to consider:
 
         s1   s2   e1   e2
         (    [----)----]
@@ -33,6 +33,9 @@ class AccountFiscalYear(models.Model):
 
         s1   s2   e2   e1
         (    [----]    )
+
+        s2   s1   e1   e2
+        [----(    )----]
         '''
         for fy in self:
             # Starting date must be prior to the ending date
@@ -46,11 +49,22 @@ class AccountFiscalYear(models.Model):
             domain = [
                 ('id', '!=', fy.id),
                 ('company_id', '=', fy.company_id.id),
-                '|', '|',
-                '&', ('date_from', '<=', fy.date_from), ('date_to', '>=', fy.date_from),
-                '&', ('date_from', '<=', fy.date_to), ('date_to', '>=', fy.date_to),
-                '&', ('date_from', '<=', fy.date_from), ('date_to', '>=', fy.date_to),
+                ('date_from', '<=', fy.date_to),
+                ('date_to', '>=', fy.date_from),
             ]
 
             if self.search_count(domain) > 0:
                 raise ValidationError(_('You can not have an overlap between two fiscal years, please correct the start and/or end dates of your fiscal years.'))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        self.env.cr.cache.pop('cached_fiscalyears_by_company', None)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        self.env.cr.cache.pop('cached_fiscalyears_by_company', None)
+        return super().write(vals)
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_clear_fiscalyear_cache(self):
+        self.env.cr.cache.pop('cached_fiscalyears_by_company', None)

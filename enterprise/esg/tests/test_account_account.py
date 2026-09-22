@@ -5,6 +5,8 @@ from odoo.addons.esg.tests.esg_common import TestEsgCommon
 
 class TestAccountAccount(TestEsgCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_cannot_create_non_expense_account_from_esg(self):
         """Test that we cannot create an account from ESG that is not an expense account."""
         with self.assertRaises(UserError, msg='You can only create expense accounts from ESG.'):
@@ -18,7 +20,7 @@ class TestAccountAccount(TestEsgCommon):
         """Test that we cannot link a non-expense account to ESG assignation lines."""
         non_expense_account = self.env['account.account'].create({
             'name': 'Non Expense Account',
-            'code': '999998',
+            'code': '999997',
             'account_type': 'asset_current',
         })
         with self.assertRaises(UserError, msg='You can only assign expense accounts to ESG assignation lines.'):

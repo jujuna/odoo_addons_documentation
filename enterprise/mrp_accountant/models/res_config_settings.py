@@ -13,6 +13,7 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
         related='company_id.account_production_wip_account_id',
     )
+    account_production_wip_account_active = fields.Boolean(related='account_production_wip_account_id.active', string="WIP Account Active")
 
     account_production_wip_overhead_account_id = fields.Many2one(
         comodel_name='account.account',
@@ -20,3 +21,4 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
         related='company_id.account_production_wip_overhead_account_id',
     )
+    account_production_wip_overhead_account_active = fields.Boolean(related='account_production_wip_overhead_account_id.active', string="WIP Overhead Account Active")

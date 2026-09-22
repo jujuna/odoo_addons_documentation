@@ -1,16 +1,17 @@
-import { FormController } from '@web/views/form/form_controller';
+import { onWillStart } from "@odoo/owl";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
-import { preSuperSetupFolder } from "@documents/views/hooks";
+import { FormController } from "@web/views/form/form_controller";
 
 export class FolderFormController extends FormController {
     setup() {
-        preSuperSetupFolder();
         super.setup();
-        this.action = useService("action");
-        this.orm = useService("orm");
-        this.dialog = useService("dialog");
+
+        onWillStart(async () => {
+            this._deletionDelay = await this.orm.call("documents.document", "get_deletion_delay", [
+                [],
+            ]);
+        });
     }
 
     /**
@@ -22,14 +23,14 @@ export class FolderFormController extends FormController {
             duplicate: {
                 isAvailable: () => activeActions.create && activeActions.duplicate,
                 sequence: 30,
-                icon: "fa fa-clone",
+                icon: "content_copy",
                 description: _t("Duplicate"),
                 callback: () => this.duplicateRecord(),
             },
             unarchive: {
                 isAvailable: () => !this.model.root.data.active,
                 sequence: 20,
-                icon: "fa fa-history",
+                icon: "history",
                 description: _t("Restore"),
                 callback: () => this.model.root.unarchive(),
             },
@@ -37,7 +38,8 @@ export class FolderFormController extends FormController {
                 isAvailable: () =>
                     activeActions.delete && !this.model.root.isNew && this.model.root.data.active,
                 sequence: 40,
-                icon: "fa fa-trash-o",
+                icon: "delete",
+                iconClass: "oi-filled",
                 description: _t("Delete"),
                 callback: () => this.deleteRecord(),
                 skipSave: true,
@@ -55,7 +57,7 @@ export class FolderFormController extends FormController {
             [this.model.root.resId]
         );
         if (displayDialog) {
-            this.dialog.add(ConfirmationDialog, {
+            this.dialogService.add(ConfirmationDialog, {
                 title: _t("Move to trash?"),
                 body: _t(
                     "Files will be sent to trash and deleted forever after %s days.",
@@ -63,11 +65,9 @@ export class FolderFormController extends FormController {
                 ),
                 confirmLabel: _t("Move to trash"),
                 confirm: async () => {
-                    await this.orm.call(
-                        this.props.resModel,
-                        "action_archive",
-                        [this.model.root.resId]
-                    );
+                    await this.orm.call(this.props.resModel, "action_archive", [
+                        this.model.root.resId,
+                    ]);
                     this.env.config.historyBack();
                 },
                 cancel: () => {},

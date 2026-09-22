@@ -1,7 +1,7 @@
+import { onMounted } from "@odoo/owl";
 import { kanbanView } from "@web/views/kanban/kanban_view";
 import { KanbanHeader } from "@web/views/kanban/kanban_header";
 import { KanbanEditorRecord } from "@web_studio/client_action/view_editor/editors/kanban/kanban_editor_record";
-import { useRef, useEffect } from "@odoo/owl";
 import { SelectionHeaderButtons } from "../../interactive_editor/action_button/action_button";
 
 class KanbanEditorHeader extends KanbanHeader {
@@ -19,16 +19,7 @@ export class KanbanEditorRenderer extends kanbanView.Renderer {
 
     setup() {
         super.setup();
-        const rootRef = useRef("root");
-        useEffect(
-            (el) => {
-                if (!el) {
-                    return;
-                }
-                el.classList.add("o_web_studio_kanban_view_editor");
-            },
-            () => [rootRef.el]
-        );
+        onMounted(() => this.rootRef().classList.add("o_web_studio_kanban_view_editor"));
     }
 
     get canUseSortable() {

@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-16 05:27+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 02:05+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
 "documents_hr/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -24,12 +24,14 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
-msgstr "<i class=\"fa fa-download fa-fw\"/> تنزيل الملف"
+#: model:ir.module.module,description:base.module_documents_hr
+msgid ""
+"\n"
+"Easily access your documents from your employee profile.\n"
+msgstr ""
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
@@ -40,6 +42,11 @@ msgstr "<span class=\"o_form_label\">علامات التصنيف الافترا�
 #: model:documents.tag,name:documents_hr.documents_tag_absences
 msgid "Absences"
 msgstr "الغيابات"
+
+#. module: documents_hr
+#: model:ir.module.module,summary:base.module_documents_hr
+msgid "Access documents from the employee profile"
+msgstr ""
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
@@ -68,8 +75,8 @@ msgstr ""
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_res_company
-msgid "Companies"
-msgstr "الشركات"
+msgid "Company"
+msgstr ""
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_res_config_settings
@@ -77,8 +84,6 @@ msgid "Config Settings"
 msgstr "تهيئة الإعدادات"
 
 #. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
 #: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_contracts_tags
 msgid "Contracts"
 msgstr "العقود"
@@ -91,7 +96,6 @@ msgstr "العقود (الموارد البشرية)"
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_documents_document__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_documents_redirect__display_name
-#: model:ir.model.fields,field_description:documents_hr.field_documents_tag__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__display_name
 #: model:ir.model.fields,field_description:documents_hr.field_hr_version__display_name
@@ -106,36 +110,26 @@ msgid "Document"
 msgstr "المستند"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__document_count
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__document_count
-msgid "Document Count"
-msgstr "عدد المستندات"
-
-#. module: documents_hr
 #: model:ir.model,name:documents_hr.model_documents_redirect
 msgid "Document Redirect"
 msgstr "إعادة توجيه المستند"
 
 #. module: documents_hr
+#: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__document_count
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_public_view_form
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_view_form
 msgid "Documents"
 msgstr "المستندات"
 
 #. module: documents_hr
+#: model:ir.module.module,shortdesc:base.module_documents_hr
+msgid "Documents - HR"
+msgstr ""
+
+#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_contracts_tags
 msgid "Documents Hr Contracts Tags"
 msgstr "علامات تصنيف عقود الموارد البشرية للمستندات"
-
-#. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_settings
-msgid "Documents Hr Settings"
-msgstr "إعدادات الموارد البشرية للمستندات"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "Download file"
-msgstr "تنزيل الملف"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_employee
@@ -178,8 +172,28 @@ msgid "Employees Subfolders"
 msgstr ""
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__hr_employee_contract_folder_id
-msgid "HR Employee Contract Folder"
+#: model:ir.model.fields,help:documents_hr.field_res_company__documents_hr_group_id
+#: model:ir.model.fields,help:documents_hr.field_res_config_settings__documents_hr_group_id
+msgid ""
+"Group given editor access on the employees folders created from now on. "
+"Changing it does not affect the existing folders."
+msgstr ""
+
+#. module: documents_hr
+#. odoo-python
+#: code:addons/documents_hr/models/res_company.py:0
+msgid "HR (%(company_name)s)"
+msgstr ""
+
+#. module: documents_hr
+#: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
+msgid "HR Access Group"
+msgstr ""
+
+#. module: documents_hr
+#: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_group_id
+#: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_group_id
+msgid "HR Documents Default Group"
 msgstr ""
 
 #. module: documents_hr
@@ -188,14 +202,8 @@ msgid "HR Employee Folder"
 msgstr "مجلد الموارد البشرية للموظف"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_settings
-msgid "Human Resources"
-msgstr "الموارد البشرية"
-
-#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_documents_document__id
 #: model:ir.model.fields,field_description:documents_hr.field_documents_redirect__id
-#: model:ir.model.fields,field_description:documents_hr.field_documents_tag__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_employee_public__id
 #: model:ir.model.fields,field_description:documents_hr.field_hr_version__id
@@ -207,13 +215,8 @@ msgstr "المُعرف"
 #. module: documents_hr
 #. odoo-python
 #: code:addons/documents_hr/models/documents_document.py:0
-msgid "Impossible to delete employee folder or employee 'Contract' folder"
+msgid "Impossible to delete an employee folder"
 msgstr ""
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "My documents"
-msgstr "مستنداتي"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_employee_public
@@ -221,19 +224,10 @@ msgid "Public Employee"
 msgstr "موظف في القطاع العام"
 
 #. module: documents_hr
-#: model:documents.tag,name:documents_hr.document_tag_signature_request
-msgid "Signature Request"
-msgstr "طلب التوقيع"
-
-#. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
-msgid "Size:"
-msgstr "الحجم:"
-
-#. module: documents_hr
-#: model:ir.model,name:documents_hr.model_documents_tag
-msgid "Tag"
-msgstr "علامة تصنيف"
+#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__document_count
+#: model:ir.model.fields,field_description:documents_hr.field_hr_version__document_count
+msgid "Related Document Count"
+msgstr ""
 
 #. module: documents_hr
 #. odoo-python
@@ -241,110 +235,37 @@ msgstr "علامة تصنيف"
 msgid "You cannot access the employee's folder."
 msgstr ""
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/documents_tag.py:0
-msgid ""
-"You cannot delete this tag as it is used to link employee contracts and "
-"signatures."
-msgstr ""
-"لا يمكنك حذف علامة التصنيف هذه لأنها تُستخدم لربط عقود الموظفين وتوقيعاتهم."
+#~ msgid "<i class=\"oi oi-fw\" data-icon=\"download\"/> Download file"
+#~ msgstr "<i class=\"oi oi-fw\" data-icon=\"download\"/> تنزيل الملف"
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
-msgid ""
-"You must configure the HR Employee folder in document settings to use "
-"Document's features."
-msgstr ""
-"عليك تهيئة مجلد موظف الموارد البشرية في إعدادات المستند حتى تتمكن من خصائص "
-"تطبيق المستندات."
+#~ msgid "Document Count"
+#~ msgstr "عدد المستندات"
 
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
-msgid ""
-"You must have a contact linked to the employee in order to use Document's "
-"features."
-msgstr ""
-"يجب أن تكون لديك جهة اتصال مرتبطة بالموظف حتى تتمكن من استخدام خصائص تطبيق "
-"المستندات."
+#~ msgid "Documents Hr Settings"
+#~ msgstr "إعدادات الموارد البشرية للمستندات"
 
-#~ msgid ""
-#~ "<span name=\"documents_hr_tags\" class=\"o_form_label\" invisible=\"1\" "
-#~ "attrs=\"{'invisible' : [('documents_hr_settings', '=', False)]}\">\n"
-#~ "                                Default tags\n"
-#~ "                            </span>"
-#~ msgstr ""
-#~ "<span name=\"documents_hr_tags\" class=\"o_form_label\" invisible=\"1\" "
-#~ "attrs=\"{'invisible' : [('documents_hr_settings', '=', False)]}\">\n"
-#~ "                                علامات التصنيف الافتراضية\n"
-#~ "                            </span>"
+#~ msgid "Download file"
+#~ msgstr "تنزيل الملف"
 
-#~ msgid "Departure Wizard"
-#~ msgstr "معالج المغادرة"
-
-#~ msgid "Documents Share"
-#~ msgstr "مشاركة المستندات"
-
-#~ msgid ""
-#~ "Employee's private email must be set to use \"Send Access Link\" "
-#~ "function:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "يجب أن يتم إعداد البريد الإلكتروني الخاص للموظف لاستخدام وظيفة \"إرسال "
-#~ "رابط الوصول\": \n"
-#~ "%s"
-
-#~ msgid "HR"
+#~ msgid "Human Resources"
 #~ msgstr "الموارد البشرية"
 
-#~ msgid "HR Documents: %s"
-#~ msgstr "مستندات الموارد البشرية: %s "
+#~ msgid "My documents"
+#~ msgstr "مستنداتي"
 
-#~ msgid "HR: Document Access Link"
-#~ msgstr "الموارد البشرية: رابط الوصول إلى المستند "
-
-#~ msgid "Private Email"
-#~ msgstr "بريد الكتروني خاص"
-
-#~ msgid "Send Access Link"
-#~ msgstr "إرسال الرابط الوصول"
-
-#~ msgid "Send HR Documents Access Link"
-#~ msgstr "إرسال رابط الوصول إلى مستندات المواد البشرية "
+#~ msgid "Size:"
+#~ msgstr "الحجم:"
 
 #~ msgid ""
-#~ "Send a share link to the private email of the employee with all the HR "
-#~ "files he owns in Documents app"
+#~ "You must configure the HR Employee folder in document settings to use "
+#~ "Document's features."
 #~ msgstr ""
-#~ "قم بإرسال رابط مشاركة إلى البريد الإلكتروني الخاص للموظف، يحتوي على كافة "
-#~ "ملفات الموارد البشرية إذا كان لديه تطبيق المستندات "
-
-#~ msgid "Sent manually when recording an employee departure"
-#~ msgstr "يتم إرساله يدويًا عند تسجيل ملف الموظف الاقلاع"
-
-#~ msgid "The access link has been sent to the employee."
-#~ msgstr "وصول الرابط تم إرسالها إلى الموظف"
-
-#~ msgid "User"
-#~ msgstr "المستخدم"
-
-#~ msgid "Workspace"
-#~ msgstr "مساحة العمل"
+#~ "عليك تهيئة مجلد موظف الموارد البشرية في إعدادات المستند حتى تتمكن من "
+#~ "خصائص تطبيق المستندات."
 
 #~ msgid ""
-#~ "You must set a private address on the Employee in order to use Document's "
+#~ "You must have a contact linked to the employee in order to use Document's "
 #~ "features."
 #~ msgstr ""
-#~ "عليك تعيين عنوان خاص في تطبيق الموظفين حتى تتمكن من استخدام خصائص "
-#~ "المستندات. "
-
-#~ msgid "hr Workspace"
-#~ msgstr "مساحة عمل الموارد البشرية "
-
-#~ msgid "hr default workspace"
-#~ msgstr "مساحة العمل الافتراضية للموارد البشرية"
-
-#~ msgid "{{ object.name }}, your personal documents access link is available"
-#~ msgstr "{{ object.name }}, صفحتك الشخصية مستندات التمكن من الرابط متاح"
+#~ "يجب أن تكون لديك جهة اتصال مرتبطة بالموظف حتى تتمكن من استخدام خصائص "
+#~ "تطبيق المستندات."

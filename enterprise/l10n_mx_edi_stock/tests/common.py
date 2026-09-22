@@ -3,11 +3,18 @@ from odoo.addons.l10n_mx_edi_extended.tests.common import TestMxExtendedEdiCommo
 
 
 class TestMXEdiStockCommon(TestMxExtendedEdiCommon):
+
+    _test_user_groups = (
+        'stock.group_stock_manager',  # Needed to be able to generate Remolque nodes of CFDI
+        'base.group_system',
+        'fleet.fleet_group_user',
+    )
+
+    _test_user_name = "Test MX Stock User"
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env.user.group_ids += cls.env.ref('fleet.fleet_group_user')
-
         cls.customer_location = cls.env.ref('stock.stock_location_customers')
 
         cls.custom_regime_imd = cls.env.ref('l10n_mx_edi_stock.l10n_mx_edi_customs_regime_imd')
@@ -30,13 +37,35 @@ class TestMXEdiStockCommon(TestMxExtendedEdiCommon):
             'l10n_mx_edi_operator_licence': 'a234567890',
         })
 
+        cls.other_operator_pedro = cls.env['res.partner'].create({
+            'name': 'Other Amigo Pedro',
+            'vat': 'VAAM130719H60',
+            'street': 'JESUS VALDES SANCHEZ',
+            'city': 'Arteaga',
+            'country_id': cls.env.ref('base.mx').id,
+            'state_id': cls.env.ref('base.state_mx_coah').id,
+            'zip': '25350',
+            'l10n_mx_edi_operator_licence': 'c654327890',
+        })
+
+        cls.other_operator_pedro_2 = cls.env['res.partner'].create({
+            'name': 'Other Amigo Pedro 2',
+            'vat': 'VAAM130719H60',
+            'street': 'JESUS VALDES SANCHEZ',
+            'city': 'Arteaga',
+            'country_id': cls.env.ref('base.mx').id,
+            'state_id': cls.env.ref('base.state_mx_coah').id,
+            'zip': '25350',
+            'l10n_mx_edi_operator_licence': 'b114567890',
+        })
+
         cls.model = cls.env['fleet.vehicle.model'].sudo().create({
             'name': 'Clio',
             'brand_id': cls.env.ref('fleet.brand_renault').id,
             'model_year': '2023'
         })
 
-        cls.vehicle_pedro = cls.env['fleet.vehicle'].create({
+        cls.vehicle_pedro = cls.env['fleet.vehicle'].sudo().create({
             'model_id': cls.model.id,
             'l10n_mx_transport_insurer': 'DEMO INSURER',
             'l10n_mx_transport_insurance_policy': 'DEMO POLICY',
@@ -58,8 +87,11 @@ class TestMXEdiStockCommon(TestMxExtendedEdiCommon):
             ],
         })
 
-    def _create_warehouse(self, **kwargs):
-        return self.env['stock.warehouse'].create({
+        cls.mx_warehouse = cls._create_warehouse()
+
+    @classmethod
+    def _create_warehouse(cls, **kwargs):
+        return cls.env['stock.warehouse'].sudo().create({
             'name': 'New Warehouse',
             'reception_steps': 'one_step',
             'delivery_steps': 'ship_only',
@@ -67,8 +99,9 @@ class TestMXEdiStockCommon(TestMxExtendedEdiCommon):
             **kwargs,
         })
 
-    def _create_picking(self, warehouse, outgoing=True, picking_vals=None, move_vals=None):
+    def _create_picking(self, warehouse=None, outgoing=True, picking_vals=None, move_vals=None):
         picking_vals = picking_vals or {}
+        warehouse = warehouse or self.mx_warehouse
         picking = self.env['stock.picking'].create({
             'location_id': warehouse.lot_stock_id.id,
             'location_dest_id': self.customer_location.id,
@@ -86,7 +119,7 @@ class TestMXEdiStockCommon(TestMxExtendedEdiCommon):
         self.env['stock.move'].create({
             'product_id': self.product.id,
             'product_uom_qty': 10,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'picking_id': picking.id,
             'location_id': warehouse.lot_stock_id.id,
             'location_dest_id': self.customer_location.id,

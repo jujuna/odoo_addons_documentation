@@ -2,8 +2,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields
+from odoo.tests import tagged
+
 from odoo.addons.approvals_purchase_stock.tests.common import TestApprovalsCommon
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestApprovalsPurchaseStock(TestApprovalsCommon):
 
     def test_warehouse_01(self):

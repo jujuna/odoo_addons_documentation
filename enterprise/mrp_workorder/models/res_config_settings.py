@@ -9,7 +9,13 @@ class ResConfigSettings(models.TransientModel):
 
     group_mrp_wo_tablet_timer = fields.Boolean("Timer", implied_group="mrp_workorder.group_mrp_wo_tablet_timer")
     group_mrp_wo_shop_floor = fields.Boolean("Shop Floor", implied_group="mrp_workorder.group_mrp_wo_shop_floor")
-    wo_shop_floor_maximum_card_count = fields.Integer("Maximum number of cards per page", default=40, config_parameter="mrp_workorder.wo_shop_floor_maximum_card_count")
+    wo_shop_floor_maximum_card_count = fields.Integer("Maximum number of cards per page", default=40,
+        config_parameter="mrp_workorder.wo_shop_floor_maximum_card_count")
+
+    _check_wo_shop_floor_maximum_card_count = models.Constraint(
+        'CHECK(wo_shop_floor_maximum_card_count > 0)',
+        "The maximum number of cards per page should be positive.",
+    )
 
     def set_values(self):
         super().set_values()

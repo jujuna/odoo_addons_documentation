@@ -1,7 +1,7 @@
 
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
+from odoo import api, fields, models, _
 
 
 class QualitySpreadsheetTemplate(models.Model):
@@ -22,7 +22,7 @@ class QualitySpreadsheetTemplate(models.Model):
         "specified, the first sheet is selected by default.",
     )
 
-    def get_formview_action(self, access_uid=None):
+    def get_record_default_action(self, access_uid=None):
         return self.action_open_spreadsheet()
 
     def action_open_spreadsheet(self):
@@ -38,3 +38,13 @@ class QualitySpreadsheetTemplate(models.Model):
         data = super()._get_spreadsheet_metadata(access_token)
         data['quality_check_cell'] = self.check_cell
         return data
+
+    @api.model
+    def _get_spreadsheet_selector(self):
+        if self.search_count([], limit=1):
+            return {
+                'model': self._name,
+                'display_name': _("Quality templates"),
+                'sequence': 30,
+                'allow_create': False,
+            }

@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models, fields, _
+from odoo import models, fields
 
 
 class ResPartner(models.Model):
@@ -8,42 +8,42 @@ class ResPartner(models.Model):
     l10n_br_activity_sector = fields.Selection(
         string="Main Activity Sector",
         selection=[
-            ("armedForces", "armedForces"),
-            ("auctioneer", "auctioneer"),
-            ("audiovisualIndustry", "audiovisualIndustry"),
-            ("bondedWarehouse", "bondedWarehouse"),
-            ("broadcastingIndustry", "broadcastingIndustry"),
-            ("construction", "construction"),
-            ("coops", "coops"),
-            ("distributor", "distributor"),
-            ("distributionCenter", "distributionCenter"),
-            ("electricityDistributor", "electricityDistributor"),
-            ("energyGeneration", "energyGeneration"),
-            ("extractor", "extractor"),
-            ("farmCoop", "farmCoop"),
-            ("filmIndustry", "filmIndustry"),
-            ("finalConsumer", "finalConsumer"),
-            ("fuelDistributor", "fuelDistributor"),
-            ("generalWarehouse", "generalWarehouse"),
-            ("importer", "importer"),
-            ("industry", "industry"),
-            ("itaipubiNacional", "itaipubiNacional"),
-            ("maritimeService", "maritimeService"),
-            ("mealSupplier", "mealSupplier"),
-            ("nonProfitEntity", "nonProfitEntity"),
-            ("pharmaDistributor", "pharmaDistributor"),
-            ("publicAgency", "publicAgency"),
-            ("religiousEstablishment", "religiousEstablishment"),
-            ("retail", "retail"),
-            ("ruralProducer", "ruralProducer"),
-            ("securityPublicAgency", "securityPublicAgency"),
-            ("service", "service"),
-            ("stockWarehouse", "stockWarehouse"),
-            ("telco", "telco"),
-            ("transporter", "transporter"),
-            ("waterDistributor", "waterDistributor"),
-            ("wholesale", "wholesale"),
-            ("commerce", "commerce"),
+            ("armedForces", "Armed Forces"),
+            ("auctioneer", "Auctioneer"),
+            ("audiovisualIndustry", "Audiovisual Industry"),
+            ("bondedWarehouse", "Bonded Warehouse"),
+            ("broadcastingIndustry", "Broadcasting Industry"),
+            ("construction", "Construction"),
+            ("coops", "Coops"),
+            ("distributor", "Distributor"),
+            ("distributionCenter", "Distribution Center"),
+            ("electricityDistributor", "Electricity Distributor"),
+            ("energyGeneration", "Energy Generation"),
+            ("extractor", "Extractor"),
+            ("farmCoop", "Farm Coop"),
+            ("filmIndustry", "Film Industry"),
+            ("finalConsumer", "Final Consumer"),
+            ("fuelDistributor", "Fuel Distributor"),
+            ("generalWarehouse", "General Warehouse"),
+            ("importer", "Importer"),
+            ("industry", "Industry"),
+            ("itaipubiNacional", "Itaipu Binacional"),
+            ("maritimeService", "Maritime Service"),
+            ("mealSupplier", "Meal Supplier"),
+            ("nonProfitEntity", "Non Profit Entity"),
+            ("pharmaDistributor", "Pharma Distributor"),
+            ("publicAgency", "Public Agency"),
+            ("religiousEstablishment", "Religious Establishment"),
+            ("retail", "Retail"),
+            ("ruralProducer", "Rural Producer"),
+            ("securityPublicAgency", "Security Public Agency"),
+            ("service", "Service"),
+            ("stockWarehouse", "Stock Warehouse"),
+            ("telco", "Telco"),
+            ("transporter", "Transporter"),
+            ("waterDistributor", "Water Distributor"),
+            ("wholesale", "Wholesale"),
+            ("commerce", "Commerce"),
         ],
         help="Brazil: List of main Activity Sectors of the contact"
     )
@@ -59,14 +59,14 @@ class ResPartner(models.Model):
     l10n_br_tax_regime = fields.Selection(
         string="Tax Regime",
         selection=[
-            ("realProfit", "realProfit"),
-            ("estimatedProfit", "estimatedProfit"),
-            ("simplified", "simplified"),
-            ("simplifiedOverGrossthreshold", "simplifiedOverGrossthreshold"),
-            ("simplifiedEntrepreneur", "simplifiedEntrepreneur"),
-            ("notApplicable", "notApplicable"),
-            ("individual", "individual"),
-            ("variable", "variable"),
+            ("realProfit", "Real Profit"),
+            ("estimatedProfit", "Estimated Profit"),
+            ("simplified", "Simplified"),
+            ("simplifiedOverGrossthreshold", "Simplified over Gross Threshold"),
+            ("simplifiedEntrepreneur", "Simplified Entrepreneur"),
+            ("notApplicable", "Not Applicable"),
+            ("individual", "Individual"),
+            ("variable", "Variable"),
         ],
         help="Brazil: Contact FederalTax Regime"
     )
@@ -107,13 +107,18 @@ class ResPartner(models.Model):
         }
 
     def _l10n_br_avatax_action_missing_fields(self):
-        """A list view for filling in missing fields required for Avatax Brazil."""
-        return {
-            "name": _("Contacts"),
+        """Open the partner(s) with fields missing for Avatax Brazil: the form for a single
+        partner, the Brazil-specific list for several."""
+        action = {
             "type": "ir.actions.act_window",
             "res_model": "res.partner",
-            "domain": [("id", "in", self.ids)],
-            "view_mode": "list",
-            "views": [(self.env.ref("l10n_br_avatax.res_partner_view_list").id, "list"), (False, "form")],
             "context": {"create": False, "delete": False},
         }
+        if len(self) == 1:
+            action["res_id"] = self.id
+            action["views"] = [(False, "form")]
+        else:
+            action["name"] = self.env._("Contacts")
+            action["domain"] = [("id", "in", self.ids)]
+            action["views"] = [(self.env.ref("l10n_br_avatax.res_partner_view_list").id, "list"), (False, "form")]
+        return action

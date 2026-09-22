@@ -2,6 +2,8 @@ from odoo.addons.point_of_sale.tests.common import CommonPosTest
 
 
 class CommonPosBrEdiTest(CommonPosTest):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(self):
         super().setUpClass()
@@ -13,7 +15,7 @@ class CommonPosBrEdiTest(CommonPosTest):
         journal_id = self.env['account.journal'].create({
             "type": "general",
             "name": "Point of Sale - Test",
-            "code": "POSS - Test",
+            "code": "POSS-T",
             "sequence": 20,
         })
         self.pos_config_usd.write({

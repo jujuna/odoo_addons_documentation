@@ -23,8 +23,8 @@ class SocialMedia(models.Model):
         if self.media_type != 'youtube':
             return super()._action_add_account()
 
-        youtube_oauth_client_id = self.env['ir.config_parameter'].sudo().get_param('social.youtube_oauth_client_id')
-        youtube_oauth_client_secret = self.env['ir.config_parameter'].sudo().get_param('social.youtube_oauth_client_secret')
+        youtube_oauth_client_id = self.env['ir.config_parameter'].sudo().get_str('social.youtube_oauth_client_id')
+        youtube_oauth_client_secret = self.env['ir.config_parameter'].sudo().get_str('social.youtube_oauth_client_secret')
         if youtube_oauth_client_id and youtube_oauth_client_secret:
             return self._add_youtube_accounts_from_configuration(youtube_oauth_client_id)
         else:
@@ -41,7 +41,7 @@ class SocialMedia(models.Model):
         base_youtube_url = 'https://accounts.google.com/o/oauth2/v2/auth?%s'
         params = {
             'client_id': youtube_oauth_client_id,
-            'redirect_uri': url_join(self.get_base_url(), "social_youtube/callback"),
+            'redirect_uri': url_join(self.get_base_url(), '/social/youtube/start_auth_process'),
             'response_type': 'code',
             'scope': ' '.join([
                 'https://www.googleapis.com/auth/youtube.force-ssl',
@@ -51,22 +51,16 @@ class SocialMedia(models.Model):
             'prompt': 'consent',
         }
 
-        return {
-            'type': 'ir.actions.act_url',
-            'url': base_youtube_url % url_encode(params),
-            'target': 'self'
-        }
+        return base_youtube_url % url_encode(params)
 
     def _add_youtube_accounts_from_iap(self):
-        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_param(
-            'social.social_iap_endpoint',
-            self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
-        )
+        social_iap_endpoint = self.env['ir.config_parameter'].sudo().get_str(
+            'social.social_iap_endpoint') or self.env['social.media']._DEFAULT_SOCIAL_IAP_ENDPOINT
 
         iap_add_accounts_url = requests.get(url_join(social_iap_endpoint, 'api/social/youtube/1/add_accounts'),
             params={
-                'returning_url': url_join(self.get_base_url(), 'social_youtube/callback'),
-                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+                'returning_url': url_join(self.get_base_url(), '/social/youtube/start_auth_process'),
+                'db_uuid': self.env['ir.config_parameter'].sudo().get_str('database.uuid')
             },
             timeout=5
         ).text
@@ -79,11 +73,7 @@ class SocialMedia(models.Model):
         elif iap_add_accounts_url == 'youtube_missing_configuration':
             raise UserError(_("The url that this service requested returned an error. Please contact the author of the app."))
 
-        return {
-            'type': 'ir.actions.act_url',
-            'url': iap_add_accounts_url,
-            'target': 'self'
-        }
+        return iap_add_accounts_url
 
     @api.model
     def _format_youtube_comment(self, youtube_comment):

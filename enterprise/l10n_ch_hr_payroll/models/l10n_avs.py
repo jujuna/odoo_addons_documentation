@@ -16,7 +16,7 @@ class L10nChSocialInsurance(models.Model):
     def _get_default_avs_line_ids(self):
         vals = [
             (0, 0, {
-                'date_from': fields.Date.today().replace(month=1, day=1),
+                'date_from': fields.Date.context_today(self).replace(month=1, day=1),
                 'employer_rate': 5.3,
                 'employee_rate': 5.3,
                 'admin_fees': 1.2,
@@ -28,7 +28,7 @@ class L10nChSocialInsurance(models.Model):
     def _get_default_ac_line_ids(self):
         vals = [
             (0, 0, {
-                'date_from': fields.Date.today().replace(month=1, day=1),
+                'date_from': fields.Date.context_today(self).replace(month=1, day=1),
                 'employer_rate': 1.1,
                 'employee_rate': 1.1,
                 'employee_additional_rate': 0,
@@ -41,7 +41,7 @@ class L10nChSocialInsurance(models.Model):
     def _get_default_l10n_ch_avs_rente_ids(self):
         vals = [
             (0, 0, {
-                'date_from': fields.Date.today().replace(month=1, day=1),
+                'date_from': fields.Date.context_today(self).replace(month=1, day=1),
                 'amount': 1400
             })
         ]
@@ -51,7 +51,7 @@ class L10nChSocialInsurance(models.Model):
     def _get_default_l10n_ch_avs_ac_threshold_ids(self):
         vals = [
             (0, 0, {
-                'date_from': fields.Date.today().replace(month=1, day=1),
+                'date_from': fields.Date.context_today(self).replace(month=1, day=1),
                 'amount': 148200
             })
         ]
@@ -61,7 +61,7 @@ class L10nChSocialInsurance(models.Model):
     def _get_default_l10n_ch_avs_acc_threshold_ids(self):
         vals = [
             (0, 0, {
-                'date_from': fields.Date.today().replace(month=1, day=1),
+                'date_from': fields.Date.context_today(self).replace(month=1, day=1),
                 'amount': 0
             })
         ]

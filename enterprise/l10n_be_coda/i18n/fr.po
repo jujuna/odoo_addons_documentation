@@ -7,14 +7,15 @@
 # Jolien De Paepe, 2023
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.3+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:04+0000\n"
-"PO-Revision-Date: 2025-11-18 17:08+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19-l10n/"
+"POT-Creation-Date: 2026-08-28 18:17+0000\n"
+"PO-Revision-Date: 2026-09-18 04:58+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "l10n_be_coda/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +23,80 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: l10n_be_coda
+#: model:ir.module.module,description:base.module_l10n_be_coda
+msgid ""
+"\n"
+"Module to import CODA bank statements.\n"
+"======================================\n"
+"\n"
+"Supported are CODA flat files in V2 format from Belgian bank accounts.\n"
+"----------------------------------------------------------------------\n"
+"    * CODA v1 support.\n"
+"    * CODA v2.2 support.\n"
+"    * Foreign Currency support.\n"
+"    * Support for all data record types (0, 1, 2, 3, 4, 8, 9).\n"
+"    * Parsing & logging of all Transaction Codes and Structured Format\n"
+"      Communications.\n"
+"    * Automatic Financial Journal assignment via CODA configuration "
+"parameters.\n"
+"    * Support for multiple Journals per Bank Account Number.\n"
+"    * Support for multiple statements from different bank accounts in a "
+"single\n"
+"      CODA file.\n"
+"    * Support for 'parsing only' CODA Bank Accounts (defined as type='info' "
+"in\n"
+"      the CODA Bank Account configuration records).\n"
+"    * Multi-language CODA parsing, parsing configuration data provided for "
+"EN,\n"
+"      NL, FR.\n"
+"\n"
+"The machine readable CODA Files are parsed and stored in human readable "
+"format in\n"
+"CODA Bank Statements. Also Bank Statements are generated containing a subset "
+"of\n"
+"the CODA information (only those transaction lines that are required for "
+"the\n"
+"creation of the Financial Accounting records). The CODA Bank Statement is a\n"
+"'read-only' object, hence remaining a reliable representation of the "
+"original\n"
+"CODA file whereas the Bank Statement will get modified as required by "
+"accounting\n"
+"business processes.\n"
+"\n"
+"CODA Bank Accounts configured as type 'Info' will only generate CODA Bank "
+"Statements.\n"
+"\n"
+"A removal of one object in the CODA processing results in the removal of "
+"the\n"
+"associated objects. The removal of a CODA File containing multiple Bank\n"
+"Statements will also remove those associated statements.\n"
+"\n"
+"Instead of a manual adjustment of the generated Bank Statements, you can "
+"also\n"
+"re-import the CODA after updating the OpenERP database with the information "
+"that\n"
+"was missing to allow automatic reconciliation.\n"
+"\n"
+"Remark on CODA V1 support:\n"
+"~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+"In some cases a transaction code, transaction category or structured\n"
+"communication code has been given a new or clearer description in CODA "
+"V2.The\n"
+"description provided by the CODA configuration tables is based upon the "
+"CODA\n"
+"V2.2 specifications.\n"
+"If required, you can manually adjust the descriptions via the CODA "
+"configuration menu.\n"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid " - %s"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -51,14 +125,56 @@ msgstr "Débit ATM/PdV"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Acceptance charges"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Acceptance fee"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Access right to database"
 msgstr "Droit d'accès à la base de données"
 
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Account insurance"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Advice notice commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Advice of expiry charges"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Advising commission - Additional advising commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Agio on supplier's bill"
 msgstr "Agios sur une facture fournisseur"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Amendment fee"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -93,8 +209,37 @@ msgstr "Confirmation de la banque au réviseur ou au comptable"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Bank service fee"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Belgian Stock Exchange tax"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Belgian broker's commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#: model:ir.module.module,shortdesc:base.module_l10n_be_coda
+msgid "Belgium - Import Bank CODA Statements"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Bill claimed back"
 msgstr "Facture revendiquée"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Bill guarantee commission"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -113,6 +258,24 @@ msgstr "Annulation ou correction"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Capital and/or interest term investment"
 msgstr "Investissement à terme en capital et/ou intérêts"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Capital gains tax"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Capital premium"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Capital term investment"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -153,8 +316,50 @@ msgstr "Retrait d'espèces à un guichet automatique"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Certification costs"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Charge for safe custody"
 msgstr "Droit de garde"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Charges extension bill"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Charges for a foreign bill"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Charges for the deposit of security"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Charges for unpaid bills"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Charges foreign cheque"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Charges foreign documentary bill"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -195,6 +400,18 @@ msgstr "Codes propres à chaque banque"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Collection charges"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Collection commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Collective payments of wages"
 msgstr "Paiements collectifs des salaires"
 
@@ -225,6 +442,24 @@ msgstr "Effet de commerce revendiqué"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Commission for handling charges"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Commitment fee"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Commitment fee deferred payment"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Communicaton"
 msgstr "Communication"
 
@@ -237,14 +472,40 @@ msgstr "Compensation d'un coupon manquant"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid ""
+"Confirmation fee - Additional confirmation fee - Commitment fee - Flat fee - "
+"Confirmation reservation commission - Additional reservation commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Correction for prepaid card"
 msgstr "Correction pour la carte prépayée"
 
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Correspondent charges"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Costs"
 msgstr "Coûts"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Costs Article 45"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Costs for drawing up a bank cheque"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -267,8 +528,26 @@ msgstr "Frais de garde de la correspondance"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Costs of ATM abroad"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Costs of physical delivery"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Costs related to commercial paper"
 msgstr "Coûts liés à l'effet de commerce"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Costs relating to a refused cheque"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -309,8 +588,26 @@ msgstr "Contre-opérations"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Countervalue of an entry"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Countervalue of commission to third party"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Country code of the principal"
 msgstr "Code de pays du principal"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Cover commission"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -335,6 +632,24 @@ msgstr "Crédit après le paiement à un terminal"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Credit after collection"
 msgstr "Crédit après l'encaissement"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Credit arrangement fee - Additional credit arrangement fee"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Credit card costs"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Credit commission"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -365,6 +680,18 @@ msgstr "Devise"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Damage relating to bills and cheques"
 msgstr "Dommages relatifs aux factures et aux chèques"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Default interest"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Delivery of a copy"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -423,6 +750,12 @@ msgstr "Remise à l'étranger"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Discount commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Discount foreign supplier's bills"
 msgstr "Remise des factures des fournisseurs étrangers"
 
@@ -452,6 +785,14 @@ msgstr "Lettre de crédit à l'importation"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid ""
+"Documentary payment commission - Document commission - Drawdown fee - "
+"Negotiation fee"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Domestic commercial paper"
 msgstr "Effet de commerce national"
 
@@ -476,6 +817,18 @@ msgstr "Établissement d'un certificat"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Drawing up a circular cheque"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Endorsement commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Equivalent in EUR"
 msgstr "Équivalent en euros"
 
@@ -486,6 +839,9 @@ msgid ""
 "Error %(error_code)s:\n"
 "Movement data records of type 2.%(type)s are not supported"
 msgstr ""
+"Erreur %(error_code)s :\n"
+"Les enregistrements de données de mouvement de type 2.%(type)s ne sont pas "
+"pris en charge"
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -494,6 +850,8 @@ msgid ""
 "Error %(error_code)s: CODA V%(version)s statements are not supported, please "
 "contact your bank"
 msgstr ""
+"Erreur %(error_code)s : les extraits CODA V%(version)s ne sont pas pris en "
+"charge, veuillez contacter votre banque"
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -502,6 +860,9 @@ msgid ""
 "Error %(error_code)s: CODA parsing error on information data record 3.2, seq "
 "nr %(seq_nr)s! Please report this issue via your Odoo support channel."
 msgstr ""
+"Erreur %(error_code)s : erreur d’analyse CODA sur l’enregistrement de "
+"données d’information 3.2, numéro de séquence %(seq_nr)s ! Veuillez signaler "
+"ce problème via votre canal de support Odoo."
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -510,6 +871,9 @@ msgid ""
 "Error %(error_code)s: CODA parsing error on information data record 3.3, seq "
 "nr %(seq_nr)s! Please report this issue via your Odoo support channel."
 msgstr ""
+"Erreur %(error_code)s : erreur d’analyse CODA sur l’enregistrement de "
+"données d’information 3.3, numéro de séquence %(seq_nr)s ! Veuillez signaler "
+"ce problème via votre canal de support Odoo."
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -518,6 +882,9 @@ msgid ""
 "Error %(error_code)s: CODA parsing error on movement data record 2.2, seq nr "
 "%(seq_nr)s! Please report this issue via your Odoo support channel."
 msgstr ""
+"Erreur %(error_code)s : erreur d’analyse CODA sur l’enregistrement de "
+"données de mouvement 2.2, numéro de séquence %(seq_nr)s ! Veuillez signaler "
+"ce problème via votre canal de support Odoo."
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -526,6 +893,9 @@ msgid ""
 "Error %(error_code)s: CODA parsing error on movement data record 2.3, seq nr "
 "%(seq_nr)s! Please report this issue via your Odoo support channel."
 msgstr ""
+"Erreur %(error_code)s : erreur d’analyse CODA sur l’enregistrement de "
+"données de mouvement 2.3, numéro de séquence %(seq_nr)s ! Veuillez signaler "
+"ce problème via votre canal de support Odoo."
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -534,11 +904,26 @@ msgid ""
 "Error %(error_code)s: Foreign bank accounts with BBAN structure are not "
 "supported."
 msgstr ""
+"Erreur %(error_code)s : les comptes bancaires étrangers avec une structure "
+"BBAN ne sont pas pris en charge."
 
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Error %(error_code)s: Unsupported bank account structure."
+msgstr ""
+"Erreur %(error_code)s : structure de compte bancaire non prise en charge."
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Exchange commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Exercising fee"
 msgstr ""
 
 #. module: l10n_be_coda
@@ -546,6 +931,11 @@ msgstr ""
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Extension"
 msgstr "Extension"
+
+#. module: l10n_be_coda
+#: model:ir.model.fields,field_description:l10n_be_coda.field_account_journal__extension_number
+msgid "Extension Number"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -558,6 +948,12 @@ msgstr "Prolongation de la date d'échéance"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Fees and commissions"
 msgstr "Frais et commissions"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Fidelity premium"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -586,12 +982,24 @@ msgstr "Centralisation Financière"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Financing fee"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid ""
 "First credit of cheques, vouchers, luncheon vouchers, postal orders, credit "
 "under usual reserve"
 msgstr ""
 "Premier crédit de chèques, de bons, de tickets restaurant, de mandats de "
 "poste, crédit sous réserve habituelle."
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Fiscal stamps/stamp duty"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -608,6 +1016,42 @@ msgstr "Avance à terme fixe - intérêts uniquement"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Fixed collection charge"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Fixed loan advance - availability"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Fixed loan advance - extension"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Fixed loan advance - reimbursement"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Foreign Stock Exchange tax"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Foreign broker's commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Foreign cheques"
 msgstr "Chèques étrangers"
 
@@ -616,6 +1060,18 @@ msgstr "Chèques étrangers"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Foreign commercial paper"
 msgstr "Effet de commerce étranger"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Forward arbitrage contracts : sum to be supplied by bank"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Forward arbitrage contracts : sum to be supplied by customer"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -632,6 +1088,12 @@ msgstr "Vente à terme de devises étrangères"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Gross amount"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Gross amount in the currency of the account"
 msgstr "Montant brut dans la devise du compte"
 
@@ -640,6 +1102,24 @@ msgstr "Montant brut dans la devise du compte"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Gross amount in the original currency"
 msgstr "Montant brut dans la devise d'origine"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Growth premium"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Handling commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Handling costs"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -663,6 +1143,12 @@ msgstr "Idem sans garantie"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Income from payments by GSM"
 msgstr "Revenu des paiements par GSM"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Individual entry for exchange charges"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -697,6 +1183,36 @@ msgstr "Coûts d'assurance"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Interest accrued"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Interest paid"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Interest payment advice"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Interest received"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Interest subsidy"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Interest term investment"
 msgstr "Intérêts d'un investissement à terme"
 
@@ -711,6 +1227,12 @@ msgstr "Intérêts intercalaires sur abonnement"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "International credit transfers - non-SEPA credit transfers"
 msgstr "Virements internationaux - Virements non-SEPA"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Issue commission (delivery order)"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -762,6 +1284,12 @@ msgstr "Maestro"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Mailing costs"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Management fee"
 msgstr "Frais de gestion"
 
@@ -793,6 +1321,12 @@ msgstr "Mode de calcul (TVA, précompte mobilier, commission, etc.)"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Minimum discount rate"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Miscellaneous fees and commissions"
 msgstr "Frais et commissions divers"
 
@@ -800,6 +1334,18 @@ msgstr "Frais et commissions divers"
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Name: %(name)s, Town: %(city)s"
+msgstr "Nom : %(name)s, Ville : %(city)s"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Negative interest"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Net amount"
 msgstr ""
 
 #. module: l10n_be_coda
@@ -813,6 +1359,18 @@ msgstr "Coffre de nuit"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "No date"
 msgstr "Aucune date"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "No description"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Non-conformity fee"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -843,6 +1401,12 @@ msgstr "Autre"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Other credit applications"
 msgstr "Autres demandes de crédit"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Overall documentary credit charges"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -938,8 +1502,20 @@ msgstr "Paiement par votre succursale/agents"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Payment card costs"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Payment commercial paper"
 msgstr "Paiement d'un effet de commerce"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Payment commission"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1026,8 +1602,20 @@ msgstr "L'impression de formulaires"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Priority costs"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Private"
 msgstr "Privé"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Protest charges"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1098,8 +1686,26 @@ msgstr "Motif"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Reclamation charges"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Recovery of foreign tax"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Registering compensation for savings accounts"
 msgstr "Enregistrement de la compensation pour les comptes d'épargne"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Regularisation charges"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1124,6 +1730,12 @@ msgstr "Remboursement des coûts liés aux chèques"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Reimbursement of costs"
 msgstr "Remboursement des coûts"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Reinvestment fee"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1219,6 +1831,12 @@ msgstr "Location d'une boîte de prélèvement automatique"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Renting of letterbox"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Renting of safes"
 msgstr "Location de coffres"
 
@@ -1235,8 +1853,28 @@ msgstr ""
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Repayment loan or credit capital"
+msgstr ""
+
+#. module: l10n_be_coda
+#: model:ir.model.fields,help:l10n_be_coda.field_account_journal__extension_number
+msgid ""
+"Required if you have multiple accounts sharing the same IBAN and same "
+"currency. It specifies the journal used for processing the corresponding "
+"coda file"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Research costs"
 msgstr "Coûts de recherche"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Retention charges"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1277,6 +1915,12 @@ msgstr "Extourne d'un bon"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Rounding differences"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "SEPA B2B"
 msgstr "SEPA B2B"
 
@@ -1291,6 +1935,12 @@ msgstr "Prélèvement automatique SEPA"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "SEPA core"
 msgstr "SEPA classique"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Safe deposit charges"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1327,6 +1977,12 @@ msgstr "Deuxième crédit de chèque impayé"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Securities"
 msgstr "Titres"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Securities account tax"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1413,6 +2069,12 @@ msgid "Special charge for safe custody"
 msgstr "Frais spéciaux de garde"
 
 #. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Speculation tax"
+msgstr ""
+
+#. module: l10n_be_coda
 #: model:ir.model.fields,field_description:l10n_be_coda.field_account_journal__coda_split_transactions
 msgid "Split Transactions"
 msgstr "Diviser les transactions"
@@ -1467,14 +2129,44 @@ msgstr "Subsides"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Supplementary tax"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Surety fee"
 msgstr "Frais de cautionnement"
 
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Surety fee/payment under reserve"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "TINA"
 msgstr "TINA"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Tax on physical delivery"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Tax on physical securities"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Telecommunications"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1487,6 +2179,12 @@ msgstr "Offre"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Tenders"
 msgstr "Offres"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Tental guarantee charges"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1521,6 +2219,12 @@ msgstr "Transfert"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Transfer commission"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Transfer from your account"
 msgstr "Virement depuis votre compte"
 
@@ -1551,6 +2255,12 @@ msgstr "Prime d'assurance voyage"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Travelling expenses"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Type Direct Debit"
 msgstr "Type prélèvement automatique"
 
@@ -1564,6 +2274,12 @@ msgstr "Type de transaction R"
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Type of structured communication not supported: %(type)s"
+msgstr "Type de communication structurée non pris en charge : %(type)s"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Undefined"
 msgstr ""
 
 #. module: l10n_be_coda
@@ -1635,14 +2351,38 @@ msgstr "Déchargement d'une carte prépayée"
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "VAT"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Value (date) correction"
 msgstr "Correction de valeur (date)"
 
 #. module: l10n_be_coda
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Various fees/commissions"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Various transactions"
 msgstr "Transactions diverses"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Visa charges"
+msgstr ""
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Warehousing fee"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1655,6 +2395,12 @@ msgstr "Mandat"
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "Warrant fallen due"
 msgstr "Mandat arrivé à échéance"
+
+#. module: l10n_be_coda
+#. odoo-python
+#: code:addons/l10n_be_coda/models/account_journal.py:0
+msgid "Withholding tax"
+msgstr ""
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -1744,7 +2490,7 @@ msgstr "montant de la facture"
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "amount on which % is calculated"
-msgstr ""
+msgstr "montant sur lequel le % est calculé"
 
 #. module: l10n_be_coda
 #. odoo-python
@@ -2116,7 +2862,7 @@ msgstr "pourcentage"
 #. odoo-python
 #: code:addons/l10n_be_coda/models/account_journal.py:0
 msgid "period from %(start)s to %(end)s"
-msgstr ""
+msgstr "période du %(start)s au %(end)s"
 
 #. module: l10n_be_coda
 #. odoo-python

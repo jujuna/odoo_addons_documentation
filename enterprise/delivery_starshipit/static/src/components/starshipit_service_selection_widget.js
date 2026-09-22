@@ -1,7 +1,8 @@
+import { Component, proxy, useProps } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { registry } from "@web/core/registry";
-import { Component, useState } from "@odoo/owl";
+import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
 export class StarshipitServiceSelectionWidget extends Component {
     static template = "delivery_starshipit.StarshipitServiceWidget";
@@ -9,9 +10,8 @@ export class StarshipitServiceSelectionWidget extends Component {
         Dropdown,
         DropdownItem,
     };
-    static props = {
-        "*": true,
-    };
+
+    props = useProps(standardWidgetProps);
 
     setup() {
         this.available_services = this.props.record.data.available_services;
@@ -20,7 +20,7 @@ export class StarshipitServiceSelectionWidget extends Component {
             this.code = this.available_services[0].service_code;
             this.props.record.update({ [this.props.name]: this.code });
         }
-        this.state = useState({
+        this.state = proxy({
             'code': this.code,
         });
     }

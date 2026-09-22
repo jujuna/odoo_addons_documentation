@@ -12,7 +12,7 @@
                 <field name="l10n_jo_has_dependants" invisible="company_country_code != 'JO'"/>
             </group>
             <field name="lang" position="after">
-                <field name="l10n_jo_is_eligible_for_eos" invisible="company_country_code != 'JO'"/>
+                <field name="l10n_jo_is_eligible_for_eos" invisible="company_country_code != 'JO'" help="If not checked, the employee will not be eligible for the end of service benefit upon leaving the company"/>
             </field>
             <group name="contract" position="after">
                 <group string="Allowances" invisible="company_country_code != 'JO'">
@@ -31,18 +31,11 @@
                         <field name="l10n_jo_other_allowances" class="o_hr_narrow_field"/>
                         <span>/ month</span>
                     </div>
-                    <label for="l10n_jo_tax_exemption" string="Tax Exemption"/>
-                    <div class="o_row" name="l10n_jo_tax_exemption">
-                        <field name="l10n_jo_tax_exemption" class="o_hr_narrow_field"/>
-                        <span>/ year</span>
-                    </div>
-                    <field name="l10n_jo_is_commission_based" string="Is Commission based"/>
-
                     <separator string="Annual Leave Provision"/>
-                    <label for="l10n_jo_number_of_leave_days" string="Number of Leave"/>
+                    <label for="l10n_jo_number_of_leave_days" string="Eligibility"/>
                     <div class="o_row" name="l10n_jo_number_of_leave_days">
-                        <field name="l10n_jo_number_of_leave_days" class="o_hr_narrow_field"/>
-                        <span>days</span>
+                        <field name="l10n_jo_number_of_leave_days" class="o_hr_narrow_field" help="Total Number of annual leave days the employee is eligible for in the current year"/>
+                        <span>days / year</span>
                     </div>
                 </group>
             </group>

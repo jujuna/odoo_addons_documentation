@@ -70,13 +70,13 @@ class TestSmartSchedule(TestSmartScheduleCommon):
             'date_from': datetime(2023, 1, 3, 0),
             'date_to': datetime(2023, 1, 6, 23),
             'calendar_id': self.user_projectuser.resource_calendar_id.id,
-            'time_type': 'leave',
+            'count_as': 'absence',
         }, {
             'name': 'scheduled leave',
             'date_from': datetime(2023, 1, 5, 0),
             'date_to': datetime(2023, 1, 10, 23),
             'calendar_id': self.user_projectmanager.resource_calendar_id.id,
-            'time_type': 'leave',
+            'count_as': 'absence',
         }])
 
         result = (
@@ -185,7 +185,7 @@ class TestSmartSchedule(TestSmartScheduleCommon):
                 'date_from': begin_leave.strftime('%Y-%m-%d %H:%M:%S'),
                 'date_to': end_leave.strftime('%Y-%m-%d %H:%M:%S'),
                 'calendar_id': self.user_projectuser.resource_calendar_id.id,
-                'time_type': 'leave',
+                'count_as': 'absence',
             },
         ])
 
@@ -418,13 +418,19 @@ class TestSmartSchedule(TestSmartScheduleCommon):
                          '2023-01-31 09:00:00',
                          )
         self.assertEqual(self.task_project_pigs_no_allocated_hours_manager.date_deadline.strftime('%Y-%m-%d %H:%M:%S'),
-                         '2023-02-27 11:00:00',
+                         '2023-02-28 09:00:00',
+                         'when no allocated hours, delta hours = 160, from 9H day 31/01 to 9H day 28/02, duration = 20 * 8 = 160'
                          )
         self.assertEqual(self.task_project_pigs_no_allocated_hours_no_user.planned_date_start.strftime('%Y-%m-%d %H:%M:%S'),
-                         '2023-02-27 12:00:00',
+                         '2023-02-28 09:00:00',
                          )
         self.assertEqual(self.task_project_pigs_no_allocated_hours_no_user.date_deadline.strftime('%Y-%m-%d %H:%M:%S'),
-                         '2023-03-23 16:00:00',
+                         '2023-03-28 08:00:00',
+                         """
+                            when no allocated hours, delta hours = 160, from 9H day 28/02 to 9H day 28/03, duration = 20 * 8 = 160
+                            It's 8H on day 28 instead of 9H in the assert because Daylight Saving Time (DST) in Europe in 2023 began
+                            on Sunday, March 26, 2023
+                         """
                          )
         # Check if the user is the target one
         self.assertEqual(self.task_project_pigs_with_allocated_hours_manager.user_ids, self.user_projectmanager, "Wrong user id")
@@ -434,7 +440,7 @@ class TestSmartSchedule(TestSmartScheduleCommon):
         """ test if the recordset is correctly sorted when multiple dependencies are involved """
         self.user_projectmanager.write({
             "tz": "Europe/Brussels",
-            "resource_calendar_id": self.env['ir.model.data']._xmlid_to_res_id("resource.resource_calendar_std"),
+            "resource_calendar_id": self.calendar_40h,
         })
 
         vals_list = [{
@@ -583,3 +589,58 @@ class TestSmartSchedule(TestSmartScheduleCommon):
                 for field in ["planned_date_begin", "date_deadline", "user_ids"]:
                     if field in old_vals[task.id]:
                         self.assertEqual(task[field].ids or False if field == "user_ids" else task[field], old_vals[task.id][field])
+
+    def test_load_more_intervals(self):
+        """
+            first, valid intervals will be between planned_date_begin and last_date_view
+            only 16 hours can be planned during these 2 days (30, 31)
+
+            then, loading more intervals will run and get other ranges starting from 01 Dec 2023
+            day 01, 02 and 03 will be enough to plan the 24 remaining hours
+        """
+        self.task_project_pigs_with_allocated_hours_user.allocated_hours = 40
+        self.task_project_pigs_with_allocated_hours_user.with_context({
+            'last_date_view': '2023-10-31 22:00:00',
+            'cell_part': 2.0,
+        }).schedule_tasks({
+            'planned_date_begin': '2023-10-30 00:00:00',
+            'date_deadline': '2023-10-31 22:00:00',
+            'user_ids': self.user_projectmanager.ids,
+        })
+
+        self.assertEqual(self.task_project_pigs_with_allocated_hours_user.planned_date_begin, datetime(2023, 10, 30, 7))
+        self.assertEqual(self.task_project_pigs_with_allocated_hours_user.date_deadline, datetime(2023, 11, 3, 16))
+
+    def test_tasks_no_assignees_scheduled_sequentially(self):
+        """
+        Tasks should be scheduled sequentially, even if they have no assignees.
+        """
+
+        tasks = (
+            self.task_project_pigs_with_allocated_hours_no_user +
+            self.task_project_pigs_with_allocated_hours_no_user.copy({
+                'name': 'Second no-user task',
+            })
+        )
+
+        result = tasks.with_context({
+            'last_date_view': self.end_date_view_str,
+            'gantt_scale': "week",
+            'cell_part': 2.0,
+        }).schedule_tasks({
+            'planned_date_begin': self.start_date_view_str,
+            'date_deadline': (self.start_date_view + relativedelta(day=1)).strftime('%Y-%m-%d %H:%M:%S'),
+            'user_ids': None,
+        })
+        self.assertDictEqual(result[0], {}, 'No warnings should be displayed')
+
+        task1, task2 = tasks.sorted('planned_date_begin')
+        self.assertFalse(task1.user_ids)
+        self.assertFalse(task2.user_ids)
+
+        self.assertEqual(task1.planned_date_start, datetime(2023, 1, 2, 7))
+        self.assertEqual(
+            task2.planned_date_start,
+            task1.date_deadline,
+            'Tasks without users should be scheduled sequentially, not concurrently',
+        )

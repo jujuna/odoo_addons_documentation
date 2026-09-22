@@ -3,21 +3,27 @@
 # * account_fleet
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# Hanna Kharraziha <hakha@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-09-16 21:27+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:41+0000\n"
+"PO-Revision-Date: 2026-08-31 12:52+0000\n"
+"Last-Translator: Hanna Kharraziha <hakha@odoo.com>\n"
+"Language-Team: Swedish <https://translate.odoo.com/projects/odoo-s19-4/"
 "account_fleet/sv/>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_fleet
+#: model_terms:ir.ui.view,arch_db:account_fleet.report_invoice_document
+msgid "1-ABC-123"
+msgstr "1-ABC-123"
 
 #. module: account_fleet
 #: model_terms:ir.ui.view,arch_db:account_fleet.fleet_vehicle_log_services_view_form
@@ -35,30 +41,61 @@ msgstr ""
 "Bill\">Servicefaktura </span>"
 
 #. module: account_fleet
+#: model_terms:ir.ui.view,arch_db:account_fleet.fleet_vehicle_log_services_view_form
+msgid ""
+"<span class=\"o_stat_value\">New</span>\n"
+"                                <span class=\"o_stat_text\">Service's Bill</"
+"span>"
+msgstr ""
+"<span class=\"o_stat_value\">Ny</span>\n"
+"                                <span class=\"o_stat_text\">tjänstefaktura</"
+"span>"
+
+#. module: account_fleet
+#: model:ir.model,name:account_fleet.model_account_account
+msgid "Account"
+msgstr "Konto"
+
+#. module: account_fleet
 #: model:ir.model.fields,field_description:account_fleet.field_fleet_vehicle__account_move_ids
 msgid "Account Move"
-msgstr "Verifikat"
+msgstr "Verifikation"
 
 #. module: account_fleet
 #: model:ir.model.fields,field_description:account_fleet.field_fleet_vehicle_log_services__account_move_line_id
 msgid "Account Move Line"
-msgstr "Transaktionsrad"
+msgstr "Verifikationsrad"
+
+#. module: account_fleet
+#: model:ir.module.module,shortdesc:base.module_account_fleet
+msgid "Accounting/Fleet bridge"
+msgstr ""
 
 #. module: account_fleet
 #. odoo-python
 #: code:addons/account_fleet/models/fleet_vehicle_log_services.py:0
 msgid "Bill"
-msgstr "Faktura"
+msgstr "Leverantörsfaktura"
 
 #. module: account_fleet
 #: model_terms:ir.ui.view,arch_db:account_fleet.fleet_vehicle_view_form
 msgid "Bills"
-msgstr "Räkningar"
+msgstr "Leverantörsfakturor"
 
 #. module: account_fleet
 #: model:ir.model.fields,field_description:account_fleet.field_fleet_vehicle__bill_count
 msgid "Bills Count"
-msgstr "Antal fakturor"
+msgstr "Antal leverantörsfakturor"
+
+#. module: account_fleet
+#: model:ir.model.fields,help:account_fleet.field_account_account__is_vehicle_account
+msgid ""
+"Check this box if a vehicle has to be linked to the account, when creating a "
+"bill for an expense or when creating an asset."
+msgstr ""
+"Kryssa i den här rutan om ett fordon måste vara kopplat till kontot för att "
+"man ska kunna skapa en ny leverantörsfaktura för en utgift eller en ny "
+"tillgång."
 
 #. module: account_fleet
 #: model:ir.model.fields,field_description:account_fleet.field_fleet_vehicle_log_services__amount
@@ -68,26 +105,30 @@ msgstr "Kostnad"
 #. module: account_fleet
 #: model:ir.model,name:account_fleet.model_account_automatic_entry_wizard
 msgid "Create Automatic Entries"
-msgstr "Skapa automatiska poster"
+msgstr "Skapa verifikation automatiskt"
 
 #. module: account_fleet
 #: model_terms:ir.ui.view,arch_db:account_fleet.account_move_view_tree
 msgid "Creation Date"
-msgstr "Skapad datum"
+msgstr "Skapad den"
 
 #. module: account_fleet
+#: model:ir.model.fields,field_description:account_fleet.field_account_account__display_name
 #: model:ir.model.fields,field_description:account_fleet.field_account_automatic_entry_wizard__display_name
 #: model:ir.model.fields,field_description:account_fleet.field_account_move__display_name
 #: model:ir.model.fields,field_description:account_fleet.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:account_fleet.field_account_tax__display_name
 #: model:ir.model.fields,field_description:account_fleet.field_fleet_vehicle__display_name
 #: model:ir.model.fields,field_description:account_fleet.field_fleet_vehicle_log_services__display_name
 msgid "Display Name"
 msgstr "Visningsnamn"
 
 #. module: account_fleet
+#: model:ir.model.fields,field_description:account_fleet.field_account_account__id
 #: model:ir.model.fields,field_description:account_fleet.field_account_automatic_entry_wizard__id
 #: model:ir.model.fields,field_description:account_fleet.field_account_move__id
 #: model:ir.model.fields,field_description:account_fleet.field_account_move_line__id
+#: model:ir.model.fields,field_description:account_fleet.field_account_tax__id
 #: model:ir.model.fields,field_description:account_fleet.field_fleet_vehicle__id
 #: model:ir.model.fields,field_description:account_fleet.field_fleet_vehicle_log_services__id
 msgid "ID"
@@ -96,12 +137,17 @@ msgstr "ID"
 #. module: account_fleet
 #: model:ir.model,name:account_fleet.model_account_move
 msgid "Journal Entry"
-msgstr "Verifikat"
+msgstr "Verifikation"
 
 #. module: account_fleet
 #: model:ir.model,name:account_fleet.model_account_move_line
 msgid "Journal Item"
-msgstr "Journalpost"
+msgstr "Verifikationsrad"
+
+#. module: account_fleet
+#: model:ir.module.module,summary:base.module_account_fleet
+msgid "Manage accounting with fleets"
+msgstr ""
 
 #. module: account_fleet
 #: model:ir.model.fields,field_description:account_fleet.field_account_move_line__need_vehicle
@@ -109,20 +155,39 @@ msgid "Need Vehicle"
 msgstr "Behöver fordon"
 
 #. module: account_fleet
+#: model:ir.model.fields,field_description:account_fleet.field_account_account__is_vehicle_account
+msgid "Requires vehicle"
+msgstr "Kräver ett fordon"
+
+#. module: account_fleet
 #. odoo-python
 #: code:addons/account_fleet/models/account_move.py:0
 msgid "Service Vendor Bill: %s"
-msgstr "Tjänsteleverantörsfaktura: %s"
+msgstr "Serviceleverantörsfaktura: %s"
+
+#. module: account_fleet
+#. odoo-python
+#: code:addons/account_fleet/models/account_move.py:0
+#: model:ir.model.fields,field_description:account_fleet.field_account_bank_statement_line__service_count
+#: model:ir.model.fields,field_description:account_fleet.field_account_move__service_count
+#: model_terms:ir.ui.view,arch_db:account_fleet.view_move_form
+msgid "Services"
+msgstr "Tjänster"
 
 #. module: account_fleet
 #: model:ir.model,name:account_fleet.model_fleet_vehicle_log_services
 msgid "Services for vehicles"
-msgstr "Service av fordon"
+msgstr "Fordonstjänster"
 
 #. module: account_fleet
 #: model:ir.model.fields,field_description:account_fleet.field_fleet_vehicle_log_services__account_move_state
 msgid "Status"
 msgstr "Status"
+
+#. module: account_fleet
+#: model:ir.model,name:account_fleet.model_account_tax
+msgid "Tax"
+msgstr "Skatt"
 
 #. module: account_fleet
 #: model:ir.model,name:account_fleet.model_fleet_vehicle
@@ -143,20 +208,26 @@ msgid ""
 "You cannot delete log services records because one or more of them were bill "
 "created."
 msgstr ""
-"Du kan inte ta bort loggtjänstposter eftersom en eller flera av dem skapades "
-"med räkningar."
+"Det är inte möjligt att ta bort de sparade tjänstehandlingarna eftersom en "
+"eller flera av dem skapades baserat på leverantörsfakturor."
 
 #. module: account_fleet
 #. odoo-python
 #: code:addons/account_fleet/models/fleet_vehicle_log_services.py:0
 msgid ""
-"You cannot modify amount of services linked to an account move line. Do it "
-"on the related accounting entry instead."
+"You cannot modify the amount of services linked to a journal item. Do it on "
+"the related accounting entry instead."
 msgstr ""
-"Du kan inte ändra antalet tjänster kopplade till en transaktionsrad. Gör det "
-"på den relaterade bokföringsposten istället."
+"Det är inte möjligt att redigera beloppet för tjänster kopplade till en "
+"verifikationsrad. Gör det istället direkt på motsvarande verifikationsrad."
+
+#. module: account_fleet
+#. odoo-python
+#: code:addons/account_fleet/models/account_move.py:0
+msgid "account_move_line_id"
+msgstr "account_move_line_id"
 
 #. module: account_fleet
 #: model_terms:ir.ui.view,arch_db:account_fleet.fleet_vehicle_view_form
 msgid "show the vendor bills for this vehicle"
-msgstr "visa leverantörsfakturorna för detta fordon"
+msgstr "visa leverantörsfakturor för detta fordon"

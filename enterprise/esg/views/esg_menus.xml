@@ -42,6 +42,19 @@
                     action="action_offset_emission_report_views"
                 />
             </menuitem>
+            <menuitem
+                id="menu_esg_collect_csrd"
+                name="ESG"
+                sequence="20"
+            >
+                <menuitem
+                    id="menu_esg_metrics"
+                    name="Metrics"
+                    sequence="10"
+                    action="action_view_metrics"
+                    groups="esg.group_esg_csrd_reporting"
+                />
+            </menuitem>
         </menuitem>
         <menuitem
             id="menu_esg_measure"
@@ -59,24 +72,56 @@
                     sequence="10"
                     action="action_carbon_emission_report_analytics_views"
                 />
-                <!-- TODO: move it in master -->
                 <menuitem
                     id="menu_esg_carbon_report"
                     name="Carbon Footprint"
                     sequence="20"
                     action="action_view_carbon_report"
+                    groups="account.group_account_readonly"
                 />
             </menuitem>
         </menuitem>
         <menuitem
+            id="menu_esg_report"
+            name="Report"
+            sequence="35"
+        >
+            <menuitem
+                id="menu_esg_vsme_report"
+                name="VSME Report"
+                sequence="10"
+                action="action_view_esg_vsme_report"
+            />
+            <menuitem
+                id="menu_esg_csrd_report"
+                name="CSRD Report"
+                sequence="20"
+                action="action_view_esg_csrd_report"
+                groups="esg.group_esg_csrd_reporting"
+            />
+        </menuitem>
+        <menuitem
+            id="menu_esg_act"
+            name="Act"
+            sequence="40"
+        >
+            <menuitem
+                id="menu_esg_action"
+                name="Actions"
+                sequence="10"
+                action="action_view_esg_action"
+            />
+        </menuitem>
+        <menuitem
             id="menu_esg_configuration"
             name="Configuration"
-            sequence="40"
+            sequence="50"
             groups="esg_group_manager"
         >
             <menuitem
                 id="menu_esg_settings"
                 name="Settings"
+                action="action_esg_configuration"
                 sequence="10"
             />
             <menuitem
@@ -97,6 +142,12 @@
                     action="action_view_emission_source"
                 />
                 <menuitem
+                    id="menu_esg_assignation_rules"
+                    name="Assignation Rules"
+                    sequence="45"
+                    action="action_view_assignation_rule"
+                />
+                <menuitem
                     id="menu_esg_configuration_carbon_emissions_gasses"
                     name="Gases"
                     sequence="50"
@@ -104,7 +155,7 @@
                 />
                 <menuitem
                     id="menu_esg_source_databases"
-                    name="Source Databases"
+                    name="Databases"
                     sequence="60"
                     action="action_view_database"
                 />

@@ -4,7 +4,7 @@ export class SignatureInputPlugin extends Plugin {
     static id = "signatureInput";
     static dependencies = ["baseContainer", "history"];
     resources = {
-        mount_component_handlers: this.setupNewSignatureInput.bind(this),
+        on_will_mount_component_handlers: this.setupNewSignatureInput.bind(this),
     };
     setupNewSignatureInput({ name, props }) {
         if (name !== "signatureInput") {
@@ -15,14 +15,15 @@ export class SignatureInputPlugin extends Plugin {
                 if (!host.isConnected) {
                     return;
                 }
-                const baseContainer = this.dependencies.baseContainer.createBaseContainer();
                 const img = document.createElement("img");
                 img.classList.add("img", "img-fluid", "o_we_custom_image");
                 img.style = "width: 50%";
                 img.src = b64SignatureImage;
-                baseContainer.append(img);
+                const baseContainer = this.dependencies.baseContainer.createBaseContainer({
+                    children: [img],
+                });
                 host.replaceWith(baseContainer);
-                this.dependencies.history.addStep();
+                this.dependencies.history.commit();
             },
         });
     }

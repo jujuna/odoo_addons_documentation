@@ -3,18 +3,18 @@
 
   <t t-name="web_studio.ListEditorRenderer" t-inherit="web.ListRenderer" >
 
-    <xpath expr="//*[@t-ref='table']" position="before">
-      <SelectionHeaderButtons t-if="!this.env.viewEditorModel.isEditingSubview" headerButtons="props.archInfo.headerButtons" />
+    <xpath expr="//*[@t-ref='this.tableRef']" position="before">
+      <SelectionHeaderButtons t-if="!this.env.viewEditorModel.isEditingSubview" headerButtons="this.props.archInfo.headerButtons" />
     </xpath>
 
-    <xpath expr="//*[@t-ref='table']" position="attributes">
-      <attribute name="t-on-click.capture">onTableClicked</attribute>
-      <attribute name="t-on-mouseover">onTableHover</attribute>
-      <attribute name="t-on-mouseout">onTableHover</attribute>
+    <xpath expr="//*[@t-ref='this.tableRef']" position="attributes">
+      <attribute name="t-on-click.capture">this.onTableClicked</attribute>
+      <attribute name="t-on-mouseover">this.onTableHover</attribute>
+      <attribute name="t-on-mouseout">this.onTableHover</attribute>
     </xpath>
 
     <xpath expr="//thead[1]" position="attributes">
-      <attribute name="t-ref">tableHead</attribute>
+      <attribute name="t-ref">this.tableHeadRef</attribute>
     </xpath>
 
     <xpath expr="//*[hasclass('o_optional_columns_dropdown_toggle')]" position="attributes">
@@ -23,10 +23,7 @@
 
     <xpath expr="//thead//t[@t-foreach]//*[@t-else][1]" position="before">
       <t t-elif="column.type === 'studio_hook'">
-        <t t-call="web_studio.ListEditor.StudioHook" >
-          <t t-set="column" t-value="column" />
-          <t t-set="isHeader" t-value="true" />
-        </t>
+        <t t-call="web_studio.ListEditor.StudioHook" column="column" isHeader="true" />
       </t>
     </xpath>
 
@@ -43,9 +40,7 @@
   <t t-name="web_studio.ListEditorRenderer.RecordRow" t-inherit="web.ListRenderer.RecordRow">
     <xpath expr="//t[@t-foreach]" position="inside">
       <t t-if="column.type === 'studio_hook'">
-        <t t-call="web_studio.ListEditor.StudioHook" >
-          <t t-set="column" t-value="column" />
-        </t>
+        <t t-call="web_studio.ListEditor.StudioHook" column="column" />
       </t>
     </xpath>
 
@@ -58,8 +53,8 @@
       <attribute name="t-att-data-studio-xpath">column.studioXpath</attribute>
     </xpath>
 
-    <xpath expr="//t[@t-if='hasOpenFormViewColumn']" position="attributes">
-      <attribute name="t-if">props.archInfo.openFormView</attribute>
+    <xpath expr="//t[@t-if='this.hasOpenFormViewColumn']" position="attributes">
+      <attribute name="t-if">this.props.archInfo.openFormView</attribute>
     </xpath>
 
     <xpath expr="//button[@name='Open in form view']" position="attributes">
@@ -69,7 +64,7 @@
 
   <t t-name="web_studio.ListEditor.StudioHook">
     <t t-tag="isHeader ? 'th' : 'td'" t-att-data-xpath="column.xpath" t-att-data-position="column.position" class="o_web_studio_hook" t-attf-class="{{ !isHeader ? 'border-bottom-0' : ''}}">
-      <i t-if="isHeader" class="fa fa-plus" />
+      <i t-if="isHeader" class="oi" data-icon="add" />
     </t>
   </t>
 

@@ -4,7 +4,24 @@ from odoo import api, fields, models
 class WebsiteVisitor(models.Model):
     _inherit = 'website.visitor'
 
+    visitor_appointment_count = fields.Integer(
+        string="Appointment Views",
+        help="Total number of views on appointments",
+        compute='_compute_appointment_statistics',
+    )
+    appointment_type_ids = fields.Many2many(
+        comodel_name='appointment.type',
+        string="Appointments",
+        compute='_compute_appointment_statistics',
+    )
     calendar_event_ids = fields.One2many('calendar.event', 'visitor_id')
+
+    @api.depends('website_track_ids')
+    def _compute_appointment_statistics(self):
+        mapped_data = self._get_visitor_statistics('appointment_type_id')
+        for visitor in self:
+            visitor.appointment_type_ids = mapped_data[visitor.id]['ids']
+            visitor.visitor_appointment_count = mapped_data[visitor.id]['count']
 
     @api.depends('calendar_event_ids')
     def _compute_email_phone(self):

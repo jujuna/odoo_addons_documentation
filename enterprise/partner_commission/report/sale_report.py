@@ -9,15 +9,8 @@ class SaleReport(models.Model):
     referrer_id = fields.Many2one("res.partner", "Referrer", readonly=True)
     commission_plan_id = fields.Many2one("commission.plan", readonly=True)
 
-    def _select_additional_fields(self):
-        res = super()._select_additional_fields()
-        res["referrer_id"] = "s.referrer_id"
-        res["commission_plan_id"] = "s.commission_plan_id"
-        return res
-
-    def _group_by_sale(self):
-        group_by_str = super()._group_by_sale()
-        return f"""{group_by_str},
-                    s.referrer_id,
-                    s.commission_plan_id
-        """
+    def _select_dict(self, table):
+        return super()._select_dict(table) | {
+            'referrer_id': table.order_id.referrer_id,
+            'commission_plan_id': table.order_id.commission_plan_id,
+        }

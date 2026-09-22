@@ -1,11 +1,12 @@
 import { registry } from "@web/core/registry";
 import { listView } from "@web/views/list/list_view";
-import { AppointmentTypeListController} from "@appointment/views/list/list_controller";
-import { AppointmentBookingListRenderer, AppointmentTypeListRenderer} from "@appointment/views/list/list_renderer";
+import { AppointmentBookingListController, AppointmentTypeListController} from "@appointment/views/list/list_controller";
+import { AppointmentTypeListRenderer} from "@appointment/views/list/list_renderer";
 
 export const AppointmentBookingListView = {
     ...listView,
-    Renderer: AppointmentBookingListRenderer,
+    Controller: AppointmentBookingListController,
+    buttonTemplate: 'appointment.List.Buttons',
 };
 
 registry.category("views").add("appointment_booking_list", AppointmentBookingListView);

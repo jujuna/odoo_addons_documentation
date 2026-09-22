@@ -11,16 +11,16 @@
 # Martin Trigaux, 2022
 # Paweł Wodyński <pw@myodoo.pl>, 2022
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Marta (wacm)" <wacm@odoo.com>, 2025.
+# "Marta (wacm)" <wacm@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-11-16 13:49+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Polish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:52+0000\n"
+"PO-Revision-Date: 2026-09-17 23:04+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-master/"
 "sale_stock_renting/pl/>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -29,13 +29,13 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
 "(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
 "n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale_stock_renting
 #. odoo-python
 #: code:addons/sale_stock_renting/models/sale_order_line.py:0
 msgid "%(lots)s %(are)s reserved on multiple order lines"
-msgstr ""
+msgstr "%(lots)s %(are)s zarezerwowane w wielu wierszach zamówienia"
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -52,27 +52,28 @@ msgstr "%(product)s(pozycje %(qty)s)"
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.rental_order_wizard_view_form
 msgid ""
-"<i class=\"fa fa-warning\"/>\n"
+"<i class=\"oi\" data-icon=\"warning\"/>\n"
 "                        <span>\n"
-"                            Some products don't have the requested qty "
-"available for pickup\n"
+"                            Some products don't have the requested quantity "
+"available for pickup.\n"
 "                        </span>"
 msgstr ""
-"<i class=\"fa fa-warning\"/>\n"
-"<span>\n"
-"Niektóre produkty nie mają żądanej ilości dostępnej do odbioru\n"
-"</span>"
+
+#. module: sale_stock_renting
+#: model:ir.model,name:sale_stock_renting.model_res_groups
+msgid "Access Groups"
+msgstr ""
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "Activate to use stock deliveries and receipts for rental orders"
+msgid "Activate to use stock deliveries and receipts for rental orders."
 msgstr ""
-"Aktywuj, aby używać dostaw i odbiorów towarów w przypadku zamówień wynajmu."
+"Aktywuj, aby wykorzystywać dostawy magazynowe i odbiory do zamówień wynajmu."
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.stock_lot_kanban_allocation
 msgid "Add Serial Number"
-msgstr ""
+msgstr "Dodaj numer seryjny"
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.sale_order_line_form_lot_allocation
@@ -80,28 +81,15 @@ msgid "Add a line"
 msgstr "Dodaj pozycję"
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,help:sale_stock_renting.field_res_company__padding_time
-msgid ""
-"Amount of time (in hours) during which a product is considered unavailable "
-"prior to renting (preparation time)."
+#: model:ir.module.module,summary:base.module_sale_stock_renting
+msgid "Allows use of stock application to manage rentals inventory"
 msgstr ""
-"Czas (w godzinach), w którym produkt jest uważany za niedostępny przed "
-"wypożyczeniem (czas przygotowania)."
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,help:sale_stock_renting.field_res_config_settings__padding_time
-msgid ""
-"Amount of time (in hours) during which a product is considered "
-"unavailableprior to renting (preparation time)."
-msgstr ""
-"Ilość czasu (w godzinach), podczas którego produkt jest uznawany za "
-"niedostępny przed wynajmem (czas na przygotowanie)."
 
 #. module: sale_stock_renting
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.sale_order_line_form_lot_allocation
 #: model_terms:ir.ui.view,arch_db:sale_stock_renting.stock_lot_kanban_allocation
 msgid "Auto assign"
-msgstr ""
+msgstr "Automatyczne przypisanie"
 
 #. module: sale_stock_renting
 #. odoo-javascript
@@ -117,7 +105,7 @@ msgstr "Dostępny"
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__available_reserved_lots
 msgid "Available Reserved Lots"
-msgstr ""
+msgstr "Dostępne zarezerwowane partie"
 
 #. module: sale_stock_renting
 #. odoo-javascript
@@ -127,18 +115,13 @@ msgstr "Dostępne do wynajęcia"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_res_company
-msgid "Companies"
-msgstr "Firmy"
+msgid "Company"
+msgstr "Firma"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_res_config_settings
 msgid "Config Settings"
 msgstr "Ustawienia konfiguracji"
-
-#. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "Default Padding Time"
-msgstr "Domyślny bufor czasowy"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_account_move__display_name
@@ -149,23 +132,17 @@ msgstr "Domyślny bufor czasowy"
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:sale_stock_renting.field_res_groups__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_rental_report__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_lot__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_picking__display_name
-#: model:ir.model.fields,field_description:sale_stock_renting.field_stock_return_picking__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse__display_name
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse_orderpoint__display_name
 msgid "Display Name"
 msgstr "Nazwa wyświetlana"
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,help:sale_stock_renting.field_rental_order_wizard_line__tracking
-#: model:ir.model.fields,help:sale_stock_renting.field_sale_order_line__tracking
-msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr "Zapewnij identyfikowalność produktu rejestrowanego w Twoim magazynie."
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard__has_lines_missing_stock
@@ -186,17 +163,22 @@ msgstr "Posiada linie ze śledzonymi produktami"
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__id
+#: model:ir.model.fields,field_description:sale_stock_renting.field_res_groups__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_rental_report__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_lot__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_move__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_picking__id
-#: model:ir.model.fields,field_description:sale_stock_renting.field_stock_return_picking__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse__id
 #: model:ir.model.fields,field_description:sale_stock_renting.field_stock_warehouse_orderpoint__id
 msgid "ID"
 msgstr "ID"
+
+#. module: sale_stock_renting
+#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
+msgid "Inventory"
+msgstr "Magazyn"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__is_product_storable
@@ -217,7 +199,7 @@ msgstr "Pozycja dziennika"
 #. odoo-python
 #: code:addons/sale_stock_renting/models/sale_order_line.py:0
 msgid "Lot Allocation"
-msgstr ""
+msgstr "Przypisanie partii"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_stock_lot
@@ -230,17 +212,14 @@ msgid "Minimum Inventory Rule"
 msgstr "Reguła minimalnych zapasów"
 
 #. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "Minimum amount of time between two rentals"
-msgstr "Minimalny czas pomiędzy dwoma wypożyczeniami"
-
-#. module: sale_stock_renting
 #. odoo-python
 #: code:addons/sale_stock_renting/models/sale_order_line.py:0
 msgid ""
 "No valid quant has been found in location %(location)s for serial number %"
 "(serial_number)s!"
 msgstr ""
+"W lokalizacji %(location)s nie znaleziono żadnych ważnych ilości dla numeru "
+"seryjnego %(serial_number)s!"
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -249,14 +228,12 @@ msgid ""
 "Not enough %(product)s in stock.\n"
 "%(reserved_qty)s reserved but only %(stock_qty)s in stock."
 msgstr ""
+"Nie ma wystarczającej ilości %(product)s w magazynie.\n"
+"Zarezerwowano %(reserved_qty)s, ale tylko %(stock_qty)s jest na stanie."
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__padding_time
-msgid "Padding"
-msgstr "Margines wewnętrzny"
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__padding_time
+#: model:ir.model.fields,field_description:sale_stock_renting.field_product_product__preparation_time
+#: model:ir.model.fields,field_description:sale_stock_renting.field_product_template__preparation_time
 msgid "Padding Time"
 msgstr "Czas wypełnienia"
 
@@ -313,6 +290,11 @@ msgstr "Raport Analizy Wynajmów"
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__rental_loc_id
 msgid "Rental Location"
+msgstr "Lokacja wynajmu"
+
+#. module: sale_stock_renting
+#: model:ir.module.module,shortdesc:base.module_sale_stock_renting
+msgid "Rental Stock Management"
 msgstr ""
 
 #. module: sale_stock_renting
@@ -324,7 +306,7 @@ msgstr "Transfery wynajmu"
 #. odoo-python
 #: code:addons/sale_stock_renting/models/stock_move.py:0
 msgid "Rental move: %(order)s"
-msgstr ""
+msgstr "Ruch magazynowy wynajmu: %(order)s"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__group_rental_stock_picking
@@ -337,26 +319,15 @@ msgid "RentalOrderLine transient representation"
 msgstr "RentalOrderLine reprezentacja przejściowa"
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_product_product__preparation_time
-#: model:ir.model.fields,field_description:sale_stock_renting.field_product_template__preparation_time
-msgid "Reserve product"
-msgstr ""
-
-#. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__reserved_lot_ids
 msgid "Reserved Lots"
-msgstr ""
+msgstr "Zarezerwowane partie"
 
 #. module: sale_stock_renting
 #. odoo-javascript
 #: code:addons/sale_stock_renting/static/src/widgets/qty_at_date_widget.xml:0
 msgid "Reserved lots unavailable"
-msgstr ""
-
-#. module: sale_stock_renting
-#: model:ir.model,name:sale_stock_renting.model_stock_return_picking
-msgid "Return Picking"
-msgstr "Pobranie zwrotne"
+msgstr "Niedostępne zarezerwowane partie"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__returnable_lot_ids
@@ -398,6 +369,14 @@ msgid "Stock Move"
 msgstr "Przesunięcie"
 
 #. module: sale_stock_renting
+#: model:ir.model.fields,help:sale_stock_renting.field_rental_order_wizard_line__tracking
+#: model:ir.model.fields,help:sale_stock_renting.field_sale_order_line__tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
+
+#. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_product_product__preparation_time
 #: model:ir.model.fields,help:sale_stock_renting.field_product_template__preparation_time
 msgid "Temporarily make this product unavailable before pickup."
@@ -410,23 +389,25 @@ msgid ""
 "The number of reserved lots is less than the quantity required for this "
 "order line. Please allocate additional lots."
 msgstr ""
+"Liczba zarezerwowanych partii jest mniejsza niż ilość wymagana dla tego "
+"wiersza zamówienia. Przydziel dodatkowe partie."
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_res_company__rental_loc_id
 msgid ""
-"This technical location serves as stock for products currently in rentalThis "
-"location is internal because products in rentalare still considered as "
+"This technical location serves as stock for products currently in rental. "
+"This location is internal because products in rental are still considered as "
 "company assets."
 msgstr ""
-"Ta lokalizacja techniczna służy jako magazyn dla produktów aktualnie "
-"wynajmowanych. Ta lokalizacja jest wewnętrzna, ponieważ produkty wynajmowane "
-"są nadal uważane za aktywa firmy."
+"Ta lokacja techniczna służy jako magazyn dla produktów znajdujących się w "
+"wynajmie. Ta lokacja jest wewnętrzna, ponieważ wynajmowane produkty są nadal "
+"traktowane jako aktywa firmy."
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__tracking
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__tracking
-msgid "Tracking"
-msgstr "Śledzenie"
+msgid "Tracking Method"
+msgstr ""
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -442,7 +423,7 @@ msgstr ""
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "Przekaz"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__unavailable_lot_ids
@@ -452,7 +433,7 @@ msgstr "Niedostępna partia"
 #. module: sale_stock_renting
 #: model:res.groups,name:sale_stock_renting.group_rental_stock_picking
 msgid "Use pickings for rental orders"
-msgstr ""
+msgstr "Używaj opcji kompletacji dla zamówień wynajmu"
 
 #. module: sale_stock_renting
 #. odoo-javascript
@@ -472,44 +453,14 @@ msgid "You cannot change the product of lines linked to stock moves."
 msgstr "Nie można zmienić iloczynu linii powiązanych z przesunięciami zapasów."
 
 #. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.res_config_settings_inherit_view_form
-msgid "hours"
-msgstr "godzin"
-
-#. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.product_template_inherit_view_form_stock_rental
-msgid "hours before its picking time"
-msgstr ""
-
-#. module: sale_stock_renting
 #. odoo-javascript
 #: code:addons/sale_stock_renting/static/src/widgets/qty_at_date_widget.xml:0
 msgid "to"
 msgstr "do"
 
-#~ msgid "Configure the rental of a product"
-#~ msgstr "Skonfiguruj wynajem produktu"
+#~ msgid "Ensure the traceability of a storable product in your warehouse."
+#~ msgstr ""
+#~ "Zapewnij identyfikowalność produktu rejestrowanego w Twoim magazynie."
 
-#~ msgid "Is Available"
-#~ msgstr "Jest dostępne"
-
-#~ msgid "Printer"
-#~ msgstr "Drukarka"
-
-#~ msgid "Product UoM"
-#~ msgstr "JM produktu"
-
-#~ msgid "Rental Schedule"
-#~ msgstr "Planowanie Wynajmu"
-
-#~ msgid "Reserved Lot"
-#~ msgstr "Zarezerwowana partia"
-
-#~ msgid "Security Time"
-#~ msgstr "Czas bezpieczeństwa"
-
-#~ msgid "Stock"
-#~ msgstr "Strefa składowania"
-
-#~ msgid "hours before orders"
-#~ msgstr "godzin przed zamówieniami"
+#~ msgid "Tracking"
+#~ msgstr "Śledzenie"

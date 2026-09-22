@@ -1,35 +1,53 @@
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { MrpWorkcenterDialog } from "./mrp_workcenter_dialog";
 import { MrpQualityCheckSelectDialog } from "./mrp_check_select_dialog";
 
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, onWillStart, t, useProps } from "@odoo/owl";
 
 export class MrpMenuDialog extends Component {
-    static props = {
-        close: Function,
-        groups: Object,
-        params: Object,
-        record: Object,
-        reload: Function,
-        title: String,
-        removeFromCache: Function,
-        registerProduction: Function,
-    };
     static template = "mrp_workorder.MrpDisplayMenuDialog";
     static components = { Dialog };
-    static NOTIFICATION_MESSAGE = {
-        button_scrap: _t("The scrap order has been successfully registered."),
-        button_quality_alert: _t("The quality alert has been successfully created."),
-    };
+
+    props = useProps({
+        close: t.function(),
+        groups: t.object(),
+        params: t.object(),
+        record: t.object(),
+        reload: t.function(),
+        title: t.string(),
+        removeFromCache: t.function(),
+        registerProduction: t.function(),
+        logTime: t.function(),
+        updateWorkcenter: t.function(),
+        onNavigateToMO: t.function().optional(),
+    });
 
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
         this.dialogService = useService("dialog");
         this.notification = useService("notification");
-        this.state = useState({ menu: "main" });
+        this.state = proxy({ menu: "main" });
+        this.workOrdersEnabled = false;
+
+        onWillStart(async () => {
+            this.workOrdersEnabled = await user.hasGroup("mrp.group_mrp_routings");
+        });
+    }
+
+    getNotificationMessage(method) {
+        // Notification messages are consolidated here to avoid redundant overrides in extending modules.
+        if (method === "action_scrap") {
+            return _t("The scrap order has been successfully registered.");
+        } else if (method === "button_quality_alert") {
+            return _t("The quality alert has been successfully created.");
+        } else if (method === "button_maintenance_req") {
+            return _t("The maintenance request has been successfully created.");
+        }
+        return "";
     }
 
     async callAction(method, props = {}) {
@@ -42,7 +60,7 @@ export class MrpMenuDialog extends Component {
             }
         );
 
-        const message = MrpMenuDialog.NOTIFICATION_MESSAGE[method];
+        const message = this.getNotificationMessage(method);
         if (message) {
             props.onSave = async () => {
                 this.notification.add(message, { type: "success" });
@@ -81,10 +99,9 @@ export class MrpMenuDialog extends Component {
             this.props.record.update({ workcenter_id: workcenter });
             this.props.record.save().then((succeeded) => {
                 if (succeeded) {
-                    this.notification.add(
-                        _t("The operation has been successfully moved."),
-                        { type: "success" }
-                    );
+                    this.notification.add(_t("The operation has been successfully moved."), {
+                        type: "success",
+                    });
                 }
             });
             this.props.removeFromCache(this.props.record.resId);
@@ -107,6 +124,9 @@ export class MrpMenuDialog extends Component {
                 ? this.props.record.resId
                 : this.props.record.data.production_id.id;
 
+        if (this.props.onNavigateToMO) {
+            this.props.onNavigateToMO();
+        }
         await this.action.doAction({
             type: "ir.actions.act_window",
             res_model: "mrp.production",
@@ -120,8 +140,11 @@ export class MrpMenuDialog extends Component {
     async block() {
         const options = {
             additionalContext: { default_workcenter_id: this.props.record.data.workcenter_id.id },
-            onClose: async () => {
+            onClose: async (result) => {
                 await this.props.reload();
+                if (!result) {
+                    this.props.updateWorkcenter(this.props.record.data.workcenter_id.id, "blocked")
+                }
             },
         };
         await this.action.doAction("mrp.act_mrp_block_workcenter_wo", options);
@@ -136,6 +159,7 @@ export class MrpMenuDialog extends Component {
             resModel: "mrp.workcenter",
             onClose: async () => {
                 await this.props.reload();
+                this.props.updateWorkcenter(this.props.record.data.workcenter_id.id, "normal")
             },
         });
         this.props.close();
@@ -153,8 +177,8 @@ export class MrpMenuDialog extends Component {
         this.state.menu = "improvement";
     }
 
-    displayModifyRoutingMenu(){
-        this.state.menu = "routing"
+    displayModifyRoutingMenu() {
+        this.state.menu = "routing";
     }
 
     updateStep() {

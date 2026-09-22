@@ -31,7 +31,7 @@ class L10nRoTrialBalance5ColumnReportHandler(models.AbstractModel):
 
         date_to = fields.Date.from_string(
             min(key['forced_options']['date']['date_from']
-                for key in options['column_groups'].values())
+                for key in options['column_groups'])
         ) - datetime.timedelta(days=1)
 
         # Format dates and create header name
@@ -53,7 +53,6 @@ class L10nRoTrialBalance5ColumnReportHandler(models.AbstractModel):
                 'date': {
                     'string': header_name,
                     'period_type': 'custom',
-                    'currency_table_period_key': f"{date_from_str}_{date_to_str}",
                     'mode': 'range',
                     'date_from': date_from_str,
                     'date_to': date_to_str
@@ -68,14 +67,13 @@ class L10nRoTrialBalance5ColumnReportHandler(models.AbstractModel):
             {'horizontal_groupby_element': {}, **column_header_values}
         )
 
-        new_columns, new_column_groups = report._build_columns_from_column_group_vals(
-            column_header_values['forced_options'],
+        new_columns = report._build_columns_from_column_group_vals(
+            options,
             new_column_group_vals
         )
 
         options['columns'] = new_columns + options['columns']
         options['column_headers'][0] = [{'name': header_name, **column_header_values}, *options['column_headers'][0]]
-        options['column_groups'].update(new_column_groups)
 
     def _generate_total_amounts_columns(self, options):
         end_balance_columns = deepcopy(options['columns'][-2:])
@@ -98,16 +96,16 @@ class L10nRoTrialBalance5ColumnReportHandler(models.AbstractModel):
         total_credit = 0.0
 
         for line in lines:
-            balance = line['columns'][end_balance_debit_index]['no_format'] - line['columns'][end_balance_credit_index]['no_format']
+            balance = line.columns[end_balance_debit_index].no_format - line.columns[end_balance_credit_index].no_format
             debit = max(balance, 0.0) or 0.0
             credit = max(-balance, 0.0) or 0.0
-            line['columns'][end_balance_debit_index]['no_format'] = debit
-            line['columns'][end_balance_credit_index]['no_format'] = credit
+            line.columns[end_balance_debit_index].no_format = debit
+            line.columns[end_balance_credit_index].no_format = credit
             total_debit += debit
             total_credit += credit
 
-        lines[-1]['columns'][end_balance_debit_index]['no_format'] = self.env.company.currency_id.round(total_debit)
-        lines[-1]['columns'][end_balance_credit_index]['no_format'] = self.env.company.currency_id.round(total_credit)
+        lines[-1].columns[end_balance_debit_index].no_format = self.env.company.currency_id.round(total_debit)
+        lines[-1].columns[end_balance_credit_index].no_format = self.env.company.currency_id.round(total_credit)
 
         return lines
 

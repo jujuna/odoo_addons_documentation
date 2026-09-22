@@ -14,7 +14,6 @@ class AppointmentCrmLeadPropagationTest(HttpCase):
         opportunity = self.env['crm.lead'].create({
             'name': 'Test Opportunity'
         })
-        appointment_type = self.env['appointment.type'].create({'name': "Test AppointmentCRM"})
         self.start_tour('/odoo', 'appointment_crm_meeting_tour', login='admin')
-        appointment_invite = self.env['appointment.invite'].search([('appointment_type_ids', 'in', appointment_type.ids)])
-        self.assertTrue(appointment_invite.opportunity_id == opportunity)
+        appointment_invite = self.env['appointment.invite'].search([('opportunity_id', '=', opportunity.id)], limit=1)
+        self.assertTrue(appointment_invite)

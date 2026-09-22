@@ -3,22 +3,22 @@
 # * social_linkedin
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-10-22 07:52+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:56+0000\n"
+"PO-Revision-Date: 2026-09-18 04:03+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "social_linkedin/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: social_linkedin
 #: model_terms:ir.ui.view,arch_db:social_linkedin.linkedin_preview
@@ -27,18 +27,30 @@ msgstr "<b>Post LinkedIn</b>"
 
 #. module: social_linkedin
 #: model_terms:ir.ui.view,arch_db:social_linkedin.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-comments me-1\" title=\"Comments\"/>"
-msgstr "<i class=\"fa fa-comments me-1\" title=\"Commentaires\"/>"
+msgid "<i class=\"oi oi-filled me-1\" data-icon=\"thumb_up\" title=\"Likes\"/>"
+msgstr ""
+"<i class=\"oi oi-filled me-1\" data-icon=\"thumb_up\" title=\"J'aime\"/>"
 
 #. module: social_linkedin
-#: model_terms:ir.ui.view,arch_db:social_linkedin.social_stream_post_view_kanban
-msgid "<i class=\"fa fa-thumbs-up me-1\" title=\"Likes\"/>"
-msgstr "<i class=\"fa fa-thumbs-up me-1\" title=\"J'aime\"/>"
+#: model_terms:ir.ui.view,arch_db:social_linkedin.linkedin_preview
+msgid "<span>1 Comment</span>"
+msgstr ""
 
 #. module: social_linkedin
 #: model:ir.model.fields,field_description:social_linkedin.field_social_live_post__linkedin_post_id
 msgid "Actual LinkedIn ID of the post"
 msgstr "ID LinkedIn réel du post"
+
+#. module: social_linkedin
+#: model_terms:ir.ui.view,arch_db:social_linkedin.social_post_template_view_form
+msgid "Add Media"
+msgstr ""
+
+#. module: social_linkedin
+#. odoo-python
+#: code:addons/social_linkedin/models/social_account.py:0
+msgid "An error occurred when fetching your account: “%s”."
+msgstr ""
 
 #. module: social_linkedin
 #. odoo-python
@@ -72,6 +84,12 @@ msgid "Author Image"
 msgstr "Auteur de l'image"
 
 #. module: social_linkedin
+#. odoo-javascript
+#: code:addons/social_linkedin/static/src/xml/social_linkedin_templates.xml:0
+msgid "Brand Pages"
+msgstr ""
+
+#. module: social_linkedin
 #: model:ir.model.fields,help:social_linkedin.field_res_config_settings__linkedin_use_own_account
 msgid ""
 "Check this if you want to use your personal LinkedIn Developer Account "
@@ -79,6 +97,18 @@ msgid ""
 msgstr ""
 "Cochez cette case si vous souhaitez utiliser votre compte développeur "
 "LinkedIn personnel au lieu de celui fourni."
+
+#. module: social_linkedin
+#: model_terms:ir.ui.view,arch_db:social_linkedin.social_post_template_view_form
+msgid ""
+"Comment your own post to get the conversation going or share some extra "
+"content."
+msgstr ""
+
+#. module: social_linkedin
+#: model_terms:ir.ui.view,arch_db:social_linkedin.social_stream_post_view_kanban
+msgid "Comments"
+msgstr "Commentaires"
 
 #. module: social_linkedin
 #: model:ir.model,name:social_linkedin.model_res_config_settings
@@ -156,15 +186,25 @@ msgid "ID"
 msgstr "ID"
 
 #. module: social_linkedin
-#: model_terms:ir.ui.view,arch_db:social_linkedin.social_post_template_view_form
-msgid "Images"
-msgstr "Images"
+#: model_terms:ir.ui.view,arch_db:social_linkedin.social_post_view_form
+msgid "Immediately"
+msgstr ""
 
 #. module: social_linkedin
 #. odoo-javascript
 #: code:addons/social_linkedin/static/src/xml/social_linkedin_templates.xml:0
 msgid "Likes"
 msgstr "J'aime"
+
+#. module: social_linkedin
+#: model_terms:ir.ui.view,arch_db:social_linkedin.social_media_view_kanban
+msgid "Link Page Account"
+msgstr ""
+
+#. module: social_linkedin
+#: model_terms:ir.ui.view,arch_db:social_linkedin.social_media_view_kanban
+msgid "Link Personal Account"
+msgstr ""
 
 #. module: social_linkedin
 #: model:ir.model.fields.selection,name:social_linkedin.selection__social_media__media_type__linkedin
@@ -192,10 +232,21 @@ msgid "LinkedIn Comments"
 msgstr "Commentaires LinkedIn"
 
 #. module: social_linkedin
+#: model:ir.model.fields,field_description:social_linkedin.field_social_post__linkedin_first_comment
+#: model:ir.model.fields,field_description:social_linkedin.field_social_post_template__linkedin_first_comment
+msgid "LinkedIn First Comment"
+msgstr ""
+
+#. module: social_linkedin
 #: model:ir.model.fields,field_description:social_linkedin.field_social_post__linkedin_image_ids
 #: model:ir.model.fields,field_description:social_linkedin.field_social_post_template__linkedin_image_ids
 msgid "LinkedIn Images"
 msgstr "Images LinkedIn"
+
+#. module: social_linkedin
+#: model:ir.model.fields,field_description:social_linkedin.field_social_account__linkedin_is_personal_account
+msgid "LinkedIn Is Personal Account"
+msgstr ""
 
 #. module: social_linkedin
 #: model:ir.model.fields,field_description:social_linkedin.field_social_stream_post__linkedin_likes_count
@@ -213,6 +264,11 @@ msgstr "Message LinkedIn"
 #: model:ir.model.fields,field_description:social_linkedin.field_social_post_template__linkedin_preview
 msgid "LinkedIn Preview"
 msgstr "Aperçu LinkedIn"
+
+#. module: social_linkedin
+#: model:ir.model.fields,field_description:social_linkedin.field_social_post__linkedin_scheduled_date
+msgid "LinkedIn Scheduled for"
+msgstr ""
 
 #. module: social_linkedin
 #: model:ir.model.fields,field_description:social_linkedin.field_social_stream_post__linkedin_author_vanity_name
@@ -256,6 +312,17 @@ msgid "Linkedin Developer Account"
 msgstr "Compte développeur LinkedIn"
 
 #. module: social_linkedin
+#: model:ir.module.module,description:base.module_social_linkedin
+#: model:ir.module.module,summary:base.module_social_linkedin
+msgid "Manage your LinkedIn accounts and schedule posts"
+msgstr ""
+
+#. module: social_linkedin
+#: model_terms:ir.ui.view,arch_db:social_linkedin.social_post_template_view_form
+msgid "Media"
+msgstr ""
+
+#. module: social_linkedin
 #: model:ir.model.fields,field_description:social_linkedin.field_social_media__media_type
 msgid "Media Type"
 msgstr "Type de réseau"
@@ -278,6 +345,12 @@ msgstr ""
 "Prenez un abonnement et débloquez un monde de fonctionnalités incroyables !"
 
 #. module: social_linkedin
+#. odoo-javascript
+#: code:addons/social_linkedin/static/src/xml/social_linkedin_templates.xml:0
+msgid "Personal Account"
+msgstr ""
+
+#. module: social_linkedin
 #. odoo-python
 #: code:addons/social_linkedin/models/social_post_template.py:0
 msgid ""
@@ -291,6 +364,11 @@ msgid "Post Image"
 msgstr "Image du post"
 
 #. module: social_linkedin
+#: model_terms:ir.ui.view,arch_db:social_linkedin.social_post_view_form
+msgid "Post On"
+msgstr ""
+
+#. module: social_linkedin
 #: model:social.stream.type,name:social_linkedin.stream_type_linkedin_company_post
 msgid "Posts"
 msgstr "Posts"
@@ -302,9 +380,19 @@ msgid "Read More about Business Accounts"
 msgstr "En savoir plus sur les comptes professionnels"
 
 #. module: social_linkedin
+#: model_terms:ir.ui.view,arch_db:social_linkedin.social_post_template_view_form
+msgid "Scheduled first comment"
+msgstr ""
+
+#. module: social_linkedin
 #: model:ir.model,name:social_linkedin.model_social_account
 msgid "Social Account"
 msgstr "Compte social"
+
+#. module: social_linkedin
+#: model:ir.module.module,shortdesc:base.module_social_linkedin
+msgid "Social LinkedIn"
+msgstr ""
 
 #. module: social_linkedin
 #: model:ir.model,name:social_linkedin.model_social_live_post
@@ -419,6 +507,12 @@ msgstr "Permet de joindre des images à vos publications."
 #: code:addons/social_linkedin/models/social_stream.py:0
 msgid "Wrong stream type for \"%s\""
 msgstr "Mauvais type de flux pour \"%s\""
+
+#. module: social_linkedin
+#. odoo-javascript
+#: code:addons/social_linkedin/static/src/js/add_stream_modal.js:0
+msgid "You cannot add a stream for a personal LinkedIn account."
+msgstr ""
 
 #. module: social_linkedin
 #. odoo-python

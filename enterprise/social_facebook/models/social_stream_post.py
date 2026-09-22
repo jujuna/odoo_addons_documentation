@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import dateutil.parser
+import json
 import logging
 import requests
 import urllib.parse
@@ -59,7 +60,7 @@ class SocialStreamPost(models.Model):
 
     def _facebook_comment_delete(self, comment_id):
         requests.delete(url_join(self.env['social.media']._FACEBOOK_ENDPOINT_VERSIONED, comment_id),
-            data={'access_token': self.stream_id.account_id.facebook_access_token},
+            data={'access_token': self.stream_id.account_id._get_facebook_access_token()},
             timeout=5
         )
 
@@ -71,7 +72,7 @@ class SocialStreamPost(models.Model):
         comments_endpoint_url = url_join(self.env['social.media']._FACEBOOK_ENDPOINT_VERSIONED, "%s/comments" % self.facebook_post_id)
         params = {
             'fields': self.FACEBOOK_COMMENT_FIELDS,
-            'access_token': self.stream_id.account_id.facebook_access_token,
+            'access_token': self.stream_id.account_id._get_facebook_access_token(),
             'summary': 1,
             'limit': count,
             'order': 'reverse_chronological'
@@ -111,10 +112,11 @@ class SocialStreamPost(models.Model):
             'nextRecordsToken': result_json.get('paging').get('cursors').get('after') if result_json.get('paging') else None
         }
 
-    def _facebook_comment_post(self, endpoint_url, message, existing_attachment_id=None, attachment=None):
+    @api.model
+    def _facebook_comment_post(self, account_id, endpoint_url, message, existing_attachment_id=None, attachment=None):
         params = {
             'message': message,
-            'access_token': self.stream_id.account_id.facebook_access_token,
+            'access_token': account_id._get_facebook_access_token(),
             # The response received from the post request to post the comment
             # does not return all the fields mentioned here.
             'fields': self.FACEBOOK_COMMENT_FIELDS
@@ -144,12 +146,28 @@ class SocialStreamPost(models.Model):
         return result
 
     def _facebook_like(self, object_id, like):
-        params = {'access_token': self.stream_id.account_id.facebook_access_token}
+        params = {'access_token': self.stream_id.account_id._get_facebook_access_token()}
         comments_like_endpoint_url = url_join(self.env['social.media']._FACEBOOK_ENDPOINT_VERSIONED, "%s/likes" % (object_id))
         if like:
             requests.post(comments_like_endpoint_url, data=params, timeout=5)
         else:
             requests.delete(comments_like_endpoint_url, data=params)
+
+    def _facebook_update_likes(self, like):
+        """Like the post in SUDO for social users."""
+        for post in self:
+            if post.facebook_user_likes == like:
+                continue
+
+            increment = 1 if like else -1
+            likes_count = max(0, post.facebook_likes_count + increment)
+            reactions_count = json.loads(post.facebook_reactions_count or '{}')
+            reactions_count['LIKE'] = max(0, reactions_count.get('LIKE', 0) + increment)
+            post.sudo().write({
+                'facebook_likes_count': likes_count,
+                'facebook_reactions_count': json.dumps(reactions_count),
+                'facebook_user_likes': like,
+            })
 
     # ========================================================
     # MISC / UTILITY
@@ -185,7 +203,12 @@ class SocialStreamPost(models.Model):
         }
         if "from" not in comment:
             comment["from"] = {"name": _("Unknown")}
+
         if comment.get('attachment', {}).get('type') == 'sticker':
             # stickers are just image
             comment['attachment']['type'] = 'photo'
+        elif comment.get('attachment', {}).get('type') == 'animated_image_share':
+            # GIF from the Facebook "GIF button"
+            comment['attachment']['type'] = 'animated_image_video'
+
         return comment

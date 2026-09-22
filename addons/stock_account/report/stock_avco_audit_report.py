@@ -1,4 +1,5 @@
 from odoo import fields, models, tools
+from odoo.tools import float_is_zero
 
 
 class StockAverageCostReport(models.AbstractModel):
@@ -58,15 +59,13 @@ LEFT JOIN
 LEFT JOIN
     product_category pc ON pt.categ_id = pc.id
 LEFT JOIN
-    res_company company ON sm.company_id = company.id
+    ir_default cost_method_default ON cost_method_default.company_id = sm.company_id
+                                  AND cost_method_default.field_id = (SELECT id FROM ir_model_fields WHERE name = 'property_cost_method' AND model = 'product.category')
 WHERE
     sm.state = 'done'
     AND (sm.is_in = TRUE OR sm.is_out = TRUE)
     -- Ignore moves for standard cost method. Only display the list of cost updates
-    AND (
-        (pt.categ_id IS NOT NULL AND pc.property_cost_method ->> company.id::text IN ('fifo', 'average'))
-        OR (pt.categ_id IS NULL OR pc.property_cost_method IS NULL AND company.cost_method IN ('fifo', 'average'))
-    )
+    AND COALESCE(pc.property_cost_method ->> sm.company_id::text, cost_method_default.json_value::jsonb #>> '{}') IN ('fifo', 'average')
 UNION ALL
 SELECT
     -pv.id,
@@ -99,20 +98,29 @@ WHERE
             total_quantity = 0.0
             avco = 0.0
             for record in total_records:
+                qty = record.quantity
                 if record.res_model_name == 'stock.move':
-                    if record.quantity > 0:
+                    previous_qty = total_quantity
+                    total_quantity += qty
+                    if qty > 0:
                         added_value = record.value
-                    elif record.quantity < 0:
-                        added_value = avco * record.quantity
-                    total_value += added_value
-                    total_quantity += record.quantity
+                        # Regular case, value from accumulation
+                        if previous_qty > 0:
+                            total_value += added_value
+                            avco = total_value / total_quantity if not float_is_zero(total_quantity, precision_digits=self.env['decimal.precision'].precision_get('Product Unit')) else avco
+                        # From negative quantity case, value from last_in
+                        elif previous_qty <= 0:
+                            avco = added_value / qty if qty else avco
+                            total_value = avco * total_quantity
+                    else:
+                        added_value = avco * qty
+                        total_value += added_value
 
                 elif record.res_model_name == 'product.value':
-                    added_value = (record.value * total_quantity) - total_value
-                    total_value = record.value * total_quantity
+                    avco = record.value
+                    added_value = (avco * total_quantity) - total_value
+                    total_value = avco * total_quantity
 
-                if total_quantity:
-                    avco = total_value / total_quantity
                 if record in current_page_records:
                     record.added_value = added_value
                     record.total_value = total_value

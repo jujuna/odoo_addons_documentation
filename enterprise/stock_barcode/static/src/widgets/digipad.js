@@ -4,15 +4,16 @@ import { formatFloat } from "@web/core/utils/numbers";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, proxy, t, useProps } from "@odoo/owl";
 
 export class Digipad extends Component {
     static template = "stock_barcode.DigipadTemplate";
-    static props = {
+
+    props = useProps({
         ...standardWidgetProps,
-        fieldToEdit: { type: String },
-        fulfilledAt: { type: String, optional: true },
-    };
+        fieldToEdit: t.string(),
+        fulfilledAt: t.string().optional(),
+    });
 
     setup() {
         this.orm = useService("orm");
@@ -28,7 +29,7 @@ export class Digipad extends Component {
         const field = this.props.record.model.config.fields[this.props.fieldToEdit];
         this.precision = field.digits[1];
         this.productId = this.props.record.data.product_id.id;
-        this.state = useState({
+        this.state = proxy({
             packagingButtons: [],
         });
         useRecordObserver(async (record) => {
@@ -116,20 +117,26 @@ export class Digipad extends Component {
      */
     async _fetchPackagingButtons() {
         const record = this.props.record.data;
-        this.productUom = (
-            await this.orm.searchRead(
-                "uom.uom",
-                [["id", "=", record.product_uom_id?.id]],
-                ["factor"]
-            )
-        )?.[0];
+        this.productUom = false;
+        if (record.uom_id) {
+            this.productUom = (
+                await this.orm.searchRead("uom.uom", [["id", "=", record.uom_id.id]], ["factor"])
+            )?.[0];
+        }
         if (record.product_id.id) {
-            let domain = [["id", "=", record.product_id.id]];
-            const product_uoms = await this.orm.searchRead("product.product", domain, ["uom_ids"]);
-            if (product_uoms.length === 0) {
+            const productUoms = await this.orm.searchRead(
+                "product.product",
+                [["id", "=", record.product_id.id]],
+                ["uom_ids", "extra_uom_ids"],
+                { limit: 1 }
+            );
+            if (productUoms.length === 0) {
                 return;
             }
-            domain = [["id", "in", product_uoms[0].uom_ids]];
+            const allUomIds = [
+                ...new Set([...productUoms[0].uom_ids, ...productUoms[0].extra_uom_ids]),
+            ];
+            const domain = [["id", "in", allUomIds]];
             if (this.quantityToFulfill) {
                 // Doesn't fetch packaging with a too high quantity.
                 domain.push(["factor", "<=", this.quantityToFulfill]);

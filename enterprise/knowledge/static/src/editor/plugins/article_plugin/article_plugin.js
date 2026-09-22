@@ -3,9 +3,9 @@ import { rightPos } from "@html_editor/utils/position";
 import { ArticleSearchDialog } from "@knowledge/components/article_search_dialog/article_search_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { renderToElement } from "@web/core/utils/render";
-import { isHtmlContentSupported } from "@html_editor/core/selection_plugin";
+import { isLinkSupported } from "@html_editor/main/link/link_plugin";
 
-const ARTICLE_LINKS_SELECTOR = ".o_knowledge_article_link";
+export const ARTICLE_LINKS_SELECTOR = ".o_knowledge_article_link";
 export class KnowledgeArticlePlugin extends Plugin {
     static id = "article";
     static dependencies = ["history", "dom", "selection", "dialog"];
@@ -15,9 +15,9 @@ export class KnowledgeArticlePlugin extends Plugin {
                 id: "insertArticle",
                 title: _t("Article"),
                 description: _t("Insert an Article shortcut"),
-                icon: "fa-newspaper-o",
+                icon: "newspaper",
                 run: this.addArticle.bind(this),
-                isAvailable: isHtmlContentSupported,
+                isAvailable: isLinkSupported,
             },
         ],
         powerbox_items: [
@@ -26,14 +26,9 @@ export class KnowledgeArticlePlugin extends Plugin {
                 commandId: "insertArticle",
             },
         ],
-        clean_for_save_handlers: this.cleanForSave.bind(this),
-        normalize_handlers: this.normalize.bind(this),
+        clean_for_save_processors: this.cleanForSave.bind(this),
+        normalize_processors: this.normalize.bind(this),
     };
-
-    setup() {
-        super.setup();
-        this.boundOpenArticle = this.openArticle.bind(this);
-    }
 
     addArticle() {
         const recordInfo = this.config.getRecordInfo();
@@ -42,15 +37,16 @@ export class KnowledgeArticlePlugin extends Plugin {
             parentArticleId = recordInfo.resId;
         }
         const cursors = this.dependencies.selection.preserveSelection();
-        const renderArticleLink = (id, displayName) => {
+        const renderArticleLink = (id, icon, name) => {
             const articleLinkBlock = renderToElement("knowledge.ArticleBlueprint", {
                 href: `/knowledge/article/${id}`,
                 articleId: id,
-                displayName,
+                icon,
+                name: name || _t("Untitled"),
             });
             cursors.restore();
             this.dependencies.dom.insert(articleLinkBlock);
-            this.dependencies.history.addStep();
+            this.dependencies.history.commit();
             const [anchorNode, anchorOffset] = rightPos(articleLinkBlock);
             this.dependencies.selection.setSelection({ anchorNode, anchorOffset });
         };
@@ -66,14 +62,14 @@ export class KnowledgeArticlePlugin extends Plugin {
                     }
                 );
                 const articleId = articleIds[0];
-                renderArticleLink(articleId, `📄 ${label}`);
+                renderArticleLink(articleId, false, label);
                 if (parentArticleId) {
                     this.config.embeddedComponentInfo.env.bus.trigger(
                         "knowledge.sidebar.insertNewArticle",
                         {
                             articleId,
                             name: label,
-                            icon: "📄",
+                            icon: false,
                             parentId: parentArticleId,
                         }
                     );
@@ -93,7 +89,7 @@ export class KnowledgeArticlePlugin extends Plugin {
                 return this.services.orm.call("knowledge.article", searchFunction, [[]], params);
             },
             searchEmptyQuery: true,
-            select: (article) => renderArticleLink(article.id, article.displayName),
+            select: (article) => renderArticleLink(article.id, article.icon, article.name),
         }, { onClose: () => { this.dependencies.selection.focusEditable(); }});
     }
 
@@ -105,37 +101,20 @@ export class KnowledgeArticlePlugin extends Plugin {
         return articleLinks;
     }
 
-    async openArticle(ev) {
-        if (this.config.embeddedComponentInfo?.env?.openArticle) {
-            const articleId = parseInt(ev.target.dataset.res_id);
-            if (articleId) {
-                ev.preventDefault();
-                await this.config.embeddedComponentInfo.env.openArticle(articleId);
-            }
-        }
-    }
-
     normalize(element) {
         const articleLinks = this.scanForArticleLinks(element);
         for (const articleLink of articleLinks) {
             articleLink.setAttribute("target", "_blank");
-            articleLink.setAttribute("contenteditable", "false");
-            articleLink.addEventListener("click", this.boundOpenArticle);
+            articleLink.setAttribute("contenteditable", "true");
         }
+        return element;
     }
 
-    cleanForSave({ root }) {
+    cleanForSave(root) {
         const articleLinks = this.scanForArticleLinks(root);
         for (const articleLink of articleLinks) {
             articleLink.removeAttribute("contenteditable");
         }
-    }
-
-    destroy() {
-        super.destroy();
-        const articleLinks = this.scanForArticleLinks(this.editable);
-        for (const articleLink of articleLinks) {
-            articleLink.removeEventListener("click", this.boundOpenArticle);
-        }
+        return root;
     }
 }

@@ -8,6 +8,7 @@ import xlsxwriter
 
 from odoo import api, models, _
 from odoo.fields import Domain
+from odoo.tools import SQL
 
 _logger = logging.getLogger(__name__)
 
@@ -31,11 +32,59 @@ class AccountReport(models.Model):
                 if button.get('action') == 'action_open_returns':
                     button['name'] = 'Reconcile'
 
+    def _is_available_for(self, companies):
+        in_companies = self.env.companies.filtered(lambda c: c.account_fiscal_country_id.code == 'IN')
+        if not in_companies:
+            return super()._is_available_for(companies)
+
+        to_exclude = set()
+
+        if not any(c.l10n_in_gst_efiling_feature for c in in_companies):
+            to_exclude.update({
+                'l10n_in_reports.account_report_gstr1',
+                'l10n_in_reports.account_report_gstr2b',
+                'l10n_in_reports.account_report_gstr3b',
+                'l10n_in_reports.account_report_cmp_08',
+                'l10n_in_reports.account_report_gstr4',
+            })
+        elif any(
+            company.l10n_in_gst_registration_type == 'composition'
+            for company in in_companies
+        ):
+            to_exclude.update({
+                'l10n_in_reports.account_report_gstr1',
+                'l10n_in_reports.account_report_gstr2b',
+                'l10n_in_reports.account_report_gstr3b',
+            })
+        else:
+            to_exclude.update({
+                'l10n_in_reports.account_report_cmp_08',
+                'l10n_in_reports.account_report_gstr4',
+            })
+
+        if not any(c.l10n_in_tcs_feature for c in in_companies):
+            to_exclude.add('l10n_in.tcs_report')
+
+        if not any(c.l10n_in_tds_feature for c in in_companies):
+            to_exclude.add('l10n_in.tds_report')
+
+        external_ids = self._get_external_ids()
+        reports = self.filtered(lambda report: (external_ids.get(report.id) or [None])[0] not in to_exclude)
+        return super(AccountReport, reports)._is_available_for(companies)
+
 
 class L10n_InReportHandler(models.AbstractModel):
     _name = 'l10n_in.report.handler'
     _inherit = ['account.generic.tax.report.handler']
     _description = 'Indian Tax Report Custom Handler'
+
+    def _custom_line_postprocessor(self, report, options, lines):
+        if (
+            report.id == self.env.ref('l10n_in_reports.account_report_gstr1').id
+            and self.env.company.l10n_in_disable_b2c_hsn_reporting
+        ):
+            lines.remove(report._get_line_from_xml_id(lines, 'l10n_in_reports.account_report_gstr1_hsn_b2c'))
+        return super()._custom_line_postprocessor(report, options, lines)
 
     @api.model
     def _get_invalid_intra_state_tax_on_lines(self, aml_domain):
@@ -64,7 +113,10 @@ class L10n_InReportHandler(models.AbstractModel):
         return [
             ('l10n_in_gstr_section', '!=', 'sale_out_of_scope'),
             ('l10n_in_hsn_code', '=', False),
-            ('display_type', '!=', 'tax')
+            ('display_type', '!=', 'tax'),
+            '|',
+            ('company_id.l10n_in_disable_b2c_hsn_reporting', '=', False),
+            ('move_id.l10n_in_gst_treatment', 'in', self.env['account.move']._l10n_in_get_b2b_gst_treatments()),
         ]
 
     @api.model
@@ -143,14 +195,6 @@ class L10n_InReportHandler(models.AbstractModel):
         ]
 
     @api.model
-    def _get_out_of_fiscal_year_reversed_moves(self, options):
-        """This method is deprecated and will be removed in the next version (master).
-        The warning is now displayed directly on each individual move until it is checked,
-        instead of being shown at the report level.
-        """
-        return 'l10n_in_reports.out_of_fiscal_year_reversed_moves_warning', self.env['account.move']
-
-    @api.model
     def _get_unlinked_unregistered_inter_state_reversed_moves(self, options):
         unlinked_reversed_moves = self.env['account.move'].search(
             self._get_reversed_moves_domain(options) +
@@ -164,20 +208,33 @@ class L10n_InReportHandler(models.AbstractModel):
 
     @api.model
     def _get_invalid_tds_tcs_moves(self, options, report):
-        AccountMove = self.env['account.move']
-        domain = [
-            ('date', '>=', options['date']['date_from']),
-            ('date', '<=', options['date']['date_to']),
-            ('state', '=', 'posted'),
-            ('commercial_partner_id.l10n_in_pan_entity_id', '=', False),
-        ]
+
+        def get_invalid_moves(tax_type, group_ref):
+            domain = [
+                ('date', '>=', options['date']['date_from']),
+                ('date', '<=', options['date']['date_to']),
+                ('state', '=', 'posted'),
+                ('move_type', '!=', 'entry'),
+                ('commercial_partner_id.l10n_in_pan_entity_id', '=', False),
+                ('invoice_line_ids.tax_ids.l10n_in_tax_type', '=', tax_type),
+                ('invoice_line_ids.tax_ids.tax_group_id', '=', self.env['account.chart.template'].with_company(self.env.company).ref(group_ref, raise_if_not_found=False)),
+            ]
+            if tax_type == 'tds':
+                domain += [('invoice_line_ids.tax_ids.type_tax_use', '=', 'purchase')]
+            elif tax_type == 'tcs':
+                domain += [('invoice_line_ids.tax_ids.type_tax_use', '=', 'sale')]
+            return self.env['account.move'].search(domain)
+
         invalid_move_ids = []
         if report.id == self.env.ref("l10n_in.tds_report").id:
-            domain += [('invoice_line_ids.tax_ids.l10n_in_tax_type', '=', 'tds_purchase')]
-            invalid_move_ids = AccountMove.search(domain).l10n_in_withholding_ref_move_id.ids
-        if report.id == self.env.ref("l10n_in.tcs_report").id:
-            domain += [('invoice_line_ids.tax_ids.l10n_in_tax_type', '=', 'tcs')]
-            invalid_move_ids = AccountMove.search(domain).ids
+            invalid_move_ids = get_invalid_moves('tds', 'tds_group').ids
+        elif report.id == self.env.ref("l10n_in.tcs_report").id:
+            invalid_move_ids = get_invalid_moves('tcs', 'tcs_group').ids
+        elif report.id == self.env.ref("l10n_in.tds_report_it_act_25").id:
+            invalid_move_ids = get_invalid_moves('tds', 'tds_it_act_25_group').ids
+        elif report.id == self.env.ref("l10n_in.tcs_report_it_act_25").id:
+            invalid_move_ids = get_invalid_moves('tcs', 'tcs_it_act_25_group').ids
+
         return 'l10n_in_reports.missing_pan_tds_tcs_warning', invalid_move_ids
 
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
@@ -200,14 +257,13 @@ class L10n_InReportHandler(models.AbstractModel):
                     self._get_invalid_inter_state_tax_on_lines(aml_domain),
                     self._get_invalid_no_hsn_products(aml_domain),
                     self._get_invalid_uqc_codes(aml_domain),
-                    self._get_out_of_fiscal_year_reversed_moves(options),
                     self._get_unlinked_unregistered_inter_state_reversed_moves(options),
                 ]
                 all_checks = [
                     (xml_id, obj.ids)
                     for xml_id, obj in all_checks
                 ]
-            elif report.id in (self.env.ref("l10n_in.tds_report").id, self.env.ref("l10n_in.tcs_report").id):
+            elif report.id in (self.env.ref("l10n_in.tds_report").id, self.env.ref("l10n_in.tcs_report").id, self.env.ref("l10n_in.tds_report_it_act_25").id, self.env.ref("l10n_in.tcs_report_it_act_25").id):
                 all_checks = [
                     self._get_invalid_tds_tcs_moves(options, report),
                 ]
@@ -248,10 +304,6 @@ class L10n_InReportHandler(models.AbstractModel):
         return self._l10n_in_open_action(_('Invalid UQC Code'), 'uom.uom', [(False, 'list'), (False, 'form')], params)
 
     @api.model
-    def open_out_of_fiscal_year_reversed_moves(self, options, params):
-        return self._l10n_in_open_action(_('Credit Notes'), 'account.move', [(False, 'list'), (False, 'form')], params)
-
-    @api.model
     def open_unlinked_reversed_moves(self, options, params):
         return self._l10n_in_open_action(_('Unlinked Credit Notes'), 'account.move', [(False, 'list'), (False, 'form')], params)
 
@@ -264,13 +316,16 @@ class L10n_InReportHandler(models.AbstractModel):
 
         if self.env.company.account_fiscal_country_id.code != 'IN':
             return
-        if report in (self.env.ref('l10n_in.tds_report'), self.env.ref('l10n_in.tcs_report')):
+        if report in (self.env.ref('l10n_in.tds_report'), self.env.ref('l10n_in.tcs_report'), self.env.ref('l10n_in.tcs_report_it_act_25'), self.env.ref('l10n_in.tds_report_it_act_25')):
             xlsx_button_option = next(button_opt for button_opt in options['buttons'] if button_opt.get('action_param') == 'export_to_xlsx')
             xlsx_button_option['action_param'] = 'tds_tcs_export_to_xlsx'
 
     @api.model
     def tds_tcs_export_to_xlsx(self, options):
-        is_tds_report = options['report_id'] == self.env.ref('l10n_in.tds_report').id
+        is_tds_report = options['report_id'] in (
+            self.env.ref('l10n_in.tds_report').id,
+            self.env.ref('l10n_in.tds_report_it_act_25').id,
+        )
         with io.BytesIO() as output:
             with xlsxwriter.Workbook(output, {
                 'in_memory': True,
@@ -306,7 +361,7 @@ class L10n_InReportHandler(models.AbstractModel):
 
         colname_to_idx = {col['expression_label']: idx for idx, col in enumerate(options.get('columns', []))}
         lines_mapping = {
-            line['name']: ("{:.2f}".format(float(line['columns'][colname_to_idx['balance']]['no_format'])))
+            line['name']: ("{:.2f}".format(float(line.columns[colname_to_idx['balance']].no_format)))
             for line in report._get_lines(options)
         }
 
@@ -333,7 +388,7 @@ class L10n_InReportHandler(models.AbstractModel):
             sheet = workbook.add_worksheet(section_name)
             for i, width in enumerate(col_widths):
                 sheet.set_column(i, i, width)
-            write_header(sheet, [report_date, next(iter(section_info['description'].values()))])
+            write_header(sheet, [report_date, section_info['description']])
             write_rows(sheet, 3, section_info['moves'], lambda i: title_style if i == 0 else line_style)
 
     @api.model
@@ -350,31 +405,61 @@ class L10n_InReportHandler(models.AbstractModel):
             _("TDS Rate") if is_tds_report else _("TCS Rate"),
         ]
 
+        # -----------------------------------
+        # Step 1: Map report tags to section metadata (name & description)
+        # -----------------------------------
+        report = self.env['account.report'].browse(options['report_id'])
+
+        tag_to_section = {}
+        all_tag_ids = set()
+
+        for line in report.line_ids:
+            tags = line.expression_ids._get_matching_tags()
+
+            for tag in tags:
+                tag_to_section[tag.id] = {
+                    'code': tag.name,
+                    'description': line.name,
+                }
+                all_tag_ids.add(tag.id)
+
+        # -----------------------------------
+        # Step 2: Query
+        # -----------------------------------
+
         domain = [
-            ('date', '>=', options['date']['date_from']),
-            ('date', '<=', options['date']['date_to']),
-            ('state', '=', 'posted'),
-            ('line_ids.display_type', '=', 'tax'),
-            ('line_ids.tax_ids.l10n_in_tax_type', '=', 'tds_purchase' if is_tds_report else 'tcs'),
+            ('move_id.date', '>=', options['date']['date_from']),
+            ('move_id.date', '<=', options['date']['date_to']),
+            ('move_id.state', '=', 'posted'),
+            ('tax_line_id.l10n_in_tax_type', '=', 'tds' if is_tds_report else 'tcs'),
+            ('tax_tag_ids', 'in', all_tag_ids),
         ]
+        if is_tds_report:
+            domain += [
+                ('tax_line_id.l10n_in_tax_type', '=', 'tds'),
+            ]
+        else:
+            domain += [
+                ('tax_line_id.l10n_in_tax_type', '=', 'tcs'),
+            ]
+        query = self.env['account.move.line']._search(domain)
+        aml_t = query.table._sudo()
+        am_t = aml_t._join('move_id', kind='JOIN')
+        tax_t = aml_t._join('tax_line_id', kind='JOIN')
+        tag_t = aml_t._join('tax_tag_ids')
+        partner = aml_t.partner_id
+        pan_entity = partner.l10n_in_pan_entity_id
 
-        query = self.env['account.move']._search(domain)
-        # common joins
-        query.join('account_move', 'id', 'account_move_line', 'move_id', 'aml')
-        query.join('account_move__aml', 'tax_line_id', 'account_tax', 'id', 'tax')
-        query.join('account_move__aml__tax', 'l10n_in_section_id', 'l10n_in_section_alert', 'id', 'section')
-        query.join('account_move__aml__tax__section', 'tax_report_line_id', 'account_report_line', 'id', 'report_line')
-        query.left_join('account_move__aml', 'partner_id', 'res_partner', 'id', 'partner')
-        query.left_join('account_move__aml__partner', 'l10n_in_pan_entity_id', 'l10n_in_pan_entity', 'id', 'pan_entity')
-
+        # -----------------------------------
+        # Step 3: Select
+        # -----------------------------------
         common_cols = [
-            'account_move__aml__partner.name AS partner_name',
-            'account_move__aml__partner__pan_entity.name AS partner_pan',
-            'account_move__aml__tax__section.name AS section_name',
-            'account_move__aml__tax__section__report_line.name AS section_description',
-            'COALESCE(account_move__aml.debit, 0) AS tax_debit_amount',
-            'COALESCE(account_move__aml.credit, 0) AS tax_credit_amount',
-            'COALESCE(account_move__aml.tax_base_amount, 0) AS amount',
+            SQL("%s AS partner_name", partner.name),
+            SQL("%s AS partner_pan", pan_entity.name),
+            SQL("%s AS tag_id", tag_t.id),
+            SQL("COALESCE(%s, 0) AS tax_debit_amount", aml_t.debit),
+            SQL("COALESCE(%s, 0) AS tax_credit_amount", aml_t.credit),
+            SQL("COALESCE(%s, 0) AS amount", aml_t.tax_base_amount),
         ]
 
         if is_tds_report:
@@ -384,39 +469,43 @@ class L10n_InReportHandler(models.AbstractModel):
             columns.insert(11, _("Remarks (Reason for non-deduction/lower deduction/higher deduction/threshold)"))
             columns.insert(12, _("Deductee Code (1. Company, 2. Other than Company)"))
 
-            query.left_join('account_move', 'l10n_in_withholding_ref_move_id', 'account_move', 'id', 'bill_move')
+            payment_t = am_t._join('origin_payment_id', kind='JOIN')
+            bill_move = payment_t._join('invoice_ids', kind='JOIN')
 
             qu = query.select(
                 *common_cols,
-                'account_move__aml__partner__pan_entity.tds_deduction AS tds_remarks',
-                'account_move__aml__partner__pan_entity.type AS deductee_code',
-                'account_move.name AS wh_move_name',
-                'account_move__bill_move.name AS move_name',
-                'account_move__bill_move.invoice_date',
-                'account_move__bill_move.ref AS bill_ref',
-                'ABS(account_move__aml__tax.amount) AS tax_rate',
-                'account_move.date AS deduction_date',
+                SQL("%s AS tds_remarks", pan_entity.tds_deduction),
+                SQL("%s AS deductee_code", pan_entity.type),
+                SQL("%s AS wh_move_name", am_t.name),
+                SQL("%s AS move_name", bill_move.name),
+                bill_move.invoice_date,
+                SQL("%s AS bill_ref", bill_move.ref),
+                SQL("ABS(%s) AS tax_rate", tax_t.amount),
+                SQL("%s AS deduction_date", am_t.date),
             )
         else:
             qu = query.select(
                 *common_cols,
-                'account_move.name AS move_name',
-                'account_move.invoice_date',
-                'account_move__aml__tax.amount AS tax_rate',
+                SQL("%s AS move_name", am_t.name),
+                am_t.invoice_date,
+                SQL("%s AS tax_rate", tax_t.amount),
             )
 
-        self.env.cr.execute(qu)
-        rows = self.env.cr.dictfetchall()
+        rows = self.env.execute_query_dict(qu)
 
+        # -----------------------------------
+        # Step 4: Group by Section
+        # -----------------------------------
         section_data = defaultdict(lambda: {'description': '', 'moves': [], 'row_count': 0})
         for row in rows:
-            section = row['section_name']
-            data = section_data[section]
+            section = tag_to_section.get(row['tag_id'])
+            section_key = section['code']
+            data = section_data[section_key]
 
             data['row_count'] += 1
             sr_no = data['row_count']
 
-            data['description'] = row['section_description']
+            data['description'] = section['description']
             if not data['moves']:
                 data['moves'].append(columns)
 
@@ -440,3 +529,32 @@ class L10n_InReportHandler(models.AbstractModel):
             data['moves'].append(line)
 
         return section_data
+
+    def _report_engine_outward_supplies_tax_amounts(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        tax_total = 0.0
+        report = self.env['account.report'].browse(options['report_id'])
+        for company_data in options['companies']:
+            company = self.env['res.company'].browse(company_data['id'])
+
+            if company.l10n_in_gst_registration_type != 'composition' or not company.l10n_in_composition_tax_rate:
+                continue
+
+            domain = [
+                ('l10n_in_gstr_section', '=', 'sale_composition_supplies'),
+                ('display_type', '=', 'product')
+            ]
+            domain = report._get_options_domain(options, date_scope) & Domain(domain)
+
+            taxable_result = self.env['account.move.line']._read_group(
+                domain,
+                aggregates=['balance:sum'],
+            )
+            taxable_base = -taxable_result[0][0]
+            tax_rate = float(company.l10n_in_composition_tax_rate) / 2 / 100
+            tax_total += taxable_base * tax_rate
+
+        return {
+            next(iter(formulas_dict.values())): {
+                'tax_amount': tax_total,
+            }
+        }

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "External calculation for Ecommerce",
     'category': 'Accounting/Accounting',

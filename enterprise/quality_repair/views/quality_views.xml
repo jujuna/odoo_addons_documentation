@@ -7,9 +7,9 @@
         <field name="inherit_id" ref="quality_control.quality_check_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='picking_id']" position="after">
-                <field name="repair_id" invisible="(quality_state in ('pass', 'fail') and not repair_id) or context.get('from_barcode') or hide_repair_id > 0"/>
+                <field name="repair_id" invisible="(quality_state in ('pass', 'fail') and not repair_id) or context.get('barcode_view') or hide_repair_id > 0"/>
             </xpath>
-        </field>    
+        </field>
     </record>
 
     <record id="quality_alert_view_form_inherit_repairp" model="ir.ui.view">

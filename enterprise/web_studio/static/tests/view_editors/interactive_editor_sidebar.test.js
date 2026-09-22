@@ -1,7 +1,7 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
 import { edit, press, queryAllTexts } from "@odoo/hoot-dom";
-import { animationFrame, Deferred } from "@odoo/hoot-mock";
+import { animationFrame } from "@odoo/hoot-mock";
 import { onMounted } from "@odoo/owl";
 import {
     contains,
@@ -14,11 +14,14 @@ import {
 } from "@web/../tests/web_test_helpers";
 import { CodeEditor } from "@web/core/code_editor/code_editor";
 import { PivotEditorSidebar } from "@web_studio/client_action/view_editor/editors/pivot/pivot_editor";
+import { ViewEditorModel } from "@web_studio/client_action/view_editor/view_editor_model";
 import { editView, mountViewEditor } from "../view_editor_tests_utils";
 
 describe.current.tags("desktop");
 class Partner extends models.Model {
     _name = "partner";
+
+    display_name = fields.Char();
 }
 
 defineMailModels();
@@ -47,30 +50,93 @@ test("show properties sidepanel on field selection", async () => {
     expect("#help").toHaveValue("Display name");
 });
 
-test("Sidebar should display all field's widgets", async () => {
+test("Sidebar should display all non-blacklisted field's widgets: kanban", async () => {
+    Partner._fields.selection = fields.Selection({
+        selection: [
+            ["dog", "Dog"],
+            ["cat", "Cat"],
+        ],
+    });
+    await mountViewEditor({
+        type: "kanban",
+        resModel: "partner",
+        arch: `
+            <kanban>
+                <templates>
+                    <t t-name='card'>
+                        <field name='selection'/>
+                    </t>
+                </templates>
+            </kanban>`,
+    });
+    await contains(".o_web_studio_widget_empty").click();
+    await contains(".o_select_menu_toggler").click();
+
+    expect(queryAllTexts(".o_select_menu_item")).toEqual([
+        "Badge (badge)",
+        "Badges (badges_selection)",
+        "Label Selection (state_selection)",
+        "Priority (priority)",
+        "Radio (radio)",
+        "Selection (selection)",
+        "Status (statusbar)",
+    ]);
+});
+
+test("Sidebar should display all non-blacklisted field's widgets: form", async () => {
+    Partner._fields.selection = fields.Selection({
+        selection: [
+            ["dog", "Dog"],
+            ["cat", "Cat"],
+        ],
+    });
     await mountViewEditor({
         type: "form",
         resModel: "partner",
-        arch: `<form><group><field name='display_name'/></group></form>`,
+        arch: `<form><group><field name='selection'/></group></form>`,
+    });
+    await contains(".o_form_label").click();
+    await contains(".o_select_menu_toggler").click();
+
+    // "Badge (badge)" is blacklisted in form view thus won't be available outside of debug mode
+    expect(queryAllTexts(".o_select_menu_item")).toEqual([
+        "Badges (badges_selection)",
+        "Label Selection (state_selection)",
+        "Priority (priority)",
+        "Radio (radio)",
+        "Selection (selection)",
+    ]);
+});
+
+test("Sidebar should display all non-blacklisted field's widgets: form in debug", async () => {
+    Partner._fields.selection = fields.Selection({
+        selection: [
+            ["dog", "Dog"],
+            ["cat", "Cat"],
+        ],
+    });
+    serverState.debug = "1";
+    await mountViewEditor({
+        type: "form",
+        resModel: "partner",
+        arch: `<form><group><field name='selection'/></group></form>`,
     });
     await contains(".o_form_label").click();
     await contains(".o_select_menu_toggler").click();
 
     expect(queryAllTexts(".o_select_menu_item")).toEqual([
         "Badge (badge)",
-        "Copy Text to Clipboard (CopyClipboardChar)",
-        "Copy URL to Clipboard (CopyClipboardURL)",
-        "Email (email)",
-        "Image (image_url)",
-        "Multiline Text (sms_widget)",
-        "Multiline Text (text_emojis)",
-        "Multiline Text (text)",
-        "Phone (phone)",
-        "Reference (reference)",
-        "Stat Info (statinfo)",
-        "Text (char_emojis)",
-        "Text (char)",
-        "URL (url)",
+        "Badges (badges_selection)",
+        "Label Selection (label_selection)",
+        "Label Selection (state_selection)",
+        "Priority (priority)",
+        "Radio (radio)",
+        "Selection (selection)",
+        "Selection (filterable_selection)",
+        "Selection (timezone_mismatch)",
+        "Selection (mail_server_configurator_selection)",
+        "Selection (base_automation_trigger_selection)",
+        "Status (statusbar)",
     ]);
 });
 
@@ -116,13 +182,16 @@ test("folds/unfolds the existing fields into sidebar", async () => {
     });
 
     expect(".o_web_studio_field_type_container").toHaveCount(2);
-    expect(".o_web_studio_existing_fields_header i").toHaveClass(["fa-caret-right"]);
+    expect(".o_web_studio_existing_fields_header i").toHaveAttribute("data-icon", "arrow_right");
     expect(".o_web_studio_existing_fields_section").not.toHaveCount();
 
     await contains(".o_web_studio_existing_fields_header").click();
 
     expect(".o_web_studio_field_type_container").toHaveCount(3);
-    expect(".o_web_studio_existing_fields_header i").toHaveClass(["fa-caret-down"]);
+    expect(".o_web_studio_existing_fields_header i").toHaveAttribute(
+        "data-icon",
+        "arrow_drop_down"
+    );
     expect(".o_web_studio_existing_fields_section").toBeVisible();
 
     await contains(`.o_web_studio_existing_fields .o_web_studio_field_integer`).dragAndDrop(
@@ -132,7 +201,7 @@ test("folds/unfolds the existing fields into sidebar", async () => {
 
     await contains(".o_web_studio_existing_fields_header").click();
     expect(".o_web_studio_field_type_container").toHaveCount(2);
-    expect(".o_web_studio_existing_fields_header i").toHaveClass(["fa-caret-right"]);
+    expect(".o_web_studio_existing_fields_header i").toHaveAttribute("data-icon", "arrow_right");
     expect(".o_web_studio_existing_fields_section").not.toHaveCount();
 });
 
@@ -219,7 +288,7 @@ test("default value in sidebar", async () => {
         </form>`,
     });
 
-    onRpc("/web_studio/get_default_value", async (request) => {
+    onRpc("/web_studio/get_field_infos", async (request) => {
         const { params } = await request.json();
         if (params.field_name === "display_name") {
             return { default_value: "yolo" };
@@ -235,7 +304,7 @@ test("default value in sidebar", async () => {
     await contains("[data-field-name='gender']").click();
     await contains(".o_web_studio_property_default_value .o_select_menu_toggler").click();
     expect(".o_web_studio_property_default_value .o_select_menu_toggler").toHaveValue("Male");
-    expect(queryAllTexts(".o_select_menu_item")).toEqual(["Female", "Male"]);
+    expect(queryAllTexts(".o_select_menu_item")).toEqual(["Male", "Female"]);
 });
 
 test("default value for new field name", async () => {
@@ -252,13 +321,9 @@ test("default value for new field name", async () => {
         editViewCount++;
         const { params } = await request.json();
         if (editViewCount === 1) {
-            expect(params.operations[0].node.field_description.name).toMatch(
-                /^x_studio_char_field_.*$/
-            );
+            expect(params.operations[0].node.field_description.name).toMatch("x_studio_char_1");
         } else if (editViewCount === 2) {
-            expect(params.operations[1].node.field_description.name).toMatch(
-                /^x_studio_float_field_.*$/
-            );
+            expect(params.operations[1].node.field_description.name).toMatch("x_studio_float_1");
         }
         return editView(params, "form", arch);
     });
@@ -269,6 +334,34 @@ test("default value for new field name", async () => {
     await contains(".o_web_studio_new_fields .o_web_studio_field_float").dragAndDrop(
         ".o_inner_group .o_cell.o-draggable"
     );
+});
+
+test("default value for new field name with deletion and related fields", () => {
+    const mockModel = {
+        fields: {},
+        getNewFieldName: ViewEditorModel.prototype.getNewFieldName,
+    };
+
+    expect(mockModel.getNewFieldName("char")).toBe("x_studio_char_1");
+    mockModel.fields["x_studio_char_1"] = { type: "char" };
+    expect(mockModel.getNewFieldName("char")).toBe("x_studio_char_2");
+    mockModel.fields["x_studio_char_2"] = { type: "char" };
+    expect(mockModel.getNewFieldName("char")).toBe("x_studio_char_3");
+    mockModel.fields["x_studio_char_3"] = { type: "char" };
+
+    // If we delete `x_studio_char_1`, `*_3` is still the biggest increment.
+    // The increment of a new char field should be equal to `4`.
+    delete mockModel.fields["x_studio_char_1"];
+    expect(mockModel.getNewFieldName("char")).toBe("x_studio_char_4");
+
+    expect(mockModel.getNewFieldName("related", "partner_id.company_name")).toBe(
+        "x_studio_related_company_name_1"
+    );
+    mockModel.fields["x_studio_related_company_name_1"] = { type: "related" };
+    expect(mockModel.getNewFieldName("related", "partner_id.company_name")).toBe(
+        "x_studio_related_company_name_2"
+    );
+    expect(mockModel.getNewFieldName("char")).toBe("x_studio_char_4");
 });
 
 test("remove starting underscore from new field value", async () => {
@@ -374,7 +467,7 @@ test("click on the 'More' Button", async () => {
         arch: `<form></form>`,
     });
 
-    await contains(".o_web_studio_editor .o_notebook_headers li:nth-child(2) a").click();
+    await contains(".o_web_studio_editor .o_notebook_headers li:nth-child(2) button").click();
     expect(".o_web_studio_sidebar .o_web_studio_parameters").toHaveCount(1);
     await contains(".o_web_studio_sidebar .o_web_studio_parameters").click();
 });
@@ -384,7 +477,7 @@ test("open xml editor of component view", async () => {
 
     // the XML editor lazy loads its libs and its templates so its start
     // method is monkey-patched to know when the widget has started
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     patchWithCleanup(CodeEditor.prototype, {
         setup() {
             super.setup();
@@ -421,7 +514,7 @@ test("open xml editor of component view", async () => {
 
     await contains(".o_web_studio_sidebar .o_web_studio_view").click();
     await contains(".o_web_studio_open_xml_editor").click();
-    await def;
+    await def.promise;
     expect(".o_web_studio_code_editor.ace_editor").toHaveCount(1);
 });
 

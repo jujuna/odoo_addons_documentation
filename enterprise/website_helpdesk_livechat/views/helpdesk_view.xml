@@ -8,10 +8,10 @@
             <xpath expr="//field[@name='use_website_helpdesk_livechat']" position="after">
                 <div id='im_livechat' invisible="not use_website_helpdesk_livechat">
                     <div class="mt16">
-                        <button name="action_view_channel" type="object" string="Configure Live Chat Channel" icon="oi-arrow-right" class="btn-link"/>
+                        <button name="action_view_channel" type="object" string="Configure Live Chat Channel" icon="east" class="btn-link"/>
                     </div>
                     <div>
-                        <button name="%(im_livechat.chatbot_script_action)d" type="action" string="Configure Chatbots" icon="oi-arrow-right" class="btn-link"/>
+                        <button name="%(im_livechat.chatbot_script_action)d" type="action" string="Configure Chatbots" icon="east" class="btn-link"/>
                     </div>
                 </div>
             </xpath>
@@ -24,8 +24,8 @@
         <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_open_helpdesk_ticket']" position="after">
-                <button name="action_open_livechat" type="object" class="oe_stat_button" icon="fa-comments" groups="helpdesk.group_helpdesk_user" invisible="not origin_channel_id">
-                    <div class="o_stat_info"><span class="o_stat_text">View chat</span></div>
+                <button name="action_open_livechat" type="object" class="oe_stat_button" icon="forum" icon_class="oi-filled" groups="helpdesk.group_helpdesk_user" invisible="not origin_channel_id">
+                    <div class="o_stat_info"><span class="o_stat_text">View Live Chat</span></div>
                 </button>
             </xpath>
         </field>

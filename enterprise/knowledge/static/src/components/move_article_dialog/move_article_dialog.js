@@ -3,31 +3,30 @@ import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { SelectMenu } from '@web/core/select_menu/select_menu';
 
-import { Component, onWillStart, useEffect, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, onWillStart, proxy, signal, t, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 
 class MoveArticleDialog extends Component {
-
     static template = "knowledge.MoveArticleDialog";
     static components = { Dialog, SelectMenu };
-    static props = {
-        close: Function,
-        knowledgeArticleRecord: Object
-    };
+
+    props = useProps({
+        close: t.function(),
+        knowledgeArticleRecord: t.object(),
+    });
+
+    togglerRef = signal.ref();
 
     setup() {
         this.size = 'md';
         this.orm = useService("orm");
-        this.state = useState({selectedParentArticle: false, selectionDisplayGroups: []});
+        this.state = proxy({selectedParentArticle: false, selectionDisplayGroups: []});
         this.placeholderLabel = _t('Choose an Article...');
-        this.toggler = useRef("togglerRef");
 
-        onWillStart(this.fetchValues);
+        onWillStart(() => this.fetchValues());
 
         //autofocus
-        useEffect((toggler) => {
-            toggler.click();
-        }, () => [this.toggler.el]);
+        onMounted(() => this.togglerRef()?.click());
 
     }
 

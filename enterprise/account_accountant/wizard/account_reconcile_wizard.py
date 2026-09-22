@@ -10,6 +10,7 @@ from odoo.tools.misc import formatLang
 class AccountReconcileWizard(models.TransientModel):
     """ This wizard is used to reconcile selected account.move.line. """
     _name = 'account.reconcile.wizard'
+    _inherit = ['analytic.mixin']
     _description = 'Account reconciliation wizard'
     _check_company_auto = True
 
@@ -349,7 +350,7 @@ class AccountReconcileWizard(models.TransientModel):
                 rate_lower_bound = rate - rate_tolerance
                 rate_upper_bound = rate + rate_tolerance
             else:
-                rate = self.env['res.currency']._get_conversion_rate(reco_currency, amls.company_currency_id, amls.company_id, most_recent_line.date)
+                rate = self.env['res.currency']._get_conversion_rate(reco_currency, amls.company_currency_id, most_recent_line.company_id, most_recent_line.date)
                 rate_lower_bound = rate_upper_bound = rate
 
             # If an AML's rate is close enough to the reconciliation rate that it could be the same,
@@ -428,8 +429,9 @@ class AccountReconcileWizard(models.TransientModel):
 
     @api.depends('company_id', 'move_line_ids.partner_id', 'amount')
     def _compute_reco_model_autocomplete_ids(self):
-        """ Computes available reconcile models, we only take models that
-        and that have one (and only one) line, that have partners or amount that match the ones of the entries.
+        """ Computes available reconcile models, we only take manually created models that
+        have one (and only one) line, and have partners, amount, or journal that match the
+        ones of the entries.
         """
         for wizard in self:
             domain = [
@@ -452,6 +454,10 @@ class AccountReconcileWizard(models.TransientModel):
                 '&',
                 ('match_amount_min', '<', wizard.amount),
                 ('match_amount_max', '>', wizard.amount),
+                '|',
+                ('match_journal_ids', '=', False),
+                ('match_journal_ids', 'in', wizard.move_line_ids.journal_id.ids),
+                ('created_automatically', '=', False),
             ]
             query = self.env['account.reconcile.model']._search(domain, bypass_access=True)
             reco_model_ids = [r[0] for r in self.env.execute_query(SQL("""
@@ -582,6 +588,7 @@ class AccountReconcileWizard(models.TransientModel):
                 'account_id': self.account_id.id,
                 'partner_id': to_partner.id,
                 'currency_id': self.reco_currency_id.id,
+                'analytic_distribution': self.analytic_distribution,
                 'tax_ids': self.tax_id.ids,
                 'tax_tag_ids': None if not tax_data else tax_data['base_tax_tag_ids'],
                 'amount_currency': amount_currency if not tax_data else tax_data['base_amount_currency'],
@@ -612,7 +619,7 @@ class AccountReconcileWizard(models.TransientModel):
             'company_id': self.company_id.id,
             'date': self._get_date_after_lock_date() or self.date,
             'move_type': 'entry',
-            'checked': not self.to_check,
+            'review_state': 'todo' if self.to_check else 'reviewed',
             'line_ids': self._create_write_off_lines(partner=partner)
         }
         write_off_move = self.env['account.move'].with_context(
@@ -620,7 +627,7 @@ class AccountReconcileWizard(models.TransientModel):
             skip_invoice_line_sync=True,
         ).create(write_off_vals)
         write_off_move.action_post()
-        return write_off_move
+        return write_off_move.with_env(self.env)
 
     def create_transfer(self):
         """ Create transfer move.
@@ -752,6 +759,7 @@ class AccountReconcileWizard(models.TransientModel):
     def reconcile(self):
         """ Reconcile selected moves, with a transfer and/or write-off move if necessary."""
         self.ensure_one()
+        self = self.with_context(no_exchange_difference=not self.reco_account_id.reconcile)  # ruff: ignore[self-or-cls-assignment]
         move_lines_to_reconcile = self.move_line_ids._origin
         do_transfer = self.is_transfer_required
         do_write_off = self.edit_mode or (self.is_write_off_required and not self.allow_partials)

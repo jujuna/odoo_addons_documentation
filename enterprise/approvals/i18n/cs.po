@@ -13,68 +13,58 @@
 # karolína schusterová <karolina.schusterova@vdp.sk>, 2022
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-08 19:32+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Czech <https://translate.odoo.com/projects/odoo-19/approvals/"
-"cs/>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 03:18+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-master/"
+"approvals/cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
 "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "%s (copy)"
-msgstr "%s (kopie)"
+#: model:ir.module.module,description:base.module_approvals
+msgid ""
+"\n"
+"This module manages approvals workflow\n"
+"======================================\n"
+"\n"
+"This module manages approval requests like business trips,\n"
+"out of office, overtime, borrow items, general approvals,\n"
+"procurements, contract approval, etc.\n"
+"\n"
+"According to the approval type configuration, a request\n"
+"creates next activities for the related approvers.\n"
+msgstr ""
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
 msgid "'Approval - %s' % object.name"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/07/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/08/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "1200"
-msgstr "1200"
+msgstr "„Schválení – %s “ % object.name"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-check text-success me-1\"/>Approve"
-msgstr ""
+msgid "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuse"
+msgstr "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Odmítnout"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
-msgid "<i class=\"fa fa-times text-danger me-1\"/>Refuse"
-msgstr ""
+msgid "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Approve"
+msgstr "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Schválit"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "<span class=\"col-2 fw-bold\">Description:</span>"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
-msgstr "<span class=\"fa fa-warning\" title=\"Neplatné minimální schválení\"/>"
+msgstr "<span class=\"col-2 fw-bold\">Popis:</span>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -85,6 +75,15 @@ msgstr "<span class=\"fw-bold\">Do</span>"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
 msgid "<span class=\"mx-1\">-</span>"
 msgstr "<span class=\"mx-1\">-</span>"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/"
+">"
+msgstr ""
+"<span class=\"oi\" data-icon=\"warning\" title=\"Neplatné minimální "
+"schválení\"/>"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
@@ -113,6 +112,11 @@ msgid "Activity Exception Decoration"
 msgstr "Typ výjimečné aktivity"
 
 #. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
+msgid "Activity Plans"
+msgstr "Plány aktivit"
+
+#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
 msgid "Activity State"
 msgstr "Stav aktivity"
@@ -131,27 +135,18 @@ msgstr "Ikona typu aktivity"
 #: model:ir.model.fields,help:approvals.field_approval_category__has_product
 #: model:ir.model.fields,help:approvals.field_approval_request__has_product
 msgid "Additional products that should be specified on the request."
-msgstr "Další produkty, které je třeba uvést na vyžádání."
+msgstr "Další produkty, které je třeba uvést na žádosti."
 
 #. module: approvals
 #: model:res.groups,name:approvals.group_approval_manager
 msgid "Administrator"
-msgstr "Administrátor"
+msgstr "Správce"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.approval_request_action_all
 #: model:ir.ui.menu,name:approvals.approvals_approval_menu_all
 msgid "All Approvals"
-msgstr "Schvalovací požadavky"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,help:approvals.field_approval_request__approval_type
-msgid ""
-"Allows you to define which documents you would like to create once the "
-"request has been approved"
-msgstr ""
-"Umožňuje definovat, které dokumenty chcete vytvořit po schválení požadavku"
+msgstr "Vše schvalovací požadavky"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__amount
@@ -173,7 +168,7 @@ msgstr "Další odkaz, který by měl být uveden v žádosti."
 #. module: approvals
 #: model:ir.model.constraint,message:approvals.constraint_approval_approver_unique_request_user
 msgid "An approver with the same user already exists for this request."
-msgstr ""
+msgstr "Pro tuto žádost již existuje schvalovatel se stejným uživatelem."
 
 #. module: approvals
 #. odoo-python
@@ -190,7 +185,7 @@ msgstr "Schválení"
 #: model:ir.actions.act_window,name:approvals.approval_category_action
 #: model:ir.ui.menu,name:approvals.approvals_category_menu_config
 msgid "Approval Categories"
-msgstr ""
+msgstr "Kategorie schválení"
 
 #. module: approvals
 #: model:ir.model,name:approvals.model_approval_category
@@ -202,12 +197,12 @@ msgstr "Schvalovací kategorie"
 #. module: approvals
 #: model:ir.model,name:approvals.model_approval_category_approver
 msgid "Approval Category Approver"
-msgstr ""
+msgstr "Schvalovatel kategorie schválení"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__approval_properties_definition
 msgid "Approval Properties"
-msgstr ""
+msgstr "Vlastnosti schválení"
 
 #. module: approvals
 #: model:ir.actions.report,name:approvals.action_report_approval_request
@@ -229,12 +224,7 @@ msgid "Approval Subject"
 msgstr "Předmět schválení"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_type
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approval_type
-msgid "Approval Type"
-msgstr "Typ schválení"
-
-#. module: approvals
+#: model:ir.module.module,shortdesc:base.module_approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_root
 #: model:res.groups.privilege,name:approvals.res_groups_privilege_approvals
 msgid "Approvals"
@@ -275,15 +265,6 @@ msgid "Approver"
 msgstr "Schvalovatel"
 
 #. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_category.py:0
-msgid ""
-"Approver Sequence can only be activated with at least 1 minimum approver."
-msgstr ""
-"Sekvence schvalovatelů může být aktivována pouze s alespoň 1 minimálním "
-"schvalovatelem."
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__user_ids
 msgid "Approver Users"
 msgstr "Schvalující uživatelé"
@@ -300,12 +281,6 @@ msgstr "Schvalovatel(é)"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Approvers"
 msgstr "Schvalovatelé"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_request__approver_sequence
-msgid "Approvers Sequence?"
-msgstr "Pořadí schvalovatelů?"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -357,8 +332,8 @@ msgstr "Přílohy"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
-msgid "Automated Sequence?"
-msgstr "Automatická sekvence?"
+msgid "Automated Sequence"
+msgstr "Automatické pořadí"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -425,11 +400,6 @@ msgid "Category Approver"
 msgstr "Kategorie schvalovatele"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
-msgid "Code"
-msgstr "Kód"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category__company_id
 #: model:ir.model.fields,field_description:approvals.field_approval_category_approver__company_id
@@ -440,13 +410,9 @@ msgstr "Společnost"
 
 #. module: approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_config
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 msgid "Configuration"
 msgstr "Konfigurace"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
-msgid "Confirm Date"
-msgstr "Potvrdit datum"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__partner_id
@@ -465,9 +431,9 @@ msgid "Contract Approval"
 msgstr "Schválení smlouvy"
 
 #. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid "Create a new product variant"
-msgstr "Vytvořit novou variantu produktu"
+#: model:ir.module.module,summary:base.module_approvals
+msgid "Create and validate approvals requests"
+msgstr ""
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid
@@ -503,12 +469,12 @@ msgstr "Datum"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__date_confirmed
 msgid "Date Confirmed"
-msgstr "Datum potvrzeno"
+msgstr "Datum potvrzení"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__date_end
 msgid "Date end"
-msgstr "Konec data"
+msgstr "Datum ukončení"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__date_start
@@ -526,6 +492,8 @@ msgid ""
 "Define the components and finished products you wish to use in\n"
 "            bill of materials and manufacturing orders."
 msgstr ""
+"Definujte komponenty a hotové výrobky, které chcete použít v\n"
+"            kusovnících a příkazech pro výrobu."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__description
@@ -577,7 +545,7 @@ msgstr "Upravit"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__manager_approval
 msgid "Employee's Manager"
-msgstr "Zaměstnanecký manažer"
+msgstr "Nadřízený zaměstnance"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__existing_request_user_ids
@@ -590,11 +558,6 @@ msgid "Existing User"
 msgstr "Stávající uživatel"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
-msgid "Fields"
-msgstr "Pole"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
 msgid "Followers"
 msgstr "Odběratelé"
@@ -605,24 +568,14 @@ msgid "Followers (Partners)"
 msgstr "Odběratelé (partneři)"
 
 #. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Ikona v rámci awesome font, např. fa-tasks"
-
-#. module: approvals
 #: model:ir.actions.server,name:approvals.model_approval_request_approve_admin
 msgid "Force Approval"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "From:"
-msgstr "Od:"
+msgstr "Vynutit schválení"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 msgid "Future Activities"
-msgstr ""
+msgstr "Budoucí činnosti"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_general_approval
@@ -698,19 +651,10 @@ msgstr "Má odkaz"
 msgid ""
 "How the employee's manager interacts with this type of approval.\n"
 "\n"
-"        Empty: do nothing\n"
-"        Is Approver: the employee's manager will be in the approver list\n"
-"        Is Required Approver: the employee's manager will be required to "
-"approve the request.\n"
+"        if checked the employee's manager is a required approver of the "
+"request, along with the selected users\n"
 "    "
 msgstr ""
-"Jak s tímto typem schválení spolupracuje manažer zaměstnance.\n"
-"\n"
-"        Prázdný: nedělejte nic\n"
-"        Je schvalovatel: manažer zaměstnance bude v seznamu schvalovatelů\n"
-"        Je vyžadován schvalovatel: žádost bude muset schválit manažer "
-"zaměstnance.\n"
-"    "
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__id
@@ -749,20 +693,11 @@ msgstr "Pokud zaškrtnuto, některé zprávy mají chybu při doručení."
 #: model:ir.model.fields,help:approvals.field_approval_category__automated_sequence
 #: model:ir.model.fields,help:approvals.field_approval_request__automated_sequence
 msgid ""
-"If checked, the Approval Requests will have an automated generated name "
-"based on the given code."
+"If enabled, the approval request subject will be generated automatically "
+"using the given prefix code."
 msgstr ""
-"Pokud je zaškrtnuto, bude mít žádost o schválení automaticky vygenerovaný "
-"název založený na daném kódu."
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence
-#: model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
-msgid ""
-"If checked, the approvers have to approve in sequence (one after the other). "
-"If Employee's Manager is selected as approver, they will be the first in "
-"line."
-msgstr ""
+"Pokud je tato možnost povolena, předmět žádosti o schválení bude automaticky "
+"generován pomocí zadané předpony kódu."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -781,19 +716,9 @@ msgid "Invalid Minimum Warning"
 msgstr "Varování na neplatné minimum"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__approver
-msgid "Is Approver"
-msgstr "Je schvalovatel"
-
-#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_is_follower
 msgid "Is Follower"
 msgstr "Je odběratel"
-
-#. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__required
-msgid "Is Required Approver"
-msgstr "Je vyžadován schvalovatel"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_job_referral_award
@@ -821,7 +746,7 @@ msgstr "Naposledy upraveno dne"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 msgid "Late Activities"
-msgstr ""
+msgstr "Zpožděné činnosti"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action
@@ -834,7 +759,7 @@ msgstr "Pojďme do"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Location"
-msgstr "Místo"
+msgstr "Lokace"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -866,6 +791,11 @@ msgid "Marc Demo"
 msgstr "Marc Demo"
 
 #. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
 msgid "Message Delivery error"
 msgstr "Chyba při doručování zprávy"
@@ -880,6 +810,12 @@ msgstr "Zprávy"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__approval_minimum
 msgid "Minimum Approval"
 msgstr "Minimální schválení"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Minimum Approval must be at least 1."
+msgstr ""
 
 #. module: approvals
 #. odoo-python
@@ -962,6 +898,11 @@ msgid "Next Activity Type"
 msgstr "Typ další aktivity"
 
 #. module: approvals
+#: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
+msgid "No"
+msgstr ""
+
+#. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
 msgid "No Approvals"
 msgstr "Žádné schválení"
@@ -980,7 +921,7 @@ msgstr "Žádná nová schválení ke kontrole"
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.product_template_action
 msgid "No product found. Let's create one!"
-msgstr "Nebyl nalezen žádný produkt. Vytvořme si jeden!"
+msgstr "Nebyl nalezen žádný produkt. Vytvořme si nějaký!"
 
 #. module: approvals
 #: model:ir.model.fields.selection,name:approvals.selection__approval_category__has_amount__no
@@ -1028,12 +969,12 @@ msgstr "Počet žádostí o ověření"
 #. module: approvals
 #: model:res.groups,name:approvals.group_approval_user
 msgid "Officer: Approve all requests"
-msgstr "Vedoucí pracovník : Spravování všech žádostí"
+msgstr "Správce : Spravování všech žádostí"
 
 #. module: approvals
 #: model:ir.actions.server,name:approvals.action_open_approval_category
 msgid "Open Approval Category"
-msgstr ""
+msgstr "Otevřená kategorie schválení"
 
 #. module: approvals
 #: model:ir.model.fields.selection,name:approvals.selection__approval_category__has_amount__optional
@@ -1076,9 +1017,9 @@ msgid "Period:"
 msgstr "Období:"
 
 #. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "Print"
-msgstr "Tisk"
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
+msgid "Prefix Code"
+msgstr "Předčíslí"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_procurement
@@ -1100,12 +1041,6 @@ msgstr "Popis produktu"
 #: model:ir.model.fields,field_description:approvals.field_approval_request__product_line_ids
 msgid "Product Line"
 msgstr "Položka produktu"
-
-#. module: approvals
-#: model:ir.actions.act_window,name:approvals.product_product_action
-#: model:ir.ui.menu,name:approvals.approvals_menu_product_variant
-msgid "Product Variants"
-msgstr "Produktové varianty"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.product_template_action
@@ -1229,9 +1164,7 @@ msgid "SMS Delivery error"
 msgstr "Chyba doručení SMS"
 
 #. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_approver__sequence
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence
-#: model:ir.model.fields,field_description:approvals.field_approval_category_approver__sequence
 msgid "Sequence"
 msgstr "Sekvence"
 
@@ -1239,7 +1172,7 @@ msgstr "Sekvence"
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Sequence %(code)s"
-msgstr ""
+msgstr "Sekvence %(code)s"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_approver__can_edit_user_id
@@ -1247,6 +1180,8 @@ msgid ""
 "Simple users should not be able to remove themselves as approvers because "
 "they will lose access to the record if they misclick."
 msgstr ""
+"Obyčejní uživatelé by neměli mít možnost odstranit se jako schvalovatelé, "
+"protože by v případě nesprávného kliknutí ztratili přístup k záznamu."
 
 #. module: approvals
 #. odoo-python
@@ -1268,7 +1203,7 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "Stav na základě aktivit\n"
-"Po splatnosti: Datum již uplynul\n"
+"Po splatnosti: Datum již uplynulo\n"
 "Dnes: Datum aktivity je dnes\n"
 "Plánováno: Budoucí aktivity."
 
@@ -1289,30 +1224,36 @@ msgid "Submitted"
 msgstr "Odesláno"
 
 #. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Submitted Date"
+msgstr ""
+
+#. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Category"
-msgstr ""
+msgstr "Testovací kategorie"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Document"
-msgstr ""
+msgstr "Testovací dokument"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Product"
-msgstr ""
+msgstr "Testovací produkt"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Reference"
-msgstr ""
+msgstr "Testovací reference"
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "The request %(request_name)s for %(request_owner)s has been approved"
-msgstr ""
+msgstr "Žádost %(request_name)s pro %(request_owner)s byla schválena."
 
 #. module: approvals
 #. odoo-python
@@ -1327,6 +1268,8 @@ msgid ""
 "The request created on %(create_date)s by %(request_owner)s has been "
 "approved."
 msgstr ""
+"Žádost vytvořená na %(create_date)s uživatelem %(request_owner)s byla "
+"schválena."
 
 #. module: approvals
 #. odoo-python
@@ -1340,7 +1283,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "The request has been approved by an Approval Officer"
-msgstr ""
+msgstr "Žádost byla schválena schvalovatelem."
 
 #. module: approvals
 #: model:res.groups,comment:approvals.group_approval_user
@@ -1402,7 +1345,7 @@ msgstr "Předložit"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 msgid "Today Activities"
-msgstr ""
+msgstr "Dnešní aktivity"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_request__activity_exception_decoration
@@ -1442,49 +1385,27 @@ msgid "Users"
 msgstr "Uživatelé"
 
 #. module: approvals
-#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__waiting
-#: model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__waiting
-msgid "Waiting"
-msgstr "Čekající"
-
-#. module: approvals
-#: model:ir.model.fields,field_description:approvals.field_approval_request__website_message_ids
-msgid "Website Messages"
-msgstr "Webové zprávy"
-
-#. module: approvals
-#: model:ir.model.fields,help:approvals.field_approval_request__website_message_ids
-msgid "Website communication history"
-msgstr "Webová historie komunikace"
-
-#. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "Withdraw"
-msgstr "Stáhnout"
+msgstr "Výberte"
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You are not allowed to approved or refused your own approval."
-msgstr ""
+msgstr "Nemáte oprávnění schvalovat nebo zamítat vlastní schválení."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You can't delete an approved request. Archive it instead."
-msgstr ""
-
-#. module: approvals
-#. odoo-python
-#: code:addons/approvals/models/approval_request.py:0
-msgid "You cannot approve before the previous approver."
-msgstr "Nemůžete schválit dříve než předchozí schvalovatel."
+msgstr "Schválenou žádost nelze smazat. Místo toho ji archivujte."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_approver.py:0
 msgid "You cannot change approval request."
-msgstr ""
+msgstr "Žádost o schválení nelze změnit."
 
 #. module: approvals
 #. odoo-python
@@ -1500,7 +1421,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You do not have the rights to execute that action."
-msgstr ""
+msgstr "Nemáte oprávnění k provedení této akce."
 
 #. module: approvals
 #. odoo-python
@@ -1518,17 +1439,7 @@ msgstr "Při pronájmu musíte připojit jeden dokument."
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You must cancel and then back to draft the approval first."
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.actions.act_window,help:approvals.product_product_action
-msgid ""
-"You must define a product for everything you sell or purchase,\n"
-"            whether it's a storable product, a consumable or a service."
-msgstr ""
-"Musíte definovat produkt pro vše, co prodáváte nebo kupujete,\n"
-"            ať už jde o skladovatelný produkt, spotřební materiál nebo "
-"službu."
+msgstr "Musíte nejprve zrušit a poté se vrátit k návrhu schválení."
 
 #. module: approvals
 #. odoo-python
@@ -1545,7 +1456,7 @@ msgstr "např. Brusel"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 msgid "e.g. Procurement"
-msgstr "např. zadávání veřejných zakázek"
+msgstr "např. Doplňování"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action
@@ -1559,55 +1470,14 @@ msgstr "nabídka"
 msgid "new request"
 msgstr "nový požadavek"
 
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
-msgid "to:"
-msgstr "komu:"
-
-#~ msgid "<span>From: </span>"
-#~ msgstr "<span>Od: </span>"
-
-#~ msgid "<span>to: </span>"
-#~ msgstr "<span>komu: </span>"
-
-#~ msgid "Approvals Types"
-#~ msgstr "Typy schválení"
-
-#~ msgid "Approvals Types Image"
-#~ msgstr "Obrázek typů schválení"
-
 #~ msgid ""
-#~ "Conversion between Units of Measure can only occur if they belong to the "
-#~ "same category. The conversion will be made based on the ratios."
+#~ "Approver Sequence can only be activated with at least 1 minimum approver."
 #~ msgstr ""
-#~ "Převod mezi měrnými jednotkami lze uskutečnit jen když patří do stejné "
-#~ "kategorie. Převod bude proveden na základě vzájemných poměrů."
+#~ "Sekvence schvalovatelů může být aktivována pouze s alespoň 1 minimálním "
+#~ "schvalovatelem."
 
-#~ msgid "Deadline"
-#~ msgstr "Uzávěrka"
+#~ msgid "Waiting"
+#~ msgstr "Čekající"
 
-#~ msgid "Delete"
-#~ msgstr "Smazat"
-
-#~ msgid "Edit Request"
-#~ msgstr "Žádost o úpravu"
-
-#~ msgid "Log"
-#~ msgstr "Záznam"
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Počet zpráv, které vyžadují akci"
-
-#~ msgid "Request Approval"
-#~ msgstr "Požádat o schválení"
-
-#~ msgid "Unit of Measure"
-#~ msgstr "Měrná jednotka"
-
-#~ msgid ""
-#~ "You cannot assign the same approver multiple times on the same request."
-#~ msgstr ""
-#~ "Nemůžete přiřadit stejného schvalujícího vícekrát ke stejné žádosti."
-
-#~ msgid "You have to attach at lease one document."
-#~ msgstr "Při pronájmu musíte připojit jeden dokument."
+#~ msgid "You cannot approve before the previous approver."
+#~ msgstr "Nemůžete schválit dříve než předchozí schvalovatel."

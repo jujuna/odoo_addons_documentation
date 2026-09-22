@@ -52,3 +52,8 @@ class ProductTemplate(models.Model):
     alert_time = fields.Integer(string='Alert Date',
         help='Number of days before the Expiration Date after which an alert should be'
         ' raised on the lot/serial number. It will be computed on the lot/serial number.')
+
+    def write(self, vals):
+        if 'tracking' in vals and not vals['tracking']:
+            vals['use_expiration_date'] = False
+        return super().write(vals)

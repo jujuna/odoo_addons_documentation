@@ -14,103 +14,76 @@
                 <div class="o_appointment_edit_in_backend alert alert-info alert-dismissible fade show d-print-none css_editable_mode_hidden" groups="appointment.group_appointment_manager">
                     <t t-call="appointment.appointment_edit_in_backend"/>
                 </div>
-                <h2 t-if="booking.not_available">
-                    <i class="fa fa-times-circle text-danger me-3"/>Appointment Unavailable!
-                    <h5>Unfortunately, it looks like this booking is not possible anymore. Please contact us to find an alternative.</h5>
-                </h2>
-                <h2 t-else="">
-                    <i class="fa fa-pencil-square-o text-warning me-3"/>Appointment waiting for payment
-                </h2>
-                <h4 class="py-3 fw-normal">
-                    <t t-if="based_on_users and staff_user and staff_user.name not in appointment_type.name">
-                        <span t-out="staff_user.name"/> -
-                    </t>
-                    <span t-out="appointment_type.name"/>
-                </h4>
                 <div class="oe_structure"/>
-                <div class="o_appointment_validation_details row justify-content-between">
-                    <div class="col-12 col-md-8 pe-md-4 pe-lg-5 o_not_editable">
-                        <div class="row mb-4">
-                            <div class="col-3">
-                                <label class="text-muted">When</label>
-                            </div>
-                            <div class="col-9 col-lg-6">
-                                <strong t-out="start_dt"/>
-                                <span t-if="not appointment_type.hide_timezone" class="text-muted"> (<t t-out="timezone"/>)</span>
-                            </div>
+                <div class="o_appointment_validation_details row justify-content-between row-gap-4">
+                    <div class="col-12 col-md-8 d-flex flex-column gap-4 pe-md-4 pe-xxl-5 o_not_editable">
+                        <div>
+                            <t t-if="booking.not_available">
+                                <h2>
+                                    Appointment Unavailable! <i class="oi oi-filled text-danger me-3" data-icon="cancel"/>
+                                </h2>
+                                <h5>Unfortunately, it looks like this booking is not possible anymore. Please contact us to find an alternative.</h5>
+                            </t>
+                            <h2 t-else="">
+                                Appointment waiting for payment <i class="oi text-warning me-3" data-icon="hourglass_bottom"/>
+                            </h2>
+                            <h4 class="pt-3 fw-normal">
+                                <t t-if="based_on_users and staff_user and staff_user.name not in appointment_type.name">
+                                    <span t-out="staff_user.name"/> -
+                                </t>
+                                <span t-out="appointment_type.name"/>
+                            </h4>
                         </div>
-                        <div class="row mb-4">
-                            <div class="col-3">
-                                <label class="text-muted">Duration</label>
-                            </div>
-                            <div class="col-9 col-lg-6">
-                                <t t-out="booking.duration" t-options="{'widget': 'duration', 'unit': 'hour', 'round': 'minute'}"/>
-                            </div>
-                        </div>
-                        <div t-if="total_capacity_reserved > 1" class="row mb-4">
-                            <div class="col-3">
-                                <label class="text-muted">For</label>
-                            </div>
-                            <div class="col-9 col-lg-6">
-                                <t t-out="total_capacity_reserved"/> people
-                            </div>
-                        </div>
-                        <div t-if="(not appointment_type.is_auto_assign or appointment_type.show_avatars) and
-                                (appointment_type.manage_capacity or
-                                    (len(resources) == 1 and not appointment_type.show_avatars and is_html_empty(resources[0].description))
-                                )" class="row mb-4">
-                            <div class="col-3">
-                                <label class="text-muted">Resources</label>
-                            </div>
-                            <div class="col-9 col-lg-6">
-                                <div t-foreach="resources" t-as="resource" class="d-flex flex-nowrap gap-2 align-items-center mb-1">
-                                    <div t-if="appointment_type.show_avatars"
-                                        class="o_appointment_avatar_container o_appointment_avatar_multi_resource ratio ratio-1x1">
-                                        <div t-attf-style="background-image: url('/appointment/#{appointment_type.id}/resource_avatar?resource_id=#{resource.id}');"
-                                            class="o_appointment_avatar_background rounded-circle"/>
-                                    </div>
-                                    <t t-out="resource.name"/>
+                        <div t-if="based_on_users or appointment_type.location_id" class="d-flex gap-2">
+                            <i class="oi oi-stack rounded-1 text-muted text-center fs-4" data-icon="location_on"/>
+                            <div t-if="appointment_type.location_id">
+                                <div class="d-flex gap-2 mt-1">
+                                    <span t-field="appointment_type.location_id" t-options="{'widget': 'contact', 'fields': ['name']}" class="fw-bold"/>
+                                    <span t-if="not based_on_users and not appointment_type.is_auto_assign" class="text-muted">
+                                        (<t t-out="', '.join(resources.mapped('name'))"/>)
+                                    </span>
                                 </div>
+                                <div t-field="appointment_type.location_id" t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true}"/>
+                            </div>
+                            <div t-else="" class="d-flex align-items-center">
+                                <span class="fw-bold">Online</span>
                             </div>
                         </div>
-                        <div t-if="based_on_users or appointment_type.location_id" class="row mb-4">
-                            <div class="col-3">
-                                <label class="text-muted">Where</label>
-                            </div>
-                            <div class="col-9 col-lg-6">
-                                <span t-if="appointment_type.location_id">
-                                    <div t-att-class="str(appointment_type.location_id.contact_address).strip() and 'fw-bold' or ''"
-                                            t-field="appointment_type.location_id" t-options="{'widget': 'contact', 'fields': ['name']}"/>
-                                    <div t-field="appointment_type.location_id" t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true}"/>
-                                </span>
-                                <t t-elif="based_on_users" ><span>Online</span></t>
+                        <div t-elif="resources and not based_on_users and not appointment_type.is_auto_assign" class="d-flex gap-2 align-items-center">
+                            <i class="oi oi-stack rounded-1 text-muted text-center fs-4" data-icon="inventory_2" role="img"/>
+                            <p class="mb-0 fw-bold" t-out="', '.join(resources.mapped('name'))"/>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <i class="oi oi-stack oi-filled rounded-1 text-muted text-center fs-4" data-icon="calendar_today" role="img"/>
+                            <div class="mt-1">
+                                <p class="mb-0">
+                                    <span class="fw-bold" t-out="start_dt"/>
+                                    <span t-if="not appointment_type.hide_duration" class="text-muted">
+                                        (<i class="oi oi-fw" data-icon="schedule"/>
+                                        <t t-out="booking.duration" t-options="{'widget': 'duration', 'unit': 'hour', 'round': 'minute'}"/>)
+                                    </span>
+                                </p>
+                                <div t-if="not appointment_type.hide_timezone" class="text-muted"> <t t-out="request.session.get('timezone')"/></div>
                             </div>
                         </div>
-                        <div t-if="based_on_users" class="row mb-4">
-                            <div class="col-3">
-                                <label class="text-muted">Attendees</label>
-                            </div>
-                            <div class="col-9">
-                                <div class="list-group">
-                                    <div class="list-group-item" t-foreach="attendees" t-as="attendee">
-                                        <t t-out="attendee.display_name"/>
-                                    </div>
-                                </div>
+                        <div class="d-flex gap-2 align-items-center" t-if="total_capacity_reserved > 1">
+                            <i class="oi oi-stack oi-filled rounded-1 text-muted text-center fs-4" data-icon="group"/>
+                            <span class="fw-bold">For <t t-out="total_capacity_reserved"/> people</span>
+                        </div>
+                        <div t-if="based_on_users" class="d-flex gap-2">
+                            <i class="oi oi-stack flex-shrink-0 rounded-1 text-muted text-center fs-4" data-icon="check_circle"/>
+                            <div class="d-flex flex-column lh-lg">
+                                <span class="fw-bold">Attendees</span>
+                                <span t-foreach="attendees" t-as="attendee" t-out="attendee.display_name" class="lh-base"/>
                             </div>
                         </div>
-                        <div t-if="not is_html_empty(booking.description)" class="row mb-4">
-                            <div class="col-3">
-                                <label class="text-muted">Details</label>
-                            </div>
-                            <div class="col-9 col-lg-6">
-                                <div t-field="booking.description"/>
-                            </div>
+                        <div t-if="appointment_type.message_confirmation" class="border-top pt-3 px-md-3">
+                            <div t-out="appointment_type.message_confirmation" class="fw-normal"/>
                         </div>
-                        <div t-if="appointment_type" t-out="appointment_type.message_confirmation" class="mt-4"/>
                     </div>
-                    <div class="col-12 col-md-4 px-md-4">
-                        <t t-if="not appointment_type.is_auto_assign or appointment_type.show_avatars"
-                            t-call="appointment.appointment_validated_card"/>
+                    <div t-if="not is_html_empty(booking.description)" class="col-12 col-md-4 d-flex flex-column col-gap-3 row-gap-4">
+                        <h5>Your Details</h5>
+                        <div t-field="booking.description"/>
                     </div>
                 </div>
             </div>

@@ -2,6 +2,8 @@ from lxml import etree, objectify
 
 from odoo import _, models, release
 from odoo.tools import SQL
+from odoo.tools.business_data import split_vat
+
 from odoo.addons.l10n_cz_reports.models import l10n_cz_reports_utils as cz_utils
 
 
@@ -36,19 +38,21 @@ class CzechVIESSummaryReportCustomHandler(models.AbstractModel):
 
         lines = []
         for report_line in report_lines:
-            markup = report._get_markup(report_line['id'])
+            markup = report._get_markup(report_line.id)
             if not isinstance(markup, dict) or markup.get('groupby') != 'l10n_cz_transaction_code':
                 continue
 
             line = {}
-            for col in report_line['columns']:
-                line[col['expression_label']] = col['no_format']
+            for col in report_line.columns:
+                line[col.expression_label] = col.no_format
+            if line.get('vat_number') and line['vat_number'][0].isalpha():
+                line['vat_number'] = split_vat(line['vat_number'])[1]
             lines.append(line)
 
         data = {
             'odoo_version': release.version,
-            'veta_d': cz_utils.get_veta_d_vals(report, options),
-            'veta_p': cz_utils.get_veta_p_vals(sender_company),
+            'veta_d': cz_utils.get_veta_d_vals(report, options, sender_company),
+            'veta_p': cz_utils.get_veta_p_vals(report, sender_company, self.env.user.partner_id),
             'lines': lines,
         }
         xml_content = self.env['ir.qweb']._render('l10n_cz_reports.cz_vies_summary_template', values=data)
@@ -61,7 +65,7 @@ class CzechVIESSummaryReportCustomHandler(models.AbstractModel):
             'file_type': 'xml',
         }
 
-    def _report_custom_engine_vies_summary(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_vies_summary(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         def build_result_dict(query_res_lines):
             result = {
                 'country_code': None,
@@ -98,11 +102,8 @@ class CzechVIESSummaryReportCustomHandler(models.AbstractModel):
                 return result
 
         report = self.env['account.report'].browse(options['report_id'])
-        report._check_groupby_fields(
-            (next_groupby.split(',') if next_groupby else []) +
-            ([current_groupby] if current_groupby else [])
-        )
-
+        if current_groupby:
+            report._check_groupby_fields([current_groupby])
         query = report._get_report_query(options, 'strict_range')
 
         groupby_field_sql = self.env['account.move.line']._field_to_sql('account_move_line', current_groupby, query) if current_groupby else SQL()
@@ -110,7 +111,6 @@ class CzechVIESSummaryReportCustomHandler(models.AbstractModel):
         if groupby_field_sql:
             groupby_clause = SQL("%s, %s", groupby_clause, groupby_field_sql)
 
-        tail_query = report._get_engine_query_tail(offset, limit)
         query = SQL(
             """
                 SELECT %(select_from_groupby)s
@@ -119,7 +119,7 @@ class CzechVIESSummaryReportCustomHandler(models.AbstractModel):
                     l10n_cz_transaction_code                                                                                                AS transaction_code,
                     l10n_cz_transaction_code                                                                                                AS supplies_code,
                     COUNT(DISTINCT account_move_line.move_id * (CASE WHEN am.move_type IN ('out_refund', 'in_refund') THEN -1 ELSE 1 END))  AS supplies_number,
-                    CEIL(SUM(ABS(account_move_line.balance) * (CASE WHEN am.move_type IN ('out_refund', 'in_refund') THEN -1 ELSE 1 END)))  AS total_value
+                    CEIL(SUM(account_move_line.balance * (CASE WHEN am.move_type IN ('out_refund', 'out_invoice') THEN -1 ELSE 1 END)))     AS total_value
                 FROM %(table_references)s
                 JOIN account_move am ON am.id = account_move_line.move_id
                 JOIN res_partner                partner         ON account_move_line.partner_id                 = partner.id
@@ -132,7 +132,6 @@ class CzechVIESSummaryReportCustomHandler(models.AbstractModel):
                     AND move.move_type IN %(move_types)s
                 %(groupby_clause)s
                 %(orderby_clause)s
-                %(tail_query)s
             """,
             select_from_groupby=SQL('%s AS grouping_key,', groupby_field_sql) if groupby_field_sql else SQL(''),
             table_references=query.from_clause,
@@ -141,9 +140,8 @@ class CzechVIESSummaryReportCustomHandler(models.AbstractModel):
             move_types=tuple(self.env['account.move'].get_invoice_types()),
             groupby_clause=SQL("GROUP BY %s", groupby_clause),
             orderby_clause=SQL("ORDER BY %s", groupby_clause),
-            tail_query=SQL(tail_query),
         )
         self.env.cr.execute(query)
         query_res_lines = self.env.cr.dictfetchall()
 
-        return build_result(query_res_lines)
+        return {next(iter(formulas_dict.values())): build_result(query_res_lines)}

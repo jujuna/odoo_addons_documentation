@@ -71,7 +71,7 @@ class TestUi(odoo.tests.HttpCase):
                             <field name="x_studio_currency_id"/>
                             <field name="x_studio_monetary"/>
                             <field name="x_studio_html"/>
-                            <field name="x_studio_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                            <field name="x_studio_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color', 'on_tag_click': 'edit_color'}"/>
                         </group>
                     </sheet>
                 </form>
@@ -143,7 +143,7 @@ class TestUi(odoo.tests.HttpCase):
             'x_studio_image': image_data,
         })
 
-        self.start_tour("/odoo", 'website_studio_listing_and_page', login="admin", timeout=3600)
+        self.start_tour("/odoo/action-studio?debug=1&mode=home_menu", 'website_studio_listing_and_page', login="admin", timeout=3600)
         created_pages = self.env["website.controller.page"].search([])
         self.assertEqual(len(created_pages), 1)
 
@@ -197,7 +197,7 @@ class TestUi(odoo.tests.HttpCase):
             'x_studio_image': image_data,
         })
 
-        self.start_tour("/odoo", 'website_studio_listing_without_page', login="admin", watch=False, timeout=3600)
+        self.start_tour("/odoo/action-studio?debug=1&mode=home_menu", 'website_studio_listing_without_page', login="admin", watch=False, timeout=3600)
         created_pages = self.env["website.controller.page"].search([])
         self.assertEqual(len(created_pages), 1)
         self.assertEqual(created_pages[0].name_slugified, 'mycustom-name')

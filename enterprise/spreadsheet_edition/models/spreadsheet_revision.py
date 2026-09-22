@@ -11,7 +11,7 @@ class SpreadsheetRevision(models.Model):
     _name = 'spreadsheet.revision'
     _description = "Collaborative spreadsheet revision"
     _rec_name = 'revision_uuid'
-    _rec_names_search = ['name', 'revision_uuid']
+    _rec_names_search = ('name', 'revision_uuid')
 
     name = fields.Char("Revision name")
     active = fields.Boolean(default=True)
@@ -43,18 +43,16 @@ class SpreadsheetRevision(models.Model):
         """Delete the history for spreadsheets that have not been modified for more
         than a year (overridable with an 'ir.config_parameter').
         """
-        config_param = self.env['ir.config_parameter'].sudo().get_param(
+        inactivity_days = self.env['ir.config_parameter'].sudo().get_int(
             'spreadsheet_edition.gc_revisions_inactivity_in_days',
-            ''
+            inactivity_days
         )
-        if config_param:
-            inactivity_days = int(config_param)
-        one_year_ago = fields.Datetime.now() - relativedelta(days=inactivity_days)
+        inactivity_time = fields.Datetime.now() - relativedelta(days=inactivity_days)
         inactive_spreadsheets = self.with_context(active_test=False)._read_group(
             domain=domain,
             groupby=["res_model", "res_id"],
             aggregates=["write_date:max"],
-            having=[("write_date:max", "<=", one_year_ago)],
+            having=[("write_date:max", "<=", inactivity_time)],
         )
         ids_by_model = defaultdict(list)
         for res_model, res_id, _last_revision_date in inactive_spreadsheets:

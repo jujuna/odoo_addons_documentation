@@ -1,19 +1,18 @@
 import { registry } from "@web/core/registry";
-import { Component, onWillStart, onWillUnmount } from "@odoo/owl";
+import { Component, onWillStart, onWillUnmount, t, useProps } from "@odoo/owl";
 import { useInactivity } from "../use_inactivity";
 
 export class RegisterPage extends Component {
     static template = "frontdesk.RegisterPage";
-    static props = {
-        createVisitor: Function,
-        hostData: { optional: true },
-        isDrinkVisible: Boolean,
-        isMobile: Boolean,
-        onClose: Function,
-        plannedVisitorData: { optional: true },
-        showScreen: Function,
-        theme: String,
-    };
+
+    props = useProps({
+        createVisitor: t.function(),
+        hostData: t.any().optional(),
+        isMobile: t.boolean(),
+        onClose: t.function(),
+        showScreen: t.function(),
+        theme: t.string(),
+    });
 
     setup() {
         if (!this.props.isMobile) {
@@ -21,15 +20,12 @@ export class RegisterPage extends Component {
         }
 
         onWillStart(async () => {
-            if (!this.props.plannedVisitorData) {
-                // Check if a visitor has already been created
-                const visitorCreated = sessionStorage.getItem("visitorCreated");
-                if (!visitorCreated) {
-                    await this.props.createVisitor();
-                    if (this.props.isMobile) {
-                        // Set the flag in sessionStorage
-                        sessionStorage.setItem("visitorCreated", "true");
-                    }
+            const visitorCreated = sessionStorage.getItem("visitorCreated");
+            if (!visitorCreated) {
+                await this.props.createVisitor();
+                if (this.props.isMobile) {
+                    // Set the flag in sessionStorage
+                    sessionStorage.setItem("visitorCreated", "true");
                 }
             }
         });

@@ -1,18 +1,24 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import logging
+
 from hashlib import sha256
 from json import dumps
 from urllib.parse import urlsplit
 
 from odoo import http, _
 from odoo.http import request
-from odoo.addons.iap import jsonrpc
+from odoo.addons.iap.tools import iap_tools
 from odoo.tools import consteq
 from odoo.tools.urls import urljoin as url_join
 from odoo.addons.sign.controllers.main import Sign as SignController
 
+_logger = logging.getLogger(__name__)
+
 IAP_DEFAULT_DOMAIN = 'https://itsme.api.odoo.com'
 IAP_SERVICE_NAME = 'itsme_proxy'
+
+
 class SignItsme(SignController):
     def get_document_qweb_context(self, sign_request_id, token, **post):
         res = super().get_document_qweb_context(sign_request_id, token, **post)
@@ -34,18 +40,18 @@ class SignItsme(SignController):
                     'message': _("itsme® IAP service could not be found.")
                 }
             parsed_referrer = urlsplit(referrer)
-            endpoint = request.env['ir.config_parameter'].sudo().get_param('sign_itsme.iap_endpoint', IAP_DEFAULT_DOMAIN)
+            endpoint = request.env['ir.config_parameter'].sudo().get_str('sign_itsme.iap_endpoint') or IAP_DEFAULT_DOMAIN
             itsme_credits = request.env['iap.account'].sudo().get_credits(IAP_SERVICE_NAME)
             if itsme_credits < 1:
                 request_item_sudo.signed_without_extra_auth = True
                 return {
                     'success': True
                 }
-            response = jsonrpc(url_join(endpoint, '/itsme/v1/sign_identity_request'), params={
+            response = iap_tools.iap_jsonrpc(url_join(endpoint, '/itsme/v1/sign_identity_request'), params={
                 'account_token': account.sudo().account_token,
                 'itsme_state': '%s.%s' % (request_item_sudo.sign_request_id.id, request_item_sudo.access_token),
                 'referrer': parsed_referrer._replace(path='', query='', fragment='').geturl()
-            })
+            }, raise_user_error=True)
             return response
         else:
             return super()._validate_auth_method(request_item_sudo, **kwargs)

@@ -1,7 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-
 from odoo import fields, models
+from odoo.fields import Domain
+from odoo.tools import SQL
+
 from odoo.addons.sale_subscription.models.sale_order import SUBSCRIPTION_STATES
 
 
@@ -29,82 +30,69 @@ class SaleSubscriptionReport(models.Model):
     plan_id = fields.Many2one('sale.subscription.plan', 'Plan', readonly=True)
     origin_order_id = fields.Many2one('sale.order', string='First contract', readonly=True)
 
-    def _select_additional_fields(self):
-        res = super()._select_additional_fields()
-        res['is_subscription'] = "s.is_subscription"
-        res['subscription_state'] = "s.subscription_state"
-        res['end_date'] = "s.end_date"
-        res['first_contract_date'] = "s.first_contract_date"
-        res['template_id'] = "s.sale_order_template_id"
-        res['close_reason_id'] = "s.close_reason_id"
-        res['next_invoice_date'] = "s.next_invoice_date"
-        res['plan_id'] = "s.plan_id"
-        res['origin_order_id'] = "s.origin_order_id"
-        res['client_order_ref'] = "s.client_order_ref"
-        res['margin'] = 0
-        res['recurring_monthly'] = f"""sum(l.price_subtotal)
-            / CASE
-                WHEN ssp.billing_period_unit = 'week' THEN 7.0 / 30.437
-                WHEN ssp.billing_period_unit = 'month' THEN 1
-                WHEN ssp.billing_period_unit = 'year' THEN 12
-                ELSE 1
-             END
-            / ssp.billing_period_value
-            / {self._case_value_or_one('s.currency_rate') }
-            * {self._case_value_or_one('account_currency_table.rate') }
-        """
-        res['recurring_yearly'] = f"""sum(l.price_subtotal)
-            / CASE
-                WHEN ssp.billing_period_unit = 'week' THEN 7.0 / 30.437
-                WHEN ssp.billing_period_unit = 'month' THEN 1
-                WHEN ssp.billing_period_unit = 'year' THEN 12
-                ELSE 1
-             END
-            / ssp.billing_period_value
-            * 12
-            / {self._case_value_or_one('s.currency_rate') }
-            * {self._case_value_or_one('account_currency_table.rate') }
-        """
-        res['recurring_total'] = f"""
-                s.recurring_total
-                / {self._case_value_or_one('s.currency_rate') }
-                * {self._case_value_or_one('account_currency_table.rate') }
-        """
-        return res
+    def _order_line_domain(self):
+        return super()._order_line_domain() & Domain('order_id.subscription_state', '!=', False)
 
-    def _from_sale(self):
-        frm = super()._from_sale()
-        return f"""
-            {frm}
-            LEFT JOIN sale_subscription_plan ssp ON ssp.id = s.plan_id
-        """
+    def _sql_line_is_recurring(self, table):
+        return SQL(
+            """(
+                %(product_recurring)s
+                OR (
+                    %(product_id)s IS NULL
+                    AND %(display_type)s IS NULL
+                    AND %(is_downpayment)s IS NOT TRUE
+                    AND %(order_plan_id)s IS NOT NULL
+                )
+            )""",
+            product_recurring=table.product_id.recurring_invoice,
+            product_id=table.product_id,
+            display_type=table.display_type,
+            is_downpayment=table.is_downpayment,
+            order_plan_id=table.order_id.plan_id,
+        )
 
-    def _where_sale(self):
-        where = super()._where_sale()
-        return f"""
-            {where}
-            AND s.subscription_state IS NOT NULL
-        """
+    def _select_dict(self, table):
+        order_rate = self._case_value_or_one(table.order_id.currency_rate)
+        rate = SQL("%s / %s", table.consolidation_rate, order_rate)
+        is_recurring = self._sql_line_is_recurring(table)
+        return super()._select_dict(table) | {
+            'is_subscription': table.order_id.is_subscription,
+            'subscription_state': table.order_id.subscription_state,
+            'end_date': table.order_id.end_date,
+            'first_contract_date': table.order_id.first_contract_date,
+            'template_id': table.order_id.sale_order_template_id,
+            'close_reason_id': table.order_id.close_reason_id,
+            'next_invoice_date': table.order_id.next_invoice_date,
+            'plan_id': table.order_id.plan_id,
+            'origin_order_id': table.order_id.origin_order_id,
+            'client_order_ref': table.order_id.client_order_ref,
+            'recurring_monthly': SQL("""
+                SUM(CASE WHEN %s THEN %s ELSE 0 END)
+                / CASE %s WHEN 'week' THEN 7.0 / 30.437 WHEN 'month' THEN 1 WHEN 'year' THEN 12 ELSE 1 END
+                / %s
+                * %s""",
+                is_recurring,
+                table.price_subtotal,
+                table.order_id.plan_id.billing_period_unit,
+                table.order_id.plan_id.billing_period_value,
+                rate,
+            ),
+            'recurring_yearly': SQL("""
+                SUM(CASE WHEN %s THEN %s ELSE 0 END)
+                / CASE %s WHEN 'week' THEN 7.0 / 30.437 WHEN 'month' THEN 1 WHEN 'year' THEN 12 ELSE 1 END
+                / %s * 12
+                * %s""",
+                is_recurring,
+                table.price_subtotal,
+                table.order_id.plan_id.billing_period_unit,
+                table.order_id.plan_id.billing_period_value,
+                rate,
+            ),
+            'recurring_total': SQL("%s * %s", table.order_id.recurring_total, rate),
+        }
 
-    def _group_by_sale(self):
-        group_by_str = super()._group_by_sale()
-        group_by_str = f"""{group_by_str},
-                    s.subscription_state,
-                    s.end_date,
-                    s.subscription_state,
-                    s.sale_order_template_id,
-                    partner.industry_id,
-                    s.close_reason_id,
-                    s.state,
-                    s.next_invoice_date,
-                    s.plan_id,
-                    s.origin_order_id,
-                    s.first_contract_date,
-                    s.client_order_ref,
-                    ssp.billing_period_unit,
-                    ssp.billing_period_value
-        """
-        return group_by_str
+    def _groupby_list(self, table):
+        return super()._groupby_list(table) + [table.order_id.plan_id.id]
 
     def action_open_subscription_order(self):
         self.ensure_one()

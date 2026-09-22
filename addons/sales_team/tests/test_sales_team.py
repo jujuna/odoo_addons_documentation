@@ -11,6 +11,7 @@ from odoo.addons.sales_team.tests.common import (
 )
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestDefaultTeam(TestSalesCommon):
     """Tests to check if correct default team is found."""
 
@@ -18,7 +19,7 @@ class TestDefaultTeam(TestSalesCommon):
     def setUpClass(cls):
         """Set up data for default team tests."""
         super(TestDefaultTeam, cls).setUpClass()
-        cls.env['ir.config_parameter'].set_param('sales_team.membership_multi', True)
+        cls.env['ir.config_parameter'].set_bool('sales_team.membership_multi', True)
 
         # Salesmen organization
         # ------------------------------------------------------------
@@ -152,6 +153,8 @@ class TestDefaultTeam(TestSalesCommon):
                 'SalesTeam: default taken into account when no member / responsible'
             )
 
+
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestMultiCompany(TestSalesMC):
     """Tests to check multi company management with sales team and their
     members. """
@@ -227,11 +230,17 @@ class TestMultiCompany(TestSalesMC):
 @tagged('post_install', '-at_install')
 class TestAccessRights(SalesTeamCommon):
 
+    _test_user_groups = (
+        'sales_team.group_sale_manager',  # FIXME: use sales_team.group_sale_salesman
+    )
+
+    _test_user_name = 'Test Sales Manager'
+
     @users('salesmanager')
     def test_access_sales_manager(self):
         """ Test sales manager's access rights """
         # Manager can create a Sales Team
-        india_channel = self.env['crm.team'].with_context(tracking_disable=True).create({
+        india_channel = self.env['crm.team'].create({
             'name': 'India',
         })
         self.assertIn(

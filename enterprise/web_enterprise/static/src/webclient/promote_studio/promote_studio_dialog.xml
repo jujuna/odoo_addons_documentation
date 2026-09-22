@@ -2,7 +2,7 @@
 <template>
 
     <t t-name="web_enterprise.PromoteStudioDialog">
-        <Dialog title="props.title" modalRef="modalRef">
+        <Dialog title="this.props.title" modalRef="this.modalRef">
             <div class="modal-studio">
                 <div id="studio_install_dialog"
                     class="d-flex flex-row align-items-center flex-wrap">
@@ -11,18 +11,14 @@
                         <h4>Want to tailor-make your Odoo?</h4>
                         <p>Unleash the power of Odoo Studio:</p>
                         <ul>
-                            <li>Create automation rules</li>
+                            <li>Automate jobs</li>
                             <li>Customize any screen</li>
-                            <li>Customize Reports</li>
-                            <li>Build new reports</li>
+                            <li>Auto-fill fields with AI</li>
+                            <li>Customize or build new reports</li>
                             <li>Build new apps from scratch</li>
                             <li>Define webhooks</li>
                             <li>and more!</li>
                         </ul>
-                        <a role="button" class="btn btn-secondary btn-block"
-                            href="https://www.odoo.com/app/studio" target="_blank"> Learn More <i
-                                class="fa fa-external-link" />
-                        </a>
                     </div>
                     <div id="studio_video" class="o_video_embed w-100 w-md-50 ratio ratio-16x9">
                         <iframe class="embed-responsive-item"
@@ -32,14 +28,19 @@
                 </div>
 
                 <t t-set-slot="footer">
-                    <button class="btn btn-primary btn-block o_install_studio"
-                        t-on-click.stop="onClickInstallStudio"
+                    <button class="btn btn-primary o_install_studio"
+                        t-on-click.stop="this.onClickInstallStudio"
                         data-tooltip="Install Odoo Studio and its dependencies">
                         Start using Odoo Studio
                     </button>
 
-                    <button class="btn btn-secondary btn-block"
-                        t-on-click="props.close">
+                    <a role="button" class="btn btn-secondary"
+                        href="https://www.odoo.com/app/studio" target="_blank"> Learn More <i
+                            class="oi" data-icon="open_in_new" />
+                    </a>
+
+                    <button class="btn btn-secondary"
+                        t-on-click="this.props.close">
                         Discard
                     </button>
                 </t>

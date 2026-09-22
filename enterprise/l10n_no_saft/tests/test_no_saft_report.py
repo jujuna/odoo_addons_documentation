@@ -3,12 +3,14 @@
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.tests.common import test_xsd
 from odoo.tests import tagged
-from odoo import Command, fields
+from odoo import Command
 
 from freezegun import freeze_time
 
 
 class TestNoSaftReportCommon(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestAccountReportsCommon.setup_country('no')
@@ -25,14 +27,12 @@ class TestNoSaftReportCommon(TestAccountReportsCommon):
         cls.company_data['company'].write({
             'city': 'OSLO',
             'zip': 'N-0104',
-            'company_registry': '123456',
             'phone': '+47 11 11 11 11',
             'l10n_no_bronnoysund_number': '987654325',
         })
 
         cls.env['res.partner'].create({
             'name': 'Mr Big CEO',
-            'is_company': False,
             'phone': '+47 11 11 12 34',
             'parent_id': cls.company_data['company'].partner_id.id,
         })
@@ -118,10 +118,12 @@ class TestNoSaftReportCommon(TestAccountReportsCommon):
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestNoSaftReport(TestNoSaftReportCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time('2019-12-31')
     def test_saft_report_values(self):
         report = self.env.ref('account_reports.general_ledger_report')
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(report, '2019-01-01', '2019-12-31')
 
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(self.env[report.custom_handler_model_name].l10n_no_export_saft_to_xml(options)['file_content']),
@@ -135,7 +137,7 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                         <SoftwareID>Odoo</SoftwareID>
                         <SoftwareVersion>___ignore___</SoftwareVersion>
                         <Company>
-                            <RegistrationNumber>123456</RegistrationNumber>
+                            <RegistrationNumber>987654325</RegistrationNumber>
                             <Name>company_1_data</Name>
                             <Address>
                                 <City>OSLO</City>
@@ -145,9 +147,9 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                             <Contact>
                                 <ContactPerson>
                                     <FirstName>NotUsed</FirstName>
-                                    <LastName>Mr Big CEO</LastName>
+                                    <LastName>company_1_data</LastName>
                                 </ContactPerson>
-                                <Telephone>+47 11 11 12 34</Telephone>
+                                <Telephone>+47 11 11 11 11</Telephone>
                             </Contact>
                         </Company>
                         <DefaultCurrencyCode>NOK</DefaultCurrencyCode>
@@ -253,7 +255,7 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                         </TaxTable>
                         <Owners>
                             <Owner>
-                                <RegistrationNumber>123456</RegistrationNumber>
+                                <RegistrationNumber>987654325</RegistrationNumber>
                                 <Name>company_1_data</Name>
                                 <Address>
                                     <City>OSLO</City>
@@ -263,9 +265,9 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                 <Contact>
                                     <ContactPerson>
                                         <FirstName>NotUsed</FirstName>
-                                        <LastName>Mr Big CEO</LastName>
+                                        <LastName>company_1_data</LastName>
                                     </ContactPerson>
-                                    <Telephone>+47 11 11 12 34</Telephone>
+                                    <Telephone>+47 11 11 11 11</Telephone>
                                 </Contact>
                                 <OwnerID>___ignore___</OwnerID>
                             </Owner>
@@ -421,8 +423,10 @@ class TestNoSaftReport(TestNoSaftReportCommon):
 
 @tagged('external_l10n', 'post_install', '-at_install', '-standard', 'external')
 class TestNoSaftReportXmlValidity(TestNoSaftReportCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @test_xsd(url='https://raw.githubusercontent.com/Skatteetaten/saf-t/master/SAF-T_Financial_1.3/Norwegian_SAF-T_Financial_Schema_v_1.30.xsd')
     def test_xml_validity(self):
         report = self.env.ref('account_reports.general_ledger_report')
-        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+        options = self._generate_options(report, '2019-01-01', '2019-12-31')
         return self.get_xml_tree_from_string(self.env[report.custom_handler_model_name].l10n_no_export_saft_to_xml(options)['file_content'])

@@ -1,7 +1,7 @@
 from lxml import etree
 
 from odoo import Command, fields
-from odoo.tests import Form, users
+from odoo.tests import tagged, Form, users
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -11,7 +11,21 @@ class TestProjectCommon(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super(TestProjectCommon, cls).setUpClass()
-        cls.env.company.resource_calendar_id.tz = "Europe/Brussels"
+        cls.env.company.tz = "Europe/Brussels"
+        cls.calendar_40h = cls.env['resource.calendar'].create({
+            'attendance_ids': [
+                (0, 0,
+                    {
+                        'dayofweek': weekday,
+                        'hour_from': hour,
+                        'hour_to': hour + 4,
+                    })
+                for weekday in ['0', '1', '2', '3', '4']
+                for hour in [8, 13]
+            ],
+            'name': 'Standard 40h/week',
+        })
+        cls.env.company.resource_calendar_id = cls.calendar_40h
 
         user_group_partner_manager = cls.env.ref('base.group_partner_manager')
         user_group_employee = cls.env.ref('base.group_user')
@@ -27,6 +41,9 @@ class TestProjectCommon(TransactionCase):
         cls.partner_3 = cls.env['res.partner'].create({
             'name': 'Valid Poilboeuf',
             'email': 'valid.poilboeuf@gmail.com'})
+        cls.partner_4 = cls.env['res.partner'].create({
+            'name': 'Valid banana',
+            'email': 'valid.banana@gmail.com'})
 
         # Test users to use through the various tests
         Users = cls.env['res.users'].with_context({'no_reset_password': True})
@@ -44,6 +61,12 @@ class TestProjectCommon(TransactionCase):
             'signature': 'SignChell',
             'notification_type': 'email',
             'group_ids': [(6, 0, [cls.env.ref('base.group_portal').id])]})
+        cls.user_employee = Users.create({
+            'name': 'Eustache Employee',
+            'login': 'eustache',
+            'password': 'eustache',
+            'email': 'eustache.projectuser@example.com',
+            'group_ids': [(6, 0, [user_group_employee.id])]})
         cls.user_projectuser = Users.create({
             'name': 'Armande ProjectUser',
             'login': 'armandel',
@@ -56,13 +79,22 @@ class TestProjectCommon(TransactionCase):
             'login': 'bastien',
             'email': 'bastien.projectmanager@example.com',
             'group_ids': [(6, 0, [user_group_employee.id, user_group_project_manager.id, user_group_partner_manager.id])]})
-
+        cls.user_portal_1 = Users.create({
+            'login': 'banana',
+            'name': 'Valid banana',
+            'email': 'valid.banana@agrolait.com',
+            'partner_id': cls.partner_4.id,
+            'signature': 'SignBanana',
+            'notification_type': 'email',
+            'group_ids': [(6, 0, [cls.env.ref('base.group_public').id])]})
         # Test 'Pigs' project
         cls.project_pigs = cls.env['project.project'].with_context({'mail_create_nolog': True}).create({
             'name': 'Pigs',
             'privacy_visibility': 'employees',
             'alias_name': 'project+pigs',
-            'partner_id': cls.partner_1.id})
+            'partner_id': cls.partner_1.id,
+            'type_ids': [Command.set([])],
+        })
         # Already-existing tasks in Pigs
         cls.task_1 = cls.env['project.task'].with_context({'mail_create_nolog': True}).create({
             'name': 'Pigs UserTask',
@@ -91,6 +123,7 @@ class TestProjectCommon(TransactionCase):
             })
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install, fails post install
 class TestProjectBase(TestProjectCommon):
 
     def test_delete_project_with_tasks(self):
@@ -382,42 +415,6 @@ class TestProjectBase(TestProjectCommon):
             self.assertEqual(fields.Date.to_string(p.date_start), '2021-09-25', f'The start date of {p.name} should be updated.')
             self.assertEqual(fields.Date.to_string(p.date), '2021-09-26', f'The expiration date of {p.name} should be updated.')
 
-    def test_create_task_in_batch_with_email_cc(self):
-        user_a, user_b, user_c = self.env['res.users'].create([{
-            'name': 'user A',
-            'login': 'loginA',
-            'email': 'email@bisous1',
-        }, {
-            'name': 'user B',
-            'login': 'loginB',
-            'email': 'email@bisous2',
-        }, {
-            'name': 'user C',
-            'login': 'loginC',
-            'email': 'email@bisous3',
-        }])
-        partner = self.env['res.partner'].create({
-            'name': 'partner',
-            'email': 'email@bisous4',
-        })
-        task_1, task_2 = self.env['project.task'].with_context({'mail_create_nolog': True}).create([{
-            'name': 'task 1',
-            'project_id': self.project_pigs.id,
-            'email_cc': 'email@bisous1, email@bisous2, email@bisous4'
-        }, {
-            'name': 'task 2',
-            'project_id': self.project_pigs.id,
-            'email_cc': 'email@bisous3, email@bisous2, email@bisous4'
-        }])
-        self.assertTrue(user_a.partner_id in task_1.message_partner_ids)
-        self.assertTrue(user_b.partner_id in task_1.message_partner_ids)
-        self.assertFalse(user_c.partner_id in task_1.message_partner_ids)
-        self.assertFalse(partner in task_1.message_partner_ids)
-        self.assertFalse(user_a.partner_id in task_2.message_partner_ids)
-        self.assertTrue(user_b.partner_id in task_2.message_partner_ids)
-        self.assertTrue(user_c.partner_id in task_2.message_partner_ids)
-        self.assertFalse(partner in task_2.message_partner_ids)
-
     def test_create_private_task_in_batch(self):
         """ This test ensures that copying private task in batch can be done correctly."""
 
@@ -526,3 +523,24 @@ class TestProjectBase(TestProjectCommon):
         self.assertFalse(project_copy.date, "The project's date fields shouldn't be copied on project duplication")
         self.assertFalse(project_copy.task_ids.date_deadline, "The task's date fields shouldn't be copied on project duplication")
         self.assertFalse(task.copy().date_deadline, "The task's date fields shouldn't be copied on task duplication")
+
+    def test_archived_subtask_not_copied_during_parent_task_duplication(self):
+        """Test that archived subtasks are not copied when duplicating a parent task."""
+        parent_task = self.env['project.task'].create({
+            'name': 'Parent Task',
+            'project_id': self.project_pigs.id,
+            'child_ids': [
+                Command.create({
+                    'name': 'child task',
+                    'project_id': self.project_pigs.id,
+                }),
+            ],
+        })
+        parent_task.child_ids.active = False
+        self.assertFalse(parent_task.copy().child_ids, "Archived subtask should not be copied")
+
+    def test_rename_multiple_projects_updates_analytic_account_names(self):
+        projects = self.project_pigs + self.project_goats
+        projects._create_analytic_account()
+        projects.write({'name': 'sheeps'})
+        self.assertEqual(projects.account_id.mapped('name'), ['sheeps', 'sheeps'])

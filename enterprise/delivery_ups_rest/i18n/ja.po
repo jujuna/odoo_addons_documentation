@@ -4,21 +4,22 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-14 15:22+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:23+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "delivery_ups_rest/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_bill_my_account
@@ -67,7 +68,7 @@ msgstr "応答をデコードできませんでした"
 #. module: delivery_ups_rest
 #: model:ir.model,website_form_label:delivery_ups_rest.model_res_partner
 msgid "Create a Customer"
-msgstr "顧客を作成する"
+msgstr "顧客を作成"
 
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
@@ -78,6 +79,27 @@ msgstr "以下にアカウントを作成"
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid "Create an app"
 msgstr "アプリを作成"
+
+#. module: delivery_ups_rest
+#: model:ir.model,name:delivery_ups_rest.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "配送方法"
+
+#. module: delivery_ups_rest
+#. odoo-python
+#: code:addons/delivery_ups_rest/models/ups_request.py:0
+msgid ""
+"Detected a problem when validating delivery %(delivery_name)s. Invoicing "
+"address of the commercial invoice has been defaulted to %(ship_to_partner)s "
+"instead of %(sold_to_partner)s to avoid the following error from UPS: \"The "
+"Sold To party's country code must be the same as the Ship To party's country "
+"code with the exception of Canada and satellite countries.\""
+msgstr ""
+"配送%(delivery_name)s の検証時に問題が検出されました。UPSで以下のエラーが発生"
+"するのを避けるため、商業送状(インボイス)の請求先が %(ship_to_partner)s ( %"
+"(sold_to_partner)s ではなく)にデフォルト設定されました：「Sold To(購入者)の国"
+"コードは、カナダおよび周辺国・地域(サテライト国)を除き、Ship To(配送先)の国"
+"コードと一致している必要があります"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__display_name
@@ -181,21 +203,19 @@ msgstr "アプリに名前を付けて、"
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid ""
-"Now go to odoo and create a shipping method for UPS, using Account Number "
+"Now go to odoo and create a delivery method for UPS, using Account Number "
 "(step2) and Client ID + Client Secret (step 8). Also ensure you use correct "
 "dimensions and weight unit for your country"
 msgstr ""
-"アカウント番号(ステップ2)とクライアントID + クライアントシークレット(ステップ"
-"8)を使用して、odooでUPSの配送方法を作成します。また、あなたの国の正しい寸法と"
-"重量単位を使用していることを確認して下さい。"
+"次にOdooにアクセスし、UPS用の配送方法を作成してください。アカウント番号"
+"(ステップ2)とClient ID＋Client Secret(ステップ8)を使用します。また、自国に適"
+"した寸法と重量単位を使用していることを確認してください。"
 
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid ""
 "Now open your app, you'll have your <b>Client ID</b> and <b>Client Secret</b>"
-msgstr ""
-"アプリを開けると、<b>クライアントID</b>と <b>クライアントシークレット</b>を入"
-"手できます。"
+msgstr "アプリを開けると、<b>Client ID</b>と <b>Client Secret</b>を入手できます。"
 
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
@@ -252,8 +272,8 @@ msgstr "宛先"
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
-msgid "Recipient Phone must be at least 10 alphanumeric characters."
-msgstr "受信者の携帯電話は、少なくとも10個の文字の英数字でなければなりません。"
+msgid "Recipient Phone must be between 1 and 15 alphanumeric characters."
+msgstr ""
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_require_signature
@@ -291,6 +311,14 @@ msgid "Save and Accept terms and your app is created!"
 msgstr "保存し、条件を受け入れると、アプリが作成されます!"
 
 #. module: delivery_ups_rest
+#: model:ir.module.module,summary:base.module_delivery_ups_rest
+msgid ""
+"Send your shippings through UPS and track them online. This new version of "
+"the UPS connector is compatiblewith the newest version of the UPS REST APIs "
+"available at https://developer.ups.com/"
+msgstr ""
+
+#. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_duty_payment__sender
 msgid "Sender"
 msgstr "送信者"
@@ -314,13 +342,8 @@ msgstr ""
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
-msgid "Shipper Phone must be at least 10 alphanumeric characters."
-msgstr "荷送人の電話番号は、少なくとも10個の文字の英数字でなければなりません。"
-
-#. module: delivery_ups_rest
-#: model:ir.model,name:delivery_ups_rest.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "配送方法"
+msgid "Shipper Phone must be between 1 and 15 alphanumeric characters."
+msgstr ""
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -436,12 +459,12 @@ msgstr "UPS口座番号"
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_client_id
 msgid "UPS Client ID"
-msgstr "UPSクライアントID"
+msgstr "UPS Client ID"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_client_secret
 msgid "UPS Client Secret"
-msgstr "UPSクライアントシークレット"
+msgstr "UPS Client Secret"
 
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
@@ -492,6 +515,11 @@ msgstr "UPS Saver"
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_default_service_type
 msgid "UPS Service Type"
 msgstr "UPSサービスタイプ"
+
+#. module: delivery_ups_rest
+#: model:ir.module.module,shortdesc:base.module_delivery_ups_rest
+msgid "UPS Shipping"
+msgstr ""
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__11
@@ -552,8 +580,8 @@ msgstr "アップパッケージの重量単位"
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
-msgid "Warehouse Phone must be at least 10 alphanumeric characters."
-msgstr "倉庫の電話番号は、少なくとも10個の文字の英数字でなければなりません。"
+msgid "Warehouse Phone must be between 1 and 15 alphanumeric characters."
+msgstr ""
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -565,7 +593,7 @@ msgstr "UPSの口座番号を入力する必要があります。"
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
 msgid "You must setup a client ID and secret on the carrier first"
-msgstr "最初にキャリアでクライアントIDとシークレットを設定する必要があります。"
+msgstr "最初にキャリアでClient IDとシークレットを設定する必要があります。"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_label_file_type__zpl

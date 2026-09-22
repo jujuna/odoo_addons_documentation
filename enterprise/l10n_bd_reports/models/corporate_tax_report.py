@@ -57,6 +57,6 @@ class L10n_BdCorporateTaxReportHandler(models.AbstractModel):
         cop_line = self.env.ref('l10n_bd_reports.bd_corporate_tax_report_cop_tax_amount')
 
         line_id = report._build_line_id([(None, 'account.report', report.id), (None, 'account.report.line', cop_line.id)])
-        payable_line_info = next(report_line for report_line in report_lines if report_line['id'] == line_id)
+        payable_line_info = next(report_line for report_line in report_lines if report_line.id == line_id)
 
-        return payable_line_info['columns'][0]['no_format']
+        return payable_line_info.columns[0].no_format

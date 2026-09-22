@@ -65,7 +65,8 @@ class AccountMove(models.Model):
         return incoterm_dict.get(code, '8')
 
     def _get_inverse_currency_rate(self):
-        return float_round(abs(self.line_ids[0].balance / self.line_ids[0].amount_currency), 2)
+        lines = self.line_ids.filtered(lambda line: line.display_type not in ('line_section', 'line_note'))
+        return float_round(abs(lines[0].balance / lines[0].amount_currency), 2)
 
     def _l10n_cl_edi_post_validation(self):
         if self.l10n_latam_document_type_id._is_doc_type_export():

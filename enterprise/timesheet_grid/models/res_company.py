@@ -6,10 +6,12 @@ from dateutil import rrule
 
 from odoo.tools import get_lang
 from odoo import api, fields, models
+from odoo.tools.translate import LazyTranslate
 from odoo.fields import Domain
 import logging
 
 _logger = logging.getLogger(__name__)
+_lt = LazyTranslate(__name__)
 
 
 class ResCompany(models.Model):
@@ -41,6 +43,11 @@ class ResCompany(models.Model):
         return companies
 
     def write(self, vals):
+        if 'timesheet_encode_uom_id' in vals and any(
+            company.timesheet_encode_uom_id.id != vals['timesheet_encode_uom_id']
+            for company in self
+        ):
+            self.env.transaction.invalidate_ormcache()
         result = super().write(vals)
         self.with_context(force_nextdates_calculation=False)._timesheet_postprocess(vals)
         return result
@@ -93,9 +100,10 @@ class ResCompany(models.Model):
 
     @api.model
     def _get_timesheet_reminder_domain(self):
+        today = fields.Date.context_today(self)
         return [
-            ('date', '>=', fields.Date.to_string(date.today() - relativedelta(months=3))),
-            ('date', '<=', fields.Date.today()),
+            ('date', '>=', fields.Date.to_string(today - relativedelta(months=3))),
+            ('date', '<=', today),
             ('project_id', '!=', False),
         ]
 
@@ -140,6 +148,7 @@ class ResCompany(models.Model):
                         employee,
                         'timesheet_grid.mail_template_timesheet_reminder_user',
                         'hr_timesheet.act_hr_timesheet_line',
+                        company.timesheet_mail_employee_interval,
                         additionnal_values=work_hours_struct[employee.id],
                     )
 
@@ -161,14 +170,10 @@ class ResCompany(models.Model):
             if company.timesheet_mail_interval == 'months':
                 date_start = (date.today() - timedelta(days=company.timesheet_mail_delay + 1)) + relativedelta(day=1)
                 date_stop = date_start + relativedelta(months=1, days=-1)
-
-                action_xmlid = 'timesheet_grid.action_timesheet_previous_month'
             else:
                 week_start = int(get_lang(self.env).week_start)
                 date_start = date.today() - timedelta(days=company.timesheet_mail_delay + 1) + relativedelta(weekday=rrule.weekday(week_start - 1)(-1))
                 date_stop = date_start + timedelta(days=6)
-
-                action_xmlid = 'timesheet_grid.action_timesheet_previous_week'
 
             date_start = fields.Date.to_string(date_start)
             date_stop = fields.Date.to_string(date_stop)
@@ -194,14 +199,15 @@ class ResCompany(models.Model):
                     self._cron_timesheet_send_reminder(
                         self.env['hr.employee'].search([('company_id', '=', company.id), ('user_id', '=', user.id)]),
                         'timesheet_grid.mail_template_timesheet_reminder',
-                        action_xmlid,
+                        action_xmlid='timesheet_grid.timesheet_grid_to_validate_action',
+                        reminder_interval=company.timesheet_mail_interval,
                         additionnal_values=values)
 
         # compute the next execution date
         companies._calculate_timesheet_mail_nextdate()
 
     @api.model
-    def _cron_timesheet_send_reminder(self, employees, template_xmlid, action_xmlid, additionnal_values=None):
+    def _cron_timesheet_send_reminder(self, employees, template_xmlid, action_xmlid, reminder_interval, additionnal_values=None):
         """ Send the email reminder to specified users
             :param user_ids : list of user identifier to send the reminder
             :param template_xmlid : xml id of the reminder mail template
@@ -209,6 +215,7 @@ class ResCompany(models.Model):
         action_url = (
             f"{self.get_base_url()}/odoo/action-{action_xmlid}"
             f"?menu_id={self.env.ref('hr_timesheet.timesheet_menu_root').id}"
+            f"&reminder_interval={reminder_interval}"
         )
 
         # send mail template to users having email address
@@ -218,4 +225,9 @@ class ResCompany(models.Model):
             template_ctx.update(additionnal_values)
 
         for employee in employees.filtered('user_id'):
-            template.with_context(**template_ctx).send_mail(employee.id)
+            template.with_context(
+                **template_ctx,
+                email_notification_force_header=True,
+                email_notification_force_footer=True,
+                email_notification_subtitles=[_lt("Your Timesheets"), employee.name],
+            ).send_mail_batch(employee.ids, email_layout_xmlid='mail.mail_notification_layout')

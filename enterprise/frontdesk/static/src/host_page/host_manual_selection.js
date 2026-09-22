@@ -1,11 +1,11 @@
-import { Component, useState, onWillStart } from "@odoo/owl";
+import { Component, onWillStart, proxy, t, useProps } from "@odoo/owl";
 import { Domain } from "@web/core/domain";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { Pager } from "@web/core/pager/pager";
-import { MEDIAS_BREAKPOINTS, SIZES } from "@web/core/ui/ui_service";
+import { MEDIAS_BREAKPOINTS, SIZES } from "@web/core/ui/ui_utils";
 import { useService } from "@web/core/utils/hooks";
 import { useDebounced } from "@web/core/utils/timing";
 
@@ -16,17 +16,18 @@ export class HostManualSelection extends Component {
         DropdownItem,
         Pager,
     };
-    static props = {
-        stationId: Number,
-        token: String,
-        theme: String,
-        onSelectHost: Function,
-        onClickBack: Function,
-    };
+    props = useProps({
+        stationId: t.number(),
+        token: t.string(),
+        theme: t.string(),
+        onSelectHost: t.function(),
+        onClickBack: t.function(),
+    });
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({
+        this.uiService = useService("ui");
+        this.state = proxy({
             hostsData: {
                 count: 0,
                 records: [],
@@ -37,9 +38,10 @@ export class HostManualSelection extends Component {
             searchInput: "",
             searchDomain: [],
             departmentDomain: [],
+            selectedDepartmentId: false,
         });
         this.departmentName = _t("All departments");
-        this.debouncedSearch = useDebounced(this._performSearch, 250);
+        this.debouncedSearch = useDebounced(this._performSearch.bind(this), 250);
         onWillStart(async () => {
             await this._fetchDepartments();
             await this._fetchHostData();
@@ -103,7 +105,7 @@ export class HostManualSelection extends Component {
     }
 
     async onDepartmentClick(departmentId = false) {
-        if (this.env.isSmall) {
+        if (this.uiService.isSmall) {
             if (departmentId) {
                 const selectedDepartment = this.state.departments.find((department) => department.id === departmentId);
                 this.departmentName = selectedDepartment.name;
@@ -112,6 +114,7 @@ export class HostManualSelection extends Component {
             }
         }
         this.state.departmentDomain = departmentId ? [["department_id", "=", departmentId]] : [];
+        this.state.selectedDepartmentId = departmentId || false;
         this.state.offset = 0;
         await this._fetchHostData();
     }
@@ -133,6 +136,7 @@ export class HostManualSelection extends Component {
             this.props.onSelectHost({
                 id: host.id,
                 display_name: host.display_name,
+                avatar: host.avatar,
             });
         }
     }

@@ -30,16 +30,11 @@ class CustomerPortal(payment_portal.PaymentPortal):
             ('is_subscription', '=', True)
         ]
 
-    def _prepare_home_portal_values(self, counters):
-        """ Add subscription details to main account page """
-        values = super()._prepare_home_portal_values(counters)
-        if 'subscription_count' in counters:
-            if request.env['sale.order'].has_access('read'):
-                partner = request.env.user.partner_id
-                values['subscription_count'] = request.env['sale.order'].search_count(self._get_subscription_domain(partner))
-            else:
-                values['subscription_count'] = 0
-        return values
+    def _prepare_portal_counter_values(self, counter):
+        if counter == 'subscription_count':
+            domain = self._get_subscription_domain(request.env.user.partner_id)
+            return 'sale.order', domain, 'read'
+        return super()._prepare_portal_counter_values(counter)
 
     def _get_subscription(self, access_token, order_id):
         logged_in = not request.env.user.sudo()._is_public()
@@ -93,7 +88,7 @@ class CustomerPortal(payment_portal.PaymentPortal):
         searchbar_filters = {
             'all': {'label': _('All'), 'domain': []},
             'open': {'label': _('In Progress'), 'domain': [('subscription_state', 'in', ['3_progress', '4_paused'])]},
-            'to_renew': {'label': _('To Renew'), 'domain': [('subscription_state', '=', '3_progress'), ('next_invoice_date', '<', fields.Date.today())]},
+            'to_renew': {'label': _('To Renew'), 'domain': [('subscription_state', '=', '3_progress'), ('next_invoice_date', '<', fields.Date.context_today(self))]},
             'close': {'label': _('Closed'), 'domain': [('subscription_state', '=', '6_churn')]},
         }
 
@@ -206,15 +201,15 @@ class CustomerPortal(payment_portal.PaymentPortal):
             'product_documents': order_sudo._get_product_documents(),
             'next_billing_details': order_sudo._next_billing_details(),
             'format_date': lambda date: format_date(request.env, date),
-            'next_invoice_date_at_resume': max(order_sudo.user_pause_start, fields.Date.today()) if order_sudo.user_pause_start else False,
+            'next_invoice_date_at_resume': max(order_sudo.user_pause_start, fields.Date.context_today(self)) if order_sudo.user_pause_start else False,
             'is_subscription_postpaid': order_sudo._is_subscription_postpaid(),
-            'is_delivery_product': int(any(line.product_id.invoice_policy == 'delivery' for line in order_sudo.order_line)),
+            'is_delivery_product': int(any(line.invoice_policy == 'delivery' for line in order_sudo.order_line)),
             **self._prepare_partner_addresses(order_sudo)
         }
 
         history_session_key = request.session.get('current_history', 'my_subscriptions_history')
-        portal_page_values = self._get_page_view_values(
-            order_sudo, access_token, portal_page_values, history_session_key, False)
+        portal_page_values = self._sale_order_get_page_view_values(
+            order_sudo, access_token, portal_page_values, history_session_key, **kw)
 
         payment_form_values = {
             'default_token_id': order_sudo.payment_token_id.id,
@@ -234,13 +229,13 @@ class CustomerPortal(payment_portal.PaymentPortal):
 
     def _prepare_partner_addresses(self, order_sudo):
         """ Retrieves the invoicing and delivery addresses of the sale order, and format them properly for display. """
-        addresses_data = self._prepare_address_data(order_sudo.partner_id)
+        addresses_data = self._prepare_address_data(order_sudo.partner_id, order_sudo=order_sudo)
         check_user_id = order_sudo.user_id or request.env.user
         # we don't allow to update the subscription shipping address yet.
         return {
             'multiple_addresses_enabled': check_user_id.has_group('account.group_delivery_invoice_address'),
-            'invoicing_addresses': [{'id': partner.id, 'address': f'{partner.name}, {partner._display_address(without_company=True)}'} for partner in addresses_data.get('billing_addresses')],
-            'delivery_addresses': [{'id': partner.id, 'address': f'{partner.name}, {partner._display_address(without_company=True)}'} for partner in addresses_data.get('delivery_addresses') if order_sudo.partner_shipping_id.id == partner.id],
+            'invoicing_addresses': [{'id': partner.id, 'address': f'{partner.name}, {partner.address}'} for partner in addresses_data.get('billing_addresses')],
+            'delivery_addresses': [{'id': partner.id, 'address': f'{partner.name}, {partner.address}'} for partner in addresses_data.get('delivery_addresses') if order_sudo.partner_shipping_id.id == partner.id],
         }
 
     @http.route([
@@ -278,7 +273,7 @@ class CustomerPortal(payment_portal.PaymentPortal):
 
         if redirection:
             return redirection
-        if order_sudo.next_invoice_date <= fields.Date.today():
+        if order_sudo.next_invoice_date <= fields.Date.context_today(self):
             raise UserError(self.env._('You cannot pause a subscription that is not yet due.'))
         if order_sudo._is_subscription_postpaid():
             raise UserError(self.env._('You cannot pause a subscription with postpaid lines.'))
@@ -317,15 +312,16 @@ class CustomerPortal(payment_portal.PaymentPortal):
 
     @http.route(['/my/subscriptions/<int:order_id>/resume'], type='http', methods=["POST"], auth="public", website=True)
     def subscription_resume(self, order_id, access_token=None, **kw):
+        today = fields.Date.context_today(self)
         order_sudo, redirection = self._get_subscription(access_token, order_id)
         if redirection:
             return redirection
-        if order_sudo.next_invoice_date <= fields.Date.today():
+        if order_sudo.next_invoice_date <= today:
             raise UserError(self.env._('You cannot resume a subscription that is not yet due.'))
 
         if order_sudo.plan_id.pausable_by_user and order_sudo.user_pause_start:
             user = request.env['res.users'].sudo().search([('partner_id', '=', order_sudo.partner_id.id)], limit=1) or SUPERUSER_ID
-            invoice_date = max(order_sudo.user_pause_start, fields.Date.today())
+            invoice_date = max(order_sudo.user_pause_start, today)
             message_body = self.env._("Subscription was resumed on the %s.", format_date(request.env, invoice_date))
             order_sudo.with_user(user).sudo().with_context(subscription_pause=True).write({
                 'next_invoice_date': invoice_date,
@@ -366,7 +362,7 @@ class CustomerPortal(payment_portal.PaymentPortal):
         multiple_addresses_enabled = check_user_id.has_group('account.group_delivery_invoice_address')
         if not multiple_addresses_enabled:
             raise request.not_found()
-        addresses_data = self._prepare_address_data(order_sudo.partner_id)
+        addresses_data = self._prepare_address_data(order_sudo.partner_id, order_sudo=order_sudo)
         invoicing_id = int(kw.get('invoicing_address', 0))
         invoicing_partner = request.env['res.partner'].browse(invoicing_id)
         # Check if the provided address is in the list of accessible address to the SO partner
@@ -610,6 +606,18 @@ class PaymentPortal(payment_portal.PaymentPortal):
             # and shouldn't be re-assigned through this route.
             raise werkzeug.exceptions.NotFound()
 
+        min_amount = token_sudo.provider_id.minimum_amount
+        if (
+            min_amount > 0
+            and order_sudo.currency_id.compare_amounts(order_sudo.amount_total, min_amount) == -1
+        ):
+            raise UserError(
+                _(
+                    "The payment method you selected can only pay amounts starting from %s. Please"
+                    " create or select another one.",
+                    token_sudo.provider_id.main_currency_id.format(min_amount),
+                )
+            )
         max_amount = token_sudo.provider_id.maximum_amount
         if max_amount > 0 and order_sudo.currency_id.compare_amounts(order_sudo.amount_total, max_amount) == 1:
             raise UserError(_(
@@ -653,9 +661,32 @@ class SalePortal(sale_portal.CustomerPortal):
         is_subscription = is_subscription \
                           or order_sudo.is_subscription \
                           or order_sudo.subscription_id.is_subscription
-        return {
-            **super()._get_payment_values(order_sudo, is_subscription=is_subscription,
-                                          subscription_anticipate=subscription_anticipate,
-                                          **kwargs),
+
+        payment_values = super()._get_payment_values(
+            order_sudo,
+            is_subscription=is_subscription,
+            subscription_anticipate=subscription_anticipate,
+            **kwargs,
+        )
+        payment_values.update({
             'is_subscription': is_subscription,
-        }
+            'show_amount_input': payment_values['show_amount_input'] and not is_subscription,
+        })
+        return payment_values
+
+    @http.route()
+    def portal_order_page(self, *args, **kw):
+        order_id = kw.get('order_id')
+        access_token = kw.get('access_token')
+
+        if order_id:
+            try:
+                order_sudo = self._document_check_access('sale.order', order_id, access_token=access_token)
+            except (AccessError, MissingError):
+                order_sudo = False
+
+            if order_sudo and order_sudo.is_subscription and order_sudo.state == 'sale':
+                return self.subscription(*args, **kw)
+
+        # Fallback to the default Sales portal behavior
+        return super().portal_order_page(*args, **kw)

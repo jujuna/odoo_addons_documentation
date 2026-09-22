@@ -1,17 +1,17 @@
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, useProps, t } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
 
 export class IoTRemoteDebug extends Component {
     static template = `iot.HeaderButton`;
-    static props = {
+    props = useProps({
         ...standardWidgetProps,
-        btn_name: { type: String },
-        btn_class: { type: String },
-    };
+        btn_name: t.string(),
+        btn_class: t.string(),
+    });
 
     setup() {
         super.setup();
@@ -19,11 +19,15 @@ export class IoTRemoteDebug extends Component {
         this.dialog = useService("dialog");
         this.notification = useService("notification");
 
-        this.state = useState({ enabled: false });
+        this.state = proxy({ enabled: false });
 
         // Get ngrok status on view load
-        this.iotHttp.websocket.onMessage(this.identifier, null, this.onMessageUpdateStatus.bind(this));
-        this.iotHttp.websocket.sendMessage(this.identifier, { 'status': true }, null, 'remote_debug');
+        this.iotHttp.websocket.onMessage(
+            this.identifier,
+            null,
+            this.onMessageUpdateStatus.bind(this)
+        );
+        this.iotHttp.websocket.sendMessage(this.identifier, { status: true }, null, "remote_debug");
     }
 
     get identifier() {
@@ -47,12 +51,11 @@ export class IoTRemoteDebug extends Component {
                     return this.onFailure();
                 }
                 this.notification.add(
-                    _t("Remote debug is %s.", this.state.enabled ? _t("enabled") : _t("disabled")), {
-                        type: "info",
-                    }
+                    _t("Remote debug is %s.", this.state.enabled ? _t("enabled") : _t("disabled")),
+                    { type: "info" }
                 );
             },
-            this.onFailure.bind(this),
+            this.onFailure.bind(this)
         );
         this.iotHttp.websocket.sendMessage(this.identifier, { token }, null, "remote_debug");
     }
@@ -70,25 +73,23 @@ export class IoTRemoteDebug extends Component {
 
 export const ioTRemoteDebug = {
     component: IoTRemoteDebug,
-    extractProps: ({ attrs }) => {
-        return {
-            btn_name: attrs.btn_name,
-            btn_class: attrs.btn_class,
-        };
-    },
+    extractProps: ({ attrs }) => ({
+        btn_name: attrs.btn_name,
+        btn_class: attrs.btn_class,
+    }),
 };
 
 export class TokenDialog extends Component {
     static template = "iot.RemoteDebugDialog";
     static components = { Dialog };
-    static props = {
-        validate: Function,
-        close: Function,
-        enabled: Boolean,
-    };
+    props = useProps({
+        validate: t.function([t.string()]),
+        close: t.function([]),
+        enabled: t.boolean(),
+    });
 
     setup() {
-        this.state = useState({ token: "" });
+        this.state = proxy({ token: "" });
     }
 
     validate() {

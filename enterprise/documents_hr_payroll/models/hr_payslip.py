@@ -35,19 +35,20 @@ class HrPayslip(models.Model):
                   '\n'.join(invalid_employees.mapped('name'))))
 
         payslip_without_documents = payslips_sudo.filtered(lambda p: not p.document_access_url)
-        for payslip in (payslips_sudo - payslip_without_documents):
-            template = payslip._get_email_template()
-            template.send_mail(payslip.id, email_layout_xmlid='mail.mail_notification_light')
-            payslip.message_post(body=_('The payslip has been re-sent to the employee.'))
+        if payslip_without_documents:
+            message = _("Some payslips could not be resend as they do not have related document")
+            return show_notification("warning", message)
 
-        if not notify and not payslip_without_documents:  # refresh the form view
-            return True
-
-        message = _("Some payslips could not be resend as they do not have related document") \
-            if payslip_without_documents else (
-            _("%s Payslip(s) correctly sent.", len(payslips_sudo)))
-        notification_type = "warning" if payslip_without_documents else "success"
-        return show_notification(notification_type, message)
+        return {
+            'name': _('Send Email'),
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'view_mode': 'form',
+            'res_model': 'hr.payslip.send.mail',
+            'context': {
+                'default_payslip_ids': self.ids,
+            },
+        }
 
     def _get_document_vals_access_rights(self):
         """ All payslips should be accessible in 'Anyone with the link' to make the link permanent.
@@ -58,24 +59,31 @@ class HrPayslip(models.Model):
             'is_access_via_link_hidden': True,
         }
 
-    def _get_document_access_ids(self):
-        return [(self._get_document_partner(), ('view', False))]
-
-    def _get_document_tags(self):
-        return self.company_id.documents_hr_payslips_tags
-
-    def _get_document_partner(self):
-        return self.employee_id.user_id.partner_id or self.employee_id.work_contact_id
-
-    def _get_document_owner(self):
-        return self.employee_id.user_id or super()._get_document_owner()
+    def _get_document_members(self):
+        return [(self.employee_id.user_id.partner_id or self.employee_id.work_contact_id, ('view', False))]
 
     def _get_document_folder(self):
-        return super()._get_document_folder() if self.employee_id.user_id else self.company_id._get_or_create_worker_payroll_folder()
+        return self.employee_id.hr_employee_payroll_folder_id
 
-    def _check_create_documents(self):
-        self.ensure_one()
-        return self._get_document_partner().id and (bool(self.employee_id.user_id) or self.company_id.documents_hr_settings)
+    def _generate_pdf(self):
+        """ Generate the missing folders before the PDF attachments, which are filed in them.
+
+        An employee may have no folder yet, e.g. when they were archived at the installation of the
+        module (their folders are only generated for the active ones), as for the declarations.
+        """
+        if missing := self.employee_id.filtered(lambda e: not e.hr_employee_payroll_folder_id):
+            missing._generate_employee_documents_folders()
+        return super()._generate_pdf()
+
+    def _pdf_post_create(self, employee_attachments):
+        """ Create a shortcut in the employee's My Drive for each payslip document. """
+        super()._pdf_post_create(employee_attachments)
+        self.env["documents.document"].sudo().create([
+            document.sudo()._get_base_shortcut_vals() | {"owner_id": employee.user_id.id, "folder_id": False}
+            for employee, attachments in employee_attachments.items()
+            if employee.user_id.active
+            for document in attachments.document_ids
+        ])
 
     def _get_email_template(self):
         return self.env.ref(

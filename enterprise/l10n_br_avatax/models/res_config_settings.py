@@ -41,8 +41,8 @@ class ResConfigSettings(models.TransientModel):
     )
     l10n_br_icms_rate = fields.Float(
         related='company_id.l10n_br_icms_rate',
-        string='Simplified Regime ICMS Rate',
-        help="This only applies if you are a simplified tax regime company.",
+        string='ICMS Simplified Credit Rate',
+        help="Brazil: Use only when ICMS credit applies. The rate may vary based on revenue, tax annex, and specific transaction rules.",
         readonly=False,
     )
     l10n_br_tax_regime = fields.Selection(related='company_id.partner_id.l10n_br_tax_regime')
@@ -73,7 +73,7 @@ class ResConfigSettings(models.TransientModel):
             # Don't redirect, the user is already on in the Accounting settings.
             raise ValidationError(_("Please set a valid Avatax portal email."))
 
-        if not partner.vat:
+        if not partner.has_vat:
             raise RedirectWarning(
                 _("Please set a valid Tax ID on your company."),
                 partner._get_records_action(),

@@ -9,6 +9,8 @@ from odoo.tools.misc import format_amount
 @tagged('post_install', '-at_install')
 class AccountJournalDashboard3WayWatchTest(TestAccountJournalDashboardCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def init_invoice(cls, move_type, partner=None, invoice_date=None, post=False, products=None, amounts=None, taxes=None, company=False, currency=None, journal=None, invoice_date_due=None, release_to_pay=None):
         move = super().init_invoice(move_type, partner, invoice_date, False, products, amounts, taxes, company, currency, journal)

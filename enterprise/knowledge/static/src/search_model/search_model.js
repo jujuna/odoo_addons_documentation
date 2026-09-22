@@ -1,3 +1,4 @@
+import { patch } from "@web/core/utils/patch";
 import { SearchModel } from "@web/search/search_model";
 
 export const KnowledgeSearchModelMixin = (T) => class extends T {
@@ -90,3 +91,9 @@ export const KnowledgeSearchModelMixin = (T) => class extends T {
 };
 
 export class KnowledgeSearchModel extends KnowledgeSearchModelMixin(SearchModel) {}
+
+patch(SearchModel.prototype, {
+    exportKnowledgeState() {
+        return this.exportState();
+    }
+});

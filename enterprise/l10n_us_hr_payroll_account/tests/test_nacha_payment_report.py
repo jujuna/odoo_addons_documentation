@@ -1,5 +1,4 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 from dateutil.relativedelta import relativedelta
 
 from odoo import fields
@@ -27,7 +26,8 @@ class TestNacha(CommonTestPayslips):
         })
         cls.default_journal_bank.bank_account_id = cls.env["res.partner.bank"].create({
             "partner_id": cls.env.company.partner_id.id,
-            "acc_number": "223344556",
+            "account_number": "223344556",
+            "clearing_label_id": cls.env.ref("base.clearing_label_us").id,
             "clearing_number": "123456780",
         })
 
@@ -57,7 +57,7 @@ class TestNacha(CommonTestPayslips):
         transaction_code = "27" if is_offset else "22"
         payslip_amount_in_cents = round(payment.amount * 100)
         partner_name = 'OFFSET' if is_offset else payment.partner_id.name
-        partner_iban = payment.partner_bank_id.acc_number
+        partner_iban = payment.partner_bank_id.account_number
         return f"6{transaction_code}123456780{partner_iban:17.17}{payslip_amount_in_cents:010d}               {partner_name:22.22}  0ORIGINAT{payment_nr:07d}"
 
     def get_payslips_total_amount_cents(self):
@@ -82,11 +82,7 @@ class TestNacha(CommonTestPayslips):
             'journal_id': self.default_journal_bank.id,
         })
         payment_report_wizard.generate_payment_report()
-        # The payment report is encoded to base64 and hence should be decoded.
-        generated = base64.b64decode(payment_report_wizard.payslip_run_id.payment_report).splitlines()
-        # Each line of the payment report is encoded to bytes using UTF-8 encoding and hence has to be decoded
-        generated = [generated_line.decode() for generated_line in generated]
-        return generated
+        return payment_report_wizard.payslip_run_id.payment_report.decode().splitlines()
 
     def assertFile(self, generated_file, expected, nr_of_payments, nr_of_batches=1):
         self.assertEqual(
@@ -119,7 +115,7 @@ class TestNacha(CommonTestPayslips):
             # header
             f"101 111111118  IMM_ORIG2011301945A094101DESTINATION            {self.env.company.name:23.23}{self.payslip_run_id.id:8d}",
             # batch header
-            f"5220{self.env.company.name:16.16}Payslip Run         COMPANY   CCDBATCH 0   201130201130   1ORIGINAT0000000",
+            f"5220{self.env.company.name:16.16}Payslip Run         COMPANY   CCDPAYROLL 0 201130201130   1ORIGINAT0000000",
         ]
         entry_detail_records = self.generate_batch_entry_detail_records()
         total_payslips_amount_in_cents = self.get_payslips_total_amount_cents()
@@ -142,7 +138,7 @@ class TestNacha(CommonTestPayslips):
             # header
             f"101 111111118  IMM_ORIG2011301945A094101DESTINATION            {self.env.company.name:23.23}{self.payslip_run_id.id:8d}",
             # batch header
-            f"5200{self.env.company.name:16.16}00000000000123456789COMPANY   CCDBATCH 0   201130201130   1ORIGINAT0000000",
+            f"5200{self.env.company.name:16.16}00000000000123456789COMPANY   CCDPAYROLL 0 201130201130   1ORIGINAT0000000",
         ]
         entry_detail_records = self.generate_batch_entry_detail_records()
         # Add the offset entry detail record to the entry detail records
@@ -174,17 +170,18 @@ class TestNacha(CommonTestPayslips):
             'name': 'test emp',
             'date_version': fields.Date.today(),
             'contract_date_start': fields.Date.today(),
+            'structure_type_id': self.env.ref('hr.structure_type_employee').id,
         })
         # Setting nacha_effective_date on the payslip means that a NACHA file has been generated for that payslip
         self.env['hr.payslip'].create({
-            'name': 'payslip',
             'employee_id': employee.id,
             'nacha_effective_date': fields.Date.today() + relativedelta(days=-1)
         })
         # Setting nacha_effective_date on the payslip batch means that a NACHA file has been generated for that batch
         self.env['hr.payslip.run'].create({
             'name': 'batch',
-            'nacha_effective_date': fields.Date.today() + relativedelta(days=-1)
+            'nacha_effective_date': fields.Date.today() + relativedelta(days=-1),
+            'structure_id': self.env.ref('hr_payroll.default_structure').id,
         })
         # Create an account.batch.payment and set its payment_method to NACHA and its state to sent
         x = self.env['account.batch.payment'].create({

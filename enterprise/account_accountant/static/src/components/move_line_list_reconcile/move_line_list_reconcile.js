@@ -1,39 +1,37 @@
 import { registry } from "@web/core/registry";
-import { useSubEnv } from "@odoo/owl";
-import { AccountMoveLineListController, AccountMoveLineListRenderer, AccountMoveLineListView } from "../move_line_list/move_line_list";
+import { useService } from "@web/core/utils/hooks";
+import {
+    AccountMoveLineListController,
+    AccountMoveLineListRenderer,
+    AccountMoveLineListView,
+} from "../move_line_list/move_line_list";
 
+function useAutoReconcileAction() {
+    const action = useService("action");
+    return (group = null) => {
+        const options = {};
+        if (group) {
+            options.additionalContext = {
+                domain: group.list.domain,
+            };
+        }
+        return action.doAction("account_accountant.action_open_auto_reconcile_wizard", options);
+    };
+}
 
 export class AccountMoveLineReconcileListController extends AccountMoveLineListController {
-
-    setup() {
-        super.setup();
-        useSubEnv({
-            callAutoReconcileAction: this.openAutoReconcileWizard.bind(this),
-        });
-    }
-
-    openAutoReconcileWizard(group=null) {
-        if (group) {
-            return this.actionService.doAction("account_accountant.action_open_auto_reconcile_wizard", {
-                additionalContext: {
-                    domain: group.list.domain,
-                }
-            });
-        } else {
-            return this.actionService.doAction("account_accountant.action_open_auto_reconcile_wizard");
-        }
-    }
+    openAutoReconcileWizard = useAutoReconcileAction();
 }
 
 export class AccountMoveLineReconcileListRenderer extends AccountMoveLineListRenderer {
-
     static groupRowTemplate = "account_accountant.AccountMoveLineReconcileGroupRow";
+
+    callAutoReconcileAction = useAutoReconcileAction();
 
     setup() {
         super.setup();
-        this.props.list.groups?.map(group => this.toggleGroup(group));  // unfold the first groups (account_id)
+        this.props.list.groups?.map((group) => this.toggleGroup(group)); // unfold the first groups (account_id)
     }
-
 }
 
 export const AccountMoveLineReconcileLineListView = {
@@ -41,6 +39,8 @@ export const AccountMoveLineReconcileLineListView = {
     Controller: AccountMoveLineReconcileListController,
     Renderer: AccountMoveLineReconcileListRenderer,
     buttonTemplate: "account_accountant.ListViewReconcile.Buttons",
-}
+};
 
-registry.category("views").add("account_move_line_reconcile_list", AccountMoveLineReconcileLineListView);
+registry
+    .category("views")
+    .add("account_move_line_reconcile_list", AccountMoveLineReconcileLineListView);

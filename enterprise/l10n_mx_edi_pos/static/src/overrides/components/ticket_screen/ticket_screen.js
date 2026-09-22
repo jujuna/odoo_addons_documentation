@@ -14,11 +14,21 @@ patch(TicketScreen.prototype, {
                 (line) => line.line.order_id.uuid === order.uuid
             );
 
-            const totalAmount = orderLineToRefund.reduce(
+            let refundLinesTotal = orderLineToRefund.reduce(
                 (sum, line) => sum + line.line.prices.total_included,
                 0
             );
-            if (order.currency.isPositive(totalAmount - order.priceIncl)) {
+            if (order.discountLines) {
+                refundLinesTotal += order.discountLines.reduce(
+                    (sum, line) => sum + line.prices.total_included,
+                    0
+                );
+            }
+            const originalLinesTotal = order.lines.reduce(
+                (sum, line) => sum + line.prices.total_included,
+                0
+            );
+            if (order.currency.isPositive(refundLinesTotal - originalLinesTotal)) {
                 this.dialog.add(AlertDialog, {
                     title: _t("Refund Amount Exceeds Original Order"),
                     body: _t(

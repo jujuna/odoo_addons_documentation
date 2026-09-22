@@ -15,6 +15,7 @@ class SignEmsignerCommon(TestSignControllerCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env.company.country_id = cls.env.ref('base.in').id
 
         emsigner_auth_role = cls.env['sign.item.role'].create({
             'name': 'Emsigner Role',

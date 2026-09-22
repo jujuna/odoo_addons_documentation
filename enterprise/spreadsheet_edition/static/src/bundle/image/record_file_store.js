@@ -1,5 +1,5 @@
 /**
- * @typedef {import("@web/core/orm_service").ORM} ORM
+ * @typedef {import("@web/core/orm_plugin").ORM} ORM
  */
 
 /**
@@ -29,30 +29,13 @@ export class RecordFileStore {
      * Upload a file on the server and returns the path to the file.
      */
     async upload(file) {
-        const route = "/web/binary/upload_attachment";
+        const route = `/spreadsheet/${this.resModel}/${this.resId}/upload_image`;
         const params = {
-            ufile: [file],
+            ufile: file,
             csrf_token: odoo.csrf_token,
-            model: this.resModel,
-            id: this.resId,
         };
-        const fileData = JSON.parse(await this.http.post(route, params, "text"))[0];
-        const [accessToken] = await this.orm.call("ir.attachment", "generate_access_token", [
-            fileData.id,
-        ]);
-        return `/web/image/${fileData.id}?access_token=${accessToken}`;
-    }
-
-    /**
-     * @param {string} path
-     * @returns {Promise<void>}
-     */
-    async delete(path) {
-        const attachmentId = path.split("/").pop();
-        if (Number.isNaN(attachmentId)) {
-            throw new Error("Invalid path: " + path);
-        }
-        await this.orm.unlink("ir.attachment", [parseInt(attachmentId)]);
+        const response = JSON.parse(await this.http.post(route, params, "text"));
+        return response.url;
     }
 
     async getFile(path) {

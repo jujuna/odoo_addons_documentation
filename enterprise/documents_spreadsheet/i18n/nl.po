@@ -10,23 +10,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2026-01-28 12:29+0000\n"
-"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 02:07+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
 "documents_spreadsheet/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
-
-#. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
-msgid " file preview"
-msgstr " bestandsweergave"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -35,10 +29,12 @@ msgid "\"%s\" saved as template"
 msgstr "\"%s\" opgeslagen als sjabloon"
 
 #. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/models/spreadsheet_template.py:0
-msgid "%s (copy)"
-msgstr "%s (kopie)"
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/external_share_function.js:0
+msgid "%(function_name)s is not available in spreadsheets shared externally."
+msgstr ""
+"%(function_name)s is niet beschikbaar in spreadsheets die extern worden "
+"gedeeld."
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -57,16 +53,21 @@ msgid "A frozen spreadsheet can not be editable"
 msgstr "Een bevroren spreadsheet kan niet worden bewerkt"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__group_ids
+msgid "Access Groups"
+msgstr ""
+
+#. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Actuals vs Target"
-msgstr "Actualiteit vs Doelstelling"
+msgstr "Werkelijk vs. Doelstelling"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Actuals vs Target status"
-msgstr "Werkelijke versus streefstatus"
+msgstr "Status Werkelijk vs. Doelstelling"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -88,9 +89,9 @@ msgid "Can view the spreadsheet. Cannot make changes."
 msgstr "Kan de spreadsheet bekijken. Kan geen wijzigingen aanbrengen."
 
 #. module: documents_spreadsheet
-#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
-msgid "Cancel"
-msgstr "Annuleren"
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__comma
+msgid "Comma"
+msgstr "Komma"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -102,6 +103,11 @@ msgstr "Bevestigen"
 #: model:ir.ui.menu,name:documents_spreadsheet.menu_technical_spreadsheet_contributor
 msgid "Contributors"
 msgstr "Bijdragers"
+
+#. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_documents_import_to_spreadsheet
+msgid "Convert XLSX and CSV files to Odoo Spreadsheet"
+msgstr "XLSX- en CSV-bestanden converteren naar Odoo Spreadsheet"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -116,6 +122,7 @@ msgid "Create a Spreadsheet or select a Template"
 msgstr "Maak een spreadsheet of kies een sjabloon"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__create_uid
@@ -123,6 +130,7 @@ msgid "Created by"
 msgstr "Aangemaakt door"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__create_date
@@ -137,8 +145,22 @@ msgid "Current Revision Uuid"
 msgstr "Huidige revisie Uuid"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__custom
+msgid "Custom"
+msgstr "Aangepast"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__csv_separator
+msgid "Custom separator"
+msgstr "Aangepast scheidingsteken"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__auto_detect
+msgid "Detect automatically"
+msgstr "Automatisch detecteren"
+
+#. module: documents_spreadsheet
 #. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
 #: code:addons/documents_spreadsheet/static/src/spreadsheet_template/template_dialog.xml:0
 msgid "Discard"
 msgstr "Negeren"
@@ -146,8 +168,10 @@ msgstr "Negeren"
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_access__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__display_name
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_sharing__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_http__display_name
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__display_name
@@ -164,6 +188,7 @@ msgstr "Miniatuur weergeven"
 
 #. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_document
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__document_id
 msgid "Document"
@@ -178,6 +203,13 @@ msgstr "Document / Partner"
 #: model:ir.model,name:documents_spreadsheet.model_documents_sharing
 msgid "Documents Sharing"
 msgstr "Documenten delen"
+
+#. module: documents_spreadsheet
+#: model:ir.module.module,description:base.module_documents_spreadsheet
+#: model:ir.module.module,shortdesc:base.module_documents_spreadsheet
+#: model:ir.module.module,summary:base.module_documents_spreadsheet
+msgid "Documents Spreadsheet"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
@@ -198,12 +230,23 @@ msgstr "Excel exporteren"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Expected Revenue by Stage"
-msgstr "Verwachte omzet per Fase"
+msgstr "Verwachte inkomsten per fase"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__file_name
 msgid "File Name"
 msgstr "Bestandsnaam"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.xml:0
+msgid "File is in trash"
+msgstr "Bestand zit in de prullenbak"
+
+#. module: documents_spreadsheet
+#: model:ir.actions.act_window,name:documents_spreadsheet.import_to_spreadsheet_action
+msgid "File preview"
+msgstr "Bestand Voorbeeld"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -264,8 +307,10 @@ msgstr "Handler"
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_access__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__id
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_sharing__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_http__id
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__id
@@ -274,6 +319,12 @@ msgid "ID"
 msgstr "ID"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__is_csv
+msgid "Is Csv"
+msgstr "Is CSV"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__write_uid
@@ -281,6 +332,7 @@ msgid "Last Updated by"
 msgstr "Laatst bijgewerkt door"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__write_date
@@ -296,12 +348,22 @@ msgstr "Datum laatste update"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Lost Opportunities by Stage"
-msgstr "Gemiste verkoopkansen per Fase"
+msgstr "Gemiste verkoopkansen per fase"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
 msgid "Make a copy"
 msgstr "Kopie maken"
+
+#. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_ir_ui_menu
+msgid "Menu"
+msgstr ""
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__archive_document
+msgid "Move source file to trash"
+msgstr "Bronbestand verplaatsen naar prullenbak"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -314,6 +376,12 @@ msgstr "Naar prullenbak verplaatsen"
 #: code:addons/documents_spreadsheet/static/src/spreadsheet_template/spreadsheet_template_dialog.js:0
 msgid "My Drive"
 msgstr "Mijn Drive"
+
+#. module: documents_spreadsheet
+#: model:ir.actions.act_window,name:documents_spreadsheet.spreadsheet_my_template_action
+#: model:ir.ui.menu,name:documents_spreadsheet.menu_technical_my_spreadsheet_template
+msgid "My Spreadsheet Templates"
+msgstr ""
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_search
@@ -331,8 +399,7 @@ msgid "New spreadsheet"
 msgstr "Nieuwe spreadsheet"
 
 #. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_import_to_spreadsheet_view_form
 msgid "Open with Odoo Spreadsheet"
 msgstr "Openen met Odoo Spreadsheet"
 
@@ -340,7 +407,7 @@ msgstr "Openen met Odoo Spreadsheet"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
 msgid "Opportunities by Stage"
-msgstr "Verkoopkansen per Fase"
+msgstr "Verkoopkansen per fase"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -394,10 +461,14 @@ msgid "Select one and only one spreadsheet"
 msgstr "Selecteer één en slechts één spreadsheet"
 
 #. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog.xml:0
-msgid "Send source file to trash"
-msgstr "Bronbestand naar prullenbak verzenden"
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__semicolon
+msgid "Semicolon"
+msgstr "Puntkomma"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_import_to_spreadsheet__csv_separator_type
+msgid "Separator"
+msgstr "Scheidingsteken"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__sequence
@@ -410,6 +481,17 @@ msgstr "Reeks"
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_share/spreadsheet_share.xml:0
 msgid "Share"
 msgstr "Delen"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__is_shared_externally
+msgid "Shared Externally"
+msgstr "Extern gedeeld"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_share/spreadsheet_share.xml:0
+msgid "Shared externally"
+msgstr "Extern gedeeld"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -438,6 +520,13 @@ msgstr "Spreadsheetgegevens"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
 msgstr "Bestandsnaam spreadsheet"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_image_ids
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_image_ids
+msgid "Spreadsheet Image"
+msgstr "Spreadsheet Afbeelding"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_document_view_kanban
@@ -510,12 +599,15 @@ msgid "Spreadsheets"
 msgstr "Spreadsheets"
 
 #. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/models/documents_access.py:0
-msgid "Spreadsheets can not be shared in edit mode to non-internal users."
-msgstr ""
-"Spreadsheets kunnen niet in bewerkingsmodus worden gedeeld met niet-interne "
-"gebruikers."
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_import_to_spreadsheet__csv_separator_type__tab
+msgid "Tab"
+msgstr "Tab"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.xml:0
+msgid "Take out of trash"
+msgstr "Uit prullenbak halen"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__template_id
@@ -552,21 +644,23 @@ msgid "The xlsx file is too big"
 msgstr "Het xlsx-bestand is te groot"
 
 #. module: documents_spreadsheet
-#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_error_live_data
-msgid "This spreadsheet contains live data, only internal users can view it."
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_import_to_spreadsheet_view_form
+msgid ""
+"This file type can't be opened directly in Odoo. Convert it to an Odoo "
+"Spreadsheet to view or edit it."
 msgstr ""
-"Deze spreadsheet bevat live gegevens, alleen interne gebruikers kunnen deze "
-"bekijken."
+"Dit bestandstype kan niet rechtstreeks in Odoo worden geopend. Converteer "
+"het naar een Odoo Spreadsheet om het te bekijken of te bewerken."
 
 #. module: documents_spreadsheet
 #. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog.xml:0
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.js:0
 msgid ""
-"This type of file cannot be previewed or edited directly in Odoo. Opening "
-"your file with Odoo Spreadsheet will allow you to do so."
+"This file will be deleted forever in %(deletion_delay)s days. You can still "
+"download it."
 msgstr ""
-"Dit type bestand kan niet direct in Odoo worden bekeken of bewerkt. Het "
-"openen van je bestand met Odoo Spreadsheet maakt dit wel mogelijk."
+"Dit bestand wordt over %(deletion_delay)s dagen definitief verwijderd. Je "
+"kan het nog steeds downloaden."
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__thumbnail
@@ -576,11 +670,18 @@ msgid "Thumbnail"
 msgstr "Miniatuur"
 
 #. module: documents_spreadsheet
-#: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_spreadsheet_access_via_link
-msgid "To share a spreadsheet in edit mode, add the user in the accesses"
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.js:0
+msgid "To access this file, contact the owner to take it out of the trash."
 msgstr ""
-"Om een spreadsheet in bewerkingsmodus te delen, voeg je de gebruiker toe in "
-"de toegangen"
+"Om toegang te krijgen tot dit bestand kan je contact opnemen met de eigenaar "
+"om het uit de prullenbak te halen."
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/trash_banner/trash_banner.js:0
+msgid "To access this file, take it out of the trash."
+msgstr "Haal het bestand uit de prullenbak om het te kunnen openen."
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -625,7 +726,45 @@ msgstr "Je kunt een vergrendelde spreadsheet niet nogmaals vergrendelen"
 
 #. module: documents_spreadsheet
 #. odoo-python
-#: code:addons/documents_spreadsheet/wizard/documents_sharing.py:0
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You cannot modify this spreadsheet because it is in the trash."
+msgstr "Je kunt deze spreadsheet niet wijzigen omdat het in de prullenbak zit."
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid ""
+"You cannot restore this version because the spreadsheet is in the trash."
+msgstr ""
+"Je kunt deze versie niet herstellen omdat de spreadsheet in de prullenbak "
+"zit."
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You don't have access to this document"
+msgstr "Je hebt geen toegang tot dit document"
+
+#. module: documents_spreadsheet
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_import_to_spreadsheet_view_form
+msgid "e.g. ; or |"
+msgstr "bv. ; of |"
+
+msgid "Spreadsheets can not be shared in edit mode to non-internal users."
+msgstr ""
+"Spreadsheets kunnen niet in bewerkingsmodus worden gedeeld met niet-interne "
+"gebruikers."
+
+msgid "This spreadsheet contains live data, only internal users can view it."
+msgstr ""
+"Deze spreadsheet bevat live gegevens, alleen interne gebruikers kunnen deze "
+"bekijken."
+
+msgid "To share a spreadsheet in edit mode, add the user in the accesses"
+msgstr ""
+"Om een spreadsheet in bewerkingsmodus te delen, voeg je de gebruiker toe in "
+"de toegangen"
+
 msgid ""
 "You can not share spreadsheet(s) in edit mode (%(document_names)s) to non-"
 "internal users."
@@ -633,17 +772,8 @@ msgstr ""
 "Je kunt spreadsheet(s) in bewerkingsmodus (%(document_names)s) niet delen "
 "met niet-interne gebruikers."
 
-#. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/wizard/documents_sharing.py:0
 msgid ""
 "You cannot share spreadsheet(s) via link in edit mode (%(document_names)s)."
 msgstr ""
 "Je kunt spreadsheet(s) niet delen via een link in de bewerkingsmodus (%"
 "(document_names)s)."
-
-#. module: documents_spreadsheet
-#. odoo-python
-#: code:addons/documents_spreadsheet/models/documents_document.py:0
-msgid "You don't have access to this document"
-msgstr "Je hebt geen toegang tot dit document"

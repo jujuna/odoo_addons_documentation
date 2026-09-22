@@ -1,12 +1,11 @@
-import { AccountAttachmentView } from "./account_attachment_view";
-
+import { computed, proxy, t, useProps } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import { SIZES } from "@web/core/ui/ui_utils";
 import { useService } from "@web/core/utils/hooks";
-import { listView } from "@web/views/list/list_view";
-import { ListRenderer } from "@web/views/list/list_renderer";
 import { ListController } from "@web/views/list/list_controller";
-import { SIZES } from "@web/core/ui/ui_service";
-import { useChildSubEnv, useState } from "@odoo/owl";
+import { ListRenderer, listRendererProps } from "@web/views/list/list_renderer";
+import { listView } from "@web/views/list/list_view";
+import { AccountAttachmentView } from "./account_attachment_view";
 
 export class AttachmentPreviewListController extends ListController {
     static template = "account_accountant.AttachmentPreviewListView";
@@ -20,16 +19,13 @@ export class AttachmentPreviewListController extends ListController {
         this.store = useService("mail.store");
         this.ui = useService("ui");
         this.mailPopoutService = useService("mail.popout");
-        this.attachmentPreviewState = useState({
+        this.attachmentPreviewState = proxy({
             displayAttachment: localStorage.getItem(this.previewerStorageKey) !== "false",
             selectedRecord: false,
             thread: null,
         });
-        this.popout = useState({ active: false });
-
-        useChildSubEnv({
-            setPopout: this.setPopout.bind(this),
-        });
+        this.thread = computed(() => this.attachmentPreviewState.thread);
+        this.popout = proxy({ active: false });
     }
 
     get previewEnabled() {
@@ -65,7 +61,7 @@ export class AttachmentPreviewListController extends ListController {
             this.attachmentPreviewState.thread = null;
             return;
         }
-        const thread = this.store.Thread.insert({
+        const thread = this.store["mail.thread"].insert({
             attachments: attachments.map((attachment) => ({
                 id: attachment.resId,
                 mimetype: attachment.data.mimetype,
@@ -81,7 +77,10 @@ export class AttachmentPreviewListController extends ListController {
 }
 
 export class AttachmentPreviewListRenderer extends ListRenderer {
-    static props = [...ListRenderer.props, "setSelectedRecord"];
+    props = useProps({
+        ...listRendererProps,
+        setSelectedRecord: t.any(),
+    });
     async onCellClicked(record, column, ev) {
         this.props.setSelectedRecord(record);
         await super.onCellClicked(record, column, ev);

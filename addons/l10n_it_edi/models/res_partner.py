@@ -4,6 +4,7 @@ from stdnum.it import codicefiscale, iva
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.tools.business_data import split_vat
 
 
 class ResPartner(models.Model):
@@ -74,7 +75,7 @@ class ResPartner(models.Model):
         # VAT number and country code
         normalized_vat = self.vat
         normalized_country = self.country_code
-        if has_vat := self.vat not in [False, '/', 'NA']:
+        if self.has_vat:
             normalized_vat = self.vat.replace(' ', '')
             if in_eu:
                 # If there is no country-code prefix, it's domestic to Italy
@@ -83,17 +84,15 @@ class ResPartner(models.Model):
                         normalized_country = 'IT'
                 # If the partner is from the EU, the country-code prefix of the VAT must be taken away
                 else:
-                    if not normalized_country:
-                        normalized_country = normalized_vat[:2].upper()
-                    normalized_vat = normalized_vat[2:]
+                    normalized_country, normalized_vat = split_vat(normalized_vat, default_country_code=normalized_country)
             # If customer is from San Marino
             elif is_sm:
-                normalized_vat = normalized_vat if normalized_vat[:2].isdecimal() else normalized_vat[2:]
+                normalized_vat = split_vat(normalized_vat)[1]
 
         # If it has a codice fiscale (and no country), it's an Italian partner
         if not normalized_country and self.l10n_it_codice_fiscale:
             normalized_country = 'IT'
-        elif not has_vat and self.country_id and self.country_id.code != 'IT':
+        elif not self.has_vat and self.country_id and self.country_id.code != 'IT':
             if in_eu:
                 normalized_vat = '0000000'
             else:
@@ -141,7 +140,7 @@ class ResPartner(models.Model):
 
     @api.onchange('vat', 'country_id')
     def _l10n_it_onchange_vat(self):
-        if self.vat and (
+        if self.has_vat and (
             self.country_code == "IT"
             if self.country_code
             else self.vat.startswith("IT")
@@ -192,14 +191,19 @@ class ResPartner(models.Model):
                     }
         return errors
 
+    @api.depends('l10n_it_codice_fiscale')
+    def _compute_is_company(self):
+        l10n_it_partners = self.filtered(lambda p: p.vat and p.country_code == 'IT')
+        for partner in l10n_it_partners:
+            cf = partner._l10n_it_edi_normalized_codice_fiscale() or ''
+            partner.is_company = len(cf) == 11
+
+        super(ResPartner, self - l10n_it_partners)._compute_is_company()
+
     def _deduce_country_code(self):
         if self.l10n_it_codice_fiscale:
             return 'IT'
         return super()._deduce_country_code()
-
-    def _peppol_eas_endpoint_depends(self):
-        # extends account_edi_ubl_cii
-        return super()._peppol_eas_endpoint_depends() + ['l10n_it_codice_fiscale']
 
     def _get_frontend_writable_fields(self):
         frontend_writable_fields = super()._get_frontend_writable_fields()
@@ -214,3 +218,17 @@ class ResPartner(models.Model):
             return 'it_edi_xml'
         else:
             return res
+
+    def _create_parent_from_name(self, parent_name, additional_values=None):
+        parent_company = super()._create_parent_from_name(parent_name=parent_name, additional_values=additional_values)
+        if parent_company:
+            it_values = self._convert_fields_to_values(('l10n_it_codice_fiscale', 'l10n_it_pa_index'))
+            parent_company.update(it_values)
+        return parent_company
+
+    def _l10n_it_edi_is_italian(self):
+        return (
+            self.country_code == 'IT'
+            or self.l10n_it_codice_fiscale
+            or (self.vat and self.vat.upper().startswith('IT') and iva.is_valid(self.vat))
+        )

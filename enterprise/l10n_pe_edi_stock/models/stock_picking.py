@@ -1,20 +1,21 @@
-# -*- coding: utf-8 -*-
-
 import base64
+import hashlib
 import logging
 import re
-import hashlib
-import requests
 import urllib.parse
-from lxml import etree
-from json.decoder import JSONDecodeError
-from markupsafe import Markup
-from pytz import timezone
 from datetime import datetime
+from json.decoder import JSONDecodeError
+from zoneinfo import ZoneInfo
 
-from odoo import api, models, fields
+import requests
+from lxml import etree
+from markupsafe import Markup
+
+from odoo import api, fields, models
 from odoo.exceptions import UserError
-from odoo.tools import _, LazyTranslate
+from odoo.tools import _, BinaryBytes, LazyTranslate
+
+from odoo.addons.l10n_pe.tools.partner_identifiers import PE_RUC_SUNAT_CODE
 
 _lt = LazyTranslate(__name__)
 _logger = logging.getLogger(__name__)
@@ -67,6 +68,12 @@ ERROR_MESSAGES = {
     "response_code": _lt("SUNAT returned an error code. Details:"),
     "response_unknown": _lt("Could not identify content in the response retrieved from SUNAT. Details:"),
 }
+
+# SUNAT validation codes returned when the submitted delivery guide is missing
+# data required by a newer regulation, meaning the installed module is out of
+# date and must be updated. 3617: the "Fecha de entrega de bienes al
+# transportista" is missing for public transport (R. S. N° 000108-2026/SUNAT).
+OUTDATED_MODULE_SUNAT_CODES = {"3617"}
 
 
 class StockPicking(models.Model):
@@ -143,6 +150,18 @@ class StockPicking(models.Model):
         copy=False,
         help="The type of the related document."
     )
+    l10n_pe_edi_delivery_partner_id = fields.Many2one(
+        string="Delivery Partner",
+        comodel_name='res.partner',
+        compute='_compute_l10n_pe_edi_delivery_partner_id',
+        help="Partner the delivery guide is issued to.",
+    )
+    l10n_pe_edi_delivery_address_id = fields.Many2one(
+        string="Delivery Address",
+        comodel_name='res.partner',
+        compute='_compute_l10n_pe_edi_delivery_address_id',
+        help="Partner whose address is used as the delivery destination.",
+    )
     l10n_pe_edi_content = fields.Binary(
         string="Delivery guide content",
         compute='_l10n_pe_edi_compute_edi_content',
@@ -150,7 +169,7 @@ class StockPicking(models.Model):
 
     def _l10n_pe_edi_compute_edi_content(self):
         for picking in self:
-            picking.l10n_pe_edi_content = base64.b64encode(picking._l10n_pe_edi_create_delivery_guide())
+            picking.l10n_pe_edi_content = BinaryBytes(picking._l10n_pe_edi_create_delivery_guide())
 
     def l10n_pe_edi_action_clear_error(self):
         for record in self:
@@ -168,11 +187,13 @@ class StockPicking(models.Model):
         for record in self:
             record.l10n_pe_edi_operator_id = record.l10n_pe_edi_vehicle_id.operator_id or record.l10n_pe_edi_operator_id
 
-    @api.depends('l10n_pe_edi_transport_type')
+    @api.depends('l10n_pe_edi_transport_type', 'picking_type_code')
     def _compute_l10n_pe_edi_reason_for_transfer(self):
-        """ We use a compute to avoid setting 01 where the delivery guide is not applied """
+        """ We use a compute to avoid setting a default where the delivery guide is not applied """
         for record in self:
-            record.l10n_pe_edi_reason_for_transfer = record.l10n_pe_edi_reason_for_transfer or '01'
+            if record.l10n_pe_edi_reason_for_transfer:
+                continue
+            record.l10n_pe_edi_reason_for_transfer = '04' if record.picking_type_code == 'internal' else '01'
 
     # Validation
 
@@ -186,6 +207,24 @@ class StockPicking(models.Model):
             error_msg = self.env._("Invalid picking configuration:") + "\n\n" + "\n".join(errors)
             raise UserError(error_msg)
 
+    @api.depends('picking_type_code', 'partner_id', 'company_id')
+    def _compute_l10n_pe_edi_delivery_partner_id(self):
+        """ Internal pickings don't have a default contact, so fall back to the company partner. """
+        for record in self:
+            if record.picking_type_code == 'internal':
+                record.l10n_pe_edi_delivery_partner_id = record.partner_id or record.company_id.partner_id
+            else:
+                record.l10n_pe_edi_delivery_partner_id = record.partner_id
+
+    @api.depends('picking_type_code', 'partner_id', 'location_dest_id.warehouse_id.partner_id', 'company_id')
+    def _compute_l10n_pe_edi_delivery_address_id(self):
+        """ For internal pickings the goods are delivered to the destination warehouse. """
+        for record in self:
+            if record.picking_type_code == 'internal':
+                record.l10n_pe_edi_delivery_address_id = record.location_dest_id.warehouse_id.partner_id or record.company_id.partner_id
+            else:
+                record.l10n_pe_edi_delivery_address_id = record.partner_id
+
     def _l10n_pe_edi_generate_missing_data_error_list(self):
         """ Check that all the required data is present before generating the delivery guide.
             Based on SUNAT resolution 000123-2022 (published 2022-07-12), pages 48-54,
@@ -193,10 +232,10 @@ class StockPicking(models.Model):
             https://cpe.sunat.gob.pe/sites/default/files/inline-files/ValidacionesGREv20221020_publicacion.xlsx
         """
         errors = []
-        if not self.partner_id:
+        if not self.l10n_pe_edi_delivery_partner_id:
             errors.append(_('Please set a Delivery Address as the delivery guide needs one.'))
-        if not self.partner_id.l10n_pe_district:
-            errors.append(_('The client must have a defined district.'))
+        if not self.l10n_pe_edi_delivery_address_id.l10n_pe_district:
+            errors.append(_('The destination address must have a defined district.'))
         if not self.l10n_pe_edi_transport_type:
             errors.append(_('You must select a transport type to generate the delivery guide.'))
         if not self.l10n_pe_edi_reason_for_transfer:
@@ -205,17 +244,17 @@ class StockPicking(models.Model):
             errors.append(_('You must choose the start date of the transfer.'))
         if self.l10n_pe_edi_transport_type == '02' and not self.l10n_pe_edi_vehicle_id:
             errors.append(_('You must choose the transfer vehicle.'))
-        if not self.company_id.partner_id.l10n_latam_identification_type_id:
+        if not self.company_id.partner_id.l10n_pe_sunat_id_code:
             errors.append(_('A document type is required for the company.'))
-        if not self.company_id.partner_id.vat:
+        if not self.company_id.has_vat:
             errors.append(_('An identification number is required for the company.'))
         warehouse_address = self.picking_type_id.warehouse_id.partner_id or self.company_id.partner_id
         if not warehouse_address.l10n_pe_district:
             errors.append(_('The origin address must have a defined district.'))
         if not warehouse_address.street:
             errors.append(_('The origin address must have a defined street.'))
-        if self.company_id.partner_id.l10n_latam_identification_type_id.l10n_pe_vat_code != "6":
-            errors.append(_("The company's ID type must be set to RUC on the company contact page."))
+        if self.company_id.partner_id.l10n_pe_sunat_id_code != PE_RUC_SUNAT_CODE:
+            errors.append(_("The company's identification must be a RUC set on the company contact page."))
         if (self.l10n_pe_edi_transport_type == '02' and not self.l10n_pe_edi_operator_id and not self.l10n_pe_edi_vehicle_id.is_m1l
             or self.l10n_pe_edi_transport_type == '01' and not self.l10n_pe_edi_operator_id):
             errors.append(_("You must choose the transfer operator."))
@@ -243,12 +282,14 @@ class StockPicking(models.Model):
         def format_float(val, digits=2):
             return '%.*f' % (digits, val)
 
-        date_pe = datetime.now(tz=timezone('America/Lima')).date()
+        date_pe = datetime.now(tz=ZoneInfo('America/Lima')).date()
         return {
             'date_issue': date_pe.strftime(DEFAULT_PE_DATE_FORMAT),
             'time_issue': date_pe.strftime("%H:%M:%S"),
             'l10n_pe_edi_observation': self.l10n_pe_edi_observation or 'Guía',
             'record': self,
+            'partner': self.l10n_pe_edi_delivery_partner_id,
+            'delivery_address': self.l10n_pe_edi_delivery_address_id,
             'weight_uom': self.env['product.template']._get_weight_uom_id_from_ir_config_parameter(),
             'warehouse_address': self.picking_type_id.warehouse_id.partner_id or self.company_id.partner_id,
             'document_number': self.l10n_latam_document_number,
@@ -284,6 +325,16 @@ class StockPicking(models.Model):
             record.l10n_pe_edi_status = 'to_send'
             edi_str = record._l10n_pe_edi_create_delivery_guide()
             res = record._l10n_pe_edi_sign(edi_str)
+
+            if res.get('error_reason') == 'outdated_module':
+                record.l10n_pe_edi_error = _(
+                    "SUNAT rejected the delivery guide because it is missing data now required by "
+                    "SUNAT (error %(code)s). Please update the \"Peruvian - Electronic Delivery "
+                    "Note\" (l10n_pe_edi_stock) module to its latest version, then send the "
+                    "delivery guide again.",
+                    code=res.get('error_code', ''),
+                )
+                continue
 
             if 'error' in res:
                 record.l10n_pe_edi_error = res['error']
@@ -460,7 +511,7 @@ class StockPicking(models.Model):
 
         # SUNAT expects the XML to be encoded using ISO-8859-1.
         edi_str = etree.tostring(etree.fromstring(edi_str), xml_declaration=True, encoding='ISO-8859-1')
-        zip_file = self.env.ref('l10n_pe_edi.edi_pe_ubl_2_1')._l10n_pe_edi_zip_edi_document([('%s.xml' % edi_filename, edi_str)])
+        zip_file = self.env['account.move']._l10n_pe_edi_zip_edi_document([('%s.xml' % edi_filename, edi_str)])
         data = {
             "archivo": {
                 "nomArchivo": "%s.zip" % edi_filename,
@@ -484,7 +535,10 @@ class StockPicking(models.Model):
         if isinstance(response_json.get("errors"), list) and len(response_json["errors"]) > 0 and isinstance(response_json["errors"][0], dict):
             code = response_json["errors"][0].get("cod", "")
             msg = response_json["errors"][0].get("msg", "")
-            return {"error": str(Markup("%s<br/>%s: %s") % (str(ERROR_MESSAGES["response_code"]), code, msg))}
+            error = {"error": str(Markup("%s<br/>%s: %s") % (str(ERROR_MESSAGES["response_code"]), code, msg))}
+            if code in OUTDATED_MODULE_SUNAT_CODES:
+                error.update({"error_reason": "outdated_module", "error_code": code})
+            return error
         if not response_json.get("numTicket"):
             return {"error": str(Markup("%s<br/>%s") % (str(ERROR_MESSAGES["response_unknown"]), response_json))}
 
@@ -522,6 +576,9 @@ class StockPicking(models.Model):
             if code == "1033":
                 error_msg = str(ERROR_MESSAGES["duplicate"])
                 return {"error": error_msg, "error_reason": "duplicate"}
+            elif code in OUTDATED_MODULE_SUNAT_CODES:
+                return {"error": str(Markup("%s %s: %s") % (ERROR_MESSAGES["response_code"], code, msg)),
+                        "error_reason": "outdated_module", "error_code": code}
             else:
                 return {"error": str(Markup("%s %s: %s") % (str(ERROR_MESSAGES["response_code"]), code, msg)), "error_reason": "rejected"}
         if not response_json.get("arcCdr") or response_json.get("codRespuesta") != "0":
@@ -533,11 +590,17 @@ class StockPicking(models.Model):
         cdr_zip = response_json["arcCdr"]
 
         try:
-            cdr = self.env["account.edi.format"]._l10n_pe_edi_unzip_edi_document(base64.b64decode(cdr_zip))
+            cdr = self.env["account.move"]._l10n_pe_edi_unzip_edi_document(base64.b64decode(cdr_zip))
         except Exception as e:
             return {"error": str(Markup("%s<br/>%s") % (str(ERROR_MESSAGES["unzip"]), e))}
 
         return {"cdr": cdr}
+
+    def _get_deliveryslip_report_title(self):
+        self.ensure_one()
+        if self.l10n_pe_edi_status == 'sent':
+            return _("Sender Electronic Delivery Guide")
+        return super()._get_deliveryslip_report_title()
 
     def _l10n_pe_edi_get_qr(self):
         """ Retrieve the CDR's QR code. """
@@ -552,8 +615,7 @@ class StockPicking(models.Model):
             ('res_model', '=', self._name)])
         if not attachment:
             return ''
-        edi_attachment_str = attachment.raw
-        edi_tree = etree.fromstring(edi_attachment_str)
+        edi_tree = etree.fromstring(attachment.raw.content)
         element = edi_tree.xpath('//cbc:DocumentDescription',
                                  namespaces={'cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2'})
         if not element:

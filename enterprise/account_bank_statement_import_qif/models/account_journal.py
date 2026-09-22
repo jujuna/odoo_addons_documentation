@@ -5,6 +5,7 @@ import io
 import logging
 
 import dateutil.parser
+from copy import deepcopy
 
 from odoo import fields, models, _
 from odoo.exceptions import UserError
@@ -45,7 +46,7 @@ class AccountJournal(models.Model):
         return rslt
 
     def _check_qif(self, raw_file):
-        return (raw_file or b'').strip().startswith(b'!Type:')
+        return raw_file.content[:1024].strip().startswith(b'!Type:')
 
     def _parse_bank_statement_file(self, raw_file):
         if not self._check_qif(raw_file):
@@ -53,11 +54,11 @@ class AccountJournal(models.Model):
 
         data_list = [
             line.rstrip(b'\r\n')
-            for line in io.BytesIO(raw_file.strip())
+            for line in io.BytesIO(raw_file)
         ]
         try:
             header = data_list[0].strip().split(b':')[1]
-        except:
+        except Exception:  # noqa: BLE001
             raise UserError(_('Could not decipher the QIF file.'))
 
         transactions = []
@@ -99,6 +100,7 @@ class AccountJournal(models.Model):
                         vals_line['payment_ref'] = u': '.join(vals_line['payment_ref'])
                     else:
                         del vals_line['payment_ref']
+                    vals_line['transaction_details'] = deepcopy(vals_line)
                     transactions.append(vals_line)
                     vals_line = {'payment_ref': []}
                 elif line[:1] == b'\n':

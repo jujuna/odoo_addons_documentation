@@ -12,7 +12,7 @@
                     <group>
                          <group>
                              <field name="partner_is_company" invisible="1"/>
-                             <field name="l10n_pl_birthdate" invisible="partner_is_company" required="not partner_is_company"/>
+                             <field name="l10n_pl_birthdate"/>
                              <field name="l10n_pl_repayment_amount"/>
                              <field name="l10n_pl_repayment_timeframe" invisible="l10n_pl_repayment_amount == 0" required="l10n_pl_repayment_amount != 0"/>
                              <field name="l10n_pl_repayment_future_tax"/>
@@ -27,7 +27,7 @@
                     </group>
                     <footer>
                         <button string='Export XML' name="print_xml" type="object" class="btn-primary" data-hotkey="q"/>
-                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                        <button class="btn-secondary" special="cancel" data-hotkey="z"/>
                     </footer>
                </form>
             </field>

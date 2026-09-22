@@ -5,6 +5,8 @@ from odoo.exceptions import UserError
 from odoo.release import version
 from odoo.tools import SQL
 
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
+
 RUN_TYPE = 'P'  # T for test or P for production
 
 VALID_STATES = {'ACT', 'NSW', 'NT', 'QLD', 'SA', 'TAS', 'VIC', 'WA', 'OTH'}
@@ -21,10 +23,10 @@ class L10n_AuReportHandler(models.AbstractModel):
     _description = 'Australian Report Custom Handler'
 
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
-        # dict of the form {partner_id: {column_group_key: {expression_label: value}}}
+        # dict of the form {partner_id: {column_group_index: {expression_label: value}}}
         partner_info_dict = {}
 
-        # dict of the form {column_group_key: total_value}
+        # dict of the form {column_group_index: total_value}
         total_values_dict = {}
 
         # Build and execute query
@@ -33,14 +35,14 @@ class L10n_AuReportHandler(models.AbstractModel):
         # Fill dictionaries
         for result in results:
             partner_id = result['id']
-            column_group_key = result['column_group_key']
+            column_group_index = result['column_group_index']
             current_partner_info = partner_info_dict.setdefault(partner_id, {})
 
-            current_partner_info[column_group_key] = result
+            current_partner_info[column_group_index] = result
             current_partner_info['name'] = result['name']
 
             column_group_total = total_values_dict.setdefault(
-                column_group_key, {'total_gst': 0, 'gross_paid': 0, 'tax_withheld': 0}
+                column_group_index, {'total_gst': 0, 'gross_paid': 0, 'tax_withheld': 0}
             )
             column_group_total['total_gst'] += result['total_gst']
             column_group_total['gross_paid'] += result['gross_paid']
@@ -54,21 +56,20 @@ class L10n_AuReportHandler(models.AbstractModel):
             columns = []
             for column in options['columns']:
                 expression_label = column['expression_label']
-                value = partner_info.get(column['column_group_key'], {}).get(expression_label, False)
-                columns.append(report._build_column_dict(
+                value = partner_info.get(column['column_group_index'], {}).get(expression_label, False)
+                columns.append(report._build_column_data(
                     value,
                     column,
                     options=options,
                     currency=company_currency,
                 ))
-            line = {
-                'id': report._get_generic_line_id('res.partner', partner_id),
-                'caret_options': 'res.partner',
-                'model': 'res.partner',
-                'name': partner_info['name'],
-                'level': 1,
-                'columns': columns,
-            }
+            line = AccountReportLineData(
+                id=report._get_generic_line_id('res.partner', partner_id),
+                caret_options='res.partner',
+                name=partner_info['name'],
+                level=1,
+                columns=columns,
+            )
             lines.append((0, line))
 
         # Add total line
@@ -76,19 +77,19 @@ class L10n_AuReportHandler(models.AbstractModel):
             total_columns = []
             for column in options['columns']:
                 expression_label = column['expression_label']
-                value = total_values_dict.get(column['column_group_key'], {}).get(expression_label, False)
-                total_columns.append(report._build_column_dict(
+                value = total_values_dict.get(column['column_group_index'], {}).get(expression_label, False)
+                total_columns.append(report._build_column_data(
                     value if value else None,
                     column,
                     options=options,
                 ))
-            total_line = {
-                'id': report._get_generic_line_id(None, None, markup='total'),
-                'name': _('Total'),
-                'class': 'total',
-                'level': 1,
-                'columns': total_columns,
-            }
+            total_line = AccountReportLineData(
+                id=report._get_generic_line_id(None, None, markup='total'),
+                name=self.env._('Total'),
+                css_class='total',
+                level=1,
+                columns=total_columns,
+            )
             lines.append((0, total_line))
 
         return lines
@@ -107,7 +108,7 @@ class L10n_AuReportHandler(models.AbstractModel):
             'name': _('TPAR'), 'sequence': 30, 'action': 'export_file', 'action_param': 'get_txt', 'file_export_type': _('TPAR')
         }]
 
-    def _build_query(self, options, column_group_key=None) -> SQL:
+    def _build_query(self, options, column_group_index=None) -> SQL:
         query = self.env.ref('l10n_au_reports.tpar_report')._get_report_query(options, 'strict_range')
 
         self.env['account.move'].flush_model()
@@ -117,7 +118,7 @@ class L10n_AuReportHandler(models.AbstractModel):
         query = SQL(
             """
             SELECT
-                %(column_group_key)s AS column_group_key,
+                %(column_group_index)s AS column_group_index,
                 payee.id as id,
                 payee.vat as abn,
                 payee.name as name,
@@ -130,7 +131,7 @@ class L10n_AuReportHandler(models.AbstractModel):
                 payee.zip as zip,
                 payee_country.name->>'en_US' as country_name,
                 payee.phone as phone,
-                payee_bank.sanitized_acc_number as account_number,
+                payee_bank.sanitized_account_number as account_number,
                 payee.email as email,
                 -- # 6.61
                 -- the total of all payments made to the payee for the financial year (which may be different to invoiced amounts). It includes:
@@ -164,11 +165,11 @@ class L10n_AuReportHandler(models.AbstractModel):
             LEFT JOIN account_account_tag_account_move_line_rel aml_tag ON account_move_line.id = aml_tag.account_move_line_id
             LEFT JOIN account_account account ON account_move_line.account_id = account.id
             WHERE %(search_condition)s
-            GROUP BY payee.id, payee.vat, payee.name, payee.name, payee.street, payee.street2, payee.city, payee_state.name, payee_state.code, payee.zip, payee_country.name, payee.phone, payee_bank.sanitized_acc_number, payee.email
+            GROUP BY payee.id, payee.vat, payee.name, payee.name, payee.street, payee.street2, payee.city, payee_state.name, payee_state.code, payee.zip, payee_country.name, payee.phone, payee_bank.sanitized_account_number, payee.email
             HAVING BOOL_OR(aml_tag.account_account_tag_id IN (%(tag_withheld_id)s, %(tag_tpar_id)s))
             ORDER BY payee.name
             """,
-            column_group_key=column_group_key,
+            column_group_index=column_group_index,
             tag_withheld_id=self.env.ref('l10n_au.tax_withheld_tag').id,
             tag_tpar_id=self.env.ref('l10n_au.service_tag').id,
             table_references=query.from_clause,
@@ -180,8 +181,8 @@ class L10n_AuReportHandler(models.AbstractModel):
     def _execute_query(self, options, raise_warning=False):
         query_list = []
 
-        for column_group_key, column_group_options in self.env['account.report']._split_options_per_column_group(options).items():
-            query = self._build_query(column_group_options, column_group_key)
+        for column_group_index, column_group_options in self.env['account.report']._split_options_per_column_group(options).items():
+            query = self._build_query(column_group_options, column_group_index)
             query_list.append(SQL("(%s)", query))
 
         full_query = SQL(" UNION ALL ").join(query_list)

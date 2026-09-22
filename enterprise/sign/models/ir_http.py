@@ -9,7 +9,7 @@ class IrHttp(models.AbstractModel):
 
     @api.model
     def get_frontend_session_info_sign(self):
-        frontend_session_info = super().get_frontend_session_info()
+        frontend_session_info = self.get_frontend_session_info()
         frontend_session_info.update({
             'user_context': request.env.context
         })

@@ -56,7 +56,7 @@ class AccountFecImportWizard(models.TransientModel):
 
     def _generator_fec_account_account(self, rows, cache):
         """ Import the accounts from the FEC file """
-        data = self.env['account.chart.template']._get_chart_template_data('fr')
+        data = self.env['account.chart.template']._get_chart_template_data(self.company_id.chart_template)
         template_data = data.pop('template_data')
         accounts = cache['account.account'].copy()
         new_ids = {}
@@ -138,9 +138,10 @@ class AccountFecImportWizard(models.TransientModel):
                         'noupdate': True,
                     }
             else:
+                journal_code_size = self.env['account.journal']._fields['code'].size
                 data = {
                     "company_id": self.company_id.id,
-                    "code": self._shorten_code(journal_code, 5, cache),
+                    "code": self._shorten_code(journal_code, journal_code_size, cache),
                     "name": "FEC-%s" % (journal_name or journal_code),
                     "type": "general"
                 }
@@ -150,7 +151,7 @@ class AccountFecImportWizard(models.TransientModel):
 
     def _generator_fec_res_partner(self, rows, cache):
         """ Import the partners from FEC data files """
-        template_data = self.env['account.chart.template']._get_chart_template_data('fr').get('template_data')
+        template_data = self.env['account.chart.template']._get_chart_template_data(self.company_id.chart_template).get('template_data')
         partners_set = set()
         for record in rows:
             partner_ref = record.get("CompAuxNum", "")
@@ -349,7 +350,7 @@ class AccountFecImportWizard(models.TransientModel):
             Sens must be in ['C', 'D'] which mean Credit/Debit).
         """
 
-        template_data = self.env['account.chart.template']._get_chart_template_data('fr').get('template_data')
+        template_data = self.env['account.chart.template']._get_chart_template_data(self.company_id.chart_template).get('template_data')
         moves_dict = {}
 
         # Keeps track of moves grouped by journal_id and move_date, it helps with imbalances
@@ -466,8 +467,34 @@ class AccountFecImportWizard(models.TransientModel):
         """ Find all the templates for the considered entities.
             These templates will be used to fill out missing information coming from the records.
             For accounts, account_type and reconcile flags are used.  """
-        account_data = self.env['account.chart.template']._get_account_account('fr')
-        all_templates = {"account.account": {x['code']: x for x in account_data.values()}}
+        account_data = self.env['account.chart.template']._get_account_account('fr_comp')
+        allowed_x2many_fields = {'tag_ids'}
+
+        def is_supported_template_key(key):
+            field_name = key.split('@', 1)[0]
+            field = self.env['account.account']._fields.get(field_name)
+            # Keep translation keys (e.g. name@fr) and scalar fields.
+            # Skip x2many fields, except account tags, which are needed for reporting and are
+            # part of the expected chart template payload.
+            return bool(
+                field
+                and (
+                    '@' in key
+                    or field.type not in ('one2many', 'many2many')
+                    or field_name in allowed_x2many_fields
+                )
+            )
+
+        all_templates = {
+            "account.account": {
+                values['code']: {
+                    key: value
+                    for key, value in values.items()
+                    if is_supported_template_key(key)
+                }
+                for values in account_data.values()
+            }
+        }
         return all_templates
 
     def _apply_template(self, templates, model, record):
@@ -642,9 +669,9 @@ class AccountFecImportWizard(models.TransientModel):
         # to the date of the oldest move (defaulting to today if there is no move at all).
         if "account.move" in models:
             domain = [("company_id", "=", self.company_id.id)]
-            start_date = self.env["account.move"].search(domain, limit=1, order="date asc").date or fields.Date.today()
+            start_date = self.env["account.move"].search(domain, limit=1, order="date asc").date or fields.Date.context_today(self)
             start_date_str = start_date.strftime("%Y-%m-%d")
-            self.env["ir.config_parameter"].sudo().set_param("sequence.mixin.constraint_start_date", start_date_str)
+            self.env["ir.config_parameter"].sudo().set_str("sequence.mixin.constraint_start_date", start_date_str)
 
         # Build a cache with all the cache needed by the generators, so that the query is done just one time
         cache = self._build_import_cache()

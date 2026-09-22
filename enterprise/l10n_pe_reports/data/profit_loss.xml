@@ -4,7 +4,7 @@
         <field name="name">Profit and Loss</field>
         <field name="name@es_419">Estado de resultados</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
-        <field name="filter_analytic" eval="False"/>
+        <field name="groupby">account_id</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
         <field name="country_id" ref="base.pe"/>
@@ -25,7 +25,7 @@
                     <record id="account_financial_report_pnl_A_4_balance" model="account.report.expression">
                         <field name="label">balance</field>
                         <field name="engine">aggregation</field>
-                        <field name="formula">PE_PNL_A.balance - PE_PNL_A_3.balance</field>
+                        <field name="formula">PE_PNL_A.balance - PE_PNL_A_3.balance + PE_PNL_A_5.balance</field>
                     </record>
                 </field>
                 <field name="children_ids">
@@ -45,8 +45,6 @@
                                 <field name="name">Income from ordinary activities</field>
                                 <field name="name@es_419">Ingresos ordinarios</field>
                                 <field name="code">PE_PNL_A_1</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_pnl_A_1_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -59,8 +57,6 @@
                                 <field name="name">Sublease income and other</field>
                                 <field name="name@es_419">Ingresos por subarrendamiento y otros</field>
                                 <field name="code">PE_PNL_A_2</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="account_financial_report_pnl_A_2_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -75,8 +71,6 @@
                         <field name="name">Sales costs</field>
                         <field name="name@es_419">Costo de las ventas</field>
                         <field name="code">PE_PNL_A_3</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_pnl_A_3_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -91,16 +85,11 @@
                         <field name="name@es_419">Otro ingreso operativo</field>
                         <field name="code">PE_PNL_A_5</field>
                         <field name="hide_if_zero" eval="1"/>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_pnl_A_5_balance" model="account.report.expression">
                                 <field name="label">balance</field>
                                 <field name="engine">domain</field>
                                 <field name="formula" eval="[
-                                         '|', ('account_id.code', '=like', '61%'),
-                                         '|', ('account_id.code', '=like', '66%'),
-                                         '|', ('account_id.code', '=like', '68%'),
                                          '|', ('account_id.code', '=like', '71%'),
                                          '|', ('account_id.code', '=like', '73%'),
                                          '|', ('account_id.code', '=like', '74%'),
@@ -109,9 +98,10 @@
                                          '|', ('account_id.code', '=like', '76%'),
                                          '|', ('account_id.code', '=like', '78%'),
                                          '|', ('account_id.code', '=like', '79%'),
-                                              ('account_id.code', '=like', '99900%'),
+                                              '&amp;', ('account_id.code', '=like', '99900%'),
+                                                       ('account_id.account_type', '=', 'income_other'),
                                  ]"/>
-                                <field name="subformula">sum_if_pos</field>
+                                <field name="subformula">-sum</field>
                             </record>
                         </field>
                     </record>
@@ -135,8 +125,6 @@
                         <field name="name">Sales and distribution expenses</field>
                         <field name="name@es_419">Gastos de distribución</field>
                         <field name="code">PE_PNL_B_3</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_pnl_B_3_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -150,8 +138,6 @@
                         <field name="name">Administrative expenses</field>
                         <field name="name@es_419">Gastos de administración</field>
                         <field name="code">PE_PNL_B_4</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_pnl_B_4_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -165,9 +151,7 @@
                         <field name="name">Other operating expenses</field>
                         <field name="name@es_419">Otros gastos operacionales</field>
                         <field name="code">PE_PNL_B_5</field>
-                        <field name="groupby">account_id</field>
                         <field name="hide_if_zero" eval="1"/>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_pnl_B_5_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -176,17 +160,10 @@
                                          '|', ('account_id.code', '=like', '61%'),
                                          '|', ('account_id.code', '=like', '66%'),
                                          '|', ('account_id.code', '=like', '68%'),
-                                         '|', ('account_id.code', '=like', '71%'),
-                                         '|', ('account_id.code', '=like', '73%'),
-                                         '|', ('account_id.code', '=like', '74%'),
-                                         '|', '&amp;', ('account_id.code', '=like', '75%'),
-                                                  '!', ('account_id.code', '=like', '754%'),
-                                         '|', ('account_id.code', '=like', '76%'),
-                                         '|', ('account_id.code', '=like', '78%'),
-                                         '|', ('account_id.code', '=like', '79%'),
-                                              ('account_id.code', '=like', '99900%'),
+                                              '&amp;', ('account_id.code', '=like', '99900%'),
+                                                       ('account_id.account_type', '=', 'expense'),
                                  ]"/>
-                                <field name="subformula">-sum_if_neg</field>
+                                <field name="subformula">sum</field>
                                 <field name="green_on_positive" eval="False"/>
                             </record>
                         </field>
@@ -223,8 +200,6 @@
                         <field name="name">Exchange difference, net</field>
                         <field name="name@es_419">Diferencia de cambio, neta</field>
                         <field name="code">PE_PNL_C</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="account_financial_report_pnl_C_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -239,8 +214,6 @@
                 <field name="name">Financial income</field>
                 <field name="name@es_419">Ingresos financieros</field>
                 <field name="code">PE_PNL_B_1</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_pnl_B_1_balance" model="account.report.expression">
@@ -254,8 +227,6 @@
                 <field name="name">Financial expenses</field>
                 <field name="name@es_419">Gastos financieros</field>
                 <field name="code">PE_PNL_B_2</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_pnl_B_2_balance" model="account.report.expression">
@@ -283,8 +254,6 @@
                 <field name="name">Income tax expense</field>
                 <field name="name@es_419">Gasto en impuesto sobre la renta</field>
                 <field name="code">PE_PNL_D</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="hierarchy_level">0</field>
                 <field name="expression_ids">
                     <record id="account_financial_report_pnl_D_balance" model="account.report.expression">

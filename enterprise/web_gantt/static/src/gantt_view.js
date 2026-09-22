@@ -1,5 +1,4 @@
 import { registry } from "@web/core/registry";
-import { scrollSymbol } from "@web/search/action_hook";
 import { GanttArchParser } from "./gantt_arch_parser";
 import { GanttController } from "./gantt_controller";
 import { GanttModel } from "./gantt_model";
@@ -22,14 +21,14 @@ export const ganttView = {
         let scrollPosition;
         let multiCreateValues;
         if (genericProps.state) {
-            scrollPosition = genericProps.state[scrollSymbol];
+            scrollPosition = genericProps.state.scrollPosition;
             modelParams.metaData = genericProps.state.metaData;
             modelParams.displayParams = genericProps.state.displayParams;
             multiCreateValues = genericProps.state.multiCreateValues;
         } else {
-            const { arch, fields, resModel } = genericProps;
+            const { arch, fields, relatedModels, resModel } = genericProps;
             const parser = new view.ArchParser();
-            const archInfo = parser.parse(arch);
+            const archInfo = parser.parse(arch, relatedModels, resModel);
 
             let formViewId = archInfo.formViewId;
             if (!formViewId) {
@@ -39,15 +38,11 @@ export const ganttView = {
                 }
             }
 
-            const kanbanViewId =
-                archInfo.kanbanViewId ?? config.views.find(([_, type]) => type === "kanban")?.[0];
-
             modelParams.metaData = {
                 ...omit(archInfo, "displayMode"),
                 fields,
                 resModel,
                 formViewId,
-                kanbanViewId,
             };
             modelParams.displayParams = {
                 displayMode: archInfo.displayMode,

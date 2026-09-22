@@ -1,0 +1,53 @@
+<templates>
+    <t t-name="marketing_automation.AddStepButton">
+        <Dropdown menuClass="'ps-1'">
+            <button class="o-editor-button btn btn-primary"
+                t-att-style="this.props.style"
+                t-att-title="this.props.title"
+                t-on-pointerdown="(e) => e.stopPropagation()">
+                <i class="oi" t-att-data-icon="this.props.icon || 'add'"/>
+            </button>
+            <t t-set-slot="content">
+                <div class="o_communicate_category">
+                    <span class="small text-muted">Communicate</span>
+                    <DropdownItem t-props="this.getDropdownItemProps('mail')">
+                        <i class="oi pe-1" data-icon="mail"/>Send Email
+                    </DropdownItem>
+                    <DropdownItem t-props="this.getDropdownItemProps('log_note')">
+                        <i class="oi pe-1" data-icon="edit_square"/>Log Note
+                    </DropdownItem>
+                </div>
+                <div class="o_flow_rules_category">
+                    <span class="small text-muted">Flow Rules</span>
+                    <DropdownItem t-props="this.getDropdownItemProps('delay')">
+                        <i class="oi pe-1" data-icon="hourglass_empty"/>Time Delay
+                    </DropdownItem>
+                    <DropdownItem t-props="this.getDropdownItemProps('branching')">
+                        <i class="oi oi-rotate-90 pe-1" data-icon="fork_right"/>New Path
+                    </DropdownItem>
+                    <DropdownItem t-props="this.getDropdownItemProps('split')">
+                        <i class="oi pe-1" data-icon="signpost"/>If/Else Split
+                    </DropdownItem>
+                    <DropdownItem t-props="this.getDropdownItemProps('trigger')">
+                        <i class="oi pe-1" data-icon="back_hand"/>Condition Delay
+                    </DropdownItem>
+                </div>
+                <div class="o_actions_category">
+                    <span class="small text-muted">Actions</span>
+                    <DropdownItem t-props="this.getDropdownItemProps('subscribe_to_list')">
+                        <i class="oi pe-1" data-icon="contact_mail"/>Add/Remove from List
+                    </DropdownItem>
+                    <DropdownItem t-props="this.getDropdownItemProps('create_activity')">
+                        <i class="oi pe-1" data-icon="verified"/>Create an Activity
+                    </DropdownItem>
+                    <DropdownItem t-props="this.getDropdownItemProps('update_record')">
+                        <i class="oi pe-1" data-icon="edit"/>Update Record
+                    </DropdownItem>
+                    <DropdownItem t-props="this.getDropdownItemProps('action')">
+                        <i class="oi pe-1" data-icon="settings"/>Server Action
+                    </DropdownItem>
+                </div>
+            </t>
+        </Dropdown>
+    </t>
+</templates>

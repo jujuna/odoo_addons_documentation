@@ -28,6 +28,10 @@ class MrpWorkcenter(models.Model):
             context = context[:-1] + ",'workcenter_id': active_id}"
         context = context.replace('active_id', str(self.id))
         action['context'] = dict(literal_eval(context), employee_id=request.session.get('employee_id'), shouldHideNewWorkcenterButton=True)
+        if self.env.context.get("view_mode"):
+            del action["mobile_view_mode"]
+            del action["views"]
+            action["view_mode"] = self.env.context["view_mode"]
         return action
 
     @api.model
@@ -51,6 +55,25 @@ class MrpWorkcenter(models.Model):
 
     def action_enable_routings(self):
         self.env['res.config.settings'].create([{'group_mrp_routings': True}]).execute()
+
+    def action_open_workorders(self, from_gantt_view=False, date_to_plan_on=False):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self.env._("Plan Work Orders in %(workcenter)s", workcenter=self.name),
+            'res_model': 'mrp.workorder',
+            'domain': [('state', 'not in', ['draft', 'done', 'cancel'])],
+            'views': [(self.env.ref('mrp_workorder.mrp_workcenter_workorders_tree_view').id if from_gantt_view else False, 'list')],
+            'search_view_id': (self.env.ref('mrp.view_mrp_production_workorder_form_view_filter').id, 'search'),
+            'context': {
+                'search_default_workcenter_id': self.id,
+                'search_default_ready': True,
+                'search_default_blocked': True,
+                'search_default_filter_to_plan': True,
+                'date_to_plan_on': date_to_plan_on,
+                'workcenter_to_plan_on': self.id,
+            },
+        }
 
 
 class MrpWorkcenterProductivity(models.Model):

@@ -1,4 +1,3 @@
-import { Deferred } from "@web/core/utils/concurrency";
 import { animationFrame } from "@odoo/hoot-mock";
 import { makeSpreadsheetMockEnv } from "@spreadsheet/../tests/helpers/model";
 import { WebClient } from "@web/webclient/webclient";
@@ -27,7 +26,7 @@ import { DashboardEditAction } from "../../src/bundle/action/dashboard_edit_acti
 export async function createDashboardEditAction(params) {
     /** @type {any} */
     let spreadsheetAction;
-    const actionMountedDef = new Deferred();
+    const actionMountedDef = Promise.withResolvers();
     patchWithCleanup(DashboardEditAction.prototype, {
         setup() {
             super.setup();
@@ -53,7 +52,7 @@ export async function createDashboardEditAction(params) {
             spreadsheet_id: spreadsheetId,
         },
     });
-    await actionMountedDef;
+    await actionMountedDef.promise;
     await animationFrame();
     return {
         model: getSpreadsheetActionModel(spreadsheetAction),

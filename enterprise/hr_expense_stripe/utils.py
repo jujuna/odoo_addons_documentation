@@ -1,5 +1,7 @@
+import hashlib
 import logging
 import re
+from functools import lru_cache
 from json import JSONDecodeError
 
 import requests
@@ -18,28 +20,57 @@ STRIPE_VALID_JOURNAL_CURRENCIES = {
     'GB': 'GBP',
 }
 
+# List of countries that support Stripe Issuing
+# See https://docs.stripe.com/issuing/global#local-issuing
+# Note that US is not yet supported
+STRIPE_SUPPORTED_COUNTRY_CODES = {
+    'AT',
+    'BE',
+    'CY',
+    'DE',
+    'EE',
+    'ES',
+    'FI',
+    'FR',
+    'GB',
+    'GR',
+    'HR',
+    'IE',
+    'IT',
+    'LT',
+    'LU',
+    'LV',
+    'MT',
+    'NL',
+    'PT',
+    'SI',
+    'SK',
+}
+
 HANDLED_WEBHOOK_EVENTS = {
-    # Balance
+    ## Balance
     'balance.available',
-    # Authorization
+    ## Authorization
     'issuing_authorization.created',
     'issuing_authorization.request',
     'issuing_authorization.updated',
-    # Cards
+    ## Cards
     # 'issuing_card.created',
     'issuing_card.updated',
-    # Cardholders
+    ## Cardholders
     # 'issuing_cardholder.updated',
-    # Disputes
-    # 'issuing_dispute.funds_rescinded', # TODO to implement
-    # 'issuing_dispute.created', # TODO to implement
-    # 'issuing_dispute.closed', # TODO to implement
-    # 'issuing_dispute.funds_reinstated', # TODO to implement
-    # Capture transactions
+    ## Disputes
+    'issuing_dispute.created',
+    'issuing_dispute.updated',
+    'issuing_dispute.submitted',
+    'issuing_dispute.closed',
+    'issuing_dispute.funds_reinstated',
+    'issuing_dispute.funds_rescinded',
+    ## Capture transactions
     'issuing_transaction.created',
     'issuing_transaction.updated',
     # 'issuing_transaction.purchase_details_receipt_updated', TODO check if we want it
-    # Account top-ups
+    ## Account top-ups
     # 'topup.created',
     # 'topup.updated',
     'topup.succeeded',
@@ -356,28 +387,137 @@ STRIPE_EXCEPTIONS_CURRENCY_MINOR_UNITS = {
 
 STRIPE_CURRENCY_MINOR_UNITS = {**CURRENCY_MINOR_UNITS, **STRIPE_EXCEPTIONS_CURRENCY_MINOR_UNITS}
 
+STRIPE_SAFE_SIMPLE_ROUTES = {
+    'accounts',
+    'account_links',
+    'cardholders',
+    'cards',
+    'disputes',
+    'ephemeral_keys',
+    'files',
+    'funding_instructions',
+    'send_verification_code',
+    'test_helpers/authorizations',
+    'test_helpers/issuing/cards',
+    'test_helpers/fund_balance',
+    'test_helpers/transactions/create_force_capture',
+    'test_helpers/account_verify',
+    'topups',
+}
+
 STRIPE_REQUEST_REFUSED_REASONS = {
-    'account_disabled': _lt("Your Stripe account is disabled"),
-    'card_active': _lt("The card is active, and there was no control setup on your Stripe account"),  # SHOULD NEVER HAPPEN
-    'card_canceled': _lt("The card used was blocked"),
-    'card_expired': _lt("The card has expired"),
-    'card_inactive': _lt("The card is currently inactive, please activate it first"),
-    'cardholder_blocked': _lt("The cardholder was blocked"),
-    'cardholder_inactive': _lt("The cardholder is currently inactive"),
-    'cardholder_verification_required': _lt("The cardholder is still under verification"),
-    'insecure_authorization_method': _lt("An insecure authorization method was used"),
+    'account_disabled': _lt("Your Stripe account is disabled."),
+    'card_active': _lt("The card is active, and there was no control setup on your Stripe account."),  # SHOULD NEVER HAPPEN
+    'card_canceled': _lt("The card used was blocked."),
+    'card_expired': _lt("The card has expired."),
+    'card_inactive': _lt("The card is currently inactive, please activate it first."),
+    'cardholder_blocked': _lt("The cardholder was blocked."),
+    'cardholder_inactive': _lt("The cardholder is currently inactive."),
+    'cardholder_verification_required': _lt("The cardholder is still under verification."),
+    'insecure_authorization_method': _lt("An insecure authorization method was used."),
     'insufficient_funds': _lt("There is insufficient funds on your Stripe account, please top-up your account first."),
-    'network_fallback': _lt("Stripe timed-out or encountered an error when communicating with the card network"),
+    'network_fallback': _lt("Stripe timed-out or encountered an error when communicating with the card network."),
     'not_allowed': _lt("The charge is not allowed on the Stripe network, possibly because it is an ATM withdrawal or cash advance."),
-    'pin_blocked': _lt("The card's PIN is blocked"),
-    'authorization_controls': _lt("Transaction amount exceeded the card daily/transaction hard limit of 50.000 €"),
-    'spending_controls': _lt("The card was declined because of the Stripe spending controls"),
-    'suspected_fraud': _lt("The authorization was suspected as fraudulent by Stripe's risk controls"),
-    'verification_failed': _lt("The authorization failed required verification checks"),
-    'webhook_approved': _lt("The authorization was approved by your Odoo database"),
-    'webhook_declined': _lt("The authorization was refused by your Odoo database"),
-    'webhook_error': _lt("There was an error in your Odoo database and Stripe received an invalid response"),
-    'webhook_timeout': _lt("Your Odoo database failed to respond to Stripe in time, and the authorization was refused by default")
+    'pin_blocked': _lt("The card's PIN is blocked."),
+    'authorization_controls': _lt("Transaction amount exceeded the card daily/transaction hard limit of 50,000 €."),
+    'spending_controls': _lt("The card was declined because of the Stripe spending controls."),
+    'suspected_fraud': _lt("The authorization was suspected as fraudulent by Stripe's risk controls."),
+    'verification_failed': _lt("The authorization failed required verification checks."),
+    'webhook_approved': _lt("The authorization was approved by your Odoo database."),
+    'webhook_declined': _lt("The authorization was refused by your Odoo database."),
+    'webhook_error': _lt("There was an error in your Odoo database and Stripe received an invalid response."),
+    'webhook_timeout': _lt("Your Odoo database failed to respond to Stripe in time, and the authorization was refused by default.")
+}
+
+KiB = 1024
+MiB = 1024 * KiB
+# see https://docs.stripe.com/file-upload
+STRIPE_FILE_UPLOAD_CONFIG = {
+    'account_requirement': {
+        'mimetypes': ['application/pdf', 'image/jpeg', 'image/png'],
+        'max_size': 64 * MiB,
+        'supported_models': [],
+        # 'downloadable': False,
+    },
+    'business_icon': {
+        'mimetypes': ['image/jpeg', 'image/png', 'image/gif'],
+        'max_size': 512 * KiB,
+        'supported_models': [],
+        # 'downloadable': True,
+    },
+    'business_logo': {
+        'mimetypes': ['image/jpeg', 'image/png', 'image/gif'],
+        'max_size': 512 * KiB,
+        'supported_models': [],
+        # 'downloadable': True,
+    },
+    'customer_signature': {
+        'mimetypes': ['image/jpeg', 'image/png', 'image/svg+xml'],
+        'max_size': 4 * MiB,
+        'supported_models': [],
+        # 'downloadable': True,
+    },
+    'dispute_evidence': {
+        'mimetypes': ['application/pdf', 'image/jpeg', 'image/png'],
+        'max_size': 5 * MiB,
+        'supported_models': ['hr.expense.stripe.dispute'],
+        # 'downloadable': True,
+    },
+    'platform_terms_of_service': {
+        'mimetypes': ['application/pdf', 'text/plain', 'text/markdown'],
+        'max_size': 64 * MiB,
+        'supported_models': [],
+        # 'downloadable': False,
+    },
+    'issuing_regulatory_reporting': {
+        'mimetypes': ['application/json'],
+        'max_size': 256 * KiB,
+        'supported_models': [],
+        # 'downloadable': True,
+    },
+    'pci_document': {
+        'mimetypes': ['application/pdf'],
+        'max_size': 16 * MiB,
+        'supported_models': [],
+        # 'downloadable': True,
+    },
+    'tax_document_user_upload': {
+        'mimetypes': [
+            'application/pdf',
+            'text/csv',
+            'image/jpeg',
+            'image/png',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ],
+        'max_size': 16 * MiB,
+        'supported_models': [],
+        # 'downloadable': True,
+    },
+    'additional_verification': {
+        'mimetypes': ['application/pdf', 'image/jpeg', 'image/png'],
+        'max_size': 16 * MiB,
+        'supported_models': [],
+        # 'downloadable': False,
+    },
+    'terminal_android_apk': {
+        'mimetypes': ['application/vnd.android.package-archive'],
+        'max_size': 200 * MiB,
+        'supported_models': [],
+        # 'downloadable': True,
+    },
+    'terminal_reader_splashscreen': {
+        'mimetypes': ['image/png', 'image/jpeg', 'image/gif'],
+        'max_size': 4 * MiB,
+        'supported_models': [],
+        # 'downloadable': True,
+    },
+    'identity_document': {
+        'mimetypes': ['application/pdf', 'image/jpeg', 'image/png'],
+        'max_size': 32 * MiB,
+        'supported_models': [],
+        # 'downloadable': True,
+    },
 }
 
 
@@ -431,6 +571,10 @@ def interpret_error_code(response):
         459: _lt("Your account balance isn't zero, please use any remaining funds or contact support to close your account."),
         460: _lt("The creation rate limit for this type of cards has been reached. Please try again later."),  # Rate limit reached for creating cards
         461: _lt("Only licenses databases can use Odoo Stripe Issuing services."),
+        463: _lt("There was an error when sending the SMS, please try again later. If the problem persists, please contact the support."),
+        464: _lt("The country of the phone number is not supported for SMS."),
+        465: _lt("There was an error when sending the email, please try again later. If the problem persists, please contact the support."),
+        467: _lt("Your dispute creation rate limit has been reached. Please try again later."),  # Rate limit for creating disputes
         500: _lt("There was an unexpected error on Odoo IAP proxy server"),
         503: _lt("We received the following error from Odoo IAP proxy server:\n- Missing account secret"),
         504: _lt("We received the following error from Odoo IAP proxy server:\n- Missing account webhook"),
@@ -539,42 +683,34 @@ def _create_signature(signature_key, payload_data):
     return f'v1={signature},t={timestamp}'
 
 
-def _validate_route(route):
-    """ Check that the route is in the proper whitelist """
-    safe_simple_routes = {
-        'accounts',
-        'account_links',
-        'cardholders',
-        'cards',
-        'ephemeral_keys',
-        'funding_instructions',
-        'send_verification_code',
-        'test_helpers/authorizations',
-        'test_helpers/issuing/cards',
-        'test_helpers/fund_balance',
-        'test_helpers/transactions/create_force_capture',
-        'test_helpers/account_verify',
-        'topups',
-    }
-    if route in safe_simple_routes:
-        return None
-
+@lru_cache(maxsize=1)
+def _get_route_re_pattern(safe_simple_routes):
     # Check if the route is a formatted route e.g. 'test_helpers/authorizations/ich_1MsKAB2eZvKYlo2C3eZ2BdvK/capture'
     simple_routes_pattern = '|'.join(safe_simple_routes)
-    pattern = re.compile(
+    return re.compile(
         rf'(?:{simple_routes_pattern})/'  # base route part
         r'[a-z]{2,5}(?:_[a-z]{2,4})?_'  # Prefix part (e.g. 'sk_test_', 'ich_', etc.)
         r'[a-zA-Z0-9]{16,24}'  # Stripe ID part (alphanumeric characters)
         r'(?:/capture'  # Optional capture part (e.g. in the case of test authorizations)
-        r'|/shipping/(?:submit|ship|deliver|return|fail))?$'  # Optional shipping part (e.g. in the case of test shippings)
+        r'|/shipping/(?:submit|ship|deliver|return|fail)'  # Optional shipping part (e.g. in the case of test shippings)
+        r'|/submit'  # when submitting disputes
+        r'|/contents'  # for file contents
+        r')?$'
     )
-    if pattern.fullmatch(route):
+
+
+def _validate_route(route):
+    """ Check that the route is in the proper whitelist """
+    if route in STRIPE_SAFE_SIMPLE_ROUTES:
+        return None
+
+    if _get_route_re_pattern(tuple(STRIPE_SAFE_SIMPLE_ROUTES)).fullmatch(route):
         return None
 
     return _lt("The route '%(route)s' is not allowed to be called from the Stripe IAP proxy server.", route=route)
 
 
-def make_request_stripe_proxy(company, route, route_params=None, payload=None, method="POST", headers=None):
+def make_request_stripe_proxy(company, route, route_params=None, payload=None, method="POST", headers=None, files=None, raw=False):
     """ Main helper to make requests to the Stripe IAP proxy server.
 
     :param :class:`~odoo.addons.base.models.res_company.ResCompany` company: The company for which the request is made
@@ -583,12 +719,13 @@ def make_request_stripe_proxy(company, route, route_params=None, payload=None, m
     :param dict payload: The payload to send in the request
     :param str method: The HTTP method to use for the request (default: "POST")
     :param dict headers: Additional headers to send with the request
+    :param dict files: The files to send, used for `requests`
     :return: The response content from the IAP proxy server
-    :rtype: dict
+    :rtype: dict | tuple[str, bytes]
     """
     if not headers:
         headers = {}
-    match company.env['ir.config_parameter'].get_param('hr_expense_stripe.stripe_mode', 'live'):
+    match company.env['ir.config_parameter'].get_str('hr_expense_stripe.stripe_mode') or 'live':
         case 'live':
             proxy_server = 'https://iap-services.odoo.com'
         case 'test':
@@ -599,7 +736,15 @@ def make_request_stripe_proxy(company, route, route_params=None, payload=None, m
     signature_key = company.stripe_issuing_db_private_key_id
 
     if signature_key:
-        headers['Db-Signature'] = _create_signature(signature_key, {**(route_params or {}), **payload})
+        payload_data = {**(route_params or {}), **payload}
+        if files:
+            file_name, file_content, file_type = files['file']
+            payload_data.update({
+                'file_name': file_name,
+                'file_type': file_type,
+                'file_sha256': hashlib.sha256(file_content).hexdigest(),
+            })
+        headers['Db-Signature'] = _create_signature(signature_key, payload_data)
     if route_params:
         route = route.format(**route_params)
 
@@ -620,12 +765,20 @@ def make_request_stripe_proxy(company, route, route_params=None, payload=None, m
         },
     )
 
-    response = requests.request(method, url, data=payload, headers=headers, timeout=10)
+    response = requests.request(
+        method,
+        url,
+        params=payload if method == 'GET' else None,
+        data=payload if method != 'GET' else None,
+        headers=headers,
+        timeout=(5, 30 if files else 10),
+        files=files,
+    )
     if not response.ok:
         raise UserError(company.env._(interpret_error_code(response)))  # pylint: disable=gettext-variable
+    if raw:
+        return response.headers.get('Content-Type', 'application/octet-stream'), response.content
     response_content = response.json()
-    session_headers = response.headers.get('Set-Cookie', '')
-    session_headers = dict(key.split('=') for key in session_headers.split('; ') if '=' in key)
-    response_content['session_id'] = session_headers.get('session_id', False)
+    response_content['session_id'] = response.cookies.get('session_id', False)
 
     return response_content

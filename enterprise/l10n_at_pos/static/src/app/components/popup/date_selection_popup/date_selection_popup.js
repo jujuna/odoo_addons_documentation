@@ -1,23 +1,19 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, useProps, proxy, t } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { Dialog } from "@web/core/dialog/dialog";
 
 export class DateSelectionPopup extends Component {
     static template = "l10n_at_pos.DateSelectionPopup";
     static components = { Dialog };
-    static props = {
-        title: { type: String, optional: true },
-        confirmLabel: { type: String, optional: true },
-        getPayload: Function,
-        close: Function,
-    };
-    static defaultProps = {
-        confirmLabel: _t("Print"),
-        title: _t("DatePicker"),
-    };
+    props = useProps({
+        title: t.string().optional(_t("DatePicker")),
+        confirmLabel: t.string().optional(_t("Print")),
+        getPayload: t.function(),
+        close: t.function(),
+    });
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             period: "monthly",
             selectedDate: this.defaultDate(),
         });

@@ -27,11 +27,11 @@ class ExtractMixinWithWords(models.AbstractModel):
         i = 0
         return {
             box_type: {
-                page_number: [
+                int(page_number): [
                     {
                         'id': (i := i + 1),
                         'text': box['content'],
-                        'page': page_number,
+                        'page': int(page_number),
                         'minX': box['coords'][0] - box['coords'][2] / 2,
                         'midX': box['coords'][0],
                         'maxX': box['coords'][0] + box['coords'][2] / 2,

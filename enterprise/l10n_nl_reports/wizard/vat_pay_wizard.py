@@ -13,7 +13,7 @@ class VATPayWizard(models.TransientModel):
         company = self.return_id.company_id
         periodicity = self.return_id.type_id._get_periodicity(company)
         try:
-            nl_vat = company.l10n_nl_reports_sbr_ob_nummer or company.vat
+            nl_vat = company.l10n_nl_sbr_ob_nummer or company.vat
             vat = validate(nl_vat)
         except Exception as e:
             raise UserError(_(

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'UK BACS Payment Files',
@@ -11,16 +10,15 @@ Direct Debit allows businesses to collect payments directly from the bank accoun
 
 This module follows the implementation guidelines issued by the Bacs Payment Schemes Limited (BPSL). For more information about the BACS standards: https://www.bacs.co.uk/
     """,
-    'version': '1.0',
-    'depends': ['account_batch_payment', 'base_iban', 'l10n_uk'],
+    'depends': ['account_batch_payment', 'l10n_uk'],
     'data': [
-        'security/ir.model.access.csv',
         'report/ddi_report.xml',
         'data/bacs_payment_methods.xml',
         'views/bacs_ddi_views.xml',
         'views/res_config_settings_views.xml',
         'views/account_payment_views.xml',
         'views/account_batch_payment_views.xml',
+        'security/ir.access.csv',
     ],
     'assets': {
         'web.report_assets_common': [

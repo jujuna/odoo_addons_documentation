@@ -9,6 +9,8 @@ from odoo.addons.partner_commission.tests.setup import Line, Spec, TestCommissio
 @tagged('commission', 'post_install', '-at_install')
 class TestCommissions(TestCommissionsSetup):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_commissions(self):
         """Commissions should be computed based on matching rules."""
         # We override the products to avoid dealing with subscriptions and mandatory pricings
@@ -80,7 +82,7 @@ class TestCommissions(TestCommissionsSetup):
         self.referrer.grade_id = self.gold.id
         self.referrer._onchange_grade_id()
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
 
@@ -105,7 +107,7 @@ class TestCommissions(TestCommissionsSetup):
             'amount': 10,
         })
         payment = payment_register._create_payments()
-        if payment.state != 'in_process':
+        if payment.state != 'paid':
             payment.action_post()
 
         self.assertEqual(inv.payment_state, 'partial')
@@ -162,7 +164,7 @@ class TestCommissions(TestCommissionsSetup):
         # Subscription commission plan overrides SO commission_plan, remove it for this test
         self.crm.recurring_invoice = False
 
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         # Modify SO commission_plan
@@ -216,8 +218,7 @@ class TestCommissions(TestCommissionsSetup):
         })
         self.referrer.commission_plan_id = plan
         # make sure the sale_order_template_id field is in the view
-        self.salesman.group_ids += self.env.ref('sale_management.group_sale_order_template')
-        form = Form(self.env['sale.order'].with_user(self.salesman).with_context(tracking_disable=True))
+        form = Form(self.env['sale.order'].with_user(self.salesman))
         form.partner_id = self.customer
         form.referrer_id = self.referrer
         form.sale_order_template_id = so_template

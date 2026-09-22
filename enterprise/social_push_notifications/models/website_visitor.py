@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.fields import Domain
 
@@ -10,9 +10,20 @@ class WebsiteVisitor(models.Model):
 
     push_subscription_ids = fields.One2many('website.visitor.push.subscription', 'website_visitor_id',
         string="Push Subscriptions")
-    has_push_notifications = fields.Boolean('Push Notifications Enabled')
+    has_push_notifications = fields.Boolean('Push Notifications Enabled',
+        compute='_compute_has_push_notifications', store=True)
 
     _has_push_notifications_index = models.UniqueIndex("(id) WHERE has_push_notifications IS TRUE")
+
+    @api.depends('push_subscription_ids')
+    def _compute_has_push_notifications(self):
+        count_push_subscriptions_per_visitor = dict(
+            self.env['website.visitor.push.subscription']._read_group(
+                domain=[('website_visitor_id', 'in', self.ids)],
+                groupby=['website_visitor_id'],
+                aggregates=['__count']))
+        for visitor in self:
+            visitor.has_push_notifications = count_push_subscriptions_per_visitor.get(visitor, 0) > 0
 
     def action_send_push_notification(self):
         """ Opens social media post form prefilled with selected website.visitor
@@ -38,18 +49,4 @@ class WebsiteVisitor(models.Model):
     def _merge_visitor(self, target):
         """ Override linking process to link existing push subscriptions to the final visitor. """
         self.push_subscription_ids.write({'website_visitor_id': target.id})
-        self.write({'has_push_notifications': False})
         return super()._merge_visitor(target)
-
-    def _register_push_subscription(self, push_token):
-        self.ensure_one()
-
-        # in case we already have this token, delete and re-create
-        if push_token:
-            self.env['website.visitor.push.subscription'].search(
-                [('push_token', '=', push_token)]).unlink()
-
-            return self.env['website.visitor.push.subscription'].create({
-                'website_visitor_id': self.id,
-                'push_token': push_token
-            })

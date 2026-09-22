@@ -10,6 +10,7 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 @tagged('post_install', '-at_install')
 class TestAccountReconcileWizard(AccountTestInvoicingCommon):
     """ Tests the account reconciliation and its wizard. """
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -22,20 +23,22 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
             'name': 'Payable Account 2',
             'account_type': 'liability_current',
             'code': 'PAY2.TEST',
-            'reconcile': True
         })
         cls.write_off_account = cls.env['account.account'].create({
             'name': 'Write-Off Account',
             'account_type': 'liability_current',
             'code': 'WO.TEST',
-            'reconcile': False
+        })
+        cls.analytic_account = cls.env['account.analytic.account'].create({
+            'name': 'Reconcile Wizard Analytic Account',
+            'plan_id': cls.env['account.analytic.plan'].create({'name': 'Reconcile Wizard Plan'}).id,
         })
 
         cls.misc_journal = cls.company_data['default_journal_misc']
         cls.test_date = fields.Date.from_string('2016-01-01')
         cls.company_currency = cls.company_data['currency']
         cls.foreign_currency = cls.setup_other_currency('EUR')
-        cls.foreign_currency_2 = cls.setup_other_currency('XAF', rates=[('2016-01-01', 6.0), ('2017-01-01', 4.0)])
+        cls.foreign_currency_2 = cls.setup_other_currency('XAF', rates=[('2015-12-31', 6.0), ('2016-12-31', 4.0)])
 
     # -------------------------------------------------------------------------
     # HELPERS
@@ -154,6 +157,26 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         ]
         self.assertWizardReconcileValues(line_1 + line_2, wizard_input_values, write_off_expected_values)
 
+    def test_write_off_with_analytic_distribution(self):
+        """The wizard should preserve the analytic distribution on the created write-off line."""
+        line_1 = self.create_line_for_reconciliation(1000.0, 1000.0, self.company_currency, '2016-01-01')
+        line_2 = self.create_line_for_reconciliation(-500.0, -500.0, self.company_currency, '2016-01-01')
+        wizard_input_values = {
+            'journal_id': self.misc_journal.id,
+            'account_id': self.write_off_account.id,
+            'label': 'Write-Off With Analytic',
+            'allow_partials': False,
+            'date': self.test_date,
+            'analytic_distribution': {self.analytic_account.id: 100.0},
+        }
+        write_off_expected_values = [
+            {'account_id': self.receivable_account.id, 'name': 'Write-Off With Analytic',
+             'balance': -500.0, 'analytic_distribution': False},
+            {'account_id': self.write_off_account.id, 'name': 'Write-Off With Analytic',
+             'balance': 500.0, 'analytic_distribution': {str(self.analytic_account.id): 100.0}},
+        ]
+        self.assertWizardReconcileValues(line_1 + line_2, wizard_input_values, write_off_expected_values)
+
     def test_write_off_one_foreign_currency(self):
         """ Reconciliation of two lines with one of the two using foreign currency should reconcile in foreign currency."""
         line_1 = self.create_line_for_reconciliation(1000.0, 1000.0, self.company_currency, '2016-01-01')
@@ -175,7 +198,7 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
 
     def test_write_off_one_foreign_currency_rounding(self):
         """ Reconciliation of two lines with one of the two using foreign currency should reconcile in foreign currency."""
-        foreign_currency = self.setup_other_currency('CAD', rounding=0.01, rates=[('2016-01-01', 0.052972554919), ('2017-01-01', 4.0)])
+        foreign_currency = self.setup_other_currency('CAD', rounding=0.01, rates=[('2015-12-31', 0.052972554919), ('2016-12-31', 4.0)])
 
         # Check that the reconciliation works independently of
         # - whether the foreign amount is debit or credit
@@ -255,7 +278,7 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
 
     def test_write_off_one_foreign_currency_change_rate(self):
         """ Tests that write-off use the correct rate from/at wizard's date. """
-        foreign_currency = self.setup_other_currency('CAD', rounding=0.001, rates=[('2016-01-01', 0.5), ('2017-01-01', 1 / 3)])
+        foreign_currency = self.setup_other_currency('CAD', rounding=0.001, rates=[('2015-12-31', 0.5), ('2016-12-31', 1 / 3)])
         new_date = fields.Date.from_string('2017-02-01')
         line_1 = self.create_line_for_reconciliation(-2000.0, -2000.0, self.company_currency, '2017-01-01')  # conversion in 2017 => -666.67🍫
         line_2 = self.create_line_for_reconciliation(2000.0, 1000.0, foreign_currency, '2016-01-01')
@@ -299,7 +322,7 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         """ Test that if both AMLs have the same foreign currency and rate, the amount in company currency
             is computed on the write-off in such a way that no exchange diff is created.
         """
-        foreign_currency = self.setup_other_currency('CAD', rounding=0.01, rates=[('2016-01-01', 1 / 0.225)])
+        foreign_currency = self.setup_other_currency('CAD', rounding=0.01, rates=[('2015-12-31', 1 / 0.225)])
         new_date = fields.Date.from_string('2017-02-01')
         line_1 = self.create_line_for_reconciliation(21.38, 95.0, foreign_currency, '2016-01-01')
         line_2 = self.create_line_for_reconciliation(1.13, 5.0, foreign_currency, '2016-01-01')
@@ -412,7 +435,6 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
             'name': 'Tax Account Test',
             'account_type': 'liability_current',
             'code': 'TAX.TEST',
-            'reconcile': False
         })
         base_tag = self.env['account.account.tag'].create({
             'applicability': 'taxes',
@@ -493,7 +515,6 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         it should reconcile in company currency.
         """
         account = self.company_data['default_account_expense']
-        account.reconcile = True
         line_1 = self.create_line_for_reconciliation(1000.0, 1000.0, self.company_currency, '2016-01-01', account_1=account)
         line_2 = self.create_line_for_reconciliation(-500.0, -1500.0, self.foreign_currency, '2016-01-01', account_1=account)
         wizard_input_values = {
@@ -515,7 +536,6 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         """ When reconciling exchange_diff with amount_residual_currency = 0 we need to reconcile in company_currency.
         """
         exchange_gain_account = self.company_data['company'].income_currency_exchange_account_id
-        exchange_gain_account.reconcile = True
         line_1 = self.create_line_for_reconciliation(150.0, 0.0, self.foreign_currency, '2016-01-01')
         line_2 = self.create_line_for_reconciliation(-100.0, 0.0, self.foreign_currency, '2016-01-01', account_1=exchange_gain_account)
         wizard_input_values = {
@@ -563,7 +583,6 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         """ When reconciling exchange_diff with amount_residual_currency = 0 we need to reconcile in company_currency.
         """
         exchange_gain_account = self.company_data['company'].income_currency_exchange_account_id
-        exchange_gain_account.reconcile = True
         line_1 = self.create_line_for_reconciliation(100.0, 0.0, self.foreign_currency, '2016-01-01')
         line_2 = self.create_line_for_reconciliation(-100.0, 0.0, self.foreign_currency, '2016-01-01', account_1=exchange_gain_account)
         lines = line_1 + line_2
@@ -735,7 +754,7 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         """
         Test the reconciliation with two lines on the same side (debit/credit), same currency and not on a receivable/payable account
         """
-        current_assets_account = self.company_data['default_account_assets'].copy({'name': 'Current Assets', 'account_type': 'asset_current', 'reconcile': True})
+        current_assets_account = self.company_data['default_account_assets'].copy({'name': 'Current Assets', 'account_type': 'asset_current'})
         line_1 = self.create_line_for_reconciliation(200, 200, self.company_currency, '2016-01-01', current_assets_account)
         line_2 = self.create_line_for_reconciliation(200, 200, self.company_currency, '2016-01-01', current_assets_account)
 
@@ -766,7 +785,7 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         """
         Test the reconciliation with two lines on the same side (debit/credit), one foreign currency and not on a receivable/payable account
         """
-        current_assets_account = self.company_data['default_account_assets'].copy({'name': 'Current Assets', 'account_type': 'asset_current', 'reconcile': True})
+        current_assets_account = self.company_data['default_account_assets'].copy({'name': 'Current Assets', 'account_type': 'asset_current'})
         line_1 = self.create_line_for_reconciliation(200, 300, self.foreign_currency, '2016-01-01', current_assets_account)
         line_2 = self.create_line_for_reconciliation(200, 200, self.company_currency, '2016-01-01', current_assets_account)
 
@@ -799,7 +818,6 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         one regular aml in company currency
         """
         exchange_gain_account = self.company_data['company'].income_currency_exchange_account_id
-        exchange_gain_account.reconcile = True
         line_1 = self.create_line_for_reconciliation(150.0, 150.0, self.company_currency, '2016-01-01')
         line_2 = self.create_line_for_reconciliation(100.0, 0.0, self.foreign_currency, '2016-01-01', account_1=exchange_gain_account)
         wizard_input_values = {

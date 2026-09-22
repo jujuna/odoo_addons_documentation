@@ -1,4 +1,5 @@
 from odoo import fields, models
+from odoo.addons.account_reports.models.account_return import LIMIT_CHECK_ENTRIES
 
 
 class AccountReturn(models.Model):
@@ -28,8 +29,9 @@ class AccountReturn(models.Model):
         _ = self.env._
         checks = super()._check_suite_in_gstr1_report(check_codes_to_ignore)
         options = self._get_closing_report_options()
-
-        if not self.l10n_in_edi_feature_enabled:
+        gstr1_return_type = self.env.ref('l10n_in_reports.in_gstr1_return_type')
+        periodicity = gstr1_return_type._get_periodicity(self.company_id)
+        if not self.l10n_in_edi_feature_enabled or periodicity == 'trimester':
             check_codes_to_ignore.add('missing_einvoice')
             self.check_ids.filtered(lambda check: check.code == 'missing_einvoice').unlink()
 
@@ -52,7 +54,7 @@ class AccountReturn(models.Model):
                 ("line_ids.l10n_in_gstr_section", "like", 'sale_'),
                 ("line_ids.l10n_in_gstr_section", "not in", sale_section_exceptions + [False]),
             ]
-            moves = self.env['account.move'].search(domain)
+            moves = self.env['account.move'].search(domain, limit=LIMIT_CHECK_ENTRIES)
             checks.append({
                 'code': 'missing_einvoice',
                 'name': _("Missing E-Invoice"),
@@ -66,6 +68,7 @@ class AccountReturn(models.Model):
                         (self.env.ref('account.view_out_invoice_tree').id, 'list'),
                         (self.env.ref('account.view_move_form').id, 'form'),
                     ],
-                ),
+                    domain=domain,
+                ) if moves else None,
             })
         return checks

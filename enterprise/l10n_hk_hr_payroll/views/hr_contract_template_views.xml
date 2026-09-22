@@ -7,10 +7,11 @@
         <field name="arch" type="xml">
             <group name="salary_info" position="inside">
                 <group string="Benefits" invisible="country_code != 'HK'">
-                    <label for="l10n_hk_internet" string="Internet Subscription"/>
+                    <label for="l10n_hk_internet" string="Internet Allowance"/>
                     <div class="o_row">
                         <field name="l10n_hk_internet" class="o_hr_narrow_field"/>
-                        <span>/ month</span>
+                        <span class="mx-2 text-muted">/</span>
+                        <field name="schedule_pay" class="o_hr_narrow_field" nolabel="1" readonly="1"/>
                     </div>
                 </group>
             </group>

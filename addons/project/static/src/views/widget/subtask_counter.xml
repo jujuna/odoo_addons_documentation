@@ -3,11 +3,11 @@
 <templates>
 
     <t t-name="project.SubtaskCounter" owl="1">
-        <a t-att-title="counterTitle"
+        <a t-att-title="this.counterTitle"
            class="subtask_list_button btn-link text-dark"
            t-on-click.prevent="() => this.onClick()">
-            <span class="fa fa-check-square-o me-1"/>
-            <t t-esc="counterDisplay"/>
+            <i class="oi me-1" data-icon="subdirectory_arrow_right"></i>
+            <t t-out="this.counterDisplay"/>
         </a>
     </t>
 

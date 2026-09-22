@@ -158,7 +158,10 @@ class WebsiteControllerPage(models.Model):
 
             if not values.get("menu_ids") and values.get("use_menu") and "name" in values:
                 # Fix me: make one menu per website ???
-                website = Website.browse(values.get("website_id")) or Website.get_current_website()
+                website = (Website.browse(values.get("website_id"))
+                           or self.env.website
+                           or Website.browse(self.env.context.get('host_id'))
+                           or self.env.ref('base.default_website'))
                 menu_values = {
                     'name': values["name"],
                     'url': f"/model/{name_slugified}",
@@ -168,10 +171,10 @@ class WebsiteControllerPage(models.Model):
                 values["menu_ids"] = [Command.create(menu_values)]
 
             if not self._get_ir_model_access(model):
-                self.env["ir.model.access"].create({
+                self.env["ir.access"].create({
                     "name": "Website integration: public model access",
                     "model_id": model.id,
-                    "perm_read": True,
+                    "operation": "r",
                     "group_id": self.env.ref("website.website_page_controller_expose").id
                 })
 
@@ -197,4 +200,7 @@ class WebsiteControllerPage(models.Model):
         return adapt_arch_to_model(arch, self.env[model.model])
 
     def _get_ir_model_access(self, model):
-        return self.env["ir.model.access"].with_context(active_test=False).search([("model_id", "=", model.id), ("group_id", "=", self.env.ref("website.website_page_controller_expose").id)])
+        return self.env["ir.access"].with_context(active_test=False).search([
+            ("model_id", "=", model.id),
+            ("group_id", "=", self.env.ref("website.website_page_controller_expose").id),
+        ])

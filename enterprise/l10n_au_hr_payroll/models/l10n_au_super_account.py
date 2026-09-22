@@ -6,7 +6,7 @@ from odoo import api, fields, models, _
 class L10n_AuSuperAccount(models.Model):
     _name = 'l10n_au.super.account'
     _description = "Super Account"
-    _rec_names_search = ["employee_id", "fund_id"]
+    _rec_names_search = ("employee_id", "fund_id")
 
     employee_id = fields.Many2one('hr.employee', string='Employee', required=True)
     display_name = fields.Char(export_string_translation=False)
@@ -20,8 +20,8 @@ class L10n_AuSuperAccount(models.Model):
         ("other", "Someone Else"),
     ], string="Trustee")
     trustee_name_id = fields.Many2one("res.partner", string='Trustee Name')
-    date_from = fields.Date(string="Member Since", default=lambda self: fields.Date.today(), required=True)
-    proportion = fields.Float("Proportion", default=1)
+    date_from = fields.Date(string="Member Since", default=fields.Date.context_today, required=True)
+    proportion = fields.Float("Proportion", default=1, digits="Payroll Rate")
     account_active = fields.Boolean("Active", default=True)
     super_account_warning = fields.Text(related="employee_id.super_account_warning")
     company_id = fields.Many2one('res.company', related='employee_id.company_id', string='Company', store=True)

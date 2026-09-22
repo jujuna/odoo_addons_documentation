@@ -4,13 +4,11 @@ from markupsafe import Markup
 
 from odoo import Command
 from odoo.addons.mrp_workorder.tests.common import TestMrpWorkorderCommon
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 
 
 class TestWorkorderClientActionCommon(TestMrpWorkorderCommon):
-    @classmethod
-    def _get_client_action_url(cls, workorder_id):
-        return f'/odoo/{workorder_id}/action-mrp_workorder.tablet_client_action'
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -18,7 +16,8 @@ class TestWorkorderClientActionCommon(TestMrpWorkorderCommon):
         cls.user_admin = cls.env.ref('base.user_admin')
         cls.user_admin.write({
             'name': 'Mitchell Admin',
-            'email': 'mitchell.admin@example.com'
+            'email': 'mitchell.admin@example.com',
+            'company_ids': [Command.link(cls.company.id)],
         })
         cls.potion = cls.env['product.product'].create({
             'name': 'Magic Potion',
@@ -28,7 +27,6 @@ class TestWorkorderClientActionCommon(TestMrpWorkorderCommon):
             'type': 'consu'})
         cls.bom_potion = cls.env['mrp.bom'].create({
             'product_tmpl_id': cls.potion.product_tmpl_id.id,
-            'consumption': 'flexible',
             'product_qty': 1.0,
             'bom_line_ids': [Command.create({'product_id': cls.ingredient_1.id, 'product_qty': 1})]})
         cls.wizard_op_1 = cls.env['mrp.routing.workcenter'].create({
@@ -59,7 +57,10 @@ class TestWorkorderClientActionCommon(TestMrpWorkorderCommon):
 # IMPORTANT: These tests need to be at_install because expected behavior is different when plm is installed
 # Also, since tours are ONLY allowed in the post_install case, we do a pure python recreation of the flow
 # here and only run tours in the corresponding plm module
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestPickingWorkorderClientActionSuggestImprovement(TestWorkorderClientActionCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_add_step(self):
         """ Add 2 new steps as instruction in the tablet view via the 'suggest
         worksheet improvement' and check that BoM chatter messages are correct:
@@ -142,7 +143,7 @@ class TestPickingWorkorderClientActionSuggestImprovement(TestWorkorderClientActi
     def test_update_instructions(self):
         """ 'Update Instructions' for a step in the tablet view via the 'suggest
         worksheet improvement' and check that the BoM chatter messages are correct:
-        - Existing BoM step with no title provided (i.e. keep original title) + no note + no comment, i.e. check no 'False' values displayed
+        - Existing BoM step with no title provided (i.e. keep original title) + untouched pre-filled note + no comment
         - Existing BoM step with a title + note + comment
         - An added step (via 'suggest worksheet improvement'), i.e. check activity is created for its update"""
         mo_form = Form(self.env['mrp.production'])
@@ -154,6 +155,7 @@ class TestPickingWorkorderClientActionSuggestImprovement(TestWorkorderClientActi
         wo.button_start()
 
         original_title = wo.current_quality_check_id.title
+        original_note = wo.current_quality_check_id.note
         updated_title = "Pre-magic Step"
         updated_note = "This is the step before magic is done"
         update_comment = "This step was inaccurate"
@@ -167,6 +169,7 @@ class TestPickingWorkorderClientActionSuggestImprovement(TestWorkorderClientActi
         update_step = update_step_form.save()
         update_step.with_user(self.user_admin).process()
         self.assertEqual(wo.current_quality_check_id.title, original_title, "When no title provided, keep original title")
+        self.assertEqual(wo.current_quality_check_id.note, original_note, "When the pre-filled instruction is left untouched, keep it as is")
 
         # update existing BoM step with title + instruction + comment
         action = wo.action_propose_change('update_step', wo.check_ids[0].id)
@@ -198,13 +201,13 @@ class TestPickingWorkorderClientActionSuggestImprovement(TestWorkorderClientActi
         self.assertEqual(messages[0].body, Markup('<p>BoM feedback %s (%s - %s)<br><b>New Instruction suggested by Mitchell Admin</b><br><b>Instruction:</b></p><p>%s</p>') % (new_step_title, mo.name, wo.operation_id.name, new_step_note))
         self.assertEqual(messages[1].body, Markup('<p>BoM feedback (%s - %s)<br>New Step suggested by Mitchell Admin<br><b>Title:</b> %s</p>') % (mo.name, wo.operation_id.name, new_step_title))
         self.assertEqual(messages[2].body, Markup('<p>BoM feedback %s (%s - %s)<br><b>New Instruction suggested by Mitchell Admin</b><br><b>Instruction:</b></p><p>%s</p><br><b>Reason:</b> %s<br><b>New Title suggested: %s</b>') % (original_title, mo.name, wo.operation_id.name, updated_note, update_comment, updated_title))
-        self.assertEqual(messages[3].body, Markup('<p>BoM feedback %s (%s - %s)<br><b>New Instruction suggested by Mitchell Admin</b></p>') % (original_title, mo.name, wo.operation_id.name))
+        self.assertEqual(messages[3].body, Markup('<p>BoM feedback %s (%s - %s)<br><b>New Instruction suggested by Mitchell Admin</b><br><b>Instruction:</b></p>%s') % (original_title, mo.name, wo.operation_id.name, original_note))
 
     def test_update_instructions_w_images(self):
         """ 'Update Instructions' for a step in the tablet view via the 'suggest
         worksheet improvement' when images are involved and check that the BoM chatter messages are correct:
         - Step with no image + update with an new_image => instruction should be: completely overwritten (only new_image)
-        - Step with image and text + update only with 'new_text' => instruction should be: 'new_text' + image
+        - Step with image and text + update only with 'new_text' => instruction should be: 'new_text'
         - Step with image + update with new_image + 'new_text' => instruction should be: new_image + 'new_text' """
 
         mo_form = Form(self.env['mrp.production'])
@@ -234,7 +237,7 @@ class TestPickingWorkorderClientActionSuggestImprovement(TestWorkorderClientActi
         update_step_form.note = updated_note
         update_step = update_step_form.save()
         update_step.with_user(self.user_admin).process()
-        self.assertEqual(wo.current_quality_check_id.note, Markup("<p>%s</p>" % updated_note) + image, "Step's note should have been updated to updated text + original image")
+        self.assertEqual(wo.current_quality_check_id.note, Markup("<p>%s</p>") % updated_note, "Step's note should have been updated to updated text")
 
         # update existing BoM step containing text + image instructions with image + text
         action = wo.action_propose_change('update_step', wo.check_ids[1].id)

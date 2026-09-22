@@ -8,17 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-14 15:22+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Czech <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:23+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-master/"
 "delivery_ups_rest/cs/>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_bill_my_account
@@ -77,6 +77,22 @@ msgstr ""
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid "Create an app"
+msgstr ""
+
+#. module: delivery_ups_rest
+#: model:ir.model,name:delivery_ups_rest.model_delivery_carrier
+msgid "Delivery Method"
+msgstr ""
+
+#. module: delivery_ups_rest
+#. odoo-python
+#: code:addons/delivery_ups_rest/models/ups_request.py:0
+msgid ""
+"Detected a problem when validating delivery %(delivery_name)s. Invoicing "
+"address of the commercial invoice has been defaulted to %(ship_to_partner)s "
+"instead of %(sold_to_partner)s to avoid the following error from UPS: \"The "
+"Sold To party's country code must be the same as the Ship To party's country "
+"code with the exception of Canada and satellite countries.\""
 msgstr ""
 
 #. module: delivery_ups_rest
@@ -180,7 +196,7 @@ msgstr ""
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid ""
-"Now go to odoo and create a shipping method for UPS, using Account Number "
+"Now go to odoo and create a delivery method for UPS, using Account Number "
 "(step2) and Client ID + Client Secret (step 8). Also ensure you use correct "
 "dimensions and weight unit for your country"
 msgstr ""
@@ -246,8 +262,8 @@ msgstr "Adresát"
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
-msgid "Recipient Phone must be at least 10 alphanumeric characters."
-msgstr "Telefon příjemce musí mít alespoň 10 alfanumerických znaků."
+msgid "Recipient Phone must be between 1 and 15 alphanumeric characters."
+msgstr ""
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_require_signature
@@ -261,8 +277,8 @@ msgid ""
 "Return label generated<br/><b>Tracking Numbers:</b> %(tracking_numbers)s<br/"
 "><b>Packages:</b> %(packages)s"
 msgstr ""
-"Zpětné štítky generovány<br/><b>Sledovací čísla:</b> %(tracking_numbers)s<br/"
-"><b>Balení:</b> %(packages)s"
+"Zpětné štítky generovány<br/><b>Sledovací čísla:</b> %(tracking_numbers)"
+"s<br/><b>Balení:</b> %(packages)s"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_label_file_type__spl
@@ -285,6 +301,14 @@ msgid "Save and Accept terms and your app is created!"
 msgstr ""
 
 #. module: delivery_ups_rest
+#: model:ir.module.module,summary:base.module_delivery_ups_rest
+msgid ""
+"Send your shippings through UPS and track them online. This new version of "
+"the UPS connector is compatiblewith the newest version of the UPS REST APIs "
+"available at https://developer.ups.com/"
+msgstr ""
+
+#. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_duty_payment__sender
 msgid "Sender"
 msgstr "Odesílatel"
@@ -302,19 +326,14 @@ msgid ""
 "Shipment created into UPS<br/><b>Tracking Numbers:</b> %"
 "(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
 msgstr ""
-"Zásilka vytvořená v UPS <br/><b>Sledovací čísla: </b>%(tracking_numbers)s<br/"
-"><b>Balení:</b>%(packages)s"
+"Zásilka vytvořená v UPS <br/><b>Sledovací čísla: </b>%(tracking_numbers)"
+"s<br/><b>Balení:</b>%(packages)s"
 
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
-msgid "Shipper Phone must be at least 10 alphanumeric characters."
-msgstr "Telefon odesílatele musí mít alespoň 10 alfanumerických znaků."
-
-#. module: delivery_ups_rest
-#: model:ir.model,name:delivery_ups_rest.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Přepravní metody"
+msgid "Shipper Phone must be between 1 and 15 alphanumeric characters."
+msgstr ""
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -491,6 +510,11 @@ msgid "UPS Service Type"
 msgstr "UPS typ služby"
 
 #. module: delivery_ups_rest
+#: model:ir.module.module,shortdesc:base.module_delivery_ups_rest
+msgid "UPS Shipping"
+msgstr ""
+
+#. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__11
 msgid "UPS Standard"
 msgstr ""
@@ -549,8 +573,8 @@ msgstr "Jednotka hmotnosti balíku Ups"
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
-msgid "Warehouse Phone must be at least 10 alphanumeric characters."
-msgstr "Skladový telefon musí mít alespoň 10 alfanumerických znaků."
+msgid "Warehouse Phone must be between 1 and 15 alphanumeric characters."
+msgstr ""
 
 #. module: delivery_ups_rest
 #. odoo-python

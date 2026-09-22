@@ -9,3 +9,4 @@ from . import res_company
 from . import res_config_settings
 from . import pos_order_line
 from . import pos_payment_method
+from . import l10n_de_pos_tss_export

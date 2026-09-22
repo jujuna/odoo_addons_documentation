@@ -2,9 +2,7 @@
 
 {
     'name': 'Lithuania - Payroll with Accounting',
-    'author': 'Odoo',
-    'version': '1.0',
-    'countries': ['lt'],
+    'author': 'Odoo S.A.',
     'category': 'Human Resources',
     'description': """
 Accounting Data for Lithuania Payroll Rules
@@ -19,5 +17,5 @@ Accounting Data for Lithuania Payroll Rules
         'data/l10n_lt_hr_payroll_account_demo.xml',
     ],
     'license': 'OEEL-1',
-    'auto_install': True,
+    'auto_install': ['l10n_lt_hr_payroll', 'hr_payroll_account'],
 }

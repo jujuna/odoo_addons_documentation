@@ -5,7 +5,7 @@ patch(Store.prototype, {
     async getMessagePostParams({ thread }) {
         const params = await super.getMessagePostParams(...arguments);
 
-        if (thread.channel_type === "whatsapp") {
+        if (thread.channel?.channel_type === "whatsapp") {
             params.post_data.message_type = "whatsapp_message";
         }
         return params;

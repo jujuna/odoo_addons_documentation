@@ -1,6 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.addons.survey.tests.common import TestSurveyCommon
+from odoo.tests import tagged
+
 from odoo.addons.documents_spreadsheet.tests.common import SpreadsheetTestCommon
 
 import json
@@ -59,8 +61,8 @@ class DocumentSpreadsheetSurveyAction(TestSurveyCommon, SpreadsheetTestCommon):
         self.assertTrue(test_survey.spreadsheet_document_id.active)
 
         # Survey folder is restored as well
-        folder_id = self.env["ir.config_parameter"].sudo().get_param('documents_spreadsheet_survey.survey_folder', False)
-        folder = self.env["documents.document"].browse(int(folder_id))
+        folder_id = self.env["ir.config_parameter"].sudo().get_int('documents_spreadsheet_survey.survey_folder')
+        folder = self.env["documents.document"].browse(folder_id)
 
         folder.action_archive()
         test_survey.spreadsheet_document_id.action_archive()

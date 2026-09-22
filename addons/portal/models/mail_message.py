@@ -60,19 +60,18 @@ class MailMessage(models.Model):
         """
         return {
             'attachment_ids',
-            'author_avatar_url',
             'author_id',
             'author_guest_id',
             'body',
             'date',
             'id',
+            'is_bookmarked',
             'is_internal',
             'is_message_subtype_note',
             'message_type',
             'model',
             'published_date_str',
             'res_id',
-            'starred',
             'subtype_id',
         }
 
@@ -98,7 +97,7 @@ class MailMessage(models.Model):
             related_attachments = {
                 att_read_values['id']: att_read_values
                 for att_read_values in attachments_sudo.read(
-                    ["checksum", "id", "mimetype", "name", "res_id", "res_model"]
+                    ["checksum", "has_thumbnail", "id", "mimetype", "name", "res_id", "res_model"],
                 )
             }
             message_to_attachments = {
@@ -120,20 +119,13 @@ class MailMessage(models.Model):
             values["body"] = ["markup", values["body"]]
             if message_to_attachments:
                 values['attachment_ids'] = message_to_attachments.get(message.id, {})
-            if 'author_avatar_url' in properties_names:
-                if options and options.get("token"):
-                    values['author_avatar_url'] = f'/mail/avatar/mail.message/{message.id}/author_avatar/50x50?access_token={options["token"]}'
-                elif options and options.get("hash") and options.get("pid"):
-                    values['author_avatar_url'] = f'/mail/avatar/mail.message/{message.id}/author_avatar/50x50?_hash={options["hash"]}&pid={options["pid"]}'
-                else:
-                    values['author_avatar_url'] = f'/web/image/mail.message/{message.id}/author_avatar/50x50'
             if 'is_message_subtype_note' in properties_names:
                 values['is_message_subtype_note'] = (values.get('subtype_id') or [False, ''])[0] == note_id
             if 'published_date_str' in properties_names:
                 values['published_date_str'] = format_datetime(self.env, values['date']) if values.get('date') else ''
             reaction_groups = []
             for content, reactions in groupby(message.sudo().reaction_ids, lambda r: r.content):
-                reactions = self.env["mail.message.reaction"].union(*reactions)
+                reactions = self.env["mail.message.reaction"].union(reactions)
                 reaction_groups.append(
                     {
                         "content": content,
@@ -156,10 +148,29 @@ class MailMessage(models.Model):
                     "author_id": {
                         "id": message.author_id.id,
                         "name": message.author_id.name,
-                    },
-                    "thread": {"model": values["model"], "id": values["res_id"]},
-                }
+                        "avatar_128_access_token": message.author_id._get_avatar_128_access_token(),
+                    } if message.author_id else False,
+                    "thread": {
+                       "has_mail_thread": isinstance(self.env[values["model"]], self.pool["mail.thread"]),
+                       "id": values["res_id"],
+                       "model": values["model"],
+                   },
+                },
             )
+        linked_messages = self.linked_message_ids - self
+        linked_messages_vals_list = linked_messages._read_format({"id", "model", "res_id"})
+        record_by_linked_message = linked_messages._record_by_message()
+        for message, values in zip(linked_messages, linked_messages_vals_list):
+            if record := record_by_linked_message.get(message):
+                values["thread"] = {
+                    "id": record.id,
+                    "model": record._name,
+                    # sudo: mail.thread - reading display_name of accessed thread is acceptable
+                    "display_name": record.sudo().display_name,
+                }
+            else:
+                values["thread"] = False
+        vals_list.extend(linked_messages_vals_list)
         return vals_list
 
     def _portal_message_format_attachments(self, attachment_values):
@@ -173,13 +184,13 @@ class MailMessage(models.Model):
         :rtype: dict
         """
         safari = request and request.httprequest.user_agent and request.httprequest.user_agent.browser == 'safari'
-        attachment_values['filename'] = attachment_values['name']
         attachment_values['mimetype'] = (
             'application/octet-stream' if safari and
             'video' in (attachment_values["mimetype"] or "")
             else attachment_values["mimetype"])
         attachment = self.env['ir.attachment'].browse(attachment_values['id'])
         attachment_values["raw_access_token"] = attachment._get_raw_access_token()
+        attachment_values["thumbnail_access_token"] = attachment._get_thumbnail_token()
         if self.is_current_user_or_guest_author:
             attachment_values["ownership_token"] = attachment._get_ownership_token()
         return attachment_values

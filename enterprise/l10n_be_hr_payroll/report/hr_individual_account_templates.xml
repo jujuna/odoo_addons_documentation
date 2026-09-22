@@ -28,7 +28,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Company number</td>
-                                                    <td><span t-field="company_id.l10n_be_company_number"/></td>
+                                                    <td><span t-field="payroll_config_id.l10n_be_company_number"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Joint committee</td>
@@ -44,15 +44,47 @@
                                                 </tr>
                                                 <tr>
                                                     <td>ONSS Number</td>
-                                                    <td><span t-field="company_id.dmfa_employer_class"/><span t-field="company_id.onss_registration_number"/></td>
+                                                    <td><span t-field="payroll_config_id.l10n_be_employer_category_id.dmfa_code"/><span t-field="payroll_config_id.onss_registration_number"/></td>
                                                 </tr>
-                                                <tr>
+                                                <tr t-if="report_data['version'].is_employee()">
                                                     <td>Accident insurance organization</td>
-                                                    <td><span t-field="company_id.accident_insurance_name"/></td>
+                                                    <td><span t-field="payroll_config_id.employee_accident_insurance_name"/></td>
                                                 </tr>
-                                                <tr>
+                                                <tr t-if="report_data['version'].is_employee()">
                                                     <td>Work accident policy number</td>
-                                                    <td><span t-field="company_id.accident_insurance_number"/></td>
+                                                    <td><span t-field="payroll_config_id.employee_accident_insurance_number"/></td>
+                                                </tr>
+                                                <tr t-if="report_data['version'].is_worker()">
+                                                    <td>Accident insurance organization</td>
+                                                    <td><span t-field="payroll_config_id.worker_accident_insurance_name"/></td>
+                                                </tr>
+                                                <tr t-if="report_data['version'].is_worker()">
+                                                    <td>Work accident policy number</td>
+                                                    <td><span t-field="payroll_config_id.worker_accident_insurance_number"/></td>
+                                                </tr>
+                                                <tr t-if="payroll_config_id.group_insurance_name">
+                                                    <td>Group insurance name</td>
+                                                    <td><span t-field="payroll_config_id.group_insurance_name"/></td>
+                                                </tr>
+                                                <tr t-if="payroll_config_id.group_insurance_number">
+                                                    <td>Group insurance number</td>
+                                                    <td><span t-field="payroll_config_id.group_insurance_number"/></td>
+                                                </tr>
+                                                <tr t-if="report_data['version'].is_worker()">
+                                                    <td>Holiday pay fund</td>
+                                                    <td><span t-out="payroll_config_id.l10n_be_holiday_pay_fund_name"/></td>
+                                                </tr>
+                                                <tr t-if="report_data['version'].is_worker()">
+                                                    <td>Holiday pay fund number</td>
+                                                    <td><span t-out="payroll_config_id.l10n_be_holiday_pay_fund_number"/></td>
+                                                </tr>
+                                                <tr t-if="payroll_config_id.l10n_be_SEPPT_name">
+                                                    <td>External service for prevention and protection at work name</td>
+                                                    <td><span t-out="payroll_config_id.l10n_be_SEPPT_name"/></td>
+                                                </tr>
+                                                <tr t-if="payroll_config_id.l10n_be_SEPPT_number">
+                                                    <td>External service for prevention and protection at work number</td>
+                                                    <td><span t-out="payroll_config_id.l10n_be_SEPPT_number"/></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -82,7 +114,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Number of tax dependents</td>
-                                                    <td><span t-out="employee.children + employee.other_senior_dependent + employee.other_juniors_dependent"/></td>
+                                                    <td><span t-out="employee.other_dependents"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>National Register Identification Number</td>
@@ -90,15 +122,15 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Legal nature of the contract</td>
-                                                    <td>Employee</td>
+                                                    <td><span t-out="report_data['version'].employee_type_id.name"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Function held</td>
-                                                    <td><span t-out="(employee.job_id or employee.version_id.job_id).name"/></td>
+                                                    <td><span t-out="report_data['version'].job_id.name"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Professional qualification</td>
-                                                    <td><span t-out="(employee.job_id or employee.version_id.job_id).l10n_be_scale_category"/></td>
+                                                    <td><span t-out="report_data['version'].l10n_be_salary_scale_id.name"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Entry date</td>
@@ -106,7 +138,11 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Departure date</td>
-                                                    <td><span t-field="employee.end_notice_period"/></td>
+                                                    <td><span t-field="employee.departure_date"/></td>
+                                                </tr>
+                                                <tr t-if="employee.l10n_be_apprenticeship_contract_number">
+                                                    <td>Apprenticeship Contract Number</td>
+                                                    <td><span t-field="employee.l10n_be_apprenticeship_contract_number"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Workplace</td>
@@ -114,15 +150,15 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Gross wage</td>
-                                                    <td><span t-field="employee.version_id.wage_on_signature"/></td>
+                                                    <td><span t-field="report_data['version'].wage"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Remuneration payment frequency</td>
-                                                    <td><span t-field="employee.version_id.schedule_pay"/></td>
+                                                    <td><span t-field="report_data['version'].schedule_pay"/></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Current work regime</td>
-                                                    <td><span t-field="employee.version_id.resource_calendar_id.hours_per_week"/> hours/week</td>
+                                                    <td><span t-field="report_data['version'].resource_calendar_id.hours_per_week"/> hours/week</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -211,7 +247,7 @@
                                             <td><span t-out="name" style="white-space: normal; word-wrap: break-word; max-width: 300px; display: block;">Demo Name</span></td>
                                             <t t-foreach="[0,1,2,3,4,5,6,7,8,9,10,11]" t-as="m">
                                                 <t t-if="value[m]['total'] != 0">
-                                                    <td class="text-end"><t t-esc="round(value[m]['total'], 2)"/></td>
+                                                    <td class="text-end"><t t-out="round(value[m]['total'], 2)"/></td>
                                                 </t>
                                                 <t t-else="">
                                                     <td class="text-center">/</td>

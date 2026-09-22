@@ -1,10 +1,8 @@
 
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Quality Base',
-    'version': '1.0',
     'category': 'Supply Chain/Quality',
     'sequence': 50,
     'summary': 'Basic Feature for Quality',
@@ -20,10 +18,10 @@ Quality Base
 """,
     'data': [
         'security/quality.xml',
-        'security/ir.model.access.csv',
         'data/mail_alias_data.xml',
         'data/quality_data.xml',
         'views/quality_views.xml',
+        'security/ir.access.csv',
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',

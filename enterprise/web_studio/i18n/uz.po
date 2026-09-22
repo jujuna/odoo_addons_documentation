@@ -14,15 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:41+0000\n"
-"PO-Revision-Date: 2025-10-08 18:43+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-18 17:46+0000\n"
+"PO-Revision-Date: 2026-09-18 00:27+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-master/"
+"web_studio/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: web_studio
 #. odoo-python
@@ -56,18 +58,23 @@ msgstr ""
 "xabarini ham o‘zgartirishingiz mumkin).</p>"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/interactive_editor.js:0
-#, fuzzy
+#: model:ir.module.module,description:base.module_web_studio
 msgid ""
 "\n"
-"    There are no many2one fields related to the current model.\n"
-"    To create a one2many field on the current model, you must first create "
-"its many2one counterpart on the model you want to relate to.\n"
+"Studio - Customize Odoo\n"
+"=======================\n"
+"\n"
+"This addon allows the user to customize most element of the user interface, "
+"in a\n"
+"simple and graphical way. It has two main features:\n"
+"\n"
+"* create a new application (add module, top level menu item, and default "
+"action)\n"
+"* customize an existing application (edit menus, actions, views, "
+"translations, ...)\n"
+"\n"
+"Note: Only the admin user is allowed to make those customizations.\n"
 msgstr ""
-"Joriy model bilan bog‘liq many2one maydonlari mavjud emas.     Joriy modelda "
-"one2many maydonini yaratish uchun, avval siz bog‘lamoqchi bo‘lgan modelda "
-"uning many2one ekvivalentini yaratishingiz kerak."
 
 #. module: web_studio
 #. odoo-python
@@ -101,9 +108,14 @@ msgstr "%s gacha"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor.xml:0
-#, fuzzy
 msgid "\" failed."
-msgstr "\" muvaffaqiyatsiz tugadi."
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.xml:0
+msgid "# Code editor"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -115,13 +127,8 @@ msgstr "%(user_name)s tasdiqlash huquqlarini %(delegate_to)sga topshirdi"
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/studio_approval.py:0
-#, fuzzy
-msgid ""
-"%(user_name)s has set approval rights from %(previous_approvers)s to %"
-"(next_approvers)s"
+msgid "%(user_name)s has set approval rights from %(pre)s to %(post)s"
 msgstr ""
-"%(user_name)s tasdiqlash huquqlarini %(previous_approvers)sdan %"
-"(next_approvers)sga o‘zgartirdi"
 
 #. module: web_studio
 #. odoo-python
@@ -153,23 +160,20 @@ msgstr "%s ta yozuv"
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_kanban_view
-#, fuzzy
 msgid ""
-"<i role=\"img\" class=\"fa fa-user-times\" title=\"Exclusive approval\"/>"
-msgstr "<i role=\"img\" class=\"fa fa-user-times\" title=\"Maxsus ruxsat\"/>"
+"<i role=\"img\" class=\"oi oi-filled\" data-icon=\"person_remove\" "
+"title=\"Exclusive approval\"/>"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/controllers/main.py:0
-#, fuzzy
 msgid ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                Add a new access control list\n"
+"                Add a new access record\n"
 "            </p>\n"
 "            "
 msgstr ""
-"<p class=\"o_view_nocontent_smiling_face\">Yangi kirish huquqlarini nazorat "
-"qilish ro‘yxatini qo‘shing</p>"
 
 #. module: web_studio
 #. odoo-python
@@ -194,6 +198,12 @@ msgstr ""
 "muvaffaqiyatli yakunladingiz.</span>"
 
 #. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
+msgid "A child rule must operates on the same model as its main rule"
+msgstr ""
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/view_editor_model.js:0
 #, fuzzy
@@ -216,62 +226,49 @@ msgstr ""
 "ikkalasiga birdan emas."
 
 #. module: web_studio
-#: model:ir.model.constraint,message:web_studio.constraint_studio_approval_rule_method_or_action_not_null
-#, fuzzy
-msgid "A rule must apply to an action or a method."
-msgstr ""
-"Qoida albatta biror harakatga yoki uslubga nisbatan qo‘llanilishi shart."
-
-#. module: web_studio
-#: model:ir.model.fields,field_description:web_studio.field_ir_model__abstract
-#, fuzzy
-msgid "Abstract Model"
-msgstr "Abstrakt model"
-
-#. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/editor/editor_menu/editor_menu.js:0
-#, fuzzy
-msgid "Access Control"
-msgstr "Kirish nazorati"
-
-#. module: web_studio
-#. odoo-python
-#: code:addons/web_studio/controllers/main.py:0
-#, fuzzy
-msgid "Access Control Lists"
-msgstr "Kirish huquqlarini nazorat qilish ro‘yxatlari"
-
-#. module: web_studio
+#: code:addons/web_studio/static/src/client_action/action_editor/action_editor.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_model.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/limit_group_visibility/limit_group_visibility.js:0
 #: model:ir.model,name:web_studio.model_res_groups
 #, fuzzy
 msgid "Access Groups"
 msgstr "Kirish guruhlari"
 
 #. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/controllers/main.py:0
+msgid "Access Records"
+msgstr ""
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/pivot/pivot_editor_sidebar.xml:0
-#, fuzzy
 msgid "Access records from cell"
-msgstr "Katak (yacheyka)dagi ma'lumotlarga kirish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
-#, fuzzy
 msgid "Access records from graph"
-msgstr "Grafikdan ma'lumotlarga kirish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
+#: model:ir.model,name:web_studio.model_ir_actions_actions
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__action_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__action_id
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_search_view
 #, fuzzy
 msgid "Action"
 msgstr "Harakat"
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_ir_actions_report__name
+msgid "Action Name"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__message_needaction
@@ -290,6 +287,12 @@ msgstr "Amaliyot oynasi"
 #, fuzzy
 msgid "Action Window View"
 msgstr "Amallar oynasi ko‘rinishi"
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
+msgid "Action disabled due to approval rules"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -315,7 +318,6 @@ msgstr "Harakat: %s"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/editor_menu/editor_menu.js:0
-#: model:ir.model,name:web_studio.model_ir_actions_actions
 #, fuzzy
 msgid "Actions"
 msgstr "Amallar"
@@ -363,10 +365,15 @@ msgstr "Bu modelda faoliyat ko‘rinishi mavjud emas"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+msgid "Add"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/chatter_container.xml:0
-#, fuzzy
 msgid "Add Chatter Widget"
-msgstr "Chatter vidjetini qo‘shish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -385,14 +392,6 @@ msgstr "Tugma qo‘shish"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/action_button/action_button.xml:0
-#, fuzzy
-msgid "Add a button"
-msgstr "Tugma qo‘shish"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
 #, fuzzy
 msgid "Add a pipeline status bar"
 msgstr "Jarayon holati panelini qo‘shish"
@@ -400,9 +399,14 @@ msgstr "Jarayon holati panelini qo‘shish"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
-#, fuzzy
 msgid "Add an approval step"
-msgstr "Tasdiqlash bosqichini qo‘shish"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Add button"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -431,6 +435,12 @@ msgstr "Pastki qismga yozuv qo‘shish"
 #, fuzzy
 msgid "Add record on top"
 msgstr "Yuqori qismga yozuv qo‘shish"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/editor_statusbar_widget.xml:0
+msgid "Add stage"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard__additional_export_data
@@ -477,20 +487,8 @@ msgstr "Umumlashtirish"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
-#, fuzzy
 msgid "All Day"
-msgstr "Butun kun"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#, fuzzy
-msgid ""
-"All changes done to the report's structure will be discarded and the report "
-"will be reset to its factory settings."
 msgstr ""
-"Hisobot tuzilishiga kiritilgan barcha o‘zgarishlar bekor qilinadi va hisobot "
-"dastlabki sozlamalarga qaytariladi."
 
 #. module: web_studio
 #. odoo-javascript
@@ -504,13 +502,6 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
-#, fuzzy
-msgid "Allow Resequencing"
-msgstr "Qayta tartiblashga ruxsat berish"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/limit_group_visibility/limit_group_visibility.xml:0
 #, fuzzy
 msgid "Allow visibility to groups"
@@ -518,12 +509,16 @@ msgstr "Guruhlarga ko‘rinishiga ruxsat berish"
 
 #. module: web_studio
 #. odoo-javascript
-#. odoo-python
-#: code:addons/web_studio/models/studio_approval.py:0
 #: code:addons/web_studio/static/src/approval/approval_hook.js:0
 #, fuzzy
 msgid "An approval is missing"
 msgstr "Tasdiqlash yetishmayapti"
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
+msgid "An approval is missing."
+msgstr ""
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_delegate_approvers
@@ -553,12 +548,10 @@ msgstr "Tasdiqlash guruhi"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
-#, fuzzy
 msgid "Approval Order"
-msgstr "Tasdiqlash tartibi"
+msgstr ""
 
 #. module: web_studio
-#: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__rule_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_request__rule_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_delegate__approval_rule_id
 #, fuzzy
@@ -621,6 +614,8 @@ msgstr "Tasdiqlash"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__approved
+#: model:ir.model.fields.selection,name:web_studio.selection__studio_approval_entry__state__approved
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 #, fuzzy
 msgid "Approved"
@@ -628,16 +623,21 @@ msgstr "Tasdiqlangan"
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.notify_approval
-#, fuzzy
-msgid "Approved <i class=\"fa fa-thumbs-up text-success\"/>"
-msgstr "Tasdiqlandi <i class=\"fa fa-thumbs-up text-success\"/>"
+msgid ""
+"Approved <i class=\"oi oi-filled text-success\" data-icon=\"thumb_up\"/>"
+msgstr ""
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
+msgid "Approved by"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/approval/approval_infos.xml:0
-#, fuzzy
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
 msgid "Approved on"
-msgstr "Tasdiqlangan sana"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__user_id
@@ -648,9 +648,8 @@ msgstr "Tasdiqlagan/rad etgan shaxs"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
-#, fuzzy
 msgid "Approver Group"
-msgstr "Tasdiqlovchilar guruhi"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__approver_log_ids
@@ -693,7 +692,15 @@ msgstr "Arxivlash"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.js:0
+msgid ""
+"Are you sure you want to remove the %(node)s %(field)s from the view?\n"
+"If you need it back, add it from the list of existing fields."
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/view_editor_model.js:0
 #, fuzzy
 msgid "Are you sure you want to remove the selection values?"
 msgstr "Haqiqatan ham tanlangan qiymatlarni olib tashlamoqchimisiz?"
@@ -701,9 +708,8 @@ msgstr "Haqiqatan ham tanlangan qiymatlarni olib tashlamoqchimisiz?"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.js:0
-#, fuzzy
-msgid "Are you sure you want to remove this %s from the view?"
-msgstr "Haqiqatan ham ushbu %sni ko‘rinishdan olib tashlamoqchimisiz?"
+msgid "Are you sure you want to remove this %(node)s from the view?"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -775,9 +781,8 @@ msgstr "Biriktirmalar"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/search/search_editor.xml:0
-#, fuzzy
 msgid "Autocompletion Fields"
-msgstr "Avtoto‘ldirish maydonlari"
+msgstr ""
 
 #. module: web_studio
 #: model_terms:ir.actions.act_window,help:web_studio.webhook_automation_act
@@ -857,9 +862,8 @@ msgstr "To‘silgan"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
-#, fuzzy
 msgid "Bold"
-msgstr "Qalin"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -880,9 +884,8 @@ msgstr "Tugma"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/properties/aside_properties/aside_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/properties/div_properties/div_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/properties/footer_properties/footer_properties.xml:0
-#, fuzzy
 msgid "CSS style"
-msgstr "CSS uslubi"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -905,34 +908,31 @@ msgstr "Usulni chaqirish"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
-#, fuzzy
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
 msgid "Can Create"
-msgstr "Yaratish mumkin"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_sidebar/form_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
-#, fuzzy
 msgid "Can Delete"
-msgstr "O‘chirish mumkin"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_sidebar/form_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
-#, fuzzy
 msgid "Can Duplicate"
-msgstr "Nusxalash mumkin"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_sidebar/form_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
-#, fuzzy
 msgid "Can Edit"
-msgstr "Tahrirlash mumkin"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__can_validate
@@ -957,24 +957,6 @@ msgstr "Maxfiy usullarni tuzatib bo‘lmaydi."
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/editor/app_menu_editor/app_menu_editor.xml:0
-#: code:addons/web_studio/static/src/client_action/editor/new_model_item/new_model_item.xml:0
-#: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/map_new_view_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/new_view_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
-#: code:addons/web_studio/static/src/client_action/studio_home_menu/icon_creator_dialog/icon_creator_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/components/field_selector_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:web_studio.view_studio_export_wizard
-#, fuzzy
-msgid "Cancel"
-msgstr "Bekor qilish"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/model_configurator/model_configurator.js:0
 #, fuzzy
 msgid "Categorize records with custom tags"
@@ -983,23 +965,20 @@ msgstr "Yozuvlarni maxsus teglar bilan turkumlash"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/navbar/home_menu_customizer/home_menu_customizer.xml:0
-#, fuzzy
 msgid "Change Background"
-msgstr "Fon rangini o‘zgartirish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/rainbow_effect.xml:0
-#, fuzzy
 msgid "Change Image"
-msgstr "Rasmni o‘zgartirish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-#, fuzzy
-msgid "Change the placeholder or the expression for an existing field"
-msgstr "Mavjud maydon uchun to‘ldiruvchi yoki ifodani o‘zgartirish"
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Changes to this shared block will affect other reports using it"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1020,6 +999,11 @@ msgstr "Belgilash katakchasi"
 #, fuzzy
 msgid "Checked if it has been edited with Studio."
 msgstr "Studio bilan tahrirlangani tekshirilsin."
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__child_ids
+msgid "Child"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1045,9 +1029,8 @@ msgstr "Yo‘qotish"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/class_attribute/class_attribute.xml:0
-#, fuzzy
 msgid "Class"
-msgstr "Sinf"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1060,7 +1043,6 @@ msgstr "Barcha tasdiqlash qoidalarini ko‘rish uchun bosing."
 #. odoo-javascript
 #: code:addons/web_studio/static/src/approval/approval_infos.xml:0
 #: code:addons/web_studio/static/src/client_action/navbar/navbar.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
 #: code:addons/web_studio/static/src/client_action/xml_resource_editor/xml_resource_editor.xml:0
 #, fuzzy
 msgid "Close"
@@ -1101,28 +1083,21 @@ msgstr "Ustun"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
-#, fuzzy
 msgid "Column Width (px)"
-msgstr "Ustun kengligi (px)"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/pivot/pivot_editor_sidebar.xml:0
-#, fuzzy
 msgid "Column grouping"
-msgstr "Ustunlarni guruhlash"
-
-#. module: web_studio
-#: model:ir.model,name:web_studio.model_res_company
-#, fuzzy
-msgid "Companies"
-msgstr "Kompaniyalar"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 #: code:addons/web_studio/static/src/client_action/model_configurator/model_configurator.js:0
+#: model:ir.model,name:web_studio.model_res_company
 #, fuzzy
 msgid "Company"
 msgstr "Kompaniya"
@@ -1137,10 +1112,15 @@ msgstr "Komponentlar"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Condition"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
-#, fuzzy
 msgid "Conditional"
-msgstr "Shartli"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__conditional
@@ -1182,9 +1162,8 @@ msgstr "Eksport qilish uchun ma'lumotlar va namoyish ma'lumotlarini sozlash"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.xml:0
-#, fuzzy
 msgid "Configure model"
-msgstr "Modelni sozlash"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1193,8 +1172,7 @@ msgstr "Modelni sozlash"
 #: code:addons/web_studio/static/src/client_action/studio_home_menu/icon_creator_dialog/icon_creator_dialog.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/field_selector_dialog.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.xml:0
 #, fuzzy
 msgid "Confirm"
 msgstr "Tasdiqlash"
@@ -1261,6 +1239,12 @@ msgstr "Fonni o‘zgartirib bo‘lmadi"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.js:0
+msgid "Create %(name)s (%(technical_name)s)"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.js:0
 #, fuzzy
 msgid "Create Menu"
@@ -1279,6 +1263,11 @@ msgstr "Model yaratish"
 #, fuzzy
 msgid "Create a new Model"
 msgstr "Yangi model yaratish"
+
+#. module: web_studio
+#: model:ir.module.module,summary:base.module_web_studio
+msgid "Create and customize your Odoo apps"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1405,41 +1394,10 @@ msgid "Custom field names cannot contain double underscores."
 msgstr "Maxsus maydon nomlarida ikkita pastki chiziq bo‘lishi mumkin emas."
 
 #. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-#, fuzzy
-msgid "Custom fields:"
-msgstr "Maxsus maydonlar:"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-#, fuzzy
-msgid "Custom models:"
-msgstr "Maxsus modellar:"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-#, fuzzy
-msgid "Custom reports:"
-msgstr "Maxsus hisobotlar:"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-#, fuzzy
-msgid "Custom views:"
-msgstr "Maxsus ko‘rinishlar:"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
-#, fuzzy
-msgid "Customization made with Studio will be permanently lost"
-msgstr "Studio yordamida qilingan moslashtirishlar butunlay yo‘qoladi"
-
-#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
-#, fuzzy
-msgid "DIFF"
-msgstr "FARQ"
+msgid "Customizations"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1447,6 +1405,8 @@ msgstr "FARQ"
 #: code:addons/web_studio/models/ir_model.py:0
 #: code:addons/web_studio/models/ir_ui_view.py:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/view_fields.js:0
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_tree_view
 #, fuzzy
 msgid "Date"
 msgstr "Sana"
@@ -1489,9 +1449,8 @@ msgstr "Kun"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
-#, fuzzy
 msgid "Day Precision"
-msgstr "Kunlik aniqlik"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1499,6 +1458,18 @@ msgstr "Kunlik aniqlik"
 #, fuzzy
 msgid "Decimal"
 msgstr "O‘nlik son"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_widget_properties.xml:0
+msgid "Decoration"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_widget_properties.xml:0
+msgid "Decoration Condition"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -1510,9 +1481,8 @@ msgstr "%(model)s uchun standart %(view_type)s ko‘rinishi"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
-#, fuzzy
 msgid "Default Display Mode"
-msgstr "Standart ko‘rsatish rejimi"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard__default_export_data
@@ -1525,39 +1495,38 @@ msgstr "Standart eksport ma'lumotlari"
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
-#, fuzzy
 msgid "Default Group By"
-msgstr "Standart guruhlash"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
-#, fuzzy
 msgid "Default Group by"
-msgstr "Standart guruhlash"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
-#, fuzzy
 msgid "Default Scale"
-msgstr "Standart masshtab"
+msgstr ""
+
+#. module: web_studio
+#: model:ir.model,name:web_studio.model_ir_default
+msgid "Default Value"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/interactive_editor.js:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox.xml:0
-#: model:ir.model,name:web_studio.model_ir_default
-#, fuzzy
 msgid "Default Values"
-msgstr "Standart qiymatlar"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
-#, fuzzy
 msgid "Default value"
-msgstr "Standart qiymat"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1592,13 +1561,6 @@ msgid "Defines the sequential order in which the approvals are requested."
 msgstr "Roziliklar so‘raladigan ketma-ketlik tartibini belgilaydi."
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
-#, fuzzy
-msgid "Delay Field"
-msgstr "Kechikish maydoni"
-
-#. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_kanban_view
 #, fuzzy
@@ -1621,6 +1583,12 @@ msgstr "Vakolat berish"
 #, fuzzy
 msgid "Delete"
 msgstr "O‘chirish"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/view_editor_model.js:0
+msgid "Delete Values"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_model__is_demo_data
@@ -1665,14 +1633,29 @@ msgstr "Belgingizni yarating"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.xml:0
-#, fuzzy
 msgid "Disable View"
-msgstr "Ko‘rinishni o‘chirish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_snackbar.xml:0
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_delegate_approvers
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+msgid "Disabled"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/editor/app_menu_editor/app_menu_editor.xml:0
+#: code:addons/web_studio/static/src/client_action/editor/new_model_item/new_model_item.xml:0
+#: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/map_new_view_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/new_view_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
+#: code:addons/web_studio/static/src/client_action/studio_home_menu/icon_creator_dialog/icon_creator_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/components/field_selector_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.xml:0
 #, fuzzy
 msgid "Discard"
 msgstr "Bekor qilish"
@@ -1687,13 +1670,13 @@ msgstr "O‘zgarishlarni bekor qilish"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
-#, fuzzy
 msgid "Display Mode"
-msgstr "Ko‘rsatish rejimi"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_base_automation__display_name
 #: model:ir.model.fields,field_description:web_studio.field_base_module_uninstall__display_name
+#: model:ir.model.fields,field_description:web_studio.field_ir_access__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_act_window__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_act_window_view__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_actions__display_name
@@ -1703,12 +1686,10 @@ msgstr "Ko‘rsatish rejimi"
 #: model:ir.model.fields,field_description:web_studio.field_ir_filters__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_http__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_model__display_name
-#: model:ir.model.fields,field_description:web_studio.field_ir_model_access__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_data__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_fields__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_module_module__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_qweb__display_name
-#: model:ir.model.fields,field_description:web_studio.field_ir_rule__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_menu__display_name
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_view__display_name
 #: model:ir.model.fields,field_description:web_studio.field_mail_activity__display_name
@@ -1734,16 +1715,14 @@ msgstr "Ko‘rsatiladigan nom"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
-#, fuzzy
 msgid "Display Total row"
-msgstr "Jami qatorni ko‘rsatish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
-#, fuzzy
 msgid "Display Unavailability"
-msgstr "Mavjud emaslikni ko‘rsatish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1784,9 +1763,14 @@ msgstr ""
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/app_menu_editor/app_menu_editor.xml:0
-#, fuzzy
 msgid "Drag a menu to the right to create a sub-menu"
-msgstr "Pastki menyu yaratish uchun menyuni o‘ngga suring"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Drop a Many2One or Selection field"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1809,8 +1793,10 @@ msgid "Dynamic Table"
 msgstr "Dinamik jadval"
 
 #. module: web_studio
+#. odoo-javascript
 #. odoo-python
 #: code:addons/web_studio/models/ir_ui_view.py:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
 #, fuzzy
 msgid "Edit"
 msgstr "Tahrirlash"
@@ -1838,6 +1824,12 @@ msgstr "Rang tanlash vositasini tahrirlash"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.xml:0
+msgid "Edit Condition"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/app_menu_editor/app_menu_editor.xml:0
 #, fuzzy
 msgid "Edit Menu"
@@ -1846,16 +1838,26 @@ msgstr "Menyuni tahrirlash"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
-#, fuzzy
-msgid "Edit Values"
-msgstr "Qiymatlarni tahrirlash"
+msgid "Edit Stages"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-#, fuzzy
-msgid "Edit field"
-msgstr "Maydonni tahrirlash"
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.js:0
+msgid "Edit Stages for field %s"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
+msgid "Edit Values"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Edit report action"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1863,13 +1865,6 @@ msgstr "Maydonni tahrirlash"
 #, fuzzy
 msgid "Edit selection"
 msgstr "Tanlovni tahrirlash"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#, fuzzy
-msgid "Edit sources"
-msgstr "Manbalarni tahrirlash"
 
 #. module: web_studio
 #. odoo-javascript
@@ -1885,9 +1880,14 @@ msgstr ""
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
-#, fuzzy
 msgid "Editing item:"
-msgstr "Tahrirlanayotgan element:"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor.js:0
+msgid "Editor"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -1898,9 +1898,8 @@ msgstr "Elektron pochta"
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_mail_template
-#, fuzzy
-msgid "Email Templates"
-msgstr "Elektron pochta andozalari"
+msgid "Email Template"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_mail_thread
@@ -1918,16 +1917,8 @@ msgstr "Bo‘sh ro‘yxat xabari"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
-#, fuzzy
 msgid "Enable Mass Editing"
-msgstr "Ommaviy tahrirlashni yoqish"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
-#, fuzzy
-msgid "Enable Routing"
-msgstr "Yo‘naltirishni yoqish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -1939,6 +1930,7 @@ msgstr "Tugash sanasi"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__entry_ids
+#: model:ir.ui.menu,name:web_studio.menu_studio_approval_entry
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view
 #, fuzzy
 msgid "Entries"
@@ -1976,9 +1968,8 @@ msgstr "Eksklyuziv tasdiqlash"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/view_fields.xml:0
-#, fuzzy
 msgid "Existing Fields"
-msgstr "Mavjud maydonlar"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -1990,9 +1981,8 @@ msgstr "Mavjud model"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
-#, fuzzy
 msgid "Expand Groups"
-msgstr "Guruhlarni kengaytirish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -2002,6 +1992,12 @@ msgstr "Guruhlarni kengaytirish"
 #, fuzzy
 msgid "Export"
 msgstr "Eksport"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_simple_dialog.js:0
+msgid "Expression is invalid. Please correct it"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -2040,10 +2036,9 @@ msgstr "Sevimlilar"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/field_selector_dialog.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+#: model:ir.model,name:web_studio.model_ir_model_fields
 #, fuzzy
 msgid "Field"
 msgstr "Maydon"
@@ -2063,10 +2058,13 @@ msgid "Field properties: %s"
 msgstr "Maydon xususiyatlari: %s"
 
 #. module: web_studio
-#: model:ir.model,name:web_studio.model_ir_model_fields
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/pivot/pivot_editor.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.js:0
 #, fuzzy
 msgid "Fields"
-msgstr "Maydonlar"
+msgstr "Maydon"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_model__excluded_fields
@@ -2093,6 +2091,7 @@ msgstr "%s uchun fayl nomi"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/search/search_editor.js:0
+#: model:ir.model,name:web_studio.model_ir_filters
 #, fuzzy
 msgid "Filter"
 msgstr "Filtr"
@@ -2109,38 +2108,27 @@ msgstr "Filtrlash qoidalari"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.xml:0
-#, fuzzy
 msgid "Filter label"
-msgstr "Filtr yorlig‘i"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/search/search_editor.xml:0
-#: model:ir.model,name:web_studio.model_ir_filters
 #, fuzzy
 msgid "Filters"
 msgstr "Filtrlar"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-#, fuzzy
-msgid "First Status"
-msgstr "Boshlang‘ich holat"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
-#, fuzzy
 msgid "First dimension"
-msgstr "Birinchi o‘lcham"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
-#, fuzzy
 msgid "Fold By"
-msgstr "Bo‘yicha buklash"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__message_follower_ids
@@ -2195,6 +2183,8 @@ msgstr "Shakl"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
 #: code:addons/web_studio/static/src/client_action/xml_resource_editor/xml_resource_editor.xml:0
 #, fuzzy
 msgid "Format"
@@ -2206,6 +2196,12 @@ msgstr "Format"
 #, fuzzy
 msgid "Forward"
 msgstr "Oldinga"
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/ir_ui_view.py:0
+msgid "Future Activities"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -2235,13 +2231,6 @@ msgstr "%s ko‘rinishini yaratish"
 #, fuzzy
 msgid "Get contact, phone and email fields on records"
 msgstr "Yozuvlardagi kontakt, telefon va elektron pochta maydonlarini olish"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.js:0
-#, fuzzy
-msgid "Go back"
-msgstr "Orqaga qaytish"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2312,6 +2301,12 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Groups"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/components/view_fields.js:0
 #, fuzzy
 msgid "HTML"
@@ -2345,22 +2340,10 @@ msgstr "Xabar mavjud"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#, fuzzy
-msgid ""
-"Header and footer are shared with other reports which may be impacted by the "
-"reset."
-msgstr ""
-"Sarlavha va kolontitul boshqa hisobotlar bilan ulashiladi, ular tiklash "
-"tufayli ta'sirlanishi mumkin."
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
-#, fuzzy
 msgid "Help Tooltip"
-msgstr "Yordam ko‘rsatmasi"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -2375,17 +2358,21 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
-#, fuzzy
-msgid "Hide Address"
-msgstr "Manzilni yashirish"
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Hidden"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
-#, fuzzy
+msgid "Hide Address"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
 msgid "Hide Name"
-msgstr "Nomni yashirish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -2404,9 +2391,14 @@ msgstr "Yuqori ustuvorlik"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
-#, fuzzy
 msgid "Highlight Color Field"
-msgstr "Ajratib ko‘rsatish rangi maydoni"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
+msgid "History"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_res_company__background_image
@@ -2451,6 +2443,7 @@ msgstr ""
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_base_automation__id
 #: model:ir.model.fields,field_description:web_studio.field_base_module_uninstall__id
+#: model:ir.model.fields,field_description:web_studio.field_ir_access__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_act_window__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_act_window_view__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_actions_actions__id
@@ -2460,12 +2453,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:web_studio.field_ir_filters__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_http__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_model__id
-#: model:ir.model.fields,field_description:web_studio.field_ir_model_access__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_data__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_fields__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_module_module__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_qweb__id
-#: model:ir.model.fields,field_description:web_studio.field_ir_rule__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_menu__id
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_view__id
 #: model:ir.model.fields,field_description:web_studio.field_mail_activity__id
@@ -2497,6 +2488,7 @@ msgstr "ID raqamlari"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
 #, fuzzy
 msgid "Icon"
@@ -2514,15 +2506,6 @@ msgstr "Agar belgilansa, yangi xabarlar e'tiboringizni talab qiladi."
 #, fuzzy
 msgid "If checked, some messages have a delivery error."
 msgstr "Agar belgilansa, ba'zi xabarlarda yetkazib berish xatosi mavjud."
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
-#, fuzzy
-msgid "If not set, the width is automatically computed to fit optimally"
-msgstr ""
-"Agar o‘rnatilmasa, kenglik optimal moslashtirish uchun avtomatik ravishda "
-"hisoblanadi"
 
 #. module: web_studio
 #: model:ir.model.fields,help:web_studio.field_studio_export_model__include_attachment
@@ -2623,13 +2606,6 @@ msgid "Include Demo Data"
 msgstr "Namoyish ma'lumotlarini kiritish"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#, fuzzy
-msgid "Include header and footer"
-msgstr "Sarlavha va kolontitulni kiritish"
-
-#. module: web_studio
 #: model:ir.model.fields,help:web_studio.field_ir_ui_menu__is_studio_configuration
 #, fuzzy
 msgid ""
@@ -2638,20 +2614,6 @@ msgid ""
 msgstr ""
 "Bu menyu Studio tomonidan sozlash qism menyularini saqlash uchun "
 "yaratilganini bildiradi"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
-#, fuzzy
-msgid "Insert"
-msgstr "Kiritish"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-#, fuzzy
-msgid "Insert a field"
-msgstr "Maydon kiritish"
 
 #. module: web_studio
 #. odoo-javascript
@@ -2698,9 +2660,8 @@ msgstr "Ichki"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor_sidebar.xml:0
-#, fuzzy
 msgid "Interval"
-msgstr "Oraliq"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -2708,13 +2669,6 @@ msgstr "Oraliq"
 #, fuzzy
 msgid "Invalid studio_approval %s in button"
 msgstr "Tugmadagi noto‘g‘ri studio_approval %s"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
-#, fuzzy
-msgid "Invisible"
-msgstr "Ko‘rinmas"
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_approver__is_delegation
@@ -2764,7 +2718,6 @@ msgstr "Kanban holati"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_sidebar/properties/group_properties/group_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_sidebar/properties/page_properties/page_properties.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
@@ -2804,11 +2757,10 @@ msgid "Last Updated on"
 msgstr "Oxirgi yangilangan sana"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
-#, fuzzy
-msgid "Leave DIFF"
-msgstr "DIFFni tark etish"
+#. odoo-python
+#: code:addons/web_studio/models/ir_ui_view.py:0
+msgid "Late Activities"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.actions.client,name:web_studio.action_web_studio_leave_with
@@ -2830,7 +2782,6 @@ msgstr ""
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
 #, fuzzy
 msgid "Limit visibility to groups"
 msgstr "Ko‘rinishni guruhlarga cheklash"
@@ -2907,17 +2858,21 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
+msgid "Mapbox Token"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
-#, fuzzy
 msgid "Measure"
-msgstr "O‘lchov"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor_sidebar.xml:0
-#, fuzzy
 msgid "Measure Field"
-msgstr "O‘lchov maydoni"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -2965,7 +2920,6 @@ msgstr "Xabarlar"
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__method
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__method
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_search_view
 #, fuzzy
 msgid "Method"
@@ -2988,19 +2942,17 @@ msgstr "Minimal sarlavha/pastki qism"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor_sidebar.xml:0
-#, fuzzy
 msgid "Mode"
-msgstr "Rejim"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.xml:0
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
+#: model:ir.model,name:web_studio.model_ir_model
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__model_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_model__model_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard_data__model
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_search_view
 #, fuzzy
 msgid "Model"
@@ -3012,12 +2964,6 @@ msgstr "Model"
 #, fuzzy
 msgid "Model '%s' should not contain records with the same ID."
 msgstr "'%s' modelida bir xil IDga ega yozuvlar bo‘lmasligi kerak."
-
-#. module: web_studio
-#: model:ir.model,name:web_studio.model_ir_model_access
-#, fuzzy
-msgid "Model Access"
-msgstr "Model kirish huquqi"
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_ir_model_data
@@ -3047,17 +2993,19 @@ msgid "Model name"
 msgstr "Model nomi"
 
 #. module: web_studio
-#: model:ir.model,name:web_studio.model_ir_model
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/menu_creator/menu_creator.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_model.js:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/field_configuration.js:0
 #, fuzzy
 msgid "Models"
-msgstr "Modellar"
+msgstr "Model"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/xml_resource_editor/xml_resource_editor.xml:0
-#, fuzzy
 msgid "Modified by:"
-msgstr "O‘zgartirgan:"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_ir_module_module
@@ -3096,14 +3044,12 @@ msgstr "Oy"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
-#, fuzzy
 msgid "Month Precision"
-msgstr "Oy aniqligi"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox.xml:0
@@ -3132,17 +3078,17 @@ msgid "My %s"
 msgstr "Mening %s"
 
 #. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/ir_ui_view.py:0
+msgid "My Activities"
+msgstr ""
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
 #, fuzzy
 msgid "My Button"
 msgstr "Mening tugmam"
-
-#. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
-#, fuzzy
-msgid "My entries"
-msgstr "Mening yozuvlarim"
 
 #. module: web_studio
 #. odoo-javascript
@@ -3156,6 +3102,7 @@ msgstr "Mavjud emas"
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__name
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__name
 #, fuzzy
@@ -3172,9 +3119,8 @@ msgstr "Yangi"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/interactive_editor.js:0
-#, fuzzy
 msgid "New %s"
-msgstr "Yangi %s"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3221,9 +3167,8 @@ msgstr "Yangi qatorlar"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/app_menu_editor/app_menu_editor.xml:0
-#, fuzzy
 msgid "New Menu"
-msgstr "Yangi menyu"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3371,9 +3316,8 @@ msgstr "Odoo Studio"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor.xml:0
-#, fuzzy
 msgid "On view (ir.ui.view):"
-msgstr "Ko‘rinishda (ir.ui.view):"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3395,18 +3339,15 @@ msgstr ""
 "identifikator belgilang."
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
-#, fuzzy
-msgid "Only visible during the edition of the report"
-msgstr "Faqat hisobotni tahrirlash paytida ko‘rinadi"
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_button_configuration_search_view
+msgid "Only subrules"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
-#, fuzzy
 msgid "Open Record On Click"
-msgstr "Bosish orqali yozuvni ochish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3425,18 +3366,28 @@ msgstr "Tasdiqlarning kanban ko‘rinishini ochish"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+msgid "Optimized"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
-#, fuzzy
 msgid "Optional"
-msgstr "Ixtiyoriy"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
-#, fuzzy
 msgid "Order"
-msgstr "Tartib"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+msgid "Ordered"
+msgstr ""
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.act_report_xml_view_kanban
@@ -3452,10 +3403,15 @@ msgstr "Qog‘oz formatini sozlash"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_model.js:0
 #, fuzzy
 msgid "Paper format"
 msgstr "Qog‘oz formati"
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__parent_id
+msgid "Parent"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3508,13 +3464,6 @@ msgstr "Jarayon bosqichlari"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-#, fuzzy
-msgid "Pipeline status bar"
-msgstr "Jarayon holati paneli"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/editor_menu/editor_menu.js:0
 #: code:addons/web_studio/static/src/studio_service.js:0
 #, fuzzy
@@ -3548,11 +3497,10 @@ msgstr "Oldindan o‘rnatilgan"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
-#, fuzzy
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 msgid "Preview"
-msgstr "Ko‘rib chiqish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3571,10 +3519,15 @@ msgstr "Oldingi"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_record_navigation.xml:0
-#, fuzzy
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 msgid "Print"
-msgstr "Chop etish"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Print Menu"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3596,11 +3549,23 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Properties"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor.js:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.js:0
 #, fuzzy
 msgid "Quarter"
 msgstr "Chorak"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.js:0
+msgid "Quarter Day"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3613,16 +3578,14 @@ msgstr "Chorak soat"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
-#, fuzzy
 msgid "Quick Create"
-msgstr "Tezkor yaratish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
-#, fuzzy
 msgid "Quick Create Field"
-msgstr "Tezkor maydon yaratish"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_ir_qweb
@@ -3633,9 +3596,8 @@ msgstr "Qweb"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/rainbow_effect.xml:0
-#, fuzzy
 msgid "Rainbow Effect"
-msgstr "Kamalak effekti"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3651,13 +3613,6 @@ msgid "Ratings"
 msgstr "Reytinglar"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
-#, fuzzy
-msgid "Readonly"
-msgstr "Faqat o‘qish uchun"
-
-#. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 #, fuzzy
@@ -3665,7 +3620,9 @@ msgid "Ready"
 msgstr "Tayyor"
 
 #. module: web_studio
-#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__record_display_name
 #, fuzzy
 msgid "Record"
 msgstr "Yozuv"
@@ -3691,11 +3648,10 @@ msgstr "Yozuvlar"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/view_editor_snackbar.xml:0
-#, fuzzy
 msgid "Redo"
-msgstr "Qayta bajarish"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__reference
@@ -3711,6 +3667,8 @@ msgid "Reject"
 msgstr "Rad etish"
 
 #. module: web_studio
+#: model:ir.model.fields.selection,name:web_studio.selection__studio_approval_entry__state__rejected
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 #, fuzzy
 msgid "Rejected"
@@ -3718,16 +3676,26 @@ msgstr "Rad etilgan"
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.notify_approval
-#, fuzzy
-msgid "Rejected <i class=\"fa fa-thumbs-down text-danger\"/>"
-msgstr "Rad etildi <i class=\"fa fa-thumbs-down text-danger\"/>"
+msgid ""
+"Rejected <i class=\"oi oi-filled text-danger\" data-icon=\"thumb_down\"/>"
+msgstr ""
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
+msgid "Rejected by"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/approval/approval_infos.xml:0
-#, fuzzy
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_form_view
 msgid "Rejected on"
-msgstr "Rad etilgan sana"
+msgstr ""
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_request__model
+msgid "Related Document Model"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3738,10 +3706,21 @@ msgstr "Bog‘liq maydon"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#, fuzzy
-msgid "Reload from attachment"
-msgstr "Biriktirmadan qayta yuklash"
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+msgid "Related field"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.js:0
+msgid "Remove %s"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/sidebar_properties_toolbox/sidebar_properties_toolbox.js:0
+msgid "Remove %s from view"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3772,13 +3751,6 @@ msgstr "Harakat haqida xabar berish"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/report_editor_plugin.js:0
-#, fuzzy
-msgid "Report Tools"
-msgstr "Hisobot vositalari"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor_model.js:0
 #, fuzzy
 msgid "Report edition failed"
@@ -3786,14 +3758,7 @@ msgstr "Hisobot tahrirlanmadi"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#, fuzzy
-msgid "Report name"
-msgstr "Hisobot nomi"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_record_navigation.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.js:0
 #, fuzzy
 msgid "Report preview not available"
 msgstr "Hisobotni oldindan ko‘rish imkonsiz"
@@ -3820,13 +3785,6 @@ msgid "Reports for %(model_name)s (%(model)s)"
 msgstr "%(model_name)s (%(model)s) uchun hisobotlar"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/modifiers/modifiers_properties.xml:0
-#, fuzzy
-msgid "Required"
-msgstr "Majburiy"
-
-#. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard_data__res_id
 #, fuzzy
 msgid "Res"
@@ -3835,16 +3793,14 @@ msgstr "Qayta"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/navbar/home_menu_customizer/home_menu_customizer.xml:0
-#, fuzzy
 msgid "Reset Default Background"
-msgstr "Standart orqa fonni tiklash"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/rainbow_effect.xml:0
-#, fuzzy
 msgid "Reset Image"
-msgstr "Rasmni qayta o‘rnatish"
+msgstr ""
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.reset_view_arch_wizard_view
@@ -3859,14 +3815,6 @@ msgid "Reset View Architecture Wizard"
 msgstr "Ko‘rinish arxitekturasi ustasini qayta o‘rnatish"
 
 #. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.js:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#, fuzzy
-msgid "Reset report"
-msgstr "Hisobotni qayta o‘rnatish"
-
-#. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/ir_model.py:0
 #: code:addons/web_studio/models/ir_ui_view.py:0
@@ -3878,9 +3826,8 @@ msgstr "Mas'ul"
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox.xml:0
-#, fuzzy
 msgid "Restore Default View"
-msgstr "Standart ko‘rinishni tiklash"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -3912,24 +3859,35 @@ msgstr "Lenta"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/pivot/pivot_editor_sidebar.xml:0
-#, fuzzy
-msgid "Row grouping - First level"
-msgstr "Qatorlarni guruhlash - Birinchi daraja"
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
+msgid "Routing"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/pivot/pivot_editor_sidebar.xml:0
-#, fuzzy
-msgid "Row grouping - Second level"
-msgstr "Qatorlarni guruhlash - Ikkinchi daraja"
+msgid "Row grouping - First level"
+msgstr ""
 
 #. module: web_studio
-#: model:ir.model,name:web_studio.model_ir_rule
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/pivot/pivot_editor_sidebar.xml:0
+msgid "Row grouping - Second level"
+msgstr ""
+
+#. module: web_studio
+#: model:ir.model,name:web_studio.model_ir_access
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__rule_id
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_approver__rule_id
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
 #, fuzzy
 msgid "Rule"
 msgstr "Qoida"
+
+#. module: web_studio
+#: model:ir.ui.menu,name:web_studio.menu_studio_approval_rule
+msgid "Rules"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -3970,7 +3928,7 @@ msgstr "SMS yuborishda xatolik yuz berdi"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_snackbar.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 #: code:addons/web_studio/static/src/client_action/xml_resource_editor/xml_resource_editor.xml:0
 #, fuzzy
 msgid "Save"
@@ -4009,9 +3967,15 @@ msgstr ""
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor.xml:0
-#, fuzzy
 msgid "Saving the report \""
-msgstr "\"Hisobot saqlanmoqda"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
+msgid "Scheduling"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4030,17 +3994,15 @@ msgstr "Qidirish..."
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-#, fuzzy
-msgid "Second Status"
-msgstr "Ikkinchi holat"
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
+msgid "Second dimension"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
-#, fuzzy
-msgid "Second dimension"
-msgstr "Ikkinchi o‘lcham"
+#: code:addons/web_studio/static/src/client_action/editor/editor_menu/editor_menu.js:0
+msgid "Security"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4057,24 +4019,16 @@ msgid "Select a Field"
 msgstr "Maydonni tanlash"
 
 #. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
+msgid "Select a M2O field from another model pointing to the current model"
+msgstr ""
+
+#. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view_quick_create
 #, fuzzy
 msgid "Select a group..."
 msgstr "Guruhni tanlash..."
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.xml:0
-#, fuzzy
-msgid "Select a related field"
-msgstr "Bog‘liq maydonni tanlash"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/new_button_box_dialog.js:0
-#, fuzzy
-msgid "Select a related field."
-msgstr "Bog‘liq maydonni tanlash"
 
 #. module: web_studio
 #: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_rule_form_view
@@ -4109,6 +4063,15 @@ msgstr "Teskari ManyToOne maydonini tanlang"
 #, fuzzy
 msgid "Select users..."
 msgstr "Foydalanuvchilarni tanlash..."
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.js:0
+msgid ""
+"Select your Mapbox routing preference:\\n- Ordered: Keeps stops in their "
+"predefined order\\n- Optimized: Reorders stops to minimize travel time and "
+"distance"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4160,10 +4123,24 @@ msgstr "Server harakati"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Set"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/action_editor/action_editor.xml:0
-#, fuzzy
 msgid "Set As Default"
-msgstr "Standart sifatida o‘rnatish"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
+msgid ""
+"Set a fixed width (e.g. 100) or a minimum width (e.g. [100]) or a width "
+"range (e.g. [100, 200]). If not set, the width is automatically computed to "
+"fit optimally."
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4175,9 +4152,8 @@ msgstr "Yozuvlarga narx yoki qiymat belgilash"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox.xml:0
-#, fuzzy
 msgid "Show Invisible Elements"
-msgstr "Ko‘rinmas elementlarni ko‘rsatish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4195,17 +4171,9 @@ msgstr "Standart bo‘yicha ko‘rsatish"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#, fuzzy
-msgid "Show in print menu"
-msgstr "Chop etish menyusida ko‘rsatish"
-
-#. module: web_studio
-#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
-#, fuzzy
 msgid "Show link to record"
-msgstr "Yozuvga havolani ko‘rsatish"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4230,8 +4198,6 @@ msgstr "Sekin"
 
 #. module: web_studio
 #. odoo-javascript
-#. odoo-python
-#: code:addons/web_studio/models/studio_approval.py:0
 #: code:addons/web_studio/static/src/approval/approval_hook.js:0
 #, fuzzy
 msgid "Some approvals are missing"
@@ -4240,35 +4206,41 @@ msgstr "Ba'zi tasdiqlar mavjud emas"
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/studio_approval.py:0
-#, fuzzy
+msgid "Some approvals are missing."
+msgstr ""
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
 msgid ""
 "Some records were skipped because approvals were missing "
-"to                                    proceed with your request: "
+"to                                    proceed with your request:"
 msgstr ""
-"So‘rovingizni davom ettirish uchun zarur tasdiqlar mavjud bo‘lmagani sababli "
-"ba'zi yozuvlar o‘tkazib yuborildi:"
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
-#, fuzzy
 msgid "Sort By"
-msgstr "Saralash"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/map/map_editor_sidebar.xml:0
-#, fuzzy
 msgid "Sort by"
-msgstr "Saralash"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
-#, fuzzy
 msgid "Sorting"
-msgstr "Saralash"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor.js:0
+msgid "Sources"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4287,9 +4259,8 @@ msgstr "Barcha mumkin bo‘lgan qiymatlarni belgilash"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
-#, fuzzy
 msgid "Stacked graph"
-msgstr "Ustma-ust joylashgan grafik"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -4298,6 +4269,18 @@ msgstr "Ustma-ust joylashgan grafik"
 #, fuzzy
 msgid "Stage"
 msgstr "Bosqich"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Stage 1"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Stage 2"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -4313,6 +4296,12 @@ msgstr "Bosqich nomi"
 msgid "Stage and visualize records in a custom pipeline"
 msgstr ""
 "Maxsus quvurda yozuvlarni bosqichma-bosqich ko‘rsatish va vizuallashtirish"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
+msgid "Start Buffer Field"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -4331,6 +4320,17 @@ msgstr "Boshlanish sanasi"
 #, fuzzy
 msgid "Start Date Field"
 msgstr "Boshlanish sanasi maydoni"
+
+#. module: web_studio
+#: model:ir.model.fields,field_description:web_studio.field_studio_approval_entry__state
+msgid "State"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.xml:0
+msgid "Statusbar"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__notification_order
@@ -4396,6 +4396,12 @@ msgstr "9-qadam"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
+msgid "Stop Buffer Field"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/editor/new_view_dialogs/new_view_dialog.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/calendar/calendar_editor_sidebar.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor_sidebar.xml:0
@@ -4405,8 +4411,15 @@ msgid "Stop Date Field"
 msgstr "Tugash sanasi maydoni"
 
 #. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
+msgid "Structure"
+msgstr ""
+
+#. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_ir_model_data__studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_export_wizard_data__studio
+#: model:ir.module.module,shortdesc:base.module_web_studio
 #, fuzzy
 msgid "Studio"
 msgstr "Studiya"
@@ -4419,7 +4432,6 @@ msgstr "Studiya ilova yaratuvchisi"
 
 #. module: web_studio
 #: model:ir.actions.act_window,name:web_studio.studio_approval_entry_action
-#: model:ir.ui.menu,name:web_studio.menu_studio_approval_entry
 #, fuzzy
 msgid "Studio Approval Entries"
 msgstr "Studiya tasdiqlash yozuvlari"
@@ -4447,10 +4459,14 @@ msgstr "Studiya tasdiqlash qoidasi"
 
 #. module: web_studio
 #: model:ir.actions.act_window,name:web_studio.studio_approval_rule_action
-#: model:ir.ui.menu,name:web_studio.menu_studio_approval_rule
 #, fuzzy
 msgid "Studio Approval Rules"
 msgstr "Studiya tasdiqlash qoidalari"
+
+#. module: web_studio
+#: model:ir.ui.menu,name:web_studio.menu_technical_studio_approvals
+msgid "Studio Approvals"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_ir_ui_menu__is_studio_configuration
@@ -4494,9 +4510,8 @@ msgstr "Studio ma'lumotlarini eksport qilish"
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_studio_export_model
-#, fuzzy
-msgid "Studio Export Models"
-msgstr "Studio modellarini eksport qilish"
+msgid "Studio Export Model"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model,name:web_studio.model_studio_export_wizard
@@ -4509,6 +4524,11 @@ msgstr "Studio eksport yordamchisi"
 #, fuzzy
 msgid "Studio Mixin"
 msgstr "Studio miksin"
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "Studio customizations:"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4531,6 +4551,12 @@ msgstr "Yangi modelingiz uchun tavsiya etilgan xususiyatlar"
 #, fuzzy
 msgid "Sum"
 msgstr "Jami"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/editors/kanban/kanban_editor_sidebar/kanban_editor_sidebar.xml:0
+msgid "Sum Field"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4561,13 +4587,6 @@ msgstr "Teglar"
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
 #, fuzzy
 msgid "Technical Name"
-msgstr "Texnik nom"
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
-#, fuzzy
-msgid "Technical name"
 msgstr "Texnik nom"
 
 #. module: web_studio
@@ -4650,16 +4669,11 @@ msgstr "Tugmaning bog‘liq maydoni %s ga ko‘p-birga (many2one) bo‘lishi ker
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/report_editor/report_editor.xml:0
-#, fuzzy
 msgid ""
-"The report could not be loaded as some error occured. Usually it means that "
+"The report could not be loaded as some error occurred. Usually it means that "
 "some view inherits from another but targets a node that doesn't exist. It "
 "might be due to the mutations of the base views during the upgrade process."
 msgstr ""
-"Xatolik yuz bergani sababli hisobot yuklanmadi. Odatda, bu biror ko‘rinish "
-"boshqasidan meros olib, mavjud bo‘lmagan tugunni nishonga olgani bilan "
-"bog‘liq. Bu yangilash jarayonida asosiy ko‘rinishlarning o‘zgarishi tufayli "
-"bo‘lishi mumkin."
 
 #. module: web_studio
 #. odoo-javascript
@@ -4713,15 +4727,20 @@ msgstr ""
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/controllers/main.py:0
-#, fuzzy
 msgid ""
-"There are %s records using selection values not listed in those you are "
-"trying to save.\n"
-"Are you sure you want to remove the selection values of those records?"
+"There are %s records that use the values you are trying to remove.\n"
+"Are you sure you want to get rid of them?"
 msgstr ""
-"Siz saqlamoqchi bo‘lgan ro‘yxatda ko‘rsatilmagan tanlangan qiymatlardan "
-"foydalangan %s ta yozuv mavjud. Haqiqatan ham ushbu yozuvlarning tanlangan "
-"qiymatlarini olib tashlamoqchimisiz?"
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/interactive_editor.js:0
+msgid ""
+"There are no many2one fields related to the current model.\n"
+"\n"
+"To create a one2many field on the current model, you must first create its "
+"many2one counterpart on the model you want to relate to.\n"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -4733,7 +4752,7 @@ msgstr "%(model_name)s (%(model_id)s) modelida %(method)s metodi mavjud emas"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_record_navigation.js:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.js:0
 #, fuzzy
 msgid ""
 "There is no record on which this report can be previewed. Create at least "
@@ -4741,14 +4760,6 @@ msgid ""
 msgstr ""
 "Ushbu hisobotni ko‘rish uchun hech qanday yozuv yo‘q. Hisobotni ko‘rish "
 "uchun kamida bitta yozuv yarating."
-
-#. module: web_studio
-#. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_record_navigation.xml:0
-#, fuzzy
-msgid "There is no record to preview"
-msgstr "Ko‘rish uchun hech qanday yozuv yo‘q"
 
 #. module: web_studio
 #. odoo-javascript
@@ -4776,10 +4787,9 @@ msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/view_editor/editors/form/form_editor_renderer/form_editor_renderer_components.js:0
-#, fuzzy
-msgid "Third Status"
-msgstr "Uchinchi holat"
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
+msgid "This action is blocked by other rules"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4854,9 +4864,8 @@ msgstr ""
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor_sidebar.xml:0
-#, fuzzy
 msgid "Timeline"
-msgstr "Vaqt jadvali"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4871,6 +4880,12 @@ msgstr "Vaqt jadvali ko‘rinishlari"
 #, fuzzy
 msgid "To <b>customize a field</b>, click on its <i>label</i>."
 msgstr "<b>Maydonni sozlash</b> uchun uning <i>yorlig‘ini</i> bosing."
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/ir_ui_view.py:0
+msgid "Today Activities"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -4888,10 +4903,21 @@ msgstr "Jami"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
+msgid "Track in chatter"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.js:0
+msgid "Translate Report"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/graph/graph_editor_sidebar.xml:0
-#, fuzzy
 msgid "Type"
-msgstr "Tur"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -4902,11 +4928,16 @@ msgstr "Eslatmalaringizni shu yerga yozing..."
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_components.xml:0
 #: code:addons/web_studio/static/src/client_action/view_editor/view_editor_snackbar.xml:0
-#, fuzzy
 msgid "Undo"
-msgstr "Bekor qilish"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_xml/report_editor_xml.xml:0
+msgid "Unsaved changes"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_delegate__date_to
@@ -4929,7 +4960,7 @@ msgstr "O‘zgartirilishi mumkin"
 
 #. module: web_studio
 #. odoo-javascript
-#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/editor_plugins/studio_dynamic_placeholder_popover.xml:0
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
 #, fuzzy
 msgid "Update"
 msgstr "Yangilash"
@@ -4947,6 +4978,8 @@ msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule_approver__user_id
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_search_view
+#: model_terms:ir.ui.view,arch_db:web_studio.studio_approval_entry_tree_view
 #, fuzzy
 msgid "User"
 msgstr "Foydalanuvchi"
@@ -4967,6 +5000,13 @@ msgstr "Foydalanuvchi avatari joytutari"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.js:0
+#, fuzzy
+msgid "Users"
+msgstr "Foydalanuvchi"
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
 #: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__users_to_notify
 #, fuzzy
@@ -4976,9 +5016,8 @@ msgstr "Xabardor qilinadigan foydalanuvchilar"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/xml_resource_editor/xml_resource_editor.xml:0
-#, fuzzy
 msgid "Uses:"
-msgstr "Foydalanishlar:"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -5025,6 +5064,18 @@ msgstr "Ko‘rinishlar"
 
 #. module: web_studio
 #. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Visibility"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg.xml:0
+msgid "Visible"
+msgstr ""
+
+#. module: web_studio
+#. odoo-javascript
 #: code:addons/web_studio/static/src/approval/studio_approval.xml:0
 #, fuzzy
 msgid "Waiting for approval"
@@ -5053,18 +5104,6 @@ msgid "Webhooks"
 msgstr "Veb-xuklar"
 
 #. module: web_studio
-#: model:ir.model.fields,field_description:web_studio.field_studio_approval_rule__website_message_ids
-#, fuzzy
-msgid "Website Messages"
-msgstr "Veb-sayt xabarlari"
-
-#. module: web_studio
-#: model:ir.model.fields,help:web_studio.field_studio_approval_rule__website_message_ids
-#, fuzzy
-msgid "Website communication history"
-msgstr "Veb-sayt muloqoti tarixi"
-
-#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/cohort/cohort_editor.js:0
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.js:0
@@ -5075,9 +5114,8 @@ msgstr "Hafta"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/gantt/gantt_editor_sidebar.xml:0
-#, fuzzy
 msgid "Week Precision"
-msgstr "Haftalik aniqlik"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -5096,28 +5134,20 @@ msgstr "<b>Kanban ko‘rinishi</b> haqida nima deysiz?"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/button_properties/button_properties.xml:0
-#, fuzzy
 msgid "What should the button do"
-msgstr "Tugma nima qilishi kerak"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/editors/list/list_editor_sidebar/list_editor_sidebar.xml:0
-#, fuzzy
 msgid "When Creating Record"
-msgstr "Yozuv yaratilayotganda"
+msgstr ""
 
 #. module: web_studio
 #: model:ir.model.fields,help:web_studio.field_studio_approval_rule__can_validate
 #, fuzzy
 msgid "Whether the rule can be approved by the current user"
 msgstr "Qoidani joriy foydalanuvchi tasdiqlashi mumkinmi"
-
-#. module: web_studio
-#: model:ir.model.fields,help:web_studio.field_ir_model__abstract
-#, fuzzy
-msgid "Whether this model is abstract"
-msgstr "Bu model mavhummi"
 
 #. module: web_studio
 #. odoo-javascript
@@ -5129,9 +5159,8 @@ msgstr "Qanday turdagi hisobot yaratmoqchisiz?"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_widget_properties.xml:0
-#, fuzzy
 msgid "Widget"
-msgstr "Vidjet"
+msgstr ""
 
 #. module: web_studio
 #: model_terms:ir.actions.act_window,help:web_studio.webhook_automation_act
@@ -5165,9 +5194,8 @@ msgstr "Qo‘shimcha eslatmalar yoki izohlar yozing"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox.xml:0
-#, fuzzy
 msgid "XML"
-msgstr "XML"
+msgstr ""
 
 #. module: web_studio
 #. odoo-javascript
@@ -5180,9 +5208,22 @@ msgstr "Yil"
 #. module: web_studio
 #. odoo-python
 #: code:addons/web_studio/models/studio_approval.py:0
+msgid "You are not allowed to delegate this approval rule."
+msgstr ""
+
+#. module: web_studio
+#. odoo-python
+#: code:addons/web_studio/models/studio_approval.py:0
 #, fuzzy
 msgid "You can not approve this rule."
 msgstr "Bu qoidani tasdiqlay olmaysiz."
+
+#. module: web_studio
+#. odoo-javascript
+#: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_widget_properties.js:0
+msgid ""
+"You can't select the 'Start date field' and 'End date field' at the same time"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -5241,11 +5282,20 @@ msgid "e.g. Real Estate"
 msgstr "masalan, Ko‘chmas mulk"
 
 #. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "field<span invisible=\"custom_fields == 1\">s</span>"
+msgstr ""
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
-#, fuzzy
 msgid "for company"
-msgstr "kompaniya uchun"
+msgstr ""
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "model<span invisible=\"custom_models == 1\">s</span>"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -5257,9 +5307,13 @@ msgstr "hech kim"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/icon_creator/icon_creator.xml:0
-#, fuzzy
 msgid "or"
-msgstr "yoki"
+msgstr ""
+
+#. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "report<span invisible=\"custom_reports == 1\">s</span>"
+msgstr ""
 
 #. module: web_studio
 #. odoo-python
@@ -5291,6 +5345,11 @@ msgid "upload one"
 msgstr "birini yuklab oling"
 
 #. module: web_studio
+#: model_terms:ir.ui.view,arch_db:web_studio.view_base_module_uninstall_studio
+msgid "view<span invisible=\"custom_views == 1\">s</span>"
+msgstr ""
+
+#. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/properties/field_properties/field_properties.xml:0
 #, fuzzy
@@ -5300,6 +5359,91 @@ msgstr "x_studio_"
 #. module: web_studio
 #. odoo-javascript
 #: code:addons/web_studio/static/src/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog.xml:0
-#, fuzzy
 msgid "{{ item.isInEdition ? 'Add selection' : 'Edit selection' }}"
-msgstr "{{ item.isInEdition ? 'Tanlov qo‘shish' : 'Tanlovni tahrirlash' }}"
+msgstr ""
+
+#, fuzzy
+#~ msgid ""
+#~ "All changes done to the report's structure will be discarded and the "
+#~ "report will be reset to its factory settings."
+#~ msgstr ""
+#~ "Hisobot tuzilishiga kiritilgan barcha o‘zgarishlar bekor qilinadi va "
+#~ "hisobot dastlabki sozlamalarga qaytariladi."
+
+#, fuzzy
+#~ msgid "Include header and footer"
+#~ msgstr "Sarlavha va kolontitulni kiritish"
+
+#, fuzzy
+#~ msgid ""
+#~ "<p class=\"o_view_nocontent_smiling_face\">\n"
+#~ "                Add a new access control list\n"
+#~ "            </p>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<p class=\"o_view_nocontent_smiling_face\">Yangi kirish huquqlarini "
+#~ "nazorat qilish ro‘yxatini qo‘shing</p>"
+
+#, fuzzy
+#~ msgid "Abstract Model"
+#~ msgstr "Abstrakt model"
+
+#, fuzzy
+#~ msgid "Access Control"
+#~ msgstr "Kirish nazorati"
+
+#, fuzzy
+#~ msgid "Access Control Lists"
+#~ msgstr "Kirish huquqlarini nazorat qilish ro‘yxatlari"
+
+#, fuzzy
+#~ msgid "Model Access"
+#~ msgstr "Model kirish huquqi"
+
+#, fuzzy
+#~ msgid "Website Messages"
+#~ msgstr "Veb-sayt xabarlari"
+
+#, fuzzy
+#~ msgid "Website communication history"
+#~ msgstr "Veb-sayt muloqoti tarixi"
+
+#, fuzzy
+#~ msgid "Whether this model is abstract"
+#~ msgstr "Bu model mavhummi"
+
+#, fuzzy
+#~ msgid "DIFF"
+#~ msgstr "FARQ"
+
+#, fuzzy
+#~ msgid "Invisible"
+#~ msgstr "Ko‘rinmas"
+
+#, fuzzy
+#~ msgid "Leave DIFF"
+#~ msgstr "DIFFni tark etish"
+
+#, fuzzy
+#~ msgid "Readonly"
+#~ msgstr "Faqat o‘qish uchun"
+
+#, fuzzy
+#~ msgid "Reload from attachment"
+#~ msgstr "Biriktirmadan qayta yuklash"
+
+#, fuzzy
+#~ msgid "Report name"
+#~ msgstr "Hisobot nomi"
+
+#, fuzzy
+#~ msgid "Required"
+#~ msgstr "Majburiy"
+
+#, fuzzy
+#~ msgid "Show in print menu"
+#~ msgstr "Chop etish menyusida ko‘rsatish"
+
+#, fuzzy
+#~ msgid "There is no record to preview"
+#~ msgstr "Ko‘rish uchun hech qanday yozuv yo‘q"

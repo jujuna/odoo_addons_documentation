@@ -1,15 +1,19 @@
-from odoo import fields, Command
-from odoo.addons.account.tests.common import AccountTestInvoicingCommon
-from odoo.tests import tagged
-from odoo.tools import SQL
+from collections import OrderedDict
 
+from odoo import Command, fields
+from odoo.tests import tagged
+
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
-from collections import OrderedDict
+import zipfile
+import io
 
 
 @tagged("post_install", "post_install_l10n", "-at_install", "l10n_pe_lib")
 class TestPeReportsLib(TestAccountReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     @AccountTestInvoicingCommon.setup_country('pe')
     def setUpClass(cls):
@@ -25,11 +29,10 @@ class TestPeReportsLib(TestAccountReportsCommon):
             'vat': "20512528458",
             'l10n_pe_financial_statement_type': '01',
         })
-        cls.env.company.partner_id.l10n_latam_identification_type_id = cls.env.ref("l10n_pe.it_RUC")
+        cls.company_data['default_account_expense'] = cls.env['account.chart.template'].ref("chart6329")
         cls.partner_a.write({
             "country_id": cls.env.ref("base.pe").id,
             "vat": "20557912879",
-            "l10n_latam_identification_type_id": cls.env.ref("l10n_pe.it_RUC").id,
             "ref": "Partner A ref that is longer than 11 characters."
         })
         cls.partner_b.write({
@@ -51,20 +54,11 @@ class TestPeReportsLib(TestAccountReportsCommon):
         cls.default_options = cls._generate_options(cls.report, '2024-01-01', '2024-12-31')
         cls.default_options['date']['period_type'] = 'year'
 
-        cls.report._init_currency_table(cls.default_options)
-        currency_table_query = {
-            'join': cls.report._currency_table_aml_join(cls.default_options),
-            'balance': cls.report._currency_table_apply_rate(SQL("account_move_line.balance")),
-            'debit': cls.report._currency_table_apply_rate(SQL("account_move_line.debit")),
-            'credit': cls.report._currency_table_apply_rate(SQL("account_move_line.credit")),
-            'residual': cls.report._currency_table_apply_rate(SQL("account_move.amount_residual")),
-        }
-        cls.report_args = [cls.default_options, currency_table_query]
+        cls.report_args = [cls.default_options]
 
         cls.move = cls.create_move_on_account_product(cls, cls.account_base)
 
     def create_move_on_account_product(self, account, move_type='out_invoice', partner=None, amount=100):
-        date_invoice = "2024-07-01"
         date_invoice = "2024-07-01"
         move = self.env['account.move'].create({
             'move_type': move_type,
@@ -152,22 +146,19 @@ class TestPeReportsLib(TestAccountReportsCommon):
         })])
 
     def test_lib_3_2_bank(self):
-        bank = self.env['res.bank'].create({
-            'name': "PE Bank A",
-            'l10n_pe_edi_code': '00'
-        })
         partner_bank = self.env['res.partner.bank'].create({
-            'acc_number': '12345678',
+            'account_number': '12345678',
             'partner_id': self.env.company.partner_id.id,
-            'bank_id': bank.id,
-            'currency_id': self.env.ref('base.PEN').id,
+            'bank_name': 'PE Bank A',
+            'clearing_label_id': self.env.ref('base.clearing_label_pe').id,
+            'clearing_number': '00',
+            'allow_out_payment': True,
         })
         account = self.env['account.account'].search([("code", "=like", "1051000")], limit=1)
         move = self.create_move_on_account_product(account)
         journal = move.journal_id
         journal.bank_account_id = partner_bank
         journal.default_account_id = account
-        bank.flush_model()
         partner_bank.flush_model()
         account.flush_model()
         move.flush_model()
@@ -189,6 +180,7 @@ class TestPeReportsLib(TestAccountReportsCommon):
         move_1 = self.create_move_on_account_payment_term(account)
         account = self.env['account.account'].search([("code_store", "=like", "13%")], limit=1)
         move_2 = self.create_move_on_account_payment_term(account)
+        draft_move = self._create_invoice(invoice_date='2024-07-01')
         report_data = self.handler._l10n_pe_get_lib_3_3_data(*self.report_args)
         self.assertEqual([OrderedDict(data) for data in report_data], [
             OrderedDict({
@@ -211,6 +203,17 @@ class TestPeReportsLib(TestAccountReportsCommon):
                 'partner_name': 'partner_a',
                 'move_date': '01/07/2024',
                 'move_amount_residual': '100.00',
+                'op_status': '1'
+            }),
+            OrderedDict({
+                'report_date': '20241231',
+                'move_name': '',
+                'move_number': ("M%9d" % int(draft_move.id)).replace(' ', '0'),
+                'id_type_code': '6',
+                'partner_vat': '20557912879',
+                'partner_name': 'partner_a',
+                'move_date': '01/07/2024',
+                'move_amount_residual': '237.18',
                 'op_status': '1'
             }),
             OrderedDict({
@@ -678,3 +681,32 @@ class TestPeReportsLib(TestAccountReportsCommon):
                 'op_status': '1'
             })
         ])
+
+    def test_l10n_pe_export_lib_to_txt_csv_format(self):
+        """
+        Test that the CSV generation completes without a ValueError (fixes Python 3.14+ strictness)
+        and correctly ends every row with a pipe to satisfy SUNAT PLE requirements.
+        """
+        self.account_base.l10n_pe_fs_rubric_ids = self.env.ref('l10n_pe_reports_lib.l10n_pe_fs_rubric_1D0109')
+        self.account_base.flush_model()
+
+        result = self.handler.l10n_pe_export_lib_to_txt(self.default_options)
+
+        self.assertEqual(result.get('file_type'), 'zip')
+        self.assertTrue(result.get('file_content'))
+
+        with zipfile.ZipFile(io.BytesIO(result['file_content'])) as z:
+            txt_files = z.namelist()
+            self.assertTrue(txt_files, "The exported zip should not be empty.")
+
+            for filename in txt_files:
+                content = z.read(filename).decode('utf-8')
+                if content:
+                    lines = content.split('\n')
+                    if lines and not lines[-1]:
+                        lines.pop()
+                    for line in lines:
+                        self.assertTrue(
+                            line.endswith('|'),
+                            f"File {filename} has a line that does not end with a pipe: {line}"
+                        )

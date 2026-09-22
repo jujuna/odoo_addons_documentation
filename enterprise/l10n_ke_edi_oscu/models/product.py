@@ -422,7 +422,7 @@ class ProductUnspscCode(models.Model):
             tax_code['code']: tax_code['id']
             for tax_code in self.env['l10n_ke_edi_oscu.code'].search_read([('code_type', '=', '04')], ['code'])
         }
-        last_request_date = self.env['ir.config_parameter'].get_param('l10n_ke_oscu.last_unspsc_code_request_date', '20180101000000')
+        last_request_date = self.env['ir.config_parameter'].get_str('l10n_ke_oscu.last_unspsc_code_request_date') or '20180101000000'
         error, data, _date = company._l10n_ke_call_etims('selectItemClsList', {'lastReqDt': last_request_date})
         if error:
             if error.get('code') == '001':
@@ -458,4 +458,4 @@ class ProductUnspscCode(models.Model):
                 WHERE product_unspsc_code.id IN %s""", tuple(new_codes.ids)))
 
         _logger.info("%i UNSPSC codes fetched from the OSCU, %i UNSPSC codes created", len(cls_list), len(new_codes))
-        self.env['ir.config_parameter'].sudo().set_param('l10n_ke_oscu.last_unspsc_code_request_date', format_etims_datetime(fields.Datetime.now()))
+        self.env['ir.config_parameter'].sudo().set_str('l10n_ke_oscu.last_unspsc_code_request_date', format_etims_datetime(fields.Datetime.now()))

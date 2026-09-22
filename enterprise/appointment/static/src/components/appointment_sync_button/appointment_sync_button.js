@@ -2,15 +2,15 @@ import { _t } from "@web/core/l10n/translation";
 import { registry } from '@web/core/registry';
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { useService } from "@web/core/utils/hooks";
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { rpc } from "@web/core/network/rpc";
 
 export class AppointmentSyncButton extends Component {
-    static props = {
+    props = useProps({
         ...standardWidgetProps,
-        calendarName: String,
-        iconSrc: String,
-    };
+        calendarName: t.string(),
+        iconSrc: t.string(),
+    });
     static template = "appointment.AppointmentSyncButton";
 
     setup() {

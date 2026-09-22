@@ -10,42 +10,39 @@ class AccountChartTemplate(models.AbstractModel):
     _inherit = "account.chart.template"
 
     def _configure_payroll_account_ch(self, companies):
-        account_codes = [
-            '1090',  # Salary Pass Through Account
-            '1091',  # Transfer account: Salaries
-            '2270',  # Health insurance AHV, IV, EO, ALV
-            '2210',  # Short Term liabilities
-            '2271',  # LPP Provision
-            '2272',  # Health insurance CAF
-            '2273',  # Assurance Accident
-            '2274',  # Daily Sickness Insurance
-            '2279',  # Source Tax
-            '2350',  # 13th month provision
-            '2351',  # 14th month provision
-            '5000',  # Wages
-            '5001',  # Social insurance Payments
-            '5002',  # Profit Sharing
-            '5005',  # 13th Month
-            '5011',  # 14th Month
-            '5007',  # Bonus
-            '5010',  # Commissions
-            '5700',  # AHV
-            '5710',  # FAK
-            '5710',  # FAK
-            '5720',  # LPP
-            '5730',  # AANP
-            '5731',  # LAAC
-            '5740',  # IJM
-            '5790',  # IS
-            '5800',  # Other Expenses
-            '5810',  # Professional Training
-            '5820',  # Travel Expenses
-            '5830',  # Representation fees Expenses
-            '5832',  # Fixed Rate Expenses
-            '5890',  # Rate of personal Use
-            '5891',  # Compensation Company Car
-            '6200',  # Vehicle Expenses
-        ]
+        salary_pass_through = 'ch_coa_1090'
+        transfer_salaries = 'ch_coa_1091'
+        health_insurance_ahv = 'ch_coa_2270'
+        short_term_liabilities = 'ch_coa_2210'
+        lpp_provision = 'ch_coa_2271'
+        health_insurance_caf = 'ch_coa_2272'
+        assurance_accident = 'ch_coa_2273'
+        sickness_insurance = 'ch_coa_2274'
+        source_tax = 'ch_coa_2279'
+        provision_13th = 'ch_coa_2350'
+        provision_14th = 'ch_coa_2351'
+        wages = 'ch_coa_5000'
+        social_insurance_payments = 'ch_coa_5001'
+        profit_sharing = 'ch_coa_5002'
+        month_13th = 'ch_coa_5005'
+        bonus = 'ch_coa_5007'
+        commissions = 'ch_coa_5010'
+        month_14th = 'ch_coa_5011'
+        ahv = 'ch_coa_5700'
+        fak = 'ch_coa_5710'
+        lpp = 'ch_coa_5720'
+        aanp = 'ch_coa_5730'
+        laac = 'ch_coa_5731'
+        ijm = 'ch_coa_5740'
+        is_tax = 'ch_coa_5790'
+        other_expenses = 'ch_coa_5800'
+        prof_training = 'ch_coa_5810'
+        travel_expenses = 'ch_coa_5820'
+        representation_fees = 'ch_coa_5830'
+        fixed_rate_expenses = 'ch_coa_5832'
+        rate_personal_use = 'ch_coa_5890'
+        comp_company_car = 'ch_coa_5891'
+        vehicle_expenses = 'ch_coa_6200'
 
         rules_mapping = defaultdict(dict)
 
@@ -67,465 +64,271 @@ class AccountChartTemplate(models.AbstractModel):
             "1214", "1215", "1216", "1217", "1219", "1232", "1250", "3032"
         ]
 
-        bonus_rules = self.env['hr.salary.rule'].search([('l10n_ch_code', 'in', bonuses), ('struct_id', '=', self.env.ref('l10n_ch_hr_payroll.hr_payroll_structure_ch_elm').id)])
-
+        bonus_rules = self.env['hr.salary.rule'].search([('l10n_ch_code', 'in', bonuses), ('struct_ids', 'in', self.env.ref('l10n_ch_hr_payroll.hr_payroll_structure_ch_elm').id)])
         for rule in bonus_rules:
-            rules_mapping[rule]['debit'] = '5007'
-            rules_mapping[rule]['credit'] = '1090'
+            rules_mapping[rule]['debit'] = bonus
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        wage_rules = self.env['hr.salary.rule'].search([('l10n_ch_code', 'in', rules_with_default_mapping), ('struct_id', '=', self.env.ref('l10n_ch_hr_payroll.hr_payroll_structure_ch_elm').id)])
-
+        wage_rules = self.env['hr.salary.rule'].search([('l10n_ch_code', 'in', rules_with_default_mapping), ('struct_ids', 'in', self.env.ref('l10n_ch_hr_payroll.hr_payroll_structure_ch_elm').id)])
         for rule in wage_rules:
-            rules_mapping[rule]['debit'] = '5000'
-            rules_mapping[rule]['credit'] = '1090'
+            rules_mapping[rule]['debit'] = wages
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1510')
-        rules_mapping[rule]['debit'] = '5002'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1218')
-        rules_mapping[rule]['debit'] = '5002'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_1510', 'l10n_ch_elm_1218']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = profit_sharing
+            rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1211')
-        rules_mapping[rule]['debit'] = '5010'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = commissions
+        rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1400')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_1400', 'l10n_ch_elm_1401', 'l10n_ch_elm_1410', 'l10n_ch_elm_1411', 'l10n_ch_elm_1420']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = transfer_salaries
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1401')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1410')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1411')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1420')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1900')
-        rules_mapping[rule]['debit'] = '5890'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1901')
-        rules_mapping[rule]['debit'] = '5890'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1902')
-        rules_mapping[rule]['debit'] = '5890'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_1900', 'l10n_ch_elm_1901', 'l10n_ch_elm_1902']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = rate_personal_use
+            rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1910')
-        rules_mapping[rule]['debit'] = '1090'
-        rules_mapping[rule]['credit'] = '6200'
+        rules_mapping[rule]['debit'] = salary_pass_through
+        rules_mapping[rule]['credit'] = vehicle_expenses
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1950')
-        rules_mapping[rule]['debit'] = '5890'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = rate_personal_use
+        rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1960')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1960')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1961')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1962')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_1960', 'l10n_ch_elm_1961', 'l10n_ch_elm_1962']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = transfer_salaries
+            rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1971')
-        rules_mapping[rule]['debit'] = '5740'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = ijm
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1972')
-        rules_mapping[rule]['debit'] = '5720'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = lpp
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1974')
-        rules_mapping[rule]['debit'] = '5740'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = ijm
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1975')
-        rules_mapping[rule]['debit'] = '5730'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = aanp
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1976')
-        rules_mapping[rule]['debit'] = '5731'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = laac
+        rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1977')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1977')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1978')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_1977', 'l10n_ch_elm_1978']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = transfer_salaries
+            rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1979')
-        rules_mapping[rule]['debit'] = '5790'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = is_tax
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_1980')
-        rules_mapping[rule]['debit'] = '5810'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = prof_training
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_1200')
-        rules_mapping[rule]['debit'] = '2350'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = provision_13th
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_1205')
-        rules_mapping[rule]['debit'] = '2351'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = provision_14th
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_13_prov')
-        rules_mapping[rule]['debit'] = '5005'
-        rules_mapping[rule]['credit'] = '2350'
+        rules_mapping[rule]['debit'] = month_13th
+        rules_mapping[rule]['credit'] = provision_13th
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_14_prov')
-        rules_mapping[rule]['debit'] = '5011'
-        rules_mapping[rule]['credit'] = '2351'
+        rules_mapping[rule]['debit'] = month_14th
+        rules_mapping[rule]['credit'] = provision_14th
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2000')
-        rules_mapping[rule]['debit'] = '5001'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in [
+            'l10n_ch_elm_2000', 'l10n_ch_elm_2005', 'l10n_ch_elm_2010',
+            'l10n_ch_elm_2015', 'l10n_ch_elm_2020', 'l10n_ch_elm_2021', 'l10n_ch_elm_2022'
+        ]:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = social_insurance_payments
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2005')
-        rules_mapping[rule]['debit'] = '5001'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2010')
-        rules_mapping[rule]['debit'] = '5001'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2015')
-        rules_mapping[rule]['debit'] = '5001'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2020')
-        rules_mapping[rule]['debit'] = '5001'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2021')
-        rules_mapping[rule]['debit'] = '5001'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2022')
-        rules_mapping[rule]['debit'] = '5001'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2050')
-        rules_mapping[rule]['credit'] = '1090'
-        rules_mapping[rule]['debit'] = '5000'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2060')
-        rules_mapping[rule]['debit'] = '5000'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_2050', 'l10n_ch_elm_2060']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = wages
+            rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2065')
-        rules_mapping[rule]['debit'] = '1090'
-        rules_mapping[rule]['credit'] = '5000'
+        rules_mapping[rule]['debit'] = salary_pass_through
+        rules_mapping[rule]['credit'] = wages
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_2075')
-        rules_mapping[rule]['debit'] = '5000'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = wages
+        rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3000')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in [
+            'l10n_ch_elm_3000', 'l10n_ch_elm_3001', 'l10n_ch_elm_3004_fcf', 'l10n_ch_elm_3005_fcf',
+            'l10n_ch_elm_3010', 'l10n_ch_elm_3011', 'l10n_ch_elm_3014_fcf', 'l10n_ch_elm_3015_fcf',
+            'l10n_ch_elm_3030', 'l10n_ch_elm_3031', 'l10n_ch_elm_3032', 'l10n_ch_elm_3033',
+            'l10n_ch_elm_3038', 'l10n_ch_elm_3035', 'l10n_ch_elm_3036', 'l10n_ch_elm_3037'
+        ]:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = transfer_salaries
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3001')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in [
+            'l10n_ch_elm_rule_5010', 'l10n_ch_elm_rule_5020', 'l10n_ch_elm_rule_5400', 'l10n_ch_elm_rule_compl_ac'
+        ]:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = health_insurance_ahv
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3004_fcf')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in [
+            'l10n_ch_elm_rule_7400', 'l10n_ch_elm_rule_7010', 'l10n_ch_elm_rule_7011',
+            'l10n_ch_elm_rule_5020_comp', 'l10n_ch_elm_rule_compl_ac_comp'
+        ]:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = ahv
+            rules_mapping[rule]['credit'] = health_insurance_ahv
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3005_fcf')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in [
+            'l10n_ch_elm_rule_aap_comp', 'l10n_ch_elm_rule_5040_comp',
+            'l10n_ch_elm_rule_laac_comp_1', 'l10n_ch_elm_rule_laac_comp_2'
+        ]:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = aanp
+            rules_mapping[rule]['credit'] = assurance_accident
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3010')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_rule_5040', 'l10n_ch_elm_rule_laac1', 'l10n_ch_elm_rule_laac_2']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = assurance_accident
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3011')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_rule_ijm_1', 'l10n_ch_elm_rule_ijm_2']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = sickness_insurance
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3014_fcf')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_rule_ijm_comp_1', 'l10n_ch_elm_rule_ijm_comp_2']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = ijm
+            rules_mapping[rule]['credit'] = sickness_insurance
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3015_fcf')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_hr_elm_5050', 'l10n_ch_hr_elm_5052']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = lpp_provision
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3030')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_hr_elm_7050', 'l10n_ch_hr_elm_7052']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = lpp
+            rules_mapping[rule]['credit'] = lpp_provision
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3031')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3032')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3032')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3033')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3038')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3035')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3036')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_3037')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5010')
-        rules_mapping[rule]['debit'] = '2270'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5020')
-        rules_mapping[rule]['debit'] = '2270'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5400')
-        rules_mapping[rule]['debit'] = '2270'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_compl_ac')
-        rules_mapping[rule]['debit'] = '2270'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_7400')
-        rules_mapping[rule]['debit'] = '5700'
-        rules_mapping[rule]['credit'] = '2270'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_7010')
-        rules_mapping[rule]['debit'] = '5700'
-        rules_mapping[rule]['credit'] = '2270'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_7011')
-        rules_mapping[rule]['debit'] = '5700'
-        rules_mapping[rule]['credit'] = '2270'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5020_comp')
-        rules_mapping[rule]['debit'] = '5700'
-        rules_mapping[rule]['credit'] = '2270'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_compl_ac_comp')
-        rules_mapping[rule]['debit'] = '5700'
-        rules_mapping[rule]['credit'] = '2270'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_aap_comp')
-        rules_mapping[rule]['debit'] = '5730'
-        rules_mapping[rule]['credit'] = '2273'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5040_comp')
-        rules_mapping[rule]['debit'] = '5730'
-        rules_mapping[rule]['credit'] = '2273'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_laac_comp_1')
-        rules_mapping[rule]['debit'] = '5730'
-        rules_mapping[rule]['credit'] = '2273'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_laac_comp_2')
-        rules_mapping[rule]['debit'] = '5730'
-        rules_mapping[rule]['credit'] = '2273'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5040')
-        rules_mapping[rule]['debit'] = '2273'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_laac1')
-        rules_mapping[rule]['debit'] = '2273'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_laac_2')
-        rules_mapping[rule]['debit'] = '2273'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_ijm_1')
-        rules_mapping[rule]['debit'] = '2274'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_ijm_2')
-        rules_mapping[rule]['debit'] = '2274'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_ijm_comp_1')
-        rules_mapping[rule]['debit'] = '5740'
-        rules_mapping[rule]['credit'] = '2274'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_ijm_comp_2')
-        rules_mapping[rule]['debit'] = '5740'
-        rules_mapping[rule]['credit'] = '2274'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_5050')
-        rules_mapping[rule]['debit'] = '2271'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_5052')
-        rules_mapping[rule]['debit'] = '2271'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_7050')
-        rules_mapping[rule]['debit'] = '5720'
-        rules_mapping[rule]['credit'] = '2271'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_7052')
-        rules_mapping[rule]['debit'] = '5720'
-        rules_mapping[rule]['credit'] = '2271'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_5111')
-        rules_mapping[rule]['debit'] = '5720'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_5112')
-        rules_mapping[rule]['debit'] = '5720'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_hr_elm_5111', 'l10n_ch_hr_elm_5112']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = lpp
+            rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_5051')
-        rules_mapping[rule]['debit'] = '2271'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = lpp_provision
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_7051')
-        rules_mapping[rule]['debit'] = '5720'
-        rules_mapping[rule]['credit'] = '2271'
+        rules_mapping[rule]['debit'] = lpp
+        rules_mapping[rule]['credit'] = lpp_provision
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5061')
-        rules_mapping[rule]['debit'] = '2279'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5061_nk')
-        rules_mapping[rule]['debit'] = '2279'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5060')
-        rules_mapping[rule]['debit'] = '2279'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5060_manual')
-        rules_mapping[rule]['debit'] = '2279'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_elm_rule_5061', 'l10n_ch_elm_rule_5061_nk', 'l10n_ch_elm_rule_5060', 'l10n_ch_elm_rule_5060_manual']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = source_tax
+            rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5070')
-        rules_mapping[rule]['debit'] = '2272'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = health_insurance_caf
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_7070')
-        rules_mapping[rule]['debit'] = '2272'
-        rules_mapping[rule]['credit'] = '5710'
+        rules_mapping[rule]['debit'] = health_insurance_caf
+        rules_mapping[rule]['credit'] = fak
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5080')
-        rules_mapping[rule]['debit'] = '1090'
-        rules_mapping[rule]['credit'] = '5891'
+        rules_mapping[rule]['debit'] = salary_pass_through
+        rules_mapping[rule]['credit'] = comp_company_car
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5081')
-        rules_mapping[rule]['debit'] = '1090'
-        rules_mapping[rule]['credit'] = '2210'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5082')
-        rules_mapping[rule]['debit'] = '1090'
-        rules_mapping[rule]['credit'] = '2210'
+        for xml_id in ['l10n_ch_elm_rule_5081', 'l10n_ch_elm_rule_5082']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = salary_pass_through
+            rules_mapping[rule]['credit'] = short_term_liabilities
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5100')
-        rules_mapping[rule]['debit'] = '5800'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = other_expenses
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5110')
-        rules_mapping[rule]['debit'] = '5000'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = wages
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5310')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = transfer_salaries
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_7310')
-        rules_mapping[rule]['debit'] = '1090'
-        rules_mapping[rule]['credit'] = '1091'
+        rules_mapping[rule]['debit'] = salary_pass_through
+        rules_mapping[rule]['credit'] = transfer_salaries
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_5300')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = transfer_salaries
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_7300')
-        rules_mapping[rule]['debit'] = '1090'
-        rules_mapping[rule]['credit'] = '1091'
+        rules_mapping[rule]['debit'] = salary_pass_through
+        rules_mapping[rule]['credit'] = transfer_salaries
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_6000')
-        rules_mapping[rule]['debit'] = '5832'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_6020')
-        rules_mapping[rule]['debit'] = '5832'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_hr_elm_6000', 'l10n_ch_hr_elm_6020']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = fixed_rate_expenses
+            rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_6030')
-        rules_mapping[rule]['debit'] = '5800'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = other_expenses
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_6035')
-        rules_mapping[rule]['debit'] = '1091'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = transfer_salaries
+        rules_mapping[rule]['credit'] = salary_pass_through
 
         rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_6040')
-        rules_mapping[rule]['debit'] = '5830'
-        rules_mapping[rule]['credit'] = '1090'
+        rules_mapping[rule]['debit'] = representation_fees
+        rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_6050')
-        rules_mapping[rule]['debit'] = '5832'
-        rules_mapping[rule]['credit'] = '1090'
+        for xml_id in ['l10n_ch_hr_elm_6050', 'l10n_ch_hr_elm_6070']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = fixed_rate_expenses
+            rules_mapping[rule]['credit'] = salary_pass_through
 
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_hr_elm_6070')
-        rules_mapping[rule]['debit'] = '5832'
-        rules_mapping[rule]['credit'] = '1090'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_6510')
-        rules_mapping[rule]['debit'] = '1090'
-        rules_mapping[rule]['credit'] = '1091'
-
-        rule = self.env.ref('l10n_ch_hr_payroll.l10n_ch_elm_rule_6600')
-        rules_mapping[rule]['debit'] = '1090'
-        rules_mapping[rule]['credit'] = '1091'
+        for xml_id in ['l10n_ch_elm_rule_6510', 'l10n_ch_elm_rule_6600']:
+            rule = self.env.ref(f'l10n_ch_hr_payroll.{xml_id}')
+            rules_mapping[rule]['debit'] = salary_pass_through
+            rules_mapping[rule]['credit'] = transfer_salaries
 
         self._configure_payroll_account(
             companies,
             "CH",
-            account_codes=account_codes,
+            account_refs=[
+                salary_pass_through, transfer_salaries, health_insurance_ahv, short_term_liabilities, lpp_provision,
+                health_insurance_caf, assurance_accident, sickness_insurance, source_tax, provision_13th,
+                provision_14th, wages, social_insurance_payments, profit_sharing, month_13th, bonus, commissions,
+                month_14th, ahv, fak, lpp, aanp, laac, ijm, is_tax, other_expenses, prof_training, travel_expenses,
+                representation_fees, fixed_rate_expenses, rate_personal_use, comp_company_car, vehicle_expenses
+            ],
             rules_mapping=rules_mapping,
         )

@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from odoo import Command, fields
+from odoo.exceptions import UserError
 from odoo.tests.common import tagged
 
 from . import common
@@ -8,6 +9,8 @@ from . import common
 
 @tagged("-at_install", "post_install", "post_install_l10n", "manual")
 class TestManual(common.TestUyEdi):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
@@ -145,6 +148,28 @@ class TestManual(common.TestUyEdi):
         self._send_and_print(refund)
         self._check_cfe(refund, "e-NCTK", "80_e_ticket_credit_note")
 
+    def test_81_e_ticket_credit_note_zero_amount(self):
+        """ Ensure that credit note of a 0.00 e-Ticket must keep the mandatory MntCFEref reference node (DGI CODE 31). """
+        invoice = self._create_move(invoice_line_ids=[Command.create({
+            "product_id": self.service_vat_22.id,
+            "price_unit": 0,
+        })])
+        invoice.action_post()
+        self.assertEqual(invoice.amount_total, 0.0, "Original e-Ticket should have a 0.00 total.")
+        self._send_and_print(invoice)
+
+        refund = self._create_credit_note(invoice)
+        refund.action_post()
+        self._send_and_print(refund)
+
+        cfe = self.get_xml_tree_from_attachment(refund.l10n_uy_edi_document_id.attachment_id)
+        namespace = {"cfe": "http://cfe.dgi.gub.uy"}
+        reference = cfe.find(".//cfe:Referencia/cfe:Referencia", namespace)
+        mnt_cfe_ref = reference.find("cfe:MntCFEref", namespace)
+        self.assertIsNotNone(mnt_cfe_ref, "MntCFEref must be present even when the referenced amount is 0.00.")
+        self.assertEqual(mnt_cfe_ref.text, "0.00")
+        self.assertIsNotNone(reference.find("cfe:TpoMonedaRef", namespace), "TpoMonedaRef must be present.")
+
     def test_90_e_ticket_debit_note(self):
         """ Create a credit note, validate it, check that we do not get any error. """
         invoice = self._create_move()
@@ -278,10 +303,16 @@ class TestManual(common.TestUyEdi):
         self._check_cfe(invoice, "e-TK", "120_e_ticket_final_consumer")
 
     def test_default_doc_type_by_id(self):
+        partner_dgi = self.env["res.partner"].create({
+            "name": "DGI",
+            "vat": "219999800012",
+            "website": "https://www.dgi.gub.uy",
+            "country_id": self.env.ref("base.uy").id,
+        })
         dc_e_inv = self.env.ref('l10n_uy.dc_e_inv')
         move = self._create_move(partner_id=self.env.ref("l10n_uy.partner_cfu").id)
         self.assertEqual(move.l10n_latam_document_type_id, self.env.ref('l10n_uy.dc_e_ticket'), "The document type is not being set correctly.")
-        move.partner_id = self.env.ref('l10n_uy.partner_dgi').id
+        move.partner_id = partner_dgi.id
         self.assertEqual(move.l10n_latam_document_type_id, dc_e_inv, "The expected document should be e-invoice")
 
     def test_130_entrega_gratuita(self):
@@ -324,10 +355,10 @@ class TestManual(common.TestUyEdi):
             "type": "service",
         })
         discount_list = [
-            {"product_id": discount.id, "price_unit": -5.0, "tax_ids": self.tax_22},  # w/product
-            {"product_id": discount.id, "name": "", "price_unit": -2.0, "tax_ids": self.tax_22},  # w/product & wo/label
-            {"name": "Discount only Label", "price_unit": -20.0, "tax_ids": self.tax_0},  # wo product but w/label
-            {"name": "", "price_unit": -10.0, "tax_ids": self.tax_10},  # wo product or label
+            {"product_id": discount.id, "price_unit": -5.0, "tax_ids": self.tax_22},  # w/product & wo/description
+            {"product_id": discount.id, "name": "Discount Description", "price_unit": -2.0, "tax_ids": self.tax_22},  # w/product & w/description
+            {"name": "Discount only Label", "price_unit": -20.0, "tax_ids": self.tax_0},  # wo product but w/description
+            {"name": "", "price_unit": -10.0, "tax_ids": self.tax_10},  # wo product or description
         ]
         invoice = self._create_move(
             ref="test_140_global_discount",
@@ -365,7 +396,8 @@ class TestManual(common.TestUyEdi):
         invoice.action_post()
 
         with patch("odoo.addons.account.models.account_move.AccountMove._is_downpayment", return_value=True), \
-             patch("odoo.addons.sale.models.account_move.AccountMove._is_downpayment", return_value=True):
+             patch("odoo.addons.sale.models.account_move.AccountMove._is_downpayment", return_value=True), \
+             patch("odoo.addons.pos_sale.models.account_move.AccountMove._is_downpayment", return_value=True):
             self._send_and_print(invoice)
         self._check_cfe(invoice, "e-FC", "150_global_donwpayment")
 
@@ -395,6 +427,56 @@ class TestManual(common.TestUyEdi):
         with patch(url % "account", return_value=result_value), patch(url % "sale", return_value=result_value):
             self._send_and_print(invoice)
         self._check_cfe(invoice, "e-FC", "160_deduct_global_donwpayment")
+
+    def test_165_non_billable_products(self):
+        """ Create e-invoice with non-billable products (positive indicator 6 + negative indicator 7)."""
+        non_billable = self.env["product.product"].create({
+            "name": "Non-Billable Product",
+            "list_price": 50.0,
+            "standard_price": 50.0,
+            "type": "service",
+            "company_id": self.company_uy.id,
+            "taxes_id": False,
+            "l10n_uy_edi_is_non_billable": True,
+        })
+        invoice = self._create_move(
+            ref="test_165_non_billable",
+            partner_id=self.partner_local.id,
+            l10n_latam_document_type_id=self.env.ref("l10n_uy.dc_e_inv").id,
+            invoice_line_ids=[
+                Command.create({"product_id": self.service_vat_22.id, "price_unit": 1000.0, "tax_ids": self.tax_22}),
+                Command.create({"product_id": non_billable.id, "price_unit": 50.0, "tax_ids": False}),  # ind 6
+                Command.create({"product_id": non_billable.id, "price_unit": -20.0, "tax_ids": False}),  # ind 7 (negative price)
+            ])
+        invoice.action_post()
+        self._send_and_print(invoice)
+        self._check_cfe(invoice, "e-FC", "165_non_billable")
+
+    def test_166_non_billable_products_with_discounts(self):
+        """ Create e-invoice of non-billable lines with line discounts."""
+        non_billable = self.env["product.product"].create({
+            "name": "Non-Billable Product",
+            "list_price": 50.0,
+            "standard_price": 50.0,
+            "type": "service",
+            "company_id": self.company_uy.id,
+            "taxes_id": False,
+            "l10n_uy_edi_is_non_billable": True,
+        })
+        invoice = self._create_move(
+            ref="test_166_non_billable_discounts",
+            partner_id=self.partner_local.id,
+            l10n_latam_document_type_id=self.env.ref("l10n_uy.dc_e_inv").id,
+            invoice_line_ids=[
+                Command.create({"product_id": self.service_vat_22.id, "price_unit": 1000.0, "tax_ids": self.tax_22}),
+                Command.create({"product_id": non_billable.id, "price_unit": -20.0, "discount": -10.0, "tax_ids": False}),  # ind 7 (negative price + negative discount)
+                Command.create({"product_id": non_billable.id, "price_unit": -50.0, "discount": 10.0, "tax_ids": False}),  # ind 7 (negative price + positive discount)
+                Command.create({"product_id": non_billable.id, "price_unit": 30.0, "discount": -10.0, "tax_ids": False}),  # ind 6 (positive subtotal + negative discount)
+                Command.create({"product_id": non_billable.id, "price_unit": 40.0, "discount": 10.0, "tax_ids": False}),  # ind 6 (positive subtotal + positive discount)
+            ])
+        invoice.action_post()
+        self._send_and_print(invoice)
+        self._check_cfe(invoice, "e-FC", "166_non_billable_discounts")
 
     def test_170_uploaded_vendor_bill_with_global_fixed_discount(self):
         """ Simulate upload xml document with global discount fixed line on vendor bill journal and test if it was
@@ -517,3 +599,65 @@ class TestManual(common.TestUyEdi):
         invoice.action_post()
         self._send_and_print(invoice)
         self._check_cfe(invoice, "e-FCE", "60_e_invoice_another_currency")
+
+    def test_e_expo_invoice_global_discount(self):
+        """ Create an Expo e-Invoice (CFE 121) with a global discount line. The discount must be
+        reported in the DscRcgGlobal section with IndFactDR = 10 (Exportación y asimiladas) and
+        ValorDR taken from the line tax base (quantity * price_unit, not just the unit price).
+        MntExpoyAsim and MntTotal must be the total after applying the discount. """
+        invoice = self._create_move(
+            l10n_latam_document_type_id=self.env.ref("l10n_uy.dc_e_inv_exp").id,
+            partner_id=self.foreign_partner.id,
+            invoice_incoterm_id=self.env.ref("account.incoterm_FOB").id,
+            l10n_uy_edi_cfe_sale_mode="1",
+            l10n_uy_edi_cfe_transport_route="1",
+            invoice_line_ids=[
+                Command.create({"product_id": self.product_vat_22.id, "price_unit": 100.0}),
+                # quantity 2 x -5.0: ValorDR must be 10.00 (the tax base), not abs(price_unit) = 5.00
+                Command.create({"name": "Global Discount", "quantity": 2.0, "price_unit": -5.0, "tax_ids": self.tax_0}),
+            ],
+        )
+        self.assertEqual(invoice.l10n_latam_document_type_id.code, "121", "Not Expo e-invoice")
+        invoice.action_post()
+        self.assertEqual(invoice.amount_total, 90.0, "Global discount not applied to the total")
+        self._send_and_print(invoice)
+        self._check_cfe(invoice, "e-FCE", "230_e_expo_invoice_global_discount")
+
+    def test_e_expo_invoice_full_discount(self):
+        """ Create an Expo e-Invoice fully discounted (total = 0.0). MntExpoyAsim is a mandatory tag
+        for expo CFEs, so it must be reported with 0.00 value instead of being removed from the XML """
+        invoice = self._create_move(
+            l10n_latam_document_type_id=self.env.ref("l10n_uy.dc_e_inv_exp").id,
+            partner_id=self.foreign_partner.id,
+            invoice_incoterm_id=self.env.ref("account.incoterm_FOB").id,
+            l10n_uy_edi_cfe_sale_mode="1",
+            l10n_uy_edi_cfe_transport_route="1",
+            invoice_line_ids=[
+                Command.create({"product_id": self.product_vat_22.id, "price_unit": 100.0}),
+                Command.create({"name": "Full Discount", "price_unit": -100.0, "tax_ids": self.tax_0}),
+            ],
+        )
+        self.assertEqual(invoice.l10n_latam_document_type_id.code, "121", "Not Expo e-invoice")
+        invoice.action_post()
+        self.assertEqual(invoice.amount_total, 0.0, "Global discount not applied to the total")
+        self._send_and_print(invoice)
+        self._check_cfe(invoice, "e-FCE", "235_e_expo_invoice_full_discount")
+
+    def test_global_discount_tax_mismatch(self):
+        """ A discount line whose taxes do not match the taxes of any regular line must be rejected
+        with a pre-send validation error (and the CFE should not be left in error state) """
+        invoice = self._create_move(
+            partner_id=self.partner_local.id,
+            l10n_latam_document_type_id=self.env.ref("l10n_uy.dc_e_inv").id,
+            invoice_line_ids=[
+                Command.create({"product_id": self.service_vat_22.id, "price_unit": 100.0, "tax_ids": self.tax_22}),
+                Command.create({"name": "Discount", "price_unit": -10.0, "tax_ids": self.tax_10}),
+            ],
+        )
+        invoice.action_post()
+        with self.assertRaisesRegex(UserError, "must be associated to another line having the same taxes"):
+            self._send_and_print(invoice)
+
+        # Since it is an internal pre-send validation, the CFE state/error must remain unset
+        self.assertFalse(invoice.l10n_uy_edi_cfe_state)
+        self.assertFalse(invoice.l10n_uy_edi_error)

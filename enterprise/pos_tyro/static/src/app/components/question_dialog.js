@@ -1,22 +1,19 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps, t } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 
 export class QuestionDialog extends Component {
     static template = "pos_tyro.QuestionDialog";
     static components = { Dialog };
-    static props = {
-        question: {
-            type: Object,
-            shape: {
-                text: String,
-                options: { type: Array, element: String },
-                isError: { type: Boolean, optional: true },
-                isManualCancel: { type: Boolean, optional: true },
-            },
-        },
-        onClickAnswer: Function,
-        close: Function,
-    };
+    props = useProps({
+        question: t.object({
+            text: t.string(),
+            options: t.array(t.string()),
+            isError: t.boolean().optional(),
+            isManualCancel: t.boolean().optional(),
+        }),
+        onClickAnswer: t.function(),
+        close: t.function(),
+    });
 
     onClickOption(option) {
         this.props.onClickAnswer(option);

@@ -1,13 +1,16 @@
 import { _t } from "@web/core/l10n/translation";
 import { CalendarCommonPopover } from "@web/views/calendar/calendar_common/calendar_common_popover";
-import { CalendarCommonRenderer } from "@web/views/calendar/calendar_common/calendar_common_renderer";
+import {
+    CalendarCommonRenderer,
+    calendarCommonRendererProps,
+} from "@web/views/calendar/calendar_common/calendar_common_renderer";
 import { CalendarController } from "@web/views/calendar/calendar_controller";
-import { CalendarRenderer } from "@web/views/calendar/calendar_renderer";
+import { CalendarRenderer, calendarRendererProps } from "@web/views/calendar/calendar_renderer";
 import { calendarView } from "@web/views/calendar/calendar_view";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { ItemCalendarModel } from "@knowledge/views/item_calendar/item_calendar_model";
 import { registry } from "@web/core/registry";
-import { onMounted, onWillUpdateProps, useEffect } from "@odoo/owl";
+import { onMounted, onWillUpdateProps, t, useEffect, useProps } from "@odoo/owl";
 
 export class KnowledgeArticleItemsCalendarController extends CalendarController {
     static template = "knowledge.ArticleItemsCalendarController";
@@ -58,9 +61,9 @@ export class KnowledgeArticleItemsCalendarController extends CalendarController 
         });
     }
 
-    get showSideBar() {
-        // Hide sideabar when the view is embedded
-        return !this.env.isEmbeddedView && super.showSideBar;
+    get hasSidePanel() {
+        // Hide side panel when the view is embedded
+        return false;
     }
 
     /**
@@ -95,12 +98,12 @@ export class KnowledgeArticleItemsCalendarController extends CalendarController 
     deleteRecord(record) {
         this.displayDialog(ConfirmationDialog, {
             title: _t("Confirmation"),
-            body: _t("Are you sure you want to send this article to the trash?"),
+            body: _t("Are you sure you want to move this article to the trash?"),
             confirm: async () => {
                 await this.orm.call("knowledge.article", "action_send_to_trash", [record.id]);
                 this.model.load();
             },
-            confirmLabel: _t("Send to trash"),
+            confirmLabel: _t("Move to trash"),
             cancel: () => {
                 // `ConfirmationDialog` needs this prop to display the cancel
                 // button but we do nothing on cancel.
@@ -160,11 +163,7 @@ export class KnowledgeArticleItemsCalendarController extends CalendarController 
 }
 
 class KnowledgeArticleItemsCommonPopover extends CalendarCommonPopover {
-    static subTemplates = {
-        ...CalendarCommonPopover.subTemplates,
-        body: "knowledge.ArticleItemsCalendarCommonPopover.body",
-        footer: "knowledge.ArticleItemsCalendarCommonPopover.footer",
-    };
+    static defaultFooterButtonsTemplate = "knowledge.ArticleItemsCalendarCommonPopover.footer";
 
     /**
      * Delete permission should not be based on the view's delete parameter only, but on the
@@ -175,12 +174,12 @@ class KnowledgeArticleItemsCommonPopover extends CalendarCommonPopover {
     }
 }
 
-class KnowledgeArticleItemsCommonRenderer extends CalendarCommonRenderer {
-    static props = {
-        ...CalendarCommonRenderer.props,
-        slotMinTime: { type: String },
-        slotMaxTime: { type: String },
-    };
+export class KnowledgeArticleItemsCommonRenderer extends CalendarCommonRenderer {
+    props = useProps({
+        ...calendarCommonRendererProps,
+        slotMinTime: t.string(),
+        slotMaxTime: t.string(),
+    });
     static components = {
         ...CalendarCommonRenderer.components,
         Popover: KnowledgeArticleItemsCommonPopover,
@@ -196,22 +195,21 @@ class KnowledgeArticleItemsCommonRenderer extends CalendarCommonRenderer {
 
     setup() {
         super.setup();
-        useEffect(
-            (slotMinTime, slotMaxTime) => {
-                this.fc.api.setOption("slotMinTime", slotMinTime);
-                this.fc.api.setOption("slotMaxTime", slotMaxTime);
-            },
-            () => [this.options.slotMinTime, this.options.slotMaxTime]
-        );
+        useEffect(() => {
+            if (this.fc()) {
+                this.fc().setOption("slotMinTime", this.props.slotMinTime);
+                this.fc().setOption("slotMaxTime", this.props.slotMaxTime);
+            }
+        });
     }
 }
 
 class KnowledgeArticleItemsCalendarRenderer extends CalendarRenderer {
-    static props = {
-        ...CalendarRenderer.props,
-        slotMinTime: { type: String },
-        slotMaxTime: { type: String },
-    };
+    props = useProps({
+        ...calendarRendererProps,
+        slotMinTime: t.string(),
+        slotMaxTime: t.string(),
+    });
     static components = {
         ...CalendarRenderer.components,
         day: KnowledgeArticleItemsCommonRenderer,

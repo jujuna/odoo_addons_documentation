@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import ast
+import contextlib
 import logging
 import re
 import requests
@@ -28,6 +28,13 @@ class SocialLivePost(models.Model):
             post.live_post_link = 'https://www.twitter.com/%s/statuses/%s' % (
                 post.account_id.twitter_user_id, post.twitter_tweet_id
             )
+
+    def _compute_has_metrics(self):
+        super()._compute_has_metrics()
+        twitter_live_posts = self._filter_by_media_types(['twitter'])
+        twitter_live_posts.has_likes = True
+        twitter_live_posts.has_comments = True
+        twitter_live_posts.has_shares = True
 
     def _refresh_statistics(self):
         super()._refresh_statistics()
@@ -72,9 +79,11 @@ class SocialLivePost(models.Model):
                 existing_live_post = existing_live_posts_by_tweet_id.get(tweet.get('id'))
                 if existing_live_post:
                     public_metrics = tweet.get('public_metrics', {})
-                    likes_count = public_metrics.get('like_count', 0)
-                    retweets_count = public_metrics.get('retweet_count', 0)
-                    existing_live_post.engagement = likes_count + retweets_count
+                    existing_live_post.write({
+                        'likes_count': public_metrics.get('like_count', 0),
+                        'comments_count': public_metrics.get('reply_count', 0),
+                        'shares_count': public_metrics.get('retweet_count', 0),
+                    })
 
     def _post(self):
         twitter_live_posts = self._filter_by_media_types(['twitter'])
@@ -117,10 +126,30 @@ class SocialLivePost(models.Model):
                     'state': 'posted',
                     'failure_reason': False
                 }
+                if live_post.post_id.twitter_first_comment:
+                    comment = self.env['mail.render.mixin'].sudo()._shorten_links_text(
+                        live_post.post_id.twitter_first_comment,
+                        live_post._get_utm_values()
+                    )
+                    comment = self._remove_mentions(comment)
+                    with contextlib.suppress(UserError):
+                        self.env['social.stream.post']._twitter_comment_add(
+                            live_post.account_id,
+                            live_post.twitter_tweet_id,
+                            None,
+                            comment,
+                        )
             else:
+                try:
+                    error_data = result.json()
+                except ValueError:
+                    failure_reason = result.text
+                else:
+                    failure_reason = error_data.get('detail')
+
                 values = {
                     'state': 'failed',
-                    'failure_reason': result.text
+                    'failure_reason': failure_reason
                 }
 
             live_post.write(values)
@@ -132,8 +161,7 @@ class SocialLivePost(models.Model):
         :param message: text message in which we will look for mention
         :param ignore_mentions: do not remove those mentions if found
         """
-        if not ast.literal_eval(self.env['ir.config_parameter'].sudo().get_param(
-           'social_twitter.disable_mentions', 'False')):
+        if not self.env['ir.config_parameter'].sudo().get_bool('social_twitter.disable_mentions'):
             return message
 
         if ignore_mentions:

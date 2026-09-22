@@ -8,15 +8,16 @@
 # Jolien De Paepe, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:44+0000\n"
-"PO-Revision-Date: 2025-12-10 10:26+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 03:51+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "mrp_workorder/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +25,13 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/wizard/propose_change.py:0
+msgid "%(user_name)s suggests to add this picture to the instruction"
+msgstr ""
 
 #. module: mrp_workorder
 #. odoo-python
@@ -34,14 +41,48 @@ msgstr "%(user_name)s suggère de supprimer cette instruction"
 
 #. module: mrp_workorder
 #. odoo-python
-#: code:addons/mrp_workorder/wizard/propose_change.py:0
-msgid "%(user_name)s suggests to use this document as instruction"
-msgstr "%(user_name)s suggère d'utiliser ce document comme instruction"
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "4 x 12 - One per lot/SN"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "4 x 12 - One per unit"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "4x12_units"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+msgid ""
+"<i class=\"oi oi-filled px-1 o-pt-0_5\" data-icon=\"settings\" role=\"img\" "
+"title=\"Work Center\"/>"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+msgid ""
+"<i class=\"oi oi-filled px-1\" data-icon=\"calendar_today\" role=\"img\" "
+"title=\"Date\"/>"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+msgid ""
+"<i class=\"oi px-1\" data-icon=\"build\" role=\"img\" title=\"Manufacturing "
+"Order\"/>"
+msgstr ""
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.res_config_settings_view_form
-msgid "<i class=\"fa fa-print\"/> Print barcode commands"
-msgstr "<i class=\"fa fa-print\"/> Imprimer les commandes de code-barres"
+msgid "<i class=\"oi\" data-icon=\"print\"/> Print barcode commands"
+msgstr ""
+"<i class=\"oi\" data-icon=\"print\"/> Imprimer les commandes de code-barres"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_bom_form_view_inherited
@@ -54,27 +95,31 @@ msgid "<span class=\"o_stat_text order-2\">Operations</span>"
 msgstr "<span class=\"o_stat_text order-2\">Opérations</span>"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "<span invisible=\"employee_name\">Log In </span>"
-msgstr "<span invisible=\"employee_name\">Se connecter </span>"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+msgid ""
+"<span invisible=\"state != 'done'\" class=\"align-self-center text-"
+"success\">This work order is done</span>"
+msgstr ""
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
-msgid "<strong>Start Date: </strong>"
-msgstr "<strong>Date de début :</strong>"
+msgid "<strong>Start: </strong>"
+msgstr "<strong>Début :</strong>"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
-msgid "<strong>Stop Date: </strong>"
-msgstr "<strong>Date de fin : </strong>"
+msgid "<strong>Stop: </strong>"
+msgstr "<strong>Fin :</strong>"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
 msgid "<strong>Workcenter: </strong>"
 msgstr "<strong>Poste de travail : </strong>"
+
+#. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_res_groups
+msgid "Access Groups"
+msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -91,7 +136,12 @@ msgstr "Activités"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "Activité exception décoration"
+msgstr "Indicateur d’exception d’activité"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__activity_plans_ids
+msgid "Activity Plans"
+msgstr "Plans d'activité"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__activity_state
@@ -123,6 +173,17 @@ msgstr "Ajouter composant"
 
 #. module: mrp_workorder
 #. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Add Note"
+msgstr "Ajouter une note"
+
+#. module: mrp_workorder
+#: model:ir.model.fields.selection,name:mrp_workorder.selection__propose_change__change_type__set_picture
+msgid "Add Picture"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
 #. odoo-python
 #: code:addons/mrp_workorder/models/mrp_production.py:0
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
@@ -139,6 +200,12 @@ msgstr "Ajouter un poste de travail"
 
 #. module: mrp_workorder
 #. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Add a New picture"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
 #. odoo-python
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
@@ -152,24 +219,15 @@ msgid "Add line: %(productName)s"
 msgstr "Ajouter une ligne : %(productName)s"
 
 #. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/mrp_production.py:0
-msgid "Add log note"
-msgstr "Ajouter une note"
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Add/Modify Step"
+msgstr "Ajouter/Modifier une étape"
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_mrp_production_additional_workorder
 msgid "Additional Workorder"
 msgstr "Ordre de travail additionnel"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_form_view
-msgid ""
-"Additional instructions that can be created and visualised from both here "
-"and the shop floor interface."
-msgstr ""
-"Instructions supplémentaires pouvant être créées et visualisées à partir "
-"d'ici et de l'interface de l'atelier."
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__all_employees_allowed
@@ -197,6 +255,11 @@ msgstr ""
 "depuis l’onglet aperçu."
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__allowed_bom_line_ids
+msgid "Allowed Bom Line"
+msgstr "Ligne de nomenclature autorisée"
+
+#. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_form_view_inherit
 msgid "Allowed Employees"
 msgstr "Employés autorisés"
@@ -220,6 +283,18 @@ msgid "Assigned"
 msgstr "Assigné"
 
 #. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_routing_view_tree
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
+msgid "Attachment"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "Attachment Preview"
+msgstr ""
+
+#. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_employee_form_account
 msgid "Attendance/Point of Sale/Manufacturing"
 msgstr "Présence / Point de Vente / Fabrication"
@@ -230,11 +305,22 @@ msgid "Availability"
 msgstr "Disponibilité"
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__available_packaging_ids
+msgid "Available Packaging"
+msgstr ""
+
+#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.xml:0
 msgid "Back"
 msgstr "Retour"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/components/product_catalog/kanban_controller.js:0
+msgid "Back to ShopFloor"
+msgstr "Retour à l'Atelier"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_barcode
@@ -243,15 +329,15 @@ msgid "Barcode"
 msgstr "Code-barres"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder___barcode_scanned
-msgid "Barcode Scanned"
-msgstr "Code barre scanné"
-
-#. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_mrp_bom
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_id
 msgid "Bill of Material"
 msgstr "Nomenclature"
+
+#. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_mrp_bom_line
+msgid "Bill of Material Line"
+msgstr "Ligne de nomenclature"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -284,9 +370,19 @@ msgid "BoM feedback (%(production)s - %(operation)s)"
 msgstr "Retour sur la nomenclature (%(production)s - %(operation)s)"
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_line_id
+msgid "Bom Line"
+msgstr "Ligne de nomenclature"
+
+#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_product_ids
 msgid "Bom Product"
 msgstr "Produit de la nomenclature"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
+msgid "By-Product To Register"
+msgstr "Sous-produit à enregistrer"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -295,21 +391,16 @@ msgid "By-product: %(productName)s"
 msgstr "Sous-produit : %(productName)s"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "CONTINUE"
-msgstr "CONTINUER"
+#: model:ir.model,name:mrp_workorder.model_mrp_bom_byproduct
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__byproduct_id
+msgid "Byproduct"
+msgstr "Sous-produit"
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.xml:0
-msgid "Cancel"
-msgstr "Annuler"
-
-#. module: mrp_workorder
-#: model:ir.model,name:mrp_workorder.model_change_production_qty
-msgid "Change Production Qty"
-msgstr "Changer la quantité de fabrication"
+msgid "C"
+msgstr "C"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__check_ids
@@ -351,10 +442,9 @@ msgid "Close Manufacturing Orders"
 msgstr "Clôturer les ordres de fabrication"
 
 #. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
-msgid "Close Production"
-msgstr "Fermer la production"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__columns
+msgid "Columns"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__comment
@@ -368,10 +458,14 @@ msgstr "Société"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_id
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__component_ids
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_filter_shop_floor
 msgid "Component"
 msgstr "Composant"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
+msgid "Component To Register"
+msgstr "Composant à enregistrer"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_uom_id
@@ -402,14 +496,15 @@ msgid "Confirm"
 msgstr "Confirmer"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__connected_employee_ids
-msgid "Connected Employee"
-msgstr "Employé connecté"
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_workorder_gantt/mrp_workorder_gantt_controller.xml:0
+msgid "Confirm Planning"
+msgstr ""
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__consumption
-msgid "Consumption"
-msgstr "Consommation"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__custom_quantity
+msgid "Copies"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workcenter_productivity__total_cost
@@ -421,6 +516,14 @@ msgstr "Coût"
 #: code:addons/mrp_workorder/static/src/components/viewer.js:0
 msgid "Could not display the selected %s"
 msgstr "Impossible d'afficher le %s sélectionné"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mrp_workorder/models/mrp_workorder.py:0
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_employee_dialog.xml:0
+msgid "Create Employee"
+msgstr "Créer un employé"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -442,19 +545,16 @@ msgstr "Créer un nouveau poste de travail"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__create_uid
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__create_uid
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__create_uid
 msgid "Created by"
 msgstr "Créé par"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__create_date
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__create_date
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__create_date
 msgid "Created on"
 msgstr "Créé le"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Creates a new serial/lot number"
-msgstr "Créez un nouveau numéro de lot/série"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workcenter__currency_id
@@ -499,21 +599,19 @@ msgid "Delete a Step"
 msgstr "Supprimer une étape"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__is_deleted
-msgid "Deleted in production"
-msgstr "Supprimé en production"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.add_quality_check_from_tablet
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_additional_workorder_wizard
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_propose_change_wizard
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_employee_dialog.xml:0
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.xml:0
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.xml:0
 msgid "Discard"
 msgstr "Ignorer"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_change_production_qty__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom_byproduct__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom_line__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_backorder__display_name
@@ -524,15 +622,23 @@ msgstr "Ignorer"
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_alert__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point_test_type__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_report_mrp_report_mo_overview__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_res_groups__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move_line__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_picking_type__display_name
+#: model:ir.model.fields,field_description:mrp_workorder.field_stock_rule__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.res_config_settings_view_form
+msgid "Display timer on work order cards in the shop floor app"
+msgstr ""
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.add_quality_check_from_tablet
@@ -588,21 +694,26 @@ msgid "Employee Name"
 msgstr "Nom de l'employé"
 
 #. module: mrp_workorder
+#: model:ir.ui.menu,name:mrp_workorder.mrp_workorder_menu_employee
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_view_employee_filter
 msgid "Employees"
 msgstr "Employés"
-
-#. module: mrp_workorder
-#: model:ir.model.fields,help:mrp_workorder.field_quality_check__component_tracking
-#: model:ir.model.fields,help:mrp_workorder.field_quality_check__product_tracking
-msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr "Assurez la traçabilité d'un produit stockable dans votre entrepôt."
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
 msgid "Enter your pin"
 msgstr "Saisir votre PIN"
+
+#. module: mrp_workorder
+#: model:ir.module.module,description:base.module_mrp_workorder
+msgid ""
+"Enterprise extension for MRP\n"
+"* Work order planning.  Check planning by Gantt views grouped by production "
+"order / work center\n"
+"* Traceability report\n"
+"* Cost Structure report (mrp_account)"
+msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -617,20 +728,31 @@ msgid "Estimated employee cost: %(operation_name)s"
 msgstr "Coût estimé de l’employé : %(operation_name)s"
 
 #. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_form_view_inherit
+msgid "Everyone"
+msgstr "Tout le monde"
+
+#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__duration_expected
 msgid "Expected Duration"
 msgstr "Durée prévue"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__extra_html
+msgid "Extra Content"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "Failure"
+msgstr "Échec"
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.xml:0
 msgid "Feedback Loop"
 msgstr "Boucle feedback"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_inherit_workorder
-msgid "Finished Lot/Serial Number"
-msgstr "Lot/numéro de série terminé"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__finished_product_check_ids
@@ -643,9 +765,9 @@ msgid "Finished Product Sequence Number"
 msgstr "Numéro de séquence du produit fini"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,help:mrp_workorder.field_mrp_bom__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Icône Font Awesome par ex. fa-tasks"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__print_format
+msgid "Format"
+msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -660,9 +782,10 @@ msgid "Generate Serial"
 msgstr "Générer numéro de série"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_change_production_qty__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_hr_employee__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom_byproduct__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom_line__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_backorder__id
@@ -673,13 +796,16 @@ msgstr "Générer numéro de série"
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_alert__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point_test_type__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_report_mrp_report_mo_overview__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_res_config_settings__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_res_groups__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move_line__id
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_picking_type__id
+#: model:ir.model.fields,field_description:mrp_workorder.field_stock_rule__id
 msgid "ID"
 msgstr "ID"
 
@@ -698,12 +824,6 @@ msgstr "Icône pour indiquer une activité d'exception."
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__worksheet_document
 msgid "Image/PDF"
 msgstr "Image/PDF"
-
-#. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-msgid "Improvement Suggestion"
-msgstr "Suggestion d'amélioration"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -747,6 +867,8 @@ msgid "Instruction:"
 msgstr "Instruction :"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_worksheet_dialog.xml:0
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_routing_workcenter__quality_point_count
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_operation_form_view
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_inherit_workorder
@@ -764,6 +886,12 @@ msgstr "Nombre d’instructions"
 msgid "International Article Number used for product identification."
 msgstr ""
 "Numéro d'article international (IAN) utilisé pour identifier cet article."
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.js:0
+msgid "Invalid duration"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workorder__move_line_ids
@@ -803,14 +931,21 @@ msgid "Is the Current User Working"
 msgstr "L'utilisateur actuel travaille-t-il ?"
 
 #. module: mrp_workorder
+#: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_production
+msgid "Kanban"
+msgstr "Kanban"
+
+#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__write_uid
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__write_uid
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__write_uid
 msgid "Last Updated by"
 msgstr "Mis à jour par"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__write_date
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__write_date
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__write_date
 msgid "Last Updated on"
 msgstr "Mis à jour le"
 
@@ -835,14 +970,7 @@ msgstr "Charger les exemples"
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_view_form_log_note
 msgid "Log Note"
-msgstr "Note"
-
-#. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__log_note
-msgid "Log note"
 msgstr "Note"
 
 #. module: mrp_workorder
@@ -858,14 +986,9 @@ msgid "Logged out!"
 msgstr "Déconnecté !"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Lot"
-msgstr "Lot"
-
-#. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__finished_lot_ids
-msgid "Lot/Serial Number"
-msgstr "Lot/numéro de série"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__lot_label_format
+msgid "Lot/SN Label Format"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_report_mrp_report_mo_overview
@@ -881,6 +1004,11 @@ msgstr "OF en attente"
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_filter_shop_floor
 msgid "MO Ready"
 msgstr "OF prêt"
+
+#. module: mrp_workorder
+#: model:ir.module.module,shortdesc:base.module_mrp_workorder
+msgid "MRP II"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:res.groups,name:mrp_workorder.group_mrp_wo_tablet_timer
@@ -906,6 +1034,7 @@ msgid "Manufacturing Order"
 msgstr "Ordre de fabrication"
 
 #. module: mrp_workorder
+#: model:ir.actions.act_window,name:mrp_workorder.mrp_production_products_gantt
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_gantt_view
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_tree_view_planning
 msgid "Manufacturing Orders"
@@ -914,15 +1043,15 @@ msgstr "Ordres de fabrication"
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_inherit_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
 msgid "Mark as Done"
 msgstr "Marquer comme terminé"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Mark as Done and Close MO"
-msgstr "Marquer comme terminé et fermer l'ordre de fabrication"
+#: model:ir.model.fields,help:mrp_workorder.field_mrp_bom__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_res_config_settings__wo_shop_floor_maximum_card_count
@@ -930,16 +1059,15 @@ msgid "Maximum number of cards per page"
 msgstr "Nombre maximal de cartes par page"
 
 #. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/mrp_workorder.py:0
-msgid "Menu"
-msgstr "Menu"
-
-#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Modify Routing"
 msgstr "Modifier l'acheminement"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__move_ids
+msgid "Move"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move__move_line_ids_picked
@@ -1008,11 +1136,6 @@ msgid "New Title suggested:"
 msgstr "Suggestion de nouveau titre :"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_view_employee_filter
-msgid "Newly Hired"
-msgstr "Nouvelles recrues"
-
-#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_bom__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
 msgstr "Activité suivante de l'événement du calendrier"
@@ -1038,12 +1161,18 @@ msgid "Next Check"
 msgstr "Prochain contrôle"
 
 #. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/employees_panel.xml:0
-msgid "No operators connected"
-msgstr "Aucun opérateur connecté"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_split_mo_form
+msgid "No Backorder"
+msgstr ""
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/employees_panel.xml:0
+msgid "No operators connected."
+msgstr "Aucun opérateur connecté."
+
+#. module: mrp_workorder
+#: model_terms:ir.actions.act_window,help:mrp_workorder.action_mrp_planning_gantt
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid "No work orders to do!"
 msgstr "Aucun ordre de fabrication à faire !"
@@ -1059,7 +1188,11 @@ msgid "Note"
 msgstr "Note"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_form_view
+#. odoo-javascript
+#. odoo-python
+#: code:addons/mrp_workorder/models/mrp_production.py:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_view_form_log_note
 msgid "Notes"
 msgstr "Notes"
 
@@ -1075,6 +1208,12 @@ msgid "Open Manufacturing Order"
 msgstr "Ouvrir l'ordre de fabrication"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_production_gantt/mrp_production_gantt_renderer.js:0
+msgid "Open Manufacturing Orders"
+msgstr ""
+
+#. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_inherit_workorder
 msgid "Open Shop Floor"
 msgstr "Ouvrir l'atelier"
@@ -1082,6 +1221,7 @@ msgstr "Ouvrir l'atelier"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_alert__workorder_id
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__workorder_id
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_workorders_tree_view
 msgid "Operation"
 msgstr "Opération"
 
@@ -1119,20 +1259,15 @@ msgid "Overview"
 msgstr "Vue d'ensemble"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "PAUSE"
-msgstr "PAUSE"
-
-#. module: mrp_workorder
-#: model:ir.model.fields.selection,name:mrp_workorder.selection__quality_point__test_report_type__pdf
-msgid "PDF"
-msgstr "PDF"
-
-#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/components/viewer.xml:0
 msgid "PDF file"
 msgstr "Fichier PDF"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__packaging_id
+msgid "Packaging"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_stock_picking_type
@@ -1146,14 +1281,27 @@ msgid "Picture"
 msgstr "Image"
 
 #. module: mrp_workorder
-#: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_production
-msgid "Planning by Production"
-msgstr "Planning par production"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_workorders_tree_view
+msgid "Plan"
+msgstr "Planifier"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_workorder_gantt/mrp_workorder_gantt_controller.xml:0
+msgid "Plan MO"
+msgstr "Planifier l'OF"
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/mrp_workcenter.py:0
+msgid "Plan Work Orders in %(workcenter)s"
+msgstr "Planifier les ordres de travail dans %(workcenter)s"
+
+#. module: mrp_workorder
+#: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_employee
 #: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_workcenter
-msgid "Planning by Workcenter"
-msgstr "Planning par poste de travail"
+msgid "Planning"
+msgstr "Planification"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1164,12 +1312,6 @@ msgid ""
 msgstr ""
 "Définissez la quantité que vous produisez actuellement. Celle-ci doit être "
 "différente de zéro."
-
-#. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/mrp_workorder.py:0
-msgid "Please unblock the work center to start the work order"
-msgstr "Débloquez le poste de travail pour lancer l'ordre de travail"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1189,9 +1331,55 @@ msgid "Previous Check"
 msgstr "Contrôle précédent"
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__pricelist_id
+msgid "Pricelist"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__pricer_tags_pricelist_id
+msgid "Pricer Tags Pricelist"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:quality.point.test_type,name:mrp_workorder.test_type_print_lot_label
+msgid "Print Lot/SN Label"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__print_packaging
+msgid "Print Packaging"
+msgstr ""
+
+#. module: mrp_workorder
 #: model:quality.point.test_type,name:mrp_workorder.test_type_print_label
-msgid "Print label"
-msgstr "Imprimer l'étiquette"
+msgid "Print Product Label"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__with_price
+msgid "Print With Price"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,help:mrp_workorder.field_quality_check_label_layout__print_packaging
+msgid "Print labels with each delivery order line's packaging."
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
+msgid "Produce"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__product_ids
+msgid "Product"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__product_label_format
+msgid "Product Label Format"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_stock_move_line
@@ -1199,9 +1387,14 @@ msgid "Product Moves (Stock Move Line)"
 msgstr "Mouvements de produit (Ligne de mouvement de stock)"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__component_id
-msgid "Product To Register"
-msgstr "Produit à enregistrer"
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__product_tmpl_ids
+msgid "Product Tmpl"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__product_uom_ids
+msgid "Product Uom"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__production_id
@@ -1213,11 +1406,6 @@ msgstr "Production"
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__production_id
 msgid "Production Order"
 msgstr "Ordre de production"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Production Workcenter"
-msgstr "Poste de travail"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__product_ids
@@ -1248,6 +1436,7 @@ msgstr "Nombre d'alertes qualité"
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_quality_check
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__quality_check_id
 msgid "Quality Check"
 msgstr "Contrôle qualité"
 
@@ -1255,6 +1444,11 @@ msgstr "Contrôle qualité"
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__quality_check_fail
 msgid "Quality Check Fail"
 msgstr "Échec du contrôle qualité"
+
+#. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_quality_check_label_layout
+msgid "Quality Check Label Layout"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__quality_check_todo
@@ -1312,15 +1506,15 @@ msgid "Quantity Produced"
 msgstr "Quantité produite"
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__move_quantity
+msgid "Quantity to print"
+msgstr ""
+
+#. module: mrp_workorder
 #. odoo-python
 #: code:addons/mrp_workorder/wizard/propose_change.py:0
 msgid "Reason:"
 msgstr "Motif :"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Record production"
-msgstr "Enregistrer la production"
 
 #. module: mrp_workorder
 #: model:quality.point.test_type,name:mrp_workorder.test_type_register_byproducts
@@ -1347,15 +1541,15 @@ msgstr "Enregistrer la production"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-msgid "Register Production / Serial"
-msgstr "Enregistrer la production / la série"
-
-#. module: mrp_workorder
-#. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
 msgid "Register Production: %s"
 msgstr "Enregistrer la production : %s"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Register Quantity / Lot"
+msgstr "Enregistrer la quantité / le lot"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_active
@@ -1380,9 +1574,10 @@ msgid "Remove Current Step"
 msgstr "Supprimer l'étape actuelle"
 
 #. module: mrp_workorder
-#: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__test_report_type
-msgid "Report Type"
-msgstr "Type de rapport"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
+msgid "Replan"
+msgstr "Replanifier"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__user_id
@@ -1398,6 +1593,11 @@ msgstr "Utilisateur responsable"
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__result
 msgid "Result"
 msgstr "Résultat"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__rows
+msgid "Rows"
+msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1434,22 +1634,6 @@ msgid "Select the step you want to modify"
 msgstr "Sélectionnez l'étape que vous souhaitez modifier"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "Serial"
-msgstr "En série"
-
-#. module: mrp_workorder
-#: model:ir.model.fields.selection,name:mrp_workorder.selection__propose_change__change_type__set_picture
-msgid "Set Picture"
-msgstr "Définir la photo"
-
-#. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-msgid "Set a New picture"
-msgstr "Définir une nouvelle photo"
-
-#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
@@ -1458,6 +1642,7 @@ msgstr "Définir une nouvelle photo"
 #: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_root
 #: model:ir.ui.menu,name:mrp_workorder.menu_shop_floor
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_form_view
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_view_kanban_inherit_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_picking_type_form_inherit_mrp_workorder
 msgid "Shop Floor"
 msgstr "Atelier"
@@ -1475,11 +1660,6 @@ msgid "Shop Floor Onboarding Image"
 msgstr "Image Onboarding Atelier"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.res_config_settings_view_form
-msgid "Show the timer on the work order screen"
-msgstr "Montrer le minuteur sur l'écran des ordres de travail"
-
-#. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/components/viewer.xml:0
 msgid "Slides viewer"
@@ -1489,6 +1669,25 @@ msgstr "Slides viewer"
 #: model:product.template,description_sale:mrp_workorder.product_template_stool
 msgid "Small wooden stool"
 msgstr "Petit tabouret en bois"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_split_mo_form
+msgid "Split MO"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_split_mo_form
+msgid "Split Manufacturing Order"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_split_mo_form
+msgid ""
+"Split the manufacturing order if you expect to process the\n"
+"                        remaining quantities later. Don't split if you won't "
+"process the\n"
+"                        remaining products."
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__state_color
@@ -1504,9 +1703,9 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "Statut basé sur les activités\n"
-"En retard : la date d'échéance est déjà dépassée\n"
+"En retard : l'échéance est déjà dépassée\n"
 "Aujourd'hui : la date d'activité est aujourd'hui\n"
-"Planifiée : activités futures"
+"Planifié : activités futures."
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__operation_id
@@ -1531,6 +1730,11 @@ msgid "Stock Move"
 msgstr "Mouvement de stock"
 
 #. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_stock_rule
+msgid "Stock Rule"
+msgstr "Règle de stock"
+
+#. module: mrp_workorder
 #: model:product.template,name:mrp_workorder.product_template_stool
 msgid "Stool"
 msgstr "Tabouret"
@@ -1546,9 +1750,18 @@ msgid "Stool Top"
 msgstr "Assise du tabouret"
 
 #. module: mrp_workorder
-#: model:ir.actions.client,name:mrp_workorder.tablet_client_action
-msgid "Tablet Client Action"
-msgstr "Action de tablette client"
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "Success"
+msgstr "Réussite"
+
+#. module: mrp_workorder
+#: model:ir.model.fields,help:mrp_workorder.field_quality_check__component_tracking
+#: model:ir.model.fields,help:mrp_workorder.field_quality_check__product_tracking
+msgid ""
+"Technical field holding the tracking method. False on a storable product "
+"means it's tracked by quantity only."
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__test_type
@@ -1562,9 +1775,26 @@ msgid "Test Type"
 msgstr "Type de test"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_kanban_view_inherit
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_card_view_inherit
 msgid "The deadline of this MO is on"
 msgstr "L’échéance de cet OF est fixée au"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.js:0
+msgid "The employee time log has been successfully updated"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.js:0
+msgid "The maintenance request has been successfully created."
+msgstr "La demande de maintenance a été créée avec succès."
+
+#. module: mrp_workorder
+#: model:ir.model.constraint,message:mrp_workorder.constraint_res_config_settings_check_wo_shop_floor_maximum_card_count
+msgid "The maximum number of cards per page should be positive."
+msgstr "Le nombre maximal de cartes par page doit être positif."
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1613,14 +1843,16 @@ msgid "This Station"
 msgstr "Cette station de travail"
 
 #. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/mrp_workorder.py:0
-msgid ""
-"This workcenter isn't expected to have open workorders during this period. "
-"Work hours :"
-msgstr ""
-"Ce poste de travail ne devrait pas avoir d'ordres de travail ouverts pendant "
-"cette période. Heures de travail :"
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
+msgid "This workorder has conflicts"
+msgstr "Cet ordre de travail a des conflits"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_gantt
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.workcenter_line_gantt_production
+msgid "This workorder is scheduled before its dependencies"
+msgstr "Cet ordre de travail est planifié avant ses dépendances"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1665,6 +1897,12 @@ msgid "To Process"
 msgstr "À traiter"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.xml:0
+msgid "Total Duration"
+msgstr ""
+
+#. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_tree_view_planning
 msgid "Total Qty"
 msgstr "Qté totale"
@@ -1684,10 +1922,11 @@ msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__product_tracking
-msgid "Tracking"
-msgstr "Suivi"
+msgid "Tracking Method"
+msgstr ""
 
 #. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__barcode_format
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_workorder_form
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_routing_view_tree
 msgid "Type"
@@ -1715,7 +1954,6 @@ msgstr ""
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
 msgid "Unblock"
 msgstr "Débloquer"
 
@@ -1745,9 +1983,27 @@ msgstr "Mettre à jour l'étape actuelle"
 
 #. module: mrp_workorder
 #. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_log_time_dialog.xml:0
+msgid "Update Duration"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
+msgid "Update Employee Time Spent on Work Order"
+msgstr ""
+
+#. module: mrp_workorder
+#. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Update Instructions"
 msgstr "Mettre à jour les instructions"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
+msgid "Update Time Spent"
+msgstr ""
 
 #. module: mrp_workorder
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
@@ -1771,11 +2027,6 @@ msgstr ""
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_register_production_dialog.xml:0
 msgid "Validate"
 msgstr "Valider"
-
-#. module: mrp_workorder
-#: model:ir.model.fields,help:mrp_workorder.field_mrp_workorder___barcode_scanned
-msgid "Value of the last barcode scanned."
-msgstr "Valeur du dernier code-barres scanné."
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1839,23 +2090,31 @@ msgid "Work Order Operation"
 msgstr "Opération d'ordre de travail"
 
 #. module: mrp_workorder
+#: model:ir.actions.act_window,name:mrp_workorder.mrp_workcenter_workorders_gantt
 #: model:ir.actions.act_window,name:mrp_workorder.mrp_workorder_action_tablet
 #: model:ir.ui.menu,name:mrp_workorder.mrp_workorder_menu_planning
 msgid "Work Orders"
 msgstr "Ordres de travail"
 
 #. module: mrp_workorder
-#: model:ir.actions.server,name:mrp_workorder.action_mrp_workorder_dependencies_production
+#: model:ir.actions.act_window,name:mrp_workorder.action_mrp_planning_gantt
+#: model:ir.actions.server,name:mrp_workorder.action_mrp_workorder_dependencies_employee
 #: model:ir.actions.server,name:mrp_workorder.action_mrp_workorder_dependencies_workcenter
 msgid "Work Orders Planning"
 msgstr "Planification des ordres de travail"
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_view_kanban_inherit_workorder
-msgid "Work orders"
-msgstr "Ordres de travail"
+#: model:ir.actions.server,name:mrp_workorder.action_mrp_workorder_dependencies_production
+msgid "Work Orders Planning Kanban"
+msgstr "Kanban de planification des ordres de travail"
 
 #. module: mrp_workorder
+#: model:ir.module.module,summary:base.module_mrp_workorder
+msgid "Work Orders, Planning, Stock Reports."
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.actions.act_window,help:mrp_workorder.action_mrp_planning_gantt
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid ""
 "Work orders are operations to do as part of a manufacturing order.\n"
@@ -1893,23 +2152,9 @@ msgid "Workorder"
 msgstr "Ordre de travail"
 
 #. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_worksheet_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_routing_view_tree
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
-msgid "Worksheet"
-msgstr "Feuille de travail"
-
-#. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_stock_move__worksheet_document
 msgid "Worksheet Image/PDF"
 msgstr "Image/PDF de la feuille de travail"
-
-#. module: mrp_workorder
-#. odoo-python
-#: code:addons/mrp_workorder/models/quality.py:0
-msgid "Worksheet Preview"
-msgstr "Aperçu de la fiche de travail"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__worksheet_page
@@ -1937,16 +2182,6 @@ msgstr "Vous n'êtes pas autorisé à travailler sur l'ordre de travail"
 
 #. module: mrp_workorder
 #. odoo-python
-#: code:addons/mrp_workorder/wizard/change_production_qty.py:0
-msgid ""
-"You cannot update the quantity to do of an ongoing manufacturing order for "
-"which quality checks have been performed."
-msgstr ""
-"Vous ne pouvez pas mettre la quantité à faire à jour sur un ordre de "
-"fabrication en cours pour lequel des contrôles qualités ont été réalisés."
-
-#. module: mrp_workorder
-#. odoo-python
 #: code:addons/mrp_workorder/models/quality.py:0
 msgid "You did not set a lot/serial number for the final product"
 msgstr "Vous n'avez pas indiqué de lot/numéro de série pour le produit fini"
@@ -1957,6 +2192,20 @@ msgstr "Vous n'avez pas indiqué de lot/numéro de série pour le produit fini"
 msgid "You must be logged in to process some of these work orders."
 msgstr ""
 "Vous devez être connecté pour traiter certains de ces ordres de travail."
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_employee_dialog.xml:0
+msgid "You must create an employee to log in as an operator in Shopfloor."
+msgstr ""
+"Vous devez créer un employé pour vous connecter en tant qu'opérateur dans "
+"l'atelier."
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/employees_panel.xml:0
+msgid "You must log in to process work orders."
+msgstr "Vous devez vous connecter pour traiter les ordres de travail."
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1985,10 +2234,20 @@ msgstr ""
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
 msgid ""
 "You need to link this user to an employee of this company to process the "
-"work order"
+"work order."
 msgstr ""
-"Vous devez relier cet utilisateur à un employé de cette entreprise pour "
+"Vous devez lier cet utilisateur à un employé de cette entreprise pour "
 "traiter l'ordre de travail."
+
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/mrp_workorder.py:0
+msgid ""
+"You need to link this user to an employee of this company to process these "
+"work orders."
+msgstr ""
+"Vous devez lier cet utilisateur à un employé de cette entreprise pour "
+"traiter ces ordres de travail."
 
 #. module: mrp_workorder
 #. odoo-python
@@ -2009,14 +2268,68 @@ msgid "Your suggestion to delete the %s step was successfully created."
 msgstr "Votre suggestion pour supprimer l'étape %s a été créée avec succès."
 
 #. module: mrp_workorder
-#: model:ir.model.fields.selection,name:mrp_workorder.selection__quality_point__test_report_type__zpl
-msgid "ZPL"
-msgstr "ZPL"
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "ZPL Labels - One per lot/SN"
+msgstr ""
 
 #. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "back"
-msgstr "retour"
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "ZPL Labels - One per unit"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__zpl_preview
+msgid "ZPL Preview"
+msgstr ""
+
+#. module: mrp_workorder
+#: model:ir.model.fields,field_description:mrp_workorder.field_quality_check_label_layout__zpl_template
+msgid "ZPL Template"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid "^FO14,67^BY2^BCN,74,N^FH^FD"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid "^FO14,90^A0N,22^FB378,1,0,C^FDNo barcode available^FS"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid "^FO222,159^A0N,21,16^FB170,1,0,R^FH^FD"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid "^FS"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid ""
+"^FS\n"
+"^FO14,159^A0N,21,16^FB170,1,0,L^FH^FD"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid ""
+"^FS\n"
+"^FO250,23^A0N,23,18^FB142,1,0,R^FH^FD"
+msgstr ""
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_check_zpl_label
+msgid ""
+"^PW406\n"
+"^LL203\n"
+"^FO14,23^A0N,23^FB235,1,0,L^FH^FD"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workcenter_productivity__employee_id
@@ -2035,16 +2348,16 @@ msgid "employees with access"
 msgstr "employés avec accès"
 
 #. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_workorders_tree_view
+msgid "expected duration"
+msgstr "durée prévue"
+
+#. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workcenter__employee_ids
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workorder__allowed_employees
 msgid "if left empty, all employees can log in to the workcenter"
 msgstr ""
 "si laissé vide, tous les employés peuvent se connecter au poste de travail"
-
-#. module: mrp_workorder
-#: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
-msgid "menu"
-msgstr "menu"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_form_view_inherit
@@ -2072,169 +2385,46 @@ msgstr "assise du tabouret en bois"
 msgid "working employees"
 msgstr "employés actifs"
 
-#~ msgid "<span class=\"o_stat_text\">Instructions</span>"
-#~ msgstr "<span class=\"o_stat_text\">Instructions</span>"
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "zpl_lots"
+msgstr ""
 
-#~ msgid "Add By-Product"
-#~ msgstr "Ajouter sous-produit"
+#. module: mrp_workorder
+#. odoo-python
+#: code:addons/mrp_workorder/models/quality.py:0
+msgid "zpl_units"
+msgstr ""
 
-#~ msgid "Add product"
-#~ msgstr "Ajouter un produit"
+#~ msgid "Ensure the traceability of a storable product in your warehouse."
+#~ msgstr "Assurez la traçabilité d'un produit stockable dans votre entrepôt."
 
-#~ msgid "Additional Product"
-#~ msgstr "Produit additionnel"
+#~ msgid "PDF"
+#~ msgstr "PDF"
 
-#~ msgid "Best Time! Congratulations!"
-#~ msgstr "Meilleur temps ! Félicitations !"
-
-#~ msgid "BoM feedback %s (%s)"
-#~ msgstr "Retour nomenclature %s(%s)"
-
-#~ msgid "By-Product"
-#~ msgstr "Sous-produit"
-
-#~ msgid "CONTINUE PRODUCTION"
-#~ msgstr "CONTINUER PRODUCTION"
-
-#~ msgid "Category"
-#~ msgstr "Catégorie"
-
-#~ msgid "Color"
-#~ msgstr "Couleur"
-
-#~ msgid "Completion Time:"
-#~ msgstr "Temps de traitement :"
-
-#~ msgid "Component Qty To Do"
-#~ msgstr "Qté de composants à faire"
-
-#~ msgid ""
-#~ "Conversion between Units of Measure can only occur if they belong to the "
-#~ "same category. The conversion will be made based on the ratios."
+#~ msgid "Please unblock the work center to start some of these work orders."
 #~ msgstr ""
-#~ "Il est possible de convertir deux unités de mesures si elles "
-#~ "appartiennent à la même catégorie. Cette conversion utilise les facteurs "
-#~ "définis pour ces unités."
+#~ "Veuillez débloquer le poste de travail pour démarrer certains de ces "
+#~ "ordres de travail."
 
-#~ msgid "Custom"
-#~ msgstr "Personnalisé"
+#~ msgid "Print label"
+#~ msgstr "Imprimer l'étiquette"
 
-#~ msgid "Delete this Step"
-#~ msgstr "Supprimer cette étape"
+#~ msgid "Report Type"
+#~ msgstr "Type de rapport"
 
-#~ msgid "Finished Lot/Serial"
-#~ msgstr "Lot/numéro de série fini"
+#~ msgid "Tracking"
+#~ msgstr "Suivi"
 
-#~ msgid "Finished Steps"
-#~ msgstr "Étapes terminées"
+#~ msgid "ZPL"
+#~ msgstr "ZPL"
 
-#~ msgid "Good Job!"
-#~ msgstr "Bravo !"
+#~ msgid "%(user_name)s suggests to use this document as instruction"
+#~ msgstr "%(user_name)s suggère d'utiliser ce document comme instruction"
 
-#~ msgid "Google Slide Link"
-#~ msgstr "Lien Google Slides"
+#~ msgid "Set Picture"
+#~ msgstr "Définir la photo"
 
-#~ msgid "Google doc URL"
-#~ msgstr "URL du document Google"
-
-#~ msgid ""
-#~ "In case of Quality Check by Quantity, Move Line on which the Quality "
-#~ "Check applies"
-#~ msgstr ""
-#~ "En cas de contrôle qualité par quantité, déplacer la ligne sur laquelle "
-#~ "le contrôle qualité s'applique"
-
-#~ msgid "Lot/Serial"
-#~ msgstr "Lot/série"
-
-#~ msgid "Manage Work Order timer on Tablet View"
-#~ msgstr "Gérer le temps des ordres de travail sur la vue tablette"
-
-#~ msgid "Next"
-#~ msgstr "Suivant"
-
-#~ msgid "No manufacturing steps defined yet!"
-#~ msgstr "Aucune étape de fabrication n'est encore définie !"
-
-#~ msgid "Open Tablet View"
-#~ msgstr "Ouvrir la vue tablette"
-
-#~ msgid "Please ensure the quantity to produce is greater than 0."
-#~ msgstr "Assurez-vous que la quantité à produire est supérieure à 0. "
-
-#~ msgid "Please enter a Lot/SN."
-#~ msgstr "Saisissez un numéro de lot/série."
-
-#~ msgid "Please enter a positive quantity."
-#~ msgstr "Saisissez une quantité positive."
-
-#~ msgid "Print Labels"
-#~ msgstr "Imprimer les étiquettes"
-
-#~ msgid "Product"
-#~ msgstr "Produit"
-
-#~ msgid "Product Uom"
-#~ msgstr "UdM du produit"
-
-#~ msgid "Quality"
-#~ msgstr "Qualité"
-
-#~ msgid "Register additional product"
-#~ msgstr "Enregistrer un produit supplémentaire"
-
-#~ msgid "Remaining Quantity for Component"
-#~ msgstr "Quantité restante pour le composant"
-
-#~ msgid "Show Instructions"
-#~ msgstr "Afficher les instructions"
-
-#~ msgid "Specific Page of Operation Worksheet"
-#~ msgstr "Page précise d'une feuille de travail d'opération"
-
-#~ msgid "Step Document"
-#~ msgstr "Document d'étape"
-
-#~ msgid "Stock Move Line"
-#~ msgstr "Ligne de mouvement de stock"
-
-#~ msgid "Suggest a Worksheet improvement"
-#~ msgstr "Suggérer une amélioration de la feuille de travail"
-
-#~ msgid "Unit of Measure"
-#~ msgstr "Unité de mesure"
-
-#~ msgid "UoM"
-#~ msgstr "UdM"
-
-#~ msgid "Upload your PDF file."
-#~ msgstr "Téléchargez votre fichier PDF."
-
-#~ msgid ""
-#~ "Use steps to show instructions on a worksheet to operators, or trigger "
-#~ "quality checks at specific steps of the work order."
-#~ msgstr ""
-#~ "Utilisez des étapes pour afficher des instructions sur une feuille de "
-#~ "travail aux opérateurs ou déclencher des contrôles de qualité à des "
-#~ "étapes spécifiques de l'ordre de travail."
-
-#~ msgid "VALIDATE"
-#~ msgstr "VALIDER"
-
-#~ msgid "Well done, you're in the Top 10!"
-#~ msgstr "Bravo, vous êtes dans le Top 10 ! "
-
-#~ msgid "Worksheet Page"
-#~ msgstr "Page de feuille de travail"
-
-#~ msgid "Wow, you made the Top 5!"
-#~ msgstr "Wouah, vous êtes dans le Top 5 !"
-
-#~ msgid "You should provide a lot/serial number for the final product"
-#~ msgstr "Vous devez indiquer un lot/numéro de série pour le produit fini"
-
-#~ msgid "minutes"
-#~ msgstr "minutes"
-
-#~ msgid "title"
-#~ msgstr "titre"
+#~ msgid "Set a New picture"
+#~ msgstr "Définir une nouvelle photo"

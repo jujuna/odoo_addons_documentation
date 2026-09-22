@@ -1,7 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from dateutil.relativedelta import relativedelta
-
 from odoo import api, fields, models, _
 from odoo.fields import Domain
 
@@ -29,20 +27,6 @@ class MarketingParticipant(models.Model):
         models = self.env['ir.model'].sudo().search([('is_mail_thread', '=', True)])
         return [(model.model, model.name) for model in models]
 
-    def _search_resource_ref(self, operator, value):
-        if operator in Domain.NEGATIVE_OPERATORS:
-            return NotImplemented
-        ir_model_ids = []
-        for [model_name] in self.env['marketing.campaign']._read_group([], ['model_name']):
-            model = self.env.get(model_name)
-            if model is None:
-                continue
-            ir_model_ids += self.env['marketing.participant'].search(
-                ['&', ('model_name', '=', model_name), ('res_id', 'in', [name[0] for name in model.name_search(name=value)])],
-                order='id',
-            ).ids
-        return [('id', 'in', ir_model_ids)]
-
     campaign_id = fields.Many2one(
         'marketing.campaign', string='Campaign',
         index=True, ondelete='cascade', required=True)
@@ -52,6 +36,7 @@ class MarketingParticipant(models.Model):
     model_name = fields.Char(
         string='Record model', related='campaign_id.model_id.model',
         readonly=True, store=True)
+    # TDE note: somehow make it required + cleanup leftover ?
     res_id = fields.Integer(string='Record ID', index=True)
     resource_ref = fields.Reference(
         string='Record', selection='_selection_target_model',
@@ -60,10 +45,15 @@ class MarketingParticipant(models.Model):
     state = fields.Selection([
         ('running', 'Running'),
         ('completed', 'Completed'),
-        ('unlinked', 'Removed'),
+        ('canceled', 'Canceled'),
+        ('rejected', 'Rejected'),  # being out of campaign's enroll_domain filter
+        ('unlinked', 'Unlinked'),  # record found to be unlinked
         ], default='running', index=True, required=True,
         help='Removed means the related record does not exist anymore.')
     is_test = fields.Boolean('Test Record', default=False)
+    # enroll information
+    # anniversary-specific enroll date, different from create_date to ease usage
+    anniversary_dt = fields.Datetime(string='Enrolled at')
 
     @api.depends('model_name', 'res_id')
     def _compute_resource_ref(self):
@@ -78,71 +68,65 @@ class MarketingParticipant(models.Model):
             if participant.resource_ref:
                 participant.res_id = participant.resource_ref.id
 
+    def _search_resource_ref(self, operator, value):
+        if operator in Domain.NEGATIVE_OPERATORS:
+            return NotImplemented
+        ir_model_ids = []
+        for [model_name] in self.env['marketing.campaign']._read_group([], ['model_name']):
+            model = self.env.get(model_name)
+            if model is None:
+                continue
+            ir_model_ids += self.env['marketing.participant'].search(
+                ['&', ('model_name', '=', model_name), ('res_id', 'in', [name[0] for name in model.name_search(name=value)])],
+                order='id',
+            ).ids
+        return [('id', 'in', ir_model_ids)]
+
+    # STATE MANAGEMENT
+    # ------------------------------------------------------------
+
     def check_completed(self):
         existing_traces = self.env['marketing.trace'].search([
             ('participant_id', 'in', self.ids),
-            ('state', '=', 'scheduled'),
+            ('state', 'in', ['scheduled', 'waiting']),
         ])
         (self - existing_traces.mapped('participant_id')).write({'state': 'completed'})
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        participants = super().create(vals_list)
-        now = self.env.cr.now()
-        cron_trigger_dates = set()
-        for res in participants:
-            # prepare first traces related to begin activities
-            primary_activities = res.campaign_id.marketing_activity_ids.filtered(lambda act: act.trigger_type == 'begin')
-            trace_ids = [
-                (0, 0, {
-                    'activity_id': activity.id,
-                    'schedule_date': now + relativedelta(**{activity.interval_type: activity.interval_number}),
-                }) for activity in primary_activities]
-            res.write({'trace_ids': trace_ids})
-
-            cron_trigger_dates |= set([
-                now + relativedelta(**{activity.interval_type: activity.interval_number})
-                for activity in primary_activities
-            ])
-
-        if cron_trigger_dates:
-            # based on activities with 'begin' trigger_type, we schedule CRON triggers
-            # that match the scheduled_dates of created marketing.traces
-            # we use a set to only trigger the CRON once per timeslot event if there are multiple
-            # marketing.participants
-            cron = self.env.ref('marketing_automation.ir_cron_campaign_execute_activities')
-            cron._trigger(cron_trigger_dates)
-
-        return participants
-
-    def action_set_completed(self):
-        ''' Manually mark as a completed and cancel every scheduled trace '''
-        self._action_set_completed(trace_message=_('Marked as completed'))
-
-    def _action_set_completed(self, trace_message=False):
-        # TDE TODO: delegate set Canceled to trace record
-        self.write({'state': 'completed'})
-        trace_vals = {
-            'state': 'canceled',
-            'schedule_date': self.env.cr.now(),
-        }
-        if trace_message:
-            trace_vals['state_msg'] = trace_message
-        self.env['marketing.trace'].search([
+    def action_set_canceled(self, trace_message: str | None = None):
+        """ Cancel current participants and their scheduled traces """
+        self.write({'state': 'canceled'})
+        return self.env['marketing.trace'].search([
             ('participant_id', 'in', self.ids),
-            ('state', '=', 'scheduled')
-        ]).write(trace_vals)
+            ('state', '=', 'scheduled'),
+        ]).action_set_canceled(message=trace_message or self.env._('Participant canceled'), check_participant_completed=False)
+
+    def action_set_completed_manual(self):
+        """ Manually mark as a completed and cancel every scheduled trace """
+        return self.action_set_completed(trace_message=_('Marked as completed'))
+
+    def action_set_completed(self, trace_message: str | None = None):
+        """ Mark as completed, and cancel their scheduled traces. """
+        self.write({'state': 'completed'})
+        return self.env['marketing.trace'].search([
+            ('participant_id', 'in', self.ids),
+            ('state', '=', 'scheduled'),
+        ]).action_set_canceled(message=trace_message, check_participant_completed=False)
 
     def action_set_running(self):
-        self.write({'state': 'running'})
+        return self.write({'state': 'running'})
 
-    def action_set_unlink(self):
-        self.write({'state': 'unlinked'})
-        self.env['marketing.trace'].search([
+    def action_set_rejected(self, trace_message: str | None = None):
+        """ Mark related record has been unlinked """
+        self.write({'state': 'rejected'})
+        return self.env['marketing.trace'].search([
             ('participant_id', 'in', self.ids),
-            ('state', '=', 'scheduled')
-        ]).write({
-            'state': 'canceled',
-            'state_msg': _('Record deleted'),
-        })
-        return True
+            ('state', '=', 'scheduled'),
+        ]).action_set_canceled(message=trace_message or self.env._('Record rejected from campaign'), check_participant_completed=False)
+
+    def action_set_unlinked(self, trace_message: str | None = None):
+        """ Mark related record has been unlinked """
+        self.write({'state': 'unlinked'})
+        return self.env['marketing.trace'].search([
+            ('participant_id', 'in', self.ids),
+            ('state', '=', 'scheduled'),
+        ]).action_set_canceled(message=trace_message or self.env._('Record deleted'), check_participant_completed=False)

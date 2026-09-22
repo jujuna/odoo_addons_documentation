@@ -37,7 +37,7 @@
     // case, which is not what we want.
     --body-color: var(--card-color);
 }
-:where(.card:not([data-vxml])) .card-body {
+:where(.card:not([data-vxml])) .card-body:not(.card[data-vxml] .card-body) {
     // BS4 colored cards do not have a very popular design. This will reset them
     // to a BS3-like one: only the header and footer are colored and the body
     // will use the color of a default card background with a light opacity.
@@ -246,7 +246,7 @@ $o-navbar-nav-pills-link-border-radius: $nav-pills-border-radius !default;
 
 // Default style inputs
 input[type="search"] {
-    @include o-search-cancel-button($input-color);
+    @include o-search-cancel-button(color-contrast($light));
 }
 
 $-color-for-gray-200-bg: adjust-color-to-background($body-color, $gray-200);

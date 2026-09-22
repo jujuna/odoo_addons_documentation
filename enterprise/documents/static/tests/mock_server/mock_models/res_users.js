@@ -6,6 +6,6 @@ export class ResUsers extends mailModels.ResUsers {
      */
     _init_store_data(store) {
         super._init_store_data(...arguments);
-        store.add({ hasDocumentsUserGroup: true });
+        store.add_global_values({ hasDocumentsUserGroup: true });
     }
 }

@@ -8,12 +8,9 @@ export class WhatsappChannelListController extends ListController {
     }
 
     async openRecord(record) {
-        const thread = await this.store.Thread.getOrFetch({
-            model: "discuss.channel",
-            id: record.resId,
-        });
-        if (thread) {
-            return thread.open();
+        const channel = await this.store["discuss.channel"].getOrFetch(record.resId);
+        if (channel) {
+            return channel.open();
         }
         return super.openRecord(record);
     }

@@ -13,6 +13,8 @@ from .common import TestL10nClEdiCommon, _check_with_xsd_patch, _is_valid_certif
 @patch('odoo.tools.xml_utils._check_with_xsd', _check_with_xsd_patch)
 @tagged('post_install', '-at_install')
 class TestL10nClDte(TestL10nClEdiCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @patch('odoo.addons.l10n_cl_edi.models.l10n_cl_edi_util.L10n_ClEdiUtil._get_seed_ws')
     def test_get_seed_none(self, get_seed_ws):
         get_seed_ws.return_value = None

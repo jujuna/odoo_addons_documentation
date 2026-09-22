@@ -5,14 +5,14 @@ from odoo.tests.common import tagged
 from odoo.addons.sale_amazon.tests import common
 
 
-@tagged('post_install', '-at_install')
+@tagged("post_install", "-at_install")
 class TestAmazon(common.TestAmazonCommon):
-
     def test_recompute_subtotal_returns_subtotal_tax_excluded_when_avatax(self):
-        fiscal_position = self.env['account.fiscal.position'].create({
-            'name': "Avatax FP", 'is_avatax': True
+        fiscal_position = self.env["account.fiscal.position"].create({
+            "name": "Avatax FP",
+            "is_avatax": True,
         })
-        taxes = self.env['account.tax'].create({'name': "Fake expensive tax", 'amount': 80})
+        taxes = self.env["account.tax"].create({"name": "Fake expensive tax", "amount": 80})
         subtotal, tax_amount = 100, 45
         currency = self.account.company_id.currency_id
         recomputed_subtotal = self.account._recompute_subtotal(

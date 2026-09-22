@@ -7,15 +7,10 @@ from odoo.tools.sql import convert_column
 
 
 class TestCommon(TransactionCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.addClassCleanup(lambda: cls.registry._setup_models__(cls.cr))
 
     def setUp(self):
-        super(TestCommon, self).setUp()
-
-        self.registry._setup_models__(self.cr)
+        super().setUp()
+        self.env.transaction.will_change_registry()
 
         self.DMModel  = self.env['data_merge.model']
         self.DMRule   = self.env['data_merge.rule']
@@ -61,6 +56,7 @@ class TestCommon(TransactionCase):
         self.MyModel = self.DMModel.create({
             'name': 'test of test model',
             'res_model_id': self.DMTestModel.id,
+            'similarity_threshold': 0
         })
 
         self.MyModel2 = self.DMModel.create({

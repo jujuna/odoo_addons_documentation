@@ -16,13 +16,14 @@ _logger = logging.getLogger(__name__)
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class AccountTestFecImport(AccountTestInvoicingCommon):
     """ Main test class for Account FEC import testing """
+    _test_user_groups = None  # FIXME list needed groups
 
     # ----------------------------------------
     # 1:: Test class body
     # ----------------------------------------
 
     @classmethod
-    @AccountTestInvoicingCommon.setup_country('fr')
+    @AccountTestInvoicingCommon.setup_country('fr_comp')
     def setUpClass(cls):
         super().setUpClass()
 
@@ -177,7 +178,9 @@ class AccountTestFecImport(AccountTestInvoicingCommon):
             # and we don't care about comparing partner.id
             fields[1:] = [[*field[:6], '', *field[7:]] for field in fields[1:]]
             return fields
-        exported_content = split_fields(export_wizard.generate_fec()['file_content'].decode())
+        fec_stream = export_wizard.with_context(fec_test_mode=True).generate_fec()['file_content']
+        content = b''.join(fec_stream).decode()
+        exported_content = split_fields(content)
         with tools.file_open('l10n_fr_fec_import/static/tests/fec_test_files/fec_crlf_pipe_utf8_export.txt', mode='rb') as raw_file:
             expected_export = split_fields(raw_file.read().decode())
             self.assertEqual(exported_content, expected_export)
@@ -356,3 +359,16 @@ class AccountTestFecImport(AccountTestInvoicingCommon):
         self._import_fec_file('fec_lf_tab_utf8_imbalanced_month.json')
         account = self.env['account.account'].search([('code', '=', '455000')])
         self.assertEqual(account.name, "Associate's current account")
+
+    def test_gather_templates_does_not_copy_asset_model_ids(self):
+        wizard = self.env['account.fec.import.wizard'].create({})
+
+        templates = wizard._gather_templates()['account.account']
+        # We want a template with 'tag_ids', because it gets an exception in the whitelist and we want to test it.
+        account_template = next(template for template in templates.values() if template and template.get('tag_ids'))
+
+        self.assertNotIn('asset_model_ids', account_template)
+        self.assertIn('name@fr', account_template)
+        self.assertIn('account_type', account_template)
+        self.assertIn('reconcile', account_template)
+        self.assertIn('tag_ids', account_template)

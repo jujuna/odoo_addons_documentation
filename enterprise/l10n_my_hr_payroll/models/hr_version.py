@@ -8,5 +8,5 @@ class HrVersion(models.Model):
 
     l10n_my_socso_exempted = fields.Boolean(
         string="SOCSO Exempted",
-        groups="hr_payroll.group_hr_payroll_user", tracking=True,
+        groups="hr_payroll.group_hr_payroll_user", tracking=1,
         help="Employee over 60 years old / Employee has reached 55 years and without any previous contribution payments. For foreign workers who have reached 55 years and above as of 1st July 2024.")

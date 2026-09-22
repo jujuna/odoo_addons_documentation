@@ -10,7 +10,7 @@ class AccountJournal(models.Model):
             ("manual", "Manual"),
         ],
         string="Invoicing Type",
-        compute="compute_l10n_uy_edi_type",
+        compute="_compute_l10n_uy_edi_type",
         precompute=True,
         store=True,
         copy=False,
@@ -27,9 +27,16 @@ class AccountJournal(models.Model):
         " help ensure you don't forget to generate and send the required CFE (electronic tax document) to the"
         " government."
     )
+    l10n_uy_edi_ucfe_terminal_code = fields.Char(
+        string="UCFE Provider Terminal Code",
+        copy=False,
+        help="Terminal code (point of invoicing) declared in Uruware for this journal. When set, it is used instead"
+        " of the company default terminal code when sending the CFE of the documents issued from this journal."
+        " Leave empty to fall back to the company terminal code.",
+    )
 
     @api.depends("type")
-    def compute_l10n_uy_edi_type(self):
+    def _compute_l10n_uy_edi_type(self):
         """
         Set default value if not value and journal type of type sale (If different journal type then clean up
         the value of the field

@@ -3,13 +3,14 @@ import { useService } from "@web/core/utils/hooks";
 
 import { DocumentsDetailsPanel } from "@documents/components/documents_details_panel/documents_details_panel";
 
-import { Component, useState } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 
 export class DocumentsRightPanel extends Component {
     static template = "documents.DocumentsViews.RightPanel";
-    static props = {
-        nbViewItems: { type: Number },
-    };
+
+    props = useProps({
+        nbViewItems: t.number(),
+    });
     static components = {
         Chatter: DocumentsChatter,
         DocumentsDetailsPanel,
@@ -17,7 +18,7 @@ export class DocumentsRightPanel extends Component {
 
     setup() {
         this.documentService = useService("document.document");
-        this.state = useState(this.documentService.rightPanelReactive);
+        this.state = this.documentService.state;
     }
 
     get panelDisabled() {

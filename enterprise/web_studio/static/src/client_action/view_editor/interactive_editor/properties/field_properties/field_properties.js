@@ -1,23 +1,34 @@
-import { Component, onWillStart, onWillUpdateProps, useState, toRaw } from "@odoo/owl";
+import {
+    Component,
+    onWillStart,
+    onWillUpdateProps,
+    proxy,
+    t,
+    usePlugin,
+    useProps,
+} from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
-import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { rpc } from "@web/core/network/rpc";
 import { user } from "@web/core/user";
 import { Property } from "@web_studio/client_action/view_editor/property/property";
-import { SelectionContentDialog } from "@web_studio/client_action/view_editor/interactive_editor/field_configuration/selection_content_dialog";
+import { CheckBox } from "@web/core/checkbox/checkbox";
 import { TypeWidgetProperties } from "@web_studio/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_widget_properties";
 import { ViewStructureProperties } from "@web_studio/client_action/view_editor/interactive_editor/properties/view_structure_properties/view_structure_properties";
 import { useService } from "@web/core/utils/hooks";
 import { ClassAttribute } from "../class_attribute/class_attribute";
 import { ModifiersProperties } from "../modifiers/modifiers_properties";
 import { useEditNodeAttributes } from "@web_studio/client_action/view_editor/view_editor_model";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 class TechnicalName extends Component {
-    static props = {
-        node: { type: Object },
-    };
     static template = "web_studio.ViewEditor.InteractiveEditorProperties.Field.TechnicalName";
     static components = { Property };
+
+    props = useProps({
+        node: t.object(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
         this.renameField = (value) =>
@@ -28,7 +39,8 @@ class TechnicalName extends Component {
 
     get canEdit() {
         return (
-            this.env.debug && this.env.viewEditorModel.isFieldRenameable(this.props.node.attrs.name)
+            this.debugMode.isActive() &&
+            this.env.viewEditorModel.isFieldRenameable(this.props.node.attrs.name)
         );
     }
 
@@ -43,10 +55,6 @@ class TechnicalName extends Component {
 
 export class FieldProperties extends Component {
     static template = "web_studio.ViewEditor.InteractiveEditorProperties.Field";
-    static props = {
-        node: { type: Object },
-        availableOptions: { type: Array, optional: true },
-    };
     static components = {
         ClassAttribute,
         Property,
@@ -54,24 +62,47 @@ export class FieldProperties extends Component {
         TypeWidgetProperties,
         ViewStructureProperties,
         ModifiersProperties,
+        CheckBox,
     };
 
+    props = useProps({
+        node: t.object(),
+        availableOptions: t.array().optional(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
+
     setup() {
+        this.action = useService("action");
         this.dialog = useService("dialog");
         this.multiCompany = user.allowedCompanies.length > 1;
         this.activeCompany = user.activeCompany;
-        this.state = useState({});
+        this.state = proxy({});
         this.editNodeAttributes = useEditNodeAttributes();
 
         onWillStart(async () => {
-            if (this._canShowDefaultValue(this.props.node)) {
-                this.state.defaultValue = await this.getDefaultValue(this.props.node);
+            const node = this.props.node;
+            if (this._canShowDefaultValue(node) || this.canShowTracking(node)) {
+                const infos = await this.getFieldInfos(node);
+                if (this._canShowDefaultValue(node)) {
+                    this.state.defaultValue = infos.default_value;
+                }
+                if (this.canShowTracking(node)) {
+                    this.state.tracking = infos.tracking;
+                }
             }
         });
 
         onWillUpdateProps(async (nextProps) => {
-            if (this._canShowDefaultValue(nextProps.node)) {
-                this.state.defaultValue = await this.getDefaultValue(nextProps.node);
+            const node = nextProps.node;
+            if (this._canShowDefaultValue(node) || this.canShowTracking(node)) {
+                const infos = await this.getFieldInfos(node);
+                if (this._canShowDefaultValue(node)) {
+                    this.state.defaultValue = infos.default_value;
+                }
+                if (this.canShowTracking(node)) {
+                    this.state.tracking = infos.tracking;
+                }
             }
         });
     }
@@ -100,7 +131,11 @@ export class FieldProperties extends Component {
     }
 
     onChangeAttribute(value, name) {
-        return this.editNodeAttributes({ [name]: value });
+        const attributesToChange = { [name]: value };
+        if (name === "widget") {
+            attributesToChange["options"] = null;
+        }
+        return this.editNodeAttributes(attributesToChange);
     }
 
     async onChangeDefaultValue(value) {
@@ -120,15 +155,6 @@ export class FieldProperties extends Component {
             classList.contains("fw-bolder") ||
             this.props.node.attrs.bold // legacy kanban
         );
-    }
-
-    async getDefaultValue(node) {
-        const defaultValueObj = await rpc("/web_studio/get_default_value", {
-            model_name: this.env.viewEditorModel.resModel,
-            field_name: node.field.name,
-            company_id: user.activeCompany.id,
-        });
-        return defaultValueObj.default_value;
     }
 
     get optionalVisibilityChoices() {
@@ -165,11 +191,34 @@ export class FieldProperties extends Component {
     }
 
     _canShowDefaultValue(node) {
-        return !["image", "many2many", "one2many", "many2one", "binary"].includes(node.field.type);
+        const field = node.field;
+        return (
+            !["image", "many2many", "one2many", "many2one", "binary"].includes(field.type) &&
+            !field.readonly
+        );
     }
 
     get canEditSelectionChoices() {
         return this.props.node.field.manual && this.props.node.field.type === "selection";
+    }
+
+    get canEditStages() {
+        return (
+            this.props.node.field.type === "many2one" &&
+            this.props.node.attrs?.widget === "statusbar"
+        );
+    }
+
+    editStages() {
+        this.action.doAction({
+            name: _t("Edit Stages for field %s", this.props.node.field.label),
+            type: "ir.actions.act_window",
+            res_model: this.props.node.field.relation,
+            views: [
+                [false, "list"],
+                [false, "form"],
+            ],
+        });
     }
 
     /**
@@ -181,42 +230,30 @@ export class FieldProperties extends Component {
     }
 
     editSelectionChoices() {
-        const field = this.props.node.field;
-        this.dialog.add(SelectionContentDialog, {
-            defaultChoices: toRaw(field).selection.map((s) => [...s]),
-            onConfirm: async (choices) => {
-                const result = await rpc("/web_studio/edit_field", {
-                    model_name: this.env.viewEditorModel.resModel,
-                    field_name: field.name,
-                    values: { selection: JSON.stringify(choices) },
-                    force_edit: false,
-                });
-                let reflectChanges = !result;
-                if (result && result.records_linked) {
-                    reflectChanges = false;
-                    await new Promise((resolve) => {
-                        this.dialog.add(ConfirmationDialog, {
-                            body:
-                                result.message ||
-                                _t("Are you sure you want to remove the selection values?"),
-                            confirm: async () => {
-                                await rpc("/web_studio/edit_field", {
-                                    model_name: this.env.viewEditorModel.resModel,
-                                    field_name: field.name,
-                                    values: { selection: JSON.stringify(choices) },
-                                    force_edit: true,
-                                });
-                                reflectChanges = true;
-                                resolve();
-                            },
-                            cancel: () => resolve(),
-                        });
-                    });
-                }
-                if (reflectChanges) {
-                    field.selection = choices;
-                }
-            },
+        return this.viewEditorModel.editFieldSelectionChoices({
+            fieldName: this.props.node.field.name,
         });
+    }
+
+    async getFieldInfos(node) {
+        return rpc("/web_studio/get_field_infos", {
+            model_name: this.env.viewEditorModel.resModel,
+            field_name: node.field.name,
+            company_id: user.activeCompany.id,
+        });
+    }
+
+    async onChangeTracking(value) {
+        const trackingValue = value ? 100 : 0;
+        await rpc("/web_studio/set_field_tracking", {
+            model_name: this.env.viewEditorModel.resModel,
+            field_name: this.props.node.field.name,
+            tracking_value: trackingValue,
+        });
+        this.state.tracking = value;
+    }
+
+    canShowTracking(node) {
+        return node.field.manual && !["one2many", "binary", "image"].includes(node.field.type);
     }
 }

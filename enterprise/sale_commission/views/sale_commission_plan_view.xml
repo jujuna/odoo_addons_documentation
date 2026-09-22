@@ -47,7 +47,7 @@
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                     <div name="button_box" class="oe_button_box">
                         <button name="action_open_commission" type="object"
-                                class="oe_stat_button" icon="fa-dollar" invisible="state in ['draft', 'cancel']">
+                                class="oe_stat_button" icon="attach_money" invisible="state in ['draft', 'cancel']">
                             <div class="o_stat_info">
                                 <span class="o_stat_text">Commissions</span>
                             </div>
@@ -61,7 +61,7 @@
                     </div>
                     <group>
                         <group>
-                            <label for="type" string="Based on"/>
+                            <label for="type" string="Structure"/>
                             <div>
                                 <field name="type" class="oe_inline" readonly="state != 'draft'"/>
                                 per <field name="user_type" class="oe_inline" readonly="state != 'draft'"/>
@@ -81,6 +81,11 @@
                             </div>
                             <field name="periodicity" string="Target Frequency"
                                 readonly="state != 'draft'" force_save="1" />
+                            <field name="dynamic_plan_ids"
+                                   string="Dynamic Target"
+                                   widget="many2many_tags"
+                                   placeholder="Static"
+                                   readonly="state != 'draft'"/>
                         </group>
                     </group>
                     <notebook name="main_book">
@@ -103,7 +108,7 @@
                                     <field name="target_commission_graph" widget="commission_graph" nolabel="1"/>
                                 </group>
                             </group>
-                            <button string="Commission table" type="object" name="action_export_targets" icon="fa-download" class="btn btn-link"/>
+                            <button string="Commission table" type="object" name="action_export_targets" icon="download" class="btn btn-link"/>
                         </page>
                         <page string="Targets" invisible="type != 'target'">
                             <field name="target_ids" readonly="state != 'draft'">
@@ -112,13 +117,13 @@
                                     <field name="date_from" optional="hide" force_save="1"/>
                                     <field name="date_to" optional="hide" force_save="1"/>
                                     <field name="payment_date" optional="hide" force_save="1"/>
-                                    <field name="payment_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" />
-                                    <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="payment_amount" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="parent.target_type != 'static'" optional="hide" />
+                                    <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="parent.target_type != 'static'"/>
                                     <field name="currency_id" column_invisible="1"/> <!-- For monetary field -->
                                 </list>
                             </field>
                         </page>
-                        <page string="Achievements">
+                        <page string="Achievements Rules">
                             <field name="achievement_ids" readonly="state != 'draft'">
                                 <list editable="bottom">
                                     <control>
@@ -137,24 +142,27 @@
                                     <field name="name" force_save="1"/>
                                     <field name="date_from" optional="hide" force_save="1"/>
                                     <field name="date_to" optional="hide" force_save="1"/>
-                                    <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide"/>
+                                    <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" invisible="target_type != 'static'"/>
                                     <field name="currency_id" column_invisible="1"/> <!-- For monetary field -->
                                 </list>
                             </field>
                         </page>
-                        <page string="Sales People">
+                        <page string="Salespeople">
                             <field name="user_ids">
                                 <list editable="bottom">
                                     <control>
-                                        <create string="Add a new Sales Person"/>
+                                        <create string="Add a new Salesperson"/>
                                     </control>
                                     <field name="user_id"/>
                                     <field name="date_from" required="True"/>
                                     <field name="date_to"/>
+                                    <field name="user_ids" widget="many2many_avatar_user" invisible="user_type != 'person'" column_invisible="parent.user_type != 'person'"/>
                                     <field name="other_plans" widget="many2many_tags" readonly="True"/>
                                 </list>
                             </field>
-                            <button string="Add Multiple Salespersons" type="action" name="%(sale_commission.sale_subscription_change_customer_wizard_action)d" groups="base.group_no_one"/>
+                            <button string="Add Multiple Salespeople" type="action"
+                                name="%(sale_commission.sale_commission_change_customer_wizard_action)d"
+                                groups="base.group_no_one"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -167,7 +175,7 @@
         <field name="name">sale.commission.plan.view.list</field>
         <field name="model">sale.commission.plan</field>
         <field name="arch" type="xml">
-            <list>
+            <list js_class="commission_plan_list">
                 <field name="name"/>
                 <field name="type"/>
                 <field name="periodicity"/>
@@ -215,13 +223,17 @@
         <field name="view_mode">list,form</field>
         <field name="context">{}</field>
         <field name="search_view_id" ref="sale_commission_plan_view_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create a new commission plan
-            </p>
-            <p>
-                Compute commissions of your sales people based on their achievements and targets
-            </p>
-        </field>
+        <!-- Empty-state is rendered by `js_class="commission_plan_list"` -->
     </record>
+
+    <!-- ACTIONS (SERVER) -->
+    <record id="model_sale_commission_plan_duplicates" model="ir.actions.server">
+        <field name="name">Detect users conflicts</field>
+        <field name="model_id" ref="sale_commission.model_sale_commission_plan"/>
+        <field name="binding_model_id" ref="sale_commission.model_sale_commission_plan"/>
+        <field name="binding_view_types">form,list,kanban</field>
+        <field name="state">code</field>
+        <field name="code">action = env["ir.actions.actions"]._for_xml_id("sale_commission.duplicated_user_wizard_action")</field>
+    </record>
+
 </odoo>

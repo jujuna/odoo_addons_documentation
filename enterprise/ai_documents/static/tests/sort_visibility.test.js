@@ -1,6 +1,6 @@
 import { user } from "@web/core/user";
 import { describe, expect, test } from "@odoo/hoot";
-import { waitFor } from "@odoo/hoot-dom";
+import { animationFrame, waitFor } from "@odoo/hoot-dom";
 import {
     contains,
     defineModels,
@@ -29,7 +29,7 @@ test("Admin user should be able to see the Auto-sort item under the cog menu", a
 
     await contains(`.o_kanban_record:contains(${folder1Name})`).click();
     await waitFor(`.o_last_breadcrumb_item:contains('${folder1Name}')`);
-    await contains(".o_cp_action_menus .fa-cog").click();
+    await contains(".o_cp_action_menus [data-icon='more_vert']").click();
     await waitFor(`.o-dropdown-item`);
     expect(".o-dropdown-item:contains('Auto-sort')").toHaveCount(1);
 });
@@ -46,7 +46,7 @@ test("Basic user shouldn't be able to see the Auto-sort item under the cog menu"
 
     await contains(`.o_kanban_record:contains(${folder1Name})`).click();
     await waitFor(`.o_last_breadcrumb_item:contains('${folder1Name}')`);
-    await contains(".o_cp_action_menus .fa-cog").click();
-    await waitFor(`.o-dropdown-item`);
+    await animationFrame();
+    expect(".o_cp_action_menus [data-icon='more_vert']").toHaveCount(0);
     expect(".o-dropdown-item:contains('Auto-sort')").toHaveCount(0);
 });

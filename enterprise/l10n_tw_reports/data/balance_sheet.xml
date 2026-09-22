@@ -3,6 +3,7 @@
     <record id="l10n_tw_balance_sheet" model="account.report">
         <field name="name">Balance Sheet</field>
         <field name="root_report_id" ref="account_reports.balance_sheet"/>
+        <field name="groupby">account_id</field>
         <field name="filter_date_range" eval="False"/>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
@@ -22,7 +23,6 @@
                 <field name="name@zh_TW">資產</field>
                 <field name="code">TW_A</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="False"/>
                 <field name="expression_ids">
                     <record id="l10n_tw_balance_sheet_tw_a_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -36,7 +36,7 @@
                         <field name="name@zh_TW">流動資產</field>
                         <field name="code">TW_CA</field>
                         <field name="hierarchy_level">3</field>
-                        <field name="foldable" eval="True"/>
+                        <field name="foldability">foldable</field>
                         <field name="expression_ids">
                             <record id="l10n_tw_balance_sheet_tw_ca_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -50,8 +50,6 @@
                                 <field name="name@zh_TW">現金及約當現金</field>
                                 <field name="code">TW_CCA</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_cca_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -65,8 +63,6 @@
                                 <field name="name@zh_TW">流動金融資產</field>
                                 <field name="code">TW_CFA</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_cfa_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -80,8 +76,6 @@
                                 <field name="name@zh_TW">應收帳款及其他應收款</field>
                                 <field name="code">TW_REC</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_rec_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -95,8 +89,6 @@
                                 <field name="name@zh_TW">存貨</field>
                                 <field name="code">TW_CINV</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_cinv_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -110,8 +102,6 @@
                                 <field name="name@zh_TW">其他流動資產</field>
                                 <field name="code">TW_OCA</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_oca_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -127,8 +117,6 @@
                         <field name="name@zh_TW">非流動資產</field>
                         <field name="code">TW_NCA</field>
                         <field name="hierarchy_level">3</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tw_balance_sheet_tw_nca_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -144,7 +132,6 @@
                 <field name="name@zh_TW">負債</field>
                 <field name="code">TW_L</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="False"/>
                 <field name="expression_ids">
                     <record id="l10n_tw_balance_sheet_tw_l_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -158,8 +145,6 @@
                         <field name="name@zh_TW">流動負債</field>
                         <field name="code">TW_CL</field>
                         <field name="hierarchy_level">3</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tw_balance_sheet_tw_cl_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -173,8 +158,6 @@
                         <field name="name@zh_TW">非流動負債</field>
                         <field name="code">TW_NCL</field>
                         <field name="hierarchy_level">3</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tw_balance_sheet_tw_ncl_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -190,7 +173,6 @@
                 <field name="name@zh_TW">權益</field>
                 <field name="code">TW_EQ</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="False"/>
                 <field name="expression_ids">
                     <record id="l10n_tw_balance_sheet_tw_eq_balance" model="account.report.expression">
                         <field name="label">balance</field>
@@ -204,7 +186,7 @@
                         <field name="name@zh_TW">歸屬於母公司業主之權益</field>
                         <field name="code">TW_EAO</field>
                         <field name="hierarchy_level">3</field>
-                        <field name="foldable" eval="True"/>
+                        <field name="foldability">foldable</field>
                         <field name="expression_ids">
                             <record id="l10n_tw_balance_sheet_tw_eao_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -218,8 +200,6 @@
                                 <field name="name@zh_TW">股本</field>
                                 <field name="code">TW_SC</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_sc_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -233,7 +213,7 @@
                                 <field name="name@zh_TW">資本公積</field>
                                 <field name="code">TW_CS</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="foldable" eval="False"/>
+                                <field name="foldability">always_unfolded</field>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_cs_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -247,7 +227,6 @@
                                 <field name="name@zh_TW">尚未分攤之盈餘</field>
                                 <field name="code">TW_UE</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="foldable" eval="False"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_ue_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -261,14 +240,13 @@
                                         <field name="name@zh_TW">本期未分配盈餘</field>
                                         <field name="code">TW_CUE</field>
                                         <field name="hierarchy_level">7</field>
-                                        <field name="foldable" eval="False"/>
                                         <field name="expression_ids">
                                             <record id="l10n_tw_balance_sheet_tw_cue_pnl" model="account.report.expression">
                                                 <field name="label">pnl</field>
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">TW_PNLCOAT.balance</field>
                                                 <field name="date_scope">from_fiscalyear</field>
-                                                <field name="subformula">cross_report(l10n_tw_reports.l10n_tw_profit_and_loss)</field>
+                                                <field name="subformula">cross_report(l10n_tw_reports.l10n_tw_profit_and_loss, force_date_scope)</field>
                                             </record>
                                             <record id="l10n_tw_balance_sheet_tw_cue_alloc" model="account.report.expression">
                                                 <field name="label">alloc</field>
@@ -288,7 +266,6 @@
                                         <field name="name@zh_TW">以前年度未分配盈餘</field>
                                         <field name="code">TW_PUE</field>
                                         <field name="hierarchy_level">7</field>
-                                        <field name="foldable" eval="False"/>
                                         <field name="expression_ids">
                                             <record id="l10n_tw_balance_sheet_tw_pue_alloc_earnings" model="account.report.expression">
                                                 <field name="label">alloc_earnings</field>
@@ -301,7 +278,7 @@
                                                 <field name="engine">aggregation</field>
                                                 <field name="formula">TW_PNLCOAT.balance</field>
                                                 <field name="date_scope">from_beginning</field>
-                                                <field name="subformula">cross_report(l10n_tw_reports.l10n_tw_profit_and_loss)</field>
+                                                <field name="subformula">cross_report(l10n_tw_reports.l10n_tw_profit_and_loss, force_date_scope)</field>
                                             </record>
                                             <record id="l10n_tw_balance_sheet_tw_pue_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -317,7 +294,7 @@
                                 <field name="name@zh_TW">保留盈餘及公積</field>
                                 <field name="code">TW_RERS</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="foldable" eval="True"/>
+                                <field name="foldability">foldable</field>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_rers_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -331,8 +308,6 @@
                                         <field name="name@zh_TW">公積</field>
                                         <field name="code">TW_RS</field>
                                         <field name="hierarchy_level">7</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_tw_balance_sheet_tw_rs_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -346,8 +321,6 @@
                                         <field name="name@zh_TW">累計其他綜合損益</field>
                                         <field name="code">TW_AOCI</field>
                                         <field name="hierarchy_level">7</field>
-                                        <field name="groupby">account_id</field>
-                                        <field name="foldable" eval="True"/>
                                         <field name="expression_ids">
                                             <record id="l10n_tw_balance_sheet_tw_aoci_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -362,7 +335,6 @@
                                         <field name="name@zh_TW">保留盈餘</field>
                                         <field name="code">TW_RE</field>
                                         <field name="hierarchy_level">7</field>
-                                        <field name="foldable" eval="False"/>
                                         <field name="expression_ids">
                                             <record id="l10n_tw_balance_sheet_tw_re_balance" model="account.report.expression">
                                                 <field name="label">balance</field>
@@ -376,7 +348,7 @@
                                                 <field name="name@zh_TW">未分配盈餘</field>
                                                 <field name="code">TW_URE</field>
                                                 <field name="hierarchy_level">7</field>
-                                                <field name="foldable" eval="False"/>
+                                                <field name="foldability">always_unfolded</field>
                                                 <field name="expression_ids">
                                                     <record id="l10n_tw_balance_sheet_tw_ure_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -391,7 +363,6 @@
                                                 <field name="name@zh_TW">前期保留盈餘</field>
                                                 <field name="code">TW_PYRE</field>
                                                 <field name="hierarchy_level">7</field>
-                                                <field name="foldable" eval="False"/>
                                                 <field name="expression_ids">
                                                     <record id="l10n_tw_balance_sheet_tw_pyre_balance" model="account.report.expression">
                                                         <field name="label">balance</field>
@@ -416,8 +387,6 @@
                                 <field name="name@zh_TW">其他權益合計</field>
                                 <field name="code">TW_OEI</field>
                                 <field name="hierarchy_level">5</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="expression_ids">
                                     <record id="l10n_tw_balance_sheet_tw_oei_balance" model="account.report.expression">
                                         <field name="label">balance</field>
@@ -433,8 +402,6 @@
                         <field name="name@zh_TW">非控制權益</field>
                         <field name="code">TW_NCI</field>
                         <field name="hierarchy_level">3</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="expression_ids">
                             <record id="l10n_tw_balance_sheet_tw_nci_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -448,7 +415,7 @@
                         <field name="name@zh_TW">庫藏股票</field>
                         <field name="code">TW_TS</field>
                         <field name="hierarchy_level">3</field>
-                        <field name="foldable" eval="False"/>
+                        <field name="foldability">always_unfolded</field>
                         <field name="expression_ids">
                             <record id="l10n_tw_balance_sheet_tw_ts_balance" model="account.report.expression">
                                 <field name="label">balance</field>
@@ -464,7 +431,6 @@
                 <field name="name@zh_TW">負債及權益總計</field>
                 <field name="code">TW_LBEQ</field>
                 <field name="hierarchy_level">0</field>
-                <field name="foldable" eval="False"/>
                 <field name="expression_ids">
                     <record id="l10n_tw_balance_sheet_tw_lbeq_balance" model="account.report.expression">
                         <field name="label">balance</field>

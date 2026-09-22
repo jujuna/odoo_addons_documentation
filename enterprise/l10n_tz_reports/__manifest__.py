@@ -1,6 +1,5 @@
 {
     'name': 'Tanzania - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Accounting reports for Tanzania
@@ -14,7 +13,6 @@ Accounting reports for Tanzania
         "data/balance_sheet.xml",
         "data/profit_loss.xml",
     ],
-    'installable': True,
     'auto_install': True,
     'website': 'https://www.odoo.com/app/accounting',
     'author': 'Odoo S.A.',

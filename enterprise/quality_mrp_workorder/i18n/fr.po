@@ -7,15 +7,16 @@
 # Cécile Collart <cco@odoo.com>, 2022
 # Jolien De Paepe, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-11-05 10:25+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-11 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 02:23+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "quality_mrp_workorder/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +24,14 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: quality_mrp_workorder
+#: model:ir.module.module,description:base.module_quality_mrp_workorder
+msgid ""
+"\n"
+"Adds Quality Control to workorders.\n"
+msgstr ""
 
 #. module: quality_mrp_workorder
 #: model_terms:ir.ui.view,arch_db:quality_mrp_workorder.worksheet_page
@@ -36,15 +44,15 @@ msgid "<strong>Work Order: </strong>"
 msgstr "<strong>Ordre de travail : </strong>"
 
 #. module: quality_mrp_workorder
+#: model_terms:ir.ui.view,arch_db:quality_mrp_workorder.quality_check_view_form_inherit_mrp_workorder
+#, fuzzy
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+#. module: quality_mrp_workorder
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_mrp_production__check_ids
 msgid "Checks"
 msgstr "Contrôles"
-
-#. module: quality_mrp_workorder
-#. odoo-javascript
-#: code:addons/quality_mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
-msgid "Close Production"
-msgstr "Fermer la production"
 
 #. module: quality_mrp_workorder
 #. odoo-javascript
@@ -55,7 +63,6 @@ msgstr "Créer une alerte qualité"
 #. module: quality_mrp_workorder
 #. odoo-javascript
 #: code:addons/quality_mrp_workorder/static/src/mrp_display/mrp_measure_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:quality_mrp_workorder.quality_alert_view_form_inherit_mrp
 msgid "Discard"
 msgstr "Ignorer"
 
@@ -64,10 +71,9 @@ msgstr "Ignorer"
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_mrp_workorder__display_name
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_product_product__display_name
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_product_template__display_name
+#: model:ir.model.fields,field_description:quality_mrp_workorder.field_quality_alert_team__display_name
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_quality_check__display_name
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_quality_point__display_name
-#: model:ir.model.fields,field_description:quality_mrp_workorder.field_stock_lot__display_name
-#: model:ir.model.fields,field_description:quality_mrp_workorder.field_stock_move_line__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
 
@@ -83,26 +89,26 @@ msgid "Failure"
 msgstr "Échec"
 
 #. module: quality_mrp_workorder
-#: model_terms:ir.ui.view,arch_db:quality_mrp_workorder.quality_check_view_search_inherit_quality_mrp_workorder
-msgid "Finished Lot/Serial"
-msgstr "Lot/numéro de série fini"
-
-#. module: quality_mrp_workorder
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_mrp_production__id
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_mrp_workorder__id
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_product_product__id
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_product_template__id
+#: model:ir.model.fields,field_description:quality_mrp_workorder.field_quality_alert_team__id
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_quality_check__id
 #: model:ir.model.fields,field_description:quality_mrp_workorder.field_quality_point__id
-#: model:ir.model.fields,field_description:quality_mrp_workorder.field_stock_lot__id
-#: model:ir.model.fields,field_description:quality_mrp_workorder.field_stock_move_line__id
 msgid "ID"
 msgstr "ID"
 
 #. module: quality_mrp_workorder
-#: model:ir.model,name:quality_mrp_workorder.model_stock_lot
-msgid "Lot/Serial"
-msgstr "Lot/série"
+#: model:ir.model.fields,field_description:quality_mrp_workorder.field_quality_check__worksheet_document
+#, fuzzy
+msgid "Image/PDF"
+msgstr "Image/PDF"
+
+#. module: quality_mrp_workorder
+#: model:ir.module.module,shortdesc:base.module_quality_mrp_workorder
+msgid "MRP features for Quality Control"
+msgstr ""
 
 #. module: quality_mrp_workorder
 #: model:ir.model,name:quality_mrp_workorder.model_mrp_production
@@ -127,19 +133,25 @@ msgid "Operation"
 msgstr "Opération"
 
 #. module: quality_mrp_workorder
+#. odoo-javascript
+#: code:addons/quality_mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
+msgid "Produce"
+msgstr ""
+
+#. module: quality_mrp_workorder
 #: model:ir.model,name:quality_mrp_workorder.model_product_template
 msgid "Product"
 msgstr "Produit"
 
 #. module: quality_mrp_workorder
-#: model:ir.model,name:quality_mrp_workorder.model_stock_move_line
-msgid "Product Moves (Stock Move Line)"
-msgstr "Mouvements de produit (Ligne de mouvement de stock)"
-
-#. module: quality_mrp_workorder
 #: model:ir.model,name:quality_mrp_workorder.model_product_product
 msgid "Product Variant"
 msgstr "Variante de produit"
+
+#. module: quality_mrp_workorder
+#: model:ir.model,name:quality_mrp_workorder.model_quality_alert_team
+msgid "Quality Alert Team"
+msgstr "Équipe d'alerte qualité"
 
 #. module: quality_mrp_workorder
 #: model:ir.model,name:quality_mrp_workorder.model_quality_check
@@ -164,6 +176,11 @@ msgstr "Contrôles qualité"
 #: model:ir.model,name:quality_mrp_workorder.model_quality_point
 msgid "Quality Control Point"
 msgstr "Point de contrôle qualité"
+
+#. module: quality_mrp_workorder
+#: model:ir.module.module,summary:base.module_quality_mrp_workorder
+msgid "Quality Management with MRP"
+msgstr ""
 
 #. module: quality_mrp_workorder
 #: model_terms:ir.ui.view,arch_db:quality_mrp_workorder.quality_point_view_search_inherit_mrp_workorder
@@ -207,30 +224,8 @@ msgstr "Ordre de travail"
 msgid "Work Order Operation"
 msgstr "Opération d'ordre de travail"
 
-#~ msgid "Component Lot/Serial"
-#~ msgstr "Lot/numéro de série du composant"
+#~ msgid "Product Moves (Stock Move Line)"
+#~ msgstr "Mouvements de produit (Ligne de mouvement de stock)"
 
-#~ msgid "Fail"
-#~ msgstr "Échec"
-
-#~ msgid "Measure:"
-#~ msgstr "Mesure :"
-
-#~ msgid "Pass"
-#~ msgstr "Réussite"
-
-#~ msgid "Production Order"
-#~ msgstr "Ordre de fabrication"
-
-#~ msgid "Quality Alert"
-#~ msgstr "Alerte qualité"
-
-#~ msgid "Validate"
-#~ msgstr "Valider"
-
-#~ msgid ""
-#~ "You first need to complete the Quality Check using the Tablet View before "
-#~ "marking the Operation as Done."
-#~ msgstr ""
-#~ "Vous devez d'abord effectuer le contrôle qualité à l'aide de la vue "
-#~ "tablette avant de marquer l'opération comme terminée."
+#~ msgid "Close Production"
+#~ msgstr "Fermer la production"

@@ -1,5 +1,5 @@
 import { _t } from "@web/core/l10n/translation";
-import { markup, onMounted, useState } from "@odoo/owl";
+import { markup, onMounted, onWillStart, proxy } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { FormController } from "@web/views/form/form_controller";
@@ -8,6 +8,7 @@ import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { AddressRecurrencyConfirmationDialog } from "@planning/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog";
 import { deserializeDateTime } from "@web/core/l10n/dates";
+import { user } from "@web/core/user";
 import { usePlanningRecurringDeleteAction } from "../planning_hooks";
 
 export class PlanningFormController extends FormController {
@@ -16,10 +17,13 @@ export class PlanningFormController extends FormController {
         this.action = useService("action");
         this.notification = useService("notification");
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             recurrenceUpdate: "this",
         });
         this.planningRecurrenceDeletion = usePlanningRecurringDeleteAction();
+        onWillStart(async () => {
+            this.isPlanningManager = await user.hasGroup("planning.group_planning_manager");
+        });
         onMounted(() => {
             this.initialTemplateCreation = this.model.root.data.template_creation;
         });
@@ -38,15 +42,22 @@ export class PlanningFormController extends FormController {
     }
 
     async onRecordSaved(record, changes) {
-        if ("repeat" in changes && record.data["repeat"]) {
+        if (
+            "repeat" in changes &&
+            record.data["repeat"] &&
+            record.data["start_datetime"] &&
+            record.data["end_datetime"]
+        ) {
             const message = _t("Recurring shifts created");
             this.notification.add(
-                markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${message}</span>`,
+                markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${message}</span>`,
                 { type: "success" }
             );
         }
         if (
             record.context.is_record_created &&
+            record.data.start_datetime &&
+            record.data.end_datetime &&
             (deserializeDateTime(record.context.view_start_date) > record.data.start_datetime ||
                 deserializeDateTime(record.context.view_end_date) < record.data.end_datetime)
         ) {
@@ -86,31 +97,11 @@ export class PlanningFormController extends FormController {
                 return false;
             }
         } else if (clickParams.name === 'action_send') {
+            if (shift.dirty) {
+                await shift.save({ reload: true });
+            }
             if (shift.resId) {
-                // We want to check if all employees impacted to this action have a email.
-                // For those who do not have any email in work_email field, then a FormViewDialog is displayed for each employee who is not email.
-                const result = await this.orm.call(this.props.resModel, "get_employees_without_work_email", [shift.resId]);
-                if (result) {
-                    const { res_ids: resIds, relation: resModel, context } = result;
-                    const canProceed = await this.displayDialogWhenEmployeeNoEmail(resIds, resModel, context);
-                    if (!canProceed) {
-                        return false;
-                    }
-                }
-            } else if (shift.data.employee_id && !shift.data.work_email) {
-                const canProceed = await new Promise((resolve) => {
-                    this.dialogService.add(FormViewDialog, {
-                        title: "Add Work Email",
-                        resModel: "hr.employee",
-                        resId: shift.data.employee_id.id,
-                        context: {
-                            form_view_ref: 'planning.hr_employee_view_form_email',
-                            force_email: true,
-                        },
-                        onRecordSaved: () => resolve(true),
-                    }, { onClose: () => resolve(false) });
-                });
-                if (!canProceed) {
+                if (!(await this.checkEmployeeLackData(shift))) {
                     return false;
                 }
             }
@@ -119,7 +110,7 @@ export class PlanningFormController extends FormController {
             // then the shift should be saved as a template too.
             const message = _t("Shift saved as template");
             this.notification.add(
-                markup`<i class="fa fa-fw fa-check"></i><span class="ms-1">${message}</span>`,
+                markup`<i class="oi oi-fw" data-icon="check"></i><span class="ms-1">${message}</span>`,
                 { type: "success" },
             );
         }
@@ -144,8 +135,14 @@ export class PlanningFormController extends FormController {
                     resId,
                     context,
                     preventCreate: true,
-                    onRecordSaved: () => resolve(true),
-                }, { onClose: () => resolve(false) });
+                    onRecordSaved: () => {
+                        resolve(true);
+                    },
+                }, { 
+                    onClose: () => {
+                        resolve(false); 
+                    }
+                });
             });
         }));
         return results.every((r) => r);
@@ -175,6 +172,32 @@ export class PlanningFormController extends FormController {
         } else {
             await super.deleteRecord(...arguments);
         }
+    }
+
+    getStaticActionMenuItems() {
+        const menuItems = super.getStaticActionMenuItems();
+        if (menuItems.addPropertyFieldValue.isAvailable) {
+            menuItems.addPropertyFieldValue.isAvailable = () => this.isPlanningManager;
+        }
+        return menuItems;
+    }
+
+    async checkEmployeeLackData(shift) {
+        const result = await this.orm.call(this.props.resModel, "get_employees_with_missing_data", [
+            shift.resId,
+        ]);
+        if (result) {
+            const { res_ids: resIds, relation: resModel, context } = result;
+            const canProceed = await this.displayDialogWhenEmployeeNoEmail(
+                resIds,
+                resModel,
+                context
+            );
+            if (!canProceed) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

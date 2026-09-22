@@ -9,6 +9,7 @@ export const projectGanttView = {
     Controller: ProjectGanttController,
     Renderer: ProjectGanttRenderer,
     Model: ProjectGanttModel,
+    buttonTemplate: "project_enterprise.ProjectGanttView.Buttons",
 };
 
 registry.category("views").add("project_gantt", projectGanttView);

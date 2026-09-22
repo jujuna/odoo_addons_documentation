@@ -2,19 +2,21 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
-from odoo import fields, models, api
+from odoo import api, fields, models
+from odoo.fields import Domain
 
 
 class SocialPost(models.Model):
     _inherit = 'social.post'
 
-    use_visitor_timezone = fields.Boolean(compute='_compute_use_visitor_timezone', readonly=False, store=True)
+    push_notifications_scheduled_date = fields.Datetime(
+        string='Push Notifications Scheduled for',
+        compute='_compute_scheduled_date_by_media',
+        store=True, readonly=False, copy=False)
 
-    @api.depends('post_method')
-    def _compute_use_visitor_timezone(self):
-        for post in self:
-            if post.post_method == 'now' or not post.use_visitor_timezone:
-                post.use_visitor_timezone = False
+    @api.model
+    def _scheduled_date_fields(self):
+        return {**super()._scheduled_date_fields(), 'push_notifications': 'push_notifications_scheduled_date'}
 
     def _action_post(self):
         """ We also setup a CRON trigger at "now" to run the job as soon as possible to get the
@@ -23,10 +25,10 @@ class SocialPost(models.Model):
 
         super()._action_post()
 
-        if 'push_notifications' in self.account_ids.mapped('media_type') and any(post_method == 'now' for post_method in self.mapped('post_method')):
+        if 'push_notifications' in self.account_ids.mapped('media_type') and not all(self.mapped('push_notifications_scheduled_date')):
             # trigger CRON job ASAP so that push notifications are sent
             cron = self.env.ref('social.ir_cron_post_scheduled')
-            cron._trigger(at=fields.Datetime.now())
+            cron._trigger()
 
     @api.model
     def _cron_publish_scheduled(self):
@@ -35,14 +37,15 @@ class SocialPost(models.Model):
         indefinitely.
 
         The related social.post will remain 'pending' until all live.posts are processed. """
-
         super()._cron_publish_scheduled()
 
-        ready_live_posts = self.env['social.live.post'].search([
-            ('state', 'in', ['ready', 'posting'])
-        ])
-        push_notifications_live_posts = ready_live_posts._filter_by_media_types(['push_notifications'])
-        push_notifications_live_posts.write({
-            'state': 'posting'
-        })
-        push_notifications_live_posts._post_push_notifications()
+        domain = Domain([
+            ('state', 'in', ['ready', 'posting']),
+            ('account_id.media_id.media_type', '=', 'push_notifications'),
+        ]) & (
+            Domain('post_id.push_notifications_scheduled_date', '=', False)
+            | Domain('post_id.push_notifications_scheduled_date', '<=', fields.Datetime.now())
+        )
+        live_posts = self.env['social.live.post'].search(domain)
+        live_posts.write({'state': 'posting'})
+        live_posts._post_push_notifications()

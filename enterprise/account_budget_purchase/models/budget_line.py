@@ -29,4 +29,4 @@ class BudgetLine(models.Model):
             line.committed_amount = committed
             line.achieved_amount = achieved
             line.committed_percentage = line.budget_amount and (line.committed_amount / line.budget_amount)
-            line.achieved_percentage = line.budget_amount and (line.achieved_amount / line.budget_amount)
+            line.achieved_percentage = line.liquidation_amount and (line.achieved_amount / line.liquidation_amount)

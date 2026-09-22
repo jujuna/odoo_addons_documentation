@@ -8,6 +8,8 @@ from odoo.addons.website_sale.tests.common import WebsiteSaleCommon
 
 class WebsiteSaleSubscriptionCommon(SaleSubscriptionCommon, WebsiteSaleCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -30,6 +32,7 @@ class WebsiteSaleSubscriptionCommon(SaleSubscriptionCommon, WebsiteSaleCommon):
             }
         ])
 
+        cls.pricelist = cls._enable_pricelists()
         cls.env['product.pricelist.item'].create([
             {
                 'plan_id': cls.plan_week.id,

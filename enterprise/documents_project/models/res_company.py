@@ -2,6 +2,7 @@
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.fields import Domain
 
 
 class ResCompany(models.Model):
@@ -25,3 +26,6 @@ class ResCompany(models.Model):
             raise ValidationError(
                 _("Company Project Folders cannot be linked to another company.%s", f'\n- {companies_list}')
             )
+
+    def _get_used_folder_ids_domain(self, folder_ids):
+        return super()._get_used_folder_ids_domain(folder_ids) | Domain('documents_project_folder_id', 'in', folder_ids)

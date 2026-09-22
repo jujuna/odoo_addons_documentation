@@ -1,9 +1,15 @@
 import { KanbanRecord } from '@web/views/kanban/kanban_record';
+import { debounce } from "@web/core/utils/timing";
 
-export const CANCEL_GLOBAL_CLICK = ["a", ".o_social_subtle_btn", "img"].join(",");
+export const CANCEL_GLOBAL_CLICK = ["a", ".o_social_subtle_btn"].join(",");
 const DEFAULT_COMMENT_COUNT = 20;
 
 export class StreamPostKanbanRecord extends KanbanRecord {
+    setup() {
+        super.setup(...arguments);
+        this._openComments = debounce(this.openComments.bind(this), 300, true);
+    }
+
     //---------------------------------------
     // Handlers
     //---------------------------------------
@@ -15,40 +21,10 @@ export class StreamPostKanbanRecord extends KanbanRecord {
         if (ev.target.closest(CANCEL_GLOBAL_CLICK)) {
             return;
         }
-        this.rootRef.el.querySelector('.o_social_comments').click();
+        this._openComments(ev);
     }
 
-    //---------------------------------------
-    // Private
-    //---------------------------------------
-
-    /**
-     * Calculate the new likes count and then update the record.
-     */
-    async _updateLikesCount(userLikeField, likesCountField, record = null) {
-        record = record || this.props.record;
-        const userLikes = record.data[userLikeField];
-        let likesCount = record.data[likesCountField];
-        if (userLikes) {
-            if (likesCount > 0) {
-                likesCount--;
-            }
-        } else {
-            likesCount++;
-        }
-
-        // Update the record with the "user liked" and likes count values.
-        await record.update({
-            [userLikeField]: !userLikes,
-            [likesCountField]: likesCount,
-            ...this._prepareLikeAdditionnalValues(likesCount, !userLikes),
-        });
-        await record.save();
-    }
-
-    _prepareLikeAdditionnalValues(likesCount, userLikes) {
-        return {};
-    }
+    openComments(ev) {}
 
     //---------
     // Getters

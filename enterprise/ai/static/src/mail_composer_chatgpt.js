@@ -1,13 +1,15 @@
+import { getInnerHtml } from "@mail/utils/common/html";
+
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
-import { Component, markup, onMounted, onWillUnmount } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { htmlJoin } from "@web/core/utils/html";
 
 export class MailComposerChatGPT extends Component {
     static template = "mail.MailComposerChatGPT";
-    static props = { ...standardFieldProps };
+    props = useProps(standardFieldProps);
 
     setup() {
         this.store = useService("mail.store");
@@ -32,34 +34,30 @@ export class MailComposerChatGPT extends Component {
         });
     }
 
-    get originalRecordModel() {
-        return this.props.record.data.model;
-    }
-
-    get originalRecordId() {
-        return Number(this.props.record.data.res_ids.slice(1, -1));
-    }
-
     async onOpenChatGPTPromptDialogBtnClick() {
+        const resId = JSON.parse(this.props.record.data.res_ids || "[]")[0] || false;
         await this.aiChatLauncher.launchAIChat({
-            callerComponentName: "mail_composer",
-            recordModel: this.originalRecordModel,
-            recordId: this.originalRecordId,
+            interfaceKey: this.interfaceKey,
+            recordModel: resId ? this.props.record.data.model : false,
+            recordId: resId,
             originalRecordData: this.props.record.data,
             aiSpecialActions: {
                 insert: (content) => {
                     const root = document.createElement("div");
                     root.appendChild(content);
                     const { body } = this.props.record.data;
-                    // markup: the element of which innerHTML is taken should be safely built
-                    this.props.record.update({
-                        body: htmlJoin([markup(root.innerHTML), body]),
-                    });
+                    this.props.record.update({ body: htmlJoin([getInnerHtml(root), body]) });
                 },
+                selectPreviousInsertion: (selectionId) => false,
             },
             channelTitle: this.props.record.data.subject,
             aiChatSourceId: this.props.record.id,
         });
+    }
+
+    // Getter so subclasses can override the key.
+    get interfaceKey() {
+        return "mail_composer";
     }
 }
 

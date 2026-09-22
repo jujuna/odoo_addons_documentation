@@ -10,12 +10,14 @@ import base64
 @tagged('post_install', '-at_install')
 class TestAccountBankStatementImportQIF(AccountTestInvoicingCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_qif_file_import(self):
         bank_journal = self.env['account.journal'].create({
             'name': 'bank QIF',
             'code': 'BNK67',
             'type': 'bank',
-            'bank_acc_number': '123456',
+            'bank_account_number': '123456',
             'currency_id': self.env.ref('base.USD').id,
         })
 

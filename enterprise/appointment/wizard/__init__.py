@@ -1,4 +1,2 @@
-# -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-from . import appointment_manage_leaves
+from . import calendar_event_archive_or_unlink_wizard
+from . import calendar_event_multi_archive_or_unlink_wizard

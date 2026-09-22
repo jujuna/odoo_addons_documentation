@@ -7,6 +7,8 @@ from freezegun import freeze_time
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestCFDIInvoiceDocuments(TestMxEdiCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -65,6 +67,7 @@ class TestCFDIInvoiceDocuments(TestMxEdiCommon):
             .create({}) \
             .action_create_replacement_invoice()
         new_invoice = self.env['account.move'].browse(action_results['res_id'])
+        self.assertEqual(new_invoice.invoice_origin, invoice.invoice_origin)
 
         # Change the quantity and sign the new invoice.
         # The sale order is invoiced by 2 invoices but only the original one is used for computation

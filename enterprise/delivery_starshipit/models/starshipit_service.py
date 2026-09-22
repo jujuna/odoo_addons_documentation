@@ -11,47 +11,62 @@ from odoo.tools.urls import urljoin as url_join
 BASE_URL = 'https://api.starshipit.com/api/'
 
 
+def _starshipit_send_request(starshipit, endpoint, method='GET', data=None, params=None, route=BASE_URL):
+    """ Send a request to the starshipit api at the given endpoint, with the given method and data.
+        Returns the response, and use some basic error handling to raise a UserError if something went wrong.
+        """
+    if not starshipit._active:
+        raise UserError(_('Starshipit should be used with a context manager.'))
+    url = url_join(route, endpoint)
+    starshipit.logger(f'{url}\n{method}\n{data}\n{params}', f'starshipit request {endpoint}')
+    if method not in ['GET', 'POST', 'DELETE']:
+        raise Exception(f'Unhandled request method {method}')
+    try:
+        session = requests.Session()
+        session.headers = {
+            'Platform': 'Odoo',
+            'Content-Type': 'application/json',
+            'StarShipIT-Api-Key': starshipit.api_key,
+            'Ocp-Apim-Subscription-Key': starshipit.subscription_key,
+        }
+        res = session.request(method=method, url=url, json=data, params=params, timeout=15)
+        starshipit.logger(f'{res.status_code} {res.text}', f'starshipit response {endpoint}')
+        res = res.json()
+    except (RequestException, ValueError) as err:
+        starshipit.logger(str(err), f'starshipit response {endpoint}')
+        raise UserError(_('Something went wrong, please try again later: %s', err))
+
+    if res.get('statusCode') == 403:
+        raise UserError(_('Invalid Starshipit credentials.'))
+    if res.get('statusCode') == 429:
+        raise UserError(_('Starshipit API rate exceeded. Please try again later.'))
+    if not res.get('success'):  # In case of errors from the api we can display the first issue to the user.
+        message = ''
+        if res.get('errors'):
+            message = res['errors'][0]['details']
+        elif res.get('message'):
+            message = res['message']
+        raise UserError('Starshipit returned an error: %(message)s' % {'message': message})  # pylint: disable=E8507
+
+    return res
+
+
 class Starshipit:
 
     def __init__(self, api_key, subscription_key, logger):
+        self._active = False
+        self.api_key = api_key
         self.logger = logger
-        self.session = requests.Session()
-        self.session.headers = {
-            'Platform': 'Odoo',
-            'Content-Type': 'application/json',
-            'StarShipIT-Api-Key': api_key,
-            'Ocp-Apim-Subscription-Key': subscription_key,
-        }
+        self.subscription_key = subscription_key
 
-    def _send_request(self, endpoint, method='GET', data=None, params=None, route=BASE_URL):
-        """ Send a request to the starshipit api at the given endpoint, with the given method and data.
-        Returns the response, and use some basic error handling to raise a UserError if something went wrong.
-        """
-        url = url_join(route, endpoint)
-        self.logger(f'{url}\n{method}\n{data}\n{params}', f'starshipit request {endpoint}')
-        if method not in ['GET', 'POST', 'DELETE']:
-            raise Exception(f'Unhandled request method {method}')
-        try:
-            res = self.session.request(method=method, url=url, json=data, params=params, timeout=15)
-            self.logger(f'{res.status_code} {res.text}', f'starshipit response {endpoint}')
-            res = res.json()
-        except (RequestException, ValueError) as err:
-            self.logger(str(err), f'starshipit response {endpoint}')
-            raise UserError(_('Something went wrong, please try again later: %s', err))
+    def __enter__(self):
+        self._active = True
+        return self
 
-        if res.get('statusCode') == 403:
-            raise UserError(_('Invalid Starshipit credentials.'))
-        if res.get('statusCode') == 429:
-            raise UserError(_('Starshipit API rate exceeded. Please try again later.'))
-        if not res.get('success'):  # In case of errors from the api we can display the first issue to the user.
-            message = ''
-            if res.get('errors'):
-                message = res['errors'][0]['details']
-            elif res.get('message'):
-                message = res['message']
-            raise UserError('Starshipit returned an error: %(message)s' % {'message': message})  # pylint: disable=E8507
-
-        return res
+    def __exit__(self, exc_type, exc_value, traceback):
+        self._active = False
+        self.api_key = None
+        self.subscription_key = None
 
     def _rate_shipment(self, packages, order=False, picking=False):
         """ Returns the rates for the given order for every available delivery service.
@@ -84,7 +99,7 @@ class Starshipit:
             'currency': currency_id.name,
             'include_pricing': True,
         }
-        result = self._send_request('rates', method='POST', data=payload)
+        result = _starshipit_send_request(self, 'rates', method='POST', data=payload)
         return {
             'success': result['success'],
             'rates': {rate['service_code']: rate for rate in result['rates']},
@@ -162,7 +177,7 @@ class Starshipit:
             'name': partner.name,
             'email': partner.email,
             'phone': partner.phone,
-            'company': partner.commercial_company_name or partner.name,
+            'company': partner.parent_name or partner.name,
             'street': ' '.join(filter(None, [partner.street, partner.street2])),
             'city': partner.city,
             'state': partner.state_id.code,
@@ -179,7 +194,8 @@ class Starshipit:
         return details
 
     def _create_label(self, order_id):
-        return self._send_request(
+        return _starshipit_send_request(
+            self,
             'orders/shipment',
             method='POST',
             data={
@@ -188,7 +204,8 @@ class Starshipit:
         )
 
     def _import_order(self, orders_to_import):
-        return self._send_request(
+        return _starshipit_send_request(
+            self,
             'orders/import',
             method='POST',
             data={
@@ -197,7 +214,8 @@ class Starshipit:
         )
 
     def _delete_order(self, order_id):
-        self._send_request(
+        _starshipit_send_request(
+            self,
             'orders/delete',
             method='DELETE',
             params={
@@ -206,7 +224,8 @@ class Starshipit:
         )
 
     def _archive_order(self, order_id):
-        return self._send_request(
+        return _starshipit_send_request(
+            self,
             'orders/archive',
             method='POST',
             params={
@@ -215,7 +234,8 @@ class Starshipit:
         )
 
     def _get_order_details(self, order_id):
-        return self._send_request(
+        return _starshipit_send_request(
+            self,
             'orders',
             method='GET',
             params={
@@ -223,7 +243,8 @@ class Starshipit:
             })
 
     def _get_created_order(self, order_number):
-        return self._send_request(
+        return _starshipit_send_request(
+            self,
             'orders',
             method='GET',
             params={
@@ -231,7 +252,8 @@ class Starshipit:
             })
 
     def _manifest_orders(self, order_ids):
-        return self._send_request(
+        return _starshipit_send_request(
+            self,
             'orders/manifest',
             method='POST',
             data={
@@ -239,7 +261,8 @@ class Starshipit:
             })
 
     def _get_tracking_link(self, order_number):
-        return self._send_request(
+        return _starshipit_send_request(
+            self,
             'track',
             method='GET',
             params={
@@ -249,7 +272,7 @@ class Starshipit:
 
     def _get_delivery_services(self, origin_partner):
         self._validate_partner_fields(origin_partner)
-        return self._send_request('deliveryservices', method='POST', data={
+        return _starshipit_send_request(self, 'deliveryservices', method='POST', data={
             'street': ' '.join(filter(None, [origin_partner.street, origin_partner.street2])),
             'city': origin_partner.city,
             'post_code': origin_partner.zip,
@@ -280,10 +303,10 @@ class Starshipit:
             },
             'packages': [{"weight": total_weight}] if total_weight else [{}],
         }
-        return self._send_request('deliveryservices', method='POST', data=details)
+        return _starshipit_send_request(self, 'deliveryservices', method='POST', data=details)
 
     def _clone_order(self, order_id):
-        return self._send_request('orders/shipment/clone', data={
+        return _starshipit_send_request(self, 'orders/shipment/clone', data={
             'order_id': order_id,
             'to_return_shipment': True,
         })
@@ -306,5 +329,5 @@ class Starshipit:
         In order to reduce the risk of having duplication as much as possible, we will use the company_id and the database
         uuid in order to get a unique but easily recomputable reference and add it to the picking number.
         """
-        database_uuid = picking.env['ir.config_parameter'].sudo().get_param('database.uuid')
+        database_uuid = picking.env['ir.config_parameter'].sudo().get_str('database.uuid')
         return f"{picking.name}#{picking.company_id.id} ({picking.sale_id.name})-{database_uuid[:5]}"

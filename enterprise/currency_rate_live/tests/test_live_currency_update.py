@@ -2,6 +2,7 @@ from odoo.tests.common import TransactionCase, tagged
 
 
 @tagged('-standard', 'external')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class CurrencyTestCase(TransactionCase):
 
     def setUp(self):
@@ -224,4 +225,79 @@ class CurrencyTestCase(TransactionCase):
         self.assertTrue(res)
         self.assertEqual(len(eur.rate_ids), eur_rates_count + 1)
         self.assertEqual(eur.rate_ids[-1].rate, 1.0)
+        self.assertEqual(len(usd.rate_ids), usd_rates_count + 1)
+
+    def test_live_currency_update_nbkz(self):
+        self.test_company.currency_provider = 'nbkz'
+        rates_count = len(self.currency_usd.rate_ids)
+        res = self.test_company.update_currency_rates()
+        self.assertTrue(res)
+        self.assertEqual(len(self.currency_usd.rate_ids), rates_count + 1)
+
+    def test_live_currency_update_cbu(self):
+        eur = self.env.ref('base.EUR')
+        eur.active = True
+        usd = self.env.ref('base.USD')
+        usd.active = True
+        self.test_company.write({
+            'currency_provider': 'cbu',
+            'currency_id': eur.id,
+        })
+        eur_rates_count = len(eur.rate_ids)
+        usd_rates_count = len(self.currency_usd.rate_ids)
+        res = self.test_company.update_currency_rates()
+        self.assertTrue(res)
+        self.assertEqual(len(eur.rate_ids), eur_rates_count + 1)
+        self.assertEqual(eur.rate_ids[-1].rate, 1.0)
+        self.assertEqual(len(usd.rate_ids), usd_rates_count + 1)
+
+    def test_live_currency_update_nbg(self):
+        gel = self.env.ref('base.GEL')
+        gel.active = True
+        usd = self.env.ref('base.USD')
+        usd.active = True
+        self.test_company.write({
+            'currency_provider': 'nbg',
+            'currency_id': gel.id,
+        })
+        gel_rates_count = len(gel.rate_ids)
+        usd_rates_count = len(usd.rate_ids)
+        res = self.test_company.update_currency_rates()
+        self.assertTrue(res)
+        self.assertEqual(len(gel.rate_ids), gel_rates_count + 1)
+        self.assertEqual(gel.rate_ids[-1].rate, 1.0)
+        self.assertEqual(len(usd.rate_ids), usd_rates_count + 1)
+
+    def test_live_currency_update_cbar(self):
+        azn = self.env.ref('base.AZN')
+        azn.active = True
+        usd = self.env.ref('base.USD')
+        usd.active = True
+        self.test_company.write({
+            'currency_provider': 'cbar',
+            'currency_id': azn.id,
+        })
+        azn_rates_count = len(azn.rate_ids)
+        usd_rates_count = len(usd.rate_ids)
+        res = self.test_company.update_currency_rates()
+        self.assertTrue(res)
+        self.assertEqual(len(azn.rate_ids), azn_rates_count + 1)
+        self.assertEqual(azn.rate_ids[-1].rate, 1.0)
+        self.assertEqual(len(usd.rate_ids), usd_rates_count + 1)
+
+    def test_live_currency_update_sama(self):
+        sar = self.env.ref('base.SAR')
+        sar.active = True
+        usd = self.env.ref('base.USD')
+        usd.active = True
+        self.test_company.write({
+            'currency_provider': 'sama',
+            'currency_id': sar.id,
+        })
+        sar_rates_count = len(sar.rate_ids)
+        usd_rates_count = len(usd.rate_ids)
+        res = self.test_company.update_currency_rates()
+        self.assertTrue(res)
+        self.assertEqual(len(sar.rate_ids), sar_rates_count + 1)
+        self.assertEqual(sar.rate_ids[-1].rate, 1.0)
         self.assertEqual(len(usd.rate_ids), usd_rates_count + 1)

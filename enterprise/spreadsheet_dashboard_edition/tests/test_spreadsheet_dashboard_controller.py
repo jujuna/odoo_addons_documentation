@@ -2,11 +2,12 @@ import json
 
 from odoo import Command
 from odoo.tools import file_open
-from odoo.tests.common import HttpCase
+from odoo.tests.common import tagged, HttpCase
 from odoo.addons.spreadsheet_dashboard.tests.common import DashboardTestCommon
 from odoo.addons.spreadsheet_edition.tests.spreadsheet_test_case import SpreadsheetTestCase
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestSpreadsheetDashboard(DashboardTestCommon, SpreadsheetTestCase, HttpCase):
 
     def test_join_new_dashboard_user(self):
@@ -26,7 +27,7 @@ class TestSpreadsheetDashboard(DashboardTestCommon, SpreadsheetTestCase, HttpCas
         response = self.url_open('/spreadsheet/data/spreadsheet.dashboard/%s' % dashboard.id)
         result = response.json()
         self.assertEqual(result["data"], {})
-        self.assertEqual(result["isReadonly"], True)
+        self.assertEqual(result["has_write_access"], False)
 
     def test_join_published(self):
         dashboard = self.create_dashboard().with_user(self.user)
@@ -84,7 +85,7 @@ class TestSpreadsheetDashboard(DashboardTestCommon, SpreadsheetTestCase, HttpCas
     def test_load_with_user_locale_existing_revisions(self):
         self.authenticate(self.user.login, self.user.password)
         dashboard = self.create_dashboard()
-        dashboard.dispatch_spreadsheet_message(self.new_revision_data(dashboard))
+        dashboard._dispatch_spreadsheet_message(self.new_revision_data(dashboard))
 
         response = self.url_open('/spreadsheet/dashboard/data/%s' % dashboard.id)
         data = response.json()
@@ -117,11 +118,11 @@ class TestSpreadsheetDashboard(DashboardTestCommon, SpreadsheetTestCase, HttpCas
             with file_open(sample_dashboard_path, 'rb') as f:
                 return json.load(f)
         dashboard = self.create_dashboard()
-        dashboard.main_data_model_ids = [(4, self.env.ref("base.model_res_bank").id)]
+        dashboard.main_data_model_ids = [(4, self.env.ref("base.model_res_partner_bank").id)]
         dashboard.sample_dashboard_file_path = sample_dashboard_path
 
         # when no records are available for the main data model and no revisions, the sample data is loaded
-        self.env["res.bank"].search([]).action_archive()
+        self.env["res.partner.bank"].search([]).action_archive()
         self.env["spreadsheet.revision"].search([]).unlink()
         response = self.url_open('/spreadsheet/dashboard/data/%s' % dashboard.id)
         data = response.json()
@@ -129,7 +130,7 @@ class TestSpreadsheetDashboard(DashboardTestCommon, SpreadsheetTestCase, HttpCas
         self.assertEqual(data["snapshot"], get_sample_data())
 
         # when there are revisions, the sample data is not loaded
-        dashboard.dispatch_spreadsheet_message(self.new_revision_data(dashboard))
+        dashboard._dispatch_spreadsheet_message(self.new_revision_data(dashboard))
         response = self.url_open('/spreadsheet/dashboard/data/%s' % dashboard.id)
         data = response.json()
         self.assertFalse(data.get("is_sample"))
@@ -137,7 +138,7 @@ class TestSpreadsheetDashboard(DashboardTestCommon, SpreadsheetTestCase, HttpCas
 
         # when no revisions, but we have records for the main data model, the sample data is not loaded
         self.env["spreadsheet.revision"].search([]).unlink()
-        self.env["res.bank"].create({"name": "My bank"})
+        self.env["res.partner.bank"].create({"account_number": "1234", "partner_id": self.env.user.partner_id.id})
         response = self.url_open('/spreadsheet/dashboard/data/%s' % dashboard.id)
         data = response.json()
         self.assertFalse(data.get("is_sample"))

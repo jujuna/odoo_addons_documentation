@@ -1,9 +1,9 @@
 from datetime import timedelta
 from freezegun import freeze_time
-from psycopg2.errors import ForeignKeyViolation
+from psycopg2.errors import ForeignKeyViolation, RestrictViolation
 
-from odoo.addons.documents_sign.tests.test_documents import TestCaseDocumentsBridgeSign
 from odoo.tools import mute_logger
+from .test_documents import TestCaseDocumentsBridgeSign
 
 
 class TestSignedDocument(TestCaseDocumentsBridgeSign):
@@ -28,6 +28,7 @@ class TestSignedDocument(TestCaseDocumentsBridgeSign):
                 "folder_id": cls.folder_a_a.id,
                 "active": False,
                 "res_model": False,
+                "res_id": False,
             }, {
                 "name": "signed document",
                 "folder_id": cls.folder_a_a.id,
@@ -69,7 +70,7 @@ class TestSignedDocument(TestCaseDocumentsBridgeSign):
         self.assertFalse(self.sign_doc.active)
         self.assertFalse(self.signed_document_pdf.active)
 
-        with (self.assertRaises(ForeignKeyViolation), mute_logger("odoo.sql_db")):
+        with (self.assertRaises((ForeignKeyViolation, RestrictViolation)), mute_logger("odoo.sql_db")):
             self.sign_doc.unlink()
-        with (self.assertRaises(ForeignKeyViolation), mute_logger("odoo.sql_db")):
+        with (self.assertRaises((ForeignKeyViolation, RestrictViolation)), mute_logger("odoo.sql_db")):
             self.signed_document_pdf.unlink()

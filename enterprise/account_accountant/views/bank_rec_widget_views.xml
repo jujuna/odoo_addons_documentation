@@ -7,9 +7,13 @@
             <field name="priority">10</field>
             <field name="arch" type="xml">
                 <form string="Bank Statement">
+                    <header>
+                        <button name="action_post" type="object" string="Post" class="btn-primary" invisible="is_statement_posted"/>
+                        <button name="action_draft" type="object" string="Reset to draft" class="btn-secondary" invisible="not is_statement_posted or is_journal_hash"/>
+                    </header>
                     <div class="alert alert-warning text-center" role="alert" invisible="is_valid and is_complete and (not context.get('at_creation') or not journal_has_invalid_statements)">
                         <div invisible="is_valid">The starting balance doesn't match the ending balance of the previous statement, or an earlier statement is missing.</div>
-                        <div invisible="is_complete">The running balance (<field name="balance_end"/>) doesn't match the specified ending balance.</div>
+                        <div invisible="is_complete">The final calculated balance (<field name="balance_end"/>) doesn't match the specified ending balance.</div>
                         <div invisible="not context.get('at_creation') or not journal_has_invalid_statements">
                             There are one or more <a type="object" name="action_open_journal_invalid_statements" string="invalid statement(s)"/>
                         </div>
@@ -42,12 +46,27 @@
                                     <list editable="bottom">
                                         <field name="date"/>
                                         <field name="payment_ref" required="1"/>
+                                        <field name="partner_id" optional="hide"/>
                                         <field name="journal_id" column_invisible="1"/>
                                         <field name="account_number" optional="hide"/>
+                                        <field name="currency_id" column_invisible="1"/>
                                         <field name="foreign_currency_id" optional="hide"/>
-                                        <field name="amount_currency" optional="hide"/>
-                                        <field name="amount"/>
+                                        <field name="amount_currency" optional="hide" sum="Total"/>
+                                        <field name="amount" sum="Total"/>
+                                        <field name="reconcile_model_id" optional="show"/>
                                     </list>
+                                    <kanban class="o_kanban_mobile">
+                                        <templates>
+                                            <t t-name="card">
+                                                <field name="currency_id" invisible="1"/>
+                                                <div class="row">
+                                                    <field name="date" class="col-3"/>
+                                                    <field name="payment_ref" class="col-5"/>
+                                                    <field name="amount" class="col-4 text-end"/>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
                                 </field>
                             </page>
                         </notebook>
@@ -63,17 +82,13 @@
             <field name="model">account.bank.statement</field>
             <field name="arch" type="xml">
                 <form string="Bank Statement">
-                    <div class="alert alert-warning text-center" role="alert" invisible="is_valid and is_complete and (not context.get('at_creation') or not journal_has_invalid_statements)">
-                        <div invisible="is_valid">The starting balance doesn't match the ending balance of the previous statement, or an earlier statement is missing.</div>
-                        <div invisible="is_complete">The running balance (<field name="balance_end"/>) doesn't match the specified ending balance.</div>
-                        <div invisible="not context.get('at_creation') or not journal_has_invalid_statements">
-                            There are one or more <a type="object" name="action_open_journal_invalid_statements" string="invalid statement(s)"/>
-                        </div>
+                    <div class="alert alert-warning text-center" role="alert" invisible="is_valid and is_complete">
+                        <field name="problem_description"/>
                     </div>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
                             <button name="action_open_bank_reconcile_widget" type="object" class="oe_stat_button" invisible="not line_ids">
-                            <field name="line_ids" string="Transactions" widget="statinfo" />
+                            <field name="line_ids" widget="statinfo" />
                         </button>
                         </div>
                         <group>
@@ -94,7 +109,7 @@
             <field name="view_mode">form</field>
             <field name="view_id" ref="view_bank_create_statement_form_bank_rec_widget"/>
             <field name="target">new</field>
-            <field name="context">{'dialog_size': 'medium', 'show_running_balance_latest': True, 'at_creation': True}</field>
+            <field name="context">{'dialog_size': 'medium', 'show_running_balance_latest': True, 'at_creation': True, 'from_bank_reco': True}</field>
         </record>
 
         <!-- Search view of the reconcile button -->
@@ -157,10 +172,11 @@
                     <field name="statement_line_id" string="Statement Line"/>
                     <field name="activity_ids"/>
                     <separator/>
-                    <filter name="deposits" string="Deposits" domain="[('amount', '>', 0.0)]"/>
-                    <filter name="payments" string="Payments" domain="[('amount', '&lt;', 0.0)]"/>
+                    <filter name="cash_in" string="Cash In" domain="[('amount', '>', 0.0)]"/>
+                    <filter name="cash_out" string="Cash Out" domain="[('amount', '&lt;', 0.0)]"/>
                     <separator/>
-                    <filter name="to_check" string="To Review" domain="[('checked', '=', False)]"/>
+                    <filter name="to_check" string="To Review" domain="[('review_state', 'in', ('todo', 'anomaly'))]"/>
+                    <filter name="statement_to_review" string="Statements to Review" domain="[('statement_id', 'in', context.get('review_statement_ids', []))]" invisible="True"/>
                     <separator/>
                     <filter name="no_statement" string="No statement" domain="[('statement_id', '=', False)]"/>
                     <filter name="invalid_statement" string="Invalid statements"
@@ -168,8 +184,7 @@
                     <separator/>
                     <filter name="matched" string="Matched" domain="[('is_reconciled', '=', True)]"/>
                     <filter name="not_matched" string="Not Matched"
-                            domain="[('is_reconciled', '=', False), ('checked', '=', True)]"/>
-                    <filter name="to_check" string="To Check" domain="[('checked', '=', False)]"/>
+                            domain="[('is_reconciled', '=', False), ('review_state', 'not in', ('todo', 'anomaly'))]"/>
                     <filter name="with_activities" string="With Activities" domain="[('activity_ids', '!=', False)]"/>
                     <separator/>
                     <filter name="date" string="Date" date="date"/>
@@ -188,6 +203,7 @@
             <field name="model">account.bank.statement.line</field>
             <field name="arch" type="xml">
                 <kanban js_class="bank_rec_widget_kanban"
+                        class="o_kanban_mobile"
                         on_create="quick_create"
                         quick_create_view="account_accountant.view_bank_statement_line_quick_create_form_bank_rec_widget">
                     <field name="id"/>
@@ -196,10 +212,11 @@
                     <field name="statement_valid"/>
                     <field name="statement_balance_end_real"/>
                     <field name="statement_name"/>
+                    <field name="statement_problem_description"/>
                     <field name="journal_id"/>
                     <field name="statement_id"/>
                     <field name="is_reconciled"/>
-                    <field name="checked"/>
+                    <field name="review_state"/>
                     <field name="currency_id"/>
                     <field name="partner_id"/>
                     <field name="amount"/>
@@ -237,7 +254,7 @@
                     <field name="statement_complete" column_invisible="True"/>
                     <field name="statement_valid" column_invisible="True"/>
                     <field name="is_reconciled" column_invisible="True"/>
-                    <field name="checked" column_invisible="True"/>
+                    <field name="review_state" column_invisible="True"/>
                     <field name="country_code" column_invisible="True"/>
                     <field name="currency_id" column_invisible="True"/>
                     <field name="company_id" column_invisible="True"/>
@@ -245,11 +262,12 @@
                     <!--Visible fields-->
                     <field name="sequence" widget="handle" column_invisible="True"/> <!--Until we add the JS class-->
                     <field name="date" readonly="is_reconciled and amount != 0"
-                           options="{'warn_future': true}"/>
+                           options="{'warning': 'future'}"/>
                     <field name="move_id" optional="hidden" required="0"/>
                     <field name="payment_ref" required="1" readonly="is_reconciled and amount != 0"/>
                     <field name="partner_id" readonly="is_reconciled and amount != 0"/>
                     <field name="account_number" optional="hidden"/>
+                    <field name="transaction_uuid" optional="hide" readonly="True"/>
                     <field name="narration"
                            string="Notes"
                            readonly="is_reconciled and amount != 0"
@@ -290,6 +308,10 @@
                            widget="badge"
                            decoration-info="state == 'draft'"
                            decoration-success="state == 'posted'"/>
+                    <field name="transaction_details"
+                           optional="hidden"
+                           class="d-none d-md-block"
+                           widget="formatted_transaction_details"/>
                 </list>
             </field>
         </record>
@@ -343,10 +365,10 @@
                             <button string="Save &amp; New" type="object"
                                     name="action_save_new" class="btn btn-primary"
                                     data-hotkey="n"/>
-                            <button string="Cancel" class="btn-secondary"
-                                    special="cancel" data-hotkey="x"/>
+                            <button class="btn-secondary" special="cancel" data-hotkey="x"/>
                         </footer>
                     </sheet>
+                    <chatter/>
                 </form>
             </field>
         </record>
@@ -360,10 +382,16 @@
                     <field name="journal_id" invisible="1"/>
                     <field name="currency_id" invisible="1"/>
                     <group class="o_quick_create p-2">
-                        <field name="date" nolabel="1"/>
-                        <field name="payment_ref" class="o_payment_ref" required="1" nolabel="1" placeholder="Write a label ..."/>
+                        <field name="date" class="w-100" nolabel="1"/>
+                        <field name="payment_ref" class="w-100 o_payment_ref" required="1" nolabel="1" placeholder="Write a label ..."/>
                         <field name="partner_id" class="w-100" nolabel="1" placeholder="Partner"/>
                         <field name="amount" class="w-100" nolabel="1"/>
+                        <field name="reconcile_model_id"
+                               class="w-100"
+                               nolabel="1"
+                               placeholder="Reconciliation model"
+                               domain="[('id', 'in', allowed_reconcile_model_ids)]"
+                               options="{'no_create': True, 'no_open': True}"/>
                     </group>
                 </form>
             </field>
@@ -379,7 +407,7 @@
 
         <!--
             The action record of Bank Reconciliation has a duplicate one below it with different view_mode (and path).
-            This was needed because the function "_action_open_bank_reconciliation_widget" was expected to return 2 
+            This was needed because the function "_action_open_bank_reconciliation_widget" was expected to return 2
             different view_modes namely list,kanban and kanban,list depending on the boolean "kanban_first".
             The solution of changing the action dict was not useful because the dict view_mode would be erased on page refresh.
         -->
@@ -391,11 +419,12 @@
             <field name="view_id" ref="view_bank_statement_line_tree_bank_rec_widget"/>
             <field name="path">reconciliation_list</field>
             <field name="domain">[('state', '!=', 'cancel')]</field>
-            <field name="context">{'default_journal_id': active_id, 'search_default_journal_id': active_id}</field>
-            <field name="help" type="html">
-                <p class='o_view_nocontent_smiling_face'>Nothing to do here!</p>
-                <p>No transactions matching your filters were found.</p>
-            </field>
+            <field name="context">{
+                'bank_rec_widget': True,
+                'default_journal_id': active_id,
+                'search_default_journal_id': active_id
+            }</field>
+            <field name="help"/>
         </record>
 
         <record id="action_bank_statement_line_transactions_kanban" model="ir.actions.act_window">
@@ -406,11 +435,12 @@
             <field name="view_id" ref="view_bank_statement_line_kanban_bank_rec_widget"/>
             <field name="path">reconciliation</field>
             <field name="domain">[('state', '!=', 'cancel')]</field>
-            <field name="context">{'default_journal_id': active_id, 'search_default_journal_id': active_id}</field>
-            <field name="help" type="html">
-                <p class='o_view_nocontent_smiling_face'>Nothing to do here!</p>
-                <p>No transactions matching your filters were found.</p>
-            </field>
+            <field name="context">{
+                'bank_rec_widget': True,
+                'default_journal_id': active_id,
+                'search_default_journal_id': active_id
+            }</field>
+            <field name="help"/>
         </record>
 
         <record id="view_move_form_bank_rec_widget" model="ir.ui.view">
@@ -450,6 +480,40 @@
             </field>
         </record>
 
+        <!-- Kanban view of aml used in the reconcile search more (bank rec widget) -->
+        <record id="view_account_move_line_kanban_bank_rec_widget" model="ir.ui.view">
+            <field name="name">account.move.line.kanban.bank_rec_widget</field>
+            <field name="model">account.move.line</field>
+            <field name="priority">999</field>
+            <field name="arch" type="xml">
+                <kanban js_class="bank_rec_dialog_kanban" class="o_kanban_mobile" create="false" group_create="false">
+                    <field name="currency_id"/>
+                    <field name="company_currency_id"/>
+                    <templates>
+                        <t t-name="card" class="px-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <field name="move_name"/>
+                                <div t-if="record.date.raw_value" class="fw-bold">
+                                    <field name="date"/>
+                                </div>
+                            </div>
+                            <div class="o_bank_rec_ref fst-italic w-50">
+                                <field name="ref"/>
+                            </div>
+                            <div class="d-flex align-items-end justify-content-between">
+                                <field name="partner_id"/>
+                                <div class="d-flex flex-column align-items-end"
+                                     t-attf-class="{{ record.amount_residual_currency.raw_value &lt; 0 ? 'text-muted' : '' }}">
+                                    <field name="amount_residual" invisible="currency_id == company_currency_id"/>
+                                    <field name="amount_residual_currency"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
         <!-- List view of aml used in the set account search (bank rec widget) -->
         <record id="view_account_list_bank_rec_widget" model="ir.ui.view">
             <field name="name">account.account.list.bank.rec.widget</field>
@@ -458,9 +522,8 @@
                 <list string="Account" create="false" edit="false">
                     <field name="code" groups="account.group_account_readonly"/>
                     <field name="name" optional="show"/>
-                    <field name="description" optional="hide" width="350px"/>
+                    <field name="description" optional="show" width="350px"/>
                     <field name="account_type" optional="hide"/>
-                    <field name="group_id" optional="hide"/>
                     <field name="reconcile" string="Reconcile" optional="hide"/>
                 </list>
             </field>
@@ -486,6 +549,9 @@
             <field name="model">account.bank.statement</field>
             <field name="inherit_id" ref="account.view_bank_statement_tree"/>
             <field name="arch" type="xml">
+                <list position="attributes">
+                    <attribute name="create">1</attribute>
+                </list>
                 <list position="inside">
                     <button name="action_open_bank_reconcile_widget" string="Transactions" type="object"/>
                 </list>
@@ -513,6 +579,18 @@ if records:
             <field name="code">
                 if records:
                     action = records.action_button_draft()
+            </field>
+        </record>
+
+        <record id="action_download_attachments" model="ir.actions.server">
+            <field name="name">Download Attachments</field>
+            <field name="model_id" ref="model_account_bank_statement_line"/>
+            <field name="binding_model_id" ref="model_account_bank_statement_line" />
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.action_download_attachments()
             </field>
         </record>
     </data>

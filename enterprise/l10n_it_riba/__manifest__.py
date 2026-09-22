@@ -4,11 +4,10 @@
     'version': '0.1',
     'depends': [
         'l10n_it_edi',
-        'base_iban',
         'account_batch_payment'
     ],
     'auto_install': ['l10n_it_edi'],
-    'author': 'Odoo',
+    'author': 'Odoo S.A.',
     'description': """
 Ri.Ba. Export for Batch Payment
 ================================
@@ -22,11 +21,10 @@ It facilitates compliance with the Italian banking standard for managing receiva
 For more information about RIBA standards, refer to the guidelines issued by the Italian Bankers Association (CBI).
     """,
     'category': 'Accounting/Localizations',
-    'website': 'http://www.odoo.com/',
     'data': [
         'data/account_payment_method_data.xml',
         'views/res_company_views.xml'
     ],
     'demo': ['demo/res_company_demo.xml'],
-    'license': 'LGPL-3',
+    'license': 'OEEL-1',
 }

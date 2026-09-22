@@ -7,6 +7,8 @@ from .l10n_cz_reports_common import CzechReportsCommon
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class CzechVIESReportTest(CzechReportsCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @freeze_time('2019-12-31')
     def setUp(self):
         super().setUp()
@@ -54,6 +56,13 @@ class CzechVIESReportTest(CzechReportsCommon):
             'invoice_date': '2019-11-12',
             'taxable_supply_date': '2019-11-12',
             'move_type': 'in_invoice',
+            'partner_id': self.partner_eu_4.id,
+            'invoice_line_ids': [Command.create({'quantity': 3, 'price_unit': 20, 'l10n_cz_transaction_code': '2'})],
+        }).action_post()
+        self.env['account.move'].create({
+            'invoice_date': '2019-11-12',
+            'taxable_supply_date': '2019-11-12',
+            'move_type': 'in_invoice',
             'partner_id': self.partner_non_eu.id,
             'invoice_line_ids': [Command.create(line_data) for line_data in [
                 {'quantity': 3, 'price_unit': 20, 'l10n_cz_transaction_code': '0'},
@@ -70,14 +79,14 @@ class CzechVIESReportTest(CzechReportsCommon):
         options = report.get_options({})
 
         # Excluding journal items lines from the test
-        lines = [line for line in report._get_lines({**options, 'unfold_all': True}) if line['level'] != 6]
+        lines = [line for line in report._get_lines({**options, 'unfold_all': True}) if line.level != 6]
 
         self.assertLinesValues(
             lines,
             # Name                   county code        vat number          transaction code         supplies number                total
             [0,                          1,                 2,                      3,                     4,                        5],
             [
-                ('B. SECTION',          '',                '',                      '',                    8,                        890),
+                ('B. SECTION',          '',                '',                      '',                    9,                        950),
                 ('Partner EU 1',        'FR',              'FR23334175221',         '',                    5,                        510),
                 ('0 Goods',             'FR',              'FR23334175221',         '0',                   1,                        130),
                 ('1 Business asset',    'FR',              'FR23334175221',         '1',                   2,                        240),
@@ -88,6 +97,8 @@ class CzechVIESReportTest(CzechReportsCommon):
                 ('3 Service',           'DE',              'DE123456788',           '3',                   1,                        80),
                 ('Partner EU 3',        'BE',              'BE0477472701',          '',                    1,                        60),
                 ('2 Triangular',        'BE',              'BE0477472701',          '2',                   1,                        60),
+                ('Partner EU 4',        'BE',              '0477472701',            '',                    1,                        60),
+                ('2 Triangular',        'BE',              '0477472701',            '2',                   1,                        60),
             ],
             options,
         )
@@ -112,15 +123,18 @@ class CzechVIESReportTest(CzechReportsCommon):
         expected_xml = f"""
             <Pisemnost nazevSW="Odoo SA" verzeSW="{release.version}">
             <DPHSHV verzePis="02.01">
-                <VetaD shvies_forma="N" dokument="SHV" k_uladis="DPH" mesic="11" rok="2019"/>
-                <VetaP typ_ds="P" zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679" email="info@company.czexample.com"/>
-                <VetaR k_stat="FR" c_vat="FR23334175221" k_pln_eu="0" pln_pocet="2" pln_hodnota="260"/>
-                <VetaR k_stat="FR" c_vat="FR23334175221" k_pln_eu="1" pln_pocet="3" pln_hodnota="300"/>
-                <VetaR k_stat="FR" c_vat="FR23334175221" k_pln_eu="2" pln_pocet="1" pln_hodnota="60"/>
-                <VetaR k_stat="FR" c_vat="FR23334175221" k_pln_eu="3" pln_pocet="1" pln_hodnota="80"/>
-                <VetaR k_stat="DE" c_vat="DE123456788"   k_pln_eu="1" pln_pocet="1" pln_hodnota="240"/>
-                <VetaR k_stat="DE" c_vat="DE123456788"   k_pln_eu="3" pln_pocet="1" pln_hodnota="80"/>
-                <VetaR k_stat="BE" c_vat="BE0477472701"  k_pln_eu="2" pln_pocet="1" pln_hodnota="60"/>
+                <VetaD shvies_forma="N" dokument="SHV" k_uladis="DPH" mesic="11" rok="2019" d_poddp="31.12.2019"/>
+                <VetaP typ_ds="P" zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679"
+                       ulice="Pařížská Street" c_orient="25" naz_obce="PRAGUE 1" stat="ČESKÁ REPUBLIKA"
+                       sest_jmeno="Because" sest_prijmeni="I am accountman!"/>
+                <VetaR k_stat="FR" c_vat="23334175221" k_pln_eu="0" pln_pocet="2" pln_hodnota="260"/>
+                <VetaR k_stat="FR" c_vat="23334175221" k_pln_eu="1" pln_pocet="3" pln_hodnota="300"/>
+                <VetaR k_stat="FR" c_vat="23334175221" k_pln_eu="2" pln_pocet="1" pln_hodnota="60"/>
+                <VetaR k_stat="FR" c_vat="23334175221" k_pln_eu="3" pln_pocet="1" pln_hodnota="80"/>
+                <VetaR k_stat="DE" c_vat="123456788"   k_pln_eu="1" pln_pocet="1" pln_hodnota="240"/>
+                <VetaR k_stat="DE" c_vat="123456788"   k_pln_eu="3" pln_pocet="1" pln_hodnota="80"/>
+                <VetaR k_stat="BE" c_vat="0477472701"  k_pln_eu="2" pln_pocet="1" pln_hodnota="60"/>
+                <VetaR k_stat="BE" c_vat="0477472701"  k_pln_eu="2" pln_pocet="1" pln_hodnota="60"/>
             </DPHSHV>
             </Pisemnost>
         """
@@ -133,14 +147,15 @@ class CzechVIESReportTest(CzechReportsCommon):
     def test_cz_vies_report_custom_options_export(self):
         report = self.env.ref('l10n_cz_reports.vies_summary_report')
         options = self._generate_options(report, date_from='2018-07-01', date_to='2018-09-30')
-        self.env.company.partner_id.company_type = 'person'
 
         generated_xml = self.env['l10n_cz.vies.summary.report.handler'].export_to_xml(options)['file_content']
         expected_xml = f"""
             <Pisemnost nazevSW="Odoo SA" verzeSW="{release.version}">
             <DPHSHV verzePis="02.01">
-                <VetaD shvies_forma="N" dokument="SHV" k_uladis="DPH" ctvrt="3" rok="2018"/>
-                <VetaP typ_ds="F" zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679" email="info@company.czexample.com"/>
+                <VetaD shvies_forma="N" dokument="SHV" k_uladis="DPH" ctvrt="3" rok="2018" d_poddp="31.12.2019"/>
+                <VetaP typ_ds="P" zkrobchjm="company_1_data" c_pracufo="2001" c_ufo="451" dic="12345679"
+                       ulice="Pařížská Street" c_orient="25" naz_obce="PRAGUE 1" stat="ČESKÁ REPUBLIKA"
+                       sest_jmeno="Because" sest_prijmeni="I am accountman!"/>
             </DPHSHV>
             </Pisemnost>
         """
@@ -244,11 +259,9 @@ class CzechVIESReportTest(CzechReportsCommon):
         options = self.env['account.report'].browse(report.id).get_options({})
         options['date'] = {
             'string': '11/11/2020 - 13/11/2020',
-            'mode': 'range',
             'date_from': '2020-11-11',
             'date_to': '2020-11-13',
-            'filter': 'custom',
-            'period_type': 'range',
+            'period_type': 'custom',
         }
 
         xml_content = self.env['l10n_cz.vies.summary.report.handler'].export_to_xml(options)['file_content']
@@ -297,11 +310,9 @@ class CzechVIESReportTest(CzechReportsCommon):
         refund_options = self.env['account.report'].browse(refund_report.id).get_options({})
         refund_options['date'] = {
             'string': '11/11/2021 - 13/11/2021',
-            'mode': 'range',
             'date_from': '2021-11-11',
             'date_to': '2021-11-13',
-            'filter': 'custom',
-            'period_type': 'range',
+            'period_type': 'custom',
         }
 
         refund_xml_content = self.env['l10n_cz.vies.summary.report.handler'].export_to_xml(refund_options)['file_content']
@@ -309,3 +320,85 @@ class CzechVIESReportTest(CzechReportsCommon):
         refudn_veta_r = refudn_tree.find('.//VetaR')
 
         self.assertEqual(refudn_veta_r.attrib.get('pln_hodnota'), '-1000')
+
+    @freeze_time('2020-12-31')
+    def test_cz_vies_report_total_value_calculation_with_discount(self):
+        """Tests that total value is correctly calculated with discount lines in the VIES summary report"""
+
+        self.env['account.move'].create({
+            'currency_id': self.env.ref('base.USD').id,
+            'invoice_date': '2020-11-12',
+            'taxable_supply_date': '2020-11-12',
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_eu_1.id,
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'Test Line',
+                    'quantity': 1,
+                    'price_unit': 100,
+                    'l10n_cz_transaction_code': '0',
+                    'tax_ids': self.l10n_cz_21_domestic_supplies.ids,
+                }),
+                Command.create({
+                    'name': 'Discount Line',
+                    'quantity': 1,
+                    'price_unit': -10,
+                    'l10n_cz_transaction_code': '0',
+                    'tax_ids': self.l10n_cz_21_domestic_supplies.ids,
+                })
+            ],
+        }).action_post()
+        report = self.env.ref('l10n_cz_reports.vies_summary_report')
+        options = self._generate_options(report, '2020-11-11', '2020-11-13')
+        self.assertLinesValues(
+            report._get_lines({**options, 'unfold_all': True}), [0, 5],
+            #        name                          total
+            [
+                ('B. SECTION',                      90),
+                ('Partner EU 1',                    90),
+                ('0 Goods',                         90),
+                ('INV/2020/00001',                  90),
+            ],
+            options,
+        )
+
+    @freeze_time('2020-12-31')
+    def test_cz_vies_report_total_value_calculation_with_discount_refund(self):
+        """Tests that total value is correctly calculated with discount lines for refunds in the VIES summary report"""
+
+        self.env['account.move'].create({
+            'currency_id': self.env.ref('base.USD').id,
+            'invoice_date': '2020-11-12',
+            'taxable_supply_date': '2020-11-12',
+            'move_type': 'out_refund',
+            'partner_id': self.partner_eu_1.id,
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'Test Line',
+                    'quantity': 1,
+                    'price_unit': 100,
+                    'l10n_cz_transaction_code': '0',
+                    'tax_ids': self.l10n_cz_21_domestic_supplies.ids,
+                }),
+                Command.create({
+                    'name': 'Discount Line',
+                    'quantity': 1,
+                    'price_unit': -10,
+                    'l10n_cz_transaction_code': '0',
+                    'tax_ids': self.l10n_cz_21_domestic_supplies.ids,
+                })
+            ],
+        }).action_post()
+        report = self.env.ref('l10n_cz_reports.vies_summary_report')
+        options = self._generate_options(report, '2020-11-11', '2020-11-13')
+        self.assertLinesValues(
+            report._get_lines({**options, 'unfold_all': True}), [0, 5],
+            #        name                          total
+            [
+                ('B. SECTION',                     -90),
+                ('Partner EU 1',                   -90),
+                ('0 Goods',                        -90),
+                ('RINV/2020/00001',                -90),
+            ],
+            options,
+        )

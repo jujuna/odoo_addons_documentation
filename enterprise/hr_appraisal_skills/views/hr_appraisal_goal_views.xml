@@ -10,7 +10,7 @@
                     name="current_goal_skill_ids"
                     widget="many2many_tags"
                     readonly="True"
-                    options="{'color_field': 'color', 'no_edit_color': True}"
+                    options="{'color_field': 'color'}"
                     invisible="not current_goal_skill_ids"
                     string="Skills"/>
             </field>
@@ -38,7 +38,7 @@
                 <field name="current_goal_skill_ids"
                     widget="many2many_tags"
                     invisible="not current_goal_skill_ids"
-                    options="{'color_field': 'color'}"/>
+                    options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
             </span>
         </field>
     </record>
@@ -53,7 +53,7 @@
                     name="current_goal_skill_ids"
                     widget="many2many_tags"
                     readonly="True"
-                    options="{'color_field': 'color', 'no_edit_color': True}"
+                    options="{'color_field': 'color'}"
                     optional="hide"
                     string="Skills"/>
             </field>

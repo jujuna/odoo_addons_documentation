@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, fields, api, _
-from odoo.tools import float_is_zero, SQL
+from odoo import _, models
 from odoo.exceptions import UserError
-
-from itertools import chain
+from odoo.tools import SQL, float_is_zero
 
 
 class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
@@ -28,21 +25,19 @@ class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
         active_currencies = self.env['res.currency'].search([('active', '=', True)])
         if len(active_currencies) < 2:
             raise UserError(_("You need to activate more than one currency to access this report."))
-        rates = active_currencies._get_rates(self.env.company, options.get('date').get('date_to'))
-        # Normalize the rates to the company's currency
-        company_rate = rates[self.env.company.currency_id.id]
-        for key in rates.keys():
-            rates[key] /= company_rate
-
+        active_currencies = active_currencies.with_context(
+            to_currency=self.env.company.currency_id.id,
+            date=options['date']['date_to']
+        )
         options['currency_rates'] = {
-            str(currency_id.id): {
-                'currency_id': currency_id.id,
-                'currency_name': currency_id.name,
+            str(currency.id): {
+                'currency_id': currency.id,
+                'currency_name': currency.name,
                 'currency_main': self.env.company.currency_id.name,
-                'rate': (rates[currency_id.id]
-                         if not previous_options.get('currency_rates', {}).get(str(currency_id.id), {}).get('rate') else
-                         float(previous_options['currency_rates'][str(currency_id.id)]['rate'])),
-            } for currency_id in active_currencies
+                'rate': (currency.rate
+                         if not previous_options.get('currency_rates', {}).get(str(currency.id), {}).get('rate') else
+                         float(previous_options['currency_rates'][str(currency.id)]['rate'])),
+            } for currency in active_currencies
         }
 
         for currency_rates in options['currency_rates'].values():
@@ -51,7 +46,7 @@ class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
 
         options['company_currency'] = options['currency_rates'].pop(str(self.env.company.currency_id.id))
         options['custom_rate'] = any(
-            not float_is_zero(cr['rate'] - rates[cr['currency_id']], 20)
+            not float_is_zero(cr['rate'] - active_currencies.browse(cr['currency_id']).rate, 20)
             for cr in options['currency_rates'].values()
         )
 
@@ -79,10 +74,10 @@ class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
 
         rslt = []
         for index, line in enumerate(lines):
-            res_model_name, res_id = report._get_model_info_from_id(line['id'])
+            res_model_name, res_id = report._get_model_info_from_id(line.id)
 
             if res_model_name == 'account.report.line' and (
-                   (res_id == line_to_adjust_id and report._get_model_info_from_id(lines[index + 1]['id']) == ('account.report.line', line_excluded_id)) or
+                   (res_id == line_to_adjust_id and report._get_model_info_from_id(lines[index + 1].id) == ('account.report.line', line_excluded_id)) or
                    (res_id == line_excluded_id and index == len(lines) - 1)
             ):
                 # 'To Adjust' and 'Excluded' lines need to be hidden if they have no child
@@ -90,28 +85,28 @@ class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
 
             elif res_model_name == 'res.currency':
                 # Include the rate in the currency_id group lines
-                line['name'] = '{for_cur} (1 {comp_cur} = {rate:.6} {for_cur})'.format(
-                    for_cur=line['name'],
+                line.name = '{for_cur} (1 {comp_cur} = {rate:.6} {for_cur})'.format(
+                    for_cur=line.name,
                     comp_cur=self.env.company.currency_id.display_name,
                     rate=float(options['currency_rates'][str(res_id)]['rate']),
                 )
 
             elif res_model_name == 'account.account':
                 # Mark the included/excluded lines, so that the custom component templates knows what label to put on them
-                line['is_included_line'] = report._get_res_id_from_line_id(line['id'], 'account.account') == line_to_adjust_id
+                line.get_custom()['is_included_line'] = report._get_res_id_from_line_id(line.id, 'account.account') == line_to_adjust_id
 
             # Inject the related model into the line dict in order to use it on the custom component template on js side to display buttons
-            line['cur_revaluation_line_model'] = res_model_name
+            line.get_custom()['cur_revaluation_line_model'] = res_model_name
 
             rslt.append(line)
 
         return rslt
 
-    def _custom_groupby_line_completer(self, report, options, line_dict, current_groupby):
-        model_info_from_id = report._get_model_info_from_id(line_dict['id'])
+    def _custom_groupby_line_completer(self, report, options, line_data, current_groupby):
+        model_info_from_id = report._get_model_info_from_id(line_data.id)
         if model_info_from_id[0] == 'res.currency':
-            line_dict['unfolded'] = True
-            line_dict['unfoldable'] = False
+            line_data.unfolded = True
+            line_data.unfoldable = False
 
     def action_multi_currency_revaluation_open_revaluation_wizard(self, options):
         """Open the revaluation wizard."""
@@ -173,13 +168,13 @@ class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
             'domain': [('currency_id', '=', currency_id)],
         }
 
-    def _report_custom_engine_multi_currency_revaluation_to_adjust(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
-        return self._multi_currency_revaluation_get_custom_lines(options, 'to_adjust', current_groupby, next_groupby, offset=offset, limit=limit)
+    def _report_engine_multi_currency_revaluation_to_adjust(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        return self._multi_currency_revaluation_get_custom_lines(options, 'to_adjust', formulas_dict, current_groupby)
 
-    def _report_custom_engine_multi_currency_revaluation_excluded(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
-        return self._multi_currency_revaluation_get_custom_lines(options, 'excluded', current_groupby, next_groupby, offset=offset, limit=limit)
+    def _report_engine_multi_currency_revaluation_excluded(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
+        return self._multi_currency_revaluation_get_custom_lines(options, 'excluded', formulas_dict, current_groupby)
 
-    def _multi_currency_revaluation_get_custom_lines(self, options, line_code, current_groupby, next_groupby, offset=0, limit=None):
+    def _multi_currency_revaluation_get_custom_lines(self, options, line_code, formulas_dict, current_groupby):
         def build_result_dict(report, query_res):
             return {
                 'balance_currency': query_res['balance_currency'] if len(query_res['currency_id']) == 1 else None,
@@ -190,23 +185,24 @@ class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
                 'has_sublines': True,
             }
 
-        report = self.env['account.report'].browse(options['report_id'])
-        report._check_groupby_fields((next_groupby.split(',') if next_groupby else []) + ([current_groupby] if current_groupby else []))
-
         # No need to run any SQL if we're computing the main line: it does not display any total
         if not current_groupby:
-            return {
+            return {next(iter(formulas_dict.values())): {
                 'balance_currency': None,
                 'currency_id': None,
                 'balance_operation': None,
                 'balance_current': None,
                 'adjustment': None,
                 'has_sublines': True,
-            }
+            }}
 
-        query = "(VALUES {})".format(', '.join("(%s, %s)" for rate in options['currency_rates']))
-        params = list(chain.from_iterable((cur['currency_id'], cur['rate']) for cur in options['currency_rates'].values()))
-        custom_currency_table_query = SQL(query, *params)
+        report = self.env['account.report'].browse(options['report_id'])
+        report._check_groupby_fields([current_groupby])
+
+        custom_currency_table_query = SQL("(VALUES %s)", SQL(", ").join(
+            SQL("(%(currency_id)s, %(rate)s)", **cur)
+            for cur in options['currency_rates'].values()
+        ))
         date_to = options['date']['date_to']
         select_part_not_an_exchange_move_id = SQL(
             """
@@ -222,7 +218,6 @@ class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
 
         query = report._get_report_query(options, 'strict_range')
         groupby_field_sql = self.env['account.move.line']._field_to_sql("account_move_line", current_groupby, query)
-        tail_query = report._get_engine_query_tail(offset, limit)
         full_query = SQL(
             """
             WITH custom_currency_table(currency_id, rate) AS (%(custom_currency_table_query)s)
@@ -361,14 +356,12 @@ class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
 
             GROUP BY grouping_key
             ORDER BY grouping_key
-            %(tail_query)s
             """,
             groupby_field_sql=groupby_field_sql,
             custom_currency_table_query=custom_currency_table_query,
             exist_condition=SQL('NOT EXISTS') if line_code == 'to_adjust' else SQL('EXISTS'),
             table_references=query.from_clause,
             date_to=date_to,
-            tail_query=tail_query,
             search_condition=query.where_clause,
             select_part_not_an_exchange_move_id=select_part_not_an_exchange_move_id,
         )
@@ -379,4 +372,4 @@ class AccountMulticurrencyRevaluationReportHandler(models.AbstractModel):
         for query_res in query_res_lines:
             grouping_key = query_res['grouping_key']
             rslt.append((grouping_key, build_result_dict(report, query_res)))
-        return rslt
+        return {next(iter(formulas_dict.values())): rslt}

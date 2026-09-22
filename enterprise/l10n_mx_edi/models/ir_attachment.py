@@ -12,7 +12,7 @@ class IrAttachment(models.Model):
                 ('attachment_id', 'in', self.ids),
                 ('move_id.state', '!=', 'draft'),
                 ('move_id.l10n_mx_edi_cfdi_uuid', '!=', False),
-                ('move_id.move_type', 'not in', ['in_invoice', 'in_refund']),
+                ('move_id.move_type', 'not in', self.env['account.move'].get_purchase_types(include_receipts=True)),
             ],
             limit=1,
         )

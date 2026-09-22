@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from odoo import SUPERUSER_ID, api, fields, models
 from odoo.tools import SQL
 
@@ -7,6 +9,8 @@ class AccountReconcileModel(models.Model):
 
     # Technical field to know if the rule was created automatically or by a user.
     created_automatically = fields.Boolean(default=False, copy=False)
+    is_asking_for_autopost = fields.Boolean(default=True)
+    use_count = fields.Integer()
 
     def _apply_lines_for_bank_widget(self, residual_amount_currency, residual_balance, partner, st_line):
         """ Apply the reconciliation model lines to the statement line passed as parameter.
@@ -63,12 +67,13 @@ class AccountReconcileModel(models.Model):
                  )
 
           SELECT st_line.id AS st_line_id,
-                 array_agg(reco_model.id ORDER BY reco_model.sequence ASC, reco_model.id ASC) AS reco_model_ids,
-                 array_agg(reco_model.name ORDER BY reco_model.sequence ASC, reco_model.id ASC) AS reco_model_names
+                 array_agg(reco_model.id ORDER BY reco_model.created_automatically ASC NULLS FIRST, reco_model.sequence ASC, reco_model.id ASC) AS reco_model_ids,
+                 array_agg(reco_model.name ORDER BY reco_model.created_automatically ASC NULLS FIRST, reco_model.sequence ASC, reco_model.id ASC) AS reco_model_names
             FROM account_bank_statement_line st_line
        LEFT JOIN LATERAL (
                    SELECT DISTINCT reco_model.id,
                           reco_model.sequence,
+                          reco_model.created_automatically,
                           COALESCE(reco_model.name -> %(lang)s, reco_model.name -> 'en_US') as name
                      FROM account_reconcile_model reco_model
                 LEFT JOIN matching_journal_ids ON reco_model.id = matching_journal_ids.account_reconcile_model_id
@@ -131,12 +136,12 @@ class AccountReconcileModel(models.Model):
             in query_result
         }
 
-    def _apply_reconcile_models(self, statement_lines):
+    def _apply_reconcile_models(self, statement_lines, remaining_st_line_ids=None, account_ids=None):
         if not self or not statement_lines:
             return
         self.env['account.reconcile.model'].flush_model()
         statement_lines.flush_recordset(['journal_id', 'amount', 'amount_residual', 'transaction_details', 'payment_ref', 'partner_id', 'company_id'])
-        self.env.cr.execute(SQL("""
+        self.env.cr.execute(SQL(r"""
             WITH matching_journal_ids AS (
                     SELECT account_reconcile_model_id,
                            ARRAY_AGG(account_journal_id) AS ids
@@ -158,7 +163,7 @@ class AccountReconcileModel(models.Model):
                       JOIN account_reconcile_model_line model_lines ON model_lines.model_id = model_fees.id
                  LEFT JOIN matching_journal_ids ON model_fees.id = matching_journal_ids.account_reconcile_model_id
                      WHERE imd.module = 'account'
-                       AND imd.name LIKE 'account_reco_model_fee_%%'
+                       AND imd.name LIKE 'account\_reco\_model\_fee\_%%'
                        AND model_fees.active IS TRUE
                        AND model_lines.account_id IS NOT NULL
                  )
@@ -214,7 +219,7 @@ class AccountReconcileModel(models.Model):
                       AND reco_model.id IN %s
                       AND reco_model.can_be_proposed IS TRUE
                       AND reco_model.company_id = st_line.company_id
-                 ORDER BY reco_model.sequence ASC, reco_model.id ASC
+                 ORDER BY reco_model.created_automatically ASC NULLS FIRST, reco_model.sequence ASC, reco_model.id ASC
                     LIMIT 1
                  ) AS reco_model ON TRUE
        LEFT JOIN LATERAL (
@@ -233,6 +238,7 @@ class AccountReconcileModel(models.Model):
         query_result = self.env.cr.fetchall()
 
         processed_st_line_ids = set()
+        matching_rules = defaultdict(lambda: self.env['account.bank.statement.line'])
         # apply the found suitable reco models on the statement lines
         for st_line_id, reco_model_id, reco_model_trigger in query_result:
             if st_line_id in processed_st_line_ids or reco_model_id is None:
@@ -243,9 +249,16 @@ class AccountReconcileModel(models.Model):
 
             if reco_model_trigger == 'manual':
                 st_line._action_manual_reco_model(reco_model_id)
+            elif reco_model.rule_type == 'matching_rule':
+                matching_rules[reco_model] += st_line
             else:
                 reco_model.with_user(SUPERUSER_ID)._trigger_reconciliation_model(st_line.with_user(SUPERUSER_ID))
             processed_st_line_ids.add(st_line_id)
+
+        for matching_rule, st_lines in matching_rules.items():
+            st_lines._try_auto_matching_and_reconcile(st_lines.move_id.ids, remaining_st_line_ids, account_ids, matching_rule=matching_rule)
+
+        return remaining_st_line_ids
 
     def _trigger_reconciliation_model(self, statement_line):
         self.ensure_one()
@@ -272,29 +285,100 @@ class AccountReconcileModel(models.Model):
             statement_line._create_tax_lines(original_base_lines, original_tax_lines, new_lines)
 
         if self.next_activity_type_id:
-            statement_line.move_id.activity_schedule(
+            statement_line.activity_schedule(
                 activity_type_id=self.next_activity_type_id.id,
                 user_id=self.env.user.id,
             )
 
-    def trigger_reconciliation_model(self, statement_line_id):
+    def _trigger_matching_rule(self, st_line, aml_ids, amls_amount_residual, processed_st_line_ids, allow_partial=True):
+        """ Reconcile amls with the st_line, respecting the matching order and the payment tolerance of the matching_rule.
+            We loop into aml_ids until we hit the payment tolerance or the statement line is reconciled or we matched all
+            account.move.line.
+            Once we set the aml on the statement line, if we hit the tolerance, apply the matching rule counterparts items.
+
+            :param st_line: The statement line to reconcile.
+            :param aml_ids: List of account.move.line ids to reconcile with the statement line. This list should be the same
+                            order as the one defined on the matching rule.
+            :param amls_amount_residual: List of account.move.line amount_residual, mapped with aml_ids.
+            :param processed_st_line_ids: Set of statement line ids, to keep track of reconciled lines.
+            :param allow_partial: Flag to know if we want to allow partial reconciliation.
+        """
+        def _amount_matches_or_exceeds(st_line_amount, aml_amount):
+            return (
+                (st_line_amount < 0 and aml_amount < -st_line_amount) or
+                (st_line_amount > 0 and aml_amount > -st_line_amount)
+            )
+
+        self.ensure_one()
+        matched_aml_ids = []
+        aml_amount_sum = 0
+        st_line_amount_residual = st_line.amount_residual
+        matching_tolerance = False
+        if self.payment_tolerance_type == 'percentage':
+            tolerance = abs(st_line.amount * (self.payment_tolerance / 100))
+        else:
+            tolerance = self.payment_tolerance
+        amls = self.env['account.move.line'].search_fetch(domain=[('id', 'in', aml_ids)], field_names=['reconciled']).grouped('id')
+        # We loop until:
+        #     1. The amount of matched aml exceed the st_line residual amount -> We'll do a partial reconcile on the last aml
+        #     2. We pop all amls
+        #     3. We hit the tolerance -> We'll do a full reconcile on the last aml, then apply the counterparts items
+        #
+        # aml_ids & amls_amount_residual are ordered the same way
+        for aml_id, aml_amount_residual in zip(aml_ids, amls_amount_residual):
+            if not (
+                _amount_matches_or_exceeds(st_line.amount_residual, aml_amount_sum) and
+                not matching_tolerance
+            ):
+                break
+
+            aml = amls.get(aml_id)
+            if aml.reconciled:
+                continue
+            # If the aml amount is between the tolerance boundaries, we fully match the aml then stop the loop
+            if tolerance and -st_line_amount_residual - tolerance <= aml_amount_residual <= -st_line_amount_residual + tolerance:
+                matched_aml_ids.append(aml_id)
+                matching_tolerance = True
+                processed_st_line_ids.add(st_line.id)
+            # We still check if the st_line residual amount is not in the tolerance boundaries to keep the suspense line in the boundaries
+            elif abs(st_line_amount_residual) > tolerance and allow_partial:
+                matched_aml_ids.append(aml_id)
+                st_line_amount_residual += aml_amount_residual
+                aml_amount_sum += aml_amount_residual
+        # Set the matched aml on the st_line, the partial reconcile shouldn't be allowed if we hit the tolerance
+        st_line.set_line_bank_statement_line(matched_aml_ids, allow_partial=not matching_tolerance and allow_partial)
+        self.env['account.move.line'].browse(matched_aml_ids).reconcile_model_id = self.id
+        # If the tolerance has been hit, trigger the reco model to apply the counterpart items if any
+        if matching_tolerance:
+            self._trigger_reconciliation_model(st_line)
+
+    def trigger_reconciliation_model(self, statement_line_ids):
         self.ensure_one()
 
-        statement_line = self.env['account.bank.statement.line'].browse(statement_line_id).exists()
-        self._trigger_reconciliation_model(statement_line)
+        if self.is_asking_for_autopost:
+            self.use_count += 1
+
+        statement_lines = self.env['account.bank.statement.line'].browse(statement_line_ids).exists()
+        for statement_line in statement_lines:
+            self._trigger_reconciliation_model(statement_line)
 
     def write(self, vals):
         res = super().write(vals)
-        unreconciled_statement_lines = self.env['account.bank.statement.line'].search([
+        unreconciled_domain = [
             *self._check_company_domain(self.env.company),
             ('is_reconciled', '=', False),
-        ])
+        ]
+        unreconciled_statement_lines = self.env['account.bank.statement.line'].search(unreconciled_domain)
         if unreconciled_statement_lines:
-            unreconciled_statement_lines.line_ids.filtered(
+            move_lines = self.env['account.move.line'].search([
+                ('reconcile_model_id', 'in', self.ids),
+                ('move_id.statement_line_id', 'any', unreconciled_domain)
+            ])
+            move_lines.filtered(
                 lambda line:
-                line.account_id == line.move_id.journal_id.suspense_account_id and line.reconcile_model_id in self
+                line.account_id == line.move_id.journal_id.suspense_account_id
             ).reconcile_model_id = False
-            self._apply_reconcile_models(unreconciled_statement_lines)
+            self.filtered(lambda model: model.rule_type == 'reco_model')._apply_reconcile_models(unreconciled_statement_lines)
 
         return res
 
@@ -306,7 +390,7 @@ class AccountReconcileModel(models.Model):
             ('is_reconciled', '=', False),
         ])
         if unreconciled_statement_lines:
-            reco_models._apply_reconcile_models(unreconciled_statement_lines)
+            reco_models.filtered(lambda model: model.rule_type == 'reco_model')._apply_reconcile_models(unreconciled_statement_lines)
 
         return reco_models
 
@@ -323,3 +407,20 @@ class AccountReconcileModel(models.Model):
                 line.account_id == line.move_id.journal_id.suspense_account_id
             ).reconcile_model_id = False
         return res
+
+    def _order_to_sql(self, table, order, reverse=False):
+        sql_order = super()._order_to_sql(table, order, reverse)
+        if journal_id := self.env.context.get('active_id') or self.env.context.get('default_journal_id'):
+            return SQL(
+                """EXISTS (
+                    SELECT 1
+                    FROM account_journal_account_reconcile_model_rel
+                    WHERE account_reconcile_model_id = %(reco_model_id)s
+                      AND account_journal_id = %(journal_id)s
+                ) DESC, %(sql_order)s""",
+                reco_model_id=table.id,
+                journal_id=journal_id,
+                sql_order=sql_order,
+            )
+
+        return sql_order

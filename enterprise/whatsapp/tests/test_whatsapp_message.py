@@ -8,6 +8,7 @@ from odoo.tests import tagged
 
 
 @tagged('wa_message')
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class WhatsAppMessage(WhatsAppCommon, MockIncomingWhatsApp):
 
     @freeze_time('2023-08-20')

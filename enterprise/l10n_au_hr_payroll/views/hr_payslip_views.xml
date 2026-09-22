@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="hr_payroll.view_hr_payslip_filter"/>
         <field name="arch" type="xml">
             <filter name="group_by_company_id" position="after">
-                <filter name="period_filter" string="Pay Period" context="{'group_by': 'l10n_au_schedule_pay'}"/>
+                <filter name="period_filter" string="Pay Period" context="{'group_by': 'schedule_pay'}"/>
                 <filter name="final_pay" string="Final Pay" domain="[('l10n_au_termination_type', '!=', False)]"/>
             </filter>
         </field>
@@ -81,8 +81,12 @@
         <field name="inherit_id" ref="hr_payroll.view_hr_payslip_tree"/>
         <field name="arch" type="xml">
             <list position="inside">
-                <field name="l10n_au_schedule_pay" optional="hide"/>
+                <field name="schedule_pay" optional="hide"/>
             </list>
+            <xpath expr="//field[@name='net_wage']" position="after">
+                <field name="l10n_au_super_contributions" optional="show" sum="Total Super Contributions"/>
+                <field name="l10n_au_withholding_tax" optional="show" sum="Total Tax Withholding"/>
+            </xpath>
         </field>
     </record>
 </odoo>

@@ -1,16 +1,17 @@
 import { useService } from "@web/core/utils/hooks";
-import { Component, markup, onWillStart, onWillUpdateProps, useState } from "@odoo/owl";
+import { Component, markup, onWillStart, onWillUpdateProps, proxy, t, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 
 export class DocumentsActionHelper extends Component {
     static template = "documents.DocumentsActionHelper";
-    static props = [
-        "noContentHelp", // Markup Object
-    ];
+
+    props = useProps({
+        noContentHelp: t.any(), // Markup Object
+    });
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({
+        this.state = proxy({
             mailTo: undefined,
         });
         onWillStart(async () => {

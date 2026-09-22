@@ -3,27 +3,31 @@
 # * web_gantt
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-30 18:49+0000\n"
-"PO-Revision-Date: 2025-09-16 22:57+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
-"Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/web_gantt/"
-"th/>\n"
+"POT-Creation-Date: 2026-08-28 17:58+0000\n"
+"PO-Revision-Date: 2026-09-18 00:48+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-master/"
+"web_gantt/th/>\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%(hour)sh%(minute)s"
-msgstr "%(hour)s ชั่วโมง %(minute)s นาที"
+#: model:ir.module.module,description:base.module_web_gantt
+msgid ""
+"\n"
+"Odoo Web Gantt chart view.\n"
+"=============================\n"
+"\n"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -33,9 +37,10 @@ msgstr "%s ไม่สามารถกำหนดเวลาในอดี
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_model.js:0
-msgid "%sh"
-msgstr "%s ชั่วโมง"
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "%s to schedule"
+msgstr "%s เพื่อกำหนดเวลา"
 
 #. module: web_gantt
 #: model:ir.model,name:web_gantt.model_ir_actions_act_window_view
@@ -44,12 +49,14 @@ msgstr "มุมมองหน้าต่างการดำเนินก
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
-msgstr ""
+msgstr "เปิดใช้งานโหมดความหนาแน่น"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr ""
@@ -103,7 +110,13 @@ msgstr "แสดงชื่อ"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Drop here to unschedule"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Edit"
 msgstr "แก้ไข"
 
@@ -146,8 +159,8 @@ msgstr "มุมมองแบบแกนต์"
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt child can only be field or template, got %s"
-msgstr "แกนต์ย่อยได้เฉพาะฟิลด์หรือเทมเพลตเท่านั้น มี %s"
+msgid "Gantt child can only be field or popover, got %s"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -171,6 +184,18 @@ msgstr ""
 "Gantt ต้องมีแอตทริบิวต์ 'dependency_inverted_field' เมื่อระบุ 'dependency_field' แล้ว"
 
 #. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover can contain only one templates tag"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid "Gantt popover child can only be field or template, got %s"
+msgstr ""
+
+#. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_scale_selector.js:0
 msgid "Gantt start date"
@@ -185,8 +210,8 @@ msgstr ""
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
-msgid "Gantt view can contain only one templates tag"
-msgstr "มุมมองแกนต์สามารถมีแท็กเทมเพลตได้เพียงแท็กเดียว"
+msgid "Gantt view can contain only one popover tag"
+msgstr ""
 
 #. module: web_gantt
 #: model:ir.model.fields,field_description:web_gantt.field_ir_actions_act_window_view__id
@@ -205,6 +230,14 @@ msgstr "ไม่สามารถกำหนดเวลาในอดีต
 #: code:addons/web_gantt/models/models.py:0
 msgid "Insufficient fields for Gantt View!"
 msgstr "ฟิลด์ไม่เพียงพอสำหรับมุมมองแกนต์!"
+
+#. module: web_gantt
+#. odoo-python
+#: code:addons/web_gantt/models/ir_ui_view.py:0
+msgid ""
+"Invalid attributes (%(invalid_attributes)s) in gantt popover. Attributes "
+"must be in (%(valid_attributes)s)"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-python
@@ -242,27 +275,34 @@ msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_side_panel.xml:0
+msgid "Load More"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "Month"
 msgstr "เดือน"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
-msgid "Name"
-msgstr ""
-
-#. module: web_gantt
-#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_controller.xml:0
 msgid "New"
-msgstr "ใหม่"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_controller.js:0
 msgid "No, keep it"
 msgstr "ไม่ เก็บมันไว้"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_side_panel.js:0
+msgid "Nothing to schedule"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
@@ -315,7 +355,13 @@ msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Show dependencies"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Start"
 msgstr ""
 
@@ -327,7 +373,7 @@ msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 msgid "Stop"
 msgstr ""
 
@@ -347,7 +393,13 @@ msgstr "การขึ้นต่อกันไม่ถูกต้อง �
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Today"
-msgstr "วันนี้"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
+msgid "Toggle Side Panel"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
@@ -369,7 +421,7 @@ msgstr "ไม่กำหนด %s"
 
 #. module: web_gantt
 #. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+#: code:addons/web_gantt/static/src/gantt_popover.js:0
 #: model:ir.model,name:web_gantt.model_ir_ui_view
 msgid "View"
 msgstr "ดู"
@@ -381,16 +433,15 @@ msgid "View Type"
 msgstr "ประเภทมุมมอง"
 
 #. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week"
-msgstr "สัปดาห์"
+#: model:ir.module.module,shortdesc:base.module_web_gantt
+msgid "Web Gantt"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
-msgid "Week %(week)s, %(startDate)s - %(endDate)s"
-msgstr ""
+msgid "Week"
+msgstr "สัปดาห์"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -415,9 +466,3 @@ msgstr "นาที"
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "months"
 msgstr "เดือน"
-
-#~ msgid "From"
-#~ msgstr "จาก"
-
-#~ msgid "to"
-#~ msgstr "ถึง"

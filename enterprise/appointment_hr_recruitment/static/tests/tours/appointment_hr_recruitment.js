@@ -1,8 +1,8 @@
 import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_utils";
+import { redirect } from "@web/core/utils/urls";
 
 registry.category("web_tour.tours").add('appointment_hr_recruitment_tour', {
-    url: '/odoo',
     steps: () => [stepUtils.showAppsMenuItem(), {
         trigger: '.o_app[data-menu-xmlid="hr_recruitment.menu_hr_recruitment_root"]',
         run: 'click',
@@ -16,19 +16,25 @@ registry.category("web_tour.tours").add('appointment_hr_recruitment_tour', {
         trigger: 'button[name="action_create_meeting"]',
         run: 'click',
     }, {
-        trigger: 'button.dropdownAppointmentLink',
-        run: 'click',
-    }, {
-        trigger: '.o_appointment_button_link:contains("Test AppointmentHrRecruitment")',
+        trigger: 'button:contains("Share my calendar")',
         async run(helpers) {
-            // Patch write on clipboard -- go to the url (to then book an appointment from there
-            // No need to cleanup as it triggers an unload
-            navigator.clipboard.writeText = (text) => {window.location.href = text};
+            // Patch clipboard write to check the applicant_code is included, then
+            // navigate to the url to book an appointment from there.
+            // No need to cleanup as it triggers an unload.
+            navigator.clipboard.writeText = (text) => {
+                if (!text || !text.includes("applicant_code=")) {
+                    console.error("All urls should get the applicant_code included.");
+                }
+                redirect(text);
+            };
             await helpers.click();
         },
         expectUnloadPage: true,
     }, {
-        trigger: '.o_slot_hours:contains("4")',
+        trigger: '.o_slot_hours',
+        run: 'click',
+    }, {
+        trigger: "button[name='submitSlotInfoSelected']",
         run: 'click',
         expectUnloadPage: true,
     }, {
@@ -45,7 +51,7 @@ registry.category("web_tour.tours").add('appointment_hr_recruitment_tour', {
         run: 'click',
         expectUnloadPage: true,
     }, {
-        trigger: '.fa-check-circle',
+        trigger: '[data-icon="check_circle"]',
         run: 'click',
     }],
 });

@@ -8,7 +8,7 @@ import { setupWithThreads } from "@test_spreadsheet_edition/../tests/helpers/hel
 describe.current.tags("headless");
 defineTestSpreadsheetEditionModels();
 
-const { CellPopoverStore } = stores;
+const { CellPopoverStore, ViewportsStore } = stores;
 
 test("Change thread visibility", async () => {
     const { env } = await setupWithThreads();
@@ -23,7 +23,8 @@ test("Change thread visibility", async () => {
 test("Open a comment thread", async () => {
     const { model, env } = await setupWithThreads();
     const commentsStore = env.getStore(CommentsStore);
-    model.dispatch("RESIZE_SHEETVIEW", { width: 1000, height: 1000 }); // Require a viewport big enough to display the popover
+    const viewStore = env.getStore(ViewportsStore);
+    viewStore.resizeSheetView({ width: 1000, height: 1000 }); // Require a viewport big enough to display the popover
     const threadId = 1;
     const sheetId = model.getters.getActiveSheetId();
     model.dispatch("ADD_COMMENT_THREAD", { sheetId, col: 0, row: 0, threadId });
@@ -36,7 +37,8 @@ test("Opening a thread makes the threads visible", async () => {
     const { model, env } = await setupWithThreads();
     const commentsStore = env.getStore(CommentsStore);
     const popoverStore = env.getStore(CellPopoverStore);
-    model.dispatch("RESIZE_SHEETVIEW", { width: 1000, height: 1000 }); // require a viewport to display the popover
+    const viewStore = env.getStore(ViewportsStore);
+    viewStore.resizeSheetView({ width: 1000, height: 1000 }); // require a viewport to display the popover
     const threadId = 1;
     const sheetId = model.getters.getActiveSheetId();
     model.dispatch("ADD_COMMENT_THREAD", { sheetId, col: 0, row: 0, threadId });
@@ -46,25 +48,12 @@ test("Opening a thread makes the threads visible", async () => {
     expect(popoverStore.persistentCellPopover.type).toBe("OdooCellComment");
 });
 
-test("Scrolling the viewport should close the comments popover", async () => {
-    const { model, env } = await setupWithThreads();
-    const commentsStore = env.getStore(CommentsStore);
-    model.dispatch("RESIZE_SHEETVIEW", { width: 1000, height: 1000 }); // Require a viewport big enough to display the popover
-    const threadId = 1;
-    const sheetId = model.getters.getActiveSheetId();
-    model.dispatch("ADD_COMMENT_THREAD", { sheetId, col: 0, row: 0, threadId });
-    commentsStore.openCommentThread(threadId);
-    const popoverStore = env.getStore(CellPopoverStore);
-    expect(popoverStore.persistentCellPopover.type).toBe("OdooCellComment");
-    model.dispatch("SET_VIEWPORT_OFFSET", { offsetX: 100, offsetY: 0 });
-    expect(popoverStore.persistentCellPopover.type).toBe(undefined);
-});
-
 test("Selecting a resolved thread closes the popover", async () => {
     const { model, env } = await setupWithThreads();
     const commentsStore = env.getStore(CommentsStore);
     const popoverStore = env.getStore(CellPopoverStore);
-    model.dispatch("RESIZE_SHEETVIEW", { width: 1000, height: 1000 }); // Require a viewport big enough to display the popover
+    const viewStore = env.getStore(ViewportsStore);
+    viewStore.resizeSheetView({ width: 1000, height: 1000 }); // Require a viewport big enough to display the popover
     const sheetId = model.getters.getActiveSheetId();
     model.dispatch("ADD_COMMENT_THREAD", { sheetId, col: 0, row: 0, threadId: 1 });
     model.dispatch("ADD_COMMENT_THREAD", { sheetId, col: 0, row: 1, threadId: 2 });

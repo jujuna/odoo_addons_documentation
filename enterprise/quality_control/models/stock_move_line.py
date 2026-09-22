@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models
 
@@ -36,7 +35,9 @@ class StockMoveLine(models.Model):
 
     def write(self, vals):
         if self._create_quality_check_at_write(vals):
-            self.filtered(lambda ml: not ml.picked and not ml.sudo().check_ids)._create_check()
+            self.filtered(lambda ml: ml.state != 'done' and not ml.sudo().check_ids)._create_check()
+        if 'picking_id' in vals:
+            self.check_ids.filtered(lambda qc: qc.point_id.measure_on == 'move_line').picking_id = vals['picking_id']
         return super().write(vals)
 
     def unlink(self):
@@ -58,16 +59,29 @@ class StockMoveLine(models.Model):
             self.product_id, self.move_id.picking_type_id, measure_on='move_line')
         quality_points = self.env['quality.point'].sudo().search(quality_points_domain)
         quality_points_by_product_picking_type = {}
+
+        product_ids_by_categ_id = {}
+        if categ_ids := set(quality_points.product_category_ids.ids):
+            categ_products = self.env['product.product'].search([
+                ('categ_id', 'child_of', list(categ_ids)),
+                ('id', 'in', self.product_id.ids),
+            ])
+            for product in categ_products:
+                # parent_path contains the category itself and all its ancestors.
+                for categ_id in map(int, product.categ_id.parent_path.split('/')[:-1]):
+                    if categ_id in categ_ids:
+                        product_ids_by_categ_id.setdefault(categ_id, []).append(product.id)
+
         for quality_point in quality_points:
             for product in quality_point.product_ids:
                 for picking_type in quality_point.picking_type_ids:
                     quality_points_by_product_picking_type.setdefault(
                         (product, picking_type), set()).add(quality_point.id)
             for categ in quality_point.product_category_ids:
-                categ_product = self.env['product.product'].search([
-                    ('categ_id', 'child_of', categ.id)
-                ])
-                for product in categ_product & self.product_id:
+                categ_products = self.env['product.product'].browse(
+                    product_ids_by_categ_id.get(categ.id, [])
+                )
+                for product in categ_products:
                     for picking_type in quality_point.picking_type_ids:
                         quality_points_by_product_picking_type.setdefault(
                             (product, picking_type), set()).add(quality_point.id)
@@ -76,11 +90,16 @@ class StockMoveLine(models.Model):
                     quality_points_by_product_picking_type.setdefault(
                         (None, picking_type), set()).add(quality_point.id)
 
+        quality_points_by_id = {
+            quality_point.id: quality_point
+            for quality_point in quality_points
+        }
         for ml in self:
             quality_points_product = quality_points_by_product_picking_type.get((ml.product_id, ml.move_id.picking_type_id), set())
             quality_points_all_products = ml._get_quality_points_all_products(quality_points_by_product_picking_type)
-            quality_points = self.env['quality.point'].sudo().search([('id', 'in', list(quality_points_product | quality_points_all_products))])
-            for quality_point in quality_points:
+            quality_point_ids = quality_points_product | quality_points_all_products
+            for quality_point_id in quality_point_ids:
+                quality_point = quality_points_by_id[quality_point_id]
                 if quality_point.check_execute_now():
                     check_values = ml._get_check_values(quality_point)
                     check_values_list.append(check_values)
@@ -97,6 +116,7 @@ class StockMoveLine(models.Model):
             'team_id': quality_point.team_id.id,
             'product_id': self.product_id.id,
             'picking_id': self.picking_id.id,
+            'batch_id': self.picking_id.batch_id.id,
             'move_line_id': self.id,
             'lot_name': self.lot_name,
             'company_id': self.company_id.id,
@@ -105,16 +125,10 @@ class StockMoveLine(models.Model):
     def _get_quality_points_all_products(self, quality_points_by_product_picking_type):
         return quality_points_by_product_picking_type.get((None, self.move_id.picking_type_id), set())
 
-    def _is_checkable_from_context(self):
-        if self.env.context.get('picking_validation'):
-            return self.move_id.picked
-        return True
-
     def _is_checkable(self, check_picked=False):
         self.ensure_one()
-        if self.product_uom_id.is_zero(self.quantity):
+        if self.uom_id.is_zero(self.quantity):
             return False
         if check_picked:
-            if not self._is_checkable_from_context():
-                return False
+            return self.picked
         return True

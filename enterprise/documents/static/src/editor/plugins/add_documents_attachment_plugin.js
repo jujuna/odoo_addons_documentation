@@ -2,8 +2,11 @@ import { renderStaticFileBox } from "@html_editor/main/media/media_dialog/docume
 import { Plugin } from "@html_editor/plugin";
 import { _t } from "@web/core/l10n/translation";
 import { MAIN_PLUGINS } from "@html_editor/plugin_sets";
-
-import { SelectAddDocumentCreateDialog } from "@documents/views/view_dialogs/select_add_document_create_dialog";
+import {
+    getAddDocumentDialogProps,
+    SelectAddDocumentCreateDialog,
+} from "@documents/views/view_dialogs/select_add_document_create_dialog";
+import { isLinkSupported } from "@html_editor/main/link/link_plugin";
 
 export class AddDocumentsAttachmentPlugin extends Plugin {
     static id = "add_documents_attachment";
@@ -13,8 +16,9 @@ export class AddDocumentsAttachmentPlugin extends Plugin {
             id: "addDocumentsAttachment",
             title: _t("File"),
             description: _t("Insert a file from Documents"),
-            icon: "o_add_documents_icon",
+            icon: "oi_app_documents",
             run: this.openSelectAddDocumentCreateDialog.bind(this),
+            isAvailable: isLinkSupported,
         },
         powerbox_items: {
             categoryId: "media",
@@ -25,18 +29,7 @@ export class AddDocumentsAttachmentPlugin extends Plugin {
 
     openSelectAddDocumentCreateDialog() {
         this.dependencies.dialog.addDialog(SelectAddDocumentCreateDialog, {
-            resModel: "documents.document",
-            title: _t("Search: Documents"),
-            noCreate: true,
-            domain: [
-                ["type", "=", "binary"],
-                ["shortcut_document_id", "=", false],
-            ],
-            context: {
-                list_view_ref: "documents.documents_view_list_add_documents_attachment",
-                documents_search_panel_no_trash: true,
-                documents_view_secondary: true,
-            },
+            ...getAddDocumentDialogProps(),
             chatterParams: {
                 isPlugin: true,
                 isNewRecord: !this.config.getRecordInfo().resId,
@@ -76,7 +69,7 @@ export class AddDocumentsAttachmentPlugin extends Plugin {
         const fileCards = processedAttachments.map(this.renderDownloadBox.bind(this));
         // Insert
         fileCards.forEach(this.dependencies.dom.insert);
-        this.dependencies.history.addStep();
+        this.dependencies.history.commit();
         this.services.notification.add(_t("Document(s) added!"), { type: "success" });
         closeDialog();
     }

@@ -1,16 +1,12 @@
 import threading
-import typing
 from collections.abc import Iterable, Iterator, MutableMapping
 
 from .misc import SENTINEL
 
 __all__ = ['LRU']
 
-K = typing.TypeVar('K')
-V = typing.TypeVar('V')
 
-
-class LRU(MutableMapping[K, V], typing.Generic[K, V]):
+class LRU[K, V](MutableMapping[K, V]):
     """
     Implementation of a length-limited LRU map.
 
@@ -49,6 +45,14 @@ class LRU(MutableMapping[K, V], typing.Generic[K, V]):
     @property
     def count(self) -> int:
         return self._count
+
+    @count.setter
+    def count(self, count: int):
+        assert count > 0, "LRU needs a positive count"
+        with self._lock:
+            self._count = count
+            while len(self) > count:
+                self.popitem()
 
     def __contains__(self, key: object) -> bool:
         return key in self._values

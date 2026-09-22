@@ -13,7 +13,7 @@
 
             <xpath expr="//header" position="after">
                 <div class="alert alert-danger mb-0" role="alert" invisible="not l10n_uy_edi_error">
-                    <div class="p-0 m-0"><i class="fa fa-warning" role="img" title="EDI (Uruguay)"/>
+                    <div class="p-0 m-0"><i class="oi" data-icon="warning" role="img" title="EDI (Uruguay)"/>
                         <span class="mx-1">E-invoicing (Uruguay)</span>
                     </div>
                     <div class="o_row">
@@ -44,7 +44,7 @@
                 <field name="l10n_uy_edi_addenda_ids" widget="many2many_tags" invisible="country_code != 'UY'"/>
             </field>
 
-            <xpath expr="//field[@name='invoice_line_ids']/list//field[@name='name']" position="after">
+            <xpath expr="//field[@name='invoice_line_ids']/list//column[@name='product_and_description']" position="after">
                 <field name="l10n_uy_edi_addenda_ids" widget="many2many_tags" optional="hide"
                        column_invisible="parent.country_code != 'UY'"
                        context="{

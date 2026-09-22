@@ -4,23 +4,31 @@
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Erwin van der Ploeg <erwin@odooexperts.nl>, 2025.
-# Bren Driesen <brdri@odoo.com>, 2025.
+# Bren Driesen <brdri@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-11-19 08:19+0000\n"
+"POT-Creation-Date: 2026-09-04 18:11+0000\n"
+"PO-Revision-Date: 2026-09-18 02:11+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
 "hr_appraisal_skills/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: hr_appraisal_skills
+#: model:ir.module.module,description:base.module_hr_appraisal_skills
+msgid ""
+"\n"
+"This module makes it possible to manage employee skills during an appraisal "
+"process.\n"
+msgstr ""
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_goal_template_view_hierarchy
@@ -40,26 +48,41 @@ msgid "Appraisal"
 msgstr "Evaluatie"
 
 #. module: hr_appraisal_skills
+#: model:ir.module.module,shortdesc:base.module_hr_appraisal_skills
+msgid "Appraisal - Skills"
+msgstr ""
+
+#. module: hr_appraisal_skills
 #: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_goal
 msgid "Appraisal Goal"
 msgstr "Doelstelling evaluatie"
 
 #. module: hr_appraisal_skills
 #: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_skill
-msgid "Appraisal Skills"
-msgstr "Evaluatievaardigheden"
+msgid "Appraisal Skill"
+msgstr "Evaluatie Vaardigheid"
 
 #. module: hr_appraisal_skills
-#: model:ir.actions.act_window,name:hr_appraisal_skills.hr_appraisal_skill_report_action
-#: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_skill_report
-msgid "Appraisal Skills Report"
-msgstr "Evaluatie vaardighedenrapport"
+#: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_skill_evolution_report
+msgid "Appraisal Skill Evolution Report"
+msgstr "Evaluatierapport evolutie van vaardigheden"
+
+#. module: hr_appraisal_skills
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__level_progress_average
+msgid "Average Progress (%)"
+msgstr "Gemiddelde voortgang (%)"
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_goal_skill_view_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skills_view_form
 msgid "Category"
 msgstr "Categorie"
+
+#. module: hr_appraisal_skills
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__certificate_file
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__certificate_file
+msgid "Certificate"
+msgstr "Certificaat"
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.view_hr_appraisal_form
@@ -73,15 +96,9 @@ msgid "Color"
 msgstr "Kleur"
 
 #. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__company_id
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__company_id
 msgid "Company"
 msgstr "Bedrijf"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__create_date
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "Create Date"
-msgstr "Aanmaakdatum"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__create_uid
@@ -116,23 +133,14 @@ msgid "Current Goals"
 msgstr "Huidige doelen"
 
 #. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__current_skill_level_id
-msgid "Current Level"
-msgstr "Huidig niveau"
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__date
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
+msgid "Date"
+msgstr "Datum"
 
 #. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__current_level_progress
-msgid "Current Progress"
-msgstr "Huidige vooruitgang"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields.selection,name:hr_appraisal_skills.selection__hr_appraisal_skill_report__evolution__decline
-msgid "Decline"
-msgstr "Afwijzen"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__department_id
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__department_id
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
 msgid "Department"
 msgstr "Afdeling"
 
@@ -141,7 +149,7 @@ msgstr "Afdeling"
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal__display_name
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__display_name
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__display_name
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__display_name
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__display_name
 msgid "Display Name"
 msgstr "Schermnaam"
 
@@ -153,8 +161,8 @@ msgstr "Waarschuwingsbericht weergeven"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__employee_id
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__employee_id
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__employee_id
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
 msgid "Employee"
 msgstr "Werknemer"
 
@@ -162,17 +170,6 @@ msgstr "Werknemer"
 #: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal
 msgid "Employee Appraisal"
 msgstr "Werknemersevaluatie"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__evolution
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "Evolution"
-msgstr "Evolutie"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__evolution_sequence
-msgid "Evolution Sequence"
-msgstr "Evolutievolgorde"
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_goal_template_view_form
@@ -190,15 +187,9 @@ msgstr "Doel"
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal__id
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__id
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__id
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__id
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__id
 msgid "ID"
 msgstr "ID"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields.selection,name:hr_appraisal_skills.selection__hr_appraisal_skill_report__evolution__improvement
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "Improvement"
-msgstr "Vooruitgang"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__target_job_skill_progress
@@ -211,13 +202,7 @@ msgid "Job Target Score should be between 0 and 1"
 msgstr "Score van functiespecifiek doel moet tussen 0 en 1 liggen"
 
 #. module: hr_appraisal_skills
-#: model:ir.model.fields.selection,name:hr_appraisal_skills.selection__hr_appraisal_skill_report__evolution__just_added
-msgid "Just added"
-msgstr "Net toegevoegd"
-
-#. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__justification
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__justification
 msgid "Justification"
 msgstr "Verantwoording"
 
@@ -240,14 +225,9 @@ msgid "Levels Count"
 msgstr "Niveaus Tellen"
 
 #. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__manager_ids
-msgid "Manager"
-msgstr "Manager"
-
-#. module: hr_appraisal_skills
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "No Change"
-msgstr "Geen verandering"
+#: model:ir.module.module,summary:base.module_hr_appraisal_skills
+msgid "Manage skills of your employees during an appraisal process"
+msgstr ""
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__number_of_recommended_goals
@@ -261,16 +241,6 @@ msgid "Number of levels linked to this skill type"
 msgstr "Aantal niveaus gekoppeld aan dit vaardigheidstype"
 
 #. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__previous_skill_level_id
-msgid "Previous Level"
-msgstr "Vorig niveau"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__previous_level_progress
-msgid "Previous Progress"
-msgstr "Vorige vooruitgang"
-
-#. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__previous_skill_level_id
 msgid "Previous Skill Level"
 msgstr "Vorig vaardigheidsniveau"
@@ -280,11 +250,6 @@ msgstr "Vorig vaardigheidsniveau"
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__level_progress
 msgid "Progress"
 msgstr "Voortgang"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__progress_evolution
-msgid "Progress Evolution"
-msgstr "Evolutie vooruitgang"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,help:hr_appraisal_skills.field_hr_appraisal_goal_skill__level_progress
@@ -308,27 +273,19 @@ msgid "Recommended for"
 msgstr "Aanbevolen voor"
 
 #. module: hr_appraisal_skills
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
-msgid "Regression"
-msgstr "Regressie"
-
-#. module: hr_appraisal_skills
-#: model:ir.model.fields.selection,name:hr_appraisal_skills.selection__hr_appraisal_skill_report__evolution__same
-msgid "Same"
-msgstr "Zelfde"
-
-#. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__skill_id
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__skill_id
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__skill_id
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__skill_id
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
 msgid "Skill"
 msgstr "Vaardigheid"
 
 #. module: hr_appraisal_skills
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_graph
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_pivot
-msgid "Skill Analysis"
-msgstr "Vaardighedenanalyse"
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_graph
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_list
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_pivot
+msgid "Skill Evolution"
+msgstr "Evolutie van vaardigheden"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__skill_level_id
@@ -339,10 +296,10 @@ msgstr "Vaardigheidsniveau"
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_goal_skill__skill_type_id
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill__skill_type_id
-#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_report__skill_type_id
-#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_report_view_search
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__skill_type_id
+#: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.hr_appraisal_skill_evolution_report_view_search
 msgid "Skill Type"
-msgstr "Soort vaardigheid"
+msgstr "Vaardigheidstype"
 
 #. module: hr_appraisal_skills
 #: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal__appraisal_skill_ids
@@ -358,15 +315,16 @@ msgid "Skills"
 msgstr "Vaardigheden"
 
 #. module: hr_appraisal_skills
-#: model:ir.ui.menu,name:hr_appraisal_skills.menu_appraisal_skills_report
-#: model_terms:ir.actions.act_window,help:hr_appraisal_skills.hr_appraisal_skill_report_action
+#: model:ir.actions.act_window,name:hr_appraisal_skills.hr_appraisal_skill_evolution_report_action
+#: model:ir.ui.menu,name:hr_appraisal_skills.menu_skills_evolution
+#: model_terms:ir.actions.act_window,help:hr_appraisal_skills.hr_appraisal_skill_evolution_report_action
 msgid "Skills Evolution"
 msgstr "Vaardighedenontwikeling"
 
 #. module: hr_appraisal_skills
 #: model:ir.actions.act_window,name:hr_appraisal_skills.hr_skill_type_action_appraisal
 msgid "Skills Type"
-msgstr "Vaardighedensoorten"
+msgstr "Vaardigheidstype"
 
 #. module: hr_appraisal_skills
 #: model:ir.model,name:hr_appraisal_skills.model_hr_appraisal_goal_skill
@@ -403,6 +361,11 @@ msgid "To"
 msgstr "Tot"
 
 #. module: hr_appraisal_skills
+#: model:ir.model.fields,field_description:hr_appraisal_skills.field_hr_appraisal_skill_evolution_report__level_progress_count
+msgid "Total Assessed"
+msgstr "Totaal beoordeeld"
+
+#. module: hr_appraisal_skills
 #. odoo-python
 #: code:addons/hr_appraisal_skills/models/hr_appraisal_skill.py:0
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.view_hr_appraisal_form
@@ -427,12 +390,12 @@ msgid "Validity Stop"
 msgstr "Einde geldigheid"
 
 #. module: hr_appraisal_skills
-#: model_terms:ir.actions.act_window,help:hr_appraisal_skills.hr_appraisal_skill_report_action
+#: model_terms:ir.actions.act_window,help:hr_appraisal_skills.hr_appraisal_skill_evolution_report_action
 msgid ""
-"View the evolution of employee's skill between the two latest appraisals."
+"View the evolution of employee's skill between the two latest appraisals"
 msgstr ""
 "Bekijk de ontwikkeling van de vaardigheden van een werknemer tussen de twee "
-"laatste beoordelingen."
+"laatste beoordelingen"
 
 #. module: hr_appraisal_skills
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.appraisal_skills_update_template
@@ -459,11 +422,3 @@ msgstr "onbepaald"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_skills.view_hr_appraisal_form
 msgid "infinite"
 msgstr "oneindig"
-
-#~ msgid "If skills are missing, they can be created by an HR officer."
-#~ msgstr "Hr-medewerkers kunnen extra vaardigheden aanmaken."
-
-#~ msgid "You can add skills from our library to the employee profile."
-#~ msgstr ""
-#~ "Je kunt vaardigheden toevoegen uit onze bibliotheek aan het "
-#~ "werknemersprofiel."

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -10,6 +9,9 @@
     ],
     'data': [
         'views/helpdesk_templates.xml',
+    ],
+    'demo': [
+        'data/helpdesk_demo.xml',
     ],
     'auto_install': True,
     'author': 'Odoo S.A.',

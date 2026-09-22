@@ -26,7 +26,7 @@ test("Can add an odoo chart to a carousel figure", async () => {
     expect(model.getters.getCarousel("carouselId").items).toEqual([
         { type: "chart", chartId: chartId },
     ]);
-    expect(model.getters.getChartDefinition(chartId)).toMatchObject({ type: "odoo_bar" });
+    expect(model.getters.getChartDefinition(chartId)).toMatchObject({ type: "bar" });
 });
 
 test("Link to menu id is preserved when adding a chart to a carousel", async () => {
@@ -37,13 +37,13 @@ test("Link to menu id is preserved when adding a chart to a carousel", async () 
 
     const sheetId = model.getters.getActiveSheetId();
     const chartId = model.getters.getChartIds(sheetId)[0];
-    model.dispatch("LINK_ODOO_MENU_TO_CHART", {
+    model.dispatch("UPDATE_ODOO_LINK_TO_CHART", {
         chartId,
-        odooMenuId: 1,
+        odooLink: { type: "odooMenu", odooMenuId: 1 },
     });
 
     const [chartFigure, carouselFigure] = [...fixture.querySelectorAll(".o-figure")];
     await contains(chartFigure).dragAndDrop(carouselFigure, { position: "top" });
 
-    expect(model.getters.getChartOdooMenu(chartId)?.id).toBe(1);
+    expect(model.getters.getChartOdooLink(chartId)).toEqual({ type: "odooMenu", odooMenuId: 1 });
 });

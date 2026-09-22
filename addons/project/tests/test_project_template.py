@@ -1,11 +1,12 @@
 from datetime import date
 
 from odoo import Command
-from odoo.tests import freeze_time
+from odoo.tests import tagged, freeze_time
 
 from odoo.addons.project.tests.test_project_base import TestProjectCommon
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install, fails post install
 class TestProjectTemplates(TestProjectCommon):
     @classmethod
     def setUpClass(cls):
@@ -37,6 +38,56 @@ class TestProjectTemplates(TestProjectCommon):
         self.assertFalse(task_a.is_template, "The copied tasks should retain their template status.")
         self.assertEqual(task_b.name, self.task_template_inside_template.name, "The copied task should have the same name as the original.")
         self.assertTrue(task_b.is_template, "The copied tasks should retain their template status.")
+
+    def test_convert_project_to_project_template_preserves_planned_dates(self):
+        """
+        Test that converting a project into a project template preserves the planned start and end dates.
+        """
+        project = self.env["project.project"].create({
+            "name": "Project",
+            "date_start": date(2025, 6, 1),
+            "date": date(2025, 6, 11),
+        })
+        task_1, task_2 = self.env["project.task"].create([{
+            "name": "Task 1",
+            "project_id": project.id,
+            "date_deadline": date(2025, 6, 10),
+        }, {
+            "name": "Task 2",
+            "project_id": project.id,
+            "date_deadline": date(2025, 6, 11),
+        }])
+
+        data = project.action_create_template_from_project()
+        project_template = self.env["project.project"].browse(
+            data["params"]["project_id"]
+        )
+
+        self.assertTrue(project_template.is_template,
+            "The generated project should be marked as a template."
+        )
+        self.assertEqual(project_template.date_start, project.date_start,
+            "The start date should be preserved when converting a project to a template."
+        )
+        self.assertEqual(project_template.date, project.date,
+            "The expiration date should be preserved when converting a project to a template."
+        )
+        self.assertEqual(task_1.date_deadline, project_template.task_ids[0].date_deadline,
+            "The task 1 deadline date should be preserved when converting a project to a template."
+        )
+        self.assertEqual(task_2.date_deadline, project_template.task_ids[1].date_deadline,
+            "The task 2 deadline date should be preserved when converting a project to a template."
+        )
+
+        # Create project with planned new dates
+        project_b = project_template.action_create_from_template({
+            "name": "Project B",
+            "date_start": date(2025, 6, 1),
+            "date": date(2025, 6, 10),
+        })
+
+        self.assertEqual(project_b.date_start, date(2025, 6, 1), "Project should have the new start date.")
+        self.assertEqual(project_b.date, date(2025, 6, 10), "Project should have the new expiration date.")
 
     def test_create_from_template(self):
         """
@@ -237,3 +288,107 @@ class TestProjectTemplates(TestProjectCommon):
 
         self.assertEqual(new_project.date_start, new_start, "Start date should be the one provided")
         self.assertEqual(new_project.date, new_end, "End date should be the one provided")
+
+    def test_create_from_template_with_default_roles(self):
+        developer_role, team_leader_role = self.env['project.role'].create([
+            {'name': 'Developer', 'user_ids': (self.user_projectuser + self.user_projectmanager).ids},
+            {'name': 'Team Leader', 'user_ids': self.user_projectmanager.ids},
+        ])
+        self.task_inside_template.role_ids = team_leader_role
+        self.task_template_inside_template.role_ids = team_leader_role
+        new_project = self.project_template.action_create_from_template({
+            'name': 'New Project',
+        })
+        self.assertFalse(new_project.is_template)
+        new_tasks = new_project.task_ids
+        task = new_tasks.filtered(lambda t: t.name == self.task_inside_template.name)
+        task_template = new_tasks - task
+        self.assertEqual(
+            task.user_ids,
+            self.user_projectmanager,
+        )
+        self.assertFalse(task.is_template)
+        self.assertFalse(task.role_ids)
+        self.assertTrue(task_template.is_template)
+        self.assertFalse(task_template.user_ids)
+        self.assertEqual(task_template.role_ids, self.task_template_inside_template.role_ids)
+
+        self.task_inside_template.role_ids += developer_role
+        self.task_template_inside_template.role_ids += developer_role
+        new_project = self.project_template.action_create_from_template({
+            'name': 'New Project',
+        })
+        self.assertFalse(new_project.is_template)
+        new_tasks = new_project.task_ids
+        task = new_tasks.filtered(lambda t: t.name == self.task_inside_template.name)
+        task_template = new_tasks - task
+        self.assertFalse(task.is_template)
+        self.assertEqual(
+            task.user_ids,
+            self.user_projectmanager + self.user_projectuser,
+        )
+        self.assertFalse(task.role_ids)
+        self.assertTrue(task_template.is_template)
+        self.assertEqual(task_template.role_ids, self.task_template_inside_template.role_ids)
+        self.assertFalse(task_template.user_ids)
+
+    def test_project_template_stage_copy(self):
+        """ The stage of a project template should be copied to the new project """
+        # Ensure project stages are enabled for the current user
+        self.env.user.group_ids |= self.env.ref('project.group_project_stages')
+
+        template_stage = self.env['project.project.stage'].create({'name': 'Template Stage', 'sequence': 100})
+        self.project_template.stage_id = template_stage
+
+        # Create project from template
+        new_project = self.project_template.action_create_from_template()
+        self.assertEqual(
+            new_project.stage_id,
+            template_stage,
+            "The new project should correctly inherit the 'Template Stage' from its template.",
+        )
+
+    def test_create_project_from_template_with_task_template_without_project(self):
+        """
+        Create a project from a template that has a sub-task template without a project.
+        It should only copy the task dependencies if the project has them enabled.
+        """
+        template_task_without_project = self.env["project.task"].create({
+            "name": "Task Template without Project",
+            "project_id": False,
+            "is_template": True,
+            "parent_id": self.task_template_inside_template.id,
+            "depend_on_ids": [Command.set(self.task_template_inside_template.ids)],
+        })
+
+        self.project_template.allow_task_dependencies = False
+        project_1 = self.project_template.action_create_from_template({"name": "Project 1"})
+        task_1 = project_1.task_ids.filtered(lambda t: t.name == template_task_without_project.name)
+        self.assertEqual(task_1.project_id, project_1, "The created task should be in the project that was created from the template.")
+        self.assertTrue(task_1.is_template, "The copied task should retain its template status.")
+        self.assertFalse(task_1.depend_on_ids, "The created task should not have dependencies as the project has task dependencies disabled.")
+
+        self.project_template.allow_task_dependencies = True
+        project_2 = self.project_template.action_create_from_template({"name": "Project 2"})
+        task_2 = project_2.task_ids.filtered(lambda t: t.name == template_task_without_project.name)
+        self.assertEqual(task_2.project_id, project_2, "The created task should be in the project that was created from the template.")
+        self.assertTrue(task_2.depend_on_ids, "The created task should have some dependencies as the template as the project has task dependencies enabled.")
+
+    def test_create_from_template_with_archived_user_in_role(self):
+        """ Test that archived users in project roles are not assigned to tasks
+            when creating a project from a template.
+        """
+        developer_role = self.env['project.role'].create({
+            'name': 'Developer',
+            'user_ids': [Command.set(self.user_projectuser.ids)],
+        })
+        self.task_inside_template.role_ids = developer_role
+        self.user_projectuser.action_archive()
+        self.assertFalse(self.user_projectuser.active)
+
+        new_project = self.project_template.action_create_from_template({
+            'name': 'New Project',
+        })
+        self.assertFalse(new_project.is_template)
+        task = new_project.task_ids.filtered(lambda t: t.name == self.task_inside_template.name)
+        self.assertFalse(task.user_ids)

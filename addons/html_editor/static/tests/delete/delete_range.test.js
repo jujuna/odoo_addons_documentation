@@ -5,7 +5,7 @@ import { CORE_PLUGINS } from "@html_editor/plugin_sets";
 import { getContent, setSelection } from "../_helpers/selection";
 
 async function testCoreEditor(testConfig) {
-    return testEditor({ ...testConfig, config: { Plugins: CORE_PLUGINS } });
+    return testEditor({ ...testConfig, config: { basePlugins: CORE_PLUGINS } });
 }
 
 // Tests the deleteRange shared method.
@@ -154,6 +154,13 @@ describe("deleteRange method", () => {
                 contentBefore: "<div><p>abc[</p><p>]def</p></div>",
                 stepFunction: deleteRange,
                 contentAfter: "<div><p>abc[]def</p></div>",
+            });
+        });
+        test("should remove contenteditable=false element if fully selected", async () => {
+            await testEditor({
+                contentBefore: `<p>a[bc</p><div contenteditable="false">def</div><p>gh]i</p>`,
+                stepFunction: deleteSelection,
+                contentAfter: `<p>a[]i</p>`,
             });
         });
     });
@@ -334,6 +341,13 @@ describe("deleteSelection", () => {
                 contentBefore: `<p>a[bc</p><div class="oe_unremovable">def</div><p>gh]i</p>`,
                 stepFunction: deleteSelection,
                 contentAfter: `<p>a[]</p><div class="oe_unremovable"><br></div><p>i</p>`,
+            });
+        });
+        test("should not remove nor clear content of unremovable contenteditable=false node", async () => {
+            await testEditor({
+                contentBefore: `<p>a[bc</p><div class="oe_unremovable" contenteditable="false">def</div><p>gh]i</p>`,
+                stepFunction: deleteSelection,
+                contentAfter: `<p>a[]</p><div class="oe_unremovable" contenteditable="false">def</div><p>i</p>`,
             });
         });
         test("should move the unremovable up the tree", async () => {

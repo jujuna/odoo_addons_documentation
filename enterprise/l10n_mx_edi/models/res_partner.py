@@ -1,11 +1,11 @@
 # coding: utf-8
-from .extra_timezones import TIEMPO_DEL_CENTRO_ZIPCODES, TIEMPO_DEL_CENTRO_EN_FRONTIERA_ZIPCODES
-
-from pytz import timezone
+from zoneinfo import ZoneInfo
 
 from odoo import api, fields, models, _
 from odoo.addons.l10n_mx_edi.models.res_company import FISCAL_REGIMES_SELECTION
 from odoo.addons.l10n_mx_edi.models.l10n_mx_edi_document import USAGE_SELECTION
+
+from .extra_timezones import TIEMPO_DEL_CENTRO_ZIPCODES, TIEMPO_DEL_CENTRO_EN_FRONTIERA_ZIPCODES
 
 
 class ResPartner(models.Model):
@@ -14,6 +14,7 @@ class ResPartner(models.Model):
     l10n_mx_edi_addenda_ids = fields.Many2many(
         comodel_name='l10n_mx_edi.addenda',
         string='Addendas & Complementos',
+        copy=False,
     )
     l10n_mx_edi_fiscal_regime = fields.Selection(
         selection=FISCAL_REGIMES_SELECTION,
@@ -60,24 +61,24 @@ class ResPartner(models.Model):
 
         # northwest area
         if code == 'BCN':
-            return timezone('America/Tijuana') # UTC-8 (-7 DST)
+            return ZoneInfo('America/Tijuana')  # UTC-8 (-7 DST)
         # Southeast area
         elif code == 'ROO':
-            return timezone('America/Bogota') # UTC-5
+            return ZoneInfo('America/Bogota')  # UTC-5
         # East Chihuahua
         elif code == 'CHH' and zipcode in TIEMPO_DEL_CENTRO_EN_FRONTIERA_ZIPCODES:
-            return timezone('America/Boise') # UTC-7 (-6 DST)
+            return ZoneInfo('America/Boise')  # UTC-7 (-6 DST)
         # Tiempo del centro areas
         elif code == 'NAY' and zipcode in TIEMPO_DEL_CENTRO_ZIPCODES:
-            return timezone('America/Guatemala') # UTC-6
+            return ZoneInfo('America/Guatemala')  # UTC-6
         # Tiempo del centro en frontiera areas
         elif code in ('TAM', 'NLE', 'COA') and zipcode in TIEMPO_DEL_CENTRO_EN_FRONTIERA_ZIPCODES:
-            return timezone('America/Matamoros') # UTC-6 (-5 DST)
+            return ZoneInfo('America/Matamoros')  # UTC-6 (-5 DST)
         # Pacific area
         elif code in ('SON', 'BCS', 'SIN', 'NAY'):
-            return timezone('America/Hermosillo') # UTC-7
+            return ZoneInfo('America/Hermosillo')  # UTC-7
         # By default, takes the central area timezone
-        return timezone('America/Guatemala') # UTC-6
+        return ZoneInfo('America/Guatemala')  # UTC-6
 
     def _get_frontend_writable_fields(self):
         frontend_writable_fields = super()._get_frontend_writable_fields()
@@ -89,7 +90,10 @@ class ResPartner(models.Model):
     def get_partner_localisation_fields_required_to_invoice(self, country_id):
         res = super().get_partner_localisation_fields_required_to_invoice(country_id)
         if country_id.code == 'MX':
-            res.extend([self.env['ir.model.fields']._get(self._name, 'l10n_mx_edi_fiscal_regime')])
+            res.extend([
+                self.env['ir.model.fields']._get(self._name, 'l10n_mx_edi_fiscal_regime'),
+                self.env['ir.model.fields']._get(self._name, 'vat'),
+            ])
         return res
 
     def _deduce_country_code(self):
@@ -97,7 +101,7 @@ class ResPartner(models.Model):
             return 'MX'
         return super()._deduce_country_code()
 
-    @api.depends('country_id', 'zip')
+    @api.depends('country_id', 'zip', 'vat')
     def _compute_l10n_mx_edi_partner_address_complete(self):
         for partner in self:
-            partner.l10n_mx_edi_partner_address_complete = bool(partner.country_id and partner.zip)
+            partner.l10n_mx_edi_partner_address_complete = bool(partner.country_id and partner.zip and partner.vat)

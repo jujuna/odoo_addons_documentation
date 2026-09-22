@@ -19,21 +19,22 @@
     </record>
 
     <record id="hr_employee_sharon" model="hr.employee">
-        <field name="name">Sharon Jacket</field>
+        <field name="name">Sharon Lewis</field>
         <field name="work_phone">0431 415 926</field>
         <field name="job_id" ref="hr.job_developer"/>
         <field name="country_id" ref="base.au"/>
         <field name="company_id" ref="base.demo_company_au"/>
-        <field name="image_1920" type="base64" file="hr/static/img/employee_chs-image.jpg"/>
+        <field name="image_1920" type="bytes" file="hr/static/img/employee_chs-image.jpg"/>
         <field name="private_street">Hotline St. 82d</field>
         <field name="private_city">Miami</field>
         <field name="private_zip">1600</field>
         <field name="private_country_id" ref="base.au"/>
         <field name="private_phone">0431 415 926</field>
-        <field name="private_email">sharon.jacket@example.com</field>
+        <field name="private_email">sharon.lewis@myau.com</field>
         <field name="birthday">1978-08-09</field>
         <field name="sex">female</field>
         <field name="l10n_au_tax_treatment_category">N</field>
+        <field name="wage">25000.00</field>
     </record>
 
     <record id="res_partner_example_super" model="res.partner">
@@ -55,15 +56,45 @@
         <field name="fund_id" ref="l10n_au_hr_payroll_account.super_fund_example_super"/>
         <field name="member_nbr">003478191</field>
         <field name="trustee">employee</field>
-        <field name="trustee_name_id" ref="l10n_au_hr_payroll.res_partner_dennis_private_address"/>
+        <field name="trustee_name_id" ref="l10n_au_hr_payroll.res_partner_dennis"/>
         <field name="date_from" eval="datetime(2022, 1, 1).date()"/>
     </record>
 
     <record id="l10n_au_hr_payroll.res_partner_bank_account_roger" model="res.partner.bank">
-        <field name="aba_bsb">234-456</field>
+        <field name="clearing_label_id" ref="base.clearing_label_au"/>
+        <field name="clearing_number">234-456</field>
     </record>
     <record id="l10n_au_hr_payroll.res_partner_bank_account_dennis" model="res.partner.bank">
-        <field name="aba_bsb">345-567</field>
+        <field name="clearing_label_id" ref="base.clearing_label_au"/>
+        <field name="clearing_number">112-347</field>
+    </record>
+    <record id="l10n_au_hr_payroll.res_partner_bank_claire_jonas" model="res.partner.bank">
+        <field name="clearing_label_id" ref="base.clearing_label_au"/>
+        <field name="clearing_number">112-346</field>
+    </record>
+    <record id="l10n_au_hr_payroll.res_partner_bank_harry_anderson" model="res.partner.bank">
+        <field name="clearing_label_id" ref="base.clearing_label_au"/>
+        <field name="clearing_number">112-348</field>
+    </record>
+    <record id="l10n_au_hr_payroll.res_partner_bank_morgan_cameron" model="res.partner.bank">
+        <field name="clearing_label_id" ref="base.clearing_label_au"/>
+        <field name="clearing_number">112-349</field>
+    </record>
+    <record id="l10n_au_hr_payroll.res_partner_bank_jack_williams" model="res.partner.bank">
+        <field name="clearing_label_id" ref="base.clearing_label_au"/>
+        <field name="clearing_number">112-249</field>
+    </record>
+    <record id="l10n_au_hr_payroll.res_partner_bank_rohan_brown" model="res.partner.bank">
+        <field name="clearing_label_id" ref="base.clearing_label_au"/>
+        <field name="clearing_number">122-449</field>
+    </record>
+    <record id="l10n_au_hr_payroll.res_partner_bank_holly_adams" model="res.partner.bank">
+        <field name="clearing_label_id" ref="base.clearing_label_au"/>
+        <field name="clearing_number">132-449</field>
+    </record>
+    <record id="l10n_au_hr_payroll.res_partner_bank_tom_marriot" model="res.partner.bank">
+        <field name="clearing_label_id" ref="base.clearing_label_au"/>
+        <field name="clearing_number">112-449</field>
     </record>
 
     <data noupdate="1">

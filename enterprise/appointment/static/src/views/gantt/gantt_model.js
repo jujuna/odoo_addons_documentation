@@ -1,4 +1,3 @@
-import { Domain } from "@web/core/domain";
 import { GanttModel } from "@web_gantt/gantt_model";
 import { localStartOf } from "@web_gantt/gantt_helpers";
 
@@ -10,7 +9,11 @@ export class AppointmentBookingGanttModel extends GanttModel {
         // add some context keys to the search
         return super.load({
             ...searchParams,
-            context: { ...searchParams.context, appointment_booking_gantt_show_all_resources: true }
+            context: {
+                ...searchParams.context,
+                appointment_booking_gantt_show_all_resources: true,
+                appointment_allow_overbooking: true, // moving things to "unassigned" in gantt is explicit enough
+            }
         });
     }
 
@@ -67,50 +70,40 @@ export class AppointmentBookingGanttModel extends GanttModel {
     _scheduleToData(schedule) {
         const data = super._scheduleToData(...arguments);
 
-        if (!this.metaData.groupedBy || !schedule.originId) {
+        if (!this.metaData.groupedBy) {
             return data;
         }
-        if (
-            this.metaData.groupedBy &&
-            this.metaData.groupedBy[0] === "partner_ids" &&
-            schedule.partner_ids &&
-            data.partner_ids[0] !== schedule.originId // attendee_ids will be messed up without this check
-        ) {
+        if (this.metaData.groupedBy[0] === "resource_ids") {
+            const targetId = data.resource_ids && data.resource_ids[0];
+            const commands = [];
+            if (schedule.originId) {
+                commands.push([3, schedule.originId, 0]);
+            }
+            if (targetId) {
+                commands.push([4, targetId, 0]);
+            }
             return {
                 ...data,
-                partner_ids: [
-                    [3, schedule.originId, 0],
-                    [4, data.partner_ids[0], 0],
-                ],
+                resource_ids: commands,
             };
         }
         if (
-            this.metaData.groupedBy &&
-            this.metaData.groupedBy[0] === "resource_ids" &&
-            schedule.resource_ids &&
-            data.resource_ids[0] !== schedule.originId
+            this.metaData.groupedBy[0] === "partner_ids" &&
+            data.partner_ids?.[0] !== schedule.originId // attendee_ids will be messed up without this check
         ) {
+            const commands = [];
+            if (schedule.originId) {
+                commands.push([3, schedule.originId, 0]);
+            }
+            if (data.partner_ids?.[0]) {
+                commands.push([4, data.partner_ids[0], 0]);
+            }
             return {
                 ...data,
-                resource_ids: [
-                    [3, schedule.originId, 0],
-                    [4, data.resource_ids[0], 0],
-                ],
+                partner_ids: commands,
             };
         }
         return data;
-    }
-
-    /**
-     * @override
-     */
-    _getDomain(metaData) {
-        const domainList = super._getDomain(metaData);
-        const ganttDomain = this.searchParams.context.appointment_booking_gantt_domain;
-        if (ganttDomain) {
-            return Domain.and([domainList, ganttDomain]).toList();
-        }
-        return domainList;
     }
 
     getRangeFromDate(rangeId, date) {

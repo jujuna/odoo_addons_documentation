@@ -3,21 +3,44 @@
 # * sale_shopee
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-09-15 23:07+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-04 18:03+0000\n"
+"PO-Revision-Date: 2026-09-18 02:44+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-master/"
 "sale_shopee/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: sale_shopee
+#: model:ir.module.module,description:base.module_sale_shopee
+msgid ""
+"\n"
+"Import your Shopee orders in Odoo and synchronize deliveries\n"
+"============================================================\n"
+"\n"
+"Key Features\n"
+"------------\n"
+"* Import orders from multiple accounts and shops\n"
+"* Orders are matched with Odoo products based on their internal reference "
+"(item_id or model_id in\n"
+"  Shopee)\n"
+"* Support for both Fulfillment by Shopee (FBS), Fulfillment by Merchant "
+"(FBM) and Fulfilled by Cross\n"
+"  Border Seller (Hybrid):\n"
+"* FBS: Importing the completed orders\n"
+"* FBM/Hybrid: Delivery information is fetched from Shopee, track and "
+"synchronize the stock level to\n"
+"  Shopee\n"
+msgstr ""
 
 #. module: sale_shopee
 #: model:mail.template,body_html:sale_shopee.order_sync_failure
@@ -319,8 +342,8 @@ msgstr ""
 "            </style>\n"
 "            <body><div>\n"
 "                <p>Sinkronisasi inventaris untuk Shopee Shop\n"
-"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></"
-"b>\n"
+"                    <b><t t-out=\"ctx.get('shopee_shop') or ''\">REF</t></b>"
+"\n"
 "                    mengalami beberapa error dan tidak dapat diselesaikan.</"
 "p>\n"
 "                <p>Berikut beberapa error yang dikirim oleh Shopee: </p>\n"
@@ -334,8 +357,8 @@ msgstr ""
 "                    <tbody>\n"
 "                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
 "as=\"error\">\n"
-"                            <th><t t-out=\"error['item_identifier']\"/></"
-"th>\n"
+"                            <th><t t-out=\"error['item_identifier']\"/></th>"
+"\n"
 "                            <td>\n"
 "                                <t t-if=\"error['message']\" t-"
 "out=\"error['message']\"/>\n"
@@ -372,7 +395,7 @@ msgstr "Tanggal Habis Masa Berlaku Token Akses"
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__access_token
 msgid "Access Token expires in 4 hours and is used to access the Shopee API."
 msgstr ""
-"Token Akses kadaluwarsa dalam 4 jam dan digunakan untuk mengakses Shopee API."
+"Token Akses kedaluwarsa dalam 4 jam dan digunakan untuk mengakses Shopee API."
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__access_token_expiration_date
@@ -381,17 +404,17 @@ msgid ""
 "Shopee."
 msgstr ""
 "Tanggal habis masa berlaku token akses. Dihitung menggunakan expires_in yang "
-"dikembalikkan oleh Shopee."
+"dikembalikan oleh Shopee."
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
+msgid "Account"
+msgstr ""
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Account Name"
 msgstr "Nama Akun"
-
-#. module: sale_shopee
-#: model:ir.ui.menu,name:sale_shopee.accounts_menu
-msgid "Accounts"
-msgstr "Akun"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__active
@@ -471,7 +494,13 @@ msgid "Authorization Remaining Days"
 msgstr "Sisa Hari Otorisasi"
 
 #. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Authorize New Shop"
+msgstr ""
+
+#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
 msgid "Authorize Shop"
 msgstr "Otorisasikan Tok"
 
@@ -480,11 +509,6 @@ msgstr "Otorisasikan Tok"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Bundle Deal"
 msgstr "Bundle Deal"
-
-#. module: sale_shopee
-#: model_terms:ir.ui.view,arch_db:sale_shopee.quick_create_account_form
-msgid "Cancel"
-msgstr "Batal"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__cancelled
@@ -528,7 +552,12 @@ msgstr "Tidak dapat menemukan akun Shopee dengan id %(account)s"
 #. module: sale_shopee
 #: model:ir.actions.act_window,name:sale_shopee.quick_create_account_action
 msgid "Create Shopee Accounts"
-msgstr "Buat Akun-Akun Shopee"
+msgstr "Buat Akun Shopee"
+
+#. module: sale_shopee
+#: model:ir.model,name:sale_shopee.model_shopee_shop_create
+msgid "Create Shopee Shop Wizard"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model,website_form_label:sale_shopee.model_res_partner
@@ -539,6 +568,7 @@ msgstr "Buat Pelanggan"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_uid
 msgid "Created by"
 msgstr "Dibuat oleh"
 
@@ -546,6 +576,7 @@ msgstr "Dibuat oleh"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__create_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__create_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__create_date
 msgid "Created on"
 msgstr "Dibuat pada"
 
@@ -576,6 +607,7 @@ msgstr "Penjual Standar"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__display_name
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__display_name
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__display_name
 msgid "Display Name"
@@ -617,7 +649,7 @@ msgid ""
 "One of the following input could be incorrect: Partner ID, Partner Key, or "
 "API Endpoint."
 msgstr ""
-"Gagal untuk mengotorisasi toko oleh karena error berikut:\n"
+"Gagal mengotorisasi toko karena error berikut:\n"
 "- %(message)s\n"
 "\n"
 "Salah satu input berikut tidak benar: Partner ID, Partner Key, atau API "
@@ -631,7 +663,7 @@ msgstr "Ambil Label Pengiriman"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Fetch Shipping Labels"
-msgstr "Ambil Label-Label Pengiriman"
+msgstr "Ambil Label Pengiriman"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.picking_view_form
@@ -681,6 +713,7 @@ msgstr "Fulfillment oleh Shopee"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__id
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_move__id
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__id
 msgid "ID"
@@ -709,6 +742,11 @@ msgid "If this field is empty, all companies will be allowed."
 msgstr "Bila field ini kosong, semua perusahaan akan diizinkan."
 
 #. module: sale_shopee
+#: model:ir.module.module,summary:base.module_sale_shopee
+msgid "Import Shopee orders and sync deliveries"
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__shopee_shop__status__inactive
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_search
 msgid "Inactive"
@@ -727,7 +765,7 @@ msgstr "Status Label"
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__last_orders_sync_date
 msgid "Last Order Synchronization Date"
-msgstr "Tanggal Sinkronisasi Pesanan Terakhir"
+msgstr "Tanggal Sinkronisasi Order Terakhir"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_stock_picking__last_picking_sync_date
@@ -748,6 +786,7 @@ msgstr "Tanggal Sinkronisasi Terakhir"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_uid
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_uid
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_uid
 msgid "Last Updated by"
 msgstr "Terakhir Diperbarui oleh"
 
@@ -755,6 +794,7 @@ msgstr "Terakhir Diperbarui oleh"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__write_date
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__write_date
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__write_date
 msgid "Last Updated on"
 msgstr "Terakhir Diperbarui pada"
 
@@ -762,6 +802,11 @@ msgstr "Terakhir Diperbarui pada"
 #: model_terms:ir.ui.view,arch_db:sale_shopee.view_order_form
 msgid "Lock"
 msgstr "Kunci"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "Manage Accounts"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__name
@@ -776,8 +821,19 @@ msgstr "Harus mengatur ulang pengiriman pada Shopee"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_list
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_list
 msgid "New"
 msgstr "Baru"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid "New Account"
+msgstr ""
+
+#. module: sale_shopee
+#: model:ir.actions.act_window,name:sale_shopee.shopee_shop_create_wizard_action
+msgid "New Shop"
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__not_available
@@ -788,6 +844,12 @@ msgstr "Tidak Tersedia"
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__order_count
 msgid "Order Count"
 msgstr "Jumlah Order"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Order Discount"
+msgstr "Diskon Order"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
@@ -832,6 +894,16 @@ msgid "Product Variant"
 msgstr "Varian Produk"
 
 #. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid ""
+"Promotion: %(promotion_type)s - id: %(promotion_id)d\n"
+"Original price: %(price)s"
+msgstr ""
+"Promosi: %(promotion_type)s - id: %(promotion_id)d\n"
+"Harga asli: %(price)s"
+
+#. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__ready
 msgid "Ready"
 msgstr "Siap"
@@ -870,8 +942,7 @@ msgstr "Daftarkan akun Shopee Anda"
 #. module: sale_shopee
 #: model_terms:ir.actions.act_window,help:sale_shopee.action_shopee_account_list
 msgid "Register yours to start synchronizing your orders into Odoo."
-msgstr ""
-"Daftarkan milik Anda untuk memulai sinkronisasi pesanan Anda dengan Odoo."
+msgstr "Daftarkan milik Anda untuk memulai sinkronisasi order Anda dengan Odoo."
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__authorization_remaining_days
@@ -879,14 +950,14 @@ msgid ""
 "Remaining days of the shop authorization. Show a warning in the Shopee Shop "
 "view that the authorization will expire soon."
 msgstr ""
-"Hari-hari tersisa untuk otorisasi toko. Tunjukkan peringatan di tampilan "
-"Toko Shopee bahwa otorisasi akan berakhir sebentar lagi."
+"Hari tersisa untuk otorisasi toko. Tunjukkan peringatan di tampilan Toko "
+"Shopee bahwa otorisasi akan berakhir sebentar lagi."
 
 #. module: sale_shopee
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Sale Orders"
-msgstr "Sale Orders"
+msgstr "Order Penjualan"
 
 #. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_sale_order
@@ -897,6 +968,13 @@ msgstr "Order Penjualan"
 #: model_terms:ir.ui.view,arch_db:sale_shopee.quick_create_account_form
 msgid "Save And Authorize"
 msgstr "Simpan dan Otorisasi"
+
+#. module: sale_shopee
+#: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_create_wizard_form
+msgid ""
+"Select the Shopee account on which to authorize the new shop, or register "
+"another account."
+msgstr ""
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__confirmed
@@ -911,7 +989,7 @@ msgstr "Pengiriman diatur melalui Shopee"
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__sale_order__shopee_delivery_status__done
 msgid "Shipped"
-msgstr "Dikiri"
+msgstr "Dikirim"
 
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.picking_view_form
@@ -923,6 +1001,12 @@ msgstr "Dikirim melalui Shopee"
 #: code:addons/sale_shopee/models/stock_picking.py:0
 msgid "Shipping Label Not Ready"
 msgstr "Label Pengiriman Belum Siap"
+
+#. module: sale_shopee
+#. odoo-python
+#: code:addons/sale_shopee/models/shopee_shop.py:0
+msgid "Shipping: %(carrier)s"
+msgstr "Pengiriman: %(carrier)s"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_item__shop_id
@@ -971,14 +1055,9 @@ msgid "Shopee"
 msgstr "Shopee"
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_account.py:0
-msgid "Shopee API Account - %(partner_id)s"
-msgstr "Akun Shopee API - %(partner_id)s"
-
-#. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_shopee_account
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__account_id
+#: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop_create__account_id
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shopee Account"
 msgstr "Akun Shopee"
@@ -987,7 +1066,7 @@ msgstr "Akun Shopee"
 #: model:ir.actions.act_window,name:sale_shopee.action_shopee_account_list
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_list
 msgid "Shopee Accounts"
-msgstr "Akun-Akun Shopee"
+msgstr "Akun Shopee"
 
 #. module: sale_shopee
 #: model:product.template,name:sale_shopee.default_adjustment_product_product_template
@@ -998,7 +1077,12 @@ msgstr "Penyesuaian Jumlah Shopee"
 #: model:ir.model.fields,field_description:sale_shopee.field_res_partner__shopee_buyer_identifier
 #: model:ir.model.fields,field_description:sale_shopee.field_res_users__shopee_buyer_identifier
 msgid "Shopee Buyer ID"
-msgstr "ID Shopee Buye"
+msgstr "ID Shopee Buyer"
+
+#. module: sale_shopee
+#: model:ir.module.module,shortdesc:base.module_sale_shopee
+msgid "Shopee Connector"
+msgstr ""
 
 #. module: sale_shopee
 #. odoo-python
@@ -1031,11 +1115,10 @@ msgstr "ID Item Shopee"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 #: model:ir.actions.act_window,name:sale_shopee.sale_shopee_item_action
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__shopee_item_ids
-#: model:ir.ui.menu,name:sale_shopee.items_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_item_view_list
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Shopee Items"
-msgstr "Item-Item Shopee"
+msgstr "Item Shopee"
 
 #. module: sale_shopee
 #. odoo-python
@@ -1059,6 +1142,11 @@ msgstr "Pesanan Shopee %(order)s di mock_shopee_shop"
 #: code:addons/sale_shopee/models/shopee_shop.py:0
 msgid "Shopee Order %(shopee_order_ref)s at %(shop_name)s"
 msgstr "Pesanan Shopee %(shopee_order_ref)s di %(shop_name)s"
+
+#. module: sale_shopee
+#: model:product.template,name:sale_shopee.default_discount_product_product_template
+msgid "Shopee Order Discount"
+msgstr "Diskon Order Shopee"
 
 #. module: sale_shopee
 #. odoo-python
@@ -1121,7 +1209,7 @@ msgstr "ID Toko Shopee"
 #: model:ir.actions.act_window,name:sale_shopee.action_shopee_shop_list
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_list
 msgid "Shopee Shops"
-msgstr "Toko-Toko Shopee"
+msgstr "Toko Shopee"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_sale_order__shopee_delivery_status
@@ -1164,7 +1252,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/sale_shopee/models/stock_move.py:0
 msgid "Shopee move: %s"
-msgstr "Pergerakkan Shopee: %s"
+msgstr "Pergerakan Shopee: %s"
 
 #. module: sale_shopee
 #: model:mail.template,name:sale_shopee.inventory_sync_failure
@@ -1174,7 +1262,7 @@ msgstr "Shopee: Sinkronisasi Inventaris Gagal"
 #. module: sale_shopee
 #: model:mail.template,name:sale_shopee.order_sync_failure
 msgid "Shopee: Order Synchronization Failure"
-msgstr "Shopee: Sinkronisasi Pesanan Gagal"
+msgstr "Shopee: Sinkronisasi Order Gagal"
 
 #. module: sale_shopee
 #: model:mail.template,name:sale_shopee.picking_sync_failure
@@ -1194,7 +1282,7 @@ msgstr "Shopee: sinkronisasi inventaris"
 #. module: sale_shopee
 #: model:ir.actions.server,name:sale_shopee.ir_cron_sync_shopee_orders_ir_actions_server
 msgid "Shopee: sync orders"
-msgstr "Shopee: sinkronisasi pesana"
+msgstr "Shopee: sinkronisasi order"
 
 #. module: sale_shopee
 #: model:ir.actions.server,name:sale_shopee.ir_cron_sync_shopee_pickings_ir_actions_server
@@ -1205,9 +1293,10 @@ msgstr "Shopee: sinkronisasi label shipping"
 #. odoo-python
 #: code:addons/sale_shopee/models/shopee_account.py:0
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_account__shop_ids
+#: model:ir.ui.menu,name:sale_shopee.shops_menu
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "Shops"
-msgstr "Toko-Toko"
+msgstr "Toko"
 
 #. module: sale_shopee
 #: model:ir.model.fields,field_description:sale_shopee.field_shopee_shop__status
@@ -1217,7 +1306,7 @@ msgstr "Status"
 #. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_stock_move
 msgid "Stock Move"
-msgstr "Pergerakkan Stok"
+msgstr "Pergerakan Stok"
 
 #. module: sale_shopee
 #: model:ir.model.fields.selection,name:sale_shopee.selection__stock_picking__shopee_label_status__stored
@@ -1248,8 +1337,7 @@ msgstr "Sinkronisasi inventaris Shopee gagal"
 #: model:mail.template,subject:sale_shopee.order_sync_failure
 msgid ""
 "Synchronization of Shopee order {{ ctx.get('shopee_order_ref') }} has failed"
-msgstr ""
-"Sinkronisasi pesanan Shopee {{ ctx.get('shopee_order_ref') }} telah gagal"
+msgstr "Sinkronisasi order Shopee {{ ctx.get('shopee_order_ref') }} gagal"
 
 #. module: sale_shopee
 #: model:mail.template,subject:sale_shopee.picking_sync_failure
@@ -1278,26 +1366,30 @@ msgstr ""
 "geografik ke marketplace yang Anda target."
 
 #. module: sale_shopee
+#: model:ir.model.fields,help:sale_shopee.field_shopee_shop_create__account_id
+msgid "The Shopee account on which the new shop is authorized."
+msgstr ""
+
+#. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_sale_order__shopee_shop_id
 msgid "The Shopee shop from which the order was placed."
-msgstr "Toko Shopee dari mana pesanan akan dibuat."
+msgstr "Toko Shopee dari mana order akan dibuat."
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_sale_order__shopee_order_ref
 #: model:ir.model.fields,help:sale_shopee.field_stock_picking__shopee_order_ref
 msgid "The Shopee-defined order reference."
-msgstr "Referensi pesanan yang didefinisikan oleh Shopee."
+msgstr "Referensi order yang didefinisikan oleh Shopee."
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__team_id
 msgid "The default Sales Team assigned to Shopee orders for reporting"
-msgstr ""
-"Tim Sales yang  ditugaskan secara default ke pesanan Shopee untuk laporan"
+msgstr "Tim Sales yang  ditugaskan secara default ke order Shopee untuk laporan"
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__user_id
 msgid "The default salesperson assigned to Shopee orders"
-msgstr "Salesperson yang ditugaskan secara default ke pesanan Shopee"
+msgstr "Salesperson yang ditugaskan secara default ke order Shopee"
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_shopee_shop__last_orders_sync_date
@@ -1305,9 +1397,9 @@ msgid ""
 "The last time the orders were synchronized with Shopee. Orders whose status "
 "has not changed since this date will not be created nor updated in Odoo."
 msgstr ""
-"Waktu terakhir di mana pesanan disinkronisasikan dengan Shopee. Pesanan di "
-"mana statusnya belum berubah semenjak tanggal ini tidak akan dibuat atau "
-"diupdate di Odoo."
+"Waktu terakhir di mana order disinkronisasikan dengan Shopee. Order di mana "
+"statusnya belum berubah semenjak tanggal ini tidak akan dibuat atau diupdate "
+"di Odoo."
 
 #. module: sale_shopee
 #: model:ir.model.fields,help:sale_shopee.field_stock_picking__last_picking_sync_date
@@ -1353,7 +1445,7 @@ msgstr ""
 "- Shipment Diatur: Seller telah mengatur shipment online dan memiliki nomor "
 "tracking dari 3PL.\n"
 "- Terkirim: Paket telah ditaruh di 3PL atau di pick-up oleh 3PL.\n"
-"- Dibatalkan: Pesanan telah dibatalkan.\n"
+"- Dibatalkan: Order telah dibatalkan.\n"
 "- Pickup Gagal: Pickup paket 3PL gagal. Harus mengatur ulang shipment."
 
 #. module: sale_shopee
@@ -1397,7 +1489,7 @@ msgstr ""
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "Tokens"
-msgstr "Token-Token"
+msgstr "Token"
 
 #. module: sale_shopee
 #: model:ir.model,name:sale_shopee.model_stock_picking
@@ -1439,22 +1531,6 @@ msgid "You are not allowed to access this page."
 msgstr "Anda tidak diizinkan untuk mengakses halaman ini."
 
 #. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid "[%(sku)s] %(product_name)s"
-msgstr "[%(sku)s] %(product_name)s"
-
-#. module: sale_shopee
-#. odoo-python
-#: code:addons/sale_shopee/models/shopee_shop.py:0
-msgid ""
-"[%(sku)s] %(product_title)s\n"
-"Promotion: %(promotion_type)s - id: %(promotion_id)d"
-msgstr ""
-"[%(sku)s] %(product_title)s\n"
-"Promosi: %(promotion_type)s - id: %(promotion_id)d"
-
-#. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_account_view_form
 msgid "e.g. American Market"
 msgstr "e.g. Pasar Amerika"
@@ -1462,7 +1538,7 @@ msgstr "e.g. Pasar Amerika"
 #. module: sale_shopee
 #: model_terms:ir.ui.view,arch_db:sale_shopee.shopee_shop_view_form
 msgid "e.g. Indonesian Shop"
-msgstr "contoh. Toko Indonesia"
+msgstr "Contoh: Toko Indonesia"
 
 #. module: sale_shopee
 #. odoo-python

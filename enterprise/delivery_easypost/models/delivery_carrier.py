@@ -28,6 +28,11 @@ class DeliveryCarrier(models.Model):
         ('PNG', 'PNG'), ('PDF', 'PDF'),
         ('ZPL', 'ZPL'), ('EPL2', 'EPL2')],
         string="Easypost Label File Type", default='PDF')
+    easypost_label_size = fields.Selection([
+        ('4x6', '4x6'), ('4x4', '4x4'),
+        ('8.5x11', '8.5x11'), ('7x3', '7x3'),
+        ('6x4', '6x4')
+    ], string="Easypost Label Size")
     easypost_insurance_fee_rate = fields.Float("Insurance fee rate (USD)")
     easypost_insurance_fee_minimum = fields.Float("Insurance fee minimum (USD)")
 
@@ -80,12 +85,12 @@ class DeliveryCarrier(models.Model):
             price = float(rate['rate'])
         else:
             quote_currency = self.env['res.currency'].search([('name', '=', rate['currency'])], limit=1)
-            price = quote_currency._convert(float(rate['rate']), order.currency_id, self.env.company, fields.Date.context_today(self))
+            price = quote_currency._convert(float(rate['rate']), order.currency_id, self.env.company)
 
         # Update price with the insurance cost
         insurance_cost = response.get('insurance_cost', 0)
         usd = self.env.ref('base.USD')
-        price += usd._convert(insurance_cost, order.currency_id, self.env.company, fields.Date.context_today(self))
+        price += usd._convert(insurance_cost, order.currency_id, self.env.company)
 
         return {
             'success': True,
@@ -113,12 +118,12 @@ class DeliveryCarrier(models.Model):
                 price = float(rate['rate'])
             else:
                 quote_currency = self.env['res.currency'].search([('name', '=', rate['currency'])], limit=1)
-                price = quote_currency._convert(float(rate['rate']), picking.company_id.currency_id, self.env.company, fields.Date.context_today(self))
+                price = quote_currency._convert(float(rate['rate']), picking.company_id.currency_id, self.env.company)
 
             # Update price with the insurance cost
             insurance_cost = result.get('insurance_cost', 0)
             usd = self.env.ref('base.USD')
-            price += usd._convert(insurance_cost, picking.company_id.currency_id, self.env.company, fields.Date.context_today(self))
+            price += usd._convert(insurance_cost, picking.company_id.currency_id, self.env.company)
 
             # return tracking information
             carrier_tracking_link = ""
@@ -291,7 +296,7 @@ class DeliveryCarrier(models.Model):
             return 0
         usd = self.env.ref('base.USD')
         current_insured_value = package_value * self.shipping_insurance / 100
-        usd_insured_value = currency._convert(current_insured_value, usd, self.env.company, fields.Date.context_today(self))
+        usd_insured_value = currency._convert(current_insured_value, usd, self.env.company)
         return usd_insured_value
 
     def _easypost_usd_estimated_insurance_cost(self, usd_insured_value):

@@ -4,33 +4,34 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:45+0000\n"
-"PO-Revision-Date: 2025-11-17 03:10+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/hr_sign/"
-"fi/>\n"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-18 02:28+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
+"hr_sign/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_sign
 #. odoo-python
 #: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
-msgid "%(employee)s and %(responsible)s are the signatories."
-msgstr "%(employee)s ja %(responsible)s ovat allekirjoittajia."
+msgid "%(responsible)s, %(employee)s"
+msgstr ""
 
 #. module: hr_sign
 #. odoo-python
 #: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
-msgid "%(user_name)s requested a new signature on the following documents:"
-msgstr "%(user_name)s pyysi uutta allekirjoitusta seuraaviin asiakirjoihin:"
+msgid "%(signer)s"
+msgstr ""
 
 #. module: hr_sign
 #. odoo-python
@@ -58,7 +59,7 @@ msgstr "Toimintasuunnitelman malli"
 #. module: hr_sign
 #: model:ir.model,name:hr_sign.model_mail_activity_schedule
 msgid "Activity schedule plan Wizard"
-msgstr "Toiminta-aikataulun suunnittelun ohjattu toiminto"
+msgstr "Ohjattu toimenpideaikataulun suunnittelutoiminto"
 
 #. module: hr_sign
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
@@ -71,6 +72,13 @@ msgid "Attachment"
 msgstr "Liite"
 
 #. module: hr_sign
+#: model:ir.model.fields,help:hr_sign.field_hr_contract_sign_document_wizard__signing_employee
+msgid ""
+"Choose who will sign the document when the selected template has a single "
+"signer."
+msgstr ""
+
+#. module: hr_sign
 #: model:sign.template,redirect_url_text:hr_sign.template_sign_termination
 msgid "Close"
 msgstr "Sulje"
@@ -79,6 +87,11 @@ msgstr "Sulje"
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__version_id
 msgid "Contract"
 msgstr "Sopimus"
+
+#. module: hr_sign
+#: model:ir.module.module,shortdesc:base.module_hr_sign
+msgid "Contract - Signature"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__cc_partner_ids
@@ -101,11 +114,6 @@ msgid "Customer"
 msgstr "Asiakas"
 
 #. module: hr_sign
-#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
-msgid "Discard"
-msgstr "Hylkää"
-
-#. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__display_name
 #: model:ir.model.fields,field_description:hr_sign.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__display_name
@@ -115,16 +123,6 @@ msgstr "Hylkää"
 #: model:ir.model.fields,field_description:hr_sign.field_res_users__display_name
 msgid "Display Name"
 msgstr "Näyttönimi"
-
-#. module: hr_sign
-#: model:ir.actions.act_window,name:hr_sign.sign_contract_wizard_action
-msgid "Document Signature"
-msgstr "Asiakirjan allekirjoitus"
-
-#. module: hr_sign
-#: model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__sign_template_id
-msgid "Document to sign"
-msgstr "Allekirjoitettava asiakirja"
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__sign_template_ids
@@ -155,6 +153,7 @@ msgstr ""
 
 #. module: hr_sign
 #: model:ir.model,name:hr_sign.model_hr_employee
+#: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__signing_employee__employee
 #: model:sign.item.role,name:hr_sign.sign_item_role_employee_signatory
 msgid "Employee"
 msgstr "Työntekijä"
@@ -186,6 +185,7 @@ msgid "Employees"
 msgstr "Työntekijät"
 
 #. module: hr_sign
+#: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__signing_employee__hr_responsible
 #: model:sign.item.role,name:hr_sign.sign_item_role_job_responsible
 msgid "HR Responsible"
 msgstr "HR-vastaava"
@@ -207,9 +207,9 @@ msgid "ID"
 msgstr "Tunnus"
 
 #. module: hr_sign
-#: model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__is_signature_request
-msgid "Is Signature Request"
-msgstr "Onko allekirjoituspyyntö"
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__is_single_signer
+msgid "Is Single Signer"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__write_uid
@@ -232,6 +232,11 @@ msgid "Mail Options"
 msgstr "Postitusvaihtoehdot"
 
 #. module: hr_sign
+#: model:ir.module.module,summary:base.module_hr_sign
+msgid "Manage your documents to sign in contracts"
+msgstr ""
+
+#. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__message
 msgid "Message"
 msgstr "Viesti"
@@ -248,12 +253,6 @@ msgid "No template available"
 msgstr "Mallia ei ole saatavilla"
 
 #. module: hr_sign
-#. odoo-python
-#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
-msgid "Only %s has to sign."
-msgstr "Vain %s:n on allekirjoitettava."
-
-#. module: hr_sign
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
 msgid "Optional Message..."
 msgstr "Valinnainen viesti..."
@@ -261,7 +260,7 @@ msgstr "Valinnainen viesti..."
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__possible_template_ids
 msgid "Possible Template"
-msgstr "Mahdollinen malli"
+msgstr "Mahdollinen mallipohja"
 
 #. module: hr_sign
 #: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__mail_to__private
@@ -311,6 +310,16 @@ msgid "Send"
 msgstr "Lähetä"
 
 #. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__show_sign_now
+msgid "Show Sign Now"
+msgstr ""
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Sign Now"
+msgstr ""
+
+#. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__sign_request_ids
 msgid "Sign Request"
 msgstr "Allekirjoituspyyntö"
@@ -343,10 +352,26 @@ msgstr "Allekirjoita sopimusasiakirja"
 #: code:addons/hr_sign/models/hr_employee.py:0
 #: code:addons/hr_sign/wizard/mail_activity_schedule.py:0
 #: model:ir.actions.server,name:hr_sign.action_signature_request_multi
-#: model_terms:ir.ui.view,arch_db:hr_sign.hr_employee_sign_view_form
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
 msgid "Signature Request"
 msgstr "Allekirjoituspyyntö"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "Signature requested for the following document(s):"
+msgstr ""
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "Signer(s): %(signatories)s"
+msgstr ""
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__signing_employee
+msgid "Signing Employee"
+msgstr ""
 
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__subject
@@ -356,7 +381,7 @@ msgstr "Aihe"
 #. module: hr_sign
 #: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__template_warning
 msgid "Template Warning"
-msgstr "Mallivaroitus"
+msgstr "Mallipohjan varoitus"
 
 #. module: hr_sign
 #: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign

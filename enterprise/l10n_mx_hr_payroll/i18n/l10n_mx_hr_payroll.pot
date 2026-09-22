@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e\n"
+"Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:08+0000\n"
-"PO-Revision-Date: 2025-12-30 19:08+0000\n"
+"POT-Creation-Date: 2026-09-18 18:21+0000\n"
+"PO-Revision-Date: 2026-09-18 18:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,19 +16,60 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: l10n_mx_hr_payroll
+#: model:ir.module.module,description:base.module_l10n_mx_hr_payroll
+msgid ""
+"\n"
+"Mexican Payroll Rules.\n"
+"=========================\n"
+"\n"
+"    * Employee Details\n"
+"    * Employee Contracts\n"
+"    * Passport based Contract\n"
+"    * Allowances/Deductions\n"
+"    * Allow to configure Basic/Gross/Net Salary\n"
+"    * Employee Payslip\n"
+"    * Integrated with Leaves Management\n"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:ir.actions.report,print_report_name:l10n_mx_hr_payroll.action_report_payslip_mx
 msgid "'Payslip - %s' % (object.employee_id.name)"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.l10n_mx_hr_infonavit_form
-msgid "<span class=\"oe_inline\">%</span>"
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "10 days"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.hr_contract_template_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.hr_employee_view_form
-msgid "<span>%</span>"
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "10_days"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "14 days"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "14_days"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "2 months"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "2 weeks"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -68,9 +109,16 @@ msgid "Basic Salary"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_mx_hr_payroll.l10n_mx_input_bonus
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_bonus
 msgid "Bonus"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,help:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_is_seventh_day
+#: model:ir.model.fields,help:l10n_mx_hr_payroll.field_hr_version__l10n_mx_is_seventh_day
+msgid ""
+"Check this box to separately break down the seventh day in the payroll "
+"calculation."
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -89,21 +137,32 @@ msgid "Christmas Bonus Exemption"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_christmas_bonus
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_version__l10n_mx_christmas_bonus
+msgid "Christmas bonus"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_mx_hr_payroll.selection__l10n_mx_hr_fonacot__status__closed
 #: model:ir.model.fields.selection,name:l10n_mx_hr_payroll.selection__l10n_mx_hr_infonavit__status__closed
 msgid "Closed"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_mx_hr_payroll.l10n_mx_input_commissions
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_commissions
 msgid "Commissions"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model:ir.model,name:l10n_mx_hr_payroll.model_res_company
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_fonacot__company_id
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_infonavit__company_id
 msgid "Company"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model,name:l10n_mx_hr_payroll.model_res_config_settings
+msgid "Config Settings"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -196,8 +255,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_payslip__display_name
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_payslip_worked_days__display_name
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_version__display_name
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_work_entry_type__display_name
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_fonacot__display_name
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_infonavit__display_name
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -268,13 +330,13 @@ msgid "Gasoline Vouchers"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
-#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_bruto
-msgid "Gross without Holidays"
+#: model:ir.model.fields.selection,name:l10n_mx_hr_payroll.selection__hr_version__l10n_mx_min_wage_zone__zsmg
+msgid "General Zone"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
-#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_holiday_bonus
-msgid "Holiday Bonus"
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_bruto
+msgid "Gross without Holidays"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -300,18 +362,38 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_payslip__id
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_payslip_worked_days__id
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_version__id
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_work_entry_type__id
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_fonacot__id
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_infonavit__id
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_config_settings__id
 msgid "ID"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule.category,name:l10n_mx_hr_payroll.l10n_mx_category_social_security_employee
+msgid "IMSS (Employee)"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_social_security_total_employee_on_minimum_wage
+msgid "IMSS (Employee) on minimum wage"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule.category,name:l10n_mx_hr_payroll.l10n_mx_category_social_security_employer
+msgid "IMSS (Employer)"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_social_security_total_employee
+#: model:hr.salary.rule.category,name:l10n_mx_hr_payroll.l10n_mx_category_social_security_employee_total
 msgid "IMSS Total (Employee)"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_social_security_total_employer
+#: model:hr.salary.rule.category,name:l10n_mx_hr_payroll.l10n_mx_category_social_security_employer_total
 msgid "IMSS Total (Employer)"
 msgstr ""
 
@@ -323,18 +405,35 @@ msgstr ""
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_christmas_bonus_isr
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_isr
+#: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.res_config_settings_view_form
 msgid "ISR (Income Tax)"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
-#: model:hr.payslip.input.type,name:l10n_mx_hr_payroll.l10n_mx_input_isr_adjustment
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_isr_adjustment
 msgid "ISR Adjustment"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_company__l10n_mx_isr_calculation_method
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_config_settings__l10n_mx_isr_calculation_method
+msgid "ISR Calculation Method"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_company__l10n_mx_isr_days_per_month
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_res_config_settings__l10n_mx_isr_days_per_month
+msgid "ISR Days per Month"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_isr_holiday_bonus_tax
 msgid "ISR Holiday Bonus (Income Tax)"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_isr_on_minimum_wage
+msgid "ISR on minimum wage"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -384,28 +483,13 @@ msgid "Infonavit IMSS (Employer)"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
-#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_integrated_daily_wage
-msgid "Integrated Daily Wage"
-msgstr ""
-
-#. module: l10n_mx_hr_payroll
-#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_integrated_daily_wage_base
-msgid "Integrated Daily Wage (Base)"
-msgstr ""
-
-#. module: l10n_mx_hr_payroll
-#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_integrated_daily_wage_commissions
-msgid "Integrated Daily Wage (Commissions)"
-msgstr ""
-
-#. module: l10n_mx_hr_payroll
-#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_integrated_daily_wage_other_incomes
-msgid "Integrated Daily Wage (Other Incomes)"
-msgstr ""
-
-#. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule.category,name:l10n_mx_hr_payroll.l10n_mx_category_intermediary_computation
 msgid "Intermediary Computation"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_payslip__l10n_mx_is_integration_factor_manual
+msgid "L10N Mx Is Integration Factor Manual"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -488,6 +572,17 @@ msgid "MX: Savings Fund"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_is_seventh_day
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_version__l10n_mx_is_seventh_day
+msgid "MX: Seventh Day"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_ssn
+msgid "MX: Social Security Number"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_transport_amount
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_version__l10n_mx_transport_amount
 msgid "MX: Transport Amount"
@@ -516,8 +611,88 @@ msgid "Medical expenses for pensioners and beneficiaries"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.res_config_settings_view_form
+msgid "Method used to compute the income tax withheld on each payslip"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.res_config_settings_view_form
+msgid "Mexican Localization"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.module.module,shortdesc:base.module_l10n_mx_hr_payroll
+msgid "Mexico - Payroll"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_ceav_lower_upper
+msgid "Mexico: Ceav Lower / Upper Limits"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_ceav_percentage
+msgid "Mexico: Ceav Percentages"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:hr.payroll.structure,name:l10n_mx_hr_payroll.l10n_mx_christmas_bonus
 msgid "Mexico: Christmas Bonus"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_christmas_bonus_exemption
+msgid "Mexico: Christmas Bonus Exemption"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_compensation_factor
+msgid "Mexico: Compensation Factor"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_daily_minimum_wage
+msgid "Mexico: Daily Minimum Wage"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_umi
+msgid "Mexico: Daily UMI"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_days_per_month
+msgid "Mexico: Days Per Month"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.payroll.structure.type,name:l10n_mx_hr_payroll.l10n_mx_employee
+msgid "Mexico: Employee"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_exemption_saving_fund_salary
+msgid "Mexico: Exemption for Savings Fund (Salary)"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_exemption_saving_fund_monthly_uma
+msgid "Mexico: Exemption for Savings Fund (by Monthly UMA)"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_holiday_table
+msgid "Mexico: Holiday Table"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_imss_limit_with_uma
+msgid "Mexico: IMSS Limit with the UMA"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_isr_table
+msgid "Mexico: ISR Table"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -526,8 +701,49 @@ msgid "Mexico: Regular Pay"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_risk_bonus_rate
+msgid "Mexico: Risk Bonus Rate"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_subsidy_salary_limit
+msgid "Mexico: Salary Limit for Employment Subsidy"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_salary_limit_annual_declaration
+msgid "Mexico: Salary Limit for the Annual Declaration"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_schedule_table
+msgid "Mexico: Schedule Table"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.l10n_mx_rule_parameter_uma
+msgid "Mexico: UMA"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.rule.parameter,name:l10n_mx_hr_payroll.rule_parameter_uma_percentage_for_subsidy
+msgid "Mexico: UMA Percentage for Subsidy"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_employee__l10n_mx_min_wage_zone
+#: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_hr_version__l10n_mx_min_wage_zone
+msgid "Minimum Wage Zone"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_infonavit__monthly_insurance
 msgid "Monthly Insurance"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model.fields.selection,name:l10n_mx_hr_payroll.selection__res_company__l10n_mx_isr_calculation_method__monthly_with_period_factor
+msgid "Monthly Table with Period Factor"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -551,6 +767,11 @@ msgid "Non Taxable Gasoline"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_holiday_bonus
+msgid "Non Taxable Holiday Bonus"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_meal_voucher
 msgid "Non Taxable Meal Voucher"
 msgstr ""
@@ -558,6 +779,19 @@ msgstr ""
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_transport
 msgid "Non Taxable Transport Support"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model.fields.selection,name:l10n_mx_hr_payroll.selection__hr_version__l10n_mx_min_wage_zone__zlfn
+msgid "Northern Border Zone"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,help:l10n_mx_hr_payroll.field_res_company__l10n_mx_isr_days_per_month
+#: model:ir.model.fields,help:l10n_mx_hr_payroll.field_res_config_settings__l10n_mx_isr_days_per_month
+msgid ""
+"Number of days in a month used to compute the period factor (365 / 12 by "
+"default)."
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -615,6 +849,19 @@ msgid "Period Provisions Vacations Bonus"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model:ir.model.fields.selection,name:l10n_mx_hr_payroll.selection__res_company__l10n_mx_isr_calculation_method__standard
+msgid "Period Table"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model.fields,help:l10n_mx_hr_payroll.field_res_company__l10n_mx_isr_calculation_method
+#: model:ir.model.fields,help:l10n_mx_hr_payroll.field_res_config_settings__l10n_mx_isr_calculation_method
+msgid ""
+"Period Table: the ISR is computed on the taxable income with the tax table matching the pay period.\n"
+"Monthly Table with Period Factor: the taxable income is converted to its monthly equivalent, and the resulting tax is converted back to the pay period."
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule.category,name:l10n_mx_hr_payroll.l10n_mx_category_provisions
 msgid "Provisions"
 msgstr ""
@@ -645,6 +892,11 @@ msgid "Reimbursement"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.view_hr_payslip_form
+msgid "Reset integration factor"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_imss_ceav_employee
 msgid "Retirement, assault in elderly and old age (CEAV) IMSS (Employee)"
 msgstr ""
@@ -657,6 +909,31 @@ msgstr ""
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_imss_retirement
 msgid "Retirement, assault in elderly and old age IMSS (Employer)"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule.category,name:l10n_mx_hr_payroll.l10n_mx_category_base_contribution_salary
+msgid "SBC"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary_commissions
+msgid "SBC (Commissions)"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary_fixed_salary
+msgid "SBC (Fixed Salary)"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary_other_earnings
+msgid "SBC (Other Earnings)"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_base_contribution_salary
+msgid "SBC (Total)"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -699,6 +976,16 @@ msgid "Savings Fund - Salary Limit"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_mx_hr_payroll.hr_employee_view_form
+msgid "Seventh Day"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_seventh_day
+msgid "Seventh day"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_fonacot__status
 #: model:ir.model.fields,field_description:l10n_mx_hr_payroll.field_l10n_mx_hr_infonavit__status
 msgid "Status"
@@ -712,6 +999,11 @@ msgstr ""
 #. module: l10n_mx_hr_payroll
 #: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_gasoline_alw
 msgid "Taxable Gasoline Voucher"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:hr.salary.rule,name:l10n_mx_hr_payroll.l10n_mx_regular_pay_holiday_bonus_alw
+msgid "Taxable Holiday Bonus"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -737,6 +1029,12 @@ msgstr ""
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.constraint,message:l10n_mx_hr_payroll.constraint_hr_version_check_christmas_bonus_percentage
 msgid "The Christmas Bonus rate must be between 0 and 100"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/res_company.py:0
+msgid "The ISR days per month must be strictly positive."
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -768,6 +1066,11 @@ msgstr ""
 #. module: l10n_mx_hr_payroll
 #: model:ir.model.constraint,message:l10n_mx_hr_payroll.constraint_l10n_mx_hr_infonavit_check_percentage
 msgid "The percentage must be between 0 and 100"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#: model:ir.model,name:l10n_mx_hr_payroll.model_hr_work_entry_type
+msgid "Time Type"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
@@ -854,6 +1157,24 @@ msgid "an Infonavit Credit"
 msgstr ""
 
 #. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "bi-monthly"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "bi-weekly"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "day"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
 #: model:ir.model,name:l10n_mx_hr_payroll.model_l10n_mx_hr_fonacot
 msgid "fonacot"
 msgstr ""
@@ -861,4 +1182,28 @@ msgstr ""
 #. module: l10n_mx_hr_payroll
 #: model:ir.model,name:l10n_mx_hr_payroll.model_l10n_mx_hr_infonavit
 msgid "infonavit"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "month"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "monthly"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "week"
+msgstr ""
+
+#. module: l10n_mx_hr_payroll
+#. odoo-python
+#: code:addons/l10n_mx_hr_payroll/models/hr_payroll_structure_type.py:0
+msgid "weekly"
 msgstr ""

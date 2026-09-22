@@ -1,4 +1,6 @@
 from datetime import date
+
+from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
 from ...sign.tests.sign_request_common import SignRequestCommon
 from odoo.addons.http_routing.tests.common import MockRequest
 from ..controllers.main import SignContract
@@ -7,14 +9,16 @@ from odoo.tests.common import tagged
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
-class TestSignContract(SignRequestCommon):
+class TestSignContract(SignRequestCommon, TestBelgiumCommon):
+
     def test_update_contract_on_signature_custom_logic(self):
-        """Test _update_version_on_signature updates future driver and flags correctly"""
+        """Test _update_version_on_signature updates driver and flags correctly"""
         # Prepare contract and vehicles
         company = self.env['res.company'].create({
             'name': 'Test Belgium Company',
             'country_id': self.env.ref('base.be').id,
         })
+        company.current_payroll_config_id.l10n_be_employer_category_id = self.env.ref('l10n_be_hr_payroll.l10n_be_employer_category_00010')
 
         employee = self.env['hr.employee'].create({
             'name': 'John Tester',
@@ -34,7 +38,7 @@ class TestSignContract(SignRequestCommon):
 
         car = self.env['fleet.vehicle'].create({
             'model_id': model.id,
-            'plan_to_change_car': True,
+            'plan_to_change_vehicle': True,
         })
 
         version = self.env['hr.version'].create({
@@ -45,6 +49,7 @@ class TestSignContract(SignRequestCommon):
             'date_version': date(2025, 1, 1),
             'wage': 1000,
             'company_id': employee.company_id.id,
+            'active': False
         })
 
         sign_request = self.create_sign_request_2_roles(self.partner_2, self.partner_3, self.env['res.partner'])
@@ -54,6 +59,7 @@ class TestSignContract(SignRequestCommon):
 
         # Create a salary offer linked to the sign request
         offer = self.env['hr.contract.salary.offer'].create({
+            'employee_id': employee.id,
             'company_id': employee.company_id.id,
             'contract_template_id': version.id,
             'sign_request_ids': [(4, sign_request.id)],
@@ -72,11 +78,10 @@ class TestSignContract(SignRequestCommon):
 
         # Assertions to verify that your custom logic is executed
         self.assertEqual(version.car_id.future_driver_id, self.partner_2, "Car future driver should be updated")
-        self.assertFalse(version.car_id.plan_to_change_car, "Car should not be flagged for change")
+        self.assertFalse(version.car_id.plan_to_change_vehicle, "Car should not be flagged for change")
 
         # Add a new car request to the version
-        version.new_car = True
-        version.ordered_car_id = False
+        version.has_new_car = True
         version.new_car_model_id = model
 
         # Company (HR Responsible) signs the contract
@@ -84,5 +89,4 @@ class TestSignContract(SignRequestCommon):
         with MockRequest(sign_request.env):
             controller._update_version_on_signature(sign_request_item_signer_2, version, offer)
 
-        self.assertEqual(version.car_id.future_driver_id, self.partner_2, "Car future driver should be updated")
-        self.assertFalse(version.car_id.plan_to_change_car, "Car should not be flagged for change")
+        self.assertEqual(version.car_id.driver_id, self.partner_2, "Car driver should be updated")

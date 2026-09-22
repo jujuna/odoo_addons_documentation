@@ -9,6 +9,7 @@ import {
     clickOnSave,
     registerWebsitePreviewTour,
     goBackToBlocks,
+    unfoldOptionsGroup,
 } from "@website/js/tours/tour_utils";
 
 const carouselInnerSelector = ":iframe .carousel-inner";
@@ -16,7 +17,6 @@ const carouselInnerSelector = ":iframe .carousel-inner";
 registerWebsitePreviewTour(
     "carousel_content_removal",
     {
-        url: "/",
         edition: true,
     },
     () => [
@@ -82,7 +82,6 @@ const checkSlides = (number, position) => {
 registerWebsitePreviewTour(
     "snippet_carousel",
     {
-        url: "/",
         edition: true,
     },
     () => [
@@ -104,6 +103,7 @@ registerWebsitePreviewTour(
         },
         checkSlides(3, 1),
         // Add a slide (with the "Carousel" option).
+        ...unfoldOptionsGroup("Carousel"),
         changeOption("Carousel", "[data-action-id='addSlide']"),
         checkSlides(4, 2),
         {
@@ -149,19 +149,27 @@ registerWebsitePreviewTour(
         ...clickOnSave(),
         // Check that saving always sets the first slide as active.
         checkSlides(4, 1),
+        {
+            content: "Slide the carousel",
+            trigger: ":iframe .carousel .carousel-control-next",
+            run: "click",
+        },
+        // Ensure opening edit mode while sliding doesn't cause any issue.
+        ...clickOnEditAndWaitEditMode(),
+        {
+            content: "Slide the carousel in edit mode",
+            trigger: ":iframe .carousel .carousel-control-next",
+            run: "click",
+        },
+        checkSlides(4, 3),
     ]
 );
 
-const setSlideUrl = (urlText, matchText) => [
+const setSlideUrl = (urlText) => [
     {
         content: "Enter the URL to be linked with the slide",
         trigger: "div[data-action-id='setSlideAnchorUrl'] input[title='Your URL']",
-        run: `edit ${urlText}`,
-    },
-    {
-        content: "Select the URL from autocomplete dropdown",
-        trigger: `ul.ui-autocomplete li div:contains('${matchText}')`,
-        run: "click",
+        run: `edit ${urlText} && press Tab`,
     },
 ];
 
@@ -173,7 +181,6 @@ const checkSlideNotClickable = () => ({
 registerWebsitePreviewTour(
     "snippet_carousel_clickable_slides",
     {
-        url: "/",
         edition: true,
     },
     () => [
@@ -187,7 +194,7 @@ registerWebsitePreviewTour(
             content: "Check that the 'clickable-slide' class is added to the carousel item",
             trigger: ":iframe .carousel-item.active.clickable-slide",
         },
-        ...setSlideUrl("/contactus", "/contactus-thank-you"),
+        ...setSlideUrl("/contactus-thank-you"),
         {
             content: "Check that the anchor tag is added to the carousel item",
             trigger:
@@ -214,9 +221,9 @@ registerWebsitePreviewTour(
             run: "edit ",
         },
         {
-            content: "Press Enter in the URL input",
+            content: "Press Tab in the URL input",
             trigger: "div[data-action-id='setSlideAnchorUrl'] input",
-            run: "press Enter",
+            run: "press Tab",
         },
         {
             content: "Check that the anchor tag is removed",
@@ -226,7 +233,7 @@ registerWebsitePreviewTour(
             content: "Check that the 'Open in New Tab' option is no longer visible",
             trigger: "[data-label='Open in New Tab']:not(:visible)",
         },
-        ...setSlideUrl("/contactus", "/contactus-thank-you"),
+        ...setSlideUrl("/contactus-thank-you"),
 
         // Turn off the 'Make Slide Clickable' option
         changeOption("Slide (1/3)", "[data-action-id='makeSlideClickable'] input"),

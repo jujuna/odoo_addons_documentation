@@ -11,14 +11,16 @@ from freezegun import freeze_time
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestFRIntrastatReport(TestAccountReportsCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
-    @TestAccountReportsCommon.setup_country('fr')
+    @TestAccountReportsCommon.setup_country('fr_comp')
     def setUpClass(cls):
         super().setUpClass()
         italy = cls.env.ref('base.it')
         cls.company_data['company'].write({
             'vat': 'FR23334175221',
-            'company_registry': '2333417522155555',
+            'l10n_fr_siret': '33417522101010',
             'l10n_fr_intrastat_envelope_id': 'D090',
             'intrastat_region_id': cls.env.ref('l10n_fr_intrastat.intrastat_region_01').id,
         })
@@ -178,7 +180,6 @@ class TestFRIntrastatReport(TestAccountReportsCommon):
         self._report_compare_with_test_file(report, 'vat_summary_stmt.xml')
 
     def test_fr_intrastat_export_errors(self):
-        self.company_data['company'].company_registry = False
         self.outwards_customer_invoice.intrastat_transport_mode_id = False
         self.outwards_customer_invoice.line_ids[0].update({
             "intrastat_transaction_id": False,
@@ -186,7 +187,7 @@ class TestFRIntrastatReport(TestAccountReportsCommon):
         })
         self.product_aeroplane.intrastat_code_id = False
         self.company_data['company'].write({
-            'company_registry': False,
+            'additional_identifiers': False,
             'intrastat_region_id': False,
         })
         options = self._generate_options(self.report_goods, {
@@ -214,3 +215,16 @@ class TestFRIntrastatReport(TestAccountReportsCommon):
         options = self._generate_options(self.report_services)
         report_xml = self._l10n_fr_intrastat_generate_report_xml(options, self.report_handler_services)
         self._report_compare_with_test_file(report_xml, 'services_export.xml')
+
+    def test_fr_intrastat_export_report_with_commas_as_decimal(self):
+        """ Test creating a report when the language sets the decimal separator to a comma instead of a period """
+        langs = self.env['res.lang'].search([['active', '=', True]])
+        langs.write({
+            'decimal_point': ',',
+            'thousands_sep': ''
+        })
+        options = self._generate_options(self.report_goods, {
+            'export_type': 'statistical_survey_and_vat_summary_statement',
+            'emebi_flow': 'arrivals_and_dispatches',
+        })
+        self._l10n_fr_intrastat_generate_report_xml(options, self.report_handler_goods)

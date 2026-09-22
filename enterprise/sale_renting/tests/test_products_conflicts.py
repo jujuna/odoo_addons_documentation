@@ -6,28 +6,26 @@ from odoo.tests import tagged
 from odoo.addons.product.tests.common import ProductCommon
 
 
-@tagged('post_install', '-at_install')
+@tagged("post_install", "-at_install")
 class TestProductsConflicts(ProductCommon):
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if 'sale.subscription.plan' not in cls.env:
+        if "sale.subscription.plan" not in cls.env:
             cls.skipTest(cls, "sale_subscription module is not installed")
 
     def test_subsription_on_rentable(self):
-        self.product.write({'rent_ok': True})
+        self.product.rent_periodicity = "hours"
         with self.assertRaises(ValidationError):
-            self.product.write({'recurring_invoice': True})
+            self.product.write({"recurring_invoice": True})
 
     def test_rentable_on_subscription(self):
-        self.product.write({'recurring_invoice': True})
+        self.product.write({"recurring_invoice": True})
         with self.assertRaises(ValidationError):
-            self.product.write({'rent_ok': True})
+            self.product.write({"rent_periodicity": "days"})
 
     def test_rentable_and_subscription(self):
         with self.assertRaises(ValidationError):
-            self.product.write({
-                'recurring_invoice': True,
-                'rent_ok': True,
-            })
+            self.product.write({"recurring_invoice": True, "rent_periodicity": "days"})

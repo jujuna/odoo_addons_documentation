@@ -8,258 +8,149 @@
         <field name="arch" type="xml">
             <form string="Asset">
                 <field name="company_id" invisible="1" readonly="state != 'draft'"/>
+                <field name="is_multi_ledger_company" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
-                <field name="account_type" invisible="1"/>
                 <field name="account_asset_id" invisible="1" readonly="state == 'close'"/>
-                <field name="display_account_asset_id" invisible="1"/>
                 <field name="state" invisible="1"/>
                 <field name="total_depreciation_entries_count" invisible="1"/>
                 <field name="parent_id" invisible="1"/>
+                <field name="is_main_variant" invisible="1"/>
+                <field name="origin_asset_id" invisible="1"/>
+                <field name="derived_asset_ids" invisible="1"/>
+                <field name="non_deductible_tax_value" invisible="1"/>
                 <header>
                     <button name="validate" invisible="state != 'draft'" string="Confirm" type="object" class="oe_highlight" data-hotkey="q"/>
                     <button type="object" name="compute_depreciation_board" string="Compute Depreciation" invisible="state != 'draft'" data-hotkey="d"/>
-                    <button name="set_to_draft" string="Set to Draft" type="object" invisible="depreciation_move_ids or state not in ['open', 'cancelled']"/>
-                    <button name="set_to_running" string="Set to Running" type="object" invisible="state != 'close'"/>
+                    <button name="set_to_running" string="Set to Running" type="object" invisible="state != 'close' or derived_asset_ids or not is_main_variant"/>
                     <button name="resume_after_pause" string="Resume Depreciation" type="object" class="oe_highlight" invisible="state != 'paused'"/>
-                    <button name="action_asset_modify" invisible="state != 'open'" string="Modify Depreciation" type="object" data-hotkey="e" class="oe_highlight"/>
-                    <button name="action_save_model" invisible="state not in ('open', 'paused', 'close')" string="Save as Model" type="object" data-hotkey="m"/>
-                    <button name="set_to_cancelled" string="Cancel Asset" type="object" invisible="state != 'open'" data-hotkey="x"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,open" invisible="state == 'model'"/>
+                    <button name="action_asset_modify" invisible="state != 'open' or not is_main_variant" string="Modify Depreciation" type="object" data-hotkey="e" class="oe_highlight"/>
+                    <button name="set_to_cancelled" string="Cancel Assets" type="object" invisible="variant_count &lt; 2 or not is_main_variant or state != 'open'" data-hotkey="x"/>
+                    <button name="set_to_cancelled" string="Cancel Asset" type="object" invisible="(variant_count &gt; 1 and is_main_variant) or state != 'open'" data-hotkey="x"/>
+                    <button name="set_to_draft" string="Set All to Draft" type="object" invisible="variant_count &lt; 2 or not is_main_variant or depreciation_entries_count > 0 or state not in ['open', 'cancelled']"/>
+                    <button name="set_to_draft" string="Set to Draft" type="object" invisible="(variant_count &gt; 1 and is_main_variant) or depreciation_entries_count > 0 or state not in ['open', 'cancelled']"/>
+                    <button name="action_depreciation_ledger" invisible="state != 'open' or not is_multi_ledger_company or not is_main_variant or main_variant_parent_id" string="New Depreciation" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open"/>
                 </header>
                 <sheet>
-                    <div class="oe_button_box" name="button_box" invisible="state == 'model'">
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" name="open_main_variant" type="object" icon="stacks" invisible="not main_variant_id or is_main_variant">
+                            <field string="Main Asset" name="main_variant_model_name" widget="statinfo" />
+                        </button>
                         <button name="action_open_linked_assets"
                             type="object"
                             class="oe_stat_button"
-                            icon="fa-id-card-o"
+                            icon="badge"
                             invisible="count_linked_asset == 0 or warning_count_assets">
                             <field string="Asset(s)" name="count_linked_asset" widget="statinfo"/>
                         </button>
                         <button name="action_open_linked_assets"
                             type="object"
                             class="oe_stat_button text-danger"
-                            icon="fa-id-card-o"
+                            icon="badge"
                             invisible="count_linked_asset == 0 or not warning_count_assets">
                             <field string="Asset(s)" name="count_linked_asset" widget="statinfo"/>
                         </button>
-                        <button class="oe_stat_button" name="open_entries"  type="object" icon="fa-bars" data-hotkey="p">
+                        <button class="oe_stat_button" name="open_related_items" type="object" icon="menu" data-hotkey="r" invisible="original_move_lines_count == 0">
+                            <field string="Related Items" name="original_move_lines_count" widget="statinfo" />
+                        </button>
+                        <button class="oe_stat_button" name="open_entries"  type="object" icon="menu" data-hotkey="shift+p">
                             <field string="Posted Entries" name="depreciation_entries_count" widget="statinfo" />
                         </button>
-                        <button class="oe_stat_button" name="open_increase"  type="object" icon="fa-chevron-circle-up" invisible="gross_increase_count == 0">
+                        <button class="oe_stat_button" name="open_increase"  type="object" icon="expand_circle_up" icon_class="oi-filled" invisible="gross_increase_count == 0">
                             <field string="Gross Increase" name="gross_increase_count" widget="statinfo" />
                         </button>
-                        <button class="oe_stat_button" string="Parent Asset" name="open_parent_id" type="object" icon="fa-bars" invisible ="not parent_id"/>
+                        <button class="oe_stat_button" string="Original Asset" name="open_origin_asset" type="object" icon="arrow_circle_left" icon_class="oi-filled" invisible="not origin_asset_id"/>
+                        <button class="oe_stat_button" string="Active Asset" name="open_derived_assets" type="object" icon="arrow_circle_right" icon_class="oi-filled" invisible="not derived_asset_ids"/>
+                        <button class="oe_stat_button" string="Parent Asset" name="open_variant_parent_id" type="object" icon="menu" invisible ="not parent_id"/>
+                        <button class="oe_stat_button" name="open_variants" type="object" icon="stacks" invisible="variant_count &lt; 2 or (variant_count == 2 and not is_main_variant) or warning_sub_assets">
+                            <field string="Sub-Assets" name="variant_ledger_names" widget="statinfo" />
+                        </button>
+                        <button class="oe_stat_button text-danger" name="open_variants" type="object" icon="stacks" invisible="variant_count &lt; 2 or (variant_count == 2 and not is_main_variant) or not warning_sub_assets">
+                            <field string="Sub-Assets" name="variant_ledger_names" widget="statinfo" />
+                        </button>
                     </div>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                     <div class="oe_title">
-                        <label for="name" name="name_label" invisible="state == 'model'"/>
-                        <label for="name" name="model_name_label" string="Asset Model name" invisible="state != 'model'"/>
+                        <label for="name" name="name_label"/>
                         <h1>
-                            <field name="name" placeholder="e.g. Laptop iBook" required="1"/>
+                            <field name="name" placeholder="e.g. Laptop iBook" required="1" readonly="not is_main_variant"/>
                         </h1>
                     </div>
-                    <group invisible="state != 'model'">
-                        <group string="Depreciation Method">
-                            <field name="method" required="1" readonly="state not in ['draft', 'model']" />
-                            <label for="method_progress_factor" invisible="method == 'linear'"/>
-                            <div class="o_row" invisible="method == 'linear'">
-                                <field class="oe_inline" name="method_progress_factor" widget="percentage" readonly="state not in ['draft', 'model']" required="method in ('degressive', 'degressive_then_linear')"/>
-                                <span> per year</span>
-                            </div>
-                            <label for="method_number" string="Duration"/>
-                            <div class="o_row">
-                                <field name="method_number" required="1" readonly="state not in ['draft', 'model']"/>
-                                <field name="method_period" required="1" readonly="state not in ['draft', 'model']" nolabel="1"/>
-                            </div>
-                            <field name="prorata_computation_type" readonly="state not in ['draft', 'model']"/>
-                            <label for="salvage_value_pct"/>
-                            <div>
-                                <field name="salvage_value_pct" widget="percentage" class="oe_inline"/>
-                            </div>
-                        </group>
-                        <group string="Accounting">
-                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company" readonly="state != 'draft'"/>
-                            <field
-                                name="account_asset_id"
-                                domain="[
-                                    ('company_ids', 'parent_of', company_id),
-                                    ('account_type', 'in', (
-                                        'asset_fixed',
-                                        'asset_non_current',
-                                        'asset_current')
-                                    ),
-                                ]"
-                                context="{
-                                    'default_account_type': 'asset_fixed',
-                                    'hide_model_on_account': state == 'model' and not id,
-                                    'account_type_domain': [('account_type', 'in', (
-                                        'asset_fixed',
-                                        'asset_non_current'))]}"
-                                groups="base.group_no_one"
-                                invisible="not display_account_asset_id"
-                                readonly="state == 'close'"/>
-                            <field
-                                name="account_depreciation_id"
-                                domain="[
-                                    ('company_ids', 'parent_of', company_id),
-                                    ('account_type', 'in', (
-                                        'asset_fixed',
-                                        'asset_non_current',
-                                        'asset_current')
-                                    ),
-                                ]"
-                                context="{
-                                    'default_account_type': 'asset_non_current',
-                                    'hide_model_on_account': state == 'model' and not id,
-                                    'account_type_domain': [('account_type', 'in', (
-                                        'asset_fixed',
-                                        'asset_non_current'))]}"
-                                required="1"
-                                readonly="state == 'close'"/>
-                            <field
-                                name="account_depreciation_expense_id"
-                                domain="[
-                                    ('company_ids', 'parent_of', company_id),
-                                    ('account_type', 'in', (
-                                        'expense_depreciation',
-                                        'expense')
-                                    ),
-                                ]"
-                                context="{
-                                    'default_account_type': 'expense_depreciation',
-                                    'default_tax_ids': [],
-                                    'hide_model_on_account': state == 'model' and not id,
-                                    'account_type_domain': [('account_type', 'in', (
-                                        'expense_depreciation',
-                                        'expense'))]}"
-                                required="1"
-                                readonly="state == 'close'"/>
-                            <field name="journal_id" required="1" readonly="state not in ['draft', 'model']"/>
-                        </group>
-                    </group>
-                    <notebook colspan="4" invisible="state == 'model'">
+                    <notebook colspan="4">
                         <page string="Asset" name="main_page">
                             <group>
                                 <field name="active" invisible="1"/>
                                 <field name="asset_properties" columns="2"/>
-                                <group string="Asset Values" invisible="state == 'model'" name="asset_values">
-                                    <field name="original_value" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="state == 'model'" readonly="state != 'draft'"/>
-                                    <field name="gross_increase_value" widget="monetary" invisible="state == 'model' or gross_increase_value == 0" options="{'currency_field': 'currency_id'}"/>
-                                    <field name="acquisition_date" invisible="state == 'model'" readonly="state != 'draft'"/>
-                                    <field  name="model_id"
-                                            string="Asset Model"
-                                            domain="[('state', '=', 'model')]"
-                                            options="{'no_quick_create': True}"
-                                            context="{
-                                                'default_state': 'model',
-                                                'default_account_asset_id': account_asset_id,
-                                                'default_account_depreciation_id': account_depreciation_id,
-                                                'default_account_depreciation_expense_id': account_depreciation_expense_id
-                                            }" readonly="state != 'draft'"/>
-                                    <field name="asset_group_id"/>
-                                </group>
-                                <group string="Current Values" invisible="state == 'model'" name="current_values">
-                                    <field name="salvage_value" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="state != 'draft'"/>
-                                    <label for="book_value"/>
+                                <group string="Asset Values" name="asset_values">
+                                    <label for="original_value"/>
                                     <span>
-                                        <field name="book_value" class="oe_inline" widget="monetary" required="1" invisible="state == 'model'" options="{'currency_field': 'currency_id'}"/>
-                                        <span invisible="salvage_value == 0">
-                                            (incl.
-                                            <field name="value_residual" nolabel="1" force_save="1" widget="monetary" invisible="state == 'model'" options="{'currency_field': 'currency_id'}"/>
-                                             depreciable)
+                                        <field name="original_value" class="oe_inline" readonly="state != 'draft' or not is_main_variant"/>
+                                        <span class="text-muted" invisible="non_deductible_tax_value == 0">
+                                            (<field name="related_purchase_value" nolabel="1" class="oe_inline"/>
+                                             tax excl.)
                                         </span>
                                     </span>
-                                </group>
-                                <group string="Depreciation Method">
-                                    <field name="method" required="1" readonly="state not in ['draft', 'model']" />
-                                    <label for="method_progress_factor" invisible="method == 'linear'"/>
-                                    <div class="o_row" invisible="method == 'linear'">
-                                        <field class="oe_inline" name="method_progress_factor" widget="percentage" readonly="state not in ['draft', 'model']" required="method in ('degressive', 'degressive_then_linear')"/>
-                                        <span> per year</span>
-                                    </div>
-                                    <label for="method_number" string="Duration"/>
-                                    <div class="o_row">
-                                        <field name="method_number" required="1" readonly="state not in ['draft', 'model']" class="oe_inline"/>
-                                        <field name="method_period" required="1" readonly="state not in ['draft', 'model']" nolabel="1"/>
-                                    </div>
-                                    <field name="prorata_computation_type" readonly="state not in ['draft', 'model']"/>
-                                    <field name="prorata_date" invisible="prorata_computation_type == 'none'" readonly="state != 'draft'"/>
-                                </group>
-                                <group string="Accounting">
-                                    <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                                    <field name="gross_increase_value" widget="monetary" invisible="gross_increase_value == 0" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="acquisition_date" readonly="state != 'draft' or not is_main_variant"/>
                                     <field
                                         name="account_asset_id"
                                         domain="[
                                             ('company_ids', 'parent_of', company_id),
-                                            ('account_type', 'in', (
-                                                'asset_fixed',
-                                                'asset_non_current',
-                                                'asset_current')
-                                            ),
+                                            ('depreciation_model_id', '!=', None),
                                         ]"
                                         context="{
                                             'default_account_type': 'asset_fixed',
-                                            'hide_model_on_account': state == 'model' and not id,
                                             'account_type_domain': [('account_type', 'in', (
                                                 'asset_fixed',
                                                 'asset_non_current'))]}"
-                                        invisible="not display_account_asset_id"
-                                        readonly="state == 'close'"/>
-                                    <field
-                                        name="account_depreciation_id"
-                                        domain="[
-                                            ('company_ids', 'parent_of', company_id),
-                                            ('account_type', 'in', (
-                                                'asset_fixed',
-                                                'asset_non_current',
-                                                'asset_current')
-                                            ),
-                                        ]"
-                                        context="{
-                                            'default_account_type': 'asset_non_current',
-                                            'hide_model_on_account': state == 'model' and not id,
-                                            'account_type_domain': [('account_type', 'in', (
-                                                'asset_fixed',
-                                                'asset_non_current'))]}"
+                                        invisible="original_move_line_ids"
                                         required="1"
-                                        readonly="state == 'close'"/>
+                                        readonly="state != 'draft' or not is_main_variant"/>
+                                    <field name="asset_group_id" readonly="not is_main_variant"/>
+                                </group>
+                                <group string="Current Values" name="current_values">
+                                    <field name="salvage_value" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="state != 'draft'" invisible="not is_main_variant"/>
+                                    <label for="book_value"/>
+                                    <span>
+                                        <field name="book_value" class="oe_inline" widget="monetary" required="1" options="{'currency_field': 'currency_id'}"/>
+                                        <span invisible="salvage_value == 0 or not is_main_variant">
+                                            (incl.
+                                            <field name="value_residual" nolabel="1" force_save="1" class="oe_inline" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                             depreciable)
+                                        </span>
+                                    </span>
+                                    <field name="already_depreciated_amount_import" readonly="state != 'draft'" invisible="not is_main_variant"/>
+                                </group>
+                                <group string="Depreciation Method">
                                     <field
-                                        name="account_depreciation_expense_id"
-                                        domain="[
-                                            ('company_ids', 'parent_of', company_id),
-                                            ('account_type', 'in', (
-                                                'expense_depreciation',
-                                                'expense')
-                                            ),
-                                        ]"
-                                        context="{
-                                            'default_account_type': 'expense_depreciation',
-                                            'hide_model_on_account': state == 'model' and not id,
-                                            'account_type_domain': [('account_type', 'in', (
-                                                'expense_depreciation',
-                                                'expense'))]}"
-                                        required="1"
-                                        readonly="state == 'close'"/>
-                                    <field name="journal_id" required="1" readonly="state not in ['draft', 'model']"/>
-                                    <field name="analytic_distribution" groups="analytic.group_analytic_accounting" widget="analytic_distribution"
+                                        name="model_id"
+                                        domain="['|', ('journal_id.journal_group_id', '=', False), ('journal_id', '=', False)]"
+                                        string="Depreciation Model"
+                                        options="{'no_quick_create': True}"
+                                        readonly="state != 'draft' or not is_main_variant"
+                                        required="1"/>
+                                    <field name="prorata_computation_type" readonly="state != 'draft'" invisible="method == 'no_depreciation'"/>
+                                </group>
+                                <group string="Accounting">
+                                    <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                                    <field name="journal_id" invisible="method == 'no_depreciation'"/>
+                                    <field name="analytic_distribution" string="Analytic" groups="analytic.group_analytic_accounting" widget="analytic_distribution"
                                            options="{'account_field': 'account_depreciation_expense_id', 'business_domain': 'general'}"
                                            readonly="0"/>
-                                </group>
-                                <group string="Value at Import" invisible="state == 'model'">
-                                    <field name="already_depreciated_amount_import" string="Depreciated Amount" readonly="state != 'draft'"/>
                                 </group>
                             </group>
                         </page>
                         <page string="Depreciation Board" name="depreciation_board" invisible="total_depreciation_entries_count == 0">
                             <field name="depreciation_move_ids" mode="list" options="{'reload_whole_on_button': true}" readonly="state not in ['draft', 'open', 'paused']">
-                                <list string="Depreciation Lines" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" create="0"  default_order="date asc, id asc" editable="top">
+                                <list string="Depreciation Lines" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" create="0" default_order="date asc, id asc" editable="top">
                                     <field name="currency_id" column_invisible="True" readonly="state in ['cancel', 'posted']"/>
                                     <field name="date" string="Depreciation Date" readonly="state in ['cancel', 'posted']"/>
                                     <field name="ref" invisible="0"/>
                                     <field name="reversal_move_ids" widget="deprec_lines_reversed" nolabel="1"/>
-                                    <field name="depreciation_value" widget="monetary" string="Depreciation" options="{'currency_field': 'currency_id'}" readonly="state == 'posted'"/>
+                                    <field name="depreciation_value" widget="monetary" string="Depreciation"
+                                        options="{'currency_field': 'currency_id'}" readonly="state == 'posted' or not parent.is_main_variant"/>
                                     <field name="asset_depreciated_value" readonly="1" force_save="1" options="{'currency_field': 'currency_id'}"/>
-                                    <field name="asset_remaining_value" readonly="1" widget="monetary" force_save="1" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="asset_remaining_value" readonly="1" widget="monetary" force_save="1" options="{'currency_field': 'currency_id'}" column_invisible="not parent.is_main_variant"/>
                                     <field name="name" readonly="1" string="Journal Entry" widget="open_move_widget"/>
                                     <field name="state" column_invisible="True"/>
                                 </list>
@@ -272,10 +163,15 @@
                                 domain="[
                                     ('parent_state', '=', 'posted'),
                                     ('company_id', '=', company_id),
-                                    ('account_id.account_type', 'in', ('asset_fixed', 'asset_non_current', 'asset_current')),
                                     ('move_id.move_type', 'in', ('in_invoice', 'in_refund', 'in_receipt', 'entry')),
-                                    ('move_id.asset_id', '=', False),
-                                ]"
+                                    ('move_id.asset_variant_id', '=', False),
+                                    ('tax_line_id', '=', False),
+                                    ('tax_repartition_line_id', '=', False),
+                                    ] + (
+                                        [('account_id', '=', account_asset_id)]
+                                        if account_asset_id
+                                        else [('account_id.account_type', 'in', ('asset_fixed', 'asset_non_current', 'asset_current'))]
+                                    )"
                                 class="original_move_line_ids_field"
                                 context="{'disable_preview': 1, 'list_view_ref': 'account_asset.view_move_line_tree_asset'}">
                                 <list create="0" no_open="1">
@@ -307,7 +203,9 @@
                         <div class="row mb4">
                             <field name="name" class="fw-bold fs-5 col-10"/>
                             <div class="col-2">
-                                <field name="state" class="float-end" widget="label_selection" options="{'classes': {'draft': 'primary', 'open': 'success', 'close': 'default'}}"/>
+                                <field name="state" class="float-end" widget="badge"
+                                       decoration-info="state == 'draft'"
+                                       decoration-success="state == 'open'"/>
                             </div>
                         </div>
                         <div class="row">
@@ -328,14 +226,6 @@
                         </div>
                         <div class="row">
                             <div class="col-5">
-                                Duration
-                            </div>
-                            <div class="col-7 text-end">
-                                <field name="method_number" readonly="state not in ['draft', 'model']"/> <field name="method_period" readonly="state not in ['draft', 'model']"/>
-                            </div>
-                        </div>
-                        <div class="row" t-if="record.model_id.value">
-                            <div class="col-5">
                                 Model
                             </div>
                             <div class="col-7 text-end">
@@ -352,43 +242,25 @@
         <field name="name">account.asset.list</field>
         <field name="model">account.asset</field>
         <field name="arch" type="xml">
-            <list string="Assets" decoration-info="(state == 'draft')" decoration-muted="(state in ['close', 'cancelled'])" decoration-warning="(state == 'close' and value_residual != 0)" sample="1" multi_edit="1" open_form_view="True">
+            <list string="Assets" decoration-info="(state == 'draft')" decoration-muted="(state in ['close', 'cancelled'])" decoration-warning="(state == 'close' and value_residual != 0)" sample="1" multi_edit="1">
                 <field name="name" readonly="state != 'draft'"/>
                 <field name="asset_properties" readonly="state != 'draft'"/>
                 <field name="acquisition_date" readonly="state != 'draft'"/>
                 <field name="original_value" readonly="state != 'draft'"/>
-                <field name="method" readonly="state not in ['draft', 'model']"/>
                 <field name="book_value" readonly="1"/>
-                <field name="value_residual" widget="monetary" readonly="1"/>
-                <field name="account_asset_id" readonly="state not in ['draft', 'open']"/>
-                <field name="account_depreciation_id" readonly="state not in ['draft', 'open']"/>
-                <field name="account_depreciation_expense_id" readonly="state not in ['draft', 'open']"/>
-                <field name="analytic_distribution" widget="analytic_distribution" groups="analytic.group_analytic_accounting" readonly="state not in ['draft', 'open']"/>
-                <field name="currency_id" groups="base.group_multi_currency" optional="hide"/>
+                <field name="value_residual" widget="monetary" readonly="1" optional="hide"/>
+                <field name="account_asset_id" width="120px" readonly="state not in ['draft', 'open']"/>
+                <field name="analytic_distribution" widget="analytic_distribution" groups="analytic.group_analytic_accounting" options="{'multi_edit': true}" optional="hide"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="state != 'draft'"/>
                 <field name="company_id" groups="!base.group_multi_company" column_invisible="True" readonly="state != 'draft'"/>
                 <field name="parent_id" optional="hide" readonly="1"/>
-                <field name="state" readonly="1"/>
+                <field name="model_id" string="Depreciation Model" readonly="state != 'draft'"/>
+                <field name="asset_group_id"/>
+                <field name="main_variant_state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'open'" readonly="1"/>
+                <field name="already_depreciated_amount_import" string="Depreciated Amount" readonly="state != 'draft'" optional="hide"/>
+                <field name="salvage_value" widget="monetary" readonly="state != 'draft'" optional="hide"/>
                 <field name="activity_exception_decoration" widget="activity_exception" readonly="1"/>
                 <field name="activity_ids" widget="list_activity" optional="hide" readonly="1"/>
-            </list>
-        </field>
-    </record>
-
-    <record model="ir.ui.view" id="view_account_asset_model_tree">
-        <field name="name">account.asset.model.list</field>
-        <field name="model">account.asset</field>
-        <field name="arch" type="xml">
-            <list string="Asset Models">
-                <field name="name"/>
-                <field name="account_asset_id" readonly="state == 'close'"/>
-                <field name="account_depreciation_id" readonly="state == 'close'"/>
-                <field name="account_depreciation_expense_id"/>
-                <field name="method" readonly="state not in ['draft', 'model']"/>
-                <field name="method_number" string="Number of Depreciations" readonly="state not in ['draft', 'model']"/>
-                <field name="method_period" string="Period length" readonly="state not in ['draft', 'model']"/>
-                <field name="company_id" column_invisible="True" readonly="state != 'draft'"/>
-                <field name="state" column_invisible="True"/>
             </list>
         </field>
     </record>
@@ -400,9 +272,9 @@
             <search string="Asset Account">
                 <field name="name" string="Asset"/>
                 <field name="acquisition_date"/>
-                <filter string="Current" name="current" domain="[('state','in', ('draft','open'))]" help="Assets in draft and open states"/>
-                <filter string="Closed" name="closed" domain="[('state','=', 'close')]" help="Assets in closed state"/>
-                <field name="model_id" string="Asset Model"/>
+                <filter string="Current" name="current" domain="[('main_variant_state','in', ('draft','open'))]" help="Assets in draft and open states"/>
+                <filter string="Closed" name="closed" domain="[('main_variant_state','=', 'close')]" help="Assets in closed state"/>
+                <field name="model_id" string="Depreciation Model"/>
                 <separator/>
                 <field name="asset_properties"/>
                 <filter invisible="1" string="My Activities" name="filter_activities_my"
@@ -419,26 +291,8 @@
                 <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
                 <group>
                         <filter string="Date" name="month" domain="[]" context="{'group_by':'acquisition_date'}"/>
-                        <filter string="Asset Model" name="model" domain="[]" context="{'group_by':'model_id'}"/>
+                        <filter string="Depreciation Model" name="model" domain="[]" context="{'group_by':'model_id'}"/>
                         <filter string="Properties" name="group_by_properties" context="{'group_by': 'asset_properties'}"/>
-                </group>
-            </search>
-        </field>
-    </record>
-
-    <record id="view_account_asset_model_search" model="ir.ui.view">
-        <field name="name">account.asset.model.search</field>
-        <field name="model">account.asset</field>
-        <field name="priority">100</field>
-        <field name="arch" type="xml">
-            <search string="Asset Model">
-                <field name="name"/>
-                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
-                <group>
-                        <filter string="Fixed Asset Account" name="account_asset_id" domain="[]" context="{'group_by':'account_asset_id'}"/>
-                        <filter string="Depreciation Account" name="account_depreciation_id" domain="[]" context="{'group_by':'account_depreciation_id'}"/>
-                        <filter string="Expense Account" name="account_depreciation_expense_id" domain="[]" context="{'group_by':'account_depreciation_expense_id'}"/>
-                        <filter string="Journal" name="journal_id" domain="[]" context="{'group_by':'journal_id'}"/>
                 </group>
             </search>
         </field>
@@ -453,7 +307,7 @@
             (0, 0, {'view_mode': 'kanban'}),
             (0, 0, {'view_mode': 'activity'}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('view_account_asset_form')})]"/>
-        <field name="domain">[('state', '!=', 'model'), ('parent_id', '=', False)]</field>
+        <field name="domain">[('main_variant_parent_id', '=', False)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Import your fixed assets' original data and their already accumulated depreciation.
@@ -465,27 +319,7 @@
 
     </record>
 
-    <record model="ir.actions.act_window" id="action_account_asset_model_form">
-        <field name="name">Asset Models</field>
-        <field name="res_model">account.asset</field>
-        <field name="path">asset-models</field>
-        <field name="view_mode">list,kanban,form</field>
-        <field name="view_ids" eval="[(5, 0, 0),
-            (0, 0, {'view_mode': 'list', 'view_id': ref('view_account_asset_model_tree')}),
-            (0, 0, {'view_mode': 'kanban'}),
-            (0, 0, {'view_mode': 'form', 'view_id': ref('view_account_asset_form')})]"/>
-        <field name="search_view_id" ref="view_account_asset_model_search"/>
-        <field name="domain">[('state', '=', 'model')]</field>
-        <field name="context">{'default_state': 'model'}</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create new asset model
-            </p>
-        </field>
-    </record>
-
     <menuitem parent="accountant.account_assets_liabilities_menu" id="menu_action_account_asset_form" action="action_account_asset_form" sequence="60" groups="account.group_account_readonly"/>
-    <menuitem parent="account.account_account_menu" id="menu_action_account_asset_model_form" action="action_account_asset_model_form" groups="account.group_account_readonly"/>
 
     <record model="ir.actions.server" id="action_account_asset_run">
         <field name="name">Confirm</field>

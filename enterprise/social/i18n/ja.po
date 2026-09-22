@@ -8,34 +8,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-27 22:48+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/social/"
-"ja/>\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-18 04:08+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
+"social/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_media__accounts_count
 msgid "# Accounts"
-msgstr "アカウント数"
-
-#. module: social
-#. odoo-python
-#: code:addons/social/models/social_post.py:0
-msgid "%(media_name)s (max %(max_chars)s chars)"
-msgstr "%(media_name)s (最大 %(max_chars)s 文字)"
+msgstr "勘定科目数"
 
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
-msgid ", you must first link a social media."
-msgstr "、まずはソーシャルメディアにリンクして下さい。"
+msgid "+ Add"
+msgstr ""
 
 #. module: social
 #: model_terms:ir.ui.view,arch_db:social.social_http_error_view
@@ -43,26 +37,48 @@ msgid "<b>An error occurred while trying to link your account</b>"
 msgstr "<b>アカウントのリンク試行中にエラーが発生しました</b>"
 
 #. module: social
-#: model_terms:ir.ui.view,arch_db:social.social_post_view_kanban
-msgid "<i class=\"fa fa-calendar me-1 small fw-bold\" title=\"Calendar\"/>"
-msgstr "<i class=\"fa fa-calendar me-1 small fw-bold\" title=\"Calendar\"/>"
-
-#. module: social
-#: model_terms:ir.ui.view,arch_db:social.social_post_view_kanban
-msgid ""
-"<i class=\"fa fa-calendar-check-o me-1 small fw-bold\" title=\"Calendar\"/>"
+#: model_terms:ir.ui.view,arch_db:social.social_http_authentication_redirect
+msgid "<b>Connecting your account...</b>"
 msgstr ""
-"<i class=\"fa fa-calendar-check-o me-1 small fw-bold\" title=\"Calendar\"/>"
 
 #. module: social
 #: model_terms:ir.ui.view,arch_db:social.social_post_view_form
-msgid "<i class=\"fa fa-globe ms-1\" title=\"See the post\"/>"
-msgstr "<i class=\"fa fa-globe ms-1\" title=\"See the post\"/>"
+msgid "<i class=\"oi oi-filled me-2\" data-icon=\"share\" title=\"Shares\"/>"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "<i class=\"oi oi-filled me-2\" data-icon=\"thumb_up\" title=\"Likes\"/>"
+msgstr ""
 
 #. module: social
 #: model_terms:ir.ui.view,arch_db:social.social_http_error_view
-msgid "<i class=\"oi oi-arrow-left\"/> Go back to Odoo"
-msgstr "<i class=\"oi oi-arrow-left\"/>Odooに戻る"
+msgid "<i class=\"oi\" data-icon=\"west\"/> Go back to Odoo"
+msgstr "<i class=\"oi\" data-icon=\"west\"/>Odooに戻る"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
+msgid ""
+"<span invisible=\"min_calendar_date\" class=\"fw-bold d-inline-block ms-"
+"auto\">-</span>"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_form
+msgid ""
+"<span invisible=\"not is_livechat_webhook_registered\" class=\"badge rounded-"
+"pill text-bg-success\">\n"
+"                                                        Connected\n"
+"                                                    </span>"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid ""
+"<span>\n"
+"                            Your Post is being published...\n"
+"                        </span>"
+msgstr ""
 
 #. module: social
 #: model_terms:web_tour.tour,rainbow_man_message:social.social_tour
@@ -74,6 +90,16 @@ msgstr ""
 "strong>"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_live_post__account_link
+msgid "Account Link"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
+msgid "Accounts"
+msgstr ""
+
+#. module: social
 #: model:ir.model.fields,field_description:social.field_social_media__message_needaction
 #: model:ir.model.fields,field_description:social.field_social_post__message_needaction
 msgid "Action Needed"
@@ -82,7 +108,7 @@ msgstr "要アクション"
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_account__active
 msgid "Active"
-msgstr "アクティブ"
+msgstr "有効"
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_post__activity_ids
@@ -95,6 +121,11 @@ msgid "Activity Exception Decoration"
 msgstr "例外の活動を示す装飾"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_post__activity_plans_ids
+msgid "Activity Plans"
+msgstr "活動計画"
+
+#. module: social
 #: model:ir.model.fields,field_description:social.field_social_post__activity_state
 msgid "Activity State"
 msgstr "活動ステータス"
@@ -105,47 +136,30 @@ msgid "Activity Type Icon"
 msgstr "活動タイプアイコン"
 
 #. module: social
-#. odoo-javascript
-#: code:addons/social/static/src/xml/social_templates.xml:0
-msgid "Add"
-msgstr "追加"
-
-#. module: social
-#: model_terms:ir.ui.view,arch_db:social.utm_campaign_view_form
-msgid "Add Post"
-msgstr "投稿を追加"
+#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
+msgid "Add Media"
+msgstr ""
 
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
-msgid "Add Stream"
-msgstr "ストリームを追加"
-
-#. module: social
-#. odoo-javascript
-#: code:addons/social/static/src/js/add_stream_modal.js:0
-#: code:addons/social/static/src/js/stream_post_kanban_controller.js:0
-msgid "Add a Stream"
-msgstr "ストリームを追加"
-
-#. module: social
-#: model_terms:ir.actions.act_window,help:social.action_social_stream_post
-msgid "Add a stream"
-msgstr "ストリームを追加"
+msgid "Add a Stream from an existing account"
+msgstr ""
 
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "Add an image"
-msgstr "画像を追加する"
+msgstr "画像を追加"
 
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "All Companies"
-msgstr "全ての会社"
+msgstr "すべての会社"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_marketing_campaign__social_post_ids
 #: model:ir.model.fields,field_description:social.field_utm_campaign__social_post_ids
 msgid "All related social media posts"
 msgstr "すべての関連するソーシャルメディア投稿"
@@ -156,15 +170,28 @@ msgid "Allowed Accounts"
 msgstr "許可されたアカウント"
 
 #. module: social
+#. odoo-python
+#: code:addons/social/models/social_post.py:0
+msgid "Almost ready! Just select which accounts you'd like to post from."
+msgstr ""
+
+#. module: social
 #: model_terms:ir.ui.view,arch_db:social.social_account_view_search
 msgid "Archived"
 msgstr "アーカイブ済"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_im_livechat_channel__has_active_accounts
 #: model:ir.model.fields,field_description:social.field_social_post__has_active_accounts
 #: model:ir.model.fields,field_description:social.field_social_post_template__has_active_accounts
 msgid "Are Accounts Available?"
 msgstr "アカウントは利用可能ですか？"
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/js/add_stream_modal.js:0
+msgid "Are you sure you want to delete this account?"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_post__image_ids
@@ -178,10 +205,25 @@ msgid "Attached Images"
 msgstr "添付画像"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_post_image__attachment_id
+msgid "Attachment"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__attachment_content_type
+msgid "Attachment Content Type"
+msgstr ""
+
+#. module: social
 #: model:ir.model.fields,field_description:social.field_social_media__message_attachment_count
 #: model:ir.model.fields,field_description:social.field_social_post__message_attachment_count
 msgid "Attachment Count"
 msgstr "添付数"
+
+#. module: social
+#: model:ir.model.fields,help:social.field_social_stream_post__stream_post_attachment_ids
+msgid "Attachments shared with this post."
+msgstr ""
 
 #. module: social
 #. odoo-javascript
@@ -203,12 +245,22 @@ msgstr "著者リンク"
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_stream_post__author_name
 msgid "Author Name"
-msgstr "作成者名"
+msgstr "著者名"
 
 #. module: social
 #: model:ir.model.fields,help:social.field_social_stream_post__author_link
 msgid "Author link to the external social.media (ex: link to the X Account)."
 msgstr "外部 social.media への著者リンク(例: Xアカウントへのリンク)"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_form
+msgid "Auto-reply message for when operators are offline."
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_form
+msgid "Away Message"
+msgstr ""
 
 #. module: social
 #: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
@@ -226,7 +278,6 @@ msgid "CSRF Token"
 msgstr "CSRFトークン"
 
 #. module: social
-#: model:ir.model.fields,field_description:social.field_social_post__calendar_date
 #: model_terms:ir.ui.view,arch_db:social.social_post_view_search
 msgid "Calendar Date"
 msgstr "カレンダ日付"
@@ -265,6 +316,17 @@ msgid "Cancel"
 msgstr "キャンセル"
 
 #. module: social
+#: model:ir.model.fields.selection,name:social.selection__social_live_post__state__cancel
+msgid "Cancelled"
+msgstr ""
+
+#. module: social
+#: model:ir.actions.act_window,name:social.im_livechat_channel_action_social
+#: model:ir.ui.menu,name:social.social_live_channels
+msgid "Channels"
+msgstr ""
+
+#. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/js/tours/social.js:0
 msgid "Choose which <b>account</b> you would like to link first."
@@ -282,15 +344,40 @@ msgid "Clicks"
 msgstr "クリック数"
 
 #. module: social
-#: model_terms:ir.ui.view,arch_db:social.social_post_view_kanban
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
 msgid "Clicks:"
 msgstr "クリック:"
 
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
+msgid "Comment GIF"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "Comment Image"
 msgstr "コメント画像"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
+msgid ""
+"Comment your own post to get the conversation going or share some extra "
+"content."
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_live_post__comments_count
+#: model:ir.model.fields,field_description:social.field_social_post__comments_count
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Comments"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
+msgid "Comments:"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_account__company_id
@@ -316,6 +403,33 @@ msgstr "設定"
 
 #. module: social
 #. odoo-javascript
+#: code:addons/social/static/src/js/social_action_connect_account.js:0
+msgid "Connect Your Account"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/xml/social_templates.xml:0
+msgid "Connect a new Account"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.actions.act_window,help:social.action_social_stream_post
+msgid "Connect an Account"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_account_view_list
+msgid "Connected By"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_search
+msgid "Connected to Social"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "Connecting Problem"
 msgstr "接続の問題"
@@ -328,6 +442,11 @@ msgid ""
 msgstr ""
 "このアカウントを作成した人のソーシャルメディアハンドルを含む。例:  'Odoo' Xア"
 "カウント用の'@odoo.official'"
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__content_url
+msgid "Content URL"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,help:social.field_social_live_post__message
@@ -353,6 +472,7 @@ msgstr "キャンペーンを作成"
 
 #. module: social
 #: model_terms:ir.actions.act_window,help:social.action_social_post
+#: model_terms:ir.actions.act_window,help:social.action_social_post_pivot
 msgid "Create a Post"
 msgstr "投稿を作成"
 
@@ -371,10 +491,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:social.field_social_live_post__create_uid
 #: model:ir.model.fields,field_description:social.field_social_media__create_uid
 #: model:ir.model.fields,field_description:social.field_social_post__create_uid
+#: model:ir.model.fields,field_description:social.field_social_post_image__create_uid
 #: model:ir.model.fields,field_description:social.field_social_post_template__create_uid
 #: model:ir.model.fields,field_description:social.field_social_stream__create_uid
 #: model:ir.model.fields,field_description:social.field_social_stream_post__create_uid
-#: model:ir.model.fields,field_description:social.field_social_stream_post_image__create_uid
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__create_uid
 #: model:ir.model.fields,field_description:social.field_social_stream_type__create_uid
 msgid "Created by"
 msgstr "作成者"
@@ -384,10 +505,11 @@ msgstr "作成者"
 #: model:ir.model.fields,field_description:social.field_social_live_post__create_date
 #: model:ir.model.fields,field_description:social.field_social_media__create_date
 #: model:ir.model.fields,field_description:social.field_social_post__create_date
+#: model:ir.model.fields,field_description:social.field_social_post_image__create_date
 #: model:ir.model.fields,field_description:social.field_social_post_template__create_date
 #: model:ir.model.fields,field_description:social.field_social_stream__create_date
 #: model:ir.model.fields,field_description:social.field_social_stream_post__create_date
-#: model:ir.model.fields,field_description:social.field_social_stream_post_image__create_date
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__create_date
 #: model:ir.model.fields,field_description:social.field_social_stream_type__create_date
 msgid "Created on"
 msgstr "作成日"
@@ -410,7 +532,6 @@ msgstr "このアカウントに統計の傾向があるかどうかを定義し
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/js/stream_post_comment.js:0
-#: code:addons/social/static/src/js/stream_post_comments.js:0
 #: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "Delete"
 msgstr "削除"
@@ -420,6 +541,11 @@ msgstr "削除"
 #: code:addons/social/static/src/js/stream_post_comment.js:0
 msgid "Delete Comment"
 msgstr "コメントを削除"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_account_view_form
+msgid "Delete Livechat Webhook"
+msgstr ""
 
 #. module: social
 #. odoo-javascript
@@ -443,10 +569,26 @@ msgid "Developer Accounts"
 msgstr "開発者アカウント"
 
 #. module: social
+#: model:ir.model,name:social.model_digest_digest
+msgid "Digest"
+msgstr "ダイジェスト"
+
+#. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
 msgid "Discard"
 msgstr "破棄"
+
+#. module: social
+#: model:ir.model.fields,help:social.field_im_livechat_channel__social_discuss_channel_need_action_ids
+msgid "Discuss channel for which no operator could have been found"
+msgstr ""
+
+#. module: social
+#: model:ir.model,name:social.model_discuss_channel
+msgid "Discussion Channel"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_post__display_message
@@ -455,33 +597,42 @@ msgid "Display Message"
 msgstr "メッセージを表示"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_digest_digest__display_name
+#: model:ir.model.fields,field_description:social.field_discuss_channel__display_name
+#: model:ir.model.fields,field_description:social.field_im_livechat_channel__display_name
+#: model:ir.model.fields,field_description:social.field_mail_message__display_name
 #: model:ir.model.fields,field_description:social.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:social.field_social_account__display_name
 #: model:ir.model.fields,field_description:social.field_social_live_post__display_name
 #: model:ir.model.fields,field_description:social.field_social_media__display_name
 #: model:ir.model.fields,field_description:social.field_social_post__display_name
+#: model:ir.model.fields,field_description:social.field_social_post_image__display_name
 #: model:ir.model.fields,field_description:social.field_social_post_template__display_name
 #: model:ir.model.fields,field_description:social.field_social_stream__display_name
 #: model:ir.model.fields,field_description:social.field_social_stream_post__display_name
-#: model:ir.model.fields,field_description:social.field_social_stream_post_image__display_name
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__display_name
 #: model:ir.model.fields,field_description:social.field_social_stream_type__display_name
 #: model:ir.model.fields,field_description:social.field_utm_campaign__display_name
-#: model:ir.model.fields,field_description:social.field_utm_medium__display_name
-#: model:ir.model.fields,field_description:social.field_utm_source__display_name
 msgid "Display Name"
 msgstr "表示名"
 
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/js/stream_post_comment.js:0
-msgid "Do you really want to delete this %s?"
-msgstr "本当にこの%sを削除しますか？"
+msgid ""
+"Do you really want to delete this %(comment)s?\n"
+"It will also be deleted from %(platform)s."
+msgstr ""
+"本当にこれ%(comment)sを削除しますか?\n"
+"%(platform)sからも削除されます。"
 
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/js/stream_post_comments.js:0
-msgid "Do you really want to delete this Post ?"
-msgstr "本当にこの投稿を削除しますか？"
+msgid ""
+"Do you really want to delete this Post? It will also be deleted from %"
+"(platform)s."
+msgstr "この投稿を本当に削除しますか?%(platform)s からも削除されます。"
 
 #. module: social
 #: model:ir.model.fields.selection,name:social.selection__social_post__state__draft
@@ -489,14 +640,9 @@ msgid "Draft"
 msgstr "ドラフト"
 
 #. module: social
-#. odoo-python
-#: code:addons/social/models/social_post.py:0
-msgid ""
-"Due to length restrictions, the following posts cannot be posted:\n"
-" %s"
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Duplicate"
 msgstr ""
-"長さの制約のため、以下の投稿は投稿できません: \n"
-"%s"
 
 #. module: social
 #. odoo-javascript
@@ -528,9 +674,6 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
 #: model:ir.model.fields,field_description:social.field_social_account__engagement
-#: model:ir.model.fields,field_description:social.field_social_live_post__engagement
-#: model:ir.model.fields,field_description:social.field_social_post__engagement
-#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
 #: model_terms:ir.ui.view,arch_db:social.utm_campaign_view_form
 msgid "Engagement"
 msgstr "エンゲージメント"
@@ -541,24 +684,10 @@ msgid "Engagement Trend"
 msgstr "エンゲージメント傾向"
 
 #. module: social
-#: model_terms:ir.ui.view,arch_db:social.social_post_view_kanban
-msgid "Engagement:"
-msgstr "エンゲージメント:"
-
-#. module: social
-#: model:ir.model.fields,help:social.field_social_account__utm_medium_id
-msgid ""
-"Every time an account is created, a utm.medium is also created and linked to "
-"the account"
-msgstr ""
-"アカウントが作成される度に、 a utm.medium も作成され、アカウントにリンクされ"
-"ます。"
-
-#. module: social
 #: model:ir.model.fields.selection,name:social.selection__social_live_post__state__failed
-#: model_terms:ir.ui.view,arch_db:social.social_post_view_kanban
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
 msgid "Failed"
-msgstr "不合格"
+msgstr "失敗"
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_live_post__failure_reason
@@ -584,6 +713,17 @@ msgid "Feed Posts Count"
 msgstr "フィード投稿数"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_post_image__file_size
+msgid "File Size"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_post__first_comment
+#: model:ir.model.fields,field_description:social.field_social_post_template__first_comment
+msgid "First Comment"
+msgstr ""
+
+#. module: social
 #: model:ir.model.fields,field_description:social.field_social_media__message_follower_ids
 #: model:ir.model.fields,field_description:social.field_social_post__message_follower_ids
 msgid "Followers"
@@ -596,11 +736,7 @@ msgid "Followers (Partners)"
 msgstr "フォロワー (取引先)"
 
 #. module: social
-#: model:ir.model.fields,help:social.field_social_post__activity_type_icon
-msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesomeのアイコン 例. fa-tasks"
-
-#. module: social
+#: model:ir.model.fields,field_description:social.field_social_live_post__formatted_published_date
 #: model:ir.model.fields,field_description:social.field_social_stream_post__formatted_published_date
 msgid "Formatted Published Date"
 msgstr "フォーマット済公開日"
@@ -635,10 +771,36 @@ msgid "Has Account Stats"
 msgstr "アカウントステータスあり"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_live_post__has_comments
+msgid "Has Comments"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_live_post__has_likes
+msgid "Has Likes"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_account__has_livechat
+#: model:ir.model.fields,field_description:social.field_social_media__has_livechat
+msgid "Has Livechat"
+msgstr ""
+
+#. module: social
 #: model:ir.model.fields,field_description:social.field_social_media__has_message
 #: model:ir.model.fields,field_description:social.field_social_post__has_message
 msgid "Has Message"
 msgstr "メッセージあり"
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_live_post__has_shares
+msgid "Has Shares"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_post__has_scheduled_date
+msgid "Has Specific Date"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_account__has_trends
@@ -651,19 +813,22 @@ msgid "Hatched"
 msgstr "開始された"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_digest_digest__id
+#: model:ir.model.fields,field_description:social.field_discuss_channel__id
+#: model:ir.model.fields,field_description:social.field_im_livechat_channel__id
+#: model:ir.model.fields,field_description:social.field_mail_message__id
 #: model:ir.model.fields,field_description:social.field_res_config_settings__id
 #: model:ir.model.fields,field_description:social.field_social_account__id
 #: model:ir.model.fields,field_description:social.field_social_live_post__id
 #: model:ir.model.fields,field_description:social.field_social_media__id
 #: model:ir.model.fields,field_description:social.field_social_post__id
+#: model:ir.model.fields,field_description:social.field_social_post_image__id
 #: model:ir.model.fields,field_description:social.field_social_post_template__id
 #: model:ir.model.fields,field_description:social.field_social_stream__id
 #: model:ir.model.fields,field_description:social.field_social_stream_post__id
-#: model:ir.model.fields,field_description:social.field_social_stream_post_image__id
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__id
 #: model:ir.model.fields,field_description:social.field_social_stream_type__id
 #: model:ir.model.fields,field_description:social.field_utm_campaign__id
-#: model:ir.model.fields,field_description:social.field_utm_medium__id
-#: model:ir.model.fields,field_description:social.field_utm_source__id
 msgid "ID"
 msgstr "ID"
 
@@ -694,13 +859,9 @@ msgstr "有効にすると、一部のメッセージに配信エラーが発生
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_account__image
 #: model:ir.model.fields,field_description:social.field_social_media__image
+#: model:ir.model.fields.selection,name:social.selection__social_stream_post_attachment__attachment_content_type__image
 msgid "Image"
 msgstr "画像"
-
-#. module: social
-#: model:ir.model.fields,field_description:social.field_social_stream_post_image__image_url
-msgid "Image URL"
-msgstr "画像URL"
 
 #. module: social
 #. odoo-javascript
@@ -715,9 +876,9 @@ msgid "Images URLs"
 msgstr "画像URL"
 
 #. module: social
-#: model:ir.model.fields,help:social.field_social_stream_post__stream_post_image_ids
-msgid "Images that were shared with this post."
-msgstr "この投稿で共有された画像"
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Immediately"
+msgstr ""
 
 #. module: social
 #. odoo-javascript
@@ -728,13 +889,18 @@ msgstr "インサイト"
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_stream_post__is_author
 msgid "Is Author"
-msgstr "作成者"
+msgstr "著者"
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_media__message_is_follower
 #: model:ir.model.fields,field_description:social.field_social_post__message_is_follower
 msgid "Is Follower"
 msgstr "フォロー中"
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_account__is_livechat_webhook_registered
+msgid "Is Livechat Webhook Registered"
+msgstr ""
 
 #. module: social
 #. odoo-javascript
@@ -753,14 +919,20 @@ msgid "It will appear in the Feed once it has posts to display."
 msgstr "表示する投稿があると、フィードに表示されます。"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_digest_digest__kpi_nbr_of_clicks_value
+msgid "Kpi Nbr Of Clicks Value"
+msgstr "KPI クリック数 値"
+
+#. module: social
 #: model:ir.model.fields,field_description:social.field_social_account__write_uid
 #: model:ir.model.fields,field_description:social.field_social_live_post__write_uid
 #: model:ir.model.fields,field_description:social.field_social_media__write_uid
 #: model:ir.model.fields,field_description:social.field_social_post__write_uid
+#: model:ir.model.fields,field_description:social.field_social_post_image__write_uid
 #: model:ir.model.fields,field_description:social.field_social_post_template__write_uid
 #: model:ir.model.fields,field_description:social.field_social_stream__write_uid
 #: model:ir.model.fields,field_description:social.field_social_stream_post__write_uid
-#: model:ir.model.fields,field_description:social.field_social_stream_post_image__write_uid
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__write_uid
 #: model:ir.model.fields,field_description:social.field_social_stream_type__write_uid
 msgid "Last Updated by"
 msgstr "最終更新者"
@@ -770,10 +942,11 @@ msgstr "最終更新者"
 #: model:ir.model.fields,field_description:social.field_social_live_post__write_date
 #: model:ir.model.fields,field_description:social.field_social_media__write_date
 #: model:ir.model.fields,field_description:social.field_social_post__write_date
+#: model:ir.model.fields,field_description:social.field_social_post_image__write_date
 #: model:ir.model.fields,field_description:social.field_social_post_template__write_date
 #: model:ir.model.fields,field_description:social.field_social_stream__write_date
 #: model:ir.model.fields,field_description:social.field_social_stream_post__write_date
-#: model:ir.model.fields,field_description:social.field_social_stream_post_image__write_date
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__write_date
 #: model:ir.model.fields,field_description:social.field_social_stream_type__write_date
 msgid "Last Updated on"
 msgstr "最終更新日"
@@ -800,13 +973,26 @@ msgstr "投稿を始めましょう。"
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "Like"
-msgstr "いいね(好評価)"
+msgstr "いいね"
 
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
+#: model:ir.model.fields,field_description:social.field_social_live_post__likes_count
+#: model:ir.model.fields,field_description:social.field_social_post__likes_count
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
 msgid "Likes"
 msgstr "いいね！"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
+msgid "Likes:"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_media_view_kanban
+msgid "Link Account"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_stream_post__link_description
@@ -826,6 +1012,13 @@ msgid "Link Image URL"
 msgstr "リンク画像URL"
 
 #. module: social
+#: model_terms:ir.actions.act_window,help:social.im_livechat_channel_action_social
+msgid ""
+"Link Live Chat channels to your social media accounts to respond to messages "
+"directly from Odoo."
+msgstr ""
+
+#. module: social
 #: model:ir.model.fields,field_description:social.field_social_stream_post__link_title
 msgid "Link Title"
 msgstr "リンクタイトル"
@@ -834,17 +1027,6 @@ msgstr "リンクタイトル"
 #: model:ir.model.fields,field_description:social.field_social_stream_post__link_url
 msgid "Link URL"
 msgstr "リンクURL"
-
-#. module: social
-#. odoo-javascript
-#: code:addons/social/static/src/xml/social_templates.xml:0
-msgid "Link a new account"
-msgstr "新しいアカウントを追加"
-
-#. module: social
-#: model_terms:ir.ui.view,arch_db:social.social_media_view_kanban
-msgid "Link account"
-msgstr "アカウントのリンク"
 
 #. module: social
 #: model_terms:ir.actions.act_window,help:social.action_social_account
@@ -894,10 +1076,42 @@ msgid "Live Posts by Social Media"
 msgstr "ソーシャルメディアごとのライブ投稿"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_account__livechat_awaiting_discuss_channel_ids
+msgid "Livechat Awaiting Discuss Channels"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_account__livechat_awaiting_discuss_channel_count
+msgid "Livechat Awaiting Discuss Channels Count"
+msgstr ""
+
+#. module: social
+#: model:ir.model,name:social.model_im_livechat_channel
+#: model:ir.model.fields,field_description:social.field_social_account__livechat_channel_id
+msgid "Livechat Channel"
+msgstr ""
+
+#. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "Load more comments..."
 msgstr "さらにコメントをロード..."
+
+#. module: social
+#: model:ir.module.module,description:base.module_social
+#: model:ir.module.module,summary:base.module_social
+msgid "Manage your social media and website visitors"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,help:social.field_social_post__activity_type_icon
+msgid "Material Symbols icon e.g. checklist"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_post__max_calendar_date
+msgid "Max Calendar Date"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_media__max_post_length
@@ -905,29 +1119,49 @@ msgid "Max Post Length"
 msgstr "最大投稿文字数"
 
 #. module: social
-#: model:ir.model.fields,field_description:social.field_social_live_post__media_type
+#: model:ir.model.fields,field_description:social.field_social_post__max_post_length_per_media
+#: model:ir.model.fields,field_description:social.field_social_post_template__max_post_length_per_media
+msgid "Max Post Length Per Media"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/xml/social_templates.xml:0
+#: model:ir.model.fields,field_description:social.field_social_live_post__media_id
 #: model:ir.model.fields,field_description:social.field_social_post__media_ids
-#: model_terms:ir.ui.view,arch_db:social.social_post_view_kanban
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_form
+#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
 msgid "Media"
 msgstr "メディア"
 
 #. module: social
-#: model:ir.model.fields,field_description:social.field_social_post__media_count
-#: model:ir.model.fields,field_description:social.field_social_post_template__media_count
-msgid "Media Count"
-msgstr "メディア数"
-
-#. module: social
 #: model:ir.model.fields,field_description:social.field_social_account__media_type
+#: model:ir.model.fields,field_description:social.field_social_live_post__media_type
 #: model:ir.model.fields,field_description:social.field_social_media__media_type
 msgid "Media Type"
 msgstr "メディアタイプ"
 
 #. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/js/fields/social_post_message_field.xml:0
+msgid "Mention"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_post__social_post_mentions
+#: model:ir.model.fields,field_description:social.field_social_post_template__social_post_mentions
+msgid "Mentions by Media"
+msgstr "メディアによる言及"
+
+#. module: social
+#: model:ir.model,name:social.model_mail_message
 #: model:ir.model.fields,field_description:social.field_social_live_post__message
 #: model:ir.model.fields,field_description:social.field_social_post__message
 #: model:ir.model.fields,field_description:social.field_social_post_template__message
 #: model:ir.model.fields,field_description:social.field_social_stream_post__message
+#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
 msgid "Message"
 msgstr "メッセージ"
 
@@ -957,17 +1191,23 @@ msgid "Messages"
 msgstr "メッセージ"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_post_image__mimetype
+msgid "Mimetype"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_post__min_calendar_date
+msgid "Min Calendar Date"
+msgstr ""
+
+#. module: social
 #: model:ir.model.fields,help:social.field_social_live_post__state
 msgid ""
 "Most social.live.posts directly go from Ready to Posted/Failed since they "
 "result of a single call to the third party API.\n"
 "        A 'Posting' state is also available for those that are sent through "
-"batching (like push notifications)."
+"batching (like push notifications) or scheduled."
 msgstr ""
-"ほとんどのsocial.live.postsは、サードパーティAPIへの単一の呼び出しの結果であ"
-"るため、直接、準備完了から投稿済/失敗になります。\n"
-"’投稿'ステータスは、バッチ処理(プッシュ通知のような)によって送信されるものに"
-"も利用可能です。"
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_post__my_activity_date_deadline
@@ -987,7 +1227,7 @@ msgstr "自分のストリーム"
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_account__name
 #: model:ir.model.fields,field_description:social.field_social_media__name
-#: model:ir.model.fields,field_description:social.field_social_post__name
+#: model:ir.model.fields,field_description:social.field_social_post_image__name
 #: model:ir.model.fields,field_description:social.field_social_stream_type__name
 #: model_terms:ir.ui.view,arch_db:social.social_account_view_form
 #: model_terms:ir.ui.view,arch_db:social.social_account_view_search
@@ -998,6 +1238,7 @@ msgstr "名称"
 #. odoo-javascript
 #: code:addons/social/static/src/js/stream_post_kanban_controller.js:0
 #: code:addons/social/static/src/xml/social_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:social.utm_campaign_view_form
 msgid "New Post"
 msgstr "新しい投稿"
 
@@ -1011,7 +1252,7 @@ msgstr "新しいコメントは無効になっています。"
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "New content available"
-msgstr "新しいコンテンツが利用できます"
+msgstr "新しいコンテンツがあります"
 
 #. module: social
 #. odoo-javascript
@@ -1040,6 +1281,16 @@ msgid "Next Activity Type"
 msgstr "次の活動タイプ"
 
 #. module: social
+#: model:res.groups.privilege,placeholder:social.res_groups_privilege_social_marketing
+msgid "No"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.actions.act_window,help:social.im_livechat_channel_action_social
+msgid "No Live Chat channel found"
+msgstr ""
+
+#. module: social
 #: model_terms:ir.actions.act_window,help:social.action_social_account
 msgid "No Social Account yet!"
 msgstr "ソーシャルアカウントがまだありません！"
@@ -1048,11 +1299,6 @@ msgstr "ソーシャルアカウントがまだありません！"
 #: model_terms:ir.actions.act_window,help:social.action_social_stream
 msgid "No Social Streams yet!"
 msgstr "まだソーシャルストリームがありません！"
-
-#. module: social
-#: model_terms:ir.actions.act_window,help:social.action_social_stream_post
-msgid "No Stream added yet!"
-msgstr "まだストリームが追加されていません！"
 
 #. module: social
 #. odoo-javascript
@@ -1090,10 +1336,11 @@ msgid "Number of errors"
 msgstr "エラー数"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_marketing_campaign__social_engagement
 #: model:ir.model.fields,field_description:social.field_utm_campaign__social_engagement
 msgid ""
-"Number of interactions (likes, shares, comments ...) with the social posts"
-msgstr "ソーシャル投稿での交流(いいね、共有、コメントなど)の数"
+"Number of interactions (likes, comments and shares) with the social posts"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,help:social.field_social_media__message_needaction_counter
@@ -1106,12 +1353,6 @@ msgstr "対応が必要なメッセージ数"
 #: model:ir.model.fields,help:social.field_social_post__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "配信エラーが発生されたメッセージ数"
-
-#. module: social
-#: model:ir.model.fields,help:social.field_social_live_post__engagement
-#: model:ir.model.fields,help:social.field_social_post__engagement
-msgid "Number of people engagements with the post (Likes, comments...)"
-msgstr "投稿のエンゲージメント人数(いいね、コメント...)"
 
 #. module: social
 #: model:ir.model.fields,help:social.field_social_account__engagement
@@ -1142,10 +1383,16 @@ msgstr ""
 "作成した回数(シェア、リポスト...)"
 
 #. module: social
-#. odoo-javascript
-#: code:addons/social/static/src/xml/social_templates.xml:0
-msgid "Or add"
-msgstr "または追加"
+#. odoo-python
+#: code:addons/social/models/social_account.py:0
+msgid "Only social manager can register webhook."
+msgstr ""
+
+#. module: social
+#. odoo-python
+#: code:addons/social/models/social_post.py:0
+msgid "Oops! Your post is a bit too long. Try shortening it to fit the limit."
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,help:social.field_social_account__audience_trend
@@ -1165,12 +1412,6 @@ msgstr "一定期間におけるストーリーの増減率。"
 
 #. module: social
 #. odoo-python
-#: code:addons/social/models/social_post.py:0
-msgid "Please specify at least one account to post into (for post ID(s) %s)."
-msgstr "投稿するアカウントを1つ以上指定して下さい(投稿ID %s)"
-
-#. module: social
-#. odoo-python
 #: code:addons/social/models/social_post_template.py:0
 msgid "Please specify either a message or upload some images."
 msgstr "メッセージを指定するか、画像をアップロードして下さい。"
@@ -1178,16 +1419,21 @@ msgstr "メッセージを指定するか、画像をアップロードして下
 #. module: social
 #. odoo-python
 #: code:addons/social/models/social_post.py:0
-#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
 msgid "Post"
 msgstr "記帳"
 
 #. module: social
 #. odoo-javascript
+#: code:addons/social/static/src/xml/social_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:social.social_stream_post_view_kanban
+msgid "Post Attachment"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
 #: code:addons/social/static/src/js/fields/social_many2many_images.xml:0
 #: code:addons/social/static/src/xml/social_templates.xml:0
-#: model_terms:ir.ui.view,arch_db:social.social_post_view_kanban
-#: model_terms:ir.ui.view,arch_db:social.social_stream_post_view_kanban
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
 msgid "Post Image"
 msgstr "ポストイメージ"
 
@@ -1195,16 +1441,27 @@ msgstr "ポストイメージ"
 #. odoo-javascript
 #: code:addons/social/static/src/js/fields/social_many2many_images.js:0
 #: code:addons/social/static/src/js/post_kanban_view.js:0
-#: code:addons/social/static/src/js/stream_post_comments.js:0
-#: code:addons/social/static/src/js/stream_post_kanban_renderer.js:0
+#: model_terms:ir.ui.view,arch_db:social.social_post_image_view_kanban
 msgid "Post Images"
 msgstr "画像を投稿"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
+msgid "Post Info"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_live_post__live_post_link
 #: model:ir.model.fields,field_description:social.field_social_stream_post__post_link
 msgid "Post Link"
 msgstr "投稿リンク"
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/js/stream_post_comments.js:0
+#: code:addons/social/static/src/js/stream_post_kanban_renderer.js:0
+msgid "Post Medias"
+msgstr ""
 
 #. module: social
 #: model_terms:ir.ui.view,arch_db:social.social_post_view_search
@@ -1218,6 +1475,17 @@ msgid "Post Now"
 msgstr "今すぐ投稿"
 
 #. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Post On"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/xml/social_templates.xml:0
+msgid "Post Video"
+msgstr ""
+
+#. module: social
 #: model:ir.model.fields,help:social.field_social_stream_post__post_link
 msgid ""
 "Post link to the external social.media (ex: link to the actual Facebook "
@@ -1226,15 +1494,15 @@ msgstr ""
 "外部ソーシャルメディアへのリンクを投稿 (例:現在のFacebook投稿へのリンク)"
 
 #. module: social
-#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
-msgid "Post on"
-msgstr "以下に投稿:"
-
-#. module: social
 #: model:ir.model.fields.selection,name:social.selection__social_live_post__state__posted
 #: model:ir.model.fields.selection,name:social.selection__social_post__state__posted
 msgid "Posted"
 msgstr "記帳済"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
+msgid "Posted:"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields.selection,name:social.selection__social_live_post__state__posting
@@ -1285,9 +1553,14 @@ msgid "Previous"
 msgstr "前へ"
 
 #. module: social
-#: model:ir.model.fields,help:social.field_social_post__post_method
-msgid "Publish your post immediately or schedule it at a later time."
-msgstr "すぐに投稿を公開するまたは後に投稿を予定します。"
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Publish all Posts now?"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Publish all now"
+msgstr ""
 
 #. module: social
 #: model_terms:ir.ui.view,arch_db:social.social_post_view_search
@@ -1311,9 +1584,26 @@ msgid "Ratings"
 msgstr "評価"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_post_image__raw
+msgid "Raw"
+msgstr ""
+
+#. module: social
 #: model:ir.model.fields.selection,name:social.selection__social_live_post__state__ready
 msgid "Ready"
 msgstr "準備完了"
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/xml/social_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Refresh"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_account_view_form
+msgid "Register Webhook"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_stream_post__media_type
@@ -1322,6 +1612,7 @@ msgstr "関連ソーシャルメディア"
 
 #. module: social
 #: model:ir.model.fields,help:social.field_social_account__media_id
+#: model:ir.model.fields,help:social.field_social_live_post__media_id
 msgid "Related Social Media (Facebook, X, ...)."
 msgstr "関連ソーシャルメディア (Facebook, X, ...)."
 
@@ -1333,8 +1624,19 @@ msgstr "関連ソーシャルアカウント"
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
+msgid "Remove the account"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "Reply"
 msgstr "返信"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Reset to Draft"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_post__activity_user_id
@@ -1359,19 +1661,46 @@ msgid "Schedule"
 msgstr "スケジュール"
 
 #. module: social
-#: model:ir.model.fields.selection,name:social.selection__social_post__post_method__scheduled
-msgid "Schedule later"
-msgstr "投稿をスケジュール"
-
-#. module: social
 #: model:ir.model.fields.selection,name:social.selection__social_post__state__scheduled
 msgid "Scheduled"
 msgstr "スケジュール済"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_live_post__scheduled_date
 #: model:ir.model.fields,field_description:social.field_social_post__scheduled_date
 msgid "Scheduled Date"
 msgstr "予定日"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
+msgid "Scheduled first comment"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
+msgid "Scheduled:"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/js/fields/social_post_message_field.js:0
+msgid "Searching..."
+msgstr "検索中..."
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "See Error Details"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
+msgid "Select Accounts to start preparing your post..."
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Select a Campaign..."
+msgstr ""
 
 #. module: social
 #. odoo-python
@@ -1384,11 +1713,7 @@ msgstr ""
 "(company)s)"
 
 #. module: social
-#: model:ir.model.fields.selection,name:social.selection__social_post__post_method__now
-msgid "Send now"
-msgstr "今すぐ送信"
-
-#. module: social
+#: model:ir.model.fields,field_description:social.field_social_post_image__sequence
 #: model:ir.model.fields,field_description:social.field_social_stream__sequence
 msgid "Sequence"
 msgstr "シーケンス"
@@ -1412,7 +1737,32 @@ msgid "Settings"
 msgstr "管理設定"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_live_post__shares_count
+#: model:ir.model.fields,field_description:social.field_social_post__shares_count
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid "Shares"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_card
+msgid "Shares:"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/js/fields/social_post_split_per_media.xml:0
+msgid "Show all options"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.digest_digest_view_form
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_form
+msgid "Social"
+msgstr "ソーシャル"
+
+#. module: social
 #: model:ir.model,name:social.model_social_account
+#: model:ir.model.fields,field_description:social.field_discuss_channel__livechat_social_account_id
 #: model:ir.model.fields,field_description:social.field_social_live_post__account_id
 #: model:ir.model.fields,field_description:social.field_social_stream__account_id
 #: model_terms:ir.ui.view,arch_db:social.social_account_view_form
@@ -1421,6 +1771,7 @@ msgstr "ソーシャルアカウント"
 
 #. module: social
 #: model:ir.actions.act_window,name:social.action_social_account
+#: model:ir.model.fields,field_description:social.field_im_livechat_channel__social_account_ids
 #: model:ir.model.fields,field_description:social.field_social_media__account_ids
 #: model:ir.model.fields,field_description:social.field_social_post__account_ids
 #: model:ir.model.fields,field_description:social.field_social_post_template__account_ids
@@ -1428,6 +1779,22 @@ msgstr "ソーシャルアカウント"
 #: model_terms:ir.ui.view,arch_db:social.social_account_view_list
 msgid "Social Accounts"
 msgstr "ソーシャルアカウント"
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_im_livechat_channel__social_away_message
+msgid "Social Away Message"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_form
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_kanban
+msgid "Social Chats awaiting"
+msgstr ""
+
+#. module: social
+#: model:ir.actions.client,name:social.action_social_connect_account
+msgid "Social Connect Account"
+msgstr ""
 
 #. module: social
 #: model:ir.model,name:social.model_social_live_post
@@ -1440,6 +1807,7 @@ msgid "Social Manager"
 msgstr "ソーシャルマネジャー"
 
 #. module: social
+#: model:ir.module.module,shortdesc:base.module_social
 #: model:ir.ui.menu,name:social.menu_social_global
 #: model:res.groups.privilege,name:social.res_groups_privilege_social_marketing
 #: model_terms:ir.ui.view,arch_db:social.res_config_settings_view_form
@@ -1448,6 +1816,8 @@ msgstr "ソーシャルマーケティング"
 
 #. module: social
 #. odoo-javascript
+#: code:addons/social/static/src/xml/discuss/composer.xml:0
+#: code:addons/social/static/src/xml/discuss/thread_icon.xml:0
 #: code:addons/social/static/src/xml/social_templates.xml:0
 #: model:ir.actions.act_window,name:social.action_social_media
 #: model:ir.model,name:social.model_social_media
@@ -1461,9 +1831,25 @@ msgid "Social Media"
 msgstr "ソーシャルメディア"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_digest_digest__kpi_nbr_of_clicks
+msgid "Social Media Clicks"
+msgstr "ソーシャルメディアのクリック数"
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_marketing_campaign__social_posts_count
 #: model:ir.model.fields,field_description:social.field_utm_campaign__social_posts_count
 msgid "Social Media Posts"
 msgstr "ソーシャルメディア投稿"
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_im_livechat_channel__social_discuss_channel_need_action_ids
+msgid "Social Need Action"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_im_livechat_channel__social_discuss_channel_need_action_count
+msgid "Social Need Action Count"
+msgstr ""
 
 #. module: social
 #: model:ir.model,name:social.model_social_post
@@ -1471,6 +1857,11 @@ msgstr "ソーシャルメディア投稿"
 #: model_terms:ir.ui.view,arch_db:social.social_live_post_view_form
 msgid "Social Post"
 msgstr "ソーシャル・ポスト"
+
+#. module: social
+#: model:ir.model,name:social.model_social_post_image
+msgid "Social Post Image"
+msgstr ""
 
 #. module: social
 #: model:ir.model,name:social.model_social_post_template
@@ -1485,6 +1876,7 @@ msgstr "ソーシャルポストテンプレート"
 
 #. module: social
 #: model:ir.actions.act_window,name:social.action_social_post
+#: model:ir.actions.act_window,name:social.action_social_post_pivot
 #: model_terms:ir.ui.view,arch_db:social.social_post_view_calendar
 #: model_terms:ir.ui.view,arch_db:social.social_post_view_pivot
 msgid "Social Posts"
@@ -1504,9 +1896,9 @@ msgid "Social Stream Post"
 msgstr "ソーシャルストリームポスト"
 
 #. module: social
-#: model:ir.model,name:social.model_social_stream_post_image
-msgid "Social Stream Post Image Attachment"
-msgstr "ソーシャルストリーム投稿画像添付"
+#: model:ir.model,name:social.model_social_stream_post_attachment
+msgid "Social Stream Post Attachment"
+msgstr ""
 
 #. module: social
 #: model:ir.actions.act_window,name:social.action_social_stream
@@ -1533,11 +1925,6 @@ msgid ""
 msgstr "このアカウントに再リンクする権限がありません。管理者に連絡して下さい。"
 
 #. module: social
-#: model:ir.model.fields,field_description:social.field_social_post__source_id
-msgid "Source"
-msgstr "流入元"
-
-#. module: social
 #: model:ir.model.fields,help:social.field_social_post__live_posts_by_media
 msgid ""
 "Special technical field that holds a dict containing the live posts names by "
@@ -1547,16 +1934,21 @@ msgstr ""
 "んばん表示に使用)。"
 
 #. module: social
-#. odoo-javascript
-#: code:addons/social/static/src/js/fields/social_post_split_per_media.xml:0
-msgid "Split Per Media"
-msgstr "メディアごとに分割"
-
-#. module: social
 #: model:ir.model.fields,field_description:social.field_social_post__is_split_per_media
 #: model:ir.model.fields,field_description:social.field_social_post_template__is_split_per_media
 msgid "Split Per Network"
 msgstr "ネットワークごとに分割"
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/js/fields/social_post_message_field.js:0
+msgid "Split per media to add mentions"
+msgstr "メディアごとに分割して、メンションを追加"
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_form
+msgid "Start by connecting your accounts"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_account__stats_link
@@ -1578,9 +1970,9 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "活動に基づくステータス\n"
-"期限超過：期限日がすでに過ぎています\n"
+"遅延: 期限が既に過ぎています\n"
 "今日: 活動日は今日です\n"
-"予定: 将来の活動。"
+"予定: 今後の活動です"
 
 #. module: social
 #. odoo-javascript
@@ -1601,19 +1993,19 @@ msgid "Stream Added (%s)"
 msgstr "ストリームが追加されました (%s)"
 
 #. module: social
-#: model:ir.model.fields,field_description:social.field_social_stream_post_image__stream_post_id
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__stream_post_id
 msgid "Stream Post"
 msgstr "ストリーム投稿"
 
 #. module: social
-#: model:ir.model.fields,field_description:social.field_social_stream_post__stream_post_image_ids
-msgid "Stream Post Images"
-msgstr "ストリーム投稿画像"
+#: model:ir.model.fields,field_description:social.field_social_stream_post__stream_post_attachment_ids
+msgid "Stream Post Attachments"
+msgstr ""
 
 #. module: social
-#: model:ir.model.fields,field_description:social.field_social_stream_post__stream_post_image_urls
-msgid "Stream Post Images URLs"
-msgstr "ストリーム投稿画像URL"
+#: model:ir.model.fields,field_description:social.field_social_stream_post__stream_post_content_json
+msgid "Stream Post Attachments data"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_media__stream_type_ids
@@ -1637,10 +2029,9 @@ msgid "Sub-posts that will be published on each selected social accounts."
 msgstr "選択された各ソーシャルアカウントで公開されるサブ投稿"
 
 #. module: social
-#. odoo-javascript
-#: code:addons/social/static/src/xml/social_templates.xml:0
-msgid "Sync"
-msgstr "同期"
+#: model_terms:ir.ui.view,arch_db:social.im_livechat_channel_view_form
+msgid "Test & Confirm"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,help:social.field_social_post__account_ids
@@ -1665,7 +2056,7 @@ msgstr ""
 #. module: social
 #: model:ir.model.fields,help:social.field_social_stream_post__published_date
 msgid "The post published date based on third party information."
-msgstr "第3者情報に基づいた投稿公開日"
+msgstr "サードパーティ(第三者)情報に基づく投稿公開日"
 
 #. module: social
 #: model:ir.model.fields,help:social.field_social_live_post__failure_reason
@@ -1700,15 +2091,26 @@ msgstr ""
 "いことを確認するために使用できます。"
 
 #. module: social
+#: model:ir.model.fields,help:social.field_social_post__first_comment
+#: model:ir.model.fields,help:social.field_social_post_template__first_comment
+msgid "This will be posted as a comment right after publishing"
+msgstr ""
+
+#. module: social
+#: model_terms:ir.ui.view,arch_db:social.social_post_view_form
+msgid ""
+"This will immediately publish all Posts, regardless of their scheduled dates."
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields,field_description:social.field_social_stream_post_attachment__thumbnail_url
+msgid "Thumbnail URL"
+msgstr ""
+
+#. module: social
 #: model:ir.model.fields,field_description:social.field_social_stream__name
 msgid "Title"
 msgstr "タイトル"
-
-#. module: social
-#. odoo-javascript
-#: code:addons/social/static/src/xml/social_templates.xml:0
-msgid "To add a stream"
-msgstr "ストリームを追加するため"
 
 #. module: social
 #: model:ir.model.fields,field_description:social.field_social_stream__stream_type_id
@@ -1718,23 +2120,12 @@ msgstr "タイプ"
 #. module: social
 #: model:ir.model.fields,help:social.field_social_post__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "記録上の例外活動の種類。"
+msgstr "レコード上の例外の活動タイプ。"
 
 #. module: social
 #: model:ir.model,name:social.model_utm_campaign
 msgid "UTM Campaign"
 msgstr "UTMキャンペーン"
-
-#. module: social
-#: model:ir.model,name:social.model_utm_medium
-#: model:ir.model.fields,field_description:social.field_social_account__utm_medium_id
-msgid "UTM Medium"
-msgstr "UTM媒体"
-
-#. module: social
-#: model:ir.model,name:social.model_utm_source
-msgid "UTM Source"
-msgstr "UTMソース"
 
 #. module: social
 #. odoo-python
@@ -1743,16 +2134,16 @@ msgid "Uh-oh! It looks like this message has been deleted from X."
 msgstr "このメッセージはXから削除されたようです。"
 
 #. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/js/stream_post_comments.js:0
+msgid "Unknown"
+msgstr "不明"
+
+#. module: social
 #. odoo-python
 #: code:addons/social/models/social_post.py:0
 msgid "Unknown error"
 msgstr "不明なエラー"
-
-#. module: social
-#. odoo-python
-#: code:addons/social/models/social_post_template.py:0
-msgid "Uploaded file does not seem to be a valid image."
-msgstr "アップロードされたファイルは有効な画像ではないようです"
 
 #. module: social
 #: model_terms:ir.ui.view,arch_db:social.res_config_settings_view_form
@@ -1776,10 +2167,26 @@ msgstr ""
 "比較を行うために使用されます。"
 
 #. module: social
+#: model:ir.model.fields,field_description:social.field_social_account__user_link
+msgid "User Link"
+msgstr ""
+
+#. module: social
+#: model:ir.model.fields.selection,name:social.selection__social_stream_post_attachment__attachment_content_type__video
+msgid "Video"
+msgstr ""
+
+#. module: social
+#. odoo-javascript
+#: code:addons/social/static/src/xml/social_templates.xml:0
+msgid "Video Url"
+msgstr ""
+
+#. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
 msgid "View"
-msgstr "表示"
+msgstr "ビュー"
 
 #. module: social
 #: model_terms:ir.ui.view,arch_db:social.social_account_view_form
@@ -1788,21 +2195,15 @@ msgid "Visible to all"
 msgstr "全員に表示"
 
 #. module: social
-#: model:ir.model.fields,field_description:social.field_social_media__website_message_ids
-#: model:ir.model.fields,field_description:social.field_social_post__website_message_ids
-msgid "Website Messages"
-msgstr "ウェブサイトメッセージ"
+#: model_terms:ir.actions.act_window,help:social.action_social_stream_post
+msgid "Welcome to Odoo Social!"
+msgstr ""
 
 #. module: social
-#: model:ir.model.fields,help:social.field_social_media__website_message_ids
-#: model:ir.model.fields,help:social.field_social_post__website_message_ids
-msgid "Website communication history"
-msgstr "ウェブサイト通信履歴"
-
-#. module: social
-#: model:ir.model.fields,field_description:social.field_social_post__post_method
-msgid "When"
-msgstr "日時"
+#. odoo-javascript
+#: code:addons/social/static/src/js/fields/social_post_message_field.js:0
+msgid "What do you want to say?"
+msgstr ""
 
 #. module: social
 #: model:ir.model.fields,help:social.field_social_post__published_date
@@ -1827,11 +2228,6 @@ msgid "Write a comment..."
 msgstr "コメントを書く..."
 
 #. module: social
-#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
-msgid "Write a message or upload an image"
-msgstr "メッセージを書くか画像をアップロードする"
-
-#. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/js/tours/social.js:0
 msgid "Write a message to get a preview of your post."
@@ -1845,6 +2241,7 @@ msgstr "回答を書く..."
 
 #. module: social
 #: model_terms:ir.actions.act_window,help:social.action_social_post
+#: model_terms:ir.actions.act_window,help:social.action_social_post_pivot
 msgid ""
 "Write an enticing post, add images and schedule it to be posted later on "
 "multiple platforms at once."
@@ -1853,51 +2250,20 @@ msgstr ""
 "よう予定します。"
 
 #. module: social
-#. odoo-python
-#: code:addons/social/models/utm_medium.py:0
-msgid ""
-"You cannot delete these UTM Mediums as they are linked to the following "
-"social accounts in Social:\n"
-"%(social_accounts)s"
-msgstr ""
-"これらのUTM媒体はソーシャルの以下のソーシャルアカウントにリンクされているた"
-"め、削除することはできません:\n"
-"%(social_accounts)s"
-
-#. module: social
-#. odoo-python
-#: code:addons/social/models/utm_source.py:0
-msgid ""
-"You cannot delete these UTM Sources as they are linked to social posts in "
-"Social:\n"
-"%(utm_sources)s"
-msgstr ""
-"これらのUTMソースはソーシャルのソーシャル投稿にリンクされているため、削除する"
-"ことはできません: \n"
-"%(utm_sources)s"
-
-#. module: social
+#. odoo-javascript
 #. odoo-python
 #: code:addons/social/models/social_post.py:0
-msgid "You cannot reschedule a post that has already been posted."
-msgstr "すでに投稿された投稿を再予定することはできません。"
-
-#. module: social
-#. odoo-python
-#: code:addons/social/models/social_post.py:0
+#: code:addons/social/static/src/js/social_post_calendar_controller.js:0
 msgid "You cannot schedule a post in the past."
 msgstr "過去の投稿を予定することはできません。"
 
 #. module: social
-#: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
-msgid "Your Post"
-msgstr "あなたの投稿"
-
-#. module: social
-#. odoo-javascript
-#: code:addons/social/static/src/xml/social_templates.xml:0
-msgid "a Stream from an existing account"
-msgstr "既存のアカウントからのストリーム"
+#: model_terms:ir.actions.act_window,help:social.action_social_stream_post
+msgid ""
+"Your place to monitor discussions, schedule posts, and track their results.\n"
+"                <br>\n"
+"                Connect your accounts to get started."
+msgstr ""
 
 #. module: social
 #: model_terms:ir.ui.view,arch_db:social.social_post_template_view_form
@@ -1907,8 +2273,8 @@ msgstr "投稿する前に"
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/js/stream_post_comment.js:0
-msgid "comment/reply"
-msgstr "コメント/返信"
+msgid "comment"
+msgstr "コメント"
 
 #. module: social
 #: model_terms:ir.actions.act_window,help:social.action_social_stream
@@ -1924,13 +2290,14 @@ msgstr "for"
 #. module: social
 #. odoo-javascript
 #: code:addons/social/static/src/xml/social_templates.xml:0
-msgid "replies..."
-msgstr "返信..."
+msgid "or add an already connected account"
+msgstr ""
 
 #. module: social
-#: model_terms:ir.actions.act_window,help:social.action_social_stream_post
-msgid "to keep an eye on your own posts and monitor all social activities."
-msgstr "自分の投稿を監視し、すべてのソーシャル活動をモニターします。"
+#. odoo-javascript
+#: code:addons/social/static/src/xml/social_templates.xml:0
+msgid "replies..."
+msgstr "返信..."
 
 #. module: social
 #: model_terms:ir.actions.act_window,help:social.action_social_stream
@@ -1941,3 +2308,39 @@ msgstr "クリックしてアカウントをリンクし、投稿を開始して
 #: model_terms:ir.actions.act_window,help:social.action_social_account
 msgid "to start posting from Odoo."
 msgstr "Odooから投稿を開始"
+
+#~ msgid "At least one access token should be set."
+#~ msgstr "少なくとも1つのアクセストークンを設定する必要があります。"
+
+#~ msgid "<i class=\"oi ms-1\" data-icon=\"public\" title=\"See the post\"/>"
+#~ msgstr "<i class=\"oi ms-1\" data-icon=\"public\" title=\"See the post\"/>"
+
+#~ msgid "Engagement:"
+#~ msgstr "エンゲージメント:"
+
+#~ msgid "Link account"
+#~ msgstr "アカウントのリンク"
+
+#~ msgid ""
+#~ "Most social.live.posts directly go from Ready to Posted/Failed since they "
+#~ "result of a single call to the third party API.\n"
+#~ "        A 'Posting' state is also available for those that are sent "
+#~ "through batching (like push notifications)."
+#~ msgstr ""
+#~ "ほとんどのsocial.live.postsは、サードパーティAPIへの単一の呼び出しの結果で"
+#~ "あるため、直接、準備完了から投稿済/失敗になります。\n"
+#~ "’投稿'ステータスは、バッチ処理(プッシュ通知のような)によって送信されるもの"
+#~ "にも利用可能です。"
+
+#~ msgid ""
+#~ "Number of interactions (likes, shares, comments ...) with the social posts"
+#~ msgstr "ソーシャル投稿での交流(いいね、共有、コメントなど)の数"
+
+#~ msgid "Number of people engagements with the post (Likes, comments...)"
+#~ msgstr "投稿のエンゲージメント人数(いいね、コメント...)"
+
+#~ msgid "Post on"
+#~ msgstr "以下に投稿:"
+
+#~ msgid "You cannot reschedule a post that has already been posted."
+#~ msgstr "すでに投稿された投稿を再予定することはできません。"

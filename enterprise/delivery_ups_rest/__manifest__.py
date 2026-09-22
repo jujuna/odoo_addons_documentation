@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "UPS Shipping",
     'summary': "Send your shippings through UPS and track them online. This new version of the UPS connector is compatible"

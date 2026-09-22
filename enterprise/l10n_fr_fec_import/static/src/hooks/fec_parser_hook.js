@@ -1,5 +1,5 @@
 import { _t } from "@web/core/l10n/translation";
-import { floatIsZero } from "@web/core/utils/numbers";
+import { floatIsZero, range } from "@web/core/utils/numbers";
 
 export function useFECParser() {
     const maxLines = 1e3; // maximum size of each chunk (1,000 lines)
@@ -37,6 +37,10 @@ export function useFECParser() {
         const incompleteLines = [];
         const processedLines = lines.map((line) => splitLine(line));
         processedLines.forEach((line, lineIndex) => {
+            const isEmptyRow = !line.some((cell) => cell.trim() !== "");
+            if (isEmptyRow) {
+                return;
+            }
             const lineNumber = lineIndex + 2; // 1 for the 0-based indexing, and 1 to compensate removed header
             if (!getMoveName(line)) {
                 throw new Error(_t("Line %s does not have a valid move name", lineNumber));
@@ -67,7 +71,7 @@ export function useFECParser() {
         }, {});
 
         const chunks = [];
-        const unbalancedChunks = Array.from({ length: 12 }, () => []); // unbalanced lines per month
+        const unbalancedChunks = range(12).map(() => []); // unbalanced lines per month
         for (const moveLines of Object.values(moves)) {
             if (isBalanced(moveLines)) {
                 const lastChunk = chunks.at(-1);

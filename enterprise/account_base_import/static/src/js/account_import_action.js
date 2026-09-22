@@ -13,15 +13,22 @@ export class AccountImportAction extends ImportAction {
         });
     }
 
+    _getImportedRecordsName() {
+        const names = {
+            "account.move.line": _t("Journal Items"),
+            "account.account": _t("Chart of Accounts"),
+            "res.partner": _t("Customers"),
+            "account.asset": _t("Assets"),
+            "account.depreciation.model": _t("Depreciation Models"),
+        };
+        return names[this.resModel];
+    }
+
     openRecords(resIds) {
-        if (["account.move.line", "account.account", "res.partner"].includes(this.resModel)) {
-            const names = {
-                "account.move.line": _t("Journal Items"),
-                "account.account": _t("Chart of Accounts"),
-                "res.partner": _t("Customers"),
-            }
+        const name = this._getImportedRecordsName();
+        if (name) {
             const action = {
-                name: names[this.resModel],
+                name,
                 res_model: this.resModel,
                 type: "ir.actions.act_window",
                 views: [[false, "list"], [false, "form"]],

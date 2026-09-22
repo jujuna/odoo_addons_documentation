@@ -2,7 +2,6 @@
 
 {
     "name": "AI Documents",
-    "version": "1.0",
     "category": "Hidden",
     "summary": "Automatically sort your documents.",
     "description": """
@@ -12,14 +11,14 @@
     """,
     "depends": ["ai", "documents", "base_automation"],
     "demo": [
-        "demo/ir_actions_server_tools.xml",
+        "demo/ai_documents_sort.xml",
     ],
     "data": [
         "data/ir_actions_server_tools.xml",
         "data/ir_cron.xml",
         "views/documents_document_views.xml",
-        "security/ir.model.access.csv",
         "wizard/ai_documents_sort.xml",
+        'security/ir.access.csv',
     ],
     "author": "Odoo S.A.",
     "license": "OEEL-1",
@@ -29,6 +28,7 @@
             "ai_documents/static/src/scss/*",
             "ai_documents/static/src/views/**/*",
             "ai_documents/static/src/views/*",
+            "ai_documents/static/src/file_viewer/*",
             "ai_documents/static/src/*",
             ("remove", "ai_documents/static/src/views/activity/**"),
         ],
@@ -40,4 +40,5 @@
         ],
     },
     "auto_install": True,
+    "uninstall_hook": "uninstall_hook",
 }

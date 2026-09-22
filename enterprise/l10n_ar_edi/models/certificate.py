@@ -1,5 +1,3 @@
-import base64
-
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs7
@@ -21,7 +19,7 @@ class CertificateCertificate(models.Model):
         if not company:
             return
 
-        private_key = serialization.load_pem_private_key(base64.b64decode(company.l10n_ar_afip_ws_key_id.pem_key), None)
+        private_key = serialization.load_pem_private_key(company.l10n_ar_afip_ws_key_id.pem_key.content, None)
 
         common_name = 'ARCA WS %s - %s' % (company._get_environment_type(), company.name)[:50]
 
@@ -50,8 +48,8 @@ class CertificateCertificate(models.Model):
         if not isinstance(message, bytes):
             message = message.encode('utf-8')
 
-        cert = x509.load_pem_x509_certificate(base64.b64decode(self.with_context(bin_size=False).pem_certificate))
-        key = serialization.load_pem_private_key(base64.b64decode(self.with_context(bin_size=False).private_key_id.pem_key), None)
+        cert = x509.load_pem_x509_certificate(self.pem_certificate.content)
+        key = serialization.load_pem_private_key(self.private_key_id.pem_key.content, None)
         options = [pkcs7.PKCS7Options.Binary]
         signature = pkcs7.PKCS7SignatureBuilder().set_data(
             message

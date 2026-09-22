@@ -1,4 +1,3 @@
-import base64
 import io
 import json
 import logging
@@ -12,22 +11,27 @@ from urllib.parse import quote
 
 from werkzeug.exceptions import BadRequest, Forbidden
 
-from odoo import fields, http, _
+from odoo import _, http
 from odoo.exceptions import MissingError
 from odoo.fields import Domain
-from odoo.http import request, content_disposition
-from odoo.tools import replace_exceptions, str2bool, consteq
+from odoo.http import request
+from odoo.http.stream import STATIC_CACHE_LONG, content_disposition
+from odoo.tools import consteq, replace_exceptions, str2bool
+from odoo.tools.mimetypes import fix_filename_extension
 
 from odoo.addons.base.models.ir_qweb import keep_query
-from odoo.addons.documents.tools import attachment_read, is_mimetype_textual
 from odoo.addons.mail.controllers.attachment import AttachmentController
 
 logger = logging.getLogger(__name__)
 
+try:
+    from markdown2 import markdown
+except ImportError:
+    markdown = None
+    logger.warning("markdown2 is not installed, markdown won't be rendered")
+
 
 class ShareRoute(http.Controller):
-
-    TEXTUAL_THUMBNAIL_SIZE = 4096
 
     # util methods #################################################################################
     def _max_content_length(self):
@@ -41,13 +45,9 @@ class ShareRoute(http.Controller):
                 [('access_via_link', 'in', ('edit', 'view'))],
                 # public user cannot access a request, unless access_via_link='edit'
                 Domain.OR([
+                    [('type', '!=', 'request')],
                     [('access_via_link', '=', 'edit')],
-                    [('type', '!=', 'binary')],
-                    Domain.OR([
-                        [('attachment_id', '!=', False)],
-                        [('shortcut_document_id.attachment_id', '!=', False)],
-                    ]),
-                ])
+                ]),
             ])
         else:
             permission_domain = Domain('user_permission', '!=', 'none')  # needed for search in sudo
@@ -58,106 +58,6 @@ class ShareRoute(http.Controller):
         )
 
         return children_sudo
-
-    @classmethod
-    def _from_access_token(cls, access_token, *, skip_log=False, follow_shortcut=True):
-        """Get existing document with matching ``access_token``.
-
-        It returns an empty recordset when either:
-        * the document is not found ;
-        * the user cannot already access the document and the link
-          doesn't grant access ;
-        * the matching document is a shortcut but it is not allowed to
-          follow the shortcut.
-        Otherwise it returns the matching document in sudo.
-
-        A ``documents.access`` record is created/updated with the
-        current date unless the ``skip_log`` flag is set.
-
-        :param str access_token: the access token to the document record
-        :param bool skip_log: flag to prevent updating the record last
-            access date of internal users, useful to prevent silly
-            serialization errors, best used with read-only controllers.
-        :param bool follow_shortcut: flag to prevent returning the target
-            from a shortcut and instead return the shortcut itself.
-        """
-        Doc = request.env['documents.document']
-
-        # Document record
-        try:
-            document_token, __, encoded_id = access_token.rpartition('o')
-            document_id = int(encoded_id, 16)
-        except ValueError:
-            return Doc
-        if not document_token or document_id < 1:
-            return Doc
-        document_sudo = Doc.browse(document_id).sudo()
-        try:
-            if not document_sudo.document_token: # like exists() but prefetch 
-                return Doc
-        except MissingError:
-            return Doc
-
-        # Permissions
-        if not (
-            consteq(document_token, document_sudo.document_token)
-            and (document_sudo.user_permission != 'none'
-                 or document_sudo.access_via_link != 'none')
-        ):
-            return Doc
-        if not request.env.user._is_internal() and not document_sudo.active:
-            return Doc
-
-        # Document access
-        skip_log = skip_log or request.env.user._is_public()
-        if not skip_log:
-            for doc_sudo in filter(bool, (document_sudo, document_sudo.shortcut_document_id)):
-                new_access = cls._upsert_last_access_date(request.env, doc_sudo)
-                if new_access and doc_sudo._get_permission_without_token() == 'none':
-                    # Used to trigger webclient reload
-                    document_sudo = document_sudo.with_context(document_newly_accessible=True)
-
-        # Shortcut
-        if follow_shortcut:
-            if target_sudo := document_sudo.shortcut_document_id:
-                if (target_sudo.user_permission != 'none'
-                    or (target_sudo.access_via_link != 'none'
-                        and not target_sudo.is_access_via_link_hidden)):
-                    document_sudo = target_sudo
-                else:
-                    document_sudo = Doc
-
-        # Extra validation step, to run with the target
-        if (
-            request.env.user._is_public()
-            and document_sudo.type == 'binary'
-            and not document_sudo.attachment_id
-            and document_sudo.access_via_link != 'edit'
-        ):
-            # public cannot access a document request, unless access_via_link='edit'
-            return Doc
-
-        return document_sudo
-
-    @classmethod
-    def _upsert_last_access_date(cls, env, document):
-        """
-        Set or update last_access_date to now() for env user, WITHOUT ACCESS RIGHT CHECK.
-
-        :return: True if a new documents.access record was created
-        """
-        if access := env['documents.access'].sudo().search([
-            ('partner_id', '=', env.user.partner_id.id),
-            ('document_id', '=', document.id),
-        ]):
-            access.last_access_date = fields.Datetime.now()
-        else:
-            env['documents.access'].sudo().create({
-                'document_id': document.id,
-                'partner_id': env.user.partner_id.id,
-                'last_access_date': fields.Datetime.now(),
-            })
-        return not bool(access)
 
     def _make_zip(self, name, documents):
         """
@@ -208,7 +108,7 @@ class ShareRoute(http.Controller):
             yield from (
                 item
                 for doc in documents_sudo
-                if doc.type == 'binary' and (doc.shortcut_document_id or doc).attachment_id
+                if doc.type == 'binary'
                 if (item := make_zip_item(doc, folder)) is not None
             )
             for folder_sudo in documents_sudo:
@@ -281,7 +181,7 @@ class ShareRoute(http.Controller):
             document_id_index_map = {}
             current_index = len(open_files)
             for document in documents:
-                open_files.append(stack.enter_context(io.BytesIO(base64.b64decode(document.datas))))
+                open_files.append(stack.enter_context(document.raw.open()))
                 document_id_index_map[document.id] = current_index
                 current_index += 1
 
@@ -301,12 +201,9 @@ class ShareRoute(http.Controller):
         response = request.make_response(json.dumps(new_documents.ids), [('Content-Type', 'application/json')])
         return response
 
-    @http.route('/documents/<access_token>', type='http', auth='public')
-    def documents_home(self, access_token):
-        document_sudo = self._from_access_token(access_token)
-
-        member_signup_token = request.params.get('member_signup_token')
-        member_id = int(request.params.get('member_id') or "0")
+    @http.route(['/my/documents', '/documents/<access_token>'], type='http', auth='public')
+    def documents_home(self, access_token='', member_signup_token=None, member_id=None):
+        document_sudo = request.env['documents.document']._from_access_token(access_token)
 
         if not document_sudo:
             Redirect = request.env['documents.redirect'].sudo()
@@ -317,14 +214,7 @@ class ShareRoute(http.Controller):
                 )
 
         if request.env.user._is_public():
-            if not document_sudo:
-                redirect_url = f'/documents/{quote(access_token, safe="")}?{keep_query("*")}'
-                if signup_url := request.env["documents.access"]._get_signup_url(
-                    member_id, member_signup_token, access_token, redirect_url):
-                    # Document requires a member to access (not "access_via_link")
-                    # and we have a signup token -> redirect user to signup
-                    return request.redirect(signup_url)
-            return self._documents_render_public_view(document_sudo)
+            return self._documents_render_public_view(document_sudo, access_token, member_signup_token, member_id)
         elif request.env.user._is_portal():
             return self._documents_render_portal_view(document_sudo)
         else:  # assume internal user
@@ -334,7 +224,18 @@ class ShareRoute(http.Controller):
                 HTTPStatus.TEMPORARY_REDIRECT,
             )
 
-    def _documents_render_public_view(self, document_sudo):
+    def _documents_render_public_view(self, document_sudo, access_token, member_signup_token, member_id):
+        """Render the document page for the public user.
+
+        :param document_sudo: The document found with the token
+        :param access_token: The access_token of document
+            (in case it's in access_via_link = none, to redirect
+            the user after the sign-up)
+        :param member_signup_token: The invitation token if any, so the
+            user can create an account linked to the partner set on
+            the member
+        :param member_id: The ID of the `documents.access`
+        """
         target_sudo = document_sudo.shortcut_document_id
         if (
             target_sudo
@@ -343,15 +244,33 @@ class ShareRoute(http.Controller):
         ):
             return request.redirect(
                 f'/odoo/documents/{quote(target_sudo.access_token, safe="")}?{keep_query("*")}')
-        if target_sudo or not document_sudo:
-            return request.render(
-                'documents.not_available', {'document': document_sudo}, status=404)
+        if target_sudo:
+            return request.render('documents.not_available', status=404)
+
+        # get the signup URL if the token member is valid
+        # (even if the token is expired, to show an error page)
+        member_sudo = signup_url = None
+        if member_id and member_signup_token:
+            member_sudo = request.env['documents.access']._get_member_from_token(
+                int(member_id), member_signup_token)
+            if member_sudo and not member_sudo.partner_id.user_ids:
+                signup_url = f'/documents/signup/{access_token}?{keep_query("*")}'
+
+        if not document_sudo and member_sudo and signup_url:
+            # Document requires a member to access (not "access_via_link")
+            # and we have a signup token -> redirect user to signup
+            return request.redirect(signup_url)
+        if not document_sudo:
+            # the document is not accessible via link
+            # or the user already registered using the member token and is logged out
+            return request.render('documents.not_available', status=404)
         if document_sudo.type == 'url':
             return request.redirect(
                 document_sudo.url, code=HTTPStatus.TEMPORARY_REDIRECT, local=False)
-        if document_sudo.type == 'binary' and document_sudo.attachment_id:
-            return request.render('documents.share_file', {'document': document_sudo, 'quote': lambda v: quote(v, safe='')})
+        render_vals = {'quote': lambda v: quote(v, safe=''), 'signup_url': signup_url}
         if document_sudo.type == 'binary':
+            return request.render('documents.share_file', {'document': document_sudo, **render_vals})
+        if document_sudo.type == 'request':
             return request.render('documents.document_request_page', {'document': document_sudo, 'quote': lambda v: quote(v, safe='')})
         if document_sudo.type == 'folder':
             sub_documents_sudo = ShareRoute._get_folder_children(document_sudo)
@@ -363,11 +282,9 @@ class ShareRoute(http.Controller):
                     for sub_folder_sudo in sub_documents_sudo
                     if sub_folder_sudo.type == 'folder'
                 },
-                'quote': lambda v: quote(v, safe=''),
+                **render_vals,
             })
-        else:
-            e = f"unknown document type {document_sudo.type}"
-            raise NotImplementedError(e)
+        raise NotImplementedError(f"unknown document type {document_sudo.type}")
 
     def _documents_render_portal_view(self, document):
         """ Render the portal version (stripped version of the backend Documents app). """
@@ -392,6 +309,41 @@ class ShareRoute(http.Controller):
             {'session_info': session_info},
         )
 
+    @http.route('/documents/signup/<access_token>', type='http', auth='public')
+    def documents_signup(self, access_token, member_signup_token, member_id):
+        """Build the signup URL for the given public member.
+
+        We use a custom route for it, so we don't generate the signup
+        token if the user doesn't try to register
+        (see @_get_signup_url_for_action).
+
+        :param access_token: Token of the document (used to redirect
+            the user after they signed up)
+        :param member_signup_token: Token of the `documents.access`
+        :param member_id: ID of the `documents.access`
+        """
+        if not member_id or not member_signup_token or not access_token:
+            raise BadRequest()
+
+        # need to get the document from the member, because `_from_access_token`
+        # won't return the document if it's in `access_via_link == 'none'`
+        member_sudo = request.env['documents.access']._get_member_from_token(
+            int(member_id), member_signup_token)
+        if (
+            not member_sudo
+            or not member_sudo._is_signup_available()
+            or not consteq(access_token, member_sudo.document_id.access_token)
+        ):
+            if self.env['res.users'].sudo()._get_signup_invitation_scope() != 'b2c':
+                # signup has been disabled after the email has been sent
+                return request.render('documents.not_available', status=404)
+            return request.render('documents.invitation_expired', status=404)
+
+        member_sudo.partner_id.signup_get_auth_param()
+        redirect_url = member_sudo.partner_id._get_signup_url_for_action(
+            url=f'/documents/{quote(access_token, safe="")}?{keep_query("*")}')[member_sudo.partner_id.id]
+        return request.redirect(redirect_url)
+
     @classmethod
     def _documents_get_init_data(cls, document, user):
         """ Get initialization data to restore the interface on the selected document. """
@@ -405,10 +357,8 @@ class ShareRoute(http.Controller):
         # Shortcuts to archived folders behave like binary documents because these folders cannot be browsed.
         elif document.type == "folder" and (not document.shortcut_document_id or document.shortcut_document_id.active):
             documents_init = {'user_folder_id': str(document.id)}
-        else:
-            target = document.shortcut_document_id or document
-            if document.type == 'binary' and target.attachment_id:
-                documents_init['open_preview'] = True
+        elif document.type == 'binary':
+            documents_init['open_preview'] = True
         return documents_init
 
     @http.route('/documents/avatar/<access_token>',
@@ -418,7 +368,7 @@ class ShareRoute(http.Controller):
 
         :param access_token: the access token to the document record
         """
-        partner_sudo = self._from_access_token(access_token, skip_log=True).owner_id.partner_id
+        partner_sudo = request.env['documents.document']._from_access_token(access_token, skip_log=True).owner_id.partner_id
         return request.env['ir.binary']._get_image_stream_from(
             partner_sudo, 'avatar_128', placeholder=partner_sudo._avatar_get_placeholder_path()
         ).get_response(as_attachment=False)
@@ -432,7 +382,7 @@ class ShareRoute(http.Controller):
         :param download: whether to download the document on the user's
             file system or to preview the document within the browser
         """
-        document_sudo = self._from_access_token(access_token, skip_log=True)
+        document_sudo = request.env['documents.document']._from_access_token(access_token, skip_log=True)
         if not document_sudo:
             Redirect = request.env['documents.redirect'].sudo()
             if document_sudo := Redirect._get_redirection(access_token):
@@ -449,9 +399,9 @@ class ShareRoute(http.Controller):
                 f'{document_sudo.name}.zip',
                 self._get_folder_children(document_sudo),
             )
+        if document_sudo.type == 'request':
+            raise request.not_found()
         if document_sudo.type == 'binary':
-            if not document_sudo.attachment_id:
-                raise request.not_found()
             with replace_exceptions(ValueError, by=BadRequest):
                 download = str2bool(download)
             with replace_exceptions(ValueError, MissingError, by=request.not_found()):
@@ -469,7 +419,7 @@ class ShareRoute(http.Controller):
 
     @http.route('/documents/touch/<access_token>', type='jsonrpc', auth='user')
     def documents_touch(self, access_token):
-        doc = self._from_access_token(access_token)
+        doc = request.env['documents.document']._from_access_token(access_token)
         if doc.env.context.get('document_newly_accessible'):
             return {'reload': True}
         return {}
@@ -492,46 +442,11 @@ class ShareRoute(http.Controller):
         send_file_kwargs = {}
         if unique:
             send_file_kwargs['immutable'] = True
-            send_file_kwargs['max_age'] = http.STATIC_CACHE_LONG
-        document_sudo = self._from_access_token(access_token, skip_log=True)
+            send_file_kwargs['max_age'] = STATIC_CACHE_LONG
+        document_sudo = request.env['documents.document']._from_access_token(access_token, skip_log=True)
         return request.env['ir.binary']._get_image_stream_from(
             document_sudo, 'thumbnail', width=width, height=height
         ).get_response(as_attachment=False, **send_file_kwargs)
-
-    @http.route(['/documents/thumbnail_textual/<access_token>'],
-                type='http', auth='public', readonly=True)
-    def documents_thumbnail_textual(self, access_token):
-        """Show the thumbnail (first 4kiB) of text-like documents.
-
-        Textual documents are those whose mimetype starts with text/
-        or are a recognized application (json, xml, ...)
-        .html and external attachment url are served by Stream (same
-        as `/documents/content`).
-
-        :param access_token: the access token to the document record
-        """
-        document_sudo = self._from_access_token(access_token, skip_log=True)
-        if not document_sudo:
-            raise request.not_found()
-        if document_sudo.type != 'binary':
-            e = f"bad document type: expected a file (binary) document, found a {document_sudo.type} document"
-            raise BadRequest(e)
-        attachment_sudo = document_sudo.attachment_id.sudo()
-        if not attachment_sudo:
-            raise request.not_found()
-        if not is_mimetype_textual(document_sudo.mimetype):
-            e = f"bad document mimetype: expect text/* or a recognized application/, got {document_sudo.mimetype}"
-            raise BadRequest(e)
-        head = None
-        if document_sudo.mimetype not in ['text/html']:
-            head = attachment_read(attachment_sudo, size=self.TEXTUAL_THUMBNAIL_SIZE)
-        if not head:
-            with replace_exceptions(ValueError, MissingError, by=request.not_found()):
-                stream = self._documents_content_stream(document_sudo)
-            return stream.get_response(as_attachment=False)
-        return request.render("documents.thumbnails_textual", {
-            'content': head.decode('utf-8', errors='replace'),
-        })
 
     @http.route(['/documents/document/<int:document_id>/update_thumbnail'], type='jsonrpc', auth='user')
     def documents_update_thumbnail(self, document_id, thumbnail):
@@ -588,6 +503,7 @@ class ShareRoute(http.Controller):
         res_id='',
         res_model=False,
         allowed_company_ids='',
+        active_model=''
     ):
         """
         Replace an existing document or create new ones.
@@ -603,6 +519,8 @@ class ShareRoute(http.Controller):
         :param owner_id, partner_id, res_id, res_model: field values
             when creating new documents, for internal users only
         """
+        if active_model:
+            request.update_context(active_model=active_model)
         if allowed_company_ids:
             request.update_context(allowed_company_ids=json.loads(allowed_company_ids))
         if access_token and user_folder_id or not access_token and user_folder_id not in {'COMPANY', 'MY'}:
@@ -611,19 +529,19 @@ class ShareRoute(http.Controller):
         if is_internal_user and not access_token:
             document_sudo = request.env['documents.document'].sudo()
         else:
-            document_sudo = self._from_access_token(access_token)
+            document_sudo = request.env['documents.document']._from_access_token(access_token)
             if (
                 not document_sudo
                 or (document_sudo.user_permission != 'edit'
                     and document_sudo.access_via_link != 'edit')
-                or document_sudo.type not in ('binary', 'folder')
+                or document_sudo.type not in ('binary', 'request', 'folder')
             ):
                 raise request.not_found()
 
         files = request.httprequest.files.getlist('ufile')
         if not files:
             raise BadRequest("missing files")
-        if len(files) > 1 and document_sudo.type not in (False, 'folder'):
+        if len(files) > 1 and document_sudo.type not in (False, 'folder', 'request'):
             raise BadRequest("cannot save multiple files inside a single document")
 
         if is_internal_user:
@@ -658,37 +576,78 @@ class ShareRoute(http.Controller):
         is_internal_user = request.env.user._is_internal()
 
         document_ids = []
-        AttachmentSudo = request.env['ir.attachment'] \
-            .sudo(not is_internal_user) \
-            .with_context(image_no_postprocess=True)
+        AttachmentSudo = request.env["ir.attachment"].sudo().with_context(image_no_postprocess=True)
 
-        if document_sudo.type == 'binary':
-            attachment_sudo = AttachmentSudo._from_request_file(
-                files[0], mimetype='TRUST' if is_internal_user else 'GUESS'
-            )
-            attachment_sudo.res_model = document_sudo.res_model or 'documents.document'
-            attachment_sudo.res_id = document_sudo.res_id if document_sudo.res_model else document_sudo.id
-            values = {'attachment_id': attachment_sudo.id}
-            if not document_sudo.attachment_id:  # is a request
-                if document_sudo.access_via_link == 'edit':
+        if document_sudo.type in ('binary', 'request'):
+            if document_sudo.type == 'request' and len(files) > 1:
+                # duplicate the requests for all files we upload
+                copy_vals = {"request_activity_id": False, "owner_id": document_sudo.owner_id.id}
+                documents_sudo = [
+                    document_sudo,
+                    *(document_sudo._copy_with_access(copy_vals) for __ in range(len(files) - 1)),
+                ]
+                # duplicate the shortcuts to the request
+                for new_document_sudo in documents_sudo[1:]:
+                    # for each new document, we need to duplicate the shortcuts
+                    for owner, shortcuts in document_sudo.shortcut_ids.grouped("owner_id").items():
+                        shortcuts._copy_with_access({
+                            "shortcut_document_id": new_document_sudo.id,
+                            "owner_id": owner.id,
+                        })
+
+            else:
+                documents_sudo = [document_sudo]
+                files = [files[0]]
+
+            for file, doc_sudo in zip(files, documents_sudo, strict=True):
+                if is_internal_user:
+                    # Trust the provided filename and content-type.
+                    attachment_sudo = AttachmentSudo._upload_file(file, {
+                        'name': file.filename,
+                        'mimetype': file.content_type,
+                    })
+                else:
+                    # Portal user, use neither the filename extension nor the content-type,
+                    # use guess_mimetype on the content and fix the filename accordingly.
+                    attachment_sudo = AttachmentSudo._upload_file(file, {'name': 'upload.bin'})
+                    attachment_sudo.name = fix_filename_extension(
+                        file.filename, attachment_sudo.mimetype)
+                attachment_sudo.with_context(no_document=True).write({
+                    'res_model': doc_sudo.res_model or 'documents.document',
+                    'res_id': doc_sudo.res_id if doc_sudo.res_model else doc_sudo.id,
+                })
+                values = {'attachment_id': attachment_sudo.id}
+                if doc_sudo.type == 'request' and doc_sudo.access_via_link == 'edit':
                     values['access_via_link'] = 'view'
-            self._documents_upload_create_write(document_sudo, values)
-            document_ids.append(document_sudo.id)
+                self._documents_upload_create_write(doc_sudo, values)
+                document_ids.append(doc_sudo.id)
         else:
             folder_sudo = document_sudo
             location = {'user_folder_id': user_folder_id} if user_folder_id else {'folder_id': folder_sudo.id}
             for file in files:
+                if is_internal_user:
+                    # Trust the provided filename and content-type.
+                    attachment_sudo = AttachmentSudo._upload_file(file, {
+                        'name': file.filename,
+                        'mimetype': file.content_type,
+                    })
+                else:
+                    # Portal user, use neither the filename extension nor the content-type,
+                    # use guess_mimetype on the content and fix the filename accordingly.
+                    attachment_sudo = AttachmentSudo._upload_file(file, {'name': 'upload.bin'})
+                    attachment_sudo.name = fix_filename_extension(
+                        file.filename, attachment_sudo.mimetype)
+
                 document_sudo = self._documents_upload_create_write(folder_sudo, {
-                    'attachment_id': AttachmentSudo._from_request_file(
-                        file, mimetype='TRUST' if is_internal_user else 'GUESS'
-                    ).id,
+                    'attachment_id': attachment_sudo.id,
                     'type': 'binary',
                     'access_via_link': 'none' if folder_sudo.access_via_link in (False, 'none') else 'view',
                     **location,
                     'owner_id': owner_id,
-                    'res_model': res_model or False,
-                    'res_id': res_id,
-                } | (
+                } | (  # Avoid to force res_model, res_id as it can be inherited from the folder where it is uploaded
+                    {'res_model': res_model or False, 'res_id': res_id} if res_model or res_id
+                    else {}
+                ) | (
                     {'partner_id': partner_id} if partner_id is not None else {}
                 ))
                 document_ids.append(document_sudo.id)
@@ -705,17 +664,14 @@ class ShareRoute(http.Controller):
         The actual function that either write vals on a binary document
         or create a new document with vals inside a folder document.
         """
-        if document_sudo.type == 'binary':
+        if document_sudo.type in ('binary', 'request'):
+            # requests messages are handled inside write, binary type documents are handled here
+            if document_sudo.type != 'request' or self.env.user == document_sudo.create_uid:
+                document_sudo.message_post(body=_("Attachment updated by %(user)s", user=request.env.user.name))
             document_sudo.write(vals)
         else:
             vals.setdefault('folder_id', document_sudo.id)
             document_sudo = document_sudo.create(vals)
-        if (any(field_name in vals for field_name in [
-                'raw', 'datas', 'attachment_id'])):
-            document_sudo.message_post(body=_(
-                "Document uploaded by %(user)s",
-                user=request.env.user.name
-            ))
 
         return document_sudo
 
@@ -737,8 +693,10 @@ class ShareRoute(http.Controller):
             raise BadRequest("This route only accepts one file at a time.")
 
         traceback_sudo = self._documents_upload_create_write(folder_sudo, {
-            'attachment_id': request.env['ir.attachment']._from_request_file(
-                files[0], mimetype='text/plain').id,
+            'attachment_id': request.env['ir.attachment']._upload_file(files[0], {
+                'name': fix_filename_extension(files[0].filename, 'text/plain'),
+                'mimetype': 'text/plain',
+            }).id,
             'type': 'binary',
             'access_internal': 'none',
             'access_via_link': 'view',
@@ -770,7 +728,42 @@ class DocumentsAttachmentController(AttachmentController):
     )
     def document_attachment_pdf_first_page(self, access_token=None):
         """Returns the first page of a pdf."""
-        document_sudo = ShareRoute._from_access_token(access_token, skip_log=True)
+        document_sudo = request.env['documents.document']._from_access_token(access_token, skip_log=True)
         if not document_sudo.attachment_id:
             raise request.not_found()
         return self._get_pdf_first_page_response(document_sudo.attachment_id)
+
+    @http.route(['/documents/render_text/<access_token>'],
+                type='http', auth='public', readonly=True)
+    def documents_render_text(self, access_token, head=False, unique=False):
+        """Render the text content for preview and thumbnail.
+
+        Render the document content / preview for
+        - Simple text
+        - HTML
+        - XML
+        - JSON
+        - Markdown
+        - Email
+
+        :param access_token: the access token to the document record
+        :param head: show the thumbnail (first 4kiB) of text-like documents
+        :param str unique: Indicates if the response can be cached
+        """
+        document_sudo = request.env['documents.document']._from_access_token(access_token, skip_log=True)
+        if not document_sudo:
+            raise request.not_found()
+        if document_sudo.type != 'binary':
+            e = f"bad document type: expected a file (binary) document, found a {document_sudo.type} document"
+            raise BadRequest(e)
+        if not document_sudo.attachment_id:
+            raise request.not_found()
+        if document_sudo.attachment_id.mimetype == 'application/documents-email':
+            response = request.render("documents.content_email", {
+                'content': document_sudo.attachment_id.raw.content.decode(errors='replace'),
+                'is_thumbnail': str2bool(head, False),
+            })
+            immutable = bool(unique) and unique == document_sudo.attachment_id.checksum
+            return self._set_render_with_headers(response, immutable)
+
+        return self._render_text_attachment(document_sudo.attachment_id, str2bool(head, False), unique)

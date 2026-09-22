@@ -15,43 +15,53 @@ import { Wysiwyg } from "@html_editor/wysiwyg";
 import { Dialog } from "@web/core/dialog/dialog";
 import { localization } from "@web/core/l10n/localization";
 import { isHtmlEmpty } from "@web/core/utils/html";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
-import { Component, markup, onWillUpdateProps, useState } from "@odoo/owl";
+import { Component, markup, proxy, onPatched, t, usePlugin, useProps } from "@odoo/owl";
 
 export class AiPrompt extends Component {
     static template = "ai.AiPrompt";
     static components = { Wysiwyg };
-    static props = {
-        comodel: { type: String, optional: true },
-        domain: { type: String, optional: true },
-        model: { type: String, optional: true },
-        onChange: { type: Function, optional: true },
-        placeholder: { type: String, optional: true },
-        prompt: { type: String },
-        readonly: { type: Boolean, optional: true },
-        aiFieldPath: { type: String, optional: true },
-        missingRecordsWarning: { type: String, optional: true },
-        updatePrompt: { type: Function, optional: true },
-    };
+
+    props = useProps({
+        comodel: t.string().optional(),
+        domain: t.string().optional(),
+        model: t.string().optional(),
+        onChange: t.function().optional(),
+        placeholder: t.string().optional(),
+        prompt: t.string(),
+        readonly: t.boolean().optional(),
+        aiFieldPath: t.string().optional(),
+        missingRecordsWarning: t.string().optional(),
+        updatePrompt: t.function().optional(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
 
     setup() {
-        super.setup();
-        this.state = useState({
+        this.state = proxy({
             key: 0,
             hasRecords: this.props.prompt.includes("data-ai-record"),
         });
-        this.lastValue = this.props.prompt;
 
-        onWillUpdateProps((newProps) => {
-            if ((newProps.prompt || "").toString() !== (this.lastValue || "").toString()) {
-                this.lastValue = newProps.prompt;
-                this.state.key++;
-            } else if (
-                newProps.comodel !== this.props.comodel ||
-                newProps.domain !== this.props.domain
-            ) {
-                this.state.key++;
+        this.lastValue = this.props.prompt;
+        let prev = { ...this.props };
+
+        onPatched(() => {
+            const { prompt, comodel, domain } = this.props;
+            const promptChanged = `${prompt || ""}` !== `${prev.prompt || ""}`;
+            const configChanged = comodel !== prev.comodel || domain !== prev.domain;
+            prev = { prompt, comodel, domain };
+
+            if (promptChanged) {
+                if (`${prompt || ""}` === `${this.lastValue || ""}`) {
+                    return;
+                }
+                this.lastValue = prompt;
+            } else if (!configChanged) {
+                return;
             }
+            this.state.key++;
         });
     }
 
@@ -78,7 +88,7 @@ export class AiPrompt extends Component {
     getConfig() {
         return {
             content: this.value,
-            debug: !!this.env.debug,
+            debug: this.debugMode.isActive(),
             direction: localization.direction || "ltr",
             aiFieldPath: this.props.aiFieldPath,
             fieldSelectorResModel: this.props.model,
@@ -155,11 +165,12 @@ export class AiPrompt extends Component {
 export class AiPromptDialog extends Component {
     static template = "ai.AiPromptDialog";
     static components = { Dialog, AiPrompt };
-    static props = {
-        aiPromptProps: { type: Object },
-        close: { type: Function },
-        confirm: { type: Function },
-    };
+
+    props = useProps({
+        aiPromptProps: t.object(),
+        close: t.function(),
+        confirm: t.function(),
+    });
 
     setup() {
         super.setup();

@@ -1,40 +1,23 @@
-import { Component, useEffect, useState } from "@odoo/owl";
+import { Component, signal, t, useListener, useProps } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class DocumentsDropZone extends Component {
     static template = "documents.DocumentsDropZone";
-    static props = [
-        "parentRoot", // Parent's root element, used to know the zone to use.
-    ];
+
+    props = useProps({
+        parentRoot: t.any(), // Parent's root element, used to know the zone to use.
+    });
+
+    dragOver = signal(false);
+    topOffset = signal(0);
 
     setup() {
-        this.state = useState({
-            dragOver: false,
-            topOffset: 0,
-        });
         this.documentService = useService("document.document");
-        useEffect(
-            (el) => {
-                if (!el) {
-                    return;
-                }
-                this.state.topOffset = el.scrollTop;
-                const overHandler = this.onDragOver.bind(this);
-                const leaveHandler = this.onDragLeave.bind(this);
-                const scrollHandler = () => {
-                    this.state.topOffset = el.scrollTop;
-                };
-                el.addEventListener("dragover", overHandler);
-                el.addEventListener("dragleave", leaveHandler);
-                el.addEventListener("scroll", scrollHandler);
-                return () => {
-                    el.removeEventListener("dragover", overHandler);
-                    el.removeEventListener("dragleave", leaveHandler);
-                    el.removeEventListener("scroll", scrollHandler);
-                };
-            },
-            () => [this.props.parentRoot.el]
-        );
+        useListener(this.props.parentRoot, "dragover", this.onDragOver.bind(this));
+        useListener(this.props.parentRoot, "dragleave", this.onDragLeave.bind(this));
+        useListener(this.props.parentRoot, "scroll", () => {
+            this.topOffset.set(this.props.parentRoot().scrollTop);
+        });
     }
 
     get root() {
@@ -59,16 +42,16 @@ export class DocumentsDropZone extends Component {
         ev.stopPropagation();
         ev.preventDefault();
 
-        this.root?.el?.classList.toggle(this.rootDropOverClass, true);
-        this.state.dragOver = true;
+        this.root?.()?.classList.toggle(this.rootDropOverClass, true);
+        this.dragOver.set(true);
     }
 
     onDragLeave(ev) {
         ev.stopPropagation();
         ev.preventDefault();
 
-        this.root?.el?.classList.remove(this.rootDropOverClass);
-        this.state.dragOver = false;
+        this.root?.()?.classList.remove(this.rootDropOverClass);
+        this.dragOver.set(false);
     }
 
     onDrop(ev) {
@@ -76,8 +59,8 @@ export class DocumentsDropZone extends Component {
             return;
         }
 
-        this.root?.el?.classList.remove(this.rootDropOverClass);
-        this.state.dragOver = false;
+        this.root?.()?.classList.remove(this.rootDropOverClass);
+        this.dragOver.set(false);
         if (this.canDrop) {
             this.env.documentsView.bus.trigger("documents-upload-files", {
                 files: ev.dataTransfer.files,

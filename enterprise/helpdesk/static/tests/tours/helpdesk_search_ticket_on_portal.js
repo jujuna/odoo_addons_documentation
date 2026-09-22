@@ -4,7 +4,6 @@ import { registry } from "@web/core/registry";
 const helpdeskSearchTicketSteps = new HelpdeskSearchTicketSteps();
 
 registry.category("web_tour.tours").add("helpdesk_search_ticket_on_portal_tour", {
-    url: "/my/tickets",
     steps: () => [
         {
             trigger: ".border-end",

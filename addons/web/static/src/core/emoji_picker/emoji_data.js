@@ -2265,6 +2265,7 @@ const _getEmojisData1 = () => `{
     ],
     "name": "` + _t("hundred points") + `",
     "shortcodes": [
+        ":100:",
         ":hundred_points:"
     ]
 },
@@ -2993,7 +2994,8 @@ const _getEmojisData2 = () => `{
     ],
     "name": "` + _t("flexed biceps") + `",
     "shortcodes": [
-        ":flexed_biceps:"
+        ":flexed_biceps:",
+		":muscle:"
     ]
 },
 {
@@ -8223,6 +8225,7 @@ const _getEmojisData3 = () => `{
     ],
     "name": "` + _t("sauropod") + `",
     "shortcodes": [
+        ":dinosaur:",
         ":sauropod:"
     ]
 },
@@ -8236,6 +8239,7 @@ const _getEmojisData3 = () => `{
     ],
     "name": "` + _t("T-Rex") + `",
     "shortcodes": [
+        ":dinosaur:",
         ":T-Rex:"
     ]
 },
@@ -12198,6 +12202,7 @@ const _getEmojisData5 = () => `{
     ],
     "name": "` + _t("police car light") + `",
     "shortcodes": [
+        ":rotating_light",
         ":police_car_light:"
     ]
 },
@@ -21862,30 +21867,19 @@ const _getEmojisData8 = () => `{
     ]
 }`;
 
-/** @type {string} */
-let parsedCategories;
-/** @type {string} */
-let parsedEmojis;
-
 export function getEmojis() {
-    if (!parsedEmojis) {
-        parsedEmojis = JSON.parse(`[
-            ${_getEmojisData1()}
-            ${_getEmojisData2()}
-            ${_getEmojisData3()}
-            ${_getEmojisData4()}
-            ${_getEmojisData5()}
-            ${_getEmojisData6()}
-            ${_getEmojisData7()}
-            ${_getEmojisData8()}
-        ]`);
-    }
-    return parsedEmojis;
+    return JSON.parse(`[
+        ${_getEmojisData1()}
+        ${_getEmojisData2()}
+        ${_getEmojisData3()}
+        ${_getEmojisData4()}
+        ${_getEmojisData5()}
+        ${_getEmojisData6()}
+        ${_getEmojisData7()}
+        ${_getEmojisData8()}
+    ]`);
 }
 
 export function getCategories() {
-    if (!parsedCategories) {
-        parsedCategories = JSON.parse(_getCategories());
-    }
-    return parsedCategories;
+    return JSON.parse(_getCategories());
 }

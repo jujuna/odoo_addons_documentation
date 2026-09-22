@@ -6,6 +6,9 @@ from odoo import _, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    def _compute_show_ship_button(self):
+        self.show_ship_button = False  # Revert to Delivery smart button for stock module
+
     def set_delivery_line(self, carrier, amount):
         res = super().set_delivery_line(carrier, amount)
         for order in self:
@@ -36,15 +39,6 @@ class SaleOrder(models.Model):
         del context
         return sol
 
-    # to remove in master
-    def _format_currency_amount(self, amount):
-        pre = post = u''
-        if self.currency_id.position == 'before':
-            pre = u'{symbol}\N{NO-BREAK SPACE}'.format(symbol=self.currency_id.symbol or '')
-        else:
-            post = u'\N{NO-BREAK SPACE}{symbol}'.format(symbol=self.currency_id.symbol or '')
-        return u' {pre}{0}{post}'.format(amount, pre=pre, post=post)
-
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -54,3 +48,9 @@ class SaleOrderLine(models.Model):
         if not values.get("route_ids") and self.order_id.carrier_id.route_ids:
             values['route_ids'] = self.order_id.carrier_id.route_ids
         return values
+
+    def _get_protected_fields(self):
+        fields = super()._get_protected_fields()
+        if self.env.context.get('allow_delivery_cost_update') and all(self.mapped('is_delivery')):
+            fields = [f for f in fields if f not in ('price_unit', 'name')]
+        return fields

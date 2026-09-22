@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2026-01-06 10:37+0000\n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-17 23:11+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
-"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-master/"
 "stock_barcode/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,30 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: stock_barcode
+#: model:ir.module.module,description:base.module_stock_barcode
+msgid ""
+"\n"
+"This module enables the barcode scanning feature for the warehouse "
+"management system.\n"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
+msgid "%(nbr_of_picking)s pickings"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/js/stock_barcode_sml_form.js:0
+#: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
+msgid ""
+"%(product)s was not expected for this receipt but can be found in other "
+"waiting receipts "
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -35,69 +58,102 @@ msgstr ""
 "المخزون."
 
 #. module: stock_barcode
-#: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
-msgid ""
-"<i class=\"fa fa-fw fa-lg fa-barcode me-3\" title=\"Serial/Lot Number\"/>"
-msgstr ""
-"<i class=\"fa fa-fw fa-lg fa-barcode me-3\" title=\"الرقم التسلسلي/رقم "
-"المجموعة \"/>"
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
+msgid "(optional)"
+msgstr "(اختياري)"
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/count_screen_rfid.xml:0
+msgid "/s"
+msgstr "/s"
+
+#. module: stock_barcode
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_quant_barcode
+msgid "<i class=\"oi fs-4 me-1\" data-icon=\"sell\" title=\"Product\"/>"
+msgstr "<i class=\"oi fs-4 me-1\" data-icon=\"sell\" title=\"المنتج \"/>"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
-msgid "<i class=\"fa fa-fw fa-lg fa-cube me-3\" title=\"Quantity\"/>"
-msgstr "<i class=\"fa fa-fw fa-lg fa-cube me-3\" title=\"الكمية \"/>"
+msgid ""
+"<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"barcode\" title=\"Serial/Lot "
+"Number\"/>"
+msgstr ""
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
 msgid ""
-"<i class=\"fa fa-fw fa-lg fa-long-arrow-right me-3\" title=\"Scrap "
-"Location\"/>"
+"<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"deployed_code\" "
+"title=\"Quantity\"/>"
 msgstr ""
-"<i class=\"fa fa-fw fa-lg fa-long-arrow-right me-3\" title=\"موقع مخلفات "
+"<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"deployed_code\" title=\"الكمية "
+"\"/>"
+
+#. module: stock_barcode
+#: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
+msgid ""
+"<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"east\" title=\"Scrap Location\"/"
+">"
+msgstr ""
+"<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"east\" title=\"موقع مخلفات "
 "التصنيع \"/>"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
 msgid ""
-"<i class=\"fa fa-fw fa-lg fa-map-marker me-3\" title=\"Source Location\"/>"
+"<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"location_on\" title=\"Source "
+"Location\"/>"
 msgstr ""
-"<i class=\"fa fa-fw fa-lg fa-map-marker me-3\" title=\"Source Location\"/>"
+"<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"location_on\" title=\"Source "
+"Location\"/>"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
-msgid "<i class=\"fa fa-fw fa-lg fa-tags me-3\" title=\"Product\"/>"
-msgstr "<i class=\"fa fa-fw fa-lg fa-tags me-3\" title=\"المنتج \"/>"
+msgid "<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"sell\" title=\"Product\"/>"
+msgstr ""
+"<i class=\"oi oi-fw oi-lg me-3\" data-icon=\"sell\" title=\"المنتج \"/>"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_quant_barcode_kanban_2
-msgid "<i class=\"fa fa-lg fa-archive me-2\" title=\"Package\"/>"
-msgstr "<i class=\"fa fa-lg fa-archive me-2\" title=\"التغليف \"/>"
+msgid "<i class=\"oi oi-lg me-2\" data-icon=\"archive\" title=\"Package\"/>"
+msgstr "<i class=\"oi oi-lg me-2\" data-icon=\"archive\" title=\"التغليف \"/>"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_quant_barcode_kanban_2
-msgid "<i class=\"fa fa-lg fa-user-o me-2\" title=\"Owner\"/>"
-msgstr "<i class=\"fa fa-lg fa-user-o me-2\" title=\"المالك \"/>"
+msgid "<i class=\"oi oi-lg me-2\" data-icon=\"person\" title=\"Owner\"/>"
+msgstr "<i class=\"oi oi-lg me-2\" data-icon=\"person\" title=\"المالك \"/>"
+
+#. module: stock_barcode
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_view_form_barcode_from_batch
+msgid "<i class=\"oi oi-lg\" data-icon=\"local_shipping\" title=\"Transfer\"/>"
+msgstr ""
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.res_config_settings_view_form
-msgid "<i class=\"fa fa-print\"/> Print barcode commands and operation types"
-msgstr "<i class=\"fa fa-print\"/> طباعة أوامر الباركود وأنواع العمليات"
+msgid ""
+"<i class=\"oi\" data-icon=\"print\"/> Print barcode commands and operation "
+"types"
+msgstr ""
+"<i class=\"oi\" data-icon=\"print\"/> طباعة أوامر الباركود وأنواع العمليات"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.res_config_settings_view_form
-msgid "<i class=\"fa fa-print\"/> Print barcode demo sheet"
-msgstr "<i class=\"fa fa-print\"/> طباعة ورقة الباركود التجريبية"
+msgid "<i class=\"oi\" data-icon=\"print\"/> Print barcode demo sheet"
+msgstr "<i class=\"oi\" data-icon=\"print\"/> طباعة ورقة الباركود التجريبية"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.res_config_settings_view_form
-msgid "<i class=\"fa fa-print\"/> Print storage locations"
-msgstr "<i class=\"fa fa-print\"/> طباعة مواقع التخزين"
+msgid "<i class=\"oi\" data-icon=\"print\"/> Print storage locations"
+msgstr "<i class=\"oi\" data-icon=\"print\"/> طباعة مواقع التخزين"
 
 #. module: stock_barcode
-#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
-#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_quant_barcode
-msgid "<i class=\"fa fs-4 fa-tags me-1\" title=\"Product\"/>"
-msgstr "<i class=\"fa fs-4 fa-tags me-1\" title=\"المنتج \"/>"
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_picking_view_kanban
+msgid ""
+"<span class=\"oi ms-1\" data-icon=\"open_in_new\" title=\"Open Batch "
+"Picking\"/>"
+msgstr ""
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
@@ -128,6 +184,7 @@ msgstr ""
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.js:0
+#: code:addons/stock_barcode/static/src/components/suggest_batch_dialog.xml:0
 msgid "Add Product"
 msgstr "إضافة منتج"
 
@@ -138,7 +195,7 @@ msgstr "أضف الألوان إلى بطاقات العمليات لمساعد�
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
+#: code:addons/stock_barcode/static/src/components/extra_product_dialog.js:0
 msgid "Add extra product?"
 msgstr "إضافة منتج إضافي؟"
 
@@ -156,17 +213,26 @@ msgstr "بعد مجموعة من المنتجات"
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__barcode_default_snln_generation__all
+msgid "All"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "All products need to be packed"
 msgstr "كافة المنتجات تحتاج إلى تغليفها"
 
 #. module: stock_barcode
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_batch_picking_view_info
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_picking_barcode
 msgid "Allocation"
 msgstr "التخصيص"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__barcode_allow_extra_product
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_view_picking_type_form
 msgid "Allow extra products"
 msgstr "السماح بالمنتجات الإضافية"
 
@@ -186,39 +252,35 @@ msgstr ""
 
 #. module: stock_barcode
 #. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
+msgid "Alternative:"
+msgstr "البديل:"
+
+#. module: stock_barcode
+#. odoo-python
 #: code:addons/stock_barcode/models/epc_encoder.py:0
 msgid ""
-"An error occured during parsing of element_string: AI code %(ai_code)s is "
+"An error occurred during parsing of element_string: AI code %(ai_code)s is "
 "missing for scheme %(scheme_name)s"
 msgstr ""
-"حدث خطأ أثناء تحليل element_string: رمز الذكاء الاصطناعي %(ai_code)s غير "
-"موجود للمخطط %(scheme_name)s"
-
-#. module: stock_barcode
-#. odoo-python
-#: code:addons/stock_barcode/models/epc_encoder.py:0
-msgid ""
-"An error occured with field '%(field_name)s': the corresponding AI '%"
-"(ai_code)s' was not found in the element_string"
-msgstr ""
-"حدث خطأ في الحقل '%(field_name)s': لم يتم العثور على الذكاء الاصطناعي '%"
-"(ai_code)s' المقابل في element_string"
-
-#. module: stock_barcode
-#. odoo-python
-#: code:addons/stock_barcode/models/epc_encoder.py:0
-msgid ""
-"An error occured: value of company_prefix_length (%(company_prefix_length)s) "
-"must be between 6 and 12 inclusive."
-msgstr ""
-"حدث خطأ ما: يجب أن تكون قيمة company_prefix_length (%"
-"(company_prefix_length)s) بين 6 و12 شاملة كلتا القيمتين."
+"حدث خطأ أثناء تحليل element_string: الرمز AI %(ai_code)s غير موجود في المخطط "
+"%(scheme_name)s"
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/epc_encoder.py:0
 msgid "An error occurred with field '%(field_name)s': %(error_message)s"
 msgstr "حدث خطأ في الحقل '%(field_name)s': %(error_message)s"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/epc_encoder.py:0
+msgid ""
+"An error occurred with field '%(field_name)s': the corresponding AI '%"
+"(ai_code)s' was not found in the element_string"
+msgstr ""
+"حدث خطأ في الحقل '%(field_name)s': لم يتم العثور على الذكاء الاصطناعي "
+"المقابل '%(ai_code)s' في element_string"
 
 #. module: stock_barcode
 #. odoo-python
@@ -235,6 +297,16 @@ msgstr ""
 #: code:addons/stock_barcode/models/epc_encoder.py:0
 msgid "An error occurred with method '%(method_name)s': %(error_message)s"
 msgstr "حدث خطأ في الطريقة '%(method_name)s': %(error_message)s"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/epc_encoder.py:0
+msgid ""
+"An error occurred: value of company_prefix_length (%"
+"(company_prefix_length)s) must be between 6 and 12 inclusive."
+msgstr ""
+"حدث خطأ: يجب أن تتراوح قيمة company_prefix_length (%"
+"(company_prefix_length)s) بين 6 و12، بما في ذلك الرقمان."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -262,7 +334,7 @@ msgstr "متاح:"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/backorder_dialog.xml:0
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
 msgid "Backorder"
 msgstr "الطلبات المتأخرة"
 
@@ -276,8 +348,9 @@ msgstr "تأكيد الطلبات المتأخرة"
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.xml:0
 #: model:ir.actions.client,name:stock_barcode.stock_barcode_action_main_menu
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_move_line__product_barcode
-#: model:ir.model.fields,field_description:stock_barcode.field_stock_scrap__product_barcode
+#: model:ir.module.module,shortdesc:base.module_stock_barcode
 #: model:ir.ui.menu,name:stock_barcode.stock_barcode_menu
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_picking_batch_form
 #: model_terms:ir.ui.view,arch_db:stock_barcode.view_picking_form
 msgid "Barcode"
 msgstr "باركود"
@@ -288,9 +361,14 @@ msgid "Barcode App"
 msgstr "تطبيق الباركود"
 
 #. module: stock_barcode
+#: model:ir.actions.client,name:stock_barcode.stock_barcode_picking_batch_client_action
+msgid "Barcode Batch Picking Client Action"
+msgstr ""
+
+#. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_location__barcode_img
 msgid "Barcode Img"
-msgstr ""
+msgstr "صورة الباركود"
 
 #. module: stock_barcode
 #: model:ir.actions.client,name:stock_barcode.stock_barcode_inventory_client_action
@@ -306,11 +384,6 @@ msgstr "تسمية الباركود"
 #: model:ir.actions.client,name:stock_barcode.stock_barcode_picking_client_action
 msgid "Barcode Picking Client Action"
 msgstr "إجراء عميل باركود الانتقاء"
-
-#. module: stock_barcode
-#: model:ir.model.fields,field_description:stock_barcode.field_stock_scrap___barcode_scanned
-msgid "Barcode Scanned"
-msgstr "الباركود الممسوح ضوئيًا"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -331,6 +404,41 @@ msgid "Barcodes are not available."
 msgstr "الباركودات غير متاحة."
 
 #. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/suggest_batch_dialog.js:0
+msgid "Batch Receipts"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/js/stock_barcode_sml_form.js:0
+#: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
+msgid "Batch Receipts from %(partner)s?"
+msgstr ""
+
+#. module: stock_barcode
+#: model:ir.model,name:stock_barcode.model_stock_picking_batch
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_barcode_cancel_operation__batch_id
+msgid "Batch Transfer"
+msgstr ""
+
+#. module: stock_barcode
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_barcode_cancel_operation__batch_name
+msgid "Batch Transfer Name"
+msgstr ""
+
+#. module: stock_barcode
+#: model:ir.actions.act_window,name:stock_barcode.stock_barcode_batch_picking_action_kanban
+msgid "Batch Transfers"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/kanban/stock_barcode_kanban_renderer.xml:0
+msgid "Batches"
+msgstr ""
+
+#. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/epc_encoder.py:0
 msgid ""
@@ -344,12 +452,15 @@ msgid "Cable Management Box"
 msgstr "صندوق تنظيم الأسلاك الكهربائية"
 
 #. module: stock_barcode
-#. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/confirm_quant_dialog.xml:0
-#: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_cancel_operation_view
 msgid "Cancel"
 msgstr "إلغاء"
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
+msgid "Cancel Batch Transfer"
+msgstr ""
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_barcode_cancel_operation
@@ -366,6 +477,12 @@ msgstr "إلغاء الشحنة"
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_cancel_operation_view
 msgid "Cancel operation"
 msgstr "إلغاء العملية"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_batch.py:0
+msgid "Cancel this batch transfer?"
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-python
@@ -388,6 +505,11 @@ msgid "Close"
 msgstr "إغلاق"
 
 #. module: stock_barcode
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_move_line__product_category_name
+msgid "Complete Name"
+msgstr "الاسم الكامل "
+
+#. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_res_config_settings
 msgid "Config Settings"
 msgstr "تهيئة الإعدادات"
@@ -401,6 +523,7 @@ msgstr "تهيئة باركود المنتج"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 #: code:addons/stock_barcode/static/src/js/stock_barcode_sml_form.js:0
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_batch_picking_view_info
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_picking_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_quant_barcode
@@ -411,7 +534,7 @@ msgstr "تأكيد"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/confirm_quant_dialog.xml:0
 msgid "Confirm Inventory Adjustment"
-msgstr ""
+msgstr "تأكيد تعديل المخزون"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_res_partner
@@ -422,7 +545,7 @@ msgstr "جهة الاتصال"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "Count Entire Locations"
-msgstr "حساب كافة المواقع"
+msgstr "جرد كافة المواقع"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -436,9 +559,25 @@ msgid "Counted Quantity"
 msgstr "الكمية المحسوبة"
 
 #. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
+msgid "Create Backorder"
+msgstr "إنشاء طلب متأخر"
+
+#. module: stock_barcode
 #: model:ir.model,website_form_label:stock_barcode.model_res_partner
 msgid "Create a Customer"
 msgstr "Create a Customer"
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
+msgid ""
+"Create a backorder if you expect to process the remaining products later. Do "
+"not create a backorder if you will not process the remaining products."
+msgstr ""
+"قم بإنشاء طلب متأخر إذا كنت تتوقع معالجة المنتجات المتبقية لاحقاً. لا تقم "
+"بإنشاء طلب متأخر إذا لم تكن تنوي معالجة بقية المنتجات."
 
 #. module: stock_barcode
 #: model_terms:ir.actions.act_window,help:stock_barcode.stock_picking_action_kanban
@@ -477,6 +616,11 @@ msgid "Demo Data Active"
 msgstr "البيانات التجريبية النشطة"
 
 #. module: stock_barcode
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_batch_picking_view_info
+msgid "Description"
+msgstr ""
+
+#. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
 msgid "Destination Container Package"
 msgstr ""
@@ -508,13 +652,17 @@ msgstr "تعطيل المؤثرات الصوتية عند مسح الباركو�
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/apply_quant_dialog.xml:0
-#: code:addons/stock_barcode/static/src/js/stock_barcode_sml_form.js:0
-#: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
-#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
-#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_picking_barcode
-#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_quant_barcode
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: code:addons/stock_barcode/static/src/components/confirm_quant_dialog.xml:0
+#: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 msgid "Discard"
 msgstr "إهمال"
+
+#. module: stock_barcode
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_picking__display_batch_button
+msgid "Display Batch Button"
+msgstr ""
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_product_product__display_name
@@ -530,9 +678,10 @@ msgstr "إهمال"
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_package__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_package_type__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_batch__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_quant__display_name
-#: model:ir.model.fields,field_description:stock_barcode.field_stock_scrap__display_name
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_request_count__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_warehouse__display_name
 #: model:ir.model.fields,field_description:stock_barcode.field_uom_uom__display_name
 msgid "Display Name"
@@ -587,7 +736,13 @@ msgstr "لا تقم بإظهار هذه الرسالة مجدداً"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/backorder_dialog.xml:0
 msgid "Done / To do"
-msgstr ""
+msgstr "المهام المنتهية / المهام المراد تنفيذها"
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.xml:0
+msgid "Done:"
+msgstr "تم:"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -666,6 +821,18 @@ msgstr "التصديق النهائي"
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+msgid "First Lot Number"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+msgid "First Serial Number"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Following backorder was created:"
 msgstr "تم إنشاء الطلب المتأخر التالي:"
@@ -675,6 +842,16 @@ msgstr "تم إنشاء الطلب المتأخر التالي:"
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Following backorders were created:"
 msgstr "تم إنشاء الطلبات المتأخرة التالية:"
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/extra_product_dialog.js:0
+msgid ""
+"Following scanned products are not reserved for this transfer. Are you sure "
+"you want to add them?"
+msgstr ""
+"المنتجات الممسوحة ضوئيًا التالية غير محجوزة لهذه الشحنة. هل أنت متأكد من "
+"رغبتك في إضافتها؟"
 
 #. module: stock_barcode
 #: model:ir.model.fields,help:stock_barcode.field_stock_picking_type__barcode_allow_extra_product
@@ -722,9 +899,36 @@ msgid "Formatted Product Barcode"
 msgstr "باركود المنتج المنسَّق"
 
 #. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.js:0
+msgid "Generate Lot numbers"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.js:0
+msgid "Generate Serial numbers"
+msgstr ""
+
+#. module: stock_barcode
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__barcode_default_snln_generation
+msgid "Generation Mode"
+msgstr ""
+
+#. module: stock_barcode
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__group_lines_by_product
+msgid "Group batch lines"
+msgstr ""
+
+#. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_product_product__has_image
 msgid "Has Image"
 msgstr "يحتوي على صورة"
+
+#. module: stock_barcode
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_quant__has_count_requested
+msgid "Has this quant count been requested"
+msgstr "تم طلب هذه الكمية"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_move_line__hide_lot
@@ -750,9 +954,10 @@ msgstr "إخفاء اسم المجموعة"
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_package__id
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_package_type__id
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking__id
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_batch__id
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__id
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_quant__id
-#: model:ir.model.fields,field_description:stock_barcode.field_stock_scrap__id
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_request_count__id
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_warehouse__id
 #: model:ir.model.fields,field_description:stock_barcode.field_uom_uom__id
 msgid "ID"
@@ -770,10 +975,16 @@ msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/backorder_dialog.xml:0
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
 msgid ""
 "If you validate now, the remaining products will be added to a backorder."
 msgstr "إذا قمت بتصديق الطلب الآن، ستتم إضافة بقية المنتجات إلى الطلب المتأخر."
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
+msgid "If you validate, the remaining products will never be done."
+msgstr "إذا قمت بتصديقها، فلن يتم إنجاز المنتجات المتبقية أبدًا."
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_move_line__image_1920
@@ -790,12 +1001,17 @@ msgstr "نقل غير مكتمل"
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.xml:0
-msgid "Install"
-msgstr "تثبيت"
+msgid "Install Barcode PWA"
+msgstr ""
+
+#. module: stock_barcode
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__instructions_preview
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_view_picking_type_form
+msgid "Instructions Preview"
+msgstr "معاينة التعليمات"
 
 #. module: stock_barcode
 #: model:ir.model.fields,help:stock_barcode.field_stock_move_line__product_barcode
-#: model:ir.model.fields,help:stock_barcode.field_stock_scrap__product_barcode
 msgid "International Article Number used for product identification."
 msgstr "رقم المادة الدولي المستخدم للتعرف على المنتج."
 
@@ -825,8 +1041,8 @@ msgstr "word_pad_char '%(word_pad_side)s' غير صالح. استخدم 'يسا�
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_location
-msgid "Inventory Locations"
-msgstr "مواقع المخزون"
+msgid "Inventory Location"
+msgstr "موقع المخزون"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -862,6 +1078,18 @@ msgid "Length must be a positive integer"
 msgstr "يجب أن يكون الطول عبارة عن عدد صحيح موجب"
 
 #. module: stock_barcode
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_batch_picking_view_kanban
+msgid "Lines"
+msgstr ""
+
+#. module: stock_barcode
+#: model:ir.model.fields,help:stock_barcode.field_stock_picking_type__group_lines_by_product
+msgid ""
+"Lines of same product at same location appear grouped. Not to use for "
+"cluster picking"
+msgstr ""
+
+#. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_product_uom
 msgid "Link between products and their UoMs"
 msgstr "رابط بين المنتجات ووحدات القياس الخاصة بها"
@@ -885,8 +1113,14 @@ msgstr "تمت معالجة الموقع"
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.xml:0
-msgid "Log out"
-msgstr "تسجيل الخروج"
+msgid "Logout"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+msgid "Lot Number"
+msgstr ""
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_lot
@@ -924,6 +1158,12 @@ msgid "Maximum delay between each key in ms (100 ms by default)"
 msgstr "أقصى تأخير بين كل مفتاح وآخر بالمللي ثانية (100 مللي ثانية افتراضياً)"
 
 #. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
+msgid "Missing"
+msgstr "ناقص "
+
+#. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_res_config_settings__barcode_separator_regex
 msgid "Multiscan Separator"
 msgstr "فاصل المسح المتعدد"
@@ -946,21 +1186,33 @@ msgid "No %(picking_type)s ready for this %(barcode_type)s"
 msgstr "لا توجد %(picking_type)s جاهزة لـ %(barcode_type)s"
 
 #. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
+msgid "No Backorder"
+msgstr "لا توجد طلبات متأخرة"
+
+#. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_move_line.py:0
 msgid "No Barcode"
 msgstr "لا يوجد باركود"
 
 #. module: stock_barcode
-#: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__restrict_scan_source_location__no
-msgid "No Scan"
-msgstr "بلا مسح ضوئي"
+#: model_terms:ir.actions.act_window,help:stock_barcode.stock_barcode_batch_picking_action_kanban
+msgid "No batch transfer found"
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/controllers/stock_barcode.py:0
 msgid "No internal operation type. Please configure one in warehouse settings."
 msgstr "لا يوجد نوع عمليات داخلي. يرجى تهيئة واحد في إعدادات المستودع."
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/controllers/stock_barcode.py:0
+msgid "No pending transfer for %(partner)s"
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-python
@@ -978,13 +1230,13 @@ msgstr "لا توجد عملية انتقاء أو منتج مقابل للبا�
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "No product found for barcode %s"
-msgstr ""
+msgstr "لم يتم العثور على منتج مرتبط بالباركود %s"
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "No product or lot found for barcode %s"
-msgstr ""
+msgstr "لم يتم العثور على أي منتج أو مجموعة مرتبطة بالباركود %s"
 
 #. module: stock_barcode
 #. odoo-python
@@ -996,31 +1248,31 @@ msgstr "لم يتم العثور على طرد للباركود %s "
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "No product or packaging found for barcode %s"
-msgstr ""
+msgstr "لم يتم العثور على أي منتج أو تغليف مرتبط بالباركود %s"
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "No product, lot, or package found for barcode %s"
-msgstr ""
+msgstr "لم يتم العثور على منتج أو مجموعة أو طرد للباركود %s"
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "No product, lot, or packaging found for barcode %s"
-msgstr ""
+msgstr "لم يتم العثور على أي منتج أو مجموعة أو عبوة للباركود %s"
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "No product, lot, packaging, or package found for barcode %s"
-msgstr ""
+msgstr "لم يتم العثور على أي منتج أو مجموعة أو عبوة أو طرد مرتبط بالباركود %s"
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "No product, package, or packaging found for barcode %s"
-msgstr ""
+msgstr "لم يتم العثور على أي منتج أو طرد أو تغليف للباركود %s"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1041,6 +1293,19 @@ msgstr "ليست عملية المسح الضوئي المتوقعة"
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+msgid "Number of SN"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+#: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__barcode_default_snln_generation__only_one
+msgid "Only One"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
 #: code:addons/stock_barcode/static/src/js/stock_barcode_sml_form.js:0
 msgid ""
 "Oops! It seems that this product is not located in %(location)s.\n"
@@ -1048,6 +1313,18 @@ msgid ""
 msgstr ""
 "عذراً! يبدو أن هذا المنتج غير موجود في %(location)s.\n"
 "هل تؤكد أنك قمت بالانتقاء من هناك؟"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/controllers/stock_barcode.py:0
+msgid "Open lot"
+msgstr "مجموعة مفتوحة"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_batch.py:0
+msgid "Open picking batch form"
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-python
@@ -1066,6 +1343,7 @@ msgid "Operations"
 msgstr "العمليات"
 
 #. module: stock_barcode
+#: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__restrict_scan_source_location__no
 #: model:ir.model.fields.selection,name:stock_barcode.selection__stock_picking_type__restrict_scan_tracking_number__optional
 msgid "Optional Scan"
 msgstr "المسح الضوئي الاختياري"
@@ -1187,9 +1465,9 @@ msgstr "طباعة"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
-msgid "Print Barcodes"
-msgstr "طباعة الباركودات"
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
+msgid "Print Batch Transfer"
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1206,6 +1484,12 @@ msgstr "طباعة المخزون"
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
+msgid "Print Labels"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Print Packages"
 msgstr "طباعة الطرود"
 
@@ -1217,11 +1501,25 @@ msgstr "طباعة عمليات الانتقاء"
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
+msgid "Print Product Labels"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/line.xml:0
+msgid "Print Reservation"
+msgstr "طباعة الحجز"
+
+#. module: stock_barcode
+#. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.js:0
 msgid ""
 "Print the %(sheet_s)sdemo data sheet%(sheet_e)s to test, or %"
 "(ops_s)sbarcodes%(ops_e)s for operations."
 msgstr ""
+"اطبع ورقة بيانات العرض التوضيحي %(sheet_s)s وورقة %(sheet_e)s لاختبارها، أو "
+"الباركودات %(ops_s)s وورقة %(ops_e)s لإجراء العمليات."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1282,7 +1580,7 @@ msgstr "الخصائص"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
 msgid "Put In Pack"
-msgstr "وضعه في الطرد"
+msgstr "وضعه ضمن حزمة"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_view_picking_type_form
@@ -1293,6 +1591,11 @@ msgstr "تغليف في طرد"
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_move_line__qty_done
 msgid "Qty Done"
 msgstr "الكمية المنتهية"
+
+#. module: stock_barcode
+#: model:ir.model,name:stock_barcode.model_stock_quant
+msgid "Quant"
+msgstr "سجل الكميات"
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
@@ -1306,9 +1609,15 @@ msgid "Quantity Done"
 msgstr "الكمية المنتهية"
 
 #. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+msgid "Quantity Received"
+msgstr ""
+
+#. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
 msgid "Quantity in Stock"
-msgstr ""
+msgstr "الكمية المتوفرة في المخزون "
 
 #. module: stock_barcode
 #: model:ir.model.fields,help:stock_barcode.field_stock_move_line__packaging_uom_qty
@@ -1316,9 +1625,10 @@ msgid "Quantity in the packaging unit"
 msgstr "الكمية معبر عنها بوحدة التعبئة والتغليف"
 
 #. module: stock_barcode
-#: model:ir.model,name:stock_barcode.model_stock_quant
-msgid "Quants"
-msgstr "سجلات الكميات"
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+msgid "Quantity per Lot"
+msgstr ""
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_res_config_settings__barcode_rfid_batch_time
@@ -1356,6 +1666,7 @@ msgid ""
 "Scan a %(bold_s)s transfer%(bold_e)s or a %(bold_s)s product%(bold_e)s to "
 "filter your records"
 msgstr ""
+"قم بمسح %(bold_s)s شحنة %(bold_e)s أو %(bold_s)s منتج%(bold_e)s لتصفية سجلاتك"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1409,6 +1720,8 @@ msgid ""
 "Scan a %(bold_s)s transfer%(bold_e)s, a %(bold_s)s product%(bold_e)s, or a %"
 "(bold_s)s lot%(bold_e)s to filter your records"
 msgstr ""
+"قم بمسح %(bold_s)s شحنة %(bold_e)s، أو %(bold_s)s منتج%(bold_e)s، أو %"
+"(bold_s)s دفعة%(bold_e)s لتصفية سجلاتك"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1417,6 +1730,8 @@ msgid ""
 "Scan a %(bold_s)s transfer%(bold_e)s, a %(bold_s)s product%(bold_e)s, or a %"
 "(bold_s)s package%(bold_e)s to filter your records"
 msgstr ""
+"قم بمسح %(bold_s)s شحنة %(bold_e)s، أو %(bold_s)s منتج%(bold_e)s، أو %"
+"(bold_s)s طرد %(bold_e)s لتصفية سجلاتك"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1425,24 +1740,32 @@ msgid ""
 "Scan a %(bold_s)s transfer%(bold_e)s, a %(bold_s)s product%(bold_e)s, or a %"
 "(bold_s)s packaging%(bold_e)s to filter your records"
 msgstr ""
+"قم بمسح %(bold_s)s شحنة %(bold_e)s، أو %(bold_s)s منتج%(bold_e)s، أو %"
+"(bold_s)s عبوة%(bold_e)s لتصفية سجلاتك"
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/main_menu/main_menu.js:0
+msgid "Scan a %(bold_s)scontact%(bold_e)s to see their pending transfers"
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.js:0
 msgid "Scan a %(bold_s)slocation%(bold_e)s to initiate a transfer"
-msgstr ""
+msgstr "امسح %(bold_s)s موقعاً %(bold_e)s لبدء عملية النقل"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.js:0
 msgid "Scan a %(bold_s)spackage%(bold_e)s to find a transfer"
-msgstr ""
+msgstr "امسح %(bold_s)sالطرد%(bold_e)s للعثور على الشحنة"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.js:0
 msgid "Scan a %(bold_s)spicking%(bold_e)s to open it"
-msgstr ""
+msgstr "امسح %(bold_s)sعملية الانتقاء%(bold_e)s لفتحها"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1451,6 +1774,8 @@ msgid ""
 "Scan a %(bold_s)sproduct%(bold_e)s or its %(bold_s)spackaging%(bold_e)s to "
 "locate it"
 msgstr ""
+"امسح %(bold_s)sالمنتج%(bold_e)s ضوئياً أو %(bold_s)sالعبوة/التغليف%(bold_e)s "
+"الخاص به لتحديد موقعه"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1459,12 +1784,14 @@ msgid ""
 "Scan a %(bold_s)stracking number%(bold_e)s or a %(bold_s)spackage%(bold_e)s "
 "to find a transfer"
 msgstr ""
+"امسح %(bold_s)sرقم التتبع%(bold_e)s ضوئياً أو %(bold_s)sالعبوة/التغليف%"
+"(bold_e)s للعثور على الشحنة"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.js:0
 msgid "Scan a %(bold_s)stracking number%(bold_e)s to find a transfer"
-msgstr ""
+msgstr "امسح %(bold_s)sرقم التتبع%(bold_e)s ضوئياً للعثور على الشحنة"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1485,6 +1812,12 @@ msgid "Scan a lot number then the destination location"
 msgstr "مسح رقم مجموعة ضوئياً، ثم موقع الوجهة"
 
 #. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
+msgid "Scan a lot/serial number if product is tracked"
+msgstr "قم بمسح رقم المجموعة/الرقم التسلسلي إذا كان المنتج قابلاً للتتبع"
+
+#. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Scan a package"
@@ -1492,9 +1825,17 @@ msgstr "مسح طرد ضوئياً"
 
 #. module: stock_barcode
 #. odoo-javascript
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Scan a package or put in pack"
 msgstr "مسح طرد ضوئياً أو وضع في طرد"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
+msgid "Scan a package or put in pack if desired"
+msgstr "امسح الطرد ضوئيًا أو ضعه في حزمة إذا رغبت في ذلك"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1510,6 +1851,8 @@ msgstr "مسح طرد ضوئياً أو مسح موقع الوجهة أو منت
 
 #. module: stock_barcode
 #. odoo-javascript
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Scan a product"
 msgstr "مسح منتج"
@@ -1530,7 +1873,7 @@ msgstr "مسح منتج ضوئياً من %s"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "Scan a product or a lot to filter the transfers."
-msgstr ""
+msgstr "قم بمسح منتج أو مجموعة ضوئيًا لتصفية الشحنات."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1548,7 +1891,7 @@ msgstr "قم بمسح منتج أو طرد لتصفية الشحنات. "
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "Scan a product or a packaging to filter the transfers."
-msgstr ""
+msgstr "قم بمسح منتج أو عبوة ضوئيًّا لتصفية الشحنات."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1572,26 +1915,26 @@ msgstr "قم بمسح منتج ضوئياً ثم موقع الوجهة"
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "Scan a product to filter the transfers."
-msgstr ""
+msgstr "قم بمسح منتج ضوئيًا لتصفية الشحنات."
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid ""
 "Scan a product, a lot, a packaging, or a package to filter the transfers."
-msgstr ""
+msgstr "قم بمسح منتج أو مجموعة أو عبوة أو طرد ضوئيًا لتصفية الشحنات."
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "Scan a product, a lot, or a package to filter the transfers."
-msgstr ""
+msgstr "قم بمسح منتج أو مجموعة أو طرد ضوئيًا لتصفية الشحنات."
 
 #. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "Scan a product, a lot, or a packaging to filter the transfers."
-msgstr ""
+msgstr "امسح منتجًا أو دفعة أو عبوة ضوئيًّا لتصفية الشحنات."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1609,7 +1952,7 @@ msgstr "قم بمسح منتح أو طرد أو موقع الوجهة ضوئيا
 #. odoo-python
 #: code:addons/stock_barcode/models/stock_picking.py:0
 msgid "Scan a product, a package, or a packaging to filter the transfers."
-msgstr ""
+msgstr "امسح منتجًا أو طرداً أو عبوة لتصفية الشحنات."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1636,16 +1979,34 @@ msgid "Scan a serial number then the destination location"
 msgstr "مسح رقم تسلسلي ضوئياً، ثم موقع الوجهة"
 
 #. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
+msgid "Scan a source location"
+msgstr "مسح موقع المصدر"
+
+#. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.js:0
 msgid "Scan an %(bold_s)soperation type%(bold_e)s to start it"
-msgstr ""
+msgstr "امسح %(bold_s)sنوع العملية%(bold_e)s ضوئياً لبدئها"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
+msgid "Scan an existing package to move"
+msgstr "امسح طرداً موجوداً لنقله"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Scan another serial number"
 msgstr "مسح رقم تسلسلي آخر ضوئياً"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
+msgid "Scan another source location"
+msgstr "مسح موقع مصدر آخر"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1658,6 +2019,12 @@ msgstr "مسح المزيد من أرقام المجموعات ضوئياً"
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Scan more lot numbers or a package"
 msgstr "مسح المزيد من أرقام المجموعات أو طرد ضوئياً"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
+msgid "Scan more lot/serial numbers"
+msgstr "مسح المزيد من أرقام المجموعات/الأرقام التسلسلية"
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1674,23 +2041,29 @@ msgstr "مسح المزيد من المنتجات، أو مسح موقع مصد�
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/main_menu/main_menu.xml:0
+#: code:addons/stock_barcode/static/src/main_scanner/main_scanner.xml:0
 msgid "Scan or tap"
 msgstr "المسح أو النقر"
 
 #. module: stock_barcode
 #. odoo-javascript
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Scan the destination location"
 msgstr "مسح موقع الوجهة ضوئياً"
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Scan the package %s"
 msgstr "مسح الطرد %s ضوئياً"
 
 #. module: stock_barcode
 #. odoo-javascript
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Scan the source location"
 msgstr "مسح الموقع المصدر"
@@ -1704,23 +2077,12 @@ msgstr "مسح موقع المصدر أو طرد ضوئياً"
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
-msgid ""
-"Scanned product %s is not reserved for this transfer. Are you sure you want "
-"to add it?"
-msgstr ""
-"المنتج %s الممسوح ضوئياً غير محجوز لهذه الشحنة. هل أنت متأكد من أنك ترغب في "
-"إضافته؟"
-
-#. module: stock_barcode
-#. odoo-javascript
-#: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid "Scanning package"
 msgstr "مسح الطرد ضوئياً"
 
 #. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/main.xml:0
-#: model:ir.model,name:stock_barcode.model_stock_scrap
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
 msgid "Scrap"
 msgstr "مخلفات التصنيع"
@@ -1731,6 +2093,12 @@ msgid "Scrap Location"
 msgstr "موقع مخلفات التصنيع"
 
 #. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/main.xml:0
+msgid "See Allocation"
+msgstr ""
+
+#. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
 msgid "Select a Product"
 msgstr "تحديد منتج"
@@ -1739,6 +2107,12 @@ msgstr "تحديد منتج"
 #: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_product_selector
 msgid "Select where else to pick the product from"
 msgstr "حدد موقعاً آخر لانتقاء المنتج منه"
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
+msgid "Serial Number"
+msgstr ""
 
 #. module: stock_barcode
 #: model_terms:ir.ui.view,arch_db:stock_barcode.scrap_product_selector
@@ -1766,6 +2140,7 @@ msgstr "إظهار التصديق عن طريق الباركود"
 
 #. module: stock_barcode
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_type__show_reserved_sns
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_view_picking_type_form
 msgid "Show reserved lots/SN"
 msgstr "إظهار أرقام المجموعات/الأرقام التسلسلية المحجوزة"
 
@@ -1795,14 +2170,24 @@ msgstr "الطرد المصدري"
 
 #. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/backorder_dialog.xml:0
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
 msgid "Stay on transfer"
 msgstr "البقاء في الشحنة"
+
+#. module: stock_barcode
+#: model:ir.actions.act_window,name:stock_barcode.stock_quant_action_locate
+msgid "Stock Locations"
+msgstr "مواقع المخزون"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_move
 msgid "Stock Move"
 msgstr "حركة المخزون"
+
+#. module: stock_barcode
+#: model:ir.model,name:stock_barcode.model_stock_request_count
+msgid "Stock Request an Inventory Count for barcode"
+msgstr "طلب جرد المخزون للباركود"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_package_type
@@ -1819,6 +2204,15 @@ msgstr ""
 "للتحكم في الظهور في واجهة المستخدم ذات الصلة."
 
 #. module: stock_barcode
+#: model:ir.model.fields,help:stock_barcode.field_stock_quant__has_count_requested
+msgid ""
+"Technical field to mark the quant count request to make it non-removable for "
+"the barcode user"
+msgstr ""
+"حقل تقني لتمييز طلب عدد الوحدات الكمية لجعله غير قابل للإزالة بالنسبة "
+"لمستخدم باركود"
+
+#. module: stock_barcode
 #: model:ir.model.fields,help:stock_barcode.field_stock_picking_type__show_barcode_validation
 msgid ""
 "Technical field used to compute whether the \"Final Validation\" group "
@@ -1828,16 +2222,51 @@ msgstr ""
 "لا، لتقليل تعقيد المجموعات المجمعة/المخفية."
 
 #. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
+msgid "The Batch Transfer has been validated"
+msgstr ""
+
+#. module: stock_barcode
+#: model:ir.model.constraint,message:stock_barcode.constraint_res_config_settings_check_barcode_rfid_batch_time
+msgid "The RFID timer should be positive."
+msgstr "يجب أن يكون مؤقت RFID موجباً."
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
+msgid "The batch picking has been cancelled"
+msgstr ""
+
+#. module: stock_barcode
 #. odoo-python
 #: code:addons/stock_barcode/models/epc_encoder.py:0
 msgid "The encoding '%(encoding_name)s' is not supported."
 msgstr "الترميز '%(encoding_name)s' غير مدعوم."
 
 #. module: stock_barcode
+#: model_terms:ir.actions.act_window,help:stock_barcode.stock_barcode_batch_picking_action_kanban
+msgid ""
+"The goal of the batch transfer is to group operations that may\n"
+"            (needs to) be done together in order to increase their "
+"efficiency.\n"
+"            It may also be useful to assign jobs (one person = one batch) "
+"or\n"
+"            help the timing management of operations (tasks to be done at "
+"1pm)."
+msgstr ""
+
+#. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_quant_model.js:0
 msgid "The inventory count has been updated"
 msgstr "تم تحديث تعداد المخزون"
+
+#. module: stock_barcode
+#: model:ir.model.constraint,message:stock_barcode.constraint_res_config_settings_check_barcode_max_time_between_keys_in_ms
+msgid "The maximum time between each key should be positive."
+msgstr ""
+"يجب أن يكون الحد الأقصى للوقت الفاصل بين كل مفتاح وقبله أو بعده عددًا موجبًا."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1859,9 +2288,20 @@ msgstr "لا تنتمي الوجهة التي تم مسحها ضوئياً إل�
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
+msgid "The scanned serial number %(lotName)s is already awaiting confirmation."
+msgstr "الرقم التسلسلي الممسوح ضوئيًّا %(lotName)s بانتظار التأكيد بالفعل."
+
+#. module: stock_barcode
+#. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 msgid "The scanned serial number %s is already used."
 msgstr "الرقم التسلسلي الممسوح ضوئياً %s مستخدم بالفعل."
+
+#. module: stock_barcode
+#: model:ir.model.fields,help:stock_barcode.field_stock_move_line__picking_id
+msgid "The stock operation where the packing has been made"
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1889,11 +2329,33 @@ msgstr "لا يوجد ما يمكن طباعته في هذه الصفحة."
 
 #. module: stock_barcode
 #. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
+msgid "This batch is already cancelled"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
+msgid "This batch is already done"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/models/barcode_picking_batch_model.js:0
+msgid ""
+"This batch transfer is still in draft, scans are disabled until the batch is "
+"confirmed"
+msgstr ""
+
+#. module: stock_barcode
+#. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid ""
 "This package contains extra products and extra products are not allowed on "
 "this operation."
 msgstr ""
+"يحتوي هذا الطرد على منتجات إضافية، ولا يُسمح بوجود منتجات إضافية في هذه "
+"العملية."
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1961,6 +2423,8 @@ msgstr "إجمالي مرات القراءة"
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_picking
 #: model:ir.model.fields,field_description:stock_barcode.field_stock_barcode_cancel_operation__picking_id
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_move_line__picking_id
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_move_line_view_form_barcode_from_batch
 msgid "Transfer"
 msgstr "تحويل"
 
@@ -1970,9 +2434,25 @@ msgid "Transfer Name"
 msgstr "اسم الشحنة"
 
 #. module: stock_barcode
+#. odoo-javascript
+#: code:addons/stock_barcode/static/src/kanban/stock_barcode_kanban_renderer.xml:0
+msgid "Transfers"
+msgstr ""
+
+#. module: stock_barcode
 #: model_terms:ir.actions.act_window,help:stock_barcode.stock_picking_action_kanban
 msgid "Transfers allow you to move products from one location to another."
 msgstr "تتيح لك الشحنات نقل البضائع من موقع إلى آخر."
+
+#. module: stock_barcode
+#: model:ir.model.fields,field_description:stock_barcode.field_stock_picking_batch__picking_type_code
+msgid "Type of Operation"
+msgstr ""
+
+#. module: stock_barcode
+#: model_terms:ir.ui.view,arch_db:stock_barcode.stock_barcode_batch_picking_view_info
+msgid "Unbatch Transfer"
+msgstr ""
 
 #. module: stock_barcode
 #. odoo-javascript
@@ -1997,11 +2477,23 @@ msgid "UoM"
 msgstr "وحدة القياس"
 
 #. module: stock_barcode
+#: model:ir.module.module,summary:base.module_stock_barcode
+msgid "Use barcode scanners to process logistics operations"
+msgstr ""
+
+#. module: stock_barcode
 #. odoo-javascript
-#: code:addons/stock_barcode/static/src/components/backorder_dialog.xml:0
+#: code:addons/stock_barcode/static/src/components/backorder_dialog.js:0
+#: code:addons/stock_barcode/static/src/components/barcode_generate_serial.xml:0
 #: code:addons/stock_barcode/static/src/models/barcode_model.js:0
 msgid "Validate"
 msgstr "تصديق"
+
+#. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking_type.py:0
+msgid "Validate or scan another product"
+msgstr "قم بتصديق منتج آخر أو مسحه ضوئيًا"
 
 #. module: stock_barcode
 #. odoo-python
@@ -2014,11 +2506,6 @@ msgstr "لا يمكن تمثيل القيمة %(value)s باستخدام %(lengt
 #: code:addons/stock_barcode/models/epc_encoder.py:0
 msgid "Value '%(value)s' must be an integer"
 msgstr "يجب أن تكون القيمة '%(value)s' عبارة عن عدد صحيح"
-
-#. module: stock_barcode
-#: model:ir.model.fields,help:stock_barcode.field_stock_scrap___barcode_scanned
-msgid "Value of the last barcode scanned."
-msgstr "قيمة آخر باركود ممسوح ضوئيًا."
 
 #. module: stock_barcode
 #. odoo-python
@@ -2037,7 +2524,7 @@ msgstr "العارض"
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/components/confirm_quant_dialog.xml:0
 msgid "Wait a Review"
-msgstr ""
+msgstr "في انتظار المراجعة"
 
 #. module: stock_barcode
 #: model:ir.model,name:stock_barcode.model_stock_warehouse
@@ -2096,6 +2583,15 @@ msgid "You can't register scrap at this state of the operation"
 msgstr "لا يمكنك تسجيل مخلفات التصنيع في هذه المرحلة من العملية"
 
 #. module: stock_barcode
+#. odoo-python
+#: code:addons/stock_barcode/models/stock_picking.py:0
+msgid ""
+"You cannot validate a transfer if no quantities are reserved nor done. You "
+"can use the info button on the top right corner of your screen to remove the "
+"transfer in question from the batch."
+msgstr ""
+
+#. module: stock_barcode
 #. odoo-javascript
 #: code:addons/stock_barcode/static/src/models/barcode_picking_model.js:0
 msgid ""
@@ -2131,278 +2627,14 @@ msgstr "منتجات لم تتم معالجتها على الإطلاق."
 msgid "products were partially processed."
 msgstr "منتجات قد تمت معالجتها جزئياً."
 
-#~ msgid "<i class=\"fa fa-fw fa-lg fa-archive me-3\" title=\"Package\"/>"
-#~ msgstr "<i class=\"fa fa-fw fa-lg fa-archive me-3\" title=\"الطرد \"/>"
+#~ msgid "Install"
+#~ msgstr "تثبيت"
 
-#~ msgid ""
-#~ "<i class=\"fa fa-fw fa-lg fa-archive me-3\" title=\"Source Package\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-fw fa-lg fa-archive me-3\" title=\"الطرد المصدري \"/>"
+#~ msgid "Log out"
+#~ msgstr "تسجيل الخروج"
 
-#~ msgid ""
-#~ "<i class=\"fa fa-fw fa-lg fa-barcode me-3\" title=\"Serial/Lot Number\" "
-#~ "attrs=\"{'invisible': [('tracking', 'not in', ['serial', 'lot'])]}\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-fw fa-lg fa-barcode me-3\" title=\"الرقم التسلسلي/رقم "
-#~ "المجموعة \" attrs=\"{'invisible': [('tracking', 'not in', ['serial', "
-#~ "'lot'])]}\"/>"
+#~ msgid "Print Barcodes"
+#~ msgstr "طباعة الباركودات"
 
-#~ msgid ""
-#~ "<i class=\"fa fa-fw fa-lg fa-cube me-3\" title=\"Counted Quantity\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-fw fa-lg fa-cube me-3\" title=\"الكمية المحسوبة \"/>"
-
-#~ msgid "<i class=\"fa fa-fw fa-lg fa-cubes me-3\" title=\"Locations\"/>"
-#~ msgstr "<i class=\"fa fa-fw fa-lg fa-cubes me-3\" title=\"المواقع \"/>"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-fw fa-lg fa-long-arrow-right me-3\" title=\"Destination "
-#~ "Location\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-fw fa-lg fa-long-arrow-right me-3\" title=\"موقع الوجهة "
-#~ "\"/>"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-fw fa-lg fa-long-arrow-right me-3\" title=\"Destination "
-#~ "Package\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-fw fa-lg fa-long-arrow-right me-3\" title=\"الطرد الوجهة "
-#~ "\"/>"
-
-#~ msgid "<i class=\"fa fa-fw fa-lg fa-map-marker me-3\" title=\"Location\"/>"
-#~ msgstr "<i class=\"fa fa-fw fa-lg fa-map-marker me-3\" title=\"الموقع \"/>"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-fw fa-lg fa-map-marker text-center me-3\" title=\"Source "
-#~ "Location\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-fw fa-lg fa-map-marker text-center me-3\" title=\"موقع "
-#~ "المصدر \"/>"
-
-#~ msgid "<i class=\"fa fa-fw fa-lg fa-user-o me-3\" title=\"Owner\"/>"
-#~ msgstr "<i class=\"fa fa-fw fa-lg fa-user-o me-3\" title=\"المالك \"/>"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-fw fa-lg fa-user-o text-center me-3\" title=\"Owner\"/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-fw fa-lg fa-user-o text-center me-3\" title=\"المالك \"/>"
-
-#~ msgid "<i class=\"fa fa-lg fa-archive\" title=\"Package\"/>"
-#~ msgstr "<i class=\"fa fa-lg fa-archive\" title=\"الطرد \"/>"
-
-#~ msgid "<i class=\"fa fa-lg fa-user-o\" title=\"Owner\"/>"
-#~ msgstr "<i class=\"fa fa-lg fa-user-o\" title=\"المالك \"/>"
-
-#~ msgid "<i class=\"fa fa-print\"/> Print barcode commands"
-#~ msgstr "<i class=\"fa fa-print\"/> طباعة أوامر الباركود"
-
-#~ msgid "<i class=\"fa fa-trash-o\"/> Delete"
-#~ msgstr "<i class=\"fa fa-trash-o\"/> حذف "
-
-#~ msgid "After group of Products"
-#~ msgstr "بعد مجموعة من المنتجات "
-
-#~ msgid ""
-#~ "Allow to validate a picking even if nothing was scanned yet (and so, do "
-#~ "an immediate transfert)"
-#~ msgstr ""
-#~ "السماح بتصديق عملية انتقاء حتى وإن لم يتم مسح أي شيء ضوئياً بعد (وبالتالي، "
-#~ "القيام بالنقل فوراً) "
-
-#~ msgid "Apply"
-#~ msgstr "تطبيق"
-
-#~ msgid "Barcode Scanning"
-#~ msgstr "مسح الباركود"
-
-#~ msgid "Check if the quantity done matches the demand"
-#~ msgstr "تحقق مما إذا كانت الكمية المنتهية تطابق الطلب "
-
-#~ msgid ""
-#~ "Does the picker have to put in a package the scanned products? If yes, at "
-#~ "which rate?"
-#~ msgstr ""
-#~ "هل على القائم بانتقاء المنتجات وضع المنتجات الممسوحة ضوئياً في طرد؟ إذا "
-#~ "كانت الإجابة نعم، فبأي وتيرة يجب القيام بذلك؟ "
-
-#~ msgid "Does the picker have to scan the destination? If yes, at which rate?"
-#~ msgstr ""
-#~ "هل على القائم بانتقاء المنتجات مسح الوجهة ضوئياً؟ إذا كانت الإجابة نعم، "
-#~ "فبأي وتيرة يجب القيام بذلك؟ "
-
-#~ msgid "Download"
-#~ msgstr "تنزيل "
-
-#~ msgid "Force a destination on all products"
-#~ msgstr "فرض وجهة لكافة المنتجات "
-
-#~ msgid "General"
-#~ msgstr "عام"
-
-#~ msgid "In #{kanban_getcolorname(record.color.raw_value)}"
-#~ msgstr "في #{kanban_getcolorname(record.color.raw_value)}"
-
-#~ msgid "Inventory Adjustment"
-#~ msgstr "تعديل المخزون "
-
-#~ msgid "Inventory Adjustments"
-#~ msgstr "تعديلات المخزون"
-
-#~ msgid "Is Completed"
-#~ msgstr "مكتملة "
-
-#~ msgid "Line's product must be scanned before the line can be edited"
-#~ msgstr "يجب أن يتم مسح منتج البند ضوئياً قبل أن تتمكن من تحرير البند "
-
-#~ msgid "Open picking"
-#~ msgstr "فتح عملية الانتقاء "
-
-#~ msgid "Package type %s was correctly applied to the package %s"
-#~ msgstr "تم تطبيق نوع الطرد %s بشكل صحيح على الطرد %s "
-
-#~ msgid "Packages"
-#~ msgstr "الطرود "
-
-#~ msgid "Packaging"
-#~ msgstr "التعبئة"
-
-#~ msgid "Picking"
-#~ msgstr "الانتقاء "
-
-#~ msgid "Print Barcodes PDF"
-#~ msgstr "طباعة الباركود PDF "
-
-#~ msgid "Product Packaging"
-#~ msgstr "تعبئة المنتج"
-
-#~ msgid "Quantity of the Packaging in the UoM of the Stock Move Line."
-#~ msgstr " كمية الطرود في قائمة المواد في بند حركة المخزون. "
-
-#~ msgid "Scan a"
-#~ msgstr "مسح"
-
-#~ msgid "Scan a location"
-#~ msgstr "مسح موقع ضوئياً "
-
-#~ msgid "Scan a product in %s or scan another location"
-#~ msgstr "مسح منتج ضوئياً في %s أو مسح موقع آخر "
-
-#~ msgid "Scan a transfer or a product to filter your records"
-#~ msgstr "قم بمسح شحنة ضوئياً لتصفية سجلاتك "
-
-#~ msgid "Scan a transfer, a product or a package to filter your records"
-#~ msgstr "قم بمسح شحنة أو طرد ضوئياً لتصفية سجلاتك "
-
-#~ msgid "Scan an"
-#~ msgstr "مسح"
-
-#~ msgid "Scan lot numbers for product %s to change their quantity"
-#~ msgstr "مسح أرقام المجموعات ضوئياً للمنتج %s لتغيير الكمية "
-
-#~ msgid "Scan more products in %s or scan another location"
-#~ msgstr "مسح المزيد من المنتجات ضوئياً في %s أو مسح موقع آخر "
-
-#~ msgid "Scan serial numbers for product %s to change their quantity"
-#~ msgstr "مسح الأرقام التسلسلية ضوئياً للمنتج %s لتغيير الكمية "
-
-#~ msgid ""
-#~ "Scanned product [%s] %s is not reserved for this transfer. Are you sure "
-#~ "you want to add it?"
-#~ msgstr ""
-#~ "المنتج [%s] %s الممسوح ضوئياً غير محجوز لهذه الشحنة. هل أنت متأكد من أنك "
-#~ "ترغب في إضافته؟ "
-
-#~ msgid ""
-#~ "Scanned quantity uses %s as Unit of Measure, but this UoM is not "
-#~ "compatible with the line's one (%s)."
-#~ msgstr ""
-#~ "تستخدم الكمية الممسوحة %s كوحدة قياس، ولكن وحدة القياس هذه غير متوافقة مع "
-#~ "البند (%s). "
-
-#~ msgid ""
-#~ "Scanned quantity uses %s as Unit of Measure, but this UoM is not "
-#~ "compatible with the product's one (%s)."
-#~ msgstr ""
-#~ "تستخدم الكميات الممسوحة %s كوحدة القياس، ولكن وحدة القياس هذه غير متوافقة "
-#~ "مع وحدة المنتج (%s). "
-
-#~ msgid "Tap to scan"
-#~ msgstr "انقر للمسح "
-
-#~ msgid ""
-#~ "Technical field used to compute whether the \"Final Validation\" group "
-#~ "should be displayed, solving combined groups/invisible complexity."
-#~ msgstr ""
-#~ "حقل تقني يُستخدم لاحتساب ما إذا كان يجب عرض مجموعة \"التصديق النهائي\"  أم "
-#~ "لا، مما يحل مسألة تعقيد المجموعات المجمعة/المخفية. "
-
-#~ msgid "The inventory adjustment has been validated"
-#~ msgstr "تم تصديق تعديل المخزون "
-
-#~ msgid "The scanned serial number is already used."
-#~ msgstr "الرقم التسلسلي الممسوح مستخدم بالفعل. "
-
-#~ msgid "To Process"
-#~ msgstr "للمعالجة "
-
-#~ msgid "Unit of Measure"
-#~ msgstr "وحدة القياس"
-
-#~ msgid ""
-#~ "We have created a few demo data with barcodes for you to explore the "
-#~ "features. Print the"
-#~ msgstr ""
-#~ "لقد أنشأنا بعض البيانات التجريبية مع باركودات حتى تستخدمها لاستكشاف "
-#~ "الخصائص. قم بطباعة "
-
-#~ msgid "Wrong Unit of Measure"
-#~ msgstr "وحدة القياس غير صحيحة "
-
-#~ msgid "You are expected to scan one or more products."
-#~ msgstr "من المتوقع أن تقوم بمسح منتج واحد أو أكثر."
-
-#~ msgid "commands for Inventory"
-#~ msgstr "أوامر المخزون"
-
-#~ msgid "document"
-#~ msgstr "مستند"
-
-#~ msgid "location"
-#~ msgstr "الموقع "
-
-#~ msgid ""
-#~ "o_digipad_button btn d-flex justify-content-center align-items-center "
-#~ "border w-100 py-2"
-#~ msgstr ""
-#~ "o_digipad_button btn d-flex justify-content-center align-items-center "
-#~ "border w-100 py-2"
-
-#~ msgid "operation type"
-#~ msgstr "نوع العملية"
-
-#~ msgid "package"
-#~ msgstr "طرد "
-
-#~ msgid "product"
-#~ msgstr "المنتج"
-
-#~ msgid "stock barcodes sheet"
-#~ msgstr "ورقة باركودات المخزون "
-
-#~ msgid "to check out what this module can do! You can also print the barcode"
-#~ msgstr "لرؤية ما بوسع هذا التطبيق القيام به! يمكنك أيضاً طباعة الباركود "
-
-#~ msgid "to create a new transfer from this location."
-#~ msgstr "لإنشاء شحنة جديدة من هذا الموقع. "
-
-#~ msgid "to create a new transfer."
-#~ msgstr "لإنشاء شحنة جديدة. "
-
-#~ msgid "to know its content."
-#~ msgstr "لمعرفة محتواه. "
-
-#~ msgid "to open it."
-#~ msgstr "لفتحه."
-
-#~ msgid "to show its location and quantity."
-#~ msgstr "لإظهار الموقع والكمية. "
+#~ msgid "There is no reserved operation to print."
+#~ msgstr "لا توجد عملية محجوزة بانتظارة الطباعة."

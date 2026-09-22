@@ -60,10 +60,10 @@ class SocialStream(models.Model):
         result = requests.get(
             posts_endpoint_url,
             params={
-                'access_token': self.account_id.facebook_access_token,
+                'access_token': self.account_id._get_facebook_access_token(),
                 'fields': ','.join(facebook_fields)
             },
-            timeout=5
+            timeout=10
         )
 
         result_posts = result.json().get('data')
@@ -107,8 +107,8 @@ class SocialStream(models.Model):
             attachments = self._extract_facebook_attachments(post)
             existing_post = existing_posts_by_facebook_post_id.get(post.get('id'))
             if existing_post:
-                if attachments.get('stream_post_image_ids'):
-                    values['stream_post_image_ids'] = [(5, 0, 0)] + attachments['stream_post_image_ids']
+                if attachments.get('stream_post_attachment_ids'):
+                    values['stream_post_attachment_ids'] = [(5, 0, 0)] + attachments['stream_post_attachment_ids']
                 existing_post.sudo().write(values)
             else:
                 if attachments or values['message']:
@@ -136,25 +136,42 @@ class SocialStream(models.Model):
                         'link_image_url': attachment.get('media').get('image').get('src')
                     })
             elif attachment.get('type') == 'album':
-                images = []
-                images_urls = []
-                for sub_image in attachment.get('subattachments', {}).get('data', []):
-                    image_url = sub_image.get('media').get('image').get('src')
-                    images.append({
-                        'image_url': image_url
-                    })
-                    images_urls.append(image_url)
+                content_vals = []
+                for sub_attachment in attachment.get('subattachments', {}).get('data', []):
+                    attachment_media = sub_attachment.get('media', {})
+                    if sub_attachment.get('type') == 'photo':
+                        if image := attachment_media.get('image', {}).get('src'):
+                            content_vals.append({
+                                'content_url': self._enforce_url_scheme(image),
+                                'attachment_content_type': 'image',
+                            })
+                    elif sub_attachment.get('type') == 'video':
+                        if video := attachment_media.get('source'):
+                            content_vals.append({
+                                'content_url': self._enforce_url_scheme(video),
+                                'thumbnail_url': self._enforce_url_scheme(attachment_media.get('image', {}).get('src', False)),
+                                'attachment_content_type': 'video',
+                            })
 
-                if images:
+                if content_vals:
                     result.update({
-                        'stream_post_image_ids': [(0, 0, attachment) for attachment in images],
+                        'stream_post_attachment_ids': [(0, 0, attachment) for attachment in content_vals],
                     })
-            elif attachment.get('type') in ['photo', 'animated_image_video']:
-                # TODO improvement later: handle videos in Feed view to correctly display FB GIFs?
-                image_src = attachment.get('media', {}).get('image', {}).get('src')
-                if image_src:
-                    result.update({'stream_post_image_ids': [(0, 0, {'image_url': image_src})]})
+            elif attachment.get('type') == 'photo':
+                if image_src := attachment.get('media', {}).get('image', {}).get('src'):
+                    result.update({'stream_post_attachment_ids': [(0, 0, {
+                        'content_url': self._enforce_url_scheme(image_src),
+                        'attachment_content_type': 'image',
+                    })]})
 
+            elif attachment.get('type') in ['animated_image_video', 'video_inline']:
+                media = attachment.get('media', {})
+                if video_src := media.get('source'):
+                    result.update({'stream_post_attachment_ids': [(0, 0, {
+                        'content_url': self._enforce_url_scheme(video_src),
+                        'attachment_content_type': 'video',
+                        'thumbnail_url': self._enforce_url_scheme(media.get('image', {}).get('src', False)),
+                    })]})
             elif attachment.get('type') == 'event':
                 # events creation post are handle like link and image in the frontend
                 result.update({
@@ -163,9 +180,11 @@ class SocialStream(models.Model):
                     'link_url': attachment.get('target', {}).get('url', ''),
                 })
 
-                image_src = attachment.get('media', {}).get('image', {}).get('src')
-                if image_src:
-                    result.update({'stream_post_image_ids': [(0, 0, {'image_url': image_src})]})
+                if image_src := attachment.get('media', {}).get('image', {}).get('src'):
+                    result.update({'stream_post_attachment_ids': [(0, 0, {
+                        'content_url': self._enforce_url_scheme(image_src),
+                        'attachment_content_type': 'image',
+                    })]})
 
         return result
 

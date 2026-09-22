@@ -8,10 +8,11 @@ from freezegun import freeze_time
 from .common import HelpdeskCommon
 from odoo.exceptions import AccessError
 from odoo.fields import Command
-from odoo.tests import Form
+from odoo.tests import tagged, Form
 from odoo.tests.common import users
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestHelpdeskFlow(HelpdeskCommon):
     """ Test used to check that the base functionalities of Helpdesk function as expected.
         - test_access_rights: tests a few access rights constraints
@@ -88,22 +89,53 @@ class TestHelpdeskFlow(HelpdeskCommon):
         tag.read()
         test_write_and_unlink(tag)
 
+    def test_ticket_access_by_internal_user(self):
+        # helpdesk manager create a ticket
+        ticket = self.env['helpdesk.ticket'].with_user(self.helpdesk_manager).create({'name': 'Test Ticket'})
+
+        with self.assertRaises(AccessError):
+            # ensure user without helpdesk access rights cannot access other data
+            ticket.with_user(self.internal_user).read()
+
+    def test_internal_user_access_ticket_via_message_partner(self):
+        # we create ticket with helpdesk_manager and set base_user's as message partner
+        ticket = self.env['helpdesk.ticket'].with_user(self.helpdesk_manager).create({
+            'name': 'Test Ticket',
+        })
+        ticket.message_subscribe(partner_ids=[self.internal_user.partner_id.id])
+
+        # ensure user can read ticket
+        ticket.with_user(self.internal_user).read()
+
+    def test_internal_user_can_access_following_team_tickets(self):
+        # we put the internal user in the test_team's members
+        self.test_team.message_subscribe(partner_ids=[self.internal_user.partner_id.id])
+
+        # we create ticket with helpdesk_manager and set team which user follow
+        tickets = self.env['helpdesk.ticket'].with_user(self.helpdesk_manager).create({
+            'name': 'Ticket 1',
+            'team_id': self.test_team.id,
+        })
+
+        # ensure user can read ticket
+        tickets.with_user(self.internal_user).read()
+
     def test_assign_close_dates(self):
         # helpdesk user create a ticket
-        with self._ticket_patch_now('2019-01-08 12:00:00'):
+        with self._ticket_patch_now(datetime(2019, 1, 8, 12, 0, 0)):
             ticket1 = self.env['helpdesk.ticket'].with_user(self.helpdesk_user).create({
                 'name': 'test ticket 1',
                 'team_id': self.test_team.id,
             })
 
-        with self._ticket_patch_now('2019-01-10 13:00:00'):
+        with self._ticket_patch_now(datetime(2019, 1, 10, 13, 0, 0)):
             # the helpdesk user takes the ticket
             ticket1.user_id = self.helpdesk_user
             # we verify the ticket is correctly assigned
             self.assertEqual(ticket1.user_id.id, ticket1.env.uid, "Assignation for ticket not correct")
             self.assertEqual(ticket1.assign_hours, 17, "Assignation time for ticket not correct")
 
-        with self._ticket_patch_now('2019-01-10 15:00:00'):
+        with self._ticket_patch_now(datetime(2019, 1, 10, 15, 0, 0)):
             # we close the ticket and verify its closing time
             ticket1.write({'stage_id': self.stage_done.id})
             self.assertEqual(ticket1.close_hours, 19, "Close time for ticket not correct")
@@ -461,8 +493,7 @@ Content-Transfer-Encoding: quoted-printable
             }
         ])
 
-        helpdesk_ticket1_id = self.env['mail.thread'].message_process('helpdesk.ticket', new_message1)
-        helpdesk_ticket1 = self.env['helpdesk.ticket'].browse(helpdesk_ticket1_id)
+        helpdesk_ticket1 = self.env['mail.thread'].message_process('helpdesk.ticket', new_message1)
         self.assertTrue(helpdesk_ticket1.ticket_ref.startswith('SecondCompany'))
 
     def test_email_non_ascii(self):
@@ -490,7 +521,6 @@ Content-Transfer-Encoding: quoted-printable
 --000000000000a47519057e029630--
 """
         helpdesk_ticket = self.env['mail.thread'].message_process('helpdesk.ticket', new_message)
-        helpdesk_ticket = self.env['helpdesk.ticket'].browse(helpdesk_ticket)
 
         self.assertEqual(helpdesk_ticket.partner_id.name, "Client with a §tràÑge name")
         self.assertEqual(helpdesk_ticket.partner_id.email, "client_b@someprovaîdère.com")
@@ -503,7 +533,7 @@ Content-Transfer-Encoding: quoted-printable
             'name': 'test sla policy',
             'team_id': self.test_team.id,
             'stage_id': self.stage_progress.id,
-            'priority': '2',
+            'criteria_domain': "[('priority', '=', '2')]",
             'time': 1,
         })
 
@@ -538,6 +568,7 @@ Content-Transfer-Encoding: quoted-printable
         self.test_team.write({
             'auto_close_ticket': True,
             'auto_close_day': 7,
+            'auto_close_reminder_delay': 2,
             'to_stage_id': self.stage_cancel.id,
         })
 
@@ -580,6 +611,54 @@ Content-Transfer-Encoding: quoted-printable
         # Tickets under the threshold should not be moved (5 < 7)
         self.assertEqual(ticket_7.stage_id, self.stage_progress)
 
+        # test that the reminder message is sent to the ticket (auto_close_day' [7] - auto_close_reminder_delay [2] = 5)
+        ticket_8 = create_ticket(self.stage_progress.id)
+        number_of_messages = len(ticket_8.message_ids)
+
+        with freeze_time(datetime.now() + relativedelta(days=3)):
+            self.test_team._cron_auto_close_tickets()
+
+        # no reminder message sent to the ticket under threshold (3 < 5)
+        self.assertEqual(len(ticket_8.message_ids), number_of_messages)
+
+        with freeze_time(datetime.now() + relativedelta(days=5)):
+            self.test_team._cron_auto_close_tickets()
+
+        # Test that a reminder message is sent to the ticket
+        self.assertEqual(len(ticket_8.message_ids), number_of_messages + 1)
+        self.assertIn('Your support ticket will be closed soon', ticket_8.message_ids[0].subject)
+
+    def test_automatic_ticket_closing_reminder_respects_stages(self):
+        """ A reminder is sent only for tickets that would actually be auto-closed,
+            i.e. those in the team's auto-close stages. """
+        self.test_team.write({
+            'auto_close_ticket': True,
+            'auto_close_day': 7,
+            'auto_close_reminder_delay': 2,
+            'from_stage_ids': [Command.link(self.stage_progress.id)],
+            'to_stage_id': self.stage_cancel.id,
+        })
+
+        reminded_ticket = self.env['helpdesk.ticket'].create({
+            'name': 'In an auto-close stage',
+            'team_id': self.test_team.id,
+            'stage_id': self.stage_progress.id,
+        })
+        ignored_ticket = self.env['helpdesk.ticket'].create({
+            'name': 'Outside the auto-close stages',
+            'team_id': self.test_team.id,
+            'stage_id': self.stage_new.id,
+        })
+        reminded_count = len(reminded_ticket.message_ids)
+        ignored_count = len(ignored_ticket.message_ids)
+
+        with freeze_time(datetime.now() + relativedelta(days=5)):
+            self.test_team._cron_auto_close_tickets()
+
+        self.assertEqual(len(reminded_ticket.message_ids), reminded_count + 1)
+        self.assertIn('Your support ticket will be closed soon', reminded_ticket.message_ids[0].subject)
+        self.assertEqual(len(ignored_ticket.message_ids), ignored_count)
+
     def test_create_from_email(self):
         with freeze_time('2018-12-27 00:00:00'):
             helpdesk_ticket = self.env['helpdesk.ticket'].create({'name': 'Hi! How was your day?'})
@@ -614,7 +693,7 @@ Content-Transfer-Encoding: quoted-printable
                 'date': '2018-12-27 %s:00:00' % hour,
             })
             email_vals_list.append(temp_email_vals)
-        helpdesk_ticket.website_message_ids = self.env['mail.message'].create(email_vals_list)
+        self.env['mail.message'].create(email_vals_list)
         self.assertEqual(helpdesk_ticket.first_response_hours, 2.0)
         self.assertEqual(helpdesk_ticket.avg_response_hours, 5 / 3)
 
@@ -641,47 +720,6 @@ Content-Transfer-Encoding: quoted-printable
         self.assertEqual(open_ticket.partner_ticket_count, 1, "There should be one other ticket than this one for this partner")
         self.assertEqual(closed_ticket.partner_open_ticket_count, 1, "There should be one other open ticket than this one for this partner")
         self.assertEqual(closed_ticket.partner_ticket_count, 1, "There should be one other ticket than this one for this partner")
-
-    def test_create_ticket_in_batch_with_email_cc(self):
-        user_a, user_b, user_c = self.env['res.users'].create([{
-            'name': 'user A',
-            'login': 'loginA',
-            'email': 'email@bisous1',
-        }, {
-            'name': 'user B',
-            'login': 'loginB',
-            'email': 'email@bisous2',
-        }, {
-            'name': 'user C',
-            'login': 'loginC',
-            'email': 'email@bisous3',
-        }])
-        partner_a, partner_b = self.env['res.partner'].create([{
-            'name': 'partner A',
-            'email': 'email@bisous4',
-        }, {
-            'name': 'partner B',
-        }])
-        ticket_1, ticket_2 = self.env['helpdesk.ticket'].with_context({'mail_create_nolog': True}).create([{
-            'name': 'ticket 1',
-            'team_id': self.test_team.id,
-            'email_cc': 'email@bisous1, email@bisous2, email@bisous4',
-            'partner_id': partner_b.id,
-        }, {
-            'name': 'ticket 2',
-            'team_id': self.test_team.id,
-            'email_cc': 'email@bisous3, email@bisous2, email@bisous4'
-        }])
-        self.assertTrue(user_a.partner_id in ticket_1.message_partner_ids)
-        self.assertTrue(user_b.partner_id in ticket_1.message_partner_ids)
-        self.assertFalse(user_c.partner_id in ticket_1.message_partner_ids)
-        self.assertFalse(partner_a in ticket_1.message_partner_ids)
-        self.assertTrue(partner_b in ticket_1.message_partner_ids)
-        self.assertFalse(user_a.partner_id in ticket_2.message_partner_ids)
-        self.assertTrue(user_b.partner_id in ticket_2.message_partner_ids)
-        self.assertTrue(user_c.partner_id in ticket_2.message_partner_ids)
-        self.assertFalse(partner_a in ticket_2.message_partner_ids)
-        self.assertFalse(partner_b in ticket_2.message_partner_ids)
 
     @users('hm')
     def test_mail_alias_after_helpdesk_team_creation(self):
@@ -722,21 +760,60 @@ Content-Transfer-Encoding: quoted-printable
                         self.env.ref('base.group_partner_manager').id])],
         })
 
-        self.assertFalse(self.helpdesk_user.partner_id.phone)
-        ticket = self.env['helpdesk.ticket'].with_user(user).create({
+        self.helpdesk_user.partner_id.phone = '123'
+
+        # An internal user can create a ticket using another internal user as customer
+        self.env['helpdesk.ticket'].with_user(user).create({
             'name': 'test ticket 1',
             'team_id': self.test_team.id,
             'partner_id': self.helpdesk_user.partner_id.id,
-            'partner_phone': '123'
         })
-        self.assertEqual(self.helpdesk_user.partner_id.phone, ticket.partner_phone)
-        ticket = self.env['helpdesk.ticket'].with_user(self.helpdesk_user).create({
+
+        # An internal user cannot overwrite the phone number of another internal user
+        with self.assertRaises(AccessError):
+            self.env['helpdesk.ticket'].with_user(user).create({
+                'name': 'test ticket 1',
+                'team_id': self.test_team.id,
+                'partner_id': self.helpdesk_user.partner_id.id,
+                'partner_phone': '456',
+            })
+
+        # An internal user can create a ticket using another internal user as customer with an empty phone number
+        # and it must not remove the phone number of the other internal user
+        self.env['helpdesk.ticket'].with_user(self.helpdesk_user).create({
             'name': 'test ticket 2',
             'team_id': self.test_team.id,
             'partner_id': self.helpdesk_user.partner_id.id,
             'partner_phone': ''
         })
         self.assertEqual(self.helpdesk_user.partner_id.phone, '123')
+
+    def test_partner_multi_email_not_overwritten(self):
+        """Test that a partner with multiple comma-separated emails does not
+        get their email overwritten when a ticket is created with one of those
+        emails as the partner_email (e.g. from an incoming mail).
+        """
+        multi_email = 'primary@example.com, secondary@example.com'
+        partner = self.env['res.partner'].create({
+            'name': 'Multi Email Partner',
+            'email': multi_email,
+        })
+        ticket = self.env['helpdesk.ticket'].create({
+            'name': 'Ticket from primary email',
+            'partner_id': partner.id,
+            'partner_email': '"Multi Email Partner" <primary@example.com>',
+        })
+        self.assertEqual(partner.email, multi_email)
+        self.assertFalse(ticket.is_partner_email_update)
+
+        # Same test with the secondary email
+        ticket2 = self.env['helpdesk.ticket'].create({
+            'name': 'Ticket from secondary email',
+            'partner_id': partner.id,
+            'partner_email': 'secondary@example.com',
+        })
+        self.assertEqual(partner.email, multi_email)
+        self.assertFalse(ticket2.is_partner_email_update)
 
     def test_ticket_display_name(self):
         """
@@ -856,7 +933,7 @@ Content-Transfer-Encoding: quoted-printable
            created partner in company2 and different from `test_partner`
         """
 
-        company1 = self.main_company_id
+        company1 = self.main_company.id
         company2, company3 = self.env['res.company'].create([
             {'name': 'company2'},
             {'name': 'company3'},
@@ -871,7 +948,6 @@ Content-Transfer-Encoding: quoted-printable
             }, {
                 'name': 'test partner without company',
                 'email': 'testcompany@test.com',
-                'company_type': 'company',
                 'company_id': False,
             },
         ])
@@ -906,7 +982,7 @@ Content-Transfer-Encoding: quoted-printable
 
     def test_ticket_created_in_closed_stage_sets_close_date(self):
         """Test that a ticket created directly in a folded (closed) stage sets close_date."""
-        with self._ticket_patch_now("2024-06-01 10:00:00"):
+        with self._ticket_patch_now(datetime(2024, 6, 1, 10, 0, 0)):
             ticket = self.env['helpdesk.ticket'].create({
                 'name': 'Closed from start',
                 'team_id': self.test_team.id,
@@ -941,3 +1017,142 @@ Content-Transfer-Encoding: quoted-printable
         ticket = ticket_form.save()
         self.assertTrue(ticket.id)
         self.assertEqual(ticket.stage_id.name, 'New')
+
+    def test_unanswered_ticket_filter(self):
+        """
+        Check unanswered ticket filter for portal, internal, and public users.
+        Steps:
+        1. Create four tickets, and move one of them to the Solved stage
+        2. Post messages
+        3. Apply unanswered filter
+        4. Reply on each ticket individually and check
+        """
+
+        partner = self.env['res.partner'].create({'name': 'Freddy Krueger'})
+
+        tickets = self.env['helpdesk.ticket'].create([
+            {'name': 'Ticket 1', 'team_id': self.test_team.id, 'partner_id': self.helpdesk_portal.partner_id.id},
+            {'name': 'Ticket 2', 'team_id': self.test_team.id, 'partner_id': self.helpdesk_user.partner_id.id},
+            {'name': 'Ticket 3', 'team_id': self.test_team.id, 'partner_id': partner.id},
+            {'name': 'Ticket 4', 'team_id': self.test_team.id, 'partner_id': partner.id},
+            {'name': 'Ticket 4 (Auto reply)', 'team_id': self.test_team.id, 'partner_id': partner.id},
+            {'name': 'solved ticket', 'team_id': self.test_team.id, 'partner_id': partner.id, 'stage_id': self.stage_done.id},
+        ])
+
+        self.env['mail.message'].create([
+            {
+                'model': 'helpdesk.ticket',
+                'res_id': tickets[0].id,
+                'author_id': self.helpdesk_portal.partner_id.id,
+                'body': 'Last message from portal',
+            }, {
+                'model': 'helpdesk.ticket',
+                'res_id': tickets[1].id,
+                'author_id': self.helpdesk_user.partner_id.id,
+                'body': 'Last message from internal',
+            }, {
+                'model': 'helpdesk.ticket',
+                'res_id': tickets[2].id,
+                'author_id': partner.id,
+                'body': 'Last message from public user',
+            },
+            {
+                'model': 'helpdesk.ticket',
+                'res_id': tickets[3].id,
+                'author_id': self.env.company.partner_id.id,
+                'body': 'auto reply',
+            },
+            {
+                'model': 'helpdesk.ticket',
+                'res_id': tickets[4].id,
+                'author_id': self.env.ref('base.partner_root').id,
+                'body': 'auto reply',
+                'message_type': 'auto_comment',
+            }
+        ])
+
+        unfolded = tickets[-1].filtered(lambda t: not t.stage_id.fold)
+        unread_tickets = self.env['helpdesk.ticket'].search(
+            self.env['helpdesk.ticket']._search_unanswered('in', True)
+        )
+        # system generated message
+        self.assertIn(tickets[4], unread_tickets)
+
+        self.assertNotIn(tickets[3], unread_tickets)
+
+        # Check that all unfolded tickets are unread
+        self.assertTrue(
+            all(t.id in unread_tickets.ids for t in unfolded),
+            "Unfolded tickets should be marked as unanswered"
+        )
+        # Reply on Ticket 1 and check
+        self.env['mail.message'].create({
+            'model': 'helpdesk.ticket',
+            'res_id': tickets[0].id,
+            'author_id': self.helpdesk_manager.partner_id.id,
+            'body': 'Reply',
+        })
+        unread_tickets = self.env['helpdesk.ticket'].search(
+            self.env['helpdesk.ticket']._search_unanswered('in', True)
+        ).ids
+        self.assertNotIn(tickets[0].id, unread_tickets, "Ticket 1 still appears as unanswered")
+
+        # Reply on Ticket 2 and check
+        self.env['mail.message'].create({
+            'model': 'helpdesk.ticket',
+            'res_id': tickets[1].id,
+            'author_id': self.helpdesk_manager.partner_id.id,
+            'body': 'Reply',
+        })
+        unread_tickets = self.env['helpdesk.ticket'].search(
+            self.env['helpdesk.ticket']._search_unanswered('in', True)
+        ).ids
+        self.assertNotIn(tickets[1].id, unread_tickets, "Ticket 2 still appears as unanswered")
+
+        # Reply on Ticket 3 and check
+        self.env['mail.message'].create({
+            'model': 'helpdesk.ticket',
+            'res_id': tickets[2].id,
+            'author_id': self.helpdesk_manager.partner_id.id,
+            'body': 'Reply',
+        })
+        unread_tickets = self.env['helpdesk.ticket'].search(
+            self.env['helpdesk.ticket']._search_unanswered('in', True)
+        ).ids
+        self.assertNotIn(tickets[2].id, unread_tickets, "Ticket 3 still appears as unanswered")
+
+    def test_close_hours_excludes_closed_stages_hours(self):
+        """
+        Test that close_hours is accurately calculated across multiple reopenings of a ticket.
+        Steps:
+        1. Create a ticket and close it.
+        2. Reopen the ticket and close it again.
+        3. Verify that close_hours does not include time when the ticket is in a closed stage.
+        """
+        with self._ticket_patch_now(datetime(2026, 5, 19, 8, 0, 0)):
+            ticket = self.env['helpdesk.ticket'].with_user(self.helpdesk_user).create({
+                'name': 'Close Hour Test Ticket',
+                'team_id': self.test_team.id,
+                'stage_id': self.stage_new.id,
+            })
+        with self._ticket_patch_now(datetime(2026, 5, 19, 10, 0, 0)):
+            ticket.write({'stage_id': self.stage_done.id})
+            self.assertEqual(ticket.close_hours, 2.0)
+
+        with self._ticket_patch_now(datetime(2026, 5, 19, 11, 0, 0)):
+            ticket.write({'stage_id': self.stage_progress.id})
+            self.assertEqual(ticket.close_hours, 0.0)
+
+        with self._ticket_patch_now(datetime(2026, 5, 19, 12, 0, 0)):
+            ticket.write({'stage_id': self.stage_done.id})
+            self.assertEqual(ticket.close_hours, 3.0)
+
+    def test_get_empty_list_context_pollution(self):
+        """ Test that context pollution from another model doesn't crash the ticket view action. """
+        team = self.env['helpdesk.team'].create({'name': 'Test Team'})
+        bad_context = {
+            'active_model': 'mail.alias',
+            'active_id': 9999,
+        }
+        action = team.with_context(bad_context).action_view_ticket()
+        self.assertEqual(action.get('type'), 'ir.actions.act_window')

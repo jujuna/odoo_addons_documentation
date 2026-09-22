@@ -5,7 +5,6 @@
         <field name="model">hr.payslip</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ch_hr_payroll.ch_elm_report_payslip_lang</field>
-        <field name="report_file">l10n_ch_hr_payroll.ch_elm_report_payslip_lang</field>
         <field name="print_report_name">'Payslip - %s' % (object.employee_id.name)</field>
         <field name="binding_model_id" ref="hr_payroll.model_hr_payslip"/>
         <field name="binding_type">report</field>
@@ -27,5 +26,6 @@
 
     <record id="l10n_ch_hr_payroll.structure_type_employee_ch" model="hr.payroll.structure.type">
         <field name="default_struct_id" ref="hr_payroll_structure_ch_elm"/>
+        <field name="default_work_entry_type_id" ref="hr_work_entry.ch_work_entry_type_attendance"/>
     </record>
 </odoo>

@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+  <record id="hr_contract_salary_personal_info_view_search" model="ir.ui.view">
+      <field name="name">hr.contract.salary.personal.info.view.search</field>
+      <field name="model">hr.contract.salary.personal.info</field>
+      <field name="arch" type="xml">
+          <search>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+          </search>
+      </field>
+  </record>
+
     <record id="hr_contract_salary_personal_info_action" model="ir.actions.act_window">
         <field name="name">Personal Info</field>
         <field name="res_model">hr.contract.salary.personal.info</field>
+        <field name="domain">[('user_has_access', '=', True)]</field>
         <field name="view_mode">list,form</field>
     </record>
 
@@ -11,11 +23,13 @@
         <field name="model">hr.contract.salary.personal.info</field>
         <field name="arch" type="xml">
             <list string="Salary Package Personal Info">
+                <field name="active" invisible="1" />  <!-- To allow model to be archived -->
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="res_field_id"/>
                 <field name="field" column_invisible="True"/>
                 <field name="structure_type_id"/>
+                <field name="country_id"/>
             </list>
         </field>
     </record>
@@ -25,12 +39,14 @@
         <field name="model">hr.contract.salary.personal.info</field>
         <field name="arch" type="xml">
             <form string="Salary Package Personal Info">
+                <field name="active" invisible="1" /> <!-- To allow model to be archived -->
                 <sheet>
                     <div class="oe_title">
                         <label for="name" string="Information"/>
                         <h1><field name="name" placeholder="e.g. Birthdate"/></h1>
                     </div>
                     <group>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
                         <group>
                             <field name="applies_on" string="Related Model" required="1"/>
                             <field name="res_field_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>

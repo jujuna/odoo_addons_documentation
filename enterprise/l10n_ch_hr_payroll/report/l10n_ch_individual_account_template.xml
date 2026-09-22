@@ -8,10 +8,10 @@
                 <div t-if="company" class="page">
                     <h2>
                         <t t-if="employee">
-                            <span>Individual Account - </span> <t t-esc="report_data['year']"/> <t t-esc="employee.name"/> <span> - </span> <t t-esc="employee.registration_number"/>
+                            <span>Individual Account - </span> <t t-out="report_data['year']"/> <t t-out="employee.name"/> <span> - </span> <t t-out="employee.registration_number"/>
                         </t>
                         <t t-else="">
-                            <span>Individual Account - <t t-esc="report_data['company'].name"/> - </span> <t t-esc="report_data['year']"/>
+                            <span>Individual Account - <t t-out="report_data['company'].name"/> - </span> <t t-out="report_data['year']"/>
                         </t>
                     </h2>
                     <br/>
@@ -35,11 +35,11 @@
                                 <th class="text-center">Total</th>
                             </tr></thead>
                             <tr t-foreach="report_data['rules']" t-as="rule">
-                                <td t-esc="rule['code']"/>
-                                <td t-esc="rule['name']"/>
+                                <td t-out="rule['code']"/>
+                                <td t-out="rule['name']"/>
                                 <t t-foreach="[0,1,2,3,4,5,6,7,8,9,10,11,12]" t-as="m">
                                     <t t-if="rule['monthly_values'][m] != 0">
-                                        <td t-esc="rule['monthly_values'][m]"/>
+                                        <td t-out="rule['monthly_values'][m]"/>
                                     </t>
                                     <t t-else="">
                                         <td class="text-center">/</td>

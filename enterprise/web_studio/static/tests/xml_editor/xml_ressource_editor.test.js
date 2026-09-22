@@ -2,7 +2,7 @@ import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
 import { queryOne } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
-import { Component, reactive, useState, xml } from "@odoo/owl";
+import { Component, signal, xml } from "@odoo/owl";
 import { contains, mountWithCleanup, onRpc } from "@web/../tests/web_test_helpers";
 import { XmlResourceEditor } from "@web_studio/client_action/xml_resource_editor/xml_resource_editor";
 
@@ -22,17 +22,15 @@ test("can display warnings", async () => {
 
     class Parent extends Component {
         static components = { XmlResourceEditor };
-        static template = xml`<XmlResourceEditor displayAlerts="props.state.displayAlerts" onClose="() => {}" mainResourceId="1" />`;
-        static props = ["*"];
+        static template = xml`<XmlResourceEditor displayAlerts="this.displayAlerts()" onClose="() => {}" mainResourceId="1" />`;
+        displayAlerts = displayAlerts;
     }
 
-    const state = reactive({ displayAlerts: true });
-    await mountWithCleanup(Parent, {
-        props: { state },
-    });
+    const displayAlerts = signal(true);
+    await mountWithCleanup(Parent);
     await animationFrame();
     expect(".o_web_studio_code_editor_info .alert.alert-warning").toHaveCount(1);
-    state.displayAlerts = false;
+    displayAlerts.set(false);
     await animationFrame();
     expect(".o_web_studio_code_editor_info .alert.alert-warning").toHaveCount(0);
 });
@@ -53,15 +51,10 @@ test("stores and restores the cursor position when reloading resources after sav
 
     class Parent extends Component {
         static components = { XmlResourceEditor };
-        static template = xml`<XmlResourceEditor onClose="() => {}" mainResourceId="1" reloadSources="state.key" onSave.bind="onSave" onCodeChange="() => {}"/>`;
-        static props = ["*"];
+        static template = xml`<XmlResourceEditor onClose="() => {}" mainResourceId="1" onSave.bind="this.onSave" onCodeChange="() => {}"/>`;
 
-        setup() {
-            this.state = useState({ key: 0 });
-        }
         async onSave({ newCode }) {
             await Promise.resolve();
-            this.state.key++;
             arch = newCode;
         }
     }
@@ -79,6 +72,7 @@ test("stores and restores the cursor position when reloading resources after sav
         column: 1,
     });
     editor.insert("appended");
+    await animationFrame();
 
     await contains(".o_web_studio_xml_resource_selector .btn-primary").click();
     await animationFrame();
@@ -86,11 +80,8 @@ test("stores and restores the cursor position when reloading resources after sav
 
     const newAceEl = queryOne(".o_web_studio_code_editor.ace_editor");
     const newEditor = window.ace.edit(newAceEl);
-    expect(aceEl).not.toBe(newAceEl);
-    expect(editor).not.toBe(newEditor);
-
     expect(newEditor.getCursorPosition()).toEqual({
-        column: 1,
+        column: 9,
         row: 3,
     });
 });

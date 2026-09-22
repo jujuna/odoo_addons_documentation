@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from markupsafe import Markup
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -21,9 +22,6 @@ class HrReferralCampaignWizard(models.TransientModel):
 
     job_id = fields.Many2one('hr.job', string='Job Position', readonly=True, required=True)
     is_published = fields.Boolean(related='job_id.is_published', export_string_translation=False)
-    target = fields.Selection(
-        selection=[('all', 'All'), ('selection', 'Selection')],
-        string='Contacted Employees', default='all', required=True)
     employee_ids = fields.Many2many(
         comodel_name='hr.employee', domain=_domain_employee_ids, store=True, export_string_translation=False)
 
@@ -48,15 +46,21 @@ class HrReferralCampaignWizard(models.TransientModel):
     def _compute_mail_subject(self):
         for wizard in self:
             if not wizard.mail_subject:
-                wizard.mail_subject = _(
-                    'Job Offer for a %(job_title)s at %(company_name)s',
-                    company_name=wizard.job_id.company_id.name,
-                    job_title=wizard.job_id.name,
-                )
+                if (company_name := wizard.job_id.company_id.name):
+                    wizard.mail_subject = self.env._(
+                            'Job Opportunity for a %(job_title)s at %(company_name)s',
+                            company_name=company_name,
+                            job_title=wizard.job_id.name,
+                        )
+                else:
+                    wizard.mail_subject = self.env._(
+                            'Job Opportunity for a %(job_title)s',
+                            job_title=wizard.job_id.name,
+                        )
 
     def _get_employees(self):
         self.ensure_one()
-        if self.target == 'selection' and self.employee_ids:
+        if self.employee_ids:
             return self.employee_ids.filtered(lambda employee: employee['work_email'])
         base_domain = [('company_id', 'in', self.env.companies.ids), ('user_id', '!=', False)]
         return self.env['hr.employee'].search(base_domain)
@@ -66,7 +70,7 @@ class HrReferralCampaignWizard(models.TransientModel):
         users = self._get_employees().user_id
 
         if not users:
-            raise UserError(_('No users to send the campaign to. Please adapt your target.'))
+            raise UserError(self.env._('No users to send the campaign to. Please adapt your target.'))
         if not self.is_published:
             self.job_id.write({'is_published': True})
 
@@ -98,4 +102,19 @@ class HrReferralCampaignWizard(models.TransientModel):
             'res_id': None,
         } for personalized_content in personalized_contents]
         self.env['mail.mail'].sudo().create(mails)
+        message_start = self.env._("A promotion email for the referral campaign (%s) has been sent to", self.job_id.name)
+        if self.employee_ids:
+            message_end = [
+                self.env._(" the following employees:"),
+                Markup("<br/><br/>"),
+                Markup().join(Markup("- %s <br/>") % emp.name for emp in self._get_employees())
+            ]
+        else:
+            message_end = [self.env._(" all employees."), Markup("<br/>")]
+        self.job_id.message_post(
+            body=Markup().join([message_start, Markup().join(message_end)]),
+            subject=self.mail_subject,
+            message_type="comment",
+            subtype_xmlid="mail.mt_note",
+        )
         return {'type': 'ir.actions.act_window_close'}

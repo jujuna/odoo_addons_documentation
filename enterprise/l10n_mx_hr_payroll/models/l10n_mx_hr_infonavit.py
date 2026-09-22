@@ -29,7 +29,7 @@ class HrInfonavit(models.Model):
     discount_factor = fields.Float(string="Discount Factor")
 
     _check_percentage = models.Constraint(
-        'CHECK (0 <= percentage AND percentage <= 100)',
+        'CHECK (0 <= percentage AND percentage <= 1.0)',
         'The percentage must be between 0 and 100'
     )
     _check_positive_monthly_insurance = models.Constraint(

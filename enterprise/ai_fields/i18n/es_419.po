@@ -3,22 +3,36 @@
 # * ai_fields
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025.
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
+# "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2025-10-08 02:41+0000\n"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-17 22:37+0000\n"
 "Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
-"odoo-19/ai_fields/es_419/>\n"
+"odoo-master/ai_fields/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: ai_fields
+#: model:ir.module.module,description:base.module_ai_fields
+msgid ""
+"\n"
+"The purpose of this module is to implement AI computed fields, i.e. fields "
+"that are computed\n"
+"using an AI model and a system prompt.\n"
+msgstr ""
+"\n"
+"El propósito de este módulo es implementar campos calculados con IA, es "
+"decir, campos que se calculan\n"
+"usando un modelo de IA y una instrucción del sistema.\n"
 
 #. module: ai_fields
 #. odoo-javascript
@@ -94,11 +108,6 @@ msgid "AI Monetary"
 msgstr "Valor monetario de IA"
 
 #. module: ai_fields
-#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__system_prompt
-msgid "AI Prompt"
-msgstr "Instrucción para la IA"
-
-#. module: ai_fields
 #. odoo-javascript
 #: code:addons/ai_fields/static/src/views/fields/ai_fields/ai_fields.js:0
 msgid "AI Selection"
@@ -116,19 +125,25 @@ msgid "AI computed field"
 msgstr "Campo calculado con IA"
 
 #. module: ai_fields
-#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__ai
-msgid "AI field"
-msgstr "Campo de IA"
-
-#. module: ai_fields
 #: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__ai_domain
 msgid "AI field domain"
 msgstr "Dominio del campo de IA"
 
 #. module: ai_fields
+#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__ai
+msgid "Autofill"
+msgstr ""
+
+#. module: ai_fields
 #: model:ir.model,name:ai_fields.model_base
 msgid "Base"
 msgstr "Base"
+
+#. module: ai_fields
+#: model_terms:ir.ui.view,arch_db:ai_fields.view_model_fields_form
+#: model_terms:ir.ui.view,arch_db:ai_fields.view_model_form
+msgid "Describe how to compute this field, or type '/' for commands..."
+msgstr ""
 
 #. module: ai_fields
 #: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__display_name
@@ -144,8 +159,8 @@ msgstr "Se sintió como un acertijo que no pude resolver"
 
 #. module: ai_fields
 #: model:ir.model,name:ai_fields.model_ir_model_fields
-msgid "Fields"
-msgstr "Campos"
+msgid "Field"
+msgstr "Campo"
 
 #. module: ai_fields
 #. odoo-javascript
@@ -178,6 +193,11 @@ msgid "ID"
 msgstr "ID"
 
 #. module: ai_fields
+#: model:ir.module.module,summary:base.module_ai_fields
+msgid "Implementation of AI computed fields"
+msgstr "Implementación de campos calculados por IA"
+
+#. module: ai_fields
 #: model:ir.model,name:ai_fields.model_mail_message
 msgid "Message"
 msgstr "Mensaje"
@@ -195,40 +215,16 @@ msgid "My circuits didn't quite get it"
 msgstr "Mis circuitos no lo entendieron del todo"
 
 #. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "No allowed values are provided in the prompt."
-msgstr "La instrucción no contiene ningún valor permitido."
-
-#. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "Oops, an unexpected error occurred."
-msgstr "Uy, ocurrió un error inesperado."
-
-#. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "Oops, the connection failed."
-msgstr "Uy, la conexión falló."
-
-#. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "Oops, the request timed out."
-msgstr "Uy, la solicitud superó el tiempo de espera."
-
-#. module: ai_fields
-#. odoo-python
-#: code:addons/ai_fields/tools.py:0
-msgid "Oops, the response could not be processed."
-msgstr "Uy, no pudimos procesar la respuesta."
-
-#. module: ai_fields
 #. odoo-javascript
 #: code:addons/ai_fields/static/src/views/fields/properties_field_patch/properties_field_patch.xml:0
+#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__system_prompt
 msgid "Prompt"
 msgstr "Instrucción"
+
+#. module: ai_fields
+#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__prompt_custom
+msgid "Prompt Custom"
+msgstr "Personalización de instrucciones"
 
 #. module: ai_fields
 #: model:ir.model.fields,help:ai_fields.field_ir_model_fields__system_prompt
@@ -241,6 +237,11 @@ msgstr ""
 #: code:addons/ai_fields/static/src/views/fields/ai_fields/ai_fields.xml:0
 msgid "Refresh value"
 msgstr "Actualizar valor"
+
+#. module: ai_fields
+#: model:ir.model.fields,field_description:ai_fields.field_ir_model_fields__supports_ai
+msgid "Supports Ai"
+msgstr "Compatible con IA"
 
 #. module: ai_fields
 #. odoo-javascript
@@ -267,3 +268,14 @@ msgstr "No puedes usar el campo %(field)s en una instrucción."
 #: code:addons/ai_fields/static/src/views/fields/ai_fields/ai_fields.xml:0
 msgid "ai icon"
 msgstr "icono de ia"
+
+#. module: ai_fields
+#: model:ir.module.module,shortdesc:base.module_ai_fields
+msgid "ai_fields"
+msgstr "ai_fields"
+
+#~ msgid "AI Prompt"
+#~ msgstr "Instrucción para la IA"
+
+#~ msgid "AI field"
+#~ msgstr "Campo de IA"

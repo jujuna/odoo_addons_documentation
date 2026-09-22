@@ -14,6 +14,8 @@ class ResConfigSettings(models.TransientModel):
     )
     stripe_account_issuing_tos_accepted = fields.Boolean(related="company_id.stripe_account_issuing_tos_accepted", readonly=False)
     stripe_company_currency_id = fields.Many2one(related='company_id.stripe_currency_id')
+    unmapped_mcc_count = fields.Integer(related="company_id.unmapped_mcc_count")
+    is_stripe_issuing_supported = fields.Boolean(related='company_id.is_stripe_issuing_supported')
 
     @api.model
     def open_expense_stripe_issuing_terms(self, params):
@@ -30,3 +32,10 @@ class ResConfigSettings(models.TransientModel):
 
     def action_configure_stripe_account(self):
         return self.company_id.action_configure_stripe_account()
+
+    def action_open_unmapped_mcc(self):
+        """ Action to open all unmapped MCC Codes """
+        self.ensure_one()
+        action = self.env.ref('hr_expense_stripe.product_mcc_stripe_tag').read()[0]
+        action['domain'] = [('product_id', '=', False)]
+        return action

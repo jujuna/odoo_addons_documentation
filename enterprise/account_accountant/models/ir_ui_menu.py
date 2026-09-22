@@ -12,7 +12,6 @@ class IrUiMenu(models.Model):
         """
         return [
             'account_accountant.account_tag_menu',
-            'account_accountant.menu_account_group',
         ]
 
     def _visible_menu_ids(self, debug=False):

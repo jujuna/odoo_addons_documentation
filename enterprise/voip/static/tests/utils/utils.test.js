@@ -5,6 +5,11 @@ import { matchPhoneNumber } from "@voip/utils/utils";
 describe.current.tags("headless");
 
 describe("matchPhoneNumber", () => {
+    test("phone number is only matched with at least 3 search characters", () => {
+        expect(matchPhoneNumber("+1 (234) 567-89/00", "12")).toBe(null);
+        expect(matchPhoneNumber("+1 (234) 567-89/00", "123")).not.toBe(null);
+    });
+
     test("phone number with space, dash, slash and parentheses", () => {
         const { before, match, after } = matchPhoneNumber("+1 (234) 567-89/00", "234567890");
         expect(match).toBe("234) 567-89/0");

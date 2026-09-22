@@ -3,6 +3,7 @@
 import json
 
 from odoo import models
+from odoo.addons.account_reports.utils.report_data_objects import AccountReportLineData
 
 
 class L10n_CoReportHandler(models.AbstractModel):
@@ -29,10 +30,10 @@ class L10n_CoReportHandler(models.AbstractModel):
 
         for column in options['columns']:
             col_expr = column['expression_label']
-            current_value = grouped_values.get(column['column_group_key'], {})
+            current_value = grouped_values.get(column['column_group_index'], {})
 
             if not current_value:
-                column_values.append(report._build_column_dict(None, None))
+                column_values.append(report._build_column_data(None, None))
             else:
                 col_val = current_value.get(col_expr)
 
@@ -40,40 +41,40 @@ class L10n_CoReportHandler(models.AbstractModel):
                     col_val = 15 if current_value['balance'] else 0
                 else:
                     if col_val is None:
-                        column_values.append(report._build_column_dict(None, None))
+                        column_values.append(report._build_column_data(None, None))
                         continue
                     else:
                         if col_expr == 'bimestre' and current_value.get('bimestre'):
                             col_val = self._get_bimonth_name(current_value['bimestre'])
 
-                column_values.append(report._build_column_dict(col_val, column, options=options))
+                column_values.append(report._build_column_data(col_val, column, options=options))
 
         return column_values
 
     def _get_partner_values(self, report, options, query_results, expand_function):
         grouped_results = {}
         for results in query_results:
-            grouped_results.setdefault(results['partner_id'], {})[results['column_group_key']] = results
+            grouped_results.setdefault(results['partner_id'], {})[results['column_group_index']] = results
 
         lines = []
         for partner_id, partner_values in grouped_results.items():
             line_id = report._get_generic_line_id('res.partner', partner_id)
-            lines.append((0, {
-                'id': line_id,
-                'name': list(partner_values.values())[0]['partner_name'],
-                'level': 2,
-                'unfoldable': True,
-                'unfolded': line_id in options.get('unfolded_lines') or options.get('unfold_all'),
-                'expand_function': expand_function,
-                'columns': self._get_column_values(report, options, partner_values)
-            }))
+            lines.append((0, AccountReportLineData(
+                id=line_id,
+                name=next(iter(partner_values.values()))['partner_name'],
+                level=2,
+                unfoldable=True,
+                unfolded=line_id in options.get('unfolded_lines') or options.get('unfold_all'),
+                expand_function=expand_function,
+                columns=self._get_column_values(report, options, partner_values)
+            )))
         return lines
 
     def _get_grouped_values(self, report, options, query_results, group_by=None):
 
         grouped_results = {}
         for results in query_results:
-            grouped_results.setdefault(tuple(results[item] for item in group_by), {})[results['column_group_key']] = results
+            grouped_results.setdefault(tuple(results[item] for item in group_by), {})[results['column_group_index']] = results
 
         lines = []
         for group, group_values in grouped_results.items():
@@ -82,15 +83,15 @@ class L10n_CoReportHandler(models.AbstractModel):
             for key, value in zip(group_by, group):
                 markup += '%s_%s_' % (key, value)
             markup = markup[:-1]
-            lines.append({
-                'id': report._get_generic_line_id(None, None, markup=markup, parent_line_id=parent_line_id),
-                'name': '',
-                'unfoldable': False,
-                'columns': self._get_column_values(report, options, group_values),
-                'level': 3,
-                'parent_id': parent_line_id,
-            })
-        return {'lines': lines}
+            lines.append(AccountReportLineData(
+                id=report._get_generic_line_id(None, None, markup=markup, parent_line_id=parent_line_id),
+                name='',
+                unfoldable=False,
+                columns=self._get_column_values(report, options, group_values),
+                level=3,
+                parent_id=parent_line_id,
+            ))
+        return lines
 
     def _get_bimonth_name(self, bimonth_index):
         bimonth_names = {

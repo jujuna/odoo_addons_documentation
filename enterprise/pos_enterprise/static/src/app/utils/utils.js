@@ -1,4 +1,5 @@
-import { useState, useEffect } from "@odoo/owl";
+import { proxy, useEffect } from "@odoo/owl";
+import { roundDecimals } from "@web/core/utils/numbers";
 
 export const computeFontColor = (bgColor) => {
     if (!bgColor) {
@@ -11,19 +12,16 @@ export const computeFontColor = (bgColor) => {
 };
 
 export function useDelayedValueChange(getCurrentValue, duration = 5000) {
-    const state = useState({
+    const state = proxy({
         oldValue: getCurrentValue(),
     });
-    let timeout = null;
-    useEffect(
-        () => {
-            timeout = setTimeout(() => {
-                state.oldValue = getCurrentValue();
-            }, duration);
-            return () => clearTimeout(timeout);
-        },
-        () => [getCurrentValue()]
-    );
+    useEffect(() => {
+        void getCurrentValue(); // subscribe to the tracked value (only read async below)
+        const timeout = setTimeout(() => {
+            state.oldValue = getCurrentValue();
+        }, duration);
+        return () => clearTimeout(timeout);
+    });
     return {
         get isActive() {
             return state.oldValue != getCurrentValue();
@@ -34,4 +32,9 @@ export function useDelayedValueChange(getCurrentValue, duration = 5000) {
 export const computeDurationSinceDate = (startDateTime) => {
     const timeDiff = (luxon.DateTime.now().ts - startDateTime.ts) / 1000;
     return Math.floor(timeDiff / 60);
+};
+
+export const roundQuantity = (quantity, models) => {
+    const productUnit = models["decimal.precision"].find((dp) => dp.name === "Product Unit");
+    return roundDecimals(quantity, productUnit?.digits ?? 2);
 };

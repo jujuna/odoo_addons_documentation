@@ -3,9 +3,7 @@
 {
     'name': 'Switzerland - Payroll with Accounting',
     'icon': '/account/static/description/l10n.png',
-    'countries': ['ch'],
-    'author': 'Odoo',
-    'version': '1.0',
+    'author': 'Odoo S.A.',
     'category': 'Human Resources',
     'description': """
 Accounting Data for Switzerland Payroll Rules
@@ -21,5 +19,5 @@ Accounting Data for Switzerland Payroll Rules
         'data/l10n_ch_hr_payroll_account_demo.xml',
     ],
     'license': 'OEEL-1',
-    'auto_install': True,
+    'auto_install': ['l10n_ch_hr_payroll', 'hr_payroll_account'],
 }

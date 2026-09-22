@@ -5,6 +5,9 @@
         <field name="model">fleet.vehicle</field>
         <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
         <field name="arch" type="xml">
+            <group name="fiscality_group" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </group>
             <group name="fiscality_first_group" position='after'>
                 <div name="disallowed_expense_rate_history">
                     <label for="rate_ids">Deductibility Rates</label>

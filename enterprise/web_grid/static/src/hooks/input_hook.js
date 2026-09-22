@@ -1,9 +1,109 @@
-import { getActiveHotkey } from "@web/core/hotkeys/hotkey_service";
+import { untrack, useEffect, useListener } from "@odoo/owl";
+import { getActiveHotkey } from "@web/core/hotkeys/hotkey_utils";
 
-import { useEffect, useRef } from "@odoo/owl";
-
+/**
+ * @param {{
+ *  inputRef: import("@odoo/owl").Signal<HTMLInputElement | null>
+ *  invalid: import("@odoo/owl").Signal<boolean>;
+ *  value: import("@odoo/owl").Signal<string>;
+ *  discard: () => any;
+ *  onChange: (value: number) => any;
+ *  onCommit: () => any;
+ *  onKeyDown: (ev: KeyboardEvent) => any;
+ *  parse: (formattedValue: string) => number;
+ * }} params
+ */
 export function useInputHook(params) {
-    const inputRef = params.ref || useRef(params.refName || "input");
+    /**
+     * Roughly the same as onChange, but called at more specific / critical times. (See bus events)
+     */
+    async function commitChanges(urgent) {
+        if (!inputRef()) {
+            return;
+        }
+
+        isDirty = inputRef().value !== lastSetValue;
+        if (isDirty || urgent) {
+            let isInvalid = false;
+            isDirty = false;
+            const strValue = inputRef().value;
+            let val;
+            if (params.parse) {
+                try {
+                    val = params.parse(strValue);
+                } catch {
+                    isInvalid = true;
+                    if (urgent) {
+                        return;
+                    } else {
+                        params.invalid.set(true);
+                    }
+                }
+            }
+
+            if (isInvalid) {
+                return;
+            }
+
+            const result = params.onCommit(val); // means change has been committed
+            if (result) {
+                lastSetValue = inputRef().value;
+                params.invalid.set(false);
+            }
+        }
+    }
+
+    /**
+     * When a user types, we need to set the field as dirty.
+     *
+     * @param {InputEvent & { currentTarget: HTMLInputElement }} ev
+     */
+    function onInput(ev) {
+        isDirty = ev.currentTarget.value !== lastSetValue;
+        params.invalid.set(false);
+    }
+
+    /**
+     * On blur, we consider the field no longer dirty, even if it were to be invalid.
+     * However, if the field is invalid, the new value will not be committed to the model.
+     *
+     * @param {Event & { currentTarget: HTMLInputElement }} ev
+     */
+    function onChange(ev) {
+        if (isDirty) {
+            isDirty = false;
+            let isInvalid = false;
+            let val = ev.currentTarget.value;
+            try {
+                val = params.parse(val);
+            } catch {
+                params.invalid.set(true);
+                isInvalid = true;
+            }
+
+            if (!isInvalid) {
+                params.onChange(val);
+                lastSetValue = ev.currentTarget.value;
+            }
+
+            params.invalid.set(false);
+        }
+    }
+
+    /**
+     * @param {KeyboardEvent & { currentTarget: HTMLInputElement }} ev
+     */
+    function onKeydown(ev) {
+        const hotkey = getActiveHotkey(ev);
+        if (hotkey === "escape") {
+            params.discard();
+        } else if (["enter", "tab", "shift+tab"].includes(hotkey)) {
+            commitChanges();
+        }
+        params.onKeyDown(ev);
+    }
+
+    const inputRef = params.inputRef;
 
     /*
      * A field is dirty if it is no longer sync with the model
@@ -18,73 +118,9 @@ export function useInputHook(params) {
      */
     let lastSetValue = null;
 
-    /**
-     * When a user types, we need to set the field as dirty.
-     */
-    function onInput(ev) {
-        isDirty = ev.target.value !== lastSetValue;
-        if (params.setDirty) {
-            params.setDirty(isDirty);
-        }
-    }
-
-    /**
-     * On blur, we consider the field no longer dirty, even if it were to be invalid.
-     * However, if the field is invalid, the new value will not be committed to the model.
-     */
-    function onChange(ev) {
-        if (isDirty) {
-            isDirty = false;
-            let isInvalid = false;
-            let val = ev.target.value;
-            if (params.parse) {
-                try {
-                    val = params.parse(val);
-                } catch {
-                    if (params.setInvalid) {
-                        params.setInvalid();
-                    }
-                    isInvalid = true;
-                }
-            }
-
-            if (!isInvalid) {
-                params.notifyChange(val);
-                lastSetValue = ev.target.value;
-            }
-
-            if (params.setDirty) {
-                params.setDirty(isDirty);
-            }
-        }
-    }
-    function onKeydown(ev) {
-        const hotkey = getActiveHotkey(ev);
-        if (params.discard && hotkey === "escape") {
-            params.discard();
-        } else if (params.commitChanges && ["enter", "tab", "shift+tab"].includes(hotkey)) {
-            commitChanges();
-        }
-        if (params.onKeyDown) {
-            params.onKeyDown(ev);
-        }
-    }
-
-    useEffect(
-        (inputEl) => {
-            if (inputEl) {
-                inputEl.addEventListener("input", onInput);
-                inputEl.addEventListener("change", onChange);
-                inputEl.addEventListener("keydown", onKeydown);
-                return () => {
-                    inputEl.removeEventListener("input", onInput);
-                    inputEl.removeEventListener("change", onChange);
-                    inputEl.removeEventListener("keydown", onKeydown);
-                };
-            }
-        },
-        () => [inputRef.el]
-    );
+    useListener(inputRef, "input", onInput);
+    useListener(inputRef, "change", onChange);
+    useListener(inputRef, "keydown", onKeydown);
 
     /**
      * Sometimes, a patch can happen with possible a new value for the field
@@ -93,59 +129,11 @@ export function useInputHook(params) {
      * If it is not such a case, we update the field with the new value.
      */
     useEffect(() => {
-        const isInvalid = params.isInvalid ? params.isInvalid() : false;
-        if (inputRef.el && !isDirty && !isInvalid) {
-            inputRef.el.value = params.getValue();
-            lastSetValue = inputRef.el.value;
+        const isInvalid = untrack(params.invalid) ?? false;
+        const value = untrack(params.value);
+        if (inputRef() && !isDirty && !isInvalid) {
+            inputRef().value = value;
+            lastSetValue = value;
         }
     });
-
-    function isUrgentSaved(urgent) {
-        if (params.isUrgentSaved) {
-            return params.isUrgentSaved(urgent);
-        }
-        return urgent;
-    }
-
-    /**
-     * Roughly the same as onChange, but called at more specific / critical times. (See bus events)
-     */
-    async function commitChanges(urgent) {
-        if (!inputRef.el) {
-            return;
-        }
-
-        isDirty = inputRef.el.value !== lastSetValue;
-        if (isDirty || isUrgentSaved(urgent)) {
-            let isInvalid = false;
-            isDirty = false;
-            let val = inputRef.el.value;
-            if (params.parse) {
-                try {
-                    val = params.parse(val);
-                } catch {
-                    isInvalid = true;
-                    if (urgent) {
-                        return;
-                    } else {
-                        params.setInvalid();
-                    }
-                }
-            }
-
-            if (isInvalid) {
-                return;
-            }
-
-            const result = params.commitChanges(val); // means change has been committed
-            if (result) {
-                lastSetValue = inputRef.el.value;
-                if (params.setDirty) {
-                    params.setDirty(isDirty);
-                }
-            }
-        }
-    }
-
-    return inputRef;
 }

@@ -4,6 +4,7 @@
         <field name="name">Profit and Loss</field>
         <field name="name@ru">Отчет о прибылях и убытках</field>
         <field name="root_report_id" ref="account_reports.profit_and_loss"/>
+        <field name="groupby">account_id</field>
         <field name="filter_analytic_groupby" eval="True"/>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_journals" eval="True"/>
@@ -34,16 +35,12 @@
                                 <field name="name">010. Revenue from sales of goods, works and services</field>
                                 <field name="name@ru">010. Выручка от реализации товаров, работ и услуг</field>
                                 <field name="code">L10N_KZ_PNL_010</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">-60</field>
                             </record>
                             <record id="l10n_kz_pl_revenue_011" model="account.report.line">
                                 <field name="name">011. Cost of goods, works and services sold</field>
                                 <field name="name@ru">011. Себестоимость реализованных товаров, работ и услуг</field>
                                 <field name="code">L10N_KZ_PNL_011</field>
-                                <field name="groupby">account_id</field>
-                                <field name="foldable" eval="True"/>
                                 <field name="account_codes_formula">70</field>
                             </record>
                         </field>
@@ -52,16 +49,12 @@
                         <field name="name">013. Cost of sales</field>
                         <field name="name@ru">013. Расходы по реализации</field>
                         <field name="code">L10N_KZ_PNL_013</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">71</field>
                     </record>
                     <record id="l10n_kz_pl_revenue_014" model="account.report.line">
                         <field name="name">014. Administrative expenses</field>
                         <field name="name@ru">014. Административные расходы</field>
                         <field name="code">L10N_KZ_PNL_014</field>
-                        <field name="groupby">account_id</field>
-                        <field name="foldable" eval="True"/>
                         <field name="account_codes_formula">72</field>
                     </record>
                 </field>
@@ -70,40 +63,30 @@
                 <field name="name">021. Financial income</field>
                 <field name="name@ru">021. Финансовые доходы</field>
                 <field name="code">L10N_KZ_PNL_021</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-61 - 6280</field>
             </record>
             <record id="l10n_kz_pl_income_022" model="account.report.line">
                 <field name="name">022. Financial expenses</field>
                 <field name="name@ru">022. Финансовые расходы</field>
                 <field name="code">L10N_KZ_PNL_022</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">73 + 7470</field>
             </record>
             <record id="l10n_kz_pl_income_023" model="account.report.line">
                 <field name="name">023. Share of the organization in profit (loss) of associates and joint ventures accounted for using the equity method</field>
                 <field name="name@ru">023. Доля организации в прибыли (убытке) ассоциированных организаций и совместной деятельности, учитываемых по методу долевого участия</field>
                 <field name="code">L10N_KZ_PNL_023</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-64 - 76</field>
             </record>
             <record id="l10n_kz_pl_income_024" model="account.report.line">
                 <field name="name">024. Other income</field>
                 <field name="name@ru">024. Прочие доходы</field>
                 <field name="code">L10N_KZ_PNL_024</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-62\(6280)</field>
             </record>
             <record id="l10n_kz_pl_income_025" model="account.report.line">
                 <field name="name">025. Other expenses</field>
                 <field name="name@ru">025. Прочие расходы</field>
                 <field name="code">L10N_KZ_PNL_025</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">74\(7470) + 8</field>
             </record>
             <record id="l10n_kz_pl_income_100" model="account.report.line">
@@ -116,8 +99,6 @@
                 <field name="name">101. Income tax expense (income)</field>
                 <field name="name@ru">101. Расходы (доходы) по подоходному налогу</field>
                 <field name="code">L10N_KZ_PNL_101</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">77</field>
             </record>
             <record id="l10n_kz_pl_after_tax_200" model="account.report.line">
@@ -130,8 +111,6 @@
                 <field name="name">201. Profit (loss) after tax from discontinued operations</field>
                 <field name="name@ru">201. Прибыль (убыток) после налогообложения от прекращенной деятельности</field>
                 <field name="code">L10N_KZ_PNL_201</field>
-                <field name="groupby">account_id</field>
-                <field name="foldable" eval="True"/>
                 <field name="account_codes_formula">-63 - 75</field>
             </record>
             <record id="l10n_kz_pl_after_tax_300" model="account.report.line">

@@ -2,7 +2,7 @@
 <templates>
     <t t-name="account_reports.AccountReportDebugPopover">
         <div class="account_report_popover_debug">
-            <t t-foreach="props.expressionsDetail" t-as="expressionEngineAndTotals" t-key="expressionEngineAndTotals_index">
+            <t t-foreach="this.props.expressionsDetail" t-as="expressionEngineAndTotals" t-key="expressionEngineAndTotals_index">
                 <t t-set="expressionEngine" t-value="expressionEngineAndTotals[0]"/>
                 <t t-set="expressionTotals" t-value="expressionEngineAndTotals[1]"/>
 
@@ -34,7 +34,7 @@
 
                     <div class="line_debug">
                         <span>Value</span>
-                        <span t-out="expressionInfo.value"/>
+                        <span t-out="expressionInfo.value.toString()"/>
                     </div>
 
                     <t t-if="!labelAndInfo_last">

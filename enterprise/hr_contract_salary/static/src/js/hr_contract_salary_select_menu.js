@@ -5,8 +5,8 @@ export class HrContractSalarySelectMenu extends SelectMenu {
 
     onStateChanged(open){
         super.onStateChanged(open);
-        if(open && this.inputRef.el){
-            this.inputRef.el.focus();
+        if (open) {
+            this.inputRefs.menu()?.focus();
         }
     }
 

@@ -1,25 +1,38 @@
-import { useEffect } from "@odoo/owl";
-
 import { localization } from "@web/core/l10n/localization";
 import { usePopover } from "@web/core/popover/popover_hook";
 
+import { GanttPopover } from "@web_gantt/gantt_popover";
 import { GanttRenderer } from "@web_gantt/gantt_renderer";
 
 import { MilestonesPopover } from "./milestones_popover";
 
+import { onMounted, t, useProps } from "@odoo/owl";
+
+class TaskGanttPopover extends GanttPopover {
+    ownProps = useProps({
+        context: t.object().optional(),
+    });
+
+    get cardPopoverProps() {
+        const props = super.cardPopoverProps;
+        props.context = { ...props.context, ...this.ownProps.context };
+        return props;
+    }
+}
 
 export class TaskGanttRendererCommon extends GanttRenderer {
     static headerTemplate = "project_enterprise.TaskGanttRenderer.Header";
     static rowContentTemplate = "project_enterprise.TaskGanttRenderer.RowContent";
     static totalRowTemplate = "project_enterprise.TaskGanttRenderer.TotalRow";
     static pillTemplate = "project_enterprise.TaskGanttRenderer.Pill";
+    static components = {
+        ...GanttRenderer.components,
+        Popover: TaskGanttPopover,
+    }
 
     setup() {
         super.setup(...arguments);
-        useEffect(
-            (el) => el.classList.add("o_project_gantt"),
-            () => [this.gridRef.el]
-        );
+        onMounted(() => this.gridRef().classList.add("o_project_gantt"));
         const position = localization.direction === "rtl" ? "bottom" : "right";
         this.milestonePopover = usePopover(MilestonesPopover, { position });
     }
@@ -33,6 +46,36 @@ export class TaskGanttRendererCommon extends GanttRenderer {
             pill.className += " opacity-50";
         }
         return enrichedPill;
+    }
+
+    /**
+     * Sparse task rows have no group-by field and incorrectly reused the Total bar.
+     *
+     * @override
+     */
+    getRowProgressBar(groupedByField, resId) {
+        if (!groupedByField && resId) {
+            const record = this.model.data.records.find((r) => r.id === resId);
+            const allocatedHours = record?.allocated_hours ?? 0;
+            if (allocatedHours > 0) {
+                return this.model._processProgressBar({ value: 0, max_value: allocatedHours }, null);
+            }
+            return null;
+        }
+        return super.getRowProgressBar(groupedByField, resId);
+    }
+
+    /**
+     * Hide the progress-bar track on sparse task leaf rows while keeping
+     * the progress label (allocated time) in the row header.
+     *
+     * @override
+     */
+    progressBarIsVisible(row) {
+        if (!row.groupedByField && row.resId) {
+            return false;
+        }
+        return super.progressBarIsVisible(row);
     }
 
     computeVisibleColumns() {
@@ -134,9 +177,9 @@ export class TaskGanttRendererCommon extends GanttRenderer {
         }
     }
 
-    async getPopoverProps(pill) {
-        const props = await super.getPopoverProps(...arguments);
-        props.actionContext.is_form_gantt = true;
+    getPopoverProps() {
+        const props = super.getPopoverProps(...arguments);
+        props.context = { is_form_gantt: true };
         return props;
     }
 

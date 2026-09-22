@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.tools import format_date, format_time
 
 
 class AppointmentType(models.Model):
@@ -18,9 +19,8 @@ class AppointmentType(models.Model):
     has_payment_step = fields.Boolean("Up-front Payment", help="Require visitors to pay to confirm their booking")
     product_id = fields.Many2one(
         'product.product', string="Booking Product",
-        compute="_compute_product_id",
         domain=_product_id_domain,
-        readonly=False, store=True, tracking=True)
+        tracking=True)
     product_currency_id = fields.Many2one(related='product_id.currency_id')
     product_lst_price = fields.Float(related='product_id.lst_price')
 
@@ -29,15 +29,27 @@ class AppointmentType(models.Model):
         "Activating the payment step requires a product",
     )
 
-    @api.depends('has_payment_step')
-    def _compute_product_id(self):
-        needs_product = self.filtered('has_payment_step')
-        (self - needs_product).product_id = False
-        if not needs_product:
-            return
-        default_product = self.env.ref(
-            'appointment_account_payment.default_booking_product',
-            raise_if_not_found=False)
-        if not default_product:
-            return
-        needs_product.filtered(lambda app: not app.product_id).product_id = default_product
+    def _get_booking_multiline_description(self, start, stop, user, tz):
+        """ Utility method returning a multiline description of the booking, including the
+            time range and the name of the user argument if set.
+            e.g.: '''Dental Care with Mitchell Admin
+                     28/11/2025 at 10:00:00AM to 28/11/2025 at 11:00:00AM (Europe/Brussels)'''
+        """
+        env_tz = self.with_context(tz=tz).env
+        common_args = {
+            'name': self.name,
+            'date_start': format_date(env_tz, start),
+            'time_start': format_time(env_tz, start, tz=tz),
+            'date_end': format_date(env_tz, stop),
+            'time_end': format_time(env_tz, stop, tz=tz),
+            'timezone': tz,
+        }
+        if user:
+            return _(
+                "%(name)s with %(user_name)s\n%(date_start)s at %(time_start)s to %(date_end)s at %(time_end)s (%(timezone)s)",
+                user_name=user.display_name, **common_args
+            )
+        return _(
+            "%(name)s\n%(date_start)s at %(time_start)s to %(date_end)s at %(time_end)s (%(timezone)s)",
+            **common_args
+        )

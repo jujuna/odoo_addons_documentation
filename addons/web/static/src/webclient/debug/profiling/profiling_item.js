@@ -1,24 +1,24 @@
+import { Component, EventBus, t, useProps } from "@odoo/owl";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { useBus, useService } from "@web/core/utils/hooks";
-
-import { Component, EventBus } from "@odoo/owl";
+import { render } from "@web/owl2/utils";
 
 export class ProfilingItem extends Component {
     static components = { DropdownItem };
     static template = "web.DebugMenu.ProfilingItem";
-    static props = {
-        bus: { type: EventBus },
-    };
+    props = useProps({
+        bus: t.instanceOf(EventBus),
+    });
     setup() {
         this.profiling = useService("profiling");
-        useBus(this.props.bus, "UPDATE", this.render);
+        useBus(this.props.bus, "UPDATE", () => render(this));
     }
 
     changeParam(param, ev) {
         this.profiling.setParam(param, ev.target.value);
     }
     toggleParam(param) {
-        const value = this.profiling.state.params.execution_context_qweb;
+        const value = this.profiling.state.params[param];
         this.profiling.setParam(param, !value);
     }
     openProfiles() {

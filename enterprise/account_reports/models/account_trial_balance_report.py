@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from odoo import api, models, _, fields
 from odoo.tools import SQL, groupby, frozendict
+from odoo.fields import Domain
 
 
 class AccountTrialBalanceReportHandler(models.AbstractModel):
@@ -25,17 +26,23 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
             options['comparison']['hide_period_order_filter'] = True
 
         # Modify column headers and group structure
-        column_headers, column_groups, columns = self._get_column_values(report, options)
+        column_headers, columns = self._get_column_values(report, options)
 
         options['column_headers'][0] = column_headers
-        options['column_groups'].update(column_groups)
         options['columns'] = columns
 
         # CTA
-        for group_vals in options['column_groups'].values():
-            group_vals['forced_options']['date']['currency_table_period_key'] = '_trial_balance_middle_periods'
+        for group_vals in options['column_groups']:
             if group_vals['forced_options']['trial_balance_column_type'] in ('initial_balance', 'end_balance'):
                 group_vals['forced_options']['no_impact_on_currency_table'] = True
+
+        options['custom_display_config'] = {
+            'pdf_export': {
+                'pdf_export_main': 'account_reports.audit_pdf_export_main',
+                'pdf_export_main_table_header': 'account_reports.audit_pdf_export_main_table_header',
+                'pdf_export_main_table_body': 'account_reports.audit_pdf_export_main_table_body',
+            },
+        }
 
     def _get_column_values(self, report, options):
         """
@@ -43,22 +50,22 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
         Returns modified column headers, column groups, and columns.
         """
         headers = []
-        groups = {}
         columns = []
 
         original_headers = options['column_headers'][0]
         original_columns = options['columns']
 
         initial_date_from = fields.Date.to_date(
-            options['column_groups'][original_columns[0]['column_group_key']]['forced_options']['date']['date_from']
+            options['column_groups'][original_columns[0]['column_group_index']]['forced_options']['date']['date_from']
         )
         previous_fiscal_year = self.env.company.compute_fiscalyear_dates(initial_date_from)
         block_id = 0
 
         # Add initial balance column
         initial_date_to = initial_date_from - datetime.timedelta(days=1)
-        headers, groups, columns = self._add_initial_column(
-            report, options, headers, groups, columns, initial_date_to, block_id, previous_fiscal_year['date_from']
+        block_end_date = fields.Date.to_date(options['column_groups'][0]['forced_options']['date']['date_to'])
+        headers, columns = self._add_initial_column(
+            report, options, headers, columns, initial_date_to, block_id, previous_fiscal_year['date_from'], block_end_date=block_end_date,
         )
 
         last_column = {}
@@ -67,26 +74,28 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
         fiscal_year = {}
 
         for column in original_columns:
-            column_group_values = options['column_groups'][column['column_group_key']]
+            column_group_values = options['column_groups'][column['column_group_index']]
             fiscal_year = self.env.company.compute_fiscalyear_dates(
                 fields.Date.to_date(column_group_values['forced_options']['date']['date_from'])
             )
 
             # Check for fiscal year change
             if fiscal_year != previous_fiscal_year:
-                headers, groups, columns = self._add_end_column(report, options, headers, groups, columns, last_column, block_id, previous_fiscal_year)
+                headers, columns = self._add_end_column(report, options, headers, columns, last_column, block_id, previous_fiscal_year)
 
                 block_id += 1
                 initial_date_to = fields.Date.to_date(column_group_values['forced_options']['date']['date_from']) - datetime.timedelta(days=1)
-                headers, groups, columns = self._add_initial_column(report, options, headers, groups, columns, initial_date_to, block_id, fiscal_year['date_from'])
+                block_end_date = fields.Date.to_date(column_group_values['forced_options']['date']['date_to'])
+                headers, columns = self._add_initial_column(report, options, headers, columns, initial_date_to, block_id, fiscal_year['date_from'], block_end_date=block_end_date)
                 previous_fiscal_year = fiscal_year
 
             # Update column group
-            if column['column_group_key'] != last_column.get('column_group_key'):
+            if column['column_group_index'] != last_column.get('column_group_index'):
                 column_group_values['forced_options'].update({
                     'trial_balance_column_block_id': str(block_id),
                     'trial_balance_column_type': 'period',
-                    'trial_balance_block_fiscalyear_start': fields.Date.to_string(fiscal_year['date_from'])
+                    'trial_balance_block_fiscalyear_start': fields.Date.to_string(fiscal_year['date_from']),
+                    'trial_balance_block_end_date': fields.Date.to_string(block_end_date),
                 })
 
             # Handle column headers
@@ -97,33 +106,29 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
             columns.append(column)
             last_column = column
 
-        headers, groups, columns = self._add_end_column(report, options, headers, groups, columns, last_column, block_id, fiscal_year)
+        headers, columns = self._add_end_column(report, options, headers, columns, last_column, block_id, fiscal_year)
 
-        return headers, groups, columns
+        return headers, columns
 
-    def _add_initial_column(self, report, options, headers, groups, columns, date_to, block_id, fiscal_year_start):
-        initial_dates = report._get_dates_period(date_from=None, date_to=date_to, mode='single')
-        header, group, col = self._create_column(report, options, _("Initial Balance"), initial_dates, block_id, fiscal_year_start, 'initial_balance')
+    def _add_initial_column(self, report, options, headers, columns, date_to, block_id, fiscal_year_start, block_end_date=None):
+        initial_dates = report._build_date_dict(options, None, date_to, mode='single')
+        header, col = self._create_column(report, options, _("Initial Balance"), initial_dates, block_id, fiscal_year_start, 'initial_balance', block_end_date)
         headers.append(header)
-        groups.update(group)
         columns.extend(col)
-        return headers, groups, columns
+        return headers, columns
 
-    def _add_end_column(self, report, options, headers, groups, columns, last_column, block_id, fiscal_year):
-        last_group = options['column_groups'][last_column['column_group_key']]
-        end_dates = report._get_dates_period(
-            date_from=fields.Date.to_date(last_group['forced_options']['date']['date_from']),
-            date_to=fields.Date.to_date(last_group['forced_options']['date']['date_to']),
-            mode='range'
-        )
-        header, group, col = self._create_column(report, options, _("End Balance"), end_dates, block_id, fiscal_year['date_from'], 'end_balance')
+    def _add_end_column(self, report, options, headers, columns, last_column, block_id, fiscal_year):
+        last_group = options['column_groups'][last_column['column_group_index']]
+        end_date_from = fields.Date.to_date(last_group['forced_options']['date']['date_from'])
+        end_date_to = fields.Date.to_date(last_group['forced_options']['date']['date_to'])
+        end_dates = report._build_date_dict(options, end_date_from, end_date_to)
+        header, col = self._create_column(report, options, _("End Balance"), end_dates, block_id, fiscal_year['date_from'], 'end_balance', block_end_date=end_date_to)
         headers.append(header)
-        groups.update(group)
         columns.extend(col)
-        return headers, groups, columns
+        return headers, columns
 
-    def _create_column(self, report, options, header_name, period_dates, block_id, fiscal_year_start, column_type):
-        header, group, cols = self._generate_column_group(
+    def _create_column(self, report, options, header_name, period_dates, block_id, fiscal_year_start, column_type, block_end_date=None):
+        header, cols = self._generate_column_group(
             report, options,
             new_header_name=header_name,
             new_values={
@@ -132,11 +137,12 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
                     'trial_balance_column_block_id': str(block_id),
                     'trial_balance_column_type': column_type,
                     'trial_balance_block_fiscalyear_start': fields.Date.to_string(fiscal_year_start),
+                    'trial_balance_block_end_date': fields.Date.to_string(block_end_date) if block_end_date else options['date']['date_to'],
                 },
             },
             create_single_column=self._display_single_column_for_initial_and_end_sections(options),
         )
-        return header, group, cols
+        return header, cols
 
     @api.model
     def _display_single_column_for_initial_and_end_sections(self, options):
@@ -167,7 +173,7 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
             *options['column_headers'][1:],
         ]
         new_column_group_vals = report._generate_columns_group_vals_recursively(column_headers, default_group_vals)
-        new_columns, new_column_groups = report._build_columns_from_column_group_vals(new_values['forced_options'], new_column_group_vals)
+        new_columns = report._build_columns_from_column_group_vals(options, new_column_group_vals)
 
         if create_single_column:
             # _build_columns_from_column_group_vals creates a column group with all the columns defined in the report.
@@ -183,7 +189,7 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
                 if new_column['expression_label'] == 'debit'
             ]
 
-        return new_column_header_element, new_column_groups, new_columns
+        return new_column_header_element, new_columns
 
     def _caret_options_initializer(self):
         return {
@@ -205,7 +211,7 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
     #  REPORT ENGINE  #
     ###################
 
-    def _report_custom_engine_trial_balance(self, expressions, options, date_scope, current_groupby, next_groupby, offset=0, limit=None, warnings=None):
+    def _report_engine_trial_balance(self, options, date_scope, formulas_dict, current_groupby, warnings=None):
         """ The custom engine for the Trial Balance.
 
             Return a list of lines with keys {'balance', 'debit', 'credit'} that are the aggregation
@@ -220,7 +226,7 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
 
         # Never expand individual AMLs if we are in the Initial Balance.
         if 'id' in current_groupbys and options['trial_balance_column_type'] == 'initial_balance':
-            return []
+            return {next(iter(formulas_dict.values())): []}
 
         extra_domain = []
         # Don't consider income and expense AMLs from previous fiscal years.
@@ -236,99 +242,67 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
             ]
 
         if options.get('export_mode') == 'print' and options.get('filter_search_bar'):
-            if options.get('hierarchy'):
-                extra_domain += [
-                    '|',
-                    ('account_id', 'ilike', options['filter_search_bar']),
-                    ('account_id', 'in', SQL(
-                        """
-                        /*
-                        JOIN clause: Check if the account_group include the account_account
-                        A group from 10 to 10 include every account with code that begin with 10.
-                        If there is an account with a length of 6, it should be included if it's in the range from 100 000 to 109 999 included
+            extra_domain.append(('account_id', 'ilike', options['filter_search_bar']))
 
-                        Where clause: Check if the account_group matches the filter
-                        */
-                        (SELECT distinct account_account.id
-                        FROM account_account
-                        LEFT JOIN account_group ON
-                            (
-                                LEFT(account_account.code_store->> '%(company_id)s', LENGTH(code_prefix_start)) BETWEEN
-                                    code_prefix_start
-                                AND code_prefix_end
-                            )
-                        WHERE ( account_group.name->> %(lang)s  ILIKE %(filter_search_bar)s
-                            OR  account_group.code_prefix_start ILIKE %(filter_search_bar)s)
-                        )""",
-                        lang=self.env.lang,
-                        company_id=self.env.company.id,
-                        filter_search_bar="%" + options['filter_search_bar'] + "%")),
-                ]
-            else:
-                extra_domain.append(('account_id', 'ilike', options['filter_search_bar']))
+        block_end_date = None
+        if options['trial_balance_column_type'] == 'initial_balance':
+            date_scope = 'from_beginning'
+            block_end_date = options.get('trial_balance_block_end_date')
 
-        next_groupbys = next_groupby.split(',') if next_groupby else []
-        query = report._get_report_query(options, date_scope, domain=extra_domain)
+        query = report._get_report_query(options, date_scope, domain=extra_domain, cta_date_to=block_end_date)
 
         if current_groupbys:
-            select_groupby_key_components = SQL('\n').join(
-                SQL("%s AS %s,", self.env['account.move.line']._field_to_sql("account_move_line", groupby_key, query), SQL.identifier(f'groupby_key_{groupby_key}'))
+            select_groupby_key_components = SQL(',\n').join(
+                SQL("%s AS %s", self.env['account.move.line']._field_to_sql("account_move_line", groupby_key, query), SQL.identifier(f'groupby_key_{groupby_key}'))
                 for groupby_key in current_groupbys
             )
             query.groupby = SQL(',').join(SQL.identifier(f'groupby_key_{groupby_key}') for groupby_key in current_groupbys)
 
-        sql_query = SQL(
-            """
-            SELECT
-                %(select_groupby_key_components)s
-                COALESCE(SUM(%(select_balance)s), 0.0) AS balance,
-                COALESCE(SUM(%(select_debit)s), 0.0) AS debit,
-                COALESCE(SUM(%(select_credit)s), 0.0) AS credit
-            FROM %(table_references)s
-            %(currency_table_join)s
-            WHERE %(search_condition)s
-            %(groupby_clause)s
-            """,
-            select_groupby_key_components=select_groupby_key_components if current_groupbys else SQL(''),
-            select_balance=report._currency_table_apply_rate(SQL("account_move_line.balance")),
-            select_debit=report._currency_table_apply_rate(SQL("account_move_line.debit")),
-            select_credit=report._currency_table_apply_rate(SQL("account_move_line.credit")),
-            table_references=query.from_clause,
-            currency_table_join=report._currency_table_aml_join(options),
-            search_condition=query.where_clause,
-            groupby_clause=SQL("GROUP BY %s", query.groupby) if query.groupby else SQL(),
-        )
-
-        self.env.cr.execute(sql_query)
-        query_results = self.env.cr.dictfetchall()
-
-        # Don't expand individual AMLs in the Initial Balance
-        disable_expand = bool((not next_groupby or next_groupbys[0] == 'id') and options['trial_balance_column_type'] == 'initial_balance')
+        query_results = self.env.execute_query_dict(query.select(SQL(', ').join(s for s in (
+            SQL('%s', select_groupby_key_components) if current_groupbys else SQL(),
+            SQL('COALESCE(SUM(%s), 0.0) AS balance', query.table.consolidation_balance),
+            SQL('COALESCE(SUM(%s), 0.0) AS credit', query.table.consolidation_credit),
+            SQL('COALESCE(SUM(%s), 0.0) AS debit', query.table.consolidation_debit),
+        ) if s)))
 
         if not current_groupbys:
             if not query_results:
-                return {
+                return {next(iter(formulas_dict.values())): {
                     'balance': 0.0,
                     'debit': 0.0,
                     'credit': 0.0,
                     'has_sublines': False,
-                }
+                }}
 
             query_result = query_results[0]
             query_result['has_sublines'] = True
-            return query_result
+            return {next(iter(formulas_dict.values())): query_result}
 
-        return [
+        return {next(iter(formulas_dict.values())): [
             (
                 (
                     query_result[f'groupby_key_{current_groupbys[0]}']
                     if len(current_groupbys) == 1
                     else tuple(query_result[f'groupby_key_{groupby}'] for groupby in current_groupbys)
                 ),
-                {**query_result, 'has_sublines': not disable_expand},
+                {**query_result, 'has_sublines': True},
             )
             for query_result in query_results
-        ]
+        ]}
+
+    def _custom_groupby_line_completer(self, report, options, line_dict, current_groupby):
+        if line_dict.groupby != 'id':
+            return
+
+        # Don't expand individual AMLs in the Initial Balance
+        unfoldable = False
+        for column in line_dict.columns:
+            column_options = options['column_groups'][column.column_group_index]['forced_options']
+            if column_options['trial_balance_column_type'] == 'initial_balance':
+                column.has_sublines = False
+            unfoldable = unfoldable or column.has_sublines
+
+        line_dict.unfoldable = unfoldable
 
     def _custom_line_postprocessor(self, report, options, lines):
         """ Compute the end balance for each column block and each horizontal group,
@@ -337,22 +311,33 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
             Any value that was already in the end_balance column is ignored.
         """
         def get_block_and_group_key(column):
-            column_group = options['column_groups'][column['column_group_key']]
+            col_group_index = column.column_group_index
+            if col_group_index is None:
+                return None, frozendict(), ()
+
+            column_group = options['column_groups'][col_group_index]
             block_id = column_group['forced_options'].get('trial_balance_column_block_id')
             horizontal_group = frozendict(column_group.get('horizontal_groupby_element', {}))
             analytic_group = tuple(column_group['forced_options'].get('analytic_accounts_list', []))
+
             return block_id, horizontal_group, analytic_group
 
         # Unaffected Earnings lines
-        if report._parse_line_id(lines[0]['id'])[-1] == ('', 'account.report.line', report.line_ids[0].id):
+        if report._parse_line_id(lines[0].id)[-1] == ('', 'account.report.line', report.line_ids[0].id):
             unaffected_earning_lines = report._get_unallocated_earnings_lines(options, 'strict_range', auditable=True)
         else:
             unaffected_earning_lines = []
 
-        if self.env.company.totals_below_sections:
-            total_line_id = lines[-1]['id']
+        if report.currency_translation == 'cta':
+            cta_line = report._compute_cumulative_translation_adjustment_lines(options, 'strict_range')
+            cumulative_translation_adjustment_lines = [cta_line] if cta_line else []
         else:
-            total_line_id = lines[0]['id']
+            cumulative_translation_adjustment_lines = []
+
+        if self.env.company.totals_below_sections:
+            total_line_id = lines[-1].id
+        else:
+            total_line_id = lines[0].id
 
         unaffected_earning_values = defaultdict(
             lambda: {
@@ -361,15 +346,26 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
             }
         )
 
-        for line in unaffected_earning_lines + lines:
-            unaffected_earning_line = report._get_markup(line['id']) == 'undistributed_profits_losses'
+        cumulative_translation_adjustment_values = defaultdict(
+            lambda: {
+                'initial_balance': {'debit': 0, 'credit': 0, 'balance': 0},
+                'period': {'debit': 0, 'credit': 0, 'balance': 0},
+            }
+        )
+
+        for line in unaffected_earning_lines + cumulative_translation_adjustment_lines + lines:
+            unaffected_earning_line = report._get_markup(line.id) == 'undistributed_profits_losses'
+            cumulative_translation_adjustment_line = report._get_markup(line.id) == 'cumulative_translation_adjustment'
             # Group by column block ID and horizontal groupby element to sum up end balance
-            grouped_by_block = groupby(line['columns'], key=get_block_and_group_key)
+            grouped_by_block = groupby(line.columns, key=get_block_and_group_key)
 
             for _grouping_key, columns_in_block in grouped_by_block:
                 columns_grouped_by_type = dict(groupby(
                     columns_in_block,
-                    lambda column: options['column_groups'][column['column_group_key']]['forced_options'].get('trial_balance_column_type')
+                    lambda column: (
+                        options['column_groups'][column.column_group_index]['forced_options'].get('trial_balance_column_type')
+                        if column.column_group_index is not None else None
+                    )
                 ))
 
                 # We do a separate sum for debits and credits since we need to handle both the case where
@@ -379,32 +375,35 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
                 for col_type, cols in columns_grouped_by_type.items():
                     if col_type in ('initial_balance', 'period'):
                         for col in cols:
-                            if line['id'] == total_line_id:
-                                col['no_format'] += unaffected_earning_values[_grouping_key][col_type][col['expression_label']]
-                                col['is_zero'] = not bool(col['no_format'])
-                            if not col['is_zero']:
-                                if col['expression_label'] == 'debit' or (col['expression_label'] == 'balance' and col in columns_grouped_by_type['initial_balance']):
-                                    sum_debit += col['no_format']
-                                elif col['expression_label'] == 'credit':
-                                    sum_credit += col['no_format']
+                            if line.id == total_line_id:
+                                col.no_format += unaffected_earning_values[_grouping_key][col_type][col.expression_label]
+                                col.no_format += cumulative_translation_adjustment_values[_grouping_key][col_type][col.expression_label]
+                                col.is_zero = not bool(col.no_format)
+                            if not col.is_zero:
+                                if col.expression_label == 'debit' or (col.expression_label == 'balance' and col in columns_grouped_by_type['initial_balance']):
+                                    sum_debit += col.no_format
+                                elif col.expression_label == 'credit':
+                                    sum_credit += col.no_format
                                 if unaffected_earning_line:
-                                    unaffected_earning_values[_grouping_key][col_type][col['expression_label']] += col['no_format']
+                                    unaffected_earning_values[_grouping_key][col_type][col.expression_label] += col.no_format
+                                if cumulative_translation_adjustment_line:
+                                    cumulative_translation_adjustment_values[_grouping_key][col_type][col.expression_label] += col.no_format
 
                 for end_balance_col in columns_grouped_by_type.get('end_balance', []):
-                    match end_balance_col['expression_label']:
+                    match end_balance_col.expression_label:
                         case 'debit':
-                            end_balance_col['no_format'] = sum_debit
-                            end_balance_col['is_zero'] = not bool(sum_debit)
+                            end_balance_col.no_format = sum_debit
+                            end_balance_col.is_zero = not bool(sum_debit)
                         case 'credit':
-                            end_balance_col['no_format'] = sum_credit
-                            end_balance_col['is_zero'] = not bool(sum_credit)
+                            end_balance_col.no_format = sum_credit
+                            end_balance_col.is_zero = not bool(sum_credit)
                         case 'balance':
                             balance = sum_debit - sum_credit
-                            end_balance_col['no_format'] = balance
-                            end_balance_col['is_zero'] = not bool(balance)
+                            end_balance_col.no_format = balance
+                            end_balance_col.is_zero = not bool(balance)
 
         # Total line
-        if lines and not lines[0].get('parent_id'):  # should not affect when unfolding lines
+        if lines and not lines[0].parent_id:  # should not affect when unfolding lines
             # The same behavior is expected with or without totals_below_sections activated
             # Only the total line should be displayed at the bottom, in bold
             if self.env.company.totals_below_sections:  # total line already exists
@@ -413,29 +412,39 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
                     total_line = lines.pop(-1)
                     lines.extend(unaffected_earning_lines)
                     lines.append(total_line)
+                if cumulative_translation_adjustment_lines and not all(col.is_zero for col in cumulative_translation_adjustment_lines[0].columns):
+                    total_line = lines.pop(-1)
+                    lines.extend(cumulative_translation_adjustment_lines)
+                    lines.append(total_line)
             else:
                 lines.extend(unaffected_earning_lines)
+                if cumulative_translation_adjustment_lines and not all(col.is_zero for col in cumulative_translation_adjustment_lines[0].columns):
+                    lines.extend(cumulative_translation_adjustment_lines)
                 lines.append(lines.pop(0))
                 # To make the style as if totals_below_sections was activated
-                lines[-1]['id'] = report._build_subline_id(lines[-1]['id'], report._build_line_id([('total', None, None)]))
+                lines[-1].id = report._build_subline_id(lines[-1].id, report._build_line_id([('total', None, None)]))
             # To make totals line not blank
-            for col in lines[-1]['columns']:
-                col['blank_if_zero'] = False
-            lines[-1]['name'] = _("Total")
+            for col in lines[-1].columns:
+                col.blank_if_zero = False
+            lines[-1].name = self.env._("Total")
 
         return lines
 
-    def _report_expand_unfoldable_line_with_groupby(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
+    def _report_expand_unfoldable_line_with_groupby(self, line_dict_id, groupby, options, unfold_all_batch_data=None, limit_to_load=None):
         """ Shallow the 'account.report' function to prevent displaying move lines that do not belong to the period that is selected """
+        if limit_to_load and groupby.replace(' ', '').split(',')[0] == 'account_id':
+            # Done for usability. We don't apply any load more limit for that grouping, assuming the number of accounts will always be small enough
+            limit_to_load = None
+
         report = self.env['account.report'].browse(options['report_id'])
         if groupby != 'id':
-            return report._report_expand_unfoldable_line_with_groupby(line_dict_id, groupby, options, progress, offset, unfold_all_batch_data)
+            return report._report_expand_unfoldable_line_with_groupby(line_dict_id, groupby, options, unfold_all_batch_data=unfold_all_batch_data, limit_to_load=limit_to_load)
 
-        for _col_group_key, col_group_vals in options['column_groups'].items():
+        for _col_group_index, col_group_vals in enumerate(options['column_groups']):
             if col_group_vals['forced_options']['trial_balance_column_type'] == 'initial_balance':
                 col_group_vals['forced_domain'].append(('id', '=', False))
 
-        return report._report_expand_unfoldable_line_with_groupby(line_dict_id, groupby, options, progress, offset, unfold_all_batch_data)
+        return report._report_expand_unfoldable_line_with_groupby(line_dict_id, groupby, options, unfold_all_batch_data=unfold_all_batch_data, limit_to_load=limit_to_load)
 
     def _get_account_ids_type_map(self, report, options):
         company_ids = report.get_report_company_ids(options)
@@ -464,33 +473,35 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
         results = {}  # In the form {full_sub_groupby_key: all_column_group_expression_totals for this groupby computation}
 
         for line_to_expand in lines_to_expand_by_function.get('_report_expand_unfoldable_line_with_groupby', []):
-            report_line_id = report._get_res_id_from_line_id(line_to_expand['id'], 'account.report.line')
+            report_line_id = report._get_res_id_from_line_id(line_to_expand.id, 'account.report.line')
             report_line = self.env['account.report.line'].browse(report_line_id)
 
             expressions = report_line.expression_ids.filtered(
-                lambda x: x.engine == 'custom' and x.formula == '_report_custom_engine_trial_balance'
+                lambda x: x.engine == 'custom' and x.formula == '_report_engine_trial_balance'
             )
             if len(expressions) != len(report_line.expression_ids):
                 continue
 
+            formulas_dict = {expressions[0].formula: expressions}
+
             groupby_str = report_line._get_groupby(options)
             groupbys = groupby_str.replace(' ', '').split(',')
-            next_groupby = 'id'
 
             # Execute the query once for each groupby level. While we could optimize this further
             # (execute the query once at the deepest groupby level, and then aggregate the results in Python),
             # this ensures that the results match exactly what we would get by expanding each line.
             # But we could change that if there is a performance need.
             while groupbys:
-                for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
+                for column_group_index, column_group_options in report._split_options_per_column_group(options).items():
                     for date_scope, expressions_by_date_scope in groupby(expressions, lambda e: e.date_scope):
                         # Get the custom engine results for the given groupby level.
-                        engine_lines = self._report_custom_engine_trial_balance(expressions, column_group_options, date_scope, current_groupby=groupbys, next_groupby=next_groupby)
+                        engine_res = self._report_engine_trial_balance(column_group_options, date_scope, formulas_dict, current_groupby=groupbys)
 
                         # Transform the groupby key of each line into a list
                         engine_lines = [
                             (grouping_key if isinstance(grouping_key, tuple) else (grouping_key,), line_values)
-                            for grouping_key, line_values in engine_lines
+                            for formula_res in engine_res.values()
+                            for grouping_key, line_values in formula_res
                         ]
                         for parent_line_grouping_key, engine_lines_grouped_by_parent_line in groupby(
                             engine_lines,
@@ -498,7 +509,7 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
                         ):
                             full_sub_groupby_key = get_sub_groupby_key(report_line_id, groupbys, parent_line_grouping_key)
                             results.setdefault(full_sub_groupby_key, {})
-                            results[full_sub_groupby_key][column_group_key] = {
+                            results[full_sub_groupby_key][column_group_index] = {
                                 expression: {
                                     'value': [
                                         (grouping_key[-1], line_values[expression.subformula])
@@ -512,12 +523,12 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
                                 }
                                 for expression in expressions_by_date_scope
                             }
-                next_groupby = groupbys.pop()
+                groupbys.pop()
         return results
 
     def action_audit_cell(self, options, params):
         report = self.env['account.report'].browse(options['report_id'])
-        column_group_forced_options = options['column_groups'][params['column_group_key']]['forced_options']
+        column_group_forced_options = options['column_groups'][params['column_group_index']]['forced_options']
 
         # When generating the end balance column, we didn't specify a date in the forced_options,
         # to avoid a separate call to the custom engine (instead, the end balance is computed in
@@ -557,4 +568,26 @@ class AccountTrialBalanceReportHandler(models.AbstractModel):
                         modified_domain.append(condition)
 
             action['domain'] = modified_domain
+
+        date_from, date_to = report._get_date_bounds_info(options, 'strict_range')
+        if report._get_markup(params['calling_line_dict_id']) == 'undistributed_profits_losses':
+            date_from = column_group_forced_options['date']['date_from']
+            date_to = column_group_forced_options['date']['date_to']
+
+        action['context'].update({
+            'currency_translation': report.currency_translation,
+            'date_from': date_from,
+            'date_to': date_to,
+        })
+
+        if options.get('multi_currency'):
+            action['views'] = [(self.env.ref('account_reports.view_multi_currency_report_audit').id, 'list')]
+
+        if report._get_markup(params['calling_line_dict_id']) == 'cumulative_translation_adjustment':
+            column_group_options = report._get_column_group_options(options, params.get('column_group_index'))
+            action['views'] = [(self.env.ref('account_reports.view_cumulative_translation_adjustment_audit_tree').id, 'list')]
+            action['domain'] = Domain.AND([
+                report._get_options_domain(column_group_options, 'strict_range'),
+                Domain('account_type', 'in', ['equity', 'equity_unaffected', 'income', 'income_other', 'expense_direct_cost', 'expense', 'expense_depreciation', 'expense_other'])])
+
         return action

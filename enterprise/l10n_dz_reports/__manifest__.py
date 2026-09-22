@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
@@ -16,7 +15,6 @@ Accounting reports for Algeria
         'data/profit_loss.xml',
     ],
     'auto_install': ['l10n_dz', 'account_reports'],
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
 }

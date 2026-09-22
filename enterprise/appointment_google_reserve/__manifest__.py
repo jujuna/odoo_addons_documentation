@@ -1,19 +1,18 @@
 {
     'name': 'Appointment Google Reserve',
-    'version': '1.0',
     'category': 'Productivity',
     'description': """Enable a link between your appointment type and the google API""",
     'depends': [
-        'appointment'
+        'appointment',
+        'iap',
     ],
-    'installable': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
     'data': [
         'data/ir_cron_data.xml',
         'views/appointment_type_views.xml',
         'views/google_reserve_merchant_views.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
     ],
     'demo': [
         'data/google_reserve_demo.xml',

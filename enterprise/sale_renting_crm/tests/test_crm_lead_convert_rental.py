@@ -3,11 +3,12 @@
 from odoo.fields import Command
 from odoo.tests import tagged, users
 
-from odoo.addons.crm.tests import common as crm_common
+from odoo.addons.crm.tests.common import TestCrmCommon
 
 
 @tagged('lead_manage')
-class TestLeadConvertToRental(crm_common.TestCrmCommon):
+@tagged('at_install', '-post_install')  # LEGACY at_install
+class TestLeadConvertToRental(TestCrmCommon):
 
     @classmethod
     def setUpClass(cls):
@@ -45,7 +46,6 @@ class TestLeadConvertToRental(crm_common.TestCrmCommon):
         self.assertEqual(action['res_model'], 'sale.order')
         self.assertEqual(action['context']['default_partner_id'], new_partner.id)
         self.assertEqual(action['context']['default_tag_ids'][0][-1], self.lead_1.tag_ids.ids)
-        self.assertTrue(action['context'].get('in_rental_app'))
 
     @users('user_sales_salesman')
     def test_lead_convert_to_rental_exist(self):

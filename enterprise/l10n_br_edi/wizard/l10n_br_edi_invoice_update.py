@@ -30,14 +30,16 @@ class L10n_Br_EdiInvoiceUpdate(models.TransientModel):
     @api.constrains("move_id", "mode", "reason")
     def _constrains_reason(self):
         for wizard in self.filtered(lambda wizard: not wizard.is_service_invoice):
-            if wizard.mode == "cancel" and not 15 <= len(wizard.reason or "") <= 255:
+            if not 15 <= len(wizard.reason or "") <= 255:
                 raise ValidationError(_("The reason must contain at least 15 characters and cannot exceed a maximum of 255 characters."))
 
     def _create_xml_attachment(self, response):
         return self.env["ir.attachment"].create(
             {
                 "name": f"{self.move_id.name}_edi_{'cancel' if self.mode == 'cancel' else 'correction'}.xml",
-                "datas": response["xml"]["base64"],
+                "raw": response["xml"]["base64"],
+                "res_model": "account.move",
+                "res_id": self.move_id.id,
             }
         )
 
@@ -58,6 +60,7 @@ class L10n_Br_EdiInvoiceUpdate(models.TransientModel):
         move = self.move_id
         if self.mode == "cancel":
             move.button_cancel()
+            move.l10n_br_last_edi_status = "cancelled"
         else:
             move.l10n_br_edi_last_correction_number = iap_args["seq"]
 
@@ -84,7 +87,9 @@ class L10n_Br_EdiInvoiceUpdate(models.TransientModel):
             attachments |= self.env["ir.attachment"].create(
                 {
                     "name": f"{move.name}_edi_correction.pdf",
-                    "datas": response["pdf"]["base64"],
+                    "raw": response["pdf"]["base64"],
+                    "res_model": "account.move",
+                    "res_id": self.move_id.id,
                 }
             )
 

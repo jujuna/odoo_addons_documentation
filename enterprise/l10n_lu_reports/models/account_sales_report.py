@@ -12,32 +12,46 @@ from odoo.tools import float_compare
 
 class L10n_LuEcSalesReportHandler(models.AbstractModel):
     _name = 'l10n_lu.ec.sales.report.handler'
-    _inherit = ['account.ec.sales.report.handler']
+    _inherit = ['account.ec.sales.with.tags.report.handler']
     _description = 'Luxembourgish EC Sales Report Custom Handler'
 
     def _custom_options_initializer(self, report, options, previous_options):
-        """
-        Add the invoice lines search domain that is specific to the country.
-        Typically, the taxes account.report.expression ids relative to the country for the triangular, sale of goods
-        or services.
-        :param dict options: Report options
-        :return dict: The modified options dictionary
-        """
-        super()._init_core_custom_options(report, options, previous_options)
-        ec_operation_category = options.get('sales_report_taxes') or self._get_tax_tags_for_lux_sales_report()
-
-        # Change the names of the taxes to specific ones that are dependant to the tax type
-        ec_operation_category['operation_category'] = {
-            'goods': 'L',
-            'triangular': 'T',
-            'services': 'S',
+        lu_tax_tags = self._get_ec_sales_tax_tags()
+        options['sales_report_operation_types'] = {
+            'goods': {
+                'tax_tag_ids': lu_tax_tags['goods'],
+                'name': self.env._('Goods'),
+                'shortcut': 'L',
+            },
+            'services': {
+                'tax_tag_ids': lu_tax_tags['services'],
+                'name': self.env._('Services'),
+                'shortcut': 'S',
+            },
+            'triangular': {
+                'tax_tag_ids': lu_tax_tags['triangular'],
+                'name': self.env._('Triangular'),
+                'shortcut': 'T',
+            },
         }
-        options.update({'sales_report_taxes': ec_operation_category})
 
-        # Buttons
+        super()._custom_options_initializer(report, options, previous_options)
+
         options.setdefault('buttons', []).append(
-            {'name': _('XML'), 'sequence': 30, 'action': 'open_report_export_wizard'}
+            {'name': _('XML'), 'sequence': 30, 'action': 'open_report_export_wizard', 'branch_allowed': True}
         )
+
+    def _get_ec_sales_tax_tags(self):
+        # Overrides account_reports
+        goods_expression = self.env.ref('l10n_lu.account_tax_report_line_1b_1_intra_community_goods_pi_vat_tag')
+        services_expression = self.env.ref('l10n_lu.account_tax_report_line_1b_6_b1_non_exempt_customer_vat_tag')
+        triangular_expression = self.env.ref('l10n_lu.account_tax_report_line_1b_6_a_subsequent_to_intra_community_tag')
+
+        return {
+            'goods': goods_expression._get_matching_tags().ids,
+            'services': services_expression._get_matching_tags().ids,
+            'triangular': triangular_expression._get_matching_tags().ids,
+        }
 
     def get_file_name(self, options):
         ''' 000000         X            20200101 T                      120030  01
@@ -51,9 +65,14 @@ class L10n_LuEcSalesReportHandler(models.AbstractModel):
 
     def get_file_data_lines(self, options):
         report = self.env['account.report'].browse(options['report_id'])
-        lines = report._get_lines(report.get_options(options))[:-1]  # Remove the total line
+        lines = [
+            line for line in report._get_lines(report.get_options(options))
+            if isinstance((markup := report._get_markup(line.id)), dict)
+               and markup.get('groupby', '') == 'partner_id_and_sale_type'
+        ]
+
         for i, line in enumerate(lines):
-            new_line = [j['no_format'] for j in line['columns']]
+            new_line = [j.no_format for j in line.columns]
             lines[i] = new_line
 
         l_lines = []
@@ -121,7 +140,7 @@ class L10n_LuEcSalesReportHandler(models.AbstractModel):
         if errors:
             raise UserError(_('The following must be set on your company:\n- %s', ('\n- '.join(errors))))
 
-        rcs_number = company.company_registry or 'NE'
+        rcs_number = company.partner_id._get_additional_identifier('LU_EN') or 'NE'
         self.get_file_name(options)
         file_ref = options['filename']
         company_vat = company_vat.replace(' ', '').upper()[2:]
@@ -160,12 +179,14 @@ class L10n_LuEcSalesReportHandler(models.AbstractModel):
         """
         xml_data, month, quarter, year = self.get_report_data(options)
         # Format the values for the export
-        intra_codes = []
-        for c in options.get('ec_tax_filter_selection', {}):
-            if c['selected']:
-                intra_codes.append(options.get('sales_report_taxes', {}).get('operation_category', {})[c['id']])
-        if not intra_codes:
-            intra_codes = ['L', 'T', 'S']
+        raw_intra_codes = {
+            options['sales_report_operation_types'][category['id']]['shortcut']
+            for category in options.get('filter_sale_type_selection', {})
+            if category['selected']
+        }
+        order = {"L": 0, "T": 1, "S": 2}
+        intra_codes = sorted(raw_intra_codes, key=lambda x: order[x])
+
         corr, comped_decl = self.get_correction_data(options, comparison_files)
         forms = self.format_export_values(intra_codes, xml_data, corr, comped_decl, month, quarter, year)
 
@@ -449,7 +470,7 @@ class L10n_LuEcSalesReportHandler(models.AbstractModel):
             decl_date_from = datetime(int(decl_year), decl_month_from, decl_day_from)
             delta = relativedelta(months=1, days=-1) if decl_type[-1] == 'M' else relativedelta(months=3, days=-1)
             decl_date_to = decl_date_from + delta
-            options['date'] = {'mode': 'range', 'date_from': decl_date_from, 'date_to': decl_date_to}
+            options['date'] = {'date_from': decl_date_from, 'date_to': decl_date_to}
             # Get the actualised data for the examined period
             options.update({'get_xml_data': True, 'filter_unfold_all': True})
             new_lines = self.get_file_data_lines(options)
@@ -469,13 +490,6 @@ class L10n_LuEcSalesReportHandler(models.AbstractModel):
             correction_sums[k.replace('lines', 'sum')] = sum([sum(corrections[k][key].values()) for key in corrections[k]])
         corrections.update(correction_sums)
         return corrections
-
-    def _get_tax_tags_for_lux_sales_report(self):
-        return {
-            'goods': tuple(self.env.ref('l10n_lu.account_tax_report_line_1b_1_intra_community_goods_pi_vat_tag')._get_matching_tags().ids),
-            'triangular': tuple(self.env.ref('l10n_lu.account_tax_report_line_1b_6_a_subsequent_to_intra_community_tag')._get_matching_tags().ids),
-            'services': tuple(self.env.ref('l10n_lu.account_tax_report_line_1b_6_b1_non_exempt_customer_vat_tag')._get_matching_tags().ids),
-        }
 
 
 class L10n_LuStoredIntraReport(models.Model):

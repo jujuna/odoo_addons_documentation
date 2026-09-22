@@ -2,6 +2,6 @@
 
 from . import hr_yearly_salary_detail
 from . import hr_salary_register
-from . import hr_tds_calculation
 from . import hr_payroll_payment_report_wizard
 from . import l10n_in_labour_welfare_fund_wizard
+from . import l10n_in_hr_gratuity_calculation_report_wizard

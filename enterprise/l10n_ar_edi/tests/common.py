@@ -1,5 +1,4 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
 import logging
 import re
 import time
@@ -11,7 +10,6 @@ from requests import Response
 
 from odoo.addons.l10n_ar.tests.common import TestArCommon
 from odoo.exceptions import UserError
-from odoo.tests import tagged
 from odoo.tools import file_open
 from odoo.tools.zeep import Transport
 
@@ -25,6 +23,8 @@ class ArMockedClient:
 
 
 class TestArEdiCommon(TestArCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @staticmethod
     def setup_afip_ws(afip_ws="wsfe"):
@@ -42,24 +42,24 @@ class TestArEdiCommon(TestArCommon):
         cls.subfolder = ""
         cls.ar_private_key = cls.env['certificate.key'].create({
             'name': 'AR Test Private key 1',
-            'content': base64.b64encode(file_open("l10n_ar_edi/tests/private_key.pem", 'rb').read()),
+            'content': cls.file_read("l10n_ar_edi/tests/private_key.pem"),
         })
 
         cls.ar_certificate_1 = cls.env['certificate.certificate'].create({
             'name': 'AR Test certificate 1',
-            'content': base64.b64encode(file_open("l10n_ar_edi/tests/test_cert1.crt", 'rb').read()),
+            'content': cls.file_read("l10n_ar_edi/tests/test_cert1.crt"),
             'private_key_id': cls.ar_private_key.id,
         })
 
         cls.ar_certificate_2 = cls.env['certificate.certificate'].create({
             'name': 'AR Test certificate 2',
-            'content': base64.b64encode(file_open("l10n_ar_edi/tests/test_cert2.crt", 'rb').read()),
+            'content': cls.file_read("l10n_ar_edi/tests/test_cert2.crt"),
             'private_key_id': cls.ar_private_key.id,
         })
 
         cls.ar_certificate_3 = cls.env['certificate.certificate'].create({
             'name': 'AR Test certificate 3',
-            'content': base64.b64encode(file_open("l10n_ar_edi/tests/test_cert3.crt", 'rb').read()),
+            'content': cls.file_read("l10n_ar_edi/tests/test_cert3.crt"),
             'private_key_id': cls.ar_private_key.id,
         })
 
@@ -179,6 +179,7 @@ class TestArEdiCommon(TestArCommon):
         return invoice
 
     def _test_ar_edi_flow(self, test_name: str, move_type: str, document_code: str, concept: str, **invoice_args):
+        _logger.info("Testing subtest: %s", test_name)
         if document_code == 'b':
             invoice_args.setdefault('partner_id', self.partner_cf)
         if concept == 'product':
@@ -294,7 +295,7 @@ class TestArEdiCommon(TestArCommon):
             self.assertIn("<ns0:CanMisMonExt>N</ns0:CanMisMonExt>", invoice.l10n_ar_afip_xml_request)
 
         # Yes + Correct last business day rate: Will work
-        self.env['ir.config_parameter'].sudo().set_param(
+        self.env['ir.config_parameter'].sudo().set_str(
             f"l10n_ar_edi.{self.env.company.id}_foreign_currency_payment", "Yes")
         invoice = self._create_invoice_ar(currency_id=USD)
         invoice.company_id._compute_l10n_ar_payment_foreign_currency()
@@ -309,8 +310,7 @@ class TestArEdiCommon(TestArCommon):
             # Yes + bad rate: Will fail because is not last business day
             USD.rate_ids.rate = USD.rate_ids.rate * 0.10
             invoice = self._create_invoice_ar(currency_id=USD)
-            with self.assertRaisesRegex(UserError,
-                                        "The rate to be reported.*differs from that of ARCA Remember that if you pay in foreign currency you must use the same rate of the last business day of ARCA"):
+            with self.assertRaisesRegex(UserError, "The rate to be reported.*differs from that of ARCA Remember that if you pay in foreign currency you must use the same rate of the last business day of ARCA"):
                 self._validate_and_review(invoice, "", document_number='12345-12345680')
 
             # Yes + No rate defined: Will raise error
@@ -321,6 +321,8 @@ class TestArEdiCommon(TestArCommon):
 
 
 class TestArEdiMockedCommon(TestArEdiCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     @contextmanager
     def patch_client(self, responses):
         """ Patch zeep.Transport in l10n_ar_edi/models/l10n_ar_afipws_connection.py"""

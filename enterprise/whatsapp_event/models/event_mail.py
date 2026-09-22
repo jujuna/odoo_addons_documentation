@@ -17,8 +17,8 @@ class EventMail(models.Model):
     @api.constrains('template_ref')
     def _check_whatsapp_template_phone_field(self):
         for record in self:
-            if record.notification_type == 'whatsapp' and not record.template_ref.phone_field:
-                raise ValidationError(_('Whatsapp Templates in Events must have a phone field set.'))
+            if record.notification_type == 'whatsapp' and not (record.template_ref.phone_field or record.template_ref.use_default_recipient):
+                raise ValidationError(_('WhatsApp Templates in Events require either using default recipients or setting a phone field.'))
 
     def _compute_notification_type(self):
         super()._compute_notification_type()

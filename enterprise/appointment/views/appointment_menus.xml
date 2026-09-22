@@ -8,7 +8,7 @@
         sequence="10"
         action="appointment.appointment_type_action"
         web_icon="appointment,static/description/icon.png"
-        groups="base.group_user"/>
+        groups="base.group_user_regular"/>
 
     <!-- Schedule menu -->
     <menuitem
@@ -22,12 +22,12 @@
         id="menu_appointment_schedule_resource_booking"
         parent="menu_appointment_schedule_resources"
         action="calendar_event_action_all_resources_bookings"
-        name="Resources Bookings"/>
+        name="Resources"/>
     <menuitem
         id="menu_appointment_schedule_staff_appointment"
         parent="menu_appointment_schedule_resources"
         action="calendar_event_action_all_users_appointments"
-        name="Staff Bookings"/>
+        name="Staff"/>
 
     <!-- Appointment's type, Shared Links -->
     <menuitem
@@ -39,6 +39,7 @@
         id="menu_appointment_invite"
         parent="appointment.main_menu_appointments"
         action="appointment_invite_action"
+        groups="base.group_no_one"
         name="Shared Links"/>
 
     <!-- Appointment's Reporting -->
@@ -58,6 +59,12 @@
         parent="menu_appointment_reporting"
         name="Answers"
         action="appointment_answer_input_action"/>
+
+    <menuitem
+        id="menu_appointment_reporting_ratings"
+        parent="menu_appointment_reporting"
+        name="Ratings"
+        action="rating_rating_action_appointment"/>
 
     <!-- Appointment's config menu-->
     <menuitem
@@ -84,10 +91,10 @@
         action="appointment_resource_action"
         groups="group_appointment_manager"/>
     <menuitem
-        id="menu_appointment_resource_leaves"
+        id="menu_appointment_leave"
         parent="appointment.appointment_menu_config"
-        action="appointment.resource_calendar_leaves_action_show_appointment_resources"
+        action="appointment.appointment_leave_action"
         groups="group_appointment_manager"
-        name="Resource Leaves"/>
+        name="Closing Days"/>
 
 </odoo>

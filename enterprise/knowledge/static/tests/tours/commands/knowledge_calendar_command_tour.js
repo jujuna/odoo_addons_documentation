@@ -54,7 +54,6 @@ function dragDate(el, target) {
 }
 
 registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
-    url: '/odoo',
     steps: () => [stepUtils.showAppsMenuItem(), { // open the Knowledge App
     trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
     run: "click",
@@ -106,7 +105,7 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
 },
 {
     // Check we created an item with the right datetime used as property
-    trigger: '.o_widget_knowledge_properties_panel .o_property_field:contains("Start Date")',
+    trigger: '.o_widget_knowledge_side_panel .o_property_field:contains("Start Date")',
     run: function () {
         const input = this.anchor.querySelector("input");
         if (!input.value.includes("08:00")) {
@@ -138,22 +137,16 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     // Click on the "Create Item Calednar" helper
     trigger: '.o_knowledge_helper .o_knowledge_add_item_calendar',
     run: 'click',
-}, { // Open the start date dropdown
-    trigger: '.o_knowledge_item_calendar_dialog_date_start .o_select_menu_toggler',
-    run: 'click',
-},
-// Create a new start property
-...stepUtils.editSelectMenuInput('.o_knowledge_item_calendar_dialog_date_start .o_select_menu_input', 'Start Property'),
-{
+}, { // Create a new start property
+    trigger: '.o_knowledge_item_calendar_dialog_date_start .o_select_menu_input',
+    run: 'edit Start Property',
+}, {
     trigger: '.o_select_menu_menu .o_select_menu_item.o_create_datetime',
     run: 'click',
-}, { // Open the stop dropwdown
-    trigger: '.o_knowledge_item_calendar_dialog_date_stop .o_select_menu_toggler',
-    run: 'click',
-},
-// Create a new stop property
-...stepUtils.editSelectMenuInput('.o_knowledge_item_calendar_dialog_date_stop .o_select_menu_input', 'Stop Property'),
-{
+}, { // Create a new stop property
+    trigger: '.o_knowledge_item_calendar_dialog_date_stop .o_select_menu_input',
+    run: 'edit Stop Property',
+}, {
     trigger: '.o_select_menu_menu .o_select_menu_item.o_create_choice',
     run: 'click',
 }, { // Change the min slot time
@@ -205,7 +198,7 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
 },
 {
     // Check we created an item with the right datetime used as property
-    trigger: '.o_widget_knowledge_properties_panel .o_property_field:contains("Start Property")',
+    trigger: '.o_widget_knowledge_side_panel .o_property_field:contains("Start Property")',
     run: function () {
         const input = this.anchor.querySelector("input");
         if (!input.value.includes("08:00")) {
@@ -219,13 +212,13 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     //-----------------------------------------------------------------------
 
     // Create a new date property
-    trigger: '.o_widget_knowledge_properties_panel .o_field_property_add button',
+    trigger: '.o_widget_knowledge_side_panel .o_field_property_add button',
     run: 'click',
 }, {
     trigger: '.o_field_property_definition_header',
-    run: "edit Date Property",
+    run: "fill Date Property",
 }, {
-    trigger: '.o_field_property_definition_type button.dropdown-toggle',
+    trigger: '.o_field_property_definition_type .o-dropdown .o_input',
     run: 'click',
 }, {
     trigger: '.dropdown-menu .dropdown-item:contains("Date"):not(:contains("Time"))',
@@ -234,13 +227,13 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     trigger: '.o_knowledge_editor .odoo-editor-editable',
     run: 'click',
 }, { // Create a new checkbox property
-    trigger: '.o_widget_knowledge_properties_panel .o_field_property_add button',
+    trigger: '.o_widget_knowledge_side_panel .o_field_property_add button',
     run: 'click',
 }, {
     trigger: '.o_field_property_definition_header',
-    run: "edit Boolean Property",
+    run: "fill Boolean Property",
 }, {
-    trigger: '.o_field_property_definition_type button.dropdown-toggle',
+    trigger: '.o_field_property_definition_type .o-dropdown .o_input',
     run: 'click',
 }, {
     trigger: '.dropdown-menu .dropdown-item:contains("Checkbox")',
@@ -249,13 +242,13 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     trigger: '.o_knowledge_editor .odoo-editor-editable',
     run: 'click',
 }, { // Create a text property
-    trigger: '.o_widget_knowledge_properties_panel .o_field_property_add button',
+    trigger: '.o_widget_knowledge_side_panel .o_field_property_add button',
     run: 'click',
 }, {
     trigger: '.o_field_property_definition_header',
-    run: "edit Text Property",
+    run: "fill Text Property",
 }, {
-    trigger: '.o_field_property_definition_type button.dropdown-toggle',
+    trigger: '.o_field_property_definition_type .o-dropdown .o_input',
     run: 'click',
 }, {
     trigger: '.dropdown-menu .dropdown-item:contains("Text")',
@@ -264,7 +257,7 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     trigger: '.o_knowledge_editor .odoo-editor-editable',
     run: 'click',
 }, { // Set the text property
-    trigger: '.o_widget_knowledge_properties_panel .o_property_field:contains("Text Property") input',
+    trigger: '.o_widget_knowledge_side_panel .o_property_field:contains("Text Property") input',
     run: 'edit Custom text && click body',
 }, { // Set the name of the item
     trigger: '.o_knowledge_editor .odoo-editor-editable h1',
@@ -337,8 +330,8 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
 }, {
     trigger: '.o_select_menu_menu .o_select_menu_item:contains("Start Property")',
     run: 'click',
-}, { // Check that stop date has been removed as the start type changed,
-    trigger: '.o_knowledge_item_calendar_dialog_date_stop .o_select_menu_toggler:empty',
+}, { // Wait for the start property dropdown to disappear, otherwise the stop becomes the start
+    trigger: 'body:not(:has(.o_select_menu-choices))',
 }, { // Open the stop property dropdown
     trigger: '.o_knowledge_item_calendar_dialog_date_stop .o_select_menu_toggler',
     run: 'click',
@@ -388,6 +381,8 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
         const target = document.querySelector('.fc-timegrid-slot.fc-timegrid-slot-lane[data-time="09:00:00"]');
         dragDate(this.anchor, target);
     },
+}, { // Wait for the move to completely finish
+    trigger: '.o_calendar_widget:not(.o_interacting):not(.o_grabbing)',
 }, { // Resize the item
     trigger: '.fc-timegrid-event:contains("Item Article")',
     async run({ hover }){
@@ -404,6 +399,8 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
         const target = document.querySelector('.fc-timegrid-slot.fc-timegrid-slot-lane[data-time="11:00:00"]');
         dragDate(resizer, target);
     },
+}, { // Wait for the resize to completely finish
+    trigger: 'td[data-date="2025-02-10"] .fc-timegrid-col-events + .fc-timegrid-col-events:empty:not(:visible)'
 }, {
     //----------------------------------------------------------------------
     // Check that the date properties have been updated correctly after that
@@ -420,7 +417,7 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
 },
 {
     // Check that the properties have been updated
-    trigger: '.o_widget_knowledge_properties_panel .o_property_field:contains("Start Property")',
+    trigger: '.o_widget_knowledge_side_panel .o_property_field:contains("Start Property")',
     run: function () {
         const input = this.anchor.querySelector("input");
         if (!input.value.includes("09:00")) {
@@ -428,16 +425,16 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
         }
     },
 }, {
-    trigger: '.o_widget_knowledge_properties_panel .o_property_field:contains("Stop Property")',
+    trigger: '.o_widget_knowledge_side_panel .o_property_field:contains("Stop Property")',
     run: function () {
         const input = this.anchor.querySelector("input");
         // When resizing an event, the event spans the hovered row, so we need to add 15 minutes
         if (!input.value.includes("11:15")) {
-            console.error('Item stop date property has not been updated');
+            console.error('Item stop date property has not been updated' + input.value);
         }
     },
 }, { // Check text property did not change
-    trigger: '.o_widget_knowledge_properties_panel .o_property_field:contains("Text Property")',
+    trigger: '.o_widget_knowledge_side_panel .o_property_field:contains("Text Property")',
     run: function () {
         const input = this.anchor.querySelector("input");
         if (!input.value.includes("Custom text")) {
@@ -451,13 +448,13 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     //---------------------------------------------------------------------
 
     // Click on edit property button
-    trigger: ".o_widget_knowledge_properties_panel .o_property_field:contains(Start Property)",
-    run: "hover && click .o_widget_knowledge_properties_panel .o_property_field:contains(Start Property) .o_field_property_open_popover",
+    trigger: ".o_widget_knowledge_side_panel .o_property_field:contains(Start Property)",
+    run: "hover && click .o_widget_knowledge_side_panel .o_property_field:contains(Start Property) .o_field_property_open_popover",
 }, { // Delete start date property
     trigger: '.o_field_property_definition .o_field_property_definition_delete',
     run: 'click',
 }, { // Confirm deletion
-    trigger: '.modal-dialog .btn-primary',
+    trigger: '.btn:contains("Delete Field")',
     run: 'click',
 }, { // Go back to parent article
     trigger: '.o_knowledge_tree .o_article_name:contains("Article Items")',

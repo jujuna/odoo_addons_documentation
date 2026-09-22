@@ -1,4 +1,4 @@
-import { Component, useRef, useState, useEffect } from "@odoo/owl";
+import { Component, onMounted, onPatched, proxy, signal, t, useProps } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { components } from "@odoo/o-spreadsheet";
 
@@ -9,34 +9,39 @@ import { pyToJsLocale } from "@web/core/l10n/utils";
 export class VersionHistoryItem extends Component {
     static template = "spreadsheet_edition.VersionHistoryItem";
     static components = { Dropdown, TextInput: components.TextInput };
-    static props = {
-        active: Boolean,
-        revision: Object,
-        onActivation: Function,
-        onBlur: Function,
-        getRevisions: Function,
-        renameRevision: Function,
-        restoreRevision: Function,
-        forkHistory: Function,
-        getLocale: Function,
-        editable: { optional: true, type: Boolean },
-    };
+
+    props = useProps({
+        active: t.boolean(),
+        revision: t.object(),
+        onActivation: t.function(),
+        onBlur: t.function(),
+        getRevisions: t.function(),
+        renameRevision: t.function(),
+        restoreRevision: t.function(),
+        forkHistory: t.function(),
+        getLocale: t.function(),
+        editable: t.boolean().optional(),
+    });
+
+    menuButtonRef = signal.ref();
+    itemRef = signal.ref();
+    labelRef = signal.ref();
 
     setup() {
-        this.menuState = useState({ isOpen: false });
-        this.state = useState({ editName: this.defaultName });
-        this.menuButtonRef = useRef("menuButton");
-        this.itemRef = useRef("item");
+        this.menuState = proxy({ isOpen: false });
+        this.state = proxy({ editName: this.defaultName });
 
-        useEffect(() => {
+        const scrollIntoViewIfActive = () => {
             if (this.props.active) {
-                this.itemRef.el.scrollIntoView({
+                this.itemRef()?.scrollIntoView({
                     behavior: "smooth",
                     block: "nearest",
                     inline: "nearest",
                 });
             }
-        });
+        };
+        onMounted(scrollIntoViewIfActive);
+        onPatched(scrollIntoViewIfActive);
     }
 
     get revision() {

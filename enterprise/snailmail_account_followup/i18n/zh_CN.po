@@ -13,32 +13,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:47+0000\n"
-"PO-Revision-Date: 2025-11-16 17:58+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:57+0000\n"
+"PO-Revision-Date: 2026-09-17 23:03+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/snailmail_account_followup/zh_Hans/>\n"
+"projects/odoo-master/snailmail_account_followup/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: snailmail_account_followup
-#: model_terms:ir.ui.view,arch_db:snailmail_account_followup.manual_reminder_view_form_inherit_snailmail
+#: model:ir.module.module,description:base.module_snailmail_account_followup
 msgid ""
-"<i class=\"fa fa-info-circle\" role=\"img\" aria-label=\"Warning\" "
-"title=\"The letter will be sent using the IAP service from Odoo.&#10;Make "
-"sure you have enough credits on your account or proceed to a recharge.\"/>"
+"\n"
+"Extension to send follow-up documents by post\n"
 msgstr ""
-"<i class=\"fa fa-info-circle\" role=\"img\" aria-label=\"警告\" title=\"信件"
-"将以 Odoo 的 IAP 服务发送。&#10;请确保您的账户有足够点数，或前往增值。\"/>"
-
-#. module: snailmail_account_followup
-#: model_terms:ir.ui.view,arch_db:snailmail_account_followup.manual_reminder_view_form_inherit_snailmail
-msgid "By post"
-msgstr "通过邮局"
 
 #. module: snailmail_account_followup
 #: model:ir.model,name:snailmail_account_followup.model_res_partner
@@ -52,12 +44,16 @@ msgstr "创建客户"
 
 #. module: snailmail_account_followup
 #: model:ir.model.fields,field_description:snailmail_account_followup.field_account_followup_followup_line__display_name
-#: model:ir.model.fields,field_description:snailmail_account_followup.field_account_followup_manual_reminder__display_name
 #: model:ir.model.fields,field_description:snailmail_account_followup.field_account_followup_report__display_name
 #: model:ir.model.fields,field_description:snailmail_account_followup.field_res_partner__display_name
 #: model:ir.model.fields,field_description:snailmail_account_followup.field_snailmail_letter__display_name
 msgid "Display Name"
 msgstr "显示名称"
+
+#. module: snailmail_account_followup
+#: model:ir.module.module,summary:base.module_snailmail_account_followup
+msgid "Extension to send follow-up documents by post"
+msgstr ""
 
 #. module: snailmail_account_followup
 #: model:ir.model,name:snailmail_account_followup.model_account_followup_followup_line
@@ -71,7 +67,6 @@ msgstr "催款报表"
 
 #. module: snailmail_account_followup
 #: model:ir.model.fields,field_description:snailmail_account_followup.field_account_followup_followup_line__id
-#: model:ir.model.fields,field_description:snailmail_account_followup.field_account_followup_manual_reminder__id
 #: model:ir.model.fields,field_description:snailmail_account_followup.field_account_followup_report__id
 #: model:ir.model.fields,field_description:snailmail_account_followup.field_res_partner__id
 #: model:ir.model.fields,field_description:snailmail_account_followup.field_snailmail_letter__id
@@ -84,24 +79,14 @@ msgid "Letter"
 msgstr "信"
 
 #. module: snailmail_account_followup
-#: model:ir.model.fields,field_description:snailmail_account_followup.field_account_followup_manual_reminder__snailmail
-msgid "Snailmail"
-msgstr "传统信件"
+#: model:ir.module.module,shortdesc:base.module_snailmail_account_followup
+msgid "Snail Mail Follow-Up"
+msgstr ""
 
 #. module: snailmail_account_followup
 #: model:ir.model,name:snailmail_account_followup.model_snailmail_letter
 msgid "Snailmail Letter"
 msgstr ""
-
-#. module: snailmail_account_followup
-#: model:ir.model.fields,field_description:snailmail_account_followup.field_account_followup_manual_reminder__snailmail_cost
-msgid "Stamps"
-msgstr "邮票"
-
-#. module: snailmail_account_followup
-#: model:ir.model,name:snailmail_account_followup.model_account_followup_manual_reminder
-msgid "Wizard for sending manual reminders to clients"
-msgstr "用于向客户端发送手动提醒的向导"
 
 #. module: snailmail_account_followup
 #. odoo-python
@@ -110,22 +95,3 @@ msgid ""
 "You are trying to send a letter by post, but no follow-up contact has any "
 "address set"
 msgstr "您正在尝试邮寄信件，但没有后续联系人有任何地址设置"
-
-#~ msgid ""
-#~ "<i class=\"fa fa-info-circle\" role=\"img\" aria-label=\"Warning\" "
-#~ "title=\"The letter will be sent using the IAP service from Odoo.&#10;Make "
-#~ "sure you have enough credits on your account or proceed to a recharge.\"/"
-#~ ">\n"
-#~ "                        <br/>"
-#~ msgstr ""
-#~ "<i class=\"fa fa-info-circle\" role=\"img\" aria-label=\"Warning\" "
-#~ "title=\"The letter will be sent using the IAP service from Odoo.&#10;Make "
-#~ "sure you have enough credits on your account or proceed to a recharge.\"/"
-#~ ">\n"
-#~ "                        <br/>"
-
-#~ msgid "Send a Letter"
-#~ msgstr "发送信"
-
-#~ msgid "Sending this document by post will cost"
-#~ msgstr "通过邮局发送这份文档将花费"

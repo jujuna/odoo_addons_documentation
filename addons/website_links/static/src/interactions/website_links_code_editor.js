@@ -1,8 +1,10 @@
+import { usePlugin } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { browser } from "@web/core/browser/browser";
 import { rpc } from "@web/core/network/rpc";
 import { Interaction } from "@web/public/interaction";
 import { registry } from "@web/core/registry";
+import { BootstrapInstance } from "@web/core/utils/bootstrap_plugin";
 
 class WebsiteLinksCodeEditor extends Interaction {
     static selector = "#wrapwrap";
@@ -12,6 +14,9 @@ class WebsiteLinksCodeEditor extends Interaction {
             "t-on-click.prevent": this.onCopyToClipboardClick,
             "t-att-class": () => ({ "d-none": this.editing }),
         },
+        ".download-qr-code": {
+            "t-att-class": () => ({ "d-none": this.editing }),
+        },
         ".o_website_links_edit_code": {
             "t-on-click": this.onEditCodeClick,
             "t-att-class": () => ({ "d-none": this.editing }),
@@ -19,11 +24,13 @@ class WebsiteLinksCodeEditor extends Interaction {
         ".o_website_links_edit_tools": { "t-att-class": () => ({ "d-none": !this.editing }) },
         ".o_website_links_code_error": { "t-att-class": () => ({ "d-none": !this.error }) },
         ".o_website_links_cancel_edit": { "t-on-click.prevent": this.onCancelEditClick },
+        ".o_website_links_new_link_tracker": { "t-on-click": this.onCancelEditClick },
         "#edit-code-form": { "t-on-submit.prevent": this.onEditCodeFormSubmit },
         ".o_website_links_ok_edit": { "t-on-click.prevent": this.onEditCodeFormSubmit },
     };
 
     setup() {
+        this.bootstrap = usePlugin(BootstrapInstance);
         this.codeEl = this.el.querySelector("#o_website_links_code");
         this.copyButtonEl = this.el.querySelector(".copy-to-clipboard");
         this.codeErrorEl = this.el.querySelector(".o_website_links_code_error");
@@ -33,7 +40,7 @@ class WebsiteLinksCodeEditor extends Interaction {
 
     onCopyToClipboardClick(event) {
         const copyButtonEl = event.currentTarget;
-        const tooltip = window.Tooltip.getOrCreateInstance(copyButtonEl, {
+        const tooltip = this.bootstrap.getOrCreateInstance(window.Tooltip, copyButtonEl, {
             title: _t("Link Copied!"),
             trigger: "manual",
             placement: "right",
@@ -63,7 +70,12 @@ class WebsiteLinksCodeEditor extends Interaction {
     }
 
     onCancelEditClick() {
-        this.codeEl.replaceChildren(this.codeEl.querySelector("#edit-code-form #init_code").value);
+        const initCode = this.codeEl.querySelector("#edit-code-form #init_code");
+        if (!initCode) {
+            return;
+        }
+
+        this.codeEl.replaceChildren(initCode.value);
         this.editing = false;
         this.error = false;
     }
@@ -73,12 +85,30 @@ class WebsiteLinksCodeEditor extends Interaction {
         this.codeEl.replaceChildren(newCode);
         const host = this.el.querySelector("#short-url-host").textContent;
         this.copyButtonEl.dataset.clipboardText = `${host}${newCode}`;
+
+        const downloadQRButton = this.el.querySelector(".download-qr-code");
+        if (downloadQRButton) {
+            downloadQRButton.href = `/report/barcode/QR/${encodeURIComponent(
+                `${host}${newCode}`
+            )}?width=500&height=500&download=1`;
+        }
+
         this.editing = false;
         this.error = false;
     }
 
     async onEditCodeFormSubmit() {
         const newCode = this.codeEl.querySelector("#edit-code-form #new_code").value;
+        const formattedNewCode = newCode.replace(/[^a-zA-Z0-9_-]/g, "");
+
+        if (formattedNewCode !== newCode) {
+            this.codeErrorEl.textContent = _t(
+                "Only letters (A–Z, a–z), numbers (0–9), underscores (_) and hyphens (-) are allowed. No spaces."
+            );
+            this.error = true;
+            return;
+        }
+
         if (newCode === "") {
             this.codeErrorEl.textContent = _t("The code cannot be left empty");
             this.error = true;

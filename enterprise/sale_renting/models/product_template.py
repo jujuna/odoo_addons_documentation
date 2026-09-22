@@ -1,167 +1,115 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from math import ceil
+from datetime import UTC, datetime, timedelta
+
+from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.tools import format_amount
+from odoo.tools.date_utils import float_to_time, to_timezone
+
+from odoo.addons.sale_renting import const, utils
 
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = "product.template"
 
-    rent_ok = fields.Boolean(
-        string="Rental",
-        default=lambda self: bool(self.env.context.get('in_rental_app')),
-        help="Allow renting of this product.")
-    qty_in_rent = fields.Float("Quantity currently in rent", compute='_get_qty_in_rent')
-    product_pricing_ids = fields.One2many(
-        comodel_name='product.pricing',
-        inverse_name='product_template_id',
-        string="Custom Pricings",
-        bypass_search_access=True,
-        copy=False,
-        domain=['|', ('pricelist_id', '=', False), ('pricelist_id.active', '=', True)],
+    rent_periodicity = fields.Selection(
+        string="Rental Periodicity",
+        selection=[("hours", "Hours"), ("days", "Days"), ("nights", "Nights"), ("weeks", "Weeks")],
     )
-    display_price = fields.Char(
-        string="Rental price",
-        compute='_compute_display_price',
-        help="First rental pricing of the product",
+    pickup_time = fields.Float(
+        default=lambda self: (self.env.context.get("default_rent_periodicity") and 9) or 0
+    )
+    return_time = fields.Float(
+        default=lambda self: (self.env.context.get("default_rent_periodicity") and 18) or 0
     )
 
-    # Delays pricing
+    qty_in_rent = fields.Float("Quantity currently in rent", compute="_compute_qty_in_rent")
+    display_price = fields.Char(string="Rental price", compute="_compute_display_price")
 
-    extra_hourly = fields.Float("Hourly Fine", help="Fine per hour late", company_dependent=True)
-    extra_daily = fields.Float("Daily Fine", help="Fine per day late", company_dependent=True)
+    _check_24h_pickup_and_return_time = models.Constraint(
+        "CHECK (0 <= pickup_time AND pickup_time < 24 AND 0 <= return_time AND return_time < 24)",
+        "The pickup and return time must be between 0 and 24h (not included).",
+    )
+    _check_pickup_return_time_nights = models.Constraint(
+        """CHECK (NOT (rent_periodicity = 'nights' AND pickup_time < return_time))""",
+        "For nightly rentals, the pickup time must be later than the return time.",
+    )
 
     def _compute_display_price(self):
-        rental_products = self.filtered('rent_ok')
-        rental_priced_products = rental_products.filtered('product_pricing_ids')
+        rental_products = self.filtered("rent_periodicity")
         (self - rental_products).display_price = ""
-        for product in (rental_products - rental_priced_products):
-            # No rental pricing defined, fallback on list price
-            product.display_price = self.env._(
-                "%(amount)s (fixed)",
-                amount=format_amount(self.env, product.list_price, product.currency_id),
+        for product in rental_products:
+            product.display_price = (
+                f"{format_amount(self.env, product.list_price, product.currency_id)}"
+                f" / {product._get_rent_periodicity_label()}"
             )
-        for product in rental_priced_products:
-            product.display_price = product.product_pricing_ids[0].description
 
-    def _get_qty_in_rent(self):
-        rentable = self.filtered('rent_ok')
+    def _compute_qty_in_rent(self):
+        rentable = self.filtered("rent_periodicity")
         not_rentable = self - rentable
-        not_rentable.update({'qty_in_rent': 0.0})
+        not_rentable.update({"qty_in_rent": 0.0})
         for template in rentable:
-            template.qty_in_rent = sum(template.mapped('product_variant_ids.qty_in_rent'))
+            template.qty_in_rent = sum(template.mapped("product_variant_ids.qty_in_rent"))
 
-    @api.constrains('type', 'combo_ids', 'rent_ok')
+    @api.constrains("type", "combo_ids", "rent_periodicity")
     def _check_rental_combo_ids(self):
         for template in self:
             if (
-                template.type == 'combo'
-                and template.rent_ok
-                and any(
-                    not product.rent_ok for product in template.combo_ids.combo_item_ids.product_id
+                template.type == "combo"
+                and template.rent_periodicity
+                and not all(
+                    product.rent_periodicity == template.rent_periodicity
+                    for product in template.combo_ids.combo_item_ids.product_id
                 )
             ):
                 raise ValidationError(
-                    self.env._("A rental combo product can only contain rental products.")
+                    template.env._(
+                        "A rental combo product can only contain rental products with the same"
+                        " periodicity."
+                    )
+                )
+
+    @api.onchange("rent_periodicity")
+    def _onchange_rent_periodicity(self):
+        """Swap pickup time and return time when swapping to and from nights or weeks
+        periodicity."""
+        for template in self:
+            if not (
+                (template.rent_periodicity in {"nights", "weeks"})
+                ^ (template.pickup_time < template.return_time)
+            ):
+                template.pickup_time, template.return_time = (
+                    template.return_time,
+                    template.pickup_time,
                 )
 
     @api.model
     def _get_incompatible_types(self):
-        return ['rent_ok'] + super()._get_incompatible_types()
+        return ["rent_periodicity"] + super()._get_incompatible_types()
 
     def action_view_rentals(self):
         """Access Schedule view of rental order lines, filtered on variants of the current
         templates."""
         return self.product_variant_ids.action_view_rentals()
 
-    @api.depends('rent_ok')
-    @api.depends_context('show_rental_tag')
+    @api.depends("rent_periodicity")
+    @api.depends_context("show_rental_tag")
     def _compute_display_name(self):
         super()._compute_display_name()
-        if not self.env.context.get('show_rental_tag'):
+        if not self.env.context.get("show_rental_tag"):
             return
         for template in self:
-            if template.rent_ok:
-                template.display_name = self.env._("%s (Rental)", template.display_name)
+            if template.rent_periodicity:
+                template.display_name = template.env._("%s (Rental)", template.display_name)
 
-    def _get_best_pricing_rule(self, product=False, start_date=False, end_date=False, **kwargs):
-        """ Return the best pricing rule for the given duration.
-
-        :param ProductProduct product: a product recordset (containing at most one record)
-        :param datetime start_date: start date of leasing period
-        :param datetime end_date: end date of leasing period
-        :return: least expensive pricing rule for given duration
-        """
+    def _get_rent_periodicity_label(self, duration=1, /):
         self.ensure_one()
-        best_pricing_rule = self.env['product.pricing']
-        if not self.product_pricing_ids or not (start_date and end_date):
-            return best_pricing_rule
-        pricelist = kwargs.get('pricelist', self.env['product.pricelist'])
-        currency = kwargs.get('currency', self.currency_id)
-        company = kwargs.get('company', self.env.company)
-        duration_dict = self.env['product.pricing']._compute_duration_vals(start_date, end_date)
-        min_price = float("inf")  # positive infinity
-        available_pricings = self.env['product.pricing']._get_suitable_pricings(
-            product or self, pricelist=pricelist
-        )
-        for pricing in available_pricings:
-            unit = pricing.recurrence_id.unit
-            price = pricing._compute_price(duration_dict[unit], unit)
-            if pricing.currency_id != currency:
-                price = pricing.currency_id._convert(
-                    from_amount=price,
-                    to_currency=currency,
-                    company=company,
-                    date=fields.Date.today(),
-                )
-            if price < min_price:
-                min_price, best_pricing_rule = price, pricing
-        return best_pricing_rule
-
-    def _get_contextual_price(self, product=None):
-        self.ensure_one()
-        if not (product or self).rent_ok:
-            return super()._get_contextual_price(product=product)
-
-        pricelist = self._get_contextual_pricelist()
-
-        quantity = self.env.context.get('quantity', 1.0)
-        uom = self.env['uom.uom'].browse(self.env.context.get('uom'))
-        date = self.env.context.get('date')
-        start_date = self.env.context.get('start_date')
-        end_date = self.env.context.get('end_date')
-        return pricelist._get_product_price(
-            product or self, quantity, uom=uom, date=date, start_date=start_date, end_date=end_date
-        )
-
-    def copy(self, default=None):
-        copied_tmpls = self.env['product.template']
-        for record in self:
-            copied_tmpl = super(ProductTemplate, record).copy(default)
-            copied_tmpls += copied_tmpl
-            for pricing in record.product_pricing_ids:
-                copied_variant_ids = []
-                for product in pricing.product_variant_ids:
-                    pav_ids = product\
-                        .product_template_variant_value_ids\
-                        .product_attribute_value_id\
-                        .ids
-                    copied_variant_ids.extend(
-                        copied_tmpl.product_variant_ids.filtered(
-                            lambda p: p
-                                .product_template_variant_value_ids
-                                .product_attribute_value_id
-                                .ids == pav_ids
-                        ).ids
-                    )
-                pricing.copy({
-                    'product_template_id': copied_tmpl.id,
-                    'product_variant_ids': copied_variant_ids,
-                })
-        return copied_tmpls
+        if duration <= 1:
+            return const.PERIODICITY_LABEL_SINGULAR[self.rent_periodicity]
+        return const.PERIODICITY_LABEL[self.rent_periodicity]
 
     @api.model
     def _get_additional_configurator_data(
@@ -175,7 +123,7 @@ class ProductTemplate(models.Model):
         end_date=None,
         **kwargs,
     ):
-        """ Override of `sale` to append rental data.
+        """Override of `sale` to append rental data.
 
         :param product.product|product.template product_or_template: The product for which to get
             additional data.
@@ -197,29 +145,93 @@ class ProductTemplate(models.Model):
             end_date=end_date,
             **kwargs,
         )
+        # TODO LIPI: don't show periodicity_label if has_rentable_lines but not period
+        if not product_or_template.rent_periodicity:
+            return data
 
-        if product_or_template.rent_ok and start_date and end_date:
-            pricing = product_or_template._get_best_pricing_rule(
-                start_date=start_date, end_date=end_date, pricelist=pricelist, currency=currency
-            )
-            if pricing:
-                rental_duration = self.env['product.pricing']._compute_duration_vals(
-                    start_date, end_date
-                )[pricing.recurrence_id.unit]
-                # Some locales might swap the duration and the unit, so we need to use the
-                # translation function.
-                duration, label = pricing.recurrence_id._get_converted_duration_and_label(
-                    rental_duration
-                )
-                data['price_info'] = self.env._(
-                    "%(duration)s %(unit)s",
-                    duration=ceil(duration),
-                    unit=label,
-                )
+        duration = 1
+        if start_date and end_date:
+            duration = product_or_template._get_number_of_periods(start_date, end_date)
+        template = (
+            product_or_template.product_tmpl_id
+            if product_or_template.is_product_variant
+            else product_or_template
+        )
+        periodicity_label = template._get_rent_periodicity_label(duration)
+        data["price_info"] = (
+            f"/ {duration} {periodicity_label}" if duration > 1 else f"/ {periodicity_label}"
+        )
         return data
 
     def _has_multiple_uoms(self):
         # multi-uoms doesn't work with rental (for now)
-        if self.rent_ok:
+        if self.rent_periodicity:
             return False
         return super()._has_multiple_uoms()
+
+    def _get_number_of_periods(self, start_date, end_date):
+        return utils.number_of_periods(self.rent_periodicity, start_date, end_date)
+
+    def _get_default_rental_dates(self, *, tzinfo=None):
+        """Get default renting dates to help user.
+
+        Note: `self and self.ensure_one()`
+
+        :param ZoneInfo tzinfo: The timezone in which the product is rented, default to UTC
+        :return: The default start and end datetime in naive UTC.
+        :rtype: tuple[datetime, datetime]
+        """
+        if self:
+            self.ensure_one()
+
+        to_sales_tz = to_timezone(tzinfo or UTC)
+        to_naive_utc = to_timezone(None)
+
+        def combine_with_hour(dt, hour_):
+            if self.rent_periodicity not in {"hours", False}:
+                return datetime.combine(dt, float_to_time(hour_), tzinfo=dt.tzinfo)
+            return dt
+
+        loc_now = to_sales_tz(fields.Datetime.now().replace(minute=0, second=0))
+        loc_start_date = loc_now + self._get_default_start_delta()
+        loc_start_date = self._get_first_potential_date(loc_start_date)
+        loc_start_date = combine_with_hour(loc_start_date, self.pickup_time)
+
+        loc_end_date = loc_start_date + self._get_default_end_delta()
+        loc_end_date = self._get_first_potential_date(loc_end_date)
+        loc_end_date = combine_with_hour(loc_end_date, self.return_time)
+
+        return to_naive_utc(loc_start_date), to_naive_utc(loc_end_date)
+
+    def _get_default_start_delta(self):
+        if self.rent_periodicity not in {"hours", False}:
+            return timedelta(days=1)
+        return timedelta(hours=1)
+
+    def _get_default_end_delta(self):
+        if unit := self.rent_periodicity:
+            if unit == "days" and self.pickup_time < self.return_time:
+                # Ensure period defaults to 1 day after return_time is applied.
+                return timedelta(days=0)
+            if unit == "weeks" and self.pickup_time < self.return_time:
+                # Ensure period defaults to 1 week after return_time is applied.
+                return timedelta(days=6)
+            if unit == "nights":
+                unit = "days"
+            return timedelta(**{unit: 1})
+        return timedelta(days=1)
+
+    def _get_first_potential_date(self, date):
+        """Offset to the first potential date which respects the rental calendar.
+        :param datetime date: The localized datetime we want to verify.
+        :rtype: Datetime
+        :return: The first datetime matching the rental calendar, if any.
+        """
+        calendar_sudo = self.env.company.sudo().rental_resource_calendar_id
+        if not calendar_sudo:
+            return date
+
+        potential_date = calendar_sudo._get_closest_work_time(
+            date, search_range=(date, date + relativedelta(years=3))
+        )
+        return potential_date or date

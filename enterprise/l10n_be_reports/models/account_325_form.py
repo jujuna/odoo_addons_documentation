@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-import base64
 import tempfile
 import re
 import zipfile
@@ -14,6 +11,7 @@ from .ONSS_country_mapping import ONSS_COUNTRY_CODE_MAPPING
 
 def format_if_float(amount):
     return f"{amount * 100:.0f}" if isinstance(amount, float) else amount  # amounts in € requires to be formatted for xml
+
 
 def format_325_form_values(values):
     tmp_dict = {}
@@ -207,7 +205,7 @@ class L10n_BeForm325(models.Model):
     def _compute_sender_address(self):
         for form in self:
             if form.state == 'draft':
-                form.sender_address = form.sender_id._formated_address()
+                form.sender_address = form.sender_id._get_formatted_address()
 
     @api.depends('state', 'sender_id', 'sender_id.zip')
     def _compute_sender_zip(self):
@@ -249,7 +247,7 @@ class L10n_BeForm325(models.Model):
     def _compute_debtor_address(self):
         for form in self:
             if form.state == 'draft':
-                form.debtor_address = form.debtor_id._formated_address()
+                form.debtor_address = form.debtor_id._get_formatted_address()
 
     @api.depends('state', 'debtor_id', 'debtor_id.zip')
     def _compute_debtor_zip(self):
@@ -542,7 +540,7 @@ class L10n_BeForm325(models.Model):
         pdf_file, dummy = self.env['ir.actions.report']._render_qweb_pdf("l10n_be_reports.action_report_325_form_pdf", self, data=self._get_325_form_values())
         self.env['ir.attachment'].create({
             'name': f"{self.reference_year}_325_form.pdf",
-            'datas': base64.b64encode(pdf_file),
+            'raw': pdf_file,
             'res_model': 'l10n_be.form.325',
             'res_id': self.id,
         })
@@ -579,7 +577,7 @@ class L10n_BeForm325(models.Model):
         return {
             'V0002': self.reference_year,
             'V0010': "BELCOTST" if self.is_test else "BELCOTAX",
-            'V0011': fields.Date.today().strftime('%d-%m-%Y'),
+            'V0011': fields.Date.context_today(self).strftime('%d-%m-%Y'),
             'V0014': self.sender_name,
             'V0015': self.sender_address,
             'V0016': self.sender_zip,
@@ -615,8 +613,8 @@ class L10n_BeForm325(models.Model):
             'R8005': self.debtor_bce_number,
             'R8010': 2 + len(partner_281_50_forms),
             # number of record for this declaration: A1XXX + R8XXX + Fiches28150
-            'R8011': sum((form.get('F2009') for form in partner_281_50_forms)),  # Sum sequence
-            'R8012': sum((p.get('F50_2059') for p in partner_281_50_forms)),  # Total control
+            'R8011': sum(form.get('F2009') for form in partner_281_50_forms),  # Sum sequence
+            'R8012': sum(p.get('F50_2059') for p in partner_281_50_forms),  # Total control
         }
 
     def _get_325_form_values(self):

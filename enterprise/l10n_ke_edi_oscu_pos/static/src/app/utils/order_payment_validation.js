@@ -9,17 +9,22 @@ patch(OrderPaymentValidation.prototype, {
         if (this.pos.config.is_kenyan) {
             this.pos.env.services.ui.block();
             try {
-                await this.pos.data.call("pos.order", "action_post_order", [order_server_ids], {});
+                await this.pos.data.call(
+                    "pos.order",
+                    "action_post_selected_orders",
+                    [order_server_ids],
+                    {}
+                );
             } catch (error) {
                 this.pos.dialog.add(AlertDialog, {
-                    title: _t("Error"),
+                    title: _t("Oh snap !"),
                     body: _t(error.data.message),
                 });
             } finally {
                 const l10n_ke_edi_oscu_pos_data = await this.pos.data.call(
                     "pos.order",
                     "get_l10n_ke_edi_oscu_pos_data",
-                    [order_server_ids],
+                    [order.id],
                     {}
                 );
 
@@ -71,12 +76,14 @@ patch(OrderPaymentValidation.prototype, {
                         .length
                 )
             ) {
-                errorMessage += _t("You can't mix refund lines and order lines.\n");
+                errorMessage += _t(
+                    "Can't process a refund and a sale in the same order. Please create two separate orders.\n"
+                );
             }
 
             if (errorMessage) {
                 this.pos.dialog.add(AlertDialog, {
-                    title: _t("Error"),
+                    title: _t("Oh snap !"),
                     body: _t(errorMessage),
                 });
                 return false;

@@ -1,15 +1,15 @@
-import base64
 from odoo.tests.common import tagged, TransactionCase
 
-GIF = b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs="
-TEXT = base64.b64encode(bytes("workflow bridge product", 'utf-8'))
+from odoo.addons.base.tests.files import GIF_RAW
+
+TEXT_RAW = b"workflow bridge product"
 
 
 @tagged('post_install', '-at_install')
 class TestCaseDocumentsBridgeProduct(TransactionCase):
-    
+
     def setUp(self):
-        super(TestCaseDocumentsBridgeProduct, self).setUp()
+        super().setUp()
         self.folder_test = self.env['documents.document'].create({'name': 'folder_test', 'type': 'folder'})
         self.company_test = self.env['res.company'].create({
             'name': 'test bridge products',
@@ -32,41 +32,20 @@ class TestCaseDocumentsBridgeProduct(TransactionCase):
         })
         self.product_test_2 = self.template_test_2.product_variant_id
         self.attachment_txt_two = self.env['ir.attachment'].create({
-            'datas': TEXT,
+            'raw': TEXT_RAW,
             'name': 'fileTextTwo.txt',
             'mimetype': 'text/plain',
         })
         self.attachment_gif_two = self.env['ir.attachment'].create({
-            'datas': GIF,
+            'raw': GIF_RAW,
             'name': 'fileTwoGif.gif',
             'mimetype': 'image/gif',
         })
         self.attachment_gif = self.env['ir.attachment'].create({
-            'datas': GIF,
+            'raw': GIF_RAW,
             'name': 'fileGif.gif',
             'mimetype': 'image/gif',
         })
-
-    def test_bridge_folder_product_settings_on_write(self):
-        """
-        Makes sure the settings apply their values when a document is assigned a res_model, res_id.
-        """
-        self.company_test.write({'documents_product_settings': True})
-        
-        self.attachment_gif_two.write({
-            'res_model': 'product.product',
-            'res_id': self.product_test.id
-        })
-        self.attachment_txt_two.write({
-            'res_model': 'product.template',
-            'res_id': self.template_test.id
-        })
-
-        txt_doc = self.env['documents.document'].search([('attachment_id', '=', self.attachment_txt_two.id)])
-        gif_doc = self.env['documents.document'].search([('attachment_id', '=', self.attachment_gif_two.id)])
-
-        self.assertEqual(txt_doc.folder_id, self.folder_test, 'the text two document should have a folder')
-        self.assertEqual(gif_doc.folder_id, self.folder_test, 'the gif two document should have a folder')
 
     def _products_search(self, record, field_name):
         """
@@ -156,26 +135,9 @@ class TestCaseDocumentsBridgeProduct(TransactionCase):
         gif_doc = self.env['documents.document'].search([('attachment_id', '=', self.attachment_gif_two.id)])
         self.assertEqual(gif_doc.folder_id, self.folder_test, 'the gif two document should have a folder')
 
-    def test_default_res_id_model(self):
-        """
-        Test default res_id and res_model from context are used for document creation.
-        """
-        self.company_test.write({'documents_product_settings': True})
-
-        attachment = self.env['ir.attachment'].with_context(
-            default_res_id=self.product_test.id,
-            default_res_model=self.product_test._name,
-        ).create({
-            'datas': GIF,
-            'name': 'fileTwoGif.gif',
-            'mimetype': 'image/gif',
-        })
-        document = self.env['documents.document'].search([('attachment_id', '=', attachment.id)])
-        self.assertTrue(document, "It should have created a document from default values")
-
     def test_create_product_from_workflow(self):
         document_gif = self.env['documents.document'].create({
-            'datas': GIF,
+            'raw': GIF_RAW,
             'name': 'file.gif',
             'mimetype': 'image/gif',
             'folder_id': self.folder_test.id,
@@ -186,7 +148,7 @@ class TestCaseDocumentsBridgeProduct(TransactionCase):
 
         self.assertEqual(document_gif.res_model, 'product.template')
         self.assertEqual(document_gif.res_id, new_product.id)
-        self.assertEqual(new_product.image_1920, document_gif.datas)
+        self.assertEqual(new_product.image_1920.content, document_gif.raw.content)
 
     def test_sync_product_document_with_document(self):
         """
@@ -195,7 +157,7 @@ class TestCaseDocumentsBridgeProduct(TransactionCase):
         version is deleted, it should fall back to the previous one.
         """
         self.company_test.documents_product_settings = True
-        base_vals = {"name": "specs_v1.gif", "datas": GIF}
+        base_vals = {"name": "specs_v1.gif", "raw": GIF_RAW}
         product_docs = self.env["product.document"].create([
             base_vals | {
                 "res_model": "product.product",
@@ -221,7 +183,7 @@ class TestCaseDocumentsBridgeProduct(TransactionCase):
             old_attachment = product_doc.ir_attachment_id
             new_attachment = self.env["ir.attachment"].create({
                 "name": "specs_v2.gif",
-                "datas": GIF,
+                "raw": GIF_RAW,
                 "mimetype": "image/gif",
             })
             doc_document.attachment_id = new_attachment

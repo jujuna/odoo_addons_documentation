@@ -2,6 +2,8 @@
 
 import datetime
 
+from unittest.mock import patch
+
 from odoo import Command
 
 from odoo.addons.sale.tests.common import SaleCommon, TestSaleCommon
@@ -16,6 +18,8 @@ class UncatchableException(BaseException):
 
 class SaleSubscriptionCommon(SaleCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -24,11 +28,15 @@ class SaleSubscriptionCommon(SaleCommon):
             cls.plan_week,
             cls.plan_month,
             cls.plan_2_month,
+            cls.plan_3_month,
+            cls.plan_6_month,
             cls.plan_year,
         ) = cls.env['sale.subscription.plan'].create([
             {'name': 'Weekly', 'billing_period_value': 1, 'billing_period_unit': 'week', 'sequence': 1},
             {'name': 'Monthly', 'billing_period_value': 1, 'billing_period_unit': 'month', 'sequence': 4},
             {'name': '2 Months', 'billing_period_value': 2, 'billing_period_unit': 'month', 'sequence': 8},
+            {'name': '3 Months', 'billing_period_value': 3, 'billing_period_unit': 'month', 'sequence': 10},
+            {'name': '6 Months', 'billing_period_value': 6, 'billing_period_unit': 'month', 'sequence': 12},
             {'name': 'Yearly', 'billing_period_value': 1, 'billing_period_unit': 'year', 'sequence': 52},
         ])
 
@@ -41,6 +49,8 @@ class SaleSubscriptionCommon(SaleCommon):
 
 class TestSubscriptionCommon(TestSaleCommon):
 
+    _test_user_groups = None  # FIXME list needed groups
+
     def setUp(self):
         super().setUp()
 
@@ -50,6 +60,20 @@ class TestSubscriptionCommon(TestSaleCommon):
             self.env['sale.order']._create_recurring_invoice(batch_size=batch_size)
 
         self.patch(SO, '_subscription_launch_cron_parallel', _subscription_launch_cron_single)
+
+    def _patch_account_payment_post_process(self):
+        """Patch only the account payment generation part of the `_post_process` chain.
+
+        Call `_disable_post_process_patcher()` first to re-enable the whole post-processing chain,
+        then skip only the account payment generation.
+        """
+        self.post_process_mock = self.startPatcher(patch(
+            "odoo.addons.account_payment.models.payment_transaction.PaymentTransaction._post_process",
+            autospec=True,
+            side_effect=lambda txs: txs.with_context(payment_safe_write=True).write(
+                {"is_post_processed": True}
+            ),
+        ))
 
     @classmethod
     def setUpClass(cls):
@@ -284,6 +308,7 @@ class TestSubscriptionCommon(TestSaleCommon):
             'note': "original subscription description",
             'partner_id': cls.user_portal.partner_id.id,
             'sale_order_template_id': cls.subscription_tmpl.id,
+            'require_signature': False,
         })
         cls.subscription._onchange_sale_order_template_id()
         cls.subscription.start_date = False # the confirmation will set the start_date
@@ -294,12 +319,12 @@ class TestSubscriptionCommon(TestSaleCommon):
             {'name': 'Ian Anderson',
              'code': 'IA',
              'account_type': 'asset_receivable',
-             'reconcile': True})
+             })
         cls.account_sale = cls.env['account.account'].create(
             {'name': 'Product Sales ',
              'code': 'S200000',
              'account_type': 'income',
-             'reconcile': False})
+             })
 
         cls.sale_journal = cls.env['account.journal'].create(
             {'name': 'reflets.info',
@@ -318,9 +343,12 @@ class TestSubscriptionCommon(TestSaleCommon):
         cls.provider = cls.env['payment.provider'].create(
             {'name': 'The Wire',
              'company_id': cls.company.id,
-             'state': 'test',
              'redirect_form_view_id': cls.env['ir.ui.view'].search([('type', '=', 'qweb')], limit=1).id})
-        cls.payment_method_id = cls.env.ref('payment.payment_method_unknown').id
+        cls.payment_method_id = cls.env["payment.method"].create({
+            "name": "Payment method",
+            "code": "unknown",
+            "provider_id": cls.provider.id,
+        }).id
         cls.payment_token = cls.env['payment.token'].create(
             {'payment_details': 'Jimmy McNulty',
              'partner_id': cls.partner.id,
@@ -363,7 +391,7 @@ class TestSubscriptionCommon(TestSaleCommon):
         values = [{
             'amount': invoice.amount_total,
             'provider_id': provider.id,
-            'payment_method_id': self.payment_method_id,
+            'payment_method_id': payment_token.payment_method_id.id,
             'operation': 'offline',
             'currency_id': invoice.currency_id.id,
             'reference': reference,
@@ -380,15 +408,15 @@ class TestSubscriptionCommon(TestSaleCommon):
 
     def _mock_subscription_do_payment_rejected(self, payment_method, invoice, auto_commit=False):
         tx = self._mock_subscription_do_payment(payment_method, invoice)
-        tx.state = "pending"
-        tx._set_error("Payment declined")
-        tx._post_process()
+        tx.with_context(payment_safe_write=True).state = "pending"
+        tx.with_context(payment_safe_write=True)._set_error("Payment declined")
+        tx.with_context(payment_safe_write=True)._post_process()
         tx.env.cr.flush()  # simulate commit after sucessfull `_do_payment()`
         return tx
 
     def _mock_subscription_do_payment_pending(self, payment_method, invoice, auto_commit=False):
         tx = self._mock_subscription_do_payment(payment_method, invoice)
-        tx.state = "pending"
+        tx.with_context(payment_safe_write=True).state = "pending"
         tx.env.cr.flush()  # simulate commit after sucessfull `_do_payment()`
         return tx
 

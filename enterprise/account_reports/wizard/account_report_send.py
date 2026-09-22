@@ -122,7 +122,8 @@ class AccountReportSend(models.TransientModel):
         * placeholder       bool: Should be true to prevent download / deletion.
         """
         self.ensure_one()
-        filename = f"{partner.name} - {self.account_report_id.get_default_report_filename(self.report_options, 'pdf')}"
+        filename = self.account_report_id.get_default_partner_report_filename(partner, self.report_options)
+
         return [{
             'id': f'placeholder_{filename}',
             'name': filename,

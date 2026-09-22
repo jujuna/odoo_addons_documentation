@@ -7,6 +7,7 @@ import {
     queryFirst,
     queryOne,
     queryText,
+    waitFor,
 } from "@odoo/hoot-dom";
 import { advanceTime, animationFrame, runAllTimers } from "@odoo/hoot-mock";
 import { getPickerCell, zoomOut } from "@web/../tests/core/datetime/datetime_test_helpers";
@@ -68,14 +69,16 @@ export const CLASSES = {
 
 export const SELECTORS = {
     addButton: ".o_gantt_button_add",
+    buffer: ".o_gantt_pill_buffer",
     cell: ".o_gantt_cell",
     cellContainer: ".o_gantt_cells",
     collapseButton: ".o_gantt_button_collapse_rows",
-    dense: ".fa-compress",
-    sparse: ".fa-expand",
+    dense: "[data-icon='close_fullscreen']",
+    sparse: "[data-icon='expand_content']",
     draggable: makeClassSelector(CLASSES.draggable),
     expandButton: ".o_gantt_button_expand_rows",
     expandCollapseButtons: ".o_gantt_button_expand_rows, .o_gantt_button_collapse_rows",
+    eventToSchedule: ".o_event_to_schedule_draggable",
     group: makeClassSelector(CLASSES.group),
     groupHeader: ".o_gantt_header_title",
     columnHeader: ".o_gantt_header_cell",
@@ -85,11 +88,9 @@ export const SELECTORS = {
     pill: ".o_gantt_pill",
     pillWrapper: ".o_gantt_pill_wrapper",
     progressBar: ".o_gantt_row_header .o_gantt_progress_bar",
-    progressBarBackground: ".o_gantt_row_header .o_gantt_progress_bar > span.bg-opacity-25",
-    progressBarForeground:
-        ".o_gantt_row_header .o_gantt_progress_bar > span > .o_gantt_group_hours",
-    progressBarWarning:
-        ".o_gantt_row_header .o_gantt_progress_bar > .o_gantt_group_hours > .fa-exclamation-triangle",
+    progressBarBackground: ".o_gantt_row_header .o_gantt_progress_bar > span",
+    progressBarForeground: ".o_gantt_row_header .o_gantt_progress_bar_label",
+    progressBarWarning: ".o_gantt_row_header .o_gantt_progress_bar_label [data-icon='warning']",
     renderer: ".o_gantt_renderer",
     resizable: makeClassSelector(CLASSES.resizable),
     startBadge: ".o_gantt_pill_time_display_badge:eq(0)",
@@ -100,18 +101,23 @@ export const SELECTORS = {
     rowHeader: ".o_gantt_row_header",
     rowTitle: ".o_gantt_row_title",
     rowTotal: ".o_gantt_row_total",
+    rowTotalProgressBar: ".o_gantt_row_total .o_gantt_progress_bar > span",
     startDatePicker: ".o_gantt_picker:nth-child(1)",
     stopDatePicker: ".o_gantt_picker:nth-child(3)",
     thumbnail: ".o_gantt_row_thumbnail",
     scaleSelectorMenu: ".o_gantt_scale_selector_menu",
     scaleSelectorToggler: ".o_gantt_scale_selector .dropdown-toggle",
+    sideBarController: ".o_gantt_sidebar_controller",
+    sideBarToggler: "button[title='Toggle Side Panel']",
+    sidePanel: ".o_gantt_sidepanel",
     todayButton: ".o_gantt_button_today",
     toolbar: ".o_gantt_renderer_controls div[name='ganttToolbar']",
     undraggable: ".o_undraggable",
+    unscheduleZone: ".o_gantt_unschedule_zone",
     view: ".o_gantt_view",
     viewContent: ".o_gantt_view .o_content",
-    previousButton: ".o_gantt_renderer_controls button:has(> .oi-arrow-left)",
-    nextButton: ".o_gantt_renderer_controls button:has(> .oi-arrow-right)",
+    previousButton: ".o_gantt_renderer_controls button:has(> [data-icon='west'])",
+    nextButton: ".o_gantt_renderer_controls button:has(> [data-icon='east'])",
 
     // Connectors
     connector: ".o_gantt_connector",
@@ -201,6 +207,9 @@ export async function dragPill(text, options) {
      * @param {DragParams} params
      */
     const moveTo = async (params) => {
+        if (params.unschedule) {
+            return dragActions.moveTo(queryOne(SELECTORS.unscheduleZone));
+        }
         let cell;
         if (params?.columnHeader && params?.groupHeader) {
             cell = await hoverGridCell(params.columnHeader, params.groupHeader, params.row, params);
@@ -226,10 +235,49 @@ export async function dragPill(text, options) {
     return { ...dragActions, drop, moveTo };
 }
 
+/**
+ * @param {string} [text]
+ */
+export async function dragToSchedule(text) {
+    /**
+     * @param {DragParams} [params]
+     */
+    const drop = async (params) => {
+        if (params) {
+            await moveTo(params);
+        }
+        await dragActions.drop();
+    };
+
+    /**
+     * @param {DragParams} params
+     */
+    const moveTo = async (params) => {
+        let cell;
+        if (params?.columnHeader && params?.groupHeader) {
+            cell = await hoverGridCell(params.columnHeader, params.groupHeader, params.row, params);
+        } else if (params?.pill) {
+            ({ cell } = await hoverPillCell(getPillWrapper(params.pill, params)));
+        }
+        return dragActions.moveTo(cell, {
+            position: getCellPositionOffset(cell, params?.part),
+            relative: true,
+        });
+    };
+
+    const dragActions = await contains(
+        `${SELECTORS.eventToSchedule}:contains(${text}):first .o_event_to_schedule_handle`
+    ).drag();
+
+    return { ...dragActions, drop, moveTo };
+}
+
 /** @type {PillHelper<Promise<void>>} */
 export async function editPill(text, options) {
     await contains(getPill(text, options)).click();
-    await contains(".o_popover .popover-footer .btn-primary").click();
+    await runAllTimers();
+    await waitFor(".o_popover");
+    await contains(".o_popover .o_popover_footer .btn-primary").click();
 }
 
 /**
@@ -347,8 +395,8 @@ export function setCellParts(cellPart) {
 export function getGridContent(params = {}) {
     const columnHeaders = getHeaders(SELECTORS.columnHeader, params.setTitleAttrOnHeaders);
     const groupHeaders = getHeaders(SELECTORS.groupHeader, params.setTitleAttrOnHeaders);
-    const rangeElement = queryOne(SELECTORS.scaleSelectorToggler)
-    const arrow = queryFirst(".fa-long-arrow-right", { root: rangeElement });
+    const rangeElement = queryOne(SELECTORS.scaleSelectorToggler);
+    const arrow = queryFirst("[data-icon='east']", { root: rangeElement });
     const range = arrow
         ? queryText(arrow.parentNode).split("\n").join(` -> `)
         : queryText(SELECTORS.scaleSelectorToggler) || null;
@@ -374,7 +422,13 @@ export function getGridContent(params = {}) {
     for (const rowEl of rowEls) {
         const isGroup = rowEl.classList.contains(CLASSES.group);
         const { row: gridRow } = getGridStyle(rowEl);
-        const row = singleRowMode ? {} : { title: queryText(rowEl) };
+        const row = singleRowMode
+            ? {}
+            : {
+                  title:
+                      rowEl.querySelector(SELECTORS.rowTitle)?.getAttribute("title") ??
+                      queryText(rowEl),
+              };
         if (isGroup) {
             row.isGroup = true;
         }
@@ -507,7 +561,7 @@ export async function clickCell(columnHeader, groupHeader, rowHeader = null, opt
  * Hovers a cell found from a pill element.
  * @param {HTMLElement} pill
  */
-async function hoverPillCell(pill) {
+export async function hoverPillCell(pill) {
     const cell = getCellFromPill(pill);
     const pStart = getGridStyle(pill).column[0];
     const cellStyle = getGridStyle(cell).column[0];
@@ -589,6 +643,13 @@ export function getPillWrapper(text, options) {
     return getPill(text, options).closest(SELECTORS.pillWrapper);
 }
 
+/** @type {PillHelper<HTMLElement>} */
+export function getPillBuffer(text, options) {
+    const pill = getPillWrapper(text, options);
+    const pillId = pill.dataset.pillId;
+    return queryOne(`${SELECTORS.buffer}[data-pill-id="${pillId}"]`);
+}
+
 /**
  * For each cell of a specific column, checks whether the cell has the class in
  * its' classList and returns as a list of booleans.
@@ -600,7 +661,5 @@ export function getPillWrapper(text, options) {
 export function cssClassPresencePerCellInColumn(cssClass, columnHeaders) {
     const columnIndex = findColumnFromHeader(...columnHeaders);
     const cells = queryAll(`${SELECTORS.cell}[data-col='${columnIndex}']`);
-    return cells.map((el) => {
-        return el.classList.contains(cssClass);
-    });
+    return cells.map((el) => el.classList.contains(cssClass));
 }

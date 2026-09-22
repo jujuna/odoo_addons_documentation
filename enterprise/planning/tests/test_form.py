@@ -1,13 +1,15 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
-import pytz
 
-from odoo.tests import Form, new_test_user
+from odoo.tests import tagged, Form, new_test_user
 from .common import TestCommonPlanning
 
 
+@tagged('at_install', '-post_install')  # LEGACY at_install
 class TestPlanningForm(TestCommonPlanning):
 
     @classmethod
@@ -16,30 +18,21 @@ class TestPlanningForm(TestCommonPlanning):
         cls.resource_calendar_38_hours_per_week = cls.env['resource.calendar'].create([{
             'name': "Test Calendar : 38 Hours/Week",
             'hours_per_day': 7.6,
-            'tz': 'Europe/Brussels',
-            'two_weeks_calendar': False,
             'attendance_ids': [(5, 0, 0)] + [(0, 0, {
-                'name': "Attendance",
                 'dayofweek': dayofweek,
                 'hour_from': hour_from,
                 'hour_to': hour_to,
-                'day_period': day_period,
-            }) for dayofweek, hour_from, hour_to, day_period in [
-                ("0", 8.0, 12.0, "morning"),
-                ("0", 12.0, 13.0, "lunch"),
-                ("0", 13.0, 16.6, "afternoon"),
-                ("1", 8.0, 12.0, "morning"),
-                ("1", 12.0, 13.0, "lunch"),
-                ("1", 13.0, 16.6, "afternoon"),
-                ("2", 8.0, 12.0, "morning"),
-                ("2", 12.0, 13.0, "lunch"),
-                ("2", 13.0, 16.6, "afternoon"),
-                ("3", 8.0, 12.0, "morning"),
-                ("3", 12.0, 13.0, "lunch"),
-                ("3", 13.0, 16.6, "afternoon"),
-                ("4", 8.0, 12.0, "morning"),
-                ("4", 12.0, 13.0, "lunch"),
-                ("4", 13.0, 16.6, "afternoon"),
+            }) for dayofweek, hour_from, hour_to in [
+                ("0", 8.0, 12.0),
+                ("0", 13.0, 16.6),
+                ("1", 8.0, 12.0),
+                ("1", 13.0, 16.6),
+                ("2", 8.0, 12.0),
+                ("2", 13.0, 16.6),
+                ("3", 8.0, 12.0),
+                ("3", 13.0, 16.6),
+                ("4", 8.0, 12.0),
+                ("4", 13.0, 16.6),
             ]],
         }])
 
@@ -56,9 +49,8 @@ class TestPlanningForm(TestCommonPlanning):
             start, end = datetime(2020, 1, 1, 8, 0), datetime(2020, 1, 11, 18, 0)
             slot.start_datetime = start
             slot.end_datetime = end
-            slot.resource_id = self.env['resource.resource']
+            slot.resource_ids = self.env['resource.resource']
             slot.company_id = self.env['res.company']
-            slot.allocated_percentage = 100
             self.assertEqual(slot.allocated_hours, (end - start).total_seconds() / (60 * 60))
             # The test is really weird.
             # It tests the behavior of the computed field `allocated_hours` when there is no company
@@ -76,15 +68,14 @@ class TestPlanningForm(TestCommonPlanning):
             slot.company_id = self.env.company
 
     def planning_form(self, timezone, start, end, expected_start, expected_end):
-        self.resource_calendar_38_hours_per_week.tz = timezone
         self.employee_janice.tz = timezone
         context = dict(
-            default_resource_id=self.employee_janice.resource_id.id,
+            default_resource_ids=self.employee_janice.resource_id.ids,
             default_start_datetime=start,
             default_end_datetime=end,
         )
         with Form(self.env['planning.slot'].with_user(self.test_user).with_context(context)) as slot:
-            tz = pytz.timezone(self.employee_janice.resource_calendar_id.tz)
+            tz = ZoneInfo(self.employee_janice.tz)
             start_decimal_time = slot.start_datetime.astimezone(tz).hour + slot.start_datetime.astimezone(tz).minute / 60
             self.assertEqual(start_decimal_time, expected_start,
                              "The planning slot doesn't start at the same time than the employee's resource calendar")
@@ -133,16 +124,20 @@ class TestPlanningForm(TestCommonPlanning):
             'name': 'Developer',
             'color': 2,
         })
+        flexible_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Calendar',
+            'calendar_type': 'undefined',
+            'attendance_ids': [],
+        })
         self.employee_joseph.write({
-            'resource_calendar_id': False,
+            'resource_calendar_id': flexible_calendar.id,
             'default_planning_role_id': developer_role.id,
             'tz': 'Europe/Brussels',
         })
-        self.resource_joseph.calendar_id = False
         expected_start_datetime = datetime.now() + relativedelta(hour=8, minute=0, second=0)
         expected_end_datetime = datetime.now() + relativedelta(hour=12, minute=0, second=0)
         slot_form = Form(self.env['planning.slot'], view="planning.planning_view_form_in_gantt")
-        slot_form.resource_id = self.resource_joseph
+        slot_form.resource_ids = self.resource_joseph
         self.assertEqual(slot_form.role_id, developer_role)
         slot_form.start_datetime = expected_start_datetime
         slot_form.end_datetime = expected_end_datetime
@@ -151,3 +146,13 @@ class TestPlanningForm(TestCommonPlanning):
         self.assertTrue(slot.allocated_hours > 0)
         self.assertEqual(slot.start_datetime, expected_start_datetime)
         self.assertEqual(slot.end_datetime, expected_end_datetime)
+
+    def test_my_planning_assigns_current_user_and_its_materials_by_default(self):
+        material = self.env['resource.resource'].create({
+            'name': "Material Resource",
+            'resource_type': 'material',
+            'assigned_employee_id': self.employee_bert.id,
+        })
+        self.employee_bert.user_id = self.test_user
+        with Form(self.env['planning.slot'].with_user(self.employee_bert.user_id).with_context(my_planning_action=True)) as slot:
+            self.assertEqual((self.resource_bert + material).ids, slot.resource_ids.ids, "The slot should include the current user and its assigned materials")

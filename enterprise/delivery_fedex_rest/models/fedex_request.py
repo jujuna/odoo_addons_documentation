@@ -2,6 +2,8 @@
 import json
 from json import JSONDecodeError
 
+import re
+
 import requests
 from requests import RequestException
 
@@ -110,7 +112,6 @@ class FedexRequest:
         self.label_stock = _convert_stock_type(super_carrier.fedex_rest_label_stock_type)
         self.label_file = super_carrier.fedex_rest_label_file_type
         self.duty_payment = super_carrier.fedex_rest_duty_payment
-        self.make_return = super_carrier.return_label_on_delivery
         self.debug_logger = super_carrier.log_xml
         self.carrier = super_carrier
         self.session = requests.Session()
@@ -251,7 +252,9 @@ class FedexRequest:
         return res
 
     def _get_contact_from_partner(self, partner, company_partner=False):
-        res = {'phoneNumber': partner.phone}
+        res = {
+            'phoneNumber': partner.phone or partner.parent_id.phone or partner.child_ids.filtered(lambda x: x.type == 'delivery')[-1:].phone,
+        }
         if company_partner and not res['phoneNumber']:
             # Fallback to phone on the company if none on the WH
             res['phoneNumber'] = company_partner.phone
@@ -266,8 +269,8 @@ class FedexRequest:
             res['personName'] = partner.name[:70]
             if partner.parent_id:
                 res['companyName'] = partner.parent_id.name[:35]
-            elif partner.company_name:
-                res['companyName'] = partner.company_name[:35]
+            elif partner.parent_name:
+                res['companyName'] = partner.parent_name[:35]
         if partner.email:
             res['emailAddress'] = partner.email
         elif company_partner and company_partner.email:
@@ -280,6 +283,7 @@ class FedexRequest:
                 'units': self.weight_units,
                 'value': self.carrier._fedex_rest_convert_weight(package.weight)
             },
+            'customerReferences': [],
         }
         if int(package.dimension['length']) or int(package.dimension['width']) or int(package.dimension['height']):
             # FedEx will raise a warning when mixing imperial and metric units (MIXED.MEASURING.UNITS.INCLUDED).
@@ -304,11 +308,16 @@ class FedexRequest:
         description = ', '.join([c.product_id.name for c in package.commodities])
         res['itemDescription'] = description[:50]
         res['itemDescriptionForClearance'] = description
+        if package.picking_id:
+            res['customerReferences'].append({
+                'customerReferenceType': 'CUSTOMER_REFERENCE',
+                'value': package.picking_id.name,
+            })
         if order_no:
-            res['customerReferences'] = [{
+            res['customerReferences'].append({
                 'customerReferenceType': 'P_O_NUMBER',
                 'value': order_no
-            }]
+            })
         return res
 
     def _get_commodities_info(self, commodity, currency):
@@ -330,16 +339,23 @@ class FedexRequest:
         return res
 
     def _get_tins_from_partner(self, partner, custom_vat=False):
+        def _transform_vat_to_fedex_format(vat_number):
+            if not vat_number:
+                return ''
+            if len(vat_number) > 18:
+                return re.sub(r'[^A-Za-z0-9 ]', '', vat_number)
+            return vat_number
+
         res = []
         if custom_vat:
             res.append({
-                'number': self.vat_override,
+                'number': _transform_vat_to_fedex_format(self.vat_override),
                 'tinType': 'BUSINESS_UNION'
             })
         if partner.vat and partner.is_company:
-            res.append({'number': partner.vat, 'tinType': 'BUSINESS_NATIONAL'})
+            res.append({'number': _transform_vat_to_fedex_format(partner.vat), 'tinType': 'BUSINESS_NATIONAL'})
         elif partner.parent_id and partner.parent_id.vat and partner.parent_id.is_company:
-            res.append({'number': partner.parent_id.vat, 'tinType': 'BUSINESS_NATIONAL'})
+            res.append({'number': _transform_vat_to_fedex_format(partner.parent_id.vat), 'tinType': 'BUSINESS_NATIONAL'})
         return res
 
     def _get_shipping_price(self, ship_from, ship_to, packages, currency):
@@ -470,8 +486,6 @@ class FedexRequest:
                     ]
                 }
             }
-        if self.make_return:
-            request_data['requestedShipment']['customsClearanceDetail']['customsOption'] = {'type': 'COURTESY_RETURN_LABEL'}
 
         self._add_extra_data_to_request(request_data, 'ship')
         res = self._send_fedex_request("/ship/v1/shipments", request_data)

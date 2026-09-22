@@ -1,11 +1,14 @@
-import { Component } from "@odoo/owl";
+import { Component, t, usePlugin, useProps } from "@odoo/owl";
+import { DebugModePlugin } from "@web/core/debug_mode_plugin";
 
 export class SidebarViewToolbox extends Component {
     static template = "web_studio.ViewEditor.ViewToolbox";
-    static props = {
-        canEditXml: { type: Boolean, optional: true },
-        onMore: { type: Function, optional: true },
-        openDefaultValues: { type: Function, optional: true },
-        canEditDefaultValues: { type: Boolean, optional: true },
-    };
+    props = useProps({
+        canEditXml: t.boolean().optional(),
+        onMore: t.function().optional(),
+        openDefaultValues: t.function().optional(),
+        canEditDefaultValues: t.boolean().optional(),
+    });
+
+    debugMode = usePlugin(DebugModePlugin);
 }

@@ -18,23 +18,48 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:43+0000\n"
-"PO-Revision-Date: 2026-01-23 17:54+0000\n"
-"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
-"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-09-18 17:48+0000\n"
+"PO-Revision-Date: 2026-09-18 01:15+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-master/"
 "account_iso20022/fi/>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: account_iso20022
+#: model:ir.module.module,description:base.module_account_iso20022
+msgid ""
+"\n"
+"Generate XML payment orders as recommended by the SEPA and ISO20022 norms.\n"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "A bank account is not defined."
 msgstr "Pankkitiliä ei ole määritelty."
+
+#. module: account_iso20022
+#: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__is_third_party
+#: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__is_third_party
+msgid "Account owned by someone else than the employee"
+msgstr ""
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "All payments in the batch must share the same SEPA pain version."
+msgstr "Kaikilla erän maksuilla on oltava sama SEPA-pain-versio."
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "All payments in the batch must share the same payment method line."
+msgstr "Kaikilla erän maksuilla on oltava sama maksutaparivi."
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_batch_payment__iso20022_batch_booking
@@ -46,14 +71,20 @@ msgstr ""
 "yhdeksi tapahtumaksi."
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03_austrian_004
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03_austrian_004
 msgid "Austrian"
 msgstr "Itävalta"
 
 #. module: account_iso20022
-#: model:ir.model,name:account_iso20022.model_account_bank_statement_line
-msgid "Bank Statement Line"
-msgstr "Pankkitiliotteen rivi"
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__available_iso20022_priority
+msgid "Available Iso20022 Priority"
+msgstr "Saatavilla oleva Iso20022-prioriteetti"
+
+#. module: account_iso20022
+#: model:ir.model,name:account_iso20022.model_res_partner_bank
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__bank_account_id
+msgid "Bank Account"
+msgstr "Pankkitili"
 
 #. module: account_iso20022
 #: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
@@ -72,8 +103,8 @@ msgstr "Kulusta vastaava"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_company
-msgid "Companies"
-msgstr "Yritykset"
+msgid "Company"
+msgstr "Yritys"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_config_settings
@@ -119,14 +150,15 @@ msgid "Default Priority"
 msgstr "Oletusprioriteetti"
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__display_name
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_partner__display_name
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__display_name
 msgid "Display Name"
 msgstr "Näyttönimi"
 
@@ -137,10 +169,10 @@ msgid "Employee %s has no country in their address."
 msgstr "Työntekijän %s osoitteessa ei ole maata."
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__end_to_end_uuid
-#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__end_to_end_uuid
-msgid "End to End ID"
-msgstr "End to End -tunnus"
+#: model:ir.model.fields,help:account_iso20022.field_account_setup_bank_manual_config__third_party_beneficiary_id
+#: model:ir.model.fields,help:account_iso20022.field_res_partner_bank__third_party_beneficiary_id
+msgid "Entity managing the third-party account"
+msgstr ""
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -150,7 +182,12 @@ msgid ""
 msgstr "Tunnuksen myöntävä taho (esim. KBE-BCO tai Finanzamt Muenchen IV)."
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03_de
+#: model:ir.module.module,summary:base.module_account_iso20022
+msgid "Export payments as SEPA Credit Transfer or ISO20022 files"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03_de
 msgid "German"
 msgstr "Saksa"
 
@@ -177,14 +214,15 @@ msgid "Has Sepa Ct Payment Method"
 msgstr "Sisältää Sepa Ct -maksutavan"
 
 #. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_bank_statement_line__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__id
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__id
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__id
 #: model:ir.model.fields,field_description:account_iso20022.field_res_partner__id
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__id
 msgid "ID"
 msgstr "Tunnus"
 
@@ -207,8 +245,19 @@ msgstr "Tunnistus"
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_id
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_orgid_id
-msgid "Identification assigned by an institution (eg. VAT number)."
-msgstr "Instituution myöntämä tunnus (esim. ALV-numero)."
+msgid "Identification assigned by an institution (eg. Tax ID)."
+msgstr "Laitoksen myöntämä tunniste (esim. verotunnus)."
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_batch_payment.py:0
+msgid "Invalid Partners"
+msgstr "Virheelliset kumppanit"
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__invalid_sct_partners_ids
+msgid "Invalid Sct Partners"
+msgstr "Virheelliset Sct-kumppanit"
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__payment_method_is_iso20022
@@ -216,6 +265,11 @@ msgstr "Instituution myöntämä tunnus (esim. ALV-numero)."
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method__is_iso20022
 msgid "Is Iso20022"
 msgstr "On Iso20022"
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__is_sepa_ct_payment_method
+msgid "Is Sepa Ct Payment Method"
+msgstr "On Sepa Ct -maksutapa"
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -249,6 +303,12 @@ msgid "NORM - Normal"
 msgstr "NORM - Normaali"
 
 #. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__partner_name
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__partner_name
+msgid "Name"
+msgstr ""
+
+#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_initiating_party_name
 msgid ""
 "Name of the Creditor Reference Party. Usage Rule: Limited to 70 characters "
@@ -276,24 +336,19 @@ msgid "Partner %s has not bank account defined."
 msgstr "Kumppanilla %s ei ole määritettyä pankkitiliä."
 
 #. module: account_iso20022
-#: model:ir.model,name:account_iso20022.model_account_payment_method
-msgid "Payment Methods"
-msgstr "Maksutavat"
-
-#. module: account_iso20022
-#: model_terms:ir.ui.view,arch_db:account_iso20022.account_journal_dashboard_kanban_view_inherited
-msgid "Payment to send via SEPA"
-msgstr "Lähetettävä SEPA-maksu"
-
-#. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_account_payment
-msgid "Payments"
-msgstr "Maksut"
+msgid "Payment"
+msgstr "Maksu"
 
 #. module: account_iso20022
-#: model_terms:ir.ui.view,arch_db:account_iso20022.account_journal_dashboard_kanban_view_inherited
-msgid "Payments to send via SEPA"
-msgstr "Lähetettävät SEPA-maksut"
+#: model:ir.model,name:account_iso20022.model_account_payment_method
+msgid "Payment Method"
+msgstr "Maksutapa"
+
+#. module: account_iso20022
+#: model:ir.model,name:account_iso20022.model_account_payment_method_line
+msgid "Payment Method Line"
+msgstr "Maksutavan rivi"
 
 #. module: account_iso20022
 #. odoo-python
@@ -312,21 +367,25 @@ msgid "SCT Batch Booking"
 msgstr "SCT-erävaraus"
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_account_payment_search_inherit_account_sepa_pain_09
+msgid "SEPA / ISO20022"
+msgstr ""
+
+#. module: account_iso20022
 #: model:account.payment.method,name:account_iso20022.account_payment_method_sepa_ct
 msgid "SEPA Credit Transfer"
 msgstr "SEPA-tilisiirto"
+
+#. module: account_iso20022
+#: model:ir.module.module,shortdesc:base.module_account_iso20022
+msgid "SEPA Credit Transfer / ISO20022"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_journal_dashboard.py:0
 msgid "SEPA Credit Transfers to Send"
 msgstr "Lähetettävät SEPA-tilisiirrot"
-
-#. module: account_iso20022
-#: model:ir.model.fields,field_description:account_iso20022.field_account_journal__sepa_pain_version
-#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
-msgid "SEPA XML Format"
-msgstr "SEPA XML-muoto"
 
 #. module: account_iso20022
 #. odoo-python
@@ -344,8 +403,8 @@ msgstr ""
 "valuuttaa."
 
 #. module: account_iso20022
-#: model:ir.model.fields,help:account_iso20022.field_account_journal__sepa_pain_version
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__sepa_pain_version
+#: model:ir.model.fields,help:account_iso20022.field_account_payment_method_line__sepa_pain_version
 msgid ""
 "SEPA version to use to generate Credit Transfer XML files from this journal"
 msgstr ""
@@ -375,16 +434,6 @@ msgstr "Jaettu"
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Some payments are above the maximum amount allowed."
 msgstr "Jotkin maksut ylittävät sallitun enimmäismäärän."
-
-#. module: account_iso20022
-#. odoo-python
-#: code:addons/account_iso20022/models/account_journal_sepa_ct.py:0
-msgid ""
-"Some payments are missing a value for 'UETR', required for the SEPA "
-"Pain.001.001.09 format."
-msgstr ""
-"Joistakin maksuista puuttuu UETR-arvo, jota vaaditaan SEPA "
-"Pain.001.001.001.09 -muodossa."
 
 #. module: account_iso20022
 #. odoo-python
@@ -443,19 +492,6 @@ msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
-#: code:addons/account_iso20022/models/res_partner.py:0
-msgid ""
-"The LEI number must contain 20 characters and match the following "
-"structure:\n"
-"- 18 alphanumeric characters with capital letters\n"
-"- 2 digits in the end\n"
-msgstr ""
-"LEI-numeron on sisällettävä 20 merkkiä ja vastattava seuraavaa rakennetta:\n"
-"- 18 aakkosnumeerista merkkiä isoilla kirjaimilla\n"
-"- 2 numeroa lopussa\n"
-
-#. module: account_iso20022
-#. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
 "The Name Identification and Issuer details are required to proceed. Please "
@@ -476,6 +512,11 @@ msgstr ""
 "SEPA-toimintoja varten tarvitaan voimassa oleva IBAN-tili."
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "The country or city of"
+msgstr "Maata tai kaupunkia ei ole määritetty"
+
+#. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
@@ -494,6 +535,18 @@ msgid ""
 msgstr ""
 "Päiväkirja '%s' vaatii asianmukaista IBAN-tilin SEPA-maksamista varten. "
 "Määritä se ensin."
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__is_third_party
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__is_third_party
+msgid "Third-Party Account"
+msgstr ""
+
+#. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_setup_bank_manual_config__third_party_beneficiary_id
+#: model:ir.model.fields,field_description:account_iso20022.field_res_partner_bank__third_party_beneficiary_id
+msgid "Third-Party Beneficiary"
+msgstr ""
 
 #. module: account_iso20022
 #. odoo-python
@@ -524,15 +577,9 @@ msgid "URGP - Critical urgency"
 msgstr "URGP - Kriittinen kiireellisyys"
 
 #. module: account_iso20022
-#: model:ir.model.fields,help:account_iso20022.field_account_bank_statement_line__end_to_end_uuid
-#: model:ir.model.fields,help:account_iso20022.field_account_payment__end_to_end_uuid
-msgid "Unique end-to-end assigned by the initiating party"
-msgstr "Aloittavan osapuolen antama yksilöllinen End to End -tunnus"
-
-#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__iso20022_uetr
 msgid "Unique end-to-end transaction reference"
-msgstr "Yksilöllinen End to End -tapahtumaviite"
+msgstr "Yksilöllinen päästä päähän -tapahtumaviite"
 
 #. module: account_iso20022
 #. odoo-python
@@ -556,10 +603,21 @@ msgstr ""
 "Näkyy SEPA-maksuissa aloittavan osapuolen nimenä. Rajoitettu 70 merkkiin."
 
 #. module: account_iso20022
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
+#: model:ir.model.fields,field_description:account_iso20022.field_account_payment_method_line__sepa_pain_version
+msgid "XML Version"
+msgstr "XML-versio"
+
+#. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_initiating_party_name
 #: model:ir.model.fields,field_description:account_iso20022.field_res_config_settings__iso20022_initiating_party_name
 msgid "Your Company Name"
 msgstr "Yrityksesi nimi"
+
+#. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "is not set, which could cause the file to be refused by the bank."
+msgstr "minkä takia pankki saattaa hylätä tiedoston."
 
 #. module: account_iso20022
 #. odoo-python
@@ -568,12 +626,12 @@ msgid "is_sent"
 msgstr "is_sent"
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_03
 msgid "pain.001.001.03"
 msgstr "pain.001.001.03"
 
 #. module: account_iso20022
-#: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_09
+#: model:ir.model.fields.selection,name:account_iso20022.selection__account_payment_method_line__sepa_pain_version__pain_001_001_09
 msgid "pain.001.001.09"
 msgstr "pain.001.001.09"
 
@@ -590,6 +648,11 @@ msgid "state"
 msgstr "tila"
 
 #. module: account_iso20022
+#: model_terms:ir.ui.view,arch_db:account_iso20022.view_batch_payment_form_inherit
+msgid "these partners"
+msgstr "näille kumppaneille,"
+
+#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_journal__iso20022_default_priority
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__iso20022_priority
 msgid ""
@@ -603,119 +666,8 @@ msgstr ""
 "• URGP: Kriittinen, vaatii välitöntä käsittelyä.\n"
 "• SVDA: Maksut on suoritettava samana päivänä kuin ne lähetetään."
 
-#~ msgid "A bank account must be set on the following documents: "
-#~ msgstr "Pankkitili on määritettävä seuraavissa asiakirjoissa: "
+#~ msgid "SEPA XML Format"
+#~ msgstr "SEPA XML-muoto"
 
-#~ msgid ""
-#~ "Bank account %s 's bank does not have any BIC number associated. Please "
-#~ "define one."
-#~ msgstr "Pankkitilin %s pankkiin ei liity BIC-numeroa. Määrittele sellainen."
-
-#~ msgid "Generic"
-#~ msgstr "Yleiset"
-
-#~ msgid "Maximum amount is %s for payments in Euros, %s for other currencies."
-#~ msgstr ""
-#~ "Enimmäismäärä on %s euromääräisille maksuille ja %s muille valuutoille."
-
-#~ msgid ""
-#~ "Please first set a SEPA identification number in the accounting settings."
-#~ msgstr "Aseta ensin SEPA-tunnistenumero kirjanpitoasetuksissa."
-
-#~ msgid "Register Payment"
-#~ msgstr "Kirjaa maksu"
-
-#~ msgid "Request batch booking from the bank for the related bank statements."
-#~ msgstr "Pyydä pankilta erävarausta asiaan liittyviä tiliotteita varten."
-
-#~ msgid "SEPA Pain Version"
-#~ msgstr "SEPA Pain -versio"
-
-#~ msgid ""
-#~ "SEPA may be a generic format, some countries differ from the SEPA "
-#~ "recommendations made by the EPC (European Payment Council) and thus the "
-#~ "XML created need some tweaking."
-#~ msgstr ""
-#~ "SEPA saattaa olla yleinen muoto, mutta jotkin maat poikkeavat EPC:n "
-#~ "(European Payment Council) SEPA-suosituksista, joten luotua XML-muotoa on "
-#~ "hieman muokattava."
-
-#~ msgid "Sct Generic"
-#~ msgstr "Sct Yleinen"
-
-#~ msgid ""
-#~ "Some payments are not made on an IBAN recipient account. This batch might "
-#~ "not be accepted by certain banks because of that."
-#~ msgstr ""
-#~ "Joitakin maksuja ei suoriteta IBAN-vastaanottotilille. Tämän vuoksi "
-#~ "tietyt pankit eivät välttämättä hyväksy tätä erää."
-
-#~ msgid ""
-#~ "Some payments were instructed in another currency than Euro. This batch "
-#~ "might not be accepted by certain banks because of that."
-#~ msgstr ""
-#~ "Jotkin maksut suoritettiin muuna valuuttana kuin euroina. Tämän vuoksi "
-#~ "tietyt pankit eivät välttämättä hyväksy tätä erää."
-
-#~ msgid "Swedish"
-#~ msgstr "Ruotsalainen"
-
-#~ msgid "Swiss"
-#~ msgstr "Sveitsi"
-
-#~ msgid ""
-#~ "Technical feature used during the file creation. A SEPA message is said "
-#~ "to be 'generic' if it cannot be considered as a standard european credit "
-#~ "transfer. That is if the bank journal is not in €, a transaction is not "
-#~ "in € or a payee is not identified by an IBAN account number."
-#~ msgstr ""
-#~ "Tekninen ominaisuus, jota käytetään tiedoston luomisessa. SEPA-sanomaa "
-#~ "sanotaan \"yleiseksi\", jos sitä ei voida pitää tavanomaisena "
-#~ "eurooppalaisena tilisiirtona. Tämä tarkoittaa, että pankkipäiväkirja ei "
-#~ "ole euromääräinen, maksutapahtuma ei ole euromääräinen tai maksunsaajaa "
-#~ "ei ole tunnistettu IBAN-tilinumerolla."
-
-#~ msgid ""
-#~ "The BIC code '%s' associated to the bank '%s' of bank account '%s' of "
-#~ "partner '%s' does not respect the required convention.\n"
-#~ "It must contain 8 or 11 characters and match the following structure:\n"
-#~ "- 4 letters: institution code or bank code\n"
-#~ "- 2 letters: country code\n"
-#~ "- 2 letters or digits: location code\n"
-#~ "- 3 letters or digits: branch code, optional\n"
-#~ msgstr ""
-#~ "Kumppanin \"%s\" pankkitilin \"%s\" pankkiin \"%s\" liittyvä BIC-koodi "
-#~ "\"%s\" ei ole vaaditun sopimuksen mukainen.\n"
-#~ "Sen on sisällettävä 8 tai 11 merkkiä ja vastattava seuraavaa rakennetta:\n"
-#~ "- 4 kirjainta: laitoksen koodi tai pankin koodi\n"
-#~ "- 2 kirjainta: maakoodi\n"
-#~ "- 2 kirjainta tai numeroa: sijaintikoodi\n"
-#~ "- 3 kirjainta tai numeroa: sivukonttorin koodi, valinnainen\n"
-
-#~ msgid ""
-#~ "The account %s, linked to partner '%s', is not of type IBAN.\n"
-#~ "A valid IBAN account is required to use SEPA features."
-#~ msgstr ""
-#~ "Kumppaniin \"%s\" liittyvä tili %s ei ole IBAN-tyyppinen.\n"
-#~ "SEPA-ominaisuuksien käyttäminen edellyttää voimassa olevaa IBAN-tiliä."
-
-#~ msgid ""
-#~ "The account %s, of journal '%s', is not of type IBAN.\n"
-#~ "A valid IBAN account is required to use SEPA features."
-#~ msgstr ""
-#~ "Tili %s, päiväkirjassa \"%s\", ei ole IBAN-tyyppinen.\n"
-#~ "SEPA-ominaisuuksien käyttäminen edellyttää voimassa olevaa IBAN-tiliä."
-
-#~ msgid ""
-#~ "The amount of the payment '%(payment)s' is too high. The maximum "
-#~ "permitted is %(limit)s."
-#~ msgstr ""
-#~ "Maksun '%(payment)s' määrä on liian suuri. Suurin sallittu arvo on %"
-#~ "(limit)s."
-
-#~ msgid ""
-#~ "The bank defined on account %s (from partner %s) has no BIC. Please first "
-#~ "set one."
-#~ msgstr ""
-#~ "Tilille %s (kumppanilta %s) määritellyllä pankilla ei ole BIC-koodia. "
-#~ "Aseta ensin sellainen."
+#~ msgid "Identification assigned by an institution (eg. VAT number)."
+#~ msgstr "Instituution myöntämä tunnus (esim. ALV-numero)."

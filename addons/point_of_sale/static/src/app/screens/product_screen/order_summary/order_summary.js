@@ -1,5 +1,5 @@
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
-import { Component } from "@odoo/owl";
+import { Component, computed, usePlugin } from "@odoo/owl";
 import { Orderline } from "@point_of_sale/app/components/orderline/orderline";
 import { useService } from "@web/core/utils/hooks";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
@@ -8,6 +8,8 @@ import { makeAwaitable } from "@point_of_sale/app/utils/make_awaitable_dialog";
 import { NumberPopup } from "@point_of_sale/app/components/popups/number_popup/number_popup";
 import { parseFloat } from "@web/views/fields/parsers";
 import { OrderDisplay } from "@point_of_sale/app/components/order_display/order_display";
+import { ChoseComboPopup } from "@point_of_sale/app/components/popups/chose_combo_popup/chose_combo_popup";
+import { PosNumberBufferPlugin } from "@point_of_sale/app/plugins/pos_number_buffer_plugin";
 
 export class OrderSummary extends Component {
     static template = "point_of_sale.OrderSummary";
@@ -15,11 +17,9 @@ export class OrderSummary extends Component {
         Orderline,
         OrderDisplay,
     };
-    static props = {};
 
     setup() {
-        super.setup();
-        this.numberBuffer = useService("number_buffer");
+        this.numberBuffer = usePlugin(PosNumberBufferPlugin);
         this.dialog = useService("dialog");
         this.pos = usePos();
 
@@ -29,22 +29,14 @@ export class OrderSummary extends Component {
         });
     }
 
-    get currentOrder() {
-        return this.pos.selectedOrder;
-    }
+    // We update the potential combos when the order changes
+    // or the quantity of the items changes.
+    potentialCombos = computed(() =>
+        this.pos.comboSuggestion.getApplicableProductCombo(this.currentOrder, "limited")
+    );
 
-    async editPackLotLines(line) {
-        const isAllowOnlyOneLot = line.product_id.isAllowOnlyOneLot();
-        let editedPackLotLines = [];
-        if (line.refunded_orderline_id) {
-            editedPackLotLines = await this.pos.editLotsRefund(line);
-        } else {
-            editedPackLotLines = await this.pos.editLots(
-                line.product_id,
-                line.getPackLotLinesToEdit(isAllowOnlyOneLot)
-            );
-        }
-        line.editPackLotLines(editedPackLotLines);
+    get currentOrder() {
+        return this.pos.getOrder();
     }
 
     clickLine(ev, orderline) {
@@ -69,13 +61,7 @@ export class OrderSummary extends Component {
 
         // Prevent if already sent to kitchen
         if (typeof order.id === "number") {
-            const preparation_data = await this.pos.data.call(
-                "pos.order",
-                "get_preparation_change",
-                [order.id]
-            );
-            const prep = JSON.parse(preparation_data.last_order_preparation_change || "{}");
-            if (prep.lines && Object.keys(prep.lines).some((l) => l === orderline.uuid)) {
+            if (orderline.prep_line_ids.length > 0) {
                 this.dialog.add(AlertDialog, {
                     title: _t("Cannot edit orderline"),
                     body: _t(
@@ -96,6 +82,7 @@ export class OrderSummary extends Component {
         };
 
         // Configurable product
+        const beforeValues = { ...values };
         let keepGoing = await this.pos.handleConfigurableProduct(
             values,
             productTemplate,
@@ -113,6 +100,10 @@ export class OrderSummary extends Component {
             line: orderline,
         });
         if (keepGoing === false) {
+            return false;
+        }
+
+        if (JSON.stringify(values) === JSON.stringify(beforeValues)) {
             return false;
         }
 
@@ -155,6 +146,10 @@ export class OrderSummary extends Component {
     async updateSelectedOrderline({ buffer, key }) {
         const order = this.pos.getOrder();
         const selectedLine = order.getSelectedOrderline();
+        if (key == "-" && !this.pos.accessRight.canNegateQuantity) {
+            this.numberBuffer.reset();
+            return;
+        }
         // Handling negation of value on first input
         if (buffer === "-0" && key == "-") {
             if (this.pos.numpadMode === "quantity" && !selectedLine.refunded_orderline_id) {
@@ -184,6 +179,18 @@ export class OrderSummary extends Component {
             }
             return;
         }
+
+        if (selectedLine?.isServiceFeeLine() && order.preset_id?.service_fee_type !== "fixed") {
+            this.numberBuffer.reset();
+            if (key === "Backspace") {
+                this.dialog.add(AlertDialog, {
+                    title: _t("Cannot modify a service fee"),
+                    body: _t("Service fees cannot be modified from the order."),
+                });
+            }
+            return;
+        }
+
         if (
             selectedLine &&
             this.pos.numpadMode === "quantity" &&
@@ -264,15 +271,32 @@ export class OrderSummary extends Component {
 
     async setLinePrice(line, price) {
         line.price_type = "manual";
-        line.setUnitPrice(price);
+        const parsedPrice = typeof price === "number" ? price : parseFloat(price);
+
+        if (line.product_id.to_weight) {
+            const val = line.getQuantityFromDisplayPrice(parsedPrice);
+            line.setQuantity(val, false);
+        } else {
+            price = line.getUnitPriceFromDisplayPrice(parsedPrice);
+            line.setUnitPrice(price);
+        }
     }
 
-    async _showDecreaseQuantityPopup() {
+    /**
+     * @param {Object} [options={}]
+     * @param {(value: string) => string} [options.formatDisplayedValue]
+     * @param {(value: string) => string} [options.parseQuantityValue]
+     */
+    async _showDecreaseQuantityPopup(options = {}) {
         this.numberBuffer.reset();
-        const inputNumber = await makeAwaitable(this.dialog, NumberPopup, {
+        let inputNumber = await makeAwaitable(this.dialog, NumberPopup, {
             title: _t("Set the new quantity"),
+            formatDisplayedValue: options.formatDisplayedValue,
         });
         if (inputNumber) {
+            inputNumber = options.parseQuantityValue
+                ? options.parseQuantityValue(inputNumber)
+                : inputNumber;
             const newQuantity = inputNumber && inputNumber !== "" ? parseFloat(inputNumber) : null;
             return await this.updateQuantityNumber(newQuantity);
         }
@@ -309,15 +333,14 @@ export class OrderSummary extends Component {
         if (selectedLine.combo_parent_id) {
             selectedLine = selectedLine.combo_parent_id;
         }
-        let current_saved_quantity = 0;
-        for (const line of this.currentOrder.lines) {
-            if (line === selectedLine) {
-                current_saved_quantity += line.uiState.savedQuantity;
-            } else if (
-                line.product_id.id === selectedLine.product_id.id &&
-                line.prices.total_excluded_currency === selectedLine.prices.total_excluded_currency
-            ) {
-                current_saved_quantity += line.qty;
+        let current_saved_quantity = selectedLine.uiState.savedQuantity;
+        const decreaseLineUuid = selectedLine.uiState.decreaseLineUuid;
+        if (decreaseLineUuid) {
+            const decreaseLine = this.currentOrder.lines.find(
+                (line) => line.uuid === decreaseLineUuid
+            );
+            if (decreaseLine) {
+                current_saved_quantity += decreaseLine.qty;
             }
         }
         const newLine = this.getNewLine();
@@ -338,18 +361,15 @@ export class OrderSummary extends Component {
         if (selectedLine.combo_parent_id) {
             selectedLine = selectedLine.combo_parent_id;
         }
-        const sign = selectedLine.getQuantity() > 0 ? 1 : -1;
         let newLine = selectedLine;
         if (selectedLine.uiState.savedQuantity != 0) {
-            for (const line of selectedLine.order_id.lines) {
-                if (
-                    line.product_id.id === selectedLine.product_id.id &&
-                    line.prices.total_excluded_currency ===
-                        selectedLine.prices.total_excluded_currency &&
-                    line.getQuantity() * sign < 0 &&
-                    line !== selectedLine
-                ) {
-                    return line;
+            const existingUuid = selectedLine.uiState.decreaseLineUuid;
+            if (existingUuid) {
+                const existing = selectedLine.order_id.lines.find(
+                    (line) => line.uuid === existingUuid
+                );
+                if (existing) {
+                    return existing;
                 }
             }
             const data = selectedLine.serializeForORM({ keepCommands: true });
@@ -364,7 +384,40 @@ export class OrderSummary extends Component {
                 true
             );
             newLine.setQuantity(0);
+            selectedLine.uiState.decreaseLineUuid = newLine.uuid;
         }
         return newLine;
+    }
+    get isComboApplicable() {
+        return this.potentialCombos().length > 0;
+    }
+    get bestComboName() {
+        const combos = this.potentialCombos();
+        let name = `
+            ${combos[0].quantity} ${combos[0].product.display_name}`;
+        if (combos.length > 1) {
+            name = _t("%s + Others", name);
+        }
+        return name;
+    }
+    async applyBestCombo(keepOpen = false) {
+        let comboToApply = false;
+        const bestPotentialCombos = this.pos.comboSuggestion.getPotentialCombos(this.currentOrder);
+        if (bestPotentialCombos.length > (keepOpen ? 0 : 1)) {
+            comboToApply = await makeAwaitable(this.dialog, ChoseComboPopup, {
+                potentialCombos: bestPotentialCombos,
+            });
+        } else if (bestPotentialCombos.length === 1) {
+            comboToApply = bestPotentialCombos[0];
+        }
+        if (comboToApply) {
+            // Apply the exact suggestion selected by the user.
+            await this.pos.createComboFromLines(
+                comboToApply.product.product_tmpl_id,
+                comboToApply.combinations
+            );
+            // If more combo applicable left, keep popup opened
+            await this.applyBestCombo(true);
+        }
     }
 }

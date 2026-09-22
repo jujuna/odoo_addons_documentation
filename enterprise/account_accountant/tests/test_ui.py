@@ -68,7 +68,9 @@ class TestUi(AccountTestMockOnlineSyncCommon):
         # Disable all onboarding tours
         self.env['web_tour.tour'].search([]).unlink()
 
-        # create what would be "demo data" as the sample invoice button does not appear when it is not present
+        # Mark the base module as having demo data so the "try our sample" button appears
+        self.env['ir.module.module'].sudo().search([('name', '=', 'base')]).write({'demo': True})
+        # action_create_vendor_bill requires base.res_partner_2 (a demo data record)
         if not self.env.ref('base.res_partner_2', raise_if_not_found=False):
             demo_partner = self.env['res.partner'].create({'name': 'Acme Corporation'})
             self.env['ir.model.data']._update_xmlids([{

@@ -1,24 +1,85 @@
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
+import { useService } from "@web/core/utils/hooks";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 
-import { DocumentsListActionItemDetails } from "./documents_list_action_item_details";
-import { DocumentsListActionItemDownload } from "./documents_list_action_item_download";
-import { DocumentsListActionItemOpenFolder } from "./documents_list_action_item_open_folder";
-import { DocumentsListActionItemRename } from "./documents_list_action_item_rename";
-import { DocumentsListActionItemShare } from "./documents_list_action_item_share";
-
 export class DocumentsListActionWidget extends Component {
-    static props = { ...standardWidgetProps };
+    props = useProps(standardWidgetProps);
     static template = "documents.DocumentsListActionWidget";
 
-    static actionItems = [
-        DocumentsListActionItemShare,
-        DocumentsListActionItemDownload,
-        DocumentsListActionItemRename,
-        DocumentsListActionItemDetails,
-        DocumentsListActionItemOpenFolder,
-    ];
+    setup() {
+        this.documentService = useService("document.document");
+    }
+
+    get actionItems() {
+        return [
+            {
+                name: "deepSearch",
+                icon: "search",
+                description: _t("Search in Folder"),
+                isVisible: () =>
+                    this.props.record.data.active && this.props.record.data.type === "folder",
+                onActionClicked: () =>
+                    this.env.searchModel.deepSearchFolder(this.props.record.data.id),
+            },
+            {
+                name: "share",
+                icon: "share",
+                description: _t("Share"),
+                isVisible: () =>
+                    this.props.record.isActive &&
+                    this.documentService.userIsInternal &&
+                    this.documentService.isFolderSharable(this.props.record.data),
+                onActionClicked: () =>
+                    this.documentService.openSharingDialog([this.props.record.data.id]),
+            },
+            {
+                name: "download",
+                icon: "download",
+                description: _t("Download"),
+                isVisible: () => this.props.record.data.type !== "request",
+                onActionClicked: () => this.documentService.downloadDocuments([this.props.record]),
+            },
+            {
+                name: "edit",
+                icon: "edit",
+                description: _t("Rename"),
+                isVisible: () =>
+                    this.props.record.isActive &&
+                    this.documentService.isEditable(this.props.record.data),
+                onActionClicked: async () => {
+                    await this.documentService.openDocumentFormDialog({
+                        documentId: this.props.record.data.id,
+                    });
+                    await this.env.model._notifyChange();
+                },
+            },
+            {
+                name: "details",
+                icon: "info",
+                description: _t("Details"),
+                isVisible: () => this.documentService.userIsInternal,
+                onActionClicked: async () => {
+                    if (this.documentService.focusedRecord.id !== this.props.record.id) {
+                        this.documentService.focusRecord(this.props.record);
+                        if (!this.documentService.state.rightPanelVisible) {
+                            this.documentService.toggleRightPanelVisibility();
+                        }
+                    } else {
+                        this.documentService.toggleRightPanelVisibility();
+                    }
+                },
+            },
+            {
+                name: "open",
+                icon: "login",
+                description: _t("Go inside"),
+                isVisible: () => this.props.record.data.type === "folder",
+                onActionClicked: () => this.props.record.openFolder(),
+            },
+        ];
+    }
 }
 
 export const documentsListActionWidget = {

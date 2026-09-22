@@ -1,9 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-
-from odoo import api, fields,models,_
-from odoo.exceptions import UserError
+from odoo import api, fields, models
+from odoo.tools import BinaryBytes
+from odoo.tools.pdf import PdfFileReader
+from odoo.tools.pdf.signature import IncrementalPdfMerge
 
 
 class SignTemplatePreview(models.TransientModel):
@@ -20,7 +20,8 @@ class SignTemplatePreview(models.TransientModel):
             if not wiz.template_id:
                 continue
             wiz.template_id.check_access('read')
-            output = wiz.document_id.with_context(bin_size=False).render_document_with_items()
-            pdf_data = base64.b64encode(output.getvalue())
-            output.close()
-            wiz.pdf_data = pdf_data
+            overlay_pdf_raw, overlay_regions = wiz.document_id.render_document_with_items()
+            incremental_pdf_merger = IncrementalPdfMerge(bytes(wiz.document_id.attachment_id.raw))
+            incremental_pdf_merger.merge_pdf_regions_as_annotations(
+                PdfFileReader(overlay_pdf_raw, strict=False), overlay_regions, "sign_items_preview")
+            wiz.pdf_data = BinaryBytes(incremental_pdf_merger.get_output_stream_value())

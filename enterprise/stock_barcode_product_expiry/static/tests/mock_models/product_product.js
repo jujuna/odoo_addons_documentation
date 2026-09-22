@@ -5,7 +5,6 @@ export class ProductProduct extends models.Model {
         selection: [
             ("serial", "By Unique Serial Number"),
             ("lot", "By Lots"),
-            ("none", "By Quantity"),
         ],
     });
     use_expiration_date = fields.Boolean();

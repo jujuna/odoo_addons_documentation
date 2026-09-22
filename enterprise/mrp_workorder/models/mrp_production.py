@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
-
 from ast import literal_eval
 from datetime import datetime
 
@@ -9,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import fields, models, _, api
 from odoo.exceptions import UserError
-from odoo.tools import file_open
+from odoo.tools import BinaryBytes, file_open
 
 
 class MrpProduction(models.Model):
@@ -20,8 +17,6 @@ class MrpProduction(models.Model):
     check_ids = fields.One2many('quality.check', 'production_id', string="Checks")
 
     employee_ids = fields.Many2many('hr.employee', string="working employees", compute='_compute_employee_ids', compute_sudo=True)
-
-    log_note = fields.Text(string="Log note")
 
     picking_type_auto_close = fields.Boolean(related='picking_type_id.auto_close_production')
 
@@ -35,8 +30,10 @@ class MrpProduction(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        if 'lot_producing_ids' in vals and self._has_workorders():
-            self.workorder_ids.check_ids.filtered(lambda c: c.test_type_id.technical_name == 'register_production').write({'lot_ids': self.lot_producing_ids.ids})
+        if 'lot_producing_ids' in vals:
+            if self._has_workorders():
+                self.workorder_ids.check_ids.lot_ids = self.lot_producing_ids
+            self.check_ids.lot_ids = self.lot_producing_ids
         return res
 
     def action_add_byproduct(self):
@@ -74,7 +71,7 @@ class MrpProduction(models.Model):
             'res_id': self.id,
             'res_model': 'mrp.production',
             'views': [[self.env.ref('mrp_workorder.mrp_production_view_form_log_note').id, 'form']],
-            'name': _('Add log note'),
+            'name': _('Notes'),
             'target': 'new',
             'context': {
                 'default_production_id': self.id,
@@ -90,8 +87,19 @@ class MrpProduction(models.Model):
             'workcenter_id': 0,  # Sets active WC to Overview
             'search_default_blocked': True,
             'shouldHideNewWorkcenterButton': True,
+            'shouldKeepMoFilter': True,
         }
         del action['context']['search_default_filter_ready']
+        return action
+
+    def _action_generate_backorder_wizard(self, quantity_issues):
+        action = super()._action_generate_backorder_wizard(quantity_issues)
+        if self.env.context.get('workorder_id_to_finish'):
+            split_mo_form = self.env.ref('mrp_workorder.view_mrp_production_split_mo_form')
+            action.update({
+                'view_id': split_mo_form.id,
+                'views': [[split_mo_form.id, 'form']],
+            })
         return action
 
     @api.depends('workorder_ids', 'workorder_ids.employee_ids')
@@ -105,24 +113,26 @@ class MrpProduction(models.Model):
             self.workorder_ids.verify_quality_checks()
         return res
 
-    def _update_catalog_line_quantity(self, line, quantity, **kwargs):
-        super()._update_catalog_line_quantity(line, quantity)
-        if kwargs.get('from_shop_floor'):
-            line.quantity = quantity
-            line.manual_consumption = True
+    def _catalog_create_new_line(
+        self, child_field, product, quantity, uom, *, from_shop_floor=False, **kwargs
+    ):
+        line = super()._catalog_create_new_line(
+            child_field, product, quantity, uom, from_shop_floor=from_shop_floor, **kwargs
+        )
 
-    def _get_new_catalog_line_values(self, product_id, quantity, **kwargs):
-        values = super()._get_new_catalog_line_values(product_id, quantity)
-        if kwargs.get('from_shop_floor'):
-            values.update({
-                'additional': True,
-                'manual_consumption': True,
-            })
-        if workorder_id := kwargs.get('workorder_id'):
-            workorder = self.env['mrp.workorder'].browse(workorder_id)
-            values['workorder_id'] = workorder_id
-            values['operation_id'] = workorder.operation_id.id
-        return values
+        if from_shop_floor:
+            line.quantity = quantity
+
+        return line
+
+    def _catalog_prepare_new_line_vals(self, *args, from_shop_floor=False, **kwargs) -> dict:
+        vals = super()._catalog_prepare_new_line_vals(
+            *args, from_shop_floor=from_shop_floor, **kwargs
+        )
+
+        if from_shop_floor:
+            vals['additional'] = True
+        return vals
 
     def can_load_samples(self):
         return self.sudo().env['mrp.production'].search_count([]) == 0
@@ -133,9 +143,10 @@ class MrpProduction(models.Model):
 
         warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.env.company.id)], limit=1)
 
-        def read_file_datas(path):
-            with file_open(path, "rb") as f:
-                return base64.b64encode(f.read())
+        def file_read(path: str) -> BinaryBytes:
+            """Read contents of a file using ``file_open``."""
+            with file_open(path, 'rb') as f:
+                return BinaryBytes(f.read())
 
         products = [{'xml_id': xmlid, 'noupdate': True, 'values': {
             'name': name,
@@ -143,7 +154,7 @@ class MrpProduction(models.Model):
             'uom_id': self.env.ref('uom.product_uom_unit').id,
             'description': desc,
             'default_code': code,
-            'image_1920': read_file_datas(img),
+            'image_1920': file_read(img),
         }} for (xmlid, name, desc, code, img) in (
             (
                 'mrp.product_product_computer_desk',
@@ -181,16 +192,15 @@ class MrpProduction(models.Model):
 
         bom = self.env['mrp.bom']._load_records([{'xml_id': 'mrp.mrp_bom_desk', 'noupdate': True, 'values': {
             'product_tmpl_id': table.product_tmpl_id.id,
-            'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+            'uom_id': self.env.ref('uom.product_uom_unit').id,
             'sequence': 3,
-            'consumption': 'flexible',
             'days_to_prepare_mo': 3,
         }}], True)
 
         bom_lines = [{'xml_id': xmlid, 'noupdate': True, 'values': {
             'product_id': prod,
             'product_qty': qty,
-            'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+            'uom_id': self.env.ref('uom.product_uom_unit').id,
             'sequence': seq,
             'bom_id': bom.id,
         }} for (xmlid, prod, qty, seq) in (
@@ -201,7 +211,7 @@ class MrpProduction(models.Model):
 
         MO = self.env['mrp.production']._load_records([{'xml_id': 'mrp.mrp_production_3', 'noupdate': True, 'values': {
             'product_id': table.id,
-            'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+            'uom_id': self.env.ref('uom.product_uom_unit').id,
             'product_qty': 1,
             'date_start': datetime.today() + relativedelta(days=1),
             'bom_id': bom.id,
@@ -212,7 +222,10 @@ class MrpProduction(models.Model):
         if self.env.user.has_group('mrp.group_mrp_routings'):
             WC = self.env['mrp.workcenter']._load_records([{'xml_id': 'mrp.mrp_workcenter_3', 'noupdate': True, 'values': {
                 'name': 'Assembly line 1',
-                'resource_calendar_id': self.env.ref('resource.resource_calendar_std').id,
+                'resource_calendar_id': (
+                    self.env.ref('mrp.mrp_workcenter_calendar', raise_if_not_found=False)
+                    or self.env.ref('resource.resource_calendar_std')
+                ).id,
             }}], True)
 
             routing = self.env['mrp.routing.workcenter']._load_records([{
@@ -234,9 +247,9 @@ class MrpProduction(models.Model):
                 'note': note,
                 'title': title,
                 'sequence': seq,
-                'component_id': comp,
-                'worksheet_document': worksheet_doc and read_file_datas(worksheet_doc),
-            }} for (xmlid, testtype, note, title, seq, comp, worksheet_doc) in (
+                'bom_line_id': bom_line and bom_line.id,
+                'worksheet_document': worksheet_doc and file_read(worksheet_doc),
+            }} for (xmlid, testtype, note, title, seq, bom_line, worksheet_doc) in (
                 (
                     'mrp_workorder.quality_point_register_serial_production',
                     'mrp_workorder.test_type_register_production',
@@ -252,7 +265,7 @@ class MrpProduction(models.Model):
                     'Please register consumption of the table top.',
                     'Component Registration: Table Head',
                     20,
-                    tabletop.id,
+                    bom_lines[0],
                     'mrp/static/img/cutting-worksheet-1.pdf',
                 ),
                 (
@@ -270,7 +283,7 @@ class MrpProduction(models.Model):
                     'Please register consumption of the table legs.',
                     'Component Registration: Table Legs',
                     70,
-                    tableleg.id,
+                    bom_lines[1],
                     'mrp/static/img/cutting-worksheet-4.pdf',
                 ),
                 (

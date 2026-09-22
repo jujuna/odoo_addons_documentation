@@ -9,6 +9,8 @@ class ProjectProject(models.Model):
 
     def _get_sale_orders_domain(self, all_sale_orders):
         domain = super()._get_sale_orders_domain(all_sale_orders)
+        if not self.env.context.get('from_embedded_action'):
+            return domain
         rental_filter = [('is_rental_order', '=', self.env.context.get('is_rental_order', False))]
         return Domain.AND([domain, rental_filter])
 

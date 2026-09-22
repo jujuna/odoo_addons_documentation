@@ -9,7 +9,7 @@
         <field name="project_id" model="product.product" eval="obj().env.ref('helpdesk.helpdesk_team3').project_id.id"/>
     </record>
 
-    <!-- set product template from product varient on helpdesk.sla -->
+    <!-- set product template from product variant on helpdesk.sla -->
     <function model="helpdesk.sla" name="write">
         <value model="helpdesk.sla" eval="obj().search([('id', '=', ref('helpdesk.helpdesk_sla_2'))]).ids"/>
         <value model="product.product" eval="{

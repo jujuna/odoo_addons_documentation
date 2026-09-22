@@ -4,7 +4,7 @@
         <field name="name">stock.picking.view.map</field>
         <field name="model">stock.picking</field>
         <field name="arch" type="xml">
-            <map res_partner="partner_id" default_order="batch_sequence" allow_resequence="true" routing="1">
+            <map res_partner="partner_id" default_order="batch_sequence" routing="optimized">
                 <field name="scheduled_date" string="Scheduled Date"/>
                 <field name="batch_sequence" string="Sequence"/>
             </map>

@@ -1,23 +1,22 @@
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
 import { useFileViewer } from "@web/core/file_viewer/file_viewer_hook";
-import { Component } from "@odoo/owl";
+import { Component, usePlugin, useProps } from "@odoo/owl";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { CheckAttachment } from "./account_return_check_attachment_model";
 import { downloadFile } from "@web/core/network/download";
+import { ORM } from "@web/core/orm_plugin";
 
 class AccountReturnCheckAttachmentViewer extends Component {
     static template = "account_reports.AccountReturnCheckAttachmentViewer";
     static components = {
 
     };
-    static props = {
-        ...standardWidgetProps,
-    };
+    props = useProps(standardWidgetProps);
+
+    orm = usePlugin(ORM);
 
     setup() {
         super.setup();
-        this.orm = useService("orm");
         this.fileViewer = useFileViewer();
     }
 

@@ -8,9 +8,7 @@ from odoo.addons.purchase_stock.tests.common import PurchaseTestCommon
 @tagged('post_install', '-at_install')
 class TestRepairPurchaseFlow(PurchaseTestCommon):
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    _test_user_groups = None  # FIXME list needed groups
 
     def test_repair_with_purchase_mto_link(self):
         """
@@ -30,7 +28,7 @@ class TestRepairPurchaseFlow(PurchaseTestCommon):
 
         product = self.product
         product.write({
-            'route_ids': [Command.set([self.route_mto.id, self.route_buy.id])],
+            'route_ids': [Command.set([self.route_mto.id])],
             'seller_ids': [
                 Command.create({
                     'partner_id': seller.id,

@@ -23,7 +23,7 @@ class TestKnowledgePublic(HttpCase):
         cls.env['knowledge.article'].with_context(active_test=False).search([]).unlink()
         cls.attachment = cls.env['ir.attachment'].create({
             'name': 'pixel',
-            'datas': 'R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=',
+            'raw': 'R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=',
             'res_model': 'knowledge.cover',
             'res_id': 0
         })
@@ -103,20 +103,6 @@ class TestKnowledgePublic(HttpCase):
             ['What is Odoo Experience? Odoo Experience is our largest event, taking place once a year. It brings t...'])
         self.assertEqual(
             root_html.xpath('/html/head/meta[@property="og:image"]/@content'),
-            [article.get_base_url() + article.cover_image_url])
-
-        # X meta tags:
-        self.assertEqual(
-            root_html.xpath('/html/head/meta[@name="twitter:title"]/@content'),
-            ['💬 Odoo Experience'])
-        self.assertEqual(
-            root_html.xpath('/html/head/meta[@name="twitter:description"]/@content'),
-            ['What is Odoo Experience? Odoo Experience is our largest event, taking place once a year. It brings t...'])
-        self.assertEqual(
-            root_html.xpath('/html/head/meta[@name="twitter:card"]/@content'),
-            ['summary_large_image'])
-        self.assertEqual(
-            root_html.xpath('/html/head/meta[@name="twitter:image"]/@content'),
             [article.get_base_url() + article.cover_image_url])
 
     @users('custom_public_user')

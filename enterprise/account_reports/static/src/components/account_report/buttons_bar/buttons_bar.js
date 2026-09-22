@@ -1,12 +1,12 @@
-import { Component, useState } from "@odoo/owl";
+import { Component, usePlugin } from "@odoo/owl";
+
+import { AccountReportController } from "@account_reports/components/account_report/controller";
+
 
 export class AccountReportButtonsBar extends Component {
     static template = "account_reports.AccountReportButtonsBar";
-    static props = {};
 
-    setup() {
-        this.controller = useState(this.env.controller);
-    }
+    controller = usePlugin(AccountReportController);
 
     //------------------------------------------------------------------------------------------------------------------
     // Buttons

@@ -7,22 +7,47 @@
 # Andy Yiu, 2022
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Junko Augias (juau)" <juau@odoo.com>, 2025.
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~15.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-10-20 02:40+0000\n"
-"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
-"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 01:01+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-master/"
 "delivery_easypost/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__4x4
+msgid "4x4"
+msgstr "4x4"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__4x6
+msgid "4x6"
+msgstr "4x6"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__6x4
+msgid "6x4"
+msgstr "6x4"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__7x3
+msgid "7x3"
+msgstr "7x3"
+
+#. module: delivery_easypost
+#: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_size__8_5x11
+msgid "8.5x11"
+msgstr "8.5x11"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -44,8 +69,8 @@ msgid ""
 msgstr ""
 "<b>アカウントが作成されたら、ダッシュボードに移動し、ユーザ名の横にある矢印を"
 "クリックして配送業者アカウントを設定します。</b>\n"
-"              <b>同じページの右側で、新しい配送業者アカウントを追加できます。"
-"</b>\n"
+"              <b>同じページの右側で、新しい配送業者アカウントを追加できます"
+"。</b>\n"
 "                <br/>"
 
 #. module: delivery_easypost
@@ -69,11 +94,6 @@ msgstr "保険料をロードするにはプロダクションキーが必要で
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "API keys"
 msgstr "APIキー"
-
-#. module: delivery_easypost
-#: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_easypost_carrier_type
-msgid "Cancel"
-msgstr "キャンセル"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_stock_package_type__package_carrier_type
@@ -132,6 +152,11 @@ msgid "Delivery Carrier"
 msgstr "配送業者"
 
 #. module: delivery_easypost
+#: model:ir.model,name:delivery_easypost.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "配送方法"
+
+#. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__display_name
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__display_name
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__display_name
@@ -145,8 +170,7 @@ msgstr "表示名"
 msgid ""
 "Do not forget to load your Easypost carrier accounts for a valid "
 "configuration."
-msgstr ""
-"有効な設定のため、Easypost配送業者アカウントを忘れずにロードして下さい。"
+msgstr "有効な設定のため、Easypost配送業者アカウントを忘れずにロードして下さい。"
 
 #. module: delivery_easypost
 #: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_file_type__epl2
@@ -186,6 +210,11 @@ msgid "Easypost Label File Type"
 msgstr "Easypostラベルファイルタイプ"
 
 #. module: delivery_easypost
+#: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_label_size
+msgid "Easypost Label Size"
+msgstr "Easypostラベルサイズ"
+
+#. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_stock_picking__ep_order_ref
 msgid "Easypost Order Reference"
 msgstr "Easypostオーダ参照"
@@ -196,10 +225,9 @@ msgid "Easypost Service"
 msgstr "Easypostサービス"
 
 #. module: delivery_easypost
-#: model_terms:ir.ui.view,arch_db:delivery_easypost.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_easypost.res_config_settings_view_form_stock
-msgid "Easypost Shipping Methods"
-msgstr "Easypost配送方法"
+#: model:ir.module.module,shortdesc:base.module_delivery_easypost
+msgid "Easypost Shipping"
+msgstr ""
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -265,13 +293,18 @@ msgid ""
 "It seems Easypost do not provide shipments for this order.                We "
 "advise you to try with another package type or service level."
 msgstr ""
-"Easypostはこのオーダに発送を提供していないようです。 　　　別のパッケージタイ"
-"プまたはサービスレベルでお試し頂くことをお勧めします。"
+"Easypostはこのオーダに発送を提供していないようです。 　　　別の"
+"パッケージタイプまたはサービスレベルでお試し頂くことをお勧めします。"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Label Format"
 msgstr "ラベルフォーマット"
+
+#. module: delivery_easypost
+#: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
+msgid "Label Size"
+msgstr "ラベルサイズ"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__write_uid
@@ -350,6 +383,11 @@ msgid "Select a carrier"
 msgstr "配送業者を選択"
 
 #. module: delivery_easypost
+#: model:ir.module.module,description:base.module_delivery_easypost
+msgid "Send your parcels through Easypost and track them online"
+msgstr ""
+
+#. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__name
 msgid "Service Level Name"
 msgstr "サービスレベル名"
@@ -359,11 +397,6 @@ msgstr "サービスレベル名"
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "Shipment created into Easypost<br/><b>Tracking Numbers:</b> %s<br/>"
 msgstr "Easypostでの発送が作成されました<br/><b>追跡番号:</b> %s<br/>"
-
-#. module: delivery_easypost
-#: model:ir.model,name:delivery_easypost.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "配送方法"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -384,40 +417,40 @@ msgstr "APIキーをテスト"
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Default Package Type)"
 msgstr ""
-"配送業者%sが見当たりません (欠落しているフィールド :\n"
-"デフォルトパッケージタイプ)"
+"%s の配信方法が不足しています(不足しているフィールド：\n"
+"デフォルト梱包タイプ)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Delivery Carrier Type)"
 msgstr ""
-"配送業者%sが見当たりません (欠落しているフィールド :\n"
-"配送配送業者タイプ)"
+"%s 配送方法が不足しています(不足しているフィールド:\n"
+" 配送業者タイプ)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Production API Key)"
 msgstr ""
-"配送業者%sが見当たりません (欠落しているフィールド :\n"
-"製造APIキー)"
+"%sの配送方法が未設定です（未入力の項目：\n"
+" ：本番用APIキー)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The %s carrier is missing (Missing field(s) :\n"
+"The %s delivery method is missing (Missing field(s) :\n"
 " Test API Key)"
 msgstr ""
-"配送業者%sが見当たりません (欠落しているフィールド :\n"
+"%s の配信方法が不足しています（不足しているフィールド：\n"
 "テストAPIキー)"
 
 #. module: delivery_easypost
@@ -485,8 +518,8 @@ msgid ""
 "You have no carrier linked to your Easypost Account.                Please "
 "connect to Easypost, link your account to carriers and then retry."
 msgstr ""
-"Easypost アカウントに配送業者がリンクされていません。 Easypostに接続し、アカ"
-"ウントを配送業者にリンクしてから再試行して下さい。"
+"Easypost アカウントに配送業者がリンクされていません。 Easypostに接続し、"
+"アカウントを配送業者にリンクしてから再試行して下さい。"
 
 #. module: delivery_easypost
 #: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_file_type__zpl
@@ -497,3 +530,6 @@ msgstr "FPO"
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "to create a new account:"
 msgstr "新規アカウントを作成:"
+
+msgid "Easypost Delivery Methods"
+msgstr "Easypost配送方法"

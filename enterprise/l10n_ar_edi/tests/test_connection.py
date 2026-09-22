@@ -1,6 +1,4 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import base64
-
 from contextlib import contextmanager
 from lxml import etree
 from unittest.mock import patch
@@ -9,13 +7,14 @@ from odoo.addons.account.tests.common import skip_unless_external
 from odoo.exceptions import RedirectWarning
 
 from odoo.addons.l10n_ar.tests.common import TestArCommon
-from odoo.tools.misc import file_open
 from odoo.tools.zeep.exceptions import Fault
 from odoo.tests import tagged
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install', *TestArCommon.extra_tags)
 class TestArConnection(TestArCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @contextmanager
     def mock_zeep_client(self, response, should_error=False):
@@ -58,16 +57,12 @@ class TestArConnection(TestArCommon):
         super().setUpClass()
         cls.ar_private_key = cls.env['certificate.key'].create({
             'name': 'AR Test Private key 1',
-            'content': base64.b64encode(
-                file_open("l10n_ar_edi/tests/private_key.pem", 'rb').read()
-            ),
+            'content': cls.file_read("l10n_ar_edi/tests/private_key.pem"),
         })
 
         cls.ar_certificate_1 = cls.env['certificate.certificate'].create({
             'name': 'AR Test certificate 1',
-            'content': base64.b64encode(
-                file_open("l10n_ar_edi/tests/test_cert1.crt", 'rb').read()
-            ),
+            'content': cls.file_read("l10n_ar_edi/tests/test_cert1.crt"),
             'private_key_id': cls.ar_private_key.id,
         })
 

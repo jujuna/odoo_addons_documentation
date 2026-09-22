@@ -18,12 +18,8 @@ class EnterpriseBaseMailPerformance(FullBaseMailPerformance):
             cls.user_admin.partner_id + cls.user_employee.partner_id +
             cls.user_follower_emp_email.partner_id +
             cls.user_follower_emp_inbox.partner_id +
-            cls.user_follower_portal.partner_id +
-            cls.partner_follower +
             cls.user_emp_inbox.partner_id +
-            cls.user_emp_email.partner_id +
-            cls.partner +
-            cls.customers
+            cls.user_emp_email.partner_id
         )
 
     def setUp(self):
@@ -34,9 +30,9 @@ class EnterpriseBaseMailPerformance(FullBaseMailPerformance):
     def _setup_ocn_for_partners(cls, partners, endpoint=None):
         """ Generate keys and tokens """
         cls.ocn_project_id = 'TestOcnProject'
-        cls.env['ir.config_parameter'].sudo().set_param('odoo_ocn.project_id', cls.ocn_project_id)
-        cls.env['ir.config_parameter'].sudo().set_param('mail_mobile.enable_ocn', True)
-        cls.env['ir.config_parameter'].sudo().set_param('mail_mobile.disable_redirect_firebase_dynamic_link', False)
+        cls.env['ir.config_parameter'].sudo().set_str('odoo_ocn.project_id', cls.ocn_project_id)
+        cls.env['ir.config_parameter'].sudo().set_bool('mail_mobile.enable_ocn', True)
+        cls.env['ir.config_parameter'].sudo().set_bool('mail_mobile.disable_redirect_firebase_dynamic_link', False)
 
         for partner in partners:
             partner.ocn_token = f'OCN Token {partner.id}'
@@ -75,7 +71,7 @@ class TestMailPerformance(EnterpriseBaseMailPerformance):
         self.ocn_iap_jsonrpc_mocked.reset_mock()  # reset as executed twice
         self.flush_tracking()
 
-        with self.assertQueryCount(employee=159):  # tme: 153
+        with self.assertQueryCount(employee=136):  # tme: 135
             new_message = record_ticket.message_post(
                 attachment_ids=attachments.ids,
                 # atmention a user, as it generates a different chunk for ocn
@@ -92,5 +88,5 @@ class TestMailPerformance(EnterpriseBaseMailPerformance):
             new_message.notified_partner_ids,
             self.user_follower_emp_email.partner_id + self.user_admin.partner_id + self.customers + self.user_follower_portal.partner_id
         )
-        self.assertEqual(self.push_to_end_point_mocked.call_count, 8, "Not sure why 8")
+        self.assertEqual(self.push_to_end_point_mocked.call_count, 2, "Not sure why 2")
         self.assertEqual(self.ocn_iap_jsonrpc_mocked.call_count, 2, "One call for standard, one call for at mention")

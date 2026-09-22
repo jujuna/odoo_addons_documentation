@@ -3,3 +3,4 @@
 
 from . import test_invoice_extract
 from . import test_invoice_extract_concurrency
+from . import test_res_partner_merge

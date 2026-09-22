@@ -7,12 +7,12 @@ import {
     serializeDateTime,
 } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
-import { x2ManyCommands } from "@web/core/orm_service";
+import { x2ManyCommands } from "@web/core/orm_plugin";
 import { registry } from "@web/core/registry";
-import { groupBy, unique } from "@web/core/utils/arrays";
+import { unique } from "@web/core/utils/arrays";
 import { KeepLast, Mutex } from "@web/core/utils/concurrency";
 import { pick } from "@web/core/utils/objects";
-import { Model } from "@web/model/model";
+import { addPropertyFieldDefs, Model } from "@web/model/model";
 import { parseServerValue } from "@web/model/relational_model/utils";
 import { formatFloatTime, formatPercentage } from "@web/views/fields/formatters";
 import { getScaleForCustomRange } from "./gantt_arch_parser";
@@ -42,7 +42,6 @@ const { DateTime } = luxon;
  * @property {[any, string][]} [selection]
  *
  * @typedef MetaData
- * @property {ConsolidationParams} consolidationParams
  * @property {string} dateStartField
  * @property {string} dateStopField
  * @property {string[]} decorationFields
@@ -109,10 +108,11 @@ export function parseServerValues(fields, values) {
 }
 
 export class GanttModel extends Model {
-    static services = ["notification"];
+    static services = ["notification", "ui"];
 
     setup(params, services) {
         this.notification = services.notification;
+        this.uiService = services.ui;
 
         /** @type {Data} */
         this.data = {};
@@ -145,6 +145,14 @@ export class GanttModel extends Model {
             pagerOffset: 0,
         };
 
+        await addPropertyFieldDefs(
+            this.orm,
+            metaData.resModel,
+            searchParams.context,
+            metaData.fields,
+            params.groupedBy
+        );
+
         if (!metaData.scale || !metaData.startDate || !metaData.stopDate) {
             Object.assign(
                 params,
@@ -162,11 +170,19 @@ export class GanttModel extends Model {
     //-------------------------------------------------------------------------
     // Public
     //-------------------------------------------------------------------------
+    get canScheduleEvents() {
+        return (
+            !this.uiService.isSmall &&
+            this.metaData.canSchedule &&
+            this.metaData.canEdit &&
+            !this.useSampleModel
+        );
+    }
 
     get hasMultiCreate() {
         return (
             !!this.metaData.multiCreateView &&
-            !this.env.isSmall &&
+            !this.uiService.isSmall &&
             this.displayParams.displayMode === "dense" &&
             this.metaData.scale.interval === "day"
         );
@@ -341,6 +357,16 @@ export class GanttModel extends Model {
         return this.closedRows.has(rowId);
     }
 
+    async loadMoreEventsToSchedule() {
+        const { records } = this.data.eventsToSchedule;
+        const limit = records.length + 20;
+        this.data.eventsToSchedule = await this._fetchEventsToSchedule({
+            limit,
+            metaData: this.metaData,
+        });
+        this.notify();
+    }
+
     async multiCreateRecords(multiCreateData, cellsInfo) {
         if (!cellsInfo.length) {
             return;
@@ -370,7 +396,7 @@ export class GanttModel extends Model {
         if (!ids.length) {
             return;
         }
-        await this.orm.unlink(this.metaData.resModel, ids);
+        await this.orm.webUnlink(this.metaData.resModel, ids);
         await this.fetchData();
     }
 
@@ -411,7 +437,7 @@ export class GanttModel extends Model {
          * @param {Field} field
          */
         const isSameValue = (record, { name, type }) => {
-            const recordValue = record[name];
+            const recordValue = record[name.split(".")[0]];
             let newValue = data[name];
             if (Array.isArray(newValue)) {
                 [newValue] = newValue;
@@ -421,7 +447,7 @@ export class GanttModel extends Model {
             } else if (type === "one2many") {
                 return recordValue[0] === newValue;
             } else if (type === "many2many") {
-                return recordValue.includes(newValue);
+                return this._getM2mRecordValue(recordValue, name).includes(newValue);
             } else if (type === "date") {
                 return serializeDate(recordValue) === newValue;
             } else if (type === "datetime") {
@@ -445,12 +471,46 @@ export class GanttModel extends Model {
         return trimmed;
     }
 
+    _getM2mRecordValue(recordValue, name) {
+        // The needed recordValue is nested inside the property field
+        return this.metaData.fields[name].relatedPropertyField
+            ? recordValue
+                  .find((field) => field.name === name.split(".")[1])
+                  ?.value?.map((el) => el[0]) ?? []
+            : recordValue;
+    }
+
     _getRescheduleData(ids, schedule) {
         if (!Array.isArray(ids)) {
             ids = [ids];
         }
         const allData = this._scheduleToData(schedule);
         return [ids, this.removeRedundantData(allData, ids), this._getRescheduleContext()];
+    }
+
+    /**
+     * @param {number} eventId
+     */
+    _getUnscheduleData(eventId) {
+        const { dateStartField, dateStopField } = this.metaData;
+        return {
+            [dateStartField]: false,
+            [dateStopField]: false,
+        };
+    }
+
+    _getUnscheduleContext() {
+        return { ...this.searchParams.context };
+    }
+
+    /**
+     * @param {number} eventId
+     */
+    async unscheduleEvent(eventId) {
+        await this.orm.write(this.metaData.resModel, [eventId], this._getUnscheduleData(eventId), {
+            context: this._getUnscheduleContext(),
+        });
+        await this.fetchData();
     }
 
     /**
@@ -661,29 +721,27 @@ export class GanttModel extends Model {
             ...additionalContext,
         };
         const domain = this._getDomain(metaData);
-        const fields = this._getFields(metaData);
-        const specification = {};
-        for (const fieldName of fields) {
-            specification[fieldName] = {};
-            if (metaData.fields[fieldName].type === "many2one") {
-                specification[fieldName].fields = { display_name: {} };
-            }
-        }
+        const specification = this._getRecordSpecification(metaData);
 
-        const ganttData = await this.keepLast.add(
-            this.orm.call(resModel, "get_gantt_data", [], {
-                domain,
-                groupby: groupedBy,
-                read_specification: specification,
-                scale: scale.unit,
-                start_date: serializeDateTime(globalStart),
-                stop_date: serializeDateTime(globalStop),
-                unavailability_fields: this._getUnavailabilityFields(metaData),
-                progress_bar_fields: this._getProgressBarFields(metaData),
-                context,
-                limit: pagerLimit,
-                offset: pagerOffset,
-            })
+        const [ganttData, sidePanelData] = await this.keepLast.add(
+            Promise.all([
+                this.orm.call(resModel, "get_gantt_data", [], {
+                    domain,
+                    groupby: groupedBy,
+                    read_specification: specification,
+                    scale: scale.unit,
+                    start_date: serializeDateTime(globalStart),
+                    stop_date: serializeDateTime(globalStop),
+                    unavailability_fields: this._getUnavailabilityFields(metaData),
+                    progress_bar_fields: this._getProgressBarFields(metaData),
+                    context,
+                    limit: pagerLimit,
+                    offset: pagerOffset,
+                }),
+                this.canScheduleEvents
+                    ? this._fetchEventsToSchedule({ metaData })
+                    : { records: [] },
+            ])
         );
 
         const { length, groups, records, progress_bars, unavailabilities } = ganttData;
@@ -700,6 +758,7 @@ export class GanttModel extends Model {
         });
         data.unavailabilities = this._processUnavailabilities(unavailabilities);
         data.progressBars = this._processProgressBars(progress_bars);
+        data.eventsToSchedule = sidePanelData;
 
         this._processGanttData(metaData, data, ganttData);
 
@@ -709,6 +768,29 @@ export class GanttModel extends Model {
         this.data = data;
         this.metaData = metaData;
         this._nextMetaData = null;
+    }
+
+    /**
+     * @protected
+     */
+    async _fetchEventsToSchedule(params) {
+        const { limit, metaData } = params;
+        const domain = this._getEventsToScheduleDomain(metaData);
+        return await this.orm.webSearchRead(metaData.resModel, domain, {
+            specification: { display_name: {} },
+            limit: limit || 20,
+            order: this._getEventsToScheduleOrder(),
+        });
+    }
+
+    /**
+     * Returns the order used to fetch events to schedule.
+     *
+     * @protected
+     * @returns {string}
+     */
+    _getEventsToScheduleOrder() {
+        return "";
     }
 
     /**
@@ -730,8 +812,7 @@ export class GanttModel extends Model {
     _filterDateIngroupedBy(metaData, groupedBy) {
         return groupedBy.filter((gb) => {
             const [fieldName] = gb.split(":");
-            const { type } = metaData.fields[fieldName];
-            return !["date", "datetime"].includes(type);
+            return !["date", "datetime"].includes(metaData.fields[fieldName]?.type);
         });
     }
 
@@ -741,11 +822,7 @@ export class GanttModel extends Model {
      * @param {string}
      */
     _formatTime(floatVal) {
-        const timeStr = formatFloatTime(floatVal, { noLeadingZeroHour: true });
-        const [hourStr, minuteStr] = timeStr.split(":");
-        const hour = parseInt(hourStr, 10);
-        const minute = parseInt(minuteStr, 10);
-        return minute ? _t("%(hour)sh%(minute)s", { hour, minute }) : _t("%sh", hour);
+        return formatFloatTime(floatVal);
     }
 
     /**
@@ -766,6 +843,17 @@ export class GanttModel extends Model {
         const groups = params.groups;
         const groupLevel = metaData.groupedBy.length - groupedBy.length;
         const parentGroup = params.parentGroup;
+
+        if (groupedBy.length && parentGroup.length === 0) {
+            // Records with no value on the grouped by field are grouped in a
+            // leading "undefined" row, which must exist even when no such
+            // record does. This is pointless when the field is required, as no
+            // record can ever land in that group.
+            const [fieldName] = groupedBy[0].split(":");
+            if (!metaData.fields[fieldName]?.required) {
+                groups.unshift({});
+            }
+        }
 
         if (!groupedBy.length || !groups.length) {
             const recordIds = [];
@@ -793,7 +881,7 @@ export class GanttModel extends Model {
         // Some groups might be empty (thanks to expand_groups), so we can't
         // simply group the data, we need to keep all returned groups
         const groupedByField = groupedBy[0];
-        const currentLevelGroups = groupBy(groups, (g) => {
+        const currentLevelGroups = Object.groupBy(groups, (g) => {
             if (g[groupedByField] === undefined) {
                 // we want to group the groups with undefined values for groupedByField with the ones
                 // with false value for the same field.
@@ -804,9 +892,7 @@ export class GanttModel extends Model {
             }
             return g[groupedByField];
         });
-        const { maxField } = metaData.consolidationParams;
-        const consolidate = groupLevel === 0 && groupedByField === maxField;
-        const generateSubRow = maxField ? true : groupedBy.length > 1;
+        const generateSubRow = groupedBy.length > 1;
         for (const key in currentLevelGroups) {
             const subGroups = currentLevelGroups[key];
             const value = subGroups[0][groupedByField];
@@ -821,7 +907,6 @@ export class GanttModel extends Model {
                 recordIds.push(...(g.__record_ids || []));
             }
             const row = {
-                consolidate,
                 fromServer,
                 groupedBy,
                 groupedByField,
@@ -882,6 +967,25 @@ export class GanttModel extends Model {
     }
 
     /**
+     * Get domain of unscheduled records to display in the gantt sidebar.
+     *
+     * @protected
+     * @param {MetaData} metaData
+     * @returns {any[]}
+     */
+    _getEventsToScheduleDomain(metaData) {
+        const { dateStartField, dateStopField } = metaData;
+        const domain = Domain.and([
+            Domain.removeDomainLeaves(this.searchParams.domain, [
+                dateStartField,
+                dateStopField,
+            ]).toList(),
+            ["&", [dateStartField, "=", false], [dateStopField, "=", false]],
+        ]);
+        return domain.toList();
+    }
+
+    /**
      * Format field value to display purpose.
      *
      * @protected
@@ -919,11 +1023,11 @@ export class GanttModel extends Model {
         if (metaData.colorField) {
             fields.add(metaData.colorField);
         }
-        if (metaData.consolidationParams.field) {
-            fields.add(metaData.consolidationParams.field);
+        if (metaData.bufferStartField) {
+            fields.add(metaData.bufferStartField);
         }
-        if (metaData.consolidationParams.excludeField) {
-            fields.add(metaData.consolidationParams.excludeField);
+        if (metaData.bufferStopField) {
+            fields.add(metaData.bufferStopField);
         }
         if (metaData.dependencyField) {
             fields.add(metaData.dependencyField);
@@ -934,6 +1038,18 @@ export class GanttModel extends Model {
         return [...fields];
     }
 
+    _getRecordSpecification(metaData) {
+        const fields = this._getFields(metaData);
+        const specification = {};
+        for (const fieldName of fields) {
+            specification[fieldName.split(".")[0]] = {};
+            if (metaData.fields[fieldName.split(".")[0]].type === "many2one") {
+                specification[fieldName].fields = { display_name: {} };
+            }
+        }
+        return specification;
+    }
+
     /**
      * @protected
      * @param {MetaData} metaData
@@ -941,12 +1057,7 @@ export class GanttModel extends Model {
      * @returns {string[]}
      */
     _getGroupedBy(metaData, searchParams) {
-        let groupedBy = [...searchParams.groupBy];
-        groupedBy = groupedBy.filter((gb) => {
-            const [fieldName] = gb.split(".");
-            const field = metaData.fields[fieldName];
-            return field?.type !== "properties";
-        });
+        const groupedBy = [...searchParams.groupBy];
         return this._filterDateIngroupedBy(metaData, groupedBy);
     }
 
@@ -1109,6 +1220,9 @@ export class GanttModel extends Model {
             ratio: progressBar.max_value ? (progressBar.value / progressBar.max_value) * 100 : 0,
             warning,
         };
+        processedProgressBar.available =
+            processedProgressBar.max_value - processedProgressBar.value;
+        processedProgressBar.available_formatted = this._formatTime(processedProgressBar.available);
         if (processedProgressBar?.max_value) {
             processedProgressBar.ratio_formatted = formatPercentage(
                 processedProgressBar.ratio / 100

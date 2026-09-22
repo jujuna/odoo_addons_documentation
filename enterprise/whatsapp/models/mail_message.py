@@ -61,19 +61,11 @@ class MailMessage(models.Model):
             })
             self._bus_send_reaction_group(reaction_content)
 
-    def _to_store_defaults(self, target):
-        return super()._to_store_defaults(target) + ["whatsappStatus"]
-
-    def _to_store(self, store: Store, fields, **kwargs):
-        super()._to_store(store, [field for field in fields if field != "whatsappStatus"], **kwargs)
-        if "whatsappStatus" not in fields:
-            return
-        if whatsapp_mail_messages := self.filtered(lambda m: m.message_type == "whatsapp_message"):
-            for whatsapp_message in (
-                self.env["whatsapp.message"]
-                .sudo()
-                .search([("mail_message_id", "in", whatsapp_mail_messages.ids)])
-            ):
-                store.add(
-                    whatsapp_message.mail_message_id, {"whatsappStatus": whatsapp_message.state}
-                )
+    def _store_message_fields(self, res: Store.FieldList, **kwargs):
+        super()._store_message_fields(res, **kwargs)
+        # sudo: whatsapp.message - can read the state of accessible messages
+        res.attr(
+            "whatsappStatus",
+            lambda m: m.sudo().wa_message_ids[:1].state,
+            predicate=lambda m: m.message_type == "whatsapp_message",
+        )

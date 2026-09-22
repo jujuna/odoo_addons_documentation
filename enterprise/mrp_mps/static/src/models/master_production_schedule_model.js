@@ -34,31 +34,29 @@ export class MasterProductionScheduleModel extends EventBus {
         this.notify();
     }
 
-    async reload(productionScheduleId) {
-        return await this.orm.call(
+    async reload(productionScheduleIds) {
+        const impactedScheduleIds = await this.orm.call(
             'mrp.production.schedule',
             'get_impacted_schedule',
-            [productionScheduleId, this.domain],
-        ).then((productionScheduleIds) => {
-            productionScheduleIds.push(productionScheduleId);
-            const visibleScheduleIds = new Set(this.data.production_schedule_ids.map(ps => ps.id));
-            const filteredScheduleIds = productionScheduleIds.filter(id => visibleScheduleIds.has(id));
-            return this.orm.call(
-                'mrp.production.schedule',
-                'get_production_schedule_view_state',
-                [filteredScheduleIds, this.scale],
-            );
-        }).then((production_schedule_ids) => {
-            for (var i = 0; i < production_schedule_ids.length; i++) {
-                const index = this.data.production_schedule_ids.findIndex(ps => ps.id === production_schedule_ids[i].id);
-                if (index >= 0) {
-                    this.data.production_schedule_ids.splice(index, 1, production_schedule_ids[i]);
-                } else {
-                    this.data.production_schedule_ids.push(production_schedule_ids[i]);
-                }
+            [productionScheduleIds, this.domain],
+        );
+        const scheduleIdsToReload = new Set([...productionScheduleIds, ...impactedScheduleIds]);
+        const visibleScheduleIds = new Set(this.data.production_schedule_ids.map(ps => ps.id));
+        const filteredScheduleIds = [...scheduleIdsToReload].filter(id => visibleScheduleIds.has(id));
+        const productionSchedules = await this.orm.call(
+            'mrp.production.schedule',
+            'get_production_schedule_view_state',
+            [filteredScheduleIds, this.scale],
+        );
+        for (const productionSchedule of productionSchedules) {
+            const index = this.data.production_schedule_ids.findIndex(ps => ps.id === productionSchedule.id);
+            if (index >= 0) {
+                this.data.production_schedule_ids.splice(index, 1, productionSchedule);
+            } else {
+                this.data.production_schedule_ids.push(productionSchedule);
             }
-            this.notify();
-        });
+        }
+        this.notify();
     }
 
     notify() {
@@ -82,13 +80,7 @@ export class MasterProductionScheduleModel extends EventBus {
                 'mrp.production.schedule',
                 'action_replenish',
                 [productionScheduleIds, basedOnLeadTime],
-            ).then(() => {
-                if (productionScheduleIds.length === 1) {
-                    this.reload(productionScheduleIds[0]);
-                } else {
-                    this.load();
-                }
-            });
+            ).then(() => this.reload(productionScheduleIds));
         });
     }
 
@@ -120,7 +112,7 @@ export class MasterProductionScheduleModel extends EventBus {
                 'set_forecast_qty',
                 [productionScheduleId, dateIndex, forecastQty, this.scale],
             ).then(() => {
-                return this.reload(productionScheduleId);
+                return this.reload([productionScheduleId]);
             });
         });
     }
@@ -155,7 +147,7 @@ export class MasterProductionScheduleModel extends EventBus {
                 target: 'new',
                 res_id: productionScheduleId,
             }, {
-                onClose: () => {this.reload(productionScheduleId)},
+                onClose: () => this.reload([productionScheduleId]),
             });
         });
     }
@@ -178,17 +170,19 @@ export class MasterProductionScheduleModel extends EventBus {
                         const index = this.data.production_schedule_ids.findIndex(ps => ps.id === productionScheduleId);
                         this.data.production_schedule_ids.splice(index, 1);
                     }
-                    this.notify();
+                    this.data.production_schedule_ids.length ? this.notify() : this.trigger("reload");
                 });
             });
         }
         const body = productionScheduleIds.length > 1
-            ? _t("Are you sure you want to delete these records?")
-            : _t("Are you sure you want to delete this record?");
+            ? _t("Are you sure you want to remove these products from your schedule?\nAll forecasts will be gone for good.")
+            : _t("Are you sure you want to remove this product from your schedule?\nAll forecasts will be gone for good.");
         this.dialog.add(ConfirmationDialog, {
             body: body,
-            title: _t("Confirmation"),
+            title: _t("Remove Product Lines"),
+            confirmLabel: _t("Remove lines"),
             confirm: doIt.bind(this),
+            cancel: () => {},
         });
     }
 
@@ -235,7 +229,7 @@ export class MasterProductionScheduleModel extends EventBus {
                 'set_replenish_qty',
                 [productionScheduleId, dateIndex, replenishQty, this.scale],
             ).then(() => {
-                return this.reload(productionScheduleId);
+                return this.reload([productionScheduleId]);
             });
         });
     }
@@ -254,7 +248,7 @@ export class MasterProductionScheduleModel extends EventBus {
                 'remove_replenish_qty',
                 [productionScheduleId, dateIndex, this.scale]
             ).then(() => {
-                return this.reload(productionScheduleId);
+                return this.reload([productionScheduleId]);
             });
         });
     }
@@ -314,26 +308,6 @@ export class MasterProductionScheduleModel extends EventBus {
             this.selectAll();
         }
         this.trigger('update');
-    }
-
-    _toggleIsIndirect(productionScheduleIds) {
-        this.mutex.exec(() => {
-            return this.orm.call(
-                'mrp.production.schedule',
-                'action_toggle_is_indirect',
-                [productionScheduleIds],
-            ).then(() => {
-                if (productionScheduleIds.length === 1) {
-                    this.reload(productionScheduleIds[0]);
-                } else {
-                    this.load();
-                }
-            });
-        });
-    }
-
-    toggleIsIndirect() {
-        return this._toggleIsIndirect(Array.from(this.selectedRecords));
     }
 
 }

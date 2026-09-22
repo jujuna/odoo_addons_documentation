@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 
 
 from odoo import api, fields, models, _
-from odoo.tools import SQL
+from odoo.tools import format_date, SQL
 from odoo.exceptions import UserError
 
 
@@ -23,7 +23,7 @@ class ReportL10n_In_Hr_PayrollReport_Hryearlysalary(models.AbstractModel):
         # Get name of the months from integer
         month_name = []
         for month in range(1, 13):
-            month_name.append(date(year, month, 1).strftime('%b'))
+            month_name.append(format_date(self.env, date(year, month, 1), date_format='MMM'))
             months.append(f"{month:02d}-{year}")
         return [month_name], months
 
@@ -73,19 +73,25 @@ class ReportL10n_In_Hr_PayrollReport_Hryearlysalary(models.AbstractModel):
 
         self.env.cr.execute(SQL(
             """
-                  SELECT src.code, pl.name, sum(pl.total), to_char(p.date_to,'mm-yyyy') as to_date, ps.name
+                  SELECT
+                      src.code,
+                      COALESCE(pl.custom_name, sr.name->>%(lang)s) AS line_name,
+                      sum(pl.total),
+                      to_char(p.date_to,'mm-yyyy') as to_date,
+                      ps.name
                     FROM hr_payslip_line as pl
                     LEFT JOIN hr_salary_rule AS sr on sr.id = pl.salary_rule_id
-                    LEFT JOIN hr_salary_rule_category AS src on (sr.category_id = src.id)
+                    LEFT JOIN hr_salary_rule_hr_salary_rule_category_rel AS rel ON rel.hr_salary_rule_id = sr.id
+                    LEFT JOIN hr_salary_rule_category AS src ON src.id = rel.hr_salary_rule_category_id
                     LEFT JOIN hr_payslip as p on pl.slip_id = p.id
                     LEFT JOIN hr_employee as e on e.id = p.employee_id
                     LEFT JOIN hr_payroll_structure as ps on ps.id = p.struct_id
                    WHERE p.employee_id = %(employee_id)s
                      AND p.state = 'paid'
                      AND p.date_from >= %(date_from)s AND p.date_to <= %(date_to)s
-                   GROUP BY src.parent_id, pl.sequence, pl.id, sr.category_id, pl.name, p.date_to, src.code, ps.name
+                   GROUP BY src.parent_id, pl.sequence, pl.id, COALESCE(pl.custom_name, sr.name->>%(lang)s), p.date_to, src.code, ps.name
                    ORDER BY pl.sequence, src.parent_id
-            """, employee_id=emp_id, date_from=date_from, date_to=date_to
+            """, employee_id=emp_id, date_from=date_from, date_to=date_to, lang=lang_code
         ))
 
         for category_code, item_name, amount, payslip_date, structure_name in self.env.cr.fetchall():
@@ -126,8 +132,9 @@ class ReportL10n_In_Hr_PayrollReport_Hryearlysalary(models.AbstractModel):
         docs = self.env[model].browse(self.env.context.get('active_id'))
         employees = self._get_employee(data['form'])
         month_name, months = self._get_periods_new(data['form'])
-        date_from = fields.Date.today() + relativedelta(day=1, month=1, year=int(data['form']['year']))
-        date_to = fields.Date.today() + relativedelta(day=31, month=12, year=int(data['form']['year']))
+        today = fields.Date.context_today(self)
+        date_from = today + relativedelta(day=1, month=1, year=int(data['form']['year']))
+        date_to = today + relativedelta(day=31, month=12, year=int(data['form']['year']))
 
         employee_data = {}
         for employee in employees:

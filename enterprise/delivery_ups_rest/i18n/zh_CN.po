@@ -4,21 +4,22 @@
 #
 # "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-11-14 15:22+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-08-28 17:49+0000\n"
+"PO-Revision-Date: 2026-09-18 03:24+0000\n"
+"Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
-"projects/odoo-19/delivery_ups_rest/zh_Hans/>\n"
+"projects/odoo-master/delivery_ups_rest/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_bill_my_account
@@ -78,6 +79,22 @@ msgstr "创建一个账户在"
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid "Create an app"
 msgstr "创建一个应用程序"
+
+#. module: delivery_ups_rest
+#: model:ir.model,name:delivery_ups_rest.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "送货方式"
+
+#. module: delivery_ups_rest
+#. odoo-python
+#: code:addons/delivery_ups_rest/models/ups_request.py:0
+msgid ""
+"Detected a problem when validating delivery %(delivery_name)s. Invoicing "
+"address of the commercial invoice has been defaulted to %(ship_to_partner)s "
+"instead of %(sold_to_partner)s to avoid the following error from UPS: \"The "
+"Sold To party's country code must be the same as the Ship To party's country "
+"code with the exception of Canada and satellite countries.\""
+msgstr ""
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__display_name
@@ -180,19 +197,18 @@ msgstr "为您的应用程序命名，"
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid ""
-"Now go to odoo and create a shipping method for UPS, using Account Number "
+"Now go to odoo and create a delivery method for UPS, using Account Number "
 "(step2) and Client ID + Client Secret (step 8). Also ensure you use correct "
 "dimensions and weight unit for your country"
 msgstr ""
-"现在进入 odoo，使用帐号（第 2 步）和客户 ID + 客户密文（第 8 步）为 UPS 创建"
-"运输方法。同时确保使用所在国家/地区适用的正确尺寸和重量单位"
+"现在请进入 Odoo，使用账户号码（步骤 2）以及客户 ID + 客户密钥（步骤 8）为 "
+"UPS 创建一种配送方式。同时请确保使用您所在国家的正确尺寸和重量单位。"
 
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid ""
 "Now open your app, you'll have your <b>Client ID</b> and <b>Client Secret</b>"
-msgstr ""
-"现在，开启您的应用程序，将会有您的<b>客户识别码</b> 以及<b>客户密钥</b>"
+msgstr "现在，开启您的应用程序，将会有您的<b>客户识别码</b> 以及<b>客户密钥</b>"
 
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
@@ -249,8 +265,8 @@ msgstr "收件人"
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
-msgid "Recipient Phone must be at least 10 alphanumeric characters."
-msgstr "收件人电话必须至少为10个字母数字字符。"
+msgid "Recipient Phone must be between 1 and 15 alphanumeric characters."
+msgstr ""
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_require_signature
@@ -288,6 +304,14 @@ msgid "Save and Accept terms and your app is created!"
 msgstr "保存并接受条款，然后您的应用程序就完成创建了！"
 
 #. module: delivery_ups_rest
+#: model:ir.module.module,summary:base.module_delivery_ups_rest
+msgid ""
+"Send your shippings through UPS and track them online. This new version of "
+"the UPS connector is compatiblewith the newest version of the UPS REST APIs "
+"available at https://developer.ups.com/"
+msgstr ""
+
+#. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_duty_payment__sender
 msgid "Sender"
 msgstr "发送者"
@@ -305,19 +329,14 @@ msgid ""
 "Shipment created into UPS<br/><b>Tracking Numbers:</b> %"
 "(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
 msgstr ""
-"已在 UPS 中创建货运<br/><b>追踪编号：</b>%(tracking_numbers)s<br/><b>包裹</"
-"b>%(packages)s"
+"已在 UPS 中创建货运<br/><b>追踪编号：</b>%(tracking_numbers)s<br/><b>包裹</b>"
+"%(packages)s"
 
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
-msgid "Shipper Phone must be at least 10 alphanumeric characters."
-msgstr "托运人电话必须至少为10个字母数字字符。"
-
-#. module: delivery_ups_rest
-#: model:ir.model,name:delivery_ups_rest.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "送货方式"
+msgid "Shipper Phone must be between 1 and 15 alphanumeric characters."
+msgstr ""
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -489,6 +508,11 @@ msgid "UPS Service Type"
 msgstr "UPS服务方式"
 
 #. module: delivery_ups_rest
+#: model:ir.module.module,shortdesc:base.module_delivery_ups_rest
+msgid "UPS Shipping"
+msgstr ""
+
+#. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_default_service_type__11
 msgid "UPS Standard"
 msgstr "UPS 标准"
@@ -524,8 +548,7 @@ msgstr "UPS帐号"
 msgid ""
 "UPS address lines can only contain a maximum of 35 characters. You can split "
 "the contacts addresses on multiple lines to try to avoid this limitation."
-msgstr ""
-"UPS地址行最多只能包含35个字符。您可以将联系人地址拆分为多行以避免此限制。"
+msgstr "UPS地址行最多只能包含35个字符。您可以将联系人地址拆分为多行以避免此限制。"
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -546,8 +569,8 @@ msgstr "UPS 包裹重量单位"
 #. module: delivery_ups_rest
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
-msgid "Warehouse Phone must be at least 10 alphanumeric characters."
-msgstr "仓库电话必须至少有10个字母数字字符。"
+msgid "Warehouse Phone must be between 1 and 15 alphanumeric characters."
+msgstr ""
 
 #. module: delivery_ups_rest
 #. odoo-python

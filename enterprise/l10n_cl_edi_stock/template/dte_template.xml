@@ -2,6 +2,7 @@
 <odoo>
     <data>
         <template id="dte_subtemplate">
+            <t t-set="issuer" t-value="picking.company_id._l10n_cl_get_root_company()"/>
             <Encabezado>
                 <IdDoc>
                     <TipoDTE t-out="picking.l10n_latam_document_type_id.code"/>
@@ -10,11 +11,11 @@
                     <IndTraslado t-out="picking.l10n_cl_delivery_guide_reason"/>
                 </IdDoc>
                 <Emisor>
-                    <RUTEmisor t-out="format_vat(picking.company_id.vat)"/>
-                    <RznSoc t-out="format_length(picking.company_id.partner_id.name, 100)"/>
-                    <GiroEmis t-out="format_length(picking.company_id.l10n_cl_activity_description, 80)"/>
+                    <RUTEmisor t-out="format_vat(issuer.vat)"/>
+                    <RznSoc t-out="format_length(issuer.partner_id.name, 100)"/>
+                    <GiroEmis t-out="format_length(issuer.l10n_cl_activity_description, 80)"/>
                     <Telefono t-if="picking.company_id.phone and not picking.l10n_latam_document_type_id._is_doc_type_voucher()" t-out="format_length(picking.company_id.phone, 20)"/>
-                    <CorreoEmisor t-out="picking.company_id.l10n_cl_dte_email"/>
+                    <CorreoEmisor t-out="issuer.l10n_cl_dte_email"/>
                 <t t-foreach="picking.company_id.l10n_cl_company_activity_ids" t-as="activity">
                     <Acteco t-out="activity.code"/>
                 </t>
@@ -64,7 +65,7 @@
                 <NmbItem t-out="format_length(line.product_id.name, 80)"/>
                 <DscItem t-out="format_length(line.product_id.name, 1000)"/>
                 <QtyItem t-out="float_repr(line.quantity, 6)"/>
-                <UnmdItem t-out="format_uom(line.product_uom)"/>
+                <UnmdItem t-out="format_uom(line.uom_id)"/>
                 <PrcItem t-if="line_amounts.get('price_unit', False)" t-out="float_repr(line_amounts['price_unit'], 6)"/>
             <t t-if="line_amounts.get('discount', False)">
                 <DescuentoPct t-out="float_repr(line_amounts['discount'], 2)"/>

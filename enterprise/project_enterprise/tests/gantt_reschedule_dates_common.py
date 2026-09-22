@@ -36,9 +36,6 @@ class ProjectEnterpriseGanttRescheduleCommon(TestProjectCommon):
 
         super().setUpClass()
 
-        test_additional_context = {'mail_create_nolog': True, 'tracking_disable': True, 'mail_notrack': True}
-        test_context = dict(cls.env.context, **test_additional_context)
-        cls.env = cls.env(context=test_context)
         cls.maxDiff = None
 
         cls.ProjectTask = cls.env['project.task']
@@ -50,7 +47,6 @@ class ProjectEnterpriseGanttRescheduleCommon(TestProjectCommon):
         cls.project_pigs.write({
             'allow_task_dependencies': True,
         })
-        cls.task_1 = cls.task_1.with_context(**test_context)
         cls.task_1_planned_date_begin = datetime(2021, 6, 24, 9, 0, 0)
         cls.task_1_date_deadline = datetime(2021, 6, 24, 12, 0, 0)
         cls.task_1.write({
@@ -120,82 +116,46 @@ class ProjectEnterpriseGanttRescheduleCommon(TestProjectCommon):
             'name': '40h calendar',
             'attendance_ids': [
                 (0, 0, {
-                    'name': 'Monday Morning', 'dayofweek': '0',
-                    'hour_from': 8, 'hour_to': 12,
-                    'day_period': 'morning'}
+                    'dayofweek': '0',
+                    'hour_from': 8, 'hour_to': 12}
                 ),
                 (0, 0, {
-                    'name': 'Monday Lunch', 'dayofweek': '0',
-                    'hour_from': 12, 'hour_to': 13,
-                    'day_period': 'lunch'}
+                    'dayofweek': '0',
+                    'hour_from': 13, 'hour_to': 17}
                 ),
                 (0, 0, {
-                    'name': 'Monday Evening', 'dayofweek': '0',
-                    'hour_from': 13, 'hour_to': 17,
-                    'day_period': 'afternoon'}
+                    'dayofweek': '1',
+                    'hour_from': 8, 'hour_to': 12}
                 ),
                 (0, 0, {
-                    'name': 'Tuesday Morning', 'dayofweek': '1',
-                    'hour_from': 8, 'hour_to': 12,
-                    'day_period': 'morning'}
+                    'dayofweek': '1',
+                    'hour_from': 13, 'hour_to': 17}
                 ),
                 (0, 0, {
-                    'name': 'Tuesday Lunch', 'dayofweek': '1',
-                    'hour_from': 12, 'hour_to': 13,
-                    'day_period': 'lunch'}
+                    'dayofweek': '2',
+                    'hour_from': 8, 'hour_to': 12}
                 ),
                 (0, 0, {
-                    'name': 'Tuesday Evening', 'dayofweek': '1',
-                    'hour_from': 13, 'hour_to': 17,
-                    'day_period': 'afternoon'}
+                    'dayofweek': '2',
+                    'hour_from': 13, 'hour_to': 17}
                 ),
                 (0, 0, {
-                    'name': 'Wednesday Morning', 'dayofweek': '2',
-                    'hour_from': 8, 'hour_to': 12,
-                    'day_period': 'morning'}
+                    'dayofweek': '3',
+                    'hour_from': 8, 'hour_to': 12}
                 ),
                 (0, 0, {
-                    'name': 'Wednesday Lunch', 'dayofweek': '2',
-                    'hour_from': 12, 'hour_to': 13,
-                    'day_period': 'lunch'}
+                    'dayofweek': '3',
+                    'hour_from': 13, 'hour_to': 17}
                 ),
                 (0, 0, {
-                    'name': 'Wednesday Evening', 'dayofweek': '2',
-                    'hour_from': 13, 'hour_to': 17,
-                    'day_period': 'afternoon'}
+                    'dayofweek': '4',
+                    'hour_from': 8, 'hour_to': 12}
                 ),
                 (0, 0, {
-                    'name': 'Thursday Morning', 'dayofweek': '3',
-                    'hour_from': 8, 'hour_to': 12,
-                    'day_period': 'morning'}
-                ),
-                (0, 0, {
-                    'name': 'Thursday Lunch', 'dayofweek': '3',
-                    'hour_from': 12, 'hour_to': 13,
-                    'day_period': 'lunch'}
-                ),
-                (0, 0, {
-                    'name': 'Thursday Evening', 'dayofweek': '3',
-                    'hour_from': 13, 'hour_to': 17,
-                    'day_period': 'afternoon'}
-                ),
-                (0, 0, {
-                    'name': 'Friday Morning', 'dayofweek': '4',
-                    'hour_from': 8, 'hour_to': 12,
-                    'day_period': 'morning'}
-                ),
-                (0, 0, {
-                    'name': 'Friday Lunch', 'dayofweek': '4',
-                    'hour_from': 12, 'hour_to': 13,
-                    'day_period': 'lunch'}
-                ),
-                (0, 0, {
-                    'name': 'Friday Evening', 'dayofweek': '4',
-                    'hour_from': 13, 'hour_to': 17,
-                    'day_period': 'afternoon'}
+                    'dayofweek': '4',
+                    'hour_from': 13, 'hour_to': 17}
                 ),
             ],
-            'tz': 'UTC',
         })
         cls.annual_holiday = cls.env['resource.calendar.leaves'].create({
             'name': 'Building leave',

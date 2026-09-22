@@ -7,7 +7,6 @@ class HrAppraisalGoalSkill(models.Model):
     _name = "hr.appraisal.goal.skill"
     _inherit = "hr.individual.skill.mixin"
     _description = "Skills for goal positions"
-    _order = "skill_type_id, skill_level_id desc"
     _rec_name = "skill_id"
 
     goal_id = fields.Many2one(

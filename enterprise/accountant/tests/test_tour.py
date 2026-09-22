@@ -8,6 +8,8 @@ from odoo.addons.account.tests.common import AccountTestInvoicingHttpCommon
 
 @odoo.tests.tagged('post_install_l10n', 'post_install', '-at_install')
 class TestAccountantTours(AccountTestInvoicingHttpCommon):
+    _test_user_groups = None  # FIXME list needed groups
+
     def test_account_merge_wizard_tour(self):
         companies = self.env['res.company'].create([
             {'name': 'tour_company_1'},

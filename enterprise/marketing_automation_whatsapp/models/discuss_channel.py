@@ -32,6 +32,6 @@ class DiscussChannel(models.Model):
                 order='id DESC', limit=1,
             )
         for parent_trace in parent_wa_msg.marketing_trace_ids:
-            parent_trace.process_event('whatsapp_replied')
+            parent_trace.process_event('whatsapp_reply')
         parent_wa_msg.state = 'replied'
         return new_msg

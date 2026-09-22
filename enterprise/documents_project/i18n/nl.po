@@ -6,24 +6,31 @@
 # Erwin van der Ploeg <erwin@odooexperts.nl>, 2022
 # Martin Trigaux, 2023
 # Jolien De Paepe, 2023
-# Bren Driesen <brdri@odoo.com>, 2025.
+# Bren Driesen <brdri@odoo.com>, 2025, 2026.
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 # Odoo Translation Bot <c3p@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:44+0000\n"
-"PO-Revision-Date: 2025-11-27 14:13+0000\n"
-"Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
-"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:53+0000\n"
+"PO-Revision-Date: 2026-09-18 03:26+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-master/"
 "documents_project/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: documents_project
+#: model:ir.module.module,description:base.module_documents_project
+msgid ""
+"\n"
+"Add the ability to create invoices from the document module.\n"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_ir_attachment
@@ -32,8 +39,8 @@ msgstr "Bijlage"
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_res_company
-msgid "Companies"
-msgstr "Bedrijven"
+msgid "Company"
+msgstr "Bedrijf"
 
 #. module: documents_project
 #. odoo-python
@@ -48,6 +55,11 @@ msgstr ""
 #: model:ir.model,name:documents_project.model_res_config_settings
 msgid "Config Settings"
 msgstr "Configuratie-instellingen"
+
+#. module: documents_project
+#: model:ir.model,website_form_label:documents_project.model_project_task
+msgid "Create a Task"
+msgstr "Taak aanmaken"
 
 #. module: documents_project
 #: model:documents.document,name:documents_project.project_1_document_1
@@ -69,10 +81,11 @@ msgstr "Standaard Projectmap"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__display_name
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__display_name
 #: model:ir.model.fields,field_description:documents_project.field_project_project__display_name
+#: model:ir.model.fields,field_description:documents_project.field_project_task__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_company__display_name
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__display_name
 msgid "Display Name"
-msgstr "Weergavenaam"
+msgstr "Schermnaam"
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_documents_document
@@ -80,13 +93,18 @@ msgid "Document"
 msgstr "Document"
 
 #. module: documents_project
-#. odoo-python
-#: code:addons/documents_project/models/project_project.py:0
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents
 #: model:ir.embedded.actions,name:documents_project.project_embedded_action_documents_dashboard
-#: model_terms:ir.ui.view,arch_db:documents_project.project_view_kanban_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.edit_project_document_form_inherit
+#: model_terms:ir.ui.view,arch_db:documents_project.project_view_card_inherit_documents
+#: model_terms:ir.ui.view,arch_db:documents_project.view_task_form2
 msgid "Documents"
 msgstr "Documenten"
+
+#. module: documents_project
+#: model:ir.module.module,shortdesc:base.module_documents_project
+msgid "Documents - Projects"
+msgstr ""
 
 #. module: documents_project
 #: model:ir.model.fields,field_description:documents_project.field_project_project__documents_folder_id
@@ -119,6 +137,7 @@ msgstr "Map waar nieuwe projecten worden aangemaakt"
 #: model:ir.model.fields,field_description:documents_project.field_documents_tag__id
 #: model:ir.model.fields,field_description:documents_project.field_ir_attachment__id
 #: model:ir.model.fields,field_description:documents_project.field_project_project__id
+#: model:ir.model.fields,field_description:documents_project.field_project_task__id
 #: model:ir.model.fields,field_description:documents_project.field_res_company__id
 #: model:ir.model.fields,field_description:documents_project.field_res_config_settings__id
 msgid "ID"
@@ -141,15 +160,30 @@ msgid "Project Folder"
 msgstr "Projectmap"
 
 #. module: documents_project
+#: model:ir.module.module,summary:base.module_documents_project
+msgid "Project from documents"
+msgstr ""
+
+#. module: documents_project
 #: model:documents.document,name:documents_project.document_project_folder
 #: model:ir.model.fields,field_description:documents_project.field_documents_document__project_ids
 msgid "Projects"
 msgstr "Projecten"
 
 #. module: documents_project
+#: model:ir.model.fields,field_description:documents_project.field_project_task__document_count
+msgid "Related Document Count"
+msgstr "Aantal gerelateerde documenten"
+
+#. module: documents_project
 #: model:ir.model,name:documents_project.model_documents_tag
 msgid "Tag"
 msgstr "Label"
+
+#. module: documents_project
+#: model:ir.model,name:documents_project.model_project_task
+msgid "Task"
+msgstr "Taak"
 
 #. module: documents_project
 #. odoo-python
@@ -223,6 +257,33 @@ msgstr ""
 "verwijderd."
 
 #. module: documents_project
+#: model:ir.model.fields,help:documents_project.field_project_task__display_name
+msgid ""
+"Use these keywords in the title to set new tasks:\n"
+"\n"
+"        30h Allocate 30 hours to the task\n"
+"        #tags Set tags on the task\n"
+"        @user Assign the task to a user\n"
+"        ! Set the task a medium priority\n"
+"        !! Set the task a high priority\n"
+"        !!! Set the task a urgent priority\n"
+"\n"
+"        Make sure to use the right format and order e.g. Improve the "
+"configuration screen 5h #feature #v16 @Mitchell !"
+msgstr ""
+"Gebruik deze trefwoorden in de titel om nieuwe taken in te stellen:\n"
+"\n"
+"        30h Wijs 30 uur toe aan de taak\n"
+"        #label Stel labels in op de taak\n"
+"        @user Wijs de taak toe aan een gebruiker\n"
+"        ! Geef de taak een gemiddelde prioriteit\n"
+"        !! Geef de taak een hoge prioriteit\n"
+"        !!! Geef de taak een urgente prioriteit\n"
+"\n"
+"        Zorg ervoor dat je de juiste indeling en volgorde gebruikt, bv.: "
+"Verbeter het configuratiescherm 5h #feature #v16 @Mitchell !"
+
+#. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot archive the project base folder (%s)."
@@ -254,170 +315,3 @@ msgstr ""
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot set a company on the %s folder."
 msgstr "Je kunt geen bedrijf instellen op de map %s."
-
-#~ msgid "%(project_name)s's Documents"
-#~ msgstr "%(project_name)s's documenten"
-
-#~ msgid ""
-#~ "A set of condition and actions which will be available to all attachments "
-#~ "matching the conditions"
-#~ msgstr ""
-#~ "Een set van condities en acties welke beschikbaar is voor alle bijlagen "
-#~ "die aan deze condities voldoen"
-
-#~ msgid "Ask for Validation"
-#~ msgstr "Vragen om bevestiging"
-
-#~ msgid "Categorize and share your documents with your customers"
-#~ msgstr "Categoriseer en deel je documenten met je klanten"
-
-#~ msgid "Category"
-#~ msgstr "Categorie"
-
-#~ msgid "Create"
-#~ msgstr "Aanmaken"
-
-#~ msgid "Create a Task"
-#~ msgstr "Taak aanmaken"
-
-#~ msgid "Default Tags"
-#~ msgstr "Standaard labels"
-
-#~ msgid "Deprecate"
-#~ msgstr "Afkeuren"
-
-#~ msgid "Deprecated"
-#~ msgstr "Vervallen"
-
-#~ msgid "Documents &amp; Analytics"
-#~ msgstr "Documenten &amp; Analytics"
-
-#~ msgid "Documents Workspace"
-#~ msgstr "Documenten werkruimte"
-
-#~ msgid "Draft"
-#~ msgstr "Concept"
-
-#~ msgid "Is Shared"
-#~ msgstr "Is gedeeld"
-
-#~ msgid "Mark As Draft"
-#~ msgstr "Markeer als concept"
-
-#~ msgid "Merged Workspace"
-#~ msgstr "Samengevoegde werkruimte"
-
-#~ msgid "New task from Documents"
-#~ msgstr "Nieuwe taak van documenten"
-
-#~ msgid "Number of documents in Project"
-#~ msgstr "Aantal documenten in project"
-
-#~ msgid "Number of documents in Task"
-#~ msgstr "Aantal documenten in taak"
-
-#~ msgid "Shared Documents"
-#~ msgstr "Gedeelde documenten"
-
-#~ msgid "Shared Documents Count"
-#~ msgstr "Aantal gedeelde documenten"
-
-#~ msgid "Status"
-#~ msgstr "Status"
-
-#~ msgid "Task"
-#~ msgstr "Taak"
-
-#~ msgid ""
-#~ "The \"%s\" workspace is required by the Project application and cannot be "
-#~ "deleted."
-#~ msgstr ""
-#~ "De werkruimte \"%s\" is vereist voor de projecttoepassing en kan niet "
-#~ "worden verwijderd."
-
-#~ msgid ""
-#~ "The \"%s\" workspace should either be in the \"%s\" company like this "
-#~ "project or be open to all companies."
-#~ msgstr ""
-#~ "De werkruimte \"%s\" moet zich in het bedrijf \"%s\" bevinden zoals dit "
-#~ "project, of moet openstaan voor alle bedrijven."
-
-#~ msgid ""
-#~ "This workspace should remain in the same company as the \"%s\" project to "
-#~ "which it is linked. Please update the company of the \"%s\" project, or "
-#~ "leave the company of this workspace empty."
-#~ msgstr ""
-#~ "Deze werkruimte moet in hetzelfde bedrijf blijven als het \"%s\"-project "
-#~ "waaraan deze is gekoppeld. Werk het bedrijf van het \"%s\"-project bij, "
-#~ "of laat het bedrijf van deze werkruimte leeg."
-
-#~ msgid ""
-#~ "This workspace should remain in the same company as the following "
-#~ "projects to which it is linked:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Please update the company of those projects, or leave the company of this "
-#~ "workspace empty."
-#~ msgstr ""
-#~ "Deze werkruimte moet in hetzelfde bedrijf blijven als de volgende "
-#~ "projecten waaraan deze is gekoppeld:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Werk het bedrijf van die projecten bij, of laat het bedrijf van deze "
-#~ "werkruimte leeg."
-
-#~ msgid "To Validate"
-#~ msgstr "Goedkeuren"
-
-#~ msgid ""
-#~ "Upload <span class=\"fw-normal\">a file or </span>drag <span class=\"fw-"
-#~ "normal\">it here.</span>"
-#~ msgstr ""
-#~ "Upload <span class=\"fw-normal\">een bestand of </span>sleep <span "
-#~ "class=\"fw-normal\">het hier.</span>"
-
-#~ msgid "Use Documents"
-#~ msgstr "Documenten gebruiken"
-
-#~ msgid "Validate"
-#~ msgstr "Bevestigen"
-
-#~ msgid "Validated"
-#~ msgstr "Goedgekeurd"
-
-#~ msgid "Workspace"
-#~ msgstr "Werkruimte"
-
-#~ msgid ""
-#~ "Workspace in which all of the documents of this project will be "
-#~ "categorized. All of the attachments of your tasks will be automatically "
-#~ "added as documents in this workspace as well."
-#~ msgstr ""
-#~ "Werkruimte waarin alle documenten van dit project worden gecategoriseerd. "
-#~ "Alle bijlagen van je taken worden ook automatisch toegevoegd als "
-#~ "documenten in deze werkruimte."
-
-#~ msgid ""
-#~ "You cannot change the company of this project, because its workspace is "
-#~ "linked to the other following projects that are still in the \"%s\" "
-#~ "company:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Please update the company of all projects so that they remain in the same "
-#~ "company as their workspace, or leave the company of the \"%s\" workspace "
-#~ "blank."
-#~ msgstr ""
-#~ "Je kunt het bedrijf van dit project niet wijzigen, omdat de werkruimte is "
-#~ "gekoppeld aan de andere volgende projecten die zich nog in het bedrijf "
-#~ "\"%s\" bevinden:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Werk het bedrijf van alle projecten bij zodat ze in hetzelfde bedrijf "
-#~ "blijven als hun werkruimte, of laat het bedrijf van de \"%s\" werkruimte "
-#~ "leeg."
-
-#~ msgid "documents shared"
-#~ msgstr "documenten gedeeld"
-
-#~ msgid "new %s from %s"
-#~ msgstr "nieuw %s van %s"

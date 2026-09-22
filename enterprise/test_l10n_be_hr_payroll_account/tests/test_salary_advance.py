@@ -1,13 +1,13 @@
 from datetime import date
 
-from odoo import Command
+from odoo.addons.l10n_be_hr_payroll.tests.common import TestBelgiumCommon
 from odoo.tests import tagged
 
 from .test_payslip import TestPayslipBase
 
 
 @tagged('post_install', '-at_install', 'salary_advance')
-class TestSalaryAdvance(TestPayslipBase):
+class TestSalaryAdvance(TestPayslipBase, TestBelgiumCommon):
 
     def setUp(self):
         super().setUp()
@@ -22,62 +22,40 @@ class TestSalaryAdvance(TestPayslipBase):
         self.monthly_struct.journal_id = self.journal
         self.saladv_struct.journal_id = self.journal
 
-    def _get_input_line_amount(self, payslip, code):
-        input_lines = payslip.input_line_ids.filtered(lambda line: line.code == code)
-        amounts = input_lines.mapped('amount')
-        return len(amounts), sum(amounts)
-
     def test_salary_advance(self):
         self.payslip = self.create_payslip(self.saladv_struct, date(2024, 9, 1), date(2024, 9, 30))
 
         # First salary advance payslip of 500 on 01/09/2024
         george_saladv_payslip1 = self.create_payslip(self.saladv_struct, date(2024, 9, 1), date(2024, 9, 30))
-        # Should have added a salary advance input with amount 0
-        nbr_rec, amount_rec = self._get_input_line_amount(george_saladv_payslip1, "SALARYADV")
-        self.assertEqual(nbr_rec, 1)
-        self.assertEqual(amount_rec, 0)
         # Setting the advance amount to 500 and validate the payslip
-        george_saladv_payslip1.input_line_ids.filtered(lambda line: line.code == "SALARYADV").write({
-            "amount": 500
-        })
+        george_saladv_payslip1._set_input_value("SALARYADV", 500)
         george_saladv_payslip1.compute_sheet()
         george_saladv_payslip1.action_payslip_done()
+        self.assertEqual(george_saladv_payslip1._get_line_values(['SALARYADV'])['SALARYADV'][george_saladv_payslip1.id]['total'], 500)
 
         # Second salary advance payslip of 200 on 15/09/2024
         george_saladv_payslip2 = self.create_payslip(self.saladv_struct, date(2024, 9, 15), date(2024, 9, 30))
-        george_saladv_payslip2.write({
-            "input_line_ids": [Command.create({
-                "input_type_id": self.env.ref('l10n_be_hr_payroll.input_salary_advance').id,
-                "amount": 200
-            })]
-        })
+        george_saladv_payslip2._set_input_value('SALARYADV', 200)
         george_saladv_payslip2.compute_sheet()
         george_saladv_payslip2.action_payslip_done()
+        self.assertEqual(george_saladv_payslip2._get_line_values(['SALARYADV'])['SALARYADV'][george_saladv_payslip2.id]['total'], 200)
 
         # September monthly payslip
         george_payslip_sept = self.create_payslip(self.monthly_struct, date(2024, 9, 1), date(2024, 9, 30))
+        george_payslip_sept.compute_sheet()
         # September monthly pay should have salary advance recovery = 700 by default
-        nbr_rec, amount_rec = self._get_input_line_amount(george_payslip_sept, "SALARYADVREC")
-        self.assertEqual(nbr_rec, 1)
+        amount_rec = george_payslip_sept._get_input_line_amount("SALARYADVREC")
         self.assertEqual(amount_rec, 700)
         # Changing the recovery amount to 500 and validate the payslip
-        george_payslip_sept.input_line_ids.filtered(lambda line: line.code == "SALARYADVREC").write({
-            "amount": 500
-        })
+        george_payslip_sept._set_input_value("SALARYADVREC", 500)
         george_payslip_sept.compute_sheet()
         george_payslip_sept.action_payslip_done()
-        nbr_rec, amount_rec = self._get_input_line_amount(george_payslip_sept, "SALARYADVREC")
-        self.assertEqual(nbr_rec, 1)
+        amount_rec = george_payslip_sept._get_input_line_amount("SALARYADVREC")
         self.assertEqual(amount_rec, 500)
 
         # Third salary advance payslip of 300 on 1/10/2024
         george_saladv_payslip3 = self.create_payslip(self.saladv_struct, date(2024, 10, 1), date(2024, 10, 31))
-        george_saladv_payslip3.write({
-            "input_line_ids": [Command.create({
-                "input_type_id": self.env.ref('l10n_be_hr_payroll.input_salary_advance').id,
-                "amount": 300
-            })]
-        })
+        george_saladv_payslip3._set_input_value('SALARYADV', 300)
         george_saladv_payslip3.compute_sheet()
         george_saladv_payslip3.action_payslip_done()
 
@@ -85,14 +63,12 @@ class TestSalaryAdvance(TestPayslipBase):
         george_payslip_oct = self.create_payslip(self.monthly_struct, date(2024, 10, 1), date(2024, 10, 31))
         george_payslip_oct.compute_sheet()
         george_payslip_oct.action_payslip_done()
-        nbr_rec, amount_rec = self._get_input_line_amount(george_payslip_oct, "SALARYADVREC")
-        self.assertEqual(nbr_rec, 1)
+        amount_rec = george_payslip_oct._get_input_line_amount("SALARYADVREC")
         self.assertEqual(amount_rec, 500)
 
         # November monthly pay should have salary advance recovery = 0
         george_payslip_nov = self.create_payslip(self.monthly_struct, date(2024, 11, 1), date(2024, 11, 30))
         george_payslip_nov.compute_sheet()
         george_payslip_nov.action_payslip_done()
-        nbr_rec, amount_rec = self._get_input_line_amount(george_payslip_nov, "SALARYADVREC")
-        self.assertEqual(nbr_rec, 0)
+        amount_rec = george_payslip_nov._get_input_line_amount("SALARYADVREC")
         self.assertEqual(amount_rec, 0)

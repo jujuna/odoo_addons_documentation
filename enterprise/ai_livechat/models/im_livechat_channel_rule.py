@@ -17,5 +17,6 @@ class Im_LivechatChannelRule(models.Model):
     def _is_bot_configured(self):
         return super()._is_bot_configured() or bool(self.ai_agent_id)
 
-    def _to_store_defaults(self, target):
-        return super()._to_store_defaults(target) + [Store.One("ai_agent_id")]
+    def _store_channel_rule_fields(self, res: Store.FieldList):
+        super()._store_channel_rule_fields(res)
+        res.one("ai_agent_id", "_store_agent_fields")

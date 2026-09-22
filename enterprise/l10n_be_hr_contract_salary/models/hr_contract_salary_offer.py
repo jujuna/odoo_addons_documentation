@@ -1,6 +1,4 @@
-# -*- coding:utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
+from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, _
 
 
@@ -8,18 +6,22 @@ class HrContractSalaryOffer(models.Model):
     _inherit = 'hr.contract.salary.offer'
     _description = 'Salary Package Offer'
 
-    contract_type_id = fields.Many2one(
-        'hr.contract.type', "Contract Type",
-        compute='_compute_contract_type_id',
+    employee_type_id = fields.Many2one(
+        'hr.employee.type', "Employee Type",
+        compute='_compute_employee_type_id',
         store=True,
         readonly=False,
         tracking=True)
-    new_car = fields.Boolean(
-        string='Show "Company Car (To Order)"', tracking=True,
-        compute="_compute_new_car",
-        store=True,
-        readonly=False,
-        help="The employee will be able to choose a new car even if the maximum number of used cars available is reached.")
+    new_car_options = fields.Selection(
+        string='Company Car', tracking=True,
+        selection=[
+            ('all_options', "Available & New"),
+            ('available', "Available"),
+            ('none', "No Option"),
+        ],
+        default='all_options',
+        required=True,
+        help="It determines the vehicle options that will be available for the employee to choose from.")
     car_id = fields.Many2one(
         'fleet.vehicle', string='Default Vehicle',
         compute='_compute_car_id',
@@ -28,27 +30,16 @@ class HrContractSalaryOffer(models.Model):
         help="Default employee's company car. If left empty, the default value will be the employee's current car.")
     additional_car_ids = fields.Many2many('fleet.vehicle', domain="[('vehicle_type', '=', 'car')]", string="Additional cars",
                                           help="You can add used cars to this field, they'll be added to the list for simulation purposes.")
-    l10n_be_canteen_cost = fields.Float(
-        compute='_compute_l10n_be_canteen_cost',
-        store=True,
-        string="Canteen Cost", readonly=False)
-    country_code = fields.Char(related='contract_template_id.country_code', depends=['contract_template_id'])
     assigned_car_warning = fields.Char(compute='_compute_assigned_car_warning')
     wishlist_car_warning = fields.Char(compute='_compute_wishlist_car_warning')
+    l10n_be_offer_seniority = fields.Integer(string="Hiring Seniority (Years)", compute='_compute_l10n_be_offer_seniority', readonly=False, store=True)
+    l10n_be_offer_seniority_months = fields.Integer(string="Hiring Seniority (Months)", compute='_compute_l10n_be_offer_seniority', readonly=False, store=True)
+    l10n_be_is_below_scale_warning = fields.Char(compute='_compute_l10n_be_is_below_scale', compute_sudo=True)
 
     @api.depends('contract_template_id')
-    def _compute_contract_type_id(self):
+    def _compute_employee_type_id(self):
         for offer in self:
-            offer.contract_type_id = offer.contract_template_id.contract_type_id
-
-    @api.depends('applicant_id', 'contract_template_id.available_cars_amount', 'contract_template_id.max_unused_cars')
-    def _compute_new_car(self):
-        for offer in self:
-            # new_car defaults to True for applicants
-            if offer.applicant_id:
-                offer.new_car = True
-            else:
-                offer.new_car = offer.contract_template_id.available_cars_amount < offer.contract_template_id.max_unused_cars
+            offer.employee_type_id = offer.contract_template_id.employee_type_id
 
     @api.depends('applicant_id.partner_id', 'employee_id', 'contract_template_id')
     def _compute_car_id(self):
@@ -86,11 +77,6 @@ class HrContractSalaryOffer(models.Model):
                 car = car_is_driver or car_is_future_driver
             offer.car_id = car
 
-    @api.depends('contract_template_id')
-    def _compute_l10n_be_canteen_cost(self):
-        for offer in self:
-            offer.l10n_be_canteen_cost = offer.contract_template_id.l10n_be_canteen_cost
-
     @api.depends('applicant_id.partner_id', 'employee_id', 'car_id')
     def _compute_assigned_car_warning(self):
         self.assigned_car_warning = False
@@ -110,11 +96,80 @@ class HrContractSalaryOffer(models.Model):
             if warning:
                 offer.assigned_car_warning = f"Warning: {' '.join(warning)}"
 
-    @api.depends('new_car')
+    @api.depends('new_car_options')
     def _compute_wishlist_car_warning(self):
         for offer in self:
-            if offer.contract_template_id.available_cars_amount >= offer.contract_template_id.max_unused_cars:
+            if offer.contract_template_id.available_cars_amount >= offer.company_id.l10n_be_max_unused_cars:
                 offer.wishlist_car_warning = _("We already have %s car(s) without driver(s) available",
                                               offer.employee_version_id.available_cars_amount)
             else:
                 offer.wishlist_car_warning = False
+
+    @api.depends('employee_id')
+    def _compute_l10n_be_offer_seniority(self):
+        for offer in self:
+            offer.l10n_be_offer_seniority = offer.employee_id.l10n_be_scale_seniority
+            offer.l10n_be_offer_seniority_months = offer.employee_id.l10n_be_scale_seniority_months
+
+    def _get_below_scale_warning_excluded_offers(self):
+        return self.filtered(
+            lambda o: o.employee_version_id.l10n_be_joint_committee_id.egov3_code == '999' or
+                (o.employee_version_id.l10n_be_egov3_code == '200' and o.employee_version_id.l10n_be_is_sale_representative)
+        )
+
+    @api.depends(
+        'gross_wage', 'employee_version_id.l10n_be_salary_scale_id', 'l10n_be_offer_seniority', 'l10n_be_offer_seniority_months',
+        'employee_id.work_time_rate', 'employee_id.l10n_be_time_credit', 'employee_version_id.l10n_be_dimona_category',
+        'employee_version_id.l10n_be_joint_committee_id')
+    def _compute_l10n_be_is_below_scale(self):
+        # Source: https://salairesminimums.be/index.html
+        today = fields.Date.context_today(self)
+        excluded_offers = self._get_below_scale_warning_excluded_offers()
+        excluded_offers.l10n_be_is_below_scale_warning = False
+        applicable_offers = self - excluded_offers
+        for structure_type, offers_per_structure_type in applicable_offers.grouped('structure_type_id').items():
+            if structure_type == self.env.ref('hr.structure_type_employee_cp200'):
+                for offer in offers_per_structure_type:
+                    target = offer.employee_id
+                    if not offer.employee_version_id or not offer.employee_version_id.l10n_be_salary_scale_id:
+                        offer.l10n_be_is_below_scale_warning = False
+                        continue
+                    if offer.employee_version_id.l10n_be_dimona_category == 'stu':
+                        age = target._get_age()
+                        min_wage = offer.employee_version_id._get_student_min_wage(
+                            offer.employee_version_id.l10n_be_salary_scale_id.code,
+                            age,
+                            offer.employee_version_id.wage_type,
+                            offer.employee_version_id.resource_calendar_id.hours_per_week,
+                        )
+                    else:
+                        company_seniority = 0
+                        if target:
+                            company_seniority = relativedelta(today, target._get_first_contract_date())
+                        seniority = company_seniority.years + offer.l10n_be_offer_seniority + (offer.l10n_be_offer_seniority_months + company_seniority.months) // 12
+                        min_wage = offer.employee_version_id._get_employee_min_wage(
+                            salary_scale=offer.employee_version_id.l10n_be_salary_scale_id.code,
+                            company_seniority=company_seniority.years,
+                            seniority=seniority,
+                            wage_type=offer.employee_version_id.wage_type,
+                            hours_per_week=offer.employee_version_id.resource_calendar_id.hours_per_week,
+                        )
+                    if min_wage == 0:
+                        offer.l10n_be_is_below_scale_warning = False
+                        continue
+                    if target:
+                        min_wage = min_wage * target.work_time_rate
+                    if offer.gross_wage < min_wage:
+                        scale_type = "age" if offer.employee_version_id.l10n_be_dimona_category == 'stu' else "seniority"
+                        scale_value = age if offer.employee_version_id.l10n_be_dimona_category == 'stu' else seniority
+                        offer.l10n_be_is_below_scale_warning = offer.employee_version_id._get_min_wage_warning_message(scale_type, scale_value, min_wage, offer._fields["gross_wage"].string)
+                    else:
+                        offer.l10n_be_is_below_scale_warning = False
+            else:
+                offers_per_structure_type.l10n_be_is_below_scale_warning = False
+
+    def _get_simulation_required_fields(self):
+        res = super()._get_simulation_required_fields()
+        if self.country_code == 'BE':
+            res.append("employee_job_id")
+        return res

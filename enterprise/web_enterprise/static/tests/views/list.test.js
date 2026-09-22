@@ -14,7 +14,7 @@ import {
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
 
-import { browser } from "@web/core/browser/browser";
+import { location, browser } from "@web/core/browser/browser";
 import { user } from "@web/core/user";
 import { WebClientEnterprise } from "@web_enterprise/webclient/webclient";
 
@@ -74,7 +74,7 @@ test("add custom field button with other optional columns - studio not installed
         config: getDefaultConfig(),
     });
 
-    patchWithCleanup(browser.location, {
+    patchWithCleanup(location, {
         reload: function () {
             expect.step("window_reload");
         },
@@ -85,7 +85,7 @@ test("add custom field button with other optional columns - studio not installed
 
     await click(".o_optional_columns_dropdown_toggle");
     await animationFrame();
-    const dropdown = getDropdownMenu(".o_optional_columns_dropdown");
+    const dropdown = getDropdownMenu(".o_optional_columns");
 
     expect(queryAll(".dropdown-item", { root: dropdown })).toHaveCount(2);
     expect(queryAll(".dropdown-item-studio", { root: dropdown })).toHaveCount(1);
@@ -130,7 +130,7 @@ test("add custom field button without other optional columns - studio not instal
         `,
     });
 
-    patchWithCleanup(browser.location, {
+    patchWithCleanup(location, {
         reload: function () {
             expect.step("window_reload");
         },
@@ -141,7 +141,7 @@ test("add custom field button without other optional columns - studio not instal
 
     await click(".o_optional_columns_dropdown_toggle");
     await animationFrame();
-    const dropdown = getDropdownMenu(".o_optional_columns_dropdown");
+    const dropdown = getDropdownMenu(".o_optional_columns");
 
     expect(queryAll(".dropdown-item", { root: dropdown })).toHaveCount(1);
     expect(queryAll(".dropdown-item-studio", { root: dropdown })).toHaveCount(1);
@@ -177,7 +177,7 @@ test("add custom field button not shown to non-system users (with opt. col.)", a
 
     await click(".o_optional_columns_dropdown_toggle");
     await animationFrame();
-    const dropdown = getDropdownMenu(".o_optional_columns_dropdown");
+    const dropdown = getDropdownMenu(".o_optional_columns");
     expect(queryAll(".dropdown-item", { root: dropdown })).toHaveCount(1);
     expect(queryAll(".dropdown-item-studio", { root: dropdown })).toHaveCount(0);
 });
@@ -330,7 +330,7 @@ test("upsell studio feature is not polluted by another view", async () => {
 
     await click(".modal .o_optional_columns_dropdown_toggle");
     await animationFrame();
-    let dropdown = getDropdownMenu(".modal .o_optional_columns_dropdown");
+    let dropdown = getDropdownMenu(".modal .o_optional_columns");
     expect(queryAll(".dropdown-item", { root: dropdown })).toHaveCount(1);
     expect(queryAll(".dropdown-item-studio", { root: dropdown })).toHaveCount(0);
     await click(".modal-header .btn-close");
@@ -343,7 +343,7 @@ test("upsell studio feature is not polluted by another view", async () => {
     await click(".o_optional_columns_dropdown_toggle");
     await animationFrame();
 
-    dropdown = getDropdownMenu(".o_optional_columns_dropdown");
+    dropdown = getDropdownMenu(".o_optional_columns");
     expect(queryAll(".dropdown-item", { root: dropdown })).toHaveCount(2);
     expect(queryAll(".dropdown-item-studio", { root: dropdown })).toHaveCount(1);
 });

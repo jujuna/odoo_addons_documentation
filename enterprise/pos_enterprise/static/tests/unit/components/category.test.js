@@ -47,3 +47,20 @@ test("preparation_display_service.toggleProduct", async () => {
     store.toggleProduct(product);
     expect(store.selectedProductIds.has(product.id)).toBe(false);
 });
+
+test("accumulated quantities are rounded to the product unit precision", async () => {
+    const store = await setupPosPrepDisplayEnv();
+    await createPrepDisplayTicket(store, {
+        lines: [
+            { qty: 0.1, product_id: 5, full_product_name: "TEST" },
+            { qty: 0.2, product_id: 5, full_product_name: "TEST" },
+        ],
+    });
+    const category = store.data.models["pos.category"].getAll()[0];
+    const comp = await mountWithCleanup(Category, { props: { category: category } });
+    expect(comp.shouldShowCategory).toBe(1);
+
+    // 0.1 + 0.2 === 0.30000000000000004
+    expect(comp.productCount).toBe(0.3);
+    expect(comp.products[0].quantity).toBe(0.3);
+});

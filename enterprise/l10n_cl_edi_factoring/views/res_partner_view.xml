@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="l10n_cl_edi.view_partner_l10n_cl_edi_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='l10n_cl_dte_email']" position="after">
-                    <field name="l10n_cl_is_factoring" invisible="company_type == 'person'"/>
+                    <field name="l10n_cl_is_factoring" invisible="not is_company"/>
                 </xpath>
             </field>
         </record>

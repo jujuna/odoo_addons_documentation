@@ -5,6 +5,7 @@
             <field name="name">Balance Sheet</field>
             <field name="name@es_419">Balance de Situación</field>
             <field name="root_report_id" ref="account_reports.balance_sheet"/>
+            <field name="groupby">account_id</field>
             <field name="filter_analytic_groupby" eval="True"/>
             <field name="filter_unfold_all" eval="True"/>
             <field name="filter_journals" eval="True"/>
@@ -22,8 +23,6 @@
                     <field name="name">Total Assets</field>
                     <field name="name@es_419">Total Activos</field>
                     <field name="code">ACTT</field>
-                    <field name="groupby">account_id</field>
-                    <field name="foldable" eval="True"/>
                     <field name="horizontal_split_side">left</field>
                     <field name="hierarchy_level">0</field>
                     <field name="expression_ids">
@@ -39,8 +38,6 @@
                     <field name="name">Total Liabilities</field>
                     <field name="name@es_419">Total Pasivos</field>
                     <field name="code">PAST</field>
-                    <field name="groupby">account_id</field>
-                    <field name="foldable" eval="True"/>
                     <field name="horizontal_split_side">right</field>
                     <field name="hierarchy_level">0</field>
                     <field name="expression_ids">
@@ -82,7 +79,7 @@
                                                     <field name="engine">aggregation</field>
                                                     <field name="formula">NEP.balance</field>
                                                     <field name="date_scope">from_fiscalyear</field>
-                                                    <field name="subformula">cross_report(account_reports.profit_and_loss)</field>
+                                                    <field name="subformula">cross_report(account_reports.profit_and_loss, force_date_scope)</field>
                                                 </record>
                                             </field>
                                         </record>
@@ -134,8 +131,6 @@
                             <field name="name">Retained Earnings</field>
                             <field name="name@es_419">Ganancias acumuladas</field>
                             <field name="code">RETAINED_EARNINGS_EC</field>
-                            <field name="groupby">account_id</field>
-                            <field name="foldable" eval="True"/>
                             <field name="domain_formula">-sum([('account_id.account_type', '=', 'equity')])</field>
                         </record>
                     </field>
@@ -160,6 +155,7 @@
 
         <record id="l10n_ec_profit_and_loss" model="account.report">
             <field name="name">Profit and Loss</field>
+            <field name="groupby">account_id</field>
             <field name="name@es_419">Perdidas y Ganancias</field>
             <field name="root_report_id" ref="account_reports.profit_and_loss"/>
             <field name="filter_analytic_groupby" eval="True"/>
@@ -179,8 +175,6 @@
                     <field name="name">Total Revenue</field>
                     <field name="name@es_419">Total Ingresos</field>
                     <field name="code">INGT</field>
-                    <field name="groupby">account_id</field>
-                    <field name="foldable" eval="True"/>
                     <field name="hierarchy_level">0</field>
                     <field name="expression_ids">
                         <record id="l10n_ec_profit_and_loss_income_expression" model="account.report.expression">
@@ -195,8 +189,6 @@
                     <field name="name">Total Expenses</field>
                     <field name="name@es_419">Total Egresos</field>
                     <field name="code">GAST</field>
-                    <field name="groupby">account_id</field>
-                    <field name="foldable" eval="True"/>
                     <field name="hierarchy_level">0</field>
                     <field name="expression_ids">
                         <record id="l10n_ec_profit_and_loss_expenses_expression" model="account.report.expression">

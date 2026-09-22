@@ -61,14 +61,13 @@ class AccountIntrastatGoodsReportHandler(models.AbstractModel):
     def _cz_intrastat_get_report_results_for_file_export(self, options):
         report = self.env['account.report'].browse(options['report_id'])
         expressions = report.line_ids.expression_ids
-        report._init_currency_table(options)
-        return self._report_custom_engine_intrastat(
-            expressions,
+        return self._report_engine_intrastat(
             options,
             expressions[0].date_scope,
+            expressions.grouped('formula'),
             'id',
             None,
-        )
+        )[expressions]
 
     @api.model
     def _cz_intrastat_get_csv_file_content(self, results, options):

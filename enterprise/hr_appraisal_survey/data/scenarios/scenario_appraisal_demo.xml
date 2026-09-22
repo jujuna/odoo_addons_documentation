@@ -122,6 +122,6 @@
         <field name="answer_type">text_box</field>
     </record>
     <record id="hr_appraisal.hr_appraisal_0" model="hr.appraisal">
-        <field name="employee_feedback_ids" eval="[(4, ref('hr.employee_eg'))]"/>
+        <field name="partner_feedback_ids" eval="[Command.link(ref('hr.work_contact_eg'))]"/>
     </record>
 </odoo>

@@ -7,15 +7,15 @@
 # Cécile Collart <cco@odoo.com>, 2022
 # Jolien De Paepe, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:49+0000\n"
-"PO-Revision-Date: 2025-10-23 08:07+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: French <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:59+0000\n"
+"PO-Revision-Date: 2026-09-18 01:55+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-master/"
 "delivery_fedex/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -95,6 +95,11 @@ msgstr "Type de facture commerciale"
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_droppoff_type__drop_box
 msgid "DROP_BOX"
 msgstr "DROP_BOX"
+
+#. module: delivery_fedex
+#: model:ir.model,name:delivery_fedex.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "Mode de livraison"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_developer_key
@@ -309,6 +314,11 @@ msgstr "Type de colis Fedex"
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_service_type
 msgid "Fedex Service Type"
 msgstr "Type de service FedEx"
+
+#. module: delivery_fedex
+#: model:ir.module.module,shortdesc:base.module_delivery_fedex
+msgid "Fedex Shipping (Legacy)"
+msgstr ""
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -584,11 +594,6 @@ msgstr ""
 "(bold_end)s%(packages)s"
 
 #. module: delivery_fedex
-#: model:ir.model,name:delivery_fedex.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "Modes d'expédition"
-
-#. module: delivery_fedex
 #: model:ir.model.fields,help:delivery_fedex.field_delivery_carrier__fedex_saturday_delivery
 msgid ""
 "Special service:Saturday Delivery, can be requested on following days.\n"
@@ -669,6 +674,15 @@ msgstr ""
 "d'assistance de FedEx par e-mail."
 
 #. module: delivery_fedex
+#: model:ir.module.module,description:base.module_delivery_fedex
+msgid ""
+"This is the legacy integration with FedEx that is no longer "
+"supported.         Please install the new \"Fedex Shipping\" module and "
+"uninstall this one as soon as possible. This integration will stop working "
+"in 2024."
+msgstr ""
+
+#. module: delivery_fedex
 #. odoo-python
 #: code:addons/delivery_fedex/models/delivery_fedex.py:0
 msgid ""
@@ -687,39 +701,3 @@ msgstr "ZPLII"
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid "to create a FedEx account of the following type:"
 msgstr "pour créer un compte FedEx pour le type suivant :"
-
-#~ msgid ""
-#~ "<span attrs=\"{'invisible': [('fedex_weight_unit', '!=', 'KG')]}\">CM</"
-#~ "span>\n"
-#~ "                                <span attrs=\"{'invisible': "
-#~ "[('fedex_weight_unit', '!=', 'LB')]}\">IN</span>"
-#~ msgstr ""
-#~ "<span attrs=\"{'invisible': [('fedex_weight_unit', '!=', 'KG')]}\">CM</"
-#~ "span>\n"
-#~ "                                <span attrs=\"{'invisible': "
-#~ "[('fedex_weight_unit', '!=', 'LB')]}\">IN</span>"
-
-#~ msgid "Extra data for rate"
-#~ msgstr "Données supplémentaires pour le calcul du prix"
-
-#~ msgid "Extra data for return"
-#~ msgstr "Données supplémentaires pour les retours"
-
-#~ msgid "Extra data for ship"
-#~ msgstr "Données supplémentaires pour l'expédition"
-
-#~ msgid "FedEx"
-#~ msgstr "FedEx"
-
-#~ msgid "FedEx Account Number"
-#~ msgstr "Numéro de compte FedEx"
-
-#~ msgid "FedEx Shipping Methods"
-#~ msgstr "Modes d'expédition FedEx"
-
-#~ msgid ""
-#~ "Shipment created into Fedex<br/><b>Tracking Numbers:</b> %s<br/"
-#~ "><b>Packages:</b> %s"
-#~ msgstr ""
-#~ "Expédition créée dans Fedex<br/><b>Numéros de suivi :</b> %s<br/"
-#~ "><b>Colis :</b> %s"

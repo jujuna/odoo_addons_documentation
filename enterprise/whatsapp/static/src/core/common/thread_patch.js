@@ -9,10 +9,10 @@ patch(Thread.prototype, {
         return super.isSquashed(msg, prevMsg);
     },
 
-    get isWhatsAppThreadExpired() {
+    get isWhatsappThreadDisabled() {
         return (
-            this.props.thread.channel_type === "whatsapp" &&
-            this.props.thread.composer.threadExpired
+            this.channel?.channel_type === "whatsapp" &&
+            this.props.thread.composer.whatsappThreadDisabled
         );
     },
 });

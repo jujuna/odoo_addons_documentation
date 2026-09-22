@@ -36,7 +36,9 @@
                     <tbody>
                         <t t-foreach="timesheets" t-as="line">
                             <tr valign="middle">
-                                <td><span t-field="line.date"/></td>
+                                <td>
+                                    <t t-call="helpdesk.portal_format_date" date_record="line.date"/>
+                                </td>
                                 <td><span t-field="line.employee_id"/></td>
                                 <td><span t-field="line.name"/></td>
                                 <td t-if="display_sol">
@@ -44,8 +46,8 @@
                                     <span t-else="" class="text-muted">Non-billable</span>
                                 </td>
                                 <td class="text-end">
-                                    <span t-if="is_uom_day" t-esc="convert_hours_to_days(line.unit_amount)" t-options='{"widget": "timesheet_uom"}'/>
-                                    <span t-else="" t-field="line.unit_amount" t-options='{"widget": "float_time"}'/>
+                                    <span t-if="is_uom_day" t-out="convert_hours_to_days(line.unit_amount)" t-options='{"widget": "timesheet_uom"}'/>
+                                    <span t-else="" t-out="timesheets._format_portal_hours(line.unit_amount)"/>
                                 </td>
                             </tr>
                         </t>
@@ -58,15 +60,15 @@
                                     <t t-set="total_timesheet_amount" t-value="sum(timesheets.mapped('unit_amount'))"/>
                                     <div>
                                         Total Time Spent:
-                                        <span t-if="is_uom_day" t-esc="convert_hours_to_days(total_timesheet_amount)" />
-                                        <span t-else="" t-esc="round(total_timesheet_amount, 2)" t-options='{"widget": "float_time"}'/>
+                                        <span t-if="is_uom_day" t-out="convert_hours_to_days(total_timesheet_amount)" />
+                                        <span t-else="" t-out="timesheets._format_portal_hours(total_timesheet_amount)"/>
                                     </div>
                                 </div>
                                 <div t-if="ticket.remaining_hours_available">
                                     <div>
                                         Time Remaining on SO:
-                                        <span t-if="is_uom_day" t-esc="convert_hours_to_days(ticket.remaining_hours_so)" t-options='{"widget": "timesheet_uom"}'/>
-                                        <span t-else="" t-esc="ticket.remaining_hours_so" t-options='{"widget": "float_time"}'/>
+                                        <span t-if="is_uom_day" t-out="convert_hours_to_days(ticket.remaining_hours_so)" t-options='{"widget": "timesheet_uom"}'/>
+                                        <span t-else="" t-out="timesheets._format_portal_hours(ticket.remaining_hours_so)"/>
                                     </div>
                                 </div>
                             </th>
@@ -83,7 +85,7 @@
         </xpath>
         <xpath expr="//th[@id='ticket_user_header']" position="after">
             <th class="text-end" t-if="show_spent_hours and show_portal_timesheets">
-                <t t-esc="display_tickets"/>
+                <t t-out="display_tickets"/>
                 Time Spent
             </th>
         </xpath>
@@ -103,7 +105,7 @@
                                 <t t-out="convert_hours_to_days(ticket_hours_spent)" t-options='{"widget": "timesheet_uom"}'/>
                             </t>
                             <t t-else="">
-                                <t t-out="ticket_hours_spent" t-options='{"widget": "float_time"}'/>
+                                <t t-out="tickets.env['account.analytic.line']._format_portal_hours(ticket_hours_spent)"/>
                             </t>
                         </span>
                     </div>
@@ -117,10 +119,10 @@
                     <t t-if="timesheet_lines">
                         <t t-set="total_timesheet_amount" t-value="sum(timesheet_lines.mapped('unit_amount'))"/>
                         <t t-if="is_uom_day">
-                            <span t-esc="convert_hours_to_days(total_timesheet_amount)" />
+                            <span t-out="convert_hours_to_days(total_timesheet_amount)" />
                         </t>
                         <t t-else="">
-                            <span t-esc="round(total_timesheet_amount, 2)" t-options='{"widget": "float_time"}'/>
+                            <span t-out="timesheet_lines._format_portal_hours(total_timesheet_amount)"/>
                         </t>
                     </t>
                 </t>

@@ -12,10 +12,14 @@ class DocumentsDocument(models.Model):
                 lambda doc: doc.type != 'binary' or doc.shortcut_document_id or doc.res_model == 'hr.expense' or (
                         doc.mimetype and 'image' not in doc.mimetype.lower() and 'pdf' not in doc.mimetype.lower())):
             raise UserError(_("This action can only be applied on image and pdf not yet linked to an expense."))
+
+        # Calling default to make sure that if user has no employee, he at least has the rights to create expense for other employees
+        employee = self.env['hr.expense']._default_employee_id()
         category_id = self.env.ref("hr_expense.product_product_no_cost").id
         expenses = self.env["hr.expense"].create([{
             'name': document.attachment_id.name,
             'product_id': category_id,
+            'employee_id': employee.id,
         } for document in self])
         for document, expense in zip(self, expenses):
             if document.res_model or document.res_id:

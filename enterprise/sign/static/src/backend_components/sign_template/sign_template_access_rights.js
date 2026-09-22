@@ -1,5 +1,5 @@
 import { useService } from "@web/core/utils/hooks";
-import { Component, useState } from "@odoo/owl";
+import { Component, proxy, t, useProps } from "@odoo/owl";
 import { Record } from "@web/model/record";
 import { Dialog } from "@web/core/dialog/dialog";
 import {
@@ -19,6 +19,10 @@ export function getActionActiveFields(actionFieldsGetDict) {
         const related = Object.fromEntries(
             many2ManyTagsField.relatedFields({ options: {} }).map((f) => [f.name, f])
         );
+        // res.groups does not have a `color` field, so don't include it.
+        if (fName !== "group_ids") {
+            related.color = { type: "integer", string: "Color" };
+        }
         activeFields[fName] = {
             related: {
                 activeFields: related,
@@ -26,7 +30,6 @@ export function getActionActiveFields(actionFieldsGetDict) {
             },
         };
     }
-    activeFields.tag_ids.related.activeFields.color = { type: "integer", string: "Color" };
     return activeFields;
 }
 
@@ -37,18 +40,19 @@ export class SignTemplateAccessRights extends Component {
         Many2ManyTagsField,
         Record,
     };
-    static props = {
-        close: { type: Function },
-        signTemplate: { type: Object },
-        hasSignRequests: { type: Boolean },
-    };
+
+    props = useProps({
+        close: t.function(),
+        signTemplate: t.object(),
+        hasSignRequests: t.boolean(),
+    });
 
     setup() {
         this.action = useService("action");
         this.notification = useService("notification");
         this.orm = useService("orm");
         this.signTemplateFieldsGet = getActionActiveFields(actionFieldsGet);
-        this.state = useState({
+        this.state = proxy({
             properties: false,
         });
     }

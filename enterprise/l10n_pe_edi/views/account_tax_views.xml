@@ -19,7 +19,7 @@
             <field name="model">account.tax.group</field>
             <field name="inherit_id" ref="account.view_tax_group_tree"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='tax_payable_account_id']" position="after">
+                <xpath expr="//field[@name='preceding_subtotal']" position="after">
                     <field name="l10n_pe_edi_code" invisible="country_code != 'PE'" optional="hide"/>
                 </xpath>
             </field>

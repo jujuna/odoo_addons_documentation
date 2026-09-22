@@ -1,21 +1,19 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from markupsafe import Markup
-
-from odoo.addons.iap.tools import iap_tools
-from odoo import api, fields, models, _
-from odoo.tools import is_html_empty
-from odoo.tools.misc import DEFAULT_SERVER_DATE_FORMAT
-
 import time
 
+from markupsafe import Markup
+
+from odoo import _, api, fields, models
+from odoo.tools import is_html_empty
+from odoo.tools.misc import DEFAULT_SERVER_DATE_FORMAT
 
 OCR_VERSION = 133
 
 
 class HrExpense(models.Model):
     _name = 'hr.expense'
-    _inherit = ['extract.mixin', 'hr.expense']
+    _inherit = ['extract.mixin.with.words', 'hr.expense']
     # We want to see the records that are just processed by OCR at the top of the list
     _order = "extract_state_processed desc, date desc, id desc"
 
@@ -24,7 +22,7 @@ class HrExpense(models.Model):
     @api.depends('state')
     def _compute_is_in_extractable_state(self):
         for expense in self:
-            expense.is_in_extractable_state = expense.state == 'draft'
+            expense.is_in_extractable_state = expense.state == 'draft' and not expense.split_expense_origin_id
 
     @api.depends('extract_state', 'state')
     def _compute_extract_state_processed(self):
@@ -33,19 +31,41 @@ class HrExpense(models.Model):
             expense.extract_state_processed = expense.extract_state == 'waiting_extraction' and expense.state == 'draft'
 
     @api.model
-    def _contact_iap_extract(self, pathinfo, params):
-        params['version'] = OCR_VERSION
-        params['account_token'] = self._get_iap_account().sudo().account_token
-        endpoint = self.env['ir.config_parameter'].sudo().get_param('iap_extract_endpoint', 'https://extract.api.odoo.com')
-        return iap_tools.iap_jsonrpc(endpoint + '/api/extract/expense/2/' + pathinfo, params=params)
+    def _get_ocr_api_version(self):
+        return OCR_VERSION
+
+    @api.model
+    def _get_api_route(self):
+        return 'api/extract/expense/2'
+
+    def _filter_preprocess_skipped_ocr(self):
+        """ If the hr_expense_stripe module is installed we want to skip the OCR """
+        if 'is_card_expense' not in self._fields:
+            return self
+
+        stripe_expenses = self.filtered('is_card_expense')
+        stripe_expenses.write({'extract_state': 'done'})
+        for expense in stripe_expenses:
+            expense.message_post(body=self.env._("Receipt not digitized: the expense already includes Stripe data."))
+
+        return self - stripe_expenses
+
+    def _upload_to_extract(self):
+        to_extract = self._filter_preprocess_skipped_ocr()
+        if to_extract:
+            super(HrExpense, to_extract)._upload_to_extract()
 
     def _autosend_for_digitization(self):
-        if self.env.company.expense_extract_show_ocr_option_selection == 'auto_send':
-            self.filtered('extract_can_show_send_button')._send_batch_for_digitization()
+        to_extract = self.filtered(lambda e:
+            e.company_id.expense_extract_show_ocr_option_selection == 'auto_send'
+            and e.extract_can_show_send_button
+        )._filter_preprocess_skipped_ocr()
+        if to_extract:
+            to_extract._send_batch_for_digitization()
 
     def _message_set_main_attachment_id(self, attachments, force=False, filter_xml=True):
         super()._message_set_main_attachment_id(attachments, force=force, filter_xml=filter_xml)
-        if not self.sample:
+        if not self.sample and attachments:
             self._autosend_for_digitization()
 
     def _get_validation(self, field):
@@ -68,22 +88,24 @@ class HrExpense(models.Model):
     def _fill_document_with_results(self, ocr_results):
         if ocr_results is not None and self.state == "draft":
             vals = {}
-
             description_ocr = self._get_ocr_selected_value(ocr_results, 'description', "")
             total_ocr = self._get_ocr_selected_value(ocr_results, 'total', 0.0)
             date_ocr = self._get_ocr_selected_value(ocr_results, 'date', fields.Date.context_today(self).strftime(DEFAULT_SERVER_DATE_FORMAT))
             currency_ocr = self._get_ocr_selected_value(ocr_results, 'currency', self.env.company.currency_id.name)
 
-            # We need to set the user to ensure it will be translated in the same language
-            user_id = self.employee_id.user_id if self.employee_id.user_id else self.env.uid
-            default_receipt_name = self.with_user(user_id)._get_untitled_expense_name("").strip()
-
-            if default_receipt_name in self.name:
+            if not self.name:
                 predicted_product_id = self._predict_product(description_ocr)
                 if predicted_product_id:
-                    vals['product_id'] = predicted_product_id or self.product_id.id
+                    vals['product_id'] = predicted_product_id
+                else:
+                    fallback_product = (
+                        self.env['product.product'].search([('default_code', '=', 'EXP_GEN'), ('can_be_expensed', '=', True)], limit=1)
+                        or self.env['product.product'].search([('can_be_expensed', '=', True)], limit=1)
+                    )
+                    if fallback_product:
+                        vals['product_id'] = fallback_product.id
+
                 vals['name'] = description_ocr
-                # We need to set the name after the product change as changing the product may change the name
 
             context_create_date = fields.Date.context_today(self, self.create_date)
             if not self.date or self.date == context_create_date:
@@ -97,9 +119,9 @@ class HrExpense(models.Model):
                 vals['total_amount'] = product_price
             else:
                 vals['total_amount_currency'] = total_ocr
-                vals['total_amount'] = total_ocr
                 vals['quantity'] = 1  # Always the case for expense that are not using a flat rate
                 vals['price_unit'] = total_ocr
+                current_currency = self.currency_id
                 if not self.currency_id or self.currency_id == self.env.company.currency_id:
                     for comparison in ['=ilike', 'ilike']:
                         matched_currency = self.env["res.currency"].with_context(active_test=False).search([
@@ -109,15 +131,18 @@ class HrExpense(models.Model):
                             ('symbol', comparison, currency_ocr),
                         ])
                         if len(matched_currency) == 1:
-                            vals['currency_id'] = matched_currency.id
+                            current_currency = matched_currency
 
-                            if matched_currency != self.company_currency_id:
-                                vals['total_amount'] = matched_currency._convert(
-                                    vals.get('total_amount_currency', self.total_amount_currency),
-                                    self.company_currency_id,
-                                    company=self.company_id,
-                                    date=vals.get('date', self.date),
-                            )
+                vals['currency_id'] = current_currency.id
+                if current_currency and current_currency != self.company_currency_id:
+                    vals['total_amount'] = current_currency._convert(
+                        total_ocr,
+                        self.company_currency_id,
+                        company=self.company_id,
+                        date=vals.get('date', self.date),
+                    )
+                else:
+                    vals['total_amount'] = total_ocr
 
             self.write(vals)
 
@@ -175,7 +200,7 @@ class HrExpense(models.Model):
     def _unlink_except_approved(self):
         super(HrExpense, self - self.filtered('sample'))._unlink_except_approved()
 
-    def _do_approve(self, check=True):
+    def _do_approve(self):
         # If we're dealing with sample expenses (demo data) then we should NEVER create any account.move
         # EXTENDS account
         today = fields.Date.context_today(self)
@@ -189,13 +214,7 @@ class HrExpense(models.Model):
                 }
             )
             expense.update_activities_and_mails()
-        return super(HrExpense, self - samples)._do_approve(check)
-
-    def action_post(self):
-        # Add an override for sample expenses
-        # EXTENDS account
-        samples = self.filtered('sample')
         for expense in samples:
             expense.state = 'paid'
 
-        return super(HrExpense, self - samples).action_post()
+        return super(HrExpense, self - samples)._do_approve()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=bad-whitespace
-from odoo import fields, Command
+from odoo import Command
 from odoo.tests import tagged
 from odoo.exceptions import UserError
 
@@ -9,6 +9,8 @@ from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
 @tagged('post_install', 'post_install_l10n', '-at_install')
 class TestDiot(TestAccountReportsCommon):
+
+    _test_user_groups = None  # FIXME list needed groups
 
     @classmethod
     @TestAccountReportsCommon.setup_country('mx')
@@ -77,7 +79,7 @@ class TestDiot(TestAccountReportsCommon):
 
         diot_report = self.env.ref('l10n_mx.diot_report')
 
-        options = self._generate_options(diot_report, fields.Date.from_string('2022-01-01'), fields.Date.from_string('2022-12-31'))
+        options = self._generate_options(diot_report, '2022-01-01', '2022-12-31')
         options['unfold_all'] = True
 
         self.assertLinesValues(
@@ -200,7 +202,7 @@ class TestDiot(TestAccountReportsCommon):
             'amount': multi_tax_line_move.amount_total,
         })._create_payments()
 
-        options = self._generate_options(diot_report, fields.Date.from_string('2022-01-01'), fields.Date.from_string('2022-12-31'))
+        options = self._generate_options(diot_report, '2022-01-01', '2022-12-31')
 
         self.assertLinesValues(
             diot_report._get_lines(options),
@@ -252,7 +254,7 @@ class TestDiot(TestAccountReportsCommon):
 
         diot_report = self.env.ref('l10n_mx.diot_report')
 
-        options = self._generate_options(diot_report, fields.Date.from_string('2022-01-01'), fields.Date.from_string('2022-12-31'))
+        options = self._generate_options(diot_report, '2022-01-01', '2022-12-31')
 
         self.assertLinesValues(
             diot_report._get_lines(options),
@@ -306,8 +308,7 @@ class TestDiot(TestAccountReportsCommon):
         moves.action_post()
 
         diot_report = self.env.ref('l10n_mx.diot_report')
-        options = self._generate_options(diot_report, fields.Date.from_string('2022-01-01'), fields.Date.from_string('2022-12-31'))
-        diot_report._init_currency_table(options)
+        options = self._generate_options(diot_report, '2022-01-01', '2022-12-31')
 
         with self.assertRaises(UserError, msg="The report cannot be generated because there are entries with tax amounts but no partner assigned."):
             self.env[diot_report.custom_handler_model_name].action_get_diot_txt(options)

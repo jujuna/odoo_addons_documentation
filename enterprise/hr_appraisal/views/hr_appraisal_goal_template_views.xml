@@ -33,7 +33,7 @@
                     </group>
                     <group>
                         <group name="tags_group">
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                         </group>
                     </group>
                     <notebook>
@@ -63,7 +63,7 @@
             <list sample="1" js_class="appraisal_goal_delete_list">
                 <field name="name"/>
                 <field name="child_ids" widget="many2many_tags" string="Sub Goals"/>
-                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="hide" string="Tags"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" optional="hide" string="Tags"/>
             </list>
         </field>
     </record>
@@ -90,7 +90,7 @@
                                     <span>months</span>
                                 </span>
                                 <span id="span_tag" invisible="not tag_ids">Tags:</span>
-                                <field name="tag_ids" invisible="not tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                <field name="tag_ids" invisible="not tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'on_tag_click': 'edit_color'}"/>
                             </div>
                         </div>
                     </t>
@@ -115,6 +115,7 @@
     <record id="action_hr_appraisal_goal_template" model="ir.actions.act_window">
         <field name="name">Goals Template</field>
         <field name="res_model">hr.appraisal.goal</field>
+        <field name="context">{'default_employee_ids': [(5, 0, 0)]}</field>
         <field name="search_view_id" ref="hr_appraisal_goal_template_view_search"/>
         <field name="view_mode">list,hierarchy,form</field>
         <field name="view_ids" eval="[(5, 0, 0),

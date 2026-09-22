@@ -18,7 +18,8 @@
                                 <field name="l10n_nz_payer_code" string="Analysis Code"/>
                                 <field name="l10n_nz_available_dd_bank_ids" invisible="True"/>
                                 <field name="l10n_nz_dd_account_id"
-                                       context="{'default_partner_id': partner_id, 'display_account_trust': True}"
+                                       widget="many2one_bank"
+                                       context="{'default_partner_id': partner_id}"
                                        invisible="payment_method_code != 'l10n_nz_eft_in'"
                                        required="payment_method_code == 'l10n_nz_eft_in'"/>
                             </group>

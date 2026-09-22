@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Website Appointment Lead Enrichment',
-    'version': '1.0',
     'category': 'Services/Appointment',
     'sequence': 2160,
     'summary': 'Enrich lead created automatically through an appointment with gathered website visitor information',
@@ -16,9 +14,4 @@ country and detailed information like pages browsed by the lead (through a link 
     'auto_install': True,
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'assets': {
-        'web.assets_tests': [
-            'website_appointment_crm/static/tests/tours/**/*',
-        ],
-    },
 }

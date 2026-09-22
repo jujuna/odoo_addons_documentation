@@ -3,18 +3,24 @@ import { ListController } from "@web/views/list/list_controller";
 import { registry } from "@web/core/registry";
 import { listView } from "@web/views/list/list_view";
 import { useService } from "@web/core/utils/hooks";
+import { usePlugin } from "@odoo/owl";
+import { ORM } from "@web/core/orm_plugin";
 
 export class TransientBankStatementLineListController extends ListController {
+    orm = usePlugin(ORM);
 
     setup() {
         super.setup();
-        this.orm = useService("orm");
         this.action = useService("action");
     }
 
     async onClickImportTransactions() {
         const resIds = await this.model.root.getResIds(true);
-        const resultAction = await this.orm.call("account.bank.statement.line.transient", "action_import_transactions", [resIds]);
+        const resultAction = await this.orm.call(
+            "account.bank.statement.line.transient",
+            "action_import_transactions",
+            [resIds]
+        );
         this.action.doAction(resultAction);
     }
 
@@ -24,7 +30,6 @@ export class TransientBankStatementLineListController extends ListController {
 }
 
 export class TransientBankStatementLineListRenderer extends ListRenderer {
-
     static template = "account_online_synchronization.TransientBankStatementLineRenderer";
 
     setup() {
@@ -34,9 +39,16 @@ export class TransientBankStatementLineListRenderer extends ListRenderer {
     }
 
     async openManualEntries() {
-        if (this.env.searchModel.context.active_model === "account.missing.transaction.wizard" && this.env.searchModel.context.active_ids) {
+        if (
+            this.env.searchModel.context.active_model === "account.missing.transaction.wizard" &&
+            this.env.searchModel.context.active_ids
+        ) {
             const activeIds = this.env.searchModel.context.active_ids;
-            const action = await this.orm.call("account.missing.transaction.wizard", "action_open_manual_bank_statement_lines", activeIds);
+            const action = await this.orm.call(
+                "account.missing.transaction.wizard",
+                "action_open_manual_bank_statement_lines",
+                activeIds
+            );
             this.action.doAction(action);
         }
     }
@@ -61,6 +73,8 @@ export const TransientBankStatementLineListView = {
     Renderer: TransientBankStatementLineListRenderer,
     Controller: TransientBankStatementLineListController,
     buttonTemplate: "TransientBankStatementLineButtonTemplate",
-}
+};
 
-registry.category("views").add("transient_bank_statement_line_list_view", TransientBankStatementLineListView);
+registry
+    .category("views")
+    .add("transient_bank_statement_line_list_view", TransientBankStatementLineListView);

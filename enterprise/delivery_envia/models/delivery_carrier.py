@@ -208,7 +208,7 @@ class DeliverCarrier(models.Model):
         }
 
     def envia_rate_shipment(self, order):
-        """ Returns shipping rate for the order and chosen shipping method."""
+        """ Returns shipping rate for the order and chosen delivery method."""
         if not self.envia_carrier_code or not self.envia_service_code:
             return {
                 'success': False,

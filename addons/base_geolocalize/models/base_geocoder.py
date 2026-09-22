@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
+import time
 
 from odoo import api, fields, models, modules, tools, _
 from odoo.exceptions import UserError
@@ -7,6 +8,10 @@ from odoo.http import request
 
 
 _logger = logging.getLogger(__name__)
+
+
+def get_google_map_api_key(env):
+    return env['ir.config_parameter'].sudo().get_str('base_geolocalize.google_map_api_key')
 
 
 class BaseGeo_Provider(models.Model):
@@ -27,7 +32,7 @@ class BaseGeocoder(models.AbstractModel):
 
     @api.model
     def _get_provider(self):
-        prov_id = self.env['ir.config_parameter'].sudo().get_param('base_geolocalize.geo_provider')
+        prov_id = self.env['ir.config_parameter'].sudo().get_int('base_geolocalize.geo_provider')
         if prov_id:
             provider = self.env['base.geo_provider'].browse(int(prov_id))
         if not prov_id or not provider.exists():
@@ -84,6 +89,7 @@ class BaseGeocoder(models.AbstractModel):
         if not addr:
             _logger.info('invalid address given')
             return None
+        time.sleep(15 if self.env.context.get('cron_id') else 1)
         import requests  # noqa: PLC0415
         url = 'https://nominatim.openstreetmap.org/search'
         try:
@@ -112,6 +118,7 @@ class BaseGeocoder(models.AbstractModel):
             return None
         if tools.config['test_enable'] or modules.module.current_test:
             raise UserError(_("OpenStreetMap calls disabled in testing environment."))
+        time.sleep(15 if self.env.context.get('cron_id') else 1)
         import requests  # noqa: PLC0415
         try:
             headers = {"User-Agent": "Odoo (http://www.odoo.com/contactus)"}
@@ -138,7 +145,7 @@ class BaseGeocoder(models.AbstractModel):
         """ Use google maps API. It won't work without a valid API key.
         :return: (latitude, longitude) or None if not found
         """
-        apikey = self.env['ir.config_parameter'].sudo().get_param('base_geolocalize.google_map_api_key')
+        apikey = get_google_map_api_key(self.env)
         if not apikey:
             raise UserError(_(
                 "API key for GeoCoding (Places) required.\n"

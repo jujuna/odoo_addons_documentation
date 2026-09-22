@@ -3,21 +3,22 @@
 # * delivery_sendcloud
 #
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 18:42+0000\n"
-"PO-Revision-Date: 2025-09-16 12:13+0000\n"
-"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
-"Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
+"POT-Creation-Date: 2026-08-28 17:50+0000\n"
+"PO-Revision-Date: 2026-09-18 01:16+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-master/"
 "delivery_sendcloud/ko/>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -47,8 +48,8 @@ msgid ""
 "than %(max_weight)s %(unit)s or choose another carrier."
 msgstr ""
 "\n"
-"각 제품의 중량이 %(max_weight)s%(unit)s를 넘지 않도록 패키지 전체에 제품을 분"
-"산하거나 다른 배송업체를 선택하세요."
+"각 제품의 중량이 %(max_weight)s%(unit)s를 넘지 않도록 패키지 전체에 제품을 "
+"분산하거나 다른 배송업체를 선택하세요."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -63,41 +64,41 @@ msgid "%(partner_name)s phone required"
 msgstr "%(partner_name)s 전화번호 필요"
 
 #. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
+#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Do not forget to load your "
-"SendCloud shipping products for a valid configuration."
+"<i class=\"oi\" data-icon=\"info\"/> Available shipping products depend on "
+"enabled carriers in your Sendcloud account."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/>SendCloud 배송 품목을 불러와서 알맞"
-"게 설정하시기 바랍니다."
+"<i class=\"oi\" data-icon=\"info\"/> 사용할 수 있는 배송 상품은 Sendcloud "
+"계정에 활성화되어 있는 운송업체에 따라 다릅니다."
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> In test environment, to avoid "
+"<i class=\"oi\" data-icon=\"warning\"/> Do not forget to load your SendCloud "
+"shipping products for a valid configuration."
+msgstr ""
+"<i class=\"oi\" data-icon=\"warning\"/>SendCloud 배송 품목을 불러와서 알맞게 "
+"설정하시기 바랍니다."
+
+#. module: delivery_sendcloud
+#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
+msgid ""
+"<i class=\"oi\" data-icon=\"warning\"/> In test environment, to avoid "
 "charges, your shippings are automatically <b>cancelled</b> after the label "
 "creation."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> 테스트 환경에서 청구되는 것을 피하"
-"기 위해서 배송 항목은 라벨 생성 후 자동으로 <b>취소됩니다</b>."
+"<i class=\"oi\" data-icon=\"warning\"/> 테스트 환경에서 청구되는 것을 피하기 "
+"위해서 배송 항목은 라벨 생성 후 자동으로 <b>취소됩니다</b>."
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> Only administrators can configure "
+"<i class=\"oi\" data-icon=\"warning\"/> Only administrators can configure "
 "the public and private keys."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> 관리자만 공개 키와 비공개 키를 설정"
-"할 수 있습니다."
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
-msgid ""
-"<i class=\"fa fa-info-circle\"/> Available shipping products depend on "
-"enabled carriers in your Sendcloud account."
-msgstr ""
-"<i class=\"fa fa-info-circle\"/> 사용할 수 있는 배송 상품은 Sendcloud 계정에 "
-"활성화되어 있는 운송업체에 따라 다릅니다."
+"<i class=\"oi\" data-icon=\"warning\"/> 관리자만 공개 키와 비공개 키를 "
+"설정할 수 있습니다."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__sendcloud_products_code
@@ -114,11 +115,6 @@ msgstr "사용 가능한 기능"
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_product__can_customize_functionalities
 msgid "Can Customize Functionalities"
 msgstr "기능 맞춤 설정 가능"
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
-msgid "Cancel"
-msgstr "취소"
 
 #. module: delivery_sendcloud
 #. odoo-javascript
@@ -188,6 +184,11 @@ msgid "Delivery"
 msgstr "배송"
 
 #. module: delivery_sendcloud
+#: model:ir.model,name:delivery_sendcloud.model_delivery_carrier
+msgid "Delivery Method"
+msgstr "배송 방법"
+
+#. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_shipping_method_sendcloud
 msgid "Delivery Product"
 msgstr "상품 배송"
@@ -200,10 +201,10 @@ msgid ""
 "weight, value, etc.\n"
 "Rules can override shipping product selected in Odoo"
 msgstr ""
-"Sendcloud 계정 유형에 따라 목적지, 무게, 금액 등 다양한 조건에 맞게 배송 방"
-"법 선택을 지시하는 규칙을 설정할 수 있습니다.\n"
-"이러한 규칙에는 Odoo에서 선택한 기본 배송 제품을 재정의할 수 있는 기능이 있습"
-"니다."
+"Sendcloud 계정 유형에 따라 목적지, 무게, 금액 등 다양한 조건에 맞게 배송 "
+"방법 선택을 지시하는 규칙을 설정할 수 있습니다.\n"
+"이러한 규칙에는 Odoo에서 선택한 기본 배송 제품을 재정의할 수 있는 기능이 "
+"있습니다."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__display_name
@@ -221,8 +222,8 @@ msgid ""
 "Each address line can only contain a maximum of 75 characters. You can split "
 "the address into multiple lines to try to avoid this limitation."
 msgstr ""
-"각 주소 줄에는 최대 75자까지만 입력할 수 있습니다. 제한없이 입력하려면 주소"
-"를 여러 줄로 나누어서 입력하세요."
+"각 주소 줄에는 최대 75자까지만 입력할 수 있습니다. 제한없이 입력하려면 "
+"주소를 여러 줄로 나누어서 입력하세요."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -231,8 +232,8 @@ msgid ""
 "Ensure picking has shipping weight, if using packages, each package should "
 "have a shipping weight"
 msgstr ""
-"픽업 정보에 배송 중량이 있는지 확인하십시오. 패키지를 사용하는 경우, 패키지마"
-"다 배송 중량 정보가 있어야만 합니다."
+"픽업 정보에 배송 중량이 있는지 확인하십시오. 패키지를 사용하는 경우, "
+"패키지마다 배송 중량 정보가 있어야만 합니다."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -283,6 +284,17 @@ msgid "Integration"
 msgstr "연동"
 
 #. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid "Invalid SendCloud URL."
+msgstr "잘못된 SendCloud URL입니다."
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_label_type
+msgid "Label Format"
+msgstr ""
+
+#. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_product__write_uid
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__write_uid
 msgid "Last Updated by"
@@ -304,8 +316,7 @@ msgstr "제품 로드"
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
 "Make sure country codes are set in partner country and warehouse country"
-msgstr ""
-"협력사 국가 및 창고 국가 정보에 국가 코드가 설정되어 있는지 확인하십시오."
+msgstr "협력사 국가 및 창고 국가 정보에 국가 코드가 설정되어 있는지 확인하십시오."
 
 #. module: delivery_sendcloud
 #. odoo-javascript
@@ -344,8 +355,11 @@ msgstr "SendCloud 운송업체여야 합니다!"
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
-msgid "No address found with contact name %s on your sendcloud account."
-msgstr "SendCloud 계정에서 연락처 이름이 %s인 주소를 찾을 수 없습니다."
+msgid ""
+"No address found matching Warehouse name \"%s\" on your sendcloud account. "
+"Please make sure there is an address with the same name under \"Address Name "
+"(optional)\" in your Sendcloud Address configuration."
+msgstr ""
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -358,8 +372,16 @@ msgstr "픽업 또는 주문 내용이 없습니다"
 #: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
 msgid ""
 "Note that a unit of the product '%s' is heavier than the maximum weight "
-"allowed by the shipping method."
-msgstr "제품 '%s'의 단위가 배송 수단에서 허용하는 최대 중량을 초과합니다."
+"allowed by the delivery method."
+msgstr ""
+
+#. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
+msgid ""
+"Note that this price is for %s packages since the order weight is more than "
+"the maximum packaging weight."
+msgstr ""
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -368,8 +390,6 @@ msgid ""
 "Note that this price is for %s packages since the order weight is more than "
 "the maximum weight allowed by the shipping method."
 msgstr ""
-"주문 중량이 배송 방법에서 허용하는 최대 중량을 초과하였으므로 %s 패키지의 가"
-"격이 새롭게 적용되었음을 확인해 주십시오."
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
@@ -389,6 +409,16 @@ msgid "Other Functionalities"
 msgstr "기타 기능"
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__application/pdf
+msgid "PDF"
+msgstr "PDF"
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__image/png
+msgid "PNG"
+msgstr "PNG"
+
+#. module: delivery_sendcloud
 #. odoo-javascript
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
 msgid ""
@@ -396,9 +426,6 @@ msgid ""
 "product. For some products, you can be charged for return labels printed but "
 "not used."
 msgstr ""
-"반품 제품을 선택하기 전에 SendCloud 반품 제품 설명서를 검토하세요.특정 품목"
-"의 경우 인쇄되었지만 사용하지 않은 반품 라벨에 대해 요금이 부과될 수 있습니"
-"다."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__delivery_type
@@ -421,14 +448,21 @@ msgid "Select the country to be used by this delivery method"
 msgstr "이 배송 방법을 사용할 국가를 선택하세요."
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields,help:delivery_sendcloud.field_delivery_carrier__sendcloud_label_type
+msgid ""
+"Select the label format to be used when sending shipments with Sendcloud."
+msgstr ""
+
+#. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid "SendCloud Configuration"
 msgstr "SendCloud 환경 설정"
 
 #. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.res_config_settings_view_form_sale
-msgid "SendCloud Shipping Methods"
-msgstr "SendCloud 배송 방법"
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid "SendCloud should be used with a context manager."
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__delivery_type__sendcloud
@@ -483,13 +517,9 @@ msgstr "Sendcloud 개인 키"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_id
+#: model:ir.module.module,shortdesc:base.module_delivery_sendcloud
 msgid "Sendcloud Shipping"
 msgstr "Sendcloud 배송"
-
-#. module: delivery_sendcloud
-#: model_terms:ir.ui.view,arch_db:delivery_sendcloud.res_config_settings_view_form_stock
-msgid "Sendcloud Shipping Methods"
-msgstr "Sendcloud 배송 방법"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_name
@@ -500,8 +530,7 @@ msgstr "Sendcloud 배송 품목"
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid "Sendcloud is not responding. Check your credentials and/or retry later."
-msgstr ""
-"Sendcloud가 응답하지 않습니다. 자격 증명을 확인하거나 나중에 다시 시도하세요."
+msgstr "Sendcloud가 응답하지 않습니다. 자격 증명을 확인하거나 나중에 다시 시도하세요."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__country_id
@@ -520,9 +549,9 @@ msgid "Shipping Carrier"
 msgstr "배송업체"
 
 #. module: delivery_sendcloud
-#: model:ir.model,name:delivery_sendcloud.model_delivery_carrier
-msgid "Shipping Methods"
-msgstr "배송 방법"
+#: model:ir.module.module,description:base.module_delivery_sendcloud
+msgid "Shipping Integration with Sendcloud platform"
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_product__name
@@ -551,8 +580,8 @@ msgid ""
 "Some packages in your transfer are too heavy for the heaviest available "
 "shipping method."
 msgstr ""
-"배송에 포함된 일부 패키지가 너무 무거워서 사용 가능한 가장 무거운 배송 방법"
-"을 사용할 수 없습니다."
+"배송에 포함된 일부 패키지가 너무 무거워서 사용 가능한 가장 무거운 배송 "
+"방법을 사용할 수 없습니다."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -602,9 +631,9 @@ msgid ""
 "delivery partner via the delivery order and make sure the parent of the "
 "delivery partner is the partner you want to ship to."
 msgstr ""
-"고객의 배송 주소가 픽업 위치에서 제거되었으며 이 정보는 Sendcloud에 필요합니"
-"다. 배송 주문을 통해 배송 파트너에 액세스하여 배송 파트너의 모기업이 배송하려"
-"는 파트너로 설정되어 있는지 확인하세요."
+"고객의 배송 주소가 픽업 위치에서 제거되었으며 이 정보는 Sendcloud에 "
+"필요합니다. 배송 주문을 통해 배송 파트너에 액세스하여 배송 파트너의 모기업이 "
+"배송하려는 파트너로 설정되어 있는지 확인하세요."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -702,8 +731,8 @@ msgstr "전송"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_use_batch_shipping
-msgid "Use Batch Shipping"
-msgstr "일괄 배송 사용"
+msgid "Use Multicollo"
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_rules
@@ -722,8 +751,8 @@ msgid ""
 "When sending multiple parcels, combine them in one shipment. Not supported "
 "for international shipping requiring customs' documentation"
 msgstr ""
-"여러 개의 소포를 발송할 때는 하나로 합쳐서 발송할 수 있습니다. 세관 서류가 필"
-"요한 국제 배송은 지원되지 않습니다."
+"여러 개의 소포를 발송할 때는 하나로 합쳐서 발송할 수 있습니다. 세관 서류가 "
+"필요한 국제 배송은 지원되지 않습니다."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -737,8 +766,7 @@ msgstr "SendCloud 배송 유형에 일반 및 개인 키를 추가해야 합니�
 msgid ""
 "You must assign the required 'Shipping From' field in order to search for "
 "available products"
-msgstr ""
-"사용 가능한 제품을 검색하려면 '배송 출발지' 필드를 필수로 입력해야 합니다."
+msgstr "사용 가능한 제품을 검색하려면 '배송 출발지' 필드를 필수로 입력해야 합니다."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -747,10 +775,15 @@ msgid "You must have a shipping product configured!"
 msgstr "배송 품목에 대해 설정해야 합니다!"
 
 #. module: delivery_sendcloud
+#: model:ir.model.fields.selection,name:delivery_sendcloud.selection__delivery_carrier__sendcloud_label_type__application/zpl
+msgid "ZPL"
+msgstr "ZPL"
+
+#. module: delivery_sendcloud
 #. odoo-javascript
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
 msgid "cm"
-msgstr "cm"
+msgstr ""
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.sendcloud_label_tracking
@@ -760,3 +793,9 @@ msgid ""
 msgstr ""
 "SendCloud에서 생성되었습니다. <br/>\n"
 "            <b>배송 조회:</b>"
+
+#. module: delivery_sendcloud
+#. odoo-javascript
+#: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
+msgid "g"
+msgstr ""

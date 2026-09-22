@@ -1,12 +1,13 @@
-import { Component } from "@odoo/owl";
+import { Component, t, useProps } from "@odoo/owl";
 import { getEmbeddedProps } from "@html_editor/others/embedded_component_utils";
 
 export class ReadonlyAccountReportComponent extends Component {
     static template = "accountant_knowledge.ReadonlyEmbeddedAccountReport";
-    static props = {
-        name: { type: String },
-        options: { type: Object },
-    };
+
+    props = useProps({
+        name: t.string(),
+        options: t.object(),
+    });
 
 }
 

@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Sweden - Accounting Reports',
-    'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
-    'author': "XCLUDE, Linserv, Odoo SA",
+    'author': "XCLUDE, Linserv, Odoo S.A.",
     'description': """
 Accounting reports for Sweden
     """,
@@ -19,8 +17,10 @@ Accounting reports for Sweden
         'data/account_return_data.xml',
         'data/tax_report_data.xml',
         'views/report_export_template.xml',
+        'wizard/ec_sales_list_submission_wizard.xml',
+        'wizard/vat_return_submission_wizard.xml',
+        'security/ir.access.csv',
     ],
-    'installable': True,
     'auto_install': ['l10n_se', 'account_reports'],
     'website': 'https://www.odoo.com/app/accounting',
     'license': 'OEEL-1',

@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Test US Payroll',
-    'countries': ['us'],
+    'name': 'United States - Test Payroll',
     'category': 'Human Resources',
     'summary': 'Test US Payroll',
     'depends': [
@@ -12,5 +10,5 @@
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'post_init_hook': '_generate_payslips',
+    'post_init_hook': 'generate_payslips',
 }

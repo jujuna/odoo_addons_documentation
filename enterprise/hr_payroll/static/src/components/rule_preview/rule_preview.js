@@ -1,15 +1,15 @@
 import { registry } from "@web/core/registry";
 import { formView } from "@web/views/form/form_view";
-import { Notebook } from "@web/core/notebook/notebook";
+import { Notebook, notebookProps } from "@web/core/notebook/notebook";
 import { FormRenderer } from "@web/views/form/form_renderer";
 import { FormCompiler } from "@web/views/form/form_compiler";
-import { onMounted, onPatched } from "@odoo/owl";
+import { onMounted, onPatched, useProps, t } from "@odoo/owl";
 
 export class RuleFormNotebook extends Notebook {
-    static props = {
-        ...Notebook.props,
-        onValueCheck: { type: Function, optional: true },
-    };
+    props = useProps({
+        ...notebookProps,
+        onValueCheck: t.function().optional(),
+    });
 
     setup() {
         super.setup();

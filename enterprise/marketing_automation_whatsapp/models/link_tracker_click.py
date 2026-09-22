@@ -18,6 +18,8 @@ class LinkTrackerClick(models.Model):
 
     @api.model
     def add_click(self, code, **route_values):
+        # override to manually call clicked on whatsapp message, as we have no
+        # mailing.trace delegation
         click = super().add_click(code, **route_values)
 
         if click and click.whatsapp_message_id:

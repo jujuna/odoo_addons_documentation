@@ -1,5 +1,5 @@
 import { _t } from "@web/core/l10n/translation";
-import { browser } from "@web/core/browser/browser";
+import { location, browser } from "@web/core/browser/browser";
 import { isDisplayStandalone } from "@web/core/browser/feature_detection";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { deserializeDateTime, serializeDateTime } from "@web/core/l10n/dates";
@@ -17,8 +17,10 @@ import {
     markup,
     onWillStart,
     onWillUnmount,
-    useExternalListener,
-    useState,
+    proxy,
+    t,
+    useListener,
+    useProps,
 } from "@odoo/owl";
 
 // Time (in ms, so 2 minutes) after which the user is considered inactive
@@ -52,19 +54,20 @@ export class RoomBookingView extends Component {
         RoomDisplayTime,
     };
     static template = "room.RoomBookingView";
-    static props = {
-        accessToken: String,
-        bookableBgColor: String,
-        bookedBgColor: String,
-        description: String,
-        id: Number,
-        name: String,
-    };
+
+    props = useProps({
+        accessToken: t.string(),
+        bookableBgColor: t.string(),
+        bookedBgColor: t.string(),
+        description: t.string(),
+        id: t.number(),
+        name: t.string(),
+    });
 
     setup() {
         this.manageRoomUrl = `/room/${this.props.accessToken}`;
         this.pwaService = useService("pwa");
-        this.state = useState({
+        this.state = proxy({
             bookings: [],
             bookingName: undefined,
             bookingToEdit: undefined,
@@ -97,7 +100,7 @@ export class RoomBookingView extends Component {
 
         // If the user is inactive for more than the  INACTIVITY_TIMEOUT, reset the view
         ["pointerdown", "keydown"].forEach((event) =>
-            useExternalListener(window, event, () => {
+            useListener(window, event, () => {
                 browser.clearTimeout(this.inactivityTimer);
                 this.inactivityTimer = browser.setTimeout(() => {
                     this.resetBookingForm();
@@ -208,7 +211,7 @@ export class RoomBookingView extends Component {
 
     installPwa() {
         browser.open(
-            `/scoped_app?app_id=room&path=${encodeURIComponent(browser.location.pathname.slice(1))}&app_name=${encodeURIComponent(this.props.name)}`,
+            `/scoped_app?app_id=room&path=${encodeURIComponent(location.pathname.slice(1))}&app_name=${encodeURIComponent(this.props.name)}`,
         );
     }
 

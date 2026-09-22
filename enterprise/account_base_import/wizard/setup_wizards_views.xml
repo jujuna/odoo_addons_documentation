@@ -6,10 +6,8 @@
         <field name="model">account.account</field>
         <field name="inherit_id" ref="account.init_accounts_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//list" position="inside">
-                <header>
-                   <button name="%(account_base_import.action_open_import_guide)d" type="action" string="Import" display="always"/>
-                </header>
+            <xpath expr="//list/header" position="inside">
+                <button name="%(account_base_import.action_open_import_guide)d" type="action" string="Import" display="always"/>
             </xpath>
         </field>
     </record>

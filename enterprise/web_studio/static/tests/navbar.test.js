@@ -1,13 +1,14 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
 import { advanceTime, queryAllTexts, resize, waitFor } from "@odoo/hoot-dom";
-import { animationFrame, Deferred } from "@odoo/hoot-mock";
+import { animationFrame } from "@odoo/hoot-mock";
 import { EventBus } from "@odoo/owl";
 import {
     contains,
     defineMenus,
+    getMockEnv,
     getService,
-    makeMockEnv,
+    makeTestApp,
     MockServer,
     mockService,
     mountWithCleanup,
@@ -102,14 +103,14 @@ test("menu buttons will not be placed under 'more' menu", async () => {
         };
     });
 
-    const env = await makeMockEnv();
+    await makeTestApp();
 
     const menuButtonsRegistry = registry.category("studio_navbar_menubuttons");
     menuButtonsRegistry.add(
         "app_menu_editor",
         {
             Component: AppMenuEditor,
-            props: { env },
+            props: { env: getMockEnv() },
         },
         { force: true }
     );
@@ -181,7 +182,7 @@ test("adapt navbar when leaving studio", async () => {
 
     expect(".o_menu_sections .o_menu_sections_more").toHaveCount(0);
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
 
     expect(".o_studio .o_menu_sections").toHaveCount(2);
     expect(".o_studio .o_menu_sections .o_menu_sections_more").toHaveCount(0);
@@ -206,9 +207,9 @@ test("adapt navbar when leaving studio", async () => {
 test("concurrency: open studio while loading the views", async () => {
     defineStudioEnvironment();
 
-    const def = new Deferred();
+    const def = Promise.withResolvers();
     onRpc("get_views", async () => {
-        await def;
+        await def.promise;
     });
 
     await mountWithCleanup(WebClientEnterprise);
@@ -217,11 +218,11 @@ test("concurrency: open studio while loading the views", async () => {
     await contains(".o_app[data-menu-xmlid=app_1]").click();
     expect(".o_web_studio_navbar_item.o_disabled").toHaveCount(1);
 
-    await contains(".o_web_studio_navbar_item button").click();
+    await contains(".o_web_studio_navbar_item").click();
     def.resolve();
 
     await waitFor(".o_kanban_view");
 
-    expect(".o_web_studio_navbar_item button:not(.o_disabled)").toHaveCount(1);
+    expect(".o_web_studio_navbar_item:not(.o_disabled)").toHaveCount(1);
     expect(".o_web_studio_editor_manager").toHaveCount(0);
 });

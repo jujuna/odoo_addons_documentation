@@ -5,7 +5,7 @@
         <field name="name">Marketing Automation: sync participants</field>
         <field name="model_id" ref="model_marketing_campaign"/>
         <field name="state">code</field>
-        <field name="code">model.search([('state', '=', 'running')]).sync_participants()</field>
+        <field name="code">model._cron_synchronize_participants()</field>
         <field name="interval_number">12</field>
         <field name="interval_type">hours</field>
     </record>
@@ -14,9 +14,17 @@
         <field name="name">Marketing Automation: execute activities</field>
         <field name="model_id" ref="model_marketing_campaign"/>
         <field name="state">code</field>
-        <field name="code">model.search([('state', '=', 'running')]).execute_activities()</field>
+        <field name="code">model._cron_execute_activities()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">hours</field>
     </record>
 
+    <record id="ir_cron_activity_check_activities_status" model="ir.cron">
+        <field name="name">Marketing Automation: check activities status</field>
+        <field name="model_id" ref="model_marketing_activity"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_update_status()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
 </odoo>

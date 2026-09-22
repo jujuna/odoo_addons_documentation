@@ -5,12 +5,12 @@
         <field name="model">mrp.bom</field>
         <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@icon='fa-clock-o']" position="before">
+            <button name="%(mrp.action_report_mrp_bom)d" position="after">
                 <button class="oe_stat_button" name="action_open_mps_view" type="object"
-                   icon="fa-area-chart" groups="mrp.group_mrp_manager">
+                   icon="area_chart" groups="mrp.group_mrp_manager">
                     <span>Schedules</span>
                 </button>
-            </xpath>
+            </button>
         </field>
     </record>
 </odoo>

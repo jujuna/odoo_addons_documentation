@@ -3,7 +3,6 @@
 import re
 
 from werkzeug.exceptions import NotFound
-from werkzeug.utils import redirect
 
 from odoo import http, _
 from odoo.fields import Domain
@@ -28,33 +27,37 @@ class WebsiteHelpdesk(http.Controller):
 
     def sitemap_helpdesk(env, rule, qs):
         HelpdeskTeam = env['helpdesk.team']
-        slug = env['ir.http']._slug
+
+        def match(loc):
+            return not qs or qs.lower() in loc.lower()
 
         dom = (
-            env['website'].get_current_website().website_domain()
+            env.website.website_domain()
             & Domain('use_website_helpdesk_form', '=', True)
             & Domain('website_published', '=', True)
         )
         dom += sitemap_qs2dom(qs, '/helpdesk', HelpdeskTeam._rec_name)
 
         teams = HelpdeskTeam.search(dom)
-        for team in teams:
-            loc = '/helpdesk/%s' % slug(team)
-            if not qs or qs.lower() in loc:
-                yield {'loc': loc}
-
         if not teams:
-            # avoid 404 or blank page in sitemap
             return False
 
-        if not qs or qs.lower() in '/helpdesk':
-            yield {'loc': '/helpdesk'}
+        # In case of multiple teams, add main helpdesk page
+        if len(teams) > 1:
+            loc = '/helpdesk'
+            if match(loc):
+                yield {'loc': loc}
+
+        for team in teams:
+            url = team.website_url
+            if not team.show_knowledge_base and match(url):
+                yield {'loc': url}
 
     @http.route(['/helpdesk', '/helpdesk/<model("helpdesk.team"):team>'], type='http', auth="public", website=True, sitemap=sitemap_helpdesk, list_as_website_content=_lt('Helpdesk'))
     def website_helpdesk_teams(self, team=None, **kwargs):
         search = kwargs.get('search')
 
-        teams_domain = Domain('use_website_helpdesk_form', '=', True) & Domain('website_id', '=', request.website.id)
+        teams_domain = Domain('use_website_helpdesk_form', '=', True) & Domain('website_id', '=', self.env.website.id)
         if not request.env.user.has_group('helpdesk.group_helpdesk_manager'):
             if team and not team.is_published:
                 raise NotFound()
@@ -72,10 +75,10 @@ class WebsiteHelpdesk(http.Controller):
                 redirect_url += '/knowledgebase'
             elif kwargs.get('contact_form'):
                 redirect_url += '/?contact_form=1'
-            return redirect(redirect_url)
+            return request.redirect(redirect_url, code=302)
 
         if team.show_knowledge_base and not kwargs.get('contact_form'):
-            return redirect(team.website_url + '/knowledgebase')
+            return request.redirect('%s/knowledgebase' % team.website_url, code=302)
 
         result = self.get_helpdesk_team_data(team or teams[0], search=search)
         result['multiple_teams'] = len(teams) > 1
@@ -87,17 +90,25 @@ class WebsiteHelpdesk(http.Controller):
             'main_object': team,
         }
 
-    @http.route(['/helpdesk/<model("helpdesk.team"):team>/knowledgebase'], type='http', auth="public", website=True, sitemap=True)
+    def sitemap_helpdesk_knowledge_base(env, rule, qs):
+        teams = env['helpdesk.team'].search([])
+        for team in teams:
+            if team.show_knowledge_base:
+                loc = '%s/knowledgebase' % team.website_url
+                if not qs or qs.lower() in loc:
+                    yield {'loc': loc}
+
+    @http.route(['/helpdesk/<model("helpdesk.team"):team>/knowledgebase'], type='http', auth="public", website=True, sitemap=sitemap_helpdesk_knowledge_base)
     def website_helpdesk_knowledge_base(self, team, **kwargs):
         if not team.show_knowledge_base:
-            return redirect(team.website_url)
+            return request.redirect(team.website_url, code=302)
 
         search = kwargs.get('search')
         search_kw = ['type', 'date', 'tag']
         if search is not None:
             searches = {
                 'search': search,
-                **{k: kwargs.get(k) for k in search_kw if request.website.is_view_active('website_helpdesk.navbar_search_%s' % k)}
+                **{k: kwargs.get(k) for k in search_kw if self.env.website.is_view_active('website_helpdesk.navbar_search_%s' % k)}
             }
 
             types = team._helpcenter_filter_types()
@@ -154,7 +165,7 @@ class WebsiteHelpdesk(http.Controller):
         search_results = []
         if search:
             for search_type in search_types:
-                count, results, dummy = request.website._search_with_fuzzy(search_type, search, limit=10, order='name', options=options)
+                count, results, _ = self.env.website._search_with_fuzzy(search_type, search, offset=0, limit=10, order='name', options=options)
                 if count:
                     for all_results in results:
                         if all_results.get('results', False):
@@ -169,20 +180,23 @@ class WebsiteForm(form.WebsiteForm):
 
     def _handle_website_form(self, model_name, **kwargs):
         email = request.params.get('partner_email')
-        if email:
+        if model_name == 'helpdesk.ticket' and email:
             if request.env.user.email == email:
                 partner = request.env.user.partner_id
             else:
-                partner = request.env['res.partner'].sudo().search([('email', '=', email)], limit=1)
+                team_company = request.env['helpdesk.team'].sudo().browse(int(request.params.get('team_id'))).company_id.id if request.params.get('team_id') else False
+                partner = request.env['mail.thread'].sudo()._mail_find_partner_from_emails(emails=[email], extra_domain=[('company_id', 'in', [team_company, False])])[0]
             if not partner:
                 partner = request.env['res.partner'].sudo().create({
                     'email': email,
                     'name': request.params.get('partner_name', False),
                     'phone': request.params.get('partner_phone', False),
-                    'company_name': request.params.get('partner_company_name', False),
+                    'parent_name': request.params.get('partner_company_name', False),
                     'lang': request.lang.code,
                 })
-            request.params['partner_id'] = partner.id
+            kwargs.update({'partner_id': partner.id})
+            if not request.env.user._is_internal():
+                kwargs.pop('partner_phone', None)  # disallow partner's phone modification via _inverse_partner_phone
 
         return super()._handle_website_form(model_name, **kwargs)
 
